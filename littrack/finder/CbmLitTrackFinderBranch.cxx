@@ -1,0 +1,246 @@
+#include "CbmLitTrackFinderBranch.h"
+
+#include "CbmLitTrackSelection.h"
+#include "CbmLitTrackPropagator.h"
+#include "CbmLitTrackUpdate.h"
+#include "CbmLitTrackFitter.h"
+
+#include <iostream>
+#include <cmath>
+
+CbmLitTrackFinderBranch::CbmLitTrackFinderBranch()
+{
+	fMaxNofBranches = 64;
+}
+
+CbmLitTrackFinderBranch::~CbmLitTrackFinderBranch()
+{
+	
+}
+
+LitStatus CbmLitTrackFinderBranch::Initialize()
+{
+	return kLITSUCCESS;
+}
+
+LitStatus CbmLitTrackFinderBranch::Finalize()
+{
+	return kLITSUCCESS;
+}
+
+LitStatus CbmLitTrackFinderBranch::DoFind(
+		const HitVector& hits,
+		const TrackVector& trackSeeds,
+		TrackVector& tracks)
+{
+
+	//TODO copy links
+	fHitsArray = hits;
+	fTrackSeeds = trackSeeds;
+
+	fTracks.clear();
+	fFoundTracks.clear();
+	fSeedsIdSet.clear();
+	fUsedHitsSet.clear();
+	fHits.clear();
+	fHits.resize(fLayout.GetNofLayers());
+	fMaxErrX.resize(fLayout.GetNofLayers());
+	fMaxErrY.resize(fLayout.GetNofLayers());
+	
+	for (Int_t iIter = 0; iIter < fNofIter; iIter++) {
+	       
+		SetIterationParameters(iIter);
+		
+		ArrangeHits();
+		      
+		InitTrackSeeds();
+		
+		TrackFollowing();
+		
+		fTrackSelectionFinal->DoSelect(fTracksCopy.begin(), fTracksCopy.end());
+		
+		RemoveHits(fTracksCopy.begin(), fTracksCopy.end());
+				
+		CopyToOutput(fTracksCopy.begin(), fTracksCopy.end(), tracks);
+		
+		for_each(fTracksCopy.begin(), fTracksCopy.end(), DeleteObject());
+		fTracksCopy.clear();		   
+		for (Int_t i = 0; i < fLayout.GetNofLayers(); i++) fHits[i].clear();
+	}
+	   
+	fEventNo++;
+	
+	std::cout << "-I- CbmLitTrackFinderBranch: " << fEventNo << " events processed" << std::endl;
+	
+	return kLITSUCCESS;
+}
+
+void CbmLitTrackFinderBranch::TrackFollowing()
+{  
+	//loop over stations
+	for (Int_t iStation = fBeginStation; iStation < fEndStation + 1; iStation++) { 
+
+		for (TrackIterator it = fTracks.begin(); it != fTracks.end(); it++) 
+			TrackFollowingStation(*it, iStation);
+		
+		if (fVerbose > 1)
+			std::cout << "-I- CbmLitTrackFinderImp::TrackFollowing:" 
+				<< fFoundTracks.size() << " followed in the "
+				<< iStation << " station" << std::endl;
+		
+		for_each(fTracks.begin(), fTracks.end(), DeleteObject());
+		fTracks.clear();
+			      
+		RefitTracks(fFoundTracks.begin(), fFoundTracks.end());
+
+		fTrackSelectionStation->DoSelect(fFoundTracks.begin(), fFoundTracks.end());
+
+		CopyToOutputArray();
+	    
+	} //loop over stations
+	
+	for_each(fTracks.begin(), fTracks.end(), DeleteObject());
+	fTracks.clear();
+}
+
+void CbmLitTrackFinderBranch::TrackFollowingStation(
+		CbmLitTrack *track, 
+		Int_t station) 
+{
+	Int_t nofLayers = fLayout.GetNofLayers(station);
+	std::vector<CbmLitTrackParam> par(nofLayers);
+	par[0] = *track->GetParamLast();
+	std::vector<CbmLitTrackParam> uPar(nofLayers);
+    HitVector hits(nofLayers);
+    std::vector<HitIteratorPair> bounds(nofLayers);
+    std::vector<Int_t> nofMissingHits(nofLayers, 0);
+    Int_t nofBranches = 0;
+    
+   Int_t layer = 0;
+   for (Int_t i = 0; i < station; i++) layer += fLayout.GetNofLayers(i);
+   
+   Int_t extraLoop = 0;
+   if (fMaxNofMissingHitsInStation > 0) extraLoop = 1;    
+   if (std::abs(layer - track->GetNofHits()) >= fMaxNofMissingHits) extraLoop = 0;
+   
+   if (fPropagator->Propagate(&par[0], fLayout.GetLayerZ(layer + 0)) == kLITERROR) return;
+   bounds[0] = MinMaxIndex(&par[0], layer + 0);
+   for (HitIterator iHit0 = bounds[0].first; iHit0 != bounds[0].second + extraLoop; iHit0++) { //1
+   
+      if (!ProcessLayer(0, iHit0, bounds[0], nofMissingHits, &par[0], &uPar[0], hits)) continue;
+       
+      if (fPropagator->Propagate(&uPar[0], &par[1], fLayout.GetLayerZ(layer + 1)) == kLITERROR) continue;
+      bounds[1] = MinMaxIndex(&par[1], layer + 1);
+      for (HitIterator iHit1 = bounds[1].first; iHit1 != bounds[1].second + extraLoop; iHit1++) { //2
+      
+         if (!ProcessLayer(1, iHit1, bounds[1], nofMissingHits, &par[1], &uPar[1], hits)) continue;
+         
+         if (nofLayers < 3) {
+        	 if (nofBranches++ > fMaxNofBranches) return;
+        	 AddTrackCandidate(track, hits, station);
+             continue;
+         }
+         
+         if (fPropagator->Propagate(&uPar[1], &par[2], fLayout.GetLayerZ(layer + 2)) == kLITERROR) continue;
+         bounds[2] = MinMaxIndex(&par[2], layer + 2);
+         for (HitIterator iHit2 = bounds[2].first; iHit2 != bounds[2].second + extraLoop; iHit2++) { //3
+            
+            if (!ProcessLayer(2, iHit2, bounds[2], nofMissingHits, &par[2], &uPar[2], hits)) continue;
+  
+            if (nofLayers < 4) {
+            	if (nofBranches++ > fMaxNofBranches) return;
+               AddTrackCandidate(track, hits, station);
+               continue;
+            }
+            
+            if (fPropagator->Propagate(&uPar[2], &par[3], fLayout.GetLayerZ(layer + 3)) == kLITERROR) continue;
+            bounds[3] = MinMaxIndex(&par[3], layer + 3);
+            for (HitIterator iHit3 = bounds[3].first; iHit3 != bounds[3].second + extraLoop; iHit3++) { //4
+            
+               if (!ProcessLayer(3, iHit3, bounds[3], nofMissingHits, &par[3],&uPar[3], hits)) continue;
+               
+               if (nofBranches++ > fMaxNofBranches) return;
+               AddTrackCandidate(track, hits, station);
+           
+            } //4
+         } //3
+      } //2
+   } //1
+}
+
+Bool_t CbmLitTrackFinderBranch::ProcessLayer(                      
+		Int_t layerInStation,
+		HitIterator &hitIt,
+		HitIteratorPair &bounds,
+ 		std::vector<Int_t>& nofMissingHits,  
+		CbmLitTrackParam* par,
+		CbmLitTrackParam* uPar,
+		HitVector& hits)
+{
+   Bool_t result = true;
+   
+   if (layerInStation == 0) nofMissingHits[0] = 0; 
+   else nofMissingHits[layerInStation] = nofMissingHits[layerInStation - 1];
+            
+   if (hitIt < bounds.second) {
+      hits[layerInStation] = *hitIt;
+      if (!IsIn(par,  hits[layerInStation])) result = false;
+      *uPar = *par; 
+      if (fApplyUpdateInLayer && result) fFilter->Update(uPar,  hits[layerInStation]);
+   } else {
+      hits[layerInStation] = NULL;
+      nofMissingHits[layerInStation]++;
+      if (nofMissingHits[layerInStation] > fMaxNofMissingHitsInStation) result = false;
+   }
+   
+   return result;
+}
+
+void CbmLitTrackFinderBranch::AddTrackCandidate(
+		CbmLitTrack* track,
+		const HitVector& hits, 
+		Int_t station)
+{
+   CbmLitTrack* newTrack = new CbmLitTrack(*track);
+
+   for (Int_t i = 0; i < hits.size(); i++) {
+	  if (hits[i] == NULL) continue;
+      newTrack->AddHit(hits[i]);
+   }
+     
+   newTrack->SortHits();   
+   newTrack->SetLastPlaneId(station);
+     
+   if (newTrack->GetNofHits() == 0) {
+      delete newTrack;
+      return;
+   }   
+
+   fFoundTracks.push_back(newTrack);
+}
+
+void CbmLitTrackFinderBranch::RefitTracks(
+		TrackIterator itBegin,
+		TrackIterator itEnd) 
+{
+   for (TrackIterator it = itBegin; it != itEnd; it++)
+	   fFitter->Fit(*it);
+}
+
+void CbmLitTrackFinderBranch::CopyToOutputArray() 
+{
+	for (TrackIterator iTrack = fFoundTracks.begin();
+		iTrack != fFoundTracks.end(); iTrack++) {
+			    		  
+		if ((*iTrack)->GetFlag() == 1) {
+			delete (*iTrack);              
+		} else {
+			fTracks.push_back(*iTrack);
+			fTracksCopy.push_back(new CbmLitTrack(*(*iTrack)));
+		}
+	}
+	fFoundTracks.clear();
+}
+
+ClassImp(CbmLitTrackFinderBranch)
+

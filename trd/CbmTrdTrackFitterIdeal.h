@@ -1,0 +1,34 @@
+// -------------------------------------------------------------------------
+// -----                CbmTrdTrackFitterIdeal header file             -----
+// -----                  Created 12/05/06  by D. Kresan               -----
+// -------------------------------------------------------------------------
+#ifndef CBMTRDTRACKFITTERIDEAL
+#define CBMTRDTRACKFITTERIDEAL
+
+#include "CbmTrdTrackFitter.h"
+
+class TClonesArray;
+class CbmTrdPoint;
+class CbmTrackParam;
+class CbmTrdTrack;
+
+
+class CbmTrdTrackFitterIdeal : public CbmTrdTrackFitter {
+
+private:
+    TClonesArray *fArrayTrdPoint;   // TRD points
+    TClonesArray *fArrayTrdHit;     // TRD hits
+
+public:
+    CbmTrdTrackFitterIdeal();
+    virtual ~CbmTrdTrackFitterIdeal();
+
+    void Init();
+    Int_t DoFit(CbmTrdTrack* pTrack);
+
+    void SetTrackParam(CbmTrdPoint* point, CbmTrackParam* trackParam);
+
+    ClassDef(CbmTrdTrackFitterIdeal,1);
+};
+
+#endif

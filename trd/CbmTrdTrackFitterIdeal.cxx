@@ -1,0 +1,125 @@
+// -------------------------------------------------------------------------
+// -----                CbmTrdTrackFitterIdeal source file             -----
+// -----                  Created 12/05/06  by D. Kresan               -----
+// -------------------------------------------------------------------------
+#include "CbmTrdTrackFitterIdeal.h"
+
+#include "CbmTrdPoint.h"
+#include "CbmTrdHit.h"
+#include "CbmTrdTrack.h"
+
+#include "CbmRootManager.h"
+
+#include "TClonesArray.h"
+#include "TVector3.h"
+
+#include <iostream>
+using std::cerr;
+using std::cout;
+using std::endl;
+
+
+//__________________________________________________________________________
+//
+// CbmTrdTrackFitterIdeal
+//
+// Concrete implementation of TRD track fitting algorithm, based on MC
+//
+
+
+// -------------------------------------------------------------------------
+CbmTrdTrackFitterIdeal::CbmTrdTrackFitterIdeal()
+{
+    // Default constructor
+}
+// -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+CbmTrdTrackFitterIdeal::~CbmTrdTrackFitterIdeal()
+{
+    // Destructor
+}
+// -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+void CbmTrdTrackFitterIdeal::Init()
+{
+    // Task initialisation
+    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    if(NULL == rootMgr) {
+	cerr << "-E- CbmTrdTrackFitterIdeal::Init : "
+	    << "ROOT manager is not instantiated!" << endl;
+        return;
+    }
+
+    fArrayTrdPoint = (TClonesArray*) rootMgr->GetObject("TRDPoint");
+    if(NULL == fArrayTrdPoint) {
+	cout << "-W- CbmTrdTrackFitterIdeal::Init : "
+            << "no TRD point array!" << endl;
+    }
+
+    fArrayTrdHit = (TClonesArray*) rootMgr->GetObject("TRDHit");
+    if(NULL == fArrayTrdHit) {
+	cout << "-W- CbmTrdTrackFitterIdeal::Init : "
+            << "no TRD hit array!" << endl;
+    }
+}
+// -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+Int_t CbmTrdTrackFitterIdeal::DoFit(CbmTrdTrack* pTrack)
+{
+    // Implementation of the fitting algorithm
+    if(NULL == fArrayTrdPoint ||
+       NULL == fArrayTrdHit) return 0;
+
+    // Parameters at the first plane
+    Int_t hitIndex = pTrack->GetTrdHitIndex(0);
+    if(hitIndex < 0) return 0;
+    CbmTrdHit* hit = (CbmTrdHit*) fArrayTrdHit->At(hitIndex);
+    if(NULL == hit) return 0;
+    Int_t pointIndex = hit->GetRefIndex();
+    if(pointIndex < 0) return 0;
+    CbmTrdPoint* point = (CbmTrdPoint*) fArrayTrdPoint->At(pointIndex);
+    if(NULL == point) return 0;
+    SetTrackParam(point, pTrack->GetParamFirst());
+
+    // Parameters at the last plane
+    hitIndex = pTrack->GetTrdHitIndex( pTrack->GetNofTrdHits()-1 );
+    if(hitIndex < 0) return 0;
+    hit = (CbmTrdHit*) fArrayTrdHit->At(hitIndex);
+    if(NULL == hit) return 0;
+    pointIndex = hit->GetRefIndex();
+    if(pointIndex < 0) return 0;
+    point = (CbmTrdPoint*) fArrayTrdPoint->At(pointIndex);
+    if(NULL == point) return 0;
+    SetTrackParam(point, pTrack->GetParamLast());
+
+    return 1;
+}
+// -------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------------------
+void CbmTrdTrackFitterIdeal::SetTrackParam(CbmTrdPoint* point, CbmTrackParam* trackParam)
+{
+    // Set track parameters from the MC point
+    TVector3 pos;
+    TVector3 mom;
+    point->Position(pos);
+    point->Momentum(mom);
+    trackParam->SetX(pos.X());
+    trackParam->SetY(pos.Y());
+    trackParam->SetZ(pos.Z());
+    trackParam->SetTx(mom.X()/mom.Z());
+    trackParam->SetTy(mom.Y()/mom.Z());
+}
+// -------------------------------------------------------------------------
+
+
+ClassImp(CbmTrdTrackFitterIdeal)
+
+

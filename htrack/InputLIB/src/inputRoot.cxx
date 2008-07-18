@@ -1,0 +1,2357 @@
+/* *******************************************************************
+// (C)opyright 2004
+// 
+// Institute of Computer Science V
+// Prof. M�ner
+// University of Mannheim, Germany
+// 
+// *******************************************************************
+// 
+// Designer(s):   Steinle / Gl�
+// 
+// *******************************************************************
+// 
+// Project:     Trackfinder for CBM-Project at GSI-Darmstadt, Germany
+// 
+// *******************************************************************
+// 
+// Description:
+//
+//   class:
+//     - reads the event information from a special file
+//
+// *******************************************************************
+//
+// $Author: csteinle $
+// $Date: 2007-06-19 14:32:30 $
+// $Revision: 1.11 $
+//
+// *******************************************************************/
+
+
+#include "../../MiscLIB/include/defs.h"
+#include "../../MiscLIB/include/conversionRoutines.h"
+#include "../../MiscLIB/include/globalWarningMsg.h"
+#include "../../RootFrameworkLIB/include/hitProducer.h"
+#include "../include/inputError.h"
+#include "../include/inputWarningMsg.h"
+#include "../include/inputRoot.h"
+#ifdef CBMROOTFRAMEWORK
+	#include "CbmStsPoint.h"
+#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+	#include "CbmStsMapsHit.h"
+	#include "CbmStsStripHit.h"
+	#include "CbmStsHybridHit.h"
+#else
+	#include "CbmMvdPoint.h"
+	#include "CbmStsHit.h"
+	#include "CbmMvdHit.h"
+#endif
+#else
+	#include "../../RootFrameworkLIB/include/CbmStsPoint.h"
+	#include "../../RootFrameworkLIB/include/CbmMvdPoint.h"
+	#include "../../RootFrameworkLIB/include/CbmStsMapsHit.h"
+	#include "../../RootFrameworkLIB/include/CbmStsStripHit.h"
+	#include "../../RootFrameworkLIB/include/CbmStsHybridHit.h"
+	#include "../../RootFrameworkLIB/include/CbmStsHit.h"
+	#include "../../RootFrameworkLIB/include/CbmMvdHit.h"
+#endif
+#include "TGeoManager.h"
+#include "TGeoMatrix.h"
+#include "TGeoShape.h"
+#include "TGeoTube.h"
+#include "TParticlePDG.h"
+#include <stdlib.h>
+#include <fstream>
+
+
+#ifdef DETECTORINFO
+	#include <iostream>
+#endif
+#ifdef HITINFO
+#ifndef DETECTORINFO
+	#include <iostream>
+#endif
+#endif
+#ifdef TRACKINFO
+#ifndef HITINFO
+#ifndef DETECTORINFO
+	#include <iostream>
+#endif
+#endif
+#endif
+
+
+
+
+/****************************************************************
+ * Method generates the name of the actual file to read.		*
+ ****************************************************************/
+
+std::string inputRoot::generateFileName(std::string name) {
+
+	std::string returnValue;
+
+	returnValue.clear();
+
+	if ((name.find("../") == 0) || (name.find("./") == 0)) {
+
+		if (getenv("VMCWORKDIR") != NULL) {
+
+			returnValue  = getenv("VMCWORKDIR");
+			returnValue += "/";
+
+		}
+
+	}
+
+	returnValue += name;
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * Method generates the name of the actual file to read.		*
+ ****************************************************************/
+
+std::string inputRoot::generateMvdStationFileName(unsigned int stationNumber) {
+
+	char        intBuffer[intConversionDigits + 1];
+	std::string returnValue;
+
+	returnValue  = geometryFileDirectory;
+	returnValue += "mvd_station";
+	uitos(stationNumber, intBuffer, 10, intConversionDigits);
+	returnValue += intBuffer;
+	returnValue += "_geom.";
+	returnValue += ASCIIVERSION;
+	returnValue += ".par";
+
+	return returnValue;
+
+}
+std::string inputRoot::generateStsStationFileName(unsigned int stationNumber) {
+
+	char        intBuffer[intConversionDigits + 1];
+	std::string returnValue;
+
+	returnValue  = geometryFileDirectory;
+	returnValue += "sts_station";
+	uitos(stationNumber, intBuffer, 10, intConversionDigits);
+	returnValue += intBuffer;
+	returnValue += "_geom.";
+	returnValue += ASCIIVERSION;
+	returnValue += ".par";
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * Method generates the name of the actual volume to read.		*
+ ****************************************************************/
+
+std::string inputRoot::generateMvdStationVolumeName(unsigned int stationNumber, bool newFormat) {
+
+	std::string returnValue;
+	char        intBuffer[intConversionDigits + 1];
+
+	returnValue  = "mvdstation";
+	uitos(stationNumber, intBuffer, 10, intConversionDigits);
+	if ((newFormat) && (stationNumber < 10))
+		returnValue += "0";
+	returnValue += intBuffer;
+
+	return returnValue;
+
+}
+std::string inputRoot::generateStsStationVolumeName(unsigned int stationNumber, bool newFormat) {
+
+	std::string returnValue;
+	char        intBuffer[intConversionDigits + 1];
+
+	returnValue  = "stsstation";
+	uitos(stationNumber, intBuffer, 10, intConversionDigits);
+	if ((newFormat) && (stationNumber < 10))
+		returnValue += "0";
+	returnValue += intBuffer;
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * Method reads the variables based on the detector stations.	*
+ ****************************************************************/
+
+bool inputRoot::readDetector() {
+
+	bool returnValue;
+
+	returnValue = readDetectorFromAsciiFile();
+
+	if (!returnValue)
+		returnValue = readDetectorFromAsciiFiles();
+
+	if (!returnValue)
+		returnValue = readDetectorFromTGeoManager();
+
+	return returnValue;
+
+}
+
+/**
+ * Method reads the variables of the detector from ascii file.
+ */
+
+bool inputRoot::readDetectorFromAsciiFile() {
+
+	bool                    returnValue;
+	unsigned int            numberOfStations;
+	ifstream*               inputFile;
+	std::string             skipInformation;
+	trackfinderInputStation actualStation;
+	int                     id;
+	std::string             type;
+	double                  thickness;
+	double                  distance;
+	double                  radiusIn;
+	double                  radiusOut;
+	double                  thicknessIn;
+	double                  thicknessOut;
+
+	numberOfStations = 0;
+
+	if (!detectorFileName.empty()) {
+
+		inputFile = new ifstream(detectorFileName.c_str());
+
+		if (inputFile->is_open()) {
+
+			*inputFile >> skipInformation >> numberOfStations;
+
+#ifdef DETECTORINFO
+
+			std::cout << std::endl;
+			std::cout << "numberOfStations: " << numberOfStations << std::endl;
+
+#endif
+
+			/* skip some information parameters in the file */
+			for (unsigned int i = 0; i < 16; i++) {
+
+				*inputFile >> skipInformation;
+
+			}
+
+			data.removeDetector();
+
+			/* get the information for each station */
+			for (unsigned int i = 0; i < numberOfStations; i++) {
+
+				*inputFile >> id >> type >> thickness >> distance >> radiusIn >> radiusOut >> thicknessIn >> thicknessOut;
+
+				/* set the id of the station */
+				actualStation.setId(id + numberOfVolumesInfrontOfSTS);
+				/* set the distnace of the station */
+				actualStation.setDistance(distance / 10);	/* factor to convert from mm to cm */
+				/* set the type of the station */
+				actualStation.removeType();
+
+				/* add the station */
+				data.addStation(actualStation);
+
+#ifdef DETECTORINFO
+
+				std::cout << "actualStationCounter: "    << i                               << std::endl;
+				std::cout << " id: "                     << actualStation.getId()           << std::endl;
+				std::cout << " distance: "               << actualStation.getDistance()     << std::endl;
+				std::cout << " isMaps: "                 << actualStation.isMapsType()      << std::endl;
+				std::cout << " isHybrid: "               << actualStation.isHybridType()    << std::endl;
+				std::cout << " isStrip: "                << actualStation.isStripType()     << std::endl;
+				std::cout << std::endl;
+
+#endif
+
+			}
+
+			inputFile->close();
+		
+			if (inputFile != NULL) {
+				delete inputFile;
+				inputFile = NULL;
+			}
+
+		}
+
+	}
+
+	if (numberOfStations > 0)
+		returnValue = true;
+	else {
+
+		asciiFileNotFoundWarningMsg* asciiFileNotFound = new asciiFileNotFoundWarningMsg(detectorFileName);
+		asciiFileNotFound->warningMsg();
+		if(asciiFileNotFound != NULL) {
+			delete asciiFileNotFound;
+			asciiFileNotFound = NULL;
+		}
+
+		returnValue = false;
+
+	}
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * Method reads the variables of the detector from ascii files.	*
+ ****************************************************************/
+
+bool inputRoot::readDetectorFromAsciiFiles() {
+
+	bool isMvdDetectorRead;
+	bool isStsDetectorRead;
+	bool isDetectorRead;
+
+	data.removeDetector();
+
+	if (readMapsHits)
+		isMvdDetectorRead = readDetectorFromAsciiFiles();
+	else
+		isMvdDetectorRead = false;
+
+	if (readHybridHits || readStripHits)
+		isStsDetectorRead = readDetectorFromAsciiFiles();
+	else
+		isStsDetectorRead = false;
+
+	if (readMapsHits) {
+
+		if (readHybridHits || readStripHits)
+			isDetectorRead = (isMvdDetectorRead && isStsDetectorRead);
+		else
+			isDetectorRead = (isMvdDetectorRead && !isStsDetectorRead);
+
+	}
+	else {
+
+		if (readHybridHits || readStripHits)
+			isDetectorRead = (!isMvdDetectorRead && isStsDetectorRead);
+		else
+			isDetectorRead = false;
+
+	}
+
+	return isDetectorRead;
+
+}
+bool inputRoot::readMvdDetectorFromAsciiFiles() {
+
+	bool                    returnValue;
+	unsigned int            numberOfStations;
+	std::string             actualStationFileName;
+	std::string             actualStationName;
+	ifstream*               inputFile;
+	trackfinderInputStation actualStation;
+	int                     id;
+	double                  distance;
+
+	numberOfStations  = 0;
+
+	/* get just the number of stations */
+	while (1 == 1) {
+
+		actualStationFileName = generateMvdStationFileName(numberOfStations + 1);
+
+		inputFile             = new ifstream(actualStationFileName.c_str());
+
+		if (!inputFile->is_open())
+			break;
+		
+		inputFile->close();
+		
+		if (inputFile != NULL) {
+			delete inputFile;
+			inputFile = NULL;
+		}
+
+		numberOfStations++;
+
+	}
+
+#ifdef DETECTORINFO
+
+	std::cout << std::endl;
+	std::cout << "numberOfStations: " << numberOfStations << std::endl;
+
+#endif
+
+	/* get the information for each station */
+	for (unsigned int i = 0; i < numberOfStations; i++) {
+
+		actualStationFileName = generateMvdStationFileName(i + 1);
+
+		inputFile             = new ifstream(actualStationFileName.c_str());
+
+		if (!inputFile->is_open()) {
+
+			asciiFilesNotFoundWarningMsg* asciiFilesNotFound = new asciiFilesNotFoundWarningMsg();
+			asciiFilesNotFound->warningMsg();
+			if(asciiFilesNotFound != NULL) {
+				delete asciiFilesNotFound;
+				asciiFilesNotFound = NULL;
+			}
+
+			numberOfStations = i;
+
+		}
+
+		*inputFile >> actualStationName >> id >> distance;
+		actualStation.setId(id);
+		actualStation.setDistance(distance);
+
+		inputFile->close();
+		
+		if (inputFile != NULL) {
+			delete inputFile;
+			inputFile = NULL;
+		}
+
+		/* set the type of the station */
+		actualStation.removeType();
+
+		/* add the station */
+		data.addStation(actualStation);
+
+#ifdef DETECTORINFO
+
+		std::cout << actualStationName           << ":"                             << std::endl;
+		std::cout << " actualStationFileName: "  << actualStationFileName           << std::endl;
+		std::cout << " id: "                     << actualStation.getId()           << std::endl;
+		std::cout << " distance: "               << actualStation.getDistance()     << std::endl;
+		std::cout << " isMaps: "                 << actualStation.isMapsType()      << std::endl;
+		std::cout << " isHybrid: "               << actualStation.isHybridType()    << std::endl;
+		std::cout << " isStrip: "                << actualStation.isStripType()     << std::endl;
+		std::cout << std::endl;
+
+#endif
+
+	}
+
+	if (numberOfStations > 0)
+		returnValue = true;
+	else {
+
+		asciiFilesNotFoundWarningMsg* asciiFilesNotFound = new asciiFilesNotFoundWarningMsg();
+		asciiFilesNotFound->warningMsg();
+		if(asciiFilesNotFound != NULL) {
+			delete asciiFilesNotFound;
+			asciiFilesNotFound = NULL;
+		}
+
+		returnValue = false;
+
+	}
+
+	return returnValue;
+
+}
+bool inputRoot::readStsDetectorFromAsciiFiles() {
+
+	bool                    returnValue;
+	unsigned int            numberOfStations;
+	std::string             actualStationFileName;
+	std::string             actualStationName;
+	ifstream*               inputFile;
+	trackfinderInputStation actualStation;
+	int                     id;
+	double                  distance;
+
+	numberOfStations  = 0;
+
+	/* get just the number of stations */
+	while (1 == 1) {
+
+		actualStationFileName = generateStsStationFileName(numberOfStations + 1);
+
+		inputFile             = new ifstream(actualStationFileName.c_str());
+
+		if (!inputFile->is_open())
+			break;
+		
+		inputFile->close();
+		
+		if (inputFile != NULL) {
+			delete inputFile;
+			inputFile = NULL;
+		}
+
+		numberOfStations++;
+
+	}
+
+#ifdef DETECTORINFO
+
+	std::cout << std::endl;
+	std::cout << "numberOfStations: " << numberOfStations << std::endl;
+
+#endif
+
+	/* get the information for each station */
+	for (unsigned int i = 0; i < numberOfStations; i++) {
+
+		actualStationFileName = generateStsStationFileName(i + 1);
+
+		inputFile             = new ifstream(actualStationFileName.c_str());
+
+		if (!inputFile->is_open()) {
+
+			asciiFilesNotFoundWarningMsg* asciiFilesNotFound = new asciiFilesNotFoundWarningMsg();
+			asciiFilesNotFound->warningMsg();
+			if(asciiFilesNotFound != NULL) {
+				delete asciiFilesNotFound;
+				asciiFilesNotFound = NULL;
+			}
+
+			numberOfStations = i;
+
+		}
+
+		*inputFile >> actualStationName >> id >> distance;
+		actualStation.setId(id);
+		actualStation.setDistance(distance);
+
+		inputFile->close();
+		
+		if (inputFile != NULL) {
+			delete inputFile;
+			inputFile = NULL;
+		}
+
+		/* set the type of the station */
+		actualStation.removeType();
+
+		/* add the station */
+		data.addStation(actualStation);
+
+#ifdef DETECTORINFO
+
+		std::cout << actualStationName           << ":"                             << std::endl;
+		std::cout << " actualStationFileName: "  << actualStationFileName           << std::endl;
+		std::cout << " id: "                     << actualStation.getId()           << std::endl;
+		std::cout << " distance: "               << actualStation.getDistance()     << std::endl;
+		std::cout << " isMaps: "                 << actualStation.isMapsType()      << std::endl;
+		std::cout << " isHybrid: "               << actualStation.isHybridType()    << std::endl;
+		std::cout << " isStrip: "                << actualStation.isStripType()     << std::endl;
+		std::cout << std::endl;
+
+#endif
+
+	}
+
+	if (numberOfStations > 0)
+		returnValue = true;
+	else {
+
+		asciiFilesNotFoundWarningMsg* asciiFilesNotFound = new asciiFilesNotFoundWarningMsg();
+		asciiFilesNotFound->warningMsg();
+		if(asciiFilesNotFound != NULL) {
+			delete asciiFilesNotFound;
+			asciiFilesNotFound = NULL;
+		}
+
+		returnValue = false;
+
+	}
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * Method reads the variables of the detector from TGeoManager.	*
+ ****************************************************************/
+
+bool inputRoot::readDetectorFromTGeoManager() {
+
+	bool isMvdDetectorRead;
+	bool isStsDetectorRead;
+	bool isDetectorRead;
+
+	data.removeDetector();
+
+	if (readMapsHits)
+		isMvdDetectorRead = readDetectorFromTGeoManager();
+	else
+		isMvdDetectorRead = false;
+
+	if (readHybridHits || readStripHits)
+		isStsDetectorRead = readDetectorFromTGeoManager();
+	else
+		isStsDetectorRead = false;
+
+	if (readMapsHits) {
+
+		if (readHybridHits || readStripHits)
+			isDetectorRead = (isMvdDetectorRead && isStsDetectorRead);
+		else
+			isDetectorRead = (isMvdDetectorRead && !isStsDetectorRead);
+
+	}
+	else {
+
+		if (readHybridHits || readStripHits)
+			isDetectorRead = (!isMvdDetectorRead && isStsDetectorRead);
+		else
+			isDetectorRead = false;
+
+	}
+
+	return isDetectorRead;
+
+}
+bool inputRoot::readMvdDetectorFromTGeoManager() {
+
+	bool                    returnValue;
+	unsigned int            i;
+	unsigned int            numberOfStations;
+	bool                    foundNodeName;
+	std::string             actualStationName;
+	std::string             nodeName;
+	TGeoVolume*             volume;
+	trackfinderInputStation actualStation;
+
+#ifdef DETECTORINFO
+
+	TGeoTube*       shape;
+	TGeoMaterial*   material;
+
+#endif
+
+	TGeoNode*       node;
+	TGeoMatrix*     matrix;
+	const double*   translation;
+
+	volume      = NULL;
+
+#ifdef DETECTORINFO
+
+	shape       = NULL;
+	material    = NULL;
+
+#endif
+
+	node        = NULL;
+	matrix      = NULL;
+	translation = NULL;
+
+	numberOfStations = 0;
+
+	if (gGeoManager != NULL) {
+
+		while (gGeoManager) {
+
+	        /* get name from volume */
+			actualStationName  = generateMvdStationVolumeName(numberOfStations + 1, false);
+		
+			if ((volume = gGeoManager->GetVolume(actualStationName.c_str())) == NULL)
+				break;
+
+			numberOfStations++;
+
+#ifdef DETECTORINFO
+
+			/* get the shape from volume */
+			shape    = (TGeoTube*) volume->GetShape();
+			if (shape == NULL) {
+				stationShapeNotFoundWarningMsg* noShape = new stationShapeNotFoundWarningMsg(actualStationName);
+				noShape->warningMsg();
+				if(noShape != NULL) {
+					delete noShape;
+					noShape = NULL;
+				}
+			}
+
+			/* get the material from volume */
+			material = (TGeoMaterial*) volume->GetMaterial();
+			if (material == NULL) {
+				stationMaterialNotFoundWarningMsg* noMaterial = new stationMaterialNotFoundWarningMsg(actualStationName);
+				noMaterial->warningMsg();
+				if(noMaterial != NULL) {
+					delete noMaterial;
+					noMaterial = NULL;
+				}
+			}
+
+			std::cout << actualStationName  << ":" << std::endl;
+			std::cout << " UID:     " << gGeoManager->GetUID(actualStationName.c_str()) << std::endl;
+			if (shape != NULL) {
+				std::cout << " Dz:      " << shape->GetDz()                   << std::endl;
+				std::cout << " Rmin:    " << shape->GetRmin()                 << std::endl;
+				std::cout << " Rmax:    " << shape->GetRmax()                 << std::endl;
+			}
+			if (material != NULL) {
+				std::cout << " A:       " << material->GetA()                 << std::endl;
+				std::cout << " Z:       " << material->GetZ()                 << std::endl;
+				std::cout << " Density: " << material->GetDensity()           << std::endl;
+				std::cout << " RadLen:  " << material->GetRadLen()            << std::endl;
+			}
+
+			std::cout << std::endl;
+
+#endif
+
+		}
+
+#ifdef DETECTORINFO
+
+		std::cout << std::endl;
+		std::cout << "numberOfStations: " << numberOfStations << std::endl;
+
+#endif
+
+		for (i = 0; i < numberOfStations; i++) {
+
+			node = NULL;
+
+	        /* get name from volume */
+			actualStationName = generateMvdStationVolumeName(i + 1, false);
+
+			/* get id from volume */
+			actualStation.setId(gGeoManager->GetUID(actualStationName.c_str()));
+
+			/* get name from node for volume, if it is in the vacuum */
+			nodeName  = topnode;
+			nodeName += "/";
+			nodeName += STSVACUUMFODLER;
+			nodeName += "/";
+			nodeName += actualStationName;
+			nodeName += "_1";
+
+			/* change to the node for the volume, if it exists */
+			foundNodeName = gGeoManager->cd(nodeName.c_str());
+
+			/* the node for the volume is not in the vacuum */
+			if (!foundNodeName) {
+
+				/* get name from node for volume, if it is not in the vacuum */
+				nodeName  = topnode;
+				nodeName += "/";
+				nodeName += actualStationName;
+				nodeName += "_1";
+
+				/* change to the node for the volume, if it exists */
+				foundNodeName = gGeoManager->cd(nodeName.c_str());
+
+			}
+
+			if (foundNodeName)
+			/* get the node for the volume */
+				node = gGeoManager->GetCurrentNode();
+			else
+				throw detectorNodeNotFoundError(nodeName);
+
+			/* get the matrix from node for volume */
+			if (node != NULL)
+				matrix = node->GetMatrix();
+
+			/* get the translation from the matrix for node for volume */
+			if (matrix != NULL)
+				translation = matrix->GetTranslation();
+			else
+				throw detectorMatrixNotFoundError(nodeName);
+		
+			/* set the distance for the detector */
+			if (translation != NULL)
+				actualStation.setDistance(translation[2]);
+			else
+				throw detectorTranslationNotFoundError(nodeName);
+
+			/* set the type of the station */
+			actualStation.removeType();
+
+			/* add the station */
+			data.addStation(actualStation);
+
+#ifdef DETECTORINFO
+
+			std::cout << actualStationName      << ":"                              << std::endl;
+			std::cout << " nodeName: "          << nodeName                         << std::endl;
+			std::cout << " translation: "       << translation[0]                   << " , ";
+			std::cout << translation[1]         << " , " << translation[2]          << std::endl;
+			std::cout << " id: "                << actualStation.getId()            << std::endl;
+			std::cout << " distance: "          << actualStation.getDistance()      << std::endl;
+			std::cout << " isMaps: "            << actualStation.isMapsType()       << std::endl;
+			std::cout << " isHybrid: "          << actualStation.isHybridType()     << std::endl;
+			std::cout << " isStrip: "           << actualStation.isStripType()      << std::endl;
+			std::cout << std::endl;
+
+#endif
+
+		}
+
+	}
+	else {
+
+		geoManagerNotFoundWarningMsg* geoManagerNotFound = new geoManagerNotFoundWarningMsg();
+		geoManagerNotFound->warningMsg();
+		if(geoManagerNotFound != NULL) {
+			delete geoManagerNotFound;
+			geoManagerNotFound = NULL;
+		}
+
+	}
+
+	if (numberOfStations > 0)
+		returnValue = true;
+	else
+		returnValue = false;
+
+	return returnValue;
+
+}
+bool inputRoot::readStsDetectorFromTGeoManager() {
+
+	bool                    returnValue;
+	unsigned int            i;
+	unsigned int            numberOfStations;
+	bool                    foundNodeName;
+	std::string             actualStationName;
+	std::string             nodeName;
+	TGeoVolume*             volume;
+	trackfinderInputStation actualStation;
+
+#ifdef DETECTORINFO
+
+	TGeoTube*       shape;
+	TGeoMaterial*   material;
+
+#endif
+
+	TGeoNode*       node;
+	TGeoMatrix*     matrix;
+	const double*   translation;
+
+	volume      = NULL;
+
+#ifdef DETECTORINFO
+
+	shape       = NULL;
+	material    = NULL;
+
+#endif
+
+	node        = NULL;
+	matrix      = NULL;
+	translation = NULL;
+
+	numberOfStations = 0;
+
+	if (gGeoManager != NULL) {
+
+		while (gGeoManager) {
+
+	        /* get name from volume */
+			actualStationName  = generateStsStationVolumeName(numberOfStations + 1, false);
+		
+			if ((volume = gGeoManager->GetVolume(actualStationName.c_str())) == NULL)
+				break;
+
+			numberOfStations++;
+
+#ifdef DETECTORINFO
+
+			/* get the shape from volume */
+			shape    = (TGeoTube*) volume->GetShape();
+			if (shape == NULL) {
+				stationShapeNotFoundWarningMsg* noShape = new stationShapeNotFoundWarningMsg(actualStationName);
+				noShape->warningMsg();
+				if(noShape != NULL) {
+					delete noShape;
+					noShape = NULL;
+				}
+			}
+
+			/* get the material from volume */
+			material = (TGeoMaterial*) volume->GetMaterial();
+			if (material == NULL) {
+				stationMaterialNotFoundWarningMsg* noMaterial = new stationMaterialNotFoundWarningMsg(actualStationName);
+				noMaterial->warningMsg();
+				if(noMaterial != NULL) {
+					delete noMaterial;
+					noMaterial = NULL;
+				}
+			}
+
+			std::cout << actualStationName  << ":" << std::endl;
+			std::cout << " UID:     " << gGeoManager->GetUID(actualStationName.c_str()) << std::endl;
+			if (shape != NULL) {
+				std::cout << " Dz:      " << shape->GetDz()                   << std::endl;
+				std::cout << " Rmin:    " << shape->GetRmin()                 << std::endl;
+				std::cout << " Rmax:    " << shape->GetRmax()                 << std::endl;
+			}
+			if (material != NULL) {
+				std::cout << " A:       " << material->GetA()                 << std::endl;
+				std::cout << " Z:       " << material->GetZ()                 << std::endl;
+				std::cout << " Density: " << material->GetDensity()           << std::endl;
+				std::cout << " RadLen:  " << material->GetRadLen()            << std::endl;
+			}
+
+			std::cout << std::endl;
+
+#endif
+
+		}
+
+#ifdef DETECTORINFO
+
+		std::cout << std::endl;
+		std::cout << "numberOfStations: " << numberOfStations << std::endl;
+
+#endif
+
+		for (i = 0; i < numberOfStations; i++) {
+
+			node = NULL;
+
+	        /* get name from volume */
+			actualStationName = generateStsStationVolumeName(i + 1, false);
+
+			/* get id from volume */
+			actualStation.setId(gGeoManager->GetUID(actualStationName.c_str()));
+
+			/* get name from node for volume, if it is in the vacuum */
+			nodeName  = topnode;
+			nodeName += "/";
+			nodeName += STSVACUUMFODLER;
+			nodeName += "/";
+			nodeName += actualStationName;
+			nodeName += "_1";
+
+			/* change to the node for the volume, if it exists */
+			foundNodeName = gGeoManager->cd(nodeName.c_str());
+
+			/* the node for the volume is not in the vacuum */
+			if (!foundNodeName) {
+
+				/* get name from node for volume, if it is not in the vacuum */
+				nodeName  = topnode;
+				nodeName += "/";
+				nodeName += actualStationName;
+				nodeName += "_1";
+
+				/* change to the node for the volume, if it exists */
+				foundNodeName = gGeoManager->cd(nodeName.c_str());
+
+			}
+
+			if (foundNodeName)
+			/* get the node for the volume */
+				node = gGeoManager->GetCurrentNode();
+			else
+				throw detectorNodeNotFoundError(nodeName);
+
+			/* get the matrix from node for volume */
+			if (node != NULL)
+				matrix = node->GetMatrix();
+
+			/* get the translation from the matrix for node for volume */
+			if (matrix != NULL)
+				translation = matrix->GetTranslation();
+			else
+				throw detectorMatrixNotFoundError(nodeName);
+		
+			/* set the distance for the detector */
+			if (translation != NULL)
+				actualStation.setDistance(translation[2]);
+			else
+				throw detectorTranslationNotFoundError(nodeName);
+
+			/* set the type of the station */
+			actualStation.removeType();
+
+			/* add the station */
+			data.addStation(actualStation);
+
+#ifdef DETECTORINFO
+
+			std::cout << actualStationName      << ":"                              << std::endl;
+			std::cout << " nodeName: "          << nodeName                         << std::endl;
+			std::cout << " translation: "       << translation[0]                   << " , ";
+			std::cout << translation[1]         << " , " << translation[2]          << std::endl;
+			std::cout << " id: "                << actualStation.getId()            << std::endl;
+			std::cout << " distance: "          << actualStation.getDistance()      << std::endl;
+			std::cout << " isMaps: "            << actualStation.isMapsType()       << std::endl;
+			std::cout << " isHybrid: "          << actualStation.isHybridType()     << std::endl;
+			std::cout << " isStrip: "           << actualStation.isStripType()      << std::endl;
+			std::cout << std::endl;
+
+#endif
+
+		}
+
+	}
+	else {
+
+		geoManagerNotFoundWarningMsg* geoManagerNotFound = new geoManagerNotFoundWarningMsg();
+		geoManagerNotFound->warningMsg();
+		if(geoManagerNotFound != NULL) {
+			delete geoManagerNotFound;
+			geoManagerNotFound = NULL;
+		}
+
+	}
+
+	if (numberOfStations > 0)
+		returnValue = true;
+	else
+		returnValue = false;
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * Method initializes special parts of the object.				*
+ ****************************************************************/
+
+void inputRoot::initSpecial(CbmRootManager* manager) {
+
+	std::string stsHitBranch;
+
+	stsHitBranch.clear();
+
+#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+
+	if (readMapsHits)
+		stsHitBranch += STSMAPSHITBRANCH;
+	if (readHybridHits) {
+		if (readMapsHits)
+			stsHitBranch += ", ";
+		stsHitBranch += STSHYBRIDHITBRANCH;
+	}
+	if (readStripHits) {
+		if ((readMapsHits) || (readHybridHits))
+			stsHitBranch += ", ";
+		stsHitBranch += STSSTRIPHITBRANCH;
+	}
+
+#else
+
+	if (readMapsHits)
+		stsHitBranch += MVDHITBRANCH;
+	if (readHybridHits || readStripHits) {
+		if (readMapsHits)
+			stsHitBranch += ", ";
+		stsHitBranch += STSHITBRANCH;
+	}
+
+#endif
+
+	if (getenv("VMCWORKDIR") != NULL) {
+
+		geometryFileDirectory = getenv("VMCWORKDIR");
+
+	}
+	else {
+
+		geometryFileDirectory = getGeometryFileRelativePath();
+
+#ifdef ENABLEALLWARNINGS
+
+		cbmrootEnvironmentVariableNotFoundWarningMsg* cbmrootEnvironmentVariableNotFound = new cbmrootEnvironmentVariableNotFoundWarningMsg(geometryFileDirectory);
+		cbmrootEnvironmentVariableNotFound->warningMsg();
+		if(cbmrootEnvironmentVariableNotFound != NULL) {
+			delete cbmrootEnvironmentVariableNotFound;
+			cbmrootEnvironmentVariableNotFound = NULL;
+		}
+
+#endif
+
+	}
+
+	geometryFileDirectory += "/geometry/";
+
+	/* get pointer to the list of mc tracks */
+	inputTracks = (TClonesArray*) manager->ActivateBranch(MCTRACKBRANCH);
+
+	if (inputTracks == NULL)
+		throw noTrackInFileError(MCTRACKBRANCH);
+
+	if (readPointsFromFile) {
+
+		/* get pointer to the list of sts points */
+
+#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+
+		if (readMapsHits || readHybridHits || readStripHits) {
+	
+			inputStsPoints = (TClonesArray*) manager->ActivateBranch(STSPOINTBRANCH);
+
+			if (inputStsPoints == NULL)
+				throw noPointInFileError(STSPOINTBRANCH);
+
+		}
+
+#else
+
+		if (readMapsHits) {
+	
+			inputMvdPoints = (TClonesArray*) manager->ActivateBranch(MVDPOINTBRANCH);
+
+			if (inputMvdPoints == NULL)
+				throw noPointInFileError(MVDPOINTBRANCH);
+
+		}
+
+		if (readHybridHits || readStripHits) {
+	
+			inputStsPoints = (TClonesArray*) manager->ActivateBranch(STSPOINTBRANCH);
+
+			if (inputStsPoints == NULL)
+				throw noPointInFileError(STSPOINTBRANCH);
+
+		}
+
+#endif
+
+	}
+
+	if (readHitsFromFile) {
+
+#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+
+		if (readMapsHits)
+
+#ifdef CBMROOTFRAMEWORKINPUTCOMPATIBILITY
+
+			inputMapsHits   = (TClonesArray*) manager->GetRegisteredObject(STSMAPSHITBRANCH);
+
+#else
+
+			inputMapsHits   = (TClonesArray*) manager->ActivateBranch(STSMAPSHITBRANCH);
+
+#endif
+
+		if (readHybridHits)
+
+#ifdef CBMROOTFRAMEWORKINPUTCOMPATIBILITY
+
+			inputHybridHits = (TClonesArray*) manager->GetRegisteredObject(STSHYBRIDHITBRANCH);
+
+#else
+
+			inputHybridHits = (TClonesArray*) manager->ActivateBranch(STSHYBRIDHITBRANCH);
+
+#endif
+
+		if (readStripHits)
+
+#ifdef CBMROOTFRAMEWORKINPUTCOMPATIBILITY
+
+			inputStripHits  = (TClonesArray*) manager->GetRegisteredObject(STSSTRIPHITBRANCH);
+
+#else
+
+			inputStripHits  = (TClonesArray*) manager->ActivateBranch(STSSTRIPHITBRANCH);
+
+#endif
+
+#else
+
+		if (readMapsHits)
+
+#ifdef CBMROOTFRAMEWORKINPUTCOMPATIBILITY
+
+			inputMvdHits   = (TClonesArray*) manager->GetRegisteredObject(MVDHITBRANCH);
+
+#else
+
+			inputMvdHits   = (TClonesArray*) manager->ActivateBranch(MVDHITBRANCH);
+
+#endif
+
+		if (readHybridHits || readStripHits)
+
+#ifdef CBMROOTFRAMEWORKINPUTCOMPATIBILITY
+
+			inputStsHits = (TClonesArray*) manager->GetRegisteredObject(STSHITBRANCH);
+
+#else
+
+			inputStsHits = (TClonesArray*) manager->ActivateBranch(STSHITBRANCH);
+
+#endif
+
+#endif
+
+		if ((inputMvdHits == NULL) && (inputStsHits == NULL) && (inputMapsHits == NULL) && (inputHybridHits == NULL) && (inputStripHits == NULL)) {
+
+			noHitWarningMsg* noHit = new noHitWarningMsg(stsHitBranch, STSPOINTBRANCH);
+			noHit->warningMsg();
+			if(noHit != NULL) {
+				delete noHit;
+				noHit = NULL;
+			}
+
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * Method reads the data from the file.							*
+ ****************************************************************/
+
+void inputRoot::read(unsigned int event, TClonesArray* mvdHitArray, TClonesArray* stsHitArray, TClonesArray* mHitArray, TClonesArray* hHitArray, TClonesArray* sHitArray) {
+
+	bool readEventFromRootManager;
+
+	addDictionaries();
+
+	if (readPointsFromFile) {
+
+		if (readHitsFromFile) {
+
+			disableAutomaticReadHitsWarningMsg* disableAutomaticReadHits = new disableAutomaticReadHitsWarningMsg();
+			disableAutomaticReadHits->warningMsg();
+			if(disableAutomaticReadHits != NULL) {
+				delete disableAutomaticReadHits;
+				disableAutomaticReadHits = NULL;
+			}
+
+		}
+		else {
+
+#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+
+			if (readMapsHits)
+				inputMapsHits   = mHitArray;
+			if (readHybridHits)
+				inputHybridHits = hHitArray;
+			if (readStripHits)
+				inputStripHits  = sHitArray;
+
+#else
+
+			if (readMapsHits)
+				inputMvdHits    = mvdHitArray;
+			if (readHybridHits || readStripHits)
+				inputStsHits    = stsHitArray;
+
+#endif
+
+		}
+
+		readEventFromRootManager = true;
+
+	}
+	else {
+
+		noHitToPointWarningMsg* noHitToPoint = new noHitToPointWarningMsg();
+		noHitToPoint->warningMsg();
+		if(noHitToPoint != NULL) {
+			delete noHitToPoint;
+			noHitToPoint = NULL;
+		}
+
+		if (readHitsFromFile) {
+
+			disableAutomaticReadHitsWarningMsg* disableAutomaticReadHits = new disableAutomaticReadHitsWarningMsg();
+			disableAutomaticReadHits->warningMsg();
+			if(disableAutomaticReadHits != NULL) {
+				delete disableAutomaticReadHits;
+				disableAutomaticReadHits = NULL;
+			}
+
+			readEventFromRootManager = true;
+
+		}
+		else {
+
+#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+
+			if (readMapsHits)
+				inputMapsHits   = mHitArray;
+			if (readHybridHits)
+				inputHybridHits = hHitArray;
+			if (readStripHits)
+				inputStripHits  = sHitArray;
+
+#else
+
+			if (readMapsHits)
+				inputMvdHits    = mvdHitArray;
+			if (readHybridHits || readStripHits)
+				inputStsHits    = stsHitArray;
+
+#endif
+
+			readEventFromRootManager = false;
+
+		}
+
+	}
+
+#ifndef CBMROOTFRAMEWORK
+
+	if (readEventFromRootManager) {
+
+		/* get pointer to ROOT manager */
+		CbmRootManager* manager = CbmRootManager::Instance();
+		if (manager == NULL)
+			throw cannotAccessRootManagerError(INPUTLIB);
+
+		if (!manager->getEvent(event))
+			throw eventNotFoundError(event);
+
+	}
+
+#endif
+
+}
+
+/**
+ * Method returns the relative path for the geometry file.
+ */
+
+std::string inputRoot::getGeometryFileRelativePath() {
+
+	return ".";
+
+}
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+inputRoot::inputRoot() : inputData() {
+
+	inputTracks        = NULL;
+	inputStsPoints     = NULL;
+	inputMvdPoints     = NULL;
+	inputMapsHits      = NULL;
+	inputStripHits     = NULL;
+	inputHybridHits    = NULL;
+	inputStsHits       = NULL;
+	inputMvdHits       = NULL;
+	detectorFileName.clear();
+	numberOfVolumesInfrontOfSTS = 0;
+	geometryFileDirectory.clear();
+	topnode.clear();
+	hitsProduced       = false;
+	readPointsFromFile = false;
+	readHitsFromFile   = false;
+	readMapsHits       = false;
+	readHybridHits     = false;
+	readStripHits      = false;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+inputRoot::inputRoot(bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) : inputData(detMask) {
+
+	inputTracks        = NULL;
+	inputStsPoints     = NULL;
+	inputMvdPoints     = NULL;
+	inputMapsHits      = NULL;
+	inputStripHits     = NULL;
+	inputHybridHits    = NULL;
+	inputStsHits       = NULL;
+	inputMvdHits       = NULL;
+	detectorFileName.clear();
+	numberOfVolumesInfrontOfSTS = 0;
+	geometryFileDirectory.clear();
+	topnode.clear();
+	hitsProduced       = false;
+	readPointsFromFile = enableJustPoints;
+	readHitsFromFile   = enableHitsFromFile;
+	readMapsHits       = enableMapsHits;
+	readHybridHits     = enableHybridHits;
+	readStripHits      = enableStripHits;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+inputRoot::inputRoot(const char* name, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) : inputData(detMask, hitProducer) {
+
+	CbmRootManager* manager;
+	std::string     fileName;
+
+	/* get pointer to ROOT manager */
+	manager  = CbmRootManager::Instance();
+	if (manager == NULL)
+		throw cannotAccessRootManagerError(INPUTLIB);
+
+	fileName = generateFileName(name);
+
+	manager->OpenInFile(fileName.c_str());
+
+	inputTracks        = NULL;
+	inputStsPoints     = NULL;
+	inputMvdPoints     = NULL;
+	inputMapsHits      = NULL;
+	inputStripHits     = NULL;
+	inputHybridHits    = NULL;
+	inputStsHits       = NULL;
+	inputMvdHits       = NULL;
+	detectorFileName.clear();
+	numberOfVolumesInfrontOfSTS = 0;
+	geometryFileDirectory.clear();
+	topnode.clear();
+	hitsProduced       = false;
+	readPointsFromFile = enableJustPoints;
+	readHitsFromFile   = enableHitsFromFile;
+	readMapsHits       = enableMapsHits;
+	readHybridHits     = enableHybridHits;
+	readStripHits      = enableStripHits;
+
+}
+inputRoot::inputRoot(const char* detectorFileName, unsigned short numberOfVolumesInfrontOfSTS, bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) : inputData(detMask) {
+
+	inputTracks                       = NULL;
+	inputStsPoints                    = NULL;
+	inputMvdPoints                    = NULL;
+	inputMapsHits                     = NULL;
+	inputStripHits                    = NULL;
+	inputHybridHits                   = NULL;
+	inputStsHits                      = NULL;
+	inputMvdHits                      = NULL;
+	this->detectorFileName            = detectorFileName;
+	this->numberOfVolumesInfrontOfSTS = numberOfVolumesInfrontOfSTS;
+	geometryFileDirectory.clear();
+	topnode.clear();
+	hitsProduced                      = false;
+	readPointsFromFile                = enableJustPoints;
+	readHitsFromFile                  = enableHitsFromFile;
+	readMapsHits                      = enableMapsHits;
+	readHybridHits                    = enableHybridHits;
+	readStripHits                     = enableStripHits;
+
+}
+inputRoot::inputRoot(const char* name, const char* detectorFileName, unsigned short numberOfVolumesInfrontOfSTS, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) : inputData(detMask, hitProducer) {
+
+	CbmRootManager* manager;
+	std::string     fileName;
+
+	/* get pointer to ROOT manager */
+	manager  = CbmRootManager::Instance();
+	if (manager == NULL)
+		throw cannotAccessRootManagerError(INPUTLIB);
+
+	fileName = generateFileName(name);
+
+	manager->OpenInFile(fileName.c_str());
+
+	inputTracks                       = NULL;
+	inputStsPoints                    = NULL;
+	inputMvdPoints                    = NULL;
+	inputMapsHits                     = NULL;
+	inputStripHits                    = NULL;
+	inputHybridHits                   = NULL;
+	inputStsHits                      = NULL;
+	inputMvdHits                      = NULL;
+	this->detectorFileName            = detectorFileName;
+	this->numberOfVolumesInfrontOfSTS = numberOfVolumesInfrontOfSTS;
+	geometryFileDirectory.clear();
+	topnode.clear();
+	hitsProduced                      = false;
+	readPointsFromFile                = enableJustPoints;
+	readHitsFromFile                  = enableHitsFromFile;
+	readMapsHits                      = enableMapsHits;
+	readHybridHits                    = enableHybridHits;
+	readStripHits                     = enableStripHits;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+inputRoot::~inputRoot() {
+
+	/* delete allocated space */
+	if (hitsProduced) {
+		if (inputMapsHits != NULL) {
+			inputMapsHits->RemoveAll();
+			delete inputMapsHits;
+			inputMapsHits = NULL;
+		}
+		if (inputStripHits != NULL) {
+			inputStripHits->RemoveAll();
+			delete inputStripHits;
+			inputStripHits = NULL;
+		}
+		if (inputHybridHits != NULL) {
+			inputHybridHits->RemoveAll();
+			delete inputHybridHits;
+			inputHybridHits = NULL;
+		}
+		if (inputStsHits != NULL) {
+			inputStsHits->RemoveAll();
+			delete inputStsHits;
+			inputStsHits = NULL;
+		}
+		if (inputMvdHits != NULL) {
+			inputMvdHits->RemoveAll();
+			delete inputMvdHits;
+			inputMvdHits = NULL;
+		}
+	}
+
+}
+
+/****************************************************************
+ * method initializes the object.								*
+ ****************************************************************/
+
+void inputRoot::init() {
+
+	CbmRootManager* manager;
+	TGeoNode*       topGeoNode;
+
+	inputTracks     = NULL;
+	inputStsPoints  = NULL;
+	inputMvdPoints  = NULL;
+	inputMapsHits   = NULL;
+	inputStripHits  = NULL;
+	inputHybridHits = NULL;
+	inputStsHits    = NULL;
+	inputMvdHits    = NULL;
+	hitsProduced    = false;
+	manager         = NULL;
+
+	data.init();
+
+	/* get pointer to the topnode of the geoManager */
+	if (gGeoManager != NULL) {
+
+		topGeoNode = gGeoManager->GetTopNode();
+
+		if (topGeoNode != NULL)
+			topnode = TString(topGeoNode->GetName()).Data();
+		else
+			topnode.clear();
+
+	}
+	else
+		topnode.clear();
+
+	/* get pointer to ROOT manager */
+	manager     = CbmRootManager::Instance();
+	if (manager == NULL)
+		throw cannotAccessRootManagerError(INPUTLIB);
+
+	initSpecial(manager);
+
+	data.initDefaultDetector();
+
+}
+void inputRoot::init(const char* name, int hitProducer) {
+
+	CbmRootManager* manager;
+	std::string     fileName;
+
+	/* get pointer to ROOT manager */
+	manager  = CbmRootManager::Instance();
+	if (manager == NULL)
+		throw cannotAccessRootManagerError(INPUTLIB);
+
+	fileName = generateFileName(name);
+
+	manager->OpenInFile(fileName.c_str());
+
+	inputData::init(hitProducer);
+
+	init();
+
+}
+void inputRoot::init(const char* detectorFileName, unsigned int numberOfVolumesInfrontOfSTS) {
+
+	this->detectorFileName            = detectorFileName;
+	this->numberOfVolumesInfrontOfSTS = numberOfVolumesInfrontOfSTS;
+
+}
+void inputRoot::init(const char* name, int hitProducer, const char* detectorFileName, unsigned int numberOfVolumesInfrontOfSTS) {
+
+	init(name, hitProducer);
+	init(detectorFileName, numberOfVolumesInfrontOfSTS);
+
+}
+void inputRoot::init(bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) {
+
+	inputData::init(detMask);
+
+	readPointsFromFile = enableJustPoints;
+	readHitsFromFile   = enableHitsFromFile;
+	readMapsHits       = enableMapsHits;
+	readHybridHits     = enableHybridHits;
+	readStripHits      = enableStripHits;
+
+}
+void inputRoot::init(const char* name, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) {
+
+	inputData::init(detMask);
+	init(name, hitProducer);
+
+	readPointsFromFile = enableJustPoints;
+	readHitsFromFile   = enableHitsFromFile;
+	readMapsHits       = enableMapsHits;
+	readHybridHits     = enableHybridHits;
+	readStripHits      = enableStripHits;
+
+}
+void inputRoot::init(const char* detectorFileName, unsigned short numberOfVolumesInfrontOfSTS, bitArray detMask, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) {
+
+	init(detectorFileName, numberOfVolumesInfrontOfSTS);
+	init(detMask, enableJustPoints, enableHitsFromFile, enableMapsHits, enableHybridHits, enableStripHits);
+
+}
+void inputRoot::init(const char* name, const char* detectorFileName, unsigned short numberOfVolumesInfrontOfSTS, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) {
+
+	init(detectorFileName, numberOfVolumesInfrontOfSTS);
+	init(name, detMask, hitProducer, enableJustPoints, enableHitsFromFile, enableMapsHits, enableHybridHits, enableStripHits);
+
+}
+
+/****************************************************************
+ * method reads the source data from a file based on the		*
+ * CbmStsMapsHit-class, CbmStsHybridHit-class and				*
+ * CbmStsStripHit-class											*
+ ****************************************************************/
+
+void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClonesArray* hHitArray, TClonesArray* sHitArray) {
+
+	int                      i;
+	bool                     zeroTracks;
+	bool                     zeroMapsHits;
+	bool                     zeroHybridHits;
+	bool                     zeroStripHits;
+	unsigned int             numberOfTracks;
+	unsigned int             numberOfHits;
+	CbmHitProducer*          hitProducer;
+	CbmMCTrack*              inputTrack;
+	CbmStsPoint*             inputStsPoint;
+	CbmHit*                  inputHit;
+
+#ifdef TRACKINFO
+
+	trackfinderInputTrack* track;
+
+#endif
+
+#ifdef HITINFO
+
+	trackfinderInputHit*   hit;
+	magneticFieldValue     magnetField;
+
+#endif
+
+	if (hitsProduced) {
+		if (inputMapsHits != NULL) {
+			inputMapsHits->RemoveAll();
+			delete inputMapsHits;
+			inputMapsHits = NULL;
+		}
+		if (inputStripHits != NULL) {
+			inputStripHits->RemoveAll();
+			delete inputStripHits;
+			inputStripHits = NULL;
+		}
+		if (inputHybridHits != NULL) {
+			inputHybridHits->RemoveAll();
+			delete inputHybridHits;
+			inputHybridHits = NULL;
+		}
+		if (inputStsHits != NULL) {
+			inputStsHits->RemoveAll();
+			delete inputStsHits;
+			inputStsHits = NULL;
+		}
+		if (inputMvdHits != NULL) {
+			inputMvdHits->RemoveAll();
+			delete inputMvdHits;
+			inputMvdHits = NULL;
+		}
+	}
+
+	/* READ THE TRACKS AND HITS FROM THE STSDETECTOR */
+
+	read(event, NULL, NULL, mHitArray, hHitArray, sHitArray);
+
+	if ((inputMapsHits == NULL) && (inputHybridHits == NULL) && (inputStripHits == NULL)) {
+
+		takeMyHitProducerWarningMsg* takeMyHitProducer = new takeMyHitProducerWarningMsg();
+		takeMyHitProducer->warningMsg();
+		if(takeMyHitProducer != NULL) {
+			delete takeMyHitProducer;
+			takeMyHitProducer = NULL;
+		}
+
+#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+
+		inputMapsHits   = new TClonesArray("CbmStsMapsHit");
+		inputStripHits  = new TClonesArray("CbmStsStripHit");
+		inputHybridHits = new TClonesArray("CbmStsHybridHit");
+
+#else
+
+		throw functionIsDeprecatedError(INPUTLIB);
+
+#endif
+
+		hitsProduced    = true;
+		hitProducer     = new CbmHitProducer(typeOfHitProducer, data.getDetectorPointer());
+		hitProducer->produceOld(inputMapsHits, inputStripHits, inputHybridHits, inputStsPoints);
+		delete hitProducer;
+
+	}
+
+	numberOfTracks = 0;
+
+	if (inputTracks != NULL) {
+		numberOfTracks += inputTracks->GetEntries();
+		if (inputTracks->GetEntries() == 0)
+			zeroTracks = true;
+		else
+			zeroTracks = false;
+	}
+	else
+		zeroTracks     = true;
+
+	numberOfHits   = 0;
+
+	if (inputMapsHits != NULL) {
+		numberOfHits += inputMapsHits->GetEntries();
+		if (inputMapsHits->GetEntries() == 0)
+			zeroMapsHits = true;
+		else
+			zeroMapsHits = false;
+	}
+	else
+		zeroMapsHits = true;
+	if (inputHybridHits != NULL) {
+		numberOfHits += inputHybridHits->GetEntries();
+		if (inputHybridHits->GetEntries() == 0)
+			zeroHybridHits = true;
+		else
+			zeroHybridHits = false;
+	}
+	else
+		zeroHybridHits = true;
+	if (inputStripHits != NULL) {
+		numberOfHits += inputStripHits->GetEntries();
+		if (inputStripHits->GetEntries() == 0)
+			zeroStripHits = true;
+		else
+			zeroStripHits = false;
+	}
+	else
+		zeroStripHits = true;
+
+	if ((zeroTracks) || (zeroMapsHits && zeroHybridHits && zeroStripHits))
+		throw zeroTracksOrHitsError(numberOfTracks, numberOfHits);
+
+	/* SETTING THE INPUT */
+
+	data.setEventNumber(event);
+
+	/* ERASING DATA STORAGE */
+
+	data.removeAllTracks();
+	data.removeAllHits();
+
+	if (inputTracks != NULL) {
+
+		for (i = 0; i < inputTracks->GetEntries(); i++ ) {
+
+			inputTrack = (CbmMCTrack*)inputTracks->At(i);
+			if (inputTrack == NULL)
+				throw cannotAccessHitsOrTracksError(INPUTLIB);
+
+
+			if (inputTrack->GetNPoints(kSTS) > 0) {
+
+				/* what are these particles????? */
+				if ((inputTrack->GetPdgCode() != 10010020) && (inputTrack->GetPdgCode() != 10010030) && (inputTrack->GetPdgCode() != 50000050) && (inputTrack->GetPdgCode() != 50010051) && (inputTrack->GetPdgCode() != 10020040))
+					data.addTrack(inputTrack, i, TDatabasePDG::Instance()->GetParticle(inputTrack->GetPdgCode())->Charge() / 3.0);
+
+			}
+
+		}
+
+	}
+
+	if (inputMapsHits != NULL) {
+
+		for (i = 0; i < inputMapsHits->GetEntries(); i++) {
+
+			inputHit = (CbmHit*)inputMapsHits->At(i);
+			if (inputHit == NULL)
+				throw cannotAccessHitsOrTracksError(INPUTLIB);
+
+			if ((inputHit->GetRefIndex() < 0) || (inputStsPoints == NULL))
+				inputStsPoint = NULL;
+			else
+				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputHit->GetRefIndex());
+
+/* This is just used because the type of the station must be derived from the hits */
+			if (data.getDetectorPointer()->getStationPointer(inputHit->GetDetectorID()) != NULL)
+				data.getDetectorPointer()->getStationPointer(inputHit->GetDetectorID())->setMapsType(true);
+/* Later the type is derived from the station itself. So it must be checked that the hit is correct */
+
+			if (data.getDetector().getStationById(inputHit->GetDetectorID()).isMapsType()) {
+
+				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked())
+					data.addHit(inputHit->GetDetectorID(), inputHit, (CbmMCPoint*)inputStsPoint, i);
+
+			}
+			else {
+
+				hitWithWrongStationFoundWarningMsg* hitWithWrongStationFound = new hitWithWrongStationFoundWarningMsg();
+				hitWithWrongStationFound->warningMsg();
+				if(hitWithWrongStationFound != NULL) {
+					delete hitWithWrongStationFound;
+					hitWithWrongStationFound = NULL;
+				}
+
+			}
+
+		}
+
+	}
+	if (inputHybridHits != NULL) {
+
+		for (i = 0; i < inputHybridHits->GetEntries(); i++) {
+
+			inputHit = (CbmHit*)inputHybridHits->At(i);
+			if (inputHit == NULL)
+				throw cannotAccessHitsOrTracksError(INPUTLIB);
+
+			if ((inputHit->GetRefIndex() < 0) || (inputStsPoints == NULL))
+				inputStsPoint = NULL;
+			else
+				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputHit->GetRefIndex());
+
+/* This is just used because the type of the station must be derived from the hits */
+			if (data.getDetectorPointer()->getStationPointer(inputHit->GetDetectorID()) != NULL)
+				data.getDetectorPointer()->getStationPointer(inputHit->GetDetectorID())->setHybridType(true);
+/* Later the type is derived from the station itself. So it must be checked that the hit is correct */
+
+			if (data.getDetector().getStationById(inputHit->GetDetectorID()).isHybridType()) {
+
+				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked())
+					data.addHit(inputHit->GetDetectorID(), inputHit, (CbmMCPoint*)inputStsPoint, i);
+
+			}
+			else {
+
+				hitWithWrongStationFoundWarningMsg* hitWithWrongStationFound = new hitWithWrongStationFoundWarningMsg();
+				hitWithWrongStationFound->warningMsg();
+				if(hitWithWrongStationFound != NULL) {
+					delete hitWithWrongStationFound;
+					hitWithWrongStationFound = NULL;
+				}
+
+			}
+
+		}
+	}
+	if (inputStripHits != NULL) {
+
+		for (i = 0; i < inputStripHits->GetEntries(); i++) {
+
+			inputHit = (CbmHit*)inputStripHits->At(i);
+			if (inputHit == NULL)
+				throw cannotAccessHitsOrTracksError(INPUTLIB);
+
+			if ((inputHit->GetRefIndex() < 0) || (inputStsPoints == NULL))
+				inputStsPoint = NULL;
+			else
+				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputHit->GetRefIndex());
+
+/* This is just used because the type of the station must be derived from the hits */
+			if (data.getDetectorPointer()->getStationPointer(inputHit->GetDetectorID()) != NULL)
+				data.getDetectorPointer()->getStationPointer(inputHit->GetDetectorID())->setStripType(true);
+/* Later the type is derived from the station itself. So it must be checked that the hit is correct */
+
+			if (data.getDetector().getStationById(inputHit->GetDetectorID()).isStripType()) {
+
+				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked())
+					data.addHit(inputHit->GetDetectorID(), inputHit, (CbmMCPoint*)inputStsPoint, i);
+
+			}
+			else {
+
+				hitWithWrongStationFoundWarningMsg* hitWithWrongStationFound = new hitWithWrongStationFoundWarningMsg();
+				hitWithWrongStationFound->warningMsg();
+				if(hitWithWrongStationFound != NULL) {
+					delete hitWithWrongStationFound;
+					hitWithWrongStationFound = NULL;
+				}
+
+			}
+
+		}
+
+	}
+
+	data.finalizeHitTrackAssignment(readPointsFromFile);
+
+	if ((data.getNumberOfTracks() == 0) || (data.getNumberOfHits() == 0))
+		throw zeroTracksOrHitsError(data.getNumberOfTracks(), data.getNumberOfHits());
+
+#ifdef TRACKINFO
+
+	std::cout << std::endl;
+	std::cout << "numberOfTracks: " << data.getNumberOfTracks() << std::endl;
+
+	for (i = 0; i < data.getNumberOfTracks(); i++ ) {
+	
+		if ((i > 5) && (i < 10)) {
+			
+			track = data.getTrackByIndex(i);
+			if (track == NULL)
+				throw cannotAccessHitsOrTracksError(INPUTLIB);
+
+			std::cout << "TrackId: "       << track->getTrackIndex()     << std::endl;
+			std::cout << " Hits: "         << track->getNumberOfHits()   << std::endl;
+			std::cout << " Points: "       << track->getNumberOfPoints() << std::endl;
+			std::cout << " PdgCode: "      << track->getPdgCode()        << std::endl;
+			std::cout << " Charge:    "    << track->getCharge()         << std::endl;
+
+			std::cout << " momemtumX: "    << track->getMomX()           << std::endl;
+			std::cout << " momentumY: "    << track->getMomY()           << std::endl;
+			std::cout << " momentumZ: "    << track->getMomZ()           << std::endl;
+
+			std::cout << std::endl;
+
+		}
+
+	}
+
+#endif
+
+#ifdef HITINFO
+
+	std::cout << std::endl;
+	std::cout << "numberOfHits: " << data.getNumberOfHits() << std::endl;
+
+	for (i = 0; i < data.getNumberOfHits(); i++ ) {
+
+		if ((i > 5) && (i < 10)) {
+
+			hit = data.getHitByIndex(i);
+			if (hit == NULL)
+				throw cannotAccessHitsOrTracksError(INPUTLIB);
+
+			data.getMagneticField()->getFieldValues(hit, &magnetField);
+
+			std::cout << "HitID: "        << hit->getHitIndex()               << std::endl;
+			if (hit->getPoint() != NULL)
+				std::cout << " PointID: " << hit->getHit()->GetRefIndex()     << std::endl;
+			else
+				std::cout << " PointID: missing"                              << std::endl;
+			if (hit->getTrack() != NULL)
+				std::cout << " TrackID: " << hit->getTrack()->getTrackIndex() << std::endl;
+			else
+				std::cout << " TrackID: missing"                              << std::endl;
+			std::cout << " DetectorID: "  << hit->getStationId()              << std::endl;
+
+			std::cout << " PosX: "        << hit->getPosX()                   << std::endl;
+			std::cout << " PosY: "        << hit->getPosY()                   << std::endl;
+			std::cout << " PosZ: "        << hit->getPosZ()                   << std::endl;
+
+			std::cout << " FieldX: "      << magnetField.getFieldX()          << std::endl;
+			std::cout << " FieldY: "      << magnetField.getFieldY()          << std::endl;
+			std::cout << " FieldZ: "      << magnetField.getFieldZ()          << std::endl;
+			
+			std::cout << std::endl;
+
+		}
+
+	}
+
+#endif
+
+}
+
+/****************************************************************
+ * method reads the source data from a file based on the		*
+ * CbmStsHit-class												*
+ ****************************************************************/
+
+void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TClonesArray* stsHitArray) {
+
+	int                      i;
+	bool                     zeroTracks;
+	bool                     zeroStsHits;
+	bool                     zeroMvdHits;
+	unsigned int             numberOfTracks;
+	unsigned int             numberOfHits;
+	CbmHitProducer*          hitProducer;
+	CbmMCTrack*              inputTrack;
+	CbmStsPoint*             inputStsPoint;
+	CbmMvdPoint*             inputMvdPoint;
+	CbmStsHit*               inputStsHit;
+	CbmMvdHit*               inputMvdHit;
+
+#ifdef TRACKINFO
+
+	trackfinderInputTrack* track;
+
+#endif
+
+#ifdef HITINFO
+
+	trackfinderInputHit*   hit;
+	magneticFieldValue     magnetField;
+
+#endif
+
+	if (hitsProduced) {
+		if (inputMapsHits != NULL) {
+			inputMapsHits->RemoveAll();
+			delete inputMapsHits;
+			inputMapsHits = NULL;
+		}
+		if (inputStripHits != NULL) {
+			inputStripHits->RemoveAll();
+			delete inputStripHits;
+			inputStripHits = NULL;
+		}
+		if (inputHybridHits != NULL) {
+			inputHybridHits->RemoveAll();
+			delete inputHybridHits;
+			inputHybridHits = NULL;
+		}
+		if (inputStsHits != NULL) {
+			inputStsHits->RemoveAll();
+			delete inputStsHits;
+			inputStsHits = NULL;
+		}
+		if (inputMvdHits != NULL) {
+			inputMvdHits->RemoveAll();
+			delete inputMvdHits;
+			inputMvdHits = NULL;
+		}
+	}
+
+	/* READ THE TRACKS AND HITS FROM THE STSDETECTOR */
+
+	read(event, mvdHitArray, stsHitArray, NULL, NULL, NULL);
+
+	if ((inputMvdHits == NULL) && (inputStsHits == NULL)) {
+
+		takeMyHitProducerWarningMsg* takeMyHitProducer = new takeMyHitProducerWarningMsg();
+		takeMyHitProducer->warningMsg();
+		if(takeMyHitProducer != NULL) {
+			delete takeMyHitProducer;
+			takeMyHitProducer = NULL;
+		}
+
+#ifndef CBMROOTFRAMEWORKHITCOMPATIBILITY
+
+		inputStsHits    = new TClonesArray("CbmStsHit");
+		inputMvdHits    = new TClonesArray("CbmMvdHit");
+
+#else
+
+		throw functionIsDeprecatedError(INPUTLIB);
+
+#endif
+
+		hitsProduced = true;
+		hitProducer  = new CbmHitProducer(typeOfHitProducer, data.getDetectorPointer());
+		hitProducer->produceNew(inputMvdHits, inputStsHits, inputMvdPoints, inputStsPoints);
+		delete hitProducer;
+
+	}
+
+	numberOfTracks = 0;
+
+	if (inputTracks != NULL) {
+		numberOfTracks += inputTracks->GetEntries();
+		if (inputTracks->GetEntries() == 0)
+			zeroTracks = true;
+		else
+			zeroTracks = false;
+	}
+	else
+		zeroTracks     = true;
+
+	numberOfHits   = 0;
+
+	if (inputStsHits != NULL) {
+		numberOfHits += inputStsHits->GetEntries();
+		if (inputStsHits->GetEntries() == 0)
+			zeroStsHits = true;
+		else
+			zeroStsHits = false;
+	}
+	else
+		zeroStsHits = true;
+	if (inputMvdHits != NULL) {
+		numberOfHits += inputMvdHits->GetEntries();
+		if (inputMvdHits->GetEntries() == 0)
+			zeroMvdHits = true;
+		else
+			zeroMvdHits = false;
+	}
+	else
+		zeroMvdHits = true;
+
+	if ((zeroTracks) || ((zeroStsHits) && (zeroMvdHits)))
+		throw zeroTracksOrHitsError(numberOfTracks, numberOfHits);
+
+	/* SETTING THE INPUT */
+
+	data.setEventNumber(event);
+
+	/* ERASING DATA STORAGE */
+
+	data.removeAllTracks();
+	data.removeAllHits();
+
+	if (inputTracks != NULL) {
+
+		for (i = 0; i < inputTracks->GetEntries(); i++ ) {
+
+			inputTrack = (CbmMCTrack*)inputTracks->At(i);
+			if (inputTrack == NULL)
+				throw cannotAccessHitsOrTracksError(INPUTLIB);
+
+
+			if (inputTrack->GetNPoints(kSTS) > 0) {
+
+				/* what are these particles????? */
+				if ((inputTrack->GetPdgCode() != 10010020) && (inputTrack->GetPdgCode() != 10010030) && (inputTrack->GetPdgCode() != 50000050) && (inputTrack->GetPdgCode() != 50010051) && (inputTrack->GetPdgCode() != 10020040))
+					data.addTrack(inputTrack, i, TDatabasePDG::Instance()->GetParticle(inputTrack->GetPdgCode())->Charge() / 3.0);
+
+			}
+
+		}
+
+	}
+
+	if (inputStsHits != NULL) {
+
+		for (i = 0; i < inputStsHits->GetEntries(); i++) {
+
+			inputStsHit = (CbmStsHit*)inputStsHits->At(i);
+			if (inputStsHit == NULL)
+				throw cannotAccessHitsOrTracksError(INPUTLIB);
+
+			if ((inputStsHit->GetRefIndex() < 0) || (inputStsPoints == NULL))
+				inputStsPoint = NULL;
+			else
+				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputStsHit->GetRefIndex());
+
+/* This is just used because the type of the station must be derived from the hits */
+			if (data.getDetectorPointer()->getStationPointer(inputStsHit->GetStationNr()) != NULL)
+				data.getDetectorPointer()->getStationPointer(inputStsHit->GetStationNr())->setHybridType(true);
+/* Later the type is derived from the station itself. So it must be checked that the hit is correct */
+
+			if (data.getDetector().getStationById(inputStsHit->GetStationNr()).isHybridType() || data.getDetector().getStationById(inputStsHit->GetStationNr()).isStripType()) {
+
+				if (!data.getDetector().getStationById(inputStsHit->GetStationNr()).isMasked())
+					data.addHit(inputStsHit->GetStationNr(), (CbmHit*)inputStsHit, (CbmMCPoint*)inputStsPoint, i);
+
+			}
+			else {
+
+				hitWithWrongStationFoundWarningMsg* hitWithWrongStationFound = new hitWithWrongStationFoundWarningMsg();
+				hitWithWrongStationFound->warningMsg();
+				if(hitWithWrongStationFound != NULL) {
+					delete hitWithWrongStationFound;
+					hitWithWrongStationFound = NULL;
+				}
+
+			}
+
+		}
+
+	}
+
+	if (inputMvdHits != NULL) {
+
+		for (i = 0; i < inputMvdHits->GetEntries(); i++) {
+
+			inputMvdHit = (CbmMvdHit*)inputMvdHits->At(i);
+			if (inputMvdHit == NULL)
+				throw cannotAccessHitsOrTracksError(INPUTLIB);
+
+			if ((inputMvdHit->GetRefIndex() < 0) || (inputMvdPoints == NULL))
+				inputMvdPoint = NULL;
+			else
+				inputMvdPoint = (CbmMvdPoint*)inputMvdPoints->At(inputMvdHit->GetRefIndex());
+
+/* This is just used because the type of the station must be derived from the hits */
+			if (data.getDetectorPointer()->getStationPointer(inputMvdHit->GetStationNr()) != NULL)
+				data.getDetectorPointer()->getStationPointer(inputMvdHit->GetStationNr())->setMapsType(true);
+/* Later the type is derived from the station itself. So it must be checked that the hit is correct */
+
+			if (data.getDetector().getStationById(inputMvdHit->GetStationNr()).isMapsType()) {
+
+				if (!data.getDetector().getStationById(inputMvdHit->GetStationNr()).isMasked())
+					data.addHit(inputMvdHit->GetStationNr(), (CbmHit*)inputMvdHit, (CbmMCPoint*)inputMvdPoint, i);
+
+			}
+			else {
+
+				hitWithWrongStationFoundWarningMsg* hitWithWrongStationFound = new hitWithWrongStationFoundWarningMsg();
+				hitWithWrongStationFound->warningMsg();
+				if(hitWithWrongStationFound != NULL) {
+					delete hitWithWrongStationFound;
+					hitWithWrongStationFound = NULL;
+				}
+
+			}
+
+		}
+
+	}
+
+	data.finalizeHitTrackAssignment(readPointsFromFile);
+
+	if ((data.getNumberOfTracks() == 0) || (data.getNumberOfHits() == 0))
+		throw zeroTracksOrHitsError(data.getNumberOfTracks(), data.getNumberOfHits());
+
+#ifdef TRACKINFO
+
+	std::cout << std::endl;
+	std::cout << "numberOfTracks: " << data.getNumberOfTracks() << std::endl;
+
+	for (i = 0; i < data.getNumberOfTracks(); i++ ) {
+	
+		if ((i > 5) && (i < 10)) {
+			
+			track = data.getTrackByIndex(i);
+			if (track == NULL)
+				throw cannotAccessHitsOrTracksError(INPUTLIB);
+
+			std::cout << "TrackId: "       << track->getTrackIndex()     << std::endl;
+			std::cout << " Hits: "         << track->getNumberOfHits()   << std::endl;
+			std::cout << " Points: "       << track->getNumberOfPoints() << std::endl;
+			std::cout << " PdgCode: "      << track->getPdgCode()        << std::endl;
+			std::cout << " Charge:    "    << track->getCharge()         << std::endl;
+
+			std::cout << " momemtumX: "    << track->getMomX()           << std::endl;
+			std::cout << " momentumY: "    << track->getMomY()           << std::endl;
+			std::cout << " momentumZ: "    << track->getMomZ()           << std::endl;
+
+			std::cout << std::endl;
+
+		}
+
+	}
+
+#endif
+
+#ifdef HITINFO
+
+	std::cout << std::endl;
+	std::cout << "numberOfHits: " << data.getNumberOfHits() << std::endl;
+
+	for (i = 0; i < data.getNumberOfHits(); i++ ) {
+
+		if ((i > 5) && (i < 10)) {
+
+			hit = data.getHitByIndex(i);
+			if (hit == NULL)
+				throw cannotAccessHitsOrTracksError(INPUTLIB);
+
+			data.getMagneticField()->getFieldValues(hit, &magnetField);
+
+			std::cout << "HitID: "        << hit->getHitIndex()               << std::endl;
+			if (hit->getPoint() != NULL)
+				std::cout << " PointID: " << hit->getHit()->GetRefIndex()     << std::endl;
+			else
+				std::cout << " PointID: missing"                              << std::endl;
+			if (hit->getTrack() != NULL)
+				std::cout << " TrackID: " << hit->getTrack()->getTrackIndex() << std::endl;
+			else
+				std::cout << " TrackID: missing"                              << std::endl;
+			std::cout << " DetectorID: "  << hit->getStationId()              << std::endl;
+
+			std::cout << " PosX: "        << hit->getPosX()                   << std::endl;
+			std::cout << " PosY: "        << hit->getPosY()                   << std::endl;
+			std::cout << " PosZ: "        << hit->getPosZ()                   << std::endl;
+
+			std::cout << " FieldX: "      << magnetField.getFieldX()          << std::endl;
+			std::cout << " FieldY: "      << magnetField.getFieldY()          << std::endl;
+			std::cout << " FieldZ: "      << magnetField.getFieldZ()          << std::endl;
+			
+			std::cout << std::endl;
+
+		}
+
+	}
+
+#endif
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for the		*
+ * source data.													*
+ ****************************************************************/
+
+double inputRoot::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue = 0;
+
+	if (inputStsPoints != NULL)
+		returnValue   = inputStsPoints->GetEntries()     * sizeof(CbmStsPoint);
+
+#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+
+	if (inputMapsHits != NULL)
+		returnValue  += inputMapsHits->GetEntries()   * sizeof(CbmStsMapsHit);
+	if (inputStripHits != NULL)
+		returnValue  += inputStripHits->GetEntries()  * sizeof(CbmStsStripHit);
+	if (inputHybridHits != NULL)
+		returnValue  += inputHybridHits->GetEntries() * sizeof(CbmStsHybridHit);
+
+#else
+
+	if (inputMvdPoints != NULL)
+		returnValue   = inputMvdPoints->GetEntries()  * sizeof(CbmMvdPoint);
+	if (inputStsHits != NULL)
+		returnValue  += inputStsHits->GetEntries()    * sizeof(CbmStsHit);
+	if (inputMvdHits != NULL)
+		returnValue  += inputMvdHits->GetEntries()    * sizeof(CbmMvdHit);
+
+#endif
+
+	if (inputTracks != NULL)
+		returnValue  += inputTracks->GetEntries()     * sizeof(CbmMCTrack);
+
+	returnValue = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double inputRoot::getAllocatedSizeOfData(unsigned short dimension) {
+
+	return getUsedSizeOfData(dimension);
+
+}
+
+ClassImp(inputRoot)

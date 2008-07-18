@@ -1,0 +1,175 @@
+//////////////////////////////////////////////////////////////////////
+/// (C)opyright 2004
+/// 
+/// Institute of Computer Science V
+/// Prof. M‰nner
+/// University of Mannheim, Germany
+/// 
+/// *******************************************************************
+/// 
+/// Designer(s):   Steinle / Gl‰ﬂ
+/// 
+/// *******************************************************************
+/// 
+/// Project:     Trackfinder for CBM-Project at GSI-Darmstadt, Germany
+/// 
+/// *******************************************************************
+/// 
+/// Description:
+///
+///   class:
+///     - consists of the information for the magnetic field
+///
+/// *******************************************************************
+///
+/// $Author: csteinle $
+/// $Date: 2006/12/28 13:09:04 $
+/// $Revision: 1.5 $
+///
+//////////////////////////////////////////////////////////////////////
+
+
+#ifndef _TRACKFINDERINPUTMAGNETICFIELD_H
+#define _TRACKFINDERINPUTMAGNETICFIELD_H
+
+
+#include "../../MiscLIB/include/defs.h"
+#ifdef CBMROOTFRAMEWORK
+	#include "CbmField.h"
+#else
+	#include "../../RootFrameworkLIB/include/CbmField.h"
+#endif
+#include "../../DataObjectLIB/include/magneticFieldValue.h"
+#include "trackfinderInputHit.h"
+#include "TObject.h"
+
+
+typedef struct {
+
+	double         value;
+	unsigned short weigth;
+
+} magnetfieldFactor;
+
+/* **************************************************************
+ * CLASS trackfinderInputMagneticField							*
+ * **************************************************************/
+
+class trackfinderInputMagneticField : public TObject {
+
+protected:
+
+	CbmField*          magneticField;
+	bool               isLocalField;
+	unsigned short     magneticFieldIntegrationStepwidthPerStation;
+	double             magneticFieldIntegrationFactor;
+	std::string        fileName;
+	std::string        mapName;
+	bool               isRootFile;
+	unsigned short     numberOfMagnetfieldFactors;
+	magnetfieldFactor* magnetfieldFactors;
+
+/**
+ * method tries to read the field.
+ */
+
+	void readField();
+
+public:
+
+/**
+ * class definition which is needed for TObject from root.
+ */
+
+	ClassDef(trackfinderInputMagneticField, 1);
+
+/**
+ * Default constructor
+ */
+
+	trackfinderInputMagneticField();
+
+/**
+ * Constructor
+ */
+
+	trackfinderInputMagneticField(const trackfinderInputMagneticField& value);
+	trackfinderInputMagneticField(const char* fileName, bool isRootFile = true, const char* mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0);
+	trackfinderInputMagneticField(std::string fileName, bool isRootFile = true, std::string mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0);
+	trackfinderInputMagneticField(unsigned short numberOfMagnetfieldFactors);
+	trackfinderInputMagneticField(CbmField* field, unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0);
+
+/**
+ * Destructor
+ */
+
+	virtual ~trackfinderInputMagneticField();
+
+/**
+ * operator = ()
+ */
+
+	const trackfinderInputMagneticField& operator = (const trackfinderInputMagneticField& value);
+
+/**
+ * method inits the fieldmap.
+ */
+
+	virtual void initialize() = 0;
+	void init(const char* fileName, bool isRootFile = true, const char* mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0);
+	void init(std::string fileName, bool isRootFile = true, std::string mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0);
+	void init(unsigned short numberOfMagnetfieldFactors);
+	void init(CbmField* field, unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0);
+
+/**
+ * Returns the field values at a given point. This is defined at the
+ * value as the nearest grid point. The dimension of the values read from
+ * the file is Tesla.
+ */
+
+	void getFieldValues(trackfinderInputHit* hit, magneticFieldValue* fieldValue);
+	void getFieldValues(double hitPosX, double hitPosY, double hitPosZ, magneticFieldValue* fieldValue);
+
+/**
+ * Returns the integrated field values at a given point. This is
+ * defined as the integrated value at the nearest grid point.
+ */
+
+	void getIntegratedFieldValues(trackfinderInputHit* hit, magneticFieldValue* fieldValue, bool negativFieldOrientation = true, bool median = true);
+	void getIntegratedFieldValues(double hitPosX, double hitPosY, double hitPosZ, unsigned short stationIndex, magneticFieldValue* fieldValue, bool negativFieldOrientation = true, bool median = true);
+
+/**
+ * Returns the field factor at a given point
+ */
+
+	double getFieldFactor(trackfinderInputHit* hit, bool negativFieldOrientation = true);
+	double getFieldFactor(double hitPosX, double hitPosY, double hitPosZ, unsigned short stationIndex, bool negativFieldOrientation = true);
+
+/*
+ * method sets the number of magnetfield factors (stations)
+ */
+
+	void setNumberOfMagnetfieldFactors(unsigned short numberOfMagnetfieldFactors);
+
+/*
+ * method sets the magnetfield factor for station stationIndex
+ */
+
+	void setMagnetfieldFactor(unsigned short stationIndex, double value);
+
+/*
+ * method updates the magnetfield factor for station stationIndex
+ */
+
+	void updateMagnetfieldFactor(unsigned short stationIndex, double value);
+
+/**
+ * method returns the magnetfield factor for the station
+ */
+
+	double evaluateMagnetfieldFactor(trackfinderInputHit* hit);
+	double evaluateMagnetfieldFactor(unsigned short stationIndex);
+
+};
+
+#endif

@@ -1,0 +1,83 @@
+# Create a library called "libBase" which includes the source files given in
+# the array .
+# The extension is already found.  Any number of sources could be listed here.
+
+set(INCLUDE_DIRECTORIES
+${ROOT_INCLUDE_DIR} 
+${CBMROOT_SOURCE_DIR}/geobase 
+${CBMROOT_SOURCE_DIR}/parbase 
+${CBMROOT_SOURCE_DIR}/base 
+${CBMROOT_SOURCE_DIR}/cbmbase 
+${CBMROOT_SOURCE_DIR}/field 
+${CBMROOT_SOURCE_DIR}/passive 
+${CBMROOT_SOURCE_DIR}/sts
+${CBMROOT_SOURCE_DIR}/KF
+${CBMROOT_SOURCE_DIR}/KF/Interface
+${CBMROOT_SOURCE_DIR}/global
+${CBMROOT_SOURCE_DIR}/much
+)
+
+include_directories( ${INCLUDE_DIRECTORIES})
+
+set(LINK_DIRECTORIES
+${ROOT_LIBRARY_DIR}
+)
+ 
+link_directories( ${LINK_DIRECTORIES})
+
+set(MUCH_SRCS
+CbmGeoMuch.cxx  
+CbmGeoMuchPar.cxx 
+CbmMuch.cxx
+CbmMuchCluster.cxx
+CbmMuchContFact.cxx  
+CbmMuchDigi.cxx
+CbmMuchDigiMatch.cxx
+CbmMuchDigitize.cxx
+CbmMuchFindClusters.cxx
+CbmMuchFindHits.cxx
+CbmMuchFindHitsSimple.cxx
+CbmMuchFindTracks.cxx
+CbmMuchGeoScheme.cxx
+CbmMuchHit.cxx 
+CbmMuchHitFinderQa.cxx
+CbmMuchHitProducerIdeal.cxx
+CbmMuchLayer.cxx
+CbmMuchLayerSide.cxx
+CbmMuchMatchTracks.cxx 
+#CbmMuchMaximalChargeQa.cxx
+CbmMuchModule.cxx
+CbmMuchPad.cxx
+CbmMuchPoint.cxx 
+CbmMuchPointInfo.cxx
+#CbmMuchPhysicsQa.cxx
+CbmMuchSector.cxx
+CbmMuchSegmentation.cxx
+CbmMuchStation.cxx
+CbmMuchTask.cxx
+CbmMuchTrack.cxx 
+CbmMuchTrackFinder.cxx
+CbmMuchTrackMatch.cxx
+)
+
+if(RULE_CHECKER_FOUND)
+  CHECK_RULES("${MUCH_SRCS}" "${INCLUDE_DIRECTORIES}" MUCH_RULES)
+endif(RULE_CHECKER_FOUND)
+
+# fill list of header files from list of source files
+# by exchanging the file extension
+CHANGE_FILE_EXTENSION(*.cxx *.h MUCH_HEADERS "${MUCH_SRCS}")
+
+set(MUCH_LINKDEF MuchLinkDef.h)
+set(MUCH_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/CbmMuchDict.cxx) 
+
+ROOT_GENERATE_DICTIONARY("${MUCH_HEADERS}" "${MUCH_LINKDEF}" "${MUCH_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
+
+set(MUCH_SRCS ${MUCH_SRCS} ${MUCH_DICTIONARY})
+
+add_library(Much SHARED ${MUCH_SRCS})
+target_link_libraries(Much ${ROOT_LIBRARIES})
+set_target_properties(Much PROPERTIES  ${CBMROOT_LIBRARY_PROPERTIES})
+
+################ install ###################
+install(TARGETS Much DESTINATION ${CMAKE_BINARY_DIR}/lib)

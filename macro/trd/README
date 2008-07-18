@@ -1,0 +1,25 @@
+----------------------------------------------------------------------------------
+-----                                 README                                 -----
+-----                           cbmroot2/macro/trd                           -----
+-----          M.Kalisky@gsi.de                    D.Kresan@gsi.de           -----
+-----     Created : 16/12/2005                                               -----
+----- Last update : 19/12/2005                                               -----
+----------------------------------------------------------------------------------
+
+macroses in TRD directory:
+
+                sim.C - makes the transport of UrQMD events. Output files are
+   	                test.mc.root and test.mc.param.root
+		Sts.C - runs reconstruction in the STS. Output file is
+		        test.stsTracks.root
+  CbmTrdHitProducer.C - produces TRD hits from TRD points. Output file is
+                        test.trdHits.root
+TrdTrackFinderIdeal.C - runs ideal TRD track finder and Kalman Filter
+                        track fitter together with performance tasks.
+			Output file is test.trdIdealTracks.root
+  TrdTrackFinderSts.C - runs TRD track finder, based on track following
+  			from STS approach. Found tracks are fitted
+			using the Kalman Filter fitter. Output file is
+			test.trdTracks.root
+
+

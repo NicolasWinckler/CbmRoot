@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 ##################################################################
 # set the source and the build directory for ctest
 # change this directories to your needs

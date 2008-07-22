@@ -2,10 +2,14 @@ SET(MODEL Experimental)
 IF(${CTEST_SCRIPT_ARG} MATCHES Nightly)
   SET(MODEL Nightly)
 ENDIF(${CTEST_SCRIPT_ARG} MATCHES Nightly)
+
 SET (CTEST_COMMAND
-    "ctest -D ${MODEL}Start -D ${MODEL}Configure -D ${MODEL}Build -D ${MODEL}Test -D ${MODEL}Submit"
+    "ctest -D ${MODEL}Start"
+    "ctest -D ${MODEL}Build"
+    "make install" 
+    "ctest -D ${MODEL}Test" 
+    "ctest -D ${MODEL}Submit"
 )
-#    "ctest -D ${MODEL}Start -D ${MODEL}Update -D ${MODEL}Configure -D ${MODEL}Build -D ${MODEL}Test -D ${MODEL}Submit"
 
 SET (CTEST_SOURCE_DIRECTORY $ENV{SOURCEDIR})
 SET (CTEST_BINARY_DIRECTORY $ENV{BUILDDIR})
@@ -36,14 +40,3 @@ BUILDNAME:STRING=$ENV{LABEL}
 SITE:STRING=$ENV{SITE}
 ")
 
-
-# set any extra environment variables here
-#SET (CTEST_ENVIRONMENT
-#)
-
-#CTEST_START (${MODEL})
-#CTEST_UPDATE (SOURCE "${CTEST_SOURCE_DIRECTORY}")
-#CTEST_CONFIGURE (BUILD "${CTEST_BINARY_DIRECTORY}")
-#CTEST_BUILD (BUILD "${CTEST_BINARY_DIRECTORY}")
-#CTEST_TEST (BUILD "${CTEST_BINARY_DIRECTORY}")
-#CTEST_SUBMIT ()

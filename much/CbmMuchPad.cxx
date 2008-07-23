@@ -11,36 +11,35 @@
 using std::cout;
 using std::endl;
 
-// -----  Defaul constructor  ----------------------------------------------
+// -----  Default constructor  ----------------------------------------------
 CbmMuchPad::CbmMuchPad():TPolyLine(){}
 // -------------------------------------------------------------------------
 
 // -----  Standard constructor  --------------------------------------------
 CbmMuchPad::CbmMuchPad (CbmMuchSector* sector, Int_t iChannel):TPolyLine(){
   // Generate detectorId
-  Long64_t sectorId = sector->GetDetectorId();
-  fDetectorId = CbmMuchGeoScheme::GetDetIdFromSector(sectorId, iChannel);
+  fSectorId = sector->GetDetectorId();
+  fDetectorId = CbmMuchGeoScheme::GetDetIdFromSector(fSectorId, iChannel);
 
-  fSector = *sector;
-  TVector3 secPos = fSector.GetPosition();
-  TVector3 secSize = fSector.GetSize();
+  TVector3 secPos = sector->GetPosition();
+  TVector3 secSize = sector->GetSize();
   Double_t secX0 = secPos[0];
   Double_t secY0 = secPos[1];
-  Double_t dx = fSector.GetDx();
-  Double_t dy = fSector.GetDy();
+  Double_t dx = sector->GetDx();
+  Double_t dy = sector->GetDy();
   Double_t secLx = secSize[0];
   Double_t secLy = secSize[1];
-  Int_t nCols = fSector.GetNCols();
-  Int_t nRows = fSector.GetNRows();
+  Int_t nCols = sector->GetNCols();
+  Int_t nRows = sector->GetNRows();
   Double_t xVertices[5], yVertices[5];
-  
+
   // Create TPolyLine for this pad
   Int_t iRow = iChannel/nCols;
   Int_t iCol = iChannel - iRow*nCols;
   for (Int_t iVertex = 0; iVertex < 4 ; iVertex++){
     Double_t xInt = (iVertex < 2 ) ? iCol*dx : (iCol+1)*dx;
     Double_t yInt = (iVertex == 0 || iVertex ==3) ? iRow*dy : (iRow+1)*dy;
-    // Translate to centre of the sector
+    // Translate to center of the sector
     Double_t xc = xInt - secLx/2.;
     Double_t yc = yInt - secLy/2.;
     // Translate to global system
@@ -49,7 +48,7 @@ CbmMuchPad::CbmMuchPad (CbmMuchSector* sector, Int_t iChannel):TPolyLine(){
   }
   xVertices[4] = xVertices[0];
   yVertices[4] = yVertices[0];
-  
+
   fX0 = (xVertices[1] + xVertices[3])/2.;
   fY0 = (yVertices[0] + yVertices[2])/2.;
   SetPolyLine(5, xVertices, yVertices);
@@ -62,6 +61,34 @@ CbmMuchPad::CbmMuchPad (CbmMuchSector* sector, Int_t iChannel):TPolyLine(){
 
 // ------  Destructor  -----------------------------------------------------
 CbmMuchPad::~CbmMuchPad(){
+}
+// -------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------
+Double_t CbmMuchPad::GetSectorX0() const{
+	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
+	return geoScheme->GetSectorByDetId(fSectorId)->GetPosition()[0];
+}
+// -------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------
+Double_t CbmMuchPad::GetSectorY0() const{
+	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
+	return geoScheme->GetSectorByDetId(fSectorId)->GetPosition()[1];
+}
+// -------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------
+Double_t CbmMuchPad::GetLx() const{
+	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
+	return geoScheme->GetSectorByDetId(fSectorId)->GetDx();
+}
+// -------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------
+Double_t CbmMuchPad::GetLy() const{
+	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
+	return geoScheme->GetSectorByDetId(fSectorId)->GetDy();
 }
 // -------------------------------------------------------------------------
 
@@ -87,7 +114,6 @@ void CbmMuchPad::Reset(){
 }
 // -------------------------------------------------------------------------
 
-
 // -------------------------------------------------------------------------
 void CbmMuchPad::SetFired(Int_t digiId, Int_t charge, Int_t ADCcharge){
   fDigiIndex = digiId;
@@ -102,14 +128,12 @@ void CbmMuchPad::SetFired(Int_t digiId, Int_t charge, Int_t ADCcharge){
 }
 // -------------------------------------------------------------------------
 
-
 // -------------------------------------------------------------------------
 void CbmMuchPad::DrawPad(){
   Draw("f");
   Draw();
 }
 // -------------------------------------------------------------------------
-
 
 // -------------------------------------------------------------------------
 TString CbmMuchPad::GetInfo(){

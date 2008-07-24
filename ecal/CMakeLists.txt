@@ -36,6 +36,8 @@ CbmEcalSCurveLibRecord.cxx CbmEcalOShowerCalibrator.cxx
 CbmEcalShowerLib.cxx CbmEcalTrackExtrapolation.cxx
 CbmEcalTracking.cxx CbmEcalStructureFiller.cxx
 CbmEcalTrackExport.cxx CbmEcalStructureExport.cxx
+CbmEcalRecoSimple.cxx CbmEcalClusterV1.cxx
+CbmEcalQualityCheck.cxx
 )
 
 SET(ECAL_SRCS ${ECAL_SRCS_RULECHECKER} CbmEcalInf.cxx)

@@ -4,6 +4,7 @@
 #include "CbmTrackParam.h"
 
 #include "TClonesArray.h"
+#include "TFile.h"
 
 #include <iostream>
 
@@ -80,6 +81,7 @@ void CbmEcalTrackExport::Exec(Option_t* opt)
     Info("Exec", "%d tracks writen to disk.", tr);
   }
   fEventN++;
+  gFile->Write();
 }
   
 /** Finish task **/

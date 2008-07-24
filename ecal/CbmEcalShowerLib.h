@@ -3,7 +3,7 @@
 #ifndef CBMECALSHOWERLIB_H
 #define CBMECALSHOWERLIB_H
 
-#include "TNamed.h"
+#include "CbmTask.h"
 #include "TString.h"
 
 /** Representation of record in shower library.
@@ -24,7 +24,7 @@ public:
   Float_t* fData;
 };
 
-class CbmEcalShowerLib : public TNamed
+class CbmEcalShowerLib : public CbmTask
 {
 public:
   /** Constructor to use **/
@@ -41,7 +41,9 @@ public:
   /** Default constructor **/
   CbmEcalShowerLib();
   
-  void Init();
+  virtual InitStatus Init();
+  inline virtual void Finish() {};
+  inline virtual void Exec(Option_t* option) {};
   
   virtual ~CbmEcalShowerLib();
 

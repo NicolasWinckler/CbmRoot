@@ -305,7 +305,7 @@ Float_t CbmEcalShowerLib::GetSumEThetaPhi(Float_t x, Float_t y, Float_t cell, Fl
 
 /** Constructor to use **/
 CbmEcalShowerLib::CbmEcalShowerLib(const char* libname, Int_t verbose)
-  : TNamed("CbmEcalShowerLib", "Shower library"), fLibName(libname), fVerb(verbose)
+  : CbmTask("CbmEcalShowerLib", verbose), fLibName(libname), fVerb(verbose)
 {
   fSize=0;
   fIX=361;
@@ -323,7 +323,7 @@ CbmEcalShowerLib::CbmEcalShowerLib(const char* libname, Int_t verbose)
 
 /** Default constructor **/
 CbmEcalShowerLib::CbmEcalShowerLib()
-  : TNamed("CbmEcalShowerLib", "Shower library"), fLibName(""), fVerb(0)
+  : CbmTask(), fLibName(""), fVerb(0)
 {
   fSize=0;
   fEs=NULL;
@@ -331,7 +331,7 @@ CbmEcalShowerLib::CbmEcalShowerLib()
   fPhis=NULL;
 }
 
-void CbmEcalShowerLib::Init()
+InitStatus CbmEcalShowerLib::Init()
 {
   TFile* f;
   TTree* t;
@@ -359,7 +359,10 @@ void CbmEcalShowerLib::Init()
     Fatal("CbmEcalShowerLib", "Can't find library file %s.", lib.Data());
   t=(TTree*)f->Get("showerlib");
   if (t==NULL)
+  {
     Fatal("CbmEcalShowerLib", "Can't find library in file %s.", lib.Data());
+    return kFATAL;
+  }
 
   fRSize=fIX*fIY;
   en=new Float_t[fRSize];
@@ -461,6 +464,8 @@ void CbmEcalShowerLib::Init()
 
   CbmRootManager* fManager=CbmRootManager::Instance();
   fManager->Register("EcalShowerLib", "ECAL", this, kFALSE);
+
+  return kSUCCESS;
 }
 
 CbmEcalShowerLib::~CbmEcalShowerLib()

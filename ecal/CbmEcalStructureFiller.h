@@ -91,7 +91,7 @@ private:
   TClonesArray* fListECALpts;   // ECAL MC points
   TClonesArray* fListUHits;	// ECAL hits
   TClonesArray* fListHits;	// ECAL summable hits
-  TClonesArray* fListStack;     // Tracks
+//  TClonesArray* fListStack;     // Tracks
   Int_t fEvent;                 //! Internal event counter
 
   /** Is Init() already done? **/

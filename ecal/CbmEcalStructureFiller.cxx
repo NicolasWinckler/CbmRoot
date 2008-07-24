@@ -52,8 +52,8 @@ InitStatus CbmEcalStructureFiller::Init()
 
   if (fUseMCPoints==kFALSE&&fUseSummableHits==kFALSE&&fUseUnSummableHits==kFALSE)
   {
-    Error("Init()", "Structure filler needs data source!!!");
-    return kFATAL;
+    Warning("Init()", "No data source for structure filler! Calorimeter structure will be empty.");
+//    return kFATAL;
   }
   //ECAL MC points
   if (fUseMCPoints) 
@@ -67,8 +67,8 @@ InitStatus CbmEcalStructureFiller::Init()
   if (fUseUnSummableHits) 
     fListUHits = (TClonesArray*)fManager->ActivateBranch("EcalHit");
   
-  // all tracks
-  fListStack = (TClonesArray *)fManager->ActivateBranch("MCTrack");
+  // all MC tracks
+  //fListStack = (TClonesArray *)fManager->ActivateBranch("MCTrack");
   fInf->CheckVariables();
   fStr=new CbmEcalStructure(fInf);
   fStr->Construct();

@@ -22,6 +22,7 @@ struct CbmEcalClusterSortProcess : public std::binary_function<CbmEcalCell*, Cbm
 class CbmEcalClusterV1 : public TObject
 {
 friend class CbmEcalFitter;
+friend class CbmEcalClusterFinderV1;
 public:
   /** An empty constructor **/
   CbmEcalClusterV1();

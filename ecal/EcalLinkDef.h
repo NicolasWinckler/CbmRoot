@@ -43,5 +43,7 @@
 #pragma link C++ class  CbmEcalRecoSimple;
 #pragma link C++ class  CbmEcalClusterV1+;
 #pragma link C++ class	CbmEcalQualityCheck;
+#pragma link C++ class  CbmEcalClusterFinderV1;
+#pragma link C++ class  CbmEcalTrackImport;
 
 #endif

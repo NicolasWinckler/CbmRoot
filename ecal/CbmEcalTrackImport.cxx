@@ -1,0 +1,101 @@
+#include "CbmEcalTrackImport.h"
+
+#include "CbmRootManager.h"
+#include "CbmTrackParam.h"
+
+#include "TClonesArray.h"
+#include "TChain.h"
+#include "TMatrixFSym.h"
+
+#include <iostream>
+
+using namespace std;
+
+/** add a root file with tracks to chain **/
+void CbmEcalTrackImport::AddFile(const char* name)
+{
+  fChain->Add(name);
+}
+
+/** Standard constructor **/
+CbmEcalTrackImport::CbmEcalTrackImport(const char* name, const Int_t verbose)
+  : CbmTask(name, verbose)
+{
+  fChain=new TChain("ecaltracks");
+}
+
+
+/** Task initialization **/
+InitStatus CbmEcalTrackImport::Init()
+{
+  CbmRootManager* io=CbmRootManager::Instance();
+  if (!io)
+  {
+    Fatal("Init", "Can't find IOManager.");
+    return kFATAL;
+  }
+  fChain->SetBranchAddress("ev", &fEventN);
+  fChain->SetBranchAddress("x", &fX);
+  fChain->SetBranchAddress("y", &fY);
+  fChain->SetBranchAddress("z", &fZ);
+  fChain->SetBranchAddress("tx", &fTx);
+  fChain->SetBranchAddress("ty", &fTy);
+  fChain->SetBranchAddress("qp", &fQp);
+  fN=fChain->GetEntries();
+  if (fVerbose>0)
+    Info("Init", "%d tracks in input files.", fN);
+  if (fN==0)
+    Error("Init", "No tracks in input files");
+  fTracks=new TClonesArray("CbmTrackParam", 1000);
+  io->Register("EcalTrackParam", "ECAL", fTracks, kFALSE);
+  fEv=0; fEntry=1;
+  fChain->GetEntry(0);
+  return kSUCCESS;
+}
+
+/** Exec for task **/
+void CbmEcalTrackImport::Exec(Option_t* opt)
+{
+  fTracks->Delete();
+
+  fEv++;
+  Int_t nTr=0;
+  TMatrixFSym mat(5);
+  if (fEntry>=fN)
+  {
+    Warning("Exec", "No tracks found in file for event %d!", fEventN);
+    return;
+  }
+  while(fEventN<fEv)
+  {
+    new ((*fTracks)[nTr++]) CbmTrackParam(fX, fY, fZ, fTx, fTy, fQp, mat);
+    if (fEntry<fN)
+      fChain->GetEntry(fEntry++);
+    else
+      break;
+  }
+  if (fVerbose>0)
+    Info("Exec", "%d tracks imported.", nTr);
+}
+  
+/** Finish task **/
+void CbmEcalTrackImport::Finish()
+{
+  ;
+}
+
+/** virtual destructor **/
+CbmEcalTrackImport::~CbmEcalTrackImport()
+{
+  fTracks->Delete();
+  delete fTracks;
+}
+  
+/** Only to comply with framework **/
+CbmEcalTrackImport::CbmEcalTrackImport()
+{
+  ;
+}
+
+
+ClassImp(CbmEcalTrackImport)

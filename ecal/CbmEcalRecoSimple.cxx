@@ -21,53 +21,26 @@ using namespace std;
 void CbmEcalRecoSimple::Exec(Option_t* option)
 {
   Int_t i;
+  Int_t n=fClusters->GetEntriesFast();
+  CbmEcalClusterV1* cluster;
+  list<CbmEcalCell*>::const_iterator p;
 
   fN=0;
   fReco->Delete();
-  fClusters->Delete();
   if (fToTree&&fOutTree==NULL)
     CreateTree();
   fEventN++;
   if (fVerbose>0) 
-    Info("Exec", "Event %d .", fEventN);
-  if (fChain) ImportTracks();
-  ExcludeMaximums();
-  FindMaximums();
-  for(i=0;fMaximums[i]!=NULL;i++)
-    Reco(fMaximums[i]);
-  if (fVerbose>1)
-    Info("Exec", "%d photons reconstructed in calorimeter.", fN);
-}
-
-void CbmEcalRecoSimple::FindMaximums()
-{
-  list<CbmEcalCell*> cells;
-  list<CbmEcalCell*>::const_iterator p;
-  list<CbmEcalCell*>::const_iterator p1;
-  list<CbmEcalCell*> neib;
-  Int_t n=0;
-  Int_t i;
-  Double_t e;
-
-  fStr->GetCells(cells);
-  p=cells.begin();
-  for(;p!=cells.end();++p)
+    Info("Exec", "Event %d, %d clusters in event.", fEventN, n);
+  for(i=0;i<n;i++)
   {
-    e=(*p)->GetTotalEnergy();
-    (*p)->GetNeighborsList(0, neib);
-    p1=neib.begin();
-    for(;p1!=neib.end();++p1)
-      if ((*p1)->GetTotalEnergy()>=e) break;
-    if (p1==neib.end())
-    {
-      for(i=0;fExcluded[i]!=NULL;i++)
-	if (fExcluded[i]==(*p)) break;
-      if (fExcluded[i]==NULL) fMaximums[n++]=(*p);
-    }
+    cluster=(CbmEcalClusterV1*)fClusters->At(i);
+    p=cluster->PeaksBegin();
+    for(;p!=cluster->PeaksEnd();++p)
+      Reco(*p, cluster);
   }
   if (fVerbose>1)
-    Info("FindMaximums", "%d local maximums found in calorimeter.", n);
-  fMaximums[n++]=NULL;
+    Info("Exec", "%d photons reconstructed in calorimeter.", fN);
 }
 
 /** Returns incoming particle energy **/
@@ -86,7 +59,7 @@ Double_t CbmEcalRecoSimple::GetEnergy(Double_t e2, CbmEcalCell* cell)
 }
 
   /** Reconstruct photon from maximum **/
-void CbmEcalRecoSimple::Reco(CbmEcalCell* cell)
+void CbmEcalRecoSimple::Reco(CbmEcalCell* cell, CbmEcalClusterV1* clstr)
 {
   Double_t x;
   Double_t y;
@@ -195,75 +168,7 @@ void CbmEcalRecoSimple::Reco(CbmEcalCell* cell)
   px=fEReco*x/amp;
   py=fEReco*y/amp;
   pz=fEReco*z/amp;
-  CbmEcalClusterV1* cluster=new((*fClusters)[fN]) CbmEcalClusterV1(fN, cells); 
-  new((*fReco)[fN++]) CbmEcalRecParticle(px, py, pz, fEReco, x, y, z, 22, -1111, cluster, fType);
-}
-
-void CbmEcalRecoSimple::ExcludeMaximums()
-{
-  Int_t n=fTracks->GetEntriesFast();
-  Int_t i;
-  Int_t mn=0;
-  CbmTrackParam* tr;
-  CbmEcalCell* cell;
-  list<CbmEcalCell*> cells;
-  list<CbmEcalCell*>::const_iterator p;
-  CbmEcalCell* maxcell;
-  Double_t e;
-
-  if (fVerbose>1) 
-    Info("ExcludeMaximums", "Find %d charged tracks in event.", n);
-  for(i=0;i<n;i++)
-  {
-    tr=(CbmTrackParam*)fTracks->At(i);
-    cell=fStr->GetCell(tr->GetX(), tr->GetY());
-    if (cell==NULL) continue;
-    cell->GetNeighborsList(0, cells);
-    e=cell->GetTotalEnergy();
-    maxcell=cell;
-    for(p=cells.begin();p!=cells.end();++p)
-      if ((*p)->GetTotalEnergy()>e)
-      {
-	e=(*p)->GetTotalEnergy();
-	maxcell=(*p);
-      }
-    if (cell==maxcell)
-    {
-      fExcluded[mn++]=cell;
-      continue;
-    }
-    cell->GetNeighborsList(0, cells);
-    e=cell->GetTotalEnergy();
-    for(p=cells.begin();p!=cells.end();++p)
-      if ((*p)->GetTotalEnergy()>e) break;
-    if (p==cells.end())
-      fExcluded[mn++]=(*p);
-  }
-  fExcluded[mn]=NULL;
-}
-
-void CbmEcalRecoSimple::ImportTracks()
-{
-  fTracks->Delete();
-
-  Int_t nTr=0;
-  TMatrixFSym mat(5);
-  if (fChEntry>=fChEntries)
-  {
-    Warning("ImportTracks", "No tracks found in file for event %d!", fEventN);
-    return;
-  }
-  while(fTrEv<fEventN)
-  {
-    /** TODO: In general this is not correct is case of inclined calorimeter *
-     ** Should be corrected to fStr->GetCell(fTrX, fTrY)->GetCenterZ() for
-     ** example. **/
-    new ((*fTracks)[nTr++]) CbmTrackParam(fTrX, fTrY, fStr->GetEcalInf()->GetZPos(), fTrTx, fTrTy, fTrQp, mat);
-    if (fChEntry<fChEntries)
-      fChain->GetEntry(fChEntry++);
-    else
-      break;
-  }
+  new((*fReco)[fN++]) CbmEcalRecParticle(px, py, pz, fEReco, x, y, z, 22, -1111, clstr, fType);
 }
 
 void CbmEcalRecoSimple::CreateTree()
@@ -296,11 +201,8 @@ CbmEcalRecoSimple::CbmEcalRecoSimple()
 CbmEcalRecoSimple::CbmEcalRecoSimple(const char *name, const Int_t iVerbose)
   : CbmTask(name, iVerbose)
 {
-  fTracksFileName="";
-  fChain=NULL;
   fToTree=kFALSE;
   fOutTree=NULL;
-  fChEntry=1;
   fMaximums=NULL;
   fExcluded=NULL;
 
@@ -328,17 +230,8 @@ CbmEcalRecoSimple::CbmEcalRecoSimple(const char *name, const Int_t iVerbose)
 
 CbmEcalRecoSimple::~CbmEcalRecoSimple()
 {
-  if (fTracksFileName!="") 
-  {
-    fTracks->Delete();
-    delete fTracks;
-  }
   fReco->Delete();
-  fClusters->Delete();
-  delete fClusters;
   delete fReco;
-  delete fMaximums;
-  delete fExcluded;
 }
 
 void CbmEcalRecoSimple::Finish()
@@ -350,8 +243,6 @@ void CbmEcalRecoSimple::Finish()
 InitStatus CbmEcalRecoSimple::Init()
 {
   fEventN=0;
-  fMaximums=new CbmEcalCell*[5000];
-  fExcluded=new CbmEcalCell*[2000];
   CbmRootManager* io=CbmRootManager::Instance();
   if (!io)
   {
@@ -359,41 +250,26 @@ InitStatus CbmEcalRecoSimple::Init()
     return kFATAL;
   }
   fStr=(CbmEcalStructure*)io->GetObject("EcalStructure");
-  fInf=fStr->GetEcalInf();
   if (!fStr) 
   {
     Fatal("Init()", "Can't find calorimeter structure in the system.");
     return kFATAL;
   }
-  if (fTracksFileName!="")
+  fInf=fStr->GetEcalInf();
+  fTracks=(TClonesArray*)io->GetObject("EcalTrackParam");
+  if (!fTracks)
   {
-    // Read tracks from file
-    fChain=new TChain("ecaltracks");
-    fChain->AddFile(fTracksFileName);
-    fChain->SetBranchAddress("ev", &fTrEv);
-    fChain->SetBranchAddress("x", &fTrX);
-    fChain->SetBranchAddress("y", &fTrY);
-    fChain->SetBranchAddress("tx", &fTrTx);
-    fChain->SetBranchAddress("ty", &fTrTy);
-    fChain->SetBranchAddress("qp", &fTrQp);
-    fChEntries=fChain->GetEntries();
-    fTracks=new TClonesArray("CbmTrackParam", 1000);
-    TClonesArray* tr=(TClonesArray*)io->GetObject("EcalTrackParam");
-    if (tr==NULL)
-      io->Register("EcalTrackParam", "ECAL", fTracks, kFALSE);
-    fChain->GetEntry(0);
-  } else
+    Fatal("Init", "Can't find EcalTrackParam.");
+    return kFATAL;
+  }
+  fClusters=(TClonesArray*)io->GetObject("EcalClusters");
+  if (!fClusters)
   {
-    fTracks=(TClonesArray*)io->GetObject("EcalTrackParam");
-    if (!fTracks)
-    {
-      Fatal("Init", "Can't find EcalTrackParam.");
-      return kFATAL;
-    }
+    Fatal("Init", "Can't find EcalClusters");
+    return kFATAL;
   }
   fReco=new TClonesArray("CbmEcalRecParticle", 2000);
   io->Register(fRecoName, "ECAL", fReco, kFALSE);
-  fClusters=new TClonesArray("CbmEcalClusterV1", 2000);
   return kSUCCESS;
 }
 

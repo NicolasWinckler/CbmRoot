@@ -17,6 +17,7 @@ class CbmEcalStructure;
 class CbmEcalCell;
 class CbmEcalSCurveLib;
 class CbmEcalInf;
+class CbmEcalClusterV1;
 
 class CbmEcalRecoSimple : public CbmTask
 {
@@ -36,19 +37,14 @@ public:
   virtual void Finish();
 
   /** Tools for debugging **/
-  inline void SetTracksFileName(const char* name) {fTracksFileName=name;}
   inline void SetOutToTree(Bool_t totree=kTRUE) {fToTree=totree;}
   inline void SetRecoName(const char* name) {fRecoName=name;}
   inline TString GetRecoName() const {return fRecoName;}
 private:
-  /** Find maximums in calorimeter **/
-  void FindMaximums();
-  /** Exclude maximums belongs to charged tracks **/
-  void ExcludeMaximums();
   /** Returns incoming particle energy **/
   Double_t GetEnergy(Double_t e2, CbmEcalCell* cell);
   /** Reconstruct photon from maximum **/
-  void Reco(CbmEcalCell* cell);
+  void Reco(CbmEcalCell* cell, CbmEcalClusterV1* clstr);
   /** Number of reconstructed tracks **/
   Int_t fN;
 
@@ -70,23 +66,12 @@ private:
 
   /** Array of tracks **/
   TClonesArray* fTracks;	//!
+  /** Array of reconstructed particles **/
   TClonesArray* fReco;		//!
+  /** Array of clusters **/
   TClonesArray* fClusters;	//!
+  /** Name of output tree **/
   TString fRecoName;
-
-  /** A chain used for hack of tracking algorithms and stuff needed for 
-   ** it. To be removed after fast and reliable tracking will be available. **/
-  TString fTracksFileName;
-  TChain* fChain;		//!
-  Int_t fChEntry;
-  Int_t fChEntries;
-  Int_t fTrEv;
-  Float_t fTrX;
-  Float_t fTrY;
-  Float_t fTrTx;
-  Float_t fTrTy;
-  Float_t fTrQp;
-  void ImportTracks();
 
   /** A tool, to export reconstructed particles to file. Should be moved to
    ** a separate task in future. For debugging now. **/

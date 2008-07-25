@@ -37,7 +37,8 @@ CbmEcalShowerLib.cxx CbmEcalTrackExtrapolation.cxx
 CbmEcalTracking.cxx CbmEcalStructureFiller.cxx
 CbmEcalTrackExport.cxx CbmEcalStructureExport.cxx
 CbmEcalRecoSimple.cxx CbmEcalClusterV1.cxx
-CbmEcalQualityCheck.cxx
+CbmEcalQualityCheck.cxx CbmEcalClusterFinderV1.cxx
+CbmEcalTrackImport.cxx
 )
 
 SET(ECAL_SRCS ${ECAL_SRCS_RULECHECKER} CbmEcalInf.cxx)

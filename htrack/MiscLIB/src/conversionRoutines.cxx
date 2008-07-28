@@ -1278,7 +1278,7 @@ unsigned int stoui(char* value, int radix) {
 
 	}
 	else
-		returnValue = (unsigned long) -1;
+		returnValue = (unsigned int) -1;
 
 	return returnValue;
 
@@ -1319,7 +1319,7 @@ unsigned int stoui(std::string value, int radix) {
 
 	}
 	else
-		returnValue = (unsigned long) -1;
+		returnValue = (unsigned int) -1;
 
 	return returnValue;
 

@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/07/17 11:27:42 $
-// $Revision: 1.1 $
+// $Date: 2007-10-19 14:33:06 $
+// $Revision: 1.2 $
 //
 // *******************************************************************/
 
@@ -216,6 +216,68 @@ trackfinderInputHit* inputHitSpecialList::readActiveObjectAndMakeNextOneActive()
 	activeObjectPointer++;
 	if (activeObjectPointer == getNumberOfEntries())
 		resetActiveObject();
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double inputHitSpecialList::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = minimalArraySize * sizeof(trackfinderInputHit*);
+	returnValue += sizeof(specialAddArray);
+	returnValue += sizeof(numberOfEntries);
+	returnValue += sizeof(activeObjectPointer);
+	returnValue += sizeof(internalListObjectPointer);
+	returnValue += sizeof(specialAddArrayIterator);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double inputHitSpecialList::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = specialAddArray.size() * sizeof(trackfinderInputHit*);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double inputHitSpecialList::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = minimalArraySize * sizeof(trackfinderInputHit*);
+	returnValue += sizeof(specialAddArray);
+	returnValue += specialAddArray.size() * sizeof(trackfinderInputHit*);
+	returnValue += sizeof(numberOfEntries);
+	returnValue += sizeof(activeObjectPointer);
+	returnValue += sizeof(internalListObjectPointer);
+	returnValue += sizeof(specialAddArrayIterator);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
 
 	return returnValue;
 

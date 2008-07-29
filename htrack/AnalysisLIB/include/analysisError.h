@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/12/12 13:04:34 $
-/// $Revision: 1.2 $
+/// $Date: 2007-12-13 13:47:19 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -202,10 +202,10 @@ public:
 #define _CANNOTACCESSMAGNETFIELDANALYSERERROR_H
 
 /**
- * CLASS cannotAccessMagnetfieldAnalyser
+ * CLASS cannotAccessMagnetfieldAnalyserError
  */
 
-class cannotAccessMagnetfieldAnalyser : public analysisError {
+class cannotAccessMagnetfieldAnalyserError : public analysisError {
 
 public:
 
@@ -213,13 +213,13 @@ public:
  * Default constructor
  */
 
-	cannotAccessMagnetfieldAnalyser();
+	cannotAccessMagnetfieldAnalyserError();
 
 /**
  * Destructor
  */
 
-	virtual ~cannotAccessMagnetfieldAnalyser();
+	virtual ~cannotAccessMagnetfieldAnalyserError();
 
 /**
  * This method displays an error message.
@@ -436,6 +436,40 @@ public:
 #endif
 
 
+#ifndef _CANNOTACCESSPRELUTRANGEANALYSERERROR_H
+#define _CANNOTACCESSPRELUTRANGEANALYSERERROR_H
+
+/**
+ * CLASS cannotAccessPrelutRangeAnalyserError
+ */
+
+class cannotAccessPrelutRangeAnalyserError : public analysisError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotAccessPrelutRangeAnalyserError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotAccessPrelutRangeAnalyserError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
 #ifndef _INDEXISOUTOFDISPLAYRANGEERROR_H
 #define _INDEXISOUTOFDISPLAYRANGEERROR_H
 
@@ -627,6 +661,153 @@ public:
  */
 
 	virtual ~cannotAccessTrackCoordinatesError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _INDEXISOUTOFTRACKRANGEERROR_H
+#define _INDEXISOUTOFTRACKRANGEERROR_H
+
+/**
+ * CLASS indexIsOutOfTrackRangeError
+ */
+
+class indexIsOutOfTrackRangeError : public analysisError {
+
+protected:
+
+	unsigned int index;
+	unsigned int numberOfTracks;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	indexIsOutOfTrackRangeError();
+
+/**
+ * Constructor
+ */
+
+	indexIsOutOfTrackRangeError(unsigned int index, unsigned int numberOfTracks);
+
+/**
+ * Destructor
+ */
+
+	virtual ~indexIsOutOfTrackRangeError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _WRONGRELATIVEVALUEFOUNDERROR_H
+#define _WRONGRELATIVEVALUEFOUNDERROR_H
+
+/**
+ * CLASS wrongRelativeValueFoundError
+ */
+
+class wrongRelativeValueFoundError : public analysisError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	wrongRelativeValueFoundError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~wrongRelativeValueFoundError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _WRONGCONSTRAINTVALUEFOUNDERROR_H
+#define _WRONGCONSTRAINTVALUEFOUNDERROR_H
+
+/**
+ * CLASS wrongConstraintValueFoundError
+ */
+
+class wrongConstraintValueFoundError : public analysisError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	wrongConstraintValueFoundError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~wrongConstraintValueFoundError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _INITHISTOGRAMDIMENSIONSFIRSTERROR_H
+#define _INITHISTOGRAMDIMENSIONSFIRSTERROR_H
+
+/**
+ * CLASS initHistogramDimensionsFirstError
+ */
+
+class initHistogramDimensionsFirstError : public analysisError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	initHistogramDimensionsFirstError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~initHistogramDimensionsFirstError();
 
 /**
  * This method displays an error message.

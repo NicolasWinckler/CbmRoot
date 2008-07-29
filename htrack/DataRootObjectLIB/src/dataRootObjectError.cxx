@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007/01/03 13:46:00 $
-// $Revision: 1.3 $
+// $Date: 2007-10-19 14:33:04 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
@@ -101,6 +101,37 @@ void cannotFindStationIdError::errorMsg() {
 	temp += buffer;
 	temp += " is not found!!!";
 	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS detectorIsNotDefinedError				 				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+detectorIsNotDefinedError::detectorIsNotDefinedError() : dataRootObjectError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+detectorIsNotDefinedError::~detectorIsNotDefinedError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void detectorIsNotDefinedError::errorMsg() {
+
+	printMsg("The detector is not defined. No station exists!!!");
 
 }
 

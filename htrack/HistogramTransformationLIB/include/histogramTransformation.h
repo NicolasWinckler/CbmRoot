@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-05-04 11:19:59 $
-/// $Revision: 1.4 $
+/// $Date: 2008-06-26 12:52:50 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -165,7 +165,7 @@ public:
  * the correspondance to be equal to the eraser-object result.
  */
 
-	void finalizeHistogramLayer(unsigned short layer, std::streambuf* terminal = NULL, terminalSequence* statusSequence = NULL, unsigned short statusMax = 0);
+	void serializeHistogramLayer(unsigned short layer, std::streambuf* terminal = NULL, terminalSequence* statusSequence = NULL, unsigned short statusMax = 0);
 
 /**
  * This method filters the tracks in a speciallized manner

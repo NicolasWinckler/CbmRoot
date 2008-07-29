@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-04-16 10:38:13 $
-/// $Revision: 1.5 $
+/// $Date: 2007-10-19 14:34:30 $
+/// $Revision: 1.6 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -118,12 +118,12 @@ public:
 	void readDataSource(unsigned int event, TClonesArray* mvdHitArray, TClonesArray* stsHitArray);
 
 /**
- * This method returns the size of the used memory for the
- * source data.
+ * This method returns the size of the reserved memory for
+ * the source data.
  * @param dimension formats the returnvalue to B, kB, MB or GB
  */
 
-	double getUsedSizeOfData(unsigned short dimension);
+	double getReservedSizeOfData(unsigned short dimension = 0);
 
 /**
  * This method returns the size of the allocated memory for
@@ -131,7 +131,15 @@ public:
  * @param dimension formats the returnvalue to B, kB, MB or GB
  */
 
-	double getAllocatedSizeOfData(unsigned short dimension);
+	double getAllocatedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfData(unsigned short dimension = 0);
 
 };
 

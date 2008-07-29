@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/07/17 11:27:42 $
-// $Revision: 1.1 $
+// $Date: 2007-10-19 14:33:06 $
+// $Revision: 1.2 $
 //
 // *******************************************************************/
 
@@ -230,6 +230,68 @@ trackfinderInputHit* inputHitSpecialArray::readActiveObjectAndMakeNextOneActive(
 	activeObjectPointer++;
 	if (activeObjectPointer == numberOfEntries)
 		resetActiveObject();
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double inputHitSpecialArray::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = minimalArraySize * sizeof(trackfinderInputHit*);
+	returnValue += sizeof(specialAddArray);
+	returnValue += sizeof(numberOfEntries);
+	returnValue += sizeof(activeObjectPointer);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double inputHitSpecialArray::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	if (numberOfEntries > minimalArraySize)
+		returnValue  = (numberOfEntries - minimalArraySize) * sizeof(trackfinderInputHit*);
+	else
+		returnValue  = 0;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double inputHitSpecialArray::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = minimalArraySize * sizeof(trackfinderInputHit*);
+	returnValue += sizeof(specialAddArray);
+	if (numberOfEntries > minimalArraySize)
+		returnValue += (numberOfEntries - minimalArraySize) * sizeof(trackfinderInputHit*);
+	returnValue += sizeof(numberOfEntries);
+	returnValue += sizeof(activeObjectPointer);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
 
 	return returnValue;
 

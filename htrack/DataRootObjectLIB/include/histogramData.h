@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:27:33 $
-/// $Revision: 1.1 $
+/// $Date: 2007-10-19 14:32:57 $
+/// $Revision: 1.2 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -126,22 +126,6 @@ public:
 	void resetLayer();
 
 /**
- * This method returns the size of the used memory for
- * histogram.
- * @param dimension formats the returnvalue to B, kB, MB or GB
- */
-
-	double getUsedSizeOfHistogram(unsigned short dimension = 0);
-
-/**
- * This method returns the size of the allocated memory for
- * histogram.
- * @param dimension formats the returnvalue to B, kB, MB or GB
- */
-
-	double getAllocatedSizeOfHistogram(unsigned short dimension = 0);
-
-/**
  * This method returns the size of the dimension 1 for the
  * histogram.
  */
@@ -183,6 +167,12 @@ public:
 
 	std::vector<lutBorder>::iterator getBorderBeginIterator(unsigned short index);
 	std::vector<lutBorder>::iterator getBorderEndIterator(unsigned short index);
+
+/**
+ * This method returns the number of borders at position (index) from the histogram.
+ */
+
+	unsigned long getNumberOfBorders(unsigned short index);
 
 /**
  * This method sets the hit into the cell at position
@@ -231,6 +221,182 @@ public:
  */
 
 	void printBorder(unsigned int dim3Start, unsigned int dim3Stop, char* name);
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfHBufferData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfHBufferData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfHBufferData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfHBufferPrelutData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfHBufferPrelutData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfHBufferPrelutData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfHBufferLutData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfHBufferLutData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfHBufferLutData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfHBufferHitData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfHBufferHitData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfHBufferHitData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfHBufferAddOnData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfHistogramData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfHistogramData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfHistogramData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfHistogramSignatureData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfHistogramSignatureData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfHistogramSignatureData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfHistogramHitData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfHistogramHitData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfHistogramHitData(unsigned short dimension = 0);
 
 };
 

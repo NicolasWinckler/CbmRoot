@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-05-14 15:48:25 $
-// $Revision: 1.5 $
+// $Date: 2008-06-26 13:01:08 $
+// $Revision: 1.8 $
 //
 // *******************************************************************/
 
@@ -52,7 +52,11 @@ trackfinder::trackfinder() {
 
 #endif
 
+#ifndef NOANALYSIS
+
 	analyser       = NULL;
+
+#endif
 
 }
 
@@ -80,7 +84,11 @@ trackfinder::trackfinder( trackfinderInputData** eventData, histogramData** hist
 
 #endif
 
+#ifndef NOANALYSIS
+
 	analyser       = NULL;
+
+#endif
 
 }
 
@@ -137,7 +145,11 @@ void trackfinder::init(trackfinderInputData** eventData, histogramData** histogr
 
 void trackfinder::setAnalyser(analysis* analyser) {
 
+#ifndef NOANALYSIS
+
 	this->analyser = analyser;
+
+#endif
 
 }
 
@@ -156,14 +168,76 @@ void trackfinder::evaluate(std::streambuf* terminal) {
 
 	houghTransform->resetHistogram();
 	histoTransform->resetTracks();
+
+
+#ifndef NOANALYSIS
+
+	if (analyser != NULL) {
+		if (analyser->isTimeAnalysisEnabled()) {
+			analyser->borderCreationTimerReset();
+			analyser->histogramCreationTimerReset();
+			analyser->histogramEncodingTimerReset();
+			analyser->histogramDiagonalizingTimerReset();
+			analyser->histogramPeakfindingTimerReset();
+			analyser->histogramFinalizingTimerReset();
+			analyser->histogramResettingTimerReset();
+			analyser->trackPeakfindingTimerReset();
+		}
+	}
+
+#endif
+
+#ifndef NOANALYSIS
+
+	if (analyser != NULL)
+		if (analyser->isTimeAnalysisEnabled())
+			analyser->borderCreationTimerStart(false);
+
+#endif
+
+#ifndef NOANALYSIS
+
+	houghTransform->createBorders(analyser, terminal);
+
+#else
+
 	houghTransform->createBorders(terminal);
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Process layers:\t\t\t", houghTransform->getNumberOfHistogramLayers());
+#endif
+
+#ifndef NOANALYSIS
+
+	if (analyser != NULL)
+		if (analyser->isTimeAnalysisEnabled())
+			analyser->borderCreationTimerStop();
+
+#endif
+
+	createTerminalStatusSequence(&statusSequence, terminal, "Process layers:\t\t\t\t\t", houghTransform->getNumberOfHistogramLayers());
 	terminalInitialize(statusSequence);
 
 	for (unsigned short i = 0; i < houghTransform->getNumberOfHistogramLayers(); i++) {
 
+#ifndef NOANALYSIS
+
+		if (analyser != NULL)
+			if (analyser->isTimeAnalysisEnabled())
+				analyser->histogramCreationTimerStart(false);
+
+#endif
+
 		houghTransform->createHistogramLayer(i);
+
+#ifndef NOANALYSIS
+
+		if (analyser != NULL)
+			if (analyser->isTimeAnalysisEnabled())
+				analyser->histogramCreationTimerStop();
+
+#endif
+
+#ifndef NOANALYSIS
+
 		if (analyser != NULL) {
 			if (analyser->isWritingCreatedHistogramLayerEnabled()) {
 				if (analyser->isWritingJustOneCreatedHistogramLayerEnabled()) {
@@ -182,7 +256,29 @@ void trackfinder::evaluate(std::streambuf* terminal) {
 				}
 			}
 		}
+
+#endif
+
+#ifndef NOANALYSIS
+
+		if (analyser != NULL)
+			if (analyser->isTimeAnalysisEnabled())
+				analyser->histogramEncodingTimerStart(false);
+
+#endif
+
 		histoTransform->encodeHistogramLayer(i);
+
+#ifndef NOANALYSIS
+
+		if (analyser != NULL)
+			if (analyser->isTimeAnalysisEnabled())
+				analyser->histogramEncodingTimerStop();
+
+#endif
+
+#ifndef NOANALYSIS
+
 		if (analyser != NULL) {
 			if (analyser->isWritingEncodedHistogramLayerEnabled()) {
 				if (analyser->isWritingJustOneEncodedHistogramLayerEnabled()) {
@@ -201,8 +297,47 @@ void trackfinder::evaluate(std::streambuf* terminal) {
 				}
 			}
 		}
+
+#endif
+
+#ifndef NOANALYSIS
+
+		if (analyser != NULL)
+			if (analyser->isTimeAnalysisEnabled())
+				analyser->histogramDiagonalizingTimerStart(false);
+
+#endif
+
 		histoTransform->diagonalizeHistogramLayer(i);
+
+#ifndef NOANALYSIS
+
+		if (analyser != NULL)
+			if (analyser->isTimeAnalysisEnabled())
+				analyser->histogramDiagonalizingTimerStop();
+
+#endif
+
+#ifndef NOANALYSIS
+
+		if (analyser != NULL)
+			if (analyser->isTimeAnalysisEnabled())
+				analyser->histogramPeakfindingTimerStart(false);
+
+#endif
+
 		histoTransform->filterHistogramLayer(i);
+
+#ifndef NOANALYSIS
+
+		if (analyser != NULL)
+			if (analyser->isTimeAnalysisEnabled())
+				analyser->histogramPeakfindingTimerStop();
+
+#endif
+
+#ifndef NOANALYSIS
+
 		if (analyser != NULL) {
 			if (analyser->isWritingFilteredHistogramLayerEnabled()) {
 				if (analyser->isWritingJustOneFilteredHistogramLayerEnabled()) {
@@ -222,9 +357,43 @@ void trackfinder::evaluate(std::streambuf* terminal) {
 			}
 		}
 
-		histoTransform->finalizeHistogramLayer(i, terminal, &statusSequence, houghTransform->getNumberOfHistogramLayers());
+#endif
+
+#ifndef NOANALYSIS
+
+		if (analyser != NULL)
+			if (analyser->isTimeAnalysisEnabled())
+				analyser->histogramFinalizingTimerStart(false);
+
+#endif
+
+		histoTransform->serializeHistogramLayer(i, terminal, &statusSequence, houghTransform->getNumberOfHistogramLayers());
+
+#ifndef NOANALYSIS
+
+		if (analyser != NULL)
+			if (analyser->isTimeAnalysisEnabled())
+				analyser->histogramFinalizingTimerStop();
+
+#endif
+
+#ifndef NOANALYSIS
+
+		if (analyser != NULL)
+			if (analyser->isTimeAnalysisEnabled())
+				analyser->histogramResettingTimerStart(false);
+
+#endif
 
 		houghTransform->resetHistogramLayer();
+
+#ifndef NOANALYSIS
+
+		if (analyser != NULL)
+			if (analyser->isTimeAnalysisEnabled())
+				analyser->histogramResettingTimerStop();
+
+#endif
 
 		terminalOverwrite(statusSequence, i + 1);
 
@@ -232,15 +401,63 @@ void trackfinder::evaluate(std::streambuf* terminal) {
 
 	terminalFinalize(statusSequence);
 
+#ifndef NOANALYSIS
+
 	if (analyser != NULL) {
 
 		if (analyser->isNumberOfTracksInAllColumnsAnalysisEnabled())
-			analyser->evaluateNumberOfTracksInAllColumns();
+			analyser->evaluateNumberOfTracksInAllColumns(terminal);
+		if (analyser->isNumberOfTracksInAllRowsAnalysisEnabled())
+			analyser->evaluateNumberOfTracksInAllRows(terminal);
 		if (analyser->isNumberOfTracksInAllLayersAnalysisEnabled())
-			analyser->evaluateNumberOfTracksInAllLayers();
+			analyser->evaluateNumberOfTracksInAllLayers(terminal);
 
 	}
 
+#endif
+
+#ifndef NOANALYSIS
+
+	if (analyser != NULL)
+		if (analyser->isMemoryAnalysisEnabled())
+			analyser->evaluateSizeOfLBufferData();
+
+#endif
+
+#ifndef NOANALYSIS
+
+	if (analyser != NULL)
+		if (analyser->isTimeAnalysisEnabled())
+			analyser->trackPeakfindingTimerStart(false);
+
+#endif
+
 	histoTransform->filterHistogram(terminal);
+
+#ifndef NOANALYSIS
+
+	if (analyser != NULL)
+		if (analyser->isTimeAnalysisEnabled())
+			analyser->trackPeakfindingTimerStop();
+
+#endif
+
+}
+
+/****************************************************************
+ * This method returns the trackIndex of the debugged track,	*
+ * if DEBUGJUSTONEGOODTRACK is enabled.							*
+ ****************************************************************/
+
+int trackfinder::getDebugTrackIndex() {
+
+	int returnValue;
+
+	if (houghTransform != NULL)
+		returnValue = houghTransform->getDebugTrackIndex();
+	else
+		returnValue = INVALIDTRACKINDEX;
+
+	return returnValue;
 
 }

@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-04-16 10:37:52 $
-// $Revision: 1.8 $
+// $Date: 2008-06-26 12:33:39 $
+// $Revision: 1.10 $
 //
 // *******************************************************************/
 
@@ -229,7 +229,7 @@ TClonesArray* trackfinderOutputData::getTrackData() {
  * method returns a reference to a track with a specified index	*
  ****************************************************************/
 
-CbmStsTrack* trackfinderOutputData::getTrackByIndex(unsigned int index) {
+CbmStsTrack* trackfinderOutputData::getTrackByOrder(unsigned int index) {
 
 	CbmStsTrack* track;
 
@@ -245,34 +245,6 @@ CbmStsTrack* trackfinderOutputData::getTrackByIndex(unsigned int index) {
 		throw cannotAccessHitsOrTracksError(DATAOBJECTLIB);
 
 	return track;
-
-}
-
-/****************************************************************
- * This method returns the size of the used memory for the		*
- * source data.													*
- ****************************************************************/
-
-double trackfinderOutputData::getUsedSizeOfData(unsigned short dimension) {
-
-	double returnValue;
-
-	returnValue =  getNumberOfTracks() * sizeof(CbmStsTrack);
-
-	returnValue = (returnValue / (1 << (10 * dimension)));
-
-	return returnValue;
-
-}
-
-/****************************************************************
- * This method returns the size of the allocated memory for		*
- * the source data.												*
- ****************************************************************/
-
-double trackfinderOutputData::getAllocatedSizeOfData(unsigned short dimension) {
-
-	return getUsedSizeOfData(dimension);
 
 }
 
@@ -414,6 +386,66 @@ void trackfinderOutputData::removeAllTracks() {
 		init();
 
 	tracks->RemoveAll();
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderOutputData::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(tracks);
+	returnValue += sizeof(actualTrack);
+	returnValue += sizeof(tracksAreLocal);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderOutputData::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	if (tracks != NULL)
+		returnValue += tracks->Capacity() * sizeof(CbmStsTrack);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderOutputData::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(tracks);
+	if (tracks != NULL)
+		returnValue += tracks->GetEntries() * sizeof(CbmStsTrack);
+	returnValue += sizeof(actualTrack);
+	returnValue += sizeof(tracksAreLocal);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }
 

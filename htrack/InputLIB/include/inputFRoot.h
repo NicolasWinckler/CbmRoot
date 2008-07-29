@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-05-29 15:11:47 $
-/// $Revision: 1.4 $
+/// $Date: 2007-10-19 14:34:30 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -121,6 +121,30 @@ public:
  */
 
 	void readDetectorInfo(CbmStsDigiScheme* scheme = NULL);
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfData(unsigned short dimension = 0);
 
 };
 

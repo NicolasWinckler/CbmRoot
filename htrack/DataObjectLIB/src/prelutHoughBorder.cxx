@@ -24,14 +24,17 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/11/06 11:12:14 $
-// $Revision: 1.2 $
+// $Date: 2008-02-29 11:38:11 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
 
 #include "../../MiscLIB/include/conversionRoutines.h"
 #include "../include/prelutHoughBorder.h"
+
+
+#define RADIX 10
 
 
 /****************************************************************
@@ -127,8 +130,10 @@ std::string prelutHoughBorder::getStart() {
 	std::string returnValue;
 	char        buffer[shortConversionDigits+1];
 
-	ustos(start, buffer, 10, shortConversionDigits);
-	returnValue = buffer;
+	returnValue  = "000";
+	addRadix(RADIX, returnValue);
+	ustos(start, buffer, RADIX, shortConversionDigits);
+	returnValue += buffer;
 
 	return returnValue;
 
@@ -143,8 +148,10 @@ std::string prelutHoughBorder::getStop() {
 	std::string returnValue;
 	char        buffer[shortConversionDigits+1];
 
-	ustos(stop, buffer, 10, shortConversionDigits);
-	returnValue = buffer;
+	returnValue  = "000";
+	addRadix(RADIX, returnValue);
+	ustos(stop, buffer, RADIX, shortConversionDigits);
+	returnValue += buffer;
 
 	return returnValue;
 
@@ -156,7 +163,12 @@ std::string prelutHoughBorder::getStop() {
 
 void prelutHoughBorder::setStart(std::string& value) {
 
-	start = stous(value, 10);
+	std::string temp;
+	int         radix;
+
+	temp  = value;
+	radix = extractRadix(&temp);
+	start = stous(temp, radix);
 
 }
 
@@ -166,6 +178,64 @@ void prelutHoughBorder::setStart(std::string& value) {
 
 void prelutHoughBorder::setStop(std::string& value) {
 
-	stop = stous(value, 10);
+	std::string temp;
+	int         radix;
+
+	temp  = value;
+	radix = extractRadix(&temp);
+	stop  = stous(temp, radix);
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double prelutHoughBorder::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(start);
+	returnValue += sizeof(stop);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double prelutHoughBorder::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double prelutHoughBorder::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(start);
+	returnValue += sizeof(stop);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }

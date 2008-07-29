@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007/01/17 15:39:49 $
-/// $Revision: 1.3 $
+/// $Date: 2007-12-13 13:47:19 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -37,9 +37,10 @@
 #include "../include/magnetfieldFactorAnalysisDef.h"
 #include "../include/magnetfieldFactorAnalysis.h"
 #include "TStyle.h"
-#include "TFile.h"
 #include "TAxis.h"
 #include "TH1F.h"
+#include "TFile.h"
+
 
 /* **************************************************************
  * CLASS magnetfieldFactorAnalysis								*
@@ -407,7 +408,7 @@ void magnetfieldFactorAnalysis::initWindow() {
 
 		initDisplayStyle();
 
-		window = new TCanvas("MFFWindow", "Magnetfield Factor Analysis", 600, 400);
+		window = new TCanvas("MFAWindow", "Magnetfield Factor Analysis", 600, 400);
 
 		numberOfWindowPadColumns = 0;
 		numberOfWindowPadRows    = 0;
@@ -433,43 +434,39 @@ void magnetfieldFactorAnalysis::setAutomaticAxisRange() {
 
 		if (displays[i] != NULL) {
 
-			if (displays[i]->GetHistogram() != NULL) {
+			xValues = displays[i]->GetX();
+			yValues = displays[i]->GetY();
 
-				xValues = displays[i]->GetX();
-				yValues = displays[i]->GetY();
+			xMin = xValues[0];
+			xMax = xValues[0];
+			yMin = yValues[0];
+			yMax = yValues[0];
 
-				xMin = xValues[0];
-				xMax = xValues[0];
-				yMin = yValues[0];
-				yMax = yValues[0];
+			for (int j = 1; j < displays[i]->GetN(); j++) {
 
-				for (int j = 1; j < displays[i]->GetN(); j++) {
-
-					if (xValues[j] < xMin)
-						xMin = xValues[j];
-					if (xValues[j] > xMax)
-						xMax = xValues[j];
-					if (yValues[j] < yMin)
-						yMin = yValues[j];
-					if (yValues[j] > yMax)
-						yMax = yValues[j];
-
-				}
-
-				displays[i]->GetHistogram()->SetAxisRange(xMin, xMax, "X");
-				displays[i]->GetHistogram()->SetAxisRange(yMin, yMax, "Y");
+				if (xValues[j] < xMin)
+					xMin = xValues[j];
+				if (xValues[j] > xMax)
+					xMax = xValues[j];
+				if (yValues[j] < yMin)
+					yMin = yValues[j];
+				if (yValues[j] > yMax)
+					yMax = yValues[j];
 
 			}
-			else {
 
-				rootHistogramNotFoundWarningMsg* rootHistogramNotFound = new rootHistogramNotFoundWarningMsg();
-				rootHistogramNotFound->warningMsg();
-				if(rootHistogramNotFound != NULL) {
-					delete rootHistogramNotFound;
-					rootHistogramNotFound = NULL;
-				}
-
-			}
+			/*
+			 * SetLimits sets the minimal and maximal values for the axis.
+			 * Smaller values are in the underflow bin and higher values
+			 * in the overflow bin.
+			 *
+			 * SetRangeUser sets the zoom of the axis. Here the zoom is
+			 * set to one.
+			 */
+			displays[i]->GetXaxis()->SetLimits(0.95 * xMin, 1.05 * xMax);
+			displays[i]->GetXaxis()->SetRangeUser(0.95 * xMin, 1.05 * xMax);
+			displays[i]->GetYaxis()->SetLimits(0.95 * yMin, 1.05 * yMax);
+			displays[i]->GetYaxis()->SetRangeUser(0.95 * yMin, 1.05 * yMax);
 
 		}
 		else {
@@ -729,6 +726,7 @@ void magnetfieldFactorAnalysis::setDistance(unsigned short display, unsigned int
 		if (index < numberOfFactors) {
 
 			distances[display][index] = value;
+
 		}
 		else
 			throw indexIsOutOfFactorRangeError(index, numberOfFactors);
@@ -751,6 +749,7 @@ void magnetfieldFactorAnalysis::addDistance(unsigned short display, unsigned int
 		if (index < numberOfFactors) {
 
 			distances[display][index] += value;
+
 		}
 		else
 			throw indexIsOutOfFactorRangeError(index, numberOfFactors);
@@ -1016,6 +1015,8 @@ void magnetfieldFactorAnalysis::magnetfieldFactorAnalysisDraw(bitArray preventDr
 				if (displays[i] != NULL) {
 
 					displays[i]->Draw("AC*");
+
+					setAutomaticAxisRange();
 
 				}
 				else {

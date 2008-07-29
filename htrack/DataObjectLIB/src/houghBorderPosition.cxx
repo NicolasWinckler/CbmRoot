@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/11/08 12:37:31 $
-// $Revision: 1.3 $
+// $Date: 2008-02-29 11:38:11 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -188,6 +188,36 @@ void houghBorderPosition::fromNotIdentifiedString(std::string& value) {
 
 /****************************************************************
  * This method sets the object based on the string				*
+ * representation without identifiers.							*
+ ****************************************************************/
+
+void houghBorderPosition::fromNotIdentifiedRadixString(std::string& value) {
+
+	std::string removeFrontPart;
+	std::string removeBackPart;
+	std::string part1;
+	std::string part2;
+	std::string number1;
+	std::string number2;
+	int         radix;
+
+	removeFrontPart = NOTIDENTIFIEDFRONTSTRING;
+	removeBackPart  = NOTIDENTIFIEDBACKSTRING;
+
+	partString(value, part1, part2);
+
+	number1 = removeFrontString(part1, removeFrontPart);
+	number2 = removeBackString(part2, removeBackPart);
+
+	radix = extractRadix(&number1);
+	pos1  = stous(number1, radix);
+	radix = extractRadix(&number2);
+	pos2  = stous(number2, radix);
+
+}
+
+/****************************************************************
+ * This method sets the object based on the string				*
  * representation with identifiers.								*
  ****************************************************************/
 
@@ -210,6 +240,36 @@ void houghBorderPosition::fromIdentifiedString(std::string& value) {
 
 	pos1 = stous(number1, STRINGRADIX);
 	pos2 = stous(number2, STRINGRADIX);
+
+}
+
+/****************************************************************
+ * This method sets the object based on the string				*
+ * representation with identifiers.								*
+ ****************************************************************/
+
+void houghBorderPosition::fromIdentifiedRadixString(std::string& value) {
+
+	std::string removePart1;
+	std::string removePart2;
+	std::string part1;
+	std::string part2;
+	std::string number1;
+	std::string number2;
+	int         radix;
+
+	removePart1 = IDENTIFIEDFRONTSTRING1;
+	removePart2 = IDENTIFIEDFRONTSTRING2;
+
+	partString(value, part1, part2);
+
+	number1 = removeFrontString(part1, removePart1);
+	number2 = removeFrontString(part2, removePart2);
+
+	radix = extractRadix(&number1);
+	pos1  = stous(number1, radix);
+	radix = extractRadix(&number2);
+	pos2  = stous(number2, radix);
 
 }
 
@@ -238,6 +298,33 @@ std::string houghBorderPosition::toNotIdentifiedString() {
  * This method converts the object into a string representation	*
  ****************************************************************/
 	
+std::string houghBorderPosition::toNotIdentifiedRadixString() {
+
+	std::string radix;
+	std::string returnValue;
+	char        buffer[shortConversionDigits+1];
+
+	radix        = "000";
+	addRadix(STRINGRADIX, radix);
+
+	returnValue  = NOTIDENTIFIEDFRONTSTRING;
+	returnValue += radix;
+	ustos(pos1, buffer, STRINGRADIX, shortConversionDigits);
+	returnValue += buffer;
+	returnValue += CLASSMEMBERSTRINGSEPARATOR;
+	returnValue += radix;
+	ustos(pos2, buffer, STRINGRADIX, shortConversionDigits);
+	returnValue += buffer;
+	returnValue += NOTIDENTIFIEDBACKSTRING;
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method converts the object into a string representation	*
+ ****************************************************************/
+	
 std::string houghBorderPosition::toIdentifiedString() {
 
 	std::string returnValue;
@@ -250,6 +337,86 @@ std::string houghBorderPosition::toIdentifiedString() {
 	returnValue += IDENTIFIEDFRONTSTRING2;
 	ustos(pos2, buffer, STRINGRADIX, shortConversionDigits);
 	returnValue += buffer;
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method converts the object into a string representation	*
+ ****************************************************************/
+	
+std::string houghBorderPosition::toIdentifiedRadixString() {
+
+	std::string radix;
+	std::string returnValue;
+	char        buffer[shortConversionDigits+1];
+
+	radix        = "000";
+	addRadix(STRINGRADIX, radix);
+
+	returnValue  = IDENTIFIEDFRONTSTRING1;
+	returnValue += radix;
+	ustos(pos1, buffer, STRINGRADIX, shortConversionDigits);
+	returnValue += buffer;
+	returnValue += CLASSMEMBERSTRINGSEPARATOR;
+	returnValue += IDENTIFIEDFRONTSTRING2;
+	returnValue += radix;
+	ustos(pos2, buffer, STRINGRADIX, shortConversionDigits);
+	returnValue += buffer;
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double houghBorderPosition::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(pos1);
+	returnValue += sizeof(pos2);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double houghBorderPosition::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double houghBorderPosition::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(pos1);
+	returnValue += sizeof(pos2);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
 
 	return returnValue;
 

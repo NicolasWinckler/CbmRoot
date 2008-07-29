@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:26:55 $
-/// $Revision: 1.1 $
+/// $Date: 2007-10-31 13:44:01 $
+/// $Revision: 1.2 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -180,6 +180,12 @@ public:
 	trackToPeak* getTrackToPeakInfo();
 
 /**
+ * method returns the number of the clone tracks.
+ */
+
+	unsigned short getNumberOfCloneTracks();
+
+/**
  * method returns the number of the fake tracks.
  */
 
@@ -196,6 +202,12 @@ public:
  */
 
 	unsigned short getNumberOfIdentifiedTracks();
+
+/**
+ * method returns the number of the not well found tracks.
+ */
+
+	unsigned short getNumberOfNotWellFoundTracks();
 
 /**
  * method returns the number of the well found tracks.

@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007/01/19 16:00:52 $
-/// $Revision: 1.7 $
+/// $Date: 2007-12-13 13:48:58 $
+/// $Revision: 1.10 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -42,12 +42,12 @@
 #ifdef CBMROOTFRAMEWORK
 
 #define numberOfDefaultMagnetfieldFactors 7
-const double defaultMagnetfieldFactors[numberOfDefaultMagnetfieldFactors] = {6.574331, 6.977340, 7.253845, 7.521950, 7.981060, 8.076062, 8.1};			// dimension: [100 Tesla = 1 N/Acm]
+const double defaultMagnetfieldFactors[numberOfDefaultMagnetfieldFactors] = {6.574331, 6.977340, 7.253845, 7.521950, 7.981060, 8.076062, 8.1};			// dimension: [kG]
 
 #else
 
 #define numberOfDefaultMagnetfieldFactors 8
-const double defaultMagnetfieldFactors[numberOfDefaultMagnetfieldFactors] = {4.9622, 5.8029, 6.1539, 6.9865, 7.5914, 7.9442, 8.0900, 8.0};				// dimension: [100 Tesla = 1 N/Acm]
+const double defaultMagnetfieldFactors[numberOfDefaultMagnetfieldFactors] = {5.98, 6.66, 7.01, 7.70, 8.37, 8.89, 9.04, 10.0};							// dimension: [kG]
 
 #endif
 
@@ -625,9 +625,37 @@ void trackfinderInputMagneticField::setNumberOfMagnetfieldFactors(unsigned short
 
 }
 
-/*
- * method sets the magnetfield factor for station stationIndex
- */
+/****************************************************************
+ * method gets the magnetfield factor for station stationIndex	*
+ ****************************************************************/
+
+double trackfinderInputMagneticField::getMagnetfieldFactor(unsigned short stationIndex) {
+
+	double returnValue = 0;
+
+	if (stationIndex >= numberOfMagnetfieldFactors) {
+
+		stationIndexIsBiggerThanLastStationIndexWarningMsg* stationIndexIsBiggerThanNumberOfFactors = new stationIndexIsBiggerThanLastStationIndexWarningMsg(stationIndex, numberOfMagnetfieldFactors - 1);
+		stationIndexIsBiggerThanNumberOfFactors->warningMsg();
+		if(stationIndexIsBiggerThanNumberOfFactors != NULL) {
+			delete stationIndexIsBiggerThanNumberOfFactors;
+			stationIndexIsBiggerThanNumberOfFactors = NULL;
+		}
+
+	}
+	else {
+
+		returnValue = magnetfieldFactors[stationIndex].value;
+
+	}
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * method sets the magnetfield factor for station stationIndex	*
+ ****************************************************************/
 
 void trackfinderInputMagneticField::setMagnetfieldFactor(unsigned short stationIndex, double value) {
 
@@ -650,9 +678,10 @@ void trackfinderInputMagneticField::setMagnetfieldFactor(unsigned short stationI
 
 }
 
-/*
- * method updates the magnetfield factor for station stationIndex
- */
+/****************************************************************
+ * method updates the magnetfield factor for station			*
+ * stationIndex													*
+ ****************************************************************/
 
 void trackfinderInputMagneticField::updateMagnetfieldFactor(unsigned short stationIndex, double value) {
 
@@ -716,6 +745,80 @@ double trackfinderInputMagneticField::evaluateMagnetfieldFactor(unsigned short s
 	}
 	else
 		returnValue = magnetfieldFactors[stationIndex].value;
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputMagneticField::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(magneticField);
+	returnValue += sizeof(isLocalField);
+	returnValue += sizeof(magneticFieldIntegrationStepwidthPerStation);
+	returnValue += sizeof(magneticFieldIntegrationFactor);
+	returnValue += sizeof(fileName);
+	returnValue += sizeof(mapName);
+	returnValue += sizeof(isRootFile);
+	returnValue += sizeof(numberOfMagnetfieldFactors);
+	returnValue += sizeof(magnetfieldFactors);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputMagneticField::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = fileName.capacity() * sizeof(char);
+	returnValue += mapName.capacity()  * sizeof(char);
+	if (numberOfMagnetfieldFactors > 0)
+		returnValue += numberOfMagnetfieldFactors * sizeof(magnetfieldFactors[0]);;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputMagneticField::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(magneticField);
+	returnValue += sizeof(isLocalField);
+	returnValue += sizeof(magneticFieldIntegrationStepwidthPerStation);
+	returnValue += sizeof(magneticFieldIntegrationFactor);
+	returnValue += sizeof(fileName);
+	returnValue += fileName.capacity() * sizeof(char);
+	returnValue += sizeof(mapName);
+	returnValue += mapName.capacity()  * sizeof(char);
+	returnValue += sizeof(isRootFile);
+	returnValue += sizeof(numberOfMagnetfieldFactors);
+	returnValue += sizeof(magnetfieldFactors);
+	if (numberOfMagnetfieldFactors > 0)
+		returnValue += numberOfMagnetfieldFactors * sizeof(magnetfieldFactors[0]);;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
 
 	return returnValue;
 

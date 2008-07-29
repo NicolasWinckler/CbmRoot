@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-06 14:18:42 $
-// $Revision: 1.4 $
+// $Date: 2007-10-25 14:14:34 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -36,9 +36,11 @@
 #include "../include/magnetfieldAnalysisDef.h"
 #include "../include/magnetfieldDirectionAnalysis.h"
 #include "TStyle.h"
+#include "TAxis.h"
+#include "TH1F.h"
 #include "TTree.h"
 #include "TFile.h"
-#include "TH1F.h"
+
 
 /****************************************************************
  * This method sets the range of the axis for each display.		*
@@ -55,43 +57,39 @@ void magnetfieldDirectionAnalysis::setAutomaticAxisRangeOfDisplay(TGraph* displa
 
 	if (display != NULL) {
 
-		if (display->GetHistogram() != NULL) {
+		xValues = display->GetX();
+		yValues = display->GetY();
 
-			xValues = display->GetX();
-			yValues = display->GetY();
+		xMin = xValues[0];
+		xMax = xValues[0];
+		yMin = yValues[0];
+		yMax = yValues[0];
 
-			xMin = xValues[0];
-			xMax = xValues[0];
-			yMin = yValues[0];
-			yMax = yValues[0];
+		for (int j = 1; j < display->GetN(); j++) {
 
-			for (int j = 1; j < display->GetN(); j++) {
-
-				if (xValues[j] < xMin)
-					xMin = xValues[j];
-				if (xValues[j] > xMax)
-					xMax = xValues[j];
-				if (yValues[j] < yMin)
-					yMin = yValues[j];
-				if (yValues[j] > yMax)
-					yMax = yValues[j];
-
-			}
-
-			display->GetHistogram()->SetAxisRange(xMin, xMax, "X");
-			display->GetHistogram()->SetAxisRange(yMin, yMax, "Y");
+			if (xValues[j] < xMin)
+				xMin = xValues[j];
+			if (xValues[j] > xMax)
+				xMax = xValues[j];
+			if (yValues[j] < yMin)
+				yMin = yValues[j];
+			if (yValues[j] > yMax)
+				yMax = yValues[j];
 
 		}
-		else {
 
-			rootHistogramNotFoundWarningMsg* rootHistogramNotFound = new rootHistogramNotFoundWarningMsg();
-			rootHistogramNotFound->warningMsg();
-			if(rootHistogramNotFound != NULL) {
-				delete rootHistogramNotFound;
-				rootHistogramNotFound = NULL;
-			}
-
-		}
+		/*
+		 * SetLimits sets the minimal and maximal values for the axis.
+		 * Smaller values are in the underflow bin and higher values
+		 * in the overflow bin.
+		 *
+		 * SetRangeUser sets the zoom of the axis. Here the zoom is
+		 * set to one.
+		 */
+		display->GetXaxis()->SetLimits(0.95 * xMin, 1.05 * xMax);
+		display->GetXaxis()->SetRangeUser(0.95 * xMin, 1.05 * xMax);
+		display->GetYaxis()->SetLimits(0.95 * yMin, 1.05 * yMax);
+		display->GetYaxis()->SetRangeUser(0.95 * yMin, 1.05 * yMax);
 
 	}
 	else {

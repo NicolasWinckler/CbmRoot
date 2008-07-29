@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-19 14:30:24 $
-// $Revision: 1.2 $
+// $Date: 2007-07-06 00:28:39 $
+// $Revision: 1.3 $
 //
 // *******************************************************************/
 
@@ -79,10 +79,14 @@ protected:
 	TGraph*        oneCoordinateTrackAnalyticFormulaDisplay;
 	TCanvas*       oneHoughPointAnalyticFormulaWindow;
 	TGraph*        oneHoughPointAnalyticFormulaDisplay;
-	TCanvas*       coordinateAnalyticFormulaWindow;
-	TGraph*        coordinateAnalyticFormulaDisplay;
-	TCanvas*       houghAnalyticFormulaWindow;
-	TGraph**       houghAnalyticFormulaDisplay;
+	TCanvas*       coordinateAnalyticFormulaPrelutWindow;
+	TGraph*        coordinateAnalyticFormulaPrelutDisplay;
+	TCanvas*       coordinateAnalyticFormulaLutWindow;
+	TGraph*        coordinateAnalyticFormulaLutDisplay;
+	TCanvas*       houghAnalyticFormulaPrelutWindow;
+	TGraph**       houghAnalyticFormulaPrelutDisplay;
+	TCanvas*       houghAnalyticFormulaLutWindow;
+	TGraph**       houghAnalyticFormulaLutDisplay;
 
 /**
  * This method initializes the global style for each display.
@@ -189,13 +193,15 @@ protected:
  * coordinate space.
  */
 
-	void createCoordinateAnalyticFormula();
+	void createCoordinateAnalyticFormulaPrelut();
+	void createCoordinateAnalyticFormulaLut();
 
 /**
  * This method creates the analyticFormula object in the Hough space.
  */
 
-	void createHoughAnalyticFormula();
+	void createHoughAnalyticFormulaPrelut();
+	void createHoughAnalyticFormulaLut();
 
 public:
 

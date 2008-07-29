@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/12/14 12:17:31 $
-// $Revision: 1.4 $
+// $Date: 2008-06-26 12:52:50 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
@@ -111,7 +111,7 @@ void histogramTransformation::resetTracks() {
 void histogramTransformation::encodeHistogramLayer(unsigned short layer) {
 
 	histogramCell* actualCell;
-	bitArray       zeroComparator;
+	bitArray       comparator;
 
 #ifdef PRINTORIGINALHISTOGRAMLAYERSTOFILE
 
@@ -144,7 +144,7 @@ void histogramTransformation::encodeHistogramLayer(unsigned short layer) {
 
 #endif
 
-	zeroComparator = bitArray(0);
+	comparator = (*ratings)->getCodingTable().getMinimumClassification();
 
 	for(unsigned short i = 0; i < (*histogram)->getValueDim2(); i++) {
 
@@ -152,7 +152,7 @@ void histogramTransformation::encodeHistogramLayer(unsigned short layer) {
 
 			actualCell = (*histogram)->getCell(j, i);
 
-			if (actualCell->value != zeroComparator)
+			if (actualCell->value >= comparator)
 				actualCell->value = (*ratings)->getCodingTableClassification(actualCell->value);
 
 #ifdef SKIPFIRSTHISTOGRAMCOLUMN
@@ -261,7 +261,7 @@ void histogramTransformation::filterHistogramLayer(unsigned short layer) {
  * the correspondance to be equal to the eraser-object result.	*
  ****************************************************************/
 
-void histogramTransformation::finalizeHistogramLayer(unsigned short layer, std::streambuf* terminal, terminalSequence* statusSequence, unsigned short statusMax) {
+void histogramTransformation::serializeHistogramLayer(unsigned short layer, std::streambuf* terminal, terminalSequence* statusSequence, unsigned short statusMax) {
 
 	histogramCell* actualCell;
 	bitArray       comparator;
@@ -295,20 +295,6 @@ void histogramTransformation::finalizeHistogramLayer(unsigned short layer, std::
 
 				(*tracks)->addTrack(j, i, layer, *actualCell);
 
-#ifdef DEBUGJUSTONEGOODTRACK
-
-				if ((terminal != NULL) && (statusSequence != NULL))
-					terminalFinalize(*statusSequence);
-
-				std::cout << "Position where the peak is found (dim1, dim2 , dim3): (" << j << ", " << i << ", " << layer << ")" << std::endl;
-
-				if ((terminal != NULL) && (statusSequence != NULL)) {
-					createTerminalStatusSequence(statusSequence, terminal, "Process layers:\t\t\t", statusMax);
-					terminalInitialize(*statusSequence);
-				}
-
-#endif
-
 			}
 
 		}
@@ -332,6 +318,15 @@ void histogramTransformation::finalizeHistogramLayer(unsigned short layer, std::
 
 void histogramTransformation::filterHistogram(std::streambuf* terminal) {
 
+#ifdef DEBUGJUSTONEGOODTRACK
+
+	trackDigitalInformation actualTrack;
+	trackAnalogInformation  actualParameter;
+	trackMomentum           actualMomentum;
+	analyticFormula         formula;
+
+#endif
+
 	if (tracks == NULL)
 		throw cannotAccessHistogramError();
 	if (*tracks == NULL)
@@ -344,6 +339,26 @@ void histogramTransformation::filterHistogram(std::streambuf* terminal) {
 #endif
 
 	filteringHistogram(terminal);
+
+#ifdef DEBUGJUSTONEGOODTRACK
+
+	if ((*tracks)->getNumberOfTracks() > 0)
+		std::cout << std::endl << "Position where the peak is found (dim1, dim2 , dim3; value; px ,py, pz):" << std::endl;
+
+	for (unsigned short i = 0; i < (*tracks)->getNumberOfTracks(); i++) {
+
+		(*tracks)->getNextTrackDigitalInfo(&actualTrack);
+		(*tracks)->getTrackAnalogInfoFromTrackDigitalInfo(actualTrack, &actualParameter);
+		formula.evaluatePWithCare(actualParameter.position, &actualMomentum);
+		std::cout << " (" << actualTrack.position.get(DIM1) << ", " << actualTrack.position.get(DIM2) << ", " << actualTrack.position.get(DIM3) << "; " << actualTrack.value.toString(2) << "; ";
+		std::cout << actualMomentum.get(PX) << ", " << actualMomentum.get(PY) << ", " << actualMomentum.get(PZ) << ")" << std::endl;
+
+	}
+
+	if ((*tracks)->getNumberOfTracks() > 0)
+		std::cout << std::endl;
+
+#endif
 
 #ifdef PRINTFILTEREDTRACKLAYERSTOFILE
 

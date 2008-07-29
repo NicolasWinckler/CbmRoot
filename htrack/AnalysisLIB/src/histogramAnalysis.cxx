@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007/01/17 15:39:48 $
-/// $Revision: 1.4 $
+/// $Date: 2007-12-13 13:47:19 $
+/// $Revision: 1.6 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -199,6 +199,8 @@ TH2S* histogramAnalysis::addDisplayFromFile(TH2S* displayFromFile) {
 			displaysFromFile = (TH2S**)realloc(displaysFromFile, numberOfDisplays * sizeof(TH2S*));
 
 		displaysFromFile[numberOfDisplays - 1] = new TH2S(*displayFromFile);
+		
+		displaysFromFile[numberOfDisplays - 1]->SetDirectory(0);
 
 		returnValue = displaysFromFile[numberOfDisplays - 1];
 
@@ -379,6 +381,7 @@ void histogramAnalysis::initDisplayToFile() {
 
 		displayToFile->SetXTitle(HISTOGRAMXAXITITLE);
 		displayToFile->SetYTitle(HISTOGRAMYAXITITLE);
+		displayToFile->SetDirectory(0);
 
 	}
 

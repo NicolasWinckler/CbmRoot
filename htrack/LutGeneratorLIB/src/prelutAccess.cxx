@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/11/07 12:48:07 $
-// $Revision: 1.2 $
+// $Date: 2008-02-29 11:43:28 $
+// $Revision: 1.3 $
 //
 // *******************************************************************/
 
@@ -35,6 +35,9 @@
 #include "../include/lutGeneratorWarningMsg.h"
 #include "../include/prelutAccess.h"
 #include <fstream>
+
+
+#define standardUsage "PRELUT"
 
 
 /****************************************************************
@@ -142,14 +145,14 @@ prelutHoughBorder prelutAccess::getEntry(unsigned long index) {
 	if (index < numberOfEntries) {
 
 		if (lutMem == NULL)
-			throw cannotAccessLutMemError();
+			throw cannotAccessPrelutError();
 
 		returnValue = lutMem[index];
 
 	}
 	else {
 
-		throw tooBigIndexForMemoryError(index, numberOfEntries);
+		throw tooBigIndexForPrelutError(index, numberOfEntries);
 	
 		returnValue = prelutHoughBorder();
 	
@@ -163,7 +166,7 @@ prelutHoughBorder prelutAccess::getEntry(unsigned long index) {
  * This method adds the value at the end of the prelut table.	*
  ****************************************************************/
 	
-void prelutAccess::addEntry(prelutHoughBorder value) {
+void prelutAccess::addEntry(prelutHoughBorder& value) {
 
 	allocateNewMemory(1);
 
@@ -191,7 +194,7 @@ std::string prelutAccess::toString() {
 	else {
 
 		if (lutMem == NULL)
-			throw cannotAccessLutMemError();
+			throw cannotAccessPrelutError();
 
 		for (unsigned long i = 0; i < numberOfEntries; i++) {
 
@@ -222,6 +225,17 @@ void prelutAccess::read(std::string fileName) {
 	readFile.readJustFileHeader();
 
 	prelutAccessFileHeader& fileHeader = readFile.getHeaderReference();
+
+	if (fileHeader.usage != standardUsage) {
+
+		differentPrelutUsageAsFileDetectedWarningMsg* differentPrelutUsageAsFileDetected = new differentPrelutUsageAsFileDetectedWarningMsg();
+		differentPrelutUsageAsFileDetected->warningMsg();
+		if(differentPrelutUsageAsFileDetected != NULL) {
+			delete differentPrelutUsageAsFileDetected;
+			differentPrelutUsageAsFileDetected = NULL;
+		}
+
+	}
 
 	if (def.dim3Min != fileHeader.dimMin)
 		countDifferentPrelutDefinitionAsFile++;
@@ -279,9 +293,10 @@ void prelutAccess::write(std::string fileName, std::string name) {
 	else {
 
 		if (lutMem == NULL)
-			throw cannotAccessLutMemError();
+			throw cannotAccessPrelutError();
 
 		fileHeader.name            = name;
+		fileHeader.usage           = standardUsage;
 		fileHeader.numberOfEntries = numberOfEntries;
 		fileHeader.dimMin          = def.dim3Min;
 		fileHeader.dimMax          = def.dim3Max;

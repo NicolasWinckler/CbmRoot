@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-05-14 15:47:55 $
-// $Revision: 1.4 $
+// $Date: 2008-02-29 11:43:28 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -118,14 +118,14 @@ void magneticFieldFactorCannotBeZero::errorMsg() {
 
 
 /****************************************************************
- * CLASS tooBigIndexForMemoryError				 				*
+ * CLASS tooBigIndexForDigitalHitLutError		 				*
  ****************************************************************/
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-tooBigIndexForMemoryError::tooBigIndexForMemoryError() : lutGeneratorError() {
+tooBigIndexForDigitalHitLutError::tooBigIndexForDigitalHitLutError() : lutGeneratorError() {
 
 	index           = 0;
 	numberOfEntries = 0;
@@ -136,7 +136,7 @@ tooBigIndexForMemoryError::tooBigIndexForMemoryError() : lutGeneratorError() {
  * Constructor													*
  ****************************************************************/
 
-tooBigIndexForMemoryError::tooBigIndexForMemoryError(unsigned long index, unsigned long numberOfEntries) : lutGeneratorError() {
+tooBigIndexForDigitalHitLutError::tooBigIndexForDigitalHitLutError(unsigned long index, unsigned long numberOfEntries) : lutGeneratorError() {
 
 	this->index           = index;
 	this->numberOfEntries = numberOfEntries;
@@ -147,7 +147,7 @@ tooBigIndexForMemoryError::tooBigIndexForMemoryError(unsigned long index, unsign
  * Destructor													*
  ****************************************************************/
 
-tooBigIndexForMemoryError::~tooBigIndexForMemoryError() {
+tooBigIndexForDigitalHitLutError::~tooBigIndexForDigitalHitLutError() {
 
 }
 
@@ -155,7 +155,117 @@ tooBigIndexForMemoryError::~tooBigIndexForMemoryError() {
  * This method displays an error message.		 				*
  ****************************************************************/
 
-void tooBigIndexForMemoryError::errorMsg() {
+void tooBigIndexForDigitalHitLutError::errorMsg() {
+
+	std::string temp;
+	char buffer[longConversionDigits+1];
+
+	temp  = "Cannot access the digital hit look up table memory at position ";
+	ultos(index, buffer, 10, longConversionDigits);
+	temp += buffer;
+	temp += ", because there are just ";
+	ultos(numberOfEntries, buffer, 10, longConversionDigits);
+	temp += buffer;
+	temp += " entries!!!";
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS tooBigIndexForPrelutError				 				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+tooBigIndexForPrelutError::tooBigIndexForPrelutError() : lutGeneratorError() {
+
+	index           = 0;
+	numberOfEntries = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+tooBigIndexForPrelutError::tooBigIndexForPrelutError(unsigned long index, unsigned long numberOfEntries) : lutGeneratorError() {
+
+	this->index           = index;
+	this->numberOfEntries = numberOfEntries;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+tooBigIndexForPrelutError::~tooBigIndexForPrelutError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void tooBigIndexForPrelutError::errorMsg() {
+
+	std::string temp;
+	char buffer[longConversionDigits+1];
+
+	temp  = "Cannot access the pre look up table memory at position ";
+	ultos(index, buffer, 10, longConversionDigits);
+	temp += buffer;
+	temp += ", because there are just ";
+	ultos(numberOfEntries, buffer, 10, longConversionDigits);
+	temp += buffer;
+	temp += " entries!!!";
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS tooBigIndexForLutError					 				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+tooBigIndexForLutError::tooBigIndexForLutError() : lutGeneratorError() {
+
+	index           = 0;
+	numberOfEntries = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+tooBigIndexForLutError::tooBigIndexForLutError(unsigned long index, unsigned long numberOfEntries) : lutGeneratorError() {
+
+	this->index           = index;
+	this->numberOfEntries = numberOfEntries;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+tooBigIndexForLutError::~tooBigIndexForLutError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void tooBigIndexForLutError::errorMsg() {
 
 	std::string temp;
 	char buffer[longConversionDigits+1];
@@ -173,14 +283,14 @@ void tooBigIndexForMemoryError::errorMsg() {
 
 
 /****************************************************************
- * CLASS cannotAccessLutMemError				 				*
+ * CLASS cannotAccessDigitalHitLutError			 				*
  ****************************************************************/
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-cannotAccessLutMemError::cannotAccessLutMemError() : lutGeneratorError() {
+cannotAccessDigitalHitLutError::cannotAccessDigitalHitLutError() : lutGeneratorError() {
 
 }
 
@@ -188,7 +298,7 @@ cannotAccessLutMemError::cannotAccessLutMemError() : lutGeneratorError() {
  * Destructor													*
  ****************************************************************/
 
-cannotAccessLutMemError::~cannotAccessLutMemError() {
+cannotAccessDigitalHitLutError::~cannotAccessDigitalHitLutError() {
 
 }
 
@@ -196,9 +306,71 @@ cannotAccessLutMemError::~cannotAccessLutMemError() {
  * This method displays an error message.		 				*
  ****************************************************************/
 
-void cannotAccessLutMemError::errorMsg() {
+void cannotAccessDigitalHitLutError::errorMsg() {
 
-	printMsg("The memory for the look-up-table cannot be accessed!!!");
+	printMsg("The digital hit look up table cannot be accessed!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS cannotAccessPrelutError				 				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+cannotAccessPrelutError::cannotAccessPrelutError() : lutGeneratorError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+cannotAccessPrelutError::~cannotAccessPrelutError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void cannotAccessPrelutError::errorMsg() {
+
+	printMsg("The pre look up table cannot be accessed!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS cannotAccessLutError					 				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+cannotAccessLutError::cannotAccessLutError() : lutGeneratorError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+cannotAccessLutError::~cannotAccessLutError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void cannotAccessLutError::errorMsg() {
+
+	printMsg("The look up table cannot be accessed!!!");
 
 }
 
@@ -292,6 +464,37 @@ cannotClearBorderOfUndefinedObjectError::~cannotClearBorderOfUndefinedObjectErro
 void cannotClearBorderOfUndefinedObjectError::errorMsg() {
 
 	printMsg("You cannot clear the border of an undefined object!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS cannotSetPrelutRangeOfUndefinedObjectError				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+cannotSetPrelutRangeOfUndefinedObjectError::cannotSetPrelutRangeOfUndefinedObjectError() : lutGeneratorError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+cannotSetPrelutRangeOfUndefinedObjectError::~cannotSetPrelutRangeOfUndefinedObjectError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void cannotSetPrelutRangeOfUndefinedObjectError::errorMsg() {
+
+	printMsg("You cannot set the prelut range of an undefined object!!!");
 
 }
 

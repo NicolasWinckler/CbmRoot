@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-05-29 15:11:10 $
-/// $Revision: 1.7 $
+/// $Date: 2007-10-19 14:33:10 $
+/// $Revision: 1.8 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -316,6 +316,59 @@ void trackfinderInputFMagneticField::init(CbmField* field, std::string fileName,
 	}
 	else
 		trackfinderInputMagneticField::init(field, magneticFieldIntegrationStepwidthPerStation, magneticFieldIntegrationFactor, numberOfMagnetfieldFactors);
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputFMagneticField::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = trackfinderInputMagneticField::getReservedSizeOfData(0);
+	returnValue += sizeof(disableAutomaticMagneticField);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputFMagneticField::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = trackfinderInputMagneticField::getAllocatedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputFMagneticField::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = trackfinderInputMagneticField::getUsedSizeOfData(0);
+	returnValue += sizeof(disableAutomaticMagneticField);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }
 

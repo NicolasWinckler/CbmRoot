@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-05-14 15:43:59 $
-// $Revision: 1.3 $
+// $Date: 2007-10-19 14:33:08 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
@@ -163,5 +163,215 @@ void lutBorder::setLutHoughBorder(lutHoughBorder& border) {
 void lutBorder::setHit(trackfinderInputHit* hit) {
 
 	this->hit = hit;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double lutBorder::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = getReservedSizeOfPrelutData(0);
+	returnValue += getReservedSizeOfLutData(0);
+	returnValue += getReservedSizeOfHitData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double lutBorder::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = getAllocatedSizeOfPrelutData(0);
+	returnValue += getAllocatedSizeOfLutData(0);
+	returnValue += getAllocatedSizeOfHitData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double lutBorder::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = getUsedSizeOfPrelutData(0);
+	returnValue += getUsedSizeOfLutData(0);
+	returnValue += getUsedSizeOfHitData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double lutBorder::getReservedSizeOfPrelutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = firstBorder.getReservedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double lutBorder::getAllocatedSizeOfPrelutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = firstBorder.getAllocatedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double lutBorder::getUsedSizeOfPrelutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = firstBorder.getUsedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double lutBorder::getReservedSizeOfLutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = secondBorder.getReservedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double lutBorder::getAllocatedSizeOfLutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = secondBorder.getAllocatedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double lutBorder::getUsedSizeOfLutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = secondBorder.getUsedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double lutBorder::getReservedSizeOfHitData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(hit);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double lutBorder::getAllocatedSizeOfHitData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double lutBorder::getUsedSizeOfHitData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(hit);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }

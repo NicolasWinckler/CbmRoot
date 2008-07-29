@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-15 13:56:59 $
-// $Revision: 1.7 $
+// $Date: 2007-10-19 14:33:09 $
+// $Revision: 1.8 $
 //
 // *******************************************************************/
 
@@ -354,7 +354,7 @@ unsigned short trackData::getNumberOfTracks() {
 
 void trackData::getNextTrackDigitalInfo(trackDigitalInformation* value) {
 
-	bool             wrapAround;
+	bool wrapAround;
 
 	if (value == NULL)
 		throw cannotAccessTrackInformationError();
@@ -398,7 +398,7 @@ void trackData::getNextTrackDigitalInfo(trackDigitalInformation* value) {
 
 void trackData::getNextTrackAnalogInfo(trackAnalogInformation* value) {
 
-	bool             wrapAround;
+	bool wrapAround;
 
 	if (value == NULL)
 		throw cannotAccessTrackParameterError();
@@ -432,6 +432,57 @@ void trackData::getNextTrackAnalogInfo(trackAnalogInformation* value) {
 		}
 	
 	}
+
+}
+
+/**
+ * This method returns the hit information.
+ */
+
+void trackData::getNextHitInfo(hitArray* value) {
+
+#ifndef NOANALYSIS
+
+	bool     wrapAround;
+
+	if (value == NULL)
+		throw cannotAccessTrackParameterError();
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+	wrapAround = false;
+	while (1 == 1) {
+
+		if (accessor == tracks[accessLayer].end()) {
+
+			accessLayer++;
+			if (accessLayer == (*space)->getStep(DIM3)) {
+				accessLayer = 0;
+				if (wrapAround) {
+					accessor = tracks[accessLayer].begin();
+					break;
+				}
+				wrapAround  = true;
+			}
+			accessor = tracks[accessLayer].begin();
+
+		}
+		else {
+
+			*value = accessor->hits;
+			accessor++;
+			break;
+
+		}
+	
+	}
+
+#else
+
+	value->reset();
+
+#endif
 
 }
 
@@ -644,5 +695,91 @@ void trackData::printTracks(unsigned int maximumClass, unsigned int layerStart, 
 		fclose(fileHandle);
 		fileHandle = NULL;
 	}
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackData::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(space);
+	returnValue += sizeof(tracks);
+	returnValue += sizeof(accessor);
+	returnValue += sizeof(accessLayer);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackData::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+	if (tracks != NULL) {
+
+		for (unsigned short i = 0; i < (*space)->getStep(DIM3); i++) {
+
+			for (trackLayer::iterator j = tracks[i].begin(); j != tracks[i].end(); j++) {
+
+				returnValue += j->getReservedSizeOfData(0);
+				returnValue += j->getAllocatedSizeOfData(0);
+
+			}
+
+		}
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double trackData::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(space);
+	returnValue += sizeof(tracks);
+
+	if (tracks != NULL) {
+
+		for (unsigned short i = 0; i < (*space)->getStep(DIM3); i++) {
+
+			for (trackLayer::iterator j = tracks[i].begin(); j != tracks[i].end(); j++) {
+
+				returnValue += j->getUsedSizeOfData(0);
+
+			}
+
+		}
+
+	}
+
+	returnValue += sizeof(accessor);
+	returnValue += sizeof(accessLayer);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }

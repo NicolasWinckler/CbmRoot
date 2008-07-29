@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-05-14 15:44:26 $
-/// $Revision: 1.3 $
+/// $Date: 2007-12-19 10:48:44 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -37,6 +37,7 @@
 #include "../../DataRootObjectLIB/include/trackfinderInputData.h"
 #include "../../DataRootObjectLIB/include/histogramData.h"
 #include "../../LutGeneratorLIB/include/lutImplementation.h"
+#include "../../AnalysisLIB/include/analysis.h"
 #include <list>
 
 
@@ -50,9 +51,10 @@ private:
 
 	trackfinderInputData** eventData;			/**< Object for accessing the input data. */
 	histogramData**        histogram;			/**< Object for accessing the histogram. */
-	lutImplementation**    lut;					/**< Object for computing the borders of both look-up-tables */
-	unsigned short         actualLayer;			/**< Variable to store the actual number of the layer for computing. Needed to identify the next computation as next layer */
-	std::list<lutBorder*>  dynamicLayerMemory;	/**< Object to store the borders needed for following layers */
+	lutImplementation**    lut;					/**< Object for computing the borders of both look-up-tables. */
+	unsigned short         actualLayer;			/**< Variable to store the actual number of the layer for computing. Needed to identify the next computation as next layer. */
+	std::list<lutBorder*>  dynamicLayerMemory;	/**< Object to store the borders needed for following layers. */
+	int                    debugTrackIndex;		/**< Variable to store the trackIndex, if the debugging of just one good track is enabled. */
 
 /**
  * This method does the entries for one layer of the histogram
@@ -101,9 +103,18 @@ public:
 /**
  * This method creates the borders for each hit
  * @param terminal is a buffer to place the process information
+ * @param analyser is just used in combination with DEBUGJUSTONEGOODTRACK
  */
 
+#ifndef NOANALYSIS
+
+	void createBorders(analysis* analyser = NULL, std::streambuf* terminal = NULL);
+
+#else
+
 	void createBorders(std::streambuf* terminal = NULL);
+
+#endif
 
 /**
  * This method reserves memory for the computation of the layer.
@@ -136,6 +147,13 @@ public:
  */
 
 	unsigned short getNumberOfHistogramLayers();
+
+/**
+ * This method returns the trackIndex of the debugged track,
+ * if DEBUGJUSTONEGOODTRACK is enabled.
+ */
+
+	int getDebugTrackIndex();
 
 };
 

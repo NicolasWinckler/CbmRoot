@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007/01/17 15:39:50 $
-// $Revision: 1.3 $
+// $Date: 2007-12-13 13:47:19 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
@@ -272,9 +272,9 @@ void projectionEFGCNAnalysis::initEDisplay(int nXBins, int nYBins) {
 	if (eDisplay == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
 
-	eDisplay->SetDirectory(0);
 	eDisplay->SetXTitle(getTitleOfXAxi());
 	eDisplay->SetYTitle(getTitleOfYAxi());
+	eDisplay->SetDirectory(0);
 
 }
 
@@ -299,9 +299,9 @@ void projectionEFGCNAnalysis::initFDisplay(int nXBins, int nYBins) {
 	if (fDisplay == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
 
-	fDisplay->SetDirectory(0);
 	fDisplay->SetXTitle(getTitleOfXAxi());
 	fDisplay->SetYTitle(getTitleOfYAxi());
+	fDisplay->SetDirectory(0);
 
 }
 
@@ -326,9 +326,9 @@ void projectionEFGCNAnalysis::initGDisplay(int nXBins, int nYBins) {
 	if (gDisplay == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
 
-	gDisplay->SetDirectory(0);
 	gDisplay->SetXTitle(getTitleOfXAxi());
 	gDisplay->SetYTitle(getTitleOfYAxi());
+	gDisplay->SetDirectory(0);
 
 }
 
@@ -353,9 +353,9 @@ void projectionEFGCNAnalysis::initCDisplay(int nXBins, int nYBins) {
 	if (cDisplay == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
 
-	cDisplay->SetDirectory(0);
 	cDisplay->SetXTitle(getTitleOfXAxi());
 	cDisplay->SetYTitle(getTitleOfYAxi());
+	cDisplay->SetDirectory(0);
 
 }
 
@@ -380,9 +380,9 @@ void projectionEFGCNAnalysis::initNDisplay(int nXBins, int nYBins) {
 	if (nDisplay == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
 
-	nDisplay->SetDirectory(0);
 	nDisplay->SetXTitle(getTitleOfXAxi());
 	nDisplay->SetYTitle(getTitleOfYAxi());
+	nDisplay->SetDirectory(0);
 
 }
 

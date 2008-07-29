@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-06 14:18:41 $
-// $Revision: 1.3 $
+// $Date: 2007-12-13 13:47:19 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -181,14 +181,14 @@ void magneticFieldNotFoundError::errorMsg() {
 
 
 /****************************************************************
- * CLASS cannotAccessMagnetfieldAnalyser				 		*
+ * CLASS cannotAccessMagnetfieldAnalyserError				 		*
  ****************************************************************/
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-cannotAccessMagnetfieldAnalyser::cannotAccessMagnetfieldAnalyser() : analysisError() {
+cannotAccessMagnetfieldAnalyserError::cannotAccessMagnetfieldAnalyserError() : analysisError() {
 
 }
 
@@ -196,7 +196,7 @@ cannotAccessMagnetfieldAnalyser::cannotAccessMagnetfieldAnalyser() : analysisErr
  * Destructor													*
  ****************************************************************/
 
-cannotAccessMagnetfieldAnalyser::~cannotAccessMagnetfieldAnalyser() {
+cannotAccessMagnetfieldAnalyserError::~cannotAccessMagnetfieldAnalyserError() {
 
 }
 
@@ -204,7 +204,7 @@ cannotAccessMagnetfieldAnalyser::~cannotAccessMagnetfieldAnalyser() {
  * This method displays an error message.		 				*
  ****************************************************************/
 
-void cannotAccessMagnetfieldAnalyser::errorMsg() {
+void cannotAccessMagnetfieldAnalyserError::errorMsg() {
 
 	printMsg("The magnetfield analyser object cannot be accessed!!!");
 
@@ -393,6 +393,37 @@ cannotAccessMagnetfieldFactorAnalyserError::~cannotAccessMagnetfieldFactorAnalys
 void cannotAccessMagnetfieldFactorAnalyserError::errorMsg() {
 
 	printMsg("The object for analysing the magnetfield factors is not accessible!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS cannotAccessPrelutRangeAnalyserError					*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+cannotAccessPrelutRangeAnalyserError::cannotAccessPrelutRangeAnalyserError() : analysisError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+cannotAccessPrelutRangeAnalyserError::~cannotAccessPrelutRangeAnalyserError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void cannotAccessPrelutRangeAnalyserError::errorMsg() {
+
+	printMsg("The object for analysing the prelut range is not accessible!!!");
 
 }
 
@@ -620,5 +651,153 @@ cannotAccessTrackCoordinatesError::~cannotAccessTrackCoordinatesError() {
 void cannotAccessTrackCoordinatesError::errorMsg() {
 
 	printMsg("The track coordinates cannot be accessed!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS indexIsOutOfTrackRangeError							*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+indexIsOutOfTrackRangeError::indexIsOutOfTrackRangeError() : analysisError() {
+
+	this->index          = 0;
+	this->numberOfTracks = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+indexIsOutOfTrackRangeError::indexIsOutOfTrackRangeError(unsigned int index, unsigned int numberOfTracks) : analysisError() {
+
+	this->index          = index;
+	this->numberOfTracks = numberOfTracks;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+indexIsOutOfTrackRangeError::~indexIsOutOfTrackRangeError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void indexIsOutOfTrackRangeError::errorMsg() {
+
+	std::string temp;
+	char        buffer[shortConversionDigits+1];
+
+	temp =  "The track with the index ";
+	ustos(index, buffer, 10, shortConversionDigits);
+	temp += buffer;
+	temp += " is out of range [0, ";
+	ustos(numberOfTracks - 1, buffer, shortConversionDigits);
+	temp += buffer;
+	temp += "]!!!";
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS wrongRelativeValueFoundError					 		*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+wrongRelativeValueFoundError::wrongRelativeValueFoundError() : analysisError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+wrongRelativeValueFoundError::~wrongRelativeValueFoundError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void wrongRelativeValueFoundError::errorMsg() {
+
+	printMsg("The actual relative value is wrong!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS wrongConstraintValueFoundError					 		*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+wrongConstraintValueFoundError::wrongConstraintValueFoundError() : analysisError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+wrongConstraintValueFoundError::~wrongConstraintValueFoundError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void wrongConstraintValueFoundError::errorMsg() {
+
+	printMsg("The actual constraint value is wrong!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS initHistogramDimensionsFirstError				 		*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+initHistogramDimensionsFirstError::initHistogramDimensionsFirstError() : analysisError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+initHistogramDimensionsFirstError::~initHistogramDimensionsFirstError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void initHistogramDimensionsFirstError::errorMsg() {
+
+	printMsg("If using the row or column analysis, the histogram dimensions should be set first with the function initHardwareHistogramDimensions(...)!!!");
 
 }

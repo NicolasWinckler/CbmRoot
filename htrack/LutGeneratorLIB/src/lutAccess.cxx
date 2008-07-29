@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/11/07 12:48:06 $
-// $Revision: 1.2 $
+// $Date: 2008-02-29 11:43:28 $
+// $Revision: 1.3 $
 //
 // *******************************************************************/
 
@@ -34,6 +34,9 @@
 #include "../include/lutGeneratorWarningMsg.h"
 #include "../include/lutAccess.h"
 #include <fstream>
+
+
+#define standardUsage "LUT"
 
 
 /****************************************************************
@@ -46,8 +49,13 @@ void lutAccess::allocateNewMemory(unsigned long number) {
 
 	if (lutMem == NULL)
 		lutMem = (lutHoughBorder*)calloc(numberOfEntries, sizeof(lutHoughBorder));
-	else
+	else {
+
 		lutMem = (lutHoughBorder*)realloc(lutMem, numberOfEntries * sizeof(lutHoughBorder));
+		if (number > 0)
+			memset(&lutMem[numberOfEntries - number], 0, number * sizeof(lutHoughBorder));
+
+	}
 
 	if (lutMem == NULL)
 		throw memoryAllocationError();
@@ -96,6 +104,33 @@ void lutAccess::init(double dim1Min, double dim1Max, int dim1Step, double dim2Mi
 
 	clear();
 	lut::init(dim1Min, dim1Max, dim1Step, dim2Min, dim2Max, dim2Step);
+
+}
+
+/****************************************************************
+ * This method returns the magnetic field to use.				*
+ * Caution: This function here has no useful					*
+ * implementations in some subclasses. So be					*
+ * careful when using.											*
+ ****************************************************************/
+
+trackfinderInputMagneticField* lutAccess::getMagneticField() {
+
+	return NULL;
+
+}
+
+/****************************************************************
+ * This method returns the magnetic field factor to use instead	*
+ * of the magneticField.										*
+ * Caution: This function here has no useful					*
+ * implementations in some subclasses. So be					*
+ * careful when using.											*
+ ****************************************************************/
+
+double lutAccess::getMagneticFieldFactor() {
+
+	return 0;
 
 }
 
@@ -211,14 +246,14 @@ lutHoughBorder lutAccess::getEntry(unsigned long index) {
 	if (index < numberOfEntries) {
 
 		if (lutMem == NULL)
-			throw cannotAccessLutMemError();
+			throw cannotAccessLutError();
 
 		returnValue = lutMem[index];
 
 	}
 	else {
 
-		throw tooBigIndexForMemoryError(index, numberOfEntries);
+		throw tooBigIndexForLutError(index, numberOfEntries);
 	
 		returnValue = lutHoughBorder();
 	
@@ -232,7 +267,7 @@ lutHoughBorder lutAccess::getEntry(unsigned long index) {
  * This method adds the value at the end of the prelut table.	*
  ****************************************************************/
 	
-void lutAccess::addEntry(lutHoughBorder value) {
+void lutAccess::addEntry(lutHoughBorder& value) {
 
 	allocateNewMemory(1);
 
@@ -260,7 +295,7 @@ std::string lutAccess::toString() {
 	else {
 
 		if (lutMem == NULL)
-			throw cannotAccessLutMemError();
+			throw cannotAccessLutError();
 		
 		for (unsigned long i = 0; i < numberOfEntries; i++) {
 
@@ -291,6 +326,17 @@ void lutAccess::read(std::string fileName) {
 	readFile.readJustFileHeader();
 
 	lutAccessFileHeader& fileHeader = readFile.getHeaderReference();
+
+	if (fileHeader.usage != standardUsage) {
+
+		differentLutUsageAsFileDetectedWarningMsg* differentLutUsageAsFileDetected = new differentLutUsageAsFileDetectedWarningMsg();
+		differentLutUsageAsFileDetected->warningMsg();
+		if(differentLutUsageAsFileDetected != NULL) {
+			delete differentLutUsageAsFileDetected;
+			differentLutUsageAsFileDetected = NULL;
+		}
+
+	}
 
 	if (def.dim1Min != fileHeader.dim1Min)
 		countDifferentLutDefinitionAsFile++;
@@ -350,9 +396,10 @@ void lutAccess::write(std::string fileName, std::string name, unsigned short for
 	else {
 
 		if (lutMem == NULL)
-			throw cannotAccessLutMemError();
+			throw cannotAccessLutError();
 
 		fileHeader.name            = name;
+		fileHeader.usage           = standardUsage;
 		fileHeader.format          = format;
 		fileHeader.numberOfEntries = numberOfEntries;
 		fileHeader.dim1Min         = def.dim1Min;

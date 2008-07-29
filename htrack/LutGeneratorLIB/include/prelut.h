@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:35:42 $
-/// $Revision: 1.1 $
+/// $Date: 2007-12-13 13:49:20 $
+/// $Revision: 1.2 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -66,6 +66,8 @@ public:
  * @param dim3StopEntry is the maximal value of the second dimension
  */
 
+	prelut(double dim3Min, double dim3Max, int dim3Step);
+	prelut(double dim3StartEntry, double dim3StopEntry);
 	prelut(double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry);
 
 /**
@@ -84,6 +86,18 @@ public:
  */
 
 	void init(double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry);
+
+/**
+ * Method sets the variables based on the detector stations.
+ * @param dim3Min is the minimal value of the first dimension
+ * @param dim3Max is the maximal value of the first dimension
+ * @param dim3Step is the stepwidth of the first dimension to build a grid
+ * @param dim3StartEntry is the minimal value of the second dimension
+ * @param dim3StopEntry is the maximal value of the second dimension
+ */
+
+	void set(double dim3Min, double dim3Max, int dim3Step);
+	void set(double dim3StartEntry, double dim3StopEntry);
 
 /**
  * This method returns the Definition of the prelut object.

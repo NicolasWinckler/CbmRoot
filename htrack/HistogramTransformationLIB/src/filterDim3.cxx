@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/11/17 15:12:39 $
-// $Revision: 1.3 $
+// $Date: 2007-10-19 14:34:07 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
@@ -173,7 +173,7 @@ void filterDim3::filter(std::streambuf* terminal) {
 	if (trackAccess == NULL)
 		throw memoryAllocationError(HISTOGRAMTRANSFORMATIONLIB);
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t", (*tracks)->getNumberOfLayers());
+	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t\t\t", (*tracks)->getNumberOfLayers());
 	terminalInitialize(statusSequence);
 
 	for (i = 0; i < (*tracks)->getNumberOfLayers(); i++) {

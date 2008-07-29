@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/12/12 13:04:39 $
-/// $Revision: 1.4 $
+/// $Date: 2008-06-26 12:33:39 $
+/// $Revision: 1.6 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -113,21 +113,7 @@ public:
  * method returns a reference to a track with a specified index
  */
 
-	CbmStsTrack* getTrackByIndex(unsigned int index);
-
-/**
- * This method returns the size of the used memory for the
- * source data.
- */
-
-	double getUsedSizeOfData(unsigned short dimension);
-
-/**
- * This method returns the size of the allocated memory for
- * the source data.
- */
-
-	double getAllocatedSizeOfData(unsigned short dimension);
+	CbmStsTrack* getTrackByOrder(unsigned int index);
 
 /**
  * method adds a track to the end of the Track-TClonesArray
@@ -153,6 +139,30 @@ public:
  */
 
 	void removeAllTracks();
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfData(unsigned short dimension = 0);
 
 };
 

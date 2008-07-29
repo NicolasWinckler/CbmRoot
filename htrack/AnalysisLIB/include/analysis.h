@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-06-19 14:30:24 $
-/// $Revision: 1.18 $
+/// $Date: 2008-02-29 11:36:55 $
+/// $Revision: 1.24 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -47,24 +47,23 @@
 #include "projectionAnalysis.h"
 #include "magnetfieldAnalysis.h"
 #include "magnetfieldFactorAnalysis.h"
+#include "prelutRangeLayerAnalysis.h"
 #include "histogramAnalysis.h"
 #include "showAnalysis.h"
 #include "totalAnalysis.h"
 #include "hardwareAnalysis.h"
 #include "houghPictures.h"
+#include "visualAnalysis.h"
+#include "TStopwatch.h"
 #include <list>
 
 
 /*
  * This definitions sets the ranges for the evaluation of the magnetfield factors
  */
-#define FACTORS   10
-#define FACTORMIN 0.01
-#define FACTORMAX 0.1
-
-//#define PRINTFACTORS								/**< This definition enables the printing of the evaluated magnetfield factors to standard out */
-#undef PRINTFACTORS
-
+#define NUMBEROFFACTORS   501
+#define FACTORMIN           5.0
+#define FACTORMAX          10.0
 
 #define HIGHOCCURENCEISGOODSIGNATURE				/**< This definition determines the actual good signature to be such one with the highest occurence instead of the one with the most counted ones. */
 
@@ -86,9 +85,10 @@ typedef struct {
 	/* configuration information enable */
 	bool                   initConfiguration;
 	bool                   initDetector;
-	bool                   initMemory;
 	bool                   initEvent;
 	bool                   initClassPriority;
+	bool                   initMemory;
+	bool                   initTime;
 	/* EFGC analysis enable*/
 	bool                   initQualityEFGCEventAbsolute;
 	bool                   initQualityEFGCEventRelative;
@@ -121,13 +121,21 @@ typedef struct {
 	bool                   initMagnetfieldDisplay;
 	/* hardware analysis enable */
 	bool                   initTracksPerColumn;
+	bool                   initTracksPerRow;
 	bool                   initTracksPerLayer;
+	bool                   initHitReadoutDistribution;
+	/* prelut range analysis enable */
+	bool                   initPrelutRange;
+	bool                   initPrelutRangeDisplay;
+	unsigned short         initPrelutRangeDisplayMode;
 	/* coding table generation thresholds */
 	unsigned short         percentageOfHitsInSignature;
 	unsigned short         percentageOfTracksForSignature;
 	/* special analysis enable */
 	unsigned long          analysisResultWarnings;
 	unsigned long          analysisResultDisplays;
+	unsigned long          analysisMoreResultWarnings;
+	unsigned long          analysisMoreResultDisplays;
 
 }initialParameter;
 
@@ -138,7 +146,7 @@ static const initialParameter defaultParameters = {
 	/* momentum cut */
 	0.0,
 	/* configuration information enable */
-	false, false, true, true, false,
+	false, false, true, true, false, false,
 	/* EFGC analysis enable*/
 	false, true, true, true, true, true, true, true, false, false, false, false, false, false,
 	/* EFGC analysis display enable */
@@ -148,11 +156,13 @@ static const initialParameter defaultParameters = {
 	/* magnetfield analysis display enable */
 	false,
 	/* hardware analysis enable */
-	false, false,
+	false, false, false, false,
+	/* prelut range analysis enable */
+	false, false, CUTMAINRELATIVEDISPLAYMODE,
 	/* coding table generation thresholds */
 	0, 0,
 	/* special analysis enable */
-	0, 0
+	0, 0, 0, 0
 
 };
 
@@ -173,6 +183,8 @@ typedef struct {
 	bool initJustOneCreatedHistogramToRoot;
 	bool initJustOneEncodedHistogramToRoot;
 	bool initJustOneFilteredHistogramToRoot;
+	/* prelut range analysis enable */
+	bool initPrelutRangeToRoot;
 
 }initialFileParameter;
 
@@ -191,6 +203,8 @@ static const initialFileParameter defaultFileParameters = {
 	/* just one layer */
 	false,
 	false,
+	false,
+	/* prelut range analysis enable */
 	false
 
 };
@@ -214,21 +228,38 @@ protected:
 	projectionAnalysis*        projectionAnalyser;				/**< Object for analysing the occupancy of the histogram and displaying it with ROOT graphics. */
 	magnetfieldAnalysis*       magnetfieldAnalyser;				/**< Object for analysing the magnetfield and displaying it with ROOT graphics. */
 	magnetfieldFactorAnalysis* magnetfieldFactorAnalyser;		/**< Object for analysing the magnetfield factor and displaying it with ROOT graphics. */
+	prelutRangeLayerAnalysis*  prelutRangeLayerAnalyser;        /**< Object for analysing the prelut range and displaying it with ROOT graphics. */
 	histogramAnalysis*         histogramAnalyser;				/**< Object for analysing the histogram. */
 	showAnalysis*              showAnalyser;					/**< Object for showing and displaying some analysis it with ROOT graphics. */
 	totalAnalysis*             totalAnalyser;					/**< Object for evalution and showing of some total summaries of analysis results which cannot be evaluated and shown by the analysis itself. */
-	hardwareAnalysis*          hardwareAnalyser;				/**> Object for analysing the hardware prerequisites. */
+	hardwareAnalysis*          hardwareAnalyser;				/**< Object for analysing the hardware prerequisites. */
+	visualAnalysis*            mcTrackVisualAnalyser;			/**< Object for visualizing the MCTracks with the corresponding hits.*/
+	visualAnalysis*            foundTrackVisualAnalyser;		/**< Object for visualizing the found tracks with the corresponding hits.*/
 	double                     minimumP;						/**< Variable which defines the minimum momentum for a track which should be found. */
 	bool                       configuration;					/**< Variable for enabling the configuration summary printed to the standard output stream. */
 	bool                       detector;						/**< Variable for enabling the detector summary printed to the standard output stream. */
-	bool                       memory;							/**< Variable for enabling the memory summary printed to the standard output stream. */
 	bool                       event;							/**< Variable for enabling the event summary printed to the standard output stream. */
 	bool                       classPriority;					/**< Variable for enabling the class summary printed to the standard output stream. */
+	bool                       memory;							/**< Variable for enabling the memory summary printed to the standard output stream. */
+	bool                       time;							/**< Variable for enabling the time summary printed to the standard output stream. */
 	unsigned short             percentageOfHitsInSignature;		/**< Variable to store the percentage of the number of hits which must be found to accept the signature. */
 	unsigned short             percentageOfTracksForSignature;	/**< Variable to store the percentage of the real tracks which must be found with the accepted signatures. */
 	unsigned long              analysisResultWarnings;			/**< Variable to store which result of an analysis should be printed on the standard output screen by a warning message. */
 	unsigned long              analysisResultDisplays;			/**< Variable to store which result of an analysis should be displayed with a graphical output screen. */
+	unsigned long              analysisMoreResultWarnings;		/**< Variable to store which result of an analysis should be printed on the standard output screen by a warning message. */
+	unsigned long              analysisMoreResultDisplays;		/**< Variable to store which result of an analysis should be displayed with a graphical output screen. */
 	houghPictures*             pictures;						/**< Object which draws the pictures for different Hough transforms. This pictures are static and are just needed fort he thesis. */
+	TStopwatch*                borderCreationTimer;				/**< Object to store the time for creating the borders for one event */
+	TStopwatch*                histogramCreationTimer;			/**< Object to store the time for creating the histogram layers for one event */
+	TStopwatch*                histogramEncodingTimer;			/**< Object to store the time for encoding the histogram layers for one event */
+	TStopwatch*                histogramDiagonalizingTimer;		/**< Object to store the time for diagonalizing the histogram layers for one event */
+	TStopwatch*                histogramPeakfindingTimer;		/**< Object to store the time for peak finding in the histogram layers for one event */
+	TStopwatch*                histogramFinalizingTimer;		/**< Object to store the time for finalizing the histogram layers for one event */
+	TStopwatch*                histogramResettingTimer;			/**< Object to store the time for resetting the histogram layers for one event */
+	TStopwatch*                trackPeakfindingTimer;			/**< Object to store the time for peak finding in the track candidates of neighbored layers for one event */
+	double                     reservedSizeOfLBufferData;		/**< Variable to store the reserved size of the LBuffer data */
+	double                     allocatedSizeOfLBufferData;		/**< Variable to store the allocated size of the LBuffer data */
+	double                     usedSizeOfLBufferData;			/**< Variable to store the used size of the LBuffer data */
 
 /**
  * method initializes the showAnalysis-object.
@@ -493,9 +524,10 @@ public:
  * @param minP is a variable which defines the minimum momentum for a track which should be found.
  * @param initConfiguration is a variable for enabling the summary printed to the standard output stream.
  * @param initDetector is a variable for enabling the summary printed to the standard output stream.
- * @param initMemory is a variable for enabling the summary printed to the standard output stream.
  * @param initEvent is a variable for enabling the summary printed to the standard output stream.
  * @param initClassPriority is a variable for enabling the summary printed to the standard output stream.
+ * @param initMemory is a variable for enabling the summary about the memory printed to the standard output stream.
+ * @param initTime is a variable for enabling the summary about the time printed to the standard output stream.
  * @param initQualityEFGCEventAbsolute initializes the quality analysis for the efficiency, the fakes, the ghosts and the clones for each event with absolute numbers
  * @param initQualityEFGCEventRelative initializes the quality analysis for the efficiency, the fakes, the ghosts and the clones for each event with percent numbers
  * @param initQualityEFGCTotalAbsolute initializes the quality analysis for the efficiency, the fakes, the ghosts and the clones accumulated for all computed events with absolute numbers
@@ -524,6 +556,7 @@ public:
  * @param initJustOneEncodedHistogramToRoot initializes the writing of one layer of the histogram after the encoding step into the file
  * @param initJustOneFilteredHistogramToRoot initializes the writing of one layer of the histogram after the filtering step into the file
  * @param initTracksPerColumn initializes the evaluation of the number of tracks per column in all histogram layers
+ * @param initTracksPerRow initializes the evaluation of the number of tracks per row in all histogram layers
  * @param initTracksPerLayer initializes the evaluation of the number of tracks per histogram layer
  * @param percentageOfHitsInSignature is the percentage of the number of hits which must be found to accept the signature
  * @param percentageOfTracksForSignature is the percentage of the real tracks which must be found with the accepted signatures
@@ -555,9 +588,10 @@ public:
  * @param minP is a variable which defines the minimum momentum for a track which should be found.
  * @param initConfiguration is a variable for enabling the summary printed to the standard output stream.
  * @param initDetector is a variable for enabling the summary printed to the standard output stream.
- * @param initMemory is a variable for enabling the summary printed to the standard output stream.
  * @param initEvent is a variable for enabling the summary printed to the standard output stream.
  * @param initClassPriority is a variable for enabling the summary printed to the standard output stream.
+ * @param initMemory is a variable for enabling the summary about the memory printed to the standard output stream.
+ * @param initTime is a variable for enabling the summary about the time printed to the standard output stream.
  * @param initQualityEFGCEventAbsolute initializes the quality analysis for the efficiency, the fakes, the ghosts and the clones for each event with absolute numbers
  * @param initQualityEFGCEventRelative initializes the quality analysis for the efficiency, the fakes, the ghosts and the clones for each event with percent numbers
  * @param initQualityEFGCTotalAbsolute initializes the quality analysis for the efficiency, the fakes, the ghosts and the clones accumulated for all computed events with absolute numbers
@@ -602,11 +636,21 @@ public:
  * Method returns true if the track has a the specific track
  * pattern and has a specific P.
  * @param track is the track to be validated
+ * @param minClassPriority is the minimum class which the track must have to be findable
  * @param globalTrackPattern can be used to get the trackPattern of this track. It will be not reset inside, just updated with true-values.
- * @return number of these tracks
+ * @return true if the track is a findable track
  */
 
-	bool isfindableTrack(trackfinderInputTrack* track, bitArray minClassPriority, bitArray* globalTrackPattern);
+	bool isFindableTrack(trackfinderInputTrack* track, bitArray minClassPriority, bitArray* globalTrackPattern);
+
+/**
+ * Method returns true if the track has a the specific track
+ * pattern and has a specific P.
+ * @param track is the track to be validated
+ * @return true if the track is a findable standard track
+ */
+
+	bool isFindableStandardTrack(trackfinderInputTrack* track);
 
 /**
  * Method returns the number of tracks with a the specific
@@ -628,13 +672,23 @@ public:
 
 /**
  * method evaluates the magnetfield factors.
- * @param updateFactors tells the function to set the evaluated factors for default
- * @param dim3StartEntry is the minimal value of the second dimension of prelut
- * @param dim3StopEntry is the maximal value of the second dimension of prelut
+ * @param isFirstEvent is used to deliver the information if the event is the first one. It is important for the initial values, if the averagingFactors flag is used
+ * @param averagingFactors enables the averaging of the evaluated factors over events
  * @param terminal is a buffer to place the process information
  */
 
-	void evaluateMagnetfieldFactors(bool updateFactors, double dim3StartEntry, double dim3StopEntry, std::streambuf* terminal = NULL);
+	void evaluateMagnetfieldFactors(bool isFirstEvent, bool averagingFactors, std::streambuf* terminal = NULL);
+
+/**
+ * method evaluates the prelut range.
+ * @param isFirstEvent is used to deliver the information if the event is the first one. It is important for the initial values, if the averagingFactors flag is used
+ * @param averagingFactors enables the averaging of the evaluated factors over events
+ * @param chooseMainPrelutRange choose the range of the main analyser or the correct analyser
+ * @param chooseConstraintPrelutRange choose between the maximum range or the range with regard to the constraint
+ * @param terminal is a buffer to place the process information
+ */
+
+	void evaluatePrelutRange(bool isFirstEvent, bool averagingFactors, bool chooseMainPrelutRange, bool chooseConstraintPrelutRange, std::streambuf* terminal = NULL);
 
 /**
  * method evaluates the prelut goodness.
@@ -698,6 +752,19 @@ public:
 	void evaluateQuantizationGoodness(std::streambuf* terminal = NULL);
 
 /**
+ * method evaluates the goodness of the peak distance.
+ */
+
+	void evaluatePeakDistanceGoodness(std::streambuf* terminal = NULL);
+
+/**
+ * method evaluates the neccessary files for a CELL BE simulation.
+ */
+
+	void evaluateCellSimulationFiles(std::string hitFileName, std::string prelutFileName, std::string lutFileName, std::streambuf* terminal = NULL);
+	void evaluateCellSimulationFiles(std::string hitFileName, std::string prelutFileName, std::string lutFileName, unsigned int eventNumber, std::streambuf* terminal = NULL);
+
+/**
  * method initializes the configuration-Analysis.
  */
 
@@ -714,6 +781,12 @@ public:
  */
 
 	void initMemoryAnalysis(bool enable = true);
+
+/**
+ * method initializes the time-Analysis.
+ */
+
+	void initTimeAnalysis(bool enable = true);
 
 /**
  * method initializes the event-Analysis.
@@ -1312,7 +1385,7 @@ public:
  * @param max sets the maximal value in variable dimension for this ROOT-histogram
  */
 
-	void initMagnetfieldConstantAnalysis(bool enable = true, int nBins = FACTORS, double min = FACTORMIN, double max = FACTORMAX);
+	void initMagnetfieldConstantAnalysis(bool enable = true, int nBins = NUMBEROFFACTORS, double min = FACTORMIN, double max = FACTORMAX);
 
 /**
  * method initializes the initMagnetfieldXBxAnalysis-Analysis.
@@ -1499,6 +1572,32 @@ public:
 	void initMagnetfieldConstantAnalysisDisplay(bool enable = true);
 
 /**
+ * method initializes the initPrelutRangeAnalysis-Analysis.
+ * @param enable enables or disables this analysis
+ */
+
+	void initPrelutRangeAnalysis(bool enable = true);
+	void initPrelutRangeAnalysis(bool enable, unsigned short numberOfDisplays);
+	void initPrelutRangeAnalysis(bool enable, unsigned short prelutRangeCut, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax);
+	void initPrelutRangeAnalysis(bool enable, unsigned short prelutRangeCut, unsigned short numberOfDisplays, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax);
+
+/**
+ * This method initializes the root directory for the displays.
+ * @param enable enables or disables this analysis
+ * @param name is the name of the file to place the graphics
+ */
+
+	void initPrelutRangeAnalysisToRoot(bool enable = true, const char* name = NULL);
+
+/**
+ * This method initializes the magnetfield constant's display.
+ * @param enable enables or disables this analysis
+ * @param displayMode is the mode of the display drawing functionality
+ */
+
+	void initPrelutRangeAnalysisDisplay(bool enable = true, unsigned short displayMode = CUTMAINRELATIVEDISPLAYMODE);
+
+/**
  * This method initializes the histogram analysis.
  */
 
@@ -1535,6 +1634,12 @@ public:
  */
 
 	bool isMemoryAnalysisEnabled();
+
+/**
+ * method returns true if the time-Analysis is enabled.
+ */
+
+	bool isTimeAnalysisEnabled();
 
 /**
  * method returns true if the event-Analysis is enabled.
@@ -1613,6 +1718,12 @@ public:
  */
 
 	bool isMagnetfieldFactorToRootEnabled();
+
+/**
+ * method returns true if the prelut-range-to-root-analysis is enabled.
+ */
+
+	bool isPrelutRangeToRootEnabled();
 
 /**
  * method returns a string representing the result of the
@@ -1735,9 +1846,32 @@ public:
 
 /**
  * method draws the magnetfield factor-Analysis display.
+ * @param preventDraw consists of flags which enables or disables the drawing of displays separately
  */
 
 	void magnetfieldFactorAnalysisDraw(bitArray preventDraw = 0);
+
+/**
+ * This method returns true if the prelut range's display is enabled.
+ */
+
+	bool isPrelutRangeDisplayEnabled();
+
+/**
+ * method updates the prelut range-Analysis display.
+ */
+
+	void prelutRangeAnalysisUpdate();
+
+/**
+ * method draws the prelut range-Analysis display.
+ * @param preventStationDraw consists of flags which enables or disables the drawing of station result displays separately
+ * @param preventStationSumDraw is a flag to prevent the drawing of the combined station display
+ * @param preventConstraintDraw consists of flags which enables or disables the drawing of constraint result displays separately
+ * @param preventConstraintSumDraw is a flag to prevent the drawing of the combined constraint display
+ */
+
+	void prelutRangeAnalysisDraw(bitArray preventStationDraw = 0, bool preventStationSumDraw = false, bitArray preventConstraintDraw = 0, bool preventConstraintSumDraw = false, bool preventRelativeDraw = false);
 
 /**
  * method writes the momentumEvent-Analysis for each event into
@@ -1780,6 +1914,13 @@ public:
  */
 
 	void magnetfieldFactorAnalysisWrite(int eventNumber);
+
+/**
+ * method writes the prelut range-Analysis into
+ * a root file.
+ */
+
+	void prelutRangeAnalysisWrite(int eventNumber);
 
 /**
  * method initializes the momentumEFGCEventAnalysis.
@@ -1963,10 +2104,23 @@ public:
 	void initHardwareTracksPerColumnAnalysis(bool enable = true);
 
 /**
+ * method initializes the hardwareTracksPerRowAnalysis.
+ */
+
+	void initHardwareTracksPerRowAnalysis(bool enable = true);
+
+/**
  * method initializes the hardwareTracksPerLayerAnalysis.
  */
 
 	void initHardwareTracksPerLayerAnalysis(bool enable = true);
+
+/**
+ * method initializes the hardwareHistogramLayerDistribution-
+ * Analysis.
+ */
+
+	void initHardwareHitReadoutDistributionAnalysis(bool enable);
 
 /**
  * method returns if the analysis for the number of
@@ -1978,24 +2132,53 @@ public:
 
 /**
  * method returns if the analysis for the number of
+ * tracks in all rows of the histogram layers is
+ * enabled or not
+ */
+
+	bool isNumberOfTracksInAllRowsAnalysisEnabled();
+
+/**
+ * method returns if the analysis for the number of
  * tracks in all histogram layers is enabled or not
  */
 
 	bool isNumberOfTracksInAllLayersAnalysisEnabled();
 
 /**
+ * method returns if the analysis for the histogram
+ * layer distribution is enabled or not
+ */
+
+	bool isHitReadoutDistributionAnalysisEnabled();
+
+/**
  * This method evaluates the minimal, the maximal and
  * the average number of tracks in all columns of the histogram.
  */
 
-	void evaluateNumberOfTracksInAllColumns();
+	void evaluateNumberOfTracksInAllColumns(std::streambuf* terminal);
+
+/**
+ * This method evaluates the minimal, the maximal and
+ * the average number of tracks in all rows of the histogram.
+ */
+
+	void evaluateNumberOfTracksInAllRows(std::streambuf* terminal);
 
 /**
  * This method evaluates the distribution of the number of tracks
  * in all layers of the histogram.
  */
 
-	void evaluateNumberOfTracksInAllLayers();
+	void evaluateNumberOfTracksInAllLayers(std::streambuf* terminal = NULL);
+
+/**
+ * The method evaluates the distribution how often a hit must be
+ * inserted in a layer.
+ */
+
+	void evaluateHitReadoutDistribution(histogramData* histogram, std::streambuf* terminal = NULL);
 
 /**
  * This method shows the minimal, the maximal and
@@ -2005,11 +2188,25 @@ public:
 	void showNumberOfTracksInAllColumns();
 
 /**
+ * This method shows the minimal, the maximal and
+ * the average number of tracks in all rows of the histogram.
+ */
+
+	void showNumberOfTracksInAllRows();
+
+/**
  * This method shows the distribution of the number of
  * tracks in all layers of the histogram.
  */
 
 	void showNumberOfTracksInAllLayers();
+
+/**
+ * This method shows the distribution of the histogram
+ * layers for the hits.
+ */
+
+	void showHitReadoutDistribution(bool readoutColumnsInParallel);
 
 /**
  * This method resets the totalAnalysis object with
@@ -2073,6 +2270,34 @@ public:
 	void displayTotalAnalysis();
 
 /**
+ * method returns true if the MCTrack distribution-Analysis is
+ * enabled.
+ */
+
+	bool isMCTrackVisualizationAnalysisEnabled();
+
+/**
+ * This method displays all MCTracks with corresponding hits.
+ * @param if trackIndex < 0, all tracks would be displayed, else just the track with the given index
+ */
+
+	std::string displayMCTracks(int trackIndex = -1);
+
+/**
+ * method returns true if the found track distribution-Analysis is
+ * enabled.
+ */
+
+	bool isFoundTrackVisualizationAnalysisEnabled();
+
+/**
+ * This method displays all found tracks with corresponding hits.
+ * @param if trackIndex < 0, all tracks would be displayed, else just the track with the given index
+ */
+
+	std::string displayFoundTracks(int trackIndex = -1);
+
+/**
  * This method returns the value for the percentage of
  * hits which must be in a signature which is accepted
  */
@@ -2085,6 +2310,194 @@ public:
  */
 
 	unsigned short getPercentageOfTracksForSignature();
+
+/**
+ * This method returns the actual measured time for creating the
+ * border objects.
+ */
+
+	void borderCreationTimerReset();
+	void borderCreationTimerStart(bool reset = false);
+	void borderCreationTimerStop();
+
+/**
+ * This method returns the actual measured time for creating the
+ * histogram layers.
+ */
+
+	void histogramCreationTimerReset();
+	void histogramCreationTimerStart(bool reset = false);
+	void histogramCreationTimerStop();
+
+/**
+ * This method returns the actual measured time for encoding the
+ * histogram layers.
+ */
+
+	void histogramEncodingTimerReset();
+	void histogramEncodingTimerStart(bool reset = false);
+	void histogramEncodingTimerStop();
+
+/**
+ * This method returns the actual measured time for diagonalization the
+ * histogram layers.
+ */
+
+	void histogramDiagonalizingTimerReset();
+	void histogramDiagonalizingTimerStart(bool reset = false);
+	void histogramDiagonalizingTimerStop();
+
+/**
+ * This method returns the actual measured time for peak finding the
+ * histogram layers.
+ */
+
+	void histogramPeakfindingTimerReset();
+	void histogramPeakfindingTimerStart(bool reset = false);
+	void histogramPeakfindingTimerStop();
+
+/**
+ * This method returns the actual measured time for finalizing the
+ * histogram layers.
+ */
+
+	void histogramFinalizingTimerReset();
+	void histogramFinalizingTimerStart(bool reset = false);
+	void histogramFinalizingTimerStop();
+
+/**
+ * This method returns the actual measured time for resetting the
+ * histogram layers.
+ */
+
+	void histogramResettingTimerReset();
+	void histogramResettingTimerStart(bool reset = false);
+	void histogramResettingTimerStop();
+
+/**
+ * This method returns the actual measured time for peak finding in the
+ * track candidates of neighbored layers.
+ */
+
+	void trackPeakfindingTimerReset();
+	void trackPeakfindingTimerStart(bool reset = false);
+	void trackPeakfindingTimerStop();
+
+/**
+ * This method returns the actual measured time for creating the
+ * border objects.
+ */
+
+	double getBorderCreationRealTime();
+	double getBorderCreationCpuTime();
+
+/**
+ * This method returns the actual measured time for creating the
+ * histogram layers.
+ */
+
+	double getHistogramCreationRealTime();
+	double getHistogramCreationCpuTime();
+
+/**
+ * This method returns the actual measured time for encoding the
+ * histogram layers.
+ */
+
+	double getHistogramEncodingRealTime();
+	double getHistogramEncodingCpuTime();
+
+/**
+ * This method returns the actual measured time for diagonalization the
+ * histogram layers.
+ */
+
+	double getHistogramDiagonalizingRealTime();
+	double getHistogramDiagonalizingCpuTime();
+
+/**
+ * This method returns the actual measured time for peak finding the
+ * histogram layers.
+ */
+
+	double getHistogramPeakfindingRealTime();
+	double getHistogramPeakfindingCpuTime();
+
+/**
+ * This method returns the actual measured time for finalizing the
+ * histogram layers.
+ */
+
+	double getHistogramFinalizingRealTime();
+	double getHistogramFinalizingCpuTime();
+
+/**
+ * This method returns the actual measured time for resetting the
+ * histogram layers.
+ */
+
+	double getHistogramResettingRealTime();
+	double getHistogramResettingCpuTime();
+
+/**
+ * This method returns the actual measured time for peak finding in the
+ * track candidates of neighbored layers.
+ */
+
+	double getTrackPeakfindingRealTime();
+	double getTrackPeakfindingCpuTime();
+
+/**
+ * This method evaluates the size of the memory for
+ * the source data.
+ */
+
+	void evaluateSizeOfLBufferData();
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfLBufferData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfLBufferData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfLBufferData(unsigned short dimension = 0);
+
+/**
+ * This method returns a formated string containing the time
+ * analysis.
+ */
+
+	std::string formatRealTimeAnalysis();
+	std::string formatRealTimeSummaryAnalysis(double trackfinderRealTime, double eventRealTime);
+	std::string formatCpuTimeAnalysis();
+	std::string formatCpuTimeSummaryAnalysis(double trackfinderCpuTime, double eventCpuTime);
+	std::string formatTimeAnalysis(double trackfinderRealTime, double eventRealTime, double trackfinderCpuTime, double eventCpuTime);
+
+/**
+ * This method returns a formated string containing the time
+ * analysis.
+ */
+
+	std::string formatReservedMemoryAnalysis(histogramData* histogram = NULL, double inputReservedSize = 0);
+	std::string formatAllocatedMemoryAnalysis(histogramData* histogram = NULL, double inputAllocatedSize = 0);
+	std::string formatUsedMemoryAnalysis(histogramData* histogram = NULL, double inputUsedSize = 0);
+	std::string formatMemoryAnalysis(histogramData* histogram = NULL, double inputReservedSize = 0, double inputAllocatedSize = 0, double inputUsedSize = 0);
 
 };
 

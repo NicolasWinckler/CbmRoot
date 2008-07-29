@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-04-16 10:38:14 $
-// $Revision: 1.8 $
+// $Date: 2008-06-26 12:53:22 $
+// $Revision: 1.10 $
 //
 // *******************************************************************/
 
@@ -343,7 +343,7 @@ void inputAscii::readDataSource(unsigned int event, TClonesArray* mHitArray, TCl
 			
 				if ((i > 5) && (i < 10)) {
 
-					track = data.getTrackByIndex(i);
+					track = data.getTrackByOrder(i);
 
 					std::cout << " PdgCode: "      << track->getPdgCode() << std::endl;
 					std::cout << " Charge:    "    << track->getCharge()  << std::endl;
@@ -554,7 +554,7 @@ void inputAscii::readDataSource(unsigned int event, TClonesArray* mvdHitArray, T
 			
 				if ((i > 5) && (i < 10)) {
 
-					track = data.getTrackByIndex(i);
+					track = data.getTrackByOrder(i);
 
 					std::cout << " PdgCode: "      << track->getPdgCode() << std::endl;
 					std::cout << " Charge:    "    << track->getCharge()  << std::endl;
@@ -638,19 +638,21 @@ void inputAscii::readDataSource(unsigned int event, TClonesArray* mvdHitArray, T
 	}
 
 }
+
 /****************************************************************
- * This method returns the size of the used memory for the		*
- * source data.													*
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
  ****************************************************************/
 
-double inputAscii::getUsedSizeOfData(unsigned short dimension) {
+double inputAscii::getReservedSizeOfData(unsigned short dimension) {
 
 	double returnValue;
 
-	returnValue   = data.getNumberOfHits()   * sizeof(trackfinderInputHit);
-	returnValue  += data.getNumberOfTracks() * sizeof(trackfinderInputTrack);
+	returnValue  = inputData::getReservedSizeOfData(0);
+	returnValue += sizeof(dataValidation);
+	returnValue += sizeof(sourceFile);
 
-	returnValue = (returnValue / (1 << (10 * dimension)));
+	returnValue  = (returnValue / (1 << (10 * dimension)));
 
 	return returnValue;
 
@@ -663,7 +665,32 @@ double inputAscii::getUsedSizeOfData(unsigned short dimension) {
 
 double inputAscii::getAllocatedSizeOfData(unsigned short dimension) {
 
-	return getUsedSizeOfData(dimension);
+	double returnValue;
+
+	returnValue  = inputData::getAllocatedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double inputAscii::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = inputData::getUsedSizeOfData(0);
+	returnValue += sizeof(dataValidation);
+	returnValue += sizeof(sourceFile);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }
 

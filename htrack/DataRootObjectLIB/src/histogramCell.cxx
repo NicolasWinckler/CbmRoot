@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/12/12 13:04:39 $
-// $Revision: 1.2 $
+// $Date: 2007-10-19 14:33:05 $
+// $Revision: 1.3 $
 //
 // *******************************************************************/
 
@@ -111,14 +111,120 @@ void histogramCell::reset() {
 }
 
 /****************************************************************
- * Method returns the size of the used memory for the hits.		*
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
  ****************************************************************/
 
-size_t histogramCell::getUsedSizeForHitMemory() {
+double histogramCell::getReservedSizeOfHistogramData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = getReservedSizeOfHistogramSignatureData(0);
+	returnValue += getReservedSizeOfHistogramHitData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramCell::getAllocatedSizeOfHistogramData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = getAllocatedSizeOfHistogramSignatureData(0);
+	returnValue += getAllocatedSizeOfHistogramHitData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramCell::getUsedSizeOfHistogramData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = getUsedSizeOfHistogramSignatureData(0);
+	returnValue += getUsedSizeOfHistogramHitData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramCell::getReservedSizeOfHistogramSignatureData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = value.getReservedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramCell::getAllocatedSizeOfHistogramSignatureData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = value.getAllocatedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramCell::getUsedSizeOfHistogramSignatureData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = value.getUsedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramCell::getReservedSizeOfHistogramHitData(unsigned short dimension) {
 
 #ifndef NOANALYSIS
 
-	return hits.getUsedSizeOfMemory();
+	return hits.getReservedSizeOfData();
 
 #else
 
@@ -129,14 +235,34 @@ size_t histogramCell::getUsedSizeForHitMemory() {
 }
 
 /****************************************************************
- * Method returns the size of the allocated memory for the hits.*
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
  ****************************************************************/
 
-size_t histogramCell::getAllocatedSizeForHitMemory() {
+double histogramCell::getAllocatedSizeOfHistogramHitData(unsigned short dimension) {
 
 #ifndef NOANALYSIS
 
-	return hits.getAllocatedSizeOfMemory();
+	return hits.getAllocatedSizeOfData();
+
+#else
+
+	return 0;
+
+#endif
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramCell::getUsedSizeOfHistogramHitData(unsigned short dimension) {
+
+#ifndef NOANALYSIS
+
+	return hits.getUsedSizeOfData();
 
 #else
 

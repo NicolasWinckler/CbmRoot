@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/11/08 12:37:30 $
-/// $Revision: 1.3 $
+/// $Date: 2008-02-29 11:38:11 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -36,7 +36,7 @@
 #include "../../FileioLIB/include/io.h"
 
 
-#define numberOfLutAccessFileCmds 9			/**< Definition of the number of parameters gettable from file. */
+#define numberOfLutAccessFileCmds 10			/**< Definition of the number of parameters gettable from file. */
 
 
 enum {SOFTWAREFORMAT, HARDWAREFORMAT};
@@ -47,6 +47,7 @@ enum {SOFTWAREFORMAT, HARDWAREFORMAT};
  */
 typedef struct {
 	std::string    name;					/**< Variable to store the name of the lut */
+	std::string    usage;					/**< Variable to store the usage of the lut */
 	unsigned short format;					/**< Variable to store the format of the file */
 	unsigned long  numberOfEntries;			/**< Variable to store the number of entries of the lut */
 	double         dim1Min;					/**< Variable to store the minimal value for the first dimension to compute the prelut value. */

@@ -51,8 +51,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-21 13:20:21 $
-// $Revision: 1.3 $
+// $Date: 2007-10-19 14:43:59 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
@@ -1902,5 +1902,56 @@ std::string bitfield::toString(int radix) {
 unsigned long bitfield::toULong() {
 
 	return bits.to_ulong();
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double bitfield::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(bits);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double bitfield::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double bitfield::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = ((double)numberOfBits) / 8;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }

@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-06-21 13:20:21 $
-/// $Revision: 1.8 $
+/// $Date: 2007-10-19 14:44:00 $
+/// $Revision: 1.10 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -277,7 +277,7 @@ table::~table() {
 void table::clear() {
 
 	members.clear();
-	minimumClassification = bitArray(0);
+	minimumClassification = bitArray(1);
 	maximumClassification = bitArray(0);
 
 }
@@ -461,6 +461,9 @@ void table::sumEntry(bitArray& signature, bitArray& classification) {
 			}
 
 		}
+
+		if (object->getClassification() > getMaximumClassification())
+			maximumClassification = object->getClassification();
 
 	}
 	else

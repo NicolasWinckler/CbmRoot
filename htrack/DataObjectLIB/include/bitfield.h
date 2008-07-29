@@ -51,8 +51,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-05-29 15:10:52 $
-/// $Revision: 1.2 $
+/// $Date: 2007-10-19 14:43:57 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -563,6 +563,30 @@ public:
  */
 
 	unsigned long toULong();
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfData(unsigned short dimension = 0);
 
 };
 

@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-19 14:32:12 $
-// $Revision: 1.2 $
+// $Date: 2007-10-19 14:33:12 $
+// $Revision: 1.3 $
 //
 // *******************************************************************/
 
@@ -343,6 +343,135 @@ void trackfinderInputTrack::modifyMaximumNumberOfHits(unsigned short actualMaxim
 
 	if (actualMaximumNumberOfHits > info.maximumNumberOfHits)
 		info.maximumNumberOfHits = actualMaximumNumberOfHits;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputTrack::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(track);
+	returnValue += hits.getReservedSizeOfData(0);
+	returnValue += sizeof(info);
+	returnValue += sizeof(isPointer);
+	returnValue += sizeof(trackIndex);
+	returnValue += sizeof(charge);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputTrack::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+	if (track != NULL)
+		returnValue += sizeof(*track);
+	returnValue += hits.getAllocatedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputTrack::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(track);
+	if (track != NULL)
+		returnValue += sizeof(*track);
+	returnValue += sizeof(hits);
+	returnValue += hits.getUsedSizeOfData(0);
+	returnValue += sizeof(info);
+	returnValue += sizeof(isPointer);
+	returnValue += sizeof(trackIndex);
+	returnValue += sizeof(charge);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputTrack::getReservedSizeOfAddOnData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(track);
+	returnValue += hits.getReservedSizeOfData(0);
+	returnValue += sizeof(info);
+	returnValue += sizeof(isPointer);
+	returnValue += sizeof(trackIndex);
+	returnValue += sizeof(charge);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputTrack::getAllocatedSizeOfAddOnData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = hits.getAllocatedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputTrack::getUsedSizeOfAddOnData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(track);
+	returnValue += sizeof(hits);
+	returnValue += hits.getUsedSizeOfData(0);
+	returnValue += sizeof(info);
+	returnValue += sizeof(isPointer);
+	returnValue += sizeof(trackIndex);
+	returnValue += sizeof(charge);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }
 

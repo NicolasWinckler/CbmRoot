@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-05-14 15:47:54 $
-/// $Revision: 1.4 $
+/// $Date: 2008-02-29 11:43:28 $
+/// $Revision: 1.6 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -130,14 +130,14 @@ public:
 #endif
 
 
-#ifndef _TOOBIGINDEXFORMEMORYERROR_H
-#define _TOOBIGINDEXFORMEMORYERROR_H
+#ifndef _TOOBIGINDEXFORDIGITALHITLUTERROR_H
+#define _TOOBIGINDEXFORDIGITALHITLUTERROR_H
 
 /**
- * CLASS tooBigIndexForMemoryError
+ * CLASS tooBigIndexForDigitalHitLutError
  */
 
-class tooBigIndexForMemoryError : public lutGeneratorError {
+class tooBigIndexForDigitalHitLutError : public lutGeneratorError {
 
 private:
 
@@ -150,19 +150,19 @@ public:
  * Default constructor
  */
 
-	tooBigIndexForMemoryError();
+	tooBigIndexForDigitalHitLutError();
 
 /**
  * Constructor
  */
 
-	tooBigIndexForMemoryError(unsigned long index, unsigned long numberOfEntries);
+	tooBigIndexForDigitalHitLutError(unsigned long index, unsigned long numberOfEntries);
 
 /**
  * Destructor
  */
 
-	virtual ~tooBigIndexForMemoryError();
+	virtual ~tooBigIndexForDigitalHitLutError();
 
 /**
  * This method displays an error message.
@@ -175,14 +175,19 @@ public:
 #endif
 
 
-#ifndef _CANNOTACCESSLUTMEMERROR_H
-#define _CANNOTACCESSLUTMEMERROR_H
+#ifndef _TOOBIGINDEXFORPRELUTERROR_H
+#define _TOOBIGINDEXFORPRELUTERROR_H
 
 /**
- * CLASS cannotAccessLutMemError
+ * CLASS tooBigIndexForPrelutError
  */
 
-class cannotAccessLutMemError : public lutGeneratorError {
+class tooBigIndexForPrelutError : public lutGeneratorError {
+
+private:
+
+	unsigned long index;
+	unsigned long numberOfEntries;
 
 public:
 
@@ -190,13 +195,166 @@ public:
  * Default constructor
  */
 
-	cannotAccessLutMemError();
+	tooBigIndexForPrelutError();
+
+/**
+ * Constructor
+ */
+
+	tooBigIndexForPrelutError(unsigned long index, unsigned long numberOfEntries);
 
 /**
  * Destructor
  */
 
-	virtual ~cannotAccessLutMemError();
+	virtual ~tooBigIndexForPrelutError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _TOOBIGINDEXFORLUTERROR_H
+#define _TOOBIGINDEXFORLUTERROR_H
+
+/**
+ * CLASS tooBigIndexForLutError
+ */
+
+class tooBigIndexForLutError : public lutGeneratorError {
+
+private:
+
+	unsigned long index;
+	unsigned long numberOfEntries;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	tooBigIndexForLutError();
+
+/**
+ * Constructor
+ */
+
+	tooBigIndexForLutError(unsigned long index, unsigned long numberOfEntries);
+
+/**
+ * Destructor
+ */
+
+	virtual ~tooBigIndexForLutError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _CANNOTACCESSDIGITALHITLUTERROR_H
+#define _CANNOTACCESSDIGITALHITLUTERROR_H
+
+/**
+ * CLASS cannotAccessDigitalHitLutError
+ */
+
+class cannotAccessDigitalHitLutError : public lutGeneratorError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotAccessDigitalHitLutError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotAccessDigitalHitLutError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _CANNOTACCESSPRELUTERROR_H
+#define _CANNOTACCESSPRELUTERROR_H
+
+/**
+ * CLASS cannotAccessPrelutError
+ */
+
+class cannotAccessPrelutError : public lutGeneratorError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotAccessPrelutError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotAccessPrelutError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _CANNOTACCESSLUTERROR_H
+#define _CANNOTACCESSLUTERROR_H
+
+/**
+ * CLASS cannotAccessLutError
+ */
+
+class cannotAccessLutError : public lutGeneratorError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotAccessLutError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotAccessLutError();
 
 /**
  * This method displays an error message.
@@ -299,6 +457,40 @@ public:
  */
 
 	virtual ~cannotClearBorderOfUndefinedObjectError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _CANNOTSETPRELUTRANGEOFUNDEFINEDOBJECTERROR_H
+#define _CANNOTSETPRELUTRANGEOFUNDEFINEDOBJECTERROR_H
+
+/**
+ * CLASS cannotSetPrelutRangeOfUndefinedObjectError
+ */
+
+class cannotSetPrelutRangeOfUndefinedObjectError : public lutGeneratorError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotSetPrelutRangeOfUndefinedObjectError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotSetPrelutRangeOfUndefinedObjectError();
 
 /**
  * This method displays an error message.

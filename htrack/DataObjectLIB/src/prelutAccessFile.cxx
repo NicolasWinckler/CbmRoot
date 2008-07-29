@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/11/08 12:37:31 $
-// $Revision: 1.3 $
+// $Date: 2008-02-29 11:38:11 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
@@ -50,6 +50,11 @@
 #define defValName                  "prelut"
 #define defValUsage                 "PRELUT"
 #define defValNumberOfEntries       0
+#define defValDimMin                0
+#define defValDimMax                0
+#define defValDimStep               0
+#define defValDimStartEntry         0
+#define defValDimStopEntry          0
 #define defValStructureSeparator    "TABULATOR"
 #define defValBlockSeparator        "NEWLINE"
 #define defValContent               "Start & Stop"
@@ -62,6 +67,11 @@
 #define stringCmdName               "name"
 #define stringCmdUsage              "usage"
 #define stringCmdNumberOfEntries    "numberOfEntries"
+#define stringCmdDimMin             "dimMin"
+#define stringCmdDimMax             "dimMax"
+#define stringCmdDimStep            "dimStep"
+#define stringCmdDimStartEntry      "dimStartEntry"
+#define stringCmdDimStopEntry       "dimStopEntry"
 #define stringCmdStructureSeparator "/**/ structureSeparator"
 #define stringCmdBlockSeparator     "/**/ blockSeparator"
 #define stringCmdContent            "/**/ content"
@@ -72,7 +82,13 @@
  * index of each parameter for the commandID table
  */
 #define idCmdName                   0
-#define idCmdNumberOfEntries        1
+#define idCmdUsage                  1
+#define idCmdNumberOfEntries        2
+#define idCmdDimMin                 3
+#define idCmdDimMax                 4
+#define idCmdDimStep                5
+#define idCmdDimStartEntry          6
+#define idCmdDimStopEntry           7
 
 
 /****************************************************************
@@ -129,10 +145,52 @@ bool prelutAccessFile::getHeaderValue(std::string& specifier, std::string& value
 			specifierFound = true;
 		}
 	}
+	else if (specifier.compare(stringCmdUsage) == 0) {
+		if (!(commandID[idCmdUsage])) {
+			header.usage = value;
+			commandID[idCmdUsage] = true;
+			specifierFound = true;
+		}
+	}
 	else if (specifier.compare(stringCmdNumberOfEntries) == 0) {
 		if (!(commandID[idCmdNumberOfEntries])) {
 			header.numberOfEntries = stoul((char*)value.c_str(), 10);
 			commandID[idCmdNumberOfEntries] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdDimMin) == 0) {
+		if (!(commandID[idCmdDimMin])) {
+			header.dimMin = stod((char*)value.c_str());
+			commandID[idCmdDimMin] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdDimMax) == 0) {
+		if (!(commandID[idCmdDimMax])) {
+			header.dimMax = stod((char*)value.c_str());
+			commandID[idCmdDimMax] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdDimStep) == 0) {
+		if (!(commandID[idCmdDimStep])) {
+			header.dimStep = stoi((char*)value.c_str(), 10);
+			commandID[idCmdDimStep] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdDimStartEntry) == 0) {
+		if (!(commandID[idCmdDimStartEntry])) {
+			header.dimStartEntry = stod((char*)value.c_str());
+			commandID[idCmdDimStartEntry] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdDimStopEntry) == 0) {
+		if (!(commandID[idCmdDimStopEntry])) {
+			header.dimStopEntry = stod((char*)value.c_str());
+			commandID[idCmdDimStopEntry] = true;
 			specifierFound = true;
 		}
 	}
@@ -238,8 +296,13 @@ void prelutAccessFile::writeFileHeader(std::ofstream& fileStream) {
 /********************************************************/
 /* make code changes for a different configuration here */
 	setHeaderValue(fileStream, stringCmdName,               header.name,              "Name of the look up table");
-	setHeaderValue(fileStream, stringCmdUsage,              defValUsage,              "Usage of the look up table");
+	setHeaderValue(fileStream, stringCmdUsage,              header.usage,             "Usage of the look up table");
 	setHeaderValue(fileStream, stringCmdNumberOfEntries,    header.numberOfEntries,   "Number of entries in the look up table");
+	setHeaderValue(fileStream, stringCmdDimMin,             header.dimMin,            "Minimum value of the LUT configuration during creation");
+	setHeaderValue(fileStream, stringCmdDimMax,             header.dimMax,            "Maximum value of the LUT configuration during creation");
+	setHeaderValue(fileStream, stringCmdDimStep,            header.dimStep,           "Number of steps for the value range of the LUT configuration during creation");
+	setHeaderValue(fileStream, stringCmdDimStartEntry,      header.dimStartEntry,     "Start entry value of the LUT configuration during creation");
+	setHeaderValue(fileStream, stringCmdDimStopEntry,       header.dimStopEntry,      "Stop entry value of the LUT configuration during creation");
 	setHeaderValue(fileStream, stringCmdStructureSeparator, defValStructureSeparator, "The separator for the members of the data structure");
 	setHeaderValue(fileStream, stringCmdBlockSeparator,     defValBlockSeparator,     "The separator for the blocks of the data");
 	setHeaderValue(fileStream, stringCmdContent,            defValContent,            "The content of the file");
@@ -258,7 +321,13 @@ void prelutAccessFile::setHeaderDefValues() {
 /********************************************************/
 /* make code changes for a different configuration here */
 	header.name            = defValName;
+	header.usage           = defValUsage;
 	header.numberOfEntries = defValNumberOfEntries;
+	header.dimMin          = defValDimMin;
+	header.dimMax          = defValDimMax;
+	header.dimStep         = defValDimStep;
+	header.dimStartEntry   = defValDimStartEntry;
+	header.dimStopEntry    = defValDimStopEntry;
 /********************************************************/
 
 }
@@ -317,9 +386,21 @@ prelutAccessFileHeader& prelutAccessFile::getHeaderReference() {
 void prelutAccessFile::setHeader(prelutAccessFileHeader& structure) {
 
 	header.name                     = structure.name;
+	header.usage                    = structure.usage;
 	header.numberOfEntries          = structure.numberOfEntries;
+	header.dimMin                   = structure.dimMin;
+	header.dimMax                   = structure.dimMax;
+	header.dimStep                  = structure.dimStep;
+	header.dimStartEntry            = structure.dimStartEntry;
+	header.dimStopEntry             = structure.dimStopEntry;
 	commandID[idCmdName]            = true;
+	commandID[idCmdUsage]           = true;
 	commandID[idCmdNumberOfEntries] = true;
+	commandID[idCmdDimMin]          = true;
+	commandID[idCmdDimMax]          = true;
+	commandID[idCmdDimStep]         = true;
+	commandID[idCmdDimStartEntry]   = true;
+	commandID[idCmdDimStopEntry]    = true;
 
 }
 
@@ -330,7 +411,9 @@ void prelutAccessFile::setHeader(prelutAccessFileHeader& structure) {
 std::string prelutAccessFile::getInfo() {
 
 	std::string message;
-	char buffer[longConversionDigits + 1];
+	char        intBuffer[intConversionDigits + 1];
+	char        longBuffer[longConversionDigits + 1];
+	char        doubleBuffer[doubleConversion + 1];
 
 /********************************************************/
 /* make code changes for a different information here	*/
@@ -346,14 +429,43 @@ std::string prelutAccessFile::getInfo() {
 		message += "FAILED ; ADDRESS = NULL";
 	else {
 		message += "OK ; ADDRESS = ";
-		sprintf(buffer, "%p", getDataPtr());
-		message += buffer;
+		sprintf(longBuffer, "%p", getDataPtr());
+		message += longBuffer;
 	}
+	message += "\n";
+	message += "Usage";
+	message += "\t";
+	message += header.usage;
 	message += "\n";
 	message += "Number of Data";
 	message += "\t: ";
-	ultos(getDataNum(), buffer, 10, longConversionDigits);
-	message += buffer;
+	ultos(getDataNum(), longBuffer, 10, longConversionDigits);
+	message += longBuffer;
+	message += "\n";
+	message += stringCmdDimMin;
+	message += "\t: ";
+	dtos(header.dimMin, doubleBuffer, doubleConversionDigits);
+	message += doubleBuffer;
+	message += "\n";
+	message += stringCmdDimMax;
+	message += "\t: ";
+	dtos(header.dimMax, doubleBuffer, doubleConversionDigits);
+	message += doubleBuffer;
+	message += "\n";
+	message += stringCmdDimStep;
+	message += "\t: ";
+	itos(header.dimStep, intBuffer, 10, intConversionDigits);
+	message += intBuffer;
+	message += "\n";
+	message += stringCmdDimStartEntry;
+	message += "\t: ";
+	dtos(header.dimStartEntry, doubleBuffer, doubleConversionDigits);
+	message += doubleBuffer;
+	message += "\n";
+	message += stringCmdDimStopEntry;
+	message += "\t: ";
+	dtos(header.dimStopEntry, doubleBuffer, doubleConversionDigits);
+	message += doubleBuffer;
 	message += "\n";
 	message += "\n";
 	message += "Setup for the pre-look-up-table file:\n";
@@ -361,22 +473,9 @@ std::string prelutAccessFile::getInfo() {
 	message += "CommandID";
 	message += "\t: ";
 	for (int i = 0; i < numberOfPrelutAccessFileCmds; i++) {
-		btods(commandID[i], buffer);
-		message += buffer;
+		btods(commandID[i], longBuffer);
+		message += longBuffer;
 	}
-	message += "\n";
-	message += stringCmdName;
-	message += "\t: ";
-	message += header.name;
-	message += "\n";
-	message += stringCmdUsage;
-	message += "\t: ";
-	message += defValUsage;
-	message += "\n";
-	message += stringCmdNumberOfEntries;
-	message += "\t: ";
-	ultos(header.numberOfEntries, buffer, 10, longConversionDigits);
-	message += buffer;
 	message += "\n";
 	message += stringCmdStructureSeparator;
 	message += "\t: ";

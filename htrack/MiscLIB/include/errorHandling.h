@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-06-06 14:21:07 $
-/// $Revision: 1.6 $
+/// $Date: 2008-02-29 11:43:43 $
+/// $Revision: 1.7 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -1009,14 +1009,14 @@ public:
 #endif
 
 
-#ifndef _CANNOTACCESSLUTERROR_H
-#define _CANNOTACCESSLUTERROR_H
+#ifndef _CANNOTACCESSLUTSERROR_H
+#define _CANNOTACCESSLUTSERROR_H
 
 /**
- * CLASS cannotAccessLutError
+ * CLASS cannotAccessLutsError
  */
 
-class cannotAccessLutError : public errorHandling {
+class cannotAccessLutsError : public errorHandling {
 
 public:
 
@@ -1024,7 +1024,7 @@ public:
  * Default constructor
  */
 
-	cannotAccessLutError();
+	cannotAccessLutsError();
 
 /**
  * Constructor
@@ -1032,13 +1032,13 @@ public:
  *        where the error occurs
  */
 
-	cannotAccessLutError(std::string errorSource);
+	cannotAccessLutsError(std::string errorSource);
 
 /**
  * Destructor
  */
 
-	virtual ~cannotAccessLutError();
+	virtual ~cannotAccessLutsError();
 
 /**
  * This method displays an error message.

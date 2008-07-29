@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-06 14:19:11 $
-// $Revision: 1.5 $
+// $Date: 2008-02-29 11:38:11 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -319,5 +319,61 @@ overflowByAddingClassificationsFoundWarningMsg::~overflowByAddingClassifications
 void overflowByAddingClassificationsFoundWarningMsg::warningMsg() {
 
 	printMsg("There is an overflow detected by adding classifications in a table!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS tooBigValueForAToLongConversionWarningMsg				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+tooBigValueForAToLongConversionWarningMsg::tooBigValueForAToLongConversionWarningMsg() : dataObjectWarningMsg() {
+
+	value.clear();
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+tooBigValueForAToLongConversionWarningMsg::tooBigValueForAToLongConversionWarningMsg(std::string value) : dataObjectWarningMsg() {
+
+	this->value = value;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+tooBigValueForAToLongConversionWarningMsg::~tooBigValueForAToLongConversionWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void tooBigValueForAToLongConversionWarningMsg::warningMsg() {
+
+	std::string temp;
+	char        buffer[longConversionDigits + 1];
+
+	temp =  "The occuring string: '";
+	temp += value;
+	temp += "' of length: ";
+	ultos((unsigned long)temp.length(), buffer, 10, longConversionDigits);
+	temp += buffer;
+	temp += " is too long to be converted into an unsigned long value (max length: ";
+	ultos(longConversionDigits, buffer, 10, longConversionDigits);
+	temp += buffer;
+	temp += ")!!!";
+
+	printMsg(temp);
 
 }

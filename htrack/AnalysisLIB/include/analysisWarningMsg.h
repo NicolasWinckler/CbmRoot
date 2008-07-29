@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-06-06 14:18:40 $
-/// $Revision: 1.10 $
+/// $Date: 2007-12-28 14:40:06 $
+/// $Revision: 1.15 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -146,6 +146,40 @@ public:
  */
 
 	virtual ~displayAnalyserNotFoundWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _HARDWAREANALYSERNOTFOUNDWARNINGMSG_H
+#define _HARDWAREANALYSERNOTFOUNDWARNINGMSG_H
+
+/**
+ * CLASS hardwareAnalyserNotFoundWarningMsg
+ */
+
+class hardwareAnalyserNotFoundWarningMsg : public analysisWarningMsg {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	hardwareAnalyserNotFoundWarningMsg();
+
+/**
+ * Destructor
+ */
+
+	virtual ~hardwareAnalyserNotFoundWarningMsg();
 
 /**
  * This method displays a warning message.
@@ -512,10 +546,10 @@ public:
 #define _NOANALYSISMOMENTUMOUTPUTFILENAMESPECIFIEDWARNINGMSG_H
 
 /**
- * CLASS noAnalysisMomentumOutputFileNameSpecifiedWarningMsg
+ * CLASS noAnalysisOutputFileNameSpecifiedWarningMsg
  */
 
-class noAnalysisMomentumOutputFileNameSpecifiedWarningMsg : public analysisWarningMsg {
+class noAnalysisOutputFileNameSpecifiedWarningMsg : public analysisWarningMsg {
 
 public:
 
@@ -523,13 +557,13 @@ public:
  * Default constructor
  */
 
-	noAnalysisMomentumOutputFileNameSpecifiedWarningMsg();
+	noAnalysisOutputFileNameSpecifiedWarningMsg();
 
 /**
  * Destructor
  */
 
-	virtual ~noAnalysisMomentumOutputFileNameSpecifiedWarningMsg();
+	virtual ~noAnalysisOutputFileNameSpecifiedWarningMsg();
 
 /**
  * This method displays a warning message.
@@ -776,6 +810,51 @@ public:
  */
 
 	virtual ~setMagnetfieldFactorWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _SETPRELUTRANGEWARNINGMSG_H
+#define _SETPRELUTRANGEWARNINGMSG_H
+
+/**
+ * CLASS setPrelutRangeWarningMsg
+ */
+
+class setPrelutRangeWarningMsg : public analysisWarningMsg {
+
+private:
+
+	double rangeStart;
+	double rangeStop;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	setPrelutRangeWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	setPrelutRangeWarningMsg(double rangeStart, double rangeStop);
+
+/**
+ * Destructor
+ */
+
+	virtual ~setPrelutRangeWarningMsg();
 
 /**
  * This method displays a warning message.
@@ -1068,7 +1147,6 @@ public:
 };
 
 #endif
-
 
 
 #ifndef _TRACKWITHSIGNATUREDISTRIBUTIONWARNINGMSG_H
@@ -1623,14 +1701,14 @@ public:
 #endif
 
 
-#ifndef _TRACKWITHMOMENTAXDISTRIBUTIONWARNINGMSG_H
-#define _TRACKWITHMOMENTAXDISTRIBUTIONWARNINGMSG_H
+#ifndef _QUANTIZEDMOMENTAXDISTRIBUTIONWARNINGMSG_H
+#define _QUANTIZEDMOMENTAXDISTRIBUTIONWARNINGMSG_H
 
 /**
- * CLASS trackWithMomentaXDistributionWarningMsg
+ * CLASS quantizedMomentaXDistributionWarningMsg
  */
 
-class trackWithMomentaXDistributionWarningMsg : public analysisWarningMsg {
+class quantizedMomentaXDistributionWarningMsg : public analysisWarningMsg {
 
 private:
 
@@ -1645,19 +1723,19 @@ public:
  * Default constructor
  */
 
-	trackWithMomentaXDistributionWarningMsg();
+	quantizedMomentaXDistributionWarningMsg();
 
 /**
  * Constructor
  */
 
-	trackWithMomentaXDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max);
+	quantizedMomentaXDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max);
 
 /**
  * Destructor
  */
 
-	virtual ~trackWithMomentaXDistributionWarningMsg();
+	virtual ~quantizedMomentaXDistributionWarningMsg();
 
 /**
  * This method display a warning message.
@@ -1670,14 +1748,14 @@ public:
 #endif
 
 
-#ifndef _TRACKWITHMOMENTAYDISTRIBUTIONWARNINGMSG_H
-#define _TRACKWITHMOMENTAYDISTRIBUTIONWARNINGMSG_H
+#ifndef _QUANTIZEDMOMENTAYDISTRIBUTIONWARNINGMSG_H
+#define _QUANTIZEDMOMENTAYDISTRIBUTIONWARNINGMSG_H
 
 /**
- * CLASS trackWithMomentaYDistributionWarningMsg
+ * CLASS quantizedMomentaYDistributionWarningMsg
  */
 
-class trackWithMomentaYDistributionWarningMsg : public analysisWarningMsg {
+class quantizedMomentaYDistributionWarningMsg : public analysisWarningMsg {
 
 private:
 
@@ -1692,19 +1770,19 @@ public:
  * Default constructor
  */
 
-	trackWithMomentaYDistributionWarningMsg();
+	quantizedMomentaYDistributionWarningMsg();
 
 /**
  * Constructor
  */
 
-	trackWithMomentaYDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max);
+	quantizedMomentaYDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max);
 
 /**
  * Destructor
  */
 
-	virtual ~trackWithMomentaYDistributionWarningMsg();
+	virtual ~quantizedMomentaYDistributionWarningMsg();
 
 /**
  * This method display a warning message.
@@ -1717,14 +1795,14 @@ public:
 #endif
 
 
-#ifndef _TRACKWITHMOMENTAZDISTRIBUTIONWARNINGMSG_H
-#define _TRACKWITHMOMENTAZDISTRIBUTIONWARNINGMSG_H
+#ifndef _QUANTIZEDMOMENTAZDISTRIBUTIONWARNINGMSG_H
+#define _QUANTIZEDMOMENTAZDISTRIBUTIONWARNINGMSG_H
 
 /**
- * CLASS trackWithMomentaZDistributionWarningMsg
+ * CLASS quantizedMomentaZDistributionWarningMsg
  */
 
-class trackWithMomentaZDistributionWarningMsg : public analysisWarningMsg {
+class quantizedMomentaZDistributionWarningMsg : public analysisWarningMsg {
 
 private:
 
@@ -1739,19 +1817,19 @@ public:
  * Default constructor
  */
 
-	trackWithMomentaZDistributionWarningMsg();
+	quantizedMomentaZDistributionWarningMsg();
 
 /**
  * Constructor
  */
 
-	trackWithMomentaZDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max);
+	quantizedMomentaZDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max);
 
 /**
  * Destructor
  */
 
-	virtual ~trackWithMomentaZDistributionWarningMsg();
+	virtual ~quantizedMomentaZDistributionWarningMsg();
 
 /**
  * This method display a warning message.
@@ -1764,14 +1842,14 @@ public:
 #endif
 
 
-#ifndef _TRACKWITHCOORDINATEXDISTRIBUTIONWARNINGMSG_H
-#define _TRACKWITHCOORDINATEXDISTRIBUTIONWARNINGMSG_H
+#ifndef _QUANTIZEDHOUGHSPACEDIM1DISTRIBUTIONWARNINGMSG_H
+#define _QUANTIZEDHOUGHSPACEDIM1DISTRIBUTIONWARNINGMSG_H
 
 /**
- * CLASS trackWithCoordinateXDistributionWarningMsg
+ * CLASS quantizedHoughspaceDim1DistributionWarningMsg
  */
 
-class trackWithCoordinateXDistributionWarningMsg : public analysisWarningMsg {
+class quantizedHoughspaceDim1DistributionWarningMsg : public analysisWarningMsg {
 
 private:
 
@@ -1784,19 +1862,19 @@ public:
  * Default constructor
  */
 
-	trackWithCoordinateXDistributionWarningMsg();
+	quantizedHoughspaceDim1DistributionWarningMsg();
 
 /**
  * Constructor
  */
 
-	trackWithCoordinateXDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries);
+	quantizedHoughspaceDim1DistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries);
 
 /**
  * Destructor
  */
 
-	virtual ~trackWithCoordinateXDistributionWarningMsg();
+	virtual ~quantizedHoughspaceDim1DistributionWarningMsg();
 
 /**
  * This method display a warning message.
@@ -1809,14 +1887,14 @@ public:
 #endif
 
 
-#ifndef _TRACKWITHCOORDINATEYDISTRIBUTIONWARNINGMSG_H
-#define _TRACKWITHCOORDINATEYDISTRIBUTIONWARNINGMSG_H
+#ifndef _QUANTIZEDHOUGHSPACEDIM2DISTRIBUTIONWARNINGMSG_H
+#define _QUANTIZEDHOUGHSPACEDIM2DISTRIBUTIONWARNINGMSG_H
 
 /**
- * CLASS trackWithCoordinateYDistributionWarningMsg
+ * CLASS quantizedHoughspaceDim2DistributionWarningMsg
  */
 
-class trackWithCoordinateYDistributionWarningMsg : public analysisWarningMsg {
+class quantizedHoughspaceDim2DistributionWarningMsg : public analysisWarningMsg {
 
 private:
 
@@ -1829,19 +1907,19 @@ public:
  * Default constructor
  */
 
-	trackWithCoordinateYDistributionWarningMsg();
+	quantizedHoughspaceDim2DistributionWarningMsg();
 
 /**
  * Constructor
  */
 
-	trackWithCoordinateYDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries);
+	quantizedHoughspaceDim2DistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries);
 
 /**
  * Destructor
  */
 
-	virtual ~trackWithCoordinateYDistributionWarningMsg();
+	virtual ~quantizedHoughspaceDim2DistributionWarningMsg();
 
 /**
  * This method display a warning message.
@@ -1854,14 +1932,14 @@ public:
 #endif
 
 
-#ifndef _TRACKWITHCOORDINATEZDISTRIBUTIONWARNINGMSG_H
-#define _TRACKWITHCOORDINATEZDISTRIBUTIONWARNINGMSG_H
+#ifndef _QUANTIZEDHOUGHSPACEDIM3DISTRIBUTIONWARNINGMSG_H
+#define _QUANTIZEDHOUGHSPACEDIM3DISTRIBUTIONWARNINGMSG_H
 
 /**
- * CLASS trackWithCoordinateZDistributionWarningMsg
+ * CLASS quantizedHoughspaceDim3DistributionWarningMsg
  */
 
-class trackWithCoordinateZDistributionWarningMsg : public analysisWarningMsg {
+class quantizedHoughspaceDim3DistributionWarningMsg : public analysisWarningMsg {
 
 private:
 
@@ -1874,19 +1952,19 @@ public:
  * Default constructor
  */
 
-	trackWithCoordinateZDistributionWarningMsg();
+	quantizedHoughspaceDim3DistributionWarningMsg();
 
 /**
  * Constructor
  */
 
-	trackWithCoordinateZDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries);
+	quantizedHoughspaceDim3DistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries);
 
 /**
  * Destructor
  */
 
-	virtual ~trackWithCoordinateZDistributionWarningMsg();
+	virtual ~quantizedHoughspaceDim3DistributionWarningMsg();
 
 /**
  * This method display a warning message.
@@ -1899,14 +1977,14 @@ public:
 #endif
 
 
-#ifndef _TRACKWITHMOMENTADISTRIBUTIONWARNINGMSG_H
-#define _TRACKWITHMOMENTADISTRIBUTIONWARNINGMSG_H
+#ifndef _QUANTIZEDMOMENTADISTRIBUTIONWARNINGMSG_H
+#define _QUANTIZEDMOMENTADISTRIBUTIONWARNINGMSG_H
 
 /**
- * CLASS trackWithMomentaDistributionWarningMsg
+ * CLASS quantizedMomentaDistributionWarningMsg
  */
 
-class trackWithMomentaDistributionWarningMsg : public analysisWarningMsg {
+class quantizedMomentaDistributionWarningMsg : public analysisWarningMsg {
 
 private:
 
@@ -1919,19 +1997,19 @@ public:
  * Default constructor
  */
 
-	trackWithMomentaDistributionWarningMsg();
+	quantizedMomentaDistributionWarningMsg();
 
 /**
  * Constructor
  */
 
-	trackWithMomentaDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
+	quantizedMomentaDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
 
 /**
  * Destructor
  */
 
-	virtual ~trackWithMomentaDistributionWarningMsg();
+	virtual ~quantizedMomentaDistributionWarningMsg();
 
 /**
  * This method display a warning message.
@@ -1944,14 +2022,14 @@ public:
 #endif
 
 
-#ifndef _TRACKWITHCOORDINATEDISTRIBUTIONWARNINGMSG_H
-#define _TRACKWITHCOORDINATEDISTRIBUTIONWARNINGMSG_H
+#ifndef _QUANTIZEDHOUGHSPACEDISTRIBUTIONWARNINGMSG_H
+#define _QUANTIZEDHOUGHSPACEDISTRIBUTIONWARNINGMSG_H
 
 /**
- * CLASS trackWithCoordinateDistributionWarningMsg
+ * CLASS quantizedHoughspaceDistributionWarningMsg
  */
 
-class trackWithCoordinateDistributionWarningMsg : public analysisWarningMsg {
+class quantizedHoughspaceDistributionWarningMsg : public analysisWarningMsg {
 
 private:
 
@@ -1964,19 +2042,19 @@ public:
  * Default constructor
  */
 
-	trackWithCoordinateDistributionWarningMsg();
+	quantizedHoughspaceDistributionWarningMsg();
 
 /**
  * Constructor
  */
 
-	trackWithCoordinateDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
+	quantizedHoughspaceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
 
 /**
  * Destructor
  */
 
-	virtual ~trackWithCoordinateDistributionWarningMsg();
+	virtual ~quantizedHoughspaceDistributionWarningMsg();
 
 /**
  * This method display a warning message.
@@ -2021,6 +2099,186 @@ public:
  */
 
 	virtual ~numberOfTracksWhichCannotBeFoundWarningMsg();
+
+/**
+ * This method display a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _DIM1PEAKDISTANCEDISTRIBUTIONWARNINGMSG_H
+#define _DIM1PEAKDISTANCEDISTRIBUTIONWARNINGMSG_H
+
+/**
+ * CLASS dim1PeakDistanceDistributionWarningMsg
+ */
+
+class dim1PeakDistanceDistributionWarningMsg : public analysisWarningMsg {
+
+private:
+
+	unsigned int* distribution;
+	unsigned int  numberOfEntries;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	dim1PeakDistanceDistributionWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	dim1PeakDistanceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
+
+/**
+ * Destructor
+ */
+
+	virtual ~dim1PeakDistanceDistributionWarningMsg();
+
+/**
+ * This method display a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _DIM2PEAKDISTANCEDISTRIBUTIONWARNINGMSG_H
+#define _DIM2PEAKDISTANCEDISTRIBUTIONWARNINGMSG_H
+
+/**
+ * CLASS dim2PeakDistanceDistributionWarningMsg
+ */
+
+class dim2PeakDistanceDistributionWarningMsg : public analysisWarningMsg {
+
+private:
+
+	unsigned int* distribution;
+	unsigned int  numberOfEntries;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	dim2PeakDistanceDistributionWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	dim2PeakDistanceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
+
+/**
+ * Destructor
+ */
+
+	virtual ~dim2PeakDistanceDistributionWarningMsg();
+
+/**
+ * This method display a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _DIM3PEAKDISTANCEDISTRIBUTIONWARNINGMSG_H
+#define _DIM3PEAKDISTANCEDISTRIBUTIONWARNINGMSG_H
+
+/**
+ * CLASS dim3PeakDistanceDistributionWarningMsg
+ */
+
+class dim3PeakDistanceDistributionWarningMsg : public analysisWarningMsg {
+
+private:
+
+	unsigned int* distribution;
+	unsigned int  numberOfEntries;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	dim3PeakDistanceDistributionWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	dim3PeakDistanceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
+
+/**
+ * Destructor
+ */
+
+	virtual ~dim3PeakDistanceDistributionWarningMsg();
+
+/**
+ * This method display a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _ACCUMULATEDPEAKDISTANCEDISTRIBUTIONWARNINGMSG_H
+#define _ACCUMULATEDPEAKDISTANCEDISTRIBUTIONWARNINGMSG_H
+
+/**
+ * CLASS accumulatedPeakDistanceDistributionWarningMsg
+ */
+
+class accumulatedPeakDistanceDistributionWarningMsg : public analysisWarningMsg {
+
+private:
+
+	unsigned int* distribution;
+	unsigned int  numberOfEntries;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	accumulatedPeakDistanceDistributionWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	accumulatedPeakDistanceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
+
+/**
+ * Destructor
+ */
+
+	virtual ~accumulatedPeakDistanceDistributionWarningMsg();
 
 /**
  * This method display a warning message.
@@ -2341,14 +2599,14 @@ public:
 #endif
 
 
-#ifndef _TRACKWITHSAMECOORDINATEDISTRIBUTIONWARNINGMSG_H
-#define _TRACKWITHSAMECOORDINATEDISTRIBUTIONWARNINGMSG_H
+#ifndef _SAMEHOUGHSPACECELLDISTRIBUTIONWARNINGMSG_H
+#define _SAMEHOUGHSPACECELLDISTRIBUTIONWARNINGMSG_H
 
 /**
- * CLASS trackWithSameCoordinateDistributionWarningMsg
+ * CLASS sameHoughspaceCellDistributionWarningMsg
  */
 
-class trackWithSameCoordinateDistributionWarningMsg : public analysisWarningMsg {
+class sameHoughspaceCellDistributionWarningMsg : public analysisWarningMsg {
 
 private:
 
@@ -2361,19 +2619,19 @@ public:
  * Default constructor
  */
 
-	trackWithSameCoordinateDistributionWarningMsg();
+	sameHoughspaceCellDistributionWarningMsg();
 
 /**
  * Constructor
  */
 
-	trackWithSameCoordinateDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
+	sameHoughspaceCellDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
 
 /**
  * Destructor
  */
 
-	virtual ~trackWithSameCoordinateDistributionWarningMsg();
+	virtual ~sameHoughspaceCellDistributionWarningMsg();
 
 /**
  * This method display a warning message.
@@ -2454,48 +2712,14 @@ public:
 #endif
 
 
-#ifndef _LISTOFTRACKSNOTFOUNDWARNINGMSG_H
-#define _LISTOFTRACKSNOTFOUNDWARNINGMSG_H
-
-/**
- * CLASS listOfTracksNotFoundWarningMsg
- */
-
-class listOfTracksNotFoundWarningMsg : public analysisWarningMsg {
-
-public:
-
-/**
- * Default constructor
- */
-
-	listOfTracksNotFoundWarningMsg();
-
-/**
- * Destructor
- */
-
-	virtual ~listOfTracksNotFoundWarningMsg();
-
-/**
- * This method display a warning message.
- */
-
-	void warningMsg();
-
-};
-
-#endif
-
-
 #ifndef _CURRENTTRACKNOTFOUNDWARNINGMSG_H
 #define _CURRENTTRACKNOTFOUNDWARNINGMSG_H
 
 /**
- * CLASS currentTrackNotFoundWarningMsg
+ * CLASS actualTrackNotFoundWarningMsg
  */
 
-class currentTrackNotFoundWarningMsg : public analysisWarningMsg {
+class actualTrackNotFoundWarningMsg : public analysisWarningMsg {
 
 public:
 
@@ -2503,13 +2727,13 @@ public:
  * Default constructor
  */
 
-	currentTrackNotFoundWarningMsg();
+	actualTrackNotFoundWarningMsg();
 
 /**
  * Destructor
  */
 
-	virtual ~currentTrackNotFoundWarningMsg();
+	virtual ~actualTrackNotFoundWarningMsg();
 
 /**
  * This method display a warning message.
@@ -2795,14 +3019,14 @@ public:
 #endif
 
 
-#ifndef _SIZEOFSEPARATORFIFOSWARNINGMSG_H
-#define _SIZEOFSEPARATORFIFOSWARNINGMSG_H
+#ifndef _SIZEOFCOLUMNSEPARATORFIFOSWARNINGMSG_H
+#define _SIZEOFCOLUMNSEPARATORFIFOSWARNINGMSG_H
 
 /**
- * CLASS sizeOfSeparatorFifosWarningMsg
+ * CLASS sizeOfColumnSeparatorFifosWarningMsg
  */
 
-class sizeOfSeparatorFifosWarningMsg : public analysisWarningMsg {
+class sizeOfColumnSeparatorFifosWarningMsg : public analysisWarningMsg {
 
 private:
 
@@ -2815,19 +3039,200 @@ public:
  * Default constructor
  */
 
-	sizeOfSeparatorFifosWarningMsg();
+	sizeOfColumnSeparatorFifosWarningMsg();
 
 /**
  * Constructor
  */
 
-	sizeOfSeparatorFifosWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
+	sizeOfColumnSeparatorFifosWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
 
 /**
  * Destructor
  */
 
-	virtual ~sizeOfSeparatorFifosWarningMsg();
+	virtual ~sizeOfColumnSeparatorFifosWarningMsg();
+
+/**
+ * This method display a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _NUMBEROFMINIMALTRACKSINALLROWSWARNINGMSG_H
+#define _NUMBEROFMINIMALTRACKSINALLROWSWARNINGMSG_H
+
+/**
+ * CLASS numberOfMinimalTracksInAllRowsWarningMsg
+ */
+
+class numberOfMinimalTracksInAllRowsWarningMsg : public analysisWarningMsg {
+
+private:
+
+	unsigned int* distribution;
+	unsigned int  numberOfEntries;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	numberOfMinimalTracksInAllRowsWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	numberOfMinimalTracksInAllRowsWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
+
+/**
+ * Destructor
+ */
+
+	virtual ~numberOfMinimalTracksInAllRowsWarningMsg();
+
+/**
+ * This method display a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _NUMBEROFAVERAGETRACKSINALLROWSWARNINGMSG_H
+#define _NUMBEROFAVERAGETRACKSINALLROWSWARNINGMSG_H
+
+/**
+ * CLASS numberOfAverageTracksInAllRowsWarningMsg
+ */
+
+class numberOfAverageTracksInAllRowsWarningMsg : public analysisWarningMsg {
+
+private:
+
+	double*      distribution;
+	unsigned int numberOfEntries;
+	unsigned int numberOfSummedEventsToAverage;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	numberOfAverageTracksInAllRowsWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	numberOfAverageTracksInAllRowsWarningMsg(double* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage);
+
+/**
+ * Destructor
+ */
+
+	virtual ~numberOfAverageTracksInAllRowsWarningMsg();
+
+/**
+ * This method display a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _NUMBEROFMAXIMALTRACKSINALLROWSWARNINGMSG_H
+#define _NUMBEROFMAXIMALTRACKSINALLROWSWARNINGMSG_H
+
+/**
+ * CLASS numberOfMaximalTracksInAllRowsWarningMsg
+ */
+
+class numberOfMaximalTracksInAllRowsWarningMsg : public analysisWarningMsg {
+
+private:
+
+	unsigned int* distribution;
+	unsigned int  numberOfEntries;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	numberOfMaximalTracksInAllRowsWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	numberOfMaximalTracksInAllRowsWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
+
+/**
+ * Destructor
+ */
+
+	virtual ~numberOfMaximalTracksInAllRowsWarningMsg();
+
+/**
+ * This method display a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _SIZEOFROWSEPARATORFIFOSWARNINGMSG_H
+#define _SIZEOFROWSEPARATORFIFOSWARNINGMSG_H
+
+/**
+ * CLASS sizeOfRowSeparatorFifosWarningMsg
+ */
+
+class sizeOfRowSeparatorFifosWarningMsg : public analysisWarningMsg {
+
+private:
+
+	unsigned int* distribution;
+	unsigned int  numberOfEntries;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	sizeOfRowSeparatorFifosWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	sizeOfRowSeparatorFifosWarningMsg(unsigned int* distribution, unsigned int numberOfEntries);
+
+/**
+ * Destructor
+ */
+
+	virtual ~sizeOfRowSeparatorFifosWarningMsg();
 
 /**
  * This method display a warning message.
@@ -2862,6 +3267,358 @@ public:
  */
 
 	virtual ~youCannotEnableTrackWithSameMomentaAndCoordinateDistributionWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _RELATIVEDISPLAYNOTACCESSIBLEWARNINGMSG_H
+#define _RELATIVEDISPLAYNOTACCESSIBLEWARNINGMSG_H
+
+/**
+ * CLASS relativeDisplayNotAccessibleWarningMsg
+ */
+
+class relativeDisplayNotAccessibleWarningMsg : public analysisWarningMsg {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	relativeDisplayNotAccessibleWarningMsg();
+
+/**
+ * Destructor
+ */
+
+	virtual ~relativeDisplayNotAccessibleWarningMsg();
+
+/**
+ * This method display a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _NUMBEROFPRELUTRANGESFOUNDWARNINGMSG_H
+#define _NUMBEROFPRELUTRANGESFOUNDWARNINGMSG_H
+
+/**
+ * CLASS numberOfPrelutRangesFoundWarningMsg
+ */
+
+class numberOfPrelutRangesFoundWarningMsg : public analysisWarningMsg {
+
+private:
+
+	unsigned short numberofPrelutRanges;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	numberOfPrelutRangesFoundWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	numberOfPrelutRangesFoundWarningMsg(unsigned short numberofPrelutRanges);
+
+/**
+ * Destructor
+ */
+
+	virtual ~numberOfPrelutRangesFoundWarningMsg();
+
+/**
+ * This method display a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _MAXIMUMPRELUTRANGEPERCENTAGEWARNINGMSG_H
+#define _MAXIMUMPRELUTRANGEPERCENTAGEWARNINGMSG_H
+
+/**
+ * CLASS maximumPrelutRangePercentageWarningMsg
+ */
+
+class maximumPrelutRangePercentageWarningMsg : public analysisWarningMsg {
+
+private:
+
+	unsigned short percentage;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	maximumPrelutRangePercentageWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	maximumPrelutRangePercentageWarningMsg(unsigned short percentage);
+
+/**
+ * Destructor
+ */
+
+	virtual ~maximumPrelutRangePercentageWarningMsg();
+
+/**
+ * This method display a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _MEANPRELUTRANGEENTRIESPERHITWARNINGMSG_H
+#define _MEANPRELUTRANGEENTRIESPERHITWARNINGMSG_H
+
+/**
+ * CLASS meanPrelutRangeEntriesPerHitWarningMsg
+ */
+
+class meanPrelutRangeEntriesPerHitWarningMsg : public analysisWarningMsg {
+
+private:
+
+	double mean;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	meanPrelutRangeEntriesPerHitWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	meanPrelutRangeEntriesPerHitWarningMsg(double mean);
+
+/**
+ * Destructor
+ */
+
+	virtual ~meanPrelutRangeEntriesPerHitWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _HITREADOUTDISTRIBUTIONWARNINGMSG_H
+#define _HITREADOUTDISTRIBUTIONWARNINGMSG_H
+
+/**
+ * CLASS hitReadoutDistributionWarningMsg
+ */
+
+class hitReadoutDistributionWarningMsg : public analysisWarningMsg {
+
+private:
+
+	unsigned int* distribution;
+	unsigned int  numberOfEntries;
+	unsigned int  numberOfSummedEventsToAverage;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	hitReadoutDistributionWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	hitReadoutDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage);
+
+/**
+ * Destructor
+ */
+
+	virtual ~hitReadoutDistributionWarningMsg();
+
+/**
+ * This method display a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _HITREADOUTMEANDISTRIBUTIONDISTRIBUTIONWARNINGMSG_H
+#define _HITREADOUTMEANDISTRIBUTIONDISTRIBUTIONWARNINGMSG_H
+
+/**
+ * CLASS hitReadoutMeanDistributionWarningMsg
+ */
+
+class hitReadoutMeanDistributionWarningMsg : public analysisWarningMsg {
+
+private:
+
+	unsigned int* distribution;
+	unsigned int  numberOfEntries;
+	unsigned int  numberOfSummedEventsToAverage;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	hitReadoutMeanDistributionWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	hitReadoutMeanDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage);
+
+/**
+ * Destructor
+ */
+
+	virtual ~hitReadoutMeanDistributionWarningMsg();
+
+/**
+ * This method display a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _FPGAHISTOGRAMPROCESSINGTIMEDISTRIBUTIONWARNINGMSG_H
+#define _FPGAHISTOGRAMPROCESSINGTIMEDISTRIBUTIONWARNINGMSG_H
+
+/**
+ * CLASS fpgaHistogramProcessingTimeDistributionWarningMsg
+ */
+
+class fpgaHistogramProcessingTimeDistributionWarningMsg : public analysisWarningMsg {
+
+private:
+
+	unsigned int*  distribution;
+	unsigned int   numberOfEntries;
+	unsigned int   numberOfSummedEventsToAverage;
+	bool           readoutColumnsInParallel;
+	unsigned short histogramDim1;
+	unsigned short histogramDim2;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	fpgaHistogramProcessingTimeDistributionWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	fpgaHistogramProcessingTimeDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage, bool readoutColumnsInParallel, unsigned short histogramDim1, unsigned short histogramDim2);
+
+/**
+ * Destructor
+ */
+
+	virtual ~fpgaHistogramProcessingTimeDistributionWarningMsg();
+
+/**
+ * This method display a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _MEANVALUEWARNINGMSG_H
+#define _MEANVALUEWARNINGMSG_H
+
+/**
+ * CLASS meanValueWarningMsg
+ */
+
+class meanValueWarningMsg : public analysisWarningMsg {
+
+private:
+
+	double      mean;
+	std::string dimension;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	meanValueWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	meanValueWarningMsg(double mean, std::string dimension);
+
+/**
+ * Destructor
+ */
+
+	virtual ~meanValueWarningMsg();
 
 /**
  * This method displays a warning message.

@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-05-14 15:44:00 $
-// $Revision: 1.2 $
+// $Date: 2007-10-19 14:33:12 $
+// $Revision: 1.3 $
 //
 // *******************************************************************/
 
@@ -306,5 +306,64 @@ void trackfinderInputStation::setMask(bool stationMask) {
 void trackfinderInputStation::setIndex(unsigned short stationIndex) {
 
 	index = stationIndex;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputStation::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(id);
+	returnValue += sizeof(distance);
+	returnValue += sizeof(type);
+	returnValue += sizeof(masked);
+	returnValue += sizeof(index);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputStation::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputStation::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(id);
+	returnValue += sizeof(distance);
+	returnValue += sizeof(type);
+	returnValue += sizeof(masked);
+	returnValue += sizeof(index);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }

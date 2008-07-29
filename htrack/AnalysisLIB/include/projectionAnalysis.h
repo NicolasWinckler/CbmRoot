@@ -23,14 +23,14 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/11/29 13:09:36 $
-/// $Revision: 1.2 $
+/// $Date: 2007-11-21 13:56:15 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef _PROJECTIONALANALYSIS_H
-#define _PROJECTIONALANALYSIS_H
+#ifndef _PROJECTIONANALYSIS_H
+#define _PROJECTIONANALYSIS_H
 
 
 #include "../../DataObjectLIB/include/trackCoordinates.h"

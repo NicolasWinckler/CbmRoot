@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/07/17 11:27:43 $
-// $Revision: 1.1 $
+// $Date: 2007-10-19 14:33:07 $
+// $Revision: 1.2 $
 //
 // *******************************************************************/
 
@@ -115,18 +115,23 @@ inputHitStlList& inputHitStlMem::operator [] (size_t index) {
 }
 
 /****************************************************************
- * This method returns the size of the used memory for			*
- * hits.														*
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
  ****************************************************************/
 
-size_t inputHitStlMem::getUsedSizeOfMemory() {
+double inputHitStlMem::getReservedSizeOfData(unsigned short dimension) {
 
-	size_t returnValue;
+	double returnValue;
 
-	returnValue = 0;
+	returnValue  = 0;
+
 	for (unsigned short i = 0; i < numberOfMemories; i++) {
-		returnValue += stlMem[i].getNumberOfEntries() * sizeof(trackfinderInputHit*);
+	
+		returnValue += stlMem[i].getReservedSizeOfData(0);
+
 	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
 
 	return returnValue;
 
@@ -134,17 +139,45 @@ size_t inputHitStlMem::getUsedSizeOfMemory() {
 
 /****************************************************************
  * This method returns the size of the allocated memory for		*
- * hits.														*
+ * the source data.												*
  ****************************************************************/
 
-size_t inputHitStlMem::getAllocatedSizeOfMemory() {
+double inputHitStlMem::getAllocatedSizeOfData(unsigned short dimension) {
 
-	size_t returnValue;
+	double returnValue;
 
-	returnValue = 0;
+	returnValue  = 0;
+
 	for (unsigned short i = 0; i < numberOfMemories; i++) {
-		returnValue += stlMem[i].getNumberOfEntries() * sizeof(trackfinderInputHit*);
+	
+		returnValue += stlMem[i].getAllocatedSizeOfData(0);
+
 	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double inputHitStlMem::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	for (unsigned short i = 0; i < numberOfMemories; i++) {
+	
+		returnValue += stlMem[i].getUsedSizeOfData(0);
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
 
 	return returnValue;
 

@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-06-06 14:19:11 $
-/// $Revision: 1.5 $
+/// $Date: 2008-02-29 11:38:10 $
+/// $Revision: 1.6 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -299,6 +299,51 @@ public:
  */
 
 	virtual ~overflowByAddingClassificationsFoundWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _TOOBIGVALUEFORATOLONGCONVERSIONWARNINGMSG_H
+#define _TOOBIGVALUEFORATOLONGCONVERSIONWARNINGMSG_H
+
+
+/**
+ * CLASS tooBigValueForAToLongConversionWarningMsg
+ */
+
+class tooBigValueForAToLongConversionWarningMsg : public dataObjectWarningMsg {
+
+private:
+
+	std::string value;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	tooBigValueForAToLongConversionWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	tooBigValueForAToLongConversionWarningMsg(std::string value);
+
+/**
+ * Destructor
+ */
+
+	virtual ~tooBigValueForAToLongConversionWarningMsg();
 
 /**
  * This method displays a warning message.

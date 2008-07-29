@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-04-16 10:37:51 $
-// $Revision: 1.8 $
+// $Date: 2008-06-26 12:33:39 $
+// $Revision: 1.10 $
 //
 // *******************************************************************/
 
@@ -491,10 +491,11 @@ TClonesArray& trackfinderInputData::getTrackData() {
 }
 
 /****************************************************************
- * method returns a reference to a track with a specified index	*
+ * method returns a reference to a track with a specified order	*
+ * index														*
  ****************************************************************/
 
-trackfinderInputTrack* trackfinderInputData::getTrackByIndex(unsigned int index) {
+trackfinderInputTrack* trackfinderInputData::getTrackByOrder(unsigned int index) {
 
 	trackfinderInputTrack* track;
 
@@ -504,6 +505,33 @@ trackfinderInputTrack* trackfinderInputData::getTrackByIndex(unsigned int index)
 	track = (trackfinderInputTrack*)tracks->At(index);
 	if (track == NULL)
 		throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+	return track;
+
+}
+
+/****************************************************************
+ * method returns a reference to a track with a specified track	*
+ * index														*
+ ****************************************************************/
+
+trackfinderInputTrack* trackfinderInputData::getTrackByIndex(unsigned int index) {
+
+	trackfinderInputTrack* track;
+
+	if (tracks == NULL)
+		throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+	for (int i = 0; i < getNumberOfTracks(); i++) {
+
+		track = getTrackByOrder(i);
+		if (track == NULL)
+			throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+		if (track->getTrackIndex() == index)
+			break;
+
+	}
 
 	return track;
 
@@ -561,37 +589,6 @@ trackfinderInputDetector& trackfinderInputData::getDetector() {
 trackfinderInputDetector* trackfinderInputData::getDetectorPointer() {
 
 	return detector;
-
-}
-
-/****************************************************************
- * This method returns the size of the used memory for the		*
- * source data.													*
- ****************************************************************/
-
-double trackfinderInputData::getUsedSizeOfData(unsigned short dimension) {
-
-	double returnValue;
-
-	returnValue   = getNumberOfHits()   * sizeof(trackfinderInputHit);
-	returnValue  += getNumberOfTracks() * sizeof(trackfinderInputTrack);
-	returnValue  += sizeof(trackfinderInputDetector);
-	returnValue  += detector->getNumberOfStations() * sizeof(trackfinderInputStation);
-
-	returnValue = (returnValue / (1 << (10 * dimension)));
-
-	return returnValue;
-
-}
-
-/****************************************************************
- * This method returns the size of the allocated memory for		*
- * the source data.												*
- ****************************************************************/
-
-double trackfinderInputData::getAllocatedSizeOfData(unsigned short dimension) {
-
-	return getUsedSizeOfData(dimension);
 
 }
 
@@ -1230,6 +1227,260 @@ trackfinderInputSMagneticField* trackfinderInputData::getMagneticField() {
 		initMagneticField();
 
 	return magneticField;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputData::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(eventNumber);
+	returnValue += sizeof(hits);
+	returnValue += sizeof(tracks);
+	returnValue += sizeof(detector);
+	returnValue += sizeof(magneticField);
+	returnValue += sizeof(trackFromId);
+	returnValue += sizeof(numberOfHitsWithWrongTrackId);
+
+	returnValue = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputData::getAllocatedSizeOfData(unsigned short dimension) {
+
+	trackfinderInputHit*   hit;
+	trackfinderInputTrack* track;
+	double                 returnValue;
+
+	returnValue  = 0;
+
+	if (hits != NULL) {
+
+		for (int i = 0; i < hits->GetEntries(); i++) {
+			
+			hit = (trackfinderInputHit*)hits->At(i);
+			if (hit == NULL)
+				throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+			returnValue += hit->getReservedSizeOfData(0);
+			returnValue += hit->getAllocatedSizeOfData(0);
+
+		}
+
+		returnValue += (hits->Capacity() - hits->GetEntries()) * sizeof(trackfinderInputHit);
+
+	}
+
+	if (tracks != NULL) {
+
+		for (int j = 0; j < tracks->GetEntries(); j++) {
+			
+			track = (trackfinderInputTrack*)tracks->At(j);
+			if (hit == NULL)
+				throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+			returnValue += track->getReservedSizeOfData(0);
+			returnValue += track->getAllocatedSizeOfData(0);
+
+		}
+
+		returnValue += (tracks->Capacity() - tracks->GetEntries()) * sizeof(trackfinderInputTrack);
+
+	}
+
+	if (detector != NULL) {
+		returnValue += detector->getReservedSizeOfData(0);
+		returnValue += detector->getAllocatedSizeOfData(0);
+	}
+	if (magneticField != NULL) {
+		returnValue += magneticField->getReservedSizeOfData(0);
+		returnValue += magneticField->getAllocatedSizeOfData(0);
+	}
+	if (trackFromId.maxEntry > 0)
+		returnValue += trackFromId.maxEntry * sizeof(trackFromId.list[0]);
+
+	returnValue = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputData::getUsedSizeOfData(unsigned short dimension) {
+
+	trackfinderInputHit*   hit;
+	trackfinderInputTrack* track;
+	double                 returnValue;
+
+	returnValue  = sizeof(eventNumber);
+	if (hits != NULL) {
+
+		for (int i = 0; i < hits->GetEntries(); i++) {
+			
+			hit = (trackfinderInputHit*)hits->At(i);
+			if (hit == NULL)
+				throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+			returnValue += hit->getUsedSizeOfData(0);
+
+		}
+
+	}
+
+	if (tracks != NULL) {
+
+		for (int j = 0; j < tracks->GetEntries(); j++) {
+			
+			track = (trackfinderInputTrack*)tracks->At(j);
+			if (hit == NULL)
+				throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+			returnValue += track->getUsedSizeOfData(0);
+
+		}
+
+	}
+
+	if (detector != NULL)
+		returnValue += detector->getUsedSizeOfData(0);
+	if (magneticField != NULL)
+		returnValue += magneticField->getUsedSizeOfData(0);
+	returnValue += sizeof(trackFromId);
+	if (trackFromId.maxEntry > 0)
+		returnValue += trackFromId.maxEntry * sizeof(trackFromId.list[0]);
+	returnValue += sizeof(numberOfHitsWithWrongTrackId);
+
+	returnValue = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputData::getReservedSizeOfAddOnData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputData::getAllocatedSizeOfAddOnData(unsigned short dimension) {
+
+	trackfinderInputHit*   hit;
+	trackfinderInputTrack* track;
+	double                 returnValue;
+
+	returnValue  = 0;
+
+	if (hits != NULL) {
+
+		for (int i = 0; i < hits->GetEntries(); i++) {
+			
+			hit = (trackfinderInputHit*)hits->At(i);
+			if (hit == NULL)
+				throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+			returnValue += hit->getReservedSizeOfAddOnData(0);
+			returnValue += hit->getAllocatedSizeOfAddOnData(0);
+
+		}
+
+	}
+
+	if (tracks != NULL) {
+
+		for (int j = 0; j < tracks->GetEntries(); j++) {
+			
+			track = (trackfinderInputTrack*)tracks->At(j);
+			if (hit == NULL)
+				throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+			returnValue += track->getReservedSizeOfAddOnData(0);
+			returnValue += track->getAllocatedSizeOfAddOnData(0);
+
+		}
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputData::getUsedSizeOfAddOnData(unsigned short dimension) {
+
+	trackfinderInputHit*   hit;
+	trackfinderInputTrack* track;
+	double                 returnValue;
+
+	returnValue  = sizeof(eventNumber);
+	if (hits != NULL) {
+
+		for (int i = 0; i < hits->GetEntries(); i++) {
+			
+			hit = (trackfinderInputHit*)hits->At(i);
+			if (hit == NULL)
+				throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+			returnValue += hit->getUsedSizeOfAddOnData(0);
+
+		}
+
+	}
+
+	if (tracks != NULL) {
+
+		for (int j = 0; j < tracks->GetEntries(); j++) {
+			
+			track = (trackfinderInputTrack*)tracks->At(j);
+			if (hit == NULL)
+				throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+			returnValue += track->getUsedSizeOfAddOnData(0);
+
+		}
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }
 

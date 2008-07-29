@@ -23,16 +23,21 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-21 13:20:04 $
-// $Revision: 1.25 $
+// $Date: 2008-06-26 12:32:50 $
+// $Revision: 1.34 $
 //
 // *******************************************************************/
 
 #include "../../MiscLIB/include/defs.h"
 #include "../../MiscLIB/include/errorHandling.h"
 #include "../../MiscLIB/include/terminal.h"
+#include "../../MiscLIB/include/conversionRoutines.h"
 #include "../../DataObjectLIB/include/analyticFormula.h"
 #include "../../DataObjectLIB/include/histogramCellSignatures.h"
+#include "../../LutGeneratorLIB/include/prelutMath.h"
+#include "../../LutGeneratorLIB/include/digitalHitAccess.h"
+#include "../../LutGeneratorLIB/include/prelutAccess.h"
+#include "../../LutGeneratorLIB/include/lutAccess.h"
 #include "../include/analysisError.h"
 #include "../include/analysisWarningMsg.h"
 #include "../include/analysisDef.h"
@@ -45,6 +50,10 @@
 #define NUMBEROFDIFFERENTCORRECTHITS 10				/**< This definition allows to look in prelut goodness to the percentage of hits, which meet the correct border in the histogram. */
 #define STARTSLOPE                   0.003			/**< This definition sets for the prelut goodness the allowed slope range for the first station */
 #define INCRSLOPE                    0.001			/**< This definition sets for the prelut goodness the incremental slope range for the stations after the first one */
+
+
+#define           numberOfVolumes 3
+const std::string volumes[numberOfVolumes] = {"cave", "pipevac", "sts"};
 
 
 #define sqr(a)  ((a) * (a)) 
@@ -78,7 +87,6 @@ void analysis::initializeShowAnalysis() {
 
 	if (showAnalyser == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
-
 
 }
 
@@ -532,7 +540,7 @@ void analysis::evaluateFoundTracks(trackfinderInputTrack* track, unsigned short 
 		throw cannotAccessHitsOrTracksError(ANALYSISLIB);
 
 	/* peak is a clone or not */
-	if ((track->getMomZ() > minimumP) && (evaluateFoundTrackIsRealTrack(track))) {
+	if ((track->getMomZ() > minimumP) && evaluateFoundTrackIsRealTrack(track)) {
 
 		allowWrong = false;
 		*isWrong   = false;
@@ -784,21 +792,17 @@ void analysis::setupFindableTracks(std::list<findableTrack>* findableTracks) {
 		throw cannotAccessEventDataError(ANALYSISLIB);
 	if (*eventData == NULL)
 		throw cannotAccessEventDataError(ANALYSISLIB);
-	if (ratings == NULL)
-		throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
-	if (*ratings == NULL)
-		throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
 
 	if (findableTracks == NULL)
 		throw cannotAccessFindableTracksMemoryError();
 
 	for (int i = 0; i < (*eventData)->getNumberOfTracks(); i++) {
 
-		actualMCTrack = (*eventData)->getTrackByIndex(i);
+		actualMCTrack = (*eventData)->getTrackByOrder(i);
 		if (actualMCTrack == NULL)
 			throw cannotAccessHitsOrTracksError(ANALYSISLIB);
 
-		if (isfindableTrack(actualMCTrack, (*ratings)->getGradingPTableMinimumClassification(), NULL)) {
+		if (isFindableStandardTrack(actualMCTrack)) {
 
 			if (computeCoordinates(*actualMCTrack, &estimatedPosition)) {
 
@@ -829,10 +833,13 @@ analysis::analysis() {
 	projectionAnalyser             = NULL;
 	magnetfieldAnalyser            = NULL;
 	magnetfieldFactorAnalyser      = NULL;
+	prelutRangeLayerAnalyser       = NULL;
 	histogramAnalyser              = NULL;
 	showAnalyser                   = NULL;
 	totalAnalyser                  = NULL;
 	hardwareAnalyser               = NULL;
+	mcTrackVisualAnalyser          = NULL;
+	foundTrackVisualAnalyser       = NULL;
 
 	minimumP                       = 0;
 
@@ -846,8 +853,23 @@ analysis::analysis() {
 	percentageOfTracksForSignature = 0;
 	analysisResultWarnings         = 0;
 	analysisResultDisplays         = 0;
+	analysisMoreResultWarnings     = 0;
+	analysisMoreResultDisplays     = 0;
 
 	pictures                       = NULL;
+	
+	borderCreationTimer            = NULL;
+	histogramCreationTimer         = NULL;
+	histogramEncodingTimer         = NULL;
+	histogramDiagonalizingTimer    = NULL;
+	histogramPeakfindingTimer      = NULL;
+	histogramFinalizingTimer       = NULL;
+	histogramResettingTimer        = NULL;
+	trackPeakfindingTimer          = NULL;
+
+	reservedSizeOfLBufferData      = 0;
+	allocatedSizeOfLBufferData     = 0;
+	usedSizeOfLBufferData          = 0;
 
 }
 
@@ -868,25 +890,44 @@ analysis::analysis(initialParameter parameters,
 	projectionAnalyser             = NULL;
 	magnetfieldAnalyser            = NULL;
 	magnetfieldFactorAnalyser      = NULL;
+	prelutRangeLayerAnalyser       = NULL;
 	histogramAnalyser              = NULL;
 	showAnalyser                   = NULL;
 	totalAnalyser                  = NULL;
 	hardwareAnalyser               = NULL;
+	mcTrackVisualAnalyser          = NULL;
+	foundTrackVisualAnalyser       = NULL;
 
 	minimumP                       = parameters.minP;
 
 	configuration                  = parameters.initConfiguration;
 	detector                       = parameters.initDetector;
-	memory                         = parameters.initMemory;
 	event                          = parameters.initEvent;
 	classPriority                  = parameters.initClassPriority;
+	memory                         = parameters.initMemory;
+	time                           = parameters.initTime;
 
 	percentageOfHitsInSignature    = parameters.percentageOfHitsInSignature;
 	percentageOfTracksForSignature = parameters.percentageOfTracksForSignature;
 	analysisResultWarnings         = parameters.analysisResultWarnings;
 	analysisResultDisplays         = parameters.analysisResultDisplays;
+	analysisMoreResultWarnings     = parameters.analysisMoreResultWarnings;
+	analysisMoreResultDisplays     = parameters.analysisMoreResultDisplays;
 
 	pictures                       = NULL;
+
+	borderCreationTimer            = NULL;
+	histogramCreationTimer         = NULL;
+	histogramEncodingTimer         = NULL;
+	histogramDiagonalizingTimer    = NULL;
+	histogramPeakfindingTimer      = NULL;
+	histogramFinalizingTimer       = NULL;
+	histogramResettingTimer        = NULL;
+	trackPeakfindingTimer          = NULL;
+
+	reservedSizeOfLBufferData      = 0;
+	allocatedSizeOfLBufferData     = 0;
+	usedSizeOfLBufferData          = 0;
 
 	initQualityEFGCEventAbsoluteAnalysis(parameters.initQualityEFGCEventAbsolute);
 	initQualityEFGCEventRelativeAnalysis(parameters.initQualityEFGCEventRelative);
@@ -921,8 +962,13 @@ analysis::analysis(initialParameter parameters,
 
 	initHistogramAnalysis(initHistogramAnalysisToRoot, parameters.histogram);
 
+	initPrelutRangeAnalysis(parameters.initPrelutRange);
+	initPrelutRangeAnalysisDisplay(parameters.initPrelutRangeDisplay, parameters.initPrelutRangeDisplayMode);
+
 	initHardwareTracksPerColumnAnalysis(parameters.initTracksPerColumn);
+	initHardwareTracksPerRowAnalysis(parameters.initTracksPerRow);
 	initHardwareTracksPerLayerAnalysis(parameters.initTracksPerLayer);
+	initHardwareHitReadoutDistributionAnalysis(parameters.initHitReadoutDistribution);
 
 }
 analysis::analysis(initialParameter parameters,
@@ -940,25 +986,44 @@ analysis::analysis(initialParameter parameters,
 	projectionAnalyser             = NULL;
 	magnetfieldAnalyser            = NULL;
 	magnetfieldFactorAnalyser      = NULL;
+	prelutRangeLayerAnalyser       = NULL;
 	histogramAnalyser              = NULL;
 	showAnalyser                   = NULL;
 	totalAnalyser                  = NULL;
 	hardwareAnalyser               = NULL;
+	mcTrackVisualAnalyser          = NULL;
+	foundTrackVisualAnalyser       = NULL;
 
 	minimumP                       = parameters.minP;
 
 	configuration                  = parameters.initConfiguration;
 	detector                       = parameters.initDetector;
-	memory                         = parameters.initMemory;
 	event                          = parameters.initEvent;
 	classPriority                  = parameters.initClassPriority;
+	memory                         = parameters.initMemory;
+	time                           = parameters.initTime;
 
 	percentageOfHitsInSignature    = parameters.percentageOfHitsInSignature;
 	percentageOfTracksForSignature = parameters.percentageOfTracksForSignature;
 	analysisResultWarnings         = parameters.analysisResultWarnings;
 	analysisResultDisplays         = parameters.analysisResultDisplays;
+	analysisMoreResultWarnings     = parameters.analysisMoreResultWarnings;
+	analysisMoreResultDisplays     = parameters.analysisMoreResultDisplays;
 
 	pictures                       = NULL;
+
+	borderCreationTimer            = NULL;
+	histogramCreationTimer         = NULL;
+	histogramEncodingTimer         = NULL;
+	histogramDiagonalizingTimer    = NULL;
+	histogramPeakfindingTimer      = NULL;
+	histogramFinalizingTimer       = NULL;
+	histogramResettingTimer        = NULL;
+	trackPeakfindingTimer          = NULL;
+
+	reservedSizeOfLBufferData      = 0;
+	allocatedSizeOfLBufferData     = 0;
+	usedSizeOfLBufferData          = 0;
 
 	initQualityEFGCEventAbsoluteAnalysis(parameters.initQualityEFGCEventAbsolute);
 	initQualityEFGCEventRelativeAnalysis(parameters.initQualityEFGCEventRelative);
@@ -994,11 +1059,19 @@ analysis::analysis(initialParameter parameters,
 	initMagnetfieldAnalysisDisplay(parameters.initMagnetfieldDisplay);
 
 	initMagnetfieldAnalysisToRoot(fileParameters.initMagnetfieldToRoot, fileParameters.name);
+
 	initHistogramAnalysis(fileParameters.initCreatedHistogramToRoot | fileParameters.initEncodedHistogramToRoot | fileParameters.initFilteredHistogramToRoot, parameters.histogram);
 	initHistogramAnalysis(fileParameters.initCreatedHistogramToRoot, fileParameters.initEncodedHistogramToRoot, fileParameters.initFilteredHistogramToRoot, fileParameters.initJustOneCreatedHistogramToRoot, fileParameters.initJustOneEncodedHistogramToRoot, fileParameters.initJustOneFilteredHistogramToRoot, initCreatedHistogramToShow, initEncodedHistogramToShow, initFilteredHistogramToShow, initHistogramLayer, fileParameters.name);
 
+	initPrelutRangeAnalysis(parameters.initPrelutRange);
+	initPrelutRangeAnalysisDisplay(parameters.initPrelutRangeDisplay, parameters.initPrelutRangeDisplayMode);
+
+	initPrelutRangeAnalysisToRoot(fileParameters.initPrelutRangeToRoot, fileParameters.name);
+
 	initHardwareTracksPerColumnAnalysis(parameters.initTracksPerColumn);
+	initHardwareTracksPerRowAnalysis(parameters.initTracksPerRow);
 	initHardwareTracksPerLayerAnalysis(parameters.initTracksPerLayer);
+	initHardwareHitReadoutDistributionAnalysis(parameters.initHitReadoutDistribution);
 
 }
 
@@ -1032,6 +1105,10 @@ analysis::~analysis() {
 		delete magnetfieldFactorAnalyser;
 		magnetfieldFactorAnalyser = NULL;
 	}
+	if (prelutRangeLayerAnalyser != NULL) {
+		delete prelutRangeLayerAnalyser;
+		prelutRangeLayerAnalyser = NULL;
+	}
 	if (showAnalyser != NULL) {
 		delete showAnalyser;
 		showAnalyser = NULL;
@@ -1044,9 +1121,49 @@ analysis::~analysis() {
 		delete hardwareAnalyser;
 		hardwareAnalyser = NULL;
 	}
+	if (mcTrackVisualAnalyser != NULL) {
+		delete mcTrackVisualAnalyser;
+		mcTrackVisualAnalyser = NULL;
+	}
+	if (foundTrackVisualAnalyser != NULL) {
+		delete foundTrackVisualAnalyser;
+		foundTrackVisualAnalyser = NULL;
+	}
 	if (pictures != NULL) {
 		delete pictures;
 		pictures = NULL;
+	}
+	if (borderCreationTimer != NULL) {
+		delete borderCreationTimer;
+		borderCreationTimer = NULL;
+	}
+	if (histogramCreationTimer != NULL) {
+		delete histogramCreationTimer;
+		histogramCreationTimer = NULL;
+	}
+	if (histogramEncodingTimer != NULL) {
+		delete histogramEncodingTimer;
+		histogramEncodingTimer = NULL;
+	}
+	if (histogramDiagonalizingTimer != NULL) {
+		delete histogramDiagonalizingTimer;
+		histogramDiagonalizingTimer = NULL;
+	}
+	if (histogramPeakfindingTimer != NULL) {
+		delete histogramPeakfindingTimer;
+		histogramPeakfindingTimer = NULL;
+	}
+	if (histogramFinalizingTimer != NULL) {
+		delete histogramFinalizingTimer;
+		histogramFinalizingTimer = NULL;
+	}
+	if (histogramResettingTimer != NULL) {
+		delete histogramResettingTimer;
+		histogramResettingTimer = NULL;
+	}
+	if (trackPeakfindingTimer != NULL) {
+		delete trackPeakfindingTimer;
+		trackPeakfindingTimer = NULL;
 	}
 
 }
@@ -1068,14 +1185,22 @@ void analysis::init(initialParameter parameters,
 
 	configuration                  = parameters.initConfiguration;
 	detector                       = parameters.initDetector;
-	memory                         = parameters.initMemory;
 	event                          = parameters.initEvent;
 	classPriority                  = parameters.initClassPriority;
+	memory                         = parameters.initMemory;
+	time                           = parameters.initTime;
 
 	percentageOfHitsInSignature    = parameters.percentageOfHitsInSignature;
 	percentageOfTracksForSignature = parameters.percentageOfTracksForSignature;
 	analysisResultWarnings         = parameters.analysisResultWarnings;
 	analysisResultDisplays         = parameters.analysisResultDisplays;
+	analysisMoreResultWarnings     = parameters.analysisMoreResultWarnings;
+	analysisMoreResultDisplays     = parameters.analysisMoreResultDisplays;
+
+	if (pictures != NULL) {
+		delete pictures;
+		pictures = NULL;
+	}
 
 	initQualityEFGCEventAbsoluteAnalysis(parameters.initQualityEFGCEventAbsolute);
 	initQualityEFGCEventRelativeAnalysis(parameters.initQualityEFGCEventRelative);
@@ -1109,8 +1234,13 @@ void analysis::init(initialParameter parameters,
 
 	initHistogramAnalysis(initHistogramAnalysisToRoot, parameters.histogram);
 
+	initPrelutRangeAnalysis(parameters.initPrelutRange);
+	initPrelutRangeAnalysisDisplay(parameters.initPrelutRangeDisplay, parameters.initPrelutRangeDisplayMode);
+
 	initHardwareTracksPerColumnAnalysis(parameters.initTracksPerColumn);
+	initHardwareTracksPerRowAnalysis(parameters.initTracksPerRow);
 	initHardwareTracksPerLayerAnalysis(parameters.initTracksPerLayer);
+	initHardwareHitReadoutDistributionAnalysis(parameters.initHitReadoutDistribution);
 
 }
 void analysis::init(initialParameter parameters,
@@ -1128,14 +1258,22 @@ void analysis::init(initialParameter parameters,
 
 	configuration                  = parameters.initConfiguration;
 	detector                       = parameters.initDetector;
-	memory                         = parameters.initMemory;
 	event                          = parameters.initEvent;
 	classPriority                  = parameters.initClassPriority;
+	memory                         = parameters.initMemory;
+	time                           = parameters.initTime;
 
 	percentageOfHitsInSignature    = parameters.percentageOfHitsInSignature;
 	percentageOfTracksForSignature = parameters.percentageOfTracksForSignature;
 	analysisResultWarnings         = parameters.analysisResultWarnings;
 	analysisResultDisplays         = parameters.analysisResultDisplays;
+	analysisMoreResultWarnings     = parameters.analysisMoreResultWarnings;
+	analysisMoreResultDisplays     = parameters.analysisMoreResultDisplays;
+
+	if (pictures != NULL) {
+		delete pictures;
+		pictures = NULL;
+	}
 
 	initQualityEFGCEventAbsoluteAnalysis(parameters.initQualityEFGCEventAbsolute);
 	initQualityEFGCEventRelativeAnalysis(parameters.initQualityEFGCEventRelative);
@@ -1171,11 +1309,19 @@ void analysis::init(initialParameter parameters,
 	initMagnetfieldAnalysisDisplay(parameters.initMagnetfieldDisplay);
 
 	initMagnetfieldAnalysisToRoot(fileParameters.initMagnetfieldToRoot, fileParameters.name);
+
 	initHistogramAnalysis(fileParameters.initCreatedHistogramToRoot | fileParameters.initEncodedHistogramToRoot | fileParameters.initFilteredHistogramToRoot, parameters.histogram);
 	initHistogramAnalysis(fileParameters.initCreatedHistogramToRoot, fileParameters.initEncodedHistogramToRoot, fileParameters.initFilteredHistogramToRoot, fileParameters.initJustOneCreatedHistogramToRoot, fileParameters.initJustOneEncodedHistogramToRoot, fileParameters.initJustOneFilteredHistogramToRoot, initCreatedHistogramToShow, initEncodedHistogramToShow, initFilteredHistogramToShow, initHistogramLayer, fileParameters.name);
 
+	initPrelutRangeAnalysis(parameters.initPrelutRange);
+	initPrelutRangeAnalysisDisplay(parameters.initPrelutRangeDisplay, parameters.initPrelutRangeDisplayMode);
+
+	initPrelutRangeAnalysisToRoot(fileParameters.initPrelutRangeToRoot, fileParameters.name);
+
 	initHardwareTracksPerColumnAnalysis(parameters.initTracksPerColumn);
+	initHardwareTracksPerRowAnalysis(parameters.initTracksPerRow);
 	initHardwareTracksPerLayerAnalysis(parameters.initTracksPerLayer);
+	initHardwareHitReadoutDistributionAnalysis(parameters.initHitReadoutDistribution);
 
 }
 
@@ -1184,7 +1330,7 @@ void analysis::init(initialParameter parameters,
  * pattern and has a specific P.								*
  ****************************************************************/
 
-bool analysis::isfindableTrack(trackfinderInputTrack* track, bitArray minClassPriority, bitArray* globalTrackPattern) {
+bool analysis::isFindableTrack(trackfinderInputTrack* track, bitArray minClassPriority, bitArray* globalTrackPattern) {
 
 	bitArray               localTrackPattern;
 	trackfinderInputHit*   hit;
@@ -1226,6 +1372,22 @@ bool analysis::isfindableTrack(trackfinderInputTrack* track, bitArray minClassPr
 }
 
 /****************************************************************
+ * method returns true if the track has a the specific track	*
+ * pattern and has a specific P.								*
+ ****************************************************************/
+
+bool analysis::isFindableStandardTrack(trackfinderInputTrack* track) {
+
+	if (ratings == NULL)
+		throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
+	if (*ratings == NULL)
+		throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
+
+	return isFindableTrack(track, (*ratings)->getGradingPTableMinimumClassification(), NULL);
+
+}
+
+/****************************************************************
  * method returns the number of tracks with a the specific		*
  * track patterns and with a specific P.						*
  ****************************************************************/
@@ -1256,11 +1418,11 @@ int analysis::getNumberOfTracksWithP(bitArray minimumClassPriority) {
 
 	for (int i = 0; i < (*eventData)->getNumberOfTracks(); i++) {
 
-		track = (*eventData)->getTrackByIndex(i);
+		track = (*eventData)->getTrackByOrder(i);
 		if (track == NULL)
 			throw cannotAccessHitsOrTracksError(ANALYSISLIB);
 
-		if (isfindableTrack(track, minimumClassPriority, &globalTrackPattern))
+		if (isFindableTrack(track, minimumClassPriority, &globalTrackPattern))
 			returnValue++;
 
 	}
@@ -1327,7 +1489,7 @@ void analysis::evaluateAlgorithm(std::streambuf* terminal) {
 
 	(*tracks)->resetActiveObject();
 
-	createTerminalStatusSequence(&statusSequenceForFoundTracks, terminal, "Analyse found tracks:\t\t", (*tracks)->getNumberOfTracks());
+	createTerminalStatusSequence(&statusSequenceForFoundTracks, terminal, "Analyse found tracks:\t\t\t\t", (*tracks)->getNumberOfTracks());
 	terminalInitialize(statusSequenceForFoundTracks);
 
 	for (i = 0; i < (*tracks)->getNumberOfTracks(); i++) {
@@ -1356,12 +1518,12 @@ void analysis::evaluateAlgorithm(std::streambuf* terminal) {
 
 	terminalFinalize(statusSequenceForFoundTracks);
 
-	createTerminalStatusSequence(&statusSequenceForRealTracks, terminal, "Analyse real tracks:\t\t", (*eventData)->getNumberOfTracks());
+	createTerminalStatusSequence(&statusSequenceForRealTracks, terminal, "Analyse real tracks:\t\t\t\t", (*eventData)->getNumberOfTracks());
 	terminalInitialize(statusSequenceForRealTracks);
 
 	for (i = 0; i < (*eventData)->getNumberOfTracks(); i++) {
 
-		realTrack = (*eventData)->getTrackByIndex(i);
+		realTrack = (*eventData)->getTrackByOrder(i);
 		if (realTrack == NULL)
 			throw cannotAccessTrackDataError(ANALYSISLIB);
 
@@ -1447,7 +1609,7 @@ void analysis::evaluateAlgorithm(std::streambuf* terminal) {
  * method evaluates the magnetfield factors.					*
  ****************************************************************/
 
-void analysis::evaluateMagnetfieldFactors(bool updateFactors, double dim3StartEntry, double dim3StopEntry, std::streambuf* terminal) {
+void analysis::evaluateMagnetfieldFactors(bool isFirstEvent, bool averagingFactors, std::streambuf* terminal) {
 
 	trackfinderInputMagneticField* magneticField;
 	unsigned short                 j;
@@ -1481,7 +1643,7 @@ void analysis::evaluateMagnetfieldFactors(bool updateFactors, double dim3StartEn
 		throw cannotAccessHistogramSpaceError(ANALYSISLIB);
 
 	if ((luts == NULL) || (*luts == NULL))
-		throw cannotAccessLutError(ANALYSISLIB);
+		throw cannotAccessLutsError(ANALYSISLIB);
 
 	if (magnetfieldFactorAnalyser == NULL)
 		throw cannotAccessMagnetfieldFactorAnalyserError();
@@ -1658,18 +1820,306 @@ void analysis::evaluateMagnetfieldFactors(bool updateFactors, double dim3StartEn
 	
 		magnetfieldFactor = magnetfieldFactorAnalyser->getMagnetfieldFactor(j);
 
-#ifdef PRINTFACTORS
+		if (averagingFactors && !isFirstEvent)
+			magneticField->updateMagnetfieldFactor(j, magnetfieldFactor);
+		else
+			magneticField->setMagnetfieldFactor(j, magnetfieldFactor);
 
-		setMagnetfieldFactorWarningMsg* setMagnetfieldFactor = new setMagnetfieldFactorWarningMsg(j, magnetfieldFactor);
-		setMagnetfieldFactor->warningMsg();
-		if(setMagnetfieldFactor != NULL) {
-			delete setMagnetfieldFactor;
-			setMagnetfieldFactor = NULL;
+		if (analysisResultWarnings & MAGNETFIELDFACTORINFORMATION) {
+
+			setMagnetfieldFactorWarningMsg* setMagnetfieldFactor = new setMagnetfieldFactorWarningMsg(j, magneticField->getMagnetfieldFactor(j));
+			setMagnetfieldFactor->warningMsg();
+			if(setMagnetfieldFactor != NULL) {
+				delete setMagnetfieldFactor;
+				setMagnetfieldFactor = NULL;
+			}
+
 		}
 
-#endif
+	}
 
-		magneticField->setMagnetfieldFactor(j, magnetfieldFactor);
+}
+
+/****************************************************************
+ * method evaluates the dim3 entry range.						*
+ ****************************************************************/
+
+void analysis::evaluatePrelutRange(bool isFirstEvent, bool averagingFactors, bool chooseMainPrelutRange, bool chooseConstraintPrelutRange, std::streambuf* terminal) {
+
+	prelutMath                      prelut;
+	unsigned short                  k;
+	unsigned short                  l;
+	unsigned short                  trackIndex;
+	terminalSequence                statusSequenceForDim3EntryRange;
+	std::list<findableTrack>        findableTracks;
+	trackfinderInputTrack*          track;
+	trackfinderInputHit*            hit;
+	prelutHoughBorder               firstBorder;
+	unsigned short                  stationIndex;
+	hitsInHistogramBorderFrequency* histogramBorderFrequency;
+	unsigned short                  numberOfHistogramBorderEntries;
+	unsigned short                  borderIndex;
+	hitsInHistogramBorderFrequency  maximumHistogramBorderFrequency;
+	bitArray                        trackSignature;
+	double                          evaluatedDim3StartEntry;
+	double                          evaluatedDim3StopEntry;
+	unsigned short                  evaluatedDim3Info;
+	double                          evaluatedDim3MeanEntriesPerHit;
+
+	if (eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+	if (*eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+
+	if ((luts == NULL) || (*luts == NULL))
+		throw cannotAccessLutsError();
+
+	if (prelutRangeLayerAnalyser == NULL)
+		throw cannotAccessPrelutRangeAnalyserError();
+
+	prelutRangeLayerAnalyser->reset();
+
+	/* This analysis can just be made for the Math version of the prelut */
+	prelut.init((*luts)->getPrelutDefinition().dim3Min, (*luts)->getPrelutDefinition().dim3Max, (*luts)->getPrelutDefinition().dim3Step, 0, 0);
+
+	/* this function creates a std::list which includes pointers to all
+	 * findable tracks and their corresponding position in the Hough
+	 * space */
+	setupFindableTracks(&findableTracks);
+
+	createTerminalStatusSequence(&statusSequenceForDim3EntryRange, terminal, "\nAnalyse prelut range:\t\t\t\t", findableTracks.size() * prelutRangeLayerAnalyser->getNumberOfMinFactors() * prelutRangeLayerAnalyser->getNumberOfMaxFactors());
+	terminalInitialize(statusSequenceForDim3EntryRange);
+
+	histogramBorderFrequency       = NULL;
+	numberOfHistogramBorderEntries = 0;
+
+	for (unsigned short i = 0; i < prelutRangeLayerAnalyser->getNumberOfMinFactors(); i++) {
+
+		for (unsigned short j = 0; j < prelutRangeLayerAnalyser->getNumberOfMaxFactors(); j++) {
+
+			/* the min bigger than the max value does not make sense for evaluation */
+			if (prelutRangeLayerAnalyser->getMinFactor(i) > prelutRangeLayerAnalyser->getMaxFactor(j))
+				continue;
+
+			/* sets the values for the next computation */
+			prelut.set(prelutRangeLayerAnalyser->getMinFactor(i), prelutRangeLayerAnalyser->getMaxFactor(j));
+
+			for (k = 0; k < (*eventData)->getNumberOfActiveStations(); k++) {
+
+				if ((i == 0) && (j == 0))
+					prelutRangeLayerAnalyser->setRelativeValue(k, 0);
+
+				prelutRangeLayerAnalyser->setValue(k, i, j, 0);
+
+			}
+
+			trackIndex             = 0;
+			/* loop to evaluate the prelut goodness for all findable tracks */
+			for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++, trackIndex++) {
+
+				track = actualTrack->getTrack();
+				if (track == NULL)
+					throw cannotAccessHitsOrTracksError(ANALYSISLIB);
+
+				track->resetHitPointer();
+
+				/* loop to evaluate the magnetfield factor for all hits of this track */
+				for (k = 0; k < track->getNumberOfHits(); k++) {
+
+					hit = track->getHit();
+					if (hit == NULL)
+						throw cannotAccessHitsOrTracksError(ANALYSISLIB);
+
+					if (hit->getStation() == NULL)
+						throw cannotAccessStationError(ANALYSISLIB);
+					else
+						stationIndex = hit->getStation()->getIndex();
+
+					/* compute the borders for this hit */
+					prelut.evaluate(hit, &firstBorder);
+
+					/* Accumulate the frequency of the third dimension border */
+					for (l = firstBorder.start; l <= firstBorder.stop; l++) {
+
+						if (numberOfHistogramBorderEntries == 0) {
+
+							numberOfHistogramBorderEntries        = 1;
+							histogramBorderFrequency              = (hitsInHistogramBorderFrequency*)calloc(numberOfHistogramBorderEntries, sizeof(hitsInHistogramBorderFrequency));
+							histogramBorderFrequency[0].border    = l;
+							histogramBorderFrequency[0].frequency = 1;
+
+						}
+						else {
+					
+							/* check if this border has occured until now */
+							borderIndex = numberOfHistogramBorderEntries;
+							for (unsigned short m = 0; m < numberOfHistogramBorderEntries; m++) {
+
+								if (histogramBorderFrequency[m].border == l) {
+
+									borderIndex = m;
+									break;
+
+								}
+
+							}
+					
+							/* if the border has not occured */
+							if (borderIndex == numberOfHistogramBorderEntries) {
+
+								numberOfHistogramBorderEntries++;
+								histogramBorderFrequency                        = (hitsInHistogramBorderFrequency*)realloc(histogramBorderFrequency, numberOfHistogramBorderEntries * sizeof(hitsInHistogramBorderFrequency));
+								histogramBorderFrequency[borderIndex].border    = l;
+								histogramBorderFrequency[borderIndex].frequency = 1;
+
+							}
+							/* if the border has occured */
+							else
+								histogramBorderFrequency[borderIndex].frequency++;
+
+						}
+
+					}
+
+				}
+
+				maximumHistogramBorderFrequency.frequency = 0;
+				maximumHistogramBorderFrequency.distance  = 0;
+				for (k = 0; k < numberOfHistogramBorderEntries; k++) {
+
+					histogramBorderFrequency[k].distance = sqrt((double)sqr(histogramBorderFrequency[k].border - actualTrack->getPosition().get(DIM3)));
+
+					if (histogramBorderFrequency[k].frequency > maximumHistogramBorderFrequency.frequency)
+						maximumHistogramBorderFrequency = histogramBorderFrequency[k];
+					/* This is added because if there is a equal found clone peak which is nearer to the
+					 * correct cell, this peak should be used because of a better quality approximation */
+					else if ((histogramBorderFrequency[k].frequency == maximumHistogramBorderFrequency.frequency) && (histogramBorderFrequency[k].distance < maximumHistogramBorderFrequency.distance))
+						maximumHistogramBorderFrequency = histogramBorderFrequency[k];
+
+				}
+
+				if (histogramBorderFrequency != NULL) {
+					free(histogramBorderFrequency);
+					histogramBorderFrequency       = NULL;
+					numberOfHistogramBorderEntries = 0;
+				}
+
+				trackSignature = bitArray(0);
+				/* loop to evaluate the not correct layer anaylsis*/
+				for (k = 0; k < track->getNumberOfHits(); k++) {
+
+					hit = track->getHit();
+					if (hit == NULL)
+						throw cannotAccessHitsOrTracksError(ANALYSISLIB);
+
+					if (hit->getStation() == NULL)
+						throw cannotAccessStationError(ANALYSISLIB);
+					else
+						stationIndex = hit->getStation()->getIndex();
+
+					/* compute the borders for this hit */
+					prelut.evaluate(hit, &firstBorder);
+
+					/* Prevent a track with multiple hits in one station */
+					if ((trackSignature[stationIndex] == false)) {
+
+						trackSignature[stationIndex] = true;
+
+						/* Count the number of hits per detector station  */
+						if ((i == 0) && (j == 0))
+							prelutRangeLayerAnalyser->addRelativeValue(stationIndex, 1);
+
+						/* Count the border range for the hit*/
+						prelutRangeLayerAnalyser->addConstraintValue(stationIndex, i, j, firstBorder.stop - firstBorder.start + 1);
+
+						/* Check if the third dimension border is in the correct layer range */
+						if ((firstBorder.start <= actualTrack->getPosition().get(DIM3)) && (firstBorder.stop >= actualTrack->getPosition().get(DIM3)))
+							prelutRangeLayerAnalyser->addCorrectValue(stationIndex, i, j, 1);
+
+						/* Check if the third dimension border is in the layer range */
+						if ((firstBorder.start <= maximumHistogramBorderFrequency.border) && (firstBorder.stop >= maximumHistogramBorderFrequency.border))
+							prelutRangeLayerAnalyser->addMainValue(stationIndex, i, j, 1);
+
+					}
+
+				}
+
+				terminalOverwrite(statusSequenceForDim3EntryRange, i * prelutRangeLayerAnalyser->getNumberOfMaxFactors() * findableTracks.size() + j * findableTracks.size() + trackIndex + 1);
+			}
+
+		}
+
+	}
+
+	terminalFinalize(statusSequenceForDim3EntryRange);
+
+	/* this sets the prelut range for the computing of the hough transformation */
+	if (chooseMainPrelutRange) {
+		if (chooseConstraintPrelutRange)
+			prelutRangeLayerAnalyser->getMainPrelutConstraintRange((*eventData)->getNumberOfActiveStations(), evaluatedDim3StartEntry, evaluatedDim3StopEntry, evaluatedDim3Info, evaluatedDim3MeanEntriesPerHit);
+		else
+			prelutRangeLayerAnalyser->getMainPrelutMaximumRange((*eventData)->getNumberOfActiveStations(), evaluatedDim3StartEntry, evaluatedDim3StopEntry, evaluatedDim3Info, evaluatedDim3MeanEntriesPerHit);
+	}
+	else {
+		if (chooseConstraintPrelutRange)
+			prelutRangeLayerAnalyser->getCorrectPrelutConstraintRange((*eventData)->getNumberOfActiveStations(), evaluatedDim3StartEntry, evaluatedDim3StopEntry, evaluatedDim3Info, evaluatedDim3MeanEntriesPerHit);
+		else
+			prelutRangeLayerAnalyser->getCorrectPrelutMaximumRange((*eventData)->getNumberOfActiveStations(), evaluatedDim3StartEntry, evaluatedDim3StopEntry, evaluatedDim3Info, evaluatedDim3MeanEntriesPerHit);
+	}
+
+	if (averagingFactors && !isFirstEvent) {
+
+		if (evaluatedDim3StartEntry > (*luts)->getPrelutDefinition().dim3StartEntry)
+			evaluatedDim3StartEntry = (*luts)->getPrelutDefinition().dim3StartEntry;
+
+		if (evaluatedDim3StopEntry < (*luts)->getPrelutDefinition().dim3StopEntry)
+			evaluatedDim3StopEntry = (*luts)->getPrelutDefinition().dim3StopEntry;
+
+		(*luts)->setPrelutRange(evaluatedDim3StartEntry, evaluatedDim3StopEntry);
+
+	}
+	else {
+
+		(*luts)->setPrelutRange(evaluatedDim3StartEntry, evaluatedDim3StopEntry);
+
+	}
+
+	if (analysisResultWarnings & PRELUTRANGEINFORMATION) {
+
+		if (chooseConstraintPrelutRange) {
+
+			numberOfPrelutRangesFoundWarningMsg* numberOfPrelutRangesFound = new numberOfPrelutRangesFoundWarningMsg(evaluatedDim3Info);
+			numberOfPrelutRangesFound->warningMsg();
+			if(numberOfPrelutRangesFound != NULL) {
+				delete numberOfPrelutRangesFound;
+				numberOfPrelutRangesFound = NULL;
+			}
+
+		}
+		else {
+
+			maximumPrelutRangePercentageWarningMsg* maximumPrelutRangePercentage = new maximumPrelutRangePercentageWarningMsg(evaluatedDim3Info);
+			maximumPrelutRangePercentage->warningMsg();
+			if(maximumPrelutRangePercentage != NULL) {
+				delete maximumPrelutRangePercentage;
+				maximumPrelutRangePercentage = NULL;
+			}
+
+		}
+
+		meanPrelutRangeEntriesPerHitWarningMsg* meanPrelutRangeEntriesPerHit = new meanPrelutRangeEntriesPerHitWarningMsg(evaluatedDim3MeanEntriesPerHit);
+		meanPrelutRangeEntriesPerHit->warningMsg();
+		if(meanPrelutRangeEntriesPerHit != NULL) {
+			delete meanPrelutRangeEntriesPerHit;
+			meanPrelutRangeEntriesPerHit = NULL;
+		}
+
+		setPrelutRangeWarningMsg* setPrelutRange = new setPrelutRangeWarningMsg((*luts)->getPrelutDefinition().dim3StartEntry, (*luts)->getPrelutDefinition().dim3StopEntry);
+		setPrelutRange->warningMsg();
+		if(setPrelutRange != NULL) {
+			delete setPrelutRange;
+			setPrelutRange = NULL;
+		}
 
 	}
 
@@ -1729,7 +2179,7 @@ void analysis::evaluatePrelutGoodness(std::streambuf* terminal) {
 		throw cannotAccessHistogramSpaceError(ANALYSISLIB);
 
 	if ((luts == NULL) || (*luts == NULL))
-		throw cannotAccessLutError();
+		throw cannotAccessLutsError();
 
 	numberOfTracksWithPercentCorrectHitsInLayer  = new unsigned int[NUMBEROFDIFFERENTCORRECTHITS];
 	if (numberOfTracksWithPercentCorrectHitsInLayer == NULL)
@@ -2420,7 +2870,7 @@ void analysis::evaluateLutDistribution(unsigned int* numberOfTracksWithSignature
 		throw cannotAccessHistogramSpaceError(ANALYSISLIB);
 
 	if ((luts == NULL) || (*luts == NULL))
-		throw cannotAccessLutError(ANALYSISLIB);
+		throw cannotAccessLutsError(ANALYSISLIB);
 
 	/* this function creates a std::list which includes pointers to all
 	 * findable tracks and their corresponding position in the Hough
@@ -2541,7 +2991,7 @@ void analysis::evaluateBothLutsDistribution(unsigned int* numberOfTracksWithHits
 		throw cannotAccessHistogramSpaceError(ANALYSISLIB);
 
 	if ((luts == NULL) || (*luts == NULL))
-		throw cannotAccessLutError();
+		throw cannotAccessLutsError();
 
 	if (numberOfTracksWithHits == NULL)
 		throw cannotAccessDistributionMemoryError(ANALYSISLIB);
@@ -2713,7 +3163,7 @@ void analysis::evaluateMagnetfield(std::streambuf* terminal) {
 	if (*eventData == NULL)
 		throw cannotAccessEventDataError(ANALYSISLIB);
 	if (magnetfieldAnalyser == NULL)
-		throw cannotAccessMagnetfieldAnalyser();
+		throw cannotAccessMagnetfieldAnalyserError();
 
 	magneticField = (*eventData)->getMagneticField();
 	if (magneticField == NULL)
@@ -3029,7 +3479,7 @@ void analysis::evaluateHoughTransformGoodness(std::streambuf* terminal) {
 		throw cannotAccessHistogramSpaceError(ANALYSISLIB);
 
 	if ((luts == NULL) || (*luts == NULL))
-		throw cannotAccessLutError(ANALYSISLIB);
+		throw cannotAccessLutsError(ANALYSISLIB);
 
 	numberOfTracksWithMomentaError  = new unsigned int[NUMBEROFDIFFERENTMOMENTAS];
 	if (numberOfTracksWithMomentaError == NULL)
@@ -3040,7 +3490,7 @@ void analysis::evaluateHoughTransformGoodness(std::streambuf* terminal) {
 
 	setupFindableTracks(&findableTracks);
 
-	createTerminalStatusSequence(&statusSequenceForFormula, terminal, "\nAnalyse formula goodness:\t", findableTracks.size());
+	createTerminalStatusSequence(&statusSequenceForFormula, terminal, "\nAnalyse formula goodness:\t\t\t", findableTracks.size());
 	terminalInitialize(statusSequenceForFormula);
 
 	trackIndex   = 0;
@@ -3155,11 +3605,11 @@ void analysis::evaluateQuantizationGoodness(std::streambuf* terminal) {
 	unsigned int*            numberOfTracksWithMomentumX;
 	unsigned int*            numberOfTracksWithMomentumY;
 	unsigned int*            numberOfTracksWithMomentumZ;
-	unsigned int*            numberOfTracksWithDim1Coordinate;
-	unsigned int*            numberOfTracksWithDim2Coordinate;
-	unsigned int*            numberOfTracksWithDim3Coordinate;
+	unsigned int*            numberOfTracksWithHoughspaceDim1;
+	unsigned int*            numberOfTracksWithHoughspaceDim2;
+	unsigned int*            numberOfTracksWithHoughspaceDim3;
 	unsigned int*            numberOfTracksWithMomentum;
-	unsigned int*            numberOfTracksWithCoordinate;
+	unsigned int*            numberOfTracksWithHoughspace;
 	double                   momentumXMin;
 	double                   momentumXMax;
 	double                   momentumXIncr;
@@ -3198,21 +3648,21 @@ void analysis::evaluateQuantizationGoodness(std::streambuf* terminal) {
 	numberOfTracksWithMomentumZ      = new unsigned int[(*space)->getStep(HRADIUS)];
 	if (numberOfTracksWithMomentumZ == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
-	numberOfTracksWithDim1Coordinate = new unsigned int[(*space)->getStep(DIM1)];
-	if (numberOfTracksWithDim1Coordinate == NULL)
+	numberOfTracksWithHoughspaceDim1 = new unsigned int[(*space)->getStep(DIM1)];
+	if (numberOfTracksWithHoughspaceDim1 == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
-	numberOfTracksWithDim2Coordinate = new unsigned int[(*space)->getStep(DIM2)];
-	if (numberOfTracksWithDim2Coordinate == NULL)
+	numberOfTracksWithHoughspaceDim2 = new unsigned int[(*space)->getStep(DIM2)];
+	if (numberOfTracksWithHoughspaceDim2 == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
-	numberOfTracksWithDim3Coordinate = new unsigned int[(*space)->getStep(DIM3)];
-	if (numberOfTracksWithDim3Coordinate == NULL)
+	numberOfTracksWithHoughspaceDim3 = new unsigned int[(*space)->getStep(DIM3)];
+	if (numberOfTracksWithHoughspaceDim3 == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
 
 	numberOfTracksWithMomentum       = new unsigned int[(*space)->getStep(HTHETA) * (*space)->getStep(HGAMMA) * (*space)->getStep(HRADIUS)];
 	if (numberOfTracksWithMomentum == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
-	numberOfTracksWithCoordinate     = new unsigned int[(*space)->getStep(DIM1) * (*space)->getStep(DIM2) * (*space)->getStep(DIM3)];
-	if (numberOfTracksWithCoordinate == NULL)
+	numberOfTracksWithHoughspace     = new unsigned int[(*space)->getStep(DIM1) * (*space)->getStep(DIM2) * (*space)->getStep(DIM3)];
+	if (numberOfTracksWithHoughspace == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
 
 	momentumZMin  = 1 / (*space)->getMax(HRADIUS);
@@ -3227,7 +3677,7 @@ void analysis::evaluateQuantizationGoodness(std::streambuf* terminal) {
 
 	setupFindableTracks(&findableTracks);
 
-	createTerminalStatusSequence(&statusSequenceForQuantization, terminal, "\nAnalyse quantization goodness:\t", findableTracks.size());
+	createTerminalStatusSequence(&statusSequenceForQuantization, terminal, "\nAnalyse quantization goodness:\t\t\t", findableTracks.size());
 	terminalInitialize(statusSequenceForQuantization);
 
 	for (i = 0; i < (*space)->getStep(HTHETA); i++)
@@ -3237,16 +3687,16 @@ void analysis::evaluateQuantizationGoodness(std::streambuf* terminal) {
 	for (i = 0; i < (*space)->getStep(HRADIUS); i++)
 		numberOfTracksWithMomentumZ[i]       = 0;
 	for (i = 0; i < (*space)->getStep(DIM1); i++)
-		numberOfTracksWithDim1Coordinate[i]  = 0;
+		numberOfTracksWithHoughspaceDim1[i]  = 0;
 	for (i = 0; i < (*space)->getStep(DIM2); i++)
-		numberOfTracksWithDim2Coordinate[i]  = 0;
+		numberOfTracksWithHoughspaceDim2[i]  = 0;
 	for (i = 0; i < (*space)->getStep(DIM3); i++)
-		numberOfTracksWithDim3Coordinate[i]  = 0;
+		numberOfTracksWithHoughspaceDim3[i]  = 0;
 
 	for (j = 0; j < (unsigned int)(*space)->getStep(HTHETA) * (unsigned int)(*space)->getStep(HGAMMA) * (unsigned int)(*space)->getStep(HRADIUS); j++)
 		numberOfTracksWithMomentum[j]        = 0;
 	for (j = 0; j < (unsigned int)(*space)->getStep(DIM1) * (unsigned int)(*space)->getStep(DIM2) * (unsigned int)(*space)->getStep(DIM3); j++)
-		numberOfTracksWithCoordinate[j]      = 0;
+		numberOfTracksWithHoughspace[j]      = 0;
 
 	trackIndex = 0;
 	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++, trackIndex++) {
@@ -3282,16 +3732,16 @@ void analysis::evaluateQuantizationGoodness(std::streambuf* terminal) {
 
 		actualPosition1 = actualTrack->getPosition().get(DIM1);
 		if (actualPosition1 < (*space)->getStep(DIM1))
-			numberOfTracksWithDim1Coordinate[actualPosition1]++;
+			numberOfTracksWithHoughspaceDim1[actualPosition1]++;
 		actualPosition2 = actualTrack->getPosition().get(DIM2);
 		if (actualPosition2 < (*space)->getStep(DIM2))
-			numberOfTracksWithDim2Coordinate[actualPosition2]++;
+			numberOfTracksWithHoughspaceDim2[actualPosition2]++;
 		actualPosition3 = actualTrack->getPosition().get(DIM3);
 		if (actualPosition3 < (*space)->getStep(DIM3))
-			numberOfTracksWithDim3Coordinate[actualPosition3]++;
+			numberOfTracksWithHoughspaceDim3[actualPosition3]++;
 
 		if ((actualPosition1 < (*space)->getStep(DIM1)) && (actualPosition2 < (*space)->getStep(DIM2)) && (actualPosition3 < (*space)->getStep(DIM3)))
-			numberOfTracksWithCoordinate[(unsigned int)actualPosition1 * (unsigned int)(*space)->getStep(DIM2) * (unsigned int)(*space)->getStep(DIM3) + (unsigned int)actualPosition2 * (unsigned int)(*space)->getStep(DIM3) + (unsigned int)actualPosition3]++;
+			numberOfTracksWithHoughspace[(unsigned int)actualPosition1 * (unsigned int)(*space)->getStep(DIM2) * (unsigned int)(*space)->getStep(DIM3) + (unsigned int)actualPosition2 * (unsigned int)(*space)->getStep(DIM3) + (unsigned int)actualPosition3]++;
 
 		terminalOverwrite(statusSequenceForQuantization, trackIndex + 1);
 
@@ -3299,80 +3749,101 @@ void analysis::evaluateQuantizationGoodness(std::streambuf* terminal) {
 
 	numberOfNotFindableTracks = 0;
 	for (j = 0; j < (unsigned int)(*space)->getStep(DIM1) * (unsigned int)(*space)->getStep(DIM2) * (unsigned int)(*space)->getStep(DIM3); j++)
-		if (numberOfTracksWithCoordinate[j] > 1)
-			numberOfNotFindableTracks += (numberOfTracksWithCoordinate[j] - 1);
+		if (numberOfTracksWithHoughspace[j] > 1)
+			numberOfNotFindableTracks += (numberOfTracksWithHoughspace[j] - 1);
 
 	terminalFinalize(statusSequenceForQuantization);
 
-	if (analysisResultWarnings & TRACKWITHMOMENTADISTRIBUTION) {
+	if (analysisResultWarnings & QUANTIZEDMOMENTADIMDISTRIBUTION) {
 
-		trackWithMomentaXDistributionWarningMsg* trackWithMomentaXDistribution = new trackWithMomentaXDistributionWarningMsg(numberOfTracksWithMomentumX, (*space)->getStep(HTHETA), momentumXMin, momentumXMax);
-		trackWithMomentaXDistribution->warningMsg();
-		if(trackWithMomentaXDistribution != NULL) {
-			delete trackWithMomentaXDistribution;
-			trackWithMomentaXDistribution = NULL;
+		quantizedMomentaXDistributionWarningMsg* quantizedMomentaXDistribution = new quantizedMomentaXDistributionWarningMsg(numberOfTracksWithMomentumX, (*space)->getStep(HTHETA), momentumXMin, momentumXMax);
+		quantizedMomentaXDistribution->warningMsg();
+		if(quantizedMomentaXDistribution != NULL) {
+			delete quantizedMomentaXDistribution;
+			quantizedMomentaXDistribution = NULL;
 		}
-		trackWithMomentaYDistributionWarningMsg* trackWithMomentaYDistribution = new trackWithMomentaYDistributionWarningMsg(numberOfTracksWithMomentumY, (*space)->getStep(HGAMMA), momentumYMin, momentumYMax);
-		trackWithMomentaYDistribution->warningMsg();
-		if(trackWithMomentaYDistribution != NULL) {
-			delete trackWithMomentaYDistribution;
-			trackWithMomentaYDistribution = NULL;
+		quantizedMomentaYDistributionWarningMsg* quantizedMomentaYDistribution = new quantizedMomentaYDistributionWarningMsg(numberOfTracksWithMomentumY, (*space)->getStep(HGAMMA), momentumYMin, momentumYMax);
+		quantizedMomentaYDistribution->warningMsg();
+		if(quantizedMomentaYDistribution != NULL) {
+			delete quantizedMomentaYDistribution;
+			quantizedMomentaYDistribution = NULL;
 		}
-		trackWithMomentaZDistributionWarningMsg* trackWithMomentaZDistribution = new trackWithMomentaZDistributionWarningMsg(numberOfTracksWithMomentumZ, (*space)->getStep(HRADIUS), momentumZMin, momentumZMax);
-		trackWithMomentaZDistribution->warningMsg();
-		if(trackWithMomentaZDistribution != NULL) {
-			delete trackWithMomentaZDistribution;
-			trackWithMomentaZDistribution = NULL;
+		quantizedMomentaZDistributionWarningMsg* quantizedMomentaZDistribution = new quantizedMomentaZDistributionWarningMsg(numberOfTracksWithMomentumZ, (*space)->getStep(HRADIUS), momentumZMin, momentumZMax);
+		quantizedMomentaZDistribution->warningMsg();
+		if(quantizedMomentaZDistribution != NULL) {
+			delete quantizedMomentaZDistribution;
+			quantizedMomentaZDistribution = NULL;
 		}
-		trackWithCoordinateXDistributionWarningMsg* trackWithCoordinateXDistribution = new trackWithCoordinateXDistributionWarningMsg(numberOfTracksWithDim1Coordinate, (*space)->getStep(DIM1));
-		trackWithCoordinateXDistribution->warningMsg();
-		if(trackWithCoordinateXDistribution != NULL) {
-			delete trackWithCoordinateXDistribution;
-			trackWithCoordinateXDistribution = NULL;
+
+	}
+	if (analysisResultWarnings & QUANTIZEDHOUGHSPACEDIMDISTRIBUTION) {
+
+		quantizedHoughspaceDim1DistributionWarningMsg* quantizedHoughspaceDim1Distribution = new quantizedHoughspaceDim1DistributionWarningMsg(numberOfTracksWithHoughspaceDim1, (*space)->getStep(DIM1));
+		quantizedHoughspaceDim1Distribution->warningMsg();
+		if(quantizedHoughspaceDim1Distribution != NULL) {
+			delete quantizedHoughspaceDim1Distribution;
+			quantizedHoughspaceDim1Distribution = NULL;
 		}
-		trackWithCoordinateYDistributionWarningMsg* trackWithCoordinateYDistribution = new trackWithCoordinateYDistributionWarningMsg(numberOfTracksWithDim2Coordinate, (*space)->getStep(DIM2));
-		trackWithCoordinateYDistribution->warningMsg();
-		if(trackWithCoordinateYDistribution != NULL) {
-			delete trackWithCoordinateYDistribution;
-			trackWithCoordinateYDistribution = NULL;
+		quantizedHoughspaceDim2DistributionWarningMsg* quantizedHoughspaceDim2Distribution = new quantizedHoughspaceDim2DistributionWarningMsg(numberOfTracksWithHoughspaceDim2, (*space)->getStep(DIM2));
+		quantizedHoughspaceDim2Distribution->warningMsg();
+		if(quantizedHoughspaceDim2Distribution != NULL) {
+			delete quantizedHoughspaceDim2Distribution;
+			quantizedHoughspaceDim2Distribution = NULL;
 		}
-		trackWithCoordinateZDistributionWarningMsg* trackWithCoordinateZDistribution = new trackWithCoordinateZDistributionWarningMsg(numberOfTracksWithDim3Coordinate, (*space)->getStep(DIM3));
-		trackWithCoordinateZDistribution->warningMsg();
-		if(trackWithCoordinateZDistribution != NULL) {
-			delete trackWithCoordinateZDistribution;
-			trackWithCoordinateZDistribution = NULL;
-		}
-		trackWithMomentaDistributionWarningMsg* trackWithMomentaDistribution = new trackWithMomentaDistributionWarningMsg(numberOfTracksWithMomentum, (*space)->getStep(HTHETA) * (*space)->getStep(HGAMMA) * (*space)->getStep(HRADIUS));
-		trackWithMomentaDistribution->warningMsg();
-		if(trackWithMomentaDistribution != NULL) {
-			delete trackWithMomentaDistribution;
-			trackWithMomentaDistribution = NULL;
-		}
-		trackWithCoordinateDistributionWarningMsg* trackWithCoordinateDistribution = new trackWithCoordinateDistributionWarningMsg(numberOfTracksWithCoordinate, (*space)->getStep(DIM1) * (*space)->getStep(DIM2) * (*space)->getStep(DIM3));
-		trackWithCoordinateDistribution->warningMsg();
-		if(trackWithCoordinateDistribution != NULL) {
-			delete trackWithCoordinateDistribution;
-			trackWithCoordinateDistribution = NULL;
+		quantizedHoughspaceDim3DistributionWarningMsg* quantizedHoughspaceDim3Distribution = new quantizedHoughspaceDim3DistributionWarningMsg(numberOfTracksWithHoughspaceDim3, (*space)->getStep(DIM3));
+		quantizedHoughspaceDim3Distribution->warningMsg();
+		if(quantizedHoughspaceDim3Distribution != NULL) {
+			delete quantizedHoughspaceDim3Distribution;
+			quantizedHoughspaceDim3Distribution = NULL;
 		}
 
 	}
 
-	if (analysisResultDisplays & TRACKWITHMOMENTADISTRIBUTION) {
+	if (analysisResultWarnings & QUANTIZEDMOMENTADISTRIBUTION) {
+
+		quantizedMomentaDistributionWarningMsg* quantizedMomentaDistribution = new quantizedMomentaDistributionWarningMsg(numberOfTracksWithMomentum, (*space)->getStep(HTHETA) * (*space)->getStep(HGAMMA) * (*space)->getStep(HRADIUS));
+		quantizedMomentaDistribution->warningMsg();
+		if(quantizedMomentaDistribution != NULL) {
+			delete quantizedMomentaDistribution;
+			quantizedMomentaDistribution = NULL;
+		}
+
+	}
+
+	if (analysisResultWarnings & QUANTIZEDHOUGHSPACEDISTRIBUTION) {
+
+		quantizedHoughspaceDistributionWarningMsg* quantizedHoughspaceDistribution = new quantizedHoughspaceDistributionWarningMsg(numberOfTracksWithHoughspace, (*space)->getStep(DIM1) * (*space)->getStep(DIM2) * (*space)->getStep(DIM3));
+		quantizedHoughspaceDistribution->warningMsg();
+		if(quantizedHoughspaceDistribution != NULL) {
+			delete quantizedHoughspaceDistribution;
+			quantizedHoughspaceDistribution = NULL;
+		}
+
+	}
+
+	if (analysisResultDisplays & QUANTIZEDMOMENTADIMDISTRIBUTION) {
 
 		initializeShowAnalysis();
 
 		showAnalyser->addMomentaXDistribution(numberOfTracksWithMomentumX, (*space)->getStep(HTHETA), momentumXMin, momentumXMax);
 		showAnalyser->addMomentaYDistribution(numberOfTracksWithMomentumY, (*space)->getStep(HGAMMA), momentumYMin, momentumYMax);
 		showAnalyser->addMomentaZDistribution(numberOfTracksWithMomentumZ, (*space)->getStep(HRADIUS), momentumZMin, momentumZMax);
-		showAnalyser->addCoordinateXDistribution(numberOfTracksWithDim1Coordinate, (*space)->getStep(DIM1));
-		showAnalyser->addCoordinateYDistribution(numberOfTracksWithDim2Coordinate, (*space)->getStep(DIM2));
-		showAnalyser->addCoordinateZDistribution(numberOfTracksWithDim3Coordinate, (*space)->getStep(DIM3));
 
 	}
 
-	if (analysisResultDisplays & COMPLETEMOMENTADISTRIBUTION) {
+	if (analysisResultDisplays & QUANTIZEDHOUGHSPACEDIMDISTRIBUTION) {
 
-		if (analysisResultDisplays & COMPLETECOORDINATEDISTRIBUTION) {
+		initializeShowAnalysis();
+
+		showAnalyser->addHoughspaceDim1Distribution(numberOfTracksWithHoughspaceDim1, (*space)->getStep(DIM1));
+		showAnalyser->addHoughspaceDim2Distribution(numberOfTracksWithHoughspaceDim2, (*space)->getStep(DIM2));
+		showAnalyser->addHoughspaceDim3Distribution(numberOfTracksWithHoughspaceDim3, (*space)->getStep(DIM3));
+
+	}
+
+	if (analysisResultDisplays & QUANTIZEDMOMENTADISTRIBUTION) {
+
+		if (analysisResultDisplays & QUANTIZEDHOUGHSPACEDISTRIBUTION) {
 
 			youCannotEnableTrackWithSameMomentaAndCoordinateDistributionWarningMsg* youCannotEnableTrackWithSameMomentaAndCoordinateDistribution = new youCannotEnableTrackWithSameMomentaAndCoordinateDistributionWarningMsg();
 			youCannotEnableTrackWithSameMomentaAndCoordinateDistribution->warningMsg();
@@ -3393,23 +3864,23 @@ void analysis::evaluateQuantizationGoodness(std::streambuf* terminal) {
 	}
 	else {
 
-		if (analysisResultDisplays & COMPLETECOORDINATEDISTRIBUTION) {
+		if (analysisResultDisplays & QUANTIZEDHOUGHSPACEDISTRIBUTION) {
 
 			initializeShowAnalysis();
 
-			showAnalyser->addCoordinateDistribution(numberOfTracksWithCoordinate, (unsigned int)(*space)->getStep(DIM1) * (unsigned int)(*space)->getStep(DIM2) * (unsigned int)(*space)->getStep(DIM3));
+			showAnalyser->addCoordinateDistribution(numberOfTracksWithHoughspace, (unsigned int)(*space)->getStep(DIM1) * (unsigned int)(*space)->getStep(DIM2) * (unsigned int)(*space)->getStep(DIM3));
 
 		}
 
 	}
 
-	if (analysisResultWarnings & TRACKWITHSAMECOORDINATEDISTRIBUTION) {
+	if (analysisResultWarnings & SAMEHOUGHSPACECELLDISTRIBUTION) {
 
-		trackWithSameCoordinateDistributionWarningMsg* trackWithSameCoordinateDistribution = new trackWithSameCoordinateDistributionWarningMsg(numberOfTracksWithCoordinate, (*space)->getStep(DIM1) * (*space)->getStep(DIM2) * (*space)->getStep(DIM3));
-		trackWithSameCoordinateDistribution->warningMsg();
-		if(trackWithSameCoordinateDistribution != NULL) {
-			delete trackWithSameCoordinateDistribution;
-			trackWithSameCoordinateDistribution = NULL;
+		sameHoughspaceCellDistributionWarningMsg* sameHoughspaceCellDistribution = new sameHoughspaceCellDistributionWarningMsg(numberOfTracksWithHoughspace, (*space)->getStep(DIM1) * (*space)->getStep(DIM2) * (*space)->getStep(DIM3));
+		sameHoughspaceCellDistribution->warningMsg();
+		if(sameHoughspaceCellDistribution != NULL) {
+			delete sameHoughspaceCellDistribution;
+			sameHoughspaceCellDistribution = NULL;
 		}
 
 	}
@@ -3439,27 +3910,268 @@ void analysis::evaluateQuantizationGoodness(std::streambuf* terminal) {
 		delete[] numberOfTracksWithMomentumZ;
 		numberOfTracksWithMomentumZ = NULL;
 	}
-	if (numberOfTracksWithDim1Coordinate != NULL) {
-		delete[] numberOfTracksWithDim1Coordinate;
-		numberOfTracksWithDim1Coordinate = NULL;
+	if (numberOfTracksWithHoughspaceDim1 != NULL) {
+		delete[] numberOfTracksWithHoughspaceDim1;
+		numberOfTracksWithHoughspaceDim1 = NULL;
 	}
-	if (numberOfTracksWithDim2Coordinate != NULL) {
-		delete[] numberOfTracksWithDim2Coordinate;
-		numberOfTracksWithDim2Coordinate = NULL;
+	if (numberOfTracksWithHoughspaceDim2 != NULL) {
+		delete[] numberOfTracksWithHoughspaceDim2;
+		numberOfTracksWithHoughspaceDim2 = NULL;
 	}
-	if (numberOfTracksWithDim3Coordinate != NULL) {
-		delete[] numberOfTracksWithDim3Coordinate;
-		numberOfTracksWithDim3Coordinate = NULL;
+	if (numberOfTracksWithHoughspaceDim3 != NULL) {
+		delete[] numberOfTracksWithHoughspaceDim3;
+		numberOfTracksWithHoughspaceDim3 = NULL;
 	}
 
 	if (numberOfTracksWithMomentum != NULL) {
 		delete[] numberOfTracksWithMomentum;
 		numberOfTracksWithMomentum = NULL;
 	}
-	if (numberOfTracksWithCoordinate != NULL) {
-		delete[] numberOfTracksWithCoordinate;
-		numberOfTracksWithCoordinate = NULL;
+	if (numberOfTracksWithHoughspace != NULL) {
+		delete[] numberOfTracksWithHoughspace;
+		numberOfTracksWithHoughspace = NULL;
 	}
+
+}
+
+/****************************************************************
+ * method evaluates the goodness of the used quatization.		*
+ ****************************************************************/
+
+void analysis::evaluatePeakDistanceGoodness(std::streambuf* terminal) {
+
+	unsigned int*            dim1PeakDistanceDistribution;
+	unsigned int*            dim2PeakDistanceDistribution;
+	unsigned int*            dim3PeakDistanceDistribution;
+	unsigned int*            accumulatedPeakDistanceDistribution;
+	std::list<findableTrack> findableTracks;
+	unsigned int             i;
+	terminalSequence         statusSequenceForPeakDistance;
+	unsigned short           trackIndex;
+	trackfinderInputTrack*   track;
+	unsigned short           actualPosition1;
+	unsigned short           actualPosition2;
+	unsigned short           actualPosition3;
+	unsigned short           comparePosition1;
+	unsigned short           comparePosition2;
+	unsigned short           comparePosition3;
+
+	if (eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+	if (*eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(ANALYSISLIB);
+
+	dim1PeakDistanceDistribution = new unsigned int[(*space)->getStep(DIM1)];
+	if (dim1PeakDistanceDistribution == NULL)
+		throw memoryAllocationError(ANALYSISLIB);
+	dim2PeakDistanceDistribution = new unsigned int[(*space)->getStep(DIM2)];
+	if (dim2PeakDistanceDistribution == NULL)
+		throw memoryAllocationError(ANALYSISLIB);
+	dim3PeakDistanceDistribution = new unsigned int[(*space)->getStep(DIM3)];
+	if (dim3PeakDistanceDistribution == NULL)
+		throw memoryAllocationError(ANALYSISLIB);
+	accumulatedPeakDistanceDistribution = new unsigned int[(unsigned int)ceil(sqrt((double)sqr((*space)->getStep(DIM1)) + (double)sqr((*space)->getStep(DIM2)) + (double)sqr((*space)->getStep(DIM3))))];
+	if (accumulatedPeakDistanceDistribution == NULL)
+		throw memoryAllocationError(ANALYSISLIB);
+
+	setupFindableTracks(&findableTracks);
+
+	createTerminalStatusSequence(&statusSequenceForPeakDistance, terminal, "\nAnalyse peak distances:\t\t\t\t", findableTracks.size());
+	terminalInitialize(statusSequenceForPeakDistance);
+
+	for (i = 0; i < (unsigned int)(*space)->getStep(DIM1); i++)
+		dim1PeakDistanceDistribution[i]        = 0;
+	for (i = 0; i < (unsigned int)(*space)->getStep(DIM2); i++)
+		dim2PeakDistanceDistribution[i]        = 0;
+	for (i = 0; i < (unsigned int)(*space)->getStep(DIM3); i++)
+		dim3PeakDistanceDistribution[i]        = 0;
+	for (i = 0; i < (unsigned int)ceil(sqrt((double)sqr((*space)->getStep(DIM1)) + (double)sqr((*space)->getStep(DIM2)) + (double)sqr((*space)->getStep(DIM3)))); i++)
+		accumulatedPeakDistanceDistribution[i] = 0;
+
+	trackIndex = 0;
+	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); trackIndex++) {
+
+		track = actualTrack->getTrack();
+		if (track == NULL)
+			throw cannotAccessHitsOrTracksError(ANALYSISLIB);
+
+		actualPosition1 = actualTrack->getPosition().get(DIM1);
+		actualPosition2 = actualTrack->getPosition().get(DIM2);
+		actualPosition3 = actualTrack->getPosition().get(DIM3);
+
+		actualTrack++;
+
+		for (std::list<findableTrack>::iterator compareTrack = actualTrack; compareTrack != findableTracks.end(); compareTrack++) {
+
+			comparePosition1 = compareTrack->getPosition().get(DIM1);
+			comparePosition2 = compareTrack->getPosition().get(DIM2);
+			comparePosition3 = compareTrack->getPosition().get(DIM3);
+			
+			if (abs(actualPosition1 - comparePosition1) < (*space)->getStep(DIM1))
+				dim1PeakDistanceDistribution[abs(actualPosition1 - comparePosition1)]++;
+			if (abs(actualPosition2 - comparePosition2) < (*space)->getStep(DIM2))
+				dim2PeakDistanceDistribution[abs(actualPosition2 - comparePosition2)]++;
+			if (abs(actualPosition3 - comparePosition3) < (*space)->getStep(DIM3))
+				dim3PeakDistanceDistribution[abs(actualPosition3 - comparePosition3)]++;
+			if ((unsigned int)sqrt((double)sqr(actualPosition1 - comparePosition1) + (double)sqr(actualPosition2 - comparePosition2) + (double)sqr(actualPosition3 - comparePosition3)) < (unsigned int)ceil(sqrt((double)sqr((*space)->getStep(DIM1)) + (double)sqr((*space)->getStep(DIM2)) + (double)sqr((*space)->getStep(DIM3)))))
+				accumulatedPeakDistanceDistribution[(unsigned int)sqrt((double)sqr(actualPosition1 - comparePosition1) + (double)sqr(actualPosition2 - comparePosition2) + (double)sqr(actualPosition3 - comparePosition3))]++;
+
+		}
+
+		terminalOverwrite(statusSequenceForPeakDistance, trackIndex + 1);
+
+	}
+
+	terminalFinalize(statusSequenceForPeakDistance);
+
+	if (analysisResultWarnings & DIMPEAKDISTANCEDISTRIBUTION) {
+
+		dim1PeakDistanceDistributionWarningMsg* dim1PeakDistance = new dim1PeakDistanceDistributionWarningMsg(dim1PeakDistanceDistribution, (unsigned int)(*space)->getStep(DIM1));
+		dim1PeakDistance->warningMsg();
+		if(dim1PeakDistance != NULL) {
+			delete dim1PeakDistance;
+			dim1PeakDistance = NULL;
+		}
+		dim2PeakDistanceDistributionWarningMsg* dim2PeakDistance = new dim2PeakDistanceDistributionWarningMsg(dim2PeakDistanceDistribution, (unsigned int)(*space)->getStep(DIM2));
+		dim2PeakDistance->warningMsg();
+		if(dim2PeakDistance != NULL) {
+			delete dim2PeakDistance;
+			dim2PeakDistance = NULL;
+		}
+		dim3PeakDistanceDistributionWarningMsg* dim3PeakDistance = new dim3PeakDistanceDistributionWarningMsg(dim3PeakDistanceDistribution, (unsigned int)(*space)->getStep(DIM3));
+		dim3PeakDistance->warningMsg();
+		if(dim3PeakDistance != NULL) {
+			delete dim3PeakDistance;
+			dim3PeakDistance = NULL;
+		}
+		accumulatedPeakDistanceDistributionWarningMsg* accumulatedPeakDistance = new accumulatedPeakDistanceDistributionWarningMsg(accumulatedPeakDistanceDistribution, (unsigned int)ceil(sqrt((double)sqr((*space)->getStep(DIM1)) + (double)sqr((*space)->getStep(DIM2)) + (double)sqr((*space)->getStep(DIM3)))));
+		accumulatedPeakDistance->warningMsg();
+		if(accumulatedPeakDistance != NULL) {
+			delete accumulatedPeakDistance;
+			accumulatedPeakDistance = NULL;
+		}
+
+	}
+
+
+	if (analysisResultDisplays & DIMPEAKDISTANCEDISTRIBUTION) {
+
+		initializeShowAnalysis();
+
+		showAnalyser->addDim1PeakDistanceDistribution(dim1PeakDistanceDistribution, (*space)->getStep(DIM1));
+		showAnalyser->addDim2PeakDistanceDistribution(dim2PeakDistanceDistribution, (*space)->getStep(DIM2));
+		showAnalyser->addDim3PeakDistanceDistribution(dim3PeakDistanceDistribution, (*space)->getStep(DIM3));
+		showAnalyser->addAccumulatedPeakDistanceDistribution(accumulatedPeakDistanceDistribution, (unsigned int)ceil(sqrt((double)sqr((*space)->getStep(DIM1)) + (double)sqr((*space)->getStep(DIM2)) + (double)sqr((*space)->getStep(DIM3)))));
+
+	}
+
+	if (dim1PeakDistanceDistribution != NULL) {
+		delete[] dim1PeakDistanceDistribution;
+		dim1PeakDistanceDistribution = NULL;
+	}
+	if (dim2PeakDistanceDistribution != NULL) {
+		delete[] dim2PeakDistanceDistribution;
+		dim2PeakDistanceDistribution = NULL;
+	}
+	if (dim3PeakDistanceDistribution != NULL) {
+		delete[] dim3PeakDistanceDistribution;
+		dim3PeakDistanceDistribution = NULL;
+	}
+	if (accumulatedPeakDistanceDistribution != NULL) {
+		delete[] accumulatedPeakDistanceDistribution;
+		accumulatedPeakDistanceDistribution = NULL;
+	}
+
+}
+
+/**
+ * method evaluates the neccessary files for a CELL BE simulation.
+ */
+
+void analysis::evaluateCellSimulationFiles(std::string hitFileName, std::string prelutFileName, std::string lutFileName, std::streambuf* terminal) {
+
+	terminalSequence     statusSequenceForCellFiles;
+	digitalHitAccess     digitalHitData;
+	prelutAccess         prelut;
+	lutAccess            lut;
+	trackfinderInputHit* hit;
+	digitalHit           digitalHitIdentifier;
+	lutBorder            border;
+
+	if (eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+	if (*eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+
+	if ((luts == NULL) || (*luts == NULL))
+		throw cannotAccessLutsError();
+
+	createTerminalStatusSequence(&statusSequenceForCellFiles, terminal, "\nEvaluate Cell BE simulation files:\t\t", (*eventData)->getNumberOfHits());
+	terminalInitialize(statusSequenceForCellFiles);
+
+	/* reset the counter for the corrections in the first and second
+	 * dimension. Corrected are these values which have a difference
+	 * of more than one in the first dimension according to the previous
+	 * value */
+	(*luts)->resetCorrectionCounter();
+
+	digitalHitData.init();
+	prelut.init((*luts)->getPrelutDefinition().dim3Min, (*luts)->getPrelutDefinition().dim3Max, (*luts)->getPrelutDefinition().dim3Step, (*luts)->getPrelutDefinition().dim3StartEntry, (*luts)->getPrelutDefinition().dim3StopEntry);
+	lut.init((*luts)->getLutDefinition().dim1Min, (*luts)->getLutDefinition().dim1Max, (*luts)->getLutDefinition().dim1Step, (*luts)->getLutDefinition().dim2Min, (*luts)->getLutDefinition().dim2Max, (*luts)->getLutDefinition().dim2Step);
+
+	for (int i = 0; i < (*eventData)->getNumberOfHits(); i++) {
+
+		hit = (*eventData)->getHitByIndex(i);
+
+		digitalHitData.evaluate(hit, &digitalHitIdentifier);
+		(*luts)->evaluate(hit, &border);
+
+		digitalHitData.addEntry(digitalHitIdentifier);
+		prelut.addEntry(border.getPrelutHoughBorder());
+		lut.addEntry(border.getLutHoughBorder());
+
+		terminalOverwrite(statusSequenceForCellFiles, i + 1);
+
+	}
+
+	terminalFinalize(statusSequenceForCellFiles);
+
+	digitalHitData.write(hitFileName, "hitForCellSimulation");
+	prelut.write(prelutFileName, "prelutForCellSimulation");
+	lut.write(lutFileName, "lutForCellSimulation", HARDWAREFORMAT);
+
+}
+void analysis::evaluateCellSimulationFiles(std::string hitFileName, std::string prelutFileName, std::string lutFileName, unsigned int eventNumber, std::streambuf* terminal) {
+
+	std::string modifiedHitFileName;
+	std::string modifiedPrelutFileName;
+	std::string modifiedLutFileName;
+	char        buffer[intConversionDigits+1];
+	std::string modifier;
+	int         modifierPosition;
+
+	modifiedHitFileName    = hitFileName;
+	modifiedPrelutFileName = prelutFileName;
+	modifiedLutFileName    = lutFileName;
+
+	uitos(eventNumber, buffer, 10, intConversionDigits);
+
+	modifier  = "_";
+	modifier += buffer;
+
+	modifierPosition = (int)modifiedHitFileName.find_last_of(".", modifiedHitFileName.length());
+	modifiedHitFileName.insert(modifierPosition, modifier);
+
+	modifierPosition = (int)modifiedPrelutFileName.find_last_of(".", modifiedPrelutFileName.length());
+	modifiedPrelutFileName.insert(modifierPosition, modifier);
+
+	modifierPosition = (int)modifiedLutFileName.find_last_of(".", modifiedLutFileName.length());
+	modifiedLutFileName.insert(modifierPosition, modifier);
+
+	evaluateCellSimulationFiles(modifiedHitFileName, modifiedPrelutFileName, modifiedLutFileName, terminal);
 
 }
 
@@ -3490,6 +4202,16 @@ void analysis::initDetectorAnalysis(bool enable) {
 void analysis::initMemoryAnalysis(bool enable) {
 
 	memory = enable;
+
+}
+
+/****************************************************************
+ * method initializes the time-Analysis.						*
+ ****************************************************************/
+
+void analysis::initTimeAnalysis(bool enable) {
+
+	time = enable;
 
 }
 
@@ -5383,7 +6105,7 @@ void analysis::initMomentumAnalysisToRoot(bool enable, const char* name) {
 
 	if ((name == NULL) || (strcmp(name, "") == 0)) {
 
-		noAnalysisMomentumOutputFileNameSpecifiedWarningMsg* noAnalysisMomentumOutputFileNameSpecified = new noAnalysisMomentumOutputFileNameSpecifiedWarningMsg();
+		noAnalysisOutputFileNameSpecifiedWarningMsg* noAnalysisMomentumOutputFileNameSpecified = new noAnalysisOutputFileNameSpecifiedWarningMsg();
 		noAnalysisMomentumOutputFileNameSpecified->warningMsg();
 		if(noAnalysisMomentumOutputFileNameSpecified != NULL) {
 			delete noAnalysisMomentumOutputFileNameSpecified;
@@ -5403,6 +6125,8 @@ void analysis::initMomentumAnalysisToRoot(bool enable, const char* name) {
 				justUpdate |= magnetfieldFactorAnalyser->isMagnetfieldFactorToRootEnabled();
 			if (histogramAnalyser != NULL)
 				justUpdate |= histogramAnalyser->isHistogramToRootEnabled();
+			if (prelutRangeLayerAnalyser != NULL)
+				justUpdate |= prelutRangeLayerAnalyser->isPrelutRangeToRootEnabled();
 			momentumAnalyser->initMomentumAnalysisToRoot(enable, name, justUpdate);
 		}
 
@@ -5455,6 +6179,8 @@ void analysis::initProjectionAnalysisToRoot(bool enable, const char* name) {
 				justUpdate |= magnetfieldFactorAnalyser->isMagnetfieldFactorToRootEnabled();
 			if (histogramAnalyser != NULL)
 				justUpdate |= histogramAnalyser->isHistogramToRootEnabled();
+			if (prelutRangeLayerAnalyser != NULL)
+				justUpdate |= prelutRangeLayerAnalyser->isPrelutRangeToRootEnabled();
 			projectionAnalyser->initProjectionAnalysisToRoot(enable, name, justUpdate);
 		}
 
@@ -5524,6 +6250,23 @@ void analysis::initMomentumAnalysisDisplay(bool enable) {
 			if (magnetfieldFactorAnalyser->isMagnetfieldFactorDisplayEnabled()) {
 
 				magnetfieldFactorAnalyser->initMagnetfieldFactorAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
+		if (prelutRangeLayerAnalyser != NULL) {
+
+			if (prelutRangeLayerAnalyser->isPrelutRangeDisplayEnabled()) {
+
+				prelutRangeLayerAnalyser->initPrelutRangeAnalysisDisplay(false);
 
 				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
 				enableJustOneDisplay->warningMsg();
@@ -5606,6 +6349,23 @@ void analysis::initProjectionAnalysisDisplay(bool enable) {
 			if (magnetfieldFactorAnalyser->isMagnetfieldFactorDisplayEnabled()) {
 
 				magnetfieldFactorAnalyser->initMagnetfieldFactorAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
+		if (prelutRangeLayerAnalyser != NULL) {
+
+			if (prelutRangeLayerAnalyser->isPrelutRangeDisplayEnabled()) {
+
+				prelutRangeLayerAnalyser->initPrelutRangeAnalysisDisplay(false);
 
 				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
 				enableJustOneDisplay->warningMsg();
@@ -6082,7 +6842,7 @@ void analysis::initMagnetfieldAnalysisToRoot(bool enable, const char* name) {
 
 	if ((name == NULL) || (strcmp(name, "") == 0)) {
 
-		noAnalysisMomentumOutputFileNameSpecifiedWarningMsg* noAnalysisMomentumOutputFileNameSpecified = new noAnalysisMomentumOutputFileNameSpecifiedWarningMsg();
+		noAnalysisOutputFileNameSpecifiedWarningMsg* noAnalysisMomentumOutputFileNameSpecified = new noAnalysisOutputFileNameSpecifiedWarningMsg();
 		noAnalysisMomentumOutputFileNameSpecified->warningMsg();
 		if(noAnalysisMomentumOutputFileNameSpecified != NULL) {
 			delete noAnalysisMomentumOutputFileNameSpecified;
@@ -6102,6 +6862,8 @@ void analysis::initMagnetfieldAnalysisToRoot(bool enable, const char* name) {
 				justUpdate |= magnetfieldFactorAnalyser->isMagnetfieldFactorToRootEnabled();
 			if (histogramAnalyser != NULL)
 				justUpdate |= histogramAnalyser->isHistogramToRootEnabled();
+			if (prelutRangeLayerAnalyser != NULL)
+				justUpdate |= prelutRangeLayerAnalyser->isPrelutRangeToRootEnabled();
 			magnetfieldAnalyser->initMagnetfieldAnalysisToRoot(enable, name, justUpdate);
 		}
 
@@ -6183,6 +6945,23 @@ void analysis::initMagnetfieldAnalysisDisplay(bool enable) {
 
 		}
 
+		if (prelutRangeLayerAnalyser != NULL) {
+
+			if (prelutRangeLayerAnalyser->isPrelutRangeDisplayEnabled()) {
+
+				prelutRangeLayerAnalyser->initPrelutRangeAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
 		if (magnetfieldAnalyser == NULL)
 			magnetfieldAnalyser = new magnetfieldAnalysis();
 
@@ -6216,7 +6995,7 @@ void analysis::initMagnetfieldConstantAnalysisToRoot(bool enable, const char* na
 
 	if ((name == NULL) || (strcmp(name, "") == 0)) {
 
-		noAnalysisMomentumOutputFileNameSpecifiedWarningMsg* noAnalysisMomentumOutputFileNameSpecified = new noAnalysisMomentumOutputFileNameSpecifiedWarningMsg();
+		noAnalysisOutputFileNameSpecifiedWarningMsg* noAnalysisMomentumOutputFileNameSpecified = new noAnalysisOutputFileNameSpecifiedWarningMsg();
 		noAnalysisMomentumOutputFileNameSpecified->warningMsg();
 		if(noAnalysisMomentumOutputFileNameSpecified != NULL) {
 			delete noAnalysisMomentumOutputFileNameSpecified;
@@ -6236,6 +7015,8 @@ void analysis::initMagnetfieldConstantAnalysisToRoot(bool enable, const char* na
 				justUpdate |= magnetfieldAnalyser->isMagnetfieldToRootEnabled();
 			if (histogramAnalyser != NULL)
 				justUpdate |= histogramAnalyser->isHistogramToRootEnabled();
+			if (prelutRangeLayerAnalyser != NULL)
+				justUpdate |= prelutRangeLayerAnalyser->isPrelutRangeToRootEnabled();
 			magnetfieldFactorAnalyser->initMagnetfieldFactorAnalysisToRoot(enable, name, justUpdate);
 		}
 
@@ -6317,6 +7098,23 @@ void analysis::initMagnetfieldConstantAnalysisDisplay(bool enable) {
 
 		}
 
+		if (prelutRangeLayerAnalyser != NULL) {
+
+			if (prelutRangeLayerAnalyser->isPrelutRangeDisplayEnabled()) {
+
+				prelutRangeLayerAnalyser->initPrelutRangeAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
 		if (magnetfieldFactorAnalyser == NULL)
 			magnetfieldFactorAnalyser = new magnetfieldFactorAnalysis();
 
@@ -6332,6 +7130,250 @@ void analysis::initMagnetfieldConstantAnalysisDisplay(bool enable) {
 			if ((!magnetfieldFactorAnalyser->isMagnetfieldFactorAnalysisEnabled())) {
 				delete magnetfieldFactorAnalyser;
 				magnetfieldFactorAnalyser = NULL;
+			}
+
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * method initializes the										*
+ * initPrelutRangeAnalysis-Analysis.							*
+ ****************************************************************/
+
+void analysis::initPrelutRangeAnalysis(bool enable) {
+
+	if (enable) {
+
+		if (prelutRangeLayerAnalyser == NULL)
+			prelutRangeLayerAnalyser = new prelutRangeLayerAnalysis();
+
+	}
+	else {
+
+		if (prelutRangeLayerAnalyser != NULL) {
+
+			delete prelutRangeLayerAnalyser;
+			prelutRangeLayerAnalyser = NULL;
+
+		}
+
+	}
+
+}
+void analysis::initPrelutRangeAnalysis(bool enable, unsigned short numberOfDisplays) {
+
+	if (enable) {
+
+		if (prelutRangeLayerAnalyser == NULL)
+			prelutRangeLayerAnalyser = new prelutRangeLayerAnalysis();
+
+		prelutRangeLayerAnalyser->init(numberOfDisplays);
+
+	}
+	else {
+
+		if (prelutRangeLayerAnalyser != NULL) {
+
+			delete prelutRangeLayerAnalyser;
+			prelutRangeLayerAnalyser = NULL;
+
+		}
+
+	}
+
+}
+void analysis::initPrelutRangeAnalysis(bool enable, unsigned short prelutRangeCut, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax) {
+
+	if (enable) {
+
+		if (prelutRangeLayerAnalyser == NULL)
+			prelutRangeLayerAnalyser = new prelutRangeLayerAnalysis();
+
+		prelutRangeLayerAnalyser->init(prelutRangeCut, numberOfMinFactors, factorMinMin, factorMinMax, numberOfMaxFactors, factorMaxMin, factorMaxMax);
+
+	}
+	else {
+
+		if (prelutRangeLayerAnalyser != NULL) {
+
+			delete prelutRangeLayerAnalyser;
+			prelutRangeLayerAnalyser = NULL;
+
+		}
+
+	}
+
+}
+void analysis::initPrelutRangeAnalysis(bool enable, unsigned short prelutRangeCut, unsigned short numberOfDisplays, unsigned int numberOfMinFactors, double factorMinMin, double factorMinMax, unsigned int numberOfMaxFactors, double factorMaxMin, double factorMaxMax) {
+
+	if (enable) {
+
+		if (prelutRangeLayerAnalyser == NULL)
+			prelutRangeLayerAnalyser = new prelutRangeLayerAnalysis();
+
+		prelutRangeLayerAnalyser->init(prelutRangeCut, numberOfDisplays, numberOfMinFactors, factorMinMin, factorMinMax, numberOfMaxFactors, factorMaxMin, factorMaxMax);
+
+	}
+	else {
+
+		if (prelutRangeLayerAnalyser != NULL) {
+
+			delete prelutRangeLayerAnalyser;
+			prelutRangeLayerAnalyser = NULL;
+
+		}
+
+	}
+
+}
+/****************************************************************
+ * This method initializes the root directory for the displays.	*
+ ****************************************************************/
+
+void analysis::initPrelutRangeAnalysisToRoot(bool enable, const char* name) {
+
+	bool justUpdate;
+
+	if ((name == NULL) || (strcmp(name, "") == 0)) {
+
+		noAnalysisOutputFileNameSpecifiedWarningMsg* noAnalysisMomentumOutputFileNameSpecified = new noAnalysisOutputFileNameSpecifiedWarningMsg();
+		noAnalysisMomentumOutputFileNameSpecified->warningMsg();
+		if(noAnalysisMomentumOutputFileNameSpecified != NULL) {
+			delete noAnalysisMomentumOutputFileNameSpecified;
+			noAnalysisMomentumOutputFileNameSpecified = NULL;
+		}
+
+	}
+	else {
+
+		justUpdate = false;
+		if (prelutRangeLayerAnalyser != NULL) {
+			if (momentumAnalyser != NULL)
+				justUpdate |= momentumAnalyser->isMomentumToRootEnabled();
+			if (projectionAnalyser != NULL)
+				justUpdate |= projectionAnalyser->isProjectionToRootEnabled();
+			if (magnetfieldAnalyser != NULL)
+				justUpdate |= magnetfieldAnalyser->isMagnetfieldToRootEnabled();
+			if (histogramAnalyser != NULL)
+				justUpdate |= histogramAnalyser->isHistogramToRootEnabled();
+			if (magnetfieldFactorAnalyser != NULL)
+				justUpdate |= magnetfieldFactorAnalyser->isMagnetfieldFactorToRootEnabled();
+			prelutRangeLayerAnalyser->initPrelutRangeAnalysisToRoot(enable, name, justUpdate);
+		}
+
+#ifdef ENABLEALLWARNINGS
+
+		else {
+
+			cannotUseToRootBeforeInitializingWarningMsg* cannotUseToRootBeforeInitializing = new cannotUseToRootBeforeInitializingWarningMsg();
+			cannotUseToRootBeforeInitializing->warningMsg();
+			if(cannotUseToRootBeforeInitializing != NULL) {
+				delete cannotUseToRootBeforeInitializing;
+				cannotUseToRootBeforeInitializing = NULL;
+			}
+
+		}
+
+#endif
+
+	}
+
+}
+
+/****************************************************************
+ * This method initializes the magnetfield's display.			*
+ ****************************************************************/
+
+void analysis::initPrelutRangeAnalysisDisplay(bool enable, unsigned short displayMode) {
+
+	if (enable) {
+
+		if (momentumAnalyser != NULL) {
+
+			if (momentumAnalyser->isMomentumDisplayEnabled()) {
+
+				momentumAnalyser->initMomentumAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
+		if (projectionAnalyser != NULL) {
+
+			if (projectionAnalyser->isProjectionDisplayEnabled()) {
+
+				projectionAnalyser->initProjectionAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
+		if (magnetfieldAnalyser != NULL) {
+
+			if (magnetfieldAnalyser->isMagnetfieldDisplayEnabled()) {
+
+				magnetfieldAnalyser->initMagnetfieldAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
+		if (magnetfieldFactorAnalyser != NULL) {
+
+			if (magnetfieldFactorAnalyser->isMagnetfieldFactorDisplayEnabled()) {
+
+				magnetfieldFactorAnalyser->initMagnetfieldFactorAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
+		if (prelutRangeLayerAnalyser == NULL)
+			prelutRangeLayerAnalyser = new prelutRangeLayerAnalysis();
+
+		prelutRangeLayerAnalyser->initPrelutRangeAnalysisDisplay(enable, displayMode);
+
+	}
+	else {
+
+		if (prelutRangeLayerAnalyser != NULL) {
+
+			prelutRangeLayerAnalyser->initPrelutRangeAnalysisDisplay(enable, displayMode);
+
+			if ((!prelutRangeLayerAnalyser->isPrelutRangeAnalysisEnabled())) {
+				delete prelutRangeLayerAnalyser;
+				prelutRangeLayerAnalyser = NULL;
 			}
 
 		}
@@ -6378,7 +7420,7 @@ void analysis::initHistogramAnalysis(bool enableCreated, bool enableEncoded, boo
 
 	if ((name == NULL) || (strcmp(name, "") == 0)) {
 
-		noAnalysisMomentumOutputFileNameSpecifiedWarningMsg* noAnalysisMomentumOutputFileNameSpecified = new noAnalysisMomentumOutputFileNameSpecifiedWarningMsg();
+		noAnalysisOutputFileNameSpecifiedWarningMsg* noAnalysisMomentumOutputFileNameSpecified = new noAnalysisOutputFileNameSpecifiedWarningMsg();
 		noAnalysisMomentumOutputFileNameSpecified->warningMsg();
 		if(noAnalysisMomentumOutputFileNameSpecified != NULL) {
 			delete noAnalysisMomentumOutputFileNameSpecified;
@@ -6398,6 +7440,8 @@ void analysis::initHistogramAnalysis(bool enableCreated, bool enableEncoded, boo
 				justUpdate |= magnetfieldAnalyser->isMagnetfieldToRootEnabled();
 			if (magnetfieldFactorAnalyser != NULL)
 				justUpdate |= magnetfieldFactorAnalyser->isMagnetfieldFactorToRootEnabled();
+			if (prelutRangeLayerAnalyser != NULL)
+				justUpdate |= prelutRangeLayerAnalyser->isPrelutRangeToRootEnabled();
 			histogramAnalyser->initHistogramAnalysisToRoot(enableCreated, enableEncoded, enableFiltered, justOneCreated, justOneEncoded, justOneFiltered, name, justUpdate);
 			histogramAnalyser->initHistogramAnalysisToShow(showCreated, showEncoded, showFiltered);
 			histogramAnalyser->initHistogramLayer(layer);
@@ -6449,6 +7493,16 @@ bool analysis::isDetectorAnalysisEnabled() {
 bool analysis::isMemoryAnalysisEnabled() {
 
 	return memory;
+
+}
+
+/****************************************************************
+ * method returns true if the time-Analysis is enabled.			*
+ ****************************************************************/
+
+bool analysis::isTimeAnalysisEnabled() {
+
+	return time;
 
 }
 
@@ -6645,6 +7699,24 @@ bool analysis::isMagnetfieldFactorToRootEnabled() {
 
 	if (magnetfieldFactorAnalyser != NULL)
 		returnValue = magnetfieldFactorAnalyser->isMagnetfieldFactorToRootEnabled();
+	else
+		returnValue = false;
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * method returns true if the									*
+ * prelut-range-to-root-analysis is enabled.					*
+ ****************************************************************/
+
+bool analysis::isPrelutRangeToRootEnabled() {
+
+	bool returnValue;
+
+	if (prelutRangeLayerAnalyser != NULL)
+		returnValue = prelutRangeLayerAnalyser->isPrelutRangeToRootEnabled();
 	else
 		returnValue = false;
 
@@ -7092,6 +8164,72 @@ void analysis::magnetfieldFactorAnalysisDraw(bitArray preventDraw) {
 }
 
 /****************************************************************
+ * This method returns true if the prelut range's display		*
+ * is enabled.													*
+ ****************************************************************/
+
+bool analysis::isPrelutRangeDisplayEnabled() {
+
+	bool returnValue;
+
+	if (prelutRangeLayerAnalyser != NULL)
+		returnValue = prelutRangeLayerAnalyser->isPrelutRangeDisplayEnabled();
+	else
+		returnValue = false;
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * method updates the prelut range-Analysis display.			*
+ ****************************************************************/
+
+void analysis::prelutRangeAnalysisUpdate() {
+
+	if (prelutRangeLayerAnalyser != NULL) {
+
+		prelutRangeLayerAnalyser->prelutRangeAnalysisUpdate();
+	
+	}
+	else {
+
+		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
+		displayAnalyserNotFound->warningMsg();
+		if(displayAnalyserNotFound != NULL) {
+			delete displayAnalyserNotFound;
+			displayAnalyserNotFound = NULL;
+		}
+	
+	}
+
+}
+
+/****************************************************************
+ * method draws the prelut range-Analysis display.				*
+ ****************************************************************/
+
+void analysis::prelutRangeAnalysisDraw(bitArray preventStationDraw, bool preventStationSumDraw, bitArray preventConstraintDraw, bool preventConstraintSumDraw, bool preventRelativeDraw) {
+
+	if (prelutRangeLayerAnalyser != NULL) {
+
+		prelutRangeLayerAnalyser->prelutRangeAnalysisDraw(preventStationDraw, preventStationSumDraw, preventConstraintDraw, preventConstraintSumDraw, preventRelativeDraw);
+
+	}
+	else {
+
+		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
+		displayAnalyserNotFound->warningMsg();
+		if(displayAnalyserNotFound != NULL) {
+			delete displayAnalyserNotFound;
+			displayAnalyserNotFound = NULL;
+		}
+	
+	}
+
+}
+
+/****************************************************************
  * method writes the momentumEvent-Analysis for each event into	*
  * a root file.													*
  ****************************************************************/
@@ -7234,6 +8372,31 @@ void analysis::magnetfieldFactorAnalysisWrite(int eventNumber) {
 
 }
 
+/****************************************************************
+ * method writes the prelut range-Analysis into					*
+ * a root file.													*
+ ****************************************************************/
+
+void analysis::prelutRangeAnalysisWrite(int eventNumber) {
+
+	if (prelutRangeLayerAnalyser != NULL) {
+
+		if (prelutRangeLayerAnalyser->isPrelutRangeToRootEnabled())
+			prelutRangeLayerAnalyser->prelutRangeAnalysisWrite(eventNumber);
+
+	}
+	else {
+
+		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
+		displayAnalyserNotFound->warningMsg();
+		if(displayAnalyserNotFound != NULL) {
+			delete displayAnalyserNotFound;
+			displayAnalyserNotFound = NULL;
+		}
+	
+	}
+
+}
 /****************************************************************
  * method initializes the momentumEFGCEventAnalysis.			*
  ****************************************************************/
@@ -7805,16 +8968,52 @@ void analysis::initHardwareTracksPerColumnAnalysis(bool enable) {
 		if (hardwareAnalyser == NULL)
 			hardwareAnalyser = new hardwareAnalysis();
 
-		hardwareAnalyser->initHardwareTracksPerColumnAnalysis((*space)->getStep(DIM1), enable);
+		hardwareAnalyser->initHardwareHistogramDimensions((*space)->getStep(DIM1), (*space)->getStep(DIM2));
+		hardwareAnalyser->initHardwareTracksPerColumnAnalysis(enable);
 
 	}
 	else {
 
 		if (hardwareAnalyser != NULL) {
 
-			hardwareAnalyser->initHardwareTracksPerColumnAnalysis((*space)->getStep(DIM1), enable);
+			hardwareAnalyser->initHardwareTracksPerColumnAnalysis(enable);
 
-			if (!hardwareAnalyser->isNumberOfTracksInAllColumnsAnalysisEnabled() && !hardwareAnalyser->isNumberOfTracksInAllLayersAnalysisEnabled()) {
+			if (!hardwareAnalyser->isNumberOfTracksInAllColumnsAnalysisEnabled() && !hardwareAnalyser->isNumberOfTracksInAllColumnsAnalysisEnabled() && !hardwareAnalyser->isNumberOfTracksInAllLayersAnalysisEnabled() && !hardwareAnalyser->isHitReadoutDistributionAnalysisEnabled()) {
+				delete hardwareAnalyser;
+				hardwareAnalyser = NULL;
+			}
+
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * method initializes the hardwareTracksPerRow-Analysis.		*
+ ****************************************************************/
+
+void analysis::initHardwareTracksPerRowAnalysis(bool enable) {
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(ANALYSISLIB);
+
+	if (enable) {
+
+		if (hardwareAnalyser == NULL)
+			hardwareAnalyser = new hardwareAnalysis();
+
+		hardwareAnalyser->initHardwareHistogramDimensions((*space)->getStep(DIM1), (*space)->getStep(DIM2));
+		hardwareAnalyser->initHardwareTracksPerRowAnalysis(enable);
+
+	}
+	else {
+
+		if (hardwareAnalyser != NULL) {
+
+			hardwareAnalyser->initHardwareTracksPerRowAnalysis(enable);
+
+			if (!hardwareAnalyser->isNumberOfTracksInAllColumnsAnalysisEnabled() && !hardwareAnalyser->isNumberOfTracksInAllRowsAnalysisEnabled() && !hardwareAnalyser->isNumberOfTracksInAllLayersAnalysisEnabled() && !hardwareAnalyser->isHitReadoutDistributionAnalysisEnabled()) {
 				delete hardwareAnalyser;
 				hardwareAnalyser = NULL;
 			}
@@ -7848,7 +9047,39 @@ void analysis::initHardwareTracksPerLayerAnalysis(bool enable) {
 
 			hardwareAnalyser->initHardwareTracksPerLayerAnalysis((*tracks)->getNumberOfLayers(), enable);
 
-			if (!hardwareAnalyser->isNumberOfTracksInAllColumnsAnalysisEnabled() && !hardwareAnalyser->isNumberOfTracksInAllLayersAnalysisEnabled()) {
+			if (!hardwareAnalyser->isNumberOfTracksInAllColumnsAnalysisEnabled() && !hardwareAnalyser->isNumberOfTracksInAllRowsAnalysisEnabled() && !hardwareAnalyser->isNumberOfTracksInAllLayersAnalysisEnabled() && !hardwareAnalyser->isHitReadoutDistributionAnalysisEnabled()) {
+				delete hardwareAnalyser;
+				hardwareAnalyser = NULL;
+			}
+
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * method initializes the hardwareHistogramLayerDistribution-	*
+ * Analysis.													*
+ ****************************************************************/
+
+void analysis::initHardwareHitReadoutDistributionAnalysis(bool enable) {
+
+	if (enable) {
+
+		if (hardwareAnalyser == NULL)
+			hardwareAnalyser = new hardwareAnalysis();
+
+		hardwareAnalyser->initHardwareHitReadoutDistributionAnalysis((*tracks)->getNumberOfLayers(), enable);
+
+	}
+	else {
+
+		if (hardwareAnalyser != NULL) {
+
+			hardwareAnalyser->initHardwareHitReadoutDistributionAnalysis((*tracks)->getNumberOfLayers(), enable);
+
+			if (!hardwareAnalyser->isNumberOfTracksInAllColumnsAnalysisEnabled() && !hardwareAnalyser->isNumberOfTracksInAllRowsAnalysisEnabled() && !hardwareAnalyser->isNumberOfTracksInAllLayersAnalysisEnabled() && !hardwareAnalyser->isHitReadoutDistributionAnalysisEnabled()) {
 				delete hardwareAnalyser;
 				hardwareAnalyser = NULL;
 			}
@@ -7880,6 +9111,25 @@ bool analysis::isNumberOfTracksInAllColumnsAnalysisEnabled() {
 
 /****************************************************************
  * method returns if the analysis for the number of				*
+ * tracks in all rows of the histogram layers is				*
+ * enabled or not												*
+ ****************************************************************/
+
+bool analysis::isNumberOfTracksInAllRowsAnalysisEnabled() {
+
+	bool returnValue;
+
+	if (hardwareAnalyser != NULL)
+		returnValue = hardwareAnalyser->isNumberOfTracksInAllRowsAnalysisEnabled();
+	else
+		returnValue = false;
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * method returns if the analysis for the number of				*
  * tracks in all histogram layers is enabled or not				*
  ****************************************************************/
 
@@ -7897,21 +9147,39 @@ bool analysis::isNumberOfTracksInAllLayersAnalysisEnabled() {
 }
 
 /****************************************************************
+ * method returns if the analysis for the histogram				*
+ * layer distribution is enabled or not							*
+ ****************************************************************/
+
+bool analysis::isHitReadoutDistributionAnalysisEnabled() {
+
+	bool returnValue;
+
+	if (hardwareAnalyser != NULL)
+		returnValue = hardwareAnalyser->isHitReadoutDistributionAnalysisEnabled();
+	else
+		returnValue = false;
+
+	return returnValue;
+
+}
+
+/****************************************************************
  * This method evaluates the minimal, the maximal and			*
  * the average number of tracks in all columns of the histogram.*
  ****************************************************************/
 
-void analysis::evaluateNumberOfTracksInAllColumns() {
+void analysis::evaluateNumberOfTracksInAllColumns(std::streambuf* terminal) {
 
 	if (hardwareAnalyser != NULL)
-		hardwareAnalyser->evaluateNumberOfTracksInAllColumns(*tracks);
+		hardwareAnalyser->evaluateNumberOfTracksInAllColumns(*tracks, terminal);
 	else {
 
-		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
-		displayAnalyserNotFound->warningMsg();
-		if(displayAnalyserNotFound != NULL) {
-			delete displayAnalyserNotFound;
-			displayAnalyserNotFound = NULL;
+		hardwareAnalyserNotFoundWarningMsg* hardwareAnalyserNotFound = new hardwareAnalyserNotFoundWarningMsg();
+		hardwareAnalyserNotFound->warningMsg();
+		if(hardwareAnalyserNotFound != NULL) {
+			delete hardwareAnalyserNotFound;
+			hardwareAnalyserNotFound = NULL;
 		}
 	
 	}
@@ -7919,21 +9187,64 @@ void analysis::evaluateNumberOfTracksInAllColumns() {
 }
 
 /****************************************************************
+ * This method evaluates the minimal, the maximal and			*
+ * the average number of tracks in all rows of the histogram.	*
+ ****************************************************************/
+
+void analysis::evaluateNumberOfTracksInAllRows(std::streambuf* terminal) {
+
+	if (hardwareAnalyser != NULL)
+		hardwareAnalyser->evaluateNumberOfTracksInAllRows(*tracks, terminal);
+	else {
+
+		hardwareAnalyserNotFoundWarningMsg* hardwareAnalyserNotFound = new hardwareAnalyserNotFoundWarningMsg();
+		hardwareAnalyserNotFound->warningMsg();
+		if(hardwareAnalyserNotFound != NULL) {
+			delete hardwareAnalyserNotFound;
+			hardwareAnalyserNotFound = NULL;
+		}
+	
+	}
+
+}
+/****************************************************************
  * This method evaluates the distribution of the number of		*
  * tracks in all layers of the histogram.						*
  ****************************************************************/
 
-void analysis::evaluateNumberOfTracksInAllLayers() {
+void analysis::evaluateNumberOfTracksInAllLayers(std::streambuf* terminal) {
 
 	if (hardwareAnalyser != NULL)
-		hardwareAnalyser->evaluateNumberOfTracksInAllLayers(*tracks);
+		hardwareAnalyser->evaluateNumberOfTracksInAllLayers(*tracks, terminal);
 	else {
 
-		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
-		displayAnalyserNotFound->warningMsg();
-		if(displayAnalyserNotFound != NULL) {
-			delete displayAnalyserNotFound;
-			displayAnalyserNotFound = NULL;
+		hardwareAnalyserNotFoundWarningMsg* hardwareAnalyserNotFound = new hardwareAnalyserNotFoundWarningMsg();
+		hardwareAnalyserNotFound->warningMsg();
+		if(hardwareAnalyserNotFound != NULL) {
+			delete hardwareAnalyserNotFound;
+			hardwareAnalyserNotFound = NULL;
+		}
+	
+	}
+
+}
+
+/****************************************************************
+ * The method evaluates the distribution how often a hit must	*
+ * be inserted in a layer.										*
+ ****************************************************************/
+
+void analysis::evaluateHitReadoutDistribution(histogramData* histogram, std::streambuf* terminal) {
+
+	if (hardwareAnalyser != NULL)
+		hardwareAnalyser->evaluateHitReadoutDistribution(histogram, terminal);
+	else {
+
+		hardwareAnalyserNotFoundWarningMsg* hardwareAnalyserNotFound = new hardwareAnalyserNotFoundWarningMsg();
+		hardwareAnalyserNotFound->warningMsg();
+		if(hardwareAnalyserNotFound != NULL) {
+			delete hardwareAnalyserNotFound;
+			hardwareAnalyserNotFound = NULL;
 		}
 	
 	}
@@ -7958,7 +9269,7 @@ void analysis::showNumberOfTracksInAllColumns() {
 				numberOfMinimalTracksInAllColumns = NULL;
 			}
 
-			numberOfAverageTracksInAllColumnsWarningMsg* numberOfAverageTracksInAllColumns = new numberOfAverageTracksInAllColumnsWarningMsg(hardwareAnalyser->getAverageNumberOfTracksInAllColumnsDistribution(), hardwareAnalyser->getNumberOfTracksInAllColumnEntries(), hardwareAnalyser->getNumberOfColumnAnaylsis());
+			numberOfAverageTracksInAllColumnsWarningMsg* numberOfAverageTracksInAllColumns = new numberOfAverageTracksInAllColumnsWarningMsg(hardwareAnalyser->getAverageNumberOfTracksInAllColumnsDistribution(), hardwareAnalyser->getNumberOfTracksInAllColumnEntries(), hardwareAnalyser->getNumberOfColumnAnalysis());
 			numberOfAverageTracksInAllColumns->warningMsg();
 			if(numberOfAverageTracksInAllColumns != NULL) {
 				delete numberOfAverageTracksInAllColumns;
@@ -7972,11 +9283,15 @@ void analysis::showNumberOfTracksInAllColumns() {
 				numberOfMaximalTracksInAllColumns = NULL;
 			}
 
-			sizeOfSeparatorFifosWarningMsg* sizeOfSeparatorFifos = new sizeOfSeparatorFifosWarningMsg(hardwareAnalyser->getMaximalNumberOfTracksInAllColumnsDistribution(), hardwareAnalyser->getNumberOfTracksInAllColumnEntries());
-			sizeOfSeparatorFifos->warningMsg();
-			if(sizeOfSeparatorFifos != NULL) {
-				delete sizeOfSeparatorFifos;
-				sizeOfSeparatorFifos = NULL;
+		}
+
+		if (analysisResultWarnings & FIFOSPERCOLUMNDISTRIBUTION) {
+
+			sizeOfColumnSeparatorFifosWarningMsg* sizeOfColumnSeparatorFifos = new sizeOfColumnSeparatorFifosWarningMsg(hardwareAnalyser->getNumberOfFifoSizesInAllColumnsDistribution(), hardwareAnalyser->getNumberOfTracksInAllColumnEntries());
+			sizeOfColumnSeparatorFifos->warningMsg();
+			if(sizeOfColumnSeparatorFifos != NULL) {
+				delete sizeOfColumnSeparatorFifos;
+				sizeOfColumnSeparatorFifos = NULL;
 			}
 
 		}
@@ -7986,20 +9301,104 @@ void analysis::showNumberOfTracksInAllColumns() {
 			initializeShowAnalysis();
 
 			showAnalyser->addMinimalTrackColumnDistribution(hardwareAnalyser->getMinimalNumberOfTracksInAllColumnsDistribution(), hardwareAnalyser->getNumberOfTracksInAllColumnEntries());
-			showAnalyser->addAverageTrackColumnDistribution(hardwareAnalyser->getAverageNumberOfTracksInAllColumnsDistribution(), hardwareAnalyser->getNumberOfTracksInAllColumnEntries(), hardwareAnalyser->getNumberOfColumnAnaylsis());
+			showAnalyser->addAverageTrackColumnDistribution(hardwareAnalyser->getAverageNumberOfTracksInAllColumnsDistribution(), hardwareAnalyser->getNumberOfTracksInAllColumnEntries(), hardwareAnalyser->getNumberOfColumnAnalysis());
 			showAnalyser->addMaximalTrackColumnDistribution(hardwareAnalyser->getMaximalNumberOfTracksInAllColumnsDistribution(), hardwareAnalyser->getNumberOfTracksInAllColumnEntries());
-			showAnalyser->addFifoForColumnDistribution(hardwareAnalyser->getMaximalNumberOfTracksInAllColumnsDistribution(), hardwareAnalyser->getNumberOfTracksInAllColumnEntries());
+
+		}
+
+		if (analysisResultDisplays & FIFOSPERCOLUMNDISTRIBUTION) {
+
+			initializeShowAnalysis();
+
+			showAnalyser->addFifoForColumnDistribution(hardwareAnalyser->getNumberOfFifoSizesInAllColumnsDistribution(), hardwareAnalyser->getNumberOfTracksInAllColumnEntries());
 
 		}
 
 	}
 	else {
 
-		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
-		displayAnalyserNotFound->warningMsg();
-		if(displayAnalyserNotFound != NULL) {
-			delete displayAnalyserNotFound;
-			displayAnalyserNotFound = NULL;
+		hardwareAnalyserNotFoundWarningMsg* hardwareAnalyserNotFound = new hardwareAnalyserNotFoundWarningMsg();
+		hardwareAnalyserNotFound->warningMsg();
+		if(hardwareAnalyserNotFound != NULL) {
+			delete hardwareAnalyserNotFound;
+			hardwareAnalyserNotFound = NULL;
+		}
+	
+	}
+
+}
+
+/****************************************************************
+ * This method shows the minimal, the maximal and				*
+ * the average number of tracks in all rows of the histogram.	*
+ ****************************************************************/
+
+void analysis::showNumberOfTracksInAllRows() {
+
+	if (hardwareAnalyser != NULL) {
+
+		if (analysisResultWarnings & TRACKSPERROWDISTRIBUTION) {
+
+			numberOfMinimalTracksInAllRowsWarningMsg* numberOfMinimalTracksInAllRows = new numberOfMinimalTracksInAllRowsWarningMsg(hardwareAnalyser->getMinimalNumberOfTracksInAllRowsDistribution(), hardwareAnalyser->getNumberOfTracksInAllRowEntries());
+			numberOfMinimalTracksInAllRows->warningMsg();
+			if(numberOfMinimalTracksInAllRows != NULL) {
+				delete numberOfMinimalTracksInAllRows;
+				numberOfMinimalTracksInAllRows = NULL;
+			}
+
+			numberOfAverageTracksInAllRowsWarningMsg* numberOfAverageTracksInAllRows = new numberOfAverageTracksInAllRowsWarningMsg(hardwareAnalyser->getAverageNumberOfTracksInAllRowsDistribution(), hardwareAnalyser->getNumberOfTracksInAllRowEntries(), hardwareAnalyser->getNumberOfRowAnalysis());
+			numberOfAverageTracksInAllRows->warningMsg();
+			if(numberOfAverageTracksInAllRows != NULL) {
+				delete numberOfAverageTracksInAllRows;
+				numberOfAverageTracksInAllRows = NULL;
+			}
+
+			numberOfMaximalTracksInAllRowsWarningMsg* numberOfMaximalTracksInAllRows = new numberOfMaximalTracksInAllRowsWarningMsg(hardwareAnalyser->getMaximalNumberOfTracksInAllRowsDistribution(), hardwareAnalyser->getNumberOfTracksInAllRowEntries());
+			numberOfMaximalTracksInAllRows->warningMsg();
+			if(numberOfMaximalTracksInAllRows != NULL) {
+				delete numberOfMaximalTracksInAllRows;
+				numberOfMaximalTracksInAllRows = NULL;
+			}
+
+		}
+
+		if (analysisResultWarnings & FIFOSPERROWDISTRIBUTION) {
+
+			sizeOfRowSeparatorFifosWarningMsg* sizeOfRowSeparatorFifos = new sizeOfRowSeparatorFifosWarningMsg(hardwareAnalyser->getNumberOfFifoSizesInAllRowsDistribution(), hardwareAnalyser->getNumberOfTracksInAllRowEntries());
+			sizeOfRowSeparatorFifos->warningMsg();
+			if(sizeOfRowSeparatorFifos != NULL) {
+				delete sizeOfRowSeparatorFifos;
+				sizeOfRowSeparatorFifos = NULL;
+			}
+
+		}
+
+		if (analysisResultDisplays & TRACKSPERROWDISTRIBUTION) {
+
+			initializeShowAnalysis();
+
+			showAnalyser->addMinimalTrackRowDistribution(hardwareAnalyser->getMinimalNumberOfTracksInAllRowsDistribution(), hardwareAnalyser->getNumberOfTracksInAllRowEntries());
+			showAnalyser->addAverageTrackRowDistribution(hardwareAnalyser->getAverageNumberOfTracksInAllRowsDistribution(), hardwareAnalyser->getNumberOfTracksInAllRowEntries(), hardwareAnalyser->getNumberOfRowAnalysis());
+			showAnalyser->addMaximalTrackRowDistribution(hardwareAnalyser->getMaximalNumberOfTracksInAllRowsDistribution(), hardwareAnalyser->getNumberOfTracksInAllRowEntries());
+
+		}
+
+		if (analysisResultDisplays & FIFOSPERROWDISTRIBUTION) {
+
+			initializeShowAnalysis();
+
+			showAnalyser->addFifoForRowDistribution(hardwareAnalyser->getNumberOfFifoSizesInAllRowsDistribution(), hardwareAnalyser->getNumberOfTracksInAllRowEntries());
+
+		}
+
+	}
+	else {
+
+		hardwareAnalyserNotFoundWarningMsg* hardwareAnalyserNotFound = new hardwareAnalyserNotFoundWarningMsg();
+		hardwareAnalyserNotFound->warningMsg();
+		if(hardwareAnalyserNotFound != NULL) {
+			delete hardwareAnalyserNotFound;
+			hardwareAnalyserNotFound = NULL;
 		}
 	
 	}
@@ -8017,14 +9416,14 @@ void analysis::showNumberOfTracksInAllLayers() {
 
 		if (analysisResultWarnings & TRACKSPERLAYERDISTRIBUTION) {
 
-			numberOfTracksInAllLayersWarningMsg* numberOfTracksInAllLayers = new numberOfTracksInAllLayersWarningMsg(hardwareAnalyser->getNumberOfTracksPerLayerDistribution(), hardwareAnalyser->getNumberOfTracksInAllLayersEntries(), hardwareAnalyser->getNumberOfLayerAnaylsis());
+			numberOfTracksInAllLayersWarningMsg* numberOfTracksInAllLayers = new numberOfTracksInAllLayersWarningMsg(hardwareAnalyser->getNumberOfTracksPerLayerDistribution(), hardwareAnalyser->getNumberOfTracksInAllLayersEntries(), hardwareAnalyser->getNumberOfLayerAnalysis());
 			numberOfTracksInAllLayers->warningMsg();
 			if(numberOfTracksInAllLayers != NULL) {
 				delete numberOfTracksInAllLayers;
 				numberOfTracksInAllLayers = NULL;
 			}
 
-			numberOfTrackDensitiesInAllLayersWarningMsg* numberOfTrackDensitiesInAllLayers = new numberOfTrackDensitiesInAllLayersWarningMsg(hardwareAnalyser->getNumberOfTrackDensitiesPerLayerDistribution(), hardwareAnalyser->getNumberOfTracksInAllLayersEntries(), hardwareAnalyser->getNumberOfLayerAnaylsis());
+			numberOfTrackDensitiesInAllLayersWarningMsg* numberOfTrackDensitiesInAllLayers = new numberOfTrackDensitiesInAllLayersWarningMsg(hardwareAnalyser->getNumberOfTrackDensitiesPerLayerDistribution(), hardwareAnalyser->getNumberOfTracksInAllLayersEntries(), hardwareAnalyser->getNumberOfLayerAnalysis());
 			numberOfTrackDensitiesInAllLayers->warningMsg();
 			if(numberOfTrackDensitiesInAllLayers != NULL) {
 				delete numberOfTrackDensitiesInAllLayers;
@@ -8037,19 +9436,105 @@ void analysis::showNumberOfTracksInAllLayers() {
 
 			initializeShowAnalysis();
 
-			showAnalyser->addTrackLayerDistribution(hardwareAnalyser->getNumberOfTracksPerLayerDistribution(), hardwareAnalyser->getNumberOfTracksInAllLayersEntries(), hardwareAnalyser->getNumberOfLayerAnaylsis());
-			showAnalyser->addTrackDensityLayerDistribution(hardwareAnalyser->getNumberOfTrackDensitiesPerLayerDistribution(), hardwareAnalyser->getNumberOfTracksInAllLayersEntries(), hardwareAnalyser->getNumberOfLayerAnaylsis());
+			showAnalyser->addTrackLayerDistribution(hardwareAnalyser->getNumberOfTracksPerLayerDistribution(), hardwareAnalyser->getNumberOfTracksInAllLayersEntries(), hardwareAnalyser->getNumberOfLayerAnalysis());
+			showAnalyser->addTrackDensityLayerDistribution(hardwareAnalyser->getNumberOfTrackDensitiesPerLayerDistribution(), hardwareAnalyser->getNumberOfTracksInAllLayersEntries(), hardwareAnalyser->getNumberOfLayerAnalysis());
 
 		}
 
 	}
 	else {
 
-		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
-		displayAnalyserNotFound->warningMsg();
-		if(displayAnalyserNotFound != NULL) {
-			delete displayAnalyserNotFound;
-			displayAnalyserNotFound = NULL;
+		hardwareAnalyserNotFoundWarningMsg* hardwareAnalyserNotFound = new hardwareAnalyserNotFoundWarningMsg();
+		hardwareAnalyserNotFound->warningMsg();
+		if(hardwareAnalyserNotFound != NULL) {
+			delete hardwareAnalyserNotFound;
+			hardwareAnalyserNotFound = NULL;
+		}
+	
+	}
+
+}
+
+/****************************************************************
+ * This method shows the distribution of the histogram			*
+ * layers for the hits.											*
+ ****************************************************************/
+
+void analysis::showHitReadoutDistribution(bool readoutColumnsInParallel) {
+
+	if (hardwareAnalyser != NULL) {
+
+		if (analysisResultWarnings & HITREADOUTDISTRIBUTION) {
+
+			hitReadoutDistributionWarningMsg* hitReadoutDistribution = new hitReadoutDistributionWarningMsg(hardwareAnalyser->getHitReadoutDistribution(), hardwareAnalyser->getNumberOfHitReadoutDistributionEntries(), hardwareAnalyser->getNumberOfHitReadoutDistributionAnalysis());
+			hitReadoutDistribution->warningMsg();
+			if(hitReadoutDistribution != NULL) {
+				delete hitReadoutDistribution;
+				hitReadoutDistribution = NULL;
+			}
+
+		}
+
+		if (analysisResultWarnings & HITREADOUTMEANDISTRIBUTION) {
+
+			hitReadoutMeanDistributionWarningMsg* hitReadoutMeanDistribution = new hitReadoutMeanDistributionWarningMsg(hardwareAnalyser->getHitReadoutDistribution(), hardwareAnalyser->getNumberOfHitReadoutDistributionEntries(), hardwareAnalyser->getNumberOfHitReadoutDistributionAnalysis());
+			hitReadoutMeanDistribution->warningMsg();
+			if(hitReadoutMeanDistribution != NULL) {
+				delete hitReadoutMeanDistribution;
+				hitReadoutMeanDistribution = NULL;
+			}
+
+		}
+
+		if (analysisResultWarnings & FPGAHISTOGRAMPROCESSINGTIMING) {
+
+			if ((space == NULL) || (*space == NULL))
+				throw cannotAccessHistogramSpaceError(ANALYSISLIB);
+
+			fpgaHistogramProcessingTimeDistributionWarningMsg* fpgaHistogramProcessingTimeDistribution = new fpgaHistogramProcessingTimeDistributionWarningMsg(hardwareAnalyser->getHitReadoutDistribution(), hardwareAnalyser->getNumberOfHitReadoutDistributionEntries(), hardwareAnalyser->getNumberOfHitReadoutDistributionAnalysis(), readoutColumnsInParallel, (*space)->getStep(DIM1), (*space)->getStep(DIM2));
+			fpgaHistogramProcessingTimeDistribution->warningMsg();
+			if(fpgaHistogramProcessingTimeDistribution != NULL) {
+				delete fpgaHistogramProcessingTimeDistribution;
+				fpgaHistogramProcessingTimeDistribution = NULL;
+			}
+
+		}
+
+		if (analysisResultDisplays & HITREADOUTDISTRIBUTION) {
+
+			initializeShowAnalysis();
+
+			showAnalyser->addHitReadoutDistribution(hardwareAnalyser->getHitReadoutDistribution(), hardwareAnalyser->getNumberOfHitReadoutDistributionEntries(), hardwareAnalyser->getNumberOfHitReadoutDistributionAnalysis());
+
+		}
+
+		if (analysisResultDisplays & HITREADOUTMEANDISTRIBUTION) {
+
+			initializeShowAnalysis();
+
+			showAnalyser->addHitReadoutMeanDistribution(hardwareAnalyser->getHitReadoutDistribution(), hardwareAnalyser->getNumberOfHitReadoutDistributionEntries(), hardwareAnalyser->getNumberOfHitReadoutDistributionAnalysis());
+
+		}
+
+		if (analysisResultDisplays & FPGAHISTOGRAMPROCESSINGTIMING) {
+
+			if ((space == NULL) || (*space == NULL))
+				throw cannotAccessHistogramSpaceError(ANALYSISLIB);
+
+			initializeShowAnalysis();
+
+			showAnalyser->addFpgaHistogramProcessingTimeDistribution(hardwareAnalyser->getHitReadoutDistribution(), hardwareAnalyser->getNumberOfHitReadoutDistributionEntries(), hardwareAnalyser->getNumberOfHitReadoutDistributionAnalysis(), readoutColumnsInParallel, (*space)->getStep(DIM1), (*space)->getStep(DIM2));
+
+		}
+
+	}
+	else {
+
+		hardwareAnalyserNotFoundWarningMsg* hardwareAnalyserNotFound = new hardwareAnalyserNotFoundWarningMsg();
+		hardwareAnalyserNotFound->warningMsg();
+		if(hardwareAnalyserNotFound != NULL) {
+			delete hardwareAnalyserNotFound;
+			hardwareAnalyserNotFound = NULL;
 		}
 	
 	}
@@ -8206,22 +9691,25 @@ void analysis::printTotalAnalysis() {
 
 void analysis::displayTotalAnalysis() {
 
-	initializeTotalAnalysis();
-	initializeShowAnalysis();
-
 	if (analysisResultDisplays & LUTCORRECTIONCOUNTER) {
 
+		initializeShowAnalysis();
+	
 		showAnalyser->addDistribution((double*)correctionCounterSteps, (double*)correctionCounterValues, numberOfCorrectionCounters, CORRECTIONCOUNTERNAME, CORRECTIONCOUNTERTITLE, CORRECTIONCOUNTERXAXITITLE, CORRECTIONCOUNTERYAXITITLE);
 
 	}
 
 	if (analysisResultDisplays & NUMBEROFTRACKSWHICHCANNOTBEFOUND) {
 
+		initializeShowAnalysis();
+
 		showAnalyser->addDistribution((double*)tracksWhichAreNotFindableSteps, (double*)tracksWhichAreNotFindableValues, numberOfTracksWhichArenotFindable, NOTFINDABLETRACKSNAME, NOTFINDABLETRACKSTITLE, NOTFINDABLETRACKSXAXITITLE, NOTFINDABLETRACKSYAXITITLE);
 	
 	}
 
 	if (analysisResultDisplays & GOODSIGNATURES) {
+
+		initializeShowAnalysis();
 
 		showAnalyser->addDistribution((double*)tracksWithAGoodPrelutSignatureSteps, (double*)tracksWithAGoodPrelutSignatureValues, numberOfTracksWithAGoodPrelutSignature, TRACKSWITHGOODPRELUTSIGNATURENAME, TRACKSWITHGOODPRELUTSIGNATURETITLE, TRACKSWITHGOODPRELUTSIGNATUREXAXITITLE, TRACKSWITHGOODPRELUTSIGNATUREYAXITITLE);
 		showAnalyser->addDistribution((double*)tracksWithAGoodLutSignatureSteps, (double*)tracksWithAGoodLutSignatureValues, numberOfTracksWithAGoodLutSignature, TRACKSWITHGOODLUTSIGNATURENAME, TRACKSWITHGOODLUTSIGNATURETITLE, TRACKSWITHGOODLUTSIGNATUREXAXITITLE, TRACKSWITHGOODLUTSIGNATUREYAXITITLE);
@@ -8233,9 +9721,13 @@ void analysis::displayTotalAnalysis() {
 	if (analysisResultDisplays & GOODSIGNATURETABLES) {
 
 		initializeShowAnalysis();
+		
+		if (totalAnalyser != NULL) {
 
-		showAnalyser->addTable(totalAnalyser->getGoodPrelutSignatureTable(), GOODPRELUTSIGNATURETABLENAME, GOODPRELUTSIGNATURETABLETITLE, GOODPRELUTSIGNATURETABLEXAXITITLE, GOODPRELUTSIGNATURETABLEYAXITITLE);
-		showAnalyser->addTable(totalAnalyser->getGoodLutSignatureTable(), GOODLUTSIGNATURETABLENAME, GOODLUTSIGNATURETABLETITLE, GOODLUTSIGNATURETABLEXAXITITLE, GOODLUTSIGNATURETABLEYAXITITLE);
+			showAnalyser->addTable(totalAnalyser->getGoodPrelutSignatureTable(), GOODPRELUTSIGNATURETABLENAME, GOODPRELUTSIGNATURETABLETITLE, GOODPRELUTSIGNATURETABLEXAXITITLE, GOODPRELUTSIGNATURETABLEYAXITITLE);
+			showAnalyser->addTable(totalAnalyser->getGoodLutSignatureTable(), GOODLUTSIGNATURETABLENAME, GOODLUTSIGNATURETABLETITLE, GOODLUTSIGNATURETABLEXAXITITLE, GOODLUTSIGNATURETABLEYAXITITLE);
+
+		}
 
 	}
 
@@ -8243,9 +9735,16 @@ void analysis::displayTotalAnalysis() {
 
 		initializeShowAnalysis();
 
-		showAnalyser->addTable((*ratings)->getCodingTable(), CODINGTABLENAME, CODINGTABLETITLE, CODINGTABLEXAXITITLE, CODINGTABLEYAXITITLE);
-		showAnalyser->addTable((*ratings)->getGradingPTable(), GRADINGPTABLENAME, GRADINGPTABLETITLE, GRADINGPTABLEXAXITITLE, GRADINGPTABLEYAXITITLE);
-		showAnalyser->addTable((*ratings)->getGradingRTable(), GRADINGRTABLENAME, GRADINGRTABLETITLE, GRADINGRTABLEXAXITITLE, GRADINGRTABLEYAXITITLE);
+
+		if ((ratings != NULL) && (*ratings != NULL)) {
+
+			showAnalyser->addTable((*ratings)->getCodingTable(), CODINGTABLENAME, CODINGTABLETITLE, CODINGTABLEXAXITITLE, CODINGTABLEYAXITITLE);
+			showAnalyser->addTable((*ratings)->getGradingPTable(), GRADINGPTABLENAME, GRADINGPTABLETITLE, GRADINGPTABLEXAXITITLE, GRADINGPTABLEYAXITITLE);
+			showAnalyser->addTable((*ratings)->getGradingRTable(), GRADINGRTABLENAME, GRADINGRTABLETITLE, GRADINGRTABLEXAXITITLE, GRADINGRTABLEYAXITITLE);
+
+		}
+		else
+			throw cannotAccessTablesError(ANALYSISLIB);
 
 	}
 
@@ -8260,6 +9759,354 @@ void analysis::displayTotalAnalysis() {
 		}
 
 	}
+
+}
+
+/****************************************************************
+ * method returns true if the MCTrack distribution-Analysis is	*
+ * enabled.														*
+ ****************************************************************/
+
+bool analysis::isMCTrackVisualizationAnalysisEnabled() {
+
+	return ((analysisMoreResultDisplays & MCTRACKVISUALIZATION) | (analysisMoreResultWarnings & MCTRACKVISUALIZATION));
+
+}
+
+/****************************************************************
+ * This method displays all MCTracks with corresponding hits.	*
+ ****************************************************************/
+
+std::string analysis::displayMCTracks(int trackIndex) {
+
+	std::string            returnValue;
+	trackfinderInputHit**  actualDisplayTrack;
+	unsigned int           j;
+	trackfinderInputTrack* track;
+	trackfinderInputHit*   hit;
+	double                 timeOfFlight;
+
+	if (eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+	if (*eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+
+	returnValue.clear();
+
+	/* allocate memory for one hit per detector station */
+	actualDisplayTrack = (trackfinderInputHit**)calloc((*eventData)->getNumberOfStations(), sizeof(trackfinderInputHit*));
+	if (actualDisplayTrack == NULL)
+		throw memoryAllocationError(ANALYSISLIB);
+
+	/* initialize visual analysis object */
+	if (analysisMoreResultDisplays & MCTRACKVISUALIZATION) {
+	
+		if (mcTrackVisualAnalyser == NULL) {
+
+			mcTrackVisualAnalyser = new visualAnalysis();
+			if (mcTrackVisualAnalyser == NULL)
+				throw memoryAllocationError(ANALYSISLIB);
+
+		}
+		else {
+
+			mcTrackVisualAnalyser->reset();
+
+		}
+
+	}
+
+	for (int i = 0; i < (*eventData)->getNumberOfTracks(); i++) {
+
+		track = (*eventData)->getTrackByOrder(i);
+		if (track == NULL)
+			throw cannotAccessTrackDataError(ANALYSISLIB);
+
+		if ((trackIndex != INVALIDTRACKINDEX) && (trackIndex != track->getTrackIndex()))
+			continue;
+
+		/* reset the hit pointers for the actual track which should be displayed */
+		for (j = 0; j < (*eventData)->getNumberOfStations(); j++)
+			actualDisplayTrack[j] = NULL;
+
+		track->resetHitPointer();
+		for (int k = 0; k < track->getNumberOfHits(); k++) {
+
+			hit = track->getHit();
+			if (hit == NULL)
+				throw cannotAccessHitsOrTracksError(ANALYSISLIB);
+
+			if (hit->getStation() != NULL) {
+
+				if (actualDisplayTrack[hit->getStation()->getIndex()] == NULL) {
+					
+					actualDisplayTrack[hit->getStation()->getIndex()] = hit;
+
+				}
+
+			}
+
+		}
+
+		/* add the actual track to the display */
+		if (analysisMoreResultDisplays & MCTRACKVISUALIZATION) {
+
+			if ((trackIndex == INVALIDTRACKINDEX) || (trackIndex == track->getTrackIndex())) {
+
+				mcTrackVisualAnalyser->addActualTrack(track->getTrackIndex(), track->getMomX(), track->getMomY(), track->getMomZ(), -1, -1, -1, track->getPdgCode());
+			
+				for (j = 0; j < (*eventData)->getNumberOfStations(); j++) {
+
+					if (actualDisplayTrack[j] != NULL) {
+
+						if (actualDisplayTrack[j]->getPoint() != NULL)
+							timeOfFlight = actualDisplayTrack[j]->getPoint()->GetTime();
+						else
+							timeOfFlight = -1;
+
+						mcTrackVisualAnalyser->addPointToActualTrack(actualDisplayTrack[j]->getHit()->GetX(), actualDisplayTrack[j]->getHit()->GetY(), actualDisplayTrack[j]->getHit()->GetZ(), timeOfFlight, actualDisplayTrack[j]->getHitIndex());
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+	/* convert visual analysis object to string */
+	if (analysisMoreResultWarnings & MCTRACKVISUALIZATION) {
+
+		returnValue = mcTrackVisualAnalyser->toString("MCTrack Visualization", trackIndex);
+
+	}
+	/* draw visual analysis object */
+	if (analysisMoreResultDisplays & MCTRACKVISUALIZATION) {
+
+		mcTrackVisualAnalyser->setupVolumeVisibility((std::string*)volumes, numberOfVolumes);
+		mcTrackVisualAnalyser->drawSetup("mcTrackVisualization", "MCTrack Visualization", trackIndex);
+
+	}
+
+	if (actualDisplayTrack != NULL) {
+		free(actualDisplayTrack);
+		actualDisplayTrack = NULL;
+	}
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * method returns true if the found track distribution-Analysis	*
+ * is enabled.													*
+ ****************************************************************/
+
+bool analysis::isFoundTrackVisualizationAnalysisEnabled() {
+
+	return ((analysisMoreResultDisplays & FOUNDTRACKVISUALIZATION) | (analysisMoreResultWarnings & FOUNDTRACKVISUALIZATION));
+
+}
+
+/****************************************************************
+ * This method displays all found tracks with corresponding		*
+ * hits.														*
+ ****************************************************************/
+
+std::string analysis::displayFoundTracks(int trackIndex) {
+
+	std::string                 returnValue;
+	trackfinderInputHit**       actualDisplayTrack;
+	unsigned int                j;
+	trackDigitalInformation     hitInfo;
+	trackfinderInputHit*        hit;
+	trackHitMem                 possibleTrack;
+	specialListMem<trackHitMem> possibleTracks;
+	bool                        acceptDisplay;
+	trackMomentum               momentum;
+	analyticFormula             formula;
+	double                      timeOfFlight;
+
+	if (tracks == NULL)
+		throw cannotAccessTrackDataError(ANALYSISLIB);
+	if (*tracks == NULL)
+		throw cannotAccessTrackDataError(ANALYSISLIB);
+	if (eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+	if (*eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(ANALYSISLIB);
+
+	returnValue.clear();
+
+	/* allocate memory for one hit per detector station */
+	actualDisplayTrack = (trackfinderInputHit**)calloc((*eventData)->getNumberOfStations(), sizeof(trackfinderInputHit*));
+	if (actualDisplayTrack == NULL)
+		throw memoryAllocationError(ANALYSISLIB);
+
+	/* initialize visual analysis object */
+	if (analysisMoreResultDisplays & FOUNDTRACKVISUALIZATION) {
+	
+		if (foundTrackVisualAnalyser == NULL) {
+
+			foundTrackVisualAnalyser = new visualAnalysis();
+			if (foundTrackVisualAnalyser == NULL)
+				throw memoryAllocationError(ANALYSISLIB);
+
+		}
+		else {
+
+			foundTrackVisualAnalyser->reset();
+
+		}
+
+	}
+
+
+	/* loop over all found tracks */
+	(*tracks)->resetActiveObject();
+	for (unsigned short i = 0; i < (*tracks)->getNumberOfTracks(); i++) {
+
+		/* reset the hit pointers for the actual track which should be displayed */
+		for (j = 0; j < (*eventData)->getNumberOfStations(); j++)
+			actualDisplayTrack[j] = NULL;
+
+		/* read the actual hit distribution */
+		(*tracks)->getNextTrackDigitalInfo(&hitInfo);
+
+		/* reset the distribution evaluation object and build the evaluation */
+		possibleTracks.clear();
+		for (unsigned short k = 0; k < hitInfo.hits.getNumberOfMemories(); k++) {
+
+			hitInfo.hits[k].resetActiveObject();
+			for (unsigned short l = 0; l < hitInfo.hits[k].getNumberOfEntries(); l++) {
+				
+				hit = hitInfo.hits[k].readActiveObjectAndMakeNextOneActive();
+
+				possibleTrack.removeAllHits();
+				possibleTrack.addHit(hit);
+
+				if (possibleTracks.isFound(possibleTrack, true))		/* track is old track */
+					possibleTracks.getActiveObject()->addHit(hit);
+				else													/* track not found, so add it; fakes have no track => they are always not found */
+					possibleTracks.push(possibleTrack);
+
+			}
+
+		}
+
+		/* sort the evaluation to have the highest prior object at the beginning*/
+		possibleTracks.sort();
+		possibleTracks.resetActiveObject();
+
+		/* add the highest prior object hits to the display track */
+		possibleTrack = possibleTracks.readActiveObjectAndMakeNextOneActive();
+		possibleTrack.resetHitPointer();
+		for (unsigned long m = 0; m < possibleTrack.getNumberOfHits(); m++) {
+				
+			hit = possibleTrack.getHitAndMakeNextActive();
+			if (hit->getStation() != NULL)
+				actualDisplayTrack[hit->getStation()->getIndex()] = hit;
+				
+		}
+
+		/* fill the missing hit positions with pointers from less prior objects */
+		for (unsigned long n = 1; n < possibleTracks.getNumberOfEntries(); n++) {
+
+			possibleTrack = possibleTracks.readActiveObjectAndMakeNextOneActive();
+
+			possibleTrack.resetHitPointer();
+			for (unsigned long o = 0; o < possibleTrack.getNumberOfHits(); o++) {
+				
+				hit = possibleTrack.getHitAndMakeNextActive();
+				if (hit->getStation() != NULL) {
+
+					if (actualDisplayTrack[hit->getStation()->getIndex()] == NULL) {
+					
+						actualDisplayTrack[hit->getStation()->getIndex()] = hit;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		/* avoid the drawing of objects which corresponds not the given trackIndex */
+		acceptDisplay = false;
+		for (j = 0; j < (*eventData)->getNumberOfStations(); j++) {
+
+			if (actualDisplayTrack[j] != NULL) {
+
+				if (actualDisplayTrack[j]->getTrack() != NULL) {
+
+					if ((trackIndex == INVALIDTRACKINDEX) || (trackIndex == actualDisplayTrack[j]->getTrack()->getTrackIndex())) {
+			
+						acceptDisplay = true;
+						break;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		/* add the actual track to the display */
+		if (acceptDisplay) {
+
+			if (analysisMoreResultDisplays & FOUNDTRACKVISUALIZATION) {
+
+				formula.evaluateP(hitInfo.position, *(*space), &momentum);
+				foundTrackVisualAnalyser->addActualTrack(trackIndex, momentum.get(PX), momentum.get(PY), momentum.get(PZ), hitInfo.position.get(DIM1), hitInfo.position.get(DIM2), hitInfo.position.get(DIM3));
+			
+				for (j = 0; j < (*eventData)->getNumberOfStations(); j++) {
+
+					if (actualDisplayTrack[j] != NULL) {
+
+						if (actualDisplayTrack[j]->getPoint() != NULL)
+							timeOfFlight = actualDisplayTrack[j]->getPoint()->GetTime();
+						else
+							timeOfFlight = -1;
+
+						foundTrackVisualAnalyser->addPointToActualTrack(actualDisplayTrack[j]->getHit()->GetX(), actualDisplayTrack[j]->getHit()->GetY(), actualDisplayTrack[j]->getHit()->GetZ(), timeOfFlight, actualDisplayTrack[j]->getHitIndex());
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+	/* convert visual analysis object to string */
+	if (analysisMoreResultWarnings & FOUNDTRACKVISUALIZATION) {
+
+		returnValue = foundTrackVisualAnalyser->toString("Found Track Visualization", trackIndex);
+
+	}
+	/* draw visual analysis object */
+	if (analysisMoreResultDisplays & FOUNDTRACKVISUALIZATION) {
+
+		foundTrackVisualAnalyser->setupVolumeVisibility((std::string*)volumes, numberOfVolumes);
+		foundTrackVisualAnalyser->drawSetup("foundTrackVisualization", "Found Track Visualization", trackIndex);
+
+	}
+
+	if (actualDisplayTrack != NULL) {
+		free(actualDisplayTrack);
+		actualDisplayTrack = NULL;
+	}
+
+	return returnValue;
 
 }
 
@@ -8282,5 +10129,980 @@ unsigned short analysis::getPercentageOfHitsInSignature() {
 unsigned short analysis::getPercentageOfTracksForSignature() {
 
 	return percentageOfTracksForSignature;
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for creating	*
+ * the border objects.											*
+ ****************************************************************/
+
+void analysis::borderCreationTimerReset() {
+
+	if (isTimeAnalysisEnabled() && (borderCreationTimer == NULL))
+		borderCreationTimer = new TStopwatch();
+
+	if (borderCreationTimer != NULL)
+		borderCreationTimer->Reset();
+
+}
+void analysis::borderCreationTimerStart(bool reset) {
+
+	if (isTimeAnalysisEnabled() && (borderCreationTimer == NULL))
+		borderCreationTimer = new TStopwatch();
+
+	if (borderCreationTimer != NULL)
+		borderCreationTimer->Start(reset);
+
+}
+void analysis::borderCreationTimerStop() {
+
+	if (isTimeAnalysisEnabled() && (borderCreationTimer == NULL))
+		borderCreationTimer = new TStopwatch();
+
+	if (borderCreationTimer != NULL)
+		borderCreationTimer->Stop();
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for creating	*
+ * the histogram layers.										*
+ ****************************************************************/
+
+void analysis::histogramCreationTimerReset() {
+
+	if (isTimeAnalysisEnabled() && (histogramCreationTimer == NULL))
+		histogramCreationTimer = new TStopwatch();
+
+	if (histogramCreationTimer != NULL)
+		histogramCreationTimer->Reset();
+
+}
+void analysis::histogramCreationTimerStart(bool reset) {
+
+	if (isTimeAnalysisEnabled() && (histogramCreationTimer == NULL))
+		histogramCreationTimer = new TStopwatch();
+
+	if (histogramCreationTimer != NULL)
+		histogramCreationTimer->Start(reset);
+
+}
+void analysis::histogramCreationTimerStop() {
+
+	if (isTimeAnalysisEnabled() && (histogramCreationTimer == NULL))
+		histogramCreationTimer = new TStopwatch();
+
+	if (histogramCreationTimer != NULL)
+		histogramCreationTimer->Stop();
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for encoding	*
+ * the histogram layers.										*
+ ****************************************************************/
+
+void analysis::histogramEncodingTimerReset() {
+
+	if (isTimeAnalysisEnabled() && (histogramEncodingTimer == NULL))
+		histogramEncodingTimer = new TStopwatch();
+
+	if (histogramEncodingTimer != NULL)
+		histogramEncodingTimer->Reset();
+
+}
+void analysis::histogramEncodingTimerStart(bool reset) {
+
+	if (isTimeAnalysisEnabled() && (histogramEncodingTimer == NULL))
+		histogramEncodingTimer = new TStopwatch();
+
+	if (histogramEncodingTimer != NULL)
+		histogramEncodingTimer->Start(reset);
+
+}
+void analysis::histogramEncodingTimerStop() {
+
+	if (isTimeAnalysisEnabled() && (histogramEncodingTimer == NULL))
+		histogramEncodingTimer = new TStopwatch();
+
+	if (histogramEncodingTimer != NULL)
+		histogramEncodingTimer->Stop();
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for				*
+ * diagonalization the histogram layers.						*
+ ****************************************************************/
+
+void analysis::histogramDiagonalizingTimerReset() {
+
+	if (isTimeAnalysisEnabled() && (histogramDiagonalizingTimer == NULL))
+		histogramDiagonalizingTimer = new TStopwatch();
+
+	if (histogramDiagonalizingTimer != NULL)
+		histogramDiagonalizingTimer->Reset();
+
+}
+void analysis::histogramDiagonalizingTimerStart(bool reset) {
+
+	if (isTimeAnalysisEnabled() && (histogramDiagonalizingTimer == NULL))
+		histogramDiagonalizingTimer = new TStopwatch();
+
+	if (histogramDiagonalizingTimer != NULL)
+		histogramDiagonalizingTimer->Start(reset);
+
+}
+void analysis::histogramDiagonalizingTimerStop() {
+
+	if (isTimeAnalysisEnabled() && (histogramDiagonalizingTimer == NULL))
+		histogramDiagonalizingTimer = new TStopwatch();
+
+	if (histogramDiagonalizingTimer != NULL)
+		histogramDiagonalizingTimer->Stop();
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for peak		*
+ * finding the histogram layers.								*
+ ****************************************************************/
+
+void analysis::histogramPeakfindingTimerReset() {
+
+	if (isTimeAnalysisEnabled() && (histogramPeakfindingTimer == NULL))
+		histogramPeakfindingTimer = new TStopwatch();
+
+	if (histogramPeakfindingTimer != NULL)
+		histogramPeakfindingTimer->Reset();
+
+}
+void analysis::histogramPeakfindingTimerStart(bool reset) {
+
+	if (isTimeAnalysisEnabled() && (histogramPeakfindingTimer == NULL))
+		histogramPeakfindingTimer = new TStopwatch();
+
+	if (histogramPeakfindingTimer != NULL)
+		histogramPeakfindingTimer->Start(reset);
+
+}
+void analysis::histogramPeakfindingTimerStop() {
+
+	if (isTimeAnalysisEnabled() && (histogramPeakfindingTimer == NULL))
+		histogramPeakfindingTimer = new TStopwatch();
+
+	if (histogramPeakfindingTimer != NULL)
+		histogramPeakfindingTimer->Stop();
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for finalizing	*
+ * the histogram layers.										*
+ ****************************************************************/
+
+void analysis::histogramFinalizingTimerReset() {
+
+	if (isTimeAnalysisEnabled() && (histogramFinalizingTimer == NULL))
+		histogramFinalizingTimer = new TStopwatch();
+
+	if (histogramFinalizingTimer != NULL)
+		histogramFinalizingTimer->Reset();
+
+}
+void analysis::histogramFinalizingTimerStart(bool reset) {
+
+	if (isTimeAnalysisEnabled() && (histogramFinalizingTimer == NULL))
+		histogramFinalizingTimer = new TStopwatch();
+
+	if (histogramFinalizingTimer != NULL)
+		histogramFinalizingTimer->Start(reset);
+
+}
+void analysis::histogramFinalizingTimerStop() {
+
+	if (isTimeAnalysisEnabled() && (histogramFinalizingTimer == NULL))
+		histogramFinalizingTimer = new TStopwatch();
+
+	if (histogramFinalizingTimer != NULL)
+		histogramFinalizingTimer->Stop();
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for resetting	*
+ * the histogram layers.										*
+ ****************************************************************/
+
+void analysis::histogramResettingTimerReset() {
+
+	if (isTimeAnalysisEnabled() && (histogramResettingTimer == NULL))
+		histogramResettingTimer = new TStopwatch();
+
+	if (histogramResettingTimer != NULL)
+		histogramResettingTimer->Reset();
+
+}
+void analysis::histogramResettingTimerStart(bool reset) {
+
+	if (isTimeAnalysisEnabled() && (histogramResettingTimer == NULL))
+		histogramResettingTimer = new TStopwatch();
+
+	if (histogramResettingTimer != NULL)
+		histogramResettingTimer->Start(reset);
+
+}
+void analysis::histogramResettingTimerStop() {
+
+	if (isTimeAnalysisEnabled() && (histogramResettingTimer == NULL))
+		histogramResettingTimer = new TStopwatch();
+
+	if (histogramResettingTimer != NULL)
+		histogramResettingTimer->Stop();
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for peak		*
+ * finding in the track candidates of neighbored layers.		*
+ ****************************************************************/
+
+void analysis::trackPeakfindingTimerReset() {
+
+	if (isTimeAnalysisEnabled() && (trackPeakfindingTimer == NULL))
+		trackPeakfindingTimer = new TStopwatch();
+
+	if (trackPeakfindingTimer != NULL)
+		trackPeakfindingTimer->Reset();
+
+}
+void analysis::trackPeakfindingTimerStart(bool reset) {
+
+	if (isTimeAnalysisEnabled() && (trackPeakfindingTimer == NULL))
+		trackPeakfindingTimer = new TStopwatch();
+
+	if (trackPeakfindingTimer != NULL)
+		trackPeakfindingTimer->Start(reset);
+
+}
+void analysis::trackPeakfindingTimerStop() {
+
+	if (isTimeAnalysisEnabled() && (trackPeakfindingTimer == NULL))
+		trackPeakfindingTimer = new TStopwatch();
+
+	if (trackPeakfindingTimer != NULL)
+		trackPeakfindingTimer->Stop();
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for creating	*
+ * the border objects.											*
+ ****************************************************************/
+
+double analysis::getBorderCreationRealTime() {
+
+	double returnValue = 0;
+
+	if (borderCreationTimer != NULL)
+		returnValue = borderCreationTimer->RealTime();
+
+	return returnValue;
+
+}
+double analysis::getBorderCreationCpuTime() {
+
+	double returnValue = 0;
+
+	if (borderCreationTimer != NULL)
+		returnValue = borderCreationTimer->CpuTime();
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for creating	*
+ * the histogram layers.										*
+ ****************************************************************/
+
+double analysis::getHistogramCreationRealTime() {
+
+	double returnValue = 0;
+
+	if (histogramCreationTimer != NULL)
+		returnValue = histogramCreationTimer->RealTime();
+
+	return returnValue;
+
+}
+double analysis::getHistogramCreationCpuTime() {
+
+	double returnValue = 0;
+
+	if (histogramCreationTimer != NULL)
+		returnValue = histogramCreationTimer->CpuTime();
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for encoding	*
+ * the histogram layers.										*
+ ****************************************************************/
+
+double analysis::getHistogramEncodingRealTime() {
+
+	double returnValue = 0;
+
+	if (histogramEncodingTimer != NULL)
+		returnValue = histogramEncodingTimer->RealTime();
+
+	return returnValue;
+
+}
+double analysis::getHistogramEncodingCpuTime() {
+
+	double returnValue = 0;
+
+	if (histogramEncodingTimer != NULL)
+		returnValue = histogramEncodingTimer->CpuTime();
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for				*
+ * diagonalization the histogram layers.						*
+ ****************************************************************/
+
+double analysis::getHistogramDiagonalizingRealTime() {
+
+	double returnValue = 0;
+
+	if (histogramDiagonalizingTimer != NULL)
+		returnValue = histogramDiagonalizingTimer->RealTime();
+
+	return returnValue;
+
+}
+double analysis::getHistogramDiagonalizingCpuTime() {
+
+	double returnValue = 0;
+
+	if (histogramDiagonalizingTimer != NULL)
+		returnValue = histogramDiagonalizingTimer->CpuTime();
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for peak		*
+ * finding the histogram layers.								*
+ ****************************************************************/
+
+double analysis::getHistogramPeakfindingRealTime() {
+
+	double returnValue = 0;
+
+	if (histogramPeakfindingTimer != NULL)
+		returnValue = histogramPeakfindingTimer->RealTime();
+
+	return returnValue;
+
+}
+double analysis::getHistogramPeakfindingCpuTime() {
+
+	double returnValue = 0;
+
+	if (histogramPeakfindingTimer != NULL)
+		returnValue = histogramPeakfindingTimer->CpuTime();
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for finalizing	*
+ * the histogram layers.										*
+ ****************************************************************/
+
+double analysis::getHistogramFinalizingRealTime() {
+
+	double returnValue = 0;
+
+	if (histogramFinalizingTimer != NULL)
+		returnValue = histogramFinalizingTimer->RealTime();
+
+	return returnValue;
+
+}
+double analysis::getHistogramFinalizingCpuTime() {
+
+	double returnValue = 0;
+
+	if (histogramFinalizingTimer != NULL)
+		returnValue = histogramFinalizingTimer->CpuTime();
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for resetting	*
+ * the histogram layers.										*
+ ****************************************************************/
+
+double analysis::getHistogramResettingRealTime() {
+
+	double returnValue = 0;
+
+	if (histogramResettingTimer != NULL)
+		returnValue = histogramResettingTimer->RealTime();
+
+	return returnValue;
+
+}
+double analysis::getHistogramResettingCpuTime() {
+
+	double returnValue = 0;
+
+	if (histogramResettingTimer != NULL)
+		returnValue = histogramResettingTimer->CpuTime();
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the actual measured time for peak		*
+ * finding in the track candidates of neighbored layers.		*
+ ****************************************************************/
+
+double analysis::getTrackPeakfindingRealTime() {
+
+	double returnValue = 0;
+
+	if (trackPeakfindingTimer != NULL)
+		returnValue = trackPeakfindingTimer->RealTime();
+
+	return returnValue;
+
+}
+double analysis::getTrackPeakfindingCpuTime() {
+
+	double returnValue = 0;
+
+	if (trackPeakfindingTimer != NULL)
+		returnValue = trackPeakfindingTimer->CpuTime();
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method evaluates the size of the memory for				*
+ * the source data.												*
+ ****************************************************************/
+
+void analysis::evaluateSizeOfLBufferData() {
+
+	if (tracks == NULL)
+		throw cannotAccessTrackDataError(ANALYSISLIB);
+	if (*tracks == NULL)
+		throw cannotAccessTrackDataError(ANALYSISLIB);
+
+	reservedSizeOfLBufferData  = (*tracks)->getReservedSizeOfData(0);
+	allocatedSizeOfLBufferData = (*tracks)->getAllocatedSizeOfData(0);
+	usedSizeOfLBufferData      = (*tracks)->getUsedSizeOfData(0);
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double analysis::getReservedSizeOfLBufferData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = (reservedSizeOfLBufferData / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double analysis::getAllocatedSizeOfLBufferData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = (allocatedSizeOfLBufferData / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double analysis::getUsedSizeOfLBufferData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = (usedSizeOfLBufferData / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns a formated string containing the time	*
+ * analysis.													*
+ ****************************************************************/
+
+std::string analysis::formatRealTimeAnalysis() {
+
+	char        buffer[doubleConversion+1];
+	std::string returnValue;
+
+	returnValue  = "  creating the borders: \t\t\t\t";
+	dtos(getBorderCreationRealTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  creating the histogram layers: \t\t\t";
+	dtos(getHistogramCreationRealTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  encoding the histogram layers: \t\t\t";
+	dtos(getHistogramEncodingRealTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  diagonalizing the histogram layers: \t\t\t";
+	dtos(getHistogramDiagonalizingRealTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  peak finding in the histogram layers: \t\t";
+	dtos(getHistogramPeakfindingRealTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  finalizing the histogram layers: \t\t\t";
+	dtos(getHistogramFinalizingRealTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  resetting the histogram layers: \t\t\t";
+	dtos(getHistogramResettingRealTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  peak finding in the track candidates: \t\t";
+	dtos(getTrackPeakfindingRealTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  \t\t\t\t\t\t\t---------";
+
+	return returnValue;
+
+}
+std::string analysis::formatRealTimeSummaryAnalysis(double trackfinderRealTime, double eventRealTime) {
+
+	char        buffer[doubleConversion+1];
+	std::string returnValue;
+
+	returnValue  = "  the tracking: \t\t\t\t\t";
+	dtos(trackfinderRealTime, buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  the event ";
+	if (eventData != NULL)
+		if (*eventData != NULL)
+			returnValue += (*eventData)->getEventNumber();
+	returnValue += ": \t\t\t\t\t\t";
+	dtos(eventRealTime, buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s";
+
+	return returnValue;
+
+}
+std::string analysis::formatCpuTimeAnalysis() {
+
+	char        buffer[doubleConversion+1];
+	std::string returnValue;
+
+	returnValue  = "  creating the borders: \t\t\t\t";
+	dtos(getBorderCreationCpuTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  creating the histogram layers: \t\t\t";
+	dtos(getHistogramCreationCpuTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  encoding the histogram layers: \t\t\t";
+	dtos(getHistogramEncodingCpuTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  diagonalizing the histogram layers: \t\t\t";
+	dtos(getHistogramDiagonalizingCpuTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  peak finding in the histogram layers: \t\t";
+	dtos(getHistogramPeakfindingCpuTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  finalizing the histogram layers: \t\t\t";
+	dtos(getHistogramFinalizingCpuTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  resetting the histogram layers: \t\t\t";
+	dtos(getHistogramResettingCpuTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  peak finding in the track candidates: \t\t";
+	dtos(getTrackPeakfindingCpuTime(), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  \t\t\t\t\t\t\t---------";
+
+	return returnValue;
+
+}
+std::string analysis::formatCpuTimeSummaryAnalysis(double trackfinderCpuTime, double eventCpuTime) {
+
+	char        buffer[doubleConversion+1];
+	std::string returnValue;
+
+	returnValue  = "  the tracking:  \t\t\t\t\t";
+	dtos(trackfinderCpuTime, buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s\n";
+	returnValue += "  the event ";
+	if (eventData != NULL)
+		if (*eventData != NULL)
+			returnValue += (*eventData)->getEventNumber();
+	returnValue += ":  \t\t\t\t\t";
+	dtos(eventCpuTime, buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " s";
+
+	return returnValue;
+
+}
+std::string analysis::formatTimeAnalysis(double trackfinderRealTime, double eventRealTime, double trackfinderCpuTime, double eventCpuTime) {
+
+	std::string returnValue;
+
+	returnValue  = "Needed realtime for:\n";
+	returnValue += formatRealTimeAnalysis();
+	returnValue += "\n";
+	returnValue += formatRealTimeSummaryAnalysis(trackfinderRealTime, eventRealTime);
+	returnValue += "\n\n";
+	returnValue += "Needed cputime for:\n";
+	returnValue += formatCpuTimeAnalysis();
+	returnValue += "\n";
+	returnValue += formatCpuTimeSummaryAnalysis(trackfinderCpuTime, eventCpuTime);
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns a formated string containing the time	*
+ * analysis.													*
+ ****************************************************************/
+
+std::string analysis::formatReservedMemoryAnalysis(histogramData* histogram, double inputReservedSize) {
+
+	double      sizeOfActualData;
+	double      sizeOfData;
+	char        buffer[doubleConversion+1];
+	std::string returnValue;
+
+	returnValue  = "Size of reserved memory for:\n";
+	sizeOfData   = inputReservedSize;
+	if (eventData != NULL) {
+		if (*eventData != NULL) {
+			sizeOfActualData  = (*eventData)->getReservedSizeOfAddOnData(0);
+			returnValue += "    the MC data: \t\t\t\t";
+			dtos(sizeOfData - sizeOfActualData, buffer, doubleConversionDigits);
+			returnValue += buffer;
+			returnValue += " B\n";
+			returnValue += "    the MC data addon: \t\t\t\t";
+			dtos(sizeOfActualData, buffer, doubleConversionDigits);
+			returnValue += buffer;
+			returnValue += " B\n";
+		}
+	}
+	returnValue += "  the input data: \t\t\t\t\t";
+	dtos(sizeOfData, buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " B\n";
+	if (histogram != NULL) {
+		sizeOfActualData  = histogram->getReservedSizeOfHBufferPrelutData(0);
+		returnValue += "    the HBuffer::Prelut: \t\t\t";
+		dtos(sizeOfActualData, buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " B\n";
+		sizeOfActualData  = histogram->getReservedSizeOfHBufferLutData(0);
+		returnValue += "    the HBuffer::Lut: \t\t\t\t";
+		dtos(sizeOfActualData, buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " B\n";
+		sizeOfActualData  = histogram->getReservedSizeOfHBufferHitData(0);
+		returnValue += "    the HBuffer::Hits: \t\t\t\t";
+		dtos(sizeOfActualData, buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " B\n";
+		sizeOfActualData  = histogram->getReservedSizeOfHBufferData(0);
+		sizeOfData       += sizeOfActualData;
+		returnValue += "  the HBuffer unit: \t\t\t\t\t";
+		dtos(sizeOfActualData, buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " B\n";
+		sizeOfActualData  = histogram->getReservedSizeOfHistogramSignatureData(0);
+		returnValue += "    the signature: \t\t\t\t";
+		dtos(sizeOfActualData / 1024, buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " kB\n";
+		sizeOfActualData  = histogram->getReservedSizeOfHistogramHitData(0);
+		returnValue += "    the hits: \t\t\t\t\t";
+		dtos(sizeOfActualData / (1024*1024), buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " MB\n";
+		sizeOfActualData  = histogram->getReservedSizeOfHistogramData(0);
+		sizeOfData       += sizeOfActualData;
+		returnValue += "  the Histogram: \t\t\t\t\t";
+		dtos(sizeOfActualData / (1024*1024), buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " MB\n";
+	}
+	sizeOfActualData  = getReservedSizeOfLBufferData(0);
+	sizeOfData       += sizeOfActualData;
+	returnValue += "  the LBuffer unit: \t\t\t\t\t";
+	dtos(sizeOfActualData, buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " B\n";
+	if (tracks != NULL) {
+		if (*tracks != NULL) {
+			sizeOfActualData  = (*tracks)->getReservedSizeOfData(0);
+			sizeOfData       += sizeOfActualData;
+			returnValue += "  the output data: \t\t\t\t\t";
+			dtos(sizeOfActualData, buffer, doubleConversionDigits);
+			returnValue += buffer;
+			returnValue += " B\n";
+		}
+	}
+	returnValue += "  \t\t\t\t\t\t\t----------\n";
+	returnValue += "  the tracking: \t\t\t\t\t";
+	dtos(sizeOfData / (1024*1024), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " MB";
+
+	return returnValue;
+
+}
+std::string analysis::formatAllocatedMemoryAnalysis(histogramData* histogram, double inputAllocatedSize) {
+
+	double      sizeOfActualData;
+	double      sizeOfData;
+	char        buffer[doubleConversion+1];
+	std::string returnValue;
+
+	returnValue  = "Size of used allocated for:\n";
+	sizeOfData   = inputAllocatedSize;
+	if (eventData != NULL) {
+		if (*eventData != NULL) {
+			sizeOfActualData  = (*eventData)->getAllocatedSizeOfAddOnData(0);
+			returnValue += "    the MC data: \t\t\t\t";
+			dtos((sizeOfData - sizeOfActualData) / (1024*1024), buffer, doubleConversionDigits);
+			returnValue += buffer;
+			returnValue += " MB\n";
+			returnValue += "    the MC data addon: \t\t\t\t";
+			dtos(sizeOfActualData / 1024, buffer, doubleConversionDigits);
+			returnValue += buffer;
+			returnValue += " kB\n";
+		}
+	}
+	returnValue += "  the input data: \t\t\t\t\t";
+	dtos(sizeOfData / (1024*1024), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " MB\n";
+	if (histogram != NULL) {
+		sizeOfActualData  = histogram->getAllocatedSizeOfHBufferPrelutData(0);
+		returnValue += "    the HBuffer::Prelut: \t\t\t";
+		dtos(sizeOfActualData / 1024, buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " kB\n";
+		sizeOfActualData  = histogram->getAllocatedSizeOfHBufferLutData(0);
+		returnValue += "    the HBuffer::Lut: \t\t\t\t";
+		dtos(sizeOfActualData / (1024*1024), buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " MB\n";
+		sizeOfActualData  = histogram->getAllocatedSizeOfHBufferHitData(0);
+		returnValue += "    the HBuffer::Hits: \t\t\t\t";
+		dtos(sizeOfActualData / 1024, buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " kB\n";
+		sizeOfActualData  = histogram->getAllocatedSizeOfHBufferData(0);
+		sizeOfData       += sizeOfActualData;
+		returnValue += "  the HBuffer unit: \t\t\t\t\t";
+		dtos(sizeOfActualData / (1024*1024), buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " MB\n";
+		sizeOfActualData  = histogram->getAllocatedSizeOfHistogramSignatureData(0);
+		returnValue += "    the signature: \t\t\t\t";
+		dtos(sizeOfActualData, buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " B\n";
+		sizeOfActualData  = histogram->getAllocatedSizeOfHistogramHitData(0);
+		returnValue += "    the hits: \t\t\t\t\t";
+		dtos(sizeOfActualData, buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " B\n";
+		sizeOfActualData  = histogram->getAllocatedSizeOfHistogramData(0);
+		sizeOfData       += sizeOfActualData;
+		returnValue += "  the Histogram: \t\t\t\t\t";
+		dtos(sizeOfActualData, buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " B\n";
+	}
+	sizeOfActualData  = getAllocatedSizeOfLBufferData(0);
+	sizeOfData       += sizeOfActualData;
+	returnValue += "  the LBuffer unit: \t\t\t\t\t";
+	dtos(sizeOfActualData / 1024, buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " kB\n";
+	if (tracks != NULL) {
+		if (*tracks != NULL) {
+			sizeOfActualData  = (*tracks)->getAllocatedSizeOfData(0);
+			sizeOfData       += sizeOfActualData;
+			returnValue += "  the output data: \t\t\t\t\t";
+			dtos(sizeOfActualData / 1024, buffer, doubleConversionDigits);
+			returnValue += buffer;
+			returnValue += " kB\n";
+		}
+	}
+	returnValue += "  \t\t\t\t\t\t\t----------\n";
+	returnValue += "  the tracking: \t\t\t\t\t";
+	dtos(sizeOfData / (1024*1024), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " MB";
+
+	return returnValue;
+
+}
+std::string analysis::formatUsedMemoryAnalysis(histogramData* histogram, double inputUsedSize) {
+
+	double      sizeOfActualData;
+	double      sizeOfData;
+	char        buffer[doubleConversion+1];
+	std::string returnValue;
+
+	returnValue  = "Size of used memory for:\n";
+	sizeOfData   = inputUsedSize;
+	if (eventData != NULL) {
+		if (*eventData != NULL) {
+			sizeOfActualData  = (*eventData)->getUsedSizeOfAddOnData(0);
+			returnValue += "    the MC data: \t\t\t\t";
+			dtos((sizeOfData - sizeOfActualData) / (1024*1024), buffer, doubleConversionDigits);
+			returnValue += buffer;
+			returnValue += " MB\n";
+			returnValue += "    the MC data addon: \t\t\t\t";
+			dtos(sizeOfActualData / 1024, buffer, doubleConversionDigits);
+			returnValue += buffer;
+			returnValue += " kB\n";
+		}
+	}
+	returnValue += "  the input data: \t\t\t\t\t";
+	dtos(sizeOfData / (1024*1024), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " MB\n";
+	if (histogram != NULL) {
+		sizeOfActualData  = histogram->getUsedSizeOfHBufferPrelutData(0);
+		returnValue += "    the HBuffer::Prelut: \t\t\t";
+		dtos(sizeOfActualData / 1024, buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " kB\n";
+		sizeOfActualData  = histogram->getUsedSizeOfHBufferLutData(0);
+		returnValue += "    the HBuffer::Lut: \t\t\t\t";
+		dtos(sizeOfActualData / (1024*1024), buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " MB\n";
+		sizeOfActualData  = histogram->getUsedSizeOfHBufferHitData(0);
+		returnValue += "    the HBuffer::Hits: \t\t\t\t";
+		dtos(sizeOfActualData / 1024, buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " kB\n";
+		sizeOfActualData  = histogram->getUsedSizeOfHBufferData(0);
+		sizeOfData       += sizeOfActualData;
+		returnValue += "  the HBuffer unit: \t\t\t\t\t";
+		dtos(sizeOfActualData / (1024*1024), buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " MB\n";
+		sizeOfActualData  = histogram->getUsedSizeOfHistogramSignatureData(0);
+		returnValue += "    the signature: \t\t\t\t";
+		dtos(sizeOfActualData / 1024, buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " kB\n";
+		sizeOfActualData  = histogram->getUsedSizeOfHistogramHitData(0);
+		returnValue += "    the hits: \t\t\t\t\t";
+		dtos(sizeOfActualData / (1024*1024), buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " MB\n";
+		sizeOfActualData  = histogram->getUsedSizeOfHistogramData(0);
+		sizeOfData       += sizeOfActualData;
+		returnValue += "  the Histogram: \t\t\t\t\t";
+		dtos(sizeOfActualData / (1024*1024), buffer, doubleConversionDigits);
+		returnValue += buffer;
+		returnValue += " MB\n";
+	}
+	sizeOfActualData  = getUsedSizeOfLBufferData(0);
+	sizeOfData       += sizeOfActualData;
+	returnValue += "  the LBuffer unit: \t\t\t\t\t";
+	dtos(sizeOfActualData / 1024, buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " kB\n";
+	if (tracks != NULL) {
+		if (*tracks != NULL) {
+			sizeOfActualData  = (*tracks)->getUsedSizeOfData(0);
+			sizeOfData       += sizeOfActualData;
+			returnValue += "  the output data: \t\t\t\t\t";
+			dtos(sizeOfActualData / 1024, buffer, doubleConversionDigits);
+			returnValue += buffer;
+			returnValue += " kB\n";
+		}
+	}
+	returnValue += "  \t\t\t\t\t\t\t----------\n";
+	returnValue += "  the tracking: \t\t\t\t\t";
+	dtos(sizeOfData / (1024*1024), buffer, doubleConversionDigits);
+	returnValue += buffer;
+	returnValue += " MB";
+
+	return returnValue;
+
+}
+std::string analysis::formatMemoryAnalysis(histogramData* histogram, double inputReservedSize, double inputAllocatedSize, double inputUsedSize) {
+
+	std::string returnValue;
+
+	returnValue  = formatReservedMemoryAnalysis(histogram, inputReservedSize);
+	returnValue += "\n\n";
+
+	returnValue += formatAllocatedMemoryAnalysis(histogram, inputAllocatedSize);
+	returnValue += "\n\n";
+
+	returnValue += formatUsedMemoryAnalysis(histogram, inputUsedSize);
+
+	return returnValue;
 
 }

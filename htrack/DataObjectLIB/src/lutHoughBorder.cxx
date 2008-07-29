@@ -24,13 +24,14 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-05-18 12:24:16 $
-// $Revision: 1.3 $
+// $Date: 2008-02-29 11:38:11 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
 
 #include "../../MiscLIB/include/conversionRoutines.h"
+#include "../../MiscLIB/include/defs.h"
 #include "../include/dataObjectError.h"
 #include "../include/dataObjectWarningMsg.h"
 #include "../include/lutHoughBorder.h"
@@ -151,26 +152,39 @@ houghBorderCommand lutHoughBorder::getHoughBorderCommand(unsigned short maxDim) 
 
 		cmdCounter         = 0;
 		previousHoughCoord = houghCoord.readActiveObjectAndMakeNextOneActive();
-		houghCmd.startPos  = previousHoughCoord.pos2;
+		houghCmd.startPos  = previousHoughCoord.pos1;
 
 		for (unsigned long i = 1 ; i < houghCoord.getNumberOfEntries(); i++) {
 
 			actualHoughCoord = houghCoord.readActiveObjectAndMakeNextOneActive();
 
-			if (actualHoughCoord.pos1 - previousHoughCoord.pos1 != 1)
-				throw borderIdRuleError();
+#if (LUTVERSION < 2)
+
+			throw borderIdRuleError();
+
+#endif
 
 #if (LUTVERSION > 1)
 
-			if (actualHoughCoord.pos2 - previousHoughCoord.pos2 > 1)
+			if (actualHoughCoord.pos2 - previousHoughCoord.pos2 != 1)
+				throw borderIdRuleError();
+
+			if (actualHoughCoord.pos1 - previousHoughCoord.pos1 < 0)
 				throw borderIdRuleError();
 
 #endif
 
-			if (actualHoughCoord.pos2 - previousHoughCoord.pos2) {
+#if (LUTVERSION > 2)
+
+			if (actualHoughCoord.pos1 - previousHoughCoord.pos1 > 1)
+				throw borderIdRuleError();
+
+#endif
+
+			if (actualHoughCoord.pos1 - previousHoughCoord.pos1) {
 				
 				houghCmd.cmd.push(true);
-				cmdCounter += actualHoughCoord.pos2 - previousHoughCoord.pos2;
+				cmdCounter += actualHoughCoord.pos1 - previousHoughCoord.pos1;
 			
 			}
 			else
@@ -224,9 +238,9 @@ void lutHoughBorder::setHoughBorderCommand(houghBorderCommand& value, unsigned s
 
 		actualCommand = value.cmd.readActiveObjectAndMakeNextOneActive();
 
-		actualHoughCoord.pos1++;
+		actualHoughCoord.pos2++;
 		if (actualCommand)
-			actualHoughCoord.pos2++;
+			actualHoughCoord.pos1++;
 
 		if ((actualHoughCoord.pos1 < maxFirstDim) && (actualHoughCoord.pos2 < maxSecondDim)) {
 
@@ -245,5 +259,61 @@ void lutHoughBorder::setHoughBorderCommand(houghBorderCommand& value, unsigned s
 		}
 
 	}
+
+	/* missing commands are treated as leading zeros in the command value */
+	actualHoughCoord.pos2++;
+	for (; actualHoughCoord.pos2 < maxSecondDim; actualHoughCoord.pos2++)
+		houghCoord.push(actualHoughCoord);
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double lutHoughBorder::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = houghCoord.getReservedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double lutHoughBorder::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = houghCoord.getAllocatedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double lutHoughBorder::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = houghCoord.getUsedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }

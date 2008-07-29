@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-19 14:30:25 $
-// $Revision: 1.14 $
+// $Date: 2007-12-28 14:40:07 $
+// $Revision: 1.23 $
 //
 // *******************************************************************/
 
@@ -34,6 +34,9 @@
 #include "../../MiscLIB/include/bitArray.h"
 #include "../include/analysisWarningMsg.h"
 #include <iostream>
+
+
+#define min(a, b)  (((a) < (b)) ? (a) : (b)) 
 
 
 /****************************************************************
@@ -175,6 +178,37 @@ displayAnalyserNotFoundWarningMsg::~displayAnalyserNotFoundWarningMsg() {
 void displayAnalyserNotFoundWarningMsg::warningMsg() {
 
 	printMsg("The display analyser is not found!!!\nCheck the init()-functions for correctness.\nCaution: The ...ToRoot()-function must be the last init()-function for displays.");
+
+}
+
+
+/****************************************************************
+ * CLASS hardwareAnalyserNotFoundWarningMsg		 				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+hardwareAnalyserNotFoundWarningMsg::hardwareAnalyserNotFoundWarningMsg() : analysisWarningMsg() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+hardwareAnalyserNotFoundWarningMsg::~hardwareAnalyserNotFoundWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void hardwareAnalyserNotFoundWarningMsg::warningMsg() {
+
+	printMsg("The hardware analyser is not found!!!\nCheck the init()-functions for correctness.");
 
 }
 
@@ -497,10 +531,10 @@ noHitInDetectorStationWarningMsg::~noHitInDetectorStationWarningMsg() {
 void noHitInDetectorStationWarningMsg::warningMsg() {
 
 	std::string temp;
-	char        buffer[intConversionDigits+1];
+	char        buffer[shortConversionDigits+1];
 
 	temp = "There is no hit found in the station with the index ";
-	itos(index, buffer, 10, intConversionDigits);
+	ustos(index, buffer, 10, intConversionDigits);
 	temp += buffer;
 	temp += " of the detector!!!";
 	printMsg(temp);
@@ -509,14 +543,14 @@ void noHitInDetectorStationWarningMsg::warningMsg() {
 
 
 /****************************************************************
- * CLASS noAnalysisMomentumOutputFileNameSpecifiedWarningMsg	*
+ * CLASS noAnalysisOutputFileNameSpecifiedWarningMsg	*
  ****************************************************************/
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-noAnalysisMomentumOutputFileNameSpecifiedWarningMsg::noAnalysisMomentumOutputFileNameSpecifiedWarningMsg() : analysisWarningMsg() {
+noAnalysisOutputFileNameSpecifiedWarningMsg::noAnalysisOutputFileNameSpecifiedWarningMsg() : analysisWarningMsg() {
 
 }
 
@@ -524,7 +558,7 @@ noAnalysisMomentumOutputFileNameSpecifiedWarningMsg::noAnalysisMomentumOutputFil
  * Destructor													*
  ****************************************************************/
 
-noAnalysisMomentumOutputFileNameSpecifiedWarningMsg::~noAnalysisMomentumOutputFileNameSpecifiedWarningMsg() {
+noAnalysisOutputFileNameSpecifiedWarningMsg::~noAnalysisOutputFileNameSpecifiedWarningMsg() {
 
 }
 
@@ -532,9 +566,9 @@ noAnalysisMomentumOutputFileNameSpecifiedWarningMsg::~noAnalysisMomentumOutputFi
  * This method displays a warning message.		 				*
  ****************************************************************/
 
-void noAnalysisMomentumOutputFileNameSpecifiedWarningMsg::warningMsg() {
+void noAnalysisOutputFileNameSpecifiedWarningMsg::warningMsg() {
 
-	printMsg("The name of the output file for the momentum analyser is not specified!!!");
+	printMsg("The name of the output file for the analyser is not specified!!!");
 
 }
 
@@ -827,6 +861,61 @@ void setMagnetfieldFactorWarningMsg::warningMsg() {
 	dtos(magnetfieldFactor, doubleBuffer, doubleConversionDigits);
 	temp += doubleBuffer;
 	temp += "!!!";
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS setPrelutRangeWarningMsg								*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+setPrelutRangeWarningMsg::setPrelutRangeWarningMsg() : analysisWarningMsg() {
+
+	rangeStart = 0;
+	rangeStop  = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+setPrelutRangeWarningMsg::setPrelutRangeWarningMsg(double rangeStart, double rangeStop) : analysisWarningMsg() {
+
+	this->rangeStart = rangeStart;
+	this->rangeStop  = rangeStop;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+setPrelutRangeWarningMsg::~setPrelutRangeWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void setPrelutRangeWarningMsg::warningMsg() {
+
+	std::string temp;
+	char        doubleBuffer[doubleConversion+1];
+
+	temp =  "The prelut range is actually set to [";
+	dtos(rangeStart, doubleBuffer, doubleConversionDigits);
+	temp += doubleBuffer;
+	temp += ", ";
+	dtos(rangeStop, doubleBuffer, doubleConversionDigits);
+	temp += doubleBuffer;
+	temp += "]!!!";
 	printMsg(temp);
 
 }
@@ -1360,7 +1449,7 @@ void trackWithSignatureDistributionWarningMsg::warningMsg() {
 
 		for (i = 0; i < numberOfEntries; i++) {
 
-			if (distribution > 0) {
+			if (distribution[i] > 0) {
 
 				zeroDistribution = false;
 				signature = bitArray(i);
@@ -1662,7 +1751,7 @@ void middleDistanceOfMaximumAndCorrectLayerWarningMsg::warningMsg() {
 	std::string temp;
 	char        buffer[doubleConversion+1];
 
-	temp  = "The middle distance of the layer with the maximum hits and the correct cell for all tracks is: ";
+	temp  = "The middle distance of the layer with the maximum hits and the correct layer for all tracks is: ";
 	dtos(distance, buffer, doubleConversionDigits);
 	temp += buffer;
 	temp += "!!!";
@@ -2097,14 +2186,14 @@ void trackWithMomentaErrorDistributionWarningMsg::warningMsg() {
 
 
 /****************************************************************
- * CLASS trackWithMomentaXDistributionWarningMsg				*
+ * CLASS quantizedMomentaXDistributionWarningMsg				*
  ****************************************************************/
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-trackWithMomentaXDistributionWarningMsg::trackWithMomentaXDistributionWarningMsg() : analysisWarningMsg() {
+quantizedMomentaXDistributionWarningMsg::quantizedMomentaXDistributionWarningMsg() : analysisWarningMsg() {
 
 	distribution    = NULL;
 	numberOfEntries = 0;
@@ -2117,7 +2206,7 @@ trackWithMomentaXDistributionWarningMsg::trackWithMomentaXDistributionWarningMsg
  * Constructor													*
  ****************************************************************/
 
-trackWithMomentaXDistributionWarningMsg::trackWithMomentaXDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max) : analysisWarningMsg() {
+quantizedMomentaXDistributionWarningMsg::quantizedMomentaXDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max) : analysisWarningMsg() {
 
 	this->distribution    = distribution;
 	this->numberOfEntries = numberOfEntries;
@@ -2130,7 +2219,7 @@ trackWithMomentaXDistributionWarningMsg::trackWithMomentaXDistributionWarningMsg
  * Destructor													*
  ****************************************************************/
 
-trackWithMomentaXDistributionWarningMsg::~trackWithMomentaXDistributionWarningMsg() {
+quantizedMomentaXDistributionWarningMsg::~quantizedMomentaXDistributionWarningMsg() {
 
 }
 
@@ -2138,7 +2227,7 @@ trackWithMomentaXDistributionWarningMsg::~trackWithMomentaXDistributionWarningMs
  * This method displayDirectories a warning message.	 		*
  ****************************************************************/
 
-void trackWithMomentaXDistributionWarningMsg::warningMsg() {
+void quantizedMomentaXDistributionWarningMsg::warningMsg() {
 
 	unsigned short i;
 	bool           zeroDistribution;
@@ -2192,14 +2281,14 @@ void trackWithMomentaXDistributionWarningMsg::warningMsg() {
 
 
 /****************************************************************
- * CLASS trackWithMomentaYDistributionWarningMsg				*
+ * CLASS quantizedMomentaYDistributionWarningMsg				*
  ****************************************************************/
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-trackWithMomentaYDistributionWarningMsg::trackWithMomentaYDistributionWarningMsg() : analysisWarningMsg() {
+quantizedMomentaYDistributionWarningMsg::quantizedMomentaYDistributionWarningMsg() : analysisWarningMsg() {
 
 	distribution    = NULL;
 	numberOfEntries = 0;
@@ -2212,7 +2301,7 @@ trackWithMomentaYDistributionWarningMsg::trackWithMomentaYDistributionWarningMsg
  * Constructor													*
  ****************************************************************/
 
-trackWithMomentaYDistributionWarningMsg::trackWithMomentaYDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max) : analysisWarningMsg() {
+quantizedMomentaYDistributionWarningMsg::quantizedMomentaYDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max) : analysisWarningMsg() {
 
 	this->distribution    = distribution;
 	this->numberOfEntries = numberOfEntries;
@@ -2225,7 +2314,7 @@ trackWithMomentaYDistributionWarningMsg::trackWithMomentaYDistributionWarningMsg
  * Destructor													*
  ****************************************************************/
 
-trackWithMomentaYDistributionWarningMsg::~trackWithMomentaYDistributionWarningMsg() {
+quantizedMomentaYDistributionWarningMsg::~quantizedMomentaYDistributionWarningMsg() {
 
 }
 
@@ -2233,7 +2322,7 @@ trackWithMomentaYDistributionWarningMsg::~trackWithMomentaYDistributionWarningMs
  * This method displayDirectories a warning message.	 		*
  ****************************************************************/
 
-void trackWithMomentaYDistributionWarningMsg::warningMsg() {
+void quantizedMomentaYDistributionWarningMsg::warningMsg() {
 
 	unsigned short i;
 	bool           zeroDistribution;
@@ -2287,14 +2376,14 @@ void trackWithMomentaYDistributionWarningMsg::warningMsg() {
 
 
 /****************************************************************
- * CLASS trackWithMomentaZDistributionWarningMsg				*
+ * CLASS quantizedMomentaZDistributionWarningMsg				*
  ****************************************************************/
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-trackWithMomentaZDistributionWarningMsg::trackWithMomentaZDistributionWarningMsg() : analysisWarningMsg() {
+quantizedMomentaZDistributionWarningMsg::quantizedMomentaZDistributionWarningMsg() : analysisWarningMsg() {
 
 	distribution    = NULL;
 	numberOfEntries = 0;
@@ -2307,7 +2396,7 @@ trackWithMomentaZDistributionWarningMsg::trackWithMomentaZDistributionWarningMsg
  * Constructor													*
  ****************************************************************/
 
-trackWithMomentaZDistributionWarningMsg::trackWithMomentaZDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max) : analysisWarningMsg() {
+quantizedMomentaZDistributionWarningMsg::quantizedMomentaZDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries, double min, double max) : analysisWarningMsg() {
 
 	this->distribution    = distribution;
 	this->numberOfEntries = numberOfEntries;
@@ -2320,7 +2409,7 @@ trackWithMomentaZDistributionWarningMsg::trackWithMomentaZDistributionWarningMsg
  * Destructor													*
  ****************************************************************/
 
-trackWithMomentaZDistributionWarningMsg::~trackWithMomentaZDistributionWarningMsg() {
+quantizedMomentaZDistributionWarningMsg::~quantizedMomentaZDistributionWarningMsg() {
 
 }
 
@@ -2328,7 +2417,7 @@ trackWithMomentaZDistributionWarningMsg::~trackWithMomentaZDistributionWarningMs
  * This method displayDirectories a warning message.	 		*
  ****************************************************************/
 
-void trackWithMomentaZDistributionWarningMsg::warningMsg() {
+void quantizedMomentaZDistributionWarningMsg::warningMsg() {
 
 	unsigned short i;
 	bool           zeroDistribution;
@@ -2382,14 +2471,14 @@ void trackWithMomentaZDistributionWarningMsg::warningMsg() {
 
 
 /****************************************************************
- * CLASS trackWithCoordinateXDistributionWarningMsg				*
+ * CLASS quantizedHoughspaceDim1DistributionWarningMsg				*
  ****************************************************************/
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-trackWithCoordinateXDistributionWarningMsg::trackWithCoordinateXDistributionWarningMsg() : analysisWarningMsg() {
+quantizedHoughspaceDim1DistributionWarningMsg::quantizedHoughspaceDim1DistributionWarningMsg() : analysisWarningMsg() {
 
 	distribution    = NULL;
 	numberOfEntries = 0;
@@ -2400,7 +2489,7 @@ trackWithCoordinateXDistributionWarningMsg::trackWithCoordinateXDistributionWarn
  * Constructor													*
  ****************************************************************/
 
-trackWithCoordinateXDistributionWarningMsg::trackWithCoordinateXDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
+quantizedHoughspaceDim1DistributionWarningMsg::quantizedHoughspaceDim1DistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
 
 	this->distribution    = distribution;
 	this->numberOfEntries = numberOfEntries;
@@ -2411,7 +2500,7 @@ trackWithCoordinateXDistributionWarningMsg::trackWithCoordinateXDistributionWarn
  * Destructor													*
  ****************************************************************/
 
-trackWithCoordinateXDistributionWarningMsg::~trackWithCoordinateXDistributionWarningMsg() {
+quantizedHoughspaceDim1DistributionWarningMsg::~quantizedHoughspaceDim1DistributionWarningMsg() {
 
 }
 
@@ -2419,7 +2508,7 @@ trackWithCoordinateXDistributionWarningMsg::~trackWithCoordinateXDistributionWar
  * This method displayDirectories a warning message.	 		*
  ****************************************************************/
 
-void trackWithCoordinateXDistributionWarningMsg::warningMsg() {
+void quantizedHoughspaceDim1DistributionWarningMsg::warningMsg() {
 
 	unsigned short i;
 	bool           zeroDistribution;
@@ -2428,7 +2517,7 @@ void trackWithCoordinateXDistributionWarningMsg::warningMsg() {
 	char           buffer[intConversionDigits+1];
 
 	zeroDistribution = true;
-	temp             = "Distribution of the tracks which have the coordinate in X:\n";
+	temp             = "Distribution of the tracks which have the Hough space dim1:\n";
 
 	if (distribution != NULL) {
 
@@ -2445,6 +2534,7 @@ void trackWithCoordinateXDistributionWarningMsg::warningMsg() {
 			if (distribution[i] > 0) {
 
 				zeroDistribution = false;
+				temp += "Index: ";
 				uitos(i, buffer, 10, intConversionDigits);
 				temp += buffer;
 				temp += "\t=> #Tracks: ";
@@ -2471,14 +2561,14 @@ void trackWithCoordinateXDistributionWarningMsg::warningMsg() {
 
 
 /****************************************************************
- * CLASS trackWithCoordinateYDistributionWarningMsg				*
+ * CLASS quantizedHoughspaceDim2DistributionWarningMsg			*
  ****************************************************************/
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-trackWithCoordinateYDistributionWarningMsg::trackWithCoordinateYDistributionWarningMsg() : analysisWarningMsg() {
+quantizedHoughspaceDim2DistributionWarningMsg::quantizedHoughspaceDim2DistributionWarningMsg() : analysisWarningMsg() {
 
 	distribution    = NULL;
 	numberOfEntries = 0;
@@ -2489,7 +2579,7 @@ trackWithCoordinateYDistributionWarningMsg::trackWithCoordinateYDistributionWarn
  * Constructor													*
  ****************************************************************/
 
-trackWithCoordinateYDistributionWarningMsg::trackWithCoordinateYDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
+quantizedHoughspaceDim2DistributionWarningMsg::quantizedHoughspaceDim2DistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
 
 	this->distribution    = distribution;
 	this->numberOfEntries = numberOfEntries;
@@ -2500,7 +2590,7 @@ trackWithCoordinateYDistributionWarningMsg::trackWithCoordinateYDistributionWarn
  * Destructor													*
  ****************************************************************/
 
-trackWithCoordinateYDistributionWarningMsg::~trackWithCoordinateYDistributionWarningMsg() {
+quantizedHoughspaceDim2DistributionWarningMsg::~quantizedHoughspaceDim2DistributionWarningMsg() {
 
 }
 
@@ -2508,7 +2598,7 @@ trackWithCoordinateYDistributionWarningMsg::~trackWithCoordinateYDistributionWar
  * This method displayDirectories a warning message.	 		*
  ****************************************************************/
 
-void trackWithCoordinateYDistributionWarningMsg::warningMsg() {
+void quantizedHoughspaceDim2DistributionWarningMsg::warningMsg() {
 
 	unsigned short i;
 	bool           zeroDistribution;
@@ -2517,7 +2607,7 @@ void trackWithCoordinateYDistributionWarningMsg::warningMsg() {
 	char           buffer[intConversionDigits+1];
 
 	zeroDistribution = true;
-	temp             = "Distribution of the tracks which have the coordinate in Y:\n";
+	temp             = "Distribution of the tracks which have the Hough space dim2:\n";
 
 	if (distribution != NULL) {
 
@@ -2534,6 +2624,7 @@ void trackWithCoordinateYDistributionWarningMsg::warningMsg() {
 			if (distribution[i] > 0) {
 
 				zeroDistribution = false;
+				temp += "Index: ";
 				uitos(i, buffer, 10, intConversionDigits);
 				temp += buffer;
 				temp += "\t=> #Tracks: ";
@@ -2560,14 +2651,14 @@ void trackWithCoordinateYDistributionWarningMsg::warningMsg() {
 
 
 /****************************************************************
- * CLASS trackWithCoordinateZDistributionWarningMsg				*
+ * CLASS quantizedHoughspaceDim3DistributionWarningMsg			*
  ****************************************************************/
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-trackWithCoordinateZDistributionWarningMsg::trackWithCoordinateZDistributionWarningMsg() : analysisWarningMsg() {
+quantizedHoughspaceDim3DistributionWarningMsg::quantizedHoughspaceDim3DistributionWarningMsg() : analysisWarningMsg() {
 
 	distribution    = NULL;
 	numberOfEntries = 0;
@@ -2578,7 +2669,7 @@ trackWithCoordinateZDistributionWarningMsg::trackWithCoordinateZDistributionWarn
  * Constructor													*
  ****************************************************************/
 
-trackWithCoordinateZDistributionWarningMsg::trackWithCoordinateZDistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
+quantizedHoughspaceDim3DistributionWarningMsg::quantizedHoughspaceDim3DistributionWarningMsg(unsigned int* distribution, unsigned short numberOfEntries) : analysisWarningMsg() {
 
 	this->distribution    = distribution;
 	this->numberOfEntries = numberOfEntries;
@@ -2589,7 +2680,7 @@ trackWithCoordinateZDistributionWarningMsg::trackWithCoordinateZDistributionWarn
  * Destructor													*
  ****************************************************************/
 
-trackWithCoordinateZDistributionWarningMsg::~trackWithCoordinateZDistributionWarningMsg() {
+quantizedHoughspaceDim3DistributionWarningMsg::~quantizedHoughspaceDim3DistributionWarningMsg() {
 
 }
 
@@ -2597,7 +2688,7 @@ trackWithCoordinateZDistributionWarningMsg::~trackWithCoordinateZDistributionWar
  * This method displayDirectories a warning message.	 		*
  ****************************************************************/
 
-void trackWithCoordinateZDistributionWarningMsg::warningMsg() {
+void quantizedHoughspaceDim3DistributionWarningMsg::warningMsg() {
 
 	unsigned short i;
 	bool           zeroDistribution;
@@ -2606,7 +2697,7 @@ void trackWithCoordinateZDistributionWarningMsg::warningMsg() {
 	char           buffer[intConversionDigits+1];
 
 	zeroDistribution = true;
-	temp             = "Distribution of the tracks which have the coordinate in Z:\n";
+	temp             = "Distribution of the tracks which have the Hough space dim3:\n";
 
 	if (distribution != NULL) {
 
@@ -2623,6 +2714,7 @@ void trackWithCoordinateZDistributionWarningMsg::warningMsg() {
 			if (distribution[i] > 0) {
 
 				zeroDistribution = false;
+				temp += "Index: ";
 				uitos(i, buffer, 10, intConversionDigits);
 				temp += buffer;
 				temp += "\t=> #Tracks: ";
@@ -2656,7 +2748,7 @@ void trackWithCoordinateZDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-trackWithMomentaDistributionWarningMsg::trackWithMomentaDistributionWarningMsg() : analysisWarningMsg() {
+quantizedMomentaDistributionWarningMsg::quantizedMomentaDistributionWarningMsg() : analysisWarningMsg() {
 
 	distribution    = NULL;
 	numberOfEntries = 0;
@@ -2667,7 +2759,7 @@ trackWithMomentaDistributionWarningMsg::trackWithMomentaDistributionWarningMsg()
  * Constructor													*
  ****************************************************************/
 
-trackWithMomentaDistributionWarningMsg::trackWithMomentaDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+quantizedMomentaDistributionWarningMsg::quantizedMomentaDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
 
 	this->distribution    = distribution;
 	this->numberOfEntries = numberOfEntries;
@@ -2678,7 +2770,7 @@ trackWithMomentaDistributionWarningMsg::trackWithMomentaDistributionWarningMsg(u
  * Destructor													*
  ****************************************************************/
 
-trackWithMomentaDistributionWarningMsg::~trackWithMomentaDistributionWarningMsg() {
+quantizedMomentaDistributionWarningMsg::~quantizedMomentaDistributionWarningMsg() {
 
 }
 
@@ -2686,7 +2778,7 @@ trackWithMomentaDistributionWarningMsg::~trackWithMomentaDistributionWarningMsg(
  * This method displayDirectories a warning message.	 		*
  ****************************************************************/
 
-void trackWithMomentaDistributionWarningMsg::warningMsg() {
+void quantizedMomentaDistributionWarningMsg::warningMsg() {
 
 	unsigned int i;
 	bool         zeroDistribution;
@@ -2703,6 +2795,7 @@ void trackWithMomentaDistributionWarningMsg::warningMsg() {
 			if (distribution[i] > 0) {
 
 				zeroDistribution = false;
+				temp += "Index: ";
 				uitos(i, buffer, 10, intConversionDigits);
 				temp += buffer;
 				temp += "\t=> #Tracks: ";
@@ -2732,7 +2825,7 @@ void trackWithMomentaDistributionWarningMsg::warningMsg() {
  * Default constructor											*
  ****************************************************************/
 
-trackWithCoordinateDistributionWarningMsg::trackWithCoordinateDistributionWarningMsg() : analysisWarningMsg() {
+quantizedHoughspaceDistributionWarningMsg::quantizedHoughspaceDistributionWarningMsg() : analysisWarningMsg() {
 
 	distribution    = NULL;
 	numberOfEntries = 0;
@@ -2743,7 +2836,7 @@ trackWithCoordinateDistributionWarningMsg::trackWithCoordinateDistributionWarnin
  * Constructor													*
  ****************************************************************/
 
-trackWithCoordinateDistributionWarningMsg::trackWithCoordinateDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+quantizedHoughspaceDistributionWarningMsg::quantizedHoughspaceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
 
 	this->distribution    = distribution;
 	this->numberOfEntries = numberOfEntries;
@@ -2754,7 +2847,7 @@ trackWithCoordinateDistributionWarningMsg::trackWithCoordinateDistributionWarnin
  * Destructor													*
  ****************************************************************/
 
-trackWithCoordinateDistributionWarningMsg::~trackWithCoordinateDistributionWarningMsg() {
+quantizedHoughspaceDistributionWarningMsg::~quantizedHoughspaceDistributionWarningMsg() {
 
 }
 
@@ -2762,7 +2855,7 @@ trackWithCoordinateDistributionWarningMsg::~trackWithCoordinateDistributionWarni
  * This method displayDirectories a warning message.	 		*
  ****************************************************************/
 
-void trackWithCoordinateDistributionWarningMsg::warningMsg() {
+void quantizedHoughspaceDistributionWarningMsg::warningMsg() {
 
 	unsigned int i;
 	bool         zeroDistribution;
@@ -2770,7 +2863,7 @@ void trackWithCoordinateDistributionWarningMsg::warningMsg() {
 	char         buffer[intConversionDigits+1];
 
 	zeroDistribution = true;
-	temp  = "Distribution of the tracks which have the coordinate:\n";
+	temp  = "Distribution of the tracks which have the Hough space:\n";
 
 	if (distribution != NULL) {
 
@@ -2779,6 +2872,7 @@ void trackWithCoordinateDistributionWarningMsg::warningMsg() {
 			if (distribution[i] > 0) {
 
 				zeroDistribution = false;
+				temp += "Index: ";
 				uitos(i, buffer, 10, intConversionDigits);
 				temp += buffer;
 				temp += "\t=> #Tracks: ";
@@ -2845,6 +2939,414 @@ void numberOfTracksWhichCannotBeFoundWarningMsg::warningMsg() {
 	ultos(numberOfTracks, buffer, 10, longConversionDigits);
 	temp += buffer;
 	temp += " tracks which cannot be found, because they are in the same histogram cell than another track!!!\n";
+
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS dim1PeakDistanceDistributionWarningMsg					*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+dim1PeakDistanceDistributionWarningMsg::dim1PeakDistanceDistributionWarningMsg() : analysisWarningMsg() {
+
+	distribution    = NULL;
+	numberOfEntries = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+dim1PeakDistanceDistributionWarningMsg::dim1PeakDistanceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+
+	this->distribution    = distribution;
+	this->numberOfEntries = numberOfEntries;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+dim1PeakDistanceDistributionWarningMsg::~dim1PeakDistanceDistributionWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void dim1PeakDistanceDistributionWarningMsg::warningMsg() {
+
+	unsigned short i;
+	bool           zeroDistribution;
+	std::string    temp;
+	unsigned int   numberOfTracks;
+	double         mean;
+	char           intBuffer[intConversionDigits+1];
+	char           doubleBuffer[doubleConversion+1];
+
+	zeroDistribution = true;
+	temp             = "Distribution of the tracks which have the peak distances in dim1:\n";
+
+	if (distribution != NULL) {
+
+		numberOfTracks = 0;
+		for (i = 0; i < numberOfEntries; i++)
+			numberOfTracks += distribution[i];
+
+		/* This is just to avoid the division with zero */
+		if (numberOfTracks == 0)
+			numberOfTracks = 1;
+
+		mean = 0;
+
+		for (i = 0; i < numberOfEntries; i++) {
+
+			if (distribution[i] > 0) {
+
+				mean += (double)distribution[i] / (double)numberOfTracks;
+
+				zeroDistribution = false;
+				temp += "Index: ";
+				uitos(i, intBuffer, 10, intConversionDigits);
+				temp += intBuffer;
+				temp += "\t=> #Tracks: ";
+
+				uitos((unsigned int)(((double)distribution[i] * 100) / (double)numberOfTracks), intBuffer, 10, intConversionDigits);
+				temp += intBuffer;
+				temp += "% (";
+				uitos(distribution[i], intBuffer, 10, intConversionDigits);
+				temp += intBuffer;
+				temp += ")\n";
+
+			}
+
+		}
+
+	}
+
+	if (zeroDistribution)
+		temp += "The distribution is zero allover!!!\n";
+	else {
+		temp += "\nMean peak distance in dim1: ";
+		dtos(mean, doubleBuffer, doubleConversionDigits);
+		temp += doubleBuffer;
+		temp += " cells!!!\n";
+	}
+
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS dim2PeakDistanceDistributionWarningMsg					*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+dim2PeakDistanceDistributionWarningMsg::dim2PeakDistanceDistributionWarningMsg() : analysisWarningMsg() {
+
+	distribution    = NULL;
+	numberOfEntries = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+dim2PeakDistanceDistributionWarningMsg::dim2PeakDistanceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+
+	this->distribution    = distribution;
+	this->numberOfEntries = numberOfEntries;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+dim2PeakDistanceDistributionWarningMsg::~dim2PeakDistanceDistributionWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void dim2PeakDistanceDistributionWarningMsg::warningMsg() {
+
+	unsigned short i;
+	bool           zeroDistribution;
+	std::string    temp;
+	unsigned int   numberOfTracks;
+	double         mean;
+	char           intBuffer[intConversionDigits+1];
+	char           doubleBuffer[doubleConversion+1];
+
+	zeroDistribution = true;
+	temp             = "Distribution of the tracks which have the peak distances in dim2:\n";
+
+	if (distribution != NULL) {
+
+		numberOfTracks = 0;
+		for (i = 0; i < numberOfEntries; i++)
+			numberOfTracks += distribution[i];
+
+		/* This is just to avoid the division with zero */
+		if (numberOfTracks == 0)
+			numberOfTracks = 1;
+
+		mean = 0;
+
+		for (i = 0; i < numberOfEntries; i++) {
+
+			if (distribution[i] > 0) {
+
+				mean += (double)distribution[i] / (double)numberOfTracks;
+
+				zeroDistribution = false;
+				temp += "Index: ";
+				uitos(i, intBuffer, 10, intConversionDigits);
+				temp += intBuffer;
+				temp += "\t=> #Tracks: ";
+
+				uitos((unsigned int)(((double)distribution[i] * 100) / (double)numberOfTracks), intBuffer, 10, intConversionDigits);
+				temp += intBuffer;
+				temp += "% (";
+				uitos(distribution[i], intBuffer, 10, intConversionDigits);
+				temp += intBuffer;
+				temp += ")\n";
+
+			}
+
+		}
+
+	}
+
+	if (zeroDistribution)
+		temp += "The distribution is zero allover!!!\n";
+	else {
+		temp += "\nMean peak distance in dim2: ";
+		dtos(mean, doubleBuffer, doubleConversionDigits);
+		temp += doubleBuffer;
+		temp += " cells!!!\n";
+	}
+
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS dim3PeakDistanceDistributionWarningMsg					*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+dim3PeakDistanceDistributionWarningMsg::dim3PeakDistanceDistributionWarningMsg() : analysisWarningMsg() {
+
+	distribution    = NULL;
+	numberOfEntries = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+dim3PeakDistanceDistributionWarningMsg::dim3PeakDistanceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+
+	this->distribution    = distribution;
+	this->numberOfEntries = numberOfEntries;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+dim3PeakDistanceDistributionWarningMsg::~dim3PeakDistanceDistributionWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void dim3PeakDistanceDistributionWarningMsg::warningMsg() {
+
+	unsigned short i;
+	bool           zeroDistribution;
+	std::string    temp;
+	unsigned int   numberOfTracks;
+	double         mean;
+	char           intBuffer[intConversionDigits+1];
+	char           doubleBuffer[doubleConversion+1];
+
+	zeroDistribution = true;
+	temp             = "Distribution of the tracks which have the peak distances in dim3:\n";
+
+	if (distribution != NULL) {
+
+		numberOfTracks = 0;
+		for (i = 0; i < numberOfEntries; i++)
+			numberOfTracks += distribution[i];
+
+		/* This is just to avoid the division with zero */
+		if (numberOfTracks == 0)
+			numberOfTracks = 1;
+
+		mean = 0;
+
+		for (i = 0; i < numberOfEntries; i++) {
+
+			if (distribution[i] > 0) {
+
+				mean += (double)distribution[i] / (double)numberOfTracks;
+
+				zeroDistribution = false;
+				temp += "Index: ";
+				uitos(i, intBuffer, 10, intConversionDigits);
+				temp += intBuffer;
+				temp += "\t=> #Tracks: ";
+
+				uitos((unsigned int)(((double)distribution[i] * 100) / (double)numberOfTracks), intBuffer, 10, intConversionDigits);
+				temp += intBuffer;
+				temp += "% (";
+				uitos(distribution[i], intBuffer, 10, intConversionDigits);
+				temp += intBuffer;
+				temp += ")\n";
+
+			}
+
+		}
+
+	}
+
+	if (zeroDistribution)
+		temp += "The distribution is zero allover!!!\n";
+	else {
+		temp += "\nMean peak distance in dim3: ";
+		dtos(mean, doubleBuffer, doubleConversionDigits);
+		temp += doubleBuffer;
+		temp += " cells!!!\n";
+	}
+
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS accumulatedPeakDistanceDistributionWarningMsg			*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+accumulatedPeakDistanceDistributionWarningMsg::accumulatedPeakDistanceDistributionWarningMsg() : analysisWarningMsg() {
+
+	distribution    = NULL;
+	numberOfEntries = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+accumulatedPeakDistanceDistributionWarningMsg::accumulatedPeakDistanceDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+
+	this->distribution    = distribution;
+	this->numberOfEntries = numberOfEntries;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+accumulatedPeakDistanceDistributionWarningMsg::~accumulatedPeakDistanceDistributionWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void accumulatedPeakDistanceDistributionWarningMsg::warningMsg() {
+
+	unsigned short i;
+	bool           zeroDistribution;
+	std::string    temp;
+	unsigned int   numberOfTracks;
+	double         mean;
+	char           intBuffer[intConversionDigits+1];
+	char           doubleBuffer[doubleConversion+1];
+
+	zeroDistribution = true;
+	temp             = "Distribution of the tracks which have the accumulated peak distances in all dimensions:\n";
+
+	if (distribution != NULL) {
+
+		numberOfTracks = 0;
+		for (i = 0; i < numberOfEntries; i++)
+			numberOfTracks += distribution[i];
+
+		/* This is just to avoid the division with zero */
+		if (numberOfTracks == 0)
+			numberOfTracks = 1;
+
+		mean = 0;
+
+		for (i = 0; i < numberOfEntries; i++) {
+
+			if (distribution[i] > 0) {
+
+				mean += (double)distribution[i] / (double)numberOfTracks;
+
+				zeroDistribution = false;
+				temp += "Index: ";
+				uitos(i, intBuffer, 10, intConversionDigits);
+				temp += intBuffer;
+				temp += "\t=> #Tracks: ";
+
+				uitos((unsigned int)(((double)distribution[i] * 100) / (double)numberOfTracks), intBuffer, 10, intConversionDigits);
+				temp += intBuffer;
+				temp += "% (";
+				uitos(distribution[i], intBuffer, 10, intConversionDigits);
+				temp += intBuffer;
+				temp += ")\n";
+
+			}
+
+		}
+
+	}
+
+	if (zeroDistribution)
+		temp += "The distribution is zero allover!!!\n";
+	else {
+		temp += "\nAccumulated mean peak distance: ";
+		dtos(mean, doubleBuffer, doubleConversionDigits);
+		temp += doubleBuffer;
+		temp += " cells!!!\n";
+	}
 
 	printMsg(temp);
 
@@ -3048,7 +3550,7 @@ void numberOfGoodLutSignatureWarningMsg::warningMsg() {
 	temp  = "There are ";
 	ultos(numberOfSignatures, buffer, 10, longConversionDigits);
 	temp += buffer;
-	temp += " signatures which are acceptaed belonging to the lut!!!\n";
+	temp += " signatures which are accepted belonging to the lut!!!\n";
 
 	printMsg(temp);
 
@@ -3200,14 +3702,14 @@ void usedTablesWarningMsg::warningMsg() {
 
 
 /****************************************************************
- * CLASS trackWithSameCoordinateDistributionWarningMsg			*
+ * CLASS sameHoughspaceCellDistributionWarningMsg			*
  ****************************************************************/
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-trackWithSameCoordinateDistributionWarningMsg::trackWithSameCoordinateDistributionWarningMsg() : analysisWarningMsg() {
+sameHoughspaceCellDistributionWarningMsg::sameHoughspaceCellDistributionWarningMsg() : analysisWarningMsg() {
 
 	distribution    = NULL;
 	numberOfEntries = 0;
@@ -3218,7 +3720,7 @@ trackWithSameCoordinateDistributionWarningMsg::trackWithSameCoordinateDistributi
  * Constructor													*
  ****************************************************************/
 
-trackWithSameCoordinateDistributionWarningMsg::trackWithSameCoordinateDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+sameHoughspaceCellDistributionWarningMsg::sameHoughspaceCellDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
 
 	this->distribution    = distribution;
 	this->numberOfEntries = numberOfEntries;
@@ -3229,7 +3731,7 @@ trackWithSameCoordinateDistributionWarningMsg::trackWithSameCoordinateDistributi
  * Destructor													*
  ****************************************************************/
 
-trackWithSameCoordinateDistributionWarningMsg::~trackWithSameCoordinateDistributionWarningMsg() {
+sameHoughspaceCellDistributionWarningMsg::~sameHoughspaceCellDistributionWarningMsg() {
 
 }
 
@@ -3237,14 +3739,14 @@ trackWithSameCoordinateDistributionWarningMsg::~trackWithSameCoordinateDistribut
  * This method displayDirectories a warning message.	 		*
  ****************************************************************/
 
-void trackWithSameCoordinateDistributionWarningMsg::warningMsg() {
+void sameHoughspaceCellDistributionWarningMsg::warningMsg() {
 
 	bool         nothingDetected;
 	std::string  temp;
 	char         buffer[intConversionDigits+1];
 
 	nothingDetected  = true;
-	temp             = "Distribution of the tracks which have the same coordinate:\n";
+	temp             = "Distribution of the tracks which have the same histogram cell:\n";
 	for (unsigned int i = 0; i < numberOfEntries; i++) {
 
 		if (distribution != NULL) {
@@ -3252,7 +3754,7 @@ void trackWithSameCoordinateDistributionWarningMsg::warningMsg() {
 			if (distribution[i] > 1) {
 
 				nothingDetected = false;
-
+				temp += "Index: ";
 				uitos(i, buffer, 10, intConversionDigits);
 				temp += buffer;
 				temp += "\t=> #Tracks: ";
@@ -3269,7 +3771,7 @@ void trackWithSameCoordinateDistributionWarningMsg::warningMsg() {
 
 	if (nothingDetected) {
 
-		temp += "No coordinate consisting of more than one track found!!!";
+		temp += "No histogram cells consisting of more than one track found!!!";
 
 	}
 
@@ -3341,14 +3843,14 @@ void listOfVolumesNotFoundWarningMsg::warningMsg() {
 
 
 /****************************************************************
- * CLASS listOfTracksNotFoundWarningMsg		 					*
+ * CLASS actualTrackNotFoundWarningMsg		 					*
  ****************************************************************/
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-listOfTracksNotFoundWarningMsg::listOfTracksNotFoundWarningMsg() : analysisWarningMsg() {
+actualTrackNotFoundWarningMsg::actualTrackNotFoundWarningMsg() : analysisWarningMsg() {
 
 }
 
@@ -3356,7 +3858,7 @@ listOfTracksNotFoundWarningMsg::listOfTracksNotFoundWarningMsg() : analysisWarni
  * Destructor													*
  ****************************************************************/
 
-listOfTracksNotFoundWarningMsg::~listOfTracksNotFoundWarningMsg() {
+actualTrackNotFoundWarningMsg::~actualTrackNotFoundWarningMsg() {
 
 }
 
@@ -3364,40 +3866,9 @@ listOfTracksNotFoundWarningMsg::~listOfTracksNotFoundWarningMsg() {
  * This method displayDirectories a warning message.	 		*
  ****************************************************************/
 
-void listOfTracksNotFoundWarningMsg::warningMsg() {
+void actualTrackNotFoundWarningMsg::warningMsg() {
 
-	printMsg("The list of the tracks in the TGeoManager is not found!!!");
-
-}
-
-
-/****************************************************************
- * CLASS currentTrackNotFoundWarningMsg		 					*
- ****************************************************************/
-
-/****************************************************************
- * Default constructor											*
- ****************************************************************/
-
-currentTrackNotFoundWarningMsg::currentTrackNotFoundWarningMsg() : analysisWarningMsg() {
-
-}
-
-/****************************************************************
- * Destructor													*
- ****************************************************************/
-
-currentTrackNotFoundWarningMsg::~currentTrackNotFoundWarningMsg() {
-
-}
-
-/****************************************************************
- * This method displayDirectories a warning message.	 		*
- ****************************************************************/
-
-void currentTrackNotFoundWarningMsg::warningMsg() {
-
-	printMsg("The list of the tracks in the TGeoManager is not found!!!");
+	printMsg("The actual track is not defined!!!");
 
 }
 
@@ -3500,16 +3971,18 @@ numberOfTracksInAllLayersWarningMsg::~numberOfTracksInAllLayersWarningMsg() {
 
 void numberOfTracksInAllLayersWarningMsg::warningMsg() {
 
-	bool         nothingDetected;
-	std::string  temp;
-	char         buffer[intConversionDigits+1];
+	bool          nothingDetected;
+	std::string   temp;
+	char          buffer[intConversionDigits+1];
+	unsigned long numberOfTracks;
 
 	/* This is just to avoid the division with zero */
 	if (numberOfSummedEventsToAverage == 0)
 		numberOfSummedEventsToAverage = 1;
 
 	nothingDetected  = true;
-	temp             = "Distribution of the found tracks per histogram layer:\n";
+	temp             = "Distribution of the number of track candidates per histogram layer:\n";
+	numberOfTracks   = 0;
 	for (unsigned int i = 0; i < numberOfEntries; i++) {
 
 		if (distribution != NULL) {
@@ -3518,6 +3991,7 @@ void numberOfTracksInAllLayersWarningMsg::warningMsg() {
 
 				nothingDetected = false;
 
+				temp += "Index: ";
 				uitos(i, buffer, 10, intConversionDigits);
 				temp += buffer;
 				temp += "\t=> #Tracks: ";
@@ -3525,6 +3999,8 @@ void numberOfTracksInAllLayersWarningMsg::warningMsg() {
 				uitos((unsigned int)((double)distribution[i] / (double)numberOfSummedEventsToAverage), buffer, 10, intConversionDigits);
 				temp += buffer;
 				temp += "\n";
+
+				numberOfTracks += distribution[i];
 
 			}
 
@@ -3535,6 +4011,13 @@ void numberOfTracksInAllLayersWarningMsg::warningMsg() {
 	if (nothingDetected) {
 
 		temp += "No track is found!!!";
+
+	}
+	else {
+
+		temp += "Number of tracks: ";
+		ultos((unsigned int)((double)numberOfTracks / (double)numberOfSummedEventsToAverage), buffer, 10, longConversionDigits);
+		temp += buffer;
 
 	}
 
@@ -3594,7 +4077,7 @@ void numberOfTrackDensitiesInAllLayersWarningMsg::warningMsg() {
 		numberOfSummedEventsToAverage = 1;
 
 	nothingDetected  = true;
-	temp             = "Distribution of the found track densities per histogram layer:\n";
+	temp             = "Distribution of the difference number of track candidates between consecutive histogram layers:\n";
 	for (unsigned int i = 0; i < numberOfEntries; i++) {
 
 		if (distribution != NULL) {
@@ -3682,10 +4165,11 @@ void numberOfMinimalTracksInAllColumnsWarningMsg::warningMsg() {
 
 			if (distribution[i] > 0) {
 
-			sum      += distribution[i];
+				sum      += distribution[i];
 
 				nothingDetected = false;
 
+				temp += "Index: ";
 				uitos(i, buffer, 10, intConversionDigits);
 				temp += buffer;
 				temp += "\t=> #Tracks: ";
@@ -3764,22 +4248,12 @@ void numberOfAverageTracksInAllColumnsWarningMsg::warningMsg() {
 	unsigned int i;
 	bool         nothingDetected;
 	std::string  temp;
-	double       numberOfTracks;
-	char         buffer[doubleConversion+1];
+	char         buffer[intConversionDigits+1];
 
 	nothingDetected  = true;
 	temp             = "Distribution of the average number of found tracks per histogram column in all layers:\n";
 
 	if (distribution != NULL) {
-
-		numberOfTracks = 0;
-		for (i = 0; i < numberOfEntries; i++)
-			if (distribution[i] > 0)
-				numberOfTracks += distribution[i];
-
-		/* This is just to avoid the division with zero */
-		if (numberOfTracks == 0)
-			numberOfTracks = 1;
 
 		for (i = 0; i < numberOfEntries; i++) {
 
@@ -3787,11 +4261,12 @@ void numberOfAverageTracksInAllColumnsWarningMsg::warningMsg() {
 
 				nothingDetected = false;
 
+				temp += "Index: ";
 				uitos(i, buffer, 10, intConversionDigits);
 				temp += buffer;
 				temp += "\t=> #Tracks: ";
 
-				dtos((distribution[i] * 100) / numberOfTracks, buffer, doubleConversionDigits);
+				dtos(distribution[i] / (double)numberOfSummedEventsToAverage, buffer, doubleConversionDigits);
 				temp += buffer;
 				temp += "\n";
 
@@ -3804,18 +4279,6 @@ void numberOfAverageTracksInAllColumnsWarningMsg::warningMsg() {
 	if (nothingDetected) {
 
 		temp += "No track is found!!!";
-
-	}
-	else {
-
-		/* This is just to avoid the division with zero */
-		if (numberOfSummedEventsToAverage == 0)
-			numberOfSummedEventsToAverage = 1;
-
-		temp += "percentage of tracks [%] (100%/Lage=";
-		ustos((unsigned short)((numberOfTracks / (double)numberOfSummedEventsToAverage) + 0.5), buffer, 10, shortConversionDigits);
-		temp += buffer;
-		temp += ")";
 
 	}
 
@@ -3882,6 +4345,7 @@ void numberOfMaximalTracksInAllColumnsWarningMsg::warningMsg() {
 
 				nothingDetected = false;
 
+				temp += "Index: ";
 				uitos(i, buffer, 10, intConversionDigits);
 				temp += buffer;
 				temp += "\t=> #Tracks: ";
@@ -3916,14 +4380,14 @@ void numberOfMaximalTracksInAllColumnsWarningMsg::warningMsg() {
 
 
 /****************************************************************
- * CLASS sizeOfSeparatorFifosWarningMsg							*
+ * CLASS sizeOfColumnSeparatorFifosWarningMsg					*
  ****************************************************************/
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-sizeOfSeparatorFifosWarningMsg::sizeOfSeparatorFifosWarningMsg() : analysisWarningMsg() {
+sizeOfColumnSeparatorFifosWarningMsg::sizeOfColumnSeparatorFifosWarningMsg() : analysisWarningMsg() {
 
 	distribution    = NULL;
 	numberOfEntries = 0;
@@ -3934,7 +4398,7 @@ sizeOfSeparatorFifosWarningMsg::sizeOfSeparatorFifosWarningMsg() : analysisWarni
  * Constructor													*
  ****************************************************************/
 
-sizeOfSeparatorFifosWarningMsg::sizeOfSeparatorFifosWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+sizeOfColumnSeparatorFifosWarningMsg::sizeOfColumnSeparatorFifosWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
 
 	this->distribution    = distribution;
 	this->numberOfEntries = numberOfEntries;
@@ -3945,7 +4409,7 @@ sizeOfSeparatorFifosWarningMsg::sizeOfSeparatorFifosWarningMsg(unsigned int* dis
  * Destructor													*
  ****************************************************************/
 
-sizeOfSeparatorFifosWarningMsg::~sizeOfSeparatorFifosWarningMsg() {
+sizeOfColumnSeparatorFifosWarningMsg::~sizeOfColumnSeparatorFifosWarningMsg() {
 
 }
 
@@ -3953,7 +4417,7 @@ sizeOfSeparatorFifosWarningMsg::~sizeOfSeparatorFifosWarningMsg() {
  * This method displayDirectories a warning message.	 		*
  ****************************************************************/
 
-void sizeOfSeparatorFifosWarningMsg::warningMsg() {
+void sizeOfColumnSeparatorFifosWarningMsg::warningMsg() {
 
 	bool         nothingDetected;
 	std::string  temp;
@@ -3971,7 +4435,7 @@ void sizeOfSeparatorFifosWarningMsg::warningMsg() {
 
 		if (distribution != NULL) {
 
-			value    = std::min(counter, distribution[i]);
+			value    = min(counter, distribution[i]);
 
 			counter += distribution[i];
 
@@ -3981,6 +4445,7 @@ void sizeOfSeparatorFifosWarningMsg::warningMsg() {
 
 				nothingDetected = false;
 
+				temp += "Index: ";
 				uitos(i, buffer, 10, intConversionDigits);
 				temp += buffer;
 				temp += "\t=> Fifo-size: ";
@@ -3997,7 +4462,375 @@ void sizeOfSeparatorFifosWarningMsg::warningMsg() {
 
 	if (nothingDetected) {
 
-		temp += "No Fifo-size can be evaluated!!!";
+		temp += "No Fifos are needed!!!";
+
+	}
+	else {
+
+		temp += "There are ";
+		uitos(sum, buffer, 10, intConversionDigits);
+		temp += buffer;
+		temp += " FIFOs needed at all.";
+
+	}
+
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS numberOfMinimalTracksInAllRowsWarningMsg				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+numberOfMinimalTracksInAllRowsWarningMsg::numberOfMinimalTracksInAllRowsWarningMsg() : analysisWarningMsg() {
+
+	distribution    = NULL;
+	numberOfEntries = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+numberOfMinimalTracksInAllRowsWarningMsg::numberOfMinimalTracksInAllRowsWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+
+	this->distribution    = distribution;
+	this->numberOfEntries = numberOfEntries;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+numberOfMinimalTracksInAllRowsWarningMsg::~numberOfMinimalTracksInAllRowsWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void numberOfMinimalTracksInAllRowsWarningMsg::warningMsg() {
+
+	bool         nothingDetected;
+	std::string  temp;
+	unsigned int sum;
+	char         buffer[intConversionDigits+1];
+
+	nothingDetected  = true;
+	temp             = "Distribution of the minimal number of found tracks per histogram row in all layers:\n";
+	sum              = 0;
+	for (unsigned int i = 0; i < numberOfEntries; i++) {
+
+		if (distribution != NULL) {
+
+			if (distribution[i] > 0) {
+
+				sum      += distribution[i];
+
+				nothingDetected = false;
+
+				temp += "Index: ";
+				uitos(i, buffer, 10, intConversionDigits);
+				temp += buffer;
+				temp += "\t=> #Tracks: ";
+
+				uitos(distribution[i], buffer, 10, intConversionDigits);
+				temp += buffer;
+				temp += "\n";
+
+			}
+
+		}
+
+	}
+
+	if (nothingDetected) {
+
+		temp += "No track is found!!!";
+
+	}
+	else {
+
+		temp += "There are ";
+		uitos(sum, buffer, 10, intConversionDigits);
+		temp += buffer;
+		temp += " tracks found in the worst case in one layer.";
+
+	}
+
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS numberOfAverageTracksInAllRowsWarningMsg				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+numberOfAverageTracksInAllRowsWarningMsg::numberOfAverageTracksInAllRowsWarningMsg() : analysisWarningMsg() {
+
+	distribution                  = NULL;
+	numberOfEntries               = 0;
+	numberOfSummedEventsToAverage = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+numberOfAverageTracksInAllRowsWarningMsg::numberOfAverageTracksInAllRowsWarningMsg(double* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage) : analysisWarningMsg() {
+
+	this->distribution                  = distribution;
+	this->numberOfEntries               = numberOfEntries;
+	this->numberOfSummedEventsToAverage = numberOfSummedEventsToAverage;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+numberOfAverageTracksInAllRowsWarningMsg::~numberOfAverageTracksInAllRowsWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void numberOfAverageTracksInAllRowsWarningMsg::warningMsg() {
+
+	unsigned int i;
+	bool         nothingDetected;
+	std::string  temp;
+	char         buffer[intConversionDigits+1];
+
+	nothingDetected  = true;
+	temp             = "Distribution of the average number of found tracks per histogram row in all layers:\n";
+
+	if (distribution != NULL) {
+
+		for (i = 0; i < numberOfEntries; i++) {
+
+			if (distribution[i] > 0) {
+
+				nothingDetected = false;
+
+				temp += "Index: ";
+				uitos(i, buffer, 10, intConversionDigits);
+				temp += buffer;
+				temp += "\t=> #Tracks: ";
+
+				dtos(distribution[i] / (double)numberOfSummedEventsToAverage, buffer, doubleConversionDigits);
+				temp += buffer;
+				temp += "\n";
+
+			}
+
+		}
+
+	}
+
+	if (nothingDetected) {
+
+		temp += "No track is found!!!";
+
+	}
+
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS numberOfMaximalTracksInAllRowsWarningMsg				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+numberOfMaximalTracksInAllRowsWarningMsg::numberOfMaximalTracksInAllRowsWarningMsg() : analysisWarningMsg() {
+
+	distribution    = NULL;
+	numberOfEntries = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+numberOfMaximalTracksInAllRowsWarningMsg::numberOfMaximalTracksInAllRowsWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+
+	this->distribution    = distribution;
+	this->numberOfEntries = numberOfEntries;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+numberOfMaximalTracksInAllRowsWarningMsg::~numberOfMaximalTracksInAllRowsWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void numberOfMaximalTracksInAllRowsWarningMsg::warningMsg() {
+
+	bool         nothingDetected;
+	std::string  temp;
+	unsigned int sum;
+	char         buffer[intConversionDigits+1];
+
+	nothingDetected  = true;
+	temp             = "Distribution of the maximal number of found tracks per histogram row in all layers:\n";
+	sum              = 0;
+	for (unsigned int i = 0; i < numberOfEntries; i++) {
+
+		if (distribution != NULL) {
+
+			sum      += distribution[i];
+
+			if (distribution[i] > 0) {
+
+				nothingDetected = false;
+
+				temp += "Index: ";
+				uitos(i, buffer, 10, intConversionDigits);
+				temp += buffer;
+				temp += "\t=> #Tracks: ";
+
+				uitos(distribution[i], buffer, 10, intConversionDigits);
+				temp += buffer;
+				temp += "\n";
+
+			}
+
+		}
+
+	}
+
+	if (nothingDetected) {
+
+		temp += "No track is found!!!";
+
+	}
+	else {
+
+		temp += "There are ";
+		uitos(sum, buffer, 10, intConversionDigits);
+		temp += buffer;
+		temp += " tracks found in the worst case in one layer.";
+
+	}
+
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS sizeOfRowSeparatorFifosWarningMsg						*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+sizeOfRowSeparatorFifosWarningMsg::sizeOfRowSeparatorFifosWarningMsg() : analysisWarningMsg() {
+
+	distribution    = NULL;
+	numberOfEntries = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+sizeOfRowSeparatorFifosWarningMsg::sizeOfRowSeparatorFifosWarningMsg(unsigned int* distribution, unsigned int numberOfEntries) : analysisWarningMsg() {
+
+	this->distribution    = distribution;
+	this->numberOfEntries = numberOfEntries;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+sizeOfRowSeparatorFifosWarningMsg::~sizeOfRowSeparatorFifosWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void sizeOfRowSeparatorFifosWarningMsg::warningMsg() {
+
+	bool         nothingDetected;
+	std::string  temp;
+	unsigned int value;
+	unsigned int counter;
+	unsigned int sum;
+	char         buffer[intConversionDigits+1];
+
+	nothingDetected  = true;
+	temp             = "Distribution of the assumed histogram row FIFO sizes for the separator of the found tracks:\n";
+	value            = 0;
+	counter          = 0;
+	sum              = 0;
+	for (unsigned int i = 0; i < numberOfEntries; i++) {
+
+		if (distribution != NULL) {
+
+			value    = min(counter, distribution[i]);
+
+			counter += distribution[i];
+
+			sum     += value;
+
+			if (value > 0) {
+
+				nothingDetected = false;
+
+				temp += "Index: ";
+				uitos(i, buffer, 10, intConversionDigits);
+				temp += buffer;
+				temp += "\t=> Fifo-size: ";
+
+				uitos(value, buffer, 10, intConversionDigits);
+				temp += buffer;
+				temp += "\n";
+
+			}
+
+		}
+
+	}
+
+	if (nothingDetected) {
+
+		temp += "No Fifos are needed!!!";
 
 	}
 	else {
@@ -4041,5 +4874,554 @@ youCannotEnableTrackWithSameMomentaAndCoordinateDistributionWarningMsg::~youCann
 void youCannotEnableTrackWithSameMomentaAndCoordinateDistributionWarningMsg::warningMsg() {
 
 	printMsg("The distribution with the tracks with the same momentas cannot be enabled in combination with the distribution with the same coordinates!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS relativeDisplayNotAccessibleWarningMsg					*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+relativeDisplayNotAccessibleWarningMsg::relativeDisplayNotAccessibleWarningMsg() : analysisWarningMsg() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+relativeDisplayNotAccessibleWarningMsg::~relativeDisplayNotAccessibleWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void relativeDisplayNotAccessibleWarningMsg::warningMsg() {
+
+	printMsg("The relative display is not accessible!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS numberOfPrelutRangesFoundWarningMsg	 				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+numberOfPrelutRangesFoundWarningMsg::numberOfPrelutRangesFoundWarningMsg() : analysisWarningMsg() {
+
+	numberofPrelutRanges = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+numberOfPrelutRangesFoundWarningMsg::numberOfPrelutRangesFoundWarningMsg(unsigned short numberofPrelutRanges) : analysisWarningMsg() {
+
+	this->numberofPrelutRanges = numberofPrelutRanges;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+numberOfPrelutRangesFoundWarningMsg::~numberOfPrelutRangesFoundWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void numberOfPrelutRangesFoundWarningMsg::warningMsg() {
+
+	std::string temp;
+	char        buffer[shortConversionDigits+1];
+
+	temp = "There are ";
+	ustos(numberofPrelutRanges, buffer, 10, intConversionDigits);
+	temp += buffer;
+	temp += " prelut ranges detected which fullfills the requirements!!!";
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS maximumPrelutRangePercentageWarningMsg	 				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+maximumPrelutRangePercentageWarningMsg::maximumPrelutRangePercentageWarningMsg() : analysisWarningMsg() {
+
+	percentage = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+maximumPrelutRangePercentageWarningMsg::maximumPrelutRangePercentageWarningMsg(unsigned short percentage) : analysisWarningMsg() {
+
+	this->percentage = percentage;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+maximumPrelutRangePercentageWarningMsg::~maximumPrelutRangePercentageWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void maximumPrelutRangePercentageWarningMsg::warningMsg() {
+
+	std::string temp;
+	char        buffer[shortConversionDigits+1];
+
+	temp = "The maximum hit percentage in the prelut range is ";
+	ustos(percentage, buffer, 10, intConversionDigits);
+	temp += buffer;
+	temp += "%!!!";
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS meanPrelutRangeEntriesPerHitWarningMsg					*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+meanPrelutRangeEntriesPerHitWarningMsg::meanPrelutRangeEntriesPerHitWarningMsg() : analysisWarningMsg() {
+
+	mean = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+meanPrelutRangeEntriesPerHitWarningMsg::meanPrelutRangeEntriesPerHitWarningMsg(double mean) : analysisWarningMsg() {
+
+	this->mean = mean;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+meanPrelutRangeEntriesPerHitWarningMsg::~meanPrelutRangeEntriesPerHitWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void meanPrelutRangeEntriesPerHitWarningMsg::warningMsg() {
+
+	std::string temp;
+	char        doubleBuffer[doubleConversion+1];
+
+	temp =  "The prelut range causes a mean of ";
+	dtos(mean, doubleBuffer, doubleConversionDigits);
+	temp += doubleBuffer;
+	temp += " entries per hit!!!";
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS hitReadoutDistributionWarningMsg						*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+hitReadoutDistributionWarningMsg::hitReadoutDistributionWarningMsg() : analysisWarningMsg() {
+
+	distribution                  = NULL;
+	numberOfEntries               = 0;
+	numberOfSummedEventsToAverage = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+hitReadoutDistributionWarningMsg::hitReadoutDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage) : analysisWarningMsg() {
+
+	this->distribution                  = distribution;
+	this->numberOfEntries               = numberOfEntries;
+	this->numberOfSummedEventsToAverage = numberOfSummedEventsToAverage;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+hitReadoutDistributionWarningMsg::~hitReadoutDistributionWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void hitReadoutDistributionWarningMsg::warningMsg() {
+
+	bool         nothingDetected;
+	std::string  temp;
+	char         buffer[intConversionDigits+1];
+
+	/* This is just to avoid the division with zero */
+	if (numberOfSummedEventsToAverage == 0)
+		numberOfSummedEventsToAverage = 1;
+
+	nothingDetected  = true;
+	temp             = "Distribution of the hit readout/processing to build all histogram layers:\n";
+	for (unsigned int i = 0; i < numberOfEntries; i++) {
+
+		if (distribution != NULL) {
+
+			if (distribution[i] != 0) {
+
+				nothingDetected = false;
+
+				temp += "Number of readouts: ";
+				uitos(i+1, buffer, 10, intConversionDigits);
+				temp += buffer;
+				temp += "\t=> #Hits: ";
+
+				uitos((unsigned int)((double)distribution[i] / (double)numberOfSummedEventsToAverage), buffer, 10, intConversionDigits);
+				temp += buffer;
+				temp += "\n";
+
+			}
+
+		}
+
+	}
+
+	if (nothingDetected) {
+
+		temp += "The distribution of the hit readout/processing to build all histogram layers is not found!!!";
+
+	}
+
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS hitReadoutDistributionWarningMsg						*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+hitReadoutMeanDistributionWarningMsg::hitReadoutMeanDistributionWarningMsg() : analysisWarningMsg() {
+
+	distribution                  = NULL;
+	numberOfEntries               = 0;
+	numberOfSummedEventsToAverage = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+hitReadoutMeanDistributionWarningMsg::hitReadoutMeanDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage) : analysisWarningMsg() {
+
+	this->distribution                  = distribution;
+	this->numberOfEntries               = numberOfEntries;
+	this->numberOfSummedEventsToAverage = numberOfSummedEventsToAverage;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+hitReadoutMeanDistributionWarningMsg::~hitReadoutMeanDistributionWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void hitReadoutMeanDistributionWarningMsg::warningMsg() {
+
+	unsigned int j;
+	bool         nothingDetected;
+	double       sum;
+	std::string  temp;
+	double       meanValue;
+	char         intBuffer[intConversionDigits+1];
+	char         doubleBuffer[doubleConversion+1];
+
+	/* This is just to avoid the division with zero */
+	if (numberOfSummedEventsToAverage == 0)
+		numberOfSummedEventsToAverage = 1;
+
+	nothingDetected  = true;
+
+	sum   = 0;
+	for (j = 0; j < numberOfEntries; j++)
+		sum += (double)distribution[j] / (double)numberOfSummedEventsToAverage;
+
+	if (sum == 0)
+		sum = 1;
+
+	temp  = "Distribution how often a single hit must be read in the mean, if a certain number of parallely implemented histogram layers are used:\n";
+
+	for (unsigned int i = 0; i < numberOfEntries; i++) {
+
+		meanValue = 0;
+		for (j = 0; j < numberOfEntries; j++) {
+
+			if (distribution != NULL) {
+
+				if (distribution[j] != 0) {
+
+					nothingDetected = false;
+
+					if (i + 1 < numberOfEntries)
+						meanValue += (1 + ((double)j / (double)(i + 1))) * ((double)distribution[j] / (double)numberOfSummedEventsToAverage);
+					else
+						meanValue += (double)distribution[j] / (double)numberOfSummedEventsToAverage;
+
+				}
+
+			}
+
+		}
+
+		if (meanValue > 0) {
+
+			temp += "Parallely implemented layers: ";
+			uitos(i + 1, intBuffer, 10, shortConversionDigits);
+			temp += intBuffer;
+			temp += "\t=> mean: ";
+			dtos(meanValue / sum, doubleBuffer, doubleConversionDigits);
+			temp += doubleBuffer;
+			temp += " times\n";
+	
+		}
+
+	}
+
+	if (nothingDetected) {
+
+		temp += "The mean could just be computed, if there are any histogram layer distributions!!!";
+
+	}
+
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS fpgaHistogramProcessingTimeDistributionWarningMsg		*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+fpgaHistogramProcessingTimeDistributionWarningMsg::fpgaHistogramProcessingTimeDistributionWarningMsg() : analysisWarningMsg() {
+
+	distribution                  = NULL;
+	numberOfEntries               = 0;
+	numberOfSummedEventsToAverage = 0;
+	readoutColumnsInParallel      = false;
+	histogramDim1                 = 0;
+	histogramDim2                 = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+fpgaHistogramProcessingTimeDistributionWarningMsg::fpgaHistogramProcessingTimeDistributionWarningMsg(unsigned int* distribution, unsigned int numberOfEntries, unsigned int numberOfSummedEventsToAverage, bool readoutColumnsInParallel, unsigned short histogramDim1, unsigned short histogramDim2) : analysisWarningMsg() {
+
+	this->distribution                  = distribution;
+	this->numberOfEntries               = numberOfEntries;
+	this->numberOfSummedEventsToAverage = numberOfSummedEventsToAverage;
+	this->readoutColumnsInParallel      = readoutColumnsInParallel;
+	this->histogramDim1                 = histogramDim1;
+	this->histogramDim2                 = histogramDim2;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+fpgaHistogramProcessingTimeDistributionWarningMsg::~fpgaHistogramProcessingTimeDistributionWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void fpgaHistogramProcessingTimeDistributionWarningMsg::warningMsg() {
+
+	unsigned int j;
+	bool         nothingDetected;
+	std::string  temp;
+	unsigned int timeHistogramReadout;
+	double       timeHistogramming;
+	char         buffer[intConversionDigits+1];
+
+	/* This is just to avoid the division with zero */
+	if (numberOfSummedEventsToAverage == 0)
+		numberOfSummedEventsToAverage = 1;
+
+	nothingDetected  = true;
+
+	temp  = "Distribution of the time needed for processing the histogram, if a certain number of parallely implemented histogram layers are used:\n";
+
+	for (unsigned int i = 0; i < numberOfEntries; i++) {
+
+		if (readoutColumnsInParallel)
+			timeHistogramReadout = histogramDim2 * ((numberOfEntries + i) / (i + 1));
+		else
+			timeHistogramReadout = histogramDim1 * ((numberOfEntries + i) / (i + 1));
+
+		timeHistogramming    = 0;
+		for (j = 0; j < numberOfEntries; j++) {
+
+			if (distribution != NULL) {
+
+				if (distribution[j] != 0) {
+
+					nothingDetected = false;
+
+					if (i + 1 < numberOfEntries)
+						timeHistogramming += (1 + ((double)j / (double)(i + 1))) * ((double)distribution[j] / (double)numberOfSummedEventsToAverage);
+					else
+						timeHistogramming += (double)distribution[j] / (double)numberOfSummedEventsToAverage;
+
+				}
+
+			}
+
+		}
+
+		if (timeHistogramming > 0) {
+
+			temp += "Parallely implemented layers: ";
+			uitos(i + 1, buffer, 10, shortConversionDigits);
+			temp += buffer;
+			temp += "\t=> time: ";
+			uitos((unsigned int)ceil(timeHistogramming) + timeHistogramReadout, buffer, 10, shortConversionDigits);
+			temp += buffer;
+			temp += " clock cycles\n";
+	
+		}
+
+	}
+
+	if (nothingDetected) {
+
+		temp += "The mean could just be computed, if there are any histogram layer distributions!!!";
+
+	}
+
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS meanValueWarningMsg									*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+meanValueWarningMsg::meanValueWarningMsg() : analysisWarningMsg() {
+
+	mean = 0;
+	dimension.clear();
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+meanValueWarningMsg::meanValueWarningMsg(double mean, std::string dimension) : analysisWarningMsg() {
+
+	this->mean      = mean;
+	this->dimension = dimension;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+meanValueWarningMsg::~meanValueWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void meanValueWarningMsg::warningMsg() {
+
+	std::string temp;
+	char        doubleBuffer[doubleConversion+1];
+
+	temp += "\n";
+	temp += dimension;
+	temp += ": ";
+	dtos(mean, doubleBuffer, doubleConversionDigits);
+	temp += doubleBuffer;
+	temp += " cells!!!\n";
+
+	printMsg(temp);
 
 }

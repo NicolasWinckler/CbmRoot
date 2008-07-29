@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-05-29 15:11:48 $
-/// $Revision: 1.6 $
+/// $Date: 2007-10-19 14:34:30 $
+/// $Revision: 1.7 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -75,8 +75,8 @@ protected:
 	TClonesArray*  inputMapsHits;				/**< Object to store all hits from the maps stations which are read from file. */
 	TClonesArray*  inputHybridHits;				/**< Object to store all hits from the hybrid stations which are read from file. */
 	TClonesArray*  inputStripHits;				/**< Object to store all hits from the strip stations which are read from file. */
-	TClonesArray*  inputStsHits;				/**< Object to store all hits from the STS stations which are read from file. */
 	TClonesArray*  inputMvdHits;				/**< Object to store all hits from the MVD stations which are read from file. */
+	TClonesArray*  inputStsHits;				/**< Object to store all hits from the STS stations which are read from file. */
 	TClonesArray*  inputTracks;					/**< Object to store all tracks which are read from file. */
 	std::string    detectorFileName;			/**< Variable to store the name of the file which consists of the detector's geometry definition ascii file. */
 	unsigned short numberOfVolumesInfrontOfSTS; /**< Variable to store the number of geometric volumes which are established in front of the STS volumes. Needed to compute the correct volumeID. */
@@ -262,12 +262,12 @@ public:
 	void readDataSource(unsigned int event, TClonesArray* mvdHitArray, TClonesArray* stsHitArray);
 
 /**
- * This method returns the size of the used memory for the
- * source data.
+ * This method returns the size of the reserved memory for
+ * the source data.
  * @param dimension formats the returnvalue to B, kB, MB or GB
  */
 
-	double getUsedSizeOfData(unsigned short dimension);
+	double getReservedSizeOfData(unsigned short dimension = 0);
 
 /**
  * This method returns the size of the allocated memory for
@@ -275,7 +275,15 @@ public:
  * @param dimension formats the returnvalue to B, kB, MB or GB
  */
 
-	double getAllocatedSizeOfData(unsigned short dimension);
+	double getAllocatedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfData(unsigned short dimension = 0);
 
 };
 

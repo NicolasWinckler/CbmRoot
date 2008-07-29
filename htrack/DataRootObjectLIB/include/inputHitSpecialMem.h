@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:27:34 $
-/// $Revision: 1.1 $
+/// $Date: 2007-10-19 14:32:58 $
+/// $Revision: 1.2 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -97,18 +97,28 @@ public:
 	typeOfMemories& operator [] (size_t index);
 
 /**
- * This method returns the size of the used memory for
- * hits.
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
  */
 
-	size_t getUsedSizeOfMemory();
+	double getReservedSizeOfData(unsigned short dimension = 0);
 
 /**
  * This method returns the size of the allocated memory for
- * hits.
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
  */
 
-	size_t getAllocatedSizeOfMemory();
+	double getAllocatedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfData(unsigned short dimension = 0);
 
 };
 

@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-05-18 12:26:46 $
-// $Revision: 1.8 $
+// $Date: 2008-04-08 00:42:27 $
+// $Revision: 1.10 $
 //
 // *******************************************************************/
 
@@ -34,6 +34,9 @@
 #include "../include/lutGeneratorError.h"
 #include "../include/lutGeneratorWarningMsg.h"
 #include "../include/lutMath.h"
+
+
+#define min(a, b)  (((a) < (b)) ? (a) : (b)) 
 
 
 /****************************************************************
@@ -207,7 +210,7 @@ void lutMath::evaluateHistogramBorderV1(trackfinderInputHit* hit, lutHoughBorder
 	else
 		actualBorderPointer = &border;
 
-#if (LUTVERSION > 1)
+#if (LUTVERSION > 2)
 
 	houghBorderPosition  previousHoughCoord;
 	bool                 houghCoordIsEmpty = true;
@@ -245,7 +248,7 @@ void lutMath::evaluateHistogramBorderV1(trackfinderInputHit* hit, lutHoughBorder
 
 					actualHoughCoord.pos2 = j;
 
-#if (LUTVERSION > 1)
+#if (LUTVERSION > 2)
 
 					/* the minimal corrected slope for the entries must be 45 degree */
 					if (!houghCoordIsEmpty) {
@@ -292,6 +295,8 @@ void lutMath::evaluateHistogramBorderV1(trackfinderInputHit* hit, lutHoughBorder
 }
 void lutMath::evaluateHistogramBorderV2(trackfinderInputHit* hit, lutHoughBorder* borderPointer) {
 
+	unsigned short       j;
+	unsigned short       pos2Start;
 	double               posX;
 	double               posZ;
 	double               thetaIncr;
@@ -299,6 +304,7 @@ void lutMath::evaluateHistogramBorderV2(trackfinderInputHit* hit, lutHoughBorder
 	double               magnetfieldFactor;
 	double               theta;
 	double               q_p_xz;
+	double               q_p_xz_previous;
 	unsigned short       actualPos2;
 	lutHoughBorder*      actualBorderPointer;
 	houghBorderPosition  actualHoughCoord;
@@ -310,7 +316,17 @@ void lutMath::evaluateHistogramBorderV2(trackfinderInputHit* hit, lutHoughBorder
 	else
 		actualBorderPointer = &border;
 
-#if (LUTVERSION > 1)
+#if (LUTVERSION == 1)
+
+	pos2Start = 0;
+
+#else
+
+	pos2Start = 1;
+
+#endif
+
+#if (LUTVERSION > 2)
 
 	bool                 correction            = true;
 
@@ -326,6 +342,7 @@ void lutMath::evaluateHistogramBorderV2(trackfinderInputHit* hit, lutHoughBorder
 
 	magnetfieldFactor = evaluateMagnetfieldFactor(hit);
 	theta             = def.dim1Min;
+	q_p_xz_previous   = def.dim2Min - 1;
 
 	if (magnetfieldFactor == 0)
 		throw magneticFieldFactorCannotBeZero();
@@ -345,7 +362,7 @@ void lutMath::evaluateHistogramBorderV2(trackfinderInputHit* hit, lutHoughBorder
 			/* compute the position of the value of the second dimension */
 			actualPos2            = (unsigned short)(((q_p_xz - def.dim2Min) / q_p_xzIncr) + 0.0);
 
-#if (LUTVERSION > 1)
+#if (LUTVERSION > 2)
 
 			/* check for not possible entries in hardware and correct them */
 			if (!houghCoordPos2IsEmpty) {
@@ -385,8 +402,8 @@ void lutMath::evaluateHistogramBorderV2(trackfinderInputHit* hit, lutHoughBorder
 
 			}
 
-			/* do all entries for the computed one to the last one*/
-			for (unsigned short j = previousHoughCoord.pos2 + 1; j <= actualPos2; j++) {
+			/* do all entries for the computed one to the last one */
+			for (j = previousHoughCoord.pos2 + pos2Start; j <= min(actualPos2, def.dim2Step - 1); j++) {
 
 				actualHoughCoord.pos2 = j;
 				actualBorderPointer->houghCoord.push(actualHoughCoord);
@@ -396,8 +413,32 @@ void lutMath::evaluateHistogramBorderV2(trackfinderInputHit* hit, lutHoughBorder
 			previousHoughCoord.pos2 = actualHoughCoord.pos2;
 
 		}
+		else if ((def.dim2Min > q_p_xz_previous) && (q_p_xz > def.dim2Max)) {
 
-		theta       += thetaIncr;
+			/* compute the position of the value of the first dimension */
+			actualHoughCoord.pos1  = i;
+			/* compute the position of the value of the second dimension */
+			actualPos2             = (unsigned short)((((q_p_xz + q_p_xz_previous) / 2 - def.dim2Min) / q_p_xzIncr) + 0.0);;
+
+		}
+
+		theta                     += thetaIncr;
+		q_p_xz_previous            = q_p_xz;
+
+	}
+
+	if (houghCoordPos2IsEmpty) {
+
+		/* do all entries for the computed one to the last one, if the q_p_xz range is to small */
+		for (j = 0; j <= min(actualPos2, def.dim2Step - 1); j++) {
+
+			previousHoughCoord.pos2 = j;
+			actualHoughCoord.pos2   = j;
+			actualBorderPointer->houghCoord.push(actualHoughCoord);
+
+		}
+
+		houghCoordPos2IsEmpty   = false;
 
 	}
 
@@ -415,7 +456,7 @@ void lutMath::evaluateHistogramBorderV2(trackfinderInputHit* hit, lutHoughBorder
 
 			actualHoughCoord.pos1++;
 
-			for (unsigned short j = previousHoughCoord.pos2 + 1; j < def.dim2Step; j++) {
+			for (j = previousHoughCoord.pos2 + pos2Start; j < def.dim2Step; j++) {
 
 				actualHoughCoord.pos2 = j;
 				actualBorderPointer->houghCoord.push(actualHoughCoord);

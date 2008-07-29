@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-19 14:32:29 $
-// $Revision: 1.7 $
+// $Date: 2007-10-19 14:34:32 $
+// $Revision: 1.8 $
 //
 // *******************************************************************/
 
@@ -34,10 +34,10 @@
 #include "CbmRunAna.h"
 #include "CbmRuntimeDb.h"
 #include "CbmGeoVector.h"
+#include "CbmGeoNode.h"
 #include "CbmGeoStsPar.h"
 #include "CbmStsStation.h"
 #include "CbmMvdGeoPar.h"
-#include "CbmGeoNode.h"
 //#include "CbmMvdStation.h"
 #endif
 #include "../../MiscLIB/include/conversionRoutines.h"
@@ -133,15 +133,15 @@ bool inputFRoot::readMvdDetectorByInterface(CbmStsDigiScheme* scheme) {
 
 			if (station != NULL) {
 
-				// set the id of the station 
+				/* set the id of the station */
 //				actualStation.setId(station->GetStationNr());
-				// set the distance of the station 
+				/* set the distance of the station */
 //				actualStation.setDistance(station->GetZ());
-				// reset the type of the station
+				/* reset the type of the station */
 //				actualStation.removeType();
 
-				// add the station
-//				data.addStation(actualStation);
+				/* add the station */
+/*				data.addStation(actualStation);
 
 #ifdef DETECTORINFO
 
@@ -631,6 +631,59 @@ void inputFRoot::readDetectorInfo(CbmStsDigiScheme* scheme) {
 		data.maskDetector(detectorMask);
 	else
 		throw noDetectorError(INPUTLIB);
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double inputFRoot::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = inputRoot::getReservedSizeOfData(0);
+	returnValue += sizeof(disableAutomaticDetector);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double inputFRoot::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = inputRoot::getAllocatedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double inputFRoot::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = inputRoot::getUsedSizeOfData(0);
+	returnValue += sizeof(disableAutomaticDetector);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }
 

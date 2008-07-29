@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/11/07 12:48:05 $
-/// $Revision: 1.2 $
+/// $Date: 2008-02-29 11:43:28 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -93,6 +93,25 @@ public:
  */
 
 	void init(double dim1Min, double dim1Max, int dim1Step, double dim2Min, double dim2Max, int dim2Step);
+
+/**
+ * This method returns the magnetic field to use.
+ * Caution: This function here has no useful
+ * implementations in some subclasses. So be
+ * careful when using.
+ */
+
+	trackfinderInputMagneticField* getMagneticField();
+
+/**
+ * This method returns the magnetic field factor to use instead of
+ * the magneticField.
+ * Caution: This function here has no useful
+ * implementations in some subclasses. So be
+ * careful when using.
+ */
+
+	double getMagneticFieldFactor();
 
 /**
  * This method sets the magnetic field to use.
@@ -177,7 +196,7 @@ public:
  * @param value is the actual value for the entry
  */
 	
-	void addEntry(lutHoughBorder value);
+	void addEntry(lutHoughBorder& value);
 
 /**
  * This method converts the lut table into a string.

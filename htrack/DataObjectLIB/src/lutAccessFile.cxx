@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/11/08 12:37:31 $
-// $Revision: 1.3 $
+// $Date: 2008-02-29 11:38:11 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
@@ -49,14 +49,20 @@
  */
 #define defValName                  "lut"
 #define defValUsage                 "LUT"
-#define defValFormat                SOFTWAREFORMAT
+#define defValFormat                HARDWAREFORMAT
 #define defValNumberOfEntries       0
+#define defValDim1Min               0
+#define defValDim1Max               0
+#define defValDim1Step              0
+#define defValDim2Min               0
+#define defValDim2Max               0
+#define defValDim2Step              0
 #define defValStructureSeparator    "TABULATOR"
 #define defValBlockSeparator        "NEWLINE"
-#define defValContentSoftware       "(pos1, pos2)...(pos1, pos2)"
+#define defValContentSoftware       "(pos1, pos2) ... (pos1, pos2)"
 #define defValFormatSoftware        "([Radix]x[Number],[Radix]x[Number])"defValStructureSeparator"..."defValStructureSeparator"([Radix]x[Number],[Radix]x[Number])"defValBlockSeparator
 #define defValContentHardware       "startPos & Command"
-#define defValFormatHardware        "([Radix]x[Number],[Radix]x[Number])"defValStructureSeparator"[Binary Number]"defValBlockSeparator
+#define defValFormatHardware        "[Radix]x[Number]"defValStructureSeparator"[Radix]x[Number]"defValBlockSeparator
 
 
 /*
@@ -65,6 +71,12 @@
 #define stringCmdName               "name"
 #define stringCmdUsage              "usage"
 #define stringCmdFormat             "format"
+#define stringCmdDim1Min            "dim1Min"
+#define stringCmdDim1Max            "dim1Max"
+#define stringCmdDim1Step           "dim1Step"
+#define stringCmdDim2Min            "dim2Min"
+#define stringCmdDim2Max            "dim2Max"
+#define stringCmdDim2Step           "dim2Step"
 #define stringCmdNumberOfEntries    "numberOfEntries"
 #define stringCmdStructureSeparator "/**/ structureSeparator"
 #define stringCmdBlockSeparator     "/**/ blockSeparator"
@@ -76,8 +88,15 @@
  * index of each parameter for the commandID table
  */
 #define idCmdName                   0
-#define idCmdFormat                 1
-#define idCmdNumberOfEntries        2
+#define idCmdUsage                  1
+#define idCmdFormat                 2
+#define idCmdNumberOfEntries        3
+#define idCmdDim1Min                4
+#define idCmdDim1Max                5
+#define idCmdDim1Step               6
+#define idCmdDim2Min                7
+#define idCmdDim2Max                8
+#define idCmdDim2Step               9
 
 
 /****************************************************************
@@ -133,6 +152,13 @@ bool lutAccessFile::getHeaderValue(std::string& specifier, std::string& value) {
 			specifierFound = true;
 		}
 	}
+	else if (specifier.compare(stringCmdUsage) == 0) {
+		if (!(commandID[idCmdUsage])) {
+			header.usage = value;
+			commandID[idCmdUsage] = true;
+			specifierFound = true;
+		}
+	}
 	else if (specifier.compare(stringCmdFormat) == 0) {
 		if (!(commandID[idCmdFormat])) {
 			header.format = stous((char*)value.c_str(), 10);
@@ -144,6 +170,48 @@ bool lutAccessFile::getHeaderValue(std::string& specifier, std::string& value) {
 		if (!(commandID[idCmdNumberOfEntries])) {
 			header.numberOfEntries = stoul((char*)value.c_str(), 10);
 			commandID[idCmdNumberOfEntries] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdDim1Min) == 0) {
+		if (!(commandID[idCmdDim1Min])) {
+			header.dim1Min = stod((char*)value.c_str());
+			commandID[idCmdDim1Min] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdDim1Max) == 0) {
+		if (!(commandID[idCmdDim1Max])) {
+			header.dim1Max = stod((char*)value.c_str());
+			commandID[idCmdDim1Max] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdDim1Step) == 0) {
+		if (!(commandID[idCmdDim1Step])) {
+			header.dim1Step = stoi((char*)value.c_str(), 10);
+			commandID[idCmdDim1Step] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdDim2Min) == 0) {
+		if (!(commandID[idCmdDim2Min])) {
+			header.dim2Min = stod((char*)value.c_str());
+			commandID[idCmdDim2Min] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdDim2Max) == 0) {
+		if (!(commandID[idCmdDim2Max])) {
+			header.dim2Max = stod((char*)value.c_str());
+			commandID[idCmdDim2Max] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdDim2Step) == 0) {
+		if (!(commandID[idCmdDim2Step])) {
+			header.dim2Step = stoi((char*)value.c_str(), 10);
+			commandID[idCmdDim2Step] = true;
 			specifierFound = true;
 		}
 	}
@@ -224,7 +292,7 @@ bool lutAccessFile::getDataValue(std::string& buffer, unsigned long index) {
 				if (temp.empty())
 					noError = false;
 				else {
-					actualPosition.fromNotIdentifiedString(temp);
+					actualPosition.fromNotIdentifiedRadixString(temp);
 					typeCastedData[index].houghCoord.push(actualPosition);
 					coordCounter++;
 				}
@@ -259,7 +327,7 @@ std::string lutAccessFile::setDataValue(unsigned long index) {
 	returnValue.clear();
 	switch (header.format) {
 		case HARDWAREFORMAT:
-			actualCommand = typeCastedData[index].getHoughBorderCommand(header.dim2Step);
+			actualCommand = typeCastedData[index].getHoughBorderCommand((unsigned short)header.dim1Step);
 			returnValue += actualCommand.getStartPos();
 			returnValue += fileDataSeparator;
 			returnValue += actualCommand.getCmd();
@@ -270,7 +338,7 @@ std::string lutAccessFile::setDataValue(unsigned long index) {
 				actualPosition   = typeCastedData[index].houghCoord.readActiveObjectAndMakeNextOneActive();
 				if (i > 0)
 					returnValue += fileDataSeparator;
-				returnValue     += actualPosition.toNotIdentifiedString();
+				returnValue     += actualPosition.toNotIdentifiedRadixString();
 			}
 			break;
 	}
@@ -291,9 +359,15 @@ void lutAccessFile::writeFileHeader(std::ofstream& fileStream) {
 /********************************************************/
 /* make code changes for a different configuration here */
 	setHeaderValue(fileStream, stringCmdName,               header.name,              "Name of the look up table");
-	setHeaderValue(fileStream, stringCmdUsage,              defValUsage,              "Usage of the look up table");
-	setHeaderValue(fileStream, stringCmdFormat,             header.format,             "Format of the look up table");
+	setHeaderValue(fileStream, stringCmdUsage,              header.usage,             "Usage of the look up table");
+	setHeaderValue(fileStream, stringCmdFormat,             header.format,            "Format of the look up table");
 	setHeaderValue(fileStream, stringCmdNumberOfEntries,    header.numberOfEntries,   "Number of entries in the look up table");
+	setHeaderValue(fileStream, stringCmdDim1Min,            header.dim1Min,           "Minimum value in the first dimension of the LUT configuration during creation");
+	setHeaderValue(fileStream, stringCmdDim1Max,            header.dim1Max,           "Maximum value in the first dimension of the LUT configuration during creation");
+	setHeaderValue(fileStream, stringCmdDim1Step,           header.dim1Step,          "Number of steps for the value range in the first dimension of the LUT configuration during creation");
+	setHeaderValue(fileStream, stringCmdDim2Min,            header.dim2Min,           "Minimum value in the second dimension of the LUT configuration during creation");
+	setHeaderValue(fileStream, stringCmdDim2Max,            header.dim2Max,           "Maximum value in the second dimension of the LUT configuration during creation");
+	setHeaderValue(fileStream, stringCmdDim2Step,           header.dim2Step,          "Number of steps for the value range in the second dimension of the LUT configuration during creation");
 	setHeaderValue(fileStream, stringCmdStructureSeparator, defValStructureSeparator, "The separator for the members of the data structure");
 	setHeaderValue(fileStream, stringCmdBlockSeparator,     defValBlockSeparator,     "The separator for the blocks of the data");
 	
@@ -324,8 +398,15 @@ void lutAccessFile::setHeaderDefValues() {
 /********************************************************/
 /* make code changes for a different configuration here */
 	header.name            = defValName;
+	header.usage           = defValUsage;
 	header.format          = defValFormat;
 	header.numberOfEntries = defValNumberOfEntries;
+	header.dim1Min         = defValDim1Min;
+	header.dim1Max         = defValDim1Max;
+	header.dim1Step        = defValDim1Step;
+	header.dim2Min         = defValDim2Min;
+	header.dim2Max         = defValDim2Max;
+	header.dim2Step        = defValDim2Step;
 /********************************************************/
 
 }
@@ -384,11 +465,25 @@ lutAccessFileHeader& lutAccessFile::getHeaderReference() {
 void lutAccessFile::setHeader(lutAccessFileHeader& structure) {
 
 	header.name                     = structure.name;
+	header.usage                    = structure.usage;
 	header.format                   = structure.format;
 	header.numberOfEntries          = structure.numberOfEntries;
+	header.dim1Min                  = structure.dim1Min;
+	header.dim1Max                  = structure.dim1Max;
+	header.dim1Step                 = structure.dim1Step;
+	header.dim2Min                  = structure.dim2Min;
+	header.dim2Max                  = structure.dim2Max;
+	header.dim2Step                 = structure.dim2Step;
 	commandID[idCmdName]            = true;
+	commandID[idCmdUsage]           = true;
 	commandID[idCmdFormat]          = true;
 	commandID[idCmdNumberOfEntries] = true;
+	commandID[idCmdDim1Min]         = true;
+	commandID[idCmdDim1Max]         = true;
+	commandID[idCmdDim1Step]        = true;
+	commandID[idCmdDim2Min]         = true;
+	commandID[idCmdDim2Max]         = true;
+	commandID[idCmdDim2Step]        = true;
 
 }
 
@@ -399,8 +494,10 @@ void lutAccessFile::setHeader(lutAccessFileHeader& structure) {
 std::string lutAccessFile::getInfo() {
 
 	std::string message;
-	char        longBuffer[longConversionDigits + 1];
 	char        shortBuffer[shortConversionDigits+1];
+	char        intBuffer[intConversionDigits + 1];
+	char        longBuffer[longConversionDigits + 1];
+	char        doubleBuffer[doubleConversion + 1];
 
 /********************************************************/
 /* make code changes for a different information here	*/
@@ -420,10 +517,49 @@ std::string lutAccessFile::getInfo() {
 		message += longBuffer;
 	}
 	message += "\n";
+	message += "Usage";
+	message += "\t";
+	message += header.usage;
+	message += "\n";
+	message += stringCmdFormat;
+	message += "\t: ";
+	ustos(header.format, shortBuffer, 10, shortConversionDigits);
+	message += shortBuffer;
+	message += "\n";
 	message += "Number of Data";
 	message += "\t: ";
 	ultos(getDataNum(), longBuffer, 10, longConversionDigits);
 	message += longBuffer;
+	message += "\n";
+	message += stringCmdDim1Min;
+	message += "\t: ";
+	dtos(header.dim1Min, doubleBuffer, doubleConversionDigits);
+	message += doubleBuffer;
+	message += "\n";
+	message += stringCmdDim1Max;
+	message += "\t: ";
+	dtos(header.dim1Max, doubleBuffer, doubleConversionDigits);
+	message += doubleBuffer;
+	message += "\n";
+	message += stringCmdDim1Step;
+	message += "\t: ";
+	itos(header.dim1Step, intBuffer, 10, intConversionDigits);
+	message += intBuffer;
+	message += "\n";
+	message += stringCmdDim2Min;
+	message += "\t: ";
+	dtos(header.dim2Min, doubleBuffer, doubleConversionDigits);
+	message += doubleBuffer;
+	message += "\n";
+	message += stringCmdDim2Max;
+	message += "\t: ";
+	dtos(header.dim2Max, doubleBuffer, doubleConversionDigits);
+	message += doubleBuffer;
+	message += "\n";
+	message += stringCmdDim2Step;
+	message += "\t: ";
+	itos(header.dim2Step, intBuffer, 10, intConversionDigits);
+	message += intBuffer;
 	message += "\n";
 	message += "\n";
 	message += "Setup for the look-up-table file:\n";
@@ -434,25 +570,6 @@ std::string lutAccessFile::getInfo() {
 		btods(commandID[i], longBuffer);
 		message += longBuffer;
 	}
-	message += "\n";
-	message += stringCmdName;
-	message += "\t: ";
-	message += header.name;
-	message += "\n";
-	message += stringCmdUsage;
-	message += "\t: ";
-	message += defValUsage;
-	message += "\n";
-	message += stringCmdFormat;
-	message += "\t: ";
-	ustos(header.format, shortBuffer, 10, shortConversionDigits);
-	message += shortBuffer;
-	message += "\n";
-	message += stringCmdNumberOfEntries;
-	message += "\t: ";
-	ultos(header.numberOfEntries, longBuffer, 10, longConversionDigits);
-	message += longBuffer;
-	message += "\n";
 	message += stringCmdStructureSeparator;
 	message += "\t: ";
 	message += defValStructureSeparator;

@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-04-16 10:40:52 $
-/// $Revision: 1.7 $
+/// $Date: 2008-02-29 11:43:43 $
+/// $Revision: 1.9 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -34,10 +34,41 @@
 
 
 /**
+ * LUTVERSION defines the version of the lut object which is
+ * used. Version 1 has the following rules:
+ * - The pos2 value is always not smaller than the pos2
+ *   value before.
+ * - The pos1 value is always equal or bigger than the pos1
+ *   value before.
+ * Version 2 has the following additional rules:
+ * - The pos2 value is always 1 bigger than the pos2 value
+ *   before.
+ * - No warning is printed
+ * Version 3 has the following additional rules:
+ * - The pos1 value is always equal or 1 bigger than the
+ *   pos1 value before.
+ * - No warning is printed
+ * Version 4 has the following additional rules:
+ * - A warning would be printed just if the rule is hitted once or more
+ * Version 5:
+ * - A warning is printed all the time
+ */
+
+#define LUTVERSION 3
+
+
+/**
  * This definition enables that the hits of just one track can enter the histogram
  */
 //#define DEBUGJUSTONEGOODTRACK    1
 #undef DEBUGJUSTONEGOODTRACK
+
+
+/**
+ * This definition is just used in combination with DEBUGJUSTONEGOODTRACKINDEX
+ * to workaround the displaying of all tracks
+ */
+#define INVALIDTRACKINDEX -1
 
 
 /**

@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-15 13:55:25 $
-// $Revision: 1.9 $
+// $Date: 2007-12-28 14:40:07 $
+// $Revision: 1.15 $
 //
 // *******************************************************************/
 
@@ -35,7 +35,11 @@
 #include "../include/analysisWarningMsg.h"
 #include "../include/showAnalysis.h"
 #include "TStyle.h"
-#include "TH1F.h"
+#include "TAxis.h"
+
+
+#define min(a, b)  (((a) < (b)) ? (a) : (b)) 
+
 
 /****************************************************************
  * This method initializes the global style for each display.	*
@@ -170,63 +174,59 @@ void showAnalysis::updateWindowAndDisplay(TCanvas* windowToUpdate, TGraph* displ
 
 		if (displayToUpdate != NULL) {
 
-			if (displayToUpdate->GetHistogram() != NULL) {
+			xValues = displayToUpdate->GetX();
+			yValues = displayToUpdate->GetY();
 
-				xValues = displayToUpdate->GetX();
-				yValues = displayToUpdate->GetY();
+			if (arrayY != NULL) {
 
-				if (arrayY != NULL) {
+				for (int i = 0; i < displayToUpdate->GetN(); i++) {
 
-					for (int i = 0; i < displayToUpdate->GetN(); i++) {
-
-						yValues[i] = ((double)numberOfAdditions / (double)(numberOfAdditions + 1)) * yValues[i] + arrayY[i] / (double)(numberOfAdditions + 1);
-
-					}
+					yValues[i] = ((double)numberOfAdditions / (double)(numberOfAdditions + 1)) * yValues[i] + arrayY[i] / (double)(numberOfAdditions + 1);
 
 				}
-				else {
-
-					arrayToDisplayIsNotAccessibleWarningMsg* arrayToDisplayIsNotAccessible = new arrayToDisplayIsNotAccessibleWarningMsg();
-					arrayToDisplayIsNotAccessible->warningMsg();
-					if(arrayToDisplayIsNotAccessible != NULL) {
-						delete arrayToDisplayIsNotAccessible;
-						arrayToDisplayIsNotAccessible = NULL;
-					}
-
-				}
-
-				xMin = xValues[0];
-				xMax = xValues[0];
-				yMin = yValues[0];
-				yMax = yValues[0];
-
-				for (int j = 1; j < displayToUpdate->GetN(); j++) {
-
-					if (xValues[j] < xMin)
-						xMin = xValues[j];
-					if (xValues[j] > xMax)
-						xMax = xValues[j];
-					if (yValues[j] < yMin)
-						yMin = yValues[j];
-					if (yValues[j] > yMax)
-						yMax = yValues[j];
-
-				}
-
-				displayToUpdate->GetHistogram()->SetAxisRange(xMin, xMax, "X");
-				displayToUpdate->GetHistogram()->SetAxisRange(yMin, yMax, "Y");
 
 			}
 			else {
 
-				rootHistogramNotFoundWarningMsg* rootHistogramNotFound = new rootHistogramNotFoundWarningMsg();
-				rootHistogramNotFound->warningMsg();
-				if(rootHistogramNotFound != NULL) {
-					delete rootHistogramNotFound;
-					rootHistogramNotFound = NULL;
+				arrayToDisplayIsNotAccessibleWarningMsg* arrayToDisplayIsNotAccessible = new arrayToDisplayIsNotAccessibleWarningMsg();
+				arrayToDisplayIsNotAccessible->warningMsg();
+				if(arrayToDisplayIsNotAccessible != NULL) {
+					delete arrayToDisplayIsNotAccessible;
+					arrayToDisplayIsNotAccessible = NULL;
 				}
 
 			}
+
+			xMin = xValues[0];
+			xMax = xValues[0];
+			yMin = yValues[0];
+			yMax = yValues[0];
+
+			for (int j = 1; j < displayToUpdate->GetN(); j++) {
+
+				if (xValues[j] < xMin)
+					xMin = xValues[j];
+				if (xValues[j] > xMax)
+					xMax = xValues[j];
+				if (yValues[j] < yMin)
+					yMin = yValues[j];
+				if (yValues[j] > yMax)
+					yMax = yValues[j];
+
+			}
+
+			/*
+			 * SetLimits sets the minimal and maximal values for the axis.
+			 * Smaller values are in the underflow bin and higher values
+			 * in the overflow bin.
+			 *
+			 * SetRangeUser sets the zoom of the axis. Here the zoom is
+			 * set to one.
+			 */
+			displayToUpdate->GetXaxis()->SetLimits(0.95 * xMin, 1.05 * xMax);
+			displayToUpdate->GetXaxis()->SetRangeUser(0.95 * xMin, 1.05 * xMax);
+			displayToUpdate->GetYaxis()->SetLimits(0.95 * yMin, 1.05 * yMax);
+			displayToUpdate->GetYaxis()->SetRangeUser(0.95 * yMin, 1.05 * yMax);
 
 		}
 		else {
@@ -260,79 +260,112 @@ void showAnalysis::updateWindowAndDisplay(TCanvas* windowToUpdate, TGraph* displ
 
 showAnalysis::showAnalysis() {
 
-	window                           = NULL;
-	numberOfWindows                  = 0;
-	display                          = NULL;
-	numberOfDisplays                 = 0;
-	correctLayerWindow               = NULL;
-	correctLayerDisplay              = NULL;
-	correctLayerAdditions            = 0;
-	correctSlopeWindow               = NULL;
-	correctSlopeDisplay              = NULL;
-	correctSlopeAdditions            = 0;
-	layerWindow                      = NULL;
-	layerDisplay                     = NULL;
-	layerAdditions                   = 0;
-	signatureWindow                  = NULL;
-	signatureDisplay                 = NULL;
-	signatureAdditions               = 0;
-	correctPrelutCellWindow          = NULL;
-	correctPrelutCellDisplay         = NULL;
-	correctPrelutCellAdditions       = 0;
-	prelutCellWindow                 = NULL;
-	prelutCellDisplay                = NULL;
-	prelutCellAdditions              = 0;
-	correctLutCellWindow             = NULL;
-	correctLutCellDisplay            = NULL;
-	correctLutCellAdditions          = 0;
-	lutCellWindow                    = NULL;
-	lutCellDisplay                   = NULL;
-	lutCellAdditions                 = 0;
-	momentaErrorWindow               = NULL;
-	momentaErrorDisplay              = NULL;
-	momentaErrorAdditions            = 0;
-	momentaXWindow                   = NULL;
-	momentaXDisplay                  = NULL;
-	momentaXAdditions                = 0;
-	momentaYWindow                   = NULL;
-	momentaYDisplay                  = NULL;
-	momentaYAdditions                = 0;
-	momentaZWindow                   = NULL;
-	momentaZDisplay                  = NULL;
-	momentaZAdditions                = 0;
-	coordinateXWindow                = NULL;
-	coordinateXDisplay               = NULL;
-	coordinateXAdditions             = 0;
-	coordinateYWindow                = NULL;
-	coordinateYDisplay               = NULL;
-	coordinateYAdditions             = 0;
-	coordinateZWindow                = NULL;
-	coordinateZDisplay               = NULL;
-	coordinateZAdditions             = 0;
-	momentaWindow                    = NULL;
-	momentaDisplay                   = NULL;
-	momentaAdditions                 = 0;
-	coordinateWindow                 = NULL;
-	coordinateDisplay                = NULL;
-	coordinateAdditions              = 0;
-	minimalTrackColumnWindow         = NULL;
-	minimalTrackColumnDisplay        = NULL;
-	minimalTrackColumnAdditions      = 0;
-	averageTrackColumnWindow         = NULL;
-	averageTrackColumnDisplay        = NULL;
-	averageTrackColumnAdditions      = 0;
-	maximalTrackColumnWindow         = NULL;
-	maximalTrackColumnDisplay        = NULL;
-	maximalTrackColumnAdditions      = 0;
-	fifoForColumnWindow              = NULL;
-	fifoForColumnDisplay             = NULL;
-	fifoForColumnAdditions           = 0;
-	trackLayerWindow                 = NULL;
-	trackLayerDisplay                = NULL;
-	trackLayerAdditions              = 0;
-	trackDensityLayerWindow          = NULL;
-	trackDensityLayerDisplay         = NULL;
-	trackDensityLayerAdditions       = 0;;
+	window                                                       = NULL;
+	numberOfWindows                                              = 0;
+	display                                                      = NULL;
+	numberOfDisplays                                             = 0;
+	correctLayerWindow                                           = NULL;
+	correctLayerDisplay                                          = NULL;
+	correctLayerAdditions                                        = 0;
+	correctSlopeWindow                                           = NULL;
+	correctSlopeDisplay                                          = NULL;
+	correctSlopeAdditions                                        = 0;
+	layerWindow                                                  = NULL;
+	layerDisplay                                                 = NULL;
+	layerAdditions                                               = 0;
+	signatureWindow                                              = NULL;
+	signatureDisplay                                             = NULL;
+	signatureAdditions                                           = 0;
+	correctPrelutCellWindow                                      = NULL;
+	correctPrelutCellDisplay                                     = NULL;
+	correctPrelutCellAdditions                                   = 0;
+	prelutCellWindow                                             = NULL;
+	prelutCellDisplay                                            = NULL;
+	prelutCellAdditions                                          = 0;
+	correctLutCellWindow                                         = NULL;
+	correctLutCellDisplay                                        = NULL;
+	correctLutCellAdditions                                      = 0;
+	lutCellWindow                                                = NULL;
+	lutCellDisplay                                               = NULL;
+	lutCellAdditions                                             = 0;
+	momentaErrorWindow                                           = NULL;
+	momentaErrorDisplay                                          = NULL;
+	momentaErrorAdditions                                        = 0;
+	momentaXWindow                                               = NULL;
+	momentaXDisplay                                              = NULL;
+	momentaXAdditions                                            = 0;
+	momentaYWindow                                               = NULL;
+	momentaYDisplay                                              = NULL;
+	momentaYAdditions                                            = 0;
+	momentaZWindow                                               = NULL;
+	momentaZDisplay                                              = NULL;
+	momentaZAdditions                                            = 0;
+	dim1Window                                                   = NULL;
+	dim1Display                                                  = NULL;
+	dim1Additions                                                = 0;
+	dim2Window                                                   = NULL;
+	dim2Display                                                  = NULL;
+	dim2Additions                                                = 0;
+	dim3Window                                                   = NULL;
+	dim3Display                                                  = NULL;
+	dim3Additions                                                = 0;
+	momentaWindow                                                = NULL;
+	momentaDisplay                                               = NULL;
+	momentaAdditions                                             = 0;
+	coordinateWindow                                             = NULL;
+	coordinateDisplay                                            = NULL;
+	coordinateAdditions                                          = 0;
+	dim1PeakDistanceWindow                                       = NULL;
+	dim1PeakDistanceDisplay                                      = NULL;
+	dim1PeakDistanceAdditions                                    = 0;
+	dim2PeakDistanceWindow                                       = NULL;
+	dim2PeakDistanceDisplay                                      = NULL;
+	dim2PeakDistanceAdditions                                    = 0;
+	dim3PeakDistanceWindow                                       = NULL;
+	dim3PeakDistanceDisplay                                      = NULL;
+	dim3PeakDistanceAdditions                                    = 0;
+	accumulatedPeakDistanceWindow                                = NULL;
+	accumulatedPeakDistanceDisplay                               = NULL;
+	accumulatedPeakDistanceAdditions                             = 0;
+	minimalTrackColumnWindow                                     = NULL;
+	minimalTrackColumnDisplay                                    = NULL;
+	minimalTrackColumnAdditions                                  = 0;
+	averageTrackColumnWindow                                     = NULL;
+	averageTrackColumnDisplay                                    = NULL;
+	averageTrackColumnAdditions                                  = 0;
+	maximalTrackColumnWindow                                     = NULL;
+	maximalTrackColumnDisplay                                    = NULL;
+	maximalTrackColumnAdditions                                  = 0;
+	fifoForColumnWindow                                          = NULL;
+	fifoForColumnDisplay                                         = NULL;
+	fifoForColumnAdditions                                       = 0;
+	minimalTrackRowWindow                                        = NULL;
+	minimalTrackRowDisplay                                       = NULL;
+	minimalTrackRowAdditions                                     = 0;
+	averageTrackRowWindow                                        = NULL;
+	averageTrackRowDisplay                                       = NULL;
+	averageTrackRowAdditions                                     = 0;
+	maximalTrackRowWindow                                        = NULL;
+	maximalTrackRowDisplay                                       = NULL;
+	maximalTrackRowAdditions                                     = 0;
+	fifoForRowWindow                                             = NULL;
+	fifoForRowDisplay                                            = NULL;
+	fifoForRowAdditions                                          = 0;
+	trackLayerWindow                                             = NULL;
+	trackLayerDisplay                                            = NULL;
+	trackLayerAdditions                                          = 0;
+	trackDensityLayerWindow                                      = NULL;
+	trackDensityLayerDisplay                                     = NULL;
+	trackDensityLayerAdditions                                   = 0;;
+	hitReadoutDistributionWindow                                 = NULL;
+	hitReadoutDistributionDisplay                                = NULL;
+	hitReadoutDistributionAdditions                              = 0;
+	hitReadoutMeanDistributionDistributionWindow                 = NULL;
+	hitReadoutMeanDistributionDistributionDisplay                = NULL;
+	hitReadoutMeanDistributionDistributionAdditions              = 0;
+	fpgaHistogramProcessingTimeDistributionDistributionWindow    = NULL;
+	fpgaHistogramProcessingTimeDistributionDistributionDisplay   = NULL;
+	fpgaHistogramProcessingTimeDistributionDistributionAdditions = 0;
 
 }
 
@@ -1646,7 +1679,7 @@ void showAnalysis::addMomentaZDistribution(unsigned int* array, unsigned short n
  * coordinates													*
  ****************************************************************/
 
-void showAnalysis::addCoordinateXDistribution(unsigned int* array, unsigned short numberOfEntries) {
+void showAnalysis::addHoughspaceDim1Distribution(unsigned int* array, unsigned short numberOfEntries) {
 
 	unsigned int i;
 	unsigned int numberOfTracks;
@@ -1682,26 +1715,26 @@ void showAnalysis::addCoordinateXDistribution(unsigned int* array, unsigned shor
 		arrayX[numberOfEntries + 1] = numberOfEntries;
 		arrayY[numberOfEntries + 1] = 0.0;
 
-		if (coordinateXWindow == NULL) {
+		if (dim1Window == NULL) {
 
-			coordinateXWindow    = addWindow("CXDistribution", "Coordinate X Distribution");
+			dim1Window    = addWindow("HD1Distribution", "Hough Dimension 1 Distribution");
 
-			coordinateXDisplay   = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
+			dim1Display   = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
 
-			coordinateXAdditions = 0;
+			dim1Additions = 0;
 
-			coordinateXDisplay->SetName("CXDistribution");
-			coordinateXDisplay->SetTitle("Coordinate X Distribution");
-			coordinateXDisplay->GetXaxis()->SetTitle("cell [index]");
-			coordinateXDisplay->GetYaxis()->SetTitle("percentage of tracks [%]");
+			dim1Display->SetName("HD1Distribution");
+			dim1Display->SetTitle("Hough Dimension 1 Distribution");
+			dim1Display->GetXaxis()->SetTitle("cell [index]");
+			dim1Display->GetYaxis()->SetTitle("percentage of tracks [%]");
 
-			coordinateXDisplay->Draw("AB");
+			dim1Display->Draw("AB");
 
 		}
 		else {
 
-			coordinateXAdditions++;
-			updateWindowAndDisplay(coordinateXWindow, coordinateXDisplay, coordinateXAdditions, arrayY);
+			dim1Additions++;
+			updateWindowAndDisplay(dim1Window, dim1Display, dim1Additions, arrayY);
 
 		}
 
@@ -1727,7 +1760,7 @@ void showAnalysis::addCoordinateXDistribution(unsigned int* array, unsigned shor
 	}
 
 }
-void showAnalysis::addCoordinateYDistribution(unsigned int* array, unsigned short numberOfEntries) {
+void showAnalysis::addHoughspaceDim2Distribution(unsigned int* array, unsigned short numberOfEntries) {
 
 	unsigned int i;
 	unsigned int numberOfTracks;
@@ -1763,26 +1796,26 @@ void showAnalysis::addCoordinateYDistribution(unsigned int* array, unsigned shor
 		arrayX[numberOfEntries + 1] = numberOfEntries;
 		arrayY[numberOfEntries + 1] = 0.0;
 
-		if (coordinateYWindow == NULL) {
+		if (dim2Window == NULL) {
 
-			coordinateYWindow    = addWindow("CYDistribution", "Coordinate Y Distribution");
+			dim2Window    = addWindow("HD2Distribution", "Hough Dimension 2 Distribution");
 
-			coordinateYDisplay   = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
+			dim2Display   = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
 
-			coordinateYAdditions = 0;
+			dim2Additions = 0;
 
-			coordinateYDisplay->SetName("CYDistribution");
-			coordinateYDisplay->SetTitle("Coordinate Y Distribution");
-			coordinateYDisplay->GetXaxis()->SetTitle("cell [index]");
-			coordinateYDisplay->GetYaxis()->SetTitle("percentage of tracks [%]");
+			dim2Display->SetName("HD2Distribution");
+			dim2Display->SetTitle("Hough Dimension 2 Distribution");
+			dim2Display->GetXaxis()->SetTitle("cell [index]");
+			dim2Display->GetYaxis()->SetTitle("percentage of tracks [%]");
 
-			coordinateYDisplay->Draw("AB");
+			dim2Display->Draw("AB");
 
 		}
 		else {
 
-			coordinateYAdditions++;
-			updateWindowAndDisplay(coordinateYWindow, coordinateYDisplay, coordinateYAdditions, arrayY);
+			dim2Additions++;
+			updateWindowAndDisplay(dim2Window, dim2Display, dim2Additions, arrayY);
 
 		}
 
@@ -1808,7 +1841,7 @@ void showAnalysis::addCoordinateYDistribution(unsigned int* array, unsigned shor
 	}
 
 }
-void showAnalysis::addCoordinateZDistribution(unsigned int* array, unsigned short numberOfEntries) {
+void showAnalysis::addHoughspaceDim3Distribution(unsigned int* array, unsigned short numberOfEntries) {
 
 	unsigned int i;
 	unsigned int numberOfTracks;
@@ -1844,26 +1877,26 @@ void showAnalysis::addCoordinateZDistribution(unsigned int* array, unsigned shor
 		arrayX[numberOfEntries + 1] = numberOfEntries;
 		arrayY[numberOfEntries + 1] = 0.0;
 
-		if (coordinateZWindow == NULL) {
+		if (dim3Window == NULL) {
 
-			coordinateZWindow    = addWindow("CZDistribution", "Coordinate Z Distribution");
+			dim3Window    = addWindow("HD3Distribution", "Hough Dimension 3 Distribution");
 
-			coordinateZDisplay   = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
+			dim3Display   = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
 
-			coordinateZAdditions = 0;
+			dim3Additions = 0;
 
-			coordinateZDisplay->SetName("CZDistribution");
-			coordinateZDisplay->SetTitle("Coordinate Z Distribution");
-			coordinateZDisplay->GetXaxis()->SetTitle("cell [index]");
-			coordinateZDisplay->GetYaxis()->SetTitle("percentage of tracks [%]");
+			dim3Display->SetName("HD3Distribution");
+			dim3Display->SetTitle("Hough Dimension 3 Distribution");
+			dim3Display->GetXaxis()->SetTitle("cell [index]");
+			dim3Display->GetYaxis()->SetTitle("percentage of tracks [%]");
 
-			coordinateZDisplay->Draw("AB");
+			dim3Display->Draw("AB");
 
 		}
 		else {
 
-			coordinateZAdditions++;
-			updateWindowAndDisplay(coordinateZWindow, coordinateZDisplay, coordinateZAdditions, arrayY);
+			dim3Additions++;
+			updateWindowAndDisplay(dim3Window, dim3Display, dim3Additions, arrayY);
 
 		}
 
@@ -1892,19 +1925,10 @@ void showAnalysis::addCoordinateZDistribution(unsigned int* array, unsigned shor
 void showAnalysis::addMomentaDistribution(unsigned int* array, unsigned int numberOfEntries) {
 
 	unsigned int i;
-	unsigned int numberOfTracks;
 	double*      arrayX;
 	double*      arrayY;
 
 	if ((array != NULL) && (numberOfEntries > 0)) {
-
-		numberOfTracks = 0;
-		for (i = 0; i < numberOfEntries; i++)
-			numberOfTracks += array[i];
-
-		/* This is just to avoid the division with zero */
-		if (numberOfTracks == 0)
-			numberOfTracks = 1;
 
 		arrayX = new double[numberOfEntries + 2];
 		if (arrayX == NULL)
@@ -1973,19 +1997,10 @@ void showAnalysis::addMomentaDistribution(unsigned int* array, unsigned int numb
 void showAnalysis::addCoordinateDistribution(unsigned int* array, unsigned int numberOfEntries) {
 
 	unsigned int i;
-	unsigned int numberOfTracks;
 	double*      arrayX;
 	double*      arrayY;
 
 	if ((array != NULL) && (numberOfEntries > 0)) {
-
-		numberOfTracks = 0;
-		for (i = 0; i < numberOfEntries; i++)
-			numberOfTracks += array[i];
-
-		/* This is just to avoid the division with zero */
-		if (numberOfTracks == 0)
-			numberOfTracks = 1;
 
 		arrayX = new double[numberOfEntries + 2];
 		if (arrayX == NULL)
@@ -2026,6 +2041,384 @@ void showAnalysis::addCoordinateDistribution(unsigned int* array, unsigned int n
 
 			coordinateAdditions++;
 			updateWindowAndDisplay(coordinateWindow, coordinateDisplay, coordinateAdditions, arrayY);
+
+		}
+
+		if (arrayX != NULL) {
+			delete arrayX;
+			arrayX = NULL;
+		}
+		if (arrayY != NULL) {
+			delete arrayY;
+			arrayY = NULL;
+		}
+
+	}
+	else {
+
+		arrayToDisplayIsNotAccessibleWarningMsg* arrayToDisplayIsNotAccessible = new arrayToDisplayIsNotAccessibleWarningMsg();
+		arrayToDisplayIsNotAccessible->warningMsg();
+		if(arrayToDisplayIsNotAccessible != NULL) {
+			delete arrayToDisplayIsNotAccessible;
+			arrayToDisplayIsNotAccessible = NULL;
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * method adds a display to show the distribution of the peak	*
+ * distances													*
+ ****************************************************************/
+
+void showAnalysis::addDim1PeakDistanceDistribution(unsigned int* array, unsigned short numberOfEntries) {
+
+	unsigned int i;
+	unsigned int numberOfTracks;
+	double       mean;
+	double*      arrayX;
+	double*      arrayY;
+
+	if ((array != NULL) && (numberOfEntries > 0)) {
+
+		numberOfTracks = 0;
+		for (i = 0; i < numberOfEntries; i++)
+			numberOfTracks += array[i];
+
+		/* This is just to avoid the division with zero */
+		if (numberOfTracks == 0)
+			numberOfTracks = 1;
+
+		mean   = 0;
+
+		arrayX = new double[numberOfEntries + 2];
+		if (arrayX == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayY = new double[numberOfEntries + 2];
+		if (arrayY == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayX[0] = -1.0;
+		arrayY[0] =  0.0;
+		for (i = 0; i < numberOfEntries; i++) {
+
+			mean += (double)array[i] / (double)numberOfTracks;
+		
+			arrayX[i + 1] = (double)i;
+			arrayY[i + 1] = (double)(array[i] * 100)  / (double)numberOfTracks;
+
+		}
+		arrayX[numberOfEntries + 1] = numberOfEntries;
+		arrayY[numberOfEntries + 1] = 0.0;
+
+		meanValueWarningMsg* meanValue = new meanValueWarningMsg(mean, "Mean peak distance in dim1");
+		meanValue->warningMsg();
+		if(meanValue != NULL) {
+			delete meanValue;
+			meanValue = NULL;
+		}
+
+		if (dim1PeakDistanceWindow == NULL) {
+
+			dim1PeakDistanceWindow     = addWindow("D1PDDistribution", "Dim1 Peak Distance Distribution");
+
+			dim1PeakDistanceDisplay    = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
+
+			dim1PeakDistanceAdditions  = 0;
+
+			dim1PeakDistanceDisplay->SetName("D1PDDistribution");
+			dim1PeakDistanceDisplay->SetTitle("Dim1 Peak Distance Distribution");
+			dim1PeakDistanceDisplay->GetXaxis()->SetTitle("distance [cells]");
+			dim1PeakDistanceDisplay->GetYaxis()->SetTitle("number of tracks");
+
+			dim1PeakDistanceDisplay->Draw("AL");
+
+		}
+		else {
+
+			dim1PeakDistanceAdditions++;
+			updateWindowAndDisplay(dim1PeakDistanceWindow, dim1PeakDistanceDisplay, dim1PeakDistanceAdditions, arrayY);
+
+		}
+
+		if (arrayX != NULL) {
+			delete arrayX;
+			arrayX = NULL;
+		}
+		if (arrayY != NULL) {
+			delete arrayY;
+			arrayY = NULL;
+		}
+
+	}
+	else {
+
+		arrayToDisplayIsNotAccessibleWarningMsg* arrayToDisplayIsNotAccessible = new arrayToDisplayIsNotAccessibleWarningMsg();
+		arrayToDisplayIsNotAccessible->warningMsg();
+		if(arrayToDisplayIsNotAccessible != NULL) {
+			delete arrayToDisplayIsNotAccessible;
+			arrayToDisplayIsNotAccessible = NULL;
+		}
+
+	}
+
+}
+void showAnalysis::addDim2PeakDistanceDistribution(unsigned int* array, unsigned short numberOfEntries) {
+
+	unsigned int i;
+	unsigned int numberOfTracks;
+	double       mean;
+	double*      arrayX;
+	double*      arrayY;
+
+	if ((array != NULL) && (numberOfEntries > 0)) {
+
+		numberOfTracks = 0;
+		for (i = 0; i < numberOfEntries; i++)
+			numberOfTracks += array[i];
+
+		/* This is just to avoid the division with zero */
+		if (numberOfTracks == 0)
+			numberOfTracks = 1;
+
+		mean   = 0;
+
+		arrayX = new double[numberOfEntries + 2];
+		if (arrayX == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayY = new double[numberOfEntries + 2];
+		if (arrayY == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayX[0] = -1.0;
+		arrayY[0] =  0.0;
+		for (i = 0; i < numberOfEntries; i++) {
+
+			mean += (double)array[i] / (double)numberOfTracks;
+		
+			arrayX[i + 1] = (double)i;
+			arrayY[i + 1] = (double)(array[i] * 100)  / (double)numberOfTracks;
+
+		}
+		arrayX[numberOfEntries + 1] = numberOfEntries;
+		arrayY[numberOfEntries + 1] = 0.0;
+
+		meanValueWarningMsg* meanValue = new meanValueWarningMsg(mean, "Mean peak distance in dim2");
+		meanValue->warningMsg();
+		if(meanValue != NULL) {
+			delete meanValue;
+			meanValue = NULL;
+		}
+
+		if (dim2PeakDistanceWindow == NULL) {
+
+			dim2PeakDistanceWindow     = addWindow("D2PDDistribution", "Dim2 Peak Distance Distribution");
+
+			dim2PeakDistanceDisplay    = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
+
+			dim2PeakDistanceAdditions  = 0;
+
+			dim2PeakDistanceDisplay->SetName("D2PDDistribution");
+			dim2PeakDistanceDisplay->SetTitle("Dim2 Peak Distance Distribution");
+			dim2PeakDistanceDisplay->GetXaxis()->SetTitle("distance [cells]");
+			dim2PeakDistanceDisplay->GetYaxis()->SetTitle("number of tracks");
+
+			dim2PeakDistanceDisplay->Draw("AL");
+
+		}
+		else {
+
+			dim2PeakDistanceAdditions++;
+			updateWindowAndDisplay(dim2PeakDistanceWindow, dim2PeakDistanceDisplay, dim2PeakDistanceAdditions, arrayY);
+
+		}
+
+		if (arrayX != NULL) {
+			delete arrayX;
+			arrayX = NULL;
+		}
+		if (arrayY != NULL) {
+			delete arrayY;
+			arrayY = NULL;
+		}
+
+	}
+	else {
+
+		arrayToDisplayIsNotAccessibleWarningMsg* arrayToDisplayIsNotAccessible = new arrayToDisplayIsNotAccessibleWarningMsg();
+		arrayToDisplayIsNotAccessible->warningMsg();
+		if(arrayToDisplayIsNotAccessible != NULL) {
+			delete arrayToDisplayIsNotAccessible;
+			arrayToDisplayIsNotAccessible = NULL;
+		}
+
+	}
+
+}
+void showAnalysis::addDim3PeakDistanceDistribution(unsigned int* array, unsigned short numberOfEntries) {
+
+	unsigned int i;
+	unsigned int numberOfTracks;
+	double       mean;
+	double*      arrayX;
+	double*      arrayY;
+
+	if ((array != NULL) && (numberOfEntries > 0)) {
+
+		numberOfTracks = 0;
+		for (i = 0; i < numberOfEntries; i++)
+			numberOfTracks += array[i];
+
+		/* This is just to avoid the division with zero */
+		if (numberOfTracks == 0)
+			numberOfTracks = 1;
+
+		arrayX = new double[numberOfEntries + 2];
+		if (arrayX == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayY = new double[numberOfEntries + 2];
+		if (arrayY == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		mean   = 0;
+
+		arrayX[0] = -1.0;
+		arrayY[0] =  0.0;
+		for (i = 0; i < numberOfEntries; i++) {
+
+			mean += (double)array[i] / (double)numberOfTracks;
+		
+			arrayX[i + 1] = (double)i;
+			arrayY[i + 1] = (double)(array[i] * 100)  / (double)numberOfTracks;
+
+		}
+		arrayX[numberOfEntries + 1] = numberOfEntries;
+		arrayY[numberOfEntries + 1] = 0.0;
+
+		meanValueWarningMsg* meanValue = new meanValueWarningMsg(mean, "Mean peak distance in dim3");
+		meanValue->warningMsg();
+		if(meanValue != NULL) {
+			delete meanValue;
+			meanValue = NULL;
+		}
+
+		if (dim3PeakDistanceWindow == NULL) {
+
+			dim3PeakDistanceWindow     = addWindow("D3PDDistribution", "Dim3 Peak Distance Distribution");
+
+			dim3PeakDistanceDisplay    = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
+
+			dim3PeakDistanceAdditions  = 0;
+
+			dim3PeakDistanceDisplay->SetName("D3PDDistribution");
+			dim3PeakDistanceDisplay->SetTitle("Dim3 Peak Distance Distribution");
+			dim3PeakDistanceDisplay->GetXaxis()->SetTitle("distance [cells]");
+			dim3PeakDistanceDisplay->GetYaxis()->SetTitle("number of tracks");
+
+			dim3PeakDistanceDisplay->Draw("AL");
+
+		}
+		else {
+
+			dim3PeakDistanceAdditions++;
+			updateWindowAndDisplay(dim3PeakDistanceWindow, dim3PeakDistanceDisplay, dim3PeakDistanceAdditions, arrayY);
+
+		}
+
+		if (arrayX != NULL) {
+			delete arrayX;
+			arrayX = NULL;
+		}
+		if (arrayY != NULL) {
+			delete arrayY;
+			arrayY = NULL;
+		}
+
+	}
+	else {
+
+		arrayToDisplayIsNotAccessibleWarningMsg* arrayToDisplayIsNotAccessible = new arrayToDisplayIsNotAccessibleWarningMsg();
+		arrayToDisplayIsNotAccessible->warningMsg();
+		if(arrayToDisplayIsNotAccessible != NULL) {
+			delete arrayToDisplayIsNotAccessible;
+			arrayToDisplayIsNotAccessible = NULL;
+		}
+
+	}
+
+}
+void showAnalysis::addAccumulatedPeakDistanceDistribution(unsigned int* array, unsigned short numberOfEntries) {
+
+	unsigned int i;
+	unsigned int numberOfTracks;
+	double       mean;
+	double*      arrayX;
+	double*      arrayY;
+
+	if ((array != NULL) && (numberOfEntries > 0)) {
+
+		numberOfTracks = 0;
+		for (i = 0; i < numberOfEntries; i++)
+			numberOfTracks += array[i];
+
+		/* This is just to avoid the division with zero */
+		if (numberOfTracks == 0)
+			numberOfTracks = 1;
+
+		mean   = 0;
+
+		arrayX = new double[numberOfEntries + 2];
+		if (arrayX == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayY = new double[numberOfEntries + 2];
+		if (arrayY == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayX[0] = -1.0;
+		arrayY[0] =  0.0;
+		for (i = 0; i < numberOfEntries; i++) {
+
+			mean += (double)array[i] / (double)numberOfTracks;
+		
+			arrayX[i + 1] = (double)i;
+			arrayY[i + 1] = (double)(array[i] * 100)  / (double)numberOfTracks;
+
+		}
+		arrayX[numberOfEntries + 1] = numberOfEntries;
+		arrayY[numberOfEntries + 1] = 0.0;
+
+		meanValueWarningMsg* meanValue = new meanValueWarningMsg(mean, "Accumulated mean peak distance");
+		meanValue->warningMsg();
+		if(meanValue != NULL) {
+			delete meanValue;
+			meanValue = NULL;
+		}
+
+		if (accumulatedPeakDistanceWindow == NULL) {
+
+			accumulatedPeakDistanceWindow     = addWindow("APDDistribution", "Accumulated Peak Distance Distribution");
+
+			accumulatedPeakDistanceDisplay    = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
+
+			accumulatedPeakDistanceAdditions  = 0;
+
+			accumulatedPeakDistanceDisplay->SetName("APDDistribution");
+			accumulatedPeakDistanceDisplay->SetTitle("Accumulated Peak Distance Distribution");
+			accumulatedPeakDistanceDisplay->GetXaxis()->SetTitle("distance [cells]");
+			accumulatedPeakDistanceDisplay->GetYaxis()->SetTitle("number of tracks");
+
+			accumulatedPeakDistanceDisplay->Draw("AL");
+
+		}
+		else {
+
+			accumulatedPeakDistanceAdditions++;
+			updateWindowAndDisplay(accumulatedPeakDistanceWindow, accumulatedPeakDistanceDisplay, accumulatedPeakDistanceAdditions, arrayY);
 
 		}
 
@@ -2138,22 +2531,10 @@ void showAnalysis::addMinimalTrackColumnDistribution(unsigned int* array, unsign
 void showAnalysis::addAverageTrackColumnDistribution(double* array, unsigned short numberOfEntries, unsigned int numberOfAnalysis) {
 
 	unsigned int i;
-	double       numberOfTracks;
 	double*      arrayX;
 	double*      arrayY;
-	char         buffer[doubleConversion+1];
-	std::string  yTitle;
 
 	if ((array != NULL) && (numberOfEntries > 0)) {
-
-		numberOfTracks = 0;
-		for (i = 0; i < numberOfEntries; i++)
-			if (array[i] > 0)
-				numberOfTracks += array[i];
-
-		/* This is just to avoid the division with zero */
-		if (numberOfTracks == 0)
-			numberOfTracks = 1;
 
 		arrayX = new double[numberOfEntries + 2];
 		if (arrayX == NULL)
@@ -2168,18 +2549,13 @@ void showAnalysis::addAverageTrackColumnDistribution(double* array, unsigned sho
 		for (i = 0; i < numberOfEntries; i++) {
 		
 			arrayX[i + 1] = (double)i;
-			arrayY[i + 1] = (array[i] * 100) / numberOfTracks;
+			arrayY[i + 1] = array[i] / (double)numberOfAnalysis;
 
 		}
 		arrayX[numberOfEntries + 1] = numberOfEntries;
 		arrayY[numberOfEntries + 1] = 0.0;
 
 		if (averageTrackColumnWindow == NULL) {
-
-			yTitle                       = "percentage of tracks [%] (%To#=";
-			dtos(numberOfTracks / (double)(numberOfAnalysis * 100), buffer, doubleConversionDigits);
-			yTitle                      += buffer;
-			yTitle                      += ")";
 
 			averageTrackColumnWindow     = addWindow("ATCDistribution", "Average Track Column Distribution");
 
@@ -2190,7 +2566,7 @@ void showAnalysis::addAverageTrackColumnDistribution(double* array, unsigned sho
 			averageTrackColumnDisplay->SetName("ATCDistribution");
 			averageTrackColumnDisplay->SetTitle("Average Track Column Distribution");
 			averageTrackColumnDisplay->GetXaxis()->SetTitle("column");
-			averageTrackColumnDisplay->GetYaxis()->SetTitle(yTitle.c_str());
+			averageTrackColumnDisplay->GetYaxis()->SetTitle("number of tracks");
 
 			averageTrackColumnDisplay->Draw("AB");
 
@@ -2332,7 +2708,7 @@ void showAnalysis::addFifoForColumnDistribution(unsigned int* array, unsigned sh
 		arrayY[0] =  0.0;
 		for (i = 0; i < numberOfEntries; i++) {
 
-			value    = std::min(counter, array[i]);
+			value    = min(counter, array[i]);
 
 			counter += array[i];
 		
@@ -2363,6 +2739,326 @@ void showAnalysis::addFifoForColumnDistribution(unsigned int* array, unsigned sh
 
 			fifoForColumnAdditions++;
 			updateWindowAndDisplay(fifoForColumnWindow, fifoForColumnDisplay, fifoForColumnAdditions, arrayY);
+
+		}
+
+		if (arrayX != NULL) {
+			delete arrayX;
+			arrayX = NULL;
+		}
+		if (arrayY != NULL) {
+			delete arrayY;
+			arrayY = NULL;
+		}
+
+	}
+	else {
+
+		arrayToDisplayIsNotAccessibleWarningMsg* arrayToDisplayIsNotAccessible = new arrayToDisplayIsNotAccessibleWarningMsg();
+		arrayToDisplayIsNotAccessible->warningMsg();
+		if(arrayToDisplayIsNotAccessible != NULL) {
+			delete arrayToDisplayIsNotAccessible;
+			arrayToDisplayIsNotAccessible = NULL;
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * method adds a display to show the distribution of the		*
+ * minimal found tracks' row									*
+ ****************************************************************/
+
+void showAnalysis::addMinimalTrackRowDistribution(unsigned int* array, unsigned short numberOfEntries) {
+
+	unsigned int i;
+	double*      arrayX;
+	double*      arrayY;
+
+	if ((array != NULL) && (numberOfEntries > 0)) {
+
+		arrayX = new double[numberOfEntries + 2];
+		if (arrayX == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayY = new double[numberOfEntries + 2];
+		if (arrayY == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayX[0] = -1.0;
+		arrayY[0] =  0.0;
+		for (i = 0; i < numberOfEntries; i++) {
+		
+			arrayX[i + 1] = (double)i;
+			arrayY[i + 1] = (double)array[i];
+
+		}
+		arrayX[numberOfEntries + 1] = numberOfEntries;
+		arrayY[numberOfEntries + 1] = 0.0;
+
+		if (minimalTrackRowWindow == NULL) {
+
+			minimalTrackRowWindow    = addWindow("MiniTRDistribution", "Minimal Track Row Distribution");
+
+			minimalTrackRowDisplay   = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
+
+			minimalTrackRowAdditions = 0;
+
+			minimalTrackRowDisplay->SetName("MiniTRDistribution");
+			minimalTrackRowDisplay->SetTitle("Minimal Track Row Distribution");
+			minimalTrackRowDisplay->GetXaxis()->SetTitle("row");
+			minimalTrackRowDisplay->GetYaxis()->SetTitle("number of tracks");
+
+			minimalTrackRowDisplay->Draw("AB");
+
+		}
+		else {
+
+			minimalTrackRowAdditions++;
+			updateWindowAndDisplay(minimalTrackRowWindow, minimalTrackRowDisplay, minimalTrackRowAdditions, arrayY);
+
+		}
+
+		if (arrayX != NULL) {
+			delete arrayX;
+			arrayX = NULL;
+		}
+		if (arrayY != NULL) {
+			delete arrayY;
+			arrayY = NULL;
+		}
+
+	}
+	else {
+
+		arrayToDisplayIsNotAccessibleWarningMsg* arrayToDisplayIsNotAccessible = new arrayToDisplayIsNotAccessibleWarningMsg();
+		arrayToDisplayIsNotAccessible->warningMsg();
+		if(arrayToDisplayIsNotAccessible != NULL) {
+			delete arrayToDisplayIsNotAccessible;
+			arrayToDisplayIsNotAccessible = NULL;
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * method adds a display to show the distribution of the		*
+ * average found tracks' row									*
+ ****************************************************************/
+
+void showAnalysis::addAverageTrackRowDistribution(double* array, unsigned short numberOfEntries, unsigned int numberOfAnalysis) {
+
+	unsigned int i;
+	double*      arrayX;
+	double*      arrayY;
+
+	if ((array != NULL) && (numberOfEntries > 0)) {
+
+		arrayX = new double[numberOfEntries + 2];
+		if (arrayX == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayY = new double[numberOfEntries + 2];
+		if (arrayY == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayX[0] = -1.0;
+		arrayY[0] =  0.0;
+		for (i = 0; i < numberOfEntries; i++) {
+		
+			arrayX[i + 1] = (double)i;
+			arrayY[i + 1] = array[i] / (double)numberOfAnalysis;
+
+		}
+		arrayX[numberOfEntries + 1] = numberOfEntries;
+		arrayY[numberOfEntries + 1] = 0.0;
+
+		if (averageTrackRowWindow == NULL) {
+
+			averageTrackRowWindow     = addWindow("ATRDistribution", "Average Track Row Distribution");
+
+			averageTrackRowDisplay    = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
+
+			averageTrackRowAdditions  = 0;
+
+			averageTrackRowDisplay->SetName("ATRDistribution");
+			averageTrackRowDisplay->SetTitle("Average Track Row Distribution");
+			averageTrackRowDisplay->GetXaxis()->SetTitle("row");
+			averageTrackRowDisplay->GetYaxis()->SetTitle("number of tracks");
+
+			averageTrackRowDisplay->Draw("AB");
+
+		}
+		else {
+
+			averageTrackRowAdditions++;
+			updateWindowAndDisplay(averageTrackRowWindow, averageTrackRowDisplay, averageTrackRowAdditions, arrayY);
+
+		}
+
+		if (arrayX != NULL) {
+			delete arrayX;
+			arrayX = NULL;
+		}
+		if (arrayY != NULL) {
+			delete arrayY;
+			arrayY = NULL;
+		}
+
+	}
+	else {
+
+		arrayToDisplayIsNotAccessibleWarningMsg* arrayToDisplayIsNotAccessible = new arrayToDisplayIsNotAccessibleWarningMsg();
+		arrayToDisplayIsNotAccessible->warningMsg();
+		if(arrayToDisplayIsNotAccessible != NULL) {
+			delete arrayToDisplayIsNotAccessible;
+			arrayToDisplayIsNotAccessible = NULL;
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * method adds a display to show the distribution of the		*
+ * maximal found tracks' row									*
+ ****************************************************************/
+
+void showAnalysis::addMaximalTrackRowDistribution(unsigned int* array, unsigned short numberOfEntries) {
+
+	unsigned int i;
+	double*      arrayX;
+	double*      arrayY;
+
+	if ((array != NULL) && (numberOfEntries > 0)) {
+
+		arrayX = new double[numberOfEntries + 2];
+		if (arrayX == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayY = new double[numberOfEntries + 2];
+		if (arrayY == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayX[0] = -1.0;
+		arrayY[0] =  0.0;
+		for (i = 0; i < numberOfEntries; i++) {
+		
+			arrayX[i + 1] = (double)i;
+			arrayY[i + 1] = (double)array[i];
+
+		}
+		arrayX[numberOfEntries + 1] = numberOfEntries;
+		arrayY[numberOfEntries + 1] = 0.0;
+
+		if (maximalTrackRowWindow == NULL) {
+
+			maximalTrackRowWindow    = addWindow("MaxiTRDistribution", "Maximal Track Row Distribution");
+
+			maximalTrackRowDisplay   = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
+
+			maximalTrackRowAdditions = 0;
+
+			maximalTrackRowDisplay->SetName("MaxiTRDistribution");
+			maximalTrackRowDisplay->SetTitle("Maximal Track Row Distribution");
+			maximalTrackRowDisplay->GetXaxis()->SetTitle("row");
+			maximalTrackRowDisplay->GetYaxis()->SetTitle("number of tracks");
+
+			maximalTrackRowDisplay->Draw("AB");
+
+		}
+		else {
+
+			maximalTrackRowAdditions++;
+			updateWindowAndDisplay(maximalTrackRowWindow, maximalTrackRowDisplay, maximalTrackRowAdditions, arrayY);
+
+		}
+
+		if (arrayX != NULL) {
+			delete arrayX;
+			arrayX = NULL;
+		}
+		if (arrayY != NULL) {
+			delete arrayY;
+			arrayY = NULL;
+		}
+
+	}
+	else {
+
+		arrayToDisplayIsNotAccessibleWarningMsg* arrayToDisplayIsNotAccessible = new arrayToDisplayIsNotAccessibleWarningMsg();
+		arrayToDisplayIsNotAccessible->warningMsg();
+		if(arrayToDisplayIsNotAccessible != NULL) {
+			delete arrayToDisplayIsNotAccessible;
+			arrayToDisplayIsNotAccessible = NULL;
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * method adds a display to show the distribution of the		*
+ * fifos for the found tracks' row								*
+ ****************************************************************/
+
+void showAnalysis::addFifoForRowDistribution(unsigned int* array, unsigned short numberOfEntries) {
+
+	unsigned int i;
+	unsigned int value;
+	unsigned int counter;
+	double*      arrayX;
+	double*      arrayY;
+
+	if ((array != NULL) && (numberOfEntries > 0)) {
+
+		arrayX = new double[numberOfEntries + 2];
+		if (arrayX == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayY = new double[numberOfEntries + 2];
+		if (arrayY == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		value     = 0;
+		counter   = 0;
+		arrayX[0] = -1.0;
+		arrayY[0] =  0.0;
+		for (i = 0; i < numberOfEntries; i++) {
+
+			value    = min(counter, array[i]);
+
+			counter += array[i];
+		
+			arrayX[i + 1] = (double)i;
+			arrayY[i + 1] = (double)value;
+
+		}
+		arrayX[numberOfEntries + 1] = numberOfEntries;
+		arrayY[numberOfEntries + 1] = 0.0;
+
+		if (fifoForRowWindow == NULL) {
+
+			fifoForRowWindow    = addWindow("FFRDistribution", "FIFOs For Row Distribution");
+
+			fifoForRowDisplay   = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
+
+			fifoForRowAdditions = 0;
+
+			fifoForRowDisplay->SetName("FFRDistribution");
+			fifoForRowDisplay->SetTitle("FIFOs For Row Distribution");
+			fifoForRowDisplay->GetXaxis()->SetTitle("row");
+			fifoForRowDisplay->GetYaxis()->SetTitle("fifo size");
+
+			fifoForRowDisplay->Draw("AB");
+
+		}
+		else {
+
+			fifoForRowAdditions++;
+			updateWindowAndDisplay(fifoForRowWindow, fifoForRowDisplay, fifoForRowAdditions, arrayY);
 
 		}
 
@@ -2501,14 +3197,14 @@ void showAnalysis::addTrackDensityLayerDistribution(int* array, unsigned short n
 
 		if (trackDensityLayerWindow == NULL) {
 
-			trackDensityLayerWindow    = addWindow("TDLDistribution", "Track Density Layer Distribution");
+			trackDensityLayerWindow    = addWindow("TCDLDistribution", "Track Candidate Difference Layer Distribution");
 
 			trackDensityLayerDisplay   = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
 
 			trackDensityLayerAdditions = 0;
 
-			trackDensityLayerDisplay->SetName("TDLDistribution");
-			trackDensityLayerDisplay->SetTitle("Track Density Layer Distribution");
+			trackDensityLayerDisplay->SetName("TCDLDistribution");
+			trackDensityLayerDisplay->SetTitle("Track Candidate Difference Layer Distribution");
 			trackDensityLayerDisplay->GetXaxis()->SetTitle("layer");
 			trackDensityLayerDisplay->GetYaxis()->SetTitle("number of tracks");
 
@@ -2519,6 +3215,277 @@ void showAnalysis::addTrackDensityLayerDistribution(int* array, unsigned short n
 
 			trackDensityLayerAdditions++;
 			updateWindowAndDisplay(trackDensityLayerWindow, trackDensityLayerDisplay, trackDensityLayerAdditions, arrayY);
+
+		}
+
+		if (arrayX != NULL) {
+			delete arrayX;
+			arrayX = NULL;
+		}
+		if (arrayY != NULL) {
+			delete arrayY;
+			arrayY = NULL;
+		}
+
+	}
+	else {
+
+		arrayToDisplayIsNotAccessibleWarningMsg* arrayToDisplayIsNotAccessible = new arrayToDisplayIsNotAccessibleWarningMsg();
+		arrayToDisplayIsNotAccessible->warningMsg();
+		if(arrayToDisplayIsNotAccessible != NULL) {
+			delete arrayToDisplayIsNotAccessible;
+			arrayToDisplayIsNotAccessible = NULL;
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * method adds a display to show the distribution of the		*
+ * hit readouts while histogramming								*
+ ****************************************************************/
+
+void showAnalysis::addHitReadoutDistribution(unsigned int* array, unsigned int numberOfEntries, unsigned int numberOfAnalysis) {
+
+	unsigned int i;
+	double*      arrayX;
+	double*      arrayY;
+
+	if ((array != NULL) && (numberOfEntries > 0)) {
+
+		arrayX = new double[numberOfEntries + 2];
+		if (arrayX == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayY = new double[numberOfEntries + 2];
+		if (arrayY == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayX[0] =  0.0;
+		arrayY[0] =  0.0;
+		for (i = 0; i < numberOfEntries; i++) {
+		
+			arrayX[i + 1] = (double)i + 1;
+			arrayY[i + 1] = (double)array[i] / (double)numberOfAnalysis;
+
+		}
+		arrayX[numberOfEntries + 1] = numberOfEntries;
+		arrayY[numberOfEntries + 1] = 0.0;
+
+		if (hitReadoutDistributionWindow == NULL) {
+
+			hitReadoutDistributionWindow    = addWindow("HRDistribution", "Hit Readout Distribution");
+
+			hitReadoutDistributionDisplay   = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
+
+			hitReadoutDistributionAdditions = 0;
+
+			hitReadoutDistributionDisplay->SetName("HRDistribution");
+			hitReadoutDistributionDisplay->SetTitle("Hit Readout Distribution");
+			hitReadoutDistributionDisplay->GetXaxis()->SetTitle("number of readouts");
+			hitReadoutDistributionDisplay->GetYaxis()->SetTitle("number of hits");
+
+			hitReadoutDistributionDisplay->Draw("AB");
+
+		}
+		else {
+
+			hitReadoutDistributionAdditions++;
+			updateWindowAndDisplay(hitReadoutDistributionWindow, hitReadoutDistributionDisplay, hitReadoutDistributionAdditions, arrayY);
+
+		}
+
+		if (arrayX != NULL) {
+			delete arrayX;
+			arrayX = NULL;
+		}
+		if (arrayY != NULL) {
+			delete arrayY;
+			arrayY = NULL;
+		}
+
+	}
+	else {
+
+		arrayToDisplayIsNotAccessibleWarningMsg* arrayToDisplayIsNotAccessible = new arrayToDisplayIsNotAccessibleWarningMsg();
+		arrayToDisplayIsNotAccessible->warningMsg();
+		if(arrayToDisplayIsNotAccessible != NULL) {
+			delete arrayToDisplayIsNotAccessible;
+			arrayToDisplayIsNotAccessible = NULL;
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * method adds a display to show the mean of the				*
+ * hit readouts with different parallely implemented			*
+ * histogram layers while histogramming							*
+ ****************************************************************/
+
+void showAnalysis::addHitReadoutMeanDistribution(unsigned int* array, unsigned int numberOfEntries, unsigned int numberOfAnalysis) {
+
+	unsigned int i;
+	unsigned int j;
+	double       sum;
+	double       meanValue;
+	double*      arrayX;
+	double*      arrayY;
+
+	if ((array != NULL) && (numberOfEntries > 0)) {
+
+		arrayX = new double[numberOfEntries + 2];
+		if (arrayX == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayY = new double[numberOfEntries + 2];
+		if (arrayY == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		sum      = 0;
+		for (j = 0; j < numberOfEntries; j++)
+			sum += (double)array[j] / (double)numberOfAnalysis;
+
+		arrayX[0] =  0.0;
+		arrayY[0] =  0.0;
+		for (i = 0; i < numberOfEntries; i++) {
+		
+			meanValue          = 0;
+			for (j = 0; j < numberOfEntries; j++) {
+
+				if (i + 1 < numberOfEntries)
+					meanValue += (1 + ((double)j / (double)(i + 1))) * ((double)array[j] / (double)numberOfAnalysis);
+				else
+					meanValue += (double)array[j] / (double)numberOfAnalysis;
+
+			}
+
+			arrayX[i + 1] = (double)(i + 1);
+			arrayY[i + 1] = meanValue / sum;
+
+		}
+		arrayX[numberOfEntries + 1] = numberOfEntries;
+		arrayY[numberOfEntries + 1] = 0.0;
+
+		if (hitReadoutMeanDistributionDistributionWindow == NULL) {
+
+			hitReadoutMeanDistributionDistributionWindow    = addWindow("HRMDistribution", "Hit Readout Mean Distribution");
+
+			hitReadoutMeanDistributionDistributionDisplay   = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
+
+			hitReadoutMeanDistributionDistributionAdditions = 0;
+
+			hitReadoutMeanDistributionDistributionDisplay->SetName("HRMDistribution");
+			hitReadoutMeanDistributionDistributionDisplay->SetTitle("Hit Readout Mean Distribution");
+			hitReadoutMeanDistributionDistributionDisplay->GetXaxis()->SetTitle("mean number of readouts");
+			hitReadoutMeanDistributionDistributionDisplay->GetYaxis()->SetTitle("number of parallely implemented layers");
+
+			hitReadoutMeanDistributionDistributionDisplay->Draw("AB");
+
+		}
+		else {
+
+			hitReadoutMeanDistributionDistributionAdditions++;
+			updateWindowAndDisplay(hitReadoutMeanDistributionDistributionWindow, hitReadoutMeanDistributionDistributionDisplay, hitReadoutMeanDistributionDistributionAdditions, arrayY);
+
+		}
+
+		if (arrayX != NULL) {
+			delete arrayX;
+			arrayX = NULL;
+		}
+		if (arrayY != NULL) {
+			delete arrayY;
+			arrayY = NULL;
+		}
+
+	}
+	else {
+
+		arrayToDisplayIsNotAccessibleWarningMsg* arrayToDisplayIsNotAccessible = new arrayToDisplayIsNotAccessibleWarningMsg();
+		arrayToDisplayIsNotAccessible->warningMsg();
+		if(arrayToDisplayIsNotAccessible != NULL) {
+			delete arrayToDisplayIsNotAccessible;
+			arrayToDisplayIsNotAccessible = NULL;
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * method adds a display to show the time						*
+ * consumption of the histogram processing with					*
+ * different parallely implementedhistogram layers				*
+ ****************************************************************/
+
+void showAnalysis::addFpgaHistogramProcessingTimeDistribution(unsigned int* array, unsigned int numberOfEntries, unsigned int numberOfAnalysis, bool readoutColumnsInParallel, unsigned short histogramDim1, unsigned short histogramDim2) {
+
+	unsigned int i;
+	unsigned int j;
+	unsigned int timeHistogramReadout;
+	double       timeHistogramming;
+	double*      arrayX;
+	double*      arrayY;
+
+	if ((array != NULL) && (numberOfEntries > 0)) {
+
+		arrayX = new double[numberOfEntries + 2];
+		if (arrayX == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayY = new double[numberOfEntries + 2];
+		if (arrayY == NULL)
+			throw memoryAllocationError(ANALYSISLIB);
+
+		arrayX[0] =  0.0;
+		arrayY[0] =  0.0;
+		for (i = 0; i < numberOfEntries; i++) {
+		
+			if (readoutColumnsInParallel)
+				timeHistogramReadout = histogramDim2 * ((numberOfEntries + i) / (i + 1));
+			else
+				timeHistogramReadout = histogramDim1 * ((numberOfEntries + i) / (i + 1));
+
+			timeHistogramming    = 0;
+			for (j = 0; j < numberOfEntries; j++) {
+
+				if (i + 1 < numberOfEntries)
+					timeHistogramming += (1 + ((double)j / (double)(i + 1))) * ((double)array[j] / (double)numberOfAnalysis);
+				else
+					timeHistogramming += (double)array[j] / (double)numberOfAnalysis;
+
+			}
+
+			arrayX[i + 1] = (double)(i + 1);
+			arrayY[i + 1] = (double)((unsigned int)ceil(timeHistogramming) + timeHistogramReadout);
+
+		}
+		arrayX[numberOfEntries + 1] = numberOfEntries;
+		arrayY[numberOfEntries + 1] = 0.0;
+
+		if (fpgaHistogramProcessingTimeDistributionDistributionWindow == NULL) {
+
+			fpgaHistogramProcessingTimeDistributionDistributionWindow    = addWindow("FPGAHPTDistribution", "FPGA Histogram Processing Time Distribution");
+
+			fpgaHistogramProcessingTimeDistributionDistributionDisplay   = addDisplay((int)(numberOfEntries + 2), arrayX, arrayY);
+
+			fpgaHistogramProcessingTimeDistributionDistributionAdditions = 0;
+
+			fpgaHistogramProcessingTimeDistributionDistributionDisplay->SetName("FPGAHPTDistribution");
+			fpgaHistogramProcessingTimeDistributionDistributionDisplay->SetTitle("FPGA Histogram Processing Time Distribution");
+			fpgaHistogramProcessingTimeDistributionDistributionDisplay->GetXaxis()->SetTitle("parallely implemented layers");
+			fpgaHistogramProcessingTimeDistributionDistributionDisplay->GetYaxis()->SetTitle("time [clock cycles]");
+
+			fpgaHistogramProcessingTimeDistributionDistributionDisplay->Draw("AB");
+
+		}
+		else {
+
+			fpgaHistogramProcessingTimeDistributionDistributionAdditions++;
+			updateWindowAndDisplay(fpgaHistogramProcessingTimeDistributionDistributionWindow, fpgaHistogramProcessingTimeDistributionDistributionDisplay, fpgaHistogramProcessingTimeDistributionDistributionAdditions, arrayY);
 
 		}
 

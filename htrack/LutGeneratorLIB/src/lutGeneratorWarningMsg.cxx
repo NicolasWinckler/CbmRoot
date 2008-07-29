@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/11/07 12:48:06 $
-// $Revision: 1.2 $
+// $Date: 2008-02-29 11:43:28 $
+// $Revision: 1.3 $
 //
 // *******************************************************************/
 
@@ -190,6 +190,76 @@ void differentPrelutDefinitionAsFileDetectedWarningMsg::warningMsg() {
 
 
 /****************************************************************
+ * CLASS differentDigitalHitLutUsageAsFileDetectedWarningMsg	*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+differentDigitalHitLutUsageAsFileDetectedWarningMsg::differentDigitalHitLutUsageAsFileDetectedWarningMsg() : lutGeneratorWarningMsg() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+differentDigitalHitLutUsageAsFileDetectedWarningMsg::~differentDigitalHitLutUsageAsFileDetectedWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void differentDigitalHitLutUsageAsFileDetectedWarningMsg::warningMsg() {
+
+	std::string temp;
+
+	temp = "The usage of this digital hit look up table is set different to the standard. Maybe it is not the correct one!!!";
+
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS differentPrelutUsageAsFileDetectedWarningMsg			*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+differentPrelutUsageAsFileDetectedWarningMsg::differentPrelutUsageAsFileDetectedWarningMsg() : lutGeneratorWarningMsg() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+differentPrelutUsageAsFileDetectedWarningMsg::~differentPrelutUsageAsFileDetectedWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void differentPrelutUsageAsFileDetectedWarningMsg::warningMsg() {
+
+	std::string temp;
+
+	temp = "The usage of this pre look up table is set different to the standard. Maybe it is not the correct one!!!";
+
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
  * CLASS differentLutDefinitionAsFileDetectedWarningMsg			*
  ****************************************************************/
 
@@ -240,6 +310,72 @@ void differentLutDefinitionAsFileDetectedWarningMsg::warningMsg() {
 
 
 /****************************************************************
+ * CLASS differentLutUsageAsFileDetectedWarningMsg				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+differentLutUsageAsFileDetectedWarningMsg::differentLutUsageAsFileDetectedWarningMsg() : lutGeneratorWarningMsg() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+differentLutUsageAsFileDetectedWarningMsg::~differentLutUsageAsFileDetectedWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void differentLutUsageAsFileDetectedWarningMsg::warningMsg() {
+
+	std::string temp;
+
+	temp = "The usage of this look up table is set different to the standard. Maybe it is not the correct one!!!";
+
+	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS cannotWriteEmptyDigitalHitLutWarningMsg 				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+cannotWriteEmptyDigitalHitLutWarningMsg::cannotWriteEmptyDigitalHitLutWarningMsg() : lutGeneratorWarningMsg() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+cannotWriteEmptyDigitalHitLutWarningMsg::~cannotWriteEmptyDigitalHitLutWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void cannotWriteEmptyDigitalHitLutWarningMsg::warningMsg() {
+
+	printMsg("You cannot write an empty digital hit look up table into the file!!!");
+
+}
+
+
+/****************************************************************
  * CLASS cannotWriteEmptyPrelutWarningMsg		 				*
  ****************************************************************/
 
@@ -265,7 +401,7 @@ cannotWriteEmptyPrelutWarningMsg::~cannotWriteEmptyPrelutWarningMsg() {
 
 void cannotWriteEmptyPrelutWarningMsg::warningMsg() {
 
-	printMsg("You cannot write an empty pre-look-up-table into the file!!!");
+	printMsg("You cannot write an empty pre look up table into the file!!!");
 
 }
 
@@ -296,6 +432,6 @@ cannotWriteEmptyLutWarningMsg::~cannotWriteEmptyLutWarningMsg() {
 
 void cannotWriteEmptyLutWarningMsg::warningMsg() {
 
-	printMsg("You cannot write an empty look-up-table into the file!!!");
+	printMsg("You cannot write an empty look up table into the file!!!");
 
 }

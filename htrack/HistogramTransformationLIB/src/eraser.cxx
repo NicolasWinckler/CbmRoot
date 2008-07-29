@@ -29,8 +29,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/11/17 15:12:39 $
-// $Revision: 1.3 $
+// $Date: 2007-10-19 14:34:07 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
@@ -117,7 +117,7 @@ void eraser::filteringHistogram(std::streambuf* terminal) {
 	maxClass = (unsigned short)(*ratings)->getCodingTableMaximumClassification().toULong();
 	minClass = (unsigned short)(*ratings)->getCodingTableMinimumClassification().toULong();
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t", (maxClass + DIAGONALIZATIONSUMMAND - minClass + 1) * (*tracks)->getNumberOfLayers());
+	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t\t\t", (maxClass + DIAGONALIZATIONSUMMAND - minClass + 1) * (*tracks)->getNumberOfLayers());
 	terminalInitialize(statusSequence);
 
 	for (unsigned short i = maxClass + DIAGONALIZATIONSUMMAND; i >= minClass; i--) {

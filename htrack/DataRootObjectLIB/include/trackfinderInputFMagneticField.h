@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/12/28 13:09:04 $
-/// $Revision: 1.3 $
+/// $Date: 2007-10-19 14:33:02 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -94,6 +94,30 @@ public:
 	void init(CbmField* field, unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
 	void init(CbmField* field, const char* fileName, bool isRootFile = true, const char* mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
 	void init(CbmField* field, std::string fileName, bool isRootFile = true, std::string mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfData(unsigned short dimension = 0);
 
 };
 

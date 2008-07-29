@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/07/17 11:35:45 $
-// $Revision: 1.1 $
+// $Date: 2007-12-13 13:49:20 $
+// $Revision: 1.2 $
 //
 // *******************************************************************/
 
@@ -39,8 +39,6 @@
 prelut::prelut() {
 
 	init(0, 0, 0, 0, 0);
-	border.start  = 0;
-	border.stop   = 0;
 
 }
 
@@ -48,11 +46,19 @@ prelut::prelut() {
  * Constructor													*
  ****************************************************************/
 
+prelut::prelut(double dim3Min, double dim3Max, int dim3Step) {
+
+	init(dim3Min, dim3Max, dim3Step, 0, 0);
+
+}
+prelut::prelut(double dim3StartEntry, double dim3StopEntry) {
+
+	init(0, 0, 0, dim3StartEntry, dim3StopEntry);
+
+}
 prelut::prelut(double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry) {
 
 	init(dim3Min, dim3Max, dim3Step, dim3StartEntry, dim3StopEntry);
-	border.start  = 0;
-	border.stop   = 0;
 
 }
 
@@ -73,6 +79,29 @@ void prelut::init(double dim3Min, double dim3Max, int dim3Step, double dim3Start
 	def.dim3Min  = dim3Min;
 	def.dim3Max  = dim3Max;
 	def.dim3Step = dim3Step;
+	if (dim3StartEntry > dim3StopEntry)
+		def.dim3StartEntry = dim3StopEntry;
+	else
+		def.dim3StartEntry = dim3StartEntry;
+	def.dim3StopEntry = dim3StopEntry;
+	border.start = 0;
+	border.stop  = 0;
+
+}
+
+/****************************************************************
+ * Method inits the variables based on the detector stations.	*
+ ****************************************************************/
+
+void prelut::set(double dim3Min, double dim3Max, int dim3Step) {
+
+	def.dim3Min  = dim3Min;
+	def.dim3Max  = dim3Max;
+	def.dim3Step = dim3Step;
+
+}
+void prelut::set(double dim3StartEntry, double dim3StopEntry) {
+
 	if (dim3StartEntry > dim3StopEntry)
 		def.dim3StartEntry = dim3StopEntry;
 	else

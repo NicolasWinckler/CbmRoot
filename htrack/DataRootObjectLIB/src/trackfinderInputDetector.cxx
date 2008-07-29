@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-05-14 15:44:00 $
-// $Revision: 1.2 $
+// $Date: 2007-10-19 14:33:10 $
+// $Revision: 1.3 $
 //
 // *******************************************************************/
 
@@ -53,10 +53,16 @@ int compareStationId(const void* element1, const void* element2) {
 trackfinderInputStation* trackfinderInputDetector::searchStation(int stationId) {
 
 	trackfinderInputStation  key;
-	trackfinderInputStation* returnValue;
+	trackfinderInputStation* returnValue = NULL;
 
-	key.setId(stationId);
-	returnValue = (trackfinderInputStation*)bsearch((void*)(&key), (void*)detector, numberOfStations, sizeof(trackfinderInputStation), compareStationId);
+	if (detector != NULL) {
+
+		key.setId(stationId);
+		returnValue = (trackfinderInputStation*)bsearch((void*)(&key), (void*)detector, numberOfStations, sizeof(trackfinderInputStation), compareStationId);
+
+	}
+	else
+		throw detectorIsNotDefinedError();
 
 	if (returnValue == NULL)
 		throw cannotFindStationIdError(stationId);
@@ -242,6 +248,9 @@ trackfinderInputStation& trackfinderInputDetector::getStationByIndex(unsigned in
 
 	trackfinderInputStation* returnValue;
 
+	if (detector == NULL)
+		throw detectorIsNotDefinedError();
+
 	if (stationIndex < numberOfStations)
 		returnValue = &detector[stationIndex];
 	else
@@ -315,7 +324,7 @@ void trackfinderInputDetector::removeStation(int stationId) {
 	detector = (trackfinderInputStation*)realloc(detector, numberOfStations * sizeof(trackfinderInputStation));
 
 	if (detector == NULL)
-		throw memoryAllocationError(DATAROOTOBJECTLIB);
+		throw detectorIsNotDefinedError();
 
 	reIndex();
 
@@ -342,7 +351,10 @@ void trackfinderInputDetector::removeDetector() {
 
 void trackfinderInputDetector::sortDetector() {
 
-	qsort((void*)(detector), numberOfStations, sizeof(trackfinderInputStation), compareStationId);
+	if (detector != NULL)
+		qsort((void*)(detector), numberOfStations, sizeof(trackfinderInputStation), compareStationId);
+	else
+		throw detectorIsNotDefinedError();
 
 	reIndex();
 
@@ -355,6 +367,9 @@ void trackfinderInputDetector::sortDetector() {
 void trackfinderInputDetector::reIndex() {
 
 	numberOfActiveStations = 0;
+
+	if (detector == NULL)
+		throw detectorIsNotDefinedError();
 
 	for (unsigned int i = 0; i < numberOfStations; i++) {
 
@@ -371,6 +386,82 @@ void trackfinderInputDetector::reIndex() {
 		}
 
 	}
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputDetector::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(numberOfStations);
+	returnValue += sizeof(numberOfActiveStations);
+	returnValue += sizeof(detector);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputDetector::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	if (detector != NULL) {
+
+		for (unsigned short i = 0; i < numberOfStations; i++) {
+
+			returnValue += detector[i].getReservedSizeOfData(0);
+			returnValue += detector[i].getAllocatedSizeOfData(0);
+
+		}
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputDetector::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(numberOfStations);
+	returnValue += sizeof(numberOfActiveStations);
+	returnValue += sizeof(detector);
+
+	if (detector != NULL) {
+
+		for (unsigned short i = 0; i < numberOfActiveStations; i++) {
+
+			returnValue += detector[i].getUsedSizeOfData(0);
+
+		}
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }
 

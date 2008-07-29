@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/11/06 11:12:12 $
-/// $Revision: 1.2 $
+/// $Date: 2008-02-29 11:38:11 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -104,10 +104,24 @@ public:
 
 /**
  * This method sets the object based on the string representation
+ * without identifiers.
+ */
+	
+	void fromNotIdentifiedRadixString(std::string& value);
+
+/**
+ * This method sets the object based on the string representation
  * with identifiers.
  */
 
 	void fromIdentifiedString(std::string& value);
+
+/**
+ * This method sets the object based on the string representation
+ * with identifiers.
+ */
+
+	void fromIdentifiedRadixString(std::string& value);
 
 /**
  * This method converts the object into a string representation
@@ -118,10 +132,48 @@ public:
 
 /**
  * This method converts the object into a string representation
+ * and adds no identifiers.
+ */
+	
+	std::string toNotIdentifiedRadixString();
+
+/**
+ * This method converts the object into a string representation
  * and adds identifiers.
  */
 
 	std::string toIdentifiedString();
+
+/**
+ * This method converts the object into a string representation
+ * and adds identifiers.
+ */
+
+	std::string toIdentifiedRadixString();
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfData(unsigned short dimension = 0);
 
 };
 

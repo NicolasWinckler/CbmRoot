@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/07/17 11:27:02 $
-// $Revision: 1.1 $
+// $Date: 2007-10-31 13:44:01 $
+// $Revision: 1.2 $
 //
 // *******************************************************************/
 
@@ -234,6 +234,16 @@ trackToPeak* qualityEFGCAnalysis::getTrackToPeakInfo() {
 }
 
 /****************************************************************
+ * method returns the number of the clone tracks.				*
+ ****************************************************************/
+
+unsigned short qualityEFGCAnalysis::getNumberOfCloneTracks() {
+
+	return (unsigned short)peakInfo.numberOfClonePeaks;
+
+}
+
+/****************************************************************
  * method returns the number of the fake tracks.				*
  ****************************************************************/
 
@@ -260,6 +270,23 @@ unsigned short qualityEFGCAnalysis::getNumberOfGhostTracks() {
 unsigned short qualityEFGCAnalysis::getNumberOfIdentifiedTracks() {
 
 	return (unsigned short)(trackInfo.trackToOnePeak + trackInfo.trackToMorePeaks);
+
+}
+
+/****************************************************************
+ * method returns the number of the not well found tracks.		*
+ ****************************************************************/
+
+unsigned short qualityEFGCAnalysis::getNumberOfNotWellFoundTracks() {
+
+	unsigned short returnValue;
+
+	if (getNumberOfIdentifiedTracks() > (unsigned short)trackInfo.numberOfWellFoundTracks)
+		returnValue = getNumberOfIdentifiedTracks() - (unsigned short)trackInfo.numberOfWellFoundTracks;
+	else
+		returnValue = 0;
+
+	return returnValue;
 
 }
 

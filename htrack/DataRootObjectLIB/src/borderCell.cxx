@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/07/17 11:27:40 $
-// $Revision: 1.1 $
+// $Date: 2007-10-19 14:33:04 $
+// $Revision: 1.2 $
 //
 // *******************************************************************/
 
@@ -75,5 +75,288 @@ const borderCell& borderCell::operator = (const borderCell& value) {
 	this->layer = value.layer;
 
 	return *this;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double borderCell::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(layer);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double borderCell::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	for (int i = 0; i < layer.size(); i++) {
+
+		returnValue += layer[i].getReservedSizeOfData(0);
+		returnValue += layer[i].getAllocatedSizeOfData(0);
+
+	}
+
+	returnValue += (layer.capacity() - layer.size()) * sizeof(lutBorder);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double borderCell::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	for (int i = 0; i < layer.size(); i++) {
+
+		returnValue += layer[i].getUsedSizeOfData(0);
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double borderCell::getReservedSizeOfPrelutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double borderCell::getAllocatedSizeOfPrelutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	for (int i = 0; i < layer.size(); i++) {
+
+		returnValue += layer[i].getReservedSizeOfPrelutData(0);
+		returnValue += layer[i].getAllocatedSizeOfPrelutData(0);
+
+	}
+
+	returnValue += (layer.capacity() - layer.size()) * sizeof(prelutHoughBorder);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double borderCell::getUsedSizeOfPrelutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	for (int i = 0; i < layer.size(); i++) {
+
+		returnValue += layer[i].getUsedSizeOfPrelutData(0);
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double borderCell::getReservedSizeOfLutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double borderCell::getAllocatedSizeOfLutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	for (int i = 0; i < layer.size(); i++) {
+
+		returnValue += layer[i].getReservedSizeOfLutData(0);
+		returnValue += layer[i].getAllocatedSizeOfLutData(0);
+
+	}
+
+	returnValue += (layer.capacity() - layer.size()) * sizeof(lutHoughBorder);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double borderCell::getUsedSizeOfLutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	for (int i = 0; i < layer.size(); i++) {
+
+		returnValue += layer[i].getUsedSizeOfLutData(0);
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double borderCell::getReservedSizeOfHitData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double borderCell::getAllocatedSizeOfHitData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	for (int i = 0; i < layer.size(); i++) {
+
+		returnValue += layer[i].getReservedSizeOfHitData(0);
+		returnValue += layer[i].getAllocatedSizeOfHitData(0);
+
+	}
+
+	returnValue += (layer.capacity() - layer.size()) * sizeof(trackfinderInputHit*);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double borderCell::getUsedSizeOfHitData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	for (int i = 0; i < layer.size(); i++) {
+
+		returnValue += layer[i].getUsedSizeOfHitData(0);
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double borderCell::getAllocatedSizeOfAddOnData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(layer);
+
+	returnValue += (layer.capacity() - layer.size()) * (sizeof(lutBorder) - sizeof(prelutHoughBorder) - sizeof(lutHoughBorder) - sizeof(trackfinderInputHit*));
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }

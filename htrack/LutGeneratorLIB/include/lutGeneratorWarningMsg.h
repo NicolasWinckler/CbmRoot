@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/11/07 12:48:06 $
-/// $Revision: 1.2 $
+/// $Date: 2008-02-29 11:43:28 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -189,6 +189,74 @@ public:
 #endif
 
 
+#ifndef _DIFFERENTDIGITALHITLUTUSAGEASFILEDETECTEDWARNINGMSG_H
+#define _DIFFERENTDIGITALHITLUTUSAGEASFILEDETECTEDWARNINGMSG_H
+
+/**
+ * CLASS differentDigitalHitLutUsageAsFileDetectedWarningMsg
+ */
+
+class differentDigitalHitLutUsageAsFileDetectedWarningMsg : public lutGeneratorWarningMsg {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	differentDigitalHitLutUsageAsFileDetectedWarningMsg();
+
+/**
+ * Destructor
+ */
+
+	virtual ~differentDigitalHitLutUsageAsFileDetectedWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _DIFFERENTPRELUTUSAGEASFILEDETECTEDWARNINGMSG_H
+#define _DIFFERENTPRELUTUSAGEASFILEDETECTEDWARNINGMSG_H
+
+/**
+ * CLASS differentPrelutUsageAsFileDetectedWarningMsg
+ */
+
+class differentPrelutUsageAsFileDetectedWarningMsg : public lutGeneratorWarningMsg {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	differentPrelutUsageAsFileDetectedWarningMsg();
+
+/**
+ * Destructor
+ */
+
+	virtual ~differentPrelutUsageAsFileDetectedWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
 #ifndef _DIFFERENTLUTDEFINITIONASFILEDETECTEDWARNINGMSG_H
 #define _DIFFERENTLUTDEFINITIONASFILEDETECTEDWARNINGMSG_H
 
@@ -221,6 +289,74 @@ public:
  */
 
 	virtual ~differentLutDefinitionAsFileDetectedWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _DIFFERENTLUTUSAGEASFILEDETECTEDWARNINGMSG_H
+#define _DIFFERENTLUTUSAGEASFILEDETECTEDWARNINGMSG_H
+
+/**
+ * CLASS differentLutUsageAsFileDetectedWarningMsg
+ */
+
+class differentLutUsageAsFileDetectedWarningMsg : public lutGeneratorWarningMsg {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	differentLutUsageAsFileDetectedWarningMsg();
+
+/**
+ * Destructor
+ */
+
+	virtual ~differentLutUsageAsFileDetectedWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _CANNOTWRITEEMPTYDIGITALHITLUTWARNINGMSG_H
+#define _CANNOTWRITEEMPTYDIGITALHITLUTWARNINGMSG_H
+
+/**
+ * CLASS cannotWriteEmptyDigitalHitLutWarningMsg
+ */
+
+class cannotWriteEmptyDigitalHitLutWarningMsg : public lutGeneratorWarningMsg {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotWriteEmptyDigitalHitLutWarningMsg();
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotWriteEmptyDigitalHitLutWarningMsg();
 
 /**
  * This method displays a warning message.

@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-05-14 15:47:55 $
-/// $Revision: 1.1 $
+/// $Date: 2007-12-13 13:49:20 $
+/// $Revision: 1.2 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -80,12 +80,19 @@ public:
 	lutImplementation(double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry);
 	lutImplementation(double dim1Min, double dim1Max, int dim1Step, double dim2Min, double dim2Max, int dim2Step, double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry);
 	lutImplementation(histogramSpace** space, double dim3StartEntry, double dim3StopEntry);
+	lutImplementation(const lutImplementation& value);
 
 /**
  * Destructor
  */
 
 	virtual ~lutImplementation();
+
+/**
+ * operator = ()
+ */
+
+	const lutImplementation& operator = (const lutImplementation& value);
 
 /**
  * Method initializes the object.
@@ -151,6 +158,15 @@ public:
  */
 
 	void clear(lutHoughBorder* borderPointer = NULL);
+
+/**
+ * This method sets the prelut range to use.
+ * Caution: This function here has no useful
+ * implementations in some subclasses. So be
+ * careful when using.
+ */
+
+	void setPrelutRange(double rangeStart, double rangeStop);
 
 /**
  * This method returns the magnetic field to use.

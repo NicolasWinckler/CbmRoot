@@ -23,14 +23,14 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-06-15 13:55:23 $
-/// $Revision: 1.2 $
+/// $Date: 2007-11-21 13:56:15 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef _MOMENTUMALANALYSIS_H
-#define _MOMENTUMALANALYSIS_H
+#ifndef _MOMENTUMANALYSIS_H
+#define _MOMENTUMANALYSIS_H
 
 
 #include "../../DataRootObjectLIB/include/trackfinderInputTrack.h"

@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/07/17 11:35:32 $
-// $Revision: 1.1 $
+// $Date: 2007-10-19 14:34:32 $
+// $Revision: 1.2 $
 //
 // *******************************************************************/
 
@@ -128,6 +128,63 @@ trackfinderInputData& inputData::getInputData() {
 trackfinderInputData* inputData::getInputDataPointer() {
 
 	return &data;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double inputData::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue = 0;
+	returnValue  = data.getReservedSizeOfData();
+	returnValue += detectorMask.getReservedSizeOfData(0);
+	returnValue += sizeof(typeOfHitProducer);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double inputData::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = data.getAllocatedSizeOfData();
+	returnValue += detectorMask.getAllocatedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double inputData::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = data.getUsedSizeOfData();
+	returnValue += detectorMask.getUsedSizeOfData(0);
+	returnValue += sizeof(typeOfHitProducer);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }
 

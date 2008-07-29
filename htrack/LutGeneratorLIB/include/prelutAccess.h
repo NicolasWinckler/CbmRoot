@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/11/07 12:48:06 $
-/// $Revision: 1.2 $
+/// $Date: 2008-02-29 11:43:28 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -118,7 +118,7 @@ public:
  * @param value is the actual value for the entry
  */
 	
-	void addEntry(prelutHoughBorder value);
+	void addEntry(prelutHoughBorder& value);
 
 /**
  * This method converts the prelut table into a string.

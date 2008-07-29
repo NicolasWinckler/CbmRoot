@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007/01/03 13:46:00 $
-/// $Revision: 1.3 $
+/// $Date: 2007-10-19 14:32:56 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -95,6 +95,40 @@ public:
  */
 
 	virtual ~cannotFindStationIdError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _DETECTORISNOTDEFINEDERROR_H
+#define _DETECTORISNOTDEFINEDERROR_H
+
+/**
+ * CLASS detectorIsNotDefinedError
+ */
+
+class detectorIsNotDefinedError : public dataRootObjectError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	detectorIsNotDefinedError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~detectorIsNotDefinedError();
 
 /**
  * This method displays an error message.

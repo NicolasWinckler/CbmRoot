@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/07/17 11:27:42 $
-// $Revision: 1.1 $
+// $Date: 2007-10-19 14:33:06 $
+// $Revision: 1.2 $
 //
 // *******************************************************************/
 
@@ -121,19 +121,23 @@ typeOfMemories& inputHitSpecialMem::operator [] (size_t index) {
 }
 
 /****************************************************************
- * This method returns the size of the used memory for			*
- * hits.														*
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
  ****************************************************************/
 
-size_t inputHitSpecialMem::getUsedSizeOfMemory() {
+double inputHitSpecialMem::getReservedSizeOfData(unsigned short dimension) {
 
-	size_t returnValue;
+	double returnValue;
 
-	returnValue = 0;
+	returnValue  = 0;
+
 	for (unsigned short i = 0; i < numberOfMemories; i++) {
-		returnValue += sizeof(trackfinderInputHit**);
-		returnValue += specialMem[i].getNumberOfEntries() * sizeof(trackfinderInputHit*);
+	
+		returnValue += specialMem[i].getReservedSizeOfData(0);
+
 	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
 
 	return returnValue;
 
@@ -141,18 +145,45 @@ size_t inputHitSpecialMem::getUsedSizeOfMemory() {
 
 /****************************************************************
  * This method returns the size of the allocated memory for		*
- * hits.														*
+ * the source data.												*
  ****************************************************************/
 
-size_t inputHitSpecialMem::getAllocatedSizeOfMemory() {
+double inputHitSpecialMem::getAllocatedSizeOfData(unsigned short dimension) {
 
-	size_t returnValue;
+	double returnValue;
 
-	returnValue = 0;
+	returnValue  = 0;
+
 	for (unsigned short i = 0; i < numberOfMemories; i++) {
-		returnValue += sizeof(trackfinderInputHit**);
-		returnValue += max(specialMem[i].getNumberOfEntries(), minimalArraySize) * sizeof(trackfinderInputHit*);
+	
+		returnValue += specialMem[i].getAllocatedSizeOfData(0);
+
 	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double inputHitSpecialMem::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	for (unsigned short i = 0; i < numberOfMemories; i++) {
+	
+		returnValue += specialMem[i].getUsedSizeOfData(0);
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
 
 	return returnValue;
 

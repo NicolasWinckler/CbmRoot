@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-15 13:57:24 $
-// $Revision: 1.6 $
+// $Date: 2007-10-19 14:34:49 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
@@ -133,7 +133,7 @@ void outputTrack::writeTracks(std::streambuf* terminal) {
 	data.removeAllTracks();
 	(*tracks)->resetActiveObject();
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Write tracks to file:\t\t", (*tracks)->getNumberOfTracks());
+	createTerminalStatusSequence(&statusSequence, terminal, "Write tracks to file:\t\t\t\t", (*tracks)->getNumberOfTracks());
 	terminalInitialize(statusSequence);
 
 	for (unsigned short i = 0; i < (*tracks)->getNumberOfTracks(); i++) {

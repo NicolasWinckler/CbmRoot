@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-06-21 13:20:41 $
-/// $Revision: 1.9 $
+/// $Date: 2007-10-19 14:33:08 $
+/// $Revision: 1.10 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -62,7 +62,6 @@ void tables::generateNoTable(table& actualTable) {
 
 	}
 
-	actualTable.clear();
 	for (unsigned long i = 0; i < (unsigned long)(1 << numberOfTableBits); i++) {
 
 		actualEntry = bitArray(i);
@@ -95,7 +94,6 @@ void tables::generateCrossfootTable(table& actualTable) {
 
 	}
 
-	actualTable.clear();
 	for (unsigned long i = 0; i < (unsigned long)(1 << numberOfTableBits); i++) {
 
 		actualSignatureEntry      = bitArray(i);
@@ -149,8 +147,6 @@ void tables::generateLutGoodnessTable(table& actualTable) {
 			distribution[i] = 0;
 
 		analyser->evaluateBothLutsDistribution(distribution);
-
-		actualTable.clear();
 
 		actualNumberOfTracksForSignatureAcceptance  = 0;
 		minimalNumberOfTracksForSignatureAcceptance = 0;
@@ -265,8 +261,6 @@ void tables::generateOnlineTable(table& actualTable) {
 		}
 
 		minHits = (unsigned short)ceil(((double)analyser->getPercentageOfHitsInSignature() / (double)100) * (double)numberOfTableBits);
-
-		actualTable.clear();
 
 		/* initialize first signature */
 		actualSignatureEntry = bitArray(0);

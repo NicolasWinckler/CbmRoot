@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-05-14 15:43:59 $
-// $Revision: 1.4 $
+// $Date: 2007-10-19 14:33:05 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -59,7 +59,7 @@ void histogramData::allocateMemory(std::streambuf* terminal) {
 		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
 
 #ifndef CALLOC_HISTOGRAM_RUNTIME
-
+ 
 	if ((*space)->getStep(DIM1)  > maxDim1)
 		throw memoryAllocationError(DATAOBJECTLIB);
 	if ((*space)->getStep(DIM2)  > maxDim2)
@@ -69,7 +69,7 @@ void histogramData::allocateMemory(std::streambuf* terminal) {
 
 #endif
 
-	createTerminalStatusSequence(&statusSequence, terminal, "\nAllocate histogram:\t\t", (*space)->getStep(DIM2));
+	createTerminalStatusSequence(&statusSequence, terminal, "\nAllocate histogram:\t\t\t\t", (*space)->getStep(DIM2));
 	terminalInitialize(statusSequence);
 
 #ifdef CALLOC_HISTOGRAM_RUNTIME
@@ -359,77 +359,6 @@ void histogramData::resetLayer() {
 }
 
 /****************************************************************
- * This method returns the size of the used memory for			*
- * histogram.													*
- ****************************************************************/
-
-double histogramData::getUsedSizeOfHistogram(unsigned short dimension) {
-
-	double returnValue;
-
-	if ((space == NULL) || (*(space) == NULL))
-		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
-
-	returnValue  = sizeof(histogramCell**);
-	returnValue += (*space)->getStep(DIM2) * sizeof(histogramCell*);
-	returnValue += (*space)->getStep(DIM2) * (*space)->getStep(DIM1) * sizeof(histogramCell);
-
-	for (unsigned short i = 0; i < (*space)->getStep(DIM2); i++) {
-		for (unsigned short j = 0; j < (*space)->getStep(DIM1); j++) {
-			returnValue += cell[i][j].getUsedSizeForHitMemory();
-		}
-	}
-	
-	returnValue += sizeof(borderCell*);
-	for (unsigned short k = 0; k < (*space)->getStep(DIM3); k++) {
-		returnValue += hitBorders[k].layer.size() * sizeof(lutBorder);
-	}
-
-	returnValue = (returnValue / (1 << (10 * dimension)));
-
-	return returnValue;
-
-}
-
-/****************************************************************
- * This method returns the size of the allocated memory for		*
- * histogram.													*
- ****************************************************************/
-
-double histogramData::getAllocatedSizeOfHistogram(unsigned short dimension) {
-
-	double returnValue;
-
-#ifdef CALLOC_HISTOGRAM_RUNTIME
-
-	returnValue = getUsedSizeOfHistogram(dimension);
-
-#else
-
-	returnValue  = sizeof(histogramCell**);
-	returnValue += maxDim2 * sizeof(histogramCell*);
-	returnValue += maxDim2 * maxDim1 * sizeof(histogramCell);
-
-	for (unsigned short i = 0; i < maxDim2; i++) {
-		for (unsigned short j = 0; j < maxDim1; j++) {
-			returnValue += cell[i][j].getAllocatedSizeForHitMemory();
-		}
-	}
-	
-	returnValue += sizeof(borderCell*);
-	for (unsigned short k = 0; k < maxDim3; k++) {
-		returnValue += hitBorders[k].layer.size() * sizeof(lutBorder);
-	}
-
-	returnValue = (returnValue / (1 << (10 * dimension)));
-
-#endif
-
-	return returnValue;
-
-}
-
-/****************************************************************
  * This method returns the size of the dimension 1 for the		*
  * histogram.													*
  ****************************************************************/
@@ -532,6 +461,26 @@ std::vector<lutBorder>::iterator histogramData::getBorderEndIterator(unsigned sh
 
 	if ((index < (*space)->getStep(DIM3)) && (hitBorders != NULL))
 		returnValue = hitBorders[index].layer.end();
+	else
+		throw cannotAccessHistogramBorderError(index);
+
+	return returnValue;
+
+}
+
+/**
+ * This method returns the number of borders at position (index) from the histogram.
+ */
+
+unsigned long histogramData::getNumberOfBorders(unsigned short index) {
+
+	unsigned long returnValue = 0;
+
+	if ((space == NULL) || (*(space) == NULL))
+		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+	if ((index < (*space)->getStep(DIM3)) && (hitBorders != NULL))
+		returnValue = hitBorders[index].layer.size();
 	else
 		throw cannotAccessHistogramBorderError(index);
 
@@ -766,5 +715,735 @@ void histogramData::printBorder(unsigned int dim3Start, unsigned int dim3Stop, c
 		fclose(fileHandle);
 		fileHandle = NULL;
 	}
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getReservedSizeOfHBufferData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(hitBorders);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getAllocatedSizeOfHBufferData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	if (hitBorders != NULL) {
+
+#ifdef CALLOC_HISTOGRAM_RUNTIME
+
+		if ((space == NULL) || (*space == NULL))
+			throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+		for (unsigned short i = 0; i < (*space)->getStep(DIM3); i++) {
+
+			returnValue += hitBorders[i].getReservedSizeOfData(0);
+			returnValue += hitBorders[i].getAllocatedSizeOfData(0);
+
+		}
+
+#else
+
+		for (unsigned short i = 0; i < maxDim3; i++) {
+
+			returnValue += hitBorders[i].getReservedSizeOfData(0);
+			returnValue += hitBorders[i].getAllocatedSizeOfData(0);
+
+		}
+
+#endif
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getUsedSizeOfHBufferData(unsigned short dimension) {
+
+	double returnValue;
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+	returnValue  = 0;
+
+	if (hitBorders != NULL) {
+
+		for (unsigned short i = 0; i < (*space)->getStep(DIM3); i++) {
+
+			returnValue += hitBorders[i].getUsedSizeOfData(0);
+
+		}
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getReservedSizeOfHBufferPrelutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getAllocatedSizeOfHBufferPrelutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	if (hitBorders != NULL) {
+
+#ifdef CALLOC_HISTOGRAM_RUNTIME
+
+		if ((space == NULL) || (*space == NULL))
+			throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+		for (unsigned short i = 0; i < (*space)->getStep(DIM3); i++) {
+
+			returnValue += hitBorders[i].getReservedSizeOfPrelutData(0);
+			returnValue += hitBorders[i].getAllocatedSizeOfPrelutData(0);
+
+		}
+
+#else
+
+		for (unsigned short i = 0; i < maxDim3; i++) {
+
+			returnValue += hitBorders[i].getReservedSizeOfPrelutData(0);
+			returnValue += hitBorders[i].getAllocatedSizeOfPrelutData(0);
+
+		}
+
+#endif
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getUsedSizeOfHBufferPrelutData(unsigned short dimension) {
+
+	double returnValue;
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+	returnValue  = 0;
+
+	if (hitBorders != NULL) {
+
+		for (unsigned short i = 0; i < (*space)->getStep(DIM3); i++) {
+
+			returnValue += hitBorders[i].getUsedSizeOfPrelutData(0);
+
+		}
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getReservedSizeOfHBufferLutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getAllocatedSizeOfHBufferLutData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	if (hitBorders != NULL) {
+
+#ifdef CALLOC_HISTOGRAM_RUNTIME
+
+		if ((space == NULL) || (*space == NULL))
+			throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+		for (unsigned short i = 0; i < (*space)->getStep(DIM3); i++) {
+
+			returnValue += hitBorders[i].getReservedSizeOfLutData(0);
+			returnValue += hitBorders[i].getAllocatedSizeOfLutData(0);
+
+		}
+
+#else
+
+		for (unsigned short i = 0; i < maxDim3; i++) {
+
+			returnValue += hitBorders[i].getReservedSizeOfLutData(0);
+			returnValue += hitBorders[i].getAllocatedSizeOfLutData(0);
+
+		}
+
+#endif
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getUsedSizeOfHBufferLutData(unsigned short dimension) {
+
+	double returnValue;
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+	returnValue  = 0;
+
+	if (hitBorders != NULL) {
+
+		for (unsigned short i = 0; i < (*space)->getStep(DIM3); i++) {
+
+			returnValue += hitBorders[i].getUsedSizeOfLutData(0);
+
+		}
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getReservedSizeOfHBufferHitData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getAllocatedSizeOfHBufferHitData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	if (hitBorders != NULL) {
+
+#ifdef CALLOC_HISTOGRAM_RUNTIME
+
+		if ((space == NULL) || (*space == NULL))
+			throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+		for (unsigned short i = 0; i < (*space)->getStep(DIM3); i++) {
+
+			returnValue += hitBorders[i].getReservedSizeOfHitData(0);
+			returnValue += hitBorders[i].getAllocatedSizeOfHitData(0);
+
+		}
+
+#else
+
+		for (unsigned short i = 0; i < maxDim3; i++) {
+
+			returnValue += hitBorders[i].getReservedSizeOfHitData(0);
+			returnValue += hitBorders[i].getAllocatedSizeOfHitData(0);
+
+		}
+	
+#endif
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getUsedSizeOfHBufferHitData(unsigned short dimension) {
+
+	double returnValue;
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+	returnValue  = 0;
+
+	if (hitBorders != NULL) {
+
+		for (unsigned short i = 0; i < (*space)->getStep(DIM3); i++) {
+
+			returnValue += hitBorders[i].getUsedSizeOfHitData(0);
+
+		}
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getAllocatedSizeOfHBufferAddOnData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	if (hitBorders != NULL) {
+
+#ifdef CALLOC_HISTOGRAM_RUNTIME
+
+		if ((space == NULL) || (*space == NULL))
+			throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+		for (unsigned short i = 0; i < (*space)->getStep(DIM3); i++) {
+
+			returnValue += hitBorders[i].getAllocatedSizeOfAddOnData(0);
+
+		}
+
+#else
+
+		for (unsigned short i = 0; i < maxDim3; i++) {
+
+			returnValue += hitBorders[i].getAllocatedSizeOfAddOnData(0);
+
+		}
+
+#endif
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getReservedSizeOfHistogramData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+#ifndef CALLOC_HISTOGRAM_RUNTIME
+
+	for (unsigned short i = 0; i < maxDim2; i++) {
+
+		for (unsigned short j = 0; j < maxDim1; j++) {
+
+			returnValue += cell[i][j].getReservedSizeOfHistogramData(0);
+
+		}
+
+	}
+
+#endif
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getAllocatedSizeOfHistogramData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+#ifndef CALLOC_HISTOGRAM_RUNTIME
+
+	for (unsigned short i = 0; i < maxDim2; i++) {
+
+		for (unsigned short j = 0; j < maxDim1; j++) {
+
+			returnValue += cell[i][j].getAllocatedSizeOfHistogramData(0);
+
+		}
+
+	}
+
+#else
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+	for (unsigned short i = 0; i < (*space)->getStep(DIM2); i++) {
+
+		for (unsigned short j = 0; j < (*space)->getStep(DIM1); j++) {
+
+			returnValue += cell[i][j].getReservedSizeOfHistogramData(0);
+			returnValue += cell[i][j].getAllocatedSizeOfHistogramData(0);
+
+		}
+
+	}
+
+#endif
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getUsedSizeOfHistogramData(unsigned short dimension) {
+
+	double returnValue;
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+	returnValue  = 0;
+
+	for (unsigned short i = 0; i < (*space)->getStep(DIM2); i++) {
+
+		for (unsigned short j = 0; j < (*space)->getStep(DIM1); j++) {
+
+			returnValue += cell[i][j].getUsedSizeOfHistogramData(0);
+
+		}
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getReservedSizeOfHistogramSignatureData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+#ifndef CALLOC_HISTOGRAM_RUNTIME
+
+	for (unsigned short i = 0; i < maxDim2; i++) {
+
+		for (unsigned short j = 0; j < maxDim1; j++) {
+
+			returnValue += cell[i][j].getReservedSizeOfHistogramSignatureData(0);
+
+		}
+
+	}
+
+#endif
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getAllocatedSizeOfHistogramSignatureData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+#ifndef CALLOC_HISTOGRAM_RUNTIME
+
+	for (unsigned short i = 0; i < maxDim2; i++) {
+
+		for (unsigned short j = 0; j < maxDim1; j++) {
+
+			returnValue += cell[i][j].getAllocatedSizeOfHistogramSignatureData(0);
+
+		}
+
+	}
+
+#else
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+	for (unsigned short i = 0; i < (*space)->getStep(DIM2); i++) {
+
+		for (unsigned short j = 0; j < (*space)->getStep(DIM1); j++) {
+
+			returnValue += cell[i][j].getReservedSizeOfHistogramSignatureData(0);
+			returnValue += cell[i][j].getAllocatedSizeOfHistogramSignatureData(0);
+
+		}
+
+	}
+
+#endif
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getUsedSizeOfHistogramSignatureData(unsigned short dimension) {
+
+	double returnValue;
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+	returnValue  = 0;
+
+	for (unsigned short i = 0; i < (*space)->getStep(DIM2); i++) {
+
+		for (unsigned short j = 0; j < (*space)->getStep(DIM1); j++) {
+
+			returnValue += cell[i][j].getUsedSizeOfHistogramSignatureData(0);
+
+		}
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getReservedSizeOfHistogramHitData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+#ifndef CALLOC_HISTOGRAM_RUNTIME
+
+	for (unsigned short i = 0; i < maxDim2; i++) {
+
+		for (unsigned short j = 0; j < maxDim1; j++) {
+
+			returnValue += cell[i][j].getReservedSizeOfHistogramHitData(0);
+
+		}
+
+	}
+
+#endif
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getAllocatedSizeOfHistogramHitData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+#ifndef CALLOC_HISTOGRAM_RUNTIME
+
+	for (unsigned short i = 0; i < maxDim2; i++) {
+
+		for (unsigned short j = 0; j < maxDim1; j++) {
+
+			returnValue += cell[i][j].getAllocatedSizeOfHistogramHitData(0);
+
+		}
+
+	}
+
+#else
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+	for (unsigned short i = 0; i < (*space)->getStep(DIM2); i++) {
+
+		for (unsigned short j = 0; j < (*space)->getStep(DIM1); j++) {
+
+			returnValue += cell[i][j].getReservedSizeOfHistogramHitData(0);
+			returnValue += cell[i][j].getAllocatedSizeOfHistogramHitData(0);
+
+		}
+
+	}
+
+#endif
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double histogramData::getUsedSizeOfHistogramHitData(unsigned short dimension) {
+
+	double returnValue;
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
+
+	returnValue  = 0;
+
+	for (unsigned short i = 0; i < (*space)->getStep(DIM2); i++) {
+
+		for (unsigned short j = 0; j < (*space)->getStep(DIM1); j++) {
+
+			returnValue += cell[i][j].getUsedSizeOfHistogramHitData(0);
+
+		}
+
+	}
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }

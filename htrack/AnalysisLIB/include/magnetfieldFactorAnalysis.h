@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:26:53 $
-/// $Revision: 1.1 $
+/// $Date: 2007-12-13 13:47:19 $
+/// $Revision: 1.2 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -235,6 +235,7 @@ public:
 
 /**
  * method draws the magnetfield factor-Analysis display.
+ * @param preventDraw consists of flags which enables or disables the drawing of displays separately
  */
 
 	void magnetfieldFactorAnalysisDraw(bitArray preventDraw = 0);

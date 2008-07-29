@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-06 14:21:02 $
-// $Revision: 1.9 $
+// $Date: 2008-06-26 12:53:11 $
+// $Revision: 1.15 $
 //
 // *******************************************************************/
 
@@ -53,15 +53,6 @@
 #include "../include/houghTransformationError.h"
 #include "../include/houghTransformationWarningMsg.h"
 #include "../include/houghTransformation.h"
-
-#ifdef DEBUGJUSTONEGOODTRACK
-
-#include "../../DataObjectLIB/include/histogramSpace.h"
-#include "../../DataObjectLIB/include/trackMomentum.h"
-#include "../../DataObjectLIB/include/analyticFormula.h"
-#include <iostream>
-
-#endif
 
 #ifdef PRINTCREATEDHISTOGRAMLAYERSTOFILE
 
@@ -150,11 +141,12 @@ void houghTransformation::doHistogramLayerEntry(prelutHoughBorder& firstBorder, 
 
 houghTransformation::houghTransformation() {
 
-	eventData   = NULL;
-	histogram   = NULL;
-	lut         = NULL;
+	eventData       = NULL;
+	histogram       = NULL;
+	lut             = NULL;
+	actualLayer     = 0;
 	dynamicLayerMemory.clear();
-	actualLayer = 0;
+	debugTrackIndex = INVALIDTRACKINDEX;
 
 }
 
@@ -168,8 +160,9 @@ houghTransformation::houghTransformation(trackfinderInputData** eventData, histo
 	this->histogram = histogram;
 	this->lut       = lut;
 
+	actualLayer     = 0;
 	dynamicLayerMemory.clear();
-	actualLayer = 0;
+	debugTrackIndex = INVALIDTRACKINDEX;
 
 }
 
@@ -203,7 +196,15 @@ void houghTransformation::init(trackfinderInputData** eventData, histogramData**
  * This method creates the borders for each hit					*
  ****************************************************************/
 
+#ifndef NOANALYSIS
+
+void houghTransformation::createBorders(analysis* analyser, std::streambuf* terminal) {
+
+#else
+
 void houghTransformation::createBorders(std::streambuf* terminal) {
+
+#endif
 
 	trackfinderInputHit* hit;
 	lutBorder            border;
@@ -211,13 +212,13 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 
 #if (DEBUGJUSTONEGOODTRACK > 0)
 
-	histogramSpace       space;
-	trackMomentum        actualMomentum;
-	analyticFormula      formula;
-	trackCoordinates     actualPosition;
 	int                  goodTrack[DEBUGJUSTONEGOODTRACK];
 	int                  numberOfGoodTracks;
+	bool                 isAcceptableTrack;
 	bool                 goodTrackIsFound;
+
+	for (unsigned int a = 0; a < DEBUGJUSTONEGOODTRACK; a++)
+		goodTrack[a] = -1;
 
 #endif
 
@@ -230,27 +231,18 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 	if (*histogram == NULL)
 		throw cannotAccessHistogramDataError(HOUGHTRANSFORMATIONLIB);
 	if (lut == NULL)
-		throw cannotAccessLutError(HOUGHTRANSFORMATIONLIB);
+		throw cannotAccessLutsError(HOUGHTRANSFORMATIONLIB);
 	if (*lut == NULL)
-		throw cannotAccessLutError(HOUGHTRANSFORMATIONLIB);
+		throw cannotAccessLutsError(HOUGHTRANSFORMATIONLIB);
 
 	(*lut)->resetCorrectionCounter();
 
 	hit = NULL;
-	createTerminalStatusSequence(&statusSequence, terminal, "\nCreate borders:\t\t\t", (*eventData)->getNumberOfHits());
+	createTerminalStatusSequence(&statusSequence, terminal, "\nCreate borders:\t\t\t\t\t", (*eventData)->getNumberOfHits());
 	terminalInitialize(statusSequence);
 
 #if (DEBUGJUSTONEGOODTRACK > 0)
 
-	space.setMin((*lut)->getLutDefinition().dim1Min, DIM1);
-	space.setMin((*lut)->getLutDefinition().dim2Min, DIM2);
-	space.setMin((*lut)->getPrelutDefinition().dim3Min, DIM3);
-	space.setMax((*lut)->getLutDefinition().dim1Max, DIM1);
-	space.setMax((*lut)->getLutDefinition().dim2Max, DIM2);
-	space.setMax((*lut)->getPrelutDefinition().dim3Max, DIM3);
-	space.setStep((*lut)->getLutDefinition().dim1Step, DIM1);
-	space.setStep((*lut)->getLutDefinition().dim2Step, DIM2);
-	space.setStep((*lut)->getPrelutDefinition().dim3Step, DIM3);
 	numberOfGoodTracks = 0;
 
 #endif
@@ -268,8 +260,30 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 
 		if (numberOfGoodTracks < DEBUGJUSTONEGOODTRACK) {
 
-			if (hit->getTrack()->getNumberOfHits() >= (*eventData)->getNumberOfActiveStations()) {
-			
+#ifndef NOANALYSIS
+
+			if (analyser != NULL) {
+
+				isAcceptableTrack = analyser->isFindableStandardTrack(hit->getTrack());
+
+			}
+			else {
+
+#endif
+
+				if (hit->getTrack()->getNumberOfHits() >= (*eventData)->getNumberOfActiveStations())
+					isAcceptableTrack = true;
+				else
+					isAcceptableTrack = false;
+
+#ifndef NOANALYSIS
+
+			}
+
+#endif
+
+			if (isAcceptableTrack) {
+
 				goodTrackIsFound = false;
 				for (int search = 0; search < numberOfGoodTracks; search++) {
 					if (goodTrack[search] == hit->getTrack()->getTrackIndex())
@@ -279,16 +293,6 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 				if (!goodTrackIsFound) {
 					goodTrack[numberOfGoodTracks] = hit->getTrack()->getTrackIndex();
 					numberOfGoodTracks++;
-				}
-
-				if (numberOfGoodTracks == DEBUGJUSTONEGOODTRACK) {
-				
-					actualMomentum.set(hit->getTrack()->getMomX(), PX);
-					actualMomentum.set(hit->getTrack()->getMomY(), PY);
-					actualMomentum.set(hit->getTrack()->getMomZ(), PZ);
-
-					formula.evaluateHough(actualMomentum, hit->getTrack()->getCharge(), space, &actualPosition);
-				
 				}
 
 			}
@@ -321,13 +325,23 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 	if (numberOfGoodTracks != DEBUGJUSTONEGOODTRACK)
 		throw noGoodTrackFoundError();
 	else {
-		std::cout << "Momentum of the track/peak (px, py , pz): (" << actualMomentum.get(PX) << ", " << actualMomentum.get(PY) << ", " << actualMomentum.get(PZ) << ")" << std::endl;
-		std::cout << "Estimated position to find the peak (dim1, dim2 , dim3): (" << actualPosition.get(DIM1) << ", " << actualPosition.get(DIM2) << ", " << actualPosition.get(DIM3) << ")" << std::endl;
+		debugTrackIndex = goodTrack[DEBUGJUSTONEGOODTRACK - 1];
+		if ((*eventData)->getTrackByIndex(debugTrackIndex) != NULL) {
+			std::cout << "Correct momentum of the MCTrack (px, py, pz): (";
+			std::cout << (*eventData)->getTrackByIndex(debugTrackIndex)->getMomX();
+			std::cout << ", ";
+			std::cout << (*eventData)->getTrackByIndex(debugTrackIndex)->getMomY();
+			std::cout << ", ";
+			std::cout << (*eventData)->getTrackByIndex(debugTrackIndex)->getMomZ();
+			std::cout << ")" << std::endl;
+		}
+		else
+			std::cout << "MCTrack with index: " << debugTrackIndex << " is not found!!!" << std::endl;
 	}
 
 #endif
 
-#if (LUTVERSION == 2)
+#if (LUTVERSION == 4)
 
 	if ((*lut)->getNumberOfCoordCorrections() > 0) {
 		houghLutCorrectionWarningMsg* houghLutCorrection = new houghLutCorrectionWarningMsg("HOUGHTRANSFORMATIONLIB", (*lut)->getNumberOfCorrections(), (*lut)->getNumberOfCoordCorrections());
@@ -340,7 +354,7 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 
 #else
 
-#if (LUTVERSION == 3)
+#if (LUTVERSION == 5)
 
 	houghLutCorrectionWarningMsg* houghLutCorrection = new houghLutCorrectionWarningMsg("HOUGHTRANSFORMATIONLIB", (*lut)->getNumberOfCorrections(), (*lut)->getNumberOfCoordCorrections());
 	houghLutCorrection->warningMsg();
@@ -356,6 +370,14 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 #ifdef PRINTBORDERSTOFILE
 
 	(*histogram)->printBorder(0, (*histogram)->getValueDim3(), "borders.txt");
+
+#endif
+
+#ifndef NOANALYSIS
+
+	if (analyser != NULL)
+		if (analyser->isHitReadoutDistributionAnalysisEnabled())
+			analyser->evaluateHitReadoutDistribution((*histogram), terminal);
 
 #endif
 
@@ -488,5 +510,16 @@ unsigned short houghTransformation::getNumberOfHistogramLayers() {
 		throw cannotAccessHistogramDataError(HOUGHTRANSFORMATIONLIB);
 
 	return (*histogram)->getValueDim3();
+
+}
+
+/****************************************************************
+ * This method returns the trackIndex of the debugged track,	*
+ * if DEBUGJUSTONEGOODTRACK is enabled.							*
+ ****************************************************************/
+
+int houghTransformation::getDebugTrackIndex() {
+
+	return debugTrackIndex;
 
 }

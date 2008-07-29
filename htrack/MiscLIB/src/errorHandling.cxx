@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-06 14:21:08 $
-// $Revision: 1.6 $
+// $Date: 2008-02-29 11:43:44 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
@@ -993,14 +993,14 @@ void functionIsDeprecatedError::errorMsg() {
 
 
 /****************************************************************
- * CLASS cannotAccessLutError						 			*
+ * CLASS cannotAccessLutsError						 			*
  ****************************************************************/
 
 /****************************************************************
  * Default constructor											*
  ****************************************************************/
 
-cannotAccessLutError::cannotAccessLutError() : errorHandling() {
+cannotAccessLutsError::cannotAccessLutsError() : errorHandling() {
 
 }
 
@@ -1008,7 +1008,7 @@ cannotAccessLutError::cannotAccessLutError() : errorHandling() {
  * Constructor													*
  ****************************************************************/
 
-cannotAccessLutError::cannotAccessLutError(std::string errorSource) : errorHandling(errorSource) {
+cannotAccessLutsError::cannotAccessLutsError(std::string errorSource) : errorHandling(errorSource) {
 
 }
 
@@ -1016,7 +1016,7 @@ cannotAccessLutError::cannotAccessLutError(std::string errorSource) : errorHandl
  * Destructor													*
  ****************************************************************/
 
-cannotAccessLutError::~cannotAccessLutError() {
+cannotAccessLutsError::~cannotAccessLutsError() {
 
 }
 
@@ -1024,7 +1024,7 @@ cannotAccessLutError::~cannotAccessLutError() {
  * This method displays an error message.		 				*
  ****************************************************************/
 
-void cannotAccessLutError::errorMsg() {
+void cannotAccessLutsError::errorMsg() {
 
 	printMsg("The look-up-tables for the Hough transform are not accessible!!!");
 

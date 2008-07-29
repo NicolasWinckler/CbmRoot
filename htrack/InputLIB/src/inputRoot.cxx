@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-19 14:32:30 $
-// $Revision: 1.11 $
+// $Date: 2008-06-26 12:53:22 $
+// $Revision: 1.13 $
 //
 // *******************************************************************/
 
@@ -82,6 +82,8 @@
 #endif
 
 
+#define numberOfAvoidingPdgCodes 8
+const int avoidingPdgCodes[numberOfAvoidingPdgCodes] = {10010020, 10010030, 50000050, 50010051, 10020040, 1000010020, 1000010030, 1000020040};
 
 
 /****************************************************************
@@ -1643,6 +1645,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 	CbmMCTrack*              inputTrack;
 	CbmStsPoint*             inputStsPoint;
 	CbmHit*                  inputHit;
+	bool                     avoidPdgCode;
 
 #ifdef TRACKINFO
 
@@ -1783,7 +1786,15 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 			if (inputTrack->GetNPoints(kSTS) > 0) {
 
 				/* what are these particles????? */
-				if ((inputTrack->GetPdgCode() != 10010020) && (inputTrack->GetPdgCode() != 10010030) && (inputTrack->GetPdgCode() != 50000050) && (inputTrack->GetPdgCode() != 50010051) && (inputTrack->GetPdgCode() != 10020040))
+				avoidPdgCode = false;
+				for (int j = 0; j < numberOfAvoidingPdgCodes; j++) {
+					if (inputTrack->GetPdgCode() == avoidingPdgCodes[j]) {
+						avoidPdgCode = true;
+						break;
+					}
+				}
+
+				if (!avoidPdgCode)
 					data.addTrack(inputTrack, i, TDatabasePDG::Instance()->GetParticle(inputTrack->GetPdgCode())->Charge() / 3.0);
 
 			}
@@ -1920,7 +1931,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 	
 		if ((i > 5) && (i < 10)) {
 			
-			track = data.getTrackByIndex(i);
+			track = data.getTrackByOrder(i);
 			if (track == NULL)
 				throw cannotAccessHitsOrTracksError(INPUTLIB);
 
@@ -2005,6 +2016,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 	CbmMvdPoint*             inputMvdPoint;
 	CbmStsHit*               inputStsHit;
 	CbmMvdHit*               inputMvdHit;
+	bool                     avoidPdgCode;
 
 #ifdef TRACKINFO
 
@@ -2135,7 +2147,15 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 			if (inputTrack->GetNPoints(kSTS) > 0) {
 
 				/* what are these particles????? */
-				if ((inputTrack->GetPdgCode() != 10010020) && (inputTrack->GetPdgCode() != 10010030) && (inputTrack->GetPdgCode() != 50000050) && (inputTrack->GetPdgCode() != 50010051) && (inputTrack->GetPdgCode() != 10020040))
+				avoidPdgCode = false;
+				for (int j = 0; j < numberOfAvoidingPdgCodes; j++) {
+					if (inputTrack->GetPdgCode() == avoidingPdgCodes[j]) {
+						avoidPdgCode = true;
+						break;
+					}
+				}
+
+				if (!avoidPdgCode)
 					data.addTrack(inputTrack, i, TDatabasePDG::Instance()->GetParticle(inputTrack->GetPdgCode())->Charge() / 3.0);
 
 			}
@@ -2236,7 +2256,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 	
 		if ((i > 5) && (i < 10)) {
 			
-			track = data.getTrackByIndex(i);
+			track = data.getTrackByOrder(i);
 			if (track == NULL)
 				throw cannotAccessHitsOrTracksError(INPUTLIB);
 
@@ -2303,39 +2323,44 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 }
 
 /****************************************************************
- * This method returns the size of the used memory for the		*
+ * This method returns the size of the reserved memory for the	*
  * source data.													*
  ****************************************************************/
 
-double inputRoot::getUsedSizeOfData(unsigned short dimension) {
+double inputRoot::getReservedSizeOfData(unsigned short dimension) {
 
-	double returnValue = 0;
+	double returnValue;
 
-	if (inputStsPoints != NULL)
-		returnValue   = inputStsPoints->GetEntries()     * sizeof(CbmStsPoint);
+	returnValue  = inputData::getReservedSizeOfData(0);
+
+	returnValue += sizeof(inputStsPoints);
 
 #ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
 
-	if (inputMapsHits != NULL)
-		returnValue  += inputMapsHits->GetEntries()   * sizeof(CbmStsMapsHit);
-	if (inputStripHits != NULL)
-		returnValue  += inputStripHits->GetEntries()  * sizeof(CbmStsStripHit);
-	if (inputHybridHits != NULL)
-		returnValue  += inputHybridHits->GetEntries() * sizeof(CbmStsHybridHit);
+	returnValue += sizeof(inputMapsHits);
+	returnValue += sizeof(inputStripHits);
+	returnValue += sizeof(inputHybridHits);
 
 #else
 
-	if (inputMvdPoints != NULL)
-		returnValue   = inputMvdPoints->GetEntries()  * sizeof(CbmMvdPoint);
-	if (inputStsHits != NULL)
-		returnValue  += inputStsHits->GetEntries()    * sizeof(CbmStsHit);
-	if (inputMvdHits != NULL)
-		returnValue  += inputMvdHits->GetEntries()    * sizeof(CbmMvdHit);
+	returnValue += sizeof(inputMvdPoints);
+	returnValue += sizeof(inputMvdHits);
+	returnValue += sizeof(inputStsHits);
 
 #endif
 
-	if (inputTracks != NULL)
-		returnValue  += inputTracks->GetEntries()     * sizeof(CbmMCTrack);
+	returnValue += sizeof(inputTracks);
+
+	returnValue += sizeof(detectorFileName);
+	returnValue += sizeof(numberOfVolumesInfrontOfSTS);
+	returnValue += sizeof(geometryFileDirectory);
+	returnValue += sizeof(topnode);
+	returnValue += sizeof(hitsProduced);
+	returnValue += sizeof(readPointsFromFile);
+	returnValue += sizeof(readHitsFromFile);
+	returnValue += sizeof(readMapsHits);
+	returnValue += sizeof(readHybridHits);
+	returnValue += sizeof(readStripHits);
 
 	returnValue = (returnValue / (1 << (10 * dimension)));
 
@@ -2350,7 +2375,105 @@ double inputRoot::getUsedSizeOfData(unsigned short dimension) {
 
 double inputRoot::getAllocatedSizeOfData(unsigned short dimension) {
 
-	return getUsedSizeOfData(dimension);
+	double returnValue;
+
+	returnValue  = inputData::getAllocatedSizeOfData(0);
+
+	if (inputStsPoints != NULL)
+		returnValue += inputStsPoints->Capacity()   * sizeof(CbmStsPoint);
+
+#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+
+	if (inputMapsHits != NULL)
+		returnValue += inputMapsHits->Capacity()    * sizeof(CbmStsMapsHit);
+	if (inputStripHits != NULL)
+		returnValue += inputStripHits->Capacity()   * sizeof(CbmStsStripHit);
+	if (inputHybridHits != NULL)
+		returnValue += inputHybridHits->Capacity()  * sizeof(CbmStsHybridHit);
+
+#else
+
+	if (inputMvdPoints != NULL)
+		returnValue   = inputMvdPoints->Capacity()  * sizeof(CbmMvdPoint);
+	if (inputMvdHits != NULL)
+		returnValue  += inputMvdHits->Capacity()    * sizeof(CbmMvdHit);
+	if (inputStsHits != NULL)
+		returnValue  += inputStsHits->Capacity()    * sizeof(CbmStsHit);
+
+#endif
+
+	if (inputTracks != NULL)
+		returnValue += inputTracks->Capacity()      * sizeof(CbmMCTrack);
+
+	returnValue += detectorFileName.capacity()      * sizeof(char);
+	returnValue += geometryFileDirectory.capacity() * sizeof(char);
+	returnValue += topnode.capacity()               * sizeof(char);
+
+	returnValue = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for the		*
+ * source data.													*
+ ****************************************************************/
+
+double inputRoot::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = inputData::getUsedSizeOfData(0);
+
+	returnValue += sizeof(inputStsPoints);
+	if (inputStsPoints != NULL)
+		returnValue += inputStsPoints->GetEntries()  * sizeof(CbmStsPoint);
+
+#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+
+	returnValue += sizeof(inputMapsHits);
+	if (inputMapsHits != NULL)
+		returnValue += inputMapsHits->GetEntries()   * sizeof(CbmStsMapsHit);
+	returnValue += sizeof(inputStripHits);
+	if (inputStripHits != NULL)
+		returnValue += inputStripHits->GetEntries()  * sizeof(CbmStsStripHit);
+	returnValue += sizeof(inputHybridHits);
+	if (inputHybridHits != NULL)
+		returnValue += inputHybridHits->GetEntries() * sizeof(CbmStsHybridHit);
+
+#else
+
+	returnValue += sizeof(inputMvdPoints);
+	if (inputMvdPoints != NULL)
+		returnValue   = inputMvdPoints->GetEntries() * sizeof(CbmMvdPoint);
+	returnValue += sizeof(inputMvdHits);
+	if (inputMvdHits != NULL)
+		returnValue  += inputMvdHits->GetEntries()   * sizeof(CbmMvdHit);
+	returnValue += sizeof(inputStsHits);
+	if (inputStsHits != NULL)
+		returnValue  += inputStsHits->GetEntries()   * sizeof(CbmStsHit);
+
+#endif
+
+	returnValue += sizeof(inputTracks);
+	if (inputTracks != NULL)
+		returnValue += inputTracks->GetEntries()     * sizeof(CbmMCTrack);
+
+	returnValue += sizeof(detectorFileName)      + detectorFileName.size()      * sizeof(char);
+	returnValue += sizeof(numberOfVolumesInfrontOfSTS);
+	returnValue += sizeof(geometryFileDirectory) + geometryFileDirectory.size() * sizeof(char);
+	returnValue += sizeof(topnode)               + topnode.size()               * sizeof(char);
+	returnValue += sizeof(hitsProduced);
+	returnValue += sizeof(readPointsFromFile);
+	returnValue += sizeof(readHitsFromFile);
+	returnValue += sizeof(readMapsHits);
+	returnValue += sizeof(readHybridHits);
+	returnValue += sizeof(readStripHits);
+
+	returnValue = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }
 

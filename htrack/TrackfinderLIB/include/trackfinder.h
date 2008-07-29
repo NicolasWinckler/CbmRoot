@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-05-14 15:48:24 $
-/// $Revision: 1.3 $
+/// $Date: 2007-10-19 14:34:55 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -52,9 +52,14 @@ class trackfinder {
 
 private:
 
-	houghTransformation*     houghTransform;	/**< Object which fills the histogram by transforming the hits */
-	histogramTransformation* histoTransform;	/**< Object which evaluates the tracks basing on the histogram */
-	analysis*                analyser;
+	houghTransformation*     houghTransform;				/**< Object which fills the histogram by transforming the hits */
+	histogramTransformation* histoTransform;				/**< Object which evaluates the tracks basing on the histogram */
+
+#ifndef NOANALYSIS
+
+	analysis*                analyser;						/**< Object to analyse the trackfinder internally. */
+
+#endif
 
 public:
 
@@ -129,6 +134,13 @@ public:
  */
 
 	void evaluate(std::streambuf* terminal = NULL);
+
+/**
+ * This method returns the trackIndex of the debugged track,
+ * if DEBUGJUSTONEGOODTRACK is enabled.
+ */
+
+	int getDebugTrackIndex();
 
 };
 

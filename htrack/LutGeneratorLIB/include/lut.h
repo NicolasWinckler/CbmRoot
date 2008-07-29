@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-05-18 12:26:46 $
-/// $Revision: 1.5 $
+/// $Date: 2008-02-29 11:43:28 $
+/// $Revision: 1.8 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -32,30 +32,12 @@
 #define _LUT_H
 
 
+#include "../../MiscLIB/include/defs.h"
 #include "../../DataObjectLIB/include/lutDefinition.h"
 #include "../../DataObjectLIB/include/lutHoughBorder.h"
 #include "../../DataRootObjectLIB/include/trackfinderInputHit.h"
 #include "../../DataRootObjectLIB/include/trackfinderInputMagneticField.h"
 #include <string>
-
-
-/**
- * LUTVERSION defines the version of the lut object which is
- * used. Version 1 has the following rules:
- * - The pos2 value is always 1 bigger than the pos2 value
- *   before.
- * - The pos1 value is always equal or bigger than the pos1
- *   value before.
- * - No warning is printed
- * Version 2 has the following additional rules:
- * - The pos1 value is always equal or 1 bigger than the
- *   pos1 value before.
- * - A warning would be printed just if the rule is hitted once or more
- * Version 3:
- * - A warning is printed all the time
- */
-
-#define LUTVERSION 1
 
 
 /* **************************************************************

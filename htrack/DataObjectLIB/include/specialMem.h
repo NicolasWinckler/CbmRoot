@@ -27,8 +27,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-06-21 13:20:20 $
-/// $Revision: 1.2 $
+/// $Date: 2007-10-19 14:43:58 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -164,6 +164,30 @@ public:
  */
 
 	void clear();
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfData(unsigned short dimension = 0);
 
 };
 
@@ -440,6 +464,90 @@ template<class objectClass> void specialMem<objectClass>::clear() {
 
 	stackMem.clear();
 	resetActiveObject();
+
+}
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ */
+
+template<class objectClass> double specialMem<objectClass>::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(stackMem);
+	returnValue += sizeof(activeObjectPointer);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ */
+
+template<class objectClass> double specialMem<objectClass>::getAllocatedSizeOfData(unsigned short dimension) {
+
+	typename    std::vector<objectClass>::iterator restorePointer;
+	objectClass object;
+	double      returnValue;
+
+	returnValue  = 0;
+
+	restorePointer = activeObjectPointer;
+
+	resetActiveObject();
+	for (int i = 0; i < getNumberOfEntries(); i++) {
+			
+		object       = readActiveObjectAndMakeNextOneActive();
+		returnValue += sizeof(object);
+
+	}
+
+	returnValue += (stackMem.capacity() - getNumberOfEntries()) * sizeof(objectClass);
+
+	activeObjectPointer = restorePointer;
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ */
+
+template<class objectClass> double specialMem<objectClass>::getUsedSizeOfData(unsigned short dimension) {
+
+	typename    std::vector<objectClass>::iterator restorePointer;
+	objectClass object;
+	double      returnValue;
+
+	returnValue  = 0;
+
+	restorePointer = activeObjectPointer;
+
+	resetActiveObject();
+	for (int i = 0; i < getNumberOfEntries(); i++) {
+			
+		object       = readActiveObjectAndMakeNextOneActive();
+		returnValue += sizeof(object);
+
+	}
+
+	activeObjectPointer = restorePointer;
+
+	returnValue += sizeof(activeObjectPointer);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }
 

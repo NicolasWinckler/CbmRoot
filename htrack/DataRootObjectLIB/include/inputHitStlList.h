@@ -23,14 +23,14 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:27:34 $
-/// $Revision: 1.1 $
+/// $Date: 2007-11-21 13:56:53 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef _INPUTHITSTLVECTOR_H
-#define _INPUTHITSTLVECTOR_H
+#ifndef _INPUTHITSTLLIST_H
+#define _INPUTHITSTLLIST_H
 
 
 #include "../include/trackfinderInputHit.h"
@@ -104,6 +104,30 @@ public:
  */
 
 	trackfinderInputHit* readActiveObjectAndMakeNextOneActive();
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfData(unsigned short dimension = 0);
 
 };
 

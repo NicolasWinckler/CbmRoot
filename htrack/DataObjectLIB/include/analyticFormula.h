@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-06-19 14:32:00 $
-/// $Revision: 1.6 $
+/// $Date: 2007-07-06 00:29:30 $
+/// $Revision: 1.8 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -89,6 +89,7 @@ public:
 	void evaluateP(trackCoordinates& coordinates, histogramSpace& space, trackFrameworkMomentum* momentum);
 	void evaluateP(trackParameter& parameter, histogramSpace& space, trackMomentum* momentum);
 	void evaluateP(trackParameter& parameter, histogramSpace& space, trackFrameworkMomentum* momentum);
+	void evaluatePWithCare(trackParameter& parameter, trackMomentum* momentum);
 
 /**
  * method returns the computed values for the hough
@@ -129,15 +130,27 @@ public:
 /**
  * This formula implements the computation of the original
  * formula in the coordinate space.
+ * @param layerFactor is the value of the number of overlappings for the formula
+ * @param momentumX is the value of the momentum in y direction for the formula
+ * @param momentumZ is the value of the momentum in z direction for the formula
+ * @param zPos is the input z-position for the formula
+ * @return The returning value is the result y coordinate of the computation
+ */
+
+	double evaluateFormulaPrelut(double layerFactor, double momentumY, double momentumZ, double zPos);
+
+/**
+ * This formula implements the computation of the original
+ * formula in the coordinate space.
  * @param numberOfElementaryCharges is the value of the number of elementary charges for the formula
  * @param momentumX is the value of the momentum in x direction for the formula
  * @param momentumZ is the value of the momentum in z direction for the formula
- * @param zPos is the input y-position for the formula
+ * @param zPos is the input z-position for the formula
  * @param bField is the input magnetic field value for the formula
  * @return The returning value is the result x coordinate of the computation
  */
 
-	double evaluateFormula(double numberOfElementaryCharges, double momentumX, double momentumZ, double zPos, double bField);
+	double evaluateFormulaLut(double numberOfElementaryCharges, double momentumX, double momentumZ, double zPos, double bField);
 
 };
 

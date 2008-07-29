@@ -2,12 +2,12 @@
 // (C)opyright 2004
 // 
 // Institute of Computer Science V
-// Prof. M�ner
+// Prof. Männer
 // University of Mannheim, Germany
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl�s
+// Designer(s):   Steinle / Gläss
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-21 13:20:05 $
-// $Revision: 1.4 $
+// $Date: 2008-06-26 12:32:50 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
@@ -36,9 +36,7 @@
 #include "../include/houghPictures.h"
 #include "TStyle.h"
 #include "TAxis.h"
-
-#include <cmath>
-#include <iostream>
+#include <math.h>
 
 
 #define sqr(a)  ((a) * (a)) 
@@ -50,7 +48,7 @@
 
 #define WINDOWSIZE                      600
 #define QUANTIZATION                    WINDOWSIZE
-#define MARKERTYPE                      3
+#define MARKERTYPE                      29
 
 #define RELATIVEDISTANCE                (double)0.03
 #define AXISTEXTSIZE                    (double)0.03
@@ -63,6 +61,7 @@
 #define COORDINATESTRAIGHTLINERANGEY    COORDINATESTRAIGHTLINERANGEX
 
 #define COORDINATEANALYTICFORMULARANGEX (double)100
+#define COORDINATEANALYTICFORMULARANGEY (double)100
 #define COORDINATEANALYTICFORMULARANGEZ (double)100
 
 #define COORDINATESTRAIGHTLINEM         (double)(-0.6  * (COORDINATESTRAIGHTLINERANGEY / COORDINATESTRAIGHTLINERANGEX))
@@ -74,7 +73,9 @@
 
 #define COORDINATEANALYTICFORMULAQ      (double)1
 #define COORDINATEANALYTICFORMULAPX     (double)1
+#define COORDINATEANALYTICFORMULAPY     (double)2
 #define COORDINATEANALYTICFORMULAPZ     (double)8
+#define COORDINATEANALYTICFORMULAM      (double)0.0125
 #define COORDINATEANALYTICFORMULAB      (double)100
 #define HOUGHANALYTICFORMULAB           (double)10
 
@@ -88,12 +89,17 @@
 #define HOUGHHESSERANGETHETA            (double)(PI / 2)
 #define HOUGHHESSERANGEPTHETA           (double)(4 * cos(-atan(COORDINATESTRAIGHTLINEM)) * COORDINATESTRAIGHTLINEC)
 
-#define HOUGHANALYTICFORMULARANGETHETA  (double)0.46764		// [rad]: atan((planeMaxY + planeMaxY / 100) / planeZ)
+#define HOUGHANALYTICFORMULARANGETHETA  (double)0.46764		// [rad]: atan((planeMaxX + planeMaxX / 100) / planeZ)
 #define HOUGHANALYTICFORMULARANGEQPXZ   (double)1.1
 
+#define HOUGHANALYTICFORMULARANGEGAMMA  (double)0.46764		// [rad]: atan((planeMaxY + planeMaxY / 100) / planeZ)
+#define HOUGHANALYTICFORMULARANGEM      (double)0.015
 
-#define NUMBEROFCOORDINATEPOINTS 5
+#define NUMBEROFCOORDINATEPOINTS        5
 const int COORDINATEPOINTS[NUMBEROFCOORDINATEPOINTS] = {(int)(0.15 * QUANTIZATION), (int)(0.35 * QUANTIZATION), (int)(0.52 * QUANTIZATION), (int)(0.8 * QUANTIZATION), (int)(0.9 * QUANTIZATION)};
+
+#define STARTHOUGHCOORDINATEPOINT       0
+#define STOPHOUGHCOORDINATEPOINT        NUMBEROFCOORDINATEPOINTS
 
 
 /* **************************************************************
@@ -889,7 +895,7 @@ void houghPictures::createOneCoordinateHitAnalyticFormula() {
 	for (unsigned int i = 0; i < QUANTIZATION; i++) {
 
 		arrayZ[i] = (double)i * ((double)(COORDINATEANALYTICFORMULARANGEZ) / (double)(QUANTIZATION-1));
-		arrayX[i] = (double)formula.evaluateFormula(COORDINATEANALYTICFORMULAQ, COORDINATEANALYTICFORMULAPX, COORDINATEANALYTICFORMULAPZ, arrayZ[i], COORDINATEANALYTICFORMULAB);
+		arrayX[i] = (double)formula.evaluateFormulaLut(COORDINATEANALYTICFORMULAQ, COORDINATEANALYTICFORMULAPX, COORDINATEANALYTICFORMULAPZ, arrayZ[i], COORDINATEANALYTICFORMULAB);
 
 	}
 
@@ -972,7 +978,7 @@ void houghPictures::createOneHoughCurveAnalyticFormula() {
 	for (unsigned int i = 0; i < QUANTIZATION; i++) {
 
 		arrayZ[i] = (double)i * ((double)(COORDINATEANALYTICFORMULARANGEZ) / (double)(QUANTIZATION-1));
-		arrayX[i] = (double)formula.evaluateFormula(COORDINATEANALYTICFORMULAQ, COORDINATEANALYTICFORMULAPX, COORDINATEANALYTICFORMULAPZ, arrayZ[i], HOUGHANALYTICFORMULAB);
+		arrayX[i] = (double)formula.evaluateFormulaLut(COORDINATEANALYTICFORMULAQ, COORDINATEANALYTICFORMULAPX, COORDINATEANALYTICFORMULAPZ, arrayZ[i], HOUGHANALYTICFORMULAB);
 
 	}
 
@@ -1040,7 +1046,7 @@ void houghPictures::createOneCoordinateTrackAnalyticFormula() {
 	for (unsigned int i = 0; i < QUANTIZATION; i++) {
 
 		arrayZ[i] = (double)i * ((double)(COORDINATEANALYTICFORMULARANGEZ) / (double)(QUANTIZATION-1));
-		arrayX[i] = (double)formula.evaluateFormula(COORDINATEANALYTICFORMULAQ, COORDINATEANALYTICFORMULAPX, COORDINATEANALYTICFORMULAPZ, arrayZ[i], COORDINATEANALYTICFORMULAB);
+		arrayX[i] = (double)formula.evaluateFormulaLut(COORDINATEANALYTICFORMULAQ, COORDINATEANALYTICFORMULAPX, COORDINATEANALYTICFORMULAPZ, arrayZ[i], COORDINATEANALYTICFORMULAB);
 
 	}
 
@@ -1123,7 +1129,7 @@ void houghPictures::createOneHoughPointAnalyticFormula() {
 	for (unsigned int i = 0; i < QUANTIZATION; i++) {
 
 		arrayZ[i] = (double)i * ((double)(COORDINATEANALYTICFORMULARANGEZ) / (double)(QUANTIZATION-1));
-		arrayX[i] = (double)formula.evaluateFormula(COORDINATEANALYTICFORMULAQ, COORDINATEANALYTICFORMULAPX, COORDINATEANALYTICFORMULAPZ, arrayZ[i], HOUGHANALYTICFORMULAB);
+		arrayX[i] = (double)formula.evaluateFormulaLut(COORDINATEANALYTICFORMULAQ, COORDINATEANALYTICFORMULAPX, COORDINATEANALYTICFORMULAPZ, arrayZ[i], HOUGHANALYTICFORMULAB);
 
 	}
 
@@ -1174,7 +1180,78 @@ void houghPictures::createOneHoughPointAnalyticFormula() {
  * coordinate space.											*
  ****************************************************************/
 
-void houghPictures::createCoordinateAnalyticFormula() {
+void houghPictures::createCoordinateAnalyticFormulaPrelut() {
+
+	double*         arrayZ;
+	double*         arrayY;
+	analyticFormula formula;
+	TMarker*        actualMarker;
+	TArrow*         actualArrow;
+	TLatex*         actualText;
+
+	arrayZ = new double[QUANTIZATION];
+	if (arrayZ == NULL)
+		throw memoryAllocationError(ANALYSISLIB);
+
+	arrayY = new double[QUANTIZATION];
+	if (arrayY == NULL)
+		throw memoryAllocationError(ANALYSISLIB);
+
+	for (unsigned int i = 0; i < QUANTIZATION; i++) {
+
+		arrayZ[i] = (double)i * ((double)(COORDINATEANALYTICFORMULARANGEZ) / (double)(QUANTIZATION-1));
+		arrayY[i] = (double)formula.evaluateFormulaPrelut(COORDINATEANALYTICFORMULAM, COORDINATEANALYTICFORMULAPY, COORDINATEANALYTICFORMULAPZ, arrayZ[i]);
+
+	}
+
+	if (coordinateAnalyticFormulaPrelutWindow == NULL) {
+
+		coordinateAnalyticFormulaPrelutWindow    = addWindow("CoordinatePrelutAnalyticFormula", "Coordinate Space for the prelut of the analyticFormula", -( 2 * RELATIVEDISTANCE * COORDINATEANALYTICFORMULARANGEZ), COORDINATEANALYTICFORMULARANGEZ, -COORDINATEANALYTICFORMULARANGEY, COORDINATEANALYTICFORMULARANGEY, WINDOWSIZE, WINDOWSIZE);
+
+		coordinateAnalyticFormulaPrelutDisplay   = addDisplay(QUANTIZATION, arrayZ, arrayY, -(2 * RELATIVEDISTANCE * COORDINATEANALYTICFORMULARANGEZ), COORDINATEANALYTICFORMULARANGEZ, -COORDINATEANALYTICFORMULARANGEY, COORDINATEANALYTICFORMULARANGEY, 1, "z", "y");
+
+		coordinateAnalyticFormulaPrelutDisplay->SetName("CoordinatePrelutAnalyticFormula");
+		coordinateAnalyticFormulaPrelutDisplay->SetTitle("Coordinate Space for the prelut of the analyticFormula");
+		coordinateAnalyticFormulaPrelutDisplay->GetXaxis()->SetTitle("z");
+		coordinateAnalyticFormulaPrelutDisplay->GetYaxis()->SetTitle("y");
+
+		coordinateAnalyticFormulaPrelutDisplay->Draw("C");
+
+		for (unsigned int j = 0; j < NUMBEROFCOORDINATEPOINTS; j++) {
+
+			/* draw the transforming points */
+			actualMarker = addMarker(arrayZ[COORDINATEPOINTS[j]], arrayY[COORDINATEPOINTS[j]], MARKERTYPE);
+			actualMarker->Draw();
+
+			/* draw the detector planes */
+			actualArrow = addArrow(arrayZ[COORDINATEPOINTS[j]], -arrayZ[COORDINATEPOINTS[j]], arrayZ[COORDINATEPOINTS[j]], arrayZ[COORDINATEPOINTS[j]],"");
+			actualArrow->Draw();
+
+		}
+
+		/* draw the function description */
+		actualText = addText(0.5 * FUNCTIONTEXTXPOSITION * COORDINATEANALYTICFORMULARANGEZ, FUNCTIONTEXTYPOSITION * COORDINATEANALYTICFORMULARANGEY, TEXTSIZE, "-m #upoint #frac{1}{100#upoint2} = #frac{z#upointsin#left(#gamma#right)-y#upointcos#left(#gamma#right)}{#left(y#upointsin#left(#gamma#right)+z#upointcos#left(#gamma#right)#right)^{2}}");
+		actualText->Draw();
+		actualText = addText(0.5 * FUNCTIONTEXTXPOSITION * COORDINATEANALYTICFORMULARANGEZ, FUNCTIONTEXTYPOSITION * COORDINATEANALYTICFORMULARANGEY - 2 * 4.1 * TEXTSIZE * COORDINATEANALYTICFORMULARANGEY, TEXTSIZE, "y_{1/2} = - #frac{p}{2}  #splitline{+}{-}  #sqrt{#left(#frac{p}{2}#right)^{2} - q}");
+		actualText->Draw();
+		actualText = addText(0.5 * FUNCTIONTEXTXPOSITION * COORDINATEANALYTICFORMULARANGEZ, -FUNCTIONTEXTYPOSITION * COORDINATEANALYTICFORMULARANGEY + 2 * 4.1 * TEXTSIZE * COORDINATEANALYTICFORMULARANGEY, TEXTSIZE, "#frac{p}{2} = #frac{cos#left(#gamma#right)}{2#upointsin#left(#gamma#right)} #upoint #left(z + #frac{100#upoint2}{-m#upointsin#left(#gamma#right)}#right)");
+		actualText->Draw();
+		actualText = addText(0.5 * FUNCTIONTEXTXPOSITION * COORDINATEANALYTICFORMULARANGEZ, -FUNCTIONTEXTYPOSITION * COORDINATEANALYTICFORMULARANGEY, TEXTSIZE, "q = #frac{z}{sin#left(#gamma#right)} #upoint #left(#frac{z#upointcos^{2}#left(#gamma#right)}{sin#left(#gamma#right)} - #frac{100#upoint2}{-m}#right)");
+		actualText->Draw();
+
+	}
+
+	if (arrayZ != NULL) {
+		delete arrayZ;
+		arrayZ = NULL;
+	}
+	if (arrayY != NULL) {
+		delete arrayY;
+		arrayY = NULL;
+	}
+
+}
+void houghPictures::createCoordinateAnalyticFormulaLut() {
 
 	double*         arrayZ;
 	double*         arrayX;
@@ -1194,22 +1271,22 @@ void houghPictures::createCoordinateAnalyticFormula() {
 	for (unsigned int i = 0; i < QUANTIZATION; i++) {
 
 		arrayZ[i] = (double)i * ((double)(COORDINATEANALYTICFORMULARANGEZ) / (double)(QUANTIZATION-1));
-		arrayX[i] = (double)formula.evaluateFormula(COORDINATEANALYTICFORMULAQ, COORDINATEANALYTICFORMULAPX, COORDINATEANALYTICFORMULAPZ, arrayZ[i], COORDINATEANALYTICFORMULAB);
+		arrayX[i] = (double)formula.evaluateFormulaLut(COORDINATEANALYTICFORMULAQ, COORDINATEANALYTICFORMULAPX, COORDINATEANALYTICFORMULAPZ, arrayZ[i], COORDINATEANALYTICFORMULAB);
 
 	}
 
-	if (coordinateAnalyticFormulaWindow == NULL) {
+	if (coordinateAnalyticFormulaLutWindow == NULL) {
 
-		coordinateAnalyticFormulaWindow    = addWindow("CoordinateAnalyticFormula", "Coordinate Space for the analyticFormula", -( 2 * RELATIVEDISTANCE * COORDINATEANALYTICFORMULARANGEZ), COORDINATEANALYTICFORMULARANGEZ, -COORDINATEANALYTICFORMULARANGEX, COORDINATEANALYTICFORMULARANGEX, WINDOWSIZE, WINDOWSIZE);
+		coordinateAnalyticFormulaLutWindow    = addWindow("CoordinateLutAnalyticFormula", "Coordinate Space for the lut of the analyticFormula", -( 2 * RELATIVEDISTANCE * COORDINATEANALYTICFORMULARANGEZ), COORDINATEANALYTICFORMULARANGEZ, -COORDINATEANALYTICFORMULARANGEX, COORDINATEANALYTICFORMULARANGEX, WINDOWSIZE, WINDOWSIZE);
 
-		coordinateAnalyticFormulaDisplay   = addDisplay(QUANTIZATION, arrayZ, arrayX, -(2 * RELATIVEDISTANCE * COORDINATEANALYTICFORMULARANGEZ), COORDINATEANALYTICFORMULARANGEZ, -COORDINATEANALYTICFORMULARANGEX, COORDINATEANALYTICFORMULARANGEX, 1, "z", "x");
+		coordinateAnalyticFormulaLutDisplay   = addDisplay(QUANTIZATION, arrayZ, arrayX, -(2 * RELATIVEDISTANCE * COORDINATEANALYTICFORMULARANGEZ), COORDINATEANALYTICFORMULARANGEZ, -COORDINATEANALYTICFORMULARANGEX, COORDINATEANALYTICFORMULARANGEX, 1, "z", "x");
 
-		coordinateAnalyticFormulaDisplay->SetName("CoordinateAnalyticFormula");
-		coordinateAnalyticFormulaDisplay->SetTitle("Coordinate Space for the analyticFormula");
-		coordinateAnalyticFormulaDisplay->GetXaxis()->SetTitle("z");
-		coordinateAnalyticFormulaDisplay->GetYaxis()->SetTitle("x");
+		coordinateAnalyticFormulaLutDisplay->SetName("CoordinateLutAnalyticFormula");
+		coordinateAnalyticFormulaLutDisplay->SetTitle("Coordinate Space for the lut of the analyticFormula");
+		coordinateAnalyticFormulaLutDisplay->GetXaxis()->SetTitle("z");
+		coordinateAnalyticFormulaLutDisplay->GetYaxis()->SetTitle("x");
 
-		coordinateAnalyticFormulaDisplay->Draw("C");
+		coordinateAnalyticFormulaLutDisplay->Draw("C");
 
 		for (unsigned int j = 0; j < NUMBEROFCOORDINATEPOINTS; j++) {
 
@@ -1224,13 +1301,13 @@ void houghPictures::createCoordinateAnalyticFormula() {
 		}
 
 		/* draw the function description */
-		actualText = addText(0.5 * FUNCTIONTEXTXPOSITION * COORDINATEANALYTICFORMULARANGEZ, FUNCTIONTEXTYPOSITION * COORDINATEANALYTICFORMULARANGEX, TEXTSIZE, "- #frac{q}{p_{xz}} #upoint #frac{B}{10000#upoint0.3#upoint2} = #frac{z#upointsin#left(#theta#right)-x#upointcos#left(#theta#right)}{#left(x#upointsin#left(#theta#right)+z#upointcos#left(#theta#right)#right)^{2}}");
+		actualText = addText(0.5 * FUNCTIONTEXTXPOSITION * COORDINATEANALYTICFORMULARANGEZ, FUNCTIONTEXTYPOSITION * COORDINATEANALYTICFORMULARANGEX, TEXTSIZE, "- #frac{q}{p_{xz}} #upoint #frac{0.3}{1000} #upoint #frac{B}{2} #upoint #left(x#upointsin#left(#theta#right)+z#upointcos#left(#theta#right)#right)^{2}-z#upointsin#left(#theta#right)+x#upointcos#left(#theta#right)=0");
 		actualText->Draw();
 		actualText = addText(0.5 * FUNCTIONTEXTXPOSITION * COORDINATEANALYTICFORMULARANGEZ, FUNCTIONTEXTYPOSITION * COORDINATEANALYTICFORMULARANGEX - 2 * 4.1 * TEXTSIZE * COORDINATEANALYTICFORMULARANGEX, TEXTSIZE, "x_{1/2} = - #frac{p}{2}  #splitline{+}{-}  #sqrt{#left(#frac{p}{2}#right)^{2} - q}");
 		actualText->Draw();
-		actualText = addText(0.5 * FUNCTIONTEXTXPOSITION * COORDINATEANALYTICFORMULARANGEZ, -FUNCTIONTEXTYPOSITION * COORDINATEANALYTICFORMULARANGEX + 2 * 4.1 * TEXTSIZE * COORDINATEANALYTICFORMULARANGEX, TEXTSIZE, "#frac{p}{2} = - #frac{cos#left(#theta#right)}{sin#left(#theta#right)} #upoint #left(z - #frac{10000#upoint0.3#upoint2}{2#upointB#upoint#frac{q}{p_{xz}}#upointsin#left(#theta#right)}#right)");
+		actualText = addText(0.5 * FUNCTIONTEXTXPOSITION * COORDINATEANALYTICFORMULARANGEZ, -FUNCTIONTEXTYPOSITION * COORDINATEANALYTICFORMULARANGEX + 2 * 4.1 * TEXTSIZE * COORDINATEANALYTICFORMULARANGEX, TEXTSIZE, "#frac{p}{2} = #frac{cos#left(#theta#right)}{2#upointsin#left(#theta#right)} #upoint #left(z - #frac{1000#upoint2}{0.3#upointB#upoint#frac{q}{p_{xz}}#upointsin#left(#theta#right)}#right)");
 		actualText->Draw();
-		actualText = addText(0.5 * FUNCTIONTEXTXPOSITION * COORDINATEANALYTICFORMULARANGEZ, -FUNCTIONTEXTYPOSITION * COORDINATEANALYTICFORMULARANGEX, TEXTSIZE, "q = #frac{z}{sin#left(#theta#right)} #upoint #left(#frac{z#upointcos^{2}#left(#theta#right)}{sin#left(#theta#right)} + #frac{10000#upoint0.3#upoint2}{B#upoint#frac{q}{p_{xz}}}#right)");
+		actualText = addText(0.5 * FUNCTIONTEXTXPOSITION * COORDINATEANALYTICFORMULARANGEZ, -FUNCTIONTEXTYPOSITION * COORDINATEANALYTICFORMULARANGEX, TEXTSIZE, "q = #frac{z}{sin#left(#theta#right)} #upoint #left(#frac{z#upointcos^{2}#left(#theta#right)}{sin#left(#theta#right)} + #frac{1000#upoint2}{0.3#upointB#upoint#frac{q}{p_{xz}}}#right)");
 		actualText->Draw();
 
 	}
@@ -1251,7 +1328,110 @@ void houghPictures::createCoordinateAnalyticFormula() {
  * space.														*
  ****************************************************************/
 
-void houghPictures::createHoughAnalyticFormula() {
+void houghPictures::createHoughAnalyticFormulaPrelut() {
+
+	double*         arrayZ;
+	double*         arrayY;
+	double*         arrayGamma;
+	double*         arrayM;
+	analyticFormula formula;
+	double          houghRangeGamma;
+	double          houghRangeM;
+	char            buffer[intConversionDigits + 1];
+	std::string     displayName;
+	TMarker*        actualMarker;
+	TLatex*         actualText;
+
+	arrayZ = new double[QUANTIZATION];
+	if (arrayZ == NULL)
+		throw memoryAllocationError(ANALYSISLIB);
+
+	arrayY = new double[QUANTIZATION];
+	if (arrayY == NULL)
+		throw memoryAllocationError(ANALYSISLIB);
+
+	arrayGamma = new double[QUANTIZATION];
+	if (arrayGamma == NULL)
+		throw memoryAllocationError(ANALYSISLIB);
+
+	arrayM = new double[QUANTIZATION];
+	if (arrayM == NULL)
+		throw memoryAllocationError(ANALYSISLIB);
+
+	if (HOUGHANALYTICFORMULARANGEGAMMA < 0)
+		houghRangeGamma = - HOUGHANALYTICFORMULARANGEGAMMA;
+	else
+		houghRangeGamma = HOUGHANALYTICFORMULARANGEGAMMA;
+
+	if (HOUGHANALYTICFORMULARANGEM < 0)
+		houghRangeM = - HOUGHANALYTICFORMULARANGEM;
+	else
+		houghRangeM = HOUGHANALYTICFORMULARANGEM;
+
+	for (unsigned int i = 0; i < QUANTIZATION; i++) {
+
+		arrayZ[i] = (double)i * ((double)(COORDINATEANALYTICFORMULARANGEZ) / (double)(QUANTIZATION-1));
+		arrayY[i] = (double)formula.evaluateFormulaPrelut(COORDINATEANALYTICFORMULAM, COORDINATEANALYTICFORMULAPY, COORDINATEANALYTICFORMULAPZ, arrayZ[i]);
+
+	}
+
+	if (houghAnalyticFormulaPrelutWindow == NULL) {
+
+		houghAnalyticFormulaPrelutWindow = addWindow("HoughPrelutAnalyticFormula", "Hough Space for the prelut of the analyticFormula", -houghRangeGamma, houghRangeGamma, -houghRangeM, houghRangeM, WINDOWSIZE, WINDOWSIZE);
+
+		houghAnalyticFormulaPrelutDisplay = (TGraph**)calloc(NUMBEROFCOORDINATEPOINTS, sizeof(TGraph*));
+
+		for (unsigned int j = STARTHOUGHCOORDINATEPOINT; j < STOPHOUGHCOORDINATEPOINT; j++) {
+
+			for (unsigned int k = 0; k < QUANTIZATION; k++) {
+
+				arrayGamma[k] = (double)k * ((double)(2 * houghRangeGamma) / (double)(QUANTIZATION-1)) - (double)houghRangeGamma;
+				arrayM[k]     = (double)formula.evaluatePrelut(arrayY[COORDINATEPOINTS[j]], arrayZ[COORDINATEPOINTS[j]], arrayGamma[k]);
+
+			}
+
+			houghAnalyticFormulaPrelutDisplay[j]  = addDisplay(QUANTIZATION, arrayGamma, arrayM, -houghRangeGamma, houghRangeGamma, -houghRangeM, houghRangeM, 1.5, "#gamma", "-m");
+
+			displayName                           = "HoughPrelutAnalyticFormula_TGraph_";
+			displayName                          += uitos(j, buffer, 10, intConversionDigits);
+			houghAnalyticFormulaPrelutDisplay[j]->SetName(displayName.c_str());
+			houghAnalyticFormulaPrelutDisplay[j]->SetTitle("Hough Space for the prelut of the analyticFormula");
+			houghAnalyticFormulaPrelutDisplay[j]->GetXaxis()->SetTitle("gamma");
+			houghAnalyticFormulaPrelutDisplay[j]->GetYaxis()->SetTitle("-m");
+
+			houghAnalyticFormulaPrelutDisplay[j]->Draw("SAME C *");
+
+		}
+
+		/* draw the point of the found curve */
+		actualMarker = addMarker(atan(COORDINATEANALYTICFORMULAPY / COORDINATEANALYTICFORMULAPZ), COORDINATEANALYTICFORMULAM, MARKERTYPE);
+		actualMarker->Draw();
+
+		/* draw the function description */
+		actualText = addText(-HOUGHANALYTICFORMULARANGEGAMMA + 0.5 * FUNCTIONTEXTXPOSITION * HOUGHANALYTICFORMULARANGEGAMMA, FUNCTIONTEXTYPOSITION * HOUGHANALYTICFORMULARANGEM - 2 * 2.1 * TEXTSIZE * HOUGHANALYTICFORMULARANGEM, TEXTSIZE, "-m = 100#upoint2 #upoint #frac{z#upointsin#left(#theta#right)-y#upointcos#left(#theta#right)}{#left(y#upointsin#left(#theta#right)+z#upointcos#left(#theta#right)#right)^{2}}");
+		actualText->Draw();
+
+	}
+
+	if (arrayZ != NULL) {
+		delete arrayZ;
+		arrayZ = NULL;
+	}
+	if (arrayY != NULL) {
+		delete arrayY;
+		arrayY = NULL;
+	}
+	if (arrayGamma != NULL) {
+		delete arrayGamma;
+		arrayGamma = NULL;
+	}
+	if (arrayM != NULL) {
+		delete arrayM;
+		arrayM = NULL;
+	}
+
+}
+void houghPictures::createHoughAnalyticFormulaLut() {
 
 	double*         arrayZ;
 	double*         arrayX;
@@ -1294,15 +1474,15 @@ void houghPictures::createHoughAnalyticFormula() {
 	for (unsigned int i = 0; i < QUANTIZATION; i++) {
 
 		arrayZ[i] = (double)i * ((double)(COORDINATEANALYTICFORMULARANGEZ) / (double)(QUANTIZATION-1));
-		arrayX[i] = (double)formula.evaluateFormula(COORDINATEANALYTICFORMULAQ, COORDINATEANALYTICFORMULAPX, COORDINATEANALYTICFORMULAPZ, arrayZ[i], HOUGHANALYTICFORMULAB);
+		arrayX[i] = (double)formula.evaluateFormulaLut(COORDINATEANALYTICFORMULAQ, COORDINATEANALYTICFORMULAPX, COORDINATEANALYTICFORMULAPZ, arrayZ[i], HOUGHANALYTICFORMULAB);
 
 	}
 
-	if (houghAnalyticFormulaWindow == NULL) {
+	if (houghAnalyticFormulaLutWindow == NULL) {
 
-		houghAnalyticFormulaWindow = addWindow("HoughAnalyticFormula", "Hough Space for the analyticFormula", -houghRangeTheta, houghRangeTheta, -houghRangeQPxz, houghRangeQPxz, WINDOWSIZE, WINDOWSIZE);
+		houghAnalyticFormulaLutWindow = addWindow("HoughLutAnalyticFormula", "Hough Space for the lut of the analyticFormula", -houghRangeTheta, houghRangeTheta, -houghRangeQPxz, houghRangeQPxz, WINDOWSIZE, WINDOWSIZE);
 
-		houghAnalyticFormulaDisplay = (TGraph**)calloc(NUMBEROFCOORDINATEPOINTS, sizeof(TGraph*));
+		houghAnalyticFormulaLutDisplay = (TGraph**)calloc(NUMBEROFCOORDINATEPOINTS, sizeof(TGraph*));
 
 		for (unsigned int j = 0; j < NUMBEROFCOORDINATEPOINTS; j++) {
 
@@ -1313,16 +1493,16 @@ void houghPictures::createHoughAnalyticFormula() {
 
 			}
 
-			houghAnalyticFormulaDisplay[j]  = addDisplay(QUANTIZATION, arrayTheta, arrayQPxz, -houghRangeTheta, houghRangeTheta, -houghRangeQPxz, houghRangeQPxz, 2, "#theta", "- #frac{q}{p_{xz}}");
+			houghAnalyticFormulaLutDisplay[j]  = addDisplay(QUANTIZATION, arrayTheta, arrayQPxz, -houghRangeTheta, houghRangeTheta, -houghRangeQPxz, houghRangeQPxz, 2, "#theta", "- #frac{q}{p_{xz}}");
 
-			displayName                     = "HoughAnalyticFormula_TGraph_";
+			displayName                     = "HoughLutAnalyticFormula_TGraph_";
 			displayName                    += uitos(j, buffer, 10, intConversionDigits);
-			houghAnalyticFormulaDisplay[j]->SetName(displayName.c_str());
-			houghAnalyticFormulaDisplay[j]->SetTitle("Hough Space for the analyticFormula");
-			houghAnalyticFormulaDisplay[j]->GetXaxis()->SetTitle("theta");
-			houghAnalyticFormulaDisplay[j]->GetYaxis()->SetTitle("-q/p_xz");
+			houghAnalyticFormulaLutDisplay[j]->SetName(displayName.c_str());
+			houghAnalyticFormulaLutDisplay[j]->SetTitle("Hough Space for the lut of the analyticFormula");
+			houghAnalyticFormulaLutDisplay[j]->GetXaxis()->SetTitle("theta");
+			houghAnalyticFormulaLutDisplay[j]->GetYaxis()->SetTitle("-q/p_xz");
 
-			houghAnalyticFormulaDisplay[j]->Draw("SAME C");
+			houghAnalyticFormulaLutDisplay[j]->Draw("SAME C");
 
 		}
 
@@ -1331,7 +1511,7 @@ void houghPictures::createHoughAnalyticFormula() {
 		actualMarker->Draw();
 
 		/* draw the function description */
-		actualText = addText(-HOUGHANALYTICFORMULARANGETHETA + 0.5 * FUNCTIONTEXTXPOSITION * HOUGHANALYTICFORMULARANGETHETA, FUNCTIONTEXTYPOSITION * HOUGHANALYTICFORMULARANGEQPXZ - 2 * 2.1 * TEXTSIZE * HOUGHANALYTICFORMULARANGEQPXZ, TEXTSIZE, "- #frac{q}{p_{xz}} = #upoint 10000#upoint0.3#upoint2 #upoint #frac{z#upointsin#left(#theta#right)-x#upointcos#left(#theta#right)}{B#upoint#left(x#upointsin#left(#theta#right)+z#upointcos#left(#theta#right)#right)^{2}}");
+		actualText = addText(-HOUGHANALYTICFORMULARANGETHETA + 0.5 * FUNCTIONTEXTXPOSITION * HOUGHANALYTICFORMULARANGETHETA, FUNCTIONTEXTYPOSITION * HOUGHANALYTICFORMULARANGEQPXZ - 2 * 2.1 * TEXTSIZE * HOUGHANALYTICFORMULARANGEQPXZ, TEXTSIZE, "- #frac{q}{p_{xz}} = #frac{1000}{0.3} #frac{2#left(z#upointsin#left(#theta#right)#right)-x#upointcos#left(#theta#right)}{B#upoint#left(x#upointsin#left(#theta#right)+z#upointcos#left(#theta#right)#right)^{2}}");
 		actualText->Draw();
 
 	}
@@ -1391,10 +1571,14 @@ houghPictures::houghPictures() {
 	oneCoordinateTrackAnalyticFormulaDisplay = NULL;
 	oneHoughPointAnalyticFormulaWindow       = NULL;
 	oneHoughPointAnalyticFormulaDisplay      = NULL;
-	coordinateAnalyticFormulaWindow          = NULL;
-	coordinateAnalyticFormulaDisplay         = NULL;
-	houghAnalyticFormulaWindow               = NULL;
-	houghAnalyticFormulaDisplay              = NULL;
+	coordinateAnalyticFormulaPrelutWindow    = NULL;
+	coordinateAnalyticFormulaPrelutDisplay   = NULL;
+	coordinateAnalyticFormulaLutWindow       = NULL;
+	coordinateAnalyticFormulaLutDisplay      = NULL;
+	houghAnalyticFormulaPrelutWindow         = NULL;
+	houghAnalyticFormulaPrelutDisplay        = NULL;
+	houghAnalyticFormulaLutWindow            = NULL;
+	houghAnalyticFormulaLutDisplay           = NULL;
 
 }
 
@@ -1533,10 +1717,17 @@ houghPictures::~houghPictures() {
 	
 	}
 
-	if (houghAnalyticFormulaDisplay != NULL) {
+	if (houghAnalyticFormulaPrelutDisplay != NULL) {
 	
-		free(houghAnalyticFormulaDisplay);
-		houghAnalyticFormulaDisplay = NULL;
+		free(houghAnalyticFormulaPrelutDisplay);
+		houghAnalyticFormulaPrelutDisplay = NULL;
+	
+	}
+
+	if (houghAnalyticFormulaLutDisplay != NULL) {
+	
+		free(houghAnalyticFormulaLutDisplay);
+		houghAnalyticFormulaLutDisplay = NULL;
 	
 	}
 
@@ -1560,7 +1751,9 @@ void houghPictures::draw() {
 	createOneHoughCurveAnalyticFormula();
 	createOneCoordinateTrackAnalyticFormula();
 	createOneHoughPointAnalyticFormula();
-	createCoordinateAnalyticFormula();
-	createHoughAnalyticFormula();
+	createCoordinateAnalyticFormulaPrelut();
+	createCoordinateAnalyticFormulaLut();
+	createHoughAnalyticFormulaPrelut();
+	createHoughAnalyticFormulaLut();
 
 }

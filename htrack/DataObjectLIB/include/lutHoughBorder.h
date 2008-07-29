@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/11/06 11:12:12 $
-/// $Revision: 1.2 $
+/// $Date: 2007-10-19 14:43:57 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -34,7 +34,7 @@
 #define _LUTHOUGHBORDER_H
 
 
-#include "specialMem.h"
+#include "specialMemClass.h"
 #include "houghBorderPosition.h"
 #include "houghBorderCommand.h"
 #include <iostream>
@@ -48,7 +48,7 @@ class lutHoughBorder {
 
 public:
 
-	specialMem<houghBorderPosition> houghCoord;		/**< Object to store all positions of the entry in the histogram in a list of coordinates. */
+	specialMemClass<houghBorderPosition> houghCoord;		/**< Object to store all positions of the entry in the histogram in a list of coordinates. */
 
 /**
  * Default constructor
@@ -109,6 +109,30 @@ public:
  */
 
 	void setHoughBorderCommand(houghBorderCommand& value, unsigned short maxFirstDim, unsigned short maxSecondDim);
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfData(unsigned short dimension = 0);
 
 };
 

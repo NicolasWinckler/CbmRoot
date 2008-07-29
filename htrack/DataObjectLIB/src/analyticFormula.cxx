@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-19 14:32:01 $
-// $Revision: 1.10 $
+// $Date: 2007-07-19 17:40:29 $
+// $Revision: 1.13 $
 //
 // *******************************************************************/
 
@@ -37,7 +37,9 @@
 
 #define sqr(a)  ((a) * (a)) 
 
-#define vl 0.299792458
+#define mToCm   (double)100
+#define TToKG   (double)10
+#define vlight  (double)0.299792458
 
 
 /****************************************************************
@@ -204,6 +206,48 @@ void analyticFormula::evaluateP(trackParameter& parameter, histogramSpace& space
 		throw resultPointerIsNotAccessibleError();
 
 }
+void analyticFormula::evaluatePWithCare(trackParameter& parameter, trackMomentum* momentum) {
+
+	double q_p_xz;
+	double value;
+
+	if (momentum != NULL) {
+
+		q_p_xz = parameter.get(HRADIUS);
+
+		/*
+		 * If q_p_xz is zero, there would be a track which has a momentum in z
+		 * direction which is so big that the quantization in the Hough space
+		 * is not big enough. So this track is found in the Hough space at a
+		 * coordinate representing an infinite momentum in z direction.
+		 * Ordinary this infinite coordinate in the Hough space just exists, if
+		 * the quantization is chosen in the way that there is a cell
+		 * representing zero. If one adds just one to the chosen quatization,
+		 * there are two cells with 0+epsilon and 0-epsilon instead of an
+		 * infinite cell. So q_p_xz can never be zero. But a solution for this
+		 * problem is to give such a track a momentum which is not infinite
+		 * but at least very high.
+		 */
+		if (q_p_xz == 0)
+			q_p_xz = 0.005; // incr / 2 = ((max - min) / dim) / 2 = (1.11 - (-1.11)) / 222 / 2 = 0.005;
+		
+		if (q_p_xz < 0)
+			q_p_xz = - q_p_xz;
+
+		value = 1.0 / (q_p_xz * sqrt(sqr(tan(parameter.get(HTHETA))) + 1));
+		momentum->set(value, MRADIUS);
+
+		value = tan(parameter.get(HGAMMA)) * momentum->get(MRADIUS);
+		momentum->set(value, MGAMMA);
+
+		value = tan(parameter.get(HTHETA)) * momentum->get(MRADIUS);
+		momentum->set(value, MTHETA);
+
+	}
+	else
+		throw resultPointerIsNotAccessibleError();
+
+}
 
 /****************************************************************
  * method returns the computed values for the hough				*
@@ -299,7 +343,7 @@ double analyticFormula::evaluatePrelut(double yPos, double zPos, double gamma) {
 	sinGamma = sin(gamma);
 	cosGamma = cos(gamma);
 
-	m        =  ((1000 * 2) * (zPos * sinGamma - yPos * cosGamma))
+	m        =  ((mToCm * 2) * (zPos * sinGamma - yPos * cosGamma))
 			 /	sqr(yPos * sinGamma + zPos * cosGamma);
 
 	return m;
@@ -320,7 +364,7 @@ double analyticFormula::evaluateLut(double xPos, double zPos, double theta, doub
 	sinTheta = sin(theta);
 	cosTheta = cos(theta);
 
-	q_p_xz   = ((10000 * vl * 2) * (zPos * sinTheta - xPos * cosTheta))
+	q_p_xz   = (((mToCm * TToKG / vlight) * 2) * (zPos * sinTheta - xPos * cosTheta))
 		     / (bField * sqr(xPos * sinTheta + zPos * cosTheta));
 
 	return q_p_xz;
@@ -329,10 +373,38 @@ double analyticFormula::evaluateLut(double xPos, double zPos, double theta, doub
 
 /****************************************************************
  * This formula implements the computation of the original		*
+ ****************************************************************/
+
+double analyticFormula::evaluateFormulaPrelut(double layerFactor, double momentumY, double momentumZ, double zPos) {
+
+	double sinGamma;
+	double cosGamma;
+	double constant;
+	double p_2;
+	double q;
+	double y;
+
+	sinGamma = sin(atan(momentumY / momentumZ));
+	cosGamma = cos(atan(momentumY / momentumZ));
+	constant = mToCm * 2;
+	p_2      = (cosGamma / (2 * sinGamma)) * (zPos + (constant / (layerFactor * sinGamma)));
+	q        = (zPos / sinGamma) * (((zPos * sqr(cosGamma)) / sinGamma) - (constant / layerFactor));
+
+	if (p_2 > 0)
+		y    = - p_2 + sqrt(sqr(p_2) - q);
+	else
+		y    = - p_2 - sqrt(sqr(p_2) - q);
+
+	return y;
+
+}
+
+/****************************************************************
+ * This formula implements the computation of the original		*
  * formula in the coordinate space.								*
  ****************************************************************/
 
-double analyticFormula::evaluateFormula(double numberOfElementaryCharges, double momentumX, double momentumZ, double zPos, double bField) {
+double analyticFormula::evaluateFormulaLut(double numberOfElementaryCharges, double momentumX, double momentumZ, double zPos, double bField) {
 
 	double sinTheta;
 	double cosTheta;
@@ -345,8 +417,8 @@ double analyticFormula::evaluateFormula(double numberOfElementaryCharges, double
 	sinTheta = sin(atan(momentumX / momentumZ));
 	cosTheta = cos(atan(momentumX / momentumZ));
 	bQ_p_xz  = bField * (numberOfElementaryCharges / sqrt(sqr(momentumX) + sqr(momentumZ)));
-	constant = 10000 * vl * 2;
-	p_2      = (cosTheta / sinTheta) * (zPos - (constant / (2 * bQ_p_xz * sinTheta)));
+	constant = (mToCm * TToKG / vlight) * 2;
+	p_2      = (cosTheta / (2 * sinTheta)) * (zPos - (constant / (bQ_p_xz * sinTheta)));
 	q        = (zPos / sinTheta) * (((zPos * sqr(cosTheta)) / sinTheta) + (constant / bQ_p_xz));
 
 	if (p_2 > 0)

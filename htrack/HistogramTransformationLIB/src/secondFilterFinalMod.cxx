@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/11/17 15:12:40 $
-// $Revision: 1.3 $
+// $Date: 2007-10-19 14:34:08 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -42,6 +42,9 @@
 #include "../include/secondFilterFinalMod.h"
 #include <malloc.h>
 #include <stdio.h>
+
+
+#define min(a, b)  (((a) < (b)) ? (a) : (b)) 
 
 
 /****************************************************************
@@ -69,7 +72,7 @@ secondFilterFinalMod::secondFilterFinalMod( trackData**    tracks,
 	unsigned short localSize;
 
 	size      = (size3 - 1) * ((size1 / 2) * (size2 + 1) + 1) + 1;
-	localSize = (2 * ( std::min( localSize1, localSize2) * std::min( localSize1, localSize2) + std::min( localSize1, localSize2)) + 1) * (localSize3 - 1);
+	localSize = (2 * ( min( localSize1, localSize2) * min( localSize1, localSize2) + min( localSize1, localSize2)) + 1) * (localSize3 - 1);
 	if (localSize > size)
 		localSize = size;
 
@@ -138,7 +141,7 @@ void secondFilterFinalMod::init( trackData**    tracks,
 	/* set new parameter */
 	/* set new parameter */
 	size      = (size3 - 1) * ((size1 / 2) * (size2 + 1) + 1) + 1;
-	localSize = (2 * ( std::min( localSize1, localSize2) * std::min( localSize1, localSize2) + std::min( localSize1, localSize2)) + 1) * (localSize3 - 1);
+	localSize = (2 * ( min( localSize1, localSize2) * min( localSize1, localSize2) + min( localSize1, localSize2)) + 1) * (localSize3 - 1);
 	if (localSize > size)
 		localSize = size;
 
@@ -207,7 +210,7 @@ void secondFilterFinalMod::filter(std::streambuf* terminal) {
 	if (trackAccess == NULL)
 		throw memoryAllocationError(HISTOGRAMTRANSFORMATIONLIB);
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t", (*tracks)->getNumberOfLayers());
+	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t\t\t", (*tracks)->getNumberOfLayers());
 	terminalInitialize(statusSequence);
 
 	for (i = 0; i < (*tracks)->getNumberOfLayers(); i++) {
@@ -251,7 +254,7 @@ void secondFilterFinalMod::filter(std::streambuf* terminal) {
 					filterCoordinate1    = filter->position.get(DIM1);
 					filterCoordinate2    = filter->position.get(DIM2);
 
-					if ((filterCoordinate1 < elementCoordinate1) && (filterCoordinate1 >= elementCoordinate1 - filterSize1/2) && (filterCoordinate2 <= elementCoordinate2) && (filterCoordinate2 >= elementCoordinate2 - filterSize2/2))
+					if ((filterCoordinate1 <= elementCoordinate1) && (filterCoordinate1 >= elementCoordinate1 - filterSize1/2) && (filterCoordinate2 < elementCoordinate2) && (filterCoordinate2 >= elementCoordinate2 - filterSize2/2))
 						dim1Reset = true;
 					else
 						dim1Reset = false;
@@ -266,7 +269,7 @@ void secondFilterFinalMod::filter(std::streambuf* terminal) {
 					else
 						dim2Reset = false;
 
-					if ((filterCoordinate1 > elementCoordinate1) && (filterCoordinate1 <= elementCoordinate1 + filterSize1/2) && (filterCoordinate2 >= elementCoordinate2) && (filterCoordinate2 <= elementCoordinate2 + filterSize2/2))
+					if ((filterCoordinate1 >= elementCoordinate1) && (filterCoordinate1 <= elementCoordinate1 + filterSize1/2) && (filterCoordinate2 > elementCoordinate2) && (filterCoordinate2 <= elementCoordinate2 + filterSize2/2))
 						dim3Reset = true;
 					else
 						dim3Reset = false;

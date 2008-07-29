@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-05-21 12:18:13 $
-// $Revision: 1.2 $
+// $Date: 2007-12-13 13:49:20 $
+// $Revision: 1.3 $
 //
 /////////////////////////////////////////////////////////////////////
 
@@ -60,13 +60,13 @@ lutImplementation::lutImplementation(double dim1Min, double dim1Max, int dim1Ste
 	(*space)     = new histogramSpace();
 	if (*space == NULL)
 		throw memoryAllocationError(LUTGENERATORLIB);
-	isSpaceLocal = true;
 	(*space)->setMin(dim1Min, DIM1);
 	(*space)->setMin(dim2Min, DIM2);
 	(*space)->setMax(dim1Max, DIM1);
 	(*space)->setMax(dim2Max, DIM2);
 	(*space)->setStep(dim1Step, DIM1);
 	(*space)->setStep(dim2Step, DIM2);
+	isSpaceLocal = true;
 
 	firstLut     = NULL;
 	secondLut    = new lutMath(dim1Min, dim1Max, dim1Step, dim2Min, dim2Max, dim2Step);;
@@ -80,10 +80,10 @@ lutImplementation::lutImplementation(double dim3Min, double dim3Max, int dim3Ste
 	(*space)     = new histogramSpace();
 	if (*space == NULL)
 		throw memoryAllocationError(LUTGENERATORLIB);
-	isSpaceLocal = true;
 	(*space)->setMin(dim3Min, DIM3);
 	(*space)->setMax(dim3Max, DIM3);
 	(*space)->setStep(dim3Step, DIM3);
+	isSpaceLocal = true;
 
 	firstLut     = new prelutMath(dim3Min, dim3Max, dim3Step, dim3StartEntry, dim3StopEntry);
 	secondLut    = NULL;
@@ -97,7 +97,6 @@ lutImplementation::lutImplementation(double dim1Min, double dim1Max, int dim1Ste
 	(*space)     = new histogramSpace();
 	if (*space == NULL)
 		throw memoryAllocationError(LUTGENERATORLIB);
-	isSpaceLocal = true;
 	(*space)->setMin(dim1Min, DIM1);
 	(*space)->setMin(dim2Min, DIM2);
 	(*space)->setMin(dim3Min, DIM3);
@@ -107,6 +106,7 @@ lutImplementation::lutImplementation(double dim1Min, double dim1Max, int dim1Ste
 	(*space)->setStep(dim1Step, DIM1);
 	(*space)->setStep(dim2Step, DIM2);
 	(*space)->setStep(dim3Step, DIM3);
+	isSpaceLocal = true;
 
 	firstLut     = new prelutMath(dim3Min, dim3Max, dim3Step, dim3StartEntry, dim3StopEntry);
 	secondLut    = new lutMath(dim1Min, dim1Max, dim1Step, dim2Min, dim2Max, dim2Step);
@@ -122,6 +122,21 @@ lutImplementation::lutImplementation(histogramSpace** space, double dim3StartEnt
 
 	firstLut     = new prelutMath((*space)->getMin(DIM3), (*space)->getMax(DIM3), (*space)->getStep(DIM3), dim3StartEntry, dim3StopEntry);
 	secondLut    = new lutMath((*space)->getMin(DIM1), (*space)->getMax(DIM1), (*space)->getStep(DIM1), (*space)->getMin(DIM2), (*space)->getMax(DIM2), (*space)->getStep(DIM2));
+
+}
+lutImplementation::lutImplementation(const lutImplementation& value) {
+
+	this->space        = (histogramSpace**)calloc(1, sizeof(histogramSpace*));
+	if (this->space == NULL)
+		throw memoryAllocationError(LUTGENERATORLIB);
+	(*(this->space))   = new histogramSpace();
+	if (*(this->space) == NULL)
+		throw memoryAllocationError(LUTGENERATORLIB);
+	(**(this->space))  = (**value.space);
+	this->isSpaceLocal = true;
+
+	this->firstLut     = new prelutMath((*(this->space))->getMin(DIM3), (*(this->space))->getMax(DIM3), (*(this->space))->getStep(DIM3), value.firstLut->getPrelutDefinition().dim3StartEntry, value.firstLut->getPrelutDefinition().dim3StopEntry);
+	this->secondLut    = new lutMath((*(this->space))->getMin(DIM1), (*(this->space))->getMax(DIM1), (*(this->space))->getStep(DIM1), (*(this->space))->getMin(DIM2), (*(this->space))->getMax(DIM2), (*(this->space))->getStep(DIM2));
 
 }
 
@@ -149,6 +164,47 @@ lutImplementation::~lutImplementation() {
 		delete secondLut;
 		secondLut = NULL;
 	}
+
+}
+
+/****************************************************************
+ * operator = ()												*
+ ****************************************************************/
+
+const lutImplementation& lutImplementation::operator = (const lutImplementation& value) {
+
+	if (this->isSpaceLocal) {
+		if (this->space != NULL) {
+			if ((*(this->space)) != NULL) {
+				delete (*(this->space));
+				(*(this->space)) = NULL;
+			}
+			free(this->space);
+			this->space = NULL;
+		}
+	}
+	if (this->firstLut != NULL) {
+		delete this->firstLut;
+		this->firstLut = NULL;
+	}
+	if (this->secondLut != NULL) {
+		delete this->secondLut;
+		this->secondLut = NULL;
+	}
+
+	this->space        = (histogramSpace**)calloc(1, sizeof(histogramSpace*));
+	if (this->space == NULL)
+		throw memoryAllocationError(LUTGENERATORLIB);
+	(*(this->space))   = new histogramSpace();
+	if (*(this->space) == NULL)
+		throw memoryAllocationError(LUTGENERATORLIB);
+	(**(this->space))  = (**value.space);
+	this->isSpaceLocal = true;
+
+	this->firstLut     = new prelutMath((*(this->space))->getMin(DIM3), (*(this->space))->getMax(DIM3), (*(this->space))->getStep(DIM3), value.firstLut->getPrelutDefinition().dim3StartEntry, value.firstLut->getPrelutDefinition().dim3StopEntry);
+	this->secondLut    = new lutMath((*(this->space))->getMin(DIM1), (*(this->space))->getMax(DIM1), (*(this->space))->getStep(DIM1), (*(this->space))->getMin(DIM2), (*(this->space))->getMax(DIM2), (*(this->space))->getStep(DIM2));
+
+	return *this;
 
 }
 
@@ -414,6 +470,22 @@ void lutImplementation::clear(lutHoughBorder* borderPointer) {
 		secondLut->clear(borderPointer);
 	else
 		throw cannotClearBorderOfUndefinedObjectError();
+
+}
+
+/****************************************************************
+ * This method sets the prelut range to use.					*
+ * Caution: This function here has no useful					*
+ * implementations in some subclasses. So be					*
+ * careful when using.											*
+ ****************************************************************/
+
+void lutImplementation::setPrelutRange(double rangeStart, double rangeStop) {
+
+	if (firstLut != NULL)
+		firstLut->set(rangeStart, rangeStop);
+	else
+		throw cannotSetPrelutRangeOfUndefinedObjectError();
 
 }
 

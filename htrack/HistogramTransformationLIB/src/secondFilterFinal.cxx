@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/11/17 15:12:40 $
-// $Revision: 1.3 $
+// $Date: 2007-10-19 14:34:08 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -43,7 +43,9 @@
 #include <malloc.h>
 #include <stdio.h>
 
-using std::min;
+
+#define min(a, b)  (((a) < (b)) ? (a) : (b)) 
+
 
 /****************************************************************
  * Default constructor											*
@@ -204,7 +206,7 @@ void secondFilterFinal::filter(std::streambuf* terminal) {
 	if (trackAccess == NULL)
 		throw memoryAllocationError(HISTOGRAMTRANSFORMATIONLIB);
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t", (*tracks)->getNumberOfLayers());
+	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t\t\t", (*tracks)->getNumberOfLayers());
 	terminalInitialize(statusSequence);
 
 	for (i = 0; i < (*tracks)->getNumberOfLayers(); i++) {
@@ -246,7 +248,7 @@ void secondFilterFinal::filter(std::streambuf* terminal) {
 					filterCoordinate1    = filter->position.get(DIM1);
 					filterCoordinate2    = filter->position.get(DIM2);
 					
-					if ((filterCoordinate1 < elementCoordinate1) && (filterCoordinate1 >= elementCoordinate1 - filterSize1/2) && (filterCoordinate2 <= elementCoordinate2) && (filterCoordinate2 >= elementCoordinate2 - filterSize2/2))
+					if ((filterCoordinate1 <= elementCoordinate1) && (filterCoordinate1 >= elementCoordinate1 - filterSize1/2) && (filterCoordinate2 < elementCoordinate2) && (filterCoordinate2 >= elementCoordinate2 - filterSize2/2))
 						dim1Reset = true;
 					else
 						dim1Reset = false;
@@ -256,7 +258,7 @@ void secondFilterFinal::filter(std::streambuf* terminal) {
 					else
 						dim2Reset = false;
 
-					if ((filterCoordinate1 > elementCoordinate1) && (filterCoordinate1 <= elementCoordinate1 + filterSize1/2) && (filterCoordinate2 >= elementCoordinate2) && (filterCoordinate2 <= elementCoordinate2 + filterSize2/2))
+					if ((filterCoordinate1 >= elementCoordinate1) && (filterCoordinate1 <= elementCoordinate1 + filterSize1/2) && (filterCoordinate2 > elementCoordinate2) && (filterCoordinate2 <= elementCoordinate2 + filterSize2/2))
 						dim3Reset = true;
 					else
 						dim3Reset = false;

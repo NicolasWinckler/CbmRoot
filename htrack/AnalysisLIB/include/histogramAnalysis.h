@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:26:52 $
-/// $Revision: 1.1 $
+/// $Date: 2007-10-19 14:32:12 $
+/// $Revision: 1.2 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -74,18 +74,24 @@ protected:
 
 /**
  * This method searches for the window with name and title.
+ * @param name is the name of the window
+ * @param title is the title of the window
  */
 
 	TCanvas* findWindow(std::string name, std::string title);
 
 /**
  * This method initializes the window with a name and a title.
+ * @param name is the name of the window
+ * @param title is the title of the window
  */
 
 	TCanvas* addWindow(std::string name, std::string title);
 
 /**
  * This method searches for the display with name and title.
+ * @param name is the name of the display
+ * @param title is the title of the display
  */
 
 	TH2S* findDisplayFromFile(std::string name, std::string title);

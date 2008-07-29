@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-06 14:18:40 $
-// $Revision: 1.6 $
+// $Date: 2007-12-28 14:40:06 $
+// $Revision: 1.10 $
 //
 // *******************************************************************/
 
@@ -87,21 +87,33 @@ protected:
 	TCanvas*       momentaZWindow;
 	TGraph*        momentaZDisplay;
 	unsigned short momentaZAdditions;
-	TCanvas*       coordinateXWindow;
-	TGraph*        coordinateXDisplay;
-	unsigned short coordinateXAdditions;
-	TCanvas*       coordinateYWindow;
-	TGraph*        coordinateYDisplay;
-	unsigned short coordinateYAdditions;
-	TCanvas*       coordinateZWindow;
-	TGraph*        coordinateZDisplay;
-	unsigned short coordinateZAdditions;
+	TCanvas*       dim1Window;
+	TGraph*        dim1Display;
+	unsigned short dim1Additions;
+	TCanvas*       dim2Window;
+	TGraph*        dim2Display;
+	unsigned short dim2Additions;
+	TCanvas*       dim3Window;
+	TGraph*        dim3Display;
+	unsigned short dim3Additions;
 	TCanvas*       momentaWindow;
 	TGraph*        momentaDisplay;
 	unsigned short momentaAdditions;
 	TCanvas*       coordinateWindow;
 	TGraph*        coordinateDisplay;
 	unsigned short coordinateAdditions;
+	TCanvas*       dim1PeakDistanceWindow;
+	TGraph*        dim1PeakDistanceDisplay;
+	unsigned short dim1PeakDistanceAdditions;
+	TCanvas*       dim2PeakDistanceWindow;
+	TGraph*        dim2PeakDistanceDisplay;
+	unsigned short dim2PeakDistanceAdditions;
+	TCanvas*       dim3PeakDistanceWindow;
+	TGraph*        dim3PeakDistanceDisplay;
+	unsigned short dim3PeakDistanceAdditions;
+	TCanvas*       accumulatedPeakDistanceWindow;
+	TGraph*        accumulatedPeakDistanceDisplay;
+	unsigned short accumulatedPeakDistanceAdditions;
 	TCanvas*       minimalTrackColumnWindow;
 	TGraph*        minimalTrackColumnDisplay;
 	unsigned short minimalTrackColumnAdditions;
@@ -114,12 +126,33 @@ protected:
 	TCanvas*       fifoForColumnWindow;
 	TGraph*        fifoForColumnDisplay;
 	unsigned short fifoForColumnAdditions;
+	TCanvas*       minimalTrackRowWindow;
+	TGraph*        minimalTrackRowDisplay;
+	unsigned short minimalTrackRowAdditions;
+	TCanvas*       averageTrackRowWindow;
+	TGraph*        averageTrackRowDisplay;
+	unsigned short averageTrackRowAdditions;
+	TCanvas*       maximalTrackRowWindow;
+	TGraph*        maximalTrackRowDisplay;
+	unsigned short maximalTrackRowAdditions;
+	TCanvas*       fifoForRowWindow;
+	TGraph*        fifoForRowDisplay;
+	unsigned short fifoForRowAdditions;
 	TCanvas*       trackLayerWindow;
 	TGraph*        trackLayerDisplay;
 	unsigned short trackLayerAdditions;
 	TCanvas*       trackDensityLayerWindow;
 	TGraph*        trackDensityLayerDisplay;
 	unsigned short trackDensityLayerAdditions;
+	TCanvas*       hitReadoutDistributionWindow;
+	TGraph*        hitReadoutDistributionDisplay;
+	unsigned short hitReadoutDistributionAdditions;
+	TCanvas*       hitReadoutMeanDistributionDistributionWindow;
+	TGraph*        hitReadoutMeanDistributionDistributionDisplay;
+	unsigned short hitReadoutMeanDistributionDistributionAdditions;
+	TCanvas*       fpgaHistogramProcessingTimeDistributionDistributionWindow;
+	TGraph*        fpgaHistogramProcessingTimeDistributionDistributionDisplay;
+	unsigned short fpgaHistogramProcessingTimeDistributionDistributionAdditions;
 
 /**
  * This method initializes the global style for each display.
@@ -129,6 +162,8 @@ protected:
 
 /**
  * This method initializes the window with a name and a title.
+ * @param name is the name of the window
+ * @param title is the title of the window
  */
 
 	TCanvas* addWindow(std::string name, std::string title);
@@ -249,11 +284,20 @@ public:
  * method adds a display to show the distribution of the coordinates
  */
 
-	void addCoordinateXDistribution(unsigned int* array, unsigned short numberOfEntries);
-	void addCoordinateYDistribution(unsigned int* array, unsigned short numberOfEntries);
-	void addCoordinateZDistribution(unsigned int* array, unsigned short numberOfEntries);
+	void addHoughspaceDim1Distribution(unsigned int* array, unsigned short numberOfEntries);
+	void addHoughspaceDim2Distribution(unsigned int* array, unsigned short numberOfEntries);
+	void addHoughspaceDim3Distribution(unsigned int* array, unsigned short numberOfEntries);
 	void addMomentaDistribution(unsigned int* array, unsigned int numberOfEntries);
 	void addCoordinateDistribution(unsigned int* array, unsigned int numberOfEntries);
+
+/**
+ * method adds a display to show the distribution of the peak distances
+ */
+
+	void addDim1PeakDistanceDistribution(unsigned int* array, unsigned short numberOfEntries);
+	void addDim2PeakDistanceDistribution(unsigned int* array, unsigned short numberOfEntries);
+	void addDim3PeakDistanceDistribution(unsigned int* array, unsigned short numberOfEntries);
+	void addAccumulatedPeakDistanceDistribution(unsigned int* array, unsigned short numberOfEntries);
 
 /**
  * method adds a display to show the distribution of the
@@ -285,6 +329,34 @@ public:
 
 /**
  * method adds a display to show the distribution of the
+ * minimal found tracks' row
+ */
+
+	void addMinimalTrackRowDistribution(unsigned int* array, unsigned short numberOfEntries);
+
+/**
+ * method adds a display to show the distribution of the
+ * average found tracks' row
+ */
+
+	void addAverageTrackRowDistribution(double* array, unsigned short numberOfEntries, unsigned int numberOfAnalysis);
+
+/**
+ * method adds a display to show the distribution of the
+ * maximal found tracks' row
+ */
+
+	void addMaximalTrackRowDistribution(unsigned int* array, unsigned short numberOfEntries);
+
+/**
+ * method adds a display to show the distribution of the
+ * fifos for the found tracks' row
+ */
+
+	void addFifoForRowDistribution(unsigned int* array, unsigned short numberOfEntries);
+
+/**
+ * method adds a display to show the distribution of the
  * maximal found tracks' layer
  */
 
@@ -296,6 +368,29 @@ public:
  */
 
 	void addTrackDensityLayerDistribution(int* array, unsigned short numberOfEntries, unsigned int numberOfAnalysis);
+
+/**
+ * method adds a display to show the distribution of the
+ * hit readouts while histogramming
+ */
+
+	void addHitReadoutDistribution(unsigned int* array, unsigned int numberOfEntries, unsigned int numberOfAnalysis);
+
+/**
+ * method adds a display to show the mean of the
+ * hit readouts with different parallely implemented
+ * histogram layers while histogramming
+ */
+
+	void addHitReadoutMeanDistribution(unsigned int* array, unsigned int numberOfEntries, unsigned int numberOfAnalysis);
+
+/**
+ * method adds a display to show the time 
+ * consumption of the histogram processing with
+ * different parallely implementedhistogram layers
+ */
+
+	void addFpgaHistogramProcessingTimeDistribution(unsigned int* array, unsigned int numberOfEntries, unsigned int numberOfAnalysis, bool readoutColumnsInParallel, unsigned short histogramDim1, unsigned short histogramDim2);
 
 /**
  * method adds a display to show the distribution of the

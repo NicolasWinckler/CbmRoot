@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-05-04 11:19:37 $
-/// $Revision: 1.7 $
+/// $Date: 2008-06-26 12:33:39 $
+/// $Revision: 1.10 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -68,7 +68,7 @@
 #define TRACKWITHNOPOINTSWARNING					/**< This definition enables information about such tracks which have zero StsPoints. */
 //#undef TRACKWITHNOPOINTSWARNING
 
-#define TRACKWITHNOHITSWARNING						/**< This definition enables information about such tracks which have zero StsPoints. */
+#define TRACKWITHNOHITSWARNING						/**< This definition enables information about such tracks which have zero hits. */
 //#undef TRACKWITHNOHITSWARNING
 
 //#define TRACKWITHHITSTOPOINTSWARNING				/**< This definition enables a summary about such tracks which have less or more real hits than StsPoints. */
@@ -254,7 +254,13 @@ public:
 	TClonesArray& getTrackData();
 
 /**
- * method returns a reference to a track with a specified index
+ * method returns a reference to a track with a specified ordering index
+ */
+
+	trackfinderInputTrack* getTrackByOrder(unsigned int index);
+
+/**
+ * method returns a reference to a track with a specified track index
  */
 
 	trackfinderInputTrack* getTrackByIndex(unsigned int index);
@@ -282,22 +288,6 @@ public:
  */
 
 	trackfinderInputDetector* getDetectorPointer();
-
-/**
- * This method returns the size of the used memory for the
- * source data.
- * @param dimension formats the returnvalue to B, kB, MB or GB
- */
-
-	double getUsedSizeOfData(unsigned short dimension);
-
-/**
- * This method returns the size of the allocated memory for
- * the source data.
- * @param dimension formats the returnvalue to B, kB, MB or GB
- */
-
-	double getAllocatedSizeOfData(unsigned short dimension);
 
 /**
  * method sets the number of the actual event
@@ -373,6 +363,54 @@ public:
 	trackfinderInputSMagneticField* getMagneticField();
 
 #endif
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfAddOnData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfAddOnData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfAddOnData(unsigned short dimension = 0);
 
 };
 

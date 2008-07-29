@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-21 13:20:11 $
-// $Revision: 1.24 $
+// $Date: 2008-02-29 11:37:24 $
+// $Revision: 1.32 $
 //
 // *******************************************************************/
 
@@ -35,6 +35,7 @@
 #include "../../LutGeneratorLIB/include/lutGenerator.h"
 #include "../../MiscLIB/include/memoryDef.h"
 #include "../../AnalysisLIB/include/analysisDef.h"
+#include "../../AnalysisLIB/include/prelutRangeLayerAnalysis.h"
 #include "../include/inf.h"
 
 
@@ -101,8 +102,8 @@
 #else
 	#define defValTrackfinderThetaStep                           383
 #endif
-#define defValTrackfinderPrelutRadiusMin                         -0.25
-#define defValTrackfinderPrelutRadiusMax                         +0.25
+#define defValTrackfinderPrelutRadiusMin                         -0.035
+#define defValTrackfinderPrelutRadiusMax                         +0.035
 #define defValTrackfinderLutRadiusMin                            -(1 / (momentumCutSmallerThan - momentumCutSmallerThan / 10))
 #define defValTrackfinderLutRadiusMax                            +(1 / (momentumCutSmallerThan - momentumCutSmallerThan / 10))
 #ifndef CALLOC_HISTOGRAM_RUNTIME
@@ -122,9 +123,10 @@
 #define defValAnalysisThresholdForP                              momentumCutSmallerThan
 #define defValAnalysisInitConfiguration                          false
 #define defValAnalysisInitDetector                               false
-#define defValAnalysisInitMemory                                 false
 #define defValAnalysisInitEvent                                  true
 #define defValAnalysisInitClassPriority                          false
+#define defValAnalysisInitMemory                                 false
+#define defValAnalysisInitTime                                   false
 #define defValAnalysisInitQualityEFGCEventAbsolute               false
 #define defValAnalysisInitQualityEFGCEventRelative               false
 #define defValAnalysisInitQualityEFGCTotalAbsolute               false
@@ -162,6 +164,7 @@
 #define defValAnalysisInitLutGoodness                            false
 #define defValAnalysisInitHoughTransformGoodness                 false
 #define defValAnalysisInitQuantizationGoodness                   false
+#define defValAnalysisInitPeakDistanceGoodness                   false
 #define defValAnalysisInitCreatedHistogramToRoot                 false
 #define defValAnalysisInitEncodedHistogramToRoot                 false
 #define defValAnalysisInitFilteredHistogramToRoot                false
@@ -173,15 +176,42 @@
 #define defValAnalysisInitFilteredHistogramToShow                false
 #define defValAnalysisInitHistogramLayer                         100
 #define defValAnalysisInitNumberOfTracksPerColumn                false
+#define defValAnalysisInitNumberOfTracksPerRow                   false
 #define defValAnalysisInitNumberOfTracksPerLayer                 false
+#define defValAnalysisInitHitReadoutDistribution                 false
+#define defValAnalysisInitReadoutColumnsInParallel               true
+#define defValAnalysisInitPrelutRangeForEachEvent                false
+#define defValAnalysisInitWeightedPrelutRange                    false
+#define defValAnalysisInitPrelutRangeDisplay                     false
+#define defValAnalysisInitPrelutRangeDisplayMode                 CUTMAINRELATIVEDISPLAYMODE
+#define defValAnalysisPrelutRangeStationDisplayMask              0
+#define defValAnalysisPrelutRangeStationSumDisplayMask           false
+#define defValAnalysisPrelutRangeConstraintDisplayMask           0
+#define defValAnalysisPrelutRangeConstraintSumDisplayMask        false
+#define defValAnalysisPrelutRangeRelativeDisplayMask             false
+#define defValAnalysisInitPrelutRangeToRoot                      false
+#define defValAnalysisInitPercentageOfHitsForPrelutRange         80
+#define defValAnalysisPrelutRangeMinStart                        -0.1
+#define defValAnalysisPrelutRangeMinStop                         +0.1
+#define defValAnalysisPrelutRangeMinSteps                        201
+#define defValAnalysisPrelutRangeMaxStart                        -0.1
+#define defValAnalysisPrelutRangeMaxStop                         +0.1
+#define defValAnalysisPrelutRangeMaxSteps                        201
+#define defValAnalysisChooseMainPrelutRange                      true
+#define defValAnalysisChooseConstraintPrelutRange                false
 #define defValAnalysisInitTotalAnalysis                          false
-#define defValAnalysisInitTotalAnalysisDisplay                   false
 #define defValAnalysisInitPercentageOfHitsInSignature            70
 #define defValAnalysisInitPercentageOfTracksForSignature         75
 #define defValAnalysisInitAnalysisResultWarnings                 (NUMBEROFTRACKSWHICHCANNOTBEFOUND)
 #define defValAnalysisInitAnalysisResultDisplays                 (TRACKWITHMOMENTAERRORDISTRIBUTION | TRACKSPERCOLUMNDISTRIBUTION | TRACKSPERLAYERDISTRIBUTION)
+#define defValAnalysisInitAnalysisMoreResultWarnings             0
+#define defValAnalysisInitAnalysisMoreResultDisplays             0
+#define defValAnalysisWriteCellFiles                             false
+#define defValAnalysisHitCellFileName						     "./parameters/htrack/cellHits.txt"
+#define defValAnalysisPrelutCellFileName						 "./parameters/htrack/cellPrelut.txt"
+#define defValAnalysisLutCellFileName						     "./parameters/htrack/cellLut.txt"
 #define defValInitStatus                                         true
-#define defValAnalysisOutputFileName                      "analysisOutput.root"
+#define defValAnalysisOutputFileName                             "analysisOutput.root"
 
 /*
  * stringcommands which represent the parameters read from file
@@ -242,9 +272,10 @@
 #define stringCmdAnalysisThresholdForP                              "analysisThresholdForP"
 #define stringCmdAnalysisInitConfiguration                          "analysisInitConfiguration"
 #define stringCmdAnalysisInitDetector                               "analysisInitDetector"
-#define stringCmdAnalysisInitMemory                                 "analysisInitMemory"
 #define stringCmdAnalysisInitEvent                                  "analysisInitEvent"
 #define stringCmdAnalysisInitClassPriority                          "analysisInitClassPriority"
+#define stringCmdAnalysisInitMemory                                 "analysisInitMemory"
+#define stringCmdAnalysisInitTime                                   "analysisInitTime"
 #define stringCmdAnalysisInitQualityEFGCEventAbsolute               "analysisInitQualityEFGCEventAbsolute"
 #define stringCmdAnalysisInitQualityEFGCEventRelative               "analysisInitQualityEFGCEventRelative"
 #define stringCmdAnalysisInitQualityEFGCTotalAbsolute               "analysisInitQualityEFGCTotalAbsolute"
@@ -282,6 +313,7 @@
 #define stringCmdAnalysisInitLutGoodness                            "analysisInitLutGoodness"
 #define stringCmdAnalysisInitHoughTransformGoodness                 "analysisInitHoughTransformGoodness"
 #define stringCmdAnalysisInitQuantizationGoodness                   "analysisInitQuantizationGoodness"
+#define stringCmdAnalysisInitPeakDistanceGoodness                   "analysisInitPeakDistanceGoodness"
 #define stringCmdAnalysisInitCreatedHistogramToRoot                 "analysisInitCreatedHistogramToRoot"
 #define stringCmdAnalysisInitEncodedHistogramToRoot                 "analysisInitEncodedHistogramToRoot"
 #define stringCmdAnalysisInitFilteredHistogramToRoot                "analysisInitFilteredHistogramToRoot"
@@ -293,133 +325,189 @@
 #define stringCmdAnalysisInitFilteredHistogramToShow                "analysisInitFilteredHistogramToShow"
 #define stringCmdAnalysisInitHistogramLayer                         "analysisInitHistogramLayer"
 #define stringCmdAnalysisInitNumberOfTracksPerColumn				"analysisInitNumberOfTracksPerColumn"
+#define stringCmdAnalysisInitNumberOfTracksPerRow    				"analysisInitNumberOfTracksPerRow"
 #define stringCmdAnalysisInitNumberOfTracksPerLayer                 "analysisInitNumberOfTracksPerLayer"
+#define stringCmdAnalysisInitHitReadoutDistribution                 "analysisInitHitReadoutDistribution"
+#define stringCmdAnalysisInitReadoutColumnsInParallel               "analysisInitReadoutColumnsInParallel"
+#define stringCmdAnalysisInitPrelutRangeForEachEvent                "analysisInitPrelutRangeForEachEvent"
+#define stringCmdAnalysisInitWeightedPrelutRange                    "analysisInitWeightedPrelutRange"
+#define stringCmdAnalysisInitPrelutRangeDisplay                     "analysisInitPrelutRangeDisplay"
+#define stringCmdAnalysisInitPrelutRangeDisplayMode                 "analysisInitPrelutRangeDisplayMode"
+#define stringCmdAnalysisPrelutRangeStationDisplayMask              "analysisPrelutRangeStationDisplayMask"
+#define stringCmdAnalysisPrelutRangeStationSumDisplayMask           "analysisPrelutRangeStationSumDisplayMask"
+#define stringCmdAnalysisPrelutRangeConstraintDisplayMask           "analysisPrelutRangeConstraintDisplayMask"
+#define stringCmdAnalysisPrelutRangeConstraintSumDisplayMask        "analysisPrelutRangeConstraintSumDisplayMask"
+#define stringCmdAnalysisPrelutRangeRelativeDisplayMask             "analysisPrelutRangeRelativeDisplayMask"
+#define stringCmdAnalysisInitPrelutRangeToRoot                      "analysisInitPrelutRangeToRoot"
+#define stringCmdAnalysisInitPercentageOfHitsForPrelutRange         "analysisInitPercentageOfHitsForPrelutRange"
+#define stringCmdAnalysisPrelutRangeMinStart                        "analysisPrelutRangeMinStart"
+#define stringCmdAnalysisPrelutRangeMinStop                         "analysisPrelutRangeMinStop"
+#define stringCmdAnalysisPrelutRangeMinSteps                        "analysisPrelutRangeMinSteps"
+#define stringCmdAnalysisPrelutRangeMaxStart                        "analysisPrelutRangeMaxStart"
+#define stringCmdAnalysisPrelutRangeMaxStop                         "analysisPrelutRangeMaxStop"
+#define stringCmdAnalysisPrelutRangeMaxSteps                        "analysisPrelutRangeMaxSteps"
+#define stringCmdAnalysisChooseMainPrelutRange                      "analysisChooseMainPrelutRange"
+#define stringCmdAnalysisChooseConstraintPrelutRange                "analysisChooseConstraintPrelutRange"
 #define stringCmdAnalysisInitTotalAnalysis                          "analysisInitTotalAnalysis"
-#define stringCmdAnalysisInitTotalAnalysisDisplay                   "analysisInitTotalAnalysisDisplay"
 #define stringCmdAnalysisInitPercentageOfHitsInSignature            "analysisInitPercentageOfHitsInSignature"
 #define stringCmdAnalysisInitPercentageOfTracksForSignature         "analysisInitPercentageOfTracksForSignature"
 #define stringCmdAnalysisInitAnalysisResultWarnings                 "analysisInitAnalysisResultWarnings"
 #define stringCmdAnalysisInitAnalysisResultDisplays                 "analysisInitAnalysisResultDisplays"
+#define stringCmdAnalysisInitAnalysisMoreResultWarnings             "analysisInitAnalysisMoreResultWarnings"
+#define stringCmdAnalysisInitAnalysisMoreResultDisplays             "analysisInitAnalysisMoreResultDisplays"
+#define stringCmdAnalysisWriteCellFiles                             "analysisWriteCellFiles"
+#define stringCmdAnalysisHitCellFileName						    "analysisHitCellFileName"
+#define stringCmdAnalysisPrelutCellFileName						    "analysisPrelutCellFileName"
+#define stringCmdAnalysisLutCellFileName						    "analysisLutCellFileName"
 #define stringCmdInitStatus                                         "initStatus"
 
 /*
  * index of each parameter for the commandID table
  */
-#define idCmdInputFileName                                       0
-#define idCmdInputFileFormat                                     1
-#define idCmdInputMinTracks                                      2
-#define idCmdInputMaxTracks                                      3
-#define idCmdInputDetectorMask                                   4
-#define idCmdInputFileNameMagneticField                          5
-#define idCmdInputMagneticFieldIsRootFile                        6
-#define idCmdInputMapNameMagneticField                           7
-#define idCmdInputMagneticFieldIntegrationStepwidthPerStation    8
-#define idCmdInputMagneticFieldIntegrationFactor                 9
-#define idCmdInputDisableAutomaticMagneticField                 10
-#define idCmdInputFileNameDetector                              11
-#define idCmdInputNumberOfVolumesInfrontOfSTS                   12
-#define idCmdInputDisableAutomaticDetector                      13
-#define idCmdInputCodingTableMode                               14
-#define idCmdInputGradingPTableMode                             15
-#define idCmdInputGradingRTableMode                             16
-#define idCmdInputCodingTableFileName                           17
-#define idCmdInputGradingPTableFileName                         18
-#define idCmdInputGradingRTableFileName                         19
-#define idCmdInputCodingTableWrite                              20
-#define idCmdInputGradingPTableWrite                            21
-#define idCmdInputGradingRTableWrite                            22
-#define idCmdTrackfinderHitProducer                             23
-#define idCmdTrackfinderReadPointsFromFile                      24
-#define idCmdTrackfinderReadHitsFromFile                        25
-#define idCmdTrackfinderReadMapsHits                            26
-#define idCmdTrackfinderReadHybridHits                          27
-#define idCmdTrackfinderReadStripHits                           28
-#define idCmdTrackfinderLutsVersion                             29
-#define idCmdTrackfinderPrelutFileName                          30
-#define idCmdTrackfinderLutFileName                             31
-#define idCmdTrackfinderGammaMin                                32
-#define idCmdTrackfinderGammaMax                                33
-#define idCmdTrackfinderGammaStep                               34
-#define idCmdTrackfinderThetaMin                                35
-#define idCmdTrackfinderThetaMax                                36
-#define idCmdTrackfinderThetaStep                               37
-#define idCmdTrackfinderPrelutRadiusMin                         38
-#define idCmdTrackfinderPrelutRadiusMax                         39
-#define idCmdTrackfinderLutRadiusMin                            40
-#define idCmdTrackfinderLutRadiusMax                            41
-#define idCmdTrackfinderLutRadiusStep                           42
-#define idCmdTrackfinderMinClassCoding                          43
-#define idCmdTrackfinderMinClassGradingP                        44
-#define idCmdTrackfinderMinClassGradingR                        45
-#define idCmdTrackfinderFirstFilterNeighborhoodDim1ClearRadius  46
-#define idCmdTrackfinderFirstFilterNeighborhoodDim2ClearRadius  47
-#define idCmdTrackfinderSecondFilterNeighborhoodDim1ClearRadius 48
-#define idCmdTrackfinderSecondFilterNeighborhoodDim2ClearRadius 49
-#define idCmdTrackfinderSecondFilterNeighborhoodDim3ClearRadius 50
-#define idCmdTrackfinderWriteTracksToFile                       51
-#define idCmdAnalysisOutputFileName                             52
-#define idCmdAnalysisThresholdForP                              53
-#define idCmdAnalysisInitConfiguration                          54
-#define idCmdAnalysisInitDetector                               55
-#define idCmdAnalysisInitMemory                                 56
-#define idCmdAnalysisInitEvent                                  57
-#define idCmdAnalysisInitClassPriority                          58
-#define idCmdAnalysisInitQualityEFGCEventAbsolute               59
-#define idCmdAnalysisInitQualityEFGCEventRelative               60
-#define idCmdAnalysisInitQualityEFGCTotalAbsolute               61
-#define idCmdAnalysisInitQualityEFGCTotalRelative               62
-#define idCmdAnalysisInitMomentumEFGCEventPzEFGC                63
-#define idCmdAnalysisInitMomentumEFGCEventPtEFGC                64
-#define idCmdAnalysisInitMomentumEFGCTotalPzEFGC                65
-#define idCmdAnalysisInitMomentumEFGCTotalPtEFGC                66
-#define idCmdAnalysisInitProjectionEFGCNEvent12EFGCN            67
-#define idCmdAnalysisInitProjectionEFGCNEvent13EFGCN            68
-#define idCmdAnalysisInitProjectionEFGCNEvent32EFGCN            69
-#define idCmdAnalysisInitProjectionEFGCNTotal12EFGCN            70
-#define idCmdAnalysisInitProjectionEFGCNTotal13EFGCN            71
-#define idCmdAnalysisInitProjectionEFGCNTotal32EFGCN            72
-#define idCmdAnalysisInitMomentumEvent                          73
-#define idCmdAnalysisInitMomentumTotal                          74
-#define idCmdAnalysisInitMomentumDisplay                        75
-#define idCmdAnalysisInitMomentumToRoot                         76
-#define idCmdAnalysisInitProjectionEvent                        77
-#define idCmdAnalysisInitProjectionTotal                        78
-#define idCmdAnalysisInitProjectionDisplay                      79
-#define idCmdAnalysisInitProjectionToRoot                       80
-#define idCmdAnalysisInitMagnetfieldX                           81
-#define idCmdAnalysisInitMagnetfieldY                           82
-#define idCmdAnalysisInitMagnetfieldZ                           83
-#define idCmdAnalysisInitMagnetfieldDisplay                     84
-#define idCmdAnalysisInitMagnetfieldToRoot                      85
-#define idCmdAnalysisInitMagnetfieldConstantForEachEvent        86
-#define idCmdAnalysisInitWeightedMagnetfieldConstant            87
-#define idCmdAnalysisInitMagnetfieldConstantDisplay             88
-#define idCmdAnalysisMagnetfieldConstantDisplayMask             89
-#define idCmdAnalysisInitMagnetfieldConstantToRoot              90
-#define idCmdAnalysisInitMagnetfieldVSConstants                 91
-#define idCmdAnalysisInitPrelutGoodness                         92
-#define idCmdAnalysisInitLutGoodness                            93
-#define idCmdAnalysisInitHoughTransformGoodness                 94
-#define idCmdAnalysisInitQuantizationGoodness                   95
-#define idCmdAnalysisInitCreatedHistogramToRoot                 96
-#define idCmdAnalysisInitEncodedHistogramToRoot                 97
-#define idCmdAnalysisInitFilteredHistogramToRoot                98
-#define idCmdAnalysisInitJustOneCreatedHistogramToRoot          99
-#define idCmdAnalysisInitJustOneEncodedHistogramToRoot         100
-#define idCmdAnalysisInitJustOneFilteredHistogramToRoot        101
-#define idCmdAnalysisInitCreatedHistogramToShow                102
-#define idCmdAnalysisInitEncodedHistogramToShow                103
-#define idCmdAnalysisInitFilteredHistogramToShow               104
-#define idCmdAnalysisInitHistogramLayer                        105
-#define idCmdAnalysisInitNumberOfTracksPerColumn               106
-#define idCmdAnalysisInitNumberOfTracksPerLayer                107
-#define idCmdAnalysisInitTotalAnalysis                         108
-#define idCmdAnalysisInitTotalAnalysisDisplay                  109
-#define idCmdAnalysisInitPercentageOfHitsInSignature           110
-#define idCmdAnalysisInitPercentageOfTracksForSignature        111
-#define idCmdAnalysisInitAnalysisResultWarnings                112
-#define idCmdAnalysisInitAnalysisResultDisplays                113
-#define idCmdInitStatus                                        114
+#define idCmdInputFileName                                        0
+#define idCmdInputFileFormat                                      1
+#define idCmdInputMinTracks                                       2
+#define idCmdInputMaxTracks                                       3
+#define idCmdInputDetectorMask                                    4
+#define idCmdInputFileNameMagneticField                           5
+#define idCmdInputMagneticFieldIsRootFile                         6
+#define idCmdInputMapNameMagneticField                            7
+#define idCmdInputMagneticFieldIntegrationStepwidthPerStation     8
+#define idCmdInputMagneticFieldIntegrationFactor                  9
+#define idCmdInputDisableAutomaticMagneticField                  10
+#define idCmdInputFileNameDetector                               11
+#define idCmdInputNumberOfVolumesInfrontOfSTS                    12
+#define idCmdInputDisableAutomaticDetector                       13
+#define idCmdInputCodingTableMode                                14
+#define idCmdInputGradingPTableMode                              15
+#define idCmdInputGradingRTableMode                              16
+#define idCmdInputCodingTableFileName                            17
+#define idCmdInputGradingPTableFileName                          18
+#define idCmdInputGradingRTableFileName                          19
+#define idCmdInputCodingTableWrite                               20
+#define idCmdInputGradingPTableWrite                             21
+#define idCmdInputGradingRTableWrite                             22
+#define idCmdTrackfinderHitProducer                              23
+#define idCmdTrackfinderReadPointsFromFile                       24
+#define idCmdTrackfinderReadHitsFromFile                         25
+#define idCmdTrackfinderReadMapsHits                             26
+#define idCmdTrackfinderReadHybridHits                           27
+#define idCmdTrackfinderReadStripHits                            28
+#define idCmdTrackfinderLutsVersion                              29
+#define idCmdTrackfinderPrelutFileName                           30
+#define idCmdTrackfinderLutFileName                              31
+#define idCmdTrackfinderGammaMin                                 32
+#define idCmdTrackfinderGammaMax                                 33
+#define idCmdTrackfinderGammaStep                                34
+#define idCmdTrackfinderThetaMin                                 35
+#define idCmdTrackfinderThetaMax                                 36
+#define idCmdTrackfinderThetaStep                                37
+#define idCmdTrackfinderPrelutRadiusMin                          38
+#define idCmdTrackfinderPrelutRadiusMax                          39
+#define idCmdTrackfinderLutRadiusMin                             40
+#define idCmdTrackfinderLutRadiusMax                             41
+#define idCmdTrackfinderLutRadiusStep                            42
+#define idCmdTrackfinderMinClassCoding                           43
+#define idCmdTrackfinderMinClassGradingP                         44
+#define idCmdTrackfinderMinClassGradingR                         45
+#define idCmdTrackfinderFirstFilterNeighborhoodDim1ClearRadius   46
+#define idCmdTrackfinderFirstFilterNeighborhoodDim2ClearRadius   47
+#define idCmdTrackfinderSecondFilterNeighborhoodDim1ClearRadius  48
+#define idCmdTrackfinderSecondFilterNeighborhoodDim2ClearRadius  49
+#define idCmdTrackfinderSecondFilterNeighborhoodDim3ClearRadius  50
+#define idCmdTrackfinderWriteTracksToFile                        51
+#define idCmdAnalysisOutputFileName                              52
+#define idCmdAnalysisThresholdForP                               53
+#define idCmdAnalysisInitConfiguration                           54
+#define idCmdAnalysisInitDetector                                55
+#define idCmdAnalysisInitEvent                                   56
+#define idCmdAnalysisInitClassPriority                           57
+#define idCmdAnalysisInitMemory                                  58
+#define idCmdAnalysisInitTime                                    59
+#define idCmdAnalysisInitQualityEFGCEventAbsolute                60
+#define idCmdAnalysisInitQualityEFGCEventRelative                61
+#define idCmdAnalysisInitQualityEFGCTotalAbsolute                62
+#define idCmdAnalysisInitQualityEFGCTotalRelative                63
+#define idCmdAnalysisInitMomentumEFGCEventPzEFGC                 64
+#define idCmdAnalysisInitMomentumEFGCEventPtEFGC                 65
+#define idCmdAnalysisInitMomentumEFGCTotalPzEFGC                 66
+#define idCmdAnalysisInitMomentumEFGCTotalPtEFGC                 67
+#define idCmdAnalysisInitProjectionEFGCNEvent12EFGCN             68
+#define idCmdAnalysisInitProjectionEFGCNEvent13EFGCN             69
+#define idCmdAnalysisInitProjectionEFGCNEvent32EFGCN             70
+#define idCmdAnalysisInitProjectionEFGCNTotal12EFGCN             71
+#define idCmdAnalysisInitProjectionEFGCNTotal13EFGCN             72
+#define idCmdAnalysisInitProjectionEFGCNTotal32EFGCN             73
+#define idCmdAnalysisInitMomentumEvent                           74
+#define idCmdAnalysisInitMomentumTotal                           75
+#define idCmdAnalysisInitMomentumDisplay                         76
+#define idCmdAnalysisInitMomentumToRoot                          77
+#define idCmdAnalysisInitProjectionEvent                         78
+#define idCmdAnalysisInitProjectionTotal                         79
+#define idCmdAnalysisInitProjectionDisplay                       80
+#define idCmdAnalysisInitProjectionToRoot                        81
+#define idCmdAnalysisInitMagnetfieldX                            82
+#define idCmdAnalysisInitMagnetfieldY                            83
+#define idCmdAnalysisInitMagnetfieldZ                            84
+#define idCmdAnalysisInitMagnetfieldDisplay                      85
+#define idCmdAnalysisInitMagnetfieldToRoot                       86
+#define idCmdAnalysisInitMagnetfieldConstantForEachEvent         87
+#define idCmdAnalysisInitWeightedMagnetfieldConstant             88
+#define idCmdAnalysisInitMagnetfieldConstantDisplay              89
+#define idCmdAnalysisMagnetfieldConstantDisplayMask              90
+#define idCmdAnalysisInitMagnetfieldConstantToRoot               91
+#define idCmdAnalysisInitMagnetfieldVSConstants                  92
+#define idCmdAnalysisInitPrelutGoodness                          93
+#define idCmdAnalysisInitLutGoodness                             94
+#define idCmdAnalysisInitHoughTransformGoodness                  95
+#define idCmdAnalysisInitQuantizationGoodness                    96
+#define idCmdAnalysisInitPeakDistanceGoodness                    97
+#define idCmdAnalysisInitCreatedHistogramToRoot                  98
+#define idCmdAnalysisInitEncodedHistogramToRoot                  99
+#define idCmdAnalysisInitFilteredHistogramToRoot                100
+#define idCmdAnalysisInitJustOneCreatedHistogramToRoot          101
+#define idCmdAnalysisInitJustOneEncodedHistogramToRoot          102
+#define idCmdAnalysisInitJustOneFilteredHistogramToRoot         103
+#define idCmdAnalysisInitCreatedHistogramToShow                 104
+#define idCmdAnalysisInitEncodedHistogramToShow                 105
+#define idCmdAnalysisInitFilteredHistogramToShow                106
+#define idCmdAnalysisInitHistogramLayer                         107
+#define idCmdAnalysisInitNumberOfTracksPerColumn                108
+#define idCmdAnalysisInitNumberOfTracksPerRow                   109
+#define idCmdAnalysisInitNumberOfTracksPerLayer                 110
+#define idCmdAnalysisInitHitReadoutDistribution                 111
+#define idCmdAnalysisInitReadoutColumnsInParallel               112
+#define idCmdAnalysisInitPrelutRangeForEachEvent                113
+#define idCmdAnalysisInitWeightedPrelutRange                    114
+#define idCmdAnalysisInitPrelutRangeDisplay                     115
+#define idCmdAnalysisInitPrelutRangeDisplayMode                 116
+#define idCmdAnalysisPrelutRangeStationDisplayMask              117
+#define idCmdAnalysisPrelutRangeStationSumDisplayMask           118
+#define idCmdAnalysisPrelutRangeConstraintDisplayMask           119
+#define idCmdAnalysisPrelutRangeConstraintSumDisplayMask        120
+#define idCmdAnalysisPrelutRangeRelativeDisplayMask             121
+#define idCmdAnalysisInitPrelutRangeToRoot                      122
+#define idCmdAnalysisInitPercentageOfHitsForPrelutRange         123
+#define idCmdAnalysisPrelutRangeMinStart                        124
+#define idCmdAnalysisPrelutRangeMinStop                         125
+#define idCmdAnalysisPrelutRangeMinSteps                        126
+#define idCmdAnalysisPrelutRangeMaxStart                        127
+#define idCmdAnalysisPrelutRangeMaxStop                         128
+#define idCmdAnalysisPrelutRangeMaxSteps                        129
+#define idCmdAnalysisChooseMainPrelutRange                      130
+#define idCmdAnalysisChooseConstraintPrelutRange                131
+#define idCmdAnalysisInitTotalAnalysis                          132
+#define idCmdAnalysisInitPercentageOfHitsInSignature            133
+#define idCmdAnalysisInitPercentageOfTracksForSignature         134
+#define idCmdAnalysisInitAnalysisResultWarnings                 135
+#define idCmdAnalysisInitAnalysisResultDisplays                 136
+#define idCmdAnalysisInitAnalysisMoreResultWarnings             137
+#define idCmdAnalysisInitAnalysisMoreResultDisplays             138
+#define idCmdAnalysisWriteCellFiles                             139
+#define idCmdAnalysisHitCellFileName						    140
+#define idCmdAnalysisPrelutCellFileName						    141
+#define idCmdAnalysisLutCellFileName						    142
+#define idCmdInitStatus                                         143
 
 
 #define max(a, b)  (((a) > (b)) ? (a) : (b)) 
@@ -829,15 +917,6 @@ bool inf::getInitialisationHeaderValue(std::string& specifier, std::string& valu
 			specifierFound = true;
 		}
 	}
-	else if (specifier.compare(stringCmdAnalysisInitMemory) == 0) {
-		if (!(commandID[idCmdAnalysisInitMemory])) {
-			config.analysisInitMemory = bstob((char*)value.c_str());
-			if (!config.analysisInitMemory)
-				config.analysisInitMemory = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMemory] = true;
-			specifierFound = true;
-		}
-	}
 	else if (specifier.compare(stringCmdAnalysisInitEvent) == 0) {
 		if (!(commandID[idCmdAnalysisInitEvent])) {
 			config.analysisInitEvent = bstob((char*)value.c_str());
@@ -853,6 +932,24 @@ bool inf::getInitialisationHeaderValue(std::string& specifier, std::string& valu
 			if (!config.analysisInitClassPriority)
 				config.analysisInitClassPriority = dstob(*((char*)value.c_str()));
 			commandID[idCmdAnalysisInitClassPriority] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisInitMemory) == 0) {
+		if (!(commandID[idCmdAnalysisInitMemory])) {
+			config.analysisInitMemory = bstob((char*)value.c_str());
+			if (!config.analysisInitMemory)
+				config.analysisInitMemory = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisInitMemory] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisInitTime) == 0) {
+		if (!(commandID[idCmdAnalysisInitTime])) {
+			config.analysisInitTime = bstob((char*)value.c_str());
+			if (!config.analysisInitTime)
+				config.analysisInitTime = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisInitTime] = true;
 			specifierFound = true;
 		}
 	}
@@ -1312,6 +1409,15 @@ bool inf::getGoodnessHeaderValue(std::string& specifier, std::string& value) {
 			specifierFound = true;
 		}
 	}
+	else if (specifier.compare(stringCmdAnalysisInitPeakDistanceGoodness) == 0) {
+		if (!(commandID[idCmdAnalysisInitPeakDistanceGoodness])) {
+			config.analysisInitPeakDistanceGoodness = bstob((char*)value.c_str());
+			if (!config.analysisInitPeakDistanceGoodness)
+				config.analysisInitPeakDistanceGoodness = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisInitPeakDistanceGoodness] = true;
+			specifierFound = true;
+		}
+	}
 	else if (specifier.compare(stringCmdAnalysisInitPercentageOfHitsInSignature) == 0) {
 		if (!(commandID[idCmdAnalysisInitPercentageOfHitsInSignature])) {
 			config.analysisInitPercentageOfHitsInSignature = stoul((char*)value.c_str(), 10);
@@ -1341,6 +1447,20 @@ bool inf::getGoodnessHeaderValue(std::string& specifier, std::string& value) {
 		if (!(commandID[idCmdAnalysisInitAnalysisResultDisplays])) {
 			config.analysisInitAnalysisResultDisplays = stoul((char*)value.c_str(), 10);
 			commandID[idCmdAnalysisInitAnalysisResultDisplays] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisInitAnalysisMoreResultWarnings) == 0) {
+		if (!(commandID[idCmdAnalysisInitAnalysisMoreResultWarnings])) {
+			config.analysisInitAnalysisMoreResultWarnings = stoul((char*)value.c_str(), 10);
+			commandID[idCmdAnalysisInitAnalysisMoreResultWarnings] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisInitAnalysisMoreResultDisplays) == 0) {
+		if (!(commandID[idCmdAnalysisInitAnalysisMoreResultDisplays])) {
+			config.analysisInitAnalysisMoreResultDisplays = stoul((char*)value.c_str(), 10);
+			commandID[idCmdAnalysisInitAnalysisMoreResultDisplays] = true;
 			specifierFound = true;
 		}
 	}
@@ -1469,12 +1589,206 @@ bool inf::getHardwareHeaderValue(std::string& specifier, std::string& value) {
 			specifierFound = true;
 		}
 	}
+	else if (specifier.compare(stringCmdAnalysisInitNumberOfTracksPerRow) == 0) {
+		if (!(commandID[idCmdAnalysisInitNumberOfTracksPerRow])) {
+			config.analysisInitNumberOfTracksPerRow = bstob((char*)value.c_str());
+			if (!config.analysisInitNumberOfTracksPerRow)
+				config.analysisInitNumberOfTracksPerRow = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisInitNumberOfTracksPerRow] = true;
+			specifierFound = true;
+		}
+	}
 	else if (specifier.compare(stringCmdAnalysisInitNumberOfTracksPerLayer) == 0) {
 		if (!(commandID[idCmdAnalysisInitNumberOfTracksPerLayer])) {
 			config.analysisInitNumberOfTracksPerLayer = bstob((char*)value.c_str());
 			if (!config.analysisInitNumberOfTracksPerLayer)
 				config.analysisInitNumberOfTracksPerLayer = dstob(*((char*)value.c_str()));
 			commandID[idCmdAnalysisInitNumberOfTracksPerLayer] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisInitHitReadoutDistribution) == 0) {
+		if (!(commandID[idCmdAnalysisInitHitReadoutDistribution])) {
+			config.analysisInitHitReadoutDistribution = bstob((char*)value.c_str());
+			if (!config.analysisInitHitReadoutDistribution)
+				config.analysisInitHitReadoutDistribution = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisInitHitReadoutDistribution] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisInitReadoutColumnsInParallel) == 0) {
+		if (!(commandID[idCmdAnalysisInitReadoutColumnsInParallel])) {
+			config.analysisInitReadoutColumnsInParallel = bstob((char*)value.c_str());
+			if (!config.analysisInitReadoutColumnsInParallel)
+				config.analysisInitReadoutColumnsInParallel = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisInitReadoutColumnsInParallel] = true;
+			specifierFound = true;
+		}
+	}
+
+	return specifierFound;
+
+}
+
+/****************************************************************
+ * This method assigns the value to the corresponding parameter	*
+ * which is identified by a specifier.							*
+ ****************************************************************/
+
+bool inf::getPrelutRangeHeaderValue(std::string& specifier, std::string& value) {
+
+	bool specifierFound = false;
+	
+	if (specifier.compare(stringCmdAnalysisInitPrelutRangeForEachEvent) == 0) {
+		if (!(commandID[idCmdAnalysisInitPrelutRangeForEachEvent])) {
+			config.analysisInitPrelutRangeForEachEvent = bstob((char*)value.c_str());
+			if (!config.analysisInitPrelutRangeForEachEvent)
+				config.analysisInitPrelutRangeForEachEvent = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisInitPrelutRangeForEachEvent] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisInitWeightedPrelutRange) == 0) {
+		if (!(commandID[idCmdAnalysisInitWeightedPrelutRange])) {
+			config.analysisInitWeightedPrelutRange = bstob((char*)value.c_str());
+			if (!config.analysisInitWeightedPrelutRange)
+				config.analysisInitWeightedPrelutRange = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisInitWeightedPrelutRange] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisInitPrelutRangeDisplay) == 0) {
+		if (!(commandID[idCmdAnalysisInitPrelutRangeDisplay])) {
+			config.analysisInitPrelutRangeDisplay = bstob((char*)value.c_str());
+			if (!config.analysisInitPrelutRangeDisplay)
+				config.analysisInitPrelutRangeDisplay = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisInitPrelutRangeDisplay] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisInitPrelutRangeDisplayMode) == 0) {
+		if (!(commandID[idCmdAnalysisInitPrelutRangeDisplayMode])) {
+			config.analysisInitPrelutRangeDisplayMode = stous((char*)value.c_str(), 10);
+			commandID[idCmdAnalysisInitPrelutRangeDisplayMode] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisPrelutRangeStationDisplayMask) == 0) {
+		if (!(commandID[idCmdAnalysisPrelutRangeStationDisplayMask])) {
+			config.analysisPrelutRangeStationDisplayMask = bitArray(value);
+			commandID[idCmdAnalysisPrelutRangeStationDisplayMask] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisPrelutRangeStationSumDisplayMask) == 0) {
+		if (!(commandID[idCmdAnalysisPrelutRangeStationSumDisplayMask])) {
+			config.analysisPrelutRangeStationSumDisplayMask = bstob((char*)value.c_str());
+			if (!config.analysisPrelutRangeStationSumDisplayMask)
+				config.analysisPrelutRangeStationSumDisplayMask = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisPrelutRangeStationSumDisplayMask] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisPrelutRangeConstraintDisplayMask) == 0) {
+		if (!(commandID[idCmdAnalysisPrelutRangeConstraintDisplayMask])) {
+			config.analysisPrelutRangeConstraintDisplayMask = bitArray(value);
+			commandID[idCmdAnalysisPrelutRangeConstraintDisplayMask] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisPrelutRangeConstraintSumDisplayMask) == 0) {
+		if (!(commandID[idCmdAnalysisPrelutRangeConstraintSumDisplayMask])) {
+			config.analysisPrelutRangeConstraintSumDisplayMask = bstob((char*)value.c_str());
+			if (!config.analysisPrelutRangeConstraintSumDisplayMask)
+				config.analysisPrelutRangeConstraintSumDisplayMask = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisPrelutRangeConstraintSumDisplayMask] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisPrelutRangeRelativeDisplayMask) == 0) {
+		if (!(commandID[idCmdAnalysisPrelutRangeRelativeDisplayMask])) {
+			config.analysisPrelutRangeRelativeDisplayMask = bstob((char*)value.c_str());
+			if (!config.analysisPrelutRangeRelativeDisplayMask)
+				config.analysisPrelutRangeRelativeDisplayMask = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisPrelutRangeRelativeDisplayMask] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisInitPrelutRangeToRoot) == 0) {
+		if (!(commandID[idCmdAnalysisInitPrelutRangeToRoot])) {
+			config.analysisInitPrelutRangeToRoot = bstob((char*)value.c_str());
+			if (!config.analysisInitPrelutRangeToRoot)
+				config.analysisInitPrelutRangeToRoot = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisInitPrelutRangeToRoot] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisInitPercentageOfHitsForPrelutRange) == 0) {
+		if (!(commandID[idCmdAnalysisInitPercentageOfHitsForPrelutRange])) {
+			config.analysisInitPercentageOfHitsForPrelutRange = stous((char*)value.c_str(), 10);
+			if (config.analysisInitPercentageOfHitsForPrelutRange > 100)
+				config.analysisInitPercentageOfHitsForPrelutRange = 100;
+			commandID[idCmdAnalysisInitPercentageOfHitsForPrelutRange] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisPrelutRangeMinStart) == 0) {
+		if (!(commandID[idCmdAnalysisPrelutRangeMinStart])) {
+			config.analysisPrelutRangeMinStart = stod((char*)value.c_str());
+			commandID[idCmdAnalysisPrelutRangeMinStart] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisPrelutRangeMinStop) == 0) {
+		if (!(commandID[idCmdAnalysisPrelutRangeMinStop])) {
+			config.analysisPrelutRangeMinStop = stod((char*)value.c_str());
+			commandID[idCmdAnalysisPrelutRangeMinStop] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisPrelutRangeMinSteps) == 0) {
+		if (!(commandID[idCmdAnalysisPrelutRangeMinSteps])) {
+			config.analysisPrelutRangeMinSteps = stous((char*)value.c_str(), 10);
+			commandID[idCmdAnalysisPrelutRangeMinSteps] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisPrelutRangeMaxStart) == 0) {
+		if (!(commandID[idCmdAnalysisPrelutRangeMaxStart])) {
+			config.analysisPrelutRangeMaxStart = stod((char*)value.c_str());
+			commandID[idCmdAnalysisPrelutRangeMaxStart] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisPrelutRangeMaxStop) == 0) {
+		if (!(commandID[idCmdAnalysisPrelutRangeMaxStop])) {
+			config.analysisPrelutRangeMaxStop = stod((char*)value.c_str());
+			commandID[idCmdAnalysisPrelutRangeMaxStop] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisPrelutRangeMaxSteps) == 0) {
+		if (!(commandID[idCmdAnalysisPrelutRangeMaxSteps])) {
+			config.analysisPrelutRangeMaxSteps = stous((char*)value.c_str(), 10);
+			commandID[idCmdAnalysisPrelutRangeMaxSteps] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisChooseMainPrelutRange) == 0) {
+		if (!(commandID[idCmdAnalysisChooseMainPrelutRange])) {
+			config.analysisChooseMainPrelutRange = bstob((char*)value.c_str());
+			if (!config.analysisChooseMainPrelutRange)
+				config.analysisChooseMainPrelutRange = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisChooseMainPrelutRange] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisChooseConstraintPrelutRange) == 0) {
+		if (!(commandID[idCmdAnalysisChooseConstraintPrelutRange])) {
+			config.analysisChooseConstraintPrelutRange = bstob((char*)value.c_str());
+			if (!config.analysisChooseConstraintPrelutRange)
+				config.analysisChooseConstraintPrelutRange = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisChooseConstraintPrelutRange] = true;
 			specifierFound = true;
 		}
 	}
@@ -1501,12 +1815,47 @@ bool inf::getTotalAnalysisHeaderValue(std::string& specifier, std::string& value
 			specifierFound = true;
 		}
 	}
-	else if (specifier.compare(stringCmdAnalysisInitTotalAnalysisDisplay) == 0) {
-		if (!(commandID[idCmdAnalysisInitTotalAnalysisDisplay])) {
-			config.analysisInitTotalAnalysisDisplay = bstob((char*)value.c_str());
-			if (!config.analysisInitTotalAnalysisDisplay)
-				config.analysisInitTotalAnalysisDisplay = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitTotalAnalysisDisplay] = true;
+
+	return specifierFound;
+
+}
+
+/****************************************************************
+ * This method assigns the value to the corresponding parameter	*
+ * which is identified by a specifier.							*
+ ****************************************************************/
+
+bool inf::getCellAnalysisHeaderValue(std::string& specifier, std::string& value) {
+
+	bool specifierFound = false;
+	
+	if (specifier.compare(stringCmdAnalysisWriteCellFiles) == 0) {
+		if (!(commandID[idCmdAnalysisWriteCellFiles])) {
+			config.analysisWriteCellFiles = bstob((char*)value.c_str());
+			if (!config.analysisWriteCellFiles)
+				config.analysisWriteCellFiles = dstob(*((char*)value.c_str()));
+			commandID[idCmdAnalysisWriteCellFiles] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisHitCellFileName) == 0) {
+		if (!(commandID[idCmdAnalysisHitCellFileName])) {
+			config.analysisHitCellFileName = value;
+			commandID[idCmdAnalysisHitCellFileName] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisPrelutCellFileName) == 0) {
+		if (!(commandID[idCmdAnalysisPrelutCellFileName])) {
+			config.analysisPrelutCellFileName = value;
+			commandID[idCmdAnalysisPrelutCellFileName] = true;
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdAnalysisLutCellFileName) == 0) {
+		if (!(commandID[idCmdAnalysisLutCellFileName])) {
+			config.analysisLutCellFileName = value;
+			commandID[idCmdAnalysisLutCellFileName] = true;
 			specifierFound = true;
 		}
 	}
@@ -1592,9 +1941,10 @@ inf::inf(InfData& setup) : configuration() {
 	config.analysisThresholdForP                              = setup.analysisThresholdForP;
 	config.analysisInitConfiguration                          = setup.analysisInitConfiguration;
 	config.analysisInitDetector                               = setup.analysisInitDetector;
-	config.analysisInitMemory                                 = setup.analysisInitMemory;
 	config.analysisInitEvent                                  = setup.analysisInitEvent;
 	config.analysisInitClassPriority                          = setup.analysisInitClassPriority;
+	config.analysisInitMemory                                 = setup.analysisInitMemory;
+	config.analysisInitTime                                   = setup.analysisInitTime;
 	config.analysisInitQualityEFGCEventAbsolute               = setup.analysisInitQualityEFGCEventAbsolute;
 	config.analysisInitQualityEFGCEventRelative               = setup.analysisInitQualityEFGCEventRelative;
 	config.analysisInitQualityEFGCTotalAbsolute               = setup.analysisInitQualityEFGCTotalAbsolute;
@@ -1632,6 +1982,7 @@ inf::inf(InfData& setup) : configuration() {
 	config.analysisInitLutGoodness                            = setup.analysisInitLutGoodness;
 	config.analysisInitHoughTransformGoodness                 = setup.analysisInitHoughTransformGoodness;
 	config.analysisInitQuantizationGoodness                   = setup.analysisInitQuantizationGoodness;
+	config.analysisInitPeakDistanceGoodness                   = setup.analysisInitPeakDistanceGoodness;
 	config.analysisInitCreatedHistogramToRoot                 = setup.analysisInitCreatedHistogramToRoot;
 	config.analysisInitEncodedHistogramToRoot                 = setup.analysisInitEncodedHistogramToRoot;
 	config.analysisInitFilteredHistogramToRoot                = setup.analysisInitFilteredHistogramToRoot;
@@ -1643,9 +1994,32 @@ inf::inf(InfData& setup) : configuration() {
 	config.analysisInitFilteredHistogramToShow                = setup.analysisInitFilteredHistogramToShow;
 	config.analysisInitHistogramLayer                         = setup.analysisInitHistogramLayer;
 	config.analysisInitNumberOfTracksPerColumn                = setup.analysisInitNumberOfTracksPerColumn;
+	config.analysisInitNumberOfTracksPerRow                   = setup.analysisInitNumberOfTracksPerRow;
 	config.analysisInitNumberOfTracksPerLayer                 = setup.analysisInitNumberOfTracksPerLayer;
+	config.analysisInitHitReadoutDistribution                 = setup.analysisInitHitReadoutDistribution;
+	config.analysisInitReadoutColumnsInParallel               = setup.analysisInitReadoutColumnsInParallel;
+	config.analysisInitPrelutRangeForEachEvent                = setup.analysisInitPrelutRangeForEachEvent;
+	config.analysisInitWeightedPrelutRange                    = setup.analysisInitWeightedPrelutRange;
+	config.analysisInitPrelutRangeDisplay                     = setup.analysisInitPrelutRangeDisplay;
+	config.analysisPrelutRangeStationDisplayMask              = setup.analysisPrelutRangeStationDisplayMask;
+	config.analysisPrelutRangeStationSumDisplayMask           = setup.analysisPrelutRangeStationSumDisplayMask;
+	config.analysisPrelutRangeConstraintDisplayMask           = setup.analysisPrelutRangeConstraintDisplayMask;
+	config.analysisPrelutRangeConstraintSumDisplayMask        = setup.analysisPrelutRangeConstraintSumDisplayMask;
+	config.analysisInitPrelutRangeDisplayMode                 = setup.analysisInitPrelutRangeDisplayMode;
+	config.analysisPrelutRangeRelativeDisplayMask             = setup.analysisPrelutRangeRelativeDisplayMask;
+	config.analysisInitPrelutRangeToRoot                      = setup.analysisInitPrelutRangeToRoot;
+	config.analysisInitPercentageOfHitsForPrelutRange         = setup.analysisInitPercentageOfHitsForPrelutRange;
+	if (config.analysisInitPercentageOfHitsForPrelutRange > 100)
+		config.analysisInitPercentageOfHitsForPrelutRange = 100;
+	config.analysisPrelutRangeMinStart                        = setup.analysisPrelutRangeMinStart;
+	config.analysisPrelutRangeMinStop                         = setup.analysisPrelutRangeMinStop;
+	config.analysisPrelutRangeMinSteps                        = setup.analysisPrelutRangeMinSteps;
+	config.analysisPrelutRangeMaxStart                        = setup.analysisPrelutRangeMaxStart;
+	config.analysisPrelutRangeMaxStop                         = setup.analysisPrelutRangeMaxStop;
+	config.analysisPrelutRangeMaxSteps                        = setup.analysisPrelutRangeMaxSteps;
+	config.analysisChooseMainPrelutRange                      = setup.analysisChooseMainPrelutRange;
+	config.analysisChooseConstraintPrelutRange                = setup.analysisChooseConstraintPrelutRange;
 	config.analysisInitTotalAnalysis                          = setup.analysisInitTotalAnalysis;
-	config.analysisInitTotalAnalysisDisplay                   = setup.analysisInitTotalAnalysisDisplay;
 	config.analysisInitPercentageOfHitsInSignature            = setup.analysisInitPercentageOfHitsInSignature;
 	if (config.analysisInitPercentageOfHitsInSignature > 100)
 		config.analysisInitPercentageOfHitsInSignature = 100;
@@ -1654,6 +2028,12 @@ inf::inf(InfData& setup) : configuration() {
 		config.analysisInitPercentageOfTracksForSignature = 100;
 	config.analysisInitAnalysisResultWarnings                 = setup.analysisInitAnalysisResultWarnings;
 	config.analysisInitAnalysisResultDisplays                 = setup.analysisInitAnalysisResultDisplays;
+	config.analysisInitAnalysisMoreResultWarnings             = setup.analysisInitAnalysisMoreResultWarnings;
+	config.analysisInitAnalysisMoreResultDisplays             = setup.analysisInitAnalysisMoreResultDisplays;
+	config.analysisWriteCellFiles                             = setup.analysisWriteCellFiles;
+	config.analysisHitCellFileName                            = setup.analysisHitCellFileName;
+	config.analysisPrelutCellFileName                         = setup.analysisPrelutCellFileName;
+	config.analysisLutCellFileName                            = setup.analysisLutCellFileName;
 	config.initStatus                                         = setup.initStatus;
 /********************************************************/
 
@@ -1791,9 +2171,10 @@ void inf::setHeaderDefValues() {
 	config.analysisThresholdForP                              = defValAnalysisThresholdForP;
 	config.analysisInitConfiguration                          = defValAnalysisInitConfiguration;
 	config.analysisInitDetector                               = defValAnalysisInitDetector;
-	config.analysisInitMemory                                 = defValAnalysisInitMemory;
 	config.analysisInitEvent                                  = defValAnalysisInitEvent;
 	config.analysisInitClassPriority                          = defValAnalysisInitClassPriority;
+	config.analysisInitMemory                                 = defValAnalysisInitMemory;
+	config.analysisInitTime                                   = defValAnalysisInitTime;
 	config.analysisInitQualityEFGCEventAbsolute               = defValAnalysisInitQualityEFGCEventAbsolute;
 	config.analysisInitQualityEFGCEventRelative               = defValAnalysisInitQualityEFGCEventRelative;
 	config.analysisInitQualityEFGCTotalAbsolute               = defValAnalysisInitQualityEFGCTotalAbsolute;
@@ -1831,6 +2212,7 @@ void inf::setHeaderDefValues() {
 	config.analysisInitLutGoodness                            = defValAnalysisInitLutGoodness;
 	config.analysisInitHoughTransformGoodness                 = defValAnalysisInitHoughTransformGoodness;
 	config.analysisInitQuantizationGoodness                   = defValAnalysisInitQuantizationGoodness;
+	config.analysisInitPeakDistanceGoodness                   = defValAnalysisInitPeakDistanceGoodness;
 	config.analysisInitCreatedHistogramToRoot                 = defValAnalysisInitCreatedHistogramToRoot;
 	config.analysisInitEncodedHistogramToRoot                 = defValAnalysisInitEncodedHistogramToRoot;
 	config.analysisInitFilteredHistogramToRoot                = defValAnalysisInitFilteredHistogramToRoot;
@@ -1842,9 +2224,32 @@ void inf::setHeaderDefValues() {
 	config.analysisInitFilteredHistogramToShow                = defValAnalysisInitFilteredHistogramToShow;
 	config.analysisInitHistogramLayer                         = defValAnalysisInitHistogramLayer;
 	config.analysisInitNumberOfTracksPerColumn                = defValAnalysisInitNumberOfTracksPerColumn;
+	config.analysisInitNumberOfTracksPerRow                   = defValAnalysisInitNumberOfTracksPerRow;
 	config.analysisInitNumberOfTracksPerLayer                 = defValAnalysisInitNumberOfTracksPerLayer;
+	config.analysisInitHitReadoutDistribution                 = defValAnalysisInitHitReadoutDistribution;
+	config.analysisInitReadoutColumnsInParallel               = defValAnalysisInitReadoutColumnsInParallel;
+	config.analysisInitPrelutRangeForEachEvent                = defValAnalysisInitPrelutRangeForEachEvent;
+	config.analysisInitWeightedPrelutRange                    = defValAnalysisInitWeightedPrelutRange;
+	config.analysisInitPrelutRangeDisplay                     = defValAnalysisInitPrelutRangeDisplay;
+	config.analysisInitPrelutRangeDisplayMode                 = defValAnalysisInitPrelutRangeDisplayMode;
+	config.analysisPrelutRangeStationDisplayMask              = defValAnalysisPrelutRangeStationDisplayMask;
+	config.analysisPrelutRangeStationSumDisplayMask           = defValAnalysisPrelutRangeStationSumDisplayMask;
+	config.analysisPrelutRangeConstraintDisplayMask           = defValAnalysisPrelutRangeConstraintDisplayMask;
+	config.analysisPrelutRangeConstraintSumDisplayMask        = defValAnalysisPrelutRangeConstraintSumDisplayMask;
+	config.analysisPrelutRangeRelativeDisplayMask             = defValAnalysisPrelutRangeRelativeDisplayMask;
+	config.analysisInitPrelutRangeToRoot                      = defValAnalysisInitPrelutRangeToRoot;
+	config.analysisInitPercentageOfHitsForPrelutRange         = defValAnalysisInitPercentageOfHitsForPrelutRange;
+	if (config.analysisInitPercentageOfHitsForPrelutRange > 100)
+		config.analysisInitPercentageOfHitsForPrelutRange = 100;
+	config.analysisPrelutRangeMinStart                        = defValAnalysisPrelutRangeMinStart;
+	config.analysisPrelutRangeMinStop                         = defValAnalysisPrelutRangeMinStop;
+	config.analysisPrelutRangeMinSteps                        = defValAnalysisPrelutRangeMinSteps;
+	config.analysisPrelutRangeMaxStart                        = defValAnalysisPrelutRangeMaxStart;
+	config.analysisPrelutRangeMaxStop                         = defValAnalysisPrelutRangeMaxStop;
+	config.analysisPrelutRangeMaxSteps                        = defValAnalysisPrelutRangeMaxSteps;
+	config.analysisChooseMainPrelutRange                      = defValAnalysisChooseMainPrelutRange;
+	config.analysisChooseConstraintPrelutRange                = defValAnalysisChooseConstraintPrelutRange;
 	config.analysisInitTotalAnalysis                          = defValAnalysisInitTotalAnalysis;
-	config.analysisInitTotalAnalysisDisplay                   = defValAnalysisInitTotalAnalysisDisplay;
 	config.analysisInitPercentageOfHitsInSignature            = defValAnalysisInitPercentageOfHitsInSignature;
 	if (config.analysisInitPercentageOfHitsInSignature > 100)
 		config.analysisInitPercentageOfHitsInSignature = 100;
@@ -1853,6 +2258,12 @@ void inf::setHeaderDefValues() {
 		config.analysisInitPercentageOfTracksForSignature = 100;
 	config.analysisInitAnalysisResultWarnings                 = defValAnalysisInitAnalysisResultWarnings;
 	config.analysisInitAnalysisResultDisplays                 = defValAnalysisInitAnalysisResultDisplays;
+	config.analysisInitAnalysisMoreResultWarnings             = defValAnalysisInitAnalysisMoreResultWarnings;
+	config.analysisInitAnalysisMoreResultDisplays             = defValAnalysisInitAnalysisMoreResultDisplays;
+	config.analysisWriteCellFiles                             = defValAnalysisWriteCellFiles;
+	config.analysisHitCellFileName                            = defValAnalysisHitCellFileName;
+	config.analysisPrelutCellFileName                         = defValAnalysisPrelutCellFileName;
+	config.analysisLutCellFileName                            = defValAnalysisLutCellFileName;
 	config.initStatus                                         = defValInitStatus;
 	config.analysisOutputFileName                             = defValAnalysisOutputFileName;
 /********************************************************/
@@ -1891,7 +2302,11 @@ bool inf::getHeaderValue(std::string& specifier, std::string& value) {
 	if (!specifierFound)
 		specifierFound = getHardwareHeaderValue(specifier, value);
 	if (!specifierFound)
+		specifierFound = getPrelutRangeHeaderValue(specifier, value);
+	if (!specifierFound)
 		specifierFound = getTotalAnalysisHeaderValue(specifier, value);
+	if (!specifierFound)
+		specifierFound = getCellAnalysisHeaderValue(specifier, value);
 	if (!specifierFound) {
 		if (specifier.compare(stringCmdAnalysisOutputFileName) == 0) {
 			if (!(commandID[idCmdAnalysisOutputFileName])) {
@@ -1917,7 +2332,7 @@ void inf::writeFileHeader(std::ofstream& fileStream) {
 
 /********************************************************/
 /* make code changes for a different configuration here */
-	char buffer[200];
+	char buffer[300];
 	char conversionBuffer[intConversionDigits + 1];
 
 	writeComment(fileStream, "[PARAMETERS FOR THE INPUT OBJECT]");
@@ -2008,100 +2423,150 @@ void inf::writeFileHeader(std::ofstream& fileStream) {
 	strcat(buffer, conversionBuffer);
 	strcat(buffer, ":Use Formula)");
 
-	setHeaderValue(fileStream, stringCmdTrackfinderLutsVersion,                             config.trackfinderLutsVersion,                                    buffer);
-	setHeaderValue(fileStream, stringCmdTrackfinderPrelutFileName,                          config.trackfinderPrelutFileName,                                 "Name of the file which consists the prelut");
-	setHeaderValue(fileStream, stringCmdTrackfinderLutFileName,                             config.trackfinderLutFileName,                                    "Name of the file which consists the lut");
-	setHeaderValue(fileStream, stringCmdTrackfinderGammaMin,                                config.trackfinderGammaMin,                                       "Minimal gamma angle value for the hough transformation");
-	setHeaderValue(fileStream, stringCmdTrackfinderGammaMax,                                config.trackfinderGammaMax,                                       "Maximal gamma angle value for the hough transformation");
-	setHeaderValue(fileStream, stringCmdTrackfinderGammaStep,                               config.trackfinderGammaStep,                                      "Quantization steps for the gamma angle");
-	setHeaderValue(fileStream, stringCmdTrackfinderThetaMin,                                config.trackfinderThetaMin,                                       "Minimal theta angle value for the hough transformation");
-	setHeaderValue(fileStream, stringCmdTrackfinderThetaMax,                                config.trackfinderThetaMax,                                       "Maximal theta angle value for the hough transformation");
-	setHeaderValue(fileStream, stringCmdTrackfinderThetaStep,                               config.trackfinderThetaStep,                                      "Quantization steps for the theta angle");
-	setHeaderValue(fileStream, stringCmdTrackfinderPrelutRadiusMin,                         config.trackfinderPrelutRadiusMin,                                "Minimal PrelutRadius for the hough transformation");
-	setHeaderValue(fileStream, stringCmdTrackfinderPrelutRadiusMax,                         config.trackfinderPrelutRadiusMax,                                "Maximal PrelutRadius for the hough transformation");
-	setHeaderValue(fileStream, stringCmdTrackfinderLutRadiusMin,                            config.trackfinderLutRadiusMin,                                   "Minimal LutRadius for the hough transformation");
-	setHeaderValue(fileStream, stringCmdTrackfinderLutRadiusMax,                            config.trackfinderLutRadiusMax,                                   "Maximal LutRadius for the hough transformation");
-	setHeaderValue(fileStream, stringCmdTrackfinderLutRadiusStep,                           config.trackfinderLutRadiusStep,                                  "Quantization steps for the LutRadius");
-	setHeaderValue(fileStream, stringCmdTrackfinderMinClassCoding,                          config.trackfinderMinClassCoding,                                 "Minimal allowed classification in the coding table");
-	setHeaderValue(fileStream, stringCmdTrackfinderMinClassGradingP,                        config.trackfinderMinClassGradingP,                               "Minimal allowed classification in the gradingP table");
-	setHeaderValue(fileStream, stringCmdTrackfinderMinClassGradingR,                        config.trackfinderMinClassGradingR,                               "Minimal allowed classification in the gradingR table");
-	setHeaderValue(fileStream, stringCmdTrackfinderFirstFilterNeighborhoodDim1ClearRadius,  config.trackfinderFirstFilterNeighborhoodDim1ClearRadius,         "FirstFilter's Dim1-radius which is cleared around a peak");
-	setHeaderValue(fileStream, stringCmdTrackfinderFirstFilterNeighborhoodDim2ClearRadius,  config.trackfinderFirstFilterNeighborhoodDim2ClearRadius,         "FirstFilter's Dim2-radius which is cleared around a peak");
-	setHeaderValue(fileStream, stringCmdTrackfinderSecondFilterNeighborhoodDim1ClearRadius, config.trackfinderSecondFilterNeighborhoodDim1ClearRadius,        "SecondFilter's Dim1-radius which is cleared around a peak");
-	setHeaderValue(fileStream, stringCmdTrackfinderSecondFilterNeighborhoodDim2ClearRadius, config.trackfinderSecondFilterNeighborhoodDim2ClearRadius,        "SecondFilter's Dim2-radius which is cleared around a peak");
-	setHeaderValue(fileStream, stringCmdTrackfinderSecondFilterNeighborhoodDim3ClearRadius, config.trackfinderSecondFilterNeighborhoodDim3ClearRadius,        "SecondFilter's Dim3-radius which is cleared around a peak");
-	setHeaderValue(fileStream, stringCmdTrackfinderWriteTracksToFile,                       config.trackfinderWriteTracksToFile,                              "False if the output should be placed directly into the framework interface");
+	setHeaderValue(fileStream, stringCmdTrackfinderLutsVersion,                             config.trackfinderLutsVersion,                                      buffer);
+	setHeaderValue(fileStream, stringCmdTrackfinderPrelutFileName,                          config.trackfinderPrelutFileName,                                   "Name of the file which consists the prelut");
+	setHeaderValue(fileStream, stringCmdTrackfinderLutFileName,                             config.trackfinderLutFileName,                                      "Name of the file which consists the lut");
+	setHeaderValue(fileStream, stringCmdTrackfinderGammaMin,                                config.trackfinderGammaMin,                                         "Minimal gamma angle value for the hough transformation");
+	setHeaderValue(fileStream, stringCmdTrackfinderGammaMax,                                config.trackfinderGammaMax,                                         "Maximal gamma angle value for the hough transformation");
+	setHeaderValue(fileStream, stringCmdTrackfinderGammaStep,                               config.trackfinderGammaStep,                                        "Quantization steps for the gamma angle");
+	setHeaderValue(fileStream, stringCmdTrackfinderThetaMin,                                config.trackfinderThetaMin,                                         "Minimal theta angle value for the hough transformation");
+	setHeaderValue(fileStream, stringCmdTrackfinderThetaMax,                                config.trackfinderThetaMax,                                         "Maximal theta angle value for the hough transformation");
+	setHeaderValue(fileStream, stringCmdTrackfinderThetaStep,                               config.trackfinderThetaStep,                                        "Quantization steps for the theta angle");
+	setHeaderValue(fileStream, stringCmdTrackfinderPrelutRadiusMin,                         config.trackfinderPrelutRadiusMin,                                  "Minimal PrelutRadius for the hough transformation");
+	setHeaderValue(fileStream, stringCmdTrackfinderPrelutRadiusMax,                         config.trackfinderPrelutRadiusMax,                                  "Maximal PrelutRadius for the hough transformation");
+	setHeaderValue(fileStream, stringCmdTrackfinderLutRadiusMin,                            config.trackfinderLutRadiusMin,                                     "Minimal LutRadius for the hough transformation");
+	setHeaderValue(fileStream, stringCmdTrackfinderLutRadiusMax,                            config.trackfinderLutRadiusMax,                                     "Maximal LutRadius for the hough transformation");
+	setHeaderValue(fileStream, stringCmdTrackfinderLutRadiusStep,                           config.trackfinderLutRadiusStep,                                    "Quantization steps for the LutRadius");
+	setHeaderValue(fileStream, stringCmdTrackfinderMinClassCoding,                          config.trackfinderMinClassCoding,                                   "Minimal allowed classification in the coding table");
+	setHeaderValue(fileStream, stringCmdTrackfinderMinClassGradingP,                        config.trackfinderMinClassGradingP,                                 "Minimal allowed classification in the gradingP table");
+	setHeaderValue(fileStream, stringCmdTrackfinderMinClassGradingR,                        config.trackfinderMinClassGradingR,                                 "Minimal allowed classification in the gradingR table");
+	setHeaderValue(fileStream, stringCmdTrackfinderFirstFilterNeighborhoodDim1ClearRadius,  config.trackfinderFirstFilterNeighborhoodDim1ClearRadius,           "FirstFilter's Dim1-radius which is cleared around a peak");
+	setHeaderValue(fileStream, stringCmdTrackfinderFirstFilterNeighborhoodDim2ClearRadius,  config.trackfinderFirstFilterNeighborhoodDim2ClearRadius,           "FirstFilter's Dim2-radius which is cleared around a peak");
+	setHeaderValue(fileStream, stringCmdTrackfinderSecondFilterNeighborhoodDim1ClearRadius, config.trackfinderSecondFilterNeighborhoodDim1ClearRadius,          "SecondFilter's Dim1-radius which is cleared around a peak");
+	setHeaderValue(fileStream, stringCmdTrackfinderSecondFilterNeighborhoodDim2ClearRadius, config.trackfinderSecondFilterNeighborhoodDim2ClearRadius,          "SecondFilter's Dim2-radius which is cleared around a peak");
+	setHeaderValue(fileStream, stringCmdTrackfinderSecondFilterNeighborhoodDim3ClearRadius, config.trackfinderSecondFilterNeighborhoodDim3ClearRadius,          "SecondFilter's Dim3-radius which is cleared around a peak");
+	setHeaderValue(fileStream, stringCmdTrackfinderWriteTracksToFile,                       config.trackfinderWriteTracksToFile,                                "False if the output should be placed directly into the framework interface");
 
 	writeComment(fileStream, "");
 	writeComment(fileStream, "[PARAMETERS FOR THE ANALYSIS OBJECT]");
 
-	setHeaderValue(fileStream, stringCmdAnalysisOutputFileName,                             config.analysisOutputFileName,                                    "Filename of the file which consists of the analyis graphic output data");
-	setHeaderValue(fileStream, stringCmdAnalysisThresholdForP,                              config.analysisThresholdForP,                                     "Threshold for P to be a track");
-	setHeaderValue(fileStream, stringCmdAnalysisInitConfiguration,                          config.analysisInitConfiguration,                                 "Initialize analysis for the configuration");
-	setHeaderValue(fileStream, stringCmdAnalysisInitDetector,                               config.analysisInitDetector,                                      "Initialize analysis for the detector");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMemory,                                 config.analysisInitMemory,                                        "Initialize analysis for the memory");
-	setHeaderValue(fileStream, stringCmdAnalysisInitEvent,                                  config.analysisInitEvent,                                         "Initialize analysis for the event");
-	setHeaderValue(fileStream, stringCmdAnalysisInitClassPriority,                          config.analysisInitClassPriority,                                 "Initialize analysis for the classPriority");
-	setHeaderValue(fileStream, stringCmdAnalysisInitQualityEFGCEventAbsolute,               config.analysisInitQualityEFGCEventAbsolute,                      "Initialize analysis for the absolute EFGC-quality for the event");
-	setHeaderValue(fileStream, stringCmdAnalysisInitQualityEFGCEventRelative,               config.analysisInitQualityEFGCEventRelative,                      "Initialize analysis for the relative EFGC-quality for the event");
-	setHeaderValue(fileStream, stringCmdAnalysisInitQualityEFGCTotalAbsolute,               config.analysisInitQualityEFGCTotalAbsolute,                      "Initialize analysis for the absolute EFGC-quality for all events");
-	setHeaderValue(fileStream, stringCmdAnalysisInitQualityEFGCTotalRelative,               config.analysisInitQualityEFGCTotalRelative,                      "Initialize analysis for the relative EFGC-quality for all events");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumEFGCEventPzEFGC,                config.analysisInitMomentumEFGCEventPzEFGC,                       "Initialize analysis for the EFGC-Pz-quality for the event");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumEFGCEventPtEFGC,                config.analysisInitMomentumEFGCEventPtEFGC,                       "Initialize analysis for the EFGC-Pt-quality for the event");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumEFGCTotalPzEFGC,                config.analysisInitMomentumEFGCTotalPzEFGC,                       "Initialize analysis for the EFGC-Pz-quality for all events");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumEFGCTotalPtEFGC,                config.analysisInitMomentumEFGCTotalPtEFGC,                       "Initialize analysis for the EFGC-Pt-quality for all events");
-	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionEFGCNEvent12EFGCN,            config.analysisInitProjectionEFGCNEvent12EFGCN,                   "Initialize analysis for the EFGCN-12-quality for the event");
-	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionEFGCNEvent13EFGCN,            config.analysisInitProjectionEFGCNEvent13EFGCN,                   "Initialize analysis for the EFGCN-13-quality for the event");
-	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionEFGCNEvent32EFGCN,            config.analysisInitProjectionEFGCNEvent32EFGCN,                   "Initialize analysis for the EFGCN-32-quality for the event");
-	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionEFGCNTotal12EFGCN,            config.analysisInitProjectionEFGCNTotal12EFGCN,                   "Initialize analysis for the EFGCN-12-quality for all events");
-	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionEFGCNTotal13EFGCN,            config.analysisInitProjectionEFGCNTotal13EFGCN,                   "Initialize analysis for the EFGCN-13-quality for all events");
-	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionEFGCNTotal32EFGCN,            config.analysisInitProjectionEFGCNTotal32EFGCN,                   "Initialize analysis for the EFGCN-32-quality for all events");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumEvent,                          config.analysisInitMomentumEvent,                                 "Initialize analysis for the graphic quality for the event");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumTotal,                          config.analysisInitMomentumTotal,                                 "Initialize analysis for the graphic quality for all events");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumDisplay,                        config.analysisInitMomentumDisplay,                               "Initialize analysis for the graphic display");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumToRoot,                         config.analysisInitMomentumToRoot,                                "Initialize analysis for the graphic-to-root-file functionality");
-	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionEvent,                        config.analysisInitProjectionEvent,                               "Initialize analysis for the graphic quality for the event");
-	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionTotal,                        config.analysisInitProjectionTotal,                               "Initialize analysis for the graphic quality for all events");
-	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionDisplay,                      config.analysisInitProjectionDisplay,                             "Initialize analysis for the graphic display");
-	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionToRoot,                       config.analysisInitProjectionToRoot,                              "Initialize analysis for the graphic-to-root-file functionality");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldX,                           config.analysisInitMagnetfieldX,                                  "Initialize analysis for the magnetfield in the x dimension");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldY,                           config.analysisInitMagnetfieldY,                                  "Initialize analysis for the magnetfield in the y dimension");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldZ,                           config.analysisInitMagnetfieldZ,                                  "Initialize analysis for the magnetfield in the z dimension");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldDisplay,                     config.analysisInitMagnetfieldDisplay,                            "Initialize analysis for the magnetfield display");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldToRoot,                      config.analysisInitMagnetfieldToRoot,                             "Initialize analysis for the magnetfield-to-root-file functionality");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldConstantForEachEvent,        config.analysisInitMagnetfieldConstantForEachEvent,               "Initialize analysis for the magnetfield factors for each event");
-	setHeaderValue(fileStream, stringCmdAnalysisInitWeightedMagnetfieldConstant,            config.analysisInitWeightedMagnetfieldConstant,                   "Initialize analysis for the magnetfield factors to be weighted for the events");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldConstantDisplay,             config.analysisInitMagnetfieldConstantDisplay,                    "Initialize analysis for the magnetfield constant display");
-	setHeaderValue(fileStream, stringCmdAnalysisMagnetfieldConstantDisplayMask,             config.analysisMagnetfieldConstantDisplayMask.toString().c_str(), "Number which inhibits corresponding magnetfield constants from drawing");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldConstantToRoot,              config.analysisInitMagnetfieldConstantToRoot,                     "Initialize analysis for the magnetfield-constant-to-root-file functionality");
-	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldVSConstants,                 config.analysisInitMagnetfieldVSConstants,                        "Initialize analysis for the comparisson between the magnetfield and the constants");
-	setHeaderValue(fileStream, stringCmdAnalysisInitPrelutGoodness,                         config.analysisInitPrelutGoodness,                                "Initialize analysis for the prelut");
-	setHeaderValue(fileStream, stringCmdAnalysisInitLutGoodness,                            config.analysisInitLutGoodness,                                   "Initialize analysis for the lut");
-	setHeaderValue(fileStream, stringCmdAnalysisInitHoughTransformGoodness,                 config.analysisInitHoughTransformGoodness,                        "Initialize analysis for the Hough transform");
-	setHeaderValue(fileStream, stringCmdAnalysisInitQuantizationGoodness,                   config.analysisInitQuantizationGoodness,                          "Initialize analysis for the quantization");
-	setHeaderValue(fileStream, stringCmdAnalysisInitCreatedHistogramToRoot,                 config.analysisInitCreatedHistogramToRoot,                        "Initialize analysis for the created histogram");
-	setHeaderValue(fileStream, stringCmdAnalysisInitEncodedHistogramToRoot,                 config.analysisInitEncodedHistogramToRoot,                        "Initialize analysis for the encoded histogram");
-	setHeaderValue(fileStream, stringCmdAnalysisInitFilteredHistogramToRoot,                config.analysisInitFilteredHistogramToRoot,                       "Initialize analysis for the filtered histogram");
-	setHeaderValue(fileStream, stringCmdAnalysisInitJustOneCreatedHistogramToRoot,          config.analysisInitJustOneCreatedHistogramToRoot,                 "Initialize analysis for just one created histogram");
-	setHeaderValue(fileStream, stringCmdAnalysisInitJustOneEncodedHistogramToRoot,          config.analysisInitJustOneEncodedHistogramToRoot,                 "Initialize analysis for just one encoded histogram");
-	setHeaderValue(fileStream, stringCmdAnalysisInitJustOneFilteredHistogramToRoot,         config.analysisInitJustOneFilteredHistogramToRoot,                "Initialize analysis for just one filtered histogram");
-	setHeaderValue(fileStream, stringCmdAnalysisInitCreatedHistogramToShow,                 config.analysisInitCreatedHistogramToShow,                        "Initialize analysis for showing the created histogram");
-	setHeaderValue(fileStream, stringCmdAnalysisInitEncodedHistogramToShow,                 config.analysisInitEncodedHistogramToShow,                        "Initialize analysis for showing the encoded histogram");
-	setHeaderValue(fileStream, stringCmdAnalysisInitFilteredHistogramToShow,                config.analysisInitFilteredHistogramToShow,                       "Initialize analysis for showing the filtered histogram");
-	setHeaderValue(fileStream, stringCmdAnalysisInitHistogramLayer,                         config.analysisInitHistogramLayer,                                "Initialize the index of the layer to make just one histogram accessible for showing and/or writing");
-	setHeaderValue(fileStream, stringCmdAnalysisInitNumberOfTracksPerColumn,                config.analysisInitNumberOfTracksPerColumn,                       "Initialize analysis for evaluating the number of tracks per column in all histogram layers");
-	setHeaderValue(fileStream, stringCmdAnalysisInitNumberOfTracksPerLayer,                 config.analysisInitNumberOfTracksPerLayer,                        "Initialize analysis for evaluating the number of tracks per histogram layer");
-	setHeaderValue(fileStream, stringCmdAnalysisInitTotalAnalysis,                          config.analysisInitTotalAnalysis,                                 "Initialize the total analysis package");
-	setHeaderValue(fileStream, stringCmdAnalysisInitTotalAnalysisDisplay,                   config.analysisInitTotalAnalysisDisplay,                          "Initialize the total analysis display for the arrays");
-	setHeaderValue(fileStream, stringCmdAnalysisInitPercentageOfHitsInSignature,            config.analysisInitPercentageOfHitsInSignature,                   "Initialize the percentage of the number of hits which must be found to accept the signature");
-	setHeaderValue(fileStream, stringCmdAnalysisInitPercentageOfTracksForSignature,         config.analysisInitPercentageOfTracksForSignature,                "Initialize the percentage of the real tracks which must be found with the accepted signatures");
-	setHeaderValue(fileStream, stringCmdAnalysisInitAnalysisResultWarnings,                 config.analysisInitAnalysisResultWarnings,                        "Initialize the printing of the special analysis results to standard output");
-	setHeaderValue(fileStream, stringCmdAnalysisInitAnalysisResultDisplays,                 config.analysisInitAnalysisResultDisplays,                        "Initialize the displays of the special analysis results in graphical mode");
+	setHeaderValue(fileStream, stringCmdAnalysisOutputFileName,                             config.analysisOutputFileName,                                      "Filename of the file which consists of the analyis graphic output data");
+	setHeaderValue(fileStream, stringCmdAnalysisThresholdForP,                              config.analysisThresholdForP,                                       "Threshold for P to be a track");
+	setHeaderValue(fileStream, stringCmdAnalysisInitConfiguration,                          config.analysisInitConfiguration,                                   "Initialize analysis for the configuration");
+	setHeaderValue(fileStream, stringCmdAnalysisInitDetector,                               config.analysisInitDetector,                                        "Initialize analysis for the detector");
+	setHeaderValue(fileStream, stringCmdAnalysisInitEvent,                                  config.analysisInitEvent,                                           "Initialize analysis for the event");
+	setHeaderValue(fileStream, stringCmdAnalysisInitClassPriority,                          config.analysisInitClassPriority,                                   "Initialize analysis for the classPriority");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMemory,                                 config.analysisInitMemory,                                          "Initialize analysis for the memory");
+	setHeaderValue(fileStream, stringCmdAnalysisInitTime,                                   config.analysisInitTime,                                            "Initialize analysis for the time");
+	setHeaderValue(fileStream, stringCmdAnalysisInitQualityEFGCEventAbsolute,               config.analysisInitQualityEFGCEventAbsolute,                        "Initialize analysis for the absolute EFGC-quality for the event");
+	setHeaderValue(fileStream, stringCmdAnalysisInitQualityEFGCEventRelative,               config.analysisInitQualityEFGCEventRelative,                        "Initialize analysis for the relative EFGC-quality for the event");
+	setHeaderValue(fileStream, stringCmdAnalysisInitQualityEFGCTotalAbsolute,               config.analysisInitQualityEFGCTotalAbsolute,                        "Initialize analysis for the absolute EFGC-quality for all events");
+	setHeaderValue(fileStream, stringCmdAnalysisInitQualityEFGCTotalRelative,               config.analysisInitQualityEFGCTotalRelative,                        "Initialize analysis for the relative EFGC-quality for all events");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumEFGCEventPzEFGC,                config.analysisInitMomentumEFGCEventPzEFGC,                         "Initialize analysis for the EFGC-Pz-quality for the event");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumEFGCEventPtEFGC,                config.analysisInitMomentumEFGCEventPtEFGC,                         "Initialize analysis for the EFGC-Pt-quality for the event");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumEFGCTotalPzEFGC,                config.analysisInitMomentumEFGCTotalPzEFGC,                         "Initialize analysis for the EFGC-Pz-quality for all events");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumEFGCTotalPtEFGC,                config.analysisInitMomentumEFGCTotalPtEFGC,                         "Initialize analysis for the EFGC-Pt-quality for all events");
+	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionEFGCNEvent12EFGCN,            config.analysisInitProjectionEFGCNEvent12EFGCN,                     "Initialize analysis for the EFGCN-12-quality for the event");
+	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionEFGCNEvent13EFGCN,            config.analysisInitProjectionEFGCNEvent13EFGCN,                     "Initialize analysis for the EFGCN-13-quality for the event");
+	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionEFGCNEvent32EFGCN,            config.analysisInitProjectionEFGCNEvent32EFGCN,                     "Initialize analysis for the EFGCN-32-quality for the event");
+	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionEFGCNTotal12EFGCN,            config.analysisInitProjectionEFGCNTotal12EFGCN,                     "Initialize analysis for the EFGCN-12-quality for all events");
+	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionEFGCNTotal13EFGCN,            config.analysisInitProjectionEFGCNTotal13EFGCN,                     "Initialize analysis for the EFGCN-13-quality for all events");
+	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionEFGCNTotal32EFGCN,            config.analysisInitProjectionEFGCNTotal32EFGCN,                     "Initialize analysis for the EFGCN-32-quality for all events");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumEvent,                          config.analysisInitMomentumEvent,                                   "Initialize analysis for the graphic quality for the event");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumTotal,                          config.analysisInitMomentumTotal,                                   "Initialize analysis for the graphic quality for all events");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumDisplay,                        config.analysisInitMomentumDisplay,                                 "Initialize analysis for the graphic display");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMomentumToRoot,                         config.analysisInitMomentumToRoot,                                  "Initialize analysis for the graphic-to-root-file functionality");
+	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionEvent,                        config.analysisInitProjectionEvent,                                 "Initialize analysis for the graphic quality for the event");
+	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionTotal,                        config.analysisInitProjectionTotal,                                 "Initialize analysis for the graphic quality for all events");
+	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionDisplay,                      config.analysisInitProjectionDisplay,                               "Initialize analysis for the graphic display");
+	setHeaderValue(fileStream, stringCmdAnalysisInitProjectionToRoot,                       config.analysisInitProjectionToRoot,                                "Initialize analysis for the graphic-to-root-file functionality");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldX,                           config.analysisInitMagnetfieldX,                                    "Initialize analysis for the magnetfield in the x dimension");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldY,                           config.analysisInitMagnetfieldY,                                    "Initialize analysis for the magnetfield in the y dimension");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldZ,                           config.analysisInitMagnetfieldZ,                                    "Initialize analysis for the magnetfield in the z dimension");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldDisplay,                     config.analysisInitMagnetfieldDisplay,                              "Initialize analysis for the magnetfield display");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldToRoot,                      config.analysisInitMagnetfieldToRoot,                               "Initialize analysis for the magnetfield-to-root-file functionality");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldConstantForEachEvent,        config.analysisInitMagnetfieldConstantForEachEvent,                 "Initialize analysis for the magnetfield factors for each event");
+	setHeaderValue(fileStream, stringCmdAnalysisInitWeightedMagnetfieldConstant,            config.analysisInitWeightedMagnetfieldConstant,                     "Initialize analysis for the magnetfield factors to be weighted for the events");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldConstantDisplay,             config.analysisInitMagnetfieldConstantDisplay,                      "Initialize analysis for the magnetfield constant display");
+	setHeaderValue(fileStream, stringCmdAnalysisMagnetfieldConstantDisplayMask,             config.analysisMagnetfieldConstantDisplayMask.toString().c_str(),   "Number which inhibits corresponding magnetfield constants from drawing");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldConstantToRoot,              config.analysisInitMagnetfieldConstantToRoot,                       "Initialize analysis for the magnetfield-constant-to-root-file functionality");
+	setHeaderValue(fileStream, stringCmdAnalysisInitMagnetfieldVSConstants,                 config.analysisInitMagnetfieldVSConstants,                          "Initialize analysis for the comparisson between the magnetfield and the constants");
+	setHeaderValue(fileStream, stringCmdAnalysisInitPrelutGoodness,                         config.analysisInitPrelutGoodness,                                  "Initialize analysis for the prelut");
+	setHeaderValue(fileStream, stringCmdAnalysisInitLutGoodness,                            config.analysisInitLutGoodness,                                     "Initialize analysis for the lut");
+	setHeaderValue(fileStream, stringCmdAnalysisInitHoughTransformGoodness,                 config.analysisInitHoughTransformGoodness,                          "Initialize analysis for the Hough transform");
+	setHeaderValue(fileStream, stringCmdAnalysisInitQuantizationGoodness,                   config.analysisInitQuantizationGoodness,                            "Initialize analysis for the quantization");
+	setHeaderValue(fileStream, stringCmdAnalysisInitPeakDistanceGoodness,                   config.analysisInitPeakDistanceGoodness,                            "Initialize analysis for the peak distance");
+	setHeaderValue(fileStream, stringCmdAnalysisInitCreatedHistogramToRoot,                 config.analysisInitCreatedHistogramToRoot,                          "Initialize analysis for the created histogram");
+	setHeaderValue(fileStream, stringCmdAnalysisInitEncodedHistogramToRoot,                 config.analysisInitEncodedHistogramToRoot,                          "Initialize analysis for the encoded histogram");
+	setHeaderValue(fileStream, stringCmdAnalysisInitFilteredHistogramToRoot,                config.analysisInitFilteredHistogramToRoot,                         "Initialize analysis for the filtered histogram");
+	setHeaderValue(fileStream, stringCmdAnalysisInitJustOneCreatedHistogramToRoot,          config.analysisInitJustOneCreatedHistogramToRoot,                   "Initialize analysis for just one created histogram");
+	setHeaderValue(fileStream, stringCmdAnalysisInitJustOneEncodedHistogramToRoot,          config.analysisInitJustOneEncodedHistogramToRoot,                   "Initialize analysis for just one encoded histogram");
+	setHeaderValue(fileStream, stringCmdAnalysisInitJustOneFilteredHistogramToRoot,         config.analysisInitJustOneFilteredHistogramToRoot,                  "Initialize analysis for just one filtered histogram");
+	setHeaderValue(fileStream, stringCmdAnalysisInitCreatedHistogramToShow,                 config.analysisInitCreatedHistogramToShow,                          "Initialize analysis for showing the created histogram");
+	setHeaderValue(fileStream, stringCmdAnalysisInitEncodedHistogramToShow,                 config.analysisInitEncodedHistogramToShow,                          "Initialize analysis for showing the encoded histogram");
+	setHeaderValue(fileStream, stringCmdAnalysisInitFilteredHistogramToShow,                config.analysisInitFilteredHistogramToShow,                         "Initialize analysis for showing the filtered histogram");
+	setHeaderValue(fileStream, stringCmdAnalysisInitHistogramLayer,                         config.analysisInitHistogramLayer,                                  "Initialize the index of the layer to make just one histogram accessible for showing and/or writing");
+	setHeaderValue(fileStream, stringCmdAnalysisInitNumberOfTracksPerColumn,                config.analysisInitNumberOfTracksPerColumn,                         "Initialize analysis for evaluating the number of tracks per column in all histogram layers");
+	setHeaderValue(fileStream, stringCmdAnalysisInitNumberOfTracksPerRow,                   config.analysisInitNumberOfTracksPerRow,                            "Initialize analysis for evaluating the number of tracks per row in all histogram layers");
+	setHeaderValue(fileStream, stringCmdAnalysisInitNumberOfTracksPerLayer,                 config.analysisInitNumberOfTracksPerLayer,                          "Initialize analysis for evaluating the number of tracks per histogram layer");
+	setHeaderValue(fileStream, stringCmdAnalysisInitHitReadoutDistribution,                 config.analysisInitHitReadoutDistribution,                          "Initialize analysis for evaluating the distribution how often a hit must be read out of the memory and processed to build all histogram layers");
+	setHeaderValue(fileStream, stringCmdAnalysisInitReadoutColumnsInParallel,               config.analysisInitReadoutColumnsInParallel,                        "Initialize the readout modi of the histogram");
+	setHeaderValue(fileStream, stringCmdAnalysisInitPrelutRangeForEachEvent,                config.analysisInitPrelutRangeForEachEvent,                         "Initialize analysis for the prelut ranges for each event");
+	setHeaderValue(fileStream, stringCmdAnalysisInitWeightedPrelutRange,                    config.analysisInitWeightedPrelutRange,                             "Initialize analysis for the prelut ranges to be weighted for the events");
+	setHeaderValue(fileStream, stringCmdAnalysisInitPrelutRangeDisplay,                     config.analysisInitPrelutRangeDisplay,                              "Initialize the prelut range analysis display");
+
+	strcpy(buffer, "Mode of the prelut range analysis display -> (");
+	itos(CORRECTRELATIVEDISPLAYMODE, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":Correct layer relative, ");
+	itos(CUTCORRECTRELATIVEDISPLAYMODE, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":Correct layer relative and cut, ");
+	itos(NORMALCORRECTDISPLAYMODE, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":Correct layer, ");
+	itos(MAINRELATIVEDISPLAYMODE, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":Main layer relative, ");
+	itos(CUTMAINRELATIVEDISPLAYMODE, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":Main layer relative and cut, ");
+	itos(NORMALMAINDISPLAYMODE, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":Main layer)");
+
+	setHeaderValue(fileStream, stringCmdAnalysisInitPrelutRangeDisplayMode,                 config.analysisInitPrelutRangeDisplayMode,                          buffer);
+	setHeaderValue(fileStream, stringCmdAnalysisPrelutRangeStationDisplayMask,              config.analysisPrelutRangeStationDisplayMask.toString().c_str(),    "Number which inhibits prelut range displays for each station result from drawing");
+	setHeaderValue(fileStream, stringCmdAnalysisPrelutRangeStationSumDisplayMask,           config.analysisPrelutRangeStationSumDisplayMask,                    "Initialize the inhibition of the prelut range display for the station sum result from drawing");
+	setHeaderValue(fileStream, stringCmdAnalysisPrelutRangeConstraintDisplayMask,           config.analysisPrelutRangeConstraintDisplayMask.toString().c_str(), "Number which inhibits prelut range displays for each constraint result from drawing");
+	setHeaderValue(fileStream, stringCmdAnalysisPrelutRangeConstraintSumDisplayMask,        config.analysisPrelutRangeConstraintSumDisplayMask,                 "Initialize the inhibition of the prelut range display for the constraint sum result from drawing");
+	setHeaderValue(fileStream, stringCmdAnalysisPrelutRangeRelativeDisplayMask,             config.analysisPrelutRangeRelativeDisplayMask,                      "Initialize the inhibition of the prelut range display for the relative result from drawing");
+	setHeaderValue(fileStream, stringCmdAnalysisInitPrelutRangeToRoot,                      config.analysisInitPrelutRangeToRoot,                               "Initialize analysis for the prelut-range-to-root-file functionality");
+	setHeaderValue(fileStream, stringCmdAnalysisInitPercentageOfHitsForPrelutRange,         config.analysisInitPercentageOfHitsForPrelutRange,                  "Initialize the percentage of the number of hits which must be in the prelut range to be an acceptable range");
+	setHeaderValue(fileStream, stringCmdAnalysisPrelutRangeMinStart,                        config.analysisPrelutRangeMinStart,                                 "Minimal value for the minimum of the prelut range");
+	setHeaderValue(fileStream, stringCmdAnalysisPrelutRangeMinStop,                         config.analysisPrelutRangeMinStop,                                  "Maximal value for the minimum of the prelut range");
+	setHeaderValue(fileStream, stringCmdAnalysisPrelutRangeMinSteps,                        config.analysisPrelutRangeMinSteps,                                 "Stepwidth for the minimum prelut range");
+	setHeaderValue(fileStream, stringCmdAnalysisPrelutRangeMaxStart,                        config.analysisPrelutRangeMaxStart,                                 "Minimal value for the maximum of the prelut range");
+	setHeaderValue(fileStream, stringCmdAnalysisPrelutRangeMaxStop,                         config.analysisPrelutRangeMaxStop,                                  "Maximal value for the maximum of the prelut range");
+	setHeaderValue(fileStream, stringCmdAnalysisPrelutRangeMaxSteps,                        config.analysisPrelutRangeMaxSteps,                                 "Stepwidth for the maximum prelut range");
+	setHeaderValue(fileStream, stringCmdAnalysisChooseMainPrelutRange,                      config.analysisChooseMainPrelutRange,                               "Choose range of main or correct layer analysis");
+	setHeaderValue(fileStream, stringCmdAnalysisChooseConstraintPrelutRange,                config.analysisChooseConstraintPrelutRange,                         "Choose range with regard to constraint or just maximum");
+	setHeaderValue(fileStream, stringCmdAnalysisInitTotalAnalysis,                          config.analysisInitTotalAnalysis,                                   "Initialize the total analysis package");
+	setHeaderValue(fileStream, stringCmdAnalysisInitPercentageOfHitsInSignature,            config.analysisInitPercentageOfHitsInSignature,                     "Initialize the percentage of the number of hits which must be found to accept the signature");
+	setHeaderValue(fileStream, stringCmdAnalysisInitPercentageOfTracksForSignature,         config.analysisInitPercentageOfTracksForSignature,                  "Initialize the percentage of the real tracks which must be found with the accepted signatures");
+	setHeaderValue(fileStream, stringCmdAnalysisInitAnalysisResultWarnings,                 config.analysisInitAnalysisResultWarnings,                          "Initialize the printing of the special analysis results to standard output");
+	setHeaderValue(fileStream, stringCmdAnalysisInitAnalysisResultDisplays,                 config.analysisInitAnalysisResultDisplays,                          "Initialize the displays of the special analysis results in graphical mode");
+	setHeaderValue(fileStream, stringCmdAnalysisInitAnalysisMoreResultWarnings,             config.analysisInitAnalysisMoreResultWarnings,                      "Initialize the printing of the special analysis results to standard output");
+	setHeaderValue(fileStream, stringCmdAnalysisInitAnalysisMoreResultDisplays,             config.analysisInitAnalysisMoreResultDisplays,                      "Initialize the displays of the special analysis results in graphical mode");
+	setHeaderValue(fileStream, stringCmdAnalysisWriteCellFiles,                             config.analysisWriteCellFiles,                                      "Enables the production of the neccessary files for the CELL BE implementation simulation");
+	setHeaderValue(fileStream, stringCmdAnalysisHitCellFileName,                            config.analysisHitCellFileName,                                     "Name of the file containing the hits in a format which is used in the CELL BE simulation");
+	setHeaderValue(fileStream, stringCmdAnalysisPrelutCellFileName,                         config.analysisPrelutCellFileName,                                  "Name of the file containing the prelut in a format which is used in the CELL BE simulation");
+	setHeaderValue(fileStream, stringCmdAnalysisLutCellFileName,                            config.analysisLutCellFileName,                                     "Name of the file containing the lut in a format which is used in the CELL BE simulation");
 
 	writeComment(fileStream, "");
 	writeComment(fileStream, "[GLOBAL PARAMETERS]");
 
-	setHeaderValue(fileStream, stringCmdInitStatus,                                         config.initStatus,                                                "Initialize the status to be shown");
+	setHeaderValue(fileStream, stringCmdInitStatus,                                         config.initStatus,                                                  "Initialize the status to be shown");
 /********************************************************/
 
 }
@@ -2127,7 +2592,7 @@ std::string inf::getInfo() {
 
 /********************************************************/
 /* make code changes for a different information here	*/
-	message += "Setup for the Trackfinder Testbench:\n";
+	message += "Setup for the Hough tracking:\n";
 	message += "------------------------------------\n";
 	message += "CommandID";
 	message += "\t\t: ";
@@ -2409,14 +2874,19 @@ std::string inf::getInfo() {
 	btobs(config.analysisInitDetector, buffer);
 	message += buffer;
 	message += "\n";
+	message += stringCmdAnalysisInitEvent;
+	message += "\t\t\t\t: ";
+	btobs(config.analysisInitEvent, buffer);
+	message += buffer;
+	message += "\n";
 	message += stringCmdAnalysisInitMemory;
 	message += "\t\t\t\t: ";
 	btobs(config.analysisInitMemory, buffer);
 	message += buffer;
 	message += "\n";
-	message += stringCmdAnalysisInitEvent;
+	message += stringCmdAnalysisInitTime;
 	message += "\t\t\t\t: ";
-	btobs(config.analysisInitEvent, buffer);
+	btobs(config.analysisInitTime, buffer);
 	message += buffer;
 	message += "\n";
 	message += stringCmdAnalysisInitClassPriority;
@@ -2608,6 +3078,11 @@ std::string inf::getInfo() {
 	btobs(config.analysisInitQuantizationGoodness, buffer);
 	message += buffer;
 	message += "\n";
+	message += stringCmdAnalysisInitPeakDistanceGoodness;
+	message += "\t\t: ";
+	btobs(config.analysisInitPeakDistanceGoodness, buffer);
+	message += buffer;
+	message += "\n";
 	message += stringCmdAnalysisInitCreatedHistogramToRoot;
 	message += "\t\t: ";
 	btobs(config.analysisInitCreatedHistogramToRoot, buffer);
@@ -2663,19 +3138,122 @@ std::string inf::getInfo() {
 	btobs(config.analysisInitNumberOfTracksPerColumn, buffer);
 	message += buffer;
 	message += "\n";
+	message += stringCmdAnalysisInitNumberOfTracksPerRow;
+	message += "\t\t: ";
+	btobs(config.analysisInitNumberOfTracksPerRow, buffer);
+	message += buffer;
+	message += "\n";
 	message += stringCmdAnalysisInitNumberOfTracksPerLayer;
 	message += "\t\t: ";
 	btobs(config.analysisInitNumberOfTracksPerLayer, buffer);
 	message += buffer;
 	message += "\n";
+	message += stringCmdAnalysisInitHitReadoutDistribution;
+	message += "\t\t\t: ";
+	btobs(config.analysisInitHitReadoutDistribution, buffer);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisInitReadoutColumnsInParallel;
+	message += "\t: ";
+	btobs(config.analysisInitReadoutColumnsInParallel, buffer);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisInitPrelutRangeForEachEvent;
+	message += "\t\t\t: ";
+	btobs(config.analysisInitPrelutRangeForEachEvent, buffer);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisInitWeightedPrelutRange;
+	message += "\t\t\t: ";
+	btobs(config.analysisInitWeightedPrelutRange, buffer);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisInitPrelutRangeDisplay;
+	message += "\t\t\t: ";
+	btobs(config.analysisInitPrelutRangeDisplay, buffer);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisInitPrelutRangeDisplayMode;
+	message += "\t: ";
+	ustos(config.analysisInitPrelutRangeDisplayMode, buffer, 10, shortConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisPrelutRangeStationDisplayMask;
+	message += "\t\t: ";
+	message += config.analysisPrelutRangeStationDisplayMask.toString();
+	message += "\n";
+	message += stringCmdAnalysisPrelutRangeStationSumDisplayMask;
+	message += "\t\t\t: ";
+	btobs(config.analysisPrelutRangeStationSumDisplayMask, buffer);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisPrelutRangeConstraintDisplayMask;
+	message += "\t\t: ";
+	message += config.analysisPrelutRangeConstraintDisplayMask.toString();
+	message += "\n";
+	message += stringCmdAnalysisPrelutRangeConstraintSumDisplayMask;
+	message += "\t\t\t: ";
+	btobs(config.analysisPrelutRangeConstraintSumDisplayMask, buffer);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisPrelutRangeRelativeDisplayMask;
+	message += "\t\t\t: ";
+	btobs(config.analysisPrelutRangeRelativeDisplayMask, buffer);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisInitPrelutRangeToRoot;
+	message += "\t\t\t: ";
+	btobs(config.analysisInitPrelutRangeToRoot, buffer);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisInitPercentageOfHitsForPrelutRange;
+	message += "\t: ";
+	ustos(config.analysisInitPercentageOfHitsForPrelutRange, buffer, 10, shortConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisPrelutRangeMinStart;
+	message += "\t: ";
+	dtos(config.analysisPrelutRangeMinStart, buffer, doubleConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisPrelutRangeMinStop;
+	message += "\t: ";
+	dtos(config.analysisPrelutRangeMinStop, buffer, doubleConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisPrelutRangeMinSteps;
+	message += "\t: ";
+	ustos(config.analysisPrelutRangeMinSteps, buffer, 10, shortConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisPrelutRangeMaxStart;
+	message += "\t: ";
+	dtos(config.analysisPrelutRangeMaxStart, buffer, doubleConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisPrelutRangeMaxStop;
+	message += "\t: ";
+	dtos(config.analysisPrelutRangeMaxStop, buffer, doubleConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisPrelutRangeMaxSteps;
+	message += "\t: ";
+	ustos(config.analysisPrelutRangeMaxSteps, buffer, 10, shortConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisChooseMainPrelutRange;
+	message += "\t\t\t: ";
+	btobs(config.analysisChooseMainPrelutRange, buffer);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisChooseConstraintPrelutRange;
+	message += "\t\t\t: ";
+	btobs(config.analysisChooseConstraintPrelutRange, buffer);
+	message += buffer;
+	message += "\n";
 	message += stringCmdAnalysisInitTotalAnalysis;
 	message += "\t\t\t: ";
 	btobs(config.analysisInitTotalAnalysis, buffer);
-	message += buffer;
-	message += "\n";
-	message += stringCmdAnalysisInitTotalAnalysisDisplay;
-	message += "\t\t: ";
-	btobs(config.analysisInitTotalAnalysisDisplay, buffer);
 	message += buffer;
 	message += "\n";
 	message += stringCmdAnalysisInitPercentageOfHitsInSignature;
@@ -2697,6 +3275,33 @@ std::string inf::getInfo() {
 	message += "\t\t: ";
 	ultos(config.analysisInitAnalysisResultDisplays, buffer, 10, longConversionDigits);
 	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisInitAnalysisMoreResultWarnings;
+	message += "\t\t: ";
+	ultos(config.analysisInitAnalysisMoreResultWarnings, buffer, 10, longConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisInitAnalysisMoreResultDisplays;
+	message += "\t\t: ";
+	ultos(config.analysisInitAnalysisMoreResultDisplays, buffer, 10, longConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisWriteCellFiles;
+	message += "\t\t: ";
+	btobs(config.analysisWriteCellFiles, buffer);
+	message += buffer;
+	message += "\n";
+	message += stringCmdAnalysisHitCellFileName;
+	message += "\t\t: ";
+	message += config.analysisHitCellFileName;
+	message += "\n";
+	message += stringCmdAnalysisPrelutCellFileName;
+	message += "\t\t: ";
+	message += config.analysisPrelutCellFileName;
+	message += "\n";
+	message += stringCmdAnalysisLutCellFileName;
+	message += "\t\t: ";
+	message += config.analysisLutCellFileName;
 	message += "\n\n";
 	message += "[GLOBAL PARAMETERS]";
 	message += "\n";

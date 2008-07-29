@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-04-16 10:37:52 $
-// $Revision: 1.5 $
+// $Date: 2007-10-19 14:33:11 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -427,6 +427,134 @@ void trackfinderInputHit::setTrack(trackfinderInputTrack* actualTrack) {
 void trackfinderInputHit::setStation(trackfinderInputStation* actualStation) {
 
 	station = actualStation;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputHit::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(hit);
+	returnValue += sizeof(point);
+	returnValue += sizeof(track);
+	returnValue += sizeof(station);
+	returnValue += sizeof(isPointer);
+	returnValue += sizeof(hitIndex);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputHit::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	if (hit != NULL)
+		returnValue  = sizeof(*hit);
+	if (point != NULL)
+		returnValue += sizeof(*point);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputHit::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(hit);
+	if (hit != NULL)
+		returnValue  = sizeof(*hit);
+	returnValue += sizeof(point);
+	if (point != NULL)
+		returnValue += sizeof(*point);
+	returnValue += sizeof(track);
+	returnValue += sizeof(station);
+	returnValue += sizeof(isPointer);
+	returnValue += sizeof(hitIndex);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputHit::getReservedSizeOfAddOnData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(hit);
+	returnValue += sizeof(point);
+	returnValue += sizeof(track);
+	returnValue += sizeof(station);
+	returnValue += sizeof(isPointer);
+	returnValue += sizeof(hitIndex);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputHit::getAllocatedSizeOfAddOnData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double trackfinderInputHit::getUsedSizeOfAddOnData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(hit);
+	returnValue += sizeof(point);
+	returnValue += sizeof(track);
+	returnValue += sizeof(station);
+	returnValue += sizeof(isPointer);
+	returnValue += sizeof(hitIndex);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }
 

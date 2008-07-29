@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-04-26 12:50:07 $
-// $Revision: 1.3 $
+// $Date: 2007-10-19 14:32:13 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
@@ -33,9 +33,23 @@
 #define _VISUALANALYSIS_H
 
 
+#include "../../DataObjectLIB/include/trackMomentum.h"
+#include "../../DataObjectLIB/include/trackCoordinates.h"
+#include "../../MiscLIB/include/defs.h"
 #include "TGeoManager.h"
-#include "TVirtualGeoTrack.h"
+#include "TGeoTrack.h"
+#include "TCanvas.h"
 #include <string>
+
+
+typedef struct {
+
+	TGeoTrack*        track;
+	int*              hitIndex;
+	trackMomentum*    momentum;
+	trackCoordinates* coordinates;
+
+} visualTrackInformation;
 
 
 /* **************************************************************
@@ -43,6 +57,19 @@
  * **************************************************************/
 
 class visualAnalysis {
+
+protected:
+
+	TCanvas*                window;				/**< Object to handle the window for the display. */
+	visualTrackInformation* tracks;				/**< Object to store the track information. */
+	unsigned int            numberOfTracks;		/**< Variable to store the number of tracks in the array. */
+	visualTrackInformation* actualTrack;		/**< Pointer to the actual track. */
+
+/**
+ * This method initializes the global style for each display.
+ */
+
+	void initWindowStyle();
 
 public:
 
@@ -63,37 +90,57 @@ public:
  * @param name is the name identifier of the stations which have to be displayed. All others will be discarded.
  */
 
-	void setupDisplay(std::string name1 = "sts", std::string name2 = "cave", std::string name3 = "pipevac", std::string name4 = "");
+	void setupVolumeVisibility(std::string* volumes, unsigned short numberOfVolumes);
 
 /**
- * method removes all tracks from the TGeoManager
+ * method resets the object
  */
 
-	void removeTracks();
+	void reset();
 
 /**
- * method adds the track to the TGeoManager
+ * method sets the track for actual track
+ * @param index is the index of the track to be set for actual track
+ */
+
+	void setActualTrack(unsigned int index);
+
+/**
+ * method adds the track and sets it for actual track
+ * @param trackIndex is the index of the track which the hit corresponds to in reality
+ * @param px is the coordinate in the x-dimension
+ * @param py is the coordinate in the y-dimension
+ * @param pz is the coordinate in the z-dimension
+ * @param dim1 is the histogram coordinate in the first dimension
+ * @param dim2 is the histogram coordinate in the second dimension
+ * @param dim3 is the histogram coordinate in the third dimension
  * @param pdgCode is the particle identification code
- * @param trackIndex is the index for the track to be added
  */
 
-	void addCurrentTrack(int pdgCode = 2212, int trackIndex = -1);
+	void addActualTrack(int trackIndex = INVALIDTRACKINDEX, double px = 0, double py = 0, double pz = 0, int dim1 = -1, int dim2 = -1, int dim3 = -1, int pdgCode = 2212);
 
 /**
- * method adds a point to the current track in the TGeoManager
+ * method adds a point to the actual track
  * @param x is the coordinate in the x-dimension
  * @param y is the coordinate in the y-dimension
  * @param z is the coordinate in the z-dimension
  * @param time is the arrival time at the given coordinate (must be in rising order)
  */
 
-	void addPointToCurrentTrack(double x, double y, double z, double time = -1);
+	void addPointToActualTrack(double x, double y, double z, double time = -1, int hitIndex = -1);
 
 /**
- * method draws all tracks from the TGeoManager
+ * Method draws all tracks including the visible volumes.
+ * If no track is set, just the visible volumes would be drawn.
  */
 
-	void drawTracks();
+	void drawSetup(std::string name, std::string title, int trackIndex = INVALIDTRACKINDEX);
+
+/**
+ * Method converts all tracks into a string representation.
+ */
+
+	std::string toString(std::string title, int trackIndex = INVALIDTRACKINDEX);
 
 };
 

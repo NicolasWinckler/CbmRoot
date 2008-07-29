@@ -45,7 +45,7 @@
   TString anaFile      = outputFolder + "/" + system + "." + beam + "." + trigger + ".ana.root";
 
   // Digitisation file
-  TString digiFile     = "sts_standard.gsi.digi.par";
+  TString digiFile     = "sts_standard.digi.par";
 
   // Number of events to process
   Int_t nEvents        = 1;

@@ -18,25 +18,192 @@ ${ROOT_LIBRARY_DIR}
 
 link_directories( ${LINK_DIRECTORIES})
 
-set(SOURCES
-MiscLIB/src/conversionRoutines.cxx MiscLIB/src/errorHandling.cxx MiscLIB/src/globalWarningMsg.cxx MiscLIB/src/miscError.cxx MiscLIB/src/miscWarningMsg.cxx MiscLIB/src/terminal.cxx
-FileioLIB/src/configuration.cxx FileioLIB/src/fileio.cxx FileioLIB/src/fileioError.cxx FileioLIB/src/fileioWarningMsg.cxx FileioLIB/src/io.cxx
-DataObjectLIB/src/analyticFormula.cxx DataObjectLIB/src/bitfield.cxx DataObjectLIB/src/bytefield.cxx DataObjectLIB/src/dataObjectError.cxx DataObjectLIB/src/dataObjectWarningMsg.cxx DataObjectLIB/src/digitalHitAccessFile.cxx DataObjectLIB/src/digitalHit.cxx DataObjectLIB/src/histogramCellSignatures.cxx DataObjectLIB/src/histogramSpace.cxx DataObjectLIB/src/houghBorderCommand.cxx DataObjectLIB/src/houghBorderPosition.cxx DataObjectLIB/src/lutAccessFile.cxx DataObjectLIB/src/lutDefinition.cxx DataObjectLIB/src/lutHoughBorder.cxx DataObjectLIB/src/magneticFieldValue.cxx DataObjectLIB/src/peakToTrack.cxx DataObjectLIB/src/prelutAccessFile.cxx DataObjectLIB/src/prelutDefinition.cxx DataObjectLIB/src/prelutHoughBorder.cxx DataObjectLIB/src/table.cxx DataObjectLIB/src/tableEntry.cxx DataObjectLIB/src/tableFile.cxx DataObjectLIB/src/tableStringEntry.cxx DataObjectLIB/src/trackCoordinates.cxx DataObjectLIB/src/trackFrameworkMomentum.cxx DataObjectLIB/src/trackMomentum.cxx DataObjectLIB/src/trackParameter.cxx DataObjectLIB/src/trackToPeak.cxx
-DataRootObjectLIB/src/borderCell.cxx DataRootObjectLIB/src/dataRootObjectError.cxx DataRootObjectLIB/src/dataRootObjectWarningMsg.cxx DataRootObjectLIB/src/findableTrack.cxx DataRootObjectLIB/src/histogramCell.cxx DataRootObjectLIB/src/histogramData.cxx DataRootObjectLIB/src/inputHitSpecialArray.cxx DataRootObjectLIB/src/inputHitSpecialList.cxx DataRootObjectLIB/src/inputHitSpecialMem.cxx DataRootObjectLIB/src/inputHitStlList.cxx DataRootObjectLIB/src/inputHitStlMem.cxx DataRootObjectLIB/src/lutBorder.cxx DataRootObjectLIB/src/tables.cxx DataRootObjectLIB/src/trackAnalogInformation.cxx DataRootObjectLIB/src/trackData.cxx DataRootObjectLIB/src/trackDigitalInformation.cxx DataRootObjectLIB/src/trackfinderInputData.cxx DataRootObjectLIB/src/trackfinderInputDetector.cxx DataRootObjectLIB/src/trackfinderInputFMagneticField.cxx DataRootObjectLIB/src/trackfinderInputHit.cxx DataRootObjectLIB/src/trackfinderInputMagneticField.cxx DataRootObjectLIB/src/trackfinderInputStation.cxx DataRootObjectLIB/src/trackfinderInputTrack.cxx DataRootObjectLIB/src/trackfinderOutputData.cxx DataRootObjectLIB/src/trackHitMem.cxx DataRootObjectLIB/src/trackLayerAccess.cxx
-RootFrameworkLIB/src/frameworkError.cxx RootFrameworkLIB/src/hitProducer.cxx
-InputLIB/src/inputAscii.cxx InputLIB/src/inputData.cxx InputLIB/src/inputError.cxx InputLIB/src/inputFRoot.cxx InputLIB/src/inputRoot.cxx InputLIB/src/inputWarningMsg.cxx
-LutGeneratorLIB/src/digitalHitAccess.cxx LutGeneratorLIB/src/lutAccess.cxx LutGeneratorLIB/src/lut.cxx LutGeneratorLIB/src/lutGenerator.cxx LutGeneratorLIB/src/lutGeneratorError.cxx LutGeneratorLIB/src/lutGeneratorWarningMsg.cxx LutGeneratorLIB/src/lutImplementation.cxx LutGeneratorLIB/src/lutMath.cxx LutGeneratorLIB/src/prelutAccess.cxx LutGeneratorLIB/src/prelut.cxx LutGeneratorLIB/src/prelutMath.cxx
-HoughTransformationLIB/src/houghTransformation.cxx HoughTransformationLIB/src/houghTransformationError.cxx HoughTransformationLIB/src/houghTransformationWarningMsg.cxx
-HistogramTransformationLIB/src/eraser.cxx HistogramTransformationLIB/src/filterBasicComplex.cxx HistogramTransformationLIB/src/filterBasicComplexMod.cxx HistogramTransformationLIB/src/filterBasicNeutral.cxx HistogramTransformationLIB/src/filterBasicSimple.cxx HistogramTransformationLIB/src/filterBasicSimpleMod.cxx HistogramTransformationLIB/src/filterBasicSpecial.cxx HistogramTransformationLIB/src/filterBasicStyle.cxx HistogramTransformationLIB/src/filterDim12.cxx HistogramTransformationLIB/src/filterDim12Dim1.cxx HistogramTransformationLIB/src/filterDim1.cxx HistogramTransformationLIB/src/filterDim1Dim2.cxx HistogramTransformationLIB/src/filterDim1Dim2Mod.cxx HistogramTransformationLIB/src/filterDim2.cxx HistogramTransformationLIB/src/filterDim3.cxx HistogramTransformationLIB/src/filterDim3Mod.cxx HistogramTransformationLIB/src/filterDimX.cxx HistogramTransformationLIB/src/filterDimXDimX.cxx HistogramTransformationLIB/src/filterDimXDimXDimX.cxx HistogramTransformationLIB/src/filterDimZ.cxx HistogramTransformationLIB/src/filterDimZDimZ.cxx HistogramTransformationLIB/src/filterDimZDimZDimZ.cxx HistogramTransformationLIB/src/firstFilterFinal.cxx HistogramTransformationLIB/src/firstFilterFinalMod.cxx HistogramTransformationLIB/src/histogramTransformation.cxx HistogramTransformationLIB/src/histogramTransformationError.cxx HistogramTransformationLIB/src/maxMorphSearch.cxx HistogramTransformationLIB/src/secondFilterFinal.cxx HistogramTransformationLIB/src/secondFilterFinalMod.cxx
-TrackfinderLIB/src/trackfinder.cxx TrackfinderLIB/src/trackfinderError.cxx
-OutputResultLIB/src/outputFTrack.cxx OutputResultLIB/src/outputResultWarningMsg.cxx OutputResultLIB/src/outputSTrack.cxx OutputResultLIB/src/outputTrack.cxx
-AnalysisLIB/src/analysis.cxx AnalysisLIB/src/analysisError.cxx AnalysisLIB/src/analysisWarningMsg.cxx AnalysisLIB/src/hardwareAnalysis.cxx AnalysisLIB/src/histogramAnalysis.cxx AnalysisLIB/src/houghPictures.cxx AnalysisLIB/src/magnetfieldAnalysis.cxx AnalysisLIB/src/magnetfieldDirectionAnalysis.cxx AnalysisLIB/src/magnetfieldFactorAnalysis.cxx AnalysisLIB/src/magnetfieldXAnalysis.cxx AnalysisLIB/src/magnetfieldYAnalysis.cxx AnalysisLIB/src/magnetfieldZAnalysis.cxx AnalysisLIB/src/momentumAnalysis.cxx AnalysisLIB/src/momentumEFGCAnalysis.cxx AnalysisLIB/src/momentumEFGCEventPtAnalysis.cxx AnalysisLIB/src/momentumEFGCEventPzAnalysis.cxx AnalysisLIB/src/momentumEFGCTotalPtAnalysis.cxx AnalysisLIB/src/momentumEFGCTotalPzAnalysis.cxx AnalysisLIB/src/prelutRangeAnalysis.cxx AnalysisLIB/src/prelutRangeCorrectLayerAnalysis.cxx AnalysisLIB/src/prelutRangeLayerAnalysis.cxx AnalysisLIB/src/prelutRangeMainLayerAnalysis.cxx AnalysisLIB/src/projectionAnalysis.cxx AnalysisLIB/src/projectionEFGCNAnalysis.cxx AnalysisLIB/src/projectionEFGCNEvent12Analysis.cxx AnalysisLIB/src/projectionEFGCNEvent13Analysis.cxx AnalysisLIB/src/projectionEFGCNEvent32Analysis.cxx AnalysisLIB/src/projectionEFGCNTotal12Analysis.cxx AnalysisLIB/src/projectionEFGCNTotal13Analysis.cxx AnalysisLIB/src/projectionEFGCNTotal32Analysis.cxx AnalysisLIB/src/qualityAnalysis.cxx AnalysisLIB/src/qualityEFGCAnalysis.cxx AnalysisLIB/src/qualityEFGCEventAnalysis.cxx AnalysisLIB/src/qualityEFGCTotalAnalysis.cxx AnalysisLIB/src/showAnalysis.cxx AnalysisLIB/src/totalAnalysis.cxx AnalysisLIB/src/visualAnalysis.cxx
-CbmHoughStsTrackFinder/src/CbmHoughStsTrackFinder.cxx CbmHoughStsTrackFinder/src/inf.cxx
+set(RULECHECKER_SOURCES
+#MiscLIB/src/conversionRoutines.cxx 
+MiscLIB/src/errorHandling.cxx 
+MiscLIB/src/globalWarningMsg.cxx 
+MiscLIB/src/miscError.cxx 
+MiscLIB/src/miscWarningMsg.cxx 
+MiscLIB/src/terminal.cxx
+#FileioLIB/src/configuration.cxx 
+#FileioLIB/src/fileio.cxx 
+FileioLIB/src/fileioError.cxx 
+FileioLIB/src/fileioWarningMsg.cxx 
+#FileioLIB/src/io.cxx
+DataObjectLIB/src/analyticFormula.cxx 
+DataObjectLIB/src/bitfield.cxx 
+DataObjectLIB/src/bytefield.cxx 
+DataObjectLIB/src/dataObjectError.cxx 
+DataObjectLIB/src/dataObjectWarningMsg.cxx 
+#DataObjectLIB/src/digitalHitAccessFile.cxx 
+DataObjectLIB/src/digitalHit.cxx 
+DataObjectLIB/src/histogramCellSignatures.cxx 
+DataObjectLIB/src/histogramSpace.cxx 
+DataObjectLIB/src/houghBorderCommand.cxx 
+DataObjectLIB/src/houghBorderPosition.cxx 
+#DataObjectLIB/src/lutAccessFile.cxx 
+DataObjectLIB/src/lutDefinition.cxx 
+DataObjectLIB/src/lutHoughBorder.cxx 
+DataObjectLIB/src/magneticFieldValue.cxx 
+DataObjectLIB/src/peakToTrack.cxx 
+#DataObjectLIB/src/prelutAccessFile.cxx 
+DataObjectLIB/src/prelutDefinition.cxx 
+DataObjectLIB/src/prelutHoughBorder.cxx 
+#DataObjectLIB/src/table.cxx 
+DataObjectLIB/src/tableEntry.cxx 
+#DataObjectLIB/src/tableFile.cxx 
+DataObjectLIB/src/tableStringEntry.cxx 
+DataObjectLIB/src/trackCoordinates.cxx 
+DataObjectLIB/src/trackFrameworkMomentum.cxx 
+DataObjectLIB/src/trackMomentum.cxx 
+DataObjectLIB/src/trackParameter.cxx 
+DataObjectLIB/src/trackToPeak.cxx
+DataRootObjectLIB/src/borderCell.cxx 
+DataRootObjectLIB/src/dataRootObjectError.cxx 
+DataRootObjectLIB/src/dataRootObjectWarningMsg.cxx 
+DataRootObjectLIB/src/findableTrack.cxx 
+DataRootObjectLIB/src/histogramCell.cxx 
+DataRootObjectLIB/src/histogramData.cxx 
+DataRootObjectLIB/src/inputHitSpecialArray.cxx 
+DataRootObjectLIB/src/inputHitSpecialList.cxx 
+DataRootObjectLIB/src/inputHitSpecialMem.cxx 
+DataRootObjectLIB/src/inputHitStlList.cxx 
+DataRootObjectLIB/src/inputHitStlMem.cxx 
+DataRootObjectLIB/src/lutBorder.cxx 
+DataRootObjectLIB/src/tables.cxx 
+DataRootObjectLIB/src/trackAnalogInformation.cxx 
+DataRootObjectLIB/src/trackData.cxx 
+DataRootObjectLIB/src/trackDigitalInformation.cxx 
+DataRootObjectLIB/src/trackfinderInputData.cxx 
+DataRootObjectLIB/src/trackfinderInputDetector.cxx 
+DataRootObjectLIB/src/trackfinderInputFMagneticField.cxx 
+DataRootObjectLIB/src/trackfinderInputHit.cxx 
+DataRootObjectLIB/src/trackfinderInputMagneticField.cxx 
+DataRootObjectLIB/src/trackfinderInputStation.cxx 
+DataRootObjectLIB/src/trackfinderInputTrack.cxx 
+DataRootObjectLIB/src/trackfinderOutputData.cxx 
+DataRootObjectLIB/src/trackHitMem.cxx 
+DataRootObjectLIB/src/trackLayerAccess.cxx
+RootFrameworkLIB/src/frameworkError.cxx 
+RootFrameworkLIB/src/hitProducer.cxx
+InputLIB/src/inputAscii.cxx 
+InputLIB/src/inputData.cxx 
+InputLIB/src/inputError.cxx 
+InputLIB/src/inputFRoot.cxx 
+InputLIB/src/inputRoot.cxx 
+InputLIB/src/inputWarningMsg.cxx
+#LutGeneratorLIB/src/digitalHitAccess.cxx 
+#LutGeneratorLIB/src/lutAccess.cxx 
+LutGeneratorLIB/src/lut.cxx 
+LutGeneratorLIB/src/lutGenerator.cxx 
+LutGeneratorLIB/src/lutGeneratorError.cxx 
+LutGeneratorLIB/src/lutGeneratorWarningMsg.cxx 
+LutGeneratorLIB/src/lutImplementation.cxx 
+LutGeneratorLIB/src/lutMath.cxx 
+#LutGeneratorLIB/src/prelutAccess.cxx 
+LutGeneratorLIB/src/prelut.cxx 
+LutGeneratorLIB/src/prelutMath.cxx
+HoughTransformationLIB/src/houghTransformation.cxx 
+HoughTransformationLIB/src/houghTransformationError.cxx 
+HoughTransformationLIB/src/houghTransformationWarningMsg.cxx
+HistogramTransformationLIB/src/eraser.cxx 
+HistogramTransformationLIB/src/filterBasicComplex.cxx 
+HistogramTransformationLIB/src/filterBasicComplexMod.cxx 
+HistogramTransformationLIB/src/filterBasicNeutral.cxx 
+HistogramTransformationLIB/src/filterBasicSimple.cxx 
+HistogramTransformationLIB/src/filterBasicSimpleMod.cxx 
+HistogramTransformationLIB/src/filterBasicSpecial.cxx 
+HistogramTransformationLIB/src/filterBasicStyle.cxx 
+HistogramTransformationLIB/src/filterDim12.cxx 
+HistogramTransformationLIB/src/filterDim12Dim1.cxx 
+HistogramTransformationLIB/src/filterDim1.cxx 
+HistogramTransformationLIB/src/filterDim1Dim2.cxx 
+HistogramTransformationLIB/src/filterDim1Dim2Mod.cxx 
+HistogramTransformationLIB/src/filterDim2.cxx 
+HistogramTransformationLIB/src/filterDim3.cxx 
+HistogramTransformationLIB/src/filterDim3Mod.cxx 
+HistogramTransformationLIB/src/filterDimX.cxx 
+HistogramTransformationLIB/src/filterDimXDimX.cxx 
+HistogramTransformationLIB/src/filterDimXDimXDimX.cxx 
+HistogramTransformationLIB/src/filterDimZ.cxx 
+HistogramTransformationLIB/src/filterDimZDimZ.cxx 
+HistogramTransformationLIB/src/filterDimZDimZDimZ.cxx 
+HistogramTransformationLIB/src/firstFilterFinal.cxx 
+HistogramTransformationLIB/src/firstFilterFinalMod.cxx 
+HistogramTransformationLIB/src/histogramTransformation.cxx 
+HistogramTransformationLIB/src/histogramTransformationError.cxx 
+HistogramTransformationLIB/src/maxMorphSearch.cxx 
+HistogramTransformationLIB/src/secondFilterFinal.cxx 
+HistogramTransformationLIB/src/secondFilterFinalMod.cxx
+TrackfinderLIB/src/trackfinder.cxx 
+TrackfinderLIB/src/trackfinderError.cxx
+OutputResultLIB/src/outputFTrack.cxx 
+OutputResultLIB/src/outputResultWarningMsg.cxx 
+OutputResultLIB/src/outputSTrack.cxx 
+OutputResultLIB/src/outputTrack.cxx
+#AnalysisLIB/src/analysis.cxx 
+AnalysisLIB/src/analysisError.cxx 
+AnalysisLIB/src/analysisWarningMsg.cxx 
+AnalysisLIB/src/hardwareAnalysis.cxx 
+AnalysisLIB/src/histogramAnalysis.cxx 
+AnalysisLIB/src/houghPictures.cxx 
+AnalysisLIB/src/magnetfieldAnalysis.cxx 
+AnalysisLIB/src/magnetfieldDirectionAnalysis.cxx 
+AnalysisLIB/src/magnetfieldFactorAnalysis.cxx 
+AnalysisLIB/src/magnetfieldXAnalysis.cxx 
+AnalysisLIB/src/magnetfieldYAnalysis.cxx 
+AnalysisLIB/src/magnetfieldZAnalysis.cxx 
+AnalysisLIB/src/momentumAnalysis.cxx 
+AnalysisLIB/src/momentumEFGCAnalysis.cxx 
+AnalysisLIB/src/momentumEFGCEventPtAnalysis.cxx 
+AnalysisLIB/src/momentumEFGCEventPzAnalysis.cxx 
+AnalysisLIB/src/momentumEFGCTotalPtAnalysis.cxx 
+AnalysisLIB/src/momentumEFGCTotalPzAnalysis.cxx 
+AnalysisLIB/src/prelutRangeAnalysis.cxx 
+AnalysisLIB/src/prelutRangeCorrectLayerAnalysis.cxx 
+AnalysisLIB/src/prelutRangeLayerAnalysis.cxx 
+AnalysisLIB/src/prelutRangeMainLayerAnalysis.cxx 
+AnalysisLIB/src/projectionAnalysis.cxx 
+AnalysisLIB/src/projectionEFGCNAnalysis.cxx 
+AnalysisLIB/src/projectionEFGCNEvent12Analysis.cxx 
+AnalysisLIB/src/projectionEFGCNEvent13Analysis.cxx 
+AnalysisLIB/src/projectionEFGCNEvent32Analysis.cxx 
+AnalysisLIB/src/projectionEFGCNTotal12Analysis.cxx 
+AnalysisLIB/src/projectionEFGCNTotal13Analysis.cxx 
+AnalysisLIB/src/projectionEFGCNTotal32Analysis.cxx 
+AnalysisLIB/src/qualityAnalysis.cxx 
+AnalysisLIB/src/qualityEFGCAnalysis.cxx 
+AnalysisLIB/src/qualityEFGCEventAnalysis.cxx 
+AnalysisLIB/src/qualityEFGCTotalAnalysis.cxx 
+AnalysisLIB/src/showAnalysis.cxx 
+AnalysisLIB/src/totalAnalysis.cxx 
+AnalysisLIB/src/visualAnalysis.cxx
+#CbmHoughStsTrackFinder/src/CbmHoughStsTrackFinder.cxx 
+#CbmHoughStsTrackFinder/src/inf.cxx
 )
 
 if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${SOURCES}" "${INCLUDE_DIRECTORIES}" HTRACK_RULES "../include")
+  CHECK_RULES("${RULECHECKER_SOURCES}" "${INCLUDE_DIRECTORIES}" HTRACK_RULES "../include")
 endif(RULE_CHECKER_FOUND)
+
+set(SOURCES
+${RULECHECKER_SOURCES}
+MiscLIB/src/conversionRoutines.cxx 
+FileioLIB/src/configuration.cxx 
+FileioLIB/src/fileio.cxx 
+FileioLIB/src/io.cxx
+DataObjectLIB/src/digitalHitAccessFile.cxx 
+DataObjectLIB/src/lutAccessFile.cxx 
+DataObjectLIB/src/prelutAccessFile.cxx 
+DataObjectLIB/src/table.cxx 
+DataObjectLIB/src/tableFile.cxx 
+LutGeneratorLIB/src/digitalHitAccess.cxx 
+LutGeneratorLIB/src/lutAccess.cxx 
+LutGeneratorLIB/src/prelutAccess.cxx 
+AnalysisLIB/src/analysis.cxx 
+CbmHoughStsTrackFinder/src/CbmHoughStsTrackFinder.cxx 
+CbmHoughStsTrackFinder/src/inf.cxx
+)
 
 set(HEADERS
 MiscLIB/include/bitArray.h MiscLIB/include/conversionRoutines.h MiscLIB/include/coordinateSystem.h MiscLIB/include/defs.h MiscLIB/include/errorHandling.h MiscLIB/include/globalWarningMsg.h MiscLIB/include/hitArray.h MiscLIB/include/memoryDef.h MiscLIB/include/miscError.h MiscLIB/include/miscWarningMsg.h MiscLIB/include/projects.h MiscLIB/include/terminal.h

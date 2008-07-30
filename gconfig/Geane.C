@@ -25,16 +25,17 @@ void Config()
   gMC3->SetBREM(1);
   gMC3->SetMUNU(0);
   gMC3->SetCKOV(0);
-  gMC3->SetHADR(0);                                   // Select pure GEANH (HADR 1) or GEANH/NUCRIN (HADR 3) 4 fluka 5 gcalor
+  gMC3->SetHADR(0);         //Select pure GEANH (HADR 1) or GEANH/NUCRIN (HADR 3)//4 fluka 5 gcalor
   gMC3->SetLOSS(4);
-  gMC3->SetMULS(1); 	                              // 1=Moliere,3=Gaussian
+  gMC3->SetMULS(1); 	    //1=Moliere,3=Gaussian
   gMC3->SetRAYL(0);
   gMC3->SetSTRA(0);
 
-  gMC3->SetAUTO(0);                                   // Select automatic STMIN etc... calc. (AUTO 1) or manual (AUTO 0)
-  gMC3->SetABAN(0);                                   // Restore 3.16 behaviour for abandoned tracks
-  gMC3->SetOPTI(0);                                   // Select optimisation level for GEANT geometry searches (0,1,2)
+  gMC3->SetAUTO(1);         //Select automatic STMIN etc... calc. (AUTO 1) or manual (AUTO 0)
+  gMC3->SetABAN(0);         //Restore 3.16 behaviour for abandoned tracks
+  gMC3->SetOPTI(0);         //Select optimisation level for GEANT geometry searches (0,1,2)
   gMC3->SetERAN(5.e-7);
+
 
   // -------->>>>> PAY ATTENTION!!!!!
   // For a correct use of GEANE, you MUST use the cuts as set below!!!
@@ -49,15 +50,16 @@ void Config()
   Float_t usrcuts[5] = {0.,0.,0.,0.,0.};              // usercuts
   Float_t gcalpha = 0.999;                            // Optimal value for alpha 
 
-  cout << "Energy straggling area parameter from user set to: " << gcalpha << endl;
+
+  cout<<"Energy straggling area parameter from user set to: "<<gcalpha<<endl;
   if(gcalpha<0.9) 
     {
       gcalpha=0.9;
-      cout << "User alpha parameter too low: forced to 0.9" << endl;
+      cout<<"User alpha parameter too low: forced to 0.9"<<endl;
     }
     
   // set cuts here 
-  //            GAM     ELEC    NHAD    CHAD    MUON    EBREM  MUHAB  EDEL   MUDEL  MUPA    TOFMAX
+  //             GAM ELEC NHAD CHAD MUON EBREM MUHAB EDEL MUDEL MUPA TOFMAX
   gMC3->SetCUTS(cut,  		// CUTGAM = gammas
 	 	cut,   	        // CUTELE = electrons
 		cut,   	        // CUTNEU = neutral hadrons

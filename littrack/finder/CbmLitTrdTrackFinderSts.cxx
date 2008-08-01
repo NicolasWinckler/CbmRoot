@@ -9,13 +9,10 @@
 #include "CbmLitTrackFitterImp.h"
 #include "CbmLitTrackPropagatorImp.h"
 #include "CbmLitEnvironment.h"
-#include "CbmLitTrackSelection.h"
-#include "CbmLitTrackSelectionTrd.h"
-#include "CbmLitTrackSelectionEmpty.h"
 #include "CbmLitMemoryManagment.h"
+#include "CbmLitTrackSelection.h"
 #include "CbmLitConverter.h"
 #include "CbmLitToolFactory.h"
-#include "CbmLitTrackSelectionMuch.h"
 
 #include "CbmRootManager.h"
 
@@ -30,7 +27,6 @@ CbmLitTrdTrackFinderSts::CbmLitTrdTrackFinderSts()
 
 CbmLitTrdTrackFinderSts::~CbmLitTrdTrackFinderSts()
 {
-	//delete fTrackFinder;
 	delete fExtrapolatorToDet;
 	delete fPropagatorToDet;
 	delete fPropagator;
@@ -54,20 +50,10 @@ void CbmLitTrdTrackFinderSts::Init()
    
    fExtrapolatorToDet = new CbmLitRK4TrackExtrapolator();
    fPropagatorToDet = new CbmLitTrackPropagatorImp(fExtrapolatorToDet);   
-   fPropagatorToDet->Properties().SetProperty("fMass", 0.139);
-   fPropagatorToDet->Properties().SetProperty("fApplyEnergyLoss", true);
-   //fPropagatorToDet->Properties().SetProperty("fApplyElectronEnergyLoss", true);
-   fPropagatorToDet->Properties().SetProperty("fEnergyLoss", 0.00354);
-   fPropagatorToDet->Properties().SetProperty("fFms", 1.1);
    fPropagatorToDet->Initialize();
       
    fExtrapolator = new CbmLitLineTrackExtrapolator();
    fPropagator = new CbmLitTrackPropagatorImp(fExtrapolator);
-   fPropagator->Properties().SetProperty("fMass", 0.139);
-   fPropagator->Properties().SetProperty("fApplyEnergyLoss", true);
-   //fPropagator->Properties().SetProperty("fApplyElectronEnergyLoss", true);
-   fPropagator->Properties().SetProperty("fEnergyLoss", 0.00354);
-   fPropagator->Properties().SetProperty("fFms", 1.1);
    fPropagator->Initialize();
    
    fFilter = new CbmLitKalmanFilter();
@@ -75,50 +61,36 @@ void CbmLitTrdTrackFinderSts::Init()
    
    fFitter = new CbmLitTrackFitterImp(fPropagator, fFilter);
    fFitter->Initialize();
-   
-   //CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-   //fTrackSelectionStation = factory->CreateTrackSelection("Much");
- 
-   fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
-   
+      
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
    fTrackSeedSelection = factory->CreateTrackSelection("Momentum");
-   fTrackSeedSelection->Properties().SetProperty("fMinMomentum", 0.1);
+   fTrackSelectionStation = factory->CreateTrackSelection("TrdStation");
+   fTrackSelectionFinal = factory->CreateTrackSelection("TrdFinal");
    
-   //fTrackSelectionStation = new CbmLitTrackSelectionEmpty();    
-   fTrackSelectionStation = new CbmLitTrackSelectionTrd();
-   fTrackSelectionStation->Properties().SetProperty("fNofSharedHits", 2);
-   fTrackSelectionStation->Properties().SetProperty("fMinNofHits", 1);
-   fTrackSelectionStation->Properties().SetProperty("fMinLastPlaneId", 0);
-   fTrackSelectionStation->Initialize();
-      
-   fTrackSelectionFinal = new CbmLitTrackSelectionTrd();
-   fTrackSelectionFinal->Properties().SetProperty("fNofSharedHits", 2);
-   fTrackSelectionFinal->Properties().SetProperty("fMinNofHits", 1);
-   fTrackSelectionFinal->Properties().SetProperty("fMinLastPlaneId", fLayout.GetNofStations()-1);
-   fTrackSelectionFinal->Initialize();
-
-   CbmLitTrackFinderImp::SetDetectorLayout(fLayout);
-   CbmLitTrackFinderImp::SetPropagator(fPropagator);
-   CbmLitTrackFinderImp::SetFilter(fFilter); 
-   CbmLitTrackFinderImp::SetFitter(fFitter);    
-   CbmLitTrackFinderImp::SetTrackSeedSelection(fTrackSeedSelection);
-   CbmLitTrackFinderImp::SetTrackSelectionStation(fTrackSelectionStation);
-   CbmLitTrackFinderImp::SetTrackSelectionFinal(fTrackSelectionFinal);
-   CbmLitTrackFinderImp::SetVerbose(3);
-   CbmLitTrackFinderImp::SetNofIter(1); 
-   CbmLitTrackFinderImp::SetBeginStation(0); 
-   CbmLitTrackFinderImp::SetEndStation(fLayout.GetNofStations() - 1);
-   CbmLitTrackFinderImp::SetPrecalcSearchRegions(false); 
+   fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
+   
+   SetDetectorLayout(fLayout);
+   SetPropagator(fPropagator);
+   SetFilter(fFilter); 
+   SetFitter(fFitter);    
+   SetTrackSeedSelection(fTrackSeedSelection);
+   SetTrackSelectionStation(fTrackSelectionStation);
+   SetTrackSelectionFinal(fTrackSelectionFinal);
+   SetVerbose(3);
+   SetNofIter(1); 
+   SetBeginStation(0); 
+   SetEndStation(fLayout.GetNofStations() - 1);
+   SetPrecalcSearchRegions(false); 
+   SetPDG(211);
 }
 
 void CbmLitTrdTrackFinderSts::SetIterationParameters(Int_t iter)
 {
 	if (iter == 0) {
-		CbmLitTrackFinderImp::SetMaxNofMissingHitsInStation(0);
-		CbmLitTrackFinderImp::SetMaxNofMissingHits(0);
-		CbmLitTrackFinderImp::SetSigmaCoef(5.); 
-		CbmLitTrackFinderImp::SetApplyUpdateInLayer(true);
+		SetMaxNofMissingHitsInStation(1);
+		SetMaxNofMissingHits(1);
+		SetSigmaCoef(5.); 
+		SetApplyUpdateInLayer(true);
 	} 
 }
 
@@ -143,6 +115,8 @@ Int_t CbmLitTrdTrackFinderSts::DoFind(
 	foundTracks.clear();
 	hits.clear();
 	trackSeeds.clear();
+	
+	return trackArray->GetEntriesFast();
 }
 
 void CbmLitTrdTrackFinderSts::CreateTrackSeeds(
@@ -159,7 +133,7 @@ void CbmLitTrdTrackFinderSts::CreateTrackSeeds(
     Double_t Ze = fLayout.GetLayerZ(0);
     for (TrackIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {
        CbmLitTrackParam par = *(*iTrack)->GetParamLast();
-    	fPropagatorToDet->Propagate(&par, Ze);
+    	fPropagatorToDet->Propagate(&par, Ze, fPDG);
     	(*iTrack)->SetParamLast(&par);
        (*iTrack)->SetParamFirst((*iTrack)->GetParamLast());
        (*iTrack)->SetChi2( 0.0 );

@@ -1,4 +1,3 @@
- 
 // -------------------------------------------------------------------------
 // -----                  CbmLitRK4TrackExtrapolator header file               -----
 // -----                  Created 16/07/07  by A. Lebedev               -----
@@ -11,65 +10,64 @@
  ** 
  **/ 
 
-
-
-#ifndef CBMLITRK4TRACKEXTRAPOLATOR_H
-#define CBMLITRK4TRACKEXTRAPOLATOR_H
+#ifndef CBMLITRK4TRACKEXTRAPOLATOR_H_
+#define CBMLITRK4TRACKEXTRAPOLATOR_H_
 
 #include "CbmLitTrackExtrapolator.h"
 
 #include "CbmLitTrackParam.h"
 #include "CbmField.h"
 
-class CbmLitRK4TrackExtrapolator: public CbmLitTrackExtrapolator {
+#include <vector>
 
+class CbmLitRK4TrackExtrapolator: public CbmLitTrackExtrapolator {
 public:
-   
-   // constructor
    CbmLitRK4TrackExtrapolator();
-   
-   // distructor
    virtual ~CbmLitRK4TrackExtrapolator();
    
    // derived from CbmTool
    virtual LitStatus Initialize();
    virtual LitStatus Finalize();
    
-   // Extrapolation 
    virtual LitStatus Extrapolate( 
-		   const CbmLitTrackParam *pParamIn,
-           CbmLitTrackParam *pParamOut,
+		   const CbmLitTrackParam *parIn,
+           CbmLitTrackParam *parOut,
            Double_t zOut);
                                  
    virtual LitStatus Extrapolate( 
-		   CbmLitTrackParam *pParam, 
+		   CbmLitTrackParam *par, 
            Double_t zOut );
+   
+   virtual void TransportMatrix(
+		   std::vector<Double_t>& F);
+   virtual void TransportMatrix(
+		   TMatrixD& F);
    
 protected:
    
-   void RK4Order( Double_t zIn ,
-                  Double_t xIn[] ,
-                  Double_t zOut,
-                  Double_t xOut[],
-                  Double_t derivs[] );
-                  
-   void RK4Step( Double_t zIn,
-                 Double_t xIn[],
-                 Double_t zOut,
-                 Double_t cOut[],
-                 Double_t derivs[] );
+   void RK4Order(
+		   const std::vector<Double_t>& xIn,
+		   Double_t zIn,
+		   std::vector<Double_t>& xOut,
+           Double_t zOut,
+           std::vector<Double_t>& derivs) const;
    
-   void RK4Fast( Double_t zIn ,    
-                 Double_t xIn[],   
-                 Double_t zOut,    
-                 Double_t xOut[] );
-   
-   Double_t fStepSizeMin;
-   Double_t fAccError;
-   CbmField *fMagneticField;
+   Double_t CalcOut(
+   		Double_t in,
+   		const Double_t k[4]) const;
+  
+   void TransportC(
+   		const std::vector<Double_t>& cIn,
+   		const std::vector<Double_t>& F,
+   		std::vector<Double_t>& cOut) const;
+
+private:
+
+	std::vector<Double_t> fF;
+	CbmField *fMagneticField;
    
    ClassDef(CbmLitRK4TrackExtrapolator,1)
 }; 
 
-#endif //CbmLitRK4TrackExtrapolator
+#endif //CBMLITRK4TRACKEXTRAPOLATOR_H_
 

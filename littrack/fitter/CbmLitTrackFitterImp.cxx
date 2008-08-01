@@ -10,11 +10,12 @@
 
 CbmLitTrackFitterImp::CbmLitTrackFitterImp(
 		CbmLitTrackPropagator* propagator,
-		CbmLitTrackUpdate* update)
+		CbmLitTrackUpdate* update):
+	fDownstream(true)
 {
 	fPropagator = propagator;
 	fUpdate = update;
-	Properties().AddProperty("fDownstream", true);
+	//Properties().AddProperty("fDownstream", true);
 }
 
 CbmLitTrackFitterImp::~CbmLitTrackFitterImp()
@@ -35,13 +36,14 @@ LitStatus CbmLitTrackFitterImp::Finalize()
 LitStatus CbmLitTrackFitterImp::Fit(
 		CbmLitTrack *pTrack)
 {
-	Properties().GetProperty("fDownstream", fDownstream);
+//	Properties().GetProperty("fDownstream", fDownstream);
 
 	pTrack->SortHits(fDownstream);
 	pTrack->SetChi2(0.0);
 	Int_t nofHits = pTrack->GetNofHits();
-	std::vector<CbmLitTrackParam> params(nofHits);
+	std::vector<CbmLitFitNode> nodes(nofHits);
 	CbmLitTrackParam par;
+	TMatrixD F(5,5);
 	
 	if (fDownstream) {
 	    pTrack->SetParamLast(pTrack->GetParamFirst());
@@ -50,21 +52,29 @@ LitStatus CbmLitTrackFitterImp::Fit(
 		pTrack->SetParamFirst(pTrack->GetParamLast());
 		par = *pTrack->GetParamFirst();
 	}
-
 	for (Int_t i = 0; i < nofHits; i++) {                
 		const CbmLitHit* pHit = pTrack->GetHit(i);
 	    Double_t Ze = pHit->GetZ();
-	    if (fPropagator->Propagate(&par, Ze) == kLITERROR) return kLITERROR;
-	    if (fUpdate->Update(&par, pHit) == kLITERROR) return kLITERROR;
-	    params[i] = par;
+	    if (fPropagator->Propagate(&par, Ze, pTrack->GetPDG()) == kLITERROR) {
+	    	std::cout << "ERROR CbmLitTrackFitterImp::Fit propagation failed" << std::endl;
+	    	return kLITERROR;
+	    }
+	    nodes[i].SetPredictedParam(&par);
+	    fPropagator->TransportMatrix(F);
+	    nodes[i].SetF(F);
+	    if (fUpdate->Update(&par, pHit) == kLITERROR) {
+	    	std::cout << "ERROR CbmLitTrackFitterImp::Fit track update failed" << std::endl;
+	    	return kLITERROR;
+	    }
+	    nodes[i].SetUpdatedParam(&par);
 	    Double_t chi2Hit = CalcChi2(&par, pHit);
 	    pTrack->SetChi2(pTrack->GetChi2() + chi2Hit);  
 	}
 
 	if (fDownstream) pTrack->SetParamLast(&par);
 	else pTrack->SetParamFirst(&par);
-	
-	pTrack->SetParams(params);
+
+	pTrack->SetFitNodes(nodes);
 	
 	// TODO check NDF
 	if (nofHits > 2) pTrack->SetNDF( 2 * nofHits - 5);

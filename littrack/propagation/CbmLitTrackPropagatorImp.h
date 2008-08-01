@@ -11,29 +11,25 @@
  **
  **/ 
 
-
-
-#ifndef CBMLITTRACKPROPAGATOR_H
-#define CBMLITTRACKPROPAGATOR_H
-
+#ifndef CBMLITTRACKPROPAGATORIMP_H_
+#define CBMLITTRACKPROPAGATORIMP_H_
+   
 #include "CbmLitTrackPropagator.h"
-#include "CbmLitTrackExtrapolator.h"
-#include "CbmLitMaterial.h"
-
-#include "CbmField.h"
-#include "CbmLitTrackParam.h"
 
 #include <vector>
 
-class CbmLitTrackPropagatorImp: public CbmLitTrackPropagator {
+#include "TMatrixD.h"
 
+class CbmLitTrackExtrapolator;
+class CbmLitGeoNavigatorImp;
+class CbmLitTrackParam;
+class CbmLitMaterialEffectsImp;
+
+class CbmLitTrackPropagatorImp: public CbmLitTrackPropagator
+{
 public:
-   
-   // constructor
    //CbmLitTrackPropagatorImp();
    CbmLitTrackPropagatorImp(CbmLitTrackExtrapolator *extrapolator);
-   
-   // distructor
    virtual ~CbmLitTrackPropagatorImp();
    
    // derived from CbmTool
@@ -42,53 +38,49 @@ public:
    
    // Propagator
    virtual LitStatus Propagate(
-		   const CbmLitTrackParam *pParamIn,
-           CbmLitTrackParam *pParamOut,
-           Double_t zOut);
+		   const CbmLitTrackParam *parIn,
+           CbmLitTrackParam *parOut,
+           Double_t zOut,
+           Int_t pdg);
                                  
    virtual LitStatus Propagate( 
-		   CbmLitTrackParam *pParam, 
-           Double_t zOut );
+		   CbmLitTrackParam *par, 
+           Double_t zOut,
+           Int_t pdg);
+   
+   virtual void TransportMatrix(
+		   std::vector<Double_t>& F);
+   
+   virtual void TransportMatrix(
+		   TMatrixD& F);
+   
+   Bool_t IsCalcTransportMatrix() const {return fCalcTransportMatrix;}
+   void IsCalcTransportMatrix(Bool_t calcTransportMatrix) {fCalcTransportMatrix = calcTransportMatrix;}
                            
 protected:
- 
-   void AddThinScatter(
-			CbmLitTrackParam* par,
-	        CbmLitMaterial* mat);
+	
+   void UpdateF(
+			TMatrixD& F,
+			const TMatrixD& newF);
    
-   void AddThickScatter(
-			CbmLitTrackParam* par,
-	        CbmLitMaterial* mat);
-   
-   void AddEnergyLoss( 
-		   CbmLitTrackParam* pParam,
-           CbmLitMaterial* Material);
-                       
-   void AddElectronEnergyLoss(
-		   CbmLitTrackParam* pParam,
-           CbmLitMaterial* Material);
-   
-   Double_t CalcQpErr( 
-             const CbmLitTrackParam* par,
-             const CbmLitMaterial* mat);
+   Bool_t IsParCorrect(
+			const CbmLitTrackParam* par);
    
 private:
    
    CbmLitTrackExtrapolator *fExtrapolator;
+   CbmLitGeoNavigatorImp *fNavigator;
+   CbmLitMaterialEffectsImp *fMaterial;
+
+   TMatrixD fFm;
    
    Bool_t fDownstream;
+   Int_t fPDG;
    
-   Double_t fFms;
-   Double_t fMass;
-   Double_t fEnergyLoss;
-   Bool_t fApplyEnergyLoss; 
-   Bool_t fApplyElectronEnergyLoss;
+   Bool_t fCalcTransportMatrix;
    
-   std::vector<CbmLitMaterial*> fvAllMaterials;
-   
-   
-   ClassDef(CbmLitTrackPropagatorImp,1)
+   ClassDef(CbmLitTrackPropagatorImp,1);
 }; 
 
-#endif //CbmLitTrackPropagatorImp
+#endif //CBMLITTRACKPROPAGATORIMP_H_
 

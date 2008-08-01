@@ -22,6 +22,10 @@ public:
 	virtual LitStatus DoSelect(
 			TrackVector& tracks);
 	
+	Double_t GetMinMomentum() const {return fMinMomentum;}
+	
+	void SetMinMomentum(Double_t minMomentum) {fMinMomentum = minMomentum;}
+	
 private:
 	
 	Double_t fMinMomentum; // in GeV

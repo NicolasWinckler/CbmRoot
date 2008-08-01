@@ -11,9 +11,7 @@ class CbmLitTrackParam;
 
 class CbmLitTrackFitterImp : public CbmLitTrackFitter
 {
-	
 public:
-	
 	CbmLitTrackFitterImp(
 			CbmLitTrackPropagator* propagator,
 			CbmLitTrackUpdate* update);
@@ -25,6 +23,10 @@ public:
 	
 	virtual LitStatus Fit(
 			CbmLitTrack *pTrack);
+	
+	Bool_t IsDownstream() { return fDownstream;}
+	
+	void IsDownstream(Bool_t isDownstream) { fDownstream = isDownstream; }
 	
 private:
 	

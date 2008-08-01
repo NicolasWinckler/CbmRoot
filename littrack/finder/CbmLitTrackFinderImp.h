@@ -1,4 +1,3 @@
-
 #ifndef CBMLITTRACKFINDERIMP_H_
 #define CBMLITTRACKFINDERIMP_H_
 
@@ -20,7 +19,6 @@ class CbmLitTrackFitter;
 
 class CbmLitTrackFinderImp : public CbmLitTrackFinder
 {
-
 public:
 	
 	CbmLitTrackFinderImp();
@@ -70,6 +68,7 @@ public:
 	void SetSigmaY(const std::vector<Double_t>& sigmaY){
 	  	fSigmaY = sigmaY;
 	}
+	void SetPDG(Int_t pdg) { fPDG = pdg;}
 	
 protected:
 
@@ -105,6 +104,7 @@ protected:
     Double_t fSigmaCoef;
     Bool_t fPrecalcSearchRegions;  
     Bool_t fApplyUpdateInLayer;
+    Int_t fPDG;
         
     // used only for precalculated tables of deviations
     std::vector<Double_t> fSigmaX;

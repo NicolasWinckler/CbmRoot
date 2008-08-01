@@ -4,6 +4,8 @@
 #include "CbmLitTrack.h"
 #include "CbmLitComparators.h"
 
+#include <iostream>
+
 CbmLitRobustSelection::CbmLitRobustSelection(
 		CbmLitTrackFitter* robustFitter,
 		CbmLitTrackFitter* fitter)
@@ -32,7 +34,12 @@ LitStatus CbmLitRobustSelection::DoSelect(
 {
 	for(TrackIterator it = itBegin; it != itEnd; it++) {
 		if ((*it)->GetFlag() == 1) continue;
-		fRobustFitter->Fit(*it);
+		
+		LitStatus code = fRobustFitter->Fit(*it);
+		if (code == kLITERROR) {
+			(*it)->SetFlag(1);
+			continue;
+		}
 	
 		// find the hit with maximum weight, other hits will be removed
 		std::vector<HitIteratorPair> bounds = (*it)->GetHitBounds();
@@ -45,14 +52,24 @@ LitStatus CbmLitRobustSelection::DoSelect(
 			}
 			std::sort(bounds[i].first, bounds[i].second, CompareHitPtrWLess());
 			std::cout << "max weight=" << (*(bounds[i].second-1))->GetW() << std::endl;
-			newHits.push_back(**(bounds[i].second-1));
+			CbmLitHit* hit = (*(bounds[i].second-1));
+			if (!hit->IsOutlier()) newHits.push_back(*hit);
 		}
 		(*it)->ClearHits();
 		for (Int_t i = 0; i < newHits.size(); i++) {
 			(*it)->AddHit(&newHits[i]);
 		}
 		
-		fFitter->Fit(*it);
+		if ((*it)->GetNofHits() == 0) {
+			(*it)->SetFlag(1);
+			continue;
+		}
+		
+		code = fFitter->Fit(*it);
+		if (code == kLITERROR) {
+			(*it)->SetFlag(1);
+			continue;
+		}
 	}
 	
 	return kLITSUCCESS;

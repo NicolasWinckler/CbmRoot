@@ -22,6 +22,11 @@ public:
 	
 	virtual LitStatus DoSelect(
 			TrackVector& tracks);
+	
+	Int_t GetNofSharedHits() const {return fNofSharedHits;}
+	
+	void SetNofSharedHits(Int_t nofHits) {fNofSharedHits = nofHits;}
+	
 private:
 	
 	Int_t fNofSharedHits;

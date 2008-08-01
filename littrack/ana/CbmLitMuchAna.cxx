@@ -12,12 +12,12 @@
 #include "CbmLitTrackPropagatorImp.h"
 #include "CbmLitLineTrackExtrapolator.h"
 #include "CbmLitRK4TrackExtrapolator.h"
-#include "CbmLitParabolicTrackExtrapolator.h"
 #include "CbmTrackPropagatorGeane.h"
 #include "CbmLitConverter.h"
 #include "CbmLitTrack.h"
 #include "CbmLitTrackFitter.h"
 #include "CbmLitTrackFitterImp.h"
+#include "CbmLitKalmanSmoother.h"
 
 #include "CbmMuchHit.h"
 #include "CbmMuchTrack.h"
@@ -79,14 +79,11 @@ InitStatus CbmLitMuchAna::Init() {
    fMuchTracks = (TClonesArray*) ioman->GetObject("MuchTrack");
    if ( ! fMuchTracks ) Fatal("Init", "No trackArray!");
      
-//   fExtrapolator = new CbmLitRK4TrackExtrapolator();
-//   fExtrapolator->Initialize();
-//   fPropagator = new CbmLitTrackPropagatorImp(fExtrapolator);
-//   fPropagator->Properties().SetProperty("fMass",0.105);
-//   fPropagator->Properties().SetProperty("fApplyEnergyLoss", true);
-//   fPropagator->Properties().SetProperty("fEnergyLoss", 0.00354);
-//   fPropagator->Properties().SetProperty("fFms", 1.05);
-    fPropagator = new CbmTrackPropagatorGeane();
+   fExtrapolator = new CbmLitRK4TrackExtrapolator();
+   //fExtrapolator = new CbmLitLineTrackExtrapolator();
+   fExtrapolator->Initialize();
+   fPropagator = new CbmLitTrackPropagatorImp(fExtrapolator);
+   // fPropagator = new CbmTrackPropagatorGeane();
     fPropagator->Initialize();
      
    fFilter = new CbmLitKalmanFilter();
@@ -94,6 +91,7 @@ InitStatus CbmLitMuchAna::Init() {
    
    fFitter = new CbmLitTrackFitterImp(fPropagator, fFilter);
    
+   fSmoother = new CbmLitKalmanSmoother();
    
    fNofLayers = 10;
    CreateHistograms();
@@ -104,11 +102,6 @@ InitStatus CbmLitMuchAna::Init() {
 
 void CbmLitMuchAna::SetParContainers()
 {
-//    CbmRunAna* ana = CbmRunAna::Instance();
-//    CbmRuntimeDb* rtdb = ana->GetRuntimeDb();
-//
-//    rtdb->getContainer("CbmBaseParSet");
-//    rtdb->getContainer("CbmFieldPar");
 }
 
 void CbmLitMuchAna::Exec(Option_t* opt) 
@@ -145,10 +138,10 @@ void CbmLitMuchAna::Exec(Option_t* opt)
       CbmLitTrackParam par;
       //FillParam(points[0], &par);
       CbmLitConverter::TrackParamToLitTrackParam(&(*pTrack->GetMuchTrack()), &par);
-      
-      
+            
       track.SetParamFirst(&par);
       track.SetParamLast(&par);
+      track.SetPDG(13);
           
       std::vector<Double_t> res(5), pull(5);
       Double_t resp;
@@ -159,7 +152,7 @@ void CbmLitMuchAna::Exec(Option_t* opt)
       	//Int_t i = 9;
       
          Double_t zOut = track.GetHit(i)->GetZ(); 
-         if (fPropagator->Propagate(&par, zOut) == kLITERROR) continue;
+         if (fPropagator->Propagate(&par, zOut, 13) == kLITERROR) continue;
          //fFilter->Update(&par, track.GetHit(i));
          
          fh_srx[i]->Fill(par.GetX() - track.GetHit(i)->GetX());
@@ -182,8 +175,8 @@ void CbmLitMuchAna::Exec(Option_t* opt)
        	 fFilter->Update(&par, track.GetHit(i));
       }  
       
-	  fFitter->Properties().SetProperty("fDownstream", true);
-	  fFitter->Fit(&track);
+	  //fFitter->Properties().SetProperty("fDownstream", true);
+	  if (fFitter->Fit(&track) == kLITERROR) continue;
 	  CalcResAndPull(mcTrack, points[nofHits-1], track.GetParamLast(), res, pull, resp);
       fh_resx_last->Fill(res[0]);
       fh_resy_last->Fill(res[1]); 
@@ -196,28 +189,27 @@ void CbmLitMuchAna::Exec(Option_t* opt)
       fh_pulltx_last->Fill(pull[2]);
       fh_pullty_last->Fill(pull[3]);
       fh_pullqp_last->Fill(pull[4]);
-      	  
-	  fFitter->Properties().SetProperty("fDownstream", false);
-	  fFitter->Fit(&track);
-	  CalcResAndPull(mcTrack, points[0], track.GetParamFirst(), res, pull, resp);
-      fh_resx_first->Fill(res[0]);
-      fh_resy_first->Fill(res[1]); 
-      fh_restx_first->Fill(res[2]);
-      fh_resty_first->Fill(res[3]);
-      fh_resqp_first->Fill(res[4]);
-      fh_resp_first->Fill(resp);
-      fh_pullx_first->Fill(pull[0]);
-      fh_pully_first->Fill(pull[1]); 
-      fh_pulltx_first->Fill(pull[2]);
-      fh_pullty_first->Fill(pull[3]);
-      fh_pullqp_first->Fill(pull[4]);
+
+      //fFitter->Properties().SetProperty("fDownstream", false);
+	  //fFitter->Fit(&track);
+//      fSmoother->Fit(&track);
+//	  CalcResAndPull(mcTrack, points[0], track.GetParamFirst(), res, pull, resp);
+//      fh_resx_first->Fill(res[0]);
+//      fh_resy_first->Fill(res[1]); 
+//      fh_restx_first->Fill(res[2]);
+//      fh_resty_first->Fill(res[3]);
+//      fh_resqp_first->Fill(res[4]);
+//      fh_resp_first->Fill(resp);
+//      fh_pullx_first->Fill(pull[0]);
+//      fh_pully_first->Fill(pull[1]); 
+//      fh_pulltx_first->Fill(pull[2]);
+//      fh_pullty_first->Fill(pull[3]);
+//      fh_pullqp_first->Fill(pull[4]);
   }
             
   fEvents++;
   std::cout << "Event number: " << fEvents << std::endl;
   std::cout << "---------------------------------------------" << std::endl;
-
-
 }
 
 void CbmLitMuchAna::Finish()

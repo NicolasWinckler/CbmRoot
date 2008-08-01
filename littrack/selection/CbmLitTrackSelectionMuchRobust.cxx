@@ -42,9 +42,9 @@ LitStatus CbmLitTrackSelectionMuchRobust::DoSelect(
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
 	
-	fSelectionC->Properties().SetProperty("fNofSharedHits", 2);
-	fSelectionD->Properties().SetProperty("fMinNofHits", 1);
-	fSelectionD->Properties().SetProperty("fMinLastPlaneId", 9);	
+//	fSelectionC->Properties().SetProperty("fNofSharedHits", 2);
+//	fSelectionD->Properties().SetProperty("fMinNofHits", 1);
+//	fSelectionD->Properties().SetProperty("fMinLastPlaneId", 9);	
 	
 	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) 
 		(*iTrack)->SetFlag(0);

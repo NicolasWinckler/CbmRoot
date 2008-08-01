@@ -25,6 +25,11 @@ public:
 	Int_t GetNofLayers() { return fNofLayers; }
 	Int_t GetNofLayers(Int_t station) { return fNofLayersPerStation[station]; }
 	Double_t GetLayerZ(Int_t layer) { return fLayerZPos[layer]; }
+	Double_t GetLayerZ(Int_t station, Int_t layer) {
+		Int_t sum = 0;
+		for (Int_t i = 0; i < station; i++) sum += GetNofLayers(i);
+		return GetLayerZ(sum + layer);
+	}
 	
 	void Print();
 	

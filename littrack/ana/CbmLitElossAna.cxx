@@ -1,8 +1,8 @@
 #include "CbmLitElossAna.h"
 
-#include "CbmLitMaterial.h"
 #include "CbmLitTrackParam.h"
-#include "CbmLitEnvironment.h"
+#include "CbmLitMaterialInfo.h"
+#include "CbmLitMaterialEffectsImp.h"
 
 #include "CbmRootManager.h"
 #include "CbmMCTrack.h"
@@ -12,6 +12,8 @@
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TGeoManager.h"
+#include "TGeoPcon.h"
 
 #include <iostream>
 #include <vector>
@@ -38,43 +40,37 @@ InitStatus CbmLitElossAna::Init()
     fMCPointArray  = (TClonesArray*) ioman->GetObject("MuchPoint");
     if (!fMCPointArray) Fatal("Init", "No MuchPoint array!");
     
-    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-    fvMaterials = env->GetMaterialsSimple();
-    
     Int_t nBins = 200;
     Int_t nBinsMom = 100;
-    Double_t minEloss = 0;
+    Double_t minEloss = 0.;
     Double_t maxEloss = 1.;
-    Double_t minMom = 1.;
+    Double_t minMom = 0.1;
     Double_t maxMom = 10.;
     Double_t minErr = -0.25;
     Double_t maxErr = 0.25;
     
-    fh_dp_mc = new TH1F("fh_dp_mc", "mc_mom_in - mc_mom_out", nBins, minEloss, maxEloss);
+    fh_eloss_mc = new TH1F("fh_eloss_mc", "mc_mom_in - mc_mom_out", nBins, minEloss, maxEloss);
     fh_eloss_bb = new TH1F("fh_eloss_bb", "eloss_bb", nBins, minEloss, maxEloss);
-    fh_eloss_vl = new TH1F("fh_eloss_vl", "eloss_vl", nBins, minEloss, maxEloss);
-    fh_qp_err = new TH1F("fh_qp_err", "qp_out - mc_qp_out", nBins, minErr, maxErr);
+    fh_eloss_bb_simple = new TH1F("fh_eloss_bb_simple", "eloss_bb_simple", nBins, minEloss, maxEloss);
+    fh_eloss_mpv = new TH1F("fh_eloss_mpv", "eloss_mpv", nBins, minEloss, maxEloss);
+    fh_qp_err_mc = new TH1F("fh_qp_err_mc", "qp_out - mc_qp_out", nBins, minErr, maxErr);
     fh_qp_err_calc = new TH1F("fh_qp_err_calc", "qp_err_calc", nBins, minErr, maxErr);
-    fh_eloss_err = new TH1F("fh_eloss_err", "bb_eloss - mc_dp", nBins, minErr, maxErr);
-    fh_eloss_err_calc = new TH1F("fh_eloss_err_calc", "eloss_err_calc", nBins, minErr, maxErr);
     fh_pull_qp = new TH1F("fh_pull_qp", "pull_qp", nBins, -10, 10);
-    
-    fhm_dp_mc = new TH2F("fhm_dp_mc", "(mc_mom_in - mc_mom_out) vs. momentum",
-            nBins, minEloss, maxEloss, nBinsMom, minMom, maxMom);
+  
+    fhm_eloss_mc = new TH2F("fhm_eloss_mc", "(mc_mom_in - mc_mom_out) vs. momentum",
+            nBinsMom, minMom, maxMom, nBins, minEloss, maxEloss);
     fhm_eloss_bb = new TH2F("fhm_eloss_bb", "eloss_bb vs. momentum",
-            nBins, minEloss, maxEloss, nBinsMom, minMom, maxMom);
-    fhm_eloss_vl = new TH2F("fhm_eloss_vl", "eloss_vl vs. momentum",
-            nBins, minEloss, maxEloss, nBinsMom, minMom, maxMom);   
-    fhm_qp_err = new TH2F("fhm_qp_err", "(qp_out - mc_qp_out) vs. momentum",
-            nBins, minErr, maxErr, nBinsMom, minMom, maxMom);
+            nBinsMom, minMom, maxMom, nBins, minEloss, maxEloss);
+    fhm_eloss_bb_simple = new TH2F("fhm_eloss_bb_simple", "eloss_bb_simple vs. momentum",
+            nBinsMom, minMom, maxMom, nBins, minEloss, maxEloss);
+    fhm_eloss_mpv = new TH2F("fhm_eloss_mpv", "fhm_eloss_mpv vs. momentum",
+            nBinsMom, minMom, maxMom, nBins, minEloss, maxEloss);
+    fhm_qp_err_mc = new TH2F("fhm_qp_err_mc", "(qp_out - mc_qp_out) vs. momentum",
+            nBinsMom, minMom, maxMom, nBins, minErr, maxErr);
     fhm_qp_err_calc = new TH2F("fhm_qp_err_calc", "qp_err_calc vs. momentum",
-            nBins, minErr, maxErr, nBinsMom, minMom, maxMom);
-    fhm_eloss_err = new TH2F("fhm_eloss_err", "(bb_eloss - mc_dp) vs. momentum",
-            nBins, minErr, maxErr, nBinsMom, minMom, maxMom);
-    fhm_eloss_err_calc = new TH2F("fhm_eloss_err_calc", "eloss_err_calc vs. momentum",
-            nBins, minErr, maxErr, nBinsMom, minMom, maxMom);
+            nBinsMom, minMom, maxMom, nBins, minErr, maxErr);
     fhm_pull_qp = new TH2F("fhm_pull_qp", "pull_qp vs. momentum",
-            nBins, -10., 10., nBinsMom, minMom, maxMom);   
+            nBinsMom, minMom, maxMom, nBins, -10., 10.);       
     
     Double_t minTeta = 0.0;
     Double_t maxTeta = 0.1;
@@ -84,25 +80,33 @@ InitStatus CbmLitElossAna::Init()
             nBins, minTeta, maxTeta, nBinsMom, minMom, maxMom);
     fhm_teta_calc = new TH2F("fhm_teta_calc", "teta_calc vs. momentum",
             nBins, minTeta, maxTeta, nBinsMom, minMom, maxMom);
+     
+    
+    fMatEff = new CbmLitMaterialEffectsImp();
+    
+    GetGeometry();
+    fMaterial.Print();
     
     return kSUCCESS;
 }
 
 void CbmLitElossAna::SetParContainers()
 {
-
 }
 
 void CbmLitElossAna::Exec(Option_t* opt) 
 {
 	Double_t mass = 0.105;
+	Double_t Q;
 	
-	Int_t nofTracks = fMCTrackArray->GetEntriesFast();
-	
+	Int_t nofTracks = fMCTrackArray->GetEntriesFast();	
 	for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
         CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTrackArray->At(iTrack);
         Int_t motherId = mcTrack->GetMotherId();
         if (motherId != -1) continue;
+        if (mcTrack->GetPdgCode() == -13) Q = 1.;
+        else if (mcTrack->GetPdgCode() == 13) Q = -1.;
+        else continue;
        
         CbmMuchPoint* point = NULL;
         
@@ -116,6 +120,8 @@ void CbmLitElossAna::Exec(Option_t* opt)
         }
         if (point == NULL) continue;
         
+        std::cout << "length=" << point->GetLength() << std::endl;
+        
         TVector3 momIn, momOut;
         point->Momentum(momIn);
         point->MomentumOut(momOut);
@@ -123,219 +129,110 @@ void CbmLitElossAna::Exec(Option_t* opt)
         CbmLitTrackParam par;
         par.SetTx(point->GetPx()/point->GetPz());
         par.SetTy(point->GetPy()/point->GetPz());
-        par.SetQp(1./momIn.Mag());
-        
-        Double_t teta = CalcTeta(&par, fvMaterials[0]);
-        fh_teta_mc->Fill(momOut.Theta());
-        fh_teta_calc->Fill(teta);
-        fhm_teta_mc->Fill(momOut.Theta(), momIn.Mag());;
-        fhm_teta_calc->Fill(teta, momIn.Mag());
-
-        
-        
+        par.SetQp(Q/momIn.Mag());
+        par.Print();
+               
         Double_t dp = momIn.Mag() - momOut.Mag();
-        fh_dp_mc->Fill(dp);
-        fhm_dp_mc->Fill(dp, momIn.Mag());
-
+        fh_eloss_mc->Fill(dp);
+        fhm_eloss_mc->Fill(momIn.Mag(), dp);
         
-
-        CbmLitTrackParam parOut = par;
-        Double_t bbLoss = CalcBBLoss(&parOut, fvMaterials[0]);
+        Double_t bbLoss = CalcBBLoss(&par, &fMaterial);
         fh_eloss_bb->Fill(bbLoss);
-        fhm_eloss_bb->Fill(bbLoss, momIn.Mag());
+        fhm_eloss_bb->Fill(momIn.Mag(), bbLoss);
         
+        Double_t bbLossSimple = CalcBBLossSimple(&par, &fMaterial);
+        fh_eloss_bb_simple->Fill(bbLossSimple);
+        fhm_eloss_bb_simple->Fill(momIn.Mag(), bbLossSimple);
+        
+        Double_t mpvLoss = fMatEff->MPVEnergyLoss(&par, &fMaterial);
+        fh_eloss_mpv->Fill(mpvLoss);
+        fhm_eloss_mpv->Fill(momIn.Mag(), mpvLoss);
+                
+        Double_t qp_err_mc;
         if (momOut.Mag() != 0.) {
-        	fh_qp_err->Fill(fabs(1./momOut.Mag() - parOut.GetQp()));
-        	fhm_qp_err->Fill(fabs(1./momOut.Mag() - parOut.GetQp()), momIn.Mag());
+           	Double_t qp_out = fMatEff->CalcQpAfterEloss(par.GetQp(),bbLoss);        	   
+        	Double_t qp_out_mc = Q/momOut.Mag();
+        	qp_err_mc = std::abs(qp_out - qp_out_mc);
+        	fh_qp_err_mc->Fill(qp_err_mc);
+        	fhm_qp_err_mc->Fill(momIn.Mag(), qp_err_mc);
         }
         
-        Double_t vlLoss = CalcVLLoss(&par, fvMaterials[0]);
-        fh_eloss_vl->Fill(vlLoss);  
-        fhm_eloss_vl->Fill(vlLoss, momIn.Mag());  
-        
-        Double_t qpErr, eErr;
-        CalcErr(&par, fvMaterials[0], eErr, qpErr);
+        CbmLitTrackParam par1 = par;
+        par1.SetQp(fMatEff->CalcQpAfterEloss(par.GetQp(),bbLoss));
+        Double_t qpErr = CalcSigmaQp(&par1, &fMaterial);
         fh_qp_err_calc->Fill(qpErr);
-        fhm_qp_err_calc->Fill(qpErr, momIn.Mag());
-        fh_eloss_err_calc->Fill(eErr);
-        fhm_eloss_err_calc->Fill(eErr, momIn.Mag());
-                
-    	fh_eloss_err->Fill(fabs(bbLoss - dp));
-    	fhm_eloss_err->Fill(fabs(bbLoss - dp), momIn.Mag());
+        fhm_qp_err_calc->Fill(momIn.Mag(), qpErr);
+    
+        Double_t pull = qp_err_mc / qpErr;
+        fh_pull_qp->Fill(pull);
+    	fhm_pull_qp->Fill(momIn.Mag(), pull); 
     	
-    	fh_pull_qp->Fill((1./momOut.Mag() - parOut.GetQp()) / qpErr);
-    	fhm_pull_qp->Fill((1./momOut.Mag() - parOut.GetQp()) / qpErr, momIn.Mag());
-       
-	}
+	} //loop over MC tracks
 	
 	std::cout << "Event no: " << fNEvents++ << std::endl;
 }
 
 void CbmLitElossAna::Finish()
 {
-	fh_dp_mc->Write();
+	fh_eloss_mc->Write();
 	fh_eloss_bb->Write();
-	fh_eloss_vl->Write();
-	fh_qp_err->Write();
+	fh_eloss_bb_simple->Write();
+	fh_eloss_mpv->Write();
+	fh_qp_err_mc->Write();
 	fh_qp_err_calc->Write();
-	fh_eloss_err->Write();
-	fh_eloss_err_calc->Write();
 	fh_pull_qp->Write();
-	
-	fhm_dp_mc->Write();
+		
+	fhm_eloss_mc->Write();
 	fhm_eloss_bb->Write();
-	fhm_eloss_vl->Write();
-	fhm_qp_err->Write();
+	fhm_eloss_bb_simple->Write();
+	fhm_eloss_mpv->Write();
+	fhm_qp_err_mc->Write();
 	fhm_qp_err_calc->Write();
-	fhm_eloss_err->Write();
-	fhm_eloss_err_calc->Write();
 	fhm_pull_qp->Write();
-	
+		
     fh_teta_mc->Write();
     fh_teta_calc->Write();
     fhm_teta_mc->Write();
-    fhm_teta_calc->Write();
-	
+    fhm_teta_calc->Write();	
+}
+
+void CbmLitElossAna::GetGeometry()
+{
+	TGeoNode* cave = gGeoManager->GetTopNode();
+	TObjArray* nodes = cave->GetNodes();
+	TGeoNode* node = (TGeoNode*) nodes->FindObject("muchstation01_0");
+	TGeoPcon* shape = (TGeoPcon*) node->GetVolume()->GetShape();
+	TGeoMaterial* mat = node->GetMedium()->GetMaterial();
+	fMaterial.SetRL(mat->GetRadLen());
+	fMaterial.SetRho(mat->GetDensity());
+	fMaterial.SetZ(mat->GetZ());
+	fMaterial.SetA(mat->GetA());
+	fMaterial.SetLength(2 * shape->GetDZ());
 }
 
 Double_t CbmLitElossAna::CalcBBLoss( 
-          CbmLitTrackParam* par,
-          CbmLitMaterial* mat)
+          const CbmLitTrackParam* par,
+          const CbmLitMaterialInfo* mat) const 
 {
-	Double_t fEnergyLoss = 0.00354;//0.00330;
-	Bool_t fDownstream = true;
-
-   // dE/dx energy loss (Bethe-Block)
-   Double_t tx = par->GetTx();
-   Double_t ty = par->GetTy();
-   Double_t p = 1. / par->GetQp();  
-   
-   Double_t norm = TMath::Sqrt(1 + tx * tx + ty * ty);
-   
-   Double_t bbLoss = mat->GetThickness() * norm * 
-                     mat->GetDensity() * fEnergyLoss * 
-                     mat->GetZeff() / mat->GetAeff();
-
-   //TODO bbEloss too big
-   
-   if (fDownstream) bbLoss *= -1.0;
-   
-   if (p > 0.) p += bbLoss;
-   else p -= bbLoss;
-   
-   if (p != 0) par->SetQp(1./p);
-   else par->SetQp(1./0.000001);
-	
-   return fabs(bbLoss);
+	Double_t length = mat->GetRho() * mat->GetLength();
+	Double_t bbLoss = fMatEff->BetheBloch(par, mat) * length;
+	return bbLoss;
 }
 
-Double_t CbmLitElossAna::CalcVLLoss( 
-          CbmLitTrackParam* par,
-          CbmLitMaterial* mat)
+Double_t CbmLitElossAna::CalcBBLossSimple( 
+          const CbmLitTrackParam* par,
+          const CbmLitMaterialInfo* mat) const 
 {
-   Double_t mass = 105.; //MeV
-   Double_t tx = par->GetTx();
-   Double_t ty = par->GetTy();
-   Double_t p = (1. / par->GetQp()) * 1e3;  // MeV
-	   
-   Double_t norm = std::sqrt(1 + tx * tx + ty * ty);
-   Double_t thick = mat->GetThickness() * norm;
-   
-   Double_t rl = mat->GetRadLength();
-   Double_t rho = mat->GetDensity();
-   Double_t Z = mat->GetZeff();
-   Double_t A = mat->GetAeff();
-   
-   Double_t I = 10 * Z * 10e-6; // MeV
-   
-   Double_t K = 0.307075; // MeV g^-1 cm^2
-   Double_t j = 0.200;
-   Double_t mcc = mass;
-   
-  // Double_t hwp = 28.816 * std::sqrt(rho*(Z/A)) * 1e-6; //MeV
-   
-   Double_t x = rho * thick;//rl;
-   
-   Double_t E = std::sqrt(mass * mass + p * p);
-   Double_t beta = p / E; 
-   Double_t betaSq = beta * beta;
-   Double_t gamma = E / mass;
-   Double_t gammaSq = gamma * gamma;
-   
-   Double_t ksi = (K/2.)*(Z/A)*(x/betaSq);
-   
-   Double_t eloss = ksi * (std::log(2*mcc*betaSq*gammaSq / I) + std::log(ksi/I) + j - betaSq);
-   
-   return eloss * 1e-3; //GeV
-   
+	Double_t length = mat->GetRho() * mat->GetLength();
+	Double_t bbLoss = fMatEff->BetheBlochSimple(mat) * length;
+	return bbLoss;
 }
 
-void CbmLitElossAna::CalcErr( 
-          CbmLitTrackParam* par,
-          CbmLitMaterial* mat,
-          Double_t& e_err,
-          Double_t& qp_err)
+Double_t CbmLitElossAna::CalcSigmaQp( 
+          const CbmLitTrackParam* par,
+          const CbmLitMaterialInfo* mat) const
 {
-		
-	    Double_t tx = par->GetTx();
-	    Double_t ty = par->GetTy();
-	    Double_t norm = std::sqrt(1 + tx * tx + ty * ty);
-		
-		Double_t P = (1. / par->GetQp()); // GeV    
-		Double_t XMASS = 0.105; // GeV          
-		Double_t E = std::sqrt(P * P + XMASS * XMASS);
-		Double_t Z = mat->GetZeff();
-		Double_t A = mat->GetAeff();
-		Double_t RHO = mat->GetDensity();
-		Double_t STEP = mat->GetThickness() * norm;
-		Double_t EMASS = 0.511 * 1e-3; // GeV
-		
-		// Calculate xi factor (KeV).
-		Double_t BETA = P/E;
-		Double_t GAMMA = E/XMASS;
-		Double_t XI = (153.5*Z*STEP*RHO)/(A*BETA*BETA);
-		
-		// Maximum energy transfer to atomic electron (KeV).
-		Double_t ETA = BETA*GAMMA;
-		Double_t ETASQ = ETA*ETA;
-		Double_t RATIO = EMASS/XMASS;
-		Double_t F1 = 2.*EMASS*ETASQ;
-		Double_t F2 = 1.+2.*RATIO*GAMMA+RATIO*RATIO;
-		Double_t EMAX = 1e6 * F1/F2;
-		       
-		Double_t DEDX2 = XI*EMAX*(1.-(BETA*BETA/2.))*1e-12;
-
-		Double_t SDEDX = (E*E*DEDX2) / std::pow(P, 6); 
-		
-		e_err = std::sqrt(fabs(DEDX2));
-		qp_err = std::sqrt(fabs(SDEDX));
-}
-
-Double_t CbmLitElossAna::CalcTeta(
-		CbmLitTrackParam* par,
-        CbmLitMaterial* mat)
-{
-   Double_t tx = par->GetTx();
-   Double_t ty = par->GetTy();
-   Double_t p = 1. / par->GetQp(); //GeV
-   Double_t norm = 1 + tx * tx + ty * ty;
-   
-   Double_t fMass = 0.105;
-   
-   Double_t E = std::sqrt(fMass * fMass + p * p);
-   Double_t beta = p / E;
-   
-   Double_t x = mat->GetThickness() * norm; //cm
-   Double_t X0 = mat->GetRadLength(); //cm
-   Double_t bcp = beta * p;
-   Double_t z = 1;
-   
-   Double_t fFms = 1.05;
-   
-   Double_t teta = fFms * 0.0136 * (1./bcp) * z * std::sqrt(x/X0) *
-   					(1. + 0.038 * std::log(x/X0));
-   
-   return teta;
+	return std::sqrt(fMatEff->CalcSigmaSqQp(par, mat));
 }
 
 ClassImp(CbmLitElossAna)

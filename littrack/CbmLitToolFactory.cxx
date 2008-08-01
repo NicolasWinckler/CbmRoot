@@ -16,6 +16,7 @@
 #include "CbmLitTrackSelectionMuchRobust.h"
 #include "CbmLitRobustSelection.h"
 #include "CbmLitKalmanFilter.h"
+#include "CbmLitKalmanSmoother.h"
 #include "CbmLitTrackFitterImp.h"
 #include "CbmLitTrackFitterRobust.h"
 #include "CbmLitEnvironment.h"
@@ -49,15 +50,11 @@ CbmLitTrackPropagator* CbmLitToolFactory::CreateTrackPropagator(const std::strin
 	CbmLitTrackPropagator* propagator = NULL;
 	if(name == "Much") {
 		//TODO delete extrapolator!!!!
-	   CbmLitTrackExtrapolator* extrapolator = new CbmLitRK4TrackExtrapolator();
+	   CbmLitRK4TrackExtrapolator* extrapolator = new CbmLitRK4TrackExtrapolator();
 	   extrapolator->Initialize();
-	   propagator = new CbmLitTrackPropagatorImp(extrapolator);
-	   propagator->Properties().SetProperty("fMass",0.105);
-	   propagator->Properties().SetProperty("fApplyEnergyLoss", true);
-	   propagator->Properties().SetProperty("fEnergyLoss", 0.00354);
-	   propagator->Properties().SetProperty("fFms", 1.05);
-	   propagator->Initialize();
-	   return propagator;
+	   CbmLitTrackPropagatorImp* litpropagator = new CbmLitTrackPropagatorImp(extrapolator);
+	   litpropagator->Initialize();
+	   return litpropagator;
 	} else 
 	if(name == "Trd") {
 	
@@ -86,6 +83,7 @@ CbmLitTrackFitter* CbmLitToolFactory::CreateTrackFitter(const std::string& name)
 	if(name == "Much") {
 		//TODO delete propagator and update after use
 		CbmLitTrackPropagator* propagator = CreateTrackPropagator("Much");
+		((CbmLitTrackPropagatorImp*) propagator)->IsCalcTransportMatrix(true);
 		CbmLitTrackUpdate* update = CreateTrackUpdate("Much");
 		fitter = new CbmLitTrackFitterImp(propagator, update);
 	    return fitter;
@@ -93,7 +91,9 @@ CbmLitTrackFitter* CbmLitToolFactory::CreateTrackFitter(const std::string& name)
 	if(name == "MuchRobust") {
 		//TODO delete propagator and update and fitter after use
 		CbmLitTrackFitter* fitterImp = CreateTrackFitter("Much");
-		fitter = new CbmLitTrackFitterRobust(fitterImp);
+		CbmLitTrackFitter* smoother = new CbmLitKalmanSmoother();
+		
+		fitter = new CbmLitTrackFitterRobust(fitterImp, smoother);
 		return fitter;
 	} else
 	if(name == "Trd") {
@@ -117,9 +117,10 @@ CbmLitTrackSelection* CbmLitToolFactory::CreateTrackSelection(const std::string&
 		return selection;
 	} else
 	if(name == "Momentum") {
-		selection = new CbmLitTrackSelectionMomentum();
-		selection->Initialize();
-		return selection;
+		CbmLitTrackSelectionMomentum* momSelection = new CbmLitTrackSelectionMomentum();
+		momSelection->SetMinMomentum(0.1);
+		momSelection->Initialize();
+		return momSelection;
 	} else
 	if (name == "MuchRobustSelection") {
 		CbmLitTrackFitter* robustFitter = CreateTrackFitter("MuchRobust");
@@ -134,19 +135,32 @@ CbmLitTrackSelection* CbmLitToolFactory::CreateTrackSelection(const std::string&
 		return selection;
 	} else 
 	if(name == "Much") {
-		selection = new CbmLitTrackSelectionMuch();
-		selection->Properties().SetProperty("fNofSharedHits", 2);
-		selection->Properties().SetProperty("fMinNofHits", 1);
+		CbmLitTrackSelectionMuch* muchSelection = new CbmLitTrackSelectionMuch();
+		muchSelection->SetNofSharedHits(2);
+		muchSelection->SetMinNofHits(1);
 		Int_t nofStations = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofStations();
-		selection->Properties().SetProperty("fMinLastPlaneId", nofStations-1);
-		selection->Initialize();   
-	    return selection;
+		muchSelection->SetMinLastPlaneId(nofStations-1);
+		muchSelection->Initialize(); 
+		return muchSelection;
 	} else 
-	if(name == "Trd") {
-	
+	if(name == "TrdStation") {
+		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
+		trdSelection->SetNofSharedHits(2);
+		trdSelection->SetMinNofHits(1);
+		trdSelection->SetMinLastPlaneId(0);
+		trdSelection->Initialize(); 
+		return trdSelection;
+	} else
+	if(name == "TrdFinal") {
+		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
+		trdSelection->SetNofSharedHits(2);
+		trdSelection->SetMinNofHits(1);
+		Int_t nofStations = CbmLitEnvironment::Instance()->GetTrdLayout().GetNofStations();
+		trdSelection->SetMinLastPlaneId(nofStations-1);
+		trdSelection->Initialize(); 
+		return trdSelection;
 	}
 	return selection;
 }
 	
 ClassImp(CbmLitToolFactory)
-

@@ -1,11 +1,10 @@
 #ifndef CBMLITEFFHITCALCULATOR_H_
 #define CBMLITEFFHITCALCULATOR_H_
 
-#include "CbmTool.h"
+#include "CbmLitTool.h"
 #include "CbmLitTypes.h"
-#include "CbmLitHit.h"
 
-class CbmLitEffHitCalculator
+class CbmLitEffHitCalculator : public CbmLitTool
 {
 public:
 	CbmLitEffHitCalculator();

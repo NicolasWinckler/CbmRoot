@@ -6,9 +6,10 @@
 #include <set>
 #include <iostream>
 
-CbmLitTrackSelectionC::CbmLitTrackSelectionC()
+CbmLitTrackSelectionC::CbmLitTrackSelectionC():
+	fNofSharedHits(0)
 {
-	Properties().AddProperty("fNofSharedHits", 0);
+//	Properties().AddProperty("fNofSharedHits", 0);
 }
 
 CbmLitTrackSelectionC::~CbmLitTrackSelectionC()
@@ -32,7 +33,7 @@ LitStatus CbmLitTrackSelectionC::DoSelect(
 	
 	if (itBegin == itEnd) return kLITSUCCESS;
 	
-	Properties().GetProperty("fNofSharedHits", fNofSharedHits);
+//	Properties().GetProperty("fNofSharedHits", fNofSharedHits);
 	
 	//SortNofHits(tracks);
 	SortLastPlaneId(itBegin, itEnd);

@@ -60,6 +60,7 @@ private:
    CbmLitTrackPropagator *fPropagator;
    CbmLitTrackUpdate *fFilter;
    CbmLitTrackFitter *fFitter;
+   CbmLitTrackFitter *fSmoother; 
       
    Int_t fNofLayers;
    

@@ -103,7 +103,7 @@ void CbmLitTrackFinderImp::InitTrackSeeds()
 		Double_t Ze = fLayout.GetLayerZ(beginLayer);
 		for (TrackIterator iTrack = fTracks.begin();iTrack != fTracks.end(); iTrack++) {
 			CbmLitTrackParam par(*(*iTrack)->GetParamLast());
-			fPropagator->Propagate(&par, Ze);	
+			fPropagator->Propagate(&par, Ze, fPDG);	
 			(*iTrack)->SetParamLast(&par);			
 		} 
 	}

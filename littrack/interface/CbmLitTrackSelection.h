@@ -1,11 +1,10 @@
-
 #ifndef CBMLITTRACKSELECTION_H_
 #define CBMLITTRACKSELECTION_H_
 
-#include "CbmTool.h"
+#include "CbmLitTool.h"
 #include "CbmLitTypes.h"
 
-class CbmLitTrackSelection : public CbmTool
+class CbmLitTrackSelection : public CbmLitTool
 {
 
 public:
@@ -19,8 +18,7 @@ public:
 	
 	virtual LitStatus DoSelect(
 			TrackVector& tracks) = 0;
-	
-	
+		
 	ClassDef(CbmLitTrackSelection, 1);
 };
 

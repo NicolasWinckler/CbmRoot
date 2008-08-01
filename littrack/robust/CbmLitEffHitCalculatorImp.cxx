@@ -1,15 +1,14 @@
 #include "CbmLitEffHitCalculatorImp.h"
+#include "CbmLitHit.h"
 
 #include <iostream>
 
 CbmLitEffHitCalculatorImp::CbmLitEffHitCalculatorImp()
 {
-
 }
 
 CbmLitEffHitCalculatorImp::~CbmLitEffHitCalculatorImp()
 {
-
 }
 
 LitStatus CbmLitEffHitCalculatorImp::Initialize()
@@ -31,6 +30,7 @@ CbmLitHit CbmLitEffHitCalculatorImp::DoCalculate(
 	//calculate effective weight matrix G
 	Double_t eG00 = 0., eG01 = 0., eG11 = 0.;
 	for (HitIterator it = itBegin; it != itEnd; it++) {
+		if ((*it)->IsOutlier()) continue;
 		Double_t dxx = (*it)->GetDx() * (*it)->GetDx();
 		Double_t dyy = (*it)->GetDy() * (*it)->GetDy();
 		Double_t dxy = (*it)->GetDxy();
@@ -52,6 +52,7 @@ CbmLitHit CbmLitEffHitCalculatorImp::DoCalculate(
 	// calculate effective x znd y
 	Double_t m0 = 0., m1 = 0.;
 	for (HitIterator it = itBegin; it != itEnd; it++) {
+		if ((*it)->IsOutlier()) continue;
 		Double_t dxx = (*it)->GetDx() * (*it)->GetDx();
 		Double_t dyy = (*it)->GetDy() * (*it)->GetDy();
 		Double_t dxy = (*it)->GetDxy();
@@ -72,9 +73,9 @@ CbmLitHit CbmLitEffHitCalculatorImp::DoCalculate(
 	hit.SetX(x);
 	hit.SetY(y);
 	hit.SetZ((*itBegin)->GetZ());
-	hit.SetDx(eV00);
+	hit.SetDx(std::sqrt(eV00));
 	hit.SetDxy(eV01);
-	hit.SetDy(eV11);
+	hit.SetDy(std::sqrt(eV11));
 	hit.SetPlaneId((*itBegin)->GetPlaneId());
 	
 	return hit;
@@ -90,11 +91,17 @@ void CbmLitEffHitCalculatorImp::Inverse(
 		Double_t v00, Double_t v01, Double_t v11,
 		Double_t& u00, Double_t& u01, Double_t& u11)
 {
-	Double_t norm = v00 * v11 - v01 * v01;
-	if (norm == 0.) return;
-	u00 = v11 / norm;
-	u01 = -v01 / norm;
-	u11 = v00 / norm;	
+	if (v01 != 0.) {
+		Double_t norm = v00 * v11 - v01 * v01;
+		//if (norm == 0.) return;
+		u00 = v11 / norm;
+		u01 = -v01 / norm;
+		u11 = v00 / norm;
+	} else {
+		u00 = 1. / v00;
+		u01 = 0.;
+		u11 = 1. / v11;
+	}
 }
 
 ClassImp(CbmLitEffHitCalculatorImp)

@@ -17,6 +17,8 @@
 #include "CbmField.h"
 #include "CbmGeanePro.h"
 
+#include "TMatrixD.h"
+
 #include <vector>
 
 class CbmTrackPropagatorGeane: public CbmLitTrackPropagator {
@@ -35,16 +37,26 @@ public:
    
    // Propagator
    virtual LitStatus Propagate( 
-		   const CbmLitTrackParam *pParamIn,
-           CbmLitTrackParam *pParamOut,
-           Double_t zOut);
+		   const CbmLitTrackParam *parIn,
+           CbmLitTrackParam *parOut,
+           Double_t zOut,
+           Int_t pdg);
                                  
    virtual LitStatus Propagate( 
 		   CbmLitTrackParam *pParam, 
-           Double_t zOut );
-
+           Double_t zOut,
+           Int_t pdg);
+   
+   virtual void TransportMatrix(
+		   std::vector<Double_t>& F){
+	   //TODO: implement transport matrix for geane 
+   }
+   virtual void TransportMatrix(
+		   TMatrixD& F){
+	   //TODO: implement transport matrix for geane 
+   }
+   
 private:
-
 	void ToGeaneCovMatrix(
 			const std::vector<Double_t>& cov,
 			std::vector<Double_t>& gCov);

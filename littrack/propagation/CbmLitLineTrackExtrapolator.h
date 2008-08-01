@@ -10,40 +10,44 @@
  ** 
  **/ 
 
-
-#ifndef CBMLITLINETRACKEXTRAPOLATOR_H
-#define CBMLITLINETRACKEXTRAPOLATOR_H
+#ifndef CBMLITLINETRACKEXTRAPOLATOR_H_
+#define CBMLITLINETRACKEXTRAPOLATOR_H_
 
 #include "CbmLitTrackExtrapolator.h"
 
-#include "CbmLitTrackParam.h"
+#include "TMatrixD.h"
+
+class CbmLitTrackParam;
 
 class CbmLitLineTrackExtrapolator: public CbmLitTrackExtrapolator {
 
 public:
-   
-   // constructor
    CbmLitLineTrackExtrapolator();
-   
-   // distructor
    virtual ~CbmLitLineTrackExtrapolator();
    
    // Derived from CbmTool
    virtual LitStatus Initialize();
    virtual LitStatus Finalize();
    
-   // Propagator
    virtual LitStatus Extrapolate( 
-		   const CbmLitTrackParam *pParamIn,
-           CbmLitTrackParam *pParamOut,
+		   const CbmLitTrackParam *parIn,
+           CbmLitTrackParam *parOut,
            Double_t zOut);
                                  
    virtual LitStatus Extrapolate( 
-		   CbmLitTrackParam *pParam, 
+		   CbmLitTrackParam *par, 
            Double_t zOut );
-    
+   
+   virtual void TransportMatrix(
+		   std::vector<Double_t>& F);
+   virtual void TransportMatrix(
+		   TMatrixD& F);
+   
+private:
+	
+	Double_t fDz;
 
-   ClassDef(CbmLitLineTrackExtrapolator,1)
+    ClassDef(CbmLitLineTrackExtrapolator, 1);
 }; 
 
 #endif //CbmLitLineTrackExtrapolator

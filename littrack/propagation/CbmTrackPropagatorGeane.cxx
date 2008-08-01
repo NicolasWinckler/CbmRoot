@@ -16,56 +16,53 @@
 #include <vector>
 #include <cmath>
 
-//constructors
 CbmTrackPropagatorGeane::CbmTrackPropagatorGeane():
    CbmLitTrackPropagator("CbmTrackPropagatorGeane")
 {
    fPropagator = new CbmGeanePro();
 }
 
-//Destructor
 CbmTrackPropagatorGeane::~CbmTrackPropagatorGeane() 
 {
-   //
 	if (fPropagator) delete fPropagator;
 }
 
-// Initialization
 LitStatus CbmTrackPropagatorGeane::Initialize()
 {
 	return kLITSUCCESS;
 }
 
-// Finalization
 LitStatus CbmTrackPropagatorGeane::Finalize()
 {
 	return kLITSUCCESS;
 }
 
 LitStatus CbmTrackPropagatorGeane::Propagate(
-		const CbmLitTrackParam *pParamIn,
-        CbmLitTrackParam *pParamOut,
-        Double_t zOut)
+		const CbmLitTrackParam *parIn,
+        CbmLitTrackParam *parOut,
+        Double_t zOut,
+        Int_t pdg)
 {
-   *pParamOut = *pParamIn;
-   return Propagate(pParamOut, zOut);
+   *parOut = *parIn;
+   return Propagate(parOut, zOut, pdg);
 }
 
 LitStatus CbmTrackPropagatorGeane::Propagate(
-		CbmLitTrackParam *pParam,
-        Double_t zOut)
+		CbmLitTrackParam *par,
+        Double_t zOut,
+        Int_t pdg)
 {
-	if (std::fabs(zOut - pParam->GetZ()) < 0.01) return kLITSUCCESS;
+	if (std::fabs(zOut - par->GetZ()) < 0.01) return kLITSUCCESS;
 	
-	if (!IsInParCorrect(pParam)) return kLITERROR;
+	if (!IsInParCorrect(par)) return kLITERROR;
 	
-	std::cout << "in:";
-	pParam->Print();
+//	std::cout << "in:";
+//	pParam->Print();
 	
    // covariance matrix for GEANE
    std::vector<Double_t> gCov(15);
    // fill GEANE covariant matrix
-   ToGeaneCovMatrix(pParam->GetCovMatrix(), gCov);
+   ToGeaneCovMatrix(par->GetCovMatrix(), gCov);
  
    TVector3 v1(1, 0, 0);
    TVector3 v2(0, 1, 0);    
@@ -75,10 +72,10 @@ LitStatus CbmTrackPropagatorGeane::Propagate(
    // the input parameter is defined in the xy plane 
    // which is perpendicular to z axes with origin at Z.
    // In this case X=V, Y=W
-   CbmTrackParP parStart(pParam->GetX(), pParam->GetY(),
-                         pParam->GetTx(), pParam->GetTy(), 
-                         pParam->GetQp(), &gCov[0], 
-                         TVector3(0, 0, pParam->GetZ()), 
+   CbmTrackParP parStart(par->GetX(), par->GetY(),
+                         par->GetTx(), par->GetTy(), 
+                         par->GetQp(), &gCov[0], 
+                         TVector3(0, 0, par->GetZ()), 
                          TVector3(1, 0, 0), TVector3(0, 1, 0), 1);
      
    // output track parameter
@@ -91,8 +88,8 @@ LitStatus CbmTrackPropagatorGeane::Propagate(
          
    // pdg code of the particle,
    // +/- 13 muon code 
-   Int_t pdg = 13;
-   if (pParam->GetQp() > 0) pdg = -13;
+   pdg = 13;
+   if (par->GetQp() > 0) pdg = -13;
 
    // CbmGeanePro is used to propagate the track parameters
    Bool_t propResult;
@@ -105,19 +102,19 @@ LitStatus CbmTrackPropagatorGeane::Propagate(
    }
      
    // fill the CBM track parameter representation 
-   pParam->SetX(parEnd.GetV());
-   pParam->SetY(parEnd.GetW());
-   pParam->SetZ(zOut);//parEnd.GetZ());
-   pParam->SetTx(parEnd.GetTV());
-   pParam->SetTy(parEnd.GetTW());
-   pParam->SetQp(parEnd.GetQp());
+   par->SetX(parEnd.GetV());
+   par->SetY(parEnd.GetW());
+   par->SetZ(zOut);//parEnd.GetZ());
+   par->SetTx(parEnd.GetTV());
+   par->SetTy(parEnd.GetTW());
+   par->SetQp(parEnd.GetQp());
    
    // fill and reorder covariant matrix
    std::vector<Double_t> covEnd(15);
    std::vector<Double_t> gCovEnd(15);
    parEnd.GetCov(&gCovEnd[0]);
    FromGeaneCovMatrix(gCovEnd, covEnd);
-   pParam->SetCovMatrix(covEnd);
+   par->SetCovMatrix(covEnd);
 
    //std::cout << "out:";
    //pParam->Print();
@@ -176,33 +173,15 @@ void CbmTrackPropagatorGeane::FromGeaneCovMatrix(
 Bool_t CbmTrackPropagatorGeane::IsInParCorrect(
 		const CbmLitTrackParam* par)
 {
-	Double_t maxSlope = 4.;
-	Double_t minP = 0.1;
-	Double_t maxCoordErr = 10. * 10;
-	Double_t maxSlopeErr = 1. * 1.;
+	Double_t maxSlope = 5.;
+	Double_t minSlope = 1e-4;
 	
 	if (std::abs(par->GetTx()) > maxSlope ||
-		std::abs(par->GetTy()) > maxSlope) {
-		std::cout << "slopes are incorrect" << std::endl;
-		par->Print();
+		std::abs(par->GetTy()) > maxSlope ||
+		std::abs(par->GetTx()) < minSlope ||
+		std::abs(par->GetTy()) < minSlope) {
 		return false;
 	}
-	
-	if (std::abs(1. / par->GetQp()) < minP) {
-		std::cout << "momentum too small" << std::endl;
-		par->Print();
-		return false;
-	}
-	
-	if (std::abs(par->GetCovariance(0)) > maxCoordErr ||
-		std::abs(par->GetCovariance(5)) > maxCoordErr ||
-		std::abs(par->GetCovariance(9)) > maxSlopeErr ||
-		std::abs(par->GetCovariance(12)) > maxSlopeErr) {
-		std::cout << "errors too big" << std::endl;
-		par->Print();
-		return false;
-	}
-	
 	return true;
 }
 

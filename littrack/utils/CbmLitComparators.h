@@ -1,12 +1,9 @@
-
 #ifndef CBMLITCOMPARATORS_H_
 #define CBMLITCOMPARATORS_H_
 
 #include "CbmLitHit.h"
 #include "CbmLitTrack.h"
-#include "CbmLitMaterial.h"
 #include "CbmLitTrackParam.h"
-
 
 #include <functional>
 
@@ -199,20 +196,6 @@ class CompareTrackPtrLastPlaneIdMore :
 public:
 	bool operator()(const CbmLitTrack* track1, const CbmLitTrack* track2) const {
 		return track1->GetLastPlaneId() > track2->GetLastPlaneId();
-	}
-};
-
-
-
-class CompareMaterialPtrZLess :
-	public std::binary_function<
-			const CbmLitMaterial*,
-		    const CbmLitMaterial*,
-		    bool> 
-{
-public:
-	bool operator()(const CbmLitMaterial* mat1, const CbmLitMaterial* mat2) const {
-		return mat1->GetZ() < mat2->GetZ();
 	}
 };
 

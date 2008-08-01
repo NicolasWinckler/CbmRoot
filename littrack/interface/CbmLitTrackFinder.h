@@ -1,10 +1,10 @@
 #ifndef CBMLITTRACKFINDER_H_
 #define CBMLITTRACKFINDER_H_
 
-#include "CbmTool.h"
+#include "CbmLitTool.h"
 #include "CbmLitTypes.h"
 
-class CbmLitTrackFinder : public CbmTool
+class CbmLitTrackFinder : public CbmLitTool
 {
 public:
 	

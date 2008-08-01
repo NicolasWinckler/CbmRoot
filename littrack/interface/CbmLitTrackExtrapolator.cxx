@@ -5,25 +5,19 @@
  
 #include "CbmLitTrackExtrapolator.h"
 
-//Constructors
 CbmLitTrackExtrapolator::CbmLitTrackExtrapolator():
-   CbmTool("")
+   CbmLitTool("")
 {
-   //
 }
 
-CbmLitTrackExtrapolator::CbmLitTrackExtrapolator(const std::string& name):
-   CbmTool(name)
+CbmLitTrackExtrapolator::CbmLitTrackExtrapolator(
+		const std::string& name):
+   CbmLitTool(name)
 {
-   //
 }
 
-//Destructor
 CbmLitTrackExtrapolator::~CbmLitTrackExtrapolator() 
 {
-   //
 }
 
-
 ClassImp(CbmLitTrackExtrapolator)
-

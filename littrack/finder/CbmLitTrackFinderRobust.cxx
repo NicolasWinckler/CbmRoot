@@ -6,6 +6,7 @@
 #include "CbmLitWeightCalculatorSimple.h"
 #include "CbmLitEffHitCalculatorImp.h"
 #include "CbmLitComparators.h"
+#include "CbmLitMemoryManagment.h"
 
 #include <iostream>
 #include <algorithm>
@@ -93,7 +94,7 @@ void CbmLitTrackFinderRobust::FollowTrack(
 	CbmLitTrackParam par = *track->GetParamLast();
 	
 	for(Int_t iLayer = 0; iLayer < nofLayers; iLayer++) {
-		fPropagator->Propagate(&par, fLayout.GetLayerZ(iLayer));
+		fPropagator->Propagate(&par, fLayout.GetLayerZ(iLayer), fPDG);
 		HitIteratorPair bounds = MinMaxIndex(&par, iLayer);
 		
 		Bool_t hitAdded = false;
@@ -109,7 +110,8 @@ void CbmLitTrackFinderRobust::FollowTrack(
 			if (nofMissingHits > fMaxNofMissingHits) return;
 			continue;
 		}
-				
+		
+		track->SetPDG(fPDG);
 		track->SetLastPlaneId(iLayer);
 		track->SetParamLast(&par);
 		track->SetFlag(0);

@@ -1,34 +1,23 @@
- 
- 
- 
 // -------------------------------------------------------------------------
 // -----                  CbmLitTrackUpdate source file               -----
 // -----                  Created 04/06/08  by A. Lebedev               -----
 // -------------------------------------------------------------------------
- 
-
 
 #include "CbmLitTrackUpdate.h"
 
-
-//constructor
 CbmLitTrackUpdate::CbmLitTrackUpdate():
-   CbmTool("")  
+   CbmLitTool("")  
 {
-
 }
 
-//constructor
-CbmLitTrackUpdate::CbmLitTrackUpdate(const std::string& name):
-   CbmTool(name)  
+CbmLitTrackUpdate::CbmLitTrackUpdate(
+		const std::string& name):
+   CbmLitTool(name)  
 {
-
 }
-//Destructor
+
 CbmLitTrackUpdate::~CbmLitTrackUpdate() 
 {
-
 }
 
 ClassImp(CbmLitTrackUpdate)
-

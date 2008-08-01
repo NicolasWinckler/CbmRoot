@@ -1,34 +1,23 @@
-   
 // -------------------------------------------------------------------------
 // -----                  CbmLitTrackFitter source file               -----
 // -----                  Created 04/06/08  by A. Lebedev               -----
 // -------------------------------------------------------------------------
- 
-
 
 #include "CbmLitTrackFitter.h"
 
-
-
-//constructors
 CbmLitTrackFitter::CbmLitTrackFitter():
-   CbmTool("")
+   CbmLitTool("")
 {
-
 }
 
-CbmLitTrackFitter::CbmLitTrackFitter(const std::string& name):
-   CbmTool(name)
+CbmLitTrackFitter::CbmLitTrackFitter(
+		const std::string& name):
+   CbmLitTool(name)
 {
-
 }
 
-//Destructor
 CbmLitTrackFitter::~CbmLitTrackFitter() 
 {
-   //
 }
 
-
 ClassImp(CbmLitTrackFitter)
-

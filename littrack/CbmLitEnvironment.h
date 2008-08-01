@@ -16,9 +16,7 @@
 
 #include "CbmLitDetectorLayout.h"
 #include "TObject.h"
-#include <vector>
 
-class CbmLitMaterial;
 class CbmField;
 class TGeoNode;
 class TGeoMaterial;
@@ -31,36 +29,23 @@ public:
    static CbmLitEnvironment* Instance();
    
    CbmField* GetField();
-   
-   const std::vector<CbmLitMaterial*> & GetMaterials();
-   const std::vector<CbmLitMaterial*> & GetMaterialsSimple();
-   
    CbmLitDetectorLayout GetMuchLayout();
-   
    CbmLitDetectorLayout GetTrdLayout();
-   
-   void DetermineLayout(CbmLitDetectorLayout& layout);
-    
-protected:
-    
+      
+protected:    
    CbmLitEnvironment();
  
 private:
-
    static CbmLitEnvironment* fInstance;
    
-   std::vector<CbmLitMaterial*> fvMaterials;
-   std::vector<TGeoNode*> fvGeoNodes;
-
-   Double_t fThickWall;
+   CbmLitDetectorLayout fMuchLayout;
+   CbmLitDetectorLayout fTrdLayout;
    
    CbmField *fField;
    
-   void ReadFromGeoManager();
-   void FillMaterialInfo(TGeoMaterial* material, CbmLitMaterial* mat);
+   void DetermineLayout(CbmLitDetectorLayout& layout);
    
    ClassDef(CbmLitEnvironment,1)
 }; 
 
 #endif // CBMLITENVIRONMENT_H_
-

@@ -7,8 +7,7 @@
 #include "CbmLitTrackSelection.h"
 
 class CbmLitTrackSelectionA : public CbmLitTrackSelection
-{
-	
+{	
 public:
 	
 	CbmLitTrackSelectionA();
@@ -29,7 +28,6 @@ private:
 	Bool_t IsHitSharing(
 			const CbmLitTrack* track0,
 			const CbmLitTrack* track1);
-
 
 	ClassDef(CbmLitTrackSelectionA, 1);	
 };

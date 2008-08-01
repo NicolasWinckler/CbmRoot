@@ -1,26 +1,61 @@
-
 #include "CbmLitTrack.h"
 
 #include "CbmLitComparators.h"
 #include "CbmLitMemoryManagment.h"
 
-#include "TMath.h"
-
 #include <algorithm>
+#include <iostream>
 
 CbmLitTrack::CbmLitTrack() :
 	fFlag(0),
 	fChi2(0),
 	fNDF(0),
 	fPreviousTrackId(0),
-	fLastPlaneId(0)
+	fLastPlaneId(0),
+	fPDG(211)
 {
-
 }
 
 CbmLitTrack::~CbmLitTrack()
 {
 	ClearHits();
+}
+
+CbmLitTrack& CbmLitTrack::operator=(const CbmLitTrack& track)
+{
+	for_each(fHits.begin(), fHits.end(), DeleteObject());
+	fHits.clear();
+	for (Int_t iHit = 0; iHit < track.GetNofHits(); iHit++)
+		AddHit(track.GetHit(iHit));
+	
+	SetParamFirst(track.GetParamFirst());
+	SetParamLast(track.GetParamLast());	
+	SetFlag(track.GetFlag());
+	SetChi2(track.GetChi2());
+	SetNDF(track.GetNDF());
+	SetPreviousTrackId(track.GetPreviousTrackId());	
+	SetLastPlaneId(track.GetLastPlaneId());
+	SetPDG(track.GetPDG());
+	SetFitNodes(track.GetFitNodes());
+	
+	return *this;
+}
+
+void CbmLitTrack::AddHit(const CbmLitHit* hit){
+	CbmLitHit* newHit = new CbmLitHit(*hit);
+	fHits.push_back(newHit);
+}
+
+void CbmLitTrack::ClearHits() {
+	std::for_each(fHits.begin(), fHits.end(), DeleteObject());
+	fHits.clear();
+}
+
+void CbmLitTrack::Print() const
+{
+	std::cout << "Track: flag=" <<  fFlag << ", chi2=" << fChi2 
+		<< ", ndf=" << fNDF << ", previousTrackId=" << fPreviousTrackId 
+		<< ", lastPlaneId=" << fLastPlaneId << ", pdg=" << fPDG << std::endl;
 }
 
 void CbmLitTrack::SortHits(Bool_t downstream)
@@ -63,24 +98,6 @@ std::vector<HitIteratorPair> CbmLitTrack::GetHitBounds()
 		bounds.push_back(b);
 	}
 	return bounds;
-}
-
-CbmLitTrack& CbmLitTrack::operator=(const CbmLitTrack& track)
-{
-	for_each(fHits.begin(), fHits.end(), DeleteObject());
-	fHits.clear();
-	for (Int_t iHit = 0; iHit < track.GetNofHits(); iHit++)
-		AddHit(track.GetHit(iHit));
-	
-	SetParamFirst(track.GetParamFirst());
-	SetParamLast(track.GetParamLast());	
-	SetFlag(track.GetFlag());
-	SetChi2(track.GetChi2());
-	SetNDF(track.GetNDF());
-	SetPreviousTrackId(track.GetPreviousTrackId());	
-	SetLastPlaneId(track.GetLastPlaneId());
-	
-	return *this;
 }
 
 ClassImp(CbmLitTrack);

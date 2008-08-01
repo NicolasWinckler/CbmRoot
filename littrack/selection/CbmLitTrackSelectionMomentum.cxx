@@ -5,9 +5,10 @@
 #include <cmath>
 #include <iostream>
 
-CbmLitTrackSelectionMomentum::CbmLitTrackSelectionMomentum()
+CbmLitTrackSelectionMomentum::CbmLitTrackSelectionMomentum():
+	fMinMomentum(0.)
 {
-	Properties().AddProperty("fMinMomentum", 0.);
+//	Properties().AddProperty("fMinMomentum", 0.);
 }
 
 CbmLitTrackSelectionMomentum::~CbmLitTrackSelectionMomentum()
@@ -31,7 +32,7 @@ LitStatus CbmLitTrackSelectionMomentum::DoSelect(
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
 	
-	Properties().GetProperty("fMinMomentum", fMinMomentum);
+//	Properties().GetProperty("fMinMomentum", fMinMomentum);
 	
 	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
 		if ((*iTrack)->GetFlag() == 1) continue;

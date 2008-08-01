@@ -20,6 +20,7 @@ public:
 	Int_t GetPlaneId() const { return fPlaneId; }
 	Int_t GetRefId() const { return fRefId; }
 	Double_t GetW() const { return fW; }
+	Bool_t IsOutlier() const { return fIsOutlier; }
 	
 	void SetX(Double_t x) { fX = x; }
 	void SetY(Double_t y) { fY = y; }
@@ -31,8 +32,9 @@ public:
 	void SetPlaneId(Int_t planeId) { fPlaneId = planeId; }
 	void SetRefId(Int_t refId) { fRefId = refId; }
 	void SetW(Double_t w) { fW = w; }
+	void IsOutlier(Bool_t isOutlier) { fIsOutlier = isOutlier;}
 	
-	virtual void Print();
+	virtual void Print() const;
 	
 protected:
 	
@@ -42,6 +44,7 @@ protected:
 	Int_t fPlaneId;
 	Int_t fRefId;
 	Double_t fW;
+	Bool_t fIsOutlier;
 	
 	ClassDef(CbmLitHit, 1);
 };

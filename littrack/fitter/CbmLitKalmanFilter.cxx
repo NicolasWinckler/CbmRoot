@@ -3,30 +3,22 @@
 // -----                  Created 16/07/07  by A. Lebedev               -----
 // -------------------------------------------------------------------------
  
-
 #include "CbmLitKalmanFilter.h"
 
-
-// Constructor
 CbmLitKalmanFilter::CbmLitKalmanFilter():
    CbmLitTrackUpdate("CbmLitKalmanFilter")
 {
-
 }
 
-// Destructor
 CbmLitKalmanFilter::~CbmLitKalmanFilter() 
 {
-
 }
 
-// Initialization
 LitStatus CbmLitKalmanFilter::Initialize()
 {
 	return kLITSUCCESS;
 }
 
-// Finalization
 LitStatus CbmLitKalmanFilter::Finalize()
 {
 	return kLITSUCCESS;

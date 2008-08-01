@@ -4,6 +4,7 @@
 #include "CbmLitTrackPropagator.h"
 #include "CbmLitTrackUpdate.h"
 #include "CbmLitTrackFitter.h"
+#include "CbmLitMemoryManagment.h"
 
 #include <iostream>
 #include <cmath>
@@ -123,13 +124,13 @@ void CbmLitTrackFinderBranch::TrackFollowingStation(
    if (fMaxNofMissingHitsInStation > 0) extraLoop = 1;    
    if (std::abs(layer - track->GetNofHits()) >= fMaxNofMissingHits) extraLoop = 0;
    
-   if (fPropagator->Propagate(&par[0], fLayout.GetLayerZ(layer + 0)) == kLITERROR) return;
+   if (fPropagator->Propagate(&par[0], fLayout.GetLayerZ(layer + 0), fPDG) == kLITERROR) return;
    bounds[0] = MinMaxIndex(&par[0], layer + 0);
    for (HitIterator iHit0 = bounds[0].first; iHit0 != bounds[0].second + extraLoop; iHit0++) { //1
    
       if (!ProcessLayer(0, iHit0, bounds[0], nofMissingHits, &par[0], &uPar[0], hits)) continue;
        
-      if (fPropagator->Propagate(&uPar[0], &par[1], fLayout.GetLayerZ(layer + 1)) == kLITERROR) continue;
+      if (fPropagator->Propagate(&uPar[0], &par[1], fLayout.GetLayerZ(layer + 1), fPDG) == kLITERROR) continue;
       bounds[1] = MinMaxIndex(&par[1], layer + 1);
       for (HitIterator iHit1 = bounds[1].first; iHit1 != bounds[1].second + extraLoop; iHit1++) { //2
       
@@ -141,7 +142,7 @@ void CbmLitTrackFinderBranch::TrackFollowingStation(
              continue;
          }
          
-         if (fPropagator->Propagate(&uPar[1], &par[2], fLayout.GetLayerZ(layer + 2)) == kLITERROR) continue;
+         if (fPropagator->Propagate(&uPar[1], &par[2], fLayout.GetLayerZ(layer + 2), fPDG) == kLITERROR) continue;
          bounds[2] = MinMaxIndex(&par[2], layer + 2);
          for (HitIterator iHit2 = bounds[2].first; iHit2 != bounds[2].second + extraLoop; iHit2++) { //3
             
@@ -153,7 +154,7 @@ void CbmLitTrackFinderBranch::TrackFollowingStation(
                continue;
             }
             
-            if (fPropagator->Propagate(&uPar[2], &par[3], fLayout.GetLayerZ(layer + 3)) == kLITERROR) continue;
+            if (fPropagator->Propagate(&uPar[2], &par[3], fLayout.GetLayerZ(layer + 3), fPDG) == kLITERROR) continue;
             bounds[3] = MinMaxIndex(&par[3], layer + 3);
             for (HitIterator iHit3 = bounds[3].first; iHit3 != bounds[3].second + extraLoop; iHit3++) { //4
             
@@ -209,6 +210,7 @@ void CbmLitTrackFinderBranch::AddTrackCandidate(
    }
      
    newTrack->SortHits();   
+   newTrack->SetPDG(fPDG);
    newTrack->SetLastPlaneId(station);
      
    if (newTrack->GetNofHits() == 0) {

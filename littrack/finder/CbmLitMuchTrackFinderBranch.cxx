@@ -20,8 +20,7 @@
 
 
 CbmLitMuchTrackFinderBranch::CbmLitMuchTrackFinderBranch()
-{
-	
+{	
 }
 
 CbmLitMuchTrackFinderBranch::~CbmLitMuchTrackFinderBranch()
@@ -49,9 +48,7 @@ void CbmLitMuchTrackFinderBranch::Init()
    fPropagatorToDet = fPropagator = factory->CreateTrackPropagator("Much");
    fFilter = factory->CreateTrackUpdate("Much");
    fTrackSeedSelection = factory->CreateTrackSelection("Momentum");
-   fTrackSeedSelection->Properties().SetProperty("fMinMomentum", 0.1);
    fTrackSelectionStation = factory->CreateTrackSelection("Momentum");
-   fTrackSelectionStation->Properties().SetProperty("fMinMomentum", 0.1);
    fTrackSelectionFinal = factory->CreateTrackSelection("Much");
    fFitter = factory->CreateTrackFitter("Much");
  
@@ -69,9 +66,10 @@ void CbmLitMuchTrackFinderBranch::Init()
    SetEndStation(fLayout.GetNofStations() - 1);
    SetMaxNofMissingHitsInStation(0);
    SetMaxNofMissingHits(0);
-   SetSigmaCoef(3.5); 
+   SetSigmaCoef(3.0); 
    SetPrecalcSearchRegions(false); 
    SetApplyUpdateInLayer(true);
+   SetPDG(13);
    //SetSigmaX(sigmaX);
    //SetSigmaY(sigmaY);
 }
@@ -97,6 +95,8 @@ Int_t CbmLitMuchTrackFinderBranch::DoFind(
 	foundTracks.clear();
 	hits.clear();
 	trackSeeds.clear();	
+	
+	return trackArray->GetEntriesFast();
 }
 
 void CbmLitMuchTrackFinderBranch::CreateTrackSeeds(
@@ -113,7 +113,7 @@ void CbmLitMuchTrackFinderBranch::CreateTrackSeeds(
     Double_t Ze = fLayout.GetLayerZ(0);
     for (TrackIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {   	
     	CbmLitTrackParam par = *(*iTrack)->GetParamLast();
-       fPropagatorToDet->Propagate(&par, Ze);
+       fPropagatorToDet->Propagate(&par, Ze, fPDG);
        (*iTrack)->SetParamLast(&par);
        (*iTrack)->SetParamFirst((*iTrack)->GetParamLast());
        (*iTrack)->SetChi2(0.);

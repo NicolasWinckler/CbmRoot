@@ -5,6 +5,7 @@
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
 ${GEANT3_INCLUDE_DIR}
+#${CLHEP_INCLUDE_DIR}
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
@@ -43,12 +44,14 @@ link_directories( ${LINK_DIRECTORIES})
 set(LITTRACK_SRCS_RULECHECKER
 ana/CbmLitElossAna.cxx
 ana/CbmLitMuchAna.cxx
-base/CbmTool.cxx
-#base/CbmProperty.cxx
-base/CbmPropertyMgr.cxx
+ana/CbmLitRobustAna.cxx
+base/CbmLitTool.cxx
+base/CbmLitDetectorLayout.cxx
+base/CbmLitPDG.cxx
 data/CbmLitHit.cxx
 data/CbmLitTrackParam.cxx
 data/CbmLitTrack.cxx
+data/CbmLitFitNode.cxx
 #finder/CbmLitMuchTrackFinderTrigger.cxx
 finder/CbmLitTrackFinderImp.cxx
 finder/CbmLitTrackFinderBranch.cxx
@@ -60,6 +63,7 @@ finder/CbmLitMuchTrackFinderRobust.cxx
 fitter/CbmLitTrackFitterImp.cxx
 fitter/CbmLitKalmanFilter.cxx
 fitter/CbmLitTrackFitterRobust.cxx
+fitter/CbmLitKalmanSmoother.cxx
 interface/CbmLitTrackFitter.cxx   
 interface/CbmLitTrackPropagator.cxx 
 interface/CbmLitTrackUpdate.cxx  
@@ -71,8 +75,10 @@ interface/CbmLitEffHitCalculator.cxx
 propagation/CbmLitTrackPropagatorImp.cxx 
 propagation/CbmLitRK4TrackExtrapolator.cxx
 propagation/CbmLitLineTrackExtrapolator.cxx
-propagation/CbmLitParabolicTrackExtrapolator.cxx
 propagation/CbmTrackPropagatorGeane.cxx
+propagation/CbmLitGeoNavigatorImp.cxx
+propagation/CbmLitMaterialInfo.cxx
+propagation/CbmLitMaterialEffectsImp.cxx
 qa/CbmLitMuchRecQa.cxx
 qa/CbmLitTrdRecQa.cxx
 robust/CbmLitEffHitCalculatorImp.cxx
@@ -91,15 +97,13 @@ utils/CbmLitComparators.cxx
 utils/CbmLitMemoryManagment.cxx
 utils/CbmLitConverter.cxx
 utils/CbmLitTypes.cxx
-CbmLitMaterial.cxx 
-CbmLitCircleMaterial.cxx
-CbmLitRectMaterial.cxx
 CbmLitEnvironment.cxx  
 CbmLitToolFactory.cxx
-CbmLitDetectorLayout.cxx
+#CbmLitTestGm.cxx
 )
 
-SET(LITTRACK_SRCS ${LITTRACK_SRCS_RULECHECKER} base/CbmProperty.cxx)
+SET(LITTRACK_SRCS ${LITTRACK_SRCS_RULECHECKER})
+#base/CbmProperty.cxx)
 
 if(RULE_CHECKER_FOUND)
   CHECK_RULES("${LITTRACK_SRCS_RULECHECKER}" "${INCLUDE_DIRECTORIES}" LITTRACK_RULES)

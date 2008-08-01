@@ -7,12 +7,11 @@
 #include <set>
 #include <iostream>
 
-CbmLitTrackSelectionTrd::CbmLitTrackSelectionTrd()
+CbmLitTrackSelectionTrd::CbmLitTrackSelectionTrd():
+	fNofSharedHits(0),
+	fMinNofHits(0),
+	fMinLastPlaneId(0)
 {
-	Properties().AddProperty("fNofSharedHits", 0);
-	Properties().AddProperty("fMinNofHits", 0);
-	Properties().AddProperty("fMinLastPlaneId", 0);
-	
 	fSelectionC = new CbmLitTrackSelectionC();
 	fSelectionC->Initialize();
 	fSelectionD = new CbmLitTrackSelectionD();
@@ -21,7 +20,6 @@ CbmLitTrackSelectionTrd::CbmLitTrackSelectionTrd()
 
 CbmLitTrackSelectionTrd::~CbmLitTrackSelectionTrd()
 {
-	
 }
 
 LitStatus CbmLitTrackSelectionTrd::Initialize()
@@ -41,20 +39,15 @@ LitStatus CbmLitTrackSelectionTrd::DoSelect(
 	
 	if (itBegin == itEnd) return kLITSUCCESS;
 	
-	Properties().GetProperty("fNofSharedHits", fNofSharedHits);
-	Properties().GetProperty("fMinNofHits", fMinNofHits);
-	Properties().GetProperty("fMinLastPlaneId", fMinLastPlaneId);
-	
-	fSelectionC->Properties().SetProperty("fNofSharedHits", fNofSharedHits);
-	fSelectionD->Properties().SetProperty("fMinNofHits", fMinNofHits);
-	fSelectionD->Properties().SetProperty("fMinLastPlaneId", fMinLastPlaneId);
+	((CbmLitTrackSelectionC*)fSelectionC)->SetNofSharedHits(fNofSharedHits);
+	((CbmLitTrackSelectionD*)fSelectionD)->SetMinNofHits(fMinNofHits);
+	((CbmLitTrackSelectionD*)fSelectionD)->SetMinLastPlaneId(fMinLastPlaneId);
 		
 	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) 
 		(*iTrack)->SetFlag(0);
 
 	fSelectionC->DoSelect(itBegin, itEnd);
 	fSelectionD->DoSelect(itBegin, itEnd);
-
 	
 	return kLITSUCCESS;
 }
@@ -66,5 +59,3 @@ LitStatus CbmLitTrackSelectionTrd::DoSelect(
 }
 
 ClassImp(CbmLitTrackSelectionTrd)
-
-

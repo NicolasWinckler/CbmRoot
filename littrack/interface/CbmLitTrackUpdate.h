@@ -10,16 +10,15 @@
  ** Base class for all track update algorithms
  **/ 
 
+#ifndef CBMLITTRACKUPDATE_H_
+#define CBMLITTRACKUPDATE_H_
 
-#ifndef CBMLITTRACKUPDATE_H
-#define CBMLITTRACKUPDATE_H
-
-#include "CbmTool.h"
+#include "CbmLitTool.h"
 
 class CbmLitHit;
 class CbmLitTrackParam;
 
-class CbmLitTrackUpdate : public CbmTool {
+class CbmLitTrackUpdate : public CbmLitTool {
 
 public:
 
@@ -40,5 +39,5 @@ public:
    ClassDef(CbmLitTrackUpdate,1)
 }; 
 
-#endif //CbmLitTrackUpdate
+#endif /* CBMLITTRACKUPDATE_H_ */
 

@@ -7,19 +7,18 @@
 //ana
 #pragma link C++ class  CbmLitMuchAna+;
 #pragma link C++ class  CbmLitElossAna+;
+#pragma link C++ class  CbmLitRobustAna+;
 
 // base
-#pragma link C++ class  CbmTool+;
-#pragma link C++ class  CbmPropertyType+;
-#pragma link C++ class  CbmProperty<int>+;
-#pragma link C++ class  CbmProperty<double>+;
-#pragma link C++ class  CbmProperty<bool>+;
-#pragma link C++ class  CbmPropertyMgr+;
+#pragma link C++ class  CbmLitTool+;
+#pragma link C++ class CbmLitPDG+;
+#pragma link C++ class  CbmLitDetectorLayout+;
 
 // data
 #pragma link C++ class  CbmLitHit+;
 #pragma link C++ class  CbmLitTrackParam+;
 #pragma link C++ class  CbmLitTrack+;
+#pragma link C++ class  CbmLitFitNode+;
 
 // finder
 #pragma link C++ class  CbmLitTrackFinderImp+;
@@ -45,13 +44,16 @@
 #pragma link C++ class  CbmLitTrackFinder+;
 #pragma link C++ class  CbmLitWeightCalculator+;
 #pragma link C++ class  CbmLitEffHitCalculator+;
+#pragma link C++ class  CbmLitKalmanSmoother+;
 
 // propagation
 #pragma link C++ class  CbmLitTrackPropagatorImp+;
 #pragma link C++ class  CbmLitRK4TrackExtrapolator+;
 #pragma link C++ class  CbmLitLineTrackExtrapolator+;
-#pragma link C++ class  CbmLitParabolicTrackExtrapolator+;
 #pragma link C++ class  CbmTrackPropagatorGeane+;
+#pragma link C++ class  CbmLitGeoNavigatorImp+;
+#pragma link C++ class  CbmLitMaterialInfo+;
+#pragma link C++ class CbmLitMaterialEffectsImp+;
 
 //qa
 #pragma link C++ class  CbmLitMuchRecQa+;
@@ -77,12 +79,8 @@
 #pragma link C++ class  CbmLitConverter+;
 
 // 
-#pragma link C++ class  CbmLitMaterial+;
-#pragma link C++ class  CbmLitCircleMaterial+;
-#pragma link C++ class  CbmLitRectMaterial+;
 #pragma link C++ class  CbmLitEnvironment+;
 #pragma link C++ class  CbmLitToolFactory+;
-#pragma link C++ class  CbmLitDetectorLayout+;
-
+//#pragma link C++ class  CbmLitTestGm+;
 
 #endif

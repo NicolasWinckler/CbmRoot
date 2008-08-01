@@ -1,19 +1,18 @@
 #ifndef CBMLITELOSSANA_H_
 #define CBMLITELOSSANA_H_
 
+#include "CbmLitMaterialInfo.h"
+
 #include "CbmTask.h"
 
-#include <vector>
-
-class CbmLitMaterial;
+class CbmLitMaterialEffectsImp;
 class CbmLitTrackParam;
+class CbmLitMaterialInfo;
 class TH1F;
 class TH2F;
 
-
 class CbmLitElossAna : public CbmTask
 {
-
 public:
 	CbmLitElossAna();
 	virtual ~CbmLitElossAna();
@@ -27,58 +26,51 @@ public:
     virtual void SetParContainers();
   
 private:
-
+	
+	void GetGeometry();
+	
+	Double_t CalcBBLoss( 
+	          const CbmLitTrackParam* par,
+	          const CbmLitMaterialInfo* mat) const;
+	
+	Double_t CalcBBLossSimple( 
+	          const CbmLitTrackParam* par,
+	          const CbmLitMaterialInfo* mat) const;
+	
+	Double_t CalcSigmaQp( 
+	          const CbmLitTrackParam* par,
+	          const CbmLitMaterialInfo* mat) const;
+	
     TClonesArray* fMCTrackArray;
     TClonesArray* fMCPointArray;
 
-    TH1F* fh_dp_mc;
+    TH1F* fh_eloss_mc;
     TH1F* fh_eloss_bb;
-    TH1F* fh_eloss_vl;   
-    TH1F* fh_qp_err;
-    TH1F* fh_qp_err_calc;
-    TH1F* fh_eloss_err;
-    TH1F* fh_eloss_err_calc;
+    TH1F* fh_eloss_bb_simple;
+    TH1F* fh_eloss_mpv; 
+    TH1F* fh_qp_err_mc;
+    TH1F* fh_qp_err_calc;    
     TH1F* fh_pull_qp; 
     
-    TH2F* fhm_dp_mc;
+    TH2F* fhm_eloss_mc;
     TH2F* fhm_eloss_bb;
-    TH2F* fhm_eloss_vl;   
-    TH2F* fhm_qp_err;
-    TH2F* fhm_qp_err_calc;
-    TH2F* fhm_eloss_err;
-    TH2F* fhm_eloss_err_calc;
+    TH2F* fhm_eloss_bb_simple;
+    TH2F* fhm_eloss_mpv;
+    TH2F* fhm_qp_err_mc;
+    TH2F* fhm_qp_err_calc;    
     TH2F* fhm_pull_qp; 
     
     TH1F* fh_teta_mc;
     TH1F* fh_teta_calc;
     TH2F* fhm_teta_mc;
     TH2F* fhm_teta_calc;
-    
-    
-    std::vector<CbmLitMaterial*> fvMaterials;
+
+    CbmLitMaterialInfo fMaterial;
+    CbmLitMaterialEffectsImp* fMatEff;
     
     Int_t fNEvents;
-    
-    Double_t CalcBBLoss( 
-              CbmLitTrackParam* par,
-              CbmLitMaterial* mat);
-    
-    Double_t CalcVLLoss( 
-              CbmLitTrackParam* par,
-              CbmLitMaterial* mat);
-    
-    void CalcErr( 
-              CbmLitTrackParam* par,
-              CbmLitMaterial* mat,
-              Double_t& e_err,
-              Double_t& qp_err);
-    
-    Double_t CalcTeta(
-    		CbmLitTrackParam* par,
-            CbmLitMaterial* mat);
-    
 
-   ClassDef(CbmLitElossAna,1);
+    ClassDef(CbmLitElossAna,1);
 };
 
 #endif /*CBMLITELOSSANA_H_*/

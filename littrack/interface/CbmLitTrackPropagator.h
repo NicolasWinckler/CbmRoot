@@ -1,4 +1,3 @@
-
 // -------------------------------------------------------------------------
 // -----                  CbmLitTrackPropagator header file               -----
 // -----                  Created 04/06/08  by A. Lebedev               -----
@@ -16,30 +15,39 @@
 #ifndef CBMLITTRACKPROPAGATOR_H_
 #define CBMLITTRACKPROPAGATOR_H_
 
-#include "CbmTool.h"
+#include "CbmLitTool.h"
+
+#include "TMatrixD.h"
+
+#include <vector>
+
 
 class CbmLitTrackParam;
 
-class CbmLitTrackPropagator : public CbmTool {
+class CbmLitTrackPropagator : public CbmLitTool {
 
 public:
-   
-   // constructor
    CbmLitTrackPropagator();
    CbmLitTrackPropagator(const std::string& name);
-   
-   // distructor
    virtual ~CbmLitTrackPropagator();
    
    // Pure virtual functions for track parameters propagation
    virtual LitStatus Propagate( 
-		   const CbmLitTrackParam *pParamIn,
-           CbmLitTrackParam *pParamOut,
-           Double_t zOut) = 0;
+		   const CbmLitTrackParam *parIn,
+           CbmLitTrackParam *parOut,
+           Double_t zOut,
+           Int_t pdg) = 0;
                                  
    virtual LitStatus Propagate( 
-		   CbmLitTrackParam *pParam, 
-           Double_t zOut ) = 0;
+		   CbmLitTrackParam *par, 
+           Double_t zOut,
+           Int_t pdg) = 0;
+   
+   virtual void TransportMatrix(
+		   std::vector<Double_t>& F) = 0;
+   
+   virtual void TransportMatrix(
+		   TMatrixD& F) = 0;
       
    ClassDef(CbmLitTrackPropagator,1)
 }; 

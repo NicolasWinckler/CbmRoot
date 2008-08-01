@@ -13,11 +13,11 @@
 #ifndef CBMLITTRACKFITTER_H_
 #define CBMLITTRACKFITTER_H_
 
-#include "CbmTool.h"
+#include "CbmLitTool.h"
 
 class CbmLitTrack;
 
-class CbmLitTrackFitter : public CbmTool {
+class CbmLitTrackFitter : public CbmLitTool {
 
 public:
 

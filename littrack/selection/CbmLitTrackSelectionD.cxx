@@ -2,10 +2,12 @@
 
 #include "CbmLitTrack.h"
 
-CbmLitTrackSelectionD::CbmLitTrackSelectionD()
+CbmLitTrackSelectionD::CbmLitTrackSelectionD():
+	fMinNofHits(0),
+	fMinLastPlaneId(0)
 {
-	Properties().AddProperty("fMinNofHits", 0);
-	Properties().AddProperty("fMinLastPlaneId", 0);
+//	Properties().AddProperty("fMinNofHits", 0);
+//	Properties().AddProperty("fMinLastPlaneId", 0);
 }
 
 CbmLitTrackSelectionD::~CbmLitTrackSelectionD()
@@ -28,8 +30,8 @@ LitStatus CbmLitTrackSelectionD::DoSelect(
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
 	
-	Properties().GetProperty("fMinNofHits", fMinNofHits);
-	Properties().GetProperty("fMinLastPlaneId", fMinLastPlaneId);	
+//	Properties().GetProperty("fMinNofHits", fMinNofHits);
+//	Properties().GetProperty("fMinLastPlaneId", fMinLastPlaneId);	
 	
 	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
 		if ((*iTrack)->GetFlag() == 1) continue;

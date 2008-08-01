@@ -13,7 +13,8 @@ class CbmLitTrackFitterRobust : public CbmLitTrackFitter
 {
 public:
 	CbmLitTrackFitterRobust(
-			CbmLitTrackFitter* fitter);
+			CbmLitTrackFitter* fitter,
+			CbmLitTrackFitter* smoother);
 	
 	virtual ~CbmLitTrackFitterRobust();
 	
@@ -25,6 +26,7 @@ public:
 private:
 	
 	CbmLitTrackFitter* fFitter;
+	CbmLitTrackFitter* fSmoother;
 	CbmLitWeightCalculator* fWeightCalc;
 	CbmLitEffHitCalculator* fEffHitCalc;
 	CbmLitWeightCalculator* fWeightCalcSimple;
@@ -46,6 +48,30 @@ private:
 			HitIterator itBegin,
 			HitIterator itEnd,
 			Int_t iter);
+	
+	LitStatus DAFWeight(
+			const CbmLitTrackParam* par,
+			CbmLitHit* hit,
+			Double_t beta);
+
+	Double_t DAFCut(
+			const CbmLitHit* hit,
+			Double_t beta,
+			Double_t cutValue);
+
+	LitStatus DAFWeight(
+			const CbmLitTrackParam* par,
+			HitIterator itBegin,
+			HitIterator itEnd,
+			Int_t iter);
+	
+	Bool_t AreAllOutliers(
+			HitIterator itBegin,
+			HitIterator itEnd);
+	
+	void MarkOutliers(
+			HitIterator itBegin,
+			HitIterator itEnd);
 	
 	ClassDef(CbmLitTrackFitterRobust, 1);	
 };

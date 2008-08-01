@@ -1,6 +1,6 @@
 
 
-void much_ana(Int_t nEvents = 7300)
+void much_ana(Int_t nEvents = 5000)
 {
 
    // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)

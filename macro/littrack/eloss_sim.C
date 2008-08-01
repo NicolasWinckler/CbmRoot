@@ -1,15 +1,15 @@
 
-void eloss_sim(Int_t nEvents = 10000)
+void eloss_sim(Int_t nEvents = 100000)
 {
 	
-  TString engine = "geant4/";
-  TString dir = "/d/cbm02/andrey/events/eloss/" + engine + "1-10gev_40cm/";
+  TString engine = "geant3/";
+  TString dir = "/d/cbm02/andrey/events/eloss/" + engine + "1-10gev_20cm/";
 
   TString outFile = dir + "eloss.sim.root";                      
  // TString parFile = dir + "eloss.params.root";  
   
   TString caveGeom   = "cave.geo";
-  TString muchGeom   = "../littrack/eloss/simple_geo.geo";
+  TString muchGeom   = "simple_geo.geo";
 
   gDebug = 0;
 
@@ -40,7 +40,7 @@ void eloss_sim(Int_t nEvents = 10000)
 
 
   CbmRunSim* fRun = new CbmRunSim();
-  fRun->SetName("TGeant4");              // Transport engine
+  fRun->SetName("TGeant3");              // Transport engine
   fRun->SetOutputFile(outFile);          // Output file
   CbmRuntimeDb* rtdb = fRun->GetRuntimeDb();
 
@@ -60,15 +60,12 @@ void eloss_sim(Int_t nEvents = 10000)
     cout << "    --- " << muchGeom << endl;
   }
 
-
   CbmFieldMap* magField = NULL;
   fRun->SetField(magField);
-
   
   CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
   
-
-  Double_t minMom = 1.; //minimum momentum
+  Double_t minMom = 0.1.; //minimum momentum
   Double_t maxMom = 10.; //maximum momentum
   
   CbmBoxGenerator* boxGen1 = new CbmBoxGenerator(13, 1);
@@ -83,9 +80,6 @@ void eloss_sim(Int_t nEvents = 10000)
  
   fRun->Init();
   fRun->Run(nEvents);
-
-  
-
   
   // -----   Finish   -------------------------------------------------------
   timer.Stop();

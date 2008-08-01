@@ -1,5 +1,5 @@
 
-void much_reco(Int_t nEvents = 10)
+void much_reco(Int_t nEvents = 100)
 {
 
   Int_t iVerbose = 0;
@@ -120,6 +120,7 @@ void much_reco(Int_t nEvents = 10)
   
   cout << "Starting run" << endl;
   run->Run(0,nEvents);
+
   // ------------------------------------------------------------------------
 
 

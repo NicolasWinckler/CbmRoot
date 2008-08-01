@@ -1,6 +1,4 @@
-
-
-void eloss_ana(Int_t nEvents = 10000)
+void eloss_ana(Int_t nEvents = 100000)
 {
   TString engine = "geant3/";
   TString dir = "/d/cbm02/andrey/events/eloss/" + engine + "1-10gev_20cm/";

@@ -5,6 +5,7 @@
 #include "TVectorD.h"
 
 #include <iostream>
+#include <cmath>
 
 CbmLitTrackParam::CbmLitTrackParam():
 	fX(0.),

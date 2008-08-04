@@ -8,6 +8,7 @@
 #include "TGeoVolume.h"
 
 #include <iostream>
+#include <cmath>
 
 CbmLitGeoNavigatorImp::CbmLitGeoNavigatorImp()
 {

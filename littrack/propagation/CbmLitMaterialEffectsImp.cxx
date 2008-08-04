@@ -5,6 +5,7 @@
 #include "CbmLitPDG.h"
 
 #include <iostream>
+#include <cmath>
 
 CbmLitMaterialEffectsImp::CbmLitMaterialEffectsImp():
 	fMass(0.105),

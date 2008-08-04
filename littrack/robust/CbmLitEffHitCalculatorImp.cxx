@@ -2,6 +2,7 @@
 #include "CbmLitHit.h"
 
 #include <iostream>
+#include <cmath>
 
 CbmLitEffHitCalculatorImp::CbmLitEffHitCalculatorImp()
 {

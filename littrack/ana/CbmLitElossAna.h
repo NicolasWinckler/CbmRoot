@@ -10,6 +10,7 @@ class CbmLitTrackParam;
 class CbmLitMaterialInfo;
 class TH1F;
 class TH2F;
+class TClonesArray;
 
 class CbmLitElossAna : public CbmTask
 {

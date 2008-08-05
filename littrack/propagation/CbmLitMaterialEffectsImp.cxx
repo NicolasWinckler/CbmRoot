@@ -11,7 +11,8 @@ CbmLitMaterialEffectsImp::CbmLitMaterialEffectsImp():
 	fMass(0.105),
 	fEnergyLoss(0.00354),
 	fDownstream(true),
-	fIsElectron(false)
+	fIsElectron(false),
+	fIsMuon(true)
 {
 }
 
@@ -40,14 +41,12 @@ LitStatus CbmLitMaterialEffectsImp::Update(
 	fDownstream = downstream;
 	fMass = CbmLitPDG::GetMass(pdg);
 	fIsElectron = CbmLitPDG::IsElectron(pdg);
+	fIsMuon = CbmLitPDG::IsMuon(pdg);
 
 	if (!fIsElectron) AddEnergyLoss(par, mat);
 	else AddElectronEnergyLoss(par, mat);
 
-	//Double_t length = mat->GetRho() * mat->GetLength();
-	//if (length < 7.) 
 	//AddThinScatter(par, mat);
-	//else 
 	AddThickScatter(par, mat);	
 	
 	return kLITSUCCESS;
@@ -157,10 +156,16 @@ Double_t CbmLitMaterialEffectsImp::CalcThetaSq(
    return theta * theta;
 }
 
-Double_t CbmLitMaterialEffectsImp::BetheBlochSimple(
+Double_t CbmLitMaterialEffectsImp::EnergyLoss(
+		const CbmLitTrackParam* par,
         const CbmLitMaterialInfo* mat) const
 {
-	return fEnergyLoss * mat->GetZ() / mat->GetA();
+	Double_t length = mat->GetRho() * mat->GetLength();
+	Double_t dEdx = BetheBloch(par, mat) + BetheHeitler(par, mat);
+	if (fIsMuon) dEdx += PairProduction(par, mat);
+	return dEdx * length;
+	//return BetheBlochSimple(mat) * length;
+	//return MPVEnergyLoss(par, mat);
 }
 
 Double_t CbmLitMaterialEffectsImp::BetheBloch(
@@ -171,36 +176,30 @@ Double_t CbmLitMaterialEffectsImp::BetheBloch(
 	Double_t z = (par->GetQp() > 0.) ? 1 : -1.;
 	Double_t Z = mat->GetZ();
 	Double_t A = mat->GetA();
-	//Double_t rho = mat->GetRho();
 	
 	Double_t M = fMass;
 	Double_t p = std::abs(1. / par->GetQp()); //GeV
 	Double_t E = std::sqrt(M * M + p * p);
-	Double_t beta = std::abs(p / E);
+	Double_t beta = p / E;
 	Double_t betaSq = beta * beta;
 	Double_t gamma = E / M;
 	Double_t gammaSq = gamma * gamma;
 	
-	Double_t I = 10 * 10e-9 * Z; // GeV	
-	Double_t me = 0.000511; // GeV
+	Double_t I = CalcI(Z) * 1e-9; // GeV	
 	
+	Double_t me = 0.000511; // GeV
 	Double_t ratio = me/M;	
 	Double_t Tmax = (2*me*betaSq*gammaSq) / (1+2*gamma*ratio+ratio*ratio);
 	
-	//Double_t hwp = 28.816 * 10e-9 * std::sqrt(rho*Z/A); // GeV
-	//Double_t dc = std::log(hwp/I) + std::log(beta*gamma) - 0.5;
+	// density correction
+	Double_t dc = 0.;
+	if (p > 1.) { // for particles above 1 Gev
+		Double_t rho = mat->GetRho();
+		Double_t hwp = 28.816 * std::sqrt(rho*Z/A) * 1e-9 ; // GeV
+		dc = std::log(hwp/I) + std::log(beta*gamma) - 0.5;
+	}
 	
-	return K*z*z*(Z/A)*(1./betaSq) * (0.5*std::log(2*me*betaSq*gammaSq*Tmax/(I*I))-betaSq);
-}
-
-Double_t CbmLitMaterialEffectsImp::EnergyLoss(
-		const CbmLitTrackParam* par,
-        const CbmLitMaterialInfo* mat) const
-{
-	//Double_t length = mat->GetRho() * mat->GetLength();
-	//return BetheBlochSimple(mat) * length;
-	//return BetheBloch(par, mat) * length;
-	return MPVEnergyLoss(par, mat);
+	return K*z*z*(Z/A)*(1./betaSq) * (0.5*std::log(2*me*betaSq*gammaSq*Tmax/(I*I))-betaSq - dc);
 }
 
 Double_t CbmLitMaterialEffectsImp::CalcQpAfterEloss(
@@ -215,7 +214,7 @@ Double_t CbmLitMaterialEffectsImp::CalcQpAfterEloss(
 	Double_t Enew = E-eloss;
 	Double_t pnew = (Enew > fMass) ? std::sqrt(Enew * Enew - massSq) : 0.;
 	if (pnew != 0) return q/pnew;
-	else return 1.e5;
+	else return 1e5;
 	//if (!fDownstream) eloss *= -1.0;
 	//if (p > 0.) p -= eloss;
 	//else p += eloss;
@@ -277,24 +276,65 @@ Double_t CbmLitMaterialEffectsImp::CalcSigmaSqQpElectron(
 	           (std::exp(-x/X0 * std::log(3.0)/std::log(2.0)) - 
 	        	std::exp(-2.0 * x/X0));
 }
- 
+
+Double_t CbmLitMaterialEffectsImp::CalcI(
+		Double_t Z) const
+{
+	// mean excitation energy in eV
+	if (Z > 16.) return 10 * Z;
+	else return 16 * std::pow(Z, 0.9);	
+}
+
+Double_t CbmLitMaterialEffectsImp::BetheHeitler( 
+        const CbmLitTrackParam* par,
+        const CbmLitMaterialInfo* mat) const
+{
+   Double_t M = fMass; //GeV
+   Double_t p = std::abs(1. / par->GetQp());  // GeV
+   Double_t rho = mat->GetRho();
+   Double_t X0 = mat->GetRL();
+   Double_t me = 0.000511; // GeV
+   Double_t E = std::sqrt(M * M + p * p);
+   Double_t ratio = me/M;
+   
+   return (E*ratio*ratio)/(X0*rho);
+}
+
+Double_t CbmLitMaterialEffectsImp::PairProduction( 
+        const CbmLitTrackParam* par,
+        const CbmLitMaterialInfo* mat) const
+{
+   Double_t p = std::abs(1. / par->GetQp());  // GeV
+   Double_t M = fMass; //GeV
+   Double_t rho = mat->GetRho();
+   Double_t X0 = mat->GetRL();
+   Double_t E = std::sqrt(M * M + p * p);
+
+   return 7e-5*E/(X0*rho);
+}
+
+Double_t CbmLitMaterialEffectsImp::BetheBlochSimple(
+        const CbmLitMaterialInfo* mat) const
+{
+	return fEnergyLoss * mat->GetZ() / mat->GetA();
+}
+
 Double_t CbmLitMaterialEffectsImp::MPVEnergyLoss( 
         const CbmLitTrackParam* par,
         const CbmLitMaterialInfo* mat) const
 {
-   Double_t M = fMass * 1.e3; //MeV
+   Double_t M = fMass * 1e3; //MeV
    Double_t p = std::abs(1. / par->GetQp()) * 1e3;  // MeV
    
 //   Double_t rho = mat->GetRho();
    Double_t Z = mat->GetZ();
    Double_t A = mat->GetA();
    Double_t x = mat->GetRho() * mat->GetLength();
-   
-   Double_t I = 10 * Z * 10e-6; // MeV
+	
+   Double_t I = CalcI(Z) * 1e-6; // MeV
    
    Double_t K = 0.307075; // MeV g^-1 cm^2
    Double_t j = 0.200;
-   Double_t mcc = M;
    
    Double_t E = std::sqrt(M * M + p * p);
    Double_t beta = p / E; 
@@ -304,11 +344,14 @@ Double_t CbmLitMaterialEffectsImp::MPVEnergyLoss(
 	   
    Double_t ksi = (K/2.)*(Z/A)*(x/betaSq); // MeV
 	   
-//   Double_t hwp = 28.816 * 10e-6 * std::sqrt(rho*Z/A); // MeV
+//   Double_t hwp = 28.816 * std::sqrt(rho*Z/A) * 1e-6 ; // MeV
 //   Double_t dc = std::log(hwp/I) + std::log(beta*gamma) - 0.5;
+//   dc *= 2;
+   Double_t dc = 0.;
    
-   Double_t eloss = ksi * (std::log(2*mcc*betaSq*gammaSq / I) + std::log(ksi/I) + j - betaSq);
-	   
-   return eloss * 1.e-3; //GeV
+   Double_t eloss = ksi * (std::log(2*M*betaSq*gammaSq / I) + std::log(ksi/I) + j - betaSq - dc);
+   
+   return eloss * 1e-3; //GeV
 }
+
 ClassImp(CbmLitMaterialEffectsImp);

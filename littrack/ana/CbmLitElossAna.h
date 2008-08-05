@@ -8,6 +8,7 @@
 class CbmLitMaterialEffectsImp;
 class CbmLitTrackParam;
 class CbmLitMaterialInfo;
+class CbmMuchPoint;
 class TH1F;
 class TH2F;
 class TClonesArray;
@@ -30,6 +31,10 @@ private:
 	
 	void GetGeometry();
 	
+	Double_t CalcLitELoss( 
+	          const CbmLitTrackParam* par,
+	          const CbmLitMaterialInfo* mat) const;
+	          
 	Double_t CalcBBLoss( 
 	          const CbmLitTrackParam* par,
 	          const CbmLitMaterialInfo* mat) const;
@@ -42,10 +47,18 @@ private:
 	          const CbmLitTrackParam* par,
 	          const CbmLitMaterialInfo* mat) const;
 	
+	
+	Double_t dE(
+			CbmMuchPoint* point);
+	
+	Double_t Length(
+			CbmMuchPoint* point);
+	
     TClonesArray* fMCTrackArray;
     TClonesArray* fMCPointArray;
 
     TH1F* fh_eloss_mc;
+    TH1F* fh_eloss_lit;
     TH1F* fh_eloss_bb;
     TH1F* fh_eloss_bb_simple;
     TH1F* fh_eloss_mpv; 
@@ -54,6 +67,7 @@ private:
     TH1F* fh_pull_qp; 
     
     TH2F* fhm_eloss_mc;
+    TH2F* fhm_eloss_lit;
     TH2F* fhm_eloss_bb;
     TH2F* fhm_eloss_bb_simple;
     TH2F* fhm_eloss_mpv;

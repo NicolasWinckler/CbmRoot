@@ -15,6 +15,9 @@ public:
 	static Bool_t IsElectron(
 			Int_t pdg);
 	
+	static Bool_t IsMuon(
+			Int_t pdg);
+	
 	ClassDef(CbmLitPDG,1);
 };
 

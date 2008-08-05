@@ -22,7 +22,8 @@ public:
 	virtual LitStatus Finalize();
 	
 	virtual LitStatus Fit(
-			CbmLitTrack *pTrack);
+			CbmLitTrack *track,
+			Bool_t downstream = true);
 private:
 	
 	CbmLitTrackFitter* fFitter;

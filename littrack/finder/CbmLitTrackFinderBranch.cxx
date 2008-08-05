@@ -36,8 +36,8 @@ LitStatus CbmLitTrackFinderBranch::DoFind(
 {
 
 	//TODO copy links
-	fHitsArray = hits;
-	fTrackSeeds = trackSeeds;
+	fHitArray = hits;
+	fTrackSeedArray = trackSeeds;
 
 	fTracks.clear();
 	fFoundTracks.clear();
@@ -105,7 +105,7 @@ void CbmLitTrackFinderBranch::TrackFollowing()
 }
 
 void CbmLitTrackFinderBranch::TrackFollowingStation(
-		CbmLitTrack *track, 
+		const CbmLitTrack *track, 
 		Int_t station) 
 {
 	Int_t nofLayers = fLayout.GetNofLayers(station);
@@ -127,13 +127,11 @@ void CbmLitTrackFinderBranch::TrackFollowingStation(
    if (fPropagator->Propagate(&par[0], fLayout.GetLayerZ(layer + 0), fPDG) == kLITERROR) return;
    bounds[0] = MinMaxIndex(&par[0], layer + 0);
    for (HitIterator iHit0 = bounds[0].first; iHit0 != bounds[0].second + extraLoop; iHit0++) { //1
-   
       if (!ProcessLayer(0, iHit0, bounds[0], nofMissingHits, &par[0], &uPar[0], hits)) continue;
        
       if (fPropagator->Propagate(&uPar[0], &par[1], fLayout.GetLayerZ(layer + 1), fPDG) == kLITERROR) continue;
       bounds[1] = MinMaxIndex(&par[1], layer + 1);
       for (HitIterator iHit1 = bounds[1].first; iHit1 != bounds[1].second + extraLoop; iHit1++) { //2
-      
          if (!ProcessLayer(1, iHit1, bounds[1], nofMissingHits, &par[1], &uPar[1], hits)) continue;
          
          if (nofLayers < 3) {
@@ -145,7 +143,6 @@ void CbmLitTrackFinderBranch::TrackFollowingStation(
          if (fPropagator->Propagate(&uPar[1], &par[2], fLayout.GetLayerZ(layer + 2), fPDG) == kLITERROR) continue;
          bounds[2] = MinMaxIndex(&par[2], layer + 2);
          for (HitIterator iHit2 = bounds[2].first; iHit2 != bounds[2].second + extraLoop; iHit2++) { //3
-            
             if (!ProcessLayer(2, iHit2, bounds[2], nofMissingHits, &par[2], &uPar[2], hits)) continue;
   
             if (nofLayers < 4) {
@@ -157,7 +154,6 @@ void CbmLitTrackFinderBranch::TrackFollowingStation(
             if (fPropagator->Propagate(&uPar[2], &par[3], fLayout.GetLayerZ(layer + 3), fPDG) == kLITERROR) continue;
             bounds[3] = MinMaxIndex(&par[3], layer + 3);
             for (HitIterator iHit3 = bounds[3].first; iHit3 != bounds[3].second + extraLoop; iHit3++) { //4
-            
                if (!ProcessLayer(3, iHit3, bounds[3], nofMissingHits, &par[3],&uPar[3], hits)) continue;
                
                if (nofBranches++ > fMaxNofBranches) return;
@@ -182,12 +178,12 @@ Bool_t CbmLitTrackFinderBranch::ProcessLayer(
    
    if (layerInStation == 0) nofMissingHits[0] = 0; 
    else nofMissingHits[layerInStation] = nofMissingHits[layerInStation - 1];
-            
+             
    if (hitIt < bounds.second) {
       hits[layerInStation] = *hitIt;
       if (!IsIn(par,  hits[layerInStation])) result = false;
       *uPar = *par; 
-      if (fApplyUpdateInLayer && result) fFilter->Update(uPar,  hits[layerInStation]);
+      if (result) fFilter->Update(uPar,  hits[layerInStation]);
    } else {
       hits[layerInStation] = NULL;
       nofMissingHits[layerInStation]++;
@@ -198,7 +194,7 @@ Bool_t CbmLitTrackFinderBranch::ProcessLayer(
 }
 
 void CbmLitTrackFinderBranch::AddTrackCandidate(
-		CbmLitTrack* track,
+		const CbmLitTrack* track,
 		const HitVector& hits, 
 		Int_t station)
 {
@@ -209,7 +205,7 @@ void CbmLitTrackFinderBranch::AddTrackCandidate(
       newTrack->AddHit(hits[i]);
    }
      
-   newTrack->SortHits();   
+   newTrack->SortHits();
    newTrack->SetPDG(fPDG);
    newTrack->SetLastPlaneId(station);
      

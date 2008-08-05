@@ -13,14 +13,10 @@
 
 CbmLitTrackFinderRobust::CbmLitTrackFinderRobust()
 {
-//	fWeightCalc = new CbmLitWeightCalculatorSimple;
-//	fEffHitCalc = new CbmLitEffHitCalculatorImp;
 }
 
 CbmLitTrackFinderRobust::~CbmLitTrackFinderRobust()
 {
-//	delete fWeightCalc;
-//	delete fEffHitCalc;
 }
 
 LitStatus CbmLitTrackFinderRobust::Initialize()
@@ -40,8 +36,8 @@ LitStatus CbmLitTrackFinderRobust::DoFind(
 {
 
 	//TODO copy links
-	fHitsArray = hits;
-	fTrackSeeds = trackSeeds;
+	fHitArray = hits;
+	fTrackSeedArray = trackSeeds;
 
 	fTracks.clear();
 	fSeedsIdSet.clear();
@@ -81,9 +77,8 @@ void CbmLitTrackFinderRobust::FollowTracks(
 		TrackIterator itBegin,
 		TrackIterator itEnd)
 {
-	for (TrackIterator it = itBegin; it != itEnd; it++) {
+	for (TrackIterator it = itBegin; it != itEnd; it++)
 		FollowTrack(*it);
-	}
 }
 
 void CbmLitTrackFinderRobust::FollowTrack(

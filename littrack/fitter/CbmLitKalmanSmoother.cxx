@@ -26,10 +26,11 @@ LitStatus CbmLitKalmanSmoother::Finalize()
 }
 
 LitStatus CbmLitKalmanSmoother::Fit(
-		CbmLitTrack *pTrack)
+		CbmLitTrack *track,
+		Bool_t downstream)
 {
-	Int_t n = pTrack->GetNofHits();
-	std::vector<CbmLitFitNode> nodes = pTrack->GetFitNodes();
+	Int_t n = track->GetNofHits();
+	std::vector<CbmLitFitNode> nodes = track->GetFitNodes();
 	nodes[n-1].SetSmoothedParam(nodes[n-1].GetUpdatedParam());
 
 	// start with the before the last detector plane 
@@ -37,8 +38,8 @@ LitStatus CbmLitKalmanSmoother::Fit(
 		Smooth(&nodes[i - 1], &nodes[i]);
 	}
 	
-	pTrack->SetParamFirst(nodes[0].GetSmoothedParam());	
-	pTrack->SetFitNodes(nodes);
+	track->SetParamFirst(nodes[0].GetSmoothedParam());	
+	track->SetFitNodes(nodes);
 		
 	return kLITSUCCESS;
 }

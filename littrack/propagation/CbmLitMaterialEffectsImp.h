@@ -74,11 +74,22 @@ public:
 	        const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 	
+	Double_t BetheHeitler( 
+	        const CbmLitTrackParam* par,
+	        const CbmLitMaterialInfo* mat) const;
+	
+	Double_t CbmLitMaterialEffectsImp::PairProduction( 
+	        const CbmLitTrackParam* par,
+	        const CbmLitMaterialInfo* mat) const;
+	
+	Double_t CalcI(
+			Double_t Z) const;
 private:
 	Double_t fEnergyLoss;
 	Bool_t fDownstream;
 	Double_t fMass;
 	Bool_t fIsElectron;
+	Bool_t fIsMuon;
 	
 	ClassDef(CbmLitMaterialEffectsImp, 1);
 };

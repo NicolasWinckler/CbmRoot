@@ -40,16 +40,17 @@ InitStatus CbmLitElossAna::Init()
     fMCPointArray  = (TClonesArray*) ioman->GetObject("MuchPoint");
     if (!fMCPointArray) Fatal("Init", "No MuchPoint array!");
     
-    Int_t nBins = 200;
+    Int_t nBins = 1000;
     Int_t nBinsMom = 100;
     Double_t minEloss = 0.;
-    Double_t maxEloss = 1.;
+    Double_t maxEloss = 3.0;
     Double_t minMom = 0.1;
-    Double_t maxMom = 10.;
+    Double_t maxMom = 35.;
     Double_t minErr = -0.25;
     Double_t maxErr = 0.25;
     
     fh_eloss_mc = new TH1F("fh_eloss_mc", "mc_mom_in - mc_mom_out", nBins, minEloss, maxEloss);
+    fh_eloss_lit = new TH1F("fh_eloss_lit", "eloss_lit", nBins, minEloss, maxEloss);
     fh_eloss_bb = new TH1F("fh_eloss_bb", "eloss_bb", nBins, minEloss, maxEloss);
     fh_eloss_bb_simple = new TH1F("fh_eloss_bb_simple", "eloss_bb_simple", nBins, minEloss, maxEloss);
     fh_eloss_mpv = new TH1F("fh_eloss_mpv", "eloss_mpv", nBins, minEloss, maxEloss);
@@ -58,6 +59,8 @@ InitStatus CbmLitElossAna::Init()
     fh_pull_qp = new TH1F("fh_pull_qp", "pull_qp", nBins, -10, 10);
   
     fhm_eloss_mc = new TH2F("fhm_eloss_mc", "(mc_mom_in - mc_mom_out) vs. momentum",
+            nBinsMom, minMom, maxMom, nBins, minEloss, maxEloss);
+    fhm_eloss_lit = new TH2F("fhm_eloss_lit", "eloss_lit vs. momentum",
             nBinsMom, minMom, maxMom, nBins, minEloss, maxEloss);
     fhm_eloss_bb = new TH2F("fhm_eloss_bb", "eloss_bb vs. momentum",
             nBinsMom, minMom, maxMom, nBins, minEloss, maxEloss);
@@ -120,7 +123,7 @@ void CbmLitElossAna::Exec(Option_t* opt)
         }
         if (point == NULL) continue;
         
-        std::cout << "length=" << point->GetLength() << std::endl;
+        fMaterial.SetLength(Length(point));
         
         TVector3 momIn, momOut;
         point->Momentum(momIn);
@@ -130,11 +133,15 @@ void CbmLitElossAna::Exec(Option_t* opt)
         par.SetTx(point->GetPx()/point->GetPz());
         par.SetTy(point->GetPy()/point->GetPz());
         par.SetQp(Q/momIn.Mag());
-        par.Print();
+        //par.Print();
                
-        Double_t dp = momIn.Mag() - momOut.Mag();
-        fh_eloss_mc->Fill(dp);
-        fhm_eloss_mc->Fill(momIn.Mag(), dp);
+        Double_t mcLoss = dE(point); //point->GetEnergyLoss();
+        fh_eloss_mc->Fill(mcLoss);
+        fhm_eloss_mc->Fill(momIn.Mag(), mcLoss);
+        
+        Double_t litLoss = CalcLitELoss(&par, &fMaterial);
+        fh_eloss_lit->Fill(litLoss);
+        fhm_eloss_lit->Fill(momIn.Mag(), litLoss);
         
         Double_t bbLoss = CalcBBLoss(&par, &fMaterial);
         fh_eloss_bb->Fill(bbLoss);
@@ -175,6 +182,7 @@ void CbmLitElossAna::Exec(Option_t* opt)
 void CbmLitElossAna::Finish()
 {
 	fh_eloss_mc->Write();
+	fh_eloss_lit->Write();	
 	fh_eloss_bb->Write();
 	fh_eloss_bb_simple->Write();
 	fh_eloss_mpv->Write();
@@ -183,6 +191,7 @@ void CbmLitElossAna::Finish()
 	fh_pull_qp->Write();
 		
 	fhm_eloss_mc->Write();
+	fhm_eloss_lit->Write();	
 	fhm_eloss_bb->Write();
 	fhm_eloss_bb_simple->Write();
 	fhm_eloss_mpv->Write();
@@ -210,13 +219,21 @@ void CbmLitElossAna::GetGeometry()
 	fMaterial.SetLength(2 * shape->GetDZ());
 }
 
+Double_t CbmLitElossAna::CalcLitELoss( 
+          const CbmLitTrackParam* par,
+          const CbmLitMaterialInfo* mat) const 
+{
+	return fMatEff->EnergyLoss(par, mat);
+}
+
 Double_t CbmLitElossAna::CalcBBLoss( 
           const CbmLitTrackParam* par,
           const CbmLitMaterialInfo* mat) const 
 {
 	Double_t length = mat->GetRho() * mat->GetLength();
 	Double_t bbLoss = fMatEff->BetheBloch(par, mat) * length;
-	return bbLoss;
+	Double_t bhLoss = fMatEff->BetheHeitler(par, mat) * length;
+	return bbLoss + bhLoss;
 }
 
 Double_t CbmLitElossAna::CalcBBLossSimple( 
@@ -233,6 +250,28 @@ Double_t CbmLitElossAna::CalcSigmaQp(
           const CbmLitMaterialInfo* mat) const
 {
 	return std::sqrt(fMatEff->CalcSigmaSqQp(par, mat));
+}
+
+Double_t CbmLitElossAna::dE(
+		CbmMuchPoint* point)
+{
+    TVector3 momIn, momOut;
+    point->Momentum(momIn);
+    point->MomentumOut(momOut);
+    Double_t M = 0.105;
+    
+    return std::sqrt(M*M + momIn*momIn) - std::sqrt(M*M + momOut*momOut);
+}
+
+Double_t CbmLitElossAna::Length(
+		CbmMuchPoint* point)
+{
+    Double_t dx = point->GetXIn() - point->GetXOut();
+    Double_t dy = point->GetYIn() - point->GetYOut();
+    Double_t dz = point->GetZIn() - point->GetZOut();
+    Double_t length = std::sqrt(dx*dx + dy*dy + dz*dz);   
+//    std::cout << "length=" << length << std::endl;
+    return length;
 }
 
 ClassImp(CbmLitElossAna)

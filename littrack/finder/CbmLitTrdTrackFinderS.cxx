@@ -90,8 +90,8 @@ void CbmLitTrdTrackFinderS::Init()
  //SetMaxNofMissingHitsInStation(0);
  //SetMaxNofMissingHits(0);
  //SetSigmaCoef(5.); 
-   SetPrecalcSearchRegions(false); 
-   SetApplyUpdateInLayer(true);
+ //  SetPrecalcSearchRegions(false); 
+ //  SetApplyUpdateInLayer(true);
    //fTrackFinder->SetSigmaX(sigmaX);
    //fTrackFinder->SetSigmaY(sigmaY);
    SetPDG(211);

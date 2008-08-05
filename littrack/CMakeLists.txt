@@ -97,6 +97,7 @@ utils/CbmLitComparators.cxx
 utils/CbmLitMemoryManagment.cxx
 utils/CbmLitConverter.cxx
 utils/CbmLitTypes.cxx
+utils/CbmLitMath.cxx
 CbmLitEnvironment.cxx  
 CbmLitToolFactory.cxx
 #CbmLitTestGm.cxx

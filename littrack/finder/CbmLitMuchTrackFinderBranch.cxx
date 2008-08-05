@@ -67,8 +67,8 @@ void CbmLitMuchTrackFinderBranch::Init()
    SetMaxNofMissingHitsInStation(0);
    SetMaxNofMissingHits(0);
    SetSigmaCoef(3.0); 
-   SetPrecalcSearchRegions(false); 
-   SetApplyUpdateInLayer(true);
+//   SetPrecalcSearchRegions(false); 
+//   SetApplyUpdateInLayer(true);
    SetPDG(13);
    //SetSigmaX(sigmaX);
    //SetSigmaY(sigmaY);

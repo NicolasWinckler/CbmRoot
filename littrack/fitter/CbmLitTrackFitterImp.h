@@ -22,21 +22,14 @@ public:
 	virtual LitStatus Finalize();
 	
 	virtual LitStatus Fit(
-			CbmLitTrack *pTrack);
-	
-	Bool_t IsDownstream() { return fDownstream;}
-	
-	void IsDownstream(Bool_t isDownstream) { fDownstream = isDownstream; }
-	
+			CbmLitTrack *track,
+			Bool_t downstream = true);
+
 private:
 	
 	CbmLitTrackPropagator* fPropagator;
 	CbmLitTrackUpdate* fUpdate;
 	Bool_t fDownstream;
-	
-	Double_t CalcChi2(						
-			const CbmLitTrackParam *pParam, 						
-			const CbmLitHit* pHit);
 	
 	ClassDef(CbmLitTrackFitterImp, 1)
 };

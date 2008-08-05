@@ -26,7 +26,9 @@ public:
       
    virtual ~CbmLitTrackFitter();
 
-   virtual LitStatus Fit(CbmLitTrack *pTrack) = 0;
+   virtual LitStatus Fit(
+		   CbmLitTrack *track,
+		   Bool_t downstream = true) = 0;
    
    ClassDef(CbmLitTrackFitter,1)
 };

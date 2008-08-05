@@ -56,18 +56,9 @@ public:
 	   	fMaxNofMissingHits = maxNofMissingHits;
 	}
 	void SetSigmaCoef(Double_t sigmaCoef) { fSigmaCoef = sigmaCoef;}
-	void SetPrecalcSearchRegions(Bool_t precalcSearchRegions) { 
-	   	fPrecalcSearchRegions = precalcSearchRegions;
-	}
-	void SetApplyUpdateInLayer(Bool_t applyUpdateInLayer) {
-	   	fApplyUpdateInLayer = applyUpdateInLayer;
-	}
-	void SetSigmaX(const std::vector<Double_t>& sigmaX){
-	 	fSigmaX = sigmaX;
-	}
-	void SetSigmaY(const std::vector<Double_t>& sigmaY){
-	  	fSigmaY = sigmaY;
-	}
+//	void SetApplyUpdateInLayer(Bool_t applyUpdateInLayer) {
+//	   	fApplyUpdateInLayer = applyUpdateInLayer;
+//	}
 	void SetPDG(Int_t pdg) { fPDG = pdg;}
 	
 protected:
@@ -75,8 +66,8 @@ protected:
     CbmLitDetectorLayout fLayout;
        
     // Data
-    HitVector fHitsArray;
-    TrackVector fTrackSeeds;
+    HitVector fHitArray;
+    TrackVector fTrackSeedArray;
     std::vector<HitVector> fHits;
     TrackVector fTracks;    
 
@@ -102,13 +93,8 @@ protected:
     Int_t fMaxNofMissingHitsInStation;
     Int_t fMaxNofMissingHits;
     Double_t fSigmaCoef;
-    Bool_t fPrecalcSearchRegions;  
-    Bool_t fApplyUpdateInLayer;
+//    Bool_t fApplyUpdateInLayer;
     Int_t fPDG;
-        
-    // used only for precalculated tables of deviations
-    std::vector<Double_t> fSigmaX;
-    std::vector<Double_t> fSigmaY;
     
     // Max measurement error for each layer
     std::vector<Double_t> fMaxErrX;
@@ -130,7 +116,7 @@ protected:
     // Checks if the hit in the area near the track
     bool IsIn(
     		const CbmLitTrackParam* par, 
-    		const CbmLitHit *hit);    
+    		const CbmLitHit *hit) const;    
     
     // Defines min and max index of hits 
     // which can be used for futher following 
@@ -141,11 +127,11 @@ protected:
     //
     Double_t CalcDevX(
     		const CbmLitTrackParam* par,
-    		Int_t layer);
+    		Int_t layer) const;
     //
     Double_t CalcDevY(
     		const CbmLitTrackParam* par,
-    		Int_t layer);
+    		Int_t layer) const;
 
     // Removes hits which belong to found tracks
     void RemoveHits(

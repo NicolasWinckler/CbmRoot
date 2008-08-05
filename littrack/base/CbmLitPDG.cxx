@@ -25,4 +25,10 @@ Bool_t CbmLitPDG::IsElectron(
 	else return false;
 }
 
+Bool_t CbmLitPDG::IsMuon(
+		Int_t pdg)
+{
+	if (std::abs(pdg) == 13) return true;
+	else return false;
+}
 ClassImp(CbmLitPDG);

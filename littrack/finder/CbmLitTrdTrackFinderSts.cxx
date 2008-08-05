@@ -80,7 +80,7 @@ void CbmLitTrdTrackFinderSts::Init()
    SetNofIter(1); 
    SetBeginStation(0); 
    SetEndStation(fLayout.GetNofStations() - 1);
-   SetPrecalcSearchRegions(false); 
+//   SetPrecalcSearchRegions(false); 
    SetPDG(211);
 }
 
@@ -90,7 +90,7 @@ void CbmLitTrdTrackFinderSts::SetIterationParameters(Int_t iter)
 		SetMaxNofMissingHitsInStation(1);
 		SetMaxNofMissingHits(1);
 		SetSigmaCoef(5.); 
-		SetApplyUpdateInLayer(true);
+//      SetApplyUpdateInLayer(true);
 	} 
 }
 

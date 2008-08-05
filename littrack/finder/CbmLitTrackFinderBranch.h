@@ -28,7 +28,7 @@ protected:
     
 	// Follows track through the station
     void TrackFollowingStation(
-    		CbmLitTrack *track, 
+    		const CbmLitTrack *track, 
     		Int_t station);
     
     // Process the layer
@@ -43,7 +43,7 @@ protected:
     
     // Adds track candidate 
     void AddTrackCandidate(
-    		CbmLitTrack* track, 
+    		const CbmLitTrack* track, 
     		const HitVector& hits, 
     		Int_t station);
     

@@ -78,7 +78,7 @@ public:
 	        const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 	
-	Double_t CbmLitMaterialEffectsImp::PairProduction( 
+	Double_t PairProduction( 
 	        const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 	

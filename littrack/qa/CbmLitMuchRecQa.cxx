@@ -1,4 +1,3 @@
-
 // -------------------------------------------------------------------------
 // -----                  CbmLitMuchRecQa source file               -----
 // -----                  Created 15/10/07  by A. Lebedev               -----
@@ -8,7 +7,6 @@
 
 #include "CbmMuchTrack.h"
 #include "CbmMuchTrackMatch.h"
-#include "CbmMuchDigiMatch.h"
 #include "CbmMuchHit.h"
 
 #include "CbmStsTrack.h"
@@ -79,10 +77,6 @@ InitStatus CbmLitMuchRecQa::Init()
     fMuchHits = (TClonesArray*) ioman->GetObject("MuchHit");
     if (NULL == fMuchHits) 
     	Fatal("CbmLitMuchRecQa::Init", "No fMuchHits array!");
-    
-    fMuchDigiMatches  = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
-    if (NULL == fMuchDigiMatches) 
-    	Fatal("CbmLitMuchRecQa::Init", "No MuchDigiMatches array!");
     
     if (fNormType == 2) {
     	fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
@@ -258,7 +252,12 @@ void CbmLitMuchRecQa::ProcessMcTracks()
 
     if (fMcMuchMap.find(iMCTrack) != fMcMuchMap.end() ) {
       
-      //if (IsMismatch(iMCTrack)) continue;
+      if (IsMismatch(iMCTrack)) {
+    	  fEvNofMismatches++;
+   	      fhMomMismatches->Fill(mom);
+    	  fhNpMismatches->Fill(Double_t(nofPoints));
+    	  //continue;
+      }
       
       // Fill histograms for reconstructed tracks
       fEvNofRecAll++;
@@ -326,7 +325,7 @@ void CbmLitMuchRecQa::CreateHistos()
 
   // Momentum distributions
   Double_t minMom   =  0.;
-  Double_t maxMom   = 10.;
+  Double_t maxMom   = 25.;
   Int_t    nBinsMom = 10;
   
   fhMomAccAll = new TH1F("hMomAccAll", "all accepted tracks",
@@ -444,6 +443,21 @@ void CbmLitMuchRecQa::CreateHistos()
   fHistoList->Add(fhNhClones);
   fHistoList->Add(fhNhGhosts);
   
+  // mismatches
+  fhMomMismatches = new TH1F("hMomMismatches", "mismatches",
+          nBinsMom, minMom, maxMom);
+  fhMomEffMismatches  = new TH1F("hMomEffMismatches", "efficiency mismatches",
+                           nBinsMom, minMom, maxMom);
+  fhNpMismatches = new TH1F("hNpMismatches", "mismatches",
+          nBinsNp, minNp, maxNp);
+  fhNpEffMismatches = new TH1F("hNpEffMismatches", "efficiency mismatches",
+          nBinsNp, minNp, maxNp);
+  
+  fHistoList->Add(fhMomMismatches);
+  fHistoList->Add(fhMomEffMismatches);
+  fHistoList->Add(fhNpMismatches);
+  fHistoList->Add(fhNpEffMismatches);  
+  
    // Number of hit and momentum distributions
   fhMomNhAccAll = new TH2D("hMomNhAccAll", "momentum vs. number of hits",
 		               nBinsMom, minMom, maxMom, nBinsNp, minNp, maxNp);
@@ -454,46 +468,6 @@ void CbmLitMuchRecQa::CreateHistos()
   fHistoList->Add(fhMomNhAccAll);
   fHistoList->Add(fhMomNhRecAll);
   fHistoList->Add(fhMomNhEffAll);
-  
-  //fit qa histos, residuals and pulls
-//  Double_t minRes   =  -1.;
-//  Double_t maxRes   = 1.;
-//  Int_t nBinsRes = 200;
-//  fhResX = new TH1F("hResX", "residual X", nBinsRes, minRes, maxRes);
-//  fhResY = new TH1F("hResY", "residual Y", nBinsRes, minRes, maxRes);
-//  fhResTx = new TH1F("hResTx", "residual Tx", nBinsRes, minRes, maxRes);
-//  fhResTy = new TH1F("hResTy", "residual Ty", nBinsRes, minRes, maxRes);
-//  fhResQp = new TH1F("hResQp", "residual Qp", nBinsRes, minRes, maxRes);
-//  fhResMomProc = new TH1F("fhResMomProc", "residual momentum in %", nBinsRes, -20., 20.);
-//  Double_t minPull   =  -5.;
-//  Double_t maxPull   = 5.;
-//  Int_t nBinsPull = 200;
-//  fhPullX = new TH1F("hPullX", "pull X", nBinsPull, minPull, maxPull);
-//  fhPullY = new TH1F("hPullY", "pull Y", nBinsPull, minPull, maxPull);
-//  fhPullTx = new TH1F("hPullTx", "pull Tx", nBinsPull, minPull, maxPull);
-//  fhPullTy = new TH1F("hPullTy", "pull Ty", nBinsPull, minPull, maxPull);
-//  fhPullQp = new TH1F("hPullQp", "pull Qp", nBinsPull, minPull, maxPull);
-//  
-//  fHistoList->Add(fhResX);
-//  fHistoList->Add(fhResY);
-//  fHistoList->Add(fhResTx);
-//  fHistoList->Add(fhResTy);
-//  fHistoList->Add(fhResQp);
-//  fHistoList->Add(fhResMomProc);
-//  fHistoList->Add(fhPullX);
-//  fHistoList->Add(fhPullY);
-//  fHistoList->Add(fhPullTx);
-//  fHistoList->Add(fhPullTy);
-//  fHistoList->Add(fhPullQp);
-//  
-//  Int_t nBinsChi2 = 100;
-//  Double_t minChi2 = 0;
-//  Double_t maxChi2 = 10;
-//  fhChi2Muons = new TH1F("hChi2Muons", "chi2/NDF for primary muons", nBinsChi2, minChi2, maxChi2);
-//  fhChi2Other = new TH1F("hChi2Other", "chi2/NDF for other", nBinsChi2, minChi2, maxChi2);
-//  
-//  fHistoList->Add(fhChi2Muons);
-//  fHistoList->Add(fhChi2Other);
 }
 
 void CbmLitMuchRecQa::DivideHistos(
@@ -523,6 +497,7 @@ void CbmLitMuchRecQa::ZeroGlobalCounters()
 	fNofRecMuons = 0;
 	fNofGhosts = 0;
 	fNofClones = 0;
+	fNofMismatches = 0;
 	fNEvents = 0; 
 	//rates
     fRateMcTracks = 0;
@@ -540,6 +515,7 @@ void CbmLitMuchRecQa::ZeroGlobalCounters()
     fRateAccMuons = 0;
     fRateGhosts = 0;
     fRateClones = 0;
+    fRateMismatches = 0;
     //eff
     fEffAll = 0;
     fEffRef = 0;
@@ -548,6 +524,7 @@ void CbmLitMuchRecQa::ZeroGlobalCounters()
     fEffMuons = 0;
     fEffGhosts = 0;
     fEffClones = 0;
+    fEffMismatches = 0;
 }
 
 void CbmLitMuchRecQa::ZeroEventCounters()
@@ -567,6 +544,7 @@ void CbmLitMuchRecQa::ZeroEventCounters()
 	fEvNofRecMuons = 0;
 	fEvNofGhosts = 0;
 	fEvNofClones = 0;
+	fEvNofMismatches = 0;
 	
 	fEvEffAll = 0.;
 	fEvEffRef = 0.;
@@ -575,6 +553,7 @@ void CbmLitMuchRecQa::ZeroEventCounters()
 	fEvEffMuons = 0.;
 	fEvEffGhosts = 0.;
 	fEvEffClones = 0.;
+	fEvEffMismatches = 0.;
 }
 
 void CbmLitMuchRecQa::IncreaseCounters()
@@ -594,6 +573,7 @@ void CbmLitMuchRecQa::IncreaseCounters()
   fNofRecMuons += fEvNofRecMuons;
   fNofGhosts += fEvNofGhosts;
   fNofClones += fEvNofClones;
+  fNofMismatches += fEvNofMismatches;
   fNEvents++;
 }
 
@@ -608,6 +588,7 @@ void CbmLitMuchRecQa::CalcEventEff()
   if (fEvNofAccPrim > 0) fEvEffPrim = Double_t(fEvNofRecPrim) / Double_t(fEvNofAccPrim);
   if (fEvNofAccSec > 0) fEvEffSec  = Double_t(fEvNofRecSec)  / Double_t(fEvNofAccSec);
   if (fEvNofAccMuons > 0) fEvEffMuons  = Double_t(fEvNofRecMuons)  / Double_t(fEvNofAccMuons);
+  if (fEvNofRecAll > 0)fEvEffMismatches = Double_t(fEvNofMismatches) / Double_t(fEvNofRecAll*fEvEffAll); 
 }
 
 void CbmLitMuchRecQa::CalcEffAndRates()
@@ -624,6 +605,8 @@ void CbmLitMuchRecQa::CalcEffAndRates()
   DivideHistos(fhNpRecSec, fhNpAccSec, fhNpEffSec);
   DivideHistos(fhNpRecMuons, fhNpAccMuons, fhNpEffMuons);
   DivideHistos(fhMomNhRecAll,fhMomNhAccAll,fhMomNhEffAll);
+  DivideHistos(fhMomMismatches,fhMomRecAll,fhMomEffMismatches);
+  DivideHistos(fhNpMismatches,fhNpRecAll,fhNpEffMismatches);
   
   // Normalise histos for clones and ghosts to one event
   if (fNEvents != 0) {
@@ -640,6 +623,7 @@ void CbmLitMuchRecQa::CalcEffAndRates()
   if (fNofAccPrim != 0) fEffPrim = Double_t(fNofRecPrim) / Double_t(fNofAccPrim);
   if (fNofAccSec != 0) fEffSec = Double_t(fNofRecSec)  / Double_t(fNofAccSec);
   if (fNofAccMuons != 0) fEffMuons = Double_t(fNofRecMuons)  / Double_t(fNofAccMuons);
+  if (fNofRecAll != 0) fEffMismatches = Double_t(fNofMismatches) / Double_t(fNofRecAll*fEffAll);
 
   fRateMcTracks = Double_t(fNofMcTracks) / Double_t(fNEvents);
   fRateStsTracks = Double_t(fNofStsTracks) / Double_t(fNEvents);
@@ -656,6 +640,7 @@ void CbmLitMuchRecQa::CalcEffAndRates()
   fRateAccMuons = Double_t(fNofAccMuons) / Double_t(fNEvents);
   fRateGhosts = Double_t(fNofGhosts) / Double_t(fNEvents);
   fRateClones = Double_t(fNofClones) / Double_t(fNEvents);
+  fRateMismatches = Double_t(fNofMismatches) / Double_t(fNEvents); 
 }
 
 void CbmLitMuchRecQa::PrintEventStatistic()
@@ -677,7 +662,9 @@ void CbmLitMuchRecQa::PrintEventStatistic()
     std::cout << "Sec: acc: " << fEvNofAccSec << ", rec: "
     	<< fEvNofRecSec << ", efficiency " << fEvEffSec*100. << "%" << std::endl;
     std::cout << "Muons: acc: " << fEvNofAccMuons << ", rec: "
-        	<< fEvNofRecMuons << ", efficiency " << fEvEffMuons*100. << "%" << std::endl;
+        << fEvNofRecMuons << ", efficiency " << fEvEffMuons*100. << "%" << std::endl;
+    std::cout << "Mismatches: " << fEvNofMismatches 
+    	<< ", efficiency " << fEvEffMismatches*100. << "%" << std::endl;
     std::cout << "Ghosts: " << fEvNofGhosts << ", ghosts/acc MC tracks: "
     	<< fEvEffGhosts*100. << "%" << std::endl;
     std::cout << "Clones: " << fEvNofClones << ", clones/accepted MC tracks: "
@@ -705,6 +692,8 @@ void CbmLitMuchRecQa::PrintStatistic()
   	<<"), per event (" << fRateRecSec << "/" << fRateAccSec << ")" << std::endl;
   std::cout << "muons: " << fEffMuons*100 << " % (" << fNofRecMuons << "/" << fNofAccMuons 
    	<<"), per event (" << fRateRecMuons << "/" << fRateAccMuons << ")" << std::endl;
+  std::cout << "mismatches: " << fEffMismatches*100 << " % (" << fNofMismatches << "/" << fEffAll*fNofRecAll 
+     	<<"), per event (" << fRateMismatches << "/" << fEffAll * fRateRecAll << ")" << std::endl;
   std::cout << "ghosts: " << fRateGhosts << " per event, " << "ghosts/accepted MC tracks :" 
   	<< fEffGhosts*100 << "% (" << fNofGhosts << "/" << fNofAccAll << ")" << std::endl;
   std::cout << "clone: " << fRateClones << " per event, " << "clones/accepted MC tracks :" 
@@ -724,147 +713,4 @@ void CbmLitMuchRecQa::WriteToFile()
 	//  olddir->cd();
 }
 
-//void CbmLitMuchRecQa::AddFitQa(CbmMuchTrack* track)
-//{
-//    Int_t hitIndex = track->GetHitIndex(track->GetNHits() - 1);
-//    CbmMuchHit* hit = (CbmMuchHit*) fMuchHits->At(hitIndex);
-//    Int_t digiIndex = hit->GetDigi();
-//    CbmMuchDigiMatch* pDigiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);    
-//    Int_t pointIndex = pDigiMatch->GetRefIndex(0);
-//    CbmMCPoint* point = (CbmMCPoint*) fMCPoints->At(pointIndex);
-//
-//	Double_t x = point->GetX();
-//    Double_t y = point->GetY();
-//    Double_t px = point->GetPx();
-//    Double_t py = point->GetPy();
-//    Double_t pz = point->GetPz();
-//    Double_t tx = px / pz;
-//    Double_t ty = py / pz;
-//    
-//    Int_t mcId = point->GetTrackID();
-//    CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(mcId);
-//    Int_t pdg = mcTrack->GetPdgCode();
-//    Double_t q;
-//    if (pdg > 0) q = -1.; else q = 1.;         
-//    Double_t qp = q / sqrt(px * px + py * py + pz * pz);
-//    
-//    CbmTrackParam par(*track->GetMuchTrack());
-//    
-//    Double_t resx = par.GetX() - x;
-//    Double_t resy = par.GetY() - y;
-//    Double_t restx = par.GetTx() - tx;
-//    Double_t resty = par.GetTy() - ty;
-//    Double_t resqp = par.GetQp() - qp;         
-//    
-//    Double_t resp = 100 * (((1. / fabs(par.GetQp())) - (1. / fabs(qp))) / (1. / qp));   
-//             
-//    Double_t cov00 = par.GetCovariance(0,0);
-//    Double_t cov11 = par.GetCovariance(1,1);
-//    Double_t cov22 = par.GetCovariance(2,2);
-//    Double_t cov33 = par.GetCovariance(3,3);
-//    Double_t cov44 = par.GetCovariance(4,4);
-//    if (cov00 <= 0. || cov11 <= 0. || cov22 <= 0. || cov33 <= 0. || cov44 <= 0.) return;
-//    
-//    Double_t pullx = (resx) / (sqrt(cov00));
-//    Double_t pully = (resy) / (sqrt(cov11));
-//    Double_t pulltx = (restx) / (sqrt(cov22));
-//    Double_t pullty = (resty) / (sqrt(cov33));
-//    Double_t pullqp = (resqp) / (sqrt(cov44));
-//             
-//    fhResX->Fill(resx);
-//    fhResY->Fill(resy); 
-//    fhResTx->Fill(restx);
-//    fhResTy->Fill(resty);
-//    fhResQp->Fill(resqp);
-//    fhPullX->Fill(pullx);
-//    fhPullY->Fill(pully); 
-//    fhPullTx->Fill(pulltx);
-//    fhPullTy->Fill(pullty);
-//    fhPullQp->Fill(pullqp);
-//    fhResMomProc->Fill(resp);
-//}
-//
-//
-//void CbmLitMuchRecQa::CalcMuonsEff()
-//{
-//	//fMcMuchMap.clear();
-// 
-//	// Counters
-//	Int_t nofRecMuonsA = 0;
-//	Int_t nofRecMuonPairsA = 0;
-//	Int_t nofRecMuonsB = 0;
-//	Int_t nofRecMuonPairsB = 0;
-//	Int_t nofRecMuonsC = 0;
-//	Int_t nofRecMuonPairsC = 0;
-//	Bool_t muonPlusA = false;
-//	Bool_t muonMinusA = false;
-//	Bool_t muonPlusB = false;
-//	Bool_t muonMinusB = false;
-//	Bool_t muonPlusC = false;
-//	Bool_t muonMinusC = false;
-//	
-//	Int_t nofMuchTracks = fMuchTracks->GetEntriesFast();
-//	Int_t nofMuchMatches = fMuchMatches->GetEntriesFast();
-//	for (Int_t iRec = 0; iRec < nofMuchTracks; iRec++) {
-//	    CbmMuchTrack* muchTrack = (CbmMuchTrack*) fMuchTracks->At(iRec);
-//	    CbmMuchTrackMatch* match = (CbmMuchTrackMatch*) fMuchMatches->At(iRec);
-//		Int_t mcIdMuch = match->GetMCTrackId();
-//		if (mcIdMuch == -1) continue;
-//	    
-//		Int_t mcIdSts = 0;
-//		if (fNormType == 2) {
-//			Int_t stsTrackId = muchTrack->GetStsTrackID();
-//		    CbmStsTrackMatch* stsTrackM = (CbmStsTrackMatch*) fStsMatches->At(stsTrackId);
-//			mcIdSts = stsTrackM->GetMCTrackId();   
-//			if (mcIdSts == -1) continue;
-//	       
-//			CbmMCTrack* mcTrackSts = (CbmMCTrack*) fMCTracks->At(mcIdSts);
-//			Bool_t isPrimSts = (mcTrackSts->GetMotherId() == -1);
-//		    if (isPrimSts && mcTrackSts->GetPdgCode() == 13) muonPlusA = true;
-//		    if (isPrimSts && mcTrackSts->GetPdgCode() == -13) muonMinusA = true;
-//		}
-//		
-//		//Int_t nofPoints = ((CbmMCTrack*) fMCTracks->At(mcIdMuch))->GetNPoints(kMUCH);
-//		Int_t nofHits = muchTrack->GetNHits();  
-//		Int_t nofTrue = match->GetNofTrueHits();
-//		//Double_t qualiNofHits = Double_t(nofHits) / Double_t(nofPoints);
-//		Double_t quali = Double_t(nofTrue) / Double_t(nofHits);
-//		if (quali >= fQuota /*&& qualiNofHits >= 0.0*/) { // 
-//	    	CbmMCTrack* mcTrackMuch = (CbmMCTrack*) fMCTracks->At(mcIdMuch);
-//			Bool_t isPrimMuch = (mcTrackMuch->GetMotherId() == -1);
-//			if (isPrimMuch && mcTrackMuch->GetPdgCode() == 13) muonPlusC = true;
-//			if (isPrimMuch && mcTrackMuch->GetPdgCode() == -13) muonMinusC = true; 
-//		
-//			if (fNormType == 2 && mcIdMuch == mcIdSts) {
-//	        	if (isPrimMuch && mcTrackMuch->GetPdgCode() == 13) muonPlusB = true;
-//				if (isPrimMuch && mcTrackMuch->GetPdgCode() == -13) muonMinusB = true;
-//			}	
-//		}   		
-//	  
-//	    if (muonPlusA || muonMinusA) nofRecMuonsA = 1;
-//	    if (muonPlusA && muonMinusA) {
-//		    nofRecMuonPairsA = 1;
-//		    nofRecMuonsA = 2;
-//	    }
-//	    if (muonPlusB || muonMinusB) nofRecMuonsB = 1;
-//	    if (muonPlusB && muonMinusB) {
-//	        nofRecMuonPairsB = 1;
-//		    nofRecMuonsB = 2;
-//	    }
-//	    if (muonPlusC || muonMinusC) nofRecMuonsC = 1;
-//	    if (muonPlusC && muonMinusC) {
-//		    nofRecMuonPairsC = 1;
-//		    nofRecMuonsC = 2;
-//	    } 
-//	}
-//	fNofRecMuonsA += nofRecMuonsA; 
-//	fNofRecMuonPairsA += nofRecMuonPairsA;  
-//	fNofRecMuonsB += nofRecMuonsB; 
-//	fNofRecMuonPairsB += nofRecMuonPairsB;  
-//	fNofRecMuonsC += nofRecMuonsC; 
-//	fNofRecMuonPairsC += nofRecMuonPairsC;  
-//}
-
 ClassImp(CbmLitMuchRecQa)
-
-

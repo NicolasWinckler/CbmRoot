@@ -76,7 +76,7 @@ void CbmLitTrdTrackFinderSts::Init()
    SetTrackSeedSelection(fTrackSeedSelection);
    SetTrackSelectionStation(fTrackSelectionStation);
    SetTrackSelectionFinal(fTrackSelectionFinal);
-   SetVerbose(3);
+   SetVerbose(1);
    SetNofIter(1); 
    SetBeginStation(0); 
    SetEndStation(fLayout.GetNofStations() - 1);

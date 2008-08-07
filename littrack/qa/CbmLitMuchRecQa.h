@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-// -----                  CbmMuchFindTrackQa header file               -----
+// -----                  CbmLitMuchRecQa header file               -----
 // -----                  Created 15/10/07  by A. Lebedev               -----
 // -------------------------------------------------------------------------
 
@@ -14,10 +14,8 @@
 #ifndef CBMLITMUCHRECQA_H_
 #define CBMLITMUCHRECQA_H_
 
-
 #include "CbmTask.h"
 
-#include "TVector3.h"
 #include "TH2D.h"
 
 #include <set>
@@ -29,41 +27,22 @@ class TH1F;
 class TList;
 class CbmMuchTrack;
 
-
-
 class CbmLitMuchRecQa : public CbmTask
 {
 public:
 
   CbmLitMuchRecQa();
-
-  /** Standard constructor
-  *@param minPoints   Minimal number of MCPoints for considered MCTracks
-  *@param quota       True/all hits for track to be considered reconstructed
-  *@param iVerbose    Verbosity level
-  **/
   CbmLitMuchRecQa(Int_t minPoints, Double_t quota, Int_t iVerbose = 1);
-
-  /** Destructor **/
   virtual ~CbmLitMuchRecQa();
 
-  /** Set parameter containers **/
   virtual void SetParContainers();
-
-  /** Initialisation **/
   virtual InitStatus Init();
-
-  /** Reinitialisation **/
   virtual InitStatus ReInit();
-
-  /** Execution **/
   virtual void Exec(Option_t* opt);
 
-  /** Accessors **/
   Int_t GetNormType() {return fNormType;}
   Int_t GetMinPoints() {return fMinPoints;}
 
-  /** Modifiers **/
   void SetNormType(Int_t normType) { fNormType = normType;}
   void SetMinPoints(Int_t minPoints) { fMinPoints = minPoints;}
 
@@ -93,9 +72,6 @@ private:
   void PrintStatistic();
   void WriteToFile();
   
-//  void AddFitQa(CbmMuchTrack* track);
-//  void CalcMuonsEff();
-  
   std::multimap<Int_t, Int_t> fMcMuchMap;
   std::multimap<Int_t, Int_t> fMcStsMap;
 
@@ -107,7 +83,6 @@ private:
   TClonesArray* fStsTracks; 
   TClonesArray* fMuchMatches;
   TClonesArray* fStsMatches;
-  TClonesArray* fMuchDigiMatches;
 
 //  Normalisation type.
 //   1 - by number of reconstructable in Much MC tracks.
@@ -129,9 +104,9 @@ private:
   TH1F* fhNpAccPrim, *fhNpRecPrim, *fhNpEffPrim;  
   TH1F* fhNpAccSec, *fhNpRecSec,   *fhNpEffSec;  
   TH1F* fhNpAccMuons, *fhNpRecMuons, *fhNpEffMuons;
-  TH1F* fhNhClones, *fhNhGhosts;          
+  TH1F* fhNhClones, *fhNhGhosts;
+  TH1F* fhMomMismatches, *fhNpMismatches, *fhMomEffMismatches, *fhNpEffMismatches;
   TH2D* fhMomNhAccAll, *fhMomNhRecAll, *fhMomNhEffAll;
-
 
 // List of histograms
   TList* fHistoList;
@@ -152,6 +127,7 @@ private:
   Int_t fNofRecMuons;
   Int_t fNofGhosts;
   Int_t fNofClones;
+  Int_t fNofMismatches;
   
   // rates
   Double_t fRateMcTracks;
@@ -169,6 +145,7 @@ private:
   Double_t fRateAccMuons;
   Double_t fRateGhosts;
   Double_t fRateClones;
+  Double_t fRateMismatches;
   
   //eff
   Double_t fEffAll;
@@ -178,6 +155,7 @@ private:
   Double_t fEffMuons;
   Double_t fEffGhosts;
   Double_t fEffClones;
+  Double_t fEffMismatches;
   
   
 // Counters per event
@@ -196,6 +174,7 @@ private:
   Int_t fEvNofRecMuons;
   Int_t fEvNofGhosts;
   Int_t fEvNofClones;
+  Int_t fEvNofMismatches;
 // efficiency per event
   Double_t fEvEffAll;
   Double_t fEvEffRef;
@@ -204,19 +183,11 @@ private:
   Double_t fEvEffMuons;
   Double_t fEvEffGhosts;
   Double_t fEvEffClones;
-  
+  Double_t fEvEffMismatches;  
   
   Int_t fNEvents; 
 
   ClassDef(CbmLitMuchRecQa,1);
-
 };
 
 #endif
-
-
-
-
-
-
-

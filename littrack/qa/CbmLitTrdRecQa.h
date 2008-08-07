@@ -1,23 +1,22 @@
 // -------------------------------------------------------------------------
 // -----                  CbmLitTrdRecQa header file               -----
-// -----                  Created 06/07/06  by A. Lebedev               -----
+// -----                  Created 15/10/07  by A. Lebedev               -----
 // -------------------------------------------------------------------------
 
 
-/** CbmLitTrdRecQa.h
+/** CbmLitTrdReckQa.h
  *@author A.Lebedev <alebedev@jinr.ru>
  **
  ** Quality check task for CbmTrdFindTracks
  **/
 
 
-#ifndef CBMLITTRDRECQA_H
-#define CBMLITTRDRECQA_H 1
-
+#ifndef CBMLITTRDRECQA_H_
+#define CBMLITTRDRECQA_H_
 
 #include "CbmTask.h"
 
-#include "TVector3.h"
+#include "TH2D.h"
 
 #include <set>
 #include <map>
@@ -26,148 +25,171 @@ class TClonesArray;
 class TH1;
 class TH1F;
 class TList;
-class CbmGeoPassivePar;
-
-
-
+class CbmTrdTrack;
 
 class CbmLitTrdRecQa : public CbmTask
 {
-
- public:
-
-  /** Default constructor **/
+public:
   CbmLitTrdRecQa();
-
-
-  /** Standard constructor
-  *@param minPoints   Minimal number of MCPoints for considered MCTracks
-  *@param quota       True/all hits for track to be considered reconstructed
-  *@param iVerbose    Verbosity level
-  **/
   CbmLitTrdRecQa(Int_t minPoints, Double_t quota, Int_t iVerbose = 1);
-
-
-  /** Destructor **/
   virtual ~CbmLitTrdRecQa();
 
 
-  /** Set parameter containers **/
   virtual void SetParContainers();
-
-
-  /** Initialisation **/
   virtual InitStatus Init();
-
-
-  /** Reinitialisation **/
   virtual InitStatus ReInit();
-
-
-  /** Execution **/
   virtual void Exec(Option_t* opt);
 
-  /** Accessors **/
   Int_t GetNormType() {return fNormType;}
   Int_t GetMinPoints() {return fMinPoints;}
 
-  /** Modifiers **/
   void SetNormType(Int_t normType) { fNormType = normType;}
   void SetMinPoints(Int_t minPoints) { fMinPoints = minPoints;}
 
- private:
+private:
 
-  /** Finish **/
   virtual void Finish();
 
-  /** Read the geometry parameters **/
-  InitStatus GetGeometry();
-
-
-  /** Create histograms **/
+  void ProcessStsTracks();
+  void ProcessTrdTracks();
+  void ProcessMcTracks();
+  Bool_t IsMismatch(Int_t mcId);
+  void CountClones();
+  
   void CreateHistos();
 
+  void DivideHistos(
+		  TH1* histo1, 
+		  TH1* histo2, 
+		  TH1* histo3);
+  
+  void ZeroGlobalCounters();
+  void ZeroEventCounters();
+  void IncreaseCounters();
+  void CalcEventEff();
+  void CalcEffAndRates();
+  void PrintEventStatistic();
+  void PrintStatistic();
+  void WriteToFile();
+  
+  std::multimap<Int_t, Int_t> fMcTrdMap;
+  std::multimap<Int_t, Int_t> fMcStsMap;
 
-  /** Reset histograms and counters **/
-  void Reset();
+// Pointers to data arrays
+  TClonesArray* fMCTracks;   
+  TClonesArray* fMCPoints; 
+  TClonesArray* fTrdTracks;
+  TClonesArray* fTrdHits; 
+  TClonesArray* fStsTracks; 
+  TClonesArray* fTrdMatches;
+  TClonesArray* fStsMatches;
+//  TClonesArray* fTrdDigiMatches;
 
-
-  /** Divide histograms (reco/all) with correct error for the efficiency
-   *@param histo1  reconstructed tracks
-   *@param histo2  all tracks (normalisation)
-   *@param histo3  efficiency
-   **/
-  void DivideHistos(TH1* histo1, TH1* histo2, TH1* histo3);
-
-
-  /** Map from MCTrack index to matched TrdTrack index **/
-  std::map<Int_t, Int_t> fMatchMap;
-
-  /** Set MCTrack index  **/
-  std::set<Int_t> fMatchSetSts;
-
-
-  /** Map from MCTrack index to percentage of matched hits **/
-  std::map<Int_t, Double_t> fQualiMap;
-
-
-  /** Pointers to data arrays **/
-  TClonesArray* fMCTracks;           // MCtrack
-  TClonesArray* fTrdTracks;          // TrdTrack
-  TClonesArray* fStsTracks;          // StsTrack
-  TClonesArray* fTrdMatches;         // TrdTrackMatch
-  TClonesArray* fStsMatches;         // StsTrackMatch
-
-
-  /** Normalisation type.
-     ** 1 - by number of reconstructable in TRD MC tracks.
-     ** 2 - by number of STS tracks, which match to reco MC tracks
-     ** Default value - 1.
-     **/
+//  Normalisation type.
+//   1 - by number of reconstructable in Trd MC tracks.
+//   2 - by number of STS tracks, which match to reco MC tracks
   Int_t fNormType;
 
+  Int_t fMinPoints; 
+  Double_t fQuota;
+
+  
+  // Histograms
+  TH1F* fhMomAccAll, *fhMomRecAll, *fhMomEffAll; 
+  TH1F* fhMomAccRef, *fhMomRecRef, *fhMomEffRef; 
+  TH1F* fhMomAccPrim, *fhMomRecPrim, *fhMomEffPrim; 
+  TH1F* fhMomAccSec, *fhMomRecSec, *fhMomEffSec; 
+  TH1F* fhMomAccMuons, *fhMomRecMuons, *fhMomEffMuons;
+  TH1F* fhNpAccAll, *fhNpRecAll,   *fhNpEffAll;
+  TH1F* fhNpAccRef, *fhNpRecRef, *fhNpEffRef; 
+  TH1F* fhNpAccPrim, *fhNpRecPrim, *fhNpEffPrim;  
+  TH1F* fhNpAccSec, *fhNpRecSec,   *fhNpEffSec;  
+  TH1F* fhNpAccMuons, *fhNpRecMuons, *fhNpEffMuons;
+  TH1F* fhNhClones, *fhNhGhosts;
+  TH1F* fhMomMismatches, *fhNpMismatches, *fhMomEffMismatches, *fhNpEffMismatches;
+  TH2D* fhMomNhAccAll, *fhMomNhRecAll, *fhMomNhEffAll;
 
 
-  /** Geometry parameters **/
-  CbmGeoPassivePar* fPassGeo;             // Passive geometry parameters
-  TVector3 fTargetPos;                    // Target centre position
-
-
-
-  /** Task parameters **/
-  Int_t fMinPoints; // Minimal number of MCPoints for considered MCTrack
-  Double_t fQuota;  // True/all hits for track to be considered reconstructed
-
-
-  /** Histograms **/
-  TH1F* fhMomAccAll,  *fhMomRecAll,  *fhMomEffAll;   // eff. vs. p, all
-  TH1F* fhMomAccPrim, *fhMomRecPrim, *fhMomEffPrim;  // eff. vs. p, vertex
-  TH1F* fhMomAccSec,  *fhMomRecSec,  *fhMomEffSec;   // eff. vs. p, non-vertex
-  TH1F* fhNpAccAll,   *fhNpRecAll,   *fhNpEffAll;    // eff. vs. np, all
-  TH1F* fhNpAccPrim,  *fhNpRecPrim,  *fhNpEffPrim;   // eff. vs. np, vertex
-  TH1F* fhNpAccSec,   *fhNpRecSec,   *fhNpEffSec;    // eff. vs. np, non-vertex
-  TH1F* fhZAccSec,    *fhZRecSec,    *fhZEffSec;     // eff. vs. z, non-vertex
-  TH1F* fhNhClones,   *fhNhGhosts;              // # hits of clones and ghosts   
-
-
-  /** List of histograms **/
+// List of histograms
   TList* fHistoList;
 
-
-  /** Counters **/
-  Int_t fNAll, fNAllGood;
-  Int_t fNNoSts;
-  Int_t fNAccAll, fNAccPrim, fNAccRef, fNAccSec;
-  Int_t fNRecAll, fNRecPrim, fNRecRef, fNRecSec;
-  Int_t fNGhosts, fNClones;
-  Int_t fNEvents;
-
+// Counters
+  Int_t fNofMcTracks;
+  Int_t fNofTrdTracks; 
+  Int_t fNofStsTracks; 
+  Int_t fNofAccAll;
+  Int_t fNofAccRef;
+  Int_t fNofAccPrim;
+  Int_t fNofAccSec;
+  Int_t fNofAccMuons;
+  Int_t fNofRecAll;
+  Int_t fNofRecRef;
+  Int_t fNofRecPrim;
+  Int_t fNofRecSec;
+  Int_t fNofRecMuons;
+  Int_t fNofGhosts;
+  Int_t fNofClones;
+  Int_t fNofMismatches;
+  
+  // rates
+  Double_t fRateMcTracks;
+  Double_t fRateStsTracks;
+  Double_t fRateTrdTracks;
+  Double_t fRateRecAll;
+  Double_t fRateRecRef;
+  Double_t fRateRecPrim;
+  Double_t fRateRecSec;
+  Double_t fRateRecMuons;
+  Double_t fRateAccAll;
+  Double_t fRateAccRef;
+  Double_t fRateAccPrim;
+  Double_t fRateAccSec;
+  Double_t fRateAccMuons;
+  Double_t fRateGhosts;
+  Double_t fRateClones;
+  Double_t fRateMismatches;
+  
+  //eff
+  Double_t fEffAll;
+  Double_t fEffRef;
+  Double_t fEffPrim;
+  Double_t fEffSec;
+  Double_t fEffMuons;
+  Double_t fEffGhosts;
+  Double_t fEffClones;
+  Double_t fEffMismatches;
+  
+  
+// Counters per event
+  Int_t fEvNofMcTracks;
+  Int_t fEvNofTrdTracks; 
+  Int_t fEvNofStsTracks; 
+  Int_t fEvNofAccAll;
+  Int_t fEvNofAccRef;
+  Int_t fEvNofAccPrim;
+  Int_t fEvNofAccSec;
+  Int_t fEvNofAccMuons;
+  Int_t fEvNofRecAll;
+  Int_t fEvNofRecRef;
+  Int_t fEvNofRecPrim;
+  Int_t fEvNofRecSec;
+  Int_t fEvNofRecMuons;
+  Int_t fEvNofGhosts;
+  Int_t fEvNofClones;
+  Int_t fEvNofMismatches;
+// efficiency per event
+  Double_t fEvEffAll;
+  Double_t fEvEffRef;
+  Double_t fEvEffPrim;
+  Double_t fEvEffSec;
+  Double_t fEvEffMuons;
+  Double_t fEvEffGhosts;
+  Double_t fEvEffClones;
+  Double_t fEvEffMismatches;  
+  
+  Int_t fNEvents; 
 
   ClassDef(CbmLitTrdRecQa,1);
-
 };
 
-
 #endif
-				 
-

@@ -706,14 +706,14 @@ void CbmRichRingQa::DiffFakeTrue()
     Double_t distance = ring->GetDistance();
     Int_t nHits = ring->GetNofHits();
     Double_t radPos = ring->GetRadialPosition();
-    Double_t radius = ring->GetRadius();
+    //Double_t radius = ring->GetRadius();
     Double_t axisA = ring->GetAaxis();
     Double_t axisB = ring->GetBaxis();
     Double_t phi = ring->GetPhi();
     Double_t radAngle = ring->GetRadialAngle();
     Double_t stsMomentum = GetStsMomentum(ring);  
-    Double_t centerX = ring->GetCenterX();
-    Double_t centerY = ring->GetCenterY();
+    //Double_t centerX = ring->GetCenterX();
+    //Double_t centerY = ring->GetCenterY();
     
     if (ring->GetAaxis() >= 10. || ring->GetAaxis() <= 0.){
         continue;
@@ -883,11 +883,11 @@ void CbmRichRingQa::DiffPrimElectronsAndNotPrimElectrons()
             continue;
         }
         Int_t gcode = TMath::Abs(track->GetPdgCode());
-        Double_t momentum = track->GetP();
-        Int_t motherId = track->GetMotherId();
-        Bool_t isProj = DoesRingHaveProjection(trackID);    
+        //Double_t momentum = track->GetP();
+        //Int_t motherId = track->GetMotherId();
+        //Bool_t isProj = DoesRingHaveProjection(trackID);    
         Double_t startX = track->GetStartX();
-        Double_t startY = track->GetStartY();
+        //Double_t startY = track->GetStartY();
         Double_t startZ = track->GetStartZ();
         
         if (gcode == 11 )fh_StartVertexXZ->Fill(startZ, startX);

@@ -6,9 +6,10 @@
 */
 
 void draw_qa(){
-   TFile *file = new TFile("reco.richqa.root");
-
-	TDirectory *current = gDirectory;
+   //TFile *file = new TFile("/d/cbm02/slebedev/rich/MAY08/standard/auau.25gev.centr.0000.recorich.root");
+   // TFile *file = new TFile("/d/cbm02/slebedev/rich/MAY08/density_study/new.auau.25gev.centr.0012.recorich.root");
+    TFile *file = new TFile("/d/cbm02/slebedev/rich/MAY08/density_study/auau.25gev.centr.0012.recoqa.root");
+    TDirectory *current = gDirectory;
 	current->cd("RichRingQaHist");
    // rich->cd();
    gROOT->SetStyle("Plain");
@@ -278,9 +279,7 @@ void draw_qa(){
     fh_MCElRingsProjHitCutRadPos->SetBins(20,0,10);    
 	fh_TrueFoundElRingsProjHitCutRadPos->Sumw2();
 	fh_MCElRingsProjHitCutRadPos->Sumw2();
-	TH1D* th2 = new TH1D("th1","Efficiency, electrons vs RadialPosition",20,0,150);
-	th2->GetXaxis()->SetTitle("radial position, cm");
-	th2->GetYaxis()->SetTitle("efficiency");
+	TH1D* th2 = new TH1D("th1","Efficiency, electrons vs RadialPosition;radial position, cm;efficiency",20,0,150);
 	th2->Divide(fh_TrueFoundElRingsProjHitCutRadPos,fh_MCElRingsProjHitCutRadPos,100);
 	th2->Draw();
     
@@ -288,15 +287,20 @@ void draw_qa(){
     fh_TrueMatchElMom->SetBins(20,0,10);    
     fh_TrueMatchElMom->Sumw2();
     //fh_MCElRingsProjHitCutRadPos->Sumw2();
-    TH1D* th3 = new TH1D("th3","Efficiency, ring-track matching vs momentum",20,0,10);
-    th3->GetXaxis()->SetTitle("momentum, GeV");
-    th3->GetYaxis()->SetTitle("efficiency");
+    TH1D* th3 = new TH1D("th3","Efficiency, ring-track matching vs momentum;momentum, GeV;efficiency",20,0,10);
     th3->Divide(fh_TrueMatchElMom,fh_TrueFoundElRingsProjHitCutMom,100);
     th3->Draw();   
 	
     TCanvas *c6 = new TCanvas("CbmRichQa6","c6",1200,1000);    
     fh_StartVertexXZ->Draw("COLZ");
-    cout << fh_MCElRingsProjHitCutMom->GetEntries()/8000. << endl;
+    
+    TCanvas *c7 = new TCanvas("CbmRichQa7","c7",1200,1000); 
+    fh_TrueFoundElRingsProjHitCutNofHits->Sumw2();
+    fh_MCElRingsProjHitCutNofHits->Sumw2();
+	TH1D* thNofHits = new TH1D("thNofHits","Efficiency, electrons vs NofHits;Nof Hits; efficiency, %",20,0,40);
+	thNofHits->Divide(fh_TrueFoundElRingsProjHitCutNofHits,fh_MCElRingsProjHitCutNofHits,100);
+	thNofHits->Draw();
+	
     
     cout << "El. eff = " << (Double_t)fh_TrueFoundElRingsProjHitCutMom->GetEntries()/
                             (Double_t)fh_MCElRingsProjHitCutMom->GetEntries() << endl;
@@ -304,21 +308,7 @@ void draw_qa(){
     cout << "Matching eff = " << (Double_t)fh_TrueMatchElMom->GetEntries()/
                                 (Double_t)fh_TrueFoundElRingsProjHitCutMom->GetEntries() << endl;
                                 
-    cout << "Nof Fakes = " << fh_FakePhi->GetEntries()/8000. << endl;
-    
-    
-    
-/*	TCanvas *c4 = new TCanvas("CbmRichQa4","c4",1200,1000);
-	gPad->SetLogy();
-	cout << " NofTrueMatchEl = "<<fh_TrueMatchElDistance->GetEntries() << endl;
-	cout << " NofWrongMatchEl = "<<fh_WrongMatchElDistance->GetEntries() << endl;
-	cout << " Ratio = "<<fh_WrongMatchElDistance->GetEntries() / (Double_t)fh_TrueMatchElDistance->GetEntries()<< endl;	
-	fh_TrueMatchElDistance->Draw();
-	fh_TrueMatchElDistance->GetXaxis()->SetTitle("ring-track distance, cm");
-	fh_TrueMatchElDistance->GetYaxis()->SetTitle("entries");
-	fh_WrongMatchElDistance->SetLineColor(kRed);
-	fh_WrongMatchElDistance->Draw("Same");
-*/
+    cout << "Nof Fakes = " << fh_FakePhi->GetEntries()<< endl;
 }
 
 

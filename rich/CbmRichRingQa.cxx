@@ -65,7 +65,7 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose,
     fVerbose = verbose;
     fNormType = normType;
     
-    fNofHitsInRingCut = 15; /// minumum number of hits in ring
+    fNofHitsInRingCut = 5; /// minumum number of hits in ring
     
     // count events
     fEventNumber = 1;

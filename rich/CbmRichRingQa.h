@@ -92,12 +92,15 @@ class CbmRichRingQa : public CbmTask{
     
     Int_t fNofTrueElBadFit;
     
-    TH1D* fh_TrueFoundElRingsProjHitCutMom;///Number of found rings vs momentum. Electron. Proj
-    TH1D* fh_MCElRingsProjHitCutMom;///Number of MC rings vs momentum. Electron. Proj
+    TH1D* fh_TrueFoundElRingsProjHitCutMom;///Histogram of found rings vs momentum. Electron. Proj
+    TH1D* fh_MCElRingsProjHitCutMom;///Histogram of MC rings vs momentum. Electron. Proj
 
-    TH1D* fh_TrueFoundElRingsProjHitCutRadPos;///Number of found rings vs RadialPosition. Electron. Proj
-    TH1D* fh_MCElRingsProjHitCutRadPos;///Number of MC rings vs RadialPosition. Electron. Proj    
+    TH1D* fh_TrueFoundElRingsProjHitCutRadPos;///Histogram of found rings vs RadialPosition. Electron. Proj
+    TH1D* fh_MCElRingsProjHitCutRadPos;///Histogram of MC rings vs RadialPosition. Electron. Proj    
         
+    TH1D* fh_TrueFoundElRingsProjHitCutNofHits;///Histogram of found rings vs nof Hits. Electron. Proj
+    TH1D* fh_MCElRingsProjHitCutNofHits;///Histogram of MC rings vs Nof hits. Electron. Proj
+  
     TH2D* fh_FakeFoundRingsXYAll;
   
   
@@ -167,7 +170,11 @@ class CbmRichRingQa : public CbmTask{
     TH2D* fh_StartVertexXZ;
     TH2D* fh_StartVertexYZ;
     
-        
+    TH2D* fh_MCMomvsRadpos;
+    TH2D* fh_MCMomvsNofHits;
+    TH2D* fh_MCMomvsBoverA;
+    TH2D* fh_MCXYE;
+    
     std::ofstream  foutFakeAndTrue;
     std::ofstream  foutElAndNotEl;
       

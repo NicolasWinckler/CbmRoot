@@ -191,7 +191,7 @@ void trd_el_id_sim(Int_t nEvents = 1000)
   boxGen2->SetPRange(minMomentum, maxMomentum);
   boxGen2->SetPhiRange(0.,360.);
   boxGen2->SetThetaRange(2.5,25.);
-  boxGen1->SetCosTheta();    
+  boxGen2->SetCosTheta();    
   boxGen2->Init();
   primGen->AddGenerator(boxGen2);
     
@@ -199,7 +199,7 @@ void trd_el_id_sim(Int_t nEvents = 1000)
   boxGen3->SetPRange(minMomentum, maxMomentum);
   boxGen3->SetPhiRange(0.,360.);
   boxGen3->SetThetaRange(2.5,25.);
-  boxGen1->SetCosTheta();    
+  boxGen3->SetCosTheta();    
   boxGen3->Init();
   primGen->AddGenerator(boxGen3);
   
@@ -207,7 +207,7 @@ void trd_el_id_sim(Int_t nEvents = 1000)
   boxGen4->SetPRange(minMomentum, maxMomentum);
   boxGen4->SetPhiRange(0.,360.);
   boxGen4->SetThetaRange(2.5,25.);
-  boxGen1->SetCosTheta();    
+  boxGen4->SetCosTheta();    
   boxGen4->Init();
   primGen->AddGenerator(boxGen4);
 

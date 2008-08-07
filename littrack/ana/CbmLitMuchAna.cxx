@@ -15,6 +15,7 @@
 #include "CbmTrackPropagatorGeane.h"
 #include "CbmLitConverter.h"
 #include "CbmLitTrack.h"
+#include "CbmLitHit.h"
 #include "CbmLitTrackFitter.h"
 #include "CbmLitTrackFitterImp.h"
 #include "CbmLitKalmanSmoother.h"
@@ -79,11 +80,11 @@ InitStatus CbmLitMuchAna::Init() {
    fMuchTracks = (TClonesArray*) ioman->GetObject("MuchTrack");
    if ( ! fMuchTracks ) Fatal("Init", "No trackArray!");
      
-   fExtrapolator = new CbmLitRK4TrackExtrapolator();
+   //fExtrapolator = new CbmLitRK4TrackExtrapolator();
    //fExtrapolator = new CbmLitLineTrackExtrapolator();
-   fExtrapolator->Initialize();
-   fPropagator = new CbmLitTrackPropagatorImp(fExtrapolator);
-   // fPropagator = new CbmTrackPropagatorGeane();
+   //fExtrapolator->Initialize();
+   //fPropagator = new CbmLitTrackPropagatorImp(fExtrapolator);
+    fPropagator = new CbmTrackPropagatorGeane();
     fPropagator->Initialize();
      
    fFilter = new CbmLitKalmanFilter();
@@ -93,7 +94,7 @@ InitStatus CbmLitMuchAna::Init() {
    
    fSmoother = new CbmLitKalmanSmoother();
    
-   fNofLayers = 10;
+   fNofLayers = 18;
    CreateHistograms();
    
 

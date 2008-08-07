@@ -16,9 +16,8 @@
 
 #include "CbmLitTrackUpdate.h"
 
-#include "CbmLitHit.h"
-#include "CbmLitTrackParam.h"
-
+class CbmLitHit;
+class CbmLitTrackParam;
 
 class CbmLitKalmanFilter: public CbmLitTrackUpdate 
 {
@@ -35,13 +34,13 @@ public:
    
    // Filter
    virtual LitStatus Update(
-		   const CbmLitTrackParam *pParamIn,
-           CbmLitTrackParam *pParamOut,
-           const CbmLitHit *pHit);
+		   const CbmLitTrackParam *parIn,
+           CbmLitTrackParam *parOut,
+           const CbmLitHit *hit);
                               
    virtual LitStatus Update( 
-		   CbmLitTrackParam *pParam, 
-		   const CbmLitHit *pHit);
+		   CbmLitTrackParam *par, 
+		   const CbmLitHit *hit);
    
    ClassDef(CbmLitKalmanFilter,1)
 }; 

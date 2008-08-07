@@ -5,6 +5,11 @@
  
 #include "CbmLitKalmanFilter.h"
 
+#include "CbmLitHit.h"
+#include "CbmLitTrackParam.h"
+
+#include <iostream>
+
 CbmLitKalmanFilter::CbmLitKalmanFilter():
    CbmLitTrackUpdate("CbmLitKalmanFilter")
 {
@@ -25,28 +30,28 @@ LitStatus CbmLitKalmanFilter::Finalize()
 }
 
 LitStatus CbmLitKalmanFilter::Update(
-		const CbmLitTrackParam *pParamIn,
-        CbmLitTrackParam *pParamOut,
-        const CbmLitHit *pHit)
+		const CbmLitTrackParam *parIn,
+        CbmLitTrackParam *parOut,
+        const CbmLitHit *hit)
 {
-   *pParamOut = *pParamIn;
-   return Update(pParamOut, pHit);                              
+   *parOut = *parIn;
+   return Update(parOut, hit);                              
 }
 
 LitStatus CbmLitKalmanFilter::Update(
-		CbmLitTrackParam *pParam, 
-        const CbmLitHit *pHit)
+		CbmLitTrackParam *par, 
+        const CbmLitHit *hit)
 {
-	 Double_t xIn[5] = { pParam->GetX(), pParam->GetY(),
-			 			pParam->GetTx(), pParam->GetTy(),
-			 			pParam->GetQp() };
-	 std::vector<Double_t> cIn = pParam->GetCovMatrix();
+	 Double_t xIn[5] = { par->GetX(), par->GetY(),
+			 			par->GetTx(), par->GetTy(),
+			 			par->GetQp() };
+	 std::vector<Double_t> cIn = par->GetCovMatrix();
 	 
-	 Double_t x = pHit->GetX();
-	 Double_t y = pHit->GetY();
-	 Double_t dxx = pHit->GetDx() * pHit->GetDx();
-	 Double_t dxy = pHit->GetDxy();
-	 Double_t dyy = pHit->GetDy() * pHit->GetDy();
+	 Double_t x = hit->GetX();
+	 Double_t y = hit->GetY();
+	 Double_t dxx = hit->GetDx() * hit->GetDx();
+	 Double_t dxy = hit->GetDxy();
+	 Double_t dyy = hit->GetDy() * hit->GetDy();
 	
 	 // calculate residuals
 	 Double_t dx = x - xIn[0];
@@ -102,12 +107,12 @@ LitStatus CbmLitKalmanFilter::Update(
 	cOut[14] = -K40 * cIn[4] - K41 * cIn[8] + cIn[14];
 	
    // Copy filtered state to output
-   pParam->SetX(xOut[0]);
-   pParam->SetY(xOut[1]);
-   pParam->SetTx(xOut[2]);
-   pParam->SetTy(xOut[3]);
-   pParam->SetQp(xOut[4]);
-   pParam->SetCovMatrix(cOut);
+   par->SetX(xOut[0]);
+   par->SetY(xOut[1]);
+   par->SetTx(xOut[2]);
+   par->SetTy(xOut[3]);
+   par->SetQp(xOut[4]);
+   par->SetCovMatrix(cOut);
    
    return kLITSUCCESS;
 }

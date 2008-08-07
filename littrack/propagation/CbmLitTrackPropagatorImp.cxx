@@ -58,6 +58,8 @@ LitStatus CbmLitTrackPropagatorImp::Propagate(
         Int_t pdg)
                                       
 {
+	if (!IsParCorrect(par)) return kLITERROR;
+
 	fPDG = pdg;
 	
 	Double_t zIn = par->GetZ();
@@ -126,7 +128,8 @@ LitStatus CbmLitTrackPropagatorImp::Propagate(
 		}		
 	}
 	
-	return kLITSUCCESS;
+	if (!IsParCorrect(par)) return kLITERROR;
+	else return kLITSUCCESS;
 }
 void CbmLitTrackPropagatorImp::TransportMatrix(
 		   std::vector<Double_t>& F)
@@ -144,9 +147,7 @@ void CbmLitTrackPropagatorImp::UpdateF(
 		TMatrixD& F,
 		const TMatrixD& newF)
 {
-	//std::cout << "here1" << std::endl;
 	F = newF * F;
-	//F = CbmLitMatrixMath::Multiply5x5(newF, F);
 }
 
 Bool_t CbmLitTrackPropagatorImp::IsParCorrect(

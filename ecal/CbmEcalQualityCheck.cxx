@@ -246,6 +246,7 @@ void CbmEcalQualityCheck::DrawPhotons()
     r=(CbmEcalRecParticle*)fReco->At(i);
     DrawMark(r->X(), r->Y(), "#0000FF", 0);
     DrawEnergy(r->X(), r->Y(), r->E(), "#0000FF");
+    DrawChi2(r->X(), r->Y(), r->Chi2(), "#0000FF");
   }
 }
 
@@ -272,6 +273,26 @@ Double_t CbmEcalQualityCheck::GetP(CbmEcalPoint* p)
 
   return TMath::Sqrt(px*px+py*py+pz*pz);
 }
+
+  /** Draw chi2 for photons **/
+void CbmEcalQualityCheck::DrawChi2(Float_t x, Float_t y, Float_t chi2, const char* color)
+{
+  char stri[10];
+  Int_t xi=(Int_t)((x/fInf->GetEcalSize(0))*fCX+fCX/2.0);
+  Int_t yi=(Int_t)((y/fInf->GetEcalSize(1))*fCY+fCY/2.0);
+  yi-=8;
+  yi=fCY-yi-1;
+  xi-=6;
+
+  if (chi2!=-1111)
+  {
+    sprintf(stri,"%.1f", chi2);
+    fC->DrawText(xi, yi, stri, 8, color, "arialbd.ttf");
+  }
+  else
+    fC->DrawText(xi, yi, "-111", 8, color, "arialbd.ttf");
+}
+
 
 void CbmEcalQualityCheck::DrawEnergy(CbmEcalPoint* p, const char* color)
 {

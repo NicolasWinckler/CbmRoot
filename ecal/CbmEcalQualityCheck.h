@@ -79,6 +79,9 @@ private:
   void DrawEnergy(Float_t x, Float_t y, Float_t p, const char* color);
   Double_t GetP(CbmEcalPoint* p);
 
+  /** Draw chi2 for photons **/
+  void DrawChi2(Float_t x, Float_t y, Float_t chi2, const char* color);
+
   TText* fTxt;			//!
   void DrawMC();
   void DrawPhotons();

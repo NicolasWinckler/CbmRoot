@@ -343,8 +343,10 @@ void CbmMuchMatchTracks::Finish() {
   cout << "===== Tracks per event  : " << fixed << setprecision(0)
        << fNTrackMatches / Double_t(fNEvents) << endl;
   cout << setprecision(2);
-  cout << "===== True hits         : " << fixed << setw(6) << right
-       << fNTrueHits / fNAllHits * 100. << " %" << endl;
+  cout << "===== True hits         : " << fixed << setw(6) << right;
+  if (fNAllHits != 0) cout << fNTrueHits / fNAllHits * 100.; 
+  else cout << "0";
+  cout << " %" << endl;
   cout << "============================================================"
        << endl;
 

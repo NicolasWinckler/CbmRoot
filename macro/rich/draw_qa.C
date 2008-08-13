@@ -8,7 +8,7 @@
 void draw_qa(){
    //TFile *file = new TFile("/d/cbm02/slebedev/rich/MAY08/standard/auau.25gev.centr.0000.recorich.root");
    // TFile *file = new TFile("/d/cbm02/slebedev/rich/MAY08/density_study/new.auau.25gev.centr.0012.recorich.root");
-    TFile *file = new TFile("/d/cbm02/slebedev/rich/MAY08/density_study/auau.25gev.centr.0012.recoqa.root");
+    TFile *file = new TFile("/d/cbm02/slebedev/rich/MAY08/density_study/auau.25gev.centr.0012.recoqa_15.root");
     TDirectory *current = gDirectory;
 	current->cd("RichRingQaHist");
    // rich->cd();
@@ -267,16 +267,14 @@ void draw_qa(){
     fh_MCElRingsProjHitCutMom->SetBins(20,0,10);     
 	fh_TrueFoundElRingsProjHitCutMom->Sumw2();
 	fh_MCElRingsProjHitCutMom->Sumw2();	
-	TH1D* th1 = new TH1D("th1","Efficiency, electrons vs momentum",20,0,10);
-	th1->GetXaxis()->SetTitle("momentum, GeV");	
-	th1->GetYaxis()->SetTitle("efficiency");	
+	TH1D* th1 = new TH1D("th1","Efficiency, electrons vs momentum;momentum, GeV;efficiency",20,0,10);
 	th1->Divide(fh_TrueFoundElRingsProjHitCutMom,fh_MCElRingsProjHitCutMom,100);
 	th1->Draw();
 	
 	
 	TCanvas *c4 = new TCanvas("CbmRichQa4","c4",1200,1000);
-    fh_TrueFoundElRingsProjHitCutRadPos->SetBins(20,0,10);
-    fh_MCElRingsProjHitCutRadPos->SetBins(20,0,10);    
+    fh_TrueFoundElRingsProjHitCutRadPos->SetBins(20,0,150);
+    fh_MCElRingsProjHitCutRadPos->SetBins(20,0,150);    
 	fh_TrueFoundElRingsProjHitCutRadPos->Sumw2();
 	fh_MCElRingsProjHitCutRadPos->Sumw2();
 	TH1D* th2 = new TH1D("th1","Efficiency, electrons vs RadialPosition;radial position, cm;efficiency",20,0,150);
@@ -293,14 +291,29 @@ void draw_qa(){
 	
     TCanvas *c6 = new TCanvas("CbmRichQa6","c6",1200,1000);    
     fh_StartVertexXZ->Draw("COLZ");
-    
+     
     TCanvas *c7 = new TCanvas("CbmRichQa7","c7",1200,1000); 
     fh_TrueFoundElRingsProjHitCutNofHits->Sumw2();
     fh_MCElRingsProjHitCutNofHits->Sumw2();
 	TH1D* thNofHits = new TH1D("thNofHits","Efficiency, electrons vs NofHits;Nof Hits; efficiency, %",20,0,40);
 	thNofHits->Divide(fh_TrueFoundElRingsProjHitCutNofHits,fh_MCElRingsProjHitCutNofHits,100);
+	thNofHits->SetMaximum(100);
 	thNofHits->Draw();
 	
+	
+    TCanvas *c8 = new TCanvas("CbmRichQa8","c8",1200,1000); 
+    fh_MCElRingsProjHitCutBoverA->Sumw2();
+    fh_TrueFoundElRingsProjHitCutBoverA->Sumw2();
+	TH1D* thBoverA = new TH1D("BoverA","Efficiency, electrons vs B/A;B/A; efficiency, %",20,0,1);
+	thBoverA->Divide(fh_TrueFoundElRingsProjHitCutBoverA,fh_MCElRingsProjHitCutBoverA,100);
+	thBoverA->SetMaximum(100);
+	thBoverA->Draw();
+
+	
+  //  TCanvas *c8 = new TCanvas("CbmRichQa8","c8",1200,1000); 
+  //  fh_MCElRingsProjHitCutBoverA->Draw();
+    
+    //fh_MCXYE->Draw("COLZ");
     
     cout << "El. eff = " << (Double_t)fh_TrueFoundElRingsProjHitCutMom->GetEntries()/
                             (Double_t)fh_MCElRingsProjHitCutMom->GetEntries() << endl;

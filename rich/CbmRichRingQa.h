@@ -84,6 +84,7 @@ class CbmRichRingQa : public CbmTask{
     Int_t fNofPiRingsProj; //number of Pi MC rings with proj  
     Int_t fNofElRingsProjHitCut;//number of El MC rings with proj and # hits more than HitCut
     Int_t fNofPiRingsProjHitCut;//number of Pi MC rings with proj and # hits more than HitCut  
+
     
     Int_t fNofTrueFoundElRingsProjHitCut;
     Int_t fNofTrueFoundPiRingsProjHitCut;
@@ -100,7 +101,10 @@ class CbmRichRingQa : public CbmTask{
         
     TH1D* fh_TrueFoundElRingsProjHitCutNofHits;///Histogram of found rings vs nof Hits. Electron. Proj
     TH1D* fh_MCElRingsProjHitCutNofHits;///Histogram of MC rings vs Nof hits. Electron. Proj
-  
+    
+    TH1D* fh_TrueFoundElRingsProjHitCutBoverA;
+    TH1D* fh_MCElRingsProjHitCutBoverA;
+    
     TH2D* fh_FakeFoundRingsXYAll;
   
   

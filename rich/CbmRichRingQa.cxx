@@ -94,7 +94,9 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose,
     fh_TrueFoundElRingsProjHitCutNofHits = new TH1D("fh_TrueFoundElRingsProjHitCutNofHits","fh_TrueFoundElRingsProjHitCutNofHits",20,0,40);
     fh_MCElRingsProjHitCutNofHits = new TH1D("fh_MCElRingsProjHitCutNofHits","fh_MCElRingsProjHitCutNofHits",20,0,40);
   
-    
+    fh_TrueFoundElRingsProjHitCutBoverA = new TH1D("fh_TrueFoundElRingsProjHitCutBoverA","fh_TrueFoundElRingsProjHitCutBoverA",20,0,1);
+    fh_MCElRingsProjHitCutBoverA = new TH1D("fh_MCElRingsProjHitCutBoverA","fh_MCElRingsProjHitCutBoverA",20,0,1);
+   
     // (x,y) of fake rings
     fh_FakeFoundRingsXYAll = new TH2D("fh_FakeFoundRingsXYAll","(x,y) fake rings",100,-200,200,125,-250,250);
 
@@ -412,14 +414,17 @@ void CbmRichRingQa::Exec(Option_t* option)
                 fitCOP->DoFit(&(itMapWithHits->second));
                 fitEllipse->DoFit(&(itMapWithHits->second));
                 fh_MCElRingsProjHitCutRadPos->Fill(itMapWithHits->second.GetRadialPosition());
+                fh_MCElRingsProjHitCutBoverA->Fill(itMapWithHits->second.GetBaxis()/
+                		itMapWithHits->second.GetAaxis());
+                
                 //cout << "MC "<<itMapWithHits->second.GetRadialPosition() << endl;
                 
                 fh_MCMomvsRadpos->Fill(momentum, itMapWithHits->second.GetRadialPosition());
                 fh_MCMomvsNofHits->Fill(momentum, itMapWithHits->second.GetNofHits());
                 fh_MCMomvsBoverA->Fill(momentum, itMapWithHits->second.GetBaxis()/itMapWithHits->second.GetAaxis());
-                if (momentum < 2){
-                	fh_MCXYE->Fill(itMapWithHits->second.GetCenterX(),itMapWithHits->second.GetCenterY());
-                }
+               // if (momentum < 2){
+                fh_MCXYE->Fill(itMapWithHits->second.GetCenterX(),itMapWithHits->second.GetCenterY());
+              //  }
             }
         }
     }
@@ -640,11 +645,8 @@ void CbmRichRingQa::EfficiencyCalc()
             clone.push_back(trackID);
             
         }///true rings
-        
-
     
         Int_t recFlag = ring->GetRecFlag();
-    
     
         ///clone ring
         if (recFlag ==2){
@@ -665,6 +667,8 @@ void CbmRichRingQa::EfficiencyCalc()
             fh_TrueFoundElRingsProjHitCutNofHits->Fill(lMCHits);
             fh_TrueFoundRingsXYE->Fill(ring->GetCenterX(),ring->GetCenterY());
             fh_TrueFoundElRingsProjHitCutRadPos->Fill(fRingMapWithHits[trackID].GetRadialPosition());
+            fh_TrueFoundElRingsProjHitCutBoverA->Fill(fRingMapWithHits[trackID].GetBaxis()/
+            		fRingMapWithHits[trackID].GetAaxis());            
             //cout << "True Found"<<fRingMapWithHits[trackID].GetRadialPosition() << endl;
         }
         
@@ -985,6 +989,10 @@ void CbmRichRingQa::Finish()
     fh_TrueFoundElRingsProjHitCutNofHits->Write();
     fh_MCElRingsProjHitCutNofHits->Write();
 
+    fh_TrueFoundElRingsProjHitCutBoverA->Write();
+    fh_MCElRingsProjHitCutBoverA->Write();
+
+    
     /// Difference Fake and True rings histogramms BEGIN
     fh_FakeNofHits->Write();
     fh_TrueElNofHits->Write();

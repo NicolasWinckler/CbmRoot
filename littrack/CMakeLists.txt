@@ -6,15 +6,6 @@ set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
 ${GEANT3_INCLUDE_DIR}
 #${CLHEP_INCLUDE_DIR}
-${CBMROOT_SOURCE_DIR}/geobase 
-${CBMROOT_SOURCE_DIR}/parbase 
-${CBMROOT_SOURCE_DIR}/base 
-${CBMROOT_SOURCE_DIR}/cbmbase 
-${CBMROOT_SOURCE_DIR}/field
-${CBMROOT_SOURCE_DIR}/passive 
-${CBMROOT_SOURCE_DIR}/trd 
-${CBMROOT_SOURCE_DIR}/sts 
-${CBMROOT_SOURCE_DIR}/rich 
 ${CBMROOT_SOURCE_DIR}/littrack
 ${CBMROOT_SOURCE_DIR}/littrack/ana
 ${CBMROOT_SOURCE_DIR}/littrack/base
@@ -27,10 +18,15 @@ ${CBMROOT_SOURCE_DIR}/littrack/qa
 ${CBMROOT_SOURCE_DIR}/littrack/robust
 ${CBMROOT_SOURCE_DIR}/littrack/selection
 ${CBMROOT_SOURCE_DIR}/littrack/utils
-${CBMROOT_SOURCE_DIR}/much
+${CBMROOT_SOURCE_DIR}/geobase 
+${CBMROOT_SOURCE_DIR}/parbase 
+${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/trackbase
 ${CBMROOT_SOURCE_DIR}/geane
-#/u/andrey/soft/boost/boost_1_35_0
+${CBMROOT_SOURCE_DIR}/cbmbase 
+${CBMROOT_SOURCE_DIR}/sts 
+${CBMROOT_SOURCE_DIR}/trd 
+${CBMROOT_SOURCE_DIR}/much
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

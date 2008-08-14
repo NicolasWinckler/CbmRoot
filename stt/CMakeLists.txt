@@ -5,11 +5,11 @@
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
 #put here all directories where header files are located
+${CBMROOT_SOURCE_DIR}/stt
 ${CBMROOT_SOURCE_DIR}/base
 ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/cbmbase
-${CBMROOT_SOURCE_DIR}/stt
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

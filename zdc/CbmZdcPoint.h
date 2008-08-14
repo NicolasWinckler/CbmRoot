@@ -37,7 +37,7 @@ class CbmZdcPoint : public CbmMCPoint
    *@param length   Track length since creation [cm]
    *@param eLoss    Energy deposit [GeV]
    **/
-  CbmZdcPoint(Int_t trackID, Int_t detID, TVector3 pos, TVector3 mom, 
+  CbmZdcPoint(Int_t trackID, Int_t detID,  TVector3 pos, TVector3 mom, 
 	       Double_t tof, Double_t length, Double_t eLoss);
 
 
@@ -52,8 +52,16 @@ class CbmZdcPoint : public CbmMCPoint
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;
 
+   /** Modifiers **/
+  void SetModuleID(Int_t mod) { fModuleID = mod; }
+   /** Accessors **/
+  Int_t GetModuleID() const {return fModuleID;}
+
+ private:
+  Int_t fModuleID; //number of module
+
   
-  ClassDef(CbmZdcPoint,1)
+  ClassDef(CbmZdcPoint,2)
 
 };
 

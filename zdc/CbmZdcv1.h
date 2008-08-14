@@ -58,7 +58,7 @@ class CbmZdcv1 : public CbmZdc
 
   /** Virtual method Construct geometry
    **
-   ** Constructs the ECAL geometry
+   ** Constructs the ZDC geometry
    **/
   virtual void CreateMaterial();
   virtual void ConstructGeometry();
@@ -70,6 +70,7 @@ class CbmZdcv1 : public CbmZdc
       active volume. **/
   Int_t          fTrackID;           //!  track index
   Int_t          fVolumeID;          //!  volume id
+  Int_t          fModuleID;          //!  module id
   TLorentzVector fPos;               //!  position
   TLorentzVector fMom;               //!  momentum
   Double32_t     fTime;              //!  time
@@ -86,12 +87,12 @@ class CbmZdcv1 : public CbmZdc
   void ResetParameters();
 
 
-  ClassDef(CbmZdcv1,1)
+  ClassDef(CbmZdcv1,2)
 
 };
 
 inline void CbmZdcv1::ResetParameters() {
-  fTrackID = fVolumeID = 0;
+  fTrackID = fVolumeID = fModuleID = 0;
   fPos.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMom.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fEloss = 0;

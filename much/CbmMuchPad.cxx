@@ -18,8 +18,8 @@ CbmMuchPad::CbmMuchPad():TPolyLine(){}
 // -----  Standard constructor  --------------------------------------------
 CbmMuchPad::CbmMuchPad (CbmMuchSector* sector, Int_t iChannel):TPolyLine(){
   // Generate detectorId
-  fSectorId = sector->GetDetectorId();
-  fDetectorId = CbmMuchGeoScheme::GetDetIdFromSector(fSectorId, iChannel);
+  Long64_t sectorId = sector->GetDetectorId();
+  fDetectorId = CbmMuchGeoScheme::GetDetIdFromSector(sectorId, iChannel);
 
   TVector3 secPos = sector->GetPosition();
   TVector3 secSize = sector->GetSize();
@@ -67,28 +67,28 @@ CbmMuchPad::~CbmMuchPad(){
 // -------------------------------------------------------------------------
 Double_t CbmMuchPad::GetSectorX0() const{
 	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-	return geoScheme->GetSectorByDetId(fSectorId)->GetPosition()[0];
+	return geoScheme->GetSectorByDetId(fDetectorId)->GetPosition()[0];
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 Double_t CbmMuchPad::GetSectorY0() const{
 	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-	return geoScheme->GetSectorByDetId(fSectorId)->GetPosition()[1];
+	return geoScheme->GetSectorByDetId(fDetectorId)->GetPosition()[1];
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 Double_t CbmMuchPad::GetLx() const{
 	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-	return geoScheme->GetSectorByDetId(fSectorId)->GetDx();
+	return geoScheme->GetSectorByDetId(fDetectorId)->GetDx();
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 Double_t CbmMuchPad::GetLy() const{
 	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-	return geoScheme->GetSectorByDetId(fSectorId)->GetDy();
+	return geoScheme->GetSectorByDetId(fDetectorId)->GetDy();
 }
 // -------------------------------------------------------------------------
 

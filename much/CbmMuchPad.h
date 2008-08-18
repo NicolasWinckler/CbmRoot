@@ -39,7 +39,6 @@ public:
 
 private:
   Long64_t            fDetectorId;        // Unique ID of the pad
-  Long64_t            fSectorId;          // Parent sector ID
   Double_t            fX0, fY0;           // Coordinates of the pad center
   TArrayL64           fNeighbours;        // Array of IDs of neighbour pads
   Bool_t              fFired;             // Defines whether pad is fired

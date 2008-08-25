@@ -27,9 +27,11 @@
 
 
 class CbmEcalClusterV1;
+class CbmEcalCell;
+
 class CbmEcalRecParticle : public TObject
 {
-
+friend class CbmEcalRecoSlow;
 public:
 
   /** Default constructor **/
@@ -42,7 +44,7 @@ public:
 		     Double_t pz, Double_t E,
 		     Double_t x=-1111, Double_t y=-1111, Double_t z=-1111,
 		     Int_t id=0, Double_t chi2=-1111, CbmEcalClusterV1* cl=NULL,
-		     Int_t type=0);
+		     CbmEcalCell* cell=NULL, Int_t type=0);
 
   /** Copy constructor **/
   CbmEcalRecParticle(const CbmEcalRecParticle& obj) { *this = obj; };
@@ -60,7 +62,9 @@ public:
   Double32_t Y() const {return fY;}
   Double32_t Z() const {return fZ;}
   Double_t Chi2() const {return fChi2;}
+  void SetChi2(Double_t chi2) {fChi2=chi2;}
   CbmEcalClusterV1* Cluster() const {return fCluster;}
+  CbmEcalCell* Cell() const {return fCell;}
   Int_t PdgId() const {return fId;}
   Int_t CellType() const {return fType;}
   /** Output to screen **/
@@ -89,6 +93,8 @@ protected:
 
   /** Reference to cluster **/
   CbmEcalClusterV1* fCluster;		//!
+  /** A seed for the photon **/
+  CbmEcalCell* fCell;			//!
 
   ClassDef(CbmEcalRecParticle,1)
 

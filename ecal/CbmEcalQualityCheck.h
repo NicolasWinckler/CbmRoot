@@ -121,6 +121,10 @@ private:
   Double_t fMCPY;
   Double_t fMCPZ;
   Double_t fChi2;
+  /** Pdg code. Gamma and neutron(antineutron) only **/
+  Int_t fPdgCode;
+  /** Distance between this and closest other hit in the calorimeter **/
+  Double_t fR;
 
   ClassDef(CbmEcalQualityCheck, 1)
 };

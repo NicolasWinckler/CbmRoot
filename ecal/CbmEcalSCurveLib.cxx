@@ -23,8 +23,8 @@ using std::cerr;
 using std::endl;
 using std::list;
 
-CbmEcalSCurveLib::CbmEcalSCurveLib(Int_t verbose) :
-  TNamed("CbmEcalShowerLib", "Calorimeter s-curve"), fVerbose(verbose)
+CbmEcalSCurveLib::CbmEcalSCurveLib(const char* name, Int_t verbose) :
+  CbmTask(name, verbose), fVerbose(verbose)
 {
   Int_t i;
 
@@ -33,6 +33,7 @@ CbmEcalSCurveLib::CbmEcalSCurveLib(Int_t verbose) :
   fRec=new CbmEcalSCurveLibRecord*[fSize];
   for(i=0;i<fSize;i++)
     fRec[i]=NULL;
+  fFiles.clear();
 }
 
 void CbmEcalSCurveLib::GetModuleSize()
@@ -42,14 +43,18 @@ void CbmEcalSCurveLib::GetModuleSize()
   CbmEcalInf* inf=CbmEcalInf::GetInstance(NULL);
   if (inf==NULL)
   {
-    cerr << "-E-: Can't find CbmEcalInf object! " << endl;
-    Fatal("","Can't find CbmEcalInf object!");
+    Fatal("GetModuleSize","Can't find CbmEcalInf object!");
     return;
   }
   fModuleSize=inf->GetModuleSize();
 }
 
 void CbmEcalSCurveLib::AddFile(const char* file)
+{
+  fFiles.push_back(file);
+}
+
+void CbmEcalSCurveLib::Add(const char* file)
 {
   Int_t num;
   TString fname=file;
@@ -62,17 +67,36 @@ void CbmEcalSCurveLib::AddFile(const char* file)
   }
   GetModuleSize();
   if (fVerbose>9)
-    Info("AddFile()", "Initing for cellsize %f.", rec->GetCellSize());
+    Info("AddFile", "Initing for cellsize %f.", rec->GetCellSize());
   num=(Int_t)((fModuleSize+0.0001)/rec->GetCellSize());
   fRec[num]=rec;
   if (fVerbose>0)
-    Info("AddFile()", "Inited for cell type %d", num);
+    Info("AddFile", "Inited for cell type %d", num);
 }
 
-void CbmEcalSCurveLib::Init()
+InitStatus CbmEcalSCurveLib::Init()
 {
   CbmRootManager* fManager=CbmRootManager::Instance();
+  if (fManager==NULL)
+  {
+    Fatal("Init", "Can't find IOManager.");
+    return kFATAL;
+  }
   fManager->Register("EcalSCurveLib", "ECAL", this, kFALSE);
+  for(list<TString>::const_iterator p=fFiles.begin(); p!=fFiles.end();++p)
+    Add((*p).Data());
+
+  return kSUCCESS;
+}
+
+void CbmEcalSCurveLib::Exec(Option_t* exec)
+{
+  ;
+}
+
+void CbmEcalSCurveLib::Finish()
+{
+  ;
 }
 
 void CbmEcalSCurveLib::GetCoord(Float_t e, CbmEcalCell* cell, Float_t& x, Float_t& y) const

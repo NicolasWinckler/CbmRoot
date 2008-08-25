@@ -1,5 +1,5 @@
 /** A very simple version of reconstruction.
- ** Mainly for debuging.
+ ** Mainly for debugging.
  ** The tracks array can be imported from ROOT file. (see CbmEcalTrackExport. )
  ** The output can be exported to tree. 
  ** //Dr.Sys **/
@@ -18,6 +18,9 @@ class CbmEcalCell;
 class CbmEcalSCurveLib;
 class CbmEcalInf;
 class CbmEcalClusterV1;
+class CbmEcalShowerLib;
+class CbmEcalCalibration;
+class TFormula;
 
 class CbmEcalRecoSimple : public CbmTask
 {
@@ -26,7 +29,7 @@ public:
   CbmEcalRecoSimple();
 
   /** Standard constructor **/
-  CbmEcalRecoSimple(const char *name, const Int_t iVerbose=1);
+  CbmEcalRecoSimple(const char *name, const Int_t iVerbose=1, const char* configname="none");
 
   /** Destructor **/
   virtual ~CbmEcalRecoSimple();
@@ -41,12 +44,13 @@ public:
   inline void SetRecoName(const char* name) {fRecoName=name;}
   inline TString GetRecoName() const {return fRecoName;}
 private:
-  /** Returns incoming particle energy **/
-  Double_t GetEnergy(Double_t e2, CbmEcalCell* cell);
   /** Reconstruct photon from maximum **/
   void Reco(CbmEcalCell* cell, CbmEcalClusterV1* clstr);
+  /** Calculate a chi2 for just reconstructed photons **/
+  void CalculateChi2(CbmEcalClusterV1* cluster);
   /** Number of reconstructed tracks **/
   Int_t fN;
+  Int_t fNOld;
 
   CbmEcalCell** fMaximums;	//!
   CbmEcalCell** fExcluded;	//!
@@ -55,14 +59,14 @@ private:
   Int_t fEventN;
   /** Calorimeter structure **/
   CbmEcalStructure* fStr;	//!
+  /** An information about calorimeter **/
   CbmEcalInf* fInf;		//!
+  /** S-curve library **/
   CbmEcalSCurveLib* fLib;	//!
-
-  /** An calibration constants: TODO: should be moved to other class **/
-  Double_t fP0a[5];
-  Double_t fP0b[5];
-  Double_t fP1a[5];
-  Double_t fP1b[5];
+  /** A shower library **/
+  CbmEcalShowerLib* fShLib;	//!
+  /** A calibration of the calorimeter **/
+  CbmEcalCalibration* fCal;	//!
 
   /** Array of tracks **/
   TClonesArray* fTracks;	//!
@@ -91,6 +95,14 @@ private:
   Double_t fAY;
   Double_t fCellX;
   Double_t fCellY;
+
+  /** Constants used in reconstruction **/
+  Double_t fC[10];
+  /** Definition of sigma used for chi^2 calculation **/
+  TFormula* fSigma;		//!
+  TString fParNames[14];	//!
+  TString fSigmaFormula;
+  Int_t fParOffset;
 
   ClassDef(CbmEcalRecoSimple, 1)
 };

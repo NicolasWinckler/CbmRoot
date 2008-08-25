@@ -12,22 +12,27 @@
 #ifndef CBMECALSCURVELIB_H
 #define CBMECALSCURVELIB_H
 
-#include "TNamed.h"
+#include "CbmTask.h"
+#include "TString.h"
+
+#include <list>
 
 class CbmEcalSCurveLibRecord;
 class CbmEcalCell;
 
-class CbmEcalSCurveLib : public TNamed
+class CbmEcalSCurveLib : public CbmTask
 {
 public:
-  CbmEcalSCurveLib(Int_t verbose=0);
+  CbmEcalSCurveLib(const char* name, Int_t verbose=0);
   void AddFile(const char* file);
   // a is assymetry, e --- energy of incoming particle
   void GetCoord(Float_t e, CbmEcalCell* cell, Float_t& x, Float_t& y) const;
   Float_t GetX(Float_t a, Float_t e, CbmEcalCell* cell) const;
   Float_t GetY(Float_t a, Float_t e, CbmEcalCell* cell) const;
   Float_t GetX(Float_t a, Float_t e, Float_t theta, Int_t type) const;
-  void Init();
+  InitStatus Init();
+  void Exec(Option_t* exec);
+  void Finish();
   virtual ~CbmEcalSCurveLib();
 
   /** Set module size, mostly for debuging
@@ -35,7 +40,9 @@ public:
    ** via CbmEcalInf container **/
   void SetModuleSize(Float_t msize);
 private:
+  void Add(const char* file);
 
+  std::list<TString> fFiles;
   /** if fModuleSize==0, load it from CbmEcalInf **/
   void GetModuleSize();
   /** A verbose flag **/

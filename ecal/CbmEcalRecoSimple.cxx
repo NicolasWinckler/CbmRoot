@@ -1,8 +1,8 @@
 #include "CbmEcalRecoSimple.h"
 
 #include "TTree.h"
-#include "TChain.h"
 #include "TClonesArray.h"
+#include "TFormula.h"
 
 #include "CbmRootManager.h"
 #include "CbmTrackParam.h"
@@ -13,6 +13,9 @@
 #include "CbmEcalCell.h"
 #include "CbmEcalRecParticle.h"
 #include "CbmEcalClusterV1.h"
+#include "CbmEcalShowerLib.h"
+#include "CbmEcalCalibration.h"
+#include "CbmEcalParam.h"
 
 #include <iostream>
 
@@ -34,31 +37,107 @@ void CbmEcalRecoSimple::Exec(Option_t* option)
     Info("Exec", "Event %d, %d clusters in event.", fEventN, n);
   for(i=0;i<n;i++)
   {
+    fNOld=fN;
     cluster=(CbmEcalClusterV1*)fClusters->At(i);
     p=cluster->PeaksBegin();
     for(;p!=cluster->PeaksEnd();++p)
       Reco(*p, cluster);
+    CalculateChi2(cluster);
   }
   if (fVerbose>1)
     Info("Exec", "%d photons reconstructed in calorimeter.", fN);
 }
 
-/** Returns incoming particle energy **/
-/** TODO: Need class with calibration! **/
-Double_t CbmEcalRecoSimple::GetEnergy(Double_t e2, CbmEcalCell* cell)
+/** Calculate a chi2 for just reconstructed photons **/
+void CbmEcalRecoSimple::CalculateChi2(CbmEcalClusterV1* cluster)
 {
-  Int_t type=cell->GetType();
-  Double_t x=cell->GetCenterX();
-  Double_t y=cell->GetCenterY();
-  Double_t tantheta=TMath::Sqrt(x*x+y*y)/fInf->GetZPos();
-  Double_t a=fP0a[type]+fP1a[type]*tantheta;
-  Double_t b=fP0b[type]+fP1b[type]*tantheta;
-  Double_t d=TMath::Sqrt(a*a+4.0*e2*b);
-  Double_t res=(-a+d)/2.0/b;
-  return res*res;
+  if (!fShLib) return;
+  
+  list<CbmEcalCell*>::const_iterator cell=cluster->Begin();
+  static Double_t module=fInf->GetModuleSize();
+  Int_t type;
+  Double_t de;
+  Double_t x;
+  Double_t y;
+  Double_t theta;
+  Double_t phi;
+  Double_t cellsize;
+  Double_t cx;
+  Double_t cy;
+  Double_t r;
+  Double_t celle;
+  CbmEcalCell* cl;
+  Int_t p;
+  CbmEcalRecParticle* part;
+  Double_t clustere=0;
+  Double_t clenergy;
+  Double_t sigma2;
+  Double_t cellerr;
+  Double_t epred;
+  Double_t sin4theta;
+  Double_t chi2=0;
+  Double_t emeas;
+
+
+  for(;cell!=cluster->End();++cell)
+    clustere+=(*cell)->GetTotalEnergy();
+  clenergy=fCal->GetERough(clustere);
+
+  for(cell=cluster->Begin();cell!=cluster->End();++cell)
+  {
+    type=(*cell)->GetType();
+    cellsize=module/type;
+    cellerr=0; celle=0;
+    for(p=fNOld;p<fN;p++)
+    {
+      part=(CbmEcalRecParticle*)fReco->At(p);
+      cl=part->Cell(); cx=cl->GetCenterX(); cy=cl->GetCenterY(); 
+      x=(*cell)->GetCenterX(); x-=part->X(); // x-=cx; 
+      y=(*cell)->GetCenterY(); y-=part->Y(); // y-=cy; 
+
+      r=TMath::Sqrt(cx*cx+cy*cy);
+
+      /** TODO: should be Z of the cell**/
+      theta=TMath::ATan(r/fInf->GetZPos());
+      theta*=TMath::RadToDeg();
+      phi=TMath::ACos(cx/r)*TMath::RadToDeg();
+      if (cy<0) phi=360.0-phi;
+
+      celle+=fShLib->GetSumEThetaPhi(x, y, cellsize, part->E(), theta, phi);
+    }
+//    cout << "---> " << x << "	" << y << "	" << cellsize << "	" << part->E() << "	" << theta << "	" << phi << endl;
+//    cout << "-> celle " << celle << endl;
+    cx=(*cell)->GetCenterX(); cy=(*cell)->GetCenterY();
+    r=TMath::Sqrt(cx*cx+cy*cy);
+    theta=TMath::ATan(r/fInf->GetZPos());
+
+    epred=fCal->GetEnergy(celle, *cell);
+    emeas=fCal->GetEnergy((*cell)->GetTotalEnergy(), *cell);
+//    if (epred>clenergy) epred=clenergy;
+//    if (celle>0)
+    {
+      fSigma->SetParameter(0, clenergy);	//Ecluster
+      fSigma->SetParameter(1, emeas);		//Emeas
+      fSigma->SetParameter(2, epred);		//Epred
+      fSigma->SetParameter(3, theta);		//Theta
+      cellerr=fSigma->Eval(0);
+      de=fCal->GetEnergy(celle, *cell)-fCal->GetEnergy((*cell)->GetTotalEnergy(), *cell);
+//      cout << "->" << celle << "	" << de << "	" << cellerr << endl;
+//      cellerr=1;
+      de*=de; chi2+=de/cellerr;
+    }
+  }
+  chi2/=cluster->Size();
+  for(p=fNOld;p<fN;p++)
+  {
+    part=(CbmEcalRecParticle*)fReco->At(p);
+    part->SetChi2(chi2);
+  }
+  cluster->fChi2=chi2;
+//  cout << fNOld << "	" << fN << "	" << chi2 << endl;
 }
 
-  /** Reconstruct photon from maximum **/
+/** Reconstruct photon from maximum **/
 void CbmEcalRecoSimple::Reco(CbmEcalCell* cell, CbmEcalClusterV1* clstr)
 {
   Double_t x;
@@ -138,8 +217,8 @@ void CbmEcalRecoSimple::Reco(CbmEcalCell* cell, CbmEcalClusterV1* clstr)
   
   fPSE=cell->GetPSEnergy();
 
-  if (fE2x2<0.05) return; 
-  fEReco=GetEnergy(fE2x2+fPSE, cell);
+  if (fCal->GetERough(fE2x2)<0.3) return; 
+  fEReco=fCal->GetEnergy(fE2x2+fPSE, cell);
   if (fAX!=-1111)
     fXReco=fLib->GetX(fAX, fEReco, cell);
   else
@@ -168,7 +247,7 @@ void CbmEcalRecoSimple::Reco(CbmEcalCell* cell, CbmEcalClusterV1* clstr)
   px=fEReco*x/amp;
   py=fEReco*y/amp;
   pz=fEReco*z/amp;
-  new((*fReco)[fN++]) CbmEcalRecParticle(px, py, pz, fEReco, x, y, z, 22, -1111, clstr, fType);
+  new((*fReco)[fN++]) CbmEcalRecParticle(px, py, pz, fEReco, x, y, z, 22, -1111, clstr, cell, fType);
 }
 
 void CbmEcalRecoSimple::CreateTree()
@@ -198,7 +277,7 @@ CbmEcalRecoSimple::CbmEcalRecoSimple()
 }
 
 /** Standard constructor **/
-CbmEcalRecoSimple::CbmEcalRecoSimple(const char *name, const Int_t iVerbose)
+CbmEcalRecoSimple::CbmEcalRecoSimple(const char *name, const Int_t iVerbose, const char* configname)
   : CbmTask(name, iVerbose)
 {
   fToTree=kFALSE;
@@ -208,24 +287,44 @@ CbmEcalRecoSimple::CbmEcalRecoSimple(const char *name, const Int_t iVerbose)
 
   fRecoName="EcalReco";
 
-  fLib=new CbmEcalSCurveLib(0);
-  fLib->AddFile("3x3.root");
-  fLib->AddFile("6x6.root");
-  fLib->AddFile("12x12.root");
+  Int_t i;
+  TString nm;
 
-  fP0a[1]=0.002833;
-  fP0a[2]=0.003345;
-  fP0a[4]=0.003587;
-  fP0b[1]=0.08788;
-  fP0b[2]=0.08496;
-  fP0b[4]=0.07886;
+  fParNames[0]="Ecluster";
+  fParNames[1]="Emeas";
+  fParNames[2]="Epred";
+  fParNames[3]="Theta";
+  fParOffset=3;
+  for(i=0;i<10;i++)
+  {
+    fParNames[i+fParOffset]="c";
+    fParNames[i+fParOffset]+=i;
+  }
 
-  fP1a[1]=0.003398;
-  fP1a[2]=0.003108;
-  fP1a[4]=0.001337;
-  fP1b[1]=-0.005302;
-  fP1b[2]=-0.005155;
-  fP1b[4]=-0.006937;
+  CbmEcalParam* par=new CbmEcalParam("RecoSimpleParam", configname);
+
+  for(i=0;i<10;i++)
+    fC[i]=-1111;
+  for(i=0;i<10;i++)
+  {
+    fC[i]=par->GetDouble(fParNames[i+fParOffset]);
+    if (fC[i]==-1111) break;
+  }
+  fSigmaFormula=par->GetString("sigma");
+  for(i=0;i<10;i++)
+  {
+    if (fC[i]==-1111) break;
+    fSigmaFormula.ReplaceAll(fParNames[i+fParOffset], par->GetString(fParNames[i+fParOffset]));
+  }
+  Info("Init", "Formula for sigma (with constants): %s. ", fSigmaFormula.Data());
+  for(i=0;i<fParOffset;i++)
+  {
+    nm="["; nm+=i; nm+="]";
+    fSigmaFormula.ReplaceAll(fParNames[i], nm);
+  }
+  Info("Init", "Used formula: %s.", fSigmaFormula.Data());
+  fSigma=new TFormula("RecoSimpleFormula", fSigmaFormula.Data());
+  delete par;
 }
 
 CbmEcalRecoSimple::~CbmEcalRecoSimple()
@@ -267,6 +366,25 @@ InitStatus CbmEcalRecoSimple::Init()
   {
     Fatal("Init", "Can't find EcalClusters");
     return kFATAL;
+  }
+  fCal=(CbmEcalCalibration*)io->GetObject("EcalCalibration");
+  if (!fCal)
+  {
+    Fatal("Init", "Can't find EcalCalibration");
+    return kFATAL;
+  }
+
+  fLib=(CbmEcalSCurveLib*)io->GetObject("EcalSCurveLib");
+  if (!fLib)
+  {
+    Fatal("Init", "Can't find EcalSCurveLib");
+    return kFATAL;
+  }
+
+  fShLib=(CbmEcalShowerLib*)io->GetObject("EcalShowerLib");
+  if (!fShLib)
+  {
+    Info("Init", "No shower library found in system. Will continue without chi2 calculation.");
   }
   fReco=new TClonesArray("CbmEcalRecParticle", 2000);
   io->Register(fRecoName, "ECAL", fReco, kFALSE);

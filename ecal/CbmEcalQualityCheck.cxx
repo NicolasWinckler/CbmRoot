@@ -43,12 +43,15 @@ void CbmEcalQualityCheck::Exec(Option_t* option)
   Int_t trn=fMCTracks->GetEntriesFast();
   Int_t rn=fReco->GetEntriesFast();
   CbmEcalPoint* p;
+  CbmEcalPoint* po;
   CbmMCTrack* tr;
   CbmMCTrack* tq;
   CbmEcalRecParticle* r;
   CbmEcalRecParticle* rm;
   Double_t rmin;
   Double_t rad;
+  Double_t dx;
+  Double_t dy;
 
   CreateTree();
   fEventN++;
@@ -60,13 +63,13 @@ void CbmEcalQualityCheck::Exec(Option_t* option)
     if (!p) continue;
     tr=(CbmMCTrack*)fMCTracks->At(p->GetTrackID());
     /** Only photons **/
-    if (tr->GetPdgCode()!=22) continue;
+    if (tr->GetPdgCode()!=22&&TMath::Abs(tr->GetPdgCode())!=2112) continue;
     /** ... prompt and pi0 decay photons ... **/
     if (tr->GetStartZ()>0.1) continue;
     /** ... energetic enough ... **/
     if (tr->GetEnergy()<0.5) continue;
     /** ... from pi^0 decay ... **/
-    if (tr->GetMotherId()>=0)
+    if (tr->GetMotherId()>=0&&tr->GetPdgCode()==22)
     {
       tq=(CbmMCTrack*)fMCTracks->At(tr->GetMotherId());
       if (tq->GetPdgCode()!=111) continue;
@@ -79,6 +82,18 @@ void CbmEcalQualityCheck::Exec(Option_t* option)
     }
     /** ... and without daughter tracks. **/
     if (trn!=j) continue;
+    rmin=1e10;
+    for(j=0;j<pn;j++)
+    {
+      if (i==j) continue;
+      po=(CbmEcalPoint*)fPoints->At(j);
+      dx=po->GetX(); dx-=p->GetX(); dx*=dx;
+      dy=po->GetY(); dy-=p->GetY(); dy*=dy;
+      rad=dx; rad+=dy;
+      if (rad<rmin) rmin=rad;
+    }
+    fR=TMath::Sqrt(rmin);
+
     fMCX=p->GetX();
     fMCY=p->GetY();
     fMCZ=p->GetZ();
@@ -87,6 +102,7 @@ void CbmEcalQualityCheck::Exec(Option_t* option)
     fMCPZ=p->GetPz();
     fMCE=tr->GetEnergy();
     fMCMotherTrN=tr->GetMotherId();
+    fPdgCode=tr->GetPdgCode();
     rmin=2e10; rm=NULL;
     for(j=0;j<rn;j++)
     {
@@ -201,6 +217,7 @@ void CbmEcalQualityCheck::DrawImage()
   DrawTracks();
   DrawPhotons();
   /** some beauty **/
+  /*
   PutPixel((Int_t)(fCX/2.0+ 0), (Int_t)(fCY/2.0+ 0), "#FFFFFF");
   PutPixel((Int_t)(fCX/2.0+ 0), (Int_t)(fCY/2.0+ 1), "#FFFFFF");
   PutPixel((Int_t)(fCX/2.0+ 0), (Int_t)(fCY/2.0+ 3), "#FFFFFF");
@@ -233,6 +250,7 @@ void CbmEcalQualityCheck::DrawImage()
   PutPixel((Int_t)(fCX/2.0+11), (Int_t)(fCY/2.0+ 2), "#FFFFFF");
   PutPixel((Int_t)(fCX/2.0+11), (Int_t)(fCY/2.0+ 3), "#FFFFFF");
   PutPixel((Int_t)(fCX/2.0+11), (Int_t)(fCY/2.0+ 4), "#FFFFFF");
+  */
   fC->WriteImage(name+".png", TImage::kPng);
 }
 
@@ -277,7 +295,7 @@ Double_t CbmEcalQualityCheck::GetP(CbmEcalPoint* p)
   /** Draw chi2 for photons **/
 void CbmEcalQualityCheck::DrawChi2(Float_t x, Float_t y, Float_t chi2, const char* color)
 {
-  char stri[10];
+  char stri[30];
   Int_t xi=(Int_t)((x/fInf->GetEcalSize(0))*fCX+fCX/2.0);
   Int_t yi=(Int_t)((y/fInf->GetEcalSize(1))*fCY+fCY/2.0);
   yi-=8;
@@ -538,7 +556,9 @@ void CbmEcalQualityCheck::CreateTree()
   fOut->Branch("mce", &fMCE, "mce/D");
   fOut->Branch("ev", &fEventN, "ev/I");
   fOut->Branch("chi2", &fChi2, "chi2/D");
+  fOut->Branch("r", &fR, "r/D");
   fOut->Branch("mcmothertrackn", &fMCMotherTrN, "mcmothertrackn/I");
+  fOut->Branch("pdg", &fPdgCode, "pdg/I");
 }
 
 /** Init **/

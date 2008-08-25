@@ -41,9 +41,12 @@
 #pragma link C++ class  CbmEcalTrackExport;
 #pragma link C++ class  CbmEcalStructureExport;
 #pragma link C++ class  CbmEcalRecoSimple;
+#pragma link C++ class  CbmEcalRecoSlow;
 #pragma link C++ class  CbmEcalClusterV1+;
 #pragma link C++ class	CbmEcalQualityCheck;
 #pragma link C++ class  CbmEcalClusterFinderV1;
 #pragma link C++ class  CbmEcalTrackImport;
+#pragma link C++ class  CbmEcalCalibration;
+#pragma link C++ class  CbmEcalParam+;
 
 #endif

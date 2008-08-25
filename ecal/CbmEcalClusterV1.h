@@ -21,7 +21,8 @@ struct CbmEcalClusterSortProcess : public std::binary_function<CbmEcalCell*, Cbm
 /** A temporary cluster needed for debugging of cluster finder procedure **/
 class CbmEcalClusterV1 : public TObject
 {
-friend class CbmEcalFitter;
+friend class CbmEcalRecoSimple;
+friend class CbmEcalRecoSlow;
 friend class CbmEcalClusterFinderV1;
 public:
   /** An empty constructor **/

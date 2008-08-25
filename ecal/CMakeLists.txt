@@ -37,7 +37,8 @@ CbmEcalTracking.cxx CbmEcalStructureFiller.cxx
 CbmEcalTrackExport.cxx CbmEcalStructureExport.cxx
 CbmEcalRecoSimple.cxx CbmEcalClusterV1.cxx
 CbmEcalQualityCheck.cxx CbmEcalClusterFinderV1.cxx
-CbmEcalTrackImport.cxx
+CbmEcalTrackImport.cxx CbmEcalCalibration.cxx
+CbmEcalParam.cxx CbmEcalRecoSlow.cxx
 )
 
 SET(ECAL_SRCS ${ECAL_SRCS_RULECHECKER} CbmEcalInf.cxx)

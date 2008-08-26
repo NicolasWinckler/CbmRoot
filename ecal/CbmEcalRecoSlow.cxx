@@ -245,11 +245,77 @@ void CbmEcalRecoSlow::Exec(Option_t* option)
     chi2=CalculateChi2(cluster);
     if (chi2>fChi2Th)
       FitCluster(cluster);
+    if (fStoreClusterInfo)
+      WriteClusterInfo(cluster);
     if (fOutTree)
       FillTree();
   }
   if (fVerbose>1)
     Info("Exec", "%d photons reconstructed in calorimeter.", fN);
+}
+
+/** Write a cluster info **/
+void CbmEcalRecoSlow::WriteClusterInfo(CbmEcalClusterV1* clstr)
+{
+  list<CbmEcalCell*>::const_iterator p;  
+  list<CbmEcalCell*>::const_iterator cell;
+  CbmEcalRecParticle* part;
+  Int_t i=0;
+  Int_t j;
+  Double_t celle;
+  Double_t cellsize;
+  Double_t e[3];
+  Double_t x;
+  Double_t y;
+  Double_t r;
+  Double_t theta;
+  Double_t phi;
+  CbmEcalCell* cl;
+  Double_t cx;
+  Double_t cy;
+  static Double_t module=fInf->GetModuleSize();
+
+  fECluster=fCal->GetEnergy(clstr->Energy(), *(clstr->PeaksBegin()));
+  for(p=clstr->Begin();p!=clstr->End();++p)
+  {
+    e[i++]=(*p)->GetTotalEnergy();
+    if (i==3) break;
+  }
+  fECls=e[0]/clstr->Energy();
+  fE2Cls=(e[0]+e[1])/clstr->Energy();
+  fE3Cls=(e[0]+e[1]+e[2])/clstr->Energy();
+  i=0;
+
+  for(cell=clstr->Begin();cell!=clstr->End();++cell)
+  {
+    fTypes[i]=(*cell)->GetType();
+    cellsize=module/fTypes[i];
+    celle=0;
+    for(j=fNOld;j<fN;j++)
+    {
+      part=(CbmEcalRecParticle*)fReco->At(j);
+      cl=part->Cell(); cx=cl->GetCenterX(); cy=cl->GetCenterY(); 
+      x=(*cell)->GetCenterX(); x-=part->X(); // x-=cx; 
+      y=(*cell)->GetCenterY(); y-=part->Y(); // y-=cy; 
+
+      r=TMath::Sqrt(cx*cx+cy*cy);
+
+      /** TODO: should be Z of the cell**/
+      theta=TMath::ATan(r/fInf->GetZPos());
+      theta*=TMath::RadToDeg();
+      phi=TMath::ACos(cx/r)*TMath::RadToDeg();
+      if (cy<0) phi=360.0-phi;
+
+      celle+=fShLib->GetSumEThetaPhi(x, y, cellsize, part->E(), theta, phi);
+    }
+    fEpred[i]=celle;
+    fEmeas[i]=(*cell)->GetTotalEnergy();
+    fCX[i]=(*cell)->GetCenterX();
+    fCY[i]=(*cell)->GetCenterY();
+    i++;
+  }
+  for(j=i;j<20;j++)
+    fTypes[j]=-1111;
 }
 
 void CbmEcalRecoSlow::FillTree()
@@ -539,6 +605,16 @@ void CbmEcalRecoSlow::CreateTree()
   fOutTree->Branch("y", &fYReco, "y/D");
   fOutTree->Branch("e", &fEReco, "e/D");
   fOutTree->Branch("chi2", &fChi2, "chi2/D");
+  fOutTree->Branch("ecluster", &fECluster, "ecluster/D");
+  if (fStoreClusterInfo==kFALSE) return;
+  fOutTree->Branch("cls_e", &fECls, "cls_e/D");
+  fOutTree->Branch("cls_e2", &fE2Cls, "cls_e2/D");
+  fOutTree->Branch("cls_e3", &fE3Cls, "cls_e3/D");
+  fOutTree->Branch("ctypes", fTypes, "ctypes[20]/S");
+  fOutTree->Branch("cemeas", fEmeas, "cemeas[20]/D");
+  fOutTree->Branch("cepred", fEpred, "cepred[20]/D");
+  fOutTree->Branch("cx", fCX, "cx[20]/D");
+  fOutTree->Branch("cy", fCY, "cy[20]/D");
 }
 
 /** Default constructor. Requirement of ROOT system **/
@@ -602,6 +678,7 @@ CbmEcalRecoSlow::CbmEcalRecoSlow(const char *name, const Int_t iVerbose, const c
   fMaxIterations=par->GetInteger("maxiterations");
 
   Info("Constructor", "chi2 threshold is %f, Estep is %f, and Cstep is %f.", fChi2Th, fEStep, fCStep);
+  fStoreClusterInfo=kFALSE;
   delete par;
 }
 

@@ -49,8 +49,8 @@ void CbmEcalClusterV1::Init()
   Double_t ty=0;
   Double_t tr=0;
 
-  //fCells.sort(CbmEcalClusterSortProcess());
-  //fCells.reverse();
+  fCells.sort(CbmEcalClusterSortProcess());
+  fCells.reverse();
   list<CbmEcalCell*>::const_iterator p=Begin();
   fEnergy=0;
   fX=0;

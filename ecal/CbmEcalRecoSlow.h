@@ -98,14 +98,17 @@ public:
   virtual void Finish();
 
   /** Tools for debugging **/
-  inline void SetOutToTree(Bool_t totree=kTRUE) {fToTree=totree;}
-  inline void SetRecoName(const char* name) {fRecoName=name;}
-  inline TString GetRecoName() const {return fRecoName;}
+  void SetOutToTree(Bool_t totree=kTRUE) {fToTree=totree;}
+  void SetRecoName(const char* name) {fRecoName=name;}
+  TString GetRecoName() const {return fRecoName;}
+  void SetStoreClusterInfo(Bool_t store) {fStoreClusterInfo=store;}
 private:
   /** Reconstruct photon from maximum **/
   void Reco(CbmEcalCell* cell, CbmEcalClusterV1* clstr);
   /** Fit a given cluster. A first approximation should be available **/
   void FitCluster(CbmEcalClusterV1* clstr);
+  /** Write a cluster info **/
+  void WriteClusterInfo(CbmEcalClusterV1* clstr);
   /** Calculate a chi2 for just reconstructed photons **/
   Double_t CalculateChi2(CbmEcalClusterV1* cluster);
   /** Fit a cluster. A**/
@@ -143,6 +146,7 @@ private:
    ** a separate task in future. For debugging now. **/
   Bool_t fToTree;
   TTree* fOutTree;		//!
+  Bool_t fStoreClusterInfo;
   void CreateTree();
   void FillTree();
   Short_t fType;
@@ -154,11 +158,20 @@ private:
   Double_t fEReco;
   Double_t fXReco;
   Double_t fYReco;
+  Double_t fECls;
+  Double_t fE2Cls;
+  Double_t fE3Cls;
+  Double_t fECluster;
   Double_t fAX;
   Double_t fAY;
   Double_t fCellX;
   Double_t fCellY;
   Double_t fChi2;
+  Short_t fTypes[20];
+  Double_t fEmeas[20];
+  Double_t fEpred[20];
+  Double_t fCX[20];
+  Double_t fCY[20];
 
   /** Constants used in reconstruction **/
   Double_t fC[10];

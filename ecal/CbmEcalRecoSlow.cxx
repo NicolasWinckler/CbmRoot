@@ -215,7 +215,6 @@ Double_t FCNEcalCluster::operator()(const vector<Double_t>& par) const
     }
   }
   chi2/=fCluster->Size();
-
   return chi2;
 }
 
@@ -246,9 +245,29 @@ void CbmEcalRecoSlow::Exec(Option_t* option)
     chi2=CalculateChi2(cluster);
     if (chi2>fChi2Th)
       FitCluster(cluster);
+    if (fOutTree)
+      FillTree();
   }
   if (fVerbose>1)
     Info("Exec", "%d photons reconstructed in calorimeter.", fN);
+}
+
+void CbmEcalRecoSlow::FillTree()
+{
+  Int_t n=fN-fNOld;
+  CbmEcalRecParticle* p;
+  Int_t i;
+
+  for(i=0;i<n;i++)
+  {
+    p=(CbmEcalRecParticle*)fReco->At(i+fNOld);
+    fChi2=p->Chi2();
+    fEReco=p->E();
+    fXReco=p->X();
+    fYReco=p->Y();
+    fOutTree->Fill();
+  }
+
 }
 
 /** Fit a given cluster. A first approximation should be available **/
@@ -281,6 +300,8 @@ void CbmEcalRecoSlow::FitCluster(CbmEcalClusterV1* clstr)
   }
   fFCN->SetParticleSeeds(cells);
   fFitter->CreateMinimizer();
+  ret=fFitter->Minimize();
+
   Double_t chi2;
   Double_t edm;
   Double_t errdef;
@@ -288,7 +309,6 @@ void CbmEcalRecoSlow::FitCluster(CbmEcalClusterV1* clstr)
   Int_t nparx;
 
   fFitter->GetStats(chi2, edm, errdef, nvpar, nparx);
-  ret=fFitter->Minimize();
   if (ret!=0)
   {
     Info("FitCluster", "Minimization failed! Last chi2 %f, old chi2 %f.", chi2, oldchi2);
@@ -493,7 +513,6 @@ void CbmEcalRecoSlow::Reco(CbmEcalCell* cell, CbmEcalClusterV1* clstr)
   
   if (fYReco!=-1111)
     fYReco+=cell->GetCenterY();
-  if (fOutTree) fOutTree->Fill();
   if (fXReco!=-1111)
     x=fXReco;
   else
@@ -516,17 +535,10 @@ void CbmEcalRecoSlow::CreateTree()
   fOutTree->Branch("ev", &fEventN, "ev/I");
   fOutTree->Branch("type", &fType, "type/S");
   fOutTree->Branch("difftype", &fDiffType, "difftype/S");
-  fOutTree->Branch("cellx", &fCellX, "cellx/D");
-  fOutTree->Branch("celly", &fCellY, "celly/D");
   fOutTree->Branch("x", &fXReco, "x/D");
   fOutTree->Branch("y", &fYReco, "y/D");
   fOutTree->Branch("e", &fEReco, "e/D");
-  fOutTree->Branch("ecell", &fE, "ecell/D");
-  fOutTree->Branch("e2", &fE2x2, "e2/D");
-  fOutTree->Branch("e3", &fE3x3, "e3/D");
-  fOutTree->Branch("ax", &fAX, "ax/D");
-  fOutTree->Branch("ay", &fAY, "ay/D");
-  fOutTree->Branch("pse", &fPSE, "pse/D");
+  fOutTree->Branch("chi2", &fChi2, "chi2/D");
 }
 
 /** Default constructor. Requirement of ROOT system **/

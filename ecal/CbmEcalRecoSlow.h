@@ -144,6 +144,7 @@ private:
   Bool_t fToTree;
   TTree* fOutTree;		//!
   void CreateTree();
+  void FillTree();
   Short_t fType;
   Short_t fDiffType;
   Double_t fE;
@@ -157,6 +158,7 @@ private:
   Double_t fAY;
   Double_t fCellX;
   Double_t fCellY;
+  Double_t fChi2;
 
   /** Constants used in reconstruction **/
   Double_t fC[10];

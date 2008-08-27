@@ -38,7 +38,7 @@
 #include <iostream>
 #include <iomanip>
 #include <map>
-
+#include <cmath>
 
 CbmLitMuchAna::CbmLitMuchAna() { 
   fMCTrackArray = NULL;

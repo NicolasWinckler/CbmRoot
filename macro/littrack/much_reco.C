@@ -10,7 +10,7 @@ void much_reco(Int_t nEvents = 100)
   TString particle = "mu";  
      
   //TString dir = "/d/cbm02/andrey/events/much/compact/signal/";
-  //TString dir = "/d/cbm02/andrey/events/much/10stations/new/signal/";
+//  TString dir = "/d/cbm02/andrey/events/much/10stations/new/signal/";
   TString dir = "/d/cbm02/andrey/events/much/10stations/10mu/mu_urqmd/";
 //  TString dir = "/d/cbm05/kisselan/cbmroot_Aug07/compactMuCh/";
 //  TString dir = "/d/cbm02/andrey/events/much/compact/";
@@ -41,12 +41,12 @@ void much_reco(Int_t nEvents = 100)
                     + particle + "/much.tracks." + system + "." + beam + "." 
                     + particle + "."
                     + trigger + ".root"; 
- 
+
 //  TString inFile = "/d/cbm05/kisselan/cbmroot_APR08/compactMuCh/25gev/omega/mc.auau.omega.centr.0000.root";
 //  TString inFile1 = "/d/cbm05/kisselan/cbmroot_APR08/compactMuCh/25gev/Tracks/StsTracks.auau.omega.centr.0000.root";
 //  TString inFile2 = "/d/cbm05/kisselan/cbmroot_APR08/compactMuCh/25gev/omega/MUCHhits.auau.omega.centr.0000.root";
 //  TString parFile = inFile;
-  
+
   gDebug = 0;
 
   TStopwatch timer;
@@ -55,27 +55,8 @@ void much_reco(Int_t nEvents = 100)
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libTrkBase");
-  gSystem->Load("libGeane");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libEcal");
-  gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
-  gSystem->Load("libL1");
-  gSystem->Load("libMuch");
-  gSystem->Load("libLittrack");  
-
+  gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
+  cbmrootlibs();
   
   // -----   Reconstruction run   -------------------------------------------
   CbmRunAna *run= new CbmRunAna();
@@ -88,17 +69,20 @@ void much_reco(Int_t nEvents = 100)
   CbmGeane* Geane = new CbmGeane(inFile.Data());
   
   
-  CbmMuchTrackFinder* muchTrackFinder    = new CbmLitMuchTrackFinderBranch();
+  CbmMuchTrackFinder* muchTrackFinder    = new CbmLitMuchTrackFinderRobust();
   //CbmMuchTrackFinder* muchTrackFinder    = new CbmLitMuchTrackFinderTrigger();
   //CbmMuchTrackFinder* muchTrackFinder    = new CbmMuchTrackFinderIdeal(1);
   CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
   muchFindTracks->UseFinder(muchTrackFinder);
   run->AddTask(muchFindTracks);
 
+//  CbmL1MuchFinder *MuchFinder = new CbmL1MuchFinder();
+//  run->AddTask(MuchFinder);
+  
   CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks(1);
   run->AddTask(muchMatchTracks);
   
-  CbmLitMuchRecQa* muchRecQa = new CbmLitMuchRecQa(10, 0.7);
+  CbmLitMuchRecQa* muchRecQa = new CbmLitMuchRecQa(8, 0.7);
   muchRecQa->SetNormType(2); // '2' to number of STS tracks
   run->AddTask(muchRecQa);
 

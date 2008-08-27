@@ -1,5 +1,5 @@
 
-void much_sim(Int_t nEvents = 1500)
+void much_sim(Int_t nEvents = 1000)
 {
   
   TString system  = "auau";  
@@ -11,7 +11,7 @@ void much_sim(Int_t nEvents = 1500)
   //TString dir = "/d/cbm02/andrey/events/much/10stations/new/";
   //TString dir = "/d/cbm02/andrey/events/much/10stations/new/signal/";
   //TString dir = "/d/cbm02/andrey/events/much/10stations/new/wofield/signal/";
-  TString dir = "/d/cbm02/andrey/events/much/10stations/10mu/urqmd/";
+  TString dir = "/d/cbm02/andrey/events/much/large/10mu/mu_urqmd/";
   
   
   TString outFile = dir + beam + "/" + particle + "/mc." + system + "." + beam + "." 
@@ -29,9 +29,9 @@ void much_sim(Int_t nEvents = 1500)
 //                      + particle + "." + "0000" + ".root";  
    
   
-  //TString muchGeom   = "much_standard.geo";
+  TString muchGeom   = "much_standard.geo";
  // TString muchGeom   = "../much/geometry/much_compact.geo";
- TString muchGeom   = "../much/geometry/much_compact.2.geo";
+ //TString muchGeom   = "../much/geometry/much_compact.2.geo";
   TString pipeGeom   = "pipe_much.geo";
   TString shieldGeom = "shield_standard.geo";
   
@@ -55,26 +55,8 @@ void much_sim(Int_t nEvents = 1500)
 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
-
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libEcal");
-  gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
-  gSystem->Load("libL1");
-  gSystem->Load("libMuch");
-  gSystem->Load("libLittrack"); 
-
+  gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
+  cbmrootlibs();
 
   CbmRunSim* fRun = new CbmRunSim();
   fRun->SetName("TGeant3");              // Transport engine
@@ -170,24 +152,24 @@ void much_sim(Int_t nEvents = 1500)
   CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
   primGen->AddGenerator(urqmdGen);
   
-//  Double_t minMom = 1.0; //minimum momentum
-//  Double_t maxMom = 10.; //maximum momentum
-//  
-//  CbmBoxGenerator* boxGen1 = new CbmBoxGenerator(13, 5);
-//  boxGen1->SetPRange(minMom, maxMom);
-//  boxGen1->SetPhiRange(0.,360.);
-//  boxGen1->SetThetaRange(2.5, 25.);
-//  boxGen1->SetCosTheta();    
-//  boxGen1->Init();
-//  primGen->AddGenerator(boxGen1);
-//  
-//  CbmBoxGenerator* boxGen2 = new CbmBoxGenerator(-13, 5);
-//  boxGen2->SetPRange(minMom, maxMom);
-//  boxGen2->SetPhiRange(0.,360.);
-//  boxGen2->SetThetaRange(2.5, 25.);
-//  boxGen2->SetCosTheta();    
-//  boxGen2->Init();
-//  primGen->AddGenerator(boxGen2);
+  Double_t minMom = 2.5; //minimum momentum
+  Double_t maxMom = 25.; //maximum momentum
+  
+  CbmBoxGenerator* boxGen1 = new CbmBoxGenerator(13, 5);
+  boxGen1->SetPRange(minMom, maxMom);
+  boxGen1->SetPhiRange(0.,360.);
+  boxGen1->SetThetaRange(2.5, 25.);
+  boxGen1->SetCosTheta();    
+  boxGen1->Init();
+  primGen->AddGenerator(boxGen1);
+  
+  CbmBoxGenerator* boxGen2 = new CbmBoxGenerator(-13, 5);
+  boxGen2->SetPRange(minMom, maxMom);
+  boxGen2->SetPhiRange(0.,360.);
+  boxGen2->SetThetaRange(2.5, 25.);
+  boxGen2->SetCosTheta();    
+  boxGen2->Init();
+  primGen->AddGenerator(boxGen2);
   
   fRun->SetGenerator(primGen);       
  
@@ -208,13 +190,11 @@ void much_sim(Int_t nEvents = 1500)
   rtdb->saveOutput();
   rtdb->print();
   // ------------------------------------------------------------------------
-
    
   // -----   Start run   ----------------------------------------------------
   cout << endl << "=== much_sim.C : Start run ..." << endl;
   fRun->Run(nEvents);
   // ------------------------------------------------------------------------
-
   
   // -----   Finish   -------------------------------------------------------
   timer.Stop();

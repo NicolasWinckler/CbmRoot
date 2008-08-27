@@ -1,10 +1,5 @@
-
 void sts_reco(Int_t nEvents = 1000)
 {
-
-  // ========================================================================
-  //          Adjust this part according to your requirements
-
   TString system  = "auau";  
   TString beam    = "25gev";  
   TString trigger = "centr";
@@ -15,9 +10,8 @@ void sts_reco(Int_t nEvents = 1000)
  // TString dir = "/d/cbm02/andrey/events/much/10stations/new/wofield/signal/";
  // TString dir = "/d/cbm02/andrey/events/much/10stations/new/signal/";
   //TString dir = "/d/cbm02/andrey/events/trd/25gev";
-  TString dir = "/d/cbm02/andrey/events/much/10stations/10mu/urqmd/";
-  
-  
+  TString dir = "/d/cbm02/andrey/events/much/large/10mu/mu_urqmd/";
+    
   TString inFile = dir + beam + "/" 
                     + particle + "/mc." + system + "." + beam + "." 
                     + particle + "."
@@ -27,79 +21,34 @@ void sts_reco(Int_t nEvents = 1000)
                     + particle + "/params." + system + "." + beam + "." 
                     + particle + "."
                     + trigger + ".root";  
-  
- // TString inFile = dir + "/trd.444.mc.root"; 
- // TString parFile = dir + "/trd.444.params.root"; 
-   
-  
-  // STS digitisation file
- // TString digiFile = "sts_standard.digi.par";
-  TString digiFile = "sts_allstrips.digi.par";
-  
   // Output file
   TString outFile = dir + beam + "/" 
                     + particle + "/sts.reco." + system + "." + beam + "." 
                     + particle + "."
                     + trigger + ".root"; 
-
-  //TString outFile = dir + "/trd.444.sts.reco.root";
-  // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
-  Int_t iVerbose = 0;
-  // ========================================================================
-
   
-    
-  // ---   Screen output   --------------------------------------------------  
-  cout << "*****************************************" << endl;
-  cout << "***   STS RECONSTRUCTION SCRIPT   *******" << endl;
-  cout << "*****************************************" << endl;
-  cout << "*** Input file       : " << inFile << endl;
-  cout << "*** Parameter file   : " << parFile << endl;
-  cout << "*** Digitsation file : " << digiFile << endl;
-  cout << "*** Output file      : " << outFile << endl;
-  cout << "*** Number of events : " << nEvents << endl;
-  cout << "*****************************************" << endl;
-  cout << endl << endl;
- // ------------------------------------------------------------------------
-
-
-        
-  // ---  ROOT settings   ---------------------------------------------------
-  gStyle->SetPalette(1);  
-  gDebug = 0;
-  // ------------------------------------------------------------------------
- 
-
+  dir  = "/d/cbm02/andrey/events/trd/standard/e_urqmd";
+  TString inFile = dir + "/mc.auau.25gev.e.centr.root"; 
+  TString parFile = dir + "/params.root"; 
+  TString outFile = dir + "/sts.reco.auau.25gev.e.centr.root";
+  
+  // STS digitisation file
+  TString digiFile = "sts_standard.digi.par";
+ // TString digiFile = "sts_allstrips.digi.par";
+  
+  Int_t iVerbose = 0;
   
   // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
   timer.Start();
   // ------------------------------------------------------------------------
-
-    
   
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libField");
-  gSystem->Load("libPassive");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libGen");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libEcal");
-  gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
-  gSystem->Load("libL1");
+  gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
+  cbmrootlibs();
   // ------------------------------------------------------------------------
-
-  
 
   // -----   Reconstruction run   -------------------------------------------
   CbmRunAna* run= new CbmRunAna();
@@ -160,8 +109,8 @@ void sts_reco(Int_t nEvents = 1000)
   
   
   // -----   STS reconstruction QA   ----------------------------------------
-  CbmTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 1);
-  run->AddTask(stsRecoQa);
+ // CbmTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 1);
+ // run->AddTask(stsRecoQa);
   // ------------------------------------------------------------------------
   
    

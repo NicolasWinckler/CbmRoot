@@ -1,7 +1,7 @@
-void eloss_ana(Int_t nEvents = 100000)
+void eloss_ana(Int_t nEvents = 200000)
 {
-  TString engine = "geant3/";
-  TString dir = "/d/cbm02/andrey/events/eloss/" + engine + "1-10gev_20cm/";
+  TString engine = "geant4/";
+  TString dir = "/d/cbm02/andrey/events/eloss/" + engine + "0.1-35gev_10cm/";
   TString inFile = dir + "eloss.sim.root";  
   TString outFile = dir + "eloss.ana.root";  
 
@@ -10,26 +10,8 @@ void eloss_ana(Int_t nEvents = 100000)
 
    gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
    basiclibs();
-   gSystem->Load("libGeoBase");
-   gSystem->Load("libParBase");
-   gSystem->Load("libBase");
-   gSystem->Load("libCbmBase");
-   gSystem->Load("libField");
-   gSystem->Load("libGen");
-   gSystem->Load("libPassive"); 
-   gSystem->Load("libTrkBase");
-   gSystem->Load("libGeane");
-   gSystem->Load("libMvd");
-   gSystem->Load("libSts");
-   gSystem->Load("libRich");
-   gSystem->Load("libTrd");
-   gSystem->Load("libTof");
-   gSystem->Load("libEcal");
-   gSystem->Load("libGlobal");
-   gSystem->Load("libKF");
-   gSystem->Load("libL1");   
-   gSystem->Load("libMuch"); 
-   gSystem->Load("libLittrack");
+   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
+   cbmrootlibs();
 
    
    CbmRunAna *run= new CbmRunAna();

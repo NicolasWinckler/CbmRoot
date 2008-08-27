@@ -1,10 +1,8 @@
+#include "../../cbmbase/CbmDetectorList.h";
 
-
-void much_ana(Int_t nEvents = 5000)
+void much_ana(Int_t nEvents = 1000)
 {
-
-   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
-   Int_t iVerbose = 0;
+  Int_t iVerbose = 0;
   
   TString system  = "auau";  
   TString beam    = "25gev";  
@@ -44,53 +42,25 @@ void much_ana(Int_t nEvents = 5000)
                     + particle + "."
                     + trigger + ".root";  
    
-   
-   // ----    Debug option   -------------------------------------------------
    gDebug = 0;
-   // ------------------------------------------------------------------------
-   
-   // -----   Timer   --------------------------------------------------------
+
    TStopwatch timer;
    timer.Start();
-   // ------------------------------------------------------------------------
-   
-   // ----  Load libraries   -------------------------------------------------
+
    gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
    basiclibs();
-   gSystem->Load("libGeoBase");
-   gSystem->Load("libParBase");
-   gSystem->Load("libBase");
-   gSystem->Load("libCbmBase");
-   gSystem->Load("libField");
-   gSystem->Load("libGen");
-   gSystem->Load("libPassive"); 
-   gSystem->Load("libTrkBase");
-   gSystem->Load("libGeane");
-   gSystem->Load("libMvd");
-   gSystem->Load("libSts");
-   gSystem->Load("libRich");
-   gSystem->Load("libTrd");
-   gSystem->Load("libTof");
-   gSystem->Load("libEcal");
-   gSystem->Load("libGlobal");
-   gSystem->Load("libKF");
-   gSystem->Load("libL1");   
-   gSystem->Load("libMuch"); 
-   gSystem->Load("libLittrack");
+   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
+   cbmrootlibs();
    
-   
-   // -----   Reconstruction run   -------------------------------------------
    CbmRunAna *run= new CbmRunAna();
    run->SetInputFile(inFile);
    run->AddFriend(inFile1);
    run->AddFriend(inFile2);
    run->SetOutputFile(outFile);
-  // ------------------------------------------------------------------------
-
   
-    CbmGeane* Geane = new CbmGeane(inFile.Data());
+   CbmGeane* Geane = new CbmGeane(inFile.Data());
 
-  
+   // -------------------------------------------------------------------------
    // CbmMuchTrackFinder* muchTrackFinder    = new CbmLitMuchTrackFinder();
    CbmMuchTrackFinder* muchTrackFinder    = new CbmMuchTrackFinderIdeal(1);
    CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
@@ -99,15 +69,10 @@ void much_ana(Int_t nEvents = 5000)
    
    CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks(1);
    run->AddTask(muchMatchTracks);
-   
-   CbmLitMuchAna* muchAna = new CbmLitMuchAna();
-   run->AddTask(muchAna);
-   
-   // -------------------------------------------------------------------------
-   // ===                 End of MUCH local reconstruction                   ===
-   // =========================================================================
 
-  
+   CbmLitPropAna* propAna = new CbmLitPropAna(kMUCH, 10);
+   run->AddTask(propAna);
+   // -------------------------------------------------------------------------
    
    // -----  Parameter database   --------------------------------------------
    CbmRuntimeDb* rtdb = run->GetRuntimeDb();

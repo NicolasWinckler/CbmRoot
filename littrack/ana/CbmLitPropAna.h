@@ -1,21 +1,8 @@
- 
-// -------------------------------------------------------------------------
-// -----                   CbmLitMuchAna header file                   -----
-// -----                  Created 01/10/07  by A. Lebedev              -----
-// -----                                                               -----
-// -------------------------------------------------------------------------
-
-
-/** CbmLitMuchAna
- *@author A.Lebedev <Andrey.Lebedev@gsi.de>
- **
- **
- **/
-
-#ifndef CBMLITMUCHANA_H
-#define CBMLITMUCHANA_H 1
+#ifndef CBMLITPROPANA_H
+#define CBMLITPROPANA_H 1
 
 #include "CbmTask.h"
+#include "CbmDetectorList.h"
 
 #include <vector>
 
@@ -24,18 +11,21 @@ class CbmLitTrackExtrapolator;
 class CbmLitTrackPropagator;
 class CbmLitTrackFitter;
 class CbmLitTrackParam;
+class CbmLitTrack;
 class CbmMCPoint;
 class CbmMCTrack;
 class TClonesArray;
 class TH1F;
 
-class CbmLitMuchAna : public CbmTask
+class CbmLitPropAna : public CbmTask
 {
 
 public:
 
-   CbmLitMuchAna(); 
-   virtual ~CbmLitMuchAna();
+   CbmLitPropAna(
+		   DetectorId detId,
+		   Int_t nofStations); 
+   virtual ~CbmLitPropAna();
 
    virtual InitStatus Init();
 
@@ -46,23 +36,22 @@ public:
    virtual void SetParContainers();
   
 private:
-
-      // Arrays of MC information 
-   TClonesArray* fMCTrackArray;
-   TClonesArray* fMCPointArray;
-   TClonesArray* fMuchHits;
-   TClonesArray* fMuchTracks;
-   TClonesArray* fMuchDigis;
-   TClonesArray* fMuchDigiMatches;
+   TClonesArray* fMCTracks;
+   TClonesArray* fMCPoints;
+   TClonesArray* fHits;
+   TClonesArray* fTracks;
+   TClonesArray* fDigiMatches;
    
-   // Propagation and filter tools
    CbmLitTrackExtrapolator *fExtrapolator;
    CbmLitTrackPropagator *fPropagator;
+   CbmLitTrackExtrapolator *fExtrapolatorDet;
+   CbmLitTrackPropagator *fPropagatorDet;
    CbmLitTrackUpdate *fFilter;
    CbmLitTrackFitter *fFitter;
    CbmLitTrackFitter *fSmoother; 
       
    Int_t fNofLayers;
+   DetectorId fDetId; // TRD or MUCH
    
    std::vector<TH1F *> fh_srx;
    std::vector<TH1F *> fh_sry;
@@ -99,6 +88,16 @@ private:
    
    Int_t fVerbose;
    
+   Bool_t CreateTrackMuch(
+   		Int_t trackId,
+   		CbmLitTrack* track,
+   		std::vector<CbmMCPoint*>& points);
+   
+   Bool_t CreateTrackTrd(
+	   	Int_t trackId,
+	   	CbmLitTrack* track,
+	   	std::vector<CbmMCPoint*>& points);
+   
    void FillParam(
 		   const CbmMCPoint* point,
 		   CbmLitTrackParam* par);
@@ -106,14 +105,14 @@ private:
    void CreateHistograms();
    
    void CalcResAndPull(
-   		const CbmMCTrack* mcTrack,
    		const CbmMCPoint* point,
+   		const CbmMCTrack* mcTrack,
    		const CbmLitTrackParam* par,
    		std::vector<Double_t>& res,
    		std::vector<Double_t>& pull,
    		Double_t& resp);
                   
-   ClassDef(CbmLitMuchAna,1);
+   ClassDef(CbmLitPropAna,1);
 
 };
 

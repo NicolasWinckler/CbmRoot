@@ -94,7 +94,6 @@ void CbmLitEffHitCalculatorImp::Inverse(
 {
 	if (v01 != 0.) {
 		Double_t norm = v00 * v11 - v01 * v01;
-		//if (norm == 0.) return;
 		u00 = v11 / norm;
 		u01 = -v01 / norm;
 		u11 = v00 / norm;

@@ -10,7 +10,8 @@ class CbmLitRobustSelection : public CbmLitTrackSelection
 public:
 	CbmLitRobustSelection(
 			CbmLitTrackFitter* robustFitter,
-			CbmLitTrackFitter* fitter);
+			CbmLitTrackFitter* fitter,
+			CbmLitTrackFitter* smoother);
 	virtual ~CbmLitRobustSelection();
 	
 	virtual LitStatus Initialize();
@@ -27,6 +28,7 @@ private:
 	
 	CbmLitTrackFitter* fRobustFitter;
 	CbmLitTrackFitter* fFitter;
+	CbmLitTrackFitter* fSmoother;
 
 	ClassDef(CbmLitRobustSelection, 1);
 };

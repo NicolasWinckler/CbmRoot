@@ -66,7 +66,7 @@ void CbmLitMuchTrackFinderBranch::Init()
    SetEndStation(fLayout.GetNofStations() - 1);
    SetMaxNofMissingHitsInStation(0);
    SetMaxNofMissingHits(0);
-   SetSigmaCoef(3.0); 
+   SetSigmaCoef(3.); 
 //   SetPrecalcSearchRegions(false); 
 //   SetApplyUpdateInLayer(true);
    SetPDG(13);

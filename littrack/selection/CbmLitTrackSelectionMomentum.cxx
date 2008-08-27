@@ -8,12 +8,10 @@
 CbmLitTrackSelectionMomentum::CbmLitTrackSelectionMomentum():
 	fMinMomentum(0.)
 {
-//	Properties().AddProperty("fMinMomentum", 0.);
 }
 
 CbmLitTrackSelectionMomentum::~CbmLitTrackSelectionMomentum()
 {
-	
 }
 
 LitStatus CbmLitTrackSelectionMomentum::Initialize()
@@ -31,17 +29,15 @@ LitStatus CbmLitTrackSelectionMomentum::DoSelect(
 		TrackIterator itEnd)
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
-	
-//	Properties().GetProperty("fMinMomentum", fMinMomentum);
-	
+
 	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
-		if ((*iTrack)->GetFlag() == 1) continue;
+		if ((*iTrack)->GetQuality() == kLITBAD) continue;
 		if ((*iTrack)->GetParamLast()->GetQp() == 0.) {
-			(*iTrack)->SetFlag(1);
+			(*iTrack)->SetQuality(kLITBAD);
 			continue;
 		}
 		Double_t mom = std::abs(1. / (*iTrack)->GetParamLast()->GetQp());
-		if (mom < fMinMomentum) (*iTrack)->SetFlag(1);		
+		if (mom < fMinMomentum) (*iTrack)->SetQuality(kLITBAD);		
 	}	
 	return kLITSUCCESS;
 }

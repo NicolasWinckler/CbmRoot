@@ -42,20 +42,23 @@ LitStatus CbmLitTrackFitterRobust::Finalize()
 }
 
 LitStatus CbmLitTrackFitterRobust::Fit(
-		CbmLitTrack *pTrack,
+		CbmLitTrack *track,
 		Bool_t downstream)
 {
-	pTrack->SortHits();
-	std::vector<HitIteratorPair> bounds =pTrack->GetHitBounds();
+	track->SortHits();
+	//track->Print();
+	std::vector<HitIteratorPair> bounds;
+	track->GetHitBounds(bounds);
 
 	int nofIterations = 5;
 
 	CbmLitTrack etrack;
-	etrack.SetParamFirst(pTrack->GetParamFirst());
-	std::cout << "---FIT---" << std::endl;
+	etrack.SetParamFirst(track->GetParamFirst());
+	etrack.SetPDG(track->GetPDG());
+	//std::cout << "---FIT---" << std::endl;
 	for(Int_t iter = 0; iter < nofIterations; iter++){
 		etrack.ClearHits();
-		std::cout << "---iter: " << iter << std::endl;
+		//std::cout << "---iter: " << iter << std::endl;
 		for (Int_t i = 0; i < bounds.size(); i++) {
 			// if number of hits on the station more than 1,
 			// calculate the effective hit
@@ -65,7 +68,7 @@ LitStatus CbmLitTrackFitterRobust::Fit(
 					fWeightCalcSimple->DoCalculate(&par, bounds[i].first, bounds[i].second);
 				} else {
 					const CbmLitTrackParam* param = etrack.GetFitNode(i)->GetSmoothedParam();
-					std::cout << "smoothed: "; param->Print();
+					//std::cout << "smoothed: "; param->Print();
 					if (DAFWeight(param, bounds[i].first, bounds[i].second, iter) == kLITERROR) {
 						std::cout << "ERROR in DAFWeight" << std::endl;
 						return kLITERROR;
@@ -74,22 +77,24 @@ LitStatus CbmLitTrackFitterRobust::Fit(
 				if (!AreAllOutliers(bounds[i].first, bounds[i].second)) {
 					CbmLitHit ehit = fEffHitCalc->DoCalculate(bounds[i].first, bounds[i].second);
 					etrack.AddHit(&ehit);
-					std::cout << "eff hit:"; ehit.Print();
+					//std::cout << "eff hit:"; ehit.Print();
 				} else {
 					std::cout << "all hit outliers " << std::endl;
 				}
-				for (HitIterator j = bounds[i].first; j != bounds[i].second; j++)
-				(*j)->Print();				
+				//for (HitIterator j = bounds[i].first; j != bounds[i].second; j++)
+				//(*j)->Print();				
 			} else {
 				etrack.AddHit(*bounds[i].first);
 			}	
 		}
 		
 		if (fFitter->Fit(&etrack) == kLITERROR) {
-			std::cout << "ERROR fFitter->Fit " << iter << std::endl; 
+		//	std::cout << "ERROR fFitter->Fit " << iter << std::endl; 
 			return kLITERROR;
 		}		
+		//std::cout << "eff track after fitter:"; etrack.Print();
 		if (fSmoother->Fit(&etrack) == kLITERROR) return kLITERROR;
+		//std::cout << "eff track after smoother:"; etrack.Print();
 	}
 }
 

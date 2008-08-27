@@ -87,7 +87,7 @@ void CbmLitConverter::StsTrackToLitTrack(
 {
 	// TODO note that hits are not copied now
 		
-	litTrack->SetFlag(stsTrack->GetFlag());
+	litTrack->SetQuality(kLITGOOD);
 	litTrack->SetChi2(stsTrack->GetChi2());
 	litTrack->SetNDF(stsTrack->GetNDF());
 	litTrack->SetPreviousTrackId(-1);	
@@ -113,7 +113,7 @@ void CbmLitConverter::LitTrackToMuchTrack(
 	muchTrack->SetChi2(litTrack->GetChi2());
 	muchTrack->SetNDF(litTrack->GetNDF());
 	muchTrack->SetStsTrackID(litTrack->GetPreviousTrackId());
-	muchTrack->SetFlag(litTrack->GetFlag());
+	muchTrack->SetFlag(litTrack->GetLastPlaneId());//litTrack->GetQuality());
 	CbmTrackParam par;
 	CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetParamLast(), &par);
 	muchTrack->SetMuchTrack(&par);	
@@ -130,7 +130,7 @@ void CbmLitConverter::LitTrackToTrdTrack(
 		trdTrack->AddHit(litTrack->GetHit(iHit)->GetRefId(), &hit);
 	}
 	trdTrack->SortHits();
-	trdTrack->SetFlag(litTrack->GetFlag());
+	trdTrack->SetFlag(litTrack->GetQuality());
 	trdTrack->SetChi2(litTrack->GetChi2());
 	trdTrack->SetNDF(litTrack->GetNDF());
 	trdTrack->SetStsTrackIndex(litTrack->GetPreviousTrackId());

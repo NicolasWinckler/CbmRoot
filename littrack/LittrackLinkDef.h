@@ -5,7 +5,7 @@
 #pragma link off all functions;
 
 //ana
-#pragma link C++ class  CbmLitMuchAna+;
+#pragma link C++ class  CbmLitPropAna+;
 #pragma link C++ class  CbmLitElossAna+;
 #pragma link C++ class  CbmLitRobustAna+;
 
@@ -56,8 +56,7 @@
 #pragma link C++ class CbmLitMaterialEffectsImp+;
 
 //qa
-#pragma link C++ class  CbmLitMuchRecQa+;
-#pragma link C++ class  CbmLitTrdRecQa+;
+#pragma link C++ class  CbmLitRecQa+;
 
 //robust
 #pragma link C++ class  CbmLitEffHitCalculatorImp+;
@@ -74,6 +73,7 @@
 #pragma link C++ class  CbmLitTrackSelectionMomentum+;
 #pragma link C++ class  CbmLitTrackSelectionMuch+;
 #pragma link C++ class  CbmLitTrackSelectionMuchRobust+;
+#pragma link C++ class  CbmLitTrackSelectionChiSq+;
 
 // utils
 #pragma link C++ class  CbmLitConverter+;

@@ -32,11 +32,11 @@ LitStatus CbmLitTrackSelectionA::DoSelect(
 	
 	for (TrackIterator iTrack0 = itBegin; iTrack0 != itEnd - 1; iTrack0++){
 		Int_t nofHits0 = (*iTrack0)->GetNofHits();
-		if ((*iTrack0)->GetFlag() == 1) continue;
+		if ((*iTrack0)->GetQuality() == kLITBAD) continue;
 		for (TrackIterator iTrack1 = iTrack0 + 1; iTrack1 != itEnd; iTrack1++){
 				Int_t nofHits1 = (*iTrack1)->GetNofHits();
 				if (nofHits0 == nofHits1) continue;
-				if (IsHitSharing(*iTrack0, *iTrack1)) (*iTrack0)->SetFlag(1);				
+				if (IsHitSharing(*iTrack0, *iTrack1)) (*iTrack0)->SetQuality(kLITBAD);				
 		}		
 	}	
 	

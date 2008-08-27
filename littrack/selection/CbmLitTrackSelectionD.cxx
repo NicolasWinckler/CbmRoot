@@ -34,9 +34,9 @@ LitStatus CbmLitTrackSelectionD::DoSelect(
 //	Properties().GetProperty("fMinLastPlaneId", fMinLastPlaneId);	
 	
 	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
-		if ((*iTrack)->GetFlag() == 1) continue;
+		if ((*iTrack)->GetQuality() == kLITBAD) continue;
 		if ((*iTrack)->GetNofHits() < fMinNofHits ||
-			(*iTrack)->GetLastPlaneId() < fMinLastPlaneId) (*iTrack)->SetFlag(1);		
+			(*iTrack)->GetLastPlaneId() < fMinLastPlaneId) (*iTrack)->SetQuality(kLITBAD);		
 	}	
 	
 	return kLITSUCCESS;

@@ -76,11 +76,10 @@ void CbmLitTrdTrackFinderSts::Init()
    SetTrackSeedSelection(fTrackSeedSelection);
    SetTrackSelectionStation(fTrackSelectionStation);
    SetTrackSelectionFinal(fTrackSelectionFinal);
-   SetVerbose(1);
+   SetVerbose(3);
    SetNofIter(1); 
    SetBeginStation(0); 
    SetEndStation(fLayout.GetNofStations() - 1);
-//   SetPrecalcSearchRegions(false); 
    SetPDG(211);
 }
 
@@ -90,7 +89,6 @@ void CbmLitTrdTrackFinderSts::SetIterationParameters(Int_t iter)
 		SetMaxNofMissingHitsInStation(1);
 		SetMaxNofMissingHits(1);
 		SetSigmaCoef(5.); 
-//      SetApplyUpdateInLayer(true);
 	} 
 }
 

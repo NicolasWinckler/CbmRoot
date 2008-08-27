@@ -1,0 +1,6 @@
+#ifndef CBMLITTRACKQACODE_H_
+#define CBMLITTRACKQACODE_H_
+
+enum LitTrackQa { kLITGOOD = 0, kLITBAD = 1};
+
+#endif /*CBMLITTRACKQACODE_H_*/

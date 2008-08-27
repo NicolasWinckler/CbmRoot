@@ -83,7 +83,7 @@ void CbmLitTrackFinderImp::InitTrackSeeds()
 	fTrackSeedSelection->DoSelect(fTrackSeedArray);
 	
 	for (TrackIterator iTrack = fTrackSeedArray.begin(); iTrack != fTrackSeedArray.end(); iTrack++) {
-		if ((*iTrack)->GetFlag() == 1) continue;
+		if ((*iTrack)->GetQuality() == kLITBAD) continue;
 		if (fSeedsIdSet.find((*iTrack)->GetPreviousTrackId()) 
 				!= fSeedsIdSet.end()) continue;
 		fTracks.push_back(new CbmLitTrack(*(*iTrack)));
@@ -120,9 +120,11 @@ Bool_t CbmLitTrackFinderImp::IsIn(
    	Double_t y1 = par->GetY();
    	Double_t y2 = hit->GetY();
    	Double_t dy2 = hit->GetDy();   
-    Double_t devX = fSigmaCoef * std::sqrt(Cov00 + dx2 * dx2);      
-    Double_t devY = fSigmaCoef * std::sqrt(Cov11 + dy2 * dy2);
-
+//    Double_t devX = fSigmaCoef * std::sqrt(Cov00 + dx2 * dx2);      
+//    Double_t devY = fSigmaCoef * std::sqrt(Cov11 + dy2 * dy2);
+    Double_t devX = fSigmaCoef * (std::sqrt(Cov00) + dx2);      
+    Double_t devY = fSigmaCoef * (std::sqrt(Cov11) + dy2);
+   	
     return ( ( (x1 + devX) >= x2 ) &&
              ( (x1 - devX) <= x2 ) &&
              ( (y1 + devY) >= y2 ) &&
@@ -160,14 +162,20 @@ Double_t CbmLitTrackFinderImp::CalcDevX(
 		const CbmLitTrackParam* par,
 		Int_t layer) const
 {
-	return fSigmaCoef * std::sqrt(par->GetCovariance(0) + fMaxErrX[layer] * fMaxErrX[layer]);
+	// TODO review this
+	if (par->GetCovariance(0) < 0.) return 0;
+	//return fSigmaCoef * std::sqrt(par->GetCovariance(0) + fMaxErrX[layer] * fMaxErrX[layer]);
+	return fSigmaCoef * (std::sqrt(par->GetCovariance(0)) + fMaxErrX[layer]);
 }
 
 Double_t CbmLitTrackFinderImp::CalcDevY(
 		const CbmLitTrackParam* par,
 		Int_t layer) const
 {
-   	return fSigmaCoef * std::sqrt(par->GetCovariance(5) + fMaxErrY[layer] * fMaxErrY[layer]);
+	// TODO review this
+	if (par->GetCovariance(5) < 0.) return 0;
+   	//return fSigmaCoef * std::sqrt(par->GetCovariance(5) + fMaxErrY[layer] * fMaxErrY[layer]);
+	return fSigmaCoef * (std::sqrt(par->GetCovariance(5)) + fMaxErrY[layer]);
 }
 
 void CbmLitTrackFinderImp::RemoveHits(
@@ -175,7 +183,7 @@ void CbmLitTrackFinderImp::RemoveHits(
 		TrackIterator itEnd)
 {
    for(TrackIterator it = itBegin; it != itEnd; it++) {
-      if((*it)->GetFlag() == 1) continue;
+      if((*it)->GetQuality() == kLITBAD) continue;
       Int_t nofHits = (*it)->GetNofHits();
       for (Int_t iHit = 0; iHit < nofHits; iHit++) {
          Int_t HitId = (*it)->GetHit(iHit)->GetRefId();
@@ -194,7 +202,7 @@ void CbmLitTrackFinderImp::CopyToOutput(
 		TrackVector& tracks)
 {
 	for(TrackIterator it = itBegin; it != itEnd; it++) {
-		if( (*it)->GetFlag() == 1) continue;
+		if( (*it)->GetQuality() == kLITBAD) continue;
 		tracks.push_back(new CbmLitTrack(*(*it)));
 	    fSeedsIdSet.insert((*it)->GetPreviousTrackId());
 	}

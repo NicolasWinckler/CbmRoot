@@ -3,6 +3,8 @@
 
 #include "TObject.h"
 
+#include <string>
+
 class CbmLitHit
 {
 public:
@@ -34,7 +36,7 @@ public:
 	void SetW(Double_t w) { fW = w; }
 	void IsOutlier(Bool_t isOutlier) { fIsOutlier = isOutlier;}
 	
-	virtual void Print() const;
+	std::string ToString() const;
 	
 protected:
 	

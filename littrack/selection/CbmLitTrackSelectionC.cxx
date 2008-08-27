@@ -30,10 +30,7 @@ LitStatus CbmLitTrackSelectionC::DoSelect(
 		TrackIterator itBegin,
 		TrackIterator itEnd)
 {
-	
 	if (itBegin == itEnd) return kLITSUCCESS;
-	
-//	Properties().GetProperty("fNofSharedHits", fNofSharedHits);
 	
 	//SortNofHits(tracks);
 	SortLastPlaneId(itBegin, itEnd);
@@ -110,7 +107,7 @@ void CbmLitTrackSelectionC::CheckSharedHits(
 	
 	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
 
-		if ((*iTrack)->GetFlag() == 1) continue;
+		if ((*iTrack)->GetQuality() == kLITBAD) continue;
 	    
 	    Int_t nofSharedHits = 0;
 	    Int_t nofHits = (*iTrack)->GetNofHits();
@@ -120,13 +117,13 @@ void CbmLitTrackSelectionC::CheckSharedHits(
 	    	if(hitsId.find(hitId) != hitsId.end()) {
 	            nofSharedHits++;
 	            if (nofSharedHits > fNofSharedHits) {
-	               (*iTrack)->SetFlag(1);
+	               (*iTrack)->SetQuality(kLITBAD);
 	               break;
 	            }
 	        }
 	    } 	    
 
-	    if ( (*iTrack)->GetFlag() == 1 ) continue;
+	    if ( (*iTrack)->GetQuality() == kLITBAD) continue;
 	      
 	    for(Int_t iHit = 0; iHit < nofHits; iHit++) {
 	    	Int_t hitId = (*iTrack)->GetHit(iHit)->GetRefId();

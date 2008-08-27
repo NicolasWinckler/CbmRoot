@@ -36,7 +36,6 @@ LitStatus CbmLitTrackSelectionTrd::DoSelect(
 		TrackIterator itBegin,
 		TrackIterator itEnd)
 {
-	
 	if (itBegin == itEnd) return kLITSUCCESS;
 	
 	((CbmLitTrackSelectionC*)fSelectionC)->SetNofSharedHits(fNofSharedHits);
@@ -44,7 +43,7 @@ LitStatus CbmLitTrackSelectionTrd::DoSelect(
 	((CbmLitTrackSelectionD*)fSelectionD)->SetMinLastPlaneId(fMinLastPlaneId);
 		
 	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) 
-		(*iTrack)->SetFlag(0);
+		(*iTrack)->SetQuality(kLITGOOD);
 
 	fSelectionC->DoSelect(itBegin, itEnd);
 	fSelectionD->DoSelect(itBegin, itEnd);

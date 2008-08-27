@@ -21,11 +21,12 @@ ${CBMROOT_SOURCE_DIR}/littrack/utils
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
+${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/trackbase
 ${CBMROOT_SOURCE_DIR}/geane
-${CBMROOT_SOURCE_DIR}/cbmbase 
-${CBMROOT_SOURCE_DIR}/sts 
+${CBMROOT_SOURCE_DIR}/field
 ${CBMROOT_SOURCE_DIR}/trd 
+${CBMROOT_SOURCE_DIR}/sts 
 ${CBMROOT_SOURCE_DIR}/much
 )
 
@@ -39,7 +40,7 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(LITTRACK_SRCS_RULECHECKER
 ana/CbmLitElossAna.cxx
-ana/CbmLitMuchAna.cxx
+ana/CbmLitPropAna.cxx
 ana/CbmLitRobustAna.cxx
 base/CbmLitTool.cxx
 base/CbmLitDetectorLayout.cxx
@@ -75,8 +76,7 @@ propagation/CbmTrackPropagatorGeane.cxx
 propagation/CbmLitGeoNavigatorImp.cxx
 propagation/CbmLitMaterialInfo.cxx
 propagation/CbmLitMaterialEffectsImp.cxx
-qa/CbmLitMuchRecQa.cxx
-qa/CbmLitTrdRecQa.cxx
+qa/CbmLitRecQa.cxx
 robust/CbmLitEffHitCalculatorImp.cxx
 robust/CbmLitWeightCalculatorSimple.cxx
 robust/CbmLitRobustSelection.cxx
@@ -89,6 +89,7 @@ selection/CbmLitTrackSelectionMomentum.cxx
 selection/CbmLitTrackSelectionTrd.cxx
 selection/CbmLitTrackSelectionMuch.cxx
 selection/CbmLitTrackSelectionMuchRobust.cxx
+selection/CbmLitTrackSelectionChiSq.cxx
 utils/CbmLitComparators.cxx
 utils/CbmLitMemoryManagment.cxx
 utils/CbmLitConverter.cxx

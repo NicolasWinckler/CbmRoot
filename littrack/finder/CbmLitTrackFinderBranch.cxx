@@ -230,7 +230,7 @@ void CbmLitTrackFinderBranch::CopyToOutputArray()
 	for (TrackIterator iTrack = fFoundTracks.begin();
 		iTrack != fFoundTracks.end(); iTrack++) {
 			    		  
-		if ((*iTrack)->GetFlag() == 1) {
+		if ((*iTrack)->GetQuality() == kLITBAD) {
 			delete (*iTrack);              
 		} else {
 			fTracks.push_back(*iTrack);

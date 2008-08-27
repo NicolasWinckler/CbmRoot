@@ -102,14 +102,17 @@ void CbmLitTrackFinderRobust::FollowTrack(
 		
 		if (!hitAdded) {
 			nofMissingHits++;
-			if (nofMissingHits > fMaxNofMissingHits) return;
+			if (nofMissingHits > fMaxNofMissingHits) {
+				track->SetQuality(kLITBAD);
+				return;
+			}
 			continue;
 		}
 		
 		track->SetPDG(fPDG);
 		track->SetLastPlaneId(iLayer);
 		track->SetParamLast(&par);
-		track->SetFlag(0);
+		track->SetQuality(kLITGOOD);
 	}
 }
 

@@ -4,7 +4,7 @@
 #include "TMatrixDSym.h"
 #include "TVectorD.h"
 
-#include <iostream>
+#include <sstream>
 #include <cmath>
 
 CbmLitTrackParam::CbmLitTrackParam():
@@ -125,13 +125,15 @@ void CbmLitTrackParam::SetStateVector(
 	SetQp(x[4]);
 }
 
-void CbmLitTrackParam::Print() const
+std::string CbmLitTrackParam::ToString() const
 {
-	std::cout << "TrackParam: pos=(" << fX << "," << fY << "," << fZ 
+	std::stringstream ss;
+	ss << "TrackParam: pos=(" << fX << "," << fY << "," << fZ 
     	      << ") tx=" << fTx << " ty=" << fTy << " qp=" << fQp << std::endl;    	
-//	std::cout << "cov: ";
-//	for (Int_t i = 0; i < 15; i++) std::cout << fCovMatrix[i] << " ";
-//	std::cout << std::endl;
+//	ss << "cov: ";
+//	for (Int_t i = 0; i < 15; i++) ss << fCovMatrix[i] << " ";
+//	ss << std::endl;
+	return ss.str();
 }
 
 ClassImp(CbmLitTrackParam)

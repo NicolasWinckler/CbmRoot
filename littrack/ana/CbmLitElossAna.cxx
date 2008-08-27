@@ -43,7 +43,7 @@ InitStatus CbmLitElossAna::Init()
     Int_t nBins = 1000;
     Int_t nBinsMom = 100;
     Double_t minEloss = 0.;
-    Double_t maxEloss = 3.0;
+    Double_t maxEloss = 10.0;
     Double_t minMom = 0.1;
     Double_t maxMom = 35.;
     Double_t minErr = -0.25;

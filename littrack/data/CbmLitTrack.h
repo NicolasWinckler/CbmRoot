@@ -4,6 +4,9 @@
 #include "CbmLitTrackParam.h"
 #include "CbmLitFitNode.h"
 #include "CbmLitTypes.h"
+#include "CbmLitTrackQaCode.h"
+
+#include <string>
 
 class CbmLitTrack
 {
@@ -15,7 +18,7 @@ public:
 	CbmLitTrack(const CbmLitTrack& track) { *this = track; };
 	
 	Int_t GetNofHits() const { return fHits.size(); }
-	Int_t GetFlag() const { return fFlag; }
+	LitTrackQa GetQuality() const { return fQuality; }
 	Double_t GetChi2() const { return fChi2; }
 	Int_t GetNDF() const { return fNDF; }
 	Int_t GetPreviousTrackId() const { return fPreviousTrackId; }
@@ -28,9 +31,9 @@ public:
 	const CbmLitFitNode* GetFitNode(Int_t index) const {return &fFitNodes[index];}
 	const FitNodeVector& GetFitNodes() const {return fFitNodes;}
 	HitIteratorPair GetHits(Int_t planeId);
-	std::vector<HitIteratorPair> GetHitBounds();
+	void GetHitBounds(std::vector<HitIteratorPair>& bounds);
 	
-	void SetFlag(Int_t flag) { fFlag = flag; }
+	void SetQuality(LitTrackQa quality) { fQuality = quality; }
 	void SetChi2(Double_t chi2) { fChi2 = chi2; }
 	void SetNDF(Int_t ndf) { fNDF = ndf; }
 	void SetPreviousTrackId(Int_t id) { fPreviousTrackId = id; }
@@ -46,8 +49,8 @@ public:
 	
 	Bool_t CheckParams() const;
 	void ClearHits();
-	
-	void Print() const;
+
+	std::string ToString() const;
 
 private:
 
@@ -55,7 +58,7 @@ private:
 	CbmLitTrackParam fParamFirst;
 	CbmLitTrackParam fParamLast;
 	FitNodeVector fFitNodes;
-	Int_t fFlag;
+	LitTrackQa fQuality;
 	Double_t fChi2;
 	Int_t fNDF;
 	Int_t fPreviousTrackId;

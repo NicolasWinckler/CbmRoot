@@ -56,7 +56,7 @@ LitStatus CbmLitTrackSelectionB::DoSelect(
 		SortLastPlaneId(bounds.first, bounds.second);
 		//if ((*bounds.first)->GetFlag() == 0) (*bounds.first)->SetFlag(0);
 		for (TrackIterator i = bounds.first + 1; i != bounds.second; i++) 
-			(*i)->SetFlag(1);
+			(*i)->SetQuality(kLITBAD);
 
 		//fSelection->DoSelect(bounds.first, bounds.second);
 	}

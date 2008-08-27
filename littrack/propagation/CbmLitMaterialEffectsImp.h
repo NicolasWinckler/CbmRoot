@@ -34,10 +34,6 @@ public:
 	void AddEnergyLoss( 
 			CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
-	                       
-	void AddElectronEnergyLoss(
-			CbmLitTrackParam* par,
-	        const CbmLitMaterialInfo* mat) const;
 	   
 	Double_t CalcThetaSq(
 			const CbmLitTrackParam* par,
@@ -50,11 +46,15 @@ public:
 			const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 	
-	Double_t ElectronEnergyLoss(
+	Double_t BetheBlochElectron(
 			const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 	
 	Double_t EnergyLoss(
+			const CbmLitTrackParam* par,
+	        const CbmLitMaterialInfo* mat) const;
+	
+	Double_t dEdx(
 			const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 	

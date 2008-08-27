@@ -8,10 +8,12 @@
 
 CbmLitRobustSelection::CbmLitRobustSelection(
 		CbmLitTrackFitter* robustFitter,
-		CbmLitTrackFitter* fitter)
+		CbmLitTrackFitter* fitter,
+		CbmLitTrackFitter* smoother)
 {
 	fRobustFitter = robustFitter;
 	fFitter = fitter;
+	fSmoother = smoother;
 }
 
 CbmLitRobustSelection::~CbmLitRobustSelection()
@@ -33,16 +35,17 @@ LitStatus CbmLitRobustSelection::DoSelect(
 		TrackIterator itEnd)
 {
 	for(TrackIterator it = itBegin; it != itEnd; it++) {
-		if ((*it)->GetFlag() == 1) continue;
+		if ((*it)->GetQuality() == kLITBAD) continue;
 		
 		LitStatus code = fRobustFitter->Fit(*it);
 		if (code == kLITERROR) {
-			(*it)->SetFlag(1);
+			(*it)->SetQuality(kLITBAD);
 			continue;
 		}
 	
 		// find the hit with maximum weight, other hits will be removed
-		std::vector<HitIteratorPair> bounds = (*it)->GetHitBounds();
+		std::vector<HitIteratorPair> bounds;
+		(*it)->GetHitBounds(bounds);
 				
 		std::vector<CbmLitHit> newHits;
 		for (Int_t i = 0; i < bounds.size(); i++) {
@@ -51,7 +54,7 @@ LitStatus CbmLitRobustSelection::DoSelect(
 				continue;
 			}
 			std::sort(bounds[i].first, bounds[i].second, CompareHitPtrWLess());
-			std::cout << "max weight=" << (*(bounds[i].second-1))->GetW() << std::endl;
+			//std::cout << "max weight=" << (*(bounds[i].second-1))->GetW() << std::endl;
 			CbmLitHit* hit = (*(bounds[i].second-1));
 			if (!hit->IsOutlier()) newHits.push_back(*hit);
 		}
@@ -61,15 +64,21 @@ LitStatus CbmLitRobustSelection::DoSelect(
 		}
 		
 		if ((*it)->GetNofHits() == 0) {
-			(*it)->SetFlag(1);
+			(*it)->SetQuality(kLITBAD);
 			continue;
 		}
 		
 		code = fFitter->Fit(*it);
 		if (code == kLITERROR) {
-			(*it)->SetFlag(1);
+			(*it)->SetQuality(kLITBAD);
 			continue;
 		}
+		code = fSmoother->Fit(*it);
+		if (code == kLITERROR) {
+		    (*it)->SetQuality(kLITBAD);
+			continue;
+		}
+		(*it)->SetLastPlaneId((*it)->GetHit((*it)->GetNofHits()-1)->GetPlaneId());
 	}
 	
 	return kLITSUCCESS;

@@ -6,6 +6,7 @@
 #include "TVectorD.h"
 
 #include <vector>
+#include <string>
 
 class CbmLitTrackParam
 {
@@ -40,7 +41,7 @@ public:
 	void SetStateVector(const TVectorD& x);
 	void SetCovMatrix(const TMatrixDSym& cov);
 		
-	void Print() const;
+	std::string ToString() const;
 
 private:
 

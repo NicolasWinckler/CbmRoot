@@ -1,15 +1,11 @@
-// -------------------------------------------------------------------------
-// -----                  CbmLitTrdRecQa source file               -----
-// -----                  Created 15/10/07  by A. Lebedev               -----
-// -------------------------------------------------------------------------
+#include "CbmLitRecQa.h"
 
-#include "CbmLitTrdRecQa.h"
-
+#include "CbmMuchTrack.h"
+#include "CbmMuchTrackMatch.h"
+#include "CbmMuchHit.h"
 #include "CbmTrdTrack.h"
 #include "CbmTrdTrackMatch.h"
-//#include "CbmTrdDigiMatch.h"
 #include "CbmTrdHit.h"
-
 #include "CbmStsTrack.h"
 #include "CbmStsTrackMatch.h"
 #include "CbmTrackParam.h"
@@ -27,102 +23,93 @@
 
 #include <iostream>
 #include <map>
+#include <cmath>
 
-
-CbmLitTrdRecQa::CbmLitTrdRecQa():
-  CbmTask("TrdRecQA", 1),
-  fMinPoints(15),
-  fQuota(0.7),
-  fNormType(1)
-{
-	ZeroGlobalCounters();
-}
-
-CbmLitTrdRecQa::CbmLitTrdRecQa(
+CbmLitRecQa::CbmLitRecQa(
 		Int_t minPoints, 
 		Double_t quota,
+		DetectorId detId,
 		Int_t iVerbose):
-  CbmTask("TrdRecQA", iVerbose),
+  CbmTask("MuchRecQA", iVerbose),
   fMinPoints(minPoints),
   fQuota(quota),
+  fDetId(detId),
   fNormType(1) 
 {
 	ZeroGlobalCounters();
+	fNN.open("much_rec_qa_ghost_clones.txt");
 }
 
-CbmLitTrdRecQa::~CbmLitTrdRecQa() 
+CbmLitRecQa::~CbmLitRecQa() 
 { 
   fHistoList->Delete();
   delete fHistoList;
+  fNN.close();
 }
 
-void CbmLitTrdRecQa::SetParContainers() 
+void CbmLitRecQa::SetParContainers() 
 {
 
 }
 
-InitStatus CbmLitTrdRecQa::Init() 
+InitStatus CbmLitRecQa::Init() 
 {
     CbmRootManager* ioman = CbmRootManager::Instance();
-    if (NULL == ioman) 
-    	Fatal("CbmLitTrdRecQa::Init","CbmRootManager is not instantiated");
+    if (NULL == ioman) Fatal("Init","CbmRootManager is not instantiated");
 
     fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
-    if (NULL == fMCTracks ) 
-    	Fatal("CbmLitTrdRecQa::Init","No MCTrack array!");
+    if (NULL == fMCTracks) Fatal("Init","No MCTrack array!");
     
-    fMCPoints = (TClonesArray*) ioman->GetObject("TRDPoint");
-    if (NULL == fMCTracks ) 
-    	Fatal("CbmLitTrdRecQa::Init","No MCTrack array!");
-    
-    fTrdHits = (TClonesArray*) ioman->GetObject("TRDHit");
-    if (NULL == fTrdHits) 
-    	Fatal("CbmLitTrdRecQa::Init", "No fTrdHits array!");
-    
-//    fTrdDigiMatches  = (TClonesArray*) ioman->GetObject("TrdDigiMatch");
-//    if (NULL == fTrdDigiMatches) 
-//    	Fatal("CbmLitTrdRecQa::Init", "No TrdDigiMatches array!");
+    if (fDetId == kMUCH) {
+    	fMCPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
+    	if (NULL == fMCPoints ) Fatal("Init","No MuchPoint array!");
+    	fRecHits = (TClonesArray*) ioman->GetObject("MuchHit");
+    	if (NULL == fRecHits) Fatal("Init", "No MuchHit array!");
+    	fRecTracks = (TClonesArray*) ioman->GetObject("MuchTrack");
+    	if (NULL == fRecTracks) Fatal("Init","No MuchTrack array!");
+    	fRecMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
+    	if (NULL == fRecMatches) Fatal("Init","No MuchTrackMatch array!");
+    } else
+    if (fDetId == kTRD) {
+    	fMCPoints = (TClonesArray*) ioman->GetObject("TRDPoint");
+    	if (NULL == fMCPoints ) Fatal("Init","No TRDPoint array!");
+    	fRecHits = (TClonesArray*) ioman->GetObject("TRDHit");
+    	if (NULL == fRecHits) Fatal("Init", "No TRDHit array!");
+    	fRecTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
+    	if (NULL == fRecTracks) Fatal("Init","No TRDTrack array!");
+    	fRecMatches = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
+    	if (NULL == fRecMatches) Fatal("Init","No TRDTrackMatch array!");
+    } else {
+    	Fatal("Init","This detector type is not supported");
+    }
     
     if (fNormType == 2) {
     	fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
-    	if (NULL == fStsTracks)
-    		Fatal("CbmLitTrdRecQa::Init","No STStrack array!");
-
+    	if (NULL == fStsTracks) Fatal("Init","No STStrack array!");
     	fStsMatches = (TClonesArray*) ioman->GetObject("STSTrackMatch");
-    	if (NULL == fStsMatches)
-    		Fatal("CbmLitTrdRecQa::Init",": No STSTrackMatch array!");
-    }
-
-    fTrdTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
-    if (NULL == fTrdTracks )
-    	Fatal("CbmLitTrdRecQa::Init","No TRDTrack array!");
-	  
-    fTrdMatches = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
-    if (NULL == fTrdMatches )
-    	Fatal("CbmLitTrdRecQa::Init","No TRDTrackMatch array!");
+    	if (NULL == fStsMatches) Fatal("Init",": No STSTrackMatch array!");
+    }  
 	  
     CreateHistos();
-
-    std::cout << "Minimum number of Trd points : " << fMinPoints << std::endl;
-    std::cout << "Matching quota : " << fQuota << std::endl;
-    std::cout << "-----------------------------------------------" << std::endl;
 
     return kSUCCESS;
 }
 
-InitStatus CbmLitTrdRecQa::ReInit() 
+InitStatus CbmLitRecQa::ReInit() 
 {
 	return kSUCCESS;
 }
 
-void CbmLitTrdRecQa::Exec(Option_t* opt) 
+void CbmLitRecQa::Exec(
+		Option_t* opt) 
 {
 
   ZeroEventCounters();
 	
   ProcessStsTracks();
   
-  ProcessTrdTracks();
+  if (fDetId == kMUCH) ProcessMuchTracks(); else 
+  if (fDetId == kTRD) ProcessTrdTracks(); 
   
   ProcessMcTracks();
   
@@ -135,7 +122,7 @@ void CbmLitTrdRecQa::Exec(Option_t* opt)
   IncreaseCounters();
 }
 
-void CbmLitTrdRecQa::Finish() 
+void CbmLitRecQa::Finish() 
 {
 	CalcEffAndRates();
 
@@ -145,10 +132,10 @@ void CbmLitTrdRecQa::Finish()
 }
 
 
-void CbmLitTrdRecQa::ProcessStsTracks() 
+void CbmLitRecQa::ProcessStsTracks() 
 {
   fMcStsMap.clear();
-  if (fNormType == 2) { // Normalization to number of Sts AND Trd tracks
+  if (fNormType == 2) { // Normalization to number of Sts AND Much tracks
 	fEvNofStsTracks = fStsTracks->GetEntriesFast();
     for(Int_t iStsTrack = 0; iStsTrack < fEvNofStsTracks; iStsTrack++) {
       CbmStsTrackMatch* stsTrackM = (CbmStsTrackMatch*) fStsMatches->At(iStsTrack);
@@ -173,49 +160,88 @@ void CbmLitTrdRecQa::ProcessStsTracks()
       fMcStsMap.insert(std::pair<Int_t, Int_t>(mcId, iStsTrack));
     }
   }
+  std::cout << "fMcStsMap.size()=" <<  fMcStsMap.size() << std::endl;
 }
 
-void CbmLitTrdRecQa::ProcessTrdTracks()
+void CbmLitRecQa::ProcessMuchTracks()
 {
-  fMcTrdMap.clear();
-  fEvNofTrdTracks = fTrdTracks->GetEntriesFast();
-  for (Int_t iRec = 0; iRec < fEvNofTrdTracks; iRec++) {
-    CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTrdTracks->At(iRec);
-    if (trdTrack == NULL) continue;
-    CbmTrdTrackMatch* trdMatch = (CbmTrdTrackMatch*) fTrdMatches->At(iRec);
-    if (trdMatch == NULL) continue;
-	Int_t mcIdTrd = trdMatch->GetMCTrackID();  
+  fMcRecMap.clear();
+  fEvNofRecTracks = fRecTracks->GetEntriesFast();
+  for (Int_t iRec = 0; iRec < fEvNofRecTracks; iRec++) {
     
-	if (mcIdTrd == -1){      
-      fEvNofGhosts++;
-      continue;
-    } 
+	  CbmMuchTrack* recTrack = (CbmMuchTrack*) fRecTracks->At(iRec);    
+	  CbmMuchTrackMatch* recMatch = (CbmMuchTrackMatch*) fRecMatches->At(iRec);
+	  if (recTrack == NULL || recMatch == NULL) continue;
+	  Int_t mcIdRec = recMatch->GetMCTrackId();  
+    
+	  if (mcIdRec == -1){      
+      	  fEvNofGhosts++;
+      	  continue;
+      } 
 
-    CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(mcIdTrd);
-	if (mcTrack == NULL) continue;
-	
-    Int_t nofPoints = mcTrack->GetNPoints(kTRD);
-	Int_t nofHits = trdTrack->GetNofTrdHits();  
-    Int_t nofTrue = trdMatch->GetNofTrueHits();
-    Double_t qualiNofHits = Double_t(nofHits) / Double_t(nofPoints);
-    Double_t quali = Double_t(nofTrue) / Double_t(nofHits);
-    if (quali >= fQuota && qualiNofHits >= 0.0) { // 
-      fMcTrdMap.insert(std::pair<Int_t, Int_t>(mcIdTrd, iRec));      
-    } else { 
-      fhNhGhosts->Fill(nofHits);
-	  fEvNofGhosts++;      
-    }    
-  } // Loop over TrdTracks
+	  CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(mcIdRec);
+	  if (mcTrack == NULL) continue;
+	  Int_t nofPoints = mcTrack->GetNPoints(fDetId);
+	  Int_t nofHits = recTrack->GetNHits();  
+	  Int_t nofTrue = recMatch->GetNofTrueHits();
+	  Double_t qualiNofHits = Double_t(nofHits) / Double_t(nofPoints);
+	  Double_t quali = Double_t(nofTrue) / Double_t(nofHits);
+    
+	  if (quali >= fQuota && qualiNofHits >= 0.0) { // 
+		  fMcRecMap.insert(std::pair<Int_t, Int_t>(mcIdRec, iRec));   
+		  FillTrackParams(recTrack, "true");
+	  } else { 
+		  fhNhGhosts->Fill(nofHits);
+		  fEvNofGhosts++; 
+		  FillTrackParams(recTrack, "ghost");
+	  }    
+  } // Loop over rec tracks
 }
 
-void CbmLitTrdRecQa::ProcessMcTracks()
+void CbmLitRecQa::ProcessTrdTracks()
+{
+  fMcRecMap.clear();
+  fEvNofRecTracks = fRecTracks->GetEntriesFast();
+  for (Int_t iRec = 0; iRec < fEvNofRecTracks; iRec++) {
+    
+	  CbmTrdTrack* recTrack = (CbmTrdTrack*) fRecTracks->At(iRec);    
+	  CbmTrdTrackMatch* recMatch = (CbmTrdTrackMatch*) fRecMatches->At(iRec);
+	  if (recTrack == NULL || recMatch == NULL) continue;
+	  Int_t mcIdRec = recMatch->GetMCTrackID();  
+    
+	  if (mcIdRec == -1){      
+      	  fEvNofGhosts++;
+      	  continue;
+      } 
+
+	  CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(mcIdRec);
+	  if (mcTrack == NULL) continue;
+	  Int_t nofPoints = mcTrack->GetNPoints(fDetId);
+	  Int_t nofHits = recTrack->GetNofTrdHits();  
+	  Int_t nofTrue = recMatch->GetNofTrueHits();
+	  Double_t qualiNofHits = Double_t(nofHits) / Double_t(nofPoints);
+	  Double_t quali = Double_t(nofTrue) / Double_t(nofHits);
+    
+	  if (quali >= fQuota && qualiNofHits >= 0.0) { // 
+		  fMcRecMap.insert(std::pair<Int_t, Int_t>(mcIdRec, iRec));   
+		  FillTrackParams(recTrack, "true");
+	  } else { 
+		  fhNhGhosts->Fill(nofHits);
+		  fEvNofGhosts++; 
+		  FillTrackParams(recTrack, "ghost");
+	  }    
+  } // Loop over rec tracks
+  std::cout << "fMcRecMap.size()=" <<  fMcRecMap.size() << std::endl;
+}
+
+void CbmLitRecQa::ProcessMcTracks()
 {
   fEvNofMcTracks = fMCTracks->GetEntriesFast();
   for (Int_t iMCTrack = 0; iMCTrack < fEvNofMcTracks; iMCTrack++) {
     CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(iMCTrack);
     if (mcTrack == NULL) continue;
     
-    Int_t nofPoints = mcTrack->GetNPoints(kTRD);
+    Int_t nofPoints = mcTrack->GetNPoints(fDetId);
     if (nofPoints < fMinPoints) continue; 
 
     if (fNormType == 2) {
@@ -229,6 +255,7 @@ void CbmLitTrdRecQa::ProcessMcTracks()
     Double_t mom = mcTrack->GetP();
     Bool_t isRef = (mom > 2. && nofPoints > 8);
     Bool_t isMuon = std::abs(mcTrack->GetPdgCode()) == 13;
+    Bool_t isElectron = std::abs(mcTrack->GetPdgCode()) == 11;
      
     fEvNofAccAll++;
     if (isPrim && isMuon) {
@@ -236,6 +263,11 @@ void CbmLitTrdRecQa::ProcessMcTracks()
     	fhMomAccMuons->Fill(mom);
     	fhNpAccMuons->Fill(Double_t(nofPoints));
     }    
+    if (isPrim && isElectron) {
+    	fEvNofAccElectrons++;
+    	fhMomAccElectrons->Fill(mom);
+    	fhNpAccElectrons->Fill(Double_t(nofPoints));
+    }  
     // Fill histograms for accepted tracks
     fhMomAccAll->Fill(mom);
     fhNpAccAll->Fill(Double_t(nofPoints));
@@ -255,7 +287,7 @@ void CbmLitTrdRecQa::ProcessMcTracks()
       fhNpAccSec->Fill(Double_t(nofPoints));
     }
 
-    if (fMcTrdMap.find(iMCTrack) != fMcTrdMap.end() ) {
+    if (fMcRecMap.find(iMCTrack) != fMcRecMap.end() ) {
       
       if (IsMismatch(iMCTrack)) {
     	  fEvNofMismatches++;
@@ -270,6 +302,11 @@ void CbmLitTrdRecQa::ProcessMcTracks()
     	  fEvNofRecMuons++; 
     	  fhMomRecMuons->Fill(mom);
     	  fhNpRecMuons->Fill(Double_t(nofPoints));
+      }
+      if (isPrim && isElectron) {
+    	  fEvNofRecElectrons++; 
+    	  fhMomRecElectrons->Fill(mom);
+    	  fhNpRecElectrons->Fill(Double_t(nofPoints));
       }
       fhMomRecAll->Fill(mom);
       fhNpRecAll->Fill(Double_t(nofPoints));
@@ -292,16 +329,26 @@ void CbmLitTrdRecQa::ProcessMcTracks()
   } // Loop over MCTracks
 }
 
-Bool_t CbmLitTrdRecQa::IsMismatch(Int_t mcId)
+Bool_t CbmLitRecQa::IsMismatch(
+		Int_t mcId)
 {
     typedef std::multimap<Int_t, Int_t>::iterator Iterator;
-    std::pair<Iterator, Iterator> bounds = fMcTrdMap.equal_range(mcId);
+    std::pair<Iterator, Iterator> bounds = fMcRecMap.equal_range(mcId);
     std::pair<Iterator, Iterator> boundsSts = fMcStsMap.equal_range(mcId);
 
     for (Iterator i = bounds.first; i != bounds.second; i++) {
-    	CbmTrdTrack* track = (CbmTrdTrack*) fTrdTracks->At((*i).second);
-    	if (track == NULL) return true;
-    	Int_t stsId = track->GetStsTrackIndex();
+    	Int_t stsId;
+    	if (fDetId == kMUCH) {
+	    	CbmMuchTrack* track = (CbmMuchTrack*) fRecTracks->At((*i).second);
+	    	if (track == NULL) return true;
+	    	stsId = track->GetStsTrackID();
+    	} else 
+    	if (fDetId == kTRD) {
+    		CbmTrdTrack* track = (CbmTrdTrack*) fRecTracks->At((*i).second);
+    		if (track == NULL) return true;
+    		stsId = track->GetStsTrackIndex();
+    	}
+    	
     	for (Iterator iSts = boundsSts.first; iSts != boundsSts.second; iSts++) {
     		if (stsId == (*iSts).second) return false;
     	}
@@ -309,11 +356,11 @@ Bool_t CbmLitTrdRecQa::IsMismatch(Int_t mcId)
     return true;
 }
 
-void CbmLitTrdRecQa::CountClones()
+void CbmLitRecQa::CountClones()
 {
 	typedef std::multimap<Int_t, Int_t>::iterator Iterator;
-	for (Iterator i = fMcTrdMap.begin(); i!=fMcTrdMap.end(); ){
-		Int_t count = fMcTrdMap.count((*i).first);
+	for (Iterator i = fMcRecMap.begin(); i != fMcRecMap.end(); ){
+		Int_t count = fMcRecMap.count((*i).first);
 		//std::cout << (*i).first << " " << (*i).second << " " << count << std::endl;
 		if (count > 1) {
 			fEvNofClones += count - 1;
@@ -323,7 +370,73 @@ void CbmLitTrdRecQa::CountClones()
 	}
 }
 
-void CbmLitTrdRecQa::CreateHistos() 
+void CbmLitRecQa::FillTrackParams(
+		CbmMuchTrack* track,
+		const std::string& type)
+{	
+	Double_t radialPos = std::sqrt(
+	    	track->GetMuchTrack()->GetX()*track->GetMuchTrack()->GetX() +
+			track->GetMuchTrack()->GetY()*track->GetMuchTrack()->GetY());
+	Double_t chi2 = track->GetChi2() / track->GetNDF();
+	Double_t p = std::abs(1. / track->GetMuchTrack()->GetQp());
+	Int_t nofHits = track->GetNHits();
+	Int_t lastPlaneId = track->GetFlag();
+	if (type == "true") {
+		fhChi2True->Fill(chi2);
+		fhMomTrue->Fill(p);
+		fhNofHitsTrue->Fill(nofHits);
+		fhRadialPosTrue->Fill(radialPos);
+		fhLastPlaneIdTrue->Fill(lastPlaneId);
+		fhMomChi2True->Fill(p, chi2);
+	} else if (type == "ghost"){ 
+		fhChi2Ghost->Fill(chi2);
+		fhMomGhost->Fill(p);
+		fhNofHitsGhost->Fill(nofHits);
+		fhRadialPosGhost->Fill(radialPos);
+		fhLastPlaneIdGhost->Fill(lastPlaneId);
+		fhMomChi2Ghost->Fill(p, chi2);
+	}
+	Int_t type_int;
+	if (type == "ghost") type_int = -1; else type_int = 1;
+	fNN << chi2 << " " << p << " " << nofHits << " "
+	    << radialPos << " " << lastPlaneId << " " 
+	    << type_int << std::endl; 
+}
+
+void CbmLitRecQa::FillTrackParams(
+		CbmTrdTrack* track,
+		const std::string& type)
+{	
+	Double_t radialPos = std::sqrt(
+	    	track->GetParamLast()->GetX()*track->GetParamLast()->GetX() +
+			track->GetParamLast()->GetY()*track->GetParamLast()->GetY());
+	Double_t chi2 = track->GetChi2() / track->GetNDF();
+	Double_t p = std::abs(1. / track->GetParamLast()->GetQp());
+	Int_t nofHits = track->GetNofTrdHits();
+	Int_t lastPlaneId = track->GetFlag();
+	if (type == "true") {
+		fhChi2True->Fill(chi2);
+		fhMomTrue->Fill(p);
+		fhNofHitsTrue->Fill(nofHits);
+		fhRadialPosTrue->Fill(radialPos);
+		fhLastPlaneIdTrue->Fill(lastPlaneId);
+		fhMomChi2True->Fill(p, chi2);
+	} else if (type == "ghost"){ 
+		fhChi2Ghost->Fill(chi2);
+		fhMomGhost->Fill(p);
+		fhNofHitsGhost->Fill(nofHits);
+		fhRadialPosGhost->Fill(radialPos);
+		fhLastPlaneIdGhost->Fill(lastPlaneId);
+		fhMomChi2Ghost->Fill(p, chi2);
+	}
+	Int_t type_int;
+	if (type == "ghost") type_int = -1; else type_int = 1;
+	fNN << chi2 << " " << p << " " << nofHits << " "
+	    << radialPos << " " << lastPlaneId << " " 
+	    << type_int << std::endl; 
+}
+
+void CbmLitRecQa::CreateHistos() 
 {
   // Histogram list
   fHistoList = new TList();
@@ -368,6 +481,13 @@ void CbmLitTrdRecQa::CreateHistos()
   fhMomEffMuons  = new TH1F("hMomEffMuons", "efficiency primary muon tracks",
                            nBinsMom, minMom, maxMom);
   
+  fhMomAccElectrons  = new TH1F("hMomAccElectrons", "accepted primary electron tracks",
+                           nBinsMom, minMom, maxMom);
+  fhMomRecElectrons  = new TH1F("hMomRecElectrons", "reconstructed primary electron tracks",
+                           nBinsMom, minMom, maxMom);
+  fhMomEffElectrons  = new TH1F("hMomEffElectrons", "efficiency primary electron tracks",
+                           nBinsMom, minMom, maxMom);
+  
   fHistoList->Add(fhMomAccAll);
   fHistoList->Add(fhMomRecAll);
   fHistoList->Add(fhMomEffAll);
@@ -383,11 +503,14 @@ void CbmLitTrdRecQa::CreateHistos()
   fHistoList->Add(fhMomAccMuons);
   fHistoList->Add(fhMomRecMuons);
   fHistoList->Add(fhMomEffMuons);  
+  fHistoList->Add(fhMomAccElectrons);
+  fHistoList->Add(fhMomRecElectrons);
+  fHistoList->Add(fhMomEffElectrons);  
 
   // Number-of-points distributions
   Double_t minNp   = -0.5;
-  Double_t maxNp   = 15.5;
-  Int_t    nBinsNp = 16;
+  Double_t maxNp   = 18.5;
+  Int_t    nBinsNp = 19;
   
   fhNpAccAll = new TH1F("hNpAccAll", "all accepted tracks",
                            nBinsNp, minNp, maxNp);
@@ -422,7 +545,14 @@ void CbmLitTrdRecQa::CreateHistos()
   fhNpRecMuons  = new TH1F("hNpRecMuons", "reconstructed muon tracks",
                            nBinsNp, minNp, maxNp);
   fhNpEffMuons  = new TH1F("hNpEffMuons", "efficiency muon tracks",
-                           nBinsNp, minNp, maxNp);;
+                           nBinsNp, minNp, maxNp);
+  
+  fhNpAccElectrons  = new TH1F("hNpAccElectrons", "accepted electron tracks",
+                           nBinsNp, minNp, maxNp);
+  fhNpRecElectrons  = new TH1F("hNpRecElectrons", "reconstructed electron tracks",
+                           nBinsNp, minNp, maxNp);
+  fhNpEffElectrons  = new TH1F("hNpEffElectron", "efficiency electron tracks",
+                           nBinsNp, minNp, maxNp);
   
   fHistoList->Add(fhNpAccAll);
   fHistoList->Add(fhNpRecAll);
@@ -439,6 +569,9 @@ void CbmLitTrdRecQa::CreateHistos()
   fHistoList->Add(fhNpAccMuons);
   fHistoList->Add(fhNpRecMuons);
   fHistoList->Add(fhNpEffMuons);
+  fHistoList->Add(fhNpAccElectrons);
+  fHistoList->Add(fhNpRecElectrons);
+  fHistoList->Add(fhNpEffElectrons);
 
   // Number-of-hit distributions
   fhNhClones  = new TH1F("hNhClones", "number of hits for clones",
@@ -473,33 +606,85 @@ void CbmLitTrdRecQa::CreateHistos()
   fHistoList->Add(fhMomNhAccAll);
   fHistoList->Add(fhMomNhRecAll);
   fHistoList->Add(fhMomNhEffAll);
+  
+  //histograms for true and ghost tracks
+  Double_t minChi2   =  0.;
+  Double_t maxChi2   = 100.;
+  Int_t nBinsChi2 = 100;
+  Int_t minNofHits = 0;
+  Int_t maxNofHits = 18;
+  Int_t nBinsNofHits = 18;
+  Int_t nBinsRP = 100;
+  Double_t minRP = 0.;
+  Double_t maxRP = 400;
+  fhChi2True = new TH1F("hChi2True", "chi2 of true tracks",
+           nBinsChi2, minChi2, maxChi2);
+  fhChi2Ghost = new TH1F("hChi2Ghost", "chi2 of ghost tracks",
+           nBinsChi2, minChi2, maxChi2);
+  fhMomTrue = new TH1F("hMomTrue", "momentum of true tracks",
+          100, 0., 10.);
+  fhMomGhost = new TH1F("hMomGhost", "momentum of ghost tracks",
+          100, 0., 10);
+  fhNofHitsTrue = new TH1F("hNofHitsTrue", "nof hits for true tracks",
+          nBinsNofHits, minNofHits, maxNofHits);
+  fhNofHitsGhost= new TH1F("hNofHitsGhost", "nof hits for ghost tracks",
+          nBinsNofHits, minNofHits, maxNofHits);
+  fhRadialPosTrue = new TH1F("hRadialPosTrue", "radial position for true tracks",
+          nBinsRP, minRP, maxRP);
+  fhRadialPosGhost = new TH1F("hRadialPosGhost", "radial position for ghost tracks",
+          nBinsRP, minRP, maxRP);
+  
+  fhLastPlaneIdTrue = new TH1F("hLastPlaneIdTrue", "last plane id for true tracks",
+		  nBinsNofHits, minNofHits, maxNofHits);
+  fhLastPlaneIdGhost = new TH1F("hLastPlaneIdGhost", "last plane id for ghost tracks",
+		  nBinsNofHits, minNofHits, maxNofHits);
+  
+  fhMomChi2True = new TH2D("hMomChi2True", "momentum vs. chi2 for true tracks",
+          nBinsMom, minMom, maxMom, nBinsChi2, minChi2, maxChi2);
+  fhMomChi2Ghost = new TH2D("hMomChi2Ghost", "momentum vs. chi2 for ghost tracks",
+          nBinsMom, minMom, maxMom, nBinsChi2, minChi2, maxChi2);
+  
+  fHistoList->Add(fhChi2True);
+  fHistoList->Add(fhChi2Ghost);  
+  fHistoList->Add(fhMomTrue);
+  fHistoList->Add(fhMomGhost);
+  fHistoList->Add(fhNofHitsTrue);
+  fHistoList->Add(fhNofHitsGhost);
+  fHistoList->Add(fhRadialPosTrue);
+  fHistoList->Add(fhRadialPosGhost);
+  fHistoList->Add(fhLastPlaneIdTrue);
+  fHistoList->Add(fhLastPlaneIdGhost);  
+  fHistoList->Add(fhMomChi2True);
+  fHistoList->Add(fhMomChi2Ghost);
 }
 
-void CbmLitTrdRecQa::DivideHistos(
+void CbmLitRecQa::DivideHistos(
 		TH1* histo1,
 		TH1* histo2,
 		TH1* histo3) 
 { 
 	histo1->Sumw2();
 	histo2->Sumw2();
-	histo3->Divide(histo1, histo2);
+	histo3->Divide(histo1, histo2, 1, 1, "B");
 }
 
-void CbmLitTrdRecQa::ZeroGlobalCounters()
+void CbmLitRecQa::ZeroGlobalCounters()
 {
 	fNofMcTracks = 0;
-	fNofTrdTracks = 0; 
+	fNofRecTracks = 0; 
 	fNofStsTracks = 0; 
 	fNofAccAll = 0;
 	fNofAccRef = 0;
 	fNofAccPrim = 0;
 	fNofAccSec = 0;
 	fNofAccMuons = 0;
+	fNofAccElectrons = 0;
 	fNofRecAll = 0;
 	fNofRecRef = 0;
 	fNofRecPrim = 0;
 	fNofRecSec = 0;
 	fNofRecMuons = 0;
+	fNofRecElectrons = 0;
 	fNofGhosts = 0;
 	fNofClones = 0;
 	fNofMismatches = 0;
@@ -507,17 +692,19 @@ void CbmLitTrdRecQa::ZeroGlobalCounters()
 	//rates
     fRateMcTracks = 0;
     fRateStsTracks = 0;
-    fRateTrdTracks = 0;
+    fRateRecTracks = 0;
     fRateRecAll = 0;
     fRateRecRef = 0;
     fRateRecPrim = 0;
     fRateRecSec = 0;
     fRateRecMuons = 0;
+    fRateRecElectrons = 0;
     fRateAccAll = 0;
     fRateAccRef = 0;
     fRateAccPrim = 0;
     fRateAccSec = 0;
     fRateAccMuons = 0;
+    fRateAccElectrons = 0;
     fRateGhosts = 0;
     fRateClones = 0;
     fRateMismatches = 0;
@@ -527,26 +714,29 @@ void CbmLitTrdRecQa::ZeroGlobalCounters()
     fEffPrim = 0;
     fEffSec = 0;
     fEffMuons = 0;
+    fEffElectrons = 0;
     fEffGhosts = 0;
     fEffClones = 0;
     fEffMismatches = 0;
 }
 
-void CbmLitTrdRecQa::ZeroEventCounters()
+void CbmLitRecQa::ZeroEventCounters()
 {
 	fEvNofMcTracks = 0;
-	fEvNofTrdTracks = 0; 
+	fEvNofRecTracks = 0; 
 	fEvNofStsTracks = 0; 
 	fEvNofAccAll = 0;
 	fEvNofAccRef = 0;
 	fEvNofAccPrim = 0;
 	fEvNofAccSec = 0;
 	fEvNofAccMuons = 0;
+	fEvNofAccElectrons = 0;
 	fEvNofRecAll = 0;
 	fEvNofRecRef = 0;
 	fEvNofRecPrim = 0;
 	fEvNofRecSec = 0;
 	fEvNofRecMuons = 0;
+	fEvNofRecElectrons = 0;
 	fEvNofGhosts = 0;
 	fEvNofClones = 0;
 	fEvNofMismatches = 0;
@@ -556,14 +746,15 @@ void CbmLitTrdRecQa::ZeroEventCounters()
 	fEvEffPrim = 0.;
 	fEvEffSec = 0.;
 	fEvEffMuons = 0.;
+	fEvEffElectrons = 0.;
 	fEvEffGhosts = 0.;
 	fEvEffClones = 0.;
 	fEvEffMismatches = 0.;
 }
 
-void CbmLitTrdRecQa::IncreaseCounters()
+void CbmLitRecQa::IncreaseCounters()
 {
-  fNofTrdTracks += fEvNofTrdTracks;
+  fNofRecTracks += fEvNofRecTracks;
   fNofStsTracks += fEvNofStsTracks; 
   fNofMcTracks += fEvNofMcTracks;
   fNofAccAll += fEvNofAccAll; 
@@ -571,18 +762,20 @@ void CbmLitTrdRecQa::IncreaseCounters()
   fNofAccPrim += fEvNofAccPrim;
   fNofAccSec += fEvNofAccSec;
   fNofAccMuons += fEvNofAccMuons;
+  fNofAccElectrons += fEvNofAccElectrons;
   fNofRecAll += fEvNofRecAll;
   fNofRecRef += fEvNofRecRef;
   fNofRecPrim += fEvNofRecPrim;
   fNofRecSec += fEvNofRecSec;
   fNofRecMuons += fEvNofRecMuons;
+  fNofRecElectrons += fEvNofRecElectrons;
   fNofGhosts += fEvNofGhosts;
   fNofClones += fEvNofClones;
   fNofMismatches += fEvNofMismatches;
   fNEvents++;
 }
 
-void CbmLitTrdRecQa::CalcEventEff()
+void CbmLitRecQa::CalcEventEff()
 {
   if (fEvNofAccAll > 0) {
 	  fEvEffAll  = Double_t(fEvNofRecAll)  / Double_t(fEvNofAccAll);
@@ -593,22 +786,25 @@ void CbmLitTrdRecQa::CalcEventEff()
   if (fEvNofAccPrim > 0) fEvEffPrim = Double_t(fEvNofRecPrim) / Double_t(fEvNofAccPrim);
   if (fEvNofAccSec > 0) fEvEffSec  = Double_t(fEvNofRecSec)  / Double_t(fEvNofAccSec);
   if (fEvNofAccMuons > 0) fEvEffMuons  = Double_t(fEvNofRecMuons)  / Double_t(fEvNofAccMuons);
+  if (fEvNofAccElectrons > 0) fEvEffElectrons  = Double_t(fEvNofRecElectrons)  / Double_t(fEvNofAccElectrons);
   if (fEvNofRecAll > 0)fEvEffMismatches = Double_t(fEvNofMismatches) / Double_t(fEvNofRecAll*fEvEffAll); 
 }
 
-void CbmLitTrdRecQa::CalcEffAndRates()
+void CbmLitRecQa::CalcEffAndRates()
 {
   // Divide histograms for efficiency calculation
   DivideHistos(fhMomRecAll, fhMomAccAll, fhMomEffAll);
   DivideHistos(fhMomRecRef, fhMomAccRef, fhMomEffRef);  
   DivideHistos(fhMomRecPrim, fhMomAccPrim, fhMomEffPrim);
   DivideHistos(fhMomRecSec, fhMomAccSec, fhMomEffSec);
-  DivideHistos(fhMomRecMuons, fhMomAccMuons, fhMomEffMuons);  
+  DivideHistos(fhMomRecMuons, fhMomAccMuons, fhMomEffMuons); 
+  DivideHistos(fhMomRecElectrons, fhMomAccElectrons, fhMomEffElectrons);   
   DivideHistos(fhNpRecAll, fhNpAccAll, fhNpEffAll);
   DivideHistos(fhNpRecRef, fhNpAccRef, fhNpEffRef);
   DivideHistos(fhNpRecPrim, fhNpAccPrim, fhNpEffPrim);
   DivideHistos(fhNpRecSec, fhNpAccSec, fhNpEffSec);
   DivideHistos(fhNpRecMuons, fhNpAccMuons, fhNpEffMuons);
+  DivideHistos(fhNpRecElectrons, fhNpAccElectrons, fhNpEffElectrons);
   DivideHistos(fhMomNhRecAll,fhMomNhAccAll,fhMomNhEffAll);
   DivideHistos(fhMomMismatches,fhMomRecAll,fhMomEffMismatches);
   DivideHistos(fhNpMismatches,fhNpRecAll,fhNpEffMismatches);
@@ -628,64 +824,70 @@ void CbmLitTrdRecQa::CalcEffAndRates()
   if (fNofAccPrim != 0) fEffPrim = Double_t(fNofRecPrim) / Double_t(fNofAccPrim);
   if (fNofAccSec != 0) fEffSec = Double_t(fNofRecSec)  / Double_t(fNofAccSec);
   if (fNofAccMuons != 0) fEffMuons = Double_t(fNofRecMuons)  / Double_t(fNofAccMuons);
+  if (fNofAccElectrons != 0) fEffElectrons = Double_t(fNofRecElectrons)  / Double_t(fNofAccElectrons); 
   if (fNofRecAll != 0) fEffMismatches = Double_t(fNofMismatches) / Double_t(fNofRecAll*fEffAll);
 
   fRateMcTracks = Double_t(fNofMcTracks) / Double_t(fNEvents);
   fRateStsTracks = Double_t(fNofStsTracks) / Double_t(fNEvents);
-  fRateTrdTracks = Double_t(fNofTrdTracks) / Double_t(fNEvents);
+  fRateRecTracks = Double_t(fNofRecTracks) / Double_t(fNEvents);
   fRateRecAll = Double_t(fNofRecAll)  / Double_t(fNEvents);
   fRateRecRef = Double_t(fNofRecRef)  / Double_t(fNEvents);
   fRateRecPrim = Double_t(fNofRecPrim) / Double_t(fNEvents);
   fRateRecSec = Double_t(fNofRecSec)  / Double_t(fNEvents);
   fRateRecMuons = Double_t(fNofRecMuons) / Double_t(fNEvents);
+  fRateRecElectrons = Double_t(fNofRecElectrons) / Double_t(fNEvents);
   fRateAccAll = Double_t(fNofAccAll)  / Double_t(fNEvents);
   fRateAccRef = Double_t(fNofAccRef)  / Double_t(fNEvents);
   fRateAccPrim = Double_t(fNofAccPrim) / Double_t(fNEvents);
   fRateAccSec = Double_t(fNofAccSec)  / Double_t(fNEvents);
   fRateAccMuons = Double_t(fNofAccMuons) / Double_t(fNEvents);
+  fRateAccElectrons = Double_t(fNofAccElectrons) / Double_t(fNEvents);
   fRateGhosts = Double_t(fNofGhosts) / Double_t(fNEvents);
   fRateClones = Double_t(fNofClones) / Double_t(fNEvents);
   fRateMismatches = Double_t(fNofMismatches) / Double_t(fNEvents); 
 }
 
-void CbmLitTrdRecQa::PrintEventStatistic()
+void CbmLitRecQa::PrintEventStatistic()
 {
   // Event summary
   if (fVerbose > 0) {
-    std::cout << "-------CbmLitTrdRecQa : Event summary-------" << std::endl;
+    std::cout << "-------CbmLitRecQa : Event summary-------" << std::endl;
     std::cout << "MCTracks   : " << fEvNofMcTracks << ", acc: " << fEvNofAccAll
     	<< ", rec: " << fEvNofRecAll << std::endl;
     std::cout << "Reconstructed STS tracks: " << fEvNofStsTracks << std::endl;
-    std::cout << "Reconstructed TRD tracks: " << fEvNofTrdTracks << std::endl;
+    std::cout << "Reconstructed tracks: " << fEvNofRecTracks << std::endl;
     std::cout << "Efficiency: " << std::endl;
-    std::cout << "All: acc: " << fEvNofAccAll << ", rec: "
+    std::cout << "all: acc: " << fEvNofAccAll << ", rec: "
     	<< fEvNofRecAll << ", efficiency " << fEvEffAll*100. << "%" << std::endl;
-    std::cout << "Ref: acc: " << fEvNofAccRef << ", rec: "
+    std::cout << "ref: acc: " << fEvNofAccRef << ", rec: "
     	<< fEvNofRecRef << ", efficiency " << fEvEffRef*100. << "%" << std::endl;
-    std::cout << "Prim: acc: " << fEvNofAccPrim << ", rec: "
+    std::cout << "prim: acc: " << fEvNofAccPrim << ", rec: "
          << fEvNofRecPrim << ", efficiency " << fEvEffPrim*100. << "%" << std::endl;
-    std::cout << "Sec: acc: " << fEvNofAccSec << ", rec: "
+    std::cout << "sec: acc: " << fEvNofAccSec << ", rec: "
     	<< fEvNofRecSec << ", efficiency " << fEvEffSec*100. << "%" << std::endl;
-    std::cout << "Muons: acc: " << fEvNofAccMuons << ", rec: "
+    std::cout << "muons: acc: " << fEvNofAccMuons << ", rec: "
         << fEvNofRecMuons << ", efficiency " << fEvEffMuons*100. << "%" << std::endl;
-    std::cout << "Mismatches: " << fEvNofMismatches 
+    std::cout << "electrons: acc: " << fEvNofAccElectrons << ", rec: "
+        << fEvNofRecElectrons << ", efficiency " << fEvEffElectrons*100. << "%" << std::endl;
+    std::cout << "mismatches: " << fEvNofMismatches 
     	<< ", efficiency " << fEvEffMismatches*100. << "%" << std::endl;
-    std::cout << "Ghosts: " << fEvNofGhosts << ", ghosts/acc MC tracks: "
+    std::cout << "ghosts: " << fEvNofGhosts << ", ghosts/acc MC tracks: "
     	<< fEvEffGhosts*100. << "%" << std::endl;
-    std::cout << "Clones: " << fEvNofClones << ", clones/accepted MC tracks: "
+    std::cout << "clones: " << fEvNofClones << ", clones/accepted MC tracks: "
     	<< fEvEffClones*100. << "%" << std::endl;
     std::cout << "-----------------------------------------------" << std::endl;
   }
 }
 
-void CbmLitTrdRecQa::PrintStatistic()
+void CbmLitRecQa::PrintStatistic()
 {
+	std::cout.precision(4);
   // Run summary to screen
-  std::cout << "-------CbmLitTrdRecQa: Run summary-------" << std::endl;
+  std::cout << "-------CbmLitRecQa: Run summary-------" << std::endl;
   std::cout << "MCTracks   : " << fNofMcTracks << ", acc: " << fNofAccAll
     	<< ", rec: " << fNofRecAll << std::endl;
   std::cout << "Rec STS tracks: " << fNofStsTracks << ", per event: " << fRateStsTracks << std::endl;
-  std::cout << "Rec TRD tracks: " << fNofTrdTracks << ", per event: " << fRateTrdTracks << std::endl;
+  std::cout << "Rec tracks: " << fNofRecTracks << ", per event: " << fRateRecTracks << std::endl;
   std::cout << "Efficiency: " << std::endl;
   std::cout << "all: " << fEffAll*100 << " % (" << fNofRecAll << "/" << fNofAccAll 
   	<<"), per event (" << fRateRecAll << "/" << fRateAccAll << ")" << std::endl;
@@ -697,6 +899,8 @@ void CbmLitTrdRecQa::PrintStatistic()
   	<<"), per event (" << fRateRecSec << "/" << fRateAccSec << ")" << std::endl;
   std::cout << "muons: " << fEffMuons*100 << " % (" << fNofRecMuons << "/" << fNofAccMuons 
    	<<"), per event (" << fRateRecMuons << "/" << fRateAccMuons << ")" << std::endl;
+  std::cout << "electrons: " << fEffElectrons*100 << " % (" << fNofRecElectrons << "/" << fNofAccElectrons 
+   	<<"), per event (" << fRateRecElectrons << "/" << fRateAccElectrons << ")" << std::endl;
   std::cout << "mismatches: " << fEffMismatches*100 << " % (" << fNofMismatches << "/" << fEffAll*fNofRecAll 
      	<<"), per event (" << fRateMismatches << "/" << fEffAll * fRateRecAll << ")" << std::endl;
   std::cout << "ghosts: " << fRateGhosts << " per event, " << "ghosts/accepted MC tracks :" 
@@ -707,15 +911,17 @@ void CbmLitTrdRecQa::PrintStatistic()
   std::cout << "-------------------------------------------------" << std::endl;
 }
 
-void CbmLitTrdRecQa::WriteToFile()
+void CbmLitRecQa::WriteToFile()
 {
 	//  TDirectory *olddir = gDirectory;
-	//  TDirectory *hdir = new TDirectory("TrdFinderQa",
-	//				    "Performance of the track finding in Trd");
+	//  TDirectory *hdir = new TDirectory("MuchFinderQa",
+	//				    "Performance of the track finding in Much");
 	//  hdir->cd();
 	TIter next(fHistoList);
 	while ( TH1* histo = ((TH1*)next()) ) histo->Write();
 	//  olddir->cd();
 }
 
-ClassImp(CbmLitTrdRecQa)
+
+
+ClassImp(CbmLitRecQa)

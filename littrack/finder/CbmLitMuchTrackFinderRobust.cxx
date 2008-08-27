@@ -78,7 +78,7 @@ void CbmLitMuchTrackFinderRobust::Init()
    //SetBeginStation(0); 
    //SetEndStation(fLayout.GetNofStations() - 1);
    //SetMaxNofMissingHitsInStation(0);
-   SetMaxNofMissingHits(0);
+   SetMaxNofMissingHits(1);
    SetSigmaCoef(3.5); 
 //   SetPrecalcSearchRegions(false); 
    //SetApplyUpdateInLayer(true);

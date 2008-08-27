@@ -10,6 +10,7 @@
 #include "CbmLitTrackPropagatorImp.h"
 #include "CbmTrackPropagatorGeane.h"
 #include "CbmLitTrackSelectionEmpty.h"
+#include "CbmLitTrackSelectionChiSq.h"
 #include "CbmLitTrackSelectionMuch.h"
 #include "CbmLitTrackSelectionTrd.h"
 #include "CbmLitTrackSelectionMomentum.h"
@@ -45,7 +46,8 @@ CbmLitToolFactory* CbmLitToolFactory::Instance()
    return fInstance;
 }
 
-CbmLitTrackPropagator* CbmLitToolFactory::CreateTrackPropagator(const std::string& name)
+CbmLitTrackPropagator* CbmLitToolFactory::CreateTrackPropagator(
+		const std::string& name)
 {
 	CbmLitTrackPropagator* propagator = NULL;
 	if(name == "Much") {
@@ -66,7 +68,8 @@ CbmLitTrackPropagator* CbmLitToolFactory::CreateTrackPropagator(const std::strin
 	return propagator;
 }
 
-CbmLitTrackUpdate* CbmLitToolFactory::CreateTrackUpdate(const std::string& name)
+CbmLitTrackUpdate* CbmLitToolFactory::CreateTrackUpdate(
+		const std::string& name)
 {
 	CbmLitTrackUpdate* update = NULL;
 	if(name == "Much" || name == "Trd") {
@@ -77,7 +80,8 @@ CbmLitTrackUpdate* CbmLitToolFactory::CreateTrackUpdate(const std::string& name)
 	return update;
 }
 
-CbmLitTrackFitter* CbmLitToolFactory::CreateTrackFitter(const std::string& name)
+CbmLitTrackFitter* CbmLitToolFactory::CreateTrackFitter(
+		const std::string& name)
 {
 	CbmLitTrackFitter* fitter = NULL;
 	if(name == "Much") {
@@ -104,11 +108,16 @@ CbmLitTrackFitter* CbmLitToolFactory::CreateTrackFitter(const std::string& name)
 		CbmLitTrackUpdate* update = CreateTrackUpdate("Much");
 		fitter = new CbmLitTrackFitterImp(propagator, update);
 		return fitter;
+	} else 
+	if (name == "Smoother") {
+		fitter = new CbmLitKalmanSmoother();
+		return fitter;
 	}
 	return fitter;
 }
 
-CbmLitTrackSelection* CbmLitToolFactory::CreateTrackSelection(const std::string& name)
+CbmLitTrackSelection* CbmLitToolFactory::CreateTrackSelection(
+		const std::string& name)
 {
 	CbmLitTrackSelection* selection = NULL;
 	if(name == "Empty") {
@@ -122,10 +131,17 @@ CbmLitTrackSelection* CbmLitToolFactory::CreateTrackSelection(const std::string&
 		momSelection->Initialize();
 		return momSelection;
 	} else
+	if(name == "Chi2") {
+		CbmLitTrackSelectionChiSq* chiSqSelection = new CbmLitTrackSelectionChiSq();
+		chiSqSelection->SetMaxChiSq(30);
+		chiSqSelection->Initialize();
+		return chiSqSelection;
+	} else
 	if (name == "MuchRobustSelection") {
 		CbmLitTrackFitter* robustFitter = CreateTrackFitter("MuchRobust");
 		CbmLitTrackFitter* fitter = CreateTrackFitter("Much");
-		selection = new CbmLitRobustSelection(robustFitter, fitter);
+		CbmLitTrackFitter* smoother = CreateTrackFitter("Smoother");
+		selection = new CbmLitRobustSelection(robustFitter, fitter, smoother);
 		selection->Initialize();
 		return selection;
 	} else 
@@ -146,7 +162,7 @@ CbmLitTrackSelection* CbmLitToolFactory::CreateTrackSelection(const std::string&
 	if(name == "TrdStation") {
 		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
 		trdSelection->SetNofSharedHits(2);
-		trdSelection->SetMinNofHits(1);
+		trdSelection->SetMinNofHits(2);
 		trdSelection->SetMinLastPlaneId(0);
 		trdSelection->Initialize(); 
 		return trdSelection;
@@ -154,7 +170,7 @@ CbmLitTrackSelection* CbmLitToolFactory::CreateTrackSelection(const std::string&
 	if(name == "TrdFinal") {
 		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
 		trdSelection->SetNofSharedHits(2);
-		trdSelection->SetMinNofHits(1);
+		trdSelection->SetMinNofHits(2);
 		Int_t nofStations = CbmLitEnvironment::Instance()->GetTrdLayout().GetNofStations();
 		trdSelection->SetMinLastPlaneId(nofStations-1);
 		trdSelection->Initialize(); 

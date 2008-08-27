@@ -1,6 +1,6 @@
 #include "CbmLitHit.h"
 
-#include <iostream>
+#include <sstream>
 
 CbmLitHit::CbmLitHit():
 	fX(0.),	
@@ -15,21 +15,21 @@ CbmLitHit::CbmLitHit():
 	fW(1.0),
 	fIsOutlier(false)
 {
-
 }
 
 CbmLitHit::~CbmLitHit()
 {
-
 }
 
-void CbmLitHit::Print() const
+std::string CbmLitHit::ToString() const
 {
-	std::cout << "Hit: pos=(" << fX << "," << fY << "," << fZ 
+	std::stringstream ss;
+	ss << "Hit: pos=(" << fX << "," << fY << "," << fZ 
 	          << ") err=(" << fDx << "," << fDy << "," << fDz << ") "
 	          << " dxy=" << fDxy << " planeId=" << fPlaneId 
 	          << " refId=" << fRefId << " w=" << fW 
 	          << " isOutlier=" << fIsOutlier << std::endl;
+	return ss.str();
 }
 
 ClassImp(CbmLitHit)

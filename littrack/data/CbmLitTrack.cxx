@@ -4,10 +4,10 @@
 #include "CbmLitMemoryManagment.h"
 
 #include <algorithm>
-#include <iostream>
+#include <sstream>
 
 CbmLitTrack::CbmLitTrack() :
-	fFlag(0),
+	fQuality(kLITGOOD),
 	fChi2(0),
 	fNDF(0),
 	fPreviousTrackId(0),
@@ -30,7 +30,7 @@ CbmLitTrack& CbmLitTrack::operator=(const CbmLitTrack& track)
 	
 	SetParamFirst(track.GetParamFirst());
 	SetParamLast(track.GetParamLast());	
-	SetFlag(track.GetFlag());
+	SetQuality(track.GetQuality());
 	SetChi2(track.GetChi2());
 	SetNDF(track.GetNDF());
 	SetPreviousTrackId(track.GetPreviousTrackId());	
@@ -51,11 +51,14 @@ void CbmLitTrack::ClearHits() {
 	fHits.clear();
 }
 
-void CbmLitTrack::Print() const
+std::string CbmLitTrack::ToString() const
 {
-	std::cout << "Track: flag=" <<  fFlag << ", chi2=" << fChi2 
+	std::stringstream ss;
+	ss << "Track: quality=" <<  fQuality << ", chi2=" << fChi2 
 		<< ", ndf=" << fNDF << ", previousTrackId=" << fPreviousTrackId 
-		<< ", lastPlaneId=" << fLastPlaneId << ", pdg=" << fPDG << std::endl;
+		<< ", lastPlaneId=" << fLastPlaneId << ", pdg=" << fPDG
+		<< ", nofHits=" << fHits.size() << ", nofFitNodes=" << fFitNodes.size() << std::endl;
+	return ss.str();
 }
 
 void CbmLitTrack::SortHits(Bool_t downstream)
@@ -78,7 +81,8 @@ Bool_t CbmLitTrack::CheckParams() const
 	return true;
 }
 
-HitIteratorPair CbmLitTrack::GetHits(Int_t planeId)
+HitIteratorPair CbmLitTrack::GetHits(
+		Int_t planeId)
 {
 	CbmLitHit value;
 	value.SetPlaneId(planeId);
@@ -87,9 +91,10 @@ HitIteratorPair CbmLitTrack::GetHits(Int_t planeId)
 	return bounds;
 }
 
-std::vector<HitIteratorPair> CbmLitTrack::GetHitBounds()
+void CbmLitTrack::GetHitBounds(
+		std::vector<HitIteratorPair>& bounds)
 {
-	std::vector<HitIteratorPair> bounds;
+	bounds.clear();
 	Int_t min = fHits.front()->GetPlaneId();
 	Int_t max = fHits.back()->GetPlaneId();
 	for (Int_t i = min; i <= max; i++) {
@@ -97,7 +102,6 @@ std::vector<HitIteratorPair> CbmLitTrack::GetHitBounds()
 		if(b.first == b.second) continue;
 		bounds.push_back(b);
 	}
-	return bounds;
 }
 
 ClassImp(CbmLitTrack);

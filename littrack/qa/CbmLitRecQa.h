@@ -1,39 +1,34 @@
-// -------------------------------------------------------------------------
-// -----                  CbmLitTrdRecQa header file               -----
-// -----                  Created 15/10/07  by A. Lebedev               -----
-// -------------------------------------------------------------------------
-
-
-/** CbmLitTrdReckQa.h
- *@author A.Lebedev <alebedev@jinr.ru>
- **
- ** Quality check task for CbmTrdFindTracks
- **/
-
-
-#ifndef CBMLITTRDRECQA_H_
-#define CBMLITTRDRECQA_H_
+#ifndef CBMLITRECQA_H_
+#define CBMLITRECQA_H_
 
 #include "CbmTask.h"
+#include "CbmDetectorList.h"
 
 #include "TH2D.h"
 
 #include <set>
 #include <map>
+#include <iostream>
+#include <fstream>
+#include <string>
 
 class TClonesArray;
 class TH1;
 class TH1F;
 class TList;
+class CbmMuchTrack;
 class CbmTrdTrack;
 
-class CbmLitTrdRecQa : public CbmTask
+class CbmLitRecQa : public CbmTask
 {
 public:
-  CbmLitTrdRecQa();
-  CbmLitTrdRecQa(Int_t minPoints, Double_t quota, Int_t iVerbose = 1);
-  virtual ~CbmLitTrdRecQa();
 
+  CbmLitRecQa(
+		  Int_t minPoints, 
+		  Double_t quota, 
+		  DetectorId detId,
+		  Int_t iVerbose);
+  virtual ~CbmLitRecQa();
 
   virtual void SetParContainers();
   virtual InitStatus Init();
@@ -51,9 +46,11 @@ private:
   virtual void Finish();
 
   void ProcessStsTracks();
+  void ProcessMuchTracks();
   void ProcessTrdTracks();
   void ProcessMcTracks();
-  Bool_t IsMismatch(Int_t mcId);
+  Bool_t IsMismatch(
+		  Int_t mcId);
   void CountClones();
   
   void CreateHistos();
@@ -72,26 +69,36 @@ private:
   void PrintStatistic();
   void WriteToFile();
   
-  std::multimap<Int_t, Int_t> fMcTrdMap;
+  void FillTrackParams(
+		CbmMuchTrack* track, 
+		const std::string& type);
+  void FillTrackParams(
+  		CbmTrdTrack* track,
+  		const std::string& type);
+  
+  DetectorId fDetId;
+  
+  std::ofstream fNN;
+  
+  std::multimap<Int_t, Int_t> fMcRecMap;
   std::multimap<Int_t, Int_t> fMcStsMap;
 
 // Pointers to data arrays
   TClonesArray* fMCTracks;   
   TClonesArray* fMCPoints; 
-  TClonesArray* fTrdTracks;
-  TClonesArray* fTrdHits; 
+  TClonesArray* fRecTracks;
+  TClonesArray* fRecHits; 
+  TClonesArray* fRecMatches;
   TClonesArray* fStsTracks; 
-  TClonesArray* fTrdMatches;
   TClonesArray* fStsMatches;
-//  TClonesArray* fTrdDigiMatches;
 
 //  Normalisation type.
-//   1 - by number of reconstructable in Trd MC tracks.
+//   1 - by number of reconstructable in Much MC tracks.
 //   2 - by number of STS tracks, which match to reco MC tracks
   Int_t fNormType;
 
-  Int_t fMinPoints; 
-  Double_t fQuota;
+  Int_t fMinPoints; // Minimal number of MCPoints for considered MCTrack
+  Double_t fQuota;  // True/all hits for track to be considered reconstructed
 
   
   // Histograms
@@ -100,33 +107,43 @@ private:
   TH1F* fhMomAccPrim, *fhMomRecPrim, *fhMomEffPrim; 
   TH1F* fhMomAccSec, *fhMomRecSec, *fhMomEffSec; 
   TH1F* fhMomAccMuons, *fhMomRecMuons, *fhMomEffMuons;
+  TH1F* fhMomAccElectrons, *fhMomRecElectrons, *fhMomEffElectrons;
   TH1F* fhNpAccAll, *fhNpRecAll,   *fhNpEffAll;
   TH1F* fhNpAccRef, *fhNpRecRef, *fhNpEffRef; 
   TH1F* fhNpAccPrim, *fhNpRecPrim, *fhNpEffPrim;  
   TH1F* fhNpAccSec, *fhNpRecSec,   *fhNpEffSec;  
   TH1F* fhNpAccMuons, *fhNpRecMuons, *fhNpEffMuons;
+  TH1F* fhNpAccElectrons, *fhNpRecElectrons, *fhNpEffElectrons;
   TH1F* fhNhClones, *fhNhGhosts;
   TH1F* fhMomMismatches, *fhNpMismatches, *fhMomEffMismatches, *fhNpEffMismatches;
   TH2D* fhMomNhAccAll, *fhMomNhRecAll, *fhMomNhEffAll;
-
+  
+  TH1F* fhChi2True, *fhChi2Ghost;
+  TH1F* fhMomTrue, *fhMomGhost;
+  TH1F* fhNofHitsTrue, *fhNofHitsGhost;
+  TH1F* fhRadialPosTrue, *fhRadialPosGhost;
+  TH1F* fhLastPlaneIdTrue, *fhLastPlaneIdGhost;
+  TH2D* fhMomChi2True, *fhMomChi2Ghost;
 
 // List of histograms
   TList* fHistoList;
 
 // Counters
   Int_t fNofMcTracks;
-  Int_t fNofTrdTracks; 
+  Int_t fNofRecTracks; 
   Int_t fNofStsTracks; 
   Int_t fNofAccAll;
   Int_t fNofAccRef;
   Int_t fNofAccPrim;
   Int_t fNofAccSec;
   Int_t fNofAccMuons;
+  Int_t fNofAccElectrons;  
   Int_t fNofRecAll;
   Int_t fNofRecRef;
   Int_t fNofRecPrim;
   Int_t fNofRecSec;
   Int_t fNofRecMuons;
+  Int_t fNofRecElectrons;  
   Int_t fNofGhosts;
   Int_t fNofClones;
   Int_t fNofMismatches;
@@ -134,17 +151,19 @@ private:
   // rates
   Double_t fRateMcTracks;
   Double_t fRateStsTracks;
-  Double_t fRateTrdTracks;
+  Double_t fRateRecTracks;
   Double_t fRateRecAll;
   Double_t fRateRecRef;
   Double_t fRateRecPrim;
   Double_t fRateRecSec;
   Double_t fRateRecMuons;
+  Double_t fRateRecElectrons;  
   Double_t fRateAccAll;
   Double_t fRateAccRef;
   Double_t fRateAccPrim;
   Double_t fRateAccSec;
   Double_t fRateAccMuons;
+  Double_t fRateAccElectrons;  
   Double_t fRateGhosts;
   Double_t fRateClones;
   Double_t fRateMismatches;
@@ -155,6 +174,7 @@ private:
   Double_t fEffPrim;
   Double_t fEffSec;
   Double_t fEffMuons;
+  Double_t fEffElectrons;
   Double_t fEffGhosts;
   Double_t fEffClones;
   Double_t fEffMismatches;
@@ -162,18 +182,20 @@ private:
   
 // Counters per event
   Int_t fEvNofMcTracks;
-  Int_t fEvNofTrdTracks; 
+  Int_t fEvNofRecTracks; 
   Int_t fEvNofStsTracks; 
   Int_t fEvNofAccAll;
   Int_t fEvNofAccRef;
   Int_t fEvNofAccPrim;
   Int_t fEvNofAccSec;
   Int_t fEvNofAccMuons;
+  Int_t fEvNofAccElectrons;
   Int_t fEvNofRecAll;
   Int_t fEvNofRecRef;
   Int_t fEvNofRecPrim;
   Int_t fEvNofRecSec;
   Int_t fEvNofRecMuons;
+  Int_t fEvNofRecElectrons;
   Int_t fEvNofGhosts;
   Int_t fEvNofClones;
   Int_t fEvNofMismatches;
@@ -183,13 +205,14 @@ private:
   Double_t fEvEffPrim;
   Double_t fEvEffSec;
   Double_t fEvEffMuons;
+  Double_t fEvEffElectrons;
   Double_t fEvEffGhosts;
   Double_t fEvEffClones;
   Double_t fEvEffMismatches;  
   
   Int_t fNEvents; 
 
-  ClassDef(CbmLitTrdRecQa,1);
+  ClassDef(CbmLitRecQa,1);
 };
 
 #endif

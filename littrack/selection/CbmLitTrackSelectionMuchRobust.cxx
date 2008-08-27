@@ -4,6 +4,7 @@
 #include "CbmLitTrackSelectionA.h"
 #include "CbmLitTrackSelectionD.h"
 #include "CbmLitTrackSelectionC.h"
+#include "CbmLitTrackSelectionChiSq.h"
 #include "CbmLitTrack.h"
 
 CbmLitTrackSelectionMuchRobust::CbmLitTrackSelectionMuchRobust()
@@ -16,6 +17,8 @@ CbmLitTrackSelectionMuchRobust::CbmLitTrackSelectionMuchRobust()
 	fSelectionD->Initialize();
 	fSelectionC = new CbmLitTrackSelectionC();
 	fSelectionC->Initialize();
+	fSelectionChiSq = new CbmLitTrackSelectionChiSq();
+	fSelectionChiSq->Initialize();
 }
 
 CbmLitTrackSelectionMuchRobust::~CbmLitTrackSelectionMuchRobust()
@@ -42,17 +45,22 @@ LitStatus CbmLitTrackSelectionMuchRobust::DoSelect(
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
 	
-//	fSelectionC->Properties().SetProperty("fNofSharedHits", 2);
-//	fSelectionD->Properties().SetProperty("fMinNofHits", 1);
-//	fSelectionD->Properties().SetProperty("fMinLastPlaneId", 9);	
+	((CbmLitTrackSelectionC*)fSelectionC)->SetNofSharedHits(2);
+	((CbmLitTrackSelectionD*)fSelectionD)->SetMinNofHits(1);
+	((CbmLitTrackSelectionD*)fSelectionD)->SetMinLastPlaneId(8);
+	((CbmLitTrackSelectionChiSq*)fSelectionChiSq)->SetMaxChiSq(10.);
 	
 	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) 
-		(*iTrack)->SetFlag(0);
+		(*iTrack)->SetQuality(kLITGOOD);
 
-	//fSelectionA->DoSelect(itBegin, itEnd);
 	fSelectionD->DoSelect(itBegin, itEnd);
 	fSelectionRobust->DoSelect(itBegin, itEnd);
-	//fSelectionC->DoSelect(itBegin, itEnd);
+	fSelectionChiSq->DoSelect(itBegin, itEnd);
+	((CbmLitTrackSelectionD*)fSelectionD)->SetMinNofHits(9);
+	((CbmLitTrackSelectionD*)fSelectionD)->SetMinLastPlaneId(1);
+	fSelectionD->DoSelect(itBegin, itEnd);
+//	
+//	fSelectionC->DoSelect(itBegin, itEnd);
 	
 	return kLITSUCCESS;
 }

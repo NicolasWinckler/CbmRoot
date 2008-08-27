@@ -52,7 +52,7 @@ LitStatus CbmLitTrackSelectionMuch::DoSelect(
 	((CbmLitTrackSelectionD*)fSelectionD)->SetMinLastPlaneId(fMinLastPlaneId);
 		
 	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) 
-		(*iTrack)->SetFlag(0);
+		(*iTrack)->SetQuality(kLITGOOD);
 
 	//fSelectionA->DoSelect(itBegin, itEnd);
 	//fSelectionB->DoSelect(itBegin, itEnd);

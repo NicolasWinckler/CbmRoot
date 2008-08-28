@@ -4,11 +4,12 @@
 
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
-${CBMROOT_SOURCE_DIR}/ecal
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
+${CBMROOT_SOURCE_DIR}/field 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
+${CBMROOT_SOURCE_DIR}/ecal
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -38,7 +39,7 @@ CbmEcalTrackExport.cxx CbmEcalStructureExport.cxx
 CbmEcalRecoSimple.cxx CbmEcalClusterV1.cxx
 CbmEcalQualityCheck.cxx CbmEcalClusterFinderV1.cxx
 CbmEcalTrackImport.cxx CbmEcalCalibration.cxx
-CbmEcalParam.cxx CbmEcalRecoSlow.cxx
+CbmEcalParam.cxx CbmEcalRecoSlow.cxx CbmEcalMatching.cxx
 )
 
 SET(ECAL_SRCS ${ECAL_SRCS_RULECHECKER} CbmEcalInf.cxx)

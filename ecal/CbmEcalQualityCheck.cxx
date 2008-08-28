@@ -254,6 +254,41 @@ void CbmEcalQualityCheck::DrawImage()
   fC->WriteImage(name+".png", TImage::kPng);
 }
 
+void CbmEcalQualityCheck::DrawLine(Double_t x1, Double_t y1, Double_t x2, Double_t y2,const char* color)
+{
+  Int_t x1i=(Int_t)((x1/fInf->GetEcalSize(0))*fCX+fCX/2.0);
+  Int_t y1i=(Int_t)((y1/fInf->GetEcalSize(1))*fCY+fCY/2.0);
+  Int_t x2i=(Int_t)((x2/fInf->GetEcalSize(0))*fCX+fCX/2.0);
+  Int_t y2i=(Int_t)((y2/fInf->GetEcalSize(1))*fCY+fCY/2.0);
+  if (x1i<0) x1i=0;
+  if (x1i>=fCX) x1i=fCX-1;
+  if (x2i<0) x2i=0;
+  if (x2i>=fCX) x2i=fCX-1;
+  if (y1i<0) y1i=0;
+  if (y1i>=fCY) y1i=fCY-1;
+  if (y2i<0) y2i=0;
+  if (y2i>=fCY) y2i=fCY-1;
+  y1i=fCY-y1i-1;
+  y2i=fCY-y2i-1;
+  fC->DrawLine(x1i, y1i, x2i, y2i, color);
+}
+
+void CbmEcalQualityCheck::DrawLine(Double_t x, Double_t y, const char* color, Int_t track)
+{
+  if (track==-1111) return;
+  Int_t i=0;
+  Int_t n=fPoints->GetEntriesFast();
+  CbmEcalPoint* pt;
+
+  for(i=0;i<n;i++)
+  {
+    pt=(CbmEcalPoint*)fPoints->At(i);
+    if (pt->GetTrackID()==track) break; 
+  }
+  if (i==n) return;
+  DrawLine(x, y, pt->GetX(), pt->GetY(), color);
+}
+
 void CbmEcalQualityCheck::DrawPhotons()
 {
   Int_t rn=fReco->GetEntriesFast();
@@ -262,6 +297,7 @@ void CbmEcalQualityCheck::DrawPhotons()
   for(i=0;i<rn;i++)
   {
     r=(CbmEcalRecParticle*)fReco->At(i);
+    DrawLine(r->X(), r->Y(), "#0000FF", r->MCTrack());
     DrawMark(r->X(), r->Y(), "#0000FF", 0);
     DrawEnergy(r->X(), r->Y(), r->E(), "#0000FF");
     DrawChi2(r->X(), r->Y(), r->Chi2(), "#0000FF");

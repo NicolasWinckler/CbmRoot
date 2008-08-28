@@ -74,6 +74,8 @@ private:
   void DrawCell(CbmEcalCell* cell, Float_t r, Float_t g, Float_t b);
   void DrawCell(CbmEcalCell* cell, const char* color);
 
+  void DrawLine(Double_t x, Double_t y, const char* color, Int_t track);
+  void DrawLine(Double_t x1, Double_t y1, Double_t x2, Double_t y2,const char* color);
   /** Draw energy for given point **/
   void DrawEnergy(CbmEcalPoint* p, const char* color);
   void DrawEnergy(Float_t x, Float_t y, Float_t p, const char* color);

@@ -92,8 +92,12 @@ CbmStsSector::CbmStsSector(TString tempName, Int_t detId, Int_t iType, Double_t 
   }
 
   // Transform errors to global c.s. 
-  Double_t cosRot = TMath::Cos(fRotation);
-  Double_t sinRot = TMath::Sin(fRotation);
+  //   if ( tempName.Contains("stsstation02") || tempName.Contains("stsstation07") ) {
+  //     rotation+= 90.*TMath::DegToRad();
+  //   }
+
+  Double_t cosRot = TMath::Cos(rotation);
+  Double_t sinRot = TMath::Sin(rotation);
   Double_t vX  = cosRot * cosRot * fSigmaX * fSigmaX
                - 2. * cosRot * sinRot * fSigmaXY
                + sinRot * sinRot * fSigmaY * fSigmaY;
@@ -107,6 +111,9 @@ CbmStsSector::CbmStsSector(TString tempName, Int_t detId, Int_t iType, Double_t 
   fSigmaY  = TMath::Sqrt(vY);
   fSigmaXY = vXY;
 
+  //  TString errorString = Form("%.5f  -  %.5f  - %.5f",fSigmaX,fSigmaY,fSigmaXY);
+  //   cout << "Hello, I am sector \"" << tempName.Data() << "\", errors: " 
+  //        << errorString.Data() << endl;
 }
 // -------------------------------------------------------------------------
 

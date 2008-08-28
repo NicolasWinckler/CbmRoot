@@ -294,8 +294,11 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 
     // Take point coordinates in the midplane of the station
     if ( ! point->IsUsable() ) continue;
-    Double_t xpt = point->GetX(station->GetZ());
-    Double_t ypt = point->GetY(station->GetZ());
+    Double_t statCosRot = TMath::Cos(station->GetRotation());
+    Double_t statSinRot = TMath::Sin(station->GetRotation());
+
+    Double_t xpt = statCosRot*point->GetX(station->GetZ())-statSinRot*point->GetY(station->GetZ());
+    Double_t ypt = statCosRot*point->GetY(station->GetZ())-statSinRot*point->GetX(station->GetZ());
 
     // Get the sector the point is in
     Int_t sectorNr = -1;

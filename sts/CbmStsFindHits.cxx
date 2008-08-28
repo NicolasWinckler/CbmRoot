@@ -108,6 +108,7 @@ void CbmStsFindHits::Exec(Option_t* opt) {
   Int_t nHits   = 0;
   Int_t nStations = fDigiScheme->GetNStations();
   CbmStsStation* station = NULL;
+
   for (Int_t iStation=0; iStation<nStations; iStation++) {
     station = fDigiScheme->GetStation(iStation);
     Int_t nDigisFInStation = 0;
@@ -358,6 +359,10 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
 			       CbmStsSector* sector, 
 			       set<Int_t>& fSet, set<Int_t>& bSet) {
 
+
+  Double_t statCosRot = TMath::Cos(1.*station->GetRotation());
+  Double_t statSinRot = TMath::Sin(1.*station->GetRotation());
+
   // Counter
   Int_t nNew = 0;
 
@@ -410,6 +415,12 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
                + vXY * ( cosrot*cosrot - sinrot*sinrot );
   Double_t sigmaX = TMath::Sqrt(wX);
   Double_t sigmaY = TMath::Sqrt(wY);
+
+  Double_t xold = sigmaX; 
+  Double_t yold = sigmaY;
+  sigmaX = TMath::Abs(statCosRot*xold-statSinRot*yold);
+  sigmaY = TMath::Abs(statCosRot*yold-statSinRot*xold);
+  if ( TMath::Abs(station->GetRotation()) > 0.001 ) wXY = -wXY;
 
   // Now perform the loop over active channels
   set<Int_t>::iterator it1;
@@ -600,6 +611,11 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
 	  // Translation into global c.s.
 	  x = x + xc;
 	  y = y + yc;
+
+	  xold = x;
+	  yold = y;
+	  x = statCosRot*xold-statSinRot*yold;
+	  y = statCosRot*yold-statSinRot*xold;
 
 	  // Make new hit
 	  pos.SetXYZ(x, y, z);

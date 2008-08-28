@@ -72,6 +72,7 @@ class CbmStsStation : public TNamed
     return (CbmStsSector*) fSectors->At(iSector); }
   CbmStsSector* GetSectorByNr(Int_t sectorNr);
 
+  Double_t GetRotation()  const { return fRotation; }
 
   /** Add one sector to the array **/
   void AddSector(CbmStsSectorDigiPar* sectorPar);

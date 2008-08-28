@@ -308,8 +308,11 @@ void CbmEcalRecoSlow::WriteClusterInfo(CbmEcalClusterV1* clstr)
 
       celle+=fShLib->GetSumEThetaPhi(x, y, cellsize, part->E(), theta, phi);
     }
-    fEpred[i]=celle;
-    fEmeas[i]=(*cell)->GetTotalEnergy();
+    cx=(*cell)->GetCenterX(); cy=(*cell)->GetCenterY();
+    r=TMath::Sqrt(cx*cx+cy*cy);
+    fTheta[i]=TMath::ATan(r/fInf->GetZPos());
+    fEpred[i]=fCal->GetEnergy(celle, *cell);
+    fEmeas[i]=fCal->GetEnergy((*cell)->GetTotalEnergy(), *cell);
     fCX[i]=(*cell)->GetCenterX();
     fCY[i]=(*cell)->GetCenterY();
     i++;
@@ -610,6 +613,7 @@ void CbmEcalRecoSlow::CreateTree()
   fOutTree->Branch("cls_e", &fECls, "cls_e/D");
   fOutTree->Branch("cls_e2", &fE2Cls, "cls_e2/D");
   fOutTree->Branch("cls_e3", &fE3Cls, "cls_e3/D");
+  fOutTree->Branch("theta", fTheta, "theta[20]/D");
   fOutTree->Branch("ctypes", fTypes, "ctypes[20]/S");
   fOutTree->Branch("cemeas", fEmeas, "cemeas[20]/D");
   fOutTree->Branch("cepred", fEpred, "cepred[20]/D");

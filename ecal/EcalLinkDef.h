@@ -48,5 +48,6 @@
 #pragma link C++ class  CbmEcalTrackImport;
 #pragma link C++ class  CbmEcalCalibration;
 #pragma link C++ class  CbmEcalParam+;
+#pragma link C++ class  CbmEcalMatching;
 
 #endif

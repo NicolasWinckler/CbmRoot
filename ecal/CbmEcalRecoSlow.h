@@ -167,6 +167,7 @@ private:
   Double_t fCellX;
   Double_t fCellY;
   Double_t fChi2;
+  Double_t fTheta[20];
   Short_t fTypes[20];
   Double_t fEmeas[20];
   Double_t fEpred[20];

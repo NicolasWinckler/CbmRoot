@@ -70,6 +70,8 @@ public:
   /** Output to screen **/
   virtual void Print(const Option_t* opt = "") const;
 
+  Int_t MCTrack() const {return fMCTrack;}
+  void SetMCTrack(Int_t num) {fMCTrack=num;}
 protected:
 
   Double32_t fPx;  // px component of momentum 4-vector
@@ -95,6 +97,8 @@ protected:
   CbmEcalClusterV1* fCluster;		//!
   /** A seed for the photon **/
   CbmEcalCell* fCell;			//!
+  /** A mother tracks number **/
+  Int_t fMCTrack;
 
   ClassDef(CbmEcalRecParticle,1)
 

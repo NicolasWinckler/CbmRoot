@@ -70,7 +70,7 @@ void CbmRichRingFinderHough::Init()
     fFitEllipse->Init();   
     
     TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
-    richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weight.txt";
+    richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights.txt";
     fANNSelect = new CbmRichRingSelectNeuralNet(0, richSelectNNFile);   
     fANNSelect->Init();
 }

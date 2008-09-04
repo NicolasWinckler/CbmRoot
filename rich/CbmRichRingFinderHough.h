@@ -27,8 +27,6 @@ public:
 	Int_t fId;
 	Int_t fRefIndex;
 	Bool_t fIsUsed;
-	Double_t fDeviation;
-	Int_t fRingNum;
 	
 	static Bool_t CmpUp(const CbmRichMyPoint &m1,
 			          const CbmRichMyPoint &m2){
@@ -121,6 +119,8 @@ public:
 	void FindMaxBinsXYR(Int_t *maxBinX, Int_t *maxBinY, Int_t *maxBinR);
 	void FuzzyKE(TClonesArray* rHitArray);
     void RingSelection();
+    void RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring);
+    void RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring);
     
 	virtual void Init();
 	

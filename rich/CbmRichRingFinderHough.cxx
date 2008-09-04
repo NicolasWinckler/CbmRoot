@@ -63,7 +63,6 @@ void CbmRichRingFinderHough::Init()
     fHistR.resize(fNofBinsR);
     fRingHitsR.resize(fNofBinsR);  
     
-    //fFitCOP = new CbmRichRingFitterEllipse(0, 0, "muon");
     fFitCOP = new CbmRichRingFitterCOP(0, 0);    
     fFitCOP->Init();
     
@@ -71,10 +70,9 @@ void CbmRichRingFinderHough::Init()
     fFitEllipse->Init();   
     
     TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
-    richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights.txt";
+    richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weight.txt";
     fANNSelect = new CbmRichRingSelectNeuralNet(0, richSelectNNFile);   
     fANNSelect->Init();
- 
 }
   
 Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
@@ -114,8 +112,6 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
     		  tempPoint.fId = iHit;
     		  tempPoint.fRefIndex = hit->GetRefIndex();
               tempPoint.fIsUsed = false;
-              tempPoint.fDeviation = -1;
-              tempPoint.fRingNum = -1;
             if (hit->Y() >= 0)
                 UpH.push_back(tempPoint);
             else DownH.push_back(tempPoint);
@@ -182,7 +178,7 @@ void CbmRichRingFinderHough::SetParameters()
     fHitCut = 10;
 
     fHTCutR = 40;
-    fHitCutR = 10;   
+    fHitCutR = 10;  
     
     fNofBinsX = 15;
     fNofBinsY = 15;
@@ -385,7 +381,8 @@ void CbmRichRingFinderHough::HoughTransformReconstruction()
                 }//iHit1
             }//iHit2
         }//iHit3
-       FindPeak(indmin, indmax);
+        //FindAllPeaks(indmin, indmax);
+        FindPeak(indmin, indmax);
     }//main loop over hits
 
 }
@@ -452,8 +449,6 @@ void CbmRichRingFinderHough::CalculateRingParametersOld(Double_t x[],
     t21 = pow(x[0] - *xc, 0.2e1);
     t41 = pow(y[0] - *yc, 0.2e1);
     *r = pow(t21 + t41, 0.5e0);
-
-
 }
 
 void CbmRichRingFinderHough::FindMaxBinsXYR(Int_t *maxBinX, Int_t *maxBinY, Int_t *maxBinR)
@@ -482,98 +477,136 @@ void CbmRichRingFinderHough::FindMaxBinsXYR(Int_t *maxBinX, Int_t *maxBinY, Int_
     *maxBinR = binR;
 }
 
+void CbmRichRingFinderHough::RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring)
+{
+	Double_t xf1 = ring->GetXF1();
+	Double_t yf1 = ring->GetYF1();
+	Double_t xf2 = ring->GetXF2();
+	Double_t yf2 = ring->GetYF2();
+	Double_t drElCut = 0.8*sqrt(ring->GetChi2());
+	if (drElCut > 0.3)	drElCut = 0.3;
+	drElCut = sqrt(drElCut);
+	
+	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
+		Double_t x = fData[j + indmin].fX;
+		Double_t y = fData[j + indmin].fY;
+
+		Double_t d1 = sqrt( (x-xf1)*(x-xf1) + (y-yf1)*(y-yf1));
+		Double_t d2 = sqrt( (x-xf2)*(x-xf2) + (y-yf2)*(y-yf2));
+
+		Double_t dr = fabs(d1 + d2 - 2.* ring->GetAaxis());
+		if (dr < drElCut) {
+			fData[j+indmin].fIsUsed = true;
+		}
+	}
+}
+
+void CbmRichRingFinderHough::RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring)
+{	
+	Double_t drHitCut = sqrt(ring->GetChi2());
+	if (drHitCut > 0.3)	drHitCut = 0.3;
+
+	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
+		Double_t rx = fData[j + indmin].fX - ring->GetCenterX();
+		Double_t ry = fData[j + indmin].fY - ring->GetCenterY();
+
+		Double_t dr = fabs(sqrt(rx * rx + ry * ry) - ring->GetRadius());
+		if (dr < drHitCut) {
+			fData[j+indmin].fIsUsed = true;
+		}
+	}
+}
+
 
 void CbmRichRingFinderHough::FindPeak(Int_t indmin, Int_t indmax)
 {
     Int_t maxBinNumX, maxBinNumY, maxBinNumR;
-    
-    FindMaxBinsXYR(&maxBinNumX, &maxBinNumY, &maxBinNumR);
-    
-    Int_t maxBin = fHist[maxBinNumX][maxBinNumY];
-    Int_t maxBinR = fHistR[maxBinNumR ];
-    if (maxBinNumR >=1 && maxBinNumR <=fHistR.size())
-    	maxBinR += fHistR[maxBinNumR -1] + fHistR[maxBinNumR + 1];  
-    
-    	if (maxBin > fHTCut && maxBinR > fHTCutR){
-    		//std::vector<Int_t> hitIdVec;
-    		
-	        CbmRichRing tempRing1, tempRing2, tempRing3;
-	        Double_t hitCut = maxBin/10.;
-	        if (hitCut <= fHitCut) hitCut = fHitCut;
-	       // hitCut = fHitCut;
-	        for (Int_t j = 0; j < indmax - indmin + 1; j++)
-	        {
-	        	Int_t hitCutR = fRingHitsR[maxBinNumR][j];
-	            if (maxBinNumR >=1 && maxBinNumR <=fHistR.size())
-	            	hitCutR += fRingHitsR[maxBinNumR+1][j] + fRingHitsR[maxBinNumR-1][j];
-	            
-	            if ( fRingHits[maxBinNumX][maxBinNumY][j] >= hitCut &&
-	                 hitCutR >= fHitCutR){
-	                tempRing1.AddHit(fData[j + indmin].fId);
-	            }
-	        }
-	
-	        fFitCOP->DoFit(&tempRing1);
-        
-	        Double_t xc = tempRing1.GetCenterX(); 
-	        Double_t yc = tempRing1.GetCenterY(); 
-	        Double_t radius = tempRing1.GetRadius(); 
-        
-	        for (Int_t j = 0; j < indmax - indmin + 1; j++) 
-	        {
-	        	//if (fData[j + indmin].fIsUsed == true) continue;
-	        	
-	        	Double_t rx = fData[j + indmin].fX - xc; 
-	        	Double_t ry = fData[j + indmin].fY - yc; 
-	     
-	        	Double_t dr = fabs(sqrt(rx * rx + ry * ry) - radius); 
-	        	if (dr <  1){ 
-        		//	fData[j+indmin].fIsUsed = true; 
-	        		fData[j+indmin].fDeviation = dr;
-	        		fData[j+indmin].fRingNum = fFoundRings.size();
-	        		tempRing2.AddHit(fData[j + indmin].fId); 
+	FindMaxBinsXYR(&maxBinNumX, &maxBinNumY, &maxBinNumR);
 
-	        	}// hit deviation
-	        } // hit index
-	        
-	        fFitEllipse->DoFit(&tempRing2);
-	        fANNSelect->DoSelect(&tempRing2);
-	        if (tempRing2.GetSelectionNN() < -0.2) return;
-	        
-	      /*  for (Int_t j = 0; j < indmax - indmin + 1; j++) 
-	        {
-	        	Double_t rx = fData[j + indmin].fX - xc; 
-	        	Double_t ry = fData[j + indmin].fY - yc; 
-	     
-	        	Double_t dr = fabs(sqrt(rx * rx + ry * ry) - radius); 
-	        	if (dr <  0.5){ 
-        			fData[j+indmin].fIsUsed = true; 
-	        	}// hit deviation
-	        } // hit index*/
-	        Double_t axisA = tempRing2.GetAaxis();
-	        Double_t xf1 = tempRing2.GetXF1();
-	        Double_t yf1 = tempRing2.GetYF1();
-	        Double_t xf2 = tempRing2.GetXF2();
-	        Double_t yf2 = tempRing2.GetYF2();	     
-	        
-		    for (Int_t j = 0; j < indmax - indmin + 1; j++){
-		        Double_t x = fData[j + indmin].fX;
-		        Double_t y = fData[j + indmin].fY;
-		        
-		        Double_t d1 = sqrt( (x-xf1)*(x-xf1) + (y-yf1)*(y-yf1) );
-		        Double_t d2 = sqrt( (x-xf2)*(x-xf2) + (y-yf2)*(y-yf2) );
+	Int_t maxBin = fHist[maxBinNumX][maxBinNumY];
+	Int_t maxBinR = fHistR[maxBinNumR ];
+	if (maxBinNumR >=1 && maxBinNumR <=fHistR.size())
+		maxBinR += fHistR[maxBinNumR -1] + fHistR[maxBinNumR + 1];
+
+	if (maxBin < fHTCut || maxBinR < fHTCutR) return;
+
+	CbmRichRing ring1, ring2;
+	Double_t hitCut = maxBin/10.;
+	if (hitCut <= fHitCut)	hitCut = fHitCut;
+
+	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
+		Int_t hitCutR = fRingHitsR[maxBinNumR][j];
+		if (maxBinNumR >=1 && maxBinNumR <=fHistR.size())
+			hitCutR += fRingHitsR[maxBinNumR+1][j] + fRingHitsR[maxBinNumR-1][j];
+
+		if (fRingHits[maxBinNumX][maxBinNumY][j] >= hitCut 
+				&& hitCutR >= fHitCutR) {
+			ring1.AddHit(fData[j + indmin].fId);
+		}
+	}
+
+	fFitCOP->DoFit(&ring1);
+	Double_t drCOPCut = 3*sqrt(ring1.GetChi2());
+	if (drCOPCut > 1.2)	drCOPCut = 1.2;
+
+	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
+		Double_t rx = fData[j + indmin].fX - ring1.GetCenterX();
+		Double_t ry = fData[j + indmin].fY - ring1.GetCenterY();
+
+		Double_t dr = fabs(sqrt(rx * rx + ry * ry) - ring1.GetRadius());
+		if (dr < drCOPCut) {
+			//fData[j+indmin].fIsUsed = true; 
+			ring2.AddHit(fData[j + indmin].fId);
+		}
+	}
+
+	fFitEllipse->DoFit(&ring2);
+	fANNSelect->DoSelect(&ring2);
+	if (ring2.GetSelectionNN() < -0.2) return;
+
+	//RemoveHitsAroundRing(indmin, indmax, &ring1);
+	RemoveHitsAroundEllipse(indmin, indmax, &ring2);
 	
-		        Double_t dr = (d1 + d2 - 2.*axisA)*(d1 + d2 - 2.*axisA);
-	        	if (dr <  0.3){ 
-        			fData[j+indmin].fIsUsed = true; 
-	        	}// hit deviation
-	        } // hit index
-		    
-	      //  fFitEllipse->DoFit(&tempRing2);
-	      //  fANNSelect->DoSelect(&tempRing2);
-	        fFoundRings.push_back(tempRing2);
-	    }
+	fFoundRings.push_back(ring2);	
 }
+
+void CbmRichRingFinderHough::RingSelection()
+{
+	std::sort(fFoundRings.begin(), fFoundRings.end(), CbmRichRingComparatorMore());
+	std::vector<std::set<Int_t> > usedHits;
+	
+	Int_t nofRings = fFoundRings.size();
+	for (Int_t iRing = 0; iRing < nofRings; iRing++){
+		fFoundRings[iRing].SetRecFlag(-1);
+		CbmRichRing ring = fFoundRings[iRing];
+		Int_t nofHits = ring.GetNofHits();
+		Bool_t isGoodRing = true;
+		
+		for (Int_t iRSet = 0; iRSet < usedHits.size(); iRSet++){
+			Int_t nofUsedHits = 0;
+			for(Int_t iHit = 0; iHit < nofHits; iHit++){
+				std::set<Int_t>::iterator it = usedHits[iRSet].find(ring.GetHit(iHit));
+				if(it != usedHits[iRSet].end()){
+					nofUsedHits++;
+				}
+			}
+			if ((Double_t)nofUsedHits/(Double_t)nofHits > 0.5){
+				isGoodRing = false;
+				break;
+			}
+		}// iRSet
+		
+		if (isGoodRing){
+			fFoundRings[iRing].SetRecFlag(1);
+			std::set<Int_t> usedHitsT;
+			for(Int_t iHit = 0; iHit < nofHits; iHit++){
+				usedHitsT.insert(ring.GetHit(iHit));
+			}
+			usedHits.push_back(usedHitsT);
+		}
+	}
+}
+
 
 void CbmRichRingFinderHough::FuzzyKE(TClonesArray* rHitArray)
 {
@@ -668,44 +701,6 @@ void CbmRichRingFinderHough::FuzzyKE(TClonesArray* rHitArray)
 	
 	//fFoundRings.clear();
 	//fFoundRings.assign(foundRingsFuzzy.begin(), foundRingsFuzzy.end());*/
-}
-
-void CbmRichRingFinderHough::RingSelection()
-{
-	std::sort(fFoundRings.begin(), fFoundRings.end(), CbmRichRingComparatorMore());
-	std::vector<std::set<Int_t> > usedHits;
-	
-	Int_t nofRings = fFoundRings.size();
-	for (Int_t iRing = 0; iRing < nofRings; iRing++){
-		fFoundRings[iRing].SetRecFlag(-1);
-		CbmRichRing ring = fFoundRings[iRing];
-		Int_t nofHits = ring.GetNofHits();
-		Bool_t isGoodRing = true;
-		
-		for (Int_t iRSet = 0; iRSet < usedHits.size(); iRSet++){
-			Int_t nofUsedHits = 0;
-			for(Int_t iHit = 0; iHit < nofHits; iHit++){
-				std::set<Int_t>::iterator it = usedHits[iRSet].find(ring.GetHit(iHit));
-				if(it != usedHits[iRSet].end()){
-					nofUsedHits++;
-				}
-			}
-			if ((Double_t)nofUsedHits/(Double_t)nofHits > 0.5){
-				isGoodRing = false;
-				break;
-			}
-		}// iRSet
-		
-		if (isGoodRing){
-			fFoundRings[iRing].SetRecFlag(1);
-			std::set<Int_t> usedHitsT;
-			for(Int_t iHit = 0; iHit < nofHits; iHit++){
-				usedHitsT.insert(ring.GetHit(iHit));
-			}
-			usedHits.push_back(usedHitsT);
-		}
-	}
-	
 }
 
 ClassImp(CbmRichRingFinderHough)

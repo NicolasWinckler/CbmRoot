@@ -562,12 +562,15 @@ void CbmRichRingFinderHough::FindPeak(Int_t indmin, Int_t indmax)
 
 	fFitEllipse->DoFit(&ring2);
 	fANNSelect->DoSelect(&ring2);
-	if (ring2.GetSelectionNN() < -0.2) return;
-
-	//RemoveHitsAroundRing(indmin, indmax, &ring1);
-	RemoveHitsAroundEllipse(indmin, indmax, &ring2);
+	//remove found hits only for godd quality rings
+	if (ring2.GetSelectionNN() > -0.5) {	
+		//RemoveHitsAroundRing(indmin, indmax, &ring1);
+		RemoveHitsAroundEllipse(indmin, indmax, &ring2);
 	
-	fFoundRings.push_back(ring2);	
+	
+		fFoundRings.push_back(ring2);	
+	
+	}
 }
 
 void CbmRichRingFinderHough::RingSelection()

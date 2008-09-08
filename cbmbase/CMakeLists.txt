@@ -24,6 +24,7 @@ CbmDigiManager.cxx
 CbmStack.cxx 
 CbmTrack.cxx
 CbmTrkHit.cxx
+CbmPropagator.cxx
 CbmMCTrack.cxx
 )
 

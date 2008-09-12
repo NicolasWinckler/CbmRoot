@@ -39,12 +39,15 @@ protected:
     		std::vector<Int_t>& nofMissingHits,  
             CbmLitTrackParam* par,     
             CbmLitTrackParam* uPar,
-            HitVector& hits);
+            HitVector& hits,
+            std::vector<Double_t>& chi2);
     
     // Adds track candidate 
     void AddTrackCandidate(
     		const CbmLitTrack* track, 
     		const HitVector& hits, 
+    		const std::vector<Double_t>& chi2,
+    		const CbmLitTrackParam* par,
     		Int_t station);
     
     void RefitTracks(

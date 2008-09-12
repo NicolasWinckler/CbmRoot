@@ -34,16 +34,6 @@ private:
 	TClonesArray* fTrackSeedsArray;
 	
 	CbmLitTrackPropagator* fPropagatorToDet;
-	CbmLitTrackPropagator* fPropagator;
-	CbmLitTrackUpdate* fFilter;
-	CbmLitTrackFitter* fFitter;
-	CbmLitTrackSelection* fTrackSeedSelection;
-	CbmLitTrackSelection* fTrackSelectionStation;
-	CbmLitTrackSelection* fTrackSelectionFinal;
-
-	CbmLitDetectorLayout fLayout;
-	
-    Int_t fVerbose;
     
 	void CreateTrackSeeds(
     		TClonesArray* trackArray,

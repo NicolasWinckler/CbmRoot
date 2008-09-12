@@ -26,53 +26,69 @@ public:
 			Bool_t downstream = true);
 private:
 	
+	LitStatus MultivariateGaussWeight(
+			const CbmLitTrackParam* par,
+			CbmLitHit* hit,
+			Double_t T) const;
+
+	Double_t MultivariateGaussCut(
+			const CbmLitHit* hit,
+			Double_t T,
+			Double_t cutValue) const;
+
+	LitStatus CalcWeights(
+			const CbmLitTrackParam* par,
+			HitIterator itBegin,
+			HitIterator itEnd,
+			Int_t iter) const;
+	
+	Bool_t AreAllOutliers(
+			HitIterator itBegin,
+			HitIterator itEnd) const;
+	
+	void MarkOutliers(
+			HitIterator itBegin,
+			HitIterator itEnd) const;
+	
+	LitStatus Normalize(
+			HitIterator itBegin,
+			HitIterator itEnd) const;
+	
+	LitStatus CreateEffTrack(
+			const std::vector<HitIteratorPair>& bounds,
+			Int_t iter,
+			CbmLitTrack* etrack) const;
+	
+	LitStatus CheckEffTrack(
+			const CbmLitTrack* track) const;
+	
+//	LitStatus KoshiWeight(
+//			const CbmLitTrackParam* par,
+//			HitIterator itBegin,
+//			HitIterator itEnd,
+//			Int_t iter);
+//	
+//	LitStatus OptimalWeight(
+//			const CbmLitTrackParam* par,
+//			HitIterator itBegin,
+//			HitIterator itEnd,
+//			Int_t iter);
+//	
+//	LitStatus TukeyWeight(
+//			const CbmLitTrackParam* par,
+//			HitIterator itBegin,
+//			HitIterator itEnd,
+//			Int_t iter);
+		
 	CbmLitTrackFitter* fFitter;
 	CbmLitTrackFitter* fSmoother;
 	CbmLitWeightCalculator* fWeightCalc;
 	CbmLitEffHitCalculator* fEffHitCalc;
 	CbmLitWeightCalculator* fWeightCalcSimple;
 	
-	LitStatus KoshiWeight(
-			const CbmLitTrackParam* par,
-			HitIterator itBegin,
-			HitIterator itEnd,
-			Int_t iter);
-	
-	LitStatus OptimalWeight(
-			const CbmLitTrackParam* par,
-			HitIterator itBegin,
-			HitIterator itEnd,
-			Int_t iter);
-	
-	LitStatus TukeyWeight(
-			const CbmLitTrackParam* par,
-			HitIterator itBegin,
-			HitIterator itEnd,
-			Int_t iter);
-	
-	LitStatus DAFWeight(
-			const CbmLitTrackParam* par,
-			CbmLitHit* hit,
-			Double_t beta);
-
-	Double_t DAFCut(
-			const CbmLitHit* hit,
-			Double_t beta,
-			Double_t cutValue);
-
-	LitStatus DAFWeight(
-			const CbmLitTrackParam* par,
-			HitIterator itBegin,
-			HitIterator itEnd,
-			Int_t iter);
-	
-	Bool_t AreAllOutliers(
-			HitIterator itBegin,
-			HitIterator itEnd);
-	
-	void MarkOutliers(
-			HitIterator itBegin,
-			HitIterator itEnd);
+	Int_t fNofIterations;
+	std::vector<Double_t> fAnnealing;
+	Double_t fOutlierCut;	
 	
 	ClassDef(CbmLitTrackFitterRobust, 1);	
 };

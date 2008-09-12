@@ -27,12 +27,6 @@ CbmLitMuchTrackFinderRobust::CbmLitMuchTrackFinderRobust()
 CbmLitMuchTrackFinderRobust::~CbmLitMuchTrackFinderRobust()
 {
 	if (fPropagatorToDet) delete fPropagatorToDet;
-	if (fPropagator) delete fPropagator;
-	if (fFilter) delete fFilter;
-	if (fFitter) delete fFitter;
-	if (fTrackSeedSelection) delete fTrackSeedSelection;
-	if (fTrackSelectionStation) delete fTrackSelectionStation;
-	if (fTrackSelectionFinal) delete fTrackSelectionFinal;
 }
 
 void CbmLitMuchTrackFinderRobust::Init()
@@ -44,47 +38,20 @@ void CbmLitMuchTrackFinderRobust::Init()
    fTrackSeedsArray = (TClonesArray*) rootMgr->GetObject("STSTrack");
    if(NULL == fTrackSeedsArray) 
       TObject::Fatal("CbmLitMuchTrackFinderRobust::Init","no STS track array");
-  
-   
+     
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
    fPropagatorToDet = fPropagator = factory->CreateTrackPropagator("Much");
-   //fFilter = factory->CreateTrackUpdate("Much");
-   //fTrackSelectionStation = factory->CreateTrackSelection("Empty");
    
-   fTrackSeedSelection = factory->CreateTrackSelection("Momentum");
-   //fTrackSeedSelection->Properties().SetProperty("fMinMomentum", 0.1);
-   
-   fTrackSelectionFinal = factory->CreateTrackSelection("MuchRobust");
-   //fTrackSelectionFinal = factory->CreateTrackSelection("Empty");
-   
-//   fTrackSelectionFinal = new CbmLitTrackSelectionD();
-//   fTrackSelectionFinal->Properties().SetProperty("fMinNofHits", 1);
-//   Int_t nofLayers = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofLayers();
-//   fTrackSelectionFinal->Properties().SetProperty("fMinLastPlaneId", nofLayers-1);
-//   fTrackSelectionFinal->Initialize();  
-   
-   //fFitter = factory->CreateTrackFitter("MuchRobust");
+   fSeedSelection = factory->CreateTrackSelection("MomentumSeed");
+   fFinalSelection = factory->CreateTrackSelection("MuchRobust");
 	
    fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
-   SetDetectorLayout(fLayout);
-   SetPropagator(fPropagator);
-   SetTrackSeedSelection(fTrackSeedSelection);   
-   //SetTrackSelectionStation(fTrackSelectionStation);
-   SetTrackSelectionFinal(fTrackSelectionFinal);
-   //SetFilter(fFilter); 
-   //SetFitter(fFitter); 
-   SetVerbose(1);
-   SetNofIter(1); 
-   //SetBeginStation(0); 
-   //SetEndStation(fLayout.GetNofStations() - 1);
-   //SetMaxNofMissingHitsInStation(0);
-   SetMaxNofMissingHits(1);
-   SetSigmaCoef(3.5); 
-//   SetPrecalcSearchRegions(false); 
-   //SetApplyUpdateInLayer(true);
-   //SetSigmaX(sigmaX);
-   //SetSigmaY(sigmaY);
-   SetPDG(13);
+   
+   fVerbose = 1;
+   fNofIter = 1; 
+   fMaxNofMissingHits = 1;
+   fSigmaCoef = 3.5; 
+   fPDG = 13;
 }
 
 Int_t CbmLitMuchTrackFinderRobust::DoFind(

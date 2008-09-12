@@ -25,3 +25,10 @@ Double_t ChiSq(
 	return chi2;
 }
 
+Int_t NDF(
+		Int_t nofHits)
+{
+   // TODO check NDF
+   if (nofHits > 2) return (2 * nofHits - 5);
+   else return 1; 
+}

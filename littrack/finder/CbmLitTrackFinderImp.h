@@ -23,44 +23,7 @@ public:
 	
 	CbmLitTrackFinderImp();
 	virtual ~CbmLitTrackFinderImp();
-	
-	void SetDetectorLayout(const CbmLitDetectorLayout& layout) {
-		fLayout = layout;
-	}
-	void SetPropagator(CbmLitTrackPropagator *propagator) {
-	   	fPropagator = propagator;
-	}
-	void SetFilter(CbmLitTrackUpdate *filter) {
-	   	fFilter = filter;
-	}
-	void SetFitter(CbmLitTrackFitter *fitter) {
-	   	fFitter = fitter;
-	}
-	void SetTrackSeedSelection(CbmLitTrackSelection *selection) {
-		fTrackSeedSelection = selection;
-	}
-	void SetTrackSelectionStation(CbmLitTrackSelection *selection) {
-		fTrackSelectionStation = selection;
-	}
-	void SetTrackSelectionFinal(CbmLitTrackSelection *selection) {
-		fTrackSelectionFinal = selection;
-	}
-	void SetVerbose(Int_t verbose) { fVerbose = verbose; }
-    void SetNofIter(Int_t nofIter) {fNofIter = nofIter;}
-	void SetBeginStation(Int_t beginStation) {fBeginStation = beginStation;}
-	void SetEndStation(Int_t endStation) {fEndStation = endStation;}
-	void SetMaxNofMissingHitsInStation(Int_t maxNofMissingHitsInStation) {
-	   	fMaxNofMissingHitsInStation = maxNofMissingHitsInStation;
-	}
-	void SetMaxNofMissingHits(Int_t maxNofMissingHits) {
-	   	fMaxNofMissingHits = maxNofMissingHits;
-	}
-	void SetSigmaCoef(Double_t sigmaCoef) { fSigmaCoef = sigmaCoef;}
-//	void SetApplyUpdateInLayer(Bool_t applyUpdateInLayer) {
-//	   	fApplyUpdateInLayer = applyUpdateInLayer;
-//	}
-	void SetPDG(Int_t pdg) { fPDG = pdg;}
-	
+
 protected:
 
     CbmLitDetectorLayout fLayout;
@@ -77,10 +40,11 @@ protected:
     CbmLitTrackFitter *fFitter;
     
     // track selection tools
-    CbmLitTrackSelection* fTrackSeedSelection;
-    CbmLitTrackSelection* fTrackSelectionStation;
-    CbmLitTrackSelection* fTrackSelectionFinal;
-    
+    CbmLitTrackSelection* fSeedSelection;
+    CbmLitTrackSelection* fStationSelection;
+    CbmLitTrackSelection* fFinalSelection;
+    CbmLitTrackSelection* fFinalPreSelection;
+        
     // Verbosity level
     Int_t fVerbose;
     
@@ -93,8 +57,8 @@ protected:
     Int_t fMaxNofMissingHitsInStation;
     Int_t fMaxNofMissingHits;
     Double_t fSigmaCoef;
-//    Bool_t fApplyUpdateInLayer;
     Int_t fPDG;
+    Double_t fMaxErrSq;
     
     // Max measurement error for each layer
     std::vector<Double_t> fMaxErrX;

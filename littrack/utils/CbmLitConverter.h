@@ -45,6 +45,11 @@ public:
 			const CbmStsTrack* stsTrack,
 			CbmLitTrack* litTrack);
 	
+	void MuchTrackToLitTrack(
+			const CbmMuchTrack* muchTrack,
+			CbmLitTrack* litTrack,
+			TClonesArray* hits);
+	
 	static void LitTrackToMuchTrack(
 			const CbmLitTrack* litTrack,
 			CbmMuchTrack* muchTrack);

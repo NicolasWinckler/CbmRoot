@@ -7,8 +7,9 @@
 #include "CbmLitTrackSelection.h"
 
 #include "CbmLitRK4TrackExtrapolator.h"
+#include "CbmLitLineTrackExtrapolator.h"
 #include "CbmLitTrackPropagatorImp.h"
-#include "CbmTrackPropagatorGeane.h"
+#include "CbmLitTrackPropagatorGeane.h"
 #include "CbmLitTrackSelectionEmpty.h"
 #include "CbmLitTrackSelectionChiSq.h"
 #include "CbmLitTrackSelectionMuch.h"
@@ -16,10 +17,12 @@
 #include "CbmLitTrackSelectionMomentum.h"
 #include "CbmLitTrackSelectionMuchRobust.h"
 #include "CbmLitRobustSelection.h"
+#include "CbmLitTrackSelectionD.h"
 #include "CbmLitKalmanFilter.h"
 #include "CbmLitKalmanSmoother.h"
 #include "CbmLitTrackFitterImp.h"
 #include "CbmLitTrackFitterRobust.h"
+#include "CbmLitTrackFitterIter.h"
 #include "CbmLitEnvironment.h"
 
 //#include <boost/tr1/memory.hpp>
@@ -62,9 +65,25 @@ CbmLitTrackPropagator* CbmLitToolFactory::CreateTrackPropagator(
 	
 	} else 
 	if(name == "Geane") {
-		propagator = new CbmTrackPropagatorGeane();
+		propagator = new CbmLitTrackPropagatorGeane();
 	    propagator->Initialize();
 	}
+	if(name == "rk4") {
+		//TODO delete extrapolator!!!!
+	   CbmLitRK4TrackExtrapolator* extrapolator = new CbmLitRK4TrackExtrapolator();
+	   extrapolator->Initialize();
+	   CbmLitTrackPropagatorImp* litpropagator = new CbmLitTrackPropagatorImp(extrapolator);
+	   litpropagator->Initialize();
+	   return litpropagator;
+	} else 
+	if(name == "line") {
+		//TODO delete extrapolator!!!!
+	   CbmLitLineTrackExtrapolator* extrapolator = new CbmLitLineTrackExtrapolator();
+	   extrapolator->Initialize();
+	   CbmLitTrackPropagatorImp* litpropagator = new CbmLitTrackPropagatorImp(extrapolator);
+	   litpropagator->Initialize();
+	   return litpropagator;
+	}	
 	return propagator;
 }
 
@@ -96,8 +115,14 @@ CbmLitTrackFitter* CbmLitToolFactory::CreateTrackFitter(
 		//TODO delete propagator and update and fitter after use
 		CbmLitTrackFitter* fitterImp = CreateTrackFitter("Much");
 		CbmLitTrackFitter* smoother = new CbmLitKalmanSmoother();
-		
 		fitter = new CbmLitTrackFitterRobust(fitterImp, smoother);
+		return fitter;
+	} else
+	if(name == "MuchIter") {
+		//TODO delete propagator and update and fitter after use
+		CbmLitTrackFitter* fitterImp = CreateTrackFitter("Much");
+		CbmLitTrackFitter* smoother = new CbmLitKalmanSmoother();
+		fitter = new CbmLitTrackFitterIter(fitterImp, smoother);
 		return fitter;
 	} else
 	if(name == "Trd") {
@@ -131,6 +156,12 @@ CbmLitTrackSelection* CbmLitToolFactory::CreateTrackSelection(
 		momSelection->Initialize();
 		return momSelection;
 	} else
+	if(name == "MomentumSeed") {
+		CbmLitTrackSelectionMomentum* momSelection = new CbmLitTrackSelectionMomentum();
+		momSelection->SetMinMomentum(2.5);
+		momSelection->Initialize();
+		return momSelection;
+	} else	
 	if(name == "Chi2") {
 		CbmLitTrackSelectionChiSq* chiSqSelection = new CbmLitTrackSelectionChiSq();
 		chiSqSelection->SetMaxChiSq(30);
@@ -150,15 +181,25 @@ CbmLitTrackSelection* CbmLitToolFactory::CreateTrackSelection(
 		selection->Initialize();
 		return selection;
 	} else 
-	if(name == "Much") {
+	if(name == "MuchFinal") {
 		CbmLitTrackSelectionMuch* muchSelection = new CbmLitTrackSelectionMuch();
 		muchSelection->SetNofSharedHits(2);
-		muchSelection->SetMinNofHits(1);
 		Int_t nofStations = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofStations();
 		muchSelection->SetMinLastPlaneId(nofStations-1);
+		Int_t nofLayers = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofLayers();
+		muchSelection->SetMinNofHits(nofLayers - 3);
 		muchSelection->Initialize(); 
 		return muchSelection;
 	} else 
+	if(name == "MuchPreFinal") {
+		CbmLitTrackSelectionD* muchSelection = new CbmLitTrackSelectionD();
+		Int_t nofStations = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofStations();
+		muchSelection->SetMinLastPlaneId(nofStations-1);
+		Int_t nofLayers = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofLayers();
+		muchSelection->SetMinNofHits(nofLayers - 3);
+		muchSelection->Initialize(); 
+		return muchSelection;
+	} else 	
 	if(name == "TrdStation") {
 		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
 		trdSelection->SetNofSharedHits(2);

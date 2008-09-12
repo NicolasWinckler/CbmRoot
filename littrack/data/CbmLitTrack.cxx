@@ -21,7 +21,8 @@ CbmLitTrack::~CbmLitTrack()
 	ClearHits();
 }
 
-CbmLitTrack& CbmLitTrack::operator=(const CbmLitTrack& track)
+CbmLitTrack& CbmLitTrack::operator=(
+		const CbmLitTrack& track)
 {
 	for_each(fHits.begin(), fHits.end(), DeleteObject());
 	fHits.clear();
@@ -41,12 +42,23 @@ CbmLitTrack& CbmLitTrack::operator=(const CbmLitTrack& track)
 	return *this;
 }
 
-void CbmLitTrack::AddHit(const CbmLitHit* hit){
+void CbmLitTrack::AddHit(
+		const CbmLitHit* hit)
+{
 	CbmLitHit* newHit = new CbmLitHit(*hit);
 	fHits.push_back(newHit);
 }
 
-void CbmLitTrack::ClearHits() {
+void CbmLitTrack::RemoveHit(
+		Int_t index)
+{
+	delete fHits[index];
+	fHits.erase(fHits.begin() + index);
+	if (!fFitNodes.empty()) fFitNodes.erase(fFitNodes.begin() + index);
+}
+
+void CbmLitTrack::ClearHits() 
+{
 	std::for_each(fHits.begin(), fHits.end(), DeleteObject());
 	fHits.clear();
 }
@@ -61,7 +73,8 @@ std::string CbmLitTrack::ToString() const
 	return ss.str();
 }
 
-void CbmLitTrack::SortHits(Bool_t downstream)
+void CbmLitTrack::SortHits(
+		Bool_t downstream)
 {
 	if (downstream) std::sort(fHits.begin(), fHits.end(), CompareHitPtrPlaneIdLess());
 	else std::sort(fHits.begin(), fHits.end(), CompareHitPtrPlaneIdMore());
@@ -77,7 +90,6 @@ Bool_t CbmLitTrack::CheckParams() const
 		if (TMath::Abs(covFirst[i]) > 10000. ||
 			TMath::Abs(covLast[i]) > 10000.) return false;	
 	}
-
 	return true;
 }
 

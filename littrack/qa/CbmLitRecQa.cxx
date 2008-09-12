@@ -30,7 +30,7 @@ CbmLitRecQa::CbmLitRecQa(
 		Double_t quota,
 		DetectorId detId,
 		Int_t iVerbose):
-  CbmTask("MuchRecQA", iVerbose),
+  CbmTask("LitRecQA", iVerbose),
   fMinPoints(minPoints),
   fQuota(quota),
   fDetId(detId),
@@ -609,7 +609,7 @@ void CbmLitRecQa::CreateHistos()
   
   //histograms for true and ghost tracks
   Double_t minChi2   =  0.;
-  Double_t maxChi2   = 100.;
+  Double_t maxChi2   = 20.;
   Int_t nBinsChi2 = 100;
   Int_t minNofHits = 0;
   Int_t maxNofHits = 18;

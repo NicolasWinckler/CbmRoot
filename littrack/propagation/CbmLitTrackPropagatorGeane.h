@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-// -----                  CbmTrackPropagatorGeane header file               -----
+// -----                  CbmLitTrackPropagatorGeane header file               -----
 // -----                  Created 22/11/07  by A. Lebedev               -----
 // -------------------------------------------------------------------------
 
@@ -9,27 +9,21 @@
  **
  **/ 
 
-#ifndef CBMTRACKPROPAGATORGEANE_H
-#define CBMTRACKPROPAGATORGEANE_H
+#ifndef CBMLITTRACKPROPAGATORGEANE_H
+#define CBMLITTRACKPROPAGATORGEANE_H
 
 #include "CbmLitTrackPropagator.h"
-
-#include "CbmField.h"
-#include "CbmGeanePro.h"
 
 #include "TMatrixD.h"
 
 #include <vector>
 
-class CbmTrackPropagatorGeane: public CbmLitTrackPropagator {
+class CbmPropagator;
 
+class CbmLitTrackPropagatorGeane: public CbmLitTrackPropagator {
 public:
-   
-   // constructor
-   CbmTrackPropagatorGeane();
-      
-   // distructor
-   virtual ~CbmTrackPropagatorGeane();
+   CbmLitTrackPropagatorGeane();
+   virtual ~CbmLitTrackPropagatorGeane();
    
    // derived from CbmTool
    virtual LitStatus Initialize();
@@ -57,21 +51,9 @@ public:
    }
    
 private:
-	void ToGeaneCovMatrix(
-			const std::vector<Double_t>& cov,
-			std::vector<Double_t>& gCov);
-
-	void FromGeaneCovMatrix(
-			const std::vector<Double_t>& gCov,
-			std::vector<Double_t>& cov);
-	
-	Bool_t IsInParCorrect(
-			const CbmLitTrackParam* par);
-	
-   CbmGeanePro *fPropagator;
+   CbmPropagator *fPropagator;
       
-   ClassDef(CbmTrackPropagatorGeane,1)
+   ClassDef(CbmLitTrackPropagatorGeane,1)
 }; 
 
-#endif //CbmTrackPropagatorGeane
-
+#endif //CbmLitTrackPropagatorGeane

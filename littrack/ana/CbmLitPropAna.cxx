@@ -7,7 +7,7 @@
 #include "CbmLitTrackPropagatorImp.h"
 #include "CbmLitLineTrackExtrapolator.h"
 #include "CbmLitRK4TrackExtrapolator.h"
-#include "CbmTrackPropagatorGeane.h"
+#include "CbmLitTrackPropagatorGeane.h"
 #include "CbmLitConverter.h"
 #include "CbmLitTrack.h"
 #include "CbmLitHit.h"
@@ -32,6 +32,7 @@
 #include "TH1F.h"
 
 #include <iostream>
+#include <iomanip>
 #include <cmath>
 #include <sstream>
 
@@ -88,10 +89,10 @@ InitStatus CbmLitPropAna::Init()
 	   fPropagatorDet->Initialize();
    }
    
-   fExtrapolator = new CbmLitLineTrackExtrapolator();
-   fExtrapolator->Initialize();
-   fPropagator = new CbmLitTrackPropagatorImp(fExtrapolator);
-//    fPropagator = new CbmTrackPropagatorGeane();
+//   fExtrapolator = new CbmLitLineTrackExtrapolator();
+//   fExtrapolator->Initialize();
+//   fPropagator = new CbmLitTrackPropagatorImp(fExtrapolator);
+    fPropagator = new CbmLitTrackPropagatorGeane();
     fPropagator->Initialize();
      
    fFilter = new CbmLitKalmanFilter();

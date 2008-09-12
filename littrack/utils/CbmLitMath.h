@@ -9,5 +9,7 @@ Double_t ChiSq(
 		const CbmLitTrackParam* par, 						
 		const CbmLitHit* hit);
 
+Int_t NDF(
+		Int_t nofHits);
 
 #endif /*CBMLITMATH_H_*/

@@ -26,12 +26,6 @@ CbmLitMuchTrackFinderBranch::CbmLitMuchTrackFinderBranch()
 CbmLitMuchTrackFinderBranch::~CbmLitMuchTrackFinderBranch()
 {
 	if (fPropagatorToDet) delete fPropagatorToDet;
-	if (fPropagator) delete fPropagator;
-	if (fFilter) delete fFilter;
-	if (fFitter) delete fFitter;
-	if (fTrackSeedSelection) delete fTrackSeedSelection;
-	if (fTrackSelectionStation) delete fTrackSelectionStation;
-	if (fTrackSelectionFinal) delete fTrackSelectionFinal;
 }
 
 void CbmLitMuchTrackFinderBranch::Init()
@@ -47,31 +41,21 @@ void CbmLitMuchTrackFinderBranch::Init()
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
    fPropagatorToDet = fPropagator = factory->CreateTrackPropagator("Much");
    fFilter = factory->CreateTrackUpdate("Much");
-   fTrackSeedSelection = factory->CreateTrackSelection("Momentum");
-   fTrackSelectionStation = factory->CreateTrackSelection("Momentum");
-   fTrackSelectionFinal = factory->CreateTrackSelection("Much");
-   fFitter = factory->CreateTrackFitter("Much");
+   fSeedSelection = factory->CreateTrackSelection("Momentum");
+   fStationSelection = factory->CreateTrackSelection("Momentum");
+   fFinalSelection = factory->CreateTrackSelection("MuchFinal");
+   fFinalPreSelection = factory->CreateTrackSelection("MuchPreFinal");
+   fFitter = factory->CreateTrackFitter("MuchIter");
  
    fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
-   SetDetectorLayout(fLayout);
-   SetPropagator(fPropagator);
-   SetTrackSeedSelection(fTrackSeedSelection);
-   SetTrackSelectionStation(fTrackSelectionStation);
-   SetTrackSelectionFinal(fTrackSelectionFinal);
-   SetFilter(fFilter); 
-   SetFitter(fFitter); 
-   SetVerbose(1);
-   SetNofIter(1); 
-   SetBeginStation(0); 
-   SetEndStation(fLayout.GetNofStations() - 1);
-   SetMaxNofMissingHitsInStation(0);
-   SetMaxNofMissingHits(0);
-   SetSigmaCoef(3.); 
-//   SetPrecalcSearchRegions(false); 
-//   SetApplyUpdateInLayer(true);
-   SetPDG(13);
-   //SetSigmaX(sigmaX);
-   //SetSigmaY(sigmaY);
+   fVerbose = 1;
+   fNofIter = 1;
+   fBeginStation = 0;
+   fEndStation = fLayout.GetNofStations() - 1;
+   fMaxNofMissingHitsInStation = 0;
+   fMaxNofMissingHits = 0;
+   fSigmaCoef = 3.;
+   fPDG = 13;
 }
 
 Int_t CbmLitMuchTrackFinderBranch::DoFind(

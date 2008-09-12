@@ -38,21 +38,19 @@ LitStatus CbmLitKalmanSmoother::Fit(
 	// start with the before the last detector plane 
 	for (Int_t i = n - 1; i > 0; i--) {	
 		Smooth(&nodes[i - 1], &nodes[i]);
-	    
 	}
-	
-	track->SetParamFirst(nodes[0].GetSmoothedParam());	
-	track->SetFitNodes(nodes);
 	
 	// Calculate the chi2 of the track
 	track->SetChi2(0.0);
 	for (Int_t i = 0; i < n; i++) {	
 		Double_t chi2Hit = ChiSq(nodes[i].GetSmoothedParam(), track->GetHit(i));
+		nodes[i].SetChiSqSmoothed(chi2Hit);
 		track->SetChi2(track->GetChi2() + chi2Hit); 
 	}
-	// TODO check NDF
-	if (n > 2) track->SetNDF( 2 * n - 5);
-	else track->SetNDF(1);
+    
+	track->SetParamFirst(nodes[0].GetSmoothedParam());	
+	track->SetFitNodes(nodes);
+	track->SetNDF(NDF(n));
 	
 	return kLITSUCCESS;
 }

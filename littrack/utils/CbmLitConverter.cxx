@@ -99,6 +99,30 @@ void CbmLitConverter::StsTrackToLitTrack(
 	litTrack->SetParamLast(&paramLast);
 }
 
+void CbmLitConverter::MuchTrackToLitTrack(
+		const CbmMuchTrack* muchTrack,
+		CbmLitTrack* litTrack,
+		TClonesArray* hits)
+{
+	for (int iHit = 0; iHit < muchTrack->GetNHits(); iHit++) {
+		Int_t index = muchTrack->GetHitIndex(iHit);
+		CbmTrkHit* hit = (CbmTrkHit*) hits->At(index);
+		CbmLitHit litHit;
+		TrkHitToLitHit(hit, index, &litHit);
+		litTrack->AddHit(&litHit);
+	}
+	
+	litTrack->SetQuality(kLITGOOD);
+	litTrack->SetChi2(muchTrack->GetChi2());
+	litTrack->SetNDF(muchTrack->GetNDF());
+	litTrack->SetPreviousTrackId(muchTrack->GetStsTrackID());	
+	CbmLitTrackParam paramFirst, paramLast;
+	//TODO remove this const typecasting
+	CbmLitConverter::TrackParamToLitTrackParam((const_cast<CbmMuchTrack*> (muchTrack))->GetMuchTrack(), &paramFirst);
+	CbmLitConverter::TrackParamToLitTrackParam((const_cast<CbmMuchTrack*> (muchTrack))->GetMuchTrack(), &paramLast);
+	litTrack->SetParamFirst(&paramFirst);
+	litTrack->SetParamLast(&paramLast);
+}
 void CbmLitConverter::LitTrackToMuchTrack(
 		const CbmLitTrack* litTrack,
 		CbmMuchTrack* muchTrack)

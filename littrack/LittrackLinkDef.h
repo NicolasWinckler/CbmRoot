@@ -11,8 +11,12 @@
 
 // base
 #pragma link C++ class  CbmLitTool+;
-#pragma link C++ class CbmLitPDG+;
+#pragma link C++ class  CbmLitPDG+;
 #pragma link C++ class  CbmLitDetectorLayout+;
+
+//cbm
+#pragma link C++ class  CbmPropagatorGeane+;
+#pragma link C++ class  CbmPropagatorLit+;
 
 // data
 #pragma link C++ class  CbmLitHit+;
@@ -34,6 +38,7 @@
 #pragma link C++ class  CbmLitTrackFitterImp+;
 #pragma link C++ class  CbmLitKalmanFilter+;
 #pragma link C++ class  CbmLitTrackFitterRobust+;
+#pragma link C++ class  CbmLitTrackFitterIter+;
 
 // interface
 #pragma link C++ class  CbmLitTrackFitter+;
@@ -50,7 +55,7 @@
 #pragma link C++ class  CbmLitTrackPropagatorImp+;
 #pragma link C++ class  CbmLitRK4TrackExtrapolator+;
 #pragma link C++ class  CbmLitLineTrackExtrapolator+;
-#pragma link C++ class  CbmTrackPropagatorGeane+;
+#pragma link C++ class  CbmLitTrackPropagatorGeane+;
 #pragma link C++ class  CbmLitGeoNavigatorImp+;
 #pragma link C++ class  CbmLitMaterialInfo+;
 #pragma link C++ class CbmLitMaterialEffectsImp+;

@@ -15,11 +15,18 @@ CbmLitTrackFinderImp::CbmLitTrackFinderImp()
 {
 	//TODO set default settings for the tracking
 	fEventNo = 0;
+	fMaxErrSq = 20. * 20.;
 }
 
 CbmLitTrackFinderImp::~CbmLitTrackFinderImp()
 {
-
+	if (fPropagator) delete fPropagator;
+	if (fFilter) delete fFilter;
+	if (fFitter) delete fFitter;
+	if (fSeedSelection) delete fSeedSelection;
+	if (fStationSelection) delete fStationSelection;
+	if (fFinalSelection) delete fFinalSelection;
+	if (fFinalPreSelection) delete fFinalPreSelection;
 }
 
 void CbmLitTrackFinderImp::ArrangeHits()
@@ -80,7 +87,7 @@ void CbmLitTrackFinderImp::ArrangeHits()
 void CbmLitTrackFinderImp::InitTrackSeeds()
 {
 	//TODO if more than one iteration, restore the state of the seeds
-	fTrackSeedSelection->DoSelect(fTrackSeedArray);
+	fSeedSelection->DoSelect(fTrackSeedArray);
 	
 	for (TrackIterator iTrack = fTrackSeedArray.begin(); iTrack != fTrackSeedArray.end(); iTrack++) {
 		if ((*iTrack)->GetQuality() == kLITBAD) continue;
@@ -108,11 +115,11 @@ Bool_t CbmLitTrackFinderImp::IsIn(
 		const CbmLitTrackParam* par, 
 		const CbmLitHit *hit) const 
 {
-    Double_t Cov00 = std::abs(par->GetCovariance(0));
-    Double_t Cov11 = std::abs(par->GetCovariance(5));
+    Double_t Cov00 = par->GetCovariance(0);
+    Double_t Cov11 = par->GetCovariance(5);
     
-    //TODO do not use this cuts here
-//	if(Cov00 > 100. || Cov11 > 100.) return kFALSE;  
+	if(Cov00 > fMaxErrSq || Cov11 > fMaxErrSq) return kFALSE;  
+	if(Cov00 < 0. || Cov11 < 0.) return kFALSE;  
    
    	Double_t x1 = par->GetX();
    	Double_t x2 = hit->GetX();
@@ -140,6 +147,7 @@ HitIteratorPair CbmLitTrackFinderImp::MinMaxIndex(
    
    if (fMaxErrY[layer] != 0) {
       Double_t devY = CalcDevY(par, layer);
+      if (devY == 0.) return bounds;
       hit.SetY(par->GetY() - devY);
       bounds.first = lower_bound(fHits[layer].begin(), fHits[layer].end(),
                                &hit, CompareHitPtrYLess());
@@ -148,6 +156,7 @@ HitIteratorPair CbmLitTrackFinderImp::MinMaxIndex(
                                &hit, CompareHitPtrYLess());
    } else {
       Double_t devX = CalcDevX(par, layer);
+      if (devX == 0.) return bounds;
       hit.SetX(par->GetX() - devX);
       bounds.first = lower_bound(fHits[layer].begin(), fHits[layer].end(),
                               &hit, CompareHitPtrXLess());
@@ -162,20 +171,20 @@ Double_t CbmLitTrackFinderImp::CalcDevX(
 		const CbmLitTrackParam* par,
 		Int_t layer) const
 {
-	// TODO review this
-	if (par->GetCovariance(0) < 0.) return 0;
-	//return fSigmaCoef * std::sqrt(par->GetCovariance(0) + fMaxErrX[layer] * fMaxErrX[layer]);
-	return fSigmaCoef * (std::sqrt(par->GetCovariance(0)) + fMaxErrX[layer]);
+	Double_t C0 = par->GetCovariance(0);
+	if(C0 > fMaxErrSq || C0 < 0.) return 0.;
+	//return fSigmaCoef * std::sqrt(C0 + fMaxErrX[layer] * fMaxErrX[layer]);
+	return fSigmaCoef * (std::sqrt(C0) + fMaxErrX[layer]);
 }
 
 Double_t CbmLitTrackFinderImp::CalcDevY(
 		const CbmLitTrackParam* par,
 		Int_t layer) const
 {
-	// TODO review this
-	if (par->GetCovariance(5) < 0.) return 0;
-   	//return fSigmaCoef * std::sqrt(par->GetCovariance(5) + fMaxErrY[layer] * fMaxErrY[layer]);
-	return fSigmaCoef * (std::sqrt(par->GetCovariance(5)) + fMaxErrY[layer]);
+	Double_t C5 = par->GetCovariance(5);
+	if(C5 > fMaxErrSq || C5 < 0.) return 0.;
+   	//return fSigmaCoef * std::sqrt(C5 + fMaxErrY[layer] * fMaxErrY[layer]);
+	return fSigmaCoef * (std::sqrt(C5) + fMaxErrY[layer]);
 }
 
 void CbmLitTrackFinderImp::RemoveHits(

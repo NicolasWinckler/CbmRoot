@@ -1,45 +1,28 @@
- 
-// -------------------------------------------------------------------------
-// -----                  CbmTrackPropagatorGeane source file               -----
-// -----                  Created 22/11/07  by A. Lebedev               -----
-// -------------------------------------------------------------------------
- 
+#include "CbmPropagatorGeane.h"
 
-
-#include "CbmTrackPropagatorGeane.h"
-
-#include "CbmLitTrackParam.h"
-
+#include "CbmTrackParam.h"
 #include "CbmTrackParP.h"
+
 #include "TVector3.h"
 
 #include <vector>
 #include <cmath>
 
-CbmTrackPropagatorGeane::CbmTrackPropagatorGeane():
-   CbmLitTrackPropagator("CbmTrackPropagatorGeane")
+CbmPropagatorGeane::CbmPropagatorGeane():
+	fMinSlope(1e-4),
+	fMaxSlope(5.)
 {
    fPropagator = new CbmGeanePro();
 }
 
-CbmTrackPropagatorGeane::~CbmTrackPropagatorGeane() 
+CbmPropagatorGeane::~CbmPropagatorGeane() 
 {
 	if (fPropagator) delete fPropagator;
 }
 
-LitStatus CbmTrackPropagatorGeane::Initialize()
-{
-	return kLITSUCCESS;
-}
-
-LitStatus CbmTrackPropagatorGeane::Finalize()
-{
-	return kLITSUCCESS;
-}
-
-LitStatus CbmTrackPropagatorGeane::Propagate(
-		const CbmLitTrackParam *parIn,
-        CbmLitTrackParam *parOut,
+StatusCode CbmPropagatorGeane::Propagate(
+		const CbmTrackParam *parIn,
+        CbmTrackParam *parOut,
         Double_t zOut,
         Int_t pdg)
 {
@@ -47,22 +30,20 @@ LitStatus CbmTrackPropagatorGeane::Propagate(
    return Propagate(parOut, zOut, pdg);
 }
 
-LitStatus CbmTrackPropagatorGeane::Propagate(
-		CbmLitTrackParam *par,
+StatusCode CbmPropagatorGeane::Propagate(
+		CbmTrackParam *par, 
         Double_t zOut,
         Int_t pdg)
 {
-	if (std::fabs(zOut - par->GetZ()) < 0.01) return kLITSUCCESS;
-	
-	if (!IsInParCorrect(par)) return kLITERROR;
-	
-//	std::cout << "in:";
-//	pParam->Print();
+	if (std::fabs(zOut - par->GetZ()) < 0.01) return kCBMSUCCESS;
+	if (!IsInParCorrect(par)) return kCBMERROR;
 	
    // covariance matrix for GEANE
+   std::vector<Double_t> cov(15);
    std::vector<Double_t> gCov(15);
    // fill GEANE covariant matrix
-   ToGeaneCovMatrix(par->GetCovMatrix(), gCov);
+   par->CovMatrix(&cov[0]);
+   ToGeaneCovMatrix(cov, gCov);
  
    TVector3 v1(1, 0, 0);
    TVector3 v2(0, 1, 0);    
@@ -86,10 +67,10 @@ LitStatus CbmTrackPropagatorGeane::Propagate(
    TVector3 v0(0, 0, zOut);
    Bool_t result2 = fPropagator->PropagateToPlane(v0, v1, v2);
          
-   // pdg code of the particle,
-   // +/- 13 muon code 
-   pdg = 13;
-   if (par->GetQp() > 0) pdg = -13;
+//   pdg code of the particle,
+//   +/- 13 muon code 
+//   pdg = 13;
+//   if (par->GetQp() > 0) pdg = -13;
 
    // CbmGeanePro is used to propagate the track parameters
    Bool_t propResult;
@@ -98,7 +79,7 @@ LitStatus CbmTrackPropagatorGeane::Propagate(
    // if propagation fails
    if (!propResult) {
 	   //std::cout << "PROPAGATION FAILED!!!!" <<std::endl;
-	   return kLITERROR;
+	   return kCBMERROR;
    }
      
    // fill the CBM track parameter representation 
@@ -114,17 +95,29 @@ LitStatus CbmTrackPropagatorGeane::Propagate(
    std::vector<Double_t> gCovEnd(15);
    parEnd.GetCov(&gCovEnd[0]);
    FromGeaneCovMatrix(gCovEnd, covEnd);
-   par->SetCovMatrix(covEnd);
+   par->SetCovMatrix(&covEnd[0]);
 
    //std::cout << "out:";
    //pParam->Print();
    
-   return kLITSUCCESS;
+   return kCBMSUCCESS;
 }
 
-void CbmTrackPropagatorGeane::ToGeaneCovMatrix(
+void CbmPropagatorGeane::TransportMatrix(
+		   std::vector<Double_t>& F)
+{
+	std::cout << "-WARNING- CbmPropagatorGeane::TransportMatrix not implemented yet" << std::endl;
+}
+
+void CbmPropagatorGeane::TransportMatrix(
+		   TMatrixD& F)
+{
+	std::cout << "-WARNING- CbmPropagatorGeane::TransportMatrix not implemented yet" << std::endl;
+}
+
+void CbmPropagatorGeane::ToGeaneCovMatrix(
 		const std::vector<Double_t>& cov,
-		std::vector<Double_t>& gCov)
+		std::vector<Double_t>& gCov) const
 {
 	// reorder covariant matrix elements CBM->GEANE
 	// for CBM diagonal elements in the following order: 
@@ -148,9 +141,9 @@ void CbmTrackPropagatorGeane::ToGeaneCovMatrix(
 	gCov[14] = cov[5];
 }
 
-void CbmTrackPropagatorGeane::FromGeaneCovMatrix(
+void CbmPropagatorGeane::FromGeaneCovMatrix(
 		const std::vector<Double_t>& gCov,
-		std::vector<Double_t>& cov)
+		std::vector<Double_t>& cov) const
 {
 	// reorder covariant matrix elements GEANE->CBM
 	cov[0]  = gCov[12];
@@ -170,19 +163,16 @@ void CbmTrackPropagatorGeane::FromGeaneCovMatrix(
 	cov[14] = gCov[0];
 }
 
-Bool_t CbmTrackPropagatorGeane::IsInParCorrect(
-		const CbmLitTrackParam* par)
+Bool_t CbmPropagatorGeane::IsInParCorrect(
+		const CbmTrackParam* par) const
 {
-	Double_t maxSlope = 5.;
-	Double_t minSlope = 1e-4;
-	
-	if (std::abs(par->GetTx()) > maxSlope ||
-		std::abs(par->GetTy()) > maxSlope ||
-		std::abs(par->GetTx()) < minSlope ||
-		std::abs(par->GetTy()) < minSlope) {
+	if (std::abs(par->GetTx()) > fMaxSlope ||
+		std::abs(par->GetTy()) > fMaxSlope ||
+		std::abs(par->GetTx()) < fMinSlope ||
+		std::abs(par->GetTy()) < fMinSlope) {
 		return false;
 	}
 	return true;
 }
 
-ClassImp(CbmTrackPropagatorGeane)
+ClassImp(CbmPropagatorGeane)

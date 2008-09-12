@@ -57,7 +57,7 @@ LitStatus CbmLitTrackFinderRobust::DoFind(
 		
 		FollowTracks(fTracks.begin(), fTracks.end());
 		
-		fTrackSelectionFinal->DoSelect(fTracks.begin(), fTracks.end());
+		fFinalSelection->DoSelect(fTracks.begin(), fTracks.end());
 		
 		RemoveHits(fTracks.begin(), fTracks.end());
 				

@@ -47,6 +47,8 @@ public:
 	void SetFitNodes(const FitNodeVector& nodes) {fFitNodes = nodes;}	
 	void SortHits(Bool_t downstream = true);
 	
+	void RemoveHit(Int_t index);
+	
 	Bool_t CheckParams() const;
 	void ClearHits();
 

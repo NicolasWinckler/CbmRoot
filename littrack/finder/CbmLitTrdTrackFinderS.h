@@ -8,10 +8,6 @@
 #include <vector>
 
 class CbmLitTrackPropagator;
-class CbmLitTrackExtrapolator;
-class CbmLitTrackUpdate;
-class CbmLitTrackFitter;
-class CbmLitTrackSelection;
 class CbmLitTrack;
 class CbmLitHit;
 class TClonesArray;
@@ -34,18 +30,6 @@ private:
 
     Double_t fMom;
 
-	CbmLitTrackPropagator* fPropagator;
-	CbmLitTrackExtrapolator* fExtrapolator;
-	CbmLitTrackUpdate* fFilter;
-	CbmLitTrackFitter* fFitter;
-	CbmLitTrackSelection* fTrackSeedSelection;	
-	CbmLitTrackSelection* fTrackSelectionStation;
-	CbmLitTrackSelection* fTrackSelectionFinal;
-	
-	CbmLitDetectorLayout fLayout;
-	
-    Int_t fVerbose;
-    
     virtual void SetIterationParameters(Int_t iter);
     
 	void CreateTrackSeeds(
@@ -63,7 +47,4 @@ private:
     ClassDef(CbmLitTrdTrackFinderS, 1);
 };
 
-
 #endif /*CBMLITTRDTRACKFINDERS_H_*/
-
-

@@ -21,6 +21,8 @@ public:
 	const CbmLitTrackParam* GetPredictedParam() const { return &fPredictedParam; }
 	const CbmLitTrackParam* GetUpdatedParam() const { return &fUpdatedParam; }
 	const CbmLitTrackParam* GetSmoothedParam() const { return &fSmoothedParam; }
+	Double_t GetChiSqFiltered() const { return fChiSqFiltered; }
+	Double_t GetChiSqSmoothed() const { return fChiSqSmoothed; }
 
 	void SetF(const std::vector<Double_t>& F) {
 			fF.assign(F.begin(), F.end());
@@ -31,6 +33,8 @@ public:
 	void SetPredictedParam(const CbmLitTrackParam* par) { fPredictedParam = *par;}
 	void SetUpdatedParam(const CbmLitTrackParam* par) { fUpdatedParam = *par;}
 	void SetSmoothedParam(const CbmLitTrackParam* par) { fSmoothedParam = *par;}
+	void SetChiSqFiltered(Double_t chiSq) { fChiSqFiltered = chiSq; }
+	void SetChiSqSmoothed(Double_t chiSq) { fChiSqSmoothed = chiSq; }
 	
 private:
 	// transport matrix
@@ -39,6 +43,9 @@ private:
 	CbmLitTrackParam fPredictedParam;
 	CbmLitTrackParam fUpdatedParam;
 	CbmLitTrackParam fSmoothedParam;
+	
+	Double_t fChiSqFiltered;
+	Double_t fChiSqSmoothed;
 
 	ClassDef(CbmLitFitNode,1);
 };

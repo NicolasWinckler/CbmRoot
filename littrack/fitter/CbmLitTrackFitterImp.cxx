@@ -55,18 +55,19 @@ LitStatus CbmLitTrackFitterImp::Fit(
 		const CbmLitHit* hit = track->GetHit(i);
 	    Double_t Ze = hit->GetZ();
 	    if (fPropagator->Propagate(&par, Ze, track->GetPDG()) == kLITERROR) {
-	    	std::cout << "ERROR CbmLitTrackFitterImp::Fit propagation failed" << std::endl;
+	    	//std::cout << "ERROR CbmLitTrackFitterImp::Fit propagation failed" << std::endl;
 	    	return kLITERROR;
 	    }
 	    nodes[i].SetPredictedParam(&par);
 	    fPropagator->TransportMatrix(F);
 	    nodes[i].SetF(F);
 	    if (fUpdate->Update(&par, hit) == kLITERROR) {
-	    	std::cout << "ERROR CbmLitTrackFitterImp::Fit track update failed" << std::endl;
+	    	//std::cout << "ERROR CbmLitTrackFitterImp::Fit track update failed" << std::endl;
 	    	return kLITERROR;
 	    }
 	    nodes[i].SetUpdatedParam(&par);
 	    Double_t chi2Hit = ChiSq(&par, hit);
+	    nodes[i].SetChiSqFiltered(chi2Hit);
 	    track->SetChi2(track->GetChi2() + chi2Hit);  
 	}
 
@@ -74,10 +75,7 @@ LitStatus CbmLitTrackFitterImp::Fit(
 	else track->SetParamFirst(&par);
 
 	track->SetFitNodes(nodes);
-	
-	// TODO check NDF
-	if (nofHits > 2) track->SetNDF( 2 * nofHits - 5);
-	else track->SetNDF(1);
+	track->SetNDF(NDF(nofHits));
 		
 	return kLITSUCCESS;
 }

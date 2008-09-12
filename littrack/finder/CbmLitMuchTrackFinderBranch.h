@@ -9,10 +9,6 @@
 #include <vector>
 
 class CbmLitTrackPropagator;
-class CbmLitTrackExtrapolator;
-class CbmLitTrackUpdate;
-class CbmLitTrackFitter;
-class CbmLitTrackSelection;
 class CbmLitTrack;
 class CbmLitHit;
 class TClonesArray;
@@ -35,17 +31,6 @@ private:
 	TClonesArray* fTrackSeedsArray;
 	  
 	CbmLitTrackPropagator* fPropagatorToDet;
-	CbmLitTrackPropagator* fPropagator;
-	CbmLitTrackUpdate* fFilter;
-	CbmLitTrackFitter* fFitter;
-	CbmLitTrackSelection* fTrackSeedSelection;
-	CbmLitTrackSelection* fTrackSelectionStation;
-	CbmLitTrackSelection* fTrackSelectionFinal;
-	
-	//Detector layout
-	CbmLitDetectorLayout fLayout;
-    
-    Int_t fVerbose;
     
 	void CreateTrackSeeds(
     		TClonesArray* trackArray,

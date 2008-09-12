@@ -35,17 +35,6 @@ private:
 	
 	CbmLitTrackPropagator* fPropagatorToDet;
 	CbmLitTrackExtrapolator* fExtrapolatorToDet;
-	CbmLitTrackPropagator* fPropagator;
-	CbmLitTrackExtrapolator* fExtrapolator;
-	CbmLitTrackUpdate* fFilter;
-	CbmLitTrackFitter* fFitter;
-	CbmLitTrackSelection* fTrackSeedSelection;
-	CbmLitTrackSelection* fTrackSelectionStation;
-	CbmLitTrackSelection* fTrackSelectionFinal;
-	
-	CbmLitDetectorLayout fLayout;
-    
-    Int_t fVerbose;
     
     virtual void SetIterationParameters(Int_t iter);
     

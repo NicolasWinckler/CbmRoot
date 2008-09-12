@@ -9,6 +9,7 @@ ${GEANT3_INCLUDE_DIR}
 ${CBMROOT_SOURCE_DIR}/littrack
 ${CBMROOT_SOURCE_DIR}/littrack/ana
 ${CBMROOT_SOURCE_DIR}/littrack/base
+${CBMROOT_SOURCE_DIR}/littrack/cbm
 ${CBMROOT_SOURCE_DIR}/littrack/data
 ${CBMROOT_SOURCE_DIR}/littrack/finder
 ${CBMROOT_SOURCE_DIR}/littrack/fitter
@@ -45,6 +46,8 @@ ana/CbmLitRobustAna.cxx
 base/CbmLitTool.cxx
 base/CbmLitDetectorLayout.cxx
 base/CbmLitPDG.cxx
+cbm/CbmPropagatorGeane.cxx
+cbm/CbmPropagatorLit.cxx
 data/CbmLitHit.cxx
 data/CbmLitTrackParam.cxx
 data/CbmLitTrack.cxx
@@ -61,6 +64,7 @@ fitter/CbmLitTrackFitterImp.cxx
 fitter/CbmLitKalmanFilter.cxx
 fitter/CbmLitTrackFitterRobust.cxx
 fitter/CbmLitKalmanSmoother.cxx
+fitter/CbmLitTrackFitterIter.cxx
 interface/CbmLitTrackFitter.cxx   
 interface/CbmLitTrackPropagator.cxx 
 interface/CbmLitTrackUpdate.cxx  
@@ -72,7 +76,7 @@ interface/CbmLitEffHitCalculator.cxx
 propagation/CbmLitTrackPropagatorImp.cxx 
 propagation/CbmLitRK4TrackExtrapolator.cxx
 propagation/CbmLitLineTrackExtrapolator.cxx
-propagation/CbmTrackPropagatorGeane.cxx
+propagation/CbmLitTrackPropagatorGeane.cxx
 propagation/CbmLitGeoNavigatorImp.cxx
 propagation/CbmLitMaterialInfo.cxx
 propagation/CbmLitMaterialEffectsImp.cxx

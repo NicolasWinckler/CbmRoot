@@ -29,13 +29,6 @@ CbmLitTrdTrackFinderSts::~CbmLitTrdTrackFinderSts()
 {
 	delete fExtrapolatorToDet;
 	delete fPropagatorToDet;
-	delete fPropagator;
-	delete fExtrapolator;
-	delete fFilter;
-	delete fFitter;
-	delete fTrackSelectionStation;
-	delete fTrackSeedSelection;
-	delete fTrackSelectionFinal;
 }
 
 void CbmLitTrdTrackFinderSts::Init()
@@ -52,8 +45,7 @@ void CbmLitTrdTrackFinderSts::Init()
    fPropagatorToDet = new CbmLitTrackPropagatorImp(fExtrapolatorToDet);   
    fPropagatorToDet->Initialize();
       
-   fExtrapolator = new CbmLitLineTrackExtrapolator();
-   fPropagator = new CbmLitTrackPropagatorImp(fExtrapolator);
+   fPropagator = new CbmLitTrackPropagatorImp(new CbmLitLineTrackExtrapolator());
    fPropagator->Initialize();
    
    fFilter = new CbmLitKalmanFilter();
@@ -63,32 +55,25 @@ void CbmLitTrdTrackFinderSts::Init()
    fFitter->Initialize();
       
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-   fTrackSeedSelection = factory->CreateTrackSelection("Momentum");
-   fTrackSelectionStation = factory->CreateTrackSelection("TrdStation");
-   fTrackSelectionFinal = factory->CreateTrackSelection("TrdFinal");
+   fSeedSelection = factory->CreateTrackSelection("Momentum");
+   fStationSelection = factory->CreateTrackSelection("TrdStation");
+   fFinalSelection = factory->CreateTrackSelection("TrdFinal");
+   fFinalPreSelection = factory->CreateTrackSelection("Empty");
    
    fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
-   
-   SetDetectorLayout(fLayout);
-   SetPropagator(fPropagator);
-   SetFilter(fFilter); 
-   SetFitter(fFitter);    
-   SetTrackSeedSelection(fTrackSeedSelection);
-   SetTrackSelectionStation(fTrackSelectionStation);
-   SetTrackSelectionFinal(fTrackSelectionFinal);
-   SetVerbose(3);
-   SetNofIter(1); 
-   SetBeginStation(0); 
-   SetEndStation(fLayout.GetNofStations() - 1);
-   SetPDG(211);
+
+   fNofIter = 1; 
+   fBeginStation = 0; 
+   fEndStation = fLayout.GetNofStations() - 1;
+   fPDG = 211;
 }
 
 void CbmLitTrdTrackFinderSts::SetIterationParameters(Int_t iter)
 {
 	if (iter == 0) {
-		SetMaxNofMissingHitsInStation(1);
-		SetMaxNofMissingHits(1);
-		SetSigmaCoef(5.); 
+		fMaxNofMissingHitsInStation = 1;
+		fMaxNofMissingHits = 1;
+		fSigmaCoef = 5.; 
 	} 
 }
 

@@ -1,6 +1,6 @@
 #include "../../cbmbase/CbmDetectorList.h";
 
-void much_ana(Int_t nEvents = 1000)
+void prop_ana(Int_t nEvents = 1000)
 {
   Int_t iVerbose = 0;
   

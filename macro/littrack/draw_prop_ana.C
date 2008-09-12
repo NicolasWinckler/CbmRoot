@@ -16,17 +16,17 @@ TCanvas* c_layer[nofLayers];
 TCanvas* c_fit[2];
 //TCanvas* c_sr[2];
 
-//TString dir = "/d/cbm02/andrey/events/much/10stations/10mu/mu/";
-//TFile *file = new TFile(dir + "25gev/" + "mu/" +
-//		                "/much.ana." + "auau" + "." + "25gev" + "." + 
-//		                "mu" + "." + "centr" + ".root"); 
+TString dir = "/d/cbm02/andrey/events/much/10stations/10mu/mu/";
+TFile *file = new TFile(dir + "25gev/" + "mu/" +
+		                "/much.ana." + "auau" + "." + "25gev" + "." + 
+		                "mu" + "." + "centr" + ".root"); 
 
-TString dir  = "/d/cbm02/andrey/events/trd/standard/e";
-TFile *file = new TFile(dir + "/trd.ana.auau.25gev.e.centr.root"); 
+//TString dir  = "/d/cbm02/andrey/events/trd/standard/e";
+//TFile *file = new TFile(dir + "/trd.ana.auau.25gev.e.centr.root"); 
 
 TString outDir = "./propagation_note/geane_auto/10stations/before_update/";
 
-void draw_much_ana()
+void draw_prop_ana()
 {
 	gStyle->SetOptStat("");
 	gStyle->SetOptFit(0);

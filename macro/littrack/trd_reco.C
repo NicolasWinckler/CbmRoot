@@ -67,7 +67,7 @@ void trd_reco(Int_t nEvents = 100)
   run->AddTask(trdMatchTracks);
   
     // -----   TRD track finding QA check   ------------------------------------
-  CbmLitRecQa* trdRecQa = new CbmLitRecQa(11, 0.7, kTRD, 1);
+  CbmLitRecQa* trdRecQa = new CbmLitRecQa(12, 0.7, kTRD, 1);
   trdRecQa->SetNormType(2); // '2' to number of STS tracks
   run->AddTask(trdRecQa);
   

@@ -1,5 +1,5 @@
-
-void much_reco(Int_t nEvents = 100)
+#include "../../cbmbase/CbmDetectorList.h";
+void much_reco(Int_t nEvents = 300)
 {
 
   Int_t iVerbose = 0;
@@ -10,7 +10,7 @@ void much_reco(Int_t nEvents = 100)
   TString particle = "mu";  
      
   //TString dir = "/d/cbm02/andrey/events/much/compact/signal/";
-//  TString dir = "/d/cbm02/andrey/events/much/10stations/new/signal/";
+ // TString dir = "/d/cbm02/andrey/events/much/10stations/new/";
   TString dir = "/d/cbm02/andrey/events/much/10stations/10mu/mu_urqmd/";
 //  TString dir = "/d/cbm05/kisselan/cbmroot_Aug07/compactMuCh/";
 //  TString dir = "/d/cbm02/andrey/events/much/compact/";
@@ -69,9 +69,7 @@ void much_reco(Int_t nEvents = 100)
   CbmGeane* Geane = new CbmGeane(inFile.Data());
   
   
-  CbmMuchTrackFinder* muchTrackFinder    = new CbmLitMuchTrackFinderRobust();
-  //CbmMuchTrackFinder* muchTrackFinder    = new CbmLitMuchTrackFinderTrigger();
-  //CbmMuchTrackFinder* muchTrackFinder    = new CbmMuchTrackFinderIdeal(1);
+  CbmMuchTrackFinder* muchTrackFinder    = new CbmLitMuchTrackFinderBranch();
   CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
   muchFindTracks->UseFinder(muchTrackFinder);
   run->AddTask(muchFindTracks);
@@ -82,7 +80,7 @@ void much_reco(Int_t nEvents = 100)
   CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks(1);
   run->AddTask(muchMatchTracks);
   
-  CbmLitMuchRecQa* muchRecQa = new CbmLitMuchRecQa(8, 0.7);
+  CbmLitRecQa* muchRecQa = new CbmLitRecQa(10, 0.7, kMUCH, 1);
   muchRecQa->SetNormType(2); // '2' to number of STS tracks
   run->AddTask(muchRecQa);
 

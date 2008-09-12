@@ -1,18 +1,18 @@
 TString system  = "auau";  
 TString beam    = "25gev";  
 TString trigger = "centr";
-TString particle = "mu";
+TString particle = "omega";
   
-//TString dir = "/d/cbm02/andrey/events/much/10stations/new/signal/";
+TString dir = "/d/cbm02/andrey/events/much/10stations/new/";
 //TString dir = "/d/cbm02/andrey/events/much/10stations/10mu/mu_urqmd/";
-//TString fileName = dir + beam + "/" 
-//                   + particle + "/much.tracks." + system + "." + beam + "." 
-//                   + particle + "." + trigger + ".root";
-//  
-//TFile *file = new TFile(fileName); 
+TString fileName = dir + beam + "/" 
+                   + particle + "/much.tracks." + system + "." + beam + "." 
+                   + particle + "." + trigger + ".root";
+  
+TFile *file = new TFile(fileName); 
 
-TString dir  = "/d/cbm02/andrey/events/trd/standard/e_urqmd";
-TFile *file = new TFile(dir + "/trd.reco.auau.25gev.e.centr.root"); 
+//TString dir  = "/d/cbm02/andrey/events/trd/standard/e_urqmd";
+//TFile *file = new TFile(dir + "/trd.reco.auau.25gev.e.centr.root"); 
 
 
 Int_t lsGhost = 2;
@@ -22,7 +22,7 @@ Int_t size = 3;
 Int_t colorGhost = 2;
 Int_t colorTrue = 4;
 
-void draw_much_rec_qa()
+void draw_rec_qa()
 {
 	gStyle->SetOptStat("");
 	gStyle->SetOptFit(0);
@@ -63,14 +63,14 @@ void draw_eff()
   hMomEffElectrons->SetMarkerSize(3.0);
   
   hMomEffAll->Draw();
-  //hMomEffMuons->Draw("SAME");
-  hMomEffElectrons->Draw("SAME");
+  hMomEffMuons->Draw("SAME");
+  //hMomEffElectrons->Draw("SAME");
   
   TLegend* l1 = new TLegend(0.5,0.7,0.9,0.9);
   l1->SetHeader("Efficiency");
   l1->AddEntry(hMomEffAll,"all tracks","lp");
-//  l1->AddEntry(hMomEffMuons,"muon tracks","lp");
-  l1->AddEntry(hMomEffElectrons,"electron tracks","lp");  
+  l1->AddEntry(hMomEffMuons,"muon tracks","lp");
+//  l1->AddEntry(hMomEffElectrons,"electron tracks","lp");  
   l1->Draw();
 }
 
@@ -158,7 +158,7 @@ void draw_param_hist(
   h2->Draw("SAME");
    
   TLegend* l1 = new TLegend(0.5,0.7,0.9,0.9);
-  l1->SetHeader("last plane id");
+  l1->SetHeader(header.c_str());
   l1->AddEntry(h1,"true tracks","l");  
   l1->AddEntry(h2,"ghost tracks","l"); 
   l1->Draw();

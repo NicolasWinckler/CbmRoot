@@ -156,22 +156,7 @@ class CbmRichRingQa : public CbmTask{
     TH1D* fh_TrueMatchElDistance;
     TH1D*  fh_TrueMatchElMom;
     /// Ring Track matching END    
-    
-    /// Difference Prim Electron and NOT Prim Electron rings histogramms BEGIN
-    TH1D* fh_NotTrueElNofHits;    
-    TH1D* fh_NotTrueElDistance; 
-    TH1D* fh_NotTrueElAngle;    
-    TH1D* fh_NotTrueElNofHitsOnRing;
-    TH1D* fh_NotTrueElChi2;
-    TH1D* fh_NotTrueElRadPos;
-    TH1D* fh_NotTrueElRadius;
-    TH1D* fh_NotTrueElA;
-    TH1D* fh_NotTrueElB;
-    TH1D* fh_NotTrueElPhi;    
-    TH1D* fh_NotTrueElStsMom;     
-    TH2D* fh_NotTrueElPhiVsRadAngle;
-    TH2D* fh_NotTrueElRadiusVsMom;    
-    /// Difference Prim Electron and NOT Prim Electron rings histogramms END 
+ 
     
     TH2D* fh_StartVertexXZ;
     TH2D* fh_StartVertexYZ;

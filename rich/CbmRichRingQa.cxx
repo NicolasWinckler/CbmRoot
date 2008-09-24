@@ -149,22 +149,6 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose,
     fh_TrueMatchElDistance = new TH1D("fh_TrueMatchElDistance","Distance between track and ring center",50,0,5);
     fh_TrueMatchElMom = new TH1D("fh_TrueMatchElMom","fh_TrueMatchElMom",40,0,10);    
 
-/// Difference primary electrons and NOT prymary electrons histogramms BEGIN      
-    fh_NotTrueElNofHits = new TH1D("fh_NotTrueElNofHits","Number of hits in ring",50,0,50);    
-    fh_NotTrueElDistance = new TH1D("fh_NotTrueElDistance","Distance between track and ring center",50,0,5);    
-    fh_NotTrueElAngle = new TH1D("fh_NotTrueElAngle","Biggest angle in ring",50,0,6.5);    
-    fh_NotTrueElNofHitsOnRing= new TH1D("fh_NotTrueElNofHitsOnRing","# of hits on ring",50,0,50);    
-    fh_NotTrueElChi2 = new TH1D("fh_NotTrueElChi2","Chi2",50,0.,1.);    
-    fh_NotTrueElRadPos = new TH1D("fh_NotTrueElRadPos","Radial Position",50,0,150);;    
-    fh_NotTrueElRadius = new TH1D("fh_NotTrueElRadius","Radius",70,0,7);;
-    fh_NotTrueElA = new TH1D("fh_NotTrueElA","A",90,0, 9.);
-    fh_NotTrueElB = new TH1D("fh_NotTrueElB","B", 90, 0. ,9.);
-    fh_NotTrueElPhi = new TH1D("fh_NotTrueElPhi","Phi",50, -2. ,2.);  
-    fh_NotTrueElStsMom = new TH1D("fh_NotTrueElStsMom","Sts Mom",50, 0. , 15.);       
-    fh_NotTrueElPhiVsRadAngle = new TH2D("fh_NotTrueElPhiVsRadAngle","Phi vs RadAngle", 50, -2. ,2.,50, 0. , 6.3);
-    fh_NotTrueElRadiusVsMom = new TH2D("fh_NotTrueElRadiusVsMom","Radius Vs Momentum", 50,0.,15.,50, 0. ,9.);             
-/// Difference primary electrons and NOT prymary electrons histogramms END    
-
     fh_StartVertexXZ = new TH2D("fh_StartVertexXZ","StartVertex XZ", 200, -2. ,200.,300, -150. , 150.);
     fh_StartVertexYZ = new TH2D("fh_StartVertexYZ","StartVertex YZ", 200, -2.,200.,300, -150. ,150.);  
            
@@ -188,7 +172,7 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose,
 
   
   //foutFakeAndTrue.open("ann_fake_and_true.txt",std::ios_base::app);
-  //foutElAndNotEl.open("ann_el_notel.txt",std::ios_base::app);  
+
    foutFakeAndTrue.open("ann_fake_and_true.txt");
 }
 
@@ -501,9 +485,6 @@ void CbmRichRingQa::Exec(Option_t* option)
      cout <<"Ratio (NofWrongMatchEl / NofTrueMatchEl) = "<< matchRatio<< endl;
             
      cout << "fNofTrueElBadFit = " << fNofTrueElBadFit << endl;
-           
-     cout << "fNofNOTTrueEl = " << fh_NotTrueElNofHits->GetEntries() << 
-           "  per Event = " << (Double_t)fh_NotTrueElNofHits->GetEntries() / fEventNumber << endl;
 }
 
 Bool_t CbmRichRingQa::DoesRingHaveProjection(Int_t trackId){
@@ -942,23 +923,7 @@ void CbmRichRingQa::Finish()
     
     fh_WrongMatchElDistance->Write();
     fh_TrueMatchElDistance->Write();
-    fh_TrueMatchElMom->Write();
-    
-/// Difference Fake and True rings histogramms BEGIN      
-    fh_NotTrueElNofHits->Write();
-    fh_NotTrueElDistance->Write();     
-    fh_NotTrueElAngle->Write(); 
-    fh_NotTrueElNofHitsOnRing->Write();    
-    fh_NotTrueElChi2->Write(); 
-    fh_NotTrueElRadPos->Write();
-    fh_NotTrueElRadius->Write();
-    fh_NotTrueElA->Write(); 
-    fh_NotTrueElB->Write();
-    fh_NotTrueElPhi->Write();   
-    fh_NotTrueElStsMom->Write();       
-    fh_NotTrueElPhiVsRadAngle->Write(); 
-    fh_NotTrueElRadiusVsMom->Write();     
-/// Difference Fake and True rings histogramms END        
+    fh_TrueMatchElMom->Write();      
              
     fh_StartVertexXZ->Write();
     fh_StartVertexYZ->Write();  

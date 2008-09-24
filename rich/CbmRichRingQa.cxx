@@ -97,6 +97,9 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose,
     fh_TrueFoundElRingsProjHitCutBoverA = new TH1D("fh_TrueFoundElRingsProjHitCutBoverA","fh_TrueFoundElRingsProjHitCutBoverA",20,0,1);
     fh_MCElRingsProjHitCutBoverA = new TH1D("fh_MCElRingsProjHitCutBoverA","fh_MCElRingsProjHitCutBoverA",20,0,1);
    
+    fh_TrueElMomVsBoverA = new TH2D("fh_TrueElMomVsBoverA","fh_TrueElMomVsBoverA",20, 0,10, 40,0,1);
+    fh_MCElMomVsBoverA = new TH2D("fh_MCElMomVsBoverA","fh_MCElMomVsBoverA",20, 0,10, 40,0,1);
+
     // (x,y) of fake rings
     fh_FakeFoundRingsXYAll = new TH2D("fh_FakeFoundRingsXYAll","(x,y) fake rings",100,-200,200,125,-250,250);
 
@@ -187,7 +190,6 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose,
   //foutFakeAndTrue.open("ann_fake_and_true.txt",std::ios_base::app);
   //foutElAndNotEl.open("ann_el_notel.txt",std::ios_base::app);  
    foutFakeAndTrue.open("ann_fake_and_true.txt");
-   foutElAndNotEl.open("ann_el_notel.txt");  
 }
 
   // -----   Destructor   ----------------------------------------------------
@@ -414,9 +416,18 @@ void CbmRichRingQa::Exec(Option_t* option)
                 fitCOP->DoFit(&(itMapWithHits->second));
                 fitEllipse->DoFit(&(itMapWithHits->second));
                 fh_MCElRingsProjHitCutRadPos->Fill(itMapWithHits->second.GetRadialPosition());
-                fh_MCElRingsProjHitCutBoverA->Fill(itMapWithHits->second.GetBaxis()/
-                		itMapWithHits->second.GetAaxis());
+                Double_t bOverA = itMapWithHits->second.GetBaxis()/itMapWithHits->second.GetAaxis();
+                fh_MCElRingsProjHitCutBoverA->Fill(bOverA);
                 
+                fh_MCElMomVsBoverA->Fill(momentum, bOverA);
+                
+                if (bOverA < 0.1){
+                	cout << "Nof hits = " << itMapWithHits->second.GetNofHits() << " ";
+                	cout << "B = " << itMapWithHits->second.GetBaxis() << " A = "<<
+                	itMapWithHits->second.GetAaxis() << " ";
+                	cout << "boa = " << bOverA << "  radPos = "<< 
+                		itMapWithHits->second.GetRadialPosition()<< endl;
+                }
                 //cout << "MC "<<itMapWithHits->second.GetRadialPosition() << endl;
                 
                 fh_MCMomvsRadpos->Fill(momentum, itMapWithHits->second.GetRadialPosition());
@@ -433,7 +444,6 @@ void CbmRichRingQa::Exec(Option_t* option)
     EfficiencyCalc();   
     DiffFakeTrue();
     RingTrackMatchEff();
-    DiffPrimElectronsAndNotPrimElectrons();
 
    cout <<  "fNofAllRings="<< fNofAllRings << 
            "  per Event = " << (Double_t)fNofAllRings/fEventNumber<< endl << 
@@ -667,8 +677,10 @@ void CbmRichRingQa::EfficiencyCalc()
             fh_TrueFoundElRingsProjHitCutNofHits->Fill(lMCHits);
             fh_TrueFoundRingsXYE->Fill(ring->GetCenterX(),ring->GetCenterY());
             fh_TrueFoundElRingsProjHitCutRadPos->Fill(fRingMapWithHits[trackID].GetRadialPosition());
-            fh_TrueFoundElRingsProjHitCutBoverA->Fill(fRingMapWithHits[trackID].GetBaxis()/
-            		fRingMapWithHits[trackID].GetAaxis());            
+            
+            Double_t bOverA = fRingMapWithHits[trackID].GetBaxis()/fRingMapWithHits[trackID].GetAaxis();
+            fh_TrueFoundElRingsProjHitCutBoverA->Fill(bOverA);  
+            fh_TrueElMomVsBoverA->Fill(momentum, bOverA);
             //cout << "True Found"<<fRingMapWithHits[trackID].GetRadialPosition() << endl;
         }
         
@@ -857,114 +869,6 @@ void CbmRichRingQa::RingTrackMatchEff()
     }///loop over matches
 }
 
-
-void CbmRichRingQa::DiffPrimElectronsAndNotPrimElectrons()
-{
-    CbmRichRingMatch *match;
-    CbmRichRing* ring;
-    Int_t nMatches = fMatches->GetEntriesFast();
-    
-    for (Int_t iMatches = 0; iMatches < nMatches; iMatches++){
-        match   = (CbmRichRingMatch*)fMatches->At(iMatches);
-        if (!match){
-            cout << "-E- CbmRichRingQa::DiffPrimElectronsAndNotPrimElectrons no match"<<
-            iMatches<<endl;
-            continue;
-        }
-        ring = (CbmRichRing*)fRings->At(iMatches);
-        if (!ring){
-            cout << "-E- CbmRichRingQa::DiffPrimElectronsAndNotPrimElectrons() no ring"<<
-            iMatches<<endl;
-            continue;
-        }
-        
-        Int_t trackID = match->GetMCTrackID();
-        if (trackID > fTracks->GetEntriesFast() || trackID < 0) continue;
-        CbmMCTrack *track = (CbmMCTrack*) fTracks->At(trackID);
-        if (!track) {
-            cout << "-E- CbmRichRingQa::DiffPrimElectronsAndNotPrimElectrons(). No track "
-            << trackID <<endl;
-            continue;
-        }
-        Int_t gcode = TMath::Abs(track->GetPdgCode());
-        //Double_t momentum = track->GetP();
-        //Int_t motherId = track->GetMotherId();
-        //Bool_t isProj = DoesRingHaveProjection(trackID);    
-        Double_t startX = track->GetStartX();
-        //Double_t startY = track->GetStartY();
-        Double_t startZ = track->GetStartZ();
-        
-        if (gcode == 11 )fh_StartVertexXZ->Fill(startZ, startX);
-        if (gcode == 11 )fh_StartVertexYZ->Fill(startZ, startX); 
-         
-        Int_t recFlag = ring->GetRecFlag(); 
-        
-        Bool_t isReject = false;
-       // if (recFlag == 1) continue;   
-        
-       // if (momentum > 5.) continue;
-        if (gcode != 211 || recFlag == 1) isReject = true;
-        //if (TMath::Abs(gcode) == 211 || TMath::Abs(gcode) == 11) continue;
-        //if (TMath::Abs(gcode) != 11) isReject = true;
-        //if ( !( startZ > 50.  && TMath::Abs(gcode) == 11) ) isReject = true;
-       // if ( !(  (startX > 40. || startY > 40.) && TMath::Abs(gcode) == 11)  ) isReject = true;        
-        ///reject the fake rings
-       // if (ring->GetSelectionNN() < -0.5) isReject = true;
-    
-       
-       
-        Double_t angle = ring->GetAngle();
-        Int_t hitsOnRing = ring->GetNofHitsOnRing();
-        Double_t chi2 = ring->GetChi2();
-        Double_t distance = ring->GetDistance();
-        Int_t nHits = ring->GetNofHits();
-        Double_t radPos = ring->GetRadialPosition();
-        Double_t radius = ring->GetRadius();
-        Double_t axisA = ring->GetAaxis();    
-        Double_t axisB = ring->GetBaxis();
-        Double_t phi = ring->GetPhi();
-        Double_t radAngle = ring->GetRadialAngle();  
-        Double_t stsMomentum = GetStsMomentum(ring);
-    
-        if (recFlag != 3 && !isReject) fh_NotTrueElNofHits->Fill(nHits);
-        if (recFlag != 3 && !isReject) fh_NotTrueElDistance->Fill(distance);
-        if (recFlag != 3 && !isReject) fh_NotTrueElAngle->Fill(angle);
-        if (recFlag != 3 && !isReject) fh_NotTrueElNofHitsOnRing->Fill(hitsOnRing);
-        if (recFlag != 3 && !isReject) fh_NotTrueElRadPos->Fill(radPos);
-        if (recFlag != 3 && !isReject) fh_NotTrueElChi2->Fill(chi2);
-        if (recFlag != 3 && !isReject) fh_NotTrueElRadius->Fill(radius);
-        if (recFlag != 3 && !isReject) fh_NotTrueElA->Fill(axisA);
-        if (recFlag != 3 && !isReject) fh_NotTrueElB->Fill(axisB);
-        if (recFlag != 3 && !isReject) fh_NotTrueElPhi->Fill(phi);
-        if (recFlag != 3 && !isReject) fh_NotTrueElStsMom->Fill(stsMomentum);        
-        if (recFlag != 3 && !isReject) fh_NotTrueElPhiVsRadAngle->Fill(phi, radAngle);
-        if (recFlag != 3 && !isReject) fh_NotTrueElRadiusVsMom->Fill(stsMomentum, axisB);    
-        
-
-    
-        if (recFlag != 3 && !isReject) foutElAndNotEl << radPos << " "
-                                << axisA << " "
-                                << axisB << " "
-                                << phi << " "
-                                << radAngle << " "
-                                << chi2 << " "
-                                << stsMomentum << " "
-                                << -1 << endl;
-                                
-        if (recFlag == 3) foutElAndNotEl << radPos << " "
-                                << axisA << " "
-                                << axisB << " "
-                                << phi << " "
-                                << radAngle << " "
-                                << chi2 << " "
-                                << stsMomentum << " "
-                                << 1 << endl;        
-            
-            
-    }///loop over matches
-
-}
-
 // -----   Finish Task   ---------------------------------------------------
 void CbmRichRingQa::Finish()
 {
@@ -992,6 +896,8 @@ void CbmRichRingQa::Finish()
     fh_TrueFoundElRingsProjHitCutBoverA->Write();
     fh_MCElRingsProjHitCutBoverA->Write();
 
+    fh_TrueElMomVsBoverA->Write();
+    fh_MCElMomVsBoverA->Write();
     
     /// Difference Fake and True rings histogramms BEGIN
     fh_FakeNofHits->Write();

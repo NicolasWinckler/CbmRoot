@@ -75,7 +75,6 @@ class CbmRichRingQa : public CbmTask{
     Bool_t DoesRingHaveProjection(Int_t trackId);
     Double_t GetStsMomentum(CbmRichRing * ring);    
     void RingTrackMatchEff();
-    void DiffPrimElectronsAndNotPrimElectrons();
     
     Int_t fNofAllRings;      //number of all MC rings
     Int_t fNofElRings;  //number of all electron MC rings
@@ -104,6 +103,9 @@ class CbmRichRingQa : public CbmTask{
     
     TH1D* fh_TrueFoundElRingsProjHitCutBoverA;
     TH1D* fh_MCElRingsProjHitCutBoverA;
+    
+    TH2D* fh_TrueElMomVsBoverA;
+    TH2D* fh_MCElMomVsBoverA;
     
     TH2D* fh_FakeFoundRingsXYAll;
   
@@ -180,7 +182,6 @@ class CbmRichRingQa : public CbmTask{
     TH2D* fh_MCXYE;
     
     std::ofstream  foutFakeAndTrue;
-    std::ofstream  foutElAndNotEl;
       
     TH2D*  fh_HitsXY;//hits distribution (x,y)
     TH1D*  fh_HitsRadPos;

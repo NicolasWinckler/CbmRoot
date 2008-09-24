@@ -37,7 +37,7 @@ CbmRichRingFitterEllipse::CbmRichRingFitterEllipse()
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   -------------------------------------------
-CbmRichRingFitterEllipse::CbmRichRingFitterEllipse(Int_t verbose,Double_t correction, TString fieldName)
+CbmRichRingFitterEllipse::CbmRichRingFitterEllipse(Int_t verbose,Int_t correction, TString fieldName)
 {
     fVerbose = verbose;
     fCorrection   = correction;

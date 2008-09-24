@@ -65,7 +65,7 @@ class CbmRichRingFitterEllipse : public CbmRichRingFitter
 
    /** Standard constructor **/
    CbmRichRingFitterEllipse(Int_t verbose, 
-                            Double_t correction, 
+                            Int_t correction, 
                             TString fieldName);
 
    /** Destructor **/

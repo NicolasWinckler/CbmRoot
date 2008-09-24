@@ -42,7 +42,7 @@ CbmRichRingFitterEllipse::CbmRichRingFitterEllipse(Int_t verbose,Double_t correc
     fVerbose = verbose;
     fCorrection   = correction;
     fFieldName = fieldName;  
-    InitHistForRadiusCorrection();
+    if (fCorrection == 1 )InitHistForRadiusCorrection();
 }
 // -------------------------------------------------------------------------
 
@@ -51,7 +51,7 @@ CbmRichRingFitterEllipse::~CbmRichRingFitterEllipse()
 {
 
 }
-// -------------------------------------------------------------------------
+
 void CbmRichRingFitterEllipse::DoFit(CbmRichRing *pRing)
 {
     Int_t nofHits=pRing->GetNofHits();
@@ -64,7 +64,7 @@ void CbmRichRingFitterEllipse::DoFit(CbmRichRing *pRing)
     
     CbmRichHit* hit = NULL;
     std::vector<Double_t> hitX;
-    std::vector<Double_t> hitY;
+    std::vector<Double_t> hitY;  
     hitX.clear();
     hitY.clear();
     for(Int_t i = 0; i < nofHits; i++) {
@@ -75,6 +75,9 @@ void CbmRichRingFitterEllipse::DoFit(CbmRichRing *pRing)
       
     std::vector<Double_t> fpar;
     fpar = DoFit1(hitX, hitY);
+    
+   // std::vector<Double_t> fpar;
+   // fpar = DoFit2(hitX, hitY, fpar1);   
     
     ///calculate center of the ellipse
     Double_t xc = (fpar[0] + fpar[2])/2.;
@@ -109,7 +112,7 @@ void CbmRichRingFitterEllipse::DoFit(CbmRichRing *pRing)
     pRing->SetRadius((b + fpar[4])/2.);        
     
     ///Make radius correction if it's needed
-    if (fCorrection == 1 )MakeRadiusCorrection(pRing);
+    if (fCorrection == 1 ) MakeRadiusCorrection(pRing);
     
     CalcChi2(pRing);    
 }
@@ -154,9 +157,7 @@ std::vector<Double_t> CbmRichRingFitterEllipse::DoFit1(std::vector<Double_t> x,
         
         fpar.push_back(theMinuit.GetParameter(i));
     }
-    
-   // if (theFCN) delete theFCN;
-    
+
     return fpar;
 }
 
@@ -235,17 +236,17 @@ void CbmRichRingFitterEllipse::InitHistForRadiusCorrection()
 
     TFile *file = new TFile(fileName, "READ");
     if (!file || !file->IsOpen()) {
-	cout << " -E- Read correction maps "<<endl;
-	cout << " -E- Could not open input file." <<fileName<< endl;
+    	cout << " -E- Read correction maps "<<endl;
+    	cout << " -E- Could not open input file " <<fileName<< endl;
 	return;
     } else {
-	cout <<" -I- Map Correction input file: "<< fileName << endl;
+    	cout <<" -I- Map Correction input file: "<< fileName << endl;
     }
 
     gROOT->cd();
 
-    fh_mapaxisAXY =  (TH1D*) file->Get("fh_mapaxisAXY")->Clone();
-    fh_mapaxisBXY =  (TH1D*) file->Get("fh_mapaxisBXY")->Clone();
+    fh_mapaxisAXY =  (TH2D*) file->Get("fh_mapaxisAXY")->Clone();
+    fh_mapaxisBXY =  (TH2D*) file->Get("fh_mapaxisBXY")->Clone();
 
     file->Close();
     delete file;
@@ -255,15 +256,11 @@ void CbmRichRingFitterEllipse::MakeRadiusCorrection(CbmRichRing * pRing)
 {
     Double_t centerX = pRing->GetCenterX();
     Double_t centerY = pRing->GetCenterY();  
-   // cout << "Before " <<   pRing->GetAaxis()<< " " <<pRing->GetBaxis()<< endl;
     Double_t axisA = pRing->GetAaxis() + fh_mapaxisAXY->GetBinContent(fh_mapaxisAXY->FindBin(centerX,centerY));
     Double_t axisB = pRing->GetBaxis() + fh_mapaxisBXY->GetBinContent(fh_mapaxisBXY->FindBin(centerX,centerY));
     
     pRing->SetAaxis(axisA);   
-    pRing->SetBaxis(axisB); 
-   // cout << "After " <<   pRing->GetAaxis()<< " " <<pRing->GetBaxis()<< endl;
-       
-
+    pRing->SetBaxis(axisB);
 }
 
 

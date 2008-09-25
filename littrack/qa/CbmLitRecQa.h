@@ -124,6 +124,8 @@ private:
   TH1F* fhRadialPosTrue, *fhRadialPosGhost;
   TH1F* fhLastPlaneIdTrue, *fhLastPlaneIdGhost;
   TH2D* fhMomChi2True, *fhMomChi2Ghost;
+  
+  TH1F* fhNofGoodHits, *fhNofBadHits, *fhNofHits;
 
 // List of histograms
   TList* fHistoList;
@@ -131,18 +133,21 @@ private:
 // Counters
   Int_t fNofMcTracks;
   Int_t fNofRecTracks; 
-  Int_t fNofStsTracks; 
+  Int_t fNofStsTracks;
+  Int_t fNofRecTracksNoSts;
   Int_t fNofAccAll;
   Int_t fNofAccRef;
   Int_t fNofAccPrim;
   Int_t fNofAccSec;
   Int_t fNofAccMuons;
+  Int_t fNofAccMuonPairs;  
   Int_t fNofAccElectrons;  
   Int_t fNofRecAll;
   Int_t fNofRecRef;
   Int_t fNofRecPrim;
   Int_t fNofRecSec;
   Int_t fNofRecMuons;
+  Int_t fNofRecMuonPairs;
   Int_t fNofRecElectrons;  
   Int_t fNofGhosts;
   Int_t fNofClones;
@@ -152,6 +157,7 @@ private:
   Double_t fRateMcTracks;
   Double_t fRateStsTracks;
   Double_t fRateRecTracks;
+  Double_t fRateRecTracksNoSts;
   Double_t fRateRecAll;
   Double_t fRateRecRef;
   Double_t fRateRecPrim;
@@ -184,17 +190,20 @@ private:
   Int_t fEvNofMcTracks;
   Int_t fEvNofRecTracks; 
   Int_t fEvNofStsTracks; 
+  Int_t fEvNofRecTracksNoSts; 
   Int_t fEvNofAccAll;
   Int_t fEvNofAccRef;
   Int_t fEvNofAccPrim;
   Int_t fEvNofAccSec;
   Int_t fEvNofAccMuons;
+  Int_t fEvNofAccMuonPairs;
   Int_t fEvNofAccElectrons;
   Int_t fEvNofRecAll;
   Int_t fEvNofRecRef;
   Int_t fEvNofRecPrim;
   Int_t fEvNofRecSec;
   Int_t fEvNofRecMuons;
+  Int_t fEvNofRecMuonPairs;
   Int_t fEvNofRecElectrons;
   Int_t fEvNofGhosts;
   Int_t fEvNofClones;
@@ -211,6 +220,8 @@ private:
   Double_t fEvEffMismatches;  
   
   Int_t fNEvents; 
+  
+  Int_t fNofTrue[20];
 
   ClassDef(CbmLitRecQa,1);
 };

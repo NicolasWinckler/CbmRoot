@@ -88,6 +88,8 @@ public:
   inline void SetRadius(Double_t r)                  {fRadius = r;}
   inline void SetAaxis(Double_t a)                   {fAaxis = a;}
   inline void SetBaxis(Double_t b)                   {fBaxis = b;}
+  inline void SetAaxisCor(Double_t a)                {fAaxisCor = a;}
+  inline void SetBaxisCor(Double_t b)                {fBaxisCor = b;} 
          void SetXYABPhi(Double_t x, Double_t y,
                          Double_t a, Double_t b,
                          Double_t phi);
@@ -110,6 +112,8 @@ public:
   inline Double_t GetRadius()             const {return fRadius;}
   inline Double_t GetAaxis()              const {return fAaxis;}
   inline Double_t GetBaxis()              const {return fBaxis;}
+  inline Double_t GetAaxisCor()           const {return fAaxisCor;}
+  inline Double_t GetBaxisCor()           const {return fBaxisCor;}
   inline Double_t GetPhi()                const {return fPhi;}  
   Double_t GetXF1() const;
   Double_t GetYF1() const;  
@@ -142,6 +146,9 @@ protected:
   
   Double_t fAaxis; ///major axis of ellipse
   Double_t fBaxis; ///minor axes of the ellipse
+  Double_t fAaxisCor; ///major axis of ellipse after corection
+  Double_t fBaxisCor; ///minor axes of the ellipse after correctiom
+  
   Double_t fPhi; /// rotation angle
 
   Int_t fTrackID; /** ID of the matched track, set after track matching */

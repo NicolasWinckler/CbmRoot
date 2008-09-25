@@ -62,10 +62,10 @@ void CbmLitTrdTrackFinderSts::Init()
    
    fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
 
-   fNofIter = 1; 
+   fNofIter = 2; 
    fBeginStation = 0; 
    fEndStation = fLayout.GetNofStations() - 1;
-   fPDG = 211;
+   fPDG = 11;
 }
 
 void CbmLitTrdTrackFinderSts::SetIterationParameters(Int_t iter)
@@ -74,6 +74,11 @@ void CbmLitTrdTrackFinderSts::SetIterationParameters(Int_t iter)
 		fMaxNofMissingHitsInStation = 1;
 		fMaxNofMissingHits = 1;
 		fSigmaCoef = 5.; 
+	} 
+	if (iter == 1) {
+		fMaxNofMissingHitsInStation = 1;
+		fMaxNofMissingHits = 2;
+		fSigmaCoef = 7.; 
 	} 
 }
 

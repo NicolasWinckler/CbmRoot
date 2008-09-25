@@ -8,21 +8,12 @@
 
 class CbmLitTrackPropagator;
 class CbmLitTrackExtrapolator;
-class CbmLitTrackUpdate;
-class CbmLitTrackFitter;
-class CbmLitTrackSelection;
-class CbmLitTrack;
-class CbmLitHit;
 class TClonesArray;
-
 
 class CbmLitTrdTrackFinderSts: public CbmTrdTrackFinder,
 							   private CbmLitTrackFinderBranch
 {
-
 public:
-
-	
 	CbmLitTrdTrackFinderSts();
 	virtual ~CbmLitTrdTrackFinderSts();
 	

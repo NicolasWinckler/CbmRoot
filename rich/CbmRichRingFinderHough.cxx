@@ -66,11 +66,12 @@ void CbmRichRingFinderHough::Init()
     fFitCOP = new CbmRichRingFitterCOP(0, 0);    
     fFitCOP->Init();
     
-    fFitEllipse = new CbmRichRingFitterEllipse(0, 0, "muon");    
+    fFitEllipse = new CbmRichRingFitterEllipse(0, 1, "muon");    
     fFitEllipse->Init();   
     
     TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
     richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights.txt";
+   // richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights_Compact.txt";
     fANNSelect = new CbmRichRingSelectNeuralNet(0, richSelectNNFile);   
     fANNSelect->Init();
 }
@@ -168,11 +169,15 @@ void CbmRichRingFinderHough::SetParameters()
 
     fMaxDistance = 14;
     fMinDistance = 3.;
+   // fMinDistance = 2.5;    
     fMinDistance2 = fMinDistance*fMinDistance;
     fMaxDistance2 = fMaxDistance*fMaxDistance;
 
     fMinRadius = 4.;
     fMaxRadius = 7.0;
+    
+    //fMinRadius = 3.;
+    //fMaxRadius = 6.0;
     
     fHTCut = 90;
     fHitCut = 10;
@@ -479,11 +484,12 @@ void CbmRichRingFinderHough::FindMaxBinsXYR(Int_t *maxBinX, Int_t *maxBinY, Int_
 
 void CbmRichRingFinderHough::RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring)
 {
+	Int_t nHits = ring->GetNofHits();
 	Double_t xf1 = ring->GetXF1();
 	Double_t yf1 = ring->GetYF1();
 	Double_t xf2 = ring->GetXF2();
 	Double_t yf2 = ring->GetYF2();
-	Double_t drElCut = 0.8*sqrt(ring->GetChi2());
+	Double_t drElCut = 0.8*sqrt(ring->GetChi2()* (2*nHits - 5) / (nHits - 5));
 	if (drElCut > 0.3)	drElCut = 0.3;
 	drElCut = sqrt(drElCut);
 	
@@ -503,7 +509,8 @@ void CbmRichRingFinderHough::RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax,
 
 void CbmRichRingFinderHough::RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring)
 {	
-	Double_t drHitCut = sqrt(ring->GetChi2());
+
+	Double_t drHitCut = sqrt(ring->GetChi2() );
 	if (drHitCut > 0.3)	drHitCut = 0.3;
 
 	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
@@ -548,7 +555,7 @@ void CbmRichRingFinderHough::FindPeak(Int_t indmin, Int_t indmax)
 	fFitCOP->DoFit(&ring1);
 	Double_t drCOPCut = 3*sqrt(ring1.GetChi2());
 	if (drCOPCut > 1.2)	drCOPCut = 1.2;
-
+	//drCOPCut = 1.0;
 	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
 		Double_t rx = fData[j + indmin].fX - ring1.GetCenterX();
 		Double_t ry = fData[j + indmin].fY - ring1.GetCenterY();
@@ -566,8 +573,7 @@ void CbmRichRingFinderHough::FindPeak(Int_t indmin, Int_t indmax)
 	if (ring2.GetSelectionNN() > -0.5) {	
 		//RemoveHitsAroundRing(indmin, indmax, &ring1);
 		RemoveHitsAroundEllipse(indmin, indmax, &ring2);
-	
-	
+
 		fFoundRings.push_back(ring2);	
 	
 	}

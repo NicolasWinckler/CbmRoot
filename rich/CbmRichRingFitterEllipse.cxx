@@ -18,6 +18,7 @@
 #include "TFile.h"
 #include "TSystem.h"
 #include "TROOT.h"
+#include "TDirectory.h"
 
 #include <vector>
 
@@ -40,9 +41,9 @@ CbmRichRingFitterEllipse::CbmRichRingFitterEllipse()
 CbmRichRingFitterEllipse::CbmRichRingFitterEllipse(Int_t verbose,Int_t correction, TString fieldName)
 {
     fVerbose = verbose;
-    fCorrection   = correction;
+    fCorrection   = 1;
     fFieldName = fieldName;  
-    if (fCorrection == 1 )InitHistForRadiusCorrection();
+    InitHistForRadiusCorrection();
 }
 // -------------------------------------------------------------------------
 
@@ -111,8 +112,9 @@ void CbmRichRingFitterEllipse::DoFit(CbmRichRing *pRing)
     pRing->SetXYABPhi(xc,yc,fpar[4], b, ang);    
     pRing->SetRadius((b + fpar[4])/2.);        
     
-    ///Make radius correction if it's needed
-    if (fCorrection == 1 ) MakeRadiusCorrection(pRing);
+    ///Make radius correction 
+    //Corection parameters are stored in fAaxisCor and fBaxisCor !!!!
+    MakeRadiusCorrection(pRing);
     
     CalcChi2(pRing);    
 }
@@ -212,7 +214,7 @@ void CbmRichRingFitterEllipse::CalcChi2(CbmRichRing * pRing)
 
         chi2 += (d1 + d2 - 2.*axisA)*(d1 + d2 - 2.*axisA);
     }   
-    chi2 = chi2 / (nofHits - 5);
+    chi2 = chi2 / (2*nofHits - 5);
 
     pRing->SetChi2(chi2);
 
@@ -233,8 +235,9 @@ void CbmRichRingFitterEllipse::InitHistForRadiusCorrection()
         fileName = gSystem->Getenv("VMCWORKDIR");
         fileName += "/parameters/rich/muon_radius_correction_map.root";
     }
-
+    TDirectory *current = gDirectory;
     TFile *file = new TFile(fileName, "READ");
+    
     if (!file || !file->IsOpen()) {
     	cout << " -E- Read correction maps "<<endl;
     	cout << " -E- Could not open input file " <<fileName<< endl;
@@ -250,6 +253,7 @@ void CbmRichRingFitterEllipse::InitHistForRadiusCorrection()
 
     file->Close();
     delete file;
+    current->cd();    
 }
 
 void CbmRichRingFitterEllipse::MakeRadiusCorrection(CbmRichRing * pRing)
@@ -259,8 +263,8 @@ void CbmRichRingFitterEllipse::MakeRadiusCorrection(CbmRichRing * pRing)
     Double_t axisA = pRing->GetAaxis() + fh_mapaxisAXY->GetBinContent(fh_mapaxisAXY->FindBin(centerX,centerY));
     Double_t axisB = pRing->GetBaxis() + fh_mapaxisBXY->GetBinContent(fh_mapaxisBXY->FindBin(centerX,centerY));
     
-    pRing->SetAaxis(axisA);   
-    pRing->SetBaxis(axisB);
+    pRing->SetAaxisCor(axisA);   
+    pRing->SetBaxisCor(axisB);
 }
 
 

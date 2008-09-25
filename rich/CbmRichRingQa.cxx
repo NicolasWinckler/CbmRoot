@@ -68,7 +68,7 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose,
     fNofHitsInRingCut = 5; /// minumum number of hits in ring
     
     // count events
-    fEventNumber = 1;
+    fEventNumber = 0;
     
     fNofAllRings = 0;   
     fNofElRings = 0; 
@@ -267,7 +267,8 @@ InitStatus CbmRichRingQa::Init()
 // -------------------------------------------------------------------------
 void CbmRichRingQa::Exec(Option_t* option)
 {
-    cout<<"CbmRichRingQa Event No. "<< fEventNumber++ << endl;
+	fEventNumber++;
+    cout<<"CbmRichRingQa Event No. "<< fEventNumber << endl;
     
     // Create some pointers and variables
     CbmRichHit* hit    = NULL;
@@ -394,7 +395,6 @@ void CbmRichRingQa::Exec(Option_t* option)
         Bool_t isProj = DoesRingHaveProjection(trackID);        
         Int_t gcode = track->GetPdgCode();
         Int_t motherId = track->GetMotherId();
-//!!!!!!!!  //TMath::Abs(gcode)
         if ((TMath::Abs(gcode) == 11)&& motherId == -1) {///primary electron rings
             if (isProj && itMapWithHits->second.GetNofHits() >= fNofHitsInRingCut){
                 fitCOP->DoFit(&(itMapWithHits->second));
@@ -417,9 +417,7 @@ void CbmRichRingQa::Exec(Option_t* option)
                 fh_MCMomvsRadpos->Fill(momentum, itMapWithHits->second.GetRadialPosition());
                 fh_MCMomvsNofHits->Fill(momentum, itMapWithHits->second.GetNofHits());
                 fh_MCMomvsBoverA->Fill(momentum, itMapWithHits->second.GetBaxis()/itMapWithHits->second.GetAaxis());
-               // if (momentum < 2){
                 fh_MCXYE->Fill(itMapWithHits->second.GetCenterX(),itMapWithHits->second.GetCenterY());
-              //  }
             }
         }
     }
@@ -703,14 +701,11 @@ void CbmRichRingQa::DiffFakeTrue()
     Double_t distance = ring->GetDistance();
     Int_t nHits = ring->GetNofHits();
     Double_t radPos = ring->GetRadialPosition();
-    //Double_t radius = ring->GetRadius();
-    Double_t axisA = ring->GetAaxis();
-    Double_t axisB = ring->GetBaxis();
+    Double_t axisA = ring->GetAaxisCor();
+    Double_t axisB = ring->GetBaxisCor();
     Double_t phi = ring->GetPhi();
     Double_t radAngle = ring->GetRadialAngle();
     Double_t stsMomentum = GetStsMomentum(ring);  
-    //Double_t centerX = ring->GetCenterX();
-    //Double_t centerY = ring->GetCenterY();
     
     if (ring->GetAaxis() >= 10. || ring->GetAaxis() <= 0.){
         continue;

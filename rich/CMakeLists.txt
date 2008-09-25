@@ -11,6 +11,8 @@ ${CBMROOT_SOURCE_DIR}/cbmbase
 ${CBMROOT_SOURCE_DIR}/sts
 ${CBMROOT_SOURCE_DIR}/global 
 ${CBMROOT_SOURCE_DIR}/rich 
+${CBMROOT_SOURCE_DIR}/trd
+${CBMROOT_SOURCE_DIR}/tof
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -22,26 +24,48 @@ ${ROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(RICH_SRCS
-CbmGeoRich.cxx CbmRichRing.cxx	
-CbmRichRingFinder.cxx CbmRich.cxx 
-CbmRichHit.cxx CbmRichHitProducer.cxx   
-CbmRichProjectionProducer.cxx CbmGeoRichPar.cxx CbmRichContFact.cxx   
+CbmGeoRich.cxx 
+CbmRichRing.cxx	
+CbmRichRingFinder.cxx 
+CbmRich.cxx 
+CbmRichHit.cxx 
+CbmRichHitProducer.cxx   
+CbmRichProjectionProducer.cxx 
+CbmGeoRichPar.cxx 
+CbmRichContFact.cxx   
 CbmRichPoint.cxx
-CbmRichRingFinderHough.cxx CbmRichRingFinderTrack.cxx
-CbmRichRingFinderIdeal.cxx CbmRichFindRings.cxx
-CbmRichRingFitter.cxx CbmRichRingFitterCircle.cxx CbmRichFitRings.cxx
-CbmRichRingFitterCOP.cxx CbmRichRingFitterRobustCOP.cxx CbmRichRingFitterTAU.cxx
-CbmRichTrackExtrapolation.cxx CbmRichTrackExtrapolationIdeal.cxx
+CbmRichRingFinderHough.cxx 
+CbmRichRingFinderTrack.cxx
+CbmRichRingFinderIdeal.cxx 
+CbmRichFindRings.cxx
+CbmRichRingFitter.cxx 
+CbmRichRingFitterCircle.cxx 
+CbmRichFitRings.cxx
+CbmRichRingFitterCOP.cxx 
+CbmRichRingFitterRobustCOP.cxx 
+CbmRichRingFitterTAU.cxx
+CbmRichTrackExtrapolation.cxx 
+CbmRichTrackExtrapolationIdeal.cxx
 CbmRichTrackExtrapolationMirrorIdeal.cxx
 CbmRichExtrapolateTracks.cxx
-CbmRichRingMatch.cxx CbmRichMatchRings.cxx
-CbmRichRingTrackAssign.cxx CbmRichRingTrackAssignClosestD.cxx
-CbmRichRingTrackAssignIdeal.cxx CbmRichAssignTrack.cxx
-CbmRichTestSim.cxx CbmRichTestHits.cxx
+CbmRichRingMatch.cxx 
+CbmRichMatchRings.cxx
+CbmRichRingTrackAssign.cxx 
+CbmRichRingTrackAssignClosestD.cxx
+CbmRichRingTrackAssignIdeal.cxx 
+CbmRichAssignTrack.cxx
+CbmRichTestSim.cxx 
+CbmRichTestHits.cxx
 CbmRichRingQa.cxx
-CbmRichRingSelect.cxx CbmRichRingSelectNeuralNet.cxx
-CbmRichRingSelect2DCuts.cxx CbmRichSelectRings.cxx
+CbmRichRingSelect.cxx 
+CbmRichRingSelectNeuralNet.cxx
+CbmRichRingSelect2DCuts.cxx 
+CbmRichSelectRings.cxx
 CbmRichRingFitterEllipse.cxx
+#CbmRichFuzzyKE.cxx
+#CbmRichElectrons.cxx
+#CbmRichElectronsQa.cxx
+#CbmRichElIdAnn.cxx
 )
 
 if(RULE_CHECKER_FOUND)

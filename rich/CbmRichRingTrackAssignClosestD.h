@@ -34,53 +34,50 @@ class CbmRichRingTrackAssignClosestD : public CbmRichRingTrackAssign {
 public:
 
   /** Default constructor **/
-  CbmRichRingTrackAssignClosestD();
+	CbmRichRingTrackAssignClosestD();
 
-  /** Standard constructor
-   *@param distance         max. distance between ring center and projected track [cm]
-   *@param npoints         min number of points on ring
-   *@param verbose          verbosity level
-   */
-  CbmRichRingTrackAssignClosestD(Double_t distance, Int_t npoints, Int_t verbose);
+	/** Standard constructor
+	 *@param distance         max. distance between ring center and projected track [cm]
+	 *@param npoints         min number of points on ring
+	 *@param verbose          verbosity level
+	 */
+	CbmRichRingTrackAssignClosestD(Double_t distance, Int_t npoints,
+			Int_t verbose);
 
-  /** Standard Constructor with name and title **/
-  CbmRichRingTrackAssignClosestD(const char *name, const char *title,
-   				    Double_t distance, Int_t npoints, Int_t verbose);
+	/** Standard Constructor with name and title **/
+	CbmRichRingTrackAssignClosestD(const char *name, const char *title,
+			Double_t distance, Int_t npoints, Int_t verbose);
 
-  /** Destructor **/
-  virtual ~CbmRichRingTrackAssignClosestD();
+	/** Destructor **/
+	virtual ~CbmRichRingTrackAssignClosestD();
 
-  /** Initialisation **/
-  void Init();
+	/** Initialisation **/
+	void Init();
 
+	Bool_t IsTrdElectron(Int_t iTrack);
 
-  /** Method DoAssign.
-  ** Task: Read the extrapolated Tracks, read the found rings, assign according to closest distance criterium
-   ** pointers to both Rings are given as argument
-   **
-   *@param pTrack    pointer to extrapolated track
-   *@param pRing     pointer to found ring
-   **/
-   void DoAssign(TClonesArray* pRing, TClonesArray* pTrack);
-
-
+	/** Method DoAssign.
+	 ** Task: Read the extrapolated Tracks, read the found rings, assign according to closest distance criterium
+	 ** pointers to both Rings are given as argument
+	 **
+	 *@param pTrack    pointer to extrapolated track
+	 *@param pRing     pointer to found ring
+	 **/
+	void DoAssign(TClonesArray* pRing, TClonesArray* pTrack);
 
 private:
 
-  /** Arrays of track information **/
-  TClonesArray* fMCTrackArray;
-  TClonesArray* gTrackArray;
-  TClonesArray* fRingMatchArray;
-  TClonesArray* fTrackMatchArray;
+	/** Arrays of track information **/
+	TClonesArray* gTrackArray;
+	TClonesArray* fTrdTracks;
 
+	/** Verbosity level **/
+	Int_t fVerbose;
 
-  /** Verbosity level **/
-  Int_t fVerbose;
+	Double_t fDistance; /** max. distance between ring center and track extrapolation */
+	Int_t fNpoints; /** min number of points per ring */
 
-  Double_t fDistance;  /** max. distance between ring center and track extrapolation */
-  Int_t    fNpoints;   /** min number of points per ring */
-
-  ClassDef(CbmRichRingTrackAssignClosestD,1);
+	ClassDef(CbmRichRingTrackAssignClosestD, 1);
 
 };
 

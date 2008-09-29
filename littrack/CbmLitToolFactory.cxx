@@ -158,7 +158,7 @@ CbmLitTrackSelection* CbmLitToolFactory::CreateTrackSelection(
 	} else
 	if(name == "MomentumSeed") {
 		CbmLitTrackSelectionMomentum* momSelection = new CbmLitTrackSelectionMomentum();
-		momSelection->SetMinMomentum(2.5);
+		momSelection->SetMinMomentum(1.5);
 		momSelection->Initialize();
 		return momSelection;
 	} else	
@@ -185,9 +185,9 @@ CbmLitTrackSelection* CbmLitToolFactory::CreateTrackSelection(
 		CbmLitTrackSelectionMuch* muchSelection = new CbmLitTrackSelectionMuch();
 		muchSelection->SetNofSharedHits(2);
 		Int_t nofStations = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofStations();
-		muchSelection->SetMinLastPlaneId(nofStations-1);
+		muchSelection->SetMinLastPlaneId(nofStations-2);
 		Int_t nofLayers = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofLayers();
-		muchSelection->SetMinNofHits(nofLayers - 3);
+		muchSelection->SetMinNofHits(1);
 		muchSelection->Initialize(); 
 		return muchSelection;
 	} else 

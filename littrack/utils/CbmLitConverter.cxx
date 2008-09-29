@@ -15,6 +15,8 @@
 
 #include "TClonesArray.h"
 
+#include <iostream>
+
 CbmLitConverter::CbmLitConverter()
 {
 	
@@ -146,13 +148,13 @@ void CbmLitConverter::LitTrackToMuchTrack(
 void CbmLitConverter::LitTrackToTrdTrack(
 		const CbmLitTrack* litTrack,
 		CbmTrdTrack* trdTrack)
-{
-	   
+{   
 	for (int iHit = 0; iHit < litTrack->GetNofHits(); iHit++) {
 		CbmTrdHit hit;
 		CbmLitConverter::LitHitToTrdHit(litTrack->GetHit(iHit), &hit);
 		trdTrack->AddHit(litTrack->GetHit(iHit)->GetRefId(), &hit);
 	}
+	
 	trdTrack->SortHits();
 	trdTrack->SetFlag(litTrack->GetQuality());
 	trdTrack->SetChi2(litTrack->GetChi2());

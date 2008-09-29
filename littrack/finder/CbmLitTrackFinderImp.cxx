@@ -173,7 +173,7 @@ Double_t CbmLitTrackFinderImp::CalcDevX(
 {
 	Double_t C0 = par->GetCovariance(0);
 	if(C0 > fMaxErrSq || C0 < 0.) return 0.;
-	//return fSigmaCoef * std::sqrt(C0 + fMaxErrX[layer] * fMaxErrX[layer]);
+//	return fSigmaCoef * std::sqrt(C0 + fMaxErrX[layer] * fMaxErrX[layer]);
 	return fSigmaCoef * (std::sqrt(C0) + fMaxErrX[layer]);
 }
 
@@ -183,7 +183,7 @@ Double_t CbmLitTrackFinderImp::CalcDevY(
 {
 	Double_t C5 = par->GetCovariance(5);
 	if(C5 > fMaxErrSq || C5 < 0.) return 0.;
-   	//return fSigmaCoef * std::sqrt(C5 + fMaxErrY[layer] * fMaxErrY[layer]);
+//  return fSigmaCoef * std::sqrt(C5 + fMaxErrY[layer] * fMaxErrY[layer]);
 	return fSigmaCoef * (std::sqrt(C5) + fMaxErrY[layer]);
 }
 

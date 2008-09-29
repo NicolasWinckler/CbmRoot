@@ -18,6 +18,7 @@ public:
 	CbmLitTrack(const CbmLitTrack& track) { *this = track; };
 	
 	Int_t GetNofHits() const { return fHits.size(); }
+	Int_t GetNofHits(Int_t planeId);
 	LitTrackQa GetQuality() const { return fQuality; }
 	Double_t GetChi2() const { return fChi2; }
 	Int_t GetNDF() const { return fNDF; }

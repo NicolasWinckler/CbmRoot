@@ -77,8 +77,11 @@ void CbmLitTrackFinderRobust::FollowTracks(
 		TrackIterator itBegin,
 		TrackIterator itEnd)
 {
-	for (TrackIterator it = itBegin; it != itEnd; it++)
+	for (TrackIterator it = itBegin; it != itEnd; it++) {
+		//std::cout << "id=" << (it - itBegin) << " ";
 		FollowTrack(*it);
+		//std::cout << std::endl;
+	}
 }
 
 void CbmLitTrackFinderRobust::FollowTrack(
@@ -96,6 +99,7 @@ void CbmLitTrackFinderRobust::FollowTrack(
 		for (HitIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
 			if (IsIn(&par, *iHit)) {
 				track->AddHit(*iHit);
+				//std::cout << (*iHit)->GetRefId() << " ";
 				hitAdded = true;
 			}
 		}
@@ -103,7 +107,7 @@ void CbmLitTrackFinderRobust::FollowTrack(
 		if (!hitAdded) {
 			nofMissingHits++;
 			if (nofMissingHits > fMaxNofMissingHits) {
-				track->SetQuality(kLITBAD);
+				//track->SetQuality(kLITBAD);
 				return;
 			}
 			continue;
@@ -112,7 +116,7 @@ void CbmLitTrackFinderRobust::FollowTrack(
 		track->SetPDG(fPDG);
 		track->SetLastPlaneId(iLayer);
 		track->SetParamLast(&par);
-		track->SetQuality(kLITGOOD);
+		//track->SetQuality(kLITGOOD);
 	}
 }
 

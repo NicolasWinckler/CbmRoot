@@ -54,7 +54,7 @@ LitStatus CbmLitTrackSelectionMuch::DoSelect(
 	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) 
 		(*iTrack)->SetQuality(kLITGOOD);
 
-	//fSelectionA->DoSelect(itBegin, itEnd);
+	fSelectionA->DoSelect(itBegin, itEnd);
 	//fSelectionB->DoSelect(itBegin, itEnd);
 	fSelectionC->DoSelect(itBegin, itEnd);
 	fSelectionD->DoSelect(itBegin, itEnd);

@@ -47,14 +47,14 @@ LitStatus CbmLitTrackSelectionMuchRobust::DoSelect(
 	
 	((CbmLitTrackSelectionC*)fSelectionC)->SetNofSharedHits(2);
 	((CbmLitTrackSelectionD*)fSelectionD)->SetMinNofHits(1);
-	((CbmLitTrackSelectionD*)fSelectionD)->SetMinLastPlaneId(8);
-	((CbmLitTrackSelectionChiSq*)fSelectionChiSq)->SetMaxChiSq(3.);
+	((CbmLitTrackSelectionD*)fSelectionD)->SetMinLastPlaneId(10);
+	((CbmLitTrackSelectionChiSq*)fSelectionChiSq)->SetMaxChiSq(15.);
 	
 	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) 
 		(*iTrack)->SetQuality(kLITGOOD);
 
 	fSelectionD->DoSelect(itBegin, itEnd);
-//	fSelectionRobust->DoSelect(itBegin, itEnd);
+	fSelectionRobust->DoSelect(itBegin, itEnd);
 //	fSelectionChiSq->DoSelect(itBegin, itEnd);
 //	((CbmLitTrackSelectionD*)fSelectionD)->SetMinNofHits(9);
 //	((CbmLitTrackSelectionD*)fSelectionD)->SetMinLastPlaneId(1);

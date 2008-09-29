@@ -16,7 +16,6 @@ class CbmLitTrackUpdate;
 class CbmLitTrackSelection;
 class CbmLitTrackFitter;
 
-
 class CbmLitTrackFinderImp : public CbmLitTrackFinder
 {
 public:

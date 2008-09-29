@@ -63,6 +63,7 @@ LitStatus CbmLitRobustSelection::DoSelect(
 			(*it)->AddHit(&newHits[i]);
 		}
 		
+		//std::cout << "nofHits=" << (*it)->GetNofHits() << std::endl;
 		if ((*it)->GetNofHits() == 0) {
 			(*it)->SetQuality(kLITBAD);
 			continue;

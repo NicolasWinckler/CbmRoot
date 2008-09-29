@@ -93,6 +93,16 @@ Bool_t CbmLitTrack::CheckParams() const
 	return true;
 }
 
+Int_t CbmLitTrack::GetNofHits(
+		Int_t planeId)
+{
+	CbmLitHit value;
+	value.SetPlaneId(planeId);
+	HitIteratorPair bounds = 
+			std::equal_range(fHits.begin(), fHits.end(), &value, CompareHitPtrPlaneIdLess());
+	return bounds.second - bounds.first;
+}
+
 HitIteratorPair CbmLitTrack::GetHits(
 		Int_t planeId)
 {

@@ -32,6 +32,7 @@
 #pragma link C++ class  CbmLitTrdTrackFinderS+;
 #pragma link C++ class  CbmLitMuchTrackFinderBranch+;
 #pragma link C++ class  CbmLitMuchTrackFinderRobust+;
+#pragma link C++ class  CbmLitTrdTrackFinderRobust+;
 //#pragma link C++ class  CbmLitMuchTrackFinderTrigger+;
 
 //fitter

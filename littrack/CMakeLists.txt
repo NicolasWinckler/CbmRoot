@@ -60,6 +60,7 @@ finder/CbmLitTrdTrackFinderSts.cxx
 finder/CbmLitTrdTrackFinderS.cxx
 finder/CbmLitMuchTrackFinderBranch.cxx
 finder/CbmLitMuchTrackFinderRobust.cxx
+finder/CbmLitTrdTrackFinderRobust.cxx
 fitter/CbmLitTrackFitterImp.cxx
 fitter/CbmLitKalmanFilter.cxx
 fitter/CbmLitTrackFitterRobust.cxx

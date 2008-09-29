@@ -8,6 +8,7 @@
 #include "CbmLitComparators.h"
 #include "CbmLitWeightCalculatorSimple.h"
 #include "CbmLitEffHitCalculatorImp.h"
+#include "CbmLitRobustAna.h"
 
 #include <vector>
 #include <cmath> 
@@ -24,12 +25,13 @@ CbmLitTrackFitterRobust::CbmLitTrackFitterRobust(
 	fEffHitCalc = new CbmLitEffHitCalculatorImp;
 	
 	//track fit parameters
-	fNofIterations = 5;
-	// was 81, 9, 4, 1, 1, 1
+	fNofIterations = 2;
+	// was 0, 81, 9, 4, 1, 1, 1
 	fAnnealing.push_back(0.);
-	fAnnealing.push_back(81.);
+	fAnnealing.push_back(1.);
 	fAnnealing.push_back(9.);
 	fAnnealing.push_back(4.);
+	fAnnealing.push_back(1.);
 	fAnnealing.push_back(1.);
 	fOutlierCut = 1e-20;	
 }
@@ -55,6 +57,8 @@ LitStatus CbmLitTrackFitterRobust::Fit(
 		CbmLitTrack *track,
 		Bool_t downstream)
 {
+	CbmLitRobustAna::Instance()->Fill(track);
+	
 	track->SortHits();
 	std::vector<HitIteratorPair> bounds;
 	track->GetHitBounds(bounds);
@@ -71,14 +75,23 @@ LitStatus CbmLitTrackFitterRobust::Fit(
 		if (CheckEffTrack(&etrack) == kLITERROR) {
 			return kLITERROR;
 		}	
-		
+		//std::cout << "before fitter" << std::endl;
 		if (fFitter->Fit(&etrack) == kLITERROR) {
+			//std::cout << "CbmLitTrackFitterRobust::Fit fitter error" << std::endl;
+			//std::cout << etrack.ToString();
+			//std::cout << etrack.GetParamFirst()->ToString();
+			CbmLitRobustAna::Instance()->FillErrFit(track, iter);
 			return kLITERROR;
 		}		
+		//std::cout << "after fitter" << std::endl;
 
 		if (fSmoother->Fit(&etrack) == kLITERROR) {
+			std::cout << "CbmLitTrackFitterRobust::Fit smoother error" << std::endl;
 			return kLITERROR;
 		}
+		
+		CbmLitRobustAna::Instance()->Fill(&etrack, iter);
+		CbmLitRobustAna::Instance()->FillWeight(track, iter);
 	}
 	
 	return kLITSUCCESS;
@@ -212,9 +225,10 @@ LitStatus CbmLitTrackFitterRobust::CreateEffTrack(
 			if (!AreAllOutliers(bounds[i].first, bounds[i].second)) {
 				CbmLitHit ehit = fEffHitCalc->DoCalculate(bounds[i].first, bounds[i].second);
 				etrack->AddHit(&ehit);
-				//std::cout << "eff hit:"; ehit.Print();
+//				std::cout << "eff hit:" << ehit.ToString();
 			} else {
-			//	std::cout << "all hit outliers " << std::endl;
+//				std::cout << "iter=" << iter << ", all hit outliers " << std::endl;
+//				std::cout << etrack->ToString();
 			}
 		} else {
 			etrack->AddHit(*bounds[i].first);
@@ -230,6 +244,7 @@ LitStatus CbmLitTrackFitterRobust::CheckEffTrack(
 	
 	return kLITSUCCESS;	
 }
+
 //
 //LitStatus CbmLitTrackFitterRobust::IsStopIterations(
 //		const std::vector<HitIteratorPair>& bounds) const

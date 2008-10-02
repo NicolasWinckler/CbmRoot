@@ -223,10 +223,6 @@ void run_reco(Int_t nEvents = 1)
     // ----------- TRD track Pid Ann ----------------------
     CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new
     CbmTrdSetTracksPidANN("Ann","Ann");
-    TString ParamFile = gSystem->Getenv("VMCWORKDIR");
-    ParamFile += "/parameters/trd/Neural_Net_Weights_El_ID.txt";
-    cout << ParamFile << endl;
-    trdSetTracksPidAnnTask->SetInputFile(ParamFile);
     run->AddTask(trdSetTracksPidAnnTask);
     // ----------------------------------------------------
   
@@ -388,12 +384,6 @@ void run_reco(Int_t nEvents = 1)
   
 
   //--------------------- RICH ring selection -------------------------------
-  CbmRichRingSelect2DCuts *ringSelect2D 
-    = new CbmRichRingSelect2DCuts(iVerbose);
-  CbmRichSelectRings* richSelectRings2D = new CbmRichSelectRings();
-  richSelectRings2D->UseSelect(ringSelect2D);
-  run->AddTask(richSelectRings2D);
-
   TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
   richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights.txt";
   CbmRichRingSelectNeuralNet *ringSelectNN 

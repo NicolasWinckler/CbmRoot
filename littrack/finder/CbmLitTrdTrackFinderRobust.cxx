@@ -11,6 +11,7 @@
 #include "TClonesArray.h"
 
 #include <iostream>
+#include <algorithm>
 
 CbmLitTrdTrackFinderRobust::CbmLitTrdTrackFinderRobust()
 {

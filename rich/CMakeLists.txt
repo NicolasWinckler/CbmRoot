@@ -59,13 +59,12 @@ CbmRichTestHits.cxx
 CbmRichRingQa.cxx
 CbmRichRingSelect.cxx 
 CbmRichRingSelectNeuralNet.cxx
-CbmRichRingSelect2DCuts.cxx 
 CbmRichSelectRings.cxx
 CbmRichRingFitterEllipse.cxx
-#CbmRichFuzzyKE.cxx
-#CbmRichElectrons.cxx
-#CbmRichElectronsQa.cxx
-#CbmRichElIdAnn.cxx
+CbmRichFuzzyKE.cxx
+CbmRichElectrons.cxx
+CbmRichElectronsQa.cxx
+CbmRichElIdAnn.cxx
 )
 
 if(RULE_CHECKER_FOUND)

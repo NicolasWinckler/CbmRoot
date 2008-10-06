@@ -42,13 +42,15 @@
 
 #pragma link C++ class CbmRichRingSelect+;
 #pragma link C++ class CbmRichRingSelectNeuralNet+;
-#pragma link C++ class CbmRichRingSelect2DCuts+;
 #pragma link C++ class CbmRichSelectRings+;
 #pragma link C++ class CbmRichRingFitterEllipse+;
+//#pragma link C++ class CbmRichFuzzyKE+;
+//#pragma link C++ class CbmRichElectrons+;
+//#pragma link C++ class CbmRichElectronsQa+;
+//#pragma link C++ class CbmRichElIdAnn+;
 
 #pragma link C++ class CbmRichContFact;
 #pragma link C++ class CbmGeoRichPar;
-
 
 #endif
 

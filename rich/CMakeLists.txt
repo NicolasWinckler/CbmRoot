@@ -61,10 +61,10 @@ CbmRichRingSelect.cxx
 CbmRichRingSelectNeuralNet.cxx
 CbmRichSelectRings.cxx
 CbmRichRingFitterEllipse.cxx
-CbmRichFuzzyKE.cxx
-CbmRichElectrons.cxx
-CbmRichElectronsQa.cxx
-CbmRichElIdAnn.cxx
+#CbmRichFuzzyKE.cxx
+#CbmRichElectrons.cxx
+#CbmRichElectronsQa.cxx
+#CbmRichElIdAnn.cxx
 )
 
 if(RULE_CHECKER_FOUND)

@@ -52,7 +52,7 @@ void CbmRichRingFinderHough::Init()
     if (fVerbose) cout << "CbmRichRingFinderHough::init() "<<endl;
     fNEvent = 0;
     SetParameters();
-    
+   // SetParameters("compact");
     fHist.resize(fNofBinsX);
     for (Int_t i = 0; i < fNofBinsX; i++) fHist[i].resize(fNofBinsY); 
 
@@ -66,7 +66,7 @@ void CbmRichRingFinderHough::Init()
     fFitCOP = new CbmRichRingFitterCOP(0, 0);    
     fFitCOP->Init();
     
-    fFitEllipse = new CbmRichRingFitterEllipse(0, 1, "muon");    
+    fFitEllipse = new CbmRichRingFitterEllipse(0, 0, "muon");    
     fFitEllipse->Init();   
     
     TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
@@ -169,15 +169,11 @@ void CbmRichRingFinderHough::SetParameters()
 
     fMaxDistance = 14;
     fMinDistance = 3.;
-   // fMinDistance = 2.5;    
     fMinDistance2 = fMinDistance*fMinDistance;
     fMaxDistance2 = fMaxDistance*fMaxDistance;
 
     fMinRadius = 4.;
     fMaxRadius = 7.0;
-    
-    //fMinRadius = 3.;
-    //fMaxRadius = 6.0;
     
     fHTCut = 90;
     fHitCut = 10;
@@ -201,35 +197,43 @@ void CbmRichRingFinderHough::SetParameters(TString geometry)
     }
     
     if (geometry == "standard"){
-        fMaxDistance = 14.;
+        fMaxDistance = 14;
         fMinDistance = 3.;
         fMinDistance2 = fMinDistance*fMinDistance;
         fMaxDistance2 = fMaxDistance*fMaxDistance;
+
+        fMinRadius = 4.;
+        fMaxRadius = 7.0;
         
-        fMinRadius = 5.5;
-        fMaxRadius = 6.75;
-        
-        fHTCut = 70;
-        fHitCut = 8;
+        fHTCut = 90;
+        fHitCut = 10;
+
+        fHTCutR = 40;
+        fHitCutR = 10;  
         
         fNofBinsX = 15;
         fNofBinsY = 15;
+        fNofBinsR = 40;
     }
     
-    if (geometry == "small"){
+    if (geometry == "small" || geometry == "compact"){        
         fMaxDistance = 12.;
-        fMinDistance = 3.;
+        fMinDistance = 2.5;
         fMinDistance2 = fMinDistance*fMinDistance;
         fMaxDistance2 = fMaxDistance*fMaxDistance;
+
+        fMinRadius = 3.;
+        fMaxRadius = 6.0;
         
-        fMinRadius = 4.5;
-        fMaxRadius = 5.75;
-        
-        fHTCut = 50;
-        fHitCut = 6;
+        fHTCut = 90;
+        fHitCut = 10;
+
+        fHTCutR = 40;
+        fHitCutR = 10;  
         
         fNofBinsX = 15;
         fNofBinsY = 15;
+        fNofBinsR = 40;
     }
 }
 
@@ -484,14 +488,16 @@ void CbmRichRingFinderHough::FindMaxBinsXYR(Int_t *maxBinX, Int_t *maxBinY, Int_
 
 void CbmRichRingFinderHough::RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring)
 {
-	Int_t nHits = ring->GetNofHits();
 	Double_t xf1 = ring->GetXF1();
 	Double_t yf1 = ring->GetYF1();
 	Double_t xf2 = ring->GetXF2();
 	Double_t yf2 = ring->GetYF2();
-	Double_t drElCut = 0.8*sqrt(ring->GetChi2()* (2*nHits - 5) / (nHits - 5));
+
+	Double_t drElCut = 0.8*sqrt(ring->GetChi2());
 	if (drElCut > 0.3)	drElCut = 0.3;
 	drElCut = sqrt(drElCut);
+	
+	//drElCut = 0.3;
 	
 	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
 		Double_t x = fData[j + indmin].fX;
@@ -509,8 +515,7 @@ void CbmRichRingFinderHough::RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax,
 
 void CbmRichRingFinderHough::RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring)
 {	
-
-	Double_t drHitCut = sqrt(ring->GetChi2() );
+	Double_t drHitCut = sqrt(ring->GetChi2());
 	if (drHitCut > 0.3)	drHitCut = 0.3;
 
 	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
@@ -555,7 +560,10 @@ void CbmRichRingFinderHough::FindPeak(Int_t indmin, Int_t indmax)
 	fFitCOP->DoFit(&ring1);
 	Double_t drCOPCut = 3*sqrt(ring1.GetChi2());
 	if (drCOPCut > 1.2)	drCOPCut = 1.2;
-	//drCOPCut = 1.0;
+	
+	//drCOPCut = 1.2; 
+	//Ann cut = -0.2
+	//could be also drCOPCut = 1.2, better fake rejection; Ann cut = -0.5
 	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
 		Double_t rx = fData[j + indmin].fX - ring1.GetCenterX();
 		Double_t ry = fData[j + indmin].fY - ring1.GetCenterY();
@@ -574,9 +582,9 @@ void CbmRichRingFinderHough::FindPeak(Int_t indmin, Int_t indmax)
 		//RemoveHitsAroundRing(indmin, indmax, &ring1);
 		RemoveHitsAroundEllipse(indmin, indmax, &ring2);
 
-		fFoundRings.push_back(ring2);	
-	
+		fFoundRings.push_back(ring2);
 	}
+
 }
 
 void CbmRichRingFinderHough::RingSelection()

@@ -107,8 +107,8 @@ void CbmRichRingSelectNeuralNet::DoSelect(CbmRichRing* ring)
     nnPar[1] =  ring->GetAngle();
     nnPar[2] =  ring->GetNofHitsOnRing();
     nnPar[3] =  ring->GetRadialPosition();
-    nnPar[4] =  ring->GetAaxisCor();
-    nnPar[5] =  ring->GetBaxisCor();
+    nnPar[4] =  ring->GetAaxis();
+    nnPar[5] =  ring->GetBaxis();
     nnPar[6] =  ring->GetPhi();
     nnPar[7] =  ring->GetRadialAngle(); 
     nnPar[8] =  ring->GetChi2();    

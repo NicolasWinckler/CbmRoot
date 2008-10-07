@@ -52,18 +52,17 @@ using std::vector;
 // -----   Default constructor   -------------------------------------------
 CbmRichRingQa::CbmRichRingQa() :CbmTask("RichRingQa")
 {
-  fNormType = 0;
+
 }
 // -------------------------------------------------------------------------
 
 //------------  standard constructor (with verbosity level)  ---------------------------------
-CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose, Int_t normType)
+CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
   :CbmTask(name)
 {
     
     // verbosity level
     fVerbose = verbose;
-    fNormType = normType;
     
     fNofHitsInRingCut = 5; /// minumum number of hits in ring
     
@@ -489,24 +488,21 @@ Bool_t CbmRichRingQa::DoesRingHaveProjection(Int_t trackId){
     //search for projection with such TrackID
     Bool_t isProj = false;
     Int_t nProj = fProj->GetEntriesFast();
-    CbmTrackParam* proj = NULL;
-    CbmGlobalTrack* gtrack = NULL;
-      CbmStsTrackMatch* trackMatch = NULL;
-        
+
     for (Int_t iProj = 0; iProj < nProj; iProj++){
-        proj   = (CbmTrackParam*)fProj->At(iProj);
+    	CbmTrackParam* proj   = (CbmTrackParam*)fProj->At(iProj);
         if (!proj){
             cout << "-E- no projection"<< iProj<<endl;
             continue;
 
         }
-        gtrack = (CbmGlobalTrack*)gTrackArray->At(iProj);
+        CbmGlobalTrack* gtrack = (CbmGlobalTrack*)gTrackArray->At(iProj);
         if (gtrack->GetStsTrackIndex() == -1) continue;
-        trackMatch = (CbmStsTrackMatch*)fTrackMatch->At(gtrack->GetStsTrackIndex());
+        CbmStsTrackMatch* trackMatch = (CbmStsTrackMatch*)fTrackMatch->At(gtrack->GetStsTrackIndex());
 
         if (!trackMatch) cout << "-E- no matched track!: fake?"<< endl;
-        if (!trackMatch) continue;;
-        if (trackMatch->GetMCTrackId() == trackId){
+        if (!trackMatch) continue;
+        if (trackMatch->GetMCTrackId() == trackId && proj->GetX()!= 0 &&  proj->GetY()!= 0){
             isProj = true;
             break;
         }
@@ -552,17 +548,11 @@ void CbmRichRingQa::EfficiencyCalc()
 
     for (Int_t iMatches = 0; iMatches < nMatches; iMatches++){
         match   = (CbmRichRingMatch*)fMatches->At(iMatches);
-        if (!match){
-            cout << "-E- CbmRichRingQa::EfficiencyCalc() no match"<<
-            iMatches<<endl;
-            continue;
-        }
+        if (!match) continue;
+      
         ring = (CbmRichRing*)fRings->At(iMatches);
-        if (!ring){
-            cout << "-E- CbmRichRingQa::EfficiencyCalc() no ring"<<
-            iMatches<<endl;
-            continue;
-        }  
+        if (!ring) continue;
+       
         
         Int_t lTrueHits = match->GetNofTrueHits();
         Int_t lWrongHits = match->GetNofWrongHits();
@@ -572,10 +562,6 @@ void CbmRichRingQa::EfficiencyCalc()
         Double_t lPercTrue = 0;
         if (lFoundHits >= 3){
             lPercTrue = (Double_t)lTrueHits / (Double_t)lFoundHits;
-        }
-        Double_t lPercMCTrue = 0;
-        if (lMCHits >= 3){
-            lPercMCTrue = (Double_t)lTrueHits / (Double_t)lMCHits;
         }
         
         Int_t trackID = match->GetMCTrackID();
@@ -590,19 +576,6 @@ void CbmRichRingQa::EfficiencyCalc()
         Double_t momentum = track->GetP();
         Int_t motherId = track->GetMotherId();
         Bool_t isProj = DoesRingHaveProjection(trackID);
-    
-        //choose the normalisation type!!!!!!!
-        Double_t PercOfTrueHits = -1.;
-        if (fNormType == 0) //normalize by Number of MC hits
-            PercOfTrueHits = lPercMCTrue;
-        if (fNormType == 1) //normalize by Number of found hits
-            PercOfTrueHits = lPercTrue;
-    
-        if (PercOfTrueHits == -1){
-            cout << "-E- CbmRichRingQa::EfficiencyCalc() "<<
-            "PercOfTrueHits == -1"<< endl;
-            continue;
-        }
         
         ring->SetRecFlag(-1);
             
@@ -610,12 +583,11 @@ void CbmRichRingQa::EfficiencyCalc()
      //   if (ring->GetSelectionNN() < -0.5) continue;
        
         ///fake rings
-        if (PercOfTrueHits < 0.5){
+        if (lPercTrue < 0.5){
             ring->SetRecFlag(1);
         }else{///true rings
-//!!!!!!!!        	
+    	
             if (TMath::Abs(gcode) == 11 && 
-            	// gcode == 11 &&
                  motherId == -1 &&
                  lMCHits >= fNofHitsInRingCut && 
                  isProj ){ ///primary electron rings
@@ -701,8 +673,8 @@ void CbmRichRingQa::DiffFakeTrue()
     Double_t distance = ring->GetDistance();
     Int_t nHits = ring->GetNofHits();
     Double_t radPos = ring->GetRadialPosition();
-    Double_t axisA = ring->GetAaxisCor();
-    Double_t axisB = ring->GetBaxisCor();
+    Double_t axisA = ring->GetAaxis();
+    Double_t axisB = ring->GetBaxis();
     Double_t phi = ring->GetPhi();
     Double_t radAngle = ring->GetRadialAngle();
     Double_t stsMomentum = GetStsMomentum(ring);  

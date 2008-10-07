@@ -45,7 +45,6 @@ class CbmRichRingQa : public CbmTask{
     std::map<Int_t, Int_t> fRingMap;
     std::map<Int_t, CbmRichRing > fRingMapWithHits;  
     Int_t fEventNumber;
-    Int_t fNormType;
     Int_t fNofHitsInRingCut;
     
     public:
@@ -56,7 +55,7 @@ class CbmRichRingQa : public CbmTask{
     /** Standard Constructor with name, title, and verbosity level
         *@param verbose      verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
     */
-    CbmRichRingQa(const char *name, const char *title, Int_t verbose, Int_t normType);
+    CbmRichRingQa(const char *name, const char *title, Int_t verbose);
     
     /** Destructor **/
     virtual ~CbmRichRingQa();

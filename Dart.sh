@@ -48,7 +48,8 @@ else
   COMPILER=$CXX;
   GCC_VERSION=$($CXX -dumpversion)
 fi
-export LABEL=${LINUX_FLAVOUR}-$SYSTEM-$COMPILER$GCC_VERSION
+export LABEL1=${LINUX_FLAVOUR}-$SYSTEM-$COMPILER$GCC_VERSION
+export LABEL=$(echo $LABEL1 | sed -e 's#/#_#g')
 export SITE=$(hostname -f)
 
 echo "************************"

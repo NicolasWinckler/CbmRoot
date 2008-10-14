@@ -31,7 +31,7 @@ using std::endl;
 using std::pair;
 using std::vector;
 using std::map;
-
+using std::fabs;
 
 ClassImp(CbmKF)
 

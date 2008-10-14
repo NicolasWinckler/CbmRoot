@@ -93,7 +93,7 @@ Bool_t CbmTrdSetTracksPidLike::ReadData()
   Char_t text[200];
   for (Int_t particle = 0; particle < fNParts; ++particle)
   {
-    Char_t* particleKey = "";
+    const Char_t* particleKey = "";
     switch (particle)
     {
       case CbmTrdSetTracksPidLike::kElectron: particleKey = "EL"; break;
@@ -294,6 +294,7 @@ void CbmTrdSetTracksPidLike::Exec(Option_t* opt) {
     }
     else {
       cout <<" -W- CbmTrdSetTracksPidLike::Exec : Could not assign any momentum to the track"<<endl;
+      momentum = 0;
     }
 
     //    cout <<"Momentum: "<<momentum<<endl;

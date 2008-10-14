@@ -129,7 +129,7 @@ private:
   Float_t   fCom2;        // second component of the gas
 
   static const Int_t     fSpNBins=100; // Number of Bins for histos 
-  static const Float_t   fSpRange=50;  // Maximum (keV) of eloss spectrum 
+  static const Int_t     fSpRange=50;  // Maximum (keV) of eloss spectrum 
   Float_t   fSpBinWidth;               // Bin width=fSpNBins/fSpRange
 
   Float_t*  fSigma;       // [fSpNBins] Array of sigma values

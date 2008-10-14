@@ -106,33 +106,33 @@ protected:
  * @param value is the value of the parameter
  */
 
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, bool value);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, char* value);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, const char* value);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, int value, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned int value, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, long value, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned long value, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, float value);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, double value);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, std::string& value);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, bool value, char* comment);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, char* value, char* comment);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, const char* value, char* comment);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, int value, char* comment, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned int value, char* comment, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, long value, char* comment, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned long value, char* comment, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, float value, char* comment);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, double value, char* comment);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, std::string& value, char* comment);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, bool value);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value);
+	//	void setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, int value, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned int value, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, long value, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned long value, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, float value);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, double value);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, std::string& value);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, bool value, const char* comment);
+	//	void setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value, const char* comment);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value, const char* comment);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, int value, const char* comment, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned int value, const char* comment, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, long value, const char* comment, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned long value, const char* comment, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, float value, const char* comment);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, double value, const char* comment);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, std::string& value, const char* comment);
 
 /**
  * This methods writes a comment to an ofstream.
  */
 
 	void writeComment(std::ofstream& fileStream, std::string& comment);
-	void writeComment(std::ofstream& fileStream, char* comment);
+	void writeComment(std::ofstream& fileStream, const char* comment);
 
 /**
  * This method returns the number of accepted commands.

@@ -100,7 +100,9 @@ void CbmTrdGas::Init() {
     }    
     Bool_t found_C=kFALSE;
     Bool_t found_O=kFALSE;   
-    Int_t C,O,noblegas;
+    Int_t C=0;
+	Int_t O=0;
+	Int_t noblegas=0;
 
     Double_t *elem = mixt->GetZmixt();
     Double_t *weight = mixt->GetWmixt();
@@ -173,7 +175,7 @@ void CbmTrdGas::SetFileName() {
   Int_t fraction =  TMath::Nint(fPercentNobleGas*100);
   Int_t thickness =  TMath::Nint(fGasThick*10);
 
-  char* detector;
+  const char* detector = "";
   if (fDetType == 0) {
     detector ="GSI";
   } else if (fDetType == 1){
@@ -183,7 +185,7 @@ void CbmTrdGas::SetFileName() {
     cout <<"Stop execution of program due to initilization error."<< endl;
     Fatal("CbmTrdGas","Unknown detector type.");
   }
-  char* gastype;
+  const char* gastype = "";
   if (fNobleGasType == 1) {
     gastype = "Xenon";
     //  } else if (GasType == 2){

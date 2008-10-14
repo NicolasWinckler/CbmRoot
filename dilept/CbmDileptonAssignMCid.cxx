@@ -228,10 +228,10 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
         CbmStsTrackMatch* stsMatch = NULL;
         CbmMCTrack* mcTrack        = NULL;
 
-	Int_t stsMCid;
+	Int_t stsMCid = -99;
 	TVector3 mom;
 
-	Int_t richMCid;
+	Int_t richMCid = -99;
 	CbmRichRing *richRing =  NULL;
 	CbmRichRingMatch *richMatch = NULL;
 

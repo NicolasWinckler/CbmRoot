@@ -38,9 +38,11 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+
 using std::cout;
 using std::endl;
 using std::vector;
+using std::fabs;
 
 // -------------------------------------------------------------------------
 
@@ -59,8 +61,8 @@ void writedir2current( TObject *obj ){
 
 void CbmStsFitPerformanceTask::CreateTrackHisto(TH1D* hist[10], const char* name, const char* title ){
   struct {    
-    char *name;
-    char *title;
+    const char *name;
+    const char *title;
     Int_t n;
     Double_t l,r;
   } Table[10]= 
@@ -87,8 +89,8 @@ void CbmStsFitPerformanceTask::CreateTrackHisto(TH1D* hist[10], const char* name
 
 void CbmStsFitPerformanceTask::CreateVertexHisto(TH1D* hist[9], const char* name, const char* title ){
   struct {    
-    char *name;
-    char *title;
+    const char *name;
+    const char *title;
     Int_t n;
     Double_t l,r;
   } Table[9]= 
@@ -114,8 +116,8 @@ void CbmStsFitPerformanceTask::CreateVertexHisto(TH1D* hist[9], const char* name
 
 void CbmStsFitPerformanceTask::CreateD0Histo(TH1D* hist[15], const char* name, const char* title ){
   struct {    
-    char *name;
-    char *title;
+    const char *name;
+    const char *title;
     Int_t n;
     Double_t l,r;
   } Table[14]= 

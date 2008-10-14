@@ -137,8 +137,8 @@ void CbmL1::Performance()
       gDirectory->cd("Fit");
       {
 	struct {    
-	  char *name;
-	  char *title;
+	  const char *name;
+	  const char *title;
 	  Int_t n;
 	  Double_t l,r;
 	} Table[10]= 

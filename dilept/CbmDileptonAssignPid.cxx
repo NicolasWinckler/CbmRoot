@@ -454,7 +454,7 @@ Bool_t CbmDileptonAssignPid::GetTrdPid(Bool_t isRich, Bool_t switchMom, Bool_t s
 Bool_t CbmDileptonAssignPid::GetTofPid(Bool_t isRich, Bool_t switchTof, Bool_t switchAcceptTof, TVector3 momentum, Int_t tofHitIndex, Double_t trackLength)
 {
 
-    Double_t mass2;
+    Double_t mass2 = -1;
 
     //Decide what to do when no tof hit associated with global (default -> returns kFALSE)
 
@@ -474,11 +474,14 @@ Bool_t CbmDileptonAssignPid::GetTofPid(Bool_t isRich, Bool_t switchTof, Bool_t s
 
     Double_t time = 0.2998*tofHit->GetTime();          // time in ns-> transfrom to ct in m
    
-    Bool_t tempTof=false;
+    Bool_t tempTof=kFALSE;
 
-    if(trackLength) mass2 =
-	TMath::Power(momentum.Mag(),2.)*(TMath::Power(time/trackLength,2) - 1);
-
+    if(trackLength) {
+	  mass2 = TMath::Power(momentum.Mag(),2.)*(TMath::Power(time/trackLength,2) - 1);
+    } else {
+	  return tempTof;
+    }
+	
     if(fVerbose>2)cout<<"-I- CbmDileptonAssignPid::GetTofPid(): momentum, mass2 : "<<momentum.Mag()<<" "<<mass2<<endl;
 
     fh_tof_m2_mom->Fill(momentum.Mag(),mass2);

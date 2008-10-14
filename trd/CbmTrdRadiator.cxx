@@ -93,10 +93,10 @@ void CbmTrdRadiator::CreateHistograms(){
   
   // Create the needed histograms
 
-  fSpBinWidth = fSpRange / fSpNBins;
+  fSpBinWidth = (Float_t)(fSpRange / fSpNBins);
 
   Float_t SpLower    = 1.0 - 0.5 * fSpBinWidth;
-  Float_t SpUpper    = SpLower + fSpRange;
+  Float_t SpUpper    = SpLower + (Float_t)fSpRange;
 
   Char_t name[50];
 

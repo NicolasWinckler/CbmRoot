@@ -215,7 +215,7 @@ void CbmFieldMapDistorted::ReadDistortionInformation(const char *filename) {
 }
 
 // -----------   Write Distortion Formulas to Distortion File   ------------------------------------------
-void CbmFieldMapDistorted::WriteDistortionInformation(char *filename) {
+void CbmFieldMapDistorted::WriteDistortionInformation(const char *filename) {
   TFile* filesave=gFile;
   gFile=0;
 
@@ -252,7 +252,7 @@ void CbmFieldMapDistorted::WriteDistortionInformation(char *filename) {
 }
 
 // ---------------Getter and Setter for Distortion Formulas------------------------------
-TFormula* CbmFieldMapDistorted::GetDistortionFormula(char *component_option, char *action_option)
+TFormula* CbmFieldMapDistorted::GetDistortionFormula(const char *component_option, const char *action_option)
 {
   // component_option: "x","y","z"; action_option: "m","a"
 
@@ -277,7 +277,7 @@ TFormula* CbmFieldMapDistorted::GetDistortionFormula(char *component_option, cha
   return 0;
 }
 
-Bool_t CbmFieldMapDistorted::SetDistortionFormula (TFormula* parDistortionFormula, char *component_option, char *action_option )
+Bool_t CbmFieldMapDistorted::SetDistortionFormula (TFormula* parDistortionFormula, const char *component_option, const char *action_option )
 {
   TString co= component_option;
   TString ao= action_option;
@@ -312,7 +312,7 @@ Bool_t CbmFieldMapDistorted::SetDistortionFormula (TFormula* parDistortionFormul
   return (counter>0);
 } 
 
-Bool_t CbmFieldMapDistorted::SetDistortionFormula (char* parDistortionFormulaText, char *component_option, char *action_option )
+Bool_t CbmFieldMapDistorted::SetDistortionFormula (const char* parDistortionFormulaText, const char *component_option, const char *action_option )
 {
   TString co= component_option;
   TString ao= action_option;

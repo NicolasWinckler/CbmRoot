@@ -57,7 +57,7 @@ public:
   virtual void Init();
 
   void ReadDistortionInformation(const char *filename=0) ;
-  void WriteDistortionInformation(char *filename=0) ;
+  void WriteDistortionInformation(const char *filename=0) ;
 
   /** Get the field components at a certain point 
    ** @param x,y,z     Point coordinates (global) [cm]
@@ -72,11 +72,11 @@ public:
   virtual void SetType(Int_t pfType=0) { fType = pfType; }
 
   virtual const char* GetDistortionFilename() {return fDistortionFilename.Data();}
-  virtual Bool_t SetDistortionFilename(char *filename) {fDistortionFilename=filename;}
+  virtual Bool_t SetDistortionFilename(const char *filename) {fDistortionFilename=filename;}
  
-  virtual TFormula* GetDistortionFormula(char *component_option="y", char *action_option="m");  // component_opt:"x","y","z";action_opt:"m","a" 
-  virtual Bool_t SetDistortionFormula (TFormula* parDistortionFormula, char *component_option="y", char *action_option="m" ); 
-  virtual Bool_t SetDistortionFormula (char* parDistortionFormulaText, char *component_option="y", char *action_option="m" ); 
+  virtual TFormula* GetDistortionFormula(const char *component_option="y", const char *action_option="m");  // component_opt:"x","y","z";action_opt:"m","a" 
+  virtual Bool_t SetDistortionFormula (TFormula* parDistortionFormula, const char *component_option="y", const char *action_option="m" ); 
+  virtual Bool_t SetDistortionFormula (const char* parDistortionFormulaText, const char *component_option="y", const char *action_option="m" ); 
 
 
   /** Fill main part of distorted field map from parent CbmField  **/

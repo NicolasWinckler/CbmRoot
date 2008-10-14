@@ -35,10 +35,11 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+
 using std::cout;
 using std::endl;
 using std::vector;
-
+using std::fabs;
 
 ClassImp(CbmL1SttTrackFinder);
 

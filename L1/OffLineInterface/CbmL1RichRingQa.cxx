@@ -30,6 +30,7 @@ using std::list;
 using std::pair;
 using std::vector;
 using std::map;
+using std::fabs;
 
 ClassImp(CbmL1RichRingQa)
 

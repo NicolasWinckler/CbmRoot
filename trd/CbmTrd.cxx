@@ -1,6 +1,5 @@
 #include "CbmTrd.h"
 
-
 #include "CbmGeoTrdPar.h"
 #include "CbmTrdPoint.h"
 #include "CbmGeoTrd.h"
@@ -212,21 +211,23 @@ Bool_t  CbmTrd::ProcessHits(CbmVolume* vol)
 	 gMC->IsTrackStop()       ||
 	 gMC->IsTrackDisappeared()   ) {
   	 
-         gMC->TrackPosition(fPosOut);
+	 gMC->TrackPosition(fPosOut);
 	 gMC->TrackMomentum(fMomOut);
 
 
-	if (fELoss == 0. ) return kFALSE;  // no neutrals
+	 if (fELoss == 0. ) return kFALSE;  // no neutrals
 
-        Int_t mod,layer,station;
-        Int_t fmodtype,fmodnumber,flayer,fstation;
+         Int_t mod,layer,station;
+         Int_t fmodtype,fmodnumber;
+	 Int_t flayer=-1;
+	 Int_t fstation=-1;
 
 
-	fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
-	fVolumeID = vol->getMCid();
+	 fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
+	 fVolumeID = vol->getMCid();
 	
-        if ( 0 == fSimple) {
-  
+         if ( 0 == fSimple) {
+         
           Int_t id1 = gMC->CurrentVolOffID(1, mod);
           gMC->CurrentVolOffID(2, layer);
           Int_t id3 = gMC->CurrentVolOffID(3, station);
@@ -242,7 +243,7 @@ Bool_t  CbmTrd::ProcessHits(CbmVolume* vol)
             fstation=3;
 	  }
           else {
-            fstation=0;
+            fstation=-1;
 	  }
 
 	  flayer=layer;
@@ -276,7 +277,7 @@ Bool_t  CbmTrd::ProcessHits(CbmVolume* vol)
 
 	CbmTrdPoint *fPoint= AddHit(fTrackID, fVolumeID, 
                             TVector3(fPosIn.X(),  fPosIn.Y(),  fPosIn.Z()),
-			    TVector3(fMomIn.Px(), fMomIn.Py(), fMomIn.Pz()),
+	       		    TVector3(fMomIn.Px(), fMomIn.Py(), fMomIn.Pz()),
                             TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 			    TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
                             fTime, fLength, fELoss);

@@ -299,7 +299,7 @@ void fileio::readFileHeader(std::ifstream& fileStream) {
  * which is identified by a specifier to an ofstream.			*
  ****************************************************************/
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, bool value) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, bool value) {
 
 	char buffer[6]; /* 6 = sizeof(false+'/0')*/
 
@@ -308,19 +308,21 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, bool val
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, char* value) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value) {
 
 	fileStream << specifier << ' ' << fileCmdSeparator << ' ' << value << std::endl;
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, const char* value) {
+/*
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value) {
 
 	fileStream << specifier << ' ' << fileCmdSeparator << ' ' << value << std::endl;
 
 }
+*/
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, int value, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, int value, int radix) {
 
 	char buffer[intConversionDigits+1];
 
@@ -329,7 +331,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, int valu
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned int value, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned int value, int radix) {
 
 	char buffer[intConversionDigits+1];
 
@@ -338,7 +340,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, long value, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, long value, int radix) {
 
 	char buffer[longConversionDigits+1];
 
@@ -347,7 +349,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, long val
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned long value, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned long value, int radix) {
 
 	char buffer[longConversionDigits+1];
 
@@ -356,7 +358,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, float value) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, float value) {
 
 	double temp;
 
@@ -365,7 +367,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, float va
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, double value) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, double value) {
 
 	char buffer[doubleConversion+1];
 
@@ -374,7 +376,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, double v
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, std::string& value) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, std::string& value) {
 
 	char* temp;
 
@@ -383,7 +385,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, std::str
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, bool value, char* comment) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, bool value, const char* comment) {
 
 	char buffer[6]; /* 6 = sizeof(false+'/0')*/
 
@@ -392,21 +394,23 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, bool val
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, char* value, char* comment) {
+/*
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value, const char* comment) {
+
+	fileStream << specifier << ' ' << fileCmdSeparator << ' ' << value << "\t\t";
+	writeComment(fileStream, comment);
+
+}
+*/
+
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value, const char* comment) {
 
 	fileStream << specifier << ' ' << fileCmdSeparator << ' ' << value << "\t\t";
 	writeComment(fileStream, comment);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, const char* value, char* comment) {
-
-	fileStream << specifier << ' ' << fileCmdSeparator << ' ' << value << "\t\t";
-	writeComment(fileStream, comment);
-
-}
-
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, int value, char* comment, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, int value, const char* comment, int radix) {
 
 	char buffer[intConversionDigits+1];
 
@@ -415,7 +419,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, int valu
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned int value, char* comment, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned int value, const char* comment, int radix) {
 
 	char buffer[intConversionDigits+1];
 
@@ -424,7 +428,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, long value, char* comment, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, long value, const char* comment, int radix) {
 
 	char buffer[longConversionDigits+1];
 
@@ -433,7 +437,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, long val
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned long value, char* comment, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned long value, const char* comment, int radix) {
 
 	char buffer[longConversionDigits+1];
 
@@ -442,7 +446,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, float value, char* comment) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, float value, const char* comment) {
 
 	double temp;
 
@@ -451,7 +455,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, float va
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, double value, char* comment) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, double value, const char* comment) {
 
 	char buffer[doubleConversion+1];
 
@@ -460,7 +464,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, double v
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, std::string& value, char* comment) {
+void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, std::string& value, const char* comment) {
 
 	char* temp;
 
@@ -487,7 +491,7 @@ void fileio::writeComment(std::ofstream& fileStream, std::string& comment) {
 
 }
 
-void fileio::writeComment(std::ofstream& fileStream, char* comment) {
+void fileio::writeComment(std::ofstream& fileStream, const char* comment) {
 
 	std::string temp;
 

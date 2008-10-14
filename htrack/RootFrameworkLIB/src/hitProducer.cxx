@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-04-16 10:41:00 $
-// $Revision: 1.5 $
+// $Date: 2008-10-07 10:39:35 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -32,18 +32,7 @@
 #include "../../MiscLIB/include/defs.h"
 #include "../include/frameworkError.h"
 #include "../include/hitProducer.h"
-#ifdef CBMROOTFRAMEWORK
-	#include "CbmStsPoint.h"
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
-	#include "CbmStsMapsHit.h"
-	#include "CbmStsStripHit.h"
-	#include "CbmStsHybridHit.h"
-#else
-	#include "CbmMvdPoint.h"
-	#include "CbmStsHit.h"
-	#include "CbmMvdHit.h"
-#endif
-#else
+#if (ARCHITECTURE == STANDALONE)
 	#include "../../RootFrameworkLIB/include/CbmStsPoint.h"
 	#include "../../RootFrameworkLIB/include/CbmMvdPoint.h"
 	#include "../../RootFrameworkLIB/include/CbmStsMapsHit.h"
@@ -51,6 +40,17 @@
 	#include "../../RootFrameworkLIB/include/CbmStsHybridHit.h"
 	#include "../../RootFrameworkLIB/include/CbmStsHit.h"
 	#include "../../RootFrameworkLIB/include/CbmMvdHit.h"
+#elif (ARCHITECTURE == CBMROOT)
+	#include "CbmStsPoint.h"
+	#ifdef HITCOMPATIBILITY
+		#include "CbmStsMapsHit.h"
+		#include "CbmStsStripHit.h"
+		#include "CbmStsHybridHit.h"
+	#else
+		#include "CbmMvdPoint.h"
+		#include "CbmStsHit.h"
+		#include "CbmMvdHit.h"
+	#endif
 #endif
 #include "TRandom.h"
 #include "TVector3.h"
@@ -178,7 +178,7 @@ void CbmHitProducer::produceOld(TClonesArray* mapsHits, TClonesArray* stripHits,
 	if (points == NULL)
 		throw cannotAccessPointError();
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 	TClonesArray&    mapsHitsReference   = *mapsHits;
 	TClonesArray&    stripHitsReference  = *stripHits;
@@ -204,7 +204,7 @@ void CbmHitProducer::produceOld(TClonesArray* mapsHits, TClonesArray* stripHits,
 		position.SetXYZ(xPosIn, yPosIn, point->GetZ());
 		positionError.SetXYZ(xPosOut - xPosIn, yPosOut - yPosIn, 0);
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 		if (isMapsType)
 			new(mapsHitsReference[mapsHits->GetEntries()]) CbmStsMapsHit(point->GetDetectorID(), position, positionError, i, -1);
@@ -255,7 +255,7 @@ void CbmHitProducer::produceNew(TClonesArray* mvdHits, TClonesArray* stsHits, TC
 		position.SetXYZ(xPosIn, yPosIn, stsPoint->GetZ());
 		positionError.SetXYZ(xPosOut - xPosIn, yPosOut - yPosIn, 0);
 
-#ifndef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifndef HITCOMPATIBILITY
 
 		new(stsHitsReference[stsHits->GetEntries()]) CbmStsHit(stsPoint->GetDetectorID(), position, positionError, -1, -1, -1);
 
@@ -289,7 +289,7 @@ void CbmHitProducer::produceNew(TClonesArray* mvdHits, TClonesArray* stsHits, TC
 		position.SetXYZ(xPosIn, yPosIn, mvdPoint->GetZ());
 		positionError.SetXYZ(xPosOut - xPosIn, yPosOut - yPosIn, 0);
 
-#ifndef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifndef HITCOMPATIBILITY
 
 		new(mvdHitsReference[mvdHits->GetEntries()]) CbmMvdHit(mvdPoint->GetDetectorID(), position, positionError, -1);
 

@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-06-26 12:53:22 $
-// $Revision: 1.13 $
+// $Date: 2008-10-07 10:38:09 $
+// $Revision: 1.15 $
 //
 // *******************************************************************/
 
@@ -36,18 +36,7 @@
 #include "../include/inputError.h"
 #include "../include/inputWarningMsg.h"
 #include "../include/inputRoot.h"
-#ifdef CBMROOTFRAMEWORK
-	#include "CbmStsPoint.h"
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
-	#include "CbmStsMapsHit.h"
-	#include "CbmStsStripHit.h"
-	#include "CbmStsHybridHit.h"
-#else
-	#include "CbmMvdPoint.h"
-	#include "CbmStsHit.h"
-	#include "CbmMvdHit.h"
-#endif
-#else
+#if (ARCHITECTURE == STANDALONE)
 	#include "../../RootFrameworkLIB/include/CbmStsPoint.h"
 	#include "../../RootFrameworkLIB/include/CbmMvdPoint.h"
 	#include "../../RootFrameworkLIB/include/CbmStsMapsHit.h"
@@ -55,6 +44,17 @@
 	#include "../../RootFrameworkLIB/include/CbmStsHybridHit.h"
 	#include "../../RootFrameworkLIB/include/CbmStsHit.h"
 	#include "../../RootFrameworkLIB/include/CbmMvdHit.h"
+#elif (ARCHITECTURE == CBMROOT)
+	#include "CbmStsPoint.h"
+	#ifdef HITCOMPATIBILITY
+		#include "CbmStsMapsHit.h"
+		#include "CbmStsStripHit.h"
+		#include "CbmStsHybridHit.h"
+	#else
+		#include "CbmMvdPoint.h"
+		#include "CbmStsHit.h"
+		#include "CbmMvdHit.h"
+	#endif
 #endif
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
@@ -1026,7 +1026,7 @@ void inputRoot::initSpecial(CbmRootManager* manager) {
 
 	stsHitBranch.clear();
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 	if (readMapsHits)
 		stsHitBranch += STSMAPSHITBRANCH;
@@ -1087,7 +1087,7 @@ void inputRoot::initSpecial(CbmRootManager* manager) {
 
 		/* get pointer to the list of sts points */
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 		if (readMapsHits || readHybridHits || readStripHits) {
 	
@@ -1124,11 +1124,11 @@ void inputRoot::initSpecial(CbmRootManager* manager) {
 
 	if (readHitsFromFile) {
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 		if (readMapsHits)
 
-#ifdef CBMROOTFRAMEWORKINPUTCOMPATIBILITY
+#ifdef INPUTCOMPATIBILITY
 
 			inputMapsHits   = (TClonesArray*) manager->GetRegisteredObject(STSMAPSHITBRANCH);
 
@@ -1140,7 +1140,7 @@ void inputRoot::initSpecial(CbmRootManager* manager) {
 
 		if (readHybridHits)
 
-#ifdef CBMROOTFRAMEWORKINPUTCOMPATIBILITY
+#ifdef INPUTCOMPATIBILITY
 
 			inputHybridHits = (TClonesArray*) manager->GetRegisteredObject(STSHYBRIDHITBRANCH);
 
@@ -1152,7 +1152,7 @@ void inputRoot::initSpecial(CbmRootManager* manager) {
 
 		if (readStripHits)
 
-#ifdef CBMROOTFRAMEWORKINPUTCOMPATIBILITY
+#ifdef INPUTCOMPATIBILITY
 
 			inputStripHits  = (TClonesArray*) manager->GetRegisteredObject(STSSTRIPHITBRANCH);
 
@@ -1166,7 +1166,7 @@ void inputRoot::initSpecial(CbmRootManager* manager) {
 
 		if (readMapsHits)
 
-#ifdef CBMROOTFRAMEWORKINPUTCOMPATIBILITY
+#ifdef INPUTCOMPATIBILITY
 
 			inputMvdHits   = (TClonesArray*) manager->GetRegisteredObject(MVDHITBRANCH);
 
@@ -1178,7 +1178,7 @@ void inputRoot::initSpecial(CbmRootManager* manager) {
 
 		if (readHybridHits || readStripHits)
 
-#ifdef CBMROOTFRAMEWORKINPUTCOMPATIBILITY
+#ifdef INPUTCOMPATIBILITY
 
 			inputStsHits = (TClonesArray*) manager->GetRegisteredObject(STSHITBRANCH);
 
@@ -1229,7 +1229,7 @@ void inputRoot::read(unsigned int event, TClonesArray* mvdHitArray, TClonesArray
 		}
 		else {
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 			if (readMapsHits)
 				inputMapsHits   = mHitArray;
@@ -1275,7 +1275,7 @@ void inputRoot::read(unsigned int event, TClonesArray* mvdHitArray, TClonesArray
 		}
 		else {
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 			if (readMapsHits)
 				inputMapsHits   = mHitArray;
@@ -1299,7 +1299,7 @@ void inputRoot::read(unsigned int event, TClonesArray* mvdHitArray, TClonesArray
 
 	}
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 
 	if (readEventFromRootManager) {
 
@@ -1701,7 +1701,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 			takeMyHitProducer = NULL;
 		}
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 		inputMapsHits   = new TClonesArray("CbmStsMapsHit");
 		inputStripHits  = new TClonesArray("CbmStsStripHit");
@@ -2072,7 +2072,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 			takeMyHitProducer = NULL;
 		}
 
-#ifndef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifndef HITCOMPATIBILITY
 
 		inputStsHits    = new TClonesArray("CbmStsHit");
 		inputMvdHits    = new TClonesArray("CbmMvdHit");
@@ -2335,7 +2335,7 @@ double inputRoot::getReservedSizeOfData(unsigned short dimension) {
 
 	returnValue += sizeof(inputStsPoints);
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 	returnValue += sizeof(inputMapsHits);
 	returnValue += sizeof(inputStripHits);
@@ -2382,7 +2382,7 @@ double inputRoot::getAllocatedSizeOfData(unsigned short dimension) {
 	if (inputStsPoints != NULL)
 		returnValue += inputStsPoints->Capacity()   * sizeof(CbmStsPoint);
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 	if (inputMapsHits != NULL)
 		returnValue += inputMapsHits->Capacity()    * sizeof(CbmStsMapsHit);
@@ -2430,7 +2430,7 @@ double inputRoot::getUsedSizeOfData(unsigned short dimension) {
 	if (inputStsPoints != NULL)
 		returnValue += inputStsPoints->GetEntries()  * sizeof(CbmStsPoint);
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 	returnValue += sizeof(inputMapsHits);
 	if (inputMapsHits != NULL)

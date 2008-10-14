@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -65,8 +65,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-06-21 13:20:19 $
-/// $Revision: 1.2 $
+/// $Date: 2008-10-07 10:36:23 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -566,22 +566,30 @@ template<class objectClass> void specialListMem<objectClass>::sort() {
 
 	typename std::list<objectClass>::iterator actualMax;
 
-	for (typename std::list<objectClass>::iterator i = stackMem.begin(); i != stackMem.end(); i++) {
+	for (typename std::list<objectClass>::iterator i = stackMem.begin(); i != stackMem.end();) {
 
 		for (typename std::list<objectClass>::iterator j = i; j != stackMem.end(); j++) {
 
-			if (j == i)
+			if (i == j) {
+
 				actualMax = i;
+
+			}
 			else {
 
-				if (i->isBigger(*actualMax))
-					actualMax = i;
+				if (j->isBigger(*actualMax))
+					actualMax = j;
 
 			}
 
 		}
 
-		if (actualMax != i) {
+		if (actualMax == i) {
+
+			i++;
+
+		}
+		else {
 		
 			stackMem.insert(i, *actualMax);
 			stackMem.erase(actualMax);

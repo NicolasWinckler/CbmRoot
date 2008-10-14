@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -33,8 +33,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/19 11:33:47 $
-/// $Revision: 1.2 $
+/// $Date: 2008-08-14 12:35:34 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -63,6 +63,7 @@ public:
 /**
  * Constructor
  * @param tracks is an object for accessing the tracks
+ * @param filterArithmetic defines the arithmetic which is used in the applied filter
  * @param size1 is the filtersize in the first dimension
  * @param size2 is the filtersize in the second dimension
  * @param size3 is the filtersize in the third dimension
@@ -73,13 +74,14 @@ public:
  */
 
 	secondFilterFinalMod( trackData**    tracks,
-					   unsigned short size1,
-					   unsigned short size2,
-					   unsigned short size3,
-					   unsigned short localSize1,
-					   unsigned short localSize2,
-					   unsigned short localSize3,
-					   bitArray maximumClass);
+					      unsigned short filterArithmetic,
+					      unsigned short size1,
+					      unsigned short size2,
+					      unsigned short size3,
+					      unsigned short localSize1,
+					      unsigned short localSize2,
+					      unsigned short localSize3,
+					      bitArray       maximumClass);
 
 /**
  * Destructor
@@ -90,6 +92,7 @@ public:
 /**
  * This method initializes the object.
  * @param tracks is an object for accessing the tracks
+ * @param filterArithmetic defines the arithmetic which is used in the applied filter
  * @param size1 is the filtersize in the first dimension
  * @param size2 is the filtersize in the second dimension
  * @param size3 is the filtersize in the third dimension
@@ -100,13 +103,14 @@ public:
  */
 
 	void init( trackData**    tracks,
+			   unsigned short filterArithmetic,
 			   unsigned short size1,
 			   unsigned short size2,
 			   unsigned short size3,
 			   unsigned short localSize1,
 			   unsigned short localSize2,
 			   unsigned short localSize3,
-			   bitArray maximumClass);
+			   bitArray       maximumClass);
 
 /**
  * This method implements the filter.

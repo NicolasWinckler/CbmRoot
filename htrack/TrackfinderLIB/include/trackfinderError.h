@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:36:26 $
-/// $Revision: 1.1 $
+/// $Date: 2008-08-14 12:39:20 $
+/// $Revision: 1.2 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -190,6 +190,111 @@ public:
  */
 
 	virtual ~cannotAccessHistogramTransformError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _CANNOTACCESSANALYSERERROR_H
+#define _CANNOTACCESSANALYSERERROR_H
+
+
+/**
+ * CLASS cannotAccessAnalyserError
+ */
+
+class cannotAccessAnalyserError : public trackfinderError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotAccessAnalyserError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotAccessAnalyserError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _IMPOSSIBLEFEATUREWITHOUTANALYSERERROR_H
+#define _IMPOSSIBLEFEATUREWITHOUTANALYSERERROR_H
+
+
+/**
+ * CLASS impossibleFeatureWithoutAnalyserError
+ */
+
+class impossibleFeatureWithoutAnalyserError : public trackfinderError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	impossibleFeatureWithoutAnalyserError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~impossibleFeatureWithoutAnalyserError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _FEATURENOTENABLEDINANALYSERERROR_H
+#define _FEATURENOTENABLEDINANALYSERERROR_H
+
+
+/**
+ * CLASS featureNotEnabledInAnalyserError
+ */
+
+class featureNotEnabledInAnalyserError : public trackfinderError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	featureNotEnabledInAnalyserError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~featureNotEnabledInAnalyserError();
 
 /**
  * This method displays an error message.

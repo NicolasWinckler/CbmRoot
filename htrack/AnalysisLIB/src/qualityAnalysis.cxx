@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-10-31 13:44:01 $
-// $Revision: 1.4 $
+// $Date: 2008-10-07 10:34:06 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -176,12 +176,12 @@ void qualityAnalysis::initializeEvaluation() {
  * method finalizes the evaluation.								*
  ****************************************************************/
 
-void qualityAnalysis::finalizeEvaluation(unsigned int numberOfTracksWithP) {
+void qualityAnalysis::finalizeEvaluation(int numberOfHits, int numberOfTracksWithP) {
 
 	if (qualityEFGCEvent != NULL)
-		qualityEFGCEvent->finalizeEvaluation(numberOfTracksWithP);
+		qualityEFGCEvent->finalizeEvaluation(numberOfHits, numberOfTracksWithP);
 	if (qualityEFGCTotal != NULL)
-		qualityEFGCTotal->finalizeEvaluation(numberOfTracksWithP);
+		qualityEFGCTotal->finalizeEvaluation(numberOfHits, numberOfTracksWithP);
 
 }
 
@@ -542,6 +542,11 @@ std::string qualityAnalysis::getRelativeQualityEFGCEventAnalysis() {
 			returnValue += intBuffer;
 			returnValue += "%";
 			returnValue += "\n";		
+			returnValue += "Event data reduction rate [r] (aim near 100%):       \t\t";
+			uitos(qualityEFGCEvent->getReductionQuality(), intBuffer, 10, intConversionDigits);
+			returnValue += intBuffer;
+			returnValue += "%";
+			returnValue += "\n";		
 
 		}
 
@@ -743,6 +748,11 @@ std::string qualityAnalysis::getRelativeQualityEFGCTotalAnalysis() {
 			returnValue += "\n";		
 			returnValue += "Total identification rate [i] (aim 100%):       \t";
 			uitos(qualityEFGCTotal->getIdentificationQuality(), intBuffer, 10, intConversionDigits);
+			returnValue += intBuffer;
+			returnValue += "%";
+			returnValue += "\n";		
+			returnValue += "Total data reduction rate [r] (aim near 100%):       \t";
+			uitos(qualityEFGCTotal->getReductionQuality(), intBuffer, 10, intConversionDigits);
 			returnValue += intBuffer;
 			returnValue += "%";
 			returnValue += "\n";		

@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -51,8 +51,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-10-19 14:43:59 $
-// $Revision: 1.4 $
+// $Date: 2008-10-10 13:47:05 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
@@ -76,13 +76,13 @@ void bytefield::valueFromString(std::string value) {
 	
 	int radix;
 
-	radix  = extractRadix(&value);
+	extractRadix(&radix, &value);
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 	byte   = stoul(value, radix);	/* reduction to the used number of bits */
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 	byte <<= cutBits;
@@ -1164,11 +1164,11 @@ bytefield bytefield::operator << (size_t value) {
 
 	bytefield returnValue;
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4267)
 #endif
 	returnValue.byte     = (byte << value);	/* reduction to the used number of bits */
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4267)
 #endif
 	returnValue.byte   <<= cutBits;
@@ -1213,11 +1213,11 @@ bytefield bytefield::operator >> (size_t value) {
 
 	bytefield returnValue;
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4267)
 #endif
 	returnValue.byte     = (byte >> value);	/* reduction to the used number of bits */
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4267)
 #endif
 	returnValue.position = 0;
@@ -1398,11 +1398,11 @@ bytefield operator + (unsigned long operand1, bytefield& operand2) {
 
 bytefield& bytefield::operator += (unsigned long value) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 	this->byte    += value;	/* reduction to the used number of bits */
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 	this->byte   <<= cutBits;
@@ -1475,11 +1475,11 @@ bytefield operator - (unsigned long operand1, bytefield& operand2) {
 
 bytefield& bytefield::operator -= (unsigned long value) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 	this->byte    -= value;	/* reduction to the used number of bits */
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 	this->byte   <<= cutBits;
@@ -1552,11 +1552,11 @@ bytefield operator * (unsigned long operand1, bytefield& operand2) {
 
 bytefield& bytefield::operator *= (unsigned long value) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 	this->byte    *= value;	/* reduction to the used number of bits */
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 	this->byte   <<= cutBits;
@@ -1661,11 +1661,11 @@ bytefield& bytefield::operator /= (unsigned long value) {
 
 	if (value != 0) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		this->byte    /= value;	/* reduction to the used number of bits */
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 		this->byte   <<= cutBits;
@@ -1786,11 +1786,11 @@ bytefield& bytefield::operator %= (unsigned long value) {
 
 	if (value != 0) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		this->byte    %= value;	/* reduction to the used number of bits */
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 		this->byte   <<= cutBits;

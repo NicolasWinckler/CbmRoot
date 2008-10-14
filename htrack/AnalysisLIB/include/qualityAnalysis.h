@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:26:55 $
-/// $Revision: 1.1 $
+/// $Date: 2008-10-07 10:34:05 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -99,12 +99,13 @@ public:
 
 /**
  * method finalizes the evaluation.
+ * @param numberOfHits is the number of hits which occur
  * @param numberOfTracksWithP is the number of tracks which
  *        should be found
  * @see analysis::getNumberOfTracksWithP(unsigned short minimumClassPriority)
  */
 
-	void finalizeEvaluation(unsigned int numberOfTracksWithP);
+	void finalizeEvaluation(int numberOfHits, int numberOfTracksWithP);
 
 /**
  * Function wich is called from evaluate in a special

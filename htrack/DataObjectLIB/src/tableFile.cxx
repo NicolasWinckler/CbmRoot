@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/11/08 12:37:31 $
-// $Revision: 1.3 $
+// $Date: 2008-10-10 13:47:06 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -77,38 +77,27 @@
 
 
 /****************************************************************
- * Default constructor											*
- * Dependencies:												*
- * - Io::setDataPtr												*
- * - Io::setDataNum												*
- * Errors:														*
- * - memoryAllocationError										*
+ * This method deletes the local memory if it exists.			*
  ****************************************************************/
 
-tableFile::tableFile() : io() {
+void tableFile::deleteLocalMemory() {
 
-	for (unsigned int i = 0; i < numberOfTableFileCmds; i++)
-		commandID[i] = 0;
+	if (localMemory) {
 
-	init();
+/********************************************************/
+/* make code changes for allocation number of data here*/
+		tableStringEntry* typeCastedData = (tableStringEntry*)getDataPtr();
+/********************************************************/
 
-}
+		if (typeCastedData != NULL) {
+			delete [] typeCastedData;
+			setDataNum(0);
+			setDataPtr(NULL);
+		}
 
-/****************************************************************
- * destructor													*
- ****************************************************************/
+		localMemory = false;
 
-tableFile::~tableFile() {
-
-}
-
-/****************************************************************
- * This method initializes the object.							*
- ****************************************************************/
-
-void tableFile::init() {
-
-	setHeaderDefValues();
+	}
 
 }
 
@@ -116,12 +105,11 @@ void tableFile::init() {
  * This method returns the number of accepted commands.			*
  ****************************************************************/
 
-int tableFile::getNumberOfCmds() {
+unsigned int tableFile::getNumberOfCmds() {
 
 	return numberOfTableFileCmds;
 
 }
-
 
 /****************************************************************
  * This method assigns the value to the corresponding parameter	*
@@ -135,23 +123,23 @@ bool tableFile::getHeaderValue(std::string& specifier, std::string& value) {
 /********************************************************/
 /* make code changes for a different configuration here */
 	if (specifier.compare(stringCmdName) == 0) {
-		if (!(commandID[idCmdName])) {
+		if (!isHeaderLockSet(idCmdName)) {
 			header.name = value;
-			commandID[idCmdName] = true;
+			setHeaderLock(idCmdName, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdUsage) == 0) {
-		if (!(commandID[idCmdUsage])) {
+		if (!isHeaderLockSet(idCmdUsage)) {
 			header.usage = value;
-			commandID[idCmdUsage] = true;
+			setHeaderLock(idCmdUsage, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdNumberOfEntries) == 0) {
-		if (!(commandID[idCmdNumberOfEntries])) {
+		if (!isHeaderLockSet(idCmdNumberOfEntries)) {
 			header.numberOfEntries = stoul((char*)value.c_str(), 10);
-			commandID[idCmdNumberOfEntries] = true;
+			setHeaderLock(idCmdNumberOfEntries, true);
 			specifierFound = true;
 		}
 	}
@@ -170,17 +158,20 @@ bool tableFile::getHeaderValue(std::string& specifier, std::string& value) {
 
 void tableFile::readAllData() {
 
-	if (getDataNum() == 0) {
+	if ((getDataNum() == 0) && (getDataPtr() == NULL)) {
 
 /********************************************************/
 /* make code changes for allocation number of data here*/
 		tableStringEntry* typeCastedData = new tableStringEntry[header.numberOfEntries];
+/********************************************************/
+
 		setDataNum(header.numberOfEntries);
 		setDataPtr(typeCastedData);
-/********************************************************/
 
 		if (typeCastedData == NULL)
 			throw memoryAllocationError(DATAOBJECTLIB);
+		else
+			localMemory = true;
 
 	}
 
@@ -281,6 +272,47 @@ void tableFile::setHeaderDefValues() {
 }
 
 /****************************************************************
+ * Default constructor											*
+ * Dependencies:												*
+ * - Io::setDataPtr												*
+ * - Io::setDataNum												*
+ * Errors:														*
+ * - memoryAllocationError										*
+ ****************************************************************/
+
+tableFile::tableFile() : io() {
+
+	localMemory = false;
+
+	init();
+
+}
+
+/****************************************************************
+ * destructor													*
+ ****************************************************************/
+
+tableFile::~tableFile() {
+
+	if (localMemory)
+		deleteLocalMemory();
+
+}
+
+/****************************************************************
+ * This method initializes the object.							*
+ ****************************************************************/
+
+void tableFile::init() {
+
+	if (localMemory)
+		deleteLocalMemory();
+
+	resetHeader();
+
+}
+
+/****************************************************************
  * This method returns a reference of the data struct.			*
  ****************************************************************/
 
@@ -299,9 +331,9 @@ void tableFile::setHeader(tableFileHeader& structure) {
 	header.name                     = structure.name;
 	header.usage                    = structure.usage;
 	header.numberOfEntries          = structure.numberOfEntries;
-	commandID[idCmdName]            = true;
-	commandID[idCmdUsage]           = true;
-	commandID[idCmdNumberOfEntries] = true;
+	setHeaderLock(idCmdName, true);
+	setHeaderLock(idCmdUsage, true);
+	setHeaderLock(idCmdNumberOfEntries, true);
 
 }
 
@@ -342,8 +374,8 @@ std::string tableFile::getInfo() {
 	message += "------------------------------\n";
 	message += "CommandID";
 	message += "\t: ";
-	for (int i = 0; i < numberOfTableFileCmds; i++) {
-		btods(commandID[i], buffer);
+	for (unsigned int i = 0; i < getNumberOfCmds(); i++) {
+		btods(isHeaderLockSet(i), buffer);
 		message += buffer;
 	}
 	message += "\n";

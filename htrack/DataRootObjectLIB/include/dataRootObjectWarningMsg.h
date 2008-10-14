@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-06-06 14:19:23 $
-/// $Revision: 1.7 $
+/// $Date: 2008-10-07 10:36:50 $
+/// $Revision: 1.9 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -1293,6 +1293,40 @@ public:
  */
 
 	virtual ~lutGoodnessNotPossibleForGradingPWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _MISSINGORIGINWARNINGMSG_H
+#define _MISSINGORIGINWARNINGMSG_H
+
+/**
+ * CLASS missingOriginWarningMsg
+ */
+
+class missingOriginWarningMsg : public dataRootObjectWarningMsg {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	missingOriginWarningMsg();
+
+/**
+ * Destructor
+ */
+
+	virtual ~missingOriginWarningMsg();
 
 /**
  * This method displays a warning message.

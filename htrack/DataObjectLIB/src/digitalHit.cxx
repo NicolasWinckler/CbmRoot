@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:38:12 $
-// $Revision: 1.1 $
+// $Date: 2008-10-10 13:47:05 $
+// $Revision: 1.3 $
 //
 // *******************************************************************/
 
@@ -88,8 +88,12 @@ const digitalHit& digitalHit::operator = (const digitalHit& value) {
 std::string digitalHit::toNotIdentifiedString() {
 
 	std::string returnValue;
+	char        buffer[longConversionDigits+1];
 
-	returnValue = getIdentifier();
+	returnValue  = "000";
+	addRadix(RADIX, returnValue);
+	ultos(identifier, buffer, RADIX, longConversionDigits);
+	returnValue += buffer;
 
 	return returnValue;
 
@@ -105,7 +109,7 @@ std::string digitalHit::toIdentifiedString() {
 	std::string returnValue;
 
 	returnValue  = "Identifier: ";
-	returnValue += getIdentifier();
+	returnValue += toNotIdentifiedString();
 
 	return returnValue;
 
@@ -115,17 +119,9 @@ std::string digitalHit::toIdentifiedString() {
  * method returns the start value								*
  ****************************************************************/
 
-std::string digitalHit::getIdentifier() {
+unsigned long digitalHit::getIdentifier() {
 
-	std::string returnValue;
-	char        buffer[longConversionDigits+1];
-
-	returnValue  = "000";
-	addRadix(RADIX, returnValue);
-	ultos(identifier, buffer, RADIX, longConversionDigits);
-	returnValue += buffer;
-
-	return returnValue;
+	return identifier;
 
 }
 
@@ -133,13 +129,13 @@ std::string digitalHit::getIdentifier() {
  * method sets the identifier value								*
  ****************************************************************/
 
-void digitalHit::setIdentifier(std::string& value) {
+void digitalHit::setNotIdentifiedIdentifier(std::string& value) {
 
 	std::string temp;
 	int         radix;
 
 	temp       = value;
-	radix      = extractRadix(&temp);
+	extractRadix(&radix, &temp);
 	identifier = stoul(temp, radix);
 
 }

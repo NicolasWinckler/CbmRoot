@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-12-13 13:47:19 $
-/// $Revision: 1.4 $
+/// $Date: 2008-09-11 14:07:01 $
+/// $Revision: 1.7 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -56,40 +56,6 @@ public:
  */
 
 	virtual ~analysisError();
-
-};
-
-#endif
-
-
-#ifndef _WINDOWDIVISIONERROR_H
-#define _WINDOWDIVISIONERROR_H
-
-/**
- * CLASS windowDivisionError
- */
-
-class windowDivisionError : public analysisError {
-
-public:
-
-/**
- * Default constructor
- */
-
-	windowDivisionError();
-
-/**
- * Destructor
- */
-
-	virtual ~windowDivisionError();
-
-/**
- * This method displays an error message.
- */
-
-	void errorMsg();
 
 };
 
@@ -808,6 +774,40 @@ public:
  */
 
 	virtual ~initHistogramDimensionsFirstError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _cannotAccessPeakfindingGeometryAnalyserError_H
+#define _cannotAccessPeakfindingGeometryAnalyserError_H
+
+/**
+ * CLASS cannotAccessPeakfindingGeometryAnalyserError
+ */
+
+class cannotAccessPeakfindingGeometryAnalyserError : public analysisError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotAccessPeakfindingGeometryAnalyserError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotAccessPeakfindingGeometryAnalyserError();
 
 /**
  * This method displays an error message.

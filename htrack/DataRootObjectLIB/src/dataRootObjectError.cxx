@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-10-19 14:33:04 $
-// $Revision: 1.4 $
+// $Date: 2008-09-11 14:11:31 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -608,5 +608,67 @@ void tooBigTrackIndexError::errorMsg() {
 	temp += buffer;
 	temp += " tracks!!!";
 	printMsg(temp);
+
+}
+
+
+/****************************************************************
+ * CLASS cannotAccessNumberOfIndicatorsError					*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+cannotAccessNumberOfIndicatorsError::cannotAccessNumberOfIndicatorsError() : dataRootObjectError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+cannotAccessNumberOfIndicatorsError::~cannotAccessNumberOfIndicatorsError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void cannotAccessNumberOfIndicatorsError::errorMsg() {
+
+	printMsg("The number of indicators is not accessible!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS cannotAccessIndicatorsError							*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+cannotAccessIndicatorsError::cannotAccessIndicatorsError() : dataRootObjectError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+cannotAccessIndicatorsError::~cannotAccessIndicatorsError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void cannotAccessIndicatorsError::errorMsg() {
+
+	printMsg("The indicators object is not accessible!!!");
 
 }

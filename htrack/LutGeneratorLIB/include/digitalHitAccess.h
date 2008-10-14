@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-02-29 11:43:28 $
-/// $Revision: 1.1 $
+/// $Date: 2008-10-10 13:50:00 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -32,8 +32,15 @@
 #ifndef _DIGITALHITACCESS_H
 #define _DIGITALHITACCESS_H
 
+#include "../../MiscLIB/include/defs.h"
 #include "../../DataObjectLIB/include/digitalHit.h"
+
+#if (ARCHITECTURE != PS3)
+
 #include "../../DataRootObjectLIB/include/trackfinderInputHit.h"
+
+#endif
+
 #include <string>
 
 
@@ -80,7 +87,11 @@ public:
  * @return if borderPointer is not null, this object would consist of the computed results
  */
 
+#if (ARCHITECTURE != PS3)
+
 	void evaluate(trackfinderInputHit* hit, digitalHit* digitalHitPointer = NULL);
+
+#endif
 
 /**
  * This method clears the prelut table.
@@ -89,11 +100,19 @@ public:
 	void clear();
 
 /**
+ * method returns the number of entries
+ */
+
+	unsigned long getNumberOfEntries();
+	unsigned long getNumberOfMembers();
+
+/**
  * This method returns the value from the digital hit table.
  * @param index is the actual index for the digital hit
  */
-	
+
 	digitalHit getEntry(unsigned long index);
+	digitalHit getMember(unsigned long index);
 
 /**
  * This method adds the value at the end of the digital hit table.

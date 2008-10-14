@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,14 +24,15 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-10-19 14:34:08 $
-// $Revision: 1.5 $
+// $Date: 2008-10-07 10:37:46 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
 
 #include "../../MiscLIB/include/errorHandling.h"
 #include "../../MiscLIB/include/terminal.h"
+#include "../include/filterDef.h"
 #include "../include/histogramTransformationError.h"
 #include "../include/filterBasicNeutral.h"
 #include "../include/filterBasicSimple.h"
@@ -60,6 +61,7 @@ secondFilterFinalMod::secondFilterFinalMod() : filterDimZDimZDimZ() {
  ****************************************************************/
 
 secondFilterFinalMod::secondFilterFinalMod( trackData**    tracks,
+									  unsigned short  filterArithmetic,
 									  unsigned short size1,
 									  unsigned short size2,
 									  unsigned short size3,
@@ -78,24 +80,33 @@ secondFilterFinalMod::secondFilterFinalMod( trackData**    tracks,
 
 	filterDimZDimZDimZ::init(tracks, size1, size2, size3, size, localSize);
 
-#if (SECONDFILTERHANDLINGTYPE == 0)
-	baseFilter      = new filterBasicNeutral();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 1)
-	baseFilter      = new filterBasicSimple();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 2)
-	baseFilter      = new filterBasicSimpleMod();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 3)
-	baseFilter      = new filterBasicComplex();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 4)
-	baseFilter      = new filterBasicComplexMod();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 5)
-	baseFilter      = new filterBasicSpecial(maximumClass);
-#endif
+	switch(filterArithmetic) {
+
+		case SECONDSIMPLEARITHMETIC:
+			baseFilter      = new filterBasicSimple();
+			break;
+
+		case SECONDSIMPLEMODARITHMETIC:
+			baseFilter      = new filterBasicSimpleMod();
+			break;
+
+		case SECONDCOMPLEXARITHMETIC:
+			baseFilter      = new filterBasicComplex();
+			break;
+
+		case SECONDCOMPLEXMODARITHMETIC:
+			baseFilter      = new filterBasicComplexMod();
+			break;
+
+		case SECONDSPECIALARITHMETIC:
+			baseFilter      = new filterBasicSpecial(maximumClass);
+			break;
+
+		default:
+			baseFilter      = new filterBasicNeutral();
+			break;
+
+	}
 
 	filterMem       = new bitArray[filterSize];
 
@@ -117,13 +128,14 @@ secondFilterFinalMod::~secondFilterFinalMod() {
  ****************************************************************/
 
 void secondFilterFinalMod::init( trackData**    tracks,
-							  unsigned short   size1,
-							  unsigned short   size2,
-							  unsigned short   size3,
-							  unsigned short   localSize1,
-							  unsigned short   localSize2,
-							  unsigned short   localSize3,
-							  bitArray maximumClass) {
+								 unsigned short  filterArithmetic,
+								 unsigned short   size1,
+								 unsigned short   size2,
+								 unsigned short   size3,
+								 unsigned short   localSize1,
+								 unsigned short   localSize2,
+								 unsigned short   localSize3,
+								 bitArray maximumClass) {
 					  
 	unsigned short size;
 	unsigned short localSize;
@@ -147,25 +159,33 @@ void secondFilterFinalMod::init( trackData**    tracks,
 
 	filterDimZDimZDimZ::init(tracks, size1, size2, size3, size, localSize);
 
-	/* allocate new space */
-#if (SECONDFILTERHANDLINGTYPE == 0)
-	baseFilter      = new filterBasicNeutral();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 1)
-	baseFilter      = new filterBasicSimple();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 2)
-	baseFilter      = new filterBasicSimpleMod();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 3)
-	baseFilter      = new filterBasicComplex();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 4)
-	baseFilter      = new filterBasicComplexMod();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 5)
-	baseFilter      = new filterBasicSpecial(maximumClass);
-#endif
+	switch(filterArithmetic) {
+
+		case FIRSTSIMPLEARITHMETIC:
+			baseFilter      = new filterBasicSimple();
+			break;
+
+		case FIRSTSIMPLEMODARITHMETIC:
+			baseFilter      = new filterBasicSimpleMod();
+			break;
+
+		case FIRSTCOMPLEXARITHMETIC:
+			baseFilter      = new filterBasicComplex();
+			break;
+
+		case FIRSTCOMPLEXMODARITHMETIC:
+			baseFilter      = new filterBasicComplexMod();
+			break;
+
+		case FIRSTSPECIALARITHMETIC:
+			baseFilter      = new filterBasicSpecial(maximumClass);
+			break;
+
+		default:
+			baseFilter      = new filterBasicNeutral();
+			break;
+
+	}
 
 	filterMem       = new bitArray[filterSize];
 

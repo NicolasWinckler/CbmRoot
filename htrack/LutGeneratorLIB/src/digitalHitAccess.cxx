@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:43:28 $
-// $Revision: 1.1 $
+// $Date: 2008-10-10 13:50:00 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
@@ -93,6 +93,8 @@ void digitalHitAccess::init() {
  * This method evaluates the value from the prelut table.		*
  ****************************************************************/
 
+#if (ARCHITECTURE != PS3)
+
 void digitalHitAccess::evaluate(trackfinderInputHit* hit, digitalHit* digitalHitPointer) {
 
 	if (hit == NULL)
@@ -102,6 +104,8 @@ void digitalHitAccess::evaluate(trackfinderInputHit* hit, digitalHit* digitalHit
 		digitalHitPointer->setIdentifier(numberOfEntries); //hit->digitize
 
 }
+
+#endif
 
 /****************************************************************
  * This method clears the prelut table.							*
@@ -119,9 +123,24 @@ void digitalHitAccess::clear() {
 }
 
 /****************************************************************
+ * method returns the number of entries							*
+ ****************************************************************/
+
+unsigned long digitalHitAccess::getNumberOfEntries() {
+
+	return numberOfEntries;
+
+}
+unsigned long digitalHitAccess::getNumberOfMembers() {
+
+	return getNumberOfEntries();
+
+}
+
+/****************************************************************
  * This method returns the value from the prelut table.			*
  ****************************************************************/
-	
+
 digitalHit digitalHitAccess::getEntry(unsigned long index) {
 
 	digitalHit returnValue;
@@ -143,6 +162,11 @@ digitalHit digitalHitAccess::getEntry(unsigned long index) {
 	}
 
 	return returnValue;
+
+}
+digitalHit digitalHitAccess::getMember(unsigned long index) {
+
+	return getEntry(index);
 
 }
 

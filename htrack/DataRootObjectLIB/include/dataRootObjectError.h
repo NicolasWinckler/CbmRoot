@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-10-19 14:32:56 $
-/// $Revision: 1.4 $
+/// $Date: 2008-09-11 14:11:31 $
+/// $Revision: 1.6 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -591,6 +591,74 @@ public:
  */
 
 	virtual ~tooBigTrackIndexError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _CANNOTACCESSNUMBEROFINDICATORSERROR_H
+#define _CANNOTACCESSNUMBEROFINDICATORSERROR_H
+
+/**
+ * CLASS cannotAccessNumberOfIndicatorsError
+ */
+
+class cannotAccessNumberOfIndicatorsError : public dataRootObjectError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotAccessNumberOfIndicatorsError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotAccessNumberOfIndicatorsError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _CANNOTACCESSINDICATORSERROR_H
+#define _CANNOTACCESSINDICATORSERROR_H
+
+/**
+ * CLASS cannotAccessIndicatorsError
+ */
+
+class cannotAccessIndicatorsError : public dataRootObjectError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotAccessIndicatorsError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotAccessIndicatorsError();
 
 /**
  * This method displays an error message.

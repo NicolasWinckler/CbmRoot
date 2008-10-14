@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/11/08 12:37:30 $
-/// $Revision: 1.3 $
+/// $Date: 2008-10-10 13:47:04 $
+/// $Revision: 1.6 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -57,16 +57,22 @@ class tableFile : public io {
 
 private:
 
-	bool            commandID[numberOfTableFileCmds];		/**< Variable to review which parameter comes from the file. */
 	tableFileHeader header;									/**< Struct to store all parameters. */
+	bool            localMemory;										/**< Variable to store if the memory to read the file is local memory or not. */
 
 protected:
+
+/**
+ * This method deletes the local memory if it exists.
+ */
+
+	void deleteLocalMemory();
 
 /**
  * This method returns the number of accepted commands.
  */
 
-	int getNumberOfCmds();
+	unsigned int getNumberOfCmds();
 
 /**
  * This method assigns the value to the corresponding parameter

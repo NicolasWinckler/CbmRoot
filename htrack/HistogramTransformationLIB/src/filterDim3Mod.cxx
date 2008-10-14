@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,14 +24,15 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-10-19 14:34:07 $
-// $Revision: 1.4 $
+// $Date: 2008-08-14 12:35:35 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
 
 #include "../../MiscLIB/include/errorHandling.h"
 #include "../../MiscLIB/include/terminal.h"
+#include "../include/filterDef.h"
 #include "../include/histogramTransformationError.h"
 #include "../include/filterBasicNeutral.h"
 #include "../include/filterBasicSimple.h"
@@ -57,29 +58,39 @@ filterDim3Mod::filterDim3Mod() : filterDimZ() {
  ****************************************************************/
 
 filterDim3Mod::filterDim3Mod( trackData**    tracks,
+						unsigned short  filterArithmetic,
 						unsigned short size,
 						unsigned short localSize,
 						bitArray maximumClass) : filterDimZ(
 						tracks, size, localSize) {
 
-#if (SECONDFILTERHANDLINGTYPE == 0)
-	baseFilter      = new filterBasicNeutral();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 1)
-	baseFilter      = new filterBasicSimple();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 2)
-	baseFilter      = new filterBasicSimpleMod();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 3)
-	baseFilter      = new filterBasicComplex();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 4)
-	baseFilter      = new filterBasicComplexMod();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 5)
-	baseFilter      = new filterBasicSpecial(maximumClass);
-#endif
+	switch(filterArithmetic) {
+
+		case FIRSTSIMPLEARITHMETIC:
+			baseFilter      = new filterBasicSimple();
+			break;
+
+		case FIRSTSIMPLEMODARITHMETIC:
+			baseFilter      = new filterBasicSimpleMod();
+			break;
+
+		case FIRSTCOMPLEXARITHMETIC:
+			baseFilter      = new filterBasicComplex();
+			break;
+
+		case FIRSTCOMPLEXMODARITHMETIC:
+			baseFilter      = new filterBasicComplexMod();
+			break;
+
+		case FIRSTSPECIALARITHMETIC:
+			baseFilter      = new filterBasicSpecial(maximumClass);
+			break;
+
+		default:
+			baseFilter      = new filterBasicNeutral();
+			break;
+
+	}
 
 	filterMem       = new bitArray[filterSize];
 
@@ -101,9 +112,10 @@ filterDim3Mod::~filterDim3Mod() {
  ****************************************************************/
 
 void filterDim3Mod::init( trackData**    tracks,
-					   unsigned short size,
-					   unsigned short localSize,
-					   bitArray maximumClass) {
+						  unsigned short  filterArithmetic,
+					      unsigned short size,
+					      unsigned short localSize,
+					      bitArray maximumClass) {
 					  
 	/* free the old allocated space */
 	if (baseFilter != NULL) {
@@ -118,25 +130,33 @@ void filterDim3Mod::init( trackData**    tracks,
 	/* set new parameter */
 	filterDimZ::init(tracks, size, localSize);
 
-	/* allocate new space */
-#if (SECONDFILTERHANDLINGTYPE == 0)
-	baseFilter      = new filterBasicNeutral();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 1)
-	baseFilter      = new filterBasicSimple();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 2)
-	baseFilter      = new filterBasicSimpleMod();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 3)
-	baseFilter      = new filterBasicComplex();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 4)
-	baseFilter      = new filterBasicComplexMod();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 5)
-	baseFilter      = new filterBasicSpecial(maximumClass);
-#endif
+	switch(filterArithmetic) {
+
+		case FIRSTSIMPLEARITHMETIC:
+			baseFilter      = new filterBasicSimple();
+			break;
+
+		case FIRSTSIMPLEMODARITHMETIC:
+			baseFilter      = new filterBasicSimpleMod();
+			break;
+
+		case FIRSTCOMPLEXARITHMETIC:
+			baseFilter      = new filterBasicComplex();
+			break;
+
+		case FIRSTCOMPLEXMODARITHMETIC:
+			baseFilter      = new filterBasicComplexMod();
+			break;
+
+		case FIRSTSPECIALARITHMETIC:
+			baseFilter      = new filterBasicSpecial(maximumClass);
+			break;
+
+		default:
+			baseFilter      = new filterBasicNeutral();
+			break;
+
+	}
 
 	filterMem       = new bitArray[filterSize];
 

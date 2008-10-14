@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:38:12 $
-// $Revision: 1.1 $
+// $Date: 2008-10-10 13:47:05 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
@@ -90,7 +90,7 @@ void digitalHitAccessFile::deleteLocalMemory() {
 /********************************************************/
 
 		if (typeCastedData != NULL) {
-			delete typeCastedData;
+			delete [] typeCastedData;
 			setDataNum(0);
 			setDataPtr(NULL);
 		}
@@ -105,7 +105,7 @@ void digitalHitAccessFile::deleteLocalMemory() {
  * This method returns the number of accepted commands.			*
  ****************************************************************/
 
-int digitalHitAccessFile::getNumberOfCmds() {
+unsigned int digitalHitAccessFile::getNumberOfCmds() {
 
 	return numberOfDigitalHitAccessFileCmds;
 
@@ -124,23 +124,23 @@ bool digitalHitAccessFile::getHeaderValue(std::string& specifier, std::string& v
 /********************************************************/
 /* make code changes for a different configuration here */
 	if (specifier.compare(stringCmdName) == 0) {
-		if (!(commandID[idCmdName])) {
+		if (!isHeaderLockSet(idCmdName)) {
 			header.name = value;
-			commandID[idCmdName] = true;
+			setHeaderLock(idCmdName, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdUsage) == 0) {
-		if (!(commandID[idCmdUsage])) {
+		if (!isHeaderLockSet(idCmdUsage)) {
 			header.usage = value;
-			commandID[idCmdUsage] = true;
+			setHeaderLock(idCmdUsage, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdNumberOfEntries) == 0) {
-		if (!(commandID[idCmdNumberOfEntries])) {
+		if (!isHeaderLockSet(idCmdNumberOfEntries)) {
 			header.numberOfEntries = stoul((char*)value.c_str(), 10);
-			commandID[idCmdNumberOfEntries] = true;
+			setHeaderLock(idCmdNumberOfEntries, true);
 			specifierFound = true;
 		}
 	}
@@ -199,7 +199,7 @@ bool digitalHitAccessFile::getDataValue(std::string& buffer, unsigned long index
 	if (temp.empty())
 		noError = false;
 	else
-		typeCastedData[index].setIdentifier(temp);
+		typeCastedData[index].setNotIdentifiedIdentifier(temp);
 /********************************************************/
 	return noError;
 
@@ -221,7 +221,7 @@ std::string digitalHitAccessFile::setDataValue(unsigned long index) {
 
 /********************************************************/
 /* make code changes for a different data object here	*/
-	returnValue  = typeCastedData[index].getIdentifier();
+	returnValue  = typeCastedData[index].toNotIdentifiedString();
 /********************************************************/
 
 	return returnValue;
@@ -270,8 +270,7 @@ void digitalHitAccessFile::setHeaderDefValues() {
 
 digitalHitAccessFile::digitalHitAccessFile() : io() {
 
-	for (unsigned int i = 0; i < numberOfDigitalHitAccessFileCmds; i++)
-		commandID[i] = 0;
+	localMemory = false;
 
 	init();
 
@@ -294,10 +293,10 @@ digitalHitAccessFile::~digitalHitAccessFile() {
 
 void digitalHitAccessFile::init() {
 
-	setHeaderDefValues();
-
 	if (localMemory)
 		deleteLocalMemory();
+
+	resetHeader();
 
 }
 
@@ -320,9 +319,9 @@ void digitalHitAccessFile::setHeader(digitalHitAccessFileHeader& structure) {
 	header.name                     = structure.name;
 	header.usage                    = structure.usage;
 	header.numberOfEntries          = structure.numberOfEntries;
-	commandID[idCmdName]            = true;
-	commandID[idCmdUsage]           = true;
-	commandID[idCmdNumberOfEntries] = true;
+	setHeaderLock(idCmdName, true);
+	setHeaderLock(idCmdUsage, true);
+	setHeaderLock(idCmdNumberOfEntries, true);
 
 }
 
@@ -367,8 +366,8 @@ std::string digitalHitAccessFile::getInfo() {
 	message += "------------------------------------------\n";
 	message += "CommandID";
 	message += "\t: ";
-	for (int i = 0; i < numberOfDigitalHitAccessFileCmds; i++) {
-		btods(commandID[i], longBuffer);
+	for (unsigned int i = 0; i < getNumberOfCmds(); i++) {
+		btods(isHeaderLockSet(i), longBuffer);
 		message += longBuffer;
 	}
 	message += "\n";

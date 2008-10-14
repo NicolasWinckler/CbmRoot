@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-10-25 14:16:17 $
-/// $Revision: 1.8 $
+/// $Date: 2008-10-07 10:38:09 $
+/// $Revision: 1.10 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -36,10 +36,10 @@
 #include "../../MiscLIB/include/bitArray.h"
 #include "../../DataRootObjectLIB/include/trackfinderInputData.h"
 #include "../../DataRootObjectLIB/include/trackfinderInputDetector.h"
-#ifdef CBMROOTFRAMEWORK
-	#include "CbmStsDigiScheme.h"
-#else
+#if (ARCHITECTURE == STANDALONE)
 	#include "../../RootFrameworkLIB/include/CbmStsDigiScheme.h"
+#elif (ARCHITECTURE == CBMROOT)
+	#include "CbmStsDigiScheme.h"
 #endif
 #include "TObject.h"
 

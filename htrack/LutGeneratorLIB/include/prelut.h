@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-12-13 13:49:20 $
-/// $Revision: 1.2 $
+/// $Date: 2008-10-07 10:38:29 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -33,9 +33,15 @@
 #define _PRELUT_H
 
 
+#include "../../MiscLIB/include/defs.h"
 #include "../../DataObjectLIB/include/prelutDefinition.h"
 #include "../../DataObjectLIB/include/prelutHoughBorder.h"
+
+#if (ARCHITECTURE != PS3)
+
 #include "../../DataRootObjectLIB/include/trackfinderInputHit.h"
+
+#endif
 
 
 /* **************************************************************
@@ -118,7 +124,11 @@ public:
  * @return if borderPointer is not null, this object would consist of the computed results
  */
 
+#if (ARCHITECTURE != PS3)
+
 	virtual void evaluate(trackfinderInputHit* hit, prelutHoughBorder* borderPointer = NULL) = 0;
+
+#endif
 
 };
 

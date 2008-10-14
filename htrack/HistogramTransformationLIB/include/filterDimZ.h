@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:35:11 $
-/// $Revision: 1.1 $
+/// $Date: 2008-10-07 10:37:45 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -37,41 +37,6 @@
 #include "../../DataRootObjectLIB/include/trackData.h"
 #include "../../MiscLIB/include/bitArray.h"
 #include "filterBasicStyle.h"
-#include <iostream>
-
-
-/**
- * Defines the filter strategy which should be used:
- *
- * SECONDFILTERHANDLINGTYPE |      FILTEROBJECT      | FILTERSTRATEGY   
- *--------------------------------------------------------------------------------------------------------------------------------------------
- *            0             | filterBasicNeutral     | no filtering
- *--------------------------------------------------------------------------------------------------------------------------------------------
- *            1             | filterBasicSimple      | delete array[element] if array[i] >= array[element]
- *--------------------------------------------------------------------------------------------------------------------------------------------
- *            2             | filterBasicSimpleMod   | delete array[element] if array[i] > array[element]
- *--------------------------------------------------------------------------------------------------------------------------------------------
- *            3             | filterBasicComplex     | delete array[element] if not global maximum or is not the local middle element
- *--------------------------------------------------------------------------------------------------------------------------------------------
- *            4             | filterBasicComplexMod  | delete array[element] if not global maximum or is not the absolute local maximum
- *--------------------------------------------------------------------------------------------------------------------------------------------
- *            5             | filterBasicSpecial     | if array[element] >= maximumClass use filterBasicSimpleMod, else use filterBasicSimple
- *--------------------------------------------------------------------------------------------------------------------------------------------
- */
-
-#define SECONDFILTERHANDLINGTYPE  1
-
-
-/**
- * Struct to store the information of a filter-deleted object
- */
-
-typedef struct {
-
-	trackLayer::iterator element;
-	unsigned short       layer;
-
-} removingInformation;
 
 
 /* **************************************************************

@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-10-19 14:34:55 $
-/// $Revision: 1.4 $
+/// $Date: 2008-09-11 14:13:03 $
+/// $Revision: 1.7 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -37,11 +37,8 @@
 #include "../../HoughTransformationLIB/include/houghTransformation.h"
 #include "../../HistogramTransformationLIB/include/eraser.h"
 #include "../../HistogramTransformationLIB/include/maxMorphSearch.h"
+#include "../../HistogramTransformationLIB/include/autoFinder.h"
 #include "../../AnalysisLIB/include/analysis.h"
-
-
-//#define ERASERPEAKFINDING		/**< Uses eraser-object instead of maxMorphSearch-object for the peakfinding */
-#undef ERASERPEAKFINDING
 
 
 /* **************************************************************
@@ -54,12 +51,22 @@ private:
 
 	houghTransformation*     houghTransform;				/**< Object which fills the histogram by transforming the hits */
 	histogramTransformation* histoTransform;				/**< Object which evaluates the tracks basing on the histogram */
+	unsigned short           filterType;					/**< Variable to store the general filter type. */
+	unsigned short           sourceDataPercentage;			/**< Variable to store the percentage of the source data which should be used. Less than 100% speeds the algorithm up. */
+	std::string              filterFileName;				/**< Variable to store the name of the file. */
 
 #ifndef NOANALYSIS
 
 	analysis*                analyser;						/**< Object to analyse the trackfinder internally. */
 
 #endif
+
+/**
+ * This applies the algorithm to evaluate the filter geometry
+ * @param terminal is a buffer to place the process information
+ */
+
+	void evaluatePeakfindingGeometry(std::streambuf* terminal = NULL);
 
 public:
 
@@ -76,6 +83,13 @@ public:
  * @return tracks is an object for accessing the tracks
  * @param ratings is the object to access the tables for the ratings
  * @param lut is an object for accessing both look-up-tables
+ * @param filterType defines the type of the filter
+ * @param sourceDataPercentage defines the percentage of the source data which should be used. Less than 100% speeds the algorithm up
+ * @param filterFileName defines the name of the file
+ * @param firstFilterGeometry defines the geometry of the first applied filter
+ * @param firstFilterArithmetic defines the arithmetic which is used in the first applied filter
+ * @param secondFilterGeometry defines the geometry of the second applied filter
+ * @param secondFilterArithmetic defines the arithmetic which is used in the second applied filter
  * @param firstFilterDim1ClearRadius is the region of interest for the first filter in the first dimension
  * @param firstFilterDim2ClearRadius is the region of interest for the first filter in the second dimension
  * @param secondFilterDim1ClearRadius is the region of interest for the second filter in the first dimension
@@ -85,6 +99,10 @@ public:
 
 	trackfinder(trackfinderInputData** eventData, histogramData** histogram,
 			    trackData** tracks, tables** ratings, lutImplementation** lut,
+				unsigned short filterType, unsigned short sourceDataPercentage,
+				std::string filterFileName,
+				unsigned short firstFilterGeometry, unsigned short firstFilterArithmetic,
+				unsigned short secondFilterGeometry, unsigned short secondFilterArithmetic,
 				unsigned short firstFilterDim1ClearRadius,
 				unsigned short firstFilterDim2ClearRadius,
 				unsigned short secondFilterDim1ClearRadius,
@@ -105,6 +123,13 @@ public:
  * @return tracks is an object for accessing the tracks
  * @param ratings is the object to access the tables for the ratings
  * @param lut is an object for accessing both look-up-tables
+ * @param filterType defines the type of the filter
+ * @param sourceDataPercentage defines the percentage of the source data which should be used. Less than 100% speeds the algorithm up
+ * @param filterFileName defines the name of the file
+ * @param firstFilterGeometry defines the geometry of the first applied filter
+ * @param firstFilterArithmetic defines the arithmetic which is used in the first applied filter
+ * @param secondFilterGeometry defines the geometry of the second applied filter
+ * @param secondFilterArithmetic defines the arithmetic which is used in the second applied filter
  * @param firstFilterDim1ClearRadius is the region of interest for the first filter in the first dimension
  * @param firstFilterDim2ClearRadius is the region of interest for the first filter in the second dimension
  * @param secondFilterDim1ClearRadius is the region of interest for the second filter in the first dimension
@@ -114,6 +139,10 @@ public:
 
 	void init(trackfinderInputData** eventData, histogramData** histogram,
 			  trackData** tracks, tables** ratings, lutImplementation** lut,
+			  unsigned short filterType, unsigned short sourceDataPercentage,
+			  std::string filterFileName,
+			  unsigned short firstFilterGeometry, unsigned short firstFilterArithmetic,
+			  unsigned short secondFilterGeometry, unsigned short secondFilterArithmetic,
 			  unsigned short firstFilterDim1ClearRadius,
 			  unsigned short firstFilterDim2ClearRadius,
 			  unsigned short secondFilterDim1ClearRadius,
@@ -134,6 +163,54 @@ public:
  */
 
 	void evaluate(std::streambuf* terminal = NULL);
+
+/**
+ * This applies the algorithm to generate the filter geometry
+ * @param filterCoverPercentage sets the percentage of occurence frequency for a geometry element to be used
+ * @param isFirstEvent is a flag which determines the first event
+ * @param terminal is a buffer to place the process information
+ */
+
+	void generateFilterGeometry(unsigned short filterCoverPercentage, bool isFirstEvent, std::streambuf* terminal = NULL);
+
+/**
+ * This method writes the peakfinding geometry into a file
+ */
+
+	void writePeakfindingGeometry();
+
+/**
+ * This method draws the peakfinding geometry
+ */
+
+	void drawPeakfindingGeometry();
+	void drawProjectedPeakfindingGeometry();
+	void drawCoveredPeakfindingGeometry();
+	void drawCoveredProjectedPeakfindingGeometry();
+
+/**
+ * This method returns a string representation for the
+ * peakfinding geometry
+ */
+
+	std::string peakfindingGeometryToString();
+	std::string projectedPeakfindingGeometryToString();
+	std::string coveredPeakfindingGeometryToString();
+	std::string coveredProjectedPeakfindingGeometryToString();
+
+/**
+ * method returns true if the automatic generation of the filter
+ * geometry is enabled.
+ */
+
+	bool isAutomaticFilterGeometryEnabled();
+
+/**
+ * method returns true if the generation of the filter
+ * geometry is enabled.
+ */
+
+	bool isFilterGeometryGenerationEnabled();
 
 /**
  * This method returns the trackIndex of the debugged track,

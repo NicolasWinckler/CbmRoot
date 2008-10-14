@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-12-13 13:47:19 $
-/// $Revision: 1.1 $
+/// $Date: 2008-09-11 14:07:03 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -693,7 +693,7 @@ void prelutRangeAnalysis::evaluateWindowDivisionFactors(unsigned short* numberOf
 	double         sqrtOfDisplays;
 
 	if ((numberOfEnabledPadColumns == NULL) || (numberOfEnabledPadRows == NULL))
-		throw windowDivisionError();
+		throw windowDivisionError(ANALYSISLIB);
 
 	numberOfEnabledDisplays = 0;
 	for (unsigned short i = 0; i < numberOfDisplays - 1; i++)
@@ -2144,7 +2144,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisUpdateRelative() {
 					}
 					else {
 
-						cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+						cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 						cannotDraw->warningMsg();
 						if(cannotDraw != NULL) {
 							delete cannotDraw;
@@ -2205,7 +2205,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisUpdateRelativeCut() {
 					}
 					else {
 
-						cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+						cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 						cannotDraw->warningMsg();
 						if(cannotDraw != NULL) {
 							delete cannotDraw;
@@ -2289,7 +2289,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDraw(bitArray preventStationDraw, b
 				}
 				else {
 
-					cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+					cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 					cannotDraw->warningMsg();
 					if(cannotDraw != NULL) {
 						delete cannotDraw;
@@ -2314,7 +2314,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDraw(bitArray preventStationDraw, b
 				}
 				else {
 
-					cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+					cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 					cannotDraw->warningMsg();
 					if(cannotDraw != NULL) {
 						delete cannotDraw;
@@ -2341,7 +2341,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDraw(bitArray preventStationDraw, b
 			}
 			else {
 
-				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 				cannotDraw->warningMsg();
 				if(cannotDraw != NULL) {
 					delete cannotDraw;
@@ -2366,7 +2366,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDraw(bitArray preventStationDraw, b
 			}
 			else {
 
-				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 				cannotDraw->warningMsg();
 				if(cannotDraw != NULL) {
 					delete cannotDraw;
@@ -2394,7 +2394,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDraw(bitArray preventStationDraw, b
 			}
 			else {
 
-				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 				cannotDraw->warningMsg();
 				if(cannotDraw != NULL) {
 					delete cannotDraw;
@@ -2470,7 +2470,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDrawRelative(bitArray preventStatio
 				}
 				else {
 
-					cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+					cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 					cannotDraw->warningMsg();
 					if(cannotDraw != NULL) {
 						delete cannotDraw;
@@ -2495,7 +2495,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDrawRelative(bitArray preventStatio
 				}
 				else {
 
-					cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+					cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 					cannotDraw->warningMsg();
 					if(cannotDraw != NULL) {
 						delete cannotDraw;
@@ -2532,7 +2532,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDrawRelative(bitArray preventStatio
 			}
 			else {
 
-				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 				cannotDraw->warningMsg();
 				if(cannotDraw != NULL) {
 					delete cannotDraw;
@@ -2557,7 +2557,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDrawRelative(bitArray preventStatio
 			}
 			else {
 
-				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 				cannotDraw->warningMsg();
 				if(cannotDraw != NULL) {
 					delete cannotDraw;
@@ -2585,7 +2585,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDrawRelative(bitArray preventStatio
 			}
 			else {
 
-				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 				cannotDraw->warningMsg();
 				if(cannotDraw != NULL) {
 					delete cannotDraw;
@@ -2661,7 +2661,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDrawRelativeCut(bitArray preventSta
 				}
 				else {
 
-					cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+					cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 					cannotDraw->warningMsg();
 					if(cannotDraw != NULL) {
 						delete cannotDraw;
@@ -2686,7 +2686,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDrawRelativeCut(bitArray preventSta
 				}
 				else {
 
-					cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+					cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 					cannotDraw->warningMsg();
 					if(cannotDraw != NULL) {
 						delete cannotDraw;
@@ -2723,7 +2723,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDrawRelativeCut(bitArray preventSta
 			}
 			else {
 
-				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 				cannotDraw->warningMsg();
 				if(cannotDraw != NULL) {
 					delete cannotDraw;
@@ -2748,7 +2748,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDrawRelativeCut(bitArray preventSta
 			}
 			else {
 
-				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 				cannotDraw->warningMsg();
 				if(cannotDraw != NULL) {
 					delete cannotDraw;
@@ -2776,7 +2776,7 @@ void prelutRangeAnalysis::prelutRangeAnalysisDrawRelativeCut(bitArray preventSta
 			}
 			else {
 
-				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+				cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 				cannotDraw->warningMsg();
 				if(cannotDraw != NULL) {
 					delete cannotDraw;

@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -29,8 +29,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-10-19 14:34:07 $
-// $Revision: 1.4 $
+// $Date: 2008-08-14 12:35:34 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -50,9 +50,9 @@ void eraser::filteringHistogramLayer() {
 	bitArray       comparator;
 
 	if (histogram == NULL)
-		throw cannotAccessHistogramError();
+		throw cannotAccessHistogramError(HISTOGRAMTRANSFORMATIONLIB);
 	if (*histogram == NULL)
-		throw cannotAccessHistogramError();
+		throw cannotAccessHistogramError(HISTOGRAMTRANSFORMATIONLIB);
 	if (ratings == NULL)
 		throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
 	if (*ratings == NULL)
@@ -223,9 +223,9 @@ void eraser::filteringHistogram(std::streambuf* terminal) {
 void eraser::clearPeakNeighborhood(unsigned short dim1, unsigned short dim2) {
 
 	if (histogram == NULL)
-		throw cannotAccessHistogramError();
+		throw cannotAccessHistogramError(HISTOGRAMTRANSFORMATIONLIB);
 	if (*histogram == NULL)
-		throw cannotAccessHistogramError();
+		throw cannotAccessHistogramError(HISTOGRAMTRANSFORMATIONLIB);
 
 	for(int i = dim2 - firstFilterNeighborhoodDim2ClearRadius; i <= dim2 + firstFilterNeighborhoodDim2ClearRadius; i++) {
 
@@ -260,7 +260,11 @@ eraser::eraser() : histogramTransformation() {
  * Constructor													*
  ****************************************************************/
 
-eraser::eraser(histogramData** histogram, trackData** tracks, tables** ratings, unsigned short dim1ClearRadius, unsigned short dim2ClearRadius, unsigned short dim3ClearRadius) : histogramTransformation(histogram, tracks, ratings, dim1ClearRadius, dim2ClearRadius, dim3ClearRadius){
+eraser::eraser(histogramData** histogram, trackData** tracks, tables** ratings, unsigned short dim1ClearRadius, unsigned short dim2ClearRadius, unsigned short dim3ClearRadius) : histogramTransformation(histogram, tracks, ratings){
+
+	firstFilterNeighborhoodDim1ClearRadius  = dim1ClearRadius;
+	firstFilterNeighborhoodDim2ClearRadius  = dim2ClearRadius;
+	secondFilterNeighborhoodDim3ClearRadius = dim3ClearRadius;
 
 }
 
@@ -269,5 +273,19 @@ eraser::eraser(histogramData** histogram, trackData** tracks, tables** ratings, 
  ****************************************************************/
 
 eraser::~eraser() {
+
+}
+
+/****************************************************************
+ * This method initializes the object.							*
+ ****************************************************************/
+
+void eraser::init(histogramData** histogram, trackData** tracks, tables** ratings, unsigned short dim1ClearRadius, unsigned short dim2ClearRadius, unsigned short dim3ClearRadius) {
+
+	histogramTransformation::init(histogram, tracks, ratings);
+
+	firstFilterNeighborhoodDim1ClearRadius  = dim1ClearRadius;
+	firstFilterNeighborhoodDim2ClearRadius  = dim2ClearRadius;
+	secondFilterNeighborhoodDim3ClearRadius = dim3ClearRadius;
 
 }

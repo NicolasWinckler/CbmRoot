@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-02-29 11:43:28 $
-/// $Revision: 1.3 $
+/// $Date: 2008-10-10 13:50:00 $
+/// $Revision: 1.6 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -101,7 +101,11 @@ public:
  * careful when using.
  */
 
+#if (ARCHITECTURE != PS3)
+
 	trackfinderInputMagneticField* getMagneticField();
+
+#endif
 
 /**
  * This method returns the magnetic field factor to use instead of
@@ -122,7 +126,11 @@ public:
  * is virtual in the base class.
  */
 
+#if (ARCHITECTURE != PS3)
+
 	void setMagneticField(trackfinderInputMagneticField* magneticField);
+
+#endif
 
 /**
  * This method sets the magnetic field factor to use instead of
@@ -176,7 +184,11 @@ public:
  * @return if borderPointer is not null, this object would consist of the computed results
  */
 
+#if (ARCHITECTURE != PS3)
+
 	void evaluate(trackfinderInputHit* hit, lutHoughBorder* borderPointer = NULL);
+
+#endif
 
 /**
  * This method clears the prelut table.
@@ -185,11 +197,19 @@ public:
 	void clear();
 
 /**
+ * method returns the number of entries
+ */
+
+	unsigned long getNumberOfEntries();
+	unsigned long getNumberOfMembers();
+
+/**
  * This method returns the value from the lut table.
  * @param index is the actual index for the borders
  */
 	
 	lutHoughBorder getEntry(unsigned long index);
+	lutHoughBorder getMember(unsigned long index);
 
 /**
  * This method adds the value at the end of the lut table.

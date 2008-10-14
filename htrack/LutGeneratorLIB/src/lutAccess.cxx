@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,12 +24,13 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:43:28 $
-// $Revision: 1.3 $
+// $Date: 2008-10-10 13:50:01 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
 
+#include "../../MiscLIB/include/conversionRoutines.h"
 #include "../include/lutGeneratorError.h"
 #include "../include/lutGeneratorWarningMsg.h"
 #include "../include/lutAccess.h"
@@ -114,11 +115,15 @@ void lutAccess::init(double dim1Min, double dim1Max, int dim1Step, double dim2Mi
  * careful when using.											*
  ****************************************************************/
 
+#if (ARCHITECTURE != PS3)
+
 trackfinderInputMagneticField* lutAccess::getMagneticField() {
 
 	return NULL;
 
 }
+
+#endif
 
 /****************************************************************
  * This method returns the magnetic field factor to use instead	*
@@ -143,9 +148,13 @@ double lutAccess::getMagneticFieldFactor() {
  * is virtual in the base class.								*
  ****************************************************************/
 
+#if (ARCHITECTURE != PS3)
+
 void lutAccess::setMagneticField(trackfinderInputMagneticField* magneticField) {
 
 }
+
+#endif
 
 /****************************************************************
  * This method sets the magnetic field factor to use instead of	*
@@ -208,6 +217,8 @@ void lutAccess::resetCorrectionCounter() {
  * This method evaluates the value from the prelut table.		*
  ****************************************************************/
 
+#if (ARCHITECTURE != PS3)
+
 void lutAccess::evaluate(trackfinderInputHit* hit, lutHoughBorder* borderPointer) {
 
 	if (hit == NULL)
@@ -219,6 +230,8 @@ void lutAccess::evaluate(trackfinderInputHit* hit, lutHoughBorder* borderPointer
 		border         = getEntry(0); //hit->digitize
 
 }
+
+#endif
 
 /****************************************************************
  * This method clears the lut table.							*
@@ -232,6 +245,21 @@ void lutAccess::clear() {
 	}
 
 	numberOfEntries = 0;
+
+}
+
+/****************************************************************
+ * method returns the number of entries							*
+ ****************************************************************/
+
+unsigned long lutAccess::getNumberOfEntries() {
+
+	return numberOfEntries;
+
+}
+unsigned long lutAccess::getNumberOfMembers() {
+
+	return getNumberOfEntries();
 
 }
 
@@ -260,6 +288,11 @@ lutHoughBorder lutAccess::getEntry(unsigned long index) {
 	}
 
 	return returnValue;
+
+}
+lutHoughBorder lutAccess::getMember(unsigned long index) {
+
+	return getEntry(index);
 
 }
 
@@ -318,6 +351,8 @@ void lutAccess::read(std::string fileName) {
 
 	unsigned short  countDifferentLutDefinitionAsFile;
 	lutAccessFile   readFile;
+	std::string     definitionString;
+	std::string     fileHeaderString;
 
 	countDifferentLutDefinitionAsFile = 0;
 
@@ -338,16 +373,26 @@ void lutAccess::read(std::string fileName) {
 
 	}
 
-	if (def.dim1Min != fileHeader.dim1Min)
+	dtos(def.dim1Min,        &definitionString, doubleConversionDigits);
+	dtos(fileHeader.dim1Min, &fileHeaderString, doubleConversionDigits);
+	if (definitionString != fileHeaderString)
 		countDifferentLutDefinitionAsFile++;
-	if (def.dim1Max != fileHeader.dim1Max)
+	dtos(def.dim1Max,        &definitionString, doubleConversionDigits);
+	dtos(fileHeader.dim1Max, &fileHeaderString, doubleConversionDigits);
+	if (definitionString != fileHeaderString)
 		countDifferentLutDefinitionAsFile++;
 	if (def.dim1Step != fileHeader.dim1Step)
 		countDifferentLutDefinitionAsFile++;
-	if (def.dim2Min != fileHeader.dim2Min)
+	dtos(def.dim2Min,        &definitionString, doubleConversionDigits);
+	dtos(fileHeader.dim2Min, &fileHeaderString, doubleConversionDigits);
+	if (definitionString != fileHeaderString)
 		countDifferentLutDefinitionAsFile++;
-	if (def.dim2Max != fileHeader.dim2Max)
+	dtos(def.dim2Max,        &definitionString, doubleConversionDigits);
+	dtos(fileHeader.dim2Max, &fileHeaderString, doubleConversionDigits);
+	if (definitionString != fileHeaderString)
 		countDifferentLutDefinitionAsFile++;
+	dtos(def.dim2Step,        &definitionString, doubleConversionDigits);
+	dtos(fileHeader.dim2Step, &fileHeaderString, doubleConversionDigits);
 	if (def.dim2Step != fileHeader.dim2Step)
 		countDifferentLutDefinitionAsFile++;
 

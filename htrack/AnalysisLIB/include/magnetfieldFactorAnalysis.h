@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-12-13 13:47:19 $
-/// $Revision: 1.2 $
+/// $Date: 2008-09-11 14:07:01 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -50,7 +50,7 @@ protected:
 	bool           analysisEnabled;				/**< Variable to store if the analysis is enabled. */
 	TCanvas*       window;						/**< Object for the main window. */
 	unsigned short numberOfWindowPadColumns;	/**< Number of columns which divide the window into pads. */
-	unsigned short numberOfWindowPadRows;		/**< Number of rows whihc divide the window into pads. */
+	unsigned short numberOfWindowPadRows;		/**< Number of rows which divide the window into pads. */
 	bool           enableDisplay;				/**< Variable to store the enable-state of the window. */
 	std::string    outputFileName;				/**< Variable to store the name of the file for the output. */
 	bool           writeToFile;					/**< Variable to store if writing into the file is enabled. */

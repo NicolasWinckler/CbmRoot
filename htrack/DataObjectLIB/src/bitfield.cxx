@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -51,8 +51,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-10-19 14:43:59 $
-// $Revision: 1.4 $
+// $Date: 2008-10-10 13:47:05 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
@@ -77,12 +77,12 @@ bool bitfield::greater(std::bitset<numberOfBits>& operand1, std::bitset<numberOf
 
 	if (numberOfBits < 8 * sizeof(unsigned char) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned char op1 = operand1.to_ulong();
 		unsigned char op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -91,12 +91,12 @@ bool bitfield::greater(std::bitset<numberOfBits>& operand1, std::bitset<numberOf
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned short) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned short op1 = operand1.to_ulong();
 		unsigned short op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -105,12 +105,12 @@ bool bitfield::greater(std::bitset<numberOfBits>& operand1, std::bitset<numberOf
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned int) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned int op1 = operand1.to_ulong();
 		unsigned int op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -119,12 +119,12 @@ bool bitfield::greater(std::bitset<numberOfBits>& operand1, std::bitset<numberOf
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned long) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned long op1 = operand1.to_ulong();
 		unsigned long op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -165,12 +165,12 @@ bool bitfield::greaterOrEqual(std::bitset<numberOfBits>& operand1, std::bitset<n
 
 	if (numberOfBits < 8 * sizeof(unsigned char) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned char op1 = operand1.to_ulong();
 		unsigned char op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -179,12 +179,12 @@ bool bitfield::greaterOrEqual(std::bitset<numberOfBits>& operand1, std::bitset<n
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned short) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned short op1 = operand1.to_ulong();
 		unsigned short op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -193,12 +193,12 @@ bool bitfield::greaterOrEqual(std::bitset<numberOfBits>& operand1, std::bitset<n
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned int) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned int op1 = operand1.to_ulong();
 		unsigned int op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -207,12 +207,12 @@ bool bitfield::greaterOrEqual(std::bitset<numberOfBits>& operand1, std::bitset<n
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned long) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned long op1 = operand1.to_ulong();
 		unsigned long op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -253,12 +253,12 @@ std::bitset<numberOfBits> bitfield::add(std::bitset<numberOfBits>& operand1, std
 
 	if (numberOfBits < 8 * sizeof(unsigned char) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned char op1 = operand1.to_ulong();
 		unsigned char op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -267,12 +267,12 @@ std::bitset<numberOfBits> bitfield::add(std::bitset<numberOfBits>& operand1, std
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned short) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned short op1 = operand1.to_ulong();
 		unsigned short op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -281,12 +281,12 @@ std::bitset<numberOfBits> bitfield::add(std::bitset<numberOfBits>& operand1, std
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned int) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned int op1 = operand1.to_ulong();
 		unsigned int op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -295,12 +295,12 @@ std::bitset<numberOfBits> bitfield::add(std::bitset<numberOfBits>& operand1, std
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned long) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned long op1 = operand1.to_ulong();
 		unsigned long op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -342,12 +342,12 @@ std::bitset<numberOfBits> bitfield::sub(std::bitset<numberOfBits>& operand1, std
 
 	if (numberOfBits < 8 * sizeof(unsigned char) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned char op1 = operand1.to_ulong();
 		unsigned char op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -356,12 +356,12 @@ std::bitset<numberOfBits> bitfield::sub(std::bitset<numberOfBits>& operand1, std
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned short) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned short op1 = operand1.to_ulong();
 		unsigned short op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -370,12 +370,12 @@ std::bitset<numberOfBits> bitfield::sub(std::bitset<numberOfBits>& operand1, std
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned int) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned int op1 = operand1.to_ulong();
 		unsigned int op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -384,12 +384,12 @@ std::bitset<numberOfBits> bitfield::sub(std::bitset<numberOfBits>& operand1, std
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned long) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned long op1 = operand1.to_ulong();
 		unsigned long op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -431,12 +431,12 @@ std::bitset<numberOfBits> bitfield::mult(std::bitset<numberOfBits>& operand1, st
 
 	if (numberOfBits < 8 * sizeof(unsigned char) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned char op1 = operand1.to_ulong();
 		unsigned char op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -445,12 +445,12 @@ std::bitset<numberOfBits> bitfield::mult(std::bitset<numberOfBits>& operand1, st
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned short) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned short op1 = operand1.to_ulong();
 		unsigned short op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -459,12 +459,12 @@ std::bitset<numberOfBits> bitfield::mult(std::bitset<numberOfBits>& operand1, st
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned int) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned int op1 = operand1.to_ulong();
 		unsigned int op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -473,12 +473,12 @@ std::bitset<numberOfBits> bitfield::mult(std::bitset<numberOfBits>& operand1, st
 	}
 	else if (numberOfBits < 8 * sizeof(unsigned long) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 		unsigned long op1 = operand1.to_ulong();
 		unsigned long op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -518,12 +518,12 @@ std::bitset<numberOfBits> bitfield::div(std::bitset<numberOfBits>& operand1, std
 
 		if (numberOfBits < 8 * sizeof(unsigned char) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 			unsigned char op1 = operand1.to_ulong();
 			unsigned char op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -532,12 +532,12 @@ std::bitset<numberOfBits> bitfield::div(std::bitset<numberOfBits>& operand1, std
 		}
 		else if (numberOfBits < 8 * sizeof(unsigned short) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 			unsigned short op1 = operand1.to_ulong();
 			unsigned short op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -546,12 +546,12 @@ std::bitset<numberOfBits> bitfield::div(std::bitset<numberOfBits>& operand1, std
 		}
 		else if (numberOfBits < 8 * sizeof(unsigned int) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 			unsigned int op1 = operand1.to_ulong();
 			unsigned int op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -560,12 +560,12 @@ std::bitset<numberOfBits> bitfield::div(std::bitset<numberOfBits>& operand1, std
 		}
 		else if (numberOfBits < 8 * sizeof(unsigned long) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 			unsigned long op1 = operand1.to_ulong();
 			unsigned long op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -619,12 +619,12 @@ std::bitset<numberOfBits> bitfield::mod(std::bitset<numberOfBits>& operand1, std
 
 		if (numberOfBits < 8 * sizeof(unsigned char) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 			unsigned char op1 = operand1.to_ulong();
 			unsigned char op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -633,12 +633,12 @@ std::bitset<numberOfBits> bitfield::mod(std::bitset<numberOfBits>& operand1, std
 		}
 		else if (numberOfBits < 8 * sizeof(unsigned short) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 			unsigned short op1 = operand1.to_ulong();
 			unsigned short op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -647,12 +647,12 @@ std::bitset<numberOfBits> bitfield::mod(std::bitset<numberOfBits>& operand1, std
 		}
 		else if (numberOfBits < 8 * sizeof(unsigned int) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 			unsigned int op1 = operand1.to_ulong();
 			unsigned int op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -661,12 +661,12 @@ std::bitset<numberOfBits> bitfield::mod(std::bitset<numberOfBits>& operand1, std
 		}
 		else if (numberOfBits < 8 * sizeof(unsigned long) + 1) {
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(disable : 4244)
 #endif
 			unsigned long op1 = operand1.to_ulong();
 			unsigned long op2 = operand2.to_ulong();
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 #pragma warning(default : 4244)
 #endif
 
@@ -706,7 +706,7 @@ void bitfield::valueFromString(std::string value) {
 
 	int radix;
 
-	radix = extractRadix(&value);
+	extractRadix(&radix, &value);
 
 	bits  = std::bitset<numberOfBits>(stoul(value, radix));
 

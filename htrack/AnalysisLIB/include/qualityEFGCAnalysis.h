@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-10-31 13:44:01 $
-/// $Revision: 1.2 $
+/// $Date: 2008-10-07 10:34:05 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -82,12 +82,13 @@ public:
 
 /**
  * method finalizes the evaluation.
+ * @param numberOfHits is the number of hits which occur
  * @param numberOfTracksWithP is the number of tracks which
  *        should be found
  * @see analysis::getNumberOfTracksWithP(unsigned short minimumClassPriority)
  */
 
-	void finalizeEvaluation(unsigned int numberOfTracksWithP);
+	void finalizeEvaluation(int numberOfHits, int numberOfTracksWithP);
 
 /**
  * Function wich is called from evaluate in a special
@@ -244,6 +245,12 @@ public:
  */
 
 	unsigned short getIdentificationQuality();
+
+/**
+ * method returns the quality of data reduction in percent.
+ */
+
+	unsigned short getReductionQuality();
 
 /**
  * method returns the quality of cloned tracks in percent.

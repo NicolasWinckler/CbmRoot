@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-02-29 11:43:43 $
-/// $Revision: 1.7 $
+/// $Date: 2008-09-11 14:12:40 $
+/// $Revision: 1.9 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -1081,6 +1081,90 @@ public:
  */
 
 	virtual ~cannotAccessDistributionMemoryError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _CANNOTACCESSHISTOGRAMERROR_H
+#define _CANNOTACCESSHISTOGRAMERROR_H
+
+/**
+ * CLASS cannotAccessHistogramError
+ */
+
+class cannotAccessHistogramError : public errorHandling {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotAccessHistogramError();
+
+/**
+ * Constructor
+ * @param errorSource should be a string representation for the project
+ *        where the error occurs
+ */
+
+	cannotAccessHistogramError(std::string errorSource);
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotAccessHistogramError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _WINDOWDIVISIONERROR_H
+#define _WINDOWDIVISIONERROR_H
+
+/**
+ * CLASS windowDivisionError
+ */
+
+class windowDivisionError : public errorHandling {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	windowDivisionError();
+
+/**
+ * Constructor
+ * @param errorSource should be a string representation for the project
+ *        where the error occurs
+ */
+
+	windowDivisionError(std::string errorSource);
+
+/**
+ * Destructor
+ */
+
+	virtual ~windowDivisionError();
 
 /**
  * This method displays an error message.

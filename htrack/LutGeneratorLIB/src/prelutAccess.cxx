@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,13 +24,14 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:43:28 $
-// $Revision: 1.3 $
+// $Date: 2008-10-10 13:50:01 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
 
 #include "../../DataObjectLIB/include/prelutAccessFile.h"
+#include "../../MiscLIB/include/conversionRoutines.h"
 #include "../include/lutGeneratorError.h"
 #include "../include/lutGeneratorWarningMsg.h"
 #include "../include/prelutAccess.h"
@@ -107,6 +108,8 @@ void prelutAccess::init(double dim3Min, double dim3Max, int dim3Step, double dim
  * This method evaluates the value from the prelut table.		*
  ****************************************************************/
 
+#if (ARCHITECTURE != PS3)
+
 void prelutAccess::evaluate(trackfinderInputHit* hit, prelutHoughBorder* borderPointer) {
 
 	if (hit == NULL)
@@ -118,6 +121,8 @@ void prelutAccess::evaluate(trackfinderInputHit* hit, prelutHoughBorder* borderP
 		border         = getEntry(0); //hit->digitize
 
 }
+
+#endif
 
 /****************************************************************
  * This method clears the prelut table.							*
@@ -131,6 +136,21 @@ void prelutAccess::clear() {
 	}
 
 	numberOfEntries = 0;
+
+}
+
+/****************************************************************
+ * method returns the number of entries							*
+ ****************************************************************/
+
+unsigned long prelutAccess::getNumberOfEntries() {
+
+	return numberOfEntries;
+
+}
+unsigned long prelutAccess::getNumberOfMembers() {
+
+	return getNumberOfEntries();
 
 }
 
@@ -159,6 +179,11 @@ prelutHoughBorder prelutAccess::getEntry(unsigned long index) {
 	}
 
 	return returnValue;
+
+}
+prelutHoughBorder prelutAccess::getMember(unsigned long index) {
+
+	return getEntry(index);
 
 }
 
@@ -215,8 +240,10 @@ std::string prelutAccess::toString() {
 
 void prelutAccess::read(std::string fileName) {
 
-	unsigned short     countDifferentPrelutDefinitionAsFile;
-	prelutAccessFile   readFile;
+	unsigned short   countDifferentPrelutDefinitionAsFile;
+	prelutAccessFile readFile;
+	std::string      definitionString;
+	std::string      fileHeaderString;
 
 	countDifferentPrelutDefinitionAsFile = 0;
 
@@ -237,15 +264,23 @@ void prelutAccess::read(std::string fileName) {
 
 	}
 
-	if (def.dim3Min != fileHeader.dimMin)
+	dtos(def.dim3Min,       &definitionString, doubleConversionDigits);
+	dtos(fileHeader.dimMin, &fileHeaderString, doubleConversionDigits);
+	if (definitionString != fileHeaderString)
 		countDifferentPrelutDefinitionAsFile++;
-	if (def.dim3Max != fileHeader.dimMax)
+	dtos(def.dim3Max,       &definitionString, doubleConversionDigits);
+	dtos(fileHeader.dimMax, &fileHeaderString, doubleConversionDigits);
+	if (definitionString != fileHeaderString)
 		countDifferentPrelutDefinitionAsFile++;
 	if (def.dim3Step != fileHeader.dimStep)
 		countDifferentPrelutDefinitionAsFile++;
-	if (def.dim3StartEntry != fileHeader.dimStartEntry)
+	dtos(def.dim3StartEntry,       &definitionString, doubleConversionDigits);
+	dtos(fileHeader.dimStartEntry, &fileHeaderString, doubleConversionDigits);
+	if (definitionString != fileHeaderString)
 		countDifferentPrelutDefinitionAsFile++;
-	if (def.dim3StopEntry != fileHeader.dimStopEntry)
+	dtos(def.dim3StopEntry,       &definitionString, doubleConversionDigits);
+	dtos(fileHeader.dimStopEntry, &fileHeaderString, doubleConversionDigits);
+	if (definitionString != fileHeaderString)
 		countDifferentPrelutDefinitionAsFile++;
 
 	if (countDifferentPrelutDefinitionAsFile != 0) {

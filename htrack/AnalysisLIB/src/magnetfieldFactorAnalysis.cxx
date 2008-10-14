@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-12-13 13:47:19 $
-/// $Revision: 1.5 $
+/// $Date: 2008-09-11 14:07:02 $
+/// $Revision: 1.7 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -494,7 +494,7 @@ void magnetfieldFactorAnalysis::evaluateWindowDivisionFactors(unsigned short* nu
 	double         sqrtOfDisplays;
 
 	if ((numberOfEnabledPadColumns == NULL) || (numberOfEnabledPadRows == NULL))
-		throw windowDivisionError();
+		throw windowDivisionError(ANALYSISLIB);
 
 	numberOfEnabledDisplays = 0;
 	for (unsigned short i = 0; i < numberOfDisplays; i++)
@@ -615,6 +615,11 @@ magnetfieldFactorAnalysis::magnetfieldFactorAnalysis(unsigned short numberOfDisp
 magnetfieldFactorAnalysis::~magnetfieldFactorAnalysis() {
 
 	deleteMemory();
+
+	if (window != NULL) {
+		delete window;
+		window = NULL;
+	}
 
 }
 
@@ -1021,7 +1026,7 @@ void magnetfieldFactorAnalysis::magnetfieldFactorAnalysisDraw(bitArray preventDr
 				}
 				else {
 
-					cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+					cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 					cannotDraw->warningMsg();
 					if(cannotDraw != NULL) {
 						delete cannotDraw;

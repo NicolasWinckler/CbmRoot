@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-15 13:55:24 $
-// $Revision: 1.4 $
+// $Date: 2008-09-11 14:07:03 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -593,7 +593,7 @@ void momentumEFGCAnalysis::drawEMDisplay(unsigned int error) {
 	}
 	else {
 
-		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 		cannotDraw->warningMsg();
 		if(cannotDraw != NULL) {
 			delete cannotDraw;
@@ -626,7 +626,7 @@ void momentumEFGCAnalysis::drawFMDisplay(unsigned int error) {
 	}
 	else {
 
-		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 		cannotDraw->warningMsg();
 		if(cannotDraw != NULL) {
 			delete cannotDraw;
@@ -659,7 +659,7 @@ void momentumEFGCAnalysis::drawGMDisplay(unsigned int error) {
 	}
 	else {
 
-		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 		cannotDraw->warningMsg();
 		if(cannotDraw != NULL) {
 			delete cannotDraw;
@@ -692,7 +692,7 @@ void momentumEFGCAnalysis::drawCMDisplay(unsigned int error) {
 	}
 	else {
 
-		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 		cannotDraw->warningMsg();
 		if(cannotDraw != NULL) {
 			delete cannotDraw;

@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-06-26 12:33:39 $
-/// $Revision: 1.10 $
+/// $Date: 2008-10-07 10:36:50 $
+/// $Revision: 1.12 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -38,10 +38,10 @@
 #include "../include/trackfinderInputHit.h"
 #include "../include/trackfinderInputTrack.h"
 #include "../include/trackfinderInputDetector.h"
-#ifdef CBMROOTFRAMEWORK
-#include "../include/trackfinderInputFMagneticField.h"
-#else
-#include "../include/trackfinderInputSMagneticField.h"
+#if (ARCHITECTURE == STANDALONE)
+	#include "../include/trackfinderInputSMagneticField.h"
+#elif (ARCHITECTURE == CBMROOT)
+	#include "../include/trackfinderInputFMagneticField.h"
 #endif
 #include "TClonesArray.h"
 #include "TObject.h"
@@ -112,13 +112,13 @@ protected:
 	TClonesArray*                  tracks;							/**< Object to store the tracks for this event. */
 	trackfinderInputDetector*      detector;						/**< Object to store the detector for this event. */
 
-#ifdef CBMROOTFRAMEWORK
-
-	trackfinderInputFMagneticField* magneticField;					/**< Object to store the field map for this event. */
-
-#else
+#if (ARCHITECTURE == STANDALONE)
 
 	trackfinderInputSMagneticField* magneticField;					/**< Object to store the field map for this event. */
+
+#elif (ARCHITECTURE == CBMROOT)
+
+	trackfinderInputFMagneticField* magneticField;					/**< Object to store the field map for this event. */
 
 #endif
 
@@ -354,13 +354,13 @@ public:
  * method returns the magnetic field object
  */
 
-#ifdef CBMROOTFRAMEWORK
-
-	trackfinderInputFMagneticField* getMagneticField();
-
-#else
+#if (ARCHITECTURE == STANDALONE)
 
 	trackfinderInputSMagneticField* getMagneticField();
+
+#elif (ARCHITECTURE == CBMROOT)
+
+	trackfinderInputFMagneticField* getMagneticField();
 
 #endif
 

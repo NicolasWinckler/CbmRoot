@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-10-31 13:44:01 $
-// $Revision: 1.2 $
+// $Date: 2008-10-07 10:34:06 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
@@ -53,6 +53,7 @@ void qualityEFGCAnalysis::resetPeakAndTrackInfo() {
 	trackInfo.numberOfWellFoundTracks  = 0;
 	trackInfo.numberOfWrongFoundTracks = 0;
 	trackInfo.numberOfTracksWithP      = 0;
+	trackInfo.numberOfHits             = 0;
 
 }
 
@@ -88,11 +89,12 @@ void qualityEFGCAnalysis::initializeEvaluation() {
  * method finalizes the evaluation.								*
  ****************************************************************/
 
-void qualityEFGCAnalysis::finalizeEvaluation(unsigned int numberOfTracksWithP) {
+void qualityEFGCAnalysis::finalizeEvaluation(int numberOfHits, int numberOfTracksWithP) {
 
 	peakInfo.numberOfPeaks         = peakInfo.peakToMoreTracks + peakInfo.peakToOneTrack + peakInfo.peakToNoTrack + peakInfo.peakToFakeTrack;
 	trackInfo.numberOfTracks       = trackInfo.trackToMorePeaks + trackInfo.trackToOnePeak + trackInfo.trackToNoPeak;
-	trackInfo.numberOfTracksWithP += numberOfTracksWithP;
+	trackInfo.numberOfTracksWithP += (unsigned int)numberOfTracksWithP;
+	trackInfo.numberOfHits        += (unsigned int)numberOfHits;
 
 }
 
@@ -347,6 +349,16 @@ unsigned short qualityEFGCAnalysis::getGhostQuality() {
 unsigned short qualityEFGCAnalysis::getIdentificationQuality() {
 
 	return (unsigned short)((double)((int)(100 * ((double)trackInfo.trackToOnePeak + (double)trackInfo.trackToMorePeaks) / ((double)peakInfo.numberOfPeaks) + 0.5)));
+
+}
+
+/****************************************************************
+ * method returns the quality of data reduction in percent.		*
+ ****************************************************************/
+
+unsigned short qualityEFGCAnalysis::getReductionQuality() {
+
+	return (unsigned short)((double)((int)(100 * ((double)trackInfo.numberOfHits - peakInfo.numberOfPeaks) / ((double)trackInfo.numberOfHits) + 0.5)));
 
 }
 

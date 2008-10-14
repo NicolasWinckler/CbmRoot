@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,27 +23,27 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-10-19 14:33:11 $
-// $Revision: 1.6 $
+// $Date: 2008-10-07 10:36:51 $
+// $Revision: 1.8 $
 //
 // *******************************************************************/
 
 
 #include "../../MiscLIB/include/defs.h"
 #include "../../MiscLIB/include/errorHandling.h"
-#ifdef CBMROOTFRAMEWORK
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
-	#include "CbmStsMapsHit.h"
-	#include "CbmStsStripHit.h"
-	#include "CbmStsHybridHit.h"
-#else
-	#include "CbmStsHit.h"
-#endif
-#else
+#if (ARCHITECTURE == STANDALONE)
 	#include "../../RootFrameworkLIB/include/CbmStsMapsHit.h"
 	#include "../../RootFrameworkLIB/include/CbmStsStripHit.h"
 	#include "../../RootFrameworkLIB/include/CbmStsHybridHit.h"
 	#include "../../RootFrameworkLIB/include/CbmStsHit.h"
+#elif (ARCHITECTURE == CBMROOT)
+	#ifdef HITCOMPATIBILITY
+		#include "CbmStsMapsHit.h"
+		#include "CbmStsStripHit.h"
+		#include "CbmStsHybridHit.h"
+	#else
+		#include "CbmStsHit.h"
+	#endif
 #endif
 #include "../include/dataRootObjectError.h"
 #include "../include/dataRootObjectWarningMsg.h"
@@ -75,7 +75,7 @@ trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value) {
 		this->hit   = value.hit;
 	else {
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 		if (value.station->isMapsType())
 			this->hit   = new CbmStsMapsHit(*((CbmStsMapsHit*)value.hit));
@@ -123,7 +123,7 @@ trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double pos
 
 	if (maps ^ strip ^ hybrid) {
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 		if (maps)
 			hit   = new CbmStsMapsHit(detectorId, position, positionError, pointIndex, -1);
@@ -165,7 +165,7 @@ trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double pos
 	TVector3 position(posX, posY, posZ);
 	TVector3 positionError(xError, yError, 0);
 
-#ifndef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifndef HITCOMPATIBILITY
 
 	hit   = new CbmStsHit(detectorId, position, positionError, -1, -1, -1);
 	hit->SetRefIndex(pointIndex);
@@ -212,7 +212,7 @@ const trackfinderInputHit& trackfinderInputHit::operator = (const trackfinderInp
 		this->hit   = value.hit;
 	else {
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 		if (value.station->isMapsType())
 			this->hit   = new CbmStsMapsHit(*((CbmStsMapsHit*)value.hit));

@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-05-18 12:26:59 $
-// $Revision: 1.3 $
+// $Date: 2008-09-11 14:12:40 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -270,5 +270,48 @@ void houghLutCorrectionWarningMsg::warningMsg() {
 	}
 	temp += "!!!";
 	printMsg(warningSource, temp);
+
+}
+
+
+/****************************************************************
+ * CLASS cannotDrawWarningMsg					 				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+cannotDrawWarningMsg::cannotDrawWarningMsg() : globalWarningMsg() {
+
+	warningSource.clear();
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+cannotDrawWarningMsg::cannotDrawWarningMsg(std::string actualWarningSource) : globalWarningMsg() {
+
+	warningSource = actualWarningSource;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+cannotDrawWarningMsg::~cannotDrawWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displayDirectories a warning message.	 		*
+ ****************************************************************/
+
+void cannotDrawWarningMsg::warningMsg() {
+
+	printMsg(warningSource, "The display can not be drawn!!!");
 
 }

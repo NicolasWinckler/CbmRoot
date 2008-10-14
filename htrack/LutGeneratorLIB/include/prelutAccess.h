@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-02-29 11:43:28 $
-/// $Revision: 1.3 $
+/// $Date: 2008-10-10 13:50:00 $
+/// $Revision: 1.6 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -98,7 +98,11 @@ public:
  * @return if borderPointer is not null, this object would consist of the computed results
  */
 
+#if (ARCHITECTURE != PS3)
+
 	void evaluate(trackfinderInputHit* hit, prelutHoughBorder* borderPointer = NULL);
+
+#endif
 
 /**
  * This method clears the prelut table.
@@ -107,11 +111,19 @@ public:
 	void clear();
 
 /**
+ * method returns the number of entries
+ */
+
+	unsigned long getNumberOfEntries();
+	unsigned long getNumberOfMembers();
+
+/**
  * This method returns the value from the prelut table.
  * @param index is the actual index for the borders
  */
 	
 	prelutHoughBorder getEntry(unsigned long index);
+	prelutHoughBorder getMember(unsigned long index);
 
 /**
  * This method adds the value at the end of the prelut table.

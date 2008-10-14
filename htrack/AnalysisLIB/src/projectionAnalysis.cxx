@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007/01/17 15:39:50 $
-// $Revision: 1.4 $
+// $Date: 2008-09-11 14:07:03 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -124,7 +124,7 @@ void projectionAnalysis::initWindow() {
 void projectionAnalysis::evaluateWindowDivisionSignatures(bool* globalSignature, unsigned short sizeOfGlobalSignature, bool* localSignature, unsigned short sizeOfLocalSignature) {
 
 	if ((sizeOfLocalSignature > sizeOfGlobalSignature) || (globalSignature == NULL) || (localSignature == NULL))
-		throw windowDivisionError();
+		throw windowDivisionError(ANALYSISLIB);
 
 	for (unsigned short i = 0; i < sizeOfLocalSignature; i++)
 		globalSignature[i] |= localSignature[i];
@@ -143,7 +143,7 @@ void projectionAnalysis::evaluateWindowDivisionFactors(unsigned short* numberOfE
 	unsigned short sizeOfGlobalSignature;
 
 	if ((numberOfEnabledPadColumns == NULL) || (numberOfEnabledPadRows == NULL))
-		throw windowDivisionError();
+		throw windowDivisionError(ANALYSISLIB);
 
 	(*numberOfEnabledPadColumns) = 0;
 	(*numberOfEnabledPadRows)    = 0;
@@ -257,7 +257,7 @@ void projectionAnalysis::drawWindowPads(unsigned short columnId) {
 	padId = columnId + 1;
 
 	if (padId > numberOfWindowPadColumns)
-		throw windowDivisionError();
+		throw windowDivisionError(ANALYSISLIB);
 
 	for (unsigned short i = 0; i < numberOfWindowPadRows; i++) {
 

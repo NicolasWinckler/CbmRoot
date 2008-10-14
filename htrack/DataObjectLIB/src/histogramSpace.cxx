@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:38:11 $
-// $Revision: 1.3 $
+// $Date: 2008-10-10 13:47:05 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -89,19 +89,19 @@ histogramSpace::histogramSpace(double dim1Min, double dim1Max, int dim1Step,
 	stepValues[DIM3] = dim3Step;
 
 }
-histogramSpace::histogramSpace(double HRADIUSMin, double HRADIUSMax, int HRADIUSStep,
-				   double HTHETAMin, double HTHETAMax, int HTHETAStep,
-				   double HGAMMAMin, double HGAMMAMax, int HGAMMAStep) {
+histogramSpace::histogramSpace(double radiusMin, double radiusMax, int radiusStep,
+				   double thetaMin, double thetaMax, int thetaStep,
+				   double gammaMin, double gammaMax, int gammaStep) {
 
-	minValues[HRADIUS]  = HRADIUSMin;
-	minValues[HTHETA]   = HTHETAMin;
-	minValues[HGAMMA]   = HGAMMAMin;
-	maxValues[HRADIUS]  = HRADIUSMax;
-	maxValues[HTHETA]   = HTHETAMax;
-	maxValues[HGAMMA]   = HGAMMAMax;
-	stepValues[HRADIUS] = HRADIUSStep;
-	stepValues[HTHETA]  = HTHETAStep;
-	stepValues[HGAMMA]  = HGAMMAStep;
+	minValues[HRADIUS]  = radiusMin;
+	minValues[HTHETA]   = thetaMin;
+	minValues[HGAMMA]   = gammaMin;
+	maxValues[HRADIUS]  = radiusMax;
+	maxValues[HTHETA]   = thetaMax;
+	maxValues[HGAMMA]   = gammaMax;
+	stepValues[HRADIUS] = radiusStep;
+	stepValues[HTHETA]  = thetaStep;
+	stepValues[HGAMMA]  = gammaStep;
 
 }
 

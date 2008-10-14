@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:38:11 $
-// $Revision: 1.3 $
+// $Date: 2008-10-10 13:47:05 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -91,7 +91,7 @@ const houghBorderCommand& houghBorderCommand::operator = (const houghBorderComma
 /**
  * method returns the startPos value
  */
-	
+
 std::string houghBorderCommand::getStartPos() {
 
 	std::string returnValue;
@@ -109,15 +109,18 @@ std::string houghBorderCommand::getStartPos() {
 /**
  * method returns the startPos value
  */
-	
+
 std::string houghBorderCommand::getCmd() {
 
 	std::string returnValue;
+	int         count;
 	char        buffer[1+1];
 	bool        actualCmd;
 
 	returnValue = "000";
-	addRadix(CMDRADIX, returnValue);
+	count       = addRadix(CMDRADIX, returnValue);
+	returnValue = returnValue.erase(count);
+
 	cmd.resetActiveObject();
 	for (unsigned short i = 0; i < cmd.getNumberOfEntries(); i++) {
 		
@@ -135,14 +138,14 @@ std::string houghBorderCommand::getCmd() {
 /****************************************************************
  * method sets the startPos value								*
  ****************************************************************/
-	
+
 void houghBorderCommand::setStartPos(std::string& value) {
 
 	std::string temp;
 	int         radix;
 
 	temp     = value;
-	radix    = extractRadix(&temp);
+	extractRadix(&radix, &temp);
 	startPos = stous(temp, radix); 
 
 }
@@ -150,16 +153,18 @@ void houghBorderCommand::setStartPos(std::string& value) {
 /****************************************************************
  * method sets the startPos value								*
  ****************************************************************/
-	
+
 void houghBorderCommand::setCmd(std::string& value) {
 
 	std::string   temp;
+	int           count;
 	int           radix;
 	unsigned long conversion;
 
 	temp  = value;
-	radix = extractRadix(&temp);
+	count = extractRadix(&radix, &temp);
 
+	temp.erase(0, count);
 	cmd.clear();
 
 	if (radix == 2) {

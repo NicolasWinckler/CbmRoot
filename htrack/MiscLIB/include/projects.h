@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:35:54 $
-/// $Revision: 1.1 $
+/// $Date: 2008-08-14 12:36:55 $
+/// $Revision: 1.2 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -52,6 +52,7 @@
 #define MISCLIB                    "MiscLIB"
 #define OUTPUTDATALIB              "OutputDataLIB"
 #define OUTPUTRESULTLIB            "OutputResultLIB"
+#define TRACKFINDERLIB             "TrackfinderLIB"
 
 
 #endif

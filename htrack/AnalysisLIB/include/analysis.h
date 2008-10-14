@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-02-29 11:36:55 $
-/// $Revision: 1.24 $
+/// $Date: 2008-09-11 14:07:01 $
+/// $Revision: 1.27 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -35,6 +35,7 @@
 
 #include "../../DataObjectLIB/include/histogramSpace.h"
 #include "../../DataObjectLIB/include/specialListMem.h"
+#include "../../DataObjectLIB/include/histogramCellSignatures.h"
 #include "../../DataRootObjectLIB/include/trackHitMem.h"
 #include "../../DataRootObjectLIB/include/trackAnalogInformation.h"
 #include "../../DataRootObjectLIB/include/trackfinderInputData.h"
@@ -54,6 +55,7 @@
 #include "hardwareAnalysis.h"
 #include "houghPictures.h"
 #include "visualAnalysis.h"
+#include "peakfindingGeometryAnalysis.h"
 #include "TStopwatch.h"
 #include <list>
 
@@ -82,6 +84,8 @@ typedef struct {
 	lutImplementation**    luts;
 	/* momentum cut */
 	double                 minP;
+	/* filter type */
+	bool                   initAutomatcFilterGeometry;
 	/* configuration information enable */
 	bool                   initConfiguration;
 	bool                   initDetector;
@@ -145,6 +149,8 @@ static const initialParameter defaultParameters = {
 	NULL, NULL, NULL, NULL, NULL, NULL,
 	/* momentum cut */
 	0.0,
+	/* filter type */
+	false,
 	/* configuration information enable */
 	false, false, true, true, false, false,
 	/* EFGC analysis enable*/
@@ -218,48 +224,49 @@ class analysis {
 
 protected:
 
-	trackfinderInputData**     eventData;						/**< Object for accessing the input data. */
-	trackData**                tracks;							/**< Object for accessing the computed tracks. */
-	tables**                   ratings;							/**< Object to access the tables to do the ratings. */
-	histogramSpace**           space;							/**< Object to store the needed values to compute the trackParameter object based on the trackCoordinates object. */
-	lutImplementation**        luts;							/**< Object to make both neccessary look-up-tables accessible. */
-	qualityAnalysis*           qualityAnalyser;					/**< Object for analysing the quality and writing on the standard output stream. */
-	momentumAnalysis*          momentumAnalyser;				/**< Object for analysing the quality and displaying it with ROOT graphics. */
-	projectionAnalysis*        projectionAnalyser;				/**< Object for analysing the occupancy of the histogram and displaying it with ROOT graphics. */
-	magnetfieldAnalysis*       magnetfieldAnalyser;				/**< Object for analysing the magnetfield and displaying it with ROOT graphics. */
-	magnetfieldFactorAnalysis* magnetfieldFactorAnalyser;		/**< Object for analysing the magnetfield factor and displaying it with ROOT graphics. */
-	prelutRangeLayerAnalysis*  prelutRangeLayerAnalyser;        /**< Object for analysing the prelut range and displaying it with ROOT graphics. */
-	histogramAnalysis*         histogramAnalyser;				/**< Object for analysing the histogram. */
-	showAnalysis*              showAnalyser;					/**< Object for showing and displaying some analysis it with ROOT graphics. */
-	totalAnalysis*             totalAnalyser;					/**< Object for evalution and showing of some total summaries of analysis results which cannot be evaluated and shown by the analysis itself. */
-	hardwareAnalysis*          hardwareAnalyser;				/**< Object for analysing the hardware prerequisites. */
-	visualAnalysis*            mcTrackVisualAnalyser;			/**< Object for visualizing the MCTracks with the corresponding hits.*/
-	visualAnalysis*            foundTrackVisualAnalyser;		/**< Object for visualizing the found tracks with the corresponding hits.*/
-	double                     minimumP;						/**< Variable which defines the minimum momentum for a track which should be found. */
-	bool                       configuration;					/**< Variable for enabling the configuration summary printed to the standard output stream. */
-	bool                       detector;						/**< Variable for enabling the detector summary printed to the standard output stream. */
-	bool                       event;							/**< Variable for enabling the event summary printed to the standard output stream. */
-	bool                       classPriority;					/**< Variable for enabling the class summary printed to the standard output stream. */
-	bool                       memory;							/**< Variable for enabling the memory summary printed to the standard output stream. */
-	bool                       time;							/**< Variable for enabling the time summary printed to the standard output stream. */
-	unsigned short             percentageOfHitsInSignature;		/**< Variable to store the percentage of the number of hits which must be found to accept the signature. */
-	unsigned short             percentageOfTracksForSignature;	/**< Variable to store the percentage of the real tracks which must be found with the accepted signatures. */
-	unsigned long              analysisResultWarnings;			/**< Variable to store which result of an analysis should be printed on the standard output screen by a warning message. */
-	unsigned long              analysisResultDisplays;			/**< Variable to store which result of an analysis should be displayed with a graphical output screen. */
-	unsigned long              analysisMoreResultWarnings;		/**< Variable to store which result of an analysis should be printed on the standard output screen by a warning message. */
-	unsigned long              analysisMoreResultDisplays;		/**< Variable to store which result of an analysis should be displayed with a graphical output screen. */
-	houghPictures*             pictures;						/**< Object which draws the pictures for different Hough transforms. This pictures are static and are just needed fort he thesis. */
-	TStopwatch*                borderCreationTimer;				/**< Object to store the time for creating the borders for one event */
-	TStopwatch*                histogramCreationTimer;			/**< Object to store the time for creating the histogram layers for one event */
-	TStopwatch*                histogramEncodingTimer;			/**< Object to store the time for encoding the histogram layers for one event */
-	TStopwatch*                histogramDiagonalizingTimer;		/**< Object to store the time for diagonalizing the histogram layers for one event */
-	TStopwatch*                histogramPeakfindingTimer;		/**< Object to store the time for peak finding in the histogram layers for one event */
-	TStopwatch*                histogramFinalizingTimer;		/**< Object to store the time for finalizing the histogram layers for one event */
-	TStopwatch*                histogramResettingTimer;			/**< Object to store the time for resetting the histogram layers for one event */
-	TStopwatch*                trackPeakfindingTimer;			/**< Object to store the time for peak finding in the track candidates of neighbored layers for one event */
-	double                     reservedSizeOfLBufferData;		/**< Variable to store the reserved size of the LBuffer data */
-	double                     allocatedSizeOfLBufferData;		/**< Variable to store the allocated size of the LBuffer data */
-	double                     usedSizeOfLBufferData;			/**< Variable to store the used size of the LBuffer data */
+	trackfinderInputData**       eventData;						/**< Object for accessing the input data. */
+	trackData**                  tracks;							/**< Object for accessing the computed tracks. */
+	tables**                     ratings;							/**< Object to access the tables to do the ratings. */
+	histogramSpace**             space;							/**< Object to store the needed values to compute the trackParameter object based on the trackCoordinates object. */
+	lutImplementation**          luts;							/**< Object to make both neccessary look-up-tables accessible. */
+	qualityAnalysis*             qualityAnalyser;					/**< Object for analysing the quality and writing on the standard output stream. */
+	momentumAnalysis*            momentumAnalyser;				/**< Object for analysing the quality and displaying it with ROOT graphics. */
+	projectionAnalysis*          projectionAnalyser;				/**< Object for analysing the occupancy of the histogram and displaying it with ROOT graphics. */
+	magnetfieldAnalysis*         magnetfieldAnalyser;				/**< Object for analysing the magnetfield and displaying it with ROOT graphics. */
+	magnetfieldFactorAnalysis*   magnetfieldFactorAnalyser;		/**< Object for analysing the magnetfield factor and displaying it with ROOT graphics. */
+	prelutRangeLayerAnalysis*    prelutRangeLayerAnalyser;        /**< Object for analysing the prelut range and displaying it with ROOT graphics. */
+	histogramAnalysis*           histogramAnalyser;				/**< Object for analysing the histogram. */
+	showAnalysis*                showAnalyser;					/**< Object for showing and displaying some analysis it with ROOT graphics. */
+	totalAnalysis*               totalAnalyser;					/**< Object for evalution and showing of some total summaries of analysis results which cannot be evaluated and shown by the analysis itself. */
+	hardwareAnalysis*            hardwareAnalyser;				/**< Object for analysing the hardware prerequisites. */
+	visualAnalysis*              mcTrackVisualAnalyser;			/**< Object for visualizing the MCTracks with the corresponding hits.*/
+	visualAnalysis*              foundTrackVisualAnalyser;		/**< Object for visualizing the found tracks with the corresponding hits.*/
+	peakfindingGeometryAnalysis* peakfindingGeometryAnalyser;			/**< Object for analysing an automatic filter geometry. */
+	double                       minimumP;						/**< Variable which defines the minimum momentum for a track which should be found. */
+	bool                         configuration;					/**< Variable for enabling the configuration summary printed to the standard output stream. */
+	bool                         detector;						/**< Variable for enabling the detector summary printed to the standard output stream. */
+	bool                         event;							/**< Variable for enabling the event summary printed to the standard output stream. */
+	bool                         classPriority;					/**< Variable for enabling the class summary printed to the standard output stream. */
+	bool                         memory;							/**< Variable for enabling the memory summary printed to the standard output stream. */
+	bool                         time;							/**< Variable for enabling the time summary printed to the standard output stream. */
+	unsigned short               percentageOfHitsInSignature;		/**< Variable to store the percentage of the number of hits which must be found to accept the signature. */
+	unsigned short               percentageOfTracksForSignature;	/**< Variable to store the percentage of the real tracks which must be found with the accepted signatures. */
+	unsigned long                analysisResultWarnings;			/**< Variable to store which result of an analysis should be printed on the standard output screen by a warning message. */
+	unsigned long                analysisResultDisplays;			/**< Variable to store which result of an analysis should be displayed with a graphical output screen. */
+	unsigned long                analysisMoreResultWarnings;		/**< Variable to store which result of an analysis should be printed on the standard output screen by a warning message. */
+	unsigned long                analysisMoreResultDisplays;		/**< Variable to store which result of an analysis should be displayed with a graphical output screen. */
+	houghPictures*               pictures;						/**< Object which draws the pictures for different Hough transforms. This pictures are static and are just needed fort he thesis. */
+	TStopwatch*                  borderCreationTimer;				/**< Object to store the time for creating the borders for one event */
+	TStopwatch*                  histogramCreationTimer;			/**< Object to store the time for creating the histogram layers for one event */
+	TStopwatch*                  histogramEncodingTimer;			/**< Object to store the time for encoding the histogram layers for one event */
+	TStopwatch*                  histogramDiagonalizingTimer;		/**< Object to store the time for diagonalizing the histogram layers for one event */
+	TStopwatch*                  histogramPeakfindingTimer;		/**< Object to store the time for peak finding in the histogram layers for one event */
+	TStopwatch*                  histogramFinalizingTimer;		/**< Object to store the time for finalizing the histogram layers for one event */
+	TStopwatch*                  histogramResettingTimer;			/**< Object to store the time for resetting the histogram layers for one event */
+	TStopwatch*                  trackPeakfindingTimer;			/**< Object to store the time for peak finding in the track candidates of neighbored layers for one event */
+	double                       reservedSizeOfLBufferData;		/**< Variable to store the reserved size of the LBuffer data */
+	double                       allocatedSizeOfLBufferData;		/**< Variable to store the allocated size of the LBuffer data */
+	double                       usedSizeOfLBufferData;			/**< Variable to store the used size of the LBuffer data */
 
 /**
  * method initializes the showAnalysis-object.
@@ -493,17 +500,22 @@ protected:
 	unsigned short evaluatePeakContribution(trackDigitalInformation& track, bool* isClone, bool* isWrong, bool* isFake);
 
 /**
+ * method previews the Hough space transformation for a track.
+ */
+
+	histogramCellSignature transformPreview(trackfinderInputTrack& track, trackCoordinates& estimation);
+
+/**
+ * method estimates the coordinates in the Hough space for a track.
+ */
+
+	bool estimateCoordinates(trackfinderInputTrack& track, trackCoordinates* coordinates);
+
+/**
  * method computes the coordinates in the Hough space for a track.
  */
 
 	bool computeCoordinates(trackfinderInputTrack& track, trackCoordinates* coordinates);
-
-/**
- * method searches all tracks to find the findable ones and to
- * compute their position in the Hough space.
- */
-
-	void setupFindableTracks(std::list<findableTrack>* findableTracks);
 
 public:
 
@@ -631,6 +643,53 @@ public:
 		initialFileParameter fileParameters = defaultFileParameters,
 	    bool initCreatedHistogramToShow = false, bool initEncodedHistogramToShow = false,
 	    bool initFilteredHistogramToShow = false, unsigned short initHistogramLayer = 0);
+
+/**
+ * method searches all tracks to find the findable ones and to
+ * compute their estimated position in the Hough space.
+ * @param terminal is a buffer to place the process information
+ */
+
+	void setupFindableEstimatedTracks(std::list<findableTrack>* findableTracks, std::streambuf* terminal = NULL);
+
+/**
+ * method searches all tracks to find the findable ones and to
+ * compute their computed position in the Hough space.
+ * @param terminal is a buffer to place the process information
+ */
+
+	void setupFindableComputedTracks(std::list<findableTrack>* findableTracks, std::streambuf* terminal = NULL);
+
+/**
+ * method resets the peakfinding geometry for the actual layers
+ */
+
+	void resetPeakfindingLayerGeometryElements();
+
+/**
+ * method resets the actual used peakfinding geometry
+ */
+
+	void resetPeakfindingGeometryElements();
+
+/**
+ * method adds the geometry of the actual layer to the other layers
+ */
+
+	void addPeakfindingLayerGeometry(unsigned short layer);
+
+/**
+ * method updates the used peakfinding geometry by adding the geometry of the actual layers
+ */
+
+	void updatePeakfindingGeometry(trackCoordinates& center);
+
+/**
+ * method returns the peakfinding geometry
+ * @return the automatic evaluated peakfinding geometry
+ */
+
+	peakfindingGeometry getPeakfindingGeometry();
 
 /**
  * Method returns true if the track has a the specific track
@@ -799,6 +858,12 @@ public:
  */
 
 	void initClassPriorityAnalysis(bool enable = true);
+
+/**
+ * method initializes the type of the filter.
+ */
+
+	void initAutomaticFilterGeometryAnalysis(histogramData** histogram, bool enable = true);
 
 /**
  * method initializes the qualityEFGCEventAbsolute-Analysis.
@@ -1601,7 +1666,7 @@ public:
  * This method initializes the histogram analysis.
  */
 
-	void initHistogramAnalysis(bool enable, histogramData** histogram);
+	void initHistogramAnalysis(histogramData** histogram, bool enable = true);
 
 /**
  * This method initializes the root directory for the analysis.
@@ -1652,6 +1717,12 @@ public:
  */
 
 	bool isClassPriorityAnalysisEnabled();
+
+/**
+ * method returns true if the filterGeometry-Analysis is enabled.
+ */
+
+	bool isAutomaticFilterGeometryAnalysisEnabled();
 
 /**
  * method returns true if the quality-Analysis for each event
@@ -2289,6 +2360,62 @@ public:
  */
 
 	bool isFoundTrackVisualizationAnalysisEnabled();
+
+/**
+ * method returns true if the display of the peakfinding
+ * geometry is enabled.
+ */
+
+	bool isPeakfindingGeometryDisplayEnabled();
+
+/**
+ * method returns true if the display of the projected
+ * peakfinding geometry is enabled.
+ */
+
+	bool isProjectedPeakfindingGeometryDisplayEnabled();
+
+/**
+ * method returns true if the display of the covered
+ * peakfinding geometry is enabled.
+ */
+
+	bool isCoveredPeakfindingGeometryDisplayEnabled();
+
+/**
+ * method returns true if the display of the covered and
+ * projected peakfinding geometry is enabled.
+ */
+
+	bool isCoveredProjectedPeakfindingGeometryDisplayEnabled();
+
+/**
+ * method returns true if the message of the peakfinding
+ * geometry is enabled.
+ */
+
+	bool isPeakfindingGeometryMessageEnabled();
+
+/**
+ * method returns true if the message of the projected
+ * peakfinding geometry is enabled.
+ */
+
+	bool isProjectedPeakfindingGeometryMessageEnabled();
+
+/**
+ * method returns true if the message of the covered
+ * peakfinding geometry is enabled.
+ */
+
+	bool isCoveredPeakfindingGeometryMessageEnabled();
+
+/**
+ * method returns true if the message of the covered and
+ * projected peakfinding geometry is enabled.
+ */
+
+	bool isCoveredProjectedPeakfindingGeometryMessageEnabled();
 
 /**
  * This method displays all found tracks with corresponding hits.

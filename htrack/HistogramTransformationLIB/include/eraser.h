@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -29,8 +29,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/19 11:33:45 $
-/// $Revision: 1.2 $
+/// $Date: 2008-08-14 12:35:33 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -49,6 +49,10 @@
 class eraser : public histogramTransformation {
 
 protected:
+
+	unsigned short firstFilterNeighborhoodDim1ClearRadius;	/**< Variable to store the size of the region of interest for the first filter in the first dimension. */
+	unsigned short firstFilterNeighborhoodDim2ClearRadius;	/**< Variable to store the size of the region of interest for the first filter in the second dimension.  */
+	unsigned short secondFilterNeighborhoodDim3ClearRadius;	/**<  Variable to store the size of the region of interest for the second filter in the third dimension. */
 
 /**
  * This method filters the peakclasses in a speciallized manner.
@@ -98,6 +102,18 @@ public:
  */
 
 	virtual ~eraser();
+
+/**
+ * This method initializes the object.
+ * @param histogram is an object for accessing the histogram
+ * @param tracks is the object to access the computed tracks
+ * @param ratings is the object to access the tables for the ratings
+ * @param dim1ClearRadius is the region of interest for the first filter in the first dimension
+ * @param dim2ClearRadius is the region of interest for the first filter in the second dimension
+ * @param dim3ClearRadius is the region of interest for the second filter in the third dimension
+ */
+
+	void init(histogramData** histogram, trackData** tracks, tables** ratings, unsigned short dim1ClearRadius, unsigned short dim2ClearRadius, unsigned short dim3ClearRadius);
 
 };
 

@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:38:11 $
-// $Revision: 1.5 $
+// $Date: 2008-10-10 13:47:05 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
@@ -209,9 +209,9 @@ void houghBorderPosition::fromNotIdentifiedRadixString(std::string& value) {
 	number1 = removeFrontString(part1, removeFrontPart);
 	number2 = removeBackString(part2, removeBackPart);
 
-	radix = extractRadix(&number1);
+	extractRadix(&radix, &number1);
 	pos1  = stous(number1, radix);
-	radix = extractRadix(&number2);
+	extractRadix(&radix, &number2);
 	pos2  = stous(number2, radix);
 
 }
@@ -266,9 +266,9 @@ void houghBorderPosition::fromIdentifiedRadixString(std::string& value) {
 	number1 = removeFrontString(part1, removePart1);
 	number2 = removeFrontString(part2, removePart2);
 
-	radix = extractRadix(&number1);
+	extractRadix(&radix, &number1);
 	pos1  = stous(number1, radix);
-	radix = extractRadix(&number2);
+	extractRadix(&radix, &number2);
 	pos2  = stous(number2, radix);
 
 }

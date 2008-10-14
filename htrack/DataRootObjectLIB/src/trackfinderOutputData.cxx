@@ -23,17 +23,17 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-06-26 12:33:39 $
-// $Revision: 1.10 $
+// $Date: 2008-10-07 10:36:51 $
+// $Revision: 1.11 $
 //
 // *******************************************************************/
 
 
 #include "../../MiscLIB/include/defs.h"
-#ifdef CBMROOTFRAMEWORK
-	#include "CbmTrackParam.h"
-#else
+#if (ARCHITECTURE == STANDALONE)
 	#include "../../RootFrameworkLIB/include/CbmTrackParam.h"
+#elif (ARCHITECTURE == CBMROOT)
+	#include "CbmTrackParam.h"
 #endif
 #include "../include/dataRootObjectError.h"
 #include "../include/trackfinderOutputData.h"
@@ -350,7 +350,7 @@ void trackfinderOutputData::addHitToActualTrack(trackfinderInputHit* hit) {
 
 		}
 
-#ifdef CBMROOTFRAMEWORKHITCOMPATIBILITY
+#ifdef HITCOMPATIBILITY
 
 		if (hit->isMapsHit())
 			actualTrack->AddMapsHit(hit->getHitIndex(), (CbmStsMapsHit*)hit->getHit());

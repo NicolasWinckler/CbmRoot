@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-06-26 12:33:39 $
-/// $Revision: 1.6 $
+/// $Date: 2008-10-07 10:36:50 $
+/// $Revision: 1.8 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -34,10 +34,10 @@
 
 
 #include "../../MiscLIB/include/defs.h"
-#ifdef CBMROOTFRAMEWORK
-	#include "CbmStsTrack.h"
-#else
+#if (ARCHITECTURE == STANDALONE)
 	#include "../../RootFrameworkLIB/include/CbmStsTrack.h"
+#elif (ARCHITECTURE == CBMROOT)
+	#include "CbmStsTrack.h"
 #endif
 #include "../include/trackfinderInputHit.h"
 #include "../../DataObjectLIB/include/trackMomentum.h"

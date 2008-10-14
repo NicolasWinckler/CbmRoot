@@ -23,22 +23,22 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-10-19 14:34:32 $
-// $Revision: 1.8 $
+// $Date: 2008-10-07 10:38:09 $
+// $Revision: 1.10 $
 //
 // *******************************************************************/
 
 
 #include "../../MiscLIB/include/defs.h"
-#ifdef CBMROOTFRAMEWORK
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmGeoVector.h"
-#include "CbmGeoNode.h"
-#include "CbmGeoStsPar.h"
-#include "CbmStsStation.h"
-#include "CbmMvdGeoPar.h"
-//#include "CbmMvdStation.h"
+#if (ARCHITECTURE == CBMROOT)
+	#include "CbmRunAna.h"
+	#include "CbmRuntimeDb.h"
+	#include "CbmGeoVector.h"
+	#include "CbmGeoNode.h"
+	#include "CbmGeoStsPar.h"
+	#include "CbmStsStation.h"
+	#include "CbmMvdGeoPar.h"
+//	#include "CbmMvdStation.h"
 #endif
 #include "../../MiscLIB/include/conversionRoutines.h"
 #include "../../RootFrameworkLIB/include/hitProducer.h"
@@ -112,7 +112,7 @@ bool inputFRoot::readMvdDetectorByInterface(CbmStsDigiScheme* scheme) {
 
 	bool                    isDetectorRead = false;
 /*
-#ifdef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == CBMROOT)
 
 	CbmMvdStation*          station;
 	trackfinderInputStation actualStation;
@@ -123,7 +123,7 @@ bool inputFRoot::readMvdDetectorByInterface(CbmStsDigiScheme* scheme) {
 		isDetectorRead = false;
 	else {
 
-#ifdef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == CBMROOT)
 
 		isDetectorRead = true;
 
@@ -186,7 +186,7 @@ bool inputFRoot::readStsDetectorByInterface(CbmStsDigiScheme* scheme) {
 
 	bool                    isDetectorRead;
 
-#ifdef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == CBMROOT)
 
 	CbmStsStation*          station;
 	trackfinderInputStation actualStation;
@@ -197,7 +197,7 @@ bool inputFRoot::readStsDetectorByInterface(CbmStsDigiScheme* scheme) {
 		isDetectorRead = false;
 	else {
 
-#ifdef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == CBMROOT)
 
 		isDetectorRead = true;
 
@@ -304,7 +304,7 @@ bool inputFRoot::readMvdDetectorByHand() {
 
 	bool                    isDetectorRead;
 
-#ifdef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == CBMROOT)
 
 	CbmRunAna*              runAnalysisInstance;
 	CbmRuntimeDb*           runDataBase;
@@ -431,7 +431,7 @@ bool inputFRoot::readStsDetectorByHand() {
 
 	bool                    isDetectorRead;
 
-#ifdef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == CBMROOT)
 
 	CbmRunAna*              runAnalysisInstance;
 	CbmRuntimeDb*           runDataBase;

@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-06-26 12:53:11 $
-// $Revision: 1.15 $
+// $Date: 2008-08-14 12:35:54 $
+// $Revision: 1.16 $
 //
 // *******************************************************************/
 
@@ -195,6 +195,43 @@ void houghTransformation::init(trackfinderInputData** eventData, histogramData**
 /****************************************************************
  * This method creates the borders for each hit					*
  ****************************************************************/
+
+void houghTransformation::createBorders(trackfinderInputTrack* track) {
+
+	trackfinderInputHit* hit;
+	lutBorder            border;
+
+	if (track == NULL)
+		throw cannotAccessHitsOrTracksError(HOUGHTRANSFORMATIONLIB);
+	if (histogram == NULL)
+		throw cannotAccessHistogramDataError(HOUGHTRANSFORMATIONLIB);
+	if (*histogram == NULL)
+		throw cannotAccessHistogramDataError(HOUGHTRANSFORMATIONLIB);
+	if (lut == NULL)
+		throw cannotAccessLutsError(HOUGHTRANSFORMATIONLIB);
+	if (*lut == NULL)
+		throw cannotAccessLutsError(HOUGHTRANSFORMATIONLIB);
+
+	track->resetHitPointer();
+	(*lut)->resetCorrectionCounter();
+	hit = NULL;
+
+	for(unsigned short i = 0; i < track->getNumberOfHits(); i++) {
+
+		hit = track->getHit();
+		if (hit == NULL)
+			throw cannotAccessHitsOrTracksError(HOUGHTRANSFORMATIONLIB);
+
+		(*lut)->evaluate(hit, &border);
+		border.setHit(hit);
+
+		(*histogram)->addBorder(border);
+
+	}
+
+	(*lut)->clear();
+
+}
 
 #ifndef NOANALYSIS
 

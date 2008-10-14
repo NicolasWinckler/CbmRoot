@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:27:22 $
-/// $Revision: 1.1 $
+/// $Date: 2008-10-07 10:36:23 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -48,6 +48,7 @@ public:
 	unsigned int numberOfWellFoundTracks;		/**< Variable to store the number of tracks which are found with more than 70% of their hits. */
 	unsigned int numberOfWrongFoundTracks;		/**< Variable to store the number of tracks which are found but should not be found. */
 	unsigned int numberOfTracksWithP;			/**< Variable to store the number of tracks which should be found. */
+	unsigned int numberOfHits;					/**< Variable to store the number of hits which occur in the input data. */
 
 /**
  * Default constructor

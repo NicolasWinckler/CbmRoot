@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-05-18 12:26:59 $
-/// $Revision: 1.3 $
+/// $Date: 2008-09-11 14:12:40 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -247,6 +247,50 @@ public:
 
 /**
  * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _CANNOTDRAWWARNINGMSG_H
+#define _CANNOTDRAWWARNINGMSG_H
+
+/**
+ * CLASS cannotDrawWarningMsg
+ */
+
+class cannotDrawWarningMsg : public globalWarningMsg {
+
+private:
+
+	std::string   warningSource;
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotDrawWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	cannotDrawWarningMsg(std::string actualWarningSource);
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotDrawWarningMsg();
+
+/**
+ * This method display a warning message.
  */
 
 	void warningMsg();

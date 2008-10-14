@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-12-13 13:47:19 $
-// $Revision: 1.4 $
+// $Date: 2008-09-11 14:07:03 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -615,7 +615,7 @@ void projectionEFGCNAnalysis::drawEDisplay(std::string drawOption) {
 	}
 	else {
 
-		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 		cannotDraw->warningMsg();
 		if(cannotDraw != NULL) {
 			delete cannotDraw;
@@ -639,7 +639,7 @@ void projectionEFGCNAnalysis::drawFDisplay(std::string drawOption) {
 	}
 	else {
 
-		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 		cannotDraw->warningMsg();
 		if(cannotDraw != NULL) {
 			delete cannotDraw;
@@ -663,7 +663,7 @@ void projectionEFGCNAnalysis::drawGDisplay(std::string drawOption) {
 	}
 	else {
 
-		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 		cannotDraw->warningMsg();
 		if(cannotDraw != NULL) {
 			delete cannotDraw;
@@ -687,7 +687,7 @@ void projectionEFGCNAnalysis::drawCDisplay(std::string drawOption) {
 	}
 	else {
 
-		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 		cannotDraw->warningMsg();
 		if(cannotDraw != NULL) {
 			delete cannotDraw;
@@ -711,7 +711,7 @@ void projectionEFGCNAnalysis::drawNDisplay(std::string drawOption) {
 	}
 	else {
 
-		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 		cannotDraw->warningMsg();
 		if(cannotDraw != NULL) {
 			delete cannotDraw;

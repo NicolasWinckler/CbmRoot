@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,14 +24,15 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:42:58 $
-// $Revision: 1.3 $
+// $Date: 2008-08-14 12:35:34 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
 
 #include "../../MiscLIB/include/errorHandling.h"
 #include "../../MiscLIB/include/terminal.h"
+#include "../include/filterDef.h"
 #include "../include/histogramTransformationError.h"
 #include "../include/filterBasicNeutral.h"
 #include "../include/filterBasicSimple.h"
@@ -61,30 +62,40 @@ filterDim12::filterDim12() : filterDimX() {
  ****************************************************************/
 
 filterDim12::filterDim12( histogramData** histogram,
+						  unsigned short  filterArithmetic,
 						  unsigned short  size,
 						  unsigned short  localSize,
 						  bitArray maximumClass) :
 						  filterDimX(
 						  histogram, size, localSize) {
 
-#if (FIRSTFILTERHANDLINGTYPE == 0)
-	baseFilter      = new filterBasicNeutral();
-#endif
-#if (FIRSTFILTERHANDLINGTYPE == 1)
-	baseFilter      = new filterBasicSimple();
-#endif
-#if (FIRSTFILTERHANDLINGTYPE == 2)
-	baseFilter      = new filterBasicSimpleMod();
-#endif
-#if (FIRSTFILTERHANDLINGTYPE == 3)
-	baseFilter      = new filterBasicComplex();
-#endif
-#if (FIRSTFILTERHANDLINGTYPE == 4)
-	baseFilter      = new filterBasicComplexMod();
-#endif
-#if (FIRSTFILTERHANDLINGTYPE == 5)
-	baseFilter      = new filterBasicSpecial(maximumClass);
-#endif
+	switch(filterArithmetic) {
+
+		case FIRSTSIMPLEARITHMETIC:
+			baseFilter      = new filterBasicSimple();
+			break;
+
+		case FIRSTSIMPLEMODARITHMETIC:
+			baseFilter      = new filterBasicSimpleMod();
+			break;
+
+		case FIRSTCOMPLEXARITHMETIC:
+			baseFilter      = new filterBasicComplex();
+			break;
+
+		case FIRSTCOMPLEXMODARITHMETIC:
+			baseFilter      = new filterBasicComplexMod();
+			break;
+
+		case FIRSTSPECIALARITHMETIC:
+			baseFilter      = new filterBasicSpecial(maximumClass);
+			break;
+
+		default:
+			baseFilter      = new filterBasicNeutral();
+			break;
+
+	}
 
 	filterMem       = new bitArray[filterSize];
 
@@ -106,9 +117,10 @@ filterDim12::~filterDim12() {
  ****************************************************************/
 
 void filterDim12::init( histogramData** histogram,
-					   unsigned short   size,
-					   unsigned short   localSize,
-					   bitArray maximumClass) {
+						unsigned short  filterArithmetic,
+					    unsigned short   size,
+					    unsigned short   localSize,
+					    bitArray maximumClass) {
 					  
 	/* free the old allocated space */
 	if (baseFilter != NULL) {
@@ -123,25 +135,33 @@ void filterDim12::init( histogramData** histogram,
 	/* set new parameter */
 	filterDimX::init(histogram, size, localSize);
 
-	/* allocate new space */
-#if (SECONDFILTERHANDLINGTYPE == 0)
-	baseFilter      = new filterBasicNeutral();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 1)
-	baseFilter      = new filterBasicSimple();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 2)
-	baseFilter      = new filterBasicSimpleMod();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 3)
-	baseFilter      = new filterBasicComplex();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 4)
-	baseFilter      = new filterBasicComplexMod();
-#endif
-#if (SECONDFILTERHANDLINGTYPE == 5)
-	baseFilter      = new filterBasicSpecial(maximumClass);
-#endif
+	switch(filterArithmetic) {
+
+		case FIRSTSIMPLEARITHMETIC:
+			baseFilter      = new filterBasicSimple();
+			break;
+
+		case FIRSTSIMPLEMODARITHMETIC:
+			baseFilter      = new filterBasicSimpleMod();
+			break;
+
+		case FIRSTCOMPLEXARITHMETIC:
+			baseFilter      = new filterBasicComplex();
+			break;
+
+		case FIRSTCOMPLEXMODARITHMETIC:
+			baseFilter      = new filterBasicComplexMod();
+			break;
+
+		case FIRSTSPECIALARITHMETIC:
+			baseFilter      = new filterBasicSpecial(maximumClass);
+			break;
+
+		default:
+			baseFilter      = new filterBasicNeutral();
+			break;
+
+	}
 
 	filterMem       = new bitArray[filterSize];
 
@@ -166,9 +186,9 @@ void filterDim12::filter() {
 		throw cannotAccessFilterMemoryError();
 
 	if (histogram == NULL)
-		throw cannotAccessHistogramError();
+		throw cannotAccessHistogramError(HISTOGRAMTRANSFORMATIONLIB);
 	if (*histogram == NULL)
-		throw cannotAccessHistogramError();
+		throw cannotAccessHistogramError(HISTOGRAMTRANSFORMATIONLIB);
 
 	if (baseFilter == NULL)
 		throw cannotAccessFilterError();

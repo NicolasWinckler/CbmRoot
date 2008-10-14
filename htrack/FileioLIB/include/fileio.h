@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-05-29 15:11:35 $
-/// $Revision: 1.3 $
+/// $Date: 2008-10-10 13:47:23 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -55,7 +55,20 @@ class fileio {
 
 private:
 
-	std::string fileName;	/**< Variable stores the name of the file to access */
+	std::string fileName;					/**< Variable stores the name of the file to access */
+	bool*       commandID;					/**< Variable to review which parameter comes from the file. */
+
+/**
+ * allocates memory
+ */
+
+	void allocateMemory();
+
+/**
+ * deletes allocated memory
+ */
+
+	void deleteMemory();
 
 /**
  * This method skips whitespaces in a std::string object by
@@ -125,7 +138,7 @@ protected:
  * This method returns the number of accepted commands.
  */
 
-	virtual int getNumberOfCmds() = 0;
+	virtual unsigned int getNumberOfCmds() = 0;
 
 /**
  * This method assigns the value to the corresponding parameter
@@ -176,6 +189,31 @@ public:
 
 	void init(std::string name);
 	void init(char* name);
+
+/**
+ * This method returns if the lock in the commandID is set.
+ */
+
+	bool isHeaderLockSet(unsigned int lockId);
+
+/**
+ * This method sets the lock in the commandID.
+ */
+
+	void setHeaderLock(unsigned int lockId, bool value = true);
+
+/**
+ * This method reopens all commandID locks.
+ */
+
+	void resetAllHeaderLocks();
+
+/**
+ * This method resets the header to the defualt values
+ * and reopens the commandID lock.
+ */
+
+	void resetHeader();
 
 /**
  * This method returns the name of the file.

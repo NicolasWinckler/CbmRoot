@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Author(s):   Gläß / Steinle
+// Author(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:37:24 $
-// $Revision: 1.32 $
+// $Date: 2008-10-10 13:46:00 $
+// $Revision: 1.35 $
 //
 // *******************************************************************/
 
@@ -34,6 +34,7 @@
 #include "../../RootFrameworkLIB/include/hitProducer.h"
 #include "../../LutGeneratorLIB/include/lutGenerator.h"
 #include "../../MiscLIB/include/memoryDef.h"
+#include "../../HistogramTransformationLIB/include/filterDef.h"
 #include "../../AnalysisLIB/include/analysisDef.h"
 #include "../../AnalysisLIB/include/prelutRangeLayerAnalysis.h"
 #include "../include/inf.h"
@@ -114,11 +115,21 @@
 #define defValTrackfinderMinClassCoding                          1
 #define defValTrackfinderMinClassGradingP                        1
 #define defValTrackfinderMinClassGradingR                        1
+#define defValTrackfinderFilterType                              MAXMORPHSEARCHFILTER
+#define defValTrackfinderFirstFilterGeometry                     FIRSTFINALGEOMETRY
+#define defValTrackfinderFirstFilterArithmetic                   FIRSTSIMPLEARITHMETIC
+#define defValTrackfinderSecondFilterGeometry                    SECONDFINALGEOMETRY
+#define defValTrackfinderSecondFilterArithmetic                  SECONDSIMPLEARITHMETIC
 #define defValTrackfinderFirstFilterNeighborhoodDim1ClearRadius  4
 #define defValTrackfinderFirstFilterNeighborhoodDim2ClearRadius  1
 #define defValTrackfinderSecondFilterNeighborhoodDim1ClearRadius 1
 #define defValTrackfinderSecondFilterNeighborhoodDim2ClearRadius 1
 #define defValTrackfinderSecondFilterNeighborhoodDim3ClearRadius 1
+#define defValTrackfinderAutomaticFilterCoverPercentage          100
+#define defValTrackfinderAutomaticFilterDataPercentage           10
+#define defValTrackfinderAutomaticFilterWrite                    false
+#define defValTrackfinderAutomaticFilterFileName                 "./parameters/htrack/filterGeometry.txt"
+#define defValAnalysisGraphicOutputFileName                      "../Results/trackfinderAnalysisOutput.root"
 #define defValTrackfinderWriteTracksToFile                       false
 #define defValAnalysisThresholdForP                              momentumCutSmallerThan
 #define defValAnalysisInitConfiguration                          false
@@ -262,11 +273,20 @@
 #define stringCmdTrackfinderMinClassCoding                          "trackfinderMinClassCoding"
 #define stringCmdTrackfinderMinClassGradingP                        "trackfinderMinClassGradingP"
 #define stringCmdTrackfinderMinClassGradingR                        "trackfinderMinClassGradingR"
+#define stringCmdTrackfinderFilterType                              "trackfinderFilterType"
+#define stringCmdTrackfinderFirstFilterGeometry                     "trackfinderFirstFilterGeometry"
+#define stringCmdTrackfinderFirstFilterArithmetic                   "trackfinderFirstFilterArithmetic"
+#define stringCmdTrackfinderSecondFilterGeometry                    "trackfinderSecondFilterGeometry"
+#define stringCmdTrackfinderSecondFilterArithmetic                  "trackfinderSecondFilterArithmetic"
 #define stringCmdTrackfinderFirstFilterNeighborhoodDim1ClearRadius  "trackfinderFirstFilterNeighborhoodDim1ClearRadius"
 #define stringCmdTrackfinderFirstFilterNeighborhoodDim2ClearRadius  "trackfinderFirstFilterNeighborhoodDim2ClearRadius"
 #define stringCmdTrackfinderSecondFilterNeighborhoodDim1ClearRadius "trackfinderSecondFilterNeighborhoodDim1ClearRadius"
 #define stringCmdTrackfinderSecondFilterNeighborhoodDim2ClearRadius "trackfinderSecondFilterNeighborhoodDim2ClearRadius"
 #define stringCmdTrackfinderSecondFilterNeighborhoodDim3ClearRadius "trackfinderSecondFilterNeighborhoodDim3ClearRadius"
+#define stringCmdTrackfinderAutomaticFilterCoverPercentage          "trackfinderAutomaticFilterCoverPercentage"
+#define stringCmdTrackfinderAutomaticFilterDataPercentage           "trackfinderAutomaticFilterDataPercentage"
+#define stringCmdTrackfinderAutomaticFilterWrite                    "trackfinderAutomaticFilterWrite"
+#define stringCmdTrackfinderAutomaticFilterFileName                 "trackfinderAutomaticFilterFileName"
 #define stringCmdTrackfinderWriteTracksToFile                       "trackfinderWriteTracksToFile"
 #define stringCmdAnalysisOutputFileName                             "analysisOutputFileName"
 #define stringCmdAnalysisThresholdForP                              "analysisThresholdForP"
@@ -410,104 +430,113 @@
 #define idCmdTrackfinderMinClassCoding                           43
 #define idCmdTrackfinderMinClassGradingP                         44
 #define idCmdTrackfinderMinClassGradingR                         45
-#define idCmdTrackfinderFirstFilterNeighborhoodDim1ClearRadius   46
-#define idCmdTrackfinderFirstFilterNeighborhoodDim2ClearRadius   47
-#define idCmdTrackfinderSecondFilterNeighborhoodDim1ClearRadius  48
-#define idCmdTrackfinderSecondFilterNeighborhoodDim2ClearRadius  49
-#define idCmdTrackfinderSecondFilterNeighborhoodDim3ClearRadius  50
-#define idCmdTrackfinderWriteTracksToFile                        51
-#define idCmdAnalysisOutputFileName                              52
-#define idCmdAnalysisThresholdForP                               53
-#define idCmdAnalysisInitConfiguration                           54
-#define idCmdAnalysisInitDetector                                55
-#define idCmdAnalysisInitEvent                                   56
-#define idCmdAnalysisInitClassPriority                           57
-#define idCmdAnalysisInitMemory                                  58
-#define idCmdAnalysisInitTime                                    59
-#define idCmdAnalysisInitQualityEFGCEventAbsolute                60
-#define idCmdAnalysisInitQualityEFGCEventRelative                61
-#define idCmdAnalysisInitQualityEFGCTotalAbsolute                62
-#define idCmdAnalysisInitQualityEFGCTotalRelative                63
-#define idCmdAnalysisInitMomentumEFGCEventPzEFGC                 64
-#define idCmdAnalysisInitMomentumEFGCEventPtEFGC                 65
-#define idCmdAnalysisInitMomentumEFGCTotalPzEFGC                 66
-#define idCmdAnalysisInitMomentumEFGCTotalPtEFGC                 67
-#define idCmdAnalysisInitProjectionEFGCNEvent12EFGCN             68
-#define idCmdAnalysisInitProjectionEFGCNEvent13EFGCN             69
-#define idCmdAnalysisInitProjectionEFGCNEvent32EFGCN             70
-#define idCmdAnalysisInitProjectionEFGCNTotal12EFGCN             71
-#define idCmdAnalysisInitProjectionEFGCNTotal13EFGCN             72
-#define idCmdAnalysisInitProjectionEFGCNTotal32EFGCN             73
-#define idCmdAnalysisInitMomentumEvent                           74
-#define idCmdAnalysisInitMomentumTotal                           75
-#define idCmdAnalysisInitMomentumDisplay                         76
-#define idCmdAnalysisInitMomentumToRoot                          77
-#define idCmdAnalysisInitProjectionEvent                         78
-#define idCmdAnalysisInitProjectionTotal                         79
-#define idCmdAnalysisInitProjectionDisplay                       80
-#define idCmdAnalysisInitProjectionToRoot                        81
-#define idCmdAnalysisInitMagnetfieldX                            82
-#define idCmdAnalysisInitMagnetfieldY                            83
-#define idCmdAnalysisInitMagnetfieldZ                            84
-#define idCmdAnalysisInitMagnetfieldDisplay                      85
-#define idCmdAnalysisInitMagnetfieldToRoot                       86
-#define idCmdAnalysisInitMagnetfieldConstantForEachEvent         87
-#define idCmdAnalysisInitWeightedMagnetfieldConstant             88
-#define idCmdAnalysisInitMagnetfieldConstantDisplay              89
-#define idCmdAnalysisMagnetfieldConstantDisplayMask              90
-#define idCmdAnalysisInitMagnetfieldConstantToRoot               91
-#define idCmdAnalysisInitMagnetfieldVSConstants                  92
-#define idCmdAnalysisInitPrelutGoodness                          93
-#define idCmdAnalysisInitLutGoodness                             94
-#define idCmdAnalysisInitHoughTransformGoodness                  95
-#define idCmdAnalysisInitQuantizationGoodness                    96
-#define idCmdAnalysisInitPeakDistanceGoodness                    97
-#define idCmdAnalysisInitCreatedHistogramToRoot                  98
-#define idCmdAnalysisInitEncodedHistogramToRoot                  99
-#define idCmdAnalysisInitFilteredHistogramToRoot                100
-#define idCmdAnalysisInitJustOneCreatedHistogramToRoot          101
-#define idCmdAnalysisInitJustOneEncodedHistogramToRoot          102
-#define idCmdAnalysisInitJustOneFilteredHistogramToRoot         103
-#define idCmdAnalysisInitCreatedHistogramToShow                 104
-#define idCmdAnalysisInitEncodedHistogramToShow                 105
-#define idCmdAnalysisInitFilteredHistogramToShow                106
-#define idCmdAnalysisInitHistogramLayer                         107
-#define idCmdAnalysisInitNumberOfTracksPerColumn                108
-#define idCmdAnalysisInitNumberOfTracksPerRow                   109
-#define idCmdAnalysisInitNumberOfTracksPerLayer                 110
-#define idCmdAnalysisInitHitReadoutDistribution                 111
-#define idCmdAnalysisInitReadoutColumnsInParallel               112
-#define idCmdAnalysisInitPrelutRangeForEachEvent                113
-#define idCmdAnalysisInitWeightedPrelutRange                    114
-#define idCmdAnalysisInitPrelutRangeDisplay                     115
-#define idCmdAnalysisInitPrelutRangeDisplayMode                 116
-#define idCmdAnalysisPrelutRangeStationDisplayMask              117
-#define idCmdAnalysisPrelutRangeStationSumDisplayMask           118
-#define idCmdAnalysisPrelutRangeConstraintDisplayMask           119
-#define idCmdAnalysisPrelutRangeConstraintSumDisplayMask        120
-#define idCmdAnalysisPrelutRangeRelativeDisplayMask             121
-#define idCmdAnalysisInitPrelutRangeToRoot                      122
-#define idCmdAnalysisInitPercentageOfHitsForPrelutRange         123
-#define idCmdAnalysisPrelutRangeMinStart                        124
-#define idCmdAnalysisPrelutRangeMinStop                         125
-#define idCmdAnalysisPrelutRangeMinSteps                        126
-#define idCmdAnalysisPrelutRangeMaxStart                        127
-#define idCmdAnalysisPrelutRangeMaxStop                         128
-#define idCmdAnalysisPrelutRangeMaxSteps                        129
-#define idCmdAnalysisChooseMainPrelutRange                      130
-#define idCmdAnalysisChooseConstraintPrelutRange                131
-#define idCmdAnalysisInitTotalAnalysis                          132
-#define idCmdAnalysisInitPercentageOfHitsInSignature            133
-#define idCmdAnalysisInitPercentageOfTracksForSignature         134
-#define idCmdAnalysisInitAnalysisResultWarnings                 135
-#define idCmdAnalysisInitAnalysisResultDisplays                 136
-#define idCmdAnalysisInitAnalysisMoreResultWarnings             137
-#define idCmdAnalysisInitAnalysisMoreResultDisplays             138
-#define idCmdAnalysisWriteCellFiles                             139
-#define idCmdAnalysisHitCellFileName						    140
-#define idCmdAnalysisPrelutCellFileName						    141
-#define idCmdAnalysisLutCellFileName						    142
-#define idCmdInitStatus                                         143
+#define idCmdTrackfinderFilterType                               46
+#define idCmdTrackfinderFirstFilterGeometry                      47
+#define idCmdTrackfinderFirstFilterArithmetic                    48
+#define idCmdTrackfinderSecondFilterGeometry                     49
+#define idCmdTrackfinderSecondFilterArithmetic                   50
+#define idCmdTrackfinderFirstFilterNeighborhoodDim1ClearRadius   51
+#define idCmdTrackfinderFirstFilterNeighborhoodDim2ClearRadius   52
+#define idCmdTrackfinderSecondFilterNeighborhoodDim1ClearRadius  53
+#define idCmdTrackfinderSecondFilterNeighborhoodDim2ClearRadius  54
+#define idCmdTrackfinderSecondFilterNeighborhoodDim3ClearRadius  55
+#define idCmdTrackfinderAutomaticFilterCoverPercentage           56
+#define idCmdTrackfinderAutomaticFilterDataPercentage            57
+#define idCmdTrackfinderAutomaticFilterWrite                     58
+#define idCmdTrackfinderAutomaticFilterFileName                  69
+#define idCmdTrackfinderWriteTracksToFile                        60
+#define idCmdAnalysisOutputFileName                              61
+#define idCmdAnalysisThresholdForP                               62
+#define idCmdAnalysisInitConfiguration                           63
+#define idCmdAnalysisInitDetector                                64
+#define idCmdAnalysisInitEvent                                   65
+#define idCmdAnalysisInitClassPriority                           66
+#define idCmdAnalysisInitMemory                                  67
+#define idCmdAnalysisInitTime                                    68
+#define idCmdAnalysisInitQualityEFGCEventAbsolute                69
+#define idCmdAnalysisInitQualityEFGCEventRelative                70
+#define idCmdAnalysisInitQualityEFGCTotalAbsolute                71
+#define idCmdAnalysisInitQualityEFGCTotalRelative                72
+#define idCmdAnalysisInitMomentumEFGCEventPzEFGC                 73
+#define idCmdAnalysisInitMomentumEFGCEventPtEFGC                 74
+#define idCmdAnalysisInitMomentumEFGCTotalPzEFGC                 75
+#define idCmdAnalysisInitMomentumEFGCTotalPtEFGC                 76
+#define idCmdAnalysisInitProjectionEFGCNEvent12EFGCN             77
+#define idCmdAnalysisInitProjectionEFGCNEvent13EFGCN             78
+#define idCmdAnalysisInitProjectionEFGCNEvent32EFGCN             79
+#define idCmdAnalysisInitProjectionEFGCNTotal12EFGCN             80
+#define idCmdAnalysisInitProjectionEFGCNTotal13EFGCN             81
+#define idCmdAnalysisInitProjectionEFGCNTotal32EFGCN             82
+#define idCmdAnalysisInitMomentumEvent                           83
+#define idCmdAnalysisInitMomentumTotal                           84
+#define idCmdAnalysisInitMomentumDisplay                         85
+#define idCmdAnalysisInitMomentumToRoot                          86
+#define idCmdAnalysisInitProjectionEvent                         87
+#define idCmdAnalysisInitProjectionTotal                         88
+#define idCmdAnalysisInitProjectionDisplay                       89
+#define idCmdAnalysisInitProjectionToRoot                        90
+#define idCmdAnalysisInitMagnetfieldX                            91
+#define idCmdAnalysisInitMagnetfieldY                            92
+#define idCmdAnalysisInitMagnetfieldZ                            93
+#define idCmdAnalysisInitMagnetfieldDisplay                      94
+#define idCmdAnalysisInitMagnetfieldToRoot                       95
+#define idCmdAnalysisInitMagnetfieldConstantForEachEvent         96
+#define idCmdAnalysisInitWeightedMagnetfieldConstant             97
+#define idCmdAnalysisInitMagnetfieldConstantDisplay              98
+#define idCmdAnalysisMagnetfieldConstantDisplayMask              99
+#define idCmdAnalysisInitMagnetfieldConstantToRoot              100
+#define idCmdAnalysisInitMagnetfieldVSConstants                 101
+#define idCmdAnalysisInitPrelutGoodness                         102
+#define idCmdAnalysisInitLutGoodness                            103
+#define idCmdAnalysisInitHoughTransformGoodness                 104
+#define idCmdAnalysisInitQuantizationGoodness                   105
+#define idCmdAnalysisInitPeakDistanceGoodness                   106
+#define idCmdAnalysisInitCreatedHistogramToRoot                 107
+#define idCmdAnalysisInitEncodedHistogramToRoot                 108
+#define idCmdAnalysisInitFilteredHistogramToRoot                109
+#define idCmdAnalysisInitJustOneCreatedHistogramToRoot          110
+#define idCmdAnalysisInitJustOneEncodedHistogramToRoot          111
+#define idCmdAnalysisInitJustOneFilteredHistogramToRoot         112
+#define idCmdAnalysisInitCreatedHistogramToShow                 113
+#define idCmdAnalysisInitEncodedHistogramToShow                 114
+#define idCmdAnalysisInitFilteredHistogramToShow                115
+#define idCmdAnalysisInitHistogramLayer                         116
+#define idCmdAnalysisInitNumberOfTracksPerColumn                117
+#define idCmdAnalysisInitNumberOfTracksPerRow                   118
+#define idCmdAnalysisInitNumberOfTracksPerLayer                 119
+#define idCmdAnalysisInitHitReadoutDistribution                 120
+#define idCmdAnalysisInitReadoutColumnsInParallel               121
+#define idCmdAnalysisInitPrelutRangeForEachEvent                122
+#define idCmdAnalysisInitWeightedPrelutRange                    123
+#define idCmdAnalysisInitPrelutRangeDisplay                     124
+#define idCmdAnalysisInitPrelutRangeDisplayMode                 125
+#define idCmdAnalysisPrelutRangeStationDisplayMask              126
+#define idCmdAnalysisPrelutRangeStationSumDisplayMask           127
+#define idCmdAnalysisPrelutRangeConstraintDisplayMask           128
+#define idCmdAnalysisPrelutRangeConstraintSumDisplayMask        129
+#define idCmdAnalysisPrelutRangeRelativeDisplayMask             130
+#define idCmdAnalysisInitPrelutRangeToRoot                      131
+#define idCmdAnalysisInitPercentageOfHitsForPrelutRange         132
+#define idCmdAnalysisPrelutRangeMinStart                        133
+#define idCmdAnalysisPrelutRangeMinStop                         134
+#define idCmdAnalysisPrelutRangeMinSteps                        135
+#define idCmdAnalysisPrelutRangeMaxStart                        136
+#define idCmdAnalysisPrelutRangeMaxStop                         137
+#define idCmdAnalysisPrelutRangeMaxSteps                        138
+#define idCmdAnalysisChooseMainPrelutRange                      139
+#define idCmdAnalysisChooseConstraintPrelutRange                140
+#define idCmdAnalysisInitTotalAnalysis                          141
+#define idCmdAnalysisInitPercentageOfHitsInSignature            142
+#define idCmdAnalysisInitPercentageOfTracksForSignature         143
+#define idCmdAnalysisInitAnalysisResultWarnings                 144
+#define idCmdAnalysisInitAnalysisResultDisplays                 145
+#define idCmdAnalysisInitAnalysisMoreResultWarnings             146
+#define idCmdAnalysisInitAnalysisMoreResultDisplays             147
+#define idCmdAnalysisWriteCellFiles                             148
+#define idCmdAnalysisHitCellFileName						    149
+#define idCmdAnalysisPrelutCellFileName						    150
+#define idCmdAnalysisLutCellFileName						    151
+#define idCmdInitStatus                                         152
 
 
 #define max(a, b)  (((a) > (b)) ? (a) : (b)) 
@@ -523,129 +552,129 @@ bool inf::getInputHeaderValue(std::string& specifier, std::string& value) {
 	bool specifierFound = false;
 	
 	if (specifier.compare(stringCmdInputFileName) == 0) {
-		if (!(commandID[idCmdInputFileName])) {
+		if (!isHeaderLockSet(idCmdInputFileName)) {
 			config.inputFileName = value;
-			commandID[idCmdInputFileName] = true;
+			setHeaderLock(idCmdInputFileName, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputFileFormat) == 0) {
-		if (!(commandID[idCmdInputFileFormat])) {
+		if (!isHeaderLockSet(idCmdInputFileFormat)) {
 			config.inputFileFormat = stoi((char*)value.c_str(), 10);
-			commandID[idCmdInputFileFormat] = true;
+			setHeaderLock(idCmdInputFileFormat, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputMinTracks) == 0) {
-		if (!(commandID[idCmdInputMinTracks])) {
+		if (!isHeaderLockSet(idCmdInputMinTracks)) {
 			config.inputMinTracks = stoi((char*)value.c_str(), 10);
-			commandID[idCmdInputMinTracks] = true;
+			setHeaderLock(idCmdInputMinTracks, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputMaxTracks) == 0) {
-		if (!(commandID[idCmdInputMaxTracks])) {
+		if (!isHeaderLockSet(idCmdInputMaxTracks)) {
 			config.inputMaxTracks = stoi((char*)value.c_str(), 10);
-			commandID[idCmdInputMaxTracks] = true;
+			setHeaderLock(idCmdInputMaxTracks, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputDetectorMask) == 0) {
-		if (!(commandID[idCmdInputDetectorMask])) {
+		if (!isHeaderLockSet(idCmdInputDetectorMask)) {
 			config.inputDetectorMask = bitArray(value);
-			commandID[idCmdInputDetectorMask] = true;
+			setHeaderLock(idCmdInputDetectorMask, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputFileNameDetector) == 0) {
-		if (!(commandID[idCmdInputFileNameDetector])) {
+		if (!isHeaderLockSet(idCmdInputFileNameDetector)) {
 			config.inputFileNameDetector = value;
-			commandID[idCmdInputFileNameDetector] = true;
+			setHeaderLock(idCmdInputFileNameDetector, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputNumberOfVolumesInfrontOfSTS) == 0) {
-		if (!(commandID[idCmdInputNumberOfVolumesInfrontOfSTS])) {
+		if (!isHeaderLockSet(idCmdInputNumberOfVolumesInfrontOfSTS)) {
 			config.inputNumberOfVolumesInfrontOfSTS = stous((char*)value.c_str(), 10);
-			commandID[idCmdInputNumberOfVolumesInfrontOfSTS] = true;
+			setHeaderLock(idCmdInputNumberOfVolumesInfrontOfSTS, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputDisableAutomaticDetector) == 0) {
-		if (!(commandID[idCmdInputDisableAutomaticDetector])) {
+		if (!isHeaderLockSet(idCmdInputDisableAutomaticDetector)) {
 			config.inputDisableAutomaticDetector = bstob((char*)value.c_str());
 			if (!config.inputDisableAutomaticDetector)
 				config.inputDisableAutomaticDetector = dstob(*((char*)value.c_str()));
-			commandID[idCmdInputDisableAutomaticDetector] = true;
+			setHeaderLock(idCmdInputDisableAutomaticDetector, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputCodingTableMode) == 0) {
-		if (!(commandID[idCmdInputCodingTableMode])) {
+		if (!isHeaderLockSet(idCmdInputCodingTableMode)) {
 			config.inputCodingTableMode = stoi((char*)value.c_str(), 10);
-			commandID[idCmdInputCodingTableMode] = true;
+			setHeaderLock(idCmdInputCodingTableMode, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputGradingPTableMode) == 0) {
-		if (!(commandID[idCmdInputGradingPTableMode])) {
+		if (!isHeaderLockSet(idCmdInputGradingPTableMode)) {
 			config.inputGradingPTableMode = stoi((char*)value.c_str(), 10);
-			commandID[idCmdInputGradingPTableMode] = true;
+			setHeaderLock(idCmdInputGradingPTableMode, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputGradingRTableMode) == 0) {
-		if (!(commandID[idCmdInputGradingRTableMode])) {
+		if (!isHeaderLockSet(idCmdInputGradingRTableMode)) {
 			config.inputGradingRTableMode = stoi((char*)value.c_str(), 10);
-			commandID[idCmdInputGradingRTableMode] = true;
+			setHeaderLock(idCmdInputGradingRTableMode, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputCodingTableFileName) == 0) {
-		if (!(commandID[idCmdInputCodingTableFileName])) {
+		if (!isHeaderLockSet(idCmdInputCodingTableFileName)) {
 			config.inputCodingTableFileName = value;
-			commandID[idCmdInputCodingTableFileName] = true;
+			setHeaderLock(idCmdInputCodingTableFileName, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputGradingPTableFileName) == 0) {
-		if (!(commandID[idCmdInputGradingPTableFileName])) {
+		if (!isHeaderLockSet(idCmdInputGradingPTableFileName)) {
 			config.inputGradingPTableFileName = value;
-			commandID[idCmdInputGradingPTableFileName] = true;
+			setHeaderLock(idCmdInputGradingPTableFileName, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputGradingRTableFileName) == 0) {
-		if (!(commandID[idCmdInputGradingRTableFileName])) {
+		if (!isHeaderLockSet(idCmdInputGradingRTableFileName)) {
 			config.inputGradingRTableFileName = value;
-			commandID[idCmdInputGradingRTableFileName] = true;
+			setHeaderLock(idCmdInputGradingRTableFileName, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputCodingTableWrite) == 0) {
-		if (!(commandID[idCmdInputCodingTableWrite])) {
+		if (!isHeaderLockSet(idCmdInputCodingTableWrite)) {
 			config.inputCodingTableWrite = bstob((char*)value.c_str());
 			if (!config.inputCodingTableWrite)
 				config.inputCodingTableWrite = dstob(*((char*)value.c_str()));
-			commandID[idCmdInputCodingTableWrite] = true;
+			setHeaderLock(idCmdInputCodingTableWrite, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputGradingPTableWrite) == 0) {
-		if (!(commandID[idCmdInputGradingPTableWrite])) {
+		if (!isHeaderLockSet(idCmdInputGradingPTableWrite)) {
 			config.inputGradingPTableWrite = bstob((char*)value.c_str());
 			if (!config.inputGradingPTableWrite)
 				config.inputGradingPTableWrite = dstob(*((char*)value.c_str()));
-			commandID[idCmdInputGradingPTableWrite] = true;
+			setHeaderLock(idCmdInputGradingPTableWrite, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputGradingRTableWrite) == 0) {
-		if (!(commandID[idCmdInputGradingRTableWrite])) {
+		if (!isHeaderLockSet(idCmdInputGradingRTableWrite)) {
 			config.inputGradingRTableWrite = bstob((char*)value.c_str());
 			if (!config.inputGradingRTableWrite)
 				config.inputGradingRTableWrite = dstob(*((char*)value.c_str()));
-			commandID[idCmdInputGradingRTableWrite] = true;
+			setHeaderLock(idCmdInputGradingRTableWrite, true);
 			specifierFound = true;
 		}
 	}
@@ -664,217 +693,286 @@ bool inf::getTrackfinderHeaderValue(std::string& specifier, std::string& value) 
 	bool specifierFound = false;
 	
 	if (specifier.compare(stringCmdTrackfinderHitProducer) == 0) {
-		if (!(commandID[idCmdTrackfinderHitProducer])) {
+		if (!isHeaderLockSet(idCmdTrackfinderHitProducer)) {
 			config.trackfinderHitProducer = stoi((char*)value.c_str(), 10);
-			commandID[idCmdTrackfinderHitProducer] = true;
+			setHeaderLock(idCmdTrackfinderHitProducer, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderReadPointsFromFile) == 0) {
-		if (!(commandID[idCmdTrackfinderReadPointsFromFile])) {
+		if (!isHeaderLockSet(idCmdTrackfinderReadPointsFromFile)) {
 			config.trackfinderReadPointsFromFile = bstob((char*)value.c_str());
 			if (!config.trackfinderReadPointsFromFile)
 				config.trackfinderReadPointsFromFile = dstob(*((char*)value.c_str()));
-			commandID[idCmdTrackfinderReadPointsFromFile] = true;
+			setHeaderLock(idCmdTrackfinderReadPointsFromFile, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderReadHitsFromFile) == 0) {
-		if (!(commandID[idCmdTrackfinderReadHitsFromFile])) {
+		if (!isHeaderLockSet(idCmdTrackfinderReadHitsFromFile)) {
 			config.trackfinderReadHitsFromFile = bstob((char*)value.c_str());
 			if (!config.trackfinderReadHitsFromFile)
 				config.trackfinderReadHitsFromFile = dstob(*((char*)value.c_str()));
-			commandID[idCmdTrackfinderReadHitsFromFile] = true;
+			setHeaderLock(idCmdTrackfinderReadHitsFromFile, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderReadMapsHits) == 0) {
-		if (!(commandID[idCmdTrackfinderReadMapsHits])) {
+		if (!isHeaderLockSet(idCmdTrackfinderReadMapsHits)) {
 			config.trackfinderReadMapsHits = bstob((char*)value.c_str());
 			if (!config.trackfinderReadMapsHits)
 				config.trackfinderReadMapsHits = dstob(*((char*)value.c_str()));
-			commandID[idCmdTrackfinderReadMapsHits] = true;
+			setHeaderLock(idCmdTrackfinderReadMapsHits, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderReadHybridHits) == 0) {
-		if (!(commandID[idCmdTrackfinderReadHybridHits])) {
+		if (!isHeaderLockSet(idCmdTrackfinderReadHybridHits)) {
 			config.trackfinderReadHybridHits = bstob((char*)value.c_str());
 			if (!config.trackfinderReadHybridHits)
 				config.trackfinderReadHybridHits = dstob(*((char*)value.c_str()));
-			commandID[idCmdTrackfinderReadHybridHits] = true;
+			setHeaderLock(idCmdTrackfinderReadHybridHits, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderReadStripHits) == 0) {
-		if (!(commandID[idCmdTrackfinderReadStripHits])) {
+		if (!isHeaderLockSet(idCmdTrackfinderReadStripHits)) {
 			config.trackfinderReadStripHits = bstob((char*)value.c_str());
 			if (!config.trackfinderReadStripHits)
 				config.trackfinderReadStripHits = dstob(*((char*)value.c_str()));
-			commandID[idCmdTrackfinderReadStripHits] = true;
+			setHeaderLock(idCmdTrackfinderReadStripHits, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderLutsVersion) == 0) {
-		if (!(commandID[idCmdTrackfinderLutsVersion])) {
+		if (!isHeaderLockSet(idCmdTrackfinderLutsVersion)) {
 			config.trackfinderLutsVersion = stous((char*)value.c_str(), 10);
-			commandID[idCmdTrackfinderLutsVersion] = true;
+			setHeaderLock(idCmdTrackfinderLutsVersion, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderPrelutFileName) == 0) {
-		if (!(commandID[idCmdTrackfinderPrelutFileName])) {
+		if (!isHeaderLockSet(idCmdTrackfinderPrelutFileName)) {
 			config.trackfinderPrelutFileName = value;
-			commandID[idCmdTrackfinderPrelutFileName] = true;
+			setHeaderLock(idCmdTrackfinderPrelutFileName, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderLutFileName) == 0) {
-		if (!(commandID[idCmdTrackfinderLutFileName])) {
+		if (!isHeaderLockSet(idCmdTrackfinderLutFileName)) {
 			config.trackfinderLutFileName = value;
-			commandID[idCmdTrackfinderLutFileName] = true;
+			setHeaderLock(idCmdTrackfinderLutFileName, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderGammaMin) == 0) {
-		if (!(commandID[idCmdTrackfinderGammaMin])) {
+		if (!isHeaderLockSet(idCmdTrackfinderGammaMin)) {
 			config.trackfinderGammaMin = stod((char*)value.c_str());
-			commandID[idCmdTrackfinderGammaMin] = true;
+			setHeaderLock(idCmdTrackfinderGammaMin, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderGammaMax) == 0) {
-		if (!(commandID[idCmdTrackfinderGammaMax])) {
+		if (!isHeaderLockSet(idCmdTrackfinderGammaMax)) {
 			config.trackfinderGammaMax = stod((char*)value.c_str());
-			commandID[idCmdTrackfinderGammaMax] = true;
+			setHeaderLock(idCmdTrackfinderGammaMax, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderGammaStep) == 0) {
-		if (!(commandID[idCmdTrackfinderGammaStep])) {
+		if (!isHeaderLockSet(idCmdTrackfinderGammaStep)) {
 			config.trackfinderGammaStep = stoi((char*)value.c_str(), 10);
-			commandID[idCmdTrackfinderGammaStep] = true;
+			setHeaderLock(idCmdTrackfinderGammaStep, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderThetaMin) == 0) {
-		if (!(commandID[idCmdTrackfinderThetaMin])) {
+		if (!isHeaderLockSet(idCmdTrackfinderThetaMin)) {
 			config.trackfinderThetaMin = stod((char*)value.c_str());
-			commandID[idCmdTrackfinderThetaMin] = true;
+			setHeaderLock(idCmdTrackfinderThetaMin, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderThetaMax) == 0) {
-		if (!(commandID[idCmdTrackfinderThetaMax])) {
+		if (!isHeaderLockSet(idCmdTrackfinderThetaMax)) {
 			config.trackfinderThetaMax = stod((char*)value.c_str());
-			commandID[idCmdTrackfinderThetaMax] = true;
+			setHeaderLock(idCmdTrackfinderThetaMax, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderThetaStep) == 0) {
-		if (!(commandID[idCmdTrackfinderThetaStep])) {
+		if (!isHeaderLockSet(idCmdTrackfinderThetaStep)) {
 			config.trackfinderThetaStep = stoi((char*)value.c_str(), 10);
-			commandID[idCmdTrackfinderThetaStep] = true;
+			setHeaderLock(idCmdTrackfinderThetaStep, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderPrelutRadiusMin) == 0) {
-		if (!(commandID[idCmdTrackfinderPrelutRadiusMin])) {
+		if (!isHeaderLockSet(idCmdTrackfinderPrelutRadiusMin)) {
 			config.trackfinderPrelutRadiusMin = stod((char*)value.c_str());
-			commandID[idCmdTrackfinderPrelutRadiusMin] = true;
+			setHeaderLock(idCmdTrackfinderPrelutRadiusMin, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderPrelutRadiusMax) == 0) {
-		if (!(commandID[idCmdTrackfinderPrelutRadiusMax])) {
+		if (!isHeaderLockSet(idCmdTrackfinderPrelutRadiusMax)) {
 			config.trackfinderPrelutRadiusMax = stod((char*)value.c_str());
-			commandID[idCmdTrackfinderPrelutRadiusMax] = true;
+			setHeaderLock(idCmdTrackfinderPrelutRadiusMax, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderLutRadiusMin) == 0) {
-		if (!(commandID[idCmdTrackfinderLutRadiusMin])) {
+		if (!isHeaderLockSet(idCmdTrackfinderLutRadiusMin)) {
 			config.trackfinderLutRadiusMin = stod((char*)value.c_str());
-			commandID[idCmdTrackfinderLutRadiusMin] = true;
+			setHeaderLock(idCmdTrackfinderLutRadiusMin, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderLutRadiusMax) == 0) {
-		if (!(commandID[idCmdTrackfinderLutRadiusMax])) {
+		if (!isHeaderLockSet(idCmdTrackfinderLutRadiusMax)) {
 			config.trackfinderLutRadiusMax = stod((char*)value.c_str());
-			commandID[idCmdTrackfinderLutRadiusMax] = true;
+			setHeaderLock(idCmdTrackfinderLutRadiusMax, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderLutRadiusStep) == 0) {
-		if (!(commandID[idCmdTrackfinderLutRadiusStep])) {
+		if (!isHeaderLockSet(idCmdTrackfinderLutRadiusStep)) {
 			config.trackfinderLutRadiusStep = stoi((char*)value.c_str(), 10);
-			commandID[idCmdTrackfinderLutRadiusStep] = true;
+			setHeaderLock(idCmdTrackfinderLutRadiusStep, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderMinClassCoding) == 0) {
-		if (!(commandID[idCmdTrackfinderMinClassCoding])) {
+		if (!isHeaderLockSet(idCmdTrackfinderMinClassCoding)) {
 			config.trackfinderMinClassCoding = stous((char*)value.c_str(), 10);
-			commandID[idCmdTrackfinderMinClassCoding] = true;
+			setHeaderLock(idCmdTrackfinderMinClassCoding, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderMinClassGradingP) == 0) {
-		if (!(commandID[idCmdTrackfinderMinClassGradingP])) {
+		if (!isHeaderLockSet(idCmdTrackfinderMinClassGradingP)) {
 			config.trackfinderMinClassGradingP = stous((char*)value.c_str(), 10);
-			commandID[idCmdTrackfinderMinClassGradingP] = true;
+			setHeaderLock(idCmdTrackfinderMinClassGradingP, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderMinClassGradingR) == 0) {
-		if (!(commandID[idCmdTrackfinderMinClassGradingR])) {
+		if (!isHeaderLockSet(idCmdTrackfinderMinClassGradingR)) {
 			config.trackfinderMinClassGradingR = stous((char*)value.c_str(), 10);
-			commandID[idCmdTrackfinderMinClassGradingR] = true;
+			setHeaderLock(idCmdTrackfinderMinClassGradingR, true);
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdTrackfinderFilterType) == 0) {
+		if (!isHeaderLockSet(idCmdTrackfinderFilterType)) {
+			config.trackfinderFilterType = stous((char*)value.c_str(), 10);
+			setHeaderLock(idCmdTrackfinderFilterType, true);
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdTrackfinderFirstFilterGeometry) == 0) {
+		if (!isHeaderLockSet(idCmdTrackfinderFirstFilterGeometry)) {
+			config.trackfinderFirstFilterGeometry = stous((char*)value.c_str(), 10);
+			setHeaderLock(idCmdTrackfinderFirstFilterGeometry, true);
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdTrackfinderFirstFilterArithmetic) == 0) {
+		if (!isHeaderLockSet(idCmdTrackfinderFirstFilterArithmetic)) {
+			config.trackfinderFirstFilterArithmetic = stous((char*)value.c_str(), 10);
+			setHeaderLock(idCmdTrackfinderFirstFilterArithmetic, true);
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdTrackfinderSecondFilterGeometry) == 0) {
+		if (!isHeaderLockSet(idCmdTrackfinderSecondFilterGeometry)) {
+			config.trackfinderSecondFilterGeometry = stous((char*)value.c_str(), 10);
+			setHeaderLock(idCmdTrackfinderSecondFilterGeometry, true);
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdTrackfinderSecondFilterArithmetic) == 0) {
+		if (!isHeaderLockSet(idCmdTrackfinderSecondFilterArithmetic)) {
+			config.trackfinderSecondFilterArithmetic = stous((char*)value.c_str(), 10);
+			setHeaderLock(idCmdTrackfinderSecondFilterArithmetic, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderFirstFilterNeighborhoodDim1ClearRadius) == 0) {
-		if (!(commandID[idCmdTrackfinderFirstFilterNeighborhoodDim1ClearRadius])) {
+		if (!isHeaderLockSet(idCmdTrackfinderFirstFilterNeighborhoodDim1ClearRadius)) {
 			config.trackfinderFirstFilterNeighborhoodDim1ClearRadius = stous((char*)value.c_str(), 10);
-			commandID[idCmdTrackfinderFirstFilterNeighborhoodDim1ClearRadius] = true;
+			setHeaderLock(idCmdTrackfinderFirstFilterNeighborhoodDim1ClearRadius, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderFirstFilterNeighborhoodDim2ClearRadius) == 0) {
-		if (!(commandID[idCmdTrackfinderFirstFilterNeighborhoodDim2ClearRadius])) {
+		if (!isHeaderLockSet(idCmdTrackfinderFirstFilterNeighborhoodDim2ClearRadius)) {
 			config.trackfinderFirstFilterNeighborhoodDim2ClearRadius = stous((char*)value.c_str(), 10);
-			commandID[idCmdTrackfinderFirstFilterNeighborhoodDim2ClearRadius] = true;
+			setHeaderLock(idCmdTrackfinderFirstFilterNeighborhoodDim2ClearRadius, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderSecondFilterNeighborhoodDim1ClearRadius) == 0) {
-		if (!(commandID[idCmdTrackfinderSecondFilterNeighborhoodDim1ClearRadius])) {
+		if (!isHeaderLockSet(idCmdTrackfinderSecondFilterNeighborhoodDim1ClearRadius)) {
 			config.trackfinderSecondFilterNeighborhoodDim1ClearRadius = stous((char*)value.c_str(), 10);
-			commandID[idCmdTrackfinderSecondFilterNeighborhoodDim1ClearRadius] = true;
+			setHeaderLock(idCmdTrackfinderSecondFilterNeighborhoodDim1ClearRadius, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderSecondFilterNeighborhoodDim2ClearRadius) == 0) {
-		if (!(commandID[idCmdTrackfinderSecondFilterNeighborhoodDim2ClearRadius])) {
+		if (!isHeaderLockSet(idCmdTrackfinderSecondFilterNeighborhoodDim2ClearRadius)) {
 			config.trackfinderSecondFilterNeighborhoodDim2ClearRadius = stous((char*)value.c_str(), 10);
-			commandID[idCmdTrackfinderSecondFilterNeighborhoodDim2ClearRadius] = true;
+			setHeaderLock(idCmdTrackfinderSecondFilterNeighborhoodDim2ClearRadius, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderSecondFilterNeighborhoodDim3ClearRadius) == 0) {
-		if (!(commandID[idCmdTrackfinderSecondFilterNeighborhoodDim3ClearRadius])) {
+		if (!isHeaderLockSet(idCmdTrackfinderSecondFilterNeighborhoodDim3ClearRadius)) {
 			config.trackfinderSecondFilterNeighborhoodDim3ClearRadius = stous((char*)value.c_str(), 10);
-			commandID[idCmdTrackfinderSecondFilterNeighborhoodDim3ClearRadius] = true;
+			setHeaderLock(idCmdTrackfinderSecondFilterNeighborhoodDim3ClearRadius, true);
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdTrackfinderAutomaticFilterCoverPercentage) == 0) {
+		if (!isHeaderLockSet(idCmdTrackfinderAutomaticFilterCoverPercentage)) {
+			config.trackfinderAutomaticFilterCoverPercentage = stous((char*)value.c_str(), 10);
+			if (config.trackfinderAutomaticFilterCoverPercentage > 100)
+				config.trackfinderAutomaticFilterCoverPercentage = 100;
+			setHeaderLock(idCmdTrackfinderAutomaticFilterCoverPercentage, true);
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdTrackfinderAutomaticFilterDataPercentage) == 0) {
+		if (!isHeaderLockSet(idCmdTrackfinderAutomaticFilterDataPercentage)) {
+			config.trackfinderAutomaticFilterDataPercentage = stous((char*)value.c_str(), 10);
+			if (config.trackfinderAutomaticFilterDataPercentage > 100)
+				config.trackfinderAutomaticFilterDataPercentage = 100;
+			setHeaderLock(idCmdTrackfinderAutomaticFilterDataPercentage, true);
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdTrackfinderAutomaticFilterWrite) == 0) {
+		if (!isHeaderLockSet(idCmdTrackfinderAutomaticFilterWrite)) {
+			config.trackfinderAutomaticFilterWrite = bstob((char*)value.c_str());
+			if (!config.trackfinderAutomaticFilterWrite)
+				config.trackfinderAutomaticFilterWrite = dstob(*((char*)value.c_str()));
+			setHeaderLock(idCmdTrackfinderAutomaticFilterWrite, true);
+			specifierFound = true;
+		}
+	}
+	else if (specifier.compare(stringCmdTrackfinderAutomaticFilterFileName) == 0) {
+		if (!isHeaderLockSet(idCmdTrackfinderAutomaticFilterFileName)) {
+			config.trackfinderAutomaticFilterFileName = value;
+			setHeaderLock(idCmdTrackfinderAutomaticFilterFileName, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdTrackfinderWriteTracksToFile) == 0) {
-		if (!(commandID[idCmdTrackfinderWriteTracksToFile])) {
+		if (!isHeaderLockSet(idCmdTrackfinderWriteTracksToFile)) {
 			config.trackfinderWriteTracksToFile = bstob((char*)value.c_str());
 			if (!config.trackfinderWriteTracksToFile)
 				config.trackfinderWriteTracksToFile = dstob(*((char*)value.c_str()));
-			commandID[idCmdTrackfinderWriteTracksToFile] = true;
+			setHeaderLock(idCmdTrackfinderWriteTracksToFile, true);
 			specifierFound = true;
 		}
 	}
@@ -893,72 +991,72 @@ bool inf::getInitialisationHeaderValue(std::string& specifier, std::string& valu
 	bool specifierFound = false;
 
 	if (specifier.compare(stringCmdAnalysisThresholdForP) == 0) {
-		if (!(commandID[idCmdAnalysisThresholdForP])) {
+		if (!isHeaderLockSet(idCmdAnalysisThresholdForP)) {
 			config.analysisThresholdForP = stod((char*)value.c_str());
-			commandID[idCmdAnalysisThresholdForP] = true;
+			setHeaderLock(idCmdAnalysisThresholdForP, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitConfiguration) == 0) {
-		if (!(commandID[idCmdAnalysisInitConfiguration])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitConfiguration)) {
 			config.analysisInitConfiguration = bstob((char*)value.c_str());
 			if (!config.analysisInitConfiguration)
 				config.analysisInitConfiguration = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitConfiguration] = true;
+			setHeaderLock(idCmdAnalysisInitConfiguration, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitDetector) == 0) {
-		if (!(commandID[idCmdAnalysisInitDetector])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitDetector)) {
 			config.analysisInitDetector = bstob((char*)value.c_str());
 			if (!config.analysisInitDetector)
 				config.analysisInitDetector = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitDetector] = true;
+			setHeaderLock(idCmdAnalysisInitDetector, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitEvent) == 0) {
-		if (!(commandID[idCmdAnalysisInitEvent])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitEvent)) {
 			config.analysisInitEvent = bstob((char*)value.c_str());
 			if (!config.analysisInitEvent)
 				config.analysisInitEvent = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitEvent] = true;
+			setHeaderLock(idCmdAnalysisInitEvent, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitClassPriority) == 0) {
-		if (!(commandID[idCmdAnalysisInitClassPriority])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitClassPriority)) {
 			config.analysisInitClassPriority = bstob((char*)value.c_str());
 			if (!config.analysisInitClassPriority)
 				config.analysisInitClassPriority = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitClassPriority] = true;
+			setHeaderLock(idCmdAnalysisInitClassPriority, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMemory) == 0) {
-		if (!(commandID[idCmdAnalysisInitMemory])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMemory)) {
 			config.analysisInitMemory = bstob((char*)value.c_str());
 			if (!config.analysisInitMemory)
 				config.analysisInitMemory = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMemory] = true;
+			setHeaderLock(idCmdAnalysisInitMemory, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitTime) == 0) {
-		if (!(commandID[idCmdAnalysisInitTime])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitTime)) {
 			config.analysisInitTime = bstob((char*)value.c_str());
 			if (!config.analysisInitTime)
 				config.analysisInitTime = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitTime] = true;
+			setHeaderLock(idCmdAnalysisInitTime, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInitStatus) == 0) {
-		if (!(commandID[idCmdInitStatus])) {
+		if (!isHeaderLockSet(idCmdInitStatus)) {
 			config.initStatus = bstob((char*)value.c_str());
 			if (!config.initStatus)
 				config.initStatus = dstob(*((char*)value.c_str()));
-			commandID[idCmdInitStatus] = true;
+			setHeaderLock(idCmdInitStatus, true);
 			specifierFound = true;
 		}
 	}
@@ -977,38 +1075,38 @@ bool inf::getQualityHeaderValue(std::string& specifier, std::string& value) {
 	bool specifierFound = false;
 
 	if (specifier.compare(stringCmdAnalysisInitQualityEFGCEventAbsolute) == 0) {
-		if (!(commandID[idCmdAnalysisInitQualityEFGCEventAbsolute])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitQualityEFGCEventAbsolute)) {
 			config.analysisInitQualityEFGCEventAbsolute = bstob((char*)value.c_str());
 			if (!config.analysisInitQualityEFGCEventAbsolute)
 				config.analysisInitQualityEFGCEventAbsolute = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitQualityEFGCEventAbsolute] = true;
+			setHeaderLock(idCmdAnalysisInitQualityEFGCEventAbsolute, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitQualityEFGCEventRelative) == 0) {
-		if (!(commandID[idCmdAnalysisInitQualityEFGCEventRelative])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitQualityEFGCEventRelative)) {
 			config.analysisInitQualityEFGCEventRelative = bstob((char*)value.c_str());
 			if (!config.analysisInitQualityEFGCEventRelative)
 				config.analysisInitQualityEFGCEventRelative = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitQualityEFGCEventRelative] = true;
+			setHeaderLock(idCmdAnalysisInitQualityEFGCEventRelative, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitQualityEFGCTotalAbsolute) == 0) {
-		if (!(commandID[idCmdAnalysisInitQualityEFGCTotalAbsolute])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitQualityEFGCTotalAbsolute)) {
 			config.analysisInitQualityEFGCTotalAbsolute = bstob((char*)value.c_str());
 			if (!config.analysisInitQualityEFGCTotalAbsolute)
 				config.analysisInitQualityEFGCTotalAbsolute = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitQualityEFGCTotalAbsolute] = true;
+			setHeaderLock(idCmdAnalysisInitQualityEFGCTotalAbsolute, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitQualityEFGCTotalRelative) == 0) {
-		if (!(commandID[idCmdAnalysisInitQualityEFGCTotalRelative])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitQualityEFGCTotalRelative)) {
 			config.analysisInitQualityEFGCTotalRelative = bstob((char*)value.c_str());
 			if (!config.analysisInitQualityEFGCTotalRelative)
 				config.analysisInitQualityEFGCTotalRelative = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitQualityEFGCTotalRelative] = true;
+			setHeaderLock(idCmdAnalysisInitQualityEFGCTotalRelative, true);
 			specifierFound = true;
 		}
 	}
@@ -1027,74 +1125,74 @@ bool inf::getMomentumHeaderValue(std::string& specifier, std::string& value) {
 	bool specifierFound = false;
 
 	if (specifier.compare(stringCmdAnalysisInitMomentumEFGCEventPzEFGC) == 0) {
-		if (!(commandID[idCmdAnalysisInitMomentumEFGCEventPzEFGC])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMomentumEFGCEventPzEFGC)) {
 			config.analysisInitMomentumEFGCEventPzEFGC = bstob((char*)value.c_str());
 			if (!config.analysisInitMomentumEFGCEventPzEFGC)
 				config.analysisInitMomentumEFGCEventPzEFGC = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMomentumEFGCEventPzEFGC] = true;
+			setHeaderLock(idCmdAnalysisInitMomentumEFGCEventPzEFGC, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMomentumEFGCEventPtEFGC) == 0) {
-		if (!(commandID[idCmdAnalysisInitMomentumEFGCEventPtEFGC])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMomentumEFGCEventPtEFGC)) {
 			config.analysisInitMomentumEFGCEventPtEFGC = bstob((char*)value.c_str());
 			if (!config.analysisInitMomentumEFGCEventPtEFGC)
 				config.analysisInitMomentumEFGCEventPtEFGC = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMomentumEFGCEventPtEFGC] = true;
+			setHeaderLock(idCmdAnalysisInitMomentumEFGCEventPtEFGC, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMomentumEFGCTotalPzEFGC) == 0) {
-		if (!(commandID[idCmdAnalysisInitMomentumEFGCTotalPzEFGC])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMomentumEFGCTotalPzEFGC)) {
 			config.analysisInitMomentumEFGCTotalPzEFGC = bstob((char*)value.c_str());
 			if (!config.analysisInitMomentumEFGCTotalPzEFGC)
 				config.analysisInitMomentumEFGCTotalPzEFGC = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMomentumEFGCTotalPzEFGC] = true;
+			setHeaderLock(idCmdAnalysisInitMomentumEFGCTotalPzEFGC, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMomentumEFGCTotalPtEFGC) == 0) {
-		if (!(commandID[idCmdAnalysisInitMomentumEFGCTotalPtEFGC])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMomentumEFGCTotalPtEFGC)) {
 			config.analysisInitMomentumEFGCTotalPtEFGC = bstob((char*)value.c_str());
 			if (!config.analysisInitMomentumEFGCTotalPtEFGC)
 				config.analysisInitMomentumEFGCTotalPtEFGC = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMomentumEFGCTotalPtEFGC] = true;
+			setHeaderLock(idCmdAnalysisInitMomentumEFGCTotalPtEFGC, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMomentumEvent) == 0) {
-		if (!(commandID[idCmdAnalysisInitMomentumEvent])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMomentumEvent)) {
 			config.analysisInitMomentumEvent = bstob((char*)value.c_str());
 			if (!config.analysisInitMomentumEvent)
 				config.analysisInitMomentumEvent = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMomentumEvent] = true;
+			setHeaderLock(idCmdAnalysisInitMomentumEvent, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMomentumTotal) == 0) {
-		if (!(commandID[idCmdAnalysisInitMomentumTotal])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMomentumTotal)) {
 			config.analysisInitMomentumTotal = bstob((char*)value.c_str());
 			if (!config.analysisInitMomentumTotal)
 				config.analysisInitMomentumTotal = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMomentumTotal] = true;
+			setHeaderLock(idCmdAnalysisInitMomentumTotal, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMomentumDisplay) == 0) {
-		if (!(commandID[idCmdAnalysisInitMomentumDisplay])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMomentumDisplay)) {
 			config.analysisInitMomentumDisplay = bstob((char*)value.c_str());
 			if (!config.analysisInitMomentumDisplay)
 				config.analysisInitMomentumDisplay = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMomentumDisplay] = true;
+			setHeaderLock(idCmdAnalysisInitMomentumDisplay, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMomentumToRoot) == 0) {
-		if (!(commandID[idCmdAnalysisInitMomentumToRoot])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMomentumToRoot)) {
 			config.analysisInitMomentumToRoot = bstob((char*)value.c_str());
 			if (!config.analysisInitMomentumToRoot)
 				config.analysisInitMomentumToRoot = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMomentumToRoot] = true;
+			setHeaderLock(idCmdAnalysisInitMomentumToRoot, true);
 			specifierFound = true;
 		}
 	}
@@ -1113,92 +1211,92 @@ bool inf::getProjectionHeaderValue(std::string& specifier, std::string& value) {
 	bool specifierFound = false;
 
 	if (specifier.compare(stringCmdAnalysisInitProjectionEFGCNEvent12EFGCN) == 0) {
-		if (!(commandID[idCmdAnalysisInitProjectionEFGCNEvent12EFGCN])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitProjectionEFGCNEvent12EFGCN)) {
 			config.analysisInitProjectionEFGCNEvent12EFGCN = bstob((char*)value.c_str());
 			if (!config.analysisInitProjectionEFGCNEvent12EFGCN)
 				config.analysisInitProjectionEFGCNEvent12EFGCN = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitProjectionEFGCNEvent12EFGCN] = true;
+			setHeaderLock(idCmdAnalysisInitProjectionEFGCNEvent12EFGCN, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitProjectionEFGCNEvent13EFGCN) == 0) {
-		if (!(commandID[idCmdAnalysisInitProjectionEFGCNEvent13EFGCN])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitProjectionEFGCNEvent13EFGCN)) {
 			config.analysisInitProjectionEFGCNEvent13EFGCN = bstob((char*)value.c_str());
 			if (!config.analysisInitProjectionEFGCNEvent13EFGCN)
 				config.analysisInitProjectionEFGCNEvent13EFGCN = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitProjectionEFGCNEvent13EFGCN] = true;
+			setHeaderLock(idCmdAnalysisInitProjectionEFGCNEvent13EFGCN, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitProjectionEFGCNEvent32EFGCN) == 0) {
-		if (!(commandID[idCmdAnalysisInitProjectionEFGCNEvent32EFGCN])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitProjectionEFGCNEvent32EFGCN)) {
 			config.analysisInitProjectionEFGCNEvent32EFGCN = bstob((char*)value.c_str());
 			if (!config.analysisInitProjectionEFGCNEvent32EFGCN)
 				config.analysisInitProjectionEFGCNEvent32EFGCN = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitProjectionEFGCNEvent32EFGCN] = true;
+			setHeaderLock(idCmdAnalysisInitProjectionEFGCNEvent32EFGCN, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitProjectionEFGCNTotal12EFGCN) == 0) {
-		if (!(commandID[idCmdAnalysisInitProjectionEFGCNTotal12EFGCN])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitProjectionEFGCNTotal12EFGCN)) {
 			config.analysisInitProjectionEFGCNTotal12EFGCN = bstob((char*)value.c_str());
 			if (!config.analysisInitProjectionEFGCNTotal12EFGCN)
 				config.analysisInitProjectionEFGCNTotal12EFGCN = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitProjectionEFGCNTotal12EFGCN] = true;
+			setHeaderLock(idCmdAnalysisInitProjectionEFGCNTotal12EFGCN, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitProjectionEFGCNTotal13EFGCN) == 0) {
-		if (!(commandID[idCmdAnalysisInitProjectionEFGCNTotal13EFGCN])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitProjectionEFGCNTotal13EFGCN)) {
 			config.analysisInitProjectionEFGCNTotal13EFGCN = bstob((char*)value.c_str());
 			if (!config.analysisInitProjectionEFGCNTotal13EFGCN)
 				config.analysisInitProjectionEFGCNTotal13EFGCN = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitProjectionEFGCNTotal13EFGCN] = true;
+			setHeaderLock(idCmdAnalysisInitProjectionEFGCNTotal13EFGCN, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitProjectionEFGCNTotal32EFGCN) == 0) {
-		if (!(commandID[idCmdAnalysisInitProjectionEFGCNTotal32EFGCN])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitProjectionEFGCNTotal32EFGCN)) {
 			config.analysisInitProjectionEFGCNTotal32EFGCN = bstob((char*)value.c_str());
 			if (!config.analysisInitProjectionEFGCNTotal32EFGCN)
 				config.analysisInitProjectionEFGCNTotal32EFGCN = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitProjectionEFGCNTotal32EFGCN] = true;
+			setHeaderLock(idCmdAnalysisInitProjectionEFGCNTotal32EFGCN, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitProjectionEvent) == 0) {
-		if (!(commandID[idCmdAnalysisInitProjectionEvent])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitProjectionEvent)) {
 			config.analysisInitProjectionEvent = bstob((char*)value.c_str());
 			if (!config.analysisInitProjectionEvent)
 				config.analysisInitProjectionEvent = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitProjectionEvent] = true;
+			setHeaderLock(idCmdAnalysisInitProjectionEvent, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitProjectionTotal) == 0) {
-		if (!(commandID[idCmdAnalysisInitProjectionTotal])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitProjectionTotal)) {
 			config.analysisInitProjectionTotal = bstob((char*)value.c_str());
 			if (!config.analysisInitProjectionTotal)
 				config.analysisInitProjectionTotal = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitProjectionTotal] = true;
+			setHeaderLock(idCmdAnalysisInitProjectionTotal, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitProjectionDisplay) == 0) {
-		if (!(commandID[idCmdAnalysisInitProjectionDisplay])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitProjectionDisplay)) {
 			config.analysisInitProjectionDisplay = bstob((char*)value.c_str());
 			if (!config.analysisInitProjectionDisplay)
 				config.analysisInitProjectionDisplay = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitProjectionDisplay] = true;
+			setHeaderLock(idCmdAnalysisInitProjectionDisplay, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitProjectionToRoot) == 0) {
-		if (!(commandID[idCmdAnalysisInitProjectionToRoot])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitProjectionToRoot)) {
 			config.analysisInitProjectionToRoot = bstob((char*)value.c_str());
 			if (!config.analysisInitProjectionToRoot)
 				config.analysisInitProjectionToRoot = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitProjectionToRoot] = true;
+			setHeaderLock(idCmdAnalysisInitProjectionToRoot, true);
 			specifierFound = true;
 		}
 	}
@@ -1217,145 +1315,145 @@ bool inf::getMagnetfieldHeaderValue(std::string& specifier, std::string& value) 
 	bool specifierFound = false;
 	
 	if (specifier.compare(stringCmdInputFileNameMagneticField) == 0) {
-		if (!(commandID[idCmdInputFileNameMagneticField])) {
+		if (!isHeaderLockSet(idCmdInputFileNameMagneticField)) {
 			config.inputFileNameMagneticField = value;
-			commandID[idCmdInputFileNameMagneticField] = true;
+			setHeaderLock(idCmdInputFileNameMagneticField, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputMagneticFieldIsRootFile) == 0) {
-		if (!(commandID[idCmdInputMagneticFieldIsRootFile])) {
+		if (!isHeaderLockSet(idCmdInputMagneticFieldIsRootFile)) {
 			config.inputMagneticFieldIsRootFile = bstob((char*)value.c_str());
 			if (!config.inputMagneticFieldIsRootFile)
 				config.inputMagneticFieldIsRootFile = dstob(*((char*)value.c_str()));
-			commandID[idCmdInputMagneticFieldIsRootFile] = true;
+			setHeaderLock(idCmdInputMagneticFieldIsRootFile, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputMapNameMagneticField) == 0) {
-		if (!(commandID[idCmdInputMapNameMagneticField])) {
+		if (!isHeaderLockSet(idCmdInputMapNameMagneticField)) {
 			config.inputMapNameMagneticField = value;
-			commandID[idCmdInputMapNameMagneticField] = true;
+			setHeaderLock(idCmdInputMapNameMagneticField, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputMagneticFieldIntegrationStepwidthPerStation) == 0) {
-		if (!(commandID[idCmdInputMagneticFieldIntegrationStepwidthPerStation])) {
+		if (!isHeaderLockSet(idCmdInputMagneticFieldIntegrationStepwidthPerStation)) {
 			config.inputMagneticFieldIntegrationStepwidthPerStation = stous((char*)value.c_str(), 10);
-			commandID[idCmdInputMagneticFieldIntegrationStepwidthPerStation] = true;
+			setHeaderLock(idCmdInputMagneticFieldIntegrationStepwidthPerStation, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputMagneticFieldIntegrationFactor) == 0) {
-		if (!(commandID[idCmdInputMagneticFieldIntegrationFactor])) {
+		if (!isHeaderLockSet(idCmdInputMagneticFieldIntegrationFactor)) {
 			config.inputMagneticFieldIntegrationFactor = stod((char*)value.c_str());
-			commandID[idCmdInputMagneticFieldIntegrationFactor] = true;
+			setHeaderLock(idCmdInputMagneticFieldIntegrationFactor, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdInputDisableAutomaticMagneticField) == 0) {
-		if (!(commandID[idCmdInputDisableAutomaticMagneticField])) {
+		if (!isHeaderLockSet(idCmdInputDisableAutomaticMagneticField)) {
 			config.inputDisableAutomaticMagneticField = bstob((char*)value.c_str());
 			if (!config.inputDisableAutomaticMagneticField)
 				config.inputDisableAutomaticMagneticField = dstob(*((char*)value.c_str()));
-			commandID[idCmdInputDisableAutomaticMagneticField] = true;
+			setHeaderLock(idCmdInputDisableAutomaticMagneticField, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMagnetfieldX) == 0) {
-		if (!(commandID[idCmdAnalysisInitMagnetfieldX])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMagnetfieldX)) {
 			config.analysisInitMagnetfieldX = bstob((char*)value.c_str());
 			if (!config.analysisInitMagnetfieldX)
 				config.analysisInitMagnetfieldX = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMagnetfieldX] = true;
+			setHeaderLock(idCmdAnalysisInitMagnetfieldX, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMagnetfieldY) == 0) {
-		if (!(commandID[idCmdAnalysisInitMagnetfieldY])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMagnetfieldY)) {
 			config.analysisInitMagnetfieldY = bstob((char*)value.c_str());
 			if (!config.analysisInitMagnetfieldY)
 				config.analysisInitMagnetfieldY = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMagnetfieldY] = true;
+			setHeaderLock(idCmdAnalysisInitMagnetfieldY, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMagnetfieldZ) == 0) {
-		if (!(commandID[idCmdAnalysisInitMagnetfieldZ])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMagnetfieldZ)) {
 			config.analysisInitMagnetfieldZ = bstob((char*)value.c_str());
 			if (!config.analysisInitMagnetfieldZ)
 				config.analysisInitMagnetfieldZ = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMagnetfieldZ] = true;
+			setHeaderLock(idCmdAnalysisInitMagnetfieldZ, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMagnetfieldDisplay) == 0) {
-		if (!(commandID[idCmdAnalysisInitMagnetfieldDisplay])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMagnetfieldDisplay)) {
 			config.analysisInitMagnetfieldDisplay = bstob((char*)value.c_str());
 			if (!config.analysisInitMagnetfieldDisplay)
 				config.analysisInitMagnetfieldDisplay = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMagnetfieldDisplay] = true;
+			setHeaderLock(idCmdAnalysisInitMagnetfieldDisplay, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMagnetfieldToRoot) == 0) {
-		if (!(commandID[idCmdAnalysisInitMagnetfieldToRoot])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMagnetfieldToRoot)) {
 			config.analysisInitMagnetfieldToRoot = bstob((char*)value.c_str());
 			if (!config.analysisInitMagnetfieldToRoot)
 				config.analysisInitMagnetfieldToRoot = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMagnetfieldToRoot] = true;
+			setHeaderLock(idCmdAnalysisInitMagnetfieldToRoot, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMagnetfieldConstantForEachEvent) == 0) {
-		if (!(commandID[idCmdAnalysisInitMagnetfieldConstantForEachEvent])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMagnetfieldConstantForEachEvent)) {
 			config.analysisInitMagnetfieldConstantForEachEvent = bstob((char*)value.c_str());
 			if (!config.analysisInitMagnetfieldConstantForEachEvent)
 				config.analysisInitMagnetfieldConstantForEachEvent = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMagnetfieldConstantForEachEvent] = true;
+			setHeaderLock(idCmdAnalysisInitMagnetfieldConstantForEachEvent, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitWeightedMagnetfieldConstant) == 0) {
-		if (!(commandID[idCmdAnalysisInitWeightedMagnetfieldConstant])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitWeightedMagnetfieldConstant)) {
 			config.analysisInitWeightedMagnetfieldConstant = bstob((char*)value.c_str());
 			if (!config.analysisInitWeightedMagnetfieldConstant)
 				config.analysisInitWeightedMagnetfieldConstant = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitWeightedMagnetfieldConstant] = true;
+			setHeaderLock(idCmdAnalysisInitWeightedMagnetfieldConstant, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMagnetfieldConstantDisplay) == 0) {
-		if (!(commandID[idCmdAnalysisInitMagnetfieldConstantDisplay])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMagnetfieldConstantDisplay)) {
 			config.analysisInitMagnetfieldConstantDisplay = bstob((char*)value.c_str());
 			if (!config.analysisInitMagnetfieldConstantDisplay)
 				config.analysisInitMagnetfieldConstantDisplay = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMagnetfieldConstantDisplay] = true;
+			setHeaderLock(idCmdAnalysisInitMagnetfieldConstantDisplay, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisMagnetfieldConstantDisplayMask) == 0) {
-		if (!(commandID[idCmdAnalysisMagnetfieldConstantDisplayMask])) {
+		if (!isHeaderLockSet(idCmdAnalysisMagnetfieldConstantDisplayMask)) {
 			config.analysisMagnetfieldConstantDisplayMask = bitArray(value);
-			commandID[idCmdAnalysisMagnetfieldConstantDisplayMask] = true;
+			setHeaderLock(idCmdAnalysisMagnetfieldConstantDisplayMask, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMagnetfieldConstantToRoot) == 0) {
-		if (!(commandID[idCmdAnalysisInitMagnetfieldConstantToRoot])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMagnetfieldConstantToRoot)) {
 			config.analysisInitMagnetfieldConstantToRoot = bstob((char*)value.c_str());
 			if (!config.analysisInitMagnetfieldConstantToRoot)
 				config.analysisInitMagnetfieldConstantToRoot = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMagnetfieldConstantToRoot] = true;
+			setHeaderLock(idCmdAnalysisInitMagnetfieldConstantToRoot, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitMagnetfieldVSConstants) == 0) {
-		if (!(commandID[idCmdAnalysisInitMagnetfieldVSConstants])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitMagnetfieldVSConstants)) {
 			config.analysisInitMagnetfieldVSConstants = bstob((char*)value.c_str());
 			if (!config.analysisInitMagnetfieldVSConstants)
 				config.analysisInitMagnetfieldVSConstants = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitMagnetfieldVSConstants] = true;
+			setHeaderLock(idCmdAnalysisInitMagnetfieldVSConstants, true);
 			specifierFound = true;
 		}
 	}
@@ -1374,93 +1472,93 @@ bool inf::getGoodnessHeaderValue(std::string& specifier, std::string& value) {
 	bool specifierFound = false;
 	
 	if (specifier.compare(stringCmdAnalysisInitPrelutGoodness) == 0) {
-		if (!(commandID[idCmdAnalysisInitPrelutGoodness])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitPrelutGoodness)) {
 			config.analysisInitPrelutGoodness = bstob((char*)value.c_str());
 			if (!config.analysisInitPrelutGoodness)
 				config.analysisInitPrelutGoodness = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitPrelutGoodness] = true;
+			setHeaderLock(idCmdAnalysisInitPrelutGoodness, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitLutGoodness) == 0) {
-		if (!(commandID[idCmdAnalysisInitLutGoodness])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitLutGoodness)) {
 			config.analysisInitLutGoodness = bstob((char*)value.c_str());
 			if (!config.analysisInitLutGoodness)
 				config.analysisInitLutGoodness = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitLutGoodness] = true;
+			setHeaderLock(idCmdAnalysisInitLutGoodness, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitHoughTransformGoodness) == 0) {
-		if (!(commandID[idCmdAnalysisInitHoughTransformGoodness])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitHoughTransformGoodness)) {
 			config.analysisInitHoughTransformGoodness = bstob((char*)value.c_str());
 			if (!config.analysisInitHoughTransformGoodness)
 				config.analysisInitHoughTransformGoodness = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitHoughTransformGoodness] = true;
+			setHeaderLock(idCmdAnalysisInitHoughTransformGoodness, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitQuantizationGoodness) == 0) {
-		if (!(commandID[idCmdAnalysisInitQuantizationGoodness])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitQuantizationGoodness)) {
 			config.analysisInitQuantizationGoodness = bstob((char*)value.c_str());
 			if (!config.analysisInitQuantizationGoodness)
 				config.analysisInitQuantizationGoodness = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitQuantizationGoodness] = true;
+			setHeaderLock(idCmdAnalysisInitQuantizationGoodness, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitPeakDistanceGoodness) == 0) {
-		if (!(commandID[idCmdAnalysisInitPeakDistanceGoodness])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitPeakDistanceGoodness)) {
 			config.analysisInitPeakDistanceGoodness = bstob((char*)value.c_str());
 			if (!config.analysisInitPeakDistanceGoodness)
 				config.analysisInitPeakDistanceGoodness = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitPeakDistanceGoodness] = true;
+			setHeaderLock(idCmdAnalysisInitPeakDistanceGoodness, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitPercentageOfHitsInSignature) == 0) {
-		if (!(commandID[idCmdAnalysisInitPercentageOfHitsInSignature])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitPercentageOfHitsInSignature)) {
 			config.analysisInitPercentageOfHitsInSignature = stoul((char*)value.c_str(), 10);
 			if (config.analysisInitPercentageOfHitsInSignature > 100)
 				config.analysisInitPercentageOfHitsInSignature = 100;
-			commandID[idCmdAnalysisInitPercentageOfHitsInSignature] = true;
+			setHeaderLock(idCmdAnalysisInitPercentageOfHitsInSignature, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitPercentageOfTracksForSignature) == 0) {
-		if (!(commandID[idCmdAnalysisInitPercentageOfTracksForSignature])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitPercentageOfTracksForSignature)) {
 			config.analysisInitPercentageOfTracksForSignature = stoul((char*)value.c_str(), 10);
 			if (config.analysisInitPercentageOfTracksForSignature > 100)
 				config.analysisInitPercentageOfTracksForSignature = 100;
-			commandID[idCmdAnalysisInitPercentageOfTracksForSignature] = true;
+			setHeaderLock(idCmdAnalysisInitPercentageOfTracksForSignature, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitAnalysisResultWarnings) == 0) {
-		if (!(commandID[idCmdAnalysisInitAnalysisResultWarnings])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitAnalysisResultWarnings)) {
 			config.analysisInitAnalysisResultWarnings = stoul((char*)value.c_str(), 10);
-			commandID[idCmdAnalysisInitAnalysisResultWarnings] = true;
+			setHeaderLock(idCmdAnalysisInitAnalysisResultWarnings, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitAnalysisResultDisplays) == 0) {
-		if (!(commandID[idCmdAnalysisInitAnalysisResultDisplays])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitAnalysisResultDisplays)) {
 			config.analysisInitAnalysisResultDisplays = stoul((char*)value.c_str(), 10);
-			commandID[idCmdAnalysisInitAnalysisResultDisplays] = true;
+			setHeaderLock(idCmdAnalysisInitAnalysisResultDisplays, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitAnalysisMoreResultWarnings) == 0) {
-		if (!(commandID[idCmdAnalysisInitAnalysisMoreResultWarnings])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitAnalysisMoreResultWarnings)) {
 			config.analysisInitAnalysisMoreResultWarnings = stoul((char*)value.c_str(), 10);
-			commandID[idCmdAnalysisInitAnalysisMoreResultWarnings] = true;
+			setHeaderLock(idCmdAnalysisInitAnalysisMoreResultWarnings, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitAnalysisMoreResultDisplays) == 0) {
-		if (!(commandID[idCmdAnalysisInitAnalysisMoreResultDisplays])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitAnalysisMoreResultDisplays)) {
 			config.analysisInitAnalysisMoreResultDisplays = stoul((char*)value.c_str(), 10);
-			commandID[idCmdAnalysisInitAnalysisMoreResultDisplays] = true;
+			setHeaderLock(idCmdAnalysisInitAnalysisMoreResultDisplays, true);
 			specifierFound = true;
 		}
 	}
@@ -1479,90 +1577,90 @@ bool inf::getHistogramHeaderValue(std::string& specifier, std::string& value) {
 	bool specifierFound = false;
 	
 	if (specifier.compare(stringCmdAnalysisInitCreatedHistogramToRoot) == 0) {
-		if (!(commandID[idCmdAnalysisInitCreatedHistogramToRoot])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitCreatedHistogramToRoot)) {
 			config.analysisInitCreatedHistogramToRoot = bstob((char*)value.c_str());
 			if (!config.analysisInitCreatedHistogramToRoot)
 				config.analysisInitCreatedHistogramToRoot = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitCreatedHistogramToRoot] = true;
+			setHeaderLock(idCmdAnalysisInitCreatedHistogramToRoot, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitEncodedHistogramToRoot) == 0) {
-		if (!(commandID[idCmdAnalysisInitEncodedHistogramToRoot])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitEncodedHistogramToRoot)) {
 			config.analysisInitEncodedHistogramToRoot = bstob((char*)value.c_str());
 			if (!config.analysisInitEncodedHistogramToRoot)
 				config.analysisInitEncodedHistogramToRoot = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitEncodedHistogramToRoot] = true;
+			setHeaderLock(idCmdAnalysisInitEncodedHistogramToRoot, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitFilteredHistogramToRoot) == 0) {
-		if (!(commandID[idCmdAnalysisInitFilteredHistogramToRoot])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitFilteredHistogramToRoot)) {
 			config.analysisInitFilteredHistogramToRoot = bstob((char*)value.c_str());
 			if (!config.analysisInitFilteredHistogramToRoot)
 				config.analysisInitFilteredHistogramToRoot = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitFilteredHistogramToRoot] = true;
+			setHeaderLock(idCmdAnalysisInitFilteredHistogramToRoot, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitJustOneCreatedHistogramToRoot) == 0) {
-		if (!(commandID[idCmdAnalysisInitJustOneCreatedHistogramToRoot])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitJustOneCreatedHistogramToRoot)) {
 			config.analysisInitJustOneCreatedHistogramToRoot = bstob((char*)value.c_str());
 			if (!config.analysisInitJustOneCreatedHistogramToRoot)
 				config.analysisInitJustOneCreatedHistogramToRoot = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitJustOneCreatedHistogramToRoot] = true;
+			setHeaderLock(idCmdAnalysisInitJustOneCreatedHistogramToRoot, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitJustOneEncodedHistogramToRoot) == 0) {
-		if (!(commandID[idCmdAnalysisInitJustOneEncodedHistogramToRoot])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitJustOneEncodedHistogramToRoot)) {
 			config.analysisInitJustOneEncodedHistogramToRoot = bstob((char*)value.c_str());
 			if (!config.analysisInitJustOneEncodedHistogramToRoot)
 				config.analysisInitJustOneEncodedHistogramToRoot = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitJustOneEncodedHistogramToRoot] = true;
+			setHeaderLock(idCmdAnalysisInitJustOneEncodedHistogramToRoot, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitJustOneFilteredHistogramToRoot) == 0) {
-		if (!(commandID[idCmdAnalysisInitJustOneFilteredHistogramToRoot])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitJustOneFilteredHistogramToRoot)) {
 			config.analysisInitJustOneFilteredHistogramToRoot = bstob((char*)value.c_str());
 			if (!config.analysisInitJustOneFilteredHistogramToRoot)
 				config.analysisInitJustOneFilteredHistogramToRoot = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitJustOneFilteredHistogramToRoot] = true;
+			setHeaderLock(idCmdAnalysisInitJustOneFilteredHistogramToRoot, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitCreatedHistogramToShow) == 0) {
-		if (!(commandID[idCmdAnalysisInitCreatedHistogramToShow])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitCreatedHistogramToShow)) {
 			config.analysisInitCreatedHistogramToShow = bstob((char*)value.c_str());
 			if (!config.analysisInitCreatedHistogramToShow)
 				config.analysisInitCreatedHistogramToShow = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitCreatedHistogramToShow] = true;
+			setHeaderLock(idCmdAnalysisInitCreatedHistogramToShow, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitEncodedHistogramToShow) == 0) {
-		if (!(commandID[idCmdAnalysisInitEncodedHistogramToShow])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitEncodedHistogramToShow)) {
 			config.analysisInitEncodedHistogramToShow = bstob((char*)value.c_str());
 			if (!config.analysisInitEncodedHistogramToShow)
 				config.analysisInitEncodedHistogramToShow = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitEncodedHistogramToShow] = true;
+			setHeaderLock(idCmdAnalysisInitEncodedHistogramToShow, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitFilteredHistogramToShow) == 0) {
-		if (!(commandID[idCmdAnalysisInitFilteredHistogramToShow])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitFilteredHistogramToShow)) {
 			config.analysisInitFilteredHistogramToShow = bstob((char*)value.c_str());
 			if (!config.analysisInitFilteredHistogramToShow)
 				config.analysisInitFilteredHistogramToShow = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitFilteredHistogramToShow] = true;
+			setHeaderLock(idCmdAnalysisInitFilteredHistogramToShow, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitHistogramLayer) == 0) {
-		if (!(commandID[idCmdAnalysisInitHistogramLayer])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitHistogramLayer)) {
 			config.analysisInitHistogramLayer = stous((char*)value.c_str(), 10);
-			commandID[idCmdAnalysisInitHistogramLayer] = true;
+			setHeaderLock(idCmdAnalysisInitHistogramLayer, true);
 			specifierFound = true;
 		}
 	}
@@ -1581,47 +1679,47 @@ bool inf::getHardwareHeaderValue(std::string& specifier, std::string& value) {
 	bool specifierFound = false;
 	
 	if (specifier.compare(stringCmdAnalysisInitNumberOfTracksPerColumn) == 0) {
-		if (!(commandID[idCmdAnalysisInitNumberOfTracksPerColumn])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitNumberOfTracksPerColumn)) {
 			config.analysisInitNumberOfTracksPerColumn = bstob((char*)value.c_str());
 			if (!config.analysisInitNumberOfTracksPerColumn)
 				config.analysisInitNumberOfTracksPerColumn = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitNumberOfTracksPerColumn] = true;
+			setHeaderLock(idCmdAnalysisInitNumberOfTracksPerColumn, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitNumberOfTracksPerRow) == 0) {
-		if (!(commandID[idCmdAnalysisInitNumberOfTracksPerRow])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitNumberOfTracksPerRow)) {
 			config.analysisInitNumberOfTracksPerRow = bstob((char*)value.c_str());
 			if (!config.analysisInitNumberOfTracksPerRow)
 				config.analysisInitNumberOfTracksPerRow = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitNumberOfTracksPerRow] = true;
+			setHeaderLock(idCmdAnalysisInitNumberOfTracksPerRow, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitNumberOfTracksPerLayer) == 0) {
-		if (!(commandID[idCmdAnalysisInitNumberOfTracksPerLayer])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitNumberOfTracksPerLayer)) {
 			config.analysisInitNumberOfTracksPerLayer = bstob((char*)value.c_str());
 			if (!config.analysisInitNumberOfTracksPerLayer)
 				config.analysisInitNumberOfTracksPerLayer = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitNumberOfTracksPerLayer] = true;
+			setHeaderLock(idCmdAnalysisInitNumberOfTracksPerLayer, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitHitReadoutDistribution) == 0) {
-		if (!(commandID[idCmdAnalysisInitHitReadoutDistribution])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitHitReadoutDistribution)) {
 			config.analysisInitHitReadoutDistribution = bstob((char*)value.c_str());
 			if (!config.analysisInitHitReadoutDistribution)
 				config.analysisInitHitReadoutDistribution = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitHitReadoutDistribution] = true;
+			setHeaderLock(idCmdAnalysisInitHitReadoutDistribution, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitReadoutColumnsInParallel) == 0) {
-		if (!(commandID[idCmdAnalysisInitReadoutColumnsInParallel])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitReadoutColumnsInParallel)) {
 			config.analysisInitReadoutColumnsInParallel = bstob((char*)value.c_str());
 			if (!config.analysisInitReadoutColumnsInParallel)
 				config.analysisInitReadoutColumnsInParallel = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitReadoutColumnsInParallel] = true;
+			setHeaderLock(idCmdAnalysisInitReadoutColumnsInParallel, true);
 			specifierFound = true;
 		}
 	}
@@ -1640,155 +1738,155 @@ bool inf::getPrelutRangeHeaderValue(std::string& specifier, std::string& value) 
 	bool specifierFound = false;
 	
 	if (specifier.compare(stringCmdAnalysisInitPrelutRangeForEachEvent) == 0) {
-		if (!(commandID[idCmdAnalysisInitPrelutRangeForEachEvent])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitPrelutRangeForEachEvent)) {
 			config.analysisInitPrelutRangeForEachEvent = bstob((char*)value.c_str());
 			if (!config.analysisInitPrelutRangeForEachEvent)
 				config.analysisInitPrelutRangeForEachEvent = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitPrelutRangeForEachEvent] = true;
+			setHeaderLock(idCmdAnalysisInitPrelutRangeForEachEvent, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitWeightedPrelutRange) == 0) {
-		if (!(commandID[idCmdAnalysisInitWeightedPrelutRange])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitWeightedPrelutRange)) {
 			config.analysisInitWeightedPrelutRange = bstob((char*)value.c_str());
 			if (!config.analysisInitWeightedPrelutRange)
 				config.analysisInitWeightedPrelutRange = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitWeightedPrelutRange] = true;
+			setHeaderLock(idCmdAnalysisInitWeightedPrelutRange, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitPrelutRangeDisplay) == 0) {
-		if (!(commandID[idCmdAnalysisInitPrelutRangeDisplay])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitPrelutRangeDisplay)) {
 			config.analysisInitPrelutRangeDisplay = bstob((char*)value.c_str());
 			if (!config.analysisInitPrelutRangeDisplay)
 				config.analysisInitPrelutRangeDisplay = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitPrelutRangeDisplay] = true;
+			setHeaderLock(idCmdAnalysisInitPrelutRangeDisplay, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitPrelutRangeDisplayMode) == 0) {
-		if (!(commandID[idCmdAnalysisInitPrelutRangeDisplayMode])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitPrelutRangeDisplayMode)) {
 			config.analysisInitPrelutRangeDisplayMode = stous((char*)value.c_str(), 10);
-			commandID[idCmdAnalysisInitPrelutRangeDisplayMode] = true;
+			setHeaderLock(idCmdAnalysisInitPrelutRangeDisplayMode, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisPrelutRangeStationDisplayMask) == 0) {
-		if (!(commandID[idCmdAnalysisPrelutRangeStationDisplayMask])) {
+		if (!isHeaderLockSet(idCmdAnalysisPrelutRangeStationDisplayMask)) {
 			config.analysisPrelutRangeStationDisplayMask = bitArray(value);
-			commandID[idCmdAnalysisPrelutRangeStationDisplayMask] = true;
+			setHeaderLock(idCmdAnalysisPrelutRangeStationDisplayMask, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisPrelutRangeStationSumDisplayMask) == 0) {
-		if (!(commandID[idCmdAnalysisPrelutRangeStationSumDisplayMask])) {
+		if (!isHeaderLockSet(idCmdAnalysisPrelutRangeStationSumDisplayMask)) {
 			config.analysisPrelutRangeStationSumDisplayMask = bstob((char*)value.c_str());
 			if (!config.analysisPrelutRangeStationSumDisplayMask)
 				config.analysisPrelutRangeStationSumDisplayMask = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisPrelutRangeStationSumDisplayMask] = true;
+			setHeaderLock(idCmdAnalysisPrelutRangeStationSumDisplayMask, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisPrelutRangeConstraintDisplayMask) == 0) {
-		if (!(commandID[idCmdAnalysisPrelutRangeConstraintDisplayMask])) {
+		if (!isHeaderLockSet(idCmdAnalysisPrelutRangeConstraintDisplayMask)) {
 			config.analysisPrelutRangeConstraintDisplayMask = bitArray(value);
-			commandID[idCmdAnalysisPrelutRangeConstraintDisplayMask] = true;
+			setHeaderLock(idCmdAnalysisPrelutRangeConstraintDisplayMask, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisPrelutRangeConstraintSumDisplayMask) == 0) {
-		if (!(commandID[idCmdAnalysisPrelutRangeConstraintSumDisplayMask])) {
+		if (!isHeaderLockSet(idCmdAnalysisPrelutRangeConstraintSumDisplayMask)) {
 			config.analysisPrelutRangeConstraintSumDisplayMask = bstob((char*)value.c_str());
 			if (!config.analysisPrelutRangeConstraintSumDisplayMask)
 				config.analysisPrelutRangeConstraintSumDisplayMask = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisPrelutRangeConstraintSumDisplayMask] = true;
+			setHeaderLock(idCmdAnalysisPrelutRangeConstraintSumDisplayMask, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisPrelutRangeRelativeDisplayMask) == 0) {
-		if (!(commandID[idCmdAnalysisPrelutRangeRelativeDisplayMask])) {
+		if (!isHeaderLockSet(idCmdAnalysisPrelutRangeRelativeDisplayMask)) {
 			config.analysisPrelutRangeRelativeDisplayMask = bstob((char*)value.c_str());
 			if (!config.analysisPrelutRangeRelativeDisplayMask)
 				config.analysisPrelutRangeRelativeDisplayMask = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisPrelutRangeRelativeDisplayMask] = true;
+			setHeaderLock(idCmdAnalysisPrelutRangeRelativeDisplayMask, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitPrelutRangeToRoot) == 0) {
-		if (!(commandID[idCmdAnalysisInitPrelutRangeToRoot])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitPrelutRangeToRoot)) {
 			config.analysisInitPrelutRangeToRoot = bstob((char*)value.c_str());
 			if (!config.analysisInitPrelutRangeToRoot)
 				config.analysisInitPrelutRangeToRoot = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitPrelutRangeToRoot] = true;
+			setHeaderLock(idCmdAnalysisInitPrelutRangeToRoot, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisInitPercentageOfHitsForPrelutRange) == 0) {
-		if (!(commandID[idCmdAnalysisInitPercentageOfHitsForPrelutRange])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitPercentageOfHitsForPrelutRange)) {
 			config.analysisInitPercentageOfHitsForPrelutRange = stous((char*)value.c_str(), 10);
 			if (config.analysisInitPercentageOfHitsForPrelutRange > 100)
 				config.analysisInitPercentageOfHitsForPrelutRange = 100;
-			commandID[idCmdAnalysisInitPercentageOfHitsForPrelutRange] = true;
+			setHeaderLock(idCmdAnalysisInitPercentageOfHitsForPrelutRange, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisPrelutRangeMinStart) == 0) {
-		if (!(commandID[idCmdAnalysisPrelutRangeMinStart])) {
+		if (!isHeaderLockSet(idCmdAnalysisPrelutRangeMinStart)) {
 			config.analysisPrelutRangeMinStart = stod((char*)value.c_str());
-			commandID[idCmdAnalysisPrelutRangeMinStart] = true;
+			setHeaderLock(idCmdAnalysisPrelutRangeMinStart, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisPrelutRangeMinStop) == 0) {
-		if (!(commandID[idCmdAnalysisPrelutRangeMinStop])) {
+		if (!isHeaderLockSet(idCmdAnalysisPrelutRangeMinStop)) {
 			config.analysisPrelutRangeMinStop = stod((char*)value.c_str());
-			commandID[idCmdAnalysisPrelutRangeMinStop] = true;
+			setHeaderLock(idCmdAnalysisPrelutRangeMinStop, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisPrelutRangeMinSteps) == 0) {
-		if (!(commandID[idCmdAnalysisPrelutRangeMinSteps])) {
+		if (!isHeaderLockSet(idCmdAnalysisPrelutRangeMinSteps)) {
 			config.analysisPrelutRangeMinSteps = stous((char*)value.c_str(), 10);
-			commandID[idCmdAnalysisPrelutRangeMinSteps] = true;
+			setHeaderLock(idCmdAnalysisPrelutRangeMinSteps, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisPrelutRangeMaxStart) == 0) {
-		if (!(commandID[idCmdAnalysisPrelutRangeMaxStart])) {
+		if (!isHeaderLockSet(idCmdAnalysisPrelutRangeMaxStart)) {
 			config.analysisPrelutRangeMaxStart = stod((char*)value.c_str());
-			commandID[idCmdAnalysisPrelutRangeMaxStart] = true;
+			setHeaderLock(idCmdAnalysisPrelutRangeMaxStart, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisPrelutRangeMaxStop) == 0) {
-		if (!(commandID[idCmdAnalysisPrelutRangeMaxStop])) {
+		if (!isHeaderLockSet(idCmdAnalysisPrelutRangeMaxStop)) {
 			config.analysisPrelutRangeMaxStop = stod((char*)value.c_str());
-			commandID[idCmdAnalysisPrelutRangeMaxStop] = true;
+			setHeaderLock(idCmdAnalysisPrelutRangeMaxStop, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisPrelutRangeMaxSteps) == 0) {
-		if (!(commandID[idCmdAnalysisPrelutRangeMaxSteps])) {
+		if (!isHeaderLockSet(idCmdAnalysisPrelutRangeMaxSteps)) {
 			config.analysisPrelutRangeMaxSteps = stous((char*)value.c_str(), 10);
-			commandID[idCmdAnalysisPrelutRangeMaxSteps] = true;
+			setHeaderLock(idCmdAnalysisPrelutRangeMaxSteps, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisChooseMainPrelutRange) == 0) {
-		if (!(commandID[idCmdAnalysisChooseMainPrelutRange])) {
+		if (!isHeaderLockSet(idCmdAnalysisChooseMainPrelutRange)) {
 			config.analysisChooseMainPrelutRange = bstob((char*)value.c_str());
 			if (!config.analysisChooseMainPrelutRange)
 				config.analysisChooseMainPrelutRange = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisChooseMainPrelutRange] = true;
+			setHeaderLock(idCmdAnalysisChooseMainPrelutRange, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisChooseConstraintPrelutRange) == 0) {
-		if (!(commandID[idCmdAnalysisChooseConstraintPrelutRange])) {
+		if (!isHeaderLockSet(idCmdAnalysisChooseConstraintPrelutRange)) {
 			config.analysisChooseConstraintPrelutRange = bstob((char*)value.c_str());
 			if (!config.analysisChooseConstraintPrelutRange)
 				config.analysisChooseConstraintPrelutRange = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisChooseConstraintPrelutRange] = true;
+			setHeaderLock(idCmdAnalysisChooseConstraintPrelutRange, true);
 			specifierFound = true;
 		}
 	}
@@ -1807,11 +1905,11 @@ bool inf::getTotalAnalysisHeaderValue(std::string& specifier, std::string& value
 	bool specifierFound = false;
 	
 	if (specifier.compare(stringCmdAnalysisInitTotalAnalysis) == 0) {
-		if (!(commandID[idCmdAnalysisInitTotalAnalysis])) {
+		if (!isHeaderLockSet(idCmdAnalysisInitTotalAnalysis)) {
 			config.analysisInitTotalAnalysis = bstob((char*)value.c_str());
 			if (!config.analysisInitTotalAnalysis)
 				config.analysisInitTotalAnalysis = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisInitTotalAnalysis] = true;
+			setHeaderLock(idCmdAnalysisInitTotalAnalysis, true);
 			specifierFound = true;
 		}
 	}
@@ -1830,32 +1928,32 @@ bool inf::getCellAnalysisHeaderValue(std::string& specifier, std::string& value)
 	bool specifierFound = false;
 	
 	if (specifier.compare(stringCmdAnalysisWriteCellFiles) == 0) {
-		if (!(commandID[idCmdAnalysisWriteCellFiles])) {
+		if (!isHeaderLockSet(idCmdAnalysisWriteCellFiles)) {
 			config.analysisWriteCellFiles = bstob((char*)value.c_str());
 			if (!config.analysisWriteCellFiles)
 				config.analysisWriteCellFiles = dstob(*((char*)value.c_str()));
-			commandID[idCmdAnalysisWriteCellFiles] = true;
+			setHeaderLock(idCmdAnalysisWriteCellFiles, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisHitCellFileName) == 0) {
-		if (!(commandID[idCmdAnalysisHitCellFileName])) {
+		if (!isHeaderLockSet(idCmdAnalysisHitCellFileName)) {
 			config.analysisHitCellFileName = value;
-			commandID[idCmdAnalysisHitCellFileName] = true;
+			setHeaderLock(idCmdAnalysisHitCellFileName, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisPrelutCellFileName) == 0) {
-		if (!(commandID[idCmdAnalysisPrelutCellFileName])) {
+		if (!isHeaderLockSet(idCmdAnalysisPrelutCellFileName)) {
 			config.analysisPrelutCellFileName = value;
-			commandID[idCmdAnalysisPrelutCellFileName] = true;
+			setHeaderLock(idCmdAnalysisPrelutCellFileName, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdAnalysisLutCellFileName) == 0) {
-		if (!(commandID[idCmdAnalysisLutCellFileName])) {
+		if (!isHeaderLockSet(idCmdAnalysisLutCellFileName)) {
 			config.analysisLutCellFileName = value;
-			commandID[idCmdAnalysisLutCellFileName] = true;
+			setHeaderLock(idCmdAnalysisLutCellFileName, true);
 			specifierFound = true;
 		}
 	}
@@ -1870,8 +1968,7 @@ bool inf::getCellAnalysisHeaderValue(std::string& specifier, std::string& value)
 
 inf::inf() : configuration() {
 
-	for (unsigned int i = 0; i < numberOfCmds; i++)
-		commandID[i] = 0;
+	resetHeader();
 
 	init(getDefFileName());
 
@@ -1882,6 +1979,8 @@ inf::inf() : configuration() {
  ****************************************************************/
 
 inf::inf(InfData& setup) : configuration() {
+
+	resetHeader();
 
 /********************************************************/
 /* make code changes for a different configuration here */
@@ -1931,11 +2030,24 @@ inf::inf(InfData& setup) : configuration() {
 	config.trackfinderMinClassCoding                          = setup.trackfinderMinClassCoding;
 	config.trackfinderMinClassGradingP                        = setup.trackfinderMinClassGradingP;
 	config.trackfinderMinClassGradingR                        = setup.trackfinderMinClassGradingR;
+	config.trackfinderFilterType                              = setup.trackfinderFilterType;
+	config.trackfinderFirstFilterGeometry                     = setup.trackfinderFirstFilterGeometry;
+	config.trackfinderFirstFilterArithmetic                   = setup.trackfinderFirstFilterArithmetic;
+	config.trackfinderSecondFilterGeometry                    = setup.trackfinderSecondFilterGeometry;
+	config.trackfinderSecondFilterArithmetic                  = setup.trackfinderSecondFilterArithmetic;
 	config.trackfinderFirstFilterNeighborhoodDim1ClearRadius  = setup.trackfinderFirstFilterNeighborhoodDim1ClearRadius;
 	config.trackfinderFirstFilterNeighborhoodDim2ClearRadius  = setup.trackfinderFirstFilterNeighborhoodDim2ClearRadius;
 	config.trackfinderSecondFilterNeighborhoodDim1ClearRadius = setup.trackfinderSecondFilterNeighborhoodDim1ClearRadius;
 	config.trackfinderSecondFilterNeighborhoodDim2ClearRadius = setup.trackfinderSecondFilterNeighborhoodDim2ClearRadius;
 	config.trackfinderSecondFilterNeighborhoodDim3ClearRadius = setup.trackfinderSecondFilterNeighborhoodDim3ClearRadius;
+	config.trackfinderAutomaticFilterCoverPercentage          = setup.trackfinderAutomaticFilterCoverPercentage;
+	if (config.trackfinderAutomaticFilterCoverPercentage > 100)
+		config.trackfinderAutomaticFilterCoverPercentage = 100;
+	config.trackfinderAutomaticFilterDataPercentage           = setup.trackfinderAutomaticFilterDataPercentage;
+	if (config.trackfinderAutomaticFilterDataPercentage > 100)
+		config.trackfinderAutomaticFilterDataPercentage = 100;
+	config.trackfinderAutomaticFilterWrite                    = setup.trackfinderAutomaticFilterWrite;
+	config.trackfinderAutomaticFilterFileName                 = setup.trackfinderAutomaticFilterFileName;
 	config.trackfinderWriteTracksToFile                       = setup.trackfinderWriteTracksToFile;
 	config.analysisOutputFileName                             = setup.analysisOutputFileName;
 	config.analysisThresholdForP                              = setup.analysisThresholdForP;
@@ -2044,25 +2156,22 @@ inf::inf(InfData& setup) : configuration() {
  ****************************************************************/
 
 inf::inf(int numberOfTchars, char** tchars) : configuration() {
-	
-	for (unsigned int i = 0; i < numberOfCmds; i++)
-		commandID[i] = 0;
+
+	resetHeader();
 
 	init(numberOfTchars, tchars);
 
 }
 inf::inf(std::string name) : configuration() {
-	
-	for (unsigned int i = 0; i < numberOfCmds; i++)
-		commandID[i] = 0;
+
+	resetHeader();
 
 	init(name);
 
 }
 inf::inf(char* name) : configuration() {
-	
-	for (unsigned int i = 0; i < numberOfCmds; i++)
-		commandID[i] = 0;
+
+	resetHeader();
 
 	init(name);
 
@@ -2080,7 +2189,7 @@ inf::~inf() {
  * This method returns the number of accepted commands.			*
  ****************************************************************/
 
-int inf::getNumberOfCmds() {
+unsigned int inf::getNumberOfCmds() {
 
 	return numberOfCmds;
 
@@ -2162,11 +2271,24 @@ void inf::setHeaderDefValues() {
 	config.trackfinderMinClassCoding                          = defValTrackfinderMinClassCoding;
 	config.trackfinderMinClassGradingP                        = defValTrackfinderMinClassGradingP;
 	config.trackfinderMinClassGradingR                        = defValTrackfinderMinClassGradingR;
+	config.trackfinderFilterType                              = defValTrackfinderFilterType;
+	config.trackfinderFirstFilterGeometry                     = defValTrackfinderFirstFilterGeometry;
+	config.trackfinderFirstFilterArithmetic                   = defValTrackfinderFirstFilterArithmetic;
+	config.trackfinderSecondFilterGeometry                    = defValTrackfinderSecondFilterGeometry;
+	config.trackfinderSecondFilterArithmetic                  = defValTrackfinderSecondFilterArithmetic;
 	config.trackfinderFirstFilterNeighborhoodDim1ClearRadius  = defValTrackfinderFirstFilterNeighborhoodDim1ClearRadius;
 	config.trackfinderFirstFilterNeighborhoodDim2ClearRadius  = defValTrackfinderFirstFilterNeighborhoodDim2ClearRadius;
 	config.trackfinderSecondFilterNeighborhoodDim1ClearRadius = defValTrackfinderSecondFilterNeighborhoodDim1ClearRadius;
 	config.trackfinderSecondFilterNeighborhoodDim2ClearRadius = defValTrackfinderSecondFilterNeighborhoodDim2ClearRadius;
 	config.trackfinderSecondFilterNeighborhoodDim3ClearRadius = defValTrackfinderSecondFilterNeighborhoodDim3ClearRadius;
+	config.trackfinderAutomaticFilterCoverPercentage          = defValTrackfinderAutomaticFilterCoverPercentage;
+	if (config.trackfinderAutomaticFilterCoverPercentage > 100)
+		config.trackfinderAutomaticFilterCoverPercentage = 100;
+	config.trackfinderAutomaticFilterDataPercentage           = defValTrackfinderAutomaticFilterDataPercentage;
+	if (config.trackfinderAutomaticFilterDataPercentage > 100)
+		config.trackfinderAutomaticFilterDataPercentage = 100;
+	config.trackfinderAutomaticFilterWrite                    = defValTrackfinderAutomaticFilterWrite;
+	config.trackfinderAutomaticFilterFileName                 = defValTrackfinderAutomaticFilterFileName;
 	config.trackfinderWriteTracksToFile                       = defValTrackfinderWriteTracksToFile;
 	config.analysisThresholdForP                              = defValAnalysisThresholdForP;
 	config.analysisInitConfiguration                          = defValAnalysisInitConfiguration;
@@ -2309,9 +2431,9 @@ bool inf::getHeaderValue(std::string& specifier, std::string& value) {
 		specifierFound = getCellAnalysisHeaderValue(specifier, value);
 	if (!specifierFound) {
 		if (specifier.compare(stringCmdAnalysisOutputFileName) == 0) {
-			if (!(commandID[idCmdAnalysisOutputFileName])) {
+			if (!isHeaderLockSet(idCmdAnalysisOutputFileName)) {
 				config.analysisOutputFileName = value;
-				commandID[idCmdAnalysisOutputFileName] = true;
+				setHeaderLock(idCmdAnalysisOutputFileName, true);
 				specifierFound = true;
 			}
 		}
@@ -2440,11 +2562,131 @@ void inf::writeFileHeader(std::ofstream& fileStream) {
 	setHeaderValue(fileStream, stringCmdTrackfinderMinClassCoding,                          config.trackfinderMinClassCoding,                                   "Minimal allowed classification in the coding table");
 	setHeaderValue(fileStream, stringCmdTrackfinderMinClassGradingP,                        config.trackfinderMinClassGradingP,                                 "Minimal allowed classification in the gradingP table");
 	setHeaderValue(fileStream, stringCmdTrackfinderMinClassGradingR,                        config.trackfinderMinClassGradingR,                                 "Minimal allowed classification in the gradingR table");
+
+	strcpy(buffer, "Select the general filter -> (");
+	itos(NOFILTER, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":No filter, ");
+	itos(MAXMORPHSEARCHFILTER, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":MaxMorphSearch filter, ");
+	itos(ERASERFILTER, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":Eraser filter, ");
+	itos(FILEFILTER, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":Read filter from file, ");
+	itos(AUTOMATICFIRSTEVENTFILTER, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":Automatic first event filter, ");
+	itos(AUTOMATICEACHEVENTFILTER, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":Automatic each event filter, ");
+	itos(AUTOMATICUPDATEEVENTFILTER, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":Automatic update event filter)");
+
+	setHeaderValue(fileStream, stringCmdTrackfinderFilterType,                              config.trackfinderFilterType,                                       buffer);
+
+	strcpy(buffer, "Select the first filter geometry -> (");
+	itos(NOFIRSTGEOMETRY, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":No geometry, ");
+	itos(FIRST21GEOMETRY, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":FilterDim2 and filterDim1, ");
+	itos(FIRST122GEOMETRY, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":FilterDim12 and filterDim2, ");
+	itos(FIRST12GEOMETRY, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":FilterDim1Dim2, ");
+	itos(FIRST12MODGEOMETRY, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":FilterDim1Dim2Mod, ");
+	itos(FIRST121GEOMETRY, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":FilterDim12Dim1, ");
+	itos(FIRSTFINALGEOMETRY, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":FirstFilterFinal, ");
+	itos(FIRSTFINALMODGEOMETRY, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":FirstFilterFinalMod)");
+
+	setHeaderValue(fileStream, stringCmdTrackfinderFirstFilterGeometry,                     config.trackfinderFirstFilterGeometry,                              buffer);
+
+	strcpy(buffer, "Select the first filter arithmetic -> (");
+	itos(NOFIRSTARITHMETIC, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":No arithmetic, ");
+	itos(FIRSTSIMPLEARITHMETIC, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":simple arithmetic, ");
+	itos(FIRSTSIMPLEMODARITHMETIC, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":simple modified arithmetic, ");
+	itos(FIRSTCOMPLEXARITHMETIC, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":complex arithmetic, ");
+	itos(FIRSTCOMPLEXMODARITHMETIC, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":complex modified arithmetic, ");
+	itos(FIRSTSPECIALARITHMETIC, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, "special arithmetic:)");
+
+	setHeaderValue(fileStream, stringCmdTrackfinderFirstFilterArithmetic,                   config.trackfinderFirstFilterArithmetic,                            buffer);
+
+	strcpy(buffer, "Select the second filter geometry -> (");
+	itos(NOSECONDGEOMETRY, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":No geometry, ");
+	itos(SECOND3MODGEOMETRY, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":FilterDim3Mod, ");
+	itos(SECONDFINALGEOMETRY, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":SecondFilterFinal, ");
+	itos(SECONDFINALMODGEOMETRY, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":SecondFilterFinalMod, ");
+	itos(SECOND3GEOMETRY, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":FilterDim3)");
+
+	setHeaderValue(fileStream, stringCmdTrackfinderSecondFilterGeometry,                    config.trackfinderSecondFilterGeometry,                             buffer);
+
+	strcpy(buffer, "Select the second filter arithmetic -> (");
+	itos(NOSECONDARITHMETIC, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":No arithmetic, ");
+	itos(SECONDSIMPLEARITHMETIC, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":simple arithmetic, ");
+	itos(SECONDSIMPLEMODARITHMETIC, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":simple modified arithmetic, ");
+	itos(SECONDCOMPLEXARITHMETIC, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":complex arithmetic, ");
+	itos(SECONDCOMPLEXMODARITHMETIC, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, ":complex modified arithmetic, ");
+	itos(SECONDSPECIALARITHMETIC, conversionBuffer, 10, intConversionDigits);
+	strcat(buffer, conversionBuffer);
+	strcat(buffer, "special arithmetic:)");
+
+	setHeaderValue(fileStream, stringCmdTrackfinderSecondFilterArithmetic,                  config.trackfinderSecondFilterArithmetic,                           buffer);
 	setHeaderValue(fileStream, stringCmdTrackfinderFirstFilterNeighborhoodDim1ClearRadius,  config.trackfinderFirstFilterNeighborhoodDim1ClearRadius,           "FirstFilter's Dim1-radius which is cleared around a peak");
 	setHeaderValue(fileStream, stringCmdTrackfinderFirstFilterNeighborhoodDim2ClearRadius,  config.trackfinderFirstFilterNeighborhoodDim2ClearRadius,           "FirstFilter's Dim2-radius which is cleared around a peak");
 	setHeaderValue(fileStream, stringCmdTrackfinderSecondFilterNeighborhoodDim1ClearRadius, config.trackfinderSecondFilterNeighborhoodDim1ClearRadius,          "SecondFilter's Dim1-radius which is cleared around a peak");
 	setHeaderValue(fileStream, stringCmdTrackfinderSecondFilterNeighborhoodDim2ClearRadius, config.trackfinderSecondFilterNeighborhoodDim2ClearRadius,          "SecondFilter's Dim2-radius which is cleared around a peak");
 	setHeaderValue(fileStream, stringCmdTrackfinderSecondFilterNeighborhoodDim3ClearRadius, config.trackfinderSecondFilterNeighborhoodDim3ClearRadius,          "SecondFilter's Dim3-radius which is cleared around a peak");
+	setHeaderValue(fileStream, stringCmdTrackfinderAutomaticFilterCoverPercentage,          config.trackfinderAutomaticFilterCoverPercentage,                   "Percentage of occurence frequency for a geometry element to be used");
+	setHeaderValue(fileStream, stringCmdTrackfinderAutomaticFilterDataPercentage,           config.trackfinderAutomaticFilterDataPercentage,                    "Percentage of source data which should be used to generate the automatic filter");
+	setHeaderValue(fileStream, stringCmdTrackfinderAutomaticFilterWrite,                    config.trackfinderAutomaticFilterWrite,                             "True, if the automatic filter has to be written into a file");
+	setHeaderValue(fileStream, stringCmdTrackfinderAutomaticFilterFileName,                 config.trackfinderAutomaticFilterFileName,                          "Name of the file which contains the automatic filter geometry for writing or reading");
 	setHeaderValue(fileStream, stringCmdTrackfinderWriteTracksToFile,                       config.trackfinderWriteTracksToFile,                                "False if the output should be placed directly into the framework interface");
 
 	writeComment(fileStream, "");
@@ -2596,8 +2838,8 @@ std::string inf::getInfo() {
 	message += "------------------------------------\n";
 	message += "CommandID";
 	message += "\t\t: ";
-	for (int i = 0; i < numberOfCmds; i++) {
-		btods(commandID[i], buffer);
+	for (unsigned int i = 0; i < getNumberOfCmds(); i++) {
+		btods(isHeaderLockSet(i), buffer);
 		message += buffer;
 	}
 	message += "\n\n";
@@ -2823,6 +3065,31 @@ std::string inf::getInfo() {
 	ustos(config.trackfinderMinClassGradingR, buffer, 10, shortConversionDigits);
 	message += buffer;
 	message += "\n";
+	message += stringCmdTrackfinderFilterType;
+	message += "\t\t\t: ";
+	ustos(config.trackfinderFilterType, buffer, 10, shortConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdTrackfinderFirstFilterGeometry;
+	message += "\t\t\t: ";
+	ustos(config.trackfinderFirstFilterGeometry, buffer, 10, shortConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdTrackfinderFirstFilterArithmetic;
+	message += "\t\t\t: ";
+	ustos(config.trackfinderFirstFilterArithmetic, buffer, 10, shortConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdTrackfinderSecondFilterGeometry;
+	message += "\t\t\t: ";
+	ustos(config.trackfinderSecondFilterGeometry, buffer, 10, shortConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdTrackfinderSecondFilterArithmetic;
+	message += "\t\t\t: ";
+	ustos(config.trackfinderSecondFilterArithmetic, buffer, 10, shortConversionDigits);
+	message += buffer;
+	message += "\n";
 	message += stringCmdTrackfinderFirstFilterNeighborhoodDim1ClearRadius;
 	message += "\t: ";
 	ustos(config.trackfinderFirstFilterNeighborhoodDim1ClearRadius, buffer, 10, shortConversionDigits);
@@ -2847,6 +3114,25 @@ std::string inf::getInfo() {
 	message += "\t: ";
 	ustos(config.trackfinderSecondFilterNeighborhoodDim3ClearRadius, buffer, 10, shortConversionDigits);
 	message += buffer;
+	message += "\n";
+	message += stringCmdTrackfinderAutomaticFilterCoverPercentage;
+	message += "\t: ";
+	ustos(config.trackfinderAutomaticFilterCoverPercentage, buffer, 10, shortConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdTrackfinderAutomaticFilterDataPercentage;
+	message += "\t: ";
+	ustos(config.trackfinderAutomaticFilterDataPercentage, buffer, 10, shortConversionDigits);
+	message += buffer;
+	message += "\n";
+	message += stringCmdTrackfinderAutomaticFilterWrite;
+	message += "\t\t: ";
+	btobs(config.trackfinderAutomaticFilterWrite, buffer);
+	message += buffer;
+	message += "\n";
+	message += stringCmdTrackfinderAutomaticFilterFileName;
+	message += "\t\t: ";
+	message += config.trackfinderAutomaticFilterFileName;
 	message += "\n";
 	message += stringCmdTrackfinderWriteTracksToFile;
 	message += "\t\t: ";

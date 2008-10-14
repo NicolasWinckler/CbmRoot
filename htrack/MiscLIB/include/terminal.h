@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:35:54 $
-/// $Revision: 1.1 $
+/// $Date: 2008-10-07 10:38:51 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -60,6 +60,7 @@ typedef struct {
  * @param terminal is the buffer to print
  * @param startText is the constant beginning of the text to print
  * @param statusMax is the maximal absolute value which is set for 100 percent
+ * @param statusDiv divides the maximal absolute value which is set for 100 percent just for the screen
  * @param relative formats the output to percent or absolute number
  * @param newline prints a newline after the last output or not
  * @param previous sets up the first percent number to be printed
@@ -67,7 +68,7 @@ typedef struct {
  * @return sequence is the struct consisting all needed information for the functionality
  */
 
-void createTerminalStatusSequence(terminalSequence* sequence, std::streambuf* terminal, std::string startText, int statusMax, bool relative = true, bool newline = true, int previous = 0, int radix = 10);
+void createTerminalStatusSequence(terminalSequence* sequence, std::streambuf* terminal, std::string startText, int statusMax, int statusDiv = 1, bool relative = true, bool newline = true, int previous = 0, int radix = 10);
 
 /**
  * This method initializes the terminal for overwriting.

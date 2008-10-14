@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-12-13 13:48:58 $
-/// $Revision: 1.7 $
+/// $Date: 2008-10-07 10:36:50 $
+/// $Revision: 1.9 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -34,10 +34,10 @@
 
 
 #include "../../MiscLIB/include/defs.h"
-#ifdef CBMROOTFRAMEWORK
-	#include "CbmField.h"
-#else
+#if (ARCHITECTURE == STANDALONE)
 	#include "../../RootFrameworkLIB/include/CbmField.h"
+#elif (ARCHITECTURE == CBMROOT)
+	#include "CbmField.h"
 #endif
 #include "../../DataObjectLIB/include/magneticFieldValue.h"
 #include "trackfinderInputHit.h"

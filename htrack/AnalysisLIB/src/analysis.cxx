@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-06-26 12:32:50 $
-// $Revision: 1.34 $
+// $Date: 2008-10-07 10:34:05 $
+// $Revision: 1.38 $
 //
 // *******************************************************************/
 
@@ -33,7 +33,6 @@
 #include "../../MiscLIB/include/terminal.h"
 #include "../../MiscLIB/include/conversionRoutines.h"
 #include "../../DataObjectLIB/include/analyticFormula.h"
-#include "../../DataObjectLIB/include/histogramCellSignatures.h"
 #include "../../LutGeneratorLIB/include/prelutMath.h"
 #include "../../LutGeneratorLIB/include/digitalHitAccess.h"
 #include "../../LutGeneratorLIB/include/prelutAccess.h"
@@ -54,6 +53,9 @@
 
 #define           numberOfVolumes 3
 const std::string volumes[numberOfVolumes] = {"cave", "pipevac", "sts"};
+
+
+#undef TRANSFORMPREVIEW2D							/**< This definition switches the transform preview function to use a 3D or a special 2D widened mode. */
 
 
 #define sqr(a)  ((a) * (a)) 
@@ -141,8 +143,13 @@ void analysis::initializeMagnetfieldEvaluation() {
 
 void analysis::finalizeAlgorithmEvaluation() {
 
+	if (eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+	if (*eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+
 	if (qualityAnalyser != NULL)
-		qualityAnalyser->finalizeEvaluation(getNumberOfTracksWithP());
+		qualityAnalyser->finalizeEvaluation((*eventData)->getNumberOfHits(), getNumberOfTracksWithP());
 
 	if (momentumAnalyser != NULL)
 		momentumAnalyser->finalizeEvaluation();
@@ -264,7 +271,7 @@ void analysis::trackToNoPeak(trackfinderInputTrack& actualTrack) {
 
 	if (projectionAnalyser != NULL) {
 
-		if (computeCoordinates(actualTrack, &actualCoordinates))
+		if (estimateCoordinates(actualTrack, &actualCoordinates))
 			projectionAnalyser->trackToNoPeak(actualCoordinates);
 	
 	}
@@ -677,11 +684,206 @@ unsigned short analysis::evaluatePeakContribution(trackDigitalInformation& track
 }
 
 /****************************************************************
- * method computes the coordinates in the Hough space for a		*
+ * method previews the Hough space transformation for a track.	*
+ ****************************************************************/
+
+histogramCellSignature analysis::transformPreview(trackfinderInputTrack& track, trackCoordinates& estimation) {
+
+#ifdef TRANSFORMPREVIEW2D
+
+	prelutHoughBorder*              firstBorder;
+	lutHoughBorder*                 secondBorder;
+	hitsInHistogramBorderFrequency* histogramBorderFrequency;
+	unsigned short                  numberOfHistogramBorderEntries;
+	histogramCellSignatures         cellSignatures;
+	histogramCellSignature          bestCellSignature;
+	unsigned short                  i;
+	trackfinderInputHit*            hit;
+	unsigned short                  stationIndex;
+	prelutHoughBorder               evaluateFirstBorder;
+	lutBorder                       border;
+	unsigned short                  borderIndex;
+	hitsInHistogramBorderFrequency  maximumHistogramBorderFrequency;
+	houghBorderPosition             actualPosition;
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(ANALYSISLIB);
+
+	if ((luts == NULL) || (*luts == NULL))
+		throw cannotAccessLutsError();
+
+	firstBorder                    = border.getPrelutHoughBorderPointer();
+	secondBorder                   = border.getLutHoughBorderPointer();
+	histogramBorderFrequency       = NULL;
+	numberOfHistogramBorderEntries = 0;
+	cellSignatures.reset();
+	track.resetHitPointer();
+
+	for (i = 0; i < track.getNumberOfHits(); i++) {
+
+		hit = track.getHit();
+		if (hit == NULL)
+			throw cannotAccessHitsOrTracksError(ANALYSISLIB);
+
+		(*luts)->evaluatePrelut(hit, &evaluateFirstBorder);
+
+		for (unsigned short j = evaluateFirstBorder.start; j <= evaluateFirstBorder.stop; j++) {
+
+			if (numberOfHistogramBorderEntries == 0) {
+
+				numberOfHistogramBorderEntries        = 1;
+				histogramBorderFrequency              = (hitsInHistogramBorderFrequency*)calloc(numberOfHistogramBorderEntries, sizeof(hitsInHistogramBorderFrequency));
+				histogramBorderFrequency[0].border    = j;
+				histogramBorderFrequency[0].frequency = 1;
+
+			}
+			else {
+					
+				borderIndex = numberOfHistogramBorderEntries;
+				for (unsigned short k = 0; k < numberOfHistogramBorderEntries; k++) {
+
+					if (histogramBorderFrequency[k].border == j) {
+
+						borderIndex = k;
+						break;
+
+					}
+
+				}
+					
+				if (borderIndex == numberOfHistogramBorderEntries) {
+
+					numberOfHistogramBorderEntries++;
+					histogramBorderFrequency                        = (hitsInHistogramBorderFrequency*)realloc(histogramBorderFrequency, numberOfHistogramBorderEntries * sizeof(hitsInHistogramBorderFrequency));
+					histogramBorderFrequency[borderIndex].border    = j;
+					histogramBorderFrequency[borderIndex].frequency = 1;
+
+				}
+				else
+					histogramBorderFrequency[borderIndex].frequency++;
+
+			}
+
+		}
+
+	}
+
+	maximumHistogramBorderFrequency.frequency = 0;
+	maximumHistogramBorderFrequency.distance  = 0;
+	for (i = 0; i < numberOfHistogramBorderEntries; i++) {
+
+		histogramBorderFrequency[i].distance = sqrt((double)sqr(histogramBorderFrequency[i].border - estimation.get(DIM3)));
+
+		if (histogramBorderFrequency[i].frequency > maximumHistogramBorderFrequency.frequency)
+			maximumHistogramBorderFrequency = histogramBorderFrequency[i];
+		else if ((histogramBorderFrequency[i].frequency == maximumHistogramBorderFrequency.frequency) && (histogramBorderFrequency[i].distance < maximumHistogramBorderFrequency.distance))
+			maximumHistogramBorderFrequency = histogramBorderFrequency[i];
+
+	}
+
+	if (histogramBorderFrequency != NULL) {
+		free(histogramBorderFrequency);
+		histogramBorderFrequency       = NULL;
+		numberOfHistogramBorderEntries = 0;
+	}
+
+	for (i = 0; i < track.getNumberOfHits(); i++) {
+
+		hit = track.getHit();
+		if (hit == NULL)
+			throw cannotAccessHitsOrTracksError(ANALYSISLIB);
+
+		if (hit->getStation() == NULL)
+			throw cannotAccessStationError(ANALYSISLIB);
+		else
+			stationIndex = hit->getStation()->getIndex();
+
+		(*luts)->evaluate(hit, &border);
+
+		if ((firstBorder->start <= maximumHistogramBorderFrequency.border) && (firstBorder->stop >= maximumHistogramBorderFrequency.border)) {
+
+			secondBorder->houghCoord.resetActiveObject();
+			for (unsigned short l = 0; l < secondBorder->houghCoord.getNumberOfEntries(); l++) {
+
+				actualPosition = secondBorder->houghCoord.readActiveObjectAndMakeNextOneActive();
+
+				cellSignatures.add(actualPosition, stationIndex);
+
+			}
+
+		}
+
+	}
+
+	bestCellSignature = cellSignatures.getBest(estimation);
+
+	cellSignatures.reset();
+
+	return bestCellSignature;
+
+#else
+
+	lutBorder               border;
+	prelutHoughBorder*      firstBorder;
+	lutHoughBorder*         secondBorder;
+	histogramCellSignatures cellSignatures;
+	histogramCellSignature  bestCellSignature;
+	trackfinderInputHit*    hit;
+	unsigned short          stationIndex;
+	houghBorderPosition     actualPosition;
+
+	if ((luts == NULL) || (*luts == NULL))
+		throw cannotAccessLutsError();
+
+	firstBorder  = border.getPrelutHoughBorderPointer();
+	secondBorder = border.getLutHoughBorderPointer();
+	cellSignatures.reset();
+	track.resetHitPointer();
+
+	for (unsigned short i = 0; i < track.getNumberOfHits(); i++) {
+
+		hit = track.getHit();
+		if (hit == NULL)
+			throw cannotAccessHitsOrTracksError(ANALYSISLIB);
+
+		if (hit->getStation() == NULL)
+			throw cannotAccessStationError(ANALYSISLIB);
+		else
+			stationIndex = hit->getStation()->getIndex();
+
+		(*luts)->evaluate(hit, &border);
+
+		for (unsigned short j = firstBorder->start; j <= firstBorder->stop; j++) {
+
+			secondBorder->houghCoord.resetActiveObject();
+			for (unsigned short k = 0; k < secondBorder->houghCoord.getNumberOfEntries(); k++) {
+
+				actualPosition = secondBorder->houghCoord.readActiveObjectAndMakeNextOneActive();
+
+				cellSignatures.add(actualPosition, j, stationIndex);
+
+			}
+
+		}
+
+	}
+
+	bestCellSignature = cellSignatures.getBest(estimation);
+
+	cellSignatures.reset();
+
+	return bestCellSignature;
+
+#endif
+
+}
+
+/****************************************************************
+ * method estimates the coordinates in the Hough space for a	*
  * track.														*
  ****************************************************************/
 
-bool analysis::computeCoordinates(trackfinderInputTrack& track, trackCoordinates* coordinates) {
+bool analysis::estimateCoordinates(trackfinderInputTrack& track, trackCoordinates* coordinates) {
 	
 	bool                   returnValue;
 	trackMomentum          actualMomentum;
@@ -778,42 +980,42 @@ bool analysis::computeCoordinates(trackfinderInputTrack& track, trackCoordinates
 }
 
 /****************************************************************
- * method searches all tracks to find the findable ones and to	*
- * computer their position in the Hough space.					*
+ * method computes the coordinates in the Hough space for a		*
+ * track.														*
  ****************************************************************/
 
-void analysis::setupFindableTracks(std::list<findableTrack>* findableTracks) {
+bool analysis::computeCoordinates(trackfinderInputTrack& track, trackCoordinates* coordinates) {
 
-	trackfinderInputTrack* actualMCTrack;
-	trackCoordinates       estimatedPosition;
-	findableTrack          actualFindableTrack;
+	bool                   returnValue;
+	trackCoordinates       estimatedCoordinates;
+	histogramCellSignature bestCellSignature;
 
-	if (eventData == NULL)
-		throw cannotAccessEventDataError(ANALYSISLIB);
-	if (*eventData == NULL)
-		throw cannotAccessEventDataError(ANALYSISLIB);
+	if (coordinates == NULL)
+		throw cannotAccessTrackCoordinatesError();
 
-	if (findableTracks == NULL)
-		throw cannotAccessFindableTracksMemoryError();
+	returnValue       = false;
+	estimateCoordinates(track, &estimatedCoordinates);
 
-	for (int i = 0; i < (*eventData)->getNumberOfTracks(); i++) {
+	bestCellSignature = transformPreview(track, estimatedCoordinates);
 
-		actualMCTrack = (*eventData)->getTrackByOrder(i);
-		if (actualMCTrack == NULL)
-			throw cannotAccessHitsOrTracksError(ANALYSISLIB);
+	if ((bestCellSignature.pos.get(DIM1) < (*space)->getStep(DIM1)) && (bestCellSignature.pos.get(DIM2) < (*space)->getStep(DIM2)) && (bestCellSignature.pos.get(DIM3) < (*space)->getStep(DIM3))) {
 
-		if (isFindableStandardTrack(actualMCTrack)) {
+		*coordinates = bestCellSignature.pos;
+		returnValue  = true;
 
-			if (computeCoordinates(*actualMCTrack, &estimatedPosition)) {
+	}
+	else {
 
-				actualFindableTrack.setParameter(actualMCTrack, estimatedPosition);
-				findableTracks->push_back(actualFindableTrack);
-
-			}
-
+		positionIsOutOfSpaceWarningMsg* positionIsOutOfSpace = new positionIsOutOfSpaceWarningMsg(*space, &estimatedCoordinates);
+		positionIsOutOfSpace->warningMsg();
+		if(positionIsOutOfSpace != NULL) {
+			delete positionIsOutOfSpace;
+			positionIsOutOfSpace = NULL;
 		}
 
 	}
+
+	return returnValue;
 
 }
 
@@ -840,6 +1042,7 @@ analysis::analysis() {
 	hardwareAnalyser               = NULL;
 	mcTrackVisualAnalyser          = NULL;
 	foundTrackVisualAnalyser       = NULL;
+	peakfindingGeometryAnalyser         = NULL;
 
 	minimumP                       = 0;
 
@@ -897,6 +1100,7 @@ analysis::analysis(initialParameter parameters,
 	hardwareAnalyser               = NULL;
 	mcTrackVisualAnalyser          = NULL;
 	foundTrackVisualAnalyser       = NULL;
+	peakfindingGeometryAnalyser         = NULL;
 
 	minimumP                       = parameters.minP;
 
@@ -929,6 +1133,7 @@ analysis::analysis(initialParameter parameters,
 	allocatedSizeOfLBufferData     = 0;
 	usedSizeOfLBufferData          = 0;
 
+	initAutomaticFilterGeometryAnalysis(parameters.histogram, parameters.initAutomatcFilterGeometry);
 	initQualityEFGCEventAbsoluteAnalysis(parameters.initQualityEFGCEventAbsolute);
 	initQualityEFGCEventRelativeAnalysis(parameters.initQualityEFGCEventRelative);
 	initQualityEFGCTotalAbsoluteAnalysis(parameters.initQualityEFGCTotalAbsolute);
@@ -960,7 +1165,7 @@ analysis::analysis(initialParameter parameters,
 
 	initMagnetfieldAnalysisDisplay(parameters.initMagnetfieldDisplay);
 
-	initHistogramAnalysis(initHistogramAnalysisToRoot, parameters.histogram);
+	initHistogramAnalysis(parameters.histogram, initHistogramAnalysisToRoot);
 
 	initPrelutRangeAnalysis(parameters.initPrelutRange);
 	initPrelutRangeAnalysisDisplay(parameters.initPrelutRangeDisplay, parameters.initPrelutRangeDisplayMode);
@@ -993,6 +1198,7 @@ analysis::analysis(initialParameter parameters,
 	hardwareAnalyser               = NULL;
 	mcTrackVisualAnalyser          = NULL;
 	foundTrackVisualAnalyser       = NULL;
+	peakfindingGeometryAnalyser         = NULL;
 
 	minimumP                       = parameters.minP;
 
@@ -1025,6 +1231,7 @@ analysis::analysis(initialParameter parameters,
 	allocatedSizeOfLBufferData     = 0;
 	usedSizeOfLBufferData          = 0;
 
+	initAutomaticFilterGeometryAnalysis(parameters.histogram, parameters.initAutomatcFilterGeometry);
 	initQualityEFGCEventAbsoluteAnalysis(parameters.initQualityEFGCEventAbsolute);
 	initQualityEFGCEventRelativeAnalysis(parameters.initQualityEFGCEventRelative);
 	initQualityEFGCTotalAbsoluteAnalysis(parameters.initQualityEFGCTotalAbsolute);
@@ -1129,6 +1336,10 @@ analysis::~analysis() {
 		delete foundTrackVisualAnalyser;
 		foundTrackVisualAnalyser = NULL;
 	}
+	if (peakfindingGeometryAnalyser != NULL) {
+		delete peakfindingGeometryAnalyser;
+		peakfindingGeometryAnalyser = NULL;
+	}
 	if (pictures != NULL) {
 		delete pictures;
 		pictures = NULL;
@@ -1202,6 +1413,7 @@ void analysis::init(initialParameter parameters,
 		pictures = NULL;
 	}
 
+	initAutomaticFilterGeometryAnalysis(parameters.histogram, parameters.initAutomatcFilterGeometry);
 	initQualityEFGCEventAbsoluteAnalysis(parameters.initQualityEFGCEventAbsolute);
 	initQualityEFGCEventRelativeAnalysis(parameters.initQualityEFGCEventRelative);
 	initQualityEFGCTotalAbsoluteAnalysis(parameters.initQualityEFGCTotalAbsolute);
@@ -1232,7 +1444,7 @@ void analysis::init(initialParameter parameters,
 
 	initMagnetfieldAnalysisDisplay(parameters.initMagnetfieldDisplay);
 
-	initHistogramAnalysis(initHistogramAnalysisToRoot, parameters.histogram);
+	initHistogramAnalysis(parameters.histogram, initHistogramAnalysisToRoot);
 
 	initPrelutRangeAnalysis(parameters.initPrelutRange);
 	initPrelutRangeAnalysisDisplay(parameters.initPrelutRangeDisplay, parameters.initPrelutRangeDisplayMode);
@@ -1275,6 +1487,7 @@ void analysis::init(initialParameter parameters,
 		pictures = NULL;
 	}
 
+	initAutomaticFilterGeometryAnalysis(parameters.histogram, parameters.initAutomatcFilterGeometry);
 	initQualityEFGCEventAbsoluteAnalysis(parameters.initQualityEFGCEventAbsolute);
 	initQualityEFGCEventRelativeAnalysis(parameters.initQualityEFGCEventRelative);
 	initQualityEFGCTotalAbsoluteAnalysis(parameters.initQualityEFGCTotalAbsolute);
@@ -1322,6 +1535,179 @@ void analysis::init(initialParameter parameters,
 	initHardwareTracksPerRowAnalysis(parameters.initTracksPerRow);
 	initHardwareTracksPerLayerAnalysis(parameters.initTracksPerLayer);
 	initHardwareHitReadoutDistributionAnalysis(parameters.initHitReadoutDistribution);
+
+}
+
+/****************************************************************
+ * method searches all tracks to find the findable ones and to	*
+ * computer their estimated position in the Hough space.		*
+ ****************************************************************/
+
+void analysis::setupFindableEstimatedTracks(std::list<findableTrack>* findableTracks, std::streambuf* terminal) {
+
+	trackfinderInputTrack* actualMCTrack;
+	trackCoordinates       estimatedPosition;
+	findableTrack          actualFindableTrack;
+	terminalSequence       statusSequenceForFindableTracks;
+
+	if (eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+	if (*eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+
+	if (findableTracks == NULL)
+		throw cannotAccessFindableTracksMemoryError();
+
+	createTerminalStatusSequence(&statusSequenceForFindableTracks, terminal, "\nSetup findable estimated tracks:\t\t\t", (*eventData)->getNumberOfTracks());
+	terminalInitialize(statusSequenceForFindableTracks);
+
+	findableTracks->clear();
+
+	for (int i = 0; i < (*eventData)->getNumberOfTracks(); i++) {
+
+		actualMCTrack = (*eventData)->getTrackByOrder(i);
+		if (actualMCTrack == NULL)
+			throw cannotAccessHitsOrTracksError(ANALYSISLIB);
+
+		if (isFindableStandardTrack(actualMCTrack)) {
+
+			if (estimateCoordinates(*actualMCTrack, &estimatedPosition)) {
+
+				actualFindableTrack.setParameter(actualMCTrack, estimatedPosition);
+				findableTracks->push_back(actualFindableTrack);
+
+			}
+
+		}
+
+		terminalOverwrite(statusSequenceForFindableTracks, i + 1);
+
+	}
+
+	terminalFinalize(statusSequenceForFindableTracks);
+
+}
+
+/****************************************************************
+ * method searches all tracks to find the findable ones and to	*
+ * computer their computed position in the Hough space.			*
+ ****************************************************************/
+
+void analysis::setupFindableComputedTracks(std::list<findableTrack>* findableTracks, std::streambuf* terminal) {
+
+	trackfinderInputTrack* actualMCTrack;
+	trackCoordinates       estimatedPosition;
+	findableTrack          actualFindableTrack;
+	terminalSequence       statusSequenceForFindableTracks;
+
+	if (eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+	if (*eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+
+	if (findableTracks == NULL)
+		throw cannotAccessFindableTracksMemoryError();
+
+	createTerminalStatusSequence(&statusSequenceForFindableTracks, terminal, "\nSetup findable computed tracks:\t\t\t", (*eventData)->getNumberOfTracks());
+	terminalInitialize(statusSequenceForFindableTracks);
+
+	findableTracks->clear();
+
+	for (int i = 0; i < (*eventData)->getNumberOfTracks(); i++) {
+
+		actualMCTrack = (*eventData)->getTrackByOrder(i);
+		if (actualMCTrack == NULL)
+			throw cannotAccessHitsOrTracksError(ANALYSISLIB);
+
+		if (isFindableStandardTrack(actualMCTrack)) {
+
+			if (computeCoordinates(*actualMCTrack, &estimatedPosition)) {
+
+				actualFindableTrack.setParameter(actualMCTrack, estimatedPosition);
+				findableTracks->push_back(actualFindableTrack);
+
+			}
+
+		}
+
+		terminalOverwrite(statusSequenceForFindableTracks, i + 1);
+
+	}
+
+	terminalFinalize(statusSequenceForFindableTracks);
+
+}
+
+/****************************************************************
+ * method resets the peakfinding geometry for the actual layers	*
+ ****************************************************************/
+
+void analysis::resetPeakfindingLayerGeometryElements() {
+
+	if (peakfindingGeometryAnalyser != NULL)
+		peakfindingGeometryAnalyser->resetPeakfindingLayerGeometryElements();
+	else
+		throw cannotAccessPeakfindingGeometryAnalyserError();
+
+}
+
+/****************************************************************
+ * method resets the actual used peakfinding geometry			*
+ ****************************************************************/
+
+void analysis::resetPeakfindingGeometryElements() {
+
+	if (peakfindingGeometryAnalyser != NULL)
+		peakfindingGeometryAnalyser->resetPeakfindingGeometryElements();
+	else
+		throw cannotAccessPeakfindingGeometryAnalyserError();
+
+}
+
+/****************************************************************
+ * method adds the geometry of the actual layer to the other	*
+ * layers														*
+ ****************************************************************/
+
+void analysis::addPeakfindingLayerGeometry(unsigned short layer) {
+
+	if (peakfindingGeometryAnalyser != NULL)
+		peakfindingGeometryAnalyser->addPeakfindingLayerGeometry(layer);
+	else
+		throw cannotAccessPeakfindingGeometryAnalyserError();
+
+}
+
+/****************************************************************
+ * method updates the used peakfinding geometry by adding the	*
+ * geometry of the actual layers								*
+ ****************************************************************/
+
+void analysis::updatePeakfindingGeometry(trackCoordinates& center) {
+
+	if (peakfindingGeometryAnalyser != NULL)
+		peakfindingGeometryAnalyser->updatePeakfindingGeometry(center);
+	else
+		throw cannotAccessPeakfindingGeometryAnalyserError();
+
+}
+
+/****************************************************************
+ * method returns the peakfinding geometry						*
+ ****************************************************************/
+
+peakfindingGeometry analysis::getPeakfindingGeometry() {
+
+	peakfindingGeometry returnValue;
+
+	returnValue.reset();
+
+	if (peakfindingGeometryAnalyser != NULL)
+		returnValue = peakfindingGeometryAnalyser->getPeakfindingGeometry();
+	else
+		throw cannotAccessPeakfindingGeometryAnalyserError();
+
+	return returnValue;
 
 }
 
@@ -1662,7 +2048,7 @@ void analysis::evaluateMagnetfieldFactors(bool isFirstEvent, bool averagingFacto
 	/* this function creates a std::list which includes pointers to all
 	 * findable tracks and their corresponding position in the Hough
 	 * space */
-	setupFindableTracks(&findableTracks);
+	setupFindableEstimatedTracks(&findableTracks, terminal);
 
 	/* the counter for the number of hits which have no entry in the
 	 * correct third dimension */
@@ -1674,7 +2060,7 @@ void analysis::evaluateMagnetfieldFactors(bool isFirstEvent, bool averagingFacto
 	 * value */
 	(*luts)->resetCorrectionCounter();
 
-	createTerminalStatusSequence(&statusSequenceForFactors, terminal, "\nAnalyse magnetfield factors:\t", magnetfieldFactorAnalyser->getNumberOfFactors() * findableTracks.size());
+	createTerminalStatusSequence(&statusSequenceForFactors, terminal, "Analyse magnetfield factors:\t", magnetfieldFactorAnalyser->getNumberOfFactors() * findableTracks.size());
 	terminalInitialize(statusSequenceForFactors);
 
 	/* loop to evaluate the minimal distance for each magnetfield factor */
@@ -1885,9 +2271,9 @@ void analysis::evaluatePrelutRange(bool isFirstEvent, bool averagingFactors, boo
 	/* this function creates a std::list which includes pointers to all
 	 * findable tracks and their corresponding position in the Hough
 	 * space */
-	setupFindableTracks(&findableTracks);
+	setupFindableEstimatedTracks(&findableTracks, terminal);
 
-	createTerminalStatusSequence(&statusSequenceForDim3EntryRange, terminal, "\nAnalyse prelut range:\t\t\t\t", findableTracks.size() * prelutRangeLayerAnalyser->getNumberOfMinFactors() * prelutRangeLayerAnalyser->getNumberOfMaxFactors());
+	createTerminalStatusSequence(&statusSequenceForDim3EntryRange, terminal, "Analyse prelut range:\t\t\t\t", findableTracks.size() * prelutRangeLayerAnalyser->getNumberOfMinFactors() * prelutRangeLayerAnalyser->getNumberOfMaxFactors());
 	terminalInitialize(statusSequenceForDim3EntryRange);
 
 	histogramBorderFrequency       = NULL;
@@ -2206,9 +2592,9 @@ void analysis::evaluatePrelutGoodness(std::streambuf* terminal) {
 	/* this function creates a std::list which includes pointers to all
 	 * findable tracks and their corresponding position in the Hough
 	 * space */
-	setupFindableTracks(&findableTracks);
+	setupFindableEstimatedTracks(&findableTracks, terminal);
 
-	createTerminalStatusSequence(&statusSequenceForPrelut, terminal, "\nAnalyse prelut goodness:\t", findableTracks.size());
+	createTerminalStatusSequence(&statusSequenceForPrelut, terminal, "Analyse prelut goodness:\t", findableTracks.size());
 	terminalInitialize(statusSequenceForPrelut);
 
 	for (i = 0; i < NUMBEROFDIFFERENTCORRECTHITS; i++) {
@@ -2683,7 +3069,7 @@ void analysis::evaluateLutGoodness(std::streambuf* terminal) {
 
 	distanceOfMaximumCellAndCorrectCell = 0;
 	numberOfTracksWithGoodLutSignature  = 0;
-	terminalString                      = "\nAnalyse lut goodness:\t\t";
+	terminalString                      = "Analyse lut goodness:\t\t";
 
 	evaluateLutDistribution(numberOfTracksWithSignature, numberOfTracksWithPercentCorrectHits, numberOfTracksWithPercentHits, &distanceOfMaximumCellAndCorrectCell, &numberOfTracksWithGoodLutSignature, terminalString, terminal);
 
@@ -2875,7 +3261,7 @@ void analysis::evaluateLutDistribution(unsigned int* numberOfTracksWithSignature
 	/* this function creates a std::list which includes pointers to all
 	 * findable tracks and their corresponding position in the Hough
 	 * space */
-	setupFindableTracks(&findableTracks);
+	setupFindableEstimatedTracks(&findableTracks, terminal);
 
 	createTerminalStatusSequence(&statusSequenceForLut, terminal, terminalString, findableTracks.size());
 	terminalInitialize(statusSequenceForLut);
@@ -2968,49 +3354,25 @@ void analysis::evaluateLutDistribution(unsigned int* numberOfTracksWithSignature
 
 void analysis::evaluateBothLutsDistribution(unsigned int* numberOfTracksWithHits, std::string terminalString, std::streambuf* terminal) {
 
-	unsigned short                  i;
-	unsigned short                  trackIndex;
-	terminalSequence                statusSequenceForBothLuts;
-	std::list<findableTrack>        findableTracks;
-	trackfinderInputTrack*          track;
-	trackfinderInputHit*            hit;
-	unsigned short                  stationIndex;
-	prelutHoughBorder               evaluateFirstBorder;
-	lutBorder                       border;
-	prelutHoughBorder*              firstBorder;
-	lutHoughBorder*                 secondBorder;
-	hitsInHistogramBorderFrequency* histogramBorderFrequency;
-	unsigned short                  numberOfHistogramBorderEntries;
-	unsigned short                  borderIndex;
-	hitsInHistogramBorderFrequency  maximumHistogramBorderFrequency;
-	houghBorderPosition             actualPosition;
-	histogramCellSignatures         cellSignatures;
-	histogramCellSignature          bestCellSignature;
-
-	if ((space == NULL) || (*space == NULL))
-		throw cannotAccessHistogramSpaceError(ANALYSISLIB);
-
-	if ((luts == NULL) || (*luts == NULL))
-		throw cannotAccessLutsError();
+	unsigned short           i;
+	unsigned short           trackIndex;
+	terminalSequence         statusSequenceForBothLuts;
+	std::list<findableTrack> findableTracks;
+	trackfinderInputTrack*   track;
+	histogramCellSignature   bestCellSignature;
 
 	if (numberOfTracksWithHits == NULL)
 		throw cannotAccessDistributionMemoryError(ANALYSISLIB);
 
-	firstBorder  = border.getPrelutHoughBorderPointer();
-	secondBorder = border.getLutHoughBorderPointer();
-
 	/* this function creates a std::list which includes pointers to all
 	 * findable tracks and their corresponding position in the Hough
 	 * space */
-	setupFindableTracks(&findableTracks);
+	setupFindableEstimatedTracks(&findableTracks, terminal);
 
 	createTerminalStatusSequence(&statusSequenceForBothLuts, terminal, terminalString, findableTracks.size());
 	terminalInitialize(statusSequenceForBothLuts);
 
-	trackIndex                     = 0;
-	histogramBorderFrequency       = NULL;
-	numberOfHistogramBorderEntries = 0;
-	cellSignatures.reset();
+	trackIndex = 0;
 
 	/* loop to evaluate the prelut goodness for all findable tracks */
 	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++, trackIndex++) {
@@ -3019,121 +3381,9 @@ void analysis::evaluateBothLutsDistribution(unsigned int* numberOfTracksWithHits
 		if (track == NULL)
 			throw cannotAccessHitsOrTracksError(ANALYSISLIB);
 
-		track->resetHitPointer();
-
-		/* loop to evaluate the magnetfield factor for all hits of this track */
-		for (i = 0; i < track->getNumberOfHits(); i++) {
-
-			hit = track->getHit();
-			if (hit == NULL)
-				throw cannotAccessHitsOrTracksError(ANALYSISLIB);
-
-			/* compute the borders for this hit */
-			(*luts)->evaluatePrelut(hit, &evaluateFirstBorder);
-
-			/* Accumulate the frequency of the third dimension border */
-			for (unsigned short j = evaluateFirstBorder.start; j <= evaluateFirstBorder.stop; j++) {
-
-				if (numberOfHistogramBorderEntries == 0) {
-
-					numberOfHistogramBorderEntries        = 1;
-					histogramBorderFrequency              = (hitsInHistogramBorderFrequency*)calloc(numberOfHistogramBorderEntries, sizeof(hitsInHistogramBorderFrequency));
-					histogramBorderFrequency[0].border    = j;
-					histogramBorderFrequency[0].frequency = 1;
-
-				}
-				else {
-					
-					/* check if this border has occured until now */
-					borderIndex = numberOfHistogramBorderEntries;
-					for (unsigned short k = 0; k < numberOfHistogramBorderEntries; k++) {
-
-						if (histogramBorderFrequency[k].border == j) {
-
-							borderIndex = k;
-							break;
-
-						}
-
-					}
-					
-					/* if the border has not occured */
-					if (borderIndex == numberOfHistogramBorderEntries) {
-
-						numberOfHistogramBorderEntries++;
-						histogramBorderFrequency                        = (hitsInHistogramBorderFrequency*)realloc(histogramBorderFrequency, numberOfHistogramBorderEntries * sizeof(hitsInHistogramBorderFrequency));
-						histogramBorderFrequency[borderIndex].border    = j;
-						histogramBorderFrequency[borderIndex].frequency = 1;
-
-					}
-					/* if the border has occured */
-					else
-						histogramBorderFrequency[borderIndex].frequency++;
-
-				}
-
-			}
-
-		}
-
-		maximumHistogramBorderFrequency.frequency = 0;
-		maximumHistogramBorderFrequency.distance  = 0;
-		for (i = 0; i < numberOfHistogramBorderEntries; i++) {
-
-			histogramBorderFrequency[i].distance = sqrt((double)sqr(histogramBorderFrequency[i].border - actualTrack->getPosition().get(DIM3)));
-
-			if (histogramBorderFrequency[i].frequency > maximumHistogramBorderFrequency.frequency)
-				maximumHistogramBorderFrequency = histogramBorderFrequency[i];
-			/* This is added because if there is a equal found clone peak which is nearer to the
-			 * correct cell, this peak should be used because of a better quality approximation */
-			else if ((histogramBorderFrequency[i].frequency == maximumHistogramBorderFrequency.frequency) && (histogramBorderFrequency[i].distance < maximumHistogramBorderFrequency.distance))
-				maximumHistogramBorderFrequency = histogramBorderFrequency[i];
-
-		}
-
-		if (histogramBorderFrequency != NULL) {
-			free(histogramBorderFrequency);
-			histogramBorderFrequency       = NULL;
-			numberOfHistogramBorderEntries = 0;
-		}
-
-		/* loop to evaluate the total prelut anaylsis*/
-		for (i = 0; i < track->getNumberOfHits(); i++) {
-
-			hit = track->getHit();
-			if (hit == NULL)
-				throw cannotAccessHitsOrTracksError(ANALYSISLIB);
-
-			if (hit->getStation() == NULL)
-				throw cannotAccessStationError(ANALYSISLIB);
-			else
-				stationIndex = hit->getStation()->getIndex();
-
-			/* compute the borders for this hit */
-			(*luts)->evaluate(hit, &border);
-
-			/* Check if the third dimension border is in the range */
-			if ((firstBorder->start <= maximumHistogramBorderFrequency.border) && (firstBorder->stop >= maximumHistogramBorderFrequency.border)) {
-
-				secondBorder->houghCoord.resetActiveObject();
-				for (unsigned short l = 0; l < secondBorder->houghCoord.getNumberOfEntries(); l++) {
-
-					actualPosition = secondBorder->houghCoord.readActiveObjectAndMakeNextOneActive();
-
-					/* Accumulate the frequency of the border */
-					cellSignatures.add(actualPosition, stationIndex);
-
-				}
-
-			}
-
-		}
-
-		bestCellSignature = cellSignatures.getBest(actualTrack->getPosition());
+		bestCellSignature = transformPreview(*track, actualTrack->getPosition());
 
 		numberOfTracksWithHits[bestCellSignature.value.toULong()]++;
-
-		cellSignatures.reset();
 
 		terminalOverwrite(statusSequenceForBothLuts, trackIndex + 1);
 
@@ -3488,9 +3738,9 @@ void analysis::evaluateHoughTransformGoodness(std::streambuf* terminal) {
 	firstBorder  = border.getPrelutHoughBorderPointer();
 	secondBorder = border.getLutHoughBorderPointer();
 
-	setupFindableTracks(&findableTracks);
+	setupFindableEstimatedTracks(&findableTracks, terminal);
 
-	createTerminalStatusSequence(&statusSequenceForFormula, terminal, "\nAnalyse formula goodness:\t\t\t", findableTracks.size());
+	createTerminalStatusSequence(&statusSequenceForFormula, terminal, "Analyse formula goodness:\t\t\t", findableTracks.size());
 	terminalInitialize(statusSequenceForFormula);
 
 	trackIndex   = 0;
@@ -3675,9 +3925,9 @@ void analysis::evaluateQuantizationGoodness(std::streambuf* terminal) {
 	momentumXMax  = tan((*space)->getMax(HTHETA)) * momentumZMax;
 	momentumXIncr = (momentumXMax - momentumXMin) / ((*space)->getStep(HTHETA) - 1);
 
-	setupFindableTracks(&findableTracks);
+	setupFindableEstimatedTracks(&findableTracks, terminal);
 
-	createTerminalStatusSequence(&statusSequenceForQuantization, terminal, "\nAnalyse quantization goodness:\t\t\t", findableTracks.size());
+	createTerminalStatusSequence(&statusSequenceForQuantization, terminal, "Analyse quantization goodness:\t\t\t", findableTracks.size());
 	terminalInitialize(statusSequenceForQuantization);
 
 	for (i = 0; i < (*space)->getStep(HTHETA); i++)
@@ -3977,9 +4227,9 @@ void analysis::evaluatePeakDistanceGoodness(std::streambuf* terminal) {
 	if (accumulatedPeakDistanceDistribution == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
 
-	setupFindableTracks(&findableTracks);
+	setupFindableEstimatedTracks(&findableTracks, terminal);
 
-	createTerminalStatusSequence(&statusSequenceForPeakDistance, terminal, "\nAnalyse peak distances:\t\t\t\t", findableTracks.size());
+	createTerminalStatusSequence(&statusSequenceForPeakDistance, terminal, "Analyse peak distances:\t\t\t\t", findableTracks.size());
 	terminalInitialize(statusSequenceForPeakDistance);
 
 	for (i = 0; i < (unsigned int)(*space)->getStep(DIM1); i++)
@@ -4232,6 +4482,29 @@ void analysis::initEventAnalysis(bool enable) {
 void analysis::initClassPriorityAnalysis(bool enable) {
 
 	classPriority = enable;
+
+}
+
+/****************************************************************
+ * method initializes the type of the filter.					*
+ ****************************************************************/
+
+void analysis::initAutomaticFilterGeometryAnalysis(histogramData** histogram, bool enable) {
+
+	if (enable) {
+
+		if (peakfindingGeometryAnalyser == NULL)
+			peakfindingGeometryAnalyser = new peakfindingGeometryAnalysis(histogram);
+
+	}
+	else {
+
+		if (peakfindingGeometryAnalyser != NULL) {
+			delete peakfindingGeometryAnalyser;
+			peakfindingGeometryAnalyser = NULL;
+		}
+
+	}
 
 }
 
@@ -7386,7 +7659,7 @@ void analysis::initPrelutRangeAnalysisDisplay(bool enable, unsigned short displa
  * This method initializes the histogram analysis.				*
  ****************************************************************/
 
-void analysis::initHistogramAnalysis(bool enable, histogramData** histogram) {
+void analysis::initHistogramAnalysis(histogramData** histogram, bool enable) {
 
 	if (enable) {
 
@@ -7523,6 +7796,24 @@ bool analysis::isEventAnalysisEnabled() {
 bool analysis::isClassPriorityAnalysisEnabled() {
 
 	return classPriority;
+
+}
+
+/****************************************************************
+ * method returns true if the filterGeometry-Analysis is		*
+ * enabled.														*
+ ****************************************************************/
+
+bool analysis::isAutomaticFilterGeometryAnalysisEnabled() {
+
+	bool returnValue;
+
+	if (peakfindingGeometryAnalyser != NULL)
+		returnValue = true;
+	else
+		returnValue = false;
+
+	return returnValue;
 
 }
 
@@ -9907,6 +10198,94 @@ std::string analysis::displayMCTracks(int trackIndex) {
 bool analysis::isFoundTrackVisualizationAnalysisEnabled() {
 
 	return ((analysisMoreResultDisplays & FOUNDTRACKVISUALIZATION) | (analysisMoreResultWarnings & FOUNDTRACKVISUALIZATION));
+
+}
+
+/****************************************************************
+ * method returns true if the display of the peakfinding		*
+ * geometry is enabled.											*
+ ****************************************************************/
+
+bool analysis::isPeakfindingGeometryDisplayEnabled() {
+
+	return (analysisMoreResultDisplays & PEAKFINDINGGEOMETRYVISUALIZATION);
+
+}
+
+/****************************************************************
+ * method returns true if the display of the projected			*
+ * peakfinding geometry is enabled.								*
+ ****************************************************************/
+
+bool analysis::isProjectedPeakfindingGeometryDisplayEnabled() {
+
+	return (analysisMoreResultDisplays & PROJECTEDPEAKFINDINGGEOMETRYVISUALIZATION);
+
+}
+
+/****************************************************************
+ * method returns true if the display of the covered			*
+ * peakfinding geometry is enabled.								*
+ ****************************************************************/
+
+bool analysis::isCoveredPeakfindingGeometryDisplayEnabled() {
+
+	return (analysisMoreResultDisplays & COVEREDPEAKFINDINGGEOMETRYVISUALIZATION);
+
+}
+
+/****************************************************************
+ * method returns true if the display of the covered and		*
+ * projected peakfinding geometry is enabled.					*
+ ****************************************************************/
+
+bool analysis::isCoveredProjectedPeakfindingGeometryDisplayEnabled() {
+
+	return (analysisMoreResultDisplays & COVEREDPROJECTEDPEAKFINDINGGEOMETRYVISUALIZATION);
+
+}
+
+/****************************************************************
+ * method returns true if the message of the peakfinding		*
+ * geometry is enabled.											*
+ ****************************************************************/
+
+bool analysis::isPeakfindingGeometryMessageEnabled() {
+
+	return (analysisMoreResultWarnings & PEAKFINDINGGEOMETRYVISUALIZATION);
+
+}
+
+/****************************************************************
+ * method returns true if the message of the projected			*
+ * peakfinding geometry is enabled.								*
+ ****************************************************************/
+
+bool analysis::isProjectedPeakfindingGeometryMessageEnabled() {
+
+	return (analysisMoreResultWarnings & PROJECTEDPEAKFINDINGGEOMETRYVISUALIZATION);
+
+}
+
+/****************************************************************
+ * method returns true if the message of the covered			*
+ * peakfinding geometry is enabled.								*
+ ****************************************************************/
+
+bool analysis::isCoveredPeakfindingGeometryMessageEnabled() {
+
+	return (analysisMoreResultWarnings & COVEREDPEAKFINDINGGEOMETRYVISUALIZATION);
+
+}
+
+/****************************************************************
+ * method returns true if the message of the covered and		*
+ * projected peakfinding geometry is enabled.					*
+ ****************************************************************/
+
+bool analysis::isCoveredProjectedPeakfindingGeometryMessageEnabled() {
+
+	return (analysisMoreResultWarnings & COVEREDPROJECTEDPEAKFINDINGGEOMETRYVISUALIZATION);
 
 }
 

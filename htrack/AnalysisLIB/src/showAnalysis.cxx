@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-12-28 14:40:07 $
-// $Revision: 1.15 $
+// $Date: 2008-08-14 12:29:27 $
+// $Revision: 1.16 $
 //
 // *******************************************************************/
 
@@ -2104,7 +2104,7 @@ void showAnalysis::addDim1PeakDistanceDistribution(unsigned int* array, unsigned
 		arrayY[0] =  0.0;
 		for (i = 0; i < numberOfEntries; i++) {
 
-			mean += (double)array[i] / (double)numberOfTracks;
+			mean += (double)(i * array[i]) / (double)numberOfTracks;
 		
 			arrayX[i + 1] = (double)i;
 			arrayY[i + 1] = (double)(array[i] * 100)  / (double)numberOfTracks;
@@ -2197,7 +2197,7 @@ void showAnalysis::addDim2PeakDistanceDistribution(unsigned int* array, unsigned
 		arrayY[0] =  0.0;
 		for (i = 0; i < numberOfEntries; i++) {
 
-			mean += (double)array[i] / (double)numberOfTracks;
+			mean += (double)(i * array[i]) / (double)numberOfTracks;
 		
 			arrayX[i + 1] = (double)i;
 			arrayY[i + 1] = (double)(array[i] * 100)  / (double)numberOfTracks;
@@ -2290,7 +2290,7 @@ void showAnalysis::addDim3PeakDistanceDistribution(unsigned int* array, unsigned
 		arrayY[0] =  0.0;
 		for (i = 0; i < numberOfEntries; i++) {
 
-			mean += (double)array[i] / (double)numberOfTracks;
+			mean += (double)(i * array[i]) / (double)numberOfTracks;
 		
 			arrayX[i + 1] = (double)i;
 			arrayY[i + 1] = (double)(array[i] * 100)  / (double)numberOfTracks;
@@ -2383,7 +2383,7 @@ void showAnalysis::addAccumulatedPeakDistanceDistribution(unsigned int* array, u
 		arrayY[0] =  0.0;
 		for (i = 0; i < numberOfEntries; i++) {
 
-			mean += (double)array[i] / (double)numberOfTracks;
+			mean += (double)(i * array[i]) / (double)numberOfTracks;
 		
 			arrayX[i + 1] = (double)i;
 			arrayY[i + 1] = (double)(array[i] * 100)  / (double)numberOfTracks;

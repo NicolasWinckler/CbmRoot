@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-10-19 14:33:05 $
-// $Revision: 1.5 $
+// $Date: 2008-08-14 12:33:08 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -59,7 +59,7 @@ void histogramData::allocateMemory(std::streambuf* terminal) {
 		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
 
 #ifndef CALLOC_HISTOGRAM_RUNTIME
- 
+
 	if ((*space)->getStep(DIM1)  > maxDim1)
 		throw memoryAllocationError(DATAOBJECTLIB);
 	if ((*space)->getStep(DIM2)  > maxDim2)

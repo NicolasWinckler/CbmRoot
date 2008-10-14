@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:38:11 $
-// $Revision: 1.4 $
+// $Date: 2008-10-10 13:47:05 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -167,7 +167,7 @@ void prelutHoughBorder::setStart(std::string& value) {
 	int         radix;
 
 	temp  = value;
-	radix = extractRadix(&temp);
+	extractRadix(&radix, &temp);
 	start = stous(temp, radix);
 
 }
@@ -182,7 +182,7 @@ void prelutHoughBorder::setStop(std::string& value) {
 	int         radix;
 
 	temp  = value;
-	radix = extractRadix(&temp);
+	extractRadix(&radix, &temp);
 	stop  = stous(temp, radix);
 
 }

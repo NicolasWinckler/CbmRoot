@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/07/17 11:35:56 $
-// $Revision: 1.1 $
+// $Date: 2008-10-07 10:38:52 $
+// $Revision: 1.3 $
 //
 // *******************************************************************/
 
@@ -38,14 +38,28 @@
  * This method creates a default terminalSequence for status.	*
  ****************************************************************/
 
-void createTerminalStatusSequence(terminalSequence* sequence, std::streambuf* terminal, std::string startText, int statusMax, bool relative, bool newline, int previous, int radix) {
+void createTerminalStatusSequence(terminalSequence* sequence, std::streambuf* terminal, std::string startText, int statusMax, int statusDiv, bool relative, bool newline, int previous, int radix) {
 
+	int  localStatusMax;
+	int  localStatusDiv;
 	char buffer[intConversionDigits+1];
 	int  bufferLength;
 
 	if (sequence != NULL) {
 
-		bufferLength = itos(statusMax, buffer, radix, intConversionDigits);
+		if (statusMax > 0)
+			localStatusMax = statusMax;
+		else
+			localStatusMax = - statusMax;
+
+		if (statusDiv > 0)
+			localStatusDiv = statusDiv;
+		else if (statusDiv == 0)
+			localStatusDiv = 1;
+		else
+			localStatusDiv = - statusDiv;
+
+		bufferLength = itos(localStatusMax / localStatusDiv, buffer, radix, intConversionDigits);
 		if (bufferLength == -1)
 			bufferLength = 1;
 		sequence->terminal                  = terminal;
@@ -58,7 +72,7 @@ void createTerminalStatusSequence(terminalSequence* sequence, std::streambuf* te
 			sequence->endText               = "% of 100% (";
 			sequence->endText              += buffer;
 			sequence->endText              += ")";
-			sequence->relativityCoefficient = (double)statusMax / 100;
+			sequence->relativityCoefficient = (double)localStatusMax / 100;
 
 		}
 		else {

@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-02-29 11:43:28 $
-/// $Revision: 1.8 $
+/// $Date: 2008-10-07 10:38:29 $
+/// $Revision: 1.10 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -35,8 +35,14 @@
 #include "../../MiscLIB/include/defs.h"
 #include "../../DataObjectLIB/include/lutDefinition.h"
 #include "../../DataObjectLIB/include/lutHoughBorder.h"
+
+#if (ARCHITECTURE != PS3)
+
 #include "../../DataRootObjectLIB/include/trackfinderInputHit.h"
 #include "../../DataRootObjectLIB/include/trackfinderInputMagneticField.h"
+
+#endif
+
 #include <string>
 
 
@@ -114,7 +120,11 @@ public:
  * careful when using.
  */
 
+#if (ARCHITECTURE != PS3)
+
 	virtual trackfinderInputMagneticField* getMagneticField() = 0;
+
+#endif
 
 /**
  * This method returns the magnetic field factor to use instead of
@@ -133,7 +143,11 @@ public:
  * careful when using.
  */
 
+#if (ARCHITECTURE != PS3)
+
 	virtual void setMagneticField(trackfinderInputMagneticField* magneticField) = 0;
+
+#endif
 
 /**
  * This method sets the magnetic field factor to use instead of
@@ -179,7 +193,11 @@ public:
  * @return if borderPointer is not null, this object would consist of the computed results
  */
 
+#if (ARCHITECTURE != PS3)
+
 	virtual void evaluate(trackfinderInputHit* hit, lutHoughBorder* borderPointer = NULL) = 0;
+
+#endif
 
 };
 

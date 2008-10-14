@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/07/17 11:35:22 $
-// $Revision: 1.1 $
+// $Date: 2008-10-07 10:37:46 $
+// $Revision: 1.3 $
 //
 // *******************************************************************/
 
@@ -210,37 +210,6 @@ void cannotAccessPeakHistogramError::errorMsg() {
 
 
 /****************************************************************
- * CLASS cannotAccessHistogramError			 					*
- ****************************************************************/
-
-/****************************************************************
- * Default constructor											*
- ****************************************************************/
-
-cannotAccessHistogramError::cannotAccessHistogramError() : histogramTransformationError() {
-
-}
-
-/****************************************************************
- * Destructor													*
- ****************************************************************/
-
-cannotAccessHistogramError::~cannotAccessHistogramError() {
-
-}
-
-/****************************************************************
- * This method displays an error message.		 				*
- ****************************************************************/
-
-void cannotAccessHistogramError::errorMsg() {
-
-	printMsg("The histogram is not accessible!!!");
-
-}
-
-
-/****************************************************************
  * CLASS cannotAccessTracksError			 					*
  ****************************************************************/
 
@@ -267,5 +236,36 @@ cannotAccessTracksError::~cannotAccessTracksError() {
 void cannotAccessTracksError::errorMsg() {
 
 	printMsg("The tracks are not accessible!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS wrongPeakfindingGeometryError		 					*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+wrongPeakfindingGeometryError::wrongPeakfindingGeometryError() : histogramTransformationError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+wrongPeakfindingGeometryError::~wrongPeakfindingGeometryError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void wrongPeakfindingGeometryError::errorMsg() {
+
+	printMsg("The peakfinding geometry is wrong!!!");
 
 }

@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -51,8 +51,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-10-19 14:43:57 $
-/// $Revision: 1.3 $
+/// $Date: 2008-10-07 10:36:23 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -62,8 +62,8 @@
 
 
 #include "../../MiscLIB/include/memoryDef.h"
-#include <iostream>
 #include <bitset>
+#include <iostream>
 
 
 #define numberOfBits maxDimSH	/**< This defines the number of bits to store. */

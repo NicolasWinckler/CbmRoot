@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-12-28 14:40:06 $
-/// $Revision: 1.15 $
+/// $Date: 2008-10-10 13:45:47 $
+/// $Revision: 1.18 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -282,40 +282,6 @@ public:
  */
 
 	virtual ~cannotCreateSignatureWarningMsg();
-
-/**
- * This method display a warning message.
- */
-
-	void warningMsg();
-
-};
-
-#endif
-
-
-#ifndef _CANNOTDRAWWARNINGMSG_H
-#define _CANNOTDRAWWARNINGMSG_H
-
-/**
- * CLASS cannotDrawWarningMsg
- */
-
-class cannotDrawWarningMsg : public analysisWarningMsg {
-
-public:
-
-/**
- * Default constructor
- */
-
-	cannotDrawWarningMsg();
-
-/**
- * Destructor
- */
-
-	virtual ~cannotDrawWarningMsg();
 
 /**
  * This method display a warning message.
@@ -878,8 +844,8 @@ class analysisLutCorrectionWarningMsg : public analysisWarningMsg {
 
 private:
 
-	unsigned int borderCorrections;
-	unsigned int borderPosCorrections;	
+	unsigned long borderCorrections;
+	unsigned long borderPosCorrections;	
 
 public:
 

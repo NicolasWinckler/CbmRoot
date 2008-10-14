@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-02-29 11:38:11 $
-/// $Revision: 1.1 $
+/// $Date: 2008-10-10 13:47:04 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -57,7 +57,6 @@ class digitalHitAccessFile : public io {
 
 private:
 
-	bool                       commandID[numberOfDigitalHitAccessFileCmds];			/**< Variable to review which parameter comes from the file. */
 	digitalHitAccessFileHeader header;												/**< Struct to store all parameters. */
 	bool                       localMemory;											/**< Variable to store if the memory to read the file is local memory or not. */
 
@@ -73,7 +72,7 @@ protected:
  * This method returns the number of accepted commands.
  */
 
-	int getNumberOfCmds();
+	unsigned int getNumberOfCmds();
 
 /**
  * This method assigns the value to the corresponding parameter

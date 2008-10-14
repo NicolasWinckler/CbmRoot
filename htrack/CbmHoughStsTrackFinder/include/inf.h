@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Author(s):   Steinle / Gl‰ﬂ
+/// Author(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-02-29 11:37:24 $
-/// $Revision: 1.20 $
+/// $Date: 2008-10-10 13:46:00 $
+/// $Revision: 1.23 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -46,7 +46,7 @@ enum {ASCIIFILEFORMAT, ROOTFILEFORMAT};
 /*
  * number of commands in the file
  */
-#define numberOfCmds     144		/**< Definition of the number of parameters gettable from file. */
+#define numberOfCmds     153		/**< Definition of the number of parameters gettable from file. */
 
 
 /*
@@ -99,11 +99,20 @@ typedef struct {
 	unsigned short trackfinderMinClassCoding;							/**< Variable to store the minimal classification in the coding table to be taken into account */
 	unsigned short trackfinderMinClassGradingP;							/**< Variable to store the minimal classification in the gradingP table to be taken into account */
 	unsigned short trackfinderMinClassGradingR;							/**< Variable to store the minimal classification in the gradingR table to be taken into account */
+	unsigned short trackfinderFilterType;								/**< Variable to store the general filter type. */
+	unsigned short trackfinderFirstFilterGeometry;						/**< Variable to store the geometry of the first filter, if a special type is selected. */
+	unsigned short trackfinderFirstFilterArithmetic;					/**< Variable to store the arithmetic of the first filter, if a special type is selected. */
+	unsigned short trackfinderSecondFilterGeometry;						/**< Variable to store the geometry of the second filter, if a special type is selected. */
+	unsigned short trackfinderSecondFilterArithmetic;					/**< Variable to store the arithmetic of the second filter, if a special type is selected. */
 	unsigned short trackfinderFirstFilterNeighborhoodDim1ClearRadius;	/**< Variable to store the region of interest for the first filter in the first dimension */
 	unsigned short trackfinderFirstFilterNeighborhoodDim2ClearRadius;	/**< Variable to store the region of interest for the first filter in the second dimension */
 	unsigned short trackfinderSecondFilterNeighborhoodDim1ClearRadius;	/**< Variable to store the region of interest for the second filter in the first dimension */
 	unsigned short trackfinderSecondFilterNeighborhoodDim2ClearRadius;	/**< Variable to store the region of interest for the second filter in the second dimension */
 	unsigned short trackfinderSecondFilterNeighborhoodDim3ClearRadius;	/**< Variable to store the region of interest for the second filter in the third dimension */
+	unsigned short trackfinderAutomaticFilterCoverPercentage;			/**< Variable to store the percentage of occurence frequency for a geometry element to be used. */
+	unsigned short trackfinderAutomaticFilterDataPercentage;			/**< Variable to store the percentage of source data which should be used to generate the automatic filter. */
+	bool           trackfinderAutomaticFilterWrite;						/**< Variable to store, if the automatic filter has to be written into a file. */
+	std::string    trackfinderAutomaticFilterFileName;					/**< Variable to store the name of the file which contains the automatic filter geometry for writing or reading. */
 	bool           trackfinderWriteTracksToFile;						/**< Variable to store if the computed tracks should be written directly to the file or not. */
 	std::string    analysisOutputFileName;								/**< Variable to store the name of the file to place the graphical output */
 	double         analysisThresholdForP;								/**< Variable to store the minimal momentum of tracks to be taken into account */
@@ -208,7 +217,6 @@ class inf : public configuration {
 
 private:
 
-	bool    commandID[numberOfCmds];	/**< Variable to review which parameter comes from the file. */
 	InfData config;						/**< Struct to store all parameters. */
 
 /**
@@ -308,7 +316,7 @@ protected:
  * This method returns the number of accepted commands.
  */
 
-	int getNumberOfCmds();
+	unsigned int getNumberOfCmds();
 
 /**
  * This method is to get the default name of the file.

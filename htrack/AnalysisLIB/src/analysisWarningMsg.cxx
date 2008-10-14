@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-12-28 14:40:07 $
-// $Revision: 1.23 $
+// $Date: 2008-09-11 14:07:02 $
+// $Revision: 1.25 $
 //
 // *******************************************************************/
 
@@ -302,37 +302,6 @@ cannotCreateSignatureWarningMsg::~cannotCreateSignatureWarningMsg() {
 void cannotCreateSignatureWarningMsg::warningMsg() {
 
 	printMsg("The signature for the enabled displays cannot be created!!!");
-
-}
-
-
-/****************************************************************
- * CLASS cannotDrawWarningMsg					 				*
- ****************************************************************/
-
-/****************************************************************
- * Default constructor											*
- ****************************************************************/
-
-cannotDrawWarningMsg::cannotDrawWarningMsg() : analysisWarningMsg() {
-
-}
-
-/****************************************************************
- * Destructor													*
- ****************************************************************/
-
-cannotDrawWarningMsg::~cannotDrawWarningMsg() {
-
-}
-
-/****************************************************************
- * This method displayDirectories a warning message.	 		*
- ****************************************************************/
-
-void cannotDrawWarningMsg::warningMsg() {
-
-	printMsg("The display can not be drawn!!!");
 
 }
 
@@ -3012,7 +2981,7 @@ void dim1PeakDistanceDistributionWarningMsg::warningMsg() {
 
 			if (distribution[i] > 0) {
 
-				mean += (double)distribution[i] / (double)numberOfTracks;
+				mean += (double)(i * distribution[i]) / (double)numberOfTracks;
 
 				zeroDistribution = false;
 				temp += "Index: ";
@@ -3114,7 +3083,7 @@ void dim2PeakDistanceDistributionWarningMsg::warningMsg() {
 
 			if (distribution[i] > 0) {
 
-				mean += (double)distribution[i] / (double)numberOfTracks;
+				mean += (double)(i * distribution[i]) / (double)numberOfTracks;
 
 				zeroDistribution = false;
 				temp += "Index: ";
@@ -3216,7 +3185,7 @@ void dim3PeakDistanceDistributionWarningMsg::warningMsg() {
 
 			if (distribution[i] > 0) {
 
-				mean += (double)distribution[i] / (double)numberOfTracks;
+				mean += (double)(i * distribution[i]) / (double)numberOfTracks;
 
 				zeroDistribution = false;
 				temp += "Index: ";
@@ -3318,7 +3287,7 @@ void accumulatedPeakDistanceDistributionWarningMsg::warningMsg() {
 
 			if (distribution[i] > 0) {
 
-				mean += (double)distribution[i] / (double)numberOfTracks;
+				mean += (double)(i * distribution[i]) / (double)numberOfTracks;
 
 				zeroDistribution = false;
 				temp += "Index: ";

@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:34:59 $
-/// $Revision: 1.1 $
+/// $Date: 2008-10-10 13:47:23 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -314,6 +314,51 @@ public:
  */
 
 	virtual ~tooMuchDataWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _LOCKOUTOFRANGEWARNINGMSG_H
+#define _LOCKOUTOFRANGEWARNINGMSG_H
+
+/**
+ * CLASS lockOutOfRangeWarningMsg
+ */
+
+class lockOutOfRangeWarningMsg : public fileioWarningMsg {
+
+private:
+
+	unsigned int lockId;
+	unsigned int numberOfLocks;	
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	lockOutOfRangeWarningMsg();
+
+/**
+ * Constructor
+ */
+
+	lockOutOfRangeWarningMsg(unsigned int lockId, unsigned int numberOfLocks);
+
+/**
+ * Destructor
+ */
+
+	virtual ~lockOutOfRangeWarningMsg();
 
 /**
  * This method displays a warning message.

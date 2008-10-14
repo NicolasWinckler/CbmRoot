@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-10-19 14:34:30 $
-/// $Revision: 1.7 $
+/// $Date: 2008-10-07 10:38:09 $
+/// $Revision: 1.9 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -34,10 +34,10 @@
 
 
 #include "../../MiscLIB/include/defs.h"
-#ifdef CBMROOTFRAMEWORK
-	#include "CbmRootManager.h"
-#else
+#if (ARCHITECTURE == STANDALONE)
 	#include "../../RootFrameworkLIB/include/rootManager.h"
+#elif (ARCHITECTURE == CBMROOT)
+	#include "CbmRootManager.h"
 #endif
 #include "inputData.h"
 #include <string>
@@ -55,10 +55,12 @@
 #define MVDHITBRANCH       "MVDHit"				/**< Defines the name of the branch consisting of the hits for all MVD stations */
 
 
-#ifdef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
+	#define NEWVOLUMEFORMAT false
+#elif (ARCHITECTURE == CBMROOT)
 	#define NEWVOLUMEFORMAT true
 #else
-	#define NEWVOLUMEFORMAT false
+	#undef NEWVOLUMEFORMAT
 #endif
 
 

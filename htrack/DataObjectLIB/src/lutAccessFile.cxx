@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:38:11 $
-// $Revision: 1.4 $
+// $Date: 2008-10-10 13:47:05 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
@@ -113,7 +113,7 @@ void lutAccessFile::deleteLocalMemory() {
 /********************************************************/
 
 		if (typeCastedData != NULL) {
-			delete typeCastedData;
+			delete [] typeCastedData;
 			setDataNum(0);
 			setDataPtr(NULL);
 		}
@@ -128,7 +128,7 @@ void lutAccessFile::deleteLocalMemory() {
  * This method returns the number of accepted commands.			*
  ****************************************************************/
 
-int lutAccessFile::getNumberOfCmds() {
+unsigned int lutAccessFile::getNumberOfCmds() {
 
 	return numberOfLutAccessFileCmds;
 
@@ -146,72 +146,72 @@ bool lutAccessFile::getHeaderValue(std::string& specifier, std::string& value) {
 /********************************************************/
 /* make code changes for a different configuration here */
 	if (specifier.compare(stringCmdName) == 0) {
-		if (!(commandID[idCmdName])) {
+		if (!isHeaderLockSet(idCmdName)) {
 			header.name = value;
-			commandID[idCmdName] = true;
+			setHeaderLock(idCmdName, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdUsage) == 0) {
-		if (!(commandID[idCmdUsage])) {
+		if (!isHeaderLockSet(idCmdUsage)) {
 			header.usage = value;
-			commandID[idCmdUsage] = true;
+			setHeaderLock(idCmdUsage, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdFormat) == 0) {
-		if (!(commandID[idCmdFormat])) {
+		if (!isHeaderLockSet(idCmdFormat)) {
 			header.format = stous((char*)value.c_str(), 10);
-			commandID[idCmdFormat] = true;
+			setHeaderLock(idCmdFormat, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdNumberOfEntries) == 0) {
-		if (!(commandID[idCmdNumberOfEntries])) {
+		if (!isHeaderLockSet(idCmdNumberOfEntries)) {
 			header.numberOfEntries = stoul((char*)value.c_str(), 10);
-			commandID[idCmdNumberOfEntries] = true;
+			setHeaderLock(idCmdNumberOfEntries, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdDim1Min) == 0) {
-		if (!(commandID[idCmdDim1Min])) {
+		if (!isHeaderLockSet(idCmdDim1Min)) {
 			header.dim1Min = stod((char*)value.c_str());
-			commandID[idCmdDim1Min] = true;
+			setHeaderLock(idCmdDim1Min, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdDim1Max) == 0) {
-		if (!(commandID[idCmdDim1Max])) {
+		if (!isHeaderLockSet(idCmdDim1Max)) {
 			header.dim1Max = stod((char*)value.c_str());
-			commandID[idCmdDim1Max] = true;
+			setHeaderLock(idCmdDim1Max, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdDim1Step) == 0) {
-		if (!(commandID[idCmdDim1Step])) {
+		if (!isHeaderLockSet(idCmdDim1Step)) {
 			header.dim1Step = stoi((char*)value.c_str(), 10);
-			commandID[idCmdDim1Step] = true;
+			setHeaderLock(idCmdDim1Step, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdDim2Min) == 0) {
-		if (!(commandID[idCmdDim2Min])) {
+		if (!isHeaderLockSet(idCmdDim2Min)) {
 			header.dim2Min = stod((char*)value.c_str());
-			commandID[idCmdDim2Min] = true;
+			setHeaderLock(idCmdDim2Min, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdDim2Max) == 0) {
-		if (!(commandID[idCmdDim2Max])) {
+		if (!isHeaderLockSet(idCmdDim2Max)) {
 			header.dim2Max = stod((char*)value.c_str());
-			commandID[idCmdDim2Max] = true;
+			setHeaderLock(idCmdDim2Max, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdDim2Step) == 0) {
-		if (!(commandID[idCmdDim2Step])) {
+		if (!isHeaderLockSet(idCmdDim2Step)) {
 			header.dim2Step = stoi((char*)value.c_str(), 10);
-			commandID[idCmdDim2Step] = true;
+			setHeaderLock(idCmdDim2Step, true);
 			specifierFound = true;
 		}
 	}
@@ -417,8 +417,7 @@ void lutAccessFile::setHeaderDefValues() {
 
 lutAccessFile::lutAccessFile() : io() {
 
-	for (unsigned int i = 0; i < numberOfLutAccessFileCmds; i++)
-		commandID[i] = 0;
+	localMemory = false;
 
 	init();
 
@@ -441,10 +440,10 @@ lutAccessFile::~lutAccessFile() {
 
 void lutAccessFile::init() {
 
-	setHeaderDefValues();
-
 	if (localMemory)
 		deleteLocalMemory();
+
+	resetHeader();
 
 }
 
@@ -474,16 +473,16 @@ void lutAccessFile::setHeader(lutAccessFileHeader& structure) {
 	header.dim2Min                  = structure.dim2Min;
 	header.dim2Max                  = structure.dim2Max;
 	header.dim2Step                 = structure.dim2Step;
-	commandID[idCmdName]            = true;
-	commandID[idCmdUsage]           = true;
-	commandID[idCmdFormat]          = true;
-	commandID[idCmdNumberOfEntries] = true;
-	commandID[idCmdDim1Min]         = true;
-	commandID[idCmdDim1Max]         = true;
-	commandID[idCmdDim1Step]        = true;
-	commandID[idCmdDim2Min]         = true;
-	commandID[idCmdDim2Max]         = true;
-	commandID[idCmdDim2Step]        = true;
+	setHeaderLock(idCmdName, true);
+	setHeaderLock(idCmdUsage, true);
+	setHeaderLock(idCmdFormat, true);
+	setHeaderLock(idCmdNumberOfEntries, true);
+	setHeaderLock(idCmdDim1Min, true);
+	setHeaderLock(idCmdDim1Max, true);
+	setHeaderLock(idCmdDim1Step, true);
+	setHeaderLock(idCmdDim2Min, true);
+	setHeaderLock(idCmdDim2Max, true);
+	setHeaderLock(idCmdDim2Step, true);
 
 }
 
@@ -566,8 +565,8 @@ std::string lutAccessFile::getInfo() {
 	message += "--------------------------------------\n";
 	message += "CommandID";
 	message += "\t: ";
-	for (int i = 0; i < numberOfLutAccessFileCmds; i++) {
-		btods(commandID[i], longBuffer);
+	for (unsigned int i = 0; i < getNumberOfCmds(); i++) {
+		btods(isHeaderLockSet(i), longBuffer);
 		message += longBuffer;
 	}
 	message += stringCmdStructureSeparator;

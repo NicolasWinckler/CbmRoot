@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:38:11 $
-// $Revision: 1.6 $
+// $Date: 2008-10-10 13:47:05 $
+// $Revision: 1.8 $
 //
 // *******************************************************************/
 
@@ -185,10 +185,13 @@ houghBorderCommand lutHoughBorder::getHoughBorderCommand(unsigned short maxDim) 
 				
 				houghCmd.cmd.push(true);
 				cmdCounter += actualHoughCoord.pos1 - previousHoughCoord.pos1;
-			
+
 			}
-			else
+			else {
+
 				houghCmd.cmd.push(false);
+
+			}
 
 			previousHoughCoord = actualHoughCoord;
 
@@ -214,8 +217,8 @@ void lutHoughBorder::setHoughBorderCommand(houghBorderCommand& value, unsigned s
 
 	houghCoord.clear();
 
-	actualHoughCoord.pos1 = 0;
-	actualHoughCoord.pos2 = value.startPos;
+	actualHoughCoord.pos1 = value.startPos;
+	actualHoughCoord.pos2 = 0;
 
 	if ((actualHoughCoord.pos1 < maxFirstDim) && (actualHoughCoord.pos2 < maxSecondDim)) {
 

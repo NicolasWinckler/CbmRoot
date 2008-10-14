@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-06 14:19:23 $
-// $Revision: 1.9 $
+// $Date: 2008-10-07 10:36:51 $
+// $Revision: 1.11 $
 //
 // *******************************************************************/
 
@@ -1476,5 +1476,36 @@ lutGoodnessNotPossibleForGradingPWarningMsg::~lutGoodnessNotPossibleForGradingPW
 void lutGoodnessNotPossibleForGradingPWarningMsg::warningMsg() {
 
 	printMsg("The gradingP table cannot be generated with LUTGOODNESSTABLE, because the table is a prerequisite for this algorithm!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS missingOriginWarningMsg								*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+missingOriginWarningMsg::missingOriginWarningMsg() : dataRootObjectWarningMsg() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+missingOriginWarningMsg::~missingOriginWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void missingOriginWarningMsg::warningMsg() {
+
+	printMsg("The origin is missing. Maybe the algorithm is going wrong, because it the origin is a prerequisite of many algorithms!!!");
 
 }

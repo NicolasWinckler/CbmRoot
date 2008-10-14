@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-10-19 14:34:49 $
-// $Revision: 1.7 $
+// $Date: 2008-10-07 10:39:11 $
+// $Revision: 1.9 $
 //
 // *******************************************************************/
 
@@ -35,10 +35,10 @@
 #include "../../DataObjectLIB/include/trackMomentum.h"
 #include "../../DataObjectLIB/include/specialListMem.h"
 #include "../../DataRootObjectLIB/include/trackHitMem.h"
-#ifdef CBMROOTFRAMEWORK
-	#include "CbmRootManager.h"
-#else
+#if (ARCHITECTURE == STANDALONE)
 	#include "../../RootFrameworkLIB/include/rootManager.h"
+#else
+	#include "CbmRootManager.h"
 #endif
 #include "../include/outputTrack.h"
 
@@ -57,7 +57,7 @@ void outputTrack::initialize() {
 	if (manager == NULL)
 		throw cannotAccessRootManagerError(OUTPUTRESULTLIB);
 
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 
 	manager->Register(STSTRACKBRANCH, STSFOLDER, data.getTrackData());
 

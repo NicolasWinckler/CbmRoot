@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-10-25 14:14:34 $
-// $Revision: 1.5 $
+// $Date: 2008-09-11 14:07:02 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
@@ -670,7 +670,7 @@ void magnetfieldDirectionAnalysis::drawBxDisplay() {
 	}
 	else {
 
-		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 		cannotDraw->warningMsg();
 		if(cannotDraw != NULL) {
 			delete cannotDraw;
@@ -698,7 +698,7 @@ void magnetfieldDirectionAnalysis::drawByDisplay() {
 	}
 	else {
 
-		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 		cannotDraw->warningMsg();
 		if(cannotDraw != NULL) {
 			delete cannotDraw;
@@ -726,7 +726,7 @@ void magnetfieldDirectionAnalysis::drawBzDisplay() {
 	}
 	else {
 
-		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg();
+		cannotDrawWarningMsg* cannotDraw = new cannotDrawWarningMsg(ANALYSISLIB);
 		cannotDraw->warningMsg();
 		if(cannotDraw != NULL) {
 			delete cannotDraw;

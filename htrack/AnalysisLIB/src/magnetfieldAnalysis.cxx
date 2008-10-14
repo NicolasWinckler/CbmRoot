@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007/01/17 15:39:48 $
-// $Revision: 1.2 $
+// $Date: 2008-09-11 14:07:02 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
@@ -139,7 +139,7 @@ void magnetfieldAnalysis::setAutomaticAxisRange() {
 void magnetfieldAnalysis::evaluateWindowDivisionSignatures(bool* globalSignature, unsigned short sizeOfGlobalSignature, bool* localSignature, unsigned short sizeOfLocalSignature) {
 
 	if ((sizeOfLocalSignature > sizeOfGlobalSignature) || (globalSignature == NULL) || (localSignature == NULL))
-		throw windowDivisionError();
+		throw windowDivisionError(ANALYSISLIB);
 
 	for (unsigned short i = 0; i < sizeOfLocalSignature; i++)
 		globalSignature[i] |= localSignature[i];
@@ -158,7 +158,7 @@ void magnetfieldAnalysis::evaluateWindowDivisionFactors(unsigned short* numberOf
 	unsigned short sizeOfGlobalSignature;
 
 	if ((numberOfEnabledPadColumns == NULL) || (numberOfEnabledPadRows == NULL))
-		throw windowDivisionError();
+		throw windowDivisionError(ANALYSISLIB);
 
 	(*numberOfEnabledPadColumns) = 0;
 	(*numberOfEnabledPadRows)    = 0;
@@ -272,7 +272,7 @@ void magnetfieldAnalysis::drawWindowPads(unsigned short columnId) {
 	padId = columnId + 1;
 
 	if (padId > numberOfWindowPadColumns)
-		throw windowDivisionError();
+		throw windowDivisionError(ANALYSISLIB);
 
 	for (unsigned short i = 0; i < numberOfWindowPadRows; i++) {
 

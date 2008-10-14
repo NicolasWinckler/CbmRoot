@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-21 13:22:06 $
-// $Revision: 1.4 $
+// $Date: 2008-10-10 13:50:20 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -1692,14 +1692,14 @@ double stod(std::string& value) {
  *   - 16X|Sign|Zahl	(example: 16X5, 16X-7, 16X+6)			*
  ****************************************************************/
 
-int extractRadix(char* value) {
+int extractRadix(int* radix, char* value) {
 
 	int   i;
 	int   signPos;
 	char  swapspace;
 	int   xPos;
 	char* radixPointer;
-	char  radix[3];
+	char  radixBuffer[3];
 	int   returnValue;
 
 	signPos = -1;
@@ -1734,7 +1734,6 @@ int extractRadix(char* value) {
 
 	}
 
-
 	if (signPos == -1)
 		radixPointer = &value[0];
 	else
@@ -1742,61 +1741,72 @@ int extractRadix(char* value) {
 
 	if (((xPos > 0) && (signPos == -1)) || ((xPos > 1) && (signPos != -1))) {
 
-		radix[0]      = *radixPointer;
-		*radixPointer = '0';
+		radixBuffer[0] = *radixPointer;
+		*radixPointer  = '0';
 		if (signPos == -1) {
 			if (xPos != 1) {
-				radix[1] = value[1];
-				value[1] = '0';
+				radixBuffer[1] = value[1];
+				value[1]       = '0';
 			}
 			else
-				radix[1] = '\0';
+				radixBuffer[1] = '\0';
 		}
 		else {
 			if (xPos != 2) {
-				radix[1] = value[2];
-				value[2] = '0';
+				radixBuffer[1] = value[2];
+				value[2]       = '0';
 			}
 			else
-				radix[1] = '\0';
+				radixBuffer[1] = '\0';
 		}
-		radix[2]    = '\0';
-		value[xPos] = '0';
+		radixBuffer[2] = '\0';
+		value[xPos]    = '0';
 
-		returnValue = stoi(radix, 10);
+		if (radix != NULL) {
+			*radix = stoi(radixBuffer, 10);
+			if (*radix == 0) /* hex standard */
+				*radix = 16;
+		}
 
-		if (returnValue == 0) /* hex standard */
-			returnValue = 16;
+		returnValue = xPos + 1;
 
 	}
 	else {
 
+		returnValue = 1;
+
 		switch (tolower(*radixPointer)) {
 
 			case 'b':
-				returnValue   = 2;
+				if (radix != NULL)
+					*radix    = 2;
 				*radixPointer = '0';
 				break;
 
 			case 'o':
 			case '0':
-				returnValue   = 8;
+				if (radix != NULL)
+					*radix    = 8;
 				*radixPointer = '0';
 				break;
 
 			case 'd':
 			case 'x':
-				returnValue   = 10;
+				if (radix != NULL)
+					*radix    = 10;
 				*radixPointer = '0';
 				break;
 
 			case 'h':
-				returnValue   = 16;
+				if (radix != NULL)
+					*radix    = 16;
 				*radixPointer = '0';
 				break;
 
 			default:
-				returnValue   = 10;
+				if (radix != NULL)
+					*radix    = 10;
+				returnValue = 0;
 				break;
 
 		}
@@ -1807,13 +1817,13 @@ int extractRadix(char* value) {
 
 }
 #ifndef C_COMPATIBILITY
-int extractRadix(std::string* value) {
+int extractRadix(int* radix, std::string* value) {
 
 	std::string::iterator signPos;
 	char                  swapspace;
 	std::string::iterator xPos;
 	std::string::iterator radixPointer;
-	char                  radix[3];
+	char                  radixBuffer[3];
 	int                   returnValue;
 
 	signPos = value->end();
@@ -1860,61 +1870,72 @@ int extractRadix(std::string* value) {
 
 	if (((xPos > value->begin()) && (xPos != value->end()) && (signPos == value->end())) || ((xPos > value->begin() + 1) && (xPos != value->end()) && (signPos != value->end()))) {
 
-		radix[0]      = *radixPointer;
-		*radixPointer = '0';
+		radixBuffer[0] = *radixPointer;
+		*radixPointer  = '0';
 		if (signPos == value->end()) {
 			if (xPos != value->begin() + 1) {
-				radix[1]              = *(value->begin() + 1);
+				radixBuffer[1]        = *(value->begin() + 1);
 				*(value->begin() + 1) = '0';
 			}
 			else
-				radix[1]              = '\0';
+				radixBuffer[1]        = '\0';
 		}
 		else {
 			if (xPos != value->begin() + 2) {
-				radix[1]              = *(value->begin() + 2);
+				radixBuffer[1]        = *(value->begin() + 2);
 				*(value->begin() + 2) = '0';
 			}
 			else
-				radix[1]              = '\0';
+				radixBuffer[1]        = '\0';
 		}
-		radix[2] = '\0';
-		*xPos    = '0';
+		radixBuffer[2] = '\0';
+		*xPos          = '0';
 
-		returnValue = stoi(radix, 10);
+		if (radix != NULL) {
+			*radix = stoi(radixBuffer, 10);
+			if (*radix == 0) /* hex standard */
+				*radix = 16;
+		}
 
-		if (returnValue == 0) /* hex standard */
-			returnValue = 16;
+		returnValue = (int)strlen(radixBuffer) + 1;
 
 	}
 	else {
 
+		returnValue = 1;
+
 		switch (tolower(*radixPointer)) {
 
 			case 'b':
-				returnValue   = 2;
+				if (radix != NULL)
+					*radix    = 2;
 				*radixPointer = '0';
 				break;
 
 			case 'o':
 			case '0':
-				returnValue   = 8;
+				if (radix != NULL)
+					*radix    = 8;
 				*radixPointer = '0';
 				break;
 
 			case 'd':
 			case 'x':
-				returnValue   = 10;
+				if (radix != NULL)
+					*radix    = 10;
 				*radixPointer = '0';
 				break;
 
 			case 'h':
-				returnValue   = 16;
+				if (radix != NULL)
+					*radix    = 16;
 				*radixPointer = '0';
 				break;
 
 			default:
-				returnValue   = 10;
+				if (radix != NULL)
+					*radix    = 10;
+				returnValue   = 0;
 				break;
 
 		}

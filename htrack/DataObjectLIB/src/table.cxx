@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-10-19 14:44:00 $
-/// $Revision: 1.10 $
+/// $Date: 2008-10-10 13:47:06 $
+/// $Revision: 1.12 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -62,7 +62,7 @@ void table::addTableStringEntry(tableStringEntry& string) {
 	if ((int)entrySignature.length() > (int)signature.length() - signaturePos)
 		signature.insert(signaturePos, (int)entrySignature.length() - (int)signature.length() + signaturePos, 'x');
 
-	radix             = extractRadix(&signature);
+	extractRadix(&radix, &signature);
 	unknownValueFound = false;
 	for (signaturePosition = signature.begin(); signaturePosition != signature.end(); signaturePosition++) {
 
@@ -90,7 +90,7 @@ void table::addTableStringEntry(tableStringEntry& string) {
 	}
 	else {
 
-		radix             = extractRadix(&classification);
+		extractRadix(&radix, &classification);
 		unknownValueFound = false;
 		for (std::basic_string<char>::iterator classificationPosition = classification.begin(); classificationPosition != classification.end(); classificationPosition++) {
 
@@ -318,6 +318,17 @@ unsigned long table::getNumberOfEntries() {
 }
 
 /****************************************************************
+ * method returns the maximal number of entries					*
+ ****************************************************************/
+
+unsigned long table::getNumberOfMembers() {
+
+	/* maximumClassification can be used here because it is a bitArray like all signatures */
+	return (unsigned long)(1 << maximumClassification.length());
+
+}
+
+/****************************************************************
  * method returns the tableEntry for the given signature		*
  ****************************************************************/
 
@@ -360,6 +371,20 @@ bitArray table::getClassification(bitArray& signature) {
 	returnValue = getEntry(signature);
 
 	return returnValue.getClassification();
+
+}
+
+/****************************************************************
+ * method returns the member entry for the given signature		*
+ ****************************************************************/
+
+bitArray table::getMember(unsigned long index) {
+
+	bitArray signature;
+
+	signature = bitArray(index);
+
+	return getClassification(signature);
 
 }
 
@@ -502,11 +527,6 @@ void table::read(std::string fileName) {
 	members.clear();
 	for (unsigned long i = 0; i < readFile.getDataNum(); i++)
 		addTableStringEntry(readData[i]);
-
-	if (readData != NULL) {
-		delete [] readData;
-		readData = NULL;
-	}
 
 }
 

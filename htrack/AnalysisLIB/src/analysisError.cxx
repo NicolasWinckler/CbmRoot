@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-12-13 13:47:19 $
-// $Revision: 1.5 $
+// $Date: 2008-09-11 14:07:02 $
+// $Revision: 1.8 $
 //
 // *******************************************************************/
 
@@ -52,37 +52,6 @@ analysisError::analysisError() : errorHandling(ANALYSISLIB) {
  ****************************************************************/
 
 analysisError::~analysisError() {
-
-}
-
-
-/****************************************************************
- * CLASS windowDivisionError							 		*
- ****************************************************************/
-
-/****************************************************************
- * Default constructor											*
- ****************************************************************/
-
-windowDivisionError::windowDivisionError() : analysisError() {
-
-}
-
-/****************************************************************
- * Destructor													*
- ****************************************************************/
-
-windowDivisionError::~windowDivisionError() {
-
-}
-
-/****************************************************************
- * This method displays an error message.		 				*
- ****************************************************************/
-
-void windowDivisionError::errorMsg() {
-
-	printMsg("The computing of the window division is wrong!!!");
 
 }
 
@@ -799,5 +768,36 @@ initHistogramDimensionsFirstError::~initHistogramDimensionsFirstError() {
 void initHistogramDimensionsFirstError::errorMsg() {
 
 	printMsg("If using the row or column analysis, the histogram dimensions should be set first with the function initHardwareHistogramDimensions(...)!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS cannotAccessPeakfindingGeometryAnalyserError		 	*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+cannotAccessPeakfindingGeometryAnalyserError::cannotAccessPeakfindingGeometryAnalyserError() : analysisError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+cannotAccessPeakfindingGeometryAnalyserError::~cannotAccessPeakfindingGeometryAnalyserError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void cannotAccessPeakfindingGeometryAnalyserError::errorMsg() {
+
+	printMsg("The peakfinding geometry analyser object cannot be accessed. Maybe it is not initialized!!!");
 
 }

@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:43:44 $
-// $Revision: 1.7 $
+// $Date: 2008-09-11 14:12:40 $
+// $Revision: 1.9 $
 //
 // *******************************************************************/
 
@@ -1066,5 +1066,83 @@ cannotAccessDistributionMemoryError::~cannotAccessDistributionMemoryError() {
 void cannotAccessDistributionMemoryError::errorMsg() {
 
 	printMsg("The memory to store the distribution is not accessible!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS cannotAccessHistogramError			 					*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+cannotAccessHistogramError::cannotAccessHistogramError() : errorHandling() {
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+cannotAccessHistogramError::cannotAccessHistogramError(std::string errorSource) : errorHandling(errorSource) {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+cannotAccessHistogramError::~cannotAccessHistogramError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void cannotAccessHistogramError::errorMsg() {
+
+	printMsg("The histogram is not accessible!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS windowDivisionError							 		*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+windowDivisionError::windowDivisionError() : errorHandling() {
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+windowDivisionError::windowDivisionError(std::string errorSource) : errorHandling(errorSource) {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+windowDivisionError::~windowDivisionError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void windowDivisionError::errorMsg() {
+
+	printMsg("The computing of the window division is wrong!!!");
 
 }

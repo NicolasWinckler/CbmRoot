@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:35:51 $
-/// $Revision: 1.1 $
+/// $Date: 2008-10-10 13:50:20 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -343,7 +343,7 @@ double stod(std::string& value);
 
 /**
  * This method evaluates the radix of the number in the given
- * char array.
+ * char array. The return value is the length of the radix.
  * Understanding number conventions:
  * - Binary:
  *   - Sign|b|Zahl		(example: b5, -b7, +b6)
@@ -394,9 +394,9 @@ double stod(std::string& value);
  *   - 16X|Sign|Zahl	(example: 16X5, 16X-7, 16X+6)
  */
 
-int extractRadix(char* value);
+int extractRadix(int* radix, char* value);
 #ifndef C_COMPATIBILITY
-int extractRadix(std::string* value);
+int extractRadix(int* radix, std::string* value);
 #endif
 
 /**

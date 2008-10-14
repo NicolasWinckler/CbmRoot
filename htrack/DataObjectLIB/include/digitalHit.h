@@ -2,12 +2,12 @@
 /// (C)opyright 2005
 /// 
 /// Institute of Computer Science V
-/// Prof. Männer
+/// Prof. Mï¿½ner
 /// University of Mannheim, Germany
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gläß
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-02-29 11:38:11 $
-/// $Revision: 1.1 $
+/// $Date: 2008-10-10 13:47:04 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -33,7 +33,7 @@
 #define _DIGITALHIT_H
 
 
-#include <iostream>
+#include <string>
 
 
 /* **************************************************************
@@ -88,13 +88,13 @@ public:
  * method returns the start value
  */
 
-	std::string getIdentifier();
+	unsigned long getIdentifier();
 
 /**
  * method sets the identifier value
  */
 
-	void setIdentifier(std::string& value);
+	void setNotIdentifiedIdentifier(std::string& value);
 
 /**
  * method sets the identifier value

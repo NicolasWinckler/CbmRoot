@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:37:24 $
-// $Revision: 1.35 $
+// $Date: 2008-09-11 14:07:34 $
+// $Revision: 1.38 $
 //
 // *******************************************************************/
 
@@ -34,6 +34,7 @@
 #include "../../MiscLIB/include/terminal.h"
 #include "../../DataRootObjectLIB/include/tables.h"
 #include "../../AnalysisLIB/include/analysisDef.h"
+#include "../../HistogramTransformationLIB/include/filterDef.h"
 #include "../include/CbmHoughStsTrackFinder.h"
 #include "TStopwatch.h"
 #include <iostream>
@@ -87,6 +88,13 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder() : CbmStsTrackFinder() {
 		ratings                = new tables();
 		luts                   = new lutImplementation();
 		houghTrackfinder       = new trackfinder(&eventData, &histogram, &tracks, &ratings, &luts,
+									  configurationFile->getDataReference().trackfinderFilterType,
+									  configurationFile->getDataReference().trackfinderAutomaticFilterDataPercentage,
+									  configurationFile->getDataReference().trackfinderAutomaticFilterFileName,
+									  configurationFile->getDataReference().trackfinderFirstFilterGeometry,
+									  configurationFile->getDataReference().trackfinderFirstFilterArithmetic,
+									  configurationFile->getDataReference().trackfinderSecondFilterGeometry,
+									  configurationFile->getDataReference().trackfinderSecondFilterArithmetic,
 									  configurationFile->getDataReference().trackfinderFirstFilterNeighborhoodDim1ClearRadius,
 									  configurationFile->getDataReference().trackfinderFirstFilterNeighborhoodDim2ClearRadius,
 									  configurationFile->getDataReference().trackfinderSecondFilterNeighborhoodDim1ClearRadius,
@@ -103,6 +111,7 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder() : CbmStsTrackFinder() {
 		analysisParameters.space                           = &space;
 		analysisParameters.luts                            = &luts;
 		analysisParameters.minP                            = configurationFile->getDataReference().analysisThresholdForP;
+		analysisParameters.initAutomatcFilterGeometry      = houghTrackfinder->isAutomaticFilterGeometryEnabled();
 		analysisParameters.initConfiguration               = configurationFile->getDataReference().analysisInitConfiguration;
 		analysisParameters.initDetector                    = configurationFile->getDataReference().analysisInitDetector;
 		analysisParameters.initEvent                       = configurationFile->getDataReference().analysisInitEvent;
@@ -156,6 +165,7 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder() : CbmStsTrackFinder() {
 		if ((configurationFile->getDataReference().inputCodingTableMode == LUTGOODNESSTABLE) ||
 			(configurationFile->getDataReference().inputGradingPTableMode == LUTGOODNESSTABLE) ||
 			(configurationFile->getDataReference().inputGradingRTableMode == LUTGOODNESSTABLE) ||
+			houghTrackfinder->isAutomaticFilterGeometryEnabled() ||
 			configurationFile->getDataReference().analysisInitConfiguration ||
 			configurationFile->getDataReference().analysisInitDetector ||
 			configurationFile->getDataReference().analysisInitEvent ||
@@ -282,6 +292,13 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(const char* name) : CbmStsTrackFi
 		ratings                = new tables();
 		luts                   = new lutImplementation();
 		houghTrackfinder       = new trackfinder(&eventData, &histogram, &tracks, &ratings, &luts,
+									  configurationFile->getDataReference().trackfinderFilterType,
+									  configurationFile->getDataReference().trackfinderAutomaticFilterDataPercentage,
+									  configurationFile->getDataReference().trackfinderAutomaticFilterFileName,
+									  configurationFile->getDataReference().trackfinderFirstFilterGeometry,
+									  configurationFile->getDataReference().trackfinderFirstFilterArithmetic,
+									  configurationFile->getDataReference().trackfinderSecondFilterGeometry,
+									  configurationFile->getDataReference().trackfinderSecondFilterArithmetic,
 									  configurationFile->getDataReference().trackfinderFirstFilterNeighborhoodDim1ClearRadius,
 									  configurationFile->getDataReference().trackfinderFirstFilterNeighborhoodDim2ClearRadius,
 									  configurationFile->getDataReference().trackfinderSecondFilterNeighborhoodDim1ClearRadius,
@@ -298,6 +315,7 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(const char* name) : CbmStsTrackFi
 		analysisParameters.space                           = &space;
 		analysisParameters.luts                            = &luts;
 		analysisParameters.minP                            = configurationFile->getDataReference().analysisThresholdForP;
+		analysisParameters.initAutomatcFilterGeometry      = houghTrackfinder->isAutomaticFilterGeometryEnabled();
 		analysisParameters.initConfiguration               = configurationFile->getDataReference().analysisInitConfiguration;
 		analysisParameters.initDetector                    = configurationFile->getDataReference().analysisInitDetector;
 		analysisParameters.initEvent                       = configurationFile->getDataReference().analysisInitEvent;
@@ -351,6 +369,7 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(const char* name) : CbmStsTrackFi
 		if ((configurationFile->getDataReference().inputCodingTableMode == LUTGOODNESSTABLE) ||
 			(configurationFile->getDataReference().inputGradingPTableMode == LUTGOODNESSTABLE) ||
 			(configurationFile->getDataReference().inputGradingRTableMode == LUTGOODNESSTABLE) ||
+			houghTrackfinder->isAutomaticFilterGeometryEnabled() ||
 			configurationFile->getDataReference().analysisInitConfiguration ||
 			configurationFile->getDataReference().analysisInitDetector ||
 			configurationFile->getDataReference().analysisInitEvent ||
@@ -494,6 +513,11 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(bitArray inputDetectorMask,
 	configuration.trackfinderMinClassCoding                          = 1;
 	configuration.trackfinderMinClassGradingP                        = 1;
 	configuration.trackfinderMinClassGradingR                        = 1;
+	configuration.trackfinderFilterType                              = MAXMORPHSEARCHFILTER;
+	configuration.trackfinderFirstFilterGeometry                     = FIRSTFINALGEOMETRY;
+	configuration.trackfinderFirstFilterArithmetic                   = FIRSTSIMPLEARITHMETIC;
+	configuration.trackfinderSecondFilterGeometry                    = SECONDFINALGEOMETRY;
+	configuration.trackfinderSecondFilterArithmetic                  = SECONDSIMPLEARITHMETIC;
 	configuration.trackfinderFirstFilterNeighborhoodDim1ClearRadius  = trackfinderFirstFilterNeighborhoodDim1ClearRadius;
 	configuration.trackfinderFirstFilterNeighborhoodDim2ClearRadius  = trackfinderFirstFilterNeighborhoodDim2ClearRadius;
 	configuration.trackfinderSecondFilterNeighborhoodDim1ClearRadius = trackfinderSecondFilterNeighborhoodDim1ClearRadius;
@@ -625,6 +649,13 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(bitArray inputDetectorMask,
 		ratings                = new tables();
 		luts                   = new lutImplementation();
 		houghTrackfinder       = new trackfinder(&eventData, &histogram, &tracks, &ratings, &luts,
+									  configurationFile->getDataReference().trackfinderFilterType,
+									  configurationFile->getDataReference().trackfinderAutomaticFilterDataPercentage,
+									  configurationFile->getDataReference().trackfinderAutomaticFilterFileName,
+									  configurationFile->getDataReference().trackfinderFirstFilterGeometry,
+									  configurationFile->getDataReference().trackfinderFirstFilterArithmetic,
+									  configurationFile->getDataReference().trackfinderSecondFilterGeometry,
+									  configurationFile->getDataReference().trackfinderSecondFilterArithmetic,
 									  configurationFile->getDataReference().trackfinderFirstFilterNeighborhoodDim1ClearRadius,
 									  configurationFile->getDataReference().trackfinderFirstFilterNeighborhoodDim2ClearRadius,
 									  configurationFile->getDataReference().trackfinderSecondFilterNeighborhoodDim1ClearRadius,
@@ -641,6 +672,7 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(bitArray inputDetectorMask,
 		analysisParameters.space                           = &space;
 		analysisParameters.luts                            = &luts;
 		analysisParameters.minP                            = configurationFile->getDataReference().analysisThresholdForP;
+		analysisParameters.initAutomatcFilterGeometry      = houghTrackfinder->isAutomaticFilterGeometryEnabled();
 		analysisParameters.initConfiguration               = configurationFile->getDataReference().analysisInitConfiguration;
 		analysisParameters.initDetector                    = configurationFile->getDataReference().analysisInitDetector;
 		analysisParameters.initEvent                       = configurationFile->getDataReference().analysisInitEvent;
@@ -694,6 +726,7 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(bitArray inputDetectorMask,
 		if ((configurationFile->getDataReference().inputCodingTableMode == LUTGOODNESSTABLE) ||
 			(configurationFile->getDataReference().inputGradingPTableMode == LUTGOODNESSTABLE) ||
 			(configurationFile->getDataReference().inputGradingRTableMode == LUTGOODNESSTABLE) ||
+			houghTrackfinder->isAutomaticFilterGeometryEnabled() ||
 			configurationFile->getDataReference().analysisInitConfiguration ||
 			configurationFile->getDataReference().analysisInitDetector ||
 			configurationFile->getDataReference().analysisInitEvent ||
@@ -840,6 +873,13 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(const char* name,
 		ratings                = new tables();
 		luts                   = new lutImplementation();
 		houghTrackfinder       = new trackfinder(&eventData, &histogram, &tracks, &ratings, &luts,
+									  configurationFile->getDataReference().trackfinderFilterType,
+									  configurationFile->getDataReference().trackfinderAutomaticFilterDataPercentage,
+									  configurationFile->getDataReference().trackfinderAutomaticFilterFileName,
+									  configurationFile->getDataReference().trackfinderFirstFilterGeometry,
+									  configurationFile->getDataReference().trackfinderFirstFilterArithmetic,
+									  configurationFile->getDataReference().trackfinderSecondFilterGeometry,
+									  configurationFile->getDataReference().trackfinderSecondFilterArithmetic,
 									  configurationFile->getDataReference().trackfinderFirstFilterNeighborhoodDim1ClearRadius,
 									  configurationFile->getDataReference().trackfinderFirstFilterNeighborhoodDim2ClearRadius,
 									  configurationFile->getDataReference().trackfinderSecondFilterNeighborhoodDim1ClearRadius,
@@ -856,6 +896,7 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(const char* name,
 		analysisParameters.space                           = &space;
 		analysisParameters.luts                            = &luts;
 		analysisParameters.minP                            = configurationFile->getDataReference().analysisThresholdForP;
+		analysisParameters.initAutomatcFilterGeometry      = houghTrackfinder->isAutomaticFilterGeometryEnabled();
 		analysisParameters.initConfiguration               = configurationFile->getDataReference().analysisInitConfiguration;
 		analysisParameters.initDetector                    = configurationFile->getDataReference().analysisInitDetector;
 		analysisParameters.initEvent                       = configurationFile->getDataReference().analysisInitEvent;
@@ -909,6 +950,7 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(const char* name,
 		if ((configurationFile->getDataReference().inputCodingTableMode == LUTGOODNESSTABLE) ||
 			(configurationFile->getDataReference().inputGradingPTableMode == LUTGOODNESSTABLE) ||
 			(configurationFile->getDataReference().inputGradingRTableMode == LUTGOODNESSTABLE) ||
+			houghTrackfinder->isAutomaticFilterGeometryEnabled() ||
 			configurationFile->getDataReference().analysisInitConfiguration ||
 			configurationFile->getDataReference().analysisInitDetector ||
 			configurationFile->getDataReference().analysisInitEvent ||
@@ -1438,18 +1480,6 @@ int CbmHoughStsTrackFinder::DoFind() {
 
 #endif
 
-
-			/* update the tables */
-			if (isFirstEvent) {
-
-				ratings->initCoding(configurationFile->getDataReference().inputCodingTableMode,
-									configurationFile->getDataReference().inputCodingTableFileName);
-				ratings->setCodingTableMinimumClassification(bitArray(configurationFile->getDataReference().trackfinderMinClassCoding));
-
-			}
-			else
-				ratings->update();
-
 #ifndef NOANALYSIS
 
 			if (configurationFile->getDataReference().analysisInitPrelutGoodness)
@@ -1466,6 +1496,25 @@ int CbmHoughStsTrackFinder::DoFind() {
 
 			if (configurationFile->getDataReference().analysisInitPeakDistanceGoodness)
 				analyser->evaluatePeakDistanceGoodness(terminal);
+
+#endif
+
+			/* update the tables */
+			if (isFirstEvent) {
+
+				ratings->initCoding(configurationFile->getDataReference().inputCodingTableMode,
+									configurationFile->getDataReference().inputCodingTableFileName);
+				ratings->setCodingTableMinimumClassification(bitArray(configurationFile->getDataReference().trackfinderMinClassCoding));
+
+			}
+			else
+				ratings->update();
+
+#ifndef NOANALYSIS
+
+			/* evaluate the automatic filter geometry */
+			if (houghTrackfinder->isFilterGeometryGenerationEnabled())
+				houghTrackfinder->generateFilterGeometry(configurationFile->getDataReference().trackfinderAutomaticFilterCoverPercentage, isFirstEvent, terminal);
 
 #endif
 
@@ -1600,6 +1649,29 @@ void CbmHoughStsTrackFinder::Finish() {
 		ratings->writeGradingRTable();
 
 #ifndef NOANALYSIS
+
+	if (configurationFile->getDataReference().trackfinderAutomaticFilterWrite)
+		if (houghTrackfinder->isAutomaticFilterGeometryEnabled())
+			houghTrackfinder->writePeakfindingGeometry();
+
+	if (houghTrackfinder->isFilterGeometryGenerationEnabled()) {
+		if (analyser->isPeakfindingGeometryDisplayEnabled())
+			houghTrackfinder->drawPeakfindingGeometry();
+		if (analyser->isProjectedPeakfindingGeometryDisplayEnabled())
+			houghTrackfinder->drawProjectedPeakfindingGeometry();
+		if (analyser->isCoveredPeakfindingGeometryDisplayEnabled())
+			houghTrackfinder->drawCoveredPeakfindingGeometry();
+		if (analyser->isCoveredProjectedPeakfindingGeometryDisplayEnabled())
+			houghTrackfinder->drawCoveredProjectedPeakfindingGeometry();
+		if (analyser->isPeakfindingGeometryMessageEnabled())
+			std::cout << houghTrackfinder->peakfindingGeometryToString() << std::endl;
+		if (analyser->isProjectedPeakfindingGeometryMessageEnabled())
+			std::cout << houghTrackfinder->projectedPeakfindingGeometryToString() << std::endl;
+		if (analyser->isCoveredPeakfindingGeometryMessageEnabled())
+			std::cout << houghTrackfinder->coveredPeakfindingGeometryToString() << std::endl;
+		if (analyser->isCoveredProjectedPeakfindingGeometryMessageEnabled())
+			std::cout << houghTrackfinder->coveredProjectedPeakfindingGeometryToString() << std::endl;
+	}
 
 	if ((analyser->isQualityTotalAnalysisEnabled()) && (fVerbose > 1))
 		std::cout << analyser->getAbsoluteQualityEFGCTotalAnalysis();

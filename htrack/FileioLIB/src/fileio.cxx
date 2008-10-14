@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-05-29 15:11:36 $
-// $Revision: 1.3 $
+// $Date: 2008-10-10 13:47:23 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -35,6 +35,36 @@
 #include "../include/fileioWarningMsg.h"
 #include "../include/fileio.h"
 
+
+/****************************************************************
+ * allocates memory												*
+ ****************************************************************/
+
+void fileio::allocateMemory() {
+
+	if (commandID == NULL) {
+
+		commandID = new bool[getNumberOfCmds()];
+		if (commandID == NULL)
+			throw memoryAllocationError(FILEIOLIB);
+
+	}
+
+}
+
+/****************************************************************
+ * deletes allocated memory										*
+ ****************************************************************/
+
+void fileio::deleteMemory() {
+
+	if (commandID != NULL) {
+
+		delete [] commandID;
+		commandID = NULL;
+
+	}
+}
 
 /****************************************************************
  * This method skips whitespaces in a std::string object by		*
@@ -132,22 +162,13 @@ char fileio::legalizedCommentChar(char value) {
 
 /****************************************************************
  * This method is to read the header of the file.				*
- * Dependencies:												*
- * - Subclass::getHeaderValue									*
- * - Subclass::getNumberOfCmds									*
- * Warnings:													*
- * - missingCmdSpecWarningMsg									*
- * - missingCmdValWarningMsg									*
- * - missingCmdSpecValPairWarningMsg							*
- * Errors:														*
- * - tooLessCmdsError											*
  ****************************************************************/
 
 void fileio::readFileHeader(std::ifstream& fileStream) {
 
 	std::basic_string<char>::size_type lineDelimiter;
 	bool                               specifierFound;
-	int                                numberOfFoundSpecifiers = 0;
+	unsigned int                       numberOfFoundSpecifiers;
 	std::string                        buffer;
 	std::string                        specifier;
 	std::string                        value;
@@ -162,9 +183,12 @@ void fileio::readFileHeader(std::ifstream& fileStream) {
 	missingCmdValWarningMsg*           missingCmdVal;
 	unknownCmdSpecValPairWarningMsg*   unknownCmdSpecValPair;
 
-	missingCmdSpec        = NULL;
-	missingCmdVal         = NULL;
-	unknownCmdSpecValPair = NULL;
+	numberOfFoundSpecifiers = 0;
+	missingCmdSpec          = NULL;
+	missingCmdVal           = NULL;
+	unknownCmdSpecValPair   = NULL;
+
+	resetAllHeaderLocks();
 
 	while(std::getline(fileStream, buffer, fileLineDelimiter)) {
 
@@ -478,6 +502,8 @@ void fileio::writeComment(std::ofstream& fileStream, char* comment) {
 
 fileio::fileio() {
 
+	commandID = NULL;
+
 }
 
 /****************************************************************
@@ -485,6 +511,8 @@ fileio::fileio() {
  ****************************************************************/
 
 fileio::fileio(std::string name) {
+
+	commandID = NULL;
 
 	init(name);
 
@@ -496,6 +524,8 @@ fileio::fileio(std::string name) {
 
 fileio::fileio(char* name) {
 
+	commandID = NULL;
+
 	init(name);
 
 }
@@ -505,6 +535,8 @@ fileio::fileio(char* name) {
  ****************************************************************/
 
 fileio::~fileio() {
+
+	deleteMemory();
 
 }
 
@@ -517,10 +549,81 @@ void fileio::init(std::string name) {
 	setFileName(name);
 
 }
-
 void fileio::init(char* name) {
 
 	setFileName(name);
+
+}
+
+/****************************************************************
+ * This method returns if the lock in the commandID is set.		*
+ ****************************************************************/
+
+bool fileio::isHeaderLockSet(unsigned int lockId) {
+
+	bool returnValue = false;
+
+	if (lockId < getNumberOfCmds())
+		returnValue = commandID[lockId];
+	else {
+
+		lockOutOfRangeWarningMsg* lockOutOfRange = new lockOutOfRangeWarningMsg(lockId, getNumberOfCmds());
+		lockOutOfRange->warningMsg();
+		if(lockOutOfRange != NULL) {
+			delete lockOutOfRange;
+			lockOutOfRange = NULL;
+		}
+
+	}
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method sets the lock in the commandID.					*
+ ****************************************************************/
+
+void fileio::setHeaderLock(unsigned int lockId, bool value) {
+
+	if (lockId < getNumberOfCmds())
+		commandID[lockId] = value;
+	else {
+
+		lockOutOfRangeWarningMsg* lockOutOfRange = new lockOutOfRangeWarningMsg(lockId, getNumberOfCmds());
+		lockOutOfRange->warningMsg();
+		if(lockOutOfRange != NULL) {
+			delete lockOutOfRange;
+			lockOutOfRange = NULL;
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * This method reopens all commandID locks.						*
+ ****************************************************************/
+
+void fileio::resetAllHeaderLocks() {
+
+	allocateMemory();
+
+	for (unsigned int i = 0; i < getNumberOfCmds(); i++)
+		setHeaderLock(i, false);
+
+}
+
+/****************************************************************
+ * This method resets the header to the defualt values			*
+ * and reopens the commandID lock.								*
+ ****************************************************************/
+
+void fileio::resetHeader() {
+
+	resetAllHeaderLocks();
+
+	setHeaderDefValues();
 
 }
 

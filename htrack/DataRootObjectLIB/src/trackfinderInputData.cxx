@@ -23,20 +23,20 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-06-26 12:33:39 $
-// $Revision: 1.10 $
+// $Date: 2008-10-07 10:36:51 $
+// $Revision: 1.11 $
 //
 // *******************************************************************/
 
 
 #include "../include/dataRootObjectError.h"
 #include "../include/dataRootObjectWarningMsg.h"
-#ifdef CBMROOTFRAMEWORK
-#include "../include/trackfinderInputFMagneticField.h"
-#include "CbmStsPoint.h"
-#else
-#include "../include/trackfinderInputSMagneticField.h"
-#include "../../RootFrameworkLIB/include/CbmStsPoint.h"
+#if (ARCHITECTURE == STANDALONE)
+	#include "../include/trackfinderInputSMagneticField.h"
+	#include "../../RootFrameworkLIB/include/CbmStsPoint.h"
+#elif (ARCHITECTURE == CBMROOT)
+	#include "../include/trackfinderInputFMagneticField.h"
+	#include "CbmStsPoint.h"
 #endif
 #include "../include/trackfinderInputData.h"
 
@@ -177,13 +177,13 @@ void trackfinderInputData::initMagneticField() {
 
 	if (magneticField == NULL) {
 
-#ifdef CBMROOTFRAMEWORK
-		
-		magneticField = new trackfinderInputFMagneticField();
-
-#else
+#if (ARCHITECTURE == STANDALONE)
 
 		magneticField = new trackfinderInputSMagneticField();
+
+#elif (ARCHITECTURE == CBMROOT)
+
+		magneticField = new trackfinderInputFMagneticField();
 
 #endif
 
@@ -1213,13 +1213,13 @@ void trackfinderInputData::finalizeHitTrackAssignment(bool applyAssignmentCheck)
  * method returns the magnetic field object						*
  ****************************************************************/
 
-#ifdef CBMROOTFRAMEWORK
-
-trackfinderInputFMagneticField* trackfinderInputData::getMagneticField() {
-
-#else
+#if (ARCHITECTURE == STANDALONE)
 
 trackfinderInputSMagneticField* trackfinderInputData::getMagneticField() {
+
+#elif (ARCHITECTURE == CBMROOT)
+
+trackfinderInputFMagneticField* trackfinderInputData::getMagneticField() {
 
 #endif
 

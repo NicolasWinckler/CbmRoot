@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-12-13 13:48:58 $
-/// $Revision: 1.10 $
+/// $Date: 2008-10-07 10:36:51 $
+/// $Revision: 1.12 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -39,15 +39,15 @@
 //#undef INTEGRATEDMAGNETICFIELD
 
 
-#ifdef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 
-#define numberOfDefaultMagnetfieldFactors 7
-const double defaultMagnetfieldFactors[numberOfDefaultMagnetfieldFactors] = {6.574331, 6.977340, 7.253845, 7.521950, 7.981060, 8.076062, 8.1};			// dimension: [kG]
+	#define numberOfDefaultMagnetfieldFactors 8
+	const double defaultMagnetfieldFactors[numberOfDefaultMagnetfieldFactors] = {5.98, 6.66, 7.01, 7.70, 8.37, 8.89, 9.04, 10.0};							// dimension: [kG]
 
-#else
+#elif (ARCHITECTURE == CBMROOT)
 
-#define numberOfDefaultMagnetfieldFactors 8
-const double defaultMagnetfieldFactors[numberOfDefaultMagnetfieldFactors] = {5.98, 6.66, 7.01, 7.70, 8.37, 8.89, 9.04, 10.0};							// dimension: [kG]
+	#define numberOfDefaultMagnetfieldFactors 7
+	const double defaultMagnetfieldFactors[numberOfDefaultMagnetfieldFactors] = {6.574331, 6.977340, 7.253845, 7.521950, 7.981060, 8.076062, 8.1};			// dimension: [kG]
 
 #endif
 
@@ -63,7 +63,7 @@ void trackfinderInputMagneticField::readField() {
 
 	if (!fileName.empty()) {
 	
-#ifndef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == STANDALONE)
 
 		if (isLocalField) {
 

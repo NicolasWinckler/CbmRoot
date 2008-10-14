@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-10-19 14:33:02 $
-/// $Revision: 1.4 $
+/// $Date: 2008-10-07 10:36:50 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -34,12 +34,12 @@
 
 
 #include "../../MiscLIB/include/defs.h"
-#ifdef CBMROOTFRAMEWORK
-	#include "CbmHit.h"
-	#include "CbmMCPoint.h"
-#else
+#if (ARCHITECTURE == STANDALONE)
 	#include "../../RootFrameworkLIB/include/CbmHit.h"
 	#include "../../RootFrameworkLIB/include/CbmMCPoint.h"
+#elif (ARCHITECTURE == CBMROOT)
+	#include "CbmHit.h"
+	#include "CbmMCPoint.h"
 #endif
 #include "trackfinderInputTrack.h"
 #include "trackfinderInputStation.h"

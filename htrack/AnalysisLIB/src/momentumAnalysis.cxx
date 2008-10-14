@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2007-06-15 13:55:24 $
-// $Revision: 1.3 $
+// $Date: 2008-09-11 14:07:02 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -124,7 +124,7 @@ void momentumAnalysis::initWindow() {
 void momentumAnalysis::evaluateWindowDivisionSignatures(bool* globalSignature, unsigned short sizeOfGlobalSignature, bool* localSignature, unsigned short sizeOfLocalSignature) {
 
 	if ((sizeOfLocalSignature > sizeOfGlobalSignature) || (globalSignature == NULL) || (localSignature == NULL))
-		throw windowDivisionError();
+		throw windowDivisionError(ANALYSISLIB);
 
 	for (unsigned short i = 0; i < sizeOfLocalSignature; i++)
 		globalSignature[i] |= localSignature[i];
@@ -143,7 +143,7 @@ void momentumAnalysis::evaluateWindowDivisionFactors(unsigned short* numberOfEna
 	unsigned short sizeOfGlobalSignature;
 
 	if ((numberOfEnabledPadColumns == NULL) || (numberOfEnabledPadRows == NULL))
-		throw windowDivisionError();
+		throw windowDivisionError(ANALYSISLIB);
 
 	(*numberOfEnabledPadColumns) = 0;
 	(*numberOfEnabledPadRows)    = 0;
@@ -234,7 +234,7 @@ void momentumAnalysis::drawWindowPads(unsigned short columnId) {
 	padId = columnId + 1;
 
 	if (padId > numberOfWindowPadColumns)
-		throw windowDivisionError();
+		throw windowDivisionError(ANALYSISLIB);
 
 	for (unsigned short i = 0; i < numberOfWindowPadRows; i++) {
 

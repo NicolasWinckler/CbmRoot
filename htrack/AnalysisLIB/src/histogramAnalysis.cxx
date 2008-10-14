@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-12-13 13:47:19 $
-/// $Revision: 1.6 $
+/// $Date: 2008-09-11 14:07:02 $
+/// $Revision: 1.8 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -397,7 +397,7 @@ void histogramAnalysis::setupNames(std::string* nameOfDisplay, std::string* titl
 	char shortBuffer[shortConversionDigits+1];
 
 	itos(eventNumber, intBuffer, 10, intConversionDigits);
-	ustos(layer, shortBuffer, 10, intConversionDigits);
+	ustos(layer, shortBuffer, 10, shortConversionDigits);
 
 	if (nameOfEventFolder != NULL) {
 

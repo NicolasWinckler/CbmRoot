@@ -2,12 +2,12 @@
 // (C)opyright 2004
 // 
 // Institute of Computer Science V
-// Prof. Männer
+// Prof. Mï¿½ner
 // University of Mannheim, Germany
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,16 +23,118 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-06-26 13:01:08 $
-// $Revision: 1.8 $
+// $Date: 2008-10-07 10:39:57 $
+// $Revision: 1.12 $
 //
 // *******************************************************************/
 
+
+#include "../../HistogramTransformationLIB/include/filterDef.h"
 #include "../../MiscLIB/include/terminal.h"
 #include "../include/trackfinderError.h"
 #include "../include/trackfinder.h"
 #include <stdio.h>
 
+
+#define max(a, b)  (((a) > (b)) ? (a) : (b))
+
+
+/****************************************************************
+ * This applies the algorithm to evaluate the filter geometry	*
+ ****************************************************************/
+
+void trackfinder::evaluatePeakfindingGeometry(std::streambuf* terminal) {
+
+#ifndef NOANALYSIS
+
+	unsigned short           numberOfSecuredSourceData;
+	double                   securedSourceDataIncrease;
+	std::list<findableTrack> findableTracks;
+	terminalSequence         statusSequence;
+	unsigned short           trackIndex;
+	trackfinderInputTrack*   track;
+
+	if (houghTransform == NULL)
+		throw cannotAccessHoughTransformError();
+	if (histoTransform == NULL)
+		throw cannotAccessHistogramTransformError();
+	if (analyser == NULL)
+		throw cannotAccessAnalyserError();
+
+	if (isAutomaticFilterGeometryEnabled() && analyser->isAutomaticFilterGeometryAnalysisEnabled()) {
+
+		analyser->setupFindableComputedTracks(&findableTracks, terminal);
+
+		if (sourceDataPercentage < 100) {
+			numberOfSecuredSourceData = (sourceDataPercentage * findableTracks.size()) / 100;
+			securedSourceDataIncrease = (double)100 / (double)sourceDataPercentage;
+		}
+		else {
+			numberOfSecuredSourceData = findableTracks.size();
+			securedSourceDataIncrease = 1;
+		}
+
+		createTerminalStatusSequence(&statusSequence, terminal, "Generate filter geometry:\t\t\t", numberOfSecuredSourceData * houghTransform->getNumberOfHistogramLayers(), houghTransform->getNumberOfHistogramLayers());
+		terminalInitialize(statusSequence);
+
+		analyser->resetPeakfindingGeometryElements();
+
+		trackIndex = 0;
+		for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); trackIndex++) {
+
+			track = actualTrack->getTrack();
+			if (track == NULL)
+				throw cannotAccessHitsOrTracksError(ANALYSISLIB);
+
+			houghTransform->resetHistogram();
+
+			houghTransform->createBorders(track);
+
+			analyser->resetPeakfindingLayerGeometryElements();
+
+			for (unsigned short i = 0; i < houghTransform->getNumberOfHistogramLayers(); i++) {
+
+				houghTransform->createHistogramLayer(i);
+
+				histoTransform->encodeHistogramLayer(i);
+
+				histoTransform->diagonalizeHistogramLayer(i);
+
+				analyser->addPeakfindingLayerGeometry(i);
+
+				houghTransform->resetHistogramLayer();
+
+				terminalOverwrite(statusSequence, trackIndex * houghTransform->getNumberOfHistogramLayers() + i + 1);
+
+			}
+
+			analyser->updatePeakfindingGeometry(actualTrack->getPosition());
+
+			for (unsigned short j = 0; j < max((unsigned short)(securedSourceDataIncrease * (double)(trackIndex + 1)) - (unsigned short)(securedSourceDataIncrease * (double)trackIndex), 1); j++) {
+
+				if (actualTrack != findableTracks.end())
+					actualTrack++;
+
+			}
+
+			if (trackIndex == numberOfSecuredSourceData - 1)
+				actualTrack = findableTracks.end();
+
+		}
+
+		terminalFinalize(statusSequence);
+
+	}
+	else
+		throw featureNotEnabledInAnalyserError();
+
+#else
+
+	throw impossibleFeatureWithoutAnalyserError();
+
+#endif
+
+}
 
 /****************************************************************
  * Default constructor											*
@@ -40,21 +142,15 @@
 
 trackfinder::trackfinder() {
 
-	houghTransform = new houghTransformation();
-
-#ifdef ERASERPEAKFINDING
-
-	histoTransform = new eraser();
-
-#else
-
-	histoTransform = new maxMorphSearch();
-
-#endif
+	houghTransform       = NULL;
+	histoTransform       = NULL;
+	filterType           = NOFILTER;
+	sourceDataPercentage = 100;
+	filterFileName.clear();
 
 #ifndef NOANALYSIS
 
-	analyser       = NULL;
+	analyser             = NULL;
 
 #endif
 
@@ -66,27 +162,45 @@ trackfinder::trackfinder() {
 
 trackfinder::trackfinder( trackfinderInputData** eventData, histogramData** histogram,
 						  trackData** tracks, tables** ratings, lutImplementation** lut,
+						  unsigned short filterType, unsigned short sourceDataPercentage,
+						  std::string filterFileName,
+						  unsigned short firstFilterGeometry, unsigned short firstFilterArithmetic,
+						  unsigned short secondFilterGeometry, unsigned short secondFilterArithmetic,
 						  unsigned short firstFilterDim1ClearRadius,
 						  unsigned short firstFilterDim2ClearRadius,
 						  unsigned short secondFilterDim1ClearRadius,
 						  unsigned short secondFilterDim2ClearRadius,
 						  unsigned short secondFilterDim3ClearRadius) {
 
-	houghTransform = new houghTransformation(eventData, histogram, lut);
+	houghTransform         = new houghTransformation(eventData, histogram, lut);
 
-#ifdef ERASERPEAKFINDING
+	switch(filterType) {
 
-	histoTransform = new eraser(histogram, tracks, ratings, firstFilterDim1ClearRadius, firstFilterDim2ClearRadius, secondFilterDim3ClearRadius);
+		case NOFILTER:
+			histoTransform = new maxMorphSearch(histogram, tracks, ratings, NOFIRSTARITHMETIC, firstFilterArithmetic, NOSECONDGEOMETRY, secondFilterArithmetic, firstFilterDim1ClearRadius, firstFilterDim2ClearRadius, secondFilterDim1ClearRadius, secondFilterDim2ClearRadius, secondFilterDim3ClearRadius);
+			break;
+		case MAXMORPHSEARCHFILTER:
+			histoTransform = new maxMorphSearch(histogram, tracks, ratings, firstFilterGeometry, firstFilterArithmetic, secondFilterGeometry, secondFilterArithmetic, firstFilterDim1ClearRadius, firstFilterDim2ClearRadius, secondFilterDim1ClearRadius, secondFilterDim2ClearRadius, secondFilterDim3ClearRadius);
+			break;
+		case ERASERFILTER:
+			histoTransform = new eraser(histogram, tracks, ratings, firstFilterDim1ClearRadius, firstFilterDim2ClearRadius, secondFilterDim3ClearRadius);
+			break;
+		default:
+			histoTransform = new autoFinder(histogram, tracks, ratings, firstFilterArithmetic, (firstFilterGeometry == FIRSTFINALMODGEOMETRY), secondFilterArithmetic, (secondFilterGeometry == SECONDFINALMODGEOMETRY));
+			break;
 
-#else
+	}
 
-	histoTransform = new maxMorphSearch(histogram, tracks, ratings, firstFilterDim1ClearRadius, firstFilterDim2ClearRadius, secondFilterDim1ClearRadius, secondFilterDim2ClearRadius, secondFilterDim3ClearRadius);
-
-#endif
+	this->filterType       = filterType;
+	if (sourceDataPercentage < 100)
+		this->sourceDataPercentage = sourceDataPercentage;
+	else
+		this->sourceDataPercentage = 100;
+	this->filterFileName   = filterFileName;
 
 #ifndef NOANALYSIS
 
-	analyser       = NULL;
+	analyser               = NULL;
 
 #endif
 
@@ -118,23 +232,53 @@ trackfinder::~trackfinder() {
 
 void trackfinder::init(trackfinderInputData** eventData, histogramData** histogram,
 					   trackData** tracks, tables** ratings, lutImplementation** lut,
+					   unsigned short filterType, unsigned short sourceDataPercentage,
+					   std::string filterFileName,
+					   unsigned short firstFilterGeometry, unsigned short firstFilterArithmetic,
+					   unsigned short secondFilterGeometry, unsigned short secondFilterArithmetic,
 					   unsigned short firstFilterDim1ClearRadius,
 					   unsigned short firstFilterDim2ClearRadius,
 					   unsigned short secondFilterDim1ClearRadius,
 					   unsigned short secondFilterDim2ClearRadius,
 					   unsigned short secondFilterDim3ClearRadius) {
 
+	if(houghTransform != NULL) {
+
+		delete houghTransform;
+		houghTransform = NULL;
+	}
+
+	if(histoTransform != NULL) {
+
+		delete histoTransform;
+		histoTransform = NULL;
+	}
+
 	houghTransform->init(eventData, histogram, lut);
 
-#ifdef ERASERPEAKFINDING
+	switch(filterType) {
 
-	((eraser*)histoTransform)->init(histogram, tracks, ratings, firstFilterDim1ClearRadius, firstFilterDim2ClearRadius, secondFilterDim3ClearRadius);
+		case NOFILTER:
+			histoTransform = new maxMorphSearch(histogram, tracks, ratings, NOFIRSTGEOMETRY, firstFilterArithmetic, NOSECONDGEOMETRY, secondFilterArithmetic, firstFilterDim1ClearRadius, firstFilterDim2ClearRadius, secondFilterDim1ClearRadius, secondFilterDim2ClearRadius, secondFilterDim3ClearRadius);
+			break;
+		case MAXMORPHSEARCHFILTER:
+			histoTransform = new maxMorphSearch(histogram, tracks, ratings, firstFilterGeometry, firstFilterArithmetic, secondFilterGeometry, secondFilterArithmetic, firstFilterDim1ClearRadius, firstFilterDim2ClearRadius, secondFilterDim1ClearRadius, secondFilterDim2ClearRadius, secondFilterDim3ClearRadius);
+			break;
+		case ERASERFILTER:
+			histoTransform = new eraser(histogram, tracks, ratings, firstFilterDim1ClearRadius, firstFilterDim2ClearRadius, secondFilterDim3ClearRadius);
+			break;
+		default:
+			histoTransform = new autoFinder(histogram, tracks, ratings, firstFilterArithmetic, (firstFilterGeometry == FIRSTFINALMODGEOMETRY), secondFilterArithmetic, (secondFilterGeometry == SECONDFINALMODGEOMETRY));
+			break;
 
-#else
+	}
 
-	((maxMorphSearch*)histoTransform)->init(histogram, tracks, ratings, firstFilterDim1ClearRadius, firstFilterDim2ClearRadius, secondFilterDim1ClearRadius, secondFilterDim2ClearRadius, secondFilterDim3ClearRadius);
-
-#endif
+	this->filterType       = filterType;
+	if (sourceDataPercentage < 100)
+		this->sourceDataPercentage = sourceDataPercentage;
+	else
+		this->sourceDataPercentage = 100;
+	this->filterFileName   = filterFileName;
 
 }
 
@@ -441,6 +585,210 @@ void trackfinder::evaluate(std::streambuf* terminal) {
 			analyser->trackPeakfindingTimerStop();
 
 #endif
+
+}
+
+/****************************************************************
+ * This applies the algorithm to generate the filter geometry	*
+ ****************************************************************/
+
+void trackfinder::generateFilterGeometry(unsigned short filterCoverPercentage, bool isFirstEvent, std::streambuf* terminal) {
+
+	peakfindingGeometry evaluatedGeometry;
+
+	if (histoTransform == NULL)
+		throw cannotAccessHistogramTransformError();
+	if (analyser == NULL)
+		throw cannotAccessAnalyserError();
+
+	switch (filterType) {
+
+		case FILEFILTER:
+			if (isFirstEvent) {
+				((autoFinder*)histoTransform)->readPeakfindingGeometry(filterFileName);
+				if (filterCoverPercentage > 0)
+					((autoFinder*)histoTransform)->setPeakfindingCoverage(filterCoverPercentage);
+				((autoFinder*)histoTransform)->setup();
+			}
+			break;
+
+		case AUTOMATICFIRSTEVENTFILTER:
+			if (isFirstEvent) {
+				evaluatePeakfindingGeometry(terminal);
+				evaluatedGeometry = analyser->getPeakfindingGeometry();
+				((autoFinder*)histoTransform)->setPeakfindingGeometry(evaluatedGeometry);
+				((autoFinder*)histoTransform)->setPeakfindingCoverage(filterCoverPercentage);
+				((autoFinder*)histoTransform)->setup();
+			}
+			break;
+
+		case AUTOMATICEACHEVENTFILTER:
+			evaluatePeakfindingGeometry(terminal);
+			evaluatedGeometry = analyser->getPeakfindingGeometry();
+			((autoFinder*)histoTransform)->setPeakfindingGeometry(evaluatedGeometry);
+			((autoFinder*)histoTransform)->setPeakfindingCoverage(filterCoverPercentage);
+			((autoFinder*)histoTransform)->setup();
+			break;
+
+		case AUTOMATICUPDATEEVENTFILTER:
+			evaluatePeakfindingGeometry(terminal);
+			evaluatedGeometry = analyser->getPeakfindingGeometry();
+			if (isFirstEvent) {
+				((autoFinder*)histoTransform)->setPeakfindingGeometry(evaluatedGeometry);
+				((autoFinder*)histoTransform)->setPeakfindingCoverage(filterCoverPercentage);
+			}
+			else
+				((autoFinder*)histoTransform)->updatePeakfindingGeometry(evaluatedGeometry);
+			((autoFinder*)histoTransform)->setup();
+			break;
+
+		default:
+			break;
+
+	}
+
+}
+
+/****************************************************************
+ * This method writes the peakfinding geometry into a file		*
+ ****************************************************************/
+
+void trackfinder::writePeakfindingGeometry() {
+
+	if (histoTransform == NULL)
+		throw cannotAccessHistogramTransformError();
+
+	if (isAutomaticFilterGeometryEnabled())
+		((autoFinder*)histoTransform)->writePeakfindingGeometry(filterFileName);
+
+}
+
+/****************************************************************
+ * This method draws the peakfinding geometry					*
+ ****************************************************************/
+
+void trackfinder::drawPeakfindingGeometry() {
+
+	if (histoTransform == NULL)
+		throw cannotAccessHistogramTransformError();
+
+	if (isFilterGeometryGenerationEnabled())
+		((autoFinder*)histoTransform)->drawPeakfindingGeometry();
+
+}
+void trackfinder::drawProjectedPeakfindingGeometry() {
+
+	if (histoTransform == NULL)
+		throw cannotAccessHistogramTransformError();
+
+	if (isFilterGeometryGenerationEnabled())
+		((autoFinder*)histoTransform)->drawProjectedPeakfindingGeometry();
+
+}
+void trackfinder::drawCoveredPeakfindingGeometry() {
+
+	if (histoTransform == NULL)
+		throw cannotAccessHistogramTransformError();
+
+	if (isFilterGeometryGenerationEnabled())
+		((autoFinder*)histoTransform)->drawCoveredPeakfindingGeometry();
+
+}
+void trackfinder::drawCoveredProjectedPeakfindingGeometry() {
+
+	if (histoTransform == NULL)
+		throw cannotAccessHistogramTransformError();
+
+	if (isFilterGeometryGenerationEnabled())
+		((autoFinder*)histoTransform)->drawCoveredProjectedPeakfindingGeometry();
+
+}
+
+/****************************************************************
+ * This method returns a string representation for the			*
+ * peakfinding geometry											*
+ ****************************************************************/
+
+std::string trackfinder::peakfindingGeometryToString() {
+
+	std::string returnValue;
+
+	returnValue.clear();
+
+	if (histoTransform == NULL)
+		throw cannotAccessHistogramTransformError();
+
+	if (isFilterGeometryGenerationEnabled())
+		returnValue = ((autoFinder*)histoTransform)->peakfindingGeometryToString();
+
+	return returnValue;
+
+}
+std::string trackfinder::projectedPeakfindingGeometryToString() {
+
+	std::string returnValue;
+
+	returnValue.clear();
+
+	if (histoTransform == NULL)
+		throw cannotAccessHistogramTransformError();
+
+	if (isFilterGeometryGenerationEnabled())
+		returnValue = ((autoFinder*)histoTransform)->projectedPeakfindingGeometryToString();
+
+	return returnValue;
+
+}
+std::string trackfinder::coveredPeakfindingGeometryToString() {
+
+	std::string returnValue;
+
+	returnValue.clear();
+
+	if (histoTransform == NULL)
+		throw cannotAccessHistogramTransformError();
+
+	if (isFilterGeometryGenerationEnabled())
+		returnValue = ((autoFinder*)histoTransform)->coveredPeakfindingGeometryToString();
+
+	return returnValue;
+
+}
+std::string trackfinder::coveredProjectedPeakfindingGeometryToString() {
+
+	std::string returnValue;
+
+	returnValue.clear();
+
+	if (histoTransform == NULL)
+		throw cannotAccessHistogramTransformError();
+
+	if (isFilterGeometryGenerationEnabled())
+		returnValue = ((autoFinder*)histoTransform)->coveredProjectedPeakfindingGeometryToString();
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * method returns true if the automatic generation of the filter*
+ * geometry is enabled.											*
+ ****************************************************************/
+
+bool trackfinder::isAutomaticFilterGeometryEnabled() {
+
+	return ((filterType == AUTOMATICFIRSTEVENTFILTER) || (filterType == AUTOMATICEACHEVENTFILTER) || (filterType == AUTOMATICUPDATEEVENTFILTER));
+
+}
+
+/****************************************************************
+ * method returns true if the generation of the filter			*
+ * geometry is enabled.											*
+ ****************************************************************/
+
+bool trackfinder::isFilterGeometryGenerationEnabled() {
+
+	return ((filterType == FILEFILTER) || isAutomaticFilterGeometryEnabled());
 
 }
 

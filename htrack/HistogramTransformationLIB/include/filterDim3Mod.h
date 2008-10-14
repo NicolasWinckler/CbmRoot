@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -33,8 +33,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/19 11:33:46 $
-/// $Revision: 1.2 $
+/// $Date: 2008-08-14 12:35:34 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -63,15 +63,17 @@ public:
 /**
  * Constructor
  * @param tracks is an object for accessing the tracks
+ * @param filterArithmetic defines the arithmetic which is used in the applied filter
  * @param size is the complete size of the area of the filter
  * @param localSize is the complete size of the area of the local filter
  * @param maximumClass is the maximal class which can occur while filtering
  */
 
 	filterDim3Mod( trackData**    tracks,
+				   unsigned short filterArithmetic,
 				   unsigned short size,
 				   unsigned short localSize,
-				   bitArray maximumClass);
+				   bitArray       maximumClass);
 
 /**
  * Destructor
@@ -82,15 +84,17 @@ public:
 /**
  * This method initializes the object.
  * @param tracks is an object for accessing the tracks
+ * @param filterArithmetic defines the arithmetic which is used in the applied filter
  * @param size is the complete size of the area of the filter
  * @param localSize is the complete size of the area of the local filter
  * @param maximumClass is the maximal class which can occur while filtering
  */
 
 	void init( trackData**    tracks,
+			   unsigned short filterArithmetic,
 			   unsigned short size,
 			   unsigned short localSize,
-			   bitArray maximumClass);
+			   bitArray       maximumClass);
 
 /**
  * This method implements the filter.

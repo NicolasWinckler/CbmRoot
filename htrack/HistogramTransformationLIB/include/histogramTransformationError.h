@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/07/17 11:35:13 $
-/// $Revision: 1.1 $
+/// $Date: 2008-10-07 10:37:46 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -232,40 +232,6 @@ public:
 #endif
 
 
-#ifndef _CANNOTACCESSHISTOGRAMERROR_H
-#define _CANNOTACCESSHISTOGRAMERROR_H
-
-/**
- * CLASS cannotAccessHistogramError
- */
-
-class cannotAccessHistogramError : public histogramTransformationError {
-
-public:
-
-/**
- * Default constructor
- */
-
-	cannotAccessHistogramError();
-
-/**
- * Destructor
- */
-
-	virtual ~cannotAccessHistogramError();
-
-/**
- * This method displays an error message.
- */
-
-	void errorMsg();
-
-};
-
-#endif
-
-
 #ifndef _CANNOTACCESSTRACKSERROR_H
 #define _CANNOTACCESSTRACKSERROR_H
 
@@ -288,6 +254,40 @@ public:
  */
 
 	virtual ~cannotAccessTracksError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _WRONGPEAKFINDINGGEOMETRYERROR_H
+#define _WRONGPEAKFINDINGGEOMETRYERROR_H
+
+/**
+ * CLASS wrongPeakfindingGeometryError
+ */
+
+class wrongPeakfindingGeometryError : public histogramTransformationError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	wrongPeakfindingGeometryError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~wrongPeakfindingGeometryError();
 
 /**
  * This method displays an error message.

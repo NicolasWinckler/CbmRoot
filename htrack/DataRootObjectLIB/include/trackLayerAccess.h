@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2006/11/17 15:12:37 $
-/// $Revision: 1.2 $
+/// $Date: 2008-10-07 10:36:50 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -38,6 +38,18 @@
 
 
 #define trackLayer std::list<trackDigitalInformation>		/**< Definition for easier reading code and easy exchaninging of the stl conatainer */
+
+
+/**
+ * Struct to store the information of a filter-deleted object
+ */
+
+typedef struct {
+
+	trackLayer::iterator element;
+	unsigned short       layer;
+
+} removingInformation;
 
 
 /* **************************************************************

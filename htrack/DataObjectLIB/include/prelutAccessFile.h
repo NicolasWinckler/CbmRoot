@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-02-29 11:38:11 $
-/// $Revision: 1.4 $
+/// $Date: 2008-10-10 13:47:04 $
+/// $Revision: 1.6 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -62,7 +62,6 @@ class prelutAccessFile : public io {
 
 private:
 
-	bool                   commandID[numberOfPrelutAccessFileCmds];			/**< Variable to review which parameter comes from the file. */
 	prelutAccessFileHeader header;											/**< Struct to store all parameters. */
 	bool                   localMemory;										/**< Variable to store if the memory to read the file is local memory or not. */
 
@@ -78,7 +77,7 @@ protected:
  * This method returns the number of accepted commands.
  */
 
-	int getNumberOfCmds();
+	unsigned int getNumberOfCmds();
 
 /**
  * This method assigns the value to the corresponding parameter

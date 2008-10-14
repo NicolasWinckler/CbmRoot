@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-12-19 10:48:44 $
-/// $Revision: 1.5 $
+/// $Date: 2008-08-14 12:35:54 $
+/// $Revision: 1.6 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -102,9 +102,12 @@ public:
 
 /**
  * This method creates the borders for each hit
+ * @param track is a MCTrack with links to the corresponding hits
  * @param terminal is a buffer to place the process information
  * @param analyser is just used in combination with DEBUGJUSTONEGOODTRACK
  */
+
+	void createBorders(trackfinderInputTrack* track);
 
 #ifndef NOANALYSIS
 

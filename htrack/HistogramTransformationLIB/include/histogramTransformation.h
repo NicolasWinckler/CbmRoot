@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-06-26 12:52:50 $
-/// $Revision: 1.5 $
+/// $Date: 2008-08-14 12:35:34 $
+/// $Revision: 1.6 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -78,9 +78,6 @@ protected:
 	histogramData**       histogram;								/**< Object to access the histogram. */
 	trackData**           tracks;									/**< Object to access the computed tracks. */
 	tables**              ratings;                                  /**< Object to access the tables to do the ratings. */
-	unsigned short        firstFilterNeighborhoodDim1ClearRadius;	/**< Variable to store the size of the region of interest for the first filter in the first dimension. */
-	unsigned short        firstFilterNeighborhoodDim2ClearRadius;	/**< Variable to store the size of the region of interest for the first filter in the second dimension.  */
-	unsigned short        secondFilterNeighborhoodDim3ClearRadius;	/**<  Variable to store the size of the region of interest for the second filter in the third dimension. */
 
 /**
  * This method filters the peakclasses in a speciallized manner.
@@ -109,12 +106,9 @@ public:
  * @param histogram is an object for accessing the histogram
  * @param tracks is the object to access the computed tracks
  * @param ratings is the object to access the tables for the ratings
- * @param dim1ClearRadius is the region of interest for the first filter in the first dimension
- * @param dim2ClearRadius is the region of interest for the first filter in the second dimension
- * @param dim3ClearRadius is the region of interest for the second filter in the third dimension
  */
 
-	histogramTransformation(histogramData** histogram, trackData** tracks, tables** ratings, unsigned short dim1ClearRadius, unsigned short dim2ClearRadius, unsigned short dim3ClearRadius);
+	histogramTransformation(histogramData** histogram, trackData** tracks, tables** ratings);
 
 /**
  * Default destructor
@@ -127,12 +121,9 @@ public:
  * @param histogram is an object for accessing the histogram
  * @param tracks is the object to access the computed tracks
  * @param ratings is the object to access the tables for the ratings
- * @param dim1ClearRadius is the region of interest for the first filter in the first dimension
- * @param dim2ClearRadius is the region of interest for the first filter in the second dimension
- * @param dim3ClearRadius is the region of interest for the second filter in the third dimension
  */
 
-	void init(histogramData** histogram, trackData** tracks, tables** ratings, unsigned short dim1ClearRadius, unsigned short dim2ClearRadius, unsigned short dim3ClearRadius);
+	void init(histogramData** histogram, trackData** tracks, tables** ratings);
 
 /**
  * This method resets the tracks object.

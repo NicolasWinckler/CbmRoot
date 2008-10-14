@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,13 +23,14 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/07/17 11:35:00 $
-// $Revision: 1.1 $
+// $Date: 2008-10-10 13:47:23 $
+// $Revision: 1.3 $
 //
 // *******************************************************************/
 
 
 #include "../../MiscLIB/include/projects.h"
+#include "../../MiscLIB/include/conversionRoutines.h"
 #include "../include/fileioWarningMsg.h"
 #include <iostream>
 
@@ -306,5 +307,61 @@ tooMuchDataWarningMsg::~tooMuchDataWarningMsg() {
 void tooMuchDataWarningMsg::warningMsg() {
 
 	printMsg("Too much data is detected in the file!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS lockOutOfRangeWarningMsg					 			*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+lockOutOfRangeWarningMsg::lockOutOfRangeWarningMsg() : fileioWarningMsg() {
+
+	lockId        = 0;
+	numberOfLocks = 0;
+
+}
+
+/****************************************************************
+ * Constructor													*
+ ****************************************************************/
+
+lockOutOfRangeWarningMsg::lockOutOfRangeWarningMsg(unsigned int lockId, unsigned int numberOfLocks) : fileioWarningMsg() {
+
+	this->lockId        = lockId;
+	this->numberOfLocks = numberOfLocks;
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+lockOutOfRangeWarningMsg::~lockOutOfRangeWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void lockOutOfRangeWarningMsg::warningMsg() {
+
+	std::string temp;
+	char buffer[intConversionDigits+1];
+
+	temp += "There are just ";
+	uitos(numberOfLocks, buffer, 10, intConversionDigits);
+	temp += buffer;
+	temp += " locks.";
+	temp = " So the lockId ";
+	uitos(lockId, buffer, 10, intConversionDigits);
+	temp += buffer;
+	temp += " is out of range!!!";
+	printMsg(temp);
 
 }

@@ -7,7 +7,7 @@
 ///
 /// *******************************************************************
 ///
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 ///
 /// *******************************************************************
 ///
@@ -23,20 +23,20 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-10-19 14:33:10 $
-/// $Revision: 1.8 $
+/// $Date: 2008-10-07 10:36:51 $
+/// $Revision: 1.10 $
 ///
 //////////////////////////////////////////////////////////////////////
 
 #include "../../MiscLIB/include/defs.h"
-#ifdef CBMROOTFRAMEWORK
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmFieldPar.h"
-#include "CbmFieldConst.h"
-#include "CbmFieldMap.h"
-#include "CbmFieldMapSym2.h"
-#include "CbmFieldMapSym3.h"
+#if (ARCHITECTURE == CBMROOT)
+	#include "CbmRunAna.h"
+	#include "CbmRuntimeDb.h"
+	#include "CbmFieldPar.h"
+	#include "CbmFieldConst.h"
+	#include "CbmFieldMap.h"
+	#include "CbmFieldMapSym2.h"
+	#include "CbmFieldMapSym3.h"
 #endif
 #include "../include/dataRootObjectWarningMsg.h"
 #include "../include/trackfinderInputFMagneticField.h"
@@ -120,7 +120,7 @@ const trackfinderInputFMagneticField& trackfinderInputFMagneticField::operator =
 
 void trackfinderInputFMagneticField::initialize() {
 
-#ifdef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == CBMROOT)
 
 	bool          cannotAccessFrameworkField;
 	CbmRunAna*    runAna;
@@ -136,7 +136,7 @@ void trackfinderInputFMagneticField::initialize() {
 
 		if (magneticField == NULL) {
 
-#ifdef CBMROOTFRAMEWORK
+#if (ARCHITECTURE == CBMROOT)
 
 			cannotAccessFrameworkField = false;
 	

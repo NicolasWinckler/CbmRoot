@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gläß
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-06-26 12:52:50 $
-// $Revision: 1.7 $
+// $Date: 2008-08-14 12:35:35 $
+// $Revision: 1.8 $
 //
 // *******************************************************************/
 
@@ -48,7 +48,7 @@
 
 histogramTransformation::histogramTransformation() {
 
-	init(NULL, NULL, NULL, 0, 0, 0);
+	init(NULL, NULL, NULL);
 
 }
 
@@ -56,9 +56,9 @@ histogramTransformation::histogramTransformation() {
  * Constructor													*
  ****************************************************************/
 
-histogramTransformation::histogramTransformation(histogramData** histogram, trackData** tracks, tables** ratings, unsigned short dim1ClearRadius, unsigned short dim2ClearRadius, unsigned short dim3ClearRadius) {
+histogramTransformation::histogramTransformation(histogramData** histogram, trackData** tracks, tables** ratings) {
 
-	init(histogram, tracks, ratings, dim1ClearRadius, dim2ClearRadius, dim3ClearRadius);
+	init(histogram, tracks, ratings);
 
 }
 
@@ -72,19 +72,13 @@ histogramTransformation::~histogramTransformation() {
 
 /****************************************************************
  * This method initializes the object.							*
- * Errors:														*
- * - memoryAllocationError										*
  ****************************************************************/
 
-void histogramTransformation::init(histogramData** histogram, trackData** tracks, tables** ratings, unsigned short dim1ClearRadius, unsigned short dim2ClearRadius, unsigned short dim3ClearRadius) {
+void histogramTransformation::init(histogramData** histogram, trackData** tracks, tables** ratings) {
 
 	this->histogram = histogram;
 	this->tracks    = tracks;
 	this->ratings   = ratings;
-
-	firstFilterNeighborhoodDim1ClearRadius  = dim1ClearRadius;
-	firstFilterNeighborhoodDim2ClearRadius  = dim2ClearRadius;
-	secondFilterNeighborhoodDim3ClearRadius = dim3ClearRadius;
 
 }
 
@@ -111,6 +105,7 @@ void histogramTransformation::resetTracks() {
 void histogramTransformation::encodeHistogramLayer(unsigned short layer) {
 
 	histogramCell* actualCell;
+	bitArray       zeroComparator;
 	bitArray       comparator;
 
 #ifdef PRINTORIGINALHISTOGRAMLAYERSTOFILE
@@ -144,7 +139,8 @@ void histogramTransformation::encodeHistogramLayer(unsigned short layer) {
 
 #endif
 
-	comparator = (*ratings)->getCodingTable().getMinimumClassification();
+	zeroComparator = bitArray(0);
+	comparator     = (*ratings)->getCodingTable().getMinimumClassification();
 
 	for(unsigned short i = 0; i < (*histogram)->getValueDim2(); i++) {
 
@@ -152,15 +148,28 @@ void histogramTransformation::encodeHistogramLayer(unsigned short layer) {
 
 			actualCell = (*histogram)->getCell(j, i);
 
-			if (actualCell->value >= comparator)
-				actualCell->value = (*ratings)->getCodingTableClassification(actualCell->value);
+			if (actualCell->value > zeroComparator) {
 
 #ifdef SKIPFIRSTHISTOGRAMCOLUMN
 
-			if (j == 0)
-				actualCell->value = bitArray(0);
+				if (j == 0)
+					actualCell->value = zeroComparator;
+				else {
 
 #endif
+
+					if (actualCell->value >= comparator)
+						actualCell->value = (*ratings)->getCodingTableClassification(actualCell->value);
+					else
+						actualCell->value = zeroComparator;
+
+#ifdef SKIPFIRSTHISTOGRAMCOLUMN
+
+				}
+
+#endif
+
+			}
 
 		}
 
@@ -272,6 +281,10 @@ void histogramTransformation::serializeHistogramLayer(unsigned short layer, std:
 	std::string    id;
 
 #endif
+	if (ratings == NULL)
+		throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
+	if (*ratings == NULL)
+		throw cannotAccessTablesError(HISTOGRAMTRANSFORMATIONLIB);
 
 	if (histogram == NULL)
 		throw cannotAccessHistogramError();
@@ -283,7 +296,7 @@ void histogramTransformation::serializeHistogramLayer(unsigned short layer, std:
 	if (*tracks == NULL)
 		throw cannotAccessHistogramError();
 
-	comparator = (*ratings)->getCodingTableMinimumClassification();
+	comparator = bitArray(0);
 
 	for (unsigned short i = 0; i < (*histogram)->getValueDim2(); i++) {
 
@@ -291,7 +304,7 @@ void histogramTransformation::serializeHistogramLayer(unsigned short layer, std:
 
 			actualCell = (*histogram)->getCell(j, i);
 
-			if (actualCell->value >= comparator) {
+			if (actualCell->value > comparator) {
 
 				(*tracks)->addTrack(j, i, layer, *actualCell);
 
@@ -367,4 +380,3 @@ void histogramTransformation::filterHistogram(std::streambuf* terminal) {
 #endif
 
 }
-

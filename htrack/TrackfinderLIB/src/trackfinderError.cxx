@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2006/07/17 11:36:26 $
-// $Revision: 1.1 $
+// $Date: 2008-08-14 12:39:20 $
+// $Revision: 1.2 $
 //
 // *******************************************************************/
 
@@ -174,5 +174,98 @@ cannotAccessHistogramTransformError::~cannotAccessHistogramTransformError() {
 void cannotAccessHistogramTransformError::errorMsg() {
 
 	printMsg("The histogramTransform is not accessible!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS cannotAccessAnalyserError	 							*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+cannotAccessAnalyserError::cannotAccessAnalyserError() : trackfinderError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+cannotAccessAnalyserError::~cannotAccessAnalyserError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void cannotAccessAnalyserError::errorMsg() {
+
+	printMsg("The analyser is not accessible!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS impossibleFeatureWithoutAnalyserError					*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+impossibleFeatureWithoutAnalyserError::impossibleFeatureWithoutAnalyserError() : trackfinderError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+impossibleFeatureWithoutAnalyserError::~impossibleFeatureWithoutAnalyserError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void impossibleFeatureWithoutAnalyserError::errorMsg() {
+
+	printMsg("It is impossible to use this feature without the analyser object!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS featureNotEnabledInAnalyserError						*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+featureNotEnabledInAnalyserError::featureNotEnabledInAnalyserError() : trackfinderError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+featureNotEnabledInAnalyserError::~featureNotEnabledInAnalyserError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void featureNotEnabledInAnalyserError::errorMsg() {
+
+	printMsg("This feature can not be used if it is not enabled in the analyser object!!!");
 
 }

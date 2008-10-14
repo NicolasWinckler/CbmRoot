@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-06-21 15:17:25 $
-/// $Revision: 1.6 $
+/// $Date: 2008-10-10 13:47:04 $
+/// $Revision: 1.7 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -97,6 +97,12 @@ public:
 	unsigned long getNumberOfEntries();
 
 /**
+ * method returns the maximal number of entries
+ */
+
+	unsigned long getNumberOfMembers();
+
+/**
  * method returns the tableEntry for the given signature
  */
 
@@ -107,6 +113,12 @@ public:
  */
 
 	bitArray getClassification(bitArray& signature);
+
+/**
+ * method returns the member entry for the given signature
+ */
+
+	bitArray getMember(unsigned long index);
 
 /**
  * method returns the maximal classification of this table

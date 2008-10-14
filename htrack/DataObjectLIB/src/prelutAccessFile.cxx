@@ -7,7 +7,7 @@
 // 
 // *******************************************************************
 // 
-// Designer(s):   Steinle / Gl‰ﬂ
+// Designer(s):   Steinle
 // 
 // *******************************************************************
 // 
@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-02-29 11:38:11 $
-// $Revision: 1.4 $
+// $Date: 2008-10-10 13:47:05 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
@@ -105,7 +105,7 @@ void prelutAccessFile::deleteLocalMemory() {
 /********************************************************/
 
 		if (typeCastedData != NULL) {
-			delete typeCastedData;
+			delete [] typeCastedData;
 			setDataNum(0);
 			setDataPtr(NULL);
 		}
@@ -120,7 +120,7 @@ void prelutAccessFile::deleteLocalMemory() {
  * This method returns the number of accepted commands.			*
  ****************************************************************/
 
-int prelutAccessFile::getNumberOfCmds() {
+unsigned int prelutAccessFile::getNumberOfCmds() {
 
 	return numberOfPrelutAccessFileCmds;
 
@@ -139,58 +139,58 @@ bool prelutAccessFile::getHeaderValue(std::string& specifier, std::string& value
 /********************************************************/
 /* make code changes for a different configuration here */
 	if (specifier.compare(stringCmdName) == 0) {
-		if (!(commandID[idCmdName])) {
+		if (!isHeaderLockSet(idCmdName)) {
 			header.name = value;
-			commandID[idCmdName] = true;
+			setHeaderLock(idCmdName, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdUsage) == 0) {
-		if (!(commandID[idCmdUsage])) {
+		if (!isHeaderLockSet(idCmdUsage)) {
 			header.usage = value;
-			commandID[idCmdUsage] = true;
+			setHeaderLock(idCmdUsage, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdNumberOfEntries) == 0) {
-		if (!(commandID[idCmdNumberOfEntries])) {
+		if (!isHeaderLockSet(idCmdNumberOfEntries)) {
 			header.numberOfEntries = stoul((char*)value.c_str(), 10);
-			commandID[idCmdNumberOfEntries] = true;
+			setHeaderLock(idCmdNumberOfEntries, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdDimMin) == 0) {
-		if (!(commandID[idCmdDimMin])) {
+		if (!isHeaderLockSet(idCmdDimMin)) {
 			header.dimMin = stod((char*)value.c_str());
-			commandID[idCmdDimMin] = true;
+			setHeaderLock(idCmdDimMin, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdDimMax) == 0) {
-		if (!(commandID[idCmdDimMax])) {
+		if (!isHeaderLockSet(idCmdDimMax)) {
 			header.dimMax = stod((char*)value.c_str());
-			commandID[idCmdDimMax] = true;
+			setHeaderLock(idCmdDimMax, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdDimStep) == 0) {
-		if (!(commandID[idCmdDimStep])) {
+		if (!isHeaderLockSet(idCmdDimStep)) {
 			header.dimStep = stoi((char*)value.c_str(), 10);
-			commandID[idCmdDimStep] = true;
+			setHeaderLock(idCmdDimStep, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdDimStartEntry) == 0) {
-		if (!(commandID[idCmdDimStartEntry])) {
+		if (!isHeaderLockSet(idCmdDimStartEntry)) {
 			header.dimStartEntry = stod((char*)value.c_str());
-			commandID[idCmdDimStartEntry] = true;
+			setHeaderLock(idCmdDimStartEntry, true);
 			specifierFound = true;
 		}
 	}
 	else if (specifier.compare(stringCmdDimStopEntry) == 0) {
-		if (!(commandID[idCmdDimStopEntry])) {
+		if (!isHeaderLockSet(idCmdDimStopEntry)) {
 			header.dimStopEntry = stod((char*)value.c_str());
-			commandID[idCmdDimStopEntry] = true;
+			setHeaderLock(idCmdDimStopEntry, true);
 			specifierFound = true;
 		}
 	}
@@ -338,8 +338,7 @@ void prelutAccessFile::setHeaderDefValues() {
 
 prelutAccessFile::prelutAccessFile() : io() {
 
-	for (unsigned int i = 0; i < numberOfPrelutAccessFileCmds; i++)
-		commandID[i] = 0;
+	localMemory = false;
 
 	init();
 
@@ -362,10 +361,10 @@ prelutAccessFile::~prelutAccessFile() {
 
 void prelutAccessFile::init() {
 
-	setHeaderDefValues();
-
 	if (localMemory)
 		deleteLocalMemory();
+
+	resetHeader();
 
 }
 
@@ -393,14 +392,14 @@ void prelutAccessFile::setHeader(prelutAccessFileHeader& structure) {
 	header.dimStep                  = structure.dimStep;
 	header.dimStartEntry            = structure.dimStartEntry;
 	header.dimStopEntry             = structure.dimStopEntry;
-	commandID[idCmdName]            = true;
-	commandID[idCmdUsage]           = true;
-	commandID[idCmdNumberOfEntries] = true;
-	commandID[idCmdDimMin]          = true;
-	commandID[idCmdDimMax]          = true;
-	commandID[idCmdDimStep]         = true;
-	commandID[idCmdDimStartEntry]   = true;
-	commandID[idCmdDimStopEntry]    = true;
+	setHeaderLock(idCmdName, true);
+	setHeaderLock(idCmdUsage, true);
+	setHeaderLock(idCmdNumberOfEntries, true);
+	setHeaderLock(idCmdDimMin, true);
+	setHeaderLock(idCmdDimMax, true);
+	setHeaderLock(idCmdDimStep, true);
+	setHeaderLock(idCmdDimStartEntry, true);
+	setHeaderLock(idCmdDimStopEntry, true);
 
 }
 
@@ -472,8 +471,8 @@ std::string prelutAccessFile::getInfo() {
 	message += "------------------------------------------\n";
 	message += "CommandID";
 	message += "\t: ";
-	for (int i = 0; i < numberOfPrelutAccessFileCmds; i++) {
-		btods(commandID[i], longBuffer);
+	for (unsigned int i = 0; i < getNumberOfCmds(); i++) {
+		btods(isHeaderLockSet(i), longBuffer);
 		message += longBuffer;
 	}
 	message += "\n";

@@ -7,7 +7,7 @@
 /// 
 /// *******************************************************************
 /// 
-/// Designer(s):   Steinle / Gl‰ﬂ
+/// Designer(s):   Steinle
 /// 
 /// *******************************************************************
 /// 
@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-10-19 14:34:44 $
-/// $Revision: 1.5 $
+/// $Date: 2008-08-14 12:36:55 $
+/// $Revision: 1.6 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -75,7 +75,7 @@
 #endif
 
 
-#define maxDimSH   8		/**< Actual maximal number of the detector stations in one cell of the histogram layer */
+#define maxDimSH   8			/**< Actual maximal number of the detector stations in one cell of the histogram layer */
 
 
 #endif

@@ -20,6 +20,7 @@
 #pragma link C++ class CbmBsField+;
 #pragma link C++ class CbmFieldCreator+;
 #pragma link C++ class CbmFieldMapDistorted+;
+#pragma link C++ class CbmFieldMapSym1+;
 
 //#pragma link C++ class CbmMultiField+;
 

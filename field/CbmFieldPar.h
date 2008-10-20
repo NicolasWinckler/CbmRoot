@@ -23,7 +23,7 @@
 
 class CbmParamList;
 
-const int kMaxFieldMapType = 4;        
+const int kMaxFieldMapType = 5;        
 const int kTypeDistorted = 4;        
 
 class CbmFieldPar : public CbmParGenericSet

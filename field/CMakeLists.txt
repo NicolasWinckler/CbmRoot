@@ -29,6 +29,7 @@ CbmFieldPar.cxx
 CbmBsField.cxx 
 CbmFieldCreator.cxx 
 CbmFieldMapDistorted.cxx       
+CbmFieldMapSym1.cxx     
 )
 #CbmMultiField.cxx
 

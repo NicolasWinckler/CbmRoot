@@ -47,6 +47,7 @@ CbmFieldMapDistorted::CbmFieldMapDistorted(const char* mapName, const char* pfDi
   switch (pfTypeOfParent) {
   case 3: fParentField = new  CbmFieldMapSym3 (parentName, fileTypeParent); break;
   case 2: fParentField = new  CbmFieldMapSym2 (parentName, fileTypeParent); break;
+  case 5: fParentField = new  CbmFieldMapSym1 (parentName, fileTypeParent); break;
   default: fParentField = new  CbmFieldMap (parentName, fileTypeParent); break;
   }
 
@@ -92,6 +93,7 @@ CbmFieldMapDistorted::CbmFieldMapDistorted(CbmFieldPar* fieldPar)
       switch (fTypeOfParent) {
       case 3: fParentField = new  CbmFieldMapSym3 (parentName.Data(),"R"); break;
       case 2: fParentField = new  CbmFieldMapSym2 (parentName.Data(),"R"); break;
+      case 5: fParentField = new  CbmFieldMapSym1 (parentName.Data(),"R"); break;
       case 0: fParentField = new  CbmFieldConst (parentName.Data(), fieldPar->GetXmin(), fieldPar->GetXmax(), fieldPar->GetYmin(), 
 						 fieldPar->GetYmax(), fieldPar->GetZmin(), fieldPar->GetZmax(), 
 						 fieldPar->GetBx(), fieldPar->GetBy(), fieldPar->GetBz()); 
@@ -110,6 +112,7 @@ CbmFieldMapDistorted::CbmFieldMapDistorted(CbmFieldPar* fieldPar)
       switch (fType) {
       case 3: fParentField = new  CbmFieldMapSym3 (fieldPar); break;
       case 2: fParentField = new  CbmFieldMapSym2 (fieldPar); break;
+      case 5: fParentField = new  CbmFieldMapSym1 (fieldPar); break;
       case 0: fParentField = new  CbmFieldConst (fieldPar); break;
       default: fParentField = new  CbmFieldMap (fieldPar); break;
       }

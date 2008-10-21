@@ -6,6 +6,7 @@
 
 #pragma link C++ class CbmDigi+;
 #pragma link C++ class CbmDigiManager+;
+#pragma link C++ class CbmEcalGenerator+;
 #pragma link C++ class CbmMCTrack+;
 #pragma link C++ class CbmPropagator+;
 #pragma link C++ class CbmStack+;

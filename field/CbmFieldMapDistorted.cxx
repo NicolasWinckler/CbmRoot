@@ -8,6 +8,7 @@
 #include "CbmFieldPar.h"
 #include "CbmField.h"
 #include "CbmFieldConst.h"
+#include "CbmFieldMapSym1.h"
 #include "CbmFieldMapSym2.h"
 #include "CbmFieldMapSym3.h"
 

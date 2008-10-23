@@ -72,7 +72,7 @@ public:
   virtual void SetType(Int_t pfType=0) { fType = pfType; }
 
   virtual const char* GetDistortionFilename() {return fDistortionFilename.Data();}
-  virtual Bool_t SetDistortionFilename(const char *filename) {fDistortionFilename=filename;}
+  virtual Bool_t SetDistortionFilename(const char *filename) {fDistortionFilename=filename; return (fDistortionFilename.Length()!=0);}
  
   virtual TFormula* GetDistortionFormula(const char *component_option="y", const char *action_option="m");  // component_opt:"x","y","z";action_opt:"m","a" 
   virtual Bool_t SetDistortionFormula (TFormula* parDistortionFormula, const char *component_option="y", const char *action_option="m" ); 

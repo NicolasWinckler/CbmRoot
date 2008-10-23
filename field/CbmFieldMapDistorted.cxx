@@ -14,6 +14,7 @@
 
 #include "TFile.h"
 #include "TArrayF.h"
+#include "TSystem.h"
 
 using std::cout;
 using std::cerr;
@@ -200,19 +201,25 @@ void CbmFieldMapDistorted::ReadDistortionInformation(const char *filename) {
     }}
   if (fDistortionFilename.Data()) {
     if (strlen(fDistortionFilename.Data())) {
-      TFile* f = new TFile (fDistortionFilename+".root");
-      if (f) {
-	fBxDistortionFormulaMult = (TFormula*)f->Get("BxDistortionFormulaMult"); 
-	fBxDistortionFormulaAdd = (TFormula*)f->Get("BxDistortionFormulaAdd");     
-	fByDistortionFormulaMult = (TFormula*)f->Get("ByDistortionFormulaMult");
-	fByDistortionFormulaAdd = (TFormula*)f->Get("ByDistortionFormulaAdd");    
-	fBzDistortionFormulaMult = (TFormula*)f->Get("BzDistortionFormulaMult");
-	fBzDistortionFormulaAdd = (TFormula*)f->Get("BzDistortionFormulaAdd");  
-	f->Close(); 
+      if (gSystem->AccessPathName(fDistortionFilename+".root", kFileExists)) {
+	  cerr << "CbmFieldMapDistorted::ReadDistortionInformation Warning: file " << (fDistortionFilename.Data()) 
+	       << " not exists yet !!!" << endl;
       }
       else {
-	cerr << "CbmFieldMapDistorted::ReadDistortionInformation ERROR: file " << (fDistortionFilename.Data()) 
-	     << " can not be read !!!" << endl;
+	TFile* f = new TFile (fDistortionFilename+".root");
+	if (f) {
+	  fBxDistortionFormulaMult = (TFormula*)f->Get("BxDistortionFormulaMult"); 
+	  fBxDistortionFormulaAdd = (TFormula*)f->Get("BxDistortionFormulaAdd");     
+	  fByDistortionFormulaMult = (TFormula*)f->Get("ByDistortionFormulaMult");
+	  fByDistortionFormulaAdd = (TFormula*)f->Get("ByDistortionFormulaAdd");    
+	  fBzDistortionFormulaMult = (TFormula*)f->Get("BzDistortionFormulaMult");
+	  fBzDistortionFormulaAdd = (TFormula*)f->Get("BzDistortionFormulaAdd");  
+	  f->Close(); 
+	}
+	else {
+	  cerr << "CbmFieldMapDistorted::ReadDistortionInformation ERROR: file " << (fDistortionFilename.Data()) 
+	       << " can not be read !!!" << endl;
+	}
       }
     }}
   gFile=filesave;

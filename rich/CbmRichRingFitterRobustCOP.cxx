@@ -109,7 +109,7 @@ void CbmRichRingFitterRobustCOP::DoFit(CbmRichRing *pRing)
 	Double_t A0,A1,A2,A22,epsilon=0.000000000001;
 	Double_t Dy,xnew,xold,ynew,yold=100000000000.;
 	Double_t GAM,DET;
-	Double_t Xcenter,Ycenter,Radius;
+	Double_t Xcenter = -1.,Ycenter = -1.,Radius = -1.;
 	Double_t SumS1 = 0., SumS2 = 0.;
 	Double_t sigma;
 	Double_t ctsigma;

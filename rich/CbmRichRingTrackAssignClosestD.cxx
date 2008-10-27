@@ -117,7 +117,7 @@ void CbmRichRingTrackAssignClosestD::DoAssign(TClonesArray *pRingArray, TClonesA
 
 	CbmTrackParam *pTrack;
 	CbmRichRing *pRing;
-	CbmRichRing *pRingT;
+
 	CbmGlobalTrack *gTrack;
 
 	Double_t xRing, yRing;
@@ -129,7 +129,7 @@ void CbmRichRingTrackAssignClosestD::DoAssign(TClonesArray *pRingArray, TClonesA
 	vector<Double_t> trackDist;	
 	trackIndex.resize(fNRings);
 	trackDist.resize(fNRings);	
-	for (Int_t i = 0; i < trackIndex.size(); i++){
+	for (UInt_t i = 0; i < trackIndex.size(); i++){
 		trackIndex[i] = -1;
 		trackDist[i] = 999.;
 	}
@@ -171,8 +171,8 @@ void CbmRichRingTrackAssignClosestD::DoAssign(TClonesArray *pRingArray, TClonesA
 			trackDist[iRing] = rMin;
 		}//loop rings
 		
-		for (Int_t i1 = 0; i1 < trackIndex.size(); i1++){
-			for (Int_t i2 = 0; i2 < trackIndex.size(); i2++){
+		for (UInt_t i1 = 0; i1 < trackIndex.size(); i1++){
+			for (UInt_t i2 = 0; i2 < trackIndex.size(); i2++){
 				if (i1 == i2) continue;
 				if (trackIndex[i1] == trackIndex[i2] && trackIndex[i1] != -1){
 					if (trackDist[i1] >= trackDist[i2]){
@@ -188,7 +188,7 @@ void CbmRichRingTrackAssignClosestD::DoAssign(TClonesArray *pRingArray, TClonesA
 	}//iIter
 	
 	// fill global tracks
-	for (Int_t i = 0; i < trackIndex.size(); i++){
+	for (UInt_t i = 0; i < trackIndex.size(); i++){
 		pRing = (CbmRichRing*)pRingArray->At(i);
 		pRing->SetTrackID(trackIndex[i]);
 		pRing->SetDistance(trackDist[i]);

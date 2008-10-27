@@ -201,7 +201,7 @@ Double_t CbmRichRing::GetRadialAngle() const{
         return 2*TMath::Pi() - atan(fabs((-100 - fCenterY) / (0 - fCenterX)));
     }    
   
-
+    return 999.;
 }
 
 ClassImp(CbmRichRing)

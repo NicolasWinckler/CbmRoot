@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-10-10 13:50:00 $
-/// $Revision: 1.4 $
+/// $Date: 2008-10-24 16:41:17 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -32,15 +32,7 @@
 #ifndef _DIGITALHITACCESS_H
 #define _DIGITALHITACCESS_H
 
-#include "../../MiscLIB/include/defs.h"
-#include "../../DataObjectLIB/include/digitalHit.h"
-
-#if (ARCHITECTURE != PS3)
-
-#include "../../DataRootObjectLIB/include/trackfinderInputHit.h"
-
-#endif
-
+#include "../../DataRootObjectLIB/include/digitalHit.h"
 #include <string>
 
 
@@ -82,18 +74,6 @@ public:
 	void init();
 
 /**
- * This method evaluates the value from the prelut table.
- * @param hit is the actual hit-object to compute the borders
- * @return if borderPointer is not null, this object would consist of the computed results
- */
-
-#if (ARCHITECTURE != PS3)
-
-	void evaluate(trackfinderInputHit* hit, digitalHit* digitalHitPointer = NULL);
-
-#endif
-
-/**
  * This method clears the prelut table.
  */
 	
@@ -130,18 +110,20 @@ public:
 /**
  * method reads a file to get the table
  * @param fileName is the name of the file to read the data
+ * @param terminal is a buffer to place the process information
  */
 
-	void read(std::string fileName);
+	void read(std::string fileName, std::streambuf* terminal = NULL);
 
 /**
  * method writes a file representing the table
  * @param fileName is the name of the file to write the data
  * @param name is the name of the table which should be written to file
  * @param usage is a string representing the usage of the table in the program which should be written to file
+ * @param terminal is a buffer to place the process information
  */
 
-	void write(std::string fileName, std::string name);
+	void write(std::string fileName, std::string name, std::streambuf* terminal = NULL);
 
 };
 

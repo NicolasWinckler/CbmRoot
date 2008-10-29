@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-10-10 13:47:06 $
-/// $Revision: 1.12 $
+/// $Date: 2008-10-24 16:36:58 $
+/// $Revision: 1.13 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -511,7 +511,7 @@ std::string table::toString() {
  * method reads a file to get the table							*
  ****************************************************************/
 
-void table::read(std::string fileName) {
+void table::read(std::string fileName, std::streambuf* terminal) {
 
 	tableFile         readFile;
 	tableStringEntry* readData;
@@ -520,7 +520,7 @@ void table::read(std::string fileName) {
 
 	readFile.setDataNum(0);
 
-	readFile.readFile();
+	readFile.readFile(terminal);
 
 	readData = (tableStringEntry*)readFile.getDataPtr();
 
@@ -534,7 +534,7 @@ void table::read(std::string fileName) {
  * method writes a file representing the table					*
  ****************************************************************/
 
-void table::write(std::string fileName, std::string name, std::string usage, bool useClassification) {
+void table::write(std::string fileName, std::string name, std::string usage, bool useClassification, std::streambuf* terminal) {
 
 	unsigned long               i;
 	tableEntry                  actualEntry;
@@ -576,7 +576,7 @@ void table::write(std::string fileName, std::string name, std::string usage, boo
 
 	writeFile.setHeader(fileHeader);
 
-	writeFile.writeFile();
+	writeFile.writeFile(terminal);
 
 	if (writeData != NULL) {
 		delete [] writeData;

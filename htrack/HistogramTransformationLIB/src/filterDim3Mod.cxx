@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-08-14 12:35:35 $
-// $Revision: 1.5 $
+// $Date: 2008-10-24 16:40:41 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -196,7 +196,7 @@ void filterDim3Mod::filter(std::streambuf* terminal) {
 	if (trackAccess == NULL)
 		throw memoryAllocationError(HISTOGRAMTRANSFORMATIONLIB);
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t\t\t", (*tracks)->getNumberOfLayers());
+	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t\t\t", (unsigned int)(*tracks)->getNumberOfLayers());
 	terminalInitialize(statusSequence);
 
 	for (i = 0; i < (*tracks)->getNumberOfLayers(); i++) {
@@ -291,7 +291,7 @@ void filterDim3Mod::filter(std::streambuf* terminal) {
 
 		}
 
-		terminalOverwrite(statusSequence, i + 1);
+		terminalOverwriteWithIncrement(statusSequence);
 
 	}
 
@@ -299,17 +299,15 @@ void filterDim3Mod::filter(std::streambuf* terminal) {
 
 /* Here the removing of the tracks is done if inplace is undefined		*/
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Remove filtered tracks:\t\t", removeElements.size());
+	createTerminalStatusSequence(&statusSequence, terminal, "Remove filtered tracks:\t\t", (unsigned int)removeElements.size());
 	terminalInitialize(statusSequence);
 
-	i = 1;
 	while (removeElements.size() > 0) {
 
 		removeElement = removeElements.back();
 		(*tracks)->removeTrack(removeElement.element, removeElement.layer);
 		removeElements.pop_back();
-		terminalOverwrite(statusSequence, i);
-		i++;
+		terminalOverwriteWithIncrement(statusSequence);
 
 	}
 

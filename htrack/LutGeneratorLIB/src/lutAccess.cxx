@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-10 13:50:01 $
-// $Revision: 1.6 $
+// $Date: 2008-10-24 16:41:19 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
@@ -60,6 +60,9 @@ void lutAccess::allocateNewMemory(unsigned long number) {
 
 	if (lutMem == NULL)
 		throw memoryAllocationError();
+
+	for (unsigned long i = numberOfEntries - number; i < numberOfEntries; i++)
+		lutMem[i].init();
 
 }
 
@@ -221,17 +224,30 @@ void lutAccess::resetCorrectionCounter() {
 
 void lutAccess::evaluate(trackfinderInputHit* hit, lutHoughBorder* borderPointer) {
 
+	digitalHit temp;
+
 	if (hit == NULL)
 		throw noHitError();
-/**/
-	if (borderPointer != NULL)
-		*borderPointer = getEntry(0); //hit->digitize
-	else
-		border         = getEntry(0); //hit->digitize
+
+	temp.setHit(hit);
+
+	evaluate(&temp, borderPointer);
 
 }
 
 #endif
+
+void lutAccess::evaluate(digitalHit* hit, lutHoughBorder* borderPointer) {
+
+	if (hit == NULL)
+		throw noHitError();
+
+	if (borderPointer != NULL)
+		*borderPointer = getEntry(hit);
+	else
+		border         = getEntry(hit);
+
+}
 
 /****************************************************************
  * This method clears the lut table.							*
@@ -266,7 +282,15 @@ unsigned long lutAccess::getNumberOfMembers() {
 /****************************************************************
  * This method returns the value from the lut table.			*
  ****************************************************************/
-	
+
+lutHoughBorder lutAccess::getEntry(digitalHit* hit) {
+
+	if (hit == NULL)
+		throw noHitError();
+
+	return getEntry(hit->getData());
+
+}
 lutHoughBorder lutAccess::getEntry(unsigned long index) {
 
 	lutHoughBorder returnValue;
@@ -299,12 +323,25 @@ lutHoughBorder lutAccess::getMember(unsigned long index) {
 /****************************************************************
  * This method adds the value at the end of the prelut table.	*
  ****************************************************************/
-	
+
 void lutAccess::addEntry(lutHoughBorder& value) {
 
 	allocateNewMemory(1);
 
 	lutMem[numberOfEntries - 1] = value;
+
+}
+void lutAccess::addEntry(lutHoughBorder& value, unsigned long index) {
+
+	if (index >= numberOfEntries)
+		allocateNewMemory(index + 1 - numberOfEntries);
+
+	lutMem[index] = value;
+
+}
+void lutAccess::addEntry(lutHoughBorder& value, digitalHit hit) {
+
+	addEntry(value, hit.getData());
 
 }
 
@@ -347,7 +384,7 @@ std::string lutAccess::toString() {
  * method reads a file to get the table							*
  ****************************************************************/
 
-void lutAccess::read(std::string fileName) {
+void lutAccess::read(std::string fileName, std::streambuf* terminal) {
 
 	unsigned short  countDifferentLutDefinitionAsFile;
 	lutAccessFile   readFile;
@@ -415,7 +452,7 @@ void lutAccess::read(std::string fileName) {
 
 	readFile.setDataPtr(lutMem);
 
-	readFile.readFile();
+	readFile.readFile(terminal);
 
 }
 
@@ -423,7 +460,7 @@ void lutAccess::read(std::string fileName) {
  * method writes a file representing the table					*
  ****************************************************************/
 
-void lutAccess::write(std::string fileName, std::string name, unsigned short format) {
+void lutAccess::write(std::string fileName, std::string name, unsigned short format, std::streambuf* terminal) {
 
 	lutAccessFileHeader fileHeader;
 	lutAccessFile       writeFile;
@@ -462,7 +499,7 @@ void lutAccess::write(std::string fileName, std::string name, unsigned short for
 
 		writeFile.setHeader(fileHeader);
 
-		writeFile.writeFile();
+		writeFile.writeFile(terminal);
 
 	}
 

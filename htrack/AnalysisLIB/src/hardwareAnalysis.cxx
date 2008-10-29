@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-08-14 12:29:26 $
-// $Revision: 1.7 $
+// $Date: 2008-10-24 16:35:15 $
+// $Revision: 1.8 $
 //
 // *******************************************************************/
 
@@ -441,7 +441,7 @@ void hardwareAnalysis::evaluateNumberOfTracksInAllColumns(trackData* tracks, std
 	if (averageNumberOfTracks == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Analyse tracks per column:\t\t\t\t", tracks->getNumberOfLayers());
+	createTerminalStatusSequence(&statusSequence, terminal, "Analyse tracks per column:\t\t\t\t", (unsigned int)tracks->getNumberOfLayers());
 	terminalInitialize(statusSequence);
 
 	for (unsigned short i = 0; i < tracks->getNumberOfLayers(); i++) {
@@ -529,7 +529,7 @@ void hardwareAnalysis::evaluateNumberOfTracksInAllColumns(trackData* tracks, std
 
 		}
 
-		terminalOverwrite(statusSequence, i + 1);
+		terminalOverwriteWithIncrement(statusSequence);
 
 	}
 
@@ -586,7 +586,7 @@ void hardwareAnalysis::evaluateNumberOfTracksInAllRows(trackData* tracks, std::s
 	if (averageNumberOfTracks == NULL)
 		throw memoryAllocationError(ANALYSISLIB);
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Analyse tracks per row:\t\t\t\t", tracks->getNumberOfLayers());
+	createTerminalStatusSequence(&statusSequence, terminal, "Analyse tracks per row:\t\t\t\t", (unsigned int)tracks->getNumberOfLayers());
 	terminalInitialize(statusSequence);
 
 	for (unsigned short i = 0; i < tracks->getNumberOfLayers(); i++) {
@@ -674,7 +674,7 @@ void hardwareAnalysis::evaluateNumberOfTracksInAllRows(trackData* tracks, std::s
 
 		}
 
-		terminalOverwrite(statusSequence, i + 1);
+		terminalOverwriteWithIncrement(statusSequence);
 
 	}
 
@@ -809,7 +809,7 @@ void hardwareAnalysis::evaluateNumberOfTracksInAllLayers(trackData* tracks, std:
 	if (tracks == NULL)
 		throw cannotAccessTrackDataError(ANALYSISLIB);
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Analyse tracks per layer:\t\t\t\t", min(numberOfTracksInAllLayerEntries, tracks->getNumberOfLayers()));
+	createTerminalStatusSequence(&statusSequence, terminal, "Analyse tracks per layer:\t\t\t\t", (unsigned int)min(numberOfTracksInAllLayerEntries, tracks->getNumberOfLayers()));
 	terminalInitialize(statusSequence);
 
 	for (unsigned int i = 0; i < min(numberOfTracksInAllLayerEntries, tracks->getNumberOfLayers()); i++) {
@@ -824,7 +824,7 @@ void hardwareAnalysis::evaluateNumberOfTracksInAllLayers(trackData* tracks, std:
 		else
 			numberOfTrackDensitiesPerLayer[i]  = (int)numberOfTracksPerLayer[i] - (int)numberOfTracksPerLayer[i - 1];
 
-		terminalOverwrite(statusSequence, i + 1);
+		terminalOverwriteWithIncrement(statusSequence);
 
 	}
 
@@ -889,7 +889,7 @@ void hardwareAnalysis::evaluateHitReadoutDistribution(histogramData* histogram, 
 	if (histogram == NULL)
 		throw cannotAccessHistogramDataError(ANALYSISLIB);
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Analyse hit readout:\t\t\t\t", min(numberOfHitReadoutDistributionEntries, histogram->getValueDim3()));
+	createTerminalStatusSequence(&statusSequence, terminal, "Analyse hit readout:\t\t\t\t", (unsigned int)min(numberOfHitReadoutDistributionEntries, histogram->getValueDim3()));
 	terminalInitialize(statusSequence);
 
 	for (unsigned short i = 0; i < min(numberOfHitReadoutDistributionEntries, histogram->getValueDim3()); i++) {
@@ -900,7 +900,7 @@ void hardwareAnalysis::evaluateHitReadoutDistribution(histogramData* histogram, 
 
 		}
 
-		terminalOverwrite(statusSequence, i + 1);
+		terminalOverwriteWithIncrement(statusSequence);
 
 	}
 

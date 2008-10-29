@@ -29,8 +29,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-07 10:37:46 $
-// $Revision: 1.4 $
+// $Date: 2008-10-24 16:40:41 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -554,7 +554,7 @@ void autoFinder::filteringHistogramWithoutDirectOverwriting(std::streambuf* term
 	if (trackAccess == NULL)
 		throw memoryAllocationError(HISTOGRAMTRANSFORMATIONLIB);
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t\t\t", (*tracks)->getNumberOfLayers());
+	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t\t\t", (unsigned int)(*tracks)->getNumberOfLayers());
 	terminalInitialize(statusSequence);
 
 	for (i = 0; i < (*tracks)->getNumberOfLayers(); i++) {
@@ -646,7 +646,7 @@ void autoFinder::filteringHistogramWithoutDirectOverwriting(std::streambuf* term
 
 		}
 
-		terminalOverwrite(statusSequence, i + 1);
+		terminalOverwriteWithIncrement(statusSequence);
 
 	}
 
@@ -654,17 +654,15 @@ void autoFinder::filteringHistogramWithoutDirectOverwriting(std::streambuf* term
 
 /* Here the removing of the tracks is done if inplace is undefined		*/
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Remove filtered tracks:\t\t", removeElements.size());
+	createTerminalStatusSequence(&statusSequence, terminal, "Remove filtered tracks:\t\t", (unsigned int)removeElements.size());
 	terminalInitialize(statusSequence);
 
-	i = 1;
 	while (removeElements.size() > 0) {
 
 		removeElement = removeElements.back();
 		(*tracks)->removeTrack(removeElement.element, removeElement.layer);
 		removeElements.pop_back();
-		terminalOverwrite(statusSequence, i);
-		i++;
+		terminalOverwriteWithIncrement(statusSequence);
 
 	}
 
@@ -710,7 +708,7 @@ void autoFinder::filteringHistogramWithDirectOverwriting(std::streambuf* termina
 	if (trackAccess == NULL)
 		throw memoryAllocationError(HISTOGRAMTRANSFORMATIONLIB);
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t\t\t", (*tracks)->getNumberOfLayers());
+	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t\t\t", (unsigned int)(*tracks)->getNumberOfLayers());
 	terminalInitialize(statusSequence);
 
 	for (i = 0; i < (*tracks)->getNumberOfLayers(); i++) {
@@ -786,7 +784,7 @@ void autoFinder::filteringHistogramWithDirectOverwriting(std::streambuf* termina
 
 		}
 
-		terminalOverwrite(statusSequence, i + 1);
+		terminalOverwriteWithIncrement(statusSequence);
 
 	}
 
@@ -931,7 +929,7 @@ autoFinder::~autoFinder() {
  * This method initializes the object.							*
  ****************************************************************/
 
-autoFinder::init(histogramData** histogram, trackData** tracks, tables** ratings, unsigned short firstFilterArithmetic, bool useFirstFilterMod, unsigned short secondFilterArithmetic, bool useSecondFilterMod) {
+void autoFinder::init(histogramData** histogram, trackData** tracks, tables** ratings, unsigned short firstFilterArithmetic, bool useFirstFilterMod, unsigned short secondFilterArithmetic, bool useSecondFilterMod) {
 
 	geometry.reset();
 
@@ -1082,9 +1080,9 @@ void autoFinder::updatePeakfindingGeometry(peakfindingGeometry& actualPeakfindin
  * method reads a file to get the peak finding geometry			*
  ****************************************************************/
 
-void autoFinder::readPeakfindingGeometry(std::string fileName) {
+void autoFinder::readPeakfindingGeometry(std::string fileName, std::streambuf* terminal) {
 
-	geometry.read(fileName);
+	geometry.read(fileName, terminal);
 
 }
 
@@ -1092,9 +1090,9 @@ void autoFinder::readPeakfindingGeometry(std::string fileName) {
  * method writes a file representing the peak finding geometry	*
  ****************************************************************/
 
-void autoFinder::writePeakfindingGeometry(std::string fileName) {
+void autoFinder::writePeakfindingGeometry(std::string fileName, std::streambuf* terminal) {
 
-	geometry.write(fileName, "Automatic generated peak finding geometry");
+	geometry.write(fileName, "Automatic generated peak finding geometry", terminal);
 
 }
 

@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-08-14 12:34:44 $
-/// $Revision: 1.3 $
+/// $Date: 2008-10-24 16:40:01 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -69,11 +69,12 @@ public:
 /**
  * Constructor
  * @param name is the name of the file to access
+ * @param terminal is a buffer to place the process information
  */
 
-	configuration(int numberOfTchars, char** tchars);
-	configuration(std::string name);
-	configuration(char* name);
+	configuration(int numberOfTchars, char** tchars, std::streambuf* terminal = NULL);
+	configuration(std::string name, std::streambuf* terminal = NULL);
+	configuration(char* name, std::streambuf* terminal = NULL);
 
 /**
  * Destructor
@@ -83,12 +84,13 @@ public:
 
 /**
  * This method initializes the object.
+ * @param terminal is a buffer to place the process information
  */
 
-	void init();
-	void init(int numberOfTchars, char** tchars);
-	void init(std::string name);
-	void init(char* name);
+	void init(std::streambuf* terminal = NULL);
+	void init(int numberOfTchars, char** tchars, std::streambuf* terminal = NULL);
+	void init(std::string name, std::streambuf* terminal = NULL);
+	void init(char* name, std::streambuf* terminal = NULL);
 
 /**
  * This method sets the name of the file.
@@ -100,21 +102,24 @@ public:
 
 /**
  * This method initializes the file.
+ * @param terminal is a buffer to place the process information
  */
 
-	void initFile();
+	void initFile(std::streambuf* terminal = NULL);
 
 /**
  * This method reads the file.
+ * @param terminal is a buffer to place the process information
  */
 
-	void readFile();
+	void readFile(std::streambuf* terminal = NULL);
 
 /**
  * This method writes the file.
+ * @param terminal is a buffer to place the process information
  */
 
-	void writeFile();
+	void writeFile(std::streambuf* terminal = NULL);
 
 };
 

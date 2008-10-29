@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-10 13:47:05 $
-// $Revision: 1.8 $
+// $Date: 2008-10-24 16:36:58 $
+// $Revision: 1.9 $
 //
 // *******************************************************************/
 
@@ -84,6 +84,26 @@ const lutHoughBorder& lutHoughBorder::operator = (const lutHoughBorder& value) {
 }
 
 /****************************************************************
+ * This method clears the object.								*
+ ****************************************************************/
+
+void lutHoughBorder::clear() {
+
+	houghCoord.clear();
+
+}
+
+/****************************************************************
+ * This method initializes the object.							*
+ ****************************************************************/
+
+void lutHoughBorder::init() {
+
+	clear();
+
+}
+
+/****************************************************************
  * This method converts the object into a string representation	*
  * and adds no identifiers.										*
  ****************************************************************/
@@ -121,16 +141,6 @@ std::string lutHoughBorder::toIdentifiedString() {
 	returnValue += toNotIdentifiedString();
 
 	return returnValue;
-
-}
-
-/****************************************************************
- * This method clears the object.								*
- ****************************************************************/
-
-void lutHoughBorder::clear() {
-
-	houghCoord.clear();
 
 }
 

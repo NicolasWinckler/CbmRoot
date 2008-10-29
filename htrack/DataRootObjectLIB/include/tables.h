@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-08-14 12:33:07 $
-/// $Revision: 1.4 $
+/// $Date: 2008-10-24 16:39:20 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -154,17 +154,19 @@ public:
 /**
  * method reads a file to get the table
  * @param fileName is the name of the file to read the data
+ * @param terminal is a buffer to place the process information
  */
 
-	void readCodingTable(std::string fileName = "");
+	void readCodingTable(std::string fileName = "", std::streambuf* terminal = NULL);
 
 /**
  * method writes a file representing the table
  * @param fileName is the name of the file to write the data
  * @param name is the name of the table which should be written to file
+ * @param terminal is a buffer to place the process information
  */
 
-	void writeCodingTable(std::string fileName = "", std::string name = "");
+	void writeCodingTable(std::string fileName = "", std::string name = "", std::streambuf* terminal = NULL);
 
 /**
  * method returns the classification for the given signature
@@ -193,17 +195,19 @@ public:
 /**
  * method reads a file to get the table
  * @param fileName is the name of the file to read the data
+ * @param terminal is a buffer to place the process information
  */
 
-	void readGradingPTable(std::string fileName = "");
+	void readGradingPTable(std::string fileName = "", std::streambuf* terminal = NULL);
 
 /**
  * method writes a file representing the table
  * @param fileName is the name of the file to write the data
  * @param name is the name of the table which should be written to file
+ * @param terminal is a buffer to place the process information
  */
 
-	void writeGradingPTable(std::string fileName = "", std::string name = "");
+	void writeGradingPTable(std::string fileName = "", std::string name = "", std::streambuf* terminal = NULL);
 
 /**
  * method returns the classification for the given signature
@@ -232,17 +236,19 @@ public:
 /**
  * method reads a file to get the table
  * @param fileName is the name of the file to read the data
+ * @param terminal is a buffer to place the process information
  */
 
-	void readGradingRTable(std::string fileName = "");
+	void readGradingRTable(std::string fileName = "", std::streambuf* terminal = NULL);
 
 /**
  * method writes a file representing the table
  * @param fileName is the name of the file to write the data
  * @param name is the name of the table which should be written to file
+ * @param terminal is a buffer to place the process information
  */
 
-	void writeGradingRTable(std::string fileName = "", std::string name = "");
+	void writeGradingRTable(std::string fileName = "", std::string name = "", std::streambuf* terminal = NULL);
 
 /**
  * method returns the coding table

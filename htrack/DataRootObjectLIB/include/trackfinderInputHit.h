@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-10-07 10:36:50 $
-/// $Revision: 1.5 $
+/// $Date: 2008-10-24 16:39:20 $
+/// $Revision: 1.6 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -63,6 +63,7 @@ protected:
 	trackfinderInputStation* station;		/**< Pointer to the station of the detector which the hit hits. */
 	bool                     isPointer;		/**< Variable to store if this object is just a pointer or it has allocated memory which has to be freed. */
 	int                      hitIndex;		/**< Variable to store the index of this hit. */
+	unsigned int             hitOrder;		/**< Variable to store the order of this hit. */
 
 public:
 
@@ -84,9 +85,10 @@ public:
  */
 
 	trackfinderInputHit(const trackfinderInputHit& value);
-	trackfinderInputHit(CbmHit* hitPointer, int index);
-	trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, int pointIndex, bool maps, bool strip, bool hybrid);
-	trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, int pointIndex);
+	trackfinderInputHit(const trackfinderInputHit& value, unsigned int order);
+	trackfinderInputHit(CbmHit* hitPointer, int index, unsigned int order);
+	trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex, bool maps, bool strip, bool hybrid);
+	trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex);
 
 /**
  * Destructor
@@ -99,6 +101,16 @@ public:
  */
 
 	const trackfinderInputHit& operator = (const trackfinderInputHit& value);
+
+/**
+ * method initializes the object
+ * @see CbmHit()
+ */
+
+	void initDefault();
+	void init(CbmHit* hitPointer, int index, unsigned int order);
+	void init(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex, bool maps, bool strip, bool hybrid);
+	void init(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex);
 
 /**
  * method returns the detectorId
@@ -174,6 +186,12 @@ public:
  */
 
 	int getHitIndex();
+
+/**
+ * method gets the order of this hit-object
+ */
+
+	unsigned int getHitOrder();
 
 /**
  * method sets the original point-object from hit

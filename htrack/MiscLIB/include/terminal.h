@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-10-07 10:38:51 $
-/// $Revision: 1.3 $
+/// $Date: 2008-10-24 16:41:39 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -50,7 +50,8 @@ typedef struct {
 	std::string     endText;				/**< Variable to store the constant end of the printed text. */
 	bool            newline;				/**< Variable to determine if a newline should be printed at the last printing. */
 	double          relativityCoefficient;	/**< Variable to store the upgrade factor for each printing in percent. */
-	int             previousInsertion;		/**< Variable to store the last updated printing. Prevents printing of the same number. Only changes are printed. */
+	unsigned int    relativeInsertion;		/**< Variable to store the last relative insertion which updates printing. This value prevents printing of the same number. So only changes are printed. */
+	unsigned int    absoluteInsertion;		/**< Variable to store the last absolute insertion. */
 
 } terminalSequence;
 
@@ -63,12 +64,12 @@ typedef struct {
  * @param statusDiv divides the maximal absolute value which is set for 100 percent just for the screen
  * @param relative formats the output to percent or absolute number
  * @param newline prints a newline after the last output or not
- * @param previous sets up the first percent number to be printed
+ * @param statusStart sets up the first number to be printed
  * @param radix formats the number output to the base of radix. Ordinary this is ten.
  * @return sequence is the struct consisting all needed information for the functionality
  */
 
-void createTerminalStatusSequence(terminalSequence* sequence, std::streambuf* terminal, std::string startText, int statusMax, int statusDiv = 1, bool relative = true, bool newline = true, int previous = 0, int radix = 10);
+void createTerminalStatusSequence(terminalSequence* sequence, std::streambuf* terminal, std::string startText, unsigned int statusMax, unsigned int statusDiv = 1, bool relative = true, bool newline = true, unsigned int statusStart = 0, int radix = 10);
 
 /**
  * This method initializes the terminal for overwriting.
@@ -81,11 +82,13 @@ void terminalInitialize(terminalSequence& sequence);
  * This method replaces the cursor to that position where the
  * overwriting sequence begins and overwrites the old sequence.
  * @param sequence is the created terminalSequence with the functioncreateTerminalStatusSequence(...)
- * @param insertion is the actual absolute number to be inserted
+ * @param incrementInsertion is the actual increment number to be inserted
+ * @param absoluteInsertion is the actual absolute number to be inserted
  * @param radix is the base for the number to be printed
  */
 
-void terminalOverwrite(terminalSequence& sequence, int insertion, int radix = 10);
+void terminalOverwriteWithIncrement(terminalSequence& sequence, unsigned int incrementInsertion = 1, int radix = 10);
+void terminalOverwrite(terminalSequence& sequence, unsigned int absoluteInsertion, int radix = 10);
 
 /**
  * This method replaces the cursor to the next line.

@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-10 13:47:05 $
-// $Revision: 1.3 $
+// $Date: 2008-10-24 16:39:21 $
+// $Revision: 1.1 $
 //
 // *******************************************************************/
 
@@ -46,7 +46,7 @@
 
 digitalHit::digitalHit() {
 
-	identifier = 0;
+	data = 0;
 
 }
 
@@ -56,7 +56,7 @@ digitalHit::digitalHit() {
 
 digitalHit::digitalHit(const digitalHit& value) {
 
-	this->identifier = value.identifier;
+	this->data = value.data;
 
 }
 
@@ -74,15 +74,130 @@ digitalHit::~digitalHit() {
 
 const digitalHit& digitalHit::operator = (const digitalHit& value) {
 
-	this->identifier = value.identifier;
+	this->data = value.data;
 
 	return *this;
 
 }
 
 /****************************************************************
+ * method returns the maximuum number of digital hits			*
+ * which can occur												*
+ ****************************************************************/
+
+#if (ARCHITECTURE != PS3)
+
+unsigned long digitalHit::getMaxNumberOfDigitalHitData() {
+
+	unsigned long returnValue;
+
+#if (ARCHITECTURE == CBMROOT)
+
+/**/
+
+#else
+
+	returnValue = 0;
+
+#endif
+
+	return returnValue;
+
+}
+
+#endif
+
+/****************************************************************
+ * method returns the digital hit data							*
+ ****************************************************************/
+
+unsigned long digitalHit::getData() {
+
+	return data;
+
+}
+
+/****************************************************************
+ * Method returns an analog hit based on the digital data.		*
+ * CAUTION: The return object contains just coordinates.		*
+ * Other parts of such an object are not set.					*
+ ****************************************************************/
+
+#if (ARCHITECTURE != PS3)
+
+trackfinderInputHit digitalHit::getHit() {
+
+	trackfinderInputHit returnValue;
+
+#if (ARCHITECTURE == CBMROOT)
+
+/**/
+
+#else
+
+	returnValue.initDefault();
+
+#endif
+
+	return returnValue;
+
+}
+
+#endif
+
+/****************************************************************
+ * method sets the digital hit data								*
+ ****************************************************************/
+
+void digitalHit::setData(unsigned long value) {
+
+	data = value;
+
+}
+
+/****************************************************************
+ * method sets the digital data based on an analog hit			*
+ ****************************************************************/
+
+#if (ARCHITECTURE != PS3)
+
+void digitalHit::setHit(trackfinderInputHit* hit) {
+
+	if (hit == NULL)
+		throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+#if (ARCHITECTURE == CBMROOT)
+
+/**/
+
+#else
+
+	data = (unsigned long)hit->getHitOrder();
+
+#endif
+
+}
+
+#endif
+
+/****************************************************************
+ * method sets the digital data based on a string representation*
+ ****************************************************************/
+
+void digitalHit::setNotIdentifiedString(std::string& value) {
+
+	std::string temp;
+	int         radix;
+
+	temp = value;
+	extractRadix(&radix, &temp);
+	data = stoul(temp, radix);
+
+}
+
+/****************************************************************
  * This method converts the object into a string representation	*
- * and adds no identifiers.										*
+ * without adding an identifier.								*
  ****************************************************************/
 
 std::string digitalHit::toNotIdentifiedString() {
@@ -92,7 +207,7 @@ std::string digitalHit::toNotIdentifiedString() {
 
 	returnValue  = "000";
 	addRadix(RADIX, returnValue);
-	ultos(identifier, buffer, RADIX, longConversionDigits);
+	ultos(data, buffer, RADIX, longConversionDigits);
 	returnValue += buffer;
 
 	return returnValue;
@@ -101,7 +216,7 @@ std::string digitalHit::toNotIdentifiedString() {
 
 /****************************************************************
  * This method converts the object into a string representation	*
- * and adds identifiers.										*
+ * and adds an identifier.										*
  ****************************************************************/
 
 std::string digitalHit::toIdentifiedString() {
@@ -116,41 +231,6 @@ std::string digitalHit::toIdentifiedString() {
 }
 
 /****************************************************************
- * method returns the start value								*
- ****************************************************************/
-
-unsigned long digitalHit::getIdentifier() {
-
-	return identifier;
-
-}
-
-/****************************************************************
- * method sets the identifier value								*
- ****************************************************************/
-
-void digitalHit::setNotIdentifiedIdentifier(std::string& value) {
-
-	std::string temp;
-	int         radix;
-
-	temp       = value;
-	extractRadix(&radix, &temp);
-	identifier = stoul(temp, radix);
-
-}
-
-/****************************************************************
- * method sets the identifier value								*
- ****************************************************************/
-
-void digitalHit::setIdentifier(unsigned long value) {
-
-	identifier = value;
-
-}
-
-/****************************************************************
  * This method returns the size of the reserved memory for		*
  * the source data.												*
  ****************************************************************/
@@ -159,7 +239,7 @@ double digitalHit::getReservedSizeOfData(unsigned short dimension) {
 
 	double returnValue;
 
-	returnValue  = sizeof(identifier);
+	returnValue  = sizeof(data);
 
 	returnValue  = (returnValue / (1 << (10 * dimension)));
 
@@ -193,7 +273,7 @@ double digitalHit::getUsedSizeOfData(unsigned short dimension) {
 
 	double returnValue;
 
-	returnValue  = sizeof(identifier);
+	returnValue  = sizeof(data);
 
 	returnValue  = (returnValue / (1 << (10 * dimension)));
 

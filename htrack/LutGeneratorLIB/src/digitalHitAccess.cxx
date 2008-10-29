@@ -23,13 +23,13 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-10 13:50:00 $
-// $Revision: 1.4 $
+// $Date: 2008-10-24 16:41:18 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
 
-#include "../../DataObjectLIB/include/digitalHitAccessFile.h"
+#include "../../DataRootObjectLIB/include/digitalHitAccessFile.h"
 #include "../include/lutGeneratorError.h"
 #include "../include/lutGeneratorWarningMsg.h"
 #include "../include/digitalHitAccess.h"
@@ -88,24 +88,6 @@ void digitalHitAccess::init() {
 	clear();
 
 }
-
-/****************************************************************
- * This method evaluates the value from the prelut table.		*
- ****************************************************************/
-
-#if (ARCHITECTURE != PS3)
-
-void digitalHitAccess::evaluate(trackfinderInputHit* hit, digitalHit* digitalHitPointer) {
-
-	if (hit == NULL)
-		throw noHitError();
-/**/
-	if (digitalHitPointer != NULL)
-		digitalHitPointer->setIdentifier(numberOfEntries); //hit->digitize
-
-}
-
-#endif
 
 /****************************************************************
  * This method clears the prelut table.							*
@@ -173,7 +155,7 @@ digitalHit digitalHitAccess::getMember(unsigned long index) {
 /****************************************************************
  * This method adds the value at the end of the prelut table.	*
  ****************************************************************/
-	
+
 void digitalHitAccess::addEntry(digitalHit& value) {
 
 	allocateNewMemory(1);
@@ -220,7 +202,7 @@ std::string digitalHitAccess::toString() {
  * method reads a file to get the table							*
  ****************************************************************/
 
-void digitalHitAccess::read(std::string fileName) {
+void digitalHitAccess::read(std::string fileName, std::streambuf* terminal) {
 
 	digitalHitAccessFile readFile;
 
@@ -249,7 +231,7 @@ void digitalHitAccess::read(std::string fileName) {
 
 	readFile.setDataPtr(lutMem);
 
-	readFile.readFile();
+	readFile.readFile(terminal);
 
 }
 
@@ -257,7 +239,7 @@ void digitalHitAccess::read(std::string fileName) {
  * method writes a file representing the table					*
  ****************************************************************/
 
-void digitalHitAccess::write(std::string fileName, std::string name) {
+void digitalHitAccess::write(std::string fileName, std::string name, std::streambuf* terminal) {
 
 	digitalHitAccessFileHeader fileHeader;
 	digitalHitAccessFile       writeFile;
@@ -289,7 +271,7 @@ void digitalHitAccess::write(std::string fileName, std::string name) {
 
 		writeFile.setHeader(fileHeader);
 
-		writeFile.writeFile();
+		writeFile.writeFile(terminal);
 
 	}
 

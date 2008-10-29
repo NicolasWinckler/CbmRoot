@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-08-14 12:36:37 $
-/// $Revision: 1.7 $
+/// $Date: 2008-10-24 16:41:17 $
+/// $Revision: 1.8 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -695,6 +695,40 @@ public:
  */
 
 	virtual ~cannotEvaluateBorderOfUndefinedObjectError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _WRONGLUTTYPEFORUSEDFUNCTIONALITYDETECTEDERROR_H
+#define _CANNOTEVALUATEBORDEROFUNDEFINEDOBJECTERROR_H
+
+/**
+ * CLASS wrongLutTypeForUsedFunctionalityDetectedError
+ */
+
+class wrongLutTypeForUsedFunctionalityDetectedError : public lutGeneratorError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	wrongLutTypeForUsedFunctionalityDetectedError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~wrongLutTypeForUsedFunctionalityDetectedError();
 
 /**
  * This method displays an error message.

@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-07 10:39:57 $
-// $Revision: 1.12 $
+// $Date: 2008-10-24 16:43:10 $
+// $Revision: 1.13 $
 //
 // *******************************************************************/
 
@@ -74,13 +74,13 @@ void trackfinder::evaluatePeakfindingGeometry(std::streambuf* terminal) {
 			securedSourceDataIncrease = 1;
 		}
 
-		createTerminalStatusSequence(&statusSequence, terminal, "Generate filter geometry:\t\t\t", numberOfSecuredSourceData * houghTransform->getNumberOfHistogramLayers(), houghTransform->getNumberOfHistogramLayers());
+		createTerminalStatusSequence(&statusSequence, terminal, "Generate filter geometry:\t\t\t", (unsigned int)(numberOfSecuredSourceData * houghTransform->getNumberOfHistogramLayers()), (unsigned int)houghTransform->getNumberOfHistogramLayers());
 		terminalInitialize(statusSequence);
 
 		analyser->resetPeakfindingGeometryElements();
 
 		trackIndex = 0;
-		for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); trackIndex++) {
+		for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end();  trackIndex++) {
 
 			track = actualTrack->getTrack();
 			if (track == NULL)
@@ -104,7 +104,7 @@ void trackfinder::evaluatePeakfindingGeometry(std::streambuf* terminal) {
 
 				houghTransform->resetHistogramLayer();
 
-				terminalOverwrite(statusSequence, trackIndex * houghTransform->getNumberOfHistogramLayers() + i + 1);
+				terminalOverwriteWithIncrement(statusSequence);
 
 			}
 
@@ -357,7 +357,7 @@ void trackfinder::evaluate(std::streambuf* terminal) {
 
 #endif
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Process layers:\t\t\t\t\t", houghTransform->getNumberOfHistogramLayers());
+	createTerminalStatusSequence(&statusSequence, terminal, "Process layers:\t\t\t\t\t", (unsigned int)houghTransform->getNumberOfHistogramLayers());
 	terminalInitialize(statusSequence);
 
 	for (unsigned short i = 0; i < houghTransform->getNumberOfHistogramLayers(); i++) {
@@ -539,7 +539,7 @@ void trackfinder::evaluate(std::streambuf* terminal) {
 
 #endif
 
-		terminalOverwrite(statusSequence, i + 1);
+		terminalOverwriteWithIncrement(statusSequence);
 
 	}
 
@@ -605,7 +605,7 @@ void trackfinder::generateFilterGeometry(unsigned short filterCoverPercentage, b
 
 		case FILEFILTER:
 			if (isFirstEvent) {
-				((autoFinder*)histoTransform)->readPeakfindingGeometry(filterFileName);
+				((autoFinder*)histoTransform)->readPeakfindingGeometry(filterFileName, terminal);
 				if (filterCoverPercentage > 0)
 					((autoFinder*)histoTransform)->setPeakfindingCoverage(filterCoverPercentage);
 				((autoFinder*)histoTransform)->setup();
@@ -653,13 +653,13 @@ void trackfinder::generateFilterGeometry(unsigned short filterCoverPercentage, b
  * This method writes the peakfinding geometry into a file		*
  ****************************************************************/
 
-void trackfinder::writePeakfindingGeometry() {
+void trackfinder::writePeakfindingGeometry(std::streambuf* terminal) {
 
 	if (histoTransform == NULL)
 		throw cannotAccessHistogramTransformError();
 
 	if (isAutomaticFilterGeometryEnabled())
-		((autoFinder*)histoTransform)->writePeakfindingGeometry(filterFileName);
+		((autoFinder*)histoTransform)->writePeakfindingGeometry(filterFileName, terminal);
 
 }
 

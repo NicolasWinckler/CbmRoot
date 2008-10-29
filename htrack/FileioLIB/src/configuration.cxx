@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-08-14 12:34:44 $
-// $Revision: 1.4 $
+// $Date: 2008-10-24 16:40:01 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -47,19 +47,19 @@ configuration::configuration() : fileio() {
  * Constructor													*
  ****************************************************************/
 
-configuration::configuration(int numberOfTchars, char** tchars) : fileio() {
+configuration::configuration(int numberOfTchars, char** tchars, std::streambuf* terminal) : fileio() {
 
-	init(numberOfTchars, tchars);
-
-}
-configuration::configuration(std::string name) : fileio() {
-
-	init(name);
+	init(numberOfTchars, tchars, terminal);
 
 }
-configuration::configuration(char* name) : fileio() {
+configuration::configuration(std::string name, std::streambuf* terminal) : fileio() {
 
-	init(name);
+	init(name, terminal);
+
+}
+configuration::configuration(char* name, std::streambuf* terminal) : fileio() {
+
+	init(name, terminal);
 
 }
 
@@ -75,41 +75,32 @@ configuration::~configuration() {
  * This method initializes the object.							*
  ****************************************************************/
 
-void configuration::init() {
+void configuration::init(std::streambuf* terminal) {
 	
-	initFile();
+	initFile(terminal);
 
 }
-
-/****************************************************************
- * This method initializes the object.							*
- * Dependencies:												*
- * - Fileio::setFileName										*
- ****************************************************************/
-
-void configuration::init(int numberOfTchars, char** tchars) {
+void configuration::init(int numberOfTchars, char** tchars, std::streambuf* terminal) {
 	
 	setFileName(numberOfTchars, tchars);
-	init();
+	init(terminal);
 
 }
-void configuration::init(std::string name) {
+void configuration::init(std::string name, std::streambuf* terminal) {
 	
 	setFileName(name);
-	init();
+	init(terminal);
 
 }
-void configuration::init(char* name) {
+void configuration::init(char* name, std::streambuf* terminal) {
 	
 	setFileName(name);
-	init();
+	init(terminal);
 
 }
 
 /****************************************************************
  * This method sets the name of the file.						*
- * Dependencies:												*
- * - Fileio::setFileName										*
  ****************************************************************/
 
 void configuration::setFileName(int numberOfTchars, char** tchars) {
@@ -144,21 +135,9 @@ void configuration::setFileName(char* name) {
 
 /****************************************************************
  * This method initializes the file.							*
- * Dependencies:												*
- * - Configuration::Subclass::getDefFileName					*
- * - Configuration::Subclass::setHeaderDefValues				*
- * - Subclass::writeFileHeader									*
- * - Fileio::readFileHeader										*
- * Warnings:													*
- * - cannotOpenFileWarningMsg									*
- * - writeDefaultFileWarningMsg									*
- * Errors														*
- * - noFilenameSpecifiedError									*
- * - cannotOpenFileError										*
- * - cannotCloseFileError										*
  ****************************************************************/
 
-void configuration::initFile() {
+void configuration::initFile(std::streambuf* terminal) {
 
 	std::ifstream readFileStream;
 	std::ofstream writeFileStream;
@@ -188,43 +167,28 @@ void configuration::initFile() {
 				delete writeDefaultFile;
 				writeDefaultFile = NULL;
 			}
-			writeFileStream.open(getFileName().c_str());
-			if (writeFileStream.fail())
-				throw cannotOpenFileError(FILEIOLIB, getFileName());
-			else {
-				writeFileHeader(writeFileStream);
-				writeFileStream.close();
-				if (writeFileStream.fail())
-					throw cannotCloseFileError(FILEIOLIB, getFileName());
-			}
+			writeFile(terminal);
 		}
 	}
 	/* use configuration file */
 	else {
-		readFileHeader(readFileStream);
 		readFileStream.close();
 		if (readFileStream.fail())
 			throw cannotCloseFileError(FILEIOLIB, getFileName());
+		readFile(terminal);
 	}
 
 }
 
 /****************************************************************
  * This method reads the file.									*
- * Dependencies:												*
- * - Fileio::readFileHeader										*
- * Warnings														*
- * - Fileio::readFileHeader										*
- * Errors														*
- * - noFilenameSpecifiedError									*
- * - cannotOpenFileError										*
- * - cannotCloseFileError										*
- * - Fileio::readFileHeader										*
  ****************************************************************/
 
-void configuration::readFile() {
+void configuration::readFile(std::streambuf* terminal) {
 
-	std::ifstream readFileStream;
+	std::ifstream    readFileStream;
+	std::string      statusText;
+	terminalSequence statusSequence;
 
 	if (getFileName().empty() == true)
 		throw noFilenameSpecifiedError(FILEIOLIB);
@@ -235,8 +199,19 @@ void configuration::readFile() {
 		throw cannotOpenFileError(FILEIOLIB, getFileName());
 	/* read file */
 	else {
-		readFileHeader(readFileStream);
+
+		statusText = "\nRead configuration file ";
+		statusText += getFileName();
+		statusText += ":\t";
+
+		createTerminalStatusSequence(&statusSequence, terminal, statusText, (unsigned int)getNumberOfCmds());
+		terminalInitialize(statusSequence);
+
+		readFileHeader(readFileStream, &statusSequence);
 		readFileStream.close();
+
+		terminalFinalize(statusSequence);
+
 		if (readFileStream.fail())
 			throw cannotCloseFileError(FILEIOLIB, getFileName());
 	}
@@ -247,9 +222,11 @@ void configuration::readFile() {
  * This method writes the file.									*
  ****************************************************************/
 
-void configuration::writeFile() {
+void configuration::writeFile(std::streambuf* terminal) {
 
-	std::ofstream writeFileStream;
+	std::ofstream    writeFileStream;
+	std::string      statusText;
+	terminalSequence statusSequence;
 
 	if (getFileName().empty() == true)
 		throw noFilenameSpecifiedError(FILEIOLIB);
@@ -260,9 +237,21 @@ void configuration::writeFile() {
 		throw cannotCreateFileError(FILEIOLIB, getFileName());
 	/* write file */
 	else {
-		writeFileHeader(writeFileStream);
+
+		statusText  = "\nWrite configurarion file ";
+		statusText += getFileName();
+		statusText += ":\t";
+
+		createTerminalStatusSequence(&statusSequence, terminal, statusText, (unsigned int)getNumberOfCmds());
+		terminalInitialize(statusSequence);
+
+		writeFileHeader(writeFileStream, &statusSequence);
 		writeFileStream.close();
+
+		terminalFinalize(statusSequence);
+
 		if (writeFileStream.fail())
 			throw cannotCloseFileError(FILEIOLIB, getFileName());
 	}
+
 }

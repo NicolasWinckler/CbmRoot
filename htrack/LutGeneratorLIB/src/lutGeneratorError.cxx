@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-08-14 12:36:37 $
-// $Revision: 1.7 $
+// $Date: 2008-10-24 16:41:19 $
+// $Revision: 1.8 $
 //
 // *******************************************************************/
 
@@ -681,5 +681,36 @@ cannotEvaluateBorderOfUndefinedObjectError::~cannotEvaluateBorderOfUndefinedObje
 void cannotEvaluateBorderOfUndefinedObjectError::errorMsg() {
 
 	printMsg("You cannot evaluate the border of an undefined object!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS wrongLutTypeForUsedFunctionalityDetectedError			*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+wrongLutTypeForUsedFunctionalityDetectedError::wrongLutTypeForUsedFunctionalityDetectedError() : lutGeneratorError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+wrongLutTypeForUsedFunctionalityDetectedError::~wrongLutTypeForUsedFunctionalityDetectedError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void wrongLutTypeForUsedFunctionalityDetectedError::errorMsg() {
+
+	printMsg("There is a wrong LUT type detected for the used functionality!!!");
 
 }

@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-10-07 10:36:51 $
-/// $Revision: 1.2 $
+/// $Date: 2008-10-24 16:39:20 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -1099,7 +1099,7 @@ void peakfindingGeometry::drawCoverageProjection() {
  * method reads a file to get the peakfinding geometry			*
  ****************************************************************/
 
-void peakfindingGeometry::read(std::string fileName) {
+void peakfindingGeometry::read(std::string fileName, std::streambuf* terminal) {
 
 	peakfindingGeometryFile     readFile;
 	peakfindingGeometryElement* readData;
@@ -1108,7 +1108,7 @@ void peakfindingGeometry::read(std::string fileName) {
 
 	readFile.setDataNum(0);
 
-	readFile.readFile();
+	readFile.readFile(terminal);
 
 	peakfindingGeometryFileHeader& fileHeader = readFile.getHeaderReference();
 
@@ -1126,7 +1126,7 @@ void peakfindingGeometry::read(std::string fileName) {
  * method writes a file representing the peakfinding geometry	*
  ****************************************************************/
 
-void peakfindingGeometry::write(std::string fileName, std::string name) {
+void peakfindingGeometry::write(std::string fileName, std::string name, std::streambuf* terminal) {
 
 	peakfindingGeometryElement*   writeData;
 	peakfindingGeometryFileHeader fileHeader;
@@ -1150,7 +1150,7 @@ void peakfindingGeometry::write(std::string fileName, std::string name) {
 
 	writeFile.setHeader(fileHeader);
 
-	writeFile.writeFile();
+	writeFile.writeFile(terminal);
 
 	if (writeData != NULL) {
 		delete [] writeData;

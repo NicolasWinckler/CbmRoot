@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-07 10:36:51 $
-// $Revision: 1.8 $
+// $Date: 2008-10-24 16:39:20 $
+// $Revision: 1.9 $
 //
 // *******************************************************************/
 
@@ -62,6 +62,7 @@ trackfinderInputHit::trackfinderInputHit() {
 	station   = NULL;
 	isPointer = true;
 	hitIndex  = 0;
+	hitOrder  = 0;
 
 }
 
@@ -100,9 +101,45 @@ trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value) {
 	this->station   = value.station;
 	this->isPointer = value.isPointer;
 	this->hitIndex  = value.hitIndex;
+	this->hitOrder  = value.hitOrder;
 
 }
-trackfinderInputHit::trackfinderInputHit(CbmHit* hitPointer, int index) {
+
+trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value, unsigned int order) {
+
+	if (value.isPointer)
+		this->hit   = value.hit;
+	else {
+
+#ifdef HITCOMPATIBILITY
+
+		if (value.station->isMapsType())
+			this->hit   = new CbmStsMapsHit(*((CbmStsMapsHit*)value.hit));
+		else if (value.station->isStripType())
+			this->hit   = new CbmStsStripHit(*((CbmStsStripHit*)value.hit));
+		else if (value.station->isHybridType())
+			this->hit   = new CbmStsHybridHit(*((CbmStsHybridHit*)value.hit));
+		else if (value.station->isNoType())
+			this->hit   = new CbmStsHit(*((CbmStsHit*)value.hit));
+
+#else
+
+		this->hit   = new CbmStsHit(*((CbmStsHit*)value.hit));
+
+#endif
+
+		if (hit == NULL)
+			throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+	}
+	this->point     = value.point;
+	this->track     = value.track;
+	this->station   = value.station;
+	this->isPointer = value.isPointer;
+	this->hitIndex  = value.hitIndex;
+	this->hitOrder  = order;
+
+}
+trackfinderInputHit::trackfinderInputHit(CbmHit* hitPointer, int index, unsigned int order) {
 
 	hit       = hitPointer;
 
@@ -114,9 +151,10 @@ trackfinderInputHit::trackfinderInputHit(CbmHit* hitPointer, int index) {
 	station   = NULL;
 	isPointer = true;
 	hitIndex  = index;
+	hitOrder  = order;
 
 }
-trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, int pointIndex, bool maps, bool strip, bool hybrid) {
+trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex, bool maps, bool strip, bool hybrid) {
 
 	TVector3 position(posX, posY, posZ);
 	TVector3 positionError(xError, yError, 0);
@@ -146,6 +184,7 @@ trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double pos
 		station   = NULL;
 		isPointer = false;
 		hitIndex  = index;
+		hitOrder  = order;
 	
 	}
 	else {
@@ -160,7 +199,7 @@ trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double pos
 	}
 
 }
-trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, int pointIndex) {
+trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex) {
 
 	TVector3 position(posX, posY, posZ);
 	TVector3 positionError(xError, yError, 0);
@@ -184,6 +223,7 @@ trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double pos
 	station   = NULL;
 	isPointer = false;
 	hitIndex  = index;
+	hitOrder  = order;
 
 }
 /****************************************************************
@@ -237,8 +277,118 @@ const trackfinderInputHit& trackfinderInputHit::operator = (const trackfinderInp
 	this->station   = value.station;
 	this->isPointer = value.isPointer;
 	this->hitIndex  = value.hitIndex;
+	this->hitOrder  = value.hitOrder;
 
 	return *this;
+
+}
+
+/****************************************************************
+ * method initializes the object								*
+ ****************************************************************/
+
+void trackfinderInputHit::initDefault() {
+
+	init(-1, 0, 0, 0, 0, 0, -1, 0, -1);
+
+}
+void trackfinderInputHit::init(CbmHit* hitPointer, int index, unsigned int order) {
+
+	if (!isPointer)
+		if (hit != NULL)
+			delete hit;
+
+	hit       = hitPointer;
+
+	if (hit == NULL)
+		throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+	point     = NULL;
+	track     = NULL;
+	station   = NULL;
+	isPointer = true;
+	hitIndex  = index;
+	hitOrder  = order;
+
+}
+void trackfinderInputHit::init(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex, bool maps, bool strip, bool hybrid) {
+
+	TVector3 position(posX, posY, posZ);
+	TVector3 positionError(xError, yError, 0);
+
+	if (!isPointer)
+		if (hit != NULL)
+			delete hit;
+
+	if (maps ^ strip ^ hybrid) {
+
+#ifdef HITCOMPATIBILITY
+
+		if (maps)
+			hit   = new CbmStsMapsHit(detectorId, position, positionError, pointIndex, -1);
+		else if (strip)
+			hit   = new CbmStsStripHit(detectorId, 0, position, positionError, pointIndex, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+		else if (hybrid)
+			hit   = new CbmStsHybridHit(detectorId, position, positionError, pointIndex, -1, -1);
+
+#else
+
+		throw functionIsDeprecatedError(DATAROOTOBJECTLIB);
+
+#endif
+
+		if (hit == NULL)
+			throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+		point     = NULL;
+		track     = NULL;
+		station   = NULL;
+		isPointer = false;
+		hitIndex  = index;
+		hitOrder  = order;
+	
+	}
+	else {
+
+		wrongHitDefinitionWarningMsg* wrongHitDefinition = new wrongHitDefinitionWarningMsg();
+		wrongHitDefinition->warningMsg();
+		if(wrongHitDefinition != NULL) {
+			delete wrongHitDefinition;
+			wrongHitDefinition = NULL;
+		}
+
+	}
+
+}
+void trackfinderInputHit::init(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex) {
+
+	TVector3 position(posX, posY, posZ);
+	TVector3 positionError(xError, yError, 0);
+
+	if (!isPointer)
+		if (hit != NULL)
+			delete hit;
+
+#ifndef HITCOMPATIBILITY
+
+	hit   = new CbmStsHit(detectorId, position, positionError, -1, -1, -1);
+	hit->SetRefIndex(pointIndex);
+
+#else
+
+	throw functionIsDeprecatedError(DATAROOTOBJECTLIB);
+
+#endif
+
+	if (hit == NULL)
+		throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
+
+	point     = NULL;
+	track     = NULL;
+	station   = NULL;
+	isPointer = false;
+	hitIndex  = index;
+	hitOrder  = order;
 
 }
 
@@ -397,6 +547,16 @@ bool trackfinderInputHit::isHybridHit() {
 int trackfinderInputHit::getHitIndex() {
 
 	return hitIndex;
+
+}
+
+/****************************************************************
+ * method gets the order of this hit-object						*
+ ****************************************************************/
+
+unsigned int trackfinderInputHit::getHitOrder() {
+
+	return hitOrder;
 
 }
 

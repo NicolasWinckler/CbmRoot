@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-10 13:47:23 $
-// $Revision: 1.5 $
+// $Date: 2008-10-24 16:40:01 $
+// $Revision: 1.6 $
 //
 // *******************************************************************/
 
@@ -164,7 +164,7 @@ char fileio::legalizedCommentChar(char value) {
  * This method is to read the header of the file.				*
  ****************************************************************/
 
-void fileio::readFileHeader(std::ifstream& fileStream) {
+void fileio::readFileHeader(std::ifstream& fileStream, terminalSequence* statusSequence) {
 
 	std::basic_string<char>::size_type lineDelimiter;
 	bool                               specifierFound;
@@ -270,8 +270,11 @@ void fileio::readFileHeader(std::ifstream& fileStream) {
 						specifierFound = getHeaderValue(specifier, value);
 	
 					/* specifier-value-pair found */
-						if (specifierFound == true)
+						if (specifierFound == true) {
 							numberOfFoundSpecifiers++;
+							if (statusSequence != NULL)
+								terminalOverwriteWithIncrement(*statusSequence);
+						}
 					/* specifier-value-pair mismatch */
 						else {
 							unknownCmdSpecValPair = new unknownCmdSpecValPairWarningMsg();
@@ -299,177 +302,185 @@ void fileio::readFileHeader(std::ifstream& fileStream) {
  * which is identified by a specifier to an ofstream.			*
  ****************************************************************/
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, bool value) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, bool value, terminalSequence* statusSequence) {
 
 	char buffer[6]; /* 6 = sizeof(false+'/0')*/
 
 	btobs(value, buffer);
-	setHeaderValue(fileStream, specifier, buffer);
+	setHeaderValue(fileStream, specifier, buffer, statusSequence);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, char* value, terminalSequence* statusSequence) {
 
 	fileStream << specifier << ' ' << fileCmdSeparator << ' ' << value << std::endl;
 
+	if (statusSequence != NULL)
+		terminalOverwriteWithIncrement(*statusSequence);
+
 }
 
-/*
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, const char* value, terminalSequence* statusSequence) {
 
 	fileStream << specifier << ' ' << fileCmdSeparator << ' ' << value << std::endl;
 
-}
-*/
+	if (statusSequence != NULL)
+		terminalOverwriteWithIncrement(*statusSequence);
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, int value, int radix) {
+}
+
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, int value, terminalSequence* statusSequence, int radix) {
 
 	char buffer[intConversionDigits+1];
 
 	itos(value, buffer, radix, intConversionDigits);
-	setHeaderValue(fileStream, specifier, buffer);
+	setHeaderValue(fileStream, specifier, buffer, statusSequence);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned int value, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned int value, terminalSequence* statusSequence, int radix) {
 
 	char buffer[intConversionDigits+1];
 
 	uitos(value, buffer, radix, intConversionDigits);
-	setHeaderValue(fileStream, specifier, buffer);
+	setHeaderValue(fileStream, specifier, buffer, statusSequence);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, long value, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, long value, terminalSequence* statusSequence, int radix) {
 
 	char buffer[longConversionDigits+1];
 
 	ltos(value, buffer, radix, longConversionDigits);
-	setHeaderValue(fileStream, specifier, buffer);
+	setHeaderValue(fileStream, specifier, buffer, statusSequence);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned long value, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned long value, terminalSequence* statusSequence, int radix) {
 
 	char buffer[longConversionDigits+1];
 
 	ultos(value, buffer, radix, longConversionDigits);
-	setHeaderValue(fileStream, specifier, buffer);
+	setHeaderValue(fileStream, specifier, buffer, statusSequence);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, float value) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, float value, terminalSequence* statusSequence) {
 
 	double temp;
 
 	temp = (double) value;
-	setHeaderValue(fileStream, specifier, temp);
+	setHeaderValue(fileStream, specifier, temp, statusSequence);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, double value) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, double value, terminalSequence* statusSequence) {
 
 	char buffer[doubleConversion+1];
 
 	dtos(value, buffer, doubleConversionDigits);
-	setHeaderValue(fileStream, specifier, buffer);
+	setHeaderValue(fileStream, specifier, buffer, statusSequence);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, std::string& value) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, std::string& value, terminalSequence* statusSequence) {
 
 	char* temp;
 
 	temp = (char*) value.c_str();
-	setHeaderValue(fileStream, specifier, temp);
+	setHeaderValue(fileStream, specifier, temp, statusSequence);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, bool value, const char* comment) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, bool value, char* comment, terminalSequence* statusSequence) {
 
 	char buffer[6]; /* 6 = sizeof(false+'/0')*/
 
 	btobs(value, buffer);
-	setHeaderValue(fileStream, specifier, buffer, comment);
+	setHeaderValue(fileStream, specifier, buffer, comment, statusSequence);
 
 }
 
-/*
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value, const char* comment) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, char* value, char* comment, terminalSequence* statusSequence) {
 
 	fileStream << specifier << ' ' << fileCmdSeparator << ' ' << value << "\t\t";
 	writeComment(fileStream, comment);
 
-}
-*/
+	if (statusSequence != NULL)
+		terminalOverwriteWithIncrement(*statusSequence);
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value, const char* comment) {
+}
+
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, const char* value, char* comment, terminalSequence* statusSequence) {
 
 	fileStream << specifier << ' ' << fileCmdSeparator << ' ' << value << "\t\t";
 	writeComment(fileStream, comment);
 
+	if (statusSequence != NULL)
+		terminalOverwriteWithIncrement(*statusSequence);
+
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, int value, const char* comment, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, int value, char* comment, terminalSequence* statusSequence, int radix) {
 
 	char buffer[intConversionDigits+1];
 
 	itos(value, buffer, radix, intConversionDigits);
-	setHeaderValue(fileStream, specifier, buffer, comment);
+	setHeaderValue(fileStream, specifier, buffer, comment, statusSequence);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned int value, const char* comment, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned int value, char* comment, terminalSequence* statusSequence, int radix) {
 
 	char buffer[intConversionDigits+1];
 
 	uitos(value, buffer, radix, intConversionDigits);
-	setHeaderValue(fileStream, specifier, buffer, comment);
+	setHeaderValue(fileStream, specifier, buffer, comment, statusSequence);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, long value, const char* comment, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, long value, char* comment, terminalSequence* statusSequence, int radix) {
 
 	char buffer[longConversionDigits+1];
 
 	ltos(value, buffer, radix, longConversionDigits);
-	setHeaderValue(fileStream, specifier, buffer, comment);
+	setHeaderValue(fileStream, specifier, buffer, comment, statusSequence);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned long value, const char* comment, int radix) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned long value, char* comment, terminalSequence* statusSequence, int radix) {
 
 	char buffer[longConversionDigits+1];
 
 	ultos(value, buffer, radix, longConversionDigits);
-	setHeaderValue(fileStream, specifier, buffer, comment);
+	setHeaderValue(fileStream, specifier, buffer, comment, statusSequence);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, float value, const char* comment) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, float value, char* comment, terminalSequence* statusSequence) {
 
 	double temp;
 
 	temp = (double) value;
-	setHeaderValue(fileStream, specifier, temp, comment);
+	setHeaderValue(fileStream, specifier, temp, comment, statusSequence);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, double value, const char* comment) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, double value, char* comment, terminalSequence* statusSequence) {
 
 	char buffer[doubleConversion+1];
 
 	dtos(value, buffer, doubleConversionDigits);
-	setHeaderValue(fileStream, specifier, buffer, comment);
+	setHeaderValue(fileStream, specifier, buffer, comment, statusSequence);
 
 }
 
-void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, std::string& value, const char* comment) {
+void fileio::setHeaderValue(std::ofstream& fileStream, char* specifier, std::string& value, char* comment, terminalSequence* statusSequence) {
 
 	char* temp;
 
 	temp = (char*) value.c_str();
-	setHeaderValue(fileStream, specifier, temp, comment);
+	setHeaderValue(fileStream, specifier, temp, comment, statusSequence);
 
 }
 
@@ -491,7 +502,7 @@ void fileio::writeComment(std::ofstream& fileStream, std::string& comment) {
 
 }
 
-void fileio::writeComment(std::ofstream& fileStream, const char* comment) {
+void fileio::writeComment(std::ofstream& fileStream, char* comment) {
 
 	std::string temp;
 

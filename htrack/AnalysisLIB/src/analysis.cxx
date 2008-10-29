@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-07 10:34:05 $
-// $Revision: 1.38 $
+// $Date: 2008-10-24 16:35:14 $
+// $Revision: 1.39 $
 //
 // *******************************************************************/
 
@@ -1558,7 +1558,7 @@ void analysis::setupFindableEstimatedTracks(std::list<findableTrack>* findableTr
 	if (findableTracks == NULL)
 		throw cannotAccessFindableTracksMemoryError();
 
-	createTerminalStatusSequence(&statusSequenceForFindableTracks, terminal, "\nSetup findable estimated tracks:\t\t\t", (*eventData)->getNumberOfTracks());
+	createTerminalStatusSequence(&statusSequenceForFindableTracks, terminal, "\nSetup findable estimated tracks:\t\t\t", (unsigned int)(*eventData)->getNumberOfTracks());
 	terminalInitialize(statusSequenceForFindableTracks);
 
 	findableTracks->clear();
@@ -1580,7 +1580,7 @@ void analysis::setupFindableEstimatedTracks(std::list<findableTrack>* findableTr
 
 		}
 
-		terminalOverwrite(statusSequenceForFindableTracks, i + 1);
+		terminalOverwriteWithIncrement(statusSequenceForFindableTracks);
 
 	}
 
@@ -1608,7 +1608,7 @@ void analysis::setupFindableComputedTracks(std::list<findableTrack>* findableTra
 	if (findableTracks == NULL)
 		throw cannotAccessFindableTracksMemoryError();
 
-	createTerminalStatusSequence(&statusSequenceForFindableTracks, terminal, "\nSetup findable computed tracks:\t\t\t", (*eventData)->getNumberOfTracks());
+	createTerminalStatusSequence(&statusSequenceForFindableTracks, terminal, "\nSetup findable computed tracks:\t\t\t", (unsigned int)(*eventData)->getNumberOfTracks());
 	terminalInitialize(statusSequenceForFindableTracks);
 
 	findableTracks->clear();
@@ -1630,7 +1630,7 @@ void analysis::setupFindableComputedTracks(std::list<findableTrack>* findableTra
 
 		}
 
-		terminalOverwrite(statusSequenceForFindableTracks, i + 1);
+		terminalOverwriteWithIncrement(statusSequenceForFindableTracks);
 
 	}
 
@@ -1875,7 +1875,7 @@ void analysis::evaluateAlgorithm(std::streambuf* terminal) {
 
 	(*tracks)->resetActiveObject();
 
-	createTerminalStatusSequence(&statusSequenceForFoundTracks, terminal, "Analyse found tracks:\t\t\t\t", (*tracks)->getNumberOfTracks());
+	createTerminalStatusSequence(&statusSequenceForFoundTracks, terminal, "Analyse found tracks:\t\t\t\t", (unsigned int)(*tracks)->getNumberOfTracks());
 	terminalInitialize(statusSequenceForFoundTracks);
 
 	for (i = 0; i < (*tracks)->getNumberOfTracks(); i++) {
@@ -1898,13 +1898,13 @@ void analysis::evaluateAlgorithm(std::streambuf* terminal) {
 				break;
 		}
 
-		terminalOverwrite(statusSequenceForFoundTracks, i + 1);
+		terminalOverwriteWithIncrement(statusSequenceForFoundTracks);
 
 	}
 
 	terminalFinalize(statusSequenceForFoundTracks);
 
-	createTerminalStatusSequence(&statusSequenceForRealTracks, terminal, "Analyse real tracks:\t\t\t\t", (*eventData)->getNumberOfTracks());
+	createTerminalStatusSequence(&statusSequenceForRealTracks, terminal, "Analyse real tracks:\t\t\t\t", (unsigned int)(*eventData)->getNumberOfTracks());
 	terminalInitialize(statusSequenceForRealTracks);
 
 	for (i = 0; i < (*eventData)->getNumberOfTracks(); i++) {
@@ -1981,7 +1981,7 @@ void analysis::evaluateAlgorithm(std::streambuf* terminal) {
 
 		}
 
-		terminalOverwrite(statusSequenceForRealTracks, i + 1);
+		terminalOverwriteWithIncrement(statusSequenceForRealTracks);
 
 	}
 
@@ -1999,7 +1999,6 @@ void analysis::evaluateMagnetfieldFactors(bool isFirstEvent, bool averagingFacto
 
 	trackfinderInputMagneticField* magneticField;
 	unsigned short                 j;
-	unsigned short                 trackIndex;
 	terminalSequence               statusSequenceForFactors;
 	std::list<findableTrack>       findableTracks;
 	int                            wrongThirdDimensionBorder;
@@ -2058,9 +2057,10 @@ void analysis::evaluateMagnetfieldFactors(bool isFirstEvent, bool averagingFacto
 	 * dimension. Corrected are these values which have a difference
 	 * of more than one in the first dimension according to the previous
 	 * value */
-	(*luts)->resetCorrectionCounter();
+	if ((*luts)->typeUsesCorrections())
+		(*luts)->resetCorrectionCounter();
 
-	createTerminalStatusSequence(&statusSequenceForFactors, terminal, "Analyse magnetfield factors:\t", magnetfieldFactorAnalyser->getNumberOfFactors() * findableTracks.size());
+	createTerminalStatusSequence(&statusSequenceForFactors, terminal, "Analyse magnetfield factors:\t", (unsigned int)(magnetfieldFactorAnalyser->getNumberOfFactors() * findableTracks.size()));
 	terminalInitialize(statusSequenceForFactors);
 
 	/* loop to evaluate the minimal distance for each magnetfield factor */
@@ -2069,15 +2069,15 @@ void analysis::evaluateMagnetfieldFactors(bool isFirstEvent, bool averagingFacto
 		actualFactor = magnetfieldFactorAnalyser->getFactor(i);
 
 		/* set the magnetfield factor for the lut computation */
-		(*luts)->setMagneticFieldFactor(actualFactor);
+		if ((*luts)->typeUsesMagnetism())
+			(*luts)->setMagneticFieldFactor(actualFactor);
 
 		/* reset the actual distances for this magnetfield factor */
 		for (j = 0; j < (*eventData)->getNumberOfActiveStations(); j++)
 			magnetfieldFactorAnalyser->setDistance(j, i, 0);
 
-		trackIndex   = 0;
 		/* loop to evaluate the magnetfield factor for all findable tracks */
-		for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++, trackIndex++) {
+		for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++) {
 
 			track = actualTrack->getTrack();
 			if (track == NULL)
@@ -2173,7 +2173,7 @@ void analysis::evaluateMagnetfieldFactors(bool isFirstEvent, bool averagingFacto
 
 			}
 
-			terminalOverwrite(statusSequenceForFactors, i * findableTracks.size() + trackIndex + 1);
+			terminalOverwriteWithIncrement(statusSequenceForFactors);
 
 		}
 
@@ -2235,7 +2235,6 @@ void analysis::evaluatePrelutRange(bool isFirstEvent, bool averagingFactors, boo
 	prelutMath                      prelut;
 	unsigned short                  k;
 	unsigned short                  l;
-	unsigned short                  trackIndex;
 	terminalSequence                statusSequenceForDim3EntryRange;
 	std::list<findableTrack>        findableTracks;
 	trackfinderInputTrack*          track;
@@ -2273,7 +2272,7 @@ void analysis::evaluatePrelutRange(bool isFirstEvent, bool averagingFactors, boo
 	 * space */
 	setupFindableEstimatedTracks(&findableTracks, terminal);
 
-	createTerminalStatusSequence(&statusSequenceForDim3EntryRange, terminal, "Analyse prelut range:\t\t\t\t", findableTracks.size() * prelutRangeLayerAnalyser->getNumberOfMinFactors() * prelutRangeLayerAnalyser->getNumberOfMaxFactors());
+	createTerminalStatusSequence(&statusSequenceForDim3EntryRange, terminal, "Analyse prelut range:\t\t\t\t", (unsigned int)(findableTracks.size() * prelutRangeLayerAnalyser->getNumberOfMinFactors() * prelutRangeLayerAnalyser->getNumberOfMaxFactors()));
 	terminalInitialize(statusSequenceForDim3EntryRange);
 
 	histogramBorderFrequency       = NULL;
@@ -2299,9 +2298,8 @@ void analysis::evaluatePrelutRange(bool isFirstEvent, bool averagingFactors, boo
 
 			}
 
-			trackIndex             = 0;
 			/* loop to evaluate the prelut goodness for all findable tracks */
-			for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++, trackIndex++) {
+			for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++) {
 
 				track = actualTrack->getTrack();
 				if (track == NULL)
@@ -2430,7 +2428,7 @@ void analysis::evaluatePrelutRange(bool isFirstEvent, bool averagingFactors, boo
 
 				}
 
-				terminalOverwrite(statusSequenceForDim3EntryRange, i * prelutRangeLayerAnalyser->getNumberOfMaxFactors() * findableTracks.size() + j * findableTracks.size() + trackIndex + 1);
+				terminalOverwriteWithIncrement(statusSequenceForDim3EntryRange);
 			}
 
 		}
@@ -2519,7 +2517,6 @@ void analysis::evaluatePrelutGoodness(std::streambuf* terminal) {
 
 	unsigned int                    i;
 	unsigned short                  j;
-	unsigned short                  trackIndex;
 	terminalSequence                statusSequenceForPrelut;
 	std::list<findableTrack>        findableTracks;
 	trackfinderInputTrack*          track;
@@ -2594,7 +2591,7 @@ void analysis::evaluatePrelutGoodness(std::streambuf* terminal) {
 	 * space */
 	setupFindableEstimatedTracks(&findableTracks, terminal);
 
-	createTerminalStatusSequence(&statusSequenceForPrelut, terminal, "Analyse prelut goodness:\t", findableTracks.size());
+	createTerminalStatusSequence(&statusSequenceForPrelut, terminal, "Analyse prelut goodness:\t", (unsigned int)findableTracks.size());
 	terminalInitialize(statusSequenceForPrelut);
 
 	for (i = 0; i < NUMBEROFDIFFERENTCORRECTHITS; i++) {
@@ -2612,7 +2609,6 @@ void analysis::evaluatePrelutGoodness(std::streambuf* terminal) {
 
 	}
 
-	trackIndex                            = 0;
 	histogramBorderFrequency              = NULL;
 	numberOfHistogramBorderEntries        = 0;
 	distanceOfMaximumLayerAndCorrectLayer = 0;
@@ -2623,7 +2619,7 @@ void analysis::evaluatePrelutGoodness(std::streambuf* terminal) {
 	numberOfPositions                     = 0;
 
 	/* loop to evaluate the prelut goodness for all findable tracks */
-	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++, trackIndex++) {
+	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++) {
 
 		track = actualTrack->getTrack();
 		if (track == NULL)
@@ -2723,10 +2719,14 @@ void analysis::evaluatePrelutGoodness(std::streambuf* terminal) {
 			}
 
 		}
-/**/
+
+#ifdef DEBUGTRACKINDEXOFTRACKSWITHPERCENTAGEOFCORRECTHITS
+
 		/* By enabling this you can write the trackIndex of the tracks which have a defined percentage of correct hits to the standard output */
-//		if ((unsigned short)((((double)numberOfHitsMeetingCorrectSlope * (NUMBEROFDIFFERENTCORRECTHITS - 1)) / (double)track->getNumberOfHits()) + ((double)(track->getNumberOfHits() - 1) / (double)track->getNumberOfHits())) == 6)
-//			std::cout << numberOfTracksWithPercentCorrectSlope[(unsigned short)((((double)numberOfHitsMeetingCorrectSlope * (NUMBEROFDIFFERENTCORRECTHITS - 1)) / (double)track->getNumberOfHits()) + ((double)(track->getNumberOfHits() - 1) / (double)track->getNumberOfHits()))] << ": " << track->getTrackIndex() << std::endl;
+		if ((unsigned short)((((double)numberOfHitsMeetingCorrectSlope * (NUMBEROFDIFFERENTCORRECTHITS - 1)) / (double)track->getNumberOfHits()) + ((double)(track->getNumberOfHits() - 1) / (double)track->getNumberOfHits())) == 6)
+			std::cout << numberOfTracksWithPercentCorrectSlope[(unsigned short)((((double)numberOfHitsMeetingCorrectSlope * (NUMBEROFDIFFERENTCORRECTHITS - 1)) / (double)track->getNumberOfHits()) + ((double)(track->getNumberOfHits() - 1) / (double)track->getNumberOfHits()))] << ": " << track->getTrackIndex() << std::endl;
+
+#endif
 
 		numberOfTracksWithPercentCorrectHitsInLayer[(unsigned short)((((double)numberOfHitsMeetingCorrectLayer * (NUMBEROFDIFFERENTCORRECTHITS - 1)) / (double)track->getNumberOfHits()) + ((double)(track->getNumberOfHits() - 1) / (double)track->getNumberOfHits()))]++;
 		numberOfTracksWithPercentCorrectSlope[(unsigned short)((((double)numberOfHitsMeetingCorrectSlope * (NUMBEROFDIFFERENTCORRECTHITS - 1)) / (double)track->getNumberOfHits()) + ((double)(track->getNumberOfHits() - 1) / (double)track->getNumberOfHits()))]++;
@@ -2798,7 +2798,7 @@ void analysis::evaluatePrelutGoodness(std::streambuf* terminal) {
 		if (numberOfCorrectSignaturePositions >= (unsigned short)ceil(((double)percentageOfHitsInSignature / (double)100) * (double)trackSignature.count()))
 			numberOfTracksWithGoodPrelutSignature++;
 
-		terminalOverwrite(statusSequenceForPrelut, trackIndex + 1);
+		terminalOverwriteWithIncrement(statusSequenceForPrelut);
 
 	}
 
@@ -3233,7 +3233,6 @@ void analysis::evaluateLutGoodness(std::streambuf* terminal) {
 
 void analysis::evaluateLutDistribution(unsigned int* numberOfTracksWithSignature, unsigned int* numberOfTracksWithPercentCorrectHits, unsigned int* numberOfTracksWithPercentHits, double* distanceOfMaximumCellAndCorrectCell, unsigned long* numberOfTracksWithGoodLutSignature, std::string terminalString, std::streambuf* terminal) {
 
-	unsigned short           trackIndex;
 	terminalSequence         statusSequenceForLut;
 	std::list<findableTrack> findableTracks;
 	trackfinderInputTrack*   track;
@@ -3263,14 +3262,13 @@ void analysis::evaluateLutDistribution(unsigned int* numberOfTracksWithSignature
 	 * space */
 	setupFindableEstimatedTracks(&findableTracks, terminal);
 
-	createTerminalStatusSequence(&statusSequenceForLut, terminal, terminalString, findableTracks.size());
+	createTerminalStatusSequence(&statusSequenceForLut, terminal, terminalString, (unsigned int)findableTracks.size());
 	terminalInitialize(statusSequenceForLut);
 
-	trackIndex = 0;
 	cellSignatures.reset();
 
 	/* loop to evaluate the prelut goodness for all findable tracks */
-	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++, trackIndex++) {
+	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++) {
 
 		track = actualTrack->getTrack();
 		if (track == NULL)
@@ -3340,7 +3338,7 @@ void analysis::evaluateLutDistribution(unsigned int* numberOfTracksWithSignature
 				(*numberOfTracksWithGoodLutSignature)++;
 
 		cellSignatures.reset();
-		terminalOverwrite(statusSequenceForLut, trackIndex + 1);
+		terminalOverwriteWithIncrement(statusSequenceForLut);
 
 	}
 
@@ -3355,7 +3353,6 @@ void analysis::evaluateLutDistribution(unsigned int* numberOfTracksWithSignature
 void analysis::evaluateBothLutsDistribution(unsigned int* numberOfTracksWithHits, std::string terminalString, std::streambuf* terminal) {
 
 	unsigned short           i;
-	unsigned short           trackIndex;
 	terminalSequence         statusSequenceForBothLuts;
 	std::list<findableTrack> findableTracks;
 	trackfinderInputTrack*   track;
@@ -3369,13 +3366,11 @@ void analysis::evaluateBothLutsDistribution(unsigned int* numberOfTracksWithHits
 	 * space */
 	setupFindableEstimatedTracks(&findableTracks, terminal);
 
-	createTerminalStatusSequence(&statusSequenceForBothLuts, terminal, terminalString, findableTracks.size());
+	createTerminalStatusSequence(&statusSequenceForBothLuts, terminal, terminalString, (unsigned int)findableTracks.size());
 	terminalInitialize(statusSequenceForBothLuts);
 
-	trackIndex = 0;
-
 	/* loop to evaluate the prelut goodness for all findable tracks */
-	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++, trackIndex++) {
+	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++) {
 
 		track = actualTrack->getTrack();
 		if (track == NULL)
@@ -3385,7 +3380,7 @@ void analysis::evaluateBothLutsDistribution(unsigned int* numberOfTracksWithHits
 
 		numberOfTracksWithHits[bestCellSignature.value.toULong()]++;
 
-		terminalOverwrite(statusSequenceForBothLuts, trackIndex + 1);
+		terminalOverwriteWithIncrement(statusSequenceForBothLuts);
 
 	}
 
@@ -3402,7 +3397,6 @@ void analysis::evaluateMagnetfield(std::streambuf* terminal) {
 	trackfinderInputMagneticField* magneticField;
 	terminalSequence               statusSequenceForMagnetfield;
 	unsigned int                   totalNumberOfBins;
-	unsigned int                   actualProgress;
 	unsigned int                   i;
 	magnetfieldDisplayInfo*        actualDisplayInfo;
 	double                         actualPositionIncrement;
@@ -3450,10 +3444,9 @@ void analysis::evaluateMagnetfield(std::streambuf* terminal) {
 		if (magnetfieldAnalyser->getZBzDisplayAxiRange() != NULL)
 			totalNumberOfBins += (unsigned int)magnetfieldAnalyser->getZBzDisplayEntries();
 
-	createTerminalStatusSequence(&statusSequenceForMagnetfield, terminal, "Analyse magnetfield:\t\t", totalNumberOfBins);
+	createTerminalStatusSequence(&statusSequenceForMagnetfield, terminal, "Analyse magnetfield:\t\t", (unsigned int)totalNumberOfBins);
 	terminalInitialize(statusSequenceForMagnetfield);
 
-	actualProgress = 0;
 	if (magnetfieldAnalyser->isMagnetfieldXBxAnalysisEnabled()) {
 
 		actualDisplayInfo = magnetfieldAnalyser->getXBxDisplayAxiRange();
@@ -3461,12 +3454,12 @@ void analysis::evaluateMagnetfield(std::streambuf* terminal) {
 			throw cannotAccessDisplayInfoError();
 
 		actualPositionIncrement = (actualDisplayInfo->max - actualDisplayInfo->min) / magnetfieldAnalyser->getXBxDisplayEntries();
-		for (i = 0; i < magnetfieldAnalyser->getXBxDisplayEntries(); i++, actualProgress++) {
+		for (i = 0; i < magnetfieldAnalyser->getXBxDisplayEntries(); i++) {
 
 			magneticField->getFieldValues(i * actualPositionIncrement + actualDisplayInfo->min, actualDisplayInfo->constValDim1, actualDisplayInfo->constValDim2, &actualFieldValue);
 			magnetfieldAnalyser->setXBxPoint(i, i * actualPositionIncrement + actualDisplayInfo->min, actualFieldValue.getFieldX());
 
-			terminalOverwrite(statusSequenceForMagnetfield, actualProgress + 1);
+			terminalOverwriteWithIncrement(statusSequenceForMagnetfield);
 
 		}
 
@@ -3478,12 +3471,12 @@ void analysis::evaluateMagnetfield(std::streambuf* terminal) {
 			throw cannotAccessDisplayInfoError();
 
 		actualPositionIncrement = (actualDisplayInfo->max - actualDisplayInfo->min) / magnetfieldAnalyser->getXByDisplayEntries();
-		for (i = 0; i < magnetfieldAnalyser->getXByDisplayEntries(); i++, actualProgress++) {
+		for (i = 0; i < magnetfieldAnalyser->getXByDisplayEntries(); i++) {
 
 			magneticField->getFieldValues(i * actualPositionIncrement + actualDisplayInfo->min, actualDisplayInfo->constValDim1, actualDisplayInfo->constValDim2, &actualFieldValue);
 			magnetfieldAnalyser->setXByPoint(i, i * actualPositionIncrement + actualDisplayInfo->min, actualFieldValue.getFieldY());
 
-			terminalOverwrite(statusSequenceForMagnetfield, actualProgress + 1);
+			terminalOverwriteWithIncrement(statusSequenceForMagnetfield);
 
 		}
 
@@ -3495,12 +3488,12 @@ void analysis::evaluateMagnetfield(std::streambuf* terminal) {
 			throw cannotAccessDisplayInfoError();
 
 		actualPositionIncrement = (actualDisplayInfo->max - actualDisplayInfo->min) / magnetfieldAnalyser->getXBzDisplayEntries();
-		for (i = 0; i < magnetfieldAnalyser->getXBzDisplayEntries(); i++, actualProgress++) {
+		for (i = 0; i < magnetfieldAnalyser->getXBzDisplayEntries(); i++) {
 
 			magneticField->getFieldValues(i * actualPositionIncrement + actualDisplayInfo->min, actualDisplayInfo->constValDim1, actualDisplayInfo->constValDim2, &actualFieldValue);
 			magnetfieldAnalyser->setXBzPoint(i, i * actualPositionIncrement + actualDisplayInfo->min, actualFieldValue.getFieldZ());
 
-			terminalOverwrite(statusSequenceForMagnetfield, actualProgress + 1);
+			terminalOverwriteWithIncrement(statusSequenceForMagnetfield);
 
 		}
 
@@ -3512,12 +3505,12 @@ void analysis::evaluateMagnetfield(std::streambuf* terminal) {
 			throw cannotAccessDisplayInfoError();
 
 		actualPositionIncrement = (actualDisplayInfo->max - actualDisplayInfo->min) / magnetfieldAnalyser->getYBxDisplayEntries();
-		for (i = 0; i < magnetfieldAnalyser->getYBxDisplayEntries(); i++, actualProgress++) {
+		for (i = 0; i < magnetfieldAnalyser->getYBxDisplayEntries(); i++) {
 
 			magneticField->getFieldValues(actualDisplayInfo->constValDim1, i * actualPositionIncrement + actualDisplayInfo->min,  actualDisplayInfo->constValDim2, &actualFieldValue);
 			magnetfieldAnalyser->setYBxPoint(i, i * actualPositionIncrement + actualDisplayInfo->min, actualFieldValue.getFieldX());
 
-			terminalOverwrite(statusSequenceForMagnetfield, actualProgress + 1);
+			terminalOverwriteWithIncrement(statusSequenceForMagnetfield);
 
 		}
 
@@ -3529,12 +3522,12 @@ void analysis::evaluateMagnetfield(std::streambuf* terminal) {
 			throw cannotAccessDisplayInfoError();
 
 		actualPositionIncrement = (actualDisplayInfo->max - actualDisplayInfo->min) / magnetfieldAnalyser->getYByDisplayEntries();
-		for (i = 0; i < magnetfieldAnalyser->getYByDisplayEntries(); i++, actualProgress++) {
+		for (i = 0; i < magnetfieldAnalyser->getYByDisplayEntries(); i++) {
 
 			magneticField->getFieldValues(actualDisplayInfo->constValDim1, i * actualPositionIncrement + actualDisplayInfo->min, actualDisplayInfo->constValDim2, &actualFieldValue);
 			magnetfieldAnalyser->setYByPoint(i, i * actualPositionIncrement + actualDisplayInfo->min, actualFieldValue.getFieldY());
 
-			terminalOverwrite(statusSequenceForMagnetfield, actualProgress + 1);
+			terminalOverwriteWithIncrement(statusSequenceForMagnetfield);
 
 		}
 
@@ -3546,12 +3539,12 @@ void analysis::evaluateMagnetfield(std::streambuf* terminal) {
 			throw cannotAccessDisplayInfoError();
 
 		actualPositionIncrement = (actualDisplayInfo->max - actualDisplayInfo->min) / magnetfieldAnalyser->getYBzDisplayEntries();
-		for (i = 0; i < magnetfieldAnalyser->getYBzDisplayEntries(); i++, actualProgress++) {
+		for (i = 0; i < magnetfieldAnalyser->getYBzDisplayEntries(); i++) {
 
 			magneticField->getFieldValues(actualDisplayInfo->constValDim1, i * actualPositionIncrement + actualDisplayInfo->min, actualDisplayInfo->constValDim2, &actualFieldValue);
 			magnetfieldAnalyser->setYBzPoint(i, i * actualPositionIncrement + actualDisplayInfo->min, actualFieldValue.getFieldZ());
 
-			terminalOverwrite(statusSequenceForMagnetfield, actualProgress + 1);
+			terminalOverwriteWithIncrement(statusSequenceForMagnetfield);
 
 		}
 
@@ -3563,12 +3556,12 @@ void analysis::evaluateMagnetfield(std::streambuf* terminal) {
 			throw cannotAccessDisplayInfoError();
 
 		actualPositionIncrement = (actualDisplayInfo->max - actualDisplayInfo->min) / magnetfieldAnalyser->getZBxDisplayEntries();
-		for (i = 0; i < magnetfieldAnalyser->getZBxDisplayEntries(); i++, actualProgress++) {
+		for (i = 0; i < magnetfieldAnalyser->getZBxDisplayEntries(); i++) {
 
 			magneticField->getFieldValues(actualDisplayInfo->constValDim1, actualDisplayInfo->constValDim2, i * actualPositionIncrement + actualDisplayInfo->min, &actualFieldValue);
 			magnetfieldAnalyser->setZBxPoint(i, i * actualPositionIncrement + actualDisplayInfo->min, actualFieldValue.getFieldX());
 
-			terminalOverwrite(statusSequenceForMagnetfield, actualProgress + 1);
+			terminalOverwriteWithIncrement(statusSequenceForMagnetfield);
 
 		}
 
@@ -3580,12 +3573,12 @@ void analysis::evaluateMagnetfield(std::streambuf* terminal) {
 			throw cannotAccessDisplayInfoError();
 
 		actualPositionIncrement = (actualDisplayInfo->max - actualDisplayInfo->min) / magnetfieldAnalyser->getZByDisplayEntries();
-		for (i = 0; i < magnetfieldAnalyser->getZByDisplayEntries(); i++, actualProgress++) {
+		for (i = 0; i < magnetfieldAnalyser->getZByDisplayEntries(); i++) {
 
 			magneticField->getFieldValues(actualDisplayInfo->constValDim1, actualDisplayInfo->constValDim2, i * actualPositionIncrement + actualDisplayInfo->min, &actualFieldValue);
 			magnetfieldAnalyser->setZByPoint(i, i * actualPositionIncrement + actualDisplayInfo->min, actualFieldValue.getFieldY());
 
-			terminalOverwrite(statusSequenceForMagnetfield, actualProgress + 1);
+			terminalOverwriteWithIncrement(statusSequenceForMagnetfield);
 
 		}
 
@@ -3597,12 +3590,12 @@ void analysis::evaluateMagnetfield(std::streambuf* terminal) {
 			throw cannotAccessDisplayInfoError();
 
 		actualPositionIncrement = (actualDisplayInfo->max - actualDisplayInfo->min) / magnetfieldAnalyser->getZBzDisplayEntries();
-		for (i = 0; i < magnetfieldAnalyser->getZBzDisplayEntries(); i++, actualProgress++) {
+		for (i = 0; i < magnetfieldAnalyser->getZBzDisplayEntries(); i++) {
 
 			magneticField->getFieldValues(actualDisplayInfo->constValDim1, actualDisplayInfo->constValDim2, i * actualPositionIncrement + actualDisplayInfo->min, &actualFieldValue);
 			magnetfieldAnalyser->setZBzPoint(i, i * actualPositionIncrement + actualDisplayInfo->min, actualFieldValue.getFieldZ());
 
-			terminalOverwrite(statusSequenceForMagnetfield, actualProgress + 1);
+			terminalOverwriteWithIncrement(statusSequenceForMagnetfield);
 
 		}
 
@@ -3703,7 +3696,6 @@ void analysis::evaluateHoughTransformGoodness(std::streambuf* terminal) {
 	unsigned short           j;
 	std::list<findableTrack> findableTracks;
 	terminalSequence         statusSequenceForFormula;
-	unsigned short           trackIndex;
 	trackfinderInputTrack*   track;
 	trackfinderInputHit*     hit;
 	lutBorder                border;
@@ -3740,16 +3732,15 @@ void analysis::evaluateHoughTransformGoodness(std::streambuf* terminal) {
 
 	setupFindableEstimatedTracks(&findableTracks, terminal);
 
-	createTerminalStatusSequence(&statusSequenceForFormula, terminal, "Analyse formula goodness:\t\t\t", findableTracks.size());
+	createTerminalStatusSequence(&statusSequenceForFormula, terminal, "Analyse formula goodness:\t\t\t", (unsigned int)findableTracks.size());
 	terminalInitialize(statusSequenceForFormula);
 
-	trackIndex   = 0;
 	cellSignatures.reset();
 	minimumClass = bitArray(0);
 	for (i = 0; i < NUMBEROFDIFFERENTMOMENTAS; i++)
 		numberOfTracksWithMomentaError[i]  = 0;
 
-	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++, trackIndex++) {
+	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++) {
 
 		track = actualTrack->getTrack();
 		if (track == NULL)
@@ -3814,7 +3805,7 @@ void analysis::evaluateHoughTransformGoodness(std::streambuf* terminal) {
 		}
 
 		cellSignatures.reset();
-		terminalOverwrite(statusSequenceForFormula, trackIndex + 1);
+		terminalOverwriteWithIncrement(statusSequenceForFormula);
 
 	}
 
@@ -3873,7 +3864,6 @@ void analysis::evaluateQuantizationGoodness(std::streambuf* terminal) {
 	unsigned int             j;
 	std::list<findableTrack> findableTracks;
 	terminalSequence         statusSequenceForQuantization;
-	unsigned short           trackIndex;
 	trackfinderInputTrack*   track;
 	double                   actualMomentum;
 	unsigned short           actualPosition1;
@@ -3927,7 +3917,7 @@ void analysis::evaluateQuantizationGoodness(std::streambuf* terminal) {
 
 	setupFindableEstimatedTracks(&findableTracks, terminal);
 
-	createTerminalStatusSequence(&statusSequenceForQuantization, terminal, "Analyse quantization goodness:\t\t\t", findableTracks.size());
+	createTerminalStatusSequence(&statusSequenceForQuantization, terminal, "Analyse quantization goodness:\t\t\t", (unsigned int)findableTracks.size());
 	terminalInitialize(statusSequenceForQuantization);
 
 	for (i = 0; i < (*space)->getStep(HTHETA); i++)
@@ -3948,8 +3938,7 @@ void analysis::evaluateQuantizationGoodness(std::streambuf* terminal) {
 	for (j = 0; j < (unsigned int)(*space)->getStep(DIM1) * (unsigned int)(*space)->getStep(DIM2) * (unsigned int)(*space)->getStep(DIM3); j++)
 		numberOfTracksWithHoughspace[j]      = 0;
 
-	trackIndex = 0;
-	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++, trackIndex++) {
+	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); actualTrack++) {
 
 		track = actualTrack->getTrack();
 		if (track == NULL)
@@ -3993,7 +3982,7 @@ void analysis::evaluateQuantizationGoodness(std::streambuf* terminal) {
 		if ((actualPosition1 < (*space)->getStep(DIM1)) && (actualPosition2 < (*space)->getStep(DIM2)) && (actualPosition3 < (*space)->getStep(DIM3)))
 			numberOfTracksWithHoughspace[(unsigned int)actualPosition1 * (unsigned int)(*space)->getStep(DIM2) * (unsigned int)(*space)->getStep(DIM3) + (unsigned int)actualPosition2 * (unsigned int)(*space)->getStep(DIM3) + (unsigned int)actualPosition3]++;
 
-		terminalOverwrite(statusSequenceForQuantization, trackIndex + 1);
+		terminalOverwriteWithIncrement(statusSequenceForQuantization);
 
 	}
 
@@ -4197,7 +4186,6 @@ void analysis::evaluatePeakDistanceGoodness(std::streambuf* terminal) {
 	std::list<findableTrack> findableTracks;
 	unsigned int             i;
 	terminalSequence         statusSequenceForPeakDistance;
-	unsigned short           trackIndex;
 	trackfinderInputTrack*   track;
 	unsigned short           actualPosition1;
 	unsigned short           actualPosition2;
@@ -4229,7 +4217,7 @@ void analysis::evaluatePeakDistanceGoodness(std::streambuf* terminal) {
 
 	setupFindableEstimatedTracks(&findableTracks, terminal);
 
-	createTerminalStatusSequence(&statusSequenceForPeakDistance, terminal, "Analyse peak distances:\t\t\t\t", findableTracks.size());
+	createTerminalStatusSequence(&statusSequenceForPeakDistance, terminal, "Analyse peak distances:\t\t\t\t", (unsigned int)findableTracks.size());
 	terminalInitialize(statusSequenceForPeakDistance);
 
 	for (i = 0; i < (unsigned int)(*space)->getStep(DIM1); i++)
@@ -4241,8 +4229,7 @@ void analysis::evaluatePeakDistanceGoodness(std::streambuf* terminal) {
 	for (i = 0; i < (unsigned int)ceil(sqrt((double)sqr((*space)->getStep(DIM1)) + (double)sqr((*space)->getStep(DIM2)) + (double)sqr((*space)->getStep(DIM3)))); i++)
 		accumulatedPeakDistanceDistribution[i] = 0;
 
-	trackIndex = 0;
-	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end(); trackIndex++) {
+	for (std::list<findableTrack>::iterator actualTrack = findableTracks.begin(); actualTrack != findableTracks.end();) {
 
 		track = actualTrack->getTrack();
 		if (track == NULL)
@@ -4271,7 +4258,7 @@ void analysis::evaluatePeakDistanceGoodness(std::streambuf* terminal) {
 
 		}
 
-		terminalOverwrite(statusSequenceForPeakDistance, trackIndex + 1);
+		terminalOverwriteWithIncrement(statusSequenceForPeakDistance);
 
 	}
 
@@ -4347,8 +4334,8 @@ void analysis::evaluateCellSimulationFiles(std::string hitFileName, std::string 
 	digitalHitAccess     digitalHitData;
 	prelutAccess         prelut;
 	lutAccess            lut;
-	trackfinderInputHit* hit;
-	digitalHit           digitalHitIdentifier;
+	trackfinderInputHit* analogHitValue;
+	digitalHit           digitalHitValue;
 	lutBorder            border;
 
 	if (eventData == NULL)
@@ -4359,39 +4346,49 @@ void analysis::evaluateCellSimulationFiles(std::string hitFileName, std::string 
 	if ((luts == NULL) || (*luts == NULL))
 		throw cannotAccessLutsError();
 
-	createTerminalStatusSequence(&statusSequenceForCellFiles, terminal, "\nEvaluate Cell BE simulation files:\t\t", (*eventData)->getNumberOfHits());
+	createTerminalStatusSequence(&statusSequenceForCellFiles, terminal, "\nEvaluate Cell BE simulation files:\t\t", (unsigned int)(*eventData)->getNumberOfHits());
 	terminalInitialize(statusSequenceForCellFiles);
 
 	/* reset the counter for the corrections in the first and second
 	 * dimension. Corrected are these values which have a difference
 	 * of more than one in the first dimension according to the previous
 	 * value */
-	(*luts)->resetCorrectionCounter();
+	if ((*luts)->typeUsesCorrections())
+		(*luts)->resetCorrectionCounter();
 
-	digitalHitData.init();
-	prelut.init((*luts)->getPrelutDefinition().dim3Min, (*luts)->getPrelutDefinition().dim3Max, (*luts)->getPrelutDefinition().dim3Step, (*luts)->getPrelutDefinition().dim3StartEntry, (*luts)->getPrelutDefinition().dim3StopEntry);
-	lut.init((*luts)->getLutDefinition().dim1Min, (*luts)->getLutDefinition().dim1Max, (*luts)->getLutDefinition().dim1Step, (*luts)->getLutDefinition().dim2Min, (*luts)->getLutDefinition().dim2Max, (*luts)->getLutDefinition().dim2Step);
+	if (!hitFileName.empty())
+		digitalHitData.init();
+	if (!prelutFileName.empty())
+		prelut.init((*luts)->getPrelutDefinition().dim3Min, (*luts)->getPrelutDefinition().dim3Max, (*luts)->getPrelutDefinition().dim3Step, (*luts)->getPrelutDefinition().dim3StartEntry, (*luts)->getPrelutDefinition().dim3StopEntry);
+	if (!lutFileName.empty())
+		lut.init((*luts)->getLutDefinition().dim1Min, (*luts)->getLutDefinition().dim1Max, (*luts)->getLutDefinition().dim1Step, (*luts)->getLutDefinition().dim2Min, (*luts)->getLutDefinition().dim2Max, (*luts)->getLutDefinition().dim2Step);
 
 	for (int i = 0; i < (*eventData)->getNumberOfHits(); i++) {
 
-		hit = (*eventData)->getHitByIndex(i);
+		analogHitValue = (*eventData)->getHitByIndex(i);
 
-		digitalHitData.evaluate(hit, &digitalHitIdentifier);
-		(*luts)->evaluate(hit, &border);
+		digitalHitValue.setHit(analogHitValue);
+		(*luts)->evaluate(analogHitValue, &border);
 
-		digitalHitData.addEntry(digitalHitIdentifier);
-		prelut.addEntry(border.getPrelutHoughBorder());
-		lut.addEntry(border.getLutHoughBorder());
+		if (!hitFileName.empty())
+			digitalHitData.addEntry(digitalHitValue);
+		if (!prelutFileName.empty())
+			prelut.addEntry(border.getPrelutHoughBorder(), digitalHitValue);
+		if (!lutFileName.empty())
+			lut.addEntry(border.getLutHoughBorder(), digitalHitValue);
 
-		terminalOverwrite(statusSequenceForCellFiles, i + 1);
+		terminalOverwriteWithIncrement(statusSequenceForCellFiles);
 
 	}
 
 	terminalFinalize(statusSequenceForCellFiles);
 
-	digitalHitData.write(hitFileName, "hitForCellSimulation");
-	prelut.write(prelutFileName, "prelutForCellSimulation");
-	lut.write(lutFileName, "lutForCellSimulation", HARDWAREFORMAT);
+	if (!hitFileName.empty())
+		digitalHitData.write(hitFileName, "Hits for CellBE simulation", terminal);
+	if (!prelutFileName.empty())
+		prelut.write(prelutFileName, "Prelut for CellBE simulation", terminal);
+	if (!lutFileName.empty())
+		lut.write(lutFileName, "Lut for CellBE simulation", HARDWAREFORMAT, terminal);
 
 }
 void analysis::evaluateCellSimulationFiles(std::string hitFileName, std::string prelutFileName, std::string lutFileName, unsigned int eventNumber, std::streambuf* terminal) {
@@ -4412,14 +4409,26 @@ void analysis::evaluateCellSimulationFiles(std::string hitFileName, std::string 
 	modifier  = "_";
 	modifier += buffer;
 
-	modifierPosition = (int)modifiedHitFileName.find_last_of(".", modifiedHitFileName.length());
-	modifiedHitFileName.insert(modifierPosition, modifier);
+	if (!modifiedHitFileName.empty()) {
+		
+		modifierPosition = (int)modifiedHitFileName.find_last_of(".", modifiedHitFileName.length());
+		modifiedHitFileName.insert(modifierPosition, modifier);
 
-	modifierPosition = (int)modifiedPrelutFileName.find_last_of(".", modifiedPrelutFileName.length());
-	modifiedPrelutFileName.insert(modifierPosition, modifier);
+	}
 
-	modifierPosition = (int)modifiedLutFileName.find_last_of(".", modifiedLutFileName.length());
-	modifiedLutFileName.insert(modifierPosition, modifier);
+	if (!modifiedPrelutFileName.empty()) {
+
+		modifierPosition = (int)modifiedPrelutFileName.find_last_of(".", modifiedPrelutFileName.length());
+		modifiedPrelutFileName.insert(modifierPosition, modifier);
+
+	}
+
+	if (!modifiedLutFileName.empty()) {
+
+		modifierPosition = (int)modifiedLutFileName.find_last_of(".", modifiedLutFileName.length());
+		modifiedLutFileName.insert(modifierPosition, modifier);
+
+	}
 
 	evaluateCellSimulationFiles(modifiedHitFileName, modifiedPrelutFileName, modifiedLutFileName, terminal);
 

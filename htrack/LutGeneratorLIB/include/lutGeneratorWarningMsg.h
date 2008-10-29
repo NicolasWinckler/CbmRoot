@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-08-14 12:36:37 $
-/// $Revision: 1.4 $
+/// $Date: 2008-10-24 16:41:18 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -425,6 +425,108 @@ public:
  */
 
 	virtual ~cannotWriteEmptyLutWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _TRYTOACCESSMAGNETICFIELDOFFILEOBJECTWARNINGMSG_H
+#define _TRYTOACCESSMAGNETICFIELDOFFILEOBJECTWARNINGMSG_H
+
+/**
+ * CLASS tryToAccessMagneticFieldOfFileObjectWarningMsg
+ */
+
+class tryToAccessMagneticFieldOfFileObjectWarningMsg : public lutGeneratorWarningMsg {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	tryToAccessMagneticFieldOfFileObjectWarningMsg();
+
+/**
+ * Destructor
+ */
+
+	virtual ~tryToAccessMagneticFieldOfFileObjectWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _TRYTOACCESSMAGNETICFIELDFACTOROFFILEOBJECTWARNINGMSG_H
+#define _TRYTOACCESSMAGNETICFIELDFACTOROFFILEOBJECTWARNINGMSG_H
+
+/**
+ * CLASS tryToAccessMagneticFieldFactorOfFileObjectWarningMsg
+ */
+
+class tryToAccessMagneticFieldFactorOfFileObjectWarningMsg : public lutGeneratorWarningMsg {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	tryToAccessMagneticFieldFactorOfFileObjectWarningMsg();
+
+/**
+ * Destructor
+ */
+
+	virtual ~tryToAccessMagneticFieldFactorOfFileObjectWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _TRYTOACCESSLUTCORRECTIONSOFFILEOBJECTWARNINGMSG_H
+#define _TRYTOACCESSLUTCORRECTIONSOFFILEOBJECTWARNINGMSG_H
+
+/**
+ * CLASS tryToAccessLutCorrectionsOfFileObjectWarningMsg
+ */
+
+class tryToAccessLutCorrectionsOfFileObjectWarningMsg : public lutGeneratorWarningMsg {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	tryToAccessLutCorrectionsOfFileObjectWarningMsg();
+
+/**
+ * Destructor
+ */
+
+	virtual ~tryToAccessLutCorrectionsOfFileObjectWarningMsg();
 
 /**
  * This method displays a warning message.

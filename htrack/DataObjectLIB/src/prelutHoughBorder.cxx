@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-10 13:47:05 $
-// $Revision: 1.6 $
+// $Date: 2008-10-24 16:36:58 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
@@ -47,8 +47,7 @@
 
 prelutHoughBorder::prelutHoughBorder() {
 
-	start = 0;
-	stop  = 0;
+	clear();
 
 }
 
@@ -81,6 +80,27 @@ const prelutHoughBorder& prelutHoughBorder::operator = (const prelutHoughBorder&
 	this->stop  = value.stop;
 
 	return *this;
+
+}
+
+/****************************************************************
+ * This method clears the object.								*
+ ****************************************************************/
+
+void prelutHoughBorder::clear() {
+
+	start = 0;
+	stop  = 0;
+
+}
+
+/****************************************************************
+ * This method initializes the object.							*
+ ****************************************************************/
+
+void prelutHoughBorder::init() {
+
+	clear();
 
 }
 

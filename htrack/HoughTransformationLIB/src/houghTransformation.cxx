@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-08-14 12:35:54 $
-// $Revision: 1.16 $
+// $Date: 2008-10-24 16:41:00 $
+// $Revision: 1.17 $
 //
 // *******************************************************************/
 
@@ -213,7 +213,8 @@ void houghTransformation::createBorders(trackfinderInputTrack* track) {
 		throw cannotAccessLutsError(HOUGHTRANSFORMATIONLIB);
 
 	track->resetHitPointer();
-	(*lut)->resetCorrectionCounter();
+	if ((*lut)->typeUsesCorrections())
+		(*lut)->resetCorrectionCounter();
 	hit = NULL;
 
 	for(unsigned short i = 0; i < track->getNumberOfHits(); i++) {
@@ -272,10 +273,11 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 	if (*lut == NULL)
 		throw cannotAccessLutsError(HOUGHTRANSFORMATIONLIB);
 
-	(*lut)->resetCorrectionCounter();
+	if ((*lut)->typeUsesCorrections())
+		(*lut)->resetCorrectionCounter();
 
 	hit = NULL;
-	createTerminalStatusSequence(&statusSequence, terminal, "\nCreate borders:\t\t\t\t\t", (*eventData)->getNumberOfHits());
+	createTerminalStatusSequence(&statusSequence, terminal, "\nCreate borders:\t\t\t\t\t", (unsigned int)(*eventData)->getNumberOfHits());
 	terminalInitialize(statusSequence);
 
 #if (DEBUGJUSTONEGOODTRACK > 0)
@@ -338,7 +340,7 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 
 		if ((hit->getTrack()->getTrackIndex() != goodTrack[DEBUGJUSTONEGOODTRACK - 1]) || (numberOfGoodTracks != DEBUGJUSTONEGOODTRACK)) {
 	
-			terminalOverwrite(statusSequence, i + 1);
+			terminalOverwrite(statusSequence, (unsigned int)(i + 1));
 			continue;
 		
 		}
@@ -350,7 +352,7 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 
 		(*histogram)->addBorder(border);
 
-		terminalOverwrite(statusSequence, i + 1);
+		terminalOverwrite(statusSequence, (unsigned int)(i + 1));
 
 	}
 
@@ -380,12 +382,14 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 
 #if (LUTVERSION == 4)
 
-	if ((*lut)->getNumberOfCoordCorrections() > 0) {
-		houghLutCorrectionWarningMsg* houghLutCorrection = new houghLutCorrectionWarningMsg("HOUGHTRANSFORMATIONLIB", (*lut)->getNumberOfCorrections(), (*lut)->getNumberOfCoordCorrections());
-		houghLutCorrection->warningMsg();
-		if(houghLutCorrection != NULL) {
-			delete houghLutCorrection;
-			houghLutCorrection = NULL;
+	if ((*lut)->typeUsesCorrections() {
+		if ((*lut)->getNumberOfCoordCorrections() > 0) {
+			houghLutCorrectionWarningMsg* houghLutCorrection = new houghLutCorrectionWarningMsg("HOUGHTRANSFORMATIONLIB", (*lut)->getNumberOfCorrections(), (*lut)->getNumberOfCoordCorrections());
+			houghLutCorrection->warningMsg();
+			if(houghLutCorrection != NULL) {
+				delete houghLutCorrection;
+				houghLutCorrection = NULL;
+			}
 		}
 	}
 
@@ -393,11 +397,13 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 
 #if (LUTVERSION == 5)
 
-	houghLutCorrectionWarningMsg* houghLutCorrection = new houghLutCorrectionWarningMsg("HOUGHTRANSFORMATIONLIB", (*lut)->getNumberOfCorrections(), (*lut)->getNumberOfCoordCorrections());
-	houghLutCorrection->warningMsg();
-	if(houghLutCorrection != NULL) {
-		delete houghLutCorrection;
-		houghLutCorrection = NULL;
+	if ((*lut)->typeUsesCorrections() {
+		houghLutCorrectionWarningMsg* houghLutCorrection = new houghLutCorrectionWarningMsg("HOUGHTRANSFORMATIONLIB", (*lut)->getNumberOfCorrections(), (*lut)->getNumberOfCoordCorrections());
+		houghLutCorrection->warningMsg();
+		if(houghLutCorrection != NULL) {
+			delete houghLutCorrection;
+			houghLutCorrection = NULL;
+		}
 	}
 
 #endif

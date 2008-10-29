@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-10 13:47:05 $
-// $Revision: 1.4 $
+// $Date: 2008-10-24 16:39:21 $
+// $Revision: 1.1 $
 //
 // *******************************************************************/
 
@@ -199,7 +199,7 @@ bool digitalHitAccessFile::getDataValue(std::string& buffer, unsigned long index
 	if (temp.empty())
 		noError = false;
 	else
-		typeCastedData[index].setNotIdentifiedIdentifier(temp);
+		typeCastedData[index].setNotIdentifiedString(temp);
 /********************************************************/
 	return noError;
 
@@ -234,23 +234,23 @@ std::string digitalHitAccessFile::setDataValue(unsigned long index) {
  * - Fileio::setHeaderValue										*
  ****************************************************************/
 
-void digitalHitAccessFile::writeFileHeader(std::ofstream& fileStream) {
+void digitalHitAccessFile::writeFileHeader(std::ofstream& fileStream, terminalSequence* statusSequence) {
 
 /********************************************************/
 /* make code changes for a different configuration here */
-	setHeaderValue(fileStream, stringCmdName,               header.name,              "Name of the look up table");
-	setHeaderValue(fileStream, stringCmdUsage,              header.usage,             "Usage of the look up table");
-	setHeaderValue(fileStream, stringCmdNumberOfEntries,    header.numberOfEntries,   "Number of entries in the look up table");
-	setHeaderValue(fileStream, stringCmdBlockSeparator,     defValBlockSeparator,     "The separator for the blocks of the data");
-	setHeaderValue(fileStream, stringCmdContent,            defValContent,            "The content of the file");
-	setHeaderValue(fileStream, stringCmdFormat,             defValFormat,             "The format for an entry in the file");
+	setHeaderValue(fileStream, stringCmdName,               header.name,              "Name of the look up table", statusSequence);
+	setHeaderValue(fileStream, stringCmdUsage,              header.usage,             "Usage of the look up table", statusSequence);
+	setHeaderValue(fileStream, stringCmdNumberOfEntries,    header.numberOfEntries,   "Number of entries in the look up table", statusSequence);
+	setHeaderValue(fileStream, stringCmdBlockSeparator,     defValBlockSeparator,     "The separator for the blocks of the data", statusSequence);
+	setHeaderValue(fileStream, stringCmdContent,            defValContent,            "The content of the file", statusSequence);
+	setHeaderValue(fileStream, stringCmdFormat,             defValFormat,             "The format for an entry in the file", statusSequence);
 /********************************************************/
 
 }
 
 /****************************************************************
  * This method is to set the default values for each header		*
- * parameter.
+ * parameter.													*
  ****************************************************************/
 
 void digitalHitAccessFile::setHeaderDefValues() {

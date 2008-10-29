@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-10-10 13:47:04 $
-/// $Revision: 1.7 $
+/// $Date: 2008-10-24 16:36:57 $
+/// $Revision: 1.8 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -162,9 +162,10 @@ public:
 /**
  * method reads a file to get the table
  * @param fileName is the name of the file to read the data
+ * @param terminal is a buffer to place the process information
  */
 
-	void read(std::string fileName);
+	void read(std::string fileName, std::streambuf* terminal = NULL);
 
 /**
  * method writes a file representing the table
@@ -172,10 +173,11 @@ public:
  * @param name is the name of the table which should be written to file
  * @param usage is a string representing the usage of the table in the program which should be written to file
  * @param useClassification is the flag which shows if the classification should be taken into acoount while doing quineMCClusky
+ * @param terminal is a buffer to place the process information
  * @see void quineMcClusky(std::list<tableStringEntry>& list, bool useClassification = true)
  */
 
-	void write(std::string fileName, std::string name, std::string usage, bool useClassification = true);
+	void write(std::string fileName, std::string name, std::string usage, bool useClassification = true, std::streambuf* terminal = NULL);
 
 };
 

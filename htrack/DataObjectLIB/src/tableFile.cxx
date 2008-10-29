@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-10 13:47:06 $
-// $Revision: 1.6 $
+// $Date: 2008-10-24 16:36:59 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
@@ -240,17 +240,17 @@ std::string tableFile::setDataValue(unsigned long index) {
  * - Fileio::setHeaderValue										*
  ****************************************************************/
 
-void tableFile::writeFileHeader(std::ofstream& fileStream) {
+void tableFile::writeFileHeader(std::ofstream& fileStream, terminalSequence* statusSequence) {
 
 /********************************************************/
 /* make code changes for a different configuration here */
-	setHeaderValue(fileStream, stringCmdName,               header.name,              "Name of the look up table");
-	setHeaderValue(fileStream, stringCmdUsage,              header.usage,             "Usage of the look up table");
-	setHeaderValue(fileStream, stringCmdNumberOfEntries,    header.numberOfEntries,   "Number of entries in the look up table");
-	setHeaderValue(fileStream, stringCmdStructureSeparator, defValStructureSeparator, "The separator for the members of the data structure");
-	setHeaderValue(fileStream, stringCmdBlockSeparator,     defValBlockSeparator,     "The separator for the blocks of the data");
-	setHeaderValue(fileStream, stringCmdContent,            defValContent,            "The content of the file");
-	setHeaderValue(fileStream, stringCmdFormat,             defValFormat,             "The format for an entry in the file");
+	setHeaderValue(fileStream, stringCmdName,               header.name,              "Name of the look up table", statusSequence);
+	setHeaderValue(fileStream, stringCmdUsage,              header.usage,             "Usage of the look up table", statusSequence);
+	setHeaderValue(fileStream, stringCmdNumberOfEntries,    header.numberOfEntries,   "Number of entries in the look up table", statusSequence);
+	setHeaderValue(fileStream, stringCmdStructureSeparator, defValStructureSeparator, "The separator for the members of the data structure", statusSequence);
+	setHeaderValue(fileStream, stringCmdBlockSeparator,     defValBlockSeparator,     "The separator for the blocks of the data", statusSequence);
+	setHeaderValue(fileStream, stringCmdContent,            defValContent,            "The content of the file", statusSequence);
+	setHeaderValue(fileStream, stringCmdFormat,             defValFormat,             "The format for an entry in the file", statusSequence);
 /********************************************************/
 
 }

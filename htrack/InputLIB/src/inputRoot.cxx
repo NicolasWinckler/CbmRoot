@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-07 10:38:09 $
-// $Revision: 1.15 $
+// $Date: 2008-10-24 16:41:08 $
+// $Revision: 1.16 $
 //
 // *******************************************************************/
 
@@ -1823,8 +1823,11 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 
 			if (data.getDetector().getStationById(inputHit->GetDetectorID()).isMapsType()) {
 
-				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked())
+				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked()) {
+
 					data.addHit(inputHit->GetDetectorID(), inputHit, (CbmMCPoint*)inputStsPoint, i);
+
+				}
 
 			}
 			else {
@@ -1861,8 +1864,11 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 
 			if (data.getDetector().getStationById(inputHit->GetDetectorID()).isHybridType()) {
 
-				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked())
+				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked()) {
+
 					data.addHit(inputHit->GetDetectorID(), inputHit, (CbmMCPoint*)inputStsPoint, i);
+
+				}
 
 			}
 			else {
@@ -1898,8 +1904,11 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 
 			if (data.getDetector().getStationById(inputHit->GetDetectorID()).isStripType()) {
 
-				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked())
+				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked()) {
+
 					data.addHit(inputHit->GetDetectorID(), inputHit, (CbmMCPoint*)inputStsPoint, i);
+
+				}
 
 			}
 			else {
@@ -2164,45 +2173,6 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 
 	}
 
-	if (inputStsHits != NULL) {
-
-		for (i = 0; i < inputStsHits->GetEntries(); i++) {
-
-			inputStsHit = (CbmStsHit*)inputStsHits->At(i);
-			if (inputStsHit == NULL)
-				throw cannotAccessHitsOrTracksError(INPUTLIB);
-
-			if ((inputStsHit->GetRefIndex() < 0) || (inputStsPoints == NULL))
-				inputStsPoint = NULL;
-			else
-				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputStsHit->GetRefIndex());
-
-/* This is just used because the type of the station must be derived from the hits */
-			if (data.getDetectorPointer()->getStationPointer(inputStsHit->GetStationNr()) != NULL)
-				data.getDetectorPointer()->getStationPointer(inputStsHit->GetStationNr())->setHybridType(true);
-/* Later the type is derived from the station itself. So it must be checked that the hit is correct */
-
-			if (data.getDetector().getStationById(inputStsHit->GetStationNr()).isHybridType() || data.getDetector().getStationById(inputStsHit->GetStationNr()).isStripType()) {
-
-				if (!data.getDetector().getStationById(inputStsHit->GetStationNr()).isMasked())
-					data.addHit(inputStsHit->GetStationNr(), (CbmHit*)inputStsHit, (CbmMCPoint*)inputStsPoint, i);
-
-			}
-			else {
-
-				hitWithWrongStationFoundWarningMsg* hitWithWrongStationFound = new hitWithWrongStationFoundWarningMsg();
-				hitWithWrongStationFound->warningMsg();
-				if(hitWithWrongStationFound != NULL) {
-					delete hitWithWrongStationFound;
-					hitWithWrongStationFound = NULL;
-				}
-
-			}
-
-		}
-
-	}
-
 	if (inputMvdHits != NULL) {
 
 		for (i = 0; i < inputMvdHits->GetEntries(); i++) {
@@ -2223,8 +2193,53 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 
 			if (data.getDetector().getStationById(inputMvdHit->GetStationNr()).isMapsType()) {
 
-				if (!data.getDetector().getStationById(inputMvdHit->GetStationNr()).isMasked())
+				if (!data.getDetector().getStationById(inputMvdHit->GetStationNr()).isMasked()) {
+
 					data.addHit(inputMvdHit->GetStationNr(), (CbmHit*)inputMvdHit, (CbmMCPoint*)inputMvdPoint, i);
+
+				}
+
+			}
+			else {
+
+				hitWithWrongStationFoundWarningMsg* hitWithWrongStationFound = new hitWithWrongStationFoundWarningMsg();
+				hitWithWrongStationFound->warningMsg();
+				if(hitWithWrongStationFound != NULL) {
+					delete hitWithWrongStationFound;
+					hitWithWrongStationFound = NULL;
+				}
+
+			}
+
+		}
+
+	}
+
+	if (inputStsHits != NULL) {
+
+		for (i = 0; i < inputStsHits->GetEntries(); i++) {
+
+			inputStsHit = (CbmStsHit*)inputStsHits->At(i);
+			if (inputStsHit == NULL)
+				throw cannotAccessHitsOrTracksError(INPUTLIB);
+
+			if ((inputStsHit->GetRefIndex() < 0) || (inputStsPoints == NULL))
+				inputStsPoint = NULL;
+			else
+				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputStsHit->GetRefIndex());
+
+/* This is just used because the type of the station must be derived from the hits */
+			if (data.getDetectorPointer()->getStationPointer(inputStsHit->GetStationNr()) != NULL)
+				data.getDetectorPointer()->getStationPointer(inputStsHit->GetStationNr())->setHybridType(true);
+/* Later the type is derived from the station itself. So it must be checked that the hit is correct */
+
+			if (data.getDetector().getStationById(inputStsHit->GetStationNr()).isHybridType() || data.getDetector().getStationById(inputStsHit->GetStationNr()).isStripType()) {
+
+				if (!data.getDetector().getStationById(inputStsHit->GetStationNr()).isMasked()) {
+					
+					data.addHit(inputStsHit->GetStationNr(), (CbmHit*)inputStsHit, (CbmMCPoint*)inputStsPoint, i);
+
+				}
 
 			}
 			else {

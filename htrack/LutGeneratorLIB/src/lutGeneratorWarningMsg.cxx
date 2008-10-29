@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-08-14 12:36:37 $
-// $Revision: 1.4 $
+// $Date: 2008-10-24 16:41:19 $
+// $Revision: 1.5 $
 //
 // *******************************************************************/
 
@@ -433,5 +433,98 @@ cannotWriteEmptyLutWarningMsg::~cannotWriteEmptyLutWarningMsg() {
 void cannotWriteEmptyLutWarningMsg::warningMsg() {
 
 	printMsg("You cannot write an empty look up table into the file!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS tryToAccessMagneticFieldOfFileObjectWarningMsg			*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+tryToAccessMagneticFieldOfFileObjectWarningMsg::tryToAccessMagneticFieldOfFileObjectWarningMsg() : lutGeneratorWarningMsg() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+tryToAccessMagneticFieldOfFileObjectWarningMsg::~tryToAccessMagneticFieldOfFileObjectWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void tryToAccessMagneticFieldOfFileObjectWarningMsg::warningMsg() {
+
+	printMsg("You try to access a magnetic field of a file object. Commonly this is not possible. The value is a default one!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS tryToAccessMagneticFieldFactorOfFileObjectWarningMsg	*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+tryToAccessMagneticFieldFactorOfFileObjectWarningMsg::tryToAccessMagneticFieldFactorOfFileObjectWarningMsg() : lutGeneratorWarningMsg() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+tryToAccessMagneticFieldFactorOfFileObjectWarningMsg::~tryToAccessMagneticFieldFactorOfFileObjectWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void tryToAccessMagneticFieldFactorOfFileObjectWarningMsg::warningMsg() {
+
+	printMsg("You try to access a magnetic field factor of a file object. Commonly this is not possible. The value is a default one!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS tryToAccessLutCorrectionsOfFileObjectWarningMsg		*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+tryToAccessLutCorrectionsOfFileObjectWarningMsg::tryToAccessLutCorrectionsOfFileObjectWarningMsg() : lutGeneratorWarningMsg() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+tryToAccessLutCorrectionsOfFileObjectWarningMsg::~tryToAccessLutCorrectionsOfFileObjectWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void tryToAccessLutCorrectionsOfFileObjectWarningMsg::warningMsg() {
+
+	printMsg("You try to access a lut correction function of a file object. Commonly this is not possible. The value is a default one!!!");
 
 }

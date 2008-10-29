@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2007-10-19 14:33:08 $
-/// $Revision: 1.10 $
+/// $Date: 2008-10-24 16:39:20 $
+/// $Revision: 1.11 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -545,12 +545,12 @@ void tables::setCodingTableMinimumClassification(bitArray value) {
  * method reads a file to get the table							*
  * **************************************************************/
 
-void tables::readCodingTable(std::string fileName) {
+void tables::readCodingTable(std::string fileName, std::streambuf* terminal) {
 
 	if (fileName.empty())
-		codingTable.read(codingTableName);
+		codingTable.read(codingTableName, terminal);
 	else
-		codingTable.read(fileName);
+		codingTable.read(fileName, terminal);
 
 }
 
@@ -558,15 +558,15 @@ void tables::readCodingTable(std::string fileName) {
  * method writes a file representing the table					*
  * **************************************************************/
 
-void tables::writeCodingTable(std::string fileName, std::string name) {
+void tables::writeCodingTable(std::string fileName, std::string name, std::streambuf* terminal) {
 
 	if (fileName.empty())
 		if (name.empty())
-			codingTable.write(codingTableName, codingTableName, "codingTable", true);
+			codingTable.write(codingTableName, codingTableName, "codingTable", true, terminal);
 		else
-			codingTable.write(codingTableName, name, "codingTable", true);
+			codingTable.write(codingTableName, name, "codingTable", true, terminal);
 	else
-		codingTable.write(fileName, name, "codingTable", true);
+		codingTable.write(fileName, name, "codingTable", true, terminal);
 
 }
 
@@ -625,12 +625,12 @@ void tables::setGradingPTableMinimumClassification(bitArray value) {
  * method reads a file to get the table							*
  * **************************************************************/
 
-void tables::readGradingPTable(std::string fileName) {
+void tables::readGradingPTable(std::string fileName, std::streambuf* terminal) {
 
 	if (fileName.empty())
-		gradingPTable.read(gradingPTableName);
+		gradingPTable.read(gradingPTableName, terminal);
 	else
-		gradingPTable.read(fileName);
+		gradingPTable.read(fileName, terminal);
 
 }
 
@@ -638,15 +638,15 @@ void tables::readGradingPTable(std::string fileName) {
  * method writes a file representing the table					*
  * **************************************************************/
 
-void tables::writeGradingPTable(std::string fileName, std::string name) {
+void tables::writeGradingPTable(std::string fileName, std::string name, std::streambuf* terminal) {
 
 	if (fileName.empty())
 		if (name.empty())
-			gradingPTable.write(gradingPTableName, gradingPTableName, "gradingPTable", true);
+			gradingPTable.write(gradingPTableName, gradingPTableName, "gradingPTable", true, terminal);
 		else
-			gradingPTable.write(gradingPTableName, name, "gradingPTable", true);
+			gradingPTable.write(gradingPTableName, name, "gradingPTable", true, terminal);
 	else
-		gradingPTable.write(fileName, name, "gradingPTable", true);
+		gradingPTable.write(fileName, name, "gradingPTable", true, terminal);
 
 }
 
@@ -705,12 +705,12 @@ void tables::setGradingRTableMinimumClassification(bitArray value) {
  * method reads a file to get the table							*
  * **************************************************************/
 
-void tables::readGradingRTable(std::string fileName) {
+void tables::readGradingRTable(std::string fileName, std::streambuf* terminal) {
 
 	if (fileName.empty())
-		gradingRTable.read(gradingRTableName);
+		gradingRTable.read(gradingRTableName, terminal);
 	else
-		gradingRTable.read(fileName);
+		gradingRTable.read(fileName, terminal);
 
 }
 
@@ -718,15 +718,15 @@ void tables::readGradingRTable(std::string fileName) {
  * method writes a file representing the table					*
  * **************************************************************/
 
-void tables::writeGradingRTable(std::string fileName, std::string name) {
+void tables::writeGradingRTable(std::string fileName, std::string name, std::streambuf* terminal) {
 
 	if (fileName.empty())
 		if (name.empty())
-			gradingRTable.write(gradingRTableName, gradingRTableName, "gradingRTable", true);
+			gradingRTable.write(gradingRTableName, gradingRTableName, "gradingRTable", true, terminal);
 		else
-			gradingRTable.write(gradingRTableName, name, "gradingRTable", true);
+			gradingRTable.write(gradingRTableName, name, "gradingRTable", true, terminal);
 	else
-		gradingRTable.write(fileName, name, "gradingRTable", true);
+		gradingRTable.write(fileName, name, "gradingRTable", true, terminal);
 
 }
 

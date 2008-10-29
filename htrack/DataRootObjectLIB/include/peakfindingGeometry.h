@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-10-07 10:36:50 $
-/// $Revision: 1.2 $
+/// $Date: 2008-10-24 16:39:20 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -240,17 +240,19 @@ public:
 /**
  * method reads a file to get the peakfinding geometry
  * @param fileName is the name of the file to read the data
+ * @param terminal is a buffer to place the process information
  */
 
-	void read(std::string fileName);
+	void read(std::string fileName, std::streambuf* terminal = NULL);
 
 /**
  * method writes a file representing the peakfinding geometry
  * @param fileName is the name of the file to write the data
  * @param name is the name of the filter geometry which should be written to file
+ * @param terminal is a buffer to place the process information
  */
 
-	void write(std::string fileName, std::string name);
+	void write(std::string fileName, std::string name, std::streambuf* terminal = NULL);
 
 };
 

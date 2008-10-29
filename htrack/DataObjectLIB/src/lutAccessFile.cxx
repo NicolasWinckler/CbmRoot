@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-10 13:47:05 $
-// $Revision: 1.7 $
+// $Date: 2008-10-24 16:36:58 $
+// $Revision: 1.8 $
 //
 // *******************************************************************/
 
@@ -354,33 +354,33 @@ std::string lutAccessFile::setDataValue(unsigned long index) {
  * - Fileio::setHeaderValue										*
  ****************************************************************/
 
-void lutAccessFile::writeFileHeader(std::ofstream& fileStream) {
+void lutAccessFile::writeFileHeader(std::ofstream& fileStream, terminalSequence* statusSequence) {
 
 /********************************************************/
 /* make code changes for a different configuration here */
-	setHeaderValue(fileStream, stringCmdName,               header.name,              "Name of the look up table");
-	setHeaderValue(fileStream, stringCmdUsage,              header.usage,             "Usage of the look up table");
-	setHeaderValue(fileStream, stringCmdFormat,             header.format,            "Format of the look up table");
-	setHeaderValue(fileStream, stringCmdNumberOfEntries,    header.numberOfEntries,   "Number of entries in the look up table");
-	setHeaderValue(fileStream, stringCmdDim1Min,            header.dim1Min,           "Minimum value in the first dimension of the LUT configuration during creation");
-	setHeaderValue(fileStream, stringCmdDim1Max,            header.dim1Max,           "Maximum value in the first dimension of the LUT configuration during creation");
-	setHeaderValue(fileStream, stringCmdDim1Step,           header.dim1Step,          "Number of steps for the value range in the first dimension of the LUT configuration during creation");
-	setHeaderValue(fileStream, stringCmdDim2Min,            header.dim2Min,           "Minimum value in the second dimension of the LUT configuration during creation");
-	setHeaderValue(fileStream, stringCmdDim2Max,            header.dim2Max,           "Maximum value in the second dimension of the LUT configuration during creation");
-	setHeaderValue(fileStream, stringCmdDim2Step,           header.dim2Step,          "Number of steps for the value range in the second dimension of the LUT configuration during creation");
-	setHeaderValue(fileStream, stringCmdStructureSeparator, defValStructureSeparator, "The separator for the members of the data structure");
-	setHeaderValue(fileStream, stringCmdBlockSeparator,     defValBlockSeparator,     "The separator for the blocks of the data");
+	setHeaderValue(fileStream, stringCmdName,               header.name,              "Name of the look up table", statusSequence);
+	setHeaderValue(fileStream, stringCmdUsage,              header.usage,             "Usage of the look up table", statusSequence);
+	setHeaderValue(fileStream, stringCmdFormat,             header.format,            "Format of the look up table", statusSequence);
+	setHeaderValue(fileStream, stringCmdNumberOfEntries,    header.numberOfEntries,   "Number of entries in the look up table", statusSequence);
+	setHeaderValue(fileStream, stringCmdDim1Min,            header.dim1Min,           "Minimum value in the first dimension of the LUT configuration during creation", statusSequence);
+	setHeaderValue(fileStream, stringCmdDim1Max,            header.dim1Max,           "Maximum value in the first dimension of the LUT configuration during creation", statusSequence);
+	setHeaderValue(fileStream, stringCmdDim1Step,           header.dim1Step,          "Number of steps for the value range in the first dimension of the LUT configuration during creation", statusSequence);
+	setHeaderValue(fileStream, stringCmdDim2Min,            header.dim2Min,           "Minimum value in the second dimension of the LUT configuration during creation", statusSequence);
+	setHeaderValue(fileStream, stringCmdDim2Max,            header.dim2Max,           "Maximum value in the second dimension of the LUT configuration during creation", statusSequence);
+	setHeaderValue(fileStream, stringCmdDim2Step,           header.dim2Step,          "Number of steps for the value range in the second dimension of the LUT configuration during creation", statusSequence);
+	setHeaderValue(fileStream, stringCmdStructureSeparator, defValStructureSeparator, "The separator for the members of the data structure", statusSequence);
+	setHeaderValue(fileStream, stringCmdBlockSeparator,     defValBlockSeparator,     "The separator for the blocks of the data", statusSequence);
 	
 	switch(header.format){
 	
 		case HARDWAREFORMAT:
-			setHeaderValue(fileStream, stringCmdContent,            defValContentHardware,    "The content of the file");
-			setHeaderValue(fileStream, stringCmdFormatString,       defValFormatHardware,     "The format for an entry in the file");
+			setHeaderValue(fileStream, stringCmdContent,            defValContentHardware,    "The content of the file", statusSequence);
+			setHeaderValue(fileStream, stringCmdFormatString,       defValFormatHardware,     "The format for an entry in the file", statusSequence);
 			break;
 
 		default:
-			setHeaderValue(fileStream, stringCmdContent,            defValContentSoftware,    "The content of the file");
-			setHeaderValue(fileStream, stringCmdFormatString,       defValFormatSoftware,     "The format for an entry in the file");
+			setHeaderValue(fileStream, stringCmdContent,            defValContentSoftware,    "The content of the file", statusSequence);
+			setHeaderValue(fileStream, stringCmdFormatString,       defValFormatSoftware,     "The format for an entry in the file", statusSequence);
 			break;
 
 	}

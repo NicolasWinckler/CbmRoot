@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-08-14 12:33:08 $
-// $Revision: 1.6 $
+// $Date: 2008-10-24 16:39:20 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
@@ -69,7 +69,7 @@ void histogramData::allocateMemory(std::streambuf* terminal) {
 
 #endif
 
-	createTerminalStatusSequence(&statusSequence, terminal, "\nAllocate histogram:\t\t\t\t", (*space)->getStep(DIM2));
+	createTerminalStatusSequence(&statusSequence, terminal, "\nAllocate histogram:\t\t\t\t", (unsigned int)(*space)->getStep(DIM2));
 	terminalInitialize(statusSequence);
 
 #ifdef CALLOC_HISTOGRAM_RUNTIME
@@ -102,7 +102,7 @@ void histogramData::allocateMemory(std::streambuf* terminal) {
 
 #endif
 
-		terminalOverwrite(statusSequence, i + 1);
+		terminalOverwriteWithIncrement(statusSequence);
 
 	}
 
@@ -129,7 +129,7 @@ void histogramData::deleteMemory(std::streambuf* terminal) {
 	if ((space == NULL) || (*space == NULL))
 		throw cannotAccessHistogramSpaceError(DATAROOTOBJECTLIB);
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Deallocate histogram:\t\t", (*space)->getStep(DIM2));
+	createTerminalStatusSequence(&statusSequence, terminal, "Deallocate histogram:\t\t", (unsigned int)(*space)->getStep(DIM2));
 	terminalInitialize(statusSequence);
 
 	reset();
@@ -143,7 +143,7 @@ void histogramData::deleteMemory(std::streambuf* terminal) {
 				cell[i] = NULL;
 			}
 
-			terminalOverwrite(statusSequence, i + 1);
+			terminalOverwriteWithIncrement(statusSequence);
 
 		}
 

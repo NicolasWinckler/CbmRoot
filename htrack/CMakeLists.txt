@@ -35,8 +35,6 @@ DataObjectLIB/src/bitfield.cxx
 DataObjectLIB/src/bytefield.cxx 
 DataObjectLIB/src/dataObjectError.cxx 
 DataObjectLIB/src/dataObjectWarningMsg.cxx 
-#DataObjectLIB/src/digitalHitAccessFile.cxx 
-DataObjectLIB/src/digitalHit.cxx 
 DataObjectLIB/src/histogramCellSignatures.cxx 
 DataObjectLIB/src/histogramSpace.cxx 
 DataObjectLIB/src/houghBorderCommand.cxx 
@@ -61,6 +59,8 @@ DataObjectLIB/src/trackToPeak.cxx
 DataRootObjectLIB/src/borderCell.cxx 
 DataRootObjectLIB/src/dataRootObjectError.cxx 
 DataRootObjectLIB/src/dataRootObjectWarningMsg.cxx 
+#DataRootObjectLIB/src/digitalHitAccessFile.cxx 
+DataRootObjectLIB/src/digitalHit.cxx 
 DataRootObjectLIB/src/findableTrack.cxx 
 DataRootObjectLIB/src/histogramCell.cxx 
 DataRootObjectLIB/src/histogramData.cxx 
@@ -94,8 +94,7 @@ InputLIB/src/inputRoot.cxx
 InputLIB/src/inputWarningMsg.cxx
 #LutGeneratorLIB/src/digitalHitAccess.cxx 
 #LutGeneratorLIB/src/lutAccess.cxx 
-LutGeneratorLIB/src/lut.cxx 
-LutGeneratorLIB/src/lutGenerator.cxx 
+LutGeneratorLIB/src/lut.cxx  
 LutGeneratorLIB/src/lutGeneratorError.cxx 
 LutGeneratorLIB/src/lutGeneratorWarningMsg.cxx 
 LutGeneratorLIB/src/lutImplementation.cxx 
@@ -192,11 +191,11 @@ MiscLIB/src/conversionRoutines.cxx
 FileioLIB/src/configuration.cxx 
 FileioLIB/src/fileio.cxx 
 FileioLIB/src/io.cxx
-DataObjectLIB/src/digitalHitAccessFile.cxx 
 DataObjectLIB/src/lutAccessFile.cxx 
 DataObjectLIB/src/prelutAccessFile.cxx 
 DataObjectLIB/src/table.cxx 
 DataObjectLIB/src/tableFile.cxx 
+DataRootObjectLIB/src/digitalHitAccessFile.cxx 
 LutGeneratorLIB/src/digitalHitAccess.cxx 
 LutGeneratorLIB/src/lutAccess.cxx 
 LutGeneratorLIB/src/prelutAccess.cxx 
@@ -208,11 +207,11 @@ CbmHoughStsTrackFinder/src/inf.cxx
 set(HEADERS
 MiscLIB/include/bitArray.h MiscLIB/include/conversionRoutines.h MiscLIB/include/coordinateSystem.h MiscLIB/include/defs.h MiscLIB/include/errorHandling.h MiscLIB/include/globalWarningMsg.h MiscLIB/include/hitArray.h MiscLIB/include/memoryDef.h MiscLIB/include/miscError.h MiscLIB/include/miscWarningMsg.h MiscLIB/include/projects.h MiscLIB/include/terminal.h
 FileioLIB/include/configuration.h FileioLIB/include/fileioError.h FileioLIB/include/fileio.h FileioLIB/include/fileioWarningMsg.h FileioLIB/include/io.h
-DataObjectLIB/include/analyticFormula.h DataObjectLIB/include/bitfield.h DataObjectLIB/include/bytefield.h DataObjectLIB/include/dataObjectError.h DataObjectLIB/include/dataObjectWarningMsg.h DataObjectLIB/include/digitalHitAccessFile.h DataObjectLIB/include/digitalHit.h DataObjectLIB/include/histogramCellSignatures.h DataObjectLIB/include/histogramSpace.h DataObjectLIB/include/houghBorderCommand.h DataObjectLIB/include/houghBorderPosition.h DataObjectLIB/include/lutAccessFile.h DataObjectLIB/include/lutDefinition.h DataObjectLIB/include/lutHoughBorder.h DataObjectLIB/include/magneticFieldValue.h DataObjectLIB/include/peakToTrack.h DataObjectLIB/include/prelutAccessFile.h DataObjectLIB/include/prelutDefinition.h DataObjectLIB/include/prelutHoughBorder.h DataObjectLIB/include/specialList.h DataObjectLIB/include/specialListMem.h DataObjectLIB/include/specialMemClass.h DataObjectLIB/include/specialMem.h DataObjectLIB/include/specialMemPointer.h DataObjectLIB/include/tableEntry.h DataObjectLIB/include/tableFile.h DataObjectLIB/include/table.h DataObjectLIB/include/tableStringEntry.h DataObjectLIB/include/trackCoordinates.h DataObjectLIB/include/trackFrameworkMomentum.h DataObjectLIB/include/trackMomentum.h DataObjectLIB/include/trackParameter.h DataObjectLIB/include/trackToPeak.h
+DataObjectLIB/include/analyticFormula.h DataObjectLIB/include/bitfield.h DataObjectLIB/include/bytefield.h DataObjectLIB/include/dataObjectError.h DataObjectLIB/include/dataObjectWarningMsg.h DataRootObjectLIB/include/digitalHitAccessFile.h DataRootObjectLIB/include/digitalHit.h DataObjectLIB/include/histogramCellSignatures.h DataObjectLIB/include/histogramSpace.h DataObjectLIB/include/houghBorderCommand.h DataObjectLIB/include/houghBorderPosition.h DataObjectLIB/include/lutAccessFile.h DataObjectLIB/include/lutDefinition.h DataObjectLIB/include/lutHoughBorder.h DataObjectLIB/include/magneticFieldValue.h DataObjectLIB/include/peakToTrack.h DataObjectLIB/include/prelutAccessFile.h DataObjectLIB/include/prelutDefinition.h DataObjectLIB/include/prelutHoughBorder.h DataObjectLIB/include/specialList.h DataObjectLIB/include/specialListMem.h DataObjectLIB/include/specialMemClass.h DataObjectLIB/include/specialMem.h DataObjectLIB/include/specialMemPointer.h DataObjectLIB/include/tableEntry.h DataObjectLIB/include/tableFile.h DataObjectLIB/include/table.h DataObjectLIB/include/tableStringEntry.h DataObjectLIB/include/trackCoordinates.h DataObjectLIB/include/trackFrameworkMomentum.h DataObjectLIB/include/trackMomentum.h DataObjectLIB/include/trackParameter.h DataObjectLIB/include/trackToPeak.h
 DataRootObjectLIB/include/borderCell.h DataRootObjectLIB/include/dataRootObjectError.h DataRootObjectLIB/include/dataRootObjectWarningMsg.h DataRootObjectLIB/include/findableTrack.h DataRootObjectLIB/include/histogramCell.h DataRootObjectLIB/include/histogramData.h DataRootObjectLIB/include/inputHitSpecialArray.h DataRootObjectLIB/include/inputHitSpecialList.h DataRootObjectLIB/include/inputHitSpecialMem.h DataRootObjectLIB/include/inputHitStlList.h DataRootObjectLIB/include/inputHitStlMem.h DataRootObjectLIB/include/lutBorder.h DataRootObjectLIB/include/tables.h DataRootObjectLIB/include/trackAnalogInformation.h DataRootObjectLIB/include/trackData.h DataRootObjectLIB/include/trackDigitalInformation.h DataRootObjectLIB/include/trackfinderInputData.h DataRootObjectLIB/include/trackfinderInputDetector.h DataRootObjectLIB/include/trackfinderInputFMagneticField.h DataRootObjectLIB/include/trackfinderInputHit.h DataRootObjectLIB/include/trackfinderInputMagneticField.h DataRootObjectLIB/include/trackfinderInputStation.h DataRootObjectLIB/include/trackfinderInputTrack.h DataRootObjectLIB/include/trackfinderOutputData.h DataRootObjectLIB/include/trackHitMem.h DataRootObjectLIB/include/trackLayerAccess.h
 RootFrameworkLIB/include/frameworkError.h RootFrameworkLIB/include/hitProducer.h
 InputLIB/include/inputAscii.h InputLIB/include/inputData.h InputLIB/include/inputError.h InputLIB/include/inputFRoot.h InputLIB/include/inputRoot.h InputLIB/include/inputWarningMsg.h
-LutGeneratorLIB/include/digitalHitAccess.h LutGeneratorLIB/include/lutAccess.h LutGeneratorLIB/include/lutGeneratorError.h LutGeneratorLIB/include/lutGenerator.h LutGeneratorLIB/include/lutGeneratorWarningMsg.h LutGeneratorLIB/include/lut.h LutGeneratorLIB/include/lutImplementation.h LutGeneratorLIB/include/lutMath.h LutGeneratorLIB/include/prelutAccess.h LutGeneratorLIB/include/prelut.h LutGeneratorLIB/include/prelutMath.h
+LutGeneratorLIB/include/digitalHitAccess.h LutGeneratorLIB/include/lutAccess.h LutGeneratorLIB/include/lutGeneratorError.h LutGeneratorLIB/include/lutGeneratorWarningMsg.h LutGeneratorLIB/include/lut.h LutGeneratorLIB/include/lutImplementation.h LutGeneratorLIB/include/lutMath.h LutGeneratorLIB/include/prelutAccess.h LutGeneratorLIB/include/prelut.h LutGeneratorLIB/include/prelutMath.h
 HoughTransformationLIB/include/houghTransformationError.h HoughTransformationLIB/include/houghTransformation.h HoughTransformationLIB/include/houghTransformationWarningMsg.h
 HistogramTransformationLIB/include/eraser.h HistogramTransformationLIB/include/filterBasicComplex.h HistogramTransformationLIB/include/filterBasicComplexMod.h HistogramTransformationLIB/include/filterBasicNeutral.h HistogramTransformationLIB/include/filterBasicSimple.h HistogramTransformationLIB/include/filterBasicSimpleMod.h HistogramTransformationLIB/include/filterBasicSpecial.h HistogramTransformationLIB/include/filterBasicStyle.h HistogramTransformationLIB/include/filterDim12Dim1.h HistogramTransformationLIB/include/filterDim12.h HistogramTransformationLIB/include/filterDim1Dim2.h HistogramTransformationLIB/include/filterDim1Dim2Mod.h HistogramTransformationLIB/include/filterDim1.h HistogramTransformationLIB/include/filterDim2.h HistogramTransformationLIB/include/filterDim3.h HistogramTransformationLIB/include/filterDim3Mod.h HistogramTransformationLIB/include/filterDimXDimXDimX.h HistogramTransformationLIB/include/filterDimXDimX.h HistogramTransformationLIB/include/filterDimX.h HistogramTransformationLIB/include/filterDimZDimZDimZ.h HistogramTransformationLIB/include/filterDimZDimZ.h HistogramTransformationLIB/include/filterDimZ.h HistogramTransformationLIB/include/firstFilterFinal.h HistogramTransformationLIB/include/firstFilterFinalMod.h HistogramTransformationLIB/include/histogramTransformationError.h HistogramTransformationLIB/include/histogramTransformation.h HistogramTransformationLIB/include/maxMorphSearch.h HistogramTransformationLIB/include/secondFilterFinal.h HistogramTransformationLIB/include/secondFilterFinalMod.h
 TrackfinderLIB/include/trackfinderError.h TrackfinderLIB/include/trackfinder.h

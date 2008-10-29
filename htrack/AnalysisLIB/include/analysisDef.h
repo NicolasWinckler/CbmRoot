@@ -106,7 +106,7 @@
 #define FPGAHISTOGRAMPROCESSINGTIMING                     (1 << 31)	/**< This definition sets the bit position for enabling the output about the time consumption for FPGA implementations with multiple parallel implemented histogram layers. */
 
 /*
- * Defining the bit positions in the parameters analysisInitAnalysisResultWarnings and analysisInitAnalysisResultDisplays
+ * Defining the bit positions in the parameters analysisInitAnalysisMoreResultWarnings and analysisInitAnalysisMoreResultDisplays
  */
 
 #define MCTRACKVISUALIZATION                              (1 <<  0)	/**< This definition sets the bit position for enabling the output about the MCTrack distribution (hits) in the detector system. */

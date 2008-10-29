@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-08-14 12:32:41 $
-/// $Revision: 1.4 $
+/// $Date: 2008-10-24 16:36:57 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -68,6 +68,18 @@ public:
  */
 
 	const prelutHoughBorder& operator = (const prelutHoughBorder& value);
+
+/**
+ * This method clears the object.
+ */
+
+	void clear();
+
+/**
+ * This method initializes the object.
+ */
+
+	void init();
 
 /**
  * This method converts the object into a string representation

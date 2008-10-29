@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-08-14 12:34:45 $
-// $Revision: 1.7 $
+// $Date: 2008-10-24 16:40:01 $
+// $Revision: 1.8 $
 //
 // *******************************************************************/
 
@@ -67,7 +67,7 @@ void legalizeDataString(std::string* data) {
  * This method is to read the data from the file.				*
  ****************************************************************/
 
-void io::readFileData(std::ifstream& fileStream) {
+void io::readFileData(std::ifstream& fileStream, terminalSequence* statusSequence) {
 
 	std::basic_string<char>::size_type lineDelimiter;
 	unsigned int                       numberOfFoundData = 0;
@@ -114,8 +114,11 @@ void io::readFileData(std::ifstream& fileStream) {
 			}
 			else {
 				dataFound = getDataValue(buffer, numberOfFoundData);
-				if (dataFound)
+				if (dataFound) {
 					numberOfFoundData++;
+					if (statusSequence != NULL)
+						terminalOverwriteWithIncrement(*statusSequence);
+				}
 			}
 		}
 
@@ -130,7 +133,7 @@ void io::readFileData(std::ifstream& fileStream) {
  * This method is to write the data to the file.				*
  ****************************************************************/
 
-void io::writeFileData(std::ofstream& fileStream) {
+void io::writeFileData(std::ofstream& fileStream, terminalSequence* statusSequence) {
 
 	std::string buffer;
 
@@ -143,6 +146,10 @@ void io::writeFileData(std::ofstream& fileStream) {
 		legalizeDataString(&buffer);
 		buffer += '\n';
 		fileStream << buffer;
+
+		if (statusSequence != NULL)
+			terminalOverwriteWithIncrement(*statusSequence);
+
 	}
 
 }
@@ -321,9 +328,11 @@ void io::readJustFileHeader() {
  * This method reads the file.									*
  ****************************************************************/
 
-void io::readFile() {
+void io::readFile(std::streambuf* terminal) {
 
-	std::ifstream readFileStream;
+	std::ifstream    readFileStream;
+	std::string      statusText;
+	terminalSequence statusSequence;
 
 	if (getFileName().empty() == true)
 		throw noFilenameSpecifiedError(FILEIOLIB);
@@ -334,11 +343,22 @@ void io::readFile() {
 		throw cannotOpenFileError(FILEIOLIB, getFileName());
 	/* read file */
 	else {
-		readFileHeader(readFileStream);
+
+		statusText  = "\nRead data file ";
+		statusText += getFileName();
+		statusText += ":\t";
+
+		createTerminalStatusSequence(&statusSequence, terminal, statusText, (unsigned int)(getNumberOfCmds() + numberOfData));
+		terminalInitialize(statusSequence);
+
+		readFileHeader(readFileStream, &statusSequence);
 		if ((getDataNum() == 0) && (getDataPtr() == NULL))
 			readAllData();
-		readFileData(readFileStream);
+		readFileData(readFileStream, &statusSequence);
 		readFileStream.close();
+
+		terminalFinalize(statusSequence);
+
 		if (readFileStream.is_open())
 			throw cannotCloseFileError(FILEIOLIB, getFileName());
 	}
@@ -349,11 +369,13 @@ void io::readFile() {
  * This method writes the file.									*
  ****************************************************************/
 
-void io::writeFile() {
+void io::writeFile(std::streambuf* terminal) {
 
-	std::ofstream writeFileStream;
+	std::ofstream    writeFileStream;
+	std::string      statusText;
+	terminalSequence statusSequence;
 
-	if (getFileName().empty() == true)
+	if (getFileName().empty())
 		throw noFilenameSpecifiedError(FILEIOLIB);
 	else
 		writeFileStream.open(getFileName().c_str());
@@ -362,15 +384,28 @@ void io::writeFile() {
 		throw cannotCreateFileError(FILEIOLIB, getFileName());
 	/* write file */
 	else {
+
+		statusText  = "\nWrite data file ";
+		statusText += getFileName();
+		statusText += ":\t";
+
+		createTerminalStatusSequence(&statusSequence, terminal, statusText, (unsigned int)(getNumberOfCmds() + numberOfData));
+		terminalInitialize(statusSequence);
+
 		writeComment(writeFileStream ,"FILE HEADER STARTS");
-		writeFileHeader(writeFileStream);
+		writeFileHeader(writeFileStream, &statusSequence);
 		writeComment(writeFileStream ,"FILE HEADER STOPS");
 		writeComment(writeFileStream , "");
 		writeComment(writeFileStream ,"FILE DATA STARTS");
-		writeFileData(writeFileStream);
+		writeFileData(writeFileStream, &statusSequence);
 		writeComment(writeFileStream ,"FILE DATA STOPS");
 		writeFileStream.close();
+
+		terminalFinalize(statusSequence);
+
 		if (writeFileStream.fail())
 			throw cannotCloseFileError(FILEIOLIB, getFileName());
+
 	}
+
 }

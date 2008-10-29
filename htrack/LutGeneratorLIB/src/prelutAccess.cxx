@@ -24,13 +24,12 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-10 13:50:01 $
-// $Revision: 1.6 $
+// $Date: 2008-10-24 16:41:19 $
+// $Revision: 1.7 $
 //
 // *******************************************************************/
 
 
-#include "../../DataObjectLIB/include/prelutAccessFile.h"
 #include "../../MiscLIB/include/conversionRoutines.h"
 #include "../include/lutGeneratorError.h"
 #include "../include/lutGeneratorWarningMsg.h"
@@ -56,6 +55,9 @@ void prelutAccess::allocateNewMemory(unsigned long number) {
 
 	if (lutMem == NULL)
 		throw memoryAllocationError();
+
+	for (unsigned long i = numberOfEntries - number; i < numberOfEntries; i++)
+		lutMem[i].init();
 
 }
 
@@ -112,17 +114,30 @@ void prelutAccess::init(double dim3Min, double dim3Max, int dim3Step, double dim
 
 void prelutAccess::evaluate(trackfinderInputHit* hit, prelutHoughBorder* borderPointer) {
 
+	digitalHit temp;
+
 	if (hit == NULL)
 		throw noHitError();
-/**/
-	if (borderPointer != NULL)
-		*borderPointer = getEntry(0); //hit->digitize
-	else
-		border         = getEntry(0); //hit->digitize
+
+	temp.setHit(hit);
+
+	evaluate(&temp, borderPointer);
 
 }
 
 #endif
+
+void prelutAccess::evaluate(digitalHit* hit, prelutHoughBorder* borderPointer) {
+
+	if (hit == NULL)
+		throw noHitError();
+
+	if (borderPointer != NULL)
+		*borderPointer = getEntry(hit);
+	else
+		border         = getEntry(hit);
+
+}
 
 /****************************************************************
  * This method clears the prelut table.							*
@@ -158,6 +173,14 @@ unsigned long prelutAccess::getNumberOfMembers() {
  * This method returns the value from the prelut table.			*
  ****************************************************************/
 	
+prelutHoughBorder prelutAccess::getEntry(digitalHit* hit) {
+
+	if (hit == NULL)
+		throw noHitError();
+
+	return getEntry(hit->getData());
+
+}
 prelutHoughBorder prelutAccess::getEntry(unsigned long index) {
 
 	prelutHoughBorder returnValue;
@@ -196,6 +219,19 @@ void prelutAccess::addEntry(prelutHoughBorder& value) {
 	allocateNewMemory(1);
 
 	lutMem[numberOfEntries - 1] = value;
+
+}
+void prelutAccess::addEntry(prelutHoughBorder& value, unsigned long index) {
+
+	if (index >= numberOfEntries)
+		allocateNewMemory(index + 1 - numberOfEntries);
+
+	lutMem[index] = value;
+
+}
+void prelutAccess::addEntry(prelutHoughBorder& value, digitalHit hit) {
+
+	addEntry(value, hit.getData());
 
 }
 
@@ -238,7 +274,7 @@ std::string prelutAccess::toString() {
  * method reads a file to get the table							*
  ****************************************************************/
 
-void prelutAccess::read(std::string fileName) {
+void prelutAccess::read(std::string fileName, std::streambuf* terminal) {
 
 	unsigned short   countDifferentPrelutDefinitionAsFile;
 	prelutAccessFile readFile;
@@ -302,7 +338,7 @@ void prelutAccess::read(std::string fileName) {
 
 	readFile.setDataPtr(lutMem);
 
-	readFile.readFile();
+	readFile.readFile(terminal);
 
 }
 
@@ -310,7 +346,7 @@ void prelutAccess::read(std::string fileName) {
  * method writes a file representing the table					*
  ****************************************************************/
 
-void prelutAccess::write(std::string fileName, std::string name) {
+void prelutAccess::write(std::string fileName, std::string name, std::streambuf* terminal) {
 
 	prelutAccessFileHeader fileHeader;
 	prelutAccessFile       writeFile;
@@ -347,7 +383,7 @@ void prelutAccess::write(std::string fileName, std::string name) {
 
 		writeFile.setHeader(fileHeader);
 
-		writeFile.writeFile();
+		writeFile.writeFile(terminal);
 
 	}
 

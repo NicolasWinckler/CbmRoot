@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-07 10:37:46 $
-// $Revision: 1.7 $
+// $Date: 2008-10-24 16:40:41 $
+// $Revision: 1.8 $
 //
 // *******************************************************************/
 
@@ -226,7 +226,7 @@ void secondFilterFinal::filter(std::streambuf* terminal) {
 	if (trackAccess == NULL)
 		throw memoryAllocationError(HISTOGRAMTRANSFORMATIONLIB);
 
-	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t\t\t", (*tracks)->getNumberOfLayers());
+	createTerminalStatusSequence(&statusSequence, terminal, "Process histogram:\t\t\t\t", (unsigned int)(*tracks)->getNumberOfLayers());
 	terminalInitialize(statusSequence);
 
 	for (i = 0; i < (*tracks)->getNumberOfLayers(); i++) {
@@ -316,7 +316,7 @@ void secondFilterFinal::filter(std::streambuf* terminal) {
 
 		}
 
-		terminalOverwrite(statusSequence, i + 1);
+		terminalOverwriteWithIncrement(statusSequence);
 
 	}
 

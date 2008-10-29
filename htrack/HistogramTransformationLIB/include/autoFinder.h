@@ -2,7 +2,7 @@
 /// (C)opyright 2004
 /// 
 /// Institute of Computer Science V
-/// Prof. Männer
+/// Prof. Mï¿½ner
 /// University of Mannheim, Germany
 /// 
 /// *******************************************************************
@@ -29,8 +29,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-10-07 10:37:45 $
-/// $Revision: 1.4 $
+/// $Date: 2008-10-24 16:40:41 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -195,16 +195,18 @@ public:
 /**
  * method reads a file to get the peakfinding geometry
  * @param fileName is the name of the file to read the data
+ * @param terminal is a buffer to place the process information
  */
 
-	void readPeakfindingGeometry(std::string fileName);
+	void readPeakfindingGeometry(std::string fileName, std::streambuf* terminal = NULL);
 
 /**
  * method writes a file representing the peak finding geometry
  * @param fileName is the name of the file to write the data
+ * @param terminal is a buffer to place the process information
  */
 
-	void writePeakfindingGeometry(std::string fileName);
+	void writePeakfindingGeometry(std::string fileName, std::streambuf* terminal = NULL);
 
 /**
  * This method draws the peakfinding geometry

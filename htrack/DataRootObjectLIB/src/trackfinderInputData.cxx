@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-07 10:36:51 $
-// $Revision: 1.11 $
+// $Date: 2008-10-24 16:39:20 $
+// $Revision: 1.12 $
 //
 // *******************************************************************/
 
@@ -659,6 +659,7 @@ void trackfinderInputData::addTrack(int pdgId, double momX, double momY, double 
 
 void trackfinderInputData::addHit(trackfinderInputHit& hit) {
 
+	int                  numberOfHits;
 	trackfinderInputHit* test;
 
 	if (hits == NULL)
@@ -666,7 +667,8 @@ void trackfinderInputData::addHit(trackfinderInputHit& hit) {
 
 	TClonesArray& hitsReference = *hits;
 
-	test = new(hitsReference[hits->GetEntries()]) trackfinderInputHit(hit);
+	numberOfHits = hits->GetEntries();
+	test = new(hitsReference[numberOfHits]) trackfinderInputHit(hit, (unsigned int)numberOfHits);
 
 	if (test == NULL)
 		throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
@@ -698,7 +700,7 @@ void trackfinderInputData::addHit(int detectorId, CbmHit* hit, CbmMCPoint* point
 		station = detector->getStationPointer(detectorId);
 
 	numberOfHits = hits->GetEntries();
-	test = new(hitsReference[numberOfHits]) trackfinderInputHit(hit, hitIndex);
+	test = new(hitsReference[numberOfHits]) trackfinderInputHit(hit, hitIndex, (unsigned int)numberOfHits);
 
 	if (test == NULL)
 		throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
@@ -749,7 +751,7 @@ void trackfinderInputData::addHit(int trackId, int detectorId, double hitPosX, d
 		station = detector->getStationPointer(detectorId);
 
 	numberOfHits = hits->GetEntries();
-	test = new(hitsReference[numberOfHits]) trackfinderInputHit(detectorId, hitPosX, hitPosY, posZ, hitPosX - pointPosX, hitPosY - pointPosY, hitIndex, pointIndex, maps, strip, hybrid);
+	test = new(hitsReference[numberOfHits]) trackfinderInputHit(detectorId, hitPosX, hitPosY, posZ, hitPosX - pointPosX, hitPosY - pointPosY, hitIndex, (unsigned int)numberOfHits, pointIndex, maps, strip, hybrid);
 
 	if (test == NULL)
 		throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
@@ -804,7 +806,7 @@ void trackfinderInputData::addHit(int trackId, int detectorId, double hitPosX, d
 		station = detector->getStationPointer(detectorId);
 
 	numberOfHits = hits->GetEntries();
-	test = new(hitsReference[numberOfHits]) trackfinderInputHit(detectorId, hitPosX, hitPosY, posZ, hitPosX - pointPosX, hitPosY - pointPosY, hitIndex, pointIndex);
+	test = new(hitsReference[numberOfHits]) trackfinderInputHit(detectorId, hitPosX, hitPosY, posZ, hitPosX - pointPosX, hitPosY - pointPosY, hitIndex, (unsigned int)numberOfHits, pointIndex);
 
 	if (test == NULL)
 		throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);

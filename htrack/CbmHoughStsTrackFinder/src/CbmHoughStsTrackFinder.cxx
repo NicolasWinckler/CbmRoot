@@ -23,13 +23,12 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-09-11 14:07:34 $
-// $Revision: 1.38 $
+// $Date: 2008-10-24 16:35:25 $
+// $Revision: 1.39 $
 //
 // *******************************************************************/
 
 
-#include "../../LutGeneratorLIB/include/lutGenerator.h"
 #include "../../MiscLIB/include/errorHandling.h"
 #include "../../MiscLIB/include/terminal.h"
 #include "../../DataRootObjectLIB/include/tables.h"
@@ -1142,7 +1141,7 @@ void CbmHoughStsTrackFinder::Init() {
 	eventNumber = 0;
 	try {
 
-		if (configurationFile->getDataReference().initStatus)
+		if ((configurationFile->getDataReference().initStatus) && (fVerbose > 0))
 			terminal = std::cout.rdbuf();
 		else
 			terminal = NULL;
@@ -1201,33 +1200,49 @@ void CbmHoughStsTrackFinder::Init() {
 
 		/* setup the data pointers */
 		eventData         = input->getInputDataPointer();
-		histogram->init((unsigned short)eventData->getDetector().getNumberOfActiveStations(), std::cout.rdbuf());
+		histogram->init((unsigned short)eventData->getDetector().getNumberOfActiveStations(), terminal);
 
-/**/
 		/* build the look-up-tables*/
 		switch(configurationFile->getDataReference().trackfinderLutsVersion) {
 
-			case GENERATERUNGEKUTTALUT:			// generate LUTs and write files
-				/*lutsGenerator->generate(luts, ...);*/
+			case RUNGEKUTTAFILELUT:				// generate LUTs and write files
+				luts->initRungeKuttaFileLuts(&space,
+					configurationFile->getDataReference().trackfinderPrelutRadiusMin,
+					configurationFile->getDataReference().trackfinderPrelutRadiusMax,
+					configurationFile->getDataReference().trackfinderPrelutFileName,
+					configurationFile->getDataReference().trackfinderLutFileName,
+					eventData->getMagneticField(),
+					terminal);
+
 				break;
 
-			case GENERATEANALYTICFORMULALUT:	// generate LUTs and write files
-				/*lutsGenerator->generate(luts, &space, prelutRadiusMin, prelutRadiusMax);*/
+			case ANALYTICFORMULAFILELUT:		// generate LUTs and write files
+				luts->initAnalyticFormulaFileLuts(&space,
+					configurationFile->getDataReference().trackfinderPrelutRadiusMin,
+					configurationFile->getDataReference().trackfinderPrelutRadiusMax,
+					configurationFile->getDataReference().trackfinderPrelutFileName,
+					configurationFile->getDataReference().trackfinderLutFileName,
+					eventData->getMagneticField(),
+					terminal);
 				break;
 
 			case FILELUT:						// read files
-				/*luts->init(&space, configurationFile->getDataReference().prelutFileName, configurationFile->getDataReference().lutFileName);*/
+				luts->initFileLuts(&space,
+					configurationFile->getDataReference().trackfinderPrelutRadiusMin,
+					configurationFile->getDataReference().trackfinderPrelutRadiusMax,
+					configurationFile->getDataReference().trackfinderPrelutFileName,
+					configurationFile->getDataReference().trackfinderLutFileName,
+					terminal);
 				break;
 
 			default:							// ANALYTICFORMULALUT without files
-				luts->init(&space,
+				luts->initAnalyticFormulaLuts(&space,
 					configurationFile->getDataReference().trackfinderPrelutRadiusMin,
-					configurationFile->getDataReference().trackfinderPrelutRadiusMax);
-				luts->setMagneticField(eventData->getMagneticField());
+					configurationFile->getDataReference().trackfinderPrelutRadiusMax,
+					eventData->getMagneticField());
 				break;
 
 		}
-/**/
 
 		/* build the tables */
 		ratings->initGradingP(configurationFile->getDataReference().inputGradingPTableMode,
@@ -1567,7 +1582,7 @@ int CbmHoughStsTrackFinder::DoFind() {
 			if (!analyser->isMomentumDisplayEnabled() && analyser->isProjectionDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && !analyser->isMagnetfieldFactorDisplayEnabled() && !analyser->isPrelutRangeDisplayEnabled())
 				analyser->projectionAnalysisUpdate();
 
-			if (configurationFile->getDataReference().analysisInitTotalAnalysis)
+			if (configurationFile->getDataReference().analysisInitTotalAnalysis && luts->typeUsesCorrections())
 				analyser->addNumberOfHoughTransformCorrections(luts->getNumberOfCorrections(), luts->getNumberOfCoordCorrections());
 
 			eventTimer.Stop();
@@ -1575,9 +1590,9 @@ int CbmHoughStsTrackFinder::DoFind() {
 			if (fVerbose > 1) {
 
 				std::cout << ">-----------------------------------------------<" << std::endl;
-				createTerminalStatusSequence(&statusSequenceForEvents, std::cout.rdbuf(), "Actual number of events done:\t\t\t", 1 + eventNumber);
+				createTerminalStatusSequence(&statusSequenceForEvents, terminal, "Actual number of events done:\t\t\t", (unsigned int)(1 + eventNumber));
 				terminalInitialize(statusSequenceForEvents);
-				terminalOverwrite(statusSequenceForEvents, 1 + eventNumber);
+				terminalOverwrite(statusSequenceForEvents, (unsigned int)(1 + eventNumber));
 				terminalFinalize(statusSequenceForEvents);
 
 				if (analyser->isTimeAnalysisEnabled()) {
@@ -1640,19 +1655,26 @@ int CbmHoughStsTrackFinder::DoFind() {
 
 void CbmHoughStsTrackFinder::Finish() {
 
+	std::streambuf* terminal;
+
+	if ((configurationFile->getDataReference().initStatus) && (fVerbose > 0))
+		terminal = std::cout.rdbuf();
+	else
+		terminal = NULL;
+
 	/* write the tables */
 	if (configurationFile->getDataReference().inputCodingTableWrite)
-		ratings->writeCodingTable();
+		ratings->writeCodingTable("", "", terminal);
 	if (configurationFile->getDataReference().inputGradingPTableWrite)
-		ratings->writeGradingPTable();
+		ratings->writeGradingPTable("", "", terminal);
 	if (configurationFile->getDataReference().inputGradingRTableWrite)
-		ratings->writeGradingRTable();
+		ratings->writeGradingRTable("", "", terminal);
 
 #ifndef NOANALYSIS
 
 	if (configurationFile->getDataReference().trackfinderAutomaticFilterWrite)
 		if (houghTrackfinder->isAutomaticFilterGeometryEnabled())
-			houghTrackfinder->writePeakfindingGeometry();
+			houghTrackfinder->writePeakfindingGeometry(terminal);
 
 	if (houghTrackfinder->isFilterGeometryGenerationEnabled()) {
 		if (analyser->isPeakfindingGeometryDisplayEnabled())

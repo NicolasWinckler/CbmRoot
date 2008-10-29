@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-10-10 13:47:04 $
-/// $Revision: 1.3 $
+/// $Date: 2008-10-24 16:39:20 $
+/// $Revision: 1.1 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -108,9 +108,11 @@ protected:
 
 /**
  * This method is to write the header of the file.
+ * @param fileStream is a stream to which the data is written
+ * @param statusSequence is an object to place the process information
  */
 
-	void writeFileHeader(std::ofstream& fileStream);
+	void writeFileHeader(std::ofstream& fileStream, terminalSequence* statusSequence = NULL);
 
 /**
  * This method is to set the default values for each header

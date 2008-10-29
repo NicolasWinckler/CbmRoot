@@ -62,6 +62,15 @@
 
 #define INVALIDTRACKINDEX -1
 
+
+/**
+ * By enabling this you can write the trackIndex of the tracks
+ * which have a defined percentage of correct hits to the standard output.
+ */
+
+#undef DEBUGTRACKINDEXOFTRACKSWITHPERCENTAGEOFCORRECTHITS
+
+
 /**
  * This definition enables all warning Messages which are
  * not neccessary anymore. This messages was used in some

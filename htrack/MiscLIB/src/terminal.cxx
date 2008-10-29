@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-07 10:38:52 $
-// $Revision: 1.3 $
+// $Date: 2008-10-24 16:41:39 $
+// $Revision: 1.4 $
 //
 // *******************************************************************/
 
@@ -38,57 +38,50 @@
  * This method creates a default terminalSequence for status.	*
  ****************************************************************/
 
-void createTerminalStatusSequence(terminalSequence* sequence, std::streambuf* terminal, std::string startText, int statusMax, int statusDiv, bool relative, bool newline, int previous, int radix) {
+void createTerminalStatusSequence(terminalSequence* sequence, std::streambuf* terminal, std::string startText, unsigned int statusMax, unsigned int statusDiv, bool relative, bool newline, unsigned int statusStart, int radix) {
 
-	int  localStatusMax;
-	int  localStatusDiv;
-	char buffer[intConversionDigits+1];
-	int  bufferLength;
+	unsigned int localStatusDiv;
+	char         buffer[intConversionDigits+1];
+	int          bufferLength;
 
 	if (sequence != NULL) {
 
-		if (statusMax > 0)
-			localStatusMax = statusMax;
-		else
-			localStatusMax = - statusMax;
-
-		if (statusDiv > 0)
-			localStatusDiv = statusDiv;
-		else if (statusDiv == 0)
+		if (statusDiv == 0)
 			localStatusDiv = 1;
 		else
-			localStatusDiv = - statusDiv;
+			localStatusDiv = statusDiv;
 
-		bufferLength = itos(localStatusMax / localStatusDiv, buffer, radix, intConversionDigits);
+		bufferLength = uitos((unsigned int)(((double)statusMax / (double)localStatusDiv) + 0.5), buffer, radix, intConversionDigits);
 		if (bufferLength == -1)
 			bufferLength = 1;
-		sequence->terminal                  = terminal;
-		sequence->startText                 = startText + " ";
+		sequence->terminal                   = terminal;
+		sequence->startText                  = startText + " ";
 
 		if (relative) {
 
-			bufferLength                    = 3;
+			bufferLength                     = 3;
 
-			sequence->endText               = "% of 100% (";
-			sequence->endText              += buffer;
-			sequence->endText              += ")";
-			sequence->relativityCoefficient = (double)localStatusMax / 100;
+			sequence->endText                = "% of 100% (";
+			sequence->endText               += buffer;
+			sequence->endText               += ")";
+			sequence->relativityCoefficient  = (double)statusMax / 100;
 
 		}
 		else {
 
-			sequence->endText               = " of ";
-			sequence->endText              += buffer;
-			sequence->relativityCoefficient = 1;
+			sequence->endText                = " of ";
+			sequence->endText               += buffer;
+			sequence->relativityCoefficient  = 1;
 
 		}
 
 		sequence->overwriteText.clear();
 		for (unsigned short i = 0; i < bufferLength - 1; i++)
-			sequence->overwriteText    += " ";
-		sequence->overwriteText        += "0";
-		sequence->newline               = newline;
-		sequence->previousInsertion     = previous;
+			sequence->overwriteText         += " ";
+		sequence->overwriteText             += "0";
+		sequence->newline                    = newline;
+		sequence->relativeInsertion          = (unsigned int)(((double)statusStart / sequence->relativityCoefficient) + 0.5);;
+		sequence->absoluteInsertion          = statusStart;
 
 	}
 
@@ -119,7 +112,12 @@ void terminalInitialize(terminalSequence& sequence) {
  * overwriting sequence begins and overwrites the old sequence.	*
  ****************************************************************/
 
-void terminalOverwrite(terminalSequence& sequence, int insertion, int radix) {
+void terminalOverwriteWithIncrement(terminalSequence& sequence, unsigned int incrementInsertion, int radix) {
+
+	terminalOverwrite(sequence, sequence.absoluteInsertion + incrementInsertion, radix);
+
+}
+void terminalOverwrite(terminalSequence& sequence, unsigned int absoluteInsertion, int radix) {
 
 	unsigned short i;
 	char*          buffer;
@@ -128,15 +126,18 @@ void terminalOverwrite(terminalSequence& sequence, int insertion, int radix) {
 
 	if (sequence.terminal != NULL) {
 
-		if (sequence.previousInsertion < (int)(((double)insertion / sequence.relativityCoefficient) + 0.5)) {
+		if (sequence.absoluteInsertion < absoluteInsertion)
+			sequence.absoluteInsertion  = absoluteInsertion;
 
-			sequence.previousInsertion = (int)(((double)insertion / sequence.relativityCoefficient) + 0.5);
+		if (sequence.relativeInsertion < (unsigned int)(((double)absoluteInsertion / sequence.relativityCoefficient) + 0.5)) {
+
+			sequence.relativeInsertion = (unsigned int)(((double)absoluteInsertion / sequence.relativityCoefficient) + 0.5);
 
 			buffer = new char[(unsigned short)sequence.overwriteText.size() + 2];
 			if (buffer == NULL)
 				throw memoryAllocationError(MISCLIB);
 
-			bufferLength = itos((int)(((double)insertion / sequence.relativityCoefficient) + 0.5), buffer, radix, (unsigned short)sequence.overwriteText.size());
+			bufferLength = uitos(sequence.relativeInsertion, buffer, radix, (unsigned short)sequence.overwriteText.size());
 			if (bufferLength == -1)
 				bufferLength = 1;
 

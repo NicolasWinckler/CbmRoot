@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-08-14 12:34:44 $
-/// $Revision: 1.4 $
+/// $Date: 2008-10-24 16:40:01 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -51,15 +51,19 @@ protected:
 
 /**
  * This method is to read the data from the file.
+ * @param fileStream is a stream from which the data is read
+ * @param statusSequence is an object to place the process information
  */
 
-	void readFileData(std::ifstream& fileStream);
+	void readFileData(std::ifstream& fileStream, terminalSequence* statusSequence = NULL);
 
 /**
  * This method is to write the data to the file.
+ * @param fileStream is a stream to which the data is written
+ * @param statusSequence is an object to place the process information
  */
 
-	void writeFileData(std::ofstream& fileStream);
+	void writeFileData(std::ofstream& fileStream, terminalSequence* statusSequence = NULL);
 
 /**
  * This method legalizes a data string.
@@ -152,15 +156,17 @@ public:
 
 /**
  * This method reads the file.
+ * @param terminal is a buffer to place the process information
  */
 
-	void readFile();
+	void readFile(std::streambuf* terminal = NULL);
 
 /**
  * This method writes the file.
+ * @param terminal is a buffer to place the process information
  */
 
-	void writeFile();
+	void writeFile(std::streambuf* terminal = NULL);
 
 };
 

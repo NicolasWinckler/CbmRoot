@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-10-10 13:50:00 $
-/// $Revision: 1.6 $
+/// $Date: 2008-10-24 16:41:18 $
+/// $Revision: 1.7 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -34,6 +34,9 @@
 #define _PRELUTACCESS_H
 
 
+#include "../../MiscLIB/include/defs.h"
+#include "../../DataRootObjectLIB/include/digitalHit.h"
+#include "../../DataObjectLIB/include/prelutAccessFile.h"
 #include "prelut.h"
 #include <string>
 
@@ -104,6 +107,8 @@ public:
 
 #endif
 
+	void evaluate(digitalHit* hit, prelutHoughBorder* borderPointer = NULL);
+
 /**
  * This method clears the prelut table.
  */
@@ -119,18 +124,23 @@ public:
 
 /**
  * This method returns the value from the prelut table.
+ * @param hit contains the actual index for the borders
  * @param index is the actual index for the borders
  */
 	
+	prelutHoughBorder getEntry(digitalHit* hit);
 	prelutHoughBorder getEntry(unsigned long index);
 	prelutHoughBorder getMember(unsigned long index);
 
 /**
  * This method adds the value at the end of the prelut table.
  * @param value is the actual value for the entry
+ * @param index is the actual index for the borders
  */
 	
 	void addEntry(prelutHoughBorder& value);
+	void addEntry(prelutHoughBorder& value, unsigned long index);
+	void addEntry(prelutHoughBorder& value, digitalHit hit);
 
 /**
  * This method converts the prelut table into a string.
@@ -141,18 +151,20 @@ public:
 /**
  * method reads a file to get the table
  * @param fileName is the name of the file to read the data
+ * @param terminal is a buffer to place the process information
  */
 
-	void read(std::string fileName);
+	void read(std::string fileName, std::streambuf* terminal = NULL);
 
 /**
  * method writes a file representing the table
  * @param fileName is the name of the file to write the data
  * @param name is the name of the table which should be written to file
  * @param usage is a string representing the usage of the table in the program which should be written to file
+ * @param terminal is a buffer to place the process information
  */
 
-	void write(std::string fileName, std::string name);
+	void write(std::string fileName, std::string name, std::streambuf* terminal = NULL);
 
 };
 

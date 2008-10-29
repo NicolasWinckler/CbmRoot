@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-09-11 14:13:03 $
-/// $Revision: 1.7 $
+/// $Date: 2008-10-24 16:43:10 $
+/// $Revision: 1.8 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -175,9 +175,10 @@ public:
 
 /**
  * This method writes the peakfinding geometry into a file
+ * @param terminal is a buffer to place the process information
  */
 
-	void writePeakfindingGeometry();
+	void writePeakfindingGeometry(std::streambuf* terminal = NULL);
 
 /**
  * This method draws the peakfinding geometry

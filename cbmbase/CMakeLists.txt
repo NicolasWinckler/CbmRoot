@@ -21,6 +21,7 @@ link_directories( ${LINK_DIRECTORIES})
 set(CBMBASE_SRCS
 CbmDigi.cxx 
 CbmDigiManager.cxx
+CbmDirectPhotonGenerator.cxx
 CbmEcalGenerator.cxx
 CbmStack.cxx 
 CbmTrack.cxx

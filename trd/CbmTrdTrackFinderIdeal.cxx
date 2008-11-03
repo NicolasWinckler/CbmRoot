@@ -266,7 +266,8 @@ Int_t CbmTrdTrackFinderIdeal::DoFind(TClonesArray* hitArray,
 
     // Tracks in the TRD are straight lines, so two HITS should be enough
     // to construct a track.
-    if( hitMap[iMCTrack] < (fNoTrdStations*fNoTrdPerStation) ) {
+//    if( hitMap[iMCTrack] < (fNoTrdStations*fNoTrdPerStation) ) {
+    if( hitMap[iMCTrack] < 2 ) {
         continue;
     }
     new((*trackArray)[nTracks]) CbmTrdTrack();

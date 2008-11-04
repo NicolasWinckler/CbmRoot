@@ -97,7 +97,7 @@ InputLIB/src/inputWarningMsg.cxx
 LutGeneratorLIB/src/lut.cxx  
 LutGeneratorLIB/src/lutGeneratorError.cxx 
 LutGeneratorLIB/src/lutGeneratorWarningMsg.cxx 
-LutGeneratorLIB/src/lutImplementation.cxx 
+#LutGeneratorLIB/src/lutImplementation.cxx 
 LutGeneratorLIB/src/lutMath.cxx 
 #LutGeneratorLIB/src/prelutAccess.cxx 
 LutGeneratorLIB/src/prelut.cxx 
@@ -196,6 +196,7 @@ DataObjectLIB/src/prelutAccessFile.cxx
 DataObjectLIB/src/table.cxx 
 DataObjectLIB/src/tableFile.cxx 
 DataRootObjectLIB/src/digitalHitAccessFile.cxx 
+LutGeneratorLIB/src/lutImplementation.cxx 
 LutGeneratorLIB/src/digitalHitAccess.cxx 
 LutGeneratorLIB/src/lutAccess.cxx 
 LutGeneratorLIB/src/prelutAccess.cxx 

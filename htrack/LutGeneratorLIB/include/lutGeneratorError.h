@@ -708,7 +708,7 @@ public:
 
 
 #ifndef _WRONGLUTTYPEFORUSEDFUNCTIONALITYDETECTEDERROR_H
-#define _CANNOTEVALUATEBORDEROFUNDEFINEDOBJECTERROR_H
+#define _WRONGLUTTYPEFORUSEDFUNCTIONALITYDETECTEDERROR_H
 
 /**
  * CLASS wrongLutTypeForUsedFunctionalityDetectedError
@@ -729,6 +729,108 @@ public:
  */
 
 	virtual ~wrongLutTypeForUsedFunctionalityDetectedError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _CANNOTACCESSRUNGEKUTTALISTERROR_H
+#define _CANNOTACCESSRUNGEKUTTALISTERROR_H
+
+/**
+ * CLASS cannotAccessRungeKuttaListError
+ */
+
+class cannotAccessRungeKuttaListError : public lutGeneratorError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotAccessRungeKuttaListError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotAccessRungeKuttaListError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _CANNOTACCESSRUNGEKUTTAINVERTEDLISTERROR_H
+#define _CANNOTACCESSRUNGEKUTTAINVERTEDLISTERROR_H
+
+/**
+ * CLASS cannotAccessRungeKuttaInvertedListError
+ */
+
+class cannotAccessRungeKuttaInvertedListError : public lutGeneratorError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotAccessRungeKuttaInvertedListError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotAccessRungeKuttaInvertedListError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif
+
+
+#ifndef _WRONGENTRYINLISTERROR_H
+#define _WRONGENTRYINLISTERROR_H
+
+/**
+ * CLASS wrongEntryInListError
+ */
+
+class wrongEntryInListError : public lutGeneratorError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	wrongEntryInListError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~wrongEntryInListError();
 
 /**
  * This method displays an error message.

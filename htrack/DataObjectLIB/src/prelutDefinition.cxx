@@ -120,7 +120,7 @@ std::string prelutDefinition::toString() {
 	char        intBuffer[intConversionDigits+1];
 	char        doubleBuffer[doubleConversion+1];
 
-	returnValue  = "Dim3Min: ";
+	returnValue  = " Dim3Min: ";
 	dtos(dim3Min, doubleBuffer, doubleConversionDigits);
 	returnValue += doubleBuffer;
 	returnValue += "\n Dim3Max: ";

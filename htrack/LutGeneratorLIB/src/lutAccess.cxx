@@ -288,7 +288,7 @@ lutHoughBorder lutAccess::getEntry(digitalHit* hit) {
 	if (hit == NULL)
 		throw noHitError();
 
-	return getEntry(hit->getData());
+	return getEntry(hit->getHitIndex());
 
 }
 lutHoughBorder lutAccess::getEntry(unsigned long index) {
@@ -341,7 +341,7 @@ void lutAccess::addEntry(lutHoughBorder& value, unsigned long index) {
 }
 void lutAccess::addEntry(lutHoughBorder& value, digitalHit hit) {
 
-	addEntry(value, hit.getData());
+	addEntry(value, hit.getHitIndex());
 
 }
 

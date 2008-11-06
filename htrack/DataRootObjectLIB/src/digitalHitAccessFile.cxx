@@ -199,7 +199,12 @@ bool digitalHitAccessFile::getDataValue(std::string& buffer, unsigned long index
 	if (temp.empty())
 		noError = false;
 	else
-		typeCastedData[index].setNotIdentifiedString(temp);
+		typeCastedData[index].setHitIndexString(temp);
+	temp = getDataString(buffer, 1, fileDataSeparator);
+	if (temp.empty())
+		noError = false;
+	else
+		typeCastedData[index].setStationIndexString(temp);
 /********************************************************/
 	return noError;
 
@@ -221,7 +226,9 @@ std::string digitalHitAccessFile::setDataValue(unsigned long index) {
 
 /********************************************************/
 /* make code changes for a different data object here	*/
-	returnValue  = typeCastedData[index].toNotIdentifiedString();
+	returnValue  = typeCastedData[index].getHitIndexString();
+	returnValue += fileDataSeparator;
+	returnValue += typeCastedData[index].getStationIndexString();
 /********************************************************/
 
 	return returnValue;

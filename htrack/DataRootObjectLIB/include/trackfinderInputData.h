@@ -2,7 +2,7 @@
 /// (C)opyright 2004
 /// 
 /// Institute of Computer Science V
-/// Prof. Männer
+/// Prof. Mï¿½ner
 /// University of Mannheim, Germany
 /// 
 /// *******************************************************************
@@ -40,8 +40,10 @@
 #include "../include/trackfinderInputDetector.h"
 #if (ARCHITECTURE == STANDALONE)
 	#include "../include/trackfinderInputSMagneticField.h"
+	#include "../../RootFrameworkLIB/include/CbmStsPoint.h"
 #elif (ARCHITECTURE == CBMROOT)
 	#include "../include/trackfinderInputFMagneticField.h"
+	#include "CbmStsPoint.h"
 #endif
 #include "TClonesArray.h"
 #include "TObject.h"

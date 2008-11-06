@@ -86,9 +86,9 @@ const tableEntry& tableEntry::operator = (const tableEntry& value) {
 
 }
 
-/**
- * This method converts the object into a string representation.
- */
+/****************************************************************
+ * This method converts the object into a string representation.*
+ ****************************************************************/
 
 tableEntry::operator std::string(){
 

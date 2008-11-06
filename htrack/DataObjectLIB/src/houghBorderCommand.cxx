@@ -95,10 +95,17 @@ const houghBorderCommand& houghBorderCommand::operator = (const houghBorderComma
 std::string houghBorderCommand::getStartPos() {
 
 	std::string returnValue;
+	int         counts;
+	int         maxCounts;
 	char        buffer[shortConversionDigits+1];
 
-	returnValue = "000";
-	addRadix(STARTPOSRADIX, returnValue);
+	returnValue  = "000";
+	counts       = addRadix(STARTPOSRADIX, returnValue);
+	maxCounts    = (int)returnValue.length();
+
+	if (counts < maxCounts)
+		returnValue.erase(counts, maxCounts - counts);
+
 	ustos(startPos, buffer, 10, shortConversionDigits);
 	returnValue += buffer;
 
@@ -113,13 +120,17 @@ std::string houghBorderCommand::getStartPos() {
 std::string houghBorderCommand::getCmd() {
 
 	std::string returnValue;
-	int         count;
+	int         counts;
+	int         maxCounts;
 	char        buffer[1+1];
 	bool        actualCmd;
 
-	returnValue = "000";
-	count       = addRadix(CMDRADIX, returnValue);
-	returnValue = returnValue.erase(count);
+	returnValue  = "000";
+	counts       = addRadix(CMDRADIX, returnValue);
+	maxCounts    = (int)returnValue.length();
+
+	if (counts < maxCounts)
+		returnValue.erase(counts, maxCounts - counts);
 
 	cmd.resetActiveObject();
 	for (unsigned short i = 0; i < cmd.getNumberOfEntries(); i++) {

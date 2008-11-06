@@ -111,11 +111,16 @@ short peakfindingGeometryElement::get(unsigned short dimension) {
 std::string peakfindingGeometryElement::getString(unsigned short dimension) {
 
 	std::string returnValue;
+	int         counts;
+	int         maxCounts;
 	char        buffer[shortConversionDigits+1];
 
 	if (dimension < DIMENSIONS) {
 		returnValue  = "000";
-		addRadix(RADIX, returnValue);
+		counts       = addRadix(RADIX, returnValue);
+		maxCounts    = (int)returnValue.length();
+		if (counts < maxCounts)
+			returnValue.erase(counts, maxCounts - counts);
 		stos(dim[dimension], buffer, RADIX, shortConversionDigits);
 		returnValue += buffer;
 	}
@@ -138,10 +143,17 @@ unsigned short peakfindingGeometryElement::getValue() {
 std::string peakfindingGeometryElement::getValueString() {
 
 	std::string returnValue;
+	int         counts;
+	int         maxCounts;
 	char        buffer[shortConversionDigits+1];
 
 	returnValue  = "000";
-	addRadix(RADIX, returnValue);
+	counts       = addRadix(RADIX, returnValue);
+	maxCounts    = (int)returnValue.length();
+
+	if (counts < maxCounts)
+		returnValue.erase(counts, maxCounts - counts);
+
 	ustos(value, buffer, RADIX, shortConversionDigits);
 	returnValue += buffer;
 

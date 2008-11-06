@@ -301,11 +301,17 @@ std::string houghBorderPosition::toNotIdentifiedString() {
 std::string houghBorderPosition::toNotIdentifiedRadixString() {
 
 	std::string radix;
+	int         counts;
+	int         maxCounts;
 	std::string returnValue;
 	char        buffer[shortConversionDigits+1];
 
 	radix        = "000";
-	addRadix(STRINGRADIX, radix);
+	counts       = addRadix(STRINGRADIX, radix);
+	maxCounts    = (int)radix.length();
+
+	if (counts < maxCounts)
+		radix.erase(counts, maxCounts - counts);
 
 	returnValue  = NOTIDENTIFIEDFRONTSTRING;
 	returnValue += radix;
@@ -349,11 +355,17 @@ std::string houghBorderPosition::toIdentifiedString() {
 std::string houghBorderPosition::toIdentifiedRadixString() {
 
 	std::string radix;
+	int         counts;
+	int         maxCounts;
 	std::string returnValue;
 	char        buffer[shortConversionDigits+1];
 
 	radix        = "000";
-	addRadix(STRINGRADIX, radix);
+	counts       = addRadix(STRINGRADIX, radix);
+	maxCounts    = (int)radix.length();
+
+	if (counts < maxCounts)
+		radix.erase(counts, maxCounts - counts);
 
 	returnValue  = IDENTIFIEDFRONTSTRING1;
 	returnValue += radix;

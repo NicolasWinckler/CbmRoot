@@ -33,6 +33,9 @@
 #define _LUTIMPLEMENTATION_H
 
 
+#include "../../DataRootObjectLIB/include/rungeKuttaListEntry.h"
+#include "../../DataRootObjectLIB/include/rungeKuttaInvertedListEntry.h"
+#include "../../DataObjectLIB/include/specialList.h"
 #include "../../DataObjectLIB/include/histogramSpace.h"
 #include "../../DataRootObjectLIB/include/lutBorder.h"
 #include "prelut.h"
@@ -143,6 +146,50 @@ protected:
  */
 
 	void generateAnalyticFormulaFileLuts(std::string prelutFileName, std::string prelutName, std::string lutFileName, std::string lutName, double dim3StartEntry, double dim3StopEntry, trackfinderInputMagneticField* magneticField = NULL, std::streambuf* terminal = NULL);
+
+/**
+ * Method generates the Runge-Kutta list.
+ * @param rungeKuttaList is the object which is filled by this function with entries like: TrackCoordinate(1, 2, 3) -> digitalHit1, digitalHit15, digitalHit37, ...
+ * @param magneticField is the object representing the actually used magnetic field
+ * @param terminal is a buffer to place the process information
+ */
+
+	void generateRungeKuttaList(specialList<rungeKuttaListEntry, true, true, true, true, true>* rungeKuttaList, trackfinderInputMagneticField* magneticField = NULL, std::streambuf* terminal = NULL);
+
+/**
+ * Method generates the inverted Runge-Kutta list.
+ * @param rungeKuttaList is the object which is the input to this function with entries like: TrackCoordinate(1, 2, 3) -> digitalHit1, digitalHit15, digitalHit37, ...
+ * @param invertedRungeKuttaList is the object which is filled by this function with entries like: digitalHit15 -> TrackCoordinate(1, 2, 3), TrackCoordinate(14, 21, 33), ...
+ * @param terminal is a buffer to place the process information
+ */
+
+	void generateRungeKuttaInvertedList(specialList<rungeKuttaListEntry, true, true, true, true, true>* rungeKuttaList, specialList<rungeKuttaInvertedListEntry, true, true, true, true, true>* rungeKuttaInvertedList, std::streambuf* terminal = NULL);
+
+/**
+ * Method interpolates the inverted Runge-Kutta list.
+ * @param invertedRungeKuttaList is the object which is filled by this function with entries like: digitalHit15 -> TrackCoordinate(1, 2, 3), TrackCoordinate(14, 21, 33), ...
+ * @param terminal is a buffer to place the process information
+ */
+
+	void interpolateRungeKuttaInvertedList(specialList<rungeKuttaInvertedListEntry, true, true, true, true, true>* rungeKuttaInvertedList, std::streambuf* terminal = NULL);
+
+/**
+ * Method makes the inverted Runge-Kutta list conform to the actual LUTVERSION.
+ * @param invertedRungeKuttaList is the object which is filled by this function with entries like: digitalHit15 -> TrackCoordinate(1, 2, 3), TrackCoordinate(14, 21, 33), ...
+ * @param terminal is a buffer to place the process information
+ */
+
+	void makeLutversionConformRungeKuttaInvertedList(specialList<rungeKuttaInvertedListEntry, true, true, true, true, true>* rungeKuttaInvertedList, std::streambuf* terminal = NULL);
+
+/**
+ * Method decomposes the inverted Runge-Kutta list.
+ * @param dim3StartEntry is the minimal value of the second dimension
+ * @param dim3StopEntry is the maximal value of the second dimension
+ * @param invertedRungeKuttaList is the object which is filled by this function with entries like: digitalHit15 -> TrackCoordinate(1, 2, 3), TrackCoordinate(14, 21, 33), ...
+ * @param terminal is a buffer to place the process information
+ */
+
+	void decomposeRungeKuttaInvertedList(double dim3StartEntry, double dim3StopEntry, specialList<rungeKuttaInvertedListEntry, true, true, true, true, true>* rungeKuttaInvertedList, std::streambuf* terminal = NULL);
 
 /**
  * Method generates the Runge-Kutta file look-up-tables.

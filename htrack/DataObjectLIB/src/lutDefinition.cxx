@@ -123,7 +123,7 @@ std::string lutDefinition::toString() {
 	char        intBuffer[intConversionDigits+1];
 	char        doubleBuffer[doubleConversion+1];
 
-	returnValue  = "Dim1Min: ";
+	returnValue  = " Dim1Min: ";
 	dtos(dim1Min, doubleBuffer, doubleConversionDigits);
 	returnValue += doubleBuffer;
 	returnValue += "\n Dim1Max: ";

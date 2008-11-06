@@ -29,6 +29,9 @@
 /////////////////////////////////////////////////////////////////////
 
 
+#include "../../DataRootObjectLIB/include/rungeKuttaInterface.h"
+#include "../../MiscLIB/include/defs.h"
+#include "../../MiscLIB/include/terminal.h"
 #include "../include/prelutMath.h"
 #include "../include/prelutAccess.h"
 #include "../include/lutMath.h"
@@ -226,6 +229,7 @@ void lutImplementation::generateAnalyticFormulaFileLuts(std::string prelutFileNa
 
 	identifiedPrelut    firstLutMath;
 	identifiedLut       secondLutMath;
+	terminalSequence    statusSequence;
 	digitalHit          digitalHitValue;
 	trackfinderInputHit analogHitValue;
 	prelutHoughBorder   actualPrelutBorder;
@@ -240,14 +244,17 @@ void lutImplementation::generateAnalyticFormulaFileLuts(std::string prelutFileNa
 
 	allocateFileLuts(&firstLut, &secondLut, dim3StartEntry, dim3StopEntry);
 
-	if ((firstLutMath.type != ANALYTICFORMULALUT) || (secondLutMath.type != ANALYTICFORMULALUT) || (firstLut.type != FILELUT) ||(secondLut.type != FILELUT))
+	if ((firstLutMath.type != ANALYTICFORMULALUT) || (secondLutMath.type != ANALYTICFORMULALUT) || (firstLut.type != FILELUT) || (secondLut.type != FILELUT))
 		throw wrongLutTypeForUsedFunctionalityDetectedError();
+
+	createTerminalStatusSequence(&statusSequence, terminal, "Generate Analytic Formula file LUTs:\t\t\t", (unsigned int)(digitalHitValue.getMaxNumberOfHitIndizes()));
+	terminalInitialize(statusSequence);
 
 	((prelutAccess*)(firstLut.lutObject))->clear();
 	((lutAccess*)(secondLut.lutObject))->clear();
-	for (unsigned long i = 0; i < digitalHitValue.getMaxNumberOfDigitalHitData(); i++) {
+	for (unsigned long i = 0; i < digitalHitValue.getMaxNumberOfHitIndizes(); i++) {
 
-		digitalHitValue.setData(i);
+		digitalHitValue.setHitIndex(i);
 		analogHitValue = digitalHitValue.getHit();
 		
 		((prelutMath*)(firstLutMath.lutObject))->evaluate(&analogHitValue, &actualPrelutBorder);
@@ -256,7 +263,11 @@ void lutImplementation::generateAnalyticFormulaFileLuts(std::string prelutFileNa
 		((prelutAccess*)(firstLut.lutObject))->addEntry(actualPrelutBorder, digitalHitValue);
 		((lutAccess*)(secondLut.lutObject))->addEntry(actualLutBorder, digitalHitValue);
 
+		terminalOverwriteWithIncrement(statusSequence);
+
 	}
+
+	terminalFinalize(statusSequence);
 
 	if (!prelutFileName.empty())
 		((prelutAccess*)(firstLut.lutObject))->write(prelutFileName, prelutName, terminal);
@@ -268,12 +279,412 @@ void lutImplementation::generateAnalyticFormulaFileLuts(std::string prelutFileNa
 }
 
 /****************************************************************
+ * Method generates the Runge-Kutta list.						*
+ ****************************************************************/
+
+void lutImplementation::generateRungeKuttaList(specialList<rungeKuttaListEntry, true, true, true, true, true>* rungeKuttaList, trackfinderInputMagneticField* magneticField, std::streambuf* terminal) {
+
+	terminalSequence               statusSequence;
+	trackParameter                 actualAnalogTrack;
+	trackCoordinates               actualDigitalTrack;
+	rungeKuttaInterface            formula;
+	std::list<trackfinderInputHit> actualTrackHits;
+	rungeKuttaListEntry            actualRungeKuttaListEntry;
+	trackfinderInputHit            actualAnalogHit;
+	digitalHit                     actualDigitalHit;
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(LUTGENERATORLIB);
+
+	if (rungeKuttaList == NULL)
+		throw cannotAccessRungeKuttaListError();
+
+	rungeKuttaList->clear();
+
+	/* Build the list of all possible tracks identified by the actual digitized parameter settings with their correspondent digitized detector hit coordinates */
+	createTerminalStatusSequence(&statusSequence, terminal, "Generate Runge-Kutta list:\t\t\t", (unsigned int)((*space)->getStep(DIM1) * (*space)->getStep(DIM2) * (*space)->getStep(DIM3)));
+	terminalInitialize(statusSequence);
+
+	for (unsigned short i = 0; i < (*space)->getStep(DIM3); i++) {
+
+		actualAnalogTrack.set((*space)->getAnalogFromCell(i, DIM3), DIM3);
+		actualDigitalTrack.set(i, DIM3);
+
+		for (unsigned short j = 0; i < (*space)->getStep(DIM2); i++) {
+
+			actualAnalogTrack.set((*space)->getAnalogFromCell(j, DIM2), DIM2);
+			actualDigitalTrack.set(j, DIM2);
+
+			for (unsigned short k = 0; i < (*space)->getStep(DIM1); i++) {
+
+				actualAnalogTrack.set((*space)->getAnalogFromCell(k, DIM1), DIM1);
+				actualDigitalTrack.set(k, DIM1);
+
+				actualTrackHits = formula.evaluate(actualAnalogTrack);
+
+				actualRungeKuttaListEntry.setPosition(actualDigitalTrack);
+				actualRungeKuttaListEntry.clearHits();
+				while (!actualTrackHits.empty()) {
+
+					actualAnalogHit = actualTrackHits.back(); 
+					actualTrackHits.pop_back();
+					actualDigitalHit.setHit(&actualAnalogHit);
+					actualRungeKuttaListEntry.addHit(actualDigitalHit);
+
+				}
+
+				rungeKuttaList->push(actualRungeKuttaListEntry);
+
+				terminalOverwriteWithIncrement(statusSequence);
+
+			}
+
+		}
+
+	}
+
+	terminalFinalize(statusSequence);
+
+}
+
+/****************************************************************
+ * Method generates the inverted Runge-Kutta list.				*
+ ****************************************************************/
+
+void lutImplementation::generateRungeKuttaInvertedList(specialList<rungeKuttaListEntry, true, true, true, true, true>* rungeKuttaList, specialList<rungeKuttaInvertedListEntry, true, true, true, true, true>* rungeKuttaInvertedList, std::streambuf* terminal) {
+
+	terminalSequence            statusSequence;
+	rungeKuttaListEntry         actualRungeKuttaListEntry;
+	trackCoordinates            actualDigitalTrack;
+	rungeKuttaInvertedListEntry actualRungeKuttaInvertedListEntry;
+	digitalHit                  actualDigitalHit;
+
+	if (rungeKuttaList == NULL)
+		throw cannotAccessRungeKuttaListError();
+
+	if (rungeKuttaInvertedList == NULL)
+		throw cannotAccessRungeKuttaInvertedListError();
+
+	rungeKuttaInvertedList->clear();
+
+	/* Build the list of digitized hits with their correspondent digitized track parameters by inverting the actually created list */
+	createTerminalStatusSequence(&statusSequence, terminal, "Generate Runge-Kutta inverted list:\t\t", (unsigned int)(rungeKuttaList->getNumberOfEntries()));
+	terminalInitialize(statusSequence);
+
+	while (!rungeKuttaList->isEmpty()) {
+
+		actualRungeKuttaListEntry = rungeKuttaList->pop();
+
+		actualDigitalTrack = actualRungeKuttaListEntry.getPosition();
+		actualRungeKuttaInvertedListEntry.clearPositions();
+		actualRungeKuttaInvertedListEntry.addPosition(actualDigitalTrack);
+
+		actualRungeKuttaListEntry.resetActiveHitObject();
+		for (unsigned long i = 0; i < actualRungeKuttaListEntry.getNumberOfHits(); i++) {
+
+			actualDigitalHit = actualRungeKuttaListEntry.readActiveHitObjectAndMakeNextOneActive();
+
+			actualRungeKuttaInvertedListEntry.setHit(actualDigitalHit);
+
+			if (rungeKuttaInvertedList->isFound(actualRungeKuttaInvertedListEntry, true))
+				rungeKuttaInvertedList->getActiveObject()->addPosition(actualDigitalTrack);
+			else
+				rungeKuttaInvertedList->push(actualRungeKuttaInvertedListEntry);
+
+		}
+
+		terminalOverwriteWithIncrement(statusSequence);
+
+	}
+
+	terminalFinalize(statusSequence);
+
+}
+
+/****************************************************************
+ * Method interpolates the inverted Runge-Kutta list.			*
+ ****************************************************************/
+
+void lutImplementation::interpolateRungeKuttaInvertedList(specialList<rungeKuttaInvertedListEntry, true, true, true, true, true>* rungeKuttaInvertedList, std::streambuf* terminal) {
+
+	terminalSequence            statusSequence;
+	trackCoordinates            actualDigitalTrack;
+	rungeKuttaInvertedListEntry actualRungeKuttaInvertedListEntry;
+	digitalHit                  actualDigitalHit;
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(LUTGENERATORLIB);
+
+	if (rungeKuttaInvertedList == NULL)
+		throw cannotAccessRungeKuttaInvertedListError();
+
+	/* Interpolate the actually inverted list with regard to the neccessary hit indizes */
+	createTerminalStatusSequence(&statusSequence, terminal, "Interpolate Runge-Kutta inverted list:\t\t", (unsigned int)(actualDigitalHit.getMaxNumberOfHitIndizes()));
+	terminalInitialize(statusSequence);
+
+	actualDigitalTrack.set(0, DIM1);
+	actualDigitalTrack.set((*space)->getStep(DIM2) - 1, DIM2);
+	actualDigitalTrack.set(0, DIM3);
+	actualRungeKuttaInvertedListEntry.clearPositions();
+	actualRungeKuttaInvertedListEntry.addPosition(actualDigitalTrack);
+	for (unsigned long i = 0; i < actualDigitalHit.getMaxNumberOfHitIndizes(); i++) {
+
+		actualDigitalHit.setHitIndex(i);
+
+		actualRungeKuttaInvertedListEntry.setHit(actualDigitalHit);
+
+		if (!rungeKuttaInvertedList->isFound(actualRungeKuttaInvertedListEntry, false))
+			rungeKuttaInvertedList->push(actualRungeKuttaInvertedListEntry);
+
+		terminalOverwriteWithIncrement(statusSequence);
+
+	}
+
+	terminalFinalize(statusSequence);
+
+}
+
+/****************************************************************
+ * Method makes the inverted Runge-Kutta list conform to the	*
+ * actual LUTVERSION.											*
+ ****************************************************************/
+
+void lutImplementation::makeLutversionConformRungeKuttaInvertedList(specialList<rungeKuttaInvertedListEntry, true, true, true, true, true>* rungeKuttaInvertedList, std::streambuf* terminal) {
+
+	unsigned short                                              j;
+	terminalSequence                                            statusSequence;
+	specialList<trackCoordinates, true, true, true, true, true> addLutversionConformPositions;
+	rungeKuttaInvertedListEntry*                                actualRungeKuttaInvertedListEntry;
+	trackCoordinates                                            previousLutversionConformPosition;
+	trackCoordinates                                            actualLutversionConformPosition;
+	trackCoordinates                                            addLutversionConformPosition;
+	double                                                      lutversionConformPositionSlope12;
+	double                                                      lutversionConformPositionSlope32;
+
+	if ((space == NULL) || (*space == NULL))
+		throw cannotAccessHistogramSpaceError(LUTGENERATORLIB);
+
+	if (rungeKuttaInvertedList == NULL)
+		throw cannotAccessRungeKuttaInvertedListError();
+
+	/* Make the actually interpolated list conform to the used LUTVERSION */
+	createTerminalStatusSequence(&statusSequence, terminal, "Make Runge-Kutta inverted list conform:\t\t", (unsigned int)(rungeKuttaInvertedList->getNumberOfEntries()));
+	terminalInitialize(statusSequence);
+
+	rungeKuttaInvertedList->resetActiveObject();
+	for (unsigned long i = 0; i < rungeKuttaInvertedList->getNumberOfEntries(); i++) {
+
+		actualRungeKuttaInvertedListEntry = rungeKuttaInvertedList->getActiveObject();
+		if (actualRungeKuttaInvertedListEntry == NULL)
+			throw wrongEntryInListError();
+
+		if (actualRungeKuttaInvertedListEntry->getNumberOfPositions() > 0) {
+	
+			addLutversionConformPositions.clear();
+			actualRungeKuttaInvertedListEntry->resetActivePositionObject();
+			previousLutversionConformPosition   = actualRungeKuttaInvertedListEntry->readActivePositionObjectAndMakeNextOneActive();
+
+			addLutversionConformPosition.set(previousLutversionConformPosition.get(DIM1), DIM1);
+			addLutversionConformPosition.set(previousLutversionConformPosition.get(DIM3), DIM3);
+			for (j = 0; j < previousLutversionConformPosition.get(DIM2); j++) {
+			
+				addLutversionConformPosition.set(j, DIM2);
+				addLutversionConformPositions.push(addLutversionConformPosition);
+			
+			}
+
+			for (unsigned long k = 1; k < actualRungeKuttaInvertedListEntry->getNumberOfPositions(); k++) {
+
+				actualLutversionConformPosition = actualRungeKuttaInvertedListEntry->readActivePositionObject();
+
+				if (actualLutversionConformPosition.get(DIM1) < previousLutversionConformPosition.get(DIM1))
+					actualLutversionConformPosition.set(previousLutversionConformPosition.get(DIM1), DIM1);
+
+				if (actualLutversionConformPosition.get(DIM2) < previousLutversionConformPosition.get(DIM2))
+					actualLutversionConformPosition.set(previousLutversionConformPosition.get(DIM2), DIM2);
+
+				lutversionConformPositionSlope12 = (double)(actualLutversionConformPosition.get(DIM1) - previousLutversionConformPosition.get(DIM1)) / (double)(actualLutversionConformPosition.get(DIM2) - previousLutversionConformPosition.get(DIM2));
+				lutversionConformPositionSlope32 = (double)(actualLutversionConformPosition.get(DIM3) - previousLutversionConformPosition.get(DIM3)) / (double)(actualLutversionConformPosition.get(DIM2) - previousLutversionConformPosition.get(DIM2));
+
+#if (LUTVERSION > 2)
+
+				if (lutversionConformPositionSlope12 > 1) {
+					
+					lutversionConformPositionSlope12 = 1;
+					actualLutversionConformPosition.set((unsigned short)(lutversionConformPositionSlope12 * (actualLutversionConformPosition.get(DIM2) - previousLutversionConformPosition.get(DIM2))) + previousLutversionConformPosition.get(DIM1), DIM1);
+					actualRungeKuttaInvertedListEntry->updateActivePositionObject(actualLutversionConformPosition);
+
+				}
+
+#endif
+
+#if (LUTVERSION == 1)
+
+				for (j = previousLutversionConformPosition.get(DIM2); j < actualLutversionConformPosition.get(DIM2); j++) {
+
+					for (unsigned short l = (unsigned short)(lutversionConformPositionSlope12 * (j - previousLutversionConformPosition.get(DIM2))) + previousLutversionConformPosition.get(DIM1); l <= (unsigned short)(lutversionConformPositionSlope12 * (j + 1 - previousLutversionConformPosition.get(DIM2))) + previousLutversionConformPosition.get(DIM1); l++) {
+
+						addLutversionConformPosition.set(l, DIM1);
+						addLutversionConformPosition.set(j, DIM2);
+						addLutversionConformPosition.set((unsigned short)(lutversionConformPositionSlope32 * (j - previousLutversionConformPosition.get(DIM2))) + previousLutversionConformPosition.get(DIM3), DIM3);
+						addLutversionConformPositions.push(addLutversionConformPosition);
+
+					}
+
+				}
+
+#else
+
+				for (j = previousLutversionConformPosition.get(DIM2) + 1; j < actualLutversionConformPosition.get(DIM2); j++) {
+
+					addLutversionConformPosition.set((unsigned short)(lutversionConformPositionSlope12 * (j - previousLutversionConformPosition.get(DIM2))) + previousLutversionConformPosition.get(DIM1), DIM1);
+					addLutversionConformPosition.set(j, DIM2);
+					addLutversionConformPosition.set((unsigned short)(lutversionConformPositionSlope32 * (j - previousLutversionConformPosition.get(DIM2))) + previousLutversionConformPosition.get(DIM3), DIM3);
+					addLutversionConformPositions.push(addLutversionConformPosition);
+
+				}
+
+#endif
+
+				actualRungeKuttaInvertedListEntry->makeNextPositionObjectActive();
+				previousLutversionConformPosition = actualLutversionConformPosition;
+
+			}
+
+			if (previousLutversionConformPosition.get(DIM1) + 1 < (*space)->getStep(DIM1)) {
+			
+				addLutversionConformPosition.set(previousLutversionConformPosition.get(DIM1) + 1, DIM1);
+				addLutversionConformPosition.set(previousLutversionConformPosition.get(DIM3), DIM3);
+
+#if (LUTVERSION == 1)
+
+				for (j = previousLutversionConformPosition.get(DIM2); j < (*space)->getStep(DIM2); j++) {
+
+#else
+
+				for (j = previousLutversionConformPosition.get(DIM2) + 1; j < (*space)->getStep(DIM2); j++) {
+
+#endif
+
+					addLutversionConformPosition.set(j, DIM2);
+					addLutversionConformPositions.push(addLutversionConformPosition);
+			
+				}
+
+			}
+
+			while(!addLutversionConformPositions.isEmpty()) {
+
+				addLutversionConformPosition = addLutversionConformPositions.pop();
+				actualRungeKuttaInvertedListEntry->addPosition(addLutversionConformPosition);
+
+			}
+
+		}
+
+		rungeKuttaInvertedList->makeNextOneActive();
+
+		terminalOverwriteWithIncrement(statusSequence);
+
+	}
+
+	terminalFinalize(statusSequence);
+
+}
+
+/****************************************************************
+ * Method decomposes the inverted Runge-Kutta list.				*
+ ****************************************************************/
+
+void lutImplementation::decomposeRungeKuttaInvertedList(double dim3StartEntry, double dim3StopEntry, specialList<rungeKuttaInvertedListEntry, true, true, true, true, true>* rungeKuttaInvertedList, std::streambuf* terminal) {
+	
+	terminalSequence            statusSequence;
+	rungeKuttaInvertedListEntry actualRungeKuttaInvertedListEntry;
+	trackCoordinates            actualDigitalTrack;
+	digitalHit                  actualDigitalHit;
+	prelutHoughBorder           actualPrelutBorder;
+	lutHoughBorder              actualLutBorder;
+	houghBorderPosition         actualHoughCoord;
+
+	if (rungeKuttaInvertedList == NULL)
+		throw cannotAccessRungeKuttaInvertedListError();
+
+	/* Decompose the actually interpolated list into the needed LUTs */
+	allocateFileLuts(&firstLut, &secondLut, dim3StartEntry, dim3StopEntry);
+
+	if ((firstLut.type != FILELUT) || (secondLut.type != FILELUT))
+		throw wrongLutTypeForUsedFunctionalityDetectedError();
+
+	createTerminalStatusSequence(&statusSequence, terminal, "Decompose Runge-Kutta inverted conform list:\t", (unsigned int)(rungeKuttaInvertedList->getNumberOfEntries()));
+	terminalInitialize(statusSequence);
+
+	((prelutAccess*)(firstLut.lutObject))->clear();
+	((lutAccess*)(secondLut.lutObject))->clear();
+
+	while (!rungeKuttaInvertedList->isEmpty()) {
+
+		actualRungeKuttaInvertedListEntry = rungeKuttaInvertedList->pop();
+
+		actualDigitalHit                  = actualRungeKuttaInvertedListEntry.getHit();
+
+		actualPrelutBorder.start          = actualRungeKuttaInvertedListEntry.getMinLayer();
+		actualPrelutBorder.stop           = actualRungeKuttaInvertedListEntry.getMaxLayer();
+
+		actualLutBorder.houghCoord.clear();
+		actualRungeKuttaInvertedListEntry.resetActivePositionObject();
+		for (unsigned long i = 0; i < actualRungeKuttaInvertedListEntry.getNumberOfPositions(); i++) {
+
+			actualDigitalTrack    = actualRungeKuttaInvertedListEntry.readActivePositionObjectAndMakeNextOneActive();
+
+			actualHoughCoord.pos1 = actualDigitalTrack.get(DIM1);
+			actualHoughCoord.pos2 = actualDigitalTrack.get(DIM2);
+
+			actualLutBorder.houghCoord.push(actualHoughCoord);
+
+		}
+
+		((prelutAccess*)(firstLut.lutObject))->addEntry(actualPrelutBorder, actualDigitalHit);
+		((lutAccess*)(secondLut.lutObject))->addEntry(actualLutBorder, actualDigitalHit);
+
+		terminalOverwriteWithIncrement(statusSequence);
+
+	}
+
+	terminalFinalize(statusSequence);
+
+}
+
+/****************************************************************
  * Method generates the Runge-Kutta file look-up-tables.		*
  ****************************************************************/
 
 void lutImplementation::generateRungeKuttaFileLuts(std::string prelutFileName, std::string prelutName, std::string lutFileName, std::string lutName, double dim3StartEntry, double dim3StopEntry, trackfinderInputMagneticField* magneticField, std::streambuf* terminal) {
 
-/**/
+	specialList<rungeKuttaListEntry, true, true, true, true, true>         rungeKuttaList;
+	specialList<rungeKuttaInvertedListEntry, true, true, true, true, true> rungeKuttaInvertedList;
+
+	rungeKuttaList.clear();
+	rungeKuttaInvertedList.clear();
+
+	generateRungeKuttaList(&rungeKuttaList, magneticField, terminal);
+
+	generateRungeKuttaInvertedList(&rungeKuttaList, &rungeKuttaInvertedList, terminal);
+
+	interpolateRungeKuttaInvertedList(&rungeKuttaInvertedList, terminal);
+
+#if (LUTVERSION > 0)
+
+	makeLutversionConformRungeKuttaInvertedList(&rungeKuttaInvertedList, terminal);
+
+#endif
+
+	decomposeRungeKuttaInvertedList(dim3StartEntry, dim3StopEntry, &rungeKuttaInvertedList, terminal);
+
+	/* Write both look-up-tables into a specified file */
+	if (!prelutFileName.empty())
+		((prelutAccess*)(firstLut.lutObject))->write(prelutFileName, prelutName, terminal);
+	if (!lutFileName.empty())
+		((lutAccess*)(secondLut.lutObject))->write(lutFileName, lutName, HARDWAREFORMAT, terminal);
 
 }
 

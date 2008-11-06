@@ -34,8 +34,8 @@
 
 
 #include "../../MiscLIB/include/defs.h"
-#include "../../MiscLIB/include/hitArray.h"
 #include "../../DataObjectLIB/include/trackParameter.h"
+#include "../../MiscLIB/include/hitArray.h"
 
 
 /* **************************************************************

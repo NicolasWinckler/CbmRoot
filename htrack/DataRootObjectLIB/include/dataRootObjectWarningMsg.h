@@ -81,8 +81,11 @@ public:
 #define _NOTRACKWITHIDFOUNDWARNINGMSG_H
 
 
+#if (ARCHITECTURE != PS3)
+
 #include "trackfinderInputHit.h"
 
+#endif
 
 /**
  * CLASS noTrackWithIdFoundWarningMsg
@@ -93,7 +96,12 @@ class noTrackWithIdFoundWarningMsg : public dataRootObjectWarningMsg {
 private:
 
 	int                  trackId;
+
+#if (ARCHITECTURE != PS3)
+
 	trackfinderInputHit* hit;
+
+#endif
 
 public:
 
@@ -107,7 +115,13 @@ public:
  * Constructor
  */
 
-	noTrackWithIdFoundWarningMsg(int actualTrackId, trackfinderInputHit* actualHit = NULL);
+	noTrackWithIdFoundWarningMsg(int actualTrackId);
+
+#if (ARCHITECTURE != PS3)
+
+	noTrackWithIdFoundWarningMsg(int actualTrackId, trackfinderInputHit* actualHit);
+
+#endif
 
 /**
  * Destructor
@@ -1327,6 +1341,40 @@ public:
  */
 
 	virtual ~missingOriginWarningMsg();
+
+/**
+ * This method displays a warning message.
+ */
+
+	void warningMsg();
+
+};
+
+#endif
+
+
+#ifndef _NOENTRYINLISTWARNINGMSG_H
+#define _NOENTRYINLISTWARNINGMSG_H
+
+/**
+ * CLASS noEntryInListWarningMsg
+ */
+
+class noEntryInListWarningMsg : public dataRootObjectWarningMsg {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	noEntryInListWarningMsg();
+
+/**
+ * Destructor
+ */
+
+	virtual ~noEntryInListWarningMsg();
 
 /**
  * This method displays a warning message.

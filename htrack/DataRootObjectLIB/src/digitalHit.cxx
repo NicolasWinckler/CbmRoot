@@ -46,7 +46,8 @@
 
 digitalHit::digitalHit() {
 
-	data = 0;
+	hitIndex     = 0;
+	stationIndex = 0;
 
 }
 
@@ -56,7 +57,8 @@ digitalHit::digitalHit() {
 
 digitalHit::digitalHit(const digitalHit& value) {
 
-	this->data = value.data;
+	this->hitIndex     = value.hitIndex;
+	this->stationIndex = value.stationIndex;
 
 }
 
@@ -74,20 +76,63 @@ digitalHit::~digitalHit() {
 
 const digitalHit& digitalHit::operator = (const digitalHit& value) {
 
-	this->data = value.data;
+	this->hitIndex     = value.hitIndex;
+	this->stationIndex = value.stationIndex;
 
 	return *this;
 
 }
 
 /****************************************************************
- * method returns the maximuum number of digital hits			*
- * which can occur												*
+ * This method converts the object into a string representation.*
+ ****************************************************************/
+
+digitalHit::operator std::string(){
+
+	return toNotIdentifiedString();
+
+}
+
+/****************************************************************
+ * method returns a pointer to the object						*
+ ****************************************************************/
+
+digitalHit* digitalHit::getPointer() {
+
+	return this;
+
+}
+
+/****************************************************************
+ * method compare two objects of this class						*
+ * @return value > 0, if element is smaller						*
+ * @return value = 0, if element is equal						*
+ * @return value < 0, if element is bigger						*
+ ****************************************************************/
+
+int digitalHit::compare(digitalHit element) {
+
+	int returnValue;
+
+	if (element.getHitIndex() < this->getHitIndex())
+		returnValue = 1;
+	else if (element.getHitIndex() == this->getHitIndex())
+		returnValue = 0;
+	else
+		returnValue = -1;
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * method returns the maximuum number of digital hit			*
+ * indizes which can occur										*
  ****************************************************************/
 
 #if (ARCHITECTURE != PS3)
 
-unsigned long digitalHit::getMaxNumberOfDigitalHitData() {
+unsigned long digitalHit::getMaxNumberOfHitIndizes() {
 
 	unsigned long returnValue;
 
@@ -108,17 +153,67 @@ unsigned long digitalHit::getMaxNumberOfDigitalHitData() {
 #endif
 
 /****************************************************************
- * method returns the digital hit data							*
+ * method returns the digital hit index							*
  ****************************************************************/
 
-unsigned long digitalHit::getData() {
+unsigned long digitalHit::getHitIndex() {
 
-	return data;
+	return hitIndex;
+
+}
+std::string digitalHit::getHitIndexString() {
+
+	std::string returnValue;
+	int         counts;
+	int         maxCounts;
+	char        buffer[longConversionDigits+1];
+
+	returnValue  = "000";
+	counts       = addRadix(RADIX, returnValue);
+	maxCounts    = (int)returnValue.length();
+
+	if (counts < maxCounts)
+		returnValue.erase(counts, maxCounts - counts);
+
+	ultos(hitIndex, buffer, RADIX, longConversionDigits);
+	returnValue += buffer;
+
+	return returnValue;
 
 }
 
 /****************************************************************
- * Method returns an analog hit based on the digital data.		*
+ * method returns the digital station index						*
+ ****************************************************************/
+
+unsigned short digitalHit::getStationIndex() {
+
+	return stationIndex;
+
+}
+std::string digitalHit::getStationIndexString() {
+
+	std::string returnValue;
+	int         counts;
+	int         maxCounts;
+	char        buffer[shortConversionDigits+1];
+
+	returnValue  = "000";
+	counts       = addRadix(RADIX, returnValue);
+	maxCounts    = (int)returnValue.length();
+
+	if (counts < maxCounts)
+		returnValue.erase(counts, maxCounts - counts);
+
+	ustos(stationIndex, buffer, RADIX, shortConversionDigits);
+	returnValue += buffer;
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * Method returns a hit object based on the digital hit index.	*
  * CAUTION: The return object contains just coordinates.		*
  * Other parts of such an object are not set.					*
  ****************************************************************/
@@ -146,17 +241,47 @@ trackfinderInputHit digitalHit::getHit() {
 #endif
 
 /****************************************************************
- * method sets the digital hit data								*
+ * method sets the digital hit index							*
  ****************************************************************/
 
-void digitalHit::setData(unsigned long value) {
+void digitalHit::setHitIndex(unsigned long value) {
 
-	data = value;
+	hitIndex = value;
+
+}
+void digitalHit::setHitIndexString(std::string& value) {
+
+	std::string temp;
+	int         radix;
+
+	temp     = value;
+	extractRadix(&radix, &temp);
+	hitIndex = stoul(temp, radix);
 
 }
 
 /****************************************************************
- * method sets the digital data based on an analog hit			*
+ * method sets the digital station index						*
+ ****************************************************************/
+
+void digitalHit::setStationIndex(unsigned short value) {
+
+	stationIndex = value;
+
+}
+void digitalHit::setStationIndexString(std::string& value) {
+
+	std::string temp;
+	int         radix;
+
+	temp         = value;
+	extractRadix(&radix, &temp);
+	stationIndex = stous(temp, radix);
+
+}
+
+/****************************************************************
+ * Method sets the digital hit index based on a hit object.		*
  ****************************************************************/
 
 #if (ARCHITECTURE != PS3)
@@ -172,28 +297,21 @@ void digitalHit::setHit(trackfinderInputHit* hit) {
 
 #else
 
-	data = (unsigned long)hit->getHitOrder();
+	hitIndex     = (unsigned long)hit->getHitOrder();
+
+	if (hit->getStation() != NULL)
+		if (!hit->getStation()->isMasked())
+			stationIndex = hit->getStation()->getIndex();
+		else
+			stationIndex = (unsigned short)-1;
+	else
+		stationIndex = (unsigned short)-1;
 
 #endif
 
 }
 
 #endif
-
-/****************************************************************
- * method sets the digital data based on a string representation*
- ****************************************************************/
-
-void digitalHit::setNotIdentifiedString(std::string& value) {
-
-	std::string temp;
-	int         radix;
-
-	temp = value;
-	extractRadix(&radix, &temp);
-	data = stoul(temp, radix);
-
-}
 
 /****************************************************************
  * This method converts the object into a string representation	*
@@ -203,12 +321,12 @@ void digitalHit::setNotIdentifiedString(std::string& value) {
 std::string digitalHit::toNotIdentifiedString() {
 
 	std::string returnValue;
-	char        buffer[longConversionDigits+1];
 
-	returnValue  = "000";
-	addRadix(RADIX, returnValue);
-	ultos(data, buffer, RADIX, longConversionDigits);
-	returnValue += buffer;
+	returnValue  = "(";
+	returnValue += getHitIndexString();
+	returnValue += ",";
+	returnValue += getStationIndexString();
+	returnValue += ")";
 
 	return returnValue;
 
@@ -223,8 +341,10 @@ std::string digitalHit::toIdentifiedString() {
 
 	std::string returnValue;
 
-	returnValue  = "Identifier: ";
-	returnValue += toNotIdentifiedString();
+	returnValue  = "HitIndex: ";
+	returnValue += getHitIndexString();
+	returnValue += ", StationIndex: ";
+	returnValue += getStationIndexString();
 
 	return returnValue;
 
@@ -239,7 +359,8 @@ double digitalHit::getReservedSizeOfData(unsigned short dimension) {
 
 	double returnValue;
 
-	returnValue  = sizeof(data);
+	returnValue  = sizeof(hitIndex);
+	returnValue += sizeof(stationIndex);
 
 	returnValue  = (returnValue / (1 << (10 * dimension)));
 
@@ -273,7 +394,8 @@ double digitalHit::getUsedSizeOfData(unsigned short dimension) {
 
 	double returnValue;
 
-	returnValue  = sizeof(data);
+	returnValue  = sizeof(hitIndex);
+	returnValue += sizeof(stationIndex);
 
 	returnValue  = (returnValue / (1 << (10 * dimension)));
 

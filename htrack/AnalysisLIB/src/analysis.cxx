@@ -4366,16 +4366,26 @@ void analysis::evaluateCellSimulationFiles(std::string hitFileName, std::string 
 	for (int i = 0; i < (*eventData)->getNumberOfHits(); i++) {
 
 		analogHitValue = (*eventData)->getHitByIndex(i);
+		if (analogHitValue == NULL)
+			throw cannotAccessHitsOrTracksError(ANALYSISLIB);
 
-		digitalHitValue.setHit(analogHitValue);
-		(*luts)->evaluate(analogHitValue, &border);
+		if (analogHitValue->getStation() != NULL) {
 
-		if (!hitFileName.empty())
-			digitalHitData.addEntry(digitalHitValue);
-		if (!prelutFileName.empty())
-			prelut.addEntry(border.getPrelutHoughBorder(), digitalHitValue);
-		if (!lutFileName.empty())
-			lut.addEntry(border.getLutHoughBorder(), digitalHitValue);
+			if (!analogHitValue->getStation()->isMasked()) {
+
+				digitalHitValue.setHit(analogHitValue);
+				(*luts)->evaluate(analogHitValue, &border);
+
+				if (!hitFileName.empty())
+					digitalHitData.addEntry(digitalHitValue);
+				if (!prelutFileName.empty())
+					prelut.addEntry(border.getPrelutHoughBorder(), digitalHitValue);
+				if (!lutFileName.empty())
+					lut.addEntry(border.getLutHoughBorder(), digitalHitValue);
+
+			}
+
+		}
 
 		terminalOverwriteWithIncrement(statusSequenceForCellFiles);
 

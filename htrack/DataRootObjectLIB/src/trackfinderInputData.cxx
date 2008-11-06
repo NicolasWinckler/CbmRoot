@@ -31,13 +31,6 @@
 
 #include "../include/dataRootObjectError.h"
 #include "../include/dataRootObjectWarningMsg.h"
-#if (ARCHITECTURE == STANDALONE)
-	#include "../include/trackfinderInputSMagneticField.h"
-	#include "../../RootFrameworkLIB/include/CbmStsPoint.h"
-#elif (ARCHITECTURE == CBMROOT)
-	#include "../include/trackfinderInputFMagneticField.h"
-	#include "CbmStsPoint.h"
-#endif
 #include "../include/trackfinderInputData.h"
 
 

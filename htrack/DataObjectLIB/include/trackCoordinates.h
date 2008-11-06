@@ -34,6 +34,7 @@
 
 
 #include "../../MiscLIB/include/coordinateSystem.h"
+#include <string>
 
 
 /* **************************************************************
@@ -75,6 +76,41 @@ public:
  */
 
 	const trackCoordinates& operator = (const trackCoordinates& value);
+
+/**
+ * This method converts the object into a string representation.
+ */
+
+	operator std::string();
+
+/**
+ * This method converts the object into a string representation
+ * and adds no identifiers.
+ */
+
+	std::string toNotIdentifiedString();
+
+/**
+ * This method converts the object into a string representation
+ * and adds identifiers.
+ */
+
+	std::string toIdentifiedString();
+
+/**
+ * method returns a pointer to the object
+ */
+
+	trackCoordinates* getPointer();
+
+/**
+ * method compare two objects of this class
+ * @return value > 0, if element is smaller
+ * @return value = 0, if element is equal
+ * @return value < 0, if element is bigger
+ */
+
+	int compare(trackCoordinates element);
 
 /**
  * returns the value in the dimension

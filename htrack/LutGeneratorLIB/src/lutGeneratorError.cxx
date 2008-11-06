@@ -714,3 +714,96 @@ void wrongLutTypeForUsedFunctionalityDetectedError::errorMsg() {
 	printMsg("There is a wrong LUT type detected for the used functionality!!!");
 
 }
+
+
+/****************************************************************
+ * CLASS cannotAccessRungeKuttaListError						*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+cannotAccessRungeKuttaListError::cannotAccessRungeKuttaListError() : lutGeneratorError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+cannotAccessRungeKuttaListError::~cannotAccessRungeKuttaListError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void cannotAccessRungeKuttaListError::errorMsg() {
+
+	printMsg("The Runge-Kutta list object is not accessible!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS cannotAccessRungeKuttaInvertedListError				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+cannotAccessRungeKuttaInvertedListError::cannotAccessRungeKuttaInvertedListError() : lutGeneratorError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+cannotAccessRungeKuttaInvertedListError::~cannotAccessRungeKuttaInvertedListError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void cannotAccessRungeKuttaInvertedListError::errorMsg() {
+
+	printMsg("The Runge-Kutta inverted list object is not accessible!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS noEntryInListError										*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+wrongEntryInListError::wrongEntryInListError() : lutGeneratorError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+wrongEntryInListError::~wrongEntryInListError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.						*
+ ****************************************************************/
+
+void wrongEntryInListError::errorMsg() {
+
+	printMsg("There is a wrong entry in the list!!!");
+
+}

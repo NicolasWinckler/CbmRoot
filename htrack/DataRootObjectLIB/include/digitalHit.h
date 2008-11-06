@@ -2,7 +2,7 @@
 /// (C)opyright 2005
 /// 
 /// Institute of Computer Science V
-/// Prof. M�ner
+/// Prof. Männer
 /// University of Mannheim, Germany
 /// 
 /// *******************************************************************
@@ -52,7 +52,8 @@ class digitalHit {
 
 private:
 
-	unsigned long data;			/**< Variable to store the digital hit data. */
+	unsigned long  hitIndex;			/**< Variable to store the digital hit data which can be used as index for the look-up-tables. */
+	unsigned short stationIndex;		/**< Variable to store the index for the detector station in which the digital hit occurs. */
 
 public:
 
@@ -81,24 +82,53 @@ public:
 	const digitalHit& operator = (const digitalHit& value);
 
 /**
- * method returns the maximuum number of digital hits
- * which can occur
+ * This method converts the object into a string representation.
+ */
+
+	operator std::string();
+
+/**
+ * method returns a pointer to the object
+ */
+
+	digitalHit* getPointer();
+
+/**
+ * method compare two objects of this class
+ * @return value > 0, if element is smaller
+ * @return value = 0, if element is equal
+ * @return value < 0, if element is bigger
+ */
+
+	int compare(digitalHit element);
+
+/**
+ * method returns the maximuum number of digital hit
+ * indizes which can occur
  */
 
 #if (ARCHITECTURE != PS3)
 
-	unsigned long getMaxNumberOfDigitalHitData();
+	unsigned long getMaxNumberOfHitIndizes();
 
 #endif
 
 /**
- * method returns the digital hit data
+ * method returns the digital hit index
  */
 
-	unsigned long getData();
+	unsigned long getHitIndex();
+	std::string getHitIndexString();
 
 /**
- * Method returns an analog hit based on the digital data.
+ * method returns the digital station index
+ */
+
+	unsigned short getStationIndex();
+	std::string getStationIndexString();
+
+/**
+ * Method returns a hit object based on the digital hit index.
  * CAUTION: The return object contains just coordinates.
  * Other parts of such an object are not set.
  */
@@ -110,13 +140,21 @@ public:
 #endif
 
 /**
- * method sets the digital hit data
+ * method sets the digital hit index
  */
 
-	void setData(unsigned long value);
+	void setHitIndex(unsigned long value);
+	void setHitIndexString(std::string& value);
 
 /**
- * method sets the digital data based on an analog hit
+ * method sets the digital station index
+ */
+
+	void setStationIndex(unsigned short value);
+	void setStationIndexString(std::string& value);
+
+/**
+ * Method sets the digital hit index based on a hit object.
  */
 
 #if (ARCHITECTURE != PS3)
@@ -124,12 +162,6 @@ public:
 	void setHit(trackfinderInputHit* hit);
 
 #endif
-
-/**
- * method sets the digital data based on a string representation
- */
-
-	void setNotIdentifiedString(std::string& value);
 
 /**
  * This method converts the object into a string representation

@@ -29,8 +29,12 @@
 // *******************************************************************/
 
 
+#include "../../MiscLIB/include/conversionRoutines.h"
 #include "../include/dataObjectError.h"
 #include "../include/trackCoordinates.h"
+
+
+#define RADIX 10
 
 
 /****************************************************************
@@ -84,6 +88,124 @@ const trackCoordinates& trackCoordinates::operator = (const trackCoordinates& va
 		this->dim[i] = value.dim[i];
 
 	return *this;
+
+}
+
+/****************************************************************
+ * This method converts the object into a string representation.*
+ ****************************************************************/
+
+trackCoordinates::operator std::string(){
+
+	return toNotIdentifiedString();
+
+}
+
+/****************************************************************
+ * This method converts the object into a string representation	*
+ * and adds no identifiers.										*
+ ****************************************************************/
+
+std::string trackCoordinates::toNotIdentifiedString() {
+
+	std::string radixString;
+	int         counts;
+	int         maxCounts;
+	std::string returnValue;
+	char        buffer[shortConversionDigits+1];
+
+	radixString  = "000";
+	counts       = addRadix(RADIX, radixString);
+	maxCounts    = (int)radixString.length();
+
+	if (counts < maxCounts)
+		radixString.erase(counts, maxCounts - counts);
+
+	returnValue  = "{";
+	for (unsigned short i = 0; i < DIMENSIONS; i++) {
+
+		if (i > 0)
+			returnValue += ", ";
+		returnValue += radixString;
+		ustos(dim[i], buffer, RADIX, shortConversionDigits);
+		returnValue += buffer;
+
+	}
+	returnValue += "}";
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method converts the object into a string representation	*
+ * and adds identifiers.										*
+ ****************************************************************/
+
+std::string trackCoordinates::toIdentifiedString() {
+
+	std::string radixString;
+	int         counts;
+	int         maxCounts;
+	std::string returnValue;
+	char        buffer[shortConversionDigits+1];
+
+	radixString  = "000";
+	counts       = addRadix(RADIX, radixString);
+	maxCounts    = (int)radixString.length();
+
+	if (counts < maxCounts)
+		radixString.erase(counts, maxCounts - counts);
+
+	returnValue  = "{";
+	for (unsigned short i = 0; i < DIMENSIONS; i++) {
+
+		if (i > 0)
+			returnValue += ", ";
+		returnValue += "dim";
+		ustos(i, buffer, 10, shortConversionDigits);
+		returnValue += buffer;
+		returnValue += " = ";
+		returnValue += radixString;
+		ustos(dim[i], buffer, RADIX, shortConversionDigits);
+		returnValue += buffer;
+
+	}
+	returnValue += "}";
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * method returns a pointer to the object						*
+ ****************************************************************/
+
+trackCoordinates* trackCoordinates::getPointer() {
+
+	return this;
+
+}
+
+/****************************************************************
+ * method compare two objects of this class						*
+ * @return value > 0, if element is smaller						*
+ * @return value = 0, if element is equal						*
+ * @return value < 0, if element is bigger						*
+ ****************************************************************/
+
+int trackCoordinates::compare(trackCoordinates element) {
+
+	int returnValue;
+
+	if ((element.get(DIM2) < this->get(DIM2)) || ((element.get(DIM2) == this->get(DIM2)) && (element.get(DIM1) < this->get(DIM1))) || ((element.get(DIM2) == this->get(DIM2)) && (element.get(DIM1) == this->get(DIM1)) && (element.get(DIM3) < this->get(DIM3))))
+		returnValue = 1;
+	else if ((element.get(DIM1) == this->get(DIM1)) && (element.get(DIM2) == this->get(DIM2)) && (element.get(DIM3) == this->get(DIM3)))
+		returnValue = 0;
+	else
+		returnValue = -1;
+
+	return returnValue;
 
 }
 

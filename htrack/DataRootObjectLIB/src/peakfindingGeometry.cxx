@@ -2,7 +2,7 @@
 /// (C)opyright 2004
 /// 
 /// Institute of Computer Science V
-/// Prof. Männer
+/// Prof. Mï¿½ner
 /// University of Mannheim, Germany
 /// 
 /// *******************************************************************
@@ -873,7 +873,11 @@ specialListMem<peakfindingGeometryElement> peakfindingGeometry::getCoveredGeomet
 }
 specialListMem<peakfindingGeometryElement> peakfindingGeometry::getCoveredProjectedGeometryElements() {
 
-	return buildCoveredGeometry(buildProjectedGeometry(geometry));
+	specialListMem<peakfindingGeometryElement> temp;
+
+	temp = buildProjectedGeometry(geometry);
+
+	return buildCoveredGeometry(temp);
 
 }
 
@@ -908,13 +912,19 @@ void peakfindingGeometry::addGeometryElement(short position1, short position2, s
  * Method adds whole other peakfinding geometry elements, but	*
  * will not modify the coverage									*
  ****************************************************************/
-#include <iostream>
+
 void peakfindingGeometry::addGeometryElements(specialListMem<peakfindingGeometryElement>& elements) {
 
-	elements.resetActiveObject();
+	peakfindingGeometryElement temp;
 
-	for (unsigned long i = 0; i < elements.getNumberOfEntries(); i++)
-		addGeometryElement(elements.readActiveObjectAndMakeNextOneActive());
+	elements.resetActiveObject();
+	for (unsigned long i = 0; i < elements.getNumberOfEntries(); i++) {
+
+		temp = elements.readActiveObjectAndMakeNextOneActive();
+
+		addGeometryElement(temp);
+
+	}
 
 }
 void peakfindingGeometry::addGeometryElements(specialListMem<peakfindingGeometryElement>& elements, trackCoordinates& center) {

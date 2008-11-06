@@ -148,10 +148,17 @@ std::string prelutHoughBorder::toIdentifiedString() {
 std::string prelutHoughBorder::getStart() {
 
 	std::string returnValue;
+	int         counts;
+	int         maxCounts;
 	char        buffer[shortConversionDigits+1];
 
 	returnValue  = "000";
-	addRadix(RADIX, returnValue);
+	counts       = addRadix(RADIX, returnValue);
+	maxCounts    = (int)returnValue.length();
+
+	if (counts < maxCounts)
+		returnValue.erase(counts, maxCounts - counts);
+
 	ustos(start, buffer, RADIX, shortConversionDigits);
 	returnValue += buffer;
 
@@ -166,10 +173,17 @@ std::string prelutHoughBorder::getStart() {
 std::string prelutHoughBorder::getStop() {
 
 	std::string returnValue;
+	int         counts;
+	int         maxCounts;
 	char        buffer[shortConversionDigits+1];
 
 	returnValue  = "000";
-	addRadix(RADIX, returnValue);
+	counts       = addRadix(RADIX, returnValue);
+	maxCounts    = (int)returnValue.length();
+
+	if (counts < maxCounts)
+		returnValue.erase(counts, maxCounts - counts);
+
 	ustos(stop, buffer, RADIX, shortConversionDigits);
 	returnValue += buffer;
 

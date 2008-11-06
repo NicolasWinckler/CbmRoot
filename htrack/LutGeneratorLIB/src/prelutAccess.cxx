@@ -178,7 +178,7 @@ prelutHoughBorder prelutAccess::getEntry(digitalHit* hit) {
 	if (hit == NULL)
 		throw noHitError();
 
-	return getEntry(hit->getData());
+	return getEntry(hit->getHitIndex());
 
 }
 prelutHoughBorder prelutAccess::getEntry(unsigned long index) {
@@ -231,7 +231,7 @@ void prelutAccess::addEntry(prelutHoughBorder& value, unsigned long index) {
 }
 void prelutAccess::addEntry(prelutHoughBorder& value, digitalHit hit) {
 
-	addEntry(value, hit.getData());
+	addEntry(value, hit.getHitIndex());
 
 }
 

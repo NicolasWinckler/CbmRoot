@@ -89,7 +89,12 @@ void dataRootObjectWarningMsg::printMsg(std::string message) {
 noTrackWithIdFoundWarningMsg::noTrackWithIdFoundWarningMsg() : dataRootObjectWarningMsg() {
 
 	trackId = 0;
+
+#if (ARCHITECTURE != PS3)
+
 	hit     = NULL;
+
+#endif
 
 }
 
@@ -97,12 +102,22 @@ noTrackWithIdFoundWarningMsg::noTrackWithIdFoundWarningMsg() : dataRootObjectWar
  * Constructor													*
  ****************************************************************/
 
+noTrackWithIdFoundWarningMsg::noTrackWithIdFoundWarningMsg(int actualTrackId) : dataRootObjectWarningMsg() {
+
+	trackId = actualTrackId;
+
+}
+
+#if (ARCHITECTURE != PS3)
+
 noTrackWithIdFoundWarningMsg::noTrackWithIdFoundWarningMsg(int actualTrackId, trackfinderInputHit* actualHit) : dataRootObjectWarningMsg() {
 
 	trackId = actualTrackId;
 	hit     = actualHit;
 
 }
+
+#endif
 
 /****************************************************************
  * Destructor													*
@@ -120,14 +135,21 @@ void noTrackWithIdFoundWarningMsg::warningMsg() {
 
 	std::string  temp;
 	char         intBuffer[intConversionDigits+1];
+
+#if (ARCHITECTURE != PS3)
+
 	char         doubleBuffer[doubleConversion+1];
 	CbmHit*      cbmHit;
 	CbmMCPoint*  cbmPoint;
+
+#endif
 
 	temp = "There is no track with the id ";
 	itos(trackId, intBuffer, 10, intConversionDigits);
 	temp += intBuffer;
 	temp += " !!!";
+
+#if (ARCHITECTURE != PS3)
 
 	if (hit != NULL) {
 
@@ -217,6 +239,8 @@ void noTrackWithIdFoundWarningMsg::warningMsg() {
 		}
 
 	}
+
+#endif
 
 	printMsg(temp);
 
@@ -1507,5 +1531,36 @@ missingOriginWarningMsg::~missingOriginWarningMsg() {
 void missingOriginWarningMsg::warningMsg() {
 
 	printMsg("The origin is missing. Maybe the algorithm is going wrong, because it the origin is a prerequisite of many algorithms!!!");
+
+}
+
+
+/****************************************************************
+ * CLASS noEntryInListWarningMsg								*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+noEntryInListWarningMsg::noEntryInListWarningMsg() : dataRootObjectWarningMsg() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+noEntryInListWarningMsg::~noEntryInListWarningMsg() {
+
+}
+
+/****************************************************************
+ * This method displays a warning message.		 				*
+ ****************************************************************/
+
+void noEntryInListWarningMsg::warningMsg() {
+
+	printMsg("There is no entry in the list!!!");
 
 }

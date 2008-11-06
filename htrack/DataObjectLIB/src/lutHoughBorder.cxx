@@ -119,8 +119,10 @@ std::string lutHoughBorder::toNotIdentifiedString() {
 		
 		actualHoughCoord = houghCoord.readActiveObjectAndMakeNextOneActive();
 
+		if (i > 0)
+			returnValue += ", ";
+
 		returnValue += actualHoughCoord.toNotIdentifiedString();
-		returnValue += ", ";
 
 	}
 

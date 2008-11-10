@@ -4,24 +4,25 @@
 // -----                  Destroyed 12.09.2007 by A. Bubak             -----
 // -------------------------------------------------------------------------
 
+#include "CbmTrdMatchTracksMK.h"
 
-#include "iostream"
-#include "iomanip"
-
-#include "TClonesArray.h"
-#include "TH1F.h"
-#include "TH2F.h"
-
-#include "TProfile.h"
 #include "CbmMCPoint.h"
 #include "CbmTrdPoint.h"
 #include "CbmMCTrack.h"
 #include "CbmRootManager.h"
 #include "CbmTrdHit.h"
-#include "CbmTrdMatchTracksMK.h"
 #include "CbmTrdTrack.h"
 #include "CbmTrdTrackMatch.h"
+
 #include "TStopwatch.h"
+#include "TClonesArray.h"
+#include "TH1F.h"
+#include "TH2F.h"
+#include "TProfile.h"
+
+#include <iostream>
+#include <iomanip>
+#include <vector>
 
 using namespace std;
 
@@ -985,55 +986,55 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
       Double_t recoTrs   = Double_t(recoToMc.size());
       noPrimaryRefFast    = Int_t(recoTrs);
 
-      Double_t qGhosts;
+      Double_t qGhosts = -42;
       if(nTracks) qGhosts  = Double_t(noGhost)/Double_t(nTracks)*1.;
       
-      Double_t qClones;
+      Double_t qClones = -42.;
       if(My_AllRefFast+My_AllRefSlow) qClones  = Double_t(noClones)/Double_t(My_AllRefFast+My_AllRefSlow)*1.;
       
-      Double_t qPrimaryRefFast;
+      Double_t qPrimaryRefFast = -42.;
       if(MC_PrimaryRefFast) qPrimaryRefFast = Double_t(RECO_PrimaryRefFast)/Double_t(MC_PrimaryRefFast)*1.;
       
-      Double_t qPrimaryRefSlow;
+      Double_t qPrimaryRefSlow = -42.;
       if(MC_PrimaryRefSlow) qPrimaryRefSlow = Double_t(RECO_PrimaryRefSlow)/Double_t(MC_PrimaryRefSlow)*1.;
 
-      Double_t qPrimaryRefAll;
+      Double_t qPrimaryRefAll = -42.;
       if(MC_PrimaryRefAll) qPrimaryRefAll = Double_t(RECO_PrimaryRefAll)/Double_t(MC_PrimaryRefAll)*1.;
     
-      Double_t qAllRefFast;
+      Double_t qAllRefFast = -42.;
       if(My_AllRefFast) qAllRefFast = Double_t(RECO_AllRefFast)/Double_t(My_AllRefFast)*1.;
 
-      Double_t qAllRefSlow;
+      Double_t qAllRefSlow = -42.;
       if(My_AllRefSlow) qAllRefSlow = Double_t(RECO_AllRefSlow)/Double_t(My_AllRefSlow)*1.;
 
-      Double_t qAllRefAll;
+      Double_t qAllRefAll = -42.;
       if(My_AllRefAll) qAllRefAll = Double_t(RECO_AllRefAll)/Double_t(My_AllRefAll)*1.;
 
-      Double_t qExtraRefFast;
+      Double_t qExtraRefFast = -42.;
       if(My_ExtraRefFast) qExtraRefFast = Double_t(RECO_ExtraRefFast)/Double_t(My_ExtraRefFast)*1.;
 
-      Double_t qExtraRefSlow;
+      Double_t qExtraRefSlow = -42.;
       if(My_ExtraRefSlow) qExtraRefSlow = Double_t(RECO_ExtraRefSlow)/Double_t(My_ExtraRefSlow)*1.;
 
-      Double_t qExtraRefAll;
+      Double_t qExtraRefAll = -42.;
       if(My_ExtraRefAll) qExtraRefAll = Double_t(RECO_ExtraRefAll)/Double_t(My_ExtraRefAll)*1.;
     
-      Double_t qClonesPrimFast;
+      Double_t qClonesPrimFast = -42.;
       if(MC_PrimaryRefFast) qClonesPrimFast = Double_t(clonePrimaryFast)/Double_t(MC_PrimaryRefFast)*1.;
 
-      Double_t qClonesPrimSlow;
+      Double_t qClonesPrimSlow = -42.;
       if(MC_PrimaryRefSlow) qClonesPrimSlow = Double_t(clonePrimarySlow)/Double_t(MC_PrimaryRefSlow)*1.;
 
-      Double_t qClonesFast;
+      Double_t qClonesFast = -42.;
       if(My_AllRefFast) qClonesFast = Double_t(cloneExtraFast+clonePrimaryFast)/Double_t(My_AllRefFast)*1.;
 
-      Double_t qClonesSlow; 
+      Double_t qClonesSlow = -42.; 
       if(My_AllRefSlow) qClonesSlow = Double_t(cloneExtraSlow+clonePrimarySlow)/Double_t(My_AllRefSlow)*1.;
 
-      Double_t qExtraClonesFast;
+      Double_t qExtraClonesFast = -42.;
       if(My_ExtraRefFast) qExtraClonesFast = Double_t(cloneExtraFast)/Double_t(My_ExtraRefFast)*1.;
 
-      Double_t qExtraClonesSlow;
+      Double_t qExtraClonesSlow = -42.;
       if(My_ExtraRefSlow) qExtraClonesSlow = Double_t(cloneExtraSlow)/Double_t(My_ExtraRefSlow)*1.;
 
 
@@ -1136,52 +1137,52 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     //-----------------------------------------
   
     Double_t qTotPrimaryRefFast = Double_t(RECO_Tot_PrimaryRefFast)/Double_t(MC_Tot_PrimaryRefFast)*100;
-    Double_t qTotPrimaryRefSlow;
+    Double_t qTotPrimaryRefSlow = -42.;
     if(MC_Tot_PrimaryRefSlow) qTotPrimaryRefSlow = Double_t(RECO_Tot_PrimaryRefSlow)/Double_t(MC_Tot_PrimaryRefSlow)*100;
 
     Double_t qTotPrimaryRefAll = Double_t(RECO_Tot_PrimaryRefAll)/Double_t(MC_Tot_PrimaryRefAll)*100;
 
     Double_t qTotAllRefFast = Double_t(RECO_Tot_AllRefFast)/Double_t(MC_Tot_AllRefFast)*100;
 
-    Double_t qTotAllRefSlow;    
+    Double_t qTotAllRefSlow = -42.;    
     if(MC_Tot_AllRefSlow) qTotAllRefSlow = Double_t(RECO_Tot_AllRefSlow)/Double_t(MC_Tot_AllRefSlow)*100;
 
-    Double_t qTotAllRefAll;
+    Double_t qTotAllRefAll = -42.;
     if(MC_Tot_AllRefAll) qTotAllRefAll = Double_t(RECO_Tot_AllRefAll)/Double_t(MC_Tot_AllRefAll)*100;    
 
-    Double_t qTotExtraRefFast;
+    Double_t qTotExtraRefFast = -42.;
     if(MC_Tot_ExtraRefFast) qTotExtraRefFast = Double_t(RECO_Tot_ExtraRefFast)/Double_t(MC_Tot_ExtraRefFast)*100;
 
-    Double_t qTotExtraRefSlow;
+    Double_t qTotExtraRefSlow = -42.;
     if(MC_Tot_ExtraRefSlow) qTotExtraRefSlow = Double_t(RECO_Tot_ExtraRefSlow)/Double_t(MC_Tot_ExtraRefSlow)*100;
 
-    Double_t qTotExtraRefAll;
+    Double_t qTotExtraRefAll = -42.;
     if(MC_Tot_ExtraRefAll) qTotExtraRefAll = Double_t(RECO_Tot_ExtraRefAll)/Double_t(MC_Tot_ExtraRefAll)*100;
 
-    Double_t qTotClones;
+    Double_t qTotClones = -42.;
     if(MC_Tot_AllRefAll) qTotClones = Double_t(NO_TOTAL_CLONE_TRACKS)/Double_t(MC_Tot_AllRefAll)*100;
 
-    Double_t qTotGhosts;
+    Double_t qTotGhosts = -42;
     if(NO_TOTAL_RECO_TRACKS) qTotGhosts = Double_t(NO_TOTAL_GHOST_TRACKS)/Double_t(NO_TOTAL_RECO_TRACKS)*100;
 
-    Double_t qTotClonesPrimFast;
+    Double_t qTotClonesPrimFast = -42.;
     if(MC_Tot_PrimaryRefFast) qTotClonesPrimFast = Double_t(NO_TOTAL_CLONES_PRIM_FAST)/Double_t(MC_Tot_PrimaryRefFast)*100;
 
 
-    Double_t qTotClonesPrimSlow;
+    Double_t qTotClonesPrimSlow = -42.;
     if(MC_Tot_PrimaryRefSlow) qTotClonesPrimSlow = Double_t(NO_TOTAL_CLONES_PRIM_SLOW)/Double_t(MC_Tot_PrimaryRefSlow)*100;
 
-    Double_t qTotExtraClonesFast;
+    Double_t qTotExtraClonesFast = -42.;
     if(MC_Tot_AllRefFast) qTotExtraClonesFast = Double_t(NO_TOTAL_CLONES_FAST)/Double_t(MC_Tot_AllRefFast)*100;
 
-    Double_t qTotExtraClonesSlow;
+    Double_t qTotExtraClonesSlow = -42.;
     if(MC_Tot_AllRefSlow) qTotExtraClonesSlow = Double_t(NO_TOTAL_CLONES_SLOW)/Double_t(MC_Tot_AllRefSlow)*100;
 
-    Double_t qTotClonesFast;
+    Double_t qTotClonesFast = -42.;
     if(MC_Tot_AllRefFast) qTotClonesFast = Double_t(NO_TOTAL_CLONES_FAST+NO_TOTAL_CLONES_PRIM_FAST)/Double_t(MC_Tot_AllRefFast)*100;
 
 
-    Double_t qTotClonesSlow;
+    Double_t qTotClonesSlow = -42.;
     if(MC_Tot_AllRefSlow) qTotClonesSlow = Double_t(NO_TOTAL_CLONES_SLOW+NO_TOTAL_CLONES_PRIM_SLOW)/Double_t(MC_Tot_AllRefSlow)*100;
 
 

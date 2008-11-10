@@ -3,38 +3,34 @@
 // -----                  Created 25/09/06  by M. Krauze               -----
 // -------------------------------------------------------------------------
 
-
-#include "iostream"
-
-#include "TClonesArray.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TMath.h"
+#include "CbmTrdTestEventsWithMom.h"
 
 #include "CbmMCPoint.h"
 #include "CbmTrdPoint.h"
 #include "CbmRootManager.h"
 #include "CbmTrdHit.h"
-#include "CbmTrdTestEventsWithMom.h"
 #include "CbmTrdTrack.h"
 #include "CbmTrdTrackMatch.h"
 #include "CbmMCTrack.h"
 #include "CbmTrackParam.h"
-
 #include "CbmVertex.h"
 #include "CbmTrackParam.h"
-
 #include "CbmKF.h"
 #include "CbmKFTrdHit.h"
-
-#include "TRandom.h"
-
-#include <CbmRuntimeDb.h>
-#include <CbmRunAna.h>
-
-//28.04.2008 added section
 #include "CbmGeoTrdPar.h"
 #include "CbmGeoNode.h"
+#include "CbmRuntimeDb.h"
+#include "CbmRunAna.h"
+
+#include "TRandom.h"
+#include "TClonesArray.h"
+#include "TH1F.h"
+#include "TH2F.h"
+#include "TMath.h"
+
+
+#include <iostream>
+
 
 
 using namespace std;
@@ -485,8 +481,8 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
   Bool_t
     signature = false;
 
-  Double_t
-    invMassVal = 0;
+  //  Double_t
+  //    invMassVal = 0;
 
 
   Double_t 
@@ -722,7 +718,7 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
       Double_t qp;
       qp = v_track2.GetQp();
       if(qp != 0) {
-	recoCharge = (Int_t)(qp/abs(qp));
+	recoCharge = (Int_t)(qp/fabs(qp));
       } else recoCharge = 0;
       charge = recoCharge;
       
@@ -987,10 +983,10 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
 
       
 
-      Double_t x1 = trdTr1->GetParamFirst()->GetX();
+      //      Double_t x1 = trdTr1->GetParamFirst()->GetX();
       Double_t y1 = trdTr1->GetParamFirst()->GetY();
       Double_t z1 = trdTr1->GetParamFirst()->GetZ();
-      Double_t tx = trdTr1->GetParamFirst()->GetTx();
+      //Double_t tx = trdTr1->GetParamFirst()->GetTx();
       Double_t ty = trdTr1->GetParamFirst()->GetTy();
 
       //      Double_t x0 = x1 - tx*z1;
@@ -2053,9 +2049,8 @@ void CbmTrdTestEventsWithMom::ShowMCDistance() {
     *trdPt1,
     *trdPt12;
 
-  Int_t
-    trackID1,
-    trackID12;
+  Int_t trackID1 = -42;
+  Int_t trackID12 = -42;
 
   vector <Int_t> v1;
   vector <Int_t>::iterator iv1;

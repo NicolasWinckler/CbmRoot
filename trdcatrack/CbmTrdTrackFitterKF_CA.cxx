@@ -6,6 +6,7 @@
 
 #include "CbmKFTrack.h"
 #include "CbmKFTrdHit.h"
+#include "CbmKFVertex.h"
 
 #include "CbmRootManager.h"
 #include "CbmTrdHit.h"
@@ -13,19 +14,15 @@
 
 #include "TClonesArray.h"
 
-//section added 28.04.2008 by Maciej Krauze
-#include "CbmTrdTrackFitterKF_CA.h"
-#include "CbmKFVertex.h"
-//end of added section
-
-
 #include <iostream>
 #include <vector>
+#include "math.h"
 
 using std::cout;
 using std::endl;
 using std::vector;
-
+//using std::sqrt;
+//using std::finite;
 //________________________________________________________________________
 //
 // CbmTrdTrackFitterKF_CA

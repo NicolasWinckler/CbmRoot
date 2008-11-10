@@ -17,10 +17,11 @@
 #ifndef CBMTRDMATCHTRACKSMK_H
 #define CBMTRDMATCHTRACKSMK_H 1
 
-#include "map"
 #include "CbmTask.h"
 
-using namespace std;
+#include <map>
+
+using std::map;
 
 class TClonesArray;
 class TH1F;

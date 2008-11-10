@@ -38,7 +38,7 @@
 #include "../include/dataRootObjectWarningMsg.h"
 #include "../include/peakfindingGeometry.h"
 #include <list>
-
+#include <cmath>
 
 #define RELATIVERANGE 2
 

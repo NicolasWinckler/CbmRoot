@@ -44,7 +44,7 @@ DataObjectLIB/src/lutDefinition.cxx
 DataObjectLIB/src/lutHoughBorder.cxx 
 DataObjectLIB/src/magneticFieldValue.cxx
 DataObjectLIB/src/peakfindingGeometryElement.cxx
-DataObjectLIB/src/peakfindingGeometryFile.cxx 
+#DataObjectLIB/src/peakfindingGeometryFile.cxx 
 DataObjectLIB/src/peakToTrack.cxx 
 #DataObjectLIB/src/prelutAccessFile.cxx 
 DataObjectLIB/src/prelutDefinition.cxx 
@@ -72,7 +72,7 @@ DataRootObjectLIB/src/inputHitSpecialMem.cxx
 DataRootObjectLIB/src/inputHitStlList.cxx 
 DataRootObjectLIB/src/inputHitStlMem.cxx 
 DataRootObjectLIB/src/lutBorder.cxx 
-DataRootObjectLIB/src/peakfindingGeometry.cxx
+#DataRootObjectLIB/src/peakfindingGeometry.cxx
 DataRootObjectLIB/src/rungeKuttaInterface.cxx
 DataRootObjectLIB/src/rungeKuttaInvertedListEntry.cxx
 DataRootObjectLIB/src/rungeKuttaListEntry.cxx
@@ -201,7 +201,9 @@ DataObjectLIB/src/lutAccessFile.cxx
 DataObjectLIB/src/prelutAccessFile.cxx 
 DataObjectLIB/src/table.cxx 
 DataObjectLIB/src/tableFile.cxx 
+DataObjectLIB/src/peakfindingGeometryFile.cxx 
 DataRootObjectLIB/src/digitalHitAccessFile.cxx 
+DataRootObjectLIB/src/peakfindingGeometry.cxx
 LutGeneratorLIB/src/lutImplementation.cxx 
 LutGeneratorLIB/src/digitalHitAccess.cxx 
 LutGeneratorLIB/src/lutAccess.cxx 

@@ -110,33 +110,33 @@ protected:
  * @param statusSequence is an object to place the process information
  */
 
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, bool value, terminalSequence* statusSequence = NULL);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, char* value, terminalSequence* statusSequence = NULL);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, const char* value, terminalSequence* statusSequence = NULL);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, int value, terminalSequence* statusSequence = NULL, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned int value, terminalSequence* statusSequence = NULL, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, long value, terminalSequence* statusSequence = NULL, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned long value, terminalSequence* statusSequence = NULL, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, float value, terminalSequence* statusSequence = NULL);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, double value, terminalSequence* statusSequence = NULL);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, std::string& value, terminalSequence* statusSequence = NULL);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, bool value, char* comment, terminalSequence* statusSequence = NULL);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, char* value, char* comment, terminalSequence* statusSequence = NULL);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, const char* value, char* comment, terminalSequence* statusSequence = NULL);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, int value, char* comment, terminalSequence* statusSequence = NULL, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned int value, char* comment, terminalSequence* statusSequence = NULL, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, long value, char* comment, terminalSequence* statusSequence = NULL, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, unsigned long value, char* comment, terminalSequence* statusSequence = NULL, int radix = 10);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, float value, char* comment, terminalSequence* statusSequence = NULL);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, double value, char* comment, terminalSequence* statusSequence = NULL);
-	void setHeaderValue(std::ofstream& fileStream, char* specifier, std::string& value, char* comment, terminalSequence* statusSequence = NULL);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, bool value, terminalSequence* statusSequence = NULL);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value, terminalSequence* statusSequence = NULL);
+	//	void setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value, terminalSequence* statusSequence = NULL);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, int value, terminalSequence* statusSequence = NULL, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned int value, terminalSequence* statusSequence = NULL, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, long value, terminalSequence* statusSequence = NULL, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned long value, terminalSequence* statusSequence = NULL, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, float value, terminalSequence* statusSequence = NULL);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, double value, terminalSequence* statusSequence = NULL);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, std::string& value, terminalSequence* statusSequence = NULL);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, bool value, const char* comment, terminalSequence* statusSequence = NULL);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value, const char* comment, terminalSequence* statusSequence = NULL);
+	//	void setHeaderValue(std::ofstream& fileStream, const char* specifier, const char* value, const char* comment, terminalSequence* statusSequence = NULL);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, int value, const char* comment, terminalSequence* statusSequence = NULL, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned int value, const char* comment, terminalSequence* statusSequence = NULL, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, long value, const char* comment, terminalSequence* statusSequence = NULL, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, unsigned long value, const char* comment, terminalSequence* statusSequence = NULL, int radix = 10);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, float value, const char* comment, terminalSequence* statusSequence = NULL);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, double value, const char* comment, terminalSequence* statusSequence = NULL);
+	void setHeaderValue(std::ofstream& fileStream, const char* specifier, std::string& value, const char* comment, terminalSequence* statusSequence = NULL);
 
 /**
  * This methods writes a comment to an ofstream.
  */
 
 	void writeComment(std::ofstream& fileStream, std::string& comment);
-	void writeComment(std::ofstream& fileStream, char* comment);
+	void writeComment(std::ofstream& fileStream, const char* comment);
 
 /**
  * This method returns the number of accepted commands.

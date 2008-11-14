@@ -21,7 +21,8 @@ Float_t angle;
 
 Float_t zPMT,yPMT;	// z and y position photodetector plane
 Float_t dx,dy;		// x-y size of PMT plane
-Float_t anglePMT;	// angle photodetector plane
+Float_t anglePMTx;	// angle photodetector plane (tilt around x-axis)
+Float_t anglePMTy;	// angle photodetector plane (tilt around y-axis)
 Float_t dGlass;		// thickness glass window of PMT tubes (PMTglass)
 Float_t dCathode;	// thickness photocathode (CsI)
 Float_t lTube;		// length PMT tube (air for eff. thickness)
@@ -74,10 +75,10 @@ else{
    printf ("%6.2f %6.2f %s %6.2f %6.2f\n", radius, dMirror, mirror, yBeam, angle);
    fscanf (fin,"%s %s %s",dummy[1],dummy[2],dummy[3]);
    printf ("%s %s %s\n",dummy[1],dummy[2],dummy[3]);
-   fscanf (fin,"%s %s %s %s %s %s %s %s %s",dummy[1],dummy[2],dummy[3],dummy[4],dummy[5],dummy[6],dummy[7],dummy[8],dummy[9]);
-   printf ("%s %s %s %s %s %s %s %s %s\n",dummy[1],dummy[2],dummy[3],dummy[4],dummy[5],dummy[6],dummy[7],dummy[8],dummy[9]);
-   fscanf (fin,"%f %f %f %f %f %f %f %f %f", &zPMT, &yPMT, &dx, &dy, &anglePMT, &dGlass, &dCathode, &lTube, &dSupport);
-   printf ("%6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f\n", zPMT, yPMT, dx, dy, anglePMT, dGlass, dCathode, lTube, dSupport);
+   fscanf (fin,"%s %s %s %s %s %s %s %s %s %s",dummy[1],dummy[2],dummy[3],dummy[4],dummy[5],dummy[6],dummy[7],dummy[8],dummy[9],dummy[10]);
+   printf ("%s %s %s %s %s %s %s %s %s %s\n",dummy[1],dummy[2],dummy[3],dummy[4],dummy[5],dummy[6],dummy[7],dummy[8],dummy[9],dummy[10]);
+   fscanf (fin,"%f %f %f %f %f %f %f %f %f %f", &zPMT, &yPMT, &dx, &dy, &anglePMTx, &anglePMTy, &dGlass, &dCathode, &lTube, &dSupport);
+   printf ("%6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f\n", zPMT, yPMT, dx, dy, anglePMTx, anglePMTy, dGlass, dCathode, lTube, dSupport);
    printf("--------------------------------------------------------------\n");
    printf("\n");
    fclose(fin);
@@ -91,7 +92,7 @@ yM = (zBarrel+lRadiator+zPMT)*TMath::Tan(25./180.*TMath::Pi());
 xM = 1.5*yM;
 
 // size of RICH barrel (front part in x smaller by 800mm)
-yB = (zBarrel+lBarrel)*TMath::Tan(25./180.*TMath::Pi());
+yB = (zBarrel+lBarrel)*TMath::Tan(25./180.*TMath::Pi())+300.;
 if (yB < (yPMT+dy)) yB=(yPMT+dy)+100;
 xB2 = 1.5*yB;
 xB1 = xB2 - 800.;
@@ -377,7 +378,7 @@ fprintf(fout," %6.2f %6.2f\n",radius,radius+dMirror);
 fprintf(fout," %6.2f %6.2f\n",theta1,theta2);
 fprintf(fout," %6.2f %6.2f\n",phi1,phi2);
 fprintf(fout,"0. %6.2f %6.2f\n",yMC,zMC);
-fprintf(fout," 1. 0. 0. 0. %6.2f %6.2f 0. %6.2f %6.2f\n",TMath::Cos((90.+angle)/180.*TMath::Pi()), -TMath::Sin((90.+angle)/180.*TMath::Pi()), TMath::Sin((90.+angle)/180.*TMath::Pi()), TMath::Cos((90.+angle)/180.*TMath::Pi()));
+fprintf(fout," 1. 0. 0. 0. %6.4f %6.4f 0. %6.4f %6.4f\n",TMath::Cos((90.+angle)/180.*TMath::Pi()), -TMath::Sin((90.+angle)/180.*TMath::Pi()), TMath::Sin((90.+angle)/180.*TMath::Pi()), TMath::Cos((90.+angle)/180.*TMath::Pi()));
 fprintf(fout,"//-----------------------------------------------------------\n");
 fprintf(fout,"rich1mglLU#1\n");
 fprintf(fout,"rich1gas3\n");
@@ -387,7 +388,7 @@ fprintf(fout," %6.2f %6.2f\n",radius,radius+dMirror);
 fprintf(fout," %6.2f %6.2f\n",theta3,theta1);
 fprintf(fout," %6.2f %6.2f\n",phi4,phi2);
 fprintf(fout,"0. %6.2f %6.2f\n",yMC,zMC);
-fprintf(fout," 1. 0. 0. 0. %6.2f %6.2f 0. %6.2f %6.2f\n",TMath::Cos((90.+angle)/180.*TMath::Pi()), -TMath::Sin((90.+angle)/180.*TMath::Pi()), TMath::Sin((90.+angle)/180.*TMath::Pi()), TMath::Cos((90.+angle)/180.*TMath::Pi()));
+fprintf(fout," 1. 0. 0. 0. %6.4f %6.4f 0. %6.4f %6.4f\n",TMath::Cos((90.+angle)/180.*TMath::Pi()), -TMath::Sin((90.+angle)/180.*TMath::Pi()), TMath::Sin((90.+angle)/180.*TMath::Pi()), TMath::Cos((90.+angle)/180.*TMath::Pi()));
 fprintf(fout,"//-----------------------------------------------------------\n");
 fprintf(fout,"rich1mglRU#1\n");
 fprintf(fout,"rich1gas3\n");
@@ -397,22 +398,22 @@ fprintf(fout," %6.2f %6.2f\n",radius,radius+dMirror);
 fprintf(fout," %6.2f %6.2f\n",theta3,theta1);
 fprintf(fout," %6.2f %6.2f\n",phi1,phi3);
 fprintf(fout,"0. %6.2f %6.2f\n",yMC,zMC);
-fprintf(fout," 1. 0. 0. 0. %6.2f %6.2f 0. %6.2f %6.2f\n",TMath::Cos((90.+angle)/180.*TMath::Pi()), -TMath::Sin((90.+angle)/180.*TMath::Pi()), TMath::Sin((90.+angle)/180.*TMath::Pi()), TMath::Cos((90.+angle)/180.*TMath::Pi()));
+fprintf(fout," 1. 0. 0. 0. %6.4f %6.4f 0. %6.4f %6.4f\n",TMath::Cos((90.+angle)/180.*TMath::Pi()), -TMath::Sin((90.+angle)/180.*TMath::Pi()), TMath::Sin((90.+angle)/180.*TMath::Pi()), TMath::Cos((90.+angle)/180.*TMath::Pi()));
 fprintf(fout,"//-----------------------------------------------------------\n");
 fprintf(fout,"rich1mgl#2\n");
 fprintf(fout,"rich1gas3\n");
 fprintf(fout,"0. -%6.2f %6.2f\n",yMC,zMC);
-fprintf(fout," -1. 0. 0. 0. %6.2f %6.2f 0. %6.2f %6.2f\n",TMath::Cos((90.-angle)/180.*TMath::Pi()), TMath::Sin((90.-angle)/180.*TMath::Pi()), TMath::Sin((90.-angle)/180.*TMath::Pi()), -TMath::Cos((90.-angle)/180.*TMath::Pi()));
+fprintf(fout," -1. 0. 0. 0. %6.4f %6.4f 0. %6.4f %6.4f\n",TMath::Cos((90.-angle)/180.*TMath::Pi()), TMath::Sin((90.-angle)/180.*TMath::Pi()), TMath::Sin((90.-angle)/180.*TMath::Pi()), -TMath::Cos((90.-angle)/180.*TMath::Pi()));
 fprintf(fout,"//-----------------------------------------------------------\n");
 fprintf(fout,"rich1mglLU#2\n");
 fprintf(fout,"rich1gas3\n");
 fprintf(fout,"0. -%6.2f %6.2f\n",yMC,zMC);
-fprintf(fout," -1. 0. 0. 0. %6.2f %6.2f 0. %6.2f %6.2f\n",TMath::Cos((90.-angle)/180.*TMath::Pi()), TMath::Sin((90.-angle)/180.*TMath::Pi()), TMath::Sin((90.-angle)/180.*TMath::Pi()), -TMath::Cos((90.-angle)/180.*TMath::Pi()));
+fprintf(fout," -1. 0. 0. 0. %6.4f %6.4f 0. %6.4f %6.4f\n",TMath::Cos((90.-angle)/180.*TMath::Pi()), TMath::Sin((90.-angle)/180.*TMath::Pi()), TMath::Sin((90.-angle)/180.*TMath::Pi()), -TMath::Cos((90.-angle)/180.*TMath::Pi()));
 fprintf(fout,"//-----------------------------------------------------------\n");
 fprintf(fout,"rich1mglRU#2\n");
 fprintf(fout,"rich1gas3\n");
 fprintf(fout,"0. -%6.2f %6.2f\n",yMC,zMC);
-fprintf(fout," -1. 0. 0. 0. %6.2f %6.2f 0. %6.2f %6.2f\n",TMath::Cos((90.-angle)/180.*TMath::Pi()), TMath::Sin((90.-angle)/180.*TMath::Pi()), TMath::Sin((90.-angle)/180.*TMath::Pi()), -TMath::Cos((90.-angle)/180.*TMath::Pi()));
+fprintf(fout," -1. 0. 0. 0. %6.4f %6.4f 0. %6.4f %6.4f\n",TMath::Cos((90.-angle)/180.*TMath::Pi()), TMath::Sin((90.-angle)/180.*TMath::Pi()), TMath::Sin((90.-angle)/180.*TMath::Pi()), -TMath::Cos((90.-angle)/180.*TMath::Pi()));
 fprintf(fout," \n");
 fprintf(fout,"//-----------------------------------------------------------\n");
 fprintf(fout,"// photodetector\n");
@@ -422,48 +423,72 @@ fprintf(fout,"rich1dgl#1\n");
 fprintf(fout,"rich1gas1\n");
 fprintf(fout,"BOX\n");
 fprintf(fout,"PMTglass\n");
-fprintf(fout,"%6.2f  -%6.2f  %6.2f\n",dx,dy,-dGlass);
-fprintf(fout,"%6.2f   %6.2f  %6.2f\n",dx,dy,-dGlass);
-fprintf(fout,"-%6.2f   %6.2f  %6.2f\n",dx,dy,-dGlass);
-fprintf(fout,"-%6.2f  -%6.2f  %6.2f\n",dx,dy,-dGlass);
-fprintf(fout,"%6.2f  -%6.2f  0.\n",dx,dy);
-fprintf(fout,"%6.2f  %6.2f  0.\n",dx,dy);
-fprintf(fout,"-%6.2f  %6.2f  0.\n",dx,dy);
-fprintf(fout,"-%6.2f  -%6.2f  0.\n",dx,dy);
-fprintf(fout,"0. %6.2f %6.2f\n",yPMT,zPMT);
-fprintf(fout," 1. 0. 0. 0. %6.2f %6.2f 0. %6.2f %6.2f\n",TMath::Cos((anglePMT)/180.*TMath::Pi()), -TMath::Sin((anglePMT)/180.*TMath::Pi()), TMath::Sin((anglePMT)/180.*TMath::Pi()), TMath::Cos((anglePMT)/180.*TMath::Pi()));
+fprintf(fout,"%6.2f  -%6.2f  %6.2f\n",dx/2.,dy,-dGlass);
+fprintf(fout,"%6.2f   %6.2f  %6.2f\n",dx/2.,dy,-dGlass);
+fprintf(fout,"-%6.2f   %6.2f  %6.2f\n",dx/2.,dy,-dGlass);
+fprintf(fout,"-%6.2f  -%6.2f  %6.2f\n",dx/2.,dy,-dGlass);
+fprintf(fout," %6.2f -%6.2f  0.\n",dx/2.,dy);
+fprintf(fout," %6.2f %6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"-%6.2f  %6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"-%6.2f  -%6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"%6.2f %6.2f %6.2f\n",dx/2.,yPMT,zPMT);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()));
 fprintf(fout,"//-----------------------------------------------------------\n");
 }
 fprintf(fout,"rich1d#1\n");
 fprintf(fout,"rich1gas1\n");
 fprintf(fout,"BOX\n");
 fprintf(fout,"CsI\n");
-fprintf(fout,"%6.2f  -%6.2f  %6.2f\n",dx,dy,-dCathode);
-fprintf(fout,"%6.2f   %6.2f  %6.2f\n",dx,dy,-dCathode);
-fprintf(fout,"-%6.2f   %6.2f  %6.2f\n",dx,dy,-dCathode);
-fprintf(fout,"-%6.2f  -%6.2f  %6.2f\n",dx,dy,-dCathode);
-fprintf(fout,"%6.2f  -%6.2f  0.\n",dx,dy);
-fprintf(fout,"%6.2f  %6.2f  0.\n",dx,dy);
-fprintf(fout,"-%6.2f  %6.2f  0.\n",dx,dy);
-fprintf(fout,"-%6.2f  -%6.2f  0.\n",dx,dy);
-fprintf(fout,"0. %6.2f %6.2f\n",yPMT,zPMT-dGlass);
-fprintf(fout," 1. 0. 0. 0. %6.2f %6.2f 0. %6.2f %6.2f\n",TMath::Cos((anglePMT)/180.*TMath::Pi()), -TMath::Sin((anglePMT)/180.*TMath::Pi()), TMath::Sin((anglePMT)/180.*TMath::Pi()), TMath::Cos((anglePMT)/180.*TMath::Pi()));
-fprintf(fout,"//-----------------------------------------------------------\n");
+fprintf(fout,"%6.2f  -%6.2f  %6.2f\n",dx/2.,dy,-dCathode);
+fprintf(fout,"%6.2f   %6.2f  %6.2f\n",dx/2.,dy,-dCathode);
+fprintf(fout,"-%6.2f   %6.2f  %6.2f\n",dx/2.,dy,-dCathode);
+fprintf(fout,"-%6.2f  -%6.2f  %6.2f\n",dx/2.,dy,-dCathode);
+fprintf(fout,"%6.2f  -%6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"%6.2f  %6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"-%6.2f  %6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"-%6.2f  -%6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"%6.2f %6.2f %6.2f\n",dx/2.,yPMT,zPMT-dGlass);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()));
+ fprintf(fout,"//-----------------------------------------------------------\n");
 if (lTube > 0 ){
 fprintf(fout,"rich1dtube#1\n");
 fprintf(fout,"rich1gas1\n");
 fprintf(fout,"BOX\n");
 fprintf(fout,"air\n");
-fprintf(fout,"%6.2f  -%6.2f  %6.2f\n",dx,dy,-lTube);
-fprintf(fout,"%6.2f   %6.2f  %6.2f\n",dx,dy,-lTube);
-fprintf(fout,"-%6.2f   %6.2f  %6.2f\n",dx,dy,-lTube);
-fprintf(fout,"-%6.2f  -%6.2f  %6.2f\n",dx,dy,-lTube);
-fprintf(fout,"%6.2f  -%6.2f  0.\n",dx,dy);
-fprintf(fout,"%6.2f  %6.2f  0.\n",dx,dy);
-fprintf(fout,"-%6.2f  %6.2f  0.\n",dx,dy);
-fprintf(fout,"-%6.2f  -%6.2f  0.\n",dx,dy);
-fprintf(fout,"0. %6.2f %6.2f\n",yPMT,zPMT-dGlass-dCathode);
-fprintf(fout," 1. 0. 0. 0. %6.2f %6.2f 0. %6.2f %6.2f\n",TMath::Cos((anglePMT)/180.*TMath::Pi()), -TMath::Sin((anglePMT)/180.*TMath::Pi()), TMath::Sin((anglePMT)/180.*TMath::Pi()), TMath::Cos((anglePMT)/180.*TMath::Pi()));
+fprintf(fout,"%6.2f  -%6.2f  %6.2f\n",dx/2.,dy,-lTube);
+fprintf(fout,"%6.2f   %6.2f  %6.2f\n",dx/2.,dy,-lTube);
+fprintf(fout,"-%6.2f   %6.2f  %6.2f\n",dx/2.,dy,-lTube);
+fprintf(fout,"-%6.2f  -%6.2f  %6.2f\n",dx/2.,dy,-lTube);
+fprintf(fout,"%6.2f  -%6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"%6.2f  %6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"-%6.2f  %6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"-%6.2f  -%6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"%6.2f %6.2f %6.2f\n",dx/2.,yPMT,zPMT-dGlass-dCathode);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()));
 fprintf(fout,"//-----------------------------------------------------------\n");
 }
 if (dSupport > 0 ){
@@ -471,42 +496,198 @@ fprintf(fout,"rich1dsupport#1\n");
 fprintf(fout,"rich1gas1\n");
 fprintf(fout,"BOX\n");
 fprintf(fout,"aluminium\n");
-fprintf(fout,"%6.2f  -%6.2f  %6.2f\n",dx,dy,-dSupport);
-fprintf(fout,"%6.2f   %6.2f  %6.2f\n",dx,dy,-dSupport);
-fprintf(fout,"-%6.2f   %6.2f  %6.2f\n",dx,dy,-dSupport);
-fprintf(fout,"-%6.2f  -%6.2f  %6.2f\n",dx,dy,-dSupport);
-fprintf(fout,"%6.2f  -%6.2f  0.\n",dx,dy);
-fprintf(fout,"%6.2f  %6.2f  0.\n",dx,dy);
-fprintf(fout,"-%6.2f  %6.2f  0.\n",dx,dy);
-fprintf(fout,"-%6.2f  -%6.2f  0.\n",dx,dy);
-fprintf(fout,"0. %6.2f %6.2f\n",yPMT,zPMT-dGlass-dCathode-lTube);
-fprintf(fout," 1. 0. 0. 0. %6.2f %6.2f 0. %6.2f %6.2f\n",TMath::Cos((anglePMT)/180.*TMath::Pi()), -TMath::Sin((anglePMT)/180.*TMath::Pi()), TMath::Sin((anglePMT)/180.*TMath::Pi()), TMath::Cos((anglePMT)/180.*TMath::Pi()));
+fprintf(fout,"%6.2f  -%6.2f  %6.2f\n",dx/2.,dy,-dSupport);
+fprintf(fout,"%6.2f   %6.2f  %6.2f\n",dx/2.,dy,-dSupport);
+fprintf(fout,"-%6.2f   %6.2f  %6.2f\n",dx/2.,dy,-dSupport);
+fprintf(fout,"-%6.2f  -%6.2f  %6.2f\n",dx/2.,dy,-dSupport);
+fprintf(fout,"%6.2f  -%6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"%6.2f  %6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"-%6.2f  %6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"-%6.2f  -%6.2f  0.\n",dx/2.,dy);
+fprintf(fout,"%6.2f %6.2f %6.2f\n",dx/2.,yPMT,zPMT-dGlass-dCathode-lTube);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()));
 fprintf(fout,"//-----------------------------------------------------------\n");
 }
 if (dGlass > 0 ){
 fprintf(fout,"rich1dgl#2\n");
 fprintf(fout,"rich1gas1\n");
-fprintf(fout,"0. -%6.2f %6.2f\n",yPMT,zPMT);
-fprintf(fout," 1. 0. 0. 0. %6.2f %6.2f 0. %6.2f %6.2f\n",TMath::Cos((anglePMT)/180.*TMath::Pi()), TMath::Sin((anglePMT)/180.*TMath::Pi()), -TMath::Sin((anglePMT)/180.*TMath::Pi()), TMath::Cos((anglePMT)/180.*TMath::Pi()));
+fprintf(fout,"%6.2f -%6.2f %6.2f\n",dx/2.,yPMT,zPMT);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((-anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()));
 fprintf(fout,"//-----------------------------------------------------------\n");
 }
 fprintf(fout,"rich1d#2\n");
 fprintf(fout,"rich1gas1\n");
-fprintf(fout,"0. -%6.2f %6.2f\n",yPMT,zPMT-dGlass);
-fprintf(fout," 1. 0. 0. 0. %6.2f %6.2f 0. %6.2f %6.2f\n",TMath::Cos((anglePMT)/180.*TMath::Pi()), TMath::Sin((anglePMT)/180.*TMath::Pi()), -TMath::Sin((anglePMT)/180.*TMath::Pi()), TMath::Cos((anglePMT)/180.*TMath::Pi()));
+fprintf(fout,"%6.2f -%6.2f %6.2f\n",dx/2.,yPMT,zPMT-dGlass);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((-anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()));
 fprintf(fout,"//-----------------------------------------------------------\n");
 if (lTube > 0 ){
 fprintf(fout,"rich1dtube#2\n");
 fprintf(fout,"rich1gas1\n");
-fprintf(fout,"0. -%6.2f %6.2f\n",yPMT,zPMT-dGlass-dCathode);
-fprintf(fout," 1. 0. 0. 0. %6.2f %6.2f 0. %6.2f %6.2f\n",TMath::Cos((anglePMT)/180.*TMath::Pi()), TMath::Sin((anglePMT)/180.*TMath::Pi()), -TMath::Sin((anglePMT)/180.*TMath::Pi()), TMath::Cos((anglePMT)/180.*TMath::Pi()));
+fprintf(fout,"%6.2f -%6.2f %6.2f\n",dx/2.,yPMT,zPMT-dGlass-dCathode);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((-anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()));
 fprintf(fout,"//-----------------------------------------------------------\n");
 }
 if (dSupport > 0 ){
 fprintf(fout,"rich1dsupport#2\n");
 fprintf(fout,"rich1gas1\n");
-fprintf(fout,"0. -%6.2f %6.2f\n",yPMT,zPMT-dGlass-dCathode-lTube);
-fprintf(fout," 1. 0. 0. 0. %6.2f %6.2f 0. %6.2f %6.2f\n",TMath::Cos((anglePMT)/180.*TMath::Pi()), TMath::Sin((anglePMT)/180.*TMath::Pi()), -TMath::Sin((anglePMT)/180.*TMath::Pi()), TMath::Cos((anglePMT)/180.*TMath::Pi()));
+fprintf(fout,"%6.2f -%6.2f %6.2f\n",dx/2.,yPMT,zPMT-dGlass-dCathode-lTube);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((-anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((anglePMTy)/180.*TMath::Pi()));
+fprintf(fout,"//-----------------------------------------------------------\n");
+}
+if (dGlass > 0 ){
+fprintf(fout,"rich1dgl#3\n");
+fprintf(fout,"rich1gas1\n");
+fprintf(fout,"-%6.2f %6.2f %6.2f\n",dx/2.,yPMT,zPMT);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()));
+fprintf(fout,"//-----------------------------------------------------------\n");
+}
+fprintf(fout,"rich1d#3\n");
+fprintf(fout,"rich1gas1\n");
+fprintf(fout,"-%6.2f %6.2f %6.2f\n",dx/2.,yPMT,zPMT-dGlass);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()));
+fprintf(fout,"//-----------------------------------------------------------\n");
+if (lTube > 0 ){
+fprintf(fout,"rich1dtube#3\n");
+fprintf(fout,"rich1gas1\n");
+fprintf(fout,"-%6.2f %6.2f %6.2f\n",dx/2.,yPMT,zPMT-dGlass-dCathode);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()));
+fprintf(fout,"//-----------------------------------------------------------\n");
+}
+if (dSupport > 0 ){
+fprintf(fout,"rich1dsupport#3\n");
+fprintf(fout,"rich1gas1\n");
+fprintf(fout,"-%6.2f %6.2f %6.2f\n",dx/2.,yPMT,zPMT-dGlass-dCathode-lTube);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()));
+fprintf(fout,"//-----------------------------------------------------------\n");
+}
+if (dGlass > 0 ){
+fprintf(fout,"rich1dgl#4\n");
+fprintf(fout,"rich1gas1\n");
+fprintf(fout,"-%6.2f -%6.2f %6.2f\n",dx/2.,yPMT,zPMT);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((-anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()));
+fprintf(fout,"//-----------------------------------------------------------\n");
+}
+fprintf(fout,"rich1d#4\n");
+fprintf(fout,"rich1gas1\n");
+fprintf(fout,"-%6.2f -%6.2f %6.2f\n",dx/2.,yPMT,zPMT-dGlass);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((-anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()));
+fprintf(fout,"//-----------------------------------------------------------\n");
+if (lTube > 0 ){
+fprintf(fout,"rich1dtube#4\n");
+fprintf(fout,"rich1gas1\n");
+fprintf(fout,"-%6.2f -%6.2f %6.2f\n",dx/2.,yPMT,zPMT-dGlass-dCathode);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((-anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()));
+fprintf(fout,"//-----------------------------------------------------------\n");
+}
+if (dSupport > 0 ){
+fprintf(fout,"rich1dsupport#4\n");
+fprintf(fout,"rich1gas1\n");
+fprintf(fout,"-%6.2f -%6.2f %6.2f\n",dx/2.,yPMT,zPMT-dGlass-dCathode-lTube);
+fprintf(fout," %6.4f 0. %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n",
+ TMath::Cos((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTy)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi()), 
+ -TMath::Sin((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Sin((-anglePMTy)/180.*TMath::Pi()),
+ TMath::Sin((-anglePMTx)/180.*TMath::Pi()), 
+ TMath::Cos((-anglePMTx)/180.*TMath::Pi())*TMath::Cos((-anglePMTy)/180.*TMath::Pi()));
 fprintf(fout,"//-----------------------------------------------------------\n");
 }
 

@@ -53,6 +53,7 @@ void CbmKF::SetParContainers()
   CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
   rtdb->getContainer("CbmBaseParSet");
   rtdb->getContainer("CbmGeoPassivePar");
+  rtdb->getContainer("CbmMvdGeoPar");
   rtdb->getContainer("CbmGeoStsPar");
   rtdb->getContainer("CbmGeoTrdPar");
   rtdb->getContainer("CbmGeoRichPar");

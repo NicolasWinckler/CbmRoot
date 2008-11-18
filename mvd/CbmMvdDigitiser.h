@@ -1,0 +1,293 @@
+// -------------------------------------------------------------------------
+// -----                    CbmMvdDigitiser header file              -----
+// -----                   Created 08/11/06  by V. Friese              -----
+// -------------------------------------------------------------------------
+
+
+/** CbmMvdDigitiser header file
+ **
+ ** Task class for producing MvdHits from MvdPoints.
+ ** Mode = 0 : MAPS readout
+ ** Mode = 1 : Ideal (copy of MCPoint properties)
+ **
+ ** Former CbmStsMapsDigitiser (M.Deveaux, 02/02/05)
+ **
+ **/
+
+
+#ifndef CBMMVDDIGITISER_H
+#define CBMMVDDIGITISER_H 1
+
+#include "CbmTask.h"
+#include "CbmMvdPoint.h"
+#include "CbmMvdDigi.h"
+#include "MyG4UniversalFluctuationForSi.h"
+
+#include "TRandom3.h"
+#include "TStopwatch.h"
+#include "TString.h"
+#include "TMath.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TRefArray.h"
+#include "TObjArray.h"
+#include <vector>
+#include <list>
+#include <map>
+#include <utility>
+#include "CbmMvdPixelCharge.h"
+
+class TClonesArray;
+class TRandom3;
+class CbmMvdGeoPar;
+class CbmMvdPileupManager;
+
+using namespace std;
+
+
+class CbmMvdDigitiser : public CbmTask
+{
+ 
+ public:
+
+  /** Default constructor **/  
+  CbmMvdDigitiser();
+
+
+  /** Standard constructor 
+  *@param name  Task name
+  *@param mode  0 = MAPS, 1 = Ideal
+  **/
+  CbmMvdDigitiser(const char* name, 
+		    Int_t mode = 0, Int_t iVerbose = 1);
+
+
+  /** Destructor **/
+  virtual ~CbmMvdDigitiser();
+
+
+  /** Task execution **/
+  virtual void Exec(Option_t* opt);
+
+
+  /** Accessors **/
+  TString  GetBranchName()    const { return fBranchName; };
+
+
+  /** Added by CDritsa **/
+
+  void ProduceIonisationPoints(CbmMvdPoint* MCpoint);
+  void ProduceSignalPoints();
+  //void FromLabToDetector(CbmMvdPoint* point, Double_t& InDet, Double_t& OutDet );
+  void ProducePixelCharge();
+  void TransformXYtoPixelIndex(Double_t x, Double_t y,Int_t & ix, Int_t & iy);
+  void TransformPixelIndexToXY(Int_t ix, Int_t iy, Double_t & x, Double_t & y );
+  void PositionWithinCell(Double_t x, Double_t y,  Int_t & ix, Int_t & iy, Double_t & xCell, Double_t & yCell);
+  void BuildEvent();
+  void AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t charge);
+
+  Double_t GetDetectorGeometry(CbmMvdPoint* point);
+
+  /** Modifiers **/
+  void SetEpiThickness(Double_t epiTh)              { fEpiTh = epiTh;                     }
+  void SetSegmentLength(Double_t segmentLength)     { fSegmentLength = segmentLength;     }
+  void SetDiffusionCoef(Double_t diffCoeff)         { fDiffusionCoefficient = diffCoeff;  }
+  void SetElectronsPerKeV(Double_t electronsPerKeV) { fElectronsPerKeV = electronsPerKeV; }
+  void SetWidthOfCluster(Double_t widthOfCluster)   { fWidthOfCluster = widthOfCluster;   }
+  void SetPixelSizeX(Double_t pixelSizeX)           { fPixelSizeX = pixelSizeX;           }
+  void SetPixelSizeY(Double_t pixelSizeY)           { fPixelSizeY = pixelSizeY;           }
+  void SetCutOnDeltaRays(Double_t cutOnDeltaRays)   { fCutOnDeltaRays = cutOnDeltaRays;   }
+  void SetChargeThreshold(Double_t chargeThreshold) { fChargeThreshold = chargeThreshold; }
+  void SetMvdGeometry(Int_t detId);
+  void SetPileUp(Int_t pileUp)           { fNPileup         = pileUp;      }
+  void SetDeltaEvents(Int_t deltaEvents) { fNDeltaElect     = deltaEvents; }
+  void SetBgFileName(TString fileName)   { fBgFileName      = fileName;    }
+  void SetDeltaName(TString fileName)    { fDeltaFileName   = fileName;    }
+  void SetBgBufferSize(Int_t nBuffer)    { fBgBufferSize    = nBuffer;     }
+  void SetDeltaBufferSize(Int_t nBuffer) { fDeltaBufferSize = nBuffer;     }
+
+
+
+//protected:
+public:
+
+    // ----------   Protected data members  ------------------------------------
+
+    Double_t fEpiTh;
+    Double_t fSegmentLength;
+
+    Double_t fDiffusionCoefficient;
+    Double_t fElectronsPerKeV;
+    Double_t fWidthOfCluster;
+    Double_t fPixelSizeX;
+    Double_t fPixelSizeY;
+    Double_t fCutOnDeltaRays;
+    Double_t fChargeThreshold;
+    Double_t fFanoSilicium;
+   
+    //Double_t fLayerLadderLength;
+    //Double_t fLayerLadderHalfWidth;
+    //Double_t fLayerActiveSiOffset;
+   
+
+    Double_t fLayerTh;
+    Double_t fLayerRadius;
+    Double_t fLayerRadiusInner;
+    Double_t fLayerPosZ;
+
+    Double_t fEsum;
+    Double_t fSegmentDepth;
+    Double_t fCurrentTotalCharge;
+    Double_t fCurrentParticleMass;
+    Double_t fCurrentParticleMomentum;
+    /*
+    Double_t fXin_local;
+    Double_t fYin_local;
+    Double_t fZin_local;
+    Double_t fXout_local;
+    Double_t fYout_local;
+    Double_t fZout_local;
+    */
+
+
+
+    Int_t fNumberOfSegments;
+    Int_t fCurrentLayer;
+    Int_t fEvent;
+    Int_t fVolumeId;
+
+    MyG4UniversalFluctuationForSi * fFluctuate;
+
+    TClonesArray* fDigis;
+    TClonesArray* fMCTracks;
+    TClonesArray* fPixelCharge;
+    TObjArray* fPixelScanAccelerator;
+    map<pair<Int_t, Int_t>, CbmMvdPixelCharge*> fChargeMap;
+    map<pair<Int_t, Int_t>, CbmMvdPixelCharge*>::iterator fChargeMapIt;
+
+
+
+    // std::map<Int_t,Double_t> fDigiMap;
+    // std::pair<Int_t, Int_t> fCellID;
+
+private:
+
+  /** Hit producer mode (0 = MAPS, 1 = Ideal) **/
+  Int_t fMode;
+
+
+  /** MAPS properties **/
+  Double_t fSigmaX, fSigmaY;   // MAPS resolution in cm
+  Double_t fEfficiency;        // MAPS detection efficiency
+  Double_t fMergeDist;         // Merging distance
+  Double_t fFakeRate;          // Fake hit rate
+  Int_t    fNPileup;           // Number of pile-up background events
+  Int_t    fNDeltaElect;       // Number of delta electron events
+  Int_t    fDeltaBufferSize;
+  Int_t    fBgBufferSize;
+
+  /** Map of MC Volume Id to station number **/
+  std::map<Int_t, Int_t> fStationMap;                  //!   
+ 
+  /** Map of station number to pair of (rmin, rmax) **/
+  std::map<Int_t, std::pair<Double_t, Double_t> > fRadiusMap;     //!
+
+
+  /** IO arrays **/
+  TString	fBranchName;     // Name of input branch (STSPoint)
+  TString       fBgFileName;     // Name of background (pileup) file 
+  TString       fDeltaFileName;  // Name of the file containing delta electrons
+  TClonesArray* fInputPoints;     // Array of MCPoints (input)
+  TRefArray* fPoints;            // Array of all MCPoints (including background files)
+
+
+  /** Random generator and Stopwatch **/
+  TRandom3   fRandGen; 
+  TStopwatch fTimer;
+  
+
+  /** Pileup manager **/
+  CbmMvdPileupManager* fPileupManager;
+  CbmMvdPileupManager* fDeltaManager;
+
+
+  /** Parameters **/
+  CbmMvdGeoPar*  fGeoPar;
+
+
+  /** Counters **/ 
+  Int_t    fNEvents;
+  Double_t fNPoints;
+  Double_t fNReal;
+  Double_t fNBg;
+  Double_t fNFake;
+  Double_t fNLost;
+  Double_t fNMerged;
+  Double_t fTime;
+  
+  // -----   Private methods   ---------------------------------------------
+
+  struct SignalPoint {
+      double x;
+      double y;
+      double z;
+      double sigmaX;
+      double sigmaY;
+      double charge;
+      double eloss;
+
+  };
+
+
+  typedef std::vector<SignalPoint> SignalPointVec;
+  
+  SignalPointVec fSignalPoints;
+
+
+  /** Set parameter containers **/
+  virtual void SetParContainers();
+  
+
+  /** Intialisation **/
+  virtual InitStatus Init();
+
+
+  /** Reinitialisation **/
+  virtual InitStatus ReInit();
+
+
+  /** Virtual method Finish **/
+  virtual void Finish();
+
+
+  /** Register the output arrays to the IOManager **/
+  void Register();
+
+
+  /** Clear the hit arrays **/
+  void Reset();	 
+
+
+  /** Print digitisation parameters **/
+  void PrintParameters();
+
+
+  /** Get digitisation parameters from database **/
+  Bool_t GetParameters() ;
+ 
+  /** Get MVD geometry parameters from database **/
+  Double_t GetMVDGeometry() ;
+ 
+
+  TH1F* h_trackLength;
+  TH1F* h_numSegments;
+  TH2F* h_LengthVsAngle;
+  TH2F* h_LengthVsEloss;
+  TH2F* h_ElossVsMomIn;
+
+  ClassDef(CbmMvdDigitiser,1);
+    
+};
+    
+    
+#endif   		     

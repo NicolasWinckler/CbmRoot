@@ -1,7 +1,7 @@
-/*  Description: This macro draw the histograms which
-    were create with CbmRichRingQa class.
+/*  Description: This macro draws the histograms which
+    were created by CbmRichRingQa class.
 
-    Author : Simeon Lebedev
+    Author : Semen Lebedev
     E-mail : S.Lebedev@gsi.de
 */
 
@@ -114,8 +114,8 @@ void draw_qa(){
 			"Efficiency, ring-track matching vs momentum;momentum, GeV;efficiency, %", 30, 0, 15);
     th3->Draw();   
 	
-    TCanvas *c6 = new TCanvas("CbmRichQa6","c6",1200,1000);    
-    fh_StartVertexXZ->Draw("COLZ");
+   // TCanvas *c6 = new TCanvas("CbmRichQa6","c6",1200,1000);    
+   // fh_StartVertexXZ->Draw("COLZ");
      
     TCanvas *c7 = new TCanvas("CbmRichQa7","c7",1200,1000); 
 	TH1D* thNofHits = divide_hist(fh_TrueFoundElRingsProjHitCutNofHits, fh_MCElRingsProjHitCutNofHits, 

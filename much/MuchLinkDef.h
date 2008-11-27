@@ -37,5 +37,6 @@
 #pragma link C++ class  CbmMuchTrack+;
 #pragma link C++ class  CbmMuchTrackFinder+;
 #pragma link C++ class  CbmMuchTrackMatch+;
+#pragma link C++ class  CbmMuchTrackFinderIdeal+;
 
 #endif

@@ -52,6 +52,7 @@ CbmMuchTask.cxx
 CbmMuchTrack.cxx 
 CbmMuchTrackFinder.cxx
 CbmMuchTrackMatch.cxx
+CbmMuchTrackFinderIdeal.cxx
 )
 
 if(RULE_CHECKER_FOUND)

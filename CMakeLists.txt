@@ -25,6 +25,9 @@ include(CheckCompiler)
 #Check the compiler and set the compile and link flags
 Check_Compiler()
 
+set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+
 # Check if the user wants to build the project in the source
 # directory
 CHECK_OUT_OF_SOURCE_BUILD()
@@ -80,6 +83,9 @@ SET(CBMROOT_LIBRARY_PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES}
     SUFFIX ".so"
 )
 
+SET(CBMLIBDIR ${CMAKE_BINARY_DIR}/lib)  
+SET(LD_LIBRARY_PATH  ${CBMLIBDIR} ${LD_LIBRARY_PATH})
+
 # Recurse into the given subdirectories.  This does not actually
 # cause another cmake executable to run.  The same process will walk through
 # the project's entire directory structure.
@@ -109,7 +115,8 @@ add_subdirectory (dilept)
 add_subdirectory (stt)
 add_subdirectory (geane)
 add_subdirectory (trackbase)
-#add_subdirectory (eventdisplay)
+add_subdirectory (eventdisplay)
+add_subdirectory (trdcatrack)
 #add_subdirectory (tutorials/Tutorial1/src)
 #add_subdirectory (tutorials/Tutorial2/src)
 

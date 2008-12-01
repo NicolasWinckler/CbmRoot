@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 ##################################################################
 # set the source and the build directory for ctest
 # change this directories to your needs
@@ -8,16 +7,12 @@
 # LINUX_FLAVOUR should be set to the distribution you are using
 # eg Debian, SuSe etc.
 # For example
-# export SIMPATH=/misc/cbmsoft/Debian3.1/new
-# export BUILDDIR=/misc/uhlig/test/mytest2/build_cbmroot
-# export SOURCEDIR=/misc/uhlig/test/mytest2/cbmroot
-# export LINUX_FLAVOUR=Debian
+#export LINUX_FLAVOUR=Etch32
+#export FAIRSOFT_VERSION=mar08
+#export SIMPATH=/misc/cbmsoft/${LINUX_FLAVOUR}/${FAIRSOFT_VERSION}/fairsoft
+#export BUILDDIR=/tmp/fairroot/build_cbm_${FAIRSOFT_VERSION}
+#export SOURCEDIR=/misc/uhlig/SVN/ctest/cbmroot
 ##################################################################
-export SIMPATH=
-export BUILDDIR=
-export SOURCEDIR=
-export LINUX_FLAVOUR=
-###################################################################
 
 if test  "x$SIMPATH" = "x" ; then
   echo ""                                                             
@@ -48,32 +43,21 @@ else
   COMPILER=$CXX;
   GCC_VERSION=$($CXX -dumpversion)
 fi
-export LABEL1=${LINUX_FLAVOUR}-$SYSTEM-$COMPILER$GCC_VERSION
+
+export LABEL1=${LINUX_FLAVOUR}-$SYSTEM-$COMPILER$GCC_VERSION-fairsoft_$FAIRSOFT_VERSION
 export LABEL=$(echo $LABEL1 | sed -e 's#/#_#g')
 export SITE=$(hostname -f)
+
+# get the number of processors
+export number_of_processors=$(cat /proc/cpuinfo | grep processor | wc -l)
 
 echo "************************"
 date
 echo "LABEL: " $LABEL
 echo "SITE: " $SITE
 echo "Model: " ${ctest_model}
+echo "Nr. of processes: " $number_of_processors
 echo "************************"
- 
 
-
-# run ctest to clear the build directory, update the project from svn 
-# and to create the config script for the project, submit results to
-# the server
-ctest -S $SOURCEDIR/CbmRoot_test1.cmake,${ctest_model} -V --VV --debug
-
-# runing the config script sets all needed environment variables
-. $BUILDDIR/config.sh
-
-# create directory where run macros store their output
-cd $BUILDDIR
-mkdir macro/run/data
-
-# update from svn, build makefiles, build libraries, run tests and submit
-# results to the server
 cd $SOURCEDIR
-ctest -S $SOURCEDIR/CbmRoot_test.cmake,${ctest_model}  -V --VV --debug
+ctest -S $SOURCEDIR/CbmRoot_test.cmake -V --VV 

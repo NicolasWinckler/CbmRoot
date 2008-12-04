@@ -33,8 +33,9 @@ class CbmMvdPoint : public CbmMCPoint
 
 
   /** Constructor with arguments
-   *@param trackID  Index of MCTrack
-   *@param detID    Detector ID
+   *@param trackId  Index of MCTrack
+   *@param pdgCode  Particle type (PDG code)
+   *@param detId    Detector ID
    *@param posIn    Ccoordinates at entrance to active volume [cm]
    *@param posOut   Coordinates at exit of active volume [cm]
    *@param momIn    Momentum of track at entrance [GeV]
@@ -43,7 +44,7 @@ class CbmMvdPoint : public CbmMCPoint
    *@param length   Track length since creation [cm]
    *@param eLoss    Energy deposit [GeV]
    **/
-  CbmMvdPoint(Int_t trackID, Int_t detID, TVector3 posIn, 
+  CbmMvdPoint(Int_t trackId, Int_t pdgCode, Int_t detId, TVector3 posIn, 
 	      TVector3 posOut, TVector3 momIn, TVector3 momOut,
 	      Double_t tof, Double_t length, Double_t eLoss);
 
@@ -63,6 +64,7 @@ class CbmMvdPoint : public CbmMCPoint
   Double_t GetPxOut() const { return fPx_out; }
   Double_t GetPyOut() const { return fPy_out; }
   Double_t GetPzOut() const { return fPz_out; }
+  Int_t GetPdgCode() const {return fPdgCode;}
   void PositionOut(TVector3& pos) { pos.SetXYZ(fX_out,fY_out,fZ_out); }
   void MomentumOut(TVector3& mom) { mom.SetXYZ(fPx_out,fPy_out,fPz_out); }
 
@@ -70,6 +72,8 @@ class CbmMvdPoint : public CbmMCPoint
   /** Modifiers **/
   void SetPositionOut(TVector3 pos);
   void SetMomentumOut(TVector3 mom);
+  void SetPdgCode(Int_t pdg){fPdgCode=pdg;}
+
 
 
   /** Output to screen **/
@@ -81,6 +85,7 @@ class CbmMvdPoint : public CbmMCPoint
 
   Double32_t fX_out,  fY_out,  fZ_out;
   Double32_t fPx_out, fPy_out, fPz_out;
+  Int_t      fPdgCode;
 
 
 

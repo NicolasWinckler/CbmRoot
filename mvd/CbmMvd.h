@@ -121,6 +121,7 @@ class CbmMvd : public CbmDetector
     /** Track information to be stored until the track leaves the
 	active volume. **/
     Int_t          fTrackID;           //!  track index
+    Int_t          fPdg;               //!  track particle type
     Int_t          fVolumeID;          //!  volume id
     TLorentzVector fPosIn, fPosOut;    //!  position
     TLorentzVector fMomIn, fMomOut;    //!  momentum
@@ -137,10 +138,10 @@ class CbmMvd : public CbmDetector
      **
      ** Adds a MvdPoint to the HitCollection
      **/
-    CbmMvdPoint* AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
-			TVector3 pos_out, TVector3 momIn, 
-			TVector3 momOut, Double_t time, 
-			Double_t length, Double_t eLoss);
+    CbmMvdPoint* AddHit(Int_t trackID, Int_t pdg, Int_t detID, 
+			TVector3 posIn, TVector3 pos_out, 
+			TVector3 momIn, TVector3 momOut, 
+			Double_t time, Double_t length, Double_t eLoss);
 
 
     /** Private method ResetParameters

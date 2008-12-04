@@ -79,6 +79,7 @@ Bool_t CbmMvd::ProcessHits(CbmVolume* vol) {
 
   // Store track parameters at entrance of sensitive volume
   if ( gMC->IsTrackEntering() ) {
+    fPdg    = gMC->TrackPid();
     fELoss  = 0.;
     fTime   = gMC->TrackTime() * 1.0e09;
     fLength = gMC->TrackLength();
@@ -98,7 +99,7 @@ Bool_t CbmMvd::ProcessHits(CbmVolume* vol) {
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
     if (fELoss == 0. ) return kFALSE;
-    AddHit(fTrackID, fVolumeID,
+    AddHit(fTrackID, fPdg, fVolumeID,
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
@@ -232,9 +233,9 @@ void CbmMvd::ConstructGeometry() {
 
 
 // -----   Private method AddHit   --------------------------------------------
-CbmMvdPoint* CbmMvd::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
-			    TVector3 posOut, TVector3 momIn, 
-			    TVector3 momOut, Double_t time, 
+CbmMvdPoint* CbmMvd::AddHit(Int_t trackID, Int_t pdg, Int_t detID, 
+			    TVector3 posIn, TVector3 posOut, 
+			    TVector3 momIn, TVector3 momOut, Double_t time, 
 			    Double_t length, Double_t eLoss) {
   TClonesArray& clref = *fCollection;
   Int_t size = clref.GetEntriesFast();
@@ -242,7 +243,7 @@ CbmMvdPoint* CbmMvd::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
     cout << "-I- CbmMvd: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
-  return new(clref[size]) CbmMvdPoint(trackID, detID, posIn, posOut,
+  return new(clref[size]) CbmMvdPoint(trackID, pdg, detID, posIn, posOut,
 				      momIn, momOut, time, length, eLoss);
 }
 // ----------------------------------------------------------------------------

@@ -18,7 +18,6 @@
 
 #include "TVector3.h"
 #include "CbmTrkHit.h"
-#include "CbmMuchGeoScheme.h"
 
 
 class CbmMuchHit : public CbmTrkHit
@@ -29,7 +28,7 @@ class CbmMuchHit : public CbmTrkHit
   /** Default constructor (not for use) **/
   CbmMuchHit();
 
-  CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dPos, 
+  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos, 
 	     Double_t dxy);
 
 
@@ -42,7 +41,7 @@ class CbmMuchHit : public CbmTrkHit
   *@param times      Time since event start [ns]
   *@param dTime     Time resolution [ns]
   **/
-  CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dPos, 
+  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos, 
 	     Double_t dxy, Int_t iDigi, Double_t* times,
 	     Double_t dTime);
 
@@ -53,7 +52,7 @@ class CbmMuchHit : public CbmTrkHit
   *@param dxy       Covariance of x and y
   *@param iCluster  Parent cluster index
   **/
-  CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dPos, 
+  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos, 
 	     Double_t dxy, Int_t iCluster);
 
 
@@ -65,24 +64,34 @@ class CbmMuchHit : public CbmTrkHit
 
 
   /** Accessors **/
-  Long64_t GetDetectorId()  const { return fDetectorID; }
-  Int_t    GetStationNr() const;
+
+  /** Gets system ID **/
+  inline Int_t    GetSystemId()
+    const { return ( fDetectorID & (15<<24) ) >> 24; }
+
+  /** Gets station number within the system **/
+  virtual Int_t    GetStationNr()          
+    const { return ( fDetectorID & (255<<16) ) >> 16; }
+
+  /** Gets sector number within the station **/
+  inline Int_t    GetSectorNr()
+    const { return ( fDetectorID & (32767<<1) ) >> 1; }
 
   /** Gets covariance in X and Y **/
-  Double_t GetCovXY() const  { return fCovXY; }
+  inline Double_t GetCovXY() const  { return fCovXY; }
   
   /** Gets index of the Digi corresponding to this hit **/
-  Int_t    GetDigi()  const  {  return fRefIndex; }
+  inline Int_t    GetDigi()  const  {  return fRefIndex; }
 
   /** Gets time since event start **/
-  Double_t GetTime(Int_t i)  { return fTime[i]; }
-  Double_t* GetTimes()       { return fTime;}
+  inline Double_t GetTime(Int_t i) const { return fTime[i]; }
+  inline Double_t* GetTimes() { return fTime;}
   /** Gets time resolution **/
-  Double_t GetDTime()        { return fDTime; }
+  inline Double_t GetDTime() const { return fDTime; }
 
-  Int_t GetCluster() const {return fCluster;}
+  inline Int_t GetCluster() const {return fCluster;}
 
-
+  void SetCluster(Int_t clus) { fCluster = clus; } //AZ
 
  private:
 

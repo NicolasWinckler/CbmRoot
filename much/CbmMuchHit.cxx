@@ -29,7 +29,7 @@ CbmMuchHit::CbmMuchHit() {
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchHit::CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,  
+CbmMuchHit::CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dpos,  
 		     Double_t covXY)
   : CbmTrkHit(detId, pos, dpos, covXY, -1) {
   fCluster = -1;
@@ -43,7 +43,7 @@ CbmMuchHit::CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchHit::CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,  
+CbmMuchHit::CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dpos,  
 		       Double_t covXY, Int_t iDigi, Double_t* times, 
 		       Double_t dTime)
   : CbmTrkHit(detId, pos, dpos, covXY, iDigi) {
@@ -58,7 +58,7 @@ CbmMuchHit::CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchHit::  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos, 
+CbmMuchHit::  CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dpos, 
 			 Double_t covXY, Int_t iCluster)
   : CbmTrkHit(detId, pos, dpos, covXY, -1) {
     fRefIndex = -1;
@@ -77,11 +77,20 @@ CbmMuchHit::~CbmMuchHit() { }
 void CbmMuchHit::Print(Option_t* opt) const {
   cout.precision(5);
   cout << "MuchHit at (" << fX << ", " << fY << ", " << fZ << ") cm, "
-       << "Station " << GetStationNr() << ", Sector " << GetSectorNr()
+       << "Station " << CbmMuchGeoScheme::GetStationIndex(fDetectorID) 
+       << ", Layer " << CbmMuchGeoScheme::GetLayerIndex(fDetectorID)
+       << ", Side " << CbmMuchGeoScheme::GetLayerSideIndex(fDetectorID) 
+       << ", Module " << CbmMuchGeoScheme::GetModuleIndex(fDetectorID)
+       << ", Sector " << CbmMuchGeoScheme::GetSectorIndex(fDetectorID) 
        << ", Digi " << fRefIndex << endl;
 }
 // -------------------------------------------------------------------------
 
 
+Int_t CbmMuchHit::GetStationNr() const{
+  CbmMuchGeoScheme* fGeoScheme = CbmMuchGeoScheme::Instance();
+  if (!fGeoScheme->IsInitialized()) Fatal("GetStationNr","CbmMuchGeoScheme not initialized");
+  return fGeoScheme->GetLayerSideNr(GetDetectorId());
+}
 
 ClassImp(CbmMuchHit)

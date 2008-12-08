@@ -40,6 +40,8 @@ CbmEcalRecoSimple.cxx CbmEcalClusterV1.cxx
 CbmEcalQualityCheck.cxx CbmEcalClusterFinderV1.cxx
 CbmEcalTrackImport.cxx CbmEcalCalibration.cxx
 CbmEcalParam.cxx CbmEcalRecoSlow.cxx CbmEcalMatching.cxx
+CbmEcalAnalysisPi0.cxx CbmEcalAnalysisPair.cxx
+CbmEcalAnalysisNeutron.cxx
 )
 
 SET(ECAL_SRCS ${ECAL_SRCS_RULECHECKER} CbmEcalInf.cxx)

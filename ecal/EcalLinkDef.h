@@ -49,5 +49,8 @@
 #pragma link C++ class  CbmEcalCalibration;
 #pragma link C++ class  CbmEcalParam+;
 #pragma link C++ class  CbmEcalMatching;
+#pragma link C++ class  CbmEcalAnalysisPi0;
+#pragma link C++ class  CbmEcalAnalysisPair;
+#pragma link C++ class  CbmEcalAnalysisNeutron;
 
 #endif

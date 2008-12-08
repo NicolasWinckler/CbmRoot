@@ -10,6 +10,7 @@
 class TClonesArray;
 class CbmEcalCell;
 class CbmEcalRecParticle;
+class TTree;
 
 class CbmEcalMatching : public CbmTask
 {
@@ -37,7 +38,9 @@ public:
 
   /** virtual destructor **/
   ~CbmEcalMatching();
-  
+
+  /** Set output to tree **/
+  void SetOutToTree(Bool_t totree=kFALSE) {fToTree=totree;}
 private:
   /** Form a precluster **/
   void FormPreCluster(CbmEcalRecParticle* p);
@@ -72,6 +75,32 @@ private:
 
   /** Current cell **/
   CbmEcalCell* fCell;			//!
+
+  /** Shoul write information to tree? **/
+  Bool_t fToTree;
+  /** An output tree **/
+  TTree* fTree;				//!
+  /** Init tree **/
+  void InitTree();
+  /** Number of corresponding MC track **/
+  Int_t fMCNum;
+  /** Reconstructed information **/
+  Double_t fPx;
+  Double_t fPy;
+  Double_t fPz;
+  Double_t fRE;
+  /** MC information **/
+  Double_t fMCPx;
+  Double_t fMCPy;
+  Double_t fMCPz;
+  Double_t fMCE;
+  Int_t fPDG;
+  /** Information about cluster **/
+  Double_t fChi2;
+  /** Number of maximums **/
+  Int_t fNM;
+  /** Number cells **/
+  Int_t fNC;
 
   ClassDef(CbmEcalMatching, 1)
 };

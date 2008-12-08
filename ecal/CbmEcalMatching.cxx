@@ -5,6 +5,7 @@
 
 #include "TClonesArray.h"
 #include "TMath.h"
+#include "TTree.h"
 
 #include "CbmEcalRecParticle.h"
 #include "CbmEcalPoint.h"
@@ -21,6 +22,7 @@ CbmEcalMatching::CbmEcalMatching(const char* name, const Int_t verbose)
 {
   fThreshold=0.8;
   fPhotonThr=0.95;
+  fTree=NULL;
 }
 
 
@@ -64,6 +66,7 @@ void CbmEcalMatching::Exec(Option_t* opt)
   Int_t i;
   Int_t n=fReco->GetEntriesFast();
   CbmEcalRecParticle* p;
+  if (fToTree) InitTree();
   for(i=0;i<n;i++)
   {
     p=(CbmEcalRecParticle*)fReco->At(i);
@@ -168,41 +171,49 @@ void CbmEcalMatching::Match(CbmEcalRecParticle* p)
     p->SetMCTrack(max_photon.first);
   else
     p->SetMCTrack(max.first);
-/*
-  cout << max.first << ":"<< max.second << "	" << max_photon.second << "	" << fClusterE << "	" << p->X() << "	" <<  p->Y() << "	" << p->E() << "	" << p->Cell()->GetCenterX() << "	" << p->Cell()->GetCenterY() << endl;
+  if (!fTree) return;
+  fMCNum=p->MCTrack();
+  tr=(CbmMCTrack*)fMCTracks->At(fMCNum);
+  fPx=p->Px();
+  fPy=p->Py();
+  fPz=p->Pz();
+  fRE=p->E();
+  fChi2=p->Cluster()->Chi2();
+  fNM=p->Cluster()->Maxs();
+  fNC=p->Cluster()->Size();
+  fPDG=tr->GetPdgCode();
+  fMCE=tr->GetEnergy();
+  fMCPx=tr->GetPx();
+  fMCPy=tr->GetPy();
+  fMCPz=tr->GetPz();
+  fTree->Fill();
+}
 
-  Int_t j;
-  Int_t n=fPoints->GetEntriesFast();
-  CbmEcalPoint* pt;
-  Int_t ii;
-
-  for(j=0;j<n;j++)
-  {
-    pt=(CbmEcalPoint*)fPoints->At(j);
-    if (pt->GetTrackID()==max.first)
-    {
-      cout << "->" << pt->GetX() << "	" << pt->GetY() << pt->GetTrackID() << endl;
-    }
-    if (TMath::Abs(pt->GetX()-p->X())<24&&TMath::Abs(pt->GetY()-p->Y())<24)
-    {
-      cout << "<> " << pt->GetX() << "	" << pt->GetY() << "	" << pt->GetPz();
-      ii=pt->GetTrackID();
-      while(ii>=0)
-      {
-	cout << "	" << ii;
-	tr=(CbmMCTrack*)fMCTracks->At(ii);
-	ii=tr->GetMotherId();
-      }
-      cout << endl;
-    }
-  }
-*/
+/** Initialization of output tree **/
+void CbmEcalMatching::InitTree()
+{
+  if (fTree) return;
+  fTree=new TTree("ecal_matching","Ecal matching tree");
+  fTree->Branch("ev", &fEv, "ev/I");
+  fTree->Branch("mcn", &fMCNum, "mcn/I");
+  fTree->Branch("nm", &fNM, "nm/I");
+  fTree->Branch("nc", &fNC, "nc/I");
+  fTree->Branch("pdg", &fPDG, "PDG/I");
+  fTree->Branch("chi2", &fChi2, "chi2/D");
+  fTree->Branch("px", &fPx, "px/D");
+  fTree->Branch("py", &fPy, "py/D");
+  fTree->Branch("pz", &fPz, "pz/D");
+  fTree->Branch("e", &fRE, "e/D");
+  fTree->Branch("mcpx", &fMCPx, "mcpx/D");
+  fTree->Branch("mcpy", &fMCPy, "mcpy/D");
+  fTree->Branch("mcpz", &fMCPz, "mcpz/D");
+  fTree->Branch("mce", &fMCE, "mce/D");
 }
 
 /** Finish task **/
 void CbmEcalMatching::Finish()
 {
-  ;
+  if (fTree) fTree->Write();
 }
 
 /** virtual destructor **/

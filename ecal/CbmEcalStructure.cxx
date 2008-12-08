@@ -56,12 +56,10 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
-
 using std::cerr;
 using std::endl;
 using std::list;
 using std::vector;
-using std::fabs;
 
 class __CbmEcalCellWrapper
 {

@@ -215,7 +215,10 @@ void CbmEcalRecoSimple::Reco(CbmEcalCell* cell, CbmEcalClusterV1* clstr)
   fCellX=cell->GetCenterX();
   fCellY=cell->GetCenterY();
   
-  fPSE=cell->GetPSEnergy();
+//  fPSE=cell->GetPSEnergy();
+  fPSE=0;
+  for(p=cells.begin();p!=cells.end();++p)
+    fPSE+=(*p)->GetPSEnergy();
 
   if (fCal->GetERough(fE2x2)<0.3) return; 
   fEReco=fCal->GetEnergy(fE2x2+fPSE, cell);

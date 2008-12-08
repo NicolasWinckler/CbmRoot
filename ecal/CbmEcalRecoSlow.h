@@ -26,7 +26,7 @@ class TFormula;
 class FCNEcalCluster : public ROOT::Minuit2::FCNGradientBase
 {
 public:
-  FCNEcalCluster(CbmEcalCalibration* cal, CbmEcalShowerLib* shlib, TFormula* sigma, CbmEcalInf* inf)
+  FCNEcalCluster(CbmEcalCalibration* cal, CbmEcalShowerLib* shlib, TFormula** sigma, CbmEcalInf* inf)
     : fCal(cal), fShLib(shlib), fSigma(sigma), fInf(inf), fCluster(NULL), fEStep(1e-4), fCStep(1e-4), fErrorDef(1.0) {};
   
   CbmEcalClusterV1* GetCluster() const {return fCluster;}
@@ -51,6 +51,8 @@ public:
 
   virtual Double_t Up() const {return fErrorDef;}
   void SetErrorDef(Double_t errordef) {fErrorDef=errordef;}
+  void SetFixClusterEnergy(Int_t fix) {fFixClusterEnergy=fix;}
+  Double_t ClusterEnergy() const {return fClusterEnergy;}
 
   ~FCNEcalCluster() {};
 private:
@@ -59,7 +61,7 @@ private:
   /** A shower library **/
   CbmEcalShowerLib* fShLib;		//!
   /** A sigma formula **/
-  TFormula* fSigma;			//!
+  TFormula** fSigma;			//!
   /** Calorimeter information **/
   CbmEcalInf* fInf;			//!
   /** Calorimeter cluster **/
@@ -78,6 +80,8 @@ private:
   Int_t fN;
   /** Seed cells of cluster **/
   std::vector<CbmEcalCell*> fCells;	//!
+  /** Fix sum of energies of cluster particles to energy of cluster **/
+  Int_t fFixClusterEnergy;
 };
 
 class CbmEcalRecoSlow : public CbmTask
@@ -167,27 +171,38 @@ private:
   Double_t fCellX;
   Double_t fCellY;
   Double_t fChi2;
-  Double_t fTheta[20];
-  Short_t fTypes[20];
-  Double_t fEmeas[20];
-  Double_t fEpred[20];
-  Double_t fCX[20];
-  Double_t fCY[20];
+  Double_t fTheta[50];
+  Short_t fTypes[50];
+  Double_t fEmeas[50];
+  Double_t fEpred[50];
+  Double_t fChi2Fit[50];
+  Double_t fEfirst[50];
+  Double_t fChi2First[50];
+  Double_t fCX[50];
+  Double_t fCY[50];
+  Int_t fCMaxs;
 
   /** Constants used in reconstruction **/
   Double_t fC[10];
   /** Definition of sigma used for chi^2 calculation **/
-  TFormula* fSigma;		//!
+  TFormula* fSigma[10];		//!
   TString fParNames[14];	//!
-  TString fSigmaFormula;
+  TString fSigmaFormula[10];
   Int_t fParOffset;
-  /** A threshold for chi2. Is chi2<fChi2Th no fitting **/
+  /** A threshold for chi^2. Is chi^2<fChi2Th no fitting **/
   Double_t fChi2Th;
   Double_t fEStep;
   Double_t fCStep;
+  /** Maximum number of iterations in fitting process **/
   Int_t fMaxIterations;
+  /** Fix sum of energies of cluster particles to energy of cluster **/
+  Int_t fFixClusterEnergy;
+  /** A chi^2 and gradient function for cluster/particles **/
   FCNEcalCluster* fFCN;		//!
+  /** A fitter **/
   TFitterMinuit* fFitter;	//!
+  /** Minimum energy of precluster maximum for consideration **/
+  Double_t fMinMaxE;
 
   ClassDef(CbmEcalRecoSlow, 1)
 };

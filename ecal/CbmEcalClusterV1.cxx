@@ -79,15 +79,21 @@ void CbmEcalClusterV1::Init()
     if (p1!=neib.end()) continue;
     fPeaks.push_back(*p);
   }
-  /** Still not clear about next 3 variables **/
-  fMomentX=tx-fX*fX/fSize;
-  fMomentY=ty-fY*fY/fSize;
-  fMoment=tr-ar*ar/fSize;
   fX/=fEnergy;
   fY/=fEnergy;
   fType/=fSize;
   fMaxs=fPeaks.size();
   fChi2=-1111;
+  fMomentX=0; fMomentY=0; fMoment=0;
+  for(p=Begin();p!=End();++p)
+  {
+    /** Still not clear about next 3 variables **/
+    e=(*p)->GetTotalEnergy();
+    x=fX-(*p)->GetCenterX(); x*=x;
+    y=fY-(*p)->GetCenterY(); y*=y;
+    fMomentX+=x*e; fMomentY+=y*e; fMoment+=(x+y)*e;
+  }
+  fMomentX/=fEnergy; fMomentY/=fEnergy; fMoment/=fEnergy;
   fPhotons.clear();
 }
 

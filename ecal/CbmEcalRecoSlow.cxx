@@ -26,7 +26,7 @@ void FCNEcalCluster::SetCluster(CbmEcalClusterV1* cluster)
   fCluster=cluster;
   SetN(fCluster->Maxs());
   fClusterResp=fCluster->Energy();
-  fClusterEnergy=fCal->GetERough(fClusterResp);
+  fClusterEnergy=fCal->GetEnergy(fClusterResp, *(cluster->PeaksBegin()));
 }
 
 void FCNEcalCluster::SetN(Int_t n)
@@ -38,6 +38,7 @@ void FCNEcalCluster::SetN(Int_t n)
 vector<Double_t> FCNEcalCluster::Gradient(const vector<Double_t>& par) const
 {
   Int_t i;
+  Int_t j;
   static vector<Double_t> grad;
   static vector<Double_t> celle_gr;
 
@@ -61,6 +62,10 @@ vector<Double_t> FCNEcalCluster::Gradient(const vector<Double_t>& par) const
   Double_t cy;
   Double_t r;
   Double_t celle;
+  Double_t e[6];
+  Double_t dne[6];
+  Double_t g[6];
+  Double_t t;
   CbmEcalCell* cl;
   Int_t p;
   CbmEcalRecParticle* part;
@@ -72,12 +77,28 @@ vector<Double_t> FCNEcalCluster::Gradient(const vector<Double_t>& par) const
   Double_t sin4theta;
   Double_t chi2=0;
   Double_t emeas;
+  const Double_t cDN=0.0001;
 
 
   clenergy=fClusterEnergy;
 
   for(i=0;i<fN*3;i++)
     grad[i]=0;
+
+  if (fFixClusterEnergy==0)
+    for(i=0;i<fN;i++)
+      e[i]=par[3*i];
+   else
+   {
+     t=fClusterEnergy;
+     for(i=0;i<fN-1;i++)
+     {
+       e[i]=par[3*i+2]*t;
+       t-=e[i];
+       if (t<0) t=0;
+     }
+     e[i]=t;
+   }
 
   for(cell=fCluster->Begin();cell!=fCluster->End();++cell)
   {
@@ -87,8 +108,8 @@ vector<Double_t> FCNEcalCluster::Gradient(const vector<Double_t>& par) const
     for(i=0;i<fN;i++)
     {
       cl=fCells[i]; cx=cl->GetCenterX(); cy=cl->GetCenterY(); 
-      x=(*cell)->GetCenterX(); x-=par[3*i+1]; //part->X(); // x-=cx; 
-      y=(*cell)->GetCenterY(); y-=par[3*i+2]; //part->Y(); // y-=cy; 
+      x=(*cell)->GetCenterX(); x-=par[3*i+1-fFixClusterEnergy]; //part->X(); // x-=cx; 
+      y=(*cell)->GetCenterY(); y-=par[3*i+2-fFixClusterEnergy]; //part->Y(); // y-=cy; 
 
       r=TMath::Sqrt(cx*cx+cy*cy);
 
@@ -98,10 +119,10 @@ vector<Double_t> FCNEcalCluster::Gradient(const vector<Double_t>& par) const
       phi=TMath::ACos(cx/r)*TMath::RadToDeg();
       if (cy<0) phi=360.0-phi;
 
-      celle+=fShLib->GetSumEThetaPhi(x, y, cellsize, par[3*i], theta, phi);
-      celle_gr[i*3]=fShLib->GetGradE()*fEStep;
-      celle_gr[i*3+1]=-fShLib->GetGradX()*fCStep;
-      celle_gr[i*3+2]=-fShLib->GetGradX()*fCStep;
+      celle+=fShLib->GetSumEThetaPhi(x, y, cellsize, e[i], theta, phi);
+      celle_gr[i*3+2*fFixClusterEnergy]=fShLib->GetGradE()*fEStep;
+      celle_gr[i*3+1-fFixClusterEnergy]=-fShLib->GetGradX()*fCStep;
+      celle_gr[i*3+2-fFixClusterEnergy]=-fShLib->GetGradX()*fCStep;
     }
     cx=(*cell)->GetCenterX(); cy=(*cell)->GetCenterY();
     r=TMath::Sqrt(cx*cx+cy*cy);
@@ -110,11 +131,11 @@ vector<Double_t> FCNEcalCluster::Gradient(const vector<Double_t>& par) const
     epred=fCal->GetEnergy(celle, *cell);
     emeas=fCal->GetEnergy((*cell)->GetTotalEnergy(), *cell);
     {
-      fSigma->SetParameter(0, clenergy);	//Ecluster
-      fSigma->SetParameter(1, emeas);		//Emeas
-      fSigma->SetParameter(2, epred);		//Epred
-      fSigma->SetParameter(3, theta);		//Theta
-      cellerr=fSigma->Eval(0);
+      fSigma[type]->SetParameter(0, clenergy);	//Ecluster
+      fSigma[type]->SetParameter(1, emeas);		//Emeas
+      fSigma[type]->SetParameter(2, epred);		//Epred
+      fSigma[type]->SetParameter(3, theta);		//Theta
+      cellerr=fSigma[type]->Eval(0);
       de=fCal->GetEnergy(celle, *cell)-fCal->GetEnergy((*cell)->GetTotalEnergy(), *cell);
       de*=de; chi2+=de/cellerr;
     }
@@ -122,8 +143,8 @@ vector<Double_t> FCNEcalCluster::Gradient(const vector<Double_t>& par) const
     {
       celle_gr[i]+=celle;
       epred=fCal->GetEnergy(celle_gr[i], *cell);
-      fSigma->SetParameter(2, epred);		//Epred
-      cellerr=fSigma->Eval(0);
+      fSigma[type]->SetParameter(2, epred);		//Epred
+      cellerr=fSigma[type]->Eval(0);
       de=fCal->GetEnergy(celle, *cell)-fCal->GetEnergy((*cell)->GetTotalEnergy(), *cell);
       de*=de; grad[i]+=de/cellerr;
     }
@@ -134,11 +155,35 @@ vector<Double_t> FCNEcalCluster::Gradient(const vector<Double_t>& par) const
 
   for(i=0;i<fN;i++)
   {
-    grad[i*3]/=fEStep;
-    grad[i*3+1]/=fCStep;
-    grad[i*3+2]/=fCStep;
+    grad[i*3+2*fFixClusterEnergy]/=fEStep;
+    grad[i*3+1-fFixClusterEnergy]/=fCStep;
+    grad[i*3+2-fFixClusterEnergy]/=fCStep;
   }
 
+  if (fFixClusterEnergy==0)
+    return grad;
+  for(j=0;j<fN-1;j++)
+  {
+    t=fClusterEnergy;
+    for(i=0;i<fN-1;i++)
+    {
+      if (i!=j)
+        dne[i]=(par[3*i])*t;
+      else
+        dne[i]=(par[3*i]+cDN)*t;
+      t-=dne[i];
+      if (t<0) t=0;
+    }
+    dne[i]=t;
+    for(i=0;i<fN;i++)
+      dne[i]-=e[i];
+    for(i=0;i<fN;i++)
+      g[j]=grad[i*3+2]*dne[i];
+    g[j]/=cDN;
+  }
+  for(j=0;j<fN-1;j++)
+    grad[i*3+2]=g[j];
+  
   return grad;
 }
 
@@ -171,11 +216,28 @@ Double_t FCNEcalCluster::operator()(const vector<Double_t>& par) const
   Double_t epred;
   Double_t sin4theta;
   Double_t chi2=0;
+  Double_t e[6];
+  Double_t t;
   Double_t emeas;
 
 
   clenergy=fClusterEnergy;
 
+  if (fFixClusterEnergy==0)
+    for(i=0;i<fN;i++)
+      e[i]=par[3*i];
+   else
+   {
+     t=fClusterEnergy;
+     for(i=0;i<fN-1;i++)
+     {
+       e[i]=par[3*i+2]*t;
+       t-=e[i];
+       if (t<0) t=0;
+     }
+     e[i]=t;
+   }
+ 
   for(cell=fCluster->Begin();cell!=fCluster->End();++cell)
   {
     type=(*cell)->GetType();
@@ -184,8 +246,8 @@ Double_t FCNEcalCluster::operator()(const vector<Double_t>& par) const
     for(i=0;i<fN;i++)
     {
       cl=fCells[i]; cx=cl->GetCenterX(); cy=cl->GetCenterY(); 
-      x=(*cell)->GetCenterX(); x-=par[3*i+1]; //part->X(); // x-=cx; 
-      y=(*cell)->GetCenterY(); y-=par[3*i+2]; //part->Y(); // y-=cy; 
+      x=(*cell)->GetCenterX(); x-=par[3*i+1-fFixClusterEnergy]; //part->X(); // x-=cx; 
+      y=(*cell)->GetCenterY(); y-=par[3*i+2-fFixClusterEnergy]; //part->Y(); // y-=cy; 
 
       r=TMath::Sqrt(cx*cx+cy*cy);
 
@@ -195,7 +257,7 @@ Double_t FCNEcalCluster::operator()(const vector<Double_t>& par) const
       phi=TMath::ACos(cx/r)*TMath::RadToDeg();
       if (cy<0) phi=360.0-phi;
 
-      celle+=fShLib->GetSumEThetaPhi(x, y, cellsize, par[3*i], theta, phi);
+      celle+=fShLib->GetSumEThetaPhi(x, y, cellsize, e[i], theta, phi);
 //      celle+=fShLib->GetSumEThetaPhi(x, y, cellsize, part->E(), theta, phi);
     }
     cx=(*cell)->GetCenterX(); cy=(*cell)->GetCenterY();
@@ -205,11 +267,11 @@ Double_t FCNEcalCluster::operator()(const vector<Double_t>& par) const
     epred=fCal->GetEnergy(celle, *cell);
     emeas=fCal->GetEnergy((*cell)->GetTotalEnergy(), *cell);
     {
-      fSigma->SetParameter(0, clenergy);	//Ecluster
-      fSigma->SetParameter(1, emeas);		//Emeas
-      fSigma->SetParameter(2, epred);		//Epred
-      fSigma->SetParameter(3, theta);		//Theta
-      cellerr=fSigma->Eval(0);
+      fSigma[type]->SetParameter(0, clenergy);	//Ecluster
+      fSigma[type]->SetParameter(1, emeas);		//Emeas
+      fSigma[type]->SetParameter(2, epred);		//Epred
+      fSigma[type]->SetParameter(3, theta);		//Theta
+      cellerr=fSigma[type]->Eval(0);
       de=fCal->GetEnergy(celle, *cell)-fCal->GetEnergy((*cell)->GetTotalEnergy(), *cell);
       de*=de; chi2+=de/cellerr;
     }
@@ -241,7 +303,8 @@ void CbmEcalRecoSlow::Exec(Option_t* option)
     cluster=(CbmEcalClusterV1*)fClusters->At(i);
     p=cluster->PeaksBegin();
     for(;p!=cluster->PeaksEnd();++p)
-      Reco(*p, cluster);
+      if (fCal->GetEnergy((*p)->GetTotalEnergy(), *p)>fMinMaxE)
+        Reco(*p, cluster);
     chi2=CalculateChi2(cluster);
     if (chi2>fChi2Th)
       FitCluster(cluster);
@@ -273,14 +336,21 @@ void CbmEcalRecoSlow::WriteClusterInfo(CbmEcalClusterV1* clstr)
   CbmEcalCell* cl;
   Double_t cx;
   Double_t cy;
+  Double_t de;
+  Double_t epred;
+  Double_t emeas;
+  Double_t clenergy;
+  Double_t cellerr;
   static Double_t module=fInf->GetModuleSize();
 
   fECluster=fCal->GetEnergy(clstr->Energy(), *(clstr->PeaksBegin()));
+  clenergy=fECluster;
   for(p=clstr->Begin();p!=clstr->End();++p)
   {
     e[i++]=(*p)->GetTotalEnergy();
     if (i==3) break;
   }
+  fCMaxs=clstr->Maxs();
   fECls=e[0]/clstr->Energy();
   fE2Cls=(e[0]+e[1])/clstr->Energy();
   fE3Cls=(e[0]+e[1]+e[2])/clstr->Energy();
@@ -308,6 +378,20 @@ void CbmEcalRecoSlow::WriteClusterInfo(CbmEcalClusterV1* clstr)
 
       celle+=fShLib->GetSumEThetaPhi(x, y, cellsize, part->E(), theta, phi);
     }
+    de=fCal->GetEnergy(celle, *cell)-fCal->GetEnergy((*cell)->GetTotalEnergy(), *cell);
+    cx=(*cell)->GetCenterX(); cy=(*cell)->GetCenterY();
+    r=TMath::Sqrt(cx*cx+cy*cy);
+    theta=TMath::ATan(r/fInf->GetZPos());
+
+    epred=fCal->GetEnergy(celle, *cell);
+    emeas=fCal->GetEnergy((*cell)->GetTotalEnergy(), *cell);
+    fSigma[fTypes[i]]->SetParameter(0, fECluster);		//Ecluster
+    fSigma[fTypes[i]]->SetParameter(1, emeas);		//Emeas
+    fSigma[fTypes[i]]->SetParameter(2, epred);		//Epred
+    fSigma[fTypes[i]]->SetParameter(3, theta);		//Theta
+    cellerr=fSigma[fTypes[i]]->Eval(0);
+    de*=de; fChi2Fit[i]=de/cellerr;
+
     cx=(*cell)->GetCenterX(); cy=(*cell)->GetCenterY();
     r=TMath::Sqrt(cx*cx+cy*cy);
     fTheta[i]=TMath::ATan(r/fInf->GetZPos());
@@ -317,7 +401,7 @@ void CbmEcalRecoSlow::WriteClusterInfo(CbmEcalClusterV1* clstr)
     fCY[i]=(*cell)->GetCenterY();
     i++;
   }
-  for(j=i;j<20;j++)
+  for(j=i;j<50;j++)
     fTypes[j]=-1111;
 }
 
@@ -347,6 +431,8 @@ void CbmEcalRecoSlow::FitCluster(CbmEcalClusterV1* clstr)
   Int_t n=fN-fNOld;
   Int_t ret;
   Double_t oldchi2=clstr->Chi2();
+  Double_t e;
+  Double_t pe[6];
   CbmEcalRecParticle* p;
   TString par;
 
@@ -356,17 +442,44 @@ void CbmEcalRecoSlow::FitCluster(CbmEcalClusterV1* clstr)
     return;
   }
   fFCN->SetCluster(clstr);
+  /** The cluster it self  doesn't care about amplitude of maximums **/
+  fFCN->SetN(n);
   fFitter->Clear();
   fFitter->SetPrintLevel(-1);
   fFitter->SetMaxIterations(fMaxIterations);
-  for(i=0;i<n;i++)
+  if (fFixClusterEnergy==0)
+    for(i=0;i<n;i++)
+    {
+      p=(CbmEcalRecParticle*)fReco->At(i+fNOld);
+      cells[i]=p->Cell();
+      par="e"; par+=i; fFitter->SetParameter(i*3   ,par.Data(), p->E(), 0.01*p->E(), p->E()*0.2, p->E()*2.0);
+      par="x"; par+=i; fFitter->SetParameter(i*3+1 ,par.Data(), p->X(), 0.1 ,p->X()-24., p->X()+24.);
+      par="y"; par+=i; fFitter->SetParameter(i*3+2 ,par.Data(), p->Y(), 0.1 ,p->Y()-24., p->Y()+24.);
+    } else
   {
-    p=(CbmEcalRecParticle*)fReco->At(i+fNOld);
-    cells[i]=p->Cell();
-    par="e"; par+=i; fFitter->SetParameter(i*3   ,par.Data(), p->E(), 0.01*p->E(), p->E()*0.2, p->E()*2.0);
-    par="x"; par+=i; fFitter->SetParameter(i*3+1 ,par.Data(), p->X(), 0.1 ,p->X()-12., p->X()+12.);
-    par="y"; par+=i; fFitter->SetParameter(i*3+2 ,par.Data(), p->Y(), 0.1 ,p->Y()-12., p->Y()+12.);
+    e=0;
+    for(i=0;i<n;i++)
+    {
+      p=(CbmEcalRecParticle*)fReco->At(i+fNOld);
+      pe[i]=p->E(); e+=pe[i];
+    }
+    for(i=0;i<n;i++)
+    {
+      p=(CbmEcalRecParticle*)fReco->At(i+fNOld);
+      cells[i]=p->Cell();
+      par="x"; par+=i; fFitter->SetParameter(i*3 ,par.Data(), p->X(), 0.1 ,p->X()-24., p->X()+24.);
+      par="y"; par+=i; fFitter->SetParameter(i*3+1 ,par.Data(), p->Y(), 0.1 ,p->Y()-24., p->Y()+24.);
+      if (i!=n-1)
+      {
+        par="n";
+	par+=i;
+	fFitter->SetParameter(i*3+2 ,par.Data(), p->E()/e, 0.005, 0.0, 1.0);
+      }
+      e-=p->E();
+    }
+
   }
+
   fFCN->SetParticleSeeds(cells);
   fFitter->CreateMinimizer();
   ret=fFitter->Minimize();
@@ -385,12 +498,23 @@ void CbmEcalRecoSlow::FitCluster(CbmEcalClusterV1* clstr)
 
   clstr->fChi2=chi2;
 
+  e=fFCN->ClusterEnergy();
   for(i=0;i<n;i++)
   {
     p=(CbmEcalRecParticle*)fReco->At(i+fNOld);
-    p->fE=fFitter->GetParameter(i*3  );
-    p->fX=fFitter->GetParameter(i*3+1);
-    p->fY=fFitter->GetParameter(i*3+2);
+    p->fX=fFitter->GetParameter(i*3+1-fFixClusterEnergy);
+    p->fY=fFitter->GetParameter(i*3+2-fFixClusterEnergy);
+    if (fFixClusterEnergy)
+    {
+      if (i!=n-1)
+      {
+        p->fE=fFitter->GetParameter(i*3+2)*e;
+	e-=p->fE;
+      } else
+	p->fE=e;
+    }
+    else
+      p->fE=fFitter->GetParameter(i*3);
     p->fChi2=chi2;
   }
   
@@ -416,6 +540,7 @@ Double_t CbmEcalRecoSlow::CalculateChi2(CbmEcalClusterV1* cluster)
   Double_t celle;
   CbmEcalCell* cl;
   Int_t p;
+  Int_t i;
   CbmEcalRecParticle* part;
   Double_t clustere=0;
   Double_t clenergy;
@@ -429,8 +554,9 @@ Double_t CbmEcalRecoSlow::CalculateChi2(CbmEcalClusterV1* cluster)
 
   for(;cell!=cluster->End();++cell)
     clustere+=(*cell)->GetTotalEnergy();
-  clenergy=fCal->GetERough(clustere);
+  clenergy=fCal->GetEnergy(clustere, *(cluster->PeaksBegin()));
 
+  i=0;
   for(cell=cluster->Begin();cell!=cluster->End();++cell)
   {
     type=(*cell)->GetType();
@@ -461,19 +587,22 @@ Double_t CbmEcalRecoSlow::CalculateChi2(CbmEcalClusterV1* cluster)
 
     epred=fCal->GetEnergy(celle, *cell);
     emeas=fCal->GetEnergy((*cell)->GetTotalEnergy(), *cell);
+    fEfirst[i]=epred;
 //    if (epred>clenergy) epred=clenergy;
 //    if (celle>0)
     {
-      fSigma->SetParameter(0, clenergy);	//Ecluster
-      fSigma->SetParameter(1, emeas);		//Emeas
-      fSigma->SetParameter(2, epred);		//Epred
-      fSigma->SetParameter(3, theta);		//Theta
-      cellerr=fSigma->Eval(0);
+      fSigma[type]->SetParameter(0, clenergy);	//Ecluster
+      fSigma[type]->SetParameter(1, emeas);		//Emeas
+      fSigma[type]->SetParameter(2, epred);		//Epred
+      fSigma[type]->SetParameter(3, theta);		//Theta
+      cellerr=fSigma[type]->Eval(0);
       de=fCal->GetEnergy(celle, *cell)-fCal->GetEnergy((*cell)->GetTotalEnergy(), *cell);
 //      cout << "->" << celle << "	" << de << "	" << cellerr << endl;
 //      cellerr=1;
       de*=de; chi2+=de/cellerr;
+      fChi2First[i]=de/cellerr;
     }
+    i++;
   }
   chi2/=cluster->Size();
   for(p=fNOld;p<fN;p++)
@@ -517,23 +646,19 @@ void CbmEcalRecoSlow::Reco(CbmEcalCell* cell, CbmEcalClusterV1* clstr)
   {
     if (type!=(*p)->GetType())
     {
-      fAX=-1111;
-      fAY=-1111;
       type=-1111;
       fDiffType=1;
-    } else
-    {
-      if (cell->GetCenterX()+0.001<(*p)->GetCenterX())
-	fAX+=(*p)->GetEnergy();
-      else
-      if (cell->GetCenterX()-0.001>(*p)->GetCenterX())
-	fAX-=(*p)->GetEnergy();
-      if (cell->GetCenterY()+0.001<(*p)->GetCenterY())
-	fAY+=(*p)->GetEnergy();
-      else
-      if (cell->GetCenterY()-0.001>(*p)->GetCenterY())
-	fAY-=(*p)->GetEnergy();
     }
+    if (cell->GetX2()+0.001<(*p)->GetCenterX())
+      fAX+=(*p)->GetEnergy();
+    else
+    if (cell->GetX1()-0.001>(*p)->GetCenterX())
+      fAX-=(*p)->GetEnergy();
+    if (cell->GetY2()+0.001<(*p)->GetCenterY())
+      fAY+=(*p)->GetEnergy();
+    else
+    if (cell->GetY1()-0.001>(*p)->GetCenterY())
+      fAY-=(*p)->GetEnergy();
     en+=(*p)->GetEnergy();
   }
   fE3x3=en;
@@ -564,9 +689,12 @@ void CbmEcalRecoSlow::Reco(CbmEcalCell* cell, CbmEcalClusterV1* clstr)
   fCellX=cell->GetCenterX();
   fCellY=cell->GetCenterY();
   
-  fPSE=cell->GetPSEnergy();
+//  fPSE=cell->GetPSEnergy();
+  fPSE=0;
+  for(p=cells.begin();p!=cells.end();++p)
+    fPSE+=(*p)->GetPSEnergy();
 
-  if (fCal->GetERough(fE2x2)<0.3) return; 
+  if (fCal->GetEnergy(fE2x2+fPSE, cell)<0.1) return; 
   fEReco=fCal->GetEnergy(fE2x2+fPSE, cell);
   if (fAX!=-1111)
     fXReco=fLib->GetX(fAX, fEReco, cell);
@@ -613,12 +741,16 @@ void CbmEcalRecoSlow::CreateTree()
   fOutTree->Branch("cls_e", &fECls, "cls_e/D");
   fOutTree->Branch("cls_e2", &fE2Cls, "cls_e2/D");
   fOutTree->Branch("cls_e3", &fE3Cls, "cls_e3/D");
-  fOutTree->Branch("theta", fTheta, "theta[20]/D");
-  fOutTree->Branch("ctypes", fTypes, "ctypes[20]/S");
-  fOutTree->Branch("cemeas", fEmeas, "cemeas[20]/D");
-  fOutTree->Branch("cepred", fEpred, "cepred[20]/D");
-  fOutTree->Branch("cx", fCX, "cx[20]/D");
-  fOutTree->Branch("cy", fCY, "cy[20]/D");
+  fOutTree->Branch("theta", fTheta, "theta[50]/D");
+  fOutTree->Branch("ctypes", fTypes, "ctypes[50]/S");
+  fOutTree->Branch("cemeas", fEmeas, "cemeas[50]/D");
+  fOutTree->Branch("cepred", fEpred, "cepred[50]/D");
+  fOutTree->Branch("cchi2", fChi2Fit, "cchi2[50]/D");
+  fOutTree->Branch("cefirst", fEfirst, "cefirst[50]/D");
+  fOutTree->Branch("cchi2first", fChi2First, "cchi2first[50]/D");
+  fOutTree->Branch("cx", fCX, "cx[50]/D");
+  fOutTree->Branch("cy", fCY, "cy[50]/D");
+  fOutTree->Branch("cmaxs", &fCMaxs, "cmaxs/I");
 }
 
 /** Default constructor. Requirement of ROOT system **/
@@ -640,6 +772,9 @@ CbmEcalRecoSlow::CbmEcalRecoSlow(const char *name, const Int_t iVerbose, const c
   fRecoName="EcalReco";
 
   Int_t i;
+  Int_t j;
+  Int_t types;
+  Int_t consts;
   TString nm;
 
   fParNames[0]="Ecluster";
@@ -657,29 +792,39 @@ CbmEcalRecoSlow::CbmEcalRecoSlow(const char *name, const Int_t iVerbose, const c
 
   for(i=0;i<10;i++)
     fC[i]=-1111;
-  for(i=0;i<10;i++)
+  types=par->GetInteger("types");
+  consts=par->GetInteger("consts");
+  for(j=1;j<=types;j++)
   {
-    fC[i]=par->GetDouble(fParNames[i+fParOffset]);
-    if (fC[i]==-1111) break;
+    for(i=0;i<consts;i++)
+    {
+      nm=fParNames[i+fParOffset]; nm+="_"; nm+=j;
+      fC[i]=par->GetDouble(nm);
+    }
+    nm="sigma_"; nm+=j;
+    fSigmaFormula[j]=par->GetString(nm);
+    for(i=0;i<consts;i++)
+    {
+      nm=fParNames[i+fParOffset]; nm+="_"; nm+=j;
+      fSigmaFormula[j].ReplaceAll(fParNames[i+fParOffset], par->GetString(nm));
+    }
+
+    Info("Constructor", "Formula for sigma_%d (with constants): %s. ", j, fSigmaFormula[j].Data());
+    for(i=0;i<fParOffset;i++)
+    {
+      nm="["; nm+=i; nm+="]";
+      fSigmaFormula[j].ReplaceAll(fParNames[i], nm);
+    }
+    Info("Constructor", "Used formula: %s.", fSigmaFormula[j].Data());
+    nm="RecoSlowFormula_"; nm+=j;
+    fSigma[j]=new TFormula("RecoSimpleFormula", fSigmaFormula[j].Data());
   }
-  fSigmaFormula=par->GetString("sigma");
-  for(i=0;i<10;i++)
-  {
-    if (fC[i]==-1111) break;
-    fSigmaFormula.ReplaceAll(fParNames[i+fParOffset], par->GetString(fParNames[i+fParOffset]));
-  }
-  Info("Constructor", "Formula for sigma (with constants): %s. ", fSigmaFormula.Data());
-  for(i=0;i<fParOffset;i++)
-  {
-    nm="["; nm+=i; nm+="]";
-    fSigmaFormula.ReplaceAll(fParNames[i], nm);
-  }
-  Info("Constructor", "Used formula: %s.", fSigmaFormula.Data());
-  fSigma=new TFormula("RecoSimpleFormula", fSigmaFormula.Data());
   fChi2Th=par->GetDouble("chi2th");
   fEStep=par->GetDouble("estep");
   fCStep=par->GetDouble("cstep");
   fMaxIterations=par->GetInteger("maxiterations");
+  fFixClusterEnergy=par->GetInteger("fixclusterenergy");
+  fMinMaxE=par->GetDouble("minmaxe");
 
   Info("Constructor", "chi2 threshold is %f, Estep is %f, and Cstep is %f.", fChi2Th, fEStep, fCStep);
   fStoreClusterInfo=kFALSE;
@@ -751,6 +896,7 @@ InitStatus CbmEcalRecoSlow::Init()
   fFCN=new FCNEcalCluster(fCal, fShLib, fSigma, fInf);
   fFCN->SetEStep(fEStep);
   fFCN->SetCStep(fCStep);
+  fFCN->SetFixClusterEnergy(fFixClusterEnergy);
   fFitter=new TFitterMinuit(18);
   fFitter->SetPrintLevel(-1);
   fFitter->SetMinuitFCN(fFCN);

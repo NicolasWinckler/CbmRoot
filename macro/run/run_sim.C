@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //
 // Macro for standard transport simulation using UrQMD input and GEANT3
-// Standard CBM setup with STS, RICH, TRD, TOF and ECAL
+// Standard CBM setup with MVD, STS, RICH, TRD, TOF and ECAL
 //
 // V. Friese   22/02/2007
 //
@@ -22,11 +22,10 @@ void run_sim(Int_t nEvents = 1)
   
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString targetGeom = "target.geo";
+  TString targetGeom = "target_au_250mu.geo";
   TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "magnet_muon.geo";
+  TString magnetGeom = "magnet_standard.geo";
   TString mvdGeom    = "mvd_standard.geo";
-  mvdGeom = "";
   TString stsGeom    = "sts_standard.geo";
   TString richGeom   = "rich_standard.geo";
   TString trdGeom    = "trd_standard.geo";
@@ -131,6 +130,7 @@ void run_sim(Int_t nEvents = 1)
     rich->SetGeometryFileName(richGeom);
     fRun->AddModule(rich);
   }
+  
 
   if ( trdGeom != "" ) {
     CbmDetector* trd = new CbmTrd("TRD",kTRUE );
@@ -148,6 +148,7 @@ void run_sim(Int_t nEvents = 1)
     CbmDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data()); 
     fRun->AddModule(ecal);
   }
+  
   // ------------------------------------------------------------------------
 
 

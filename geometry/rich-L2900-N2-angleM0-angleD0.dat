@@ -1,9 +1,0 @@
-RICH barrel
-  z     length   dWindows   dVessel    lRadiator  radiator
-1600.     2900.       0.25        5.        2200.    RICHgas_N2_dis
-RICH mirror
- radius  thickness   material   yBeamhole  angle
-  4500.     2.3      RICHglass     200.     0.
-RICH photodetector (PMT)
-  z    y      dx      dy    angle_det dGlass  dCathode  lTube   dSupport
- 300.  1700.  1600.   700.    0.       0.     0.5       0.        0.

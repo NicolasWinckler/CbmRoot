@@ -48,24 +48,24 @@
   fRun->AddModule(Cave);
 
   CbmModule *Pipe= new CbmPipe("PIPE");
-  Pipe->SetGeometryFileName("pipe.geo");
+  Pipe->SetGeometryFileName("pipe_standard.geo");
   fRun->AddModule(Pipe);
   
   
   CbmModule *Magnet= new CbmMagnet("MAGNET");
   // 1- Active shielding Geometry
-  Magnet->SetGeometryFileName("magnet_active.geo");
+  Magnet->SetGeometryFileName("magnet_standard.geo");
   // 2- Iron Magnet
   // Magnet->SetGeometryFileName("magnet_iron.geo");
   fRun->AddModule(Magnet);
   
   CbmDetector *Sts= new CbmSts("STS", kTRUE);
-  Sts->SetGeometryFileName("sts_allstrips_full.geo");
+  Sts->SetGeometryFileName("sts_standard.geo");
   fRun->AddModule(Sts);
 
   
   CbmModule *Target= new CbmTarget("Target");
-  Target->SetGeometryFileName("target.geo");
+  Target->SetGeometryFileName("target_au_250mu.geo");
   fRun->AddModule(Target);		
 
   CbmDetector *Tof= new CbmTof("TOF", kTRUE );

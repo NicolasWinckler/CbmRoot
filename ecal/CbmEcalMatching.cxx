@@ -10,6 +10,7 @@
 #include "CbmEcalRecParticle.h"
 #include "CbmEcalPoint.h"
 #include "CbmEcalClusterV1.h"
+#include "CbmEcalStructure.h"
 
 #include <iostream>
 
@@ -53,6 +54,18 @@ InitStatus CbmEcalMatching::Init()
     Fatal("Init", "Can't find array of Ecal Points");
     return kFATAL;
   }
+  fStr=(CbmEcalStructure*)io->GetObject("EcalStructure");
+  if (!fStr)
+  {
+    Fatal("Init","Can't find calorimeter structure in the system.");
+    return kFATAL;
+  }
+  fClusters=(TClonesArray*)io->ActivateBranch("EcalClusters");
+  if (!fClusters)
+  {
+    Fatal("Init", "Can't find array of clusters");
+    return kFATAL;
+  }
   fEv=0; 
   return kSUCCESS;
 }
@@ -80,20 +93,26 @@ void CbmEcalMatching::Exec(Option_t* opt)
 void CbmEcalMatching::FormPreCluster(CbmEcalRecParticle* p)
 {
   list<CbmEcalCell*> neib;
-  list<CbmEcalCell*>::const_iterator i;
-  CbmEcalClusterV1* cls=p->Cluster();
+  CbmEcalCell* celli;
+  Int_t i;
+  CbmEcalClusterV1* cls=(CbmEcalClusterV1*)fClusters->At(p->ClusterNum());
+  CbmEcalCell* cell;
 
   fPreCluster.clear();
   fClusterE=0;
-  p->Cell()->GetNeighborsList(0, neib);
-  for(i=cls->Begin();i!=cls->End();++i)
-    if (find(neib.begin(), neib.end(), *i)!=neib.end())
+  cell=fStr->GetHitCell(p->CellNum());
+  cell->GetNeighborsList(0, neib);
+  for(i=0;i<cls->Size();i++)
+  {
+    celli=fStr->GetHitCell(cls->CellNum(i));
+    if (find(neib.begin(), neib.end(), celli)!=neib.end())
     {
-      fPreCluster.push_back(*i);
-      fClusterE+=(*i)->GetTotalEnergy();
+      fPreCluster.push_back(celli);
+      fClusterE+=celli->GetTotalEnergy();
     }
-  fPreCluster.push_back(p->Cell());
-  fClusterE+=p->Cell()->GetTotalEnergy();
+  }
+  fPreCluster.push_back(cell);
+  fClusterE+=cell->GetTotalEnergy();
 }
 
 /** Add energy to track and all its mothers **/
@@ -146,6 +165,7 @@ void CbmEcalMatching::Match(CbmEcalRecParticle* p)
   pair<Int_t, Double_t> max; max.first=-1111; max.second=0;
   pair<Int_t, Double_t> max_photon; max_photon.second=0;
   CbmMCTrack* tr;
+  CbmEcalClusterV1* cls;
 
   for(i=fE.begin(); i!=fE.end();++i)
   {
@@ -178,9 +198,10 @@ void CbmEcalMatching::Match(CbmEcalRecParticle* p)
   fPy=p->Py();
   fPz=p->Pz();
   fRE=p->E();
-  fChi2=p->Cluster()->Chi2();
-  fNM=p->Cluster()->Maxs();
-  fNC=p->Cluster()->Size();
+  cls=(CbmEcalClusterV1*)fClusters->At(p->ClusterNum());
+  fChi2=cls->Chi2();
+  fNM=cls->Maxs();
+  fNC=cls->Size();
   fPDG=tr->GetPdgCode();
   fMCE=tr->GetEnergy();
   fMCPx=tr->GetPx();

@@ -2,6 +2,7 @@
 #define CBMECALCLUSTERV1_H
 
 #include "TObject.h"
+#include "TArrayI.h"
 #include <list>
 
 #include "CbmEcalCell.h"
@@ -51,19 +52,14 @@ public:
   /** \chi^2 of cluster after fitting **/
   inline Double_t Chi2() const {return fChi2;}
 
-  /** fCells and peaks are sorted. First entry with maximum energy **/
-  inline std::list<CbmEcalCell*>::const_iterator Begin() const {return fCells.begin();}
-  inline std::list<CbmEcalCell*>::const_iterator End() const {return fCells.end();}
-  inline std::list<CbmEcalCell*>::const_iterator PeaksBegin() const {return fPeaks.begin();}
-  inline std::list<CbmEcalCell*>::const_iterator PeaksEnd() const {return fPeaks.end();}
-
-  inline std::list<CbmEcalRecParticle*>::const_iterator PhotonsBegin() const {return fPhotons.begin();}
-  inline std::list<CbmEcalRecParticle*>::const_iterator PhotonsEnd() const {return fPhotons.end();}
+  /** Getters for cells and peaks **/
+  inline Int_t CellNum(Int_t i) const {return fCellNums[i];}
+  inline Int_t PeakNum(Int_t i) const {return fPeakNums[i];}
   /** An virtual destructor **/
   virtual ~CbmEcalClusterV1();
 private:
   /** An initialization **/
-  void Init();
+  void Init(std::list<CbmEcalCell*>& cls);
   /** Cluster number **/
   Int_t fNum;
   /** Cluster size in cells
@@ -86,13 +82,11 @@ private:
   Double_t fY;
   /** \chi^2 after fitting **/
   Double_t fChi2;
-
-  /** Cluster it self **/
-  std::list<CbmEcalCell*> fCells;		//!		
-  /** Peaks in cluster **/
-  std::list<CbmEcalCell*> fPeaks;		//!
-  /** List of reconstructed particles **/
-  std::list<CbmEcalRecParticle*> fPhotons;	//!
+  
+  /** Serial numbers of cells in cluster **/
+  TArrayI fCellNums;
+  /** Serial numbers of peaks in cluster **/
+  TArrayI fPeakNums;
 
   ClassDef(CbmEcalClusterV1, 1)
 };

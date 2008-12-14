@@ -6,6 +6,7 @@
 #include "CbmEcalRecParticle.h"
 #include "CbmEcalCell.h"
 #include "CbmEcalClusterV1.h"
+#include "CbmEcalStructure.h"
 
 #include "TTree.h"
 #include "TClonesArray.h"
@@ -28,6 +29,8 @@ void CbmEcalAnalysisPair::Exec(Option_t* option)
   CbmEcalRecParticle* p1;
   CbmEcalRecParticle* p2;
   CbmEcalClusterV1* cls;
+  CbmEcalClusterV1* cluster;
+  CbmEcalCell* cell;
   CbmMCTrack* tr1;
   CbmMCTrack* tr2;
   CbmMCTrack* mtr;
@@ -54,12 +57,14 @@ void CbmEcalAnalysisPair::Exec(Option_t* option)
     fPz1=p1->Pz();
     fChi1=p1->Chi2();
     fCellType1=p1->CellType();
-    fCellX1=p1->Cell()->GetCenterX();
-    fCellY1=p1->Cell()->GetCenterY();
-    fCells=p1->Cluster()->Size();
-    fM=p1->Cluster()->Moment();
-    fMx=p1->Cluster()->MomentX();
-    fMy=p1->Cluster()->MomentY();
+    cell=fStr->GetHitCell(p1->CellNum());
+    fCellX1=cell->GetCenterX();
+    fCellY1=cell->GetCenterY();
+    cluster=(CbmEcalClusterV1*)fClusters->At(p1->ClusterNum());
+    fCells=cluster->Size();
+    fM=cluster->Moment();
+    fMx=cluster->MomentX();
+    fMy=cluster->MomentY();
     fEntries++;
   }
   fR=-1111;
@@ -79,8 +84,9 @@ void CbmEcalAnalysisPair::Exec(Option_t* option)
     fPz2=p2->Pz();
     fChi2=p2->Chi2();
     fCellType2=p2->CellType();
-    fCellX2=p2->Cell()->GetCenterX();
-    fCellY2=p2->Cell()->GetCenterY();
+    cell=fStr->GetHitCell(p2->CellNum());
+    fCellX2=cell->GetCenterX();
+    fCellY2=cell->GetCenterY();
     fEntries++;
   }
   else
@@ -201,6 +207,12 @@ InitStatus CbmEcalAnalysisPair::Init()
   if (!fClusters)
   {
     Fatal("Init", "Can't find EcalClusters");
+    return kFATAL;
+  }
+  fStr=(CbmEcalStructure*)fManager->GetObject("EcalStructure");
+  if (!fStr)
+  {
+    Fatal("Init", "Can't find calorimeter structure in the system");
     return kFATAL;
   }
   fTree=NULL;

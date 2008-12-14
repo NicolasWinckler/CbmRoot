@@ -11,35 +11,33 @@ using namespace std;
 /** An empty constructor **/
 CbmEcalClusterV1::CbmEcalClusterV1()
 {
-  fCells.clear();
-  fPeaks.clear();
-  fPhotons.clear();
+  ;
 }
 
 /** A standart constructor **/
 CbmEcalClusterV1::CbmEcalClusterV1(Int_t num, const std::list<CbmEcalCell*>& cluster)
   : fNum(num)
 {
-  fCells.clear();
+  std::list<CbmEcalCell*> cls;
+  cls.clear();
   list<CbmEcalCell*>::const_iterator p=cluster.begin();
   for(;p!=cluster.end();++p)
-    fCells.push_back(*p);
-  Init();
+    cls.push_back(*p);
+  Init(cls);
 }
 
 /** An virtual destructor **/
 CbmEcalClusterV1::~CbmEcalClusterV1()
 {
-  fCells.clear();
-  fPeaks.clear();
-  fPhotons.clear();
+  ;
 }
 
 /** An initialization **/
-void CbmEcalClusterV1::Init()
+void CbmEcalClusterV1::Init(std::list<CbmEcalCell*>& fCells)
 {
   list<CbmEcalCell*>::const_iterator p1;
   list<CbmEcalCell*> neib;
+  list<CbmEcalCell*> fPeaks;
   Double_t e;
   Double_t x;
   Double_t y;
@@ -48,10 +46,11 @@ void CbmEcalClusterV1::Init()
   Double_t tx=0;
   Double_t ty=0;
   Double_t tr=0;
+  Int_t i;
 
   fCells.sort(CbmEcalClusterSortProcess());
   fCells.reverse();
-  list<CbmEcalCell*>::const_iterator p=Begin();
+  list<CbmEcalCell*>::const_iterator p=fCells.begin();
   fEnergy=0;
   fX=0;
   fY=0;
@@ -59,7 +58,7 @@ void CbmEcalClusterV1::Init()
 
   fSize=fCells.size();
   fPeaks.clear();
-  for(;p!=End();++p)
+  for(;p!=fCells.end();++p)
   {
     e=(*p)->GetTotalEnergy();
     fEnergy+=e;
@@ -85,7 +84,7 @@ void CbmEcalClusterV1::Init()
   fMaxs=fPeaks.size();
   fChi2=-1111;
   fMomentX=0; fMomentY=0; fMoment=0;
-  for(p=Begin();p!=End();++p)
+  for(p=fCells.begin();p!=fCells.end();++p)
   {
     /** Still not clear about next 3 variables **/
     e=(*p)->GetTotalEnergy();
@@ -94,7 +93,15 @@ void CbmEcalClusterV1::Init()
     fMomentX+=x*e; fMomentY+=y*e; fMoment+=(x+y)*e;
   }
   fMomentX/=fEnergy; fMomentY/=fEnergy; fMoment/=fEnergy;
-  fPhotons.clear();
+  fCellNums.Set(fSize);
+  fPeakNums.Set(fMaxs);
+  i=0;
+  for(p=fCells.begin();p!=fCells.end();++p)
+    fCellNums[i++]=(*p)->GetCellNumber();
+  i=0;
+  for(p=fPeaks.begin();p!=fPeaks.end();++p)
+    fPeakNums[i++]=(*p)->GetCellNumber();
+
 }
 
 ClassImp(CbmEcalClusterV1)

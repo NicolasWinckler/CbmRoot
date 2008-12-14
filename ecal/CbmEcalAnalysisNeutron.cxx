@@ -6,6 +6,7 @@
 #include "CbmEcalRecParticle.h"
 #include "CbmEcalCell.h"
 #include "CbmEcalClusterV1.h"
+#include "CbmEcalStructure.h"
 
 #include "TTree.h"
 #include "TClonesArray.h"
@@ -46,7 +47,7 @@ void CbmEcalAnalysisNeutron::Exec(Option_t* option)
   {
     p=(CbmEcalRecParticle*)fReco->At(0);
     if (p->MCTrack()<0) continue;
-    cl=p->Cluster();
+    cl=(CbmEcalClusterV1*)fClusters->At(p->ClusterNum());
     fMaxs=cl->Maxs(); 
     fM=cl->Moment();
     fMx=cl->MomentX();
@@ -64,7 +65,7 @@ void CbmEcalAnalysisNeutron::Exec(Option_t* option)
     fCellType=p->CellType();
     fPdg=mtr->GetPdgCode();
 
-    cell=p->Cell();
+    cell=fStr->GetHitCell(p->CellNum());
     cx=cell->GetCenterX();
     cy=cell->GetCenterY();
     cell->GetNeighborsList(0, neib);
@@ -145,6 +146,12 @@ InitStatus CbmEcalAnalysisNeutron::Init()
   if (!fClusters)
   {
     Fatal("Init", "Can't find EcalClusters");
+    return kFATAL;
+  }
+  fStr=(CbmEcalStructure*)fManager->GetObject("EcalStructure");
+  if (!fStr)
+  {
+    Fatal("Init", "Can't find calorimeter structure in the system");
     return kFATAL;
   }
   fTree=NULL;

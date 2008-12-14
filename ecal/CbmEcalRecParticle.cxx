@@ -20,6 +20,8 @@
  **/
 
 #include "CbmEcalRecParticle.h"
+#include "CbmEcalClusterV1.h"
+#include "CbmEcalRecParticle.h"
 
 #include <iostream>
 
@@ -27,7 +29,7 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmEcalRecParticle::CbmEcalRecParticle() : fPx(0),fPy(0),fPz(0),fE(0), fX(-1111), fY(-1111), fZ(-1111), fId(0), fChi2(-1111), fType(0), fCluster(NULL),fCell(NULL)
+CbmEcalRecParticle::CbmEcalRecParticle() : fPx(0),fPy(0),fPz(0),fE(0), fX(-1111), fY(-1111), fZ(-1111), fId(0), fChi2(-1111), fType(0), fClusterNum(-1111),fCellNum(-1111)
 {
   fMCTrack=-1111;
 }
@@ -40,12 +42,22 @@ CbmEcalRecParticle::CbmEcalRecParticle(Double_t px, Double_t py,
 				       Double_t x, Double_t y, Double_t z, 
 				       Int_t id, Double_t ch2, CbmEcalClusterV1* cluster,
 				       CbmEcalCell* cell, Int_t type)
-  : fPx(px),fPy(py),fPz(pz),fE(E), fX(x), fY(y), fZ(z), fId(id), fChi2(ch2), fType(type), fCluster(cluster), fCell(cell)
+  : fPx(px),fPy(py),fPz(pz),fE(E), fX(x), fY(y), fZ(z), fId(id), fChi2(ch2), fType(type), fClusterNum(cluster->Number()), fCellNum(cell->GetCellNumber())
 {
   fMCTrack=-1111;
 }
 // -------------------------------------------------------------------------
 
+// -----   Standard constructor   ------------------------------------------
+CbmEcalRecParticle::CbmEcalRecParticle(Int_t clnum, Int_t cellnum, Double_t px, Double_t py, 
+				       Double_t pz, Double_t E,
+				       Double_t x, Double_t y, Double_t z, 
+				       Int_t id, Double_t ch2, Int_t type)
+  : fPx(px),fPy(py),fPz(pz),fE(E), fX(x), fY(y), fZ(z), fId(id), fChi2(ch2), fType(type), fClusterNum(cellnum), fCellNum(cellnum)
+{
+  fMCTrack=-1111;
+}
+// -------------------------------------------------------------------------
 
 // -----   Destructor   ----------------------------------------------------
 CbmEcalRecParticle::~CbmEcalRecParticle()

@@ -9,6 +9,7 @@
 
 class TTree;
 class TClonesArray;
+class CbmEcalStructure;
 
 
 class CbmEcalAnalysisPair : public CbmTask
@@ -77,6 +78,8 @@ private:
   TClonesArray* fMC;
   /** An array of clusters **/
   TClonesArray* fClusters;
+  /** Calorimeter structure **/
+  CbmEcalStructure* fStr;		//!
 
   ClassDef(CbmEcalAnalysisPair,1)
 };

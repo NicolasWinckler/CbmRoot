@@ -24,9 +24,9 @@ using namespace std;
 void CbmEcalRecoSimple::Exec(Option_t* option)
 {
   Int_t i;
+  Int_t j;
   Int_t n=fClusters->GetEntriesFast();
   CbmEcalClusterV1* cluster;
-  list<CbmEcalCell*>::const_iterator p;
 
   fN=0;
   fReco->Delete();
@@ -39,9 +39,8 @@ void CbmEcalRecoSimple::Exec(Option_t* option)
   {
     fNOld=fN;
     cluster=(CbmEcalClusterV1*)fClusters->At(i);
-    p=cluster->PeaksBegin();
-    for(;p!=cluster->PeaksEnd();++p)
-      Reco(*p, cluster);
+    for(j=0;j<cluster->Maxs();j++)
+      Reco(fStr->GetHitCell(cluster->PeakNum(j)), cluster);
     CalculateChi2(cluster);
   }
   if (fVerbose>1)
@@ -53,7 +52,7 @@ void CbmEcalRecoSimple::CalculateChi2(CbmEcalClusterV1* cluster)
 {
   if (!fShLib) return;
   
-  list<CbmEcalCell*>::const_iterator cell=cluster->Begin();
+  CbmEcalCell* cell;
   static Double_t module=fInf->GetModuleSize();
   Int_t type;
   Double_t de;
@@ -68,6 +67,7 @@ void CbmEcalRecoSimple::CalculateChi2(CbmEcalClusterV1* cluster)
   Double_t celle;
   CbmEcalCell* cl;
   Int_t p;
+  Int_t i;
   CbmEcalRecParticle* part;
   Double_t clustere=0;
   Double_t clenergy;
@@ -79,21 +79,25 @@ void CbmEcalRecoSimple::CalculateChi2(CbmEcalClusterV1* cluster)
   Double_t emeas;
 
 
-  for(;cell!=cluster->End();++cell)
-    clustere+=(*cell)->GetTotalEnergy();
+  for(i=0;i<cluster->Size();i++)
+  {
+    cell=fStr->GetHitCell(cluster->CellNum(i));
+    clustere+=cell->GetTotalEnergy();
+  }
   clenergy=fCal->GetERough(clustere);
 
-  for(cell=cluster->Begin();cell!=cluster->End();++cell)
+  for(i=0;i<cluster->Size();i++)
   {
-    type=(*cell)->GetType();
+    cell=fStr->GetHitCell(cluster->CellNum(i));
+    type=cell->GetType();
     cellsize=module/type;
     cellerr=0; celle=0;
     for(p=fNOld;p<fN;p++)
     {
       part=(CbmEcalRecParticle*)fReco->At(p);
-      cl=part->Cell(); cx=cl->GetCenterX(); cy=cl->GetCenterY(); 
-      x=(*cell)->GetCenterX(); x-=part->X(); // x-=cx; 
-      y=(*cell)->GetCenterY(); y-=part->Y(); // y-=cy; 
+      cl=fStr->GetHitCell(part->CellNum()); cx=cl->GetCenterX(); cy=cl->GetCenterY(); 
+      x=cell->GetCenterX(); x-=part->X(); // x-=cx; 
+      y=cell->GetCenterY(); y-=part->Y(); // y-=cy; 
 
       r=TMath::Sqrt(cx*cx+cy*cy);
 
@@ -107,12 +111,12 @@ void CbmEcalRecoSimple::CalculateChi2(CbmEcalClusterV1* cluster)
     }
 //    cout << "---> " << x << "	" << y << "	" << cellsize << "	" << part->E() << "	" << theta << "	" << phi << endl;
 //    cout << "-> celle " << celle << endl;
-    cx=(*cell)->GetCenterX(); cy=(*cell)->GetCenterY();
+    cx=cell->GetCenterX(); cy=cell->GetCenterY();
     r=TMath::Sqrt(cx*cx+cy*cy);
     theta=TMath::ATan(r/fInf->GetZPos());
 
-    epred=fCal->GetEnergy(celle, *cell);
-    emeas=fCal->GetEnergy((*cell)->GetTotalEnergy(), *cell);
+    epred=fCal->GetEnergy(celle, cell);
+    emeas=fCal->GetEnergy(cell->GetTotalEnergy(), cell);
 //    if (epred>clenergy) epred=clenergy;
 //    if (celle>0)
     {
@@ -121,7 +125,7 @@ void CbmEcalRecoSimple::CalculateChi2(CbmEcalClusterV1* cluster)
       fSigma->SetParameter(2, epred);		//Epred
       fSigma->SetParameter(3, theta);		//Theta
       cellerr=fSigma->Eval(0);
-      de=fCal->GetEnergy(celle, *cell)-fCal->GetEnergy((*cell)->GetTotalEnergy(), *cell);
+      de=fCal->GetEnergy(celle, cell)-fCal->GetEnergy(cell->GetTotalEnergy(), cell);
 //      cout << "->" << celle << "	" << de << "	" << cellerr << endl;
 //      cellerr=1;
       de*=de; chi2+=de/cellerr;

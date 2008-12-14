@@ -11,6 +11,7 @@ class TClonesArray;
 class CbmEcalCell;
 class CbmEcalRecParticle;
 class TTree;
+class CbmEcalStructure;
 
 class CbmEcalMatching : public CbmTask
 {
@@ -56,6 +57,10 @@ private:
   TClonesArray* fMCTracks;		//!
   /** An array of calorimeter points **/
   TClonesArray* fPoints;		//!
+  /** An array of calorimeter clustes **/
+  TClonesArray* fClusters;		//!
+  /** Structure of the calorimeter system **/
+  CbmEcalStructure* fStr;		//!
 
   /** A threshold: if energy of photon is more than threshold*Ecluster
    ** than cluster is formed by that photon **/

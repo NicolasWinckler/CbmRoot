@@ -495,7 +495,7 @@ void CbmEcalClusterFinderV1::FormClusters()
       MaxSize=cluster.size();
     if (max>Maximums) Maximums=max;
     CbmEcalClusterV1* cls=new ((*fClusters)[fN]) CbmEcalClusterV1(fN, cluster); fN++;
-    cls->Init();
+    cls->Init(cluster);
   }
   if (fVerbose>0)
   {

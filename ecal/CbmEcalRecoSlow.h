@@ -31,6 +31,7 @@ public:
   
   CbmEcalClusterV1* GetCluster() const {return fCluster;}
   void SetCluster(CbmEcalClusterV1* cluster);
+  void SetStructure(CbmEcalStructure* str) {fStr=str;}
 
   void SetParticleSeeds(const std::vector<CbmEcalCell*> cells) {fCells=cells;}
 
@@ -64,6 +65,8 @@ private:
   TFormula** fSigma;			//!
   /** Calorimeter information **/
   CbmEcalInf* fInf;			//!
+  /** Calorimeter structure **/
+  CbmEcalStructure* fStr;		//!
   /** Calorimeter cluster **/
   CbmEcalClusterV1* fCluster;		//!
 

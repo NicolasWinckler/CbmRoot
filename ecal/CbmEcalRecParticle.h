@@ -46,6 +46,10 @@ public:
 		     Int_t id=0, Double_t chi2=-1111, CbmEcalClusterV1* cl=NULL,
 		     CbmEcalCell* cell=NULL, Int_t type=0);
 
+  CbmEcalRecParticle(Int_t clnum, Int_t cellnum, Double_t px, Double_t py, 
+		     Double_t pz, Double_t E,
+		     Double_t x=-1111, Double_t y=-1111, Double_t z=-1111,
+		     Int_t id=0, Double_t chi2=-1111, Int_t type=0);
   /** Copy constructor **/
   CbmEcalRecParticle(const CbmEcalRecParticle& obj) { *this = obj; };
 
@@ -63,8 +67,8 @@ public:
   Double32_t Z() const {return fZ;}
   Double_t Chi2() const {return fChi2;}
   void SetChi2(Double_t chi2) {fChi2=chi2;}
-  CbmEcalClusterV1* Cluster() const {return fCluster;}
-  CbmEcalCell* Cell() const {return fCell;}
+  Int_t ClusterNum() const {return fClusterNum;}
+  Int_t CellNum() const {return fCellNum;}
   Int_t PdgId() const {return fId;}
   Int_t CellType() const {return fType;}
   /** Output to screen **/
@@ -94,9 +98,9 @@ protected:
   Int_t fType;
 
   /** Reference to cluster **/
-  CbmEcalClusterV1* fCluster;		//!
+  Int_t fClusterNum;		//!
   /** A seed for the photon **/
-  CbmEcalCell* fCell;			//!
+  Int_t fCellNum;			//!
   /** A mother tracks number **/
   Int_t fMCTrack;
 

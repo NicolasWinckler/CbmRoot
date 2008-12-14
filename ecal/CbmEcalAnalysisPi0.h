@@ -9,7 +9,7 @@
 
 class TTree;
 class TClonesArray;
-
+class CbmEcalStructure;
 
 class CbmEcalAnalysisPi0 : public CbmTask
 {
@@ -90,11 +90,15 @@ private:
   Double_t fME;
 
   /** An array of reconstructed particles **/
-  TClonesArray* fReco;
+  TClonesArray* fReco;			//!
   /** MC tracks array **/
-  TClonesArray* fMC;
+  TClonesArray* fMC;			//!
   /** Reconstructed tracks array **/
-  TClonesArray* fTracks;
+  TClonesArray* fTracks;		//!
+  /** Array of found clusters **/
+  TClonesArray* fClusters;		//!
+  /** Calorimeter structure **/
+  CbmEcalStructure* fStr;		//!
 
   ClassDef(CbmEcalAnalysisPi0,1)
 };

@@ -7,6 +7,7 @@
 #include "CbmEcalRecParticle.h"
 #include "CbmEcalCell.h"
 #include "CbmEcalClusterV1.h"
+#include "CbmEcalStructure.h"
 
 #include "TTree.h"
 #include "TClonesArray.h"
@@ -32,6 +33,8 @@ void CbmEcalAnalysisPi0::Exec(Option_t* option)
   CbmMCTrack* tr2;
   CbmMCTrack* mtr;
   CbmTrackParam* trp;
+  CbmEcalClusterV1* cls;
+  CbmEcalCell* cell;
   TLorentzVector v1;
   TLorentzVector v2;
   TLorentzVector p;
@@ -76,9 +79,11 @@ void CbmEcalAnalysisPi0::Exec(Option_t* option)
     fME=mtr->GetEnergy();
 
     fE1=p1->E(); fPx1=p1->Px(); fPy1=p1->Py(); fPz1=p1->Pz();
-    fX1=p1->X(); fY1=p1->Y(); fChi21=p1->Cluster()->Chi2();
-    fCellX1=p1->Cell()->GetCenterX(); fCellY1=p1->Cell()->GetCenterY();
-    fCellType1=p1->Cell()->GetType();
+    cls=(CbmEcalClusterV1*)fClusters->At(p1->ClusterNum());
+    fX1=p1->X(); fY1=p1->Y(); fChi21=cls->Chi2();
+    cell=fStr->GetHitCell(p1->CellNum());
+    fCellX1=cell->GetCenterX(); fCellY1=cell->GetCenterY();
+    fCellType1=cell->GetType();
     fMCE1=tr1->GetEnergy(); fMCPx1=tr1->GetPx(); fMCPy1=tr1->GetPy(); fMCPz1=tr1->GetPz();
     fPdg1=tr1->GetPdgCode();
     fR1=1111;
@@ -92,9 +97,11 @@ void CbmEcalAnalysisPi0::Exec(Option_t* option)
     v1.SetPxPyPzE(fPx1, fPy1, fPz1, fE1);
 
     fE2=p2->E(); fPx2=p2->Px(); fPy2=p2->Py(); fPz2=p2->Pz();
-    fX2=p2->X(); fY2=p2->Y(); fChi22=p2->Cluster()->Chi2();
-    fCellX2=p2->Cell()->GetCenterX(); fCellY2=p2->Cell()->GetCenterY();
-    fCellType2=p2->Cell()->GetType();
+    cls=(CbmEcalClusterV1*)fClusters->At(p2->ClusterNum());
+    fX2=p2->X(); fY2=p2->Y(); fChi22=cls->Chi2();
+    cell=fStr->GetHitCell(p2->CellNum());
+    fCellX2=cell->GetCenterX(); fCellY2=cell->GetCenterY();
+    fCellType2=cell->GetType();
     fMCE2=tr2->GetEnergy(); fMCPx2=tr2->GetPx(); fMCPy2=tr2->GetPy(); fMCPz2=tr2->GetPz();
     fPdg2=tr2->GetPdgCode();
     fR2=1111;
@@ -207,7 +214,18 @@ InitStatus CbmEcalAnalysisPi0::Init()
     Fatal("Init", "Can't find array of reconstructed tracks");
     return kFATAL;
   }
-
+  fStr=(CbmEcalStructure*)fManager->GetObject("EcalStructure");
+  if (!fStr)
+  {
+    Fatal("Init", "Can't find calorimeter structure in the system");
+    return kFATAL;
+  }
+  fClusters=(TClonesArray*)fManager->GetObject("EcalClusters");
+  if (!fClusters)
+  {
+    Fatal("Init", "Can't find array of clusters");
+    return kFATAL;
+  }
   fTree=NULL;
 
   return kSUCCESS;

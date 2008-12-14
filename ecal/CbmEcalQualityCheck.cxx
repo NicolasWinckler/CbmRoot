@@ -461,6 +461,7 @@ void CbmEcalQualityCheck::DrawCells()
   CbmEcalRecParticle* r;
   Int_t rn=fReco->GetEntriesFast();
   Int_t i;
+  Int_t j;
   Float_t x;
   Float_t y;
   Float_t dx;
@@ -473,10 +474,9 @@ void CbmEcalQualityCheck::DrawCells()
   for(i=0;i<rn;i++)
   {
     r=(CbmEcalRecParticle*)fReco->At(i);
-    CbmEcalClusterV1* cl=r->Cluster();
-    cp=cl->Begin();
-    for(;cp!=cl->End();++cp)
-      clusters.push_back(*cp);
+    CbmEcalClusterV1* cl=(CbmEcalClusterV1*)fClusters->At(r->ClusterNum());
+    for(j=0;j<cl->Size();j++)
+      clusters.push_back(fStr->GetHitCell(cl->CellNum(j)));
   }
 
   for(p=fCells.begin();p!=fCells.end();++p)
@@ -638,6 +638,12 @@ InitStatus CbmEcalQualityCheck::Init()
   if (!fTracks)
   {
     Fatal("Init", "Can't find array of reconstructed tracks");
+    return kFATAL;
+  }
+  fClusters=(TClonesArray*)io->GetObject("EcalClusters");
+  if (!fClusters)
+  {
+    Fatal("Init", "Can't find array of calorimeter clusters");
     return kFATAL;
   }
   fInf=fStr->GetEcalInf();

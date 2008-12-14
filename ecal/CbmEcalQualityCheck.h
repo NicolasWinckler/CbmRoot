@@ -98,6 +98,7 @@ private:
   TClonesArray* fTracks;	//!
   TClonesArray* fReco;		//!
   TClonesArray* fPoints;	//!
+  TClonesArray* fClusters;	//!
   TString fInName;
   /** Event number **/
   Int_t fEventN;

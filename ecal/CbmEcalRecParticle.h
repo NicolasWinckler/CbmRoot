@@ -98,9 +98,9 @@ protected:
   Int_t fType;
 
   /** Reference to cluster **/
-  Int_t fClusterNum;		//!
+  Int_t fClusterNum;
   /** A seed for the photon **/
-  Int_t fCellNum;			//!
+  Int_t fCellNum;
   /** A mother tracks number **/
   Int_t fMCTrack;
 

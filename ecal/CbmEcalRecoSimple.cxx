@@ -394,7 +394,7 @@ InitStatus CbmEcalRecoSimple::Init()
     Info("Init", "No shower library found in system. Will continue without chi2 calculation.");
   }
   fReco=new TClonesArray("CbmEcalRecParticle", 2000);
-  io->Register(fRecoName, "ECAL", fReco, kFALSE);
+  io->Register(fRecoName, "ECAL", fReco, kTRUE);
   return kSUCCESS;
 }
 

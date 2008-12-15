@@ -60,7 +60,7 @@ InitStatus CbmEcalMatching::Init()
     Fatal("Init","Can't find calorimeter structure in the system.");
     return kFATAL;
   }
-  fClusters=(TClonesArray*)io->ActivateBranch("EcalClusters");
+  fClusters=(TClonesArray*)io->GetObject("EcalClusters");
   if (!fClusters)
   {
     Fatal("Init", "Can't find array of clusters");

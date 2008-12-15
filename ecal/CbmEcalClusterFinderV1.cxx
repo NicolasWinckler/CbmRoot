@@ -81,7 +81,7 @@ InitStatus CbmEcalClusterFinderV1::Init()
   }
 
   fClusters=new TClonesArray("CbmEcalClusterV1", 2000);
-  io->Register("EcalClusters", "ECAL", fClusters, kFALSE);
+  io->Register("EcalClusters", "ECAL", fClusters, kTRUE);
   fEv=0;
   fMaximums=new CbmEcalCell*[5000];
   fExcluded=new CbmEcalCell*[5000];

@@ -119,6 +119,7 @@ add_subdirectory (trackbase)
 add_subdirectory (trdcatrack)
 #add_subdirectory (tutorials/Tutorial1/src)
 #add_subdirectory (tutorials/Tutorial2/src)
+add_subdirectory (cbmgenerators)
 
 if(GEANT4_FOUND AND GEANT4VMC_FOUND AND CLHEP_FOUND)  
   add_subdirectory (cbmg4)

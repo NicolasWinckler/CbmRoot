@@ -75,6 +75,7 @@
 #include "CbmMvdHitMatch.h"
 #include "CbmMvdPileupManager.h"
 #include "CbmMvdPoint.h"
+#include "CbmMvdStation.h"
 
 // Includes from base
 #include "CbmGeoNode.h"
@@ -86,6 +87,9 @@
 // Includes from ROOT
 #include "TArrayD.h"
 #include "TClonesArray.h"
+#include "TGeoManager.h"
+//#include "TGeoShape.h"
+#include "TGeoTube.h"
 #include "TObjArray.h"
 #include "TRandom3.h"
 #include "TString.h"
@@ -210,12 +214,6 @@ CbmMvdDigitiser::CbmMvdDigitiser(const char* name, Int_t iMode,
     fCurrentParticleMomentum = 0;
     fPixelScanAccelerator    = 0;
 
-
-
-    //h_trackLength   = new TH1F("h_trackLength", "h_trackLength", 2000, -0.03, 0.03);
-    h_trackLength   = new TH1F("h_trackLength", "h_trackLength", 2000, 0., 0.05);
-    h_LengthVsAngle = new TH2F("h_LengthVsAngle", "test", 1000, -0.3, 0.3, 1000, -0.3, 0.3);
-
 }
 
 
@@ -230,229 +228,156 @@ CbmMvdDigitiser::~CbmMvdDigitiser() {
 	fDigis->Delete();
 	delete fDigis;
     }
+
     if ( fPileupManager ) delete fPileupManager;
     if ( fDeltaManager ) delete fDeltaManager;
 
-    delete h_LengthVsAngle;
-    delete h_trackLength;
-
 }
 
 
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+Int_t CbmMvdDigitiser::BuildEvent() {
 
-void CbmMvdDigitiser::BuildEvent() {
+  // Counters
+  Int_t nOrig = 0;
+  Int_t nPile = 0;
+  Int_t nElec = 0;
 
 
-    fPoints->Clear();
+  // Some frequently used variables
+  CbmMvdPoint*   point   = NULL;
+  CbmMvdStation* station = NULL;
+  Int_t          volId   = -1;
 
-    //===============Include standard input into the input array
 
-    Int_t i;
-    
-    for (i=0; i<fInputPoints->GetEntriesFast();i++)
+  // ----- First treat standard input file
+  for (Int_t i=0; i<fInputPoints->GetEntriesFast(); i++) {
+    point = (CbmMvdPoint*) fInputPoints->At(i);
+    volId = point->GetDetectorID();
+    if ( fStationMap.find(volId) == fStationMap.end() ) 
+      Fatal("BuildEvent", "Volume not found");
+    fStationMap[volId]->AddPoint(point);
+    nOrig++;
+  }
 
-    { CbmMvdPoint* point=(CbmMvdPoint*)fInputPoints->At(i);
 
-      fPoints->AddLast(point);
-      CbmMCTrack* track=(CbmMCTrack*)fMCTracks->At(point->GetTrackID());
-      point->SetPdgCode(track->GetPdgCode());
-     }
-
-    
-
-    //=============== Include pileup module ==============
-
-    if (fNPileup>0) {
+  // ----- Then treat event pileup
+  if (fNPileup>0) {
  
-      // --- Vector of available background events from pile-up. 
-      // --- Each event is used only once.
-      Int_t nBuffer = fPileupManager->GetNEvents();
-      vector<Int_t> freeEvents(nBuffer);
-      for (Int_t i=0; i<nBuffer; i++) freeEvents[i] = i;
+    // --- Vector of available background events from pile-up. 
+    // --- Each event is used only once.
+    Int_t nBuffer = fPileupManager->GetNEvents();
+    vector<Int_t> freeEvents(nBuffer);
+    for (Int_t i=0; i<nBuffer; i++) freeEvents[i] = i;
 
-      // --- Loop over pile-up events
-      for (Int_t iBg=0; iBg<fNPileup; iBg++) {
+    // --- Loop over pile-up events
+    for (Int_t iBg=0; iBg<fNPileup; iBg++) {
 
-	// Select random event from vector and remove it after usage
-	Int_t index = gRandom->Integer(freeEvents.size());
-	Int_t iEvent = freeEvents[index];
-	TClonesArray* points = fPileupManager->GetEvent(iEvent);
-	freeEvents.erase(freeEvents.begin() + index);
+      // Select random event from vector and remove it after usage
+      Int_t index = gRandom->Integer(freeEvents.size());
+      Int_t iEvent = freeEvents[index];
+      TClonesArray* points = fPileupManager->GetEvent(iEvent);
+      freeEvents.erase(freeEvents.begin() + index);
 
-	// Add points from this event to the input array
-	for (Int_t iPoint=0; iPoint<points->GetEntriesFast(); iPoint++) 
-	  fPoints->AddLast(points->At(iPoint));
+      // Add points from this event to the input arrays
+      for (Int_t iPoint=0; iPoint<points->GetEntriesFast(); iPoint++) {
+	point = (CbmMvdPoint*) points->At(iPoint);
+	volId = point->GetDetectorID();
+	if ( fStationMap.find(volId) == fStationMap.end() ) 
+	  Fatal("BuildEvent", "Volume not found");
+	fStationMap[volId]->AddPoint(point);
+	nPile++;
       }
+	
+    }   // Pileup event loop
 
-    }    // Usage of pile-up
+  }    // Usage of pile-up
 
 			   
-
-
-    // ========================== Delta electron module =================
-   /*
-    if (fNDeltaElect>0)
-    {
-
-	//Include Background events (for pileup) into the input array
-
-	Int_t nEvents     = fDeltaManager->GetNEvents();
-	Int_t firstEvent;
-
-	// usedEvents containes the list of events in the bg-file
-	// which have already been used in this event
-	// This is done to avoid using one event twice
-	// Volker is kindly asked not to change this concept.
-
-	TArrayI usedEvents(fNDeltaElect);
-	for(i=0; i<fNDeltaElect; i++) {usedEvents[i]=-1;}
-
-	//Decide, which events should be used
-
-	do {
-    
-	    firstEvent  = gRandom->Integer(nEvents);
-	    i=0;
-	    Bool_t eventFound=0;
-
-	    // Check, if event has already been used. Else use it
-
-	    do {
-
-		if (usedEvents[i]==-1){
-		    usedEvents[i]=firstEvent;
-		    eventFound=1;}
-
-	     	    else if (usedEvents[i]==firstEvent){eventFound=1;}
-		i=i+1;
-
-	    } while ((i<fNDeltaElect) && (eventFound==0));
-
-	} while (usedEvents[fNDeltaElect-1]==-1);
-
-	// Add the events to the input array
-
-
-
-	for (i=0; i<fNDeltaElect;i++)
-	{
-	    // Read event from the Bg-Buffer
-	    TClonesArray* points=fDeltaManager->GetEvent(usedEvents[i]);
-
-	    // Fill event into the point-Buffer
-	    for (Int_t j=0; j<points->GetEntriesFast();j++)
-
-	    {fPoints->AddLast(points->At(j));}
-	}
-    };
-    */
-
-
-    // cdritsa: copy from Volker's version on pile-up also for deltas
-
-    if (fNDeltaElect>0) {
+  // ----- Finally, treat delta electrons
+  if (fNDeltaElect>0) {
  
-      // --- Vector of available delta events.
-      // --- Each event is used only once.
-      Int_t nDeltaBuffer = fDeltaManager->GetNEvents();
-      vector<Int_t> freeDeltaEvents(nDeltaBuffer);
-      for (Int_t i=0; i<nDeltaBuffer; i++) freeDeltaEvents[i] = i;
+    // --- Vector of available delta events.
+    // --- Each event is used only once.
+    Int_t nDeltaBuffer = fDeltaManager->GetNEvents();
+    vector<Int_t> freeDeltaEvents(nDeltaBuffer);
+    for (Int_t i=0; i<nDeltaBuffer; i++) freeDeltaEvents[i] = i;
 
-      // --- Loop over delta events
-      for (Int_t it=0; it<fNDeltaElect; it++) {
+    // --- Loop over delta events
+    for (Int_t it=0; it<fNDeltaElect; it++) {
 
-	// Select random event from vector and remove it after usage
-	Int_t indexD  = gRandom->Integer(freeDeltaEvents.size());
-	Int_t iEventD = freeDeltaEvents[indexD];
-	TClonesArray* pointsD = fDeltaManager->GetEvent(iEventD);
-	freeDeltaEvents.erase(freeDeltaEvents.begin() + indexD);
+      // Select random event from vector and remove it after usage
+      Int_t indexD  = gRandom->Integer(freeDeltaEvents.size());
+      Int_t iEventD = freeDeltaEvents[indexD];
+      TClonesArray* pointsD = fDeltaManager->GetEvent(iEventD);
+      freeDeltaEvents.erase(freeDeltaEvents.begin() + indexD);
 
-	// Add points from this event to the input array
-	for (Int_t iPoint=0; iPoint<pointsD->GetEntriesFast(); iPoint++)
-	  fPoints->AddLast(pointsD->At(iPoint));
+      // Add points from this event to the input arrays
+      for (Int_t iPoint=0; iPoint<pointsD->GetEntriesFast(); iPoint++) {
+	point = (CbmMvdPoint*) pointsD->At(iPoint);
+	volId = point->GetDetectorID();
+	if ( fStationMap.find(volId) == fStationMap.end() ) 
+	  Fatal("BuildEvent", "Volume not found");
+	fStationMap[volId]->AddPoint(point);
+	nElec++;
       }
 
-    }    // Usage of delta
+    }  // Delta electron event loop
+
+  }    // Usage of delta
 
 
+  // ----- At last: Screen output
+  if ( fVerbose > 1 ) cout << "-I- " << GetName() << "::BuildEvent: original "
+			   << nOrig << ", pileup " << nPile << ", delta "
+			   << nElec << ", total " << nOrig+nPile+nElec
+			   << " MvdPoints" << endl;
 
+  return nOrig + nPile + nElec;
 
-    // ========================== End of delta electron module =================
-    cout << "Event building completed. Treating "<< fPoints->GetEntriesFast() << " MCPoints."<< endl;
 }
+// -----------------------------------------------------------------------------
 
 
 
 // -----   Virtual public method Exec   ------------------------------------
 void CbmMvdDigitiser::Exec(Option_t* opt) {
 
-
-
+    // Clear output array and stations
     fDigis->Clear("C");
+    map<Int_t, CbmMvdStation*>::iterator stationIt;
+    for (stationIt=fStationMap.begin(); stationIt!=fStationMap.end();
+	 stationIt++) (*stationIt).second->Clear();
 
-    BuildEvent(); // Composes input array from signal and background files
+
+    // Fill input arrays with signal and background points
+    Int_t nPoints = BuildEvent();
 
 
     fEvent++;
     TVector3 mom;
 
-    // First loop on MCpoints; Define min and max detectorID
-    Int_t nPoints = fPoints->GetEntriesFast();
-    Int_t minId;
-    Int_t maxId;
-    Int_t volId;
-    Int_t mcTrackIndex;
-    Int_t iPoint=0;
-    CbmMvdPoint* point = NULL;
-    point = (CbmMvdPoint*) fPoints->At(iPoint);
 
-    minId = point->GetDetectorID();
-    maxId = point->GetDetectorID();
+    // Loop over MVD stations
+    for (stationIt=fStationMap.begin(); stationIt!=fStationMap.end();
+	 stationIt++) {
+	CbmMvdStation* station = (*stationIt).second;
 
-    for (iPoint=0; iPoint<nPoints; iPoint++) {
-	point = (CbmMvdPoint*) fPoints->At(iPoint);
-	volId = point->GetDetectorID();
-	if ( volId<minId ) minId = volId;
-	if ( volId>maxId ) maxId = volId;
-    }
-    //====================================================
-
-
-    //loop on mvd stations
-    for (Int_t stationOfInterest = minId; stationOfInterest<(maxId+1);  stationOfInterest++)
-    {
 	fPixelCharge->Clear("C");
 
 	// Clear charge map
 	fChargeMap.clear();
 
-	//Loop on MC points
+	// Loop over MvdPoints in station
+	for (Int_t iPoint=0; iPoint<station->GetNPoints(); iPoint++) {
+	    CbmMvdPoint* point = station->GetPoint(iPoint);
 
-	for (iPoint=0; iPoint<nPoints; iPoint++) {
+	    // Reject for the time being light nuclei.
+	    // They have to be added in the data base...
+	    if ( point->GetPdgCode() > 100000) continue;
 
-	    point = (CbmMvdPoint*) fPoints->At(iPoint);
-	    Int_t volId   = point->GetDetectorID();
-
-	    if ( volId!=stationOfInterest ) continue;
-
-	    SetMvdGeometry(volId);
-
-	    Int_t trackId = point->GetTrackID();
-	    Int_t statNr  = fStationMap[volId];
-	    Int_t pdgCode = point->GetPdgCode();
-
-	    //momentum at the entrance point????
-	    point->Momentum(mom); 
-
-	    fCurrentParticleMomentum = mom.Mag();
-
-	    // reject temporarily light nuclei. they have to be added in the data base...
-	    if ( pdgCode > 100000)   	continue;
-	    //--------------------------------------------------------------------------
-
-	    fCurrentParticleMass = TDatabasePDG::Instance()->GetParticle( pdgCode )->Mass();
-	    ProduceIonisationPoints( point );
+	    // Produce charge in pixels
+	    ProduceIonisationPoints(point, station);
 	    ProduceSignalPoints();
 	    ProducePixelCharge();
 
@@ -464,30 +389,33 @@ void CbmMvdDigitiser::Exec(Option_t* opt) {
 		pixelCharge->DigestCharge( ( (float)( point->GetX()+point->GetXOut() )/2 ) , ( (float)( point->GetY()+point->GetYOut() )/2 )  );
 	    };
 
-	  } //loop on MCpoints
+	} //loop on MCpoints
 
-	  for (Int_t i=0; i<fPixelCharge->GetEntriesFast(); i++)
-	  {
-	      CbmMvdPixelCharge* pixel = (CbmMvdPixelCharge*)fPixelCharge->At(i);
-	      if ( pixel->GetCharge()>fChargeThreshold )
-	      {
-		  Int_t nDigis = fDigis->GetEntriesFast();
-		  new ((*fDigis)[nDigis])
-		      CbmMvdDigi(stationOfInterest,
-				 pixel->GetX(), pixel->GetY(),
-				 pixel->GetCharge(),
-				 fPixelSizeX, fPixelSizeY,
-				 pixel->GetPointX(), pixel->GetPointY(),
-				 pixel->GetContributors(),
-				 pixel->GetMaxChargeContribution());
-	      }
-	  }
-	  //------------------------------------------------------------------------------
+	for (Int_t i=0; i<fPixelCharge->GetEntriesFast(); i++)
+	{
+	    CbmMvdPixelCharge* pixel = (CbmMvdPixelCharge*)fPixelCharge->At(i);
+	    if ( pixel->GetCharge()>fChargeThreshold )
+	    {
+		Int_t nDigis = fDigis->GetEntriesFast();
+		new ((*fDigis)[nDigis])
+		    CbmMvdDigi(station->GetVolumeId(),
+			       pixel->GetX(), pixel->GetY(),
+			       pixel->GetCharge(),
+			       fPixelSizeX, fPixelSizeY,
+			       pixel->GetPointX(), pixel->GetPointY(),
+			       pixel->GetContributors(),
+			       pixel->GetMaxChargeContribution());
+	    }
+	}
+	//------------------------------------------------------------------------------
 
     }//loop on mvd stations
 
-    cout << "Event Nr: " << fEvent << " --- nPoints --- " << nPoints << endl;
-    cout << " => Number of Digis: " << fDigis->GetEntriesFast() <<"\n"<< endl;
+    cout << "\n---------------------------------------------------------------------------" << endl;
+    cout << "-I- " << GetName() <<" ******   Event Nr: " << fEvent << "  ******" << endl;
+    cout << "---------------------------------------------------------------------------" << endl;
+    cout << "-I- " << GetName() <<": Event Nr: " << fEvent << " --- nPoints --- " << nPoints << endl;
+    cout << "-I- " << GetName() <<": Number of Digis: " << fDigis->GetEntriesFast() <<"\n"<< endl;
 
 
 
@@ -495,30 +423,43 @@ void CbmMvdDigitiser::Exec(Option_t* opt) {
 
 // -------------------------------------------------------------------------
 
+
+
 // -------------------------------------------------------------------------
-void CbmMvdDigitiser::ProduceIonisationPoints(CbmMvdPoint* point) {
-    /** Produces ionisation points along track segment within active Silicon layer.
-     */
+void CbmMvdDigitiser::ProduceIonisationPoints(CbmMvdPoint* point,
+					      CbmMvdStation* station) {
+  /** Produces ionisation points along track segment within 
+   ** the active Silicon layer.
+   **/
 
+  if ( (! station) || (! point) )
+    Fatal("ProduceIonisationPoints", "Invalid point or station pointer!");
 
+  Double_t layerRadius = station->GetRmax();
+  Double_t layerTh     = station->GetD();
 
-    Int_t volId   = point->GetDetectorID();
-    SetMvdGeometry(volId);
+  Int_t pdgCode = point->GetPdgCode();
+  Double_t mass = TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass();
+  TVector3 mom;
+  point->Momentum(mom);
+  Double_t momentum = mom.Mag();
+  
+
  
-    // entry and exit from the det layer ( detector ref frame ) :
-    // -------------OK-------------------------------------------//
-    Double_t entryZ = -fLayerTh/2;                               //
-    Double_t exitZ  =  fLayerTh/2;                               //
-                                                                 //
-    Double_t entryX = point->GetX()    + fLayerRadius;           //
-    Double_t exitX  = point->GetXOut() + fLayerRadius;           //
-    Double_t entryY = point->GetY()    + fLayerRadius;           //
-    Double_t exitY  = point->GetYOut() + fLayerRadius;           //
-                                                                 //
-    Double_t lxDet  = TMath::Abs(entryX-exitX);                  //
-    Double_t lyDet  = TMath::Abs(entryY-exitY);                  //
-    Double_t lzDet  = TMath::Abs(entryZ-exitZ);                  //
-    //-----------------------------------------------------------//
+  // entry and exit from the det layer ( detector ref frame ) :
+  // -------------OK-------------------------------------------//
+  Double_t entryZ = -layerTh/2;                                //
+  Double_t exitZ  =  layerTh/2;                                //
+                                                               //
+  Double_t entryX = point->GetX()    + layerRadius;            //
+  Double_t exitX  = point->GetXOut() + layerRadius;            //
+  Double_t entryY = point->GetY()    + layerRadius;            //
+  Double_t exitY  = point->GetYOut() + layerRadius;            //
+                                                               //
+  Double_t lxDet  = TMath::Abs(entryX-exitX);                  //
+  Double_t lyDet  = TMath::Abs(entryY-exitY);                  //
+  Double_t lzDet  = TMath::Abs(entryZ-exitZ);                  //
+  //-----------------------------------------------------------//
 
 
     /**
@@ -596,7 +537,7 @@ void CbmMvdDigitiser::ProduceIonisationPoints(CbmMvdPoint* point) {
 
 
     //Smear the energy on each track segment
-    Double_t dEmean = point->GetEnergyLoss()*fEpiTh/fLayerTh; // dEmean: energy loss corresponds to the epi thickness
+    Double_t dEmean = point->GetEnergyLoss()*fEpiTh/layerTh; // dEmean: energy loss corresponds to the epi thickness
     fNumberOfSegments = int(trackLength/fSegmentLength) + 1;
     dEmean = dEmean/((Double_t)fNumberOfSegments); // From this point dEmean corresponds to the E lost per segment.
    
@@ -631,8 +572,8 @@ void CbmMvdDigitiser::ProduceIonisationPoints(CbmMvdPoint* point) {
 	SignalPoint* spoint=&fSignalPoints[i];
 	Double_t de;
 
-	if( fCurrentParticleMass!=0 ){
-	    de = fFluctuate->SampleFluctuations( double(1000.*fCurrentParticleMomentum), double(1000.*fCurrentParticleMass), fCutOnDeltaRays, segmentLength_update*10, double(1000.*dEmean) ) /1000.;
+	if( mass !=0 ){
+	    de = fFluctuate->SampleFluctuations( double(1000.* momentum), double(1000.*mass), fCutOnDeltaRays, segmentLength_update*10, double(1000.*dEmean) ) /1000.;
 	}
 	else {  de = dEmean;  }
 
@@ -646,16 +587,15 @@ void CbmMvdDigitiser::ProduceIonisationPoints(CbmMvdPoint* point) {
 
         // --- debug 05/08/08 start -------
 
-	Int_t pdgCode = point->GetPdgCode();
 
 
-	x=x-fLayerRadius;
-        y=y-fLayerRadius;
+	x=x-layerRadius;
+        y=y-layerRadius;
 
 	if (sqrt(x*x + y*y )< 0.5) {
-	    cout << "point->GetX()= " <<  point->GetX() <<  " , point->GetXOut()= " << point->GetXOut()  << " , pdg code " << pdgCode<< endl;
-	    cout << "point->GetY()= " <<  point->GetY() <<  " , point->GetYOut()= " << point->GetYOut() << endl;
-	    cout << "point->GetZ()= " <<setprecision(8)<<  point->GetZ() <<  " , point->GetZOut()= " <<setprecision(8)<< point->GetZOut() << endl;
+	    cout <<"-I- " << GetName() << "point->GetX()= " <<  point->GetX() <<  " , point->GetXOut()= " << point->GetXOut()  << " , pdg code " << pdgCode << endl;
+	    cout <<"-I- " << GetName() << "point->GetY()= " <<  point->GetY() <<  " , point->GetYOut()= " << point->GetYOut() << endl;
+	    cout <<"-I- " << GetName() << "point->GetZ()= " <<setprecision(8)<<  point->GetZ() <<  " , point->GetZOut()= " <<setprecision(8)<< point->GetZOut() << endl;
 	}
 
 	// --- debug 05/08/08 end -------
@@ -813,79 +753,78 @@ void CbmMvdDigitiser::TransformPixelIndexToXY(Int_t ix, Int_t iy, Double_t & x, 
 // -------------------------------------------------------------------------
 
 
-void CbmMvdDigitiser::SetMvdGeometry(Int_t detId){
+
+// -----  Private method GetMvdGeometry  ---------------------------------------
+
+/**  The method assumes the following convention:
+ **  --- The MVD stations are of the shape TGeoTube.
+ **  --- The name of a station is mvdstationxx, where xx is the number
+ **      of the station.
+ **  --- The stations are numbered from 1 on consecutively.
+ **  V. Friese, 4 December 2008
+ **/
+
+Int_t CbmMvdDigitiser::GetMvdGeometry() {
+   
+  cout << "-I- " << GetName() << " : Reading MVD geometry..." << endl;
+  Int_t iStation =  1;
+  Int_t volId    = -1;
+  
+  do {
+
+    // Volume name according to convention
+    TString volName  = Form("mvdstation%02i", iStation);
+    volId = gGeoManager->GetUID(volName);
+    if ( volId > -1 ) {
+
+      // Get shape parameters
+      TGeoVolume* volume = gGeoManager->GetVolume(volName.Data());
+      TGeoTube* tube = (TGeoTube*) volume->GetShape();
+      Double_t rmin = tube->GetRmin();
+      Double_t rmax = tube->GetRmax();
+      Double_t d    = 2. * tube->GetDz();
+
+      // Full path to node 
+      TString nodeName = "/cave_1/pipevac1_0/" + volName + "_0";
+
+      // Get z position of node
+      Bool_t nodeFound = gGeoManager->cd(nodeName.Data());
+      if ( ! nodeFound ) {
+	cout << "-E- " << GetName() << "::SetMvdGeometry: Node " << nodeName
+	     << " not found in geometry!" << endl;
+	Fatal("SetMvdGeometry", "Node not found");
+      }
+      Double_t local[3] = {0., 0., 0.};  // Local centre of volume
+      Double_t global[3];                // Global centre of volume
+      gGeoManager->LocalToMaster(local, global);
+      Double_t z = global[2];
 
 
-    /*
+      // Check for already existing station with the same ID
+      // (Just in case, one never knows...)
+      if ( fStationMap.find(volId) != fStationMap.end() ) {
+	cout << "-E- " << GetName() << "::GetMvdGeometry: " 
+	     << "Volume ID " << volId << " already in map!" << endl;
+	Fatal("GetMvdGeometry", "Double volume ID in TGeoManager!");
+      }
 
-    //*********************************
-    if ( detId == 15 ){
-	fLayerRadius = 5; //cm
-	fLayerTh = 0.015; //cm
-	fLayerPosZ   = 10;//cm
-	fLayerRadiusInner = 0.55; // cm
-    }
-    else if( detId == 16 ){
-	fLayerRadius = 10; //cm
-	fLayerTh = 0.015; //cm
-	fLayerPosZ   = 20;//cm
-	fLayerRadiusInner = 1.05; //cm
-    }
-    //*********************************
+      // Create new CbmMvdStation and add it to the map
+      fStationMap[volId] = new CbmMvdStation(volName.Data(), volId, 
+					     z, d, rmin, rmax);
+      fStationMap[volId]->Print();
+      
+      iStation++;
 
-    */
+    }     // Volume found
 
+  } while ( volId > -1 );
 
-
-    //*********** mvd geometry*********
-    if ( detId == 57 ){
-	fLayerRadius = 2.5; //cm
-	fLayerTh = 0.05; //cm
-	fLayerPosZ   = 5;//cm
-	fLayerRadiusInner = 1; // cm
-    }
-    else if( detId == 58 ){
-	fLayerRadius = 3.5; //cm
-	fLayerTh = 0.05; //cm
-	fLayerPosZ   = 7;//cm
-	fLayerRadiusInner = 1; //cm
-    }
-    else if( detId == 59 ){
-	fLayerRadius = 5; //cm
-	fLayerTh = 0.05; //cm
-	fLayerPosZ   = 10;//cm
-	fLayerRadiusInner = 0.8; //cm
-    }
-    else if( detId == 60 ){
-	fLayerRadius = 6; //cm
-	fLayerTh = 0.05; //cm
-	fLayerPosZ   = 12;//cm
-	fLayerRadiusInner = 0.8; //cm
-    }
-    else if( detId == 61 ){
-	fLayerRadius = 7.5; //cm
-	fLayerTh = 0.05; //cm
-	fLayerPosZ   = 15;//cm
-	fLayerRadiusInner = 0.8; //cm
-    }
-    else if( detId == 62 ){
-	fLayerRadius = 8.5; //cm
-	fLayerTh = 0.05; //cm
-	fLayerPosZ   = 17;//cm
-	fLayerRadiusInner = 0.8; //cm
-    }
-    else if( detId == 63 ){
-	fLayerRadius = 10; //cm
-	fLayerTh = 0.05; //cm
-	fLayerPosZ   = 20;//cm
-	fLayerRadiusInner = 0.8; //cm
-    }
-
-    //*********************************
-
-
-
+   
+  return iStation - 1;
 }
+// -----------------------------------------------------------------------------
+
+
 
 
 // -------------------------------------------------------------------------
@@ -930,6 +869,14 @@ void CbmMvdDigitiser::SetParContainers() {
 			      
 // -----    Virtual private method Init   ----------------------------------
 InitStatus CbmMvdDigitiser::Init() {
+
+  // *****  Get MVD geometry
+  Int_t nStations = GetMvdGeometry();
+  if ( ! nStations ) {
+    cout << "-W- " << GetName() << "::Init: No MVD stations in geometry!"
+	 << endl << "   Task will be inactive!" << endl;
+    fActive = kFALSE;
+  }
 
   
   // ************* Get input array
@@ -987,14 +934,6 @@ InitStatus CbmMvdDigitiser::Init() {
   }
 
 
-  // Get parameters from database
-  Bool_t success = GetParameters();
-  if ( ! success ) {
-      cout << "-E- " << GetName() << "::Init: "
-	  << "Error in accessing parameters" << endl;
-      return kERROR;
-  }
-
 
 
   // Screen output
@@ -1013,22 +952,6 @@ InitStatus CbmMvdDigitiser::Init() {
 // -----   Virtual public method Reinit   ----------------------------------
 InitStatus CbmMvdDigitiser::ReInit() {
    return Init();
-  /* // Get parameters from database
-  Bool_t success = GetParameters();
-  if ( ! success ) {
-    cout << "-E- " << GetName() << "::Reinit: "
-	 << "Error in accessing parameters" << endl;
-    return kERROR;
-  }
-
-  // Screen output
-  cout << endl << "---------------------------------------------" << endl;
-  cout << GetName() << " reinitialised with parameters: " << endl;
-  PrintParameters();
-  cout << "---------------------------------------------" << endl;
-
-  return kSUCCESS; */
-
 }
 // -------------------------------------------------------------------------
 
@@ -1106,47 +1029,8 @@ void CbmMvdDigitiser::PrintParameters() {
     cout << "CutOnDeltaRays             : " << setw(8) << setprecision(8)
 	<< fCutOnDeltaRays  << " MeV " <<  endl;
     cout << "ChargeThreshold            : " << setw(8) << setprecision(2)
-	<< fChargeThreshold  <<  endl;
-
-    cout << "Stations used: " << endl;
-
-    map<Int_t, Int_t>::iterator mapIt;
-    for (mapIt=fStationMap.begin(); mapIt!=fStationMap.end(); mapIt++)
-	cout << "MVD Station " << (*mapIt).second << ", volume ID "
-	    << (*mapIt).first << endl;
-
-}
+	<< fChargeThreshold  <<  endl;}
 // -------------------------------------------------------------------------  
-
-
-
-// -----   Private method GetParameters   ----------------------------------
-Bool_t CbmMvdDigitiser::GetParameters() {
-
-  fStationMap.clear();
-  fRadiusMap.clear();
-  if ( ! fGeoPar ) return kFALSE;
-  TObjArray* sensNodes = fGeoPar->GetGeoSensitiveNodes();
-  Int_t nNodes = sensNodes->GetEntriesFast();
-  for (Int_t iNode=0; iNode<nNodes; iNode++) {
-      CbmGeoNode* node = (CbmGeoNode*) (sensNodes->At(iNode));
-      Int_t volId = node->getMCid();
-      TString nodeName = node->getName();
-      char a[2];
-      a[0] = nodeName[10];
-      a[1] = nodeName[11];
-      Int_t stationNr = atoi(a);
-      fStationMap[volId] = stationNr;
-      TArrayD* params = node->getParameters();
-      Double_t rMin  = params->At(0);
-      Double_t rMax  = params->At(1);
-      Double_t thick = 2*( params->At(2) ); //cdritsa
-      pair<Double_t, Double_t> radii(rMin, rMax);
-      fRadiusMap[stationNr] = radii;
-  }
-
-  return kTRUE;
-}
 
 
 

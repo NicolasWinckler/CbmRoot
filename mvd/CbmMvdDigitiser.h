@@ -41,6 +41,7 @@ class TClonesArray;
 class TRandom3;
 class CbmMvdGeoPar;
 class CbmMvdPileupManager;
+class CbmMvdStation;
 
 using namespace std;
 
@@ -76,16 +77,14 @@ class CbmMvdDigitiser : public CbmTask
 
   /** Added by CDritsa **/
 
-  void ProduceIonisationPoints(CbmMvdPoint* MCpoint);
+  void ProduceIonisationPoints(CbmMvdPoint* point, CbmMvdStation* station);
   void ProduceSignalPoints();
-  //void FromLabToDetector(CbmMvdPoint* point, Double_t& InDet, Double_t& OutDet );
   void ProducePixelCharge();
   void TransformXYtoPixelIndex(Double_t x, Double_t y,Int_t & ix, Int_t & iy);
   void TransformPixelIndexToXY(Int_t ix, Int_t iy, Double_t & x, Double_t & y );
   void PositionWithinCell(Double_t x, Double_t y,  Int_t & ix, Int_t & iy, Double_t & xCell, Double_t & yCell);
-  void BuildEvent();
   void AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t charge);
-
+  Int_t BuildEvent();
   Double_t GetDetectorGeometry(CbmMvdPoint* point);
 
   /** Modifiers **/
@@ -108,8 +107,8 @@ class CbmMvdDigitiser : public CbmTask
 
 
 
-//protected:
-public:
+protected:
+//public:
 
     // ----------   Protected data members  ------------------------------------
 
@@ -125,31 +124,12 @@ public:
     Double_t fChargeThreshold;
     Double_t fFanoSilicium;
    
-    //Double_t fLayerLadderLength;
-    //Double_t fLayerLadderHalfWidth;
-    //Double_t fLayerActiveSiOffset;
-   
-
-    Double_t fLayerTh;
-    Double_t fLayerRadius;
-    Double_t fLayerRadiusInner;
-    Double_t fLayerPosZ;
-
     Double_t fEsum;
     Double_t fSegmentDepth;
     Double_t fCurrentTotalCharge;
     Double_t fCurrentParticleMass;
     Double_t fCurrentParticleMomentum;
-    /*
-    Double_t fXin_local;
-    Double_t fYin_local;
-    Double_t fZin_local;
-    Double_t fXout_local;
-    Double_t fYout_local;
-    Double_t fZout_local;
-    */
-
-
+    Int_t    fCurrentParticlePdg;
 
     Int_t fNumberOfSegments;
     Int_t fCurrentLayer;
@@ -165,10 +145,6 @@ public:
     map<pair<Int_t, Int_t>, CbmMvdPixelCharge*> fChargeMap;
     map<pair<Int_t, Int_t>, CbmMvdPixelCharge*>::iterator fChargeMapIt;
 
-
-
-    // std::map<Int_t,Double_t> fDigiMap;
-    // std::pair<Int_t, Int_t> fCellID;
 
 private:
 
@@ -186,11 +162,10 @@ private:
   Int_t    fDeltaBufferSize;
   Int_t    fBgBufferSize;
 
-  /** Map of MC Volume Id to station number **/
-  std::map<Int_t, Int_t> fStationMap;                  //!   
+
+  /** Map of MC Volume Id to MvdStation **/
+  std::map<Int_t, CbmMvdStation*> fStationMap;                  //!   
  
-  /** Map of station number to pair of (rmin, rmax) **/
-  std::map<Int_t, std::pair<Double_t, Double_t> > fRadiusMap;     //!
 
 
   /** IO arrays **/
@@ -272,11 +247,11 @@ private:
   void PrintParameters();
 
 
-  /** Get digitisation parameters from database **/
-  Bool_t GetParameters() ;
  
-  /** Get MVD geometry parameters from database **/
-  Double_t GetMVDGeometry() ;
+  /** Get MVD geometry parameters from database 
+   **@value Number of MVD stations
+   **/
+  Int_t GetMvdGeometry();
  
 
   TH1F* h_trackLength;

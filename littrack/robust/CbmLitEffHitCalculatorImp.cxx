@@ -1,5 +1,5 @@
 #include "CbmLitEffHitCalculatorImp.h"
-#include "CbmLitHit.h"
+#include "CbmLitPixelHit.h"
 
 #include <iostream>
 #include <cmath>
@@ -22,68 +22,68 @@ LitStatus CbmLitEffHitCalculatorImp::Finalize()
 	return kLITSUCCESS;	
 }
 
-CbmLitHit CbmLitEffHitCalculatorImp::DoCalculate(
-		HitIterator itBegin,
-		HitIterator itEnd)
+CbmLitPixelHit CbmLitEffHitCalculatorImp::DoCalculate(
+		HitPtrIterator itBegin,
+		HitPtrIterator itEnd)
 {
-	CbmLitHit hit;
-
-	//calculate effective weight matrix G
-	Double_t eG00 = 0., eG01 = 0., eG11 = 0.;
-	for (HitIterator it = itBegin; it != itEnd; it++) {
-		if ((*it)->IsOutlier()) continue;
-		Double_t dxx = (*it)->GetDx() * (*it)->GetDx();
-		Double_t dyy = (*it)->GetDy() * (*it)->GetDy();
-		Double_t dxy = (*it)->GetDxy();
-		
-		Double_t G00, G01, G11;
-		Inverse(dxx, dxy, dyy, G00, G01, G11);
-	
-		Double_t w = (*it)->GetW();
-		
-		eG00 += w * G00;
-		eG01 += w * G01;
-		eG11 += w * G11;
-	}
-	
-	//calculate effective cov matrix V
-	Double_t eV00, eV01, eV11;
-	Inverse(eG00, eG01, eG11, eV00, eV01, eV11);
-	
-	// calculate effective x znd y
-	Double_t m0 = 0., m1 = 0.;
-	for (HitIterator it = itBegin; it != itEnd; it++) {
-		if ((*it)->IsOutlier()) continue;
-		Double_t dxx = (*it)->GetDx() * (*it)->GetDx();
-		Double_t dyy = (*it)->GetDy() * (*it)->GetDy();
-		Double_t dxy = (*it)->GetDxy();
-		Double_t x = (*it)->GetX();
-		Double_t y = (*it)->GetY();
-		
-		Double_t G00, G01, G11;
-		Inverse(dxx, dxy, dyy, G00, G01, G11);
-		
-		Double_t w = (*it)->GetW();
-		
-		m0 += w * (G00 * x + G01 * y);
-		m1 += w * (G11 * y + G01 * x);
-	}
-	Double_t x = eV00 * m0 + eV01 * m1;
-	Double_t y = eV11 * m1 + eV01 * m0;
-	
-	hit.SetX(x);
-	hit.SetY(y);
-	hit.SetZ((*itBegin)->GetZ());
-	hit.SetDx(std::sqrt(eV00));
-	hit.SetDxy(eV01);
-	hit.SetDy(std::sqrt(eV11));
-	hit.SetPlaneId((*itBegin)->GetPlaneId());
-	
-	return hit;
+//	CbmLitPixelHit hit;
+//
+//	//calculate effective weight matrix G
+//	Double_t eG00 = 0., eG01 = 0., eG11 = 0.;
+//	for (HitPtrIterator it = itBegin; it != itEnd; it++) {
+//		if ((*it)->IsOutlier()) continue;
+//		Double_t dxx = (*it)->GetDx() * (*it)->GetDx();
+//		Double_t dyy = (*it)->GetDy() * (*it)->GetDy();
+//		Double_t dxy = (*it)->GetDxy();
+//		
+//		Double_t G00, G01, G11;
+//		Inverse(dxx, dxy, dyy, G00, G01, G11);
+//	
+//		Double_t w = (*it)->GetW();
+//		
+//		eG00 += w * G00;
+//		eG01 += w * G01;
+//		eG11 += w * G11;
+//	}
+//	
+//	//calculate effective cov matrix V
+//	Double_t eV00, eV01, eV11;
+//	Inverse(eG00, eG01, eG11, eV00, eV01, eV11);
+//	
+//	// calculate effective x znd y
+//	Double_t m0 = 0., m1 = 0.;
+//	for (HitPtrIterator it = itBegin; it != itEnd; it++) {
+//		if ((*it)->IsOutlier()) continue;
+//		Double_t dxx = (*it)->GetDx() * (*it)->GetDx();
+//		Double_t dyy = (*it)->GetDy() * (*it)->GetDy();
+//		Double_t dxy = (*it)->GetDxy();
+//		Double_t x = (*it)->GetX();
+//		Double_t y = (*it)->GetY();
+//		
+//		Double_t G00, G01, G11;
+//		Inverse(dxx, dxy, dyy, G00, G01, G11);
+//		
+//		Double_t w = (*it)->GetW();
+//		
+//		m0 += w * (G00 * x + G01 * y);
+//		m1 += w * (G11 * y + G01 * x);
+//	}
+//	Double_t x = eV00 * m0 + eV01 * m1;
+//	Double_t y = eV11 * m1 + eV01 * m0;
+//	
+//	hit.SetX(x);
+//	hit.SetY(y);
+//	hit.SetZ((*itBegin)->GetZ());
+//	hit.SetDx(std::sqrt(eV00));
+//	hit.SetDxy(eV01);
+//	hit.SetDy(std::sqrt(eV11));
+//	hit.SetPlaneId((*itBegin)->GetPlaneId());
+//	
+//	return hit;
 }
 
-CbmLitHit CbmLitEffHitCalculatorImp::DoCalculate(
-		HitVector& hits)
+CbmLitPixelHit CbmLitEffHitCalculatorImp::DoCalculate(
+		HitPtrVector& hits)
 {
 	return DoCalculate(hits.begin(), hits.end());
 }

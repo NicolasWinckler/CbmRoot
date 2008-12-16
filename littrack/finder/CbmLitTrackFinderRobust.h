@@ -1,21 +1,21 @@
 #ifndef CBMLITTRACKFINDERROBUST_H_
 #define CBMLITTRACKFINDERROBUST_H_
 
-#include "CbmLitTrackFinderImp.h"
+#include "CbmLitTrackFinderBase.h"
 
 //class CbmLitWeightCalculator;
 //class CbmLitEffHitCalculator;
 
-class CbmLitTrackFinderRobust : public CbmLitTrackFinderImp
+class CbmLitTrackFinderRobust : public CbmLitTrackFinderBase
 {
 public:
 	CbmLitTrackFinderRobust();
 	virtual ~CbmLitTrackFinderRobust();
 	
 	LitStatus DoFind(
-			const HitVector& hits,
-			const TrackVector& trackSeeds,
-			TrackVector& tracks);
+			const HitPtrVector& hits,
+			const TrackPtrVector& trackSeeds,
+			TrackPtrVector& tracks);
 	
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
@@ -26,8 +26,8 @@ private:
 //	CbmLitEffHitCalculator* fEffHitCalc;
 	
 	void FollowTracks(
-			TrackIterator itBegin,
-			TrackIterator itEnd);
+			TrackPtrIterator itBegin,
+			TrackPtrIterator itEnd);
 	
     void FollowTrack(
     		CbmLitTrack *track);

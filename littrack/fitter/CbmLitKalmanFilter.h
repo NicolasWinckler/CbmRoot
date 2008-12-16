@@ -17,6 +17,8 @@
 #include "CbmLitTrackUpdate.h"
 
 class CbmLitHit;
+class CbmLitStripHit;
+class CbmLitPixelHit;
 class CbmLitTrackParam;
 
 class CbmLitKalmanFilter: public CbmLitTrackUpdate 
@@ -42,7 +44,16 @@ public:
 		   CbmLitTrackParam *par, 
 		   const CbmLitHit *hit);
    
-   ClassDef(CbmLitKalmanFilter,1)
+private:
+	LitStatus Update( 
+		   CbmLitTrackParam *par, 
+		   const CbmLitPixelHit *hit);
+	
+	LitStatus Update( 
+		   CbmLitTrackParam *par, 
+		   const CbmLitStripHit *hit);
+   
+	ClassDef(CbmLitKalmanFilter,1)
 }; 
 
 #endif //CbmLitKalmanFilter

@@ -1,5 +1,9 @@
 #include "CbmLitTrack.h"
 
+#include "CbmLitHit.h"
+#include "CbmLitPixelHit.h"
+#include "CbmLitStripHit.h"
+
 #include "CbmLitComparators.h"
 #include "CbmLitMemoryManagment.h"
 
@@ -12,7 +16,8 @@ CbmLitTrack::CbmLitTrack() :
 	fNDF(0),
 	fPreviousTrackId(0),
 	fLastPlaneId(0),
-	fPDG(211)
+	fPDG(211),
+	fNofMissingHits(0)
 {
 }
 
@@ -38,6 +43,7 @@ CbmLitTrack& CbmLitTrack::operator=(
 	SetLastPlaneId(track.GetLastPlaneId());
 	SetPDG(track.GetPDG());
 	SetFitNodes(track.GetFitNodes());
+	SetNofMissingHits(track.GetNofMissingHits());
 	
 	return *this;
 }
@@ -45,8 +51,14 @@ CbmLitTrack& CbmLitTrack::operator=(
 void CbmLitTrack::AddHit(
 		const CbmLitHit* hit)
 {
-	CbmLitHit* newHit = new CbmLitHit(*hit);
-	fHits.push_back(newHit);
+	if (hit->GetType() == kLITSTRIPHIT){
+		// TODO do we need typecasting here?!?!?
+		CbmLitStripHit* newHit = new CbmLitStripHit(*static_cast<const CbmLitStripHit*>(hit));
+		fHits.push_back(newHit);
+	}else if (hit->GetType() == kLITPIXELHIT){
+		CbmLitPixelHit* newHit = new CbmLitPixelHit(*static_cast<const CbmLitPixelHit*>(hit));
+		fHits.push_back(newHit);
+	}
 }
 
 void CbmLitTrack::RemoveHit(
@@ -87,8 +99,8 @@ Bool_t CbmLitTrack::CheckParams() const
 	std::vector<Double_t> covFirst(fParamFirst.GetCovMatrix());
 	std::vector<Double_t> covLast(fParamLast.GetCovMatrix());
 	for (int i = 0; i < 15; i++) {
-		if (TMath::Abs(covFirst[i]) > 10000. ||
-			TMath::Abs(covLast[i]) > 10000.) return false;	
+		if (std::abs(covFirst[i]) > 10000. ||
+			std::abs(covLast[i]) > 10000.) return false;	
 	}
 	return true;
 }
@@ -98,29 +110,29 @@ Int_t CbmLitTrack::GetNofHits(
 {
 	CbmLitHit value;
 	value.SetPlaneId(planeId);
-	HitIteratorPair bounds = 
+	HitPtrIteratorPair bounds = 
 			std::equal_range(fHits.begin(), fHits.end(), &value, CompareHitPtrPlaneIdLess());
 	return bounds.second - bounds.first;
 }
 
-HitIteratorPair CbmLitTrack::GetHits(
+HitPtrIteratorPair CbmLitTrack::GetHits(
 		Int_t planeId)
 {
 	CbmLitHit value;
 	value.SetPlaneId(planeId);
-	HitIteratorPair bounds = 
+	HitPtrIteratorPair bounds = 
 			std::equal_range(fHits.begin(), fHits.end(), &value, CompareHitPtrPlaneIdLess());
 	return bounds;
 }
 
 void CbmLitTrack::GetHitBounds(
-		std::vector<HitIteratorPair>& bounds)
+		std::vector<HitPtrIteratorPair>& bounds)
 {
 	bounds.clear();
 	Int_t min = fHits.front()->GetPlaneId();
 	Int_t max = fHits.back()->GetPlaneId();
 	for (Int_t i = min; i <= max; i++) {
-		HitIteratorPair b = GetHits(i);
+		HitPtrIteratorPair b = GetHits(i);
 		if(b.first == b.second) continue;
 		bounds.push_back(b);
 	}

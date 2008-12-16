@@ -23,17 +23,17 @@ LitStatus CbmLitTrackSelectionA::Finalize()
 }
 
 LitStatus CbmLitTrackSelectionA::DoSelect(
-		TrackIterator itBegin,
-		TrackIterator itEnd)
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
 	
 	std::sort(itBegin, itEnd, CompareTrackPtrNofHitsLess());
 	
-	for (TrackIterator iTrack0 = itBegin; iTrack0 != itEnd - 1; iTrack0++){
+	for (TrackPtrIterator iTrack0 = itBegin; iTrack0 != itEnd - 1; iTrack0++){
 		Int_t nofHits0 = (*iTrack0)->GetNofHits();
 		if ((*iTrack0)->GetQuality() == kLITBAD) continue;
-		for (TrackIterator iTrack1 = iTrack0 + 1; iTrack1 != itEnd; iTrack1++){
+		for (TrackPtrIterator iTrack1 = iTrack0 + 1; iTrack1 != itEnd; iTrack1++){
 				Int_t nofHits1 = (*iTrack1)->GetNofHits();
 				if (nofHits0 == nofHits1) continue;
 				if (IsHitSharing(*iTrack0, *iTrack1)) (*iTrack0)->SetQuality(kLITBAD);				
@@ -44,7 +44,7 @@ LitStatus CbmLitTrackSelectionA::DoSelect(
 }
 
 LitStatus CbmLitTrackSelectionA::DoSelect(
-		TrackVector& tracks)
+		TrackPtrVector& tracks)
 {
 	return DoSelect(tracks.begin(), tracks.end());
 }

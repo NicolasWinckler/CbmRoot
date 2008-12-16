@@ -5,6 +5,8 @@
 #include "CbmLitEnvironment.h"
 #include "CbmLitConverter.h"
 #include "CbmLitMemoryManagment.h"
+#include "CbmLitHit.h"
+#include "CbmLitTrack.h"
 
 #include "CbmRootManager.h"
 
@@ -52,11 +54,11 @@ Int_t CbmLitTrdTrackFinderRobust::DoFind(
 		TClonesArray* hitArray,
 		TClonesArray* trackArray)
 {
-	HitVector hits;
-	TrackVector trackSeeds;
-	TrackVector foundTracks;
+	HitPtrVector hits;
+	TrackPtrVector trackSeeds;
+	TrackPtrVector foundTracks;
 	
-	CbmLitConverter::TrkHitArrayToHitVector(hitArray, hits);
+	CbmLitConverter::TrkHitArrayToPixelHitVector(hitArray, hits);
 	CreateTrackSeeds(fTrackSeedsArray, trackSeeds);
 	
 	CbmLitTrackFinderRobust::DoFind(hits, trackSeeds, foundTracks);
@@ -75,7 +77,7 @@ Int_t CbmLitTrdTrackFinderRobust::DoFind(
 
 void CbmLitTrdTrackFinderRobust::CreateTrackSeeds(
 		TClonesArray* trackArray,
-		TrackVector& trackSeeds)
+		TrackPtrVector& trackSeeds)
 {
 	CbmLitConverter::StsTrackArrayToTrackVector(trackArray, trackSeeds);
 
@@ -84,8 +86,8 @@ void CbmLitTrdTrackFinderRobust::CreateTrackSeeds(
                 << trackArray->GetEntriesFast() << " tracks were loaded, "
                 << trackSeeds.size() << " tracks were created" << std::endl;
     
-    Double_t Ze = fLayout.GetLayerZ(0);
-    for (TrackIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {   	
+    Double_t Ze = fLayout.GetSubstation(0, 0, 0).GetZ();
+    for (TrackPtrIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {   	
     	CbmLitTrackParam par = *(*iTrack)->GetParamLast();
        fPropagatorToDet->Propagate(&par, Ze, fPDG);
        (*iTrack)->SetParamLast(&par);

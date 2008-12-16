@@ -16,6 +16,7 @@
 
 #include "CbmLitDetectorLayout.h"
 #include "TObject.h"
+#include <vector>
 
 class CbmField;
 class TGeoNode;
@@ -43,7 +44,15 @@ private:
    
    CbmField *fField;
    
-   void DetermineLayout(CbmLitDetectorLayout& layout);
+   void DetermineLayout(
+		   const std::vector<CbmLitStation>& stations,
+		   CbmLitDetectorLayout& layout);
+   
+   std::vector<CbmLitStation> DivideToSubstations(
+		   const std::vector<CbmLitStation>& stations);
+   
+   bool IsStraw() const;
+   bool IsTrdSegmented() const;
    
    ClassDef(CbmLitEnvironment,1)
 }; 

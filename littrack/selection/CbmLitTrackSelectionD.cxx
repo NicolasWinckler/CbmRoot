@@ -25,15 +25,15 @@ LitStatus CbmLitTrackSelectionD::Finalize()
 }
 
 LitStatus CbmLitTrackSelectionD::DoSelect(
-		TrackIterator itBegin,
-		TrackIterator itEnd)
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
 	
 //	Properties().GetProperty("fMinNofHits", fMinNofHits);
 //	Properties().GetProperty("fMinLastPlaneId", fMinLastPlaneId);	
 	
-	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
+	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
 		if ((*iTrack)->GetQuality() == kLITBAD) continue;
 		if ((*iTrack)->GetNofHits() < fMinNofHits ||
 			(*iTrack)->GetLastPlaneId() < fMinLastPlaneId) (*iTrack)->SetQuality(kLITBAD);		
@@ -43,7 +43,7 @@ LitStatus CbmLitTrackSelectionD::DoSelect(
 }
 
 LitStatus CbmLitTrackSelectionD::DoSelect(
-		TrackVector& tracks)
+		TrackPtrVector& tracks)
 {
 	return DoSelect(tracks.begin(), tracks.end());
 }

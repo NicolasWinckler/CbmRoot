@@ -6,8 +6,6 @@
 class CbmLitTrackPropagator;
 class CbmLitTrackUpdate;
 class CbmLitTrack;
-class CbmLitHit;
-class CbmLitTrackParam;
 
 class CbmLitTrackFitterImp : public CbmLitTrackFitter
 {

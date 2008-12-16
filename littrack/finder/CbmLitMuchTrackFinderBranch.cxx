@@ -42,7 +42,7 @@ void CbmLitMuchTrackFinderBranch::Init()
    fPropagatorToDet = fPropagator = factory->CreateTrackPropagator("Much");
    fFilter = factory->CreateTrackUpdate("Much");
    fSeedSelection = factory->CreateTrackSelection("MomentumSeed");
-   fStationSelection = factory->CreateTrackSelection("Momentum");
+   fStationGroupSelection = factory->CreateTrackSelection("Momentum");
    fFinalSelection = factory->CreateTrackSelection("MuchFinal");
    fFinalPreSelection = factory->CreateTrackSelection("Empty");
    fFitter = factory->CreateTrackFitter("Much");
@@ -50,9 +50,9 @@ void CbmLitMuchTrackFinderBranch::Init()
    fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
    fVerbose = 1;
    fNofIter = 1;
-   fBeginStation = 0;
-   fEndStation = fLayout.GetNofStations() - 1;
-   fMaxNofMissingHitsInStation = 0;
+   fBeginStationGroup = 0;
+   fEndStationGroup = fLayout.GetNofStationGroups() - 1;
+   fMaxNofMissingHitsInStationGroup = 0;
    fMaxNofMissingHits = 0;
    fSigmaCoef = 3.;
    fPDG = 13;
@@ -62,11 +62,11 @@ Int_t CbmLitMuchTrackFinderBranch::DoFind(
 		TClonesArray* hitArray,
 		TClonesArray* trackArray)
 {
-	HitVector hits;
-	TrackVector trackSeeds;
-	TrackVector foundTracks;
+	HitPtrVector hits;
+	TrackPtrVector trackSeeds;
+	TrackPtrVector foundTracks;
 	
-	CbmLitConverter::TrkHitArrayToHitVector(hitArray, hits);
+	CbmLitConverter::MuchHitArrayToHitVector(hitArray, hits);
 	CreateTrackSeeds(fTrackSeedsArray, trackSeeds);
 	
 	CbmLitTrackFinderBranch::DoFind(hits, trackSeeds, foundTracks);
@@ -85,7 +85,7 @@ Int_t CbmLitMuchTrackFinderBranch::DoFind(
 
 void CbmLitMuchTrackFinderBranch::CreateTrackSeeds(
 		TClonesArray* trackArray,
-		TrackVector& trackSeeds)
+		TrackPtrVector& trackSeeds)
 {
 	CbmLitConverter::StsTrackArrayToTrackVector(trackArray, trackSeeds);
     
@@ -94,8 +94,8 @@ void CbmLitMuchTrackFinderBranch::CreateTrackSeeds(
                 << trackArray->GetEntriesFast() << " tracks were loaded, "
                 << trackSeeds.size() << " tracks were created" << std::endl;
     
-    Double_t Ze = fLayout.GetLayerZ(0);
-    for (TrackIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {   	
+    Double_t Ze = fLayout.GetSubstation(0, 0, 0).GetZ();
+    for (TrackPtrIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {   	
     	CbmLitTrackParam par = *(*iTrack)->GetParamLast();
        fPropagatorToDet->Propagate(&par, Ze, fPDG);
        (*iTrack)->SetParamLast(&par);

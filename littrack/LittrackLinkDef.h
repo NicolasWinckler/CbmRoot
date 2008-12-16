@@ -13,6 +13,12 @@
 #pragma link C++ class  CbmLitTool+;
 #pragma link C++ class  CbmLitPDG+;
 #pragma link C++ class  CbmLitDetectorLayout+;
+#pragma link C++ class  CbmLitStation+;
+#pragma link C++ class  CbmLitStationGroup+;
+#pragma link C++ class  CbmLitSubstation+;
+#pragma link C++ class  CbmLitEnvironment+;
+#pragma link C++ class  CbmLitToolFactory+;
+#pragma link C++ class  CbmLitHitData+;
 
 //cbm
 #pragma link C++ class  CbmPropagatorGeane+;
@@ -20,19 +26,21 @@
 
 // data
 #pragma link C++ class  CbmLitHit+;
+#pragma link C++ class  CbmLitPixelHit+;
+#pragma link C++ class  CbmLitStripHit+;
 #pragma link C++ class  CbmLitTrackParam+;
 #pragma link C++ class  CbmLitTrack+;
 #pragma link C++ class  CbmLitFitNode+;
    
 // finder
-#pragma link C++ class  CbmLitTrackFinderImp+;
-#pragma link C++ class  CbmLitTrackFinderBranch+;
 #pragma link C++ class  CbmLitTrackFinderRobust+;
 #pragma link C++ class  CbmLitTrdTrackFinderSts+;
 #pragma link C++ class  CbmLitTrdTrackFinderS+;
 #pragma link C++ class  CbmLitMuchTrackFinderBranch+;
 #pragma link C++ class  CbmLitMuchTrackFinderRobust+;
 #pragma link C++ class  CbmLitTrdTrackFinderRobust+;
+#pragma link C++ class  CbmLitTrackFinderBase+;
+#pragma link C++ class  CbmLitTrackFinderBranch+;
 //#pragma link C++ class  CbmLitMuchTrackFinderTrigger+;
 
 //fitter
@@ -84,9 +92,5 @@
 // utils
 #pragma link C++ class  CbmLitConverter+;
 
-// 
-#pragma link C++ class  CbmLitEnvironment+;
-#pragma link C++ class  CbmLitToolFactory+;
-//#pragma link C++ class  CbmLitTestGm+;
 
 #endif

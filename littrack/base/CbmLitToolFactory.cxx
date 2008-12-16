@@ -184,18 +184,18 @@ CbmLitTrackSelection* CbmLitToolFactory::CreateTrackSelection(
 	if(name == "MuchFinal") {
 		CbmLitTrackSelectionMuch* muchSelection = new CbmLitTrackSelectionMuch();
 		muchSelection->SetNofSharedHits(2);
-		Int_t nofStations = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofStations();
-		muchSelection->SetMinLastPlaneId(nofStations-2);
-		Int_t nofLayers = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofLayers();
+		Int_t nofStations = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofStationGroups();
+		muchSelection->SetMinLastPlaneId(nofStations-1);
+		Int_t nofLayers = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofPlanes();
 		muchSelection->SetMinNofHits(1);
 		muchSelection->Initialize(); 
 		return muchSelection;
 	} else 
 	if(name == "MuchPreFinal") {
 		CbmLitTrackSelectionD* muchSelection = new CbmLitTrackSelectionD();
-		Int_t nofStations = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofStations();
+		Int_t nofStations = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofStationGroups();
 		muchSelection->SetMinLastPlaneId(nofStations-1);
-		Int_t nofLayers = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofLayers();
+		Int_t nofLayers = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofPlanes();
 		muchSelection->SetMinNofHits(nofLayers - 3);
 		muchSelection->Initialize(); 
 		return muchSelection;
@@ -212,8 +212,8 @@ CbmLitTrackSelection* CbmLitToolFactory::CreateTrackSelection(
 		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
 		trdSelection->SetNofSharedHits(2);
 		trdSelection->SetMinNofHits(2);
-		Int_t nofStations = CbmLitEnvironment::Instance()->GetTrdLayout().GetNofStations();
-		trdSelection->SetMinLastPlaneId(nofStations-1);
+		Int_t nofStationGroups = CbmLitEnvironment::Instance()->GetTrdLayout().GetNofStationGroups();
+		trdSelection->SetMinLastPlaneId(nofStationGroups-1);
 		trdSelection->Initialize(); 
 		return trdSelection;
 	}

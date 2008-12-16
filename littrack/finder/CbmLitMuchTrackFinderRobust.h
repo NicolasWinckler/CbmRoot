@@ -13,7 +13,7 @@ class CbmLitTrackUpdate;
 class CbmLitTrackFitter;
 class CbmLitTrackSelection;
 class CbmLitTrack;
-class CbmLitHit;
+class CbmLitPixelHit;
 class TClonesArray;
 
 class CbmLitMuchTrackFinderRobust : public CbmMuchTrackFinder,
@@ -37,7 +37,7 @@ private:
     
 	void CreateTrackSeeds(
     		TClonesArray* trackArray,
-    		TrackVector& trackSeeds);
+    		TrackPtrVector& trackSeeds);
 	
 	ClassDef(CbmLitMuchTrackFinderRobust, 1);	
 };

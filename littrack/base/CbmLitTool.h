@@ -13,7 +13,7 @@
 #ifndef CBMLITTOOL_H_
 #define CBMLITTOOL_H_
 
-#include "CbmLitStatusCode.h"
+#include "CbmLitEnums.h"
 
 #include "TObject.h"
 

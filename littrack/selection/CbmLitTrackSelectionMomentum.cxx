@@ -25,12 +25,12 @@ LitStatus CbmLitTrackSelectionMomentum::Finalize()
 }
 
 LitStatus CbmLitTrackSelectionMomentum::DoSelect(
-		TrackIterator itBegin,
-		TrackIterator itEnd)
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
 
-	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
+	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
 		if ((*iTrack)->GetQuality() == kLITBAD) continue;
 		if ((*iTrack)->GetParamLast()->GetQp() == 0.) {
 			(*iTrack)->SetQuality(kLITBAD);
@@ -43,7 +43,7 @@ LitStatus CbmLitTrackSelectionMomentum::DoSelect(
 }
 
 LitStatus CbmLitTrackSelectionMomentum::DoSelect(
-		TrackVector& tracks)
+		TrackPtrVector& tracks)
 {
 	return DoSelect(tracks.begin(), tracks.end());
 }

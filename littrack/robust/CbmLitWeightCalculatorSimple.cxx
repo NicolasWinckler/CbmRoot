@@ -1,6 +1,6 @@
 #include "CbmLitWeightCalculatorSimple.h"
 
-#include "CbmLitHit.h"
+#include "CbmLitPixelHit.h"
 
 CbmLitWeightCalculatorSimple::CbmLitWeightCalculatorSimple()
 {
@@ -22,13 +22,13 @@ LitStatus CbmLitWeightCalculatorSimple::Finalize()
 
 LitStatus CbmLitWeightCalculatorSimple::DoCalculate(
 		const CbmLitTrackParam* par,
-		HitIterator itBegin,
-		HitIterator itEnd)
+		HitPtrIterator itBegin,
+		HitPtrIterator itEnd)
 {
 	Int_t nofHits = itEnd - itBegin;
 	Double_t w = 1.0 / Double_t(nofHits);
 	
-	for(HitIterator it = itBegin; it != itEnd; it++) {
+	for(HitPtrIterator it = itBegin; it != itEnd; it++) {
 		(*it)->SetW(w);
 	}
 	
@@ -37,7 +37,7 @@ LitStatus CbmLitWeightCalculatorSimple::DoCalculate(
 
 LitStatus CbmLitWeightCalculatorSimple::DoCalculate(
 		const CbmLitTrackParam* par,
-		HitVector& hits)
+		HitPtrVector& hits)
 {
 	return DoCalculate(par, hits.begin(), hits.end());
 }

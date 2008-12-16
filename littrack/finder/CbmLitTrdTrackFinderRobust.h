@@ -25,7 +25,7 @@ private:
     
 	void CreateTrackSeeds(
     		TClonesArray* trackArray,
-    		TrackVector& trackSeeds);
+    		TrackPtrVector& trackSeeds);
 	
 	ClassDef(CbmLitTrdTrackFinderRobust, 1);
 };

@@ -221,7 +221,7 @@ private:
   
   Int_t fNEvents; 
   
-  Int_t fNofTrue[20];
+  //Int_t fNofTrue[20];
 
   ClassDef(CbmLitRecQa,1);
 };

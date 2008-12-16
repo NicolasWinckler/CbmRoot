@@ -34,14 +34,14 @@ InitStatus CbmLitElossAna::Init()
 	CbmRootManager* ioman = CbmRootManager::Instance();
     if (!ioman) Fatal("Init", "No CbmRootManager");
    
-    fMCTrackArray  = (TClonesArray*) ioman->GetObject("MCTrack");
+    fMCTrackArray  = (TClonesArray*) ioman->ActivateBranch("MCTrack");
     if (!fMCTrackArray) Fatal("Init", "No MCTrack array!");
 
-    fMCPointArray  = (TClonesArray*) ioman->GetObject("MuchPoint");
+    fMCPointArray  = (TClonesArray*) ioman->ActivateBranch("MuchPoint");
     if (!fMCPointArray) Fatal("Init", "No MuchPoint array!");
     
     Int_t nBins = 1000;
-    Int_t nBinsMom = 100;
+    Int_t nBinsMom = 400;
     Double_t minEloss = 0.;
     Double_t maxEloss = 10.0;
     Double_t minMom = 0.1;
@@ -75,14 +75,14 @@ InitStatus CbmLitElossAna::Init()
     fhm_pull_qp = new TH2F("fhm_pull_qp", "pull_qp vs. momentum",
             nBinsMom, minMom, maxMom, nBins, -10., 10.);       
     
-    Double_t minTeta = 0.0;
-    Double_t maxTeta = 0.1;
-    fh_teta_mc = new TH1F("fh_teta_mc", "teta_mc", nBins, minTeta, maxTeta);
-    fh_teta_calc = new TH1F("fh_teta_calc", "teta_calc", nBins, minTeta, maxTeta);
-    fhm_teta_mc = new TH2F("fhm_teta_mc", "teta_mc vs. momentum",
-            nBins, minTeta, maxTeta, nBinsMom, minMom, maxMom);
-    fhm_teta_calc = new TH2F("fhm_teta_calc", "teta_calc vs. momentum",
-            nBins, minTeta, maxTeta, nBinsMom, minMom, maxMom);
+    Double_t minTheta = -0.2;
+    Double_t maxTheta =  0.2;
+    fh_theta_mc = new TH1F("fh_theta_mc", "theta_mc", nBins, minTheta, maxTheta);
+    fh_theta_calc = new TH1F("fh_theta_calc", "theta_calc", nBins, minTheta, maxTheta);
+    fhm_theta_mc = new TH2F("fhm_theta_mc", "theta_mc vs. momentum",
+            nBinsMom, minMom, maxMom, nBins, minTheta, maxTheta);
+    fhm_theta_calc = new TH2F("fhm_theta_calc", "theta_calc vs. momentum",
+            nBinsMom, minMom, maxMom, nBins, minTheta, maxTheta);
      
     
     fMatEff = new CbmLitMaterialEffectsImp();
@@ -97,12 +97,11 @@ void CbmLitElossAna::SetParContainers()
 {
 }
 
-void CbmLitElossAna::Exec(Option_t* opt) 
+void CbmLitElossAna::Exec(Option_t* opt)
 {
 	Double_t mass = 0.105;
 	Double_t Q;
-	
-	Int_t nofTracks = fMCTrackArray->GetEntriesFast();	
+	Int_t nofTracks = fMCTrackArray->GetEntriesFast();
 	for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
         CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTrackArray->At(iTrack);
         Int_t motherId = mcTrack->GetMotherId();
@@ -110,7 +109,7 @@ void CbmLitElossAna::Exec(Option_t* opt)
         if (mcTrack->GetPdgCode() == -13) Q = 1.;
         else if (mcTrack->GetPdgCode() == 13) Q = -1.;
         else continue;
-       
+
         CbmMuchPoint* point = NULL;
         
     	Int_t nofPoints = fMCPointArray->GetEntriesFast();
@@ -174,6 +173,21 @@ void CbmLitElossAna::Exec(Option_t* opt)
         fh_pull_qp->Fill(pull);
     	fhm_pull_qp->Fill(momIn.Mag(), pull); 
     	
+    	// multiple scattering
+    	//std::cout << "theta=" << momIn.Theta() << " " << momOut.Theta() << std::endl;
+    	Double_t mc_theta = momOut.Theta() * std::cos(momOut.Phi());
+    	//if (momOut.Phi() < 0) mc_theta = -mc_theta;
+    	//std::cout << "theta1=" << momIn.Theta() << " theta2=" << momOut.Theta() << std::endl;
+        fh_theta_mc->Fill(mc_theta);
+        fhm_theta_mc->Fill(momIn.Mag(), mc_theta);
+       
+        if (momIn.Mag() == 0.) continue;
+        par.SetQp(Q/momIn.Mag());
+        Double_t calc_theta = CalcTheta(&par, &fMaterial);
+        std::cout << "calc_theta=" << calc_theta << std::endl;
+        fh_theta_calc->Fill(calc_theta);
+        fhm_theta_calc->Fill(momIn.Mag(), calc_theta);
+    	
 	} //loop over MC tracks
 	
 	std::cout << "Event no: " << fNEvents++ << std::endl;
@@ -199,10 +213,10 @@ void CbmLitElossAna::Finish()
 	fhm_qp_err_calc->Write();
 	fhm_pull_qp->Write();
 		
-    fh_teta_mc->Write();
-    fh_teta_calc->Write();
-    fhm_teta_mc->Write();
-    fhm_teta_calc->Write();	
+    fh_theta_mc->Write();
+    fh_theta_calc->Write();
+    fhm_theta_mc->Write();
+    fhm_theta_calc->Write();	
 }
 
 void CbmLitElossAna::GetGeometry()
@@ -250,6 +264,13 @@ Double_t CbmLitElossAna::CalcSigmaQp(
           const CbmLitMaterialInfo* mat) const
 {
 	return std::sqrt(fMatEff->CalcSigmaSqQp(par, mat));
+}
+
+Double_t CbmLitElossAna::CalcTheta( 
+          const CbmLitTrackParam* par,
+          const CbmLitMaterialInfo* mat) const
+{
+	return std::sqrt(fMatEff->CalcThetaSq(par, mat));
 }
 
 Double_t CbmLitElossAna::dE(

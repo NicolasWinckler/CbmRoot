@@ -41,8 +41,8 @@ LitStatus CbmLitTrackSelectionMuch::Finalize()
 }
 
 LitStatus CbmLitTrackSelectionMuch::DoSelect(
-		TrackIterator itBegin,
-		TrackIterator itEnd)
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
 {
 	
 	if (itBegin == itEnd) return kLITSUCCESS;
@@ -51,10 +51,10 @@ LitStatus CbmLitTrackSelectionMuch::DoSelect(
 	((CbmLitTrackSelectionD*)fSelectionD)->SetMinNofHits(fMinNofHits);
 	((CbmLitTrackSelectionD*)fSelectionD)->SetMinLastPlaneId(fMinLastPlaneId);
 		
-	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) 
+	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) 
 		(*iTrack)->SetQuality(kLITGOOD);
 
-	fSelectionA->DoSelect(itBegin, itEnd);
+	//fSelectionA->DoSelect(itBegin, itEnd);
 	//fSelectionB->DoSelect(itBegin, itEnd);
 	fSelectionC->DoSelect(itBegin, itEnd);
 	fSelectionD->DoSelect(itBegin, itEnd);
@@ -63,7 +63,7 @@ LitStatus CbmLitTrackSelectionMuch::DoSelect(
 }
 
 LitStatus CbmLitTrackSelectionMuch::DoSelect(
-		TrackVector& tracks)
+		TrackPtrVector& tracks)
 {
 	return DoSelect(tracks.begin(), tracks.end());
 }

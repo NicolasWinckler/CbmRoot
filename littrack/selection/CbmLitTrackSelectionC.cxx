@@ -27,8 +27,8 @@ LitStatus CbmLitTrackSelectionC::Finalize()
 }
 
 LitStatus CbmLitTrackSelectionC::DoSelect(
-		TrackIterator itBegin,
-		TrackIterator itEnd)
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
 	
@@ -40,14 +40,14 @@ LitStatus CbmLitTrackSelectionC::DoSelect(
 }
 
 LitStatus CbmLitTrackSelectionC::DoSelect(
-		TrackVector& tracks)
+		TrackPtrVector& tracks)
 {
 	return DoSelect(tracks.begin(), tracks.end());
 }
 
 void CbmLitTrackSelectionC::SortNofHits(
-		TrackIterator itBegin,
-		TrackIterator itEnd)
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
 {
 	std::sort(itBegin, itEnd, CompareTrackPtrNofHitsMore());
 	
@@ -59,7 +59,7 @@ void CbmLitTrackSelectionC::SortNofHits(
 		value.SetNofHits(iNofHits);
 		//if (!std::binary_search(tracks.begin(), tracks.end(), &value, CompareTrackPtrNofHitsMore())) continue;
 		
-		std::pair<TrackIterator, TrackIterator> bounds;
+		std::pair<TrackPtrIterator, TrackPtrIterator> bounds;
 		bounds = std::equal_range(itBegin, itEnd, &value, CompareTrackPtrNofHitsMore());
 		
 		if(bounds.first == bounds.second) continue;
@@ -69,8 +69,8 @@ void CbmLitTrackSelectionC::SortNofHits(
 }
 
 void CbmLitTrackSelectionC::SortLastPlaneId(
-		TrackIterator itBegin,
-		TrackIterator itEnd)
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
 {
 	std::sort(itBegin, itEnd, CompareTrackPtrLastPlaneIdMore());
 	
@@ -86,7 +86,7 @@ void CbmLitTrackSelectionC::SortLastPlaneId(
 		value.SetLastPlaneId(iPlaneId);
 		//if (!std::binary_search(tracks.begin(), tracks.end(), &value, CompareTrackPtrLastPlaneIdMore())) continue;
 			
-		std::pair<TrackIterator, TrackIterator> bounds;
+		std::pair<TrackPtrIterator, TrackPtrIterator> bounds;
 		bounds = std::equal_range(itBegin, itEnd, &value, CompareTrackPtrLastPlaneIdMore());
 		
 		if(bounds.first == bounds.second) continue;
@@ -100,12 +100,12 @@ void CbmLitTrackSelectionC::SortLastPlaneId(
 
 
 void CbmLitTrackSelectionC::CheckSharedHits(
-		TrackIterator itBegin,
-		TrackIterator itEnd)
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
 {
 	std::set<Int_t> hitsId;
 	
-	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
+	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
 
 		if ((*iTrack)->GetQuality() == kLITBAD) continue;
 	    

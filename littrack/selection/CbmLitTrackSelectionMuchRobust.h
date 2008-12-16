@@ -13,11 +13,11 @@ public:
 	virtual LitStatus Finalize();
 	
 	virtual LitStatus DoSelect(
-			TrackIterator itBegin,
-			TrackIterator itEnd);
+			TrackPtrIterator itBegin,
+			TrackPtrIterator itEnd);
 	
 	virtual LitStatus DoSelect(
-			TrackVector& tracks);
+			TrackPtrVector& tracks);
 	
 	Int_t GetNofSharedHits() const {return fNofSharedHits;}
 	Int_t GetMinLastPlaneId() const {return fMinLastPlaneId;}

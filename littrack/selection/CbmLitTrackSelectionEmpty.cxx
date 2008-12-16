@@ -22,14 +22,14 @@ LitStatus CbmLitTrackSelectionEmpty::Finalize()
 }
 
 LitStatus CbmLitTrackSelectionEmpty::DoSelect(
-		TrackIterator itBegin,
-		TrackIterator itEnd)
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
 {
 	return kLITSUCCESS;
 }
 
 LitStatus CbmLitTrackSelectionEmpty::DoSelect(
-		TrackVector& tracks)
+		TrackPtrVector& tracks)
 {
 	return DoSelect(tracks.begin(), tracks.end());
 }

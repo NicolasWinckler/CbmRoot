@@ -74,7 +74,7 @@ void CbmLitMuchTrackFinderTrigger::ArrangeHits()
          continue;
       }
       
-      CbmLitHit* litHit = new CbmLitHit;
+      CbmLitPixelHit* litHit = new CbmLitPixelHit;
       CbmLitConverter::TrkHitToLitHit(hit, iHit, litHit);
       //litHit->MapFromCbmTrkHit(hit, iHit);
       fHits[layer].push_back(litHit);
@@ -99,8 +99,8 @@ void CbmLitMuchTrackFinderTrigger::ArrangeHits()
 
 void CbmLitMuchTrackFinderTrigger::CreateTracks()
 {
-	std::vector<CbmLitHit*>& hits = fHits[fNofLayers - 1];
-	typedef std::vector<CbmLitHit*>::iterator HitIterator;
+	std::vector<CbmLitPixelHit*>& hits = fHits[fNofLayers - 1];
+	typedef std::vector<CbmLitPixelHit*>::iterator HitIterator;
 	
 	Int_t nofLastStations = 2;
 	Int_t nofLastLayers = 0;
@@ -119,7 +119,7 @@ void CbmLitMuchTrackFinderTrigger::CreateTracks()
 		
 		std::vector<Double_t> nofTrackHits(nofLastLayers);
 		
-		std::vector<CbmLitHit*> trackHits;
+		std::vector<CbmLitPixelHit*> trackHits;
 		trackHits.reserve(10);
 		trackHits.push_back(*iLastHit);
 		
@@ -158,7 +158,7 @@ void CbmLitMuchTrackFinderTrigger::CreateTracks()
 // -----------------------------------------------------------------------
 
 // -----------------------------------------------------------------------
-void CbmLitMuchTrackFinderTrigger::AddTrack(std::vector<CbmLitHit*>& trackHits)
+void CbmLitMuchTrackFinderTrigger::AddTrack(std::vector<CbmLitPixelHit*>& trackHits)
 {
 	CbmLitTrack* track = new CbmLitTrack;
 	
@@ -176,7 +176,7 @@ void CbmLitMuchTrackFinderTrigger::AddTrack(std::vector<CbmLitHit*>& trackHits)
 // -----------------------------------------------------------------------
 Bool_t CbmLitMuchTrackFinderTrigger::IsIn(Double_t xpred, 
 		                                  Double_t ypred,
-		                                  CbmLitHit* pHit)
+		                                  CbmLitPixelHit* pHit)
 {
     Double_t xhit = pHit->GetX();
 	Double_t yhit = pHit->GetY();

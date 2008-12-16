@@ -8,6 +8,9 @@ class CbmLitWeightCalculator;
 class CbmLitEffHitCalculator;
 
 class CbmLitTrackParam;
+class CbmLitStripHit;
+class CbmLitPixelHit;
+class CbmLitHit;
 
 class CbmLitTrackFitterRobust : public CbmLitTrackFitter
 {
@@ -25,37 +28,52 @@ public:
 			CbmLitTrack *track,
 			Bool_t downstream = true);
 private:
-	
 	LitStatus MultivariateGaussWeight(
 			const CbmLitTrackParam* par,
 			CbmLitHit* hit,
 			Double_t T) const;
-
+	LitStatus MultivariateGaussWeight(
+			const CbmLitTrackParam* par,
+			CbmLitStripHit* hit,
+			Double_t T) const;
+	LitStatus MultivariateGaussWeight(
+			const CbmLitTrackParam* par,
+			CbmLitPixelHit* hit,
+			Double_t T) const;
+	
 	Double_t MultivariateGaussCut(
 			const CbmLitHit* hit,
+			Double_t T,
+			Double_t cutValue) const;
+	Double_t MultivariateGaussCut(
+			const CbmLitStripHit* hit,
+			Double_t T,
+			Double_t cutValue) const;
+	Double_t MultivariateGaussCut(
+			const CbmLitPixelHit* hit,
 			Double_t T,
 			Double_t cutValue) const;
 
 	LitStatus CalcWeights(
 			const CbmLitTrackParam* par,
-			HitIterator itBegin,
-			HitIterator itEnd,
+			HitPtrIterator itBegin,
+			HitPtrIterator itEnd,
 			Int_t iter) const;
 	
 	Bool_t AreAllOutliers(
-			HitIterator itBegin,
-			HitIterator itEnd) const;
+			HitPtrIterator itBegin,
+			HitPtrIterator itEnd) const;
 	
 	void MarkOutliers(
-			HitIterator itBegin,
-			HitIterator itEnd) const;
+			HitPtrIterator itBegin,
+			HitPtrIterator itEnd) const;
 	
 	LitStatus Normalize(
-			HitIterator itBegin,
-			HitIterator itEnd) const;
+			HitPtrIterator itBegin,
+			HitPtrIterator itEnd) const;
 	
 	LitStatus CreateEffTrack(
-			const std::vector<HitIteratorPair>& bounds,
+			const std::vector<HitPtrIteratorPair>& bounds,
 			Int_t iter,
 			CbmLitTrack* etrack) const;
 	

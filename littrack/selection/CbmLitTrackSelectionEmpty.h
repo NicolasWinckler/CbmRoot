@@ -15,11 +15,11 @@ public:
 	virtual LitStatus Finalize();
 	
 	virtual LitStatus DoSelect(
-			TrackIterator itBegin,
-			TrackIterator itEnd);
+			TrackPtrIterator itBegin,
+			TrackPtrIterator itEnd);
 	
 	virtual LitStatus DoSelect(
-			TrackVector& tracks);
+			TrackPtrVector& tracks);
 
 
 	ClassDef(CbmLitTrackSelectionEmpty, 1);

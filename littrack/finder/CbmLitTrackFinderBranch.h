@@ -1,62 +1,102 @@
-#ifndef CBMLITTRACKFINDERBRANCH_H_
-#define CBMLITTRACKFINDERBRANCH_H_
+#ifndef CBMLITTRACKFINDERBASEBRANCH_H_
+#define CBMLITTRACKFINDERBASEBRANCH_H_
 
-#include "CbmLitTrackFinderImp.h"
+#include "CbmLitTrackFinderBase.h"
 
-class CbmLitTrackFinderBranch : public CbmLitTrackFinderImp
+class CbmLitTrackSelection;
+class CbmLitTrackUpdate;
+class CbmLitTrackFitter;
+
+class CbmLitTrackFinderBranch : public CbmLitTrackFinderBase
 {
 public:
 	CbmLitTrackFinderBranch();
 	virtual ~CbmLitTrackFinderBranch();
 	
 	LitStatus DoFind(
-			const HitVector& hits,
-			const TrackVector& trackSeeds,
-			TrackVector& tracks);
+			const HitPtrVector& hits,
+			const TrackPtrVector& trackSeeds,
+			TrackPtrVector& tracks);
 	
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
 	
 protected:
 	
+	TrackPtrVector fTracksCopy;
+	TrackPtrVector fFoundTracks;
+	
+	//TrackPtrVector fTracksStationIn;
+	//TrackPtrVector fTracksStationOut;
+	
+	CbmLitTrackSelection* fFinalPreSelection;
+	CbmLitTrackSelection* fStationGroupSelection;
+	CbmLitTrackUpdate* fFilter;
+	CbmLitTrackFitter* fFitter;
+	
 	Int_t fMaxNofBranches;
-    TrackVector fFoundTracks;
-    TrackVector fTracksCopy;
-    
-	// Main track following procedure
-    void TrackFollowing();
-    
-	// Follows track through the station
-    void TrackFollowingStation(
-    		const CbmLitTrack *track, 
-    		Int_t station);
-    
-    // Process the layer
-    Bool_t ProcessLayer(
-    		Int_t layerInStation,
-    		HitIterator &hitIt,
-    		HitIteratorPair &bounds,
-    		std::vector<Int_t>& nofMissingHits,  
-            CbmLitTrackParam* par,     
-            CbmLitTrackParam* uPar,
-            HitVector& hits,
-            std::vector<Double_t>& chi2);
-    
-    // Adds track candidate 
-    void AddTrackCandidate(
-    		const CbmLitTrack* track, 
-    		const HitVector& hits, 
-    		const std::vector<Double_t>& chi2,
-    		const CbmLitTrackParam* par,
-    		Int_t station);
-    
-    void RefitTracks(
-    		TrackIterator itBegin,
-    		TrackIterator itEnd);
-    
-    void CopyToOutputArray();
-    
-	ClassDef(CbmLitTrackFinderBranch, 1);
+	
+	void FollowTracks();
+	
+	void ProcessStationGroup(
+			const CbmLitTrack *track, 
+			Int_t stationGroup);
+	
+	Bool_t ProcessStation(                      
+			Int_t station,
+			Int_t substation,
+			HitPtrIterator &hitIt,
+			HitPtrIteratorPair &bounds,
+	 		std::vector<Int_t>& nofMissingHits,  
+			CbmLitTrackParam* par,
+			CbmLitTrackParam* uPar,
+			HitPtrVector& hits,
+			std::vector<Double_t>& chiSq);
+	
+	void AddTrackCandidate(
+			const CbmLitTrack* track,
+			const HitPtrVector& hits, 
+			const std::vector<Double_t>& chiSq,
+			const CbmLitTrackParam* par,
+			Int_t stationGroup);
+	
+//	void ProcessStationGroup(
+//			const CbmLitTrack *track, 
+//			Int_t stationGroup);
+//	
+//	Bool_t ProcessStation(
+//			const CbmLitTrack *track, 
+//			Int_t stationGroup,
+//			Int_t station,
+//			TrackPtrVector& tracksOut);
+//	
+//	Bool_t ProcessSubstation(
+//			Int_t substation,
+//			HitPtrIterator hitIt,
+//			HitPtrIteratorPair bounds,
+//			const CbmLitTrackParam* par,
+//			CbmLitTrackParam* uPar,
+//			HitPtrVector& hits,
+//			std::vector<Double_t>& chiSq);
+//	
+//	Bool_t AddTrackCandidate(
+//			const CbmLitTrack* track,
+//			const HitPtrVector& hits, 
+//			const std::vector<Double_t>& chiSq,
+//			const CbmLitTrackParam* par,
+//			TrackPtrVector& tracksOut);
+//	
+//	void AddTrackCandidate(
+//			TrackPtrVector& tracks,
+//			Int_t stationGroup);
+	
+	void RefitTracks(
+			TrackPtrIterator itBegin,
+			TrackPtrIterator itEnd);
+	
+	void CopyToOutputArray();
+	
+	ClassDef(CbmLitTrackFinderBranch,1);
 };
 
-#endif /*CBMLITTRACKFINDERBRANCH_H_*/
+#endif /*CBMLITTRACKFINDERBASEBRANCH_H_*/

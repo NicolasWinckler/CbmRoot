@@ -4,7 +4,7 @@
 #include "CbmLitTrackParam.h"
 #include "CbmLitFitNode.h"
 #include "CbmLitTypes.h"
-#include "CbmLitTrackQaCode.h"
+#include "CbmLitEnums.h"
 
 #include <string>
 
@@ -28,11 +28,12 @@ public:
 	const CbmLitTrackParam* GetParamLast() const { return &fParamLast; }
 	Int_t GetLastPlaneId() const { return fLastPlaneId; };
 	const CbmLitHit* GetHit(Int_t index) const { return fHits[index];}
-	const HitVector& GetHits() const { return fHits;}
+	const HitPtrVector& GetHits() const { return fHits;}
 	const CbmLitFitNode* GetFitNode(Int_t index) const {return &fFitNodes[index];}
 	const FitNodeVector& GetFitNodes() const {return fFitNodes;}
-	HitIteratorPair GetHits(Int_t planeId);
-	void GetHitBounds(std::vector<HitIteratorPair>& bounds);
+	HitPtrIteratorPair GetHits(Int_t planeId);
+	void GetHitBounds(std::vector<HitPtrIteratorPair>& bounds);
+	Int_t GetNofMissingHits() const {return fNofMissingHits;}
 	
 	void SetQuality(LitTrackQa quality) { fQuality = quality; }
 	void SetChi2(Double_t chi2) { fChi2 = chi2; }
@@ -47,6 +48,7 @@ public:
 	void AddHit(const CbmLitHit* hit);
 	void SetFitNodes(const FitNodeVector& nodes) {fFitNodes = nodes;}	
 	void SortHits(Bool_t downstream = true);
+	void SetNofMissingHits(Int_t nofMissingHits) {fNofMissingHits = nofMissingHits;}
 	
 	void RemoveHit(Int_t index);
 	
@@ -57,7 +59,7 @@ public:
 
 private:
 
-	HitVector fHits;
+	HitPtrVector fHits;
 	CbmLitTrackParam fParamFirst;
 	CbmLitTrackParam fParamLast;
 	FitNodeVector fFitNodes;
@@ -67,6 +69,7 @@ private:
 	Int_t fPreviousTrackId;
 	Int_t fLastPlaneId;
 	Int_t fPDG;
+	Int_t fNofMissingHits;
 	
 	ClassDef(CbmLitTrack, 1);
 };

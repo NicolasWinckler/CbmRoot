@@ -44,23 +44,31 @@ ana/CbmLitElossAna.cxx
 ana/CbmLitPropAna.cxx
 ana/CbmLitRobustAna.cxx
 base/CbmLitTool.cxx
+base/CbmLitSubstation.cxx
+base/CbmLitStation.cxx
+base/CbmLitStationGroup.cxx
 base/CbmLitDetectorLayout.cxx
 base/CbmLitPDG.cxx
+base/CbmLitEnvironment.cxx  
+base/CbmLitToolFactory.cxx
+base/CbmLitHitData.cxx
 cbm/CbmPropagatorGeane.cxx
 cbm/CbmPropagatorLit.cxx
 data/CbmLitHit.cxx
+data/CbmLitPixelHit.cxx
+data/CbmLitStripHit.cxx
 data/CbmLitTrackParam.cxx
 data/CbmLitTrack.cxx
 data/CbmLitFitNode.cxx
 #finder/CbmLitMuchTrackFinderTrigger.cxx
-finder/CbmLitTrackFinderImp.cxx
-finder/CbmLitTrackFinderBranch.cxx
 finder/CbmLitTrackFinderRobust.cxx
 finder/CbmLitTrdTrackFinderSts.cxx
 finder/CbmLitTrdTrackFinderS.cxx
 finder/CbmLitMuchTrackFinderBranch.cxx
 finder/CbmLitMuchTrackFinderRobust.cxx
 finder/CbmLitTrdTrackFinderRobust.cxx
+finder/CbmLitTrackFinderBase.cxx
+finder/CbmLitTrackFinderBranch.cxx
 fitter/CbmLitTrackFitterImp.cxx
 fitter/CbmLitKalmanFilter.cxx
 fitter/CbmLitTrackFitterRobust.cxx
@@ -100,13 +108,9 @@ utils/CbmLitMemoryManagment.cxx
 utils/CbmLitConverter.cxx
 utils/CbmLitTypes.cxx
 utils/CbmLitMath.cxx
-CbmLitEnvironment.cxx  
-CbmLitToolFactory.cxx
-#CbmLitTestGm.cxx
 )
 
 SET(LITTRACK_SRCS ${LITTRACK_SRCS_RULECHECKER})
-#base/CbmProperty.cxx)
 
 if(RULE_CHECKER_FOUND)
   CHECK_RULES("${LITTRACK_SRCS_RULECHECKER}" "${INCLUDE_DIRECTORIES}" LITTRACK_RULES)

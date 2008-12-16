@@ -18,8 +18,9 @@ public:
 	virtual ~CbmLitTrdTrackFinderSts();
 	
     virtual void Init();
-    virtual Int_t DoFind(TClonesArray* hitArray,
-                         TClonesArray* trackArray);
+    virtual Int_t DoFind(
+    		TClonesArray* hitArray,
+            TClonesArray* trackArray);
 
 private:
 	TClonesArray* fTrackSeedsArray;
@@ -27,11 +28,12 @@ private:
 	CbmLitTrackPropagator* fPropagatorToDet;
 	CbmLitTrackExtrapolator* fExtrapolatorToDet;
     
-    virtual void SetIterationParameters(Int_t iter);
+    virtual void SetIterationParameters(
+    		Int_t iter);
     
 	void CreateTrackSeeds(
     		TClonesArray* trackArray,
-    		TrackVector& trackSeeds);
+    		TrackPtrVector& trackSeeds);
 
 	ClassDef(CbmLitTrdTrackFinderSts, 1);
 };

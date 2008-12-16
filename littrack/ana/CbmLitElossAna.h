@@ -47,6 +47,9 @@ private:
 	          const CbmLitTrackParam* par,
 	          const CbmLitMaterialInfo* mat) const;
 	
+	Double_t CalcTheta( 
+	          const CbmLitTrackParam* par,
+	          const CbmLitMaterialInfo* mat) const;
 	
 	Double_t dE(
 			CbmMuchPoint* point);
@@ -75,10 +78,10 @@ private:
     TH2F* fhm_qp_err_calc;    
     TH2F* fhm_pull_qp; 
     
-    TH1F* fh_teta_mc;
-    TH1F* fh_teta_calc;
-    TH2F* fhm_teta_mc;
-    TH2F* fhm_teta_calc;
+    TH1F* fh_theta_mc;
+    TH1F* fh_theta_calc;
+    TH2F* fhm_theta_mc;
+    TH2F* fhm_theta_calc;
 
     CbmLitMaterialInfo fMaterial;
     CbmLitMaterialEffectsImp* fMatEff;

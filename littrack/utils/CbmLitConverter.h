@@ -3,13 +3,15 @@
 
 #include "CbmLitTypes.h"
 
-class CbmLitHit;
+class CbmLitPixelHit;
+class CbmLitStripHit;
 class CbmLitTrack;
 class CbmLitTrackParam;
 class CbmTrkHit;
 class CbmTrackParam;
 class CbmTrdHit;
 class CbmMuchTrack;
+class CbmMuchHit;
 class CbmTrdTrack;
 class CbmStsTrack;
 class TClonesArray;
@@ -32,10 +34,15 @@ public:
 			const CbmLitTrackParam* litPar,
 			CbmTrackParam* par);
 
-	static void TrkHitToLitHit(
+	static void TrkHitToLitPixelHit(
 			const CbmTrkHit* trkHit, 
 			Int_t index,
-			CbmLitHit* litHit);
+			CbmLitPixelHit* litHit);
+	
+	static void MuchHitToLitStripHit(
+			CbmMuchHit* muchHit, 
+			Int_t index,
+			CbmLitStripHit* litHit);
 	
 	static void LitHitToTrdHit(
 			const CbmLitHit* litHit,
@@ -45,7 +52,7 @@ public:
 			const CbmStsTrack* stsTrack,
 			CbmLitTrack* litTrack);
 	
-	void MuchTrackToLitTrack(
+	static void MuchTrackToLitTrack(
 			const CbmMuchTrack* muchTrack,
 			CbmLitTrack* litTrack,
 			TClonesArray* hits);
@@ -58,20 +65,24 @@ public:
 			const CbmLitTrack* litTrack,
 			CbmTrdTrack* trdTrack);
 	
-	static void TrkHitArrayToHitVector(
+	static void TrkHitArrayToPixelHitVector(
 			const TClonesArray* hits,
-			HitVector& litHits);
+			HitPtrVector& litHits);
+	
+	static void MuchHitArrayToHitVector(
+			const TClonesArray* hits,
+			HitPtrVector& litHits);
 	
 	static void StsTrackArrayToTrackVector(
 			const TClonesArray* tracks,
-			TrackVector& litTracks);
+			TrackPtrVector& litTracks);
 	
 	static void TrackVectorToMuchTrackArray(
-			TrackVector& tracks,
+			TrackPtrVector& tracks,
 			TClonesArray* muchTracks);
 	
 	static void TrackVectorToTrdTrackArray(
-			TrackVector& tracks,
+			TrackPtrVector& tracks,
 			TClonesArray* muchTracks);
 	
 	ClassDef(CbmLitConverter, 1);

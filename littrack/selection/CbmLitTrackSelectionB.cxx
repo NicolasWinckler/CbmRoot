@@ -26,8 +26,8 @@ LitStatus CbmLitTrackSelectionB::Finalize()
 }
 
 LitStatus CbmLitTrackSelectionB::DoSelect(
-		TrackIterator itBegin,
-		TrackIterator itEnd)
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
 	
@@ -46,7 +46,7 @@ LitStatus CbmLitTrackSelectionB::DoSelect(
 		value.SetPreviousTrackId(iId);
 		//if (!std::binary_search(tracks.begin(), tracks.end(), &value, CompareTrackPtrNofHitsMore())) continue;
 		//std::cout << iId << " ";
-		std::pair<TrackIterator, TrackIterator> bounds;
+		std::pair<TrackPtrIterator, TrackPtrIterator> bounds;
 		bounds = std::equal_range(itBegin, itEnd, &value, CompareTrackPtrPrevTrackIdLess());	
 		if(bounds.first == bounds.second) continue;
 		
@@ -55,7 +55,7 @@ LitStatus CbmLitTrackSelectionB::DoSelect(
 //			<< " and " << int(bounds.second - itBegin) << std::endl;
 		SortLastPlaneId(bounds.first, bounds.second);
 		//if ((*bounds.first)->GetFlag() == 0) (*bounds.first)->SetFlag(0);
-		for (TrackIterator i = bounds.first + 1; i != bounds.second; i++) 
+		for (TrackPtrIterator i = bounds.first + 1; i != bounds.second; i++) 
 			(*i)->SetQuality(kLITBAD);
 
 		//fSelection->DoSelect(bounds.first, bounds.second);
@@ -65,14 +65,14 @@ LitStatus CbmLitTrackSelectionB::DoSelect(
 }
 
 LitStatus CbmLitTrackSelectionB::DoSelect(
-		TrackVector& tracks)
+		TrackPtrVector& tracks)
 {
 	return DoSelect(tracks.begin(), tracks.end());	
 }
 
 void CbmLitTrackSelectionB::SortLastPlaneId(
-		TrackIterator itBegin,
-		TrackIterator itEnd)
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
 {
 	std::sort(itBegin, itEnd, CompareTrackPtrLastPlaneIdMore());
 	
@@ -88,7 +88,7 @@ void CbmLitTrackSelectionB::SortLastPlaneId(
 		value.SetLastPlaneId(iPlaneId);
 		//if (!std::binary_search(tracks.begin(), tracks.end(), &value, CompareTrackPtrLastPlaneIdMore())) continue;
 			
-		std::pair<TrackIterator, TrackIterator> bounds;
+		std::pair<TrackPtrIterator, TrackPtrIterator> bounds;
 		bounds = std::equal_range(itBegin, itEnd, &value, CompareTrackPtrLastPlaneIdMore());
 		
 		if(bounds.first == bounds.second) continue;

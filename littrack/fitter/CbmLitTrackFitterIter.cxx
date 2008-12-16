@@ -1,6 +1,6 @@
 #include "CbmLitTrackFitterIter.h"
 
-#include "CbmLitHit.h"
+#include "CbmLitPixelHit.h"
 #include "CbmLitTrack.h"
 #include "CbmLitFitNode.h"
 

@@ -40,8 +40,8 @@ LitStatus CbmLitTrackSelectionMuchRobust::Finalize()
 }
 
 LitStatus CbmLitTrackSelectionMuchRobust::DoSelect(
-		TrackIterator itBegin,
-		TrackIterator itEnd)
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
 	
@@ -50,7 +50,7 @@ LitStatus CbmLitTrackSelectionMuchRobust::DoSelect(
 	((CbmLitTrackSelectionD*)fSelectionD)->SetMinLastPlaneId(10);
 	((CbmLitTrackSelectionChiSq*)fSelectionChiSq)->SetMaxChiSq(15.);
 	
-	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) 
+	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) 
 		(*iTrack)->SetQuality(kLITGOOD);
 
 	fSelectionD->DoSelect(itBegin, itEnd);
@@ -66,7 +66,7 @@ LitStatus CbmLitTrackSelectionMuchRobust::DoSelect(
 }
 
 LitStatus CbmLitTrackSelectionMuchRobust::DoSelect(
-		TrackVector& tracks)
+		TrackPtrVector& tracks)
 {
 	return DoSelect(tracks.begin(), tracks.end());
 }

@@ -6,6 +6,7 @@
 
 #include <set>
 #include <iostream>
+#include <functional>
 
 CbmLitTrackSelectionTrd::CbmLitTrackSelectionTrd():
 	fNofSharedHits(0),
@@ -33,8 +34,8 @@ LitStatus CbmLitTrackSelectionTrd::Finalize()
 }
 
 LitStatus CbmLitTrackSelectionTrd::DoSelect(
-		TrackIterator itBegin,
-		TrackIterator itEnd)
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
 	
@@ -42,8 +43,11 @@ LitStatus CbmLitTrackSelectionTrd::DoSelect(
 	((CbmLitTrackSelectionD*)fSelectionD)->SetMinNofHits(fMinNofHits);
 	((CbmLitTrackSelectionD*)fSelectionD)->SetMinLastPlaneId(fMinLastPlaneId);
 		
-	for (TrackIterator iTrack = itBegin; iTrack != itEnd; iTrack++) 
+	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) 
 		(*iTrack)->SetQuality(kLITGOOD);
+
+//	for_each(itBegin, itEnd, 
+//			std::bind2nd(std::mem_fun(&CbmLitTrack::SetQuality),kLITGOOD));
 
 	fSelectionC->DoSelect(itBegin, itEnd);
 	fSelectionD->DoSelect(itBegin, itEnd);
@@ -52,7 +56,7 @@ LitStatus CbmLitTrackSelectionTrd::DoSelect(
 }
 
 LitStatus CbmLitTrackSelectionTrd::DoSelect(
-		TrackVector& tracks)
+		TrackPtrVector& tracks)
 {
 	return DoSelect(tracks.begin(), tracks.end());
 }

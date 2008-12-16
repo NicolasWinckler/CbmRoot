@@ -13,11 +13,11 @@ public:
 	virtual ~CbmLitTrackSelection();
 	
 	virtual LitStatus DoSelect(
-			TrackIterator itBegin,
-			TrackIterator itEnd) = 0;
+			TrackPtrIterator itBegin,
+			TrackPtrIterator itEnd) = 0;
 	
 	virtual LitStatus DoSelect(
-			TrackVector& tracks) = 0;
+			TrackPtrVector& tracks) = 0;
 		
 	ClassDef(CbmLitTrackSelection, 1);
 };

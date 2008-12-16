@@ -17,11 +17,11 @@ public:
 	virtual LitStatus Finalize();
 	
 	virtual LitStatus DoSelect(
-			TrackIterator itBegin,
-			TrackIterator itEnd);
+			TrackPtrIterator itBegin,
+			TrackPtrIterator itEnd);
 	
 	virtual LitStatus DoSelect(
-			TrackVector& tracks);
+			TrackPtrVector& tracks);
 	
 	Int_t GetNofSharedHits() const {return fNofSharedHits;}
 	
@@ -32,16 +32,16 @@ private:
 	Int_t fNofSharedHits;
 	
 	void CheckSharedHits(
-			TrackIterator itBegin,
-			TrackIterator itEnd);
+			TrackPtrIterator itBegin,
+			TrackPtrIterator itEnd);
 	
 	void SortLastPlaneId(
-			TrackIterator itBegin,
-			TrackIterator itEnd);
+			TrackPtrIterator itBegin,
+			TrackPtrIterator itEnd);
 	
 	void SortNofHits(
-			TrackIterator itBegin,
-			TrackIterator itEnd);
+			TrackPtrIterator itBegin,
+			TrackPtrIterator itEnd);
 	
 	ClassDef(CbmLitTrackSelectionC, 1);
 };

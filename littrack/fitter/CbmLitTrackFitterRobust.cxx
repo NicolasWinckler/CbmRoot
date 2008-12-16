@@ -1,6 +1,8 @@
 #include "CbmLitTrackFitterRobust.h"
 
 #include "CbmLitHit.h"
+#include "CbmLitStripHit.h"
+#include "CbmLitPixelHit.h"
 #include "CbmLitTrack.h"
 #include "CbmLitTrackParam.h"
 #include "CbmLitWeightCalculator.h"
@@ -60,7 +62,7 @@ LitStatus CbmLitTrackFitterRobust::Fit(
 	CbmLitRobustAna::Instance()->Fill(track);
 	
 	track->SortHits();
-	std::vector<HitIteratorPair> bounds;
+	std::vector<HitPtrIteratorPair> bounds;
 	track->GetHitBounds(bounds);
 
 	CbmLitTrack etrack;
@@ -98,10 +100,10 @@ LitStatus CbmLitTrackFitterRobust::Fit(
 }
 
 Bool_t CbmLitTrackFitterRobust::AreAllOutliers(
-		HitIterator itBegin,
-		HitIterator itEnd) const
+		HitPtrIterator itBegin,
+		HitPtrIterator itEnd) const
 {
-	for(HitIterator it = itBegin; it != itEnd; it++) {
+	for(HitPtrIterator it = itBegin; it != itEnd; it++) {
 		if (!(*it)->IsOutlier()) {
 			return false;
 		}
@@ -110,10 +112,10 @@ Bool_t CbmLitTrackFitterRobust::AreAllOutliers(
 }
 
 void CbmLitTrackFitterRobust::MarkOutliers(
-		HitIterator itBegin,
-		HitIterator itEnd) const
+		HitPtrIterator itBegin,
+		HitPtrIterator itEnd) const
 {
-	for(HitIterator it = itBegin; it != itEnd; it++) {
+	for(HitPtrIterator it = itBegin; it != itEnd; it++) {
 		if ((*it)->GetW() < fOutlierCut) (*it)->IsOutlier(true); 
 	}
 }
@@ -121,6 +123,25 @@ void CbmLitTrackFitterRobust::MarkOutliers(
 LitStatus CbmLitTrackFitterRobust::MultivariateGaussWeight(
 		const CbmLitTrackParam* par,
 		CbmLitHit* hit,
+		Double_t T) const
+{
+	if (hit->GetType() == kLITSTRIPHIT) 
+		MultivariateGaussWeight(par, static_cast<const CbmLitStripHit*>(hit), T);
+	else if (hit->GetType() == kLITPIXELHIT) 
+		MultivariateGaussWeight(par, static_cast<const CbmLitPixelHit*>(hit), T);
+}
+
+LitStatus CbmLitTrackFitterRobust::MultivariateGaussWeight(
+		const CbmLitTrackParam* par,
+		CbmLitStripHit* hit,
+		Double_t T) const
+{
+	std::cout << "MultivariateGaussWeight NOT IMPLEMENTED FOR STRIP HIT!!!!"<< std::endl;
+}
+
+LitStatus CbmLitTrackFitterRobust::MultivariateGaussWeight(
+		const CbmLitTrackParam* par,
+		CbmLitPixelHit* hit,
 		Double_t T) const
 {
 	Double_t dim = 2.;
@@ -146,6 +167,25 @@ Double_t CbmLitTrackFitterRobust::MultivariateGaussCut(
 		Double_t T,
 		Double_t cutValue) const
 {
+	if (hit->GetType() == kLITSTRIPHIT) 
+		MultivariateGaussCut(static_cast<const CbmLitStripHit*>(hit), T, cutValue);
+	else if (hit->GetType() == kLITPIXELHIT) 
+		MultivariateGaussCut(static_cast<const CbmLitPixelHit*>(hit), T, cutValue);
+}
+
+Double_t CbmLitTrackFitterRobust::MultivariateGaussCut(
+		const CbmLitStripHit* hit,
+		Double_t T,
+		Double_t cutValue) const
+{
+	std::cout << "MultivariateGaussCut NOT IMPLEMENTED FOR STRIP HIT!!!!"<< std::endl;
+}
+
+Double_t CbmLitTrackFitterRobust::MultivariateGaussCut(
+		const CbmLitPixelHit* hit,
+		Double_t T,
+		Double_t cutValue) const
+{
 	Double_t dim = 2.;
 	const Double_t PI = 3.14159265;
 
@@ -161,15 +201,15 @@ Double_t CbmLitTrackFitterRobust::MultivariateGaussCut(
 
 LitStatus CbmLitTrackFitterRobust::CalcWeights(
 		const CbmLitTrackParam* par,
-		HitIterator itBegin,
-		HitIterator itEnd,
+		HitPtrIterator itBegin,
+		HitPtrIterator itEnd,
 		Int_t iter) const
 {
 	if (iter == 0) {
 		fWeightCalcSimple->DoCalculate(par, itBegin, itEnd);
 	} else {
 		Double_t T = fAnnealing[iter];
-		for(HitIterator it = itBegin; it != itEnd; it++) {
+		for(HitPtrIterator it = itBegin; it != itEnd; it++) {
 			CbmLitHit* hit = *it; 
 			if ((*it)->IsOutlier()) continue;
 			MultivariateGaussWeight(par, *it, T);
@@ -180,13 +220,13 @@ LitStatus CbmLitTrackFitterRobust::CalcWeights(
 }
 
 LitStatus CbmLitTrackFitterRobust::Normalize(
-		HitIterator itBegin,
-		HitIterator itEnd) const
+		HitPtrIterator itBegin,
+		HitPtrIterator itEnd) const
 {		
 	//Double_t cutValue = 3.;
 	Double_t sumW = 0.;
 	Double_t sumCut = 0.;
-	for(HitIterator it = itBegin; it != itEnd; it++) {
+	for(HitPtrIterator it = itBegin; it != itEnd; it++) {
 		if ((*it)->IsOutlier()) continue;
 		sumW += (*it)->GetW();
 		//sumCut += DAFCut(*it, T, cutValue);
@@ -195,7 +235,7 @@ LitStatus CbmLitTrackFitterRobust::Normalize(
 	if (sumW == 0.) {
 		//return kLITERROR;
 	} else {
-		for(HitIterator it = itBegin; it != itEnd; it++) {
+		for(HitPtrIterator it = itBegin; it != itEnd; it++) {
 			if ((*it)->IsOutlier()) continue;
 			(*it)->SetW((*it)->GetW() / (sumW + sumCut));
 		}
@@ -204,7 +244,7 @@ LitStatus CbmLitTrackFitterRobust::Normalize(
 }
 
 LitStatus CbmLitTrackFitterRobust::CreateEffTrack(
-		const std::vector<HitIteratorPair>& bounds,
+		const std::vector<HitPtrIteratorPair>& bounds,
 		Int_t iter,
 		CbmLitTrack* etrack) const
 {
@@ -223,8 +263,9 @@ LitStatus CbmLitTrackFitterRobust::CreateEffTrack(
 			MarkOutliers(bounds[i].first, bounds[i].second);
 			
 			if (!AreAllOutliers(bounds[i].first, bounds[i].second)) {
-				CbmLitHit ehit = fEffHitCalc->DoCalculate(bounds[i].first, bounds[i].second);
-				etrack->AddHit(&ehit);
+				// TODO DOESN'T WORK NOW TO BE IMPLEMENTED
+				//CbmLitPixelHit ehit = fEffHitCalc->DoCalculate(bounds[i].first, bounds[i].second);
+				//etrack->AddHit(&ehit);
 //				std::cout << "eff hit:" << ehit.ToString();
 			} else {
 //				std::cout << "iter=" << iter << ", all hit outliers " << std::endl;
@@ -241,7 +282,6 @@ LitStatus CbmLitTrackFitterRobust::CheckEffTrack(
 		const CbmLitTrack* track) const
 {
 	if (track->GetNofHits() < 5) return kLITERROR;
-	
 	return kLITSUCCESS;	
 }
 

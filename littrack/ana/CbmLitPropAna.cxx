@@ -10,7 +10,8 @@
 #include "CbmLitTrackPropagatorGeane.h"
 #include "CbmLitConverter.h"
 #include "CbmLitTrack.h"
-#include "CbmLitHit.h"
+#include "CbmLitStripHit.h"
+#include "CbmLitPixelHit.h"
 #include "CbmLitTrackFitter.h"
 #include "CbmLitTrackFitterImp.h"
 #include "CbmLitKalmanSmoother.h"
@@ -89,20 +90,19 @@ InitStatus CbmLitPropAna::Init()
 	   fPropagatorDet->Initialize();
    }
    
-//   fExtrapolator = new CbmLitLineTrackExtrapolator();
-//   fExtrapolator->Initialize();
-//   fPropagator = new CbmLitTrackPropagatorImp(fExtrapolator);
-    fPropagator = new CbmLitTrackPropagatorGeane();
+   fExtrapolator = new CbmLitRK4TrackExtrapolator();
+   fExtrapolator->Initialize();
+   fPropagator = new CbmLitTrackPropagatorImp(fExtrapolator);
+//    fPropagator = new CbmLitTrackPropagatorGeane();
     fPropagator->Initialize();
      
    fFilter = new CbmLitKalmanFilter();
    fFilter->Initialize();
    
    fFitter = new CbmLitTrackFitterImp(fPropagator, fFilter);
-   
    fSmoother = new CbmLitKalmanSmoother();
    
-//   fNofLayers = 12;
+   fNofLayers = 27;
    CreateHistograms();   
 }
 
@@ -136,16 +136,18 @@ void CbmLitPropAna::Exec(
     	  fPropagatorDet->Propagate(&par, zOut, track.GetPDG());
       }
       
+     // std::cout << track.ToString();
       for (Int_t i = 0; i < track.GetNofHits(); i++){
     
-         Double_t zOut = track.GetHit(i)->GetZ(); 
+    	 Double_t zOut = track.GetHit(i)->GetZ(); 
          if (fPropagator->Propagate(&par, zOut, track.GetPDG()) == kLITERROR) continue;
-         //fFilter->Update(&par, track.GetHit(i));
+        
+         fFilter->Update(&par, track.GetHit(i));
          
-         fh_srx[i]->Fill(par.GetX() - track.GetHit(i)->GetX());
-         fh_sry[i]->Fill(par.GetY() - track.GetHit(i)->GetY());
+         //fh_srx[i]->Fill(par.GetX() - track.GetHit(i)->GetX());
+         //fh_sry[i]->Fill(par.GetY() - track.GetHit(i)->GetY());
          
-         
+     	 
          CalcResAndPull(points[i], mcTrack, &par, res, pull, resp);
          
          fh_resx[i]->Fill(res[0]);
@@ -160,43 +162,47 @@ void CbmLitPropAna::Exec(
        	 fh_pullty[i]->Fill(pull[3]);
        	 fh_pullqp[i]->Fill(pull[4]);
        	 
-       	 fFilter->Update(&par, track.GetHit(i));
+//       	 std::cout << std::endl;
+      // 	 std::cout << "before " << par.ToString();
+      // 	 std::cout << track.GetHit(i)->ToString();
+//       	 fFilter->Update(&par, track.GetHit(i));
+      // 	 std::cout << "after " << par.ToString();
       }  
-	  //fFitter->Properties().SetProperty("fDownstream", true);
-	  if (fFitter->Fit(&track) == kLITERROR) continue;
-	  CalcResAndPull(points.back(), mcTrack, track.GetParamLast(), res, pull, resp);
-      fh_resx_last->Fill(res[0]);
-      fh_resy_last->Fill(res[1]); 
-      fh_restx_last->Fill(res[2]);
-      fh_resty_last->Fill(res[3]);
-      fh_resqp_last->Fill(res[4]);
-      fh_resp_last->Fill(resp);
-      fh_pullx_last->Fill(pull[0]);
-      fh_pully_last->Fill(pull[1]); 
-      fh_pulltx_last->Fill(pull[2]);
-      fh_pullty_last->Fill(pull[3]);
-      fh_pullqp_last->Fill(pull[4]);
-
-      //fFitter->Properties().SetProperty("fDownstream", false);
-	  //fFitter->Fit(&track);
-//      fSmoother->Fit(&track);
-//	  CalcResAndPull(mcTrack, points[0], track.GetParamFirst(), res, pull, resp);
-//      fh_resx_first->Fill(res[0]);
-//      fh_resy_first->Fill(res[1]); 
-//      fh_restx_first->Fill(res[2]);
-//      fh_resty_first->Fill(res[3]);
-//      fh_resqp_first->Fill(res[4]);
-//      fh_resp_first->Fill(resp);
-//      fh_pullx_first->Fill(pull[0]);
-//      fh_pully_first->Fill(pull[1]); 
-//      fh_pulltx_first->Fill(pull[2]);
-//      fh_pullty_first->Fill(pull[3]);
-//      fh_pullqp_first->Fill(pull[4]);
+	  LitStatus fitStatus = fFitter->Fit(&track);
+	  if (fitStatus == kLITSUCCESS) {
+		  CalcResAndPull(points.back(), mcTrack, track.GetParamLast(), res, pull, resp);
+	      fh_resx_last->Fill(res[0]);
+	      fh_resy_last->Fill(res[1]); 
+	      fh_restx_last->Fill(res[2]);
+	      fh_resty_last->Fill(res[3]);
+	      fh_resqp_last->Fill(res[4]);
+	      fh_resp_last->Fill(resp);
+	      fh_pullx_last->Fill(pull[0]);
+	      fh_pully_last->Fill(pull[1]); 
+	      fh_pulltx_last->Fill(pull[2]);
+	      fh_pullty_last->Fill(pull[3]);
+	      fh_pullqp_last->Fill(pull[4]);
+		  
+	
+		  //fFitter->Fit(&track);
+	//      fSmoother->Fit(&track);
+	//	  CalcResAndPull(mcTrack, points[0], track.GetParamFirst(), res, pull, resp);
+	//      fh_resx_first->Fill(res[0]);
+	//      fh_resy_first->Fill(res[1]); 
+	//      fh_restx_first->Fill(res[2]);
+	//      fh_resty_first->Fill(res[3]);
+	//      fh_resqp_first->Fill(res[4]);
+	//      fh_resp_first->Fill(resp);
+	//      fh_pullx_first->Fill(pull[0]);
+	//      fh_pully_first->Fill(pull[1]); 
+	//      fh_pulltx_first->Fill(pull[2]);
+	//      fh_pullty_first->Fill(pull[3]);
+	//      fh_pullqp_first->Fill(pull[4]);
+	  }
   }
             
   fEvents++;
   std::cout << "Event number: " << fEvents << std::endl;
-  std::cout << "---------------------------------------------" << std::endl;
 }
 
 void CbmLitPropAna::CalcResAndPull(
@@ -231,11 +237,11 @@ void CbmLitPropAna::CalcResAndPull(
     
     resp = 100 * (((1. / std::fabs(par->GetQp())) - (1. / std::fabs(qp))) / (1. / qp));                
      
-    if (par->GetCovariance(0) != 0) pull[0] = (res[0]) / (std::sqrt(par->GetCovariance(0)));
-    if (par->GetCovariance(5) != 0) pull[1] = (res[1]) / (std::sqrt(par->GetCovariance(5)));
-    if (par->GetCovariance(9) != 0) pull[2] = (res[2]) / (std::sqrt(par->GetCovariance(9)));
-    if (par->GetCovariance(12) != 0) pull[3] = (res[3]) / (std::sqrt(par->GetCovariance(12)));
-    if (par->GetCovariance(14) != 0) pull[4] = (res[4]) / (std::sqrt(par->GetCovariance(14))); 
+    if (par->GetCovariance(0) > 0) pull[0] = (res[0]) / (std::sqrt(par->GetCovariance(0)));
+    if (par->GetCovariance(5) > 0) pull[1] = (res[1]) / (std::sqrt(par->GetCovariance(5)));
+    if (par->GetCovariance(9) > 0) pull[2] = (res[2]) / (std::sqrt(par->GetCovariance(9)));
+    if (par->GetCovariance(12) > 0) pull[3] = (res[3]) / (std::sqrt(par->GetCovariance(12)));
+    if (par->GetCovariance(14) > 0) pull[4] = (res[4]) / (std::sqrt(par->GetCovariance(14))); 
 }
 
 void CbmLitPropAna::FillParam(
@@ -279,12 +285,11 @@ Bool_t CbmLitPropAna::CreateTrackMuch(
 
     points.clear();
     
+    CbmLitConverter::MuchTrackToLitTrack(pTrack, track, fHits);
+    
     for (Int_t iHit = 0; iHit < nofHits; iHit++){
        Int_t hitIndex = pTrack->GetHitIndex(iHit);
        CbmMuchHit* pHit = (CbmMuchHit*) fHits->At(hitIndex);
-       CbmLitHit hit;
-       CbmLitConverter::TrkHitToLitHit(pHit, 0, &hit);
-       track->AddHit(&hit);
        Int_t digiIndex = pHit->GetDigi();
        CbmMuchDigiMatch* pDigiMatch = (CbmMuchDigiMatch*) fDigiMatches->At(digiIndex);    
        Int_t pointIndex = pDigiMatch->GetRefIndex(0);
@@ -318,8 +323,8 @@ Bool_t CbmLitPropAna::CreateTrackTrd(
     for (Int_t iHit = 0; iHit < nofHits; iHit++){
        Int_t hitIndex = pTrack->GetTrdHitIndex(iHit);
        CbmTrkHit* pHit = (CbmTrkHit*) fHits->At(hitIndex);
-       CbmLitHit hit;
-       CbmLitConverter::TrkHitToLitHit(pHit, 0, &hit);
+       CbmLitPixelHit hit;
+       CbmLitConverter::TrkHitToLitPixelHit(pHit, 0, &hit);
        track->AddHit(&hit);
        //Int_t digiIndex = pHit->GetDigi();
        //CbmMuchDigiMatch* pDigiMatch = (CbmMuchDigiMatch*) fDigiMatches->At(digiIndex);  

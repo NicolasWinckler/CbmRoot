@@ -130,9 +130,9 @@ void CbmLitRecQa::Finish()
 
 	WriteToFile();
 	
-	std::cout << "number of true hits" << std::endl;
-	for (int i = 0; i < 15; i++)
-		std::cout << "i=" << i << " n=" << fNofTrue[i] << std::endl; 
+//	std::cout << "number of true hits" << std::endl;
+//	for (int i = 0; i < 15; i++)
+//		std::cout << "i=" << i << " n=" << fNofTrue[i] << std::endl; 
 }
 
 
@@ -164,7 +164,7 @@ void CbmLitRecQa::ProcessStsTracks()
       fMcStsMap.insert(std::pair<Int_t, Int_t>(mcId, iStsTrack));
     }
   }
-  std::cout << "fMcStsMap.size()=" <<  fMcStsMap.size() << std::endl;
+//  std::cout << "fMcStsMap.size()=" <<  fMcStsMap.size() << std::endl;
 }
 
 void CbmLitRecQa::ProcessMuchTracks()
@@ -178,7 +178,7 @@ void CbmLitRecQa::ProcessMuchTracks()
 	  if (recTrack == NULL || recMatch == NULL) continue;
 	  Int_t mcIdRec = recMatch->GetMCTrackId();  
     
-	  std::cout << "mcIdRec=" << mcIdRec << " ";
+	  //std::cout << "mcIdRec=" << mcIdRec << " ";
 	  if (mcIdRec == -1){      
       	  fEvNofGhosts++;
       	  continue;
@@ -186,7 +186,7 @@ void CbmLitRecQa::ProcessMuchTracks()
 
 	  CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(mcIdRec);
 	  if (mcTrack == NULL) continue;
-	  std::cout << "mcTrack->GetPdgCode()=" << mcTrack->GetPdgCode() << std::endl;
+//	  std::cout << "mcTrack->GetPdgCode()=" << mcTrack->GetPdgCode() << std::endl;
 	  Int_t nofPoints = mcTrack->GetNPoints(fDetId);
 	  Int_t nofHits = recTrack->GetNHits();  
 	  Int_t nofTrue = recMatch->GetNofTrueHits();
@@ -232,15 +232,15 @@ void CbmLitRecQa::ProcessTrdTracks()
 	  fhNofGoodHits->Fill(nofTrue);
 	  fhNofBadHits->Fill(nofHits - nofTrue);
 	  fhNofHits->Fill(nofHits);
-	  fNofTrue[nofTrue]++;
+	  //fNofTrue[nofTrue]++;
 	  //if (nofTrue > 8) { // 
 	  if (quali >= fQuota && qualiNofHits >= 0.0) { // 
 		  fMcRecMap.insert(std::pair<Int_t, Int_t>(mcIdRec, iRec));   
-		  FillTrackParams(recTrack, "true");
+		//  FillTrackParams(recTrack, "true");
 	  } else { 
 		  fhNhGhosts->Fill(nofHits);
 		  fEvNofGhosts++; 
-		  FillTrackParams(recTrack, "ghost");
+		//  FillTrackParams(recTrack, "ghost");
 	  }    
   } // Loop over rec tracks
 }

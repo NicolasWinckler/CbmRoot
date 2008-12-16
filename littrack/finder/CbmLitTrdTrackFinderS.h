@@ -2,46 +2,40 @@
 #define CBMLITTRDTRACKFINDERS_H_
 
 #include "CbmTrdTrackFinder.h"
-#include "CbmLitTrackFinderImp.h"
-#include "CbmLitDetectorLayout.h"
+#include "CbmLitTrackFinderBranch.h"
+#include "CbmLitTypes.h"
 
 #include <vector>
 
-class CbmLitTrackPropagator;
-class CbmLitTrack;
-class CbmLitHit;
 class TClonesArray;
 
-
 class CbmLitTrdTrackFinderS : public CbmTrdTrackFinder,
-							   private CbmLitTrackFinderImp
+							  private CbmLitTrackFinderBranch
 {
-
 public:
-
     CbmLitTrdTrackFinderS();
     ~CbmLitTrdTrackFinderS();
 	
     virtual void Init();
-    virtual Int_t DoFind(TClonesArray* hitArray,
-                         TClonesArray* trackArray);
+    virtual Int_t DoFind(
+    		TClonesArray* hitArray,
+            TClonesArray* trackArray);
 
 private:
-
     Double_t fMom;
 
     virtual void SetIterationParameters(Int_t iter);
     
 	void CreateTrackSeeds(
-			const HitVector& hits,
-    		TrackVector& trackSeeds);
+			const HitPtrVector& hits,
+    		TrackPtrVector& trackSeeds);
 
 	void CreateHits(
 			TClonesArray* hitArray,
-			HitVector& hits);
+			HitPtrVector& hits);
 	
 	void CopyToOutput(
-			TrackVector& tracks,
+			TrackPtrVector& tracks,
 			TClonesArray* trackArray);
 
     ClassDef(CbmLitTrdTrackFinderS, 1);

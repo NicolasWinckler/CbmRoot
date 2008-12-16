@@ -13,12 +13,12 @@ public:
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
 	
-	virtual CbmLitHit DoCalculate(
-			HitIterator itBegin,
-			HitIterator itEnd);
+	virtual CbmLitPixelHit DoCalculate(
+			HitPtrIterator itBegin,
+			HitPtrIterator itEnd);
 	
-	virtual CbmLitHit DoCalculate(
-			HitVector& hits);
+	virtual CbmLitPixelHit DoCalculate(
+			HitPtrVector& hits);
 private:
 	
 	inline void Inverse(

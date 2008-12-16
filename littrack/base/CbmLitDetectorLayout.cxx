@@ -1,32 +1,33 @@
 #include "CbmLitDetectorLayout.h"
 
-#include <iostream>
+#include <sstream>
 
-CbmLitDetectorLayout::CbmLitDetectorLayout():
-	fNofStations(0),
-	fNofLayers(0)
+CbmLitDetectorLayout::CbmLitDetectorLayout()
 {
-	
 }
 
 CbmLitDetectorLayout::~CbmLitDetectorLayout()
 {
-	
 }
 
-void CbmLitDetectorLayout::Print()
+std::string CbmLitDetectorLayout::ToString() const 
 {
-    std::cout << "Detector Layout:" << std::endl;
-    std::cout << "-number of stations: " << fNofStations << std::endl;
-    std::cout << "-number of layers: " << fNofLayers << std::endl;
-    std::cout << "-number of layers per station: ";
-    for (Int_t i = 0; i < fNofLayersPerStation.size(); i++)
-    	std::cout << fNofLayersPerStation[i] << " ";
-    std::cout << std::endl;
-    std::cout << "-layer z positions: ";
-    for (Int_t i = 0; i < fLayerZPos.size(); i++)
-        	std::cout << fLayerZPos[i] << " ";
-    std::cout << std::endl;
+	std::stringstream ss;
+    ss << "Detector Layout:" << std::endl
+       << "-number of station groups: " << GetNofStationGroups() << std::endl
+       << "-number of detector planes: " << GetNofPlanes() << std::endl
+       << "-station groups: " << std::endl;
+    for (Int_t i = 0; i < GetNofStationGroups(); i++){
+    	ss << " " << GetStationGroup(i).ToString();
+    	for (Int_t j = 0; j < GetNofStations(i); j++) {
+        	ss << "  " << GetStation(i, j).ToString();
+        	for (Int_t k = 0; k < GetNofSubstations(i, j); k++) {
+        		ss << "   " << GetSubstation(i, j, k).ToString();
+        	}        	
+    	}
+    }    
+    ss << std::endl;
+	return ss.str();
 }
 
-ClassImp(CbmLitDetectorLayout)
+ClassImp(CbmLitDetectorLayout);

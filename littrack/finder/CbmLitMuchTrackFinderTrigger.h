@@ -50,7 +50,7 @@ protected:
     std::vector<CbmLitTrack*> fFoundTracks;
 
     // vector with pointers to hits
-    std::vector<std::vector<CbmLitHit*> > fHits;
+    std::vector<std::vector<CbmLitPixelHit*> > fHits;
     
     Int_t fNofTracks;
     
@@ -61,9 +61,9 @@ protected:
     
     void CreateTracks();
     
-    void AddTrack(std::vector<CbmLitHit*>& trackHits);
+    void AddTrack(std::vector<CbmLitPixelHit*>& trackHits);
     
-    Bool_t IsIn(Double_t xpred, Double_t ypred, CbmLitHit* pHit);
+    Bool_t IsIn(Double_t xpred, Double_t ypred, CbmLitPixelHit* pHit);
     
     void CopyToOutput(TClonesArray* trackArray);
     

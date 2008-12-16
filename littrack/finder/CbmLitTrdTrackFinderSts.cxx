@@ -1,6 +1,5 @@
 #include "CbmLitTrdTrackFinderSts.h"
 
-#include "CbmLitTrackFinderImp.h"
 #include "CbmLitTrack.h"
 #include "CbmLitHit.h"
 #include "CbmLitRK4TrackExtrapolator.h"
@@ -56,27 +55,30 @@ void CbmLitTrdTrackFinderSts::Init()
       
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
    fSeedSelection = factory->CreateTrackSelection("Momentum");
-   fStationSelection = factory->CreateTrackSelection("TrdStation");
+   fStationGroupSelection = factory->CreateTrackSelection("TrdStation");
    fFinalSelection = factory->CreateTrackSelection("TrdFinal");
    fFinalPreSelection = factory->CreateTrackSelection("Empty");
    
    fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
 
-   fNofIter = 2; 
-   fBeginStation = 0; 
-   fEndStation = fLayout.GetNofStations() - 1;
+   fNofIter = 1; 
+   fBeginStationGroup = 0; 
+   fEndStationGroup = fLayout.GetNofStationGroups() - 1;
    fPDG = 11;
+   
+   fVerbose = 1;
 }
 
-void CbmLitTrdTrackFinderSts::SetIterationParameters(Int_t iter)
+void CbmLitTrdTrackFinderSts::SetIterationParameters(
+		Int_t iter)
 {
 	if (iter == 0) {
-		fMaxNofMissingHitsInStation = 1;
+		fMaxNofMissingHitsInStationGroup = 1;
 		fMaxNofMissingHits = 1;
 		fSigmaCoef = 5.; 
 	} 
 	if (iter == 1) {
-		fMaxNofMissingHitsInStation = 1;
+		fMaxNofMissingHitsInStationGroup = 1;
 		fMaxNofMissingHits = 2;
 		fSigmaCoef = 7.; 
 	} 
@@ -86,11 +88,11 @@ Int_t CbmLitTrdTrackFinderSts::DoFind(
 		TClonesArray* hitArray,
 		TClonesArray* trackArray)
 {
-	HitVector hits;
-	TrackVector trackSeeds;
-	TrackVector foundTracks;
+	HitPtrVector hits;
+	TrackPtrVector trackSeeds;
+	TrackPtrVector foundTracks;
 	
-	CbmLitConverter::TrkHitArrayToHitVector(hitArray, hits);
+	CbmLitConverter::TrkHitArrayToPixelHitVector(hitArray, hits);
 	CreateTrackSeeds(fTrackSeedsArray, trackSeeds);
 	
 	CbmLitTrackFinderBranch::DoFind(hits, trackSeeds, foundTracks);
@@ -109,7 +111,7 @@ Int_t CbmLitTrdTrackFinderSts::DoFind(
 
 void CbmLitTrdTrackFinderSts::CreateTrackSeeds(
 		TClonesArray* trackArray,
-		TrackVector& trackSeeds)
+		TrackPtrVector& trackSeeds)
 {
 	CbmLitConverter::StsTrackArrayToTrackVector(trackArray, trackSeeds);
 
@@ -118,8 +120,8 @@ void CbmLitTrdTrackFinderSts::CreateTrackSeeds(
                 << trackArray->GetEntriesFast() << " tracks were loaded, "
                 << trackSeeds.size() << " tracks were created" << std::endl;
     
-    Double_t Ze = fLayout.GetLayerZ(0);
-    for (TrackIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {
+    Double_t Ze = fLayout.GetSubstation(0, 0, 0).GetZ();
+    for (TrackPtrIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {
        CbmLitTrackParam par = *(*iTrack)->GetParamLast();
     	fPropagatorToDet->Propagate(&par, Ze, fPDG);
     	(*iTrack)->SetParamLast(&par);

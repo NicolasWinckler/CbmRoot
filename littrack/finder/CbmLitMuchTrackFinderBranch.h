@@ -10,7 +10,7 @@
 
 class CbmLitTrackPropagator;
 class CbmLitTrack;
-class CbmLitHit;
+class CbmLitPixelHit;
 class TClonesArray;
 
 class CbmLitMuchTrackFinderBranch : public CbmMuchTrackFinder,
@@ -34,7 +34,7 @@ private:
     
 	void CreateTrackSeeds(
     		TClonesArray* trackArray,
-    		TrackVector& trackSeeds);
+    		TrackPtrVector& trackSeeds);
 	
 	ClassDef(CbmLitMuchTrackFinderBranch, 1);	
 };

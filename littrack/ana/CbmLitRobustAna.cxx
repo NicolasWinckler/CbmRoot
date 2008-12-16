@@ -1,6 +1,6 @@
 #include "CbmLitRobustAna.h"
 
-#include "CbmLitHit.h"
+#include "CbmLitPixelHit.h"
 #include "CbmLitTrack.h"
 #include "CbmLitEnvironment.h"
 
@@ -40,7 +40,7 @@ CbmLitRobustAna* CbmLitRobustAna::Instance()
 void CbmLitRobustAna::Fill(
 		CbmLitTrack* track)
 {
-	for (Int_t i = 0; i < fLayout.GetNofLayers(); i++){
+	for (Int_t i = 0; i < fLayout.GetNofPlanes(); i++){
 		fhStationNofHits->Fill(i, track->GetNofHits(i));
 	}
 }

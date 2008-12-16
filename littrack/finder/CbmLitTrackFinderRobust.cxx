@@ -30,9 +30,9 @@ LitStatus CbmLitTrackFinderRobust::Finalize()
 }
 
 LitStatus CbmLitTrackFinderRobust::DoFind(
-		const HitVector& hits,
-		const TrackVector& trackSeeds,
-		TrackVector& tracks)
+		const HitPtrVector& hits,
+		const TrackPtrVector& trackSeeds,
+		TrackPtrVector& tracks)
 {
 
 	//TODO copy links
@@ -42,18 +42,15 @@ LitStatus CbmLitTrackFinderRobust::DoFind(
 	fTracks.clear();
 	fSeedsIdSet.clear();
 	fUsedHitsSet.clear();
-	fHits.clear();
-	fHits.resize(fLayout.GetNofLayers());
-	fMaxErrX.resize(fLayout.GetNofLayers());
-	fMaxErrY.resize(fLayout.GetNofLayers());
+	fHitData.SetDetectorLayout(fLayout);
 	
 	for (Int_t iIter = 0; iIter < fNofIter; iIter++) {
 	       
 		SetIterationParameters(iIter);
 		
-		ArrangeHits();
+		ArrangeHits(fHitArray.begin(), fHitArray.end());
 		      
-		InitTrackSeeds();
+		InitTrackSeeds(fTrackSeedArray.begin(), fTrackSeedArray.end());
 		
 		FollowTracks(fTracks.begin(), fTracks.end());
 		
@@ -65,19 +62,19 @@ LitStatus CbmLitTrackFinderRobust::DoFind(
 		
 		for_each(fTracks.begin(), fTracks.end(), DeleteObject());
 		fTracks.clear();
-		for (Int_t i = 0; i < fLayout.GetNofLayers(); i++) fHits[i].clear();
+		fHitData.Clear();
 	}
-	fEventNo++;
-	std::cout << "-I- CbmLitTrackFinderRobust: " << fEventNo << " events processed" << std::endl;
+//	fEventNo++;
+//	std::cout << "-I- CbmLitTrackFinderRobust: " << fEventNo << " events processed" << std::endl;
 	
 	return kLITSUCCESS;
 }
 
 void CbmLitTrackFinderRobust::FollowTracks(
-		TrackIterator itBegin,
-		TrackIterator itEnd)
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
 {
-	for (TrackIterator it = itBegin; it != itEnd; it++) {
+	for (TrackPtrIterator it = itBegin; it != itEnd; it++) {
 		//std::cout << "id=" << (it - itBegin) << " ";
 		FollowTrack(*it);
 		//std::cout << std::endl;
@@ -87,35 +84,38 @@ void CbmLitTrackFinderRobust::FollowTracks(
 void CbmLitTrackFinderRobust::FollowTrack(
 		CbmLitTrack *track) 
 {
-	Int_t nofLayers = fLayout.GetNofLayers();
+	Int_t nofLayers = fLayout.GetNofPlanes();
 	Int_t nofMissingHits = 0;
 	CbmLitTrackParam par = *track->GetParamLast();
 	
+	//TODO: rewrite loop station groups -> stations
+	// there will be two loops
+	
 	for(Int_t iLayer = 0; iLayer < nofLayers; iLayer++) {
-		fPropagator->Propagate(&par, fLayout.GetLayerZ(iLayer), fPDG);
-		HitIteratorPair bounds = MinMaxIndex(&par, iLayer);
+		//fPropagator->Propagate(&par, fLayout.GetLayerZ(iLayer), fPDG);
+		//HitPtrIteratorPair bounds = MinMaxIndex(&par, iLayer);
 		
-		Bool_t hitAdded = false;
-		for (HitIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
-			if (IsIn(&par, *iHit)) {
-				track->AddHit(*iHit);
-				//std::cout << (*iHit)->GetRefId() << " ";
-				hitAdded = true;
-			}
-		}
-		
-		if (!hitAdded) {
-			nofMissingHits++;
-			if (nofMissingHits > fMaxNofMissingHits) {
-				//track->SetQuality(kLITBAD);
-				return;
-			}
-			continue;
-		}
-		
-		track->SetPDG(fPDG);
-		track->SetLastPlaneId(iLayer);
-		track->SetParamLast(&par);
+//		Bool_t hitAdded = false;
+//		for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
+//			if (IsIn(&par, *iHit)) {
+//				track->AddHit(*iHit);
+//				//std::cout << (*iHit)->GetRefId() << " ";
+//				hitAdded = true;
+//			}
+//		}
+//		
+//		if (!hitAdded) {
+//			nofMissingHits++;
+//			if (nofMissingHits > fMaxNofMissingHits) {
+//				//track->SetQuality(kLITBAD);
+//				return;
+//			}
+//			continue;
+//		}
+//		
+//		track->SetPDG(fPDG);
+//		track->SetLastPlaneId(iLayer);
+//		track->SetParamLast(&par);
 		//track->SetQuality(kLITGOOD);
 	}
 }

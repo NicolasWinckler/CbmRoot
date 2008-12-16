@@ -61,7 +61,6 @@
     gSystem->Load("libParBase");
     gSystem->Load("libBase");
     gSystem->Load("libCbmBase");
-    //gSystem->Load("libMCStack");
     gSystem->Load("libField");
     gSystem->Load("libGen");
     gSystem->Load("libPassive");
@@ -88,7 +87,6 @@
 
     // -------   MVD Digitiser   ----------------------------------------------
     CbmMvdDigitiser* digi = new CbmMvdDigitiser("MVDDigitiser", 0, iVerbose);
-
     cout << "Adding Task:  CbmMvdDigitiser... " << endl;
     fRun->AddTask(digi);
 
@@ -119,7 +117,7 @@
     // -----   MVD Cluster Finder   ----------------------------------------------
 
     CbmMvdFindHits* mvd_hit   = new CbmMvdFindHits("MVDFindHits", 0, iVerbose);
-    mvd_hit->SetSigmaNoise(15);
+    mvd_hit->SetSigmaNoise(15,kTRUE);  // kTRUE = add noise to digis, kFALSE = ideal detector
     mvd_hit->SetSeedThreshold(50); //in electrons!
     mvd_hit->SetNeighbourThreshold(30);
     mvd_hit->SetAdcBits(12);

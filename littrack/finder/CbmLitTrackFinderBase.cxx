@@ -10,6 +10,7 @@
 #include "CbmLitTrackPropagator.h"
 
 #include <iostream>
+#include <cmath>
 
 CbmLitTrackFinderBase::CbmLitTrackFinderBase()
 {

@@ -1,9 +1,8 @@
-
 void eloss_sim(Int_t nEvents = 200000)
 {
 	
   TString engine = "geant4/";
-  TString dir = "/d/cbm02/andrey/events/eloss/" + engine + "0.1-35gev_10cm/";
+  TString dir = "/d/cbm02/andrey/events/eloss/" + engine + "10gev1X0iron/";
 
   TString outFile = dir + "eloss.sim.root";                      
  // TString parFile = dir + "eloss.params.root";  
@@ -47,8 +46,8 @@ void eloss_sim(Int_t nEvents = 200000)
   
   CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
   
-  Double_t minMom = 0.1.; //minimum momentum
-  Double_t maxMom = 35.; //maximum momentum
+  Double_t minMom = 10.; //minimum momentum
+  Double_t maxMom = 10.; //maximum momentum
   
   CbmBoxGenerator* boxGen1 = new CbmBoxGenerator(13, 1);
   boxGen1->SetPRange(minMom, maxMom);

@@ -1,7 +1,7 @@
 void eloss_ana(Int_t nEvents = 200000)
 {
   TString engine = "geant4/";
-  TString dir = "/d/cbm02/andrey/events/eloss/" + engine + "0.1-35gev_10cm/";
+  TString dir = "/d/cbm02/andrey/events/eloss/" + engine + "10gev10X0iron/";
   TString inFile = dir + "eloss.sim.root";  
   TString outFile = dir + "eloss.ana.root";  
 

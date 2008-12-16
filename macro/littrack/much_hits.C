@@ -1,70 +1,35 @@
-void much_hits(Int_t nEvents = 1000)
+void much_hits(Int_t nEvents = 10000)
 {
-                    
-  // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;
-     
-  TString system  = "auau";  
-  TString beam    = "25gev";  
-  TString trigger = "centr";
-  TString particle = "mu";  
+
+  TString dir = "/d/cbm02/andrey/events/muchstraw/large/10mu/mu/";
    
-  //TString dir = "/d/cbm02/andrey/events/much/compact/signal/";
-  //TString dir = "/d/cbm02/andrey/events/much/10stations/new/";
- //TString dir = "/d/cbm02/andrey/events/much/10stations/new/signal/";
- // TString dir = "/d/cbm02/andrey/events/much/10stations/new/wofield/signal/";
-  TString dir = "/d/cbm02/andrey/events/much/large/10mu/mu_urqmd/";
-  
-  TString inFile = dir + beam + "/" 
-                    + particle + "/mc." + system + "." + beam + "." 
-                    + particle + "."
-                    + trigger + ".root";  
-  
-  TString parFile = dir + beam + "/" 
-                    + particle + "/params." + system + "." + beam + "." 
-                    + particle + "."
-                    + trigger + ".root";  
-  
-  // Output file
-  TString outFile = dir + beam + "/" 
-                    + particle + "/much.hits." + system + "." + beam + "." 
-                    + particle + "."
-                    + trigger + ".root"; 
+  TString inFile = dir + "mc.root";
+  TString parFile = dir + "params.root";  
+  TString outFile = dir + "much.hits.root";
   
    //TString muchDigiFile = "$VMCWORKDIR/much/parameters/much_digi.400x800mic.par";
-    TString muchDigiFile = "/u/andrey/cbm/svnfeb08/cbmroot/much/parameters/much_large.digi.par";
+   //TString muchDigiFile = "/u/andrey/cbm/svnfeb08/cbmroot/much/parameters/much_large.digi.par";
     //TString muchDigiFile = "/u/andrey/cbm/svnfeb08/cbmroot/much/parameters/much_compact.2.norot.digi.par";
-
-
-
-   // In general, the following parts need not be touched
-   // ========================================================================
+  TString muchDigiFile = "/u/andrey/cbm/svnfeb08/cbmroot/parameters/much/much_standard.digi.par";
    
-   // ----    Debug option   -------------------------------------------------
-   gDebug = 0;
-   // ------------------------------------------------------------------------
-   
-   // -----   Timer   --------------------------------------------------------
    TStopwatch timer;
    timer.Start();
-   // ------------------------------------------------------------------------
    
    gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
    basiclibs();
    gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
    cbmrootlibs();
-
    
    // -----   Reconstruction run   -------------------------------------------
    CbmRunAna *run= new CbmRunAna();
    run->SetInputFile(inFile);
    run->SetOutputFile(outFile);
    // ------------------------------------------------------------------------
+     
    
-   
-   
-      // =========================================================================
-   // ===                      MUCH local reconstruction                     ===
+   // =========================================================================
+   // ===                      MUCH local reconstruction                    ===
    // =========================================================================
    
    // ---  MuCh digitizer ----------------------------------------------------
@@ -78,11 +43,10 @@ void much_hits(Int_t nEvents = 1000)
    muchFindHits->SetUseClustering(0);
    run->AddTask(muchFindHits);
    
-      // -------------------------------------------------------------------------
-   // ===                 End of MUCH local reconstruction                   ===
+   // -------------------------------------------------------------------------
+   // ===                 End of MUCH local reconstruction                  ===
    // =========================================================================
-   
-   
+      
 
    // -----  Parameter database   --------------------------------------------
    CbmRuntimeDb* rtdb = run->GetRuntimeDb();
@@ -99,10 +63,8 @@ void much_hits(Int_t nEvents = 1000)
    // -----   Intialise and run   --------------------------------------------
    run->LoadGeometry();
    run->Init();
-   cout << "Starting run" << endl;
    run->Run(0,nEvents);
    // ------------------------------------------------------------------------
-
 
 
    // -----   Finish   -------------------------------------------------------

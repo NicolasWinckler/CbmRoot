@@ -1,21 +1,20 @@
-void trd_sim(Int_t nEvents = 1000)
+void trd_sim(Int_t nEvents = 100)
 {
   TString inDir   = "/d/cbm03/urqmd/auau/25gev/centr";
   TString inFile  = inDir + "/urqmd.auau.25gev.centr.0000.ftn14";
   TString outDir  = "/d/cbm02/andrey/events/trd/standard/e";
-  TString outFile = outDir + "/mc.auau.25gev.e.centr.root";
+  TString outFile = outDir + "/mc.root";
   TString parFile = outDir + "/params.root";
   
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString targetGeom = "target.geo";
+  TString targetGeom = "target_au_250mu.geo";
   TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "magnet_muon.geo";
+  TString magnetGeom = "magnet_standard.geo";
   TString mvdGeom    = "mvd_standard.geo";
-  mvdGeom = "";
   TString stsGeom    = "sts_standard.geo";
   TString richGeom   = "rich_standard.geo";
-  TString trdGeom    = "trd_standard.geo";
+  TString trdGeom    = "trd_monolithic.geo";
   TString tofGeom    = "tof_standard.geo";
   TString ecalGeom   = "ecal_FastMC.geo";
   
@@ -23,42 +22,22 @@ void trd_sim(Int_t nEvents = 1000)
   TString fieldMap    = "FieldMuonMagnet";   // name of field map
   Double_t fieldZ     = 50.;             // field centre z position
   Double_t fieldScale =  1.;             // field scaling factor
-  
-  // In general, the following parts need not be touched
-  // ========================================================================
 
-
-
-
-  // ----    Debug option   -------------------------------------------------
-  gDebug = 0;
-  // ------------------------------------------------------------------------
-
-
-
-  // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
   timer.Start();
-  // ------------------------------------------------------------------------
 
-  // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
   cbmrootlibs();
-  // -----------------------------------------------------------------------
  
-  // -----   Create simulation run   ----------------------------------------
+
   CbmRunSim* fRun = new CbmRunSim();
   fRun->SetName("TGeant3");              // Transport engine
   fRun->SetOutputFile(outFile);          // Output file
   CbmRuntimeDb* rtdb = fRun->GetRuntimeDb();
-  // ------------------------------------------------------------------------
 
-
-  // -----   Create media   -------------------------------------------------
   fRun->SetMaterials("media.geo");       // Materials
-  // ------------------------------------------------------------------------
  // fRun->SetStoreTraj(kTRUE);
 
   // -----   Create detectors and passive volumes   -------------------------

@@ -1,19 +1,18 @@
 TString system  = "auau";  
 TString beam    = "25gev";  
 TString trigger = "centr";
-TString particle = "omega";
+TString particle = "mu";
   
-TString dir = "/d/cbm02/andrey/events/much/10stations/new/";
-//TString dir = "/d/cbm02/andrey/events/much/10stations/10mu/mu_urqmd/";
-TString fileName = dir + beam + "/" 
-                   + particle + "/much.tracks." + system + "." + beam + "." 
-                   + particle + "." + trigger + ".root";
-  
-TFile *file = new TFile(fileName); 
+//TString dir = "/d/cbm02/andrey/events/much/10stations/new/";
+//TString dir = "/d/cbm02/andrey/events/much/large/10mu/mu_urqmd/";
+//TString fileName = dir + beam + "/" 
+//                   + particle + "/much.tracks." + system + "." + beam + "." 
+//                   + particle + "." + trigger + ".root";
+//  
+//TFile *file = new TFile(fileName); 
 
-//TString dir  = "/d/cbm02/andrey/events/trd/standard/e_urqmd";
-//TFile *file = new TFile(dir + "/trd.reco.auau.25gev.e.centr.root"); 
-
+TString dir  = "/d/cbm02/andrey/events/trd/standard/e_urqmd";
+TFile *file = new TFile(dir + "/trd.reco.auau.25gev.e.centr.root"); 
 
 Int_t lsGhost = 2;
 Int_t lsTrue = 1;
@@ -24,9 +23,9 @@ Int_t colorTrue = 4;
 
 void draw_rec_qa()
 {
-	gStyle->SetOptStat("");
-	gStyle->SetOptFit(0);
-	gStyle->SetOptTitle(0);
+//	gStyle->SetOptStat("");
+//	gStyle->SetOptFit(0);
+//	gStyle->SetOptTitle(0);
 	
 	draw_eff();
     draw_params();
@@ -63,14 +62,14 @@ void draw_eff()
   hMomEffElectrons->SetMarkerSize(3.0);
   
   hMomEffAll->Draw();
-  hMomEffMuons->Draw("SAME");
-  //hMomEffElectrons->Draw("SAME");
+//  hMomEffMuons->Draw("SAME");
+  hMomEffElectrons->Draw("SAME");
   
   TLegend* l1 = new TLegend(0.5,0.7,0.9,0.9);
   l1->SetHeader("Efficiency");
   l1->AddEntry(hMomEffAll,"all tracks","lp");
-  l1->AddEntry(hMomEffMuons,"muon tracks","lp");
-//  l1->AddEntry(hMomEffElectrons,"electron tracks","lp");  
+//  l1->AddEntry(hMomEffMuons,"muon tracks","lp");
+  l1->AddEntry(hMomEffElectrons,"electron tracks","lp");  
   l1->Draw();
 }
 
@@ -91,6 +90,7 @@ void draw_params()
   c1->cd(5);
   draw_param_hist(hLastPlaneIdTrue, hLastPlaneIdGhost, "Last plane id", "Counter", "Last plane id");
   c1->cd(6);
+  draw_nof_hits();
 }
 
 void draw_params_2D()
@@ -130,6 +130,38 @@ void draw_params_2D()
   hMomChi2Ghost->SetLineWidth(width);
   hMomChi2Ghost->SetMarkerSize(size);
   hMomChi2Ghost->Draw("COLZ");
+}
+
+void draw_nof_hits()
+{
+  hNofHits->SetLineColor(1);
+  hNofHits->SetMarkerColor(1);
+  hNofHits->SetLineWidth(width);
+  hNofHits->SetLineStyle(3);
+  hNofHits->GetXaxis()->SetTitle("nof hits");
+  hNofHits->GetYaxis()->SetTitle("counter");
+  
+  hNofGoodHits->SetLineColor(colorTrue);
+  hNofGoodHits->SetMarkerColor(colorTrue);
+  hNofGoodHits->SetLineWidth(width);
+  hNofGoodHits->SetLineStyle(lsTrue);
+
+  hNofBadHits->SetLineColor(colorGhost);
+  hNofBadHits->SetMarkerColor(colorGhost);
+  hNofBadHits->SetLineWidth(width);
+  hNofBadHits->SetLineStyle(lsGhost);
+   
+  gPad->SetLogy(); 
+  hNofGoodHits->Draw();
+  hNofHits->Draw("SAME");
+  hNofBadHits->Draw("SAME");
+   
+  TLegend* l1 = new TLegend(0.5,0.7,0.9,0.9);
+  l1->SetHeader("nof hits");
+  l1->AddEntry(hNofHits,"nof hits","l");  
+  l1->AddEntry(hNofGoodHits,"nof good hits","l"); 
+  l1->AddEntry(hNofBadHits,"nof bad hits","l"); 
+  l1->Draw();
 }
 
 void draw_param_hist(

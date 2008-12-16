@@ -1,14 +1,12 @@
 #include "../../cbmbase/CbmDetectorList.h";
-void trd_reco(Int_t nEvents = 100)
+void trd_hits(Int_t nEvents = 100)
 {
   Int_t iVerbose = 1;
   
-  TString dir  = "/d/cbm02/andrey/events/trd/segmented/e";
+  TString dir  = "/d/cbm02/andrey/events/trd/standard/e";
   TString inFile = dir + "/mc.root"; 
   TString parFile = dir + "/params.root"; 
-  TString inFile1 = dir + "/sts.reco.root";
-  TString inFile2 = dir + "/trd.hits.root";
-  TString outFile = dir + "/trd.reco.root";
+  TString outFile = dir + "/trd.hits.root";
   
   TStopwatch timer;
   timer.Start();
@@ -21,8 +19,6 @@ void trd_reco(Int_t nEvents = 100)
   // -----   Reconstruction run   -------------------------------------------
   CbmRunAna *run= new CbmRunAna();
   run->SetInputFile(inFile);
-  run->AddFriend(inFile1);
-  run->AddFriend(inFile2);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
   
@@ -31,24 +27,28 @@ void trd_reco(Int_t nEvents = 100)
  // CbmL1* l1 = new CbmL1();
 //  run->AddTask(l1);
 
-  // -----   TRD track finding   ---------------------------------------------
-  //CbmTrdTrackFinder* trdTrackFinder    = new CbmL1TrdTrackFinderSts();
-  //((CbmL1TrdTrackFinderSts*)trdTrackFinder)->SetVerbose(iVerbose);
-  CbmTrdTrackFinder* trdTrackFinder    = new CbmLitTrdTrackFinderSts();
-  CbmTrdFindTracks* trdFindTracks = new CbmTrdFindTracks("TRD Track Finder");
-  trdFindTracks->UseFinder(trdTrackFinder);
-  run->AddTask(trdFindTracks);
-  // -------------------------------------------------------------------------
+  // =========================================================================
+  // ===                     TRD local reconstruction                      ===
+  // =========================================================================
 
-  // -----   TRD track matching   --------------------------------------------
-  CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
-  run->AddTask(trdMatchTracks);
-  
-    // -----   TRD track finding QA check   ------------------------------------
-  CbmLitRecQa* trdRecQa = new CbmLitRecQa(12, 0.7, kTRD, 1);
-  trdRecQa->SetNormType(2); // '2' to number of STS tracks
-  run->AddTask(trdRecQa);
-  
+  // -----   TRD hit producer   ----------------------------------------------
+  Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
+  // Resolutions in y - station and angle dependent [mum]
+  Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
+  Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
+  Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };  
+
+  // Update of the values for the radiator F.U. 17.08.07
+  Int_t trdNFoils    = 130;       // number of polyetylene foils
+  Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
+  Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
+  CbmTrdHitProducer* trdHitProd = new CbmTrdHitProducer("TRD Hitproducer",
+                                                        "TRD task");
+  trdHitProd->SetPar(trdNFoils, trdDFoils, trdDGap);
+  trdHitProd->SetSigmaX(trdSigmaX);
+  trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
+  run->AddTask(trdHitProd);
+  // -------------------------------------------------------------------------
 
 
   // -----  Parameter database   --------------------------------------------
@@ -71,9 +71,6 @@ void trd_reco(Int_t nEvents = 100)
   run->Init();
   run->Run(0,nEvents);
   // ------------------------------------------------------------------------
-
-  
-  CbmLitRobustAna::Instance()->WriteToFile();
 
   // -----   Finish   -------------------------------------------------------
   timer.Stop();

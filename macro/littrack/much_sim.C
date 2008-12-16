@@ -1,35 +1,15 @@
-
 void much_sim(Int_t nEvents = 1000)
 {
-  
-  TString system  = "auau";  
-  TString beam    = "25gev";  
-  TString trigger = "centr";
-  TString particle = "mu";  
-   
-  //TString directory = "/d/cbm02/andrey/events/much/compact/signal/";
-  //TString dir = "/d/cbm02/andrey/events/much/10stations/new/";
-  //TString dir = "/d/cbm02/andrey/events/much/10stations/new/signal/";
-  //TString dir = "/d/cbm02/andrey/events/much/10stations/new/wofield/signal/";
-  TString dir = "/d/cbm02/andrey/events/much/large/10mu/mu_urqmd/";
-  
-  
-  TString outFile = dir + beam + "/" + particle + "/mc." + system + "." + beam + "." 
-                    + particle + "." + trigger + ".root";                      
-                    
-  TString parFile = dir + beam + "/" + particle + "/params." + system + "." + beam + "." 
-                    + particle + "." + trigger + ".root";                     
-                    
-  TString inFile = "/d/cbm03/urqmd/" + system + "/" + beam + "/"
-                   + trigger + "/urqmd." + system + "." + beam + "."
-                   + trigger+ ".0001.ftn14";                   
-                 
-//  TString plutoFile = "/u/andrey/cbm/much/pluto/" 
-//                      + particle + "/"  + beam + "/"
-//                      + particle + "." + "0000" + ".root";  
-   
-  
-  TString muchGeom   = "much_standard.geo";
+  TString dir = "/d/cbm02/andrey/events/muchstraw/large/10mu/mu_urqmd/";
+    
+  TString outFile = dir + "/mc.root";
+  TString parFile = dir + "/params.root"; 
+
+  TString inFileUrqmd = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0001.ftn14";               
+//  TString plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";  
+     
+//  TString muchGeom   = "much_standard.geo";
+  TString muchGeom   = "much_straw_new.geo";
  // TString muchGeom   = "../much/geometry/much_compact.geo";
  //TString muchGeom   = "../much/geometry/much_compact.2.geo";
   TString pipeGeom   = "pipe_much.geo";
@@ -149,9 +129,9 @@ void much_sim(Int_t nEvents = 1000)
 //  CbmPlutoGenerator *plutoGen= new CbmPlutoGenerator(plutoFile);
 //  primGen->AddGenerator(plutoGen);
     
-  CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
+  CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFileUrqmd);
   primGen->AddGenerator(urqmdGen);
-  
+
   Double_t minMom = 2.5; //minimum momentum
   Double_t maxMom = 25.; //maximum momentum
   

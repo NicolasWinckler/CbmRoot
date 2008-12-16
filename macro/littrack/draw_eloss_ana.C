@@ -1,47 +1,40 @@
+TString engine = "geant4/";
+TString setup = "10gev10X0iron/";
+TString dir = "/d/cbm02/andrey/events/eloss/" + engine + setup;
+TString fileName = dir + "eloss.ana.root";
+TString outDir = "./" + engine + setup;
+
 void draw_eloss_ana()
 {
 	gStyle->SetOptStat("");
 	gStyle->SetOptFit(0);
 	gStyle->SetOptTitle(0);
-	
-  TString engine = "geant4/";
-  TString setup = "0.1-35gev_10cm/";
-  
-  TString dir = "/d/cbm02/andrey/events/eloss/" + engine + setup;
-  TString fileName = dir + "eloss.ana.root";
-  
-  TString outDir = "./" + engine + setup;
-  
-  TFile *file = new TFile(fileName); 
-  
-  Double_t minEloss = 0.;
-  Double_t maxEloss = 10.0;
-  Double_t minMom = 0.1;
-  Double_t maxMom = 35.;
+	//gStyle->SetOptFit(0001);
 
-  
+	TFile *file = new TFile(fileName); 
 	
-  TCanvas *c1 = new TCanvas("energy loss","c1",1200,1000);
-  c1->Divide(2, 2);
-  c1->SetGrid();
-   
+	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/draw_hist.C");
   
-  gStyle->SetOptFit(0001);
+	Double_t minEloss = 0.;
+	Double_t maxEloss = 10.0;
+	Double_t minMom = 0.1;
+	Double_t maxMom = 35.;
+ 	
+	Double_t lwidth = 2.;
+	Double_t msize = 2.;
+	
   
-  Double_t lwidth = 2.;
-  
-  c1->cd(1);
-  fh_eloss_mc->SetLineColor(4);
-  fh_eloss_mc->SetLineWidth(lwidth);
-  fh_eloss_mc->GetXaxis()->SetTitle("energy loss, GeV");
-  fh_eloss_mc->GetYaxis()->SetTitle("counter");
-  fh_eloss_mc->Fit("landau");
-  fh_eloss_mc->Draw();
-  
-  fh_eloss_lit->SetLineColor(2);
-  fh_eloss_lit->SetLineStyle(3);
-  fh_eloss_lit->SetLineWidth(lwidth);
-  fh_eloss_lit->Draw("SAME");
+	TCanvas *c1 = new TCanvas("energy loss","c1",1200,1000);
+	c1->Divide(2, 2);
+	c1->SetGrid();
+    
+	c1->cd(1);
+	draw_hist_1D(fh_eloss_mc, "energy loss, GeV", "counter", 
+			  kBlue, lwidth, 1, msize, kDot, true, true, "");
+	fh_eloss_mc->Fit("landau");
+	
+	draw_hist_1D(fh_eloss_lit, "energy loss, GeV", "counter", 
+			  kRed, lwidth, 3, msize, kDot, true, true, "SAME");
 //  
 //  fh_eloss_bb->SetLineColor(2);
 //  fh_eloss_bb->SetLineStyle(3);
@@ -193,8 +186,8 @@ void draw_eloss_ana()
  
   
   c2->cd(3);
-  fhm_qp_err_mc->GetXaxis()->SetTitle("momentum, GeV");
-  fhm_qp_err_mc->GetYaxis()->SetTitle("q/p error, GeV");
+  fhm_qp_err_mc->GetXaxis()->SetTitle("momentum, GeV/c");
+  fhm_qp_err_mc->GetYaxis()->SetTitle("q/p error, GeV/c");
   fhm_qp_err_mc->GetZaxis()->SetTitle("counter");
   fhm_qp_err_mc->SetMarkerColor(2);
   fhm_qp_err_mc->SetLineColor(2);
@@ -211,13 +204,82 @@ void draw_eloss_ana()
   l2_3->Draw();
   
   c2->cd(4);
-  fhm_pull_qp->GetXaxis()->SetTitle("momentum, GeV");
+  fhm_pull_qp->GetXaxis()->SetTitle("momentum, GeV/c");
   fhm_pull_qp->GetYaxis()->SetTitle("pull_qp");
   fhm_pull_qp->GetZaxis()->SetTitle("counter");
   fhm_pull_qp->Draw("COLZ");
   
   c2->SaveAs(TString(outDir + "eloss_mom.gif"));
   
-}
+
+  gStyle->SetPalette(1,0);
+  TCanvas *c3 = new TCanvas("theta","c3",1200,1000);
+  c3->Divide(1, 1);
+  //c3->SetGrid();
+
+  c3->cd(1);
+  fhm_theta_mc->GetXaxis()->SetTitle("momentum, GeV/c");
+  fhm_theta_mc->GetYaxis()->SetTitle("theta, rad");
+  fhm_theta_mc->GetZaxis()->SetTitle("counter");
+  fhm_theta_mc->SetMarkerColor(4);
+  fhm_theta_mc->SetLineColor(4);
+  fhm_theta_mc->SetLineWidth(lwidth);
+  fhm_theta_mc->Draw("SCAT");
+    
+  fhm_theta_calc->SetMarkerColor(2);
+  fhm_theta_calc->SetLineColor(2);
+  fhm_theta_calc->SetLineWidth(lwidth);
+  fhm_theta_calc->Draw("SCATSAME");
   
+  TProfile* profile_theta_mc = fhm_theta_mc->ProfileX();
+  profile_theta_mc->SetMarkerColor(kGreen+3);
+  profile_theta_mc->SetLineColor(kGreen+3);
+  profile_theta_mc->SetLineWidth(lwidth);
+  profile_theta_mc->Draw("SAME");
+  
+  TProfile* profile_theta_calc = fhm_theta_calc->ProfileX();
+  profile_theta_calc->SetMarkerColor(kBlack);
+  profile_theta_calc->SetLineColor(kBlack);
+  profile_theta_calc->SetLineWidth(lwidth);
+  profile_theta_calc->Draw("SAME");
+  
+  TLegend* l_theta = new TLegend(0.4,0.5,0.99,0.9);
+  l_theta->SetHeader("Theta vs. momentum");
+  l_theta->AddEntry(fhm_theta_mc,"MC","l");
+  l_theta->AddEntry(fhm_theta_calc,"Calculated","l");
+  l_theta->AddEntry(profile_theta_mc,"MC (mean)","l");
+  l_theta->AddEntry(profile_theta_calc,"Calculated (mean)","l");
+  l_theta->Draw();
+  
+  c3->cd(2);
+  TProfile* projectionY_theta_mc = fhm_theta_mc->ProjectionY("_pfx", 10, 12);
+  projectionY_theta_mc->SetMarkerColor(kGreen+3);
+  projectionY_theta_mc->SetLineColor(kGreen+3);
+  projectionY_theta_mc->SetLineWidth(lwidth);
+  projectionY_theta_mc->Draw("");
+  
+  
+  c3->cd(1);
+  draw_hist_1D(fh_theta_mc, "projected scattering angle, rad", "counter", 
+		  kBlue, lwidth, 1, msize, kDot, false, true, "");
+  fh_theta_mc->Fit("gaus");
+  //draw_hist_1D(fh_theta_calc, "projected scattering angle, rad", "counter", 
+  //		  kRed, lwidth, 1, msize, kDot, false, true, "SAME");
+ 
+  stringstream oss1;
+  oss1.precision(3);
+  oss1 << "Geant4, #sigma = " << fh_theta_mc->GetFunction("gaus")->GetParameter(2);
+  TLegend* l1 = new TLegend(0.5,0.7,0.9,0.9);
+  l1->AddEntry(NULL,oss1.str().c_str(),"");  
+  l1->AddEntry(NULL,"Lit, #sigma = 0.0047",""); 
+  l1->Draw();
+  
+  TLegend* l2 = new TLegend(0.5,0.5,0.9,0.9);
+  l2->SetHeader("#splitline{Projected scattering angle;}{10 X_{0} of iron, p=10 Gev/c}");
+  l2->Draw();
+  
+  c3->cd(4);
+	
+}
+
   

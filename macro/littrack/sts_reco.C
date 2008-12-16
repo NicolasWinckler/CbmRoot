@@ -1,38 +1,23 @@
-void sts_reco(Int_t nEvents = 1000)
+void sts_reco(Int_t nEvents = 100)
 {
-  TString system  = "auau";  
-  TString beam    = "25gev";  
-  TString trigger = "centr";
-  TString particle = "mu";  
+//  TString system  = "auau";  
+//  TString beam    = "25gev";  
+//  TString trigger = "centr";
+//  TString particle = "mu";  
    
   //TString dir = "/d/cbm02/andrey/events/much/compact/signal/";
  // TString dir = "/d/cbm02/andrey/events/much/10stations/new/";
  // TString dir = "/d/cbm02/andrey/events/much/10stations/new/wofield/signal/";
  // TString dir = "/d/cbm02/andrey/events/much/10stations/new/signal/";
   //TString dir = "/d/cbm02/andrey/events/trd/25gev";
-  TString dir = "/d/cbm02/andrey/events/much/large/10mu/mu_urqmd/";
-    
-  TString inFile = dir + beam + "/" 
-                    + particle + "/mc." + system + "." + beam + "." 
-                    + particle + "."
-                    + trigger + ".root";  
+  //TString dir = "/d/cbm02/andrey/events/much/large/10mu/mu_urqmd/";
   
-  TString parFile = dir + beam + "/" 
-                    + particle + "/params." + system + "." + beam + "." 
-                    + particle + "."
-                    + trigger + ".root";  
-  // Output file
-  TString outFile = dir + beam + "/" 
-                    + particle + "/sts.reco." + system + "." + beam + "." 
-                    + particle + "."
-                    + trigger + ".root"; 
-  
-  dir  = "/d/cbm02/andrey/events/trd/standard/e_urqmd";
-  TString inFile = dir + "/mc.auau.25gev.e.centr.root"; 
-  TString parFile = dir + "/params.root"; 
-  TString outFile = dir + "/sts.reco.auau.25gev.e.centr.root";
-  
-  // STS digitisation file
+  //TString dir = "/d/cbm02/andrey/events/muchstraw/large/10mu/mu/";
+  TString dir  = "/d/cbm02/andrey/events/trd/standard/e";
+  TString inFile = dir + "/mc.root";
+  TString parFile = dir + "/params.root";  
+  TString outFile = dir + "/sts.reco.root";
+ 
   TString digiFile = "sts_standard.digi.par";
  // TString digiFile = "sts_allstrips.digi.par";
   
@@ -55,6 +40,25 @@ void sts_reco(Int_t nEvents = 1000)
   run->SetInputFile(inFile);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
+  
+  // =========================================================================
+  // ===                     MVD local reconstruction                      ===
+  // =========================================================================
+
+  
+  // -----   MVD Hitproducer   -----------------------------------------------
+//  CbmMvdHitProducer* mvdHitProd = new CbmMvdHitProducer("MVDHitProducer", 0, 
+//  			  			       iVerbose);
+//  run->AddTask(mvdHitProd);
+  // -------------------------------------------------------------------------
+  
+  
+
+
+  // ===                 End of MVD local reconstruction                   ===
+  // =========================================================================
+  
+  
   
   
   // -----   STS digitiser   ------------------------------------------------
@@ -109,8 +113,8 @@ void sts_reco(Int_t nEvents = 1000)
   
   
   // -----   STS reconstruction QA   ----------------------------------------
- // CbmTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 1);
- // run->AddTask(stsRecoQa);
+  CbmTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 2);
+ run->AddTask(stsRecoQa);
   // ------------------------------------------------------------------------
   
    

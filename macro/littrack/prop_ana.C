@@ -1,48 +1,18 @@
 #include "../../cbmbase/CbmDetectorList.h";
-
 void prop_ana(Int_t nEvents = 1000)
 {
   Int_t iVerbose = 0;
-  
-  TString system  = "auau";  
-  TString beam    = "25gev";  
-  TString trigger = "centr";
-  TString particle = "mu";  
-   
-   // Input file (MC events)
-   //TString dir = "/d/cbm02/andrey/events/much/10stations/new/signal/";
-   //TString dir = "/d/cbm02/andrey/events/much/10stations/new/wofield/signal/";   
-   TString dir = "/d/cbm02/andrey/events/much/10stations/10mu/mu/";
-   
-   TString inFile = dir + beam + "/" 
-                    + particle + "/mc." + system + "." + beam + "." 
-                    + particle + "."
-                    + trigger + ".root";  
-                    
-   TString inFile1 = dir + beam + "/" 
-                    + particle + "/sts.reco." + system + "." + beam + "." 
-                    + particle + "."
-                    + trigger + ".root"; 
-   
-   TString inFile2 = dir + beam + "/" 
-                    + particle + "/much.hits." + system + "." + beam + "." 
-                    + particle + "."
-                    + trigger + ".root"; 
-   
 
-   TString parFile = dir + beam + "/" 
-                    + particle + "/params." + system + "." + beam + "." 
-                    + particle + "."
-                    + trigger + ".root";  
-
-  
-   // Output file
-   TString outFile = dir + beam + "/" 
-                    + particle + "/much.ana." + system + "." + beam + "." 
-                    + particle + "."
-                    + trigger + ".root";  
-   
-   gDebug = 0;
+//TString dir = "/d/cbm02/andrey/events/much/10stations/new/signal/";
+//TString dir = "/d/cbm02/andrey/events/much/10stations/new/wofield/signal/";   
+//  TString dir = "/d/cbm02/andrey/events/much/10stations/10mu/mu/";
+  TString dir = "/d/cbm02/andrey/events/muchstraw/large/10mu/mu/";
+    
+   TString inFile = dir + "mc.root";
+   TString inFile1 = dir + "sts.reco.root";
+   TString inFile2 = dir + "much.hits.root";
+   TString parFile = dir + "params.root";  
+   TString outFile = dir + "much.ana.root";
 
    TStopwatch timer;
    timer.Start();
@@ -62,12 +32,12 @@ void prop_ana(Int_t nEvents = 1000)
 
    // -------------------------------------------------------------------------
    // CbmMuchTrackFinder* muchTrackFinder    = new CbmLitMuchTrackFinder();
-   CbmMuchTrackFinder* muchTrackFinder    = new CbmMuchTrackFinderIdeal(1);
+   CbmMuchTrackFinder* muchTrackFinder    = new CbmMuchTrackFinderIdeal();
    CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
    muchFindTracks->UseFinder(muchTrackFinder);
    run->AddTask(muchFindTracks);
    
-   CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks(1);
+   CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
    run->AddTask(muchMatchTracks);
 
    CbmLitPropAna* propAna = new CbmLitPropAna(kMUCH, 10);

@@ -7,8 +7,13 @@ ${ROOT_INCLUDE_DIR}
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
+${CBMROOT_SOURCE_DIR}/field 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
-${CBMROOT_SOURCE_DIR}/mvd
+${CBMROOT_SOURCE_DIR}/passive
+${CBMROOT_SOURCE_DIR}/mvd 
+/misc/cbmsoft/Debian3.1/mar08/fairsoft/basics/gsl/gsl
+/misc/cbmsoft/Debian3.1/new/cern/clhep/include
+/misc/cbmsoft/Debian3.1/new/cern/clhep/lib
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -16,7 +21,7 @@ include_directories( ${INCLUDE_DIRECTORIES})
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 )
- 
+
 link_directories( ${LINK_DIRECTORIES})
 
 set(MVD_SRCS
@@ -27,13 +32,16 @@ CbmMvdGeoPar.cxx
 CbmMvdHit.cxx 
 CbmMvdHitMatch.cxx 
 CbmMvdHitProducer.cxx 
-CbmMvdPileupManager.cxx 
+CbmMvdDigitiser.cxx  
+CbmMvdPileupManager.cxx  
 CbmMvdPoint.cxx
+CbmMvdDigi.cxx  
+CbmMvdFindHits.cxx
+CbmMvdCluster.cxx 
+CbmMvdStation.cxx
+MyG4UniversalFluctuationForSi.cxx
+CbmMvdPixelCharge.cxx    
 )
-
-if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${MVD_SRCS}" "${INCLUDE_DIRECTORIES}" MVD_RULES)
-endif(RULE_CHECKER_FOUND)
 
 # fill list of header files from list of source files
 # by exchanging the file extension
@@ -49,7 +57,7 @@ set(MVD_SRCS ${MVD_SRCS} ${MVD_DICTIONARY})
 
 
 add_library(Mvd SHARED ${MVD_SRCS})
-target_link_libraries(Mvd ${ROOT_LIBRARIES})
+target_link_libraries(Mvd -lgsl ${ROOT_LIBRARIES}) 
 set_target_properties(Mvd PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################

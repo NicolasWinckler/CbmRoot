@@ -11,8 +11,16 @@
 #pragma link C++ class CbmMvdHit+;
 #pragma link C++ class CbmMvdHitMatch+;
 #pragma link C++ class CbmMvdHitProducer+;
+#pragma link C++ class CbmMvdDigitiser+;
 #pragma link C++ class CbmMvdPileupManager+;
 #pragma link C++ class CbmMvdPoint+;
+#pragma link C++ class CbmMvdDigi+;
+#pragma link C++ class CbmMvdFindHits+;
+#pragma link C++ class CbmMvdCluster+;
+#pragma link C++ class CbmMvdStation+;
+#pragma link C++ class MyG4UniversalFluctuationForSi+;
+#pragma link C++ class CbmMvdPixelCharge+;
+
 
 
 

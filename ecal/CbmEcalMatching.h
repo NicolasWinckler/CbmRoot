@@ -6,12 +6,14 @@
 #include "CbmTask.h"
 #include <list>
 #include <map>
+#include "TArrayD.h"
 
 class TClonesArray;
 class CbmEcalCell;
 class CbmEcalRecParticle;
 class TTree;
 class CbmEcalStructure;
+class CbmEcalShowerLib;
 
 class CbmEcalMatching : public CbmTask
 {
@@ -51,6 +53,12 @@ private:
   void AddTrackE(Int_t track, Double_t e);
   /** Match MCTrack and reconstructed particle **/
   void Match(CbmEcalRecParticle* p);
+  /** Get form of energy deposition of the particle **/
+  void FormEpred(CbmEcalRecParticle* p);
+  /** Match MCTrack and reconstructed partile using shower shape **/
+  void MatchP(CbmEcalRecParticle* p);
+  /** Add to particle constants to track and all its mothers **/
+  void AddTrackP(Int_t track, Double_t e, Int_t cell);
   /** An array of reconstructed photons **/
   TClonesArray* fReco;			//!
   /** An array of MC tracks **/
@@ -61,6 +69,8 @@ private:
   TClonesArray* fClusters;		//!
   /** Structure of the calorimeter system **/
   CbmEcalStructure* fStr;		//!
+  /** Shower library **/
+  CbmEcalShowerLib* fShLib;		//!
 
   /** A threshold: if energy of photon is more than threshold*Ecluster
    ** than cluster is formed by that photon **/
@@ -77,6 +87,14 @@ private:
   Double_t fClusterE;
   /** An energy associated with track number **/
   std::map<Int_t, Double_t> fE;		//!
+  /** Predicted by shower library energy in every cell of the cluster **/
+  TArrayD fEpred;
+  /** Total predicted energy depostion of the particle in the cluster **/
+  Double_t fEsum;
+  /** A cluster constant **/
+  Double_t fS;
+  /** An MC particle constant associated with track number **/
+  std::map<Int_t, Double_t> fP;		//!
 
   /** Current cell **/
   CbmEcalCell* fCell;			//!

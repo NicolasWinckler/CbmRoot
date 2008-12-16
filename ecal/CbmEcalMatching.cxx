@@ -11,6 +11,7 @@
 #include "CbmEcalPoint.h"
 #include "CbmEcalClusterV1.h"
 #include "CbmEcalStructure.h"
+#include "CbmEcalShowerLib.h"
 
 #include <iostream>
 
@@ -66,6 +67,12 @@ InitStatus CbmEcalMatching::Init()
     Fatal("Init", "Can't find array of clusters");
     return kFATAL;
   }
+  fShLib=(CbmEcalShowerLib*)io->GetObject("EcalShowerLib");
+  if (!fShLib)
+  {
+    Info("Init", "No shower library found in system. Will continue without chi2 calculation.");
+  }
+
   fEv=0; 
   return kSUCCESS;
 }
@@ -83,12 +90,156 @@ void CbmEcalMatching::Exec(Option_t* opt)
   for(i=0;i<n;i++)
   {
     p=(CbmEcalRecParticle*)fReco->At(i);
+    FormEpred(p);
+    MatchP(p);
+/*
     FormPreCluster(p);
     FormE();
     Match(p);
+*/
   }
 }
+
+/** Get form of energy deposition of the particle **/
+void CbmEcalMatching::FormEpred(CbmEcalRecParticle* p)
+{
+  CbmEcalClusterV1* cluster=(CbmEcalClusterV1*)fClusters->At(p->ClusterNum());
+  Int_t k=0;
+  Int_t type;
+  static Double_t module=fStr->GetEcalInf()->GetModuleSize();
+  Double_t cellsize;
+  CbmEcalCell* cell;
+  Double_t x;
+  Double_t y;
+  Double_t cx;
+  Double_t cy;
+  Double_t r;
+  Double_t theta;
+  Double_t phi;
   
+  fEpred.Set(cluster->Size());
+  fEsum=0;
+  for(k=0;k<cluster->Size();k++)
+  {
+    cell=fStr->GetHitCell(cluster->CellNum(k));
+    type=cell->GetType();
+    cellsize=module/type;
+    cx=cell->GetCenterX(); x=cx;
+    cy=cell->GetCenterY(); y=cy;
+    r=TMath::Sqrt(x*x+y*y);
+    x-=p->X(); 
+    y-=p->Y();
+
+    /** TODO: should be Z of the cell**/
+    theta=TMath::ATan(r/fStr->GetEcalInf()->GetZPos());
+    theta*=TMath::RadToDeg();
+    phi=TMath::ACos(cx/r)*TMath::RadToDeg();
+    if (cy<0) phi=360.0-phi;
+
+    fEpred[k]=fShLib->GetSumEThetaPhi(x, y, cellsize, p->E(), theta, phi);
+    fEsum+=fEpred[k];
+  }
+  fS=0;
+  for(k=0;k<cluster->Size();k++)
+  {
+    cell=fStr->GetHitCell(cluster->CellNum(k));
+    fS+=fEpred[k]/fEsum*cell->GetTotalEnergy();
+  }
+}
+
+/** Add to particle constants to track and all its mothers **/
+void CbmEcalMatching::AddTrackP(Int_t track, Double_t e, Int_t cell)
+{
+  CbmMCTrack* tr;
+  Int_t num;
+
+  fP[track]+=e*fEpred[cell]/fEsum;
+
+  tr=(CbmMCTrack*)fMCTracks->At(track);
+  if (tr==NULL)
+  {
+    Warning("AddTrackE", "Can't find MCTrack number %d.", track);
+    return;
+  }
+  num=tr->GetMotherId();
+  if (num<0) return;
+  tr=(CbmMCTrack*)fMCTracks->At(num);
+  if (tr==NULL)
+  {
+    Warning("AddTrackE", "Can't find MCTrack number %d.", num);
+    return;
+  }
+  if (tr->GetPdgCode()==22||TMath::Abs(tr->GetPdgCode())==11)
+    AddTrackP(num, e, cell);
+}
+
+  
+/** Match MCTrack and reconstructed partile using shower shape **/
+void CbmEcalMatching::MatchP(CbmEcalRecParticle* p)
+{
+  CbmEcalClusterV1* cluster=(CbmEcalClusterV1*)fClusters->At(p->ClusterNum());
+  fP.clear();
+  Int_t k;
+  CbmEcalCell* cell;
+  map<Int_t, Float_t>::const_iterator q;
+  map<Int_t, Double_t>::const_iterator i;
+  pair<Int_t, Double_t> max; max.first=-1111; max.second=0;
+  pair<Int_t, Double_t> max_photon; max_photon.second=0;
+  CbmMCTrack* tr;
+  CbmEcalClusterV1* cls;
+
+  for(k=0;k<cluster->Size();k++)
+  {
+    cell=fStr->GetHitCell(cluster->CellNum(k));
+    for(q=cell->GetTrackEnergyBegin();q!=cell->GetTrackEnergyEnd();++q)
+      AddTrackP((*q).first, (*q).second, k);
+    for(q=cell->GetTrackPSEnergyBegin();q!=cell->GetTrackPSEnergyEnd();++q)
+      AddTrackP((*q).first, (*q).second, k);
+  }
+
+  for(i=fP.begin(); i!=fP.end();++i)
+  {
+    if ((*i).second/fS<fThreshold) continue;
+    if ((*i).second>max.second)
+      max=(*i);
+    tr=(CbmMCTrack*)fMCTracks->At((*i).first);
+    if (tr==NULL)
+    {
+      Warning("Match", "Can't find MCTrack number %d.", (*i).first);
+      return;
+    }
+    if (tr->GetPdgCode()!=22) continue;
+    if ((*i).second>max_photon.second)
+      max_photon=(*i);
+  }
+  if (max.first==-1111)
+  {
+    if (fVerbose>2) Info("Match", "Matching failed for reconstructed photon (%f, %f).", p->X(), p->Y());
+    return;
+  }
+  if (max_photon.second>fPhotonThr*max.second)
+    p->SetMCTrack(max_photon.first);
+  else
+    p->SetMCTrack(max.first);
+  if (!fTree) return;
+  fMCNum=p->MCTrack();
+  tr=(CbmMCTrack*)fMCTracks->At(fMCNum);
+  fPx=p->Px();
+  fPy=p->Py();
+  fPz=p->Pz();
+  fRE=p->E();
+  cls=(CbmEcalClusterV1*)fClusters->At(p->ClusterNum());
+  fChi2=cls->Chi2();
+  fNM=cls->Maxs();
+  fNC=cls->Size();
+  fPDG=tr->GetPdgCode();
+  fMCE=tr->GetEnergy();
+  fMCPx=tr->GetPx();
+  fMCPy=tr->GetPy();
+  fMCPz=tr->GetPz();
+  fTree->Fill();
+}
+
 /** Form a precluster **/
 void CbmEcalMatching::FormPreCluster(CbmEcalRecParticle* p)
 {

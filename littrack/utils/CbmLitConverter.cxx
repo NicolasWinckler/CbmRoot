@@ -19,6 +19,7 @@
 #include "TClonesArray.h"
 
 #include <iostream>
+#include <cmath>
 
 CbmLitConverter::CbmLitConverter()
 {

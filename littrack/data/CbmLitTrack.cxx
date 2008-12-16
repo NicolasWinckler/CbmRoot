@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include <cmath>
 
 CbmLitTrack::CbmLitTrack() :
 	fQuality(kLITGOOD),

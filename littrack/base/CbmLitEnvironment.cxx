@@ -25,6 +25,7 @@
 #include <set>
 #include <functional>
 #include <algorithm>
+#include <cmath>
 
 CbmLitEnvironment* CbmLitEnvironment::fInstance = NULL;
 

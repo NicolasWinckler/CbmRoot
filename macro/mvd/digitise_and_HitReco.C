@@ -41,7 +41,6 @@
     // ========================================================================
 
 
-
     // ----    Debug option   -------------------------------------------------
     gDebug = 0;
     // ------------------------------------------------------------------------
@@ -51,7 +50,6 @@
     TStopwatch timer;
     timer.Start();
     // ------------------------------------------------------------------------
-
 
     // ----  Load libraries   -------------------------------------------------
     gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -85,6 +83,7 @@
     // ------------------------------------------------------------------------
 
 
+
     // -------   MVD Digitiser   ----------------------------------------------
     CbmMvdDigitiser* digi = new CbmMvdDigitiser("MVDDigitiser", 0, iVerbose);
     cout << "Adding Task:  CbmMvdDigitiser... " << endl;
@@ -113,7 +112,6 @@
 
 
     //----------------------------------------------------------------------------
-
     // -----   MVD Cluster Finder   ----------------------------------------------
 
     CbmMvdFindHits* mvd_hit   = new CbmMvdFindHits("MVDFindHits", 0, iVerbose);
@@ -125,87 +123,34 @@
     mvd_hit->SetHitPosErrY(0.0005);
     fRun->AddTask(mvd_hit);
 
-/*
-     // ---  STS digitiser --------------------------------------------------
-     CbmTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
-     fRun->AddTask(stsDigitize);
-     // -------------------------------------------------------------------------
 
-
-     // ---  STS hit finding   ------------------------------------------------
-     CbmTask* stsFindHits = new CbmStsFindHits("STSFindHits", iVerbose);
-     fRun->AddTask(stsFindHits);
-     // -------------------------------------------------------------------------
-
-
-     // -----  STS hit matching   -----------------------------------------------
-     CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits(iVerbose);
-     fRun->AddTask(stsMatchHits);
-     // -------------------------------------------------------------------------
-
-
-     // ---  STS track finding   ------------------------------------------------
-     CbmKF* kalman = new CbmKF();
-     fRun->AddTask(kalman);
-
-     CbmL1* l1 = new CbmL1();
-     fRun->AddTask(l1);
-
-     CbmStsTrackFinder* stsTrackFinder = new CbmL1StsTrackFinder();
-     CbmTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder, kTRUE,"TrackFinder");
-     fRun->AddTask(stsFindTracks);
-     // -------------------------------------------------------------------------
-
-
-     // ---   STS track matching   ----------------------------------------------
-     CbmTask* stsMatchTracks = new CbmStsMatchTracks(iVerbose);
-     fRun->AddTask(stsMatchTracks);
-     // -------------------------------------------------------------------------
-
-
-     // ---   STS track fitting   -----------------------------------------------
-     CbmStsTrackFitter* stsTrackFitter = new CbmStsKFTrackFitter();
-     CbmTask* stsFitTracks = new CbmStsFitTracks(stsTrackFitter, iVerbose);
-     fRun->AddTask(stsFitTracks);
-     // -------------------------------------------------------------------------
-
-     // -----   Primary vertex finding   ---------------------------------------
-     CbmPrimaryVertexFinder* pvFinder = new CbmPVFinderKF();
-     CbmFindPrimaryVertex* findVertex = new CbmFindPrimaryVertex(pvFinder);
-     fRun->AddTask(findVertex);
-     // ------------------------------------------------------------------------
-*/
-
-    // -----  Parameter database   --------------------------------------------
+    //----------------------------------------------------------------------------
+    // -----  Parameter database   -----------------------------------------------
     CbmRuntimeDb* rtdb = fRun->GetRuntimeDb();
     CbmParRootFileIo*  parIo1 = new CbmParRootFileIo();
-    CbmParAsciiFileIo* parIo2 = new CbmParAsciiFileIo();
     parIo1->open(parFile.Data());
-    parIo2->open("/u/cdritsa/cbm/APR08/cbmroot/parameters/sts/sts_Standard_s3055AAFK5.ExpE.digi.par","in");
 
     rtdb->setFirstInput(parIo1);
-    rtdb->setSecondInput(parIo2);
-
     rtdb->setOutput(parIo1);
     rtdb->saveOutput();
     rtdb->print();
     fRun->LoadGeometry();
-    // ------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
 
 
-    // -----   Run initialisation   -------------------------------------------
+    // -----   Run initialisation   ----------------------------------------------
     fRun->Init();
-    // ------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
 
 
 
-    // -----   Start run   ----------------------------------------------------
+    // -----   Start run   -------------------------------------------------------
     fRun->Run(0,nEvents);
-    // ------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
 
 
 
-    // -----   Finish   -------------------------------------------------------
+    // -----   Finish   ----------------------------------------------------------
     timer.Stop();
 
     Double_t rtime = timer.RealTime();
@@ -216,7 +161,7 @@
     cout << "Parameter file is " << parFile << endl;
     cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
     cout << endl;
-    // ------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
 
 
 }

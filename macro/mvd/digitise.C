@@ -115,67 +115,12 @@
     //----------------------------------------------------------------------------
 
 
-/*
-     // ---  STS digitiser --------------------------------------------------
-     CbmTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
-     fRun->AddTask(stsDigitize);
-     // -------------------------------------------------------------------------
-
-
-     // ---  STS hit finding   ------------------------------------------------
-     CbmTask* stsFindHits = new CbmStsFindHits("STSFindHits", iVerbose);
-     fRun->AddTask(stsFindHits);
-     // -------------------------------------------------------------------------
-
-
-     // -----  STS hit matching   -----------------------------------------------
-     CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits(iVerbose);
-     fRun->AddTask(stsMatchHits);
-     // -------------------------------------------------------------------------
-
-
-     // ---  STS track finding   ------------------------------------------------
-     CbmKF* kalman = new CbmKF();
-     fRun->AddTask(kalman);
-
-     CbmL1* l1 = new CbmL1();
-     fRun->AddTask(l1);
-
-     CbmStsTrackFinder* stsTrackFinder = new CbmL1StsTrackFinder();
-     CbmTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder, kTRUE,"TrackFinder");
-     fRun->AddTask(stsFindTracks);
-     // -------------------------------------------------------------------------
-
-
-     // ---   STS track matching   ----------------------------------------------
-     CbmTask* stsMatchTracks = new CbmStsMatchTracks(iVerbose);
-     fRun->AddTask(stsMatchTracks);
-     // -------------------------------------------------------------------------
-
-
-     // ---   STS track fitting   -----------------------------------------------
-     CbmStsTrackFitter* stsTrackFitter = new CbmStsKFTrackFitter();
-     CbmTask* stsFitTracks = new CbmStsFitTracks(stsTrackFitter, iVerbose);
-     fRun->AddTask(stsFitTracks);
-     // -------------------------------------------------------------------------
-
-     // -----   Primary vertex finding   ---------------------------------------
-     CbmPrimaryVertexFinder* pvFinder = new CbmPVFinderKF();
-     CbmFindPrimaryVertex* findVertex = new CbmFindPrimaryVertex(pvFinder);
-     fRun->AddTask(findVertex);
-     // ------------------------------------------------------------------------
-*/
-
     // -----  Parameter database   --------------------------------------------
     CbmRuntimeDb* rtdb = fRun->GetRuntimeDb();
     CbmParRootFileIo*  parIo1 = new CbmParRootFileIo();
-    CbmParAsciiFileIo* parIo2 = new CbmParAsciiFileIo();
     parIo1->open(parFile.Data());
-    parIo2->open("/u/cdritsa/cbm/APR08/cbmroot/parameters/sts/sts_Standard_s3055AAFK5.ExpE.digi.par","in");
 
     rtdb->setFirstInput(parIo1);
-    rtdb->setSecondInput(parIo2);
-
     rtdb->setOutput(parIo1);
     rtdb->saveOutput();
     rtdb->print();

@@ -502,7 +502,7 @@ void CbmEcalRecoSlow::FitCluster(CbmEcalClusterV1* clstr)
   Int_t nparx;
 
   fFitter->GetStats(chi2, edm, errdef, nvpar, nparx);
-  if (ret!=0)
+  if (ret!=0&&fVerbose>1)
   {
     Info("FitCluster", "Minimization failed! Last chi2 %f, old chi2 %f.", chi2, oldchi2);
   }

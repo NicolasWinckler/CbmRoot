@@ -18,7 +18,11 @@
  * each ionisation point is spread according to the Gaussian distribution 
  * whose width  is proportional to the square-root of the drift distance. 
  * The charge on each fired pixel is then calculated as a sum of contributions 
- * from n Gaussians.  
+ * from n Gaussians.
+ *
+ * Note that the integration of the gaussians
+ * consumes most of the execution time of this task.
+ *
  * The output of the processor is the collection of MVD digis.
  *
  * Input collection 

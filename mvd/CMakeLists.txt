@@ -4,6 +4,8 @@
 
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
+${CLHEP_INCLUDE_DIR}
+${SIMPATH}/basics/gsl/gsl
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
@@ -11,9 +13,6 @@ ${CBMROOT_SOURCE_DIR}/field
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/passive
 ${CBMROOT_SOURCE_DIR}/mvd 
-/misc/cbmsoft/Debian3.1/mar08/fairsoft/basics/gsl/gsl
-/misc/cbmsoft/Debian3.1/new/cern/clhep/include
-/misc/cbmsoft/Debian3.1/new/cern/clhep/lib
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

@@ -108,7 +108,7 @@
 #include <vector>
 #include <map>
 
-#include "gsl_sf_erf.h"
+#include "gsl/gsl_sf_erf.h"
 #include "CLHEP/Random/RandGauss.h"
 #include "CLHEP/Random/RandPoisson.h"
 #include "CLHEP/Random/RandFlat.h"

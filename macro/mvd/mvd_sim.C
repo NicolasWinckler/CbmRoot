@@ -12,8 +12,8 @@
   //          Adjust this part according to your requirements
 
   // Input file
-  TString inPath = "/d/cbm03/urqmd/auau/25gev/centr/";
-  TString inFile = inPath + "urqmd.auau.25gev.centr.0000.ftn14";
+  TString inDir   = gSystem->Getenv("VMCWORKDIR");
+  TString inFile  = inDir + "/input/urqmd.ftn14";
   
   // Number of events
   Int_t   nEvents = 10;
@@ -28,14 +28,14 @@
   TString caveGeom = "cave.geo";
 
   // Target geometry
-  TString targetGeom = "target.geo";
+  TString targetGeom = "target_au_250mu.geo";
 
   // Beam pipe geometry
   TString pipeGeom = "pipe_standard.geo";
 
   // Magnet geometry and field map
-  TString magnetGeom  = "magnet_active.geo";
-  TString fieldMap    = "FieldActive";
+  TString magnetGeom  = "magnet_standard.geo";
+  TString fieldMap    = "FieldMuonMagnet";
   Double_t fieldZ     = 50.;     // z position of field centre
   Double_t fieldScale = 1.;      // field scaling factor
 
@@ -67,7 +67,7 @@
   gSystem->Load("libGeoBase");
   gSystem->Load("libParBase");
   gSystem->Load("libBase");
-  gSystem->Load("libMCStack");
+  gSystem->Load("libCbmBase");
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
@@ -118,6 +118,8 @@
     magField = new CbmFieldMapSym3(fieldMap);
   else if ( fieldMap == "FieldAlligator" )
     magField = new CbmFieldMapSym2(fieldMap);
+  else if ( fieldMap = "FieldMuonMagnet" )
+    magField = new CbmFieldMapSym3(fieldMap);
   else {
     cout << "===> ERROR: Field map " << fieldMap << " unknown! " << endl;
     exit;

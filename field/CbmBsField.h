@@ -39,7 +39,7 @@ public:
 
 	void writeBsRootfile(const char *name);    // Write Field Splined  to root file
 	void readBsRootfile (const char *name);    // Read  Field Splined  from root file
-	void readFortranAsciifiles(const char *MapFile1,const char *MapFile3,const char *MapFile3);  // for the first use only
+	void readFortranAsciifiles(const char *MapFile1,const char *MapFile2,const char *MapFile3);  // for the first use only
 	
 	void GetFieldValue(const Double_t Point[3],Double_t *Bfield); 
 

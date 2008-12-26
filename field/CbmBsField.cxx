@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <cstdlib>
 
 using std::cout;
 using std::cerr;
@@ -74,7 +75,7 @@ CbmBsField::~CbmBsField()
 void CbmBsField::Init()
 {
   TString tmp_FileName;
-  TString dir = getenv("VMCWORKDIR");
+  TString dir =  gSystem->Getenv("VMCWORKDIR"); // getenv("VMCWORKDIR");
   tmp_FileName = dir + "/input/" + fBsName+".root";
   readBsRootfile (tmp_FileName);
 }
@@ -147,7 +148,7 @@ void CbmBsField::readBsRootfile (const char *name)    // Read  Field Splined
 	TFile *oldfile=gFile;
 	TFile *f=new TFile(name, "READ");		
 	if (f->IsZombie()) {
-	    cout << "Error CbmBsField::readBsRootfile:  can not read from file: " << endl;
+	    cout << "-E- CbmBsField::readBsRootfile:  can not read from file: " << endl;
 	    exit(-1);
 	  }
 	const char *bsname=fBsName.Data();

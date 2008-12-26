@@ -6,6 +6,7 @@
 #include "CbmFieldMapSym3.h"
 #include "CbmBsField.h"
 #include "CbmFieldMapDistorted.h"
+#include "CbmFieldMapSym1.h"
 
 #include "CbmRunAna.h"
 #include "CbmRuntimeDb.h"
@@ -48,6 +49,7 @@ CbmField* CbmFieldCreator::createCbmField()
 	else if ( fType == 2 ) fMagneticField = new CbmFieldMapSym2(fFieldPar);
 	else if ( fType == 3 ) fMagneticField = new CbmFieldMapSym3(fFieldPar);
 	else if ( fType == kTypeDistorted ) fMagneticField = new CbmFieldMapDistorted(fFieldPar); 
+	else if ( fType == 5 ) fMagneticField = new CbmFieldMapSym1(fFieldPar);
 	else if ( fType == 6 ) fMagneticField = new CbmBsField(fFieldPar);
 	else cerr << "-W- CbmRunAna::GetField: Unknown field type " << fType
 		<< endl;

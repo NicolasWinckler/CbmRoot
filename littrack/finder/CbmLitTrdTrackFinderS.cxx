@@ -25,6 +25,8 @@
 
 #include "TClonesArray.h"
 
+#include <algorithm>
+
 CbmLitTrdTrackFinderS::CbmLitTrdTrackFinderS()
 {
 }

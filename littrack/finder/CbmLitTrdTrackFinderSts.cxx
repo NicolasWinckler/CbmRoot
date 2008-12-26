@@ -18,6 +18,7 @@
 #include "TClonesArray.h"
 
 #include <vector>
+#include <algorithm>
 
 CbmLitTrdTrackFinderSts::CbmLitTrdTrackFinderSts()
 {

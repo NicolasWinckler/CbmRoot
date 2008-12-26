@@ -11,6 +11,7 @@
 #include "CbmLitHit.h"
 
 #include <iostream>
+#include <algorithm>
 
 CbmLitTrackFinderBranch::CbmLitTrackFinderBranch()
 {

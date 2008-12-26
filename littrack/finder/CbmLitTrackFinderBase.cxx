@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 CbmLitTrackFinderBase::CbmLitTrackFinderBase()
 {

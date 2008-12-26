@@ -3,6 +3,8 @@
 #include "TDatabasePDG.h"
 #include "TParticlePDG.h"
 
+#include <cstdlib>
+
 CbmLitPDG::CbmLitPDG()
 {
 }

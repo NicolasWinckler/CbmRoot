@@ -2,6 +2,8 @@
 
 #include "CbmLitComparators.h"
 
+#include <algorithm>
+
 CbmLitTrackSelectionA::CbmLitTrackSelectionA()
 {
 	

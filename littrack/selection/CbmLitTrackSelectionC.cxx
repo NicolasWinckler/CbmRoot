@@ -5,6 +5,7 @@
 
 #include <set>
 #include <iostream>
+#include <algorithm>
 
 CbmLitTrackSelectionC::CbmLitTrackSelectionC():
 	fNofSharedHits(0)

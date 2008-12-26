@@ -4,6 +4,8 @@
 #include "CbmLitComparators.h"
 //#include "CbmLitTrackSelectionC.h"
 
+#include <algorithm>
+
 CbmLitTrackSelectionB::CbmLitTrackSelectionB()
 {
 //	Properties().AddProperty("fNofSharedHits", 0);

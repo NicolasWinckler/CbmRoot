@@ -60,6 +60,7 @@
 #include "TObjString.h"
 
 #include <list>
+#include <stdlib.h>
 
 class TMap;
 class CbmGeoEcalPar;

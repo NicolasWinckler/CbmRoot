@@ -14,6 +14,7 @@
 
 #include <list>
 #include <iostream>
+#include <algorithm>
 
 using std::cerr;
 using std::endl;

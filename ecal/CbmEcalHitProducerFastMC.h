@@ -59,7 +59,7 @@ public:
    **
    ** Adds a EcalHit to the HitCollection
    **/
-  void AddHit(Double_t x, Double_t x, Double_t E);
+  void AddHit(Double_t x, Double_t y, Double_t E);
 
 protected:
 

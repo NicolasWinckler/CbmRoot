@@ -149,7 +149,7 @@ Bool_t CbmMuchDigitize::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
 	Double_t gridDx = module->GetGridDx();
 	Double_t gridDy = module->GetGridDy();
 
-	// Get entrance and exit coordinats of the point
+	// Get entrance and exit coordinates of the point
 	Double_t xIn = point->GetXIn();
 	Double_t yIn = point->GetYIn();
 	Double_t xOut = point->GetXOut();
@@ -159,13 +159,17 @@ Bool_t CbmMuchDigitize::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
 	Double_t x0 = (xIn + xOut) / 2;
 	Double_t y0 = (yIn + yOut) / 2;
 
-	Int_t iGridColumn = (Int_t) ((x0 + modLx / 2.) / gridDx);
-	Int_t iGridRow = (Int_t) ((y0 + modLy / 2.) / gridDy);
+        // Translate to module center system
+	TVector3 modPos = module->GetPosition();
+	Double_t x0_mod = x0 - modPos[0];
+	Double_t y0_mod = y0 - modPos[1];
+	
+	Int_t iGridColumn = (Int_t) ((x0_mod + modLx / 2.) / gridDx);
+	Int_t iGridRow = (Int_t) ((y0_mod + modLy / 2.) / gridDy);
 
 	if (iGridRow > module->GetGridRows() - 1 || iGridColumn
 			> module->GetGridCols() - 1)
 		return kFALSE;
-
 	CbmMuchSector* sector = module->GetSector(iGridColumn, iGridRow);
 	Int_t iChannel = -1;
 	if (sector) {

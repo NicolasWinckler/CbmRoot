@@ -76,6 +76,8 @@ CbmEcalCell* CbmEcalModule::FindCell(Float_t x, Float_t y) const
 {
   Int_t ix=(Int_t)TMath::Floor( (x-GetX1())/GetDX()*GetType() );
   Int_t iy=(Int_t)TMath::Floor( (y-GetY1())/GetDY()*GetType() );
+  if (ix<0) ix=0; if (ix>=GetType()) ix=GetType()-1;
+  if (iy<0) iy=0; if (iy>=GetType()) iy=GetType()-1;
   return At(ix,iy);
 }
 

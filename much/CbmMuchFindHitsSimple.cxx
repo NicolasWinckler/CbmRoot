@@ -88,8 +88,8 @@ void CbmMuchFindHitsSimple::Exec(Option_t* opt) {
     Int_t nRows     = sector->GetNRows();
     Double_t dx     = lx/nColumns;
     Double_t dy     = ly/nRows;
-    Double_t sigmaX = TMath::Sqrt(dx);
-    Double_t sigmaY = TMath::Sqrt(dy);
+    Double_t sigmaX = dx/TMath::Sqrt(12.);
+    Double_t sigmaY = dy/TMath::Sqrt(12.);
 
     // Find hit coordinates
     Int_t iChannel = CbmMuchGeoScheme::GetChannelIndex(detectorId);

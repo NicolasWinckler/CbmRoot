@@ -49,6 +49,7 @@ CbmUnigenGenerator::CbmUnigenGenerator(TString fileName)
     fCM = kFALSE;
     if(TMath::Abs(run->GetPTarg()) > 0) fCM = kTRUE;
     fBetaCM = 0.;
+    fGammaCM = 1.;
     if(fCM) {
         cout << "-I- CbmUnigenGenerator: we are in CM frame" << endl;
 	Double_t elab = (TMath::Power(run->GetSqrtS()/run->GetAProj(),2)-
@@ -56,13 +57,13 @@ CbmUnigenGenerator::CbmUnigenGenerator(TString fileName)
 	Double_t plab = TMath::Sqrt(elab*elab - TMath::Power(0.938271998,2));
         cout << "-I- CbmUnigenGenerator: Plab = " << plab << " AGeV" << endl;
         fBetaCM = plab / (elab + 0.938271998);
+	fGammaCM = 1./TMath::Sqrt(1. - fBetaCM*fBetaCM);
 	cout << "-I- CbmUnigenGenerator: boost parameters:" << endl
 	    << "                             betaCM = " << fBetaCM
 	    << ",  gammaCM = " << fGammaCM << endl;
     } else {
         cout << "-I- CbmUnigenGenerator: we are in LAB frame" << endl;
     }
-    fGammaCM = 1./TMath::Sqrt(1. - fBetaCM*fBetaCM);
 
     fInTree = (TTree*) fInputFile->Get("events");
     if(NULL == fInTree) {
@@ -124,9 +125,7 @@ Bool_t CbmUnigenGenerator::ReadEvent(CbmPrimaryGenerator* primGen)
 			  particle->Px(),
 			  particle->Py(),
 			  pz1,
-			  particle->X(),
-			  particle->Y(),
-			  particle->Z());
+			  0., 0., 0.);
     }
 
     fEvents += 1;

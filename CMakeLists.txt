@@ -19,7 +19,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 # Load some basic macros which are needed later on
 include(CbmMacros)
 include(WriteConfigFile)
-include(Dart)
+include(CTest)
 include(CheckCompiler)
 
 #Check the compiler and set the compile and link flags

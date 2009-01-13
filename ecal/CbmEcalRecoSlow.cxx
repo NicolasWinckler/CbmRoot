@@ -566,6 +566,7 @@ void CbmEcalRecoSlow::TimeReco(CbmEcalRecParticle* p, CbmEcalClusterV1* cluster)
   {
     cell=fStr->GetHitCell(cluster->CellNum(k));
     celltime=cell->GetTime();
+    if (celltime==-1111) continue;
     /** No time information for the cell **/
     type=cell->GetType();
     cellsize=module/type;
@@ -573,8 +574,7 @@ void CbmEcalRecoSlow::TimeReco(CbmEcalRecParticle* p, CbmEcalClusterV1* cluster)
     y=cell->GetCenterY(); y-=p->Y(); // y-=cy; 
 
     celle=fShLib->GetSumEThetaPhi(x, y, cellsize, p->E(), theta, phi);
-    cout << "CellTime: "<< celltime << "	" << celle << "	" << cell->GetTotalEnergy() << "	" << cell->GetEnergy() << "	" << cell->GetCenterX() << "	" << cell->GetCenterY() << endl;
-    if (celltime==-1111) continue;
+//    cout << "CellTime: "<< celltime << "	" << celle << "	" << cell->GetTotalEnergy() << "	" << cell->GetEnergy() << "	" << cell->GetCenterX() << "	" << cell->GetCenterY() << endl;
     time+=celle*celltime;
     te+=celle;
   }

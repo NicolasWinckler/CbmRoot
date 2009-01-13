@@ -579,9 +579,9 @@ void CbmEcalRecoSlow::TimeReco(CbmEcalRecParticle* p, CbmEcalClusterV1* cluster)
     te+=celle;
   }
  
-  cout << "CellTime: " << time << endl;
+//  cout << "CellTime: " << time << endl;
   time/=te;
-  cout << "CellTime: " << time << endl;
+//  cout << "CellTime: " << time << endl;
   if (time>0)
     p->SetTOF(time);
 }

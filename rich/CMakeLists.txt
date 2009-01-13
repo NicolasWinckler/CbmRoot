@@ -61,6 +61,7 @@ CbmRichRingSelect.cxx
 CbmRichRingSelectNeuralNet.cxx
 CbmRichSelectRings.cxx
 CbmRichRingFitterEllipse.cxx
+CbmRichGeoTest.cxx
 #CbmRichFuzzyKE.cxx
 #CbmRichElectrons.cxx
 #CbmRichElectronsQa.cxx

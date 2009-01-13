@@ -5,7 +5,7 @@
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
- 
+
 #pragma link C++ class  CbmRich+;
 
 #pragma link C++ class  CbmRichPoint+;
@@ -44,6 +44,7 @@
 #pragma link C++ class CbmRichRingSelectNeuralNet+;
 #pragma link C++ class CbmRichSelectRings+;
 #pragma link C++ class CbmRichRingFitterEllipse+;
+#pragma link C++ class CbmRichGeoTest+;
 //#pragma link C++ class CbmRichFuzzyKE+;
 //#pragma link C++ class CbmRichElectrons+;
 //#pragma link C++ class CbmRichElectronsQa+;

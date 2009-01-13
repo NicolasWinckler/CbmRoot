@@ -303,7 +303,7 @@ void CbmEcalHitProducer::CellToHits(CbmEcalCell* cell)
     cell->SetPSEnergy(psenergy);
     if (fProduceHits)
     if (energy!=0||psenergy!=0)
-      AddHit(cell->GetCellNumber(),energy,psenergy, -1, cell->GetCenterX(), cell->GetCenterY());
+      AddHit(cell->GetCellNumber(),energy,psenergy, -1, cell->GetCenterX(), cell->GetCenterY(), cell->GetTime());
   }
   else
   {
@@ -312,7 +312,7 @@ void CbmEcalHitProducer::CellToHits(CbmEcalCell* cell)
     {
       psenergy=cell->GetTrackPSEnergy(p->first);
       energy=p->second;
-      AddHit(cell->GetCellNumber(),energy,psenergy, p->first, cell->GetCenterX(), cell->GetCenterY());
+      AddHit(cell->GetCellNumber(),energy,psenergy, p->first, cell->GetCenterX(), cell->GetCenterY(), cell->GetTrackTime(p->first));
     }
     p=cell->GetTrackPSEnergyBegin();
     for(;p!=cell->GetTrackPSEnergyEnd();++p)
@@ -321,7 +321,7 @@ void CbmEcalHitProducer::CellToHits(CbmEcalCell* cell)
       if (energy==0)
       {
 	psenergy=p->second;
-	AddHit(cell->GetCellNumber(),energy,psenergy, p->first, cell->GetCenterX(), cell->GetCenterY());
+	AddHit(cell->GetCellNumber(),energy,psenergy, p->first, cell->GetCenterX(), cell->GetCenterY(), cell->GetTrackTime(p->first));
       }
     }
   }
@@ -383,9 +383,9 @@ void CbmEcalHitProducer::AddHit(TVector3 &posHit, TVector3 &posHitErr,
 
 
 // -----   Add Hit to HitCollection   --------------------------------------
-void CbmEcalHitProducer::AddHit(Int_t cellnumber, Float_t energy, Float_t psenergy, Int_t trackID, Float_t x, Float_t y)
+void CbmEcalHitProducer::AddHit(Int_t cellnumber, Float_t energy, Float_t psenergy, Int_t trackID, Float_t x, Float_t y, Double32_t time)
 {
-  new((*fHitCollection)[fNHits++]) CbmEcalHit(cellnumber,energy,psenergy,trackID,0); //No time information at the moment
+  new((*fHitCollection)[fNHits++]) CbmEcalHit(cellnumber,energy,psenergy,trackID,time); //No time information at the moment
 }
 // -------------------------------------------------------------------------
 

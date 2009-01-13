@@ -71,6 +71,8 @@ public:
   Int_t CellNum() const {return fCellNum;}
   Int_t PdgId() const {return fId;}
   Int_t CellType() const {return fType;}
+  Double_t TOF() const {return fTime;}
+  void SetTOF(Double32_t time) {fTime=time;}
   /** Output to screen **/
   virtual void Print(const Option_t* opt = "") const;
 
@@ -104,7 +106,10 @@ protected:
   /** A mother tracks number **/
   Int_t fMCTrack;
 
-  ClassDef(CbmEcalRecParticle,1)
+  /** TOF for calorimeter **/
+  Double32_t fTime;
+
+  ClassDef(CbmEcalRecParticle, 2)
 
 };
 

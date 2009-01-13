@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 using std::cout;
 using std::endl;
@@ -70,9 +71,9 @@ Int_t CbmRichRingFinderTrack::DoFind(TClonesArray* rHitArray,
 	}
 	cout << "fData.size() = "<< fData.size()<<endl;
 	sort(fData.begin(), fData.end(),CbmRichTrackMyPoint::CmpUp);
-	
+
 	//for (int i = 0; i< fData.size(); i++) cout << fData[i].fX <<" " ;
-	
+
 	const Int_t npoints = rProjArray->GetEntriesFast();
 	if(!npoints) {
 		cout << "No projections in this event." << endl;
@@ -92,14 +93,14 @@ Int_t CbmRichRingFinderTrack::DoFind(TClonesArray* rHitArray,
 	cout <<"fGuidance.size() = "<< fGuidance.size()<< endl;
 
 	int foundRingsCount = 0;
-	
+
 	FindCenters(fNBins);
 	//return -1;
  	for(unsigned int iRing=0; iRing < fFoundRings.size(); iRing++) {
 		//cout<<"111111"<<endl;
 		//new ((*rRingArray)[foundRingsCount]) CbmRichRing(fFoundRings[iRing]);
-		
-		
+
+
 		//cout<<"222222"<<endl;
 		new ((*rRingArray)[foundRingsCount]) CbmRichRing();
 		CbmRichRing * r = (CbmRichRing *)rRingArray->At(foundRingsCount);
@@ -107,7 +108,7 @@ Int_t CbmRichRingFinderTrack::DoFind(TClonesArray* rHitArray,
 		double yc = fFoundRings[iRing].GetCenterY();
 		double radius = fFoundRings[iRing].GetRadius();
 		//cout << "(X,Y,R, NHits) = "<<xc << " "
-		//     << yc<< " "<<radius << " "<< 
+		//     << yc<< " "<<radius << " "<<
 		//     fFoundRings[iRing].GetNofHits() << endl;;
 		r->SetCenterX(xc);
 		r->SetCenterY(yc);
@@ -116,7 +117,7 @@ Int_t CbmRichRingFinderTrack::DoFind(TClonesArray* rHitArray,
 			r->AddHit(fFoundRings[iRing].GetHit(ith));
 		}
 		foundRingsCount++;
-		
+
   	}
 	cout<<"found Rings = "<<foundRingsCount<<endl;
 
@@ -187,7 +188,7 @@ void CbmRichRingFinderTrack::InitHist1D(double nbins, int cpinc)
 	//cout<< " hitCnt ="<<hit_cnt;
 	if (hit_cnt >= fCut){
 	Int_t hitCntY = 0;
-		for (i = ind1; i < ind2 + 1; i++){			
+		for (i = ind1; i < ind2 + 1; i++){
 			if (fData[i].fY < fGuidance[cpinc].fY + fMaxRadius && fData[i].fY > fGuidance[cpinc].fY - fMaxRadius){
 				hitCntY++;
 				Double_t r = pow((fData[i].fX - fGuidance[cpinc].fX)*(fData[i].fX - fGuidance[cpinc].fX) +
@@ -266,7 +267,7 @@ void CbmRichRingFinderTrack::FindCenters(Double_t nbins)
 
 			if (ii-1 > 0)
 				for (unsigned int ih=0; ih < fHist[ii - 1].size(); ih++){
-				tempRing.AddHit(fData[fHist[ii-1][ih]].fId);				
+				tempRing.AddHit(fData[fHist[ii-1][ih]].fId);
 			}
 			fFoundRings.push_back(tempRing);
 		}

@@ -55,6 +55,13 @@ Int_t CbmEcalCell::CountNeighbors(const std::list<CbmEcalCell*>& lst) const
 
   return c;
 }
+//-----------------------------------------------------------------------------
+Float_t CbmEcalCell::GetTrackTime(Int_t num) const
+{
+  map<Int_t, Float_t>::const_iterator p=fTrackTime.find(num);
+  if (p==fTrackTime.end()) return 0; else return p->second;
+}
+
 
 //-----------------------------------------------------------------------------
 Float_t CbmEcalCell::GetTrackEnergy(Int_t num) const
@@ -77,6 +84,8 @@ void CbmEcalCell::ResetEnergy()
   fPSEnergy=0;
   fTrackEnergy.clear();
   fTrackPSEnergy.clear();
+  fTime=-1111;
+  fTrackTime.clear();
 }
 
 //-----------------------------------------------------------------------------

@@ -52,5 +52,6 @@
 #pragma link C++ class  CbmEcalAnalysisPi0;
 #pragma link C++ class  CbmEcalAnalysisPair;
 #pragma link C++ class  CbmEcalAnalysisNeutron;
+#pragma link C++ class  CbmEcalTimeDigitizer;
 
 #endif

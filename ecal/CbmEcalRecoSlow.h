@@ -21,6 +21,7 @@ class CbmEcalInf;
 class CbmEcalClusterV1;
 class CbmEcalShowerLib;
 class CbmEcalCalibration;
+class CbmEcalRecParticle;
 class TFormula;
 
 class FCNEcalCluster : public ROOT::Minuit2::FCNGradientBase
@@ -120,6 +121,8 @@ private:
   Double_t CalculateChi2(CbmEcalClusterV1* cluster);
   /** Fit a cluster. A**/
   Double_t FitCluster();
+  /** Reconstruct time for particle **/
+  void TimeReco(CbmEcalRecParticle* p, CbmEcalClusterV1* cluster);
   /** Number of reconstructed tracks **/
   Int_t fN;
   Int_t fNOld;

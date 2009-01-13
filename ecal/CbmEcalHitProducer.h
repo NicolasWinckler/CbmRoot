@@ -130,7 +130,7 @@ public:
   void AddHit(TVector3 &posHit, TVector3 &posHitErr,
 	      Int_t trackID, Int_t detID, Int_t pmtID, Double_t ampl);
   //Using x and y is deprecated! Will be removed in time!
-  void AddHit(Int_t cellnumber, Float_t energy, Float_t psenergy, Int_t trackID, Float_t x=0, Float_t y=0);
+  void AddHit(Int_t cellnumber, Float_t energy, Float_t psenergy, Int_t trackID, Float_t x=0, Float_t y=0, Double32_t time=0);
 
   /** Set data source for hit producer.
    ** This must be called before Init()

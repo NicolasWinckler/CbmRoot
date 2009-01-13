@@ -527,8 +527,63 @@ void CbmEcalRecoSlow::FitCluster(CbmEcalClusterV1* clstr)
     else
       p->fE=fFitter->GetParameter(i*3);
     p->fChi2=chi2;
+    TimeReco(p, clstr);
   }
   
+}
+
+void CbmEcalRecoSlow::TimeReco(CbmEcalRecParticle* p, CbmEcalClusterV1* cluster)
+{
+  Double_t time=0;
+  Double_t te=0;
+
+  static Double_t module=fInf->GetModuleSize();
+  Double_t theta;
+  Int_t k;
+  CbmEcalCell* cell;
+  Int_t type;
+  Double_t cellsize;
+  Double_t celle;
+  Double_t celltime;
+  Double_t x;
+  Double_t y;
+  Double_t r;
+  Double_t cx;
+  Double_t cy;
+  Double_t phi;
+  CbmEcalCell* cl;
+  
+  cl=fStr->GetHitCell(p->CellNum());
+  cx=cl->GetCenterX(); cy=cl->GetCenterY(); 
+  r=TMath::Sqrt(cx*cx+cy*cy);
+  /** TODO: should be Z of the cell**/
+  theta=TMath::ATan(r/fInf->GetZPos());
+  theta*=TMath::RadToDeg();
+  phi=TMath::ACos(cx/r)*TMath::RadToDeg();
+  if (cy<0) phi=360.0-phi;
+
+  for(k=0;k<cluster->Size();k++)
+  {
+    cell=fStr->GetHitCell(cluster->CellNum(k));
+    celltime=cell->GetTime();
+    /** No time information for the cell **/
+    type=cell->GetType();
+    cellsize=module/type;
+    x=cell->GetCenterX(); x-=p->X(); // x-=cx; 
+    y=cell->GetCenterY(); y-=p->Y(); // y-=cy; 
+
+    celle=fShLib->GetSumEThetaPhi(x, y, cellsize, p->E(), theta, phi);
+    cout << "CellTime: "<< celltime << "	" << celle << "	" << cell->GetTotalEnergy() << "	" << cell->GetEnergy() << "	" << cell->GetCenterX() << "	" << cell->GetCenterY() << endl;
+    if (celltime==-1111) continue;
+    time+=celle*celltime;
+    te+=celle;
+  }
+ 
+  cout << "CellTime: " << time << endl;
+  time/=te;
+  cout << "CellTime: " << time << endl;
+  if (time>0)
+    p->SetTOF(time);
 }
 
 /** Calculate a chi2 for just reconstructed photons **/

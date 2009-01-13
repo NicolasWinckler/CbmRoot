@@ -113,7 +113,7 @@ void CbmEcalStructureFiller::LoopForMCPoints()
       if (isPS)
 	cell->AddTrackPSEnergy(pt->GetTrackID(),pt->GetEnergyLoss());
       else
-	cell->AddTrackEnergy(pt->GetTrackID(),pt->GetEnergyLoss());
+	cell->AddTrackEnergy(pt->GetTrackID(),pt->GetEnergyLoss(), pt->GetTime());
   }
 }
 
@@ -142,7 +142,7 @@ void CbmEcalStructureFiller::LoopForSummableHits()
   {
     pt=(CbmEcalHit*)fListHits->At(j);
     cell=fStr->GetHitCell(pt->GetDetectorId());
-    cell->AddTrackEnergy(pt->GetTrackId(), pt->GetEnergy());
+    cell->AddTrackEnergy(pt->GetTrackId(), pt->GetEnergy(), pt->GetTime());
     cell->AddTrackPSEnergy(pt->GetTrackId(), pt->GetPSEnergy());
   }
 }
@@ -166,6 +166,7 @@ void CbmEcalStructureFiller::LoopForUnSummableHits()
     cell=fStr->GetHitCell(pt->GetDetectorId());
     cell->AddEnergy(pt->GetEnergy());
     cell->AddPSEnergy(pt->GetPSEnergy());
+    cell->SetTime(pt->GetTime());
   }
 }
 

@@ -50,6 +50,7 @@
 
 #include <list>
 #include <map>
+#include <algorithm>
 
 class CbmEcalCell : public TObject
 {
@@ -57,7 +58,7 @@ public:
   CbmEcalCell(Int_t cellnumber, Float_t x1=0, Float_t y1=0, Float_t x2=0, Float_t y2=0, Char_t type=0, Float_t energy=0) :
     fNumber(cellnumber), fX1(x1), fY1(y1), fX2(x2)
     , fY2(y2), fType(type), fEnergy(energy)
-  {f5x5List.clear();fPSEnergy=0;};
+  {f5x5List.clear();fPSEnergy=0;fTime=-1111;};
 
   inline Bool_t IsInside(Float_t x, Float_t y) {return x>GetX1()&&x<GetX2()&&y>GetY1()&&y<GetY2();}
   //getters
@@ -78,9 +79,12 @@ public:
   inline Float_t GetEnergy() const {return fEnergy;}
   inline Float_t GetTotalEnergy() const {return fEnergy+fPSEnergy;}
   inline Float_t GetPSEnergy() const {return fPSEnergy;}
+  Float_t GetTime() const {return fTime;}
+  void SetTime(Float_t time) {fTime=time;}
 	
   Float_t GetTrackEnergy(Int_t num) const;
   Float_t GetTrackPSEnergy(Int_t num) const;
+  Float_t GetTrackTime(Int_t num) const;
   inline Float_t GetTrackTotalEnergy(Int_t num) const
   {
     return GetTrackEnergy(num)+GetTrackPSEnergy(num);
@@ -105,12 +109,19 @@ public:
   inline void AddEnergy(Float_t energy) {fEnergy+=energy;}
   inline void AddPSEnergy(Float_t energy) {fPSEnergy+=energy;}
 	
-  inline void SetTrackEnergy(Int_t num, Float_t energy)
-  {fTrackEnergy[num]=energy;}
+  inline void SetTrackEnergy(Int_t num, Float_t energy, Float_t time=-1111)
+  {fTrackEnergy[num]=energy; fTrackTime[num]=time; }
   inline void SetTrackPSEnergy(Int_t num, Float_t energy)
   {fTrackPSEnergy[num]=energy;}
-  inline void AddTrackEnergy(Int_t num, Float_t energy)
-  {fTrackEnergy[num]+=energy;}
+  inline void AddTrackEnergy(Int_t num, Float_t energy, Float_t time=-1111)
+  {
+    fTrackEnergy[num]+=energy;
+    if (time==-1111) return;
+    std::map<Int_t, Float_t>::const_iterator p=fTrackTime.find(num);
+    if (p==fTrackTime.end()) fTrackTime[num]=time;
+    else
+      if (fTrackTime[num]>time) fTrackTime[num]=time;
+  }
   inline void AddTrackPSEnergy(Int_t num, Float_t energy)
   {fTrackPSEnergy[num]+=energy;}
 	
@@ -130,6 +141,11 @@ public:
 	 {return fTrackEnergy.begin();}
   inline std::map<Int_t, Float_t>::const_iterator GetTrackEnergyEnd() const
 	 {return fTrackEnergy.end();}
+
+  inline std::map<Int_t, Float_t>::const_iterator GetTrackTimeBegin() const
+	 {return fTrackTime.begin();}
+  inline std::map<Int_t, Float_t>::const_iterator GetTrackTimeEnd() const
+	 {return fTrackTime.end();}
 
   inline std::map<Int_t, Float_t>::const_iterator GetTrackPSEnergyBegin() const
 	 {return fTrackPSEnergy.begin();}
@@ -168,6 +184,12 @@ private:
   std::map<Int_t, Float_t> fTrackEnergy;
   /**  map<TrackIf, Energy in PS> **/
   std::map<Int_t, Float_t> fTrackPSEnergy;
+
+  /** Time of cell to fire **/
+  Double_t fTime;
+  /** map<TrackId, Time in ECAL>**/
+  std::map<Int_t, Float_t> fTrackTime;
+
   ClassDef(CbmEcalCell,1);
 };
   
@@ -175,6 +197,7 @@ inline void CbmEcalCell::ResetEnergyFast()
 {
   fEnergy=0;
   fPSEnergy=0;
+  fTime=-1111;
 }
 
 #endif

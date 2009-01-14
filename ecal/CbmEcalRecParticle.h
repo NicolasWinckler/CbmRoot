@@ -51,7 +51,7 @@ public:
 		     Double_t x=-1111, Double_t y=-1111, Double_t z=-1111,
 		     Int_t id=0, Double_t chi2=-1111, Int_t type=0);
   /** Copy constructor **/
-  CbmEcalRecParticle(const CbmEcalRecParticle& obj) { *this = obj; };
+  CbmEcalRecParticle(const CbmEcalRecParticle& obj): TObject(obj) { *this = obj; };
 
   /** Destructor **/
   virtual ~CbmEcalRecParticle();

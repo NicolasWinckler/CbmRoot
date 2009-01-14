@@ -31,7 +31,7 @@ void FCNEcalCluster::SetCluster(CbmEcalClusterV1* cluster)
 
 void FCNEcalCluster::SetN(Int_t n)
 {
-  Int_t i;
+//  Int_t i;
   fN=n;
 }
 
@@ -45,8 +45,8 @@ vector<Double_t> FCNEcalCluster::Gradient(const vector<Double_t>& par) const
 //  if (par.size()!=fN*3)
 //    Fatal("Gradient", "Size of input vector is wrong (%d, should be %d)!", par.size(), fN*3);
 
-  if (grad.size()!=fN*3) grad.resize(fN*3);
-  if (celle_gr.size()<fN*3) celle_gr.resize(fN*3);
+  if ((Int_t)grad.size()!=fN*3) grad.resize(fN*3);
+  if ((Int_t)celle_gr.size()<fN*3) celle_gr.resize(fN*3);
 
   /** A copy of chi2 almost **/
   CbmEcalCell* cell;
@@ -67,15 +67,15 @@ vector<Double_t> FCNEcalCluster::Gradient(const vector<Double_t>& par) const
   Double_t g[6];
   Double_t t;
   CbmEcalCell* cl;
-  Int_t p;
+ // Int_t p;
   Int_t k;
-  CbmEcalRecParticle* part;
-  Double_t clustere=fClusterResp;
+ // CbmEcalRecParticle* part;
+ // Double_t clustere=fClusterResp;
   Double_t clenergy;
-  Double_t sigma2;
+ // Double_t sigma2;
   Double_t cellerr;
   Double_t epred;
-  Double_t sin4theta;
+ // Double_t sin4theta;
   Double_t chi2=0;
   Double_t emeas;
   const Double_t cDN=0.0001;
@@ -208,16 +208,16 @@ Double_t FCNEcalCluster::operator()(const vector<Double_t>& par) const
   Double_t r;
   Double_t celle;
   CbmEcalCell* cl;
-  Int_t p;
+ // Int_t p;
   Int_t i;
   Int_t k;
-  CbmEcalRecParticle* part;
-  Double_t clustere=fClusterResp;
+ // CbmEcalRecParticle* part;
+ // Double_t clustere=fClusterResp;
   Double_t clenergy;
-  Double_t sigma2;
+ // Double_t sigma2;
   Double_t cellerr;
   Double_t epred;
-  Double_t sin4theta;
+ // Double_t sin4theta;
   Double_t chi2=0;
   Double_t e[6];
   Double_t t;
@@ -611,10 +611,10 @@ Double_t CbmEcalRecoSlow::CalculateChi2(CbmEcalClusterV1* cluster)
   CbmEcalRecParticle* part;
   Double_t clustere=0;
   Double_t clenergy;
-  Double_t sigma2;
+ // Double_t sigma2;
   Double_t cellerr;
   Double_t epred;
-  Double_t sin4theta;
+ // Double_t sin4theta;
   Double_t chi2=0;
   Double_t emeas;
 

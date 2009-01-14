@@ -47,9 +47,6 @@ public:
   
   virtual ~CbmEcalShowerLib();
 
-  /** Get response for photon with given energy **/
-  Float_t GetResponse(Float_t theta, Float_t phi, Float_t lx, Float_t ly, Float_t energy, Float_t cellsize);
-
   /** Return sum from (ix, iy) to (ix+cellx, iy+celly) **/
   Float_t GetSum(Int_t ix, Int_t iy, Int_t cellx, Int_t celly, Int_t n);
   /** Return sum for cell with center (x,y) **/

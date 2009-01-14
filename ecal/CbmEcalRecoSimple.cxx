@@ -71,10 +71,10 @@ void CbmEcalRecoSimple::CalculateChi2(CbmEcalClusterV1* cluster)
   CbmEcalRecParticle* part;
   Double_t clustere=0;
   Double_t clenergy;
-  Double_t sigma2;
+//  Double_t sigma2;
   Double_t cellerr;
   Double_t epred;
-  Double_t sin4theta;
+//  Double_t sin4theta;
   Double_t chi2=0;
   Double_t emeas;
 

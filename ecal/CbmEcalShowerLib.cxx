@@ -14,38 +14,6 @@ using std::cout;
 using std::endl;
 using std::vector;
 
-/** Get response for photon with given energy **/
-Float_t CbmEcalShowerLib::GetResponse(Float_t theta, Float_t phi, Float_t lx, Float_t ly, Float_t energy, Float_t cellsize)
-{
-  Float_t t=theta;
-  if (t<fThetas[0])
-  {
-    t=fThetas[0];
-    if (Verb()>99)
-    {
-      cout << "-I- CbmEcalShowerLib: theta " << theta << " is lower then " << t;
-      cout << ". Using " << t << " instead." << endl;
-    }
-  }
-  if (t>fThetas[fThetaS-1])
-  {
-    t=fThetas[fThetaS-1];
-    if (Verb()>99)
-    {
-      cout << "-I- CbmEcalShowerLib: theta " << theta << " is higher then " << t;
-      cout << ". Using " << t << " instead." << endl;
-    }
-  }
-  if (cellsize<0)
-  {
-    if (Verb()>99)
-      cout << "-I- CbmEcalShowerLib: Cellsize<0." << endl;
-    return -1;
-  }
-
-  return 0;
-}
-
 /** Return sum from (ix, iy) to (ix+cellx, iy+celly) **/
 Float_t CbmEcalShowerLib::GetSum(Int_t ix, Int_t iy, Int_t cellx, Int_t celly, Int_t n)
 {

@@ -285,7 +285,7 @@ void CbmEcalClusterFinderV1::FormPreClustersAlice()
   {
     cells.clear();
     cell=fMaximums[i]; cells.push_back(cell);
-    while(oldsize!=cells.size())
+    while(oldsize!=(Int_t)cells.size())
     {
       oldsize=cells.size(); a.clear();
       for(p=cells.begin();p!=cells.end();++p)
@@ -326,8 +326,6 @@ void CbmEcalClusterFinderV1::FormPreClustersAlice()
 void CbmEcalClusterFinderV1::FormPreClustersPhenix()
 {
   Int_t i;
-  Int_t j;
-  Int_t max;
   CbmEcalCell* cell;
   Double_t mine;
   Double_t maxe;
@@ -350,7 +348,7 @@ void CbmEcalClusterFinderV1::FormPreClustersPhenix()
 	cs.push_back(*p);
     cs.push_back(cell);
     if (fAttachCells>0) AttachCells(cs, fMaximums[i]);
-    while(cs.size()<fMinSize)
+    while((Int_t)cs.size()<fMinSize)
     {
       maxe=0; cell=NULL;
       for(p=cells.begin();p!=cells.end();++p)
@@ -454,7 +452,7 @@ void CbmEcalClusterFinderV1::FormClusters()
   for(;p1!=fPreClusters.end();++p1)
   if ((*p1)->fMark==0)
   {
-    cluster.clear(); oldsize==0;
+    cluster.clear(); oldsize=0;
     minimums.clear();
     cluster=(*p1)->fCells;
     if ((*p1)->fMinimum!=NULL)
@@ -491,7 +489,7 @@ void CbmEcalClusterFinderV1::FormClusters()
       }
     }
     (*p1)->fMark=1;
-    if (cluster.size()>MaxSize)
+    if ((Int_t)cluster.size()>MaxSize)
       MaxSize=cluster.size();
     if (max>Maximums) Maximums=max;
     CbmEcalClusterV1* cls=new ((*fClusters)[fN]) CbmEcalClusterV1(fN, cluster); fN++;

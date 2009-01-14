@@ -303,7 +303,7 @@ void CbmEcalHitProducer::CellToHits(CbmEcalCell* cell)
     cell->SetPSEnergy(psenergy);
     if (fProduceHits)
     if (energy!=0||psenergy!=0)
-      AddHit(cell->GetCellNumber(),energy,psenergy, -1, cell->GetCenterX(), cell->GetCenterY(), cell->GetTime());
+      AddHit(cell->GetCellNumber(),energy,psenergy, -1, cell->GetTime());
   }
   else
   {
@@ -312,7 +312,7 @@ void CbmEcalHitProducer::CellToHits(CbmEcalCell* cell)
     {
       psenergy=cell->GetTrackPSEnergy(p->first);
       energy=p->second;
-      AddHit(cell->GetCellNumber(),energy,psenergy, p->first, cell->GetCenterX(), cell->GetCenterY(), cell->GetTrackTime(p->first));
+      AddHit(cell->GetCellNumber(),energy,psenergy, p->first, cell->GetTrackTime(p->first));
     }
     p=cell->GetTrackPSEnergyBegin();
     for(;p!=cell->GetTrackPSEnergyEnd();++p)
@@ -321,7 +321,7 @@ void CbmEcalHitProducer::CellToHits(CbmEcalCell* cell)
       if (energy==0)
       {
 	psenergy=p->second;
-	AddHit(cell->GetCellNumber(),energy,psenergy, p->first, cell->GetCenterX(), cell->GetCenterY(), cell->GetTrackTime(p->first));
+	AddHit(cell->GetCellNumber(),energy,psenergy, p->first, cell->GetTrackTime(p->first));
       }
     }
   }
@@ -372,18 +372,7 @@ void CbmEcalHitProducer::Exec(Option_t* option)
 
 
 // -----   Add Hit to HitCollection   --------------------------------------
-void CbmEcalHitProducer::AddHit(TVector3 &posHit, TVector3 &posHitErr,
-				Int_t trackID, Int_t detID, Int_t pmtID, Double_t ampl)
-{
-// Add this hit to existing one, if in the same PMT,
-// otherwise create a new one.
-
-}
-// -------------------------------------------------------------------------
-
-
-// -----   Add Hit to HitCollection   --------------------------------------
-void CbmEcalHitProducer::AddHit(Int_t cellnumber, Float_t energy, Float_t psenergy, Int_t trackID, Float_t x, Float_t y, Double32_t time)
+void CbmEcalHitProducer::AddHit(Int_t cellnumber, Float_t energy, Float_t psenergy, Int_t trackID, Double32_t time)
 {
   new((*fHitCollection)[fNHits++]) CbmEcalHit(cellnumber,energy,psenergy,trackID,time); //No time information at the moment
 }

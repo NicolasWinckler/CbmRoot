@@ -23,21 +23,17 @@ using std::list;
 void CbmEcalAnalysisPair::Exec(Option_t* option)
 {
   Int_t i;
-  Int_t j;
   Int_t n=fReco->GetEntriesFast();
   Int_t mcn=fMC->GetEntriesFast();
   CbmEcalRecParticle* p1;
   CbmEcalRecParticle* p2;
-  CbmEcalClusterV1* cls;
   CbmEcalClusterV1* cluster;
   CbmEcalCell* cell;
   CbmMCTrack* tr1;
   CbmMCTrack* tr2;
   CbmMCTrack* mtr;
-  Double_t r;
   Double_t dx;
   Double_t dy;
-  Int_t mother;
   
   fEvent++;
   fEntries=0;

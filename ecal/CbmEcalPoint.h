@@ -43,7 +43,7 @@ class CbmEcalPoint : public CbmMCPoint
 
 
   /** Copy constructor **/
-  CbmEcalPoint(const CbmEcalPoint& point) { *this = point; };
+  CbmEcalPoint(const CbmEcalPoint& point):CbmMCPoint(point) { *this = point; };
 
 
   /** Destructor **/

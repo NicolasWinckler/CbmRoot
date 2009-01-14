@@ -41,6 +41,7 @@ InitStatus CbmEcalStructureExport::Init()
     Fatal("Init()", "Can't find calorimeter structure in the system.");
     return kFATAL;
   }
+  return kSUCCESS;
 }
 
 /** Exec for task **/

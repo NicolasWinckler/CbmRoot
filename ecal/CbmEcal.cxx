@@ -715,8 +715,8 @@ void CbmEcal::ConstructGeometry()
   TGeoPgon *spl;
 
   Float_t *buf = 0;
-  Float_t sumWeight;
-  Int_t i;
+//  Float_t sumWeight;
+//  Int_t i;
 
   // create SensVacuum which is defined in the media file
 

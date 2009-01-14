@@ -391,11 +391,9 @@ void CbmEcalQualityCheck::DrawMC()
 {
   Int_t i;
   Int_t pn=fPoints->GetEntriesFast();
-  Int_t trn=fMCTracks->GetEntriesFast();
   CbmEcalPoint* p;
   CbmMCTrack* tr;
   CbmMCTrack* tq;
-  char stri[10];
 
 
   for(i=0;i<pn;i++)

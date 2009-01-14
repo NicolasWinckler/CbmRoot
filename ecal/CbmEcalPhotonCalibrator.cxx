@@ -44,7 +44,7 @@ using std::flush;
 using std::list;
 using std::vector;
 
-CbmEcalPhotonCalibrator::CbmEcalPhotonCalibrator(const char* name, const Int_t iVerbose, const char* fileGeo)
+CbmEcalPhotonCalibrator::CbmEcalPhotonCalibrator(const char* name, const Int_t iVerbose, const char* fileGeo) : CbmTask(name, iVerbose)
 {
   fGeoFile=fileGeo;
   fStr=NULL;

@@ -41,7 +41,7 @@ InitStatus CbmEcalTrackExport::Init()
     Fatal("Init", "Can't find EcalTrackParam.");
     return kFATAL;
   }
-
+  return kSUCCESS;
 }
 
 /** Exec for task **/

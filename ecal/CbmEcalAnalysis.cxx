@@ -27,7 +27,7 @@ CbmEcalAnalysis::CbmEcalAnalysis() :CbmTask()
 CbmEcalAnalysis::CbmEcalAnalysis(const char *name, const char *title)
   :CbmTask(name)
 {
-
+  SetTitle(title);
   fEvent = 0;
   fDebug = "";
   fKfVectorMeson = 443;

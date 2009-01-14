@@ -1,0 +1,326 @@
+/**********************************************************************************
+*    Class: CbmRichRingFitterEllipseTau                                           *
+*    Description: This is the source of a particular ellipse fitting              *
+*                 Here the ring is fitted with Taubin algorithm from              *
+*                 Alexander Ayriyan, G. Ososkov and N. Chernov                    *
+*                                                                                 *
+*    Author : Alexander Ayriyan and Semen Lebedev                                *
+*    E-mail : A.Ayriyan@gsi.de                                                    *
+**********************************************************************************/
+
+#include "CbmRichRingFitterEllipseTau.h"
+#include "CbmRootManager.h"
+#include "CbmRichRing.h"
+#include "CbmRichHit.h"
+
+// The following classes are
+// needed for radius correction
+#include "TH1D.h"
+#include "TFile.h"
+#include "TSystem.h"
+#include "TROOT.h"
+
+//using std::vector;
+//using std::endl;
+//using std::cout;
+
+// -----   Default constructor   -------------------------------------------
+CbmRichRingFitterEllipseTau::CbmRichRingFitterEllipseTau()
+{
+    fVerbose      = 1;
+    fCorrection   = 1;
+    fFieldName = "muon";
+    InitHistForRadiusCorrection();
+}
+
+// -------------------------------------------------------------------------
+
+// -----   Standard constructor   -------------------------------------------
+CbmRichRingFitterEllipseTau::CbmRichRingFitterEllipseTau(Int_t verbose,Double_t correction, TString fieldName)
+{
+    fVerbose = verbose;
+    fCorrection   = 1;
+    fFieldName = fieldName;
+    InitHistForRadiusCorrection();
+}
+// -------------------------------------------------------------------------
+
+// -----   Destructor   ----------------------------------------------------
+CbmRichRingFitterEllipseTau::~CbmRichRingFitterEllipseTau()
+{
+    fX.clear();
+    fY.clear();
+}
+
+void CbmRichRingFitterEllipseTau::DoFit1(CbmRichRing *pRing, vector<Double_t> hitX,
+		vector<Double_t> hitY)
+{
+	fX = hitX;
+	fY = hitY;
+    FittingEllipse(pRing);
+}
+
+// -----   Public method: DoFit   ------------------------------------------
+void CbmRichRingFitterEllipseTau::DoFit(CbmRichRing *pRing)
+{
+    Int_t fNumHits = pRing->GetNofHits();
+
+	if (fVerbose > 1) {
+		cout<<" RingFitTAU: Number of Hits in this ring : "<< fNumHits << endl;
+		if (fCorrection == 0)
+			cout<<" No correction of fitted radius done " <<endl;
+		if (fCorrection == 1)
+			cout<<" Correction of ring radius was chosen" <<endl;
+		if (fCorrection > 1)
+			cout <<" - ERROR - correction value not valid: has to be either 0 (no cor.) or 1 (cor.) "
+					<<endl;
+	}
+
+	if (fNumHits <= 5) {
+		pRing->SetXYABPhi(-1., -1., -1., -1., -1.);
+		pRing->SetRadius(-1.);
+
+		if (fVerbose > 1)
+			cout
+					<<" No way for RingFitter as ellipse: Number of Hits is less then 5 "
+					<<endl;
+		return;
+	}
+    fX.clear();
+    fY.clear();
+	CbmRichHit* hit= NULL;
+	for (Int_t i = 0; i < fNumHits; i++) {
+		hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
+		fX.push_back(hit->X());
+		fY.push_back(hit->Y());
+	}
+
+	FittingEllipse(pRing);
+
+	// Make radius correction if it's needed
+	if (fCorrection == 1)
+		MakeRadiusCorrection(pRing);
+
+	CalcChi2(pRing);
+}
+
+// -----   Public method: FittingEllipse   ---------------------------------
+void CbmRichRingFitterEllipseTau::FittingEllipse(CbmRichRing *pRing)
+{
+	fAlgPar.ResizeTo(6);
+    fAlgPar = Taubin();
+    TransposeEllipse(pRing);
+
+}
+
+// -----   Public method: Taubin   -----------------------------------------
+TVectorD CbmRichRingFitterEllipseTau::Taubin(void)
+{
+    InitMatrices();
+    Double_t det;
+    fMB = fM.InvertFast(&det) * fB;
+    TMatrixDEigen eig(fMB);
+    TMatrixD evc = eig.GetEigenVectors();
+    return TMatrixDColumn(evc,0);
+}
+
+// -----   Public method: InitMatrices   -----------------------------------
+void CbmRichRingFitterEllipseTau::InitMatrices(void)
+{
+    Int_t fNum = fX.size();
+    TMatrixD fZ (fNum,6);
+    TMatrixD fZT(6,fNum);
+    for(Int_t i = 0; i < fNum; i++){
+		fZ(i,0) = fZT(0,i) = fX[i] * fX[i] ;
+		fZ(i,1) = fZT(1,i) = fX[i] * fY[i] ;
+		fZ(i,2) = fZT(2,i) = fY[i] * fY[i] ;
+		fZ(i,3) = fZT(3,i) = fX[i]         ;
+		fZ(i,4) = fZT(4,i) = fY[i]         ;
+		fZ(i,5) = fZT(5,i) = 1.            ;
+    }
+    fM.ResizeTo(6, 6);
+	fB.ResizeTo(6, 6);
+	fMB.ResizeTo(6, 6);
+
+    fM = fZT * fZ;
+
+    fB.Zero();
+    fB(0,0) = 4 * fM(5,0)           ;
+    fB(0,1) = fB(1,0) = 2 * fM(5,1) ;
+    fB(0,3) = fB(3,0) = 2 * fM(5,3) ;
+    fB(1,1) = fM(5,0) + fM(5,2)     ;
+    fB(1,2) = fB(2,1) = 2 * fM(5,1) ;
+    fB(1,3) = fB(3,1) = fM(5,4)     ;
+    fB(1,4) = fB(4,1) = fM(5,3)     ;
+    fB(2,2) = 4 * fM(5,2)           ;
+    fB(2,4) = fB(4,2) = 2 * fM(5,4) ;
+    fB(3,3) = fB(4,4) = fM(5,5)     ;
+}
+
+// -----   Public method: TransposeEllipse   -------------------------------
+void CbmRichRingFitterEllipseTau::TransposeEllipse(CbmRichRing *pRing)
+{
+    Double_t Pxx = fAlgPar(0);
+	Double_t Pxy = fAlgPar(1);
+	Double_t Pyy = fAlgPar(2);
+	Double_t Px = fAlgPar(3);
+	Double_t Py = fAlgPar(4);
+	Double_t P = fAlgPar(5);
+
+	Double_t fAlpha;
+	Double_t fXc, fYc, fA, fB;
+	Double_t QQx, QQy, Qxx, Qyy, Qx, Qy, Q;
+	Double_t cosa, sina, cca, ssa, sin2a;
+	Double_t xc, yc;
+	if (fabs(Pxx - Pyy) > 0.1e-10) {
+		fAlpha = atan(Pxy / (Pxx - Pyy));
+		fAlpha = fAlpha / 2.0;
+	} else
+		fAlpha = 1.57079633;
+
+	cosa = cos(fAlpha);
+	sina = sin(fAlpha);
+	cca = cosa * cosa;
+	ssa = sina * sina;
+	sin2a = sin(2. * fAlpha);
+	Pxy = Pxy * sin2a / 2.;
+	Qx = Px * cosa + Py * sina;
+	Qy = -Px * sina + Py * cosa;
+	QQx = Qx * Qx;
+	QQy = Qy * Qy;
+	Qxx = 1. / (Pxx * cca + Pxy + Pyy * ssa);
+	Qyy = 1. / (Pxx * ssa - Pxy + Pyy * cca);
+	Q = -P + Qxx * QQx / 4. + Qyy * QQy / 4.;
+	xc = Qx * Qxx;
+	yc = Qy * Qyy;
+
+	fA = TMath::Sqrt(Q * Qxx);
+	fB = TMath::Sqrt(Q * Qyy);
+	fXc = -xc * cosa / 2. + yc * sina / 2.;
+	fYc = -xc * sina / 2. - yc * cosa / 2.;
+
+	pRing->SetXYABPhi(fXc, fYc, fA, fB, fAlpha);
+	pRing->SetBaxis(fB);
+
+	if (pRing->GetAaxis() < pRing->GetBaxis() ) {
+
+		Double_t tmp = pRing->GetAaxis();
+		pRing->SetAaxis(pRing->GetBaxis() );
+		pRing->SetBaxis(tmp);
+
+		tmp = pRing->GetPhi();
+		if (pRing->GetPhi() <= 0)
+			pRing->SetPhi(pRing->GetPhi() + 1.57079633);
+		else
+			pRing->SetPhi(pRing->GetPhi() - 1.57079633);
+	}
+}
+
+// -----   Protected method: CalcChi2   ------------------------------------
+void CbmRichRingFitterEllipseTau::CalcChi2(CbmRichRing * pRing)
+{
+    CbmRichHit* hit = NULL;
+
+// Getting Ring parameters
+    Int_t nofHits =  pRing->GetNofHits();
+    if (nofHits <= 5){
+        pRing->SetChi2(-1.);
+        return;
+    }
+
+    Double_t axisA =  pRing->GetAaxis();
+    Double_t axisB =  pRing->GetBaxis();
+    Double_t phi =  pRing->GetPhi();
+    Double_t centerX = pRing->GetCenterX();
+    Double_t centerY = pRing->GetCenterY();
+
+// Calculate ellipse focuses
+    Double_t xf1, yf1, xf2, yf2;
+
+    if (axisA < axisB){
+        pRing->SetChi2(-1.);
+        return;
+    }
+    Double_t c = sqrt ( axisA*axisA - axisB*axisB);
+
+    if (phi > 0.){
+        xf1 = centerX + c*cos(phi);
+        yf1 = centerY + c*sin(phi);
+        xf2 = centerX - c*cos(phi);
+        yf2 = centerY - c*sin(phi);
+    }else{
+        xf1 = centerX + c*cos(TMath::Abs(phi));
+        yf1 = centerY - c*sin(TMath::Abs(phi));
+        xf2 = centerX - c*cos(TMath::Abs(phi));
+        yf2 = centerY + c*sin(TMath::Abs(phi));
+    }
+
+// Calculate chi2
+    Double_t chi2 = 0.;
+    for(Int_t iHit = 0; iHit < nofHits; iHit++){
+        hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(iHit));
+        if(!hit) continue;
+        Double_t x = hit->GetX();
+        Double_t y = hit->GetY();
+
+        Double_t d1 = sqrt( (x-xf1)*(x-xf1) + (y-yf1)*(y-yf1) );
+        Double_t d2 = sqrt( (x-xf2)*(x-xf2) + (y-yf2)*(y-yf2) );
+
+        chi2 += (d1 + d2 - 2.*axisA)*(d1 + d2 - 2.*axisA);
+    }
+    chi2 = chi2 / (nofHits - 5);
+
+    pRing->SetChi2(chi2);
+
+}
+
+// -----   Protected method: InitHistForRadiusCorrection   -----------------
+void CbmRichRingFitterEllipseTau::InitHistForRadiusCorrection()
+{
+    TString fileName;
+    if (fFieldName == "muon"){
+        fileName = gSystem->Getenv("VMCWORKDIR");
+        fileName += "/parameters/rich/muon_radius_correction_map.root";
+    }
+    if(fFieldName == "active"){
+        fileName = gSystem->Getenv("VMCWORKDIR");
+        fileName += "/parameters/rich/active_radius_correction_map.root";
+    }
+    if (fFieldName != "active" || fFieldName != "muon"){
+        fileName = gSystem->Getenv("VMCWORKDIR");
+        fileName += "/parameters/rich/muon_radius_correction_map.root";
+    }
+
+    TFile *file = new TFile(fileName, "READ");
+    if (!file || !file->IsOpen()) {
+	cout << " -E- Read correction maps "<<endl;
+	cout << " -E- Could not open input file." <<fileName<< endl;
+	return;
+    } else {
+	cout <<" -I- Map Correction input file: "<< fileName << endl;
+    }
+
+    gROOT->cd();
+
+    fh_mapaxisAXY =  (TH1D*) file->Get("fh_mapaxisAXY")->Clone();
+    fh_mapaxisBXY =  (TH1D*) file->Get("fh_mapaxisBXY")->Clone();
+
+    file->Close();
+    delete file;
+}
+
+// -----   Protected method: MakeRadiusCorrection   ------------------------
+void CbmRichRingFitterEllipseTau::MakeRadiusCorrection(CbmRichRing * pRing)
+{
+    Double_t centerX = pRing->GetCenterX();
+    Double_t centerY = pRing->GetCenterY();
+   // cout << "Before " <<   pRing->GetAaxis()<< " " <<pRing->GetBaxis()<< endl;
+    Double_t axisA = pRing->GetAaxis() + fh_mapaxisAXY->GetBinContent(fh_mapaxisAXY->FindBin(centerX,centerY));
+    Double_t axisB = pRing->GetBaxis() + fh_mapaxisBXY->GetBinContent(fh_mapaxisBXY->FindBin(centerX,centerY));
+
+    pRing->SetAaxis(axisA);
+    pRing->SetBaxis(axisB);
+   // cout << "After " <<   pRing->GetAaxis()<< " " <<pRing->GetBaxis()<< endl;
+}
+
+ClassImp(CbmRichRingFitterEllipseTau)

@@ -53,6 +53,16 @@ CbmRichRingFitterEllipse::~CbmRichRingFitterEllipse()
 
 }
 
+void CbmRichRingFitterEllipse::DoFit1(CbmRichRing *pRing, std::vector<Double_t> x,
+                                     std::vector<Double_t> y)
+{
+	
+    std::vector<Double_t> fpar;
+    fpar = DoFit1(x, y);
+    
+    TransformToRichRing(pRing, fpar);	
+}
+
 void CbmRichRingFitterEllipse::DoFit(CbmRichRing *pRing)
 {
     Int_t nofHits=pRing->GetNofHits();
@@ -77,8 +87,17 @@ void CbmRichRingFitterEllipse::DoFit(CbmRichRing *pRing)
     std::vector<Double_t> fpar;
     fpar = DoFit1(hitX, hitY);
     
-   // std::vector<Double_t> fpar;
-   // fpar = DoFit2(hitX, hitY, fpar1);   
+    TransformToRichRing(pRing, fpar);
+    
+    ///Make radius correction 
+    //Corection parameters are stored in fAaxisCor and fBaxisCor !!!!
+    MakeRadiusCorrection(pRing);
+    
+    CalcChi2(pRing);    
+}
+
+void CbmRichRingFitterEllipse::TransformToRichRing(CbmRichRing* pRing, vector<Double_t> fpar)
+{
     
     ///calculate center of the ellipse
     Double_t xc = (fpar[0] + fpar[2])/2.;
@@ -110,15 +129,8 @@ void CbmRichRingFitterEllipse::DoFit(CbmRichRing *pRing)
     Double_t ang = atan(k);
     
     pRing->SetXYABPhi(xc,yc,fpar[4], b, ang);    
-    pRing->SetRadius((b + fpar[4])/2.);        
-    
-    ///Make radius correction 
-    //Corection parameters are stored in fAaxisCor and fBaxisCor !!!!
-    MakeRadiusCorrection(pRing);
-    
-    CalcChi2(pRing);    
+    pRing->SetRadius((b + fpar[4])/2.);    
 }
-
 
 // -----   Public method DoFit   ------------------------------------------
 std::vector<Double_t> CbmRichRingFitterEllipse::DoFit1(std::vector<Double_t> x,

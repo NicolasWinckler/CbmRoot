@@ -68,10 +68,11 @@ class CbmRichRingFitterEllipse : public CbmRichRingFitter
                             Int_t correction, 
                             TString fieldName);
 
-   /** Destructor **/
+
    virtual ~CbmRichRingFitterEllipse();
    
-   /** Ring Fitting algorithm **/
+   void DoFit1(CbmRichRing *pRing, std::vector<Double_t> x, std::vector<Double_t> y);
+
    void DoFit(CbmRichRing *pRing);
    
    /** Ring Fitting algorithm **/
@@ -82,6 +83,8 @@ class CbmRichRingFitterEllipse : public CbmRichRingFitter
    virtual void CalcChi2(CbmRichRing* pRing);
    void MakeRadiusCorrection(CbmRichRing* pRing);
    void InitHistForRadiusCorrection();
+   void TransformToRichRing(CbmRichRing* ring, std::vector<Double_t> par);
+   
    private:
 
    /** Verbosity level **/

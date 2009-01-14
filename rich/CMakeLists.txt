@@ -65,9 +65,8 @@ CbmRichGeoTest.cxx
 CbmRichRingFitterEllipseTau.cxx
 CbmRichRingFitterQa.cxx
 CbmRichFuzzyKE.cxx
-#CbmRichElectrons.cxx
-#CbmRichElectronsQa.cxx
-#CbmRichElIdAnn.cxx
+CbmRichElectronsQa.cxx
+CbmRichElectronIdAnn.cxx
 )
 
 if(RULE_CHECKER_FOUND)

@@ -45,7 +45,9 @@
 #pragma link C++ class CbmRichSelectRings+;
 #pragma link C++ class CbmRichRingFitterEllipse+;
 #pragma link C++ class CbmRichGeoTest+;
-//#pragma link C++ class CbmRichFuzzyKE+;
+#pragma link C++ class CbmRichRingFitterEllipseTau+;
+#pragma link C++ class CbmRichRingFitterQa+;
+#pragma link C++ class CbmRichFuzzyKE+;
 //#pragma link C++ class CbmRichElectrons+;
 //#pragma link C++ class CbmRichElectronsQa+;
 //#pragma link C++ class CbmRichElIdAnn+;

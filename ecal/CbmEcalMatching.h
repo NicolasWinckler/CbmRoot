@@ -21,7 +21,7 @@ public:
   /** Only to comply with framework **/
   CbmEcalMatching();
   /** Standard constructor **/
-  CbmEcalMatching(const char* name, const Int_t verbose);
+  CbmEcalMatching(const char* name, const Int_t verbose, const char* configname);
 
   /** Task initialization **/
   virtual InitStatus Init();
@@ -38,7 +38,9 @@ public:
   /** Get/set photon threshold **/
   void SetPhotonThreshold(Double_t threshold=0.95) {fPhotonThr=threshold;}
   Double_t GetPhotonThreshold() const {return fPhotonThr;}
-
+  /** Get/set mother threshold **/
+  void SetMotherThreshold(Double_t threshold=1.05) {fMotherThr=threshold;}
+  Double_t GetMotherThreshold() const {return fMotherThr;}
   /** virtual destructor **/
   ~CbmEcalMatching();
 
@@ -57,6 +59,12 @@ private:
   void FormEpred(CbmEcalRecParticle* p);
   /** Match MCTrack and reconstructed partile using shower shape **/
   void MatchP(CbmEcalRecParticle* p);
+  /** First realization of matching **/
+  void MatchP1(CbmEcalRecParticle* p);
+  /** Second realization of matching **/
+  void MatchP2(CbmEcalRecParticle* p);
+  /** Third realization of matching **/
+  void MatchP3(CbmEcalRecParticle* p);
   /** Add to particle constants to track and all its mothers **/
   void AddTrackP(Int_t track, Double_t e, Int_t cell);
   /** An array of reconstructed photons **/
@@ -77,6 +85,9 @@ private:
   Double_t fThreshold;
   /** If energy of max photon > fPhotonThr*energy of any other particle will match with photon **/
   Double_t fPhotonThr;
+  /** If energy of mother > fMotherThr*Energy_{doughtier} then use mother for cluster matching instead
+   ** of doughtier**/
+  Double_t fMotherThr;
 
   /** An event number **/
   Int_t fEv;
@@ -125,6 +136,10 @@ private:
   /** Number cells **/
   Int_t fNC;
 
+  /** Name of configuration file **/
+  TString fConfigName;
+  /** Type of algorithm to use **/
+  Int_t fAlgo;
   ClassDef(CbmEcalMatching, 1)
 };
 

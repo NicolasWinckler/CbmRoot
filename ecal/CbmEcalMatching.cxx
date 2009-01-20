@@ -12,6 +12,7 @@
 #include "CbmEcalClusterV1.h"
 #include "CbmEcalStructure.h"
 #include "CbmEcalShowerLib.h"
+#include "CbmEcalParam.h"
 
 #include <iostream>
 
@@ -19,12 +20,36 @@ using namespace std;
 
 
 /** Standard constructor **/
-CbmEcalMatching::CbmEcalMatching(const char* name, const Int_t verbose)
+CbmEcalMatching::CbmEcalMatching(const char* name, const Int_t verbose, const char* config)
   : CbmTask(name, verbose)
 {
   fThreshold=0.8;
   fPhotonThr=0.95;
+  fMotherThr=1.05;
   fTree=NULL;
+  fConfigName=config;
+
+  CbmEcalParam* par=new CbmEcalParam("MatchingParam", config);
+
+  fThreshold=par->GetDouble("threshold");
+  if (fThreshold<0.5)
+    Warning("CbmEcalMatching","Energy threshold less than half energy deposition in cluster.");
+  fMotherThr=par->GetDouble("motherthreshold");
+  fPhotonThr=par->GetDouble("photonthreshold");
+  fAlgo=par->GetInteger("algorithm");
+  if (fVerbose>10)
+  {
+    Info("CbmEcalMatching", "Using Threshold --- %f, Mother Threshold --- %f, Photon Threshold --- %f.", fThreshold, fMotherThr, fPhotonThr);
+    switch (fAlgo)
+    {
+      case 1: Info("CbmEcalMatching", "Prefer match with photons. (Algorithm)"); break;
+      case 2: Info("CbmEcalMatching", "Using complex algorithm"); break;
+      case 3: Info("CbmEcalMatching", "Using simple algorithm"); break;
+      default: Warning("CbmEcalMatching", "Unknown algorithm");
+    }
+  }
+
+  delete par;
 }
 
 
@@ -91,6 +116,12 @@ void CbmEcalMatching::Exec(Option_t* opt)
   {
     p=(CbmEcalRecParticle*)fReco->At(i);
     FormEpred(p);
+    if (fEsum==0)
+    {
+      if (fVerbose>0)
+	Warning("Exec", "Predicted energy for reconstructed particle %d is zero. Matching failed", i);
+      continue;
+    }
     MatchP(p);
 /*
     FormPreCluster(p);
@@ -145,6 +176,27 @@ void CbmEcalMatching::FormEpred(CbmEcalRecParticle* p)
     cell=fStr->GetHitCell(cluster->CellNum(k));
     fS+=fEpred[k]/fEsum*cell->GetTotalEnergy();
   }
+/*
+  {
+    for(k=0;k<cluster->Size();k++)
+    {
+      cell=fStr->GetHitCell(cluster->CellNum(k));
+      type=cell->GetType();
+      cellsize=module/type;
+      cx=cell->GetCenterX(); x=cx;
+      cy=cell->GetCenterY(); y=cy;
+      r=TMath::Sqrt(x*x+y*y);
+      x-=p->X(); 
+      y-=p->Y();
+
+      theta=TMath::ATan(r/fStr->GetEcalInf()->GetZPos());
+      theta*=TMath::RadToDeg();
+      phi=TMath::ACos(cx/r)*TMath::RadToDeg();
+      
+//      cerr << "(" << x << "," << y << ") " << fEpred[k] << "," << fS << endl;
+    }
+  }
+*/
 }
 
 /** Add to particle constants to track and all its mothers **/
@@ -152,13 +204,19 @@ void CbmEcalMatching::AddTrackP(Int_t track, Double_t e, Int_t cell)
 {
   CbmMCTrack* tr;
   Int_t num;
+  map<Int_t, Double_t>::const_iterator i;
 
-  fP[track]+=e*fEpred[cell]/fEsum;
+  for(i=fP.begin(); i!=fP.end();++i)
+    if ((*i).first==track) break;
+  if (i!=fP.end())
+    fP[track]+=e*fEpred[cell]/fEsum;
+  else
+    fP[track]=e*fEpred[cell]/fEsum;
 
   tr=(CbmMCTrack*)fMCTracks->At(track);
   if (tr==NULL)
   {
-    Warning("AddTrackE", "Can't find MCTrack number %d.", track);
+    Warning("AddTrackP", "Can't find MCTrack number %d.", track);
     return;
   }
   num=tr->GetMotherId();
@@ -166,7 +224,7 @@ void CbmEcalMatching::AddTrackP(Int_t track, Double_t e, Int_t cell)
   tr=(CbmMCTrack*)fMCTracks->At(num);
   if (tr==NULL)
   {
-    Warning("AddTrackE", "Can't find MCTrack number %d.", num);
+    Warning("AddTrackP", "Can't find MCTrack number %d.", num);
     return;
   }
   if (tr->GetPdgCode()==22||TMath::Abs(tr->GetPdgCode())==11)
@@ -188,14 +246,67 @@ void CbmEcalMatching::MatchP(CbmEcalRecParticle* p)
   CbmMCTrack* tr;
   CbmEcalClusterV1* cls;
 
+  
   for(k=0;k<cluster->Size();k++)
   {
     cell=fStr->GetHitCell(cluster->CellNum(k));
     for(q=cell->GetTrackEnergyBegin();q!=cell->GetTrackEnergyEnd();++q)
+    {
+//      cerr << "Energy: " << (*q).second << ", " << (*q).first << "[" << fEpred[k] << "," << fEsum << "]" << endl;
       AddTrackP((*q).first, (*q).second, k);
+    }
     for(q=cell->GetTrackPSEnergyBegin();q!=cell->GetTrackPSEnergyEnd();++q)
+    {
+//      cerr << "PSEnergy: " << (*q).second << ", " << (*q).first << "[" << fEpred[k] << "," << fEsum << "]" << endl;
       AddTrackP((*q).first, (*q).second, k);
+    }
   }
+
+  switch (fAlgo)
+  {
+    case 1:MatchP1(p); break;
+    case 2:MatchP2(p); break;
+    case 3:MatchP3(p); break;
+    default: Error("MatchP", "Unknown algorithm: %d.", fAlgo);
+  }
+
+  if (!fTree) return;
+  fMCNum=p->MCTrack();
+  if (fMCNum!=-1111)
+  {
+    tr=(CbmMCTrack*)fMCTracks->At(fMCNum);
+    fPDG=tr->GetPdgCode();
+    fMCE=tr->GetEnergy();
+    fMCPx=tr->GetPx();
+    fMCPy=tr->GetPy();
+    fMCPz=tr->GetPz();
+  }
+  else
+  {
+    fPDG=0;
+    fMCE=-1111;
+    fMCPx=-1111;
+    fMCPy=-1111;
+    fMCPz=-1111;
+  }
+  fPx=p->Px();
+  fPy=p->Py();
+  fPz=p->Pz();
+  fRE=p->E();
+  cls=(CbmEcalClusterV1*)fClusters->At(p->ClusterNum());
+  fChi2=cls->Chi2();
+  fNM=cls->Maxs();
+  fNC=cls->Size();
+  fTree->Fill();
+}
+
+/** First realization of matching **/
+void CbmEcalMatching::MatchP1(CbmEcalRecParticle* p)
+{
+  CbmMCTrack* tr;
+  pair<Int_t, Double_t> max; max.first=-1111; max.second=0;
+  pair<Int_t, Double_t> max_photon; max_photon.second=0;
+  map<Int_t, Double_t>::const_iterator i;
 
   for(i=fP.begin(); i!=fP.end();++i)
   {
@@ -214,30 +325,147 @@ void CbmEcalMatching::MatchP(CbmEcalRecParticle* p)
   }
   if (max.first==-1111)
   {
-    if (fVerbose>2) Info("Match", "Matching failed for reconstructed photon (%f, %f).", p->X(), p->Y());
+    if (fVerbose>2) 
+      Info("MatchP1", "Matching failed for reconstructed photon (%f, %f).", p->X(), p->Y());
     return;
   }
   if (max_photon.second>fPhotonThr*max.second)
     p->SetMCTrack(max_photon.first);
   else
     p->SetMCTrack(max.first);
-  if (!fTree) return;
-  fMCNum=p->MCTrack();
-  tr=(CbmMCTrack*)fMCTracks->At(fMCNum);
-  fPx=p->Px();
-  fPy=p->Py();
-  fPz=p->Pz();
-  fRE=p->E();
-  cls=(CbmEcalClusterV1*)fClusters->At(p->ClusterNum());
-  fChi2=cls->Chi2();
-  fNM=cls->Maxs();
-  fNC=cls->Size();
-  fPDG=tr->GetPdgCode();
-  fMCE=tr->GetEnergy();
-  fMCPx=tr->GetPx();
-  fMCPy=tr->GetPy();
-  fMCPz=tr->GetPz();
-  fTree->Fill();
+}
+
+/** Second realization of matching **/
+void  CbmEcalMatching::MatchP2(CbmEcalRecParticle* p)
+{
+  CbmMCTrack* tr;
+  pair<Int_t, Double_t> max; max.first=-1111; max.second=0;
+  list<pair<Int_t, Double_t> > good;
+  list<pair<Int_t, Double_t> > remove;
+  list<pair<Int_t, Double_t> >::const_iterator j;
+  pair<Int_t, Double_t> max_photon; max_photon.second=0;
+  map<Int_t, Double_t>::const_iterator i;
+  Int_t oldsize=0;
+
+  good.clear();
+  //cerr << fP.size() << endl;
+  for(i=fP.begin(); i!=fP.end();++i)
+  {
+    if ((*i).second/fS<fThreshold) continue;
+    good.push_back((*i));
+  }
+  if (good.size()==0)
+  {
+    if (fVerbose>2)
+      Info("MatchP2", "Matching failed for reconstructed photon (%f, %f).", p->X(), p->Y());
+    return;
+  }
+  while(good.size()!=1)
+  {
+    remove.clear();
+    oldsize=good.size();
+    if (fVerbose>100)
+      Info("MatchP2", "Size of matching track list: %d.", good.size());
+    for(j=good.begin();j!=good.end();j++)
+    {
+      tr=(CbmMCTrack*)fMCTracks->At((*j).first);
+      if (tr==NULL)
+      {
+        Warning("MatchP2", "Can't find MCTrack number %d.", (*i).first);
+        return;
+      }
+      while(tr!=NULL)
+      {
+        for(i=fP.begin(); i!=fP.end();++i)
+	  if ((*i).first==tr->GetMotherId())
+	    break;
+        if (i!=fP.end())
+	  if ((*i).second>fMotherThr*(*j).second)
+	  {
+	    remove.push_back(*j);
+	    break;
+	  }
+          else
+	    remove.push_back(*i);
+	if (tr->GetMotherId()>=0)
+	  tr=(CbmMCTrack*)fMCTracks->At(tr->GetMotherId());
+	else
+	  break;
+        if (tr==NULL)
+        {
+          Warning("MatchP2", "Can't find MCTrack.");
+          return;
+        }
+	if (tr->GetPdgCode()!=22&&TMath::Abs(tr->GetPdgCode())!=11)
+	  break;
+      }
+    }
+
+    if (remove.empty())
+    {
+      if (fVerbose>2)
+      {
+	Info("MatchP2","Can't remove any from %d tracks.", good.size());
+	if (fVerbose>100)
+        for(j=good.begin();j!=good.end();j++)
+        {
+	  tr=(CbmMCTrack*)fMCTracks->At((*j).first);
+//	  cerr << "Good: (" << (*j).first << "[" << tr->GetPdgCode() << "," << tr->GetEnergy() <<"]"<< "," << (*j).second << ") " << p->E() << endl;
+        }
+      }
+      return;
+    }
+    if (fVerbose>100)
+    {
+      Info("MatchP2", "Size of list of tracks to remove: %d.", remove.size());
+      for(j=remove.begin();j!=remove.end();j++)
+      {
+	tr=(CbmMCTrack*)fMCTracks->At((*j).first);
+//	cerr << "Remove: (" << (*j).first << "[" << tr->GetPdgCode() << "," << tr->GetEnergy() << "]"<< "," << (*j).second << ")" << endl;
+      }
+      for(j=good.begin();j!=good.end();j++)
+      {
+	tr=(CbmMCTrack*)fMCTracks->At((*j).first);
+//	cerr << "Good: (" << (*j).first << "[" << tr->GetPdgCode() << "," << tr->GetEnergy() <<"]"<< "," << (*j).second << ") " << p->E() << endl;
+      }
+    }
+    for(j=remove.begin();j!=remove.end();j++)
+//      good.remove(find(good.begin(), good.end(), *j));
+      good.remove(*j);
+    if (oldsize==(Int_t)good.size())
+    {
+      if (fVerbose>2)
+	Info("MatchP2","No tracks was removed!");
+      return;
+    }
+  }
+  p->SetMCTrack((*good.begin()).first);
+}
+
+/** Third realization of matching **/
+void  CbmEcalMatching::MatchP3(CbmEcalRecParticle* p)
+{
+  CbmMCTrack* tr;
+  pair<Int_t, Double_t> max; max.first=-1111; max.second=0;
+  map<Int_t, Double_t>::const_iterator i;
+  Int_t n;
+
+  for(i=fP.begin(); i!=fP.end();++i)
+  {
+    if ((*i).second/fS<fThreshold) continue;
+    if ((*i).second>max.second)
+      max=(*i);
+    else
+      if ((*i).second==max.second&&(*i).first<max.first)
+	max=(*i);
+  }
+  if (max.first==-1111)
+  {
+    if (fVerbose>2) 
+      Info("MatchP1", "Matching failed for reconstructed photon (%f, %f).", p->X(), p->Y());
+    return;
+  }
+  p->SetMCTrack(max.first);
 }
 
 /** Form a precluster **/
@@ -335,7 +563,8 @@ void CbmEcalMatching::Match(CbmEcalRecParticle* p)
   }
   if (max.first==-1111)
   {
-    if (fVerbose>2) Info("Match", "Matching failed for reconstructed photon (%f, %f).", p->X(), p->Y());
+    if (fVerbose>2)
+      Info("Match", "Matching failed for reconstructed photon (%f, %f).", p->X(), p->Y());
     return;
   }
   if (max_photon.second>fPhotonThr*max.second)

@@ -69,7 +69,6 @@ protected:
 private:
 
    Int_t fVerbose;
-   Double_t fCorrection;
 
    TString fFieldName; ///specify correction map for different field
    TH1D* fh_mapaxisAXY;

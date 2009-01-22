@@ -28,7 +28,6 @@
 CbmRichRingFitterEllipseTau::CbmRichRingFitterEllipseTau()
 {
     fVerbose      = 1;
-    fCorrection   = 1;
     fFieldName = "muon";
     InitHistForRadiusCorrection();
 }
@@ -39,7 +38,6 @@ CbmRichRingFitterEllipseTau::CbmRichRingFitterEllipseTau()
 CbmRichRingFitterEllipseTau::CbmRichRingFitterEllipseTau(Int_t verbose,Double_t correction, TString fieldName)
 {
     fVerbose = verbose;
-    fCorrection   = 1;
     fFieldName = fieldName;
     InitHistForRadiusCorrection();
 }
@@ -65,24 +63,12 @@ void CbmRichRingFitterEllipseTau::DoFit(CbmRichRing *pRing)
 {
     Int_t fNumHits = pRing->GetNofHits();
 
-	if (fVerbose > 1) {
-		cout<<" RingFitTAU: Number of Hits in this ring : "<< fNumHits << endl;
-		if (fCorrection == 0)
-			cout<<" No correction of fitted radius done " <<endl;
-		if (fCorrection == 1)
-			cout<<" Correction of ring radius was chosen" <<endl;
-		if (fCorrection > 1)
-			cout <<" - ERROR - correction value not valid: has to be either 0 (no cor.) or 1 (cor.) "
-					<<endl;
-	}
-
 	if (fNumHits <= 5) {
 		pRing->SetXYABPhi(-1., -1., -1., -1., -1.);
 		pRing->SetRadius(-1.);
 
 		if (fVerbose > 1)
-			cout
-					<<" No way for RingFitter as ellipse: Number of Hits is less then 5 "
+			cout <<" No way for RingFitter as ellipse: Number of Hits is less then 5 "
 					<<endl;
 		return;
 	}
@@ -97,9 +83,7 @@ void CbmRichRingFitterEllipseTau::DoFit(CbmRichRing *pRing)
 
 	FittingEllipse(pRing);
 
-	// Make radius correction if it's needed
-	if (fCorrection == 1)
-		MakeRadiusCorrection(pRing);
+	MakeRadiusCorrection(pRing);
 
 	CalcChi2(pRing);
 }
@@ -125,7 +109,7 @@ TVectorD CbmRichRingFitterEllipseTau::Taubin(void)
 }
 
 // -----   Public method: InitMatrices   -----------------------------------
-void CbmRichRingFitterEllipseTau::InitMatrices(void)
+void CbmRichRingFitterEllipseTau::InitMatrices()
 {
     Int_t fNum = fX.size();
     TMatrixD fZ (fNum,6);

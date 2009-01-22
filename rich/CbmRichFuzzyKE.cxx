@@ -316,7 +316,7 @@ void CbmRichFuzzyKE::Draw(Int_t color)
 	fDisplayedHit.SetMarkerColor ( kBlue );
 	
 	TEllipse fDisplayedRing;
-	fDisplayedRing.SetLineWidth ( 3. );
+	fDisplayedRing.SetLineWidth ( 3 );
 	fDisplayedRing.SetLineColor ( color );
 	fDisplayedRing.SetFillStyle ( 0 );
 

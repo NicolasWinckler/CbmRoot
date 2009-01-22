@@ -45,21 +45,11 @@ public:
    virtual ~CbmRichRingFitterEllipseTau();
 
    void DoFit1(CbmRichRing *pRing, vector<Double_t> hitX, vector<Double_t> hitY);
-
-   /** Run Ring Fitting algorithm **/
    void DoFit(CbmRichRing *pRing);
 
-   /** Using Ring Fitting algorithm **/
-   void FittingEllipse(CbmRichRing *pRing);
-
-   /** Transpose ellipse to canonical system of coordinates **/
-   void TransposeEllipse(CbmRichRing *pRing);
-
-   /** Initialization of Matrices **/
-   void InitMatrices(void);
-
-   /** Taubin algorithm **/
-   TVectorD Taubin(void);
+	void TransEllipse(CbmRichRing *pRing);
+	void InitMatrices();
+	void Taubin();
 
 protected:
    virtual void CalcChi2(CbmRichRing* pRing);
@@ -68,18 +58,19 @@ protected:
 
 private:
 
-   Int_t fVerbose;
+    Int_t fVerbose;
 
-   TString fFieldName; ///specify correction map for different field
-   TH1D* fh_mapaxisAXY;
-   TH1D* fh_mapaxisBXY;
+	TString fFieldName; ///specify correction map for different field
+	TH1D* fh_mapaxisAXY;
+	TH1D* fh_mapaxisBXY;
 
-   vector<Double_t> fX;
-   vector<Double_t> fY;
-   TVectorD fAlgPar;
-   TMatrixD fM;
-   TMatrixD fB;
-   TMatrixD fMB;
+	TMatrixD fM;
+	TMatrixD fP;
+	TMatrixD fQ;
+
+	vector<Double_t> fAlgPar;
+	vector<Double_t> fX;
+	vector<Double_t> fY;
 
    ClassDef(CbmRichRingFitterEllipseTau,1);
 

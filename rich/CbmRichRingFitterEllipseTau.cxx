@@ -53,8 +53,8 @@ CbmRichRingFitterEllipseTau::~CbmRichRingFitterEllipseTau()
 void CbmRichRingFitterEllipseTau::DoFit1(CbmRichRing *pRing, vector<Double_t> hitX,
 		vector<Double_t> hitY)
 {
-	fX = hitX;
-	fY = hitY;
+	fX.assign(hitX.begin(), hitX.end());
+	fY.assign(hitY.begin(), hitY.end());
 
 	InitMatrices();
 	Taubin();
@@ -97,9 +97,9 @@ void CbmRichRingFitterEllipseTau::DoFit(CbmRichRing *pRing)
 void CbmRichRingFitterEllipseTau::Taubin()
 {
 	Double_t det;
-	TMatrixD fPQ(5,5); // fPQ = P^(-1) * Q
-	fPQ = fP.InvertFast(&det)*fQ;
-	TMatrixDEigen eig(fPQ);
+	TMatrixD PQ(5,5); // fPQ = P^(-1) * Q
+	PQ = fP.InvertFast(&det)*fQ;
+	TMatrixDEigen eig(PQ);
 	TMatrixD evc = eig.GetEigenVectors();
 
 	Double_t AlgParF = 0.;
@@ -115,6 +115,10 @@ void CbmRichRingFitterEllipseTau::Taubin()
 void CbmRichRingFitterEllipseTau::InitMatrices()
 {
 	UInt_t numHits = fX.size();
+	fM.Clear();
+	fP.Clear();
+	fQ.Clear();
+	fAlgPar.clear();
 
 	TMatrixD Z(numHits,6);
 	TMatrixD ZT(6,numHits);

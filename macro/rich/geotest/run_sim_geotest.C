@@ -9,19 +9,19 @@ void run_sim_geotest(Int_t nEvents = 100)
   //TString inFile  = inDir + "/input/urqmd.ftn14";
   TString inDir   = "/d/cbm03/urqmd/auau/25gev/centr";
   TString inFile  = inDir + "/urqmd.auau.25gev.centr.0006.ftn14";
-  TString outDir  = "/d/cbm02/slebedev/ebelolap/compact";
-  TString outFile = outDir + "/mc.54.root";
-  TString parFile = outDir + "/params.54.root";
+  TString outDir  = "/home/semeon/d/rich";
+  TString outFile = outDir + "/mc.00.root";
+  TString parFile = outDir + "/params.00.root";
 
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString targetGeom = "target.geo";
+  TString targetGeom = "target_au_250mu.geo";
   TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "magnet_muon.geo";
+  TString magnetGeom = "magnet_standard.geo";
   TString mvdGeom    = "mvd_standard.geo";
   mvdGeom = "";
   TString stsGeom    = "sts_standard.geo";
-  TString richGeom   = "rich_small_01.geo";
+  TString richGeom   = "rich_standard.geo";
   TString trdGeom    = "trd_standard.geo";
   TString tofGeom    = "tof_standard.geo";
   TString ecalGeom   = "ecal_FastMC.geo";
@@ -59,7 +59,6 @@ void run_sim_geotest(Int_t nEvents = 100)
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
-  gSystem->Load("libMvd");
   gSystem->Load("libSts");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");

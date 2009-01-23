@@ -9,16 +9,16 @@ void run_reco_geotest(Int_t nEvents = 100)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "/d/cbm02/slebedev/ebelolap/compact/mc.54.root";
+  TString inFile = "/home/semeon/d/rich/mc.00.root";
 
   // Parameter file
-  TString parFile = "/d/cbm02/slebedev/ebelolap/compact/params.54.root";
+  TString parFile = "/home/semeon/d/rich/params.00.root";
 
   // STS digitisation file
   TString stsDigiFile = "sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/d/cbm02/slebedev/ebelolap/compact/reco.54.root";
+  TString outFile = "/home/semeon/d/rich/reco.00.root";
 
 
   // In general, the following parts need not be touched
@@ -49,7 +49,6 @@ void run_reco_geotest(Int_t nEvents = 100)
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
-  gSystem->Load("libMvd");
   gSystem->Load("libSts");
   gSystem->Load("libRich");
   gSystem->Load("libMuch");
@@ -100,7 +99,7 @@ void run_reco_geotest(Int_t nEvents = 100)
   // B-field configuration
   TString field ="muon";  // choose between "muon" or "active"
   Double_t iRingCorr = 0.;      // correction done (default), choose 0 if not
-  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipse(iVerbose, iRingCorr, field);
+  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, iRingCorr, field);
   CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
   run->AddTask(fitRings);
   //--------------------------------------------------------------------------

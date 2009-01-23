@@ -6,12 +6,12 @@
 */
 
 
-void draw_geo_test() {
+void draw_geotest() {
 
 	gStyle->SetPalette(1,0);
 
 
-	TFile* fcompact = new TFile ("/d/cbm02/slebedev/ebelolap/compact/reco.19.root");
+	TFile* fcompact = new TFile ("/home/semeon/d/rich/reco.00.root");
 
 
 	TCanvas* c1 = new TCanvas();

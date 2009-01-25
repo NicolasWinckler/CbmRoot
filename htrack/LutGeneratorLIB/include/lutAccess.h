@@ -49,8 +49,8 @@ class lutAccess : public lut {
 
 protected:
 
-	lutHoughBorder* lutMem;					/**< Memory which stores the whole look up table. */
-	unsigned long   numberOfEntries;		/**< Variable to store the number of entries in the lutMem. */
+	lutHoughBorder* memory;					/**< Memory which stores the whole look up table. */
+	unsigned long   numberOfEntries;		/**< Variable to store the number of entries in the memory. */
 
 /**
  * This method allocates new memory.
@@ -250,6 +250,30 @@ public:
  */
 
 	void write(std::string fileName, std::string name, unsigned short format = SOFTWAREFORMAT, std::streambuf* terminal = NULL);
+
+/**
+ * This method returns the size of the reserved memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getReservedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the allocated memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getAllocatedSizeOfData(unsigned short dimension = 0);
+
+/**
+ * This method returns the size of the used memory for
+ * the source data.
+ * @param dimension formats the returnvalue to B, kB, MB or GB
+ */
+
+	double getUsedSizeOfData(unsigned short dimension = 0);
 
 };
 

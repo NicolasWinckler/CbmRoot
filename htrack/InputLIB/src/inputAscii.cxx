@@ -310,18 +310,18 @@ void inputAscii::readDataSource(unsigned int event, TClonesArray* mHitArray, TCl
 					hitProducer->produceHit(&hitXCoord, &hitYCoord, &isMapsType, &isHybridType, &isStripType, xCoord, yCoord, stationID);
 /* This is just used because the type of the station must be derived from the hits */
 					if (isMapsType)
-						if (data.getDetectorPointer()->getStationPointer(stationID) != NULL)
-							data.getDetectorPointer()->getStationPointer(stationID)->setMapsType(true);
+						if (data.getDetectorPointer()->getStationPointerById(stationID) != NULL)
+							data.getDetectorPointer()->getStationPointerById(stationID)->setMapsType(true);
 /* Later the type is derived from the station itself. So it must be checked that the hit is correct */
 /* This is just used because the type of the station must be derived from the hits */
 					if (isHybridType)
-						if (data.getDetectorPointer()->getStationPointer(stationID) != NULL)
-							data.getDetectorPointer()->getStationPointer(stationID)->setHybridType(true);
+						if (data.getDetectorPointer()->getStationPointerById(stationID) != NULL)
+							data.getDetectorPointer()->getStationPointerById(stationID)->setHybridType(true);
 /* Later the type is derived from the station itself. So it must be checked that the hit is correct */
 /* This is just used because the type of the station must be derived from the hits */
 					if (isStripType)
-						if (data.getDetectorPointer()->getStationPointer(stationID) != NULL)
-							data.getDetectorPointer()->getStationPointer(stationID)->setStripType(true);
+						if (data.getDetectorPointer()->getStationPointerById(stationID) != NULL)
+							data.getDetectorPointer()->getStationPointerById(stationID)->setStripType(true);
 /* Later the type is derived from the station itself. So it must be checked that the hit is correct */
 					if (!data.getDetector().getStationById(stationID).isMasked())
 						data.addHit(trackID, stationID, hitXCoord, hitYCoord, xCoord, yCoord, zCoord, i, i, isMapsType, isStripType, isHybridType);

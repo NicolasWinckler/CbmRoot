@@ -98,7 +98,7 @@ double analyticFormula::evaluateAbsPt(trackMomentum& momentum) {
  * method returns the momentum components in each direction.	*
  ****************************************************************/
 
-void analyticFormula::evaluateP(trackCoordinates& coordinates, histogramSpace& space, trackMomentum* momentum) {
+void analyticFormula::evaluateP(trackCoordinates& coordinates, histogramSpace& space, trackMomentum* momentum, double* charge) {
 
 	trackParameter parameter;
 
@@ -106,10 +106,10 @@ void analyticFormula::evaluateP(trackCoordinates& coordinates, histogramSpace& s
 	parameter.set(space.getAnalogFromCell(coordinates.get(DIM2), DIM2), DIM2);
 	parameter.set(space.getAnalogFromCell(coordinates.get(DIM3), DIM3), DIM3);
 
-	evaluateP(parameter, space, momentum);
+	evaluateP(parameter, space, momentum, charge);
 
 }
-void analyticFormula::evaluateP(trackCoordinates& coordinates, histogramSpace& space, trackFrameworkMomentum* momentum) {
+void analyticFormula::evaluateP(trackCoordinates& coordinates, histogramSpace& space, trackFrameworkMomentum* momentum, double* charge) {
 
 	trackParameter parameter;
 
@@ -117,10 +117,10 @@ void analyticFormula::evaluateP(trackCoordinates& coordinates, histogramSpace& s
 	parameter.set(space.getAnalogFromCell(coordinates.get(DIM2), DIM2), DIM2);
 	parameter.set(space.getAnalogFromCell(coordinates.get(DIM3), DIM3), DIM3);
 
-	evaluateP(parameter, space, momentum);
+	evaluateP(parameter, space, momentum, charge);
 
 }
-void analyticFormula::evaluateP(trackParameter& parameter, histogramSpace& space, trackMomentum* momentum) {
+void analyticFormula::evaluateP(trackParameter& parameter, histogramSpace& space, trackMomentum* momentum, double* charge) {
 
 	double q_p_xz;
 	double value;
@@ -146,8 +146,16 @@ void analyticFormula::evaluateP(trackParameter& parameter, histogramSpace& space
 		if (q_p_xz == 0)
 			q_p_xz = space.getIncr(HRADIUS) / 2;
 		
-		if (q_p_xz < 0)
-			q_p_xz = - q_p_xz;
+		if (q_p_xz < 0) {
+
+			if (charge != NULL)
+				*charge = -1;
+			q_p_xz = -q_p_xz;
+
+		}
+		else
+			if (charge != NULL)
+				*charge = +1;
 
 		value = 1.0 / (q_p_xz * sqrt(sqr(tan(parameter.get(HTHETA))) + 1));
 		momentum->set(value, MRADIUS);
@@ -163,9 +171,10 @@ void analyticFormula::evaluateP(trackParameter& parameter, histogramSpace& space
 		throw resultPointerIsNotAccessibleError();
 
 }
-void analyticFormula::evaluateP(trackParameter& parameter, histogramSpace& space, trackFrameworkMomentum* momentum) {
+void analyticFormula::evaluateP(trackParameter& parameter, histogramSpace& space, trackFrameworkMomentum* momentum, double* charge) {
 
 	double q_p_xz;
+	double sign;
 	double value;
 
 	if (momentum != NULL) {
@@ -189,8 +198,17 @@ void analyticFormula::evaluateP(trackParameter& parameter, histogramSpace& space
 		if (q_p_xz == 0)
 			q_p_xz = space.getIncr(HRADIUS) / 2;
 		
-		if (q_p_xz < 0)
-			q_p_xz = - q_p_xz;
+		if (q_p_xz < 0) {
+
+			sign   = -1;
+			q_p_xz = -q_p_xz;
+
+		}
+		else
+			sign   = +1;
+
+		if (charge != NULL)
+			*charge = sign;
 
 		value = tan(parameter.get(HTHETA));
 		momentum->setTx(value);
@@ -199,14 +217,14 @@ void analyticFormula::evaluateP(trackParameter& parameter, histogramSpace& space
 		momentum->setTy(value);
 
 		value = sqrt(sqr(tan(parameter.get(HTHETA))) + sqr(tan(parameter.get(HGAMMA))) + 1) / (q_p_xz * (sqrt(sqr(tan(parameter.get(HTHETA))) + 1)));
-		momentum->setQp(value);
+		momentum->setQp(sign * value);
 
 	}
 	else
 		throw resultPointerIsNotAccessibleError();
 
 }
-void analyticFormula::evaluatePWithCare(trackParameter& parameter, trackMomentum* momentum) {
+void analyticFormula::evaluatePWithCare(trackParameter& parameter, double care, trackMomentum* momentum, double* charge) {
 
 	double q_p_xz;
 	double value;
@@ -229,10 +247,18 @@ void analyticFormula::evaluatePWithCare(trackParameter& parameter, trackMomentum
 		 * but at least very high.
 		 */
 		if (q_p_xz == 0)
-			q_p_xz = 0.005; // incr / 2 = ((max - min) / dim) / 2 = (1.11 - (-1.11)) / 222 / 2 = 0.005;
+			q_p_xz = care;
 		
-		if (q_p_xz < 0)
-			q_p_xz = - q_p_xz;
+		if (q_p_xz < 0) {
+
+			if (charge != NULL)
+				*charge = -1;
+			q_p_xz = -q_p_xz;
+
+		}
+		else
+			if (charge != NULL)
+				*charge = +1;
 
 		value = 1.0 / (q_p_xz * sqrt(sqr(tan(parameter.get(HTHETA))) + 1));
 		momentum->set(value, MRADIUS);

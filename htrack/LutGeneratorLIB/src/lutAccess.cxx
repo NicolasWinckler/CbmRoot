@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-24 16:41:19 $
-// $Revision: 1.7 $
+// $Date: 2008-11-21 14:01:50 $
+// $Revision: 1.8 $
 //
 // *******************************************************************/
 
@@ -34,6 +34,8 @@
 #include "../include/lutGeneratorError.h"
 #include "../include/lutGeneratorWarningMsg.h"
 #include "../include/lutAccess.h"
+#include <malloc.h>
+#include <memory.h>
 #include <fstream>
 
 
@@ -48,21 +50,21 @@ void lutAccess::allocateNewMemory(unsigned long number) {
 
 	numberOfEntries += number;
 
-	if (lutMem == NULL)
-		lutMem = (lutHoughBorder*)calloc(numberOfEntries, sizeof(lutHoughBorder));
+	if (memory == NULL)
+		memory = (lutHoughBorder*)calloc(numberOfEntries, sizeof(lutHoughBorder));
 	else {
 
-		lutMem = (lutHoughBorder*)realloc(lutMem, numberOfEntries * sizeof(lutHoughBorder));
+		memory = (lutHoughBorder*)realloc(memory, numberOfEntries * sizeof(lutHoughBorder));
 		if (number > 0)
-			memset(&lutMem[numberOfEntries - number], 0, number * sizeof(lutHoughBorder));
+			memset(&memory[numberOfEntries - number], 0, number * sizeof(lutHoughBorder));
 
 	}
 
-	if (lutMem == NULL)
+	if (memory == NULL)
 		throw memoryAllocationError();
 
 	for (unsigned long i = numberOfEntries - number; i < numberOfEntries; i++)
-		lutMem[i].init();
+		memory[i].init();
 
 }
 
@@ -72,7 +74,7 @@ void lutAccess::allocateNewMemory(unsigned long number) {
 
 lutAccess::lutAccess() : lut() {
 
-	lutMem = NULL;
+	memory = NULL;
 
 	clear();
 
@@ -84,7 +86,7 @@ lutAccess::lutAccess() : lut() {
 
 lutAccess::lutAccess(double dim1Min, double dim1Max, int dim1Step, double dim2Min, double dim2Max, int dim2Step) : lut(dim1Min, dim1Max, dim1Step, dim2Min, dim2Max, dim2Step) {
 
-	lutMem = NULL;
+	memory = NULL;
 
 	clear();
 
@@ -255,9 +257,9 @@ void lutAccess::evaluate(digitalHit* hit, lutHoughBorder* borderPointer) {
 	
 void lutAccess::clear() {
 
-	if (lutMem != NULL) {
-		free(lutMem);
-		lutMem = NULL;
+	if (memory != NULL) {
+		free(memory);
+		memory = NULL;
 	}
 
 	numberOfEntries = 0;
@@ -297,10 +299,10 @@ lutHoughBorder lutAccess::getEntry(unsigned long index) {
 
 	if (index < numberOfEntries) {
 
-		if (lutMem == NULL)
+		if (memory == NULL)
 			throw cannotAccessLutError();
 
-		returnValue = lutMem[index];
+		returnValue = memory[index];
 
 	}
 	else {
@@ -328,7 +330,7 @@ void lutAccess::addEntry(lutHoughBorder& value) {
 
 	allocateNewMemory(1);
 
-	lutMem[numberOfEntries - 1] = value;
+	memory[numberOfEntries - 1] = value;
 
 }
 void lutAccess::addEntry(lutHoughBorder& value, unsigned long index) {
@@ -336,7 +338,7 @@ void lutAccess::addEntry(lutHoughBorder& value, unsigned long index) {
 	if (index >= numberOfEntries)
 		allocateNewMemory(index + 1 - numberOfEntries);
 
-	lutMem[index] = value;
+	memory[index] = value;
 
 }
 void lutAccess::addEntry(lutHoughBorder& value, digitalHit hit) {
@@ -364,13 +366,13 @@ std::string lutAccess::toString() {
 	}
 	else {
 
-		if (lutMem == NULL)
+		if (memory == NULL)
 			throw cannotAccessLutError();
 		
 		for (unsigned long i = 0; i < numberOfEntries; i++) {
 
 			returnValue += "\n";
-			returnValue += lutMem[i].toIdentifiedString();
+			returnValue += memory[i].toIdentifiedString();
 
 		}
 
@@ -412,26 +414,38 @@ void lutAccess::read(std::string fileName, std::streambuf* terminal) {
 
 	dtos(def.dim1Min,        &definitionString, doubleConversionDigits);
 	dtos(fileHeader.dim1Min, &fileHeaderString, doubleConversionDigits);
-	if (definitionString != fileHeaderString)
+	if (definitionString != fileHeaderString) {
 		countDifferentLutDefinitionAsFile++;
+		def.dim1Min  = fileHeader.dim1Min;
+	}
 	dtos(def.dim1Max,        &definitionString, doubleConversionDigits);
 	dtos(fileHeader.dim1Max, &fileHeaderString, doubleConversionDigits);
-	if (definitionString != fileHeaderString)
+	if (definitionString != fileHeaderString) {
 		countDifferentLutDefinitionAsFile++;
-	if (def.dim1Step != fileHeader.dim1Step)
+		def.dim1Max  = fileHeader.dim1Max;
+	}
+	if (def.dim1Step != fileHeader.dim1Step) {
 		countDifferentLutDefinitionAsFile++;
+		def.dim1Step = fileHeader.dim1Step;
+	}
 	dtos(def.dim2Min,        &definitionString, doubleConversionDigits);
 	dtos(fileHeader.dim2Min, &fileHeaderString, doubleConversionDigits);
-	if (definitionString != fileHeaderString)
+	if (definitionString != fileHeaderString) {
 		countDifferentLutDefinitionAsFile++;
+		def.dim2Min  = fileHeader.dim2Min;
+	}
 	dtos(def.dim2Max,        &definitionString, doubleConversionDigits);
 	dtos(fileHeader.dim2Max, &fileHeaderString, doubleConversionDigits);
-	if (definitionString != fileHeaderString)
+	if (definitionString != fileHeaderString) {
 		countDifferentLutDefinitionAsFile++;
+		def.dim2Max  = fileHeader.dim2Max;
+	}
 	dtos(def.dim2Step,        &definitionString, doubleConversionDigits);
 	dtos(fileHeader.dim2Step, &fileHeaderString, doubleConversionDigits);
-	if (def.dim2Step != fileHeader.dim2Step)
+	if (def.dim2Step != fileHeader.dim2Step) {
 		countDifferentLutDefinitionAsFile++;
+		def.dim2Step = fileHeader.dim2Step;
+	}
 
 	if (countDifferentLutDefinitionAsFile != 0) {
 
@@ -450,7 +464,7 @@ void lutAccess::read(std::string fileName, std::streambuf* terminal) {
 
 	readFile.setDataNum(numberOfEntries);
 
-	readFile.setDataPtr(lutMem);
+	readFile.setDataPtr(memory);
 
 	readFile.readFile(terminal);
 
@@ -477,7 +491,7 @@ void lutAccess::write(std::string fileName, std::string name, unsigned short for
 	}
 	else {
 
-		if (lutMem == NULL)
+		if (memory == NULL)
 			throw cannotAccessLutError();
 
 		fileHeader.name            = name;
@@ -495,12 +509,74 @@ void lutAccess::write(std::string fileName, std::string name, unsigned short for
 
 		writeFile.setDataNum(fileHeader.numberOfEntries);
 
-		writeFile.setDataPtr(lutMem);
+		writeFile.setDataPtr(memory);
 
 		writeFile.setHeader(fileHeader);
 
 		writeFile.writeFile(terminal);
 
 	}
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double lutAccess::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(lutHoughBorder*);
+	returnValue += sizeof(numberOfEntries);
+
+	for (unsigned long i = 0; i < numberOfEntries; i++)
+		returnValue += memory[i].getReservedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double lutAccess::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	for (unsigned long i = 0; i < numberOfEntries; i++)
+		returnValue += memory[i].getAllocatedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double lutAccess::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(lutHoughBorder*);
+	returnValue += sizeof(numberOfEntries);
+
+	for (unsigned long i = 0; i < numberOfEntries; i++)
+		returnValue += memory[i].getUsedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }

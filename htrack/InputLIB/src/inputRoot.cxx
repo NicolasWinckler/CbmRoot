@@ -1817,8 +1817,8 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputHit->GetRefIndex());
 
 /* This is just used because the type of the station must be derived from the hits */
-			if (data.getDetectorPointer()->getStationPointer(inputHit->GetDetectorID()) != NULL)
-				data.getDetectorPointer()->getStationPointer(inputHit->GetDetectorID())->setMapsType(true);
+			if (data.getDetectorPointer()->getStationPointerById(inputHit->GetDetectorID()) != NULL)
+				data.getDetectorPointer()->getStationPointerById(inputHit->GetDetectorID())->setMapsType(true);
 /* Later the type is derived from the station itself. So it must be checked that the hit is correct */
 
 			if (data.getDetector().getStationById(inputHit->GetDetectorID()).isMapsType()) {
@@ -1858,8 +1858,8 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputHit->GetRefIndex());
 
 /* This is just used because the type of the station must be derived from the hits */
-			if (data.getDetectorPointer()->getStationPointer(inputHit->GetDetectorID()) != NULL)
-				data.getDetectorPointer()->getStationPointer(inputHit->GetDetectorID())->setHybridType(true);
+			if (data.getDetectorPointer()->getStationPointerById(inputHit->GetDetectorID()) != NULL)
+				data.getDetectorPointer()->getStationPointerById(inputHit->GetDetectorID())->setHybridType(true);
 /* Later the type is derived from the station itself. So it must be checked that the hit is correct */
 
 			if (data.getDetector().getStationById(inputHit->GetDetectorID()).isHybridType()) {
@@ -1898,8 +1898,8 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputHit->GetRefIndex());
 
 /* This is just used because the type of the station must be derived from the hits */
-			if (data.getDetectorPointer()->getStationPointer(inputHit->GetDetectorID()) != NULL)
-				data.getDetectorPointer()->getStationPointer(inputHit->GetDetectorID())->setStripType(true);
+			if (data.getDetectorPointer()->getStationPointerById(inputHit->GetDetectorID()) != NULL)
+				data.getDetectorPointer()->getStationPointerById(inputHit->GetDetectorID())->setStripType(true);
 /* Later the type is derived from the station itself. So it must be checked that the hit is correct */
 
 			if (data.getDetector().getStationById(inputHit->GetDetectorID()).isStripType()) {
@@ -2187,8 +2187,8 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 				inputMvdPoint = (CbmMvdPoint*)inputMvdPoints->At(inputMvdHit->GetRefIndex());
 
 /* This is just used because the type of the station must be derived from the hits */
-			if (data.getDetectorPointer()->getStationPointer(inputMvdHit->GetStationNr()) != NULL)
-				data.getDetectorPointer()->getStationPointer(inputMvdHit->GetStationNr())->setMapsType(true);
+			if (data.getDetectorPointer()->getStationPointerById(inputMvdHit->GetStationNr()) != NULL)
+				data.getDetectorPointer()->getStationPointerById(inputMvdHit->GetStationNr())->setMapsType(true);
 /* Later the type is derived from the station itself. So it must be checked that the hit is correct */
 
 			if (data.getDetector().getStationById(inputMvdHit->GetStationNr()).isMapsType()) {
@@ -2229,8 +2229,8 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 				inputStsPoint = (CbmStsPoint*)inputStsPoints->At(inputStsHit->GetRefIndex());
 
 /* This is just used because the type of the station must be derived from the hits */
-			if (data.getDetectorPointer()->getStationPointer(inputStsHit->GetStationNr()) != NULL)
-				data.getDetectorPointer()->getStationPointer(inputStsHit->GetStationNr())->setHybridType(true);
+			if (data.getDetectorPointer()->getStationPointerById(inputStsHit->GetStationNr()) != NULL)
+				data.getDetectorPointer()->getStationPointerById(inputStsHit->GetStationNr())->setHybridType(true);
 /* Later the type is derived from the station itself. So it must be checked that the hit is correct */
 
 			if (data.getDetector().getStationById(inputStsHit->GetStationNr()).isHybridType() || data.getDetector().getStationById(inputStsHit->GetStationNr()).isStripType()) {

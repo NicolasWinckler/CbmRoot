@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-24 16:35:14 $
-// $Revision: 1.39 $
+// $Date: 2008-11-21 13:58:07 $
+// $Revision: 1.40 $
 //
 // *******************************************************************/
 
@@ -32,6 +32,7 @@
 #include "../../MiscLIB/include/errorHandling.h"
 #include "../../MiscLIB/include/terminal.h"
 #include "../../MiscLIB/include/conversionRoutines.h"
+#include "../../DataRootObjectLIB/include/rungeKuttaInterface.h"
 #include "../../DataObjectLIB/include/analyticFormula.h"
 #include "../../LutGeneratorLIB/include/prelutMath.h"
 #include "../../LutGeneratorLIB/include/digitalHitAccess.h"
@@ -917,7 +918,7 @@ bool analysis::estimateCoordinates(trackfinderInputTrack& track, trackCoordinate
 	 */
 
 	/* compute the estimated momentum for the computed coordinates */
-	formula.evaluateP(actualPosition, *(*space), &actualMomentum);
+	formula.evaluateP(actualPosition, *(*space), &actualMomentum, NULL);
 
 	/* compute the quadrat of the phytagoras difference for the correct and the estimated momentum */
 	bestMomentumDifferenceQuad = sqr(track.getMomX() - actualMomentum.get(DIM1)) + sqr(track.getMomY() - actualMomentum.get(DIM2)) + sqr(track.getMomZ() - actualMomentum.get(DIM3));
@@ -937,7 +938,7 @@ bool analysis::estimateCoordinates(trackfinderInputTrack& track, trackCoordinate
 				if ((estimatedPosition.get(DIM1) < (*space)->getStep(DIM1)) && (estimatedPosition.get(DIM2) < (*space)->getStep(DIM2)) && (estimatedPosition.get(DIM3) < (*space)->getStep(DIM3))) {
 
 					/* compute the estimated neighbourhood momentum for the estimated coordinates */
-					formula.evaluateP(estimatedPosition, *(*space), &actualMomentum);
+					formula.evaluateP(estimatedPosition, *(*space), &actualMomentum, NULL);
 
 					/* compute the quadrat of the phytagoras difference for the correct and the estimated neighbourhood momentum */
 					estimatedMomentumDifferenceQuad = sqr(track.getMomX() - actualMomentum.get(DIM1)) + sqr(track.getMomY() - actualMomentum.get(DIM2)) + sqr(track.getMomZ() - actualMomentum.get(DIM3));
@@ -1030,6 +1031,7 @@ analysis::analysis() {
 	ratings                        = NULL;
 	space                          = NULL;
 	luts                           = NULL;
+	trackPropagationAnalyser       = NULL;
 	qualityAnalyser                = NULL;
 	momentumAnalyser               = NULL;
 	projectionAnalyser             = NULL;
@@ -1088,6 +1090,7 @@ analysis::analysis(initialParameter parameters,
 	this->ratings                  = parameters.ratings;
 	this->space                    = parameters.space;
 	this->luts                     = parameters.luts;
+	trackPropagationAnalyser       = NULL;
 	qualityAnalyser                = NULL;
 	momentumAnalyser               = NULL;
 	projectionAnalyser             = NULL;
@@ -1100,7 +1103,7 @@ analysis::analysis(initialParameter parameters,
 	hardwareAnalyser               = NULL;
 	mcTrackVisualAnalyser          = NULL;
 	foundTrackVisualAnalyser       = NULL;
-	peakfindingGeometryAnalyser         = NULL;
+	peakfindingGeometryAnalyser    = NULL;
 
 	minimumP                       = parameters.minP;
 
@@ -1134,14 +1137,23 @@ analysis::analysis(initialParameter parameters,
 	usedSizeOfLBufferData          = 0;
 
 	initAutomaticFilterGeometryAnalysis(parameters.histogram, parameters.initAutomatcFilterGeometry);
+
+	initTrackPropagationEventPointAnalysis(parameters.initPropagationEventPoint);
+	initTrackPropagationEventHitAnalysis(parameters.initPropagationEventHit);
+	initTrackPropagationTotalPointAnalysis(parameters.initPropagationTotalPoint);
+	initTrackPropagationTotalHitAnalysis(parameters.initPropagationTotalHit);
+	initTrackPropagationAnalysisDisplay(parameters.initPropagationDisplay);
+
 	initQualityEFGCEventAbsoluteAnalysis(parameters.initQualityEFGCEventAbsolute);
 	initQualityEFGCEventRelativeAnalysis(parameters.initQualityEFGCEventRelative);
 	initQualityEFGCTotalAbsoluteAnalysis(parameters.initQualityEFGCTotalAbsolute);
 	initQualityEFGCTotalRelativeAnalysis(parameters.initQualityEFGCTotalRelative);
+
 	initMomentumEFGCEventPzEFGCAnalysis(parameters.initMomentumEFGCEventPzEFGC);
 	initMomentumEFGCEventPtEFGCAnalysis(parameters.initMomentumEFGCEventPtEFGC);
 	initMomentumEFGCTotalPzEFGCAnalysis(parameters.initMomentumEFGCTotalPzEFGC);
 	initMomentumEFGCTotalPtEFGCAnalysis(parameters.initMomentumEFGCTotalPtEFGC);
+
 	initProjectionEFGCNEvent12EFGCNAnalysis(parameters.initProjectionEFGCNEvent12EFGCN);
 	initProjectionEFGCNEvent13EFGCNAnalysis(parameters.initProjectionEFGCNEvent13EFGCN);
 	initProjectionEFGCNEvent32EFGCNAnalysis(parameters.initProjectionEFGCNEvent32EFGCN);
@@ -1159,6 +1171,7 @@ analysis::analysis(initialParameter parameters,
 
 	initMagnetfieldConstantAnalysis(parameters.initMagnetfieldFactors);
 	initMagnetfieldConstantAnalysisDisplay(parameters.initMagnetfieldFactorDisplay);
+
 	initMagnetfieldXAnalysis(parameters.initMagnetfieldX);
 	initMagnetfieldYAnalysis(parameters.initMagnetfieldY);
 	initMagnetfieldZAnalysis(parameters.initMagnetfieldZ);
@@ -1186,6 +1199,7 @@ analysis::analysis(initialParameter parameters,
 	this->ratings                  = parameters.ratings;
 	this->space                    = parameters.space;
 	this->luts                     = parameters.luts;
+	trackPropagationAnalyser       = NULL;
 	qualityAnalyser                = NULL;
 	momentumAnalyser               = NULL;
 	projectionAnalyser             = NULL;
@@ -1198,7 +1212,7 @@ analysis::analysis(initialParameter parameters,
 	hardwareAnalyser               = NULL;
 	mcTrackVisualAnalyser          = NULL;
 	foundTrackVisualAnalyser       = NULL;
-	peakfindingGeometryAnalyser         = NULL;
+	peakfindingGeometryAnalyser    = NULL;
 
 	minimumP                       = parameters.minP;
 
@@ -1232,14 +1246,24 @@ analysis::analysis(initialParameter parameters,
 	usedSizeOfLBufferData          = 0;
 
 	initAutomaticFilterGeometryAnalysis(parameters.histogram, parameters.initAutomatcFilterGeometry);
+
+	initTrackPropagationEventPointAnalysis(parameters.initPropagationEventPoint);
+	initTrackPropagationEventHitAnalysis(parameters.initPropagationEventHit);
+	initTrackPropagationTotalPointAnalysis(parameters.initPropagationTotalPoint);
+	initTrackPropagationTotalHitAnalysis(parameters.initPropagationTotalHit);
+	initTrackPropagationAnalysisDisplay(parameters.initPropagationDisplay);
+	initTrackPropagationAnalysisToRoot(fileParameters.initPropagationToRoot, fileParameters.name);
+
 	initQualityEFGCEventAbsoluteAnalysis(parameters.initQualityEFGCEventAbsolute);
 	initQualityEFGCEventRelativeAnalysis(parameters.initQualityEFGCEventRelative);
 	initQualityEFGCTotalAbsoluteAnalysis(parameters.initQualityEFGCTotalAbsolute);
 	initQualityEFGCTotalRelativeAnalysis(parameters.initQualityEFGCTotalRelative);
+
 	initMomentumEFGCEventPzEFGCAnalysis(parameters.initMomentumEFGCEventPzEFGC);
 	initMomentumEFGCEventPtEFGCAnalysis(parameters.initMomentumEFGCEventPtEFGC);
 	initMomentumEFGCTotalPzEFGCAnalysis(parameters.initMomentumEFGCTotalPzEFGC);
 	initMomentumEFGCTotalPtEFGCAnalysis(parameters.initMomentumEFGCTotalPtEFGC);
+
 	initProjectionEFGCNEvent12EFGCNAnalysis(parameters.initProjectionEFGCNEvent12EFGCN);
 	initProjectionEFGCNEvent13EFGCNAnalysis(parameters.initProjectionEFGCNEvent13EFGCN);
 	initProjectionEFGCNEvent32EFGCNAnalysis(parameters.initProjectionEFGCNEvent32EFGCN);
@@ -1250,21 +1274,21 @@ analysis::analysis(initialParameter parameters,
 	initMomentumEventAnalysis(parameters.initMomentumEvent);
 	initMomentumTotalAnalysis(parameters.initMomentumTotal);
 	initMomentumAnalysisDisplay(parameters.initMomentumDisplay);
+	initMomentumAnalysisToRoot(fileParameters.initMomentumToRoot, fileParameters.name);
+
 	initProjectionEventAnalysis(parameters.initProjectionEvent);
 	initProjectionTotalAnalysis(parameters.initProjectionTotal);
 	initProjectionAnalysisDisplay(parameters.initProjectionDisplay);
-
-	initMomentumAnalysisToRoot(fileParameters.initMomentumToRoot, fileParameters.name);
 	initProjectionAnalysisToRoot(fileParameters.initProjectionToRoot, fileParameters.name);
 
 	initMagnetfieldConstantAnalysis(parameters.initMagnetfieldFactors);
 	initMagnetfieldConstantAnalysisDisplay(parameters.initMagnetfieldFactorDisplay);
+
 	initMagnetfieldXAnalysis(parameters.initMagnetfieldX);
 	initMagnetfieldYAnalysis(parameters.initMagnetfieldY);
 	initMagnetfieldZAnalysis(parameters.initMagnetfieldZ);
 
 	initMagnetfieldAnalysisDisplay(parameters.initMagnetfieldDisplay);
-
 	initMagnetfieldAnalysisToRoot(fileParameters.initMagnetfieldToRoot, fileParameters.name);
 
 	initHistogramAnalysis(fileParameters.initCreatedHistogramToRoot | fileParameters.initEncodedHistogramToRoot | fileParameters.initFilteredHistogramToRoot, parameters.histogram);
@@ -1272,7 +1296,6 @@ analysis::analysis(initialParameter parameters,
 
 	initPrelutRangeAnalysis(parameters.initPrelutRange);
 	initPrelutRangeAnalysisDisplay(parameters.initPrelutRangeDisplay, parameters.initPrelutRangeDisplayMode);
-
 	initPrelutRangeAnalysisToRoot(fileParameters.initPrelutRangeToRoot, fileParameters.name);
 
 	initHardwareTracksPerColumnAnalysis(parameters.initTracksPerColumn);
@@ -1414,14 +1437,23 @@ void analysis::init(initialParameter parameters,
 	}
 
 	initAutomaticFilterGeometryAnalysis(parameters.histogram, parameters.initAutomatcFilterGeometry);
+
+	initTrackPropagationEventPointAnalysis(parameters.initPropagationEventPoint);
+	initTrackPropagationEventHitAnalysis(parameters.initPropagationEventHit);
+	initTrackPropagationTotalPointAnalysis(parameters.initPropagationTotalPoint);
+	initTrackPropagationTotalHitAnalysis(parameters.initPropagationTotalHit);
+	initTrackPropagationAnalysisDisplay(parameters.initPropagationDisplay);
+
 	initQualityEFGCEventAbsoluteAnalysis(parameters.initQualityEFGCEventAbsolute);
 	initQualityEFGCEventRelativeAnalysis(parameters.initQualityEFGCEventRelative);
 	initQualityEFGCTotalAbsoluteAnalysis(parameters.initQualityEFGCTotalAbsolute);
 	initQualityEFGCTotalRelativeAnalysis(parameters.initQualityEFGCTotalRelative);
+
 	initMomentumEFGCEventPzEFGCAnalysis(parameters.initMomentumEFGCEventPzEFGC);
 	initMomentumEFGCEventPtEFGCAnalysis(parameters.initMomentumEFGCEventPtEFGC);
 	initMomentumEFGCTotalPzEFGCAnalysis(parameters.initMomentumEFGCTotalPzEFGC);
 	initMomentumEFGCTotalPtEFGCAnalysis(parameters.initMomentumEFGCTotalPtEFGC);
+
 	initProjectionEFGCNEvent12EFGCNAnalysis(parameters.initProjectionEFGCNEvent12EFGCN);
 	initProjectionEFGCNEvent13EFGCNAnalysis(parameters.initProjectionEFGCNEvent13EFGCN);
 	initProjectionEFGCNEvent32EFGCNAnalysis(parameters.initProjectionEFGCNEvent32EFGCN);
@@ -1432,6 +1464,7 @@ void analysis::init(initialParameter parameters,
 	initMomentumEventAnalysis(parameters.initMomentumEvent);
 	initMomentumTotalAnalysis(parameters.initMomentumTotal);
 	initMomentumAnalysisDisplay(parameters.initMomentumDisplay);
+
 	initProjectionEventAnalysis(parameters.initProjectionEvent);
 	initProjectionTotalAnalysis(parameters.initProjectionTotal);
 	initProjectionAnalysisDisplay(parameters.initProjectionDisplay);
@@ -1488,14 +1521,24 @@ void analysis::init(initialParameter parameters,
 	}
 
 	initAutomaticFilterGeometryAnalysis(parameters.histogram, parameters.initAutomatcFilterGeometry);
+
+	initTrackPropagationEventPointAnalysis(parameters.initPropagationEventPoint);
+	initTrackPropagationEventHitAnalysis(parameters.initPropagationEventHit);
+	initTrackPropagationTotalPointAnalysis(parameters.initPropagationTotalPoint);
+	initTrackPropagationTotalHitAnalysis(parameters.initPropagationTotalHit);
+	initTrackPropagationAnalysisDisplay(parameters.initPropagationDisplay);
+	initTrackPropagationAnalysisToRoot(fileParameters.initPropagationToRoot, fileParameters.name);
+
 	initQualityEFGCEventAbsoluteAnalysis(parameters.initQualityEFGCEventAbsolute);
 	initQualityEFGCEventRelativeAnalysis(parameters.initQualityEFGCEventRelative);
 	initQualityEFGCTotalAbsoluteAnalysis(parameters.initQualityEFGCTotalAbsolute);
 	initQualityEFGCTotalRelativeAnalysis(parameters.initQualityEFGCTotalRelative);
+
 	initMomentumEFGCEventPzEFGCAnalysis(parameters.initMomentumEFGCEventPzEFGC);
 	initMomentumEFGCEventPtEFGCAnalysis(parameters.initMomentumEFGCEventPtEFGC);
 	initMomentumEFGCTotalPzEFGCAnalysis(parameters.initMomentumEFGCTotalPzEFGC);
 	initMomentumEFGCTotalPtEFGCAnalysis(parameters.initMomentumEFGCTotalPtEFGC);
+
 	initProjectionEFGCNEvent12EFGCNAnalysis(parameters.initProjectionEFGCNEvent12EFGCN);
 	initProjectionEFGCNEvent13EFGCNAnalysis(parameters.initProjectionEFGCNEvent13EFGCN);
 	initProjectionEFGCNEvent32EFGCNAnalysis(parameters.initProjectionEFGCNEvent32EFGCN);
@@ -1506,6 +1549,7 @@ void analysis::init(initialParameter parameters,
 	initMomentumEventAnalysis(parameters.initMomentumEvent);
 	initMomentumTotalAnalysis(parameters.initMomentumTotal);
 	initMomentumAnalysisDisplay(parameters.initMomentumDisplay);
+
 	initProjectionEventAnalysis(parameters.initProjectionEvent);
 	initProjectionTotalAnalysis(parameters.initProjectionTotal);
 	initProjectionAnalysisDisplay(parameters.initProjectionDisplay);
@@ -1515,12 +1559,12 @@ void analysis::init(initialParameter parameters,
 
 	initMagnetfieldConstantAnalysis(parameters.initMagnetfieldFactors);
 	initMagnetfieldConstantAnalysisDisplay(parameters.initMagnetfieldFactorDisplay);
+
 	initMagnetfieldXAnalysis(parameters.initMagnetfieldX);
 	initMagnetfieldYAnalysis(parameters.initMagnetfieldY);
 	initMagnetfieldZAnalysis(parameters.initMagnetfieldZ);
 
 	initMagnetfieldAnalysisDisplay(parameters.initMagnetfieldDisplay);
-
 	initMagnetfieldAnalysisToRoot(fileParameters.initMagnetfieldToRoot, fileParameters.name);
 
 	initHistogramAnalysis(fileParameters.initCreatedHistogramToRoot | fileParameters.initEncodedHistogramToRoot | fileParameters.initFilteredHistogramToRoot, parameters.histogram);
@@ -1528,7 +1572,6 @@ void analysis::init(initialParameter parameters,
 
 	initPrelutRangeAnalysis(parameters.initPrelutRange);
 	initPrelutRangeAnalysisDisplay(parameters.initPrelutRangeDisplay, parameters.initPrelutRangeDisplayMode);
-
 	initPrelutRangeAnalysisToRoot(fileParameters.initPrelutRangeToRoot, fileParameters.name);
 
 	initHardwareTracksPerColumnAnalysis(parameters.initTracksPerColumn);
@@ -1988,6 +2031,99 @@ void analysis::evaluateAlgorithm(std::streambuf* terminal) {
 	terminalFinalize(statusSequenceForRealTracks);
 
 	finalizeAlgorithmEvaluation();
+
+}
+
+/****************************************************************
+ * method evaluates the track propagation goodness.				*
+ ****************************************************************/
+
+void analysis::evaluateTrackPropagationGoodness(std::streambuf* terminal) {
+
+	terminalSequence                         statusSequenceForTrackPropagation;
+	trackfinderInputTrack*                   track;
+	trackMomentum                            momentum;
+	rungeKuttaInterface                      computationFormula;
+	std::list<trackfinderInputHit>           propagatedHits;
+	trackfinderInputHit*                     trackHit;
+	std::list<trackfinderInputHit>::iterator propagatedHit;
+
+	if (eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+	if (*eventData == NULL)
+		throw cannotAccessEventDataError(ANALYSISLIB);
+
+	if (trackPropagationAnalyser == NULL)
+		throw cannotAccessTrackPropagationAnalyserError();
+
+	computationFormula.init((*eventData)->getDetectorPointer());
+
+	createTerminalStatusSequence(&statusSequenceForTrackPropagation, terminal, "\nAnalyse track propagation goodness:\t\t", (*eventData)->getNumberOfTracks());
+	terminalInitialize(statusSequenceForTrackPropagation);
+
+	trackPropagationAnalyser->initializeEvaluation();
+	/* Loop over all MCTracks to compute the propagation and compare to the hit and point positions */
+	for (int i = 0; i < (*eventData)->getNumberOfTracks(); i++) {
+
+		/* get each track */
+		track = (*eventData)->getTrackByOrder(i);
+		if (track == NULL)
+			throw cannotAccessHitsOrTracksError(ANALYSISLIB);
+
+		/* test if the track is a findable one */
+		if (isFindableStandardTrack(track)) {
+
+			/* propagate the track */
+			momentum.set(track->getMomX(), PX);
+			momentum.set(track->getMomY(), PY);
+			momentum.set(track->getMomZ(), PZ);
+			propagatedHits = computationFormula.evaluate(momentum, track->getCharge());
+
+			/* compare the positions */
+			track->resetHitPointer();
+			for (unsigned short j = 0; j < track->getNumberOfHits(); j++) {
+
+				trackHit = track->getHit();
+				if (trackHit == NULL)
+					throw cannotAccessHitsOrTracksError(ANALYSISLIB);
+
+				if (trackHit->getStation() != NULL) {
+
+					if (!trackHit->getStation()->isMasked()) {
+
+						/* search for the corresponding propagated hit */
+						for (propagatedHit = propagatedHits.begin(); propagatedHit != propagatedHits.end();  propagatedHit++) {
+
+							if (propagatedHit->getStationId() == trackHit->getStationId())
+								break;
+
+						}
+
+						if (propagatedHit != propagatedHits.end()) {
+
+							/* do the comparisson and add the value to the graphic objects */
+							trackPropagationAnalyser->addHitDistance(trackHit->getStation()->getIndex(), sqrt(sqr(trackHit->getPosX() - propagatedHit->getPosX()) + sqr(trackHit->getPosY() - propagatedHit->getPosY()) + sqr(trackHit->getPosZ() - propagatedHit->getPosZ())));
+
+							if (trackHit->getPoint() != NULL) {
+								trackPropagationAnalyser->addPointDistance(trackHit->getStation()->getIndex(), sqrt(sqr(trackHit->getPoint()->GetX() - propagatedHit->getPosX()) + sqr(trackHit->getPoint()->GetY() - propagatedHit->getPosY()) + sqr(trackHit->getPoint()->GetZ() - propagatedHit->getPosZ())));
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		terminalOverwriteWithIncrement(statusSequenceForTrackPropagation);
+
+	}
+	trackPropagationAnalyser->finalizeEvaluation();
+
+	terminalFinalize(statusSequenceForTrackPropagation);
 
 }
 
@@ -3789,7 +3925,7 @@ void analysis::evaluateHoughTransformGoodness(std::streambuf* terminal) {
 
 		if (evaluateTrackPatternCoding(bestCellSignature.value) > minimumClass) {
 
-			formula.evaluateP(bestCellSignature.pos, *(*space), &momentum);
+			formula.evaluateP(bestCellSignature.pos, *(*space), &momentum, NULL);
 
 			absoluteHitMomentum = formula.evaluateAbsP(momentum);
 
@@ -4521,6 +4657,300 @@ void analysis::initAutomaticFilterGeometryAnalysis(histogramData** histogram, bo
 		if (peakfindingGeometryAnalyser != NULL) {
 			delete peakfindingGeometryAnalyser;
 			peakfindingGeometryAnalyser = NULL;
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * method initializes the number of displays.					*
+ ****************************************************************/
+
+void analysis::initTrackPropagationNumberOfDisplays(unsigned short numberOfDisplays) {
+
+	if (trackPropagationAnalyser != NULL)
+		trackPropagationAnalyser->initNumberOfDisplays(numberOfDisplays);
+	else
+		throw cannotAccessTrackPropagationAnalyserError();
+
+}
+
+/****************************************************************
+ * method initializes the track-propagation-Analysis.			*
+ ****************************************************************/
+
+void analysis::initTrackPropagationEventPointAnalysis(bool enable) {
+
+	if (enable) {
+
+		if (trackPropagationAnalyser == NULL)
+			trackPropagationAnalyser = new trackPropagationAnalysis();
+
+		trackPropagationAnalyser->initTrackPropagationEventPointAnalysis(enable);
+
+	}
+	else {
+
+		if (trackPropagationAnalyser != NULL) {
+
+			trackPropagationAnalyser->initTrackPropagationEventPointAnalysis(enable);
+
+			if (!isTrackPropagationEventAnalysisEnabled() && !isTrackPropagationTotalAnalysisEnabled()) {
+				delete trackPropagationAnalyser;
+				trackPropagationAnalyser = NULL;
+			}
+
+		}
+
+	}
+
+}
+void analysis::initTrackPropagationEventHitAnalysis(bool enable) {
+
+	if (enable) {
+
+		if (trackPropagationAnalyser == NULL)
+			trackPropagationAnalyser = new trackPropagationAnalysis();
+
+		trackPropagationAnalyser->initTrackPropagationEventHitAnalysis(enable);
+
+	}
+	else {
+
+		if (trackPropagationAnalyser != NULL) {
+
+			trackPropagationAnalyser->initTrackPropagationEventHitAnalysis(enable);
+
+			if (!isTrackPropagationEventAnalysisEnabled() && !isTrackPropagationTotalAnalysisEnabled()) {
+				delete momentumAnalyser;
+				momentumAnalyser = NULL;
+			}
+
+		}
+
+	}
+
+}
+void analysis::initTrackPropagationTotalPointAnalysis(bool enable) {
+
+	if (enable) {
+
+		if (trackPropagationAnalyser == NULL)
+			trackPropagationAnalyser = new trackPropagationAnalysis();
+
+		trackPropagationAnalyser->initTrackPropagationTotalPointAnalysis(enable);
+
+	}
+	else {
+
+		if (trackPropagationAnalyser != NULL) {
+
+			trackPropagationAnalyser->initTrackPropagationTotalPointAnalysis(enable);
+
+			if (!isTrackPropagationEventAnalysisEnabled() && !isTrackPropagationTotalAnalysisEnabled()) {
+				delete momentumAnalyser;
+				momentumAnalyser = NULL;
+			}
+
+		}
+
+	}
+
+}
+void analysis::initTrackPropagationTotalHitAnalysis(bool enable) {
+
+	if (enable) {
+
+		if (trackPropagationAnalyser == NULL)
+			trackPropagationAnalyser = new trackPropagationAnalysis();
+
+		trackPropagationAnalyser->initTrackPropagationTotalHitAnalysis(enable);
+
+	}
+	else {
+
+		if (trackPropagationAnalyser != NULL) {
+
+			trackPropagationAnalyser->initTrackPropagationTotalHitAnalysis(enable);
+
+			if (!isTrackPropagationEventAnalysisEnabled() && !isTrackPropagationTotalAnalysisEnabled()) {
+				delete momentumAnalyser;
+				momentumAnalyser = NULL;
+			}
+
+		}
+
+	}
+
+}
+
+/****************************************************************
+ * This method initializes the root directory for the displays.	*
+ ****************************************************************/
+
+void analysis::initTrackPropagationAnalysisToRoot(bool enable, const char* name) {
+
+	bool justUpdate;
+
+	if ((name == NULL) || (strcmp(name, "") == 0)) {
+
+		noAnalysisOutputFileNameSpecifiedWarningMsg* noAnalysisMomentumOutputFileNameSpecified = new noAnalysisOutputFileNameSpecifiedWarningMsg();
+		noAnalysisMomentumOutputFileNameSpecified->warningMsg();
+		if(noAnalysisMomentumOutputFileNameSpecified != NULL) {
+			delete noAnalysisMomentumOutputFileNameSpecified;
+			noAnalysisMomentumOutputFileNameSpecified = NULL;
+		}
+
+	}
+	else {
+
+		justUpdate = false;
+		if (trackPropagationAnalyser != NULL) {
+			if (momentumAnalyser != NULL)
+				justUpdate |= momentumAnalyser->isMomentumToRootEnabled();
+			if (projectionAnalyser != NULL)
+				justUpdate |= projectionAnalyser->isProjectionToRootEnabled();
+			if (magnetfieldAnalyser != NULL)
+				justUpdate |= magnetfieldAnalyser->isMagnetfieldToRootEnabled();
+			if (histogramAnalyser != NULL)
+				justUpdate |= histogramAnalyser->isHistogramToRootEnabled();
+			if (magnetfieldFactorAnalyser != NULL)
+				justUpdate |= magnetfieldFactorAnalyser->isMagnetfieldFactorToRootEnabled();
+			if (prelutRangeLayerAnalyser != NULL)
+				justUpdate |= prelutRangeLayerAnalyser->isPrelutRangeToRootEnabled();
+			trackPropagationAnalyser->initTrackPropagationAnalysisToRoot(enable, name, justUpdate);
+		}
+
+#ifdef ENABLEALLWARNINGS
+
+		else {
+
+			cannotUseToRootBeforeInitializingWarningMsg* cannotUseToRootBeforeInitializing = new cannotUseToRootBeforeInitializingWarningMsg();
+			cannotUseToRootBeforeInitializing->warningMsg();
+			if(cannotUseToRootBeforeInitializing != NULL) {
+				delete cannotUseToRootBeforeInitializing;
+				cannotUseToRootBeforeInitializing = NULL;
+			}
+
+		}
+
+#endif
+
+	}
+
+}
+
+/****************************************************************
+ * This method initializes the track propagation's display.		*
+ ****************************************************************/
+
+void analysis::initTrackPropagationAnalysisDisplay(bool enable) {
+
+	if (enable) {
+
+		if (momentumAnalyser != NULL) {
+
+			if (momentumAnalyser->isMomentumDisplayEnabled()) {
+
+				momentumAnalyser->initMomentumAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
+		if (projectionAnalyser != NULL) {
+
+			if (projectionAnalyser->isProjectionDisplayEnabled()) {
+
+				projectionAnalyser->initProjectionAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
+		if (magnetfieldAnalyser != NULL) {
+
+			if (magnetfieldAnalyser->isMagnetfieldDisplayEnabled()) {
+
+				magnetfieldAnalyser->initMagnetfieldAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
+		if (magnetfieldFactorAnalyser != NULL) {
+
+			if (magnetfieldFactorAnalyser->isMagnetfieldFactorDisplayEnabled()) {
+
+				magnetfieldFactorAnalyser->initMagnetfieldFactorAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
+		if (prelutRangeLayerAnalyser != NULL) {
+
+			if (prelutRangeLayerAnalyser->isPrelutRangeDisplayEnabled()) {
+
+				prelutRangeLayerAnalyser->initPrelutRangeAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
+		if (trackPropagationAnalyser == NULL)
+			trackPropagationAnalyser = new trackPropagationAnalysis();
+
+		trackPropagationAnalyser->initTrackPropagationAnalysisDisplay(enable);
+
+	}
+	else {
+
+		if (trackPropagationAnalyser != NULL) {
+
+			trackPropagationAnalyser->initTrackPropagationAnalysisDisplay(enable);
+
+			if ((!trackPropagationAnalyser->isTrackPropagationEventAnalysisEnabled()) && (!trackPropagationAnalyser->isTrackPropagationTotalAnalysisEnabled())) {
+				delete trackPropagationAnalyser;
+				trackPropagationAnalyser = NULL;
+			}
+
 		}
 
 	}
@@ -6409,6 +6839,8 @@ void analysis::initMomentumAnalysisToRoot(bool enable, const char* name) {
 
 		justUpdate = false;
 		if (momentumAnalyser != NULL) {
+			if (trackPropagationAnalyser != NULL)
+				justUpdate |= trackPropagationAnalyser->isTrackPropagationToRootEnabled();
 			if (projectionAnalyser != NULL)
 				justUpdate |= projectionAnalyser->isProjectionToRootEnabled();
 			if (magnetfieldAnalyser != NULL)
@@ -6463,6 +6895,8 @@ void analysis::initProjectionAnalysisToRoot(bool enable, const char* name) {
 
 		justUpdate = false;
 		if (projectionAnalyser != NULL) {
+			if (trackPropagationAnalyser != NULL)
+				justUpdate |= trackPropagationAnalyser->isTrackPropagationToRootEnabled();
 			if (momentumAnalyser != NULL)
 				justUpdate |= momentumAnalyser->isMomentumToRootEnabled();
 			if (magnetfieldAnalyser != NULL)
@@ -6571,6 +7005,23 @@ void analysis::initMomentumAnalysisDisplay(bool enable) {
 
 		}
 
+		if (trackPropagationAnalyser != NULL) {
+
+			if (trackPropagationAnalyser->isTrackPropagationDisplayEnabled()) {
+
+				trackPropagationAnalyser->initTrackPropagationAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
 		if (momentumAnalyser == NULL)
 			momentumAnalyser = new momentumAnalysis();
 
@@ -6658,6 +7109,23 @@ void analysis::initProjectionAnalysisDisplay(bool enable) {
 			if (prelutRangeLayerAnalyser->isPrelutRangeDisplayEnabled()) {
 
 				prelutRangeLayerAnalyser->initPrelutRangeAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
+		if (trackPropagationAnalyser != NULL) {
+
+			if (trackPropagationAnalyser->isTrackPropagationDisplayEnabled()) {
+
+				trackPropagationAnalyser->initTrackPropagationAnalysisDisplay(false);
 
 				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
 				enableJustOneDisplay->warningMsg();
@@ -7146,6 +7614,8 @@ void analysis::initMagnetfieldAnalysisToRoot(bool enable, const char* name) {
 
 		justUpdate = false;
 		if (magnetfieldAnalyser != NULL) {
+			if (trackPropagationAnalyser != NULL)
+				justUpdate |= trackPropagationAnalyser->isTrackPropagationToRootEnabled();
 			if (momentumAnalyser != NULL)
 				justUpdate |= momentumAnalyser->isMomentumToRootEnabled();
 			if (projectionAnalyser != NULL)
@@ -7254,6 +7724,23 @@ void analysis::initMagnetfieldAnalysisDisplay(bool enable) {
 
 		}
 
+		if (trackPropagationAnalyser != NULL) {
+
+			if (trackPropagationAnalyser->isTrackPropagationDisplayEnabled()) {
+
+				trackPropagationAnalyser->initTrackPropagationAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
 		if (magnetfieldAnalyser == NULL)
 			magnetfieldAnalyser = new magnetfieldAnalysis();
 
@@ -7299,6 +7786,8 @@ void analysis::initMagnetfieldConstantAnalysisToRoot(bool enable, const char* na
 
 		justUpdate = false;
 		if (magnetfieldFactorAnalyser != NULL) {
+			if (trackPropagationAnalyser != NULL)
+				justUpdate |= trackPropagationAnalyser->isTrackPropagationToRootEnabled();
 			if (momentumAnalyser != NULL)
 				justUpdate |= momentumAnalyser->isMomentumToRootEnabled();
 			if (projectionAnalyser != NULL)
@@ -7395,6 +7884,23 @@ void analysis::initMagnetfieldConstantAnalysisDisplay(bool enable) {
 			if (prelutRangeLayerAnalyser->isPrelutRangeDisplayEnabled()) {
 
 				prelutRangeLayerAnalyser->initPrelutRangeAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
+		if (trackPropagationAnalyser != NULL) {
+
+			if (trackPropagationAnalyser->isTrackPropagationDisplayEnabled()) {
+
+				trackPropagationAnalyser->initTrackPropagationAnalysisDisplay(false);
 
 				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
 				enableJustOneDisplay->warningMsg();
@@ -7543,6 +8049,8 @@ void analysis::initPrelutRangeAnalysisToRoot(bool enable, const char* name) {
 
 		justUpdate = false;
 		if (prelutRangeLayerAnalyser != NULL) {
+			if (trackPropagationAnalyser != NULL)
+				justUpdate |= trackPropagationAnalyser->isTrackPropagationToRootEnabled();
 			if (momentumAnalyser != NULL)
 				justUpdate |= momentumAnalyser->isMomentumToRootEnabled();
 			if (projectionAnalyser != NULL)
@@ -7651,6 +8159,23 @@ void analysis::initPrelutRangeAnalysisDisplay(bool enable, unsigned short displa
 
 		}
 
+		if (trackPropagationAnalyser != NULL) {
+
+			if (trackPropagationAnalyser->isTrackPropagationDisplayEnabled()) {
+
+				trackPropagationAnalyser->initTrackPropagationAnalysisDisplay(false);
+
+				enableJustOneDisplayWarningMsg* enableJustOneDisplay = new enableJustOneDisplayWarningMsg();
+				enableJustOneDisplay->warningMsg();
+				if(enableJustOneDisplay != NULL) {
+					delete enableJustOneDisplay;
+					enableJustOneDisplay = NULL;
+				}
+
+			}
+
+		}
+
 		if (prelutRangeLayerAnalyser == NULL)
 			prelutRangeLayerAnalyser = new prelutRangeLayerAnalysis();
 
@@ -7724,6 +8249,8 @@ void analysis::initHistogramAnalysis(bool enableCreated, bool enableEncoded, boo
 
 		justUpdate = false;
 		if (histogramAnalyser != NULL) {
+			if (trackPropagationAnalyser != NULL)
+				justUpdate |= trackPropagationAnalyser->isTrackPropagationToRootEnabled();
 			if (momentumAnalyser != NULL)
 				justUpdate |= momentumAnalyser->isMomentumToRootEnabled();
 			if (projectionAnalyser != NULL)
@@ -7837,6 +8364,36 @@ bool analysis::isAutomaticFilterGeometryAnalysisEnabled() {
 }
 
 /****************************************************************
+ * method returns true if the track-propagation-Analysis is		*
+ * enabled.														*
+ ****************************************************************/
+
+bool analysis::isTrackPropagationEventAnalysisEnabled() {
+
+	bool returnValue;
+
+	if (trackPropagationAnalyser != NULL)
+		returnValue = trackPropagationAnalyser->isTrackPropagationEventAnalysisEnabled();
+	else
+		returnValue = false;
+
+	return returnValue;
+
+}
+bool analysis::isTrackPropagationTotalAnalysisEnabled() {
+
+	bool returnValue;
+
+	if (trackPropagationAnalyser != NULL)
+		returnValue = trackPropagationAnalyser->isTrackPropagationTotalAnalysisEnabled();
+	else
+		returnValue = false;
+
+	return returnValue;
+
+}
+
+/****************************************************************
  * method returns true if the quality-Analysis for each event	*
  * is enabled.													*
  ****************************************************************/
@@ -7937,6 +8494,24 @@ bool analysis::isProjectionEFGCNTotalAnalysisEnabled() {
 
 	if (projectionAnalyser != NULL)
 		returnValue = (projectionAnalyser->isProjectionEFGCNTotal12AnalysisEnabled() || projectionAnalyser->isProjectionEFGCNTotal13AnalysisEnabled() || projectionAnalyser->isProjectionEFGCNTotal32AnalysisEnabled());
+	else
+		returnValue = false;
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * method returns true if the track-propagation-to-root-		*
+ * analysis is enabled.											*
+ ****************************************************************/
+
+bool analysis::isTrackPropagationToRootEnabled() {
+
+	bool returnValue;
+
+	if (trackPropagationAnalyser != NULL)
+		returnValue = trackPropagationAnalyser->isTrackPropagationToRootEnabled();
 	else
 		returnValue = false;
 
@@ -8115,6 +8690,72 @@ std::string analysis::getRelativeQualityEFGCTotalAnalysis() {
 		returnValue = "";
 
 	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns true if the track-propagation's display	*
+ * is enabled.													*
+ ****************************************************************/
+
+bool analysis::isTrackPropagationDisplayEnabled() {
+
+	bool returnValue;
+
+	if (trackPropagationAnalyser != NULL)
+		returnValue = trackPropagationAnalyser->isTrackPropagationDisplayEnabled();
+	else
+		returnValue = false;
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * method updates the track-propagation-Analysis display.		*
+ ****************************************************************/
+
+void analysis::trackPropagationAnalysisUpdate() {
+
+	if (trackPropagationAnalyser != NULL) {
+
+		trackPropagationAnalyser->trackPropagationAnalysisUpdate();
+	
+	}
+	else {
+
+		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
+		displayAnalyserNotFound->warningMsg();
+		if(displayAnalyserNotFound != NULL) {
+			delete displayAnalyserNotFound;
+			displayAnalyserNotFound = NULL;
+		}
+	
+	}
+
+}
+
+/****************************************************************
+ * method draws the track-propagation-Analysis display.			*
+ ****************************************************************/
+
+void analysis::trackPropagationAnalysisDraw(bitArray preventPointDraw, bitArray preventHitDraw) {
+
+	if (trackPropagationAnalyser != NULL) {
+
+		trackPropagationAnalyser->trackPropagationAnalysisDraw(preventPointDraw, preventHitDraw);
+
+	}
+	else {
+
+		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
+		displayAnalyserNotFound->warningMsg();
+		if(displayAnalyserNotFound != NULL) {
+			delete displayAnalyserNotFound;
+			displayAnalyserNotFound = NULL;
+		}
+	
+	}
 
 }
 
@@ -8540,6 +9181,51 @@ void analysis::prelutRangeAnalysisDraw(bitArray preventStationDraw, bool prevent
 }
 
 /****************************************************************
+ * method writes the track-propagation-Analysis into			*
+ * a root file.													*
+ ****************************************************************/
+
+void analysis::trackPropagationEventAnalysisWrite(int eventNumber) {
+
+	if (trackPropagationAnalyser != NULL) {
+
+		if (trackPropagationAnalyser->isTrackPropagationToRootEnabled())
+			trackPropagationAnalyser->trackPropagationEventAnalysisWrite(eventNumber);
+
+	}
+	else {
+
+		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
+		displayAnalyserNotFound->warningMsg();
+		if(displayAnalyserNotFound != NULL) {
+			delete displayAnalyserNotFound;
+			displayAnalyserNotFound = NULL;
+		}
+	
+	}
+
+}
+void analysis::trackPropagationTotalAnalysisWrite(int eventNumber) {
+
+	if (trackPropagationAnalyser != NULL) {
+
+		if (trackPropagationAnalyser->isTrackPropagationToRootEnabled())
+			trackPropagationAnalyser->trackPropagationTotalAnalysisWrite(eventNumber);
+
+	}
+	else {
+
+		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
+		displayAnalyserNotFound->warningMsg();
+		if(displayAnalyserNotFound != NULL) {
+			delete displayAnalyserNotFound;
+			displayAnalyserNotFound = NULL;
+		}
+	
+	}
+
+}
+/****************************************************************
  * method writes the momentumEvent-Analysis for each event into	*
  * a root file.													*
  ****************************************************************/
@@ -8707,6 +9393,7 @@ void analysis::prelutRangeAnalysisWrite(int eventNumber) {
 	}
 
 }
+
 /****************************************************************
  * method initializes the momentumEFGCEventAnalysis.			*
  ****************************************************************/
@@ -10461,7 +11148,7 @@ std::string analysis::displayFoundTracks(int trackIndex) {
 
 			if (analysisMoreResultDisplays & FOUNDTRACKVISUALIZATION) {
 
-				formula.evaluateP(hitInfo.position, *(*space), &momentum);
+				formula.evaluateP(hitInfo.position, *(*space), &momentum, NULL);
 				foundTrackVisualAnalyser->addActualTrack(trackIndex, momentum.get(PX), momentum.get(PY), momentum.get(PZ), hitInfo.position.get(DIM1), hitInfo.position.get(DIM2), hitInfo.position.get(DIM3));
 			
 				for (j = 0; j < (*eventData)->getNumberOfStations(); j++) {

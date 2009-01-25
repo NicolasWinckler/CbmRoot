@@ -672,3 +672,34 @@ void cannotAccessIndicatorsError::errorMsg() {
 	printMsg("The indicators object is not accessible!!!");
 
 }
+
+
+/****************************************************************
+ * CLASS trackPropagationEngineIsNotDefinedError				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+trackPropagationEngineIsNotDefinedError::trackPropagationEngineIsNotDefinedError() : dataRootObjectError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+trackPropagationEngineIsNotDefinedError::~trackPropagationEngineIsNotDefinedError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void trackPropagationEngineIsNotDefinedError::errorMsg() {
+
+	printMsg("The track propagation engine is not defined!!!");
+
+}

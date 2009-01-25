@@ -43,6 +43,7 @@
 #include "../../DataRootObjectLIB/include/tables.h"
 #include "../../DataRootObjectLIB/include/findableTrack.h"
 #include "../../LutGeneratorLIB/include/lutImplementation.h"
+#include "trackPropagationAnalysis.h"
 #include "qualityAnalysis.h"
 #include "momentumAnalysis.h"
 #include "projectionAnalysis.h"
@@ -93,6 +94,12 @@ typedef struct {
 	bool                   initClassPriority;
 	bool                   initMemory;
 	bool                   initTime;
+	/* track propagation analysis enable */
+	bool                   initPropagationEventPoint;
+	bool                   initPropagationEventHit;
+	bool                   initPropagationTotalPoint;
+	bool                   initPropagationTotalHit;
+	bool                   initPropagationDisplay;
 	/* EFGC analysis enable*/
 	bool                   initQualityEFGCEventAbsolute;
 	bool                   initQualityEFGCEventRelative;
@@ -153,6 +160,8 @@ static const initialParameter defaultParameters = {
 	false,
 	/* configuration information enable */
 	false, false, true, true, false, false,
+	/* track propagation analysis enable */
+	false, false, false, false, false,
 	/* EFGC analysis enable*/
 	false, true, true, true, true, true, true, true, false, false, false, false, false, false,
 	/* EFGC analysis display enable */
@@ -176,6 +185,8 @@ typedef struct {
 
 	/* filename */
 	const char* name;
+	/* track propagation analysis enable */
+	bool initPropagationToRoot;
 	/* EFGC graphic displays */
 	bool initMomentumToRoot;
 	bool initProjectionToRoot;
@@ -198,10 +209,12 @@ static const initialFileParameter defaultFileParameters = {
 
 	/* filename */
 	NULL,
+	/* track propagation displays */
+	false,
 	/* EFGC graphic displays */
-	true,
+	false,
 	/* magnetfield displays */
-	true,
+	false,
 	/* histogram layer */
 	false,
 	false,
@@ -224,49 +237,50 @@ class analysis {
 
 protected:
 
-	trackfinderInputData**       eventData;						/**< Object for accessing the input data. */
-	trackData**                  tracks;							/**< Object for accessing the computed tracks. */
-	tables**                     ratings;							/**< Object to access the tables to do the ratings. */
-	histogramSpace**             space;							/**< Object to store the needed values to compute the trackParameter object based on the trackCoordinates object. */
-	lutImplementation**          luts;							/**< Object to make both neccessary look-up-tables accessible. */
-	qualityAnalysis*             qualityAnalyser;					/**< Object for analysing the quality and writing on the standard output stream. */
-	momentumAnalysis*            momentumAnalyser;				/**< Object for analysing the quality and displaying it with ROOT graphics. */
-	projectionAnalysis*          projectionAnalyser;				/**< Object for analysing the occupancy of the histogram and displaying it with ROOT graphics. */
-	magnetfieldAnalysis*         magnetfieldAnalyser;				/**< Object for analysing the magnetfield and displaying it with ROOT graphics. */
-	magnetfieldFactorAnalysis*   magnetfieldFactorAnalyser;		/**< Object for analysing the magnetfield factor and displaying it with ROOT graphics. */
-	prelutRangeLayerAnalysis*    prelutRangeLayerAnalyser;        /**< Object for analysing the prelut range and displaying it with ROOT graphics. */
-	histogramAnalysis*           histogramAnalyser;				/**< Object for analysing the histogram. */
-	showAnalysis*                showAnalyser;					/**< Object for showing and displaying some analysis it with ROOT graphics. */
-	totalAnalysis*               totalAnalyser;					/**< Object for evalution and showing of some total summaries of analysis results which cannot be evaluated and shown by the analysis itself. */
-	hardwareAnalysis*            hardwareAnalyser;				/**< Object for analysing the hardware prerequisites. */
-	visualAnalysis*              mcTrackVisualAnalyser;			/**< Object for visualizing the MCTracks with the corresponding hits.*/
-	visualAnalysis*              foundTrackVisualAnalyser;		/**< Object for visualizing the found tracks with the corresponding hits.*/
-	peakfindingGeometryAnalysis* peakfindingGeometryAnalyser;			/**< Object for analysing an automatic filter geometry. */
-	double                       minimumP;						/**< Variable which defines the minimum momentum for a track which should be found. */
-	bool                         configuration;					/**< Variable for enabling the configuration summary printed to the standard output stream. */
-	bool                         detector;						/**< Variable for enabling the detector summary printed to the standard output stream. */
-	bool                         event;							/**< Variable for enabling the event summary printed to the standard output stream. */
-	bool                         classPriority;					/**< Variable for enabling the class summary printed to the standard output stream. */
-	bool                         memory;							/**< Variable for enabling the memory summary printed to the standard output stream. */
-	bool                         time;							/**< Variable for enabling the time summary printed to the standard output stream. */
-	unsigned short               percentageOfHitsInSignature;		/**< Variable to store the percentage of the number of hits which must be found to accept the signature. */
-	unsigned short               percentageOfTracksForSignature;	/**< Variable to store the percentage of the real tracks which must be found with the accepted signatures. */
-	unsigned long                analysisResultWarnings;			/**< Variable to store which result of an analysis should be printed on the standard output screen by a warning message. */
-	unsigned long                analysisResultDisplays;			/**< Variable to store which result of an analysis should be displayed with a graphical output screen. */
-	unsigned long                analysisMoreResultWarnings;		/**< Variable to store which result of an analysis should be printed on the standard output screen by a warning message. */
-	unsigned long                analysisMoreResultDisplays;		/**< Variable to store which result of an analysis should be displayed with a graphical output screen. */
-	houghPictures*               pictures;						/**< Object which draws the pictures for different Hough transforms. This pictures are static and are just needed fort he thesis. */
-	TStopwatch*                  borderCreationTimer;				/**< Object to store the time for creating the borders for one event */
-	TStopwatch*                  histogramCreationTimer;			/**< Object to store the time for creating the histogram layers for one event */
-	TStopwatch*                  histogramEncodingTimer;			/**< Object to store the time for encoding the histogram layers for one event */
-	TStopwatch*                  histogramDiagonalizingTimer;		/**< Object to store the time for diagonalizing the histogram layers for one event */
-	TStopwatch*                  histogramPeakfindingTimer;		/**< Object to store the time for peak finding in the histogram layers for one event */
-	TStopwatch*                  histogramFinalizingTimer;		/**< Object to store the time for finalizing the histogram layers for one event */
-	TStopwatch*                  histogramResettingTimer;			/**< Object to store the time for resetting the histogram layers for one event */
-	TStopwatch*                  trackPeakfindingTimer;			/**< Object to store the time for peak finding in the track candidates of neighbored layers for one event */
-	double                       reservedSizeOfLBufferData;		/**< Variable to store the reserved size of the LBuffer data */
-	double                       allocatedSizeOfLBufferData;		/**< Variable to store the allocated size of the LBuffer data */
-	double                       usedSizeOfLBufferData;			/**< Variable to store the used size of the LBuffer data */
+	trackfinderInputData**            eventData;						/**< Object for accessing the input data. */
+	trackData**                       tracks;							/**< Object for accessing the computed tracks. */
+	tables**                          ratings;							/**< Object to access the tables to do the ratings. */
+	histogramSpace**                  space;							/**< Object to store the needed values to compute the trackParameter object based on the trackCoordinates object. */
+	lutImplementation**               luts;								/**< Object to make both neccessary look-up-tables accessible. */
+	trackPropagationAnalysis*         trackPropagationAnalyser;			/**< Object for analysing the track propagation quality */
+	qualityAnalysis*                  qualityAnalyser;					/**< Object for analysing the quality and writing on the standard output stream. */
+	momentumAnalysis*                 momentumAnalyser;					/**< Object for analysing the quality and displaying it with ROOT graphics. */
+	projectionAnalysis*               projectionAnalyser;				/**< Object for analysing the occupancy of the histogram and displaying it with ROOT graphics. */
+	magnetfieldAnalysis*              magnetfieldAnalyser;				/**< Object for analysing the magnetfield and displaying it with ROOT graphics. */
+	magnetfieldFactorAnalysis*        magnetfieldFactorAnalyser;		/**< Object for analysing the magnetfield factor and displaying it with ROOT graphics. */
+	prelutRangeLayerAnalysis*         prelutRangeLayerAnalyser;			/**< Object for analysing the prelut range and displaying it with ROOT graphics. */
+	histogramAnalysis*                histogramAnalyser;				/**< Object for analysing the histogram. */
+	showAnalysis*                     showAnalyser;						/**< Object for showing and displaying some analysis it with ROOT graphics. */
+	totalAnalysis*                    totalAnalyser;					/**< Object for evalution and showing of some total summaries of analysis results which cannot be evaluated and shown by the analysis itself. */
+	hardwareAnalysis*                 hardwareAnalyser;					/**< Object for analysing the hardware prerequisites. */
+	visualAnalysis*                   mcTrackVisualAnalyser;			/**< Object for visualizing the MCTracks with the corresponding hits.*/
+	visualAnalysis*                   foundTrackVisualAnalyser;			/**< Object for visualizing the found tracks with the corresponding hits.*/
+	peakfindingGeometryAnalysis*      peakfindingGeometryAnalyser;		/**< Object for analysing an automatic filter geometry. */
+	double                            minimumP;							/**< Variable which defines the minimum momentum for a track which should be found. */
+	bool                              configuration;					/**< Variable for enabling the configuration summary printed to the standard output stream. */
+	bool                              detector;							/**< Variable for enabling the detector summary printed to the standard output stream. */
+	bool                              event;							/**< Variable for enabling the event summary printed to the standard output stream. */
+	bool                              classPriority;					/**< Variable for enabling the class summary printed to the standard output stream. */
+	bool                              memory;							/**< Variable for enabling the memory summary printed to the standard output stream. */
+	bool                              time;								/**< Variable for enabling the time summary printed to the standard output stream. */
+	unsigned short                    percentageOfHitsInSignature;		/**< Variable to store the percentage of the number of hits which must be found to accept the signature. */
+	unsigned short                    percentageOfTracksForSignature;	/**< Variable to store the percentage of the real tracks which must be found with the accepted signatures. */
+	unsigned long                     analysisResultWarnings;			/**< Variable to store which result of an analysis should be printed on the standard output screen by a warning message. */
+	unsigned long                     analysisResultDisplays;			/**< Variable to store which result of an analysis should be displayed with a graphical output screen. */
+	unsigned long                     analysisMoreResultWarnings;		/**< Variable to store which result of an analysis should be printed on the standard output screen by a warning message. */
+	unsigned long                     analysisMoreResultDisplays;		/**< Variable to store which result of an analysis should be displayed with a graphical output screen. */
+	houghPictures*                    pictures;							/**< Object which draws the pictures for different Hough transforms. This pictures are static and are just needed fort he thesis. */
+	TStopwatch*                       borderCreationTimer;				/**< Object to store the time for creating the borders for one event */
+	TStopwatch*                       histogramCreationTimer;			/**< Object to store the time for creating the histogram layers for one event */
+	TStopwatch*                       histogramEncodingTimer;			/**< Object to store the time for encoding the histogram layers for one event */
+	TStopwatch*                       histogramDiagonalizingTimer;		/**< Object to store the time for diagonalizing the histogram layers for one event */
+	TStopwatch*                       histogramPeakfindingTimer;		/**< Object to store the time for peak finding in the histogram layers for one event */
+	TStopwatch*                       histogramFinalizingTimer;			/**< Object to store the time for finalizing the histogram layers for one event */
+	TStopwatch*                       histogramResettingTimer;			/**< Object to store the time for resetting the histogram layers for one event */
+	TStopwatch*                       trackPeakfindingTimer;			/**< Object to store the time for peak finding in the track candidates of neighbored layers for one event */
+	double                            reservedSizeOfLBufferData;		/**< Variable to store the reserved size of the LBuffer data */
+	double                            allocatedSizeOfLBufferData;		/**< Variable to store the allocated size of the LBuffer data */
+	double                            usedSizeOfLBufferData;			/**< Variable to store the used size of the LBuffer data */
 
 /**
  * method initializes the showAnalysis-object.
@@ -730,6 +744,13 @@ public:
 	void evaluateAlgorithm(std::streambuf* terminal = NULL);
 
 /**
+ * method evaluates the track propagation goodness.
+ * @param terminal is a buffer to place the process information
+ */
+
+	void evaluateTrackPropagationGoodness(std::streambuf* terminal = NULL);
+
+/**
  * method evaluates the magnetfield factors.
  * @param isFirstEvent is used to deliver the information if the event is the first one. It is important for the initial values, if the averagingFactors flag is used
  * @param averagingFactors enables the averaging of the evaluated factors over events
@@ -864,6 +885,38 @@ public:
  */
 
 	void initAutomaticFilterGeometryAnalysis(histogramData** histogram, bool enable = true);
+
+/**
+ * method initializes the number of displays.
+ * @param numberOfDisplays represents the value number
+ */
+
+	void initTrackPropagationNumberOfDisplays(unsigned short numberOfDisplays);
+
+/**
+ * method initializes the qualityEFGCEventAbsolute-Analysis.
+ * @param enable enables or disables this analysis
+ */
+
+	void initTrackPropagationEventPointAnalysis(bool enable = true);
+	void initTrackPropagationEventHitAnalysis(bool enable = true);
+	void initTrackPropagationTotalPointAnalysis(bool enable = true);
+	void initTrackPropagationTotalHitAnalysis(bool enable = true);
+
+/**
+ * This method initializes the root directory for the displays.
+ * @param enable enables or disables this analysis
+ * @param name is the name of the file to place the graphics
+ */
+
+	void initTrackPropagationAnalysisToRoot(bool enable = true, const char* name = NULL);
+
+/**
+ * This method initializes the track propagation's display.
+ * @param enable enables or disables this analysis
+ */
+
+	void initTrackPropagationAnalysisDisplay(bool enable = true);
 
 /**
  * method initializes the qualityEFGCEventAbsolute-Analysis.
@@ -1725,6 +1778,13 @@ public:
 	bool isAutomaticFilterGeometryAnalysisEnabled();
 
 /**
+ * method returns true if the track-propagation-Analysis is enabled.
+ */
+
+	bool isTrackPropagationEventAnalysisEnabled();
+	bool isTrackPropagationTotalAnalysisEnabled();
+
+/**
  * method returns true if the quality-Analysis for each event
  * is enabled.
  */
@@ -1765,6 +1825,12 @@ public:
  */
 
 	bool isProjectionEFGCNTotalAnalysisEnabled();
+
+/**
+ * method returns true if the track-propagation-to-root-analysis is enabled.
+ */
+
+	bool isTrackPropagationToRootEnabled();
 
 /**
  * method returns true if the graphic-to-root-analysis is enabled.
@@ -1813,6 +1879,26 @@ public:
 	std::string getQualityEFGCTotalAnalysis();
 	std::string getAbsoluteQualityEFGCTotalAnalysis();
 	std::string getRelativeQualityEFGCTotalAnalysis();
+
+/**
+ * This method returns true if the track-propagation's display is enabled.
+ */
+
+	bool isTrackPropagationDisplayEnabled();
+
+/**
+ * method updates the track-propagation-Analysis display.
+ */
+
+	void trackPropagationAnalysisUpdate();
+
+/**
+ * method draws the track-propagation-Analysis display.
+ * @param preventPointDraw consists of flags which enables or disables the drawing of the point result displays separately
+ * @param preventHitDraw consists of flags which enables or disables the drawing of the hit result displays separately
+ */
+
+	void trackPropagationAnalysisDraw(bitArray preventPointDraw = 0, bitArray preventHitDraw = 0);
 
 /**
  * method returns true if the graphicAnalysis for each event
@@ -1943,6 +2029,14 @@ public:
  */
 
 	void prelutRangeAnalysisDraw(bitArray preventStationDraw = 0, bool preventStationSumDraw = false, bitArray preventConstraintDraw = 0, bool preventConstraintSumDraw = false, bool preventRelativeDraw = false);
+
+/**
+ * method writes the track-propagation-Analysis into
+ * a root file.
+ */
+
+	void trackPropagationEventAnalysisWrite(int eventNumber);
+	void trackPropagationTotalAnalysisWrite(int eventNumber);
 
 /**
  * method writes the momentumEvent-Analysis for each event into

@@ -818,3 +818,38 @@ public:
 };
 
 #endif
+
+
+#ifndef _CANNOTACCESSTRACKPROPAGATIONANALYSERERROR_H
+#define _CANNOTACCESSTRACKPROPAGATIONANALYSERERROR_H
+
+
+/**
+ * CLASS cannotAccessTrackPropagationAnalyserError
+ */
+
+class cannotAccessTrackPropagationAnalyserError : public analysisError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	cannotAccessTrackPropagationAnalyserError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~cannotAccessTrackPropagationAnalyserError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif

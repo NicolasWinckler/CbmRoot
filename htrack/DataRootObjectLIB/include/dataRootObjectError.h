@@ -669,3 +669,37 @@ public:
 };
 
 #endif
+
+
+#ifndef _TRACKPROPAGATIONENGINEISNOTDEFINEDERROR_H
+#define _TRACKPROPAGATIONENGINEISNOTDEFINEDERROR_H
+
+/**
+ * CLASS trackPropagationEngineIsNotDefinedError
+ */
+
+class trackPropagationEngineIsNotDefinedError : public dataRootObjectError {
+
+public:
+
+/**
+ * Default constructor
+ */
+
+	trackPropagationEngineIsNotDefinedError();
+
+/**
+ * Destructor
+ */
+
+	virtual ~trackPropagationEngineIsNotDefinedError();
+
+/**
+ * This method displays an error message.
+ */
+
+	void errorMsg();
+
+};
+
+#endif

@@ -801,3 +801,34 @@ void cannotAccessPeakfindingGeometryAnalyserError::errorMsg() {
 	printMsg("The peakfinding geometry analyser object cannot be accessed. Maybe it is not initialized!!!");
 
 }
+
+
+/****************************************************************
+ * CLASS cannotAccessTrackPropagationAnalyserError				*
+ ****************************************************************/
+
+/****************************************************************
+ * Default constructor											*
+ ****************************************************************/
+
+cannotAccessTrackPropagationAnalyserError::cannotAccessTrackPropagationAnalyserError() : analysisError() {
+
+}
+
+/****************************************************************
+ * Destructor													*
+ ****************************************************************/
+
+cannotAccessTrackPropagationAnalyserError::~cannotAccessTrackPropagationAnalyserError() {
+
+}
+
+/****************************************************************
+ * This method displays an error message.		 				*
+ ****************************************************************/
+
+void cannotAccessTrackPropagationAnalyserError::errorMsg() {
+
+	printMsg("The track propagation analyser object is not accessible!!!");
+
+}

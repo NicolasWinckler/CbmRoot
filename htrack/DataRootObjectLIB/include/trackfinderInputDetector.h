@@ -130,7 +130,14 @@ public:
  * method gets the detector station with a specific stationId
  */
 
-	trackfinderInputStation* getStationPointer(int stationId);
+	trackfinderInputStation* getStationPointerById(int stationId);
+
+/**
+ * method gets the detector station with stationIndex
+ * @see trackfinderInputStation::index
+ */
+
+	trackfinderInputStation* getStationPointerByIndex(unsigned int stationIndex);
 
 /**
  * method adds the detector station

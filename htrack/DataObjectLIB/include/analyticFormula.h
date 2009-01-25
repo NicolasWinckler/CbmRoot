@@ -84,12 +84,14 @@ public:
  * @param zPos is the input y-position for the formula
  * @param bField is the input magnetic field value for the formula
  * @return momentum is the vector of the momentum components in each direction
+ * @return charge is the value for the charge. Here it can be just +1 or -1
  */
-	void evaluateP(trackCoordinates& coordinates, histogramSpace& space, trackMomentum* momentum);
-	void evaluateP(trackCoordinates& coordinates, histogramSpace& space, trackFrameworkMomentum* momentum);
-	void evaluateP(trackParameter& parameter, histogramSpace& space, trackMomentum* momentum);
-	void evaluateP(trackParameter& parameter, histogramSpace& space, trackFrameworkMomentum* momentum);
-	void evaluatePWithCare(trackParameter& parameter, trackMomentum* momentum);
+
+	void evaluateP(trackCoordinates& coordinates, histogramSpace& space, trackMomentum* momentum, double* charge = NULL);
+	void evaluateP(trackCoordinates& coordinates, histogramSpace& space, trackFrameworkMomentum* momentum, double* charge = NULL);
+	void evaluateP(trackParameter& parameter, histogramSpace& space, trackMomentum* momentum, double* charge = NULL);
+	void evaluateP(trackParameter& parameter, histogramSpace& space, trackFrameworkMomentum* momentum, double* charge = NULL);
+	void evaluatePWithCare(trackParameter& parameter, double care, trackMomentum* momentum, double* charge = NULL);
 
 /**
  * method returns the computed values for the hough

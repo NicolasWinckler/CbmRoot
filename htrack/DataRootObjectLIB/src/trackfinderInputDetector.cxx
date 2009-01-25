@@ -264,11 +264,31 @@ trackfinderInputStation& trackfinderInputDetector::getStationByIndex(unsigned in
  * method gets the detector station with a specific detectorId	*
  ****************************************************************/
 
-trackfinderInputStation* trackfinderInputDetector::getStationPointer(int stationId) {
+trackfinderInputStation* trackfinderInputDetector::getStationPointerById(int stationId) {
 
 	trackfinderInputStation* returnValue;
 
 	returnValue = searchStation(stationId);
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * method gets the detector station with stationIndex			*
+ ****************************************************************/
+
+trackfinderInputStation* trackfinderInputDetector::getStationPointerByIndex(unsigned int stationIndex) {
+
+	trackfinderInputStation* returnValue;
+
+	if (detector == NULL)
+		throw detectorIsNotDefinedError();
+
+	if (stationIndex < numberOfStations)
+		returnValue = &detector[stationIndex];
+	else
+		throw tooBigStationOrderNumberError(stationIndex);
 
 	return returnValue;
 

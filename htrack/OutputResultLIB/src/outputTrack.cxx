@@ -140,7 +140,7 @@ void outputTrack::writeTracks(std::streambuf* terminal) {
 
 		(*tracks)->getNextTrackAnalogInfo(&actualTrackParameter);
 
-		formula.evaluateP(actualTrackParameter.position, (*tracks)->getHistogramSpace(), &frameworkTrackMomentum);
+		formula.evaluateP(actualTrackParameter.position, (*tracks)->getHistogramSpace(), &frameworkTrackMomentum, NULL);
 
 		data.addTrack(frameworkTrackMomentum);
 

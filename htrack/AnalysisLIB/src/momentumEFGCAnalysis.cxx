@@ -958,6 +958,7 @@ void momentumEFGCAnalysis::setWindowPadColumn(unsigned short column) {
 void momentumEFGCAnalysis::setWindowPadRow(bool* globalSignature, unsigned short sizeOfGlobalSignature) {
 
 	unsigned short counter;
+	unsigned short counterMax;
 
 	if (getNumberOfDisplays() > sizeOfGlobalSignature) {
 
@@ -968,24 +969,47 @@ void momentumEFGCAnalysis::setWindowPadRow(bool* globalSignature, unsigned short
 			notAllDisplaysCanBeDrawn = NULL;
 		}
 
+		counterMax = sizeOfGlobalSignature;
+
 	}
+	else
+		counterMax = getNumberOfDisplays();
 
 	counter = 0;
-	if (globalSignature[0]) {
-		emWindowPadRow = counter;
-		counter++;
+	if (counter < counterMax) {
+
+		if (globalSignature[counter]) {
+			emWindowPadRow = counter;
+			counter++;
+		}
+
 	}
-	if (globalSignature[1]) {
-		fmWindowPadRow = counter;
-		counter++;
+
+	if (counter < counterMax) {
+
+		if (globalSignature[counter]) {
+			fmWindowPadRow = counter;
+			counter++;
+		}
+
 	}
-	if (globalSignature[2]) {
-		gmWindowPadRow = counter;
-		counter++;
+
+	if (counter < counterMax) {
+
+		if (globalSignature[counter]) {
+			gmWindowPadRow = counter;
+			counter++;
+		}
+
 	}
-	if (globalSignature[3]) {
-		cmWindowPadRow = counter;
-		counter++;
+
+	if (counter < counterMax) {
+
+		if (globalSignature[counter]) {
+			cmWindowPadRow = counter;
+			counter++;
+		}
+
 	}
 
 }
@@ -1002,7 +1026,7 @@ void momentumEFGCAnalysis::peakToFakeTrack(trackParameter& parameter, histogramS
 
 	if ((isFMDisplayEnabled()) || (isGMDisplayEnabled()) || (isCMDisplayEnabled())) {
 		
-		formula.evaluateP(parameter, space, &momentum);
+		formula.evaluateP(parameter, space, &momentum, NULL);
 		value = getEntryOfXAxi(momentum);
 
 	}
@@ -1068,7 +1092,7 @@ void momentumEFGCAnalysis::peakToNoTrack(trackParameter& parameter, histogramSpa
 
 	if ((isFMDisplayEnabled()) || (isGMDisplayEnabled()) || (isCMDisplayEnabled())) {
 		
-		formula.evaluateP(parameter, space, &momentum);
+		formula.evaluateP(parameter, space, &momentum, NULL);
 		value = getEntryOfXAxi(momentum);
 
 	}
@@ -1135,7 +1159,7 @@ void momentumEFGCAnalysis::peakToOneTrack(trackParameter& parameter, histogramSp
 
 	if ((isFMDisplayEnabled()) || (isGMDisplayEnabled()) || (isCMDisplayEnabled())) {
 		
-		formula.evaluateP(parameter, space, &momentum);
+		formula.evaluateP(parameter, space, &momentum, NULL);
 		value = getEntryOfXAxi(momentum);
 
 	}
@@ -1207,7 +1231,7 @@ void momentumEFGCAnalysis::peakToMoreTracks(trackParameter& parameter, histogram
 
 	if ((isFMDisplayEnabled()) || (isGMDisplayEnabled()) || (isCMDisplayEnabled())) {
 		
-		formula.evaluateP(parameter, space, &momentum);
+		formula.evaluateP(parameter, space, &momentum, NULL);
 		value = getEntryOfXAxi(momentum);
 
 	}

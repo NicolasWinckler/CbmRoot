@@ -336,6 +336,7 @@ void histogramTransformation::filterHistogram(std::streambuf* terminal) {
 	trackDigitalInformation actualTrack;
 	trackAnalogInformation  actualParameter;
 	trackMomentum           actualMomentum;
+	double                  charge;
 	analyticFormula         formula;
 
 #endif
@@ -356,15 +357,15 @@ void histogramTransformation::filterHistogram(std::streambuf* terminal) {
 #ifdef DEBUGJUSTONEGOODTRACK
 
 	if ((*tracks)->getNumberOfTracks() > 0)
-		std::cout << std::endl << "Position where the peak is found (dim1, dim2 , dim3; value; px ,py, pz):" << std::endl;
+		std::cout << std::endl << "Position where the peak is found (dim1, dim2 , dim3; value; px ,py, pz; charge):" << std::endl;
 
 	for (unsigned short i = 0; i < (*tracks)->getNumberOfTracks(); i++) {
 
 		(*tracks)->getNextTrackDigitalInfo(&actualTrack);
 		(*tracks)->getTrackAnalogInfoFromTrackDigitalInfo(actualTrack, &actualParameter);
-		formula.evaluatePWithCare(actualParameter.position, &actualMomentum);
+		formula.evaluatePWithCare(actualParameter.position, (*tracks)->getHistogramSpace().getIncr(HRADIUS) / 2, &actualMomentum, &charge);
 		std::cout << " (" << actualTrack.position.get(DIM1) << ", " << actualTrack.position.get(DIM2) << ", " << actualTrack.position.get(DIM3) << "; " << actualTrack.value.toString(2) << "; ";
-		std::cout << actualMomentum.get(PX) << ", " << actualMomentum.get(PY) << ", " << actualMomentum.get(PZ) << ")" << std::endl;
+		std::cout << actualMomentum.get(PX) << ", " << actualMomentum.get(PY) << ", " << actualMomentum.get(PZ) << "; " << charge << ")" << std::endl;
 
 	}
 

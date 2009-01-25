@@ -33,6 +33,7 @@
 #include "../include/lutGeneratorError.h"
 #include "../include/lutGeneratorWarningMsg.h"
 #include "../include/digitalHitAccess.h"
+#include "malloc.h"
 #include <fstream>
 
 
@@ -47,12 +48,12 @@ void digitalHitAccess::allocateNewMemory(unsigned long number) {
 
 	numberOfEntries += number;
 
-	if (lutMem == NULL)
-		lutMem = (digitalHit*)calloc(numberOfEntries, sizeof(digitalHit));
+	if (memory == NULL)
+		memory = (digitalHit*)calloc(numberOfEntries, sizeof(digitalHit));
 	else
-		lutMem = (digitalHit*)realloc(lutMem, numberOfEntries * sizeof(digitalHit));
+		memory = (digitalHit*)realloc(memory, numberOfEntries * sizeof(digitalHit));
 
-	if (lutMem == NULL)
+	if (memory == NULL)
 		throw memoryAllocationError();
 
 }
@@ -63,7 +64,7 @@ void digitalHitAccess::allocateNewMemory(unsigned long number) {
 
 digitalHitAccess::digitalHitAccess() {
 
-	lutMem = NULL;
+	memory = NULL;
 
 	clear();
 
@@ -95,9 +96,9 @@ void digitalHitAccess::init() {
 	
 void digitalHitAccess::clear() {
 
-	if (lutMem != NULL) {
-		free(lutMem);
-		lutMem = NULL;
+	if (memory != NULL) {
+		free(memory);
+		memory = NULL;
 	}
 
 	numberOfEntries = 0;
@@ -129,10 +130,10 @@ digitalHit digitalHitAccess::getEntry(unsigned long index) {
 
 	if (index < numberOfEntries) {
 
-		if (lutMem == NULL)
+		if (memory == NULL)
 			throw cannotAccessDigitalHitLutError();
 
-		returnValue = lutMem[index];
+		returnValue = memory[index];
 
 	}
 	else {
@@ -160,7 +161,7 @@ void digitalHitAccess::addEntry(digitalHit& value) {
 
 	allocateNewMemory(1);
 
-	lutMem[numberOfEntries - 1] = value;
+	memory[numberOfEntries - 1] = value;
 
 }
 
@@ -182,13 +183,13 @@ std::string digitalHitAccess::toString() {
 	}
 	else {
 
-		if (lutMem == NULL)
+		if (memory == NULL)
 			throw cannotAccessDigitalHitLutError();
 
 		for (unsigned long i = 0; i < numberOfEntries; i++) {
 
 			returnValue += "\n";
-			returnValue += lutMem[i].toIdentifiedString();
+			returnValue += memory[i].toIdentifiedString();
 
 		}
 
@@ -229,7 +230,7 @@ void digitalHitAccess::read(std::string fileName, std::streambuf* terminal) {
 
 	readFile.setDataNum(numberOfEntries);
 
-	readFile.setDataPtr(lutMem);
+	readFile.setDataPtr(memory);
 
 	readFile.readFile(terminal);
 
@@ -256,7 +257,7 @@ void digitalHitAccess::write(std::string fileName, std::string name, std::stream
 	}
 	else {
 
-		if (lutMem == NULL)
+		if (memory == NULL)
 			throw cannotAccessDigitalHitLutError();
 
 		fileHeader.name            = name;
@@ -267,12 +268,74 @@ void digitalHitAccess::write(std::string fileName, std::string name, std::stream
 
 		writeFile.setDataNum(fileHeader.numberOfEntries);
 
-		writeFile.setDataPtr(lutMem);
+		writeFile.setDataPtr(memory);
 
 		writeFile.setHeader(fileHeader);
 
 		writeFile.writeFile(terminal);
 
 	}
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double digitalHitAccess::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(digitalHit*);
+	returnValue += sizeof(numberOfEntries);
+
+	for (unsigned long i = 0; i < numberOfEntries; i++)
+		returnValue += memory[i].getReservedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double digitalHitAccess::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	for (unsigned long i = 0; i < numberOfEntries; i++)
+		returnValue += memory[i].getAllocatedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double digitalHitAccess::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(digitalHit*);
+	returnValue += sizeof(numberOfEntries);
+
+	for (unsigned long i = 0; i < numberOfEntries; i++)
+		returnValue += memory[i].getUsedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }

@@ -76,7 +76,7 @@ void autoFinder::deleteFirstFilterMemory() {
 
 	if (firstBufferMem != NULL) {
 		for (unsigned short i = 0; i < sizeOfFirstBufferMem; i++) {
-			if (firstBufferMem[i].isLocal != NULL) {
+			if (firstBufferMem[i].isLocal) {
 				delete firstBufferMem[i].pointer;
 				firstBufferMem[i].pointer = NULL;
 			}
@@ -1072,7 +1072,11 @@ void autoFinder::setPeakfindingGeometry(peakfindingGeometry& actualPeakfindingGe
 
 void autoFinder::updatePeakfindingGeometry(peakfindingGeometry& actualPeakfindingGeometry) {
 
-	geometry.addGeometryElements(actualPeakfindingGeometry.getGeometryElements());
+	specialListMem<peakfindingGeometryElement> temp;
+
+	temp = actualPeakfindingGeometry.getGeometryElements();
+
+	geometry.addGeometryElements(temp);
 
 }
 

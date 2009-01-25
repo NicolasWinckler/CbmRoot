@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-24 16:41:19 $
-// $Revision: 1.7 $
+// $Date: 2008-11-21 14:01:50 $
+// $Revision: 1.8 $
 //
 // *******************************************************************/
 
@@ -34,6 +34,7 @@
 #include "../include/lutGeneratorError.h"
 #include "../include/lutGeneratorWarningMsg.h"
 #include "../include/prelutAccess.h"
+#include "malloc.h"
 #include <fstream>
 
 
@@ -48,16 +49,16 @@ void prelutAccess::allocateNewMemory(unsigned long number) {
 
 	numberOfEntries += number;
 
-	if (lutMem == NULL)
-		lutMem = (prelutHoughBorder*)calloc(numberOfEntries, sizeof(prelutHoughBorder));
+	if (memory == NULL)
+		memory = (prelutHoughBorder*)calloc(numberOfEntries, sizeof(prelutHoughBorder));
 	else
-		lutMem = (prelutHoughBorder*)realloc(lutMem, numberOfEntries * sizeof(prelutHoughBorder));
+		memory = (prelutHoughBorder*)realloc(memory, numberOfEntries * sizeof(prelutHoughBorder));
 
-	if (lutMem == NULL)
+	if (memory == NULL)
 		throw memoryAllocationError();
 
 	for (unsigned long i = numberOfEntries - number; i < numberOfEntries; i++)
-		lutMem[i].init();
+		memory[i].init();
 
 }
 
@@ -67,7 +68,7 @@ void prelutAccess::allocateNewMemory(unsigned long number) {
 
 prelutAccess::prelutAccess() : prelut() {
 
-	lutMem = NULL;
+	memory = NULL;
 
 	clear();
 
@@ -79,7 +80,7 @@ prelutAccess::prelutAccess() : prelut() {
 
 prelutAccess::prelutAccess(double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry) : prelut(dim3Min, dim3Max, dim3Step, dim3StartEntry, dim3StopEntry) {
 
-	lutMem = NULL;
+	memory = NULL;
 
 	clear();
 
@@ -145,9 +146,9 @@ void prelutAccess::evaluate(digitalHit* hit, prelutHoughBorder* borderPointer) {
 	
 void prelutAccess::clear() {
 
-	if (lutMem != NULL) {
-		free(lutMem);
-		lutMem = NULL;
+	if (memory != NULL) {
+		free(memory);
+		memory = NULL;
 	}
 
 	numberOfEntries = 0;
@@ -187,10 +188,10 @@ prelutHoughBorder prelutAccess::getEntry(unsigned long index) {
 
 	if (index < numberOfEntries) {
 
-		if (lutMem == NULL)
+		if (memory == NULL)
 			throw cannotAccessPrelutError();
 
-		returnValue = lutMem[index];
+		returnValue = memory[index];
 
 	}
 	else {
@@ -218,7 +219,7 @@ void prelutAccess::addEntry(prelutHoughBorder& value) {
 
 	allocateNewMemory(1);
 
-	lutMem[numberOfEntries - 1] = value;
+	memory[numberOfEntries - 1] = value;
 
 }
 void prelutAccess::addEntry(prelutHoughBorder& value, unsigned long index) {
@@ -226,7 +227,7 @@ void prelutAccess::addEntry(prelutHoughBorder& value, unsigned long index) {
 	if (index >= numberOfEntries)
 		allocateNewMemory(index + 1 - numberOfEntries);
 
-	lutMem[index] = value;
+	memory[index] = value;
 
 }
 void prelutAccess::addEntry(prelutHoughBorder& value, digitalHit hit) {
@@ -254,13 +255,13 @@ std::string prelutAccess::toString() {
 	}
 	else {
 
-		if (lutMem == NULL)
+		if (memory == NULL)
 			throw cannotAccessPrelutError();
 
 		for (unsigned long i = 0; i < numberOfEntries; i++) {
 
 			returnValue += "\n";
-			returnValue += lutMem[i].toIdentifiedString();
+			returnValue += memory[i].toIdentifiedString();
 
 		}
 
@@ -302,22 +303,32 @@ void prelutAccess::read(std::string fileName, std::streambuf* terminal) {
 
 	dtos(def.dim3Min,       &definitionString, doubleConversionDigits);
 	dtos(fileHeader.dimMin, &fileHeaderString, doubleConversionDigits);
-	if (definitionString != fileHeaderString)
+	if (definitionString != fileHeaderString) {
 		countDifferentPrelutDefinitionAsFile++;
+		def.dim3Min        = fileHeader.dimMin;
+	}
 	dtos(def.dim3Max,       &definitionString, doubleConversionDigits);
 	dtos(fileHeader.dimMax, &fileHeaderString, doubleConversionDigits);
-	if (definitionString != fileHeaderString)
+	if (definitionString != fileHeaderString) {
 		countDifferentPrelutDefinitionAsFile++;
-	if (def.dim3Step != fileHeader.dimStep)
+		def.dim3Max        = fileHeader.dimMax;
+	}
+	if (def.dim3Step != fileHeader.dimStep) {
 		countDifferentPrelutDefinitionAsFile++;
+		def.dim3Step       = fileHeader.dimStep;
+	}
 	dtos(def.dim3StartEntry,       &definitionString, doubleConversionDigits);
 	dtos(fileHeader.dimStartEntry, &fileHeaderString, doubleConversionDigits);
-	if (definitionString != fileHeaderString)
+	if (definitionString != fileHeaderString) {
 		countDifferentPrelutDefinitionAsFile++;
+		def.dim3StartEntry = fileHeader.dimStartEntry;
+	}
 	dtos(def.dim3StopEntry,       &definitionString, doubleConversionDigits);
 	dtos(fileHeader.dimStopEntry, &fileHeaderString, doubleConversionDigits);
-	if (definitionString != fileHeaderString)
+	if (definitionString != fileHeaderString) {
 		countDifferentPrelutDefinitionAsFile++;
+		def.dim3StopEntry  = fileHeader.dimStopEntry;
+	}
 
 	if (countDifferentPrelutDefinitionAsFile != 0) {
 
@@ -336,7 +347,7 @@ void prelutAccess::read(std::string fileName, std::streambuf* terminal) {
 
 	readFile.setDataNum(numberOfEntries);
 
-	readFile.setDataPtr(lutMem);
+	readFile.setDataPtr(memory);
 
 	readFile.readFile(terminal);
 
@@ -363,7 +374,7 @@ void prelutAccess::write(std::string fileName, std::string name, std::streambuf*
 	}
 	else {
 
-		if (lutMem == NULL)
+		if (memory == NULL)
 			throw cannotAccessPrelutError();
 
 		fileHeader.name            = name;
@@ -379,12 +390,74 @@ void prelutAccess::write(std::string fileName, std::string name, std::streambuf*
 
 		writeFile.setDataNum(fileHeader.numberOfEntries);
 
-		writeFile.setDataPtr(lutMem);
+		writeFile.setDataPtr(memory);
 
 		writeFile.setHeader(fileHeader);
 
 		writeFile.writeFile(terminal);
 
 	}
+
+}
+
+/****************************************************************
+ * This method returns the size of the reserved memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double prelutAccess::getReservedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(prelutHoughBorder*);
+	returnValue += sizeof(numberOfEntries);
+
+	for (unsigned long i = 0; i < numberOfEntries; i++)
+		returnValue += memory[i].getReservedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the allocated memory for		*
+ * the source data.												*
+ ****************************************************************/
+
+double prelutAccess::getAllocatedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = 0;
+
+	for (unsigned long i = 0; i < numberOfEntries; i++)
+		returnValue += memory[i].getAllocatedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
+
+}
+
+/****************************************************************
+ * This method returns the size of the used memory for			*
+ * the source data.												*
+ ****************************************************************/
+
+double prelutAccess::getUsedSizeOfData(unsigned short dimension) {
+
+	double returnValue;
+
+	returnValue  = sizeof(prelutHoughBorder*);
+	returnValue += sizeof(numberOfEntries);
+
+	for (unsigned long i = 0; i < numberOfEntries; i++)
+		returnValue += memory[i].getUsedSizeOfData(0);
+
+	returnValue  = (returnValue / (1 << (10 * dimension)));
+
+	return returnValue;
 
 }

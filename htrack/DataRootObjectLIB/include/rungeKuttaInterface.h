@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-10-29 11:09:52 $
-/// $Revision: 1.0 $
+/// $Date: 2008-11-21 13:59:22 $
+/// $Revision: 1.1 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -34,9 +34,16 @@
 #define _RUNGEKUTTAAPPROACH_H
 
 
-#include "../../DataObjectLIB/include/trackParameter.h"
+#include "../../DataObjectLIB/include/trackMomentum.h"
 #include "../include/trackfinderInputHit.h"
+#include "../include/trackfinderInputDetector.h"
 #include <list>
+
+#if (ARCHITECTURE == CBMROOT)
+
+#include "CbmGeanePro.h"
+
+#endif
 
 
 /* **************************************************************
@@ -44,6 +51,17 @@
  * **************************************************************/
 
 class rungeKuttaInterface {
+
+private:
+
+	trackfinderInputDetector* detector;			/**< Object to store the detector for this event. */
+
+#if (ARCHITECTURE == CBMROOT)
+
+	CbmGeanePro*              geane;			/**< Object to implement the GEANE track propagation */
+
+#endif
+
 
 public:
 
@@ -54,17 +72,31 @@ public:
 	rungeKuttaInterface();
 
 /**
+ * Constructor
+ * @param detector is an object which contains information about each detector station
+ */
+
+	rungeKuttaInterface(trackfinderInputDetector* detector);
+
+/**
  * Destructor
  */
 
 	virtual ~rungeKuttaInterface();
 
 /**
+ * method initializes the object
+ * @param detector is an object which contains information about each detector station
+ */
+
+	void init(trackfinderInputDetector* detector);
+
+/**
  * method evaluates all hits in the detector stations for a
  * given track parameter
  */
 
-	std::list<trackfinderInputHit> evaluate(trackParameter& parameter);
+	std::list<trackfinderInputHit> evaluate(trackMomentum& momentum, double charge, int pdgCode = 13);
 
 };
 

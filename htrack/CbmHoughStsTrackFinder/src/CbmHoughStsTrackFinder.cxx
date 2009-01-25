@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-24 16:35:25 $
-// $Revision: 1.39 $
+// $Date: 2008-11-21 13:58:42 $
+// $Revision: 1.40 $
 //
 // *******************************************************************/
 
@@ -117,6 +117,11 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder() : CbmStsTrackFinder() {
 		analysisParameters.initClassPriority               = configurationFile->getDataReference().analysisInitClassPriority;
 		analysisParameters.initMemory                      = configurationFile->getDataReference().analysisInitMemory;
 		analysisParameters.initTime                        = configurationFile->getDataReference().analysisInitTime;
+		analysisParameters.initPropagationEventPoint       = configurationFile->getDataReference().analysisInitTrackPropagationEventPoint;
+		analysisParameters.initPropagationEventHit         = configurationFile->getDataReference().analysisInitTrackPropagationEventHit;
+		analysisParameters.initPropagationTotalPoint       = configurationFile->getDataReference().analysisInitTrackPropagationTotalPoint;
+		analysisParameters.initPropagationTotalHit         = configurationFile->getDataReference().analysisInitTrackPropagationTotalHit;
+		analysisParameters.initPropagationDisplay          = configurationFile->getDataReference().analysisInitTrackPropagationDisplay;
 		analysisParameters.initQualityEFGCEventAbsolute    = configurationFile->getDataReference().analysisInitQualityEFGCEventAbsolute;
 		analysisParameters.initQualityEFGCEventRelative    = configurationFile->getDataReference().analysisInitQualityEFGCEventRelative;
 		analysisParameters.initQualityEFGCTotalAbsolute    = configurationFile->getDataReference().analysisInitQualityEFGCTotalAbsolute;
@@ -171,6 +176,12 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder() : CbmStsTrackFinder() {
 			configurationFile->getDataReference().analysisInitClassPriority ||
 			configurationFile->getDataReference().analysisInitMemory ||
 			configurationFile->getDataReference().analysisInitTime ||
+			configurationFile->getDataReference().analysisInitTrackPropagationEventPoint ||
+			configurationFile->getDataReference().analysisInitTrackPropagationEventHit ||
+			configurationFile->getDataReference().analysisInitTrackPropagationTotalPoint ||
+			configurationFile->getDataReference().analysisInitTrackPropagationTotalHit ||
+			configurationFile->getDataReference().analysisInitTrackPropagationDisplay ||
+			configurationFile->getDataReference().analysisInitTrackPropagationToRoot ||
 			configurationFile->getDataReference().analysisInitQualityEFGCEventAbsolute ||
 			configurationFile->getDataReference().analysisInitQualityEFGCEventRelative ||
 			configurationFile->getDataReference().analysisInitQualityEFGCTotalAbsolute ||
@@ -321,6 +332,11 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(const char* name) : CbmStsTrackFi
 		analysisParameters.initClassPriority               = configurationFile->getDataReference().analysisInitClassPriority;
 		analysisParameters.initMemory                      = configurationFile->getDataReference().analysisInitMemory;
 		analysisParameters.initTime                        = configurationFile->getDataReference().analysisInitTime;
+		analysisParameters.initPropagationEventPoint       = configurationFile->getDataReference().analysisInitTrackPropagationEventPoint;
+		analysisParameters.initPropagationEventHit         = configurationFile->getDataReference().analysisInitTrackPropagationEventHit;
+		analysisParameters.initPropagationTotalPoint       = configurationFile->getDataReference().analysisInitTrackPropagationTotalPoint;
+		analysisParameters.initPropagationTotalHit         = configurationFile->getDataReference().analysisInitTrackPropagationTotalHit;
+		analysisParameters.initPropagationDisplay          = configurationFile->getDataReference().analysisInitTrackPropagationDisplay;
 		analysisParameters.initQualityEFGCEventAbsolute    = configurationFile->getDataReference().analysisInitQualityEFGCEventAbsolute;
 		analysisParameters.initQualityEFGCEventRelative    = configurationFile->getDataReference().analysisInitQualityEFGCEventRelative;
 		analysisParameters.initQualityEFGCTotalAbsolute    = configurationFile->getDataReference().analysisInitQualityEFGCTotalAbsolute;
@@ -375,6 +391,12 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(const char* name) : CbmStsTrackFi
 			configurationFile->getDataReference().analysisInitClassPriority ||
 			configurationFile->getDataReference().analysisInitMemory ||
 			configurationFile->getDataReference().analysisInitTime ||
+			configurationFile->getDataReference().analysisInitTrackPropagationEventPoint ||
+			configurationFile->getDataReference().analysisInitTrackPropagationEventHit ||
+			configurationFile->getDataReference().analysisInitTrackPropagationTotalPoint ||
+			configurationFile->getDataReference().analysisInitTrackPropagationTotalHit ||
+			configurationFile->getDataReference().analysisInitTrackPropagationDisplay ||
+			configurationFile->getDataReference().analysisInitTrackPropagationToRoot ||
 			configurationFile->getDataReference().analysisInitQualityEFGCEventAbsolute ||
 			configurationFile->getDataReference().analysisInitQualityEFGCEventRelative ||
 			configurationFile->getDataReference().analysisInitQualityEFGCTotalAbsolute ||
@@ -530,6 +552,14 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(bitArray inputDetectorMask,
 	configuration.analysisInitClassPriority                          = false;
 	configuration.analysisInitMemory                                 = false;
 	configuration.analysisInitTime                                   = false;
+	configuration.analysisInitTrackPropagationEventPoint             = false;
+	configuration.analysisInitTrackPropagationEventHit               = false;
+	configuration.analysisInitTrackPropagationTotalPoint             = false;
+	configuration.analysisInitTrackPropagationTotalHit               = false;
+	configuration.analysisInitTrackPropagationDisplay                = false;
+	configuration.analysisInitTrackPropagationToRoot                 = false;
+	configuration.analysisTrackPropagationPointDisplayMask           = 0;
+	configuration.analysisTrackPropagationHitDisplayMask             = 0;
 	configuration.analysisInitQualityEFGCEventAbsolute               = false;
 	configuration.analysisInitQualityEFGCEventRelative               = false;
 	configuration.analysisInitQualityEFGCTotalAbsolute               = false;
@@ -678,6 +708,11 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(bitArray inputDetectorMask,
 		analysisParameters.initClassPriority               = configurationFile->getDataReference().analysisInitClassPriority;
 		analysisParameters.initMemory                      = configurationFile->getDataReference().analysisInitMemory;
 		analysisParameters.initTime                        = configurationFile->getDataReference().analysisInitTime;
+		analysisParameters.initPropagationEventPoint       = configurationFile->getDataReference().analysisInitTrackPropagationEventPoint;
+		analysisParameters.initPropagationEventHit         = configurationFile->getDataReference().analysisInitTrackPropagationEventHit;
+		analysisParameters.initPropagationTotalPoint       = configurationFile->getDataReference().analysisInitTrackPropagationTotalPoint;
+		analysisParameters.initPropagationTotalHit         = configurationFile->getDataReference().analysisInitTrackPropagationTotalHit;
+		analysisParameters.initPropagationDisplay          = configurationFile->getDataReference().analysisInitTrackPropagationDisplay;
 		analysisParameters.initQualityEFGCEventAbsolute    = configurationFile->getDataReference().analysisInitQualityEFGCEventAbsolute;
 		analysisParameters.initQualityEFGCEventRelative    = configurationFile->getDataReference().analysisInitQualityEFGCEventRelative;
 		analysisParameters.initQualityEFGCTotalAbsolute    = configurationFile->getDataReference().analysisInitQualityEFGCTotalAbsolute;
@@ -732,6 +767,12 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(bitArray inputDetectorMask,
 			configurationFile->getDataReference().analysisInitClassPriority ||
 			configurationFile->getDataReference().analysisInitMemory ||
 			configurationFile->getDataReference().analysisInitTime ||
+			configurationFile->getDataReference().analysisInitTrackPropagationEventPoint ||
+			configurationFile->getDataReference().analysisInitTrackPropagationEventHit ||
+			configurationFile->getDataReference().analysisInitTrackPropagationTotalPoint ||
+			configurationFile->getDataReference().analysisInitTrackPropagationTotalHit ||
+			configurationFile->getDataReference().analysisInitTrackPropagationDisplay ||
+			configurationFile->getDataReference().analysisInitTrackPropagationToRoot ||
 			configurationFile->getDataReference().analysisInitQualityEFGCEventAbsolute ||
 			configurationFile->getDataReference().analysisInitQualityEFGCEventRelative ||
 			configurationFile->getDataReference().analysisInitQualityEFGCTotalAbsolute ||
@@ -902,6 +943,11 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(const char* name,
 		analysisParameters.initClassPriority               = configurationFile->getDataReference().analysisInitClassPriority;
 		analysisParameters.initMemory                      = configurationFile->getDataReference().analysisInitMemory;
 		analysisParameters.initTime                        = configurationFile->getDataReference().analysisInitTime;
+		analysisParameters.initPropagationEventPoint       = configurationFile->getDataReference().analysisInitTrackPropagationEventPoint;
+		analysisParameters.initPropagationEventHit         = configurationFile->getDataReference().analysisInitTrackPropagationEventHit;
+		analysisParameters.initPropagationTotalPoint       = configurationFile->getDataReference().analysisInitTrackPropagationTotalPoint;
+		analysisParameters.initPropagationTotalHit         = configurationFile->getDataReference().analysisInitTrackPropagationTotalHit;
+		analysisParameters.initPropagationDisplay          = configurationFile->getDataReference().analysisInitTrackPropagationDisplay;
 		analysisParameters.initQualityEFGCEventAbsolute    = configurationFile->getDataReference().analysisInitQualityEFGCEventAbsolute;
 		analysisParameters.initQualityEFGCEventRelative    = configurationFile->getDataReference().analysisInitQualityEFGCEventRelative;
 		analysisParameters.initQualityEFGCTotalAbsolute    = configurationFile->getDataReference().analysisInitQualityEFGCTotalAbsolute;
@@ -956,6 +1002,12 @@ CbmHoughStsTrackFinder::CbmHoughStsTrackFinder(const char* name,
 			configurationFile->getDataReference().analysisInitClassPriority ||
 			configurationFile->getDataReference().analysisInitMemory ||
 			configurationFile->getDataReference().analysisInitTime ||
+			configurationFile->getDataReference().analysisInitTrackPropagationEventPoint ||
+			configurationFile->getDataReference().analysisInitTrackPropagationEventHit ||
+			configurationFile->getDataReference().analysisInitTrackPropagationTotalPoint ||
+			configurationFile->getDataReference().analysisInitTrackPropagationTotalHit ||
+			configurationFile->getDataReference().analysisInitTrackPropagationDisplay ||
+			configurationFile->getDataReference().analysisInitTrackPropagationToRoot ||
 			configurationFile->getDataReference().analysisInitQualityEFGCEventAbsolute ||
 			configurationFile->getDataReference().analysisInitQualityEFGCEventRelative ||
 			configurationFile->getDataReference().analysisInitQualityEFGCTotalAbsolute ||
@@ -1161,6 +1213,7 @@ void CbmHoughStsTrackFinder::Init() {
 										configurationFile->getDataReference().analysisPrelutRangeMaxSteps, configurationFile->getDataReference().analysisPrelutRangeMaxStart, configurationFile->getDataReference().analysisPrelutRangeMaxStop);
 
 		if (setAnalysisOutputFileName.empty()) {
+			analyser->initTrackPropagationAnalysisToRoot(configurationFile->getDataReference().analysisInitTrackPropagationToRoot, configurationFile->getDataReference().analysisOutputFileName.c_str());
 			analyser->initMomentumAnalysisToRoot(configurationFile->getDataReference().analysisInitMomentumToRoot, configurationFile->getDataReference().analysisOutputFileName.c_str());
 			analyser->initProjectionAnalysisToRoot(configurationFile->getDataReference().analysisInitProjectionToRoot, configurationFile->getDataReference().analysisOutputFileName.c_str());
 			analyser->initMagnetfieldAnalysisToRoot(configurationFile->getDataReference().analysisInitMagnetfieldToRoot, configurationFile->getDataReference().analysisOutputFileName.c_str());
@@ -1172,6 +1225,7 @@ void CbmHoughStsTrackFinder::Init() {
 			analyser->initPrelutRangeAnalysisToRoot(configurationFile->getDataReference().analysisInitPrelutRangeToRoot, configurationFile->getDataReference().analysisOutputFileName.c_str());
 		}
 		else {
+			analyser->initTrackPropagationAnalysisToRoot(configurationFile->getDataReference().analysisInitTrackPropagationToRoot, setAnalysisOutputFileName.c_str());
 			analyser->initMomentumAnalysisToRoot(configurationFile->getDataReference().analysisInitMomentumToRoot, setAnalysisOutputFileName.c_str());
 			analyser->initProjectionAnalysisToRoot(configurationFile->getDataReference().analysisInitProjectionToRoot, setAnalysisOutputFileName.c_str());
 			analyser->initMagnetfieldAnalysisToRoot(configurationFile->getDataReference().analysisInitMagnetfieldToRoot, setAnalysisOutputFileName.c_str());
@@ -1211,6 +1265,7 @@ void CbmHoughStsTrackFinder::Init() {
 					configurationFile->getDataReference().trackfinderPrelutRadiusMax,
 					configurationFile->getDataReference().trackfinderPrelutFileName,
 					configurationFile->getDataReference().trackfinderLutFileName,
+					eventData->getDetectorPointer(),
 					eventData->getMagneticField(),
 					terminal);
 
@@ -1254,8 +1309,15 @@ void CbmHoughStsTrackFinder::Init() {
 
 #ifndef NOANALYSIS
 
+		if (analyser->isTrackPropagationEventAnalysisEnabled() || analyser->isTrackPropagationTotalAnalysisEnabled())
+			analyser->initTrackPropagationNumberOfDisplays((unsigned short)eventData->getDetector().getNumberOfActiveStations());
+
+		analyser->initPrelutRangeAnalysis(configurationFile->getDataReference().analysisInitPrelutRangeForEachEvent || configurationFile->getDataReference().analysisInitWeightedPrelutRange, (unsigned short)eventData->getDetector().getNumberOfActiveStations());
+
 		if (fVerbose > 2) {
-			if (analyser->isPrelutRangeDisplayEnabled())
+			if (analyser->isTrackPropagationDisplayEnabled())
+				analyser->trackPropagationAnalysisDraw(configurationFile->getDataReference().analysisTrackPropagationPointDisplayMask, configurationFile->getDataReference().analysisTrackPropagationHitDisplayMask);
+			else if (analyser->isPrelutRangeDisplayEnabled())
 				analyser->prelutRangeAnalysisDraw(configurationFile->getDataReference().analysisPrelutRangeStationDisplayMask,
 								configurationFile->getDataReference().analysisPrelutRangeStationSumDisplayMask,
 								configurationFile->getDataReference().analysisPrelutRangeConstraintDisplayMask,
@@ -1313,7 +1375,7 @@ void CbmHoughStsTrackFinder::Init() {
 
 	}
 
-	if (!analyser->isMomentumDisplayEnabled() && !analyser->isProjectionDisplayEnabled() && analyser->isMagnetfieldDisplayEnabled() && !analyser->isMagnetfieldFactorDisplayEnabled() && !analyser->isPrelutRangeDisplayEnabled())
+	if (!analyser->isMomentumDisplayEnabled() && !analyser->isProjectionDisplayEnabled() && analyser->isMagnetfieldDisplayEnabled() && !analyser->isMagnetfieldFactorDisplayEnabled() && !analyser->isPrelutRangeDisplayEnabled() && !analyser->isTrackPropagationDisplayEnabled())
 		analyser->magnetfieldAnalysisUpdate();
 
 #endif
@@ -1419,6 +1481,25 @@ int CbmHoughStsTrackFinder::DoFind() {
 
 #ifndef NOANALYSIS
 
+			/* compare the propagated input data with the GEANE propagation */
+			if (analyser->isTrackPropagationEventAnalysisEnabled() || analyser->isTrackPropagationTotalAnalysisEnabled()) {
+
+				analyser->evaluateTrackPropagationGoodness(terminal);
+
+#ifdef RUNROOT
+
+				if (!analyser->isMomentumDisplayEnabled() && !analyser->isProjectionDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && !analyser->isMagnetfieldFactorDisplayEnabled() && !analyser->isPrelutRangeDisplayEnabled() && analyser->isTrackPropagationDisplayEnabled())
+					analyser->trackPropagationAnalysisUpdate();
+
+#endif
+
+				if (analyser->isTrackPropagationEventAnalysisEnabled())
+					if (analyser->isTrackPropagationToRootEnabled())
+						analyser->trackPropagationEventAnalysisWrite(eventData->getEventNumber());
+
+			}
+
+			/* evaluate the CELL simulation files */
 			analyser->evaluateCellSimulationFiles(configurationFile->getDataReference().analysisHitCellFileName,
 												  configurationFile->getDataReference().analysisPrelutCellFileName,
 												  configurationFile->getDataReference().analysisLutCellFileName,
@@ -1427,11 +1508,40 @@ int CbmHoughStsTrackFinder::DoFind() {
 
 #endif
 
+			/* update the tables */
+			if (isFirstEvent) {
+
+				ratings->initCoding(configurationFile->getDataReference().inputCodingTableMode,
+									configurationFile->getDataReference().inputCodingTableFileName);
+				ratings->setCodingTableMinimumClassification(bitArray(configurationFile->getDataReference().trackfinderMinClassCoding));
+
+			}
+			else
+				ratings->update();
+
 		}
 		else {
 
 #ifndef NOANALYSIS
-				
+
+			/* compare the propagated input data with the GEANE propagation */
+			if (analyser->isTrackPropagationEventAnalysisEnabled() || analyser->isTrackPropagationTotalAnalysisEnabled()) {
+
+				analyser->evaluateTrackPropagationGoodness(terminal);
+
+#ifdef RUNROOT
+
+				if (!analyser->isMomentumDisplayEnabled() && !analyser->isProjectionDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && !analyser->isMagnetfieldFactorDisplayEnabled() && !analyser->isPrelutRangeDisplayEnabled() && analyser->isTrackPropagationDisplayEnabled())
+					analyser->trackPropagationAnalysisUpdate();
+
+#endif
+
+				if (analyser->isTrackPropagationEventAnalysisEnabled())
+					if (analyser->isTrackPropagationToRootEnabled())
+						analyser->trackPropagationEventAnalysisWrite(eventData->getEventNumber());
+
+			}
+	
 			/* evaluate prelut range */
 			if (configurationFile->getDataReference().analysisInitPrelutRangeForEachEvent) {
 				analyser->evaluatePrelutRange(isFirstEvent,
@@ -1440,11 +1550,11 @@ int CbmHoughStsTrackFinder::DoFind() {
 						configurationFile->getDataReference().analysisChooseConstraintPrelutRange,
 						terminal);
 
-				if (!analyser->isMomentumDisplayEnabled() && !analyser->isProjectionDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && !analyser->isMagnetfieldFactorDisplayEnabled() && analyser->isPrelutRangeDisplayEnabled())
+				if (!analyser->isMomentumDisplayEnabled() && !analyser->isProjectionDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && !analyser->isMagnetfieldFactorDisplayEnabled() && analyser->isPrelutRangeDisplayEnabled() && !analyser->isTrackPropagationDisplayEnabled())
 					analyser->prelutRangeAnalysisUpdate();
 
 				if (analyser->isPrelutRangeToRootEnabled())
-					analyser->prelutRangeAnalysisWrite(eventNumber);
+					analyser->prelutRangeAnalysisWrite(eventData->getEventNumber());
 
 			}
 			else {
@@ -1456,11 +1566,11 @@ int CbmHoughStsTrackFinder::DoFind() {
 						configurationFile->getDataReference().analysisChooseConstraintPrelutRange,
 						terminal);
 
-					if (!analyser->isMomentumDisplayEnabled() && !analyser->isProjectionDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && !analyser->isMagnetfieldFactorDisplayEnabled() && analyser->isPrelutRangeDisplayEnabled())
+					if (!analyser->isMomentumDisplayEnabled() && !analyser->isProjectionDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && !analyser->isMagnetfieldFactorDisplayEnabled() && analyser->isPrelutRangeDisplayEnabled() && !analyser->isTrackPropagationDisplayEnabled())
 						analyser->prelutRangeAnalysisUpdate();
 
 					if (analyser->isPrelutRangeToRootEnabled())
-						analyser->prelutRangeAnalysisWrite(eventNumber);
+						analyser->prelutRangeAnalysisWrite(eventData->getEventNumber());
 
 				}
 			}
@@ -1469,11 +1579,11 @@ int CbmHoughStsTrackFinder::DoFind() {
 			if (configurationFile->getDataReference().analysisInitMagnetfieldConstantForEachEvent) {
 				analyser->evaluateMagnetfieldFactors(isFirstEvent, configurationFile->getDataReference().analysisInitWeightedMagnetfieldConstant, terminal);
 
-				if (!analyser->isMomentumDisplayEnabled() && !analyser->isProjectionDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && analyser->isMagnetfieldFactorDisplayEnabled() && !analyser->isPrelutRangeDisplayEnabled())
+				if (!analyser->isMomentumDisplayEnabled() && !analyser->isProjectionDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && analyser->isMagnetfieldFactorDisplayEnabled() && !analyser->isPrelutRangeDisplayEnabled() && !analyser->isTrackPropagationDisplayEnabled())
 					analyser->magnetfieldFactorAnalysisUpdate();
 
 				if (analyser->isMagnetfieldFactorToRootEnabled())
-					analyser->magnetfieldFactorAnalysisWrite(eventNumber);
+					analyser->magnetfieldFactorAnalysisWrite(eventData->getEventNumber());
 		
 			}
 			else {
@@ -1481,11 +1591,11 @@ int CbmHoughStsTrackFinder::DoFind() {
 				if ((configurationFile->getDataReference().analysisInitWeightedMagnetfieldConstant) && (isFirstEvent)) {
 					analyser->evaluateMagnetfieldFactors(true, false, terminal);
 
-					if (!analyser->isMomentumDisplayEnabled() && !analyser->isProjectionDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && analyser->isMagnetfieldFactorDisplayEnabled() && !analyser->isPrelutRangeDisplayEnabled())
+					if (!analyser->isMomentumDisplayEnabled() && !analyser->isProjectionDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && analyser->isMagnetfieldFactorDisplayEnabled() && !analyser->isPrelutRangeDisplayEnabled() && !analyser->isTrackPropagationDisplayEnabled())
 						analyser->magnetfieldFactorAnalysisUpdate();
 
 					if (analyser->isMagnetfieldFactorToRootEnabled())
-						analyser->magnetfieldFactorAnalysisWrite(eventNumber);
+						analyser->magnetfieldFactorAnalysisWrite(eventData->getEventNumber());
 
 				}
 			}
@@ -1562,7 +1672,7 @@ int CbmHoughStsTrackFinder::DoFind() {
 			if (analyser->isMomentumEFGCEventAnalysisEnabled()) {
 
 				if (analyser->isMomentumToRootEnabled())
-					analyser->momentumEventAnalysisWrite(eventNumber);
+					analyser->momentumEventAnalysisWrite(eventData->getEventNumber());
 
 				if ((analyser->isMomentumEventAnalysisEnabled()) && (fVerbose > 2))
 					std::cout << analyser->getMomentumEventAnalysis() << std::endl;
@@ -1572,14 +1682,14 @@ int CbmHoughStsTrackFinder::DoFind() {
 			if (analyser->isProjectionEFGCNEventAnalysisEnabled()) {
 
 				if (analyser->isProjectionToRootEnabled())
-					analyser->projectionEventAnalysisWrite(eventNumber);
+					analyser->projectionEventAnalysisWrite(eventData->getEventNumber());
 
 			}
 
-			if ((analyser->isMomentumDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && !analyser->isMagnetfieldFactorDisplayEnabled() && !analyser->isPrelutRangeDisplayEnabled()) && (fVerbose > 2))
+			if ((analyser->isMomentumDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && !analyser->isMagnetfieldFactorDisplayEnabled() && !analyser->isPrelutRangeDisplayEnabled() && !analyser->isTrackPropagationDisplayEnabled()) && (fVerbose > 2))
 				analyser->momentumAnalysisUpdate();
 
-			if (!analyser->isMomentumDisplayEnabled() && analyser->isProjectionDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && !analyser->isMagnetfieldFactorDisplayEnabled() && !analyser->isPrelutRangeDisplayEnabled())
+			if (!analyser->isMomentumDisplayEnabled() && analyser->isProjectionDisplayEnabled() && !analyser->isMagnetfieldDisplayEnabled() && !analyser->isMagnetfieldFactorDisplayEnabled() && !analyser->isPrelutRangeDisplayEnabled() && !analyser->isTrackPropagationDisplayEnabled())
 				analyser->projectionAnalysisUpdate();
 
 			if (configurationFile->getDataReference().analysisInitTotalAnalysis && luts->typeUsesCorrections())
@@ -1590,9 +1700,9 @@ int CbmHoughStsTrackFinder::DoFind() {
 			if (fVerbose > 1) {
 
 				std::cout << ">-----------------------------------------------<" << std::endl;
-				createTerminalStatusSequence(&statusSequenceForEvents, terminal, "Actual number of events done:\t\t\t", (unsigned int)(1 + eventNumber));
+				createTerminalStatusSequence(&statusSequenceForEvents, terminal, "Actual number of events done:\t\t\t", (unsigned int)(1 + eventData->getEventNumber()));
 				terminalInitialize(statusSequenceForEvents);
-				terminalOverwrite(statusSequenceForEvents, (unsigned int)(1 + eventNumber));
+				terminalOverwrite(statusSequenceForEvents, (unsigned int)(1 + eventData->getEventNumber()));
 				terminalFinalize(statusSequenceForEvents);
 
 				if (analyser->isTimeAnalysisEnabled()) {
@@ -1675,6 +1785,10 @@ void CbmHoughStsTrackFinder::Finish() {
 	if (configurationFile->getDataReference().trackfinderAutomaticFilterWrite)
 		if (houghTrackfinder->isAutomaticFilterGeometryEnabled())
 			houghTrackfinder->writePeakfindingGeometry(terminal);
+
+	if (analyser->isTrackPropagationTotalAnalysisEnabled())
+		if (analyser->isTrackPropagationToRootEnabled())
+			analyser->trackPropagationTotalAnalysisWrite(eventNumber);
 
 	if (houghTrackfinder->isFilterGeometryGenerationEnabled()) {
 		if (analyser->isPeakfindingGeometryDisplayEnabled())

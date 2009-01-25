@@ -115,6 +115,7 @@ public:
 
 /**
  * method sets the detector
+ * @param actualDetector is an object which contains information about each detector station
  */
 
 	void setDetector(trackfinderInputDetector* actualDetector);

@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-10-24 16:41:18 $
-/// $Revision: 1.4 $
+/// $Date: 2008-11-21 14:01:49 $
+/// $Revision: 1.5 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -154,7 +154,7 @@ protected:
  * @param terminal is a buffer to place the process information
  */
 
-	void generateRungeKuttaList(specialList<rungeKuttaListEntry, true, true, true, true, true>* rungeKuttaList, trackfinderInputMagneticField* magneticField = NULL, std::streambuf* terminal = NULL);
+	void generateRungeKuttaList(specialList<rungeKuttaListEntry, true, true, true, true, true>* rungeKuttaList, trackfinderInputDetector* detector, trackfinderInputMagneticField* magneticField = NULL, std::streambuf* terminal = NULL);
 
 /**
  * Method generates the inverted Runge-Kutta list.
@@ -203,7 +203,7 @@ protected:
  * @param terminal is a buffer to place the process information
  */
 
-	void generateRungeKuttaFileLuts(std::string prelutFileName, std::string prelutName, std::string lutFileName, std::string lutName, double dim3StartEntry, double dim3StopEntry, trackfinderInputMagneticField* magneticField = NULL, std::streambuf* terminal = NULL);
+	void generateRungeKuttaFileLuts(std::string prelutFileName, std::string prelutName, std::string lutFileName, std::string lutName, double dim3StartEntry, double dim3StopEntry, trackfinderInputDetector* detector, trackfinderInputMagneticField* magneticField = NULL, std::streambuf* terminal = NULL);
 
 public:
 
@@ -245,8 +245,8 @@ public:
 	void initFileLuts(histogramSpace** space, double dim3StartEntry, double dim3StopEntry, std::string prelutFileName, std::string lutFileName, std::streambuf* terminal = NULL);
 	void initAnalyticFormulaFileLuts(double dim1Min, double dim1Max, int dim1Step, double dim2Min, double dim2Max, int dim2Step, double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry, std::string prelutFileName, std::string lutFileName, trackfinderInputMagneticField* magneticField = NULL, std::streambuf* terminal = NULL);
 	void initAnalyticFormulaFileLuts(histogramSpace** space, double dim3StartEntry, double dim3StopEntry, std::string prelutFileName, std::string lutFileName, trackfinderInputMagneticField* magneticField = NULL, std::streambuf* terminal = NULL);
-	void initRungeKuttaFileLuts(double dim1Min, double dim1Max, int dim1Step, double dim2Min, double dim2Max, int dim2Step, double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry, std::string prelutFileName, std::string lutFileName, trackfinderInputMagneticField* magneticField = NULL, std::streambuf* terminal = NULL);
-	void initRungeKuttaFileLuts(histogramSpace** space, double dim3StartEntry, double dim3StopEntry, std::string prelutFileName, std::string lutFileName, trackfinderInputMagneticField* magneticField = NULL, std::streambuf* terminal = NULL);
+	void initRungeKuttaFileLuts(double dim1Min, double dim1Max, int dim1Step, double dim2Min, double dim2Max, int dim2Step, double dim3Min, double dim3Max, int dim3Step, double dim3StartEntry, double dim3StopEntry, std::string prelutFileName, std::string lutFileName, trackfinderInputDetector* detector, trackfinderInputMagneticField* magneticField = NULL, std::streambuf* terminal = NULL);
+	void initRungeKuttaFileLuts(histogramSpace** space, double dim3StartEntry, double dim3StopEntry, std::string prelutFileName, std::string lutFileName, trackfinderInputDetector* detector, trackfinderInputMagneticField* magneticField = NULL, std::streambuf* terminal = NULL);
 
 /**
  * This method returns true if the magnetism

@@ -23,8 +23,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-08-14 12:36:55 $
-/// $Revision: 1.2 $
+/// $Date: 2008-11-21 14:02:13 $
+/// $Revision: 1.3 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -52,6 +52,7 @@
 #define MISCLIB                    "MiscLIB"
 #define OUTPUTDATALIB              "OutputDataLIB"
 #define OUTPUTRESULTLIB            "OutputResultLIB"
+#define PPUCODEEXE                 "PpuCode"
 #define TRACKFINDERLIB             "TrackfinderLIB"
 
 

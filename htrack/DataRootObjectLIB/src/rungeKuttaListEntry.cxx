@@ -2,7 +2,7 @@
 // (C)opyright 2005
 // 
 // Institute of Computer Science V
-// Prof. Männer
+// Prof. Mï¿½ner
 // University of Mannheim, Germany
 // 
 // *******************************************************************
@@ -24,8 +24,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-30 11:10:54 $
-// $Revision: 1.0 $
+// $Date: 2008-11-21 13:59:23 $
+// $Revision: 1.1 $
 //
 // *******************************************************************/
 
@@ -191,7 +191,7 @@ specialList<digitalHit, true, true, true, true, true> rungeKuttaListEntry::getHi
 
 void rungeKuttaListEntry::resetActiveHitObject() {
 
-  hits.resetActiveObject();
+	hits.resetActiveObject();
 
 }
 

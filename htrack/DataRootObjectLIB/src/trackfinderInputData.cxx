@@ -23,8 +23,8 @@
 // *******************************************************************
 //
 // $Author: csteinle $
-// $Date: 2008-10-24 16:39:20 $
-// $Revision: 1.12 $
+// $Date: 2008-11-21 13:59:23 $
+// $Revision: 1.13 $
 //
 // *******************************************************************/
 
@@ -690,7 +690,7 @@ void trackfinderInputData::addHit(int detectorId, CbmHit* hit, CbmMCPoint* point
 	if (detectorId < 0)
 		station = NULL;
 	else
-		station = detector->getStationPointer(detectorId);
+		station = detector->getStationPointerById(detectorId);
 
 	numberOfHits = hits->GetEntries();
 	test = new(hitsReference[numberOfHits]) trackfinderInputHit(hit, hitIndex, (unsigned int)numberOfHits);
@@ -741,7 +741,7 @@ void trackfinderInputData::addHit(int trackId, int detectorId, double hitPosX, d
 	if (detectorId < 0)
 		station = NULL;
 	else
-		station = detector->getStationPointer(detectorId);
+		station = detector->getStationPointerById(detectorId);
 
 	numberOfHits = hits->GetEntries();
 	test = new(hitsReference[numberOfHits]) trackfinderInputHit(detectorId, hitPosX, hitPosY, posZ, hitPosX - pointPosX, hitPosY - pointPosY, hitIndex, (unsigned int)numberOfHits, pointIndex, maps, strip, hybrid);
@@ -796,7 +796,7 @@ void trackfinderInputData::addHit(int trackId, int detectorId, double hitPosX, d
 	if (detectorId < 0)
 		station = NULL;
 	else
-		station = detector->getStationPointer(detectorId);
+		station = detector->getStationPointerById(detectorId);
 
 	numberOfHits = hits->GetEntries();
 	test = new(hitsReference[numberOfHits]) trackfinderInputHit(detectorId, hitPosX, hitPosY, posZ, hitPosX - pointPosX, hitPosY - pointPosY, hitIndex, (unsigned int)numberOfHits, pointIndex);

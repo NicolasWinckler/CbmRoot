@@ -135,7 +135,11 @@ void peakfindingGeometryAnalysis::addPeakfindingLayerGeometry(unsigned short lay
 
 void peakfindingGeometryAnalysis::updatePeakfindingGeometry(trackCoordinates& center) {
 
-	actualPeakfindingGeometry.addGeometryElements(actualPeakfindingLayerGeometry.getGeometryElements(), center);
+	specialListMem<peakfindingGeometryElement> temp;
+
+	temp = actualPeakfindingLayerGeometry.getGeometryElements();
+
+	actualPeakfindingGeometry.addGeometryElements(temp, center);
 
 }
 

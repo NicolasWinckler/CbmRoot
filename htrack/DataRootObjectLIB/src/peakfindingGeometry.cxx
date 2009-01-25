@@ -24,8 +24,8 @@
 /// *******************************************************************
 ///
 /// $Author: csteinle $
-/// $Date: 2008-10-24 16:39:20 $
-/// $Revision: 1.3 $
+/// $Date: 2008-11-21 13:59:23 $
+/// $Revision: 1.4 $
 ///
 //////////////////////////////////////////////////////////////////////
 
@@ -38,7 +38,7 @@
 #include "../include/dataRootObjectWarningMsg.h"
 #include "../include/peakfindingGeometry.h"
 #include <list>
-#include <cmath>
+
 
 #define RELATIVERANGE 2
 

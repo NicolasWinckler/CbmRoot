@@ -46,7 +46,7 @@ enum {ASCIIFILEFORMAT, ROOTFILEFORMAT};
 /*
  * number of commands in the file
  */
-#define numberOfCmds     153		/**< Definition of the number of parameters gettable from file. */
+#define numberOfCmds     161		/**< Definition of the number of parameters gettable from file. */
 
 
 /*
@@ -122,6 +122,14 @@ typedef struct {
 	bool           analysisInitClassPriority;							/**< Variable to store, if a summary about the class priorities should be printed to the standard output stream. */
 	bool           analysisInitMemory;									/**< Variable to store, if a summary about the needed memory should be printed to the standard output stream. */
 	bool           analysisInitTime;									/**< Variable to store, if a summary about the needed time should be printed to the standard output stream. */
+	bool           analysisInitTrackPropagationEventPoint;				/**< Variable to store, if a graphical summary about the goodness of the input point data according to the GEANE propagation should be made for each event. */
+	bool           analysisInitTrackPropagationEventHit;				/**< Variable to store, if a graphical summary about the goodness of the input hit data according to the GEANE propagation should be made for each event. */
+	bool           analysisInitTrackPropagationTotalPoint;				/**< Variable to store, if a graphical summary about the goodness of the input point data according to the GEANE propagation should be made accumulated for all events. */
+	bool           analysisInitTrackPropagationTotalHit;				/**< Variable to store, if a graphical summary about the goodness of the input hit data according to the GEANE propagation should be made accumulated for all events. */
+	bool           analysisInitTrackPropagationDisplay;					/**< Variable to store the enabling of the online graphic display */
+	bool           analysisInitTrackPropagationToRoot;					/**< Variable to store the enabling of the graphics writing to file */
+	bitArray       analysisTrackPropagationPointDisplayMask;			/**< Variable to store the information which graphical summary for the input point data should not be drawn onto screen, if this feature is enabled. */
+	bitArray       analysisTrackPropagationHitDisplayMask;				/**< Variable to store the information which graphical summary for the input hit data should not be drawn onto screen, if this feature is enabled. */
 	bool           analysisInitQualityEFGCEventAbsolute;				/**< Variable to store, if a summary about the efficiency, the fakes, the ghosts and the clones with absolute numbers for each event should be printed to the standard output stream. */
 	bool           analysisInitQualityEFGCEventRelative;				/**< Variable to store, if a summary about the efficiency, the fakes, the ghosts and the clones with percentage numbers for each event should be printed to the standard output stream. */
 	bool           analysisInitQualityEFGCTotalAbsolute;				/**< Variable to store, if a summary about the efficiency, the fakes, the ghosts and the clones with accumulated absolute numbers for all events should be printed to the standard output stream. */

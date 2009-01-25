@@ -67,6 +67,7 @@
   gSystem->Load("libField");
   gSystem->Load("libPassive");
   gSystem->Load("libSts");
+  gSystem->Load("libGeane");
   gSystem->Load("libHTrack");
   // ------------------------------------------------------------------------
 

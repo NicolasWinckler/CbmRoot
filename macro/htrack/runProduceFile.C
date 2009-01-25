@@ -37,13 +37,13 @@
   TString caveGeom    = "cave.geo";
 
   // Target geometry
-  TString targetGeom  = "target.geo";
+  TString targetGeom  = "target_au_250mu.geo";
 
   // Beam pipe geometry
   TString pipeGeom    = "pipe_standard.geo";
 
   // Magnet geometry and field map
-  TString magnetGeom  = "magnet_active.geo";
+  TString magnetGeom  = "magnet_standard.geo";
   TString fieldMap    = "FieldActive";
   Double_t fieldZ     = 50.;     // z position of field centre
   Double_t fieldScale = 1.;      // field scaling factor

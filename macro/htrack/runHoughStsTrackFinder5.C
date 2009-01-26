@@ -67,6 +67,7 @@
   gSystem->Load("libField");
   gSystem->Load("libPassive");
   gSystem->Load("libSts");
+  gSystem->Load("libTrkBase");
   gSystem->Load("libGeane");
   gSystem->Load("libHTrack");
   // ------------------------------------------------------------------------
@@ -74,6 +75,10 @@
   // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
   timer.Start();
+  // ------------------------------------------------------------------------
+
+  // -----   GEANE   initialization   ---------------------------------------
+  CbmGeane* Geane            = new CbmGeane(inFile);
   // ------------------------------------------------------------------------
 
   // -----   Reconstruction run   -------------------------------------------
@@ -126,6 +131,7 @@
 
   // -----   Intialise and run   --------------------------------------------
   fRun->Init();
+  Geane->SetField(fRun->GetField());
   fRun->Run(0,nEvents);
   // ------------------------------------------------------------------------
 

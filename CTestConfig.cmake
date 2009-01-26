@@ -12,6 +12,5 @@ set(CTEST_DROP_METHOD "http")
 set(CTEST_DROP_SITE "fairroot.gsi.de")
 set(CTEST_DROP_LOCATION "/CDash/submit.php?project=CbmRoot")
 set(CTEST_DROP_SITE_CDASH TRUE)
-set(CTEST_TRIGGER_SITE "")
 
 set(CTEST_TESTING_TIMEOUT 60)

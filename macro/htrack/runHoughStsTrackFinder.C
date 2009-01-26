@@ -67,6 +67,7 @@
   gSystem->Load("libField");
   gSystem->Load("libPassive");
   gSystem->Load("libSts");
+  gSystem->Load("libTrkBase");
   gSystem->Load("libGeane");
   gSystem->Load("libHTrack");
   // ------------------------------------------------------------------------
@@ -80,6 +81,10 @@
   CbmRunAna *fRun = new CbmRunAna();
   fRun->SetInputFile(inFile);
   fRun->SetOutputFile(outFile);
+  // ------------------------------------------------------------------------
+
+  // -----   GEANE   initialization   ---------------------------------------
+  CbmGeane* Geane            = new CbmGeane(inFile);
   // ------------------------------------------------------------------------
 
   // -----  Parameter database   --------------------------------------------
@@ -126,6 +131,7 @@
 
   // -----   Intialise and run   --------------------------------------------
   fRun->Init();
+  Geane->SetField(fRun->GetField());
   fRun->Run(0,nEvents);
   // ------------------------------------------------------------------------
 

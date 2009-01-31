@@ -21,7 +21,7 @@ ${ROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(ECAL_SRCS_RULECHECKER
-CbmEcal.cxx CbmEcalHit.cxx CbmEcalPoint.cxx	
+CbmEcal.cxx CbmEcalDetailed.cxx CbmEcalHit.cxx CbmEcalPoint.cxx	
 CbmEcalPointLite.cxx CbmEcalHitProducer.cxx 
 CbmGeoEcalPar.cxx CbmEcalDrawer.cxx 
 CbmEcalContFact.cxx CbmGeoEcal.cxx  
@@ -40,7 +40,7 @@ CbmEcalRecoSimple.cxx CbmEcalClusterV1.cxx
 CbmEcalQualityCheck.cxx CbmEcalClusterFinderV1.cxx
 CbmEcalTrackImport.cxx CbmEcalCalibration.cxx
 CbmEcalParam.cxx CbmEcalRecoSlow.cxx CbmEcalMatching.cxx
-CbmEcalAnalysisPi0.cxx CbmEcalAnalysisPair.cxx
+CbmEcalAnalysisPi0.cxx CbmEcalAnalysisPair.cxx CbmEcalAnalysisMaterial.cxx
 CbmEcalAnalysisNeutron.cxx CbmEcalTimeDigitizer.cxx
 )
 

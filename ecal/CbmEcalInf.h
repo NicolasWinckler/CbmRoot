@@ -144,6 +144,8 @@ private:
   /** Init all other variables from fVariables
    ** and fEcalStr**/
   void InitVariables();
+  /** Ignore a parameter during comparision **/
+  Bool_t ExcludeParameter(TString parname);
   /** A map containing all variables
    ** This variable should be saved in parameter file **/
   TMap* fVariables;
@@ -202,7 +204,7 @@ private:
   Int_t fSuccess;
 
   TString fFileName;
-  ClassDef(CbmEcalInf,1);
+  ClassDef(CbmEcalInf,2);
 };
 
 inline char CbmEcalInf::GetType(Int_t x, Int_t y) const

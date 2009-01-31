@@ -119,6 +119,8 @@ private:
   std::list<CbmEcalCell*> fCells;
   /** MCPoint id -> ECAL cell**/
   std::vector<__CbmEcalCellWrapper*> fHash;
+  /** Version of the calorimeter class used **/
+  Int_t fEcalVersion;
 
   ClassDef(CbmEcalStructure,1);
 };

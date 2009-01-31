@@ -215,6 +215,7 @@ CbmEcal::CbmEcal(const char* name, Bool_t active, const char* fileGeo)
   fLiteCollection=NULL;
   fVerboseLevel = 1;
 
+  fInf->AddVariable("ecalversion", "0");
   for(i=kN-1;i>-1;i--)
     fVolArr[i]=-1111;
 

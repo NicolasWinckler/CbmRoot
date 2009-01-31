@@ -266,6 +266,12 @@ CbmEcalInf::CbmEcalInf(const char* filename)
   InitVariables();
 }
 
+Bool_t CbmEcalInf::ExcludeParameter(TString parname)
+{
+  if (parname.CompareTo("ecalversion")==0) return kTRUE;
+  return kFALSE;
+}
+
 void CbmEcalInf::CheckVariables()
 {
   CbmRunAna* ana = CbmRunAna::Instance();
@@ -277,7 +283,7 @@ void CbmEcalInf::CheckVariables()
   CbmGeoEcalPar* par=(CbmGeoEcalPar*)(rtdb->findContainer("CbmGeoEcalPar"));
   if (par==NULL)
   {
-    cerr << "No parameters container is found. " << endl;
+    Info("CheckVariables","No parameters container is found.");
     return;
   }
   TMap* parVariables=par->GetVariables();
@@ -289,26 +295,19 @@ void CbmEcalInf::CheckVariables()
     {
       TObjString* first=(TObjString*)parVariables->GetValue(key->String());
       TObjString* second=(TObjString*)fVariables->GetValue(key->String());
+      if (ExcludeParameter(key->String())==kFALSE)
       if (second==NULL)
       {
-	cerr << "-W-: CbmEcalInf. ";   
-	cerr << "Warning: Parameter " << key->String();
-	cerr << " not found in .geo file, but found ";
-	cerr << " in parameter file!" << endl;
+	Info("CheckVariables", "Parameter %s not found in .geo file, but found in parameter file.", key->String().Data());
       } else
       if (first->String()!=second->String())
       {
-	cerr << "-W-: CbmEcalInf. ";   
-	cerr << "Warning: Parameter " << key->String();
-	cerr << " differs in .geo file and ";
-	cerr << " in parameter file!" << endl;
-	cerr << "	" << key->String() << "=";
-	cerr << first->String() << " in parameter file";
-	cerr << endl;
-	cerr << "	" << key->String() << "=";
-	cerr << second->String() << " in .geo file";
-	cerr << endl;
+	Info("CheckVariables", "Parameter %s differs in .geo file and parameter file!", key->String().Data());
+	Info("CheckVariables", "%s=%s in parameter file.", key->String().Data(), first->String().Data());
+	Info("CheckVariables", "%s=%s in .geo file.", key->String().Data(), second->String().Data());
       }
+      if (ExcludeParameter(key->String())==kTRUE)
+	AddVariable(key->String().Data(), first->String().Data());
     }
   }
 
@@ -322,17 +321,9 @@ void CbmEcalInf::CheckVariables()
       TObjString* second=(TObjString*)fEcalStr.At(i);
       if (second&&first->String()!=second->String())
       {
-	cerr << "-W-: CbmEcalInf. ";   
-	cerr << "Warning: String " << i ;
-	cerr << " in ECAL structure differs";
-	cerr << " in .geo file and ";
-	cerr << " in parameter file!" << endl;
-	cerr << "	" << key->String() << "=";
-	cerr << first->String() << " in parameter file";
-	cerr << endl;
-	cerr << "	" << key->String() << "=";
-	cerr << second->String() << " in .geo file";
-	cerr << endl;
+	Info("CheckVariables", "String %d in calorimeter structure differs in .geo file and in parameter file.", i);
+	Info("CheckVariables", "%s=%s in parameter file", key->String().Data(), first->String().Data());
+	Info("CheckVariables", "%s=%s in .geo file", key->String().Data(), second->String().Data());
       }
     }
   }

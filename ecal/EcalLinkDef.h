@@ -6,7 +6,8 @@
 #pragma link off all classes;
 #pragma link off all functions;
  
-#pragma link C++ class  CbmEcal+;
+#pragma link C++ class  CbmEcal;
+#pragma link C++ class  CbmEcalDetailed;
 #pragma link C++ class  CbmEcalCell+;
 #pragma link C++ class  CbmEcalModule+;
 #pragma link C++ class  CbmEcalStructure+;
@@ -52,6 +53,7 @@
 #pragma link C++ class  CbmEcalAnalysisPi0;
 #pragma link C++ class  CbmEcalAnalysisPair;
 #pragma link C++ class  CbmEcalAnalysisNeutron;
+#pragma link C++ class  CbmEcalAnalysisMaterial;
 #pragma link C++ class  CbmEcalTimeDigitizer;
 
 #endif

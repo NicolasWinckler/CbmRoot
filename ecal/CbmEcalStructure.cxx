@@ -52,14 +52,12 @@
 #include "CbmEcalStructure.h"
 
 #include "CbmEcal.h"
+#include "CbmEcalDetailed.h"
 
 #include <iostream>
 #include <algorithm>
 #include <cmath>
-using std::cerr;
-using std::endl;
-using std::list;
-using std::vector;
+using namespace std;
 
 class __CbmEcalCellWrapper
 {
@@ -88,7 +86,10 @@ CbmEcalCell* CbmEcalStructure::GetCell(Int_t volId, Int_t& ten, Bool_t& isPS)
     Float_t x;
     Float_t y;
     fHash[volId]=new __CbmEcalCellWrapper();
-    lisPS=CbmEcal::GetCellCoord(volId,x,y,ten);
+    if (fEcalVersion==0)
+      lisPS=CbmEcal::GetCellCoord(volId,x,y,ten);
+    if (fEcalVersion==1)
+      lisPS=CbmEcalDetailed::GetCellCoordInf(volId, x, y, ten);
     fHash[volId]->cell=GetCell(x+0.25,y+0.25);
     fHash[volId]->isPsTen=ten*2;
     if (lisPS) fHash[volId]->isPsTen+=1;
@@ -117,6 +118,9 @@ CbmEcalStructure::CbmEcalStructure(CbmEcalInf* ecalinf)
     fEcalInf->GetModuleSize()*fEcalInf->GetXSize()/2.0;
   fY1=fEcalInf->GetYPos()-\
     fEcalInf->GetModuleSize()*fEcalInf->GetYSize()/2.0;
+  fEcalVersion=(Int_t)fEcalInf->GetVariable("ecalversion");
+  if (fEcalVersion<0)
+    fEcalVersion=0;
 }
 
 //-----------------------------------------------------------------------------

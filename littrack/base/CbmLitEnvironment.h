@@ -7,8 +7,8 @@
 /** CbmLitEnvironment.h
  *@author A.Lebedev <alebedev@jinr.ru>
  **
- ** 
- **/ 
+ **
+ **/
 
 
 #ifndef CBMLITENVIRONMENT_H_
@@ -25,36 +25,38 @@ class TGeoMaterial;
 class CbmLitEnvironment: public TObject {
 
 public:
-   virtual ~CbmLitEnvironment();  
-   
+   virtual ~CbmLitEnvironment();
+
    static CbmLitEnvironment* Instance();
-   
+
    CbmField* GetField();
    CbmLitDetectorLayout GetMuchLayout();
+   CbmLitDetectorLayout GetNewMuchLayout();
+   CbmLitDetectorLayout GetOldMuchLayout();
    CbmLitDetectorLayout GetTrdLayout();
-      
-protected:    
+
+protected:
    CbmLitEnvironment();
- 
+
 private:
    static CbmLitEnvironment* fInstance;
-   
+
    CbmLitDetectorLayout fMuchLayout;
    CbmLitDetectorLayout fTrdLayout;
-   
+
    CbmField *fField;
-   
+
    void DetermineLayout(
 		   const std::vector<CbmLitStation>& stations,
 		   CbmLitDetectorLayout& layout);
-   
+
    std::vector<CbmLitStation> DivideToSubstations(
 		   const std::vector<CbmLitStation>& stations);
-   
+
    bool IsStraw() const;
    bool IsTrdSegmented() const;
-   
+
    ClassDef(CbmLitEnvironment,1)
-}; 
+};
 
 #endif // CBMLITENVIRONMENT_H_

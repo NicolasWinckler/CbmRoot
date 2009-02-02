@@ -21,7 +21,7 @@
 
 
 CbmLitMuchTrackFinderBranch::CbmLitMuchTrackFinderBranch()
-{	
+{
 }
 
 CbmLitMuchTrackFinderBranch::~CbmLitMuchTrackFinderBranch()
@@ -32,13 +32,13 @@ CbmLitMuchTrackFinderBranch::~CbmLitMuchTrackFinderBranch()
 void CbmLitMuchTrackFinderBranch::Init()
 {
    CbmRootManager* rootMgr = CbmRootManager::Instance();
-   if(NULL == rootMgr) 
+   if(NULL == rootMgr)
       TObject::Fatal("CbmLitMuchTrackFinderBranch::Init","ROOT manager is not instantiated");
 
    fTrackSeedsArray = (TClonesArray*) rootMgr->GetObject("STSTrack");
-   if(NULL == fTrackSeedsArray) 
+   if(NULL == fTrackSeedsArray)
       TObject::Fatal("CbmLitMuchTrackFinderBranch::Init","no STS track array");
-       
+
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
    fPropagatorToDet = fPropagator = factory->CreateTrackPropagator("Much");
    fFilter = factory->CreateTrackUpdate("Much");
@@ -47,7 +47,7 @@ void CbmLitMuchTrackFinderBranch::Init()
    fFinalSelection = factory->CreateTrackSelection("MuchFinal");
    fFinalPreSelection = factory->CreateTrackSelection("Empty");
    fFitter = factory->CreateTrackFitter("Much");
- 
+
    fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
    fVerbose = 1;
    fNofIter = 1;
@@ -66,21 +66,21 @@ Int_t CbmLitMuchTrackFinderBranch::DoFind(
 	HitPtrVector hits;
 	TrackPtrVector trackSeeds;
 	TrackPtrVector foundTracks;
-	
+
 	CbmLitConverter::MuchHitArrayToHitVector(hitArray, hits);
 	CreateTrackSeeds(fTrackSeedsArray, trackSeeds);
-	
+
 	CbmLitTrackFinderBranch::DoFind(hits, trackSeeds, foundTracks);
-	
+
 	CbmLitConverter::TrackVectorToMuchTrackArray(foundTracks, trackArray);
-	
+
 	for_each(foundTracks.begin(), foundTracks.end(), DeleteObject());
 	for_each(hits.begin(), hits.end(), DeleteObject());
 	for_each(trackSeeds.begin(), trackSeeds.end(), DeleteObject());
 	foundTracks.clear();
 	hits.clear();
-	trackSeeds.clear();	
-	
+	trackSeeds.clear();
+
 	return trackArray->GetEntriesFast();
 }
 
@@ -89,14 +89,14 @@ void CbmLitMuchTrackFinderBranch::CreateTrackSeeds(
 		TrackPtrVector& trackSeeds)
 {
 	CbmLitConverter::StsTrackArrayToTrackVector(trackArray, trackSeeds);
-    
-    if (fVerbose > 1) 
+
+    if (fVerbose > 1)
       std::cout << "-I- CbmMuchTrackFinderNew::CreateTrackSeeds: " << std::endl
                 << trackArray->GetEntriesFast() << " tracks were loaded, "
                 << trackSeeds.size() << " tracks were created" << std::endl;
-    
+
     Double_t Ze = fLayout.GetSubstation(0, 0, 0).GetZ();
-    for (TrackPtrIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {   	
+    for (TrackPtrIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {
     	CbmLitTrackParam par = *(*iTrack)->GetParamLast();
        fPropagatorToDet->Propagate(&par, Ze, fPDG);
        (*iTrack)->SetParamLast(&par);

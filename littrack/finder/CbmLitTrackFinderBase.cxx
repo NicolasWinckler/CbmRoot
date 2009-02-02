@@ -34,9 +34,9 @@ void CbmLitTrackFinderBase::ArrangeHits(
     	Int_t planeId = (*hit)->GetPlaneId();
     	fHitData.AddHit(planeId, *hit);
     }
-    
+
     if (fVerbose > 1) std::cout << fHitData.ToString();
-	
+
     for (Int_t i = 0; i < fLayout.GetNofStationGroups(); i++){
     	for (Int_t j = 0; j < fLayout.GetNofStations(i); j++){
     		CbmLitStation station = fLayout.GetStation(i, j);
@@ -44,12 +44,12 @@ void CbmLitTrackFinderBase::ArrangeHits(
     			for (Int_t k = 0; k < fLayout.GetNofSubstations(i, j); k++){
     				HitPtrIteratorPair hits = fHitData.GetHits(i, j, k);
     				std::sort(hits.first, hits.second, CompareHitPtrXULess());
-//    				std::cout << "station group " << i << " station " << j 
+//    				std::cout << "station group " << i << " station " << j
 //    					<< " substation " << k << std::endl;
 //    				for(HitPtrIterator it = hits.first; it != hits.second; it++)
 //    					std::cout << (*it)->ToString();
     			}
-    		} 
+    		}
     	}
     }
 }
@@ -60,35 +60,35 @@ void CbmLitTrackFinderBase::InitTrackSeeds(
 {
 	//TODO if more than one iteration, restore the state of the seeds
 	fSeedSelection->DoSelect(itBegin, itEnd);
-	
+
 	for (TrackPtrIterator track = itBegin; track != itEnd; track++) {
 		if ((*track)->GetQuality() == kLITBAD) continue;
-		if (fSeedsIdSet.find((*track)->GetPreviousTrackId()) 
+		if (fSeedsIdSet.find((*track)->GetPreviousTrackId())
 				!= fSeedsIdSet.end()) continue;
 		fTracks.push_back(new CbmLitTrack(*(*track)));
 	}
-	
+
 	// extrapolate to the begin station group for the tracking
-	if (fBeginStationGroup > 0) {    
+	if (fBeginStationGroup > 0) {
 		Double_t Ze = fLayout.GetSubstation(fBeginStationGroup, 0, 0).GetZ();
 		for (TrackPtrIterator track = fTracks.begin(); track != fTracks.end(); track++) {
 			CbmLitTrackParam par(*(*track)->GetParamLast());
-			fPropagator->Propagate(&par, Ze, fPDG);	
-			(*track)->SetParamLast(&par);			
-		} 
+			fPropagator->Propagate(&par, Ze, fPDG);
+			(*track)->SetParamLast(&par);
+		}
 	}
 }
 
 Bool_t CbmLitTrackFinderBase::IsIn(
-		const CbmLitTrackParam* par, 
-		const CbmLitHit* hit) const 
+		const CbmLitTrackParam* par,
+		const CbmLitHit* hit) const
 {
     Double_t C0 = par->GetCovariance(0);
     Double_t C5 = par->GetCovariance(5);
-    
-	if(C0 > fMaxCovSq || C5 > fMaxCovSq) return kFALSE;  
-	if(C0 < 0. || C5 < 0.) return kFALSE;  
-	
+
+	if(C0 > fMaxCovSq || C5 > fMaxCovSq) return kFALSE;
+	if(C0 < 0. || C5 < 0.) return kFALSE;
+
 	if (hit->GetType() == kLITSTRIPHIT) {
 		const CbmLitStripHit* stripHit = static_cast<const CbmLitStripHit*>(hit);
 		return ChiSq(par, stripHit) < fChiSqStripHitCut;
@@ -99,12 +99,12 @@ Bool_t CbmLitTrackFinderBase::IsIn(
 	    Double_t dx2 = pixelHit->GetDx();
 	   	Double_t y1 = par->GetY();
 	   	Double_t y2 = pixelHit->GetY();
-	   	Double_t dy2 = pixelHit->GetDy();   
-//	   	Double_t devX = fSigmaCoef * std::sqrt(C0 + dx2 * dx2);      
+	   	Double_t dy2 = pixelHit->GetDy();
+//	   	Double_t devX = fSigmaCoef * std::sqrt(C0 + dx2 * dx2);
 //		Double_t devY = fSigmaCoef * std::sqrt(C5 + dy2 * dy2);
-	    Double_t devX = fSigmaCoef * (std::sqrt(C0) + dx2);      
+	    Double_t devX = fSigmaCoef * (std::sqrt(C0) + dx2);
 	    Double_t devY = fSigmaCoef * (std::sqrt(C5) + dy2);
-   	
+
 	    return ( ( (x1 + devX) >= x2 ) &&
 	             ( (x1 - devX) <= x2 ) &&
 	             ( (y1 + devY) >= y2 ) &&
@@ -130,9 +130,9 @@ HitPtrIteratorPair CbmLitTrackFinderBase::MinMaxIndex(
 	    hit.SetX(par->GetX() - devX);
 	    bounds.first = std::lower_bound(hits.first, hits.second, &hit, CompareHitPtrXULess());
 	    hit.SetX(par->GetX() + devX);
-	    bounds.second =	std::lower_bound(hits.first, hits.second, &hit, CompareHitPtrXULess());  
+	    bounds.second =	std::lower_bound(hits.first, hits.second, &hit, CompareHitPtrXULess());
 	}
- 
+
     return bounds;
 }
 
@@ -154,8 +154,8 @@ void CbmLitTrackFinderBase::RemoveHits(
 {
    for(TrackPtrIterator it = itBegin; it != itEnd; it++) {
       if((*it)->GetQuality() == kLITBAD) continue;
-      for (Int_t hit = 0; hit < (*it)->GetNofHits(); hit++) 
-    	  fUsedHitsSet.insert((*it)->GetHit(hit)->GetRefId());               
+      for (Int_t hit = 0; hit < (*it)->GetNofHits(); hit++)
+    	  fUsedHitsSet.insert((*it)->GetHit(hit)->GetRefId());
    }
 }
 

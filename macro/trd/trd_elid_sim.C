@@ -1,40 +1,39 @@
-/*  Description: This macro runs simulation of  
+/*  Description: This macro runs simulation of
 electrons and pions using BoxGenerator
 
  Author : Simeon Lebedev
  E-mail : S.Lebedev@gsi.de
  */
 
-void trd_el_id_sim(Int_t nEvents = 1000)
+void trd_elid_sim(Int_t nEvents = 500)
 {
 
   // ========================================================================
   //          Adjust this part according to your requirements
-  
+
   // ----- Paths and file names  --------------------------------------------
-  TString inDir   = "/d/cbm03/urqmd/auau/25gev/centr";
-  TString inFile  = inDir + "/urqmd.auau.25gev.centr.0000.ftn14";
-  TString outDir  = "/d/cbm02/slebedev/trd/MAY08/";
+  TString outDir  = "/d/cbm02/slebedev/trd/FEB09/";
   TString outFile = outDir + "mom.piel.0000.mc.root";
   TString parFile = outDir + "mom.piel.0000.params.root";
-  
+
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString targetGeom = "target.geo";
+  TString targetGeom = "target_au_250mu.geo";
   TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "magnet_active.geo";
+  TString magnetGeom = "magnet_standard.geo";
   TString mvdGeom    = "mvd_standard.geo";
   TString stsGeom    = "sts_standard.geo";
   TString richGeom   = "rich_standard.geo";
   TString trdGeom    = "trd_standard.geo";
-  //TString tofGeom    = "tof_standard.geo";
-  //TString ecalGeom   = "ecal_FastMC.geo";
-  
+ // TString tofGeom    = "tof_standard.geo";
+ // TString ecalGeom   = "ecal_FastMC.geo";
+
+
   // -----   Magnetic field   -----------------------------------------------
   TString fieldMap    = "FieldMuonMagnet";   // name of field map
   Double_t fieldZ     = 50.;             // field centre z position
   Double_t fieldScale =  1.;             // field scaling factor
-  
+
   // In general, the following parts need not be touched
   // ========================================================================
 
@@ -71,8 +70,8 @@ void trd_el_id_sim(Int_t nEvents = 1000)
  // gSystem->Load("libEcal");
   // -----------------------------------------------------------------------
 
- 
- 
+
+
   // -----   Create simulation run   ----------------------------------------
   CbmRunSim* fRun = new CbmRunSim();
   fRun->SetName("TGeant3");              // Transport engine
@@ -98,7 +97,7 @@ void trd_el_id_sim(Int_t nEvents = 1000)
     pipe->SetGeometryFileName(pipeGeom);
     fRun->AddModule(pipe);
   }
-  
+
   if ( targetGeom != "" ) {
     CbmModule* target = new CbmTarget("Target");
     target->SetGeometryFileName(targetGeom);
@@ -110,7 +109,7 @@ void trd_el_id_sim(Int_t nEvents = 1000)
     magnet->SetGeometryFileName(magnetGeom);
     fRun->AddModule(magnet);
   }
-  
+
   if ( mvdGeom != "" ) {
     CbmDetector* mvd = new CbmMvd("MVD", kTRUE);
     mvd->SetGeometryFileName(mvdGeom);
@@ -140,9 +139,9 @@ void trd_el_id_sim(Int_t nEvents = 1000)
     tof->SetGeometryFileName(tofGeom);
     fRun->AddModule(tof);
   }
-  
+
   if ( ecalGeom != "" ) {
-    CbmDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data()); 
+    CbmDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data());
     fRun->AddModule(ecal);
   }*/
   // ------------------------------------------------------------------------
@@ -170,57 +169,54 @@ void trd_el_id_sim(Int_t nEvents = 1000)
 
   // -----   Create PrimaryGenerator   --------------------------------------
   CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
-  //CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
- // primGen->AddGenerator(urqmdGen);
-     
   // ------------------------------------------------------------------------
   Int_t kfCode1=11;   // electrons
   Int_t kfCode2=-11;   // positrons
   Double_t minMomentum = 1.; //minimum momentum
   Double_t maxMomentum = 10.; //maximum momentum
-  
+
   CbmBoxGenerator* boxGen1 = new CbmBoxGenerator(11, 20);
   boxGen1->SetPRange(minMomentum, maxMomentum);
   boxGen1->SetPhiRange(0.,360.);
   boxGen1->SetThetaRange(2.5,25.);
-  boxGen1->SetCosTheta();    
+  boxGen1->SetCosTheta();
   boxGen1->Init();
   primGen->AddGenerator(boxGen1);
-  
+
   CbmBoxGenerator* boxGen2 = new CbmBoxGenerator(-11, 20);
   boxGen2->SetPRange(minMomentum, maxMomentum);
   boxGen2->SetPhiRange(0.,360.);
   boxGen2->SetThetaRange(2.5,25.);
-  boxGen2->SetCosTheta();    
+  boxGen2->SetCosTheta();
   boxGen2->Init();
   primGen->AddGenerator(boxGen2);
-    
+
   CbmBoxGenerator* boxGen3 = new CbmBoxGenerator(211, 20);
   boxGen3->SetPRange(minMomentum, maxMomentum);
   boxGen3->SetPhiRange(0.,360.);
   boxGen3->SetThetaRange(2.5,25.);
-  boxGen3->SetCosTheta();    
+  boxGen3->SetCosTheta();
   boxGen3->Init();
   primGen->AddGenerator(boxGen3);
-  
+
   CbmBoxGenerator* boxGen4 = new CbmBoxGenerator(-211, 20);
   boxGen4->SetPRange(minMomentum, maxMomentum);
   boxGen4->SetPhiRange(0.,360.);
   boxGen4->SetThetaRange(2.5,25.);
-  boxGen4->SetCosTheta();    
+  boxGen4->SetCosTheta();
   boxGen4->Init();
   primGen->AddGenerator(boxGen4);
 
   // ------------------------------------------------------------------------
-   fRun->SetGenerator(primGen);  
+   fRun->SetGenerator(primGen);
 
 
- 
+
   // -----   Run initialisation   -------------------------------------------
   fRun->Init();
   // ------------------------------------------------------------------------
-  
-  
+
+
   // -----   Runtime database   ---------------------------------------------
   CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
   fieldPar->SetParameters(magField);
@@ -234,7 +230,7 @@ void trd_el_id_sim(Int_t nEvents = 1000)
   rtdb->print();
   // ------------------------------------------------------------------------
 
- 
+
   // -----   Start run   ----------------------------------------------------
   fRun->Run(nEvents);
   // ------------------------------------------------------------------------
@@ -248,7 +244,7 @@ void trd_el_id_sim(Int_t nEvents = 1000)
   cout << "Macro finished succesfully." << endl;
   cout << "Output file is "    << outFile << endl;
   cout << "Parameter file is " << parFile << endl;
-  cout << "Real time " << rtime << " s, CPU time " << ctime 
+  cout << "Real time " << rtime << " s, CPU time " << ctime
        << "s" << endl << endl;
   // ------------------------------------------------------------------------
 

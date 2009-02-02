@@ -3,7 +3,7 @@
  Author : Simeon Lebedev
  E-mail : S.Lebedev@gsi.de
  */
-void trd_elid_reco(Int_t nEvents = 1000)
+void trd_elid_reco(Int_t nEvents = 500)
 {
 
   // ========================================================================
@@ -13,22 +13,22 @@ void trd_elid_reco(Int_t nEvents = 1000)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "/d/cbm02/slebedev/trd/MAY08/mom.piel.0000.mc.root";
+  TString inFile = "/d/cbm02/slebedev/trd/FEB09/mom.piel.0000.mc.root";
 
   // Parameter file
-  TString parFile = "/d/cbm02/slebedev/trd/MAY08/mom.piel.0000.params.root";
+  TString parFile = "/d/cbm02/slebedev/trd/FEB09/mom.piel.0000.params.root";
 
   // STS digitisation file
-  TString stsDigiFile = "sts_standard.gsi.digi.par";
+  TString stsDigiFile = "sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/d/cbm02/slebedev/trd/MAY08/new.mom.piel.0000.reco.root";
+  TString outFile = "/d/cbm02/slebedev/trd/FEB09/mom.piel.0000.reco.root";
 
   // In general, the following parts need not be touched
   // ========================================================================
 
 
- 
+
   // ----    Debug option   -------------------------------------------------
   gDebug = 0;
   // ------------------------------------------------------------------------
@@ -81,10 +81,12 @@ void trd_elid_reco(Int_t nEvents = 1000)
   // Resolutions in y - station and angle dependent [mum]
   Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
   Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
-  Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };  
-  Int_t trdNFoils    = 60;       // number of polyetylene foils
-  Float_t trdDFoils = 0.0015;    // thickness of 1 foil [cm]
-  Float_t trdDGap   = 0.05;      // thickness of gap between foils [cm]
+  Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
+
+  // Update of the values for the radiator F.U. 17.08.07
+  Int_t trdNFoils    = 130;       // number of polyetylene foils
+  Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
+  Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
   CbmTrdHitProducer* trdHitProd = new CbmTrdHitProducer("TRD Hitproducer",
                                                         "TRD task");
   trdHitProd->SetPar(trdNFoils, trdDFoils, trdDGap);
@@ -106,21 +108,21 @@ void trd_elid_reco(Int_t nEvents = 1000)
   CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(iVerbose);
   run->AddTask(trdMatchTracks);
   // -------------------------------------------------------------------------
- 
+
      // ----------- TRD track Pid Ann ----------------------
     CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new
     CbmTrdSetTracksPidANN("Ann","Ann");
-    trdSetTracksPidAnnTask->SetTRDGeometryType("mb");
+    //trdSetTracksPidAnnTask->SetTRDGeometryType("mb");
     run->AddTask(trdSetTracksPidAnnTask);
-    // ---------------------------------------------------- 
-  
-  
+    // ----------------------------------------------------
+
+
   // ===                 End of TRD local reconstruction                   ===
   // =========================================================================
 
 
-  
-  
+
+
 
   // -----  Parameter database   --------------------------------------------
   //TString stsDigi = gSystem->Getenv("VMCWORKDIR");
@@ -138,7 +140,7 @@ void trd_elid_reco(Int_t nEvents = 1000)
   // ------------------------------------------------------------------------
 
 
-     
+
   // -----   Intialise and run   --------------------------------------------
   run->LoadGeometry();
   run->Init();

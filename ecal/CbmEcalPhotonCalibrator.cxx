@@ -53,6 +53,7 @@ CbmEcalPhotonCalibrator::CbmEcalPhotonCalibrator(const char* name, const Int_t i
   fThreshold=0;
   fThresholdPS=0;
   fInf=CbmEcalInf::GetInstance(fGeoFile);
+  fAlgo=0;
 }
 
 void CbmEcalPhotonCalibrator::InitArrays(UInt_t size, UInt_t start)
@@ -342,7 +343,7 @@ void CbmEcalPhotonCalibrator::Exec(Option_t* option)
     cell->GetNeighborsList(0,lst);
     fSteps++;
     for(lp=lst.begin();lp!=lst.end();++lp)
-      if ((*lp)->GetEnergy()>cell->GetEnergy())
+      if ((*lp)->GetTotalEnergy()>cell->GetTotalEnergy())
       {
 	cell=(*lp);
       }
@@ -354,13 +355,57 @@ void CbmEcalPhotonCalibrator::Exec(Option_t* option)
   cell->Get5x5ClusterEnergy(f5x5EcalEnergy, f5x5PSEnergy);
   f2x2EcalEnergy=0;
   f2x2PSEnergy=0;
-  for(Int_t j=1;j<5;j++)
-  {
-    cell->GetClusterEnergy(j,EcalE, EcalPSE);
-    if (EcalE+EcalPSE>f2x2EcalEnergy+f2x2PSEnergy)
+  if (fAlgo==0)
+    for(Int_t j=1;j<5;j++)
     {
-      f2x2EcalEnergy=EcalE;
-      f2x2PSEnergy=EcalPSE;
+      cell->GetClusterEnergy(j,EcalE, EcalPSE);
+      if (EcalE+EcalPSE>f2x2EcalEnergy+f2x2PSEnergy)
+      {
+        f2x2EcalEnergy=EcalE;
+        f2x2PSEnergy=EcalPSE;
+      }
+    }
+  else
+  {
+    Double_t mine;
+    Double_t maxe;
+    CbmEcalCell* min;
+    Int_t max;
+    Int_t j;
+    Double_t e;
+
+    mine=cell->GetTotalEnergy(); min=cell;
+    maxe=-1.0;
+    cells.clear();
+    /** Find minimum cell **/
+    cell->GetNeighborsList(0, cells);
+    for(pc=cells.begin();pc!=cells.end();++pc)
+      if ((*pc)->GetTotalEnergy()<mine)
+      {
+	mine=(*pc)->GetTotalEnergy();
+	min=(*pc);
+      }
+    for(j=1;j<5;j++)
+    {
+      cell->GetNeighborsList(j, cells);
+      e=0;
+      for(pc=cells.begin();pc!=cells.end();++pc)
+	e+=(*pc)->GetTotalEnergy();
+      if (e>maxe)
+      {
+	maxe=e;
+	max=j;
+      }
+    }
+    maxe+=cell->GetTotalEnergy();
+    cell->GetNeighborsList(max, cells);
+    cells.push_back(cell);
+    if (find(cells.begin(), cells.end(), min)==cells.end())
+      cells.push_back(min);
+    for(pc=cells.begin();pc!=cells.end();++pc)
+    {
+      f2x2EcalEnergy+=(*pc)->GetEnergy();
+      f2x2PSEnergy+=(*pc)->GetPSEnergy();
     }
   }
   cout << endl;

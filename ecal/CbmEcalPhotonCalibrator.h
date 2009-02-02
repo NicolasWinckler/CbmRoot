@@ -83,6 +83,8 @@ public:
 
   /** Set photon birth point **/
   void SetPhotonXYZ(Float_t x=0, Float_t y=0, Float_t z=0);
+  /** Set algorithm of cluster construction **/
+  void SetAlgo(Int_t algo) {fAlgo=algo;}
 private:
   /** Init procedure for fLowTheta, fHiTheta, fMaxX, fMaxY**/
   void InitArrays(UInt_t size=15, UInt_t start=0);
@@ -161,6 +163,8 @@ private:
   Float_t fPz;
   /** Numeber of steps to find maximum cell **/
   Int_t fSteps;
+  /** Algorithm of cluster construction **/
+  Int_t fAlgo;
 
   std::vector<Float_t> fLowTheta;
   std::vector<Float_t> fHighTheta;

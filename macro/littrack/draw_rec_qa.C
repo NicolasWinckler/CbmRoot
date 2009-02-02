@@ -1,15 +1,18 @@
-TString dir  = "/home/d/andrey/events/newmuch/large/10mu/mu/";
+TString dir  = "/d/cbm02/andrey/events/much/compact10/10mu/mu/";
 TFile *file = new TFile(dir + "much.tracks.root");
 
-Int_t lsGhost = 2;
-Int_t lsTrue = 1;
-Int_t width = 3;
-Int_t size = 3;
+Int_t lineWidth = 3;
+Int_t markerSize = 3;
+
+Int_t lineStyleGhost = 2;
+Int_t lineStyleTrue = 1;
 Int_t colorGhost = 2;
 Int_t colorTrue = 4;
 
 void draw_rec_qa()
 {
+	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/draw_hist.C");
+
 //	gStyle->SetOptStat("");
 //	gStyle->SetOptFit(0);
 //	gStyle->SetOptTitle(0);
@@ -23,34 +26,17 @@ void draw_eff()
 {
   TCanvas *c1 = new TCanvas("efficiency","efficiency",1200,1000);
   c1->SetGrid();
-  hMomEffAll->Scale(100);
-  hMomEffAll->SetLineColor(4);
-  hMomEffAll->SetMarkerColor(4);
-  hMomEffAll->SetLineWidth(4.);
-  hMomEffAll->SetMarkerStyle(4);
-  hMomEffAll->SetMarkerSize(3.0);
-  hMomEffAll->GetXaxis()->SetTitle("Momentum, GeV/c");
-  hMomEffAll->GetYaxis()->SetTitle("Efficiency, %");
-  hMomEffAll->SetMaximum(100);
+
+  hMomEffAll->SetMaximum(1);
   hMomEffAll->SetMinimum(0);
+  draw_hist_1D(hMomEffAll, "Momentum, GeV/c", "Efficiency",
+		  kBlue, lineWidth, 1, markerSize, kCircle, false, false, "");
 
-  hMomEffMuons->Scale(100);
-  hMomEffMuons->SetLineColor(2);
-  hMomEffMuons->SetMarkerColor(2);
-  hMomEffMuons->SetLineWidth(4.);
-  hMomEffMuons->SetMarkerStyle(8);
-  hMomEffMuons->SetMarkerSize(3.0);
+  draw_hist_1D(hMomEffMuons, "Momentum, GeV/c", "Efficiency",
+  		  kRed, lineWidth, 1, markerSize, kFullDotLarge, false, false, "SAME");
 
-  hMomEffElectrons->Scale(100);
-  hMomEffElectrons->SetLineColor(2);
-  hMomEffElectrons->SetMarkerColor(2);
-  hMomEffElectrons->SetLineWidth(4.);
-  hMomEffElectrons->SetMarkerStyle(8);
-  hMomEffElectrons->SetMarkerSize(3.0);
-
-  hMomEffAll->Draw();
-  hMomEffMuons->Draw("SAME");
-//  hMomEffElectrons->Draw("SAME");
+//  draw_hist_1D(hMomEffElectrons, "Momentum, GeV/c", "Efficiency",
+//    		  kRed, lineWidth, 1, markerSize, kFullDotLarge, false, false, "SAME");
 
   TLegend* l1 = new TLegend(0.5,0.7,0.9,0.9);
   l1->SetHeader("Efficiency");
@@ -95,17 +81,16 @@ void draw_params_2D()
 
   TCanvas *c1 = new TCanvas("parameters2D","parameters2D", 1200, 1000);
   c1->Divide(2,1);
-
-  c1->cd(1);
   c1->SetGrid();
 
+  c1->cd(1);
   hMomChi2True->GetXaxis()->SetTitle("momentum, GeV");
   hMomChi2True->GetYaxis()->SetTitle("chi2");
   hMomChi2True->GetZaxis()->SetTitle("counter");
   hMomChi2True->SetMarkerColor(colorTrue);
   hMomChi2True->SetLineColor(colorTrue);
-  hMomChi2True->SetLineWidth(width);
-  hMomChi2True->SetMarkerSize(size);
+  hMomChi2True->SetLineWidth(lineWidth);
+  hMomChi2True->SetMarkerSize(markerSize);
   hMomChi2True->Draw("COLZ");
 
   c1->cd(2);
@@ -114,41 +99,28 @@ void draw_params_2D()
   hMomChi2Ghost->GetZaxis()->SetTitle("counter");
   hMomChi2Ghost->SetMarkerColor(colorGhost);
   hMomChi2Ghost->SetLineColor(colorGhost);
-  hMomChi2Ghost->SetLineWidth(width);
-  hMomChi2Ghost->SetMarkerSize(size);
+  hMomChi2Ghost->SetLineWidth(lineWidth);
+  hMomChi2Ghost->SetMarkerSize(markerSize);
   hMomChi2Ghost->Draw("COLZ");
 }
 
 void draw_nof_hits()
 {
-  hNofHits->SetLineColor(1);
-  hNofHits->SetMarkerColor(1);
-  hNofHits->SetLineWidth(width);
-  hNofHits->SetLineStyle(3);
-  hNofHits->GetXaxis()->SetTitle("nof hits");
-  hNofHits->GetYaxis()->SetTitle("counter");
+	draw_hist_1D(hNofHits, "nof hits", "counter",
+			  kBlack, lineWidth, 3, markerSize, kDot, false, true, "");
 
-  hNofGoodHits->SetLineColor(colorTrue);
-  hNofGoodHits->SetMarkerColor(colorTrue);
-  hNofGoodHits->SetLineWidth(width);
-  hNofGoodHits->SetLineStyle(lsTrue);
+	draw_hist_1D(hNofGoodHits, "nof hits", "counter",
+			colorTrue, lineWidth, lineStyleTrue, markerSize, kDot, false, true, "SAME");
 
-  hNofBadHits->SetLineColor(colorGhost);
-  hNofBadHits->SetMarkerColor(colorGhost);
-  hNofBadHits->SetLineWidth(width);
-  hNofBadHits->SetLineStyle(lsGhost);
+	draw_hist_1D(hNofBadHits, "nof hits", "counter",
+			colorGhost, lineWidth, lineStyleGhost, markerSize, kDot, false, true, "SAME");
 
-  gPad->SetLogy();
-  hNofGoodHits->Draw();
-  hNofHits->Draw("SAME");
-  hNofBadHits->Draw("SAME");
-
-  TLegend* l1 = new TLegend(0.5,0.7,0.9,0.9);
-  l1->SetHeader("nof hits");
-  l1->AddEntry(hNofHits,"nof hits","l");
-  l1->AddEntry(hNofGoodHits,"nof good hits","l");
-  l1->AddEntry(hNofBadHits,"nof bad hits","l");
-  l1->Draw();
+	TLegend* l1 = new TLegend(0.5,0.7,0.9,0.9);
+	l1->SetHeader("nof hits");
+	l1->AddEntry(hNofHits,"nof hits","l");
+	l1->AddEntry(hNofGoodHits,"nof good hits","l");
+	l1->AddEntry(hNofBadHits,"nof bad hits","l");
+	l1->Draw();
 }
 
 void draw_param_hist(
@@ -158,28 +130,18 @@ void draw_param_hist(
 		const std::string& titleX,
 		const std::string& titleY)
 {
-  h1->SetLineColor(colorTrue);
-  h1->SetMarkerColor(colorTrue);
-  h1->SetLineWidth(width);
-  h1->SetLineStyle(lsTrue);
-  h1->GetXaxis()->SetTitle(titleX.c_str());
-  h1->GetYaxis()->SetTitle(titleY.c_str());
+	draw_hist_1D(h1, titleX.c_str(), titleY.c_str(),
+			  colorTrue, lineWidth, lineStyleTrue, markerSize, kDot, false, true, "");
+	draw_hist_1D(h2, titleX.c_str(), titleY.c_str(),
+			  colorGhost, lineWidth, lineStyleGhost, markerSize, kDot, false, true, "SAME");
 
-  h2->SetLineColor(colorGhost);
-  h2->SetMarkerColor(colorGhost);
-  h2->SetLineWidth(width);
-  h2->SetLineStyle(lsGhost);
+	Double_t max = (h1->GetMaximum() > h2->GetMaximum()) ? h1->GetMaximum() : h2->GetMaximum();
+  	h1->SetMaximum(max);
 
-  Double_t max = (h1->GetMaximum() > h2->GetMaximum()) ? h1->GetMaximum() : h2->GetMaximum();
-  h1->SetMaximum(max);
-  gPad->SetLogy();
-  h1->Draw();
-  h2->Draw("SAME");
-
-  TLegend* l1 = new TLegend(0.5,0.7,0.9,0.9);
-  l1->SetHeader(header.c_str());
-  l1->AddEntry(h1,"true tracks","l");
-  l1->AddEntry(h2,"ghost tracks","l");
-  l1->Draw();
+  	TLegend* l1 = new TLegend(0.5,0.7,0.9,0.9);
+  	l1->SetHeader(header.c_str());
+  	l1->AddEntry(h1,"true tracks","l");
+  	l1->AddEntry(h2,"ghost tracks","l");
+  	l1->Draw();
 }
 

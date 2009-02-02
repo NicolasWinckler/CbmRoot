@@ -1,34 +1,30 @@
-void much_sim(Int_t nEvents = 1000)
+void much_sim(Int_t nEvents = 100)
 {
-  TString dir = "/d/cbm02/andrey/events/muchstraw/large/10mu/mu_urqmd/";
-    
-  TString outFile = dir + "/mc.root";
-  TString parFile = dir + "/params.root"; 
+  TString dir = "/home/d/andrey/events/newmuch/large/10mu/mu_urqmd/";
 
-  TString inFileUrqmd = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0001.ftn14";               
-//  TString plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";  
-     
-//  TString muchGeom   = "much_standard.geo";
-  TString muchGeom   = "much_straw_new.geo";
- // TString muchGeom   = "../much/geometry/much_compact.geo";
- //TString muchGeom   = "../much/geometry/much_compact.2.geo";
+  TString outFile = dir + "mc.root";
+  TString parFile = dir + "params.root";
+
+  TString inFileUrqmd = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
+//  TString plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
+
+  TString muchGeom   = "much_standard.geo";
+//  TString muchGeom   = "much_straw_new.geo";
   TString pipeGeom   = "pipe_much.geo";
   TString shieldGeom = "shield_standard.geo";
-  
+
   // -----   Other geometries   ---------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString targetGeom = "target.geo";
-  TString magnetGeom = "magnet_muon.geo";
+  TString targetGeom = "target_au_250mu.geo";
+  TString magnetGeom = "magnet_standard.geo";
   TString stsGeom    = "sts_allstrips.geo";
   TString trdGeom    = "trd_standard.geo";
   TString tofGeom    = "tof_standard.geo";
-  
+
   // -----   Magnetic field   -----------------------------------------------
   TString  fieldMap   = "FieldMuonMagnet";   // name of field map
   Double_t fieldZ     = 50.;                 // field centre z position
   Double_t fieldScale =  1.;                 // field scaling factor
-
-  gDebug = 0;
 
   TStopwatch timer;
   timer.Start();
@@ -58,14 +54,14 @@ void much_sim(Int_t nEvents = 1000)
     fRun->AddModule(pipe);
     cout << "    --- " << pipeGeom << endl;
   }
-  
+
    if ( shieldGeom != "" ) {
     CbmModule* shield = new CbmShield("SHIELD");
     shield->SetGeometryFileName(shieldGeom);
     fRun->AddModule(shield);
     cout << "    --- " << shieldGeom << endl;
   }
-      
+
   if ( targetGeom != "" ) {
     CbmModule* target = new CbmTarget("Target");
     target->SetGeometryFileName(targetGeom);
@@ -79,7 +75,7 @@ void much_sim(Int_t nEvents = 1000)
     fRun->AddModule(magnet);
     cout << "    --- " << magnetGeom << endl;
   }
-  
+
   if ( stsGeom != "" ) {
     CbmDetector* sts = new CbmSts("STS", kTRUE);
     sts->SetGeometryFileName(stsGeom);
@@ -123,42 +119,40 @@ void much_sim(Int_t nEvents = 1000)
   magField->SetScale(fieldScale);
   fRun->SetField(magField);
 
-  
+
   CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
-  
+
 //  CbmPlutoGenerator *plutoGen= new CbmPlutoGenerator(plutoFile);
 //  primGen->AddGenerator(plutoGen);
-    
+
   CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFileUrqmd);
   primGen->AddGenerator(urqmdGen);
 
   Double_t minMom = 2.5; //minimum momentum
   Double_t maxMom = 25.; //maximum momentum
-  
+
   CbmBoxGenerator* boxGen1 = new CbmBoxGenerator(13, 5);
   boxGen1->SetPRange(minMom, maxMom);
   boxGen1->SetPhiRange(0.,360.);
   boxGen1->SetThetaRange(2.5, 25.);
-  boxGen1->SetCosTheta();    
+  boxGen1->SetCosTheta();
   boxGen1->Init();
   primGen->AddGenerator(boxGen1);
-  
+
   CbmBoxGenerator* boxGen2 = new CbmBoxGenerator(-13, 5);
   boxGen2->SetPRange(minMom, maxMom);
   boxGen2->SetPhiRange(0.,360.);
   boxGen2->SetThetaRange(2.5, 25.);
-  boxGen2->SetCosTheta();    
+  boxGen2->SetCosTheta();
   boxGen2->Init();
   primGen->AddGenerator(boxGen2);
-  
-  fRun->SetGenerator(primGen);       
- 
+
+  fRun->SetGenerator(primGen);
+
   fRun->Init();
- 
-   
+
+
   // -----   Runtime database   ---------------------------------------------
-  cout << endl << "=== much_sim.C : Set up database ..." << endl;
-  cout << "                Parameters will be saved to output file" << endl;
   CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
   fieldPar->SetParameters(magField);
   fieldPar->setChanged();
@@ -170,12 +164,12 @@ void much_sim(Int_t nEvents = 1000)
   rtdb->saveOutput();
   rtdb->print();
   // ------------------------------------------------------------------------
-   
+
   // -----   Start run   ----------------------------------------------------
   cout << endl << "=== much_sim.C : Start run ..." << endl;
   fRun->Run(nEvents);
   // ------------------------------------------------------------------------
-  
+
   // -----   Finish   -------------------------------------------------------
   timer.Stop();
   Double_t rtime = timer.RealTime();

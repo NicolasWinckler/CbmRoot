@@ -2,60 +2,62 @@ void much_hits(Int_t nEvents = 10000)
 {
   Int_t iVerbose = 0;
 
-  TString dir = "/d/cbm02/andrey/events/muchstraw/large/10mu/mu/";
-   
-  TString inFile = dir + "mc.root";
-  TString parFile = dir + "params.root";  
+  TString dir = "/home/d/andrey/events/newmuch/large/10mu/mu/";
+  TString mcFile = dir + "mc.root";
+  TString parFile = dir + "params.root";
   TString outFile = dir + "much.hits.root";
-  
+  TString digiFile = dir + "much.digi.root";
+
    //TString muchDigiFile = "$VMCWORKDIR/much/parameters/much_digi.400x800mic.par";
    //TString muchDigiFile = "/u/andrey/cbm/svnfeb08/cbmroot/much/parameters/much_large.digi.par";
     //TString muchDigiFile = "/u/andrey/cbm/svnfeb08/cbmroot/much/parameters/much_compact.2.norot.digi.par";
-  TString muchDigiFile = "/u/andrey/cbm/svnfeb08/cbmroot/parameters/much/much_standard.digi.par";
-   
+  //TString muchDigiFile = "/u/andrey/cbm/svnfeb08/cbmroot/parameters/much/much_standard.digi.par";
+
    TStopwatch timer;
    timer.Start();
-   
+
    gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
    basiclibs();
    gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
    cbmrootlibs();
-   
+
    // -----   Reconstruction run   -------------------------------------------
    CbmRunAna *run= new CbmRunAna();
-   run->SetInputFile(inFile);
+   run->SetInputFile(mcFile);
    run->SetOutputFile(outFile);
    // ------------------------------------------------------------------------
-     
-   
+
+
    // =========================================================================
    // ===                      MUCH local reconstruction                    ===
    // =========================================================================
-   
+
    // ---  MuCh digitizer ----------------------------------------------------
-   CbmMuchDigitize* muchDigitize = new CbmMuchDigitize("MuchDigitize", iVerbose);
-   muchDigitize->SetUseAvalanche(0); // Not account for avalanches
+   CbmMuchDigitize* muchDigitize = new CbmMuchDigitize("MuchDigitize", digiFile.Data(), iVerbose);
+   muchDigitize->SetUseAvalanche(0); // 0 - Not account for avalanches; 1 - Account for avalanches
+   //muchDigitize->SetMeanNoise(0);
    run->AddTask(muchDigitize);
    // ------------------------------------------------------------------------
-   
+
    // ---  MuCh hit finder ---------------------------------------------------
-   CbmMuchFindHits* muchFindHits = new CbmMuchFindHits("MuchFindHits", iVerbose);
+   CbmMuchFindHits* muchFindHits = new CbmMuchFindHits("MuchFindHits", digiFile.Data(), iVerbose);
    muchFindHits->SetUseClustering(0);
    run->AddTask(muchFindHits);
-   
+
    // -------------------------------------------------------------------------
    // ===                 End of MUCH local reconstruction                  ===
    // =========================================================================
-      
+
 
    // -----  Parameter database   --------------------------------------------
    CbmRuntimeDb* rtdb = run->GetRuntimeDb();
    CbmParRootFileIo* parIo1 = new CbmParRootFileIo();
-   CbmParAsciiFileIo* parIo2 = new CbmParAsciiFileIo();
+//   CbmParRootFileIo* parIo2 = new CbmParRootFileIo();
+   // CbmParAsciiFileIo* parIo2 = new CbmParAsciiFileIo();
    parIo1->open(parFile.Data());
-   parIo2->open(muchDigiFile.Data(),"in");
+//   parIo2->open(mcFile.Data());
    rtdb->setFirstInput(parIo1);
-   rtdb->setSecondInput(parIo2);
+//   rtdb->setSecondInput(parIo2);
    rtdb->setOutput(parIo1);
    rtdb->saveOutput();
    // ------------------------------------------------------------------------
@@ -78,7 +80,7 @@ void much_hits(Int_t nEvents = 10000)
    cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
    cout << endl;
    // ------------------------------------------------------------------------
-   
+
    cout << " Test passed" << endl;
    cout << " All ok " << endl;
    exit(0);

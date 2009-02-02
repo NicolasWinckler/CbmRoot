@@ -1,33 +1,22 @@
-void sts_reco(Int_t nEvents = 100)
+void sts_reco(Int_t nEvents = 1)
 {
-//  TString system  = "auau";  
-//  TString beam    = "25gev";  
-//  TString trigger = "centr";
-//  TString particle = "mu";  
-   
-  //TString dir = "/d/cbm02/andrey/events/much/compact/signal/";
- // TString dir = "/d/cbm02/andrey/events/much/10stations/new/";
- // TString dir = "/d/cbm02/andrey/events/much/10stations/new/wofield/signal/";
- // TString dir = "/d/cbm02/andrey/events/much/10stations/new/signal/";
-  //TString dir = "/d/cbm02/andrey/events/trd/25gev";
-  //TString dir = "/d/cbm02/andrey/events/much/large/10mu/mu_urqmd/";
-  
-  //TString dir = "/d/cbm02/andrey/events/muchstraw/large/10mu/mu/";
-  TString dir  = "/d/cbm02/andrey/events/trd/standard/e";
-  TString inFile = dir + "/mc.root";
-  TString parFile = dir + "/params.root";  
-  TString outFile = dir + "/sts.reco.root";
- 
-  TString digiFile = "sts_standard.digi.par";
- // TString digiFile = "sts_allstrips.digi.par";
-  
-  Int_t iVerbose = 0;
-  
+  TString dir = "/home/d/andrey/events/newmuch/large/10mu/mu_urqmd/";
+//  TString dir = "/d/cbm02/andrey/events/muchstraw/large/10mu/mu/";
+//  TString dir  = "/d/cbm02/andrey/events/trd/standard/e";
+  TString inFile = dir + "mc.root";
+  TString parFile = dir + "params.root";
+  TString outFile = dir + "sts.reco.root";
+
+//  TString digiFile = "sts_standard.digi.par";
+  TString digiFile = "sts_allstrips.digi.par";
+
+  Int_t iVerbose = 3;
+
   // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
   timer.Start();
   // ------------------------------------------------------------------------
-  
+
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
@@ -40,49 +29,35 @@ void sts_reco(Int_t nEvents = 100)
   run->SetInputFile(inFile);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
-  
+
   // =========================================================================
   // ===                     MVD local reconstruction                      ===
   // =========================================================================
-
-  
-  // -----   MVD Hitproducer   -----------------------------------------------
-//  CbmMvdHitProducer* mvdHitProd = new CbmMvdHitProducer("MVDHitProducer", 0, 
+// -----   MVD Hitproducer   -----------------------------------------------
+//  CbmMvdHitProducer* mvdHitProd = new CbmMvdHitProducer("MVDHitProducer", 0,
 //  			  			       iVerbose);
 //  run->AddTask(mvdHitProd);
-  // -------------------------------------------------------------------------
-  
-  
+// -------------------------------------------------------------------------
 
-
-  // ===                 End of MVD local reconstruction                   ===
-  // =========================================================================
-  
-  
-  
-  
-  // -----   STS digitiser   ------------------------------------------------
+// ===                 End of MVD local reconstruction                   ===
+// =========================================================================
+// -----   STS digitiser   ------------------------------------------------
   CbmTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
   run->AddTask(stsDigitize);
-  // ------------------------------------------------------------------------
- 
-  
-  
-  // ---  STS hit finding   -------------------------------------------------
+// ------------------------------------------------------------------------
+
+// ---  STS hit finding   -------------------------------------------------
   CbmTask* findHits = new CbmStsFindHits("STSFindHits", iVerbose);
   run->AddTask(findHits);
-  // ------------------------------------------------------------------------
-   
-  
-    
-  // ---  STS hit matching   ------------------------------------------------
-  CbmTask* matchHits = new CbmStsMatchHits("STSMatchHits", 
+// ------------------------------------------------------------------------
+
+// ---  STS hit matching   ------------------------------------------------
+  CbmTask* matchHits = new CbmStsMatchHits("STSMatchHits",
                   iVerbose);
   run->AddTask(matchHits);
-  // ------------------------------------------------------------------------
-   
+// ------------------------------------------------------------------------
 
-   
+
   // -----   STS track finding   --------------------------------------------
   CbmTask* kalman= new CbmKF();
   run->AddTask(kalman);
@@ -93,15 +68,15 @@ void sts_reco(Int_t nEvents = 100)
   run->AddTask(findTracks);
   // ------------------------------------------------------------------------
 
- 
-         
+
+
   // -----   STS track matching   -------------------------------------------
   CbmTask* matchTracks = new CbmStsMatchTracks("Match tracks", iVerbose);
   run->AddTask(matchTracks);
   // ------------------------------------------------------------------------
-  
 
-  
+
+
   // -----   STS track fitting   --------------------------------------------
   CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
   CbmTask* fitTracks = new CbmStsFitTracks("STS Track Fitter",
@@ -109,15 +84,15 @@ void sts_reco(Int_t nEvents = 100)
                   iVerbose);
   run->AddTask(fitTracks);
   // ------------------------------------------------------------------------
-  
-  
-  
+
+
+
   // -----   STS reconstruction QA   ----------------------------------------
   CbmTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 2);
  run->AddTask(stsRecoQa);
   // ------------------------------------------------------------------------
-  
-   
+
+
 
   // -----  Parameter database   --------------------------------------------
   TString stsDigiFile = gSystem->Getenv("VMCWORKDIR");
@@ -134,8 +109,8 @@ void sts_reco(Int_t nEvents = 100)
   rtdb->saveOutput();
   // ------------------------------------------------------------------------
 
-  
-  
+
+
   // -----   Initialise and run   -------------------------------------------
   run->LoadGeometry();
   run->Init();

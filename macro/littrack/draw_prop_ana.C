@@ -3,7 +3,7 @@
 #include <ostream>
 
 const int nofPar = 11; // residual (x,y,tx,ty,qp) pull (x,y,tx,ty,qp) resolution p %
-const int nofLayers = 27;
+const int nofLayers = 13;
 
 double sigma_layer[nofLayers][nofPar];
 double rms_layer[nofLayers][nofPar];
@@ -15,13 +15,13 @@ double rms_fit[2][nofPar];
 TCanvas* c_layer[nofLayers];
 TCanvas* c_fit[2];
 //TCanvas* c_sr[2];
-
-TString dir = "/d/cbm02/andrey/events/muchstraw/large/10mu/mu/";
+TString dir = "/home/d/andrey/events/newmuch/large/10mu/mu/";
+//TString dir = "/home/d/andrey/events/muchstraw/large/10mu/mu/";
 //TString dir = "/d/cbm02/andrey/events/much/10stations/10mu/mu/";
-TFile *file = new TFile(dir + "much.ana.root"); 
+TFile *file = new TFile(dir + "much.ana.root");
 
 //TString dir  = "/d/cbm02/andrey/events/trd/standard/e";
-//TFile *file = new TFile(dir + "/trd.ana.auau.25gev.e.centr.root"); 
+//TFile *file = new TFile(dir + "/trd.ana.auau.25gev.e.centr.root");
 
 TString outDir = "./test/";
 
@@ -37,22 +37,22 @@ void draw_prop_ana()
 		c_layer[i] = new TCanvas(oss.str().c_str(),oss.str().c_str(),1200,1000);
 		c_layer[i]->Divide(4, 3);
 	}
-	
+
 	c_fit[0] = new TCanvas("c_fit_first","c_fit_first",1200,1000);
 	c_fit[1] = new TCanvas("c_fit_last","c_fit_last",1200,1000);
 	c_fit[0]->Divide(4, 3);
-	c_fit[1]->Divide(4, 3);	
-	
+	c_fit[1]->Divide(4, 3);
+
 //	c_sr[0] = new TCanvas("c_sr_x","c_sr_x",1200,1000);
 //	c_sr[1] = new TCanvas("c_sr_y","c_sr_y",1200,1000);
 //	c_sr[0]->Divide(4, 3);
-//	c_sr[1]->Divide(4, 3);	
+//	c_sr[1]->Divide(4, 3);
 
-	
+
 	for (int i = 0; i < nofLayers; i++) layer_histos(i);
 
 	fit_histos();
-	
+
 //	sr_histos();
 
 	ofstream fout(outDir + "out.txt");
@@ -61,7 +61,7 @@ void draw_prop_ana()
 }
 
 void layer_histos(
-		int layer) 
+		int layer)
 {
 	string names[] = { "h_resx", "h_resy", "h_restx", "h_resty", "h_resqp",
 			"h_pullx", "h_pully", "h_pulltx", "h_pullty", "h_pullqp", "h_resp" };
@@ -76,20 +76,20 @@ void layer_histos(
 		TF1 *fit1 = hist1->GetFunction("gaus");
 		sigma_layer[layer][i] = fit1->GetParameter(2);
 		rms_layer[layer][i] = hist1->GetRMS();
-	
+
 		draw_text(i, sigma_layer[layer][i], rms_layer[layer][i]);
 	}
 	stringstream oss1;
-	oss1 << outDir << "layer_" << layer << ".gif"; 
+	oss1 << outDir << "layer_" << layer << ".gif";
 	c_layer[layer]->SaveAs(TString(oss1.str().c_str()));
 }
 
-void fit_histos() 
+void fit_histos()
 {
 	string names[] = { "h_resx", "h_resy", "h_restx", "h_resty", "h_resqp",
 			"h_pullx", "h_pully", "h_pulltx", "h_pullty", "h_pullqp", "h_resp" };
 	string layer[] = {"first", "last"};
-	
+
 	for (int ilayer=0; ilayer < 2; ilayer++) {
 		for (int i = 0; i < nofPar; i++) {
 			c_fit[ilayer]->cd(i+1);
@@ -101,11 +101,11 @@ void fit_histos()
 			hist1->Draw();
 			TF1 *fit1 = hist1->GetFunction("gaus");
 			sigma_fit[ilayer][i] = fit1->GetParameter(2);
-			rms_fit[ilayer][i] = hist1->GetRMS();   
+			rms_fit[ilayer][i] = hist1->GetRMS();
 			draw_text(i, sigma_fit[ilayer][i], rms_fit[ilayer][i]);
 		}
 		stringstream oss1;
-		oss1 << outDir << "fit_" << layer[ilayer] << ".gif"; 
+		oss1 << outDir << "fit_" << layer[ilayer] << ".gif";
 		c_fit[ilayer]->SaveAs(TString(oss1.str().c_str()));
 	}
 }
@@ -113,7 +113,7 @@ void fit_histos()
 //void sr_histos()
 //{
 //	string coor[] = {"srx", "sry"};
-//	
+//
 //	for (int icoord=0; icoord < 2; icoord++) {
 //		for (int i = 0; i < nofLayers; i++) {
 //			c_sr[icoord]->cd(i+1);
@@ -124,10 +124,10 @@ void fit_histos()
 //			hist1->Draw();
 //			TF1 *fit1 = hist1->GetFunction("gaus");
 //			sigma_sr[i][icoord] = fit1->GetParameter(2);
-//			rms_sr[i][icoord] = hist1->GetRMS();   
+//			rms_sr[i][icoord] = hist1->GetRMS();
 //		}
 //		stringstream oss;
-//		oss << coor[icoord]; 
+//		oss << coor[icoord];
 //		c_sr[icoord]->SaveAs(TString(oss.str().c_str()));
 //	}
 //}
@@ -136,13 +136,13 @@ void print(
 		ostream& out)
 {
 	out.precision(4);
-	
+
 //   out << "------------search region sigma (rms)---------------" << endl;
 //   for (int i = 0; i < nofLayers; i++) {
 //      out << "srx[" << i << "]=" << sigma_sr[i][0] << "(" << rms_sr[i][0] << ");   "
 //           << "sry[" << i << "]=" << sigma_sr[i][1] << "(" << rms_sr[i][1] << ");" << endl;
 //   }
-   
+
    out << "------------resolution sigma (rms)---------------" << endl;
    out << "layer x   y   tx   ty   qp" << endl;
    for (int i = 0; i < nofLayers; i++) {
@@ -152,7 +152,7 @@ void print(
     }
 	out << endl;
    }
-   
+
    out << "------------pulls sigma (rms)---------------" << endl;
    out << "layer x   y   tx   ty   qp" << endl;
    for (int i = 0; i < nofLayers; i++) {
@@ -165,9 +165,9 @@ void print(
 
    out << "------------momentum residual sigma (rms)---------------" << endl;
    for (int i = 0; i < nofLayers; i++) {
-      out << i << " " << sigma_layer[i][10] << "(" << rms_layer[i][10] << ")" << endl; 
-   }  
-      
+      out << i << " " << sigma_layer[i][10] << "(" << rms_layer[i][10] << ")" << endl;
+   }
+
    out << "------------residuals and pull on the last and first station---------" << endl;
    for (int i = 0; i < 2; i++) {
    	out << i << " ";

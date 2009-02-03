@@ -30,7 +30,7 @@ CbmTrdSetTracksPidANN::CbmTrdSetTracksPidANN() {
 	fTrackArray = NULL;
 	fTrdHitArray = NULL;
 	fNofTracks = 0;
-	fTRDGeometryType == "st";
+	fTRDGeometryType = "st";
 }
 // -------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ CbmTrdSetTracksPidANN::CbmTrdSetTracksPidANN(const char* name, const char* title
 	fTrackArray = NULL;
 	fTrdHitArray = NULL;
 	fNofTracks = 0;
-	fTRDGeometryType == "st";
+	fTRDGeometryType = "st";
 }
 // -------------------------------------------------------------------------
 
@@ -70,8 +70,8 @@ Bool_t CbmTrdSetTracksPidANN::ReadData() {
 	TString fileName;
 	std::vector<TString> ANNWeightsFiles;
 	fileName = gSystem->Getenv("VMCWORKDIR");
-	
-	if (fTRDGeometryType != "mb" || fTRDGeometryType != "st"){
+
+	if (fTRDGeometryType != "mb" && fTRDGeometryType != "st"){
 		fTRDGeometryType = "st";
 		cout << "-E- CbmTrdSetTracksPidANN::Init: "
 			<< "wrong geometry type." << endl;
@@ -97,8 +97,8 @@ Bool_t CbmTrdSetTracksPidANN::ReadData() {
 		ANNPar1 = 3.88;
 		ANNPar2 = 1.28;
 	}
-	
-	
+
+
 	for (Int_t i = 0; i < ANNWeightsFiles.size(); i++) {
 		const char* file = (const char*)ANNWeightsFiles[i];
 		ifstream myfile(file);
@@ -134,35 +134,37 @@ Bool_t CbmTrdSetTracksPidANN::ReadData() {
 	simu->Branch("x11", &inVector[10], "x11/F");
 	simu->Branch("x12", &inVector[11], "x12/F");
 	simu->Branch("x13", &x13, "x13/I");
-	
+
+	fNN.clear();
+
 	TMultiLayerPerceptron* ann12 = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12:12:x13",simu);
-	ann12->LoadWeights(ANNWeightsFiles[0]);	
+	ann12->LoadWeights(ANNWeightsFiles[0]);
 	fNN.push_back(ann12);
-	
+
 	TMultiLayerPerceptron* ann11 = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11:12:x13",simu);
-	ann11->LoadWeights(ANNWeightsFiles[1]);	
+	ann11->LoadWeights(ANNWeightsFiles[1]);
 	fNN.push_back(ann11);
-	
+
 	TMultiLayerPerceptron* ann10 = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6,x7,x8,x9,x10:12:x13",simu);
-	ann10->LoadWeights(ANNWeightsFiles[2]);	
+	ann10->LoadWeights(ANNWeightsFiles[2]);
 	fNN.push_back(ann10);
-	
+
 	TMultiLayerPerceptron* ann9 = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6,x7,x8,x9:12:x13",simu);
-	ann9->LoadWeights(ANNWeightsFiles[3]);	
+	ann9->LoadWeights(ANNWeightsFiles[3]);
 	fNN.push_back(ann9);
-	
+
 	TMultiLayerPerceptron* ann8 = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6,x7,x8:12:x13",simu);
-	ann8->LoadWeights(ANNWeightsFiles[4]);	
+	ann8->LoadWeights(ANNWeightsFiles[4]);
 	fNN.push_back(ann8);
-	
+
 	TMultiLayerPerceptron* ann7 = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6,x7:12:x13",simu);
-	ann7->LoadWeights(ANNWeightsFiles[5]);	
+	ann7->LoadWeights(ANNWeightsFiles[5]);
 	fNN.push_back(ann7);
-	
+
 	TMultiLayerPerceptron* ann6 = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6:12:x13",simu);
-	ann6->LoadWeights(ANNWeightsFiles[6]);	
+	ann6->LoadWeights(ANNWeightsFiles[6]);
 	fNN.push_back(ann6);
-	
+
 
 	return kTRUE;
 }
@@ -250,8 +252,8 @@ void CbmTrdSetTracksPidANN::Exec(Option_t* opt) {
 		if(eLossVector.size() == 9) iANN = 3;
 		if(eLossVector.size() == 8) iANN = 4;
 		if(eLossVector.size() == 7) iANN = 5;
-		if(eLossVector.size() == 6) iANN = 6;		
-		
+		if(eLossVector.size() == 6) iANN = 6;
+
 		Double_t nnEval = fNN[iANN]->Evaluate(0, &eLossVector[0]);
 
 		if (TMath::IsNaN(nnEval) == 1) {

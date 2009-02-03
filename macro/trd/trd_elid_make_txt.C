@@ -17,10 +17,10 @@ void trd_elid_make_txt ()
 {
     TStopwatch timer;
     timer.Start();
-    
-    std::ofstream foutEl("electrons_mom_MAY08.txt");
-    std::ofstream foutPi("pions_mom_MAY08.txt");
-    
+
+    std::ofstream foutEl("electrons_mom_FEB09.txt");
+    std::ofstream foutPi("pions_mom_FEB09.txt");
+
 
     // ----  Load libraries   -------------------------------------------------
     gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -50,23 +50,23 @@ void trd_elid_make_txt ()
     Double_t eLossdEdX[12], eLossTR[12], eLoss[12];
     char fileMC[80], fileRec[80];
 
-        
+
     TH1F* hPiELoss = new TH1F("hPiELoss","Energy loss for pions in one layer;energy loss, keV;entries",100, 0, 50);
     TH1F* hPiELossSum = new TH1F("hPiELossSum","Sum of energy losses for pions in all layers;energy loss, GeV;entries",100, 0, 3.e-4);
-        
+
     TH1F* hEldEdX = new TH1F("hEldEdX","dEdX for electrons in one layer;dEdX, GeV;entries",100, 0, 1.5e-5);
     TH1F* hElTR = new TH1F("hElTR","TR for electrons in one layer;TR, GeV;entries",100, 0, 1.5e-5);
     TH1F* hElELoss = new TH1F("hElELoss","Energy loss (dEdX+TR) for electrons in one layer;energy loss, GeV;entries",100, 0, 5.0e-5);
     TH1F* hElElossSum = new TH1F("hElELossSum","Sum of energy losses (dEdX+TR) for electrons in all layers;energy loss, GeV;entries",100, 0, 3.e-4);
     TH1F* hElNofZeroTR = new TH1F("hElNofZeroTR","Number of Zero TR layers;number of layers; entries",13, 0., 13.);
 
-                
+
     int nofZeroTR = 0;
     int nofElTracks = 0, nofPiTracks = 0;
     int nofElTracksNoMomCut = 0, nofPiTracksNoMomCut = 0;
-    
+
     for(int iFile=0; iFile <=0; iFile++){
-        sprintf(fileMC,"/d/cbm02/slebedev/trd/MAY08/mom.piel.%.4i.mc.root",iFile);
+        sprintf(fileMC,"/d/cbm02/slebedev/trd/FEB09/mom.piel.%.4i.mc.root",iFile);
         cout<<fileMC<<endl;
         TFile *f1 = new TFile(fileMC,"R");
         TTree* t1 = (TTree*)f1->Get("cbmsim");
@@ -75,8 +75,8 @@ void trd_elid_make_txt ()
         t1->SetBranchAddress("MCTrack",&fListStack);
         TClonesArray *pointsTRD = (TClonesArray*) fd1->FindObjectAny("TRDPoint");
         t1->SetBranchAddress(pointsTRD->GetName(),&pointsTRD);
-        
-        sprintf(fileRec,"/d/cbm02/slebedev/trd/MAY08/mom.piel.%.4i.reco.root",iFile);
+
+        sprintf(fileRec,"/d/cbm02/slebedev/trd/FEB09/mom.piel.%.4i.reco.root",iFile);
         cout << fileRec <<endl;
         TFile *f = new TFile(fileRec,"R");
         TTree* t = f->Get("cbmsim");
@@ -127,59 +127,59 @@ void trd_elid_make_txt ()
 
             ///only primary tracks
             if (motherId != -1) continue;
-            
+
             /// Momentum at the first TRD layer
             Int_t hitIndex =  trdtrack->GetTrdHitIndex(0);
             trdhit = (CbmTrdHit*) hitsTRD->At(hitIndex);
-            Int_t iPoint = trdhit->GetRefIndex();        
-            if ( iPoint < 0 )continue;         
-            CbmMCPoint* point = (CbmMCPoint*) pointsTRD->At(iPoint);            
+            Int_t iPoint = trdhit->GetRefIndex();
+            if ( iPoint < 0 )continue;
+            CbmMCPoint* point = (CbmMCPoint*) pointsTRD->At(iPoint);
             TVector3 mom;
             point->Momentum(mom);
-            
+
             if (TMath::Abs(partPdg) == 11)nofElTracksNoMomCut++;
             if (TMath::Abs(partPdg) == 211)nofPiTracksNoMomCut++;
-            
+
             if ( mom.Mag() < .5 ) continue;
-            
+
 
             double sumELoss = 0;
             double nofZeroTRLayers = 0;
             for (Int_t iHit=0; iHit<12; iHit++){
                 Int_t hitIndex =  trdtrack->GetTrdHitIndex(iHit);
                 trdhit = (CbmTrdHit*) hitsTRD->At(hitIndex);
-                
+
                 losshit =  trdhit->GetELoss();
                 eLoss[iHit] = losshit;
                 sumELoss += losshit;
                 eLossTR[iHit] = trdhit->GetELossTR();
-                eLossdEdX[iHit] = trdhit->GetELossdEdX(); 
-                 
+                eLossdEdX[iHit] = trdhit->GetELossdEdX();
+
                 if (eLossTR[iHit] < 1e-9) nofZeroTRLayers++;
-                             
+
             } //iHit
 
             ///pions
             if (TMath::Abs(partPdg) == 211){
-            
+
                 hPiELossSum->Fill(sumELoss);
                 hPiELoss->Fill(eLossdEdX[0] * 1e6);
                 nofPiTracks++;
             }
-            
+
             ///electrons
             if (TMath::Abs(partPdg) == 11){
-                hElElossSum->Fill(sumELoss); 
+                hElElossSum->Fill(sumELoss);
                 hElNofZeroTR->Fill(nofZeroTRLayers);
                 //if (eLossTR[0] != 0){
                     hElTR->Fill(eLossTR[0]);
                     hEldEdX->Fill(eLossdEdX[0]);
-                    hElELoss->Fill(eLoss[0]);                    
+                    hElELoss->Fill(eLoss[0]);
                 //}
                     nofElTracks++;
             }
-            
-            
+
+
             if (nofZeroTRLayers == 12 && TMath::Abs(partPdg) == 11) nofZeroTR++;
 
             if (abs(partPdg) == 211){
@@ -188,7 +188,7 @@ void trd_elid_make_txt ()
                 }
                 foutPi<< momMC<<endl;
             }
-            
+
             if (abs(partPdg) == 11){
                 for (Int_t iHit=0; iHit<12; iHit++){
                     foutEl << eLossdEdX[iHit] <<" "<<eLossTR[iHit] <<" "<<eLoss[iHit] <<" ";
@@ -197,24 +197,24 @@ void trd_elid_make_txt ()
 	    }
 
         }
- 
+
         } //event
         f->Close();
         f1->Close();
     }//iFile
-    cout << "nofPiTracks = " << nofPiTracks << endl; 
-    cout << "nofElTracks = " << nofElTracks << endl;      
-    cout << "nofElTracksNoMomCut = " << nofElTracksNoMomCut << endl; 
-    cout << "nofPiTracksNoMomCut = " << nofPiTracksNoMomCut << endl;     
-    cout << "Lost of El Tracks, TRD Mom Cut at 0.5, * 100% = " << (nofElTracksNoMomCut - nofElTracks)/ (double)nofElTracksNoMomCut * 100<< endl; 
-    cout << "Lost of Pi Tracks, TRD Mom Cut at 0.5, * 100%  = " << (nofPiTracksNoMomCut - nofPiTracks)/ (double)nofPiTracksNoMomCut * 100<< endl; 
-    
+    cout << "nofPiTracks = " << nofPiTracks << endl;
+    cout << "nofElTracks = " << nofElTracks << endl;
+    cout << "nofElTracksNoMomCut = " << nofElTracksNoMomCut << endl;
+    cout << "nofPiTracksNoMomCut = " << nofPiTracksNoMomCut << endl;
+    cout << "Lost of El Tracks, TRD Mom Cut at 0.5, * 100% = " << (nofElTracksNoMomCut - nofElTracks)/ (double)nofElTracksNoMomCut * 100<< endl;
+    cout << "Lost of Pi Tracks, TRD Mom Cut at 0.5, * 100%  = " << (nofPiTracksNoMomCut - nofPiTracks)/ (double)nofPiTracksNoMomCut * 100<< endl;
+
     cout << "nofZeroTR El Tracks = " << nofZeroTR << endl;
     cout << "nofZeroTR El Tracks / nofElTracks * 100 %= " << (double)nofZeroTR/nofElTracks *100 << endl;
-    
-    cout << "mean value of sum of ELoss for El = " << hElELossSum->GetMean() << endl; 
-    cout << "mean value of sum of ELoss for Pi = " << hPiELossSum->GetMean() << endl;     
-    cout << "hElELossSum - hPiELossSum= " << hElELossSum->GetMean() - hPiELossSum->GetMean() << endl;     
+
+    cout << "mean value of sum of ELoss for El = " << hElELossSum->GetMean() << endl;
+    cout << "mean value of sum of ELoss for Pi = " << hPiELossSum->GetMean() << endl;
+    cout << "hElELossSum - hPiELossSum= " << hElELossSum->GetMean() - hPiELossSum->GetMean() << endl;
 
     gStyle->SetPalette(1,0);
     gStyle->SetHistLineWidth(3);
@@ -226,7 +226,7 @@ void trd_elid_make_txt ()
     hElTR->SetLineWidth(3);
     hEldEdX->SetLineWidth(3);
     hElELoss->SetLineWidth(3);
-    
+
     ///blue line for electrons and black for pions(default color)
     hElELossSum->SetLineStyle(2);
     hElNofZeroTR->SetLineStyle(2);
@@ -234,26 +234,27 @@ void trd_elid_make_txt ()
     hEldEdX->SetLineStyle(2);
     hElELoss->SetLineStyle(2);
 
-    
-    
+
+
     c1 = new TCanvas("c1","c1",10,10,800,800);
     c1->Divide(2,3);
     c1->cd(1);
     hPiELossSum->Draw();
     hElELossSum->Draw("same");
-    
+
     c1->cd(2);
     hPiELoss->Draw();
-	TF1 *fitFcn = new TF1("fitFcn",fitFunction, 0., 50., 3);
+    double maxX = 50, minX = 0;
+	TF1 *fitFcn = new TF1("fitFcn",fitFunction, minX, maxX, 3);
 	fitFcn->SetParameter(1, 0.5);
-	fitFcn->SetParameter(2, 1.5);		
-	hPiELoss->Fit("fitFcn","","",0.,50.);
+	fitFcn->SetParameter(2, 1.5);
+	hPiELoss->Fit("fitFcn","","",minX, maxX);
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
-	
+
 	int nofPoints = 5000;
 	double curX = 0;
-	double dx = 15./nofPoints;
+	double dx = maxX/nofPoints;
 	double par[3];
 	double halfMaxF = fitFcn->GetMaximum()/ 2.;
 	par[0] = fitFcn->GetParameter(0);
@@ -268,25 +269,25 @@ void trd_elid_make_txt ()
 			x1 = curX;
 			break;
 		}
-		curX+=dx;		
+		curX+=dx;
 	}
-	cout << "Maximum = " << fitFcn->GetMaximum() << 
+	cout << "Maximum = " << fitFcn->GetMaximum() <<
 		"  MaximumX = " <<fitFcn->GetMaximumX()<< endl;
-	cout << "x0 = " << x0 << 
-		"  x1=" << x1 << 
-		"  FWHM = " << x1 - x0 << 
+	cout << "x0 = " << x0 <<
+		"  x1=" << x1 <<
+		"  FWHM = " << x1 - x0 <<
 		"  FWHM/4.02 = "<< (x1 - x0)/4.02 << endl;
-	
-    c1->cd(3);    
+
+    c1->cd(3);
     hElNofZeroTR->Draw();
-    
-    c1->cd(4);    
+
+    c1->cd(4);
     hElTR->Draw();
-    
-    c1->cd(5);    
+
+    c1->cd(5);
     hEldEdX->Draw();
-    
-    c1->cd(6);    
-    hElELoss->Draw();     
- 
+
+    c1->cd(6);
+    hElELoss->Draw();
+
 }

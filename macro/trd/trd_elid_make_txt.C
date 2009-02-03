@@ -90,7 +90,7 @@ void trd_elid_make_txt ()
 
         Int_t nEvents=t->GetEntries();
         cout<<" nEvents ="<<nEvents<<endl;
-        //Int_t nEvents=5000;
+        Int_t nEvents=100;
         for(Int_t ievent=0;ievent<nEvents;ievent++ ) {
         cout<<"ievent = "<<ievent<<endl;
         CbmTrdTrack *trdtrack=NULL;
@@ -245,23 +245,37 @@ void trd_elid_make_txt ()
     c1->cd(2);
     hPiELoss->Draw();
     double maxX = 50, minX = 0;
-	TF1 *fitFcn = new TF1("fitFcn",fitFunction, minX, maxX, 3);
-	fitFcn->SetParameter(1, 0.5);
-	fitFcn->SetParameter(2, 1.5);
-	hPiELoss->Fit("fitFcn","","",minX, maxX);
+	TF1 *fitFcn = new TF1("fitLogNorm",fitFunction, minX, maxX, 3);
+	fitFcn->SetParameter(1, 1000.);
+	fitFcn->SetParameter(2, 0.7);
+	hPiELoss->Fit("fitLogNorm","","",minX, maxX);
+	//hPiELoss->Fit("landau");
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
+
+	double par[3];
+	par[0] = fitFcn->GetParameter(0);
+	par[1] = fitFcn->GetParameter(1);
+	par[2] = fitFcn->GetParameter(2);
 
 	int nofPoints = 5000;
 	double curX = 0;
 	double dx = maxX/nofPoints;
-	double par[3];
-	double halfMaxF = fitFcn->GetMaximum()/ 2.;
-	par[0] = fitFcn->GetParameter(0);
-	par[1] = fitFcn->GetParameter(1);
-	par[2] = fitFcn->GetParameter(2);
+	double maximum = 0.;//fitFcn->GetMaximum();
+	double maximumX = 0.;//fitFcn->GetMaximumX();
+	for (int i = 0; i < nofPoints; i++){
+		double y = fitFunction(&curX, par);
+		if (y > maximum){
+			maximum = y;
+			maximumX = curX;
+		}
+		curX+=dx;
+	}
+
+	double halfMaxF = maximum/ 2.;
 	double x0 = -1;
 	double x1 = -1;
+	curX = 0.;
 	for (int i = 0; i < nofPoints; i++){
 		double y = fitFunction(&curX, par);
 		if (y > halfMaxF && x0 == -1) x0 = curX;
@@ -271,8 +285,7 @@ void trd_elid_make_txt ()
 		}
 		curX+=dx;
 	}
-	cout << "Maximum = " << fitFcn->GetMaximum() <<
-		"  MaximumX = " <<fitFcn->GetMaximumX()<< endl;
+	cout << "Maximum = " << maximum <<"  MaximumX = " <<maximumX<< endl;
 	cout << "x0 = " << x0 <<
 		"  x1=" << x1 <<
 		"  FWHM = " << x1 - x0 <<

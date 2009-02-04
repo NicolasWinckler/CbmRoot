@@ -10,6 +10,7 @@
 #include "CbmRichRing.h"
 #include "CbmRichRingFinder.h"
 #include "CbmRichRingFitterCOP.h"
+#include "CbmRichRingFitterEllipseTau.h"
 #include "CbmRichRingFitterEllipse.h"
 #include "CbmRichRingSelectNeuralNet.h"
 #include "TClonesArray.h"
@@ -27,7 +28,7 @@ public:
 	Int_t fId;
 	Int_t fRefIndex;
 	Bool_t fIsUsed;
-	
+
 	static Bool_t CmpUp(const CbmRichMyPoint &m1,
 			          const CbmRichMyPoint &m2){
 		return m1.fX < m2.fX;
@@ -36,11 +37,11 @@ public:
 	//~CbmRichMyPoint{;}
 };
 
-class CbmRichRingComparatorMore: 
+class CbmRichRingComparatorMore:
        public std::binary_function<
 	          const CbmRichRing*,
 	          const CbmRichRing*,
-	          bool> 
+	          bool>
 {
 public:
 	bool operator()(const CbmRichRing& ring1, const CbmRichRing& ring2) const {
@@ -49,14 +50,14 @@ public:
 };
 
 class CbmRichRingFinderHough : public CbmRichRingFinder {
-	
-	Double_t fMaxDistance;	
-	Double_t fMinDistance;	
+
+	Double_t fMaxDistance;
+	Double_t fMinDistance;
     Double_t fMinDistance2; ///= fMinDistance*fMinDistance
-    Double_t fMaxDistance2;	
-	
-	Double_t fMinRadius;       
-	Double_t fMaxRadius; 	
+    Double_t fMaxDistance2;
+
+	Double_t fMinRadius;
+	Double_t fMaxRadius;
 	Int_t fNofBinsX;
 	Int_t fNofBinsY;
 	Int_t fHTCut;
@@ -64,26 +65,27 @@ class CbmRichRingFinderHough : public CbmRichRingFinder {
 
 	Int_t fNofBinsR;
 	Int_t fHTCutR;
-	Int_t fHitCutR;	
-	
+	Int_t fHitCutR;
+
 	std::vector<CbmRichMyPoint> fData;  ///Rich hits
 
 	std::vector< std::vector<Int_t> > fHist;
 	std::vector< std::vector< std::vector<Int_t> > > fRingHits;
 	std::vector< Int_t > fHistR;
-	std::vector< std::vector<Int_t> > fRingHitsR;	
+	std::vector< std::vector<Int_t> > fRingHitsR;
 	std::vector< std::vector<Int_t> > fFoundRingsHitId;
-	
-	
+
+
 	std::vector<CbmRichRing> fFoundRings;///collect found rings
 
 	Int_t fNEvent; /// event number
 	CbmRichRingFitterCOP* fFitCOP;
-	CbmRichRingFitterEllipse* fFitEllipse;	
+	CbmRichRingFitterEllipse* fFitEllipse;
+
 	CbmRichRingSelectNeuralNet* fANNSelect;
-	
+
 	Int_t fVerbose; /// Verbosity level
-	
+
 public:
 
   	/** Default constructor **/
@@ -94,9 +96,8 @@ public:
 
 	~CbmRichRingFinderHough();
 
-	void SetParameters();
 	void SetParameters(TString geometry);
-	
+
 	///Calculate circle center and radius
 	void CalculateRingParameters(Double_t x2y2[],
 				     Double_t rx[],
@@ -111,8 +112,8 @@ public:
 					Double_t y[],
 					Double_t *xc,
 					Double_t *yc,
-					Double_t *r);  
-					
+					Double_t *r);
+
 	void HoughTransformReconstruction();
 
 	void FindPeak(Int_t indmin, Int_t indmax);
@@ -121,11 +122,11 @@ public:
     void RingSelection();
     void RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring);
     void RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring);
-    
+
 	virtual void Init();
-	
+
 	virtual void Finish();
-	
+
 	virtual Int_t DoFind(TClonesArray* rHitArray,
 	 		      		 TClonesArray* rProjArray,
 		       	      	 TClonesArray* rRingArray);

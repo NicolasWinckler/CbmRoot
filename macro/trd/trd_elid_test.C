@@ -27,8 +27,17 @@ void trd_elid_test()
 
 	TH1D* hNofHitsEl = new TH1D("hNofHitsEl", "hNofHitsEl", 12, 0, 12.1);
 	TH1D* hNofHitsPi = new TH1D("hNofHitsPi", "hNofHitsPi", 12, 0, 12.1);
-	TH1D* hPidANNEl = new TH1D("hPidANNEl", "hPidANNEl", 100, -1.2, 1.2);
-	TH1D* hPidANNPi = new TH1D("hPidANNPi", "hPidANNPi", 100, -1.2, 1.2);
+	TH1D* hPidANNEl[7];
+	TH1D* hPidANNPi[7];
+	char histTitle[50], histName[50];
+	for (Int_t i = 0; i < 7; i++){
+		sprintf(histName, "hPidANNEl%d", i);
+		sprintf(histTitle, "%d hits in track", 12 - i);
+		hPidANNEl[i] = new TH1D(histName, histTitle, 100, -1.2, 1.2);
+		sprintf(histName, "hPidANNPi%d", i);
+		sprintf(histTitle, "%d hits in track", 12 - i);
+		hPidANNPi[i] = new TH1D(histName, histTitle, 100, -1.2, 1.2);
+	}
 
 	Double_t nofElTracks = 0, nofPiTracks = 0;
 
@@ -73,7 +82,7 @@ void trd_elid_test()
 			for (Int_t iTrdTrack = 0; iTrdTrack < NofTrdTracks; iTrdTrack++) {
 
 				CbmTrdTrack* trdtrack = (CbmTrdTrack*) tracksTRD->At(iTrdTrack);
-					Int_t nHits = trdtrack->GetNofTrdHits();
+				Int_t nHits = trdtrack->GetNofTrdHits();
 
 				if (nHits < 0) {
 					continue;
@@ -97,22 +106,27 @@ void trd_elid_test()
 				///only primary tracks
 				if (motherId != -1)	continue;
 
-
-				Double_t nofTrdHits = trdtrack->GetNofTrdHits();
 				Double_t pidANN = trdtrack->GetPidANN();
 
-
-				if (TMath::Abs(partPdg) == 11) {
-					hNofHitsEl->Fill(nofTrdHits);
-					hPidANNEl->Fill(pidANN);
+				if (partPdg == 11) {
+					hNofHitsEl->Fill(nHits);
 					nofElTracks++;
 				}
 
-				if (TMath::Abs(partPdg) == 211) {
-					hNofHitsPi->Fill(nofTrdHits);
-					hPidANNPi->Fill(pidANN);
+				if (partPdg == 211) {
+					hNofHitsPi->Fill(nHits);
 					nofPiTracks++;
 				}
+
+				if (nHits < 6) continue;
+				if (nHits > 12){
+					cout << "-E- nHits = " << nHits << endl;
+					continue;
+				}
+				Int_t indexAr = 12 - nHits;
+				if (partPdg == 11) hPidANNEl[indexAr]->Fill(pidANN);
+				if (partPdg == 211) hPidANNPi[indexAr]->Fill(pidANN);
+
 			}//iTrdTrack
 
 		} //event
@@ -124,20 +138,33 @@ void trd_elid_test()
 
 	hNofHitsEl->SetLineWidth(3);
     hNofHitsPi->SetLineWidth(3);
-	hPidANNEl->SetLineWidth(3);
-    hPidANNPi->SetLineWidth(3);
-
     hNofHitsEl->SetLineStyle(2);
-	hPidANNEl->SetLineStyle(2);
+    for (Int_t i = 0; i < 7; i++){
+		hPidANNEl[i]->SetLineWidth(3);
+		hPidANNPi[i]->SetLineWidth(3);
+		hPidANNEl[i]->SetLineStyle(2);
+    }
 
     c1 = new TCanvas("c1","c1",10,10,800,800);
     c1->Divide(2,2);
     c1->cd(1);
     hNofHitsEl->Draw();
     hNofHitsPi->Draw("same");
+	gPad->SetLogy(true);
 
-    c1->cd(2);
-    hPidANNEl->Draw();
-    hPidANNPi->Draw("same");
+    for (Int_t i = 0; i < 3; i++){
+    	c1->cd(i+2);
+    	hPidANNEl[i]->Draw();
+    	hPidANNPi[i]->Draw("same");
+    	gPad->SetLogy(true);
+    }
 
+    c2 = new TCanvas("c2","c2",10,10,800,800);
+    c2->Divide(2,2);
+    for (Int_t i = 0; i < 4; i++){
+    	c2->cd(i+1);
+    	hPidANNEl[i+3]->Draw();
+    	hPidANNPi[i+3]->Draw("same");
+    	gPad->SetLogy(true);
+    }
 }

@@ -17,7 +17,7 @@ CbmLitTrackFinderBase::CbmLitTrackFinderBase()
 {
 	fChiSqStripHitCut = 20.;
 	fMaxCovSq = 20. * 20.;
-	fVerbose = 3;
+	fVerbose = 1;
 	fEventNo = 0;
 }
 

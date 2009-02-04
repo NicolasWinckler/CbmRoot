@@ -22,12 +22,8 @@ public:
 	virtual LitStatus Finalize();
 
 protected:
-
 	TrackPtrVector fTracksCopy;
 	TrackPtrVector fFoundTracks;
-
-	//TrackPtrVector fTracksStationIn;
-	//TrackPtrVector fTracksStationOut;
 
 	CbmLitTrackSelection* fFinalPreSelection;
 	CbmLitTrackSelection* fStationGroupSelection;
@@ -65,6 +61,12 @@ protected:
 			Int_t stationGroup);
 
 	Bool_t ProcessStation(
+			const CbmLitTrack* track,
+			Int_t stationGroup,
+			Int_t station,
+			TrackPtrVector& tracksOut);
+
+	Bool_t ProcessStation1(
 			const CbmLitTrack *track,
 			Int_t stationGroup,
 			Int_t station,

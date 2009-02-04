@@ -3,6 +3,8 @@
 // -----                  Created 16/07/07  by A. Lebedev               -----
 // -------------------------------------------------------------------------
 
+#define NEWMUCH 1
+
 #include "CbmLitEnvironment.h"
 #include "CbmLitMemoryManagment.h"
 #include "CbmLitComparators.h"
@@ -12,11 +14,14 @@
 #include "CbmDetector.h"
 #include "CbmRuntimeDb.h"
 #include "CbmBaseParSet.h"
+
+#ifdef NEWMUCH
 #include "CbmMuchGeoScheme.h"
 #include "CbmGeoMuchPar.h"
 #include "CbmMuchStation.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
+#endif
 
 #include "TGeoNode.h"
 #include "TGeoMaterial.h"
@@ -73,10 +78,13 @@ CbmField* CbmLitEnvironment::GetField()
 
 CbmLitDetectorLayout CbmLitEnvironment::GetMuchLayout()
 {
-	if ((TGeoNode*) gGeoManager->GetTopNode()->GetNodes()->FindObject("much1_0") != NULL)
+	if ((TGeoNode*) gGeoManager->GetTopNode()->GetNodes()->FindObject("much1_0") != NULL){
+		std::cout << "OLD MUCH GEOMETRY!!!" << std::endl;
 		return GetOldMuchLayout();
-	else
+	} else {
+		std::cout << "NEW MUCH GEOMETRY!!!" << std::endl;
 		return GetNewMuchLayout();
+	}
 }
 
 CbmLitDetectorLayout CbmLitEnvironment::GetOldMuchLayout()
@@ -133,8 +141,6 @@ CbmLitDetectorLayout CbmLitEnvironment::GetOldMuchLayout()
 		}
 
 		std::vector<CbmLitStation> stationVec(stationSet.begin(), stationSet.end());
-//		for (int i = 0; i < stationVec.size(); i++ )
-//			std::cout << stationVec[i].ToString();
 		DetermineLayout(stationVec, fMuchLayout);
 		std::cout << fMuchLayout.ToString();
 		layoutCreated = true;
@@ -142,8 +148,10 @@ CbmLitDetectorLayout CbmLitEnvironment::GetOldMuchLayout()
 	return fMuchLayout;
 }
 
+
 CbmLitDetectorLayout CbmLitEnvironment::GetNewMuchLayout()
 {
+#ifdef NEWMUCH
 	static Bool_t layoutCreated = false;
 
 	if (!layoutCreated) {
@@ -153,7 +161,6 @@ CbmLitDetectorLayout CbmLitEnvironment::GetNewMuchLayout()
 		CbmGeoMuchPar* geoPar = (CbmGeoMuchPar*) db->getContainer("CbmGeoMuchPar");
 		TObjArray* stations = (TObjArray*) geoPar->GetStations();
 		geoScheme->Init(stations);
-
 		Int_t nofStations = geoScheme->GetNStations();
 		for (Int_t iStation = 0; iStation < nofStations; iStation++){
 			CbmMuchStation* station = geoScheme->GetStation(iStation);
@@ -180,7 +187,9 @@ CbmLitDetectorLayout CbmLitEnvironment::GetNewMuchLayout()
 		layoutCreated = true;
 	}
 	return fMuchLayout;
+#endif
 }
+
 
 CbmLitDetectorLayout CbmLitEnvironment::GetTrdLayout()
 {
@@ -314,7 +323,6 @@ bool CbmLitEnvironment::IsTrdSegmented() const
 	CbmDetector* much = (CbmDetector*) detList->FindObject("TRD");
 	TString name = much->GetGeometryFileName();
 	if(name.Contains("monolithic")) {
-		//std::cout << "-I- TrdLayout :" << "STRAWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" << std::endl;
 		return false;
 	} else {
 		return true;

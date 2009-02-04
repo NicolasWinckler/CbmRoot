@@ -11,27 +11,26 @@ class CbmLitTrackFinderRobust : public CbmLitTrackFinderBase
 public:
 	CbmLitTrackFinderRobust();
 	virtual ~CbmLitTrackFinderRobust();
-	
+
 	LitStatus DoFind(
 			const HitPtrVector& hits,
 			const TrackPtrVector& trackSeeds,
 			TrackPtrVector& tracks);
-	
+
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
 
 private:
-	
 //	CbmLitWeightCalculator* fWeightCalc;
 //	CbmLitEffHitCalculator* fEffHitCalc;
-	
+
 	void FollowTracks(
 			TrackPtrIterator itBegin,
 			TrackPtrIterator itEnd);
-	
+
     void FollowTrack(
     		CbmLitTrack *track);
-	
+
 	ClassDef(CbmLitTrackFinderRobust, 1);
 };
 

@@ -13,10 +13,10 @@ class CbmLitTrack
 public:
 	CbmLitTrack();
 	virtual ~CbmLitTrack();
-	
+
 	CbmLitTrack& operator=(const CbmLitTrack& track);
 	CbmLitTrack(const CbmLitTrack& track) { *this = track; };
-	
+
 	Int_t GetNofHits() const { return fHits.size(); }
 	Int_t GetNofHits(Int_t planeId);
 	LitTrackQa GetQuality() const { return fQuality; }
@@ -34,7 +34,7 @@ public:
 	HitPtrIteratorPair GetHits(Int_t planeId);
 	void GetHitBounds(std::vector<HitPtrIteratorPair>& bounds);
 	Int_t GetNofMissingHits() const {return fNofMissingHits;}
-	
+
 	void SetQuality(LitTrackQa quality) { fQuality = quality; }
 	void SetChi2(Double_t chi2) { fChi2 = chi2; }
 	void SetNDF(Int_t ndf) { fNDF = ndf; }
@@ -42,16 +42,16 @@ public:
 	void SetPDG(Int_t pdg) { fPDG = pdg; }
 	void SetParamFirst(const CbmLitTrackParam* par) { fParamFirst = *par; }
 	void SetParamLast(const CbmLitTrackParam* par) { fParamLast = *par; }
-	//TODO temporarily needed for equal_range algorithm 
+	//TODO temporarily needed for equal_range algorithm
 	void SetNofHits(Int_t nofHits) { fHits.resize(nofHits); }
 	void SetLastPlaneId(Int_t lastPlaneId) { fLastPlaneId = lastPlaneId; }
 	void AddHit(const CbmLitHit* hit);
-	void SetFitNodes(const FitNodeVector& nodes) {fFitNodes = nodes;}	
+	void SetFitNodes(const FitNodeVector& nodes) {fFitNodes = nodes;}
 	void SortHits(Bool_t downstream = true);
 	void SetNofMissingHits(Int_t nofMissingHits) {fNofMissingHits = nofMissingHits;}
-	
+
 	void RemoveHit(Int_t index);
-	
+
 	Bool_t CheckParams() const;
 	void ClearHits();
 
@@ -70,7 +70,7 @@ private:
 	Int_t fLastPlaneId;
 	Int_t fPDG;
 	Int_t fNofMissingHits;
-	
+
 	ClassDef(CbmLitTrack, 1);
 };
 

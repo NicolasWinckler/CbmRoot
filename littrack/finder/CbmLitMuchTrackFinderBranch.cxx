@@ -49,7 +49,7 @@ void CbmLitMuchTrackFinderBranch::Init()
    fFitter = factory->CreateTrackFitter("Much");
 
    fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
-   fVerbose = 1;
+   fVerbose = 3;
    fNofIter = 1;
    fBeginStationGroup = 0;
    fEndStationGroup = fLayout.GetNofStationGroups() - 1;

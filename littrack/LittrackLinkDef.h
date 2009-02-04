@@ -31,7 +31,7 @@
 #pragma link C++ class  CbmLitTrackParam+;
 #pragma link C++ class  CbmLitTrack+;
 #pragma link C++ class  CbmLitFitNode+;
-   
+
 // finder
 #pragma link C++ class  CbmLitTrackFinderRobust+;
 #pragma link C++ class  CbmLitTrdTrackFinderSts+;

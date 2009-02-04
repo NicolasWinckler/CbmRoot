@@ -34,18 +34,18 @@ CbmLitTrack& CbmLitTrack::operator=(
 	fHits.clear();
 	for (Int_t iHit = 0; iHit < track.GetNofHits(); iHit++)
 		AddHit(track.GetHit(iHit));
-	
+
 	SetParamFirst(track.GetParamFirst());
-	SetParamLast(track.GetParamLast());	
+	SetParamLast(track.GetParamLast());
 	SetQuality(track.GetQuality());
 	SetChi2(track.GetChi2());
 	SetNDF(track.GetNDF());
-	SetPreviousTrackId(track.GetPreviousTrackId());	
+	SetPreviousTrackId(track.GetPreviousTrackId());
 	SetLastPlaneId(track.GetLastPlaneId());
 	SetPDG(track.GetPDG());
 	SetFitNodes(track.GetFitNodes());
 	SetNofMissingHits(track.GetNofMissingHits());
-	
+
 	return *this;
 }
 
@@ -70,7 +70,7 @@ void CbmLitTrack::RemoveHit(
 	if (!fFitNodes.empty()) fFitNodes.erase(fFitNodes.begin() + index);
 }
 
-void CbmLitTrack::ClearHits() 
+void CbmLitTrack::ClearHits()
 {
 	std::for_each(fHits.begin(), fHits.end(), DeleteObject());
 	fHits.clear();
@@ -79,8 +79,8 @@ void CbmLitTrack::ClearHits()
 std::string CbmLitTrack::ToString() const
 {
 	std::stringstream ss;
-	ss << "Track: quality=" <<  fQuality << ", chi2=" << fChi2 
-		<< ", ndf=" << fNDF << ", previousTrackId=" << fPreviousTrackId 
+	ss << "Track: quality=" <<  fQuality << ", chi2=" << fChi2
+		<< ", ndf=" << fNDF << ", previousTrackId=" << fPreviousTrackId
 		<< ", lastPlaneId=" << fLastPlaneId << ", pdg=" << fPDG
 		<< ", nofHits=" << fHits.size() << ", nofFitNodes=" << fFitNodes.size() << std::endl;
 	return ss.str();
@@ -101,7 +101,7 @@ Bool_t CbmLitTrack::CheckParams() const
 	std::vector<Double_t> covLast(fParamLast.GetCovMatrix());
 	for (int i = 0; i < 15; i++) {
 		if (std::abs(covFirst[i]) > 10000. ||
-			std::abs(covLast[i]) > 10000.) return false;	
+			std::abs(covLast[i]) > 10000.) return false;
 	}
 	return true;
 }
@@ -111,7 +111,7 @@ Int_t CbmLitTrack::GetNofHits(
 {
 	CbmLitHit value;
 	value.SetPlaneId(planeId);
-	HitPtrIteratorPair bounds = 
+	HitPtrIteratorPair bounds =
 			std::equal_range(fHits.begin(), fHits.end(), &value, CompareHitPtrPlaneIdLess());
 	return bounds.second - bounds.first;
 }
@@ -121,7 +121,7 @@ HitPtrIteratorPair CbmLitTrack::GetHits(
 {
 	CbmLitHit value;
 	value.SetPlaneId(planeId);
-	HitPtrIteratorPair bounds = 
+	HitPtrIteratorPair bounds =
 			std::equal_range(fHits.begin(), fHits.end(), &value, CompareHitPtrPlaneIdLess());
 	return bounds;
 }

@@ -23,11 +23,11 @@
 #include "TVectorD.h"
 #include "TMatrixD.h"
 #include "TMatrixDEigen.h"
-#include "CbmRichRingFitter.h"
+#include "CbmRichRingFitterEllipseBase.h"
 
 using namespace std;
 
-class CbmRichRingFitterEllipseTau : public CbmRichRingFitter
+class CbmRichRingFitterEllipseTau : public CbmRichRingFitterEllipseBase
 {
 public:
 
@@ -51,18 +51,7 @@ public:
 	void InitMatrices();
 	void Taubin();
 
-protected:
-   virtual void CalcChi2(CbmRichRing* pRing);
-   void MakeRadiusCorrection(CbmRichRing* pRing);
-   void InitHistForRadiusCorrection();
-
 private:
-
-    Int_t fVerbose;
-
-	TString fFieldName; ///specify correction map for different field
-	TH1D* fh_mapaxisAXY;
-	TH1D* fh_mapaxisBXY;
 
 	TMatrixD fM;
 	TMatrixD fP;

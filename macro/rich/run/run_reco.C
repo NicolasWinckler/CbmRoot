@@ -19,7 +19,7 @@
 
 #include "../../../cbmbase/CbmDetectorList.h";
 
-void run_reco(Int_t nEvents = 50)
+void run_reco(Int_t nEvents = 500)
 {
 
   // ========================================================================
@@ -226,10 +226,6 @@ void run_reco(Int_t nEvents = 50)
     // ----------- TRD track Pid Ann ----------------------
     CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new
     CbmTrdSetTracksPidANN("Ann","Ann");
-    TString ParamFile = gSystem->Getenv("VMCWORKDIR");
-    ParamFile += "/parameters/trd/Neural_Net_Weights_El_ID.txt";
-    cout << ParamFile << endl;
-    trdSetTracksPidAnnTask->SetInputFile(ParamFile);
     run->AddTask(trdSetTracksPidAnnTask);
     // ----------------------------------------------------
 
@@ -407,6 +403,7 @@ void run_reco(Int_t nEvents = 50)
 
   CbmRichRingQa* richQa   =  new CbmRichRingQa("Qa","qa", 0);
   run->AddTask(richQa);
+
 
 
   // ------------------------------------------------------------------------

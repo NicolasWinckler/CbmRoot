@@ -67,6 +67,7 @@ CbmRichRingFitterQa.cxx
 CbmRichFuzzyKE.cxx
 CbmRichElectronsQa.cxx
 CbmRichElectronIdAnn.cxx
+CbmRichRingFitterEllipseBase.cxx
 )
 
 if(RULE_CHECKER_FOUND)

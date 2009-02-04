@@ -50,6 +50,7 @@
 #pragma link C++ class CbmRichFuzzyKE+;
 #pragma link C++ class CbmRichElectronsQa+;
 #pragma link C++ class CbmRichElectronIdAnn+;
+#pragma link C++ class CbmRichRingFitterEllipseBase+;
 
 #pragma link C++ class CbmRichContFact;
 #pragma link C++ class CbmGeoRichPar;

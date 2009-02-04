@@ -10,7 +10,7 @@
 #ifndef CBM_RICH_RING_FITTER_ELLIPSE_H
 #define CBM_RICH_RING_FITTER_ELLIPSE_H 1
 
-#include "CbmRichRingFitter.h"
+#include "CbmRichRingFitterEllipseBase.h"
 #include "TFitterMinuit.h"
 #include "TH2D.h"
 
@@ -55,10 +55,9 @@ private:
     Double_t fErrorDef;
 };
 
-class CbmRichRingFitterEllipse : public CbmRichRingFitter
+class CbmRichRingFitterEllipse : public CbmRichRingFitterEllipseBase
 {
-
-   public:
+public:
 
    /** Default constructor **/
    CbmRichRingFitterEllipse();
@@ -79,19 +78,8 @@ class CbmRichRingFitterEllipse : public CbmRichRingFitter
    std::vector<Double_t> DoFit1(std::vector<Double_t> x,
                std::vector<Double_t> y);
 
-   protected:
-   virtual void CalcChi2(CbmRichRing* pRing);
-   void MakeRadiusCorrection(CbmRichRing* pRing);
-   void InitHistForRadiusCorrection();
+protected:
    void TransformToRichRing(CbmRichRing* ring, std::vector<Double_t> par);
-
-   private:
-
-   /** Verbosity level **/
-   Int_t fVerbose;
-   TString fFieldName; ///specify correction map for different field
-   TH2D* fh_mapaxisAXY; // correction map for A axis
-   TH2D* fh_mapaxisBXY; // correction map for B axis
 
    ClassDef(CbmRichRingFitterEllipse,1);
 

@@ -31,6 +31,8 @@ protected:
 	CbmLitTrackFitter* fFitter;
 
 	Int_t fMaxNofBranches;
+	Int_t fNofBranches;
+	Bool_t fIsAlwaysCreateMissingHit;
 
 	void FollowTracks();
 
@@ -81,7 +83,7 @@ protected:
 			HitPtrVector& hits,
 			std::vector<Double_t>& chiSq);
 
-	Bool_t AddTrackCandidate(
+	Bool_t AddTrackBranch(
 			const CbmLitTrack* track,
 			const HitPtrVector& hits,
 			const std::vector<Double_t>& chiSq,

@@ -30,6 +30,7 @@
 #pragma link C++ class  CbmLitStripHit+;
 #pragma link C++ class  CbmLitTrackParam+;
 #pragma link C++ class  CbmLitTrack+;
+#pragma link C++ class  CbmLitTrackBranch+;
 #pragma link C++ class  CbmLitFitNode+;
 
 // finder

@@ -59,6 +59,7 @@ data/CbmLitPixelHit.cxx
 data/CbmLitStripHit.cxx
 data/CbmLitTrackParam.cxx
 data/CbmLitTrack.cxx
+data/CbmLitTrackBranch.cxx
 data/CbmLitFitNode.cxx
 #finder/CbmLitMuchTrackFinderTrigger.cxx
 finder/CbmLitTrackFinderRobust.cxx

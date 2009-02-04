@@ -34,39 +34,39 @@ CbmLitTrdTrackFinderSts::~CbmLitTrdTrackFinderSts()
 void CbmLitTrdTrackFinderSts::Init()
 {
    CbmRootManager* rootMgr = CbmRootManager::Instance();
-   if(NULL == rootMgr) 
-      TObject::Fatal("CbmLitTrdTrackFinderSts::Init", "ROOT manager is not instantiated"); 
+   if(NULL == rootMgr)
+      TObject::Fatal("CbmLitTrdTrackFinderSts::Init", "ROOT manager is not instantiated");
 
    fTrackSeedsArray = (TClonesArray*) rootMgr->GetObject("STSTrack");
    if(NULL == fTrackSeedsArray)
       TObject::Fatal("CbmLitTrdTrackFinderSts::Init", "no STS track array");
-   
+
    fExtrapolatorToDet = new CbmLitRK4TrackExtrapolator();
-   fPropagatorToDet = new CbmLitTrackPropagatorImp(fExtrapolatorToDet);   
+   fPropagatorToDet = new CbmLitTrackPropagatorImp(fExtrapolatorToDet);
    fPropagatorToDet->Initialize();
-      
+
    fPropagator = new CbmLitTrackPropagatorImp(new CbmLitLineTrackExtrapolator());
    fPropagator->Initialize();
-   
+
    fFilter = new CbmLitKalmanFilter();
    fFilter->Initialize();
-   
+
    fFitter = new CbmLitTrackFitterImp(fPropagator, fFilter);
    fFitter->Initialize();
-      
+
    CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
    fSeedSelection = factory->CreateTrackSelection("Momentum");
    fStationGroupSelection = factory->CreateTrackSelection("TrdStation");
    fFinalSelection = factory->CreateTrackSelection("TrdFinal");
    fFinalPreSelection = factory->CreateTrackSelection("Empty");
-   
+
    fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
 
-   fNofIter = 1; 
-   fBeginStationGroup = 0; 
+   fNofIter = 1;
+   fBeginStationGroup = 0;
    fEndStationGroup = fLayout.GetNofStationGroups() - 1;
    fPDG = 11;
-   
+
    fVerbose = 1;
 }
 
@@ -74,15 +74,10 @@ void CbmLitTrdTrackFinderSts::SetIterationParameters(
 		Int_t iter)
 {
 	if (iter == 0) {
-		fMaxNofMissingHitsInStationGroup = 1;
-		fMaxNofMissingHits = 1;
-		fSigmaCoef = 5.; 
-	} 
-	if (iter == 1) {
-		fMaxNofMissingHitsInStationGroup = 1;
 		fMaxNofMissingHits = 2;
-		fSigmaCoef = 7.; 
-	} 
+		fIsAlwaysCreateMissingHit = false;
+		fSigmaCoef = 3.7;
+	}
 }
 
 Int_t CbmLitTrdTrackFinderSts::DoFind(
@@ -92,21 +87,21 @@ Int_t CbmLitTrdTrackFinderSts::DoFind(
 	HitPtrVector hits;
 	TrackPtrVector trackSeeds;
 	TrackPtrVector foundTracks;
-	
+
 	CbmLitConverter::TrkHitArrayToPixelHitVector(hitArray, hits);
 	CreateTrackSeeds(fTrackSeedsArray, trackSeeds);
-	
+
 	CbmLitTrackFinderBranch::DoFind(hits, trackSeeds, foundTracks);
-	
+
 	CbmLitConverter::TrackVectorToTrdTrackArray(foundTracks, trackArray);
-	
+
 	for_each(foundTracks.begin(), foundTracks.end(), DeleteObject());
 	for_each(hits.begin(), hits.end(), DeleteObject());
 	for_each(trackSeeds.begin(), trackSeeds.end(), DeleteObject());
 	foundTracks.clear();
 	hits.clear();
 	trackSeeds.clear();
-	
+
 	return trackArray->GetEntriesFast();
 }
 
@@ -116,11 +111,11 @@ void CbmLitTrdTrackFinderSts::CreateTrackSeeds(
 {
 	CbmLitConverter::StsTrackArrayToTrackVector(trackArray, trackSeeds);
 
-    if (fVerbose > 1) 
+    if (fVerbose > 1)
       std::cout << "-I- CbmLitTrdTrackFinderSts::CreateTrackSeeds: " << std::endl
                 << trackArray->GetEntriesFast() << " tracks were loaded, "
                 << trackSeeds.size() << " tracks were created" << std::endl;
-    
+
     Double_t Ze = fLayout.GetSubstation(0, 0, 0).GetZ();
     for (TrackPtrIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {
        CbmLitTrackParam par = *(*iTrack)->GetParamLast();
@@ -130,7 +125,7 @@ void CbmLitTrdTrackFinderSts::CreateTrackSeeds(
        (*iTrack)->SetChi2( 0.0 );
     }
 
-    if (fVerbose > 1) 
+    if (fVerbose > 1)
        std::cout << "-I- CbmLitTrackFinderStsNew::CreateTrackSeeds: "
                  << "Extrapolation to detector finished " << std::endl;
 }

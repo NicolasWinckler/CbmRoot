@@ -37,7 +37,6 @@ protected:
 
     // Tracking parameters
 	Int_t fNofIter;
-	Int_t fMaxNofMissingHitsInStationGroup;
 	Int_t fMaxNofMissingHits;
     Int_t fBeginStationGroup;
     Int_t fEndStationGroup;

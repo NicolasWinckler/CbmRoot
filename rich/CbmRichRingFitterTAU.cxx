@@ -87,7 +87,7 @@ void CbmRichRingFitterTAU::DoFit(CbmRichRing *pRing)
          if (fCorrection == 1) cout<<" Correction of ring radius chosen: valid for rich_standard.geo, JUN06 " <<endl;
          if (fCorrection > 1)  cout<<" - ERROR - correction value not valid: has to be either 0 (no cor.) or 1 (cor.) "<<endl;
     }
-    
+
     // parameters for ring correction
     // note: optimized for rich_standard.geo JUN06
     Double_t A=1.0861e-2;
@@ -96,18 +96,19 @@ void CbmRichRingFitterTAU::DoFit(CbmRichRing *pRing)
     Double_t y0=-109.363;
     Double_t R0=6.27642;
 
+    Double_t fRadius  = 0.;
+    Double_t fCenterX = 0.;
+    Double_t fCenterY = 0.;
+
     if (fNhits < 3) {
-      fRadius  = 0.;
-      fCentreX = 0.;
-      fCentreY = 0.;
       pRing->SetRadius(fRadius);
-      pRing->SetCenterX(fCentreX);
-      pRing->SetCenterY(fCentreY);
+      pRing->SetCenterX(fCenterX);
+      pRing->SetCenterY(fCenterY);
       return;
     }
 
 //    CbmRichHit *hit = NULL;
-    
+
     Int_t i, iter, iterMax=20;
 
 	Int_t riter, RiterMax = 4;
@@ -136,7 +137,7 @@ void CbmRichRingFitterTAU::DoFit(CbmRichRing *pRing)
 	vector<Double_t> a;		// amplitudes of hits;
 	vector<Double_t> w;		// weights of points;
 	vector<Double_t> d;		// distance between points and circle;
-	
+
 	if(fRobust < 1 || fRobust > 2){
 	  if(fVerbose > 1) cout<<"TAU (Taubin) algorithm for fit points by circle"<<endl;
 	  RiterMax = 1;
@@ -149,7 +150,7 @@ void CbmRichRingFitterTAU::DoFit(CbmRichRing *pRing)
 	  if(fVerbose >1) cout <<"TAU (Taubin) algorithm for robust fit points by circle with optimal weight function"<<endl;
 	  RiterMax = 4;
 	}
-	
+
 	for(i = 0; i < fNhits; i++) {
 		CbmRichHit* hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
 		x.push_back(hit->X());
@@ -157,7 +158,7 @@ void CbmRichRingFitterTAU::DoFit(CbmRichRing *pRing)
 		a.push_back(hit->GetAmplitude());
 //		cout<<"x =  "<<x[i]<<";   y="<<y[i]<<";   a="<<a[i]<<endl;
 	}
-	
+
 	for(i = 0; i < fNhits; i++){
 		if(a[i] > amax) amax = a[i];
 		if(a[i] < amin) amin = a[i];
@@ -178,7 +179,7 @@ void CbmRichRingFitterTAU::DoFit(CbmRichRing *pRing)
 
 		Mx /= M0;
 		My /= M0;
-	
+
 	//computing moments (note: all moments are normed, i.e. divided by N)
 		Mxx=Myy=Mxy=Mxz=Myz=Mzz=0.;
 
@@ -269,7 +270,7 @@ void CbmRichRingFitterTAU::DoFit(CbmRichRing *pRing)
 			ctsigma = ct*sigma;
 			sig1 = 0.;
 			sig2 = 0.;
-			
+
 			w.clear();
 			for(i = 0; i < (Int_t)d.size(); i++){
 				if(fRobust == 1){	//! Tukey's weight function
@@ -293,45 +294,45 @@ void CbmRichRingFitterTAU::DoFit(CbmRichRing *pRing)
 		}
 
 	}
-	
+
 	x.clear();
 	y.clear();
 	a.clear();
 	w.clear();
 
-    fCentreX = Xcenter;
-    fCentreY = Ycenter;
+    fCenterX = Xcenter;
+    fCenterY = Ycenter;
     fRadius  = Radius;
-    
+
     pRing->SetRadius(fRadius);
-    pRing->SetCenterX(fCentreX);
-    pRing->SetCenterY(fCentreY);
+    pRing->SetCenterX(fCenterX);
+    pRing->SetCenterY(fCenterY);
 
     CalcChi2(pRing);
 
-    
-    if (fVerbose > 1 && fCorrection ==1) 
+
+    if (fVerbose > 1 && fCorrection ==1)
     cout << " Radius before correction: " << fRadius << endl;
-    
+
   // Radius correction (Petr Stolpovsky, for the method see CBM simulation meeting, 14.7.06)
     Double_t xx,yy;
-    xx=fCentreX;
-    yy=TMath::Abs(fCentreY);
+    xx=fCenterX;
+    yy=TMath::Abs(fCenterY);
     Double_t Rxy=TMath::Sqrt(xx*xx+(yy-y0)*(yy-y0));
     Double_t N=(fCorrection*(A*Rxy+B*Rxy*Rxy+C*Rxy*Rxy*Rxy)/R0)+1.;      // if fCorrection = 0: no correction done
     fRadius=fRadius/N;
   //end of correction
 
     if (TMath::IsNaN(fRadius) == 1) fRadius = 0.;
-    if (TMath::IsNaN(fCentreX) == 1) pRing->SetCenterX(0.);
-    if (TMath::IsNaN(fCentreY) == 1) pRing->SetCenterY(0.);
+    if (TMath::IsNaN(fCenterX) == 1) pRing->SetCenterX(0.);
+    if (TMath::IsNaN(fCenterY) == 1) pRing->SetCenterY(0.);
 
     pRing->SetRadius(fRadius);
-   
-    
+
+
     if (fVerbose > 1)
-         cout<<"fRadius , fCentreX, fCentreY :"<<fRadius<<" "<<fCentreX<<" "<<fCentreY<<endl;
-	
+         cout<<"fRadius , fCentreX, fCentreY :"<<fRadius<<" "<<fCenterX<<" "<<fCenterY<<endl;
+
 
 
 }

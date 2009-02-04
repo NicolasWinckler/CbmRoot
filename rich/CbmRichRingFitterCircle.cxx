@@ -83,7 +83,7 @@ void CbmRichRingFitterCircle::DoFit(CbmRichRing* pRing)
          if (fCorrection == 1) cout<<" Correction of ring radius chosen: valid for rich_standard.geo, JUN06 " <<endl;
          if (fCorrection > 1)  cout<<" - ERROR - correction value not valid: has to be either 0 (no cor.) or 1 (cor.) "<<endl;
     }
-    
+
     // parameters for ring correction
     // note: optimized for rich_standard.geo JUN06
     Double_t A=1.068e-2;
@@ -91,11 +91,12 @@ void CbmRichRingFitterCircle::DoFit(CbmRichRing* pRing)
     Double_t C=9.4583e-8;
     Double_t y0=-108.962;
     Double_t R0=6.27781;
-    
+
+    Double_t fRadius = 0.;
+    Double_t fCenterX = 0.;
+    Double_t fCenterY = 0.;
+
 if (nHits < 3) {
-    fRadius  = 0;
-    fCentreX = 0;
-    fCentreY = 0;
     return;
   }
 
@@ -182,14 +183,14 @@ if (nHits < 3) {
 //   Float_t x12 = (c[1]*a[1][2] - c[2]*a[1][1])/det2;
 //   Float_t x22 = (a[0][1]*c[2] - a[0][2]*c[1])/det2;
 
-  fRadius  = TMath::Sqrt((b3 + b32*(x11*x11 + x21*x21) -
+  fRadius = TMath::Sqrt((b3 + b32*(x11*x11 + x21*x21) -
                           a31*x11 - a32*x21)/a33);
-  fCentreX = x11;
-  fCentreY = x21;
-  
-  if (fVerbose > 1 && fCorrection ==1) 
+  fCenterX = x11;
+  fCenterY = x21;
+
+  if (fVerbose > 1 && fCorrection ==1)
     cout << " Radius before correction: " << fRadius << endl;
-  
+
   // Radius correction (Petr Stolpovsky, for the method see CBM simulation meeting, 14.7.06)
   x21=TMath::Abs(x21);
   Double_t Rxy=TMath::Sqrt(x11*x11+(x21-y0)*(x21-y0));
@@ -197,21 +198,21 @@ if (nHits < 3) {
   fRadius=fRadius/N;
   //end of correction
 
-  
+
 
   pRing->SetRadius(fRadius);
-  pRing->SetCenterX(fCentreX);
-  pRing->SetCenterY(fCentreY);
-  
-  if (TMath::IsNaN(fRadius) == 1) pRing->SetRadius(0.);
-  if (TMath::IsNaN(fCentreX) == 1) pRing->SetCenterX(0.);
-  if (TMath::IsNaN(fCentreY) == 1) pRing->SetCenterY(0.);
-  
-  if (fVerbose > 1)
-         cout<<"fRadius , fCentreX, fCentreY , fMeanX, fMeanY:"<<fRadius<<" "<<fCentreX<<" "<<fCentreY<<
-	 " " << fMeanX << " " << fMeanY << endl;
+  pRing->SetCenterX(fCenterX);
+  pRing->SetCenterY(fCenterY);
 
-    
+  if (TMath::IsNaN(fRadius) == 1) pRing->SetRadius(0.);
+  if (TMath::IsNaN(fCenterX) == 1) pRing->SetCenterX(0.);
+  if (TMath::IsNaN(fCenterY) == 1) pRing->SetCenterY(0.);
+
+  if (fVerbose > 1)
+         cout<<"fRadius , fCentreX, fCentreY , fMeanX, fMeanY:"<<fRadius<<" "<<fCenterX<<" "
+         <<fCenterY<< " " << fMeanX << " " << fMeanY << endl;
+
+
   //pRing->SetCenterX(fMeanX);
   //pRing->SetCenterY(fMeanY);
 

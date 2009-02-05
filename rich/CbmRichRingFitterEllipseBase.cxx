@@ -6,6 +6,7 @@
 #include "TDirectory.h"
 #include "TFile.h"
 
+#include <cmath>
 #include <iostream>
 using std::cout;
 using std::endl;

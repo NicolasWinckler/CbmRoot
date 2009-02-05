@@ -112,142 +112,6 @@ void CbmLitTrackFinderBranch::FollowTracks()
 	fTracks.clear();
 }
 
-
-//void CbmLitTrackFinderBranch::ProcessStationGroup(
-//		const CbmLitTrack *track,
-//		Int_t stationGroup)
-//{
-//	Int_t nofStations = fLayout.GetNofStations(stationGroup);
-//
-//	std::vector<CbmLitTrackParam> par(nofStations);
-//	par[0] = *track->GetParamLast();
-//	std::vector<CbmLitTrackParam> uPar(nofStations);
-//    HitPtrVector hits(nofStations);
-//    std::vector<HitPtrIteratorPair> bounds(nofStations);
-//    std::vector<Int_t> nofMissingHits(nofStations, 0);
-//    std::vector<Double_t> chiSq(nofStations, 0.);
-//    Int_t nofBranches = 0;
-//
-//   Int_t plane = 0;
-//   for (Int_t i = 0; i < stationGroup; i++)
-//	   plane += fLayout.GetNofStations(i);
-//
-//   Int_t extraLoop = 0;
-//   if (fMaxNofMissingHitsInStationGroup > 0) extraLoop = 1;
-//   if (std::abs(plane - track->GetNofHits()) >= fMaxNofMissingHits) extraLoop = 0;
-//
-//   Double_t z = fLayout.GetSubstation(stationGroup, 0, 0).GetZ();
-//   if (fPropagator->Propagate(&par[0], z, fPDG) == kLITERROR) return;
-//   bounds[0] = MinMaxIndex(&par[0], stationGroup, 0, 0);
-//   for (HitPtrIterator iHit0 = bounds[0].first; iHit0 != bounds[0].second + extraLoop; iHit0++) { //1
-//      if (!ProcessStation(0, 0, iHit0, bounds[0], nofMissingHits, &par[0], &uPar[0], hits, chiSq)) continue;
-//
-//      Double_t z = fLayout.GetSubstation(stationGroup, 1, 0).GetZ();
-//      if (fPropagator->Propagate(&uPar[0], &par[1], z, fPDG) == kLITERROR) continue;
-//      bounds[1] = MinMaxIndex(&par[1], stationGroup, 1, 0);
-//      for (HitPtrIterator iHit1 = bounds[1].first; iHit1 != bounds[1].second + extraLoop; iHit1++) { //2
-//    	 if (!ProcessStation(1, 0, iHit1, bounds[1], nofMissingHits, &par[1], &uPar[1], hits, chiSq)) continue;
-//
-//         if (nofStations < 3) {
-//        	 if (nofBranches++ > fMaxNofBranches) return;
-//        	 AddTrackCandidate(track, hits, chiSq, &uPar[1], stationGroup);
-//             continue;
-//         }
-//
-//         Double_t z = fLayout.GetSubstation(stationGroup, 2, 0).GetZ();
-//         if (fPropagator->Propagate(&uPar[1], &par[2], z, fPDG) == kLITERROR) continue;
-//         bounds[2] = MinMaxIndex(&par[2], stationGroup, 2, 0);
-//         for (HitPtrIterator iHit2 = bounds[2].first; iHit2 != bounds[2].second + extraLoop; iHit2++) { //3
-//            if (!ProcessStation(2, 0, iHit2, bounds[2], nofMissingHits, &par[2], &uPar[2], hits, chiSq)) continue;
-//
-//            if (nofStations < 4) {
-//            	if (nofBranches++ > fMaxNofBranches) return;
-//               AddTrackCandidate(track, hits, chiSq, &uPar[2], stationGroup);
-//               continue;
-//            }
-//
-//            Double_t z = fLayout.GetSubstation(stationGroup, 3, 0).GetZ();
-//            if (fPropagator->Propagate(&uPar[2], &par[3], z, fPDG) == kLITERROR) continue;
-//            bounds[3] = MinMaxIndex(&par[3], stationGroup, 3, 0);
-//            for (HitPtrIterator iHit3 = bounds[3].first; iHit3 != bounds[3].second + extraLoop; iHit3++) { //4
-//               if (!ProcessStation(3, 0, iHit3, bounds[3], nofMissingHits, &par[3],&uPar[3], hits, chiSq)) continue;
-//
-//               if (nofBranches++ > fMaxNofBranches) return;
-//               AddTrackCandidate(track, hits, chiSq, &uPar[3], stationGroup);
-//
-//            } //4
-//         } //3
-//      } //2
-//   } //1
-//}
-//
-//Bool_t CbmLitTrackFinderBranch::ProcessStation(
-//		Int_t station,
-//		Int_t substation,
-//		HitPtrIterator &hitIt,
-//		HitPtrIteratorPair &bounds,
-// 		std::vector<Int_t>& nofMissingHits,
-//		CbmLitTrackParam* par,
-//		CbmLitTrackParam* uPar,
-//		HitPtrVector& hits,
-//		std::vector<Double_t>& chiSq)
-//{
-//   Bool_t result = true;
-//
-//   if (station == 0) nofMissingHits[0] = 0;
-//   else nofMissingHits[station] = nofMissingHits[station - 1];
-//
-//   if (hitIt < bounds.second) {
-//      hits[station] = *hitIt;
-//      if (!IsIn(par,  hits[station])) result = false;
-//      *uPar = *par;
-//      if (result) {
-//    	  fFilter->Update(uPar,  hits[station]);
-//    	  chiSq[station] = ChiSq(uPar, hits[station]);
-//      } else {
-//    	  chiSq[station] = 0.;
-//      }
-//   } else {
-//      hits[station] = NULL;
-//      nofMissingHits[station]++;
-//      if (nofMissingHits[station] > fMaxNofMissingHitsInStationGroup) result = false;
-//      chiSq[station] = 0.;
-//   }
-//
-//   return result;
-//}
-//
-//void CbmLitTrackFinderBranch::AddTrackCandidate(
-//		const CbmLitTrack* track,
-//		const HitPtrVector& hits,
-//		const std::vector<Double_t>& chiSq,
-//		const CbmLitTrackParam* par,
-//		Int_t stationGroup)
-//{
-//   CbmLitTrack* newTrack = new CbmLitTrack(*track);
-//   Double_t chi2sum = newTrack->GetChi2();
-//
-//   for (Int_t i = 0; i < hits.size(); i++) {
-//	  if (hits[i] == NULL) continue;
-//      newTrack->AddHit(hits[i]);
-//      chi2sum += chiSq[i];
-//   }
-//
-//   newTrack->SortHits();
-//   newTrack->SetPDG(fPDG);
-//   newTrack->SetLastPlaneId(stationGroup);
-//   newTrack->SetParamLast(par);
-//   newTrack->SetChi2(chi2sum);
-//   newTrack->SetNDF(NDF(newTrack->GetNofHits()));
-//
-//   if (newTrack->GetNofHits() == 0) {
-//      delete newTrack;
-//      return;
-//   }
-//   fFoundTracks.push_back(newTrack);
-//}
-
-
 void CbmLitTrackFinderBranch::ProcessStationGroup(
 		const CbmLitTrack *track,
 		Int_t stationGroup)
@@ -333,29 +197,29 @@ Bool_t CbmLitTrackFinderBranch::ProcessStation1(
 	HitPtrVector hits(nofSubstations);
 	std::vector<HitPtrIteratorPair> bounds(nofSubstations);
 	std::vector<Double_t> chiSq(nofSubstations, 0.);
-//	Int_t nofBranches = 0;
-
-	Int_t extraLoop = 1;
+	std::vector<Int_t> extraLoop(nofSubstations, 1);
 
 	Double_t z = fLayout.GetSubstation(stationGroup, station, 0).GetZ();
 	if (fPropagator->Propagate(&par[0], z, fPDG) == kLITERROR) return false;
 	bounds[0] = MinMaxIndex(&par[0], stationGroup, station, 0);
-	for (HitPtrIterator hit0 = bounds[0].first; hit0 != bounds[0].second + extraLoop; hit0++) { //0
+	for (HitPtrIterator hit0 = bounds[0].first; hit0 < bounds[0].second + extraLoop[0]; hit0++) { //0
 		if (!ProcessSubstation(0, hit0, bounds[0], &par[0], &uPar[0], hits, chiSq)) continue;
+		else { if (!fIsAlwaysCreateMissingHit) extraLoop[0] = 0; }
 
 		if (nofSubstations < 2) {
 			if (AddTrackBranch(track, hits, chiSq, &uPar[0], tracksOut)) result = true;
-		//	if (fNofBranches > fMaxNofBranches) return result;
+//			if (fNofBranches > fMaxNofBranches) return result;
 			continue;
 		}
 
 		Double_t z = fLayout.GetSubstation(stationGroup, station, 1).GetZ();
 		if (fPropagator->Propagate(&uPar[0], &par[1], z, fPDG) == kLITERROR) continue;
 		bounds[1] = MinMaxIndex(&par[1], stationGroup, station, 1);
-		for (HitPtrIterator hit1 = bounds[1].first; hit1 != bounds[1].second + extraLoop; hit1++) { //1
+		for (HitPtrIterator hit1 = bounds[1].first; hit1 < bounds[1].second + extraLoop[1]; hit1++) { //1
 			if (!ProcessSubstation(1, hit1, bounds[1], &par[1], &uPar[1], hits, chiSq)) continue;
+			else { if (!fIsAlwaysCreateMissingHit) extraLoop[1] = 0;}
 			if (AddTrackBranch(track, hits, chiSq, &uPar[1], tracksOut)) result = true;
-		//	if (fNofBranches > fMaxNofBranches) return result;
+//			if (fNofBranches > fMaxNofBranches) return result;
 		} //1
 	} //0
 

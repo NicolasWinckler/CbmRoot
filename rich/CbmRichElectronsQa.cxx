@@ -35,8 +35,10 @@ CbmRichElectronsQa::CbmRichElectronsQa() :CbmTask("RichRingQa")
 CbmRichElectronsQa::CbmRichElectronsQa(const char *name, const char *title, Int_t verbose)
   :CbmTask(name)
 {
+	fEventNum = 1;
 
 	fMinNofHitsInRichRing = 5;
+	fMinNofTrdHits = 8;
 	fTrdAnnCut = 0.8;
 
 ///RICH
@@ -231,51 +233,71 @@ void CbmRichElectronsQa::Exec(Option_t* option)
     GlobalTracksElIdEff();
     DiffElandPi();
 
+    Double_t eventNum = (Double_t) fEventNum;
+
+    cout << endl <<"----CbmRichElectronsQa---- event # " << fEventNum << endl;
     cout << "----RICH----" << endl;
-	cout << "fNofMCRings = " << fNofMCRings << endl;
+	cout << "fNofMCRings = " << fNofMCRings <<
+		", per event " << fNofMCRings/eventNum << endl;
 	cout << "fNofAccRings = " << fNofAccRings<<
-		" Eff = " << (Double_t)fNofAccRings / fNofMCRings << endl;
+		", per event " << fNofAccRings/eventNum <<
+		", Eff = " << (Double_t)fNofAccRings / fNofMCRings << endl;
 	cout << "fNofTrueFoundRings = "<< fNofTrueFoundRings <<
-		" Eff = " << (Double_t)fNofTrueFoundRings/ fNofAccRings << endl;
+		", per event " << fNofTrueFoundRings/eventNum <<
+		", Eff = " << (Double_t)fNofTrueFoundRings/ fNofAccRings << endl;
 	cout << "fTrueMatchRings = " << fNofTrueMatchRings <<
-		" Eff = " << (Double_t) fNofTrueMatchRings / fNofTrueFoundRings <<
-		" Eff (acc) = " << (Double_t) fNofTrueMatchRings / fNofAccRings <<endl;
+		", per event " << fNofTrueMatchRings/eventNum <<
+		", Eff = " << (Double_t) fNofTrueMatchRings / fNofTrueFoundRings <<
+		", Eff (acc) = " << (Double_t) fNofTrueMatchRings / fNofAccRings <<endl;
 	cout << "fTrueElIdRings = " << fNofTrueElIdRings <<
-		" Eff = " << (Double_t) fNofTrueElIdRings / fNofTrueMatchRings <<
-		" Eff (acc) = " << (Double_t) fNofTrueElIdRings / fNofAccRings << endl;
+		", per event " << fNofTrueElIdRings/eventNum <<
+		", Eff = " << (Double_t) fNofTrueElIdRings / fNofTrueMatchRings <<
+		", Eff (acc) = " << (Double_t) fNofTrueElIdRings / fNofAccRings << endl;
 
 	cout << "----GLOBAL----"<< endl;
 	cout << "fNofAccRichTrdGlobal = " <<  fNofAccRichTrdGlobal<<
-		" Eff = " << (Double_t) fNofAccRichTrdGlobal /  fNofAccRings <<endl;
+		", per event " << fNofAccRichTrdGlobal/eventNum <<
+		", Eff = " << (Double_t) fNofAccRichTrdGlobal /  fNofAccRings <<endl;
 	cout << "fNofAccRichTrdTofGlobal = " <<  fNofAccRichTrdTofGlobal<<
-	    " Eff = " << (Double_t) fNofAccRichTrdTofGlobal / fNofAccRichTrdGlobal  <<
-		" Eff (acc.ring) = " << (Double_t) fNofAccRichTrdTofGlobal /  fNofAccRings <<endl;
+		", per event " << fNofAccRichTrdTofGlobal/eventNum <<
+	    ", Eff = " << (Double_t) fNofAccRichTrdTofGlobal / fNofAccRichTrdGlobal  <<
+		", Eff (acc.ring) = " << (Double_t) fNofAccRichTrdTofGlobal /  fNofAccRings <<endl;
 
 	cout << "fNofTrueMatchStsRichGlobal = " << fNofTrueMatchStsRichGlobal <<
-		" Eff = " << (Double_t) fNofTrueMatchStsRichGlobal / fNofTrueFoundRings <<
-		" Eff (acc. rings) = " << (Double_t) fNofTrueMatchStsRichGlobal / fNofAccRings <<endl;
+		", per event " << fNofTrueMatchStsRichGlobal/eventNum <<
+		", Eff = " << (Double_t) fNofTrueMatchStsRichGlobal / fNofTrueFoundRings <<
+		", Eff (acc. rings) = " << (Double_t) fNofTrueMatchStsRichGlobal / fNofAccRings <<endl;
 	cout << "fNofTrueMatchStsRichTrdGlobal = " << fNofTrueMatchStsRichTrdGlobal <<
-		" Eff = " << (Double_t) fNofTrueMatchStsRichTrdGlobal /  fNofTrueMatchStsRichGlobal<<
-		" Eff (acc. rings) = " << (Double_t) fNofTrueMatchStsRichTrdGlobal / fNofAccRings <<endl;
+		", per event " << fNofTrueMatchStsRichTrdGlobal/eventNum <<
+		", Eff = " << (Double_t) fNofTrueMatchStsRichTrdGlobal /  fNofTrueMatchStsRichGlobal<<
+		", Eff (acc. rings) = " << (Double_t) fNofTrueMatchStsRichTrdGlobal / fNofAccRings <<endl;
 	cout << "fNofTrueMatchStsRichTrdTofGlobal = " << fNofTrueMatchStsRichTrdTofGlobal <<
+		", per event " << fNofTrueMatchStsRichTrdTofGlobal/eventNum <<
 		" Eff = " << (Double_t) fNofTrueMatchStsRichTrdTofGlobal /  fNofTrueMatchStsRichTrdGlobal<<
 		" Eff (acc. rings) = " << (Double_t) fNofTrueMatchStsRichTrdTofGlobal / fNofAccRings <<endl;
 
 	cout << "----ELECTRON IDENTIFICATION----"<< endl;
 	cout << "fNofTrueIdRich = " << fNofTrueIdRich <<
-		" Eff (acc. rings) = " << (Double_t) fNofTrueIdRich / fNofAccRings <<endl;
+		", per event " << fNofTrueIdRich/eventNum <<
+		", Eff (acc. rings) = " << (Double_t) fNofTrueIdRich / fNofAccRings <<endl;
 
-	cout << "fNofAccPi = " << fNofAccPi << endl;
+	cout << "fNofAccPi = " << fNofAccPi <<
+		", per event " << fNofAccPi/eventNum <<endl;
 
 	cout << "fNofPiasElRich = " << fNofPiasElRich <<
-			" pion supression = " << (Double_t) fNofAccPi / fNofPiasElRich <<endl;
+		", per event " << fNofPiasElRich/eventNum <<
+		", pion supression = " << (Double_t) fNofAccPi / fNofPiasElRich <<endl;
 
 	cout << "fNofTrueIdRichTrd = " << fNofTrueIdRichTrd <<
-			" Eff (acc. rings) = " << (Double_t)  fNofTrueIdRichTrd/fNofAccRings  <<endl;
+		", per event " << fNofTrueIdRichTrd/eventNum <<
+		", Eff (acc. rings) = " << (Double_t)  fNofTrueIdRichTrd/fNofAccRings  <<endl;
 
 	cout << "fNofPiasElRichTrd = " << fNofPiasElRichTrd <<
-			" pion supression = " << (Double_t) fNofAccPi / fNofPiasElRichTrd <<endl;
+		", per event " << fNofPiasElRichTrd/eventNum <<
+		", pion supression = " << (Double_t) fNofAccPi / fNofPiasElRichTrd <<endl;
 
+
+	fEventNum++;
    //fNofFakeRings;
    // fNofCloneRings;
 }
@@ -335,7 +357,7 @@ void CbmRichElectronsQa::AccTracks()
 				fNofAccRings++;
 				fhAccRings->Fill(momentum);
 
-				if (track->GetNPoints(kTRD) >= 12){// accepted RICH + TRD
+				if (track->GetNPoints(kTRD) >= fMinNofTrdHits){// accepted RICH + TRD
 					fNofAccRichTrdGlobal++;
 					fhAccRichTrdGlobal->Fill(momentum);
 					if (track->GetNPoints(kTOF) >= 1){ // accepted RICH + TRD + TOF

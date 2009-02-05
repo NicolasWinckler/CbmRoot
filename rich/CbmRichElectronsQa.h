@@ -41,6 +41,7 @@ public:
 	virtual void Finish();
 
 private:
+	Int_t fEventNum;
 
 	TClonesArray* fRichHits;
 	TClonesArray* fRichRings;
@@ -57,6 +58,7 @@ private:
 	TClonesArray* fTofHits;
 
     Int_t fMinNofHitsInRichRing;
+    Int_t fMinNofTrdHits;
     Double_t fTrdAnnCut;
     Bool_t DoesRingHaveProjection(Int_t trackId);
     Bool_t IsRichElectron(CbmRichRing* ring, Double_t momentum);

@@ -1,6 +1,6 @@
 void much_draw3D()
 {
-  TString dir = "/home/d/andrey/events/newmuch/large/10mu/mu_urqmd/";
+  TString dir = "/d/cbm02/andrey/events/newmuch/standard/10mu/mu/";
   TString mcFile = dir + "mc.root";
 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");

@@ -1,16 +1,16 @@
-void sts_reco(Int_t nEvents = 1)
+void sts_reco(Int_t nEvents = 10000)
 {
-  TString dir = "/home/d/andrey/events/newmuch/large/10mu/mu_urqmd/";
+//  TString dir = "/d/cbm02/andrey/events/newmuch/standard/10mu/mu_urqmd/";
 //  TString dir = "/d/cbm02/andrey/events/muchstraw/large/10mu/mu/";
-//  TString dir  = "/d/cbm02/andrey/events/trd/standard/e";
+  TString dir  = "/d/cbm02/andrey/events/trd/segmented/e/";
   TString inFile = dir + "mc.root";
   TString parFile = dir + "params.root";
   TString outFile = dir + "sts.reco.root";
 
-//  TString digiFile = "sts_standard.digi.par";
-  TString digiFile = "sts_allstrips.digi.par";
+  TString digiFile = "sts_standard.digi.par";
+//  TString digiFile = "sts_allstrips.digi.par";
 
-  Int_t iVerbose = 3;
+  Int_t iVerbose = 1;
 
   // -----   Timer   --------------------------------------------------------
   TStopwatch timer;

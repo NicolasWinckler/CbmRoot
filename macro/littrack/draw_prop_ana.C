@@ -48,7 +48,6 @@ void draw_prop_ana()
 //	c_sr[0]->Divide(4, 3);
 //	c_sr[1]->Divide(4, 3);
 
-
 	for (int i = 0; i < nofLayers; i++) layer_histos(i);
 
 	fit_histos();

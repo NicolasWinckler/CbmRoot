@@ -9,7 +9,7 @@ void cbmrootlibs()
    gSystem->Load("libPassive");
    gSystem->Load("libTrkBase");
    gSystem->Load("libGeane");
-//   gSystem->Load("libMvd");
+   gSystem->Load("libMvd");
    gSystem->Load("libSts");
    gSystem->Load("libRich");
    gSystem->Load("libMuch");

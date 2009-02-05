@@ -1,9 +1,9 @@
 #include "../../cbmbase/CbmDetectorList.h";
-void much_reco(Int_t nEvents = 3600)
+void much_reco(Int_t nEvents = 10)
 {
   Int_t iVerbose = 0;
 
-  TString dir = "/home/d/andrey/events/newmuch/large/10mu/mu/";
+  TString dir = "/d/cbm02/andrey/events/newmuch/standard/10mu/mu_urqmd/";
 
   TString inFile = dir + "mc.root";
   TString inFile1 = dir + "sts.reco.root";

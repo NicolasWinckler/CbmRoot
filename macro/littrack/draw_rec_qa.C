@@ -1,5 +1,7 @@
-TString dir  = "/d/cbm02/andrey/events/much/compact10/10mu/mu/";
-TFile *file = new TFile(dir + "much.tracks.root");
+//TString dir  = "/d/cbm02/andrey/events/much/compact10/10mu/mu/";
+//TFile *file = new TFile(dir + "much.tracks.root");
+TString dir  = "/d/cbm02/andrey/events/trd/segmented/e_urqmd/";
+TFile *file = new TFile(dir + "trd.reco.root");
 
 Int_t lineWidth = 3;
 Int_t markerSize = 3;
@@ -32,17 +34,17 @@ void draw_eff()
   draw_hist_1D(hMomEffAll, "Momentum, GeV/c", "Efficiency",
 		  kBlue, lineWidth, 1, markerSize, kCircle, false, false, "");
 
-  draw_hist_1D(hMomEffMuons, "Momentum, GeV/c", "Efficiency",
-  		  kRed, lineWidth, 1, markerSize, kFullDotLarge, false, false, "SAME");
+//  draw_hist_1D(hMomEffMuons, "Momentum, GeV/c", "Efficiency",
+//  		  kRed, lineWidth, 1, markerSize, kFullDotLarge, false, false, "SAME");
 
-//  draw_hist_1D(hMomEffElectrons, "Momentum, GeV/c", "Efficiency",
-//    		  kRed, lineWidth, 1, markerSize, kFullDotLarge, false, false, "SAME");
+  draw_hist_1D(hMomEffElectrons, "Momentum, GeV/c", "Efficiency",
+    		  kRed, lineWidth, 1, markerSize, kFullDotLarge, false, false, "SAME");
 
   TLegend* l1 = new TLegend(0.5,0.7,0.9,0.9);
   l1->SetHeader("Efficiency");
   l1->AddEntry(hMomEffAll,"all tracks","lp");
-  l1->AddEntry(hMomEffMuons,"muon tracks","lp");
-//  l1->AddEntry(hMomEffElectrons,"electron tracks","lp");
+//  l1->AddEntry(hMomEffMuons,"muon tracks","lp");
+  l1->AddEntry(hMomEffElectrons,"electron tracks","lp");
   l1->Draw();
 }
 

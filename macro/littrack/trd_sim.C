@@ -1,11 +1,11 @@
-void trd_sim(Int_t nEvents = 100)
+void trd_sim(Int_t nEvents = 10000)
 {
-  TString inDir   = "/d/cbm03/urqmd/auau/25gev/centr";
-  TString inFile  = inDir + "/urqmd.auau.25gev.centr.0000.ftn14";
-  TString outDir  = "/d/cbm02/andrey/events/trd/standard/e";
-  TString outFile = outDir + "/mc.root";
-  TString parFile = outDir + "/params.root";
-  
+  TString inDir   = "/d/cbm03/urqmd/auau/25gev/centr/";
+  TString inFile  = inDir + "urqmd.auau.25gev.centr.0000.ftn14";
+  TString outDir  = "/d/cbm02/andrey/events/trd/segmented/e/";
+  TString outFile = outDir + "mc.root";
+  TString parFile = outDir + "params.root";
+
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
@@ -14,10 +14,10 @@ void trd_sim(Int_t nEvents = 100)
   TString mvdGeom    = "mvd_standard.geo";
   TString stsGeom    = "sts_standard.geo";
   TString richGeom   = "rich_standard.geo";
-  TString trdGeom    = "trd_monolithic.geo";
+  TString trdGeom    = "trd_standard.geo";
   TString tofGeom    = "tof_standard.geo";
-  TString ecalGeom   = "ecal_FastMC.geo";
-  
+  TString ecalGeom   = "";//"ecal_FastMC.geo";
+
   // -----   Magnetic field   -----------------------------------------------
   TString fieldMap    = "FieldMuonMagnet";   // name of field map
   Double_t fieldZ     = 50.;             // field centre z position
@@ -30,7 +30,7 @@ void trd_sim(Int_t nEvents = 100)
   basiclibs();
   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
   cbmrootlibs();
- 
+
 
   CbmRunSim* fRun = new CbmRunSim();
   fRun->SetName("TGeant3");              // Transport engine
@@ -52,7 +52,7 @@ void trd_sim(Int_t nEvents = 100)
     pipe->SetGeometryFileName(pipeGeom);
     fRun->AddModule(pipe);
   }
-  
+
   if ( targetGeom != "" ) {
     CbmModule* target = new CbmTarget("Target");
     target->SetGeometryFileName(targetGeom);
@@ -64,7 +64,7 @@ void trd_sim(Int_t nEvents = 100)
     magnet->SetGeometryFileName(magnetGeom);
     fRun->AddModule(magnet);
   }
-  
+
   if ( mvdGeom != "" ) {
     CbmDetector* mvd = new CbmMvd("MVD", kTRUE);
     mvd->SetGeometryFileName(mvdGeom);
@@ -94,9 +94,9 @@ void trd_sim(Int_t nEvents = 100)
     tof->SetGeometryFileName(tofGeom);
     fRun->AddModule(tof);
   }
-  
+
   if ( ecalGeom != "" ) {
-    CbmDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data()); 
+    CbmDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data());
     fRun->AddModule(ecal);
   }
   // ------------------------------------------------------------------------
@@ -124,16 +124,16 @@ void trd_sim(Int_t nEvents = 100)
 
   // -----   Create PrimaryGenerator   --------------------------------------
   CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
- // CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
- // primGen->AddGenerator(urqmdGen);
-  
+//  CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
+//  primGen->AddGenerator(urqmdGen);
+
  // ------------------------------------------------------------------------
- 
- 
+
+
 // -----   Create BoxGenerator   --------------------------------------
   Int_t kfCode1=11;   // electrons
   Int_t kfCode2=-11;   // positrons
-  
+
   CbmBoxGenerator* boxGen1 = new CbmBoxGenerator(kfCode1, 5);
   boxGen1->SetPtRange(0.,3.);
   boxGen1->SetPhiRange(0.,360.);
@@ -141,7 +141,7 @@ void trd_sim(Int_t nEvents = 100)
   boxGen1->SetCosTheta();
   boxGen1->Init();
   primGen->AddGenerator(boxGen1);
-  
+
   CbmBoxGenerator* boxGen2 = new CbmBoxGenerator(kfCode2, 5);
   boxGen2->SetPtRange(0.,3.);
   boxGen2->SetPhiRange(0.,360.);
@@ -149,15 +149,15 @@ void trd_sim(Int_t nEvents = 100)
   boxGen2->SetCosTheta();
   boxGen2->Init();
   primGen->AddGenerator(boxGen2);
-  
+
   // ------------------------------------------------------------------------
-  fRun->SetGenerator(primGen); 
- 
+  fRun->SetGenerator(primGen);
+
   // -----   Run initialisation   -------------------------------------------
   fRun->Init();
   // ------------------------------------------------------------------------
-  
-  
+
+
   // -----   Runtime database   ---------------------------------------------
   CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
   fieldPar->SetParameters(magField);
@@ -171,7 +171,7 @@ void trd_sim(Int_t nEvents = 100)
   rtdb->print();
   // ------------------------------------------------------------------------
 
- 
+
   // -----   Start run   ----------------------------------------------------
   fRun->Run(nEvents);
   // ------------------------------------------------------------------------
@@ -185,7 +185,7 @@ void trd_sim(Int_t nEvents = 100)
   cout << "Macro finished succesfully." << endl;
   cout << "Output file is "    << outFile << endl;
   cout << "Parameter file is " << parFile << endl;
-  cout << "Real time " << rtime << " s, CPU time " << ctime 
+  cout << "Real time " << rtime << " s, CPU time " << ctime
        << "s" << endl << endl;
   // ------------------------------------------------------------------------
 

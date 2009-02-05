@@ -1,13 +1,13 @@
 #include "../../cbmbase/CbmDetectorList.h";
-void trd_hits(Int_t nEvents = 100)
+void trd_hits(Int_t nEvents = 500)
 {
   Int_t iVerbose = 1;
-  
-  TString dir  = "/d/cbm02/andrey/events/trd/standard/e";
-  TString inFile = dir + "/mc.root"; 
-  TString parFile = dir + "/params.root"; 
-  TString outFile = dir + "/trd.hits.root";
-  
+
+  TString dir  = "/d/cbm02/andrey/events/trd/segmented/e_urqmd/";
+  TString inFile = dir + "mc.root";
+  TString parFile = dir + "params.root";
+  TString outFile = dir + "trd.hits.root";
+
   TStopwatch timer;
   timer.Start();
 
@@ -21,22 +21,13 @@ void trd_hits(Int_t nEvents = 100)
   run->SetInputFile(inFile);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
-  
- // CbmKF* kalman = new CbmKF();
-//  run->AddTask(kalman);
- // CbmL1* l1 = new CbmL1();
-//  run->AddTask(l1);
-
-  // =========================================================================
-  // ===                     TRD local reconstruction                      ===
-  // =========================================================================
 
   // -----   TRD hit producer   ----------------------------------------------
   Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
   // Resolutions in y - station and angle dependent [mum]
   Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
   Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
-  Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };  
+  Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
   // Update of the values for the radiator F.U. 17.08.07
   Int_t trdNFoils    = 130;       // number of polyetylene foils
@@ -52,21 +43,16 @@ void trd_hits(Int_t nEvents = 100)
 
 
   // -----  Parameter database   --------------------------------------------
- // TString stsDigi = gSystem->Getenv("VMCWORKDIR");
-//  stsDigi += "/parameters/sts/";
- // stsDigi += stsDigiFile;
   CbmRuntimeDb* rtdb = run->GetRuntimeDb();
   CbmParRootFileIo* parIo1 = new CbmParRootFileIo();
   CbmParAsciiFileIo* parIo2 = new CbmParAsciiFileIo();
   parIo1->open(parFile.Data());
-//  parIo2->open(stsDigi.Data(),"in");
   rtdb->setFirstInput(parIo1);
-//  rtdb->setSecondInput(parIo2);
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
   // ------------------------------------------------------------------------
-     
-  // -----   Intialise and run   --------------------------------------------
+
+  // -----   Initialize and run   --------------------------------------------
   run->LoadGeometry();
   run->Init();
   run->Run(0,nEvents);

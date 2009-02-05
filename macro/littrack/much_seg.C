@@ -1,6 +1,6 @@
-void much_seg(Int_t nEvents = 100)
+void much_seg(Int_t nEvents = 1000)
 {
-  TString dir = "/home/d/andrey/events/newmuch/large/10mu/mu_urqmd/";
+  TString dir = "/d/cbm02/andrey/events/newmuch/standard/10mu/mu_urqmd/";
 
   TString mcFile = dir + "mc.root";
   TString parFile = dir + "params.root";

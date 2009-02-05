@@ -1,15 +1,15 @@
 #include "../../cbmbase/CbmDetectorList.h";
-void trd_reco(Int_t nEvents = 100)
+void trd_reco(Int_t nEvents = 20)
 {
   Int_t iVerbose = 1;
-  
-  TString dir  = "/d/cbm02/andrey/events/trd/segmented/e";
-  TString inFile = dir + "/mc.root"; 
-  TString parFile = dir + "/params.root"; 
-  TString inFile1 = dir + "/sts.reco.root";
-  TString inFile2 = dir + "/trd.hits.root";
-  TString outFile = dir + "/trd.reco.root";
-  
+
+  TString dir  = "/d/cbm02/andrey/events/trd/segmented/e_urqmd/";
+  TString inFile = dir + "mc.root";
+  TString parFile = dir + "params.root";
+  TString inFile1 = dir + "sts.reco.root";
+  TString inFile2 = dir + "trd.hits.root";
+  TString outFile = dir + "trd.reco.root";
+
   TStopwatch timer;
   timer.Start();
 
@@ -25,7 +25,7 @@ void trd_reco(Int_t nEvents = 100)
   run->AddFriend(inFile2);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
-  
+
  // CbmKF* kalman = new CbmKF();
 //  run->AddTask(kalman);
  // CbmL1* l1 = new CbmL1();
@@ -43,12 +43,12 @@ void trd_reco(Int_t nEvents = 100)
   // -----   TRD track matching   --------------------------------------------
   CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
   run->AddTask(trdMatchTracks);
-  
+
     // -----   TRD track finding QA check   ------------------------------------
-  CbmLitRecQa* trdRecQa = new CbmLitRecQa(12, 0.7, kTRD, 1);
+  CbmLitRecQa* trdRecQa = new CbmLitRecQa(10, 0.7, kTRD, 1);
   trdRecQa->SetNormType(2); // '2' to number of STS tracks
   run->AddTask(trdRecQa);
-  
+
 
 
   // -----  Parameter database   --------------------------------------------
@@ -65,14 +65,14 @@ void trd_reco(Int_t nEvents = 100)
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
   // ------------------------------------------------------------------------
-     
+
   // -----   Intialise and run   --------------------------------------------
   run->LoadGeometry();
   run->Init();
   run->Run(0,nEvents);
   // ------------------------------------------------------------------------
 
-  
+
   CbmLitRobustAna::Instance()->WriteToFile();
 
   // -----   Finish   -------------------------------------------------------

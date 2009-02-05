@@ -32,17 +32,17 @@ void trd_elid_test()
 	char histTitle[50], histName[50];
 	for (Int_t i = 0; i < 7; i++){
 		sprintf(histName, "hPidANNEl%d", i);
-		sprintf(histTitle, "%d hits in track", 12 - i);
+		sprintf(histTitle, "%d hits in track;ANN output;Entries", 12 - i);
 		hPidANNEl[i] = new TH1D(histName, histTitle, 100, -1.2, 1.2);
 		sprintf(histName, "hPidANNPi%d", i);
-		sprintf(histTitle, "%d hits in track", 12 - i);
+		sprintf(histTitle, "%d hits in track;ANN output;Entries", 12 - i);
 		hPidANNPi[i] = new TH1D(histName, histTitle, 100, -1.2, 1.2);
 	}
 
 	Double_t nofElTracks = 0, nofPiTracks = 0;
 
 	char fileMC[200], fileRec[200];
-	for (int iFile = 0; iFile <= 0; iFile++) {
+	for (int iFile = 1; iFile <= 1; iFile++) {
 		sprintf(fileMC, "/d/cbm02/slebedev/trd/FEB09/mom.piel.%.4i.mc.root", iFile);
 		cout << fileMC << endl;
 		TFile *f1 = new TFile(fileMC, "R");

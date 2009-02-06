@@ -53,7 +53,7 @@ CbmTrdSetTracksPidANN.cxx
 CbmTrdCreatePidLike.cxx 
 CbmTrdTracksPidQa.cxx
 CbmTrdGas.cxx
-CbmTrdDigitizer.cxx
+#CbmTrdDigitizer.cxx
 )
 
 if(RULE_CHECKER_FOUND)

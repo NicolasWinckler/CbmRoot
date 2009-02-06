@@ -33,5 +33,5 @@
 #pragma link C++ class  CbmTrdCreatePidLike+;
 #pragma link C++ class  CbmTrdTracksPidQa+;
 #pragma link C++ class  CbmTrdGas+;
-#pragma link C++ class  CbmTrdDigitizer+;
+//#pragma link C++ class  CbmTrdDigitizer+;
 #endif

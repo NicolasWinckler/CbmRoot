@@ -15,7 +15,7 @@
 
 CbmLitTrackFinderBranch::CbmLitTrackFinderBranch()
 {
-	fMaxNofBranches = 32;
+	fMaxNofBranches = 24;
 	fIsAlwaysCreateMissingHit = true;
 }
 
@@ -81,7 +81,6 @@ LitStatus CbmLitTrackFinderBranch::DoFind(
 	return kLITSUCCESS;
 }
 
-
 void CbmLitTrackFinderBranch::FollowTracks()
 {
 	for (Int_t stationGroup = fBeginStationGroup;
@@ -118,7 +117,6 @@ void CbmLitTrackFinderBranch::ProcessStationGroup(
 {
    Int_t nofStations = fLayout.GetNofStations(stationGroup);
    std::vector<TrackPtrVector> tracks(nofStations);
-
    fNofBranches = 0;
 
    if (ProcessStation(track, stationGroup, 0, tracks[0])){ //0
@@ -126,21 +124,21 @@ void CbmLitTrackFinderBranch::ProcessStationGroup(
 		   if (!ProcessStation(*trk0, stationGroup, 1, tracks[1])) continue;
 
 	       if (nofStations < 3) {
-	    	   AddTrackCandidate(tracks[1], stationGroup);
-	    	   continue;
+	    	  if (!AddTrackCandidate(tracks[1], stationGroup)) return;
+	    	  continue;
 	       }
 
 	       for (TrackPtrIterator trk1 = tracks[1].begin(); trk1 != tracks[1].end(); trk1++) { //2
 	    	   if (!ProcessStation(*trk1, stationGroup, 2, tracks[2])) continue;
 
 	    	   if (nofStations < 4) {
-	    		  AddTrackCandidate(tracks[2], stationGroup);
+	    		  if (!AddTrackCandidate(tracks[2], stationGroup)) return;
 	    		  continue;
 	    	   }
 
 	    	   for (TrackPtrIterator trk2 = tracks[2].begin(); trk2 != tracks[2].end(); trk2++) { //3
 	    		   if (!ProcessStation(*trk2, stationGroup, 3, tracks[3])) continue;
-	    		   AddTrackCandidate(tracks[3], stationGroup);
+	    		   if (!AddTrackCandidate(tracks[3], stationGroup)) return;
 	    	   } //3
 	       } //2
 	   }//1
@@ -186,11 +184,7 @@ Bool_t CbmLitTrackFinderBranch::ProcessStation1(
 		TrackPtrVector& tracksOut)
 {
 	Bool_t result = false;
-
 	Int_t nofSubstations = fLayout.GetNofSubstations(stationGroup, station);
-
-	//TrackBranchPtrVector branches(nofSubstations);
-
 	std::vector<CbmLitTrackParam> par(nofSubstations);
 	par[0] = *track->GetParamLast();
 	std::vector<CbmLitTrackParam> uPar(nofSubstations);
@@ -198,17 +192,17 @@ Bool_t CbmLitTrackFinderBranch::ProcessStation1(
 	std::vector<HitPtrIteratorPair> bounds(nofSubstations);
 	std::vector<Double_t> chiSq(nofSubstations, 0.);
 	std::vector<Int_t> extraLoop(nofSubstations, 1);
+	if (nofSubstations < 2) std::fill(extraLoop.begin(), extraLoop.end(), 0);
 
 	Double_t z = fLayout.GetSubstation(stationGroup, station, 0).GetZ();
 	if (fPropagator->Propagate(&par[0], z, fPDG) == kLITERROR) return false;
 	bounds[0] = MinMaxIndex(&par[0], stationGroup, station, 0);
 	for (HitPtrIterator hit0 = bounds[0].first; hit0 < bounds[0].second + extraLoop[0]; hit0++) { //0
 		if (!ProcessSubstation(0, hit0, bounds[0], &par[0], &uPar[0], hits, chiSq)) continue;
-		else { if (!fIsAlwaysCreateMissingHit) extraLoop[0] = 0; }
+//		else { if (!fIsAlwaysCreateMissingHit) extraLoop[0] = 0; }
 
 		if (nofSubstations < 2) {
 			if (AddTrackBranch(track, hits, chiSq, &uPar[0], tracksOut)) result = true;
-//			if (fNofBranches > fMaxNofBranches) return result;
 			continue;
 		}
 
@@ -217,9 +211,8 @@ Bool_t CbmLitTrackFinderBranch::ProcessStation1(
 		bounds[1] = MinMaxIndex(&par[1], stationGroup, station, 1);
 		for (HitPtrIterator hit1 = bounds[1].first; hit1 < bounds[1].second + extraLoop[1]; hit1++) { //1
 			if (!ProcessSubstation(1, hit1, bounds[1], &par[1], &uPar[1], hits, chiSq)) continue;
-			else { if (!fIsAlwaysCreateMissingHit) extraLoop[1] = 0;}
+//			else { if (!fIsAlwaysCreateMissingHit) extraLoop[1] = 0;}
 			if (AddTrackBranch(track, hits, chiSq, &uPar[1], tracksOut)) result = true;
-//			if (fNofBranches > fMaxNofBranches) return result;
 		} //1
 	} //0
 
@@ -286,24 +279,23 @@ Bool_t CbmLitTrackFinderBranch::AddTrackBranch(
    newTrack->SetChi2(chi2sum);
 //   newTrack->SetNDF(NDF(newTrack->GetNofHits()));
 
- //  fNofBranches++;
-
    tracksOut.push_back(newTrack);
    return true;
 }
 
-void CbmLitTrackFinderBranch::AddTrackCandidate(
+Bool_t CbmLitTrackFinderBranch::AddTrackCandidate(
 		TrackPtrVector& tracks,
 		Int_t stationGroup)
 {
 	for (TrackPtrIterator it = tracks.begin(); it != tracks.end(); it++) {
+		if (fNofBranches++ > fMaxNofBranches) return false;
 		CbmLitTrack* newTrack = new CbmLitTrack(**it);
 		newTrack->SetLastPlaneId(stationGroup);
 		newTrack->SetNDF(NDF(newTrack->GetNofHits()));
 		fFoundTracks.push_back(newTrack);
 	}
+	return true;
 }
-
 
 void CbmLitTrackFinderBranch::RefitTracks(
 		TrackPtrIterator itBegin,

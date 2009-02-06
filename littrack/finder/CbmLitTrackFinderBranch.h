@@ -36,28 +36,6 @@ protected:
 
 	void FollowTracks();
 
-//	void ProcessStationGroup(
-//			const CbmLitTrack *track,
-//			Int_t stationGroup);
-//
-//	Bool_t ProcessStation(
-//			Int_t station,
-//			Int_t substation,
-//			HitPtrIterator &hitIt,
-//			HitPtrIteratorPair &bounds,
-//	 		std::vector<Int_t>& nofMissingHits,
-//			CbmLitTrackParam* par,
-//			CbmLitTrackParam* uPar,
-//			HitPtrVector& hits,
-//			std::vector<Double_t>& chiSq);
-//
-//	void AddTrackCandidate(
-//			const CbmLitTrack* track,
-//			const HitPtrVector& hits,
-//			const std::vector<Double_t>& chiSq,
-//			const CbmLitTrackParam* par,
-//			Int_t stationGroup);
-
 	void ProcessStationGroup(
 			const CbmLitTrack *track,
 			Int_t stationGroup);
@@ -90,7 +68,7 @@ protected:
 			const CbmLitTrackParam* par,
 			TrackPtrVector& tracksOut);
 
-	void AddTrackCandidate(
+	Bool_t AddTrackCandidate(
 			TrackPtrVector& tracks,
 			Int_t stationGroup);
 

@@ -5,6 +5,7 @@
 #include "CbmLitMemoryManagment.h"
 
 #include <sstream>
+#include <algorithm>
 
 CbmLitTrackBranch::CbmLitTrackBranch():
 	fChi2(0),

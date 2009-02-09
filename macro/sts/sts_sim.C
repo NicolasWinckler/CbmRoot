@@ -17,10 +17,10 @@ void sts_sim(Int_t nEvents = 1)
   TString inFile = inPath + "urqmd.auau.25gev.centr.0000.ftn14";
   
   // Output file
-  TString outFile = "sts.mc.root";
+  TString outFile = Form("sts.mc.root",nEvents);
   
   // Parameter file
-  TString parFile = "params.root";
+  TString parFile = Form("params.root",nEvents);
 
   // Cave geometry
   TString caveGeom = "cave.geo";
@@ -41,7 +41,7 @@ void sts_sim(Int_t nEvents = 1)
   TString mvdGeom = "mvd_standard.geo";
 
   // STS geometry
-  TString stsGeom = "sts_standard.geo";
+  TString stsGeom = "sts_Standard_s3055AAFK5.SecD.geo";
 
   // In general, the following parts need not be touched
   // ========================================================================

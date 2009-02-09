@@ -29,7 +29,7 @@ void sts_reco(Int_t nEvents = 1)
   TString parFile = "params.root";
   
   // STS digitisation file
-  TString digiFile = "sts_standard.digi.par";
+  TString digiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";
   
   // Output file
   TString outFile = "sts.reco.root";
@@ -44,11 +44,11 @@ void sts_reco(Int_t nEvents = 1)
   cout << "*****************************************" << endl;
   cout << "***   STS RECONSTRUCTION SCRIPT   *******" << endl;
   cout << "*****************************************" << endl;
-  cout << "*** Input file       : " << inFile << endl;
-  cout << "*** Parameter file   : " << parFile << endl;
-  cout << "*** Digitsation file : " << digiFile << endl;
-  cout << "*** Output file      : " << outFile << endl;
-  cout << "*** Number of events : " << nEvents << endl;
+  cout << "*** Input file        : " << inFile << endl;
+  cout << "*** Parameter file    : " << parFile << endl;
+  cout << "*** Digitisation file : " << digiFile << endl;
+  cout << "*** Output file       : " << outFile << endl;
+  cout << "*** Number of events  : " << nEvents << endl;
   cout << "*****************************************" << endl;
   cout << endl << endl;
  // ------------------------------------------------------------------------
@@ -85,6 +85,7 @@ void sts_reco(Int_t nEvents = 1)
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
   gSystem->Load("libGlobal");
+  gSystem->Load("libEcal");
   gSystem->Load("libKF");
   gSystem->Load("libL1");
   // ------------------------------------------------------------------------
@@ -149,6 +150,10 @@ void sts_reco(Int_t nEvents = 1)
   
   
   
+  // -----   STS reconstruction QA   ----------------------------------------
+  CbmTask* stsFHQa = new CbmStsFindHitsQa("STSFindHitsQA",iVerbose);
+  run->AddTask(stsFHQa);
+  // ------------------------------------------------------------------------
   // -----   STS reconstruction QA   ----------------------------------------
   CbmTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 1);
   run->AddTask(stsRecoQa);

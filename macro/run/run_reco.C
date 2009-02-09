@@ -34,8 +34,8 @@ void run_reco(Int_t nEvents = 1)
   TString parFile = "data/params.root";
 
   // STS digitisation file
-  TString stsDigiFile = "sts_standard.digi.par";
-
+//  TString stsDigiFile = "sts_standard.digi.par";
+  TString stsDigiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";
   // Output file
   TString outFile = "data/test.eds.root";
 

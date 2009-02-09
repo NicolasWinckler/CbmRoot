@@ -24,6 +24,7 @@
 #include <iostream>
 #include <map>
 #include <list>
+#include <algorithm>
 
 using std::cout;
 using std::endl;

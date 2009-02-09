@@ -36,7 +36,7 @@
 #include "../include/magnetfieldAnalysis.h"
 #include "TStyle.h"
 #include "TFile.h"
-
+#include <malloc.h>
 
 /****************************************************************
  * This method initializes the global style for each display.	*

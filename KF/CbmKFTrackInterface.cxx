@@ -21,6 +21,8 @@
 #include "CbmKFMath.h"
 #include "CbmKFHit.h"
 
+#include <algorithm>
+
 using std::vector;
 
 ClassImp( CbmKFTrackInterface )

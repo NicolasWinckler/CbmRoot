@@ -60,7 +60,7 @@ class CbmStsStation : public TNamed
     return ( ( fDetectorId & (15<<24) ) >> 24); }
   Int_t    GetStationNr()  const { 
     return ( ( fDetectorId & (255<<16) ) >> 16 ); }
-  Double_t GetZ()          const { return fZ; }
+  Double_t GetZ(Int_t it=0);
   Double_t GetD()          const { return fD; }
   Double_t GetRadLength()  const { return fRadLength; }
   Double_t GetRmin()       const { return fRmin; }
@@ -72,16 +72,14 @@ class CbmStsStation : public TNamed
     return (CbmStsSector*) fSectors->At(iSector); }
   CbmStsSector* GetSectorByNr(Int_t sectorNr);
 
-  Double_t GetRotation()  const { return fRotation; }
-
   /** Add one sector to the array **/
   void AddSector(CbmStsSectorDigiPar* sectorPar);
   void AddSector(CbmStsSector* sector);
 
+  Int_t GetNofZ();
 
   /** Reset all eventwise counters **/
   void Reset();
-
 
   /** Output to screen **/
   virtual void Print(Bool_t kLong);
@@ -101,7 +99,7 @@ class CbmStsStation : public TNamed
   std::map<Int_t, Int_t> fSectorMap; //! Map from sector number to index
   std::map<Int_t, Int_t> fMcIdMap;   //! Map from McId to index
   
-
+  Double_t fSensorZ[10];
 
   ClassDef(CbmStsStation,1);
 

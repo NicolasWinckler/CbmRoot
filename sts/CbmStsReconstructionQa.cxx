@@ -533,27 +533,27 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
     }
   }
 
-  for ( Int_t istat = 0 ; istat < fNStations ; istat++ ) {
-    for ( Int_t isect = 0 ; isect < fNSectors[istat] ; isect++ ) {
-      fhNofHits[istat][isect] -> Fill(fNofHits[istat][isect]);
-      for ( Int_t iside = 0 ; iside < 2 ; iside++ ) {
-	fhNofFiredDigis[istat][isect][iside]->Fill(fNofFiredDigis[istat][isect][iside]);
-	for ( Int_t ichip = 0 ; ichip < 8 ; ichip++ ) {
-	  if ( fhNofDigisPChip[istat][isect][iside][ichip] )
-	    fhNofDigisPChip[istat][isect][iside][ichip]->Fill(fNofDigisPChip[istat][isect][iside][ichip]);
-	}
-      }
+//   for ( Int_t istat = 0 ; istat < fNStations ; istat++ ) {
+//     for ( Int_t isect = 0 ; isect < fNSectors[istat] ; isect++ ) {
+//       fhNofHits[istat][isect] -> Fill(fNofHits[istat][isect]);
+//       for ( Int_t iside = 0 ; iside < 2 ; iside++ ) {
+// 	fhNofFiredDigis[istat][isect][iside]->Fill(fNofFiredDigis[istat][isect][iside]);
+// 	for ( Int_t ichip = 0 ; ichip < 8 ; ichip++ ) {
+// 	  if ( fhNofDigisPChip[istat][isect][iside][ichip] )
+// 	    fhNofDigisPChip[istat][isect][iside][ichip]->Fill(fNofDigisPChip[istat][isect][iside][ichip]);
+// 	}
+//       }
 
-    }
-  }
-
+//     }
+//   }
+/*
   for ( Int_t ipnt = 0 ; ipnt < nofStsPoints ; ipnt++ ) {
     CbmStsPoint *stsPoint = (CbmStsPoint*)fStsPoints->At(ipnt);
 
     Int_t startHit = hitStationLimits[0][fStationNrFromMcId[stsPoint->GetDetectorID()]];
     Int_t finalHit = hitStationLimits[1][fStationNrFromMcId[stsPoint->GetDetectorID()]];
     
-    fhEnergyLoss[fStationNrFromMcId[stsPoint->GetDetectorID()]]->Fill(stsPoint->GetXIn(),stsPoint->GetYIn(),stsPoint->GetEnergyLoss());
+    //    fhEnergyLoss[fStationNrFromMcId[stsPoint->GetDetectorID()]]->Fill(stsPoint->GetXIn(),stsPoint->GetYIn(),stsPoint->GetEnergyLoss());
 
 //     Float_t zP = stsPoint->GetZ();
 //     Float_t xP = stsPoint->GetX(zP);
@@ -565,14 +565,14 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
       CbmStsHit *stsHit= (CbmStsHit*)fStsHits->At(ihit);
       if ( ( TMath::Abs(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ())) < .1 ) &&
  	   ( TMath::Abs(stsHit->GetY()-stsPoint->GetY(stsHit->GetZ())) < .1 ) )
- 	fhHitPointCorrelation[fStationNrFromMcId[stsPoint->GetDetectorID()]]->Fill(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ()),
+	// 	fhHitPointCorrelation[fStationNrFromMcId[stsPoint->GetDetectorID()]]->Fill(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ()),
  										   stsHit->GetY()-stsPoint->GetY(stsHit->GetZ()));
 //       if ( ( TMath::Abs(stsHit->GetX()-stsPoint->GetX(stsPoint->GetZ())) < 1. ) &&
 //  	   ( TMath::Abs(stsHit->GetY()-stsPoint->GetY(stsPoint->GetZ())) < 1. ) )
 //  	fhHitPointCorrelation[fStationNrFromMcId[stsPoint->GetDetectorID()]]->Fill(stsHit->GetX()-stsPoint->GetX(stsPoint->GetZ()),
 //  										   stsHit->GetY()-stsPoint->GetY(stsPoint->GetZ()));
     }
-  }
+  }*/
   
   // Calculate efficiencies
   Double_t effAll  = 1.;
@@ -691,7 +691,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
     TF1*   fitY[100];
     Double_t resolution[2][100];
 
-    for ( Int_t ist = 0 ; ist < fNStations ; ist++ ) {
+    /*    for ( Int_t ist = 0 ; ist < fNStations ; ist++ ) {
       projX[ist] = (TH1F*)fhHitPointCorrelation[ist]->ProjectionX(Form("projX%i",ist+1));
       projY[ist] = (TH1F*)fhHitPointCorrelation[ist]->ProjectionY(Form("projY%i",ist+1));
       fitX[ist] = new TF1(Form("fitX%i",ist+1),"gaus",-0.02,0.02);
@@ -702,17 +702,17 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
       projY[ist]->Fit(fitY[ist],"QN","",-0.02,0.02);
       resolution[0][ist] = 10000.*fitX[ist]->GetParameter(2);
       resolution[1][ist] = 10000.*fitY[ist]->GetParameter(2);
-    }
+      }*/
 
     fOnlinePad[3]->cd();
-    fhHitPointCorrelation[fShowStation1]->Draw("col");
+    //    fhHitPointCorrelation[fShowStation1]->Draw("col");
     fOnlinePad[3]->Update();
     fOnlinePad[4]->cd();
-    fhHitPointCorrelation[fShowStation2]->Draw("col");
+    //    fhHitPointCorrelation[fShowStation2]->Draw("col");
     fOnlinePad[4]->Update();
 
     fOnlinePad[5]->cd();
-    projX[fShowStation1]->SetLineWidth(2);
+    /*projX[fShowStation1]->SetLineWidth(2);
     projY[fShowStation1]->SetLineWidth(2);
     projX[fShowStation1]->SetLineColor(2);
     projY[fShowStation1]->SetLineColor(3);
@@ -728,11 +728,11 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
 		      Form("X,#sigma=%3.2f#mum",resolution[0][fShowStation1]),"l");
     legend1->AddEntry(projY[fShowStation1],
 		      Form("Y,#sigma=%3.2f#mum",resolution[1][fShowStation1]),"l");
-    legend1->Draw();
+		      legend1->Draw();*/
     fOnlinePad[5]->Update();
 
     fOnlinePad[6]->cd();
-    projX[fShowStation2]->SetLineWidth(2);
+    /*    projX[fShowStation2]->SetLineWidth(2);
     projY[fShowStation2]->SetLineWidth(2);
     projX[fShowStation2]->SetLineColor(2);
     projY[fShowStation2]->SetLineColor(3);
@@ -748,7 +748,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
 		      Form("X,#sigma=%3.2f#mum",resolution[0][fShowStation2]),"l");
     legend2->AddEntry(projY[fShowStation2],
 		      Form("Y,#sigma=%3.2f#mum",resolution[1][fShowStation2]),"l");
-    legend2->Draw();
+		      legend2->Draw();*/
     fOnlinePad[6]->Update();
 
     TF1* allEffFit = new TF1 ("allEffFit","pol0",1.,10.);
@@ -884,12 +884,12 @@ void CbmStsReconstructionQa::Finish() {
   TIter next(fHistoList);
   while ( TH1* histo = ((TH1*)next()) ) histo->Write();
 
-  gDirectory->mkdir("STSOccupancy");
-  gDirectory->cd("STSOccupancy");
-  TIter nextO(fOccupHList);
-  while ( TH1* histo = ((TH1*)nextO()) ) histo->Write();
+//   gDirectory->mkdir("STSOccupancy");
+//   gDirectory->cd("STSOccupancy");
+//   TIter nextO(fOccupHList);
+//   while ( TH1* histo = ((TH1*)nextO()) ) histo->Write();
 
-  gDirectory->cd("..");
+//   gDirectory->cd("..");
   gDirectory->cd("..");
 }
 // -------------------------------------------------------------------------
@@ -1019,7 +1019,7 @@ void CbmStsReconstructionQa::CreateHistos() {
 
   // Histogram list
   fHistoList = new TList();
-  fOccupHList = new TList();
+  //  fOccupHList = new TList();
 
   // Momentum distributions
   Double_t minMom   =  0.;
@@ -1190,14 +1190,14 @@ void CbmStsReconstructionQa::CreateHistos() {
   fHistoList->Add(fhLowBand);
   fHistoList->Add(fhHigBand);
 
-  for ( Int_t ist = 0 ; ist < fNStations ; ist++ ) {
+  /*  for ( Int_t ist = 0 ; ist < fNStations ; ist++ ) {
     fhHitPointCorrelation[ist] = new TH2F(Form("hHitPointCorrelation%i",ist+1),
 					  Form("Hit vs point correlation at station %i",ist+1),
 					  500,-.1, .1,500,-.1,.1);
     fhHitPointCorrelation[ist]->SetXTitle("#Delta x [cm]");  
     fhHitPointCorrelation[ist]->SetYTitle("#Delta y [cm]");
     fHistoList->Add(fhHitPointCorrelation[ist]);
-  }
+    }*/
 
   fhPrimaryVertex = new TH3F("hPrimaryVertex","Primary vertex",2000,-0.1,0.1,2000,-0.1,0.1,2000,-0.1,0.1);
   fHistoList->Add(fhPrimaryVertex);
@@ -1294,7 +1294,7 @@ void CbmStsReconstructionQa::CreateHistos() {
 //     cout << binningNofHits[itemp] << " " << flush;
 //   cout << endl;
 
-  for ( Int_t istat = 0 ; istat < fNStations ; istat++ ) {
+/*  for ( Int_t istat = 0 ; istat < fNStations ; istat++ ) {
     fhEnergyLoss[istat] = new TH2F(Form("hEnergyLossSt%d",istat+1),
 				   Form("Energy loss on station %d",istat+1),
 				   200,-100.,100.,200,-100.,100.);
@@ -1331,7 +1331,7 @@ void CbmStsReconstructionQa::CreateHistos() {
 	}
       }
     }
-  }
+    }*/
 }
 // -------------------------------------------------------------------------
 

@@ -29,14 +29,17 @@
 #ifndef CBMSTSSECTOR_H
 #define CBMSTSSECTOR_H 1
 
+#include "TObjArray.h"
 #include "TNamed.h"
+#include "TString.h"
 
 #include <map>
 #include <list>
 #include <set>
 #include <vector>
 
-class CbmStsSectorDigiPar;
+class CbmStsSensor;
+class CbmStsSensorDigiPar;
 
 
 class CbmStsSector : public TNamed
@@ -58,15 +61,10 @@ class CbmStsSector : public TNamed
    *@param ly        sector length in y [cm]
    *@param dx        Readout pitch (strip) or pixel width in x [cm]
    *@param dy        Pixel width in y [cm].
-   *@param stereo    Stereo angle [rad] (for double sided strip)
+   *@param stereoF   StereoF angle [rad] (for double sided strip)
+   *@param stereoB   StereoB angle [rad] (for double sided strip)
    **/
-  CbmStsSector(Int_t detId, Int_t iType, Double_t x0, Double_t y0,
-	       Double_t rotation, Double_t lx, Double_t ly, 
-	       Double_t dx, Double_t dy, Double_t stereo);
-  CbmStsSector(TString tempName, Int_t detId, Int_t iType, Double_t x0, Double_t y0, Double_t z0,
-	       Double_t rotation, Double_t lx, Double_t ly, 
-	       Double_t d, Double_t dx, Double_t dy, Double_t stereo);
-
+  CbmStsSector(TString tempName, Int_t detId);
 
   /** Destructor **/
   virtual ~CbmStsSector();
@@ -81,63 +79,31 @@ class CbmStsSector : public TNamed
   Int_t    GetStationNr()  const { 
     return ( fDetectorId & (255<<16) ) >> 16; }
   Int_t    GetSectorNr()   const {  // sector number within station
-    return ( fDetectorId & (32767<<1) ) >> 1; }
-  Int_t    GetType()       const { return fType; }
-  Double_t GetX0()         const { return fX0; }
-  Double_t GetY0()         const { return fY0; }
-  Double_t GetZ0()         const { return fZ0; }
-  Double_t GetRotation()   const { return fRotation; }
-  Double_t GetLx()         const { return fLx; }
-  Double_t GetLy()         const { return fLy; }
-  Double_t GetD()          const { return fD;  }
-  Double_t GetDx()         const { return fDx; }
-  Double_t GetDy()         const { return fDy; }
-  Double_t GetStereo()     const { return fStereo; }
-  Double_t GetSigmaX()     const { return fSigmaX; }
-  Double_t GetSigmaY()     const { return fSigmaY; }
-  Double_t GetSigmaXY()    const { return fSigmaXY; }
+    return ( fDetectorId & (4095<<4) ) >> 4; }
   Int_t    GetNChannels()  const { return fNChannelsFront + fNChannelsBack; }
   Int_t    GetNChannelsFront()  const { return fNChannelsFront; }
   Int_t    GetNChannelsBack ()  const { return fNChannelsBack;  }
 
+  Int_t    GetNSensors()   const { return fSensors->GetEntriesFast(); }
+  TObjArray* GetSensors() { return fSensors; }
 
-  /** Calculate channel number for a coordinate pair.
-   *@param x      x coordinate in global c.s. [cm]
-   *@param y      y coordinate in global c.s. [cm]
-   *@param iSide  0 = front side, 1 = back side
-   *@value iChan  channel number. -1 if point is outside sector.
-   ** Will return the same for both sides in case of pixel sensor.
-   **/
-  Int_t GetChannel(Double_t x, Double_t y, Int_t iSide);
+  CbmStsSensor* GetSensor(Int_t iSensor) { 
+    return (CbmStsSensor*) fSensors->At(iSensor); }
+  CbmStsSensor* GetSensorByNr(Int_t sensorNr);
 
-  Float_t GetChannelPlus(Double_t x, Double_t y, Int_t iSide);
+  void AddSensor(CbmStsSensorDigiPar* sensorPar);
+  void AddSensor(CbmStsSensor* sensor);
 
-
-  /** Test whether a coordinate pair (x,y) in global coordinates is
-   ** inside the sector **/
-  Bool_t Inside(Double_t x, Double_t y);
-
-
-  /** Activate the channels corresponding to a MCPoint.
-   *@param ipt   Index of MCPoint
-   *@param x     x coordinate of point (global c.s.)
-   *@param y     y coordinate of point (global c.s.)
-   *@value  kTRUE if the point is inside the sector, else kFALSE
-   **/
-  Bool_t ActivateChannels(Int_t ipt, Double_t x, Double_t y);
-
-
-  /** Calculates the coordinates of the intersections of front strip i
-   ** with back strip j in the global coordinate system
-   *@param iFStrip   Front strip number
-   *@param iBStrip   Back strip number
-   *@param xCross    Vector of x coordinates of crossings [cm]
-   *@param yCross    Vector of y coordinates of crossings [cm]
-   *@value           Number of intersections
-   **/
-  Int_t Intersect(Int_t iFStrip, Int_t iBStrip,
-		  std::vector<Double_t>& xCross, std::vector<Double_t>& yCross);
-
+  // Retrieve from sensor
+  Int_t    GetType()       const { return fType; }
+  Double_t GetRotation()   const { return fRotation; }
+  Double_t GetDx()         const { return fDx; }
+  Double_t GetDy()         const { return fDy; }
+  Double_t GetStereoF()    const { return fStereoF; }
+  Double_t GetStereoB()    const { return fStereoB; }
+  Double_t GetSigmaX()     const { return fSigmaX; }
+  Double_t GetSigmaY()     const { return fSigmaY; }
+  Double_t GetSigmaXY()    const { return fSigmaXY; }
 
   /** The index of the MCPoint that has caused a combination of
    ** front and back strip to be fired. Returns -1 for combinations
@@ -148,6 +114,8 @@ class CbmStsSector : public TNamed
    **/
   Int_t PointIndex(Int_t iFStrip, Int_t IBStrip);
 
+  Int_t Intersect(Int_t iFStrip, Int_t iBStrip, Double_t& xCross, Double_t& yCross, Double_t& zCross);
+  Int_t IntersectClusters(Double_t fChan, Double_t bChan, Double_t& xCross, Double_t& yCross, Double_t& zCross);
 
   /** Clear the maps of fired strips **/
   void Reset();
@@ -162,86 +130,39 @@ class CbmStsSector : public TNamed
 
   /** -------------   Data members   --------------------------**/
 
-  TString    fName;             // Station name
   Int_t    fDetectorId;   // Unique detector ID
+
+  TObjArray* fSensors;          // Array of CbmStsSensors
+
   Int_t    fType;         // Sensor type 
-  Double_t fX0, fY0;      // Coordinates of the sector centre [cm]
   Double_t fRotation;     // Rotation angle in global c.m. [rad]
-  Double_t fLx, fLy;      // Dimensions of the sector [cm]
   Double_t fDx;           // Strip readout pitch or pixel size in x [cm]
   Double_t fDy;           // Pixel size in y [cm] for pixel sensor
-  Double_t fStereo;       // Stereo angle [rad] for strip sensor.
-
-  Double_t fZ0;           // z position of the sector [cm]
-  Double_t fD;            // thickness of the sector [cm]
-
-
-  /** Number of channels in front and back plane **/
-  Int_t fNChannelsFront;
-  Int_t fNChannelsBack;
-
+  Double_t fStereoF;      // StereoB angle [rad] for strip sensor.
+  Double_t fStereoB;      // StereoF angle [rad] for strip sensor.
 
   /** Errors of hit coordinates. For pixel sensor: size/sqrt(12),
    ** for strip sensors RMS of overlap of front and back side strip **/
   // Logically, this belongs to the HitFinder, but it is here
-  // for performance reasons: to be executed once per sector, not for
+  // for performance reasons: to be executed once per sensor, not for
   // each MCPoint
   Double_t fSigmaX;   // RMS in x, global c.s. [cm]
   Double_t fSigmaY;   // RMS in y, global c.s. [cm]
   Double_t fSigmaXY;  // Covariance in global c.s. [cm**2]
 
+  /** Number of channels in front and back plane **/
+  Int_t fNChannelsFront;
+  Int_t fNChannelsBack;
 
   /** STL sets containing the active channels **/
   std::set<Int_t> fFrontActive;       //!
   std::set<Int_t> fBackActive;        //!
 
+  std::map<Int_t, Int_t> fSensorMap; //! Map from sensor number to index
 
   /** STL map from the indizes of the fired strips to the 
    ** index of the MCPoint **/
   std::map<std::pair<Int_t,Int_t>, Int_t > fTrueHits;      //!
-
-
-
-  /** -------------   Private methods   ------------------------**/
-
-  /** Strip number of a point in the front plane.
-   ** Returns -1 if the point is outside the sector
-   *@param x  x coordinate of point (global c.s.)
-   *@param y  y coordinate of point (global c.s.)
-   *@value  Number of strip hitted by the point 
-   **/
-  Int_t FrontStripNumber(Double_t x, Double_t y) const;
-
-
-  /** Strip number of a point in the back plane.
-   ** Returns -1 if the point is outside the sector
-   *@param x  x coordinate of point (global c.s.)
-   *@param y  y coordinate of point (global c.s.)
-   *@value  Number of strip hitted by the point 
-   **/
-  Int_t BackStripNumber(Double_t x, Double_t y) const;
-
-
-  /** Calculate coordinates in internal coordinate system
-   *@param x     x coordinate in global system
-   *@param y     y coordinate in global system
-   *@param xint  internal x coordinate (return)
-   *@param yint  internal y coordinate (return)
-   *@value kTRUE if point is inside the sector
-   **/
-  Bool_t IntCoord(Double_t x, Double_t y, 
-		  Double_t& xint, Double_t& yint) const;
-
-  
-  /** Check whether a point is inside the sector
-   *@param xpt  x coordinate of point (internal system)
-   *@param ypt  y coordinate of point (internal system)
-   *@value kTRUE if inside sector, else kFALSE
-   **/
-  Bool_t IsInside(Double_t xint, Double_t yint) const;
-
-
-
 
   ClassDef(CbmStsSector,1);
 

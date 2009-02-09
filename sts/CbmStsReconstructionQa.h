@@ -172,17 +172,17 @@ class CbmStsReconstructionQa : public CbmTask
   TH1F* fhLowBand;
   TH1F* fhHigBand;
 
-  TH2F* fhHitPointCorrelation[100];
+  //  TH2F* fhHitPointCorrelation[100];
 
   TH3F* fhPrimaryVertex;
   TH1F* fhRefTracks;
   TH1F* fhRecRefTracks;
 
-  TH1F* fhNofDigisPChip[20][300][2][8];  // per station, sector, side, chip
-  TH1F* fhNofFiredDigis[20][300][2];  // per station, sector, side
-  TH1F* fhNofHits      [20][300];     // per station, sector
+/*   TH1F* fhNofDigisPChip[20][300][2][8];  // per station, sector, side, chip */
+/*   TH1F* fhNofFiredDigis[20][300][2];  // per station, sector, side */
+/*   TH1F* fhNofHits      [20][300];     // per station, sector */
 
-  TH2F* fhEnergyLoss[20];
+/*   TH2F* fhEnergyLoss[20]; */
 
   // histograms for track reconstruction: chi2, covMatr., etc...
   TH1F* fhStsTrackFPos[3];

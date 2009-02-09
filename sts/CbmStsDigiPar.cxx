@@ -85,6 +85,62 @@ void CbmStsDigiPar::readline(const char* buffer, Int_t* set, fstream* f) {
   Int_t    stationNr   = -1;
   Float_t  frotation   =  0.;
   Int_t    nSectors    =  0;
+  Int_t    nSensors    =  0;
+  sscanf(buffer, "%d%f%d", &stationNr, &frotation, &nSectors);
+  if ( stationNr == -1 ) return;
+  Double_t rotation = Double_t(frotation);
+
+  // Create new station
+  CbmStsStationDigiPar* station = new CbmStsStationDigiPar(stationNr,
+							   rotation);
+
+  // Read the sector lines
+  Int_t    sectorNr = -1;
+  Int_t    sensorNr = -1;
+  Int_t    iType    = 0;
+  Double_t x0       = 0.;
+  Double_t y0       = 0.;
+  Double_t z0       = 0.;
+  Double_t angle    = 0.;
+  Double_t lx       = 0.;
+  Double_t ly       = 0.;
+  Double_t lz       = 0.;
+  Double_t dx       = 0.;
+  Double_t dy       = 0.;
+  Double_t stereoF  = 0.;
+  Double_t stereoB  = 0.;
+  for (Int_t iSector=0; iSector<nSectors; iSector++) {
+    *f >> sectorNr >> nSensors; 
+
+    CbmStsSectorDigiPar* sector = new CbmStsSectorDigiPar(sectorNr);
+
+    for (Int_t iSensor=0; iSensor<nSensors; iSensor++) {
+
+      *f >> sensorNr >> iType >> x0 >> y0 >> z0 >> angle >> lx >> ly >> lz
+	 >> dx >> dy  >> stereoF >> stereoB; 
+      
+      angle  = angle  * TMath::Pi() / 180.;
+      stereoB = stereoB * TMath::Pi() / 180.;
+      stereoF = stereoF * TMath::Pi() / 180.;
+      
+      CbmStsSensorDigiPar* sensor = new CbmStsSensorDigiPar(sensorNr, iType,
+							    x0, y0, z0, angle,
+							    lx, ly, lz, dx, dy,
+							    stereoF, stereoB);
+      sector->AddSensor(sensor);
+    }
+    station->AddSector(sector);
+  }   // Loop over sector lines
+  fStations->Add(station);
+
+}
+// -------------------------------------------------------------------------
+/*void CbmStsDigiPar::readline(const char* buffer, Int_t* set, fstream* f) {
+
+  // First line: Station ID and type
+  Int_t    stationNr   = -1;
+  Float_t  frotation   =  0.;
+  Int_t    nSectors    =  0;
   sscanf(buffer, "%d%f%d", &stationNr, &frotation, &nSectors);
   if ( stationNr == -1 ) return;
   Double_t rotation = Double_t(frotation);
@@ -118,7 +174,7 @@ void CbmStsDigiPar::readline(const char* buffer, Int_t* set, fstream* f) {
   fStations->Add(station);
 
 }
-// -------------------------------------------------------------------------
+*/// -------------------------------------------------------------------------
 
 
 

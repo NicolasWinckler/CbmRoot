@@ -76,7 +76,6 @@ class CbmStsFindHits : public CbmTask
   std::map<CbmStsSector*, std::set<Int_t> > fDigiMapB;  /** sector digis (back)  **/
   TStopwatch fTimer;
 
-
   /** Get parameter containers **/
   virtual void SetParContainers();
 
@@ -95,6 +94,8 @@ class CbmStsFindHits : public CbmTask
 
   /** Sort digis sectorwise  **/
   void SortDigis();
+  
+  virtual void Finish();
 
 
   /** Find hits in one sector **/
@@ -103,7 +104,17 @@ class CbmStsFindHits : public CbmTask
 
 
   ClassDef(CbmStsFindHits,1);
-
+  
+  Int_t    fNStations;
+  Int_t    fNEvents;        /** Number of events with success **/
+  /** Total real time used for good events **/
+   Double_t  fTime1;     
+   Double_t  fTime2;     
+   Double_t  fTime3;
+   Double_t  fTime4;
+   Double_t  fTime5;
+   Double_t  fTime6;
+   Double_t  fTime7;
 };
 
 #endif

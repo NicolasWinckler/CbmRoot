@@ -7,6 +7,7 @@ ${ROOT_INCLUDE_DIR}
 ${CBMROOT_SOURCE_DIR}/sts
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
+${CBMROOT_SOURCE_DIR}/field 
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/passive 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
@@ -25,22 +26,29 @@ CbmGeoSts.cxx
 CbmGeoStsPar.cxx 
 CbmSts.cxx 
 CbmStsContFact.cxx 
+CbmStsCluster.cxx 
 CbmStsDigi.cxx 
 CbmStsDigiMatch.cxx 
 CbmStsDigiPar.cxx 
 CbmStsDigiScheme.cxx 
 CbmStsDigitize.cxx 
+CbmStsRealDigitize.cxx 
 CbmStsFindHits.cxx 
+CbmStsRealClusterFinder.cxx 
+CbmStsRealFindHits.cxx 
 CbmStsFindTracks.cxx 
 CbmStsFindTracksQa.cxx 
 CbmStsFitTracks.cxx 
 CbmStsHit.cxx 
 CbmStsHitProducerIdeal.cxx 
-CbmStsMatchHits.cxx
+CbmStsMatchHits.cxx 
+CbmStsRealMatchHits.cxx 
 CbmStsMatchTracks.cxx 
 CbmStsParAsciiFileIo.cxx 
 CbmStsParRootFileIo.cxx 
 CbmStsPoint.cxx 
+CbmStsSensor.cxx 
+CbmStsSensorDigiPar.cxx 
 CbmStsSector.cxx 
 CbmStsSectorDigiPar.cxx 
 CbmStsStation.cxx 
@@ -52,12 +60,9 @@ CbmStsTrackFitter.cxx
 CbmStsTrackFitterIdeal.cxx 
 CbmStsTrackMatch.cxx
 CbmStsSimulationQa.cxx 
+CbmStsFindHitsQa.cxx
 CbmStsReconstructionQa.cxx
 )
-
-if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${STS_SRCS}" "${INCLUDE_DIRECTORIES}" STS_RULES)
-endif(RULE_CHECKER_FOUND)
 
 # fill list of header files from list of source files
 # by exchanging the file extension

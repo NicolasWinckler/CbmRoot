@@ -14,6 +14,7 @@
 #include "CbmStsDigiPar.h"
 #include "CbmStsDigiScheme.h"
 #include "CbmStsPoint.h"
+#include "CbmStsSensor.h"
 #include "CbmStsSector.h"
 #include "CbmStsStation.h"
 
@@ -26,6 +27,8 @@
 #include "TClonesArray.h"
 #include "TObjArray.h"
 #include "TMath.h"
+#include "TGeoManager.h"
+#include "TGeoNode.h"
 
 #include <iostream>
 #include <iomanip>
@@ -52,6 +55,10 @@ CbmStsDigitize::CbmStsDigitize() : CbmTask("STS Digitizer", 1) {
   fDigis       = NULL;
   fDigiMatches = NULL;
   fDigiScheme  = new CbmStsDigiScheme();
+  fNStations = 0;
+  fNEvents   = 0;
+  fTime1     = 0.;
+  
   Reset();
 }
 // -------------------------------------------------------------------------
@@ -67,6 +74,10 @@ CbmStsDigitize::CbmStsDigitize(Int_t iVerbose)
   fDigis       = NULL;
   fDigiMatches = NULL;
   fDigiScheme  = new CbmStsDigiScheme();
+  fNStations = 0;
+  fNEvents   = 0;
+  fTime1     = 0.;
+  
   Reset();
 }
 // -------------------------------------------------------------------------
@@ -82,6 +93,10 @@ CbmStsDigitize::CbmStsDigitize(const char* name, Int_t iVerbose)
   fDigis       = NULL;
   fDigiMatches = NULL;
   fDigiScheme  = new CbmStsDigiScheme();
+  fNStations = 0;
+  fNEvents   = 0;
+  fTime1     = 0.;
+  
   Reset();
 }
 // -------------------------------------------------------------------------
@@ -105,156 +120,6 @@ CbmStsDigitize::~CbmStsDigitize() {
 }
 // -------------------------------------------------------------------------
 
-/*
-// -----   Public method Exec   --------------------------------------------
-void CbmStsDigitize::ExecOld(Option_t* opt) {
-
-  // Reset all eventwise counters
-  fTimer.Start();
-  Reset();
-
-  // Verbose screen output
-  if ( fVerbose > 2 ) {
-    cout << endl << "-I- " << fName << ": executing event" << endl;
-    cout << "----------------------------------------------" << endl;
-  }
-
-  // Loop over all StsPoints
-  if ( ! fPoints ) {
-    cerr << "-W- " << fName << "::Exec: No input array (STSPoint) "
-	 << endl;
-    cout << "- " << fName << endl;
-    return;
-  }
-
-  for (Int_t iPoint=0; iPoint<fPoints->GetEntriesFast(); iPoint++) {
-    CbmStsPoint* point = (CbmStsPoint*) fPoints->At(iPoint);
-    fNPoints++;
-
-    // Get the station the point is in
-    Int_t mcId = point->GetDetectorID();
-    CbmStsStation* station = fDigiScheme->GetStationByMcId(mcId);
-    if ( ! station ) {
-      if ( fVerbose > 2 ) cout << "StsPoint " << iPoint 
-			       << ", no digitisation (MC volume "
-			       << mcId << ")" << endl;
-      fNFailed++;
-      continue;
-    }
-    Int_t stationNr = station->GetStationNr();
-
-    // Take point coordinates in the midplane of the station
-    if ( ! point->IsUsable() ) continue;
-    Double_t xpt = point->GetX(station->GetZ());
-    Double_t ypt = point->GetY(station->GetZ());
-
-    // Get the sector the point is in
-    Int_t sectorNr = -1;
-    Int_t iChan    = -1;
-    Int_t channelF = -1;
-    Int_t channelB = -1;
-    Int_t nSectors = station->GetNSectors();
-    for (Int_t iSector=0; iSector<nSectors; iSector++) {
-      CbmStsSector* sector = station->GetSector(iSector);
-      iChan = sector->GetChannel(xpt, ypt, 0);
-      if ( iChan < 0 ) continue;  // Point not in this sector
-      Int_t iDet  = sector->GetDetectorId();
-      if ( sectorNr != -1 ) {
-	cout.precision(2);
-	cerr << "-W- " << fName << "::Exec: StsPoint " << iPoint
-	     << " (coordinates " << xpt << ", " << ypt 
-	     << ") found in station " << stationNr 
-	     << " in sectors " << sector->GetSectorNr() << " and "
-	     << sectorNr << endl;
-	cout << "    Check overlaps of these sectors! " << endl;
-        continue;
-      }
-      sectorNr = sector->GetSectorNr();
-      channelF = iChan;
-
-      // Treat front side
-      pair<Int_t, Int_t> a(iDet, channelF);
-      if ( fChannelMap.find(a) == fChannelMap.end() ) {
-	// Channel not yet active. Create new Digi and Match.
-	new ((*fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
-					    0, channelF);
-	new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(iPoint);
-	fChannelMap[a] = fNDigis;
-	fNDigis++;
-      }
-      else {
-	// Channel already active. Update DigiMatch.
-	Int_t iDigi = fChannelMap[a];
-	CbmStsDigiMatch* match 
-	  = dynamic_cast<CbmStsDigiMatch*>(fDigiMatches->At(iDigi));
-	if ( match ) {
-	  match->AddPoint(iPoint);
-	  fNMulti++;
-	}
-      }
-
-      // Treat back side (strip sensors only)
-      if ( sector->GetType() < 2 || sector->GetType() > 3 ) continue;
-      iChan = sector->GetChannel(xpt, ypt, 1);
-      if ( iChan <0 ) {
-	cerr << "-W- " << fName << "::Exec: No back side channel "
-	     << " for StsPoint " << iPoint << ", station "
-	     << stationNr << ", sector " << sectorNr 
-	     << ", front side channel " << channelF << endl;
-	continue;
-      }
-      iDet = iDet | (1<<31);  // for back side channel
-      channelB = iChan;
-      pair<Int_t, Int_t> b(iDet, channelB);
-      if ( fChannelMap.find(b) == fChannelMap.end() ) {
-	// Channel not yet active. Create new Digi and Match.
-	new ((*fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
-					    1, channelB);
-	new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(iPoint);
-	fChannelMap[b] = fNDigis;
-	fNDigis++;
-      }
-      else {
-	// Channel already active. Update DigiMatch.
-	Int_t iDigi = fChannelMap[b];
-	CbmStsDigiMatch* match 
-	  = dynamic_cast<CbmStsDigiMatch*>(fDigiMatches->At(iDigi));
-	if ( match ) {
-	  match->AddPoint(iPoint);
-	  fNMulti++;
-	}
-      }
-
-    }  // Sector loop
-
-    // Verbose screen output
-    if ( fVerbose > 2 ) {
-      cout.precision(6);
-      cout << "StsPoint " << iPoint << ", station " << stationNr
-	   << ", (" << xpt << ", " << ypt << ") cm, sector " 
-	   << sectorNr << ", front " << channelF << ", back "
-	   << channelB << endl;
-    }
-
-
-    // Not found in any sector?
-    if ( sectorNr == -1 ) fNOutside++;      
-
-  }  // StsPoint loop
-
-  // Screen output
-  fTimer.Stop();
-  if ( ! fVerbose ) cout << "+ ";
-  else              cout << "-I- ";
-  cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
-       << fixed << right << fTimer.RealTime()
-       << " s, points " << fNPoints << ", failed " << fNFailed 
-       << ", outside " << fNOutside << ", multihits " << fNMulti 
-       << ", digis " << fNDigis << endl;
-
-}
-// -------------------------------------------------------------------------
-*/
 // -----   Public method Exec   --------------------------------------------
 void CbmStsDigitize::Exec(Option_t* opt) {
 
@@ -280,94 +145,53 @@ void CbmStsDigitize::Exec(Option_t* opt) {
     CbmStsPoint* point = (CbmStsPoint*) fPoints->At(iPoint);
     fNPoints++;
 
-    // Get the station the point is in
-    Int_t mcId = point->GetDetectorID();
-    CbmStsStation* station = fDigiScheme->GetStationByMcId(mcId);
-    if ( ! station ) {
-      if ( fVerbose > 2 ) cout << "StsPoint " << iPoint 
-			       << ", no digitisation (MC volume "
-			       << mcId << ")" << endl;
-      fNFailed++;
-      continue;
-    }
-    Int_t stationNr = station->GetStationNr();
+    Double_t xIn = point->GetXIn(); 
+    Double_t yIn = point->GetYIn(); 
+    Double_t zIn = point->GetZIn(); 
 
-    // Take point coordinates in the midplane of the station
+    gGeoManager->FindNode(xIn,yIn,zIn);
+    TGeoNode* curNode = gGeoManager->GetCurrentNode();
+
+    CbmStsSensor* sensor = fDigiScheme->GetSensorByName(curNode->GetName());
+    
+    if ( !sensor ) 
+      Fatal("Exec",Form("No sensor in DigiScheme with name: \"%s\"",curNode->GetName()));
+
+    Int_t stationNr = sensor->GetStationNr();
+    Int_t  sectorNr = sensor->GetSectorNr();
+
+    // Take point coordinates in the midplane of the sensor
     if ( ! point->IsUsable() ) continue;
-    Double_t statCosRot = TMath::Cos(station->GetRotation());
-    Double_t statSinRot = TMath::Sin(station->GetRotation());
+    Double_t xpt = point->GetX(sensor->GetZ0());
+    Double_t ypt = point->GetY(sensor->GetZ0());
 
-    Double_t xpt = statCosRot*point->GetX(station->GetZ())-statSinRot*point->GetY(station->GetZ());
-    Double_t ypt = statCosRot*point->GetY(station->GetZ())-statSinRot*point->GetX(station->GetZ());
-
-    // Get the sector the point is in
-    Int_t sectorNr = -1;
     Int_t iChan    = -1;
     Int_t channelF = -1;
     Int_t channelB = -1;
-    Int_t nSectors = station->GetNSectors();
 
-    CbmStsSector* sector;
-    if ( !( sector = fDigiScheme->GetSectorByMcId(mcId)) ) {
-      Bool_t sectorFound = kFALSE;
-      for (Int_t iSector=0; iSector<nSectors; iSector++) {
-	sector = station->GetSector(iSector);
-	iChan = sector->GetChannel(xpt, ypt, 0);
-	if ( iChan < 0 ) continue;
-	sectorFound = kTRUE;
-	break;
-      }
-      if ( !sectorFound ) continue;
-    }
-    else {
-      iChan = sector->GetChannel(xpt, ypt, 0);
-      Int_t cloneLookup = 1;
-      while ( iChan < 0 ) {
-	sector = fDigiScheme->GetSectorByMcId(mcId+cloneLookup*100000);
-	if ( !sector ) break;
-	iChan = sector->GetChannel(xpt, ypt, 0);
-	cloneLookup++;
-      }
-    }
+    iChan = sensor->GetChannel(xpt, ypt, 0);
 
-    if ( !sector ) 
-      sector = fDigiScheme->GetSectorByMcId(mcId);
-
+    // point outside active sensor area
     if ( iChan < 0 ) {
-      if ( sector->GetX0() != 0 ) {
-	Float_t tempX = sector->GetX0();
-	Float_t tempY = sector->GetY0();
-	Float_t rot = sector->GetRotation();
-	Float_t tempLX = sector->GetLx()/2.*TMath::Cos(rot)+sector->GetLy()/2.*TMath::Sin(rot);
-	Float_t tempLY = sector->GetLy()/2.*TMath::Cos(rot)+sector->GetLx()/2.*TMath::Sin(rot);
-
+      if ( fVerbose ) {
+	Float_t tempX = sensor->GetX0();
+	Float_t tempY = sensor->GetY0();
+	Float_t rot = sensor->GetRotation();
+	Float_t tempLX = sensor->GetLx()/2.*TMath::Cos(rot)+sensor->GetLy()/2.*TMath::Sin(rot);
+	Float_t tempLY = sensor->GetLy()/2.*TMath::Cos(rot)+sensor->GetLx()/2.*TMath::Sin(rot);
+	
 	cout.precision(8);
-	cout << fName << ". Warning: Point " << xpt << ", " << ypt << ", " << station->GetZ() << " not inside sector." << endl;
-	/*	cout << "Sector from  " << tempX-tempLX << ", " << tempY-tempLY
-	     << " to "          << tempX+tempLX << ", " << tempY+tempLY
-	     << " AT Z = " << sector->GetZ0() << " and type = " << sector->GetType() << endl;
-	cout << "sorry, point (" << xpt << ", " << ypt << ", " << station->GetZ() << ") not in the sector.... dz = " << TMath::Abs(point->GetZOut()-point->GetZIn()) << ". " << endl;
-	cout << "sorry, poiIN (" << point->GetXIn() << ", " << point->GetYIn() << ", " << point->GetZIn() << ") not in the sector " << endl;
-	cout << "sorry, poOUT (" << point->GetXOut() << ", " << point->GetYOut() << ", " << point->GetZOut() << ") not in the sector " << endl;*/
+	cout << fName << ". Warning: Point " << xpt << ", " << ypt << ", " << sensor->GetZ0() << " not inside sector." << endl;
       }
-      continue;  // Point not in this sector
-    }
-    Int_t iDet  = sector->GetDetectorId();
-    if ( sectorNr != -1 ) {
-      cout.precision(2);
-      cerr << "-W- " << fName << "::Exec: StsPoint " << iPoint
-	   << " (coordinates " << xpt << ", " << ypt 
-	   << ") found in station " << stationNr 
-	   << " in sectors " << sector->GetSectorNr() << " and "
-	   << sectorNr << endl;
-      cout << "    Check overlaps of these sectors! " << endl;
       continue;
     }
-    sectorNr = sector->GetSectorNr();
+
     channelF = iChan;
-    
+
+    Int_t sectorDetId  = 2 << 24 | stationNr << 16 | sectorNr << 4;
+   
     // Treat front side
-    pair<Int_t, Int_t> a(iDet, channelF);
+    pair<Int_t, Int_t> a(sectorDetId, channelF);
     if ( fChannelMap.find(a) == fChannelMap.end() ) {
       // Channel not yet active. Create new Digi and Match.
       new ((*fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
@@ -388,9 +212,9 @@ void CbmStsDigitize::Exec(Option_t* opt) {
     }
     
     // Treat back side (strip sensors only)
-    if ( sector->GetType() < 2 || sector->GetType() > 3 ) continue;
+    if ( sensor->GetType() < 2 || sensor->GetType() > 3 ) continue;
 
-    iChan = sector->GetChannel(xpt, ypt, 1);
+    iChan = sensor->GetChannel(xpt, ypt, 1);
     if ( iChan <0 ) {
       cerr << "-W- " << fName << "::Exec: No back side channel "
 	   << " for StsPoint " << iPoint << ", station "
@@ -398,9 +222,9 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	   << ", front side channel " << channelF << endl;
       continue;
     }
-    iDet = iDet | (1<<31);  // for back side channel
+    sectorDetId = sectorDetId | (1<<0);  // for back side channel
     channelB = iChan;
-    pair<Int_t, Int_t> b(iDet, channelB);
+    pair<Int_t, Int_t> b(sectorDetId, channelB);
     if ( fChannelMap.find(b) == fChannelMap.end() ) {
       // Channel not yet active. Create new Digi and Match.
       new ((*fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
@@ -436,7 +260,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
   }  // StsPoint loop
 
   // Screen output
-  fTimer.Stop();
+
   if ( fVerbose ) {
     cout << "+ ";
     cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
@@ -445,6 +269,8 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	 << ", outside " << fNOutside << ", multihits " << fNMulti 
 	 << ", digis " << fNDigis << endl;
   }
+  fNEvents++;
+  fTime1 += fTimer.RealTime();
 }
 // -------------------------------------------------------------------------
 
@@ -452,7 +278,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
  
 // -----   Private method SetParContainers   -------------------------------
 void CbmStsDigitize::SetParContainers() {
-
+  
   // Get run and runtime database
   CbmRunAna* run = CbmRunAna::Instance();
   if ( ! run ) Fatal("SetParContainers", "No analysis run");
@@ -500,7 +326,7 @@ InitStatus CbmStsDigitize::Init() {
   }
   
   return kERROR;
-
+ 
 }
 // -------------------------------------------------------------------------
 
@@ -508,7 +334,7 @@ InitStatus CbmStsDigitize::Init() {
 
 // -----   Private method ReInit   -----------------------------------------
 InitStatus CbmStsDigitize::ReInit() {
-
+  
   // Clear digitisation scheme
   fDigiScheme->Clear();
 
@@ -516,7 +342,7 @@ InitStatus CbmStsDigitize::ReInit() {
   if ( fDigiScheme->Init(fGeoPar, fDigiPar) ) return kSUCCESS;
 
   return kERROR;
-
+  
 }
 // -------------------------------------------------------------------------
 
@@ -524,14 +350,26 @@ InitStatus CbmStsDigitize::ReInit() {
 
 // -----   Private method Reset   ------------------------------------------
 void CbmStsDigitize::Reset() {
+ 
   fNPoints = fNFailed = fNOutside = fNMulti = fNDigis = 0;
   fChannelMap.clear();
   if ( fDigis ) fDigis->Clear();
   if ( fDigiMatches ) fDigiMatches->Clear();
+
 }
 // -------------------------------------------------------------------------
 
-
+void CbmStsDigitize::Finish() {
+  fTimer.Stop();
+  cout << endl;
+  cout << "============================================================"
+       << endl;
+  cout << "===== " << fName << ": Run summary " << endl;
+  cout << "===== Average time  : " << setprecision(4) << setw(8) << right
+       << fTime1 / Double_t(fNEvents)  << " s" << endl;
+  cout << "============================================================"
+       << endl;
+}
 
 
 

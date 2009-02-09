@@ -26,8 +26,9 @@
 #define CBMSTSSECTORDIGIPAR_H 1
 
 
+#include "CbmStsSensorDigiPar.h"
 
-#include "TObject.h"
+#include "TObjArray.h"
 
 
 
@@ -42,14 +43,7 @@ class CbmStsSectorDigiPar : public TObject
 
   /** Standard constructor. For the parameters, see description of
    ** private data members. Angles must be given in radians. **/
-  CbmStsSectorDigiPar(Int_t iSector, Int_t iType, Double_t x0,
-		      Double_t y0, Double_t rotation, Double_t lx, 
-		      Double_t ly, Double_t dx, Double_t dy,
-		      Double_t stereo);
-  CbmStsSectorDigiPar(Int_t iSector, Int_t iType, Double_t x0,
-		      Double_t y0, Double_t z0, Double_t rotation, Double_t lx, 
-		      Double_t ly, Double_t d, Double_t dx, Double_t dy,
-		      Double_t stereo);
+  CbmStsSectorDigiPar(Int_t iSector);
 
 
   /** Destructor **/
@@ -58,59 +52,25 @@ class CbmStsSectorDigiPar : public TObject
 
   /** Accessors. See private data members for description **/
   Int_t    GetSectorNr()   const { return fSectorNr; }
-  Int_t    GetType()       const { return fType; }       // 1, 2 or 3
-  Double_t GetX0()         const { return fX0; }         // [cm]
-  Double_t GetY0()         const { return fY0; }         // [cm]
-  Double_t GetZ0()         const { return fZ0; }         // [cm]
-  Double_t GetRotation()   const { return fRotation; }   // [rad]
-  Double_t GetLx()         const { return fLx; }         // [cm]
-  Double_t GetLy()         const { return fLy; }         // [cm]
-  Double_t GetD()          const { return fD;  }
-  Double_t GetDx()         const { return fDx; }         // [cm]
-  Double_t GetDy()         const { return fDy; }         // [cm]
-  Double_t GetStereo()     const { return fStereo; }     // [rad]
 
-  void SetZ0(Double_t z0)        { fZ0 = z0; }         // [cm]
-  void SetD (Double_t d)         { fD  = d;  }         // [cm]
+  /** Accessors **/
+  Int_t      GetSectorNr()    { return fSectorNr; }
+  Int_t      GetNSensors()    { return fSensors->GetEntries(); }
+  TObjArray* GetSensorArray() { return fSensors; }
+  CbmStsSensorDigiPar* GetSensor(Int_t iSensor) {
+    return (CbmStsSensorDigiPar*) fSensors->At(iSensor); 
+  }
+
+
+  /** Add parameters of one sensor **/
+  void AddSensor(CbmStsSensorDigiPar* sen) { fSensors->Add(sen); }
 
 
  private:
 
   /** Sector number in station **/	
-  Int_t    fSectorNr;
-
-  /** Type of sector.
-   ** 1 = hybrid pixel sensor, no charge sharing;
-   ** 2 = strip sensor, readout of all strips on the back side
-   ** 3 = strip sensor, readout at bottom corner, double metal layer **/
-  Int_t    fType;
-
-  /** x coordinate of sector centre in the station c.s. [cm] **/
-  Double_t fX0;
-
-  /** y coordinate of sector centre in the station c.s. [cm] **/
-  Double_t fY0;
-
-  /** Rotation angle around z axis in the station c.s [rad] **/
-  Double_t fRotation;
-
-  /** Length of sector along x axis [cm] **/
-  Double_t fLx;
-
-  /** Length of sector along y axis [cm] **/
-  Double_t fLy;
-
-  /** Strip readout pitch or pixel size along x [cm] **/ 
-  Double_t fDx;
-
-  /** Pixel size along y [cm]. Irrelevant for strip sensor. **/
-  Double_t fDy;
-
-  /** Stereo angle of back side strips. Irrelevant for pixel sensors. **/
-  Double_t fStereo;
-
-  Double_t fZ0;           // z position of the sector [cm]
-  Double_t fD;            // thickness of the sector [cm]
+  Int_t      fSectorNr;
+  TObjArray* fSensors;       //  Array of sensor parameters
 
   ClassDef(CbmStsSectorDigiPar,1);
 

@@ -8,6 +8,8 @@
 #include "CbmStsSector.h"
 #include "CbmStsSectorDigiPar.h"
 
+#include "CbmStsSensor.h"
+
 #include "TMath.h"
 
 #include <iostream>
@@ -43,6 +45,10 @@ CbmStsStation::CbmStsStation(const char* name, Int_t iStation, Double_t z,
   fRotation   = rotation;
   fSectors = new TObjArray(100);
   fSectorMap.clear();
+
+  for ( Int_t isz = 0 ; isz < 10 ; isz++ )
+    fSensorZ[isz] = -666.;
+  fSensorZ[0] = z;
 }
 // -------------------------------------------------------------------------
 
@@ -92,17 +98,6 @@ void CbmStsStation::AddSector(CbmStsSectorDigiPar* sectorPar) {
 
   // Get digitisation parameters
   Int_t iSector   = sectorPar->GetSectorNr();
-  Int_t iType     = sectorPar->GetType();
-  Double_t x0     = sectorPar->GetX0();
-  Double_t y0     = sectorPar->GetY0();
-  Double_t z0     = sectorPar->GetZ0();
-  Double_t rotRel = sectorPar->GetRotation();
-  Double_t lx     = sectorPar->GetLx();
-  Double_t ly     = sectorPar->GetLy();
-  Double_t d      = sectorPar->GetD();
-  Double_t dx     = sectorPar->GetDx();
-  Double_t dy     = sectorPar->GetDy();
-  Double_t stereo = sectorPar->GetStereo();
 
   // Check for previous existence of sector
   if ( fSectorMap.find(iSector) != fSectorMap.end() ) {
@@ -112,20 +107,15 @@ void CbmStsStation::AddSector(CbmStsSectorDigiPar* sectorPar) {
   }
 
   // Calculate detectorId and rotation in global c.s.
-  Int_t    detId  = 2 << 24 | (GetStationNr() << 16) | (iSector << 1); 
-  Double_t rotGlb = fRotation + rotRel;
+  Int_t    detId  = 2 << 24 | (GetStationNr() << 16) | (iSector << 4); 
 
   // Number of existing sectors
   Int_t nSectors = fSectors->GetEntries();
 
   // Create and add new sector
-//   fSectors->Add(new CbmStsSector(detId, iType, x0, y0, rotGlb, lx, ly,
-// 				 dx, dy, stereo));
-  fSectors->Add(new CbmStsSector(Form("%ssector%i",GetName(),iSector),detId, iType, x0, y0, z0, rotGlb, lx, ly,
-				 d, dx, dy, stereo));
+  fSectors->Add(new CbmStsSector(Form("%ssect%d",fName.Data(),iSector),detId));
 
   fSectorMap[iSector] = nSectors;
-
 }
 // -------------------------------------------------------------------------
 
@@ -142,6 +132,65 @@ void CbmStsStation::AddSector(CbmStsSector* sector) {
 }
 // -------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------
+Double_t CbmStsStation::GetZ(Int_t it)
+{
+  if ( fSensorZ[it] < -665. ) {
+    Int_t knownZPos = 0;
+    for ( knownZPos = 0 ; knownZPos < 10 ; knownZPos++ ) {
+      if ( fSensorZ[knownZPos] < -665. ) break;
+    }
+
+    for (Int_t iSect=GetNSectors(); iSect > 0 ; iSect--) {
+      CbmStsSector* sector = (CbmStsSector*)GetSector(iSect-1);
+      for (Int_t iSens=sector->GetNSensors() ; iSens > 0 ; iSens--) {
+	CbmStsSensor* sensor = (CbmStsSensor*)sector->GetSensor(iSens-1);
+	Bool_t knownAlready = kFALSE;
+	for ( Int_t isz = 0 ; isz < knownZPos ; isz++ )
+	  if ( TMath::Abs(sensor->GetZ0()-fSensorZ[isz]) < 0.0001 ) {
+	    knownAlready = kTRUE;
+	    break;
+	  }
+
+	if ( knownAlready ) continue;
+
+	fSensorZ[knownZPos] = sensor->GetZ0();
+	knownZPos++;
+      }
+    }
+  }
+  return fSensorZ[it];
+}
+// -------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------
+Int_t CbmStsStation::GetNofZ()
+{
+  Int_t knownZPos = 0;
+  for ( knownZPos = 0 ; knownZPos < 10 ; knownZPos++ ) {
+    if ( fSensorZ[knownZPos] < -665. ) break;
+  }
+
+  for (Int_t iSect=GetNSectors(); iSect > 0 ; iSect--) {
+    CbmStsSector* sector = (CbmStsSector*)GetSector(iSect-1);
+    for (Int_t iSens=sector->GetNSensors() ; iSens > 0 ; iSens--) {
+      CbmStsSensor* sensor = (CbmStsSensor*)sector->GetSensor(iSens-1);
+      Bool_t knownAlready = kFALSE;
+      for ( Int_t isz = 0 ; isz < knownZPos ; isz++ )
+	if ( TMath::Abs(sensor->GetZ0()-fSensorZ[isz]) < 0.0001 ) {
+	  knownAlready = kTRUE;
+	  break;
+	}
+      
+      if ( knownAlready ) continue;
+      
+      fSensorZ[knownZPos] = sensor->GetZ0();
+      knownZPos++;
+    }
+  }
+  return knownZPos;
+}
+// -------------------------------------------------------------------------
 
 
 // -----   Public method Reset   -------------------------------------------

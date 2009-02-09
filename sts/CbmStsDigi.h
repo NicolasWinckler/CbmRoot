@@ -52,20 +52,36 @@ class CbmStsDigi : public CbmDigi
    **/
   CbmStsDigi(Int_t iStation, Int_t iSector, Int_t iSide, Int_t iChannel);
 
+  CbmStsDigi(Int_t iStation, Int_t iSector, Int_t iSide, Double_t iChannel, Double_t iADC, Double_t iTDC);
 
   /** Destructor **/
   virtual ~CbmStsDigi();
 
+  void SetADC(Double_t iADC) { fDigiADC = iADC; }
+  void SetTDC(Double_t iTDC) { fDigiTDC = iTDC; }
+  void SetCor(Double_t iCor) { fDigiCor = iCor; }
+
+  void AddADC(Double_t iADC) { fDigiADC+= iADC; }
 
   /** Accessors **/
-  Int_t GetDetectorId() const { return fDetectorId; }
-  Int_t GetStationNr()    const { 
-    return ( fDetectorId & (   255 <<  5 ) ) >>  5; }
-  Int_t GetSectorNr()     const {
-    return ( fDetectorId & ( 32767 << 13 ) ) >> 13; }
-  Int_t GetSide()        const {
-    return ( fDetectorId & (     1 << 28 ) ) >> 28; } // 0=front, 1=back
-  
+  Int_t    GetDetectorId() const { return fDetectorId; }
+
+  Int_t    GetStationNr()  const { 
+    return ( fDetectorId & (255<<16) ) >> 16; }
+  Int_t    GetSectorNr()   const {  // sector number within station
+    return ( fDetectorId & (4095<<4) ) >> 4; }
+  Int_t    GetSide()        const {
+    return ( fDetectorId & (1<<0) ) >> 0; }  // 0=front, 1=back
+
+  Double_t GetADC()          const { return fDigiADC; }
+  Double_t GetTDC()          const { return fDigiTDC; }
+  Double_t GetCor()          const { return fDigiCor; }
+
+ private:
+
+  Double_t fDigiADC;
+  Double_t fDigiTDC;
+  Double_t fDigiCor;
 
   ClassDef(CbmStsDigi,1);
 

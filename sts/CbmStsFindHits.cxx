@@ -27,6 +27,7 @@
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::flush;
 using std::fixed;
 using std::right;
 using std::left;
@@ -42,6 +43,10 @@ CbmStsFindHits::CbmStsFindHits() : CbmTask("STS Hit Finder", 1) {
   fDigis   = NULL;
   fHits    = NULL;
   fDigiScheme = new CbmStsDigiScheme();
+  fNStations = 0;
+  fNEvents   = 0;
+  fTime1     = 0.;
+  
 }
 // -------------------------------------------------------------------------
 
@@ -55,6 +60,10 @@ CbmStsFindHits::CbmStsFindHits(Int_t iVerbose)
   fDigis   = NULL;
   fHits    = NULL;
   fDigiScheme = new CbmStsDigiScheme();
+  fNStations = 0;
+  fNEvents   = 0;
+  fTime1     = 0.;
+ 
 }
 // -------------------------------------------------------------------------
 
@@ -68,6 +77,10 @@ CbmStsFindHits::CbmStsFindHits(const char* name, Int_t iVerbose)
   fDigis   = NULL;
   fHits    = NULL;
   fDigiScheme = new CbmStsDigiScheme();
+  fNStations = 0;
+  fNEvents   = 0;
+  fTime1     = 0.;
+  
 }
 // -------------------------------------------------------------------------
 
@@ -86,8 +99,8 @@ CbmStsFindHits::~CbmStsFindHits() {
 
 // -----   Public method Exec   --------------------------------------------
 void CbmStsFindHits::Exec(Option_t* opt) {
-
   fTimer.Start();
+
   Bool_t warn = kFALSE;
 
   // Check for digi scheme
@@ -108,9 +121,9 @@ void CbmStsFindHits::Exec(Option_t* opt) {
   Int_t nHits   = 0;
   Int_t nStations = fDigiScheme->GetNStations();
   CbmStsStation* station = NULL;
-
   for (Int_t iStation=0; iStation<nStations; iStation++) {
     station = fDigiScheme->GetStation(iStation);
+
     Int_t nDigisFInStation = 0;
     Int_t nDigisBInStation = 0;
     Int_t nHitsInStation   = 0;
@@ -141,10 +154,11 @@ void CbmStsFindHits::Exec(Option_t* opt) {
       Int_t nDigisFInSector = fSet.size();
       Int_t nDigisBInSector = bSet.size();
       Int_t nHitsInSector   = FindHits(station, sector, fSet, bSet);
-      if ( fVerbose > 2 ) cout << "Sector " << sector->GetSectorNr() 
-			       << ", Digis front " << nDigisFInSector 
-			       << ", Digis Back " << nDigisBInSector
-			       << ", Hits " << nHitsInSector << endl;
+      if ( fVerbose > 2 ) 
+	cout << "Sector " << sector->GetSectorNr() 
+	     << ", Digis front " << nDigisFInSector 
+	     << ", Digis Back " << nDigisBInSector
+	     << ", Hits " << nHitsInSector << endl;
       nHitsInStation   += nHitsInSector;
       nDigisFInStation += nDigisFInSector;
       nDigisBInStation += nDigisBInSector;      
@@ -161,7 +175,7 @@ void CbmStsFindHits::Exec(Option_t* opt) {
     
   }       // Station loop
 
-  fTimer.Stop();  
+  
   if ( fVerbose > 1 ) {
     cout << endl;
     cout << "-I- " << fName << ":Event summary" << endl;
@@ -179,8 +193,7 @@ void CbmStsFindHits::Exec(Option_t* opt) {
 	 << " s, digis " << nDigisF << " / " << nDigisB << ", hits: " 
 	 << nHits << endl;
   }
-
-
+ fTime1 += fTimer.RealTime();
 }
 // -------------------------------------------------------------------------
 
@@ -189,6 +202,7 @@ void CbmStsFindHits::Exec(Option_t* opt) {
 
 // -----   Private method SetParContainers   -------------------------------
 void CbmStsFindHits::SetParContainers() {
+
 
   // Get run and runtime database
   CbmRunAna* run = CbmRunAna::Instance();
@@ -211,7 +225,7 @@ void CbmStsFindHits::SetParContainers() {
 
 // -----   Private method Init   -------------------------------------------
 InitStatus CbmStsFindHits::Init() {
-
+  
   // Get input array
   CbmRootManager* ioman = CbmRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No CbmRootManager");
@@ -237,7 +251,8 @@ InitStatus CbmStsFindHits::Init() {
        << ", Sectors: " << fDigiScheme->GetNSectors() << ", Channels: " 
        << fDigiScheme->GetNChannels() << endl;
   
-  return kSUCCESS;
+  return kSUCCESS; 
+  
 }
 // -------------------------------------------------------------------------
 
@@ -267,6 +282,7 @@ InitStatus CbmStsFindHits::ReInit() {
        << fDigiScheme->GetNChannels() << endl;
   
   return kSUCCESS;
+  
 }
 // -------------------------------------------------------------------------
 
@@ -275,6 +291,7 @@ InitStatus CbmStsFindHits::ReInit() {
 
 // -----   Private method MakeSets   ---------------------------------------
 void CbmStsFindHits::MakeSets() {
+
 
   fDigiMapF.clear();
   fDigiMapB.clear();
@@ -292,7 +309,6 @@ void CbmStsFindHits::MakeSets() {
       }
     }
   }
-
 }
 // -------------------------------------------------------------------------
 
@@ -301,7 +317,7 @@ void CbmStsFindHits::MakeSets() {
 
 // -----   Private method SortDigis   --------------------------------------
 void CbmStsFindHits::SortDigis() {
-
+ 
   // Check input array
   if ( ! fDigis ) {
     cout << "-E- " << fName << "::SortDigis: No input array!" << endl;
@@ -347,7 +363,7 @@ void CbmStsFindHits::SortDigis() {
       fDigiMapB[sector].insert(iDigi);      
     }
   }
-
+  
 }
 // -------------------------------------------------------------------------
 
@@ -360,8 +376,178 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
 			       set<Int_t>& fSet, set<Int_t>& bSet) {
 
 
-  Double_t statCosRot = TMath::Cos(1.*station->GetRotation());
-  Double_t statSinRot = TMath::Sin(1.*station->GetRotation());
+  // Counter
+  Int_t nNew = 0;
+
+  // Get sector parameters
+  Int_t    detId  = sector->GetDetectorId();
+  Int_t    iType  = sector->GetType();
+
+  Double_t rot    = sector->GetRotation();
+  Double_t dx     = sector->GetDx();
+  Double_t dy     = sector->GetDy();
+  Double_t stereoF = sector->GetStereoF();
+  Double_t stereoB = sector->GetStereoB();
+
+  //  Double_t z      = station->GetZ();
+  Int_t stationNr = station->GetStationNr();
+  Int_t sectorNr  = sector->GetSectorNr();
+
+  // Some auxiliary values
+  Double_t sinrot = TMath::Sin(rot);
+  Double_t cosrot = TMath::Cos(rot);
+  Double_t tanstrB = TMath::Tan(stereoB);
+  Double_t tanstrF = TMath::Tan(stereoF);
+  
+  // Calculate error matrix in sector system
+  
+ 
+   
+    
+  Double_t vX, vY, vXY;
+  if ( iType == 1 ) {
+    vX  = dx / TMath::Sqrt(12.);
+    vY  = dy / TMath::Sqrt(12.);
+    vXY = 0.;
+  }
+  else if ( iType == 2 || iType == 3 ) {
+  
+     if (stereoF==0.) {
+
+      vX  = dx / TMath::Sqrt(12.);
+      vY  = (vX/TMath::Sqrt(2))*(1./TMath::Sin(stereoB/2.));
+      vXY = -1. * dx * dx / tanstrB;
+     }
+     else {
+      vX  = ((dx / TMath::Sqrt(24))*(1./TMath::Cos(stereoB)));
+      vY  = ((dx / TMath::Sqrt(24))*(1./TMath::Sin(stereoB)));
+      vXY = 0.;
+    }
+  }
+  else {
+    cerr << "-E- " << fName << "::FindHits: Illegal sector type "
+	 << iType << endl;
+    return 0;
+  }
+    
+  // Transform variances into global c.s.
+  Double_t wX  = vX * vX  * cosrot * cosrot 
+               - 2. * vXY * cosrot * sinrot
+               + vY * vY  * sinrot * sinrot;
+  Double_t wY  = vX * vX  * sinrot * sinrot
+               + 2. * vXY * cosrot * sinrot
+	       + vY * vY  * cosrot * cosrot; 
+  Double_t wXY = (vX*vX - vY*vY) * cosrot * sinrot
+               + vXY * ( cosrot*cosrot - sinrot*sinrot );
+  Double_t sigmaX = TMath::Sqrt(wX);
+  Double_t sigmaY = TMath::Sqrt(wY);
+
+  // Now perform the loop over active channels
+  set<Int_t>::iterator it1;
+  set<Int_t>::iterator it2;
+
+  // ----- Type 1 : Pixel sector   ---------------------------------------
+  if ( iType == 1 ) {
+    Fatal("FindHits","Sorry, not implemented yet");
+  }     // Pixel sensor
+  // ---------------------------------------------------------------------
+
+  // -----  Type 2: Strip sector OSU   -----------------------------------
+  else if ( iType == 2 ) {
+    Fatal("FindHits","Sorry, not implemented yet");
+  }         // Strip OSU
+  // ---------------------------------------------------------------------
+      
+  // -----  Type 3: Strip sector GSI   -----------------------------------
+  else if (iType == 3 ) {
+    Int_t iDigiF = -1;
+    Int_t iDigiB = -1;
+    Int_t iChanF = -1;
+    Int_t iChanB = -1;
+    Int_t nHits = fHits->GetEntriesFast();
+    Double_t xHit;
+    Double_t yHit;
+    Double_t zHit;
+    TVector3 pos, dpos;
+    CbmStsDigi* digiF = NULL;
+    CbmStsDigi* digiB = NULL;
+    for (it1=fSet.begin(); it1!=fSet.end(); it1++) {
+      iDigiF = (*it1);
+      digiF  = (CbmStsDigi*) fDigis->At(iDigiF);
+      if ( ! digiF ) {
+	cout << "-W- " << GetName() << "::FindHits: Invalid digi index " 
+	     << iDigiF << " in front set of sector " 
+	     << sector->GetSectorNr() << ", station " 
+	     << station->GetStationNr() << endl;
+	continue;
+      }
+      iChanF = digiF->GetChannelNr();
+      for (it2=bSet.begin(); it2!=bSet.end(); it2++ ) {
+	iDigiB = (*it2);
+	digiB = (CbmStsDigi*) fDigis->At(iDigiB);
+	if ( ! digiB ) {
+	  cout << "-W- " << GetName() << "::FindHits: Invalid digi index " 
+	       << iDigiB << " in back set of sector " 
+	       << sector->GetSectorNr() << ", station " 
+	       << station->GetStationNr() << endl;
+	  continue;
+	}
+	iChanB = digiB->GetChannelNr();
+
+	Int_t sensorDetId = sector->Intersect(iChanF,iChanB,xHit,yHit,zHit);
+
+	if ( sensorDetId == -1 ) continue;
+	
+	pos.SetXYZ(xHit, yHit, zHit);
+	dpos.SetXYZ(sigmaX, sigmaY, 0.);
+
+	Int_t statLayer = -1;
+	for ( Int_t istatL = station->GetNofZ() ; istatL > 0 ; istatL-- ) 
+	  if ( TMath::Abs(zHit-station->GetZ(istatL-1)) < 0.00001 ) {
+	    statLayer = istatL-1;
+	    break;
+	  }
+       
+	if ( statLayer == -1 ) 
+	  cout << "unknown layer for hit at z = " << zHit << endl;
+
+	new ((*fHits)[nHits++]) CbmStsHit(sensorDetId, pos, dpos, wXY, 
+					  iDigiF, iDigiB, iChanF, iChanB, statLayer);
+
+	nNew++;
+	if ( fVerbose > 3 ) cout << "New StsHit at (" << xHit << ", " << yHit
+				 << ", " << zHit << "), station " 
+				 << stationNr << ", sector " << sectorNr 
+				 << ", channel " << iChanF << " / " 
+				 << iChanB 
+				 << endl;
+	
+      }      // back side strip loop
+    }        // front side strip loop
+    
+  }          // strip GSI
+  // ---------------------------------------------------------------------
+ 
+  
+  return nNew; 
+}
+// -------------------------------------------------------------------------
+// -----   Virtual method Finish   -----------------------------------------
+void CbmStsFindHits::Finish() {
+  cout << endl;
+  cout << "============================================================"
+       << endl;
+  cout << "===== " << fName << ": Run summary " << endl;
+  cout << "===== Average time  : " << setprecision(4) << setw(8) << right
+       << fTime1 / Double_t(fNEvents)  << " s" << endl;
+  cout << "============================================================"
+       << endl;
+}
+/*
+// -----   Private method FindHits   ---------------------------------------
+Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
+			       CbmStsSector* sector, 
+			       set<Int_t>& fSet, set<Int_t>& bSet) {
 
   // Counter
   Int_t nNew = 0;
@@ -376,15 +562,23 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
   Double_t ly     = sector->GetLy();
   Double_t dx     = sector->GetDx();
   Double_t dy     = sector->GetDy();
-  Double_t stereo = sector->GetStereo();
-  Double_t z      = station->GetZ();
+  Double_t stereoB = sector->GetStereoB();
+  Double_t z      = sector->GetZ0();
+  //  Double_t z      = station->GetZ();
   Int_t stationNr = station->GetStationNr();
   Int_t sectorNr  = sector->GetSectorNr();
+
+  Int_t statLayer = 0;
+  for ( Int_t isz = 1 ; isz < 11 ; isz++ )
+    if ( TMath::Abs(station->GetZ(isz)-z) < 0.001 ) {
+      statLayer = isz;
+      break;
+    }
 
   // Some auxiliary values
   Double_t sinrot = TMath::Sin(rot);
   Double_t cosrot = TMath::Cos(rot);
-  Double_t tanstr = TMath::Tan(stereo);
+  Double_t tanstr = TMath::Tan(stereoB);
 
   // Calculate error matrix in sector system
   Double_t vX, vY, vXY;
@@ -415,12 +609,6 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
                + vXY * ( cosrot*cosrot - sinrot*sinrot );
   Double_t sigmaX = TMath::Sqrt(wX);
   Double_t sigmaY = TMath::Sqrt(wY);
-
-  Double_t xold = sigmaX; 
-  Double_t yold = sigmaY;
-  sigmaX = TMath::Abs(statCosRot*xold-statSinRot*yold);
-  sigmaY = TMath::Abs(statCosRot*yold-statSinRot*xold);
-  if ( TMath::Abs(station->GetRotation()) > 0.001 ) wXY = -wXY;
 
   // Now perform the loop over active channels
   set<Int_t>::iterator it1;
@@ -560,8 +748,8 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
     Int_t iChanF = -1;
     Int_t iChanB = -1;
     Int_t nHits = fHits->GetEntriesFast();
-    Int_t nStripMax = ( stereo<0. ? 0 :  Int_t(ly*tanstr/lx)+1 ); // max. number of strips
-    Int_t nStripBeg = ( stereo>0. ? 0 : -Int_t(ly*tanstr/lx)-1 );
+    Int_t nStripMax = ( stereoB<0. ? 0 :  Int_t(ly*tanstr/lx)+1 ); // max. number of strips
+    Int_t nStripBeg = ( stereoB>0. ? 0 : -Int_t(ly*tanstr/lx)-1 );
     Double_t x0 = 0.;
     Double_t xint, yint;
     Double_t xtemp, ytemp;
@@ -580,7 +768,7 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
 	continue;
       }
       iChanF = digiF->GetChannelNr();
-      xint = ( Double_t(iChanF) + 0.5 ) * dx;            
+      xint = ( Double_t(iChanF) + 0.5 ) * dx;             
       for (it2=bSet.begin(); it2!=bSet.end(); it2++ ) {
 	iDigiB = (*it2);
 	digiB = (CbmStsDigi*) fDigis->At(iDigiB);
@@ -612,16 +800,11 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
 	  x = x + xc;
 	  y = y + yc;
 
-	  xold = x;
-	  yold = y;
-	  x = statCosRot*xold-statSinRot*yold;
-	  y = statCosRot*yold-statSinRot*xold;
-
 	  // Make new hit
 	  pos.SetXYZ(x, y, z);
 	  dpos.SetXYZ(sigmaX, sigmaY, 0.);
 	  new ((*fHits)[nHits++]) CbmStsHit(detId, pos, dpos, wXY, 
-					    iDigiF, iDigiB, iChanF, discreteNetYPos);
+					    iDigiF, iDigiB, iChanF, discreteNetYPos, statLayer);
 	  nNew++;
 	  if ( fVerbose > 3 ) cout << "New StsHit at (" << x << ", " << y 
 				   << ", " << z << "), station " 
@@ -642,7 +825,7 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
 }
 // -------------------------------------------------------------------------
 
-
+*/
     
 
 ClassImp(CbmStsFindHits)

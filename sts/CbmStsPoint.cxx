@@ -9,6 +9,7 @@
 
 using std::cout;
 using std::endl;
+using std::flush;
 
 
 // -----   Default constructor   -------------------------------------------
@@ -60,6 +61,7 @@ void CbmStsPoint::Print(const Option_t* opt) const {
 
 // -----   Point x coordinate from linear extrapolation   ------------------
 Double_t CbmStsPoint::GetX(Double_t z) const {
+  //  cout << fZ << " " << z << " " << fZ_out << endl;
   if ( (fZ_out-z)*(fZ-z) >= 0. ) return (fX_out+fX)/2.;
   Double_t dz = fZ_out - fZ;
   return ( fX + (z-fZ) / dz * (fX_out-fX) );
@@ -71,7 +73,7 @@ Double_t CbmStsPoint::GetX(Double_t z) const {
 // -----   Point y coordinate from linear extrapolation   ------------------
 Double_t CbmStsPoint::GetY(Double_t z) const {
   if ( (fZ_out-z)*(fZ-z) >= 0. ) return (fY_out+fY)/2.;
- Double_t dz = fZ_out - fZ;
+  Double_t dz = fZ_out - fZ;
   //  if ( TMath::Abs(dz) < 1.e-3 ) return (fY_out+fY)/2.;
   return ( fY + (z-fZ) / dz * (fY_out-fY) );
 }

@@ -25,9 +25,12 @@
 #include "TVirtualMC.h"
 #include "TObjArray.h"
 
+#include "TGeoManager.h"
+
 #include <iostream>
 
 using std::cout;
+using std::cerr;
 using std::endl;
 
 
@@ -106,17 +109,58 @@ Bool_t CbmSts::ProcessHits(CbmVolume* vol) {
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
     if (fELoss == 0. ) return kFALSE;
+    
+    if (gMC->IsTrackExiting()) {
+      const Double_t* oldpos;
+      const Double_t* olddirection;
+      Double_t newpos[3];
+      Double_t newdirection[3];
+      Double_t safety;
+      
+      gGeoManager->FindNode(fPosOut.X(),fPosOut.Y(),fPosOut.Z());
+      oldpos = gGeoManager->GetCurrentPoint();
+      olddirection = gGeoManager->GetCurrentDirection();
+      
+//       cout << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << endl;
+
+      for (Int_t i=0; i<3; i++){
+	newdirection[i] = -1*olddirection[i];
+      }
+      
+      gGeoManager->SetCurrentDirection(newdirection);
+      TGeoNode *bla = gGeoManager->FindNextBoundary(2);
+      safety = gGeoManager->GetSafeDistance();
+
+
+      gGeoManager->SetCurrentDirection(-newdirection[0],-newdirection[1],-newdirection[2]);
+      
+      for (Int_t i=0; i<3; i++){
+	newpos[i] = oldpos[i] - (3*safety*olddirection[i]);
+      }
+
+      if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
+	cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] 
+	     << " with safety = " << safety << endl;
+	cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
+	cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
+      }
+
+      fPosOut.SetX(newpos[0]);
+      fPosOut.SetY(newpos[1]);
+      fPosOut.SetZ(newpos[2]);
+    }
+
     AddHit(fTrackID, fVolumeID,
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
 	   TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
 	   fTime, fLength, fELoss);
-
+    
     // Increment number of StsPoints for this track
     CbmStack* stack = (CbmStack*) gMC->GetStack();
     stack->AddPoint(kSTS);
-   
+    
     ResetParameters();
   }
 

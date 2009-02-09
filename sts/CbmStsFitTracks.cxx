@@ -71,8 +71,8 @@ CbmStsFitTracks::~CbmStsFitTracks() { }
 
 // -----   Virtual public method Exec   ------------------------------------
 void CbmStsFitTracks::Exec(Option_t* opt) {
-
   fTimer.Start();
+  
 
   if ( ! fTracks ) {
     cout << "-E- " << fName << "::Exec: No StsTrack array! " << endl;
@@ -95,7 +95,7 @@ void CbmStsFitTracks::Exec(Option_t* opt) {
   fNEvents++;
   fTime    += fTimer.RealTime();
   fNTracks += Double_t(nTracks);
-
+  fTime    += fTimer.RealTime();
 }
 // -------------------------------------------------------------------------
 

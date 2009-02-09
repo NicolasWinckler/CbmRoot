@@ -45,6 +45,7 @@ CbmStsMatchHits::CbmStsMatchHits() : CbmTask("STSMatchHits", 1) {
   fDigis       = NULL;
   fDigiMatches = NULL;
   fHits        = NULL;
+  fTime        = 0.;
   fDigiScheme  = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -60,6 +61,7 @@ CbmStsMatchHits::CbmStsMatchHits(Int_t iVerbose)
   fDigis       = NULL;
   fDigiMatches = NULL;
   fHits        = NULL;
+  fTime        = 0.;
   fDigiScheme  = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -75,6 +77,7 @@ CbmStsMatchHits::CbmStsMatchHits(const char* name, Int_t iVerbose)
   fDigis       = NULL;
   fDigiMatches = NULL;
   fHits        = NULL;
+  fTime        = 0.;
   fDigiScheme  = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------

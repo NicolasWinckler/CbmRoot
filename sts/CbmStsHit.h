@@ -49,10 +49,11 @@ class CbmStsHit : public CbmTrkHit
 	    Int_t iDigiF, Int_t iDigiB);
 
   CbmStsHit(Int_t detId, TVector3& pos, TVector3& dPos, Double_t covXY, 
-	    Int_t iDigiF, Int_t iDigiB, Int_t iPosSX, Int_t iPosSY);
+	    Int_t iDigiF, Int_t iDigiB, Int_t iPosSX, Int_t iPosSY, Int_t iLayer);
 
   CbmStsHit(Int_t detId, TVector3& pos, TVector3& dPos, Double_t dxy, 
 	    Int_t iDigiF, Int_t iDigiB, Double_t dSignalDiv);
+
 
   /** Destructor **/
   virtual ~CbmStsHit();
@@ -61,16 +62,22 @@ class CbmStsHit : public CbmTrkHit
   /** Accessors **/
   Int_t    GetSystemId()           const { 
     return ( fDetectorID & (15<<24) ) >> 24; }
-  virtual Int_t    GetStationNr()          const { 
+  virtual  Int_t    GetStationNr()  const { 
     return ( fDetectorID & (255<<16) ) >> 16; }
-  Int_t    GetSectorNr()           const {  // sector number within station
-    return ( fDetectorID & (32767<<1) ) >> 1; }
+  Int_t    GetSectorNr()   const {  // sector number within station
+    return ( fDetectorID & (4095<<4) ) >> 4; }
+  Int_t    GetSensorNr()   const {  // sensor number within sector
+    return ( fDetectorID & (7<<1) ) >> 1; }
   Int_t    GetDigi(Int_t iSide) const; // front side = 0; back side = 1
 
   Double_t GetSignalDiv()          const { return fSignalDiv; }
 
   Int_t GetPosSensorX()               const { return fPosSX;}
   Int_t GetPosSensorY()               const { return fPosSY;}
+
+  Int_t SetStatLayer(Int_t it)              { fStatLayer = it; }
+  Int_t GetStatLayer()                const { return fStatLayer; }
+
 
   /** Screen output **/
   virtual void Print(Option_t* opt) const;
@@ -83,6 +90,8 @@ class CbmStsHit : public CbmTrkHit
 
   Int_t fPosSX;          // discretized X position in sensor
   Int_t fPosSY;          // discretized Y position in sensor
+
+  Int_t fStatLayer;
 
   Double_t fSignalDiv;   // ADC front/ADC back, theoretically if 1 then hit is valid
 

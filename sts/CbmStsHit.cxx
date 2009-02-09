@@ -28,19 +28,23 @@ CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,
   fPosSX = 0;
   fPosSY = 0;
   fSignalDiv = 0.;
+
+  fStatLayer = 0;
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,  
                      Double_t covXY, Int_t iDigiF, Int_t iDigiB,
-                     Int_t iPosSX, Int_t iPosSY)
+                     Int_t iPosSX, Int_t iPosSY, Int_t iLayer)
   : CbmTrkHit(detId, pos, dpos, covXY, -1) {
   fDigiF = iDigiF;
   fDigiB = iDigiB;
   fPosSX = iPosSX;
   fPosSY = iPosSY;
   fSignalDiv = 0.;
+
+  fStatLayer = iLayer;
 }
 // -------------------------------------------------------------------------
 
@@ -54,6 +58,8 @@ CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,
   fPosSX = 0;
   fPosSY = 0;
   fSignalDiv = dSignalDiv;
+
+  fStatLayer = 0;
 }
 // -------------------------------------------------------------------------
 

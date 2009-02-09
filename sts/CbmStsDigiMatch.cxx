@@ -24,7 +24,7 @@ CbmStsDigiMatch::CbmStsDigiMatch() {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsDigiMatch::CbmStsDigiMatch(Int_t iPoint) { 
-  if ( iPoint < 0 ) {
+  if ( iPoint < 0 && iPoint != -666 ) {
     cout << "-W- CbmStsDigiMatch: Illegal StsPoint index " 
 	 << iPoint << endl;
     fRefIndex[0] = -1;

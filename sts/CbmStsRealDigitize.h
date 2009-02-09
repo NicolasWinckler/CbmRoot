@@ -20,7 +20,7 @@
 #ifndef CBMSTSREALDIGITIZE_H
 #define CBMSTSREALDIGITIZE_H 1
 
-#include "set.h"
+#include <set>
 #include "TStopwatch.h"
 #include "CbmTask.h"
 #include "TRandom3.h"

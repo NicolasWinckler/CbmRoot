@@ -21,11 +21,14 @@
 #define CBMSTSREALCLUSTERFINDER_H 1
 
 
-#include "map.h"
-#include "set.h"
+#include <map>
+#include <set>
 #include "TStopwatch.h"
 #include "CbmTask.h"
 
+using std::set;
+using std::map;
+using std::pair;
 
 class TClonesArray;
 class CbmGeoStsPar;

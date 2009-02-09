@@ -19,11 +19,12 @@
 #ifndef CBMSTSREALMATCHHIT_H
 #define CBMSTSREALMATCHHIT_H 1
 
-#include "set.h"
+#include <set>
 //#include <map>
 #include "TStopwatch.h"
 #include "CbmTask.h"
 
+using std::set;
 using std::map;
 using std::pair;
 

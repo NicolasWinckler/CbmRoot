@@ -123,8 +123,11 @@ inline void L1Algo::Init( fscal geo[] )
       st.XYInfo.C11 = ( c_b*c_b*f_sigma*f_sigma + c_f*c_f*b_sigma*b_sigma )/det;
     }
 
-    st.xInfo.cos_phi = c_f/(c_f*s_b - c_b*s_f);
-    st.xInfo.sin_phi =-c_b/(c_f*s_b - c_b*s_f);
+//    st.xInfo.cos_phi = c_f/(c_f*s_b - c_b*s_f);
+//    st.xInfo.sin_phi =-c_b/(c_f*s_b - c_b*s_f);
+       st.xInfo.cos_phi = -s_f/(c_f*s_b - c_b*s_f);
+       st.xInfo.sin_phi = s_b/(c_f*s_b - c_b*s_f);
+
     st.xInfo.sigma2 = st.XYInfo.C00;
 
     st.yInfo.cos_phi = c_b/(c_b*s_f - c_f*s_b);

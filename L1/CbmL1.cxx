@@ -56,7 +56,6 @@ CbmL1::CbmL1()
   fMomentumCutOff = 0.1;
   fGhostSuppression = 1;
   fDetectorEfficiency = 1.;
-  fVerbose = 1;
 }
 
 CbmL1::CbmL1(const char *name, Int_t iVerbose ):CbmTask(name,iVerbose)
@@ -216,22 +215,37 @@ InitStatus CbmL1::Init()
 	CbmStsSector* sector = st->GetSector(0);
 	fscal f_phi, f_sigma, b_phi, b_sigma; // angle and sigma front/back  side
 	f_phi = sector->GetRotation();
-	f_sigma = sector->GetDx()/sqrt(12.);
 	b_phi = sector->GetRotation();
 	if( sector->GetType()==1 ){
 	  b_phi += 3.14159265358/2.;
 	  b_sigma = sector->GetDy()/sqrt(12.);
-	}else{
-	  b_phi +=sector->GetStereo();
-	  b_sigma = f_sigma*cos(sector->GetStereo());// sector->GetDy()/sqrt(12.);
+	}
+	else{
+	  if (sector->GetStereoF()==0.) {
+	    f_phi +=sector->GetStereoF();
+	    b_phi +=sector->GetStereoB();
+            f_sigma = sector->GetDx() / TMath::Sqrt(12);
+            b_sigma = (f_sigma/TMath::Sqrt(2))*(1./TMath::Sin(b_phi/2.));          
+          }
+          else {
+	    f_phi +=sector->GetStereoF();
+	    b_phi +=sector->GetStereoB();
+            f_sigma  = ((sector->GetDx() / TMath::Sqrt(24))*(1./TMath::Cos(f_phi)));
+            b_sigma  = ((sector->GetDx() / TMath::Sqrt(24))*(1./TMath::Sin(b_phi)));
+          }
+	  /*f_phi +=sector->GetStereoF();
+	  b_phi +=sector->GetStereoB();
+	  f_sigma = (sector->GetDx()/sqrt(24.))*(1./TMath::Cos(sector->GetStereoB()));
+	  b_sigma = (sector->GetDx()/sqrt(24.))*(1./TMath::Sin(sector->GetStereoB()));// sector->GetDy()/sqrt(12.);*/
 	}
 	{
-	  double c = cos(b_phi);
-	  double s = sin(b_phi);
-	  b_sigma = sqrt( fabs( c*c*sector->GetSigmaX()*sector->GetSigmaX() 
-				+2*c*s*sector->GetSigmaXY() 
-				+s*s*sector->GetSigmaY()*sector->GetSigmaY() ) );
-	}
+	  double cb = cos(b_phi);
+	  double sb = sin(b_phi);
+	  double cf = cos(f_phi);
+	  double sf = sin(f_phi);
+	  b_sigma = sqrt( fabs( cb*cb*sector->GetSigmaX()*sector->GetSigmaX()+2*cb*sb*sector->GetSigmaXY()+sb*sb*sector->GetSigmaY()*sector->GetSigmaY()));
+	  f_sigma = sqrt( fabs( cf*cf*sector->GetSigmaX()*sector->GetSigmaX()+2*cf*sf*sector->GetSigmaXY()+sf*sf*sector->GetSigmaY()*sector->GetSigmaY()));
+        }
 	//if( sector->GetType()==2 ){ //!! DEBUG !!
 	//b_phi = sector->GetRotation() + 3.14159265358/2.;
 	//b_sigma = 12./sqrt(12.);

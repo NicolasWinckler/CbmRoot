@@ -12,6 +12,10 @@
  *  Finds tracks using the Cellular Automaton algorithm
  *
  */
+#include "CbmL1.h"
+#include "CbmStsHit.h"
+#include "CbmStsStation.h"
+#include "CbmStsDigiScheme.h"
 #include "L1Algo/L1Algo.h"
 #include "L1Algo/L1TrackPar.h"
 #include "L1Algo/L1Branch.h"
@@ -24,6 +28,7 @@
 #include <iostream>
 #include <map>
 #include <list>
+#include <vector>
 #include <algorithm>
 
 using std::cout;
@@ -58,7 +63,6 @@ void L1Algo::CATrackFinder()
   //time_find = 0.0, time_fit = 0.0, time_fit_bra = 0.0, time_fit_fin = 0.0,
   //time_find_10 = 0.0, time_find_20 = 0.0, time_find_30 = 0.0, time_find_40 = 0.0, time_find_50 = 0.0,
   //time_find_11 = 0.0, time_find_21 = 0.0, time_find_31 = 0.0;
-
   const int FIRSTCASTATION = 0;
 
   TStopwatch c_time;
@@ -69,14 +73,14 @@ void L1Algo::CATrackFinder()
   vRecoHits.clear();
   
   // Arrays of duplets 
-  const int MaxArrSize = 200000;
+//  const int MaxArrSize = 40000;
+  const int MaxArrSize = 800000;
   static unsigned short int 
     vecA0[MaxArrSize], vecB0[MaxArrSize], vecA[MaxArrSize], vecB[MaxArrSize],
     *mrDuplets_hits  = vecA, // right hits of middle-right duplets
     *mrDuplets_start = vecA0,// first right hit in mrDuplets_hits, array paralel to middle hits 
     *lmDuplets_hits  = vecB, // same for left-middle duplets 
     *lmDuplets_start = vecB0;
-
   //
 
   static bool vecFakeA[MaxArrSize], vecFakeB[MaxArrSize], 
@@ -107,7 +111,9 @@ void L1Algo::CATrackFinder()
 
   //for (int isec = 0; isec <= 0; isec++){ // D0 !!!
   //for (int isec = 0; isec <= 1; isec++){
+
   for (int isec = 0; isec <= 2; isec++){ // all finder
+
   //for (int isec = 0; isec <= fTrackingLevel; isec++){ // 
     
     unsigned int stat_n_trip = 0;
@@ -148,6 +154,7 @@ void L1Algo::CATrackFinder()
 
     if (isec <= 1){// target
       targB = vtxFieldValue;
+
       if (isec ==-1) SigmaTargetX = SigmaTargetY = 0.01; // target    
       else           SigmaTargetX = SigmaTargetY = 0.1;
     }
@@ -176,16 +183,19 @@ void L1Algo::CATrackFinder()
       vTriplets0_m[ih] = dup_init;
     }
 
+cout << "NStations " << NStations << endl;
+
     //for (int istal = NStations-2; istal >= 0; istal--){//  //start downstream chambers
     for (int istal = NStations-2; istal >= FIRSTCASTATION; istal--){//  //start downstream chambers
-      //cout << "istal " << istal << " : " << endl;
 
       TripStartIndex[istal] = TripStopIndex[istal] = vTriplets.size();
       int nstaltriplets = 0;
       
       int istam = istal+1;
       int istar = istal+2;
-           
+//     cout << "istal - last station=  " << istal  << endl;
+//     cout << "istam - middle station=  " << istam << endl;
+//     cout << "istar - first station=  " << istar << endl;  
       unsigned int nDuplets_lm = 0;
       
       L1Station &stal = vStations[istal];
@@ -194,8 +204,7 @@ void L1Algo::CATrackFinder()
 
       fvec qp1 = MaxInvMom; 
       if( isec>=2 ) qp1 = 1;
-      fvec zl = stal.z[0];
-      fvec dzli = 1./(zl-targZ[0]);
+        fvec zl, dzli;
       fvec Infqp = MaxInvMom/3.*MaxInvMom/3.;
 
       const int Portion = 16;
@@ -218,7 +227,7 @@ void L1Algo::CATrackFinder()
       static unsigned short int hitsm_3[10000];
       static unsigned short int hitsr_3[10000];
       
-      static fvec u_front[20000], u_back[20000];
+      static fvec u_front[20000], u_back[20000], Z[20000];
       static fvec x_minusV[20000], x_plusV[20000], y_minusV[20000], y_plusV[20000];
       static fscal *x_minus = (fscal*) x_minusV;
       static fscal *x_plus  = (fscal*) x_plusV;
@@ -231,11 +240,20 @@ void L1Algo::CATrackFinder()
       L1StsHit *vStsHits_l = &(vStsHits[0]) + StsHitsStartIndex[istal];
       L1StsHit *vStsHits_m = &(vStsHits[0]) + StsHitsStartIndex[istam];
       L1StsHit *vStsHits_r = 0;
+     //******************************************************************
+
+       CbmL1HitStore *vHitStore_l=&(CbmL1::Instance()->vHitStore[0])+StsHitsStartIndex[istal];
+       CbmL1HitStore *vHitStore_m=&(CbmL1::Instance()->vHitStore[0])+StsHitsStartIndex[istam];       
+       CbmL1HitStore *vHitStore_r= 0;
+   //************************************************************************
       int NHits_l = StsHitsStopIndex[istal] - StsHitsStartIndex[istal] + 1;
       int NHits_m = StsHitsStopIndex[istam] - StsHitsStartIndex[istam] + 1;
       int NHits_r = 0;
       if( istar < NStations ){
 	vStsHits_r = &(vStsHits[0]) + StsHitsStartIndex[istar];
+  //**********************************************************************
+       vHitStore_r=&(CbmL1::Instance()->vHitStore[0]) + StsHitsStartIndex[istar];
+  //************************************************************************
 	NHits_r = StsHitsStopIndex[istar] - StsHitsStartIndex[istar] + 1;
       }
 
@@ -251,8 +269,10 @@ void L1Algo::CATrackFinder()
 
 	// prepare the portion of left hits
 
+
 	//TStopwatch c_time_find_10;
 
+//********************************************************
 	for (int ilh=start_lh; ilh <end_lh; ilh++){
 	  lmDuplets_start[ilh] = nDuplets_lm;
 	  vTriplets0_l[ilh] = dup_init;
@@ -260,28 +280,33 @@ void L1Algo::CATrackFinder()
 	  //vFake_l[ilh]=1;
 	  
 	  L1StsHit &hitl = vStsHits_l[ilh];
+         CbmL1HitStore &hitl_story= vHitStore_l[ilh];
+          
+         CbmStsHit *mh = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitl_story.ExtIndex));
+
 	  if( GetFUsed( vSFlag[hitl.f] | vSFlagB[hitl.b] ) ) continue; // if used
 
 	  hitsl_1[n1] = ilh;
 	  u_front[n1_V][n1_4] = vStsStrips[hitl.f];
 	  u_back [n1_V][n1_4] = vStsStripsB[hitl.b];
-	  
+          Z[n1_V][n1_4] = mh->GetZ();
 	  n1++;
 	  n1_V= n1/fvecLen;
 	  n1_4= n1%fvecLen;
+     //           cout << "Usaully" << endl;
+     //           cout<<"n1 = "<<n1<< ",fvecLen=   " << fvecLen << ",  n1_V="<<n1_V<<", n1_4="<<n1_4<<endl;
 	}
 	if( n1_4>0 ){
 	  for( int i1_4=n1_4-1; n1_4<fvecLen; n1_4++ ){
 	    u_front[n1_V][n1_4] = u_front[n1_V][i1_4];
 	    u_back [n1_V][n1_4] = u_back [n1_V][i1_4];
+            Z[n1_V][n1_4] = Z[n1_V][n1_4];
 	  }	
 	  n1_V+=1;
 	}
-
 	//c_time_find_10.Stop();    
 	//time_find_10 += double(c_time_find_10.CpuTime()); //ms
-	
-	//cout<<"n1 = "<<n1<<", n1_V="<<n1_V<<", n1_4="<<n1_4<<endl;
+	//cout<<"n1 = "<<n1<< ",fvecLen=   " << fvecLen << ",  n1_V="<<n1_V<<", n1_4="<<n1_4<<endl;
 	stat_nhits+=n1;
 
 	// construct T_1:  target->left hit-> Z of middle station 
@@ -289,27 +314,36 @@ void L1Algo::CATrackFinder()
 	//TStopwatch c_time_find_11;
 
 	for( int i1_V=0; i1_V<n1_V; i1_V++ ){
-	  fvec &x = u_front[i1_V];
+	  fvec &xx = u_front[i1_V];
 	  fvec &v = u_back [i1_V];
-	  fvec y  = stal.yInfo.cos_phi*x + stal.yInfo.sin_phi*v;
-	  //cout<<"x="<<x<<endl;
-	  //cout<<"y="<<y<<endl;
+          fvec &zl = Z[i1_V];
+	  fvec y  = stal.yInfo.cos_phi*xx + stal.yInfo.sin_phi*v;
+          fvec x  = stal.xInfo.sin_phi*xx + stal.xInfo.cos_phi*v;
+          dzli = 1./(zl-targZ);
 	  fvec tx = (x-targX)*dzli;
 	  fvec ty = (y-targY)*dzli;
+          
 	  static L1FieldValue l_B, m_B _fvecalignment;
 	  static L1FieldRegion fld;
 	  stal.fieldSlice.GetFieldValue( x, y, l_B );
+
 	  stam.fieldSlice.GetFieldValue( tx*stam.z, ty*stam.z, m_B );
 	  if( istal>0 ){
 	    L1FieldValue centB;
 	    L1Station &st = vStations[istal/2];
 	    st.fieldSlice.GetFieldValue( tx*st.z, ty*st.z, centB );
-	    fld.Set( l_B, stal.z, centB, st.z, targB, targZ );
-	    fld_1[i1_V].Set( m_B, stam.z, l_B, stal.z, centB, st.z  );
+	   // fld.Set( l_B, stal.z, centB, st.z, targB, targZ );
+           fld.Set( l_B, zl, centB, st.z, targB, targZ );
+           fld_1[i1_V].Set( m_B, stam.z, l_B, zl, centB, st.z  );
+	   // fld_1[i1_V].Set( m_B, stam.z, l_B, stal.z, centB, st.z  );
 	  }
 	  else{
-	    fld.Set( l_B, stal.z, targB, targZ );
-	    fld_1[i1_V].Set( m_B, stam.z, l_B, stal.z, targB, targZ  );
+
+          fld.Set( l_B, zl, targB, targZ );
+          fld_1[i1_V].Set( m_B, stam.z, l_B, zl, targB, targZ  );
+
+//	    fld.Set( l_B, stal.z, targB, targZ );
+//	    fld_1[i1_V].Set( m_B, stam.z, l_B, stal.z, targB, targZ  );
 	  }
 	  L1TrackPar &T = T_1[i1_V];
 
@@ -348,7 +382,6 @@ void L1Algo::CATrackFinder()
 	  x_plusV [i1_V] = T.x + dxm_est;
 	  y_minusV[i1_V] = T.y - dym_est;
 	  y_plusV [i1_V] = T.y + dym_est;
-
 	}// i1_V
 	//cout<<20<<endl;
 	
@@ -362,37 +395,70 @@ void L1Algo::CATrackFinder()
 
 	//TStopwatch c_time_find_20;
 	
-	int n2=0, n2_V=0, n2_4=0 ;
+        int n2=0, n2_V=0, n2_4=0 ;
 
 	for (int i1=0; i1<n1; i1++){
 
 	  int i1_V = i1/fvecLen;
 	  int i1_4 = i1 % fvecLen;
 	  //cout<<i1<<":1"<<endl;
-	  for (; start_mhit <= NHits_m; start_mhit++){	    
+
+
+// 	  for (; start_mhit <= NHits_m; start_mhit++){	    
+       for (; start_mhit < NHits_m; start_mhit++){
 	    if( vFake_m[start_mhit] ) continue;
 	    L1StsHit &hitm = vStsHits_m[start_mhit];
-	    fscal &x = vStsStrips[hitm.f];
+//*********************************************************
+            CbmL1HitStore &hitm_story= vHitStore_m[start_mhit];
+            CbmStsHit *mh_m = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitm_story.ExtIndex));
+            fvec zl_m=mh_m->GetZ();
+//**************************************************************
+	    fscal &xx = vStsStrips[hitm.f];
 	    fscal &v = vStsStripsB[hitm.b];
-	    //cout<<"x,v="<<x<<" "<<v<<endl;
-	    fscal y  = (stam.yInfo.cos_phi*x + stam.yInfo.sin_phi*v)[0];
-	    //cout<<"="<<y<<endl;
-	    if ( y >= y_minus[i1]) break;	    
+	    //cout<<"x,v="<<xx<<" "<<v<<endl;
+                 
+	    fscal y  = (stam.yInfo.cos_phi*xx + stam.yInfo.sin_phi*v)[0];
+            fscal x  = (stam.xInfo.sin_phi*xx + stam.xInfo.cos_phi*v)[0];
+	    //cout<<"y= "<<y<< "x= " << x << endl;
+
+//*************************************************************
+               fscal temp1=T_1[i1_V].ty[i1_4]*(zl_m[0]-stam.z[0]);
+//            if ( y >= y_minus[i1]) break;
+            if ( y >= y_minus[i1]+temp1) break;	    
+//********************************************************
 	  }
 	  //cout<<i1<<":2"<<endl;
 	  
 	  lmDuplets_start[hitsl_1[i1]] = nDuplets_lm;
-
 	  for (int imh = start_mhit; imh < NHits_m; imh++){	  
 	    if( n2>= MaxPortionDup ) break;
 	    //if( imh>=10000 ) cout<<"imh="<<imh<<endl;
 	    if( vFake_m[imh] ) continue;
 	    L1StsHit &hitm = vStsHits_m[imh];
-	    fscal &x = vStsStrips[hitm.f];
+//*****************************************************************
+            CbmL1HitStore &hitm_story= vHitStore_m[imh];
+            CbmStsHit *mh_m = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitm_story.ExtIndex));
+            fvec zl_m=mh_m->GetZ();
+//***********************************************************************************************88
+	    fscal &xx = vStsStrips[hitm.f];
 	    fscal &v = vStsStripsB[hitm.b];
-	    fscal y  = (stam.yInfo.cos_phi*x + stam.yInfo.sin_phi*v)[0];
-	    if ( y > y_plus[i1] ) break;
-	    if ( (x < x_minus[i1] ) || (x > x_plus[i1]) ) continue;
+            fscal tempX=T_1[i1_V].tx[i1_4]*(zl_m[0]-stam.z[0]);
+            fscal tempY=T_1[i1_V].ty[i1_4]*(zl_m[0]-stam.z[0]);
+	    fscal y  = (stam.yInfo.cos_phi*xx + stam.yInfo.sin_phi*v)[0];
+            fscal x  = (stam.xInfo.sin_phi*xx + stam.xInfo.cos_phi*v)[0];
+
+//	    if ( y > y_plus[i1] ) break;
+//	    if ( (x < x_minus[i1] ) || (x > x_plus[i1]) ) continue;
+
+           if ( y > y_plus[i1]+tempY ) break;
+            if ( (x < x_minus[i1]+tempX ) || (x > x_plus[i1]+tempX) ) continue;
+
+   if (nDuplets_lm+1 >= MaxArrSize)
+{
+break;
+//cout << "nDuplets_lm > MaxArrSize, nDuplets_lm= " << nDuplets_lm << endl;
+}
+
 
 	    lmDuplets_hits[nDuplets_lm++]=imh;
 
@@ -404,12 +470,18 @@ void L1Algo::CATrackFinder()
 	    L1TrackPar &T2 = T_2[n2_V];
 	    L1FieldRegion &f1 = fld_1[i1_V];
 	    L1FieldRegion &f2 = fld_2[n2_V];
-	    u_front[n2_V][n2_4] = x;
+	    u_front[n2_V][n2_4] = xx;
 	    u_back [n2_V][n2_4] = v;
 	    for( fvec *i=&T2.x, *j=&T1.x; i<=&T2.NDF; i++,j++ ) (*i)[n2_4]=(*j)[i1_4];
 	    for( fvec *i=&f2.cx0, *j=&f1.cx0; i<=&f2.z0; i++,j++ ) (*i)[n2_4]=(*j)[i1_4];
+
+            T2.x[n2_4]+=T2.tx[n2_4]*(zl_m[0]-stam.z[0]);
+            T2.y[n2_4]+=T2.ty[n2_4]*(zl_m[0]-stam.z[0]);
+            T2.z[n2_4]=zl_m[0];
+
 	    hitsl_2[n2] = hitsl_1[i1];
 	    hitsm_2[n2] = imh;
+
 	    n2++;
 	    n2_V = n2/fvecLen;
 	    n2_4 = n2 % fvecLen;	  
@@ -472,25 +544,56 @@ void L1Algo::CATrackFinder()
 
 	int n3=0, n3_V=0, n3_4=0;
 	//cout<<40<<endl;
-
 	for( int i2=0; i2<n2; i2++){
 	  int i2_V = i2/fvecLen;
 	  int i2_4 = i2%fvecLen;
 	  unsigned short int duplet_b = mrDuplets_start[hitsm_2[i2]];
 	  unsigned short int duplet_e = mrDuplets_start[hitsm_2[i2]+1];
+//          cout << "duplet_b= " << duplet_b << " duplet_e= " << duplet_e << endl;
 
 	  for (int irh_index = duplet_b; irh_index < duplet_e; irh_index++){
 	    if( n3>= MaxPortionTrip ) break;
 	    int irh = mrDuplets_hits[irh_index];
 	    //if( irh>=10000 ) cout<<"irh="<<irh<<endl;
 	    L1StsHit &hitr = vStsHits_r[irh];
+       
+          if ( (irh+StsHitsStartIndex[istar]) > StsHitsStopIndex[istar]) { 
+  /*
+       cout << "istar= " << istar << endl;
+           cout << "irh+StsHitsStartIndex[istar]= " << (irh+StsHitsStartIndex[istar]) 
+           << " StsHitsStopIndex[istar]= " << StsHitsStopIndex[istar] << endl;
+           cout << "irh= " << irh << endl;
+           cout << "duplet_b= " << duplet_b << " duplet_e= " << duplet_e << endl;  
+         cout << "mrDuplets_hits[duplet_b]= " << mrDuplets_hits[duplet_b] 
+         << " mrDuplets_hits[duplet_e]= " << mrDuplets_hits[duplet_e] << endl;
+ */ 
+          continue;
+           }
+
+            //*******************************************
+                
+            CbmL1HitStore &hitr_story= vHitStore_r[irh];
+            CbmStsHit *mh_r = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitr_story.ExtIndex));
+            fvec zl_r=mh_r->GetZ();
+//*********************************************************
 	    //double yr = hitr.y;
-	    double xr = vStsStrips[hitr.f];
-	    double vr = vStsStripsB[hitr.b];
-	    fscal yr  = (star.yInfo.cos_phi*xr + star.yInfo.sin_phi*vr)[0];
-	    if (yr < y_minus[i2]) continue;
-	    if (yr > y_plus [i2] ) break;	      
-	    if ((xr < x_minus[i2]) || (xr > x_plus[i2])) continue;
+	    fscal &xxr = vStsStrips[hitr.f];
+	    fscal &vr = vStsStripsB[hitr.b];
+	    fscal yr  = (star.yInfo.cos_phi*xxr + star.yInfo.sin_phi*vr)[0];
+            fscal     xr  = (star.xInfo.sin_phi*xxr + star.xInfo.cos_phi*vr)[0];
+
+            fscal tempX1=T_2[i2_V].tx[i2_4]*(zl_r[0]-star.z[0]);
+            fscal tempY1=T_2[i2_V].ty[i2_4]*(zl_r[0]-star.z[0]);
+           if (yr < y_minus[i2]+tempY1) continue;
+           if (yr > y_plus [i2]+tempY1 ) break;
+           if ((xr < x_minus[i2]+tempX1) || (xr > x_plus[i2]+tempX1)) continue;
+
+
+
+
+//	    if (yr < y_minus[i2]) continue;
+//	    if (yr > y_plus [i2] ) break;	      
+//	    if ((xr < x_minus[i2]) || (xr > x_plus[i2])) continue;
 
 	    L1TrackPar &T3 = T_3[n3_V];
 	    L1TrackPar &T2 = T_2[i2_V];
@@ -508,6 +611,12 @@ void L1Algo::CATrackFinder()
 	      u_back [n3_V][n3_4] = vStsStripsB[hitr.b];
 	      for( fvec *i=&T3.x, *j=&T2.x; i<=&T3.NDF; i++,j++ )  (*i)[n3_4]=(*j)[i2_4];
 	    }
+
+
+            T3.x[n3_4]+=T3.tx[n3_4]*(zl_r[0]-star.z[0]);
+            T3.y[n3_4]+=T3.ty[n3_4]*(zl_r[0]-star.z[0]);
+            T3.z[n3_4]=zl_r[0];
+
 	    n3++;
 	    n3_V = n3/fvecLen;
 	    n3_4 = n3 % fvecLen;
@@ -654,7 +763,9 @@ void L1Algo::CATrackFinder()
 	//c_time_find_40.Stop();    
 	//time_find_40 += double(c_time_find_40.CpuTime()); //ms
 	//cout<<60<<endl;
+
       }//portion of left hits
+
       //cout<<2<<endl;
 
       //TStopwatch c_time_find_50;
@@ -690,6 +801,8 @@ void L1Algo::CATrackFinder()
       ptmp = mrDuplets_start; 
       mrDuplets_start = lmDuplets_start; 
       lmDuplets_start = ptmp;
+
+////      n2_lmr = n2;
 
       pair<unsigned short int, unsigned short int> *pttmp = vTriplets0_m; 
       vTriplets0_m = vTriplets0_l; 
@@ -751,6 +864,8 @@ void L1Algo::CATrackFinder()
 	//cout<<" level "<<ilev<<", station "<<istaF<<", triplets "<<sta_end-sta_first
 	//<<", trip indices ("<<sta_first<<"->"<<sta_end<<")"<<endl;
 	//cout<<vStsHits.size()<<endl;
+
+
 	for( int itrip=sta_first; itrip<sta_end; itrip++ ){	  	
 	  L1Triplet *first_trip = &vTriplets[itrip];
 	  int lv=first_trip->GetLevel();
@@ -810,7 +925,6 @@ void L1Algo::CATrackFinder()
 
 	  static L1TrackPar T _fvecalignment;
 	  int nGathered = 0;
-	  
 	  if(0){ // fit forward
 
 	    Int_t nHits = best_tr.StsHits.size();
@@ -833,16 +947,19 @@ void L1Algo::CATrackFinder()
 	    fvec x0  = vStsStrips[hit0.f];
 	    fvec v0  = vStsStripsB[hit0.b];
 	    fvec y0  = sta0.yInfo.cos_phi*x0 + sta0.yInfo.sin_phi*v0;
+                 x0  = sta0.xInfo.sin_phi*x0 + sta0.xInfo.cos_phi*v0;
 	    fvec z0 = sta0.z;
 
 	    fvec x1  = vStsStrips[hit1.f];
 	    fvec v1  = vStsStripsB[hit1.b];
 	    fvec y1  = sta1.yInfo.cos_phi*x1 + sta1.yInfo.sin_phi*v1;
+                 x1  = sta1.xInfo.sin_phi*x1 + sta1.xInfo.cos_phi*v1;
 	    fvec z1 = sta1.z;
-
+        
 	    fvec x2  = vStsStrips[hit2.f];
 	    fvec v2  = vStsStripsB[hit2.b];
 	    fvec y2  = sta2.yInfo.cos_phi*x2 + sta2.yInfo.sin_phi*v2;
+                 x2  = sta2.xInfo.sin_phi*x2 + sta2.xInfo.cos_phi*v2;
 	    fvec z2 = sta2.z;
     
 	    fvec dzi = 1./(z1-z0);
@@ -882,11 +999,13 @@ void L1Algo::CATrackFinder()
 	      L1StsHit &hit = vStsHits[best_tr.StsHits[i]];	      
 	      ista = vSFlag[hit.f]/4;
 	      L1Station &sta = vStations[ista];
-	      fvec x = vStsStrips[hit.f];
+	      fvec xx = vStsStrips[hit.f];
 	      fvec v = vStsStripsB[hit.b];
-	      fvec y  = sta.yInfo.cos_phi*x + sta.yInfo.sin_phi*v;
+	      fvec y  = sta.yInfo.cos_phi*xx + sta.yInfo.sin_phi*v;
+              fvec x =  sta.xInfo.sin_phi*xx + sta.xInfo.cos_phi*v;
+
 	      L1Extrapolate( T, sta.z, qp0, fld );	
-	      L1Filter( T, sta.frontInfo, x );
+	      L1Filter( T, sta.frontInfo, xx );
 	      L1Filter( T, sta.backInfo,  v );
 	      L1AddMaterial( T, sta.materialInfo, qp0 );
 	      fB0 = fB1;
@@ -921,6 +1040,7 @@ void L1Algo::CATrackFinder()
 		fscal x = vStsStrips[hit.f];
 		fscal v = vStsStripsB[hit.b];
 		fscal y  = (sta.yInfo.cos_phi*x + sta.yInfo.sin_phi*v)[0];
+                      x =  (sta.xInfo.sin_phi*x + sta.xInfo.cos_phi*v)[0];
 		if (y < y_minus) continue;
 		if (y > y_plus ) break;	      
 		if ((x < x_minus) || (x > x_plus)) continue;
@@ -937,10 +1057,11 @@ void L1Algo::CATrackFinder()
 	      best_L++;
 	      nGathered ++;
 	      L1StsHit &hit = vStsHits[ibest];
-	      fvec x = vStsStrips[hit.f];
+	      fvec xx = vStsStrips[hit.f];
 	      fvec v = vStsStripsB[hit.b];
-	      fvec y  = sta.yInfo.cos_phi*x + sta.yInfo.sin_phi*v;
-	      L1Filter( T, sta.frontInfo, x );
+	      fvec y  = sta.yInfo.cos_phi*xx + sta.yInfo.sin_phi*v;
+              fvec x =  sta.xInfo.sin_phi*xx + sta.xInfo.cos_phi*v;
+	      L1Filter( T, sta.frontInfo, xx );
 	      L1Filter( T, sta.backInfo,  v );
 	      L1AddMaterial( T, sta.materialInfo, qp0 );
 	      fB0 = fB1;
@@ -973,16 +1094,19 @@ void L1Algo::CATrackFinder()
 	    fvec x0  = vStsStrips[hit0.f];
 	    fvec v0  = vStsStripsB[hit0.b];
 	    fvec y0  = sta0.yInfo.cos_phi*x0 + sta0.yInfo.sin_phi*v0;
+                 x0  = sta0.xInfo.sin_phi*x0 + sta0.xInfo.cos_phi*v0;
 	    fvec z0 = sta0.z;
 
 	    fvec x1  = vStsStrips[hit1.f];
 	    fvec v1  = vStsStripsB[hit1.b];
 	    fvec y1  = sta1.yInfo.cos_phi*x1 + sta1.yInfo.sin_phi*v1;
+                 x1  = sta1.xInfo.sin_phi*x1 + sta1.xInfo.cos_phi*v1;   
 	    fvec z1 = sta1.z;
 
 	    fvec x2  = vStsStrips[hit2.f];
 	    fvec v2  = vStsStripsB[hit2.b];
 	    fvec y2  = sta2.yInfo.cos_phi*x2 + sta2.yInfo.sin_phi*v2;
+                 x2  = sta2.xInfo.sin_phi*x2 + sta2.xInfo.cos_phi*v2;
 	    fvec z2 = sta2.z;
     
 	    fvec dzi = 1./(z1-z0);
@@ -1026,13 +1150,14 @@ void L1Algo::CATrackFinder()
 	      ista = vSFlag[hit.f]/4;
 	      cout<<i<<" :ista="<<ista<<endl;
 	      L1Station &sta = vStations[ista];
-	      fvec x = vStsStrips[hit.f];
+	      fvec xx = vStsStrips[hit.f];
 	      fvec v = vStsStripsB[hit.b];
-	      fvec y  = sta.yInfo.cos_phi*x + sta.yInfo.sin_phi*v;
-	      cout<<i<<" :"<<x<<" "<<y<<" "<<v<<endl;
+	      fvec y  = sta.yInfo.cos_phi*xx + sta.yInfo.sin_phi*v;
+              fvec x  = sta.xInfo.sin_phi*xx + sta.xInfo.cos_phi*v;
+	      //cout<<i<<" :"<<x<<" "<<y<<" "<<v<<endl;
 	      L1Extrapolate( T, sta.z, qp0, fld );	
 	      cout<<i<<":1 "<<endl;
-	      L1Filter( T, sta.frontInfo, x );
+	      L1Filter( T, sta.frontInfo, xx );
 	      cout<<i<<":2 "<<endl;
 	      L1Filter( T, sta.backInfo,  v );
 	      cout<<i<<":3 "<<T.tx<<" "<<T.ty<<endl;
@@ -1071,9 +1196,10 @@ void L1Algo::CATrackFinder()
 		L1StsHit &hit = vStsHits[ih];
 		if( GetFUsed( vSFlag[hit.f] | vSFlagB[hit.b] ) ) continue; // if used
 
-		fscal x = vStsStrips[hit.f];
+		fscal xx = vStsStrips[hit.f];
 		fscal v = vStsStripsB[hit.b];
-		fscal y  = (sta.yInfo.cos_phi*x + sta.yInfo.sin_phi*v)[0];
+		fscal y  = (sta.yInfo.cos_phi*xx + sta.yInfo.sin_phi*v)[0];
+                fscal x  =  (sta.xInfo.sin_phi*xx + sta.xInfo.cos_phi*v)[0];
 		if (y < y_minus) continue;
 		if (y > y_plus ) break;	      
 		if ((x < x_minus) || (x > x_plus)) continue;
@@ -1090,10 +1216,11 @@ void L1Algo::CATrackFinder()
 	      best_L++;
 	      nGathered ++;
 	      L1StsHit &hit = vStsHits[ibest];
-	      fvec x = vStsStrips[hit.f];
+	      fvec xx = vStsStrips[hit.f];
 	      fvec v = vStsStripsB[hit.b];
-	      fvec y  = sta.yInfo.cos_phi*x + sta.yInfo.sin_phi*v;
-	      L1Filter( T, sta.frontInfo, x );
+	      fvec y  = sta.yInfo.cos_phi*xx + sta.yInfo.sin_phi*v;
+              fvec x  = sta.xInfo.sin_phi*xx + sta.xInfo.cos_phi*v;
+	      L1Filter( T, sta.frontInfo, xx );
 	      L1Filter( T, sta.backInfo,  v );
 	      L1AddMaterial( T, sta.materialInfo, qp0 );
 	      fB0 = fB1;

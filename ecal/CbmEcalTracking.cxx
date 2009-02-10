@@ -44,7 +44,7 @@ InitStatus CbmEcalTracking::Init()
     return kFATAL;
   }
   fTrackPar=new TClonesArray("CbmTrackParam", 1000);
-  io->Register("EcalTrackParam", "ECAL", fTrackPar, kFALSE);
+  io->Register("EcalTrackParam", "ECAL", fTrackPar, kTRUE);
   fStru=(CbmEcalStructure*)io->ActivateBranch("EcalStructure");
   if (!fStru) 
   {

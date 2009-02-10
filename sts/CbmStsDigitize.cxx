@@ -55,10 +55,6 @@ CbmStsDigitize::CbmStsDigitize() : CbmTask("STS Digitizer", 1) {
   fDigis       = NULL;
   fDigiMatches = NULL;
   fDigiScheme  = new CbmStsDigiScheme();
-  fNStations = 0;
-  fNEvents   = 0;
-  fTime1     = 0.;
-  
   Reset();
 }
 // -------------------------------------------------------------------------
@@ -74,10 +70,6 @@ CbmStsDigitize::CbmStsDigitize(Int_t iVerbose)
   fDigis       = NULL;
   fDigiMatches = NULL;
   fDigiScheme  = new CbmStsDigiScheme();
-  fNStations = 0;
-  fNEvents   = 0;
-  fTime1     = 0.;
-  
   Reset();
 }
 // -------------------------------------------------------------------------
@@ -93,10 +85,6 @@ CbmStsDigitize::CbmStsDigitize(const char* name, Int_t iVerbose)
   fDigis       = NULL;
   fDigiMatches = NULL;
   fDigiScheme  = new CbmStsDigiScheme();
-  fNStations = 0;
-  fNEvents   = 0;
-  fTime1     = 0.;
-  
   Reset();
 }
 // -------------------------------------------------------------------------
@@ -260,7 +248,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
   }  // StsPoint loop
 
   // Screen output
-
+  fTimer.Stop();
   if ( fVerbose ) {
     cout << "+ ";
     cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
@@ -269,8 +257,6 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	 << ", outside " << fNOutside << ", multihits " << fNMulti 
 	 << ", digis " << fNDigis << endl;
   }
-  fNEvents++;
-  fTime1 += fTimer.RealTime();
 }
 // -------------------------------------------------------------------------
 
@@ -278,7 +264,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
  
 // -----   Private method SetParContainers   -------------------------------
 void CbmStsDigitize::SetParContainers() {
-  
+
   // Get run and runtime database
   CbmRunAna* run = CbmRunAna::Instance();
   if ( ! run ) Fatal("SetParContainers", "No analysis run");
@@ -326,7 +312,7 @@ InitStatus CbmStsDigitize::Init() {
   }
   
   return kERROR;
- 
+
 }
 // -------------------------------------------------------------------------
 
@@ -334,7 +320,7 @@ InitStatus CbmStsDigitize::Init() {
 
 // -----   Private method ReInit   -----------------------------------------
 InitStatus CbmStsDigitize::ReInit() {
-  
+
   // Clear digitisation scheme
   fDigiScheme->Clear();
 
@@ -342,7 +328,7 @@ InitStatus CbmStsDigitize::ReInit() {
   if ( fDigiScheme->Init(fGeoPar, fDigiPar) ) return kSUCCESS;
 
   return kERROR;
-  
+
 }
 // -------------------------------------------------------------------------
 
@@ -350,26 +336,14 @@ InitStatus CbmStsDigitize::ReInit() {
 
 // -----   Private method Reset   ------------------------------------------
 void CbmStsDigitize::Reset() {
- 
   fNPoints = fNFailed = fNOutside = fNMulti = fNDigis = 0;
   fChannelMap.clear();
   if ( fDigis ) fDigis->Clear();
   if ( fDigiMatches ) fDigiMatches->Clear();
-
 }
 // -------------------------------------------------------------------------
 
-void CbmStsDigitize::Finish() {
-  fTimer.Stop();
-  cout << endl;
-  cout << "============================================================"
-       << endl;
-  cout << "===== " << fName << ": Run summary " << endl;
-  cout << "===== Average time  : " << setprecision(4) << setw(8) << right
-       << fTime1 / Double_t(fNEvents)  << " s" << endl;
-  cout << "============================================================"
-       << endl;
-}
+
 
 
 

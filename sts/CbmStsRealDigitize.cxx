@@ -7,6 +7,7 @@
 
 
 
+
 // Includes from ROOT
 #include "TClonesArray.h"
 #include "TObjArray.h"
@@ -66,11 +67,10 @@ CbmStsRealDigitize::CbmStsRealDigitize() : CbmTask("STS Digitizer", 1) {
 
   fStep = 0.001;
 
-  fFThreshold    = 0.001;
-  fBThreshold    = 0.001;
-  fFNoiseWidth   = 0.0;
-  fBNoiseWidth   = 0.0;
-
+  fFThreshold  = 0.001;
+  fBThreshold  = 0.001;
+  fFNoiseWidth = 0.0;
+  fBNoiseWidth = 0.0;
 
   fFNofBits    = 20;
   fBNofBits    = 20;
@@ -95,11 +95,10 @@ CbmStsRealDigitize::CbmStsRealDigitize(Int_t iVerbose)
 
   fStep = 0.001;
 
-  fFThreshold    = 0.001;
-  fBThreshold    = 0.001;
-  fFNoiseWidth   = 0.0;
-  fBNoiseWidth   = 0.0;
- 
+  fFThreshold  = 0.001;
+  fBThreshold  = 0.001;
+  fFNoiseWidth = 0.0;
+  fBNoiseWidth = 0.0;
 
   fFNofBits    = 20;
   fBNofBits    = 20;
@@ -124,11 +123,10 @@ CbmStsRealDigitize::CbmStsRealDigitize(const char* name, Int_t iVerbose)
 
   fStep = 0.001;
 
-  fFThreshold    = 0.001;
-  fBThreshold    = 0.001;
-  fFNoiseWidth   = 0.0;
-  fBNoiseWidth   = 0.0;
-
+  fFThreshold  = 0.001;
+  fBThreshold  = 0.001;
+  fFNoiseWidth = 0.0;
+  fBNoiseWidth = 0.0;
 
   fFNofBits    = 20;
   fBNofBits    = 20;
@@ -160,7 +158,7 @@ CbmStsRealDigitize::~CbmStsRealDigitize() {
 void CbmStsRealDigitize::Exec(Option_t* opt) {
 
 //   cout << "threshold = " << fFThreshold << endl;
- 
+
   // Reset all eventwise counters
   fTimer.Start();
   Reset();
@@ -176,7 +174,6 @@ void CbmStsRealDigitize::Exec(Option_t* opt) {
   Double_t nOutside = 0.;
   Double_t nDigisF  = 0.;
   Double_t nDigisB  = 0.;
-  
 
   // Loop over all StsPoints
   if ( ! fPoints ) {
@@ -211,10 +208,9 @@ void CbmStsRealDigitize::Exec(Option_t* opt) {
   
   for (Int_t iStation=fDigiScheme->GetNStations(); iStation > 0 ; ) {
     CbmStsStation* station = fDigiScheme->GetStation(--iStation);
-    
     for (Int_t iSector=station->GetNSectors(); iSector > 0 ; ) {
       CbmStsSector* sector = station->GetSector(--iSector);
-      
+
       map<Int_t, set<Int_t> >::iterator mapCh;
 
       for (mapCh=fFChannelPointsMap.begin(); mapCh!=fFChannelPointsMap.end(); mapCh++)
@@ -246,22 +242,14 @@ void CbmStsRealDigitize::Exec(Option_t* opt) {
       Int_t sectorDetId = sector->GetDetectorId();
       
       for ( Int_t ifstr = 0 ; ifstr < nChannels ; ifstr++ ) {
-   
 	if ( fStripSignalF[ifstr] < fFThreshold ) continue;
-	Double_t generator;
-	generator = fGen->Rndm()*100.;	
 // 	cout << "digi#" << fNDigis << " -> making fdigi at " << stationNr << "," << sectorNr 
-// 	     << " at channel " << ifstr << " with signal " << fStripSignalF[ifstr] << endl;        
-	/*if (generator< fStripDeadTime*occupancy [iStation][iSector][ifstr/125])
-	{
-	cout << "OCCUPANCYF [" << iStation+1 << "][" << iSector+1 << "][" << ifstr/125 << "] "<< occupancy [iStation][iSector][ifstr/125] << "%" << " generator = "<<generator<< endl;
-	}*/
-	//if (generator< fStripDeadTime*occupancy [iStation][iSector][ifstr/125]) ifstr = ifstr+2;
-	//if (generator< fStripDeadTime*occupancy [iStation][iSector][ifstr/125]) continue;
-	
+// 	     << " at channel " << ifstr << " with signal " << fStripSignalF[ifstr] << endl;
 	Int_t digiFSignal = 1+(Int_t)((fStripSignalF[ifstr]-fFThreshold)/fFMinStep);
 	if ( digiFSignal >= fFNofSteps ) digiFSignal = fFNofSteps-1;
-	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,0, ifstr, digiFSignal, 0);
+	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
+						  0, ifstr, 
+						  digiFSignal, 0);
 	//						  fStripSignalF[ifstr], 0);
 	set<Int_t>::iterator it1;
 	set<Int_t> chPnt = fFChannelPointsMap[ifstr];
@@ -288,17 +276,11 @@ void CbmStsRealDigitize::Exec(Option_t* opt) {
       
       for ( Int_t ibstr = 0 ; ibstr < nChannels ; ibstr++ ) {
 	if ( fStripSignalB[ibstr] < fBThreshold ) continue;
-	Double_t generator;
-	generator = fGen->Rndm()*100.;
-	/*if (generator< fStripDeadTime*occupancy [iStation][iSector][ibstr/125])
-	{
-	cout << "OCCUPANCYB [" << iStation+1 << "][" << iSector+1 << "][" << ibstr/125 << "] "<< occupancy [iStation][iSector][ibstr/125] << "%  generator = "<<generator<< endl;
-	}*/
-	//if (generator< fStripDeadTime*occupancy [iStation][iSector][ibstr/125]) ibstr = ibstr+2;
-	//if (generator< fStripDeadTime*occupancy [iStation][iSector][ibstr/125]) continue;
 	Int_t digiBSignal = 1+(Int_t)((fStripSignalB[ibstr]-fBThreshold)/fBMinStep);
 	if ( digiBSignal >= fBNofSteps ) digiBSignal = fBNofSteps-1;
-	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,1, ibstr, digiBSignal, 0);
+	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
+						  1, ibstr, 
+						  digiBSignal, 0);
 	//						  fStripSignalB[ibstr], 0);
 	set<Int_t>::iterator it1;
 	set<Int_t> chPnt = fBChannelPointsMap[ibstr];
@@ -506,12 +488,11 @@ InitStatus CbmStsRealDigitize::Init() {
 
   fEnergyLossToSignal    = 200000.;
 
-  fFNofSteps = TMath::Power(2,(Double_t)fFNofBits);
-  fBNofSteps = TMath::Power(2,(Double_t)fBNofBits);
-  
+  fFNofSteps = TMath::Power(2,fFNofBits);
+  fBNofSteps = TMath::Power(2,fBNofBits);
+
   // Build digitisation scheme
   if ( fDigiScheme->Init(fGeoPar, fDigiPar) ) {
-
     MakeSets();
 
     if      (fVerbose == 1 || fVerbose == 2) fDigiScheme->Print(kFALSE);
@@ -546,8 +527,10 @@ InitStatus CbmStsRealDigitize::ReInit() {
   return kERROR;
 
 }
-// -----   Private method MakeSets   ---------------------------------------
+// -------------------------------------------------------------------------
 
+
+// -----   Private method MakeSets   ---------------------------------------
 void CbmStsRealDigitize::MakeSets() {
 
   fPointMap.clear();
@@ -574,75 +557,6 @@ void CbmStsRealDigitize::MakeSets() {
     fBChannelPointsMap[  ichan] = b;
   }
 }
-// ---------------- With occupancy --------------------
-/*void CbmStsRealDigitize::MakeSets() {
-
-
-  fPointMap.clear();
-  Int_t nStations = fDigiScheme->GetNStations();
-      
-  TH1F* fhFNofDigisPChip[10][1000][20];
-  TH1F* fhBNofDigisPChip[10][1000][20];
-  TString qaFileName;
-  qaFileName = "sts.reco_real_corr_0vs15_mbias.root";
-  cout << "Occupancy read from file: \"" << qaFileName.Data() << "\"" << endl;
-  TFile* occuF = TFile::Open(qaFileName.Data());  
-  if ( !occuF )
-    { cout << "sorry, no file" << endl; return; }
-  TString directoryName = "STSFindHitsQA";
-  
-  Double_t fSectorWidth = 0.;
-  
-  for (Int_t iStation=0; iStation<nStations; iStation++) {
-    CbmStsStation* station = fDigiScheme->GetStation(iStation);
-    Int_t nSectors = station->GetNSectors();
-    
-    for (Int_t iSector=0; iSector<nSectors; iSector++) {
-      CbmStsSector* sector = station->GetSector(iSector);
-      Int_t nSensors = sector->GetNSensors();
-      Int_t nChannels = sector->GetNChannelsFront();
-      
-      for (Int_t iSensor=0; iSensor<nSensors; iSensor++) {
-	CbmStsSensor* sensor = sector->GetSensor(iSensor);
-	set<Int_t> a;
-	fPointMap[sensor] = a;
-	fSectorWidth = 10.*sensor->GetLx();
-      
-      
-        Int_t nofChips = (Int_t)(TMath::Ceil(fSectorWidth/7.5));  // fwidth in mm, 7.5mm = 125(channels)*60mum(pitch)
-        Int_t lastChip = (Int_t)(TMath::Ceil(10.*fSectorWidth));
-        lastChip = lastChip%75;
-        lastChip = (Int_t)(lastChip/.6);
-         //     cout << nofChips << " chips on " << iStation+1 << " " << iSector+1 << endl;
-        TString addInfo = "";
-	if ( nofChips != 8 ) {
-	addInfo = Form(", only %d strips",lastChip);
-	//	cout << fSectorWidth << " -> " << addInfo.Data() << endl;
-        }
-   
-      
-        for ( Int_t iChip = 0 ; iChip < nofChips ; iChip++ ) {
-          fhFNofDigisPChip[iStation][iSector][iChip]=(TH1F*)occuF->Get(Form("%s/Station%d/hNofFiredDigisFSt%dSect%dChip%d",directoryName.Data(),iStation+1,iStation+1,iSector+1,iChip+1));
-          fhBNofDigisPChip[iStation][iSector][iChip]=(TH1F*)occuF->Get(Form("%s/Station%d/hNofFiredDigisBSt%dSect%dChip%d",directoryName.Data(),iStation+1,iStation+1,iSector+1,iChip+1));
-          occupancy [iStation][iSector][iChip] = 100.*fhFNofDigisPChip[iStation][iSector][iChip]->GetMean()/125.;
-          occupancy [iStation][iSector][iChip] = 100.*fhBNofDigisPChip[iStation][iSector][iChip]->GetMean()/125.;
-          //cout << "OCCUPANCY [" << iStation+1 << "][" << iSector+1 << "][" << iChip << "] "<< occupancy [iStation][iSector][iChip] << "%" << endl;
-        }
-        
-
-      }
-    }
-  }
-  fFChannelPointsMap.clear();
-  fBChannelPointsMap.clear();
-  for ( Int_t ichan = 2000 ; ichan > 0 ; ) {
-    set<Int_t> a;
-    fFChannelPointsMap[--ichan] = a;
-    set<Int_t> b;
-    fBChannelPointsMap[  ichan] = b;
-  }
- 
-}*/
 // -------------------------------------------------------------------------
 
 

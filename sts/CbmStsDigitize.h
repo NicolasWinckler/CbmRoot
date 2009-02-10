@@ -58,9 +58,6 @@ class CbmStsDigitize : public CbmTask
 
   /** Execution **/
   virtual void Exec(Option_t* opt);
-  
-  /** Virtual method Finish **/
-  virtual void Finish();
 
 
 
@@ -99,14 +96,8 @@ class CbmStsDigitize : public CbmTask
   /** Reset eventwise counters **/
   void Reset();
 
-  Int_t    fNStations;
-  Int_t    fNEvents;        /** Number of events with success **/
-      /** Total real time used for good events **/
-  Double_t fTime1     ;
-  Double_t fTime2     ;
-  Double_t fTime3     ;
-  Double_t fTime4     ;
-  Double_t fTime5     ;
+
+
   ClassDef(CbmStsDigitize,1);
 
 };

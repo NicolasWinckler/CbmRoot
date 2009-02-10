@@ -95,7 +95,7 @@ void CbmStsFitTracks::Exec(Option_t* opt) {
   fNEvents++;
   fTime    += fTimer.RealTime();
   fNTracks += Double_t(nTracks);
-  fTime    += fTimer.RealTime();
+  
 }
 // -------------------------------------------------------------------------
 

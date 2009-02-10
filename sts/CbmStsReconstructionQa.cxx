@@ -458,10 +458,8 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
 	     << ", true hits " << nTrue << endl;
 
       // Fill histograms for reconstructed tracks
-      if ( stsTrack->GetParamFirst()->GetQp() ){
-	cout<<"LLLLLLLLLLLLLLLLLLLLLLL"<<endl;
+      if ( stsTrack->GetParamFirst()->GetQp() )
 	fhMomResAll->Fill(mom,100.*(mom-1./TMath::Abs(stsTrack->GetParamFirst()->GetQp()))/mom);
-	}
       nRecAll++;
       fhMomRecAll->Fill(mom);
       fhNpRecAll->Fill(Double_t(nHits));

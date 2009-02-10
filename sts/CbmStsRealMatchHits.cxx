@@ -395,8 +395,8 @@ void CbmStsRealMatchHits::ExecReal(Option_t* opt) {
     
     for ( Int_t ihit = startHit ; ihit < finalHit ; ihit++ ) {
       CbmStsHit *stsHit= (CbmStsHit*)fHits->At(ihit);
-      if ( ( TMath::Abs(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ())) < 0.01 ) &&
- 	   ( TMath::Abs(stsHit->GetY()-stsPoint->GetY(stsHit->GetZ())) < 0.04 ) ) {
+      if ( ( TMath::Abs(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ())) < .01 ) &&
+ 	   ( TMath::Abs(stsHit->GetY()-stsPoint->GetY(stsHit->GetZ())) < .04 ) ) {
 // 	cout << "matching " 
 // 	     << "X: " << stsHit->GetX() << " - " << stsPoint->GetX(stsHit->GetZ())
 // 	     << "Y: " << stsHit->GetY() << " - " << stsPoint->GetY(stsHit->GetZ()) << endl;

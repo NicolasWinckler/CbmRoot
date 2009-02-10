@@ -488,8 +488,8 @@ InitStatus CbmStsRealDigitize::Init() {
 
   fEnergyLossToSignal    = 200000.;
 
-  fFNofSteps = TMath::Power(2,fFNofBits);
-  fBNofSteps = TMath::Power(2,fBNofBits);
+  fFNofSteps = (Int_t)TMath::Power(2,(Double_t)fFNofBits);
+  fBNofSteps = (Int_t)TMath::Power(2,(Double_t)fBNofBits);
 
   // Build digitisation scheme
   if ( fDigiScheme->Init(fGeoPar, fDigiPar) ) {

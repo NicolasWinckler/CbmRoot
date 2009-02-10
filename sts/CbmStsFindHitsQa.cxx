@@ -66,7 +66,6 @@ CbmStsFindHitsQa::CbmStsFindHitsQa() : CbmTask("STS Hit Finder", 1) {
   fNEvents   = 0;
   fTime1     = 0.;
   
-
   fDigiScheme = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -88,7 +87,6 @@ CbmStsFindHitsQa::CbmStsFindHitsQa(Int_t iVerbose)
   fNEvents   = 0;
   fTime1     = 0.;
   
-
   fDigiScheme = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -109,7 +107,6 @@ CbmStsFindHitsQa::CbmStsFindHitsQa(const char* name, Int_t iVerbose)
   fNStations = 0;
   fNEvents   = 0;
   fTime1     = 0.;
-  
 
   fDigiScheme = new CbmStsDigiScheme();
 }
@@ -359,10 +356,10 @@ void CbmStsFindHitsQa::CreateHistos() {
     fHistoListPS[ist]->Add(fhHitPointCorrelation[ist]);
     fHistoListPS[ist]->Add(fhHitPointPuls[ist]);
 
-    fhHitPointCorrelationU[ist] = new TH2F(Form("h111HitPointCorrelationU%i",ist+1),
+    fhHitPointCorrelationU[ist] = new TH2F(Form("hHitPointCorrelationU%i",ist+1),
 					   Form("Hit vs point correlation at station %i",ist+1),
 					   500,-.1, .1,500,-.1,.1);
-    fhHitPointCorrelationB[ist] = new TH2F(Form("h222HitPointCorrelationB%i",ist+1),
+    fhHitPointCorrelationB[ist] = new TH2F(Form("hHitPointCorrelationB%i",ist+1),
 					   Form("Hit vs point correlation at station %i",ist+1),
 					   500,-.1, .1,500,-.1,.1);
     fHistoListPS[ist]->Add(fhHitPointCorrelationU[ist]);
@@ -622,8 +619,7 @@ void CbmStsFindHitsQa::Finish() {
   cout << "============================================================"
        << endl;
   cout << "===== " << fName << ": Run summary " << endl;
-  cout << "===== Average time  : " << setprecision(4) << setw(8) << right
-       << fTime1 / Double_t(fNEvents)  << " s" << endl;
+  cout << "===== "<< endl;
   cout << "============================================================"
        << endl;
 	

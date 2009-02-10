@@ -43,10 +43,6 @@ CbmStsFindHits::CbmStsFindHits() : CbmTask("STS Hit Finder", 1) {
   fDigis   = NULL;
   fHits    = NULL;
   fDigiScheme = new CbmStsDigiScheme();
-  fNStations = 0;
-  fNEvents   = 0;
-  fTime1     = 0.;
-  
 }
 // -------------------------------------------------------------------------
 
@@ -60,10 +56,6 @@ CbmStsFindHits::CbmStsFindHits(Int_t iVerbose)
   fDigis   = NULL;
   fHits    = NULL;
   fDigiScheme = new CbmStsDigiScheme();
-  fNStations = 0;
-  fNEvents   = 0;
-  fTime1     = 0.;
- 
 }
 // -------------------------------------------------------------------------
 
@@ -77,10 +69,6 @@ CbmStsFindHits::CbmStsFindHits(const char* name, Int_t iVerbose)
   fDigis   = NULL;
   fHits    = NULL;
   fDigiScheme = new CbmStsDigiScheme();
-  fNStations = 0;
-  fNEvents   = 0;
-  fTime1     = 0.;
-  
 }
 // -------------------------------------------------------------------------
 
@@ -175,7 +163,7 @@ void CbmStsFindHits::Exec(Option_t* opt) {
     
   }       // Station loop
 
-  
+  fTimer.Stop();  
   if ( fVerbose > 1 ) {
     cout << endl;
     cout << "-I- " << fName << ":Event summary" << endl;
@@ -193,7 +181,8 @@ void CbmStsFindHits::Exec(Option_t* opt) {
 	 << " s, digis " << nDigisF << " / " << nDigisB << ", hits: " 
 	 << nHits << endl;
   }
- fTime1 += fTimer.RealTime();
+
+  
 }
 // -------------------------------------------------------------------------
 
@@ -202,7 +191,6 @@ void CbmStsFindHits::Exec(Option_t* opt) {
 
 // -----   Private method SetParContainers   -------------------------------
 void CbmStsFindHits::SetParContainers() {
-
 
   // Get run and runtime database
   CbmRunAna* run = CbmRunAna::Instance();
@@ -252,7 +240,6 @@ InitStatus CbmStsFindHits::Init() {
        << fDigiScheme->GetNChannels() << endl;
   
   return kSUCCESS; 
-  
 }
 // -------------------------------------------------------------------------
 
@@ -282,7 +269,6 @@ InitStatus CbmStsFindHits::ReInit() {
        << fDigiScheme->GetNChannels() << endl;
   
   return kSUCCESS;
-  
 }
 // -------------------------------------------------------------------------
 
@@ -291,7 +277,6 @@ InitStatus CbmStsFindHits::ReInit() {
 
 // -----   Private method MakeSets   ---------------------------------------
 void CbmStsFindHits::MakeSets() {
-
 
   fDigiMapF.clear();
   fDigiMapB.clear();
@@ -309,6 +294,7 @@ void CbmStsFindHits::MakeSets() {
       }
     }
   }
+  
 }
 // -------------------------------------------------------------------------
 
@@ -375,7 +361,6 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
 			       CbmStsSector* sector, 
 			       set<Int_t>& fSet, set<Int_t>& bSet) {
 
-
   // Counter
   Int_t nNew = 0;
 
@@ -400,10 +385,6 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
   Double_t tanstrF = TMath::Tan(stereoF);
   
   // Calculate error matrix in sector system
-  
- 
-   
-    
   Double_t vX, vY, vXY;
   if ( iType == 1 ) {
     vX  = dx / TMath::Sqrt(12.);
@@ -411,18 +392,9 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
     vXY = 0.;
   }
   else if ( iType == 2 || iType == 3 ) {
-  
-     if (stereoF==0.) {
-
-      vX  = dx / TMath::Sqrt(12.);
-      vY  = (vX/TMath::Sqrt(2))*(1./TMath::Sin(stereoB/2.));
-      vXY = -1. * dx * dx / tanstrB;
-     }
-     else {
-      vX  = ((dx / TMath::Sqrt(24))*(1./TMath::Cos(stereoB)));
-      vY  = ((dx / TMath::Sqrt(24))*(1./TMath::Sin(stereoB)));
-      vXY = 0.;
-    }
+    vX  = dx / TMath::Sqrt(12.);
+    vY  = dx / TMath::Sqrt(6.) / TMath::Abs(tanstrB);
+    vXY = -1. * dx * dx / 12. / tanstrB;
   }
   else {
     cerr << "-E- " << fName << "::FindHits: Illegal sector type "
@@ -532,17 +504,7 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
   return nNew; 
 }
 // -------------------------------------------------------------------------
-// -----   Virtual method Finish   -----------------------------------------
-void CbmStsFindHits::Finish() {
-  cout << endl;
-  cout << "============================================================"
-       << endl;
-  cout << "===== " << fName << ": Run summary " << endl;
-  cout << "===== Average time  : " << setprecision(4) << setw(8) << right
-       << fTime1 / Double_t(fNEvents)  << " s" << endl;
-  cout << "============================================================"
-       << endl;
-}
+
 /*
 // -----   Private method FindHits   ---------------------------------------
 Int_t CbmStsFindHits::FindHits(CbmStsStation* station,

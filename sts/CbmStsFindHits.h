@@ -95,7 +95,7 @@ class CbmStsFindHits : public FairTask
   /** Sort digis sectorwise  **/
   void SortDigis();
   
-  virtual void Finish();
+//  virtual void Finish() { };
 
 
   /** Find hits in one sector **/

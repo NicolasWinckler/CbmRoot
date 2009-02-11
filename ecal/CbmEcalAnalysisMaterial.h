@@ -1,7 +1,7 @@
 #ifndef CBMECALANALYSISMATERIAL_H
 #define CBMECALANALYSISMATERIAL_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TString.h"
 
@@ -11,7 +11,7 @@ class TTree;
 class TClonesArray;
 
 
-class CbmEcalAnalysisMaterial : public CbmTask
+class CbmEcalAnalysisMaterial : public FairTask
 {
 public:
   CbmEcalAnalysisMaterial(const char* name, const Int_t iVerbose=0);

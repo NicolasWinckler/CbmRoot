@@ -2,7 +2,7 @@
  *  $Id$
  *
  *  Class : CbmDileptonAssignPid
- *  Descripton: This is a task, derived from CbmTask. This works for the real
+ *  Descripton: This is a task, derived from FairTask. This works for the real
  *              data stream to perform electron identification.
  *              Input: Arrays of global, sts, trd track, rich ring and tof hit
  *              arrays.
@@ -17,8 +17,8 @@
 #include "CbmDileptonTrackReal.h"
 #include "CbmDileptonTrackRealCollection.h"
 
-#include "CbmTask.h"
-#include "CbmRootManager.h"
+#include "FairTask.h"
+#include "FairRootManager.h"
 #include "CbmVertex.h"
 #include "CbmGlobalTrack.h"
 #include "CbmMCTrack.h"
@@ -48,7 +48,7 @@ using std::setw;
 using std::setprecision;
 using std::right;
 
-CbmDileptonAssignPid::CbmDileptonAssignPid() : CbmTask("DileptonAssignPid"){
+CbmDileptonAssignPid::CbmDileptonAssignPid() : FairTask("DileptonAssignPid"){
     fTrackRealColl = new CbmDileptonTrackRealCollection();
 
     // Initialize the cut values
@@ -92,7 +92,7 @@ CbmDileptonAssignPid::CbmDileptonAssignPid() : CbmTask("DileptonAssignPid"){
 
     fVerbose = 0;
 }
-CbmDileptonAssignPid::CbmDileptonAssignPid(Int_t iVerbose, TString fname, const char* name) : CbmTask(name,iVerbose){
+CbmDileptonAssignPid::CbmDileptonAssignPid(Int_t iVerbose, TString fname, const char* name) : FairTask(name,iVerbose){
     fTrackRealColl = new CbmDileptonTrackRealCollection();
 
      // Initialize the cut values
@@ -145,7 +145,7 @@ InitStatus CbmDileptonAssignPid::Init(){
     //Get all the necessary arrays
 
     // Get pointers to root manager
-    fRootManager = CbmRootManager::Instance();
+    fRootManager = FairRootManager::Instance();
 
     // Get Primary Vertex
     fPrimVertex = (CbmVertex*) fRootManager->GetObject("PrimaryVertex");
@@ -256,7 +256,7 @@ void CbmDileptonAssignPid::Exec(Option_t* opt){
 	if(fVerbose>1) cout<<"-I- CbmDileptonAssignPid::Exec() : "<<iGlobal<<" "<<chiPrimary<<endl;
 
 	// Fit tracks to the primary vertex
-	CbmTrackParam VtxTrack;
+	FairTrackParam VtxTrack;
 	fFitter.FitToVertex(stsTrack, fPrimVertex, &VtxTrack);
 
 	TVector3 position;

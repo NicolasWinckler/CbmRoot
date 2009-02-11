@@ -18,13 +18,13 @@
 #ifndef CBMSTTMATCHTRACKS_H
 #define CBMSTTMATCHTRACKS_H 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include <map>
 
 class TClonesArray;
 
-class CbmSttMatchTracks : public CbmTask
+class CbmSttMatchTracks : public FairTask
 {
 
  public:
@@ -38,10 +38,10 @@ class CbmSttMatchTracks : public CbmTask
   /** Constructor with name, title and verbosity
    **
    *@param name     Name of taks
-   *@param title    Title of task   (default CbmTask)
+   *@param title    Title of task   (default FairTask)
    *@param verbose  Verbosity level (default 1)
    **/
-  CbmSttMatchTracks(const char* name, const char* title = "CbmTask",
+  CbmSttMatchTracks(const char* name, const char* title = "FairTask",
 		    Int_t verbose = 1);
 
   /** Destructor **/
@@ -59,7 +59,7 @@ class CbmSttMatchTracks : public CbmTask
  private:
 
   TClonesArray* fTracks;       // Array of CbmSttTracks
-  TClonesArray* fPoints;       // Array of CbmMCPoints
+  TClonesArray* fPoints;       // Array of FairMCPoints
   TClonesArray* fHits;         // Array of CbmSttHits
   TClonesArray* fMatches;      // Array of CbmSttTrackMatch
 

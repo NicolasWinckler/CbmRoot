@@ -62,14 +62,14 @@
 #include "CbmEcalInf.h"
 #include "CbmEcalStructure.h"
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmStack.h"
 
 #include "TClonesArray.h"
 #include "TString.h"
 #include "TVector3.h"
 
-class CbmEcalHitProducer : public CbmTask {
+class CbmEcalHitProducer : public FairTask {
 
 public:
 

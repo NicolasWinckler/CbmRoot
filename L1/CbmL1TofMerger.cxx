@@ -4,7 +4,7 @@
 // ------------------------------------------------------------------
 #include "CbmL1TofMerger.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmTofHit.h"
 #include "CbmTrdTrack.h"
 #include "CbmGlobalTrack.h"
@@ -61,7 +61,7 @@ CbmL1TofMerger::~CbmL1TofMerger()
 void CbmL1TofMerger::Init()
 {
     // Initialisation
-    CbmRootManager *rootMgr = CbmRootManager::Instance();
+    FairRootManager *rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
 	cout << "-E- CbmL1TofMerger::Init(): "
 	    << "ROOT manager is not instantiated!" << endl;

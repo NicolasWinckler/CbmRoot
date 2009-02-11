@@ -19,12 +19,12 @@
 #define CBM_RICH_FIT_RINGS 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class CbmRichRingFitter;
 class TClonesArray;
 
-class CbmRichFitRings : public CbmTask
+class CbmRichFitRings : public FairTask
 {
 
  public:
@@ -46,7 +46,7 @@ class CbmRichFitRings : public CbmTask
    *@param ftter  Pointer to RICH ring fitter concrete class
    *@param verbose  Verbosity level
    **/
-  CbmRichFitRings(const char* name, const char* title = "CbmTask",
+  CbmRichFitRings(const char* name, const char* title = "FairTask",
 		  CbmRichRingFitter* fitter = NULL, Int_t verbose = 1);
 
 

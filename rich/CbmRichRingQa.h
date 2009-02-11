@@ -22,7 +22,7 @@
 
 #include "CbmRichRing.h"
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -31,10 +31,10 @@
 #include <fstream>
 
 
-class CbmRichRingQa : public CbmTask{
+class CbmRichRingQa : public FairTask{
     
     TClonesArray* fRings;        // Array of CbmRichRings
-    TClonesArray* fPoints;       // Array of CbmMCPoints
+    TClonesArray* fPoints;       // Array of FairMCPoints
     TClonesArray* fTracks;       // Array of CbmMCTracks
     TClonesArray* fHits;         // Array of CbmRichHits
     TClonesArray* fMatches;      // Array of CbmRichRingMatch

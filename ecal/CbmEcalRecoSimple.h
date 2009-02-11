@@ -7,7 +7,7 @@
 #ifndef CBMECALRECOSIMPLE_H
 #define CBMECALRECOSIMPLE_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "TString.h"
 
 class TChain;
@@ -22,7 +22,7 @@ class CbmEcalShowerLib;
 class CbmEcalCalibration;
 class TFormula;
 
-class CbmEcalRecoSimple : public CbmTask
+class CbmEcalRecoSimple : public FairTask
 {
 public:
   /** Default constructor. Requirement of ROOT system **/

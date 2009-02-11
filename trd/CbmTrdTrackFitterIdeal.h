@@ -9,7 +9,7 @@
 
 class TClonesArray;
 class CbmTrdPoint;
-class CbmTrackParam;
+class FairTrackParam;
 class CbmTrdTrack;
 
 
@@ -26,7 +26,7 @@ public:
     void Init();
     Int_t DoFit(CbmTrdTrack* pTrack);
 
-    void SetTrackParam(CbmTrdPoint* point, CbmTrackParam* trackParam);
+    void SetTrackParam(CbmTrdPoint* point, FairTrackParam* trackParam);
 
     ClassDef(CbmTrdTrackFitterIdeal,1);
 };

@@ -13,7 +13,7 @@
 #include "CbmGeoRichPar.h"
 
 #include "CbmRichContFact.h"
-#include "CbmRuntimeDb.h"
+#include "FairRuntimeDb.h"
 
 #include <iostream>
 #include <iomanip>
@@ -27,14 +27,14 @@ CbmRichContFact::CbmRichContFact() {
   fName="CbmRichContFact";
   fTitle="Factory for parameter containers in libRich";
   setAllContainers();
-  CbmRuntimeDb::instance()->addContFactory(this);
+  FairRuntimeDb::instance()->addContFactory(this);
 }
 
 void CbmRichContFact::setAllContainers() {
   /** Creates the Container objects with all accepted contexts and adds them to
    *  the list of containers for the STS library.*/
 
-    CbmContainer* p= new CbmContainer("CbmGeoRichPar",
+    FairContainer* p= new FairContainer("CbmGeoRichPar",
                                           "Rich Geometry Parameters",
                                           "TestDefaultContext");
     p->addContext("TestNonDefaultContext");
@@ -42,12 +42,12 @@ void CbmRichContFact::setAllContainers() {
     containers->Add(p);
 }
 
-CbmParSet* CbmRichContFact::createContainer(CbmContainer* c) {
+FairParSet* CbmRichContFact::createContainer(FairContainer* c) {
   /** Calls the constructor of the corresponding parameter container.
    * For an actual context, which is not an empty string and not the default context
    * of this container, the name is concatinated with the context. */
   const char* name=c->GetName();
-  CbmParSet* p=NULL;
+  FairParSet* p=NULL;
   if (strcmp(name,"CbmGeoRichPar")==0) {
     p=new CbmGeoRichPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
   }

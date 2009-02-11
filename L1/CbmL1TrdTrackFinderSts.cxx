@@ -5,11 +5,11 @@
 
 #include "CbmL1TrdTrackFinderSts.h"
 
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmBaseParSet.h"
-#include "CbmRuntimeDb.h"
-#include "CbmDetector.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairBaseParSet.h"
+#include "FairRuntimeDb.h"
+#include "FairDetector.h"
 #include "CbmTrdPoint.h"
 #include "CbmTrdHit.h"
 #include "CbmStsTrack.h"
@@ -760,7 +760,7 @@ void CbmL1TrdTrackFinderSts::DataBranches()
     // Initialisation
 
     // Get pointer to the ROOT manager
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
         cout << "-E- CbmL1TrdTrackFinderSts::DataBranches : "
             << "ROOT manager is not instantiated" << endl;
@@ -794,23 +794,23 @@ void CbmL1TrdTrackFinderSts::TrdLayout()
 {
     // Determine the actual TRD layout from the parameter file
 
-    // Get the pointer to the singleton CbmRunAna object
-    CbmRunAna* ana = CbmRunAna::Instance();
+    // Get the pointer to the singleton FairRunAna object
+    FairRunAna* ana = FairRunAna::Instance();
     if(NULL == ana) {
         cout << "-E- CbmL1TrdTrackFinderSts::TrdLayout :"
-            <<" no CbmRunAna object!" << endl;
+            <<" no FairRunAna object!" << endl;
         return;
     }
     // Get the pointer to run-time data base
-    CbmRuntimeDb* rtdb = ana->GetRuntimeDb();
+    FairRuntimeDb* rtdb = ana->GetRuntimeDb();
     if(NULL == rtdb) {
         cout << "-E- CbmL1TrdTrackFinderSts::TrdLayout :"
             <<" no runtime database!" << endl;
         return;
     }
     // Get the pointer to container of base parameters
-    CbmBaseParSet* baseParSet =
-        (CbmBaseParSet*) rtdb->getContainer("CbmBaseParSet");
+    FairBaseParSet* baseParSet =
+        (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
     if(NULL == baseParSet) {
         cout << "-E- CbmL1TrdTrackFinderSts::TrdLayout :"
             <<" no container of base parameters!" << endl;
@@ -824,7 +824,7 @@ void CbmL1TrdTrackFinderSts::TrdLayout()
         return;
     }
     // Find TRD detector
-    CbmDetector* trd = (CbmDetector*) detList->FindObject("TRD");
+    FairDetector* trd = (FairDetector*) detList->FindObject("TRD");
     if(NULL == trd) {
         cout << "-E- CbmL1TrdTrackFinderSts::TrdLayout :"
             << " no TRD detector!" << endl;

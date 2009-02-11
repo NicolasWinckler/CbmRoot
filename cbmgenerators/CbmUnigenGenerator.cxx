@@ -12,7 +12,7 @@ using namespace std;
 #include "UEvent.h"
 #include "UParticle.h"
 
-#include "CbmPrimaryGenerator.h"
+#include "FairPrimaryGenerator.h"
 #include "CbmUnigenGenerator.h"
 
 
@@ -84,7 +84,7 @@ CbmUnigenGenerator::~CbmUnigenGenerator()
 
 
 // ------------------------------------------------------------------------
-Bool_t CbmUnigenGenerator::ReadEvent(CbmPrimaryGenerator* primGen)
+Bool_t CbmUnigenGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 {
     // Check for input file
     if(NULL==fInputFile || NULL==fInTree) {

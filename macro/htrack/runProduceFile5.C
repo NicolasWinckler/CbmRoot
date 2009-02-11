@@ -84,19 +84,19 @@
   // ------------------------------------------------------------------------
 
   // -----   Create detectors and passive volumes   -------------------------
-  CbmModule* cave   = new CbmCave("CAVE");
+  FairModule* cave   = new CbmCave("CAVE");
   cave->SetGeometryFileName(caveGeom);
 
-  CbmModule* pipe   = new CbmPipe("PIPE");
+  FairModule* pipe   = new CbmPipe("PIPE");
   pipe->SetGeometryFileName(pipeGeom);
 
-  CbmModule* target = new CbmTarget("Target");
+  FairModule* target = new CbmTarget("Target");
   target->SetGeometryFileName(targetGeom);
 
-  CbmModule* magnet = new CbmMagnet("MAGNET");
+  FairModule* magnet = new CbmMagnet("MAGNET");
   magnet->SetGeometryFileName(magnetGeom);
 
-  CbmDetector* sts  = new CbmSts("STS", kTRUE);
+  FairDetector* sts  = new CbmSts("STS", kTRUE);
   sts->SetGeometryFileName(stsGeom);
   // ------------------------------------------------------------------------
 
@@ -117,13 +117,13 @@
   // ------------------------------------------------------------------------
 
   // -----   Create PrimaryGenerator   --------------------------------------
-  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
-  CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+  FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
   primGen->AddGenerator(urqmdGen);
   // ------------------------------------------------------------------------
 
   // -----   Create simulation run   ----------------------------------------
-  CbmRunSim* fRun = new CbmRunSim();
+  FairRunSim* fRun = new FairRunSim();
   fRun->SetName("TGeant3");              // Transport engine
   fRun->SetOutputFile(outFile);          // Output file
   fRun->SetGenerator(primGen);           // PrimaryGenerator
@@ -138,14 +138,14 @@
   // ------------------------------------------------------------------------
 
   // -----   Fill parameter containers   ------------------------------------
-  CbmRuntimeDb* rtdb       = fRun->GetRuntimeDb();
+  FairRuntimeDb* rtdb       = fRun->GetRuntimeDb();
   if (magField != NULL) {
     CbmFieldPar* fieldPar  = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
     fieldPar->SetParameters(magField);
     fieldPar->setChanged();
   }
   Bool_t kParameterMerged  = kTRUE;
-  CbmParRootFileIo* parOut = new CbmParRootFileIo(kParameterMerged);
+  FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
   parOut->open(parFile.Data());
   rtdb->setOutput(parOut);
   rtdb->saveOutput();

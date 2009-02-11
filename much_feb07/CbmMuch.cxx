@@ -14,15 +14,15 @@
 #include "CbmGeoMuchPar.h"
 #include "CbmGeoMuch.h"
 
-#include "CbmGeoInterface.h"
-#include "CbmGeoLoader.h"
-#include "CbmGeoNode.h"
-#include "CbmGeoRootBuilder.h"
-#include "CbmRootManager.h"
+#include "FairGeoInterface.h"
+#include "FairGeoLoader.h"
+#include "FairGeoNode.h"
+#include "FairGeoRootBuilder.h"
+#include "FairRootManager.h"
 #include "CbmStack.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRun.h"
-#include "CbmVolume.h"
+#include "FairRuntimeDb.h"
+#include "FairRun.h"
+#include "FairVolume.h"
 
 #include "TObjArray.h"
 #include "TClonesArray.h"
@@ -53,7 +53,7 @@ ClassImp(CbmMuch)
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuch::CbmMuch(const char* name, Bool_t active) 
-  : CbmDetector(name, active) {
+  : FairDetector(name, active) {
   ResetParameters();
   fMuchCollection = new TClonesArray("CbmMuchPoint");
   fPosIndex = 0;
@@ -80,7 +80,7 @@ CbmMuch::~CbmMuch() {
 
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t CbmMuch::ProcessHits(CbmVolume* vol) {
+Bool_t CbmMuch::ProcessHits(FairVolume* vol) {
   if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
     fTime   = gMC->TrackTime() * 1.0e09;
@@ -140,7 +140,7 @@ Bool_t CbmMuch::ProcessHits(CbmVolume* vol) {
 //  if (mf ) Muchf = (TFolder*) mf->FindObjectAny(GetName());
 //  cout << " Muchf: " << Muchf << endl;
 //  if (Muchf) Muchf->Add( flGeoPar0 ) ;
-//  CbmRootManager::Instance()->WriteFolder();
+//  FairRootManager::Instance()->WriteFolder();
 //  mf->Write("cbmroot",TObject::kWriteDelete);
 //}
 
@@ -169,7 +169,7 @@ void CbmMuch::EndOfEvent() {
 
 // -----   Public method Register   -------------------------------------------
 void CbmMuch::Register() {
-  CbmRootManager::Instance()->Register("MuchPoint", GetName(), fMuchCollection, kTRUE);
+  FairRootManager::Instance()->Register("MuchPoint", GetName(), fMuchCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
 
@@ -226,8 +226,8 @@ void CbmMuch::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 // -----   Public method ConstructGeometry   ----------------------------------
 void CbmMuch::ConstructGeometry() {
 
-  CbmGeoLoader*    geoLoad = CbmGeoLoader::Instance();
-  CbmGeoInterface* geoFace = geoLoad->getGeoInterface();
+  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
+  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
   CbmGeoMuch*       MuchGeo  = new CbmGeoMuch();
   MuchGeo->setGeomFile(GetGeometryFileName());
   geoFace->addGeoModule(MuchGeo);
@@ -236,18 +236,18 @@ void CbmMuch::ConstructGeometry() {
   if (rc) MuchGeo->create(geoLoad->getGeoBuilder());
   TList* volList = MuchGeo->getListOfVolumes();
   // store geo parameter
-  CbmRun *fRun = CbmRun::Instance();
-  CbmRuntimeDb *rtdb= CbmRun::Instance()->GetRuntimeDb();
+  FairRun *fRun = FairRun::Instance();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
   CbmGeoMuchPar* par=(CbmGeoMuchPar*)(rtdb->getContainer("CbmGeoMuchPar"));
   TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
   TObjArray *fPassNodes = par->GetGeoPassiveNodes();
 
   TListIter iter(volList);
-  CbmGeoNode* node   = NULL;
-  CbmGeoVolume *aVol=NULL;
+  FairGeoNode* node   = NULL;
+  FairGeoVolume *aVol=NULL;
 
-  while( (node = (CbmGeoNode*)iter.Next()) ) {
-    aVol = dynamic_cast<CbmGeoVolume*> ( node );
+  while( (node = (FairGeoNode*)iter.Next()) ) {
+    aVol = dynamic_cast<FairGeoVolume*> ( node );
     if ( node->isSensitive()  ) {
       fSensNodes->AddLast( aVol );
     }else{

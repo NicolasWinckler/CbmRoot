@@ -8,9 +8,9 @@
 
 #include "CbmTrdTrackFitter.h"
 
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 #include "TClonesArray.h"
 
@@ -33,7 +33,7 @@ CbmTrdFitTracks::CbmTrdFitTracks() {
 CbmTrdFitTracks::CbmTrdFitTracks(const char* name,
 				 const char* title,
 				 CbmTrdTrackFitter* fitter)
-  : CbmTask(name) {
+  : FairTask(name) {
   fFitter        = fitter;
   fTrackArray    = NULL;
   fNofTracks     = 0;
@@ -51,8 +51,8 @@ CbmTrdFitTracks::~CbmTrdFitTracks() { }
 // -----  SetParContainers -------------------------------------------------
 void CbmTrdFitTracks::SetParContainers()
 {
-    CbmRunAna* ana = CbmRunAna::Instance();
-    CbmRuntimeDb* rtdb = ana->GetRuntimeDb();
+    FairRunAna* ana = FairRunAna::Instance();
+    FairRuntimeDb* rtdb = ana->GetRuntimeDb();
     rtdb->getContainer("CbmGeoPassivePar");
     rtdb->getContainer("CbmGeoStsPar");
     rtdb->getContainer("CbmGeoTrdPar");
@@ -71,8 +71,8 @@ InitStatus CbmTrdFitTracks::Init() {
     return kERROR;
   }
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmTrdFitTracks::Init: "
 	 << "RootManager not instantised!" << endl;

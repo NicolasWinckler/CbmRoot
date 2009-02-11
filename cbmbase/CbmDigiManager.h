@@ -19,7 +19,7 @@
 #ifndef CBMDIGIMANAGER_H
 #define CBMDIGIMANAGER_H 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TStopwatch.h"
 
@@ -32,7 +32,7 @@ class CbmDigi;
 
 enum System {MVD=1, STS, RICH, MUCH, TRD, TOF, ECAL, PSD};
 
-class CbmDigiManager : public CbmTask
+class CbmDigiManager : public FairTask
 {
 
  public:

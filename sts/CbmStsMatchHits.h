@@ -19,7 +19,7 @@
 #ifndef CBMSTSMATCHHIT_H
 #define CBMSTSMATCHHIT_H 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TStopwatch.h"
 
@@ -34,7 +34,7 @@ class CbmStsHit;
 
 
 
-class CbmStsMatchHits : public CbmTask 
+class CbmStsMatchHits : public FairTask 
 {
 
  public:

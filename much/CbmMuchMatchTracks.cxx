@@ -5,8 +5,8 @@
 #include "CbmMuchTrackMatch.h"
 #include "CbmMuchDigiMatch.h"
 
-#include "CbmMCPoint.h"
-#include "CbmRootManager.h"
+#include "FairMCPoint.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -15,7 +15,7 @@
 #include <map>
 
 CbmMuchMatchTracks::CbmMuchMatchTracks() 
-  : CbmTask("CbmMuchMatchTracks"),
+  : FairTask("CbmMuchMatchTracks"),
   fNofHits(0),
   fNofTrueHits(0),
   fNofWrongHits(0),
@@ -58,7 +58,7 @@ void CbmMuchMatchTracks::Exec(
         	continue;
          }
          
-         CbmMCPoint* pPoint = (CbmMCPoint*) fPoints->At(pointIndex);
+         FairMCPoint* pPoint = (FairMCPoint*) fPoints->At(pointIndex);
          if (!pPoint) continue;
 
          matchMap[pPoint->GetTrackID()]++;
@@ -98,7 +98,7 @@ void CbmMuchMatchTracks::Exec(
 
 InitStatus CbmMuchMatchTracks::Init() 
 {
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  FairRootManager* ioman = FairRootManager::Instance();
   if (ioman == NULL) Fatal("Init", "RootManager not instantised!");
 
   fHits = (TClonesArray*) ioman->GetObject("MuchHit");

@@ -14,13 +14,13 @@
 #define CBMECALPOINT_H 1
 
 
-#include "CbmMCPoint.h"
+#include "FairMCPoint.h"
 
 #include "TObject.h"
 #include "TVector3.h"
 
 
-class CbmEcalPoint : public CbmMCPoint
+class CbmEcalPoint : public FairMCPoint
 {
 
  public:
@@ -43,7 +43,7 @@ class CbmEcalPoint : public CbmMCPoint
 
 
   /** Copy constructor **/
-  CbmEcalPoint(const CbmEcalPoint& point):CbmMCPoint(point) { *this = point; };
+  CbmEcalPoint(const CbmEcalPoint& point):FairMCPoint(point) { *this = point; };
 
 
   /** Destructor **/

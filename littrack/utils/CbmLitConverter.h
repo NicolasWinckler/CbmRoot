@@ -8,7 +8,7 @@ class CbmLitStripHit;
 class CbmLitTrack;
 class CbmLitTrackParam;
 class CbmTrkHit;
-class CbmTrackParam;
+class FairTrackParam;
 class CbmTrdHit;
 class CbmMuchTrack;
 class CbmMuchHit;
@@ -27,12 +27,12 @@ public:
 	virtual ~CbmLitConverter();
 		
 	static void TrackParamToLitTrackParam(
-			const CbmTrackParam* par,
+			const FairTrackParam* par,
 			CbmLitTrackParam* litPar);
 	
 	static void LitTrackParamToTrackParam(
 			const CbmLitTrackParam* litPar,
-			CbmTrackParam* par);
+			FairTrackParam* par);
 
 	static void TrkHitToLitPixelHit(
 			const CbmTrkHit* trkHit, 

@@ -6,7 +6,7 @@
 #include "TObject.h"
 #include "TArrayI.h"
 #include "TLorentzVector.h"
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 
 class CbmMuchTrack : public TObject
 {
@@ -36,7 +36,7 @@ class CbmMuchTrack : public TObject
   Int_t GetHitIndex(Int_t iHit)   const { return fHits[iHit]; }
   Double_t GetChi2()   const { return fChi2; } // much chi^2
   Int_t GetNDF() const { return fNDF; }// much NDF
-  CbmTrackParam *GetMuchTrack(){ return &fMuchTrack; }
+  FairTrackParam *GetMuchTrack(){ return &fMuchTrack; }
   Int_t GetFlag() {return fFlag;};
   
   
@@ -45,7 +45,7 @@ class CbmMuchTrack : public TObject
   void SetChi2( Double_t chi2 ) { fChi2  = chi2; }
   void SetNDF( Int_t ndf ){ fNDF = ndf; }
   void SetStsTrackID(Int_t it) { fStsTrackID = it; }
-  void SetMuchTrack( CbmTrackParam *track ){ fMuchTrack = *track; }
+  void SetMuchTrack( FairTrackParam *track ){ fMuchTrack = *track; }
   void SetFlag(Int_t flag) { fFlag = flag;};
 
  private:
@@ -55,7 +55,7 @@ class CbmMuchTrack : public TObject
   Int_t fNMissedHits;
   Int_t fNMissedStations;
   Int_t fHits[30];
-  CbmTrackParam fMuchTrack;
+  FairTrackParam fMuchTrack;
   Double_t fChi2;
   Int_t fNDF;
   Int_t fFlag; 

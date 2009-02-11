@@ -10,14 +10,14 @@
 #ifndef CBMTOFHITPRODUCER_H
 #define CBMTOFHITPRODUCER_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TVector3;
 class TClonesArray;
 class TString;                               
 
 
-class CbmTofHitProducer : public CbmTask {
+class CbmTofHitProducer : public FairTask {
 
  public:
 

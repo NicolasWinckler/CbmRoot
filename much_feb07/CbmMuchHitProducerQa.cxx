@@ -3,15 +3,15 @@
 // -----                   Created 16/11/07 by E. Kryshen              -----
 // -------------------------------------------------------------------------
 #include "CbmMuchHitProducerQa.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMuchPoint.h"
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchCluster.h"
 #include "CbmMuchHit.h"
 
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 #include "CbmGeoMuchPar.h"
 #include "CbmMuchDigiPar.h"
 #include "CbmMuchDigiScheme.h"
@@ -28,7 +28,7 @@ ClassImp(CbmMuchHitProducerQa)
 
 // -------------------------------------------------------------------------
 CbmMuchHitProducerQa::CbmMuchHitProducerQa(const char *name, Int_t verbose)
- :CbmTask(name,verbose){
+ :FairTask(name,verbose){
   fVerbose = verbose;
   fDigiScheme  = CbmMuchDigiScheme::Instance();
   fEvent=0;
@@ -47,7 +47,7 @@ CbmMuchHitProducerQa::~CbmMuchHitProducerQa(){
 // -------------------------------------------------------------------------
 InitStatus CbmMuchHitProducerQa::Init()
 {
-  CbmRootManager* fManager = CbmRootManager::Instance();
+  FairRootManager* fManager = FairRootManager::Instance();
   fPoints      = (TClonesArray*) fManager->GetObject("MuchPoint");
   fHits        = (TClonesArray*) fManager->GetObject("MuchHit");
   fDigis       = (TClonesArray*) fManager->GetObject("MuchDigi");
@@ -88,10 +88,10 @@ InitStatus CbmMuchHitProducerQa::Init()
 // -------------------------------------------------------------------------
 void CbmMuchHitProducerQa::SetParContainers() {
   // Get run and runtime database
-  CbmRunAna* run = CbmRunAna::Instance();
+  FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) Fatal("SetParContainers", "No analysis run");
 
-  CbmRuntimeDb* db = run->GetRuntimeDb();
+  FairRuntimeDb* db = run->GetRuntimeDb();
   if ( ! db ) Fatal("SetParContainers", "No runtime database");
 
   // Get MUCH geometry parameter container

@@ -18,7 +18,7 @@
 #define CBMSTSMATCHTRACKS_H 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TStopwatch.h"
 
@@ -28,7 +28,7 @@ class TClonesArray;
 
 
 
-class CbmStsMatchTracks : public CbmTask
+class CbmStsMatchTracks : public FairTask
 {
 
  public:

@@ -8,7 +8,7 @@
 //
 /////////////////////////////////////////////////////////////
 #include "CbmGeoSts.h"
-#include "CbmGeoNode.h"
+#include "FairGeoNode.h"
 
 #include <iostream>
 

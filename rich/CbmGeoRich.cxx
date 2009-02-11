@@ -11,7 +11,7 @@
 
 #include "CbmGeoRich.h"
 
-#include "CbmGeoNode.h"
+#include "FairGeoNode.h"
 
 ClassImp(CbmGeoRich)
 

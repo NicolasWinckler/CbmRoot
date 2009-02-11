@@ -17,7 +17,7 @@
 #ifndef CBMECALURQMDCALIBRATOR_H
 #define CBMECALURQMDCALIBRATOR_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TString.h"
 
@@ -31,7 +31,7 @@ class TTree;
 class TClonesArray;
 
 
-class CbmEcalUrqmdCalibrator : public CbmTask
+class CbmEcalUrqmdCalibrator : public FairTask
 {
 public:
   CbmEcalUrqmdCalibrator(const char* name, const Int_t iVerbose=0, const char* fileGeo="ecal_FullMC.geo");

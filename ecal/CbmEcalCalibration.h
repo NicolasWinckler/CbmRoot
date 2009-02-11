@@ -5,7 +5,7 @@
 #ifndef CBMECALCALIBRATION_H
 #define CBMECALCALIBRATION_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "TMath.h"
 #include "TString.h"
 
@@ -13,7 +13,7 @@ class CbmEcalCell;
 class CbmEcalInf;
 
 
-class CbmEcalCalibration : public CbmTask 
+class CbmEcalCalibration : public FairTask 
 {
 public:
   /** Standard constructor **/

@@ -72,7 +72,7 @@ CbmTrdRadiator::CbmTrdRadiator(const char *name, const char *title){
 // -----   Destructor   ----------------------------------------------------
 CbmTrdRadiator::~CbmTrdRadiator()
 {
-  //    CbmRootManager *fManager = CbmRootManager::Instance();
+  //    FairRootManager *fManager = FairRootManager::Instance();
   //  fManager->Write();
     if (fSpectrum){
         cout << " -I DELETING fSpectrum " << endl;

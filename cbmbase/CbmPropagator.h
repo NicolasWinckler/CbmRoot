@@ -13,7 +13,7 @@
 
 #include <vector>
 
-class CbmTrackParam;
+class FairTrackParam;
 
 class CbmPropagator : public TObject {
 public:
@@ -27,8 +27,8 @@ public:
     ** @param pdg              PDG code of the particle 
     **/
    virtual StatusCode Propagate( 
-		   const CbmTrackParam *parIn,
-           CbmTrackParam *parOut,
+		   const FairTrackParam *parIn,
+           FairTrackParam *parOut,
            Double_t zOut,
            Int_t pdg) = 0;
     
@@ -38,7 +38,7 @@ public:
     ** @param pdg              PDG code of the particle 
     **/
    virtual StatusCode Propagate( 
-		   CbmTrackParam *par, 
+		   FairTrackParam *par, 
            Double_t zOut,
            Int_t pdg) = 0;
    

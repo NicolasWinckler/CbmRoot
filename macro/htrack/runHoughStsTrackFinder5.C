@@ -78,11 +78,11 @@
   // ------------------------------------------------------------------------
 
   // -----   GEANE   initialization   ---------------------------------------
-  CbmGeane* Geane            = new CbmGeane(inFile);
+  FairGeane* Geane            = new FairGeane(inFile);
   // ------------------------------------------------------------------------
 
   // -----   Reconstruction run   -------------------------------------------
-  CbmRunAna *fRun = new CbmRunAna();
+  FairRunAna *fRun = new FairRunAna();
   fRun->SetInputFile(inFile);
   fRun->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
@@ -91,9 +91,9 @@
   TString stsDigiFile        = gSystem->Getenv("VMCWORKDIR");
   stsDigiFile               += "/parameters/sts/";
   stsDigiFile               += digiFile;
-  CbmRuntimeDb* rtdb         = fRun->GetRuntimeDb();
-  CbmParRootFileIo*  parIo1  = new CbmParRootFileIo();
-  CbmParAsciiFileIo* parIo2  = new CbmParAsciiFileIo();
+  FairRuntimeDb* rtdb         = fRun->GetRuntimeDb();
+  FairParRootFileIo*  parIo1  = new FairParRootFileIo();
+  FairParAsciiFileIo* parIo2  = new FairParAsciiFileIo();
   parIo1->open(parFile.Data());
   parIo2->open(stsDigiFile.Data(),"in");
   rtdb->setFirstInput(parIo1);

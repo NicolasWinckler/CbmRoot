@@ -28,8 +28,8 @@
 #include "CbmRichRing.h"
 
 #include "CbmMCTrack.h"
-#include "CbmRootManager.h"
-#include "CbmTrackParam.h"
+#include "FairRootManager.h"
+#include "FairTrackParam.h"
 #include "CbmGlobalTrack.h"
 #include "CbmStsTrackMatch.h"
 #include "CbmRichRingMatch.h"
@@ -82,8 +82,8 @@ CbmRichRingTrackAssignIdeal::~CbmRichRingTrackAssignIdeal()
 // -----   Public method Init   --------------------------------------------
 void CbmRichRingTrackAssignIdeal::Init() {
 
-// Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+// Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmRichRingTrackAssignIdeal:Init: "
 	 << "RootManager not instantised!" << endl;
@@ -138,7 +138,7 @@ void CbmRichRingTrackAssignIdeal::DoAssign(TClonesArray *pRingArray, TClonesArra
   Int_t nEl = 0;
   Int_t nCorEl = 0;
 
-  CbmTrackParam *pTrack;
+  FairTrackParam *pTrack;
   CbmRichRing *pRing;
 //  CbmRichRing *pRingT;
   CbmGlobalTrack *gTrack;
@@ -167,7 +167,7 @@ void CbmRichRingTrackAssignIdeal::DoAssign(TClonesArray *pRingArray, TClonesArra
     yRing = pRing->GetCenterY();
 
     for (Int_t iTrack=0; iTrack < fNTracks; iTrack++){
-      pTrack = (CbmTrackParam*)pTringArray->At(iTrack);
+      pTrack = (FairTrackParam*)pTringArray->At(iTrack);
       xTrack = pTrack->GetX();
       yTrack = pTrack->GetY();
       

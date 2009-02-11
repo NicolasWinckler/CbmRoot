@@ -12,11 +12,11 @@
 #ifndef CBMGEOECALPAR_H
 #define CBMGEOECALPAR_H
 
-#include "CbmParGenericSet.h"
+#include "FairParGenericSet.h"
 
 #include "TMap.h" 
 
-class CbmGeoEcalPar : public CbmParGenericSet {
+class CbmGeoEcalPar : public FairParGenericSet {
 public:
   virtual Bool_t Init() {return kTRUE;};
   CbmGeoEcalPar(const char* name="CbmGeoEcalPar",
@@ -24,9 +24,9 @@ public:
              const char* context="TestDefaultContext");
   ~CbmGeoEcalPar(void);
   void clear(void);
-  void putParams(CbmParamList*);
+  void putParams(FairParamList*);
   void dump();
-  Bool_t getParams(CbmParamList*);
+  Bool_t getParams(FairParamList*);
 
   TObjArray* GetEcalStr() const;
   TMap* GetVariables() const;

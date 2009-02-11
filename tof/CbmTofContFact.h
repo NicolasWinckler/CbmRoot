@@ -1,17 +1,17 @@
 #ifndef CBMTOFCONTFACT_H
 #define CBMTOFCONTFACT_H
 
-#include "CbmContFact.h"
+#include "FairContFact.h"
 
-class CbmContainer;
+class FairContainer;
 
-class CbmTofContFact : public CbmContFact {
+class CbmTofContFact : public FairContFact {
 private:
   void setAllContainers();
 public:
   CbmTofContFact();
   ~CbmTofContFact() {}
-  CbmParSet* createContainer(CbmContainer*);
+  FairParSet* createContainer(FairContainer*);
   ClassDef( CbmTofContFact,0) // Factory for all TOF parameter containers
 };
 

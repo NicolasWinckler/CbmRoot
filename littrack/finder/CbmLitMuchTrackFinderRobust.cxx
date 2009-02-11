@@ -12,7 +12,7 @@
 #include "CbmLitEnvironment.h"
 #include "CbmLitTrackSelectionD.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -32,7 +32,7 @@ CbmLitMuchTrackFinderRobust::~CbmLitMuchTrackFinderRobust()
 
 void CbmLitMuchTrackFinderRobust::Init()
 {
-   CbmRootManager* rootMgr = CbmRootManager::Instance();
+   FairRootManager* rootMgr = FairRootManager::Instance();
    if(NULL == rootMgr) 
       TObject::Fatal("CbmLitMuchTrackFinderRobust::Init","ROOT manager is not instantiated");
 

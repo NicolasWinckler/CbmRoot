@@ -46,13 +46,13 @@
 
   
   // -----   Analysis run, runtime database, parameter container  ---------
-  CbmRunAna* run = new CbmRunAna();
+  FairRunAna* run = new FairRunAna();
   run->SetInputFile(inFile);
   run->SetOutputFile(outFile);
 
   // Runtime database and parameter IO
-  CbmRuntimeDb* rtdb = CbmRuntimeDb::instance();
-  CbmParRootFileIo* parIo = new CbmParRootFileIo();
+  FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+  FairParRootFileIo* parIo = new FairParRootFileIo();
   parIo->open(parFile.Data());
   rtdb->setFirstInput(parIo);
 
@@ -74,10 +74,10 @@
   cout << endl << "=====>  Reading geometry..." << endl;
   Double_t fzref1, fzref2, fzref3;
   Double_t targX, targY, targZ;
-  CbmGeoVector v1, v2;
+  FairGeoVector v1, v2;
 
   TObjArray* passNodes = passSet->GetGeoPassiveNodes();
-  CbmGeoNode* target = passNodes->FindObject("targ");
+  FairGeoNode* target = passNodes->FindObject("targ");
   if ( ! target ) {
     cout << "Warning: target node not found!" << endl;
     targX = targY = targZ = 0.;
@@ -95,8 +95,8 @@
 
   TObjArray* richActNodes  = richSet->GetGeoSensitiveNodes();
   TObjArray* richPassNodes = richSet->GetGeoPassiveNodes();
-  CbmGeoNode* richEnt 
-    = (CbmGeoNode*) richPassNodes->FindObject("rich1entrance");
+  FairGeoNode* richEnt 
+    = (FairGeoNode*) richPassNodes->FindObject("rich1entrance");
   if ( ! richEnt ) {
     cout << "Warning: RICH entrance node not found!" << endl;
     fzref2 = 200.;
@@ -107,7 +107,7 @@
     fzref2 = v1.Z() + v2.Z();
     cout << "=====>  RICH entrance at z = " << fzref2 << " cm " << endl;
   }
-  CbmGeoNode* richPm = (CbmGeoNode*) richActNodes->FindObject("rich1d#1");
+  FairGeoNode* richPm = (FairGeoNode*) richActNodes->FindObject("rich1d#1");
   if ( ! richPm ) {
     cout << "Warning: RICH PM node not found!" << endl;
     fzref3 = 200.;

@@ -31,9 +31,9 @@
 
 #include "../../MiscLIB/include/defs.h"
 #if (ARCHITECTURE == STANDALONE)
-	#include "../../RootFrameworkLIB/include/CbmTrackParam.h"
+	#include "../../RootFrameworkLIB/include/FairTrackParam.h"
 #elif (ARCHITECTURE == CBMROOT)
-	#include "CbmTrackParam.h"
+	#include "FairTrackParam.h"
 #endif
 #include "../include/dataRootObjectError.h"
 #include "../include/trackfinderOutputData.h"
@@ -282,7 +282,7 @@ void trackfinderOutputData::addTrack(trackMomentum& momentum) {
 
 void trackfinderOutputData::addTrack(trackFrameworkMomentum& momentum) {
 
-	CbmTrackParam trackParameter;
+	FairTrackParam trackParameter;
 
 	if (tracks == NULL)
 		init();
@@ -311,8 +311,8 @@ void trackfinderOutputData::addTrack(trackFrameworkMomentum& momentum) {
 
 void trackfinderOutputData::addHitToActualTrack(trackfinderInputHit* hit) {
 
-	CbmTrackParam* firstTrackParameter;
-	CbmTrackParam* lastTrackParameter;
+	FairTrackParam* firstTrackParameter;
+	FairTrackParam* lastTrackParameter;
 
 	if (actualTrack != NULL) {
 
@@ -364,9 +364,9 @@ void trackfinderOutputData::addHitToActualTrack(trackfinderInputHit* hit) {
 #else
 
 		if (hit->isMapsHit())
-			actualTrack->AddMvdHit(hit->getHitIndex(), (CbmHit*)hit->getHit());
+			actualTrack->AddMvdHit(hit->getHitIndex(), (FairHit*)hit->getHit());
 		else
-			actualTrack->AddStsHit(hit->getHitIndex(), (CbmHit*)hit->getHit());
+			actualTrack->AddStsHit(hit->getHitIndex(), (FairHit*)hit->getHit());
 
 #endif
 

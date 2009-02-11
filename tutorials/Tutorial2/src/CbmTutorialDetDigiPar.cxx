@@ -5,9 +5,9 @@
 
 #include "CbmTutorialDetDigiPar.h"
 
-#include "CbmParamList.h"
-#include "CbmDetParIo.h"
-#include "CbmParIo.h"
+#include "FairParamList.h"
+#include "FairDetParIo.h"
+#include "FairParIo.h"
 
 #include "TString.h"
 #include "TMath.h"
@@ -21,7 +21,7 @@ using std::endl;
 CbmTutorialDetDigiPar::CbmTutorialDetDigiPar(const char* name, 
 					     const char* title,
 					     const char* context)
-  : CbmParGenericSet(name, title, context) {
+  : FairParGenericSet(name, title, context) {
   detName="TutorialDet";
 }
 // -------------------------------------------------------------------------
@@ -61,7 +61,7 @@ void CbmTutorialDetDigiPar::printparams() {
 }
 // -------------------------------------------------------------------------
 
-void CbmTutorialDetDigiPar::putParams(CbmParamList* l) {
+void CbmTutorialDetDigiPar::putParams(FairParamList* l) {
   //   print();
   cout << " I am in CbmTutorialDetDigiPar::putParams " << endl;
    if (!l) return;
@@ -77,12 +77,12 @@ void CbmTutorialDetDigiPar::putParams(CbmParamList* l) {
    for ( Int_t i=0; i< array_size; i++) {
      zwischen[i] = ftutdetdigipar.GetAt(i);
    }
-   l->addBinary("CbmTutorialDetDigiPar",zwischen,array_size);
+   l->addObject("CbmTutorialDetDigiPar",zwischen,array_size);
 }
 
 //------------------------------------------------------
 
-Bool_t CbmTutorialDetDigiPar::getParams(CbmParamList* l) {
+Bool_t CbmTutorialDetDigiPar::getParams(FairParamList* l) {
   //print();
     cout << " I am in CbmTutorialDetDigiPar::getParams " << endl;
 
@@ -102,7 +102,7 @@ Bool_t CbmTutorialDetDigiPar::getParams(CbmParamList* l) {
     cout << "Array Size: " << array_size << endl;
 
     Float_t zwischen[array_size];
-    if (!(l->fillBinary("CbmTutorialDetDigiPar",zwischen,array_size))) {
+    if (!(l->fillObject("CbmTutorialDetDigiPar",zwischen,array_size))) {
       cout << "--W-- Could not initialize CbmTutorialDetDigiPar"<< endl;
       return kFALSE;
     }

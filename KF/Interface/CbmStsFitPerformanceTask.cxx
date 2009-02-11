@@ -23,8 +23,8 @@
 #include "CbmMCTrack.h"
 #include "CbmStsTrackMatch.h"
 #include "CbmStsHit.h"
-#include "CbmRootManager.h"
-#include "CbmMCApplication.h"
+#include "FairRootManager.h"
+#include "FairMCApplication.h"
 #include "CbmStsTrack.h"
 #include "CbmVertex.h"
 #include "CbmMvdHit.h"
@@ -149,7 +149,7 @@ void CbmStsFitPerformanceTask::CreateD0Histo(TH1D* hist[15], const char* name, c
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsFitPerformanceTask::CbmStsFitPerformanceTask(const char* name, Int_t iVerbose )
-                 :CbmTask(name,iVerbose){
+                 :FairTask(name,iVerbose){
   fTrackAnalysis=1;
   fVertexAnalysis=0;
   fD0Analysis=0;
@@ -295,7 +295,7 @@ InitStatus CbmStsFitPerformanceTask::Init(){
 // -----   ReInit CbmStsFitPerformanceTask task   -------------------------------
 InitStatus CbmStsFitPerformanceTask::ReInit(){
 
-  CbmRootManager* fManger =CbmRootManager::Instance();	
+  FairRootManager* fManger =FairRootManager::Instance();	
   fMCTrackArray     = (TClonesArray*) fManger->GetObject("MCTrack");
   fStsPointArray    = (TClonesArray*) fManger->GetObject("STSPoint");
   fMvdPointArray    = (TClonesArray*) fManger->GetObject("MvdPoint");
@@ -415,7 +415,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
       flag[iTrack] = 1;
       double z[8] = {0.2,1,2,3,4,5,10,100};
       for( int iz=0; iz<8; iz++ ){
-	CbmTrackParam paramI;
+	FairTrackParam paramI;
 	fFitter.Extrapolate(trackI, z[iz], &paramI);
 	CbmKFMath::CopyTrackParam2TC( &paramI, sT[iTrack][iz], sC[iTrack][iz] );      
 	if( !finite(sC[iTrack][iz][0]) || sC[iTrack][iz][0]<0 || sC[iTrack][iz][0]>10. ){
@@ -572,7 +572,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	// fill momentum resolution 
 	
 	double z = mci[5];
-	CbmTrackParam param;
+	FairTrackParam param;
 	fFitter.Extrapolate(track, z, &param);
 	if( fabs(mci[4])>1.e-4 && fabs( param.GetQp() )>1.e-4 )
 	  fhPq->Fill( fabs(1./mci[4]), (mci[4]/param.GetQp() - 1.) );      
@@ -702,7 +702,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	      }
 	      SVFinder.Fit();
 	      CbmVertex sv;	    
-	      //CbmTrackParam KFitted, PFitted;
+	      //FairTrackParam KFitted, PFitted;
 	      Double_t mass, mass_err;
 	      SVFinder.GetVertex(sv);
 	      //SVFinder.GetFittedTrack(0, &KFitted );
@@ -761,7 +761,7 @@ void CbmStsFitPerformanceTask::FillTrackHisto(const Double_t mc[6], CbmStsTrack 
   }
   //cout << "*Z in  " << track->GetParamFirst()->GetZ() << endl;
   double z = mc[5];
-  CbmTrackParam param;
+  FairTrackParam param;
   //cout<<1<<endl;
   fFitter.Extrapolate(track, z, &param);
   //cout<<2<<endl;

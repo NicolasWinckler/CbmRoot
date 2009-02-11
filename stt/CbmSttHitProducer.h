@@ -9,13 +9,13 @@
 #ifndef CBMSTTHITPRODUCER_H
 #define CBMSTTHITPRODUCER_H
 
-#include "CbmTask.h"
-#include "CbmGeoVector.h"
-#include "CbmGeoRotation.h"
+#include "FairTask.h"
+#include "FairGeoVector.h"
+#include "FairGeoRotation.h"
 
 #include "TVector3.h"
 
-class CbmBaseParSet;
+class FairBaseParSet;
 class CbmGeoSttPar;
 class CbmSttPoint;
 
@@ -23,7 +23,7 @@ class CbmSttHit;
 //class CbmTrdRadiator;
 class TClonesArray;
 
-class CbmSttHitProducer : public CbmTask {
+class CbmSttHitProducer : public FairTask {
 
  public:
       
@@ -87,7 +87,7 @@ class CbmSttHitProducer : public CbmTask {
 
   //CbmTrdRadiator*  fRadiator; //!
   CbmGeoSttPar*    fGeoPar;   //!
-  CbmBaseParSet*    fBasePar; //!
+  FairBaseParSet*    fBasePar; //!
 
   // for the CbmTrdRadiator
   Int_t   fNfoils;       //!
@@ -103,9 +103,9 @@ class CbmSttHitProducer : public CbmTask {
   Double_t fSizeY[3][2]; //!
 
   // Translation vectors for 3 stations and 4 chambers (+-1, +-2)
-  CbmGeoVector fTransl[3][4]; //!
+  FairGeoVector fTransl[3][4]; //!
   // Rotation matrices for 3 doublets
-  CbmGeoRotation fRotat[3]; //!
+  FairGeoRotation fRotat[3]; //!
 
   ClassDef(CbmSttHitProducer,1) //CBMSttHitProducer
 

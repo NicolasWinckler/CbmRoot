@@ -13,8 +13,8 @@
 
 #include "TObject.h"
 
-class CbmField;
-class CbmTrackParam;
+class FairField;
+class FairTrackParam;
 
 class CbmKFFieldMath :public TObject
 {
@@ -29,7 +29,7 @@ class CbmKFFieldMath :public TObject
   
   static Int_t ExtrapolateRK4( const Double_t T_in[], const Double_t C_in[],
 			       Double_t T_out[], Double_t C_out[],
-			       Double_t z_out , Double_t qp0, CbmField *MF );
+			       Double_t z_out , Double_t qp0, FairField *MF );
   /*
   static void ExtrapolateAnalytic( const Double_t T_in[], const Double_t C_in[],
 				   Double_t T_out[], Double_t C_out[],
@@ -42,7 +42,7 @@ class CbmKFFieldMath :public TObject
   */
   static Int_t ExtrapolateALight( const Double_t T_in[], const Double_t C_in[],
 				 Double_t T_out[], Double_t C_out[],
-				 Double_t z_out, Double_t qp0, CbmField *MF);
+				 Double_t z_out, Double_t qp0, FairField *MF);
   /*
   static void IntegrateField( 
 			     CbmMagField *MF,      

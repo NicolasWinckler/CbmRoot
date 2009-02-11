@@ -37,7 +37,7 @@
 #if (ARCHITECTURE == STANDALONE)
 	#include "../../RootFrameworkLIB/include/rootManager.h"
 #elif (ARCHITECTURE == CBMROOT)
-	#include "CbmRootManager.h"
+	#include "FairRootManager.h"
 #endif
 #include "inputData.h"
 #include <string>
@@ -143,7 +143,7 @@ protected:
  * Method initializes special parts of the object.
  */
 
-	void initSpecial(CbmRootManager* manager);
+	void initSpecial(FairRootManager* manager);
 
 /**
  * Method reads the data from the file.

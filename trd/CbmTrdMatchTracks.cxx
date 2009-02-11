@@ -10,8 +10,8 @@
 #include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 
-#include "CbmMCPoint.h"
-#include "CbmRootManager.h"
+#include "FairMCPoint.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -24,7 +24,7 @@ using std::map;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrdMatchTracks::CbmTrdMatchTracks() 
-  : CbmTask("TRD track match") {
+  : FairTask("TRD track match") {
   fTracks  = NULL;
   fPoints  = NULL;
   fHits    = NULL;
@@ -37,7 +37,7 @@ CbmTrdMatchTracks::CbmTrdMatchTracks()
 
 // -----   Constructor with verbosity level   ------------------------------
 CbmTrdMatchTracks::CbmTrdMatchTracks(Int_t verbose) 
-  : CbmTask("TRD track match") {
+  : FairTask("TRD track match") {
   fTracks  = NULL;
   fPoints  = NULL;
   fHits    = NULL;
@@ -51,7 +51,7 @@ CbmTrdMatchTracks::CbmTrdMatchTracks(Int_t verbose)
 // -----   Constructor with name, title and verbosity  ---------------------
 CbmTrdMatchTracks::CbmTrdMatchTracks(const char* name, const char* title,
 				     Int_t verbose) 
-  : CbmTask(name) {
+  : FairTask(name) {
   fTracks  = NULL;
   fPoints  = NULL;
   fHits    = NULL;
@@ -72,8 +72,8 @@ CbmTrdMatchTracks::~CbmTrdMatchTracks() { }
 // -----   Public method Init   --------------------------------------------
 InitStatus CbmTrdMatchTracks::Init() {
   
-  // Get CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmTrdMatchTracks::Init: "
 	 << "RootManager not instantised!" << endl;
@@ -122,7 +122,7 @@ void CbmTrdMatchTracks::Exec(Option_t* opt) {
   // Create some pointers and variables
   CbmTrdTrack*      track = NULL;
   CbmTrdHit*        hit   = NULL;
-  CbmMCPoint*       point = NULL;
+  FairMCPoint*       point = NULL;
   Int_t nHits       = 0;
   Int_t nMCTracks   = 0;
   Int_t iPoint      = 0;
@@ -166,7 +166,7 @@ void CbmTrdMatchTracks::Exec(Option_t* opt) {
 	nFake++;
 	continue;
       }
-      point = (CbmMCPoint*) fPoints->At(iPoint);
+      point = (FairMCPoint*) fPoints->At(iPoint);
       if ( ! point ) {
 	cout << "-E- CbmTrdMatchTracks::Exec: "
 	     << "Empty MCPoint " << iPoint << " from TrdHit " << iHit

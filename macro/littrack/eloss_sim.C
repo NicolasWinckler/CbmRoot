@@ -20,22 +20,22 @@ void eloss_sim(Int_t nEvents = 200000)
   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
   cbmrootlibs();
 
-  CbmRunSim* fRun = new CbmRunSim();
+  FairRunSim* fRun = new FairRunSim();
   fRun->SetName("TGeant4");              // Transport engine
   fRun->SetOutputFile(outFile);          // Output file
-  CbmRuntimeDb* rtdb = fRun->GetRuntimeDb();
+  FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
 
   fRun->SetMaterials("media.geo");       // Materials
   
   if ( caveGeom != "" ) {
-    CbmModule* cave = new CbmCave("CAVE");
+    FairModule* cave = new CbmCave("CAVE");
     cave->SetGeometryFileName(caveGeom);
     fRun->AddModule(cave);
     cout << "    --- " << caveGeom << endl;
   }
 
   if ( muchGeom != "" ) {
-    CbmDetector* much = new CbmMuch("MUCH", kTRUE);
+    FairDetector* much = new CbmMuch("MUCH", kTRUE);
     much->SetGeometryFileName(muchGeom);
     fRun->AddModule(much);
     cout << "    --- " << muchGeom << endl;
@@ -44,12 +44,12 @@ void eloss_sim(Int_t nEvents = 200000)
   CbmFieldMap* magField = NULL;
   fRun->SetField(magField);
   
-  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   
   Double_t minMom = 10.; //minimum momentum
   Double_t maxMom = 10.; //maximum momentum
   
-  CbmBoxGenerator* boxGen1 = new CbmBoxGenerator(13, 1);
+  FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, 1);
   boxGen1->SetPRange(minMom, maxMom);
   boxGen1->SetPhiRange(0.,360.);
   boxGen1->SetThetaRange(0.,0.);

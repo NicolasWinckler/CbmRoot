@@ -33,14 +33,14 @@
 
 #include "CbmEcalStructure.h"
 #include "CbmEcalInf.h"
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 #include "CbmMCTrack.h"
 #include "CbmKFTrack.h"
 #include "CbmStsTrack.h"
 #include "CbmGlobalTrack.h"
 #include "CbmStsKFTrackFitter.h"
-#include "CbmTrackParam.h"
-#include "CbmRootManager.h"
+#include "FairTrackParam.h"
+#include "FairRootManager.h"
 #include "CbmEcalTrackExtrapolationKF.h"
 
 using namespace std;
@@ -77,8 +77,8 @@ CbmEcalTrackExtrapolationKF::~CbmEcalTrackExtrapolationKF()
 // -----   Public method Init   --------------------------------------------
 void CbmEcalTrackExtrapolationKF::Init()
 {
-  //Get and check CbmRootManager
-  CbmRootManager* ioman=CbmRootManager::Instance();
+  //Get and check FairRootManager
+  FairRootManager* ioman=FairRootManager::Instance();
   if (!ioman)
   {
     cout << "-E- CbmEcalTrackExtrapolationKF::Init: " << "RootManager not instantised!" << endl;
@@ -117,7 +117,7 @@ Int_t CbmEcalTrackExtrapolationKF::DoExtrapolate(TClonesArray *gTrackArray, TClo
   Int_t n=gTrackArray->GetEntriesFast();
   CbmGlobalTrack* tr;
   CbmKFTrack kfTr;
-  CbmTrackParam trpar;
+  FairTrackParam trpar;
   for(;i<n;i++)
   {
     tr=(CbmGlobalTrack*)gTrackArray->At(i);
@@ -127,7 +127,7 @@ Int_t CbmEcalTrackExtrapolationKF::DoExtrapolate(TClonesArray *gTrackArray, TClo
     kfTr.SetTrackParam(*(tr->GetParamLast()));
     kfTr.Extrapolate(Str()->GetEcalInf()->GetZPos());
     kfTr.GetTrackParam(trpar);
-    new ((*fTrackParamArray)[nTr++]) CbmTrackParam(trpar);
+    new ((*fTrackParamArray)[nTr++]) FairTrackParam(trpar);
   }
   
   return nTr;

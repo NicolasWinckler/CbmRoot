@@ -25,12 +25,12 @@
 
 #include "CbmEcalHit.h"
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmStack.h"
 
 #include "TClonesArray.h"
 
-class CbmEcalHitProducerFastMC : public CbmTask {
+class CbmEcalHitProducerFastMC : public FairTask {
 
 public:
 

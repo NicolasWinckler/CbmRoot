@@ -7,7 +7,7 @@
 #include "CbmTofHit.h"
 #include "CbmTofPoint.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -19,7 +19,7 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmTofHitProducerIdeal::CbmTofHitProducerIdeal() :
-  CbmTask("Ideal TOF Hit Producer") { }
+  FairTask("Ideal TOF Hit Producer") { }
 // -------------------------------------------------------------------------
 
 
@@ -34,7 +34,7 @@ CbmTofHitProducerIdeal::~CbmTofHitProducerIdeal() { }
 InitStatus CbmTofHitProducerIdeal::Init() {
 
   // Get RootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) {
     cout << "-E- CbmTofHitProducerIdeal::Init: "
 	 << "RootManager not instantised!" << endl;

@@ -1,7 +1,7 @@
 #ifndef CBMECALANALYSISPAIR_H
 #define CBMECALANALYSISPAIR_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TString.h"
 
@@ -12,7 +12,7 @@ class TClonesArray;
 class CbmEcalStructure;
 
 
-class CbmEcalAnalysisPair : public CbmTask
+class CbmEcalAnalysisPair : public FairTask
 {
 public:
   CbmEcalAnalysisPair(const char* name, const Int_t iVerbose=0);

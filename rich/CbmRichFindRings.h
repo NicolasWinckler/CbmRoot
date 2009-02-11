@@ -25,12 +25,12 @@
 #define CBM_RICH_FIND_RINGS 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class CbmRichRingFinder;
 class TClonesArray;
 
-class CbmRichFindRings : public CbmTask
+class CbmRichFindRings : public FairTask
 {
 
  public:
@@ -52,7 +52,7 @@ class CbmRichFindRings : public CbmTask
    *@param finder   Pointer to RICH ring finder concrete class
    *@param verbose  Verbosity level
    **/
-  CbmRichFindRings(const char* name, const char* title = "CbmTask",
+  CbmRichFindRings(const char* name, const char* title = "FairTask",
 		   CbmRichRingFinder* finder = NULL, Int_t verbose = 1);
 
 

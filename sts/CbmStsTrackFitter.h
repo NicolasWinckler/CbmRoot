@@ -16,7 +16,7 @@
 #ifndef CBMSTSTRACKFITTER
 #define CBMSTSTRACKFITTER 1
 
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 
 #include "TObject.h"
 
@@ -60,7 +60,7 @@ class CbmStsTrackFitter : public TObject
    *@param param  (return value) StsTrackParam at z
    **/
   virtual void Extrapolate( CbmStsTrack* track, Double_t z, 
-			    CbmTrackParam *param ) = 0;
+			    FairTrackParam *param ) = 0;
 
 
   ClassDef(CbmStsTrackFitter,1);

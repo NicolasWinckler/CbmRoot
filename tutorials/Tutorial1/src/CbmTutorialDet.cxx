@@ -4,14 +4,14 @@
 #include "CbmTutorialDetGeo.h"
 #include "CbmTutorialDetGeoPar.h"
 
-#include "CbmVolume.h"
-#include "CbmGeoVolume.h"
-#include "CbmGeoNode.h"
-#include "CbmRootManager.h"
-#include "CbmGeoLoader.h"
-#include "CbmGeoInterface.h"
-#include "CbmRun.h"
-#include "CbmRuntimeDb.h"
+#include "FairVolume.h"
+#include "FairGeoVolume.h"
+#include "FairGeoNode.h"
+#include "FairRootManager.h"
+#include "FairGeoLoader.h"
+#include "FairGeoInterface.h"
+#include "FairRun.h"
+#include "FairRuntimeDb.h"
 #include "CbmDetectorList.h"
 #include "CbmStack.h"
 
@@ -23,14 +23,14 @@ using std::cout;
 using std::endl;
 
 CbmTutorialDet::CbmTutorialDet() :
-  CbmDetector("TutorialDet", kTRUE, kTutDet) {
+  FairDetector("TutorialDet", kTRUE, kTutDet) {
   /** create your collection for data points */
   fCbmTutorialDetPointCollection = new TClonesArray("CbmTutorialDetPoint");
   
 }
 
 CbmTutorialDet::CbmTutorialDet(const char* name, Bool_t active)
-  : CbmDetector(name, active, kTutDet) {
+  : FairDetector(name, active, kTutDet) {
   fCbmTutorialDetPointCollection = new TClonesArray("CbmTutorialDetPoint");
   
 }
@@ -44,12 +44,12 @@ CbmTutorialDet::~CbmTutorialDet() {
 
 void CbmTutorialDet::Initialize()
 {
-  CbmDetector::Initialize();
-  CbmRuntimeDb *rtdb= CbmRun::Instance()->GetRuntimeDb();
+  FairDetector::Initialize();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
   CbmTutorialDetGeoPar* par=(CbmTutorialDetGeoPar*)(rtdb->getContainer("CbmTutorialDetGeoPar"));
 }
  
-Bool_t  CbmTutorialDet::ProcessHits(CbmVolume* vol)
+Bool_t  CbmTutorialDet::ProcessHits(FairVolume* vol)
 { 
   /** This method is called from the MC stepping */
   
@@ -100,7 +100,7 @@ void CbmTutorialDet::Register() {
     only during the simulation. 
 */
  
-  CbmRootManager::Instance()->Register("TutorialDetPoint", "TutorialDet",
+  FairRootManager::Instance()->Register("TutorialDetPoint", "TutorialDet",
 				       fCbmTutorialDetPointCollection, kTRUE);
  
 }
@@ -120,8 +120,8 @@ void CbmTutorialDet::ConstructGeometry() {
       just copy this and use it for your detector, otherwise you can
       implement here you own way of constructing the geometry. */
   
-  CbmGeoLoader*    geoLoad = CbmGeoLoader::Instance();
-  CbmGeoInterface* geoFace = geoLoad->getGeoInterface();
+  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
+  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
   CbmTutorialDetGeo*  Geo  = new CbmTutorialDetGeo();
   Geo->setGeomFile(GetGeometryFileName());
   geoFace->addGeoModule(Geo);
@@ -131,18 +131,18 @@ void CbmTutorialDet::ConstructGeometry() {
   TList* volList = Geo->getListOfVolumes();
   
   // store geo parameter
-  CbmRun *fRun = CbmRun::Instance();
-  CbmRuntimeDb *rtdb= CbmRun::Instance()->GetRuntimeDb();
+  FairRun *fRun = FairRun::Instance();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
   CbmTutorialDetGeoPar* par=(CbmTutorialDetGeoPar*)(rtdb->getContainer("CbmTutorialDetGeoPar"));
   TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
   TObjArray *fPassNodes = par->GetGeoPassiveNodes();
   
   TListIter iter(volList);
-  CbmGeoNode* node   = NULL;
-  CbmGeoVolume *aVol=NULL;
+  FairGeoNode* node   = NULL;
+  FairGeoVolume *aVol=NULL;
   
-  while( (node = (CbmGeoNode*)iter.Next()) ) {
-    aVol = dynamic_cast<CbmGeoVolume*> ( node );
+  while( (node = (FairGeoNode*)iter.Next()) ) {
+    aVol = dynamic_cast<FairGeoVolume*> ( node );
     if ( node->isSensitive()  ) {
       fSensNodes->AddLast( aVol );
     }else{

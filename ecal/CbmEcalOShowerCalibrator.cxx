@@ -5,9 +5,9 @@
 #include "CbmEcalPointLite.h"
 #include "CbmEcal.h"
 
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "TClonesArray.h"
@@ -19,7 +19,7 @@ using std::endl;
 using std::flush;
 
 CbmEcalOShowerCalibrator::CbmEcalOShowerCalibrator(const char* name, const Int_t iVerbose)
-	: CbmTask(name, iVerbose), fZPosition(-2), \
+	: FairTask(name, iVerbose), fZPosition(-2), \
 	fPDGCode(22), fLowEnergy(0.1)
 {
   ;
@@ -28,7 +28,7 @@ CbmEcalOShowerCalibrator::CbmEcalOShowerCalibrator(const char* name, const Int_t
 /** Initing routine **/
 InitStatus CbmEcalOShowerCalibrator::Init()
 {
-  CbmRootManager* fManager=CbmRootManager::Instance();
+  FairRootManager* fManager=FairRootManager::Instance();
 
   fLitePoints=(TClonesArray*)fManager->ActivateBranch("ECALPointLite");
   if (fLitePoints==NULL)
@@ -256,8 +256,8 @@ void CbmEcalOShowerCalibrator::GetMCXY(TVector3& mom)
 /** Parameter container init **/
 void CbmEcalOShowerCalibrator::SetParContainers()
 {
-  CbmRunAna* ana=CbmRunAna::Instance();
-  CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+  FairRunAna* ana=FairRunAna::Instance();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   fPar=(CbmGeoEcalPar*)(rtdb->getContainer("CbmGeoEcalPar"));
 }
 

@@ -2,7 +2,7 @@
  *  $Id$
  *
  *  Class : CbmDileptonAssignMCid
- *  Descripton: This is a task, derived from CbmTask. This works for the simulated
+ *  Descripton: This is a task, derived from FairTask. This works for the simulated
  *              data stream to assign MC information to the identified electron tracks.
  *              This also generates histograms for identification QA (efficiency,
  *              purity, pion supression etc.
@@ -19,8 +19,8 @@
 #include "CbmDileptonTrackSimCollection.h"
 #include "CbmDileptonTrackReal.h"
 
-#include "CbmTask.h"
-#include "CbmRootManager.h"
+#include "FairTask.h"
+#include "FairRootManager.h"
 #include "CbmGlobalTrack.h"
 #include "CbmStsTrack.h"
 #include "CbmStsTrackMatch.h"
@@ -30,7 +30,7 @@
 #include "CbmTofHit.h"
 #include "CbmTofPoint.h"
 #include "CbmMCTrack.h"
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 #include "CbmStsKFTrackFitter.h"
 
 // ROOT includes
@@ -49,7 +49,7 @@ using std::setw;
 using std::setprecision;
 using std::right;
 
-CbmDileptonAssignMCid::CbmDileptonAssignMCid() : CbmTask("DileptonAssignMCid"){
+CbmDileptonAssignMCid::CbmDileptonAssignMCid() : FairTask("DileptonAssignMCid"){
 
     fTrackSimColl= new CbmDileptonTrackSimCollection();
 
@@ -63,7 +63,7 @@ CbmDileptonAssignMCid::CbmDileptonAssignMCid() : CbmTask("DileptonAssignMCid"){
     fOutFileName = "pid.mc.hist.root";
 }
 
-CbmDileptonAssignMCid::CbmDileptonAssignMCid(Int_t iVerbose, TString fname, const char* name) : CbmTask(name,iVerbose){
+CbmDileptonAssignMCid::CbmDileptonAssignMCid(Int_t iVerbose, TString fname, const char* name) : FairTask(name,iVerbose){
 
     fTrackSimColl= new CbmDileptonTrackSimCollection();
 
@@ -86,7 +86,7 @@ InitStatus CbmDileptonAssignMCid::Init(){
     cout<<"-I- CbmDileptonAssignMCid::Init: Initialization started"<<endl;
 
     // Get pointers to root manager
-    fRootManager = CbmRootManager::Instance();
+    fRootManager = FairRootManager::Instance();
 
     // Get GlobalTrack Array
     fArrayGlobalTrack = (TClonesArray*) fRootManager->GetObject("GlobalTrack");
@@ -437,7 +437,7 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
 	Double_t chiPrimary = fFitter.GetChiToVertex(stsTrack);
 
 	// Fit tracks to the primary vertex
-	CbmTrackParam VtxTrack;
+	FairTrackParam VtxTrack;
 	fFitter.FitToVertex(stsTrack, fPrimVertex, &VtxTrack);
 
 	TVector3 position;
@@ -449,7 +449,7 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
 	if (chiPrimary > fCutChiPrimary)continue;
 	if (nStsFound < fCutStsHit) continue;
       
-	CbmTrackParam* richTrack = (CbmTrackParam*)fArrayRichProjection->At(iGlobal);
+	FairTrackParam* richTrack = (FairTrackParam*)fArrayRichProjection->At(iGlobal);
 
 	Double_t TcentreX = richTrack->GetX();
 	Double_t TcentreY = richTrack->GetY();

@@ -24,7 +24,7 @@
 #include <map>
 #include <set>
 #include "TStopwatch.h"
-#include "CbmTask.h"
+#include "FairTask.h"
 
 using std::set;
 using std::map;
@@ -39,7 +39,7 @@ class CbmStsStation;
 
 
 
-class CbmStsRealClusterFinder : public CbmTask
+class CbmStsRealClusterFinder : public FairTask
 {
 
 

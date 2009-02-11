@@ -8,7 +8,7 @@
 
 #include "CbmDigi.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 // Includes from ROOT
 #include "TClonesArray.h"
@@ -28,7 +28,7 @@ using std::setprecision;
 using std::pair;
 
 // -----   Default constructor   -------------------------------------------
-CbmDigiManager::CbmDigiManager() : CbmTask("DigiManager") {
+CbmDigiManager::CbmDigiManager() : FairTask("DigiManager") {
   for (Int_t iSys=0; iSys<16; iSys++) fDigis[iSys] = NULL;
   fSystem[0] = "";
   fSystem[1] = "MVD";
@@ -128,8 +128,8 @@ CbmDigi* CbmDigiManager::GetDigi(Int_t iDetector, Int_t iChannel) {
 // -----   Virtual private method Init   -----------------------------------
 InitStatus CbmDigiManager::Init() {
 
-  CbmRootManager* ioman = CbmRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No CbmRootManager");
+  FairRootManager* ioman = FairRootManager::Instance();
+  if ( ! ioman ) Fatal("Init", "No FairRootManager");
 
   Int_t nColl = 0;
   for (Int_t iSys=0; iSys<16; iSys++) {

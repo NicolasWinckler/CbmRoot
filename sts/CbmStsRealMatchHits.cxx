@@ -10,9 +10,9 @@
 #include "TClonesArray.h"
 
 // --- Includes from base
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 // --- Includes from STS
 #include "CbmGeoStsPar.h"
@@ -25,8 +25,8 @@
 #include "CbmStsPoint.h"
 #include "CbmStsSector.h"
 #include "CbmStsStation.h"
-#include "CbmGeoVector.h"
-#include "CbmGeoNode.h"
+#include "FairGeoVector.h"
+#include "FairGeoNode.h"
 
 #include "TMath.h"
 
@@ -44,7 +44,7 @@ using std::setprecision;
 using std::map;
 
 // -----   Default constructor   -------------------------------------------
-CbmStsRealMatchHits::CbmStsRealMatchHits() : CbmTask("STSMatchHits", 1) {
+CbmStsRealMatchHits::CbmStsRealMatchHits() : FairTask("STSMatchHits", 1) {
   fPassGeo     = NULL;
   fGeoPar      = NULL;
   fDigiPar     = NULL;
@@ -61,7 +61,7 @@ CbmStsRealMatchHits::CbmStsRealMatchHits() : CbmTask("STSMatchHits", 1) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsRealMatchHits::CbmStsRealMatchHits(Int_t iVerbose)
-  : CbmTask("STSMatchHits", iVerbose) {
+  : FairTask("STSMatchHits", iVerbose) {
   fPassGeo     = NULL;
   fGeoPar      = NULL;
   fDigiPar     = NULL;
@@ -78,7 +78,7 @@ CbmStsRealMatchHits::CbmStsRealMatchHits(Int_t iVerbose)
 
 // -----   Constructor with name   -----------------------------------------
 CbmStsRealMatchHits::CbmStsRealMatchHits(const char* name, Int_t iVerbose)
-  : CbmTask(name, iVerbose) {
+  : FairTask(name, iVerbose) {
   fPassGeo     = NULL;
   fGeoPar      = NULL;
   fDigiPar     = NULL;
@@ -436,9 +436,9 @@ void CbmStsRealMatchHits::ExecReal(Option_t* opt) {
 void CbmStsRealMatchHits::SetParContainers() {
 
   // Get run and runtime database
-  CbmRunAna* run = CbmRunAna::Instance();
+  FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) Fatal("SetParContainers", "No analysis run");
-  CbmRuntimeDb* db = run->GetRuntimeDb();
+  FairRuntimeDb* db = run->GetRuntimeDb();
   if ( ! db ) Fatal("SetParContainers", "No runtime database");
 
   // Get STS geometry and digitisation parameter container
@@ -459,8 +459,8 @@ InitStatus CbmStsRealMatchHits::Init() {
   fTime = fNHits = fNMatched = fNDistant = fNBackgrd = 0.;
 
   // Get input arrays
-  CbmRootManager* ioman = CbmRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No CbmRootManager");
+  FairRootManager* ioman = FairRootManager::Instance();
+  if ( ! ioman ) Fatal("Init", "No FairRootManager");
   fPoints = (TClonesArray*) ioman->GetObject("STSPoint");
   if ( ! fPoints ) {
     cout << "-E- " << GetName() << "::Init: No STSPoint array!" << endl;
@@ -547,15 +547,15 @@ InitStatus CbmStsRealMatchHits::GetGeometry() {
     fTargetPos.SetXYZ(0., 0., 0.);
     return kERROR;
   }
-  /*  CbmGeoNode* target = (CbmGeoNode*) passNodes->FindObject("targ");
+  /*  FairGeoNode* target = (FairGeoNode*) passNodes->FindObject("targ");
   if ( ! target ) {
     cout << "-E- " << GetName() << "::GetGeometry: No target node" 
 	 << endl;
     fTargetPos.SetXYZ(0., 0., 0.);
     return kERROR;
   }
-  CbmGeoVector targetPos = target->getLabTransform()->getTranslation();
-  CbmGeoVector centerPos = target->getCenterPosition().getTranslation();
+  FairGeoVector targetPos = target->getLabTransform()->getTranslation();
+  FairGeoVector centerPos = target->getCenterPosition().getTranslation();
   Double_t targetX = targetPos.X() + centerPos.X();
   Double_t targetY = targetPos.Y() + centerPos.Y();
   Double_t targetZ = targetPos.Z() + centerPos.Z();
@@ -583,7 +583,7 @@ InitStatus CbmStsRealMatchHits::GetGeometry() {
   fNStations = 0;
   TString stationNames[100];
   for ( Int_t ist = 0 ; ist < tempNofStations ; ist++ ) {
-    CbmGeoNode* stsNode = (CbmGeoNode*)stsNodes->At(ist);
+    FairGeoNode* stsNode = (FairGeoNode*)stsNodes->At(ist);
     if ( ! stsNode ) {
       cout << "-W- CbmStsDigiScheme::Init: station#" << ist
 	   << " not found among sensitive nodes " << endl;

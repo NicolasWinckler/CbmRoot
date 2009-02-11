@@ -17,16 +17,16 @@
 #include "CbmStsTrack.h"
 #include "CbmStsJointTrack.h"
 #include "CbmField.h"
-#include "CbmMCApplication.h"
+#include "FairMCApplication.h"
 #include "CbmStsMassHypothesis.h"
-#include "CbmRunAna.h"
+#include "FairRunAna.h"
 
 
 Double_t M[4] = {0.511, 139.57, 493.68, 938.27};
 
 //___________________________________________________________
 CbmStsPolyFitter::~CbmStsPolyFitter() {
-  CbmRootManager *fManger =CbmRootManager::Instance();
+  FairRootManager *fManger =FairRootManager::Instance();
   fManger->Write();
 }
 
@@ -38,7 +38,7 @@ CbmStsPolyFitter::CbmStsPolyFitter() {
 
 //___________________________________________________________
 CbmStsPolyFitter::CbmStsPolyFitter(const char *name, const char *title)
-	:CbmTask(name) {
+	:FairTask(name) {
 
   TrHits = new TRefArray();  
   fOutputTracks = new TClonesArray("CbmStsTrack");
@@ -48,7 +48,7 @@ CbmStsPolyFitter::CbmStsPolyFitter(const char *name, const char *title)
 //_________________________________________________________________
 void CbmStsPolyFitter::Register() {
 //
-  CbmRootManager::Instance()->Register("CbmStsTrack","Sts", fOutputTracks, kTRUE);
+  FairRootManager::Instance()->Register("CbmStsTrack","Sts", fOutputTracks, kTRUE);
 
 }
 
@@ -57,7 +57,7 @@ InitStatus CbmStsPolyFitter::Init() {
 
   Register();
 
-  CbmRootManager *fManger =CbmRootManager::Instance();	
+  FairRootManager *fManger =FairRootManager::Instance();	
   fHits = (TClonesArray *)fManger->GetObject("StsHit");
 
  if ( !fHits ) { cout << "-E no Hit found" << endl; exit(1);}
@@ -75,7 +75,7 @@ InitStatus CbmStsPolyFitter::Init() {
 
   if ( !fTracks ) { cout << "-E no Track found" << endl; exit(1);}
   
-  CbmRunAna *fRun=CbmRunAna::Instance();
+  FairRunAna *fRun=FairRunAna::Instance();
   fField = 0x0;
       //(CbmField*) fRun->GetField();
 
@@ -220,7 +220,7 @@ void CbmStsPolyFitter::Exec(Option_t * option) {
 
 //_____________________________________________________
 void CbmStsPolyFitter::Finish() {
-  CbmRootManager *fManager =CbmRootManager::Instance();
+  FairRootManager *fManager =FairRootManager::Instance();
   fManager->Fill();
 
   if(!fOption.Contains("eval")) {
@@ -259,7 +259,7 @@ void CbmStsPolyFitter::Output(CbmStsJointTrack *track) {
     out->SetPidHypo(211);
     out->SetChi2(chi2);
 
-    CbmTrackParam *parfst =  out->GetParamFirst();
+    FairTrackParam *parfst =  out->GetParamFirst();
 
     Double_t tgbet = TMath::Tan(fBETA1);
     parfst->SetTx(tgbet);  //  beta
@@ -278,7 +278,7 @@ void CbmStsPolyFitter::Output(CbmStsJointTrack *track) {
     parfst->SetY(hit->GetY());  //
     parfst->SetZ(hit->GetZ());  //
 
-    CbmTrackParam *parlast =  out->GetParamLast();
+    FairTrackParam *parlast =  out->GetParamLast();
 
     tgbet = TMath::ATan(fBETAN);
     parlast->SetTx(tgbet);  //  beta

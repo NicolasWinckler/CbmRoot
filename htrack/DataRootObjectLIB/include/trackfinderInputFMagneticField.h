@@ -68,9 +68,9 @@ public:
 	trackfinderInputFMagneticField(const char* fileName, bool isRootFile = true, const char* mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, bool disableAutomaticMagneticField = true);
 	trackfinderInputFMagneticField(std::string fileName, bool isRootFile = true, std::string mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, bool disableAutomaticMagneticField = true);
 	trackfinderInputFMagneticField(unsigned short numberOfMagnetfieldFactors);
-	trackfinderInputFMagneticField(CbmField* field, unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, bool disableAutomaticMagneticField = true);
-	trackfinderInputFMagneticField(CbmField* field, const char* fileName, bool isRootFile = true, const char* mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
-	trackfinderInputFMagneticField(CbmField* field, std::string fileName, bool isRootFile = true, std::string mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
+	trackfinderInputFMagneticField(FairField* field, unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, bool disableAutomaticMagneticField = true);
+	trackfinderInputFMagneticField(FairField* field, const char* fileName, bool isRootFile = true, const char* mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
+	trackfinderInputFMagneticField(FairField* field, std::string fileName, bool isRootFile = true, std::string mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
 
 /**
  * Destructor
@@ -91,9 +91,9 @@ public:
 	void initialize();
 	void init(const char* fileName, bool isRootFile = true, const char* mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
 	void init(std::string fileName, bool isRootFile = true, std::string mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
-	void init(CbmField* field, unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
-	void init(CbmField* field, const char* fileName, bool isRootFile = true, const char* mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
-	void init(CbmField* field, std::string fileName, bool isRootFile = true, std::string mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
+	void init(FairField* field, unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
+	void init(FairField* field, const char* fileName, bool isRootFile = true, const char* mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
+	void init(FairField* field, std::string fileName, bool isRootFile = true, std::string mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0, bool disableAutomaticMagneticField = true);
 
 /**
  * This method returns the size of the reserved memory for

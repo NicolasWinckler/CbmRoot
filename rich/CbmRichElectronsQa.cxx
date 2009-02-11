@@ -1,14 +1,14 @@
 #include "CbmRichElectronsQa.h"
 
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 #include "CbmGlobalTrack.h"
 #include "CbmStsTrackMatch.h"
 #include "CbmRichRing.h"
 #include "CbmRichRingMatch.h"
 #include "CbmTrdTrack.h"
 #include "CbmTrdTrackMatch.h"
-#include "CbmRootManager.h"
-#include "CbmMCPoint.h"
+#include "FairRootManager.h"
+#include "FairMCPoint.h"
 #include "CbmMCTrack.h"
 #include "CbmTofHit.h"
 
@@ -25,7 +25,7 @@ using std::map;
 using std::vector;
 
 // -----   Default constructor   -------------------------------------------
-CbmRichElectronsQa::CbmRichElectronsQa() :CbmTask("RichRingQa")
+CbmRichElectronsQa::CbmRichElectronsQa() :FairTask("RichRingQa")
 {
 
 }
@@ -33,7 +33,7 @@ CbmRichElectronsQa::CbmRichElectronsQa() :CbmTask("RichRingQa")
 
 //------------  standard constructor (with verbosity level)  ---------------------------------
 CbmRichElectronsQa::CbmRichElectronsQa(const char *name, const char *title, Int_t verbose)
-  :CbmTask(name)
+  :FairTask(name)
 {
 	fEventNum = 1;
 
@@ -127,8 +127,8 @@ CbmRichElectronsQa::~CbmRichElectronsQa()
 InitStatus CbmRichElectronsQa::Init()
 {
 	cout << "InitStatus CbmRichElectronsQa::Init()"<<endl;
-	// Get and check CbmRootManager
-	CbmRootManager* ioman = CbmRootManager::Instance();
+	// Get and check FairRootManager
+	FairRootManager* ioman = FairRootManager::Instance();
 	if (!ioman) {
 		cout << "-E- CbmRichElectronsQa::Init: " << "RootManager not instantised!"
 				<< endl;
@@ -319,7 +319,7 @@ void CbmRichElectronsQa::AccTracks()
 		if (iPoint < 0)	continue; // Fake or background hit
 		//Get the MC Point corresponding to the hit
 
-		CbmMCPoint* point = (CbmMCPoint*) fRichPoints->At(iPoint);
+		FairMCPoint* point = (FairMCPoint*) fRichPoints->At(iPoint);
 		if ( !point) continue;
 
 		//Get the MC Track ID corresponding to the MC Point
@@ -513,7 +513,7 @@ Bool_t CbmRichElectronsQa::DoesRingHaveProjection(Int_t trackId){
 	Int_t nProj = fRichProj->GetEntriesFast();
 
 	for (Int_t iProj = 0; iProj < nProj; iProj++) {
-		CbmTrackParam* proj = (CbmTrackParam*)fRichProj->At(iProj);
+		FairTrackParam* proj = (FairTrackParam*)fRichProj->At(iProj);
 		if (!proj) {
 			cout << "-E- no projection"<< iProj<<endl;
 			continue;
@@ -594,7 +594,7 @@ void CbmRichElectronsQa::GlobalTracksMatchEff()
 		if (!tofHit)continue;
 		Int_t tofPointIndex = tofHit->GetRefIndex();
 		if (tofPointIndex < 0) continue;
-		CbmMCPoint* tofPoint = (CbmMCPoint*)fTofPoints->At(tofPointIndex);
+		FairMCPoint* tofPoint = (FairMCPoint*)fTofPoints->At(tofPointIndex);
 		if (!tofPoint)continue;
 		Int_t mcIdTof = tofPoint->GetTrackID();
 		if (richRing->GetRecFlag() == 3 &&

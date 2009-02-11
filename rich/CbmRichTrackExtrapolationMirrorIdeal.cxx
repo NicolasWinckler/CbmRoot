@@ -29,12 +29,12 @@
 
 #include "CbmRichPoint.h"
 
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 #include "CbmMCTrack.h"
 #include "CbmStsTrack.h"
 #include "CbmStsTrackMatch.h"
 #include "CbmGlobalTrack.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 // ROOT includes
 #include "TClonesArray.h"
@@ -81,8 +81,8 @@ CbmRichTrackExtrapolationMirrorIdeal::~CbmRichTrackExtrapolationMirrorIdeal() {
 // -----   Public method Init   --------------------------------------------
 void CbmRichTrackExtrapolationMirrorIdeal::Init() {
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmRichTrackExtrapolationMirrorIdeal::Init: "
 	 << "RootManager not instantised!" << endl;
@@ -175,7 +175,7 @@ Int_t CbmRichTrackExtrapolationMirrorIdeal::DoExtrapolate(TClonesArray *gTrackAr
    Int_t nTracks = gTrackArray->GetEntriesFast();
    for (Int_t iTrack=0; iTrack < nTracks; iTrack++){
      CbmGlobalTrack* gTrack = (CbmGlobalTrack*)gTrackArray->At(iTrack);
-     new((*fTrackParamArray)[iTrack]) CbmTrackParam(0.,0.,0.,0.,0.,0.,covMat);
+     new((*fTrackParamArray)[iTrack]) FairTrackParam(0.,0.,0.,0.,0.,0.,covMat);
      Int_t idSTS = gTrack->GetStsTrackIndex();
      if (fVerbose > 1) cout << "-I- Ideal-Trackextrapolation, iTrack(STS) " << idSTS
                              << " pointer " << (CbmStsTrack*)fSTSArray->At(idSTS) << endl;
@@ -197,8 +197,8 @@ Int_t CbmRichTrackExtrapolationMirrorIdeal::DoExtrapolate(TClonesArray *gTrackAr
            tx = mom.Px()/mom.Pz();
            ty = mom.Py()/mom.Pz();
            qp = charge/mom.Mag();
-	   CbmTrackParam richtrack(pos.X(),pos.Y(),pos.Z(),tx,ty,qp,covMat);
-           * (CbmTrackParam*)(fTrackParamArray->At(iTrack)) = richtrack;
+	   FairTrackParam richtrack(pos.X(),pos.Y(),pos.Z(),tx,ty,qp,covMat);
+           * (FairTrackParam*)(fTrackParamArray->At(iTrack)) = richtrack;
 
            if (fVerbose > 1) {
 	      cout << "-I- Ideal Track Extrapolation - extrapolate track " << iTrack  << endl;

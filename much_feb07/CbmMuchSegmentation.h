@@ -15,8 +15,8 @@
 #include "TVector2.h"
 #include "TArrayD.h"
 
-#include "CbmTask.h"
-#include "CbmGeoNode.h"
+#include "FairTask.h"
+#include "FairGeoNode.h"
 
 #include <vector>
 #include <map>
@@ -24,7 +24,7 @@
 class CbmGeoMuchPar;
 class TClonesArray;
 
-class CbmMuchSegmentation : public CbmTask
+class CbmMuchSegmentation : public FairTask
 {
 
  public:
@@ -117,7 +117,7 @@ class CbmMuchSegmentation : public CbmTask
  private:
 
   enum PlainPart   {kMain, kGaps};               
-  enum GeoNodeType {kPassive, kSensitive};       // Type of CbmGeoNode enum
+  enum GeoNodeType {kPassive, kSensitive};       // Type of FairGeoNode enum
   CbmGeoMuchPar*         fGeoPar;                // Geometry parameters container
   char*                  fDigiFileName;          // Name of the digitizer parameter file
   Int_t                  fNStations;             // Total number of stations
@@ -143,7 +143,7 @@ class CbmMuchSegmentation : public CbmTask
   virtual InitStatus Init();
   
   /** Calculates regions radia where hit density decreases twicely for all stations. **/
-  void FillRadia(std::map<Double_t, std::pair<GeoNodeType, CbmGeoNode*> > geoNodesMap);
+  void FillRadia(std::map<Double_t, std::pair<GeoNodeType, FairGeoNode*> > geoNodesMap);
   /** Calculates internal radia for regions where the hit density reduces twicely
       from the given histogram. **/
   std::vector<Double_t> CalculateInternalRadia(TH1D* hist);

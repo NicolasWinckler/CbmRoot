@@ -19,9 +19,9 @@
 #include "CbmMuchPad.h"
 
 // Includes from base
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
-#include "CbmMCPoint.h"
+#include "FairMCPoint.h"
 
 // Includes from ROOT
 #include "TObjArray.h"
@@ -46,7 +46,7 @@ using std::pair;
 
 // -----   Default constructor   ------------------------------------------
 CbmMuchDigitize::CbmMuchDigitize() :
-	CbmTask("MuchDigitize", 1) {
+	FairTask("MuchDigitize", 1) {
 	fGeoScheme = CbmMuchGeoScheme::Instance();
 	fDigiFile = NULL;
 	fPoints = NULL;
@@ -69,7 +69,7 @@ CbmMuchDigitize::CbmMuchDigitize() :
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchDigitize::CbmMuchDigitize(Int_t iVerbose) :
-	CbmTask("MuchDigitize", iVerbose) {
+	FairTask("MuchDigitize", iVerbose) {
 	fGeoScheme = CbmMuchGeoScheme::Instance();
 	fDigiFile = NULL;
 	fPoints = NULL;
@@ -93,7 +93,7 @@ CbmMuchDigitize::CbmMuchDigitize(Int_t iVerbose) :
 // -----   Constructor with name   -----------------------------------------
 CbmMuchDigitize::CbmMuchDigitize(const char* name, const char* digiFileName,
 		Int_t iVerbose) :
-	CbmTask(name, iVerbose) {
+	FairTask(name, iVerbose) {
 	fGeoScheme = CbmMuchGeoScheme::Instance();
 	fDigiFile = new TFile(digiFileName);
 	fPoints = NULL;
@@ -491,9 +491,9 @@ void CbmMuchDigitize::Finish() {
 
 // -----   Private method Init   -------------------------------------------
 InitStatus CbmMuchDigitize::Init() {
-	CbmRootManager* ioman = CbmRootManager::Instance();
+	FairRootManager* ioman = FairRootManager::Instance();
 	if (!ioman)
-		Fatal("Init", "No CbmRootManager");
+		Fatal("Init", "No FairRootManager");
 
 	// Initialize GeoScheme
 	TObjArray* stations = (TObjArray*) fDigiFile->Get("stations");

@@ -21,7 +21,7 @@ CbmTrkHit::CbmTrkHit() {
 // -----   Standard constructor   ------------------------------------------
 CbmTrkHit::CbmTrkHit(Int_t detId, TVector3& pos, TVector3& dpos, 
 		     Double_t covXY, Int_t index) 
-  : CbmHit(detId, pos, dpos, index) {
+  : FairHit(detId, pos, dpos, index) {
   fCovXY = covXY;
 }
 // -------------------------------------------------------------------------

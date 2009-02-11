@@ -8,8 +8,8 @@
 #ifndef CBM_DI_LEPT_TASK_H
 #define CBM_DI_LEPT_TASK_H
 
-#include "CbmTask.h"
-#include "CbmBaseParSet.h"
+#include "FairTask.h"
+#include "FairBaseParSet.h"
 #include "CbmMCTrack.h"
 
 #include "TString.h"
@@ -18,7 +18,7 @@ class TClonesArray;
 class TH2D;
 class TH1D;
 class TH2F;
-class CbmRootManager;
+class FairRootManager;
 
 
 /**
@@ -29,7 +29,7 @@ class CbmRootManager;
  */
 
 
-class CbmDiLeptTask : public CbmTask {
+class CbmDiLeptTask : public FairTask {
 
 public:
     /**
@@ -74,14 +74,14 @@ public:
 
 private:
 
-    CbmRootManager *fRootManager;
+    FairRootManager *fRootManager;
 
     TClonesArray *fArrayMCTrack;
     TClonesArray *fArrayStsPoint;
     TClonesArray *fArrayRichPoint;
 
-    CbmBaseParSet *fBasePar;
-    CbmPrimaryGenerator *fPrimGen;
+    FairBaseParSet *fBasePar;
+    FairPrimaryGenerator *fPrimGen;
 
     Int_t fEvents;
 

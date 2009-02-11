@@ -9,8 +9,8 @@
 #include "CbmLitConverter.h"
 
 #include "CbmPropagatorGeane.h"
-#include "CbmTrackParam.h"
-#include "CbmTrackParP.h"
+#include "FairTrackParam.h"
+#include "FairTrackParP.h"
 
 #include "TVector3.h"
 
@@ -52,7 +52,7 @@ LitStatus CbmLitTrackPropagatorGeane::Propagate(
         Double_t zOut,
         Int_t pdg)
 {
-	CbmTrackParam param;
+	FairTrackParam param;
 	StatusCode result;
 	
 	CbmLitConverter::LitTrackParamToTrackParam(par, &param);

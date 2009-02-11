@@ -1,8 +1,8 @@
 #include "CbmEcalAnalysisMaterial.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
-#include "CbmRadLenPoint.h"
+#include "FairRadLenPoint.h"
 
 
 #include "TTree.h"
@@ -24,7 +24,7 @@ void CbmEcalAnalysisMaterial::Exec(Option_t* option)
     Info("Exec", "Event %d.", fEvent);
   InitTree();
   CbmMCTrack* tr;
-  CbmRadLenPoint* p;
+  FairRadLenPoint* p;
   Int_t i;
   Int_t n;
   Double_t z=1200;
@@ -48,7 +48,7 @@ void CbmEcalAnalysisMaterial::Exec(Option_t* option)
   fX0=0; fIntL=0;
   for(i=0;i<n;i++)
   {
-    p=(CbmRadLenPoint*)fRadLen->At(i);
+    p=(FairRadLenPoint*)fRadLen->At(i);
     newp=p->GetPositionOut();
 //    cout << d.Mag() << "	" << p->GetRadLength() << "	" << newp.Z() << "	" << fX0 << endl;
     if (newp.Z()>1200) break;
@@ -75,7 +75,7 @@ void CbmEcalAnalysisMaterial::InitTree()
 }
 
 CbmEcalAnalysisMaterial::CbmEcalAnalysisMaterial(const char* name, const Int_t iVerbose)
-  : CbmTask(name, iVerbose)
+  : FairTask(name, iVerbose)
 {
   fTree=NULL;
 }
@@ -83,7 +83,7 @@ CbmEcalAnalysisMaterial::CbmEcalAnalysisMaterial(const char* name, const Int_t i
 /** Initing routine **/
 InitStatus CbmEcalAnalysisMaterial::Init()
 {
-  CbmRootManager* fManager=CbmRootManager::Instance();
+  FairRootManager* fManager=FairRootManager::Instance();
   if (!fManager)
   {
     Fatal("Init", "Can't find a Root Manager.");

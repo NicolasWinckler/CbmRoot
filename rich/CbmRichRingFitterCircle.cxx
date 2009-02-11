@@ -36,7 +36,7 @@
 #include "CbmRichRing.h"
 #include "CbmRichHit.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TMath.h"
 

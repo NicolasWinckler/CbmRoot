@@ -3,7 +3,7 @@
 #include "CbmTutorialDetGeoPar.h"
 #include "CbmTutorialDetDigiPar.h"
 
-#include "CbmRuntimeDb.h"
+#include "FairRuntimeDb.h"
 
 #include <iostream>
 
@@ -16,7 +16,7 @@ CbmTutorialDetContFact::CbmTutorialDetContFact() {
   fName="CbmTutorialDetContFact";
   fTitle="Factory for parameter containers in libTutorial1";
   setAllContainers();
-  CbmRuntimeDb::instance()->addContFactory(this);
+  FairRuntimeDb::instance()->addContFactory(this);
 }
 
 void CbmTutorialDetContFact::setAllContainers() {
@@ -25,14 +25,14 @@ void CbmTutorialDetContFact::setAllContainers() {
       the list of containers for the Tutorial1 library.
   */
 
-  CbmContainer* p1= new CbmContainer("CbmTutorialDetGeoPar",
+  FairContainer* p1= new FairContainer("CbmTutorialDetGeoPar",
 				     "CbmTutorialDet Geometry Parameters",
 				     "TestDefaultContext");
   p1->addContext("TestNonDefaultContext");
   
   containers->Add(p1);
 
-  CbmContainer* p2= new CbmContainer("CbmTutorialDetDigiPar",
+  FairContainer* p2= new FairContainer("CbmTutorialDetDigiPar",
 				     "Tutorial Det Digi Parameters",
 				     "TestDefaultContext");
   p2->addContext("TestNonDefaultContext");
@@ -40,14 +40,14 @@ void CbmTutorialDetContFact::setAllContainers() {
   containers->Add(p2);
 }
 
-CbmParSet* CbmTutorialDetContFact::createContainer(CbmContainer* c) {
+FairParSet* CbmTutorialDetContFact::createContainer(FairContainer* c) {
   /** Calls the constructor of the corresponding parameter container.
       For an actual context, which is not an empty string and not 
       the default context
       of this container, the name is concatinated with the context. 
   */
   const char* name=c->GetName();
-  CbmParSet* p=NULL;
+  FairParSet* p=NULL;
   if (strcmp(name,"CbmTutorialDetGeoPar")==0) {
     p=new CbmTutorialDetGeoPar(c->getConcatName().Data(),
 			       c->GetTitle(),c->getContext());

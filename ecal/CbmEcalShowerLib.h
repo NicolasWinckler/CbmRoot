@@ -3,7 +3,7 @@
 #ifndef CBMECALSHOWERLIB_H
 #define CBMECALSHOWERLIB_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "TString.h"
 
 /** Representation of record in shower library.
@@ -24,7 +24,7 @@ public:
   Float_t* fData;
 };
 
-class CbmEcalShowerLib : public CbmTask
+class CbmEcalShowerLib : public FairTask
 {
 public:
   /** Constructor to use **/

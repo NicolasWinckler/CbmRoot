@@ -52,7 +52,7 @@
 #include "CbmEcalPointLite.h"
 #include "CbmEcalHit.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "TVector3.h"
@@ -70,11 +70,11 @@ using std::map;
 using std::vector;
 
 // -----   Default constructor   -------------------------------------------
-CbmEcalHitProducer::CbmEcalHitProducer() :CbmTask() {}
+CbmEcalHitProducer::CbmEcalHitProducer() :FairTask() {}
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   -------------------------------------------
-CbmEcalHitProducer::CbmEcalHitProducer(const char *name, const Int_t iVerbose, const char* fileGeo) :CbmTask(name,iVerbose)
+CbmEcalHitProducer::CbmEcalHitProducer(const char *name, const Int_t iVerbose, const char* fileGeo) :FairTask(name,iVerbose)
 {
   fEvent = 0;
   fNHits = 0;
@@ -100,7 +100,7 @@ CbmEcalHitProducer::CbmEcalHitProducer(const char *name, const Int_t iVerbose, c
 // -----   Destructor   ----------------------------------------------------
 CbmEcalHitProducer::~CbmEcalHitProducer()
 {
-  CbmRootManager *fManager =CbmRootManager::Instance();
+  FairRootManager *fManager =FairRootManager::Instance();
   fManager->Write();
 }
 // -------------------------------------------------------------------------
@@ -114,7 +114,7 @@ void CbmEcalHitProducer::SetParContainers()
 InitStatus CbmEcalHitProducer::Init()
 {
   fInited=kTRUE;
-  CbmRootManager* fManager = CbmRootManager::Instance();
+  FairRootManager* fManager = FairRootManager::Instance();
 
   if (fUseMCPoints==kFALSE&&fUseSummableHits==kFALSE&&fUseUnSummableHits==kFALSE)
   {

@@ -21,11 +21,11 @@
 #include "CbmL1Track.h"
 #include "CbmL1Vtx.h"
 
-#include "CbmTask.h"
-#include "CbmRootManager.h"
-#include "CbmDetector.h"
+#include "FairTask.h"
+#include "FairRootManager.h"
+#include "FairDetector.h"
 #include "CbmMCTrack.h"
-#include "CbmMCApplication.h"
+#include "FairMCApplication.h"
 #include "CbmStsPoint.h"
 #include "CbmStsHit.h"
 #include "CbmMvdPoint.h"
@@ -64,7 +64,7 @@ class CbmL1HitStore{
   double x, y;
 };
 
-class CbmL1 : public CbmTask 
+class CbmL1 : public FairTask 
 {
  public:
 

@@ -74,7 +74,7 @@ void trackfinderInputMagneticField::readField() {
 	
 		}
 
-		magneticField = new CbmField("Magnetic Field");
+		magneticField = new FairField("Magnetic Field");
 
 		isLocalField  = true;
 
@@ -174,7 +174,7 @@ trackfinderInputMagneticField::trackfinderInputMagneticField(unsigned short numb
 	setNumberOfMagnetfieldFactors(numberOfMagnetfieldFactors);
 
 }
-trackfinderInputMagneticField::trackfinderInputMagneticField(CbmField* field, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor) {
+trackfinderInputMagneticField::trackfinderInputMagneticField(FairField* field, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor) {
 
 	this->magneticField                                   = field;
 	this->isLocalField                                    = false;
@@ -347,7 +347,7 @@ void trackfinderInputMagneticField::init(unsigned short numberOfMagnetfieldFacto
 	setNumberOfMagnetfieldFactors(numberOfMagnetfieldFactors);
 
 }
-void trackfinderInputMagneticField::init(CbmField* field, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, unsigned short numberOfMagnetfieldFactors) {
+void trackfinderInputMagneticField::init(FairField* field, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor, unsigned short numberOfMagnetfieldFactors) {
 
 	if (isLocalField) {
 

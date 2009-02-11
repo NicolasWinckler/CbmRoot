@@ -17,10 +17,10 @@
 #define CBMMVDGEO_H 1
 
 
-#include "CbmGeoSet.h"
+#include "FairGeoSet.h"
 
 
-class  CbmMvdGeo : public CbmGeoSet {
+class  CbmMvdGeo : public FairGeoSet {
 
  public:
 

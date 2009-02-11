@@ -130,7 +130,7 @@ SET(LITTRACK_SRCS ${LITTRACK_SRCS} ${LITTRACK_DICTIONARY})
 
 add_library(Littrack SHARED ${LITTRACK_SRCS})
 target_link_libraries(Littrack ${ROOT_LIBRARIES})
-set_target_properties(Littrack PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(Littrack PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS Littrack DESTINATION ${CMAKE_BINARY_DIR}/lib)

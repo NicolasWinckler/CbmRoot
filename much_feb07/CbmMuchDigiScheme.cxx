@@ -10,11 +10,11 @@
 
 #include "TArrayD.h"
 
-#include "CbmGeoMedium.h"
-#include "CbmGeoNode.h"
-#include "CbmGeoTransform.h"
-#include "CbmGeoVector.h"
-#include "CbmRootManager.h"
+#include "FairGeoMedium.h"
+#include "FairGeoNode.h"
+#include "FairGeoTransform.h"
+#include "FairGeoVector.h"
+#include "FairRootManager.h"
 
 #include "CbmGeoMuchPar.h"
 #include "CbmMuchDigiPar.h"
@@ -101,7 +101,7 @@ Bool_t CbmMuchDigiScheme::Init(CbmGeoMuchPar*  geoPar,
        // Get geometry parameters of station
        TString statName = Form("muchstation%02i",statNr); 
        TObjArray* sensNodes = geoPar->GetGeoSensitiveNodes();
-       CbmGeoNode* geoStat = (CbmGeoNode*) (sensNodes->FindObject(statName));
+       FairGeoNode* geoStat = (FairGeoNode*) (sensNodes->FindObject(statName));
        if ( ! geoStat ) {
          cout << "-W- CbmMuchDigiScheme::Init: " << statName 
 	   //<< " not found among sensitive nodes " << flush;
@@ -117,12 +117,12 @@ Bool_t CbmMuchDigiScheme::Init(CbmGeoMuchPar*  geoPar,
 	 //AZ
          return kFALSE;
        }
-       CbmGeoTransform* transform = geoStat->getLabTransform();
-       CbmGeoVector translat = transform->getTranslation();
-       CbmGeoTransform center = geoStat->getCenterPosition();
-       CbmGeoVector centerV = center.getTranslation();
+       FairGeoTransform* transform = geoStat->getLabTransform();
+       FairGeoVector translat = transform->getTranslation();
+       FairGeoTransform center = geoStat->getCenterPosition();
+       FairGeoVector centerV = center.getTranslation();
        TArrayD* params = geoStat->getParameters();
-       CbmGeoMedium* material = geoStat->getMedium();
+       FairGeoMedium* material = geoStat->getMedium();
        material->calcRadiationLength();
 
        Double_t statRmin = params->At(7);

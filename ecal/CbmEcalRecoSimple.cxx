@@ -4,8 +4,8 @@
 #include "TClonesArray.h"
 #include "TFormula.h"
 
-#include "CbmRootManager.h"
-#include "CbmTrackParam.h"
+#include "FairRootManager.h"
+#include "FairTrackParam.h"
 
 #include "CbmEcalStructure.h"
 #include "CbmEcalInf.h"
@@ -278,14 +278,14 @@ void CbmEcalRecoSimple::CreateTree()
 
 /** Default constructor. Requirement of ROOT system **/
 CbmEcalRecoSimple::CbmEcalRecoSimple() 
-  : CbmTask()
+  : FairTask()
 {
   ;
 }
 
 /** Standard constructor **/
 CbmEcalRecoSimple::CbmEcalRecoSimple(const char *name, const Int_t iVerbose, const char* configname)
-  : CbmTask(name, iVerbose)
+  : FairTask(name, iVerbose)
 {
   fToTree=kFALSE;
   fOutTree=NULL;
@@ -349,7 +349,7 @@ void CbmEcalRecoSimple::Finish()
 InitStatus CbmEcalRecoSimple::Init()
 {
   fEventN=0;
-  CbmRootManager* io=CbmRootManager::Instance();
+  FairRootManager* io=FairRootManager::Instance();
   if (!io)
   {
     Fatal("Init", "Can't find IOManager.");

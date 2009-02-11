@@ -17,16 +17,16 @@
 #define CBMFIELDPAR_H 1
 
 
-#include "CbmField.h"
-#include "CbmParGenericSet.h"
+#include "FairField.h"
+#include "FairParGenericSet.h"
 
 
-class CbmParamList;
+class FairParamList;
 
 const int kMaxFieldMapType = 5;        
 const int kTypeDistorted = 4;        
 
-class CbmFieldPar : public CbmParGenericSet
+class CbmFieldPar : public FairParGenericSet
 {
 
  public:
@@ -43,15 +43,15 @@ class CbmFieldPar : public CbmParGenericSet
 
 
   /** Put parameters **/
-  virtual void putParams(CbmParamList* list);
+  virtual void putParams(FairParamList* list);
 
 
   /** Get parameters **/
-  virtual Bool_t getParams(CbmParamList* list);
+  virtual Bool_t getParams(FairParamList* list);
 
 
   /** Set parameters from CbmField  **/
-  void SetParameters(CbmField* field);
+  void SetParameters(FairField* field);
 
 
   /** Accessors **/

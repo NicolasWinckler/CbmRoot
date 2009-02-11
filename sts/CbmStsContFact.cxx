@@ -17,10 +17,10 @@
 #include "CbmGeoStsPar.h"
 #include "CbmStsDigiPar.h"
 
-#include "CbmRuntimeDb.h"
+#include "FairRuntimeDb.h"
 #include "CbmParTest.h"
-#include "CbmParRootFileIo.h"
-#include "CbmParAsciiFileIo.h"
+#include "FairParRootFileIo.h"
+#include "FairParAsciiFileIo.h"
 
 #include "TClass.h"
 
@@ -39,18 +39,18 @@ CbmStsContFact::CbmStsContFact() {
   fName="CbmStsContFact";
   fTitle="Factory for parameter containers in libSts";
   setAllContainers();
-  CbmRuntimeDb::instance()->addContFactory(this);
+  FairRuntimeDb::instance()->addContFactory(this);
 }
 
 void CbmStsContFact::setAllContainers() {
   /** Creates the Container objects with all accepted contexts and adds them to
    *  the list of containers for the STS library.*/
-    CbmContainer* p1= new CbmContainer("CbmStsDigiPar",
+    FairContainer* p1= new FairContainer("CbmStsDigiPar",
                                           "Sts Digitisation Parameters",
                                           "TestDefaultContext");
     p1->addContext("TestNonDefaultContext");
 
-    CbmContainer* p2= new CbmContainer("CbmGeoStsPar",
+    FairContainer* p2= new FairContainer("CbmGeoStsPar",
                                           "Sts Geometry Parameters",
                                           "TestDefaultContext");
     p2->addContext("TestNonDefaultContext");
@@ -59,13 +59,13 @@ void CbmStsContFact::setAllContainers() {
     containers->Add(p2);
 }
 
-CbmParSet* CbmStsContFact::createContainer(CbmContainer* c) {
+FairParSet* CbmStsContFact::createContainer(FairContainer* c) {
   /** Calls the constructor of the corresponding parameter container.
    * For an actual context, which is not an empty string and not the default context
    * of this container, the name is concatinated with the context. */
   const char* name=c->GetName();
   cout << " -I container name " << name << endl;
-  CbmParSet* p=0;
+  FairParSet* p=0;
   if (strcmp(name,"CbmStsDigiPar")==0) {
     p=new CbmStsDigiPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
   }
@@ -75,15 +75,15 @@ CbmParSet* CbmStsContFact::createContainer(CbmContainer* c) {
   return p;
 }
 
-void  CbmStsContFact::activateParIo(CbmParIo* io) {
+void  CbmStsContFact::activateParIo(FairParIo* io) {
   // activates the input/output class for the parameters
   // needed by the Sts
-  if (strcmp(io->IsA()->GetName(),"CbmParRootFileIo")==0) {
-    CbmStsParRootFileIo* p=new CbmStsParRootFileIo(((CbmParRootFileIo*)io)->getParRootFile());
+  if (strcmp(io->IsA()->GetName(),"FairParRootFileIo")==0) {
+    CbmStsParRootFileIo* p=new CbmStsParRootFileIo(((FairParRootFileIo*)io)->getParRootFile());
     io->setDetParIo(p);
   }
-  if (strcmp(io->IsA()->GetName(),"CbmParAsciiFileIo")==0) {
-    CbmStsParAsciiFileIo* p=new CbmStsParAsciiFileIo(((CbmParAsciiFileIo*)io)->getFile());
+  if (strcmp(io->IsA()->GetName(),"FairParAsciiFileIo")==0) {
+    CbmStsParAsciiFileIo* p=new CbmStsParAsciiFileIo(((FairParAsciiFileIo*)io)->getFile());
     io->setDetParIo(p);
   }
 }

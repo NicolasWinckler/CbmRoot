@@ -32,9 +32,9 @@
 #include "CbmRichRing.h"
 #include "CbmRichRingMatch.h"
 
-#include "CbmMCPoint.h"
+#include "FairMCPoint.h"
 #include "CbmMCTrack.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -48,7 +48,7 @@ using std::map;
 
 // -----   Default constructor   -------------------------------------------
 CbmRichMatchRings::CbmRichMatchRings()
-  : CbmTask("RICH Ring match") {
+  : FairTask("RICH Ring match") {
   fRings      = NULL;
   fPoints     = NULL;
   fHits       = NULL;
@@ -61,7 +61,7 @@ CbmRichMatchRings::CbmRichMatchRings()
 
 // -----   Constructor with verbosity level   ------------------------------
 CbmRichMatchRings::CbmRichMatchRings(Int_t verbose)
-  : CbmTask("RICH Ring match") {
+  : FairTask("RICH Ring match") {
   fRings      = NULL;
   fPoints     = NULL;
   fHits       = NULL;
@@ -75,7 +75,7 @@ CbmRichMatchRings::CbmRichMatchRings(Int_t verbose)
 // -----   Constructor with name, title and verbosity  ---------------------
 CbmRichMatchRings::CbmRichMatchRings(const char* name, const char* title,
 				     Int_t verbose)
-  : CbmTask(name) {
+  : FairTask(name) {
   fRings      = NULL;
   fPoints     = NULL;
   fHits       = NULL;
@@ -96,8 +96,8 @@ CbmRichMatchRings::~CbmRichMatchRings() { }
 // -----   Public method Init   --------------------------------------------
 InitStatus CbmRichMatchRings::Init() {
   
-  // Get CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmRichMatchRings::Init: "
 	 << "RootManager not instantised!" << endl;
@@ -153,7 +153,7 @@ void CbmRichMatchRings::Exec(Option_t* opt) {
   // Create some pointers and variables
   CbmRichRing* ring  = NULL;
   CbmRichHit* hit    = NULL;
-  CbmMCPoint* point  = NULL;
+  FairMCPoint* point  = NULL;
   CbmMCTrack* track  = NULL;
 
   Int_t nHits        = 0;
@@ -197,7 +197,7 @@ void CbmRichMatchRings::Exec(Option_t* opt) {
     
     //Get the MC Point corresponding to the hit
     
-    point = (CbmMCPoint*) fPoints->At(iPoint);
+    point = (FairMCPoint*) fPoints->At(iPoint);
     if ( ! point ) {
       cout << "-E- CbmRichMatchRings::Exec: "
 	   << "Empty MCPoint " << iPoint << " from Hit " << iHit
@@ -256,7 +256,7 @@ void CbmRichMatchRings::Exec(Option_t* opt) {
       
       //Get the MC Point corresponding to the hit
       
-      point = (CbmMCPoint*) fPoints->At(iPoint);
+      point = (FairMCPoint*) fPoints->At(iPoint);
       if ( ! point ) {
 	cout << "-E- CbmRichMatchRings::Exec: "
 	     << "Empty MCPoint " << iPoint << " from Hit " << iHit

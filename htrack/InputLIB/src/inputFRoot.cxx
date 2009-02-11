@@ -31,10 +31,10 @@
 
 #include "../../MiscLIB/include/defs.h"
 #if (ARCHITECTURE == CBMROOT)
-	#include "CbmRunAna.h"
-	#include "CbmRuntimeDb.h"
-	#include "CbmGeoVector.h"
-	#include "CbmGeoNode.h"
+	#include "FairRunAna.h"
+	#include "FairRuntimeDb.h"
+	#include "FairGeoVector.h"
+	#include "FairGeoNode.h"
 	#include "CbmGeoStsPar.h"
 	#include "CbmStsStation.h"
 	#include "CbmMvdGeoPar.h"
@@ -306,19 +306,19 @@ bool inputFRoot::readMvdDetectorByHand() {
 
 #if (ARCHITECTURE == CBMROOT)
 
-	CbmRunAna*              runAnalysisInstance;
-	CbmRuntimeDb*           runDataBase;
+	FairRunAna*              runAnalysisInstance;
+	FairRuntimeDb*           runDataBase;
 	CbmMvdGeoPar*           mvdParameterContainer;
 	TObjArray*              mvdGeoSensitiveNodes;
 	std::string             stationVolumeName;
 	unsigned int            stationCounter;
-	CbmGeoNode*             stationNode;
-	CbmGeoVector            volumeIV;
-	CbmGeoVector            centerV;
+	FairGeoNode*             stationNode;
+	FairGeoVector            volumeIV;
+	FairGeoVector            centerV;
 	trackfinderInputStation actualStation;
 
 	isDetectorRead        = true;
-	runAnalysisInstance   = CbmRunAna::Instance();
+	runAnalysisInstance   = FairRunAna::Instance();
 	if (runAnalysisInstance == NULL) {
 		cannotGetRunAnaInstanceWarningMsg* cannotGetRunAnaInstance = new cannotGetRunAnaInstanceWarningMsg();
 		cannotGetRunAnaInstance->warningMsg();
@@ -372,7 +372,7 @@ bool inputFRoot::readMvdDetectorByHand() {
 	while (1 == 1) {
 
 		stationVolumeName = generateMvdStationVolumeName(stationCounter + 1);
-		stationNode       = dynamic_cast<CbmGeoNode*>(mvdGeoSensitiveNodes->FindObject(stationVolumeName.c_str()));
+		stationNode       = dynamic_cast<FairGeoNode*>(mvdGeoSensitiveNodes->FindObject(stationVolumeName.c_str()));
 
 		if (stationNode == NULL)
 			break;
@@ -433,19 +433,19 @@ bool inputFRoot::readStsDetectorByHand() {
 
 #if (ARCHITECTURE == CBMROOT)
 
-	CbmRunAna*              runAnalysisInstance;
-	CbmRuntimeDb*           runDataBase;
+	FairRunAna*              runAnalysisInstance;
+	FairRuntimeDb*           runDataBase;
 	CbmGeoStsPar*           stsParameterContainer;
 	TObjArray*              stsGeoSensitiveNodes;
 	std::string             stationVolumeName;
 	unsigned int            stationCounter;
-	CbmGeoNode*             stationNode;
-	CbmGeoVector            volumeIV;
-	CbmGeoVector            centerV;
+	FairGeoNode*             stationNode;
+	FairGeoVector            volumeIV;
+	FairGeoVector            centerV;
 	trackfinderInputStation actualStation;
 
 	isDetectorRead        = true;
-	runAnalysisInstance   = CbmRunAna::Instance();
+	runAnalysisInstance   = FairRunAna::Instance();
 	if (runAnalysisInstance == NULL) {
 		cannotGetRunAnaInstanceWarningMsg* cannotGetRunAnaInstance = new cannotGetRunAnaInstanceWarningMsg();
 		cannotGetRunAnaInstance->warningMsg();
@@ -499,7 +499,7 @@ bool inputFRoot::readStsDetectorByHand() {
 	while (1 == 1) {
 
 		stationVolumeName = generateStsStationVolumeName(stationCounter + 1);
-		stationNode       = dynamic_cast<CbmGeoNode*>(stsGeoSensitiveNodes->FindObject(stationVolumeName.c_str()));
+		stationNode       = dynamic_cast<FairGeoNode*>(stsGeoSensitiveNodes->FindObject(stationVolumeName.c_str()));
 
 		if (stationNode == NULL)
 			break;

@@ -8,7 +8,7 @@
 #include "CbmTrdPoint.h"
 #include "CbmTrdHit.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 #include "TVector3.h"
@@ -43,7 +43,7 @@ CbmTrdHitProducerIdeal::CbmTrdHitProducerIdeal()
 // ------------------------------------------------------------------
 CbmTrdHitProducerIdeal::CbmTrdHitProducerIdeal(const char *name,
 					       Int_t verbose)
-:CbmTask(name, verbose)
+:FairTask(name, verbose)
 {
     // Standard constructor
     fArrayTrdPoint = NULL;
@@ -59,7 +59,7 @@ CbmTrdHitProducerIdeal::CbmTrdHitProducerIdeal(const char *name,
 CbmTrdHitProducerIdeal::~CbmTrdHitProducerIdeal()
 {
     // Destructor
-    CbmRootManager::Instance()->Write();
+    FairRootManager::Instance()->Write();
     fArrayTrdHit->Clear();
     delete fArrayTrdHit;
 }
@@ -70,7 +70,7 @@ CbmTrdHitProducerIdeal::~CbmTrdHitProducerIdeal()
 InitStatus CbmTrdHitProducerIdeal::Init()
 {
     // Initialisation of the task
-    CbmRootManager *rootMgr = CbmRootManager::Instance();
+    FairRootManager *rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
 	cout << "-E- CbmTrdHitProducerIdeal::Init: "
 	    << "ROOT manager is not instantiated!" << endl;

@@ -25,7 +25,7 @@
 
   t->SetBranchAddress("GeoTracks",&fT) ;
 
- TGeoManager *geoMan = (TGeoManager*) f->Get("CBMGeom");
+ TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
  TCanvas* c1 = new TCanvas("glcanvas", "openGL", 100, 100, 800, 800);
  c1->SetFillColor(10);
 
@@ -44,7 +44,7 @@
     		tr=(TGeoTrack *)fT->At(i);
 		if(tr->GetPDG()==2212){
                   Int_t Np=tr->GetNpoints();
-                  CbmVTrack *pt = new CbmVTrack(Np); 
+                  FairVTrack *pt = new FairVTrack(Np); 
                   pt->SetLineWidth(2);
                   pt->SetTrack(tr);
                   pt->SetParticle((TParticle *)tr->GetParticle());

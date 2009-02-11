@@ -12,20 +12,20 @@
 #include "CbmGeoEcalPar.h"
 
 #include "CbmDetectorList.h"
-#include "CbmGeoInterface.h"
-#include "CbmGeoLoader.h"
-#include "CbmGeoNode.h"
-#include "CbmGeoRootBuilder.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRootManager.h"
-#include "CbmRun.h"
-#include "CbmRunAna.h"
+#include "FairGeoInterface.h"
+#include "FairGeoLoader.h"
+#include "FairGeoNode.h"
+#include "FairGeoRootBuilder.h"
+#include "FairRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairRun.h"
+#include "FairRunAna.h"
 #include "CbmMCTrack.h"
 #include "CbmStack.h"
 #include "CbmDetectorList.h"
-#include "CbmVolume.h"
-#include "CbmGeoMedium.h"
-#include "CbmGeoMedia.h"
+#include "FairVolume.h"
+#include "FairGeoMedium.h"
+#include "FairGeoMedia.h"
 
 #include "TClonesArray.h"
 #include "TGeoMCGeometry.h"
@@ -46,7 +46,7 @@ using namespace std;
 #define kN kNumberOfECALSensitiveVolumes
 
 // -----   Default constructor   -------------------------------------------
-CbmEcalDetailed::CbmEcalDetailed() : CbmDetector("ECAL", kTRUE, kECAL) {
+CbmEcalDetailed::CbmEcalDetailed() : FairDetector("ECAL", kTRUE, kECAL) {
 //  CbmEcalPoint::Class()    ->IgnoreTObjectStreamer();
 //  CbmEcalPointLite::Class()->IgnoreTObjectStreamer();
 //  CbmMCTrack::Class()      ->IgnoreTObjectStreamer();
@@ -66,7 +66,7 @@ CbmEcalDetailed::CbmEcalDetailed() : CbmDetector("ECAL", kTRUE, kECAL) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmEcalDetailed::CbmEcalDetailed(const char* name, Bool_t active, const char* fileGeo)
-  : CbmDetector(name, active, kECAL)
+  : FairDetector(name, active, kECAL)
 {
   /** CbmEcalDetailed constructor:
    ** reads geometry parameters from the ascii file <fileGeo>,
@@ -165,9 +165,9 @@ CbmEcalDetailed::CbmEcalDetailed(const char* name, Bool_t active, const char* fi
 
 void CbmEcalDetailed::Initialize()
 {
-  CbmDetector::Initialize();
-  CbmRun* sim = CbmRun::Instance();
-  CbmRuntimeDb* rtdb=sim->GetRuntimeDb();
+  FairDetector::Initialize();
+  FairRun* sim = FairRun::Instance();
+  FairRuntimeDb* rtdb=sim->GetRuntimeDb();
   CbmGeoEcalPar *par=new CbmGeoEcalPar();
   fInf->FillGeoPar(par,0);
   rtdb->addContainer(par);
@@ -235,7 +235,7 @@ void CbmEcalDetailed::SetSpecialPhysicsCuts()
 
   if (fInf->GetFastMC()==1) return;
 
-  CbmRun* fRun = CbmRun::Instance();
+  FairRun* fRun = FairRun::Instance();
   if (strcmp(fRun->GetName(),"TGeant3") == 0) {
     Int_t mediumID;
     mediumID = gGeoManager->GetMedium("Scintillator")->GetId();
@@ -259,7 +259,7 @@ void CbmEcalDetailed::SetSpecialPhysicsCuts()
 }
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t  CbmEcalDetailed::ProcessHits(CbmVolume* vol)
+Bool_t  CbmEcalDetailed::ProcessHits(FairVolume* vol)
 {
   /** Fill MC point for sensitive ECAL volumes **/
 
@@ -507,22 +507,22 @@ void CbmEcalDetailed::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t off
 // -----   Public method Register   ----------------------------------------
 void CbmEcalDetailed::Register()
 {
-  CbmRootManager::Instance()->Register("ECALPoint","Ecal",fEcalCollection,kTRUE);
+  FairRootManager::Instance()->Register("ECALPoint","Ecal",fEcalCollection,kTRUE);
   if (fInf->GetFastMC()==0)
-    CbmRootManager::Instance()->Register("ECALPointLite","EcalLite",fLiteCollection,kTRUE);
+    FairRootManager::Instance()->Register("ECALPointLite","EcalLite",fLiteCollection,kTRUE);
 }
 // -------------------------------------------------------------------------
 
 // -----   Public method ConstructGeometry   -------------------------------
 void CbmEcalDetailed::ConstructGeometry()
 {
-  CbmGeoLoader*geoLoad = CbmGeoLoader::Instance();
-  CbmGeoInterface *geoFace = geoLoad->getGeoInterface();
-  CbmGeoMedia *Media =  geoFace->getMedia();
-  CbmGeoBuilder *geobuild=geoLoad->getGeoBuilder();
+  FairGeoLoader*geoLoad = FairGeoLoader::Instance();
+  FairGeoInterface *geoFace = geoLoad->getGeoInterface();
+  FairGeoMedia *Media =  geoFace->getMedia();
+  FairGeoBuilder *geobuild=geoLoad->getGeoBuilder();
 
   TGeoVolume *volume;
-  CbmGeoMedium *CbmMedium;
+  FairGeoMedium *CbmMedium;
   TGeoPgon *spl;
 
   Float_t *buf = 0;
@@ -727,12 +727,12 @@ void CbmEcalDetailed::ConstructCell(Int_t type)
 // -----   Private method InitMedium ---------------------------------------    
 Int_t CbmEcalDetailed::InitMedium(const char* name)
 {
-  static CbmGeoLoader *geoLoad=CbmGeoLoader::Instance();
-  static CbmGeoInterface *geoFace=geoLoad->getGeoInterface();
-  static CbmGeoMedia *media=geoFace->getMedia();
-  static CbmGeoBuilder *geoBuild=geoLoad->getGeoBuilder();
+  static FairGeoLoader *geoLoad=FairGeoLoader::Instance();
+  static FairGeoInterface *geoFace=geoLoad->getGeoInterface();
+  static FairGeoMedia *media=geoFace->getMedia();
+  static FairGeoBuilder *geoBuild=geoLoad->getGeoBuilder();
 
-  CbmGeoMedium *CbmMedium=media->getMedium(name);
+  FairGeoMedium *CbmMedium=media->getMedium(name);
 
   if (!CbmMedium)
   {

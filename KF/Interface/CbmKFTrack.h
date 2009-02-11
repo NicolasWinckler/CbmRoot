@@ -15,7 +15,7 @@
 #include <vector>
 
 class CbmKFHit;
-class CbmTrackParam;
+class FairTrackParam;
 class CbmStsTrack;
 
 class CbmKFTrack : public CbmKFTrackInterface{
@@ -35,15 +35,15 @@ class CbmKFTrack : public CbmKFTrackInterface{
 
   CbmKFTrack( CbmKFTrackInterface &track ){ SetTrack( track ); }
 
-  CbmKFTrack( CbmTrackParam &track ){    SetTrackParam( track ); }
+  CbmKFTrack( FairTrackParam &track ){    SetTrackParam( track ); }
 
   CbmKFTrack( CbmStsTrack &track, bool first=1 ){ SetStsTrack( track, first ); }
 
   void SetTrack( CbmKFTrackInterface &track );
-  void SetTrackParam( CbmTrackParam &track );
+  void SetTrackParam( FairTrackParam &track );
   void SetStsTrack( CbmStsTrack &track, bool first=1 );
 
-  void GetTrackParam( CbmTrackParam &track );
+  void GetTrackParam( FairTrackParam &track );
   void GetStsTrack( CbmStsTrack &track, bool first=1 );
 
   void SetPID( Int_t pidHypo );

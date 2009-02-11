@@ -68,16 +68,16 @@ void lhetrack() {
   
   
   // -----   Run   ----------------------------------------------------------
-  CbmRunAna *fRun= new CbmRunAna();
+  FairRunAna *fRun= new FairRunAna();
   fRun->SetInputFile(inFile);
   fRun->SetOutputFile(outFile);
 
   // Init Simulation Parameters from Root File
-  CbmRuntimeDb* rtdb=fRun->GetRuntimeDb();
-  CbmParRootFileIo* input=new CbmParRootFileIo();
+  FairRuntimeDb* rtdb=fRun->GetRuntimeDb();
+  FairParRootFileIo* input=new FairParRootFileIo();
   input->open("parfiles/testparams.root");
   // Init Digitization Parameters from Ascii File
-  CbmParAsciiFileIo* input2 = new CbmParAsciiFileIo();
+  FairParAsciiFileIo* input2 = new FairParAsciiFileIo();
   TString StsDigiFile(gSystem->Getenv("VMCWORKDIR"));
   StsDigiFile = StsDigiFile + "/parameters/sts/sts_digi.par";
   input2->open(StsDigiFile.Data(),"in");

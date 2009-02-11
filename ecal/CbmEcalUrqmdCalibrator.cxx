@@ -20,9 +20,9 @@
 #include "CbmEcalPointLite.h"
 #include "CbmEcalStructure.h"
 
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "TTree.h"
@@ -361,7 +361,7 @@ CbmEcalCell* CbmEcalUrqmdCalibrator::FindNextCell(CbmEcalCell* cell)
 }
 
 CbmEcalUrqmdCalibrator::CbmEcalUrqmdCalibrator(const char* name, const Int_t iVerbose, const char* fileGeo)
-  : CbmTask(name, iVerbose), fPDGType(22), fMinEnergy(0.5), fGeoFile(fileGeo)
+  : FairTask(name, iVerbose), fPDGType(22), fMinEnergy(0.5), fGeoFile(fileGeo)
 {
   fTree=NULL;
   fInf=CbmEcalInf::GetInstance(fGeoFile);
@@ -370,7 +370,7 @@ CbmEcalUrqmdCalibrator::CbmEcalUrqmdCalibrator(const char* name, const Int_t iVe
 /** Initing routine **/
 InitStatus CbmEcalUrqmdCalibrator::Init()
 {
-  CbmRootManager* fManager=CbmRootManager::Instance();
+  FairRootManager* fManager=FairRootManager::Instance();
 
   fLitePoints=(TClonesArray*)fManager->ActivateBranch("ECALPointLite");
   if (fLitePoints==NULL)
@@ -403,8 +403,8 @@ InitStatus CbmEcalUrqmdCalibrator::Init()
 /** Parameter container init **/
 void CbmEcalUrqmdCalibrator::SetParContainers()
 {
-  CbmRunAna* ana=CbmRunAna::Instance();
-  CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+  FairRunAna* ana=FairRunAna::Instance();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   rtdb->getContainer("CbmGeoEcalPar");
 
 }

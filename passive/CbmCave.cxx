@@ -4,17 +4,17 @@
 
 #include "CbmGeoCave.h"
 
-#include "CbmGeoInterface.h"
-#include "CbmGeoRootBuilder.h"
-#include "CbmRuntimeDb.h"
+#include "FairGeoInterface.h"
+#include "FairGeoRootBuilder.h"
+#include "FairRuntimeDb.h"
 #include "CbmGeoPassivePar.h"
-#include "CbmGeoVolume.h"
-#include "CbmGeoNode.h"
-#include "CbmRun.h"
-#include "CbmMCApplication.h"
-#include "CbmVolume.h"
-#include "CbmVolumeList.h"
-#include "CbmGeoLoader.h"
+#include "FairGeoVolume.h"
+#include "FairGeoNode.h"
+#include "FairRun.h"
+#include "FairMCApplication.h"
+#include "FairVolume.h"
+#include "FairVolumeList.h"
+#include "FairGeoLoader.h"
 
 #include "TGeoMCGeometry.h"
 #include "TGeoManager.h"
@@ -25,8 +25,8 @@
 ClassImp(CbmCave)
 void CbmCave::ConstructGeometry()
 {
-	CbmGeoLoader *loader=CbmGeoLoader::Instance();
-	CbmGeoInterface *GeoInterface =loader->getGeoInterface();
+	FairGeoLoader *loader=FairGeoLoader::Instance();
+	FairGeoInterface *GeoInterface =loader->getGeoInterface();
 	CbmGeoCave *MGeo=new CbmGeoCave();
 	MGeo->setGeomFile(GetGeometryFileName());
 	GeoInterface->addGeoModule(MGeo);
@@ -35,18 +35,18 @@ void CbmCave::ConstructGeometry()
 
         TList* volList = MGeo->getListOfVolumes();
         // store geo parameter
-        CbmRun *fRun = CbmRun::Instance();
-        CbmRuntimeDb *rtdb= CbmRun::Instance()->GetRuntimeDb();
+        FairRun *fRun = FairRun::Instance();
+        FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
         CbmGeoPassivePar* par=(CbmGeoPassivePar*)(rtdb->getContainer("CbmGeoPassivePar"));
         TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
         TObjArray *fPassNodes = par->GetGeoPassiveNodes();
 
         TListIter iter(volList);
-        CbmGeoNode* node   = NULL;
-        CbmGeoVolume *aVol=NULL;
+        FairGeoNode* node   = NULL;
+        FairGeoVolume *aVol=NULL;
 
-        while( (node = (CbmGeoNode*)iter.Next()) ) {
-            aVol = dynamic_cast<CbmGeoVolume*> ( node );
+        while( (node = (FairGeoNode*)iter.Next()) ) {
+            aVol = dynamic_cast<FairGeoVolume*> ( node );
             if ( node->isSensitive()  ) {
                 fSensNodes->AddLast( aVol );
             }else{
@@ -65,7 +65,7 @@ CbmCave::~CbmCave()
 
 }
 CbmCave::CbmCave(const char * name,  const char *Title)
-  : CbmModule(name ,Title)
+  : FairModule(name ,Title)
 {
     world[0] = 0;
     world[1] = 0;

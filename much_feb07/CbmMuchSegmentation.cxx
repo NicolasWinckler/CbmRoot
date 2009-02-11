@@ -10,9 +10,9 @@
 #include "CbmGeoMuchPar.h"
 #include "CbmMuchSegmentation.h"
 
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairRootManager.h"
 #include "CbmMuchPoint.h"
 
 #include "TCanvas.h"
@@ -73,10 +73,10 @@ CbmMuchSegmentation::~CbmMuchSegmentation() {
 void CbmMuchSegmentation::SetParContainers() {
 
   // Get run and runtime database
-  CbmRunAna* run = CbmRunAna::Instance();
+  FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) Fatal("SetParContainers", "No analysis run");
 
-  CbmRuntimeDb* db = run->GetRuntimeDb();
+  FairRuntimeDb* db = run->GetRuntimeDb();
   if ( ! db ) Fatal("SetParContainers", "No runtime database");
 
   // Get MUCH geometry parameter container
@@ -94,23 +94,23 @@ InitStatus CbmMuchSegmentation::Init() {
   Int_t nPassNodes = passNodes->GetEntries();
  
   // Sort geo nodes by z coordinate
-  map<Double_t, pair<GeoNodeType, CbmGeoNode*> > geoNodesMap;
+  map<Double_t, pair<GeoNodeType, FairGeoNode*> > geoNodesMap;
   for(Int_t iPassNode = 0; iPassNode < nPassNodes; iPassNode++){
-    CbmGeoNode* node = (CbmGeoNode*)(passNodes->At(iPassNode));
+    FairGeoNode* node = (FairGeoNode*)(passNodes->At(iPassNode));
     // Search for mother volume
-    CbmGeoNode* motherVolume = (CbmGeoNode*)(passNodes->FindObject(node->getMother().Data()));
+    FairGeoNode* motherVolume = (FairGeoNode*)(passNodes->FindObject(node->getMother().Data()));
     if(!motherVolume) continue;      
     Double_t z = node->getParameters()->At(3);
     if(geoNodesMap.find(z) == geoNodesMap.end()){
-      pair<GeoNodeType, CbmGeoNode*> p(kPassive, node);
+      pair<GeoNodeType, FairGeoNode*> p(kPassive, node);
       geoNodesMap[z] = p;
     }
   }
   for(Int_t iSensNode = 0; iSensNode < nSensNodes; iSensNode++){
-    CbmGeoNode* node = (CbmGeoNode*)(sensNodes->At(iSensNode));
+    FairGeoNode* node = (FairGeoNode*)(sensNodes->At(iSensNode));
     Double_t z = node->getParameters()->At(3);
     if(geoNodesMap.find(z) == geoNodesMap.end()){
-      pair<GeoNodeType, CbmGeoNode*> p(kSensitive, node);
+      pair<GeoNodeType, FairGeoNode*> p(kSensitive, node);
       geoNodesMap[z] = p;
     }
   }
@@ -121,11 +121,11 @@ InitStatus CbmMuchSegmentation::Init() {
   // Fill vectors with region radia
   Int_t incAbsorbers = 0; // number of absorbers
   Int_t incStations = 0;  // number of layers
-  for(map<Double_t, pair<GeoNodeType, CbmGeoNode*> >::iterator it=geoNodesMap.begin();
+  for(map<Double_t, pair<GeoNodeType, FairGeoNode*> >::iterator it=geoNodesMap.begin();
       it!=geoNodesMap.end(); it++){
-    pair<GeoNodeType, CbmGeoNode*> p = (*it).second;
+    pair<GeoNodeType, FairGeoNode*> p = (*it).second;
     GeoNodeType nodeType = p.first;
-    CbmGeoNode* node = p.second;
+    FairGeoNode* node = p.second;
 
     if(nodeType == kPassive){
       incAbsorbers++;
@@ -175,7 +175,7 @@ InitStatus CbmMuchSegmentation::Init() {
 // -------------------------------------------------------------------------
 
 // -----   Private method FillRadia  ---------------------------------------
-void CbmMuchSegmentation::FillRadia(map<Double_t, pair<GeoNodeType, CbmGeoNode*> > geoNodesMap){
+void CbmMuchSegmentation::FillRadia(map<Double_t, pair<GeoNodeType, FairGeoNode*> > geoNodesMap){
   gStyle->SetOptStat(0);
   Bool_t afterAbsorber = kFALSE; // auxilary flag showing whether a station comes after an absorber  
   vector<pair<Double_t, Double_t> > stationBorders; // borders of a station coming after an absorber
@@ -185,14 +185,14 @@ void CbmMuchSegmentation::FillRadia(map<Double_t, pair<GeoNodeType, CbmGeoNode*>
   Int_t absorberInc = 0;
   vector<TH1D*> hitDensityHist;
   Int_t binSize = 2;
-  for(map<Double_t, pair<GeoNodeType, CbmGeoNode*> >::iterator it=geoNodesMap.begin();
+  for(map<Double_t, pair<GeoNodeType, FairGeoNode*> >::iterator it=geoNodesMap.begin();
       it!=geoNodesMap.end(); it++){
 
-    pair<GeoNodeType, CbmGeoNode*> p = (*it).second;
+    pair<GeoNodeType, FairGeoNode*> p = (*it).second;
     GeoNodeType nodeType = p.first;
-    CbmGeoNode* node = p.second;
-    CbmGeoTransform* transform = node->getLabTransform();
-    CbmGeoVector translation = transform->getTranslation();
+    FairGeoNode* node = p.second;
+    FairGeoTransform* transform = node->getLabTransform();
+    FairGeoVector translation = transform->getTranslation();
 
     if(nodeType == kPassive){
       absorberInc++;
@@ -225,8 +225,8 @@ void CbmMuchSegmentation::FillRadia(map<Double_t, pair<GeoNodeType, CbmGeoNode*>
   }
 
   // Get MC points array
-  CbmRootManager* ioman = CbmRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No CbmRootManager");
+  FairRootManager* ioman = FairRootManager::Instance();
+  if ( ! ioman ) Fatal("Init", "No FairRootManager");
   TClonesArray* mcPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
 
   // Loop over all events

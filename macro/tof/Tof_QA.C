@@ -8,7 +8,7 @@
 #include "TLegend.h"
 
 #include "CbmMCTrack.h"
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 
 #include "CbmTofPoint.h"
 #include "CbmTofHit.h"
@@ -72,7 +72,7 @@ int Tof_QA()
   CbmTofHit        *TofHit;
   //CbmTrdTrack      *TrdTrack; 
   //CbmStsTrack      *StsTrack;
-  //CbmTrackParam    *FitPar;
+  //FairTrackParam    *FitPar;
   //CbmTrdTrackMatch *Trd_MCmatch;
   //CbmStsTrackMatch *Sts_MCmatch;
   //CbmGlobalTrack   *GlobTrack;

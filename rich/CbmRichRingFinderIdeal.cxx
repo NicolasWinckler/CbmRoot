@@ -14,7 +14,7 @@
 *  definition of reconstructable ring slightly changed
 *
 *  Revision 1.4  2006/01/30 14:34:35  hoehne
-*  correct CbmMCPoint to CbmRichPoint in line 141
+*  correct FairMCPoint to CbmRichPoint in line 141
 *
 *  Revision 1.3  2006/01/27 11:37:08  hoehne
 *  some "return -1" removed to allow for standalone running without track information
@@ -35,7 +35,7 @@
 
 // CBM includes
 #include "CbmMCTrack.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 // ROOT includes
 #include "TClonesArray.h"
@@ -76,8 +76,8 @@ CbmRichRingFinderIdeal::~CbmRichRingFinderIdeal() { }
 // -----   Public method Init   --------------------------------------------
 void CbmRichRingFinderIdeal::Init() {
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmRichRingFinderIdeal::Init: "
 	 << "RootManager not instantised!" << endl;

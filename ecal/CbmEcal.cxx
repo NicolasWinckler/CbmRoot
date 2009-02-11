@@ -54,7 +54,7 @@
  * CbmEcalInf now singleton.
  *
  * Revision 1.11  2006/07/12 08:41:38  prokudin
- * String compare removed. Using CbmVolume instead.
+ * String compare removed. Using FairVolume instead.
  *
  * Revision 1.10  2006/07/04 08:29:24  kharlov
  * Remove #include TGeant3.h
@@ -81,7 +81,7 @@
  * Merging full and fast MC
  *
  * Revision 1.4  2006/03/03 12:01:16  turany
- * Remove CbmVolume, framework is responsible for sensitivity
+ * Remove FairVolume, framework is responsible for sensitivity
  *
  * Revision 1.3  2006/01/31 17:07:17  kharlov
  * Correction for CbmEcal
@@ -104,20 +104,20 @@
 #include "CbmGeoEcalPar.h"
 
 #include "CbmDetectorList.h"
-#include "CbmGeoInterface.h"
-#include "CbmGeoLoader.h"
-#include "CbmGeoNode.h"
-#include "CbmGeoRootBuilder.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRootManager.h"
-#include "CbmRun.h"
-#include "CbmRunAna.h"
+#include "FairGeoInterface.h"
+#include "FairGeoLoader.h"
+#include "FairGeoNode.h"
+#include "FairGeoRootBuilder.h"
+#include "FairRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairRun.h"
+#include "FairRunAna.h"
 #include "CbmMCTrack.h"
 #include "CbmStack.h"
 #include "CbmDetectorList.h"
-#include "CbmVolume.h"
-#include "CbmGeoMedium.h"
-#include "CbmGeoMedia.h"
+#include "FairVolume.h"
+#include "FairGeoMedium.h"
+#include "FairGeoMedia.h"
 
 #include "TClonesArray.h"
 #include "TGeoMCGeometry.h"
@@ -139,7 +139,7 @@ using std::cerr;
 #define kN kNumberOfECALSensitiveVolumes
 
 // -----   Default constructor   -------------------------------------------
-CbmEcal::CbmEcal() : CbmDetector("ECAL", kTRUE, kECAL) {
+CbmEcal::CbmEcal() : FairDetector("ECAL", kTRUE, kECAL) {
 //  CbmEcalPoint::Class()    ->IgnoreTObjectStreamer();
 //  CbmEcalPointLite::Class()->IgnoreTObjectStreamer();
 //  CbmMCTrack::Class()      ->IgnoreTObjectStreamer();
@@ -159,7 +159,7 @@ CbmEcal::CbmEcal() : CbmDetector("ECAL", kTRUE, kECAL) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmEcal::CbmEcal(const char* name, Bool_t active, const char* fileGeo)
-  : CbmDetector(name, active, kECAL)
+  : FairDetector(name, active, kECAL)
 {
   /** CbmEcal constructor:
    ** reads geometry parameters from the ascii file <fileGeo>,
@@ -228,9 +228,9 @@ CbmEcal::CbmEcal(const char* name, Bool_t active, const char* fileGeo)
 
 void CbmEcal::Initialize()
 {
-  CbmDetector::Initialize();
-  CbmRun* sim = CbmRun::Instance();
-  CbmRuntimeDb* rtdb=sim->GetRuntimeDb();
+  FairDetector::Initialize();
+  FairRun* sim = FairRun::Instance();
+  FairRuntimeDb* rtdb=sim->GetRuntimeDb();
   CbmGeoEcalPar *par=new CbmGeoEcalPar();
   fInf->FillGeoPar(par,0);
   rtdb->addContainer(par);
@@ -298,7 +298,7 @@ void CbmEcal::SetSpecialPhysicsCuts()
 
   if (fInf->GetFastMC()==1) return;
 
-  CbmRun* fRun = CbmRun::Instance();
+  FairRun* fRun = FairRun::Instance();
   if (strcmp(fRun->GetName(),"TGeant3") == 0) {
     Int_t mediumID;
     mediumID = gGeoManager->GetMedium("Scintillator")->GetId();
@@ -315,7 +315,7 @@ void CbmEcal::SetSpecialPhysicsCuts()
 }
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t  CbmEcal::ProcessHits(CbmVolume* vol)
+Bool_t  CbmEcal::ProcessHits(FairVolume* vol)
 {
   /** Fill MC point for sensitive ECAL volumes **/
 
@@ -697,22 +697,22 @@ void CbmEcal::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 // -----   Public method Register   ----------------------------------------
 void CbmEcal::Register()
 {
-  CbmRootManager::Instance()->Register("ECALPoint","Ecal",fEcalCollection,kTRUE);
+  FairRootManager::Instance()->Register("ECALPoint","Ecal",fEcalCollection,kTRUE);
   if (fInf->GetFastMC()==0)
-    CbmRootManager::Instance()->Register("ECALPointLite","EcalLite",fLiteCollection,kTRUE);
+    FairRootManager::Instance()->Register("ECALPointLite","EcalLite",fLiteCollection,kTRUE);
 }
 // -------------------------------------------------------------------------
 
 // -----   Public method ConstructGeometry   -------------------------------
 void CbmEcal::ConstructGeometry()
 {
-  CbmGeoLoader*geoLoad = CbmGeoLoader::Instance();
-  CbmGeoInterface *geoFace = geoLoad->getGeoInterface();
-  CbmGeoMedia *Media =  geoFace->getMedia();
-  CbmGeoBuilder *geobuild=geoLoad->getGeoBuilder();
+  FairGeoLoader*geoLoad = FairGeoLoader::Instance();
+  FairGeoInterface *geoFace = geoLoad->getGeoInterface();
+  FairGeoMedia *Media =  geoFace->getMedia();
+  FairGeoBuilder *geobuild=geoLoad->getGeoBuilder();
 
   TGeoVolume *volume;
-  CbmGeoMedium *CbmMedium;
+  FairGeoMedium *CbmMedium;
   TGeoPgon *spl;
 
   Float_t *buf = 0;
@@ -973,12 +973,12 @@ Int_t CbmEcal::GetVolIdMaxInf()
 
 Int_t CbmEcal::GetVolIdMax()
 {
-  static CbmRunAna* ana = CbmRunAna::Instance();
+  static FairRunAna* ana = FairRunAna::Instance();
   if (ana==NULL)
   {
     return GetVolIdMaxInf();
   }
-  static CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+  static FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   static CbmGeoEcalPar* par=(CbmGeoEcalPar*)(rtdb->getContainer("CbmGeoEcalPar"));
   static Float_t cellsize=par->GetVariable("cellsize");
   static Float_t xcalosize=par->GetVariable("xecalsize");
@@ -1074,12 +1074,12 @@ Bool_t CbmEcal::GetCellCoordInf(Int_t fVolID, Float_t &x, Float_t &y, Int_t& ten
 
 Bool_t CbmEcal::GetCellCoord(Int_t fVolID, Float_t &x, Float_t &y, Int_t& tenergy)
 {
-  static CbmRunAna* ana = CbmRunAna::Instance();
+  static FairRunAna* ana = FairRunAna::Instance();
   if (ana==NULL)
   {
     return GetCellCoordInf(fVolID, x, y, tenergy);
   }
-  static CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+  static FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   static CbmGeoEcalPar* par=(CbmGeoEcalPar*)(rtdb->getContainer("CbmGeoEcalPar"));
   static Float_t cellsize=par->GetVariable("cellsize");
   static Float_t xcalosize=par->GetVariable("xecalsize");

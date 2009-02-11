@@ -8,7 +8,7 @@
  *@author V.Friese <v.friese@gsi.de>
  **
  ** STS local track. Holds lists of CbmStsHits and the fitted
- ** track parameters. The fit parameters are of type CbmTrackParam
+ ** track parameters. The fit parameters are of type FairTrackParam
  ** and can only be accesssed and modified via this class.
  **/
 
@@ -16,14 +16,14 @@
 #define CBMSTSTRACK_H 1
 
 
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 
 #include "TArrayI.h"
 #include "TObject.h"
 
 #include <map>
 
-class CbmHit;
+class FairHit;
 
 
 
@@ -41,11 +41,11 @@ class CbmStsTrack : public TObject
 
 
   /** Add a StsHit to the list **/
-  void AddStsHit(Int_t hitIndex, CbmHit* hit);
+  void AddStsHit(Int_t hitIndex, FairHit* hit);
 
 
   /** Associate a MvdHit to the track **/
-  void AddMvdHit(Int_t hitIndex, CbmHit* mvdHit);
+  void AddMvdHit(Int_t hitIndex, FairHit* mvdHit);
 
 
 
@@ -74,14 +74,14 @@ class CbmStsTrack : public TObject
   Double_t GetChi2()               const { return fChi2; }
   Int_t GetNDF()                   const { return fNDF; }
   Double_t GetB()                  const { return fB; }
-  CbmTrackParam* GetParamFirst() { return &fParamFirst; }
-  CbmTrackParam* GetParamLast()  { return &fParamLast ; }
+  FairTrackParam* GetParamFirst() { return &fParamFirst; }
+  FairTrackParam* GetParamLast()  { return &fParamLast ; }
 
 
   /** Modifiers  **/
   void SetPidHypo(Int_t pid)                { fPidHypo    = pid;  }
-  void SetParamFirst(CbmTrackParam& par)    { fParamFirst = par;  }
-  void SetParamLast(CbmTrackParam& par)     { fParamLast  = par;  }
+  void SetParamFirst(FairTrackParam& par)    { fParamFirst = par;  }
+  void SetParamLast(FairTrackParam& par)     { fParamLast  = par;  }
   void SetFlag(Int_t flag)                  { fFlag       = flag; }
   void SetChi2(Double_t chi2)               { fChi2       = chi2; }
   void SetNDF(Int_t ndf)                    { fNDF        = ndf;  }
@@ -103,8 +103,8 @@ class CbmStsTrack : public TObject
 
 
   /** Track parameters at first and last fitted hit **/
-  CbmTrackParam fParamFirst;
-  CbmTrackParam fParamLast;
+  FairTrackParam fParamFirst;
+  FairTrackParam fParamLast;
 
 
   /** Quality flag **/

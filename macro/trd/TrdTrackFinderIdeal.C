@@ -28,19 +28,19 @@
     TString outFile = "test.trdIdealTracks.root";
 
 
-    CbmRunAna *fRun= new CbmRunAna();
+    FairRunAna *fRun= new FairRunAna();
     fRun->SetInputFile(mcFile);
     fRun->SetOutputFile(outFile);
     fRun->AddFriend(hitFile);
 
 
     // Init Simulation Parameters from Root File
-    CbmRuntimeDb* rtdb=fRun->GetRuntimeDb();
-    CbmParRootFileIo* io1=new CbmParRootFileIo();
+    FairRuntimeDb* rtdb=fRun->GetRuntimeDb();
+    FairParRootFileIo* io1=new FairParRootFileIo();
     io1->open(paramFile.Data());
 
     // Init Digitization Parameters from Ascii File
-    //CbmParAsciiFileIo* input2 = new CbmParAsciiFileIo();
+    //FairParAsciiFileIo* input2 = new FairParAsciiFileIo();
     //TString StsDigiFile(gSystem->Getenv("VMCWORKDIR"));
     //StsDigiFile = StsDigiFile + "/parameters/sts/sts_digi.par";
     //input2->open(StsDigiFile.Data(),"in");

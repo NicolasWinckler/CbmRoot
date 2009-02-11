@@ -8,7 +8,7 @@
 #include "CbmLitHit.h"
 #include "CbmLitTrack.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -26,7 +26,7 @@ CbmLitTrdTrackFinderRobust::~CbmLitTrdTrackFinderRobust()
 
 void CbmLitTrdTrackFinderRobust::Init()
 {
-   CbmRootManager* rootMgr = CbmRootManager::Instance();
+   FairRootManager* rootMgr = FairRootManager::Instance();
    if(NULL == rootMgr) 
       TObject::Fatal("CbmLitTrdTrackFinderRobust::Init","ROOT manager is not instantiated");
 

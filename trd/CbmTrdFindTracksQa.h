@@ -15,7 +15,7 @@
 #define CBMTRDTRACKFINDERQAA_H 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TVector3.h"
 
@@ -31,7 +31,7 @@ class CbmGeoPassivePar;
 
 
 
-class CbmTrdFindTracksQa : public CbmTask
+class CbmTrdFindTracksQa : public FairTask
 {
 
  public:

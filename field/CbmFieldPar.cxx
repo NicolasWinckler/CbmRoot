@@ -8,7 +8,7 @@
 #include "CbmFieldMap.h"
 #include "CbmFieldMapDistorted.h"
 
-#include "CbmParamList.h"
+#include "FairParamList.h"
 
 #include "TDirectory.h"
 #include <iostream>
@@ -22,7 +22,7 @@ const int kMaxLen = 2048;
 // ------   Constructor   --------------------------------------------------
 CbmFieldPar::CbmFieldPar(const char* name, const char* title,
 			 const char* context) 
-  : CbmParGenericSet(name, title, context) {
+  : FairParGenericSet(name, title, context) {
   fType = -1;
   fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = 0.;
   fBx   = fBy   = fBz   = 0.;
@@ -52,7 +52,7 @@ CbmFieldPar::~CbmFieldPar() { }
 
 
 // ------   Put parameters   -----------------------------------------------
-void CbmFieldPar::putParams(CbmParamList* list) {
+void CbmFieldPar::putParams(FairParamList* list) {
 
   if ( ! list ) return;
 
@@ -90,7 +90,7 @@ void CbmFieldPar::putParams(CbmParamList* list) {
 
 
 // --------   Get parameters   ---------------------------------------------
-Bool_t CbmFieldPar::getParams(CbmParamList* list) {
+Bool_t CbmFieldPar::getParams(FairParamList* list) {
 
   if ( ! list ) return kFALSE;
 
@@ -138,7 +138,7 @@ Bool_t CbmFieldPar::getParams(CbmParamList* list) {
 
 
 // ---------   Set parameters from CbmField   ------------------------------
-void CbmFieldPar::SetParameters(CbmField* field) {
+void CbmFieldPar::SetParameters(FairField* field) {
 
   if ( ! field ) {
     cerr << "-W- CbmFieldPar::SetParameters: Empty field pointer!" << endl;

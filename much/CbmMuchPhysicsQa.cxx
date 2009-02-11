@@ -7,13 +7,13 @@
 
 #include "CbmMuchPhysicsQa.h"
 
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmTrackParam.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairTrackParam.h"
 #include "CbmMCTrack.h"
-#include "CbmGeoVector.h"
-#include "CbmGeoNode.h"
+#include "FairGeoVector.h"
+#include "FairGeoNode.h"
 
 #include "CbmStsTrack.h"
 #include "CbmStsTrackMatch.h"
@@ -44,7 +44,7 @@ ClassImp(CbmMuchPhysicsQa)
 
 // -------------------------------------------------------------------------
 CbmMuchPhysicsQa::CbmMuchPhysicsQa(const char *name, Int_t verbose)
- :CbmTask(name,verbose){
+ :FairTask(name,verbose){
  
  much_histo_style();
   
@@ -143,7 +143,7 @@ void CbmMuchPhysicsQa::SetMuchPIdType(Int_t type){
 // -------------------------------------------------------------------------
 InitStatus CbmMuchPhysicsQa::Init(){
 
-  CbmRootManager* manager = CbmRootManager::Instance();
+  FairRootManager* manager = FairRootManager::Instance();
   strcpy(fInFileName,(manager->GetInFile())->GetName());
 
 //--------------- MC transport file
@@ -170,18 +170,18 @@ InitStatus CbmMuchPhysicsQa::Init(){
   
   Int_t I = 0;
   Int_t MotherV = 0;
-  CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (passive->At(0)); 
+  FairGeoNode *node = dynamic_cast<FairGeoNode*> (passive->At(0)); 
   if(node->GetListOfDaughters()){MotherV = 1;I = 1;}
   
   for(Int_t i=I; i<passive->GetEntries(); i++)
   {
-	  CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (passive->At(i)); 
+	  FairGeoNode *node = dynamic_cast<FairGeoNode*> (passive->At(i)); 
    fZofLastAbsorber = max(ReadGeo(node), fZofLastAbsorber);
   }
   
   for(Int_t i=0; i<fNofDetectors; i++)
   {
-   CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (sens->At(i));   
+   FairGeoNode *node = dynamic_cast<FairGeoNode*> (sens->At(i));   
    if(ReadGeo(node) < fZofLastAbsorber)continue;
    fNofLastDetectors++;
   }
@@ -204,10 +204,10 @@ InitStatus CbmMuchPhysicsQa::Init(){
 void CbmMuchPhysicsQa::SetParContainers() {
 
 //--------------- Get run and runtime database
-  CbmRunAna* run = CbmRunAna::Instance();
+  FairRunAna* run = FairRunAna::Instance();
   if (!run)Fatal("SetParContainers", "No analysis run");
 
-  CbmRuntimeDb* db = run->GetRuntimeDb();
+  FairRuntimeDb* db = run->GetRuntimeDb();
   if (!db)Fatal("SetParContainers", "No runtime database");
 
 //--------------- Get MUCH geometry parameter container
@@ -273,7 +273,7 @@ void CbmMuchPhysicsQa::ExecReco(){
   if(!stst)continue;
   if(!ststm)continue;
 //--------------- Calculation of the reconstructed in STS momentum   
-  CbmTrackParam extr;
+  FairTrackParam extr;
   StsFitter.Extrapolate(stst, fPrimVtx->GetZ(), &extr ); // extr. to vertex 
   if(StsFitter.GetChiToVertex(stst)> cutChiPrimary) continue;
   
@@ -561,12 +561,12 @@ void CbmMuchPhysicsQa::Finish(){
   MC_QA->SaveAs(fQaFileName);  
 }
 // -------------------------------------------------------------------------
-Double_t CbmMuchPhysicsQa::ReadGeo(CbmGeoNode *node){
+Double_t CbmMuchPhysicsQa::ReadGeo(FairGeoNode *node){
   
   TString name = node->getName();
   TString Sname = node->getShapePointer()->GetName();	
-  CbmGeoVector nodeV = node->getLabTransform()->getTranslation(); //in cm
-  CbmGeoVector centerV = node->getCenterPosition().getTranslation();
+  FairGeoVector nodeV = node->getLabTransform()->getTranslation(); //in cm
+  FairGeoVector centerV = node->getCenterPosition().getTranslation();
   TArrayD *P = node->getParameters();
   Int_t NP = node->getShapePointer()->getNumParam();
  

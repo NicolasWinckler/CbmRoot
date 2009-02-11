@@ -7,8 +7,8 @@
 
 #include "CbmStsStationDigiPar.h"
 
-#include "CbmDetParIo.h"
-#include "CbmParIo.h"
+#include "FairDetParIo.h"
+#include "FairParIo.h"
 
 #include "TString.h"
 #include "TMath.h"
@@ -21,7 +21,7 @@ using std::endl;
 // -----   Standard constructor   ------------------------------------------
 CbmStsDigiPar::CbmStsDigiPar(const char* name, const char* title,
 			     const char* context)
-  : CbmParSet(name, title, context) {
+  : FairParSet(name, title, context) {
   detName="STS";
   fStations = new TObjArray();
 }
@@ -38,13 +38,13 @@ CbmStsDigiPar::~CbmStsDigiPar() {
 
 
 // -----   Public method init   --------------------------------------------
-Bool_t CbmStsDigiPar::init(CbmParIo* parIo) {
+Bool_t CbmStsDigiPar::init(FairParIo* parIo) {
   if ( ! parIo ) {
     cout << "-W- CbmStsDigiPar::init "
 	 << "No input given; could not initialise parameters." << endl;
     return kFALSE;
   }
-  CbmDetParIo* input = parIo->getDetParIo("CbmStsParIo");
+  FairDetParIo* input = parIo->getDetParIo("CbmStsParIo");
   if (input) return (input->init(this));
   return kFALSE;
 }
@@ -53,13 +53,13 @@ Bool_t CbmStsDigiPar::init(CbmParIo* parIo) {
 
 
 // -----   Public method write   -------------------------------------------
-Int_t CbmStsDigiPar::write(CbmParIo* parIo) {
+Int_t CbmStsDigiPar::write(FairParIo* parIo) {
   if ( ! parIo ) {
     cout << "-W- CbmStsDigiPar::write "
 	 << "No output given; could not write parameters." << endl;
     return kFALSE;;
   }
-  CbmDetParIo* output = parIo->getDetParIo("CbmStsParIo");
+  FairDetParIo* output = parIo->getDetParIo("CbmStsParIo");
   if (output) return (output->write(this));
   return kFALSE;
 }

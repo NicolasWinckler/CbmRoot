@@ -4,7 +4,7 @@
 #include "CbmLitToolFactory.h"
 #include "CbmLitConverter.h"
 
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 
 CbmPropagatorLit::CbmPropagatorLit(
 		const std::string& type)
@@ -19,8 +19,8 @@ CbmPropagatorLit::~CbmPropagatorLit()
 }
 
 StatusCode CbmPropagatorLit::Propagate(
-		const CbmTrackParam *parIn,
-        CbmTrackParam *parOut,
+		const FairTrackParam *parIn,
+        FairTrackParam *parOut,
         Double_t zOut,
         Int_t pdg)
 {
@@ -29,7 +29,7 @@ StatusCode CbmPropagatorLit::Propagate(
 }
 
 StatusCode CbmPropagatorLit::Propagate(
-		CbmTrackParam *par, 
+		FairTrackParam *par, 
         Double_t zOut,
         Int_t pdg)
 {

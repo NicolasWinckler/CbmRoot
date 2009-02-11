@@ -19,13 +19,13 @@ void prop_ana(Int_t nEvents = 10000)
    gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
    cbmrootlibs();
 
-   CbmRunAna *run= new CbmRunAna();
+   FairRunAna *run= new FairRunAna();
    run->SetInputFile(inFile);
    run->AddFriend(inFile1);
    run->AddFriend(inFile2);
    run->SetOutputFile(outFile);
 
-   CbmGeane* Geane = new CbmGeane(inFile.Data());
+   FairGeane* Geane = new FairGeane(inFile.Data());
 
    // -------------------------------------------------------------------------
    // CbmMuchTrackFinder* muchTrackFinder    = new CbmLitMuchTrackFinder();
@@ -42,9 +42,9 @@ void prop_ana(Int_t nEvents = 10000)
    // -------------------------------------------------------------------------
 
    // -----  Parameter database   --------------------------------------------
-   CbmRuntimeDb* rtdb = run->GetRuntimeDb();
-   CbmParRootFileIo* parIo1 = new CbmParRootFileIo();
-   //CbmParAsciiFileIo* parIo2 = new CbmParAsciiFileIo();
+   FairRuntimeDb* rtdb = run->GetRuntimeDb();
+   FairParRootFileIo* parIo1 = new FairParRootFileIo();
+   //FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
    parIo1->open(parFile.Data());
    //parIo2->open(muchDigiFile.Data(),"in");
    rtdb->setFirstInput(parIo1);

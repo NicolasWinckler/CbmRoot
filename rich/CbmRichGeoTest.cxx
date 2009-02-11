@@ -1,5 +1,5 @@
 #include "CbmRichGeoTest.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
 #include "CbmRichRingMatch.h"
@@ -16,7 +16,7 @@ using std::map;
 using std::vector;
 
 // -----   Default constructor   -------------------------------------------
-CbmRichGeoTest::CbmRichGeoTest() :CbmTask("RichGeoTestQa")
+CbmRichGeoTest::CbmRichGeoTest() :FairTask("RichGeoTestQa")
 {
 	fEventNum = 0;
 
@@ -46,7 +46,7 @@ CbmRichGeoTest::CbmRichGeoTest() :CbmTask("RichGeoTestQa")
 
 //------------  standard constructor (with verbosity level)  ---------------------------------
 CbmRichGeoTest::CbmRichGeoTest(const char *name, const char *title, Int_t verbose)
-  :CbmTask(name)
+  :FairTask(name)
 {
 
 }
@@ -65,8 +65,8 @@ CbmRichGeoTest::~CbmRichGeoTest()
 InitStatus CbmRichGeoTest::Init()
 {
 	cout << "InitStatus CbmRichGeoTest::Init()"<<endl;
-	// Get and check CbmRootManager
-	CbmRootManager* ioman = CbmRootManager::Instance();
+	// Get and check FairRootManager
+	FairRootManager* ioman = FairRootManager::Instance();
 	if (!ioman) {
 		cout << "-E- CbmRichGeoTest::Init: " << "RootManager not instantised!"
 				<< endl;

@@ -7,7 +7,7 @@
 #include "CbmKFTrack.h"
 #include "CbmKFTrdHit.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 
@@ -66,8 +66,8 @@ void CbmTrdTrackFitterKF::Init()
 {
     // Initialisation
 
-    // Get the pointer to CbmRootManager
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    // Get the pointer to FairRootManager
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
         cout << "-E- CbmTrdTrackFitterKF::Init : "
             << " ROOT manager is not instantiated!" << endl;

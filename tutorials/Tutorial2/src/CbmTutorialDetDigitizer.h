@@ -9,7 +9,7 @@
 #define CBMTUTORIALDETDIGITIZER_H
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TVector3.h"
 
@@ -17,7 +17,7 @@ class TClonesArray;
 
 class CbmTutorialDetDigiPar;
 
-    class CbmTutorialDetDigitizer : public CbmTask {
+    class CbmTutorialDetDigitizer : public FairTask {
 public:
 
     

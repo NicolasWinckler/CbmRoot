@@ -37,7 +37,7 @@
 #define CBMRICH_H
 
 
-#include "CbmDetector.h"
+#include "FairDetector.h"
 
 #include "TVector3.h"
 
@@ -45,11 +45,11 @@ class TClonesArray;
 class CbmRichRefPlanePoint;
 class CbmRichPoint;
 class CbmRichMirrorPoint;
-class CbmVolume; 
+class FairVolume; 
 
 
 
-class CbmRich : public CbmDetector 
+class CbmRich : public FairDetector 
 {
 
  public:
@@ -82,7 +82,7 @@ class CbmRich : public CbmDetector
    ** them to the collections.
    *@param vol  Pointer to the active volume
    **/
-  virtual Bool_t ProcessHits(CbmVolume* vol = 0);
+  virtual Bool_t ProcessHits(FairVolume* vol = 0);
 
 
   /** Virtual method EndOfEvent

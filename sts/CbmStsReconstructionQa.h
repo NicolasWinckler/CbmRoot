@@ -15,7 +15,7 @@
 #define CBMSTSRECONSTRUCTIONQA_H 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TStopwatch.h"
 #include "TVector3.h"
@@ -35,7 +35,7 @@ class CbmGeoStsPar;
 
 
 
-class CbmStsReconstructionQa : public CbmTask
+class CbmStsReconstructionQa : public FairTask
 {
 
  public:

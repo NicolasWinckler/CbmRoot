@@ -8,12 +8,12 @@
 #include "CbmTrdHit.h"
 #include "CbmStsTrack.h"
 #include "CbmStsTrackMatch.h"
-#include "CbmTrackParam.h"
-#include "CbmMCPoint.h"
+#include "FairTrackParam.h"
+#include "FairMCPoint.h"
 #include "CbmMCTrack.h"
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 #include "TClonesArray.h"
 #include "TDirectory.h"
@@ -30,7 +30,7 @@ CbmLitRecQa::CbmLitRecQa(
 		Double_t quota,
 		DetectorId detId,
 		Int_t iVerbose):
-  CbmTask("LitRecQA", iVerbose),
+  FairTask("LitRecQA", iVerbose),
   fMinPoints(minPoints),
   fQuota(quota),
   fDetId(detId),
@@ -54,8 +54,8 @@ void CbmLitRecQa::SetParContainers()
 
 InitStatus CbmLitRecQa::Init()
 {
-    CbmRootManager* ioman = CbmRootManager::Instance();
-    if (NULL == ioman) Fatal("Init","CbmRootManager is not instantiated");
+    FairRootManager* ioman = FairRootManager::Instance();
+    if (NULL == ioman) Fatal("Init","FairRootManager is not instantiated");
 
     fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
     if (NULL == fMCTracks) Fatal("Init","No MCTrack array!");

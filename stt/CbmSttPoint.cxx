@@ -6,13 +6,13 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmSttPoint::CbmSttPoint() : CbmMCPoint() { }
+CbmSttPoint::CbmSttPoint() : FairMCPoint() { }
 // -------------------------------------------------------------------------
 
 // ------   Copy constructor     ----------------------------------------------
 /*
 CbmSttPoint::CbmSttPoint(const CbmSttPoint& point)
-  : CbmMCPoint(point)
+  : FairMCPoint(point)
 {
  *this = point;
 }
@@ -23,7 +23,7 @@ CbmSttPoint::CbmSttPoint(const CbmSttPoint& point)
 CbmSttPoint::CbmSttPoint(Int_t trackID, Int_t detID, TVector3 pos,
 			 TVector3 mom, Double_t tof, Double_t length,
 			 Double_t eLoss)
-  : CbmMCPoint(trackID, detID, pos, mom, tof, length, eLoss), 
+  : FairMCPoint(trackID, detID, pos, mom, tof, length, eLoss), 
     fStation(0),
     fLayer(0),
     fChamber(0)

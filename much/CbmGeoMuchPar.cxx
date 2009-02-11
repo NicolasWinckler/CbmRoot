@@ -12,11 +12,11 @@
  */
 
 #include "CbmGeoMuchPar.h"
-#include "CbmParamList.h"
+#include "FairParamList.h"
 #include "TObjArray.h"
 
 CbmGeoMuchPar::CbmGeoMuchPar(const char* name,const char* title,const char* context)
-             : CbmParGenericSet(name,title,context) {
+             : FairParGenericSet(name,title,context) {
 
                fGeoSensNodes = new TObjArray();
                fGeoPassNodes = new TObjArray();
@@ -32,18 +32,18 @@ void CbmGeoMuchPar::clear(void) {
     if(fStations) delete fStations;
 }
 
-void CbmGeoMuchPar::putParams(CbmParamList* l) {
+void CbmGeoMuchPar::putParams(FairParamList* l) {
   if (!l) return;
-  l->addBinary("CbmGeoNodes Sensitive List", fGeoSensNodes);
-  l->addBinary("CbmGeoNodes Passive List", fGeoPassNodes);
-  l->addBinary("CbmMuchStationOlds list",fStations);
+  l->addObject("FairGeoNodes Sensitive List", fGeoSensNodes);
+  l->addObject("FairGeoNodes Passive List", fGeoPassNodes);
+  l->addObject("CbmMuchStationOlds list",fStations);
 }
 
-Bool_t CbmGeoMuchPar::getParams(CbmParamList* l) {
+Bool_t CbmGeoMuchPar::getParams(FairParamList* l) {
   if (!l) return kFALSE;
-  if (!l->fillBinary("CbmGeoNodes Sensitive List", fGeoSensNodes)) return kFALSE;
-  if (!l->fillBinary("CbmGeoNodes Passive List", fGeoPassNodes)) return kFALSE;
-  if (!l->fillBinary("CbmMuchStationOlds list",fStations)) return kFALSE; 
+  if (!l->fillObject("FairGeoNodes Sensitive List", fGeoSensNodes)) return kFALSE;
+  if (!l->fillObject("FairGeoNodes Passive List", fGeoPassNodes)) return kFALSE;
+  if (!l->fillObject("CbmMuchStationOlds list",fStations)) return kFALSE; 
   return kTRUE;
 }
 

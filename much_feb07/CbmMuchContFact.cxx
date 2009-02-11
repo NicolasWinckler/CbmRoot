@@ -14,9 +14,9 @@
 #include "CbmMuchParRootFileIo.h"
 #include "CbmMuchParAsciiFileIo.h"
 
-#include "CbmRuntimeDb.h"
-#include "CbmParRootFileIo.h"
-#include "CbmParAsciiFileIo.h"
+#include "FairRuntimeDb.h"
+#include "FairParRootFileIo.h"
+#include "FairParAsciiFileIo.h"
 
 #include "TClass.h"
 
@@ -34,18 +34,18 @@ CbmMuchContFact::CbmMuchContFact() {
   fName="CbmMuchContFact";
   fTitle="Factory for parameter containers in libMuch";
   setAllContainers();
-  CbmRuntimeDb::instance()->addContFactory(this);
+  FairRuntimeDb::instance()->addContFactory(this);
 }
 
 void CbmMuchContFact::setAllContainers() {
   /** Creates the Container objects with all accepted contexts and adds them to
    *  the list of containers for the MuCh library.*/
-  CbmContainer* p1= new CbmContainer("CbmMuchDigiPar",
+  FairContainer* p1= new FairContainer("CbmMuchDigiPar",
 				     "Much Digitization Parameters",
 				     "TestDefaultContext");
   p1->addContext("TestNonDefaultContext");
   
-  CbmContainer* p2= new CbmContainer("CbmGeoMuchPar",
+  FairContainer* p2= new FairContainer("CbmGeoMuchPar",
 				     "Much Geometry Parameters",
 				     "TestDefaultContext");
   p2->addContext("TestNonDefaultContext");
@@ -55,13 +55,13 @@ void CbmMuchContFact::setAllContainers() {
 
 }
 
-CbmParSet* CbmMuchContFact::createContainer(CbmContainer* c) {
+FairParSet* CbmMuchContFact::createContainer(FairContainer* c) {
   /** Calls the constructor of the corresponding parameter container.
    * For an actual context, which is not an empty string and not the default context
    * of this container, the name is concatinated with the context. */
   const char* name=c->GetName();
   cout << " -I container name " << name << endl;
-  CbmParSet* p=0;
+  FairParSet* p=0;
   if (strcmp(name,"CbmMuchDigiPar")==0) {
     p=new CbmMuchDigiPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
   }
@@ -72,15 +72,15 @@ CbmParSet* CbmMuchContFact::createContainer(CbmContainer* c) {
 
 }
 
-void  CbmMuchContFact::activateParIo(CbmParIo* io) {
+void  CbmMuchContFact::activateParIo(FairParIo* io) {
   // activates the input/output class for the parameters
   // needed by the MuCh
-  if (strcmp(io->IsA()->GetName(),"CbmParRootFileIo")==0) {
-    CbmMuchParRootFileIo* p=new CbmMuchParRootFileIo(((CbmParRootFileIo*)io)->getParRootFile());
+  if (strcmp(io->IsA()->GetName(),"FairParRootFileIo")==0) {
+    CbmMuchParRootFileIo* p=new CbmMuchParRootFileIo(((FairParRootFileIo*)io)->getParRootFile());
     io->setDetParIo(p);
   }
-  else if (strcmp(io->IsA()->GetName(),"CbmParAsciiFileIo")==0) {
-    CbmMuchParAsciiFileIo* p=new CbmMuchParAsciiFileIo(((CbmParAsciiFileIo*)io)->getFile());
+  else if (strcmp(io->IsA()->GetName(),"FairParAsciiFileIo")==0) {
+    CbmMuchParAsciiFileIo* p=new CbmMuchParAsciiFileIo(((FairParAsciiFileIo*)io)->getFile());
     io->setDetParIo(p);
   }
 }

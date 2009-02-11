@@ -1,15 +1,15 @@
 #ifndef CBM_STS_MAPS_STRIP_TRACKER_H
 #define CBM_STS_MAPS_STRIP_TRACKER_H
 
-#include "CbmTask.h"
-#include "CbmDetector.h"
+#include "FairTask.h"
+#include "FairDetector.h"
 #include "CbmStsHit.h"
 #include "CbmStsJointTrack.h"
 #include "TClonesArray.h"
 #include "TRefArray.h"
 #include "CbmGeoStsPar.h"
 
-class CbmStsMapsStripTracker : public CbmTask {
+class CbmStsMapsStripTracker : public FairTask {
 
     
 protected:

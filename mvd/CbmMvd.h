@@ -15,20 +15,20 @@
 #define CBMMVD_H 1
 
 
-#include "CbmDetector.h"
+#include "FairDetector.h"
 
 #include "TLorentzVector.h"
 #include "TVector3.h"
 
 class TClonesArray;
 class TList;
-class CbmVolume;
+class FairVolume;
 class CbmMvdPoint;
 
 
 
 
-class CbmMvd : public CbmDetector
+class CbmMvd : public FairDetector
 {
 
  public:
@@ -55,7 +55,7 @@ class CbmMvd : public CbmDetector
    ** collection.
    *@param vol  Pointer to the active volume
    **/
-  virtual Bool_t ProcessHits(CbmVolume* vol = 0);
+  virtual Bool_t ProcessHits(FairVolume* vol = 0);
 
 
   /** Virtual method BeginEvent **/

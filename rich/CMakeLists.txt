@@ -89,7 +89,7 @@ set(RICH_SRCS ${RICH_SRCS} ${RICH_DICTIONARY})
 
 add_library(Rich SHARED ${RICH_SRCS})
 target_link_libraries(Rich ${ROOT_LIBRARIES})
-set_target_properties(Rich PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(Rich PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS Rich DESTINATION ${CMAKE_BINARY_DIR}/lib)

@@ -38,14 +38,14 @@
 #include "CbmRichHit.h"
 #include "CbmGeoRichPar.h"
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmStack.h"
-#include "CbmBaseParSet.h"
+#include "FairBaseParSet.h"
 
 #include "TClonesArray.h"
 #include "TString.h"
 
-class CbmRichHitProducer : public CbmTask {
+class CbmRichHitProducer : public FairTask {
 
 public:
 

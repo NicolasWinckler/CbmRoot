@@ -38,7 +38,7 @@
 #if (ARCHITECTURE == STANDALONE)
 	#include "../../RootFrameworkLIB/include/rootManager.h"
 #else
-	#include "CbmRootManager.h"
+	#include "FairRootManager.h"
 #endif
 #include "../include/outputTrack.h"
 
@@ -49,11 +49,11 @@
 
 void outputTrack::initialize() {
 
-	CbmRootManager* manager;
+	FairRootManager* manager;
 
 	data.init();
 
-	manager = CbmRootManager::Instance();
+	manager = FairRootManager::Instance();
 	if (manager == NULL)
 		throw cannotAccessRootManagerError(OUTPUTRESULTLIB);
 
@@ -74,9 +74,9 @@ void outputTrack::initialize(const char* name, trackData** tracks) {
 
 	std::string     tempName;
 	std::string     fileName;
-	CbmRootManager* manager;
+	FairRootManager* manager;
 
-	manager = CbmRootManager::Instance();
+	manager = FairRootManager::Instance();
 	if (manager == NULL)
 		throw cannotAccessRootManagerError(OUTPUTRESULTLIB);
 

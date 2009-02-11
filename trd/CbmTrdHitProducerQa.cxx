@@ -9,11 +9,11 @@
 #include "CbmTrdPoint.h"
 #include "CbmGeoTrdPar.h"
 
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmBaseParSet.h"
-#include "CbmRuntimeDb.h"
-#include "CbmDetector.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairBaseParSet.h"
+#include "FairRuntimeDb.h"
+#include "FairDetector.h"
 #include "CbmMCTrack.h"
 
 #include "TClonesArray.h"
@@ -40,7 +40,7 @@ CbmTrdHitProducerQa::CbmTrdHitProducerQa()
 // ---- Standard constructor ------------------------------------------------
 CbmTrdHitProducerQa::CbmTrdHitProducerQa(const char* name,
 					 const char* title)
-: CbmTask(name)
+: FairTask(name)
 {
     fTrdHitCollection   = NULL;
     fTrdPointCollection = NULL;
@@ -61,7 +61,7 @@ CbmTrdHitProducerQa::~CbmTrdHitProducerQa()
 InitStatus CbmTrdHitProducerQa::Init()
 {
     // Get pointer to the ROOT I/O manager
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
 	cout << "-E- CbmTrdHitProducerQa::Init : "
 	    << "ROOT manager is not instantiated !" << endl;
@@ -92,16 +92,16 @@ InitStatus CbmTrdHitProducerQa::Init()
       return kFATAL;
     }
 
-    // Get the pointer to the singleton CbmRunAna object
-    CbmRunAna* ana = CbmRunAna::Instance();
+    // Get the pointer to the singleton FairRunAna object
+    FairRunAna* ana = FairRunAna::Instance();
     if(NULL == ana) {
         cout << "-E- CbmTrdFindTracksQa::Init :"
-            <<" no CbmRunAna object!" << endl;
+            <<" no FairRunAna object!" << endl;
         return kERROR;
     }
 
     // Get the pointer to run-time data base
-    CbmRuntimeDb* rtdb = ana->GetRuntimeDb();
+    FairRuntimeDb* rtdb = ana->GetRuntimeDb();
     if(NULL == rtdb) {
         cout << "-E- CbmTrdFindTracksQa::Init :"
             <<" no runtime database!" << endl;
@@ -109,8 +109,8 @@ InitStatus CbmTrdHitProducerQa::Init()
     }
 
     // Get the pointer to container of base parameters
-    CbmBaseParSet* baseParSet =
-        (CbmBaseParSet*) rtdb->getContainer("CbmBaseParSet");
+    FairBaseParSet* baseParSet =
+        (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
     if(NULL == baseParSet) {
         cout << "-E- CbmTrdFindTracksQa::Init :"
             <<" no container of base parameters!" << endl;
@@ -125,7 +125,7 @@ InitStatus CbmTrdHitProducerQa::Init()
     }
 
     // Find TRD detector
-    CbmDetector* trd = (CbmDetector*) detList->FindObject("TRD");
+    FairDetector* trd = (FairDetector*) detList->FindObject("TRD");
     if(NULL == trd) {
         cout << "-E- CbmTrdFindTracksQa::Init :"
             << " no TRD detector!" << endl;
@@ -135,10 +135,10 @@ InitStatus CbmTrdHitProducerQa::Init()
     // Determine the geometry version
     CbmGeoTrdPar* par=(CbmGeoTrdPar*)(rtdb->getContainer("CbmGeoTrdPar"));
     TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
-    CbmGeoNode *fm1= (CbmGeoNode *)fSensNodes->FindObject("trd3gas#4");
-    CbmGeoNode *fm2= (CbmGeoNode *)fSensNodes->FindObject("trd3gas#3");
-    CbmGeoNode *fm3= (CbmGeoNode *)fSensNodes->FindObject("trd6gas#2");
-    CbmGeoNode *fm4= (CbmGeoNode *)fSensNodes->FindObject("trd1mod1gas");
+    FairGeoNode *fm1= (FairGeoNode *)fSensNodes->FindObject("trd3gas#4");
+    FairGeoNode *fm2= (FairGeoNode *)fSensNodes->FindObject("trd3gas#3");
+    FairGeoNode *fm3= (FairGeoNode *)fSensNodes->FindObject("trd6gas#2");
+    FairGeoNode *fm4= (FairGeoNode *)fSensNodes->FindObject("trd1mod1gas");
 
     if (fm1) {
       cout << "-I CbmTrdFindTracksQa::Init : TRD geometry : 3x4" << endl;

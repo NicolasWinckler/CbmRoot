@@ -17,12 +17,12 @@
 #ifndef CBMTRDCREATEPIDLIKE_H
 #define CBMTRDCREATEPIDLIKE_H 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TH1F;
 class TClonesArray;
 
-class CbmTrdCreatePidLike : public CbmTask {
+class CbmTrdCreatePidLike : public FairTask {
 public:
 
     /* Defaul constructor */
@@ -30,7 +30,7 @@ public:
 
     /* Standard constructor */
     CbmTrdCreatePidLike(const char* name,
-                        const char* title = "CbmTask");
+                        const char* title = "FairTask");
 
     /* Destructor */
     virtual ~CbmTrdCreatePidLike();

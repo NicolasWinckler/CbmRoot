@@ -6,15 +6,15 @@
 #define CBM_UNIGEN_GENERATOR
 
 #include "TString.h"
-#include "CbmGenerator.h"
+#include "FairGenerator.h"
 
 class TFile;
 class TTree;
 class UEvent;
-class CbmPrimaryGenerator;
+class FairPrimaryGenerator;
 
 
-class CbmUnigenGenerator : public CbmGenerator {
+class CbmUnigenGenerator : public FairGenerator {
 
 private:
     Int_t         fEvents;           //! Current event number
@@ -33,7 +33,7 @@ public:
     CbmUnigenGenerator(TString fileName);
     virtual ~CbmUnigenGenerator();
 
-    virtual Bool_t ReadEvent(CbmPrimaryGenerator* primGen);
+    virtual Bool_t ReadEvent(FairPrimaryGenerator* primGen);
 
     ClassDef(CbmUnigenGenerator,1);
 };

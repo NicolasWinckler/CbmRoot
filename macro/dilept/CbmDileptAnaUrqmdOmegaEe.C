@@ -32,7 +32,7 @@
     TString inputFileNameRec = "reco_urqmd_omega_ee.auau.25gev.centr.1k.root";
     TString outputFileName   = "urqmd_omega_ee.auau.25gev.centr.1k.spectra.root";
 
-    CbmRunAna* fRun = new CbmRunAna();
+    FairRunAna* fRun = new FairRunAna();
 
     // Set the MC version used
     fRun->SetName("TGeant3");
@@ -43,8 +43,8 @@
     fRun->AddFriend( inputFileNameMC.Data() );
 
     // Init simulation parameters from root file
-    CbmRuntimeDb* rtdb=fRun->GetRuntimeDb();
-    CbmParRootFileIo* input=new CbmParRootFileIo();
+    FairRuntimeDb* rtdb=fRun->GetRuntimeDb();
+    FairParRootFileIo* input=new FairParRootFileIo();
     input->open("urqmd_omega_ee.auau.25gev.centr.1k.params.root");
     rtdb->setFirstInput(input);
 

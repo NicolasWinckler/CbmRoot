@@ -1,14 +1,14 @@
 #ifndef CBMECALTRACKING_H
 #define CBMECALTRACKING_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class CbmEcalHitProducer;
 class CbmEcalStructure;
 class CbmEcalTrackExtrapolation;
 class TClonesArray;
 
-class CbmEcalTracking : public CbmTask
+class CbmEcalTracking : public FairTask
 {
 public:
   /** Default constructor **/

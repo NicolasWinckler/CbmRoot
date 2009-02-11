@@ -3,7 +3,7 @@
 #ifndef CBMECALMATCHING_H
 #define CBMECALMATCHING_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include <list>
 #include <map>
 #include "TArrayD.h"
@@ -15,7 +15,7 @@ class TTree;
 class CbmEcalStructure;
 class CbmEcalShowerLib;
 
-class CbmEcalMatching : public CbmTask
+class CbmEcalMatching : public FairTask
 {
 public:
   /** Only to comply with framework **/

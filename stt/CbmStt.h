@@ -1,14 +1,14 @@
 #ifndef CBMSTTDET_H
 #define CBMSTTDET_H
-#include "CbmDetector.h"
+#include "FairDetector.h"
 #include "TLorentzVector.h"
 
-class CbmVolume;
+class FairVolume;
 class TClonesArray;
 class TVector3;
 class CbmSttPoint;
 
-class CbmStt: public CbmDetector {
+class CbmStt: public FairDetector {
 
 public:
   /**      Name :  Detector Name
@@ -21,8 +21,8 @@ public:
   virtual ~CbmStt();
   /**      Initialization of the detector is done here    */
   virtual void   Initialize();
-  /**       this method is called for each step during dsimulation (see CbmMCApplication::Stepping())    */
-  virtual Bool_t ProcessHits( CbmVolume *v=0);
+  /**       this method is called for each step during dsimulation (see FairMCApplication::Stepping())    */
+  virtual Bool_t ProcessHits( FairVolume *v=0);
   /**       Registers the produced collections in CBMRootManager.     */
   virtual void   Register();
   /** Gets the produced collections */

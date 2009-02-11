@@ -21,7 +21,7 @@
 #ifndef CBM_TRD_SET_TRACKS_PID_ANN
 #define CBM_TRD_SET_TRACKS_PID_ANN 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TString.h"
 
@@ -29,7 +29,7 @@
 class TMultiLayerPerceptron;
 class TClonesArray;
 
-class CbmTrdSetTracksPidANN : public CbmTask
+class CbmTrdSetTracksPidANN : public FairTask
 {
 	  
    /** Verbosity level **/
@@ -46,7 +46,7 @@ class CbmTrdSetTracksPidANN : public CbmTask
    *@param name   Name of class
    *@param title  Task title
    **/
-  CbmTrdSetTracksPidANN(const char* name, const char* title = "CbmTask");
+  CbmTrdSetTracksPidANN(const char* name, const char* title = "FairTask");
 
 
   /** Destructor **/

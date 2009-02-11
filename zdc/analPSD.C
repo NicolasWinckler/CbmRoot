@@ -11,7 +11,7 @@
 #include "TClonesArray.h"
 #include "Riostream.h"
 #include "TFolder.h"
-#include  "CbmMCEventHeader.h"
+#include  "FairMCEventHeader.h"
 #include "CbmZdcPoint.h"
 
 */
@@ -67,7 +67,7 @@ void analPSD ()
       TClonesArray *listZDCpts = (TClonesArray*) fd->FindObjectAny("ZDCPoint");
       t->SetBranchAddress(listZDCpts->GetName(),&listZDCpts);
       //  chain->SetBranchAddress(listZDCpts->GetName(),&listZDCpts);
-      CbmMCEventHeader *fHeader;  
+      FairMCEventHeader *fHeader;  
       t->SetBranchAddress("MCEventHeader.",&fHeader); 
       TClonesArray *fMCtrack = (TClonesArray*) fd->FindObjectAny("MCTrack");
       t->SetBranchAddress("MCTrack",&fMCtrack);

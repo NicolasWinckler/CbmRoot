@@ -52,8 +52,8 @@
 
 #include "CbmGeoEcalPar.h"
 
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 #include "TSystem.h"
 #include "TMap.h"
@@ -180,10 +180,10 @@ CbmEcalInf::CbmEcalInf(const char* filename)
    ** Constructor reads and parses the ascii file, and fill 
    ** the ECAL geometry container
    **/
-  CbmRunAna* ana = CbmRunAna::Instance();
+  FairRunAna* ana = FairRunAna::Instance();
   if (ana!=NULL)
   {
-    CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+    FairRuntimeDb* rtdb=ana->GetRuntimeDb();
     rtdb->getContainer("CbmGeoEcalPar");
   }
 
@@ -274,12 +274,12 @@ Bool_t CbmEcalInf::ExcludeParameter(TString parname)
 
 void CbmEcalInf::CheckVariables()
 {
-  CbmRunAna* ana = CbmRunAna::Instance();
+  FairRunAna* ana = FairRunAna::Instance();
   if (ana==NULL)
   {
     return;
   }
-  CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   CbmGeoEcalPar* par=(CbmGeoEcalPar*)(rtdb->findContainer("CbmGeoEcalPar"));
   if (par==NULL)
   {

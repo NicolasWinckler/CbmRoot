@@ -1020,7 +1020,7 @@ bool inputRoot::readStsDetectorFromTGeoManager() {
  * Method initializes special parts of the object.				*
  ****************************************************************/
 
-void inputRoot::initSpecial(CbmRootManager* manager) {
+void inputRoot::initSpecial(FairRootManager* manager) {
 
 	std::string stsHitBranch;
 
@@ -1304,7 +1304,7 @@ void inputRoot::read(unsigned int event, TClonesArray* mvdHitArray, TClonesArray
 	if (readEventFromRootManager) {
 
 		/* get pointer to ROOT manager */
-		CbmRootManager* manager = CbmRootManager::Instance();
+		FairRootManager* manager = FairRootManager::Instance();
 		if (manager == NULL)
 			throw cannotAccessRootManagerError(INPUTLIB);
 
@@ -1387,11 +1387,11 @@ inputRoot::inputRoot(bitArray detMask, bool enableJustPoints, bool enableHitsFro
 
 inputRoot::inputRoot(const char* name, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) : inputData(detMask, hitProducer) {
 
-	CbmRootManager* manager;
+	FairRootManager* manager;
 	std::string     fileName;
 
 	/* get pointer to ROOT manager */
-	manager  = CbmRootManager::Instance();
+	manager  = FairRootManager::Instance();
 	if (manager == NULL)
 		throw cannotAccessRootManagerError(INPUTLIB);
 
@@ -1443,11 +1443,11 @@ inputRoot::inputRoot(const char* detectorFileName, unsigned short numberOfVolume
 }
 inputRoot::inputRoot(const char* name, const char* detectorFileName, unsigned short numberOfVolumesInfrontOfSTS, bitArray detMask, int hitProducer, bool enableJustPoints, bool enableHitsFromFile, bool enableMapsHits, bool enableHybridHits, bool enableStripHits) : inputData(detMask, hitProducer) {
 
-	CbmRootManager* manager;
+	FairRootManager* manager;
 	std::string     fileName;
 
 	/* get pointer to ROOT manager */
-	manager  = CbmRootManager::Instance();
+	manager  = FairRootManager::Instance();
 	if (manager == NULL)
 		throw cannotAccessRootManagerError(INPUTLIB);
 
@@ -1519,7 +1519,7 @@ inputRoot::~inputRoot() {
 
 void inputRoot::init() {
 
-	CbmRootManager* manager;
+	FairRootManager* manager;
 	TGeoNode*       topGeoNode;
 
 	inputTracks     = NULL;
@@ -1550,7 +1550,7 @@ void inputRoot::init() {
 		topnode.clear();
 
 	/* get pointer to ROOT manager */
-	manager     = CbmRootManager::Instance();
+	manager     = FairRootManager::Instance();
 	if (manager == NULL)
 		throw cannotAccessRootManagerError(INPUTLIB);
 
@@ -1561,11 +1561,11 @@ void inputRoot::init() {
 }
 void inputRoot::init(const char* name, int hitProducer) {
 
-	CbmRootManager* manager;
+	FairRootManager* manager;
 	std::string     fileName;
 
 	/* get pointer to ROOT manager */
-	manager  = CbmRootManager::Instance();
+	manager  = FairRootManager::Instance();
 	if (manager == NULL)
 		throw cannotAccessRootManagerError(INPUTLIB);
 
@@ -1641,10 +1641,10 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 	bool                     zeroStripHits;
 	unsigned int             numberOfTracks;
 	unsigned int             numberOfHits;
-	CbmHitProducer*          hitProducer;
+	FairHitProducer*          hitProducer;
 	CbmMCTrack*              inputTrack;
 	CbmStsPoint*             inputStsPoint;
-	CbmHit*                  inputHit;
+	FairHit*                  inputHit;
 	bool                     avoidPdgCode;
 
 #ifdef TRACKINFO
@@ -1714,7 +1714,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 #endif
 
 		hitsProduced    = true;
-		hitProducer     = new CbmHitProducer(typeOfHitProducer, data.getDetectorPointer());
+		hitProducer     = new FairHitProducer(typeOfHitProducer, data.getDetectorPointer());
 		hitProducer->produceOld(inputMapsHits, inputStripHits, inputHybridHits, inputStsPoints);
 		delete hitProducer;
 
@@ -1807,7 +1807,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 
 		for (i = 0; i < inputMapsHits->GetEntries(); i++) {
 
-			inputHit = (CbmHit*)inputMapsHits->At(i);
+			inputHit = (FairHit*)inputMapsHits->At(i);
 			if (inputHit == NULL)
 				throw cannotAccessHitsOrTracksError(INPUTLIB);
 
@@ -1825,7 +1825,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 
 				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked()) {
 
-					data.addHit(inputHit->GetDetectorID(), inputHit, (CbmMCPoint*)inputStsPoint, i);
+					data.addHit(inputHit->GetDetectorID(), inputHit, (FairMCPoint*)inputStsPoint, i);
 
 				}
 
@@ -1848,7 +1848,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 
 		for (i = 0; i < inputHybridHits->GetEntries(); i++) {
 
-			inputHit = (CbmHit*)inputHybridHits->At(i);
+			inputHit = (FairHit*)inputHybridHits->At(i);
 			if (inputHit == NULL)
 				throw cannotAccessHitsOrTracksError(INPUTLIB);
 
@@ -1866,7 +1866,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 
 				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked()) {
 
-					data.addHit(inputHit->GetDetectorID(), inputHit, (CbmMCPoint*)inputStsPoint, i);
+					data.addHit(inputHit->GetDetectorID(), inputHit, (FairMCPoint*)inputStsPoint, i);
 
 				}
 
@@ -1888,7 +1888,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 
 		for (i = 0; i < inputStripHits->GetEntries(); i++) {
 
-			inputHit = (CbmHit*)inputStripHits->At(i);
+			inputHit = (FairHit*)inputStripHits->At(i);
 			if (inputHit == NULL)
 				throw cannotAccessHitsOrTracksError(INPUTLIB);
 
@@ -1906,7 +1906,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mHitArray, TClo
 
 				if (!data.getDetector().getStationById(inputHit->GetDetectorID()).isMasked()) {
 
-					data.addHit(inputHit->GetDetectorID(), inputHit, (CbmMCPoint*)inputStsPoint, i);
+					data.addHit(inputHit->GetDetectorID(), inputHit, (FairMCPoint*)inputStsPoint, i);
 
 				}
 
@@ -2019,7 +2019,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 	bool                     zeroMvdHits;
 	unsigned int             numberOfTracks;
 	unsigned int             numberOfHits;
-	CbmHitProducer*          hitProducer;
+	FairHitProducer*          hitProducer;
 	CbmMCTrack*              inputTrack;
 	CbmStsPoint*             inputStsPoint;
 	CbmMvdPoint*             inputMvdPoint;
@@ -2093,7 +2093,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 #endif
 
 		hitsProduced = true;
-		hitProducer  = new CbmHitProducer(typeOfHitProducer, data.getDetectorPointer());
+		hitProducer  = new FairHitProducer(typeOfHitProducer, data.getDetectorPointer());
 		hitProducer->produceNew(inputMvdHits, inputStsHits, inputMvdPoints, inputStsPoints);
 		delete hitProducer;
 
@@ -2195,7 +2195,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 
 				if (!data.getDetector().getStationById(inputMvdHit->GetStationNr()).isMasked()) {
 
-					data.addHit(inputMvdHit->GetStationNr(), (CbmHit*)inputMvdHit, (CbmMCPoint*)inputMvdPoint, i);
+					data.addHit(inputMvdHit->GetStationNr(), (FairHit*)inputMvdHit, (FairMCPoint*)inputMvdPoint, i);
 
 				}
 
@@ -2237,7 +2237,7 @@ void inputRoot::readDataSource(unsigned int event, TClonesArray* mvdHitArray, TC
 
 				if (!data.getDetector().getStationById(inputStsHit->GetStationNr()).isMasked()) {
 					
-					data.addHit(inputStsHit->GetStationNr(), (CbmHit*)inputStsHit, (CbmMCPoint*)inputStsPoint, i);
+					data.addHit(inputStsHit->GetStationNr(), (FairHit*)inputStsHit, (FairMCPoint*)inputStsPoint, i);
 
 				}
 

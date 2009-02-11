@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include "TArrayF.h"
-#include "CbmField.h"
+#include "FairField.h"
 #include "CbmFieldMap.h"
 #include "CbmFieldMapCreator.h"
 
@@ -128,7 +128,7 @@ Bool_t CbmFieldMapCreator::CreateMap(const char* fileName) {
 	Double_t by = 0.;
 	Double_t bz = 0.;
 	TIter next(&fFieldList);
-	while ( CbmField* field = ((CbmField*)next()) ) {
+	while ( FairField* field = ((FairField*)next()) ) {
 	  bx += field->GetBx(x, y, z);
 	  by += field->GetBy(x, y, z);
 	  bz += field->GetBz(x, y, z);

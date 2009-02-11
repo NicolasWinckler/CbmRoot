@@ -13,7 +13,7 @@
 #include "CbmMuchFindHitsSimple.h"
 
 // -----   Default constructor   ------------------------------------------
-CbmMuchFindHits::CbmMuchFindHits() : CbmTask("MuchFindHits", 1) {
+CbmMuchFindHits::CbmMuchFindHits() : FairTask("MuchFindHits", 1) {
   fDigiFile    = NULL;
   fSubTask = NULL;
   fUseClustering = 0;
@@ -22,7 +22,7 @@ CbmMuchFindHits::CbmMuchFindHits() : CbmTask("MuchFindHits", 1) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchFindHits::CbmMuchFindHits(Int_t iVerbose) 
-  : CbmTask("MuchFindHits", iVerbose) {
+  : FairTask("MuchFindHits", iVerbose) {
   fDigiFile    = NULL;
   fSubTask = NULL;
   fUseClustering = 0;
@@ -31,7 +31,7 @@ CbmMuchFindHits::CbmMuchFindHits(Int_t iVerbose)
 
 // -----   Constructor with name   -----------------------------------------
 CbmMuchFindHits::CbmMuchFindHits(const char* name, const char* digiFileName, Int_t iVerbose) 
-  : CbmTask(name, iVerbose) {
+  : FairTask(name, iVerbose) {
   fDigiFile    = new TFile(digiFileName);
   fSubTask = NULL;
   fUseClustering = 0;

@@ -12,7 +12,7 @@
 #include "CbmEcalCell.h"
 #include "CbmEcalSCurveLibRecord.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TMath.h"
 #include "TSystem.h"
@@ -24,7 +24,7 @@ using std::endl;
 using std::list;
 
 CbmEcalSCurveLib::CbmEcalSCurveLib(const char* name, Int_t verbose) :
-  CbmTask(name, verbose), fVerbose(verbose)
+  FairTask(name, verbose), fVerbose(verbose)
 {
   Int_t i;
 
@@ -76,7 +76,7 @@ void CbmEcalSCurveLib::Add(const char* file)
 
 InitStatus CbmEcalSCurveLib::Init()
 {
-  CbmRootManager* fManager=CbmRootManager::Instance();
+  FairRootManager* fManager=FairRootManager::Instance();
   if (fManager==NULL)
   {
     Fatal("Init", "Can't find IOManager.");

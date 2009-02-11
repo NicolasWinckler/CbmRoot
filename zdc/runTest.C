@@ -126,39 +126,39 @@ void runTest( Int_t nfile=1)
 
 
   // -----   Create detectors and passive volumes   -------------------------
-  CbmModule* cave= new CbmCave("CAVE");
+  FairModule* cave= new CbmCave("CAVE");
   cave->SetGeometryFileName(caveGeom);
 
-  CbmModule* pipe= new CbmPipe("PIPE");
+  FairModule* pipe= new CbmPipe("PIPE");
   pipe->SetGeometryFileName(pipeGeom);
   
-  CbmModule* target= new CbmTarget("Target");
+  FairModule* target= new CbmTarget("Target");
   target->SetGeometryFileName(targetGeom);
 
-  CbmModule* magnet= new CbmMagnet("MAGNET");
+  FairModule* magnet= new CbmMagnet("MAGNET");
   magnet->SetGeometryFileName(magnetGeom);
   
-  CbmDetector* sts= new CbmSts("STS", kTRUE);
+  FairDetector* sts= new CbmSts("STS", kTRUE);
   sts->SetGeometryFileName(stsGeom);
   /*
-  CbmDetector* rich= new CbmRich("RICH", kTRUE);
+  FairDetector* rich= new CbmRich("RICH", kTRUE);
   rich->SetGeometryFileName(richGeom);
 
-  CbmDetector* trd= new CbmTrd("TRD",kTRUE );
+  FairDetector* trd= new CbmTrd("TRD",kTRUE );
   trd->SetGeometryFileName(trdGeom);
 
-  CbmDetector* tof= new CbmTof("TOF", kTRUE);
+  FairDetector* tof= new CbmTof("TOF", kTRUE);
   tof->SetGeometryFileName(tofGeom);
   
-  CbmDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data());
+  FairDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data());
 */
-  CbmDetector* zdc= new CbmZdcv1("ZDC", kTRUE);
+  FairDetector* zdc= new CbmZdcv1("ZDC", kTRUE);
   zdc->SetGeometryFileName(zdcGeom);
 
   
   // ------------------------------------------------------------------------
 
-  CbmRunSim* fRun = new CbmRunSim();
+  FairRunSim* fRun = new FairRunSim();
 
 
   // -----   Create magnetic field   ----------------------------------------
@@ -181,21 +181,21 @@ void runTest( Int_t nfile=1)
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
-  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
-   CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+   FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
     primGen->AddGenerator(urqmdGen);
-//  CbmAsciiGenerator* asciiGen = new CbmAsciiGenerator("test_shield.f14");
+//  FairAsciiGenerator* asciiGen = new FairAsciiGenerator("test_shield.f14");
 //  primGen->AddGenerator(asciiGen);
 
-  // CbmIonGenerator *fIongen= new CbmIonGenerator(79, 197,79,
+  // FairIonGenerator *fIongen= new FairIonGenerator(79, 197,79,
     // 					1, 0.,0., 25, 0.,0.,-1.);
 //  primGen->AddGenerator(fIongen);
  //
-//   CbmShieldGenerator* shieldGen = new CbmShieldGenerator("/d/cbm01/alla/shield/shield_au25au_500ev_1.evt");
-//    CbmShieldGenerator* shieldGen = new CbmShieldGenerator("test.evt");
+//   FairShieldGenerator* shieldGen = new FairShieldGenerator("/d/cbm01/alla/shield/shield_au25au_500ev_1.evt");
+//    FairShieldGenerator* shieldGen = new FairShieldGenerator("test.evt");
   // primGen->AddGenerator(shieldGen);
     //  Particle Generator
-  // CbmParticleGenerator* partGen = new CbmParticleGenerator(2212, 1, 0., 0.,  25);
+  // FairParticleGenerator* partGen = new FairParticleGenerator(2212, 1, 0., 0.,  25);
   // primGen->AddGenerator(partGen);
  // ------------------------------------------------------------------------
 
@@ -224,9 +224,9 @@ void runTest( Int_t nfile=1)
 
   
   // -----   Fill parameter containers   ------------------------------------
-  CbmRuntimeDb* rtdb = fRun->GetRuntimeDb();
+  FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   Bool_t kParameterMerged = kTRUE;
-  CbmParRootFileIo* parOut = new CbmParRootFileIo(kParameterMerged);
+  FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
   parOut->open(parFile.Data());
   rtdb->setOutput(parOut);
   rtdb->saveOutput();

@@ -7,7 +7,7 @@
 #include "CbmTrdTrack.h"
 #include "CbmTrdHit.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 #include "TMultiLayerPerceptron.h"
@@ -37,7 +37,7 @@ CbmTrdSetTracksPidANN::CbmTrdSetTracksPidANN() {
 
 // -----   Standard constructor   ------------------------------------------
 CbmTrdSetTracksPidANN::CbmTrdSetTracksPidANN(const char* name, const char* title) :
-	CbmTask(name) {
+	FairTask(name) {
 	fTrackArray = NULL;
 	fTrdHitArray = NULL;
 	fNofTracks = 0;
@@ -176,8 +176,8 @@ InitStatus CbmTrdSetTracksPidANN::Init() {
 	if (!ReadData())
 		return kFATAL;
 
-	// Get and check CbmRootManager
-	CbmRootManager* ioman = CbmRootManager::Instance();
+	// Get and check FairRootManager
+	FairRootManager* ioman = FairRootManager::Instance();
 	if (!ioman) {
 		cout << "-E- CbmTrdSetTracksPidANN::Init: "
 				<< "RootManager not instantised!" << endl;

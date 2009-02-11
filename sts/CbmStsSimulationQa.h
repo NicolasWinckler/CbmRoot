@@ -14,7 +14,7 @@
 #ifndef CBMSTSSIMULATIONQA_H
 #define CBMSTSSIMULATIONQA_H 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TVector3.h"
 
@@ -30,7 +30,7 @@ class CbmGeoStsPar;
 
 
 
-class CbmStsSimulationQa : public CbmTask
+class CbmStsSimulationQa : public FairTask
 {
 
  public:

@@ -69,7 +69,7 @@ void CbmStsKFSecondaryVertexFinder::GetFittedTrack( Int_t itrack, CbmStsTrack *T
   CbmKFMath::CopyTC2TrackParam( Track->GetParamFirst(), T, C ); 
 }
 
-void CbmStsKFSecondaryVertexFinder::GetFittedTrack( Int_t itrack, CbmTrackParam *Param ){
+void CbmStsKFSecondaryVertexFinder::GetFittedTrack( Int_t itrack, FairTrackParam *Param ){
   if(!Param) return;
   double T[6], C[15];
   Finder.GetTrack(itrack, T, C );

@@ -1,15 +1,15 @@
 #ifndef CBM_STS_CANDID_TRACKER_H
 #define CBM_STS_CANDID_TRACKER_H
 
-#include "CbmTask.h"
-#include "CbmDetector.h"
+#include "FairTask.h"
+#include "FairDetector.h"
 #include "CbmStsHit.h"
 #include "CbmStsJointTrack.h"
 #include "TClonesArray.h"
 #include "TRefArray.h"
 
 
-class CbmStsCandidTracker : public CbmTask {
+class CbmStsCandidTracker : public FairTask {
 
     
 protected:

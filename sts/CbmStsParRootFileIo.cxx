@@ -13,8 +13,8 @@
 
 #include "CbmStsParRootFileIo.h"
 
-#include "CbmParRootFileIo.h"
-#include "CbmRuntimeDb.h"
+#include "FairParRootFileIo.h"
+#include "FairRuntimeDb.h"
 #include "CbmStsDigiPar.h"
 
 #include <iostream> 
@@ -25,7 +25,7 @@ using std::endl;
 
 ClassImp(CbmStsParRootFileIo)
 
-CbmStsParRootFileIo::CbmStsParRootFileIo(CbmParRootFile* f) : CbmDetParRootFileIo(f) {
+CbmStsParRootFileIo::CbmStsParRootFileIo(FairParRootFile* f) : FairDetParRootFileIo(f) {
   // constructor sets the name of the detector I/O "CbmStsParIo"
   fName="CbmStsParIo";
 
@@ -46,7 +46,7 @@ CbmStsParRootFileIo::~CbmStsParRootFileIo() {
 */
 }
 
-Bool_t CbmStsParRootFileIo::init(CbmParSet* pPar,Int_t* set) {
+Bool_t CbmStsParRootFileIo::init(FairParSet* pPar,Int_t* set) {
   // Initializes a container called by name, but only the modules defined
   //   in the array 'set.
   // Calls the special read function for this container.

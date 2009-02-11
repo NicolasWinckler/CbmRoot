@@ -27,8 +27,8 @@
 #include "CbmRichRing.h"
 
 #include "CbmMCTrack.h"
-#include "CbmRootManager.h"
-#include "CbmTrackParam.h"
+#include "FairRootManager.h"
+#include "FairTrackParam.h"
 #include "CbmGlobalTrack.h"
 #include "CbmStsTrackMatch.h"
 #include "CbmRichRingMatch.h"
@@ -84,8 +84,8 @@ CbmRichRingTrackAssignClosestD::~CbmRichRingTrackAssignClosestD()
 // -----   Public method Init   --------------------------------------------
 void CbmRichRingTrackAssignClosestD::Init() 
 {
-	// Get and check CbmRootManager
-	CbmRootManager* ioman = CbmRootManager::Instance();
+	// Get and check FairRootManager
+	FairRootManager* ioman = FairRootManager::Instance();
 	if (!ioman) {
 		cout << "-E- CbmRichRingTrackAssignClosestD:Init: "
 				<< "RootManager not instantised!" << endl;
@@ -115,7 +115,7 @@ void CbmRichRingTrackAssignClosestD::DoAssign(TClonesArray *pRingArray, TClonesA
     Int_t fNTracks = pTringArray->GetEntriesFast();
 	Int_t fNRings = pRingArray->GetEntriesFast();
 
-	CbmTrackParam *pTrack;
+	FairTrackParam *pTrack;
 	CbmRichRing *pRing;
 
 	CbmGlobalTrack *gTrack;
@@ -151,7 +151,7 @@ void CbmRichRingTrackAssignClosestD::DoAssign(TClonesArray *pRingArray, TClonesA
 				vector<Int_t>::iterator it = find(trackIndex.begin(), trackIndex.end(), iTrack);
 				if (it != trackIndex.end()) continue;
 				
-				pTrack = (CbmTrackParam*)pTringArray->At(iTrack);
+				pTrack = (FairTrackParam*)pTringArray->At(iTrack);
 				xTrack = pTrack->GetX();
 				yTrack = pTrack->GetY();
 		

@@ -18,7 +18,7 @@
 #ifndef CBMMVDDIGITISER_H
 #define CBMMVDDIGITISER_H 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmMvdPoint.h"
 #include "CbmMvdDigi.h"
 #include "MyG4UniversalFluctuationForSi.h"
@@ -46,7 +46,7 @@ class CbmMvdStation;
 using namespace std;
 
 
-class CbmMvdDigitiser : public CbmTask
+class CbmMvdDigitiser : public FairTask
 {
  
  public:

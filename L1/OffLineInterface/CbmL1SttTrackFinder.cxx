@@ -13,7 +13,7 @@
 #include "CbmSttTrack.h"
 #include "CbmKF.h"
 #include "CbmKFMath.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmKFHit.h"
 #include "CbmKFPixelMeasurement.h"
 #include "CbmKFMaterial.h"
@@ -43,7 +43,7 @@ using std::fabs;
 
 ClassImp(CbmL1SttTrackFinder);
 
-CbmL1SttTrackFinder::CbmL1SttTrackFinder(const char *name, Int_t iVerbose ):CbmTask(name, iVerbose)
+CbmL1SttTrackFinder::CbmL1SttTrackFinder(const char *name, Int_t iVerbose ):FairTask(name, iVerbose)
 {
   fTrackCollection = new TClonesArray("CbmSttTrack", 100);
   histodir = 0;
@@ -61,16 +61,16 @@ InitStatus CbmL1SttTrackFinder::Init()
 
 InitStatus CbmL1SttTrackFinder::ReInit()
 {
-  fSttPoints=(TClonesArray *) CbmRootManager::Instance()->GetObject("STTPoint");
-  fSttHits =(TClonesArray *) CbmRootManager::Instance()->GetObject("STTHit");
-  fMuchTracks =(TClonesArray *) CbmRootManager::Instance()->GetObject("MuchTrack");
-  fStsTracks =(TClonesArray *) CbmRootManager::Instance()->GetObject("STSTrack");
-  fMCTracks =(TClonesArray *) CbmRootManager::Instance()->GetObject("MCTrack");
-  fSTSTrackMatch = (TClonesArray*) CbmRootManager::Instance()->GetObject("STSTrackMatch");
-  fPrimVtx =  (CbmVertex *) CbmRootManager::Instance() ->GetObject("PrimaryVertex");
+  fSttPoints=(TClonesArray *) FairRootManager::Instance()->GetObject("STTPoint");
+  fSttHits =(TClonesArray *) FairRootManager::Instance()->GetObject("STTHit");
+  fMuchTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("MuchTrack");
+  fStsTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("STSTrack");
+  fMCTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("MCTrack");
+  fSTSTrackMatch = (TClonesArray*) FairRootManager::Instance()->GetObject("STSTrackMatch");
+  fPrimVtx =  (CbmVertex *) FairRootManager::Instance() ->GetObject("PrimaryVertex");
   fStsFitter.Init();
 
-  CbmRootManager::Instance()->Register("SttTrack", "Stt", fTrackCollection, kTRUE);
+  FairRootManager::Instance()->Register("SttTrack", "Stt", fTrackCollection, kTRUE);
 
   cout << " **************************************************" << endl;
   if (fMuchTracks) cout << " *** Using MUCH tracks for STT tracking *** " << endl;
@@ -353,7 +353,7 @@ void CbmL1SttTrackFinder::Exec(Option_t * option)
       CbmSttTrack* track = (CbmSttTrack*) fTrackCollection->At(NOutTracks++);
       track->SetChi2(tr.GetRefChi2());
       track->SetNDF(tr.GetRefNDF());
-      CbmTrackParam tp;
+      FairTrackParam tp;
       CbmKFMath::CopyTC2TrackParam( &tp, tr.T, tr.C );
       track->SetSttTrack( &tp );
       track->SetStsTrackID(tr.StsID);

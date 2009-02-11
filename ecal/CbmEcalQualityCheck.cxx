@@ -1,9 +1,9 @@
 #include "CbmEcalQualityCheck.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "CbmMCTrack.h"
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 
 #include "CbmEcalStructure.h"
 #include "CbmEcalInf.h"
@@ -306,13 +306,13 @@ void CbmEcalQualityCheck::DrawPhotons()
 
 void CbmEcalQualityCheck::DrawTracks()
 {
-  CbmTrackParam* tr;
+  FairTrackParam* tr;
   Int_t i;
   Int_t n=fTracks->GetEntriesFast();
   Double_t p;
   for(i=0;i<n;i++)
   {
-    tr=(CbmTrackParam*)fTracks->At(i);
+    tr=(FairTrackParam*)fTracks->At(i);
     p=(TMath::Abs(tr->GetQp())>1.e-4)?1./TMath::Abs(tr->GetQp()):1.e4;
     DrawMark(tr->GetX(), tr->GetY(), "#FF0000", 0);
     DrawEnergy(tr->GetX(), tr->GetY(), p, "#FF7777");
@@ -601,7 +601,7 @@ InitStatus CbmEcalQualityCheck::Init()
   fEventN=0;
 
 
-  CbmRootManager* io=CbmRootManager::Instance();
+  FairRootManager* io=FairRootManager::Instance();
   if (!io)
   {
     Fatal("Init", "Can't find IOManager.");
@@ -684,7 +684,7 @@ CbmEcalQualityCheck::~CbmEcalQualityCheck()
 
 /** Standard constructor **/
 CbmEcalQualityCheck::CbmEcalQualityCheck(const char *name, const Int_t iVerbose)
-  : CbmTask(name, iVerbose)
+  : FairTask(name, iVerbose)
 {
   fNeedDraw=kFALSE;
   fInName="EcalReco";

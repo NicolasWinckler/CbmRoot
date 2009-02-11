@@ -17,7 +17,7 @@
 #ifndef CBMTRDMATCHTRACKSMK_H
 #define CBMTRDMATCHTRACKSMK_H 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include <map>
 
@@ -29,7 +29,7 @@ class TH2F;
 class TProfile;
 class CbmTrdTrack;
 
-class CbmTrdMatchTracksMK : public CbmTask
+class CbmTrdMatchTracksMK : public FairTask
 {
  public:
 
@@ -103,7 +103,7 @@ class CbmTrdMatchTracksMK : public CbmTask
  private:
 
   TClonesArray* fTracks;       // Array of CbmTrdTracks
-  TClonesArray* fPoints;       // Array of CbmMCPoints
+  TClonesArray* fPoints;       // Array of FairMCPoints
   TClonesArray* fHits;         // Array of CbmTrdHits
   TClonesArray* fMatches;      // Array of CbmTrdTrackMatch
   TClonesArray* fMCTracks;     // Array of CbmMCTracks

@@ -15,10 +15,10 @@
 #include "CbmStsStation.h"
 #include "CbmStsStationDigiPar.h"
 
-#include "CbmGeoMedium.h"
-#include "CbmGeoNode.h"
-#include "CbmGeoTransform.h"
-#include "CbmGeoVector.h"
+#include "FairGeoMedium.h"
+#include "FairGeoNode.h"
+#include "FairGeoTransform.h"
+#include "FairGeoVector.h"
 
 #include "TArrayD.h"
 
@@ -87,12 +87,12 @@ Bool_t CbmStsDigiScheme::Init(CbmGeoStsPar*  geoPar,
     TString stationName = Form("stat%02d",iStation+1);
 
     TString statVolName = Form("stsstation%02ikeepvol",statNr);
-    CbmGeoNode* statKeepVol = (CbmGeoNode*) (passNodes->FindObject(statVolName));
+    FairGeoNode* statKeepVol = (FairGeoNode*) (passNodes->FindObject(statVolName));
     if ( statKeepVol ) {
-      CbmGeoTransform* transform = statKeepVol->getLabTransform();
-      CbmGeoVector translat = transform->getTranslation();
-      CbmGeoTransform center = statKeepVol->getCenterPosition();
-      CbmGeoVector centerV = center.getTranslation();
+      FairGeoTransform* transform = statKeepVol->getLabTransform();
+      FairGeoVector translat = transform->getTranslation();
+      FairGeoTransform center = statKeepVol->getCenterPosition();
+      FairGeoVector centerV = center.getTranslation();
 
       statZPos = translat.Z() + centerV.Z();
     }
@@ -114,13 +114,13 @@ Bool_t CbmStsDigiScheme::Init(CbmGeoStsPar*  geoPar,
 	Int_t sensorNr = iSensor+1;
 	Int_t    detId  = 2 << 24 | statNr << 16 | sectorNr << 4 | sensorNr << 1;
 	  
-	CbmGeoNode* geoSensor;
-	if ( sensorByIndex ) geoSensor = (CbmGeoNode*) (sensNodes->At(sensorByIndex++));
+	FairGeoNode* geoSensor;
+	if ( sensorByIndex ) geoSensor = (FairGeoNode*) (sensNodes->At(sensorByIndex++));
 	else {
 	  Int_t nofNodes = sensNodes->GetEntries();
 	  TString tempLookName = Form("stsstation%02isensor1#1",statNr);
 	  for (Int_t it=0; it<nofNodes; it++) {
-	    geoSensor = (CbmGeoNode*) (sensNodes->At(it));
+	    geoSensor = (FairGeoNode*) (sensNodes->At(it));
 	    TString tempNodeName = geoSensor->getName();
 	    if ( tempNodeName.Contains(tempLookName.Data()) ) {
 	      sensorByIndex = it+1;
@@ -162,7 +162,7 @@ Bool_t CbmStsDigiScheme::Init(CbmGeoStsPar*  geoPar,
 
 	  // create station that will keep the sector
 	  if ( iSector == 0 ) {
-	    CbmGeoMedium* material = geoSensor->getMedium();
+	    FairGeoMedium* material = geoSensor->getMedium();
 	    Double_t sensorRL    = material->getRadiationLength();
 
 	    station = new CbmStsStation(stationName.Data(), statNr, statZPos,

@@ -155,7 +155,7 @@ void CbmKFParticle::Construct( vector<CbmKFTrackInterface*> &vDaughters,
 
     Double_t B[3]; 
     {
-      CbmField *MF = CbmKF::Instance()->GetMagneticField();
+      FairField *MF = CbmKF::Instance()->GetMagneticField();
       MF->GetFieldValue( r0, B );
       const Double_t c_light =  0.000299792458;
       B[0]*=c_light; B[1]*=c_light; B[2]*=c_light;
@@ -592,7 +592,7 @@ void CbmKFParticle::Convert( Double_t r0[], bool ToProduction )
 
   Double_t B[3]; 
   {
-    CbmField *MF = CbmKF::Instance()->GetMagneticField();
+    FairField *MF = CbmKF::Instance()->GetMagneticField();
     MF->GetFieldValue( r0, B );
     const Double_t c_light =  Q*0.000299792458;
     B[0]*=c_light; B[1]*=c_light; B[2]*=c_light;
@@ -712,7 +712,7 @@ void CbmKFParticle::Extrapolate(Double_t r0[], Double_t dS )
   }
 
   const Double_t c_light = 0.000299792458;
-  CbmField *MF = CbmKF::Instance()->GetMagneticField();
+  FairField *MF = CbmKF::Instance()->GetMagneticField();
 
   Double_t c = Q*c_light;
 

@@ -1,7 +1,7 @@
 #include "CbmPropagatorGeane.h"
 
-#include "CbmTrackParam.h"
-#include "CbmTrackParP.h"
+#include "FairTrackParam.h"
+#include "FairTrackParP.h"
 
 #include "TVector3.h"
 
@@ -12,7 +12,7 @@ CbmPropagatorGeane::CbmPropagatorGeane():
 	fMinSlope(1e-4),
 	fMaxSlope(5.)
 {
-   fPropagator = new CbmGeanePro();
+   fPropagator = new FairGeanePro();
 }
 
 CbmPropagatorGeane::~CbmPropagatorGeane() 
@@ -21,8 +21,8 @@ CbmPropagatorGeane::~CbmPropagatorGeane()
 }
 
 StatusCode CbmPropagatorGeane::Propagate(
-		const CbmTrackParam *parIn,
-        CbmTrackParam *parOut,
+		const FairTrackParam *parIn,
+        FairTrackParam *parOut,
         Double_t zOut,
         Int_t pdg)
 {
@@ -31,7 +31,7 @@ StatusCode CbmPropagatorGeane::Propagate(
 }
 
 StatusCode CbmPropagatorGeane::Propagate(
-		CbmTrackParam *par, 
+		FairTrackParam *par, 
         Double_t zOut,
         Int_t pdg)
 {
@@ -53,14 +53,14 @@ StatusCode CbmPropagatorGeane::Propagate(
    // the input parameter is defined in the xy plane 
    // which is perpendicular to z axes with origin at Z.
    // In this case X=V, Y=W
-   CbmTrackParP parStart(par->GetX(), par->GetY(),
+   FairTrackParP parStart(par->GetX(), par->GetY(),
                          par->GetTx(), par->GetTy(), 
                          par->GetQp(), &gCov[0], 
                          TVector3(0, 0, par->GetZ()), 
                          TVector3(1, 0, 0), TVector3(0, 1, 0), 1);
      
    // output track parameter
-   CbmTrackParP parEnd; 
+   FairTrackParP parEnd; 
   
    // plane to which propagate
    // the plane is perpendicular to z axes
@@ -72,7 +72,7 @@ StatusCode CbmPropagatorGeane::Propagate(
 //   pdg = 13;
 //   if (par->GetQp() > 0) pdg = -13;
 
-   // CbmGeanePro is used to propagate the track parameters
+   // FairGeanePro is used to propagate the track parameters
    Bool_t propResult;
    propResult = fPropagator->Propagate(&parStart, &parEnd, pdg);
    
@@ -164,7 +164,7 @@ void CbmPropagatorGeane::FromGeaneCovMatrix(
 }
 
 Bool_t CbmPropagatorGeane::IsInParCorrect(
-		const CbmTrackParam* par) const
+		const FairTrackParam* par) const
 {
 	if (std::abs(par->GetTx()) > fMaxSlope ||
 		std::abs(par->GetTy()) > fMaxSlope ||

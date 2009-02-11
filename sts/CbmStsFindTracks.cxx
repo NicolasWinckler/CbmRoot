@@ -10,10 +10,10 @@
 #include "CbmStsTrackFinderIdeal.h"
 
 // Includes from base
-#include "CbmField.h"
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairField.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 // Includes from ROOT
 #include "TClonesArray.h"
@@ -32,7 +32,7 @@ using std::setprecision;
 
 // -----   Default constructor   -------------------------------------------
 CbmStsFindTracks::CbmStsFindTracks() 
-  : CbmTask("STSFindTracks") {
+  : FairTask("STSFindTracks") {
   fUseMvd         = kFALSE;
   fGeoPar         = NULL;
   fDigiPar        = NULL;
@@ -56,7 +56,7 @@ CbmStsFindTracks::CbmStsFindTracks()
 CbmStsFindTracks::CbmStsFindTracks(Int_t iVerbose,
 				   CbmStsTrackFinder* finder, 
 				   Bool_t useMvd, const char* name)
-  : CbmTask(name, iVerbose) {
+  : FairTask(name, iVerbose) {
   fUseMvd         = useMvd;
   fGeoPar         = NULL;
   fDigiPar        = NULL;
@@ -116,10 +116,10 @@ void CbmStsFindTracks::Exec(Option_t* opt) {
 void CbmStsFindTracks::SetParContainers() {
 
   // Get run and runtime database
-  CbmRunAna* run = CbmRunAna::Instance();
+  FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) Fatal("SetParContainers", "No analysis run");
 
-  CbmRuntimeDb* db = run->GetRuntimeDb();
+  FairRuntimeDb* db = run->GetRuntimeDb();
   if ( ! db ) Fatal("SetParContainers", "No runtime database");
 
   // Get STS geometry parameter container
@@ -137,8 +137,8 @@ void CbmStsFindTracks::SetParContainers() {
 InitStatus CbmStsFindTracks::Init() {
 
   // Get input hit arrays
-  CbmRootManager* ioman = CbmRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No CbmRootManager");
+  FairRootManager* ioman = FairRootManager::Instance();
+  if ( ! ioman ) Fatal("Init", "No FairRootManager");
   fStsHits = (TClonesArray*) ioman->GetObject("STSHit");
   if ( ! fStsHits ) {
     cout << "-E- "<< GetName() << "::Init: No STSHit array!" << endl;

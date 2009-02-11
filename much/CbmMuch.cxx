@@ -4,15 +4,15 @@
 #include "CbmGeoMuchPar.h"
 #include "CbmGeoMuch.h"
 
-#include "CbmGeoInterface.h"
-#include "CbmGeoLoader.h"
-#include "CbmGeoNode.h"
-#include "CbmGeoRootBuilder.h"
-#include "CbmRootManager.h"
+#include "FairGeoInterface.h"
+#include "FairGeoLoader.h"
+#include "FairGeoNode.h"
+#include "FairGeoRootBuilder.h"
+#include "FairRootManager.h"
 #include "CbmStack.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRun.h"
-#include "CbmVolume.h"
+#include "FairRuntimeDb.h"
+#include "FairRun.h"
+#include "FairVolume.h"
 
 #include "TObjArray.h"
 #include "TClonesArray.h"
@@ -26,8 +26,8 @@
 #include "TGeoCompositeShape.h"
 #include "TGeoTube.h"
 #include "TGeoCone.h"
-#include "CbmGeoMedia.h"
-#include "CbmGeoMedium.h"
+#include "FairGeoMedia.h"
+#include "FairGeoMedium.h"
 #include "TGeoBoolNode.h"
 
 #include "CbmMuchStation.h"
@@ -62,7 +62,7 @@ CbmMuch::CbmMuch() {
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuch::CbmMuch(const char* name, Bool_t active) 
-  : CbmDetector(name, active) {
+  : FairDetector(name, active) {
   ResetParameters();
   fMuchCollection = new TClonesArray("CbmMuchPoint");
   fPosIndex = 0;
@@ -88,7 +88,7 @@ CbmMuch::~CbmMuch() {
 
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t CbmMuch::ProcessHits(CbmVolume* vol) {
+Bool_t CbmMuch::ProcessHits(FairVolume* vol) {
   if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
     fTime   = gMC->TrackTime() * 1.0e09;
@@ -160,7 +160,7 @@ void CbmMuch::EndOfEvent() {
 
 // -------------------------------------------------------------------------
 void CbmMuch::Register() {
-  CbmRootManager::Instance()->Register("MuchPoint", GetName(), fMuchCollection, kTRUE);
+  FairRootManager::Instance()->Register("MuchPoint", GetName(), fMuchCollection, kTRUE);
 }
 // -------------------------------------------------------------------------
 
@@ -235,15 +235,15 @@ CbmMuchPoint* CbmMuch::AddHit(Int_t trackID, Long64_t detID, TVector3 posIn,
 
 // ----------------------------------------------------------------------------
 void CbmMuch::ConstructGeometry() {
-  CbmGeoLoader*    geoLoad = CbmGeoLoader::Instance();
-  CbmGeoInterface* geoFace = geoLoad->getGeoInterface();
+  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
+  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
   geoFace->addGeoModule(new CbmGeoMuch());
-  CbmGeoMedia*     media    = geoFace->getMedia();
-  CbmGeoBuilder*   geobuild = geoLoad->getGeoBuilder();
+  FairGeoMedia*     media    = geoFace->getMedia();
+  FairGeoBuilder*   geobuild = geoLoad->getGeoBuilder();
 
-  CbmRun*        fRun = CbmRun::Instance();
-  if (!fRun) {Fatal("CreateGeometry","No CbmRun found"); return;}
-  CbmRuntimeDb*  rtdb = CbmRuntimeDb::instance();
+  FairRun*        fRun = FairRun::Instance();
+  if (!fRun) {Fatal("CreateGeometry","No FairRun found"); return;}
+  FairRuntimeDb*  rtdb = FairRuntimeDb::instance();
   fPar  = (CbmGeoMuchPar*)(rtdb->getContainer("CbmGeoMuchPar"));
   TObjArray* stations = fPar->GetStations();
 
@@ -437,7 +437,7 @@ void CbmMuch::ConstructGeometry() {
 // -------------------------------------------------------------------------
 
 
-Long64_t CbmMuch::GetDetId(CbmVolume* vol) {
+Long64_t CbmMuch::GetDetId(FairVolume* vol) {
   TString name = vol->GetName();
   Int_t  iStation     = TString(name[11]).Atoi()-1;
   Int_t  iLayer       = TString(name[17]).Atoi()-1;
@@ -459,11 +459,11 @@ Long64_t CbmMuch::GetDetId(CbmVolume* vol) {
 
 // -------------------------------------------------------------------------
 TGeoMedium* CbmMuch::CreateMedium(const char* matName){
-  CbmGeoLoader*    geoLoad   = CbmGeoLoader::Instance();
-  CbmGeoBuilder*   geobuild  = geoLoad->getGeoBuilder();
-  CbmGeoInterface* geoFace   = geoLoad->getGeoInterface();
-  CbmGeoMedia*     media     = geoFace->getMedia();
-  CbmGeoMedium*    medium = media->getMedium(matName);
+  FairGeoLoader*    geoLoad   = FairGeoLoader::Instance();
+  FairGeoBuilder*   geobuild  = geoLoad->getGeoBuilder();
+  FairGeoInterface* geoFace   = geoLoad->getGeoInterface();
+  FairGeoMedia*     media     = geoFace->getMedia();
+  FairGeoMedium*    medium = media->getMedium(matName);
   if (!medium) Fatal("CreateGeometry",Form("%s not defined in media file",matName));
   Int_t kMat = geobuild->createMedium(medium);
   return gGeoManager->GetMedium(kMat);

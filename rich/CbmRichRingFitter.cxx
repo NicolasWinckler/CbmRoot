@@ -23,7 +23,7 @@
 #include "CbmRichRing.h"
 #include "CbmRichHit.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TMath.h"
 
@@ -36,8 +36,8 @@ using std::endl;
 void CbmRichRingFitter::Init()
 {
 	cout << "CbmRichRingFitter::Init()"<<endl;
-	// Get and check CbmRootManager
-	CbmRootManager* ioman = CbmRootManager::Instance();
+	// Get and check FairRootManager
+	FairRootManager* ioman = FairRootManager::Instance();
 	if (! ioman) {
 		cout << "-E- CbmRichRingFitter::Init()"
 		<< "RootManager not instantised!" << endl;

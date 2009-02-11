@@ -6,7 +6,7 @@
 #ifndef CBMMUCHHITPRODUCERQA_H
 #define CBMMUCHHITPRODUCERQA_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "TH2.h"
 
 class TClonesArray;
@@ -17,7 +17,7 @@ class CbmMuchDigiScheme;
 
 class TH1D;
 
-class CbmMuchHitProducerQa : public CbmTask {
+class CbmMuchHitProducerQa : public FairTask {
 
 public:
   CbmMuchHitProducerQa(const char *name="MuchHitProducer", Int_t verbose = 1);

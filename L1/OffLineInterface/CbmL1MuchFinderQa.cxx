@@ -7,7 +7,7 @@
 #include "CbmMuchHit.h"
 #include "CbmKF.h"
 #include "CbmKFMath.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmKFHit.h"
 #include "CbmKFPixelMeasurement.h"
 #include "CbmKFMaterial.h"
@@ -37,7 +37,7 @@ using std::fabs;
 
 ClassImp(CbmL1MuchFinderQa);
 
-CbmL1MuchFinderQa::CbmL1MuchFinderQa(const char *name, Int_t iVerbose ):CbmTask(name, iVerbose)
+CbmL1MuchFinderQa::CbmL1MuchFinderQa(const char *name, Int_t iVerbose ):FairTask(name, iVerbose)
 {
   histodir = 0;
   fhPerfAll = 0;
@@ -56,13 +56,13 @@ InitStatus CbmL1MuchFinderQa::Init()
 
 InitStatus CbmL1MuchFinderQa::ReInit()
 {
-  fMuchPoints=(TClonesArray *) CbmRootManager::Instance()->GetObject("MuchPoint");
-  fMuchHits =(TClonesArray *) CbmRootManager::Instance()->GetObject("MuchHit");
-  fStsTracks =(TClonesArray *) CbmRootManager::Instance()->GetObject("STSTrack");
-  fMuchTracks =(TClonesArray *) CbmRootManager::Instance()->GetObject("MuchTrack");
-  fMCTracks =(TClonesArray *) CbmRootManager::Instance()->GetObject("MCTrack");
-  fPrimVtx =  (CbmVertex *) CbmRootManager::Instance() ->GetObject("PrimaryVertex");
-  fSTSTrackMatch = (TClonesArray*) CbmRootManager::Instance()->GetObject("STSTrackMatch");
+  fMuchPoints=(TClonesArray *) FairRootManager::Instance()->GetObject("MuchPoint");
+  fMuchHits =(TClonesArray *) FairRootManager::Instance()->GetObject("MuchHit");
+  fStsTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("STSTrack");
+  fMuchTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("MuchTrack");
+  fMCTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("MCTrack");
+  fPrimVtx =  (CbmVertex *) FairRootManager::Instance() ->GetObject("PrimaryVertex");
+  fSTSTrackMatch = (TClonesArray*) FairRootManager::Instance()->GetObject("STSTrackMatch");
   fStsFitter.Init();
 
   return kSUCCESS;

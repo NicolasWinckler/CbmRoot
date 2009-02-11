@@ -5,7 +5,7 @@
 
 class TClonesArray;
 class CbmGlobalTrack;
-class CbmTrackParam;
+class FairTrackParam;
 class CbmEcalStructure;
 
 class CbmEcalTrackExtrapolation : public TObject

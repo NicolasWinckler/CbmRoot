@@ -21,12 +21,12 @@ using std::endl;
 
 ClassImp(CbmStsParAsciiFileIo)
 
-CbmStsParAsciiFileIo::CbmStsParAsciiFileIo(fstream* f) : CbmDetParAsciiFileIo(f) {
+CbmStsParAsciiFileIo::CbmStsParAsciiFileIo(fstream* f) : FairDetParAsciiFileIo(f) {
   // constructor calls the base class constructor
   fName="CbmStsParIo";
 }
 
-Bool_t CbmStsParAsciiFileIo::init(CbmParSet* pPar) {
+Bool_t CbmStsParAsciiFileIo::init(FairParSet* pPar) {
   // calls the appropriate read function for the container
   const  Text_t* name=pPar->GetName();
    cout << "-I- Ascii Io init() " << pPar->GetName() <<   endl;
@@ -40,7 +40,7 @@ Bool_t CbmStsParAsciiFileIo::init(CbmParSet* pPar) {
   return kFALSE;
 }
 
-Int_t CbmStsParAsciiFileIo::write(CbmParSet* pPar) {
+Int_t CbmStsParAsciiFileIo::write(FairParSet* pPar) {
   // calls the appropriate write function for the container
   if (pFile) {
     const  Text_t* name=pPar->GetName();

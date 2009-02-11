@@ -15,13 +15,13 @@
 #include "CbmGeoStsPar.h"
 
 // Includes from base
-#include "CbmGeoNode.h"
+#include "FairGeoNode.h"
 #include "CbmGeoPassivePar.h"
-#include "CbmGeoVector.h"
+#include "FairGeoVector.h"
 #include "CbmMCTrack.h"
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 // Includes from ROOT
 #include "TCanvas.h"
@@ -52,7 +52,7 @@ using std::flush;
 
 // -----   Default constructor   -------------------------------------------
 CbmStsReconstructionQa::CbmStsReconstructionQa(Int_t iVerbose) 
-  : CbmTask("STSReconstructionQA", iVerbose) { 
+  : FairTask("STSReconstructionQA", iVerbose) { 
   fOnlineAnalysis = kFALSE;
   fMinHits = 4;
   fQuota   = 0.7;
@@ -67,7 +67,7 @@ CbmStsReconstructionQa::CbmStsReconstructionQa(Int_t iVerbose)
 // -----   Standard constructor   ------------------------------------------
 CbmStsReconstructionQa::CbmStsReconstructionQa(Bool_t visualizeBool, Int_t minHits, Double_t quota,
 				       Int_t iVerbose) 
-  : CbmTask("STSReconstructionQA", iVerbose) {
+  : FairTask("STSReconstructionQA", iVerbose) {
   fOnlineAnalysis = visualizeBool;
   fMinHits = minHits;
   fQuota   = quota;
@@ -107,15 +107,15 @@ CbmStsReconstructionQa::~CbmStsReconstructionQa() {
 void CbmStsReconstructionQa::SetParContainers() {
 
   // Get Run
-  CbmRunAna* run = CbmRunAna::Instance();
+  FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) {
-    cout << "-E- " << GetName() << "::SetParContainers: No CbmRunAna!" 
+    cout << "-E- " << GetName() << "::SetParContainers: No FairRunAna!" 
 	 << endl;
     return;
   }
 
   // Get Runtime Database
-  CbmRuntimeDb* runDb = run->GetRuntimeDb();
+  FairRuntimeDb* runDb = run->GetRuntimeDb();
   if ( ! run ) {
     cout << "-E- " << GetName() << "::SetParContainers: No runtime database!" 
 	 << endl;
@@ -151,7 +151,7 @@ InitStatus CbmStsReconstructionQa::Init() {
   cout << GetName() << ": Initialising..." << endl;
 
   // Get RootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- " << GetName() << "::Init: "
 	 << "RootManager not instantised!" << endl;
@@ -913,15 +913,15 @@ InitStatus CbmStsReconstructionQa::GetGeometry() {
     fTargetPos.SetXYZ(0., 0., 0.);
     return kERROR;
   }
-  CbmGeoNode* target = (CbmGeoNode*) passNodes->FindObject("targ");
+  FairGeoNode* target = (FairGeoNode*) passNodes->FindObject("targ");
   if ( ! target ) {
     cout << "-E- " << GetName() << "::GetGeometry: No target node" 
 	 << endl;
     fTargetPos.SetXYZ(0., 0., 0.);
     return kERROR;
   }
-  CbmGeoVector targetPos = target->getLabTransform()->getTranslation();
-  CbmGeoVector centerPos = target->getCenterPosition().getTranslation();
+  FairGeoVector targetPos = target->getLabTransform()->getTranslation();
+  FairGeoVector centerPos = target->getCenterPosition().getTranslation();
   Double_t targetX = targetPos.X() + centerPos.X();
   Double_t targetY = targetPos.Y() + centerPos.Y();
   Double_t targetZ = targetPos.Z() + centerPos.Z();
@@ -957,7 +957,7 @@ InitStatus CbmStsReconstructionQa::GetGeometry() {
   
   for ( Int_t ist = 0 ; ist < tempNofStations ; ist++ ) {
 
-    CbmGeoNode* stsNode = (CbmGeoNode*)stsNodes->At(ist);
+    FairGeoNode* stsNode = (FairGeoNode*)stsNodes->At(ist);
     if ( ! stsNode ) {
       cout << "-W- CbmStsDigiScheme::Init: station#" << ist
 	   << " not found among sensitive nodes " << endl;
@@ -968,8 +968,8 @@ InitStatus CbmStsReconstructionQa::GetGeometry() {
 
     stationKnown = kFALSE;
 
-    CbmGeoVector* pt1 = stsNode->getPoint(0);
-    CbmGeoVector* pt2 = stsNode->getPoint(1);
+    FairGeoVector* pt1 = stsNode->getPoint(0);
+    FairGeoVector* pt2 = stsNode->getPoint(1);
     Double_t sectorWidth = TMath::Abs(pt1->getX()-pt2->getX());
     //    cout << geoNodeName.Data() << " -> " << sectorWidth << " cm wide" << endl;
 
@@ -1400,8 +1400,8 @@ void CbmStsReconstructionQa::FillMatchMap(Int_t& nRec, Int_t& nGhosts,
       }
     Int_t nHits = stsTrack->GetNStsHits();
       
-    CbmTrackParam* trParF = (CbmTrackParam*)stsTrack->GetParamFirst();
-    CbmTrackParam* trParL = (CbmTrackParam*)stsTrack->GetParamLast();
+    FairTrackParam* trParF = (FairTrackParam*)stsTrack->GetParamFirst();
+    FairTrackParam* trParL = (FairTrackParam*)stsTrack->GetParamLast();
     fhStsTrackFPos[0]->Fill(trParF->GetX());
     fhStsTrackFPos[1]->Fill(trParF->GetY());
     fhStsTrackFPos[2]->Fill(trParF->GetZ());

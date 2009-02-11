@@ -58,7 +58,7 @@ set(MVD_SRCS ${MVD_SRCS} ${MVD_DICTIONARY})
 
 add_library(Mvd SHARED ${MVD_SRCS})
 target_link_libraries(Mvd -lgsl ${ROOT_LIBRARIES}) 
-set_target_properties(Mvd PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(Mvd PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS Mvd DESTINATION ${CMAKE_BINARY_DIR}/lib)

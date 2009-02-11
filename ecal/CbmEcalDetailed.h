@@ -13,7 +13,7 @@
 #include "CbmEcalStructure.h"
 #include "CbmEcalInf.h"
 
-#include "CbmDetector.h"
+#include "FairDetector.h"
 
 #include "TClonesArray.h"
 #include "TLorentzVector.h"
@@ -22,13 +22,13 @@
 #include <list>
 
 class CbmEcalPoint; 
-class CbmVolume;
+class FairVolume;
 class TGeoTranslation;
 
 #define kNumberOfECALSensitiveVolumes 6
 const Int_t cMaxModuleType=5;
 
-class CbmEcalDetailed : public CbmDetector
+class CbmEcalDetailed : public FairDetector
 {
 
 public:
@@ -56,7 +56,7 @@ public:
    ** collection.
    *@param vol  Pointer to the active volume
    **/
-  virtual Bool_t  ProcessHits(CbmVolume* vol = NULL);
+  virtual Bool_t  ProcessHits(FairVolume* vol = NULL);
 
 
   /** Virtual method Construct geometry

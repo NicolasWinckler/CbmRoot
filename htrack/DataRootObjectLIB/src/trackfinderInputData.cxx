@@ -667,7 +667,7 @@ void trackfinderInputData::addHit(trackfinderInputHit& hit) {
 		throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
 
 }
-void trackfinderInputData::addHit(int detectorId, CbmHit* hit, CbmMCPoint* point, int hitIndex) {
+void trackfinderInputData::addHit(int detectorId, FairHit* hit, FairMCPoint* point, int hitIndex) {
 
 	int                      numberOfHits;
 	trackfinderInputHit*     test;

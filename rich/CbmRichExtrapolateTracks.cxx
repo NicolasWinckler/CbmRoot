@@ -27,7 +27,7 @@
 
 #include "CbmRichTrackExtrapolation.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmGlobalTrack.h"
 
 #include "TClonesArray.h"
@@ -40,7 +40,7 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmRichExtrapolateTracks::CbmRichExtrapolateTracks()
-  : CbmTask("RICH Extrapolate Tracks") {
+  : FairTask("RICH Extrapolate Tracks") {
   fExtrapolation    = NULL;
   gTrackArray       = NULL;
   fZ                = 300.;
@@ -54,7 +54,7 @@ CbmRichExtrapolateTracks::CbmRichExtrapolateTracks()
 CbmRichExtrapolateTracks::CbmRichExtrapolateTracks(CbmRichTrackExtrapolation* extrapolation,
                                                    Double_t Zpos,
 				                   Int_t verbose)
-  : CbmTask("RICH Extrapolate Tracks") {
+  : FairTask("RICH Extrapolate Tracks") {
   fExtrapolation         = extrapolation;
   gTrackArray            = NULL;
   fZ                     = Zpos;
@@ -68,7 +68,7 @@ CbmRichExtrapolateTracks::CbmRichExtrapolateTracks(CbmRichTrackExtrapolation* ex
 CbmRichExtrapolateTracks::CbmRichExtrapolateTracks(const char* name, const char* title,
 				   CbmRichTrackExtrapolation* extrapolation,
 				   Double_t Zpos, Int_t verbose)
-  : CbmTask(name) {
+  : FairTask(name) {
   fExtrapolation     = extrapolation;
   gTrackArray        = NULL;
   fZ                 = Zpos;
@@ -95,8 +95,8 @@ InitStatus CbmRichExtrapolateTracks::Init() {
     return kERROR;
   }
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmRichExtrapolateTracks::Init: "
 	 << "RootManager not instantised!" << endl;
@@ -115,7 +115,7 @@ InitStatus CbmRichExtrapolateTracks::Init() {
 
 
   // Create and register RichPoint array
-  fTrackParamArray = new TClonesArray("CbmTrackParam",100);
+  fTrackParamArray = new TClonesArray("FairTrackParam",100);
   ioman->Register("RichTrackParamZ", "RICH", fTrackParamArray, kFALSE);
 
   // Set verbosity of track extrapolation

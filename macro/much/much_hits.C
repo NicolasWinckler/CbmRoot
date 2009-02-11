@@ -49,15 +49,15 @@ void much_hits(const char* inFile, const char* digiFile, const char* outFile,
   // ------------------------------------------------------------------------
 
   // -----   Reconstruction run   -------------------------------------------
-  CbmRunAna *fRun= new CbmRunAna();
+  FairRunAna *fRun= new FairRunAna();
   fRun->SetInputFile(inFile);
   fRun->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
 
 
   // -----  Parameter database   --------------------------------------------
-  CbmRuntimeDb* rtdb = fRun->GetRuntimeDb();
-  CbmParRootFileIo*  parIo1 = new CbmParRootFileIo();
+  FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
+  FairParRootFileIo*  parIo1 = new FairParRootFileIo();
   parIo1->open(gFile);
   rtdb->setFirstInput(parIo1);
   rtdb->setOutput(parIo1);

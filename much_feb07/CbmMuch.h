@@ -13,14 +13,14 @@
 
 
 #include "TLorentzVector.h"
-#include "CbmDetector.h"
+#include "FairDetector.h"
 
 
 class TClonesArray;
 class CbmMuchPoint;
-class CbmVolume;
+class FairVolume;
 
-class CbmMuch : public CbmDetector
+class CbmMuch : public FairDetector
 {
 
  public:
@@ -47,7 +47,7 @@ class CbmMuch : public CbmDetector
    ** collection.
    *@param vol  Pointer to the active volume
    **/
-  virtual Bool_t ProcessHits(CbmVolume* vol = 0);
+  virtual Bool_t ProcessHits(FairVolume* vol = 0);
 
 
   /** Virtual method BeginEvent

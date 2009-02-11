@@ -8,15 +8,15 @@
 #include "CbmGeoSttPar.h"
 #include "CbmSttPoint.h"
 
-#include "CbmDetector.h"
-#include "CbmGeoLoader.h"
-#include "CbmGeoInterface.h"
-#include "CbmRun.h"
-#include "CbmRuntimeDb.h"
-#include "CbmGeoNode.h"
-#include "CbmGeoVolume.h"
-#include "CbmVolume.h"
-#include "CbmRootManager.h"
+#include "FairDetector.h"
+#include "FairGeoLoader.h"
+#include "FairGeoInterface.h"
+#include "FairRun.h"
+#include "FairRuntimeDb.h"
+#include "FairGeoNode.h"
+#include "FairGeoVolume.h"
+#include "FairVolume.h"
+#include "FairRootManager.h"
 #include "CbmStack.h"
 
 //#include "TObjArray.h"
@@ -32,7 +32,7 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmStt::CbmStt() : CbmDetector("STT", kTRUE, kTRD) {
+CbmStt::CbmStt() : FairDetector("STT", kTRUE, kTRD) {
 
   /** create your collection for data points */
   fSttCollection = new TClonesArray("CbmSttPoint");
@@ -43,7 +43,7 @@ CbmStt::CbmStt() : CbmDetector("STT", kTRUE, kTRD) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStt::CbmStt(const char* name, Bool_t active)
-  : CbmDetector(name, active, kTRD) {
+  : FairDetector(name, active, kTRD) {
   fSttCollection = new TClonesArray("CbmSttPoint");
   fVerboseLevel = 1;
   fPosIndex = 0;
@@ -59,12 +59,12 @@ CbmStt::~CbmStt() {
  
 void CbmStt::Initialize()
 {
-  CbmDetector::Initialize();
-  CbmRuntimeDb *rtdb= CbmRun::Instance()->GetRuntimeDb();
+  FairDetector::Initialize();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
   CbmGeoSttPar* par=(CbmGeoSttPar*)(rtdb->getContainer("CbmGeoSttPar"));
 }
 
-Bool_t  CbmStt::ProcessHits(CbmVolume* vol)
+Bool_t  CbmStt::ProcessHits(FairVolume* vol)
 {
  
   /** This method is called from the MC stepping */
@@ -167,7 +167,7 @@ void CbmStt::Register() {
 /** This will create a branch in the output tree called  CbmSttDetPoint, setting the last parameter to kFALSE means:
 this collection will not be written to the file, it will exist only during the simulation. */
 
-  CbmRootManager::Instance()->Register("STTPoint", "Stt", fSttCollection, kTRUE);
+  FairRootManager::Instance()->Register("STTPoint", "Stt", fSttCollection, kTRUE);
 
 }
 
@@ -214,8 +214,8 @@ void CbmStt::ConstructGeometry() {
 /** If you are using the standard ASCII input for the geometry just copy this and use it for your detector, otherwise you can
 implement here you own way of constructing the geometry. */
 
-  CbmGeoLoader*    geoLoad = CbmGeoLoader::Instance();
-  CbmGeoInterface* geoFace = geoLoad->getGeoInterface();
+  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
+  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
   CbmGeoStt*       sttGeo  = new CbmGeoStt();
   sttGeo->setGeomFile(GetGeometryFileName());
   geoFace->addGeoModule(sttGeo);
@@ -225,18 +225,18 @@ implement here you own way of constructing the geometry. */
   TList* volList = sttGeo->getListOfVolumes();
 
   // store geo parameter
-  CbmRun *fRun = CbmRun::Instance();
-  CbmRuntimeDb *rtdb= CbmRun::Instance()->GetRuntimeDb();
+  FairRun *fRun = FairRun::Instance();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
   CbmGeoSttPar* par=(CbmGeoSttPar*)(rtdb->getContainer("CbmGeoSttPar"));
   TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
   TObjArray *fPassNodes = par->GetGeoPassiveNodes();
 
   TListIter iter(volList);
-  CbmGeoNode* node   = NULL;
-  CbmGeoVolume *aVol=NULL;
+  FairGeoNode* node   = NULL;
+  FairGeoVolume *aVol=NULL;
 
-  while( (node = (CbmGeoNode*)iter.Next()) ) {
-    aVol = dynamic_cast<CbmGeoVolume*> ( node );
+  while( (node = (FairGeoNode*)iter.Next()) ) {
+    aVol = dynamic_cast<FairGeoVolume*> ( node );
     if ( node->isSensitive()  ) {
       fSensNodes->AddLast( aVol );
     }else{
@@ -259,7 +259,7 @@ CbmSttPoint* CbmStt::AddHit(Int_t trackID, Int_t detID, TVector3 pos,
 }
 
 void CbmStt::SetSpecialPhysicsCuts(){
-  CbmRun* run = CbmRun::Instance();
+  FairRun* run = FairRun::Instance();
   if (strcmp(run->GetName(),"TGeant3") == 0) {
     Int_t mat = gGeoManager->GetMaterialIndex("TRDgasJINR");
     gMC->Gstpar(mat+1,"LOSS",2.0);

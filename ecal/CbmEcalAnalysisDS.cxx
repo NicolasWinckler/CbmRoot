@@ -24,9 +24,9 @@
 #include "CbmEcalStructure.h"
 #include "CbmEcalSCurveLib.h"
 
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "TTree.h"
@@ -362,7 +362,7 @@ CbmEcalCell* CbmEcalAnalysisDS::FindNextCell(CbmEcalCell* cell)
 }
 
 CbmEcalAnalysisDS::CbmEcalAnalysisDS(const char* name, const Int_t iVerbose, const char* fileGeo)
-  : CbmTask(name, iVerbose), fPDGType(22), fMinEnergy(0.5), fGeoFile(fileGeo)
+  : FairTask(name, iVerbose), fPDGType(22), fMinEnergy(0.5), fGeoFile(fileGeo)
 {
   fTree=NULL;
   fInf=CbmEcalInf::GetInstance(fGeoFile);
@@ -389,7 +389,7 @@ CbmEcalAnalysisDS::CbmEcalAnalysisDS(const char* name, const Int_t iVerbose, con
 /** Initing routine **/
 InitStatus CbmEcalAnalysisDS::Init()
 {
-  CbmRootManager* fManager=CbmRootManager::Instance();
+  FairRootManager* fManager=FairRootManager::Instance();
 
   fLitePoints=(TClonesArray*)fManager->ActivateBranch("ECALPointLite");
   if (fLitePoints==NULL)
@@ -422,8 +422,8 @@ InitStatus CbmEcalAnalysisDS::Init()
 /** Parameter container init **/
 void CbmEcalAnalysisDS::SetParContainers()
 {
-  CbmRunAna* ana=CbmRunAna::Instance();
-  CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+  FairRunAna* ana=FairRunAna::Instance();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   rtdb->getContainer("CbmGeoEcalPar");
 
 }

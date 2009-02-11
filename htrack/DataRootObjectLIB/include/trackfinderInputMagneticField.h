@@ -35,9 +35,9 @@
 
 #include "../../MiscLIB/include/defs.h"
 #if (ARCHITECTURE == STANDALONE)
-	#include "../../RootFrameworkLIB/include/CbmField.h"
+	#include "../../RootFrameworkLIB/include/FairField.h"
 #elif (ARCHITECTURE == CBMROOT)
-	#include "CbmField.h"
+	#include "FairField.h"
 #endif
 #include "../../DataObjectLIB/include/magneticFieldValue.h"
 #include "trackfinderInputHit.h"
@@ -59,7 +59,7 @@ class trackfinderInputMagneticField : public TObject {
 
 protected:
 
-	CbmField*          magneticField;
+	FairField*          magneticField;
 	bool               isLocalField;
 	unsigned short     magneticFieldIntegrationStepwidthPerStation;
 	double             magneticFieldIntegrationFactor;
@@ -97,7 +97,7 @@ public:
 	trackfinderInputMagneticField(const char* fileName, bool isRootFile = true, const char* mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0);
 	trackfinderInputMagneticField(std::string fileName, bool isRootFile = true, std::string mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0);
 	trackfinderInputMagneticField(unsigned short numberOfMagnetfieldFactors);
-	trackfinderInputMagneticField(CbmField* field, unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0);
+	trackfinderInputMagneticField(FairField* field, unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0);
 
 /**
  * Destructor
@@ -119,7 +119,7 @@ public:
 	void init(const char* fileName, bool isRootFile = true, const char* mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0);
 	void init(std::string fileName, bool isRootFile = true, std::string mapName = "NewMap", unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0);
 	void init(unsigned short numberOfMagnetfieldFactors);
-	void init(CbmField* field, unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0);
+	void init(FairField* field, unsigned short magneticFieldIntegrationStepwidthPerStation = 10, double magneticFieldIntegrationFactor = 1.0, unsigned short numberOfMagnetfieldFactors = 0);
 
 /**
  * Returns the field values at a given point. This is defined at the

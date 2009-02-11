@@ -6,7 +6,7 @@
 
 #include "CbmGlobalTrack.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmTofPoint.h"
 #include "CbmTofHit.h"
 #include "CbmStsTrackMatch.h"
@@ -54,7 +54,7 @@ void CbmTofMergerIdeal::Init()
     // Initialisation
 
     // Get pointer to the ROOT manager
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
 	cout << "-E- CbmTofMergerIdeal::Init : "
 	    << "CBM ROOT manager is not instantiated!"

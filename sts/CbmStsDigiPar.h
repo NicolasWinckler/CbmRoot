@@ -18,7 +18,7 @@
 #define CBMSTSDIGIPAR_H
 
 
-#include "CbmParSet.h"
+#include "FairParSet.h"
 
 #include "TObject.h"
 #include "TObjArray.h"
@@ -28,13 +28,13 @@
 
 
 class TString;
-class CbmParIo;
+class FairParIo;
 class CbmStsStationDigiPar;
 
 
 
 
-class CbmStsDigiPar : public CbmParSet 
+class CbmStsDigiPar : public FairParSet 
 {
 
  public:
@@ -50,11 +50,11 @@ class CbmStsDigiPar : public CbmParSet
 
 
   /** Initialisation from input device**/
-  virtual Bool_t init(CbmParIo* input);
+  virtual Bool_t init(FairParIo* input);
 
 
   /** Output to file **/
-  virtual Int_t write(CbmParIo* output);
+  virtual Int_t write(FairParIo* output);
 
 
   /** Reset all parameters **/

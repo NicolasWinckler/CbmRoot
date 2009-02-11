@@ -2,7 +2,7 @@
 #ifndef CBM_L1_MuchFinderQa_h
 #define CBM_L1_MuchFinderQa_h
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmStsKFTrackFitter.h"
 #include "TLorentzVector.h"
 #include "TH1.h"
@@ -11,7 +11,7 @@
 class TClonesArray;
 class TProfile;
 
-class CbmL1MuchFinderQa :public CbmTask 
+class CbmL1MuchFinderQa :public FairTask 
 {
  public:
 
@@ -21,7 +21,7 @@ class CbmL1MuchFinderQa :public CbmTask
   /** Destructor **/
   ~CbmL1MuchFinderQa();
   
-  /// * CbmTask methods
+  /// * FairTask methods
   
   /** Intialisation at begin of run. To be implemented in the derived class.
    *@value  Success   If not kSUCCESS, task will be set inactive.

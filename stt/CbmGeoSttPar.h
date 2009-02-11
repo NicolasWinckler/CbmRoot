@@ -1,23 +1,23 @@
 #ifndef CBMGEOSTTPAR_H
 #define CBMGEOSTTPAR_H
 
-#include "CbmParGenericSet.h"
+#include "FairParGenericSet.h"
 
 class TObjArray;
-class CbmParamList;
+class FairParamList;
 
-class CbmGeoSttPar       : public CbmParGenericSet {
+class CbmGeoSttPar       : public FairParGenericSet {
 public:
-  TObjArray      *fGeoSensNodes; /** List of CbmGeoNodes for sensitive  volumes */
-  TObjArray      *fGeoPassNodes; /** List of CbmGeoNodes for sensitive  volumes */
+  TObjArray      *fGeoSensNodes; /** List of FairGeoNodes for sensitive  volumes */
+  TObjArray      *fGeoPassNodes; /** List of FairGeoNodes for sensitive  volumes */
 
   CbmGeoSttPar      (const char* name="CbmGeoSttPar",
              const char* title="Stt Geometry Parameters",
              const char* context="TestDefaultContext");
   ~CbmGeoSttPar      (void);
   void clear(void);
-  void putParams(CbmParamList*);
-  Bool_t getParams(CbmParamList*);
+  void putParams(FairParamList*);
+  Bool_t getParams(FairParamList*);
   TObjArray             *GetGeoSensitiveNodes(){return fGeoSensNodes;}
   TObjArray             *GetGeoPassiveNodes(){return fGeoPassNodes;}
 

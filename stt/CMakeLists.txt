@@ -52,7 +52,7 @@ set(STT_SRCS ${STT_SRCS} ${STT_DICTIONARY})
 
 add_library(Stt SHARED ${STT_SRCS})
 target_link_libraries(Stt ${ROOT_LIBRARIES})
-set_target_properties(Stt PROPERTIES  ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(Stt PROPERTIES  ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS Stt DESTINATION ${CMAKE_BINARY_DIR}/lib)

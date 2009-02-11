@@ -1,9 +1,9 @@
 #include "CbmStsCandidTracker.h"
-#include "CbmMCApplication.h"
+#include "FairMCApplication.h"
 #include "TGeoManager.h"
 #include "TGeoVolume.h"
-#include "CbmVolume.h"
-#include "CbmTask.h"
+#include "FairVolume.h"
+#include "FairTask.h"
 #include "CbmStsPoint.h"
 #include "CbmStsJointTrack.h"
 #include "CbmStsHit.h"
@@ -28,7 +28,7 @@ CbmStsCandidTracker::CbmStsCandidTracker() {
 
 //_________________________________________________________________
 CbmStsCandidTracker::CbmStsCandidTracker(const char *name,
-					 const char *title) : CbmTask(name) {
+					 const char *title) : FairTask(name) {
 
   fHits = new TClonesArray("CbmStsHit");
   fGeantTracks = new TClonesArray("CbmStsJointTrack");
@@ -37,7 +37,7 @@ CbmStsCandidTracker::CbmStsCandidTracker(const char *name,
 
 //_________________________________________________________________
 CbmStsCandidTracker::~CbmStsCandidTracker() {
-  CbmRootManager *fManager =CbmRootManager::Instance();
+  FairRootManager *fManager =FairRootManager::Instance();
   fManager->Write();
 }
 
@@ -45,7 +45,7 @@ CbmStsCandidTracker::~CbmStsCandidTracker() {
 InitStatus CbmStsCandidTracker::Init()
 {
 
-  CbmRootManager *fManager =CbmRootManager::Instance();	
+  FairRootManager *fManager =FairRootManager::Instance();	
 
   fListSTSpts = (TClonesArray *)fManager->GetObject("STSPoint");
   fListMCtracks = (TClonesArray *)fManager->GetObject("MCTrack");
@@ -181,8 +181,8 @@ CbmStsHit * CbmStsCandidTracker::AddHit()
 //_________________________________________________________________
 void CbmStsCandidTracker::Register() {
 //
-  CbmRootManager::Instance()->Register("StsGeantTrack","StsGeantTrack",fGeantTracks,kFALSE);
-  CbmRootManager::Instance()->Register("StsHit","StsHit", fHits, kFALSE);
+  FairRootManager::Instance()->Register("StsGeantTrack","StsGeantTrack",fGeantTracks,kFALSE);
+  FairRootManager::Instance()->Register("StsHit","StsHit", fHits, kFALSE);
 
 }
 
@@ -310,7 +310,7 @@ void CbmStsCandidTracker::CheckTracks() {
 void CbmStsCandidTracker::Finish() {
 
   fGeantTracks->Clear();
-  CbmRootManager *fManager =CbmRootManager::Instance();	
+  FairRootManager *fManager =FairRootManager::Instance();	
   fManager->Fill();
 
 }

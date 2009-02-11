@@ -22,7 +22,7 @@ CbmSttHit::CbmSttHit()
 CbmTrdHit::CbmTrdHit(Int_t detID, TVector3& pos, TVector3& dpos, Int_t index,
 		     Int_t planeID, Double_t eLossTR, Double_t eLossdEdx,
 		     Double_t eLoss)
-: CbmHit(detID, pos, dpos, index)
+: FairHit(detID, pos, dpos, index)
 {
     // Standard constructor
     fPlaneID = planeID;

@@ -19,7 +19,7 @@
 
 
 #include "map"
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "TLorentzVector.h"
 
 #include "CbmTrdPoint.h"
@@ -36,11 +36,11 @@ class CbmTrdTrack;
 class CbmTrdHit;
 class CbmKF;
 class CbmKFTrack;
-class CbmTrackParam;
+class FairTrackParam;
 class TH1F;
 class TH2F;
 
-class CbmTrdTestEventsWithMom : public CbmTask
+class CbmTrdTestEventsWithMom : public FairTask
 {
 
  public:
@@ -57,10 +57,10 @@ class CbmTrdTestEventsWithMom : public CbmTask
 
    **
    *@param name     Name of taks
-   *@param title    Title of task   (default CbmTask)
+   *@param title    Title of task   (default FairTask)
    *@param verbose  Verbosity level (default 1)
    **/
-  CbmTrdTestEventsWithMom(const char* name, const char* title = "CbmTask",
+  CbmTrdTestEventsWithMom(const char* name, const char* title = "FairTask",
 			  Int_t verbose = 1, Double_t RF=95., 
 			  Double_t chi=2., Double_t PtThr=0.5);
 
@@ -89,7 +89,7 @@ class CbmTrdTestEventsWithMom : public CbmTask
 
   TVector3 backtrack(CbmTrdPoint* trd0,CbmTrdPoint* trd8, Double_t z);
 
-  TVector3 backtrack(CbmTrackParam* paramFirst, CbmTrackParam* paramLast, Double_t z);
+  TVector3 backtrack(FairTrackParam* paramFirst, FairTrackParam* paramLast, Double_t z);
 
   Double_t prosta(TVector3 v0, TVector3 v1, int w0, int w1);  //wo, w1 - numery wspolrzednych wektora ktore chcemy uzyc
 
@@ -307,7 +307,7 @@ class CbmTrdTestEventsWithMom : public CbmTask
  private:
 
   TClonesArray* fTracks;       // Array of CbmTrdTracks
-  TClonesArray* fPoints;       // Array of CbmMCPoints
+  TClonesArray* fPoints;       // Array of FairMCPoints
   TClonesArray* fHits;         // Array of CbmTrdHits
   TClonesArray* fMatches;      // Array of CbmTrdTrackMatch
   TClonesArray* fMCTracks;

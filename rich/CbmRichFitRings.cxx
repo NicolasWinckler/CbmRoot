@@ -24,7 +24,7 @@
 #include "CbmRichRingFitter.h"
 #include "CbmRichRing.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -48,7 +48,7 @@ CbmRichFitRings::CbmRichFitRings() {
 // -----   Standard constructor   ------------------------------------------
 CbmRichFitRings::CbmRichFitRings(CbmRichRingFitter* fitter,
 				   Int_t verbose)
-  : CbmTask("RICH Fit Rings") {
+  : FairTask("RICH Fit Rings") {
   fFitter         = fitter;
   fRingArray      = NULL;
   fNofRings       = 0;
@@ -61,7 +61,7 @@ CbmRichFitRings::CbmRichFitRings(const char* name,
 				 const char* title,
 				 CbmRichRingFitter* fitter,
 				 Int_t verbose)
-  : CbmTask(name) {
+  : FairTask(name) {
   fFitter        = fitter;
   fRingArray    = NULL;
   fNofRings     = 0;
@@ -86,8 +86,8 @@ InitStatus CbmRichFitRings::Init() {
     return kERROR;
   }
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmRichFitRings::Init: "
 	 << "RootManager not instantised!" << endl;

@@ -92,10 +92,10 @@ void much_sim(const char* inputSignal, const char* inputBgr, const char* outFile
    
   // -----   Create simulation run   ----------------------------------------
   cout << endl << "=== much_sim.C : Creating run and database ..." << endl;
-  CbmRunSim* fRun = new CbmRunSim();
+  FairRunSim* fRun = new FairRunSim();
   fRun->SetName("TGeant3");              // Transport engine
   fRun->SetOutputFile(outFile);          // Output file
-  CbmRuntimeDb* rtdb = fRun->GetRuntimeDb();
+  FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   // ------------------------------------------------------------------------
   
   // -----   Create media   -------------------------------------------------
@@ -106,49 +106,49 @@ void much_sim(const char* inputSignal, const char* inputBgr, const char* outFile
   // -----   Create detectors and passive volumes   -------------------------
   cout << endl << "=== much_sim.C : Create geeometry ..." << endl;
   if ( caveGeom != "" ) {
-    CbmModule* cave = new CbmCave("CAVE");
+    FairModule* cave = new CbmCave("CAVE");
     cave->SetGeometryFileName(caveGeom);
     fRun->AddModule(cave);
     cout << "    --- " << caveGeom << endl;
   }
 
   if ( pipeGeom != "" ) {
-    CbmModule* pipe = new CbmPipe("PIPE");
+    FairModule* pipe = new CbmPipe("PIPE");
     pipe->SetGeometryFileName(pipeGeom);
     cout << "    --- " << pipeGeom << endl;
     fRun->AddModule(pipe);
   }
   
    if ( shieldGeom != "" ) {
-    CbmModule* shield = new CbmShield("SHIELD");
+    FairModule* shield = new CbmShield("SHIELD");
     shield->SetGeometryFileName(shieldGeom);
     cout << "    --- " << shieldGeom << endl;
     fRun->AddModule(shield);
   }
       
   if ( targetGeom != "" ) {
-    CbmModule* target = new CbmTarget("Target");
+    FairModule* target = new CbmTarget("Target");
     target->SetGeometryFileName(targetGeom);
     cout << "    --- " << targetGeom << endl;
     fRun->AddModule(target);
   }
 
   if ( magnetGeom != "" ) {
-    CbmModule* magnet = new CbmMagnet("MAGNET");
+    FairModule* magnet = new CbmMagnet("MAGNET");
     magnet->SetGeometryFileName(magnetGeom);
     cout << "    --- " << magnetGeom << endl;
     fRun->AddModule(magnet);
   }
 
   if ( stsGeom != "" ) {
-    CbmDetector* sts = new CbmSts("STS", kTRUE);
+    FairDetector* sts = new CbmSts("STS", kTRUE);
     sts->SetGeometryFileName(stsGeom);
     cout << "    --- " << stsGeom << endl;
     fRun->AddModule(sts);
   }
 
   if ( muchGeom != "" ) {
-    CbmDetector* much = new CbmMuch("MUCH", kTRUE);
+    FairDetector* much = new CbmMuch("MUCH", kTRUE);
     much->SetGeometryFileName(muchGeom);
     cout << "    --- " << muchGeom << endl;
     fRun->AddModule(much);
@@ -180,13 +180,13 @@ void much_sim(const char* inputSignal, const char* inputBgr, const char* outFile
   
   // -----   Create PrimaryGenerator   --------------------------------------
   cout << endl << "=== much_sim.C : Create generators ..." << endl;
-  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   if ( inputSignal != "" ) {
-  	CbmPlutoGenerator *plutoGen= new CbmPlutoGenerator(inputSignal);
+  	FairPlutoGenerator *plutoGen= new FairPlutoGenerator(inputSignal);
   	primGen->AddGenerator(plutoGen);
   }
   if ( inputBgr != "" ) {
-  	CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inputBgr);
+  	FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inputBgr);
   	primGen->AddGenerator(urqmdGen);
   }
   fRun->SetGenerator(primGen);       
@@ -207,7 +207,7 @@ void much_sim(const char* inputSignal, const char* inputBgr, const char* outFile
   fieldPar->setChanged();
   fieldPar->setInputVersion(fRun->GetRunId(),1);
   Bool_t kParameterMerged = kTRUE;
-  CbmParRootFileIo* parOut = new CbmParRootFileIo(kParameterMerged);
+  FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
   parOut->open(gFile);
   rtdb->setOutput(parOut);
   rtdb->saveOutput();

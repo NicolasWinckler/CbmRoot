@@ -139,7 +139,7 @@ trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value, unsig
 	this->hitOrder  = order;
 
 }
-trackfinderInputHit::trackfinderInputHit(CbmHit* hitPointer, int index, unsigned int order) {
+trackfinderInputHit::trackfinderInputHit(FairHit* hitPointer, int index, unsigned int order) {
 
 	hit       = hitPointer;
 
@@ -292,7 +292,7 @@ void trackfinderInputHit::initDefault() {
 	init(-1, 0, 0, 0, 0, 0, -1, 0, -1);
 
 }
-void trackfinderInputHit::init(CbmHit* hitPointer, int index, unsigned int order) {
+void trackfinderInputHit::init(FairHit* hitPointer, int index, unsigned int order) {
 
 	if (!isPointer)
 		if (hit != NULL)
@@ -464,9 +464,9 @@ double trackfinderInputHit::getPosZ() {
  * method gets the original hit-object							*
  ****************************************************************/
 
-CbmHit* trackfinderInputHit::getHit() {
+FairHit* trackfinderInputHit::getHit() {
 
-	CbmHit* returnValue = NULL;
+	FairHit* returnValue = NULL;
 	
 	if (hit != NULL)
 		returnValue = hit;
@@ -481,7 +481,7 @@ CbmHit* trackfinderInputHit::getHit() {
  * method gets the original point-object from hit				*
  ****************************************************************/
 
-CbmMCPoint* trackfinderInputHit::getPoint() {
+FairMCPoint* trackfinderInputHit::getPoint() {
 
 	return point;
 
@@ -564,7 +564,7 @@ unsigned int trackfinderInputHit::getHitOrder() {
  * method sets the original point-object from hit				*
  ****************************************************************/
 
-void trackfinderInputHit::setPoint(CbmMCPoint* actualPoint) {
+void trackfinderInputHit::setPoint(FairMCPoint* actualPoint) {
 
 	point = actualPoint;
 

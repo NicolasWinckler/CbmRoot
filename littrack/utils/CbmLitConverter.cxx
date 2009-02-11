@@ -9,7 +9,7 @@
 
 #include "CbmTrkHit.h"
 #include "CbmMuchHit.h"
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 #include "CbmTrdHit.h"
 #include "CbmStsTrack.h"
 #include "CbmTrdTrack.h"
@@ -32,7 +32,7 @@ CbmLitConverter::~CbmLitConverter()
 }
 
 void CbmLitConverter::TrackParamToLitTrackParam(
-		const CbmTrackParam* par,
+		const FairTrackParam* par,
 		CbmLitTrackParam* litPar)
 {
 	litPar->SetX(par->GetX());
@@ -48,7 +48,7 @@ void CbmLitConverter::TrackParamToLitTrackParam(
 
 void CbmLitConverter::LitTrackParamToTrackParam(
 		const CbmLitTrackParam* litPar,
-		CbmTrackParam* par)
+		FairTrackParam* par)
 {
 	par->SetX(litPar->GetX());
 	par->SetY(litPar->GetY());
@@ -180,7 +180,7 @@ void CbmLitConverter::LitTrackToMuchTrack(
 	muchTrack->SetNDF(litTrack->GetNDF());
 	muchTrack->SetStsTrackID(litTrack->GetPreviousTrackId());
 	muchTrack->SetFlag(litTrack->GetLastPlaneId());//litTrack->GetQuality());
-	CbmTrackParam par;
+	FairTrackParam par;
 	CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetParamLast(), &par);
 	muchTrack->SetMuchTrack(&par);	
 }
@@ -201,7 +201,7 @@ void CbmLitConverter::LitTrackToTrdTrack(
 	trdTrack->SetNDF(litTrack->GetNDF());
 	trdTrack->SetStsTrackIndex(litTrack->GetPreviousTrackId());
 	
-    CbmTrackParam parFirst, parLast;
+    FairTrackParam parFirst, parLast;
     CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetParamLast(), &parLast);
     CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetParamFirst(), &parFirst); 
 	trdTrack->SetParamFirst(parFirst);

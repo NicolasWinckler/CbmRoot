@@ -7,7 +7,7 @@
 #ifndef CBMECALANALYSIS_H
 #define CBMECALANALYSIS_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmStack.h"
 
 class CbmStack;
@@ -15,7 +15,7 @@ class TArrayD;
 class TH1F;
 class TH2F;
 
-class CbmEcalAnalysis : public CbmTask {
+class CbmEcalAnalysis : public FairTask {
 
 public:
 

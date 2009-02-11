@@ -17,14 +17,14 @@
 #define CBMFIELDCONTFACT_H 1
 
 
-#include "CbmContFact.h"
+#include "FairContFact.h"
 
 
-class CbmContainer;
-class CbmParSet;
+class FairContainer;
+class FairParSet;
 
 
-class CbmFieldContFact : public CbmContFact
+class CbmFieldContFact : public FairContFact
 {
 
  public:
@@ -40,7 +40,7 @@ class CbmFieldContFact : public CbmContFact
   /** Create containers
    ** Creates the requested parameter sets (CbmFieldPar) 
    **/
-  CbmParSet* createContainer(CbmContainer* container);
+  FairParSet* createContainer(FairContainer* container);
 
 
  private:

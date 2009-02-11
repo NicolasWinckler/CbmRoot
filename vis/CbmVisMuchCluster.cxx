@@ -8,7 +8,7 @@
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
 #include "TArrayI.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMuchStation.h"
 #include "TPolyLine.h"
 #include "TMarker.h"
@@ -21,7 +21,7 @@
 
 // -------------------------------------------------------------------------
 CbmVisMuchCluster::CbmVisMuchCluster(Int_t id){
-  CbmRootManager* fRootManager = CbmRootManager::Instance();
+  FairRootManager* fRootManager = FairRootManager::Instance();
   fDigis       = (TClonesArray*) fRootManager->GetObject("MuchDigi");
   fDigiMatches = (TClonesArray*) fRootManager->GetObject("MuchDigiMatch");
   fClusters    = (TClonesArray*) fRootManager->GetObject("MuchCluster");

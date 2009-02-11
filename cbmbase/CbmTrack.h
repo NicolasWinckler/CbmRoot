@@ -9,7 +9,7 @@
  **
  ** Base class for local tracks in the CBM detectors. 
  ** Holds a list of CbmTrkHits and the fitted track parameters. 
- ** The fit parameters are of type CbmTrackParam
+ ** The fit parameters are of type FairTrackParam
  ** and can only be accesssed and modified via this class.
  **/
 
@@ -17,7 +17,7 @@
 #define CBMTRACK_H 1
 
 #include "CbmDetectorList.h"
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 
 #include "TArrayI.h"
 #include "TObject.h"
@@ -69,14 +69,14 @@ class CbmTrack : public TObject
   Int_t GetNDF()                   const { return fNDF; }
   Int_t GetPreviousDetId()         const { return fPreviousDetId; }
   Int_t GetPreviousTrackId()       const { return fPreviousTrackId; }
-  CbmTrackParam* GetParamFirst() { return &fParamFirst; }
-  CbmTrackParam* GetParamLast()  { return &fParamLast ; }
+  FairTrackParam* GetParamFirst() { return &fParamFirst; }
+  FairTrackParam* GetParamLast()  { return &fParamLast ; }
 
 
   /** Modifiers  **/
   void SetPidHypo(Int_t pid)                { fPidHypo    = pid;  }
-  void SetParamFirst(CbmTrackParam& par)    { fParamFirst = par;  }
-  void SetParamLast(CbmTrackParam& par)     { fParamLast  = par;  }
+  void SetParamFirst(FairTrackParam& par)    { fParamFirst = par;  }
+  void SetParamLast(FairTrackParam& par)     { fParamLast  = par;  }
   void SetFlag(Int_t flag)                  { fFlag       = flag; }
   void SetChi2(Double_t chi2)               { fChi2       = chi2; }
   void SetNDF(Int_t ndf)                    { fNDF        = ndf;  }
@@ -94,8 +94,8 @@ class CbmTrack : public TObject
 
 
   /** Track parameters at first and last fitted hit **/
-  CbmTrackParam fParamFirst;
-  CbmTrackParam fParamLast;
+  FairTrackParam fParamFirst;
+  FairTrackParam fParamLast;
 
 
   /** Quality flag **/

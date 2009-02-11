@@ -38,7 +38,7 @@ class CbmStsKFSecondaryVertexFinder:public TObject {
   void Fit();
   void GetVertex( CbmVertex  &vtx );
   //void GetFittedTrack( Int_t itrack, CbmStsTrack *Track );
-  //void GetFittedTrack( Int_t itrack, CbmTrackParam *Param );
+  //void GetFittedTrack( Int_t itrack, FairTrackParam *Param );
   void GetMotherTrack( CbmStsTrack *MotherTrack );
   void GetMass( Double_t *M, Double_t *Error );
   CbmStsTrack * GetTrack( Int_t itrack );

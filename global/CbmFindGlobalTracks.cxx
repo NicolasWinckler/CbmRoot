@@ -8,7 +8,7 @@
 #include "CbmRichMerger.h"
 #include "CbmTofMerger.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -20,7 +20,7 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmFindGlobalTracks::CbmFindGlobalTracks() 
-  : CbmTask("Global Tracker") {
+  : FairTask("Global Tracker") {
   fTrackMerger = NULL;
   fRichMerger  = NULL;
   fTofMerger   = NULL;
@@ -37,7 +37,7 @@ CbmFindGlobalTracks::CbmFindGlobalTracks(CbmTrackMerger* trackMerger,
 					 CbmRichMerger* richMerger,
                                          CbmTofMerger* tofMerger,
 					 Int_t iVerbose) 
-  : CbmTask("Global Tracker") {
+  : FairTask("Global Tracker") {
   fTrackMerger = trackMerger;
   fRichMerger  = richMerger;
   fTofMerger   = tofMerger;
@@ -56,7 +56,7 @@ CbmFindGlobalTracks::CbmFindGlobalTracks(const char* name,
 					 CbmRichMerger* richMerger,
                                          CbmTofMerger* tofMerger,
 					 Int_t iVerbose)
-  : CbmTask(name) {
+  : FairTask(name) {
   fTrackMerger = trackMerger;
   fRichMerger  = richMerger;
   fTofMerger   = tofMerger;
@@ -101,8 +101,8 @@ InitStatus CbmFindGlobalTracks::Init() {
           << endl;
   }
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmFindGlobalTracks::Init: "
 	 << "RootManager not instantised!" << endl;

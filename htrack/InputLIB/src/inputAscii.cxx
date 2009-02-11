@@ -224,7 +224,7 @@ void inputAscii::readDataSource(unsigned int event, TClonesArray* mHitArray, TCl
 	bool                    isStripType;
 	double                  hitXCoord;
 	double                  hitYCoord;
-	CbmHitProducer*         hitProducer;
+	FairHitProducer*         hitProducer;
 
 #ifdef TRACKINFO
 
@@ -250,7 +250,7 @@ void inputAscii::readDataSource(unsigned int event, TClonesArray* mHitArray, TCl
 
 	}
 
-	hitProducer = new CbmHitProducer(typeOfHitProducer, data.getDetectorPointer());
+	hitProducer = new FairHitProducer(typeOfHitProducer, data.getDetectorPointer());
 
 	/* read number of tracks and Hits */
 	while ((data.getEventNumber() != event) || (!dataValidation)) {
@@ -449,7 +449,7 @@ void inputAscii::readDataSource(unsigned int event, TClonesArray* mvdHitArray, T
 	unsigned int            numberOfHits;
 	double                  hitXCoord;
 	double                  hitYCoord;
-	CbmHitProducer*         hitProducer;
+	FairHitProducer*         hitProducer;
 
 #ifdef TRACKINFO
 
@@ -475,7 +475,7 @@ void inputAscii::readDataSource(unsigned int event, TClonesArray* mvdHitArray, T
 
 	}
 
-	hitProducer = new CbmHitProducer(typeOfHitProducer, data.getDetectorPointer());
+	hitProducer = new FairHitProducer(typeOfHitProducer, data.getDetectorPointer());
 
 	/* read number of tracks and Hits */
 	while ((data.getEventNumber() != event) || (!dataValidation)) {

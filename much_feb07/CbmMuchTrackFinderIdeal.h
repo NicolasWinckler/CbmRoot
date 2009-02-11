@@ -18,7 +18,7 @@
   
 class TClonesArray;
 class CbmMCTrack;
-class CbmMCPoint;
+class FairMCPoint;
 class CbmMuchTrack;
 
 class CbmMuchTrackFinderIdeal : public CbmMuchTrackFinder
@@ -35,7 +35,7 @@ public:
 private:
 	void SetTrackParam(
 			const CbmMCTrack* mcTrack,
-			const CbmMCPoint* mcPoint,
+			const FairMCPoint* mcPoint,
 			CbmMuchTrack* track);
 	
 	TClonesArray* fMcTracks;

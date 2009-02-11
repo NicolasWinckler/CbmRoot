@@ -28,15 +28,15 @@
 
 #include "CbmGeoRichPar.h"
 
-#include "CbmTask.h"
-#include "CbmRootManager.h"
-#include "CbmBaseParSet.h"
+#include "FairTask.h"
+#include "FairRootManager.h"
+#include "FairBaseParSet.h"
 
 #include "TClonesArray.h"
 #include "TH1D.h"
 #include "TH2D.h"
 
-class CbmRichTestSim : public CbmTask {
+class CbmRichTestSim : public FairTask {
 
 public:
 

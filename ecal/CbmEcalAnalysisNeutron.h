@@ -1,7 +1,7 @@
 #ifndef CBMECALANALYSISNEUTRON_H
 #define CBMECALANALYSISNEUTRON_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TString.h"
 
@@ -11,7 +11,7 @@ class TTree;
 class TClonesArray;
 class CbmEcalStructure;
 
-class CbmEcalAnalysisNeutron : public CbmTask
+class CbmEcalAnalysisNeutron : public FairTask
 {
 public:
   CbmEcalAnalysisNeutron(const char* name, const Int_t iVerbose=0);

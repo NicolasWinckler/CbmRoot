@@ -57,7 +57,7 @@ class CbmRichTrackExtrapolationIdeal : public CbmRichTrackExtrapolation
    ** pointers to which are given as argument
    **
    *@param rTrackArray  Array of tracks
-   *@param rTrackParamArray  Array of CbmTrackParam
+   *@param rTrackParamArray  Array of FairTrackParam
    *@value Number of tracks extrapolated
    **/
   virtual Int_t DoExtrapolate(TClonesArray* gTrackArray, Double_t fZ, TClonesArray *fTrackParamArray);

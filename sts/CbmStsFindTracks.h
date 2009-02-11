@@ -21,18 +21,18 @@
 #include "CbmStsDigiScheme.h"
 #include "CbmStsTrackFinder.h"
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TStopwatch.h"
 
 class TClonesArray;
-class CbmField;
+class FairField;
 class CbmGeoStsPar;
 class CbmStsDigiPar;
 class CbmStsTrackFinderIdeal;
 
 
-class CbmStsFindTracks : public CbmTask
+class CbmStsFindTracks : public FairTask
 {
 
  public:
@@ -81,7 +81,7 @@ class CbmStsFindTracks : public CbmTask
   CbmGeoStsPar*      fGeoPar;      // STS geometry parameters
   CbmStsDigiPar*     fDigiPar;     // STS digitisation parameters
   CbmStsDigiScheme*  fDigiScheme;  // STS digitisation scheme
-  CbmField*          fField;       // Magnetic field
+  FairField*         fField;       // Magnetic field
   CbmStsTrackFinder* fFinder;      // TrackFinder concrete class
   TClonesArray*      fMvdHits ;    // Input array of MVD hits
   TClonesArray*      fStsHits ;    // Input array of STS hits

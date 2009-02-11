@@ -79,7 +79,7 @@ set(STS_SRCS ${STS_SRCS}  ${STS_DICTIONARY})
 
 add_library(Sts SHARED ${STS_SRCS})
 target_link_libraries(Sts ${ROOT_LIBRARIES})
-set_target_properties(Sts PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(Sts PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS Sts DESTINATION ${CMAKE_BINARY_DIR}/lib)

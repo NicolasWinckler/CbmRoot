@@ -11,7 +11,7 @@
 #include "TClonesArray.h"
 #include "Riostream.h"
 #include "TFolder.h"
-#include  "CbmMCEventHeader.h"
+#include  "FairMCEventHeader.h"
 #include "CbmZdcPoint.h"
 
 */
@@ -83,7 +83,7 @@ void dosa ()
       //    TString numFile = "000";
       //     numFile +=ifile;
       
-      //  CbmRootManager *fManger = CbmRootManager::Instance();
+      //  FairRootManager *fManger = FairRootManager::Instance();
       //   TString infilename = Form("/d/cbm04/alla/zdcJun08/g3/auau.25gev.mbias.%.4i.root", ifile); 
       //   TString infilename = Form("/d/cbm04/alla/zdcJun08/g3/Stsauau.25gev.mbias.%.4i.root", ifile);
       TString infilename = "zdcSts.mc.root";
@@ -97,7 +97,7 @@ void dosa ()
       TClonesArray *listZDCpts = (TClonesArray*) fd->FindObjectAny("ZDCPoint");
       t->SetBranchAddress(listZDCpts->GetName(),&listZDCpts);
       //  chain->SetBranchAddress(listZDCpts->GetName(),&listZDCpts);
-      CbmMCEventHeader *fHeader;  
+      FairMCEventHeader *fHeader;  
       t->SetBranchAddress("MCEventHeader.",&fHeader); 
       TClonesArray *fMCtrack = (TClonesArray*) fd->FindObjectAny("MCTrack");
       t->SetBranchAddress("MCTrack",&fMCtrack);

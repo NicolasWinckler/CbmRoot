@@ -13,10 +13,10 @@
 #include "CbmMvdPoint.h"
 
 // Includes from base
-#include "CbmGeoNode.h"
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairGeoNode.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 // Includes from ROOT
 #include "TArrayD.h"
@@ -47,7 +47,7 @@ using std::vector;
 
 // -----   Default constructor   ------------------------------------------
 CbmMvdHitProducer::CbmMvdHitProducer() 
-  : CbmTask("MVDHitProducer") {
+  : FairTask("MVDHitProducer") {
   fMode          = 0;
   fBranchName    = "MVDPoint";
   fHits          = new TClonesArray("CbmMvdHit");
@@ -70,7 +70,7 @@ CbmMvdHitProducer::CbmMvdHitProducer()
 // -----   Standard constructor   ------------------------------------------
 CbmMvdHitProducer::CbmMvdHitProducer(const char* name, Int_t iMode, 
 				     Int_t iVerbose) 
-  : CbmTask(name, iVerbose) {
+  : FairTask(name, iVerbose) {
   fMode          = iMode;
   fBranchName    = "MVDPoint";
   fHits          = new TClonesArray("CbmMvdHit");
@@ -148,8 +148,8 @@ void CbmMvdHitProducer::SetNPileup(Int_t nPileup) {
 
 // -----   Virtual private method SetParContainers   -----------------------
 void CbmMvdHitProducer::SetParContainers() {
-  CbmRunAna*    ana  = CbmRunAna::Instance();
-  CbmRuntimeDb* rtdb = ana->GetRuntimeDb();
+  FairRunAna*    ana  = FairRunAna::Instance();
+  FairRuntimeDb* rtdb = ana->GetRuntimeDb();
   fGeoPar  = (CbmMvdGeoPar*)  (rtdb->getContainer("CbmMvdGeoPar"));
 }
 // -------------------------------------------------------------------------
@@ -170,9 +170,9 @@ InitStatus CbmMvdHitProducer::Init() {
   Register();
 
   // Get input array
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) {
-    cout << "-E- " << GetName() << "::Init: No CbmRootManager!" << endl;
+    cout << "-E- " << GetName() << "::Init: No FairRootManager!" << endl;
     return kFATAL;
   }
   fPoints = (TClonesArray*) ioman->GetObject(fBranchName);
@@ -452,9 +452,9 @@ void CbmMvdHitProducer::Finish() {
 
 // -----   Private method Register   ---------------------------------------
 void CbmMvdHitProducer::Register() {
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman) Fatal("Register",
-		      "No CbmRootManager");
+		      "No FairRootManager");
   ioman->Register("MVDHit", "Mmv Hit", fHits, kTRUE);
   ioman->Register("MVDHitMatch", "MVD Hit Match", fMatches, kTRUE);
 }
@@ -508,7 +508,7 @@ Bool_t CbmMvdHitProducer::GetParameters() {
   TObjArray* sensNodes = fGeoPar->GetGeoSensitiveNodes();
   Int_t nNodes = sensNodes->GetEntriesFast();
   for (Int_t iNode=0; iNode<nNodes; iNode++) {
-    CbmGeoNode* node = (CbmGeoNode*) (sensNodes->At(iNode));
+    FairGeoNode* node = (FairGeoNode*) (sensNodes->At(iNode));
     Int_t volId = node->getMCid();
     TString nodeName = node->getName();
     char a[2];

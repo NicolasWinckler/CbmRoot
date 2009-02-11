@@ -117,7 +117,7 @@ set(L1_SRCS ${L1_SRCS} ${L1_DICTIONARY})
 
 add_library(L1 SHARED ${L1_SRCS})
 target_link_libraries(L1 ${ROOT_LIBRARIES})
-set_target_properties(L1 PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(L1 PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS L1 DESTINATION ${CMAKE_BINARY_DIR}/lib)

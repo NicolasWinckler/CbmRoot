@@ -4,7 +4,7 @@
 // -------------------------------------------------------------------------
 #include "CbmStsFitTracks.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmStsTrackFitter.h"
 
 #include "TClonesArray.h"
@@ -21,7 +21,7 @@ using std::setprecision;
 using std::fixed;
 
 // -----   Default constructor   -------------------------------------------
-CbmStsFitTracks::CbmStsFitTracks() : CbmTask("STSFitTracks") {
+CbmStsFitTracks::CbmStsFitTracks() : FairTask("STSFitTracks") {
   fFitter        = NULL;
   fTracks        = NULL;
   fNTracks       = 0;
@@ -35,7 +35,7 @@ CbmStsFitTracks::CbmStsFitTracks() : CbmTask("STSFitTracks") {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsFitTracks::CbmStsFitTracks(CbmStsTrackFitter* fitter,
-				 Int_t iVerbose) : CbmTask("STSFitTracks") {
+				 Int_t iVerbose) : FairTask("STSFitTracks") {
   fFitter        = fitter;
   fTracks        = NULL;
   fNTracks       = 0;
@@ -50,7 +50,7 @@ CbmStsFitTracks::CbmStsFitTracks(CbmStsTrackFitter* fitter,
 // -----   Constructor with name   -----------------------------------------
 CbmStsFitTracks::CbmStsFitTracks(const char* name,
 				 CbmStsTrackFitter* fitter,
-				 Int_t iVerbose) : CbmTask(name, iVerbose) {
+				 Int_t iVerbose) : FairTask(name, iVerbose) {
   fFitter        = fitter;
   fTracks        = NULL;
   fNTracks       = 0;
@@ -110,8 +110,8 @@ InitStatus CbmStsFitTracks::Init() {
     return kERROR;
   }
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmStsFitTracks::Init: "
 	 << "RootManager not instantised!" << endl;

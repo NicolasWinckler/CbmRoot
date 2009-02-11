@@ -21,7 +21,7 @@
 #define CBMSTSFINDHITSQA_H 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TStopwatch.h"
 
@@ -45,7 +45,7 @@ class TH3F;
 class TList;
 
 
-class CbmStsFindHitsQa : public CbmTask
+class CbmStsFindHitsQa : public FairTask
 {
 
 

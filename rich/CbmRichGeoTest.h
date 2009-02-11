@@ -2,7 +2,7 @@
 #ifndef CBMRICHGEOTEST_H
 #define CBMRICHGEOTEST_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -12,7 +12,7 @@
 
 using std::map;
 
-class CbmRichGeoTest : public CbmTask{
+class CbmRichGeoTest : public FairTask{
 
 public:
 	CbmRichGeoTest();

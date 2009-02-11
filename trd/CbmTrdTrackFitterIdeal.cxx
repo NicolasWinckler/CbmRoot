@@ -8,7 +8,7 @@
 #include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 #include "TVector3.h"
@@ -47,7 +47,7 @@ CbmTrdTrackFitterIdeal::~CbmTrdTrackFitterIdeal()
 void CbmTrdTrackFitterIdeal::Init()
 {
     // Task initialisation
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
 	cerr << "-E- CbmTrdTrackFitterIdeal::Init : "
 	    << "ROOT manager is not instantiated!" << endl;
@@ -104,7 +104,7 @@ Int_t CbmTrdTrackFitterIdeal::DoFit(CbmTrdTrack* pTrack)
 
 
 // -------------------------------------------------------------------------
-void CbmTrdTrackFitterIdeal::SetTrackParam(CbmTrdPoint* point, CbmTrackParam* trackParam)
+void CbmTrdTrackFitterIdeal::SetTrackParam(CbmTrdPoint* point, FairTrackParam* trackParam)
 {
     // Set track parameters from the MC point
     TVector3 pos;

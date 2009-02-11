@@ -4,10 +4,10 @@
 // -------------------------------------------------------------------------
 #include "CbmStack.h"
 
-#include "CbmDetector.h"
-#include "CbmMCPoint.h"
+#include "FairDetector.h"
+#include "FairMCPoint.h"
 #include "CbmMCTrack.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TError.h"
 #include "TLorentzVector.h"
@@ -246,8 +246,8 @@ void CbmStack::UpdateTrackIndex(TRefArray* detList) {
   // Now iterate through all active detectors
   TIterator* detIter = detList->MakeIterator();
   detIter->Reset();
-  CbmDetector* det = NULL;
-  while( (det = (CbmDetector*)detIter->Next() ) ) {
+  FairDetector* det = NULL;
+  while( (det = (FairDetector*)detIter->Next() ) ) {
 
 
     // --> Get hit collections from detector
@@ -259,7 +259,7 @@ void CbmStack::UpdateTrackIndex(TRefArray* detList) {
       
       // --> Update track index for all MCPoints in the collection
       for (Int_t iPoint=0; iPoint<nPoints; iPoint++) {
-	CbmMCPoint* point = (CbmMCPoint*)hitArray->At(iPoint);
+	FairMCPoint* point = (FairMCPoint*)hitArray->At(iPoint);
 	Int_t iTrack = point->GetTrackID();
 
 	fIndexIter = fIndexMap.find(iTrack);
@@ -298,7 +298,7 @@ void CbmStack::Reset() {
 
 // -----   Public method Register   ----------------------------------------
 void CbmStack::Register() {
-  CbmRootManager::Instance()->Register("MCTrack", "Stack", fTracks,kTRUE);
+  FairRootManager::Instance()->Register("MCTrack", "Stack", fTracks,kTRUE);
 }
 // -------------------------------------------------------------------------
 

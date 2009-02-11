@@ -46,10 +46,10 @@
 
 
 /* **************************************************************
- * CLASS CbmHitProducer							 				*
+ * CLASS FairHitProducer							 				*
  * **************************************************************/
 
-class CbmHitProducer {
+class FairHitProducer {
 
 protected:
 
@@ -92,20 +92,20 @@ public:
  * Default constructor
  */
 
-	CbmHitProducer();
+	FairHitProducer();
 
 /**
  * Constructor
  * @param typeOfHitProducer is the type of the hitproducer
  */
 
-	CbmHitProducer(int hitProducer, trackfinderInputDetector* actualDetector);
+	FairHitProducer(int hitProducer, trackfinderInputDetector* actualDetector);
 
 /**
  * Destructor
  */
 
-	virtual ~CbmHitProducer();
+	virtual ~FairHitProducer();
 
 /**
  * method sets the hitProducerType

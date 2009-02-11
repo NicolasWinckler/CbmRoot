@@ -6,7 +6,7 @@
 
 #include "CbmGlobalTrack.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmStsPoint.h"
 #include "CbmTrdPoint.h"
 #include "CbmStsHit.h"
@@ -44,7 +44,7 @@ CbmFitGlobalTracksQa::CbmFitGlobalTracksQa()
 
 // -----------------------------------------------------------------------
 CbmFitGlobalTracksQa::CbmFitGlobalTracksQa(const char* name, Int_t verbose)
-: CbmTask(name, verbose)
+: FairTask(name, verbose)
 {
     // Standard constructor
     fEvents = 0;
@@ -67,7 +67,7 @@ InitStatus CbmFitGlobalTracksQa::Init()
     // Initialisation of the task
 
     // Get pointer to the ROOT I/O manager
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
 	cout << "-E- CbmFitGlobalTracksQa::Init :"
 	    << " ROOT manager is not instantiated" << endl;

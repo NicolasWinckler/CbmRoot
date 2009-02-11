@@ -18,7 +18,7 @@
 #ifndef CBMMVDHITPRODUCER_H
 #define CBMMVDHITPRODUCER_H 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TRandom3.h"
 #include "TStopwatch.h"
@@ -33,7 +33,7 @@ class CbmMvdGeoPar;
 class CbmMvdPileupManager;
 
 
-class CbmMvdHitProducer : public CbmTask
+class CbmMvdHitProducer : public FairTask
 {
  
  public:

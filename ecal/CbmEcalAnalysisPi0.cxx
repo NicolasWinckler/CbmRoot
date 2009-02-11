@@ -1,8 +1,8 @@
 #include "CbmEcalAnalysisPi0.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 
 #include "CbmEcalRecParticle.h"
 #include "CbmEcalCell.h"
@@ -32,7 +32,7 @@ void CbmEcalAnalysisPi0::Exec(Option_t* option)
   CbmMCTrack* tr1;
   CbmMCTrack* tr2;
   CbmMCTrack* mtr;
-  CbmTrackParam* trp;
+  FairTrackParam* trp;
   CbmEcalClusterV1* cls;
   CbmEcalCell* cell;
   TLorentzVector v1;
@@ -89,7 +89,7 @@ void CbmEcalAnalysisPi0::Exec(Option_t* option)
     fR1=1111;
     for(j=0;j<trn;j++)
     {
-      trp=(CbmTrackParam*)fTracks->At(j);
+      trp=(FairTrackParam*)fTracks->At(j);
       r=(fX1-trp->GetX())*(fX1-trp->GetX())+(fY1-trp->GetY())*(fY1-trp->GetY());
       r=TMath::Sqrt(r);
       if (r<fR1) fR1=r;
@@ -107,7 +107,7 @@ void CbmEcalAnalysisPi0::Exec(Option_t* option)
     fR2=1111;
     for(j=0;j<trn;j++)
     {
-      trp=(CbmTrackParam*)fTracks->At(j);
+      trp=(FairTrackParam*)fTracks->At(j);
       r=(fX2-trp->GetX())*(fX2-trp->GetX())+(fY2-trp->GetY())*(fY2-trp->GetY());
       r=TMath::Sqrt(r);
       if (r<fR2) fR2=r;
@@ -182,7 +182,7 @@ void CbmEcalAnalysisPi0::InitTree()
 }
 
 CbmEcalAnalysisPi0::CbmEcalAnalysisPi0(const char* name, const Int_t iVerbose)
-  : CbmTask(name, iVerbose)
+  : FairTask(name, iVerbose)
 {
   fTree=NULL;
 }
@@ -190,7 +190,7 @@ CbmEcalAnalysisPi0::CbmEcalAnalysisPi0(const char* name, const Int_t iVerbose)
 /** Initing routine **/
 InitStatus CbmEcalAnalysisPi0::Init()
 {
-  CbmRootManager* fManager=CbmRootManager::Instance();
+  FairRootManager* fManager=FairRootManager::Instance();
   if (!fManager)
   {
     Fatal("Init", "Can't find a Root Manager.");

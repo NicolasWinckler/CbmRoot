@@ -6,8 +6,8 @@
 
 #include "CbmFieldPar.h"
 
-#include "CbmParSet.h"
-#include "CbmRuntimeDb.h"
+#include "FairParSet.h"
+#include "FairRuntimeDb.h"
 
 #include <iostream>
 
@@ -23,7 +23,7 @@ CbmFieldContFact::CbmFieldContFact() {
   fName = "CbmFieldContFact";
   fTitle = "Factory for field parameter containers";
   SetAllContainers();
-  CbmRuntimeDb::instance()->addContFactory(this);
+  FairRuntimeDb::instance()->addContFactory(this);
 }
 // -------------------------------------------------------------------------
 
@@ -35,12 +35,12 @@ CbmFieldContFact::~CbmFieldContFact() { }
 
 
 // -----   Create containers   ---------------------------------------------
-CbmParSet* CbmFieldContFact::createContainer(CbmContainer* container) {
+FairParSet* CbmFieldContFact::createContainer(FairContainer* container) {
 
 
   const char* name = container->GetName();
   cout << "create CbmFieldPar container " << name << endl;
-  CbmParSet* set = NULL;
+  FairParSet* set = NULL;
   if ( strcmp(name, "CbmFieldPar") == 0 ) 
     set = new CbmFieldPar( container->getConcatName().Data(),
 			   container->GetTitle(),
@@ -53,7 +53,7 @@ CbmParSet* CbmFieldContFact::createContainer(CbmContainer* container) {
 
 // -----   Set all containers (private)   ----------------------------------
 void CbmFieldContFact::SetAllContainers() {
-  CbmContainer* container = new CbmContainer("CbmFieldPar",
+  FairContainer* container = new FairContainer("CbmFieldPar",
 					     "Field parameter container",
 					     "Default field");
   containers->Add(container);

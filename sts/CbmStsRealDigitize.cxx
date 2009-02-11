@@ -19,9 +19,9 @@
 #include "TGeoNode.h"
 
 // Includes from base
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 // Includes from STS
 #include "CbmGeoStsPar.h"
@@ -55,7 +55,7 @@ using std::ios_base;
 
 
 // -----   Default constructor   ------------------------------------------
-CbmStsRealDigitize::CbmStsRealDigitize() : CbmTask("STS Digitizer", 1) {
+CbmStsRealDigitize::CbmStsRealDigitize() : FairTask("STS Digitizer", 1) {
   fGeoPar      = NULL;
   fDigiPar     = NULL;
   fPoints      = NULL;
@@ -83,7 +83,7 @@ CbmStsRealDigitize::CbmStsRealDigitize() : CbmTask("STS Digitizer", 1) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsRealDigitize::CbmStsRealDigitize(Int_t iVerbose) 
-  : CbmTask("STSDigitize", iVerbose) { 
+  : FairTask("STSDigitize", iVerbose) { 
   fGeoPar      = NULL;
   fDigiPar     = NULL;
   fPoints      = NULL;
@@ -111,7 +111,7 @@ CbmStsRealDigitize::CbmStsRealDigitize(Int_t iVerbose)
 
 // -----   Constructor with name   -----------------------------------------
 CbmStsRealDigitize::CbmStsRealDigitize(const char* name, Int_t iVerbose) 
-  : CbmTask(name, iVerbose) { 
+  : FairTask(name, iVerbose) { 
   fGeoPar      = NULL;
   fDigiPar     = NULL;
   fPoints      = NULL;
@@ -445,10 +445,10 @@ void CbmStsRealDigitize::FindFiredStrips(CbmStsPoint* pnt,Int_t& nofStr,Int_t*& 
 void CbmStsRealDigitize::SetParContainers() {
 
   // Get run and runtime database
-  CbmRunAna* run = CbmRunAna::Instance();
+  FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) Fatal("SetParContainers", "No analysis run");
 
-  CbmRuntimeDb* db = run->GetRuntimeDb();
+  FairRuntimeDb* db = run->GetRuntimeDb();
   if ( ! db ) Fatal("SetParContainers", "No runtime database");
 
   // Get STS geometry parameter container
@@ -466,8 +466,8 @@ void CbmStsRealDigitize::SetParContainers() {
 InitStatus CbmStsRealDigitize::Init() {
 
   // Get input array 
-  CbmRootManager* ioman = CbmRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No CbmRootManager");
+  FairRootManager* ioman = FairRootManager::Instance();
+  if ( ! ioman ) Fatal("Init", "No FairRootManager");
   fPoints = (TClonesArray*) ioman->GetObject("STSPoint");
 
   // Register output array StsDigi

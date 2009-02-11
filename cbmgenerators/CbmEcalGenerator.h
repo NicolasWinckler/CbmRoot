@@ -1,14 +1,14 @@
 #ifndef CBMECALGENERATOR_H
 #define CBMECALGENERATOR_H
 
-#include "CbmGenerator.h"
+#include "FairGenerator.h"
 
 #include <iostream>
 
 
-class CbmPrimaryGenerator;
+class FairPrimaryGenerator;
 
-class CbmEcalGenerator : public CbmGenerator
+class CbmEcalGenerator : public FairGenerator
 {
 public:
 
@@ -52,9 +52,9 @@ public:
   void Init();
 
   /** Creates an event with given type and multiplicity.
-   **@param primGen  pointer to the CbmPrimaryGenerator
+   **@param primGen  pointer to the FairPrimaryGenerator
    **/
-  virtual Bool_t ReadEvent(CbmPrimaryGenerator* primGen);
+  virtual Bool_t ReadEvent(FairPrimaryGenerator* primGen);
 
 private:
   Int_t      fPDGType;             // Particle type (PDG encoding)

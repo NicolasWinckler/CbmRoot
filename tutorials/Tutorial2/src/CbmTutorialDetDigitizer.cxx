@@ -3,11 +3,11 @@
 #include "CbmTutorialDetDigiPar.h"
 #include "CbmTutorialDetPoint.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmBaseParSet.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairBaseParSet.h"
 
 #include "TRandom.h"
 #include "TMath.h"
@@ -26,7 +26,7 @@ using std::endl;
 
 // ---- Default constructor -------------------------------------------
 CbmTutorialDetDigitizer::CbmTutorialDetDigitizer()
-    :CbmTask("TutorialDetDigitizer")
+    :FairTask("TutorialDetDigitizer")
 	//:fRef(0)
 {
   //    fDigiCollection = new TClonesArray("CbmTrdDigi");
@@ -35,7 +35,7 @@ CbmTutorialDetDigitizer::CbmTutorialDetDigitizer()
 
 // ---- Constructor ----------------------------------------------------
 CbmTutorialDetDigitizer::CbmTutorialDetDigitizer(const char *name, const char *title)
-	:CbmTask(name)
+	:FairTask(name)
 {
 
 }
@@ -44,7 +44,7 @@ CbmTutorialDetDigitizer::CbmTutorialDetDigitizer(const char *name, const char *t
 // ---- Destructor ----------------------------------------------------
 CbmTutorialDetDigitizer::~CbmTutorialDetDigitizer()
 {
-  //    CbmRootManager *ioman =CbmRootManager::Instance();
+  //    FairRootManager *ioman =FairRootManager::Instance();
   //ioman->Write();
   //fDigiCollection->Clear("C");
   //delete fDigiCollection;
@@ -59,8 +59,8 @@ void CbmTutorialDetDigitizer::SetParContainers()
 
 
     // Get Base Container
-    CbmRunAna* ana = CbmRunAna::Instance();
-    CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+    FairRunAna* ana = FairRunAna::Instance();
+    FairRuntimeDb* rtdb=ana->GetRuntimeDb();
 
     fDigiPar = (CbmTutorialDetDigiPar*)
                (rtdb->getContainer("CbmTutorialDetDigiPar"));
@@ -75,8 +75,8 @@ InitStatus CbmTutorialDetDigitizer::ReInit(){
   cout<<" * CbmTutorialDetDigitizer * :: ReInit() "<<endl;
 
 
-  CbmRunAna* ana = CbmRunAna::Instance();
-  CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+  FairRunAna* ana = FairRunAna::Instance();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
 
   fDigiPar = (CbmTutorialDetDigiPar*)
     (rtdb->getContainer("CbmTutorialDetDigiPar"));
@@ -91,8 +91,8 @@ InitStatus CbmTutorialDetDigitizer::Init()
 
     cout<<" * CbmTutorialDetDigitizer * :: Init() "<<endl;
 
-    CbmRootManager *ioman = CbmRootManager::Instance();
-    if ( ! ioman ) Fatal("Init", "No CbmRootManager");
+    FairRootManager *ioman = FairRootManager::Instance();
+    if ( ! ioman ) Fatal("Init", "No FairRootManager");
     
     fTutorialDetPoints=(TClonesArray *)  
       ioman->ActivateBranch("TutorialDetPoint");
@@ -199,7 +199,7 @@ void CbmTutorialDetDigitizer::Finish()
 // ---- Register ------------------------------------------------------
 void CbmTutorialDetDigitizer::Register(){
 
-  //CbmRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigiCollection, kTRUE);
+  //FairRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigiCollection, kTRUE);
 
 }
 // --------------------------------------------------------------------

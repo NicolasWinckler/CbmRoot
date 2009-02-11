@@ -4,13 +4,13 @@
 #include "CbmGeoTarget.h"
 #include "CbmGeoPassivePar.h"
 
-#include "CbmGeoLoader.h"
-#include "CbmGeoInterface.h"
-#include "CbmGeoRootBuilder.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRun.h"
-#include "CbmGeoVolume.h"
-#include "CbmGeoNode.h"
+#include "FairGeoLoader.h"
+#include "FairGeoInterface.h"
+#include "FairGeoRootBuilder.h"
+#include "FairRuntimeDb.h"
+#include "FairRun.h"
+#include "FairGeoVolume.h"
+#include "FairGeoNode.h"
 
 #include "TObjArray.h"
 
@@ -22,13 +22,13 @@ CbmTarget::CbmTarget()
 }
 
 CbmTarget::CbmTarget(const char * name,  const char * title)
-  : CbmModule(name ,title)
+  : FairModule(name ,title)
 {
 }
 void CbmTarget::ConstructGeometry()
 {
-	CbmGeoLoader *loader=CbmGeoLoader::Instance();
-	CbmGeoInterface *GeoInterface =loader->getGeoInterface();
+	FairGeoLoader *loader=FairGeoLoader::Instance();
+	FairGeoInterface *GeoInterface =loader->getGeoInterface();
 	CbmGeoTarget *MGeo=new CbmGeoTarget();
 	MGeo->setGeomFile(GetGeometryFileName());
 	GeoInterface->addGeoModule(MGeo);
@@ -37,18 +37,18 @@ void CbmTarget::ConstructGeometry()
 
         TList* volList = MGeo->getListOfVolumes();
         // store geo parameter
-        CbmRun *fRun = CbmRun::Instance();
-        CbmRuntimeDb *rtdb= CbmRun::Instance()->GetRuntimeDb();
+        FairRun *fRun = FairRun::Instance();
+        FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
         CbmGeoPassivePar* par=(CbmGeoPassivePar*)(rtdb->getContainer("CbmGeoPassivePar"));
         TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
         TObjArray *fPassNodes = par->GetGeoPassiveNodes();
 
         TListIter iter(volList);
-        CbmGeoNode* node   = NULL;
-        CbmGeoVolume *aVol=NULL;
+        FairGeoNode* node   = NULL;
+        FairGeoVolume *aVol=NULL;
 
-        while( (node = (CbmGeoNode*)iter.Next()) ) {
-            aVol = dynamic_cast<CbmGeoVolume*> ( node );
+        while( (node = (FairGeoNode*)iter.Next()) ) {
+            aVol = dynamic_cast<FairGeoVolume*> ( node );
             if ( node->isSensitive()  ) {
                 fSensNodes->AddLast( aVol );
             }else{

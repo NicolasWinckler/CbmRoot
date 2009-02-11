@@ -3,7 +3,7 @@
 
 #include "CbmGeoEcalPar.h"
 
-#include "CbmParamList.h"
+#include "FairParamList.h"
 
 #include "TObjArray.h"
 #include "TObjString.h"
@@ -62,7 +62,7 @@ Double_t CbmGeoEcalPar::GetVariableStrict(const char* key)
 }
 
 CbmGeoEcalPar::CbmGeoEcalPar(const char* name,const char* title,const char* context)
-           : CbmParGenericSet(name,title,context) {
+           : FairParGenericSet(name,title,context) {
 
 	     fEcalStr=NULL;
 	     fVariables=NULL;
@@ -101,18 +101,18 @@ void CbmGeoEcalPar::clear(void)
   if (fVariables) delete fVariables;
 }
 
-void CbmGeoEcalPar::putParams(CbmParamList* l) {
+void CbmGeoEcalPar::putParams(FairParamList* l) {
   if (!l) return;
   if (fEcalStr)
-   l->addBinary("ECAL Structure", fEcalStr);
-   l->addBinary("ECAL Variables", fVariables);
+   l->addObject("ECAL Structure", fEcalStr);
+   l->addObject("ECAL Variables", fVariables);
 }
 
-Bool_t CbmGeoEcalPar::getParams(CbmParamList* l) {
+Bool_t CbmGeoEcalPar::getParams(FairParamList* l) {
     if (!l) return kFALSE;
-    if (!l->fillBinary("ECAL Structure", fEcalStr))
+    if (!l->fillObject("ECAL Structure", fEcalStr))
       fEcalStr=NULL;
-    if (!l->fillBinary("ECAL Variables", fVariables))
+    if (!l->fillObject("ECAL Variables", fVariables))
       return kFALSE;
 
   return kTRUE;

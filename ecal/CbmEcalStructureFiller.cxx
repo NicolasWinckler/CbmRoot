@@ -1,5 +1,5 @@
 #include "CbmEcalStructureFiller.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 #include "CbmEcalPointLite.h"
 #include "CbmEcalHit.h"
@@ -13,11 +13,11 @@
 using namespace std;
 
 // -----   Default constructor   -------------------------------------------
-CbmEcalStructureFiller::CbmEcalStructureFiller() :CbmTask() {}
+CbmEcalStructureFiller::CbmEcalStructureFiller() :FairTask() {}
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   -------------------------------------------
-CbmEcalStructureFiller::CbmEcalStructureFiller(const char *name, const Int_t iVerbose, const char* fileGeo) :CbmTask(name,iVerbose)
+CbmEcalStructureFiller::CbmEcalStructureFiller(const char *name, const Int_t iVerbose, const char* fileGeo) :FairTask(name,iVerbose)
 {
   fEvent = 0;
   fInited=kFALSE;
@@ -34,7 +34,7 @@ CbmEcalStructureFiller::CbmEcalStructureFiller(const char *name, const Int_t iVe
 // -----   Destructor   ----------------------------------------------------
 CbmEcalStructureFiller::~CbmEcalStructureFiller()
 {
-  CbmRootManager *fManager =CbmRootManager::Instance();
+  FairRootManager *fManager =FairRootManager::Instance();
   fManager->Write();
 }
 // -------------------------------------------------------------------------
@@ -48,7 +48,7 @@ void CbmEcalStructureFiller::SetParContainers()
 InitStatus CbmEcalStructureFiller::Init()
 {
   fInited=kTRUE;
-  CbmRootManager* fManager = CbmRootManager::Instance();
+  FairRootManager* fManager = FairRootManager::Instance();
 
   if (fUseMCPoints==kFALSE&&fUseSummableHits==kFALSE&&fUseUnSummableHits==kFALSE)
   {

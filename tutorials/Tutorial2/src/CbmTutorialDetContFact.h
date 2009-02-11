@@ -1,17 +1,17 @@
 #ifndef CBMTUTORIALDETCONTFACT_H
 #define CBMTUTORIALDETCONTFACT_H
 
-#include "CbmContFact.h"
+#include "FairContFact.h"
 
-class CbmContainer;
+class FairContainer;
 
-class CbmTutorialDetContFact : public CbmContFact {
+class CbmTutorialDetContFact : public FairContFact {
  private:
   void setAllContainers();
  public:
   CbmTutorialDetContFact();
   ~CbmTutorialDetContFact() {}
-  CbmParSet* createContainer(CbmContainer*);
+  FairParSet* createContainer(FairContainer*);
   ClassDef( CbmTutorialDetContFact,0) // Factory for all MyDet parameter containers
 };
 

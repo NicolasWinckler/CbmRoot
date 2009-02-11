@@ -18,12 +18,12 @@
 #ifndef CBMMVDPOINT_H
 #define CBMMVDPOINT_H 1
 
-#include "CbmMCPoint.h"
+#include "FairMCPoint.h"
 
 #include "TObject.h"
 #include "TVector3.h"
 
-class CbmMvdPoint : public CbmMCPoint 
+class CbmMvdPoint : public FairMCPoint 
 {
 
  public:

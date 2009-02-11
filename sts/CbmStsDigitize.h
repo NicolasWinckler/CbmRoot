@@ -20,7 +20,7 @@
 #ifndef CBMSTSDIGITIZE_H
 #define CBMSTSDIGITIZE_H 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TStopwatch.h"
 
@@ -35,7 +35,7 @@ class CbmStsStation;
 
 
 
-class CbmStsDigitize : public CbmTask
+class CbmStsDigitize : public FairTask
 {
 
  public:

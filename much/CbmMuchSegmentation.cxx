@@ -10,8 +10,8 @@
 #include "CbmGeoMuchPar.h"
 #include "CbmMuchSegmentation.h"
 
-#include "CbmRuntimeDb.h"
-#include "CbmRootManager.h"
+#include "FairRuntimeDb.h"
+#include "FairRootManager.h"
 #include "CbmMuchPoint.h"
 #include "CbmMuchStation.h"
 #include "CbmMuchLayer.h"
@@ -53,7 +53,7 @@ CbmMuchSegmentation::~CbmMuchSegmentation() {
 // -----   Private method SetParContainers  --------------------------------
 void CbmMuchSegmentation::SetParContainers() {
   // Get runtime database
-  CbmRuntimeDb* db = CbmRuntimeDb::instance();
+  FairRuntimeDb* db = FairRuntimeDb::instance();
   if ( ! db ) Fatal("SetParContainers", "No runtime database");
   // Get MUCH geometry param
   fGeoPar = (CbmGeoMuchPar*) db->getContainer("CbmGeoMuchPar");
@@ -63,7 +63,7 @@ void CbmMuchSegmentation::SetParContainers() {
 
 // -----   Private method Init  --------------------------------------------
 InitStatus CbmMuchSegmentation::Init(){
-  CbmRootManager* fManager = CbmRootManager::Instance();
+  FairRootManager* fManager = FairRootManager::Instance();
   fPoints = (TClonesArray *) fManager->GetObject("MuchPoint");
   fEvents = 0;
 

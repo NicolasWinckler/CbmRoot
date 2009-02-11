@@ -26,17 +26,17 @@
 #include "CbmRichPoint.h"
 #include "CbmGeoRichPar.h"
 
-#include "CbmTask.h"
-#include "CbmRootManager.h"
+#include "FairTask.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmBaseParSet.h"
-#include "CbmGeoVolume.h"
-#include "CbmGeoTransform.h"
-#include "CbmGeoVector.h"
-#include "CbmGeoMedium.h"
-#include "CbmGeoNode.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairBaseParSet.h"
+#include "FairGeoVolume.h"
+#include "FairGeoTransform.h"
+#include "FairGeoVector.h"
+#include "FairGeoMedium.h"
+#include "FairGeoNode.h"
 
 #include "TClonesArray.h"
 #include "TGraph.h"
@@ -53,14 +53,14 @@ using std::map;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmRichTestSim::CbmRichTestSim() :CbmTask("RichTestSim")
+CbmRichTestSim::CbmRichTestSim() :FairTask("RichTestSim")
 {
 }
 // -------------------------------------------------------------------------
 
 //------------  standard constructor (with verbosity level)  ---------------------------------
 CbmRichTestSim::CbmRichTestSim(const char *name, const char *title, Int_t verbose)
-  :CbmTask(name)
+  :FairTask(name)
 {
 
   // verbosity level
@@ -109,8 +109,8 @@ CbmRichTestSim::~CbmRichTestSim()
 void CbmRichTestSim::SetParContainers()
 {
   // Get Base Container
-  CbmRunAna* ana = CbmRunAna::Instance();
-  CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+  FairRunAna* ana = FairRunAna::Instance();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   fPar=(CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
 
 //  fPar->setStatic();    // setting the parameters on static mode: <explanation>
@@ -124,17 +124,17 @@ InitStatus CbmRichTestSim::Init()
   fSensNodes = fPar->GetGeoSensitiveNodes();
 
   // get detector position (z):
-  CbmGeoNode *det= dynamic_cast<CbmGeoNode*> (fSensNodes->FindObject("rich1d#1"));
+  FairGeoNode *det= dynamic_cast<FairGeoNode*> (fSensNodes->FindObject("rich1d#1"));
   if (! det) cout << " -I no RICH Geo Node  found !!!!!  " << endl;
-  CbmGeoTransform* detTr=det->getLabTransform();  // detector position in labsystem
-  CbmGeoVector detPosLab=detTr->getTranslation(); // ... in cm
-  CbmGeoTransform detCen=det->getCenterPosition();  // center in Detector system
-  CbmGeoVector detPosCen=detCen.getTranslation();
+  FairGeoTransform* detTr=det->getLabTransform();  // detector position in labsystem
+  FairGeoVector detPosLab=detTr->getTranslation(); // ... in cm
+  FairGeoTransform detCen=det->getCenterPosition();  // center in Detector system
+  FairGeoVector detPosCen=detCen.getTranslation();
   fDetZ = detPosLab.Z() + detPosCen.Z();   /* z coordinate of photodetector (Labsystem, cm) */
 
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmRichRingFinderIdeal::Init: "
 	 << "RootManager not instantised!" << endl;

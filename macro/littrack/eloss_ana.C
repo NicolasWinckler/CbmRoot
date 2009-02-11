@@ -14,7 +14,7 @@ void eloss_ana(Int_t nEvents = 200000)
    cbmrootlibs();
 
    
-   CbmRunAna *run= new CbmRunAna();
+   FairRunAna *run= new FairRunAna();
    run->SetInputFile(inFile);
    run->SetOutputFile(outFile);
 

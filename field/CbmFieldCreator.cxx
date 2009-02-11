@@ -8,8 +8,8 @@
 #include "CbmFieldMapDistorted.h"
 #include "CbmFieldMapSym1.h"
 
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 using std::cout;
 using std::cerr;
@@ -18,7 +18,7 @@ using std::endl;
 static CbmFieldCreator gCbmFieldCreator;
 
 CbmFieldCreator::CbmFieldCreator()
-	:CbmFieldFactory()
+	:FairFieldFactory()
 {
 	fCreator=this;
         fFieldPar=0;
@@ -28,15 +28,15 @@ CbmFieldCreator::~CbmFieldCreator()
 }
 void CbmFieldCreator::SetParm()
 {
-  CbmRunAna *Run = CbmRunAna::Instance();
-  CbmRuntimeDb *RunDB = Run->GetRuntimeDb();
+  FairRunAna *Run = FairRunAna::Instance();
+  FairRuntimeDb *RunDB = Run->GetRuntimeDb();
   fFieldPar = (CbmFieldPar*) RunDB->getContainer("CbmFieldPar");
 
 }
 
-CbmField* CbmFieldCreator::createCbmField()
+FairField* CbmFieldCreator::createCbmField()
 { 
-  CbmField *fMagneticField=0;
+  FairField *fMagneticField=0;
 
   if ( ! fFieldPar ) {
     cerr << "-E-  No field parameters available!"
@@ -51,7 +51,7 @@ CbmField* CbmFieldCreator::createCbmField()
 	else if ( fType == kTypeDistorted ) fMagneticField = new CbmFieldMapDistorted(fFieldPar); 
 	else if ( fType == 5 ) fMagneticField = new CbmFieldMapSym1(fFieldPar);
 	else if ( fType == 6 ) fMagneticField = new CbmBsField(fFieldPar);
-	else cerr << "-W- CbmRunAna::GetField: Unknown field type " << fType
+	else cerr << "-W- FairRunAna::GetField: Unknown field type " << fType
 		<< endl;
 	cout << "New field at " << fMagneticField << ", type " << fType << endl;
 	// Initialise field

@@ -32,10 +32,10 @@
 #include "CbmRichRingFitterCOP.h"
 #include "CbmRichRingFitterEllipse.h"
 
-#include "CbmTask.h"
-#include "CbmRootManager.h"
+#include "FairTask.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 #include "CbmGlobalTrack.h"
 #include "CbmMCTrack.h"
 #include "CbmStsTrackMatch.h"
@@ -50,7 +50,7 @@ using std::map;
 using std::vector;
 
 // -----   Default constructor   -------------------------------------------
-CbmRichRingQa::CbmRichRingQa() :CbmTask("RichRingQa")
+CbmRichRingQa::CbmRichRingQa() :FairTask("RichRingQa")
 {
 
 }
@@ -58,7 +58,7 @@ CbmRichRingQa::CbmRichRingQa() :CbmTask("RichRingQa")
 
 //------------  standard constructor (with verbosity level)  ---------------------------------
 CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
-  :CbmTask(name)
+  :FairTask(name)
 {
     
     // verbosity level
@@ -189,8 +189,8 @@ CbmRichRingQa::~CbmRichRingQa()
 InitStatus CbmRichRingQa::Init()
 {
     cout << "InitStatus CbmRichRingQa::Init()"<<endl;
- // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+ // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmRichRingQa::Init: "
      << "RootManager not instantised!" << endl;
@@ -271,7 +271,7 @@ void CbmRichRingQa::Exec(Option_t* option)
     
     // Create some pointers and variables
     CbmRichHit* hit    = NULL;
-    CbmMCPoint* point  = NULL;
+    FairMCPoint* point  = NULL;
     CbmMCTrack* track  = NULL;
     
     Int_t iPoint       = 0;
@@ -314,7 +314,7 @@ void CbmRichRingQa::Exec(Option_t* option)
         if ( iPoint < 0 )continue; // Fake or background hit
         //Get the MC Point corresponding to the hit
     
-        point = (CbmMCPoint*) fPoints->At(iPoint);
+        point = (FairMCPoint*) fPoints->At(iPoint);
         if ( ! point ) {
         cout << "-E- CbmRichRingQa::Exec() "
             << "Empty MCPoint " << iPoint << " from Hit " << iHit
@@ -490,7 +490,7 @@ Bool_t CbmRichRingQa::DoesRingHaveProjection(Int_t trackId){
     Int_t nProj = fProj->GetEntriesFast();
 
     for (Int_t iProj = 0; iProj < nProj; iProj++){
-    	CbmTrackParam* proj   = (CbmTrackParam*)fProj->At(iProj);
+    	FairTrackParam* proj   = (FairTrackParam*)fProj->At(iProj);
         if (!proj){
             cout << "-E- no projection"<< iProj<<endl;
             continue;

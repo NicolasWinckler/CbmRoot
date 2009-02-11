@@ -6,7 +6,7 @@
 #include "CbmMuchHit.h"
 #include "CbmKF.h"
 #include "CbmKFMath.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmKFHit.h"
 #include "CbmKFPixelMeasurement.h"
 #include "CbmKFMaterial.h"
@@ -36,7 +36,7 @@ using std::fabs;
 
 ClassImp(CbmL1MuchFinder);
 
-CbmL1MuchFinder::CbmL1MuchFinder(const char *name, Int_t iVerbose ):CbmTask(name, iVerbose)
+CbmL1MuchFinder::CbmL1MuchFinder(const char *name, Int_t iVerbose ):FairTask(name, iVerbose)
 {
   fTrackCollection = new TClonesArray("CbmMuchTrack", 100);
   histodir = 0;
@@ -54,15 +54,15 @@ InitStatus CbmL1MuchFinder::Init()
 
 InitStatus CbmL1MuchFinder::ReInit()
 {
-  fMuchPoints=(TClonesArray *) CbmRootManager::Instance()->GetObject("MuchPoint");
-  fMuchHits =(TClonesArray *) CbmRootManager::Instance()->GetObject("MuchHit");
-  fStsTracks =(TClonesArray *) CbmRootManager::Instance()->GetObject("STSTrack");
-  fMCTracks =(TClonesArray *) CbmRootManager::Instance()->GetObject("MCTrack");
-  fSTSTrackMatch = (TClonesArray*) CbmRootManager::Instance()->GetObject("STSTrackMatch");
-  fPrimVtx =  (CbmVertex *) CbmRootManager::Instance() ->GetObject("PrimaryVertex");
+  fMuchPoints=(TClonesArray *) FairRootManager::Instance()->GetObject("MuchPoint");
+  fMuchHits =(TClonesArray *) FairRootManager::Instance()->GetObject("MuchHit");
+  fStsTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("STSTrack");
+  fMCTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("MCTrack");
+  fSTSTrackMatch = (TClonesArray*) FairRootManager::Instance()->GetObject("STSTrackMatch");
+  fPrimVtx =  (CbmVertex *) FairRootManager::Instance() ->GetObject("PrimaryVertex");
   fStsFitter.Init();
 
-  CbmRootManager::Instance()->Register("MuchTrack", "Much", fTrackCollection, kTRUE);
+  FairRootManager::Instance()->Register("MuchTrack", "Much", fTrackCollection, kTRUE);
 
   return kSUCCESS;
 }
@@ -247,7 +247,7 @@ void CbmL1MuchFinder::Exec(Option_t * option)
       CbmMuchTrack* MuchTrack = (CbmMuchTrack*) fTrackCollection->At(NOutTracks++);
       MuchTrack->SetChi2(tr.GetRefChi2());
       MuchTrack->SetNDF(tr.GetRefNDF());
-      CbmTrackParam tp;
+      FairTrackParam tp;
       CbmKFMath::CopyTC2TrackParam( &tp, tr.T, tr.C );
       MuchTrack->SetMuchTrack( &tp );
       MuchTrack->SetStsTrackID(tr.StsID);

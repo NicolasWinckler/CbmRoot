@@ -13,7 +13,7 @@
 #include "CbmRichRing.h"
 #include "CbmRichRingFitterCOP.h"
 
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 
 #include "TString.h"
 #include "TStopwatch.h"

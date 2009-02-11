@@ -15,7 +15,7 @@
 #include "CbmMuchTask.h"
 #include "CbmMuchSector.h"
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TFile.h"
 

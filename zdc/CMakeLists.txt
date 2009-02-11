@@ -47,7 +47,7 @@ set(ZDC_SRCS ${ZDC_SRCS} ${ZDC_DICTIONARY})
 
 add_library(Zdc SHARED ${ZDC_SRCS})
 target_link_libraries(Zdc ${ROOT_LIBRARIES})
-set_target_properties(Zdc PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(Zdc PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS Zdc DESTINATION ${CMAKE_BINARY_DIR}/lib)

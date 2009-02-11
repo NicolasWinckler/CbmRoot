@@ -125,28 +125,28 @@
 
 
   // -----   Create detectors and passive volumes   -------------------------
-  CbmModule* cave= new CbmCave("CAVE");
+  FairModule* cave= new CbmCave("CAVE");
   cave->SetGeometryFileName(caveGeom);
 
-  CbmModule* pipe= new CbmPipe("PIPE");
+  FairModule* pipe= new CbmPipe("PIPE");
   pipe->SetGeometryFileName(pipeGeom);
   
-  CbmModule* target= new CbmTarget("Target");
+  FairModule* target= new CbmTarget("Target");
   target->SetGeometryFileName(targetGeom);
 
-  CbmModule* magnet= new CbmMagnet("MAGNET");
+  FairModule* magnet= new CbmMagnet("MAGNET");
   magnet->SetGeometryFileName(magnetGeom);
   
-  CbmDetector* sts= new CbmSts("STS", kTRUE);
+  FairDetector* sts= new CbmSts("STS", kTRUE);
   sts->SetGeometryFileName(stsGeom);
 
-  CbmDetector* trd= new CbmTrd("TRD",kTRUE );
+  FairDetector* trd= new CbmTrd("TRD",kTRUE );
   trd->SetGeometryFileName(trdGeom);
 
-  CbmDetector* tof= new CbmTof("TOF", kTRUE);
+  FairDetector* tof= new CbmTof("TOF", kTRUE);
   tof->SetGeometryFileName(tofGeom);
   
-  CbmDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data());
+  FairDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data());
   
   // ------------------------------------------------------------------------
 
@@ -168,16 +168,16 @@
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
-  CbmPrimaryGenerator* primGen   = new CbmPrimaryGenerator();
-  CbmUrqmdGenerator* urqmdGen  = new CbmUrqmdGenerator(inFile);
-  //CbmPlutoGenerator*   plutoGen  = new CbmPlutoGenerator(inFile_pluto);
+  FairPrimaryGenerator* primGen   = new FairPrimaryGenerator();
+  FairUrqmdGenerator* urqmdGen  = new FairUrqmdGenerator(inFile);
+  //FairPlutoGenerator*   plutoGen  = new FairPlutoGenerator(inFile_pluto);
 
   primGen->AddGenerator(urqmdGen);
   // ------------------------------------------------------------------------
 
 
   // -----   Create simulation run   ----------------------------------------
-  CbmRunSim* fRun = new CbmRunSim();
+  FairRunSim* fRun = new FairRunSim();
   fRun->SetName("TGeant3");              // Transport engine
   fRun->SetOutputFile(outFile);          // Output file
   fRun->SetGenerator(primGen);           // PrimaryGenerator
@@ -197,9 +197,9 @@
 
 
   // -----   Fill parameter containers   ------------------------------------
-  CbmRuntimeDb* rtdb = fRun->GetRuntimeDb();
+  FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   Bool_t kParameterMerged = kTRUE;
-  CbmParRootFileIo* parOut = new CbmParRootFileIo(kParameterMerged);
+  FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
   parOut->open(parFile.Data());
   rtdb->setOutput(parOut);
   rtdb->saveOutput();

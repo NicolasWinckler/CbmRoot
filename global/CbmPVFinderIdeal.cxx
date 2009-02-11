@@ -7,7 +7,7 @@
 #include "CbmVertex.h"
 
 #include "CbmMCTrack.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 #include "TVector3.h"
@@ -36,8 +36,8 @@ CbmPVFinderIdeal::~CbmPVFinderIdeal() { }
 // -----   Public method Init   --------------------------------------------
 void CbmPVFinderIdeal::Init() {
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmPVFinderIdeal::Init: "
 	 << "RootManager not instantised!" << endl;

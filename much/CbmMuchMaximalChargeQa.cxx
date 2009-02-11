@@ -13,9 +13,9 @@
 #include "CbmMuchPoint.h"
 #include "CbmMuchPad.h"
 
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "TCanvas.h"
@@ -30,7 +30,7 @@ using std::endl;
 
 //-----  Standard constructor  ----------------------------------
 CbmMuchMaximalChargeQa::CbmMuchMaximalChargeQa(const char *name, Int_t verbose)
-  :CbmTask(name, verbose){
+  :FairTask(name, verbose){
   fEvent = 0;
   fDigiScheme = CbmMuchDigiScheme::Instance();
 }
@@ -113,10 +113,10 @@ void CbmMuchMaximalChargeQa::Finish(){
 //-----  SetParContainers method  -------------------------------
 void CbmMuchMaximalChargeQa::SetParContainers(){
   // Get run and runtime database
-  CbmRunAna* run = CbmRunAna::Instance();
+  FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) Fatal("SetParContainers", "No analysis run");
 
-  CbmRuntimeDb* db = run->GetRuntimeDb();
+  FairRuntimeDb* db = run->GetRuntimeDb();
   if ( ! db ) Fatal("SetParContainers", "No runtime database");
 
   // Get MUCH geometry parameter container
@@ -130,8 +130,8 @@ void CbmMuchMaximalChargeQa::SetParContainers(){
 //-----  Init method  -------------------------------------------
 InitStatus CbmMuchMaximalChargeQa::Init(){
   // Get input arrays
-  CbmRootManager* ioman = CbmRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No CbmRootManager");
+  FairRootManager* ioman = FairRootManager::Instance();
+  if ( ! ioman ) Fatal("Init", "No FairRootManager");
   fDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
   fPoints = (TClonesArray*)  ioman->GetObject("MuchPoint");
   fDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");

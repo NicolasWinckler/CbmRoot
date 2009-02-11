@@ -6,9 +6,9 @@
 #ifndef CBMMUCHPHYSICSQA_H
 #define CBMMUCHPHYSICSQA_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmMCTrack.h"
-#include "CbmGeoNode.h"
+#include "FairGeoNode.h"
 #include "TH1.h"
 #include "TH2.h"
 #include "TLorentzVector.h"
@@ -17,7 +17,7 @@
 #include "CbmGeoMuchPar.h"
 #include "CbmVertex.h"
 
-class CbmMuchPhysicsQa : public CbmTask {
+class CbmMuchPhysicsQa : public FairTask {
 
 public:
   CbmMuchPhysicsQa(const char *name="MuchPhysics", Int_t verbose = 1);
@@ -39,7 +39,7 @@ public:
   virtual void SetMuchPIdType(Int_t type); 
   
 //----------------   
-  Double_t ReadGeo(CbmGeoNode *node); // retutn Z position detector or absorber
+  Double_t ReadGeo(FairGeoNode *node); // retutn Z position detector or absorber
   
 //---------------- Design of histograms  
   virtual void FillHistogram(Int_t i); //--- fill QA histograms

@@ -10,15 +10,15 @@
 #include "CbmMvdPoint.h"
 
 #include "CbmDetectorList.h"
-#include "CbmGeoInterface.h"
-#include "CbmGeoLoader.h"
-#include "CbmGeoNode.h"
-#include "CbmGeoVolume.h"
-#include "CbmRootManager.h"
-#include "CbmRun.h"
-#include "CbmRuntimeDb.h"
+#include "FairGeoInterface.h"
+#include "FairGeoLoader.h"
+#include "FairGeoNode.h"
+#include "FairGeoVolume.h"
+#include "FairRootManager.h"
+#include "FairRun.h"
+#include "FairRuntimeDb.h"
 #include "CbmStack.h"
-#include "CbmVolume.h"
+#include "FairVolume.h"
 
 #include "TClonesArray.h"
 #include "TList.h"
@@ -33,7 +33,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmMvd::CbmMvd() : CbmDetector("MVD", kTRUE, kMVD) {
+CbmMvd::CbmMvd() : FairDetector("MVD", kTRUE, kMVD) {
   ResetParameters();
   fCollection = new TClonesArray("CbmMvdPoint");
   fPosIndex   = 0;
@@ -48,7 +48,7 @@ CbmMvd::CbmMvd() : CbmDetector("MVD", kTRUE, kMVD) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmMvd::CbmMvd(const char* name, Bool_t active) 
-  : CbmDetector(name, active, kMVD) {
+  : FairDetector(name, active, kMVD) {
   ResetParameters();
   fCollection = new TClonesArray("CbmMvdPoint");
   fPosIndex   = 0;
@@ -74,7 +74,7 @@ CbmMvd::~CbmMvd() {
 
 
 // -----   Virtual public method ProcessHits  ------------------------------
-Bool_t CbmMvd::ProcessHits(CbmVolume* vol) {
+Bool_t CbmMvd::ProcessHits(FairVolume* vol) {
 
 
   // Store track parameters at entrance of sensitive volume
@@ -137,7 +137,7 @@ void CbmMvd::EndOfEvent() {
 
 // -----   Virtual public method Register   --------------------------------
 void CbmMvd::Register() {
-  CbmRootManager::Instance()->Register("MVDPoint", GetName(), 
+  FairRootManager::Instance()->Register("MVDPoint", GetName(), 
 				       fCollection, kTRUE);
 }
 // -------------------------------------------------------------------------
@@ -195,8 +195,8 @@ void CbmMvd::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 // -----   Virtual public method ConstructGeometry   -----------------------
 void CbmMvd::ConstructGeometry() {
   
-  CbmGeoLoader*    geoLoad = CbmGeoLoader::Instance();
-  CbmGeoInterface* geoFace = geoLoad->getGeoInterface();
+  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
+  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
   CbmMvdGeo*       mvdGeo  = new CbmMvdGeo();
   mvdGeo->setGeomFile(GetGeometryFileName());
   geoFace->addGeoModule(mvdGeo);
@@ -205,18 +205,18 @@ void CbmMvd::ConstructGeometry() {
   if (rc) mvdGeo->create(geoLoad->getGeoBuilder());
   TList* volList = mvdGeo->getListOfVolumes();
   // store geo parameter
-  CbmRun *fRun = CbmRun::Instance();
-  CbmRuntimeDb *rtdb= CbmRun::Instance()->GetRuntimeDb();
+  FairRun *fRun = FairRun::Instance();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
   CbmMvdGeoPar* geoPar = (CbmMvdGeoPar*)(rtdb->getContainer("CbmMvdGeoPar"));
   TObjArray *fSensNodes = geoPar->GetGeoSensitiveNodes();
   TObjArray *fPassNodes = geoPar->GetGeoPassiveNodes();
 
   TListIter iter(volList);
-  CbmGeoNode*   node = NULL;
-  CbmGeoVolume* vol  = NULL;
+  FairGeoNode*   node = NULL;
+  FairGeoVolume* vol  = NULL;
 
-  while( (node = (CbmGeoNode*)iter.Next()) ) {
-      vol = dynamic_cast<CbmGeoVolume*> ( node );
+  while( (node = (FairGeoNode*)iter.Next()) ) {
+      vol = dynamic_cast<FairGeoVolume*> ( node );
        if ( node->isSensitive()  ) {
            fSensNodes->AddLast( vol );
        }else{

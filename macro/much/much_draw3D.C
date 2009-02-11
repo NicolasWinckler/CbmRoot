@@ -14,7 +14,7 @@ void much_draw(const char* mcfile = "data/mc.500.root"){
   gSystem->Load("libMuch");
 
   TFile* f = new TFile(mcfile);
-  TGeoManager *geoMan = (TGeoManager*) f->Get("CBMGeom");
+  TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
   geoMan->SetVisLevel(0);
 
   // Check overlaps

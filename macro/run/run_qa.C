@@ -67,7 +67,7 @@
   // ------------------------------------------------------------------------
 
   // -----  Analysis run   --------------------------------------------------
-  CbmRunAna *fRun= new CbmRunAna();
+  FairRunAna *fRun= new FairRunAna();
   fRun->SetInputFile(simFile);
   fRun->AddFriend(recFile);
   fRun->SetOutputFile(outFile);
@@ -78,9 +78,9 @@
   TString stsDigi = gSystem->Getenv("VMCWORKDIR");
   stsDigi += "/parameters/sts/";
   stsDigi += stsDigiFile;
-  CbmRuntimeDb* rtdb = fRun->GetRuntimeDb();
-  CbmParRootFileIo* parIo1 = new CbmParRootFileIo();
-  CbmParAsciiFileIo* parIo2 = new CbmParAsciiFileIo();
+  FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
+  FairParRootFileIo* parIo1 = new FairParRootFileIo();
+  FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
   parIo1->open(parFile.Data());
   parIo2->open(stsDigi.Data(),"in");
   rtdb->setFirstInput(parIo1);

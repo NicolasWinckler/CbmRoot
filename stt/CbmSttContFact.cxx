@@ -2,7 +2,7 @@
 
 #include "CbmGeoSttPar.h"
 
-#include "CbmRuntimeDb.h"
+#include "FairRuntimeDb.h"
 
 //#include <iostream>
 //#include <iomanip>
@@ -16,14 +16,14 @@ CbmSttContFact::CbmSttContFact() {
   fName="CbmSttContFact";
   fTitle="Factory for parameter containers in libStt";
   setAllContainers();
-  CbmRuntimeDb::instance()->addContFactory(this);
+  FairRuntimeDb::instance()->addContFactory(this);
 }
 
 void CbmSttContFact::setAllContainers() {
   /** Creates the Container objects with all accepted contexts and adds them to
    *  the list of containers for the SttDet library.*/
 
-    CbmContainer* p= new CbmContainer("CbmGeoSttPar",
+    FairContainer* p= new FairContainer("CbmGeoSttPar",
                                           "Stt Geometry Parameters",
                                           "TestDefaultContext");
     p->addContext("TestNonDefaultContext");
@@ -31,12 +31,12 @@ void CbmSttContFact::setAllContainers() {
     containers->Add(p);
 }
 
-CbmParSet* CbmSttContFact::createContainer(CbmContainer* c) {
+FairParSet* CbmSttContFact::createContainer(FairContainer* c) {
   /** Calls the constructor of the corresponding parameter container.
    * For an actual context, which is not an empty string and not the default context
    * of this container, the name is concatinated with the context. */
   const char* name=c->GetName();
-  CbmParSet* p=NULL;
+  FairParSet* p=NULL;
   if (strcmp(name,"CbmGeoSttPar")==0) {
     p=new CbmGeoSttPar (c->getConcatName().Data(),c->GetTitle(),c->getContext());
   }

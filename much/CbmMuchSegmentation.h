@@ -11,7 +11,7 @@
 #define CBMMUCHSEGMENTATION_H 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include <vector>
 
@@ -24,7 +24,7 @@ class TH1D;
 
 using std::vector;
 
-class CbmMuchSegmentation : public CbmTask{
+class CbmMuchSegmentation : public FairTask{
  public:
 
   /** Default constructor **/

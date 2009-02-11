@@ -80,6 +80,6 @@ add_library(HTrack SHARED ${SOURCES})
 
 target_link_libraries(HTrack ${ROOT_LIBRARIES})
 
-set_target_properties(HTrack PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(HTrack PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 install(TARGETS HTrack DESTINATION ${CMAKE_BINARY_DIR}/lib)

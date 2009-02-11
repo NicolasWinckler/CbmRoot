@@ -31,7 +31,7 @@
 #include "CbmEcalCluster.h"
 #include "CbmEcalHit.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TVector3.h"
 
@@ -41,12 +41,12 @@ using std::vector;
 
 // -----   Default constructor   -------------------------------------------
 CbmEcalClusterFinder::CbmEcalClusterFinder() :
-  CbmTask(),fNClusters(0),fEvent(0){}
+  FairTask(),fNClusters(0),fEvent(0){}
 // -------------------------------------------------------------------------
 
 CbmEcalClusterFinder::CbmEcalClusterFinder(const char *name, const Int_t iVerbose,
 					   const char *fileGeo) :
-  CbmTask(name,iVerbose),fNClusters(0),fEvent(0),fWzero(5.0),
+  FairTask(name,iVerbose),fNClusters(0),fEvent(0),fWzero(5.0),
   fHitThreshold(8.0e-4),fFileGeo(fileGeo)
 {}
 
@@ -54,7 +54,7 @@ CbmEcalClusterFinder::CbmEcalClusterFinder(const char *name, const Int_t iVerbos
 // -----   Destructor   ----------------------------------------------------
 CbmEcalClusterFinder::~CbmEcalClusterFinder()
 {
-  CbmRootManager *fManager =CbmRootManager::Instance();
+  FairRootManager *fManager =FairRootManager::Instance();
   fManager->Write();
 }
 // -------------------------------------------------------------------------
@@ -68,7 +68,7 @@ CbmEcalClusterFinder::~CbmEcalClusterFinder()
 // -----   Initialization   ------------------------------------------------
 InitStatus CbmEcalClusterFinder::Init()
 {
-  CbmRootManager* fManager = CbmRootManager::Instance();
+  FairRootManager* fManager = FairRootManager::Instance();
 
   // new list of ECAL hits
   fHitCollection = (TClonesArray*)fManager->ActivateBranch("EcalHit");

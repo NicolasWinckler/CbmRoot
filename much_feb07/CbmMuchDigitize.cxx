@@ -22,11 +22,11 @@
 #include "CbmMuchPad.h"
 
 // Includes from base
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 #include "CbmMCTrack.h"
-#include "CbmMCPoint.h"
+#include "FairMCPoint.h"
 
 // Includes from ROOT
 #include "TClonesArray.h"
@@ -51,7 +51,7 @@ using std::map;
 using std::pair;
 
 // -----   Default constructor   ------------------------------------------
-CbmMuchDigitize::CbmMuchDigitize() : CbmTask("MuchDigitize", 1) {
+CbmMuchDigitize::CbmMuchDigitize() : FairTask("MuchDigitize", 1) {
   fGeoPar      = NULL;
   fDigiPar     = NULL;
   fPoints      = NULL;
@@ -75,7 +75,7 @@ CbmMuchDigitize::CbmMuchDigitize() : CbmTask("MuchDigitize", 1) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchDigitize::CbmMuchDigitize(Int_t iVerbose) 
-  : CbmTask("MuchDigitize", iVerbose) { 
+  : FairTask("MuchDigitize", iVerbose) { 
   fGeoPar      = NULL;
   fDigiPar     = NULL;
   fPoints      = NULL;
@@ -99,7 +99,7 @@ CbmMuchDigitize::CbmMuchDigitize(Int_t iVerbose)
 
 // -----   Constructor with name   -----------------------------------------
 CbmMuchDigitize::CbmMuchDigitize(const char* name, Int_t iVerbose) 
-  : CbmTask(name, iVerbose) { 
+  : FairTask(name, iVerbose) { 
   fGeoPar      = NULL;
   fDigiPar     = NULL;
   fPoints      = NULL;
@@ -471,10 +471,10 @@ void CbmMuchDigitize::Exec(Option_t* opt) {
 void CbmMuchDigitize::SetParContainers() {
 
   // Get run and runtime database
-  CbmRunAna* run = CbmRunAna::Instance();
+  FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) Fatal("SetParContainers", "No analysis run");
 
-  CbmRuntimeDb* db = run->GetRuntimeDb();
+  FairRuntimeDb* db = run->GetRuntimeDb();
   if ( ! db ) Fatal("SetParContainers", "No runtime database");
 
   // Get MUCH geometry parameter container
@@ -494,8 +494,8 @@ void CbmMuchDigitize::Finish(){
 // -----   Private method Init   -------------------------------------------
 InitStatus CbmMuchDigitize::Init() {
 
-  CbmRootManager* ioman = CbmRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No CbmRootManager");
+  FairRootManager* ioman = FairRootManager::Instance();
+  if ( ! ioman ) Fatal("Init", "No FairRootManager");
 
   // Get input array of MuchPoints
   fPoints = (TClonesArray*) ioman->GetObject("MuchPoint");

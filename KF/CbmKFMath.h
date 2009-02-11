@@ -13,8 +13,8 @@
 
 #include "TObject.h"
 
-class CbmField;
-class CbmTrackParam;
+class FairField;
+class FairTrackParam;
 
 class CbmKFMath :public TObject
 {
@@ -45,7 +45,7 @@ class CbmKFMath :public TObject
   static Double_t AnalyticQP(
 			     const Double_t T[], // track parameters (x,y,tx,ty,Q/p,z)
 			     const Double_t V[], // vertex parameters (x,y,z)
-			     CbmField *MagneticField       // magnetic field
+			     FairField *MagneticField       // magnetic field
 			     );
 
   static Int_t GetNoise( Double_t Lrl, Double_t F, Double_t Fe,
@@ -54,8 +54,8 @@ class CbmKFMath :public TObject
 			 Bool_t downstream_direction, 
 			 Double_t *Q5, Double_t *Q8, Double_t *Q9, Double_t *Ecor );
 
-  static void CopyTrackParam2TC( CbmTrackParam* par, Double_t T[], Double_t C[] );
-  static void CopyTC2TrackParam( CbmTrackParam* par, Double_t T[], Double_t C[] );
+  static void CopyTrackParam2TC( FairTrackParam* par, Double_t T[], Double_t C[] );
+  static void CopyTC2TrackParam( FairTrackParam* par, Double_t T[], Double_t C[] );
   
   ClassDef(CbmKFMath, 1)
 };

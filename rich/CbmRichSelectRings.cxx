@@ -21,8 +21,8 @@
 #include "CbmRichRing.h"
 #include "CbmRichRingSelect.h"
 
-#include "CbmHit.h"
-#include "CbmRootManager.h"
+#include "FairHit.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -34,7 +34,7 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmRichSelectRings::CbmRichSelectRings()
-  : CbmTask("RICH Select Rings") {
+  : FairTask("RICH Select Rings") {
   fSelect         = NULL;
   fRichHitArray   = NULL;
   fProjArray      = NULL;
@@ -48,7 +48,7 @@ CbmRichSelectRings::CbmRichSelectRings()
 // -----   Standard constructor   ------------------------------------------
 CbmRichSelectRings::CbmRichSelectRings(CbmRichRingSelect* select,
 				   Int_t verbose)
-  : CbmTask("RICH Select Rings") {
+  : FairTask("RICH Select Rings") {
   fSelect         = select;
   fRichHitArray   = NULL;
   fProjArray      = NULL;
@@ -63,7 +63,7 @@ CbmRichSelectRings::CbmRichSelectRings(CbmRichRingSelect* select,
 CbmRichSelectRings::CbmRichSelectRings(const char* name, const char* title,
 				   CbmRichRingSelect* select,
 				   Int_t verbose)
-  : CbmTask(name) {
+  : FairTask(name) {
   fSelect         = select;
   fRichHitArray   = NULL;
   fProjArray      = NULL;
@@ -91,8 +91,8 @@ InitStatus CbmRichSelectRings::Init() {
     return kERROR;
   }
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmRichSelectRings::Init: "
 	 << "RootManager not instantised!" << endl;

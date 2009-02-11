@@ -30,7 +30,7 @@
 #include "CbmRichRingTrackAssign.h"
 
 #include "CbmGlobalTrack.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -42,7 +42,7 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmRichAssignTrack::CbmRichAssignTrack()
-  : CbmTask("RICH Assign Tracks") {
+  : FairTask("RICH Assign Tracks") {
   fAssign           = NULL;
   fTrackArray       = NULL;
   fRingArray        = NULL;
@@ -56,7 +56,7 @@ CbmRichAssignTrack::CbmRichAssignTrack()
 // -----   Standard constructor   ------------------------------------------
 CbmRichAssignTrack::CbmRichAssignTrack(CbmRichRingTrackAssign* assign,
                                                    Int_t verbose)
-  : CbmTask("RICH Assign Tracks") {
+  : FairTask("RICH Assign Tracks") {
   fAssign               = assign;
   fTrackArray           = NULL;
   fRingArray            = NULL;
@@ -70,7 +70,7 @@ CbmRichAssignTrack::CbmRichAssignTrack(CbmRichRingTrackAssign* assign,
 // -----   Constructor with name and title   -------------------------------
 CbmRichAssignTrack::CbmRichAssignTrack(const char* name, const char* title,
                                        CbmRichRingTrackAssign* assign, Int_t verbose)
-  : CbmTask(name) {
+  : FairTask(name) {
   fAssign               = assign;
   fTrackArray           = NULL;
   fRingArray            = NULL;
@@ -99,8 +99,8 @@ InitStatus CbmRichAssignTrack::Init() {
     return kERROR;
   }
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmRichAssignTrack::Init: "
 	 << "RootManager not instantised!" << endl;

@@ -26,7 +26,7 @@
 #include "CbmEcalPoint.h"
 #include "CbmEcalHitFastMC.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "TVector3.h"
@@ -39,11 +39,11 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmEcalHitProducerFastMC::CbmEcalHitProducerFastMC() :CbmTask() {}
+CbmEcalHitProducerFastMC::CbmEcalHitProducerFastMC() :FairTask() {}
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   -------------------------------------------
-CbmEcalHitProducerFastMC::CbmEcalHitProducerFastMC(const char *name, const Int_t iVerbose) :CbmTask(name,iVerbose)
+CbmEcalHitProducerFastMC::CbmEcalHitProducerFastMC(const char *name, const Int_t iVerbose) :FairTask(name,iVerbose)
 {
   // Set energy resolution parameters, zone sizes, energy threshold
   fEvent       = 0;
@@ -68,7 +68,7 @@ CbmEcalHitProducerFastMC::CbmEcalHitProducerFastMC(const char *name, const Int_t
 // -----   Destructor   ----------------------------------------------------
 CbmEcalHitProducerFastMC::~CbmEcalHitProducerFastMC()
 {
-  CbmRootManager *fManager =CbmRootManager::Instance();
+  FairRootManager *fManager =FairRootManager::Instance();
   fManager->Write();
 }
 // -------------------------------------------------------------------------
@@ -77,7 +77,7 @@ CbmEcalHitProducerFastMC::~CbmEcalHitProducerFastMC()
 // -----   Initialization   ------------------------------------------------
 InitStatus CbmEcalHitProducerFastMC::Init()
 {
-  CbmRootManager* fManager = CbmRootManager::Instance();
+  FairRootManager* fManager = FairRootManager::Instance();
 
   // ECAL MC points
   fListECALpts = (TClonesArray*)fManager->ActivateBranch("ECALPoint");

@@ -2,8 +2,8 @@
 
 #include "TClonesArray.h"
 
-#include "CbmRootManager.h"
-#include "CbmTrackParam.h"
+#include "FairRootManager.h"
+#include "FairTrackParam.h"
 
 #include "CbmEcalStructure.h"
 #include "CbmEcalCell.h"
@@ -54,7 +54,7 @@ void CbmEcalClusterFinderV1::Exec(Option_t* option)
 
 InitStatus CbmEcalClusterFinderV1::Init()
 {
-  CbmRootManager* io=CbmRootManager::Instance();
+  FairRootManager* io=FairRootManager::Instance();
   if (!io)
   {
     Fatal("Init", "Can't find IOManager.");
@@ -113,7 +113,7 @@ void CbmEcalClusterFinderV1::ExcludeMaximums()
   Int_t n=fTracks->GetEntriesFast();
   Int_t i;
   Int_t mn=0;
-  CbmTrackParam* tr;
+  FairTrackParam* tr;
   CbmEcalCell* cell;
   list<CbmEcalCell*> cells;
   list<CbmEcalCell*>::const_iterator p;
@@ -129,7 +129,7 @@ void CbmEcalClusterFinderV1::ExcludeMaximums()
     Info("ExcludeMaximums", "Find %d charged tracks in event.", n);
   for(i=0;i<n;i++)
   {
-    tr=(CbmTrackParam*)fTracks->At(i);
+    tr=(FairTrackParam*)fTracks->At(i);
     cell=fStr->GetCell(tr->GetX(), tr->GetY());
     if (cell==NULL) continue;
     cell->GetNeighborsList(0, cells);
@@ -514,7 +514,7 @@ void CbmEcalClusterFinderV1::ClearPreClusters()
 
 /** Standard constructor **/
 CbmEcalClusterFinderV1::CbmEcalClusterFinderV1(const char* name, const Int_t verbose, const char* cfg)
-  : CbmTask(name, verbose)
+  : FairTask(name, verbose)
 {
   fTracks=NULL;
   fClusters=NULL;

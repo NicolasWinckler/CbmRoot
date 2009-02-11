@@ -10,7 +10,7 @@
  * updates due to changes in extrapolation routines: acts now on "RichTrackZ"
  *
  * Revision 1.3  2005/12/19 19:04:31  friese
- * New CbmTask design
+ * New FairTask design
  *
  * Revision 1.2  2005/11/30 15:38:35  hoehne
  * hardcoded parameters removed
@@ -32,17 +32,17 @@
 #ifndef CBMRICHPROJECTIONPRODUCER_H
 #define CBMRICHPROJECTIONPRODUCER_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "TClonesArray.h"
 #include "CbmRichRing.h"
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 #include "CbmStack.h"
 #include "TVector3.h"
 #include "TString.h"
 
 class CbmGeoRichPar;
 
-class CbmRichProjectionProducer : public CbmTask {
+class CbmRichProjectionProducer : public FairTask {
 
 public:
 
@@ -85,7 +85,7 @@ private:
 
   TClonesArray* fListRICHImPlanePoint; // Starting points&directions
   TClonesArray* fListStack;            //   for checking workability
-  TClonesArray* fProjectionTrackParam; // RICH projections as CbmTrackParam
+  TClonesArray* fProjectionTrackParam; // RICH projections as FairTrackParam
 
   Int_t fNHits;                        // Number of hits
   Int_t fEvent;                        // number of events

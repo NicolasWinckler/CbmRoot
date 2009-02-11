@@ -16,16 +16,16 @@
 #define CBMTOF_H
 
 
-#include "CbmDetector.h"
+#include "FairDetector.h"
 
 #include "TClonesArray.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
 
 class CbmTofPoint;
-class CbmVolume; 
+class FairVolume; 
 
-class CbmTof : public CbmDetector
+class CbmTof : public FairDetector
 {
 
  public:
@@ -52,7 +52,7 @@ class CbmTof : public CbmDetector
    ** collection.
    *@param vol  Pointer to the active volume
    **/
-  virtual Bool_t  ProcessHits(CbmVolume* vol = 0);
+  virtual Bool_t  ProcessHits(FairVolume* vol = 0);
 
 
   /** Virtual method EndOfEvent

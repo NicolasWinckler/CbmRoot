@@ -9,11 +9,11 @@
 #include "CbmZdcPoint.h"
 #include "CbmGeoZdc.h"
 
-#include "CbmGeoInterface.h"
-#include "CbmGeoLoader.h"
-#include "CbmGeoNode.h"
-#include "CbmGeoRootBuilder.h"
-#include "CbmRootManager.h"
+#include "FairGeoInterface.h"
+#include "FairGeoLoader.h"
+#include "FairGeoNode.h"
+#include "FairGeoRootBuilder.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 #include "TGeoMCGeometry.h"
@@ -58,7 +58,7 @@ CbmZdcv1::~CbmZdcv1() {
 
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t  CbmZdcv1::ProcessHits(CbmVolume* vol)
+Bool_t  CbmZdcv1::ProcessHits(FairVolume* vol)
 {
    if (TMath::Abs(gMC->TrackCharge()) <= 0) return kFALSE;
 

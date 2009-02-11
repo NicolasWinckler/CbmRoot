@@ -1,6 +1,6 @@
 #include "CbmEcalTimeDigitizer.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TFormula.h"
 
@@ -81,7 +81,7 @@ void CbmEcalTimeDigitizer::SetArraySize(Int_t size)
 }
 
 CbmEcalTimeDigitizer::CbmEcalTimeDigitizer(const char* name, const Int_t iVerbose, const char* config)
-  : CbmTask(name, iVerbose)
+  : FairTask(name, iVerbose)
 {
   fStr=NULL;
   fConfigName=config;
@@ -94,7 +94,7 @@ CbmEcalTimeDigitizer::CbmEcalTimeDigitizer(const char* name, const Int_t iVerbos
 /** Initing routine **/
 InitStatus CbmEcalTimeDigitizer::Init()
 {
-  CbmRootManager* fManager=CbmRootManager::Instance();
+  FairRootManager* fManager=FairRootManager::Instance();
   if (!fManager)
   {
     Fatal("Init", "Can't find a Root Manager.");

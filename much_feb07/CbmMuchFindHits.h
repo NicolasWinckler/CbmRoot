@@ -13,7 +13,7 @@
 #define CBMMUCHFINDHITS_H 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TStopwatch.h"
 
@@ -37,7 +37,7 @@ using std::set;
 using std::vector;
 
 
-class CbmMuchFindHits : public CbmTask
+class CbmMuchFindHits : public FairTask
 {
 
 

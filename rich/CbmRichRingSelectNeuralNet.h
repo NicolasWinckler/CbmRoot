@@ -27,8 +27,8 @@
 
 #include "TClonesArray.h"
 #include "CbmRichRing.h"
-/*#include "CbmTask.h"
-#include "CbmRootManager.h"*/
+/*#include "FairTask.h"
+#include "FairRootManager.h"*/
 #include "CbmRichRingSelect.h"
 #include "TMultiLayerPerceptron.h"
 #include "TTree.h"

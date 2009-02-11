@@ -1,9 +1,9 @@
 #ifndef CBMTUTORIALDETGEO_H
 #define CBMTUTORIALDETGEO_H
 
-#include "CbmGeoSet.h"
+#include "FairGeoSet.h"
 
-class  CbmTutorialDetGeo : public CbmGeoSet {
+class  CbmTutorialDetGeo : public FairGeoSet {
 
  protected:
   char modName[20];  // name of module

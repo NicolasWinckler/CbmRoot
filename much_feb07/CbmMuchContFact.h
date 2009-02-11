@@ -11,18 +11,18 @@
 #ifndef CBMMUCHCONTFACT_H
 #define CBMMUCHCONTFACT_H
 
-#include "CbmContFact.h"
+#include "FairContFact.h"
 
-class CbmContainer;
+class FairContainer;
 
-class CbmMuchContFact : public CbmContFact {
+class CbmMuchContFact : public FairContFact {
 private:
   void setAllContainers();
 public:
   CbmMuchContFact();
   ~CbmMuchContFact() {}
-  CbmParSet* createContainer(CbmContainer*);
-  void  activateParIo(CbmParIo* io);
+  FairParSet* createContainer(FairContainer*);
+  void  activateParIo(FairParIo* io);
   ClassDef( CbmMuchContFact,0) // Factory for all Much parameter containers
 };
 

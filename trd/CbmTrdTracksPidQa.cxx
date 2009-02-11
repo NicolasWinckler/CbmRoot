@@ -9,7 +9,7 @@
 #include "CbmTrdPoint.h"
 #include "CbmTrdTrack.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "TClonesArray.h"
@@ -38,7 +38,7 @@ CbmTrdTracksPidQa::CbmTrdTracksPidQa()
 // ---- Standard constructor ------------------------------------------------
 CbmTrdTracksPidQa::CbmTrdTracksPidQa(const char* name,
 					 const char* title)
-: CbmTask(name)
+: FairTask(name)
 {
     fTrdTrackCollection   = NULL;
     fTrdHitCollection   = NULL;
@@ -60,7 +60,7 @@ CbmTrdTracksPidQa::~CbmTrdTracksPidQa()
 InitStatus CbmTrdTracksPidQa::Init()
 {
     // Get pointer to the ROOT I/O manager
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
 	cout << "-E- CbmTrdTrackPidQa::Init : "
 	    << "ROOT manager is not instantiated !" << endl;

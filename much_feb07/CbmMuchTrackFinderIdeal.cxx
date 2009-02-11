@@ -5,10 +5,10 @@
 #include "CbmMuchDigiMatch.h"
 
 #include "CbmDetectorList.h"
-#include "CbmMCPoint.h"
+#include "FairMCPoint.h"
 #include "CbmMCTrack.h"
-#include "CbmRootManager.h"  
-#include "CbmTrackParam.h"
+#include "FairRootManager.h"  
+#include "FairTrackParam.h"
 
 #include "TClonesArray.h"
 
@@ -28,8 +28,8 @@ CbmMuchTrackFinderIdeal::~CbmMuchTrackFinderIdeal()
 
 void CbmMuchTrackFinderIdeal::Init() 
 {
-  CbmRootManager* ioman = CbmRootManager::Instance();
-  if (ioman == NULL) Fatal("Init", "No CbmRootManager!");
+  FairRootManager* ioman = FairRootManager::Instance();
+  if (ioman == NULL) Fatal("Init", "No FairRootManager!");
   
   fMcTracks  = (TClonesArray*) ioman->GetObject("MCTrack");
   if (fMcTracks == NULL) Fatal("Init", "No MCTrack array!");
@@ -76,7 +76,7 @@ Int_t CbmMuchTrackFinderIdeal::DoFind(
       Int_t pointIndex = pDigiMatch->GetRefIndex(iDigi);
       if (pointIndex < 0) continue;      
      
-      CbmMCPoint* pMcPoint = (CbmMCPoint*) (fMcPoints->At(pointIndex));
+      FairMCPoint* pMcPoint = (FairMCPoint*) (fMcPoints->At(pointIndex));
       if (pMcPoint == NULL) continue;
       
       Int_t mcTrackIndex = pMcPoint->GetTrackID();
@@ -107,10 +107,10 @@ Int_t CbmMuchTrackFinderIdeal::DoFind(
 
 void CbmMuchTrackFinderIdeal::SetTrackParam(
 		const CbmMCTrack* mcTrack,
-		const CbmMCPoint* mcPoint,
+		const FairMCPoint* mcPoint,
 		CbmMuchTrack* track)
 {
-	CbmTrackParam par;
+	FairTrackParam par;
 	par.SetX(mcPoint->GetX());
     par.SetY(mcPoint->GetY());
     par.SetTx(mcPoint->GetPx()/mcPoint->GetPz());

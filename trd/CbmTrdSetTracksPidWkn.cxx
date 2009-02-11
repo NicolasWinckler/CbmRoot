@@ -7,7 +7,7 @@
 #include "CbmTrdTrack.h"
 #include "CbmTrdHit.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -32,7 +32,7 @@ CbmTrdSetTracksPidWkn::CbmTrdSetTracksPidWkn() {
 // -----   Standard constructor   ------------------------------------------
 CbmTrdSetTracksPidWkn::CbmTrdSetTracksPidWkn(const char* name,
 				 const char* title)
-  : CbmTask(name) {
+  : FairTask(name) {
   fTrackArray  = NULL;
   fTrdHitArray = NULL;
   fNofTracks   = 0;
@@ -61,8 +61,8 @@ void CbmTrdSetTracksPidWkn::SetParContainers()
 // -----   Public method Init (abstract in base class)  --------------------
 InitStatus CbmTrdSetTracksPidWkn::Init() {
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmTrdSetTracksPidWkn::Init: "
 	 << "RootManager not instantised!" << endl;

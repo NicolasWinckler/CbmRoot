@@ -17,7 +17,7 @@
 #define CBMFINDGLOBALTRACKS_H 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 
 class TClonesArray;
@@ -26,7 +26,7 @@ class CbmRichMerger;
 class CbmTofMerger;
 
 
-class CbmFindGlobalTracks : public CbmTask
+class CbmFindGlobalTracks : public FairTask
 {
 
  public:

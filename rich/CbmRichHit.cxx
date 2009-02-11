@@ -12,7 +12,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmRichHit::CbmRichHit(): CbmHit() {
+CbmRichHit::CbmRichHit(): FairHit() {
   fPmtID=0;
   fNPhotons=0;
   fAmplitude=0.;

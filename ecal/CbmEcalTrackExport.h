@@ -5,12 +5,12 @@
 #ifndef CBMECALTRACKEXPORT_H
 #define CBMECALTRACKEXPORT_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TTree;
 class TClonesArray;
 
-class CbmEcalTrackExport : public CbmTask
+class CbmEcalTrackExport : public FairTask
 {
 public:
   /** Default constructor **/

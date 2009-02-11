@@ -8,7 +8,7 @@
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
 
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 
 #include <iostream>
 #include <cmath>
@@ -80,7 +80,7 @@ Int_t CbmRichRingFinderTrack::DoFind(TClonesArray* rHitArray,
 		return -1;
 	}
 	for(Int_t iPoint = 0; iPoint < npoints; iPoint++) {
-		CbmTrackParam * point = (CbmTrackParam*)rProjArray->At(iPoint);
+		FairTrackParam * point = (FairTrackParam*)rProjArray->At(iPoint);
 		if(point) {
 			CbmRichTrackMyPoint tempPoint;
 			tempPoint.fX = point->GetX();

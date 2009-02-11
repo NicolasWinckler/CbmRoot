@@ -1,6 +1,6 @@
 #include "CbmEcalAnalysisNeutron.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "CbmEcalRecParticle.h"
@@ -116,7 +116,7 @@ void CbmEcalAnalysisNeutron::InitTree()
 }
 
 CbmEcalAnalysisNeutron::CbmEcalAnalysisNeutron(const char* name, const Int_t iVerbose)
-  : CbmTask(name, iVerbose)
+  : FairTask(name, iVerbose)
 {
   fTree=NULL;
 }
@@ -124,7 +124,7 @@ CbmEcalAnalysisNeutron::CbmEcalAnalysisNeutron(const char* name, const Int_t iVe
 /** Initing routine **/
 InitStatus CbmEcalAnalysisNeutron::Init()
 {
-  CbmRootManager* fManager=CbmRootManager::Instance();
+  FairRootManager* fManager=FairRootManager::Instance();
   if (!fManager)
   {
     Fatal("Init", "Can't find a Root Manager.");

@@ -31,7 +31,7 @@
  * GetCellCoord now static
  *
  * Revision 1.7  2006/07/12 08:41:38  prokudin
- * String compare removed. Using CbmVolume instead.
+ * String compare removed. Using FairVolume instead.
  *
  * Revision 1.6  2006/06/30 13:04:22  kharlov
  * Added a function SetSpecialPhysicsCuts()
@@ -65,18 +65,18 @@
 #include "CbmEcalStructure.h"
 #include "CbmEcalInf.h"
 
-#include "CbmDetector.h"
+#include "FairDetector.h"
 
 #include "TClonesArray.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
 
 class CbmEcalPoint; 
-class CbmVolume;
+class FairVolume;
 
 #define kNumberOfECALSensitiveVolumes 6
 
-class CbmEcal : public CbmDetector
+class CbmEcal : public FairDetector
 {
 
 public:
@@ -104,7 +104,7 @@ public:
    ** collection.
    *@param vol  Pointer to the active volume
    **/
-  virtual Bool_t  ProcessHits(CbmVolume* vol = NULL);
+  virtual Bool_t  ProcessHits(FairVolume* vol = NULL);
 
 
   /** Virtual method Construct geometry

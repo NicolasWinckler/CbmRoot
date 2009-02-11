@@ -7,7 +7,7 @@
 #include "CbmGlobalTrack.h"
 #include "CbmGlobalTrackFitter.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -38,7 +38,7 @@ CbmFitGlobalTracks::CbmFitGlobalTracks()
 // ------------------------------------------------------------------
 CbmFitGlobalTracks::CbmFitGlobalTracks(const char* name, Int_t verbose,
 				       CbmGlobalTrackFitter* fitter)
-: CbmTask(name, verbose)
+: FairTask(name, verbose)
 {
     // Standard constructor
     fFitter = fitter;
@@ -65,7 +65,7 @@ InitStatus CbmFitGlobalTracks::Init()
     }
     fFitter->Init();
     // Get pointer to the ROOT manager
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
 	cout << "-E- CbmFitGlobalTracks::Init : "
 	    << "CBM ROOT manager is not instantiated!" << endl;

@@ -2,12 +2,12 @@
 #define CBMTUTORIALDETPOINT_H 1
 
 
-#include "CbmMCPoint.h"
+#include "FairMCPoint.h"
 
 #include "TObject.h"
 #include "TVector3.h"
 
-class CbmTutorialDetPoint : public CbmMCPoint
+class CbmTutorialDetPoint : public FairMCPoint
 {
 
  public:

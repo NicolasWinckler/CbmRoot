@@ -7,12 +7,12 @@
 #define CBMTRKHIT_H
 
 
-#include "CbmHit.h"
+#include "FairHit.h"
 
 
 /**
  ** Abstract base class for hits used for tracking in CBM.
- ** Derives from CbmHit. 
+ ** Derives from FairHit. 
  ** Additional member is the covariance of x and y.
  ** Derived classes have to implement the pure virtual method GetStationNr()
  **
@@ -20,7 +20,7 @@
  **@since 16/11/07
  */
 
-class CbmTrkHit : public CbmHit 
+class CbmTrkHit : public FairHit 
 {
 
  public:

@@ -18,7 +18,7 @@
 *******************************************************************************/
 #include "CbmRichRingSelect.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TMath.h"
 
@@ -36,8 +36,8 @@ using std::atan;
 void CbmRichRingSelect::Init()
 {
 	cout << "CbmRichRingSelect::Init()"<<endl;
-	// Get and check CbmRootManager
-	CbmRootManager* ioman = CbmRootManager::Instance();
+	// Get and check FairRootManager
+	FairRootManager* ioman = FairRootManager::Instance();
 	if (! ioman) {
 		cout << "-E- CbmRichRingSelect::Init()"
 		<< "RootManager not instantised!" << endl;

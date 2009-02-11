@@ -10,9 +10,9 @@
 #include "CbmTrdTrackFinder.h"
 #include "CbmTrdHit.h"
 
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 #include "TClonesArray.h"
 
@@ -36,7 +36,7 @@ CbmTrdFindTracks::CbmTrdFindTracks()
 CbmTrdFindTracks::CbmTrdFindTracks(const char* name, 
 				   const char* title, 
 				   CbmTrdTrackFinder* finder) 
-: CbmTask(name)
+: FairTask(name)
 {
   fFinder         = finder;
   fTrdHitArray    = NULL;
@@ -66,8 +66,8 @@ InitStatus CbmTrdFindTracks::Init()
     return kERROR;
   }
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmTrdFindTracks::Init: "
 	 << "RootManager not instantised!" << endl;
@@ -101,12 +101,12 @@ InitStatus CbmTrdFindTracks::Init()
 // -----  SetParContainers -------------------------------------------------
 void CbmTrdFindTracks::SetParContainers()
 {
-    CbmRunAna* ana = CbmRunAna::Instance();
-    CbmRuntimeDb* rtdb = ana->GetRuntimeDb();
+    FairRunAna* ana = FairRunAna::Instance();
+    FairRuntimeDb* rtdb = ana->GetRuntimeDb();
   //  rtdb->getContainer("CbmGeoPassivePar");
  //   rtdb->getContainer("CbmGeoStsPar");
  //   rtdb->getContainer("CbmGeoTrdPar");
-    rtdb->getContainer("CbmBaseParSet");
+    rtdb->getContainer("FairBaseParSet");
     rtdb->getContainer("CbmGeoPassivePar");
     rtdb->getContainer("CbmGeoStsPar");
     rtdb->getContainer("CbmGeoRichPar");

@@ -80,10 +80,10 @@ public:
 
 
   /** Fill main part of distorted field map from parent CbmField  **/
-  virtual void SetFromParent(CbmField* field);
+  virtual void SetFromParent(FairField* field);
 
   /** Get parent Field   **/
-  virtual CbmField* GetParent() {return fParentField;}
+  virtual FairField* GetParent() {return fParentField;}
 
   /** Screen output **/
   virtual void Print();
@@ -100,7 +100,7 @@ public:
  protected:
 
   /** Parent field (can be field map or constant field)  **/
-  CbmField *fParentField;   //!
+  FairField *fParentField;   //!
 
   /** Field type of parent field.  **/
   Int_t fTypeOfParent;

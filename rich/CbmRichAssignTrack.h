@@ -24,12 +24,12 @@
 #define CBM_RICH_ASSIGN_TRACK 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class CbmRichRingTrackAssign;
 class TClonesArray;
 
-class CbmRichAssignTrack : public CbmTask
+class CbmRichAssignTrack : public FairTask
 {
 
  public:
@@ -51,7 +51,7 @@ class CbmRichAssignTrack : public CbmTask
    *@param assign             Pointer to RICH ring-track ssignement concrete class
    *@param verbose            Verbosity level
    **/
-  CbmRichAssignTrack(const char* name, const char* title = "CbmTask",
+  CbmRichAssignTrack(const char* name, const char* title = "FairTask",
 		     CbmRichRingTrackAssign* assign = NULL, Int_t verbose = 1);
 
 

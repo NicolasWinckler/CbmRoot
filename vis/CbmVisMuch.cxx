@@ -13,9 +13,9 @@
 #include "TGFrame.h"
 #include "TGStatusBar.h"
 
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 #include "CbmGeoMuchPar.h"
 #include "CbmMCTrack.h"
 
@@ -40,7 +40,7 @@
 #include "TColor.h"
 
 // -----   Default constructor   ------------------------------------------
-CbmVisMuch::CbmVisMuch():CbmTask("Task",0){
+CbmVisMuch::CbmVisMuch():FairTask("Task",0){
   fDigiFileName = "";
   fEvent  = 0;
   fMCTracks    = NULL;
@@ -65,8 +65,8 @@ CbmVisMuch::~CbmVisMuch() {
 
 // -----   Private method SetParContainers   -------------------------------
 void CbmVisMuch::SetParContainers() {
-  CbmRunAna* fRun = CbmRunAna::Instance();
-  CbmRuntimeDb* db = fRun->GetRuntimeDb();
+  FairRunAna* fRun = FairRunAna::Instance();
+  FairRuntimeDb* db = fRun->GetRuntimeDb();
   fGeoPar  = (CbmGeoMuchPar*)  db->getContainer("CbmGeoMuchPar");
 }
 // -------------------------------------------------------------------------
@@ -84,7 +84,7 @@ InitStatus CbmVisMuch::Init() {
   fGeoScheme->CreateHitArrays("CbmVisHit");
   fGeoScheme->CreateClusterArrays("CbmVisMuchCluster");
   
-  fRootManager = CbmRootManager::Instance();
+  fRootManager = FairRootManager::Instance();
   fMCTracks    = (TClonesArray*) fRootManager->GetObject("MCTrack");
   fPoints      = (TClonesArray*) fRootManager->GetObject("MuchPoint");
   fHits        = (TClonesArray*) fRootManager->GetObject("MuchHit");
@@ -264,7 +264,7 @@ Int_t CbmVisMuch::SetHitInfo(CbmVisHit* vhit){
   vhit->SetPointId(pointId);
 
   if (pointId<0) return 1;
-  CbmMCPoint*  point  = (CbmMCPoint*) fPoints->At(pointId);
+  FairMCPoint*  point  = (FairMCPoint*) fPoints->At(pointId);
   Int_t trackId = point->GetTrackID();
   vhit->SetTrackId(trackId);
 

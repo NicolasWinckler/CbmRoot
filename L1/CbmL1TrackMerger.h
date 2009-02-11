@@ -9,7 +9,7 @@
 
 class TClonesArray;
 class CbmKFTrack;
-class CbmTrackParam;
+class FairTrackParam;
 class TH2F;
 
 
@@ -29,7 +29,7 @@ private:
     TH2F         *fh_dty_true;     // Control histogramm
     TH2F         *fh_dty_false;    // Control histogramm
 
-    Double_t GetChi2XY(CbmKFTrack &kfTrack, CbmTrackParam *trackParam);
+    Double_t GetChi2XY(CbmKFTrack &kfTrack, FairTrackParam *trackParam);
     void CreateHistogramms();
     Int_t MergeSimple(TClonesArray *stsTracks,
 		      TClonesArray *trdTracks,

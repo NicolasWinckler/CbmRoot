@@ -16,7 +16,7 @@
 #include "CbmMuchDigi.h"
 #include "CbmMuchHit.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TMath.h"
 
@@ -156,8 +156,8 @@ void CbmMuchFindClusters::SetParContainers() { }
 // -----   Private method Init   -------------------------------------------
 InitStatus CbmMuchFindClusters::Init() {
   // Get input arrays
-  CbmRootManager* ioman = CbmRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No CbmRootManager");
+  FairRootManager* ioman = FairRootManager::Instance();
+  if ( ! ioman ) Fatal("Init", "No FairRootManager");
   fDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
   fDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
 

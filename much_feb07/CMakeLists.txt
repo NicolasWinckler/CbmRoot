@@ -102,7 +102,7 @@ ${MUCHFEB07_DICTIONARY} )
 
 add_library(MuchFeb07 SHARED ${MUCHFEB07_SRCS})
 target_link_libraries(MuchFeb07 ${ROOT_LIBRARIES})
-set_target_properties(MuchFeb07 PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES} )
+set_target_properties(MuchFeb07 PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES} )
 
 ################ install ###################
 install(TARGETS MuchFeb07 DESTINATION ${CMAKE_BINARY_DIR}/lib)

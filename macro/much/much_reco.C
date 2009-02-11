@@ -81,7 +81,7 @@
 
 
   // -----   Reconstruction run   -------------------------------------------
-  CbmRunAna *fRun= new CbmRunAna();
+  FairRunAna *fRun= new FairRunAna();
   fRun->SetInputFile(inFile);
   fRun->AddFriend(stsRecoFile);
   fRun->SetOutputFile(outFile);
@@ -90,10 +90,10 @@
 
 
   // -----  Parameter database   --------------------------------------------
-  CbmRuntimeDb* rtdb = fRun->GetRuntimeDb();
-  CbmParRootFileIo* parInput1 = new CbmParRootFileIo();
+  FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
+  FairParRootFileIo* parInput1 = new FairParRootFileIo();
   parInput1->open(parFile.Data());
-  CbmParAsciiFileIo* parInput2 = new CbmParAsciiFileIo();
+  FairParAsciiFileIo* parInput2 = new FairParAsciiFileIo();
   TString stsDigiFile = gSystem->Getenv("VMCWORKDIR");
   stsDigiFile += "/parameters/sts/sts_digi.par";
   parInput2->open(stsDigiFile.Data(),"in");

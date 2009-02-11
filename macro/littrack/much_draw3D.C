@@ -9,7 +9,7 @@ void much_draw3D()
   cbmrootlibs();
 
   TFile* f = new TFile(mcFile);
-  TGeoManager *geoMan = (TGeoManager*) f->Get("CBMGeom");
+  TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
   geoMan->SetVisLevel(0);
 
   // Check overlaps

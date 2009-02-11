@@ -18,7 +18,7 @@
 #include "TObject.h"
 #include <vector>
 
-class CbmField;
+class FairField;
 class TGeoNode;
 class TGeoMaterial;
 
@@ -29,7 +29,7 @@ public:
 
    static CbmLitEnvironment* Instance();
 
-   CbmField* GetField();
+   FairField* GetField();
    CbmLitDetectorLayout GetMuchLayout();
    CbmLitDetectorLayout GetNewMuchLayout();
    CbmLitDetectorLayout GetOldMuchLayout();
@@ -44,7 +44,7 @@ private:
    CbmLitDetectorLayout fMuchLayout;
    CbmLitDetectorLayout fTrdLayout;
 
-   CbmField *fField;
+   FairField *fField;
 
    void DetermineLayout(
 		   const std::vector<CbmLitStation>& stations,

@@ -1,6 +1,6 @@
 #include "CbmEcalAnalysisPair.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "CbmEcalRecParticle.h"
@@ -173,7 +173,7 @@ void CbmEcalAnalysisPair::InitTree()
 }
 
 CbmEcalAnalysisPair::CbmEcalAnalysisPair(const char* name, const Int_t iVerbose)
-  : CbmTask(name, iVerbose)
+  : FairTask(name, iVerbose)
 {
   fTree=NULL;
 }
@@ -181,7 +181,7 @@ CbmEcalAnalysisPair::CbmEcalAnalysisPair(const char* name, const Int_t iVerbose)
 /** Initing routine **/
 InitStatus CbmEcalAnalysisPair::Init()
 {
-  CbmRootManager* fManager=CbmRootManager::Instance();
+  FairRootManager* fManager=FairRootManager::Instance();
   if (!fManager)
   {
     Fatal("Init", "Can't find a Root Manager.");

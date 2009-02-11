@@ -17,7 +17,7 @@ libCbmBase_la_LIBADD   += -L$(top_srcdir)/base/
 sources                 = CbmDigi.cxx \
 	                  CbmDigiManager.cxx \
 			  CbmLinkMC.cxx \
-			  CbmMCPoint.cxx \
+			  FairMCPoint.cxx \
                           CbmMCTrack.cxx \
                           CbmStack.cxx \
 			  CbmTrkHit.cxx

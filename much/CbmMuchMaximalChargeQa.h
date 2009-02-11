@@ -14,7 +14,7 @@
 #include "CbmMuchDigiPar.h"
 #include "CbmMuchDigiScheme.h"
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "TClonesArray.h"
 #include "TH1.h"
 
@@ -22,7 +22,7 @@
 
 using std::map;
 
-class CbmMuchMaximalChargeQa : public CbmTask {
+class CbmMuchMaximalChargeQa : public FairTask {
 
  public:
 

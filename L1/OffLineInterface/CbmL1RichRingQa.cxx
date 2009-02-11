@@ -1,7 +1,7 @@
 #include "CbmL1RichRingQa.h"
 
-#include "CbmTask.h"
-#include "CbmRootManager.h"
+#include "FairTask.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 #include "CbmRichPoint.h"
 #include "CbmRichHit.h"
@@ -37,7 +37,7 @@ ClassImp(CbmL1RichRingQa)
 
 //------------  standard constructor (with verbosity level)  ---------------------------------
 CbmL1RichRingQa::CbmL1RichRingQa(const char *name, const char *title, Int_t verbose)
-  :CbmTask(name)
+  :FairTask(name)
 {
   fVerbose = verbose;
 }
@@ -50,8 +50,8 @@ CbmL1RichRingQa::~CbmL1RichRingQa()
 InitStatus CbmL1RichRingQa::Init()
 {
 
- // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+ // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmL1RichRingQa::Init: "
 	 << "RootManager not instantised!" << endl;

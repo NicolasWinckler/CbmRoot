@@ -28,11 +28,11 @@
 #define CBMTRDSETTRACKSPIDWKN 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TClonesArray;
 
-class CbmTrdSetTracksPidWkn : public CbmTask
+class CbmTrdSetTracksPidWkn : public FairTask
 {
 
  public:
@@ -46,7 +46,7 @@ class CbmTrdSetTracksPidWkn : public CbmTask
    *@param name   Name of class
    *@param title  Task title
    **/
-  CbmTrdSetTracksPidWkn(const char* name, const char* title = "CbmTask");
+  CbmTrdSetTracksPidWkn(const char* name, const char* title = "FairTask");
 
 
   /** Destructor **/

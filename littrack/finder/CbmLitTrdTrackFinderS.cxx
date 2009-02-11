@@ -275,7 +275,7 @@ void CbmLitTrdTrackFinderS::CreateTrdTracks()
 //	       << " Wrong TRD Point!!!!" << endl;
 //	}
 //
-//	CbmTrackParam* par = new CbmTrackParam();
+//	FairTrackParam* par = new FairTrackParam();
 //
 //
 //	par->SetX(TrdPoint->GetX());
@@ -370,7 +370,7 @@ Bool_t CbmLitTrdTrackFinderS::IsIn(Double_t pred, CbmTrkHit *pHit, Int_t layer)
 void CbmLitTrdTrackFinderS::AddTrackCandidate1(CbmLitTrack* pTrack,
                                                CbmTrkHit* pHits[])
 {
-   CbmTrackParam* par = new CbmTrackParam();
+   FairTrackParam* par = new FairTrackParam();
 
    Double_t x0 = pHits[0]->GetX();
    Double_t x1 = pHits[1]->GetX();

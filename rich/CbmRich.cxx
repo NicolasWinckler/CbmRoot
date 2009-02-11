@@ -60,16 +60,16 @@
 #include "CbmRichPoint.h"
 
 #include "CbmDetectorList.h"
-#include "CbmGeoInterface.h"
-#include "CbmGeoLoader.h"
-#include "CbmGeoNode.h"
-#include "CbmGeoRootBuilder.h"
+#include "FairGeoInterface.h"
+#include "FairGeoLoader.h"
+#include "FairGeoNode.h"
+#include "FairGeoRootBuilder.h"
 #include "CbmStack.h"
-#include "CbmRootManager.h"
-#include "CbmVolume.h"
-#include "CbmGeoG3Builder.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRun.h"
+#include "FairRootManager.h"
+#include "FairVolume.h"
+#include "FairGeoG3Builder.h"
+#include "FairRuntimeDb.h"
+#include "FairRun.h"
 
 #include "TObjArray.h"
 #include "TClonesArray.h"
@@ -87,7 +87,7 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmRich::CbmRich() : CbmDetector("RICH", kTRUE, kRICH) {
+CbmRich::CbmRich() : FairDetector("RICH", kTRUE, kRICH) {
   fRichCollection        = new TClonesArray("CbmRichPoint");
   fRichRefPlaneCollection = new TClonesArray("CbmRichPoint");
   fRichMirrorCollection  = new TClonesArray("CbmRichPoint");
@@ -106,7 +106,7 @@ CbmRich::CbmRich() : CbmDetector("RICH", kTRUE, kRICH) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmRich::CbmRich(const char* name, Bool_t active)
-  : CbmDetector(name, active, kRICH) {
+  : FairDetector(name, active, kRICH) {
   fRichCollection        = new TClonesArray("CbmRichPoint");
   fRichRefPlaneCollection = new TClonesArray("CbmRichPoint");
   fRichMirrorCollection  = new TClonesArray("CbmRichPoint");
@@ -145,25 +145,25 @@ CbmRich::~CbmRich() {
 
 // -----   Public method Intialize   ---------------------------------------
 void CbmRich::Initialize() {
-  CbmDetector::Initialize();
-  CbmRun* sim = CbmRun::Instance();
-  CbmRuntimeDb* rtdb=sim->GetRuntimeDb();
+  FairDetector::Initialize();
+  FairRun* sim = FairRun::Instance();
+  FairRuntimeDb* rtdb=sim->GetRuntimeDb();
   CbmGeoRichPar *par=(CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
   TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
   //	TObjArray *fPassNodes = par->GetGeoPassiveNodes();
   /*
-    CbmGeoNode *fn;
+    FairGeoNode *fn;
     for (Int_t i=0; i< fSensNodes->GetEntries();i++)
     {
-    fn=(CbmGeoNode *)fSensNodes->At(i);
+    fn=(FairGeoNode *)fSensNodes->At(i);
     cout << "Volume Id :" << fn->getMCid()<< "  "  << fn->getCopyNo()<<	endl;
     }
   */
-  CbmGeoNode *fm1= (CbmGeoNode *) fSensNodes->FindObject("rich1d#1");
-  CbmGeoNode *fm2= (CbmGeoNode *) fSensNodes->FindObject("rich1gas2");
-  CbmGeoNode *fm3= (CbmGeoNode *) fSensNodes->FindObject("rich1mgl#1");
-  CbmGeoNode *fm3a= (CbmGeoNode *) fSensNodes->FindObject("rich1mglLU#1");
-  CbmGeoNode *fm3b= (CbmGeoNode *) fSensNodes->FindObject("rich1mglRU#1");
+  FairGeoNode *fm1= (FairGeoNode *) fSensNodes->FindObject("rich1d#1");
+  FairGeoNode *fm2= (FairGeoNode *) fSensNodes->FindObject("rich1gas2");
+  FairGeoNode *fm3= (FairGeoNode *) fSensNodes->FindObject("rich1mgl#1");
+  FairGeoNode *fm3a= (FairGeoNode *) fSensNodes->FindObject("rich1mglLU#1");
+  FairGeoNode *fm3b= (FairGeoNode *) fSensNodes->FindObject("rich1mglRU#1");
 
   volDetector = fm1->getMCid();
   volRefPlane  = fm2->getMCid();
@@ -181,7 +181,7 @@ void CbmRich::Initialize() {
 
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t CbmRich::ProcessHits(CbmVolume* vol) {
+Bool_t CbmRich::ProcessHits(FairVolume* vol) {
    
   // Get track information
   // gMC is of type TVirtualMC
@@ -387,10 +387,10 @@ void CbmRich::EndOfEvent() {
 
 // -----   Public method Register   -------------------------------------------
 void CbmRich::Register() {
-  CbmRootManager::Instance()->Register("RichPoint","Rich", fRichCollection, kTRUE);
-  CbmRootManager::Instance()->Register("RefPlanePoint","RichRefPlane",
+  FairRootManager::Instance()->Register("RichPoint","Rich", fRichCollection, kTRUE);
+  FairRootManager::Instance()->Register("RefPlanePoint","RichRefPlane",
   				       fRichRefPlaneCollection, kTRUE);
-  CbmRootManager::Instance()->Register("RichMirrorPoint","RichMirror",
+  FairRootManager::Instance()->Register("RichMirrorPoint","RichMirror",
   				       fRichMirrorCollection, kFALSE);  // fFALSE -> MirrorPoint not saved
 }
 // ----------------------------------------------------------------------------
@@ -461,8 +461,8 @@ void CbmRich::ConstructOpGeometry()
 // -----   Public method ConstructGeometry   ----------------------------------
 void CbmRich::ConstructGeometry() {
 
-  CbmGeoLoader*    geoLoad = CbmGeoLoader::Instance();
-  CbmGeoInterface* geoFace = geoLoad->getGeoInterface();
+  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
+  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
   CbmGeoRich*      richGeo = new CbmGeoRich();
   richGeo->setGeomFile(GetGeometryFileName());
   geoFace->addGeoModule(richGeo);
@@ -472,18 +472,18 @@ void CbmRich::ConstructGeometry() {
   TList* volList = richGeo->getListOfVolumes();
 
   // store geo parameter
-  CbmRun *fRun = CbmRun::Instance();
-  CbmRuntimeDb *rtdb= CbmRun::Instance()->GetRuntimeDb();
+  FairRun *fRun = FairRun::Instance();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
   CbmGeoRichPar* par=(CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
   TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
   TObjArray *fPassNodes = par->GetGeoPassiveNodes();
 
   TListIter iter(volList);
-  CbmGeoNode* node   = NULL;
-  CbmGeoVolume *aVol=NULL;
+  FairGeoNode* node   = NULL;
+  FairGeoVolume *aVol=NULL;
 
-  while( (node = (CbmGeoNode*)iter.Next()) ) {
-    aVol = dynamic_cast<CbmGeoVolume*> ( node );
+  while( (node = (FairGeoNode*)iter.Next()) ) {
+    aVol = dynamic_cast<FairGeoVolume*> ( node );
     if ( node->isSensitive()  ) {
       fSensNodes->AddLast( aVol );
     }else{

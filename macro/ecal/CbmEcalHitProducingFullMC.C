@@ -44,9 +44,9 @@ void CbmEcalHitProducingFullMC(const TString infile = "test.mc.root")
   gSystem->Load("libTof");
   gSystem->Load("libEcal");
 
-  CbmRunAna *fRun = new CbmRunAna();
-  CbmRuntimeDb *rtdb = fRun->GetRuntimeDb();
-  CbmParRootFileIo *io1 = new CbmParRootFileIo();
+  FairRunAna *fRun = new FairRunAna();
+  FairRuntimeDb *rtdb = fRun->GetRuntimeDb();
+  FairParRootFileIo *io1 = new FairParRootFileIo();
 
   TString outfile=infile;
   outfile.ReplaceAll(".root",".hits.root");

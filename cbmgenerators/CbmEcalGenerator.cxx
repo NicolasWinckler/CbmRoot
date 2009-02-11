@@ -1,6 +1,6 @@
 #include "CbmEcalGenerator.h"
 
-#include "CbmPrimaryGenerator.h"
+#include "FairPrimaryGenerator.h"
 
 #include "TRandom.h"
 #include "TParticlePDG.h"
@@ -51,7 +51,7 @@ void CbmEcalGenerator::Init()
 }
 
 // ------------------------------------------------------------------------
-Bool_t CbmEcalGenerator::ReadEvent(CbmPrimaryGenerator* primGen)
+Bool_t CbmEcalGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 {
   // Generate one event: produce primary particles emitted from one vertex.
   // Primary particles are distributed uniformly along

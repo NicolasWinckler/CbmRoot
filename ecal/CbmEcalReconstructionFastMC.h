@@ -25,11 +25,11 @@
 #ifndef CBMECALRECONSTRUCTIONFASTMC_H
 #define CBMECALRECONSTRUCTIONFASTMC_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TClonesArray.h"
 
-class CbmEcalReconstructionFastMC : public CbmTask {
+class CbmEcalReconstructionFastMC : public FairTask {
 
 public:
 

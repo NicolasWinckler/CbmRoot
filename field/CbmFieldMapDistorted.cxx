@@ -6,7 +6,7 @@
 #include "CbmFieldMapDistorted.h"
 
 #include "CbmFieldPar.h"
-#include "CbmField.h"
+#include "FairField.h"
 #include "CbmFieldConst.h"
 #include "CbmFieldMapSym1.h"
 #include "CbmFieldMapSym2.h"
@@ -148,7 +148,7 @@ void CbmFieldMapDistorted::Init() {
 
 
 // -------------   Set from parent CbmField   -------------------------
-void CbmFieldMapDistorted::SetFromParent(CbmField* field)
+void CbmFieldMapDistorted::SetFromParent(FairField* field)
 {
   fTypeOfParent=0;
   fParentField = field;

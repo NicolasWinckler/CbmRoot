@@ -2,7 +2,7 @@
 
 #include "CbmKFMath.h"
 
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 #include "CbmStsTrack.h"
 
 #include "TParticlePDG.h"
@@ -31,7 +31,7 @@ void CbmKFTrack::SetTrack( CbmKFTrackInterface &track ){
   fNDF  = track.GetRefNDF();
 }
 
-void CbmKFTrack::SetTrackParam( CbmTrackParam &track )
+void CbmKFTrack::SetTrackParam( FairTrackParam &track )
 {
   CbmKFMath::CopyTrackParam2TC( &track, fT, fC ); 
 }
@@ -44,7 +44,7 @@ void CbmKFTrack::SetStsTrack( CbmStsTrack &track, bool first )
   GetRefNDF() = track.GetNDF();
 }
 
-void CbmKFTrack::GetTrackParam( CbmTrackParam &track )
+void CbmKFTrack::GetTrackParam( FairTrackParam &track )
 {
   CbmKFMath::CopyTC2TrackParam( &track, fT, fC ); 
 }

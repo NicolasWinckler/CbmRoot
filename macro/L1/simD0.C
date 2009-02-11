@@ -26,7 +26,7 @@
 
   //char *urqmdFile  =("/d/cbm01/cbmsim/urqmd/auau/25gev/mbias/urqmd.auau.25gev.mbias.0000.ftn14");
 
-  CbmRunSim *fRun = new CbmRunSim();
+  FairRunSim *fRun = new FairRunSim();
   
   // set the MC version used
   // ------------------------
@@ -45,44 +45,44 @@
   // Create and add detectors
   //-------------------------
 
-  CbmModule *Cave= new CbmCave("CAVE");
+  FairModule *Cave= new CbmCave("CAVE");
   Cave->SetGeometryFileName("cave.geo");
   fRun->AddModule(Cave);
 
-  CbmModule *Pipe= new CbmPipe("PIPE");
+  FairModule *Pipe= new CbmPipe("PIPE");
   Pipe->SetGeometryFileName("pipe.geo");
   fRun->AddModule(Pipe);
   
   
-  CbmModule *Magnet= new CbmMagnet("MAGNET");
+  FairModule *Magnet= new CbmMagnet("MAGNET");
   // 1- Active shielding Geometry
   Magnet->SetGeometryFileName("magnet_active.geo");
   // 2- Iron Magnet
   // Magnet->SetGeometryFileName("magnet_iron.geo");
   fRun->AddModule(Magnet);
   
-  CbmDetector *Sts= new CbmSts("STS", kTRUE);
+  FairDetector *Sts= new CbmSts("STS", kTRUE);
   Sts->SetGeometryFileName("sts.geo");
   fRun->AddModule(Sts);
 
   
-  CbmModule *Target= new CbmTarget("Target");
+  FairModule *Target= new CbmTarget("Target");
   Target->SetGeometryFileName("target.geo");
   fRun->AddModule(Target);		
 
-  //CbmDetector *Tof= new CbmTof("TOF", kTRUE );
+  //FairDetector *Tof= new CbmTof("TOF", kTRUE );
   //Tof->SetGeometryFileName("tof.geo");
   //fRun->AddModule(Tof);
 	
-  //CbmDetector *Trd= new CbmTrd("TRD",kTRUE );
+  //FairDetector *Trd= new CbmTrd("TRD",kTRUE );
   //Trd->SetGeometryFileName("trd_9.geo");
   //fRun->AddModule(Trd);
 
-  //CbmDetector *Rich= new CbmRich("RICH", kTRUE);
+  //FairDetector *Rich= new CbmRich("RICH", kTRUE);
   //Rich->SetGeometryFileName("rich.geo");
   //fRun->AddModule(Rich);
 
-  //CbmDetector *Ecal= new CbmEcal("ECAL", kTRUE);
+  //FairDetector *Ecal= new CbmEcal("ECAL", kTRUE);
   //Ecal->SetGeometryFileName("ecal.geo");
   //fRun->AddModule(Ecal);
 
@@ -90,26 +90,26 @@
  // Create and Set Event Generator
  //-------------------------------
 
-  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   fRun->SetGenerator(primGen);
 
   // Ascii generator
 
-  CbmAsciiGenerator *D0gen = new CbmAsciiGenerator(asciiFile);
+  FairAsciiGenerator *D0gen = new FairAsciiGenerator(asciiFile);
   primGen->AddGenerator(D0gen);
 
   // Urqmd  Generator
-  CbmUrqmdGenerator* urqmdGen = new CbmUrqmdGenerator(urqmdFile);
+  FairUrqmdGenerator* urqmdGen = new FairUrqmdGenerator(urqmdFile);
 
   primGen->AddGenerator(urqmdGen);
 
  // Particle Generator
- //  CbmParticleGenerator* partGen = new CbmParticleGenerator(211, 10, 1., 1.,
+ //  FairParticleGenerator* partGen = new FairParticleGenerator(211, 10, 1., 1.,
  //  2);
  //  primGen->AddGenerator(partGen);
  
  // Ion Generator
- //    CbmIonGenerator *fIongen= new CbmIonGenerator(79, 197,79,1, 0.,0., 25, 0.,0.,-1.);
+ //    FairIonGenerator *fIongen= new FairIonGenerator(79, 197,79,1, 0.,0., 25, 0.,0.,-1.);
  //    primGen->AddGenerator(fIongen);
 
   // smear the beam spot 
@@ -150,7 +150,7 @@
 
  //  fRun->SetStoreTraj(kTRUE);
  // Set cuts for storing the trajectpries
-  /* CbmTrajFilter* trajFilter = CbmTrajFilter::Instance();
+  /* FairTrajFilter* trajFilter = FairTrajFilter::Instance();
      trajFilter->SetStepSizeCut(0.01); // 1 cm
      trajFilter->SetVertexCut(-2000., -2000., 4., 2000., 2000., 100.);
      trajFilter->SetMomentumCutP(10e-3); // p_lab > 10 MeV
@@ -163,9 +163,9 @@
   // Fill the Parameter containers for this run
   //-------------------------------------------
 
-  CbmRuntimeDb *rtdb=fRun->GetRuntimeDb();
+  FairRuntimeDb *rtdb=fRun->GetRuntimeDb();
   Bool_t kParameterMerged=kTRUE;
-  CbmParRootFileIo* output=new CbmParRootFileIo(kParameterMerged);
+  FairParRootFileIo* output=new FairParRootFileIo(kParameterMerged);
   output->open(parFile);
   rtdb->setOutput(output);
   rtdb->saveOutput();

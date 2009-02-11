@@ -8,7 +8,7 @@
 #include "CbmKFTrdHit.h"
 #include "CbmKFTrack.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmStsHit.h"
 #include "CbmTrdHit.h"
 #include "CbmTofHit.h"
@@ -63,7 +63,7 @@ void CbmGlobalTrackFitterKF::Init()
     // Initialisation
 
     // Get pointer to the ROOT I/O manager
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
 	cout << "-E- CbmGlobalTrackFitterKF::Init :"
 	    << " ROOT manager is not instantiated" << endl;

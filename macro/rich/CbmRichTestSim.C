@@ -63,13 +63,13 @@
   gSystem->Load("libL1");
   // ------------------------------------------------------------------------
 
-  CbmRunAna *fRun = new CbmRunAna();
+  FairRunAna *fRun = new FairRunAna();
   fRun->SetInputFile(inFile);
   //fRun->AddFile(inFile2);
   fRun->SetOutputFile(outFile);
 
-  CbmRuntimeDb *rtdb = fRun->GetRuntimeDb();
-  CbmParRootFileIo *io1 = new CbmParRootFileIo();
+  FairRuntimeDb *rtdb = fRun->GetRuntimeDb();
+  FairParRootFileIo *io1 = new FairParRootFileIo();
   io1->open(parFile.Data());
   rtdb->setFirstInput(io1);
 

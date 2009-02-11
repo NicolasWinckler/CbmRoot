@@ -32,7 +32,7 @@
 
 
 #include "CbmDetectorList.h"
-#include "CbmGenericStack.h"
+#include "FairGenericStack.h"
 
 #include "TClonesArray.h"
 #include "TVirtualMCStack.h"
@@ -40,7 +40,7 @@
 #include <map>
 #include <stack>
 
-class CbmStack : public CbmGenericStack
+class CbmStack : public FairGenericStack
 {
 
  public:

@@ -9,7 +9,7 @@
  */
 
 #include "CbmGeoMuch.h"
-#include "CbmGeoNode.h"
+#include "FairGeoNode.h"
 
 CbmGeoMuch::CbmGeoMuch() {
   // Constructor

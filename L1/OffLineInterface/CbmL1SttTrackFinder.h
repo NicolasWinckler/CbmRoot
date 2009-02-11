@@ -2,7 +2,7 @@
 #ifndef CBM_L1_STTTRACKFINDER_H
 #define CBM_L1_STTTRACKFINDER_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmStsKFTrackFitter.h"
 //#include "TLorentzVector.h"
 #include "TH1.h"
@@ -10,7 +10,7 @@
 
 class TClonesArray;
 
-class CbmL1SttTrackFinder :public CbmTask 
+class CbmL1SttTrackFinder :public FairTask 
 {
  public:
 
@@ -20,7 +20,7 @@ class CbmL1SttTrackFinder :public CbmTask
   /** Destructor **/
   ~CbmL1SttTrackFinder();
   
-  /// * CbmTask methods
+  /// * FairTask methods
   
   /** Intialisation at begin of run. To be implemented in the derived class.
    *@value  Success   If not kSUCCESS, task will be set inactive.

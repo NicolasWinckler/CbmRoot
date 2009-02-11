@@ -22,7 +22,7 @@
 #include "TVector3.h"
 
 class CbmZdcPoint; 
-class CbmVolume;
+class FairVolume;
 
 
 
@@ -53,7 +53,7 @@ class CbmZdcv1 : public CbmZdc
    ** collection.
    *@param vol  Pointer to the active volume
    **/
-  virtual Bool_t  ProcessHits(CbmVolume* vol = 0);
+  virtual Bool_t  ProcessHits(FairVolume* vol = 0);
 
 
   /** Virtual method Construct geometry

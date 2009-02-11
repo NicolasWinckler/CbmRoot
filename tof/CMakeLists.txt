@@ -49,7 +49,7 @@ set(TOF_SRCS ${TOF_SRCS} ${TOF_DICTIONARY})
 
 add_library(Tof SHARED ${TOF_SRCS})
 target_link_libraries(Tof ${ROOT_LIBRARIES})
-set_target_properties(Tof PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(Tof PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS Tof DESTINATION ${CMAKE_BINARY_DIR}/lib)

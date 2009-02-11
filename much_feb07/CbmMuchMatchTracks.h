@@ -11,13 +11,13 @@
 #ifndef CBMMUCHMATCHTRACKS_H_
 #define CBMMUCHMATCHTRACKS_H_ 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include <map>
 
 class TClonesArray;
 
-class CbmMuchMatchTracks : public CbmTask
+class CbmMuchMatchTracks : public FairTask
 {
 public:
   CbmMuchMatchTracks();

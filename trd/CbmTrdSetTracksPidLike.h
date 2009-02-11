@@ -22,11 +22,11 @@
 #ifndef CBMTRDSETTRACKSPIDLIKE_H
 #define CBMTRDSETTRACKSPIDLIKE_H 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TClonesArray;
 
-class CbmTrdSetTracksPidLike : public CbmTask
+class CbmTrdSetTracksPidLike : public FairTask
 {
 
  public:
@@ -40,7 +40,7 @@ class CbmTrdSetTracksPidLike : public CbmTask
    *@param name   Name of class
    *@param title  Task title
    **/
-  CbmTrdSetTracksPidLike(const char* name, const char* title = "CbmTask");
+  CbmTrdSetTracksPidLike(const char* name, const char* title = "FairTask");
 
 
   /** Destructor **/

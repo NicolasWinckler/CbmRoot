@@ -10,9 +10,9 @@
 #include "CbmTofPoint.h"
 #include "CbmTofHit.h"
 
-#include "CbmMCApplication.h"
-#include "CbmDetector.h"
-#include "CbmRootManager.h"
+#include "FairMCApplication.h"
+#include "FairDetector.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "TRandom.h"
@@ -43,7 +43,7 @@ CbmTofHitProducer::CbmTofHitProducer()
 // ---- Constructor ----------------------------------------------------
 
 CbmTofHitProducer::CbmTofHitProducer(const char *name, Int_t verbose)
-:CbmTask(name,verbose)
+:FairTask(name,verbose)
 {
     fVerbose =  verbose;
     fSigmaT  =  0.;
@@ -58,7 +58,7 @@ CbmTofHitProducer::CbmTofHitProducer(const char *name, Int_t verbose)
 
 CbmTofHitProducer::~CbmTofHitProducer()
 {
-//	CbmRootManager *fManager =CbmRootManager::Instance();
+//	FairRootManager *fManager =FairRootManager::Instance();
 //	fManager->Write();
 }
 
@@ -67,7 +67,7 @@ CbmTofHitProducer::~CbmTofHitProducer()
 
 InitStatus CbmTofHitProducer::Init()
 {
-  CbmRootManager *fManager = CbmRootManager::Instance();
+  FairRootManager *fManager = FairRootManager::Instance();
 
     fTofPoints  = (TClonesArray *) fManager->ActivateBranch("TOFPoint");
     fMCTracks   = (TClonesArray *) fManager->ActivateBranch("MCTrack");

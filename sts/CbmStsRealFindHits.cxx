@@ -15,9 +15,9 @@
 #include "CbmStsSector.h"
 #include "CbmStsStation.h"
 
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -37,7 +37,7 @@ using std::set;
 using std::map;
 
 // -----   Default constructor   ------------------------------------------
-CbmStsRealFindHits::CbmStsRealFindHits() : CbmTask("STS Hit Finder", 1) {
+CbmStsRealFindHits::CbmStsRealFindHits() : FairTask("STS Hit Finder", 1) {
   fGeoPar  = NULL;
   fDigiPar = NULL;
   fClusters   = NULL;
@@ -51,7 +51,7 @@ CbmStsRealFindHits::CbmStsRealFindHits() : CbmTask("STS Hit Finder", 1) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsRealFindHits::CbmStsRealFindHits(Int_t iVerbose) 
-  : CbmTask("STSRealFindHits", iVerbose) {
+  : FairTask("STSRealFindHits", iVerbose) {
   fGeoPar  = NULL;
   fDigiPar = NULL;
   fClusters   = NULL;
@@ -65,7 +65,7 @@ CbmStsRealFindHits::CbmStsRealFindHits(Int_t iVerbose)
 
 // -----   Constructor with name   -----------------------------------------
 CbmStsRealFindHits::CbmStsRealFindHits(const char* name, Int_t iVerbose) 
-  : CbmTask(name, iVerbose) {
+  : FairTask(name, iVerbose) {
   fGeoPar  = NULL;
   fDigiPar = NULL;
   fClusters   = NULL;
@@ -196,10 +196,10 @@ void CbmStsRealFindHits::Exec(Option_t* opt) {
 void CbmStsRealFindHits::SetParContainers() {
 
   // Get run and runtime database
-  CbmRunAna* run = CbmRunAna::Instance();
+  FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) Fatal("SetParContainers", "No analysis run");
 
-  CbmRuntimeDb* db = run->GetRuntimeDb();
+  FairRuntimeDb* db = run->GetRuntimeDb();
   if ( ! db ) Fatal("SetParContainers", "No runtime database");
 
   // Get STS geometry parameter container
@@ -218,8 +218,8 @@ void CbmStsRealFindHits::SetParContainers() {
 InitStatus CbmStsRealFindHits::Init() {
 
   // Get input array
-  CbmRootManager* ioman = CbmRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No CbmRootManager");
+  FairRootManager* ioman = FairRootManager::Instance();
+  if ( ! ioman ) Fatal("Init", "No FairRootManager");
   fClusters = (TClonesArray*) ioman->GetObject("STSCluster");
 
   // Register output array

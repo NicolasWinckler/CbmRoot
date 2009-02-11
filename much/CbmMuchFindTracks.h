@@ -20,12 +20,12 @@
 #define CbmMuchFindTracks_H 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class CbmMuchTrackFinder;
 class TClonesArray;
 
-class CbmMuchFindTracks : public CbmTask
+class CbmMuchFindTracks : public FairTask
 {
 
  public:
@@ -41,7 +41,7 @@ class CbmMuchFindTracks : public CbmTask
    *@param finder Pointer to STS track finder concrete class
    **/
   CbmMuchFindTracks( const char* name, 
-                     const char* title = "CbmTask", 
+                     const char* title = "FairTask", 
                      CbmMuchTrackFinder* finder = NULL);
 
 

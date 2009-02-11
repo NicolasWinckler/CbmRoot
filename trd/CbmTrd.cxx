@@ -5,14 +5,14 @@
 #include "CbmGeoTrd.h"
 
 #include "CbmDetectorList.h"
-#include "CbmGeoInterface.h"
-#include "CbmGeoLoader.h"
-#include "CbmGeoNode.h"
-#include "CbmRootManager.h"
+#include "FairGeoInterface.h"
+#include "FairGeoLoader.h"
+#include "FairGeoNode.h"
+#include "FairRootManager.h"
 #include "CbmStack.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRun.h"
-#include "CbmVolume.h"
+#include "FairRuntimeDb.h"
+#include "FairRun.h"
+#include "FairVolume.h"
 
 #include "TObjArray.h"
 #include "TClonesArray.h"
@@ -25,7 +25,7 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmTrd::CbmTrd() : CbmDetector("TRD", kTRUE, kTRD) {
+CbmTrd::CbmTrd() : FairDetector("TRD", kTRUE, kTRD) {
   fTrdCollection = new TClonesArray("CbmTrdPoint");
   fPosIndex = 0;
 
@@ -37,7 +37,7 @@ CbmTrd::CbmTrd() : CbmDetector("TRD", kTRUE, kTRD) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmTrd::CbmTrd(const char* name, Bool_t active)
-  : CbmDetector(name, active, kTRD) {
+  : FairDetector(name, active, kTRD) {
   fTrdCollection = new TClonesArray("CbmTrdPoint");
   fPosIndex = 0;
 
@@ -60,13 +60,13 @@ CbmTrd::~CbmTrd() {
 // -------------------------------------------------------------------------
 void CbmTrd::Initialize()
 {
-	CbmDetector::Initialize();
- 	CbmRuntimeDb *rtdb= CbmRun::Instance()->GetRuntimeDb();
+	FairDetector::Initialize();
+ 	FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
 	CbmGeoTrdPar* par=(CbmGeoTrdPar*)(rtdb->getContainer("CbmGeoTrdPar"));
 	TObjArray *SensNodes = par->GetGeoSensitiveNodes();
 
-        CbmGeoNode *fm1= (CbmGeoNode *) SensNodes->FindObject("trd1gas#1");
-        CbmGeoNode *fm2= (CbmGeoNode *) SensNodes->FindObject("trd1mod1gas");
+        FairGeoNode *fm1= (FairGeoNode *) SensNodes->FindObject("trd1gas#1");
+        FairGeoNode *fm2= (FairGeoNode *) SensNodes->FindObject("trd1mod1gas");
                                                                 
         if (fm1) {
           fSimple = 1;
@@ -84,21 +84,21 @@ void CbmTrd::Initialize()
         if ( 1 == fSimple ) {
 
   	  Int_t nModes = SensNodes->GetEntriesFast();
-	  CbmGeoNode* node = NULL;
+	  FairGeoNode* node = NULL;
    	  Int_t mcID =0;
 	  TString name;
 
 	  for(Int_t i=0; i<nModes; i++){
-  	    node = (CbmGeoNode*) SensNodes->At(i);
+  	    node = (FairGeoNode*) SensNodes->At(i);
 	    mcID = node->getMCid();
 	    name = node->getName();
 
-	    CbmGeoVolume *aVol1 = dynamic_cast<CbmGeoVolume*> (SensNodes->FindObject("trd1gas#1") );
-	    CbmGeoVolume *aVol2 = dynamic_cast<CbmGeoVolume*> (SensNodes->FindObject("trd2gas#1") );
-	    CbmGeoVolume *aVol3 = dynamic_cast<CbmGeoVolume*> (SensNodes->FindObject("trd3gas#1") );
-	    CbmGeoVolume *aVol4 = dynamic_cast<CbmGeoVolume*> (SensNodes->FindObject("trd4gas#1") );
-	    CbmGeoVolume *aVol5 = dynamic_cast<CbmGeoVolume*> (SensNodes->FindObject("trd5gas#1") );
-	    CbmGeoVolume *aVol6 = dynamic_cast<CbmGeoVolume*> (SensNodes->FindObject("trd6gas#1") );
+	    FairGeoVolume *aVol1 = dynamic_cast<FairGeoVolume*> (SensNodes->FindObject("trd1gas#1") );
+	    FairGeoVolume *aVol2 = dynamic_cast<FairGeoVolume*> (SensNodes->FindObject("trd2gas#1") );
+	    FairGeoVolume *aVol3 = dynamic_cast<FairGeoVolume*> (SensNodes->FindObject("trd3gas#1") );
+	    FairGeoVolume *aVol4 = dynamic_cast<FairGeoVolume*> (SensNodes->FindObject("trd4gas#1") );
+	    FairGeoVolume *aVol5 = dynamic_cast<FairGeoVolume*> (SensNodes->FindObject("trd5gas#1") );
+	    FairGeoVolume *aVol6 = dynamic_cast<FairGeoVolume*> (SensNodes->FindObject("trd6gas#1") );
 
 	    if(aVol1!=0) fVolid1=aVol1->getMCid();  // store volume id of first station in fVolid1 for later comparison
 	    if(aVol2!=0) fVolid2=aVol2->getMCid();
@@ -156,7 +156,7 @@ void CbmTrd::Initialize()
 //*************************************************************************
 
 void CbmTrd::SetSpecialPhysicsCuts(){
-    CbmRun* fRun = CbmRun::Instance();
+    FairRun* fRun = FairRun::Instance();
     if (strcmp(fRun->GetName(),"TGeant3") == 0) {
    	  Int_t mat = gGeoManager->GetMaterialIndex("TRDgas");
 	   gMC->Gstpar(mat+1,"STRA",1.0);
@@ -188,7 +188,7 @@ void CbmTrd::SetSpecialPhysicsCuts(){
 }
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t  CbmTrd::ProcessHits(CbmVolume* vol)
+Bool_t  CbmTrd::ProcessHits(FairVolume* vol)
 {
 
 
@@ -325,7 +325,7 @@ void CbmTrd::EndOfEvent() {
 
 // -----   Public method Register   ----------------------------------------
 void CbmTrd::Register() {
-  CbmRootManager::Instance()->Register("TRDPoint", "Trd", fTrdCollection, kTRUE);
+  FairRootManager::Instance()->Register("TRDPoint", "Trd", fTrdCollection, kTRUE);
 }
 // -------------------------------------------------------------------------
 
@@ -384,8 +384,8 @@ void CbmTrd::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset){
 // -----   Public method ConstructGeometry   -------------------------------
 void CbmTrd::ConstructGeometry() {
 
-  CbmGeoLoader*    geoLoad = CbmGeoLoader::Instance();
-  CbmGeoInterface* geoFace = geoLoad->getGeoInterface();
+  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
+  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
   CbmGeoTrd*       trdGeo  = new CbmGeoTrd();
   trdGeo->setGeomFile(GetGeometryFileName());
   geoFace->addGeoModule(trdGeo);
@@ -394,18 +394,18 @@ void CbmTrd::ConstructGeometry() {
   if (rc) trdGeo->create(geoLoad->getGeoBuilder());
   TList* volList = trdGeo->getListOfVolumes();
  // store TRD geo parameter
-  CbmRun *fRun = CbmRun::Instance();
-  CbmRuntimeDb *rtdb= CbmRun::Instance()->GetRuntimeDb();
+  FairRun *fRun = FairRun::Instance();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
   CbmGeoTrdPar* par=(CbmGeoTrdPar*)(rtdb->getContainer("CbmGeoTrdPar"));
   TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
   TObjArray *fPassNodes = par->GetGeoPassiveNodes();
 
   TListIter iter(volList);
-  CbmGeoNode* node   = NULL;
-  CbmGeoVolume *aVol=NULL;
+  FairGeoNode* node   = NULL;
+  FairGeoVolume *aVol=NULL;
 
-  while( (node = (CbmGeoNode*)iter.Next()) ) {
-      aVol = dynamic_cast<CbmGeoVolume*> ( node );
+  while( (node = (FairGeoNode*)iter.Next()) ) {
+      aVol = dynamic_cast<FairGeoVolume*> ( node );
        if ( node->isSensitive()  ) {
            fSensNodes->AddLast( aVol );
        }else{

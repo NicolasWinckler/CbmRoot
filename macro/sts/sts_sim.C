@@ -79,10 +79,10 @@ void sts_sim(Int_t nEvents = 1)
    
  
   // -----   Create simulation run   ----------------------------------------
-  CbmRunSim* run = new CbmRunSim();
+  FairRunSim* run = new FairRunSim();
   run->SetName("TGeant3");              // Transport engine
   run->SetOutputFile(outFile);          // Output file
-  CbmRuntimeDb* rtdb = run->GetRuntimeDb();
+  FairRuntimeDb* rtdb = run->GetRuntimeDb();
   // ------------------------------------------------------------------------
   
   
@@ -94,27 +94,27 @@ void sts_sim(Int_t nEvents = 1)
     
   
   // -----   Create geometry   ----------------------------------------------
-  CbmModule* cave= new CbmCave("CAVE");
+  FairModule* cave= new CbmCave("CAVE");
   cave->SetGeometryFileName(caveGeom);
   run->AddModule(cave);
 
-  CbmModule* pipe= new CbmPipe("PIPE");
+  FairModule* pipe= new CbmPipe("PIPE");
   pipe->SetGeometryFileName(pipeGeom);
   run->AddModule(pipe);
   
-  CbmModule* target= new CbmTarget("Target");
+  FairModule* target= new CbmTarget("Target");
   target->SetGeometryFileName(targetGeom);
   run->AddModule(target);
 
-  CbmModule* magnet= new CbmMagnet("MAGNET");
+  FairModule* magnet= new CbmMagnet("MAGNET");
   magnet->SetGeometryFileName(magnetGeom);
   run->AddModule(magnet);
   
-  CbmDetector* mvd= new CbmMvd("MVD", kTRUE);
+  FairDetector* mvd= new CbmMvd("MVD", kTRUE);
   mvd->SetGeometryFileName(mvdGeom); 
   run->AddModule(mvd);
 
-  CbmDetector* sts= new CbmSts("STS", kTRUE);
+  FairDetector* sts= new CbmSts("STS", kTRUE);
   sts->SetGeometryFileName(stsGeom); 
   run->AddModule(sts);
   // ------------------------------------------------------------------------
@@ -138,8 +138,8 @@ void sts_sim(Int_t nEvents = 1)
   
   
   // -----   Create PrimaryGenerator   --------------------------------------
-  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
-  CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+  FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
   primGen->AddGenerator(urqmdGen);
   run->SetGenerator(primGen);
   // ------------------------------------------------------------------------
@@ -158,7 +158,7 @@ void sts_sim(Int_t nEvents = 1)
   fieldPar->setChanged();
   fieldPar->setInputVersion(run->GetRunId(),1);
   Bool_t kParameterMerged = kTRUE;
-  CbmParRootFileIo* parOut = new CbmParRootFileIo(kParameterMerged);
+  FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
   parOut->open(parFile.Data());
   rtdb->setOutput(parOut);
   rtdb->saveOutput();

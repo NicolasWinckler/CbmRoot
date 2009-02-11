@@ -7,7 +7,7 @@
 #ifndef CBMECALRECOSLOW_H
 #define CBMECALRECOSLOW_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "TString.h"
 #include "TFitterMinuit.h"
 
@@ -88,7 +88,7 @@ private:
   Int_t fFixClusterEnergy;
 };
 
-class CbmEcalRecoSlow : public CbmTask
+class CbmEcalRecoSlow : public FairTask
 {
 public:
   /** Default constructor. Requirement of ROOT system **/

@@ -77,10 +77,10 @@
  
  
   // -----   Create simulation run   ----------------------------------------
-  CbmRunSim* fRun = new CbmRunSim();
+  FairRunSim* fRun = new FairRunSim();
   fRun->SetName("TGeant3");              // Transport engine
   fRun->SetOutputFile(outFile);          // Output file
-  CbmRuntimeDb* rtdb = fRun->GetRuntimeDb();
+  FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   // ------------------------------------------------------------------------
 
 
@@ -90,23 +90,23 @@
 
 
   // -----   Create geometry   ----------------------------------------------
-  CbmModule* cave= new CbmCave("CAVE");
+  FairModule* cave= new CbmCave("CAVE");
   cave->SetGeometryFileName(caveGeom);
   fRun->AddModule(cave);
 
-  CbmModule* pipe= new CbmPipe("PIPE");
+  FairModule* pipe= new CbmPipe("PIPE");
   pipe->SetGeometryFileName(pipeGeom);
   fRun->AddModule(pipe);
   
-  CbmModule* target= new CbmTarget("Target");
+  FairModule* target= new CbmTarget("Target");
   target->SetGeometryFileName(targetGeom);
   fRun->AddModule(target);		
 
-  CbmModule* magnet= new CbmMagnet("MAGNET");
+  FairModule* magnet= new CbmMagnet("MAGNET");
   magnet->SetGeometryFileName(magnetGeom);
   fRun->AddModule(magnet);
   
-  CbmDetector* mvd= new CbmMvd("MVD", kTRUE);
+  FairDetector* mvd= new CbmMvd("MVD", kTRUE);
   mvd->SetGeometryFileName(mvdGeom); 
   fRun->AddModule(mvd);
   // ------------------------------------------------------------------------
@@ -132,8 +132,8 @@
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
-  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
-  CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+  FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
   primGen->AddGenerator(urqmdGen);
   fRun->SetGenerator(primGen);       
   // ------------------------------------------------------------------------
@@ -152,7 +152,7 @@
   fieldPar->setChanged();
   fieldPar->setInputVersion(fRun->GetRunId(),1);
   Bool_t kParameterMerged = kTRUE;
-  CbmParRootFileIo* parOut = new CbmParRootFileIo(kParameterMerged);
+  FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
   parOut->open(parFile.Data());
   rtdb->setOutput(parOut);
   rtdb->saveOutput();

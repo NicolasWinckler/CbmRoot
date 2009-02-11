@@ -26,7 +26,7 @@
  * hardcoded parameters removed, 3 types of photodetector efficiencies implemented, parameter setting via macro CbmRichHitsProd.C
  *
  * Revision 1.5  2005/12/19 19:04:31  friese
- * New CbmTask design
+ * New FairTask design
  *
  * Revision 1.4  2005/12/08 15:11:22  turany
  * change GetRegistered, ActivateBranch and CheckActivatedBranch
@@ -49,16 +49,16 @@
 #include "CbmRichHit.h"
 #include "CbmGeoRichPar.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmBaseParSet.h"
-#include "CbmGeoVolume.h"
-#include "CbmGeoTransform.h"
-#include "CbmGeoVector.h"
-#include "CbmGeoMedium.h"
-#include "CbmGeoNode.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairBaseParSet.h"
+#include "FairGeoVolume.h"
+#include "FairGeoTransform.h"
+#include "FairGeoVector.h"
+#include "FairGeoMedium.h"
+#include "FairGeoNode.h"
 
 #include "TVector3.h"
 #include "TRandom.h"
@@ -72,7 +72,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmRichHitProducer::CbmRichHitProducer() :CbmTask("RichHitProducer")
+CbmRichHitProducer::CbmRichHitProducer() :FairTask("RichHitProducer")
 {
 SetDefaultParameters();
 }
@@ -81,7 +81,7 @@ SetDefaultParameters();
 // -----   Standard constructor   -------------------------------------------
 CbmRichHitProducer::CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_t det_type,
                                        Int_t noise)
-  :CbmTask("RichHitProducer")
+  :FairTask("RichHitProducer")
 {
   fPhotomulRadius = pmt_rad;
   fPhotomulDist = pmt_dist;
@@ -101,7 +101,7 @@ CbmRichHitProducer::CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_
 // -----   Standard constructor with verbosity level  -------------------------------------------
 CbmRichHitProducer::CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_t det_type,
                                        Int_t noise, Int_t verbose)
-  :CbmTask("RichHitProducer")
+  :FairTask("RichHitProducer")
 {
   fPhotomulRadius = pmt_rad;
   fPhotomulDist = pmt_dist;
@@ -122,14 +122,14 @@ CbmRichHitProducer::CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_
 // -------------------------------------------------------------------------
 /** Constructor with name and title */
 CbmRichHitProducer::CbmRichHitProducer(const char *name, const char *title)
-  : CbmTask(name) {}
+  : FairTask(name) {}
 // -------------------------------------------------------------------------
 
 
 // -----   Destructor   ----------------------------------------------------
 CbmRichHitProducer::~CbmRichHitProducer()
 {
-  CbmRootManager *fManager =CbmRootManager::Instance();
+  FairRootManager *fManager =FairRootManager::Instance();
   fManager->Write();
 }
 // -------------------------------------------------------------------------
@@ -151,10 +151,10 @@ CbmRichHitProducer::~CbmRichHitProducer()
 void CbmRichHitProducer::SetParContainers()
 {
   // Get Base Container
-  CbmRunAna* ana = CbmRunAna::Instance();
-  CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+  FairRunAna* ana = FairRunAna::Instance();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   fPar=(CbmGeoRichPar*)(rtdb->getContainer("CbmGeoRichPar"));
-  // fPar1=(CbmBaseParSet*)(rtdb->getContainer("CbmBaseParSet"));
+  // fPar1=(FairBaseParSet*)(rtdb->getContainer("FairBaseParSet"));
   // fPar->print();
 //  fPar->setStatic();    // setting the parameters on static mode: <explanation>
 }
@@ -163,21 +163,21 @@ void CbmRichHitProducer::SetParContainers()
 
 InitStatus CbmRichHitProducer::Init()
 {
-  CbmRootManager* fManager = CbmRootManager::Instance();
+  FairRootManager* fManager = FairRootManager::Instance();
 
   fSensNodes = fPar->GetGeoSensitiveNodes();
   fPassNodes = fPar->GetGeoPassiveNodes();
   //fSensNodes->ls();
 
   // get detector position:
-  CbmGeoNode *det= dynamic_cast<CbmGeoNode*> (fSensNodes->FindObject("rich1d#1"));
+  FairGeoNode *det= dynamic_cast<FairGeoNode*> (fSensNodes->FindObject("rich1d#1"));
   if (! det) cout << " -I no RICH Geo Node  found !!!!!  " << endl;
   //det->Dump();
   //det->print();
-  CbmGeoTransform* detTr=det->getLabTransform();  // detector position in labsystem
-  CbmGeoVector detPosLab=detTr->getTranslation(); // ... in cm
-  CbmGeoTransform detCen=det->getCenterPosition();  // center in Detector system
-  CbmGeoVector detPosCen=detCen.getTranslation();
+  FairGeoTransform* detTr=det->getLabTransform();  // detector position in labsystem
+  FairGeoVector detPosLab=detTr->getTranslation(); // ... in cm
+  FairGeoTransform detCen=det->getCenterPosition();  // center in Detector system
+  FairGeoVector detPosCen=detCen.getTranslation();
   fDetZ = detPosLab.Z() + detPosCen.Z();   /** z coordinate of photodetector (Labsystem, cm) */
   fDetY = detPosLab.Y() + detPosCen.Y();   /** y coordinate of photodetector (Labsystem, cm) */
   fDetX = detPosLab.X() + detPosCen.X();   /** x coordinate of photodetector (Labsystem, cm) */
@@ -186,7 +186,7 @@ InitStatus CbmRichHitProducer::Init()
   fDetWidthX = fdetA->At(0);
   fDetWidthY = fdetA->At(1);
   for(Int_t i=0;i<fdetA->GetSize();i++) cout << "Array detector " << fdetA->At(i)<< endl;
-  CbmGeoRotation fdetR=detTr->getRotMatrix();
+  FairGeoRotation fdetR=detTr->getRotMatrix();
   // detector might be rotated by theta around x-axis:
   if (fVerbose) {
      cout << "Rotation matrix of photodetector " << endl;
@@ -214,9 +214,9 @@ InitStatus CbmRichHitProducer::Init()
   << " degrees" << endl;
   
   // get refractive index of gas
-  CbmGeoNode *gas= dynamic_cast<CbmGeoNode*> (fPassNodes->FindObject("rich1gas1"));
+  FairGeoNode *gas= dynamic_cast<FairGeoNode*> (fPassNodes->FindObject("rich1gas1"));
   if (! gas) cout << " -I no RICH Geo Node  found !!!!!  " << endl;
-  CbmGeoMedium* med = gas->getMedium();
+  FairGeoMedium* med = gas->getMedium();
 //  med->Dump();
   Int_t npckov = med->getNpckov();
   Double_t* cerpar;
@@ -266,7 +266,7 @@ InitStatus CbmRichHitProducer::Init()
   //------------- example for getting more parameters from the data base: -------------------
 /*
   // 1) get and print medium
-     CbmGeoMedium* med = det->getMedium();
+     FairGeoMedium* med = det->getMedium();
      med->Dump();
 
   // 2) retrieve relevant parameter
@@ -282,9 +282,9 @@ InitStatus CbmRichHitProducer::Init()
      }
 
   // 3) Lab Transform
-     CbmGeoTransform* transf =  det->getLabTransform();
-     CbmGeoRotation rot = transf->getRotMatrix();
-     CbmGeoVector trans = transf->getTransVector();
+     FairGeoTransform* transf =  det->getLabTransform();
+     FairGeoRotation rot = transf->getRotMatrix();
+     FairGeoVector trans = transf->getTransVector();
 
      Double_t rotp[9];
      cout << " Lab rotation : " << endl;

@@ -23,9 +23,9 @@
 #ifndef CBMECALHITFASTMC_H
 #define CBMECALHITFASTMC_H
 
-#include "CbmHit.h"
+#include "FairHit.h"
 
-class CbmEcalHitFastMC : public CbmHit {
+class CbmEcalHitFastMC : public FairHit {
 
 public:    
   

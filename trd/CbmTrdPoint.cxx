@@ -11,7 +11,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmTrdPoint::CbmTrdPoint() : CbmMCPoint() { 
+CbmTrdPoint::CbmTrdPoint() : FairMCPoint() { 
   fX_out      = fY_out  = fZ_out  = 0.;
   fPx_out     = fPy_out = fPz_out = 0.;
 }
@@ -23,7 +23,7 @@ CbmTrdPoint::CbmTrdPoint() : CbmMCPoint() {
 CbmTrdPoint::CbmTrdPoint(Int_t trackID, Int_t detID, TVector3 posIn, 
 			 TVector3 momIn, TVector3 posOut,  TVector3 momOut,
                          Double_t tof, Double_t length, Double_t eLoss)
-  : CbmMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) 
+  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) 
   { 
         fX_out  = posOut.X();
         fY_out  = posOut.Y();

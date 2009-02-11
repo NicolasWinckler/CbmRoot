@@ -13,7 +13,7 @@
 #ifndef CBMMUCHDIGIPAR_H
 #define CBMMUCHDIGIPAR_H
 
-#include "CbmParSet.h"
+#include "FairParSet.h"
 
 #include "TObjArray.h"
 
@@ -22,10 +22,10 @@
 
 
 class TString;
-class CbmParIo;
+class FairParIo;
 class CbmMuchStationDigiPar;
 
-class CbmMuchDigiPar : public CbmParSet 
+class CbmMuchDigiPar : public FairParSet 
 {
 
  public:
@@ -41,11 +41,11 @@ class CbmMuchDigiPar : public CbmParSet
 
 
   /** Initialisation from input device**/
-  virtual Bool_t init(CbmParIo* input);
+  virtual Bool_t init(FairParIo* input);
 
 
   /** Output to file **/
-  virtual Int_t write(CbmParIo* output);
+  virtual Int_t write(FairParIo* output);
 
 
   /** Reset all parameters **/

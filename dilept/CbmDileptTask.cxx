@@ -10,10 +10,10 @@
 #include "CbmMCTrack.h"
 #include "CbmStsPoint.h"
 #include "CbmRichPoint.h"
-#include "CbmRootManager.h"
-#include "CbmPrimaryGenerator.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairPrimaryGenerator.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 #include "TClonesArray.h"
 #include "TObjArray.h"
@@ -43,7 +43,7 @@ TString fNames_neighb[] = {"omega_neighb", "eta_neighb", "gamma_neighb", "pi0_ne
 
 
 CbmDiLeptTask::CbmDiLeptTask()
-  : CbmTask("DiLeptTask")
+  : FairTask("DiLeptTask")
 {
   // Set default values
   fArrayMCTrack   = NULL;
@@ -67,7 +67,7 @@ CbmDiLeptTask::CbmDiLeptTask()
 
 
 CbmDiLeptTask::CbmDiLeptTask(const char *name)
-  : CbmTask(name)
+  : FairTask(name)
 {
 
   fArrayMCTrack   = NULL;
@@ -402,9 +402,9 @@ void CbmDiLeptTask::CreateHistogramms()
 void CbmDiLeptTask::SetParContainers()
 {
   // Get Base Container
-  CbmRunAna *ana = CbmRunAna::Instance();
-  CbmRuntimeDb *rtdb = ana->GetRuntimeDb();
-  fBasePar = (CbmBaseParSet*)(rtdb->getContainer("CbmBaseParSet"));
+  FairRunAna *ana = FairRunAna::Instance();
+  FairRuntimeDb *rtdb = ana->GetRuntimeDb();
+  fBasePar = (FairBaseParSet*)(rtdb->getContainer("FairBaseParSet"));
 }
 // ============================================================================
 
@@ -419,7 +419,7 @@ InitStatus CbmDiLeptTask::Init()
   fPrimGen->GetListOfGenerators()->ls();
 
   // Get pointers to root manager
-  fRootManager = CbmRootManager::Instance();
+  fRootManager = FairRootManager::Instance();
 
   // Get MCTrack
   fArrayMCTrack = (TClonesArray*) fRootManager->GetObject("MCTrack");

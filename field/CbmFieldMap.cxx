@@ -53,7 +53,7 @@ CbmFieldMap::CbmFieldMap() {
 
 // -------------   Standard constructor   ---------------------------------
 CbmFieldMap::CbmFieldMap(const char* mapName, const char* fileType)
-  : CbmField(mapName) {
+  : FairField(mapName) {
   fPosX  = fPosY  = fPosZ  = 0.;
   fXmin  = fYmin  = fZmin  = 0.;
   fXmax  = fYmax  = fZmax  = 0.;

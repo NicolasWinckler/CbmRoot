@@ -1,7 +1,7 @@
 #ifndef CBML1RICHRINGQA_H
 #define CBML1RICHRINGQA_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -10,7 +10,7 @@
 #include <vector>
 #include <list>
 
-class CbmL1RichRingQa : public CbmTask{
+class CbmL1RichRingQa : public FairTask{
 
   struct MCRing
   {
@@ -35,7 +35,7 @@ class CbmL1RichRingQa : public CbmTask{
   };
 
   TClonesArray* fRingArray;        // Array of CbmRichRings
-  TClonesArray* fMCPointArray;       // Array of CbmMCPoints
+  TClonesArray* fMCPointArray;       // Array of FairMCPoints
   TClonesArray* fMCTrackArray;       // Array of CbmMCTracks
   TClonesArray* fHitArray;         // Array of CbmRichHits
 

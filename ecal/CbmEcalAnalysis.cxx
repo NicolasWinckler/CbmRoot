@@ -5,7 +5,7 @@
 #include "CbmEcalHitFastMC.h"
 #include "CbmEcalRecParticle.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "TParticle.h"
@@ -19,13 +19,13 @@ using std::cout;
 using std::endl;
 
 //------------------------------------------------------------------------------
-CbmEcalAnalysis::CbmEcalAnalysis() :CbmTask()
+CbmEcalAnalysis::CbmEcalAnalysis() :FairTask()
 {
 }
 
 //------------------------------------------------------------------------------
 CbmEcalAnalysis::CbmEcalAnalysis(const char *name, const char *title)
-  :CbmTask(name)
+  :FairTask(name)
 {
   SetTitle(title);
   fEvent = 0;
@@ -123,7 +123,7 @@ InitStatus CbmEcalAnalysis::Init()
 {
   // Activate branches with ECAL objects
 
-  CbmRootManager *manager= CbmRootManager::Instance();
+  FairRootManager *manager= FairRootManager::Instance();
   
   // all tracks
   fListStack        = (TClonesArray*)manager->ActivateBranch("MCTrack");

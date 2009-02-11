@@ -12,9 +12,9 @@
 
 #include "CbmGeoEcalPar.h"
 
-#include "CbmRuntimeDb.h"
-#include "CbmParRootFileIo.h"
-#include "CbmParAsciiFileIo.h"
+#include "FairRuntimeDb.h"
+#include "FairParRootFileIo.h"
+#include "FairParAsciiFileIo.h"
 
 #include <iostream>
 #include <iomanip>
@@ -28,14 +28,14 @@ CbmEcalContFact::CbmEcalContFact() {
   fName="CbmEcalContFact";
   fTitle="Factory for parameter containers in libEcal";
   setAllContainers();
-  CbmRuntimeDb::instance()->addContFactory(this);
+  FairRuntimeDb::instance()->addContFactory(this);
 }
 
 void CbmEcalContFact::setAllContainers() {
   /** Creates the Container objects with all accepted contexts and adds them to
    *  the list of containers for the STS library.*/
 
-    CbmContainer* p2= new CbmContainer("CbmGeoEcalPar",
+    FairContainer* p2= new FairContainer("CbmGeoEcalPar",
                                           "Ecal Geometry Parameters",
                                           "TestDefaultContext");
     p2->addContext("TestNonDefaultContext");
@@ -43,19 +43,19 @@ void CbmEcalContFact::setAllContainers() {
     containers->Add(p2);
 }
 
-CbmParSet* CbmEcalContFact::createContainer(CbmContainer* c) {
+FairParSet* CbmEcalContFact::createContainer(FairContainer* c) {
   /** Calls the constructor of the corresponding parameter container.
    * For an actual context, which is not an empty string and not the default context
    * of this container, the name is concatinated with the context. */
   const char* name=c->GetName();
-  CbmParSet* p=0;
+  FairParSet* p=0;
   if (strcmp(name,"CbmGeoEcalPar")==0) {
     p=new CbmGeoEcalPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
   }
   return p;
 }
 
-void  CbmEcalContFact::activateParIo(CbmParIo* io) {
+void  CbmEcalContFact::activateParIo(FairParIo* io) {
   // activates the input/output class for the parameters
   // needed by the Ecal
 return;

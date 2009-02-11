@@ -37,7 +37,7 @@ class CbmStsKFTrackFitter : public CbmStsTrackFitter{
    * @param z        new z-position
    * @param e_track  (return value) extrapolated track parameters
    */
-  void Extrapolate( CbmStsTrack* track, Double_t z, CbmTrackParam *e_track );
+  void Extrapolate( CbmStsTrack* track, Double_t z, FairTrackParam *e_track );
 
   /** Extrapolate track param. to any Z position 
    *
@@ -45,7 +45,7 @@ class CbmStsKFTrackFitter : public CbmStsTrackFitter{
    * @param z        new z-position
    * @param e_track  (return value) extrapolated track parameters
    */
-  void Extrapolate( CbmTrackParam* trackPar, Double_t z, CbmTrackParam *e_track );
+  void Extrapolate( FairTrackParam* trackPar, Double_t z, FairTrackParam *e_track );
 
   /** Get normalized (in sigma's) impact parameter form vertex vtx
    *  if no vtx given, return deviation from primary vertex
@@ -59,7 +59,7 @@ class CbmStsKFTrackFitter : public CbmStsTrackFitter{
    * @param v_track  (return value) fitted track parameters
    * @param retrun   sqrt(Chi^2/NDF)
    */
-  Double_t FitToVertex( CbmStsTrack* track, CbmVertex *vtx, CbmTrackParam *v_track );
+  Double_t FitToVertex( CbmStsTrack* track, CbmVertex *vtx, FairTrackParam *v_track );
 
  private:
 

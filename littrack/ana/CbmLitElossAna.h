@@ -3,7 +3,7 @@
 
 #include "CbmLitMaterialInfo.h"
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class CbmLitMaterialEffectsImp;
 class CbmLitTrackParam;
@@ -13,7 +13,7 @@ class TH1F;
 class TH2F;
 class TClonesArray;
 
-class CbmLitElossAna : public CbmTask
+class CbmLitElossAna : public FairTask
 {
 public:
 	CbmLitElossAna();

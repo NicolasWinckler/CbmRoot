@@ -4,7 +4,7 @@
 // -------------------------------------------------------------------------
 #include "CbmDirectPhotonGenerator.h"
 
-#include "CbmPrimaryGenerator.h"
+#include "FairPrimaryGenerator.h"
 
 #include "TChain.h"
 
@@ -49,7 +49,7 @@ CbmDirectPhotonGenerator::~CbmDirectPhotonGenerator()
 
 
 // -----   Public method ReadEvent   --------------------------------------
-Bool_t CbmDirectPhotonGenerator::ReadEvent(CbmPrimaryGenerator* primGen)
+Bool_t CbmDirectPhotonGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 {
   if (fNEvent==-2||fInput==NULL)
     Fatal("ReadEvent", "No input chain.");

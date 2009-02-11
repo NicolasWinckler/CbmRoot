@@ -22,7 +22,7 @@
 
 #include <set>
 #include "TStopwatch.h"
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "TRandom3.h"
 
 using std::set;
@@ -37,7 +37,7 @@ class CbmStsStation;
 class CbmStsPoint;
 
 
-class CbmStsRealDigitize : public CbmTask
+class CbmStsRealDigitize : public FairTask
 {
 
  public:

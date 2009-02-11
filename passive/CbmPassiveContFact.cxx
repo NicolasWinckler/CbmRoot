@@ -13,7 +13,7 @@
 
 #include "CbmGeoPassivePar.h"
 
-#include "CbmRuntimeDb.h"
+#include "FairRuntimeDb.h"
 
 #include <iostream>
 #include <iomanip>
@@ -27,14 +27,14 @@ CbmPassiveContFact::CbmPassiveContFact() {
   fName="CbmPassiveContFact";
   fTitle="Factory for parameter containers in libPassive";
   setAllContainers();
-  CbmRuntimeDb::instance()->addContFactory(this);
+  FairRuntimeDb::instance()->addContFactory(this);
 }
 
 void CbmPassiveContFact::setAllContainers() {
   /** Creates the Container objects with all accepted contexts and adds them to
    *  the list of containers for the STS library.*/
 
-    CbmContainer* p= new CbmContainer("CbmGeoPassivePar",
+    FairContainer* p= new FairContainer("CbmGeoPassivePar",
                                           "Passive Geometry Parameters",
                                           "TestDefaultContext");
     p->addContext("TestNonDefaultContext");
@@ -42,12 +42,12 @@ void CbmPassiveContFact::setAllContainers() {
     containers->Add(p);
 }
 
-CbmParSet* CbmPassiveContFact::createContainer(CbmContainer* c) {
+FairParSet* CbmPassiveContFact::createContainer(FairContainer* c) {
   /** Calls the constructor of the corresponding parameter container.
    * For an actual context, which is not an empty string and not the default context
    * of this container, the name is concatinated with the context. */
   const char* name=c->GetName();
-  CbmParSet *p=NULL;
+  FairParSet *p=NULL;
   if (strcmp(name,"CbmGeoPassivePar")==0) {
     p=new CbmGeoPassivePar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
   }

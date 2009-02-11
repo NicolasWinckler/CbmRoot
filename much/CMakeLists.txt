@@ -72,7 +72,7 @@ set(MUCH_SRCS ${MUCH_SRCS} ${MUCH_DICTIONARY})
 
 add_library(Much SHARED ${MUCH_SRCS})
 target_link_libraries(Much ${ROOT_LIBRARIES})
-set_target_properties(Much PROPERTIES  ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(Much PROPERTIES  ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS Much DESTINATION ${CMAKE_BINARY_DIR}/lib)

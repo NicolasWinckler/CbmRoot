@@ -8,7 +8,7 @@
 #include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 #include "TH1F.h"
@@ -39,7 +39,7 @@ CbmTrdFitTracksQa::CbmTrdFitTracksQa()
 
 // -------------------------------------------------------------------
 CbmTrdFitTracksQa::CbmTrdFitTracksQa(const char* name, Int_t verbose)
-: CbmTask(name, verbose)
+: FairTask(name, verbose)
 {
     // Standard constructor
     fArrayTrdPoint = fArrayTrdHit = fArrayTrdTrack = NULL;
@@ -62,7 +62,7 @@ InitStatus CbmTrdFitTracksQa::Init()
     // Task initialisation
 
     // Get the pointer to the ROOT IO manager
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
         cout << "-E- CbmTrdFitTracksQa::Init : "
             << "root manager is not instantiated!" << endl;
@@ -112,8 +112,8 @@ void CbmTrdFitTracksQa::Exec(Option_t* option)
     CbmTrdPoint* pLastPoint = NULL;
     CbmTrdHit* pFirstHit = NULL;
     CbmTrdHit* pLastHit = NULL;
-    CbmTrackParam* pFirstParam = NULL;
-    CbmTrackParam* pLastParam = NULL;
+    FairTrackParam* pFirstParam = NULL;
+    FairTrackParam* pLastParam = NULL;
     CbmTrdTrack* pTrack = NULL;
 
     // Loop over TRD tracks

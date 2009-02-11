@@ -2,7 +2,7 @@
  *  $Id$
  *
  *  Class : CbmDileptonAssignPid
- *  Descripton: This is a task, derived from CbmTask. This works for the real
+ *  Descripton: This is a task, derived from FairTask. This works for the real
  *              data stream to perform electron identification.
  *              Input: Arrays of global, sts, trd track, rich ring and tof hit
  *              arrays.
@@ -15,24 +15,24 @@
 #ifndef CBM_DILEPTON_ASSIGN_PID_H
 #define CBM_DILEPTON_ASSIGN_PID_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmStsKFTrackFitter.h"
 
 #include "TStopwatch.h"
 
 class TClonesArray;
-class CbmRootManager;
+class FairRootManager;
 class CbmVertex;
 class CbmDileptonTrackReal;
 class CbmDileptonTrackRealCollection;
 class TH1D;
 class TH2D;
 class TFile;
-class CbmDileptonAssignPid : public CbmTask{
+class CbmDileptonAssignPid : public FairTask{
 
 private:
 
-    CbmRootManager* fRootManager;
+    FairRootManager* fRootManager;
 
     CbmDileptonTrackRealCollection* fTrackRealColl;
 

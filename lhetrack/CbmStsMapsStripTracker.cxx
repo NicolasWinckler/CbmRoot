@@ -1,9 +1,9 @@
 #include "CbmStsMapsStripTracker.h"
-#include "CbmMCApplication.h"
+#include "FairMCApplication.h"
 #include "TGeoManager.h"
 #include "TGeoVolume.h"
-#include "CbmVolume.h"
-#include "CbmTask.h"
+#include "FairVolume.h"
+#include "FairTask.h"
 #include "CbmStsMapsHit.h"
 #include "CbmStsMapsHitInfo.h"
 #include "CbmStsJointTrack.h"
@@ -18,11 +18,11 @@
 #include "iomanip.h"
 #include "Riostream.h"
 #include "TH1F.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 #include "TArrayD.h"
-#include "CbmGeoTransform.h"
-#include "CbmGeoVector.h"
+#include "FairGeoTransform.h"
+#include "FairGeoVector.h"
 
 Int_t MSStsUid [7];
 
@@ -35,7 +35,7 @@ CbmStsMapsStripTracker::CbmStsMapsStripTracker(): ref(0) {
 
 //_________________________________________________________________
 CbmStsMapsStripTracker::CbmStsMapsStripTracker(const char *name,
-					 const char *title) : CbmTask(name) {
+					 const char *title) : FairTask(name) {
 
   ref= new TRefArray();
   
@@ -46,7 +46,7 @@ CbmStsMapsStripTracker::CbmStsMapsStripTracker(const char *name,
 
 //_________________________________________________________________
 CbmStsMapsStripTracker::~CbmStsMapsStripTracker() {
-  CbmRootManager *fManager =CbmRootManager::Instance();
+  FairRootManager *fManager =FairRootManager::Instance();
   fManager->Write();
 }
 
@@ -56,16 +56,16 @@ CbmStsMapsStripTracker::~CbmStsMapsStripTracker() {
 void CbmStsMapsStripTracker::SetParContainers()
 {
   // Get Base Container
-  CbmRunAna* ana = CbmRunAna::Instance();
-  CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+  FairRunAna* ana = FairRunAna::Instance();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   fGeoPar=(CbmGeoStsPar*)(rtdb->getContainer("CbmGeoStsPar"));
 }
 
 InitStatus CbmStsMapsStripTracker::ReInit()
 {
   // Update the pointers after reinitialisation
-  CbmRunAna* ana = CbmRunAna::Instance();
-  CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+  FairRunAna* ana = FairRunAna::Instance();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   fGeoPar=(CbmGeoStsPar*)(rtdb->getContainer("CbmGeoStsPar"));
   return kSUCCESS;
 }
@@ -75,7 +75,7 @@ InitStatus CbmStsMapsStripTracker::ReInit()
 
 //_________________________________________________________________
 InitStatus CbmStsMapsStripTracker::Init() {
-  CbmRootManager *fManager =CbmRootManager::Instance();	
+  FairRootManager *fManager =FairRootManager::Instance();	
 
   fListMCtracks = (TClonesArray *)fManager->GetObject("MCTrack");
   fListSTSpts   = (TClonesArray *)fManager->GetObject("STSPoint");
@@ -101,10 +101,10 @@ InitStatus CbmStsMapsStripTracker::Init() {
   */
 
   TObjArray *aSensNodes = fGeoPar->GetGeoSensitiveNodes();
-  CbmGeoNode* vol=NULL;
+  FairGeoNode* vol=NULL;
 
   for (Int_t i =0; i<aSensNodes->GetEntriesFast();i++){
-  vol = (CbmGeoNode*) aSensNodes->At(i);
+  vol = (FairGeoNode*) aSensNodes->At(i);
   MSStsUid[i] = vol->getMCid();
   cout << i << " " << MSStsUid[i] << endl;
   }
@@ -182,7 +182,7 @@ void CbmStsMapsStripTracker::GetHybridHits() {
     hit->SetStation(GetStation(DetId)); //
 
     if (point->GetRefIndex() > 0) {
-      CbmMCPoint *mcpoint = (CbmMCPoint *) fListSTSpts->At(point->GetRefIndex());
+      FairMCPoint *mcpoint = (FairMCPoint *) fListSTSpts->At(point->GetRefIndex());
       hit->SetTrackID(mcpoint->GetTrackID());
       SetTrack(hit);
     }
@@ -216,7 +216,7 @@ void CbmStsMapsStripTracker::GetStripHits() {
     hit->SetStation(GetStation(DetId)); //
 
     if (point->GetRefIndex() > 0) {
-      CbmMCPoint *mcpoint = (CbmMCPoint *) fListSTSpts->At(point->GetRefIndex());
+      FairMCPoint *mcpoint = (FairMCPoint *) fListSTSpts->At(point->GetRefIndex());
       hit->SetTrackID(mcpoint->GetTrackID());
       SetTrack(hit);
     }
@@ -289,9 +289,9 @@ CbmStsHit * CbmStsMapsStripTracker::AddHit() {
 //_________________________________________________________________
 void CbmStsMapsStripTracker::Register() {
 //
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman) Fatal("Register",
-		      "No CbmRootManager");
+		      "No FairRootManager");
   ioman->Register("StsGeantTrack", "GeantTrack", fGeantTracks,kTRUE);
   ioman->Register("StsHit", "CbmStsHit", fHits,kTRUE);
 

@@ -8,7 +8,7 @@
 #include "CbmTrdHit.h"
 #include "CbmTrdPoint.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "TClonesArray.h"
@@ -33,7 +33,7 @@ CbmTrdCreatePidLike::CbmTrdCreatePidLike() {
 // ---- Standard constructor ------------------------------------------------
 CbmTrdCreatePidLike::CbmTrdCreatePidLike(const char* name,
         const char* title)
-        : CbmTask(name) {
+        : FairTask(name) {
     fTrdHitCollection   = NULL;
     fTrdPointCollection = NULL;
 
@@ -50,7 +50,7 @@ CbmTrdCreatePidLike::~CbmTrdCreatePidLike() {}
 // ---- Initialisation ------------------------------------------------------
 InitStatus CbmTrdCreatePidLike::Init() {
     // Get pointer to the ROOT I/O manager
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
         cout << "-E- CbmTrdCreatePidLike::Init : "
         << "ROOT manager is not instantiated !" << endl;

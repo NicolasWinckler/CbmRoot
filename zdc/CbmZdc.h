@@ -15,18 +15,18 @@
 #ifndef CBMZDC_H
 #define CBMZDC_H
 
-#include "CbmDetector.h"
+#include "FairDetector.h"
 
 #include "TClonesArray.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
 
 class CbmZdcPoint; 
-class CbmVolume;
+class FairVolume;
 
 
 
-class CbmZdc : public CbmDetector 
+class CbmZdc : public FairDetector 
 {
 
  public:
@@ -53,7 +53,7 @@ class CbmZdc : public CbmDetector
    ** collection.
    *@param vol  Pointer to the active volume
    **/
-  virtual Bool_t  ProcessHits(CbmVolume* vol = 0);
+  virtual Bool_t  ProcessHits(FairVolume* vol = 0);
 
 
   /** Virtual method EndOfEvent

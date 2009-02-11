@@ -19,14 +19,14 @@
 #define CBMSTSFITTRACKS 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TStopwatch.h"
 
 class CbmStsTrackFitter;
 class TClonesArray;
 
-class CbmStsFitTracks : public CbmTask
+class CbmStsFitTracks : public FairTask
 {
 
  public:

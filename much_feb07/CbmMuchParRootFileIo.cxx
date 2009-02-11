@@ -15,8 +15,8 @@
 
 #include "CbmMuchDigiPar.h"
 
-#include "CbmParRootFileIo.h"
-#include "CbmRuntimeDb.h"
+#include "FairParRootFileIo.h"
+#include "FairRuntimeDb.h"
 
 #include <iostream> 
 
@@ -26,7 +26,7 @@ using std::endl;
 
 ClassImp(CbmMuchParRootFileIo)
 
-CbmMuchParRootFileIo::CbmMuchParRootFileIo(CbmParRootFile* f) : CbmDetParRootFileIo(f) {
+CbmMuchParRootFileIo::CbmMuchParRootFileIo(FairParRootFile* f) : FairDetParRootFileIo(f) {
   // constructor sets the name of the detector I/O "CbmMuchParIo"
   fName="CbmMuchParIo";
 
@@ -36,7 +36,7 @@ CbmMuchParRootFileIo::CbmMuchParRootFileIo(CbmParRootFile* f) : CbmDetParRootFil
 CbmMuchParRootFileIo::~CbmMuchParRootFileIo() {
 }
 
-Bool_t CbmMuchParRootFileIo::init(CbmParSet* pPar,Int_t* set) {
+Bool_t CbmMuchParRootFileIo::init(FairParSet* pPar,Int_t* set) {
   // Initializes a container called by name, but only the modules defined
   //   in the array 'set.
   // Calls the special read function for this container.

@@ -26,17 +26,17 @@
   char *version = "v05a";
 
   // -----   Run   ----------------------------------------------------------
-  CbmRunAna *fRun= new CbmRunAna();
+  FairRunAna *fRun= new FairRunAna();
   fRun->SetInputFile(inFile);
   fRun->SetOutputFile(outFile);
 
   // Init Simulation Parameters from Root File
-  CbmRuntimeDb* rtdb=fRun->GetRuntimeDb();
-  CbmParRootFileIo* input=new CbmParRootFileIo();
+  FairRuntimeDb* rtdb=fRun->GetRuntimeDb();
+  FairParRootFileIo* input=new FairParRootFileIo();
   input->open(parFile);
 
   // Init Digitization Parameters from Ascii File
-  CbmParAsciiFileIo* input2 = new CbmParAsciiFileIo();
+  FairParAsciiFileIo* input2 = new FairParAsciiFileIo();
   TString StsDigiFile(gSystem->Getenv("VMCWORKDIR"));
   StsDigiFile = StsDigiFile + "/parameters/sts/sts_digi.par";
   input2->open(StsDigiFile.Data(),"in");
@@ -99,7 +99,7 @@
   //CbmStsTrackFinderIdeal* trackFinder = new CbmStsTrackFinderIdeal();
   CbmL1StsTrackFinder* trackFinder = new CbmL1StsTrackFinder();
   
-  CbmStsFindTracks* findTask = new CbmStsFindTracks("finderTask","CbmTask",trackFinder);
+  CbmStsFindTracks* findTask = new CbmStsFindTracks("finderTask","FairTask",trackFinder);
   fRun->AddTask(findTask);
 
 
@@ -115,13 +115,13 @@
   //****************** track fitter *************
 
   CbmStsKFTrackFitter* kalman = new CbmStsKFTrackFitter;
-  CbmStsFitTracks *fitTask = new CbmStsFitTracks("Kalman fitter","CbmTask",kalman);
+  CbmStsFitTracks *fitTask = new CbmStsFitTracks("Kalman fitter","FairTask",kalman);
   fRun->AddTask(fitTask);
 
   //****************** vertex finder *************
 
   CbmKFPrimaryVertexFinder *vfinder = new CbmKFPrimaryVertexFinder;
-  CbmFindPrimaryVertex *vTask = new CbmFindPrimaryVertex("Kalman PV finder", "CbmTask", vfinder);
+  CbmFindPrimaryVertex *vTask = new CbmFindPrimaryVertex("Kalman PV finder", "FairTask", vfinder);
   fRun->AddTask(vTask);
 
   //***************** performance finder *********

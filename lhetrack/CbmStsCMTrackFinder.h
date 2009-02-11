@@ -9,7 +9,7 @@
 
 #include "TObject.h"
 //#include "TBenchmark.h"
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmStsVertex.h"
 #include "CbmStsHit.h"
 #include "TObjArray.h"
@@ -21,7 +21,7 @@
 
 #include "Riostream.h"
 
-class CbmStsCMTrackFinder : public CbmTask {
+class CbmStsCMTrackFinder : public FairTask {
 
 protected:
 

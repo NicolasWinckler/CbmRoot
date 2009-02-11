@@ -10,9 +10,9 @@
 
 // CBM includes
 #include "CbmDetectorList.h"
-#include "CbmMCPoint.h"
+#include "FairMCPoint.h"
 #include "CbmMCTrack.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 // ROOT includes
 #include "TClonesArray.h"
@@ -60,8 +60,8 @@ CbmStsTrackFinderIdeal::~CbmStsTrackFinderIdeal() { }
 // -----   Public method Init   --------------------------------------------
 void CbmStsTrackFinderIdeal::Init() {
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- "<< fName << "::Init: "
 	 << "RootManager not instantised!" << endl;
@@ -126,7 +126,7 @@ Int_t CbmStsTrackFinderIdeal::DoFind() {
 
   // Create pointers to StsHit and StsPoint
   CbmStsHit*   pHit  = NULL;
-  CbmMCPoint*  pMCpt = NULL;
+  FairMCPoint*  pMCpt = NULL;
   CbmMCTrack*  pMCtr = NULL;
   CbmStsTrack* pTrck = NULL;
 
@@ -148,7 +148,7 @@ Int_t CbmStsTrackFinderIdeal::DoFind() {
     if ( ! pHit ) continue;
     ptIndex = pHit->GetRefIndex();
     if (ptIndex < 0) continue;           // fake or background hit
-    pMCpt = (CbmMCPoint*) (fMCPointArray->At(ptIndex));
+    pMCpt = (FairMCPoint*) (fMCPointArray->At(ptIndex));
     if ( ! pMCpt ) continue;
     mcTrackIndex = pMCpt->GetTrackID();
     hitMap[mcTrackIndex]++;
@@ -189,7 +189,7 @@ Int_t CbmStsTrackFinderIdeal::DoFind() {
     }
     ptIndex = pHit->GetRefIndex();
     if (ptIndex < 0) continue;           // fake or background hit
-    pMCpt = (CbmMCPoint*) (fMCPointArray->At(ptIndex));
+    pMCpt = (FairMCPoint*) (fMCPointArray->At(ptIndex));
     if ( ! pMCpt ) {
       cout << "-E- " << fName << "::DoFind: No reference "
 	   << "MCPoint " << ptIndex << " for hit " << iHit << endl;

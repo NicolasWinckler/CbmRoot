@@ -18,9 +18,9 @@
 #include "CbmStsSector.h"
 #include "CbmStsStation.h"
 
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -52,7 +52,7 @@ using std::set;
 using std::map;
 
 // -----   Default constructor   ------------------------------------------
-CbmStsFindHitsQa::CbmStsFindHitsQa() : CbmTask("STS Hit Finder", 1) {
+CbmStsFindHitsQa::CbmStsFindHitsQa() : FairTask("STS Hit Finder", 1) {
   fGeoPar  = NULL;
   fDigiPar = NULL;
   fMCTracks  = NULL;          // MCtrack
@@ -74,7 +74,7 @@ CbmStsFindHitsQa::CbmStsFindHitsQa() : CbmTask("STS Hit Finder", 1) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsFindHitsQa::CbmStsFindHitsQa(Int_t iVerbose) 
-  : CbmTask("STSFindHitsQa", iVerbose) {
+  : FairTask("STSFindHitsQa", iVerbose) {
   fGeoPar  = NULL;
   fDigiPar = NULL;
   fMCTracks  = NULL;          // MCtrack
@@ -95,7 +95,7 @@ CbmStsFindHitsQa::CbmStsFindHitsQa(Int_t iVerbose)
 
 // -----   Constructor with name   -----------------------------------------
 CbmStsFindHitsQa::CbmStsFindHitsQa(const char* name, Int_t iVerbose) 
-  : CbmTask(name, iVerbose) {
+  : FairTask(name, iVerbose) {
   fGeoPar  = NULL;
   fDigiPar = NULL;
   fMCTracks  = NULL;          // MCtrack
@@ -467,10 +467,10 @@ void CbmStsFindHitsQa::SetParContainers() {
 
 
   // Get run and runtime database
-  CbmRunAna* run = CbmRunAna::Instance();
+  FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) Fatal("SetParContainers", "No analysis run");
 
-  CbmRuntimeDb* db = run->GetRuntimeDb();
+  FairRuntimeDb* db = run->GetRuntimeDb();
   if ( ! db ) Fatal("SetParContainers", "No runtime database");
 
   // Get STS geometry parameter container
@@ -490,8 +490,8 @@ InitStatus CbmStsFindHitsQa::Init() {
 
 
   // Get input array
-  CbmRootManager* ioman = CbmRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No CbmRootManager");
+  FairRootManager* ioman = FairRootManager::Instance();
+  if ( ! ioman ) Fatal("Init", "No FairRootManager");
 
   // Get MCTrack array
   fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");

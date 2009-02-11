@@ -23,8 +23,8 @@
 #include "CbmRichRing.h"
 #include "CbmRichRingFinder.h"
 
-#include "CbmHit.h"
-#include "CbmRootManager.h"
+#include "FairHit.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -36,7 +36,7 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmRichFindRings::CbmRichFindRings()
-  : CbmTask("RICH Find Rings") {
+  : FairTask("RICH Find Rings") {
   fFinder         = NULL;
   fRichHitArray   = NULL;
   fProjArray      = NULL;
@@ -51,7 +51,7 @@ CbmRichFindRings::CbmRichFindRings()
 // -----   Standard constructor   ------------------------------------------
 CbmRichFindRings::CbmRichFindRings(CbmRichRingFinder* finder,
 				   Int_t verbose)
-  : CbmTask("RICH Find Rings") {
+  : FairTask("RICH Find Rings") {
   fFinder         = finder;
   fRichHitArray   = NULL;
   fProjArray      = NULL;
@@ -67,7 +67,7 @@ CbmRichFindRings::CbmRichFindRings(CbmRichRingFinder* finder,
 CbmRichFindRings::CbmRichFindRings(const char* name, const char* title,
 				   CbmRichRingFinder* finder,
 				   Int_t verbose)
-  : CbmTask(name) {
+  : FairTask(name) {
   fFinder         = finder;
   fRichHitArray   = NULL;
   fProjArray      = NULL;
@@ -96,8 +96,8 @@ InitStatus CbmRichFindRings::Init() {
     return kERROR;
   }
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmRichFindRings::Init: "
 	 << "RootManager not instantised!" << endl;

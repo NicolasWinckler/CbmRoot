@@ -5,22 +5,22 @@
 
 #include "CbmTrdTestEventsWithMom.h"
 
-#include "CbmMCPoint.h"
+#include "FairMCPoint.h"
 #include "CbmTrdPoint.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 #include "CbmTrdTrackMatch.h"
 #include "CbmMCTrack.h"
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 #include "CbmVertex.h"
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 #include "CbmKF.h"
 #include "CbmKFTrdHit.h"
 #include "CbmGeoTrdPar.h"
-#include "CbmGeoNode.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRunAna.h"
+#include "FairGeoNode.h"
+#include "FairRuntimeDb.h"
+#include "FairRunAna.h"
 
 #include "TRandom.h"
 #include "TClonesArray.h"
@@ -37,7 +37,7 @@ using namespace std;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrdTestEventsWithMom::CbmTrdTestEventsWithMom() 
-  : CbmTask("TRD track match") {
+  : FairTask("TRD track match") {
     fTracks  = NULL;
     fPoints  = NULL;
     fHits    = NULL;
@@ -70,7 +70,7 @@ CbmTrdTestEventsWithMom::CbmTrdTestEventsWithMom()
 
 // -----   Constructor with verbosity level   ------------------------------
 CbmTrdTestEventsWithMom::CbmTrdTestEventsWithMom(Int_t verbose) 
-  : CbmTask("TRD track match") {
+  : FairTask("TRD track match") {
     fTracks  = NULL;
     fPoints  = NULL;
     fHits    = NULL;
@@ -106,7 +106,7 @@ CbmTrdTestEventsWithMom::CbmTrdTestEventsWithMom(Int_t verbose)
 CbmTrdTestEventsWithMom::CbmTrdTestEventsWithMom(const char* name, const char* title,
 						 Int_t verbose, Double_t RF, 
 						 Double_t chi, Double_t PtThr) 
-  : CbmTask(name) {
+  : FairTask(name) {
  
     cout 
       <<"-I- CbmTrdTestEventsWithMom::CbmTrdTestEventsWithMom: constructing...\n";
@@ -161,8 +161,8 @@ InitStatus CbmTrdTestEventsWithMom::Init() {
     <<"-I- CbmTrdTestEventsWithMom::Init: starting...\n";
 
   
-  // Get CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmTrdTestEventsWithMom::Init: "
 	 << "RootManager not instantised!" << endl;
@@ -208,16 +208,16 @@ InitStatus CbmTrdTestEventsWithMom::Init() {
     return kERROR;
   }
 
-// Get the pointer to the singleton CbmRunAna object
-  CbmRunAna* ana = CbmRunAna::Instance();
+// Get the pointer to the singleton FairRunAna object
+  FairRunAna* ana = FairRunAna::Instance();
   if(NULL == ana) {
     cout << "-E- CbmL1CATrdTrackFinderSA::TrdLayout :"
-         <<" no CbmRunAna object!" << endl;
+         <<" no FairRunAna object!" << endl;
     return kERROR;
   }
 
 
-  CbmRuntimeDb* rtdb = ana->GetRuntimeDb();
+  FairRuntimeDb* rtdb = ana->GetRuntimeDb();
   if(NULL == rtdb) {
     cout << "-E- CbmL1CATrdTrackFinderSA::TrdLayout :"
          <<" no runtime database!" << endl;
@@ -229,12 +229,12 @@ InitStatus CbmTrdTestEventsWithMom::Init() {
   TObjArray *Nodes = TrdPar->GetGeoPassiveNodes();
 
   for( Int_t i=0;i<Nodes->GetEntries(); i++) {
-    CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (Nodes->At(i));
+    FairGeoNode *node = dynamic_cast<FairGeoNode*> (Nodes->At(i));
     if ( !node ) continue;
     
     TString name = node->getName();
     //TString Sname = node->getShapePointer()->GetName(); 
-    CbmGeoVector nodeV = node->getLabTransform()->getTranslation(); //in cm
+    FairGeoVector nodeV = node->getLabTransform()->getTranslation(); //in cm
     
     Int_t id = node->getMCid();
     cout <<"name: "<< name <<"\tid: "<< id << endl;
@@ -309,7 +309,7 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
   // Create some pointers and variables
   //   CbmTrdTrack*      track = NULL;
   //   CbmTrdHit*        hit   = NULL;
-  //   CbmMCPoint*       point = NULL;
+  //   FairMCPoint*       point = NULL;
   //   Int_t nHits       = 0;
   //   Int_t nMCTracks   = 0;
   //   Int_t iPoint      = 0;
@@ -388,7 +388,7 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
   Bool_t
     accept;
 
-  //   CbmTrackParam
+  //   FairTrackParam
   //     *paramFirst,
   //     *paramLast;
   
@@ -421,7 +421,7 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
   //	      iTrdHit1,
   //iTrdHit12;
 
-//   CbmTrackParam
+//   FairTrackParam
 //     *paramFirst;
 
   //    *paramLast;
@@ -571,7 +571,7 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
 
 
     //control parameter display
-    CbmTrackParam testParam;
+    FairTrackParam testParam;
     testParam = *(trdTr1->GetParamLast());
 
 
@@ -584,7 +584,7 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
 
     //-------------------------------
     /*
-      CbmTrackParam tempParam;
+      FairTrackParam tempParam;
       tempParam = *(trdTr1->GetParamFirst());
       tempParam.SetQp(0.5);
       trdTr1->SetParamFirst(tempParam);
@@ -630,7 +630,7 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
 
       TVector3 bla2(0,0,0);
       vtx.Position(bla2);
-      CbmTrackParam v_track2;
+      FairTrackParam v_track2;
 
       //      if(fVerbose > 3) cout << "Marchewka 7" << endl;
 
@@ -770,8 +770,8 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
 
       TVector3 bla(0,0,0);
       vtx.Position(bla);
-      CbmTrackParam v_track;
-      CbmTrackParam momParam;
+      FairTrackParam v_track;
+      FairTrackParam momParam;
       //      momParam.SetQp(0.5);
       //      trdTr1->SetParamFirst(momParam);
 
@@ -1707,7 +1707,7 @@ TVector3 CbmTrdTestEventsWithMom::backtrack(CbmTrdPoint* trd0,CbmTrdPoint* trd8,
   return ret;
 }
 
-TVector3 CbmTrdTestEventsWithMom::backtrack(CbmTrackParam* paramFirst, CbmTrackParam* paramLast, Double_t z)
+TVector3 CbmTrdTestEventsWithMom::backtrack(FairTrackParam* paramFirst, FairTrackParam* paramLast, Double_t z)
 {
   TVector3 v1(paramFirst->GetX(),paramFirst->GetY(),paramFirst->GetZ());
   TVector3 v0(paramLast->GetX(), paramLast->GetY(), paramLast->GetZ());
@@ -2260,7 +2260,7 @@ Double_t CbmTrdTestEventsWithMom::GetBydl(CbmTrdTrack *trdTrack, Double_t pMC, I
   //method calculates mean field constant Byld using MC info
   if ( trdTrack == NULL ) return 0;
   Double_t Bydl = 0;
-  CbmTrackParam *param;
+  FairTrackParam *param;
   //  const Double_t zMag = 50; //in centimeters
   
   param = trdTrack->GetParamFirst();
@@ -2295,7 +2295,7 @@ Double_t CbmTrdTestEventsWithMom::EstimateMomentum(CbmTrdTrack *trdTrack, Double
   //method calculates q/p using given mean field constant
   if(trdTrack == NULL) return 0;
   Double_t qp = 0;
-  CbmTrackParam *param;
+  FairTrackParam *param;
   //  const Double_t zMag = 50; //in centimeters
   
   param = trdTrack->GetParamFirst();
@@ -2323,8 +2323,8 @@ Double_t CbmTrdTestEventsWithMom::GetKickPt(CbmTrdTrack *trdTrack) {
   const Double_t e = 0.2998; //charge of the electron, [GeV/c/(T*m)]
   const Double_t B = 6;
   
-  CbmTrackParam *param;
-  CbmTrackParam 
+  FairTrackParam *param;
+  FairTrackParam 
     extParam2,
     extParam1;
 
@@ -2374,8 +2374,8 @@ Double_t CbmTrdTestEventsWithMom::GetKickPt(CbmTrdPoint *trdPoint) {
   const Double_t e = 0.2998; //charge of the electron, [GeV/c/(T*m)]
   const Double_t B = 6;
   
-//   CbmTrackParam *param;
-//   CbmTrackParam 
+//   FairTrackParam *param;
+//   FairTrackParam 
 //     extParam2,
 //     extParam1;
 

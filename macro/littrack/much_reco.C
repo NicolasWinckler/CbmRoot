@@ -21,13 +21,13 @@ void much_reco(Int_t nEvents = 10)
   cbmrootlibs();
 
   // -----   Reconstruction run   -------------------------------------------
-  CbmRunAna *run= new CbmRunAna();
+  FairRunAna *run= new FairRunAna();
   run->SetInputFile(inFile);
   run->AddFriend(inFile1);
   run->AddFriend(inFile2);
   run->SetOutputFile(outFile);
 
-  CbmGeane* Geane = new CbmGeane(inFile.Data());
+  FairGeane* Geane = new FairGeane(inFile.Data());
 
   CbmMuchTrackFinder* muchTrackFinder = new CbmLitMuchTrackFinderBranch();
   CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
@@ -46,8 +46,8 @@ void much_reco(Int_t nEvents = 10)
 
 
   // -----  Parameter database   --------------------------------------------
-  CbmRuntimeDb* rtdb = run->GetRuntimeDb();
-  CbmParRootFileIo* parIo1 = new CbmParRootFileIo();
+  FairRuntimeDb* rtdb = run->GetRuntimeDb();
+  FairParRootFileIo* parIo1 = new FairParRootFileIo();
   parIo1->open(parFile.Data());
   rtdb->setFirstInput(parIo1);
   rtdb->setOutput(parIo1);

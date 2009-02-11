@@ -1,22 +1,22 @@
 #ifndef CBMGEORICHPAR_H
 #define CBMGEORICHPAR_H
 
-#include "CbmParGenericSet.h"
+#include "FairParGenericSet.h"
 
 #include "TObjArray.h"
 
-class CbmGeoRichPar : public CbmParGenericSet {
+class CbmGeoRichPar : public FairParGenericSet {
 public:
-  TObjArray      *fGeoSensNodes; /** List of CbmGeoNodes for sensitive  volumes */
-  TObjArray      *fGeoPassNodes; /** List of CbmGeoNodes for sensitive  volumes */
+  TObjArray      *fGeoSensNodes; /** List of FairGeoNodes for sensitive  volumes */
+  TObjArray      *fGeoPassNodes; /** List of FairGeoNodes for sensitive  volumes */
 
   CbmGeoRichPar(const char* name="CbmGeoRichPar",
              const char* title="Rich Geometry Parameters",
              const char* context="TestDefaultContext");
   ~CbmGeoRichPar(void);
   void clear(void);
-  void putParams(CbmParamList*);
-  Bool_t getParams(CbmParamList*);
+  void putParams(FairParamList*);
+  Bool_t getParams(FairParamList*);
   TObjArray             *GetGeoSensitiveNodes(){return fGeoSensNodes;}
   TObjArray             *GetGeoPassiveNodes(){return fGeoPassNodes;}
 

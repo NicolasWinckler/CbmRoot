@@ -7,16 +7,16 @@
 #ifndef CBMFIELDCREATOR_H
 #define CBMFIELDCREATOR_H
 
-#include "CbmField.h"
-#include "CbmFieldFactory.h"
+#include "FairField.h"
+#include "FairFieldFactory.h"
 #include "CbmFieldPar.h"
 
-class CbmFieldCreator : public CbmFieldFactory 
+class CbmFieldCreator : public FairFieldFactory 
 {
 public:
     CbmFieldCreator();
     virtual ~CbmFieldCreator();
-    virtual CbmField* createCbmField();
+    virtual FairField* createCbmField();
     virtual void SetParm();
     ClassDef(CbmFieldCreator,1);
 protected:

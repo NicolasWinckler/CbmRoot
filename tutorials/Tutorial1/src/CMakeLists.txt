@@ -42,7 +42,7 @@ set(TUTORIAL1_SRCS ${TUTORIAL1_SRCS} ${TUTORIAL1_DICTIONARY})
 
 add_library(Tutorial1 SHARED ${TUTORIAL1_SRCS})
 target_link_libraries(Tutorial1 ${ROOT_LIBRARIES})
-set_target_properties(Tutorial1 PROPERTIES  ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(Tutorial1 PROPERTIES  ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS Tutorial1 DESTINATION ${CMAKE_BINARY_DIR}/lib)

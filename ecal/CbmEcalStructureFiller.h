@@ -29,7 +29,7 @@
 #ifndef CBMECALSTRUCTUREFILLER_H
 #define CBMECALSTRUCTUREFILLER_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "TClonesArray.h"
 #include "CbmEcalHit.h"
 #include "CbmStack.h"
@@ -38,7 +38,7 @@
 #include "TString.h"
 #include "TVector3.h"
 
-class CbmEcalStructureFiller : public CbmTask {
+class CbmEcalStructureFiller : public FairTask {
 
 public:
   /** Default constructor **/

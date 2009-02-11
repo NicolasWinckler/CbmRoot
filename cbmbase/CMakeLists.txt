@@ -47,7 +47,7 @@ SET(CBMBASE_SRCS ${CBMBASE_SRCS} ${CBMBASE_DICTIONARY})
 
 add_library(CbmBase SHARED ${CBMBASE_SRCS})
 target_link_libraries(CbmBase ${ROOT_LIBRARIES})
-set_target_properties(CbmBase PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(CbmBase PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS CbmBase DESTINATION ${CMAKE_BINARY_DIR}/lib)

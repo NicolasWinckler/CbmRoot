@@ -21,7 +21,7 @@
 #include "TList.h"
 
 class TArrayF;
-class CbmField;
+class FairField;
 
 
 
@@ -56,7 +56,7 @@ class CbmFieldMapCreator
 
 
   /** Add an input field **/
-  void AddField(CbmField* field) { fFieldList.Add(field); }
+  void AddField(FairField* field) { fFieldList.Add(field); }
 
 
   /** Create the field map 

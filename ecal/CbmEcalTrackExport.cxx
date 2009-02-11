@@ -1,7 +1,7 @@
 #include "CbmEcalTrackExport.h"
 
-#include "CbmRootManager.h"
-#include "CbmTrackParam.h"
+#include "FairRootManager.h"
+#include "FairTrackParam.h"
 
 #include "TClonesArray.h"
 #include "TFile.h"
@@ -18,7 +18,7 @@ CbmEcalTrackExport::CbmEcalTrackExport()
 
 /** Standerd constructor **/
 CbmEcalTrackExport::CbmEcalTrackExport(const char* name, const Int_t verbose)
-  : CbmTask(name, verbose)
+  : FairTask(name, verbose)
 {
   fVerbose=verbose;
 }
@@ -29,7 +29,7 @@ InitStatus CbmEcalTrackExport::Init()
   fTracksOut=NULL;
   fEventN=0;
 
-  CbmRootManager* io=CbmRootManager::Instance();
+  FairRootManager* io=FairRootManager::Instance();
   if (!io)
   {
     Fatal("Init", "Can't find IOManager.");
@@ -61,11 +61,11 @@ void CbmEcalTrackExport::Exec(Option_t* opt)
   Int_t i;
   Int_t n=fTrackPar->GetEntriesFast();
   Int_t tr=0;
-  CbmTrackParam* par;
+  FairTrackParam* par;
 
   for(i=0;i<n;i++)
   {
-    par=(CbmTrackParam*)fTrackPar->At(i);
+    par=(FairTrackParam*)fTrackPar->At(i);
     if (par==NULL) continue;
     fX=par->GetX();
     fY=par->GetY();

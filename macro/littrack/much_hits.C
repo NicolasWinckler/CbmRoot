@@ -22,7 +22,7 @@ void much_hits(Int_t nEvents = 1000)
    cbmrootlibs();
 
    // -----   Reconstruction run   -------------------------------------------
-   CbmRunAna *run= new CbmRunAna();
+   FairRunAna *run= new FairRunAna();
    run->SetInputFile(mcFile);
    run->SetOutputFile(outFile);
    // ------------------------------------------------------------------------
@@ -50,10 +50,10 @@ void much_hits(Int_t nEvents = 1000)
 
 
    // -----  Parameter database   --------------------------------------------
-   CbmRuntimeDb* rtdb = run->GetRuntimeDb();
-   CbmParRootFileIo* parIo1 = new CbmParRootFileIo();
-//   CbmParRootFileIo* parIo2 = new CbmParRootFileIo();
-   // CbmParAsciiFileIo* parIo2 = new CbmParAsciiFileIo();
+   FairRuntimeDb* rtdb = run->GetRuntimeDb();
+   FairParRootFileIo* parIo1 = new FairParRootFileIo();
+//   FairParRootFileIo* parIo2 = new FairParRootFileIo();
+   // FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
    parIo1->open(parFile.Data());
 //   parIo2->open(mcFile.Data());
    rtdb->setFirstInput(parIo1);

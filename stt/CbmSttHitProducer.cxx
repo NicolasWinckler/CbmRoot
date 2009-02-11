@@ -1,20 +1,20 @@
 #include "CbmSttHitProducer.h"
 
-#include "CbmGeoNode.h"
+#include "FairGeoNode.h"
 #include "CbmGeoSttPar.h"
-#include "CbmGeoTransform.h"
+#include "FairGeoTransform.h"
 //#include "CbmTrdRadiator.h"
 #include "CbmSttPoint.h"
 #include "CbmSttHit.h"
 
-#include "CbmRootManager.h"
-//#include "CbmMCApplication.h"
-//#include "CbmDetector.h"
+#include "FairRootManager.h"
+//#include "FairMCApplication.h"
+//#include "FairDetector.h"
 #include "CbmMCTrack.h"
 //#include "CbmTrd.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmBaseParSet.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairBaseParSet.h"
 
 //#include "TParticle.h"
 //#include "TRef.h"
@@ -35,7 +35,7 @@ const Int_t CbmSttHitProducer::fgkNSegm[3][2] = {{2,4},{4,6},{6,8}};
 
 // ---- Default constructor -------------------------------------------
 CbmSttHitProducer::CbmSttHitProducer()
-    :CbmTask("SttHitProducer")
+    :FairTask("SttHitProducer")
 	//:fRef(0)
 {
     fHitCollection = new TClonesArray("CbmSttHit");
@@ -47,7 +47,7 @@ CbmSttHitProducer::CbmSttHitProducer()
 
 // ---- Constructor ----------------------------------------------------
 CbmSttHitProducer::CbmSttHitProducer(const char *name, const char *title)
-	:CbmTask(name)
+	:FairTask(name)
 {
     // default parameters
     fHitCollection = new TClonesArray("CbmSttHit");
@@ -61,7 +61,7 @@ CbmSttHitProducer::CbmSttHitProducer(const char *name, const char *title)
 // ---- Destructor ----------------------------------------------------
 CbmSttHitProducer::~CbmSttHitProducer()
 {
-    CbmRootManager *ioman =CbmRootManager::Instance();
+    FairRootManager *ioman =FairRootManager::Instance();
     ioman->Write();
     fHitCollection->Clear("C");
     delete fHitCollection;
@@ -74,11 +74,11 @@ void CbmSttHitProducer::SetParContainers()
     cout<<" * HitProducer * :: SetParContainers() "<<endl;
 
     // Get Base Container
-    CbmRunAna* ana = CbmRunAna::Instance();
-    CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+    FairRunAna* ana = FairRunAna::Instance();
+    FairRuntimeDb* rtdb=ana->GetRuntimeDb();
 
-    fBasePar = (CbmBaseParSet*)
-	(rtdb->getContainer("CbmBaseParSet"));
+    fBasePar = (FairBaseParSet*)
+	(rtdb->getContainer("FairBaseParSet"));
 
     fGeoPar = (CbmGeoSttPar*)(rtdb->getContainer("CbmGeoSttPar"));
 }
@@ -89,8 +89,8 @@ InitStatus CbmSttHitProducer::ReInit(){
 
     //cout<<" * HitProducer * :: ReInit() "<<endl;
 
-    CbmRunAna* ana = CbmRunAna::Instance();
-    CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+    FairRunAna* ana = FairRunAna::Instance();
+    FairRuntimeDb* rtdb=ana->GetRuntimeDb();
 
     fGeoPar = (CbmGeoSttPar*)(rtdb->getContainer("CbmGeoSttPar"));
 
@@ -104,7 +104,7 @@ InitStatus CbmSttHitProducer::Init()
 
     cout<<" * HitProducer * :: Init() "<<endl;
 
-    CbmRootManager *ioman = CbmRootManager::Instance();
+    FairRootManager *ioman = FairRootManager::Instance();
     fSttPoints=(TClonesArray *) ioman->ActivateBranch("STTPoint");
     if ( ! fSttPoints ) {
       cout << "-W CbmSttHitProducer::Init: No SttPoints array!" << endl;
@@ -124,14 +124,14 @@ InitStatus CbmSttHitProducer::Init()
 
     // fBasePar->Dump();
 //    TObjArray* arr = fBasePar->GetDetList();
-  //  CbmDetector* trd = (CbmDetector*) arr->FindObject("TRD");
+  //  FairDetector* trd = (FairDetector*) arr->FindObject("TRD");
     // trd->Dump();
     // here get the geometry file name with version
 
 //    TString fname = trd->GetGeometryFileName();
 
-    CbmRun *run = CbmRun::Instance();
-    CbmRuntimeDb *rtdb = run->GetRuntimeDb();
+    FairRun *run = FairRun::Instance();
+    FairRuntimeDb *rtdb = run->GetRuntimeDb();
     CbmGeoSttPar* par = (CbmGeoSttPar*)(rtdb->getContainer("CbmGeoSttPar"));
     TObjArray *sensNodes = par->GetGeoSensitiveNodes();
     TObjArray *passNodes = par->GetGeoPassiveNodes();
@@ -140,10 +140,10 @@ InitStatus CbmSttHitProducer::Init()
       for (Int_t jch = 0; jch < 2; ++jch) {
 	//sscanf(&(gMC->CurrentVolName()[3]),"%d",&fstation);
 	sprintf(volName,"stt%dC%dgas",ist+1,jch+1);
-	CbmGeoNode *node = (CbmGeoNode*) sensNodes->FindObject(volName);
-	//CbmGeoTransform* transf = node->getLabTransform();
-	//CbmGeoVector vec = transf->getTransVector();
-	//CbmGeoVector vec = transf->getTranslation();
+	FairGeoNode *node = (FairGeoNode*) sensNodes->FindObject(volName);
+	//FairGeoTransform* transf = node->getLabTransform();
+	//FairGeoVector vec = transf->getTransVector();
+	//FairGeoVector vec = transf->getTranslation();
 	Double_t xSize = TMath::Abs ((*node->getParameters())[0]);
 	Double_t ySize = TMath::Abs ((*node->getParameters())[1]);
 	fSizeX[ist][jch] = xSize;
@@ -152,12 +152,12 @@ InitStatus CbmSttHitProducer::Init()
 	//Double_t fSizeX[3][2]; //! 3 stations, 2 chamber types
 
 	sprintf(volName,"stt%dC%d#1",ist+1,jch+1);
-	node = (CbmGeoNode*) passNodes->FindObject(volName);
-	CbmGeoTransform* transf = node->getLabTransform();
-	CbmGeoVector vec = transf->getTranslation();
+	node = (FairGeoNode*) passNodes->FindObject(volName);
+	FairGeoTransform* transf = node->getLabTransform();
+	FairGeoVector vec = transf->getTranslation();
 	fTransl[ist][jch*2] = vec;
 	sprintf(volName,"stt%dC%d#3",ist+1,jch+1);
-	node = (CbmGeoNode*) passNodes->FindObject(volName);
+	node = (FairGeoNode*) passNodes->FindObject(volName);
 	transf = node->getLabTransform();
 	vec = transf->getTranslation();
 	fTransl[ist][jch*2+1] = vec;
@@ -166,19 +166,19 @@ InitStatus CbmSttHitProducer::Init()
     // Get rotation matrices for doublets
     for (Int_t id = 0; id < 3; ++id) {
       sprintf(volName,"stt1D#%d",id+1);
-      CbmGeoNode *node = (CbmGeoNode*) passNodes->FindObject(volName);
+      FairGeoNode *node = (FairGeoNode*) passNodes->FindObject(volName);
       cout << node << endl;
-      CbmGeoTransform* transf = node->getLabTransform();
+      FairGeoTransform* transf = node->getLabTransform();
       fRotat[id] = transf->getRotMatrix();
     }
 
     //exit(0);
     /*
-    CbmGeoNode *fm1= (CbmGeoNode *)fSensNodes->FindObject("trd3gas#4");
-    CbmGeoNode *fm2= (CbmGeoNode *)fSensNodes->FindObject("trd3gas#3");
-    CbmGeoNode *fm3= (CbmGeoNode *)fSensNodes->FindObject("trd6gas#2");
-    CbmGeoNode *fm4= (CbmGeoNode *)fSensNodes->FindObject("trd1gas#4");
-    CbmGeoNode *fm5= (CbmGeoNode *)fSensNodes->FindObject("trd1mod1gas");
+    FairGeoNode *fm1= (FairGeoNode *)fSensNodes->FindObject("trd3gas#4");
+    FairGeoNode *fm2= (FairGeoNode *)fSensNodes->FindObject("trd3gas#3");
+    FairGeoNode *fm3= (FairGeoNode *)fSensNodes->FindObject("trd6gas#2");
+    FairGeoNode *fm4= (FairGeoNode *)fSensNodes->FindObject("trd1gas#4");
+    FairGeoNode *fm5= (FairGeoNode *)fSensNodes->FindObject("trd1mod1gas");
 
     if (fm1) {
       cout << " -I version is with 12 layers (3 stations x 4 layers each) " << endl;
@@ -362,14 +362,14 @@ void CbmSttHitProducer::Exec(Option_t * option)
     */
     //if (point->GetTrackID() == 17) cout << station << " " << layer << " " << xloc << " " << yloc << " " << itube << endl;
 
-    CbmGeoVector p(xHit, yHit, zHit);
+    FairGeoVector p(xHit, yHit, zHit);
     Int_t ch = TMath::Abs (hit->GetChamber());
     Int_t ch1 = ch;
     if (hit->GetChamber() == 1) --ch1;
     else if (hit->GetChamber() == -2) ++ch1;
-    //CbmGeoVector ploc = fRotat[rot] * p + fTransl[station][ch];
-    CbmGeoVector ploc = fRotat[rot].inverse() * (p - fTransl[station][ch1]);
-    CbmGeoVector size(fSizeX[station][ch-1], fSizeY[station][ch-1], 0.);
+    //FairGeoVector ploc = fRotat[rot] * p + fTransl[station][ch];
+    FairGeoVector ploc = fRotat[rot].inverse() * (p - fTransl[station][ch1]);
+    FairGeoVector size(fSizeX[station][ch-1], fSizeY[station][ch-1], 0.);
     if (hit->GetChamber() == -1 || hit->GetChamber() == 2) size.setY(-size.getY());
     if (hit->GetChamber() == -1 || hit->GetChamber() == -2) size.setX(-size.getX());
     ploc += size;
@@ -418,7 +418,7 @@ void CbmSttHitProducer::Finish()
 // ---- Register ------------------------------------------------------
 void CbmSttHitProducer::Register(){
 
-  CbmRootManager::Instance()->Register("SttHit","Stt", fHitCollection, kTRUE);
+  FairRootManager::Instance()->Register("SttHit","Stt", fHitCollection, kTRUE);
 
 }
 // --------------------------------------------------------------------

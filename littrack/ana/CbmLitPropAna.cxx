@@ -23,11 +23,11 @@
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
 #include "CbmDetectorList.h"
-#include "CbmMCPoint.h"
+#include "FairMCPoint.h"
 #include "CbmMCTrack.h"
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 #include "CbmGeoMuchPar.h"
 
 #ifdef CbmMuchGeoScheme_H
@@ -59,8 +59,8 @@ CbmLitPropAna::~CbmLitPropAna()
 
 InitStatus CbmLitPropAna::Init()
 {
-   CbmRootManager* ioman = CbmRootManager::Instance();
-   if (!ioman ) Fatal("Init", "No CbmRootManager");
+   FairRootManager* ioman = FairRootManager::Instance();
+   if (!ioman ) Fatal("Init", "No FairRootManager");
 
    fMCTracks  = (TClonesArray*) ioman->GetObject("MCTrack");
    if (!fMCTracks) Fatal("Init", "No MCTrack array!");
@@ -97,7 +97,7 @@ InitStatus CbmLitPropAna::Init()
 
 #ifdef CbmMuchGeoScheme_H
 	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-	CbmRuntimeDb* db = CbmRuntimeDb::instance();
+	FairRuntimeDb* db = FairRuntimeDb::instance();
 	CbmGeoMuchPar* geoPar = (CbmGeoMuchPar*) db->getContainer("CbmGeoMuchPar");
 	TObjArray* stations = (TObjArray*) geoPar->GetStations();
 	geoScheme->Init(stations);
@@ -129,7 +129,7 @@ void CbmLitPropAna::Exec(
   Int_t nofTracks = fTracks->GetEntriesFast();
   for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
 
-	  std::vector<CbmMCPoint*> points;
+	  std::vector<FairMCPoint*> points;
       CbmLitTrack track;
 
       if (fDetId == kMUCH) {
@@ -216,7 +216,7 @@ void CbmLitPropAna::Exec(
 }
 
 void CbmLitPropAna::CalcResAndPull(
-		const CbmMCPoint* point,
+		const FairMCPoint* point,
 		const CbmMCTrack* mcTrack,
 		const CbmLitTrackParam* par,
 		std::vector<Double_t>& res,
@@ -255,7 +255,7 @@ void CbmLitPropAna::CalcResAndPull(
 }
 
 void CbmLitPropAna::FillParam(
-		   const CbmMCPoint* point,
+		   const FairMCPoint* point,
 		   CbmLitTrackParam* par)
 {
     Double_t x = point->GetX();
@@ -287,7 +287,7 @@ void CbmLitPropAna::FillParam(
 Bool_t CbmLitPropAna::CreateTrackMuch(
 		Int_t trackId,
 		CbmLitTrack* track,
-		std::vector<CbmMCPoint*>& points)
+		std::vector<FairMCPoint*>& points)
 {
     CbmMuchTrack* pTrack = (CbmMuchTrack*) fTracks->At(trackId);
     Int_t nofHits = pTrack->GetNHits();
@@ -304,7 +304,7 @@ Bool_t CbmLitPropAna::CreateTrackMuch(
        CbmMuchDigiMatch* pDigiMatch = (CbmMuchDigiMatch*) fDigiMatches->At(digiIndex);
        Int_t pointIndex = pDigiMatch->GetRefIndex(0);
        if (pointIndex < 0) Fatal("MUCH Ana", "Wrong PointIndex");
-       CbmMCPoint* pPoint = (CbmMCPoint*) fMCPoints->At(pointIndex);
+       FairMCPoint* pPoint = (FairMCPoint*) fMCPoints->At(pointIndex);
        if (!pPoint) Fatal("MUCH Ana", "Wrong Point pointer");
        points.push_back(pPoint);
     }
@@ -322,7 +322,7 @@ Bool_t CbmLitPropAna::CreateTrackMuch(
 Bool_t CbmLitPropAna::CreateTrackTrd(
 		Int_t trackId,
 		CbmLitTrack* track,
-		std::vector<CbmMCPoint*>& points)
+		std::vector<FairMCPoint*>& points)
 {
     CbmTrdTrack* pTrack = (CbmTrdTrack*) fTracks->At(trackId);
     Int_t nofHits = pTrack->GetNofTrdHits();
@@ -341,7 +341,7 @@ Bool_t CbmLitPropAna::CreateTrackTrd(
        //Int_t pointIndex = pDigiMatch->GetRefIndex(0);
        Int_t pointIndex = pHit->GetRefIndex();
        if (pointIndex < 0) Fatal("MUCH Ana", "Wrong PointIndex");
-       CbmMCPoint* pPoint = (CbmMCPoint*) fMCPoints->At(pointIndex);
+       FairMCPoint* pPoint = (FairMCPoint*) fMCPoints->At(pointIndex);
        if (!pPoint) Fatal("MUCH Ana", "Wrong Point pointer");
        points.push_back(pPoint);
     }

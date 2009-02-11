@@ -1,18 +1,18 @@
 #ifndef CBMTRDCONTFACT_H
 #define CBMTRDCONTFACT_H
 
-#include "CbmContFact.h"
+#include "FairContFact.h"
 
-class CbmContainer;
-class CbmParSet;
+class FairContainer;
+class FairParSet;
 
-class CbmTrdContFact : public CbmContFact {
+class CbmTrdContFact : public FairContFact {
 private:
   void setAllContainers();
 public:
   CbmTrdContFact();
   ~CbmTrdContFact() {}
-  CbmParSet* createContainer(CbmContainer*);
+  FairParSet* createContainer(FairContainer*);
   ClassDef( CbmTrdContFact,0) // Factory for all TRD parameter containers
 };
 

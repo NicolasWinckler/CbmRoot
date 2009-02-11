@@ -13,7 +13,7 @@
 #include "CbmLitConverter.h"
 #include "CbmLitToolFactory.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -33,7 +33,7 @@ CbmLitTrdTrackFinderSts::~CbmLitTrdTrackFinderSts()
 
 void CbmLitTrdTrackFinderSts::Init()
 {
-   CbmRootManager* rootMgr = CbmRootManager::Instance();
+   FairRootManager* rootMgr = FairRootManager::Instance();
    if(NULL == rootMgr)
       TObject::Fatal("CbmLitTrdTrackFinderSts::Init", "ROOT manager is not instantiated");
 

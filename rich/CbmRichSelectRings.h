@@ -23,11 +23,11 @@
 #define CBM_RICH_SELECT_RINGS 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmRichRingSelect.h"
 
 
-class CbmRichSelectRings : public CbmTask
+class CbmRichSelectRings : public FairTask
 {
 
  public:
@@ -36,7 +36,7 @@ class CbmRichSelectRings : public CbmTask
 
   CbmRichSelectRings(CbmRichRingSelect* select, Int_t verbose = 1);
 
-  CbmRichSelectRings(const char* name, const char* title = "CbmTask",
+  CbmRichSelectRings(const char* name, const char* title = "FairTask",
 		   CbmRichRingSelect* select = NULL, Int_t verbose = 1);
 
 

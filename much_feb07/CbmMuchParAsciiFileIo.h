@@ -2,21 +2,21 @@
 #define CBMMUCHPARASCIIFILEIO_H
 
 
-#include "CbmDetParAsciiFileIo.h"
+#include "FairDetParAsciiFileIo.h"
 
 #include "TObject.h"
 #include "TArrayI.h"
 
 #include <fstream> 
 
-class CbmParSet;
+class FairParSet;
 
-class CbmMuchParAsciiFileIo : public CbmDetParAsciiFileIo {
+class CbmMuchParAsciiFileIo : public FairDetParAsciiFileIo {
 public:
   CbmMuchParAsciiFileIo(fstream*);
   ~CbmMuchParAsciiFileIo() {}
-  Bool_t init(CbmParSet*);
-  Int_t write(CbmParSet*);
+  Bool_t init(FairParSet*);
+  Int_t write(FairParSet*);
   template<class T> Bool_t read(T*, Int_t*, Bool_t needsClear=kFALSE);
   template<class T> Int_t writeFile2(T*);
   ClassDef(CbmMuchParAsciiFileIo,0) // Class for MuCh parameter I/O from Ascii files

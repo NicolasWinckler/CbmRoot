@@ -1,11 +1,11 @@
 #ifndef CBMGEOSTART_H
 #define CBMGEOSTART_H
 
-#include "CbmGeoSet.h"
+#include "FairGeoSet.h"
 
 #include "TString.h"
 
-class  CbmGeoStart : public CbmGeoSet {
+class  CbmGeoStart : public FairGeoSet {
 protected:
   char modName[5];  // name of module
   char eleName[3];  // substring for elements in module

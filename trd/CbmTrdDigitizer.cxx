@@ -3,11 +3,11 @@
 //#include "CbmTutorialDetDigiPar.h"
 #include "CbmTrdPoint.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmBaseParSet.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairBaseParSet.h"
 
 #include "TRandom.h"
 #include "TMath.h"
@@ -27,7 +27,7 @@ using std::endl;
 
 // ---- Default constructor -------------------------------------------
 CbmTrdDigitizer::CbmTrdDigitizer()
-    :CbmTask("TrdDigitizer")
+    :FairTask("TrdDigitizer")
 	//:fRef(0)
 {
   //    fDigiCollection = new TClonesArray("CbmTrdDigi");
@@ -36,7 +36,7 @@ CbmTrdDigitizer::CbmTrdDigitizer()
 
 // ---- Constructor ----------------------------------------------------
 CbmTrdDigitizer::CbmTrdDigitizer(const char *name, const char *title)
-	:CbmTask(name)
+	:FairTask(name)
 {
 
 }
@@ -45,7 +45,7 @@ CbmTrdDigitizer::CbmTrdDigitizer(const char *name, const char *title)
 // ---- Destructor ----------------------------------------------------
 CbmTrdDigitizer::~CbmTrdDigitizer()
 {
-  //    CbmRootManager *ioman =CbmRootManager::Instance();
+  //    FairRootManager *ioman =FairRootManager::Instance();
   //ioman->Write();
   //fDigiCollection->Clear("C");
   //delete fDigiCollection;
@@ -60,8 +60,8 @@ void CbmTrdDigitizer::SetParContainers()
 
 
     // Get Base Container
-    CbmRunAna* ana = CbmRunAna::Instance();
-    CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+    FairRunAna* ana = FairRunAna::Instance();
+    FairRuntimeDb* rtdb=ana->GetRuntimeDb();
 
     //    fDigiPar = (CbmTrdDigiPar*)
     //               (rtdb->getContainer("CbmTrdDigiPar"));
@@ -76,8 +76,8 @@ InitStatus CbmTrdDigitizer::ReInit(){
   cout<<" * CbmTrdDigitizer * :: ReInit() "<<endl;
 
 
-  CbmRunAna* ana = CbmRunAna::Instance();
-  CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+  FairRunAna* ana = FairRunAna::Instance();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
 
   //  fDigiPar = (CbmTrdDigiPar*)
   //    (rtdb->getContainer("CbmTrdDigiPar"));
@@ -92,8 +92,8 @@ InitStatus CbmTrdDigitizer::Init()
 
     cout<<" * CbmTrdDigitizer * :: Init() "<<endl;
 
-    CbmRootManager *ioman = CbmRootManager::Instance();
-    if ( ! ioman ) Fatal("Init", "No CbmRootManager");
+    FairRootManager *ioman = FairRootManager::Instance();
+    if ( ! ioman ) Fatal("Init", "No FairRootManager");
     
     fTrdPoints=(TClonesArray *)  
       ioman->ActivateBranch("TRDPoint");
@@ -282,7 +282,7 @@ void CbmTrdDigitizer::GetModuleInformation()
 // ---- Register ------------------------------------------------------
 void CbmTrdDigitizer::Register(){
 
-  //CbmRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigiCollection, kTRUE);
+  //FairRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigiCollection, kTRUE);
 
 }
 // --------------------------------------------------------------------

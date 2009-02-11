@@ -7,7 +7,7 @@
 #ifndef CBMECALQUALITYCHECK_H
 #define CBMECALQUALITYCHECK_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TString.h"
 
@@ -26,7 +26,7 @@ class CbmEcalQualityCheckItem;
 class CbmEcalShowerLib;
 class CbmEcalPoint;
 
-class CbmEcalQualityCheck : public CbmTask
+class CbmEcalQualityCheck : public FairTask
 {
 public:
   /** Default constructor. Requirement of ROOT system **/

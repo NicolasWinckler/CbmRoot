@@ -9,11 +9,11 @@
 #include "CbmLitMemoryManagment.h"
 #include "CbmLitComparators.h"
 
-#include "CbmField.h"
-#include "CbmRunAna.h"
-#include "CbmDetector.h"
-#include "CbmRuntimeDb.h"
-#include "CbmBaseParSet.h"
+#include "FairField.h"
+#include "FairRunAna.h"
+#include "FairDetector.h"
+#include "FairRuntimeDb.h"
+#include "FairBaseParSet.h"
 
 #ifdef NEWMUCH
 #include "CbmMuchGeoScheme.h"
@@ -57,10 +57,10 @@ CbmLitEnvironment* CbmLitEnvironment::Instance()
    return fInstance;
 }
 
-CbmField* CbmLitEnvironment::GetField()
+FairField* CbmLitEnvironment::GetField()
 {
    if (fField == NULL) {
-      CbmRunAna *Run = CbmRunAna::Instance();
+      FairRunAna *Run = FairRunAna::Instance();
 
       if(NULL == Run) {
          std::cout << "-E- CbmLitEnvironment::GetField : "
@@ -71,7 +71,7 @@ CbmField* CbmLitEnvironment::GetField()
       std::cout << "-I- CbmLitEnvironment::GetField : "
          << "Reading Magnetic Field " << std::endl;
 
-      fField = (CbmField*) Run->GetField();
+      fField = (FairField*) Run->GetField();
    }
    return fField;
 }
@@ -157,7 +157,7 @@ CbmLitDetectorLayout CbmLitEnvironment::GetNewMuchLayout()
 	if (!layoutCreated) {
 
 		CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-		CbmRuntimeDb* db = CbmRuntimeDb::instance();
+		FairRuntimeDb* db = FairRuntimeDb::instance();
 		CbmGeoMuchPar* geoPar = (CbmGeoMuchPar*) db->getContainer("CbmGeoMuchPar");
 		TObjArray* stations = (TObjArray*) geoPar->GetStations();
 		geoScheme->Init(stations);
@@ -300,11 +300,11 @@ std::vector<CbmLitStation> CbmLitEnvironment::DivideToSubstations(
 
 bool CbmLitEnvironment::IsStraw() const
 {
-	CbmRunAna* ana = CbmRunAna::Instance();
-	CbmRuntimeDb* rtdb = ana->GetRuntimeDb();
-	CbmBaseParSet* baseParSet = (CbmBaseParSet*) rtdb->getContainer("CbmBaseParSet");
+	FairRunAna* ana = FairRunAna::Instance();
+	FairRuntimeDb* rtdb = ana->GetRuntimeDb();
+	FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
 	TObjArray *detList = baseParSet->GetDetList();
-	CbmDetector* much = (CbmDetector*) detList->FindObject("MUCH");
+	FairDetector* much = (FairDetector*) detList->FindObject("MUCH");
 	TString name = much->GetGeometryFileName();
 	if(name.Contains("straw")) {
 		//std::cout << "-I- TrdLayout :" << "STRAWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" << std::endl;
@@ -316,11 +316,11 @@ bool CbmLitEnvironment::IsStraw() const
 
 bool CbmLitEnvironment::IsTrdSegmented() const
 {
-	CbmRunAna* ana = CbmRunAna::Instance();
-	CbmRuntimeDb* rtdb = ana->GetRuntimeDb();
-	CbmBaseParSet* baseParSet = (CbmBaseParSet*) rtdb->getContainer("CbmBaseParSet");
+	FairRunAna* ana = FairRunAna::Instance();
+	FairRuntimeDb* rtdb = ana->GetRuntimeDb();
+	FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
 	TObjArray *detList = baseParSet->GetDetList();
-	CbmDetector* much = (CbmDetector*) detList->FindObject("TRD");
+	FairDetector* much = (FairDetector*) detList->FindObject("TRD");
 	TString name = much->GetGeometryFileName();
 	if(name.Contains("monolithic")) {
 		return false;

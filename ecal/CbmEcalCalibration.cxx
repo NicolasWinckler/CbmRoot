@@ -5,7 +5,7 @@
 #include "CbmEcalStructure.h"
 #include "CbmEcalParam.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include <list>
 #include <iostream>
@@ -14,7 +14,7 @@ using namespace std;
 
 /** Standard constructor **/
 CbmEcalCalibration::CbmEcalCalibration(const char *name, const Int_t iVerbose, const  char* parname)
-  : CbmTask(name, iVerbose)
+  : FairTask(name, iVerbose)
 {
   fParName=parname;
   /**TODO: Need to read parameters from a parname file! **/
@@ -35,7 +35,7 @@ CbmEcalCalibration::CbmEcalCalibration(const char *name, const Int_t iVerbose, c
 
 /** Default constructor **/
 CbmEcalCalibration::CbmEcalCalibration()
-  : CbmTask()
+  : FairTask()
 {
   ;
 }
@@ -55,11 +55,11 @@ InitStatus CbmEcalCalibration::Init()
   }
   delete par;
 
-  CbmRootManager* io=CbmRootManager::Instance();
+  FairRootManager* io=FairRootManager::Instance();
 
   if (!io)
   {
-    Fatal("Init()", "Can't find CbmRootManager.");
+    Fatal("Init()", "Can't find FairRootManager.");
     return kFATAL;
   }
   CbmEcalStructure* fStr=(CbmEcalStructure*)io->GetObject("EcalStructure");

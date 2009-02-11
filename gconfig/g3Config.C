@@ -4,7 +4,7 @@
 
 void Config()
 {
-  CbmRunSim *fRun = CbmRunSim::Instance();
+  FairRunSim *fRun = FairRunSim::Instance();
   TString* gModel = fRun->GetGeoModel();
   TGeant3* geant3 = NULL;
   if ( strncmp(gModel->Data(),"TGeo",4) == 0 ) {

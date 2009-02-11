@@ -16,8 +16,8 @@
 
 #include "CbmKFMaterial.h"
 
-#include "CbmField.h"
-#include "CbmTask.h"
+#include "FairField.h"
+#include "FairTask.h"
 #include "CbmStsDigiScheme.h"
 
 #include <iostream>
@@ -26,9 +26,9 @@
 
 class CbmKFTrackInterface;
 class CbmKFVertexInterface;
-class CbmGeoNode;
+class FairGeoNode;
 
-class CbmKF :public CbmTask {
+class CbmKF :public FairTask {
 
  public:
 
@@ -37,7 +37,7 @@ class CbmKF :public CbmTask {
 
   static CbmKF *Instance(){ return fInstance; }
 
-  /// * CbmTask methods
+  /// * FairTask methods
   
   void SetParContainers();
   InitStatus ReInit();
@@ -76,7 +76,7 @@ class CbmKF :public CbmTask {
  
   /// * Usefull information 
   
-  CbmField *GetMagneticField(){ return fMagneticField; }
+  FairField *GetMagneticField(){ return fMagneticField; }
 
   std::map<Int_t,Int_t> MvdStationIDMap;
   std::map<Int_t,Int_t> StsStationIDMap;
@@ -93,7 +93,7 @@ class CbmKF :public CbmTask {
   
   static CbmKF *fInstance;
   
-  CbmField *fMagneticField;
+  FairField *fMagneticField;
 
   
   Int_t fMethod; /* 0 = straight line,
@@ -103,8 +103,8 @@ class CbmKF :public CbmTask {
  
   std::map<Int_t,Int_t> fMaterialID2IndexMap;
 
-  Int_t ReadTube( CbmKFTube &tube, CbmGeoNode *node);
-  CbmKFMaterial *ReadPassive( CbmGeoNode *node);
+  Int_t ReadTube( CbmKFTube &tube, FairGeoNode *node);
+  CbmKFMaterial *ReadPassive( FairGeoNode *node);
 
  public: 
   

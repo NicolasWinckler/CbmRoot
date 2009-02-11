@@ -5,15 +5,15 @@
 #define CBMDIRECTPHOTONGENERATOR_H
 
 
-#include "CbmGenerator.h"
+#include "FairGenerator.h"
 
 class TChain;
 class TVirtualMCStack;
-class CbmPrimaryGenerator;
+class FairPrimaryGenerator;
 
 
 
-class CbmDirectPhotonGenerator : public CbmGenerator
+class CbmDirectPhotonGenerator : public FairGenerator
 {
 public: 
   /** Default constructor (should not be used) **/
@@ -26,9 +26,9 @@ public:
   virtual ~CbmDirectPhotonGenerator();
   /** Reads on event from the input file and pushes the tracks onto
    ** the stack. Abstract method in base class.
-   ** @param primGen  pointer to the CbmPrimaryGenerator
+   ** @param primGen  pointer to the FairPrimaryGenerator
    **/
-  virtual Bool_t ReadEvent(CbmPrimaryGenerator* primGen);
+  virtual Bool_t ReadEvent(FairPrimaryGenerator* primGen);
   /** Skip number of events in input **/
   inline virtual Bool_t SkipEvents(Int_t num) {for(Int_t i=0;i<num;i++) if (SkipEvent()==kFALSE) return kFALSE; return kTRUE;}
   virtual Bool_t SkipEvent();

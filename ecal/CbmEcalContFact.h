@@ -1,18 +1,18 @@
 #ifndef CBMECALCONTFACT_H
 #define CBMECALCONTFACT_H
 
-#include "CbmContFact.h"
+#include "FairContFact.h"
 
-class CbmContainer;
+class FairContainer;
 
-class CbmEcalContFact : public CbmContFact {
+class CbmEcalContFact : public FairContFact {
 private:
   void setAllContainers();
 public:
   CbmEcalContFact();
   ~CbmEcalContFact() {}
-  CbmParSet* createContainer(CbmContainer*);
-  void  activateParIo(CbmParIo* io);
+  FairParSet* createContainer(FairContainer*);
+  void  activateParIo(FairParIo* io);
   ClassDef( CbmEcalContFact,0) // Factory for all ECAL parameter containers
 };
 

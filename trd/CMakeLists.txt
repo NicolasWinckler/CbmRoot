@@ -74,7 +74,7 @@ set(TRD_SRCS ${TRD_SRCS} ${TRD_DICTIONARY})
 
 add_library(Trd SHARED ${TRD_SRCS})
 target_link_libraries(Trd ${ROOT_LIBRARIES})
-set_target_properties(Trd PROPERTIES  ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(Trd PROPERTIES  ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS Trd  DESTINATION ${CMAKE_BINARY_DIR}/lib)

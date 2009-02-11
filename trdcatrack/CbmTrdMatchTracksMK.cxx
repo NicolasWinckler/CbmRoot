@@ -6,10 +6,10 @@
 
 #include "CbmTrdMatchTracksMK.h"
 
-#include "CbmMCPoint.h"
+#include "FairMCPoint.h"
 #include "CbmTrdPoint.h"
 #include "CbmMCTrack.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 #include "CbmTrdTrackMatch.h"
@@ -28,7 +28,7 @@ using namespace std;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrdMatchTracksMK::CbmTrdMatchTracksMK() 
-  : CbmTask("TRD track match") {
+  : FairTask("TRD track match") {
   fTracks  = NULL;
   fPoints  = NULL;
   fHits    = NULL;
@@ -44,7 +44,7 @@ CbmTrdMatchTracksMK::CbmTrdMatchTracksMK()
 
 // -----   Constructor with verbosity level   ------------------------------
 CbmTrdMatchTracksMK::CbmTrdMatchTracksMK(Int_t verbose)
-  : CbmTask("TRD track match")
+  : FairTask("TRD track match")
 {
   //  cout << "CbmTrdMatchTracksMK: constructing...\n";
   fTracks  = NULL;
@@ -97,8 +97,8 @@ InitStatus CbmTrdMatchTracksMK::Init() {
 
   cout << "CbmTrdMatchTracksMK::Init: initializing...\n";
 
-  // Get CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmTrdMatchTracksMK::Init: "
 	 << "RootManager not instantised!" << endl;
@@ -174,7 +174,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
   // Create some pointers and variables
   //  CbmTrdTrack*      track = NULL;
   //  CbmTrdHit*        hit   = NULL;
-  //  CbmMCPoint*       point = NULL;
+  //  FairMCPoint*       point = NULL;
   Int_t nTrdHit     = fHits->GetEntriesFast();
   if(nTrdHit != 0) {
     Int_t nMCTracks   = fMCTracks->GetEntriesFast();;
@@ -587,8 +587,8 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 	//Double_t chi2;
 	//chi2 = trdTr1->GetChi2()/Double_t((trdTr1->GetNDF()));
 	//chi2 = trdTr1->GetChi2();
-	CbmTrackParam *param;
-	param = (CbmTrackParam*)trdTr1->GetParamLast();
+	FairTrackParam *param;
+	param = (FairTrackParam*)trdTr1->GetParamLast();
       
 	Double_t tx = param->GetTx();
 	Double_t ty = param->GetTy();      
@@ -1559,7 +1559,7 @@ Int_t CbmTrdMatchTracksMK::GetMCIndex(CbmTrdTrack* trdTrack)
     tempVal;
   
   CbmTrdHit* trdHit;
-  CbmMCPoint* mcPoint;
+  FairMCPoint* mcPoint;
 
   map<Int_t, Int_t> indeksy;
   map<Int_t, Int_t>::iterator it;
@@ -1568,7 +1568,7 @@ Int_t CbmTrdMatchTracksMK::GetMCIndex(CbmTrdTrack* trdTrack)
     {
       trdHit = (CbmTrdHit*)fHits->At(trdTrack->GetTrdHitIndex(i));
       trdPtInd = trdHit->GetRefIndex();
-      mcPoint = (CbmMCPoint*)fPoints->At(trdPtInd);
+      mcPoint = (FairMCPoint*)fPoints->At(trdPtInd);
       mcIndex = mcPoint->GetTrackID();
       indeksy[mcIndex]+=1;
     }

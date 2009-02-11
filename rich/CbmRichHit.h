@@ -16,9 +16,9 @@
 #ifndef CBMRICHHIT_H
 #define CBMRICHHIT_H
 
-#include "CbmHit.h"
+#include "FairHit.h"
 
-class CbmRichHit : public CbmHit {
+class CbmRichHit : public FairHit {
 
 public:    
   

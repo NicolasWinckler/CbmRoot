@@ -17,12 +17,12 @@
 #ifndef CBMTRDHITPRODUCERQA
 #define CBMTRDHITPRODUCERQA 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TClonesArray;
 class TH1F;
 
-class CbmTrdHitProducerQa : public CbmTask
+class CbmTrdHitProducerQa : public FairTask
 {
 public:
 
@@ -31,7 +31,7 @@ public:
 
     /* Standard constructor */
     CbmTrdHitProducerQa(const char* name,
-        		const char* title = "CbmTask");
+        		const char* title = "FairTask");
 
     /* Destructor */
     virtual ~CbmTrdHitProducerQa();

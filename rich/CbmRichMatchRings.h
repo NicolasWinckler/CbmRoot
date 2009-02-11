@@ -24,7 +24,7 @@
 #ifndef CBM_RICH_MATCH_RINGS_H
 #define CBM_RICH_MATCH_RINGS_H 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include <map>
 
@@ -32,7 +32,7 @@ class TClonesArray;
 
 
 
-class CbmRichMatchRings : public CbmTask
+class CbmRichMatchRings : public FairTask
 {
 
  public:
@@ -48,10 +48,10 @@ class CbmRichMatchRings : public CbmTask
   /** Constructor with name, title and verbosity
    **
    *@param name     Name of taks
-   *@param title    Title of task   (default CbmTask)
+   *@param title    Title of task   (default FairTask)
    *@param verbose  Verbosity level (default 1)
    **/
-  CbmRichMatchRings(const char* name, const char* title = "CbmTask",
+  CbmRichMatchRings(const char* name, const char* title = "FairTask",
 		    Int_t verbose = 1);
 
 
@@ -74,7 +74,7 @@ class CbmRichMatchRings : public CbmTask
  private:
 
   TClonesArray* fRings;        // Array of CbmRichRings
-  TClonesArray* fPoints;       // Array of CbmMCPoints
+  TClonesArray* fPoints;       // Array of FairMCPoints
   TClonesArray* fTracks;       // Array of CbmMCTracks
   TClonesArray* fHits;         // Array of CbmRichHits
   TClonesArray* fMatches;      // Array of CbmRichRingMatch

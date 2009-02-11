@@ -28,7 +28,7 @@
 
 class TClonesArray;
 class CbmGlobalTrack;
-class CbmTrackParam;
+class FairTrackParam;
 
 
 class CbmRichTrackExtrapolation : public TObject

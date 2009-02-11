@@ -26,7 +26,7 @@
 
   t->SetBranchAddress("GeoTracks",&fT) ;
 
- TGeoManager *geoMan = (TGeoManager*) f->Get("CBMGeom");
+ TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
  TCanvas* c1 = new TCanvas("c1", "", 100, 100, 800, 800);
  c1->SetFillColor(10);
 

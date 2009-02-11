@@ -5,13 +5,13 @@
 #ifndef CBMFINDGLOBALTRACKSQA
 #define CBMFINDGLOBALTRACKSQA
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TClonesArray;
 class TH1F;
 
 
-class CbmFindGlobalTracksQa : public CbmTask {
+class CbmFindGlobalTracksQa : public FairTask {
 
 private:
     Int_t         fMinStsPoints;             // Required minimum of STS points

@@ -17,7 +17,7 @@ project(CBMROOT)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
 # Load some basic macros which are needed later on
-include(CbmMacros)
+include(FairMacros)
 include(WriteConfigFile)
 include(CTest)
 include(CheckCompiler)
@@ -77,7 +77,7 @@ SET(CBMROOT_MAJOR_VERSION 0)
 SET(CBMROOT_MINOR_VERSION 0)
 SET(CBMROOT_PATCH_VERSION 0)
 SET(CBMROOT_VERSION "${CBMROOT_MAJOR_VERSION}.${CBMROOT_MINOR_VERSION}.${CBMROOT_PATCH_VERSION}")
-SET(CBMROOT_LIBRARY_PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES}
+SET(FAIRROOT_LIBRARY_PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES}
     VERSION "${CBMROOT_VERSION}"
     SOVERSION "${CBMROOT_MAJOR_VERSION}"
     SUFFIX ".so"
@@ -122,9 +122,6 @@ add_subdirectory (trdcatrack)
 #add_subdirectory (tutorials/Tutorial2/src)
 add_subdirectory (cbmgenerators)
 
-if(GEANT4_FOUND AND GEANT4VMC_FOUND AND CLHEP_FOUND)  
-  add_subdirectory (cbmg4)
-endif(GEANT4_FOUND AND GEANT4VMC_FOUND AND CLHEP_FOUND)  
 
 Option(BUILD_DOXYGEN "Build Doxygen" OFF)
 if(BUILD_DOXYGEN)

@@ -6,9 +6,9 @@
 #ifndef CBMTOFHIT_H
 #define CBMTOFHIT_H
 
-#include "CbmHit.h"
+#include "FairHit.h"
 
-class CbmTofHit : public CbmHit
+class CbmTofHit : public FairHit
 {
 
  public:

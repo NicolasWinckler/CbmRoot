@@ -1,7 +1,7 @@
 #ifndef CBMLITPROPANA_H
 #define CBMLITPROPANA_H 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmDetectorList.h"
 
 #include <vector>
@@ -12,12 +12,12 @@ class CbmLitTrackPropagator;
 class CbmLitTrackFitter;
 class CbmLitTrackParam;
 class CbmLitTrack;
-class CbmMCPoint;
+class FairMCPoint;
 class CbmMCTrack;
 class TClonesArray;
 class TH1F;
 
-class CbmLitPropAna : public CbmTask
+class CbmLitPropAna : public FairTask
 {
 
 public:
@@ -91,21 +91,21 @@ private:
    Bool_t CreateTrackMuch(
    		Int_t trackId,
    		CbmLitTrack* track,
-   		std::vector<CbmMCPoint*>& points);
+   		std::vector<FairMCPoint*>& points);
 
    Bool_t CreateTrackTrd(
 	   	Int_t trackId,
 	   	CbmLitTrack* track,
-	   	std::vector<CbmMCPoint*>& points);
+	   	std::vector<FairMCPoint*>& points);
 
    void FillParam(
-		   const CbmMCPoint* point,
+		   const FairMCPoint* point,
 		   CbmLitTrackParam* par);
 
    void CreateHistograms();
 
    void CalcResAndPull(
-   		const CbmMCPoint* point,
+   		const FairMCPoint* point,
    		const CbmMCTrack* mcTrack,
    		const CbmLitTrackParam* par,
    		std::vector<Double_t>& res,

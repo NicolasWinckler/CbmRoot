@@ -5,7 +5,7 @@
  **
  ** Data class for a reconstructed hit in the MUCH
  ** Data level RECO
- ** Derived from CbmHit.
+ ** Derived from FairHit.
  ** Additional members: Channel numbers and covariance in x and y
  **/
 

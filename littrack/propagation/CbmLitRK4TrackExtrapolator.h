@@ -16,7 +16,7 @@
 #include "CbmLitTrackExtrapolator.h"
 
 #include "CbmLitTrackParam.h"
-#include "CbmField.h"
+#include "FairField.h"
 
 #include <vector>
 
@@ -64,7 +64,7 @@ protected:
 private:
 
 	std::vector<Double_t> fF;
-	CbmField *fMagneticField;
+	FairField *fMagneticField;
    
    ClassDef(CbmLitRK4TrackExtrapolator,1)
 }; 

@@ -4,7 +4,7 @@
 #ifndef CBMECALCLUSTERFINDERV1_H
 #define CBMECALCLUSTERFINDERV1_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include <list>
 
 class TClonesArray;
@@ -14,7 +14,7 @@ class CbmEcalInf;
 class CbmEcalCalibration;
 class __CbmEcalPreCluster;
 
-class CbmEcalClusterFinderV1: public CbmTask
+class CbmEcalClusterFinderV1: public FairTask
 {
 public:
   /** Standard constructor **/

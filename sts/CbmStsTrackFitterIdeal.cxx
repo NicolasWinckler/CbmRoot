@@ -9,7 +9,7 @@
 #include "CbmStsHit.h"
 #include "CbmStsTrack.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "TClonesArray.h"
@@ -45,7 +45,7 @@ void CbmStsTrackFitterIdeal::Init()
             << "Database PDG is not instantiated!" << endl;
     }
 
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
 	cerr << "-E- CbmStsTrackFitterIdeal::Init : "
 	    << "ROOT manager is not instantiated!" << endl;
@@ -115,7 +115,7 @@ Int_t CbmStsTrackFitterIdeal::DoFit(CbmStsTrack* pTrack, Int_t pidHypo)
 
 
 // -------------------------- Set track parameters -------------------------
-void CbmStsTrackFitterIdeal::SetTrackParam(CbmStsPoint* point, CbmTrackParam* trackParam, Int_t out)
+void CbmStsTrackFitterIdeal::SetTrackParam(CbmStsPoint* point, FairTrackParam* trackParam, Int_t out)
 {
     TVector3 pos;
     TVector3 mom;

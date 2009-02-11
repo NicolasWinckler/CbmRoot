@@ -32,71 +32,71 @@ void trd_sim(Int_t nEvents = 10000)
   cbmrootlibs();
 
 
-  CbmRunSim* fRun = new CbmRunSim();
+  FairRunSim* fRun = new FairRunSim();
   fRun->SetName("TGeant3");              // Transport engine
   fRun->SetOutputFile(outFile);          // Output file
-  CbmRuntimeDb* rtdb = fRun->GetRuntimeDb();
+  FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
 
   fRun->SetMaterials("media.geo");       // Materials
  // fRun->SetStoreTraj(kTRUE);
 
   // -----   Create detectors and passive volumes   -------------------------
   if ( caveGeom != "" ) {
-    CbmModule* cave = new CbmCave("CAVE");
+    FairModule* cave = new CbmCave("CAVE");
     cave->SetGeometryFileName(caveGeom);
     fRun->AddModule(cave);
   }
 
   if ( pipeGeom != "" ) {
-    CbmModule* pipe = new CbmPipe("PIPE");
+    FairModule* pipe = new CbmPipe("PIPE");
     pipe->SetGeometryFileName(pipeGeom);
     fRun->AddModule(pipe);
   }
 
   if ( targetGeom != "" ) {
-    CbmModule* target = new CbmTarget("Target");
+    FairModule* target = new CbmTarget("Target");
     target->SetGeometryFileName(targetGeom);
     fRun->AddModule(target);
   }
 
   if ( magnetGeom != "" ) {
-    CbmModule* magnet = new CbmMagnet("MAGNET");
+    FairModule* magnet = new CbmMagnet("MAGNET");
     magnet->SetGeometryFileName(magnetGeom);
     fRun->AddModule(magnet);
   }
 
   if ( mvdGeom != "" ) {
-    CbmDetector* mvd = new CbmMvd("MVD", kTRUE);
+    FairDetector* mvd = new CbmMvd("MVD", kTRUE);
     mvd->SetGeometryFileName(mvdGeom);
     fRun->AddModule(mvd);
   }
 
   if ( stsGeom != "" ) {
-    CbmDetector* sts = new CbmSts("STS", kTRUE);
+    FairDetector* sts = new CbmSts("STS", kTRUE);
     sts->SetGeometryFileName(stsGeom);
     fRun->AddModule(sts);
   }
 
   if ( richGeom != "" ) {
-    CbmDetector* rich = new CbmRich("RICH", kTRUE);
+    FairDetector* rich = new CbmRich("RICH", kTRUE);
     rich->SetGeometryFileName(richGeom);
     fRun->AddModule(rich);
   }
 
   if ( trdGeom != "" ) {
-    CbmDetector* trd = new CbmTrd("TRD",kTRUE );
+    FairDetector* trd = new CbmTrd("TRD",kTRUE );
     trd->SetGeometryFileName(trdGeom);
     fRun->AddModule(trd);
   }
 
   if ( tofGeom != "" ) {
-    CbmDetector* tof = new CbmTof("TOF", kTRUE);
+    FairDetector* tof = new CbmTof("TOF", kTRUE);
     tof->SetGeometryFileName(tofGeom);
     fRun->AddModule(tof);
   }
 
   if ( ecalGeom != "" ) {
-    CbmDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data());
+    FairDetector* ecal = new CbmEcal("ECAL", kTRUE, ecalGeom.Data());
     fRun->AddModule(ecal);
   }
   // ------------------------------------------------------------------------
@@ -123,8 +123,8 @@ void trd_sim(Int_t nEvents = 10000)
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
-  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
-//  CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFile);
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+//  FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
 //  primGen->AddGenerator(urqmdGen);
 
  // ------------------------------------------------------------------------
@@ -134,7 +134,7 @@ void trd_sim(Int_t nEvents = 10000)
   Int_t kfCode1=11;   // electrons
   Int_t kfCode2=-11;   // positrons
 
-  CbmBoxGenerator* boxGen1 = new CbmBoxGenerator(kfCode1, 5);
+  FairBoxGenerator* boxGen1 = new FairBoxGenerator(kfCode1, 5);
   boxGen1->SetPtRange(0.,3.);
   boxGen1->SetPhiRange(0.,360.);
   boxGen1->SetThetaRange(2.5,25.);
@@ -142,7 +142,7 @@ void trd_sim(Int_t nEvents = 10000)
   boxGen1->Init();
   primGen->AddGenerator(boxGen1);
 
-  CbmBoxGenerator* boxGen2 = new CbmBoxGenerator(kfCode2, 5);
+  FairBoxGenerator* boxGen2 = new FairBoxGenerator(kfCode2, 5);
   boxGen2->SetPtRange(0.,3.);
   boxGen2->SetPhiRange(0.,360.);
   boxGen2->SetThetaRange(2.5,25.);
@@ -164,7 +164,7 @@ void trd_sim(Int_t nEvents = 10000)
   fieldPar->setChanged();
   fieldPar->setInputVersion(fRun->GetRunId(),1);
   Bool_t kParameterMerged = kTRUE;
-  CbmParRootFileIo* parOut = new CbmParRootFileIo(kParameterMerged);
+  FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
   parOut->open(parFile.Data());
   rtdb->setOutput(parOut);
   rtdb->saveOutput();

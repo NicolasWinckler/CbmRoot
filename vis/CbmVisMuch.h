@@ -16,7 +16,7 @@
 
 #include "RQ_OBJECT.h"
 #include "TGFrame.h"
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TClonesArray;
 class TObjArray;
@@ -27,7 +27,7 @@ class TGTextButton;
 class TGVerticalFrame;
 class TGHorizontalFrame;
 
-class CbmRootManager;
+class FairRootManager;
 class CbmMCTrack;
 class CbmGeoMuchPar;
 
@@ -40,7 +40,7 @@ class CbmVisMuchStationFrame;
 class CbmVisPoint;
 class CbmVisHit;
 
-class CbmVisMuch : public CbmTask{
+class CbmVisMuch : public FairTask{
  RQ_OBJECT("CbmVisMuch")
  ClassDef(CbmVisMuch,1);
 
@@ -82,7 +82,7 @@ private:
   
   CbmGeoMuchPar*     fGeoPar;
 
-  CbmRootManager* fRootManager;
+  FairRootManager* fRootManager;
   TClonesArray*   fMCTracks;
   TClonesArray*   fPoints;
   TClonesArray*   fHits;

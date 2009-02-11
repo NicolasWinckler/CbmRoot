@@ -17,7 +17,7 @@ void trd_ana(Int_t nEvents = 1000)
   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
   cbmrootlibs();
 
-  CbmRunAna *run= new CbmRunAna();
+  FairRunAna *run= new FairRunAna();
   run->SetInputFile(inFile);
   run->AddFriend(inFile1);
   run->SetOutputFile(outFile);
@@ -57,9 +57,9 @@ void trd_ana(Int_t nEvents = 1000)
 
 
   // -----  Parameter database   -------------------------------------------
-  CbmRuntimeDb* rtdb = run->GetRuntimeDb();
-  CbmParRootFileIo* parIo1 = new CbmParRootFileIo();
-  CbmParAsciiFileIo* parIo2 = new CbmParAsciiFileIo();
+  FairRuntimeDb* rtdb = run->GetRuntimeDb();
+  FairParRootFileIo* parIo1 = new FairParRootFileIo();
+  FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
   parIo1->open(parFile.Data());
   rtdb->setFirstInput(parIo1);
   rtdb->setOutput(parIo1);

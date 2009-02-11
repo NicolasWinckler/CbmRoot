@@ -6,7 +6,7 @@
 *               takes a particular Track Extrapolation Routine
 *               to create Points in a z-Plane in the RICH
 *               Input:  either only MC simulation or track array
-*               Output: TClonesArray of CbmTrackParam
+*               Output: TClonesArray of FairTrackParam
 *
 *  Author : Claudia Hoehne
 *  E-mail : c.hoehne@gsi.de
@@ -27,12 +27,12 @@
 #define CBM_RICH_EXTRAPOLATE_TRACKS 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class CbmRichTrackExtrapolation;
 class TClonesArray;
 
-class CbmRichExtrapolateTracks : public CbmTask
+class CbmRichExtrapolateTracks : public FairTask
 {
 
  public:
@@ -57,7 +57,7 @@ class CbmRichExtrapolateTracks : public CbmTask
    *@param Zpos               z-Position for extrapolation
    *@param verbose         Verbosity level
    **/
-  CbmRichExtrapolateTracks(const char* name, const char* title = "CbmTask",
+  CbmRichExtrapolateTracks(const char* name, const char* title = "FairTask",
 		   CbmRichTrackExtrapolation* extrapolation = NULL,
 		   Double_t Zpos = 300., Int_t verbose = 1);
 
@@ -94,7 +94,7 @@ class CbmRichExtrapolateTracks : public CbmTask
 
   CbmRichTrackExtrapolation* fExtrapolation;    //! Pointer to TrackExtrapolation concrete class
   TClonesArray* gTrackArray;       //! Input array of global tracks
-  TClonesArray* fTrackParamArray;  //! Output array of CbmTrackParam
+  TClonesArray* fTrackParamArray;  //! Output array of FairTrackParam
   Double_t fZ;                     //! z-Position for Extrapolation [cm]
   Int_t fVerbose;                  //! Verbosity level
   Int_t fNofTracks;

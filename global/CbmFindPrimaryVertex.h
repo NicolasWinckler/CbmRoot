@@ -20,7 +20,7 @@
 #define CBMFINDPRIMARYVERTEX_H 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TClonesArray;
 class CbmPrimaryVertexFinder;
@@ -28,7 +28,7 @@ class CbmVertex;
 
 
 
-class CbmFindPrimaryVertex : public CbmTask
+class CbmFindPrimaryVertex : public FairTask
 {
 
  public:

@@ -475,7 +475,7 @@ cannotGetRunAnaInstanceWarningMsg::~cannotGetRunAnaInstanceWarningMsg() {
 
 void cannotGetRunAnaInstanceWarningMsg::warningMsg() {
 
-	printMsg("The instance of the CbmRunAna object is not accessible!!!");
+	printMsg("The instance of the FairRunAna object is not accessible!!!");
 
 }
 
@@ -506,7 +506,7 @@ cannotGetRuntimeDbWarningMsg::~cannotGetRuntimeDbWarningMsg() {
 
 void cannotGetRuntimeDbWarningMsg::warningMsg() {
 
-	printMsg("The RuntimeDb object is not accessible via the CbmRunAna object!!!");
+	printMsg("The RuntimeDb object is not accessible via the FairRunAna object!!!");
 
 }
 

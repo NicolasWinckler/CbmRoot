@@ -14,12 +14,12 @@
 #define CBMTRDPOINT_H 1
 
 
-#include "CbmMCPoint.h"
+#include "FairMCPoint.h"
  
 #include "TVector3.h"
 
 
-class CbmTrdPoint : public CbmMCPoint
+class CbmTrdPoint : public FairMCPoint
 {
 
 public:

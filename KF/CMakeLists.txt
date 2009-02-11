@@ -73,7 +73,7 @@ set(KF_SRCS ${KF_SRCS} ${KF_DICTIONARY})
 
 add_library(KF SHARED ${KF_SRCS})
 target_link_libraries(KF ${ROOT_LIBRARIES})
-set_target_properties(KF PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(KF PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS KF DESTINATION ${CMAKE_BINARY_DIR}/lib)

@@ -23,7 +23,7 @@ void much_vis(const char* mcFile, const char* rcFile, const char* digiFile)
   gSystem->Load("libMuch");
   gSystem->Load("libVis");
 
-  CbmRunAna *fRun= new CbmRunAna();
+  FairRunAna *fRun= new FairRunAna();
   fRun->SetInputFile(mcFile);
   fRun->AddFriend(rcFile);
   fRun->SetOutputFile(outFile);

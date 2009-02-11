@@ -6,7 +6,7 @@
 #ifndef CbmMuchHitFinderQa_H
 #define CbmMuchHitFinderQa_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TString.h"
 #include "TH1.h"
@@ -18,7 +18,7 @@ class TObjArray;
 
 Double_t LandauMPV(Double_t *x, Double_t *par);
 
-class CbmMuchHitFinderQa : public CbmTask {
+class CbmMuchHitFinderQa : public FairTask {
 
 public:
   CbmMuchHitFinderQa(const char* name = "MuchHitFinderQa", Int_t verbose = 1);

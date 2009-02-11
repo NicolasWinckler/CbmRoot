@@ -17,10 +17,10 @@
 
 #include "L1Algo/L1Algo.h"
 
-#include "CbmHit.h"
+#include "FairHit.h"
 #include "CbmStsHit.h"
-#include "CbmMCPoint.h"
-#include "CbmRootManager.h"
+#include "FairMCPoint.h"
+#include "FairRootManager.h"
 #include "CbmStsTrack.h"
 #include "CbmKFMath.h"
 
@@ -81,7 +81,7 @@ Int_t CbmL1StsTrackFinder::DoFind() {
       new((*fTracks)[ntracks]) CbmStsTrack();
       CbmStsTrack *t = (CbmStsTrack*)fTracks->At(ntracks++);
       t->SetFlag(0);
-      CbmTrackParam* fpar = t->GetParamFirst(), * lpar = t->GetParamLast();      
+      FairTrackParam* fpar = t->GetParamFirst(), * lpar = t->GetParamLast();      
       CbmKFMath::CopyTC2TrackParam( fpar, T.T, T.C );
       CbmKFMath::CopyTC2TrackParam( lpar, T.TLast, T.CLast );
       t->SetChi2(T.chi2);

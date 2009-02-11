@@ -20,12 +20,12 @@ using std::cerr;
 
 ClassImp(CbmMuchParAsciiFileIo)
 
-CbmMuchParAsciiFileIo::CbmMuchParAsciiFileIo(fstream* f) : CbmDetParAsciiFileIo(f) {
+CbmMuchParAsciiFileIo::CbmMuchParAsciiFileIo(fstream* f) : FairDetParAsciiFileIo(f) {
   // constructor calls the base class constructor
   fName="CbmMuchParIo";
 }
 
-Bool_t CbmMuchParAsciiFileIo::init(CbmParSet* pPar) {
+Bool_t CbmMuchParAsciiFileIo::init(FairParSet* pPar) {
   // calls the appropriate read function for the container
   const  Text_t* name=pPar->GetName();
    cout << "-I- Ascii Io init() " << pPar->GetName() <<   endl;
@@ -39,7 +39,7 @@ Bool_t CbmMuchParAsciiFileIo::init(CbmParSet* pPar) {
   return kFALSE;
 }
 
-Int_t CbmMuchParAsciiFileIo::write(CbmParSet* pPar) {
+Int_t CbmMuchParAsciiFileIo::write(FairParSet* pPar) {
   // calls the appropriate write function for the container
   if (pFile) {
     const  Text_t* name=pPar->GetName();

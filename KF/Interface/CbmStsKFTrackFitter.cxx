@@ -5,7 +5,7 @@
 #include "CbmKFVertex.h"
 #include "CbmKFStsHit.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmStsTrack.h"
 #include "CbmVertex.h"
 #include "CbmMvdHit.h"
@@ -30,7 +30,7 @@ CbmStsKFTrackFitter::CbmStsKFTrackFitter(){
 
 void CbmStsKFTrackFitter::Init(){ 
   // Initialisation
-  CbmRootManager *rootMgr = CbmRootManager::Instance();
+  FairRootManager *rootMgr = FairRootManager::Instance();
   if(NULL == rootMgr) {
     cout << "-E- CbmStsKFTrackFitter::Init(): "
 	 << "ROOT manager is not instantiated!" << endl;
@@ -115,7 +115,7 @@ Int_t CbmStsKFTrackFitter::DoFit( CbmStsTrack* track, Int_t pidHypo )
 }
 
 
-void CbmStsKFTrackFitter::Extrapolate( CbmTrackParam* track, Double_t z, CbmTrackParam* e_track )
+void CbmStsKFTrackFitter::Extrapolate( FairTrackParam* track, Double_t z, FairTrackParam* e_track )
 {
   if( !track ) return;
   CbmKFTrack T;  
@@ -125,12 +125,12 @@ void CbmStsKFTrackFitter::Extrapolate( CbmTrackParam* track, Double_t z, CbmTrac
 }
 
 
-void CbmStsKFTrackFitter::Extrapolate( CbmStsTrack* track, Double_t z, CbmTrackParam* e_track )
+void CbmStsKFTrackFitter::Extrapolate( CbmStsTrack* track, Double_t z, FairTrackParam* e_track )
 {
   if( !track ) return;
   CbmKFTrack T;
   T.SetPID( track->GetPidHypo() );
-  CbmTrackParam *fpar = track->GetParamFirst(), *lpar = track->GetParamLast();
+  FairTrackParam *fpar = track->GetParamFirst(), *lpar = track->GetParamLast();
   
   if( z<=fpar->GetZ() ){ // extrapolate first parameters
     T.SetTrackParam( *fpar );
@@ -156,7 +156,7 @@ void CbmStsKFTrackFitter::Extrapolate( CbmStsTrack* track, Double_t z, CbmTrackP
 Double_t  CbmStsKFTrackFitter::GetChiToVertex( CbmStsTrack* track,  CbmVertex *vtx )
 {
   if( !vtx ){  
-    CbmRootManager *fManger = CbmRootManager::Instance();
+    FairRootManager *fManger = FairRootManager::Instance();
     vtx = (CbmVertex *)  fManger->GetObject("PrimaryVertex");
     if( !vtx ){
       cout<< "-W- CbmStsKFTrackFitter::GetChiToVertex: No Primary Vertex found!"<<endl;
@@ -176,7 +176,7 @@ Double_t  CbmStsKFTrackFitter::GetChiToVertex( CbmStsTrack* track,  CbmVertex *v
 }
 
 
-Double_t CbmStsKFTrackFitter::FitToVertex( CbmStsTrack* track, CbmVertex *vtx, CbmTrackParam *v_track )
+Double_t CbmStsKFTrackFitter::FitToVertex( CbmStsTrack* track, CbmVertex *vtx, FairTrackParam *v_track )
 {
   Double_t ret = 100.;  
   if( !track || !vtx || !v_track ) return ret;

@@ -11,7 +11,7 @@
 #include "CbmLitConverter.h"
 #include "CbmLitEnvironment.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -31,7 +31,7 @@ CbmLitMuchTrackFinderBranch::~CbmLitMuchTrackFinderBranch()
 
 void CbmLitMuchTrackFinderBranch::Init()
 {
-   CbmRootManager* rootMgr = CbmRootManager::Instance();
+   FairRootManager* rootMgr = FairRootManager::Instance();
    if(NULL == rootMgr)
       TObject::Fatal("CbmLitMuchTrackFinderBranch::Init","ROOT manager is not instantiated");
 

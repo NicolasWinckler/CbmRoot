@@ -20,12 +20,12 @@
 #define CBMTRDFITTRACKS 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class CbmTrdTrackFitter;
 class TClonesArray;
 
-class CbmTrdFitTracks : public CbmTask
+class CbmTrdFitTracks : public FairTask
 {
 
  public:
@@ -40,7 +40,7 @@ class CbmTrdFitTracks : public CbmTask
    *@param title  Task title
    *@param finder Pointer to STS track finder concrete class
    **/
-  CbmTrdFitTracks(const char* name, const char* title = "CbmTask",
+  CbmTrdFitTracks(const char* name, const char* title = "FairTask",
 		  CbmTrdTrackFitter* fitter = NULL);
 
 

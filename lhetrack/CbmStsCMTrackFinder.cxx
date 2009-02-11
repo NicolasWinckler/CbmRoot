@@ -8,8 +8,8 @@
 #include "CbmStsHit.h"
 #include "CbmStsCMTrack.h"
 #include "CbmStsCMPoint.h"
-#include "CbmMCApplication.h"
-#include "CbmTask.h"
+#include "FairMCApplication.h"
+#include "FairTask.h"
 
 #include "TRefArray.h"
 #include "TClonesArray.h"
@@ -43,14 +43,14 @@ CbmStsCMTrackFinder::~CbmStsCMTrackFinder() {
     delete fTrackCuts;
   }
 
-  CbmRootManager *fManager =CbmRootManager::Instance();
+  FairRootManager *fManager =FairRootManager::Instance();
   fManager->Write();
 
 }
 
 //_________________________________________________________________
 CbmStsCMTrackFinder::CbmStsCMTrackFinder(const char *name, const char *title)
-	:CbmTask(name) {
+	:FairTask(name) {
 
   fTrackletCuts = new CbmStsTrackletCuts();
   fTrackCuts = new CbmStsTrackCuts();
@@ -67,14 +67,14 @@ CbmStsCMTrackFinder::CbmStsCMTrackFinder(const char *name, const char *title)
 void CbmStsCMTrackFinder::Register() {
     //
 
-    CbmRootManager::Instance()->Register("StsFoundTrack","StsFoundTrack",fFoundTracks, kFALSE);
+    FairRootManager::Instance()->Register("StsFoundTrack","StsFoundTrack",fFoundTracks, kFALSE);
 
 }
 
 //________________________________________________________________
 InitStatus CbmStsCMTrackFinder::Init() {
 
-  CbmRootManager *fManager =CbmRootManager::Instance();
+  FairRootManager *fManager =FairRootManager::Instance();
   //fHits = (TClonesArray *)fManager->CheckActivatedBranch("StsHit");
   fHits  = (TClonesArray *)fManager->GetObject("StsHit");
   if (!fHits ) exit(1);
@@ -168,7 +168,7 @@ void CbmStsCMTrackFinder::Finish()
   }
 
   cout << " # of found tracks " << fFoundTracks->GetEntries() << endl;
-  CbmRootManager *fManager =CbmRootManager::Instance();	
+  FairRootManager *fManager =FairRootManager::Instance();	
   fManager->Fill();
 
 }

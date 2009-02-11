@@ -38,7 +38,7 @@ void Config()
  //  stack->SetMinPoints(0);
    geant4->SetStack(stack);
 
-   if(CbmRunSim::Instance()->IsExtDecayer()){
+   if(FairRunSim::Instance()->IsExtDecayer()){
       TVirtualMCDecayer* decayer = TPythia6Decayer::Instance();
       geant4->SetExternalDecayer(decayer);
    }

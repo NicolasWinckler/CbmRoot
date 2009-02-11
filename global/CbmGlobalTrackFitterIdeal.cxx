@@ -6,7 +6,7 @@
 
 #include "CbmGlobalTrack.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmStsTrack.h"
 #include "CbmTrdTrack.h"
 
@@ -48,7 +48,7 @@ void CbmGlobalTrackFitterIdeal::Init()
     // Initialisation
 
     // Get pointer to the ROOT I/O manager
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
 	cout << "-E- CbmGlobalTrackFitterIdeal::Init :"
 	    << " ROOT manager is not instantiated" << endl;

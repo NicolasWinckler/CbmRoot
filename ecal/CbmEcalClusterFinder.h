@@ -39,9 +39,9 @@
 #include "TClonesArray.h"
 
 #include "CbmStack.h"
-#include "CbmTask.h"
+#include "FairTask.h"
 
-class CbmEcalClusterFinder : public CbmTask {
+class CbmEcalClusterFinder : public FairTask {
 
 
 public:

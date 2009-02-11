@@ -9,14 +9,14 @@
  *@author M.Kalisky <m.kalisky@gsi.de>
  **
  ** TRD local track. Holds lists of CbmTrdHits and the fitted
- ** track parameters. The fit parameters are of type CbmTrackParam
+ ** track parameters. The fit parameters are of type FairTrackParam
  ** and can only be accesssed and modified via this class.
  **/
 #ifndef CBMTRDTRACK_H
 #define CBMTRDTRACK_H 1
 
 
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 
 #include "TArrayI.h"
 #include "TObject.h"
@@ -61,8 +61,8 @@ public:
     Int_t    GetNDF()                  const { return fNDF; }
     Double_t GetELoss()                const { return fELoss;}
     Int_t GetStsTrackIndex()           const { return fStsTrackIndex;}
-    CbmTrackParam* GetParamFirst() { return &fParamFirst; }
-    CbmTrackParam* GetParamLast()  { return &fParamLast ; }
+    FairTrackParam* GetParamFirst() { return &fParamFirst; }
+    FairTrackParam* GetParamLast()  { return &fParamLast ; }
 
     Double_t GetPidLikeEL()               const { return fPidLikeEL; }
     Double_t GetPidLikePI()               const { return fPidLikePI; }
@@ -76,8 +76,8 @@ public:
     void SetPidHypo(Int_t pid)                { fPidHypo    = pid;     }
     void SetPidWkn(Double_t pid)              { fPidWkn     = pid;     }
     void SetPidANN(Double_t pid)              { fPidANN     = pid;     }
-    void SetParamFirst(CbmTrackParam& par)    { fParamFirst = par;     }
-    void SetParamLast(CbmTrackParam& par)     { fParamLast  = par;     }
+    void SetParamFirst(FairTrackParam& par)    { fParamFirst = par;     }
+    void SetParamLast(FairTrackParam& par)     { fParamLast  = par;     }
     void SetFlag(Int_t flag)                  { fFlag       = flag;    }
     void SetChi2(Double_t chi2)               { fChi2       = chi2;    }
     void SetNDF(Int_t ndf)                    { fNDF = ndf; }
@@ -128,8 +128,8 @@ private:
     Double_t fPidLikeMU;
 
     /** Track parameters at first and last fitted hit **/
-    CbmTrackParam fParamFirst;
-    CbmTrackParam fParamLast;
+    FairTrackParam fParamFirst;
+    FairTrackParam fParamLast;
 
     /** Quality flag **/
     Int_t fFlag;

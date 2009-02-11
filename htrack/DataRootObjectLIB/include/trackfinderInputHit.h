@@ -35,11 +35,11 @@
 
 #include "../../MiscLIB/include/defs.h"
 #if (ARCHITECTURE == STANDALONE)
-	#include "../../RootFrameworkLIB/include/CbmHit.h"
-	#include "../../RootFrameworkLIB/include/CbmMCPoint.h"
+	#include "../../RootFrameworkLIB/include/FairHit.h"
+	#include "../../RootFrameworkLIB/include/FairMCPoint.h"
 #elif (ARCHITECTURE == CBMROOT)
-	#include "CbmHit.h"
-	#include "CbmMCPoint.h"
+	#include "FairHit.h"
+	#include "FairMCPoint.h"
 #endif
 #include "trackfinderInputTrack.h"
 #include "trackfinderInputStation.h"
@@ -57,8 +57,8 @@ class trackfinderInputHit : public TObject {
 
 protected:
 
-	CbmHit*                  hit;			/**< Pointer to the original hit object coming from the framework. */
-	CbmMCPoint*              point;			/**< Pointer to the original point object belonging to this hit coming from the framework. */
+	FairHit*                  hit;			/**< Pointer to the original hit object coming from the framework. */
+	FairMCPoint*              point;			/**< Pointer to the original point object belonging to this hit coming from the framework. */
 	trackfinderInputTrack*   track;			/**< Pointer to the original track for this hit object coming from the framework. */
 	trackfinderInputStation* station;		/**< Pointer to the station of the detector which the hit hits. */
 	bool                     isPointer;		/**< Variable to store if this object is just a pointer or it has allocated memory which has to be freed. */
@@ -81,12 +81,12 @@ public:
 
 /**
  * Constructor
- * @see CbmHit()
+ * @see FairHit()
  */
 
 	trackfinderInputHit(const trackfinderInputHit& value);
 	trackfinderInputHit(const trackfinderInputHit& value, unsigned int order);
-	trackfinderInputHit(CbmHit* hitPointer, int index, unsigned int order);
+	trackfinderInputHit(FairHit* hitPointer, int index, unsigned int order);
 	trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex, bool maps, bool strip, bool hybrid);
 	trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex);
 
@@ -104,11 +104,11 @@ public:
 
 /**
  * method initializes the object
- * @see CbmHit()
+ * @see FairHit()
  */
 
 	void initDefault();
-	void init(CbmHit* hitPointer, int index, unsigned int order);
+	void init(FairHit* hitPointer, int index, unsigned int order);
 	void init(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex, bool maps, bool strip, bool hybrid);
 	void init(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex);
 
@@ -140,13 +140,13 @@ public:
  * method gets the original hit-object
  */
 
-	CbmHit* getHit();
+	FairHit* getHit();
 
 /**
  * method gets the original point-object from hit
  */
 
-	CbmMCPoint* getPoint();
+	FairMCPoint* getPoint();
 
 /**
  * method gets the track-object from hit
@@ -197,7 +197,7 @@ public:
  * method sets the original point-object from hit
  */
 
-	void setPoint(CbmMCPoint* actualPoint);
+	void setPoint(FairMCPoint* actualPoint);
 
 /**
  * method sets the track-object from hit

@@ -17,7 +17,7 @@ void trd_hits(Int_t nEvents = 500)
   cbmrootlibs();
 
   // -----   Reconstruction run   -------------------------------------------
-  CbmRunAna *run= new CbmRunAna();
+  FairRunAna *run= new FairRunAna();
   run->SetInputFile(inFile);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
@@ -43,9 +43,9 @@ void trd_hits(Int_t nEvents = 500)
 
 
   // -----  Parameter database   --------------------------------------------
-  CbmRuntimeDb* rtdb = run->GetRuntimeDb();
-  CbmParRootFileIo* parIo1 = new CbmParRootFileIo();
-  CbmParAsciiFileIo* parIo2 = new CbmParAsciiFileIo();
+  FairRuntimeDb* rtdb = run->GetRuntimeDb();
+  FairParRootFileIo* parIo1 = new FairParRootFileIo();
+  FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
   parIo1->open(parFile.Data());
   rtdb->setFirstInput(parIo1);
   rtdb->setOutput(parIo1);

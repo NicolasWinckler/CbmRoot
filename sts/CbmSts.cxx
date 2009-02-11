@@ -9,15 +9,15 @@
 #include "CbmGeoStsPar.h"
 
 #include "CbmDetectorList.h"
-#include "CbmGeoInterface.h"
-#include "CbmGeoLoader.h"
-#include "CbmGeoNode.h"
-#include "CbmGeoRootBuilder.h"
-#include "CbmRootManager.h"
+#include "FairGeoInterface.h"
+#include "FairGeoLoader.h"
+#include "FairGeoNode.h"
+#include "FairGeoRootBuilder.h"
+#include "FairRootManager.h"
 #include "CbmStack.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRun.h"
-#include "CbmVolume.h"
+#include "FairRuntimeDb.h"
+#include "FairRun.h"
+#include "FairVolume.h"
 
 #include "TClonesArray.h"
 #include "TGeoMCGeometry.h"
@@ -36,7 +36,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmSts::CbmSts() : CbmDetector("STS", kTRUE, kSTS) {
+CbmSts::CbmSts() : FairDetector("STS", kTRUE, kSTS) {
   ResetParameters();
   fStsCollection = new TClonesArray("CbmStsPoint");
   fPosIndex = 0;
@@ -51,7 +51,7 @@ CbmSts::CbmSts() : CbmDetector("STS", kTRUE, kSTS) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmSts::CbmSts(const char* name, Bool_t active) 
-  : CbmDetector(name, active, kSTS) {
+  : FairDetector(name, active, kSTS) {
   ResetParameters();
   fStsCollection = new TClonesArray("CbmStsPoint");
   fPosIndex = 0;
@@ -78,7 +78,7 @@ CbmSts::~CbmSts() {
 
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t CbmSts::ProcessHits(CbmVolume* vol) {
+Bool_t CbmSts::ProcessHits(FairVolume* vol) {
   //    cout << " -I process hit called for:" <<  vol->GetName() << endl;
   // Set parameters at entrance of volume. Reset ELoss.
 
@@ -177,7 +177,7 @@ Bool_t CbmSts::ProcessHits(CbmVolume* vol) {
 //  if (mf ) stsf = (TFolder*) mf->FindObjectAny(GetName());
 //  cout << " stsf: " << stsf << endl;
 //  if (stsf) stsf->Add( flGeoPar0 ) ;
- //  CbmRootManager::Instance()->WriteFolder();
+ //  FairRootManager::Instance()->WriteFolder();
 //  mf->Write("cbmroot",TObject::kWriteDelete);
 //}
 
@@ -206,7 +206,7 @@ void CbmSts::EndOfEvent() {
 
 // -----   Public method Register   -------------------------------------------
 void CbmSts::Register() {
-  CbmRootManager::Instance()->Register("STSPoint", GetName(), fStsCollection, kTRUE);
+  FairRootManager::Instance()->Register("STSPoint", GetName(), fStsCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
 
@@ -263,8 +263,8 @@ void CbmSts::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 // -----   Public method ConstructGeometry   ----------------------------------
 void CbmSts::ConstructGeometry() {
   
-  CbmGeoLoader*    geoLoad = CbmGeoLoader::Instance();
-  CbmGeoInterface* geoFace = geoLoad->getGeoInterface();
+  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
+  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
   CbmGeoSts*       stsGeo  = new CbmGeoSts();
   stsGeo->setGeomFile(GetGeometryFileName());
   geoFace->addGeoModule(stsGeo);
@@ -273,18 +273,18 @@ void CbmSts::ConstructGeometry() {
   if (rc) stsGeo->create(geoLoad->getGeoBuilder());
   TList* volList = stsGeo->getListOfVolumes();
   // store geo parameter
-  CbmRun *fRun = CbmRun::Instance();
-  CbmRuntimeDb *rtdb= CbmRun::Instance()->GetRuntimeDb();
+  FairRun *fRun = FairRun::Instance();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
   CbmGeoStsPar* par=(CbmGeoStsPar*)(rtdb->getContainer("CbmGeoStsPar"));
   TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
   TObjArray *fPassNodes = par->GetGeoPassiveNodes();
 
   TListIter iter(volList);
-  CbmGeoNode* node   = NULL;
-  CbmGeoVolume *aVol=NULL;
+  FairGeoNode* node   = NULL;
+  FairGeoVolume *aVol=NULL;
 
-  while( (node = (CbmGeoNode*)iter.Next()) ) {
-      aVol = dynamic_cast<CbmGeoVolume*> ( node );
+  while( (node = (FairGeoNode*)iter.Next()) ) {
+      aVol = dynamic_cast<FairGeoVolume*> ( node );
        if ( node->isSensitive()  ) {
            fSensNodes->AddLast( aVol );
        }else{

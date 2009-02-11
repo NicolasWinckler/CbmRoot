@@ -65,7 +65,7 @@ set(ECAL_SRCS ${ECAL_SRCS} ${ECAL_DICTIONARY})
 
 add_library(Ecal SHARED ${ECAL_SRCS})
 target_link_libraries(Ecal ${ROOT_LIBRARIES})
-set_target_properties(Ecal PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(Ecal PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS Ecal DESTINATION ${CMAKE_BINARY_DIR}/lib)

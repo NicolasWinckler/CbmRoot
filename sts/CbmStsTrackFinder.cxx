@@ -10,7 +10,7 @@
 
 #include "CbmStsDigiScheme.h"
 
-#include "CbmField.h"
+#include "FairField.h"
 
 #include "TClonesArray.h"
 

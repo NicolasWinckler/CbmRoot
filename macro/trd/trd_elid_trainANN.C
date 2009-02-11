@@ -132,7 +132,7 @@ void trd_elid_trainANN ()
             trdhit = (CbmTrdHit*) hitsTRD->At(hitIndex);
             Int_t iPoint = trdhit->GetRefIndex();        
             if ( iPoint < 0 )continue;         
-            CbmMCPoint* point = (CbmMCPoint*) pointsTRD->At(iPoint);            
+            FairMCPoint* point = (FairMCPoint*) pointsTRD->At(iPoint);            
             TVector3 mom;
             point->Momentum(mom);
             if ( mom.Mag() < .5 ) continue;

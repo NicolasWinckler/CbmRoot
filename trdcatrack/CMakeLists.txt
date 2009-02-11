@@ -50,7 +50,7 @@ set(TRDCATRACK_SRCS ${TRDCATRACK_SRCS} ${TRDCATRACK_DICTIONARY})
 
 add_library(trdcatrack SHARED ${TRDCATRACK_SRCS})
 target_link_libraries(trdcatrack ${ROOT_LIBRARIES})
-set_target_properties(trdcatrack PROPERTIES  ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(trdcatrack PROPERTIES  ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS trdcatrack DESTINATION ${CMAKE_BINARY_DIR}/lib)

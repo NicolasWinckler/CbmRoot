@@ -10,7 +10,7 @@
 
 #include "CbmGeoZdc.h"
 
-#include "CbmGeoNode.h"
+#include "FairGeoNode.h"
 
 ClassImp(CbmGeoZdc)
 

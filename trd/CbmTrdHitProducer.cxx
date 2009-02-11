@@ -5,11 +5,11 @@
 #include "CbmTrdPoint.h"
 #include "CbmTrdHit.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmBaseParSet.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairBaseParSet.h"
 
 #include "TRandom.h"
 #include "TMath.h"
@@ -22,7 +22,7 @@ using std::endl;
 
 // ---- Default constructor -------------------------------------------
 CbmTrdHitProducer::CbmTrdHitProducer()
-    :CbmTask("TrdHitProducer")
+    :FairTask("TrdHitProducer")
 	//:fRef(0)
 {
     fHitCollection = new TClonesArray("CbmTrdHit");
@@ -49,7 +49,7 @@ CbmTrdHitProducer::CbmTrdHitProducer()
 
 // ---- Constructor ----------------------------------------------------
 CbmTrdHitProducer::CbmTrdHitProducer(const char *name, const char *title)
-	:CbmTask(name)
+	:FairTask(name)
 {
     //	cl=0;
 
@@ -80,7 +80,7 @@ CbmTrdHitProducer::CbmTrdHitProducer(const char *name, const char *title)
 // ---- Destructor ----------------------------------------------------
 CbmTrdHitProducer::~CbmTrdHitProducer()
 {
-    CbmRootManager *ioman =CbmRootManager::Instance();
+    FairRootManager *ioman =FairRootManager::Instance();
     ioman->Write();
     fHitCollection->Clear("C");
     delete fHitCollection;
@@ -96,11 +96,11 @@ void CbmTrdHitProducer::SetParContainers()
 
 
     // Get Base Container
-    CbmRunAna* ana = CbmRunAna::Instance();
-    CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+    FairRunAna* ana = FairRunAna::Instance();
+    FairRuntimeDb* rtdb=ana->GetRuntimeDb();
 
-    fBasePar = (CbmBaseParSet*)
-	(rtdb->getContainer("CbmBaseParSet"));
+    fBasePar = (FairBaseParSet*)
+	(rtdb->getContainer("FairBaseParSet"));
 
 
     fGeoPar = (CbmGeoTrdPar*)(rtdb->getContainer("CbmGeoTrdPar"));
@@ -116,8 +116,8 @@ InitStatus CbmTrdHitProducer::ReInit(){
     //cout<<" * HitProducer * :: ReInit() "<<endl;
 
 
-    CbmRunAna* ana = CbmRunAna::Instance();
-    CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+    FairRunAna* ana = FairRunAna::Instance();
+    FairRuntimeDb* rtdb=ana->GetRuntimeDb();
 
     fGeoPar = (CbmGeoTrdPar*)(rtdb->getContainer("CbmGeoTrdPar"));
 
@@ -133,7 +133,7 @@ InitStatus CbmTrdHitProducer::Init()
 
     fRadiator = new CbmTrdRadiator();
 
-    CbmRootManager *ioman = CbmRootManager::Instance();
+    FairRootManager *ioman = FairRootManager::Instance();
     fTrdPoints=(TClonesArray *)  ioman->ActivateBranch("TRDPoint");
     if ( ! fTrdPoints ) {
       cout << "-W CbmTrdHitProducer::Init: No TrdPoints array!" << endl;
@@ -151,35 +151,35 @@ InitStatus CbmTrdHitProducer::Init()
 
     // fBasePar->Dump();
 //    TObjArray* arr = fBasePar->GetDetList();
-  //  CbmDetector* trd = (CbmDetector*) arr->FindObject("TRD");
+  //  FairDetector* trd = (FairDetector*) arr->FindObject("TRD");
     // trd->Dump();
     // here get the geometry file name with version
 
 //    TString fname = trd->GetGeometryFileName();
 
 
-    CbmRun *fRun = CbmRun::Instance();
-    CbmRuntimeDb *rtdb= fRun->GetRuntimeDb();
+    FairRun *fRun = FairRun::Instance();
+    FairRuntimeDb *rtdb= fRun->GetRuntimeDb();
     CbmGeoTrdPar* par=(CbmGeoTrdPar*)(rtdb->getContainer("CbmGeoTrdPar"));
     TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
 
 
-    CbmGeoNode *fm1 = NULL;
-    CbmGeoNode *fm2 = NULL;
-    CbmGeoNode *fm3 = NULL;
-    CbmGeoNode *fm4 = NULL;
-    CbmGeoNode *fm5 = NULL;
+    FairGeoNode *fm1 = NULL;
+    FairGeoNode *fm2 = NULL;
+    FairGeoNode *fm3 = NULL;
+    FairGeoNode *fm4 = NULL;
+    FairGeoNode *fm5 = NULL;
 
-    if ((CbmGeoNode *)fSensNodes->FindObject("trd3gas#4"))
-      fm1= (CbmGeoNode *)fSensNodes->FindObject("trd3gas#4");
-    if ((CbmGeoNode *)fSensNodes->FindObject("trd3gas#3"))
-      fm2= (CbmGeoNode *)fSensNodes->FindObject("trd3gas#3");
-    if ((CbmGeoNode *)fSensNodes->FindObject("trd6gas#2"))
-      fm3= (CbmGeoNode *)fSensNodes->FindObject("trd6gas#2");
-    if ((CbmGeoNode *)fSensNodes->FindObject("trd1gas#4"))
-      fm4= (CbmGeoNode *)fSensNodes->FindObject("trd1gas#4");
-    if ((CbmGeoNode *)fSensNodes->FindObject("trd1mod1gas"))
-      fm5= (CbmGeoNode *)fSensNodes->FindObject("trd1mod1gas");
+    if ((FairGeoNode *)fSensNodes->FindObject("trd3gas#4"))
+      fm1= (FairGeoNode *)fSensNodes->FindObject("trd3gas#4");
+    if ((FairGeoNode *)fSensNodes->FindObject("trd3gas#3"))
+      fm2= (FairGeoNode *)fSensNodes->FindObject("trd3gas#3");
+    if ((FairGeoNode *)fSensNodes->FindObject("trd6gas#2"))
+      fm3= (FairGeoNode *)fSensNodes->FindObject("trd6gas#2");
+    if ((FairGeoNode *)fSensNodes->FindObject("trd1gas#4"))
+      fm4= (FairGeoNode *)fSensNodes->FindObject("trd1gas#4");
+    if ((FairGeoNode *)fSensNodes->FindObject("trd1mod1gas"))
+      fm5= (FairGeoNode *)fSensNodes->FindObject("trd1mod1gas");
 
     if (fm1) {
       cout << " -I version is with 12 layers (3 stations x 4 layers each) " << endl;
@@ -406,7 +406,7 @@ void CbmTrdHitProducer::Finish()
 // ---- Register ------------------------------------------------------
 void CbmTrdHitProducer::Register(){
 
-  CbmRootManager::Instance()->Register("TrdHit","Trd", fHitCollection, kTRUE);
+  FairRootManager::Instance()->Register("TrdHit","Trd", fHitCollection, kTRUE);
 
 }
 // --------------------------------------------------------------------

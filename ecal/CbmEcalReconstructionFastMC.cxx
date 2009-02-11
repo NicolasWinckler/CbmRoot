@@ -25,7 +25,7 @@
 #include "CbmEcalRecParticle.h"
 #include "CbmEcalHitFastMC.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include <iostream>
 
@@ -33,11 +33,11 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmEcalReconstructionFastMC::CbmEcalReconstructionFastMC() :CbmTask() {}
+CbmEcalReconstructionFastMC::CbmEcalReconstructionFastMC() :FairTask() {}
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   -------------------------------------------
-CbmEcalReconstructionFastMC::CbmEcalReconstructionFastMC(const char *name, const Int_t iVerbose) :CbmTask(name,iVerbose)
+CbmEcalReconstructionFastMC::CbmEcalReconstructionFastMC(const char *name, const Int_t iVerbose) :FairTask(name,iVerbose)
 {
   fEvent         = 0;
   fNRecParticles = 0;
@@ -49,7 +49,7 @@ CbmEcalReconstructionFastMC::CbmEcalReconstructionFastMC(const char *name, const
 // -----   Destructor   ----------------------------------------------------
 CbmEcalReconstructionFastMC::~CbmEcalReconstructionFastMC()
 {
-  CbmRootManager *fManager =CbmRootManager::Instance();
+  FairRootManager *fManager =FairRootManager::Instance();
   fManager->Write();
 }
 // -------------------------------------------------------------------------
@@ -58,7 +58,7 @@ CbmEcalReconstructionFastMC::~CbmEcalReconstructionFastMC()
 // -----   Initialization   ------------------------------------------------
 InitStatus CbmEcalReconstructionFastMC::Init()
 {
-  CbmRootManager* fManager = CbmRootManager::Instance();
+  FairRootManager* fManager = FairRootManager::Instance();
 
   // ECAL hits
   fListECALhits = (TClonesArray*)fManager->ActivateBranch("EcalHitFastMC");

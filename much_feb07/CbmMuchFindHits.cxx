@@ -21,11 +21,11 @@
 #include "CbmMuchPad.h"
 #include "CbmMuchCluster.h"
 
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmGeoNode.h" //AZ
-#include "CbmGeoRotation.h" //AZ
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairGeoNode.h" //AZ
+#include "FairGeoRotation.h" //AZ
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -48,7 +48,7 @@ using std::map;
 using std::vector;
 
 // -----   Default constructor   ------------------------------------------
-CbmMuchFindHits::CbmMuchFindHits() : CbmTask("MuchFindHits", 1) {
+CbmMuchFindHits::CbmMuchFindHits() : FairTask("MuchFindHits", 1) {
   fGeoPar  = NULL;
   fDigiPar = NULL;
   fDigis   = NULL;
@@ -64,7 +64,7 @@ CbmMuchFindHits::CbmMuchFindHits() : CbmTask("MuchFindHits", 1) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchFindHits::CbmMuchFindHits(Int_t iVerbose) 
-  : CbmTask("MuchFindHits", iVerbose) {
+  : FairTask("MuchFindHits", iVerbose) {
   fGeoPar  = NULL;
   fDigiPar = NULL;
   fDigis   = NULL;
@@ -80,7 +80,7 @@ CbmMuchFindHits::CbmMuchFindHits(Int_t iVerbose)
 
 // -----   Constructor with name   -----------------------------------------
 CbmMuchFindHits::CbmMuchFindHits(const char* name, Int_t iVerbose) 
-  : CbmTask(name, iVerbose) {
+  : FairTask(name, iVerbose) {
   fGeoPar  = NULL;
   fDigiPar = NULL;
   fDigis   = NULL;
@@ -252,7 +252,7 @@ void CbmMuchFindHits::Exec(Option_t* opt) {
   Int_t statNr = fDigiScheme->GetNStations() + 1;
   TObjArray* sensNodes = fGeoPar->GetGeoSensitiveNodes();
   TString statName = Form("muchstation%02iL#1",statNr); 
-  CbmGeoNode* geoStat = (CbmGeoNode*) (sensNodes->FindObject(statName));
+  FairGeoNode* geoStat = (FairGeoNode*) (sensNodes->FindObject(statName));
   if (geoStat) ExecStraws(statNr); // straws
   //AZ
 
@@ -283,10 +283,10 @@ void CbmMuchFindHits::Exec(Option_t* opt) {
 void CbmMuchFindHits::SetParContainers() {
 
   // Get run and runtime database
-  CbmRunAna* run = CbmRunAna::Instance();
+  FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) Fatal("SetParContainers", "No analysis run");
 
-  CbmRuntimeDb* db = run->GetRuntimeDb();
+  FairRuntimeDb* db = run->GetRuntimeDb();
   if ( ! db ) Fatal("SetParContainers", "No runtime database");
 
   // Get MUCH geometry parameter container
@@ -305,8 +305,8 @@ void CbmMuchFindHits::SetParContainers() {
 InitStatus CbmMuchFindHits::Init() {
 
   // Get input array
-  CbmRootManager* ioman = CbmRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No CbmRootManager");
+  FairRootManager* ioman = FairRootManager::Instance();
+  if ( ! ioman ) Fatal("Init", "No FairRootManager");
   fDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
   fDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
 
@@ -672,7 +672,7 @@ void CbmMuchFindHits::ExecStraws(Int_t begStation)
   // Make hits in straw tubes
 
   static Int_t first = 1;
-  static CbmGeoRotation rotMatr[3];
+  static FairGeoRotation rotMatr[3];
   static Double_t radIn[4];
   Double_t diam[4] = {0.4, 0.4, 0.4, 0.4}; // tube diameters
   Double_t sigmaX = 0.02, sigmaY = 0.02; // 200um
@@ -697,7 +697,7 @@ void CbmMuchFindHits::ExecStraws(Int_t begStation)
     TObjArray* sensNodes = fGeoPar->GetGeoSensitiveNodes();
     for (Int_t i = 0; i < 3; ++i) {
       TString statName = Form("muchstation%02iL#1",begStation+3*i); 
-      CbmGeoNode *node = (CbmGeoNode*) sensNodes->FindObject(statName);
+      FairGeoNode *node = (FairGeoNode*) sensNodes->FindObject(statName);
       TArrayD *pars = node->getParameters();
       //cout << pars->At(4) << endl;
       radIn[i] = pars->At(4);
@@ -722,8 +722,8 @@ void CbmMuchFindHits::ExecStraws(Int_t begStation)
     Int_t station = digi->GetStationNr() - begStation;
     Int_t rot = station % 3;
     Int_t station3 = station / 3; // triple station
-    CbmGeoVector p(xyz[0], xyz[1], xyz[2]);
-    CbmGeoVector ploc = rotMatr[rot] * p;
+    FairGeoVector p(xyz[0], xyz[1], xyz[2]);
+    FairGeoVector ploc = rotMatr[rot] * p;
     Double_t xloc = ploc.getX();
     if (layer % 2 != 0) xloc += diam[station3] / 2.; // half-tube shift 
     Int_t itube = (Int_t) (xloc / diam[station3]);

@@ -22,7 +22,7 @@ eventDisplay()
   gSystem->Load("libGeom");
                                      
   // -----   Reconstruction run   -------------------------------------------
-  CbmRunAna *fRun= new CbmRunAna();
+  FairRunAna *fRun= new FairRunAna();
   fRun->SetInputFile("data/test.mc.root");
   //fRun->SetInputFile("../dsk/sim_dsk.root");
  // fRun->SetInputFile("../dsk/sim_dsk.g4native.root");

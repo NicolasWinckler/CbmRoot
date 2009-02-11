@@ -28,7 +28,7 @@
 #include "CbmEcalPointLite.h"
 #include "CbmEcalPoint.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "TClonesArray.h"
@@ -44,7 +44,7 @@ using std::flush;
 using std::list;
 using std::vector;
 
-CbmEcalPhotonCalibrator::CbmEcalPhotonCalibrator(const char* name, const Int_t iVerbose, const char* fileGeo) : CbmTask(name, iVerbose)
+CbmEcalPhotonCalibrator::CbmEcalPhotonCalibrator(const char* name, const Int_t iVerbose, const char* fileGeo) : FairTask(name, iVerbose)
 {
   fGeoFile=fileGeo;
   fStr=NULL;
@@ -152,7 +152,7 @@ Float_t CbmEcalPhotonCalibrator::GetAngle(Float_t x, Float_t y, Float_t z)
 
 InitStatus CbmEcalPhotonCalibrator::Init()
 {
-  CbmRootManager* fManager=CbmRootManager::Instance();
+  FairRootManager* fManager=FairRootManager::Instance();
 
   if (fInf==NULL)
   {

@@ -12,7 +12,7 @@
 #include "CbmMuchDigi.h"
 #include "CbmMuchHit.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TMath.h"
 #include "TVector3.h"
@@ -139,8 +139,8 @@ void CbmMuchFindHitsSimple::SetParContainers() {
 // -----   Private method Init   -------------------------------------------
 InitStatus CbmMuchFindHitsSimple::Init() {
   // Get input array
-  CbmRootManager* ioman = CbmRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No CbmRootManager");
+  FairRootManager* ioman = FairRootManager::Instance();
+  if ( ! ioman ) Fatal("Init", "No FairRootManager");
   fDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
 
   // Initialize GeoScheme

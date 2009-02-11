@@ -3,7 +3,7 @@
 // -----                   Created 16/11/07 by E. Kryshen              -----
 // -------------------------------------------------------------------------
 #include "CbmMuchHitFinderQa.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMuchPoint.h"
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
@@ -29,7 +29,7 @@
 #include "CbmMuchGeoScheme.h"
 #include "TObjArray.h"
 
-#include "CbmRuntimeDb.h"
+#include "FairRuntimeDb.h"
 #include "CbmGeoMuchPar.h"
 #include "TGraph.h"
 
@@ -42,7 +42,7 @@ using std::vector;
 
 // -------------------------------------------------------------------------
 CbmMuchHitFinderQa::CbmMuchHitFinderQa(const char* name, Int_t verbose)
- :CbmTask(name,verbose){
+ :FairTask(name,verbose){
   fGeoScheme   = CbmMuchGeoScheme::Instance();
   fGeoFileName = "much.digi.root";
   fFileName = "performance.root";
@@ -62,7 +62,7 @@ CbmMuchHitFinderQa::~CbmMuchHitFinderQa(){}
 // -------------------------------------------------------------------------
 InitStatus CbmMuchHitFinderQa::Init()
 {
-  CbmRootManager* fManager = CbmRootManager::Instance();
+  FairRootManager* fManager = FairRootManager::Instance();
   fMCTracks    = (TClonesArray*) fManager->GetObject("MCTrack");
   fPoints      = (TClonesArray*) fManager->GetObject("MuchPoint");
   fHits        = (TClonesArray*) fManager->GetObject("MuchHit");
@@ -260,7 +260,7 @@ InitStatus CbmMuchHitFinderQa::Init()
 // -------------------------------------------------------------------------
 void CbmMuchHitFinderQa::SetParContainers() {
   // Get run and runtime database
-  // CbmRuntimeDb* db = CbmRuntimeDb::instance();
+  // FairRuntimeDb* db = FairRuntimeDb::instance();
   // if ( ! db ) Fatal("SetParContainers", "No runtime database");
   // Get MUCH geometry parameter container
   // fGeoPar = (CbmGeoMuchPar*) db->getContainer("CbmGeoMuchPar");

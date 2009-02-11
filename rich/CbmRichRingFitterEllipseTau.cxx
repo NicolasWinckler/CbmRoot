@@ -9,7 +9,7 @@
 **********************************************************************************/
 
 #include "CbmRichRingFitterEllipseTau.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmRichRing.h"
 #include "CbmRichHit.h"
 

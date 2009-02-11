@@ -20,13 +20,13 @@
 #ifndef CBMTRDTRACKSPIDQA_H
 #define CBMTRDTRACKSPIDQA_H 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TClonesArray;
 class TH1F;
 class TH2F;
 
-class CbmTrdTracksPidQa : public CbmTask
+class CbmTrdTracksPidQa : public FairTask
 {
 public:
 
@@ -35,7 +35,7 @@ public:
 
     /* Standard constructor */
     CbmTrdTracksPidQa(const char* name,
-        		const char* title = "CbmTask");
+        		const char* title = "FairTask");
 
     /* Destructor */
     virtual ~CbmTrdTracksPidQa();

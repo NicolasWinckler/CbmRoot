@@ -11,15 +11,15 @@
 #include "CbmGeoStsPar.h"
 
 #include "CbmDetectorList.h"
-#include "CbmGeoNode.h"
+#include "FairGeoNode.h"
 #include "CbmGeoPassivePar.h"
-#include "CbmGeoTransform.h"
-#include "CbmGeoVector.h"
+#include "FairGeoTransform.h"
+#include "FairGeoVector.h"
 #include "CbmMCTrack.h"
-#include "CbmMCPoint.h"
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairMCPoint.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 #include "TCanvas.h"
 #include "TPad.h"
@@ -52,7 +52,7 @@ CbmStsSimulationQa::CbmStsSimulationQa() {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsSimulationQa::CbmStsSimulationQa(Bool_t visualizeBool, Int_t iVerbose) 
-  : CbmTask("STS Simulation QA", iVerbose) {
+  : FairTask("STS Simulation QA", iVerbose) {
   fOnlineAnalysis = visualizeBool;
 }
 // -------------------------------------------------------------------------
@@ -73,15 +73,15 @@ CbmStsSimulationQa::~CbmStsSimulationQa() {
 void CbmStsSimulationQa::SetParContainers() {
 
   // Get Run
-  CbmRunAna* run = CbmRunAna::Instance();
+  FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) {
-    cout << "-E- " << GetName() << "::SetParContainers: No CbmRunAna!" 
+    cout << "-E- " << GetName() << "::SetParContainers: No FairRunAna!" 
 	 << endl;
     return;
   }
 
   // Get Runtime Database
-  CbmRuntimeDb* runDb = run->GetRuntimeDb();
+  FairRuntimeDb* runDb = run->GetRuntimeDb();
   if ( ! run ) {
     cout << "-E- " << GetName() << "::SetParContainers: No runtime database!" 
 	 << endl;
@@ -117,7 +117,7 @@ InitStatus CbmStsSimulationQa::Init() {
   cout << GetName() << ": Initialising..." << endl;
 
   // Get RootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- " << GetName() << "::Init: "
 	 << "RootManager not instantised!" << endl;
@@ -399,7 +399,7 @@ InitStatus CbmStsSimulationQa::GetGeometry() {
   fNStations = 0;
   TString stationNames[10];
   for ( Int_t ist = 0 ; ist < tempNofStations ; ist++ ) {
-    CbmGeoNode* stsNode = (CbmGeoNode*)stsNodes->At(ist);
+    FairGeoNode* stsNode = (FairGeoNode*)stsNodes->At(ist);
     if ( ! stsNode ) {
       cout << "-W- CbmStsDigiScheme::Init: station#" << ist
 	   << " not found among sensitive nodes " << endl;
@@ -412,10 +412,10 @@ InitStatus CbmStsSimulationQa::GetGeometry() {
     // check if the node belongs to some station, save the MCId and outer radius
     for ( Int_t ikst = 0 ; ikst < fNStations ; ikst++ )
       if ( geoNodeName.Contains(stationNames[ikst]) ) {
-	CbmGeoTransform* transform = stsNode->getLabTransform();
-	CbmGeoVector translat = transform->getTranslation();
-	CbmGeoTransform center = stsNode->getCenterPosition();
-	CbmGeoVector centerV = center.getTranslation();
+	FairGeoTransform* transform = stsNode->getLabTransform();
+	FairGeoVector translat = transform->getTranslation();
+	FairGeoTransform center = stsNode->getCenterPosition();
+	FairGeoVector centerV = center.getTranslation();
 	Double_t radialSize = TMath::Sqrt((translat.X() + centerV.X() + params->At(0))*
 					  (translat.X() + centerV.X() + params->At(0)) +
 					  (translat.Y() + centerV.Y() + params->At(1))*
@@ -436,10 +436,10 @@ InitStatus CbmStsSimulationQa::GetGeometry() {
     if ( geoNodeName.Length() == 12 )
       fStationRadius[fNStations] = params->At(1);
     else {
-      CbmGeoTransform* transform = stsNode->getLabTransform();
-      CbmGeoVector translat = transform->getTranslation();
-      CbmGeoTransform center = stsNode->getCenterPosition();
-      CbmGeoVector centerV = center.getTranslation();
+      FairGeoTransform* transform = stsNode->getLabTransform();
+      FairGeoVector translat = transform->getTranslation();
+      FairGeoTransform center = stsNode->getCenterPosition();
+      FairGeoVector centerV = center.getTranslation();
       Double_t radialSize = TMath::Sqrt((translat.X() + centerV.X() + params->At(0))*
 					(translat.X() + centerV.X() + params->At(0)) +
 					(translat.Y() + centerV.Y() + params->At(1))*

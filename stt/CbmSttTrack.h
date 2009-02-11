@@ -2,7 +2,7 @@
 #define CbmSTTTRACK_H 1
 
 
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 #include "TObject.h"
 #include "TArrayI.h"
 #include "TLorentzVector.h"
@@ -36,7 +36,7 @@ class CbmSttTrack : public TObject
   Int_t GetHitIndex(Int_t iHit)   const { return fHits[iHit]; }
   Double_t GetChi2()   const { return fChi2; } 
   Int_t GetNDF() const { return fNDF; }
-  CbmTrackParam *GetSttTrack() { return &fSttTrack; }
+  FairTrackParam *GetSttTrack() { return &fSttTrack; }
   Int_t GetFlag() const {return fFlag;};
   Double_t GetScatAng() const {return fScatAng;};
   //Double_t GetChi2Seed() const {return fChi2Seed;};
@@ -46,7 +46,7 @@ class CbmSttTrack : public TObject
   void SetChi2( Double_t chi2 ) { fChi2  = chi2; }
   void SetNDF( Int_t ndf ){ fNDF = ndf; }
   void SetStsTrackID(Int_t it) { fStsTrackID = it; }
-  void SetSttTrack( CbmTrackParam *track ){ fSttTrack = *track; }
+  void SetSttTrack( FairTrackParam *track ){ fSttTrack = *track; }
   void SetFlag(Int_t flag) { fFlag = flag;};
   void SetScatAng(Double_t angle) { fScatAng = angle;};
   //void SetChi2Seed(Double_t chi2) { fChi2Seed = chi2;};
@@ -58,7 +58,7 @@ class CbmSttTrack : public TObject
   Int_t fNMissedHits;
   Int_t fNMissedStations;
   Int_t fHits[30];
-  CbmTrackParam fSttTrack;
+  FairTrackParam fSttTrack;
   Double_t fChi2;
   Int_t fNDF;
   Int_t fFlag; 

@@ -11,19 +11,19 @@
 
 #include "CbmKF.h"
 #include "CbmKFTrdHit.h"
-#include "CbmMCPoint.h"
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmBaseParSet.h"
-#include "CbmRuntimeDb.h"
-#include "CbmDetector.h"
+#include "FairMCPoint.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairBaseParSet.h"
+#include "FairRuntimeDb.h"
+#include "FairDetector.h"
 #include "CbmTrdPoint.h"
 #include "CbmTrdHit.h"
 #include "CbmStsTrack.h"
 #include "CbmTrdTrack.h"
 #include "CbmMCTrack.h"
 #include "CbmGeoTrdPar.h"
-#include "CbmGeoNode.h"
+#include "FairGeoNode.h"
 #include "CbmVertex.h"
 #include "CbmTrdTrackFitterKF.h"
 #include "CbmKFTrack.h"
@@ -88,7 +88,7 @@ void CbmL1CATrdTrackFinderSA::Init()
   // Activate data branches
   DataBranches();
 
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmL1CATrdTrackFinderSA::Init: "
 	 << "RootManager not instantised!" << endl;
@@ -1072,7 +1072,7 @@ void CbmL1CATrdTrackFinderSA::CreateHistogramms() {
 void CbmL1CATrdTrackFinderSA::DataBranches() {
 
   // Get pointer to the ROOT manager
-  CbmRootManager* rootMgr = CbmRootManager::Instance();
+  FairRootManager* rootMgr = FairRootManager::Instance();
   if(NULL == rootMgr) {
     cout << "-E- CbmL1CATrdTrackFinderSA::DataBranches : "
 	 << "ROOT manager is not instantiated" << endl;
@@ -1093,23 +1093,23 @@ void CbmL1CATrdTrackFinderSA::DataBranches() {
 // ------------------- Determines the TRD layout -------------------------
 void CbmL1CATrdTrackFinderSA::TrdLayout() {
 
-  // Get the pointer to the singleton CbmRunAna object
-  CbmRunAna* ana = CbmRunAna::Instance();
+  // Get the pointer to the singleton FairRunAna object
+  FairRunAna* ana = FairRunAna::Instance();
   if(NULL == ana) {
     cout << "-E- CbmL1CATrdTrackFinderSA::TrdLayout :"
-	 <<" no CbmRunAna object!" << endl;
+	 <<" no FairRunAna object!" << endl;
     return;
   }
   // Get the pointer to run-time data base
-  CbmRuntimeDb* rtdb = ana->GetRuntimeDb();
+  FairRuntimeDb* rtdb = ana->GetRuntimeDb();
   if(NULL == rtdb) {
     cout << "-E- CbmL1CATrdTrackFinderSA::TrdLayout :"
 	 <<" no runtime database!" << endl;
     return;
   }
   // Get the pointer to container of base parameters
-  CbmBaseParSet* baseParSet =
-    (CbmBaseParSet*) rtdb->getContainer("CbmBaseParSet");
+  FairBaseParSet* baseParSet =
+    (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
   if(NULL == baseParSet) {
     cout << "-E- CbmL1CATrdTrackFinderSA::TrdLayout :"
 	 <<" no container of base parameters!" << endl;
@@ -1119,15 +1119,15 @@ void CbmL1CATrdTrackFinderSA::TrdLayout() {
   TrdPar = (CbmGeoTrdPar*) (rtdb->findContainer("CbmGeoTrdPar"));
   TObjArray *Nodes = TrdPar->GetGeoSensitiveNodes();
   for( Int_t i=0;i<Nodes->GetEntries(); i++) {
-    CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (Nodes->At(i));
-    //CbmGeoNode *node = (CbmGeoNode*) Nodes->At(i);
+    FairGeoNode *node = dynamic_cast<FairGeoNode*> (Nodes->At(i));
+    //FairGeoNode *node = (FairGeoNode*) Nodes->At(i);
     if ( !node ) continue;
     
     TString name = node->getName();
     //TString Sname = node->getShapePointer()->GetName();	
-    CbmGeoVector nodeV = node->getLabTransform()->getTranslation(); //in cm
+    FairGeoVector nodeV = node->getLabTransform()->getTranslation(); //in cm
 
-    //    CbmGeoBasicShape *gShapePointer = (CbmGeoBasicShape *)node->getShapePointer();
+    //    FairGeoBasicShape *gShapePointer = (FairGeoBasicShape *)node->getShapePointer();
     //gShapePointer->printParam();
 
     //    node->print();
@@ -1197,11 +1197,11 @@ void CbmL1CATrdTrackFinderSA::TrdLayout() {
     //TObjArray *Nodes = TrdPar->GetGeoSensitiveNodes();
     Nodes = TrdPar->GetGeoSensitiveNodes();
     for( Int_t i=0;i<Nodes->GetEntries(); i++) {
-    CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (Nodes->At(i));
+    FairGeoNode *node = dynamic_cast<FairGeoNode*> (Nodes->At(i));
     if ( !node ) continue;
     
     TString name = node->getName();
-    CbmGeoVector nodeV = node->getLabTransform()->getTranslation(); //in cm
+    FairGeoVector nodeV = node->getLabTransform()->getTranslation(); //in cm
 
     Int_t uid = i+1;
     cout <<"name, uid, Z: "<< name <<", "<< uid <<", "<< nodeV.Z() << endl;
@@ -1222,7 +1222,7 @@ void CbmL1CATrdTrackFinderSA::TrdLayout() {
     return;
   }
   // Find TRD detector
-  CbmDetector* trd = (CbmDetector*) detList->FindObject("TRD");
+  FairDetector* trd = (FairDetector*) detList->FindObject("TRD");
   if(NULL == trd) {
     cout << "-E- CbmL1CATrdTrackFinderSA::TrdLayout :"
 	 << " no TRD detector!" << endl;
@@ -1794,8 +1794,8 @@ void CbmL1CATrdTrackFinderSA::CreateTracks(vector<CbmL1TrdTracklet4*> clTracklet
   Int_t iHit = 0;
   Bool_t bTrueTrack = true;
 
-  CbmTrackParam *trParam;
-  trParam = new CbmTrackParam();
+  FairTrackParam *trParam;
+  trParam = new FairTrackParam();
   trParam->SetQp(0.);
 
   CbmVertex vtx;
@@ -2279,15 +2279,15 @@ void CbmL1CATrdTrackFinderSA::CreateSegments(vector<CbmL1TrdTracklet*> clSpacePo
 
 	   trdTrack->SortHits();
 
-	   CbmTrackParam *trParam;
-	   trParam = new CbmTrackParam();
+	   FairTrackParam *trParam;
+	   trParam = new FairTrackParam();
 	   trParam->SetQp(0.);
 	   trdTrack->SetParamFirst(*trParam);
 	   trdTrack->SetParamLast(*trParam);
 	
 	   trdTrackFitterKF->DoFit(trdTrack);
 
-	   //CbmTrackParam *e_track = new CbmTrackParam();
+	   //FairTrackParam *e_track = new FairTrackParam();
 	   trdTrackFitterKF->Extrapolate(trdTrack, zed, trParam);
 
 	   clTr->SetExt(0, trParam->GetY());

@@ -1,16 +1,16 @@
 #ifndef CBMTUTORIALDET_H
 #define CBMTUTORIALDET_H
 
-#include "CbmDetector.h"
+#include "FairDetector.h"
 
 #include "TVector3.h"
 #include "TLorentzVector.h"
 
 class CbmTutorialDetPoint;
-class CbmVolume;
+class FairVolume;
 class TClonesArray;
 
-class CbmTutorialDet: public CbmDetector {
+class CbmTutorialDet: public FairDetector {
 
  public:
 
@@ -30,9 +30,9 @@ class CbmTutorialDet: public CbmDetector {
     virtual void   Initialize();
 
     /**       this method is called for each step during simulation 
-     *       (see CbmMCApplication::Stepping())    
+     *       (see FairMCApplication::Stepping())    
     */
-    virtual Bool_t ProcessHits( CbmVolume *v=0);
+    virtual Bool_t ProcessHits( FairVolume *v=0);
 
     /**       Registers the produced collections in CBMRootManager.     */
     virtual void   Register();

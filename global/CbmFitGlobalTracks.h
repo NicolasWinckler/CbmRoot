@@ -5,13 +5,13 @@
 #ifndef CBMFITGLOBALTRACKS
 #define CBMFITGLOBALTRACKS
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TClonesArray;
 class CbmGlobalTrackFitter;
 
 
-class CbmFitGlobalTracks : public CbmTask {
+class CbmFitGlobalTracks : public FairTask {
 
 private:
     Int_t                 fVerbose;        // Verbosity level

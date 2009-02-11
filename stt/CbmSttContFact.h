@@ -1,17 +1,17 @@
 #ifndef CBMSTTCONTFACT_H
 #define CBMSTTCONTFACT_H
 
-#include "CbmContFact.h"
+#include "FairContFact.h"
 
-class CbmContainer;
+class FairContainer;
 
-class CbmSttContFact : public CbmContFact {
+class CbmSttContFact : public FairContFact {
 private:
   void setAllContainers();
 public:
   CbmSttContFact();
   ~CbmSttContFact() {}
-  CbmParSet* createContainer(CbmContainer*);
+  FairParSet* createContainer(FairContainer*);
   ClassDef( CbmSttContFact,0) // Factory for all SttDet parameter containers
 };
 

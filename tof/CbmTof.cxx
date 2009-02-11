@@ -10,15 +10,15 @@
 #include "CbmGeoTof.h"
 
 #include "CbmDetectorList.h"
-#include "CbmGeoInterface.h"
-#include "CbmGeoLoader.h"
-#include "CbmGeoNode.h"
-#include "CbmGeoRootBuilder.h"
-#include "CbmRootManager.h"
+#include "FairGeoInterface.h"
+#include "FairGeoLoader.h"
+#include "FairGeoNode.h"
+#include "FairGeoRootBuilder.h"
+#include "FairRootManager.h"
 #include "CbmStack.h"
-#include "CbmRuntimeDb.h"
-#include "CbmRun.h"
-#include "CbmVolume.h"
+#include "FairRuntimeDb.h"
+#include "FairRun.h"
+#include "FairVolume.h"
 
 #include "TClonesArray.h"
 #include "TLorentzVector.h"
@@ -32,7 +32,7 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmTof::CbmTof() : CbmDetector("TOF", kTRUE, kTOF) {
+CbmTof::CbmTof() : FairDetector("TOF", kTRUE, kTOF) {
   fTofCollection = new TClonesArray("CbmTofPoint");
   fPosIndex = 0;
   fVerboseLevel = 1;
@@ -43,7 +43,7 @@ CbmTof::CbmTof() : CbmDetector("TOF", kTRUE, kTOF) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmTof::CbmTof(const char* name, Bool_t active)
-  : CbmDetector(name, active, kTOF) {
+  : FairDetector(name, active, kTOF) {
   fTofCollection = new TClonesArray("CbmTofPoint");
   fPosIndex = 0;
   fVerboseLevel = 1;
@@ -65,7 +65,7 @@ CbmTof::~CbmTof() {
 
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t  CbmTof::ProcessHits(CbmVolume* vol)
+Bool_t  CbmTof::ProcessHits(FairVolume* vol)
 {
   Int_t gap, cell, module, region;
   TString Volname;
@@ -127,7 +127,7 @@ void CbmTof::EndOfEvent() {
 
 // -----   Public method Register   ----------------------------------------
 void CbmTof::Register() {
-  CbmRootManager::Instance()->Register("TOFPoint", "Tof", fTofCollection, kTRUE);
+  FairRootManager::Instance()->Register("TOFPoint", "Tof", fTofCollection, kTRUE);
 }
 // -------------------------------------------------------------------------
 
@@ -189,8 +189,8 @@ void CbmTof::ConstructGeometry() {
   Int_t count=0;
   Int_t count_tot=0;
 
-  CbmGeoLoader*    geoLoad = CbmGeoLoader::Instance();
-  CbmGeoInterface* geoFace = geoLoad->getGeoInterface();
+  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
+  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
   CbmGeoTof*       tofGeo  = new CbmGeoTof();
   tofGeo->setGeomFile(GetGeometryFileName());
   geoFace->addGeoModule(tofGeo);
@@ -200,18 +200,18 @@ void CbmTof::ConstructGeometry() {
   TList* volList = tofGeo->getListOfVolumes();
 
   // store geo parameter
-  CbmRun *fRun = CbmRun::Instance();
-  CbmRuntimeDb *rtdb= CbmRun::Instance()->GetRuntimeDb();
+  FairRun *fRun = FairRun::Instance();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
   CbmGeoTofPar* par=(CbmGeoTofPar*)(rtdb->getContainer("CbmGeoTofPar"));
   TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
   TObjArray *fPassNodes = par->GetGeoPassiveNodes();
 
   TListIter iter(volList);
-  CbmGeoNode* node   = NULL;
-  CbmGeoVolume *aVol=NULL;
+  FairGeoNode* node   = NULL;
+  FairGeoVolume *aVol=NULL;
 
-  while( (node = (CbmGeoNode*)iter.Next()) ) {
-      aVol = dynamic_cast<CbmGeoVolume*> ( node );
+  while( (node = (FairGeoNode*)iter.Next()) ) {
+      aVol = dynamic_cast<FairGeoVolume*> ( node );
        if ( node->isSensitive()  ) {
            fSensNodes->AddLast( aVol );
 	   count++;

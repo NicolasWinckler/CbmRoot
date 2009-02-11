@@ -9,12 +9,12 @@
 #include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
-#include "CbmBaseParSet.h"
-#include "CbmDetector.h"
-#include "CbmMCPoint.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairBaseParSet.h"
+#include "FairDetector.h"
+#include "FairMCPoint.h"
 #include "CbmMCTrack.h"
 
 // ROOT includes
@@ -51,8 +51,8 @@ CbmTrdTrackFinderIdeal::~CbmTrdTrackFinderIdeal()
 // -----   Public method Init   --------------------------------------------
 void CbmTrdTrackFinderIdeal::Init()
 {
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmTrdTrackFinderIdeal::Init: "
 	 << "RootManager not instantised!" << endl;
@@ -76,16 +76,16 @@ void CbmTrdTrackFinderIdeal::Init()
   }
 
 
-  // Get the pointer to the singleton CbmRunAna object
-  CbmRunAna* ana = CbmRunAna::Instance();
+  // Get the pointer to the singleton FairRunAna object
+  FairRunAna* ana = FairRunAna::Instance();
   if(NULL == ana) {
       cout << "-E- CbmTrdTrackFinderIdeal::Init :"
-          <<" no CbmRunAna object!" << endl;
+          <<" no FairRunAna object!" << endl;
       return;
   }
 
   // Get the pointer to run-time data base
-  CbmRuntimeDb* rtdb = ana->GetRuntimeDb();
+  FairRuntimeDb* rtdb = ana->GetRuntimeDb();
   if(NULL == rtdb) {
       cout << "-E- CbmTrdTrackFinderIdeal::Init :"
           <<" no runtime database!" << endl;
@@ -93,8 +93,8 @@ void CbmTrdTrackFinderIdeal::Init()
   }
 
   // Get the pointer to container of base parameters
-  CbmBaseParSet* baseParSet =
-      (CbmBaseParSet*) rtdb->getContainer("CbmBaseParSet");
+  FairBaseParSet* baseParSet =
+      (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
   if(NULL == baseParSet) {
       cout << "-E- CbmTrdTrackFinderIdeal::Init :"
           <<" no container of base parameters!" << endl;
@@ -110,7 +110,7 @@ void CbmTrdTrackFinderIdeal::Init()
   }
 
   // Find TRD detector
-  CbmDetector* trd = (CbmDetector*) detList->FindObject("TRD");
+  FairDetector* trd = (FairDetector*) detList->FindObject("TRD");
   if(NULL == trd) {
       cout << "-E- CbmTrdTrackFinderIdeal::Init :"
           << " no TRD detector!" << endl;
@@ -121,11 +121,11 @@ void CbmTrdTrackFinderIdeal::Init()
   /*
     CbmGeoTrdPar* par=(CbmGeoTrdPar*)(rtdb->getContainer("CbmGeoTrdPar"));
     TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
-    CbmGeoNode *fm1= (CbmGeoNode *)fSensNodes->FindObject("trd3gas#4");
-    CbmGeoNode *fm2= (CbmGeoNode *)fSensNodes->FindObject("trd3gas#3");
-    CbmGeoNode *fm3= (CbmGeoNode *)fSensNodes->FindObject("trd6gas#2");
-    CbmGeoNode *fm4= (CbmGeoNode *)fSensNodes->FindObject("trd1gas#4");
-    CbmGeoNode *fm5= (CbmGeoNode *)fSensNodes->FindObject("trd1mod1gas");
+    FairGeoNode *fm1= (FairGeoNode *)fSensNodes->FindObject("trd3gas#4");
+    FairGeoNode *fm2= (FairGeoNode *)fSensNodes->FindObject("trd3gas#3");
+    FairGeoNode *fm3= (FairGeoNode *)fSensNodes->FindObject("trd6gas#2");
+    FairGeoNode *fm4= (FairGeoNode *)fSensNodes->FindObject("trd1gas#4");
+    FairGeoNode *fm5= (FairGeoNode *)fSensNodes->FindObject("trd1mod1gas");
 
     if (fm1) {
       cout << " -I- CbmTrdTrackFinderIdeal: TRD version with 12 layers (3 stations x 4 layers each) " << endl;
@@ -208,7 +208,7 @@ Int_t CbmTrdTrackFinderIdeal::DoFind(TClonesArray* hitArray,
 
   // Create pointers to TRD hit and TrdPoint
   CbmTrdHit*       pHit = NULL;
-  CbmMCPoint*      pMCpt = NULL;
+  FairMCPoint*      pMCpt = NULL;
   CbmMCTrack*      pMCtr = NULL;
   CbmTrdTrack*     pTrck = NULL;
 
@@ -233,7 +233,7 @@ Int_t CbmTrdTrackFinderIdeal::DoFind(TClonesArray* hitArray,
       ptIndex = pHit->GetRefIndex();
       if(ptIndex < 0) continue; // fake or background hit
       // Get pointer to MC point
-      pMCpt = (CbmMCPoint*) fMCPointArray->At(ptIndex);
+      pMCpt = (FairMCPoint*) fMCPointArray->At(ptIndex);
       if(NULL == pMCpt) continue;
       // Get MC track index
       mcTrackIndex = pMCpt->GetTrackID();
@@ -304,7 +304,7 @@ Int_t CbmTrdTrackFinderIdeal::DoFind(TClonesArray* hitArray,
 //    if ( pHit->GetFlag() ) continue;    // lost hit
     ptIndex = pHit->GetRefIndex();
     if (ptIndex < 0) continue;           // fake or background hit
-    pMCpt = (CbmMCPoint*) (fMCPointArray->At(ptIndex));
+    pMCpt = (FairMCPoint*) (fMCPointArray->At(ptIndex));
     if ( ! pMCpt ) {
       nNoTrdPoint++;
       continue;

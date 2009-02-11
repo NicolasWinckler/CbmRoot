@@ -7,7 +7,7 @@
 #include "CbmPrimaryVertexFinder.h"
 #include "CbmVertex.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -39,7 +39,7 @@ CbmFindPrimaryVertex::CbmFindPrimaryVertex(CbmPrimaryVertexFinder* pvFinder)
 CbmFindPrimaryVertex::CbmFindPrimaryVertex(const char* name, 
 					   const char* title, 
 					   CbmPrimaryVertexFinder* finder) 
-  : CbmTask(name) {
+  : FairTask(name) {
   fFinder = finder;
   fTracks = NULL;
 }
@@ -63,8 +63,8 @@ InitStatus CbmFindPrimaryVertex::Init() {
     return kERROR;
   }
 
-  // Get CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmFindPrimaryVertex::Init: "
 	 << "RootManager not instantised!" << endl;

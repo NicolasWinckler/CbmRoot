@@ -15,10 +15,10 @@
 #include "CbmMvdStation.h"
 
 // Includes from base
-#include "CbmGeoNode.h"
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairGeoNode.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 #include "CbmMCTrack.h"
 
 // Includes from ROOT
@@ -59,7 +59,7 @@ using std::vector;
 
 // -----   Default constructor   ------------------------------------------
 CbmMvdFindHits::CbmMvdFindHits()
-    : CbmTask("MVDHitFinder")
+    : FairTask("MVDHitFinder")
 {
     fMode       = 0;
     fNEvent     = 0;
@@ -97,7 +97,7 @@ CbmMvdFindHits::CbmMvdFindHits()
 // -----   Standard constructor   ------------------------------------------
 CbmMvdFindHits::CbmMvdFindHits(const char* name, Int_t iMode,
 			       Int_t iVerbose)
-: CbmTask(name, iVerbose)
+: FairTask(name, iVerbose)
 {
     fMode       = iMode;
     fNEvent     = 0;
@@ -170,9 +170,9 @@ InitStatus CbmMvdFindHits::Init() {
 
 
     // Get input array
-    CbmRootManager* ioman = CbmRootManager::Instance();
+    FairRootManager* ioman = FairRootManager::Instance();
     if ( ! ioman ) {
-	cout << "-E- " << GetName() << "::Init: No CbmRootManager!" << endl;
+	cout << "-E- " << GetName() << "::Init: No FairRootManager!" << endl;
 	return kFATAL;
     }
 
@@ -830,9 +830,9 @@ void CbmMvdFindHits::CreateHit(vector<CbmMvdDigi*>* clusterArray, CbmMvdStation*
 
 // -----   Private method Register   ---------------------------------------
 void CbmMvdFindHits::Register() {
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman) Fatal("Register",
-		      "No CbmRootManager");
+		      "No FairRootManager");
   ioman->Register("MVDHit", "MVD", fHits, kTRUE);
   ioman->Register("MVDCluster", "MVD", fClusters, kTRUE);
   ioman->Register("MVDHitMatch", "MVD Hit Match", fMatches, kTRUE);

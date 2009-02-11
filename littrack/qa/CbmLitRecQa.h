@@ -1,7 +1,7 @@
 #ifndef CBMLITRECQA_H_
 #define CBMLITRECQA_H_
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmDetectorList.h"
 
 #include "TH2D.h"
@@ -19,7 +19,7 @@ class TList;
 class CbmMuchTrack;
 class CbmTrdTrack;
 
-class CbmLitRecQa : public CbmTask
+class CbmLitRecQa : public FairTask
 {
 public:
 

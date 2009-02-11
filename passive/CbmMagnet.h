@@ -1,15 +1,15 @@
 #ifndef MABGNET_H
 #define MABGNET_H
 
-#include "CbmDetector.h"
-#include "CbmModule.h"
+#include "FairDetector.h"
+#include "FairModule.h"
 
 #include "TNamed.h"
 #include "TArrayI.h"
 #include "TClonesArray.h"
 
 
-class CbmMagnet : public CbmModule {
+class CbmMagnet : public FairModule {
   public:
     CbmMagnet(const char * name, const char *Title="CBM Magnet");
     CbmMagnet();

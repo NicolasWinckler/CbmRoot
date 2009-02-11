@@ -41,7 +41,7 @@
 
 #if (ARCHITECTURE == CBMROOT)
 
-#include "CbmGeanePro.h"
+#include "FairGeanePro.h"
 
 #endif
 
@@ -58,7 +58,7 @@ private:
 
 #if (ARCHITECTURE == CBMROOT)
 
-	CbmGeanePro*              geane;			/**< Object to implement the GEANE track propagation */
+	FairGeanePro*              geane;			/**< Object to implement the GEANE track propagation */
 
 #endif
 

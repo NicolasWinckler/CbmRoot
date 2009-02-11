@@ -1,6 +1,6 @@
 #include "CbmEcalStructureExport.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmEcalStructure.h"
 #include "CbmEcalCell.h"
 
@@ -19,7 +19,7 @@ CbmEcalStructureExport::CbmEcalStructureExport()
 
 /** Standerd constructor **/
 CbmEcalStructureExport::CbmEcalStructureExport(const char* name, const Int_t verbose)
-  : CbmTask(name, verbose)
+  : FairTask(name, verbose)
 {
   fVerbose=verbose;
 }
@@ -29,7 +29,7 @@ InitStatus CbmEcalStructureExport::Init()
 {
   fEventN=0;
   fStructureOut=NULL;
-  CbmRootManager* io=CbmRootManager::Instance();
+  FairRootManager* io=FairRootManager::Instance();
   if (!io)
   {
     Fatal("Init()", "Can't find IOManager.");

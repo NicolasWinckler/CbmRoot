@@ -83,7 +83,7 @@ void run_reco(Int_t nEvents = 1)
 
 
   // -----   Reconstruction run   -------------------------------------------
-  CbmRunAna *run= new CbmRunAna();
+  FairRunAna *run= new FairRunAna();
   run->SetInputFile(inFile);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
@@ -118,13 +118,13 @@ void run_reco(Int_t nEvents = 1)
   // =========================================================================
 
   // -----   STS digitizer   -------------------------------------------------
-  CbmTask* stsDigitize = new CbmStsDigitize(iVerbose);
+  FairTask* stsDigitize = new CbmStsDigitize(iVerbose);
   run->AddTask(stsDigitize);
   // -------------------------------------------------------------------------
 
 
   // -----  STS hit finding   ------------------------------------------------
-  CbmTask* stsFindHits = new CbmStsFindHits(iVerbose);
+  FairTask* stsFindHits = new CbmStsFindHits(iVerbose);
   run->AddTask(stsFindHits);
   // -------------------------------------------------------------------------
 
@@ -141,19 +141,19 @@ void run_reco(Int_t nEvents = 1)
   CbmL1* l1 = new CbmL1();
   run->AddTask(l1);
   CbmStsTrackFinder* stsTrackFinder    = new CbmL1StsTrackFinder();
-  CbmTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder);  run->AddTask(stsFindTracks);
+  FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder);  run->AddTask(stsFindTracks);
   // -------------------------------------------------------------------------
   
   
   // ---   STS track matching   ----------------------------------------------
-  CbmTask* stsMatchTracks = new CbmStsMatchTracks(iVerbose);
+  FairTask* stsMatchTracks = new CbmStsMatchTracks(iVerbose);
   run->AddTask(stsMatchTracks);
   // -------------------------------------------------------------------------
 
 
   // ---   STS track fitting   -----------------------------------------------
   CbmStsTrackFitter* stsTrackFitter = new CbmStsKFTrackFitter();
-  CbmTask* stsFitTracks = new CbmStsFitTracks(stsTrackFitter, iVerbose);
+  FairTask* stsFitTracks = new CbmStsFitTracks(stsTrackFitter, iVerbose);
   run->AddTask(stsFitTracks);
   // -------------------------------------------------------------------------
 
@@ -422,9 +422,9 @@ void run_reco(Int_t nEvents = 1)
   TString stsDigi = gSystem->Getenv("VMCWORKDIR");
   stsDigi += "/parameters/sts/";
   stsDigi += stsDigiFile;
-  CbmRuntimeDb* rtdb = run->GetRuntimeDb();
-  CbmParRootFileIo* parIo1 = new CbmParRootFileIo();
-  CbmParAsciiFileIo* parIo2 = new CbmParAsciiFileIo();
+  FairRuntimeDb* rtdb = run->GetRuntimeDb();
+  FairParRootFileIo* parIo1 = new FairParRootFileIo();
+  FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
   parIo1->open(parFile.Data());
   parIo2->open(stsDigi.Data(),"in");
   rtdb->setFirstInput(parIo1);

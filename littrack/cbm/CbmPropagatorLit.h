@@ -3,7 +3,7 @@
 
 #include "CbmPropagator.h"
 
-class CbmTrackParam;
+class FairTrackParam;
 class CbmLitTrackPropagator;
 
 class CbmPropagatorLit : public CbmPropagator
@@ -16,13 +16,13 @@ public:
 	virtual ~CbmPropagatorLit();
 	
     virtual StatusCode Propagate( 
-		   const CbmTrackParam *parIn,
-           CbmTrackParam *parOut,
+		   const FairTrackParam *parIn,
+           FairTrackParam *parOut,
            Double_t zOut,
            Int_t pdg);
     
     virtual StatusCode Propagate( 
-		   CbmTrackParam *par, 
+		   FairTrackParam *par, 
            Double_t zOut,
            Int_t pdg);
    

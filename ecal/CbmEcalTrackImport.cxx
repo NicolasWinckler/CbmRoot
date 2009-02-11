@@ -1,7 +1,7 @@
 #include "CbmEcalTrackImport.h"
 
-#include "CbmRootManager.h"
-#include "CbmTrackParam.h"
+#include "FairRootManager.h"
+#include "FairTrackParam.h"
 
 #include "TClonesArray.h"
 #include "TChain.h"
@@ -19,7 +19,7 @@ void CbmEcalTrackImport::AddFile(const char* name)
 
 /** Standard constructor **/
 CbmEcalTrackImport::CbmEcalTrackImport(const char* name, const Int_t verbose)
-  : CbmTask(name, verbose)
+  : FairTask(name, verbose)
 {
   fChain=new TChain("ecaltracks");
 }
@@ -28,7 +28,7 @@ CbmEcalTrackImport::CbmEcalTrackImport(const char* name, const Int_t verbose)
 /** Task initialization **/
 InitStatus CbmEcalTrackImport::Init()
 {
-  CbmRootManager* io=CbmRootManager::Instance();
+  FairRootManager* io=FairRootManager::Instance();
   if (!io)
   {
     Fatal("Init", "Can't find IOManager.");
@@ -46,7 +46,7 @@ InitStatus CbmEcalTrackImport::Init()
     Info("Init", "%d tracks in input files.", fN);
   if (fN==0)
     Error("Init", "No tracks in input files");
-  fTracks=new TClonesArray("CbmTrackParam", 1000);
+  fTracks=new TClonesArray("FairTrackParam", 1000);
   io->Register("EcalTrackParam", "ECAL", fTracks, kFALSE);
   fEv=0; fEntry=1;
   fChain->GetEntry(0);
@@ -68,7 +68,7 @@ void CbmEcalTrackImport::Exec(Option_t* opt)
   }
   while(fEventN<fEv)
   {
-    new ((*fTracks)[nTr++]) CbmTrackParam(fX, fY, fZ, fTx, fTy, fQp, mat);
+    new ((*fTracks)[nTr++]) FairTrackParam(fX, fY, fZ, fTx, fTy, fQp, mat);
     if (fEntry<fN)
       fChain->GetEntry(fEntry++);
     else

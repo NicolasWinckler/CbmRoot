@@ -1,10 +1,10 @@
 #ifndef CBMSHIELD_H
 #define CBMSHIELD_H 1
 
-#include "CbmDetector.h"
-#include "CbmModule.h"
+#include "FairDetector.h"
+#include "FairModule.h"
 
-class CbmShield : public CbmModule {
+class CbmShield : public FairModule {
   public:
     CbmShield(const char * name, const char *Title="CBM Shield");
     CbmShield();

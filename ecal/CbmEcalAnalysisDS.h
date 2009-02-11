@@ -20,7 +20,7 @@
 #ifndef CBMECALANALYSISDS_H
 #define CBMECALANALYSISDS_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TString.h"
 
@@ -35,7 +35,7 @@ class TTree;
 class TClonesArray;
 
 
-class CbmEcalAnalysisDS : public CbmTask
+class CbmEcalAnalysisDS : public FairTask
 {
 public:
   CbmEcalAnalysisDS(const char* name, const Int_t iVerbose=0, const char* fileGeo="ecal_FullMC.geo");

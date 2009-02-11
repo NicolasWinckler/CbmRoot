@@ -12,7 +12,7 @@
 #ifndef CBMECALSCURVELIB_H
 #define CBMECALSCURVELIB_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "TString.h"
 
 #include <list>
@@ -20,7 +20,7 @@
 class CbmEcalSCurveLibRecord;
 class CbmEcalCell;
 
-class CbmEcalSCurveLib : public CbmTask
+class CbmEcalSCurveLib : public FairTask
 {
 public:
   CbmEcalSCurveLib(const char* name, Int_t verbose=0);

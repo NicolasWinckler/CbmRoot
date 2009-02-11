@@ -13,16 +13,16 @@
 
 
 #include "TLorentzVector.h"
-#include "CbmDetector.h"
+#include "FairDetector.h"
 
 
 class TClonesArray;
 class CbmMuchPoint;
-class CbmVolume;
+class FairVolume;
 class CbmGeoMuchPar;
 class TGeoMedium;
 
-class CbmMuch : public CbmDetector
+class CbmMuch : public FairDetector
 {
 
  public:
@@ -49,7 +49,7 @@ class CbmMuch : public CbmDetector
    ** collection.
    *@param vol  Pointer to the active volume
    **/
-  virtual Bool_t ProcessHits(CbmVolume* vol = 0);
+  virtual Bool_t ProcessHits(FairVolume* vol = 0);
 
 
   /** Virtual method BeginEvent
@@ -148,7 +148,7 @@ class CbmMuch : public CbmDetector
    ** Resets the private members for the track parameters
    **/
   void ResetParameters();
-  Long64_t GetDetId(CbmVolume* vol);
+  Long64_t GetDetId(FairVolume* vol);
 private:
   Int_t Intersect(Float_t x, Float_t y, Float_t lx, Float_t ly, Float_t r);
   TGeoMedium* CreateMedium(const char* matName);

@@ -11,7 +11,7 @@
 #include "CbmRichRing.h"
 #include "CbmRichHit.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 ///needed for radius correction
 #include "TH1D.h"

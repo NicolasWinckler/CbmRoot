@@ -9,13 +9,13 @@
 #include "CbmTrdTrack.h"
 #include "CbmTrdTrackMatch.h"
 
-#include "CbmGeoNode.h"
+#include "FairGeoNode.h"
 #include "CbmGeoPassivePar.h"
-#include "CbmGeoVector.h"
+#include "FairGeoVector.h"
 #include "CbmMCTrack.h"
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 #include "CbmStsTrack.h"
 #include "CbmStsTrackMatch.h"
 
@@ -33,7 +33,7 @@ using std::map;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrdFindTracksQa::CbmTrdFindTracksQa()
-  : CbmTask("STS Track Finder QA", 1) { 
+  : FairTask("STS Track Finder QA", 1) { 
   fMinPoints = 12;
   fQuota     = 0.7;
   fNormType = 1;
@@ -46,7 +46,7 @@ CbmTrdFindTracksQa::CbmTrdFindTracksQa()
 // -----   Standard constructor   ------------------------------------------
 CbmTrdFindTracksQa::CbmTrdFindTracksQa(Int_t minPoints, Double_t quota,
                                           Int_t iVerbose) 
-  : CbmTask("STS Track Finder QA", iVerbose) {
+  : FairTask("STS Track Finder QA", iVerbose) {
   fMinPoints = minPoints;
   fQuota     = quota;
     fNormType = 1;
@@ -69,15 +69,15 @@ CbmTrdFindTracksQa::~CbmTrdFindTracksQa() {
 void CbmTrdFindTracksQa::SetParContainers() {
 
   // Get Run
-  CbmRunAna* run = CbmRunAna::Instance();
+  FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) {
-    cout << "-E- " << GetName() << "::SetParContainers: No CbmRunAna!"
+    cout << "-E- " << GetName() << "::SetParContainers: No FairRunAna!"
          << endl;
     return;
   }
 
   // Get Runtime Database
-  CbmRuntimeDb* runDb = run->GetRuntimeDb();
+  FairRuntimeDb* runDb = run->GetRuntimeDb();
   if ( ! run ) {
     cout << "-E- " << GetName() << "::SetParContainers: No runtime database!"
          << endl;
@@ -104,7 +104,7 @@ InitStatus CbmTrdFindTracksQa::Init() {
   cout << GetName() << ": Initialising..." << endl;
 
   // Get RootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- " << GetName() << "::Init: "
          << "RootManager not instantised!" << endl;
@@ -585,15 +585,15 @@ InitStatus CbmTrdFindTracksQa::GetGeometry() {
     fTargetPos.SetXYZ(0., 0., 0.);
     return kERROR;
   }
-  CbmGeoNode* target = (CbmGeoNode*) passNodes->FindObject("targ");
+  FairGeoNode* target = (FairGeoNode*) passNodes->FindObject("targ");
   if ( ! target ) {
     cout << "-E- " << GetName() << "::GetGeometry: No target node" 
          << endl;
     fTargetPos.SetXYZ(0., 0., 0.);
     return kERROR;
   }
-  CbmGeoVector targetPos = target->getLabTransform()->getTranslation();
-  CbmGeoVector centerPos = target->getCenterPosition().getTranslation();
+  FairGeoVector targetPos = target->getLabTransform()->getTranslation();
+  FairGeoVector centerPos = target->getCenterPosition().getTranslation();
   Double_t targetX = targetPos.X() + centerPos.X();
   Double_t targetY = targetPos.Y() + centerPos.Y();
   Double_t targetZ = targetPos.Z() + centerPos.Z();

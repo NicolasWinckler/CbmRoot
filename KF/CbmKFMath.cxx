@@ -1,7 +1,7 @@
 #include "CbmKFMath.h"  
 
-#include "CbmField.h"
-#include "CbmTrackParam.h"
+#include "FairField.h"
+#include "FairTrackParam.h"
 
 #include <cmath>
 
@@ -295,7 +295,7 @@ Double_t CbmKFMath::getDeviation( Double_t x, Double_t y, Double_t C[], Double_t
 Double_t CbmKFMath::AnalyticQP(
 				   const Double_t T[], // track parameters (x,y,tx,ty,Q/p,z)
 				   const Double_t V[], // vertex parameters (x,y,z)
-				   CbmField *MagneticField       // magnetic field
+				   FairField *MagneticField       // magnetic field
 				   )
 {
   
@@ -775,7 +775,7 @@ Int_t CbmKFMath::GetNoise( Double_t Lrl, Double_t F,Double_t Fe,
 }
 
 
-void CbmKFMath::CopyTC2TrackParam(CbmTrackParam* par, Double_t T[], Double_t C[] )
+void CbmKFMath::CopyTC2TrackParam(FairTrackParam* par, Double_t T[], Double_t C[] )
 {
   if( T )
     {
@@ -794,7 +794,7 @@ void CbmKFMath::CopyTC2TrackParam(CbmTrackParam* par, Double_t T[], Double_t C[]
     }
 }
 
-void CbmKFMath::CopyTrackParam2TC(CbmTrackParam* par, Double_t T[], Double_t C[] )
+void CbmKFMath::CopyTrackParam2TC(FairTrackParam* par, Double_t T[], Double_t C[] )
 {
   if( T )
     {  

@@ -5,7 +5,7 @@
 
 #include "CbmStsTrack.h"
 
-#include "CbmHit.h"
+#include "FairHit.h"
 
 #include <iostream>
 #include <map>
@@ -36,14 +36,14 @@ CbmStsTrack::~CbmStsTrack() {
 
 
 // -----   Public method AddStsHit   ---------------------------------------
-void CbmStsTrack::AddStsHit(Int_t hitIndex, CbmHit* hit) {
+void CbmStsTrack::AddStsHit(Int_t hitIndex, FairHit* hit) {
   fStsHitMap[hit->GetZ()] = hitIndex;
 }
 // -------------------------------------------------------------------------
 
 
 // -----   Public method AddMvdHit   ---------------------------------------
-void CbmStsTrack::AddMvdHit(Int_t hitIndex, CbmHit* hit) {
+void CbmStsTrack::AddMvdHit(Int_t hitIndex, FairHit* hit) {
   fMvdHitMap[hit->GetZ()] = hitIndex;
 }
 // -------------------------------------------------------------------------

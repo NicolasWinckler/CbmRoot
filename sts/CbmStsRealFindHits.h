@@ -21,7 +21,7 @@
 #define CBMSTSREALFINDHITS_H 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TStopwatch.h"
 
@@ -38,7 +38,7 @@ class CbmStsStation;
 
 
 
-class CbmStsRealFindHits : public CbmTask
+class CbmStsRealFindHits : public FairTask
 {
 
 

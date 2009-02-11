@@ -28,7 +28,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmEcalHitFastMC::CbmEcalHitFastMC(): CbmHit() {}
+CbmEcalHitFastMC::CbmEcalHitFastMC(): FairHit() {}
 // -------------------------------------------------------------------------
 
 // -----   Constructor   -------------------------------------------

@@ -4,9 +4,9 @@
 #include "CbmLitMaterialInfo.h"
 #include "CbmLitMaterialEffectsImp.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
-#include "CbmMCPoint.h"
+#include "FairMCPoint.h"
 #include "CbmMuchPoint.h"
 
 #include "TClonesArray.h"
@@ -31,8 +31,8 @@ CbmLitElossAna::~CbmLitElossAna()
 
 InitStatus CbmLitElossAna::Init() 
 {
-	CbmRootManager* ioman = CbmRootManager::Instance();
-    if (!ioman) Fatal("Init", "No CbmRootManager");
+	FairRootManager* ioman = FairRootManager::Instance();
+    if (!ioman) Fatal("Init", "No FairRootManager");
    
     fMCTrackArray  = (TClonesArray*) ioman->ActivateBranch("MCTrack");
     if (!fMCTrackArray) Fatal("Init", "No MCTrack array!");

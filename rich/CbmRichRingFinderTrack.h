@@ -11,8 +11,8 @@
 #include <map>
 #include "TClonesArray.h"
 #include "CbmRichRing.h"
-/*#include "CbmTask.h"
-#include "CbmRootManager.h"*/
+/*#include "FairTask.h"
+#include "FairRootManager.h"*/
 #include "CbmRichRingFinder.h"
 
 class CbmRichTrackMyPoint {

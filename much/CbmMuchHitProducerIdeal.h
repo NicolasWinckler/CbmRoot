@@ -11,13 +11,13 @@
 #ifndef CBMMUCHHITPRODUCERIDEAL_H
 #define CBMMUCHHITPRODUCERIDEAL_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "TH2.h"
 #include "TClonesArray.h"
 #include "TString.h"                         
 
 
-class CbmMuchHitProducerIdeal : public CbmTask {
+class CbmMuchHitProducerIdeal : public FairTask {
 
 public:
 

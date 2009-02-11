@@ -1,9 +1,9 @@
 #ifndef CBMGEOTOF_H
 #define CBMGEOTOF_H
 
-#include "CbmGeoSet.h"
+#include "FairGeoSet.h"
 
-class  CbmGeoTof : public CbmGeoSet {
+class  CbmGeoTof : public FairGeoSet {
 protected:
   char modName[20];  // name of module
   char eleName[20];  // substring for elements in module

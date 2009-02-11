@@ -5,13 +5,13 @@
 #ifndef CBMFITGLOBALTRACKSQA
 #define CBMFITGLOBALTRACKSQA
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TClonesArray;
 class TH1F;
 
 
-class CbmFitGlobalTracksQa : public CbmTask {
+class CbmFitGlobalTracksQa : public FairTask {
 
 private:
     TClonesArray *fArrayStsPoint;     // STS points

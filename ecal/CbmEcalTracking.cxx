@@ -2,9 +2,9 @@
 
 #include "CbmEcalStructure.h"
 #include "CbmEcalTrackExtrapolation.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 
 #include "TClonesArray.h"
 
@@ -14,14 +14,14 @@ using namespace std;
 
 /** Default constructor **/
 CbmEcalTracking::CbmEcalTracking()
-  : CbmTask(), fStru(NULL), fTrE(NULL)
+  : FairTask(), fStru(NULL), fTrE(NULL)
 {
   ;
 }
 
 /** Standerd constructor **/
 CbmEcalTracking::CbmEcalTracking(const char* name, const Int_t verbose)
-  : CbmTask(name, verbose), fStru(NULL), fTrE(NULL)
+  : FairTask(name, verbose), fStru(NULL), fTrE(NULL)
 {
   ;
 }
@@ -31,7 +31,7 @@ InitStatus CbmEcalTracking::Init()
 {
   if (!fTrE) return kFATAL; 
   
-  CbmRootManager* io=CbmRootManager::Instance();
+  FairRootManager* io=FairRootManager::Instance();
   if (!io)
   {
     Fatal("Init()", "Can't find IOManager.");
@@ -43,7 +43,7 @@ InitStatus CbmEcalTracking::Init()
     Fatal("Init()", "Can't find GlobalTrack.");
     return kFATAL;
   }
-  fTrackPar=new TClonesArray("CbmTrackParam", 1000);
+  fTrackPar=new TClonesArray("FairTrackParam", 1000);
   io->Register("EcalTrackParam", "ECAL", fTrackPar, kTRUE);
   fStru=(CbmEcalStructure*)io->ActivateBranch("EcalStructure");
   if (!fStru) 
@@ -69,7 +69,7 @@ void CbmEcalTracking::Exec(Option_t* opt)
   tn=fTrackPar->GetEntriesFast();
   for(i=0;i<tn;i++)
   {
-    par=(CbmTrackParam*)fTrackPar->At(i);
+    par=(FairTrackParam*)fTrackPar->At(i);
     if (!par) continue;
     cout << "Track " << i << ":(" << par->GetX() << ", " << par->GetY();
     cout << ", " << par->GetZ() << ")" << endl;

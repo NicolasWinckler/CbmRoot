@@ -17,9 +17,9 @@
 #include "TCanvas.h"
 
 #include "CbmMuchHitProducerIdeal.h"
-#include "CbmMCApplication.h"
-#include "CbmDetector.h"
-#include "CbmRootManager.h"
+#include "FairMCApplication.h"
+#include "FairDetector.h"
+#include "FairRootManager.h"
 #include "CbmMuchPoint.h"
 #include "CbmMuchHit.h"
 
@@ -32,7 +32,7 @@ ClassImp(CbmMuchHitProducerIdeal)
 // ---- Constructor ----------------------------------------------------
 CbmMuchHitProducerIdeal::CbmMuchHitProducerIdeal(const char *name, Int_t verbose, 
 				       Double_t SigmaXY, Double_t SigmaZ )
-  :CbmTask(name,verbose)
+  :FairTask(name,verbose)
 {
   fVerbose = verbose;
   fSigmaXY = SigmaXY;
@@ -55,7 +55,7 @@ CbmMuchHitProducerIdeal::~CbmMuchHitProducerIdeal()
 // ---- Init ----------------------------------------------------------
 InitStatus CbmMuchHitProducerIdeal::Init()
 {
-  fMuchPoints=(TClonesArray *) CbmRootManager::Instance()->GetObject("MuchPoint");  
+  fMuchPoints=(TClonesArray *) FairRootManager::Instance()->GetObject("MuchPoint");  
   Register();
   return kSUCCESS;
 }
@@ -144,7 +144,7 @@ void CbmMuchHitProducerIdeal::Finish()
 // ---- Register ------------------------------------------------------
 void CbmMuchHitProducerIdeal::Register()
 {
-  CbmRootManager::Instance()->Register("MuchHit", "Much",
+  FairRootManager::Instance()->Register("MuchHit", "Much",
 				       fHitCollection, kTRUE);
 }
 

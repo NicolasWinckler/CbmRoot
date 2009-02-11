@@ -22,7 +22,7 @@
 
 class TClonesArray;
 class CbmStsDigiScheme;
-class CbmField;
+class FairField;
 
 
 class CbmStsTrackFinder : public TNamed
@@ -61,7 +61,7 @@ class CbmStsTrackFinder : public TNamed
 
   /** Modifiers **/
   void SetDigiScheme(CbmStsDigiScheme* scheme) { fDigiScheme = scheme; }
-  void SetField(CbmField* field)               { fField = field; }
+  void SetField(FairField* field)               { fField = field; }
   void SetMvdHitArray(TClonesArray* hits)      { fMvdHits = hits; }
   void SetStsHitArray(TClonesArray* hits)      { fStsHits = hits; }
   void SetTrackArray(TClonesArray* tracks)     { fTracks = tracks; }
@@ -71,7 +71,7 @@ class CbmStsTrackFinder : public TNamed
  protected:
 
   CbmStsDigiScheme* fDigiScheme;  // STS digitisation scheme
-  CbmField*         fField;       // Magnetic field
+  FairField*         fField;       // Magnetic field
   TClonesArray*     fMvdHits;     // MvdHit array
   TClonesArray*     fStsHits;     // StsHit array
   TClonesArray*     fTracks;      // StsTrack array

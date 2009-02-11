@@ -33,71 +33,71 @@ void much_sim(Int_t nEvents = 1000)
   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
   cbmrootlibs();
 
-  CbmRunSim* fRun = new CbmRunSim();
+  FairRunSim* fRun = new FairRunSim();
   fRun->SetName("TGeant3");              // Transport engine
   fRun->SetOutputFile(outFile);          // Output file
-  CbmRuntimeDb* rtdb = fRun->GetRuntimeDb();
+  FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
 
   fRun->SetMaterials("media.geo");       // Materials
 
   if ( caveGeom != "" ) {
-    CbmModule* cave = new CbmCave("CAVE");
+    FairModule* cave = new CbmCave("CAVE");
     cave->SetGeometryFileName(caveGeom);
     fRun->AddModule(cave);
     cout << "    --- " << caveGeom << endl;
   }
 
   if ( pipeGeom != "" ) {
-    CbmModule* pipe = new CbmPipe("PIPE");
+    FairModule* pipe = new CbmPipe("PIPE");
     pipe->SetGeometryFileName(pipeGeom);
     fRun->AddModule(pipe);
     cout << "    --- " << pipeGeom << endl;
   }
 
    if ( shieldGeom != "" ) {
-    CbmModule* shield = new CbmShield("SHIELD");
+    FairModule* shield = new CbmShield("SHIELD");
     shield->SetGeometryFileName(shieldGeom);
     fRun->AddModule(shield);
     cout << "    --- " << shieldGeom << endl;
   }
 
   if ( targetGeom != "" ) {
-    CbmModule* target = new CbmTarget("Target");
+    FairModule* target = new CbmTarget("Target");
     target->SetGeometryFileName(targetGeom);
     fRun->AddModule(target);
     cout << "    --- " << targetGeom << endl;
   }
 
   if ( magnetGeom != "" ) {
-    CbmModule* magnet = new CbmMagnet("MAGNET");
+    FairModule* magnet = new CbmMagnet("MAGNET");
     magnet->SetGeometryFileName(magnetGeom);
     fRun->AddModule(magnet);
     cout << "    --- " << magnetGeom << endl;
   }
 
   if ( stsGeom != "" ) {
-    CbmDetector* sts = new CbmSts("STS", kTRUE);
+    FairDetector* sts = new CbmSts("STS", kTRUE);
     sts->SetGeometryFileName(stsGeom);
     fRun->AddModule(sts);
     cout << "    --- " << stsGeom << endl;
   }
 
   if ( muchGeom != "" ) {
-    CbmDetector* much = new CbmMuch("MUCH", kTRUE);
+    FairDetector* much = new CbmMuch("MUCH", kTRUE);
     much->SetGeometryFileName(muchGeom);
     fRun->AddModule(much);
     cout << "    --- " << muchGeom << endl;
   }
 
   if ( trdGeom != "" ) {
-    CbmDetector* trd = new CbmTrd("TRD",kTRUE );
+    FairDetector* trd = new CbmTrd("TRD",kTRUE );
     trd->SetGeometryFileName(trdGeom);
     fRun->AddModule(trd);
     cout << "    --- " << trdGeom << endl;
   }
 
   if ( tofGeom != "" ) {
-    CbmDetector* tof = new CbmTof("TOF", kTRUE);
+    FairDetector* tof = new CbmTof("TOF", kTRUE);
     tof->SetGeometryFileName(tofGeom);
     fRun->AddModule(tof);
     cout << "    --- " << tofGeom << endl;
@@ -119,18 +119,18 @@ void much_sim(Int_t nEvents = 1000)
   fRun->SetField(magField);
 
 
-  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
-//  CbmPlutoGenerator *plutoGen= new CbmPlutoGenerator(plutoFile);
+//  FairPlutoGenerator *plutoGen= new FairPlutoGenerator(plutoFile);
 //  primGen->AddGenerator(plutoGen);
 
-  CbmUrqmdGenerator*  urqmdGen = new CbmUrqmdGenerator(inFileUrqmd);
+  FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFileUrqmd);
   primGen->AddGenerator(urqmdGen);
 
   Double_t minMom = 2.5; //minimum momentum
   Double_t maxMom = 25.; //maximum momentum
 
-  CbmBoxGenerator* boxGen1 = new CbmBoxGenerator(13, 5);
+  FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, 5);
   boxGen1->SetPRange(minMom, maxMom);
   boxGen1->SetPhiRange(0.,360.);
   boxGen1->SetThetaRange(2.5, 25.);
@@ -138,7 +138,7 @@ void much_sim(Int_t nEvents = 1000)
   boxGen1->Init();
   primGen->AddGenerator(boxGen1);
 
-  CbmBoxGenerator* boxGen2 = new CbmBoxGenerator(-13, 5);
+  FairBoxGenerator* boxGen2 = new FairBoxGenerator(-13, 5);
   boxGen2->SetPRange(minMom, maxMom);
   boxGen2->SetPhiRange(0.,360.);
   boxGen2->SetThetaRange(2.5, 25.);
@@ -157,7 +157,7 @@ void much_sim(Int_t nEvents = 1000)
   fieldPar->setChanged();
   fieldPar->setInputVersion(fRun->GetRunId(),1);
   Bool_t kParameterMerged = kTRUE;
-  CbmParRootFileIo* parOut = new CbmParRootFileIo(kParameterMerged);
+  FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
   parOut->open(parFile.Data());//gFile);
   rtdb->setOutput(parOut);
   rtdb->saveOutput();

@@ -6,7 +6,7 @@
 
 #include "CbmMvdGeoPar.h"
 
-#include "CbmParamList.h"
+#include "FairParamList.h"
 
 #include "TObjArray.h"
 
@@ -16,7 +16,7 @@
 // -----   Constructor   ---------------------------------------------------
 CbmMvdGeoPar::CbmMvdGeoPar(const char* name, const char* title,
 			   const char* context)
-  : CbmParGenericSet(name, title, context) {
+  : FairParGenericSet(name, title, context) {
   fGeoSensNodes = new TObjArray();
   fGeoPassNodes = new TObjArray();
 }
@@ -49,21 +49,21 @@ void CbmMvdGeoPar::clear() {
 
 
 // -----   Virtual public method putParams   -------------------------------
-void CbmMvdGeoPar::putParams(CbmParamList* parList) {
+void CbmMvdGeoPar::putParams(FairParamList* parList) {
   if ( ! parList ) return;
-  parList->addBinary("CbmGeoNodes Sensitive List", fGeoSensNodes);
-  parList->addBinary("CbmGeoNodes Passive List",   fGeoPassNodes);
+  parList->addObject("FairGeoNodes Sensitive List", fGeoSensNodes);
+  parList->addObject("FairGeoNodes Passive List",   fGeoPassNodes);
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Virtual public method getParams   -------------------------------
-Bool_t CbmMvdGeoPar::getParams(CbmParamList* parList) {
+Bool_t CbmMvdGeoPar::getParams(FairParamList* parList) {
   if ( ! parList ) return kFALSE;
-  if ( ! parList->fillBinary("CbmGeoNodes Sensitive List", fGeoSensNodes)) 
+  if ( ! parList->fillObject("FairGeoNodes Sensitive List", fGeoSensNodes)) 
     return kFALSE;
-  if ( ! parList->fillBinary("CbmGeoNodes Passive List", fGeoPassNodes)) 
+  if ( ! parList->fillObject("FairGeoNodes Passive List", fGeoPassNodes)) 
     return kFALSE;
   return kTRUE;
 }

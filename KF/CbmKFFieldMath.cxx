@@ -2,7 +2,7 @@
 
 #include "CbmKFMath.h"  
 
-#include "CbmField.h"
+#include "FairField.h"
 
 #include "math.h"
 
@@ -70,7 +70,7 @@ Int_t CbmKFFieldMath::ExtrapolateRK4
  Double_t       C_out[], // output covariance matrix
  Double_t       z_out  , // extrapolate to this z position
  Double_t       qp0    , // use Q/p linearisation at this value
- CbmField       *MF       // magnetic field
+ FairField       *MF       // magnetic field
  )
 {
   //
@@ -623,7 +623,7 @@ void CbmKFFieldMath::ExtrapolateAnalytic
  Double_t       C_out[], // output covariance matrix
  Double_t       z_out  , // extrapolate to this z position
  Double_t       qp0    , // use Q/p linearisation at this value
- CbmField *MF     , // magnetic field
+ FairField *MF     , // magnetic field
  Int_t order
  )
 {
@@ -1009,7 +1009,7 @@ Int_t CbmKFFieldMath::ExtrapolateALight
  Double_t       C_out[], // output covariance matrix
  Double_t       z_out  , // extrapolate to this z position
  Double_t       qp0    , // use Q/p linearisation at this value
- CbmField *MF       // magnetic field
+ FairField *MF       // magnetic field
  )
 {  
   //

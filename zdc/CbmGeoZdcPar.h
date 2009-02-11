@@ -2,23 +2,23 @@
 #define CBMGEOZDCPAR_H
 
 
-#include "CbmParGenericSet.h"
+#include "FairParGenericSet.h"
 
 class TObjArray;
-class CbmParamList;
+class FairParamList;
 
-class CbmGeoZdcPar : public CbmParGenericSet {
+class CbmGeoZdcPar : public FairParGenericSet {
 public:
-  TObjArray            *fGeoSensNodes; // List of CbmGeoNodes for sensitive volumes
-  TObjArray            *fGeoPassNodes; // List of CbmGeoNodes for sensitive volumes
+  TObjArray            *fGeoSensNodes; // List of FairGeoNodes for sensitive volumes
+  TObjArray            *fGeoPassNodes; // List of FairGeoNodes for sensitive volumes
 
   CbmGeoZdcPar(const char* name="CbmGeoZdcPar",
              const char* title="Zdc Geometry Parameters",
              const char* context="TestDefaultContext");
   ~CbmGeoZdcPar(void);
   void clear(void);
-  void putParams(CbmParamList*);
-  Bool_t getParams(CbmParamList*);
+  void putParams(FairParamList*);
+  Bool_t getParams(FairParamList*);
   TObjArray             *GetGeoSensitiveNodes(){return fGeoSensNodes;}
   TObjArray             *GetGeoPassiveNodes(){return fGeoPassNodes;}
 

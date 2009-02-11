@@ -308,11 +308,11 @@ public:
 
 /**
  * method adds a hit to the end of the Hit-TClonesArray
- * @see CbmHit()
+ * @see FairHit()
  */
 
 	void addHit(trackfinderInputHit& hit);
-	void addHit(int detectorId, CbmHit* hit, CbmMCPoint* point, int hitIndex);
+	void addHit(int detectorId, FairHit* hit, FairMCPoint* point, int hitIndex);
 	void addHit(int trackId, int detectorId, double hitPosX, double hitPosY, double pointPosX, double pointPosY, double posZ, int hitIndex, int pointIndex, bool maps, bool strip, bool hybrid);
 	void addHit(int trackId, int detectorId, double hitPosX, double hitPosY, double pointPosX, double pointPosY, double posZ, int hitIndex, int pointIndex);
 

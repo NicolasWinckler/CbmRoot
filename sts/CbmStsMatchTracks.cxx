@@ -8,8 +8,8 @@
 #include "CbmStsTrack.h"
 #include "CbmStsTrackMatch.h"
 
-#include "CbmMCPoint.h"
-#include "CbmRootManager.h"
+#include "FairMCPoint.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -28,7 +28,7 @@ using std::map;
 
 // -----   Default constructor   -------------------------------------------
 CbmStsMatchTracks::CbmStsMatchTracks() 
-  : CbmTask("STSMatchTracks") {
+  : FairTask("STSMatchTracks") {
   fTracks  = NULL;
   fPoints  = NULL;
   fHits    = NULL;
@@ -46,7 +46,7 @@ CbmStsMatchTracks::CbmStsMatchTracks()
 
 // -----   Standard constructor  -------------------------------------------
 CbmStsMatchTracks::CbmStsMatchTracks(Int_t iVerbose) 
-  : CbmTask("STSMatchTracks", iVerbose) {
+  : FairTask("STSMatchTracks", iVerbose) {
   fTracks  = NULL;
   fPoints  = NULL;
   fHits    = NULL;
@@ -64,7 +64,7 @@ CbmStsMatchTracks::CbmStsMatchTracks(Int_t iVerbose)
 
 // -----   Constructor with task name   ------------------------------------
 CbmStsMatchTracks::CbmStsMatchTracks(const char* name, Int_t iVerbose) 
-  : CbmTask(name, iVerbose) {
+  : FairTask(name, iVerbose) {
   fTracks  = NULL;
   fPoints  = NULL;
   fHits    = NULL;
@@ -97,7 +97,7 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
   // Create some pointers and variables
   CbmStsTrack* track = NULL;
   CbmStsHit*   hit  = NULL;
-  CbmMCPoint*  point = NULL;
+  FairMCPoint*  point = NULL;
   Int_t nHits    = 0;
   Int_t nMCTracks = 0;
   Int_t iPoint    = 0;
@@ -143,7 +143,7 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
 	nFake++;
 	continue;
       }
-      point = (CbmMCPoint*) fPoints->At(iPoint);
+      point = (FairMCPoint*) fPoints->At(iPoint);
       if ( ! point ) {
 	cout << "-E- CbmStsMatchTracks::Exec: "
 	     << "Empty MCPoint " << iPoint << " from MapsHit " << iHit
@@ -240,8 +240,8 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
 // -----   Virtual private method Init   -----------------------------------
 InitStatus CbmStsMatchTracks::Init() {
   
-  // Get CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmStsMatchTracks::Init: "
 	 << "RootManager not instantised!" << endl;

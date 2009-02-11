@@ -1,14 +1,14 @@
 #ifndef CBM_STS_POLY_FITTER_H
 #define CBM_STS_POLY_FITTER_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmStsJointTrack.h"
 #include "CbmField.h"
 #include "TRefArray.h"
 
 //#include "fstream.h"
 
-class CbmStsPolyFitter : public CbmTask {
+class CbmStsPolyFitter : public FairTask {
 
 protected:
 

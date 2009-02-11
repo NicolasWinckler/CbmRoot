@@ -18,7 +18,7 @@
 #define CBMTRDMATCHTRACKS_H 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include <map>
 
@@ -26,7 +26,7 @@ class TClonesArray;
 
 
 
-class CbmTrdMatchTracks : public CbmTask
+class CbmTrdMatchTracks : public FairTask
 {
 
  public:
@@ -42,10 +42,10 @@ class CbmTrdMatchTracks : public CbmTask
   /** Constructor with name, title and verbosity
    **
    *@param name     Name of taks
-   *@param title    Title of task   (default CbmTask)
+   *@param title    Title of task   (default FairTask)
    *@param verbose  Verbosity level (default 1)
    **/
-  CbmTrdMatchTracks(const char* name, const char* title = "CbmTask",
+  CbmTrdMatchTracks(const char* name, const char* title = "FairTask",
 		    Int_t verbose = 1);
 
 
@@ -68,7 +68,7 @@ class CbmTrdMatchTracks : public CbmTask
  private:
 
   TClonesArray* fTracks;       // Array of CbmTrdTracks
-  TClonesArray* fPoints;       // Array of CbmMCPoints
+  TClonesArray* fPoints;       // Array of FairMCPoints
   TClonesArray* fHits;         // Array of CbmTrdHits
   TClonesArray* fMatches;      // Array of CbmTrdTrackMatch
 

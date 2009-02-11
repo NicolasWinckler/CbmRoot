@@ -60,7 +60,7 @@ set(GLOBAL_SRCS ${GLOBAL_SRCS} ${GLOBAL_DICTIONARY})
 
 add_library(Global SHARED ${GLOBAL_SRCS})
 target_link_libraries(Global ${ROOT_LIBRARIES})
-set_target_properties(Global PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(Global PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS Global DESTINATION ${CMAKE_BINARY_DIR}/lib)

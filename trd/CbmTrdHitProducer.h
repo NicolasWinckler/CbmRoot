@@ -28,18 +28,18 @@
 #define CBMTRDHITPRODUCER_H
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TVector3.h"
 
 class TClonesArray;
-class CbmBaseParSet;
+class FairBaseParSet;
 class CbmGeoTrdPar;
 class CbmTrdHit;
 class CbmTrdRadiator;
 
 
-    class CbmTrdHitProducer : public CbmTask {
+    class CbmTrdHitProducer : public FairTask {
 public:
 
     
@@ -112,7 +112,7 @@ private:
 
     CbmTrdRadiator*  fRadiator; //!
     CbmGeoTrdPar*    fGeoPar;   //!
-    CbmBaseParSet*    fBasePar; //!
+    FairBaseParSet*    fBasePar; //!
 
     // for the CbmTrdRadiator
     Int_t   fNfoils;       //!

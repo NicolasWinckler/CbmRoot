@@ -6,12 +6,12 @@
 #ifndef _CBM_TRD_HIT_PRODUCER_IDEAL_
 #define _CBM_TRD_HIT_PRODUCER_IDEAL_
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TClonesArray;
 
 
-class CbmTrdHitProducerIdeal : public CbmTask {
+class CbmTrdHitProducerIdeal : public FairTask {
 
 private:
     TClonesArray *fArrayTrdPoint;  // Array of TRD points

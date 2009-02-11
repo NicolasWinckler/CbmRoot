@@ -13,7 +13,7 @@ class CbmKFTrack;
 
 //Section added 28.04.2008 by Maciej Krauze
 class CbmVertex;
-class CbmTrackParam;
+class FairTrackParam;
 //end of added section
 
 class CbmTrdTrackFitterKF_CA : public CbmTrdTrackFitter {
@@ -39,7 +39,7 @@ public:
     inline void SetPid    (Int_t pid)     {  fPid = pid;         }
 
    //Section added 28.04.2008 by Maciej Krauze
-   Double_t FitToVertex( CbmTrdTrack* track, CbmVertex *vtx, CbmTrackParam *v_track );
+   Double_t FitToVertex( CbmTrdTrack* track, CbmVertex *vtx, FairTrackParam *v_track );
    
       /** Extrapolate track to any Z position
        *     *    *
@@ -47,7 +47,7 @@ public:
        *     *    * @param z        new z-position
        *     *    * @param e_track  (return value) extrapolated track parameters
        *     *    */
-        void Extrapolate( CbmTrdTrack* track, Double_t z, CbmTrackParam *e_track );
+        void Extrapolate( CbmTrdTrack* track, Double_t z, FairTrackParam *e_track );
    
    //end of added section
    

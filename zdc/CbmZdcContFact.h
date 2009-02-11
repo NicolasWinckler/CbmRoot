@@ -1,18 +1,18 @@
 #ifndef CBMZDCCONTFACT_H
 #define CBMZDCCONTFACT_H
 
-#include "CbmContFact.h"
+#include "FairContFact.h"
 
-class CbmContainer;
-class CbmParSet;
+class FairContainer;
+class FairParSet;
 
-class CbmZdcContFact : public CbmContFact {
+class CbmZdcContFact : public FairContFact {
 private:
   void setAllContainers();
 public:
   CbmZdcContFact();
   ~CbmZdcContFact() {}
-  CbmParSet* createContainer(CbmContainer*);
+  FairParSet* createContainer(FairContainer*);
   ClassDef( CbmZdcContFact,0) // Factory for all ZDC parameter containers
 };
 

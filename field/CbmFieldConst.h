@@ -19,13 +19,13 @@
 #define CBMFIELDCONST_H 1
 
 
-#include "CbmField.h"
+#include "FairField.h"
 
 
 class CbmFieldPar;
 
 
-class CbmFieldConst : public CbmField
+class CbmFieldConst : public FairField
 {
 
  public:    

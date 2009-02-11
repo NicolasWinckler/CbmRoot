@@ -16,11 +16,11 @@
 #define CBMMVDGEOPAR_H 1
 
 
-#include "CbmParGenericSet.h"
+#include "FairParGenericSet.h"
 
 
 
-class CbmMvdGeoPar : public CbmParGenericSet {
+class CbmMvdGeoPar : public FairParGenericSet {
 
  public:
   
@@ -39,11 +39,11 @@ class CbmMvdGeoPar : public CbmParGenericSet {
 
 
   /** Put parameters **/
-  virtual void putParams(CbmParamList* parList);
+  virtual void putParams(FairParamList* parList);
 
 
   /** Get parameters **/
-  virtual Bool_t getParams(CbmParamList* parList);
+  virtual Bool_t getParams(FairParamList* parList);
 
 
   /** Accessors to sensitive and passive nodes **/
@@ -53,8 +53,8 @@ class CbmMvdGeoPar : public CbmParGenericSet {
 
  private:
 
-  TObjArray* fGeoSensNodes; // List of CbmGeoNodes for sensitive volumes
-  TObjArray* fGeoPassNodes; // List of CbmGeoNodes for passive volumes
+  TObjArray* fGeoSensNodes; // List of FairGeoNodes for sensitive volumes
+  TObjArray* fGeoPassNodes; // List of FairGeoNodes for passive volumes
 
 
   ClassDef(CbmMvdGeoPar,1);

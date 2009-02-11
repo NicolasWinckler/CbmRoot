@@ -1,7 +1,7 @@
 #ifndef CBMECALTIMEDIGITIZER_H
 #define CBMECALTIMEDIGITIZER_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TString.h"
 
@@ -12,7 +12,7 @@ class CbmEcalCell;
 class CbmEcalCalibration;
 class TFormula;
 
-class CbmEcalTimeDigitizer : public CbmTask
+class CbmEcalTimeDigitizer : public FairTask
 {
 public:
   CbmEcalTimeDigitizer(const char* name, const Int_t iVerbose=0, const char* config="");

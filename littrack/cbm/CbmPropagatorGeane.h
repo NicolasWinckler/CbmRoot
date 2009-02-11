@@ -3,8 +3,8 @@
 
 #include "CbmPropagator.h"
 
-#include "CbmField.h"
-#include "CbmGeanePro.h"
+#include "FairField.h"
+#include "FairGeanePro.h"
 
 #include "TMatrixD.h"
 
@@ -16,13 +16,13 @@ public:
    virtual ~CbmPropagatorGeane();
 
    virtual StatusCode Propagate( 
-		   const CbmTrackParam *parIn,
-           CbmTrackParam *parOut,
+		   const FairTrackParam *parIn,
+           FairTrackParam *parOut,
            Double_t zOut,
            Int_t pdg);
     
    virtual StatusCode Propagate( 
-		   CbmTrackParam *par, 
+		   FairTrackParam *par, 
            Double_t zOut,
            Int_t pdg);
    
@@ -42,9 +42,9 @@ private:
 			std::vector<Double_t>& cov) const;
 	
 	Bool_t IsInParCorrect(
-			const CbmTrackParam* par) const;
+			const FairTrackParam* par) const;
 	
-   CbmGeanePro *fPropagator;
+   FairGeanePro *fPropagator;
    
    Double_t fMinSlope;
    Double_t fMaxSlope;

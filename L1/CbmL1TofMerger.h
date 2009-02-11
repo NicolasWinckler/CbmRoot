@@ -10,7 +10,7 @@
 class TClonesArray;
 class CbmKFTrack;
 class CbmTofHit;
-class CbmTrackParam;
+class FairTrackParam;
 
 
 class CbmL1TofMerger : public CbmTofMerger {

@@ -15,7 +15,7 @@
 #include "TH1.h"
 #include "TH2.h"
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TStopwatch.h"
 #include "TPolyLine.h"
@@ -40,7 +40,7 @@ class TFile;
 
 enum DetectorType {kGEM, kMICROMEGAS};
 
-class CbmMuchDigitize : public CbmTask
+class CbmMuchDigitize : public FairTask
 {
 
  public:

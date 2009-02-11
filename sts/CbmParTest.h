@@ -1,11 +1,11 @@
 #ifndef CBMPARTEST_H
 #define CBMPARTEST_H
 
-#include "CbmParGenericSet.h"
+#include "FairParGenericSet.h"
 
 #include "TH1F.h"
 
-class CbmParTest : public CbmParGenericSet {
+class CbmParTest : public FairParGenericSet {
 public:
   Float_t p1;
   Int_t ai[5000];
@@ -16,11 +16,11 @@ public:
              const char* context="TestDefaultContext");
   ~CbmParTest(void);
   void clear(void);
-  virtual Bool_t init(CbmParIo*){return kTRUE;}
-  virtual Int_t write(CbmParIo*){return 0;}
+  virtual Bool_t init(FairParIo*){return kTRUE;}
+  virtual Int_t write(FairParIo*){return 0;}
 
-  void putParams(CbmParamList*);
-  Bool_t getParams(CbmParamList*);
+  void putParams(FairParamList*);
+  Bool_t getParams(FairParamList*);
   ClassDef(CbmParTest,1)
 };
 

@@ -20,7 +20,7 @@
 #ifndef CBMECALSHOWERCALIBRATOR_H
 #define CBMECALSHOWERCALIBRATOR_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include <vector>
 
@@ -29,7 +29,7 @@ class TClonesArray;
 class TTree;
 class TVector3;
 
-class CbmEcalShowerCalibrator : public CbmTask
+class CbmEcalShowerCalibrator : public FairTask
 {
 public:
   /** Standart constructor **/

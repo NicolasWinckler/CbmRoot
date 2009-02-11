@@ -44,7 +44,7 @@ SET(CBMGENERATORS_SRCS ${CBMGENERATORS_SRCS} ${CBMGENERATORS_DICTIONARY})
 
 add_library(CbmGenerators SHARED ${CBMGENERATORS_SRCS})
 target_link_libraries(CbmGenerators ${ROOT_LIBRARIES})
-set_target_properties(CbmGenerators PROPERTIES ${CBMROOT_LIBRARY_PROPERTIES})
+set_target_properties(CbmGenerators PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS CbmGenerators DESTINATION ${CMAKE_BINARY_DIR}/lib)

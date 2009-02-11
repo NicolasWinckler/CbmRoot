@@ -19,7 +19,7 @@
 #ifndef CBMECALPHOTONCALIBRATOR_H
 #define CBMECALPHOTONCALIBRATOR_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include <vector>
 
@@ -28,7 +28,7 @@ class CbmEcalStructure;
 class TClonesArray;
 class TTree;
 
-class CbmEcalPhotonCalibrator : public CbmTask
+class CbmEcalPhotonCalibrator : public FairTask
 {
 public:
   CbmEcalPhotonCalibrator(const char* name, const Int_t iVerbose=1, const char* fileGeo="ecal_FullMC.geo");

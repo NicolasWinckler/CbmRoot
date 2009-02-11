@@ -20,7 +20,7 @@
 #define CBMFIELDMAP_H 1
 
 
-#include "CbmField.h"
+#include "FairField.h"
 
 class TArrayF;
 class CbmFieldMapCreator;
@@ -28,7 +28,7 @@ class CbmFieldMapData;
 class CbmFieldPar;
 
 
-class CbmFieldMap : public CbmField {
+class CbmFieldMap : public FairField {
 
 
 public:

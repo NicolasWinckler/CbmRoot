@@ -9,7 +9,7 @@
 #include "CbmTrdGas.h"
 
 #include "CbmGlobalTrack.h"
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmStsTrack.h"
 
 #include "TClonesArray.h"
@@ -36,7 +36,7 @@ CbmTrdSetTracksPidLike::CbmTrdSetTracksPidLike()
 // -----   Standard constructor   ------------------------------------------
 CbmTrdSetTracksPidLike::CbmTrdSetTracksPidLike(const char* name,
 				 const char* title)
-  : CbmTask(name), fTrackArray(0), fTrdHitArray(0), fHistdEdx(0),
+  : FairTask(name), fTrackArray(0), fTrdHitArray(0), fHistdEdx(0),
     InputFile(0), fNofTracks(0), fTrackMomentum(0), fNBins(0), fBinSize(0)
 {
 
@@ -164,8 +164,8 @@ InitStatus CbmTrdSetTracksPidLike::Init() {
   if (!ReadData()) return kFATAL;
 
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmTrdSetTracksPidWkn::Init: "
 	 << "RootManager not instantised!" << endl;

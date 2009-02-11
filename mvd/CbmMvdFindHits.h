@@ -8,7 +8,7 @@
 #ifndef CBMMVDFINDHITS_H
 #define CBMMVDFINDHITS_H 1
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmMvdPoint.h"
 #include "CbmMvdDigi.h"
 
@@ -35,7 +35,7 @@ class CbmMvdGeoPar;
 class CbmMvdPileupManager;
 class CbmMvdStation;
 
-class CbmMvdFindHits : public CbmTask
+class CbmMvdFindHits : public FairTask
 {
 
 public:

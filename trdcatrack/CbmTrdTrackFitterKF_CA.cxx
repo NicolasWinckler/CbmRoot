@@ -8,7 +8,7 @@
 #include "CbmKFTrdHit.h"
 #include "CbmKFVertex.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 
@@ -69,8 +69,8 @@ void CbmTrdTrackFitterKF_CA::Init()
 {
     // Initialisation
 
-    // Get the pointer to CbmRootManager
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    // Get the pointer to FairRootManager
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
         cout << "-E- CbmTrdTrackFitterKF_CA::Init : "
             << " ROOT manager is not instantiated!" << endl;
@@ -179,13 +179,13 @@ Int_t CbmTrdTrackFitterKF_CA::DoFit(CbmTrdTrack* pTrack)
 
 //section added 28.04.2008 by Maciej Krauze
 
-Double_t CbmTrdTrackFitterKF_CA::FitToVertex( CbmTrdTrack* track, CbmVertex *vtx, CbmTrackParam *v_track )
+Double_t CbmTrdTrackFitterKF_CA::FitToVertex( CbmTrdTrack* track, CbmVertex *vtx, FairTrackParam *v_track )
 {
    
    
       Double_t ret = 100.;
       if( !track || !vtx || !v_track ) return ret;
-      CbmTrackParam param = *(track->GetParamFirst());
+      FairTrackParam param = *(track->GetParamFirst());
       //CbmKFTrack T( &(track->GetParamFirst()) );
       CbmKFTrack T( param );
    
@@ -207,14 +207,14 @@ Double_t CbmTrdTrackFitterKF_CA::FitToVertex( CbmTrdTrack* track, CbmVertex *vtx
 }
 
 
-void CbmTrdTrackFitterKF_CA::Extrapolate( CbmTrdTrack* track, Double_t z, CbmTrackParam* e_track )
+void CbmTrdTrackFitterKF_CA::Extrapolate( CbmTrdTrack* track, Double_t z, FairTrackParam* e_track )
 {
    
    
         if( !track ) return;
         CbmKFTrack T;
         T.SetPID( track->GetPidHypo() );
-        CbmTrackParam *fpar = track->GetParamFirst(), *lpar = track->GetParamLast();
+        FairTrackParam *fpar = track->GetParamFirst(), *lpar = track->GetParamLast();
    
    
    

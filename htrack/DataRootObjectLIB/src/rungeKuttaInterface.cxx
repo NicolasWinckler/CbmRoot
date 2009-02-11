@@ -36,7 +36,7 @@
 #if (ARCHITECTURE == CBMROOT)
 
 #include "TVector3.h"
-#include "CbmTrackParP.h"
+#include "FairTrackParP.h"
 
 #endif
 
@@ -71,7 +71,7 @@ rungeKuttaInterface::rungeKuttaInterface(trackfinderInputDetector* detector) {
 
 #if (ARCHITECTURE == CBMROOT)
 
-	geane          = new CbmGeanePro();
+	geane          = new FairGeanePro();
 
 #endif
 
@@ -109,7 +109,7 @@ void rungeKuttaInterface::init(trackfinderInputDetector* detector) {
 		geane = NULL;
 	}
 
-	geane          = new CbmGeanePro();
+	geane          = new FairGeanePro();
 
 #endif
 
@@ -127,10 +127,10 @@ std::list<trackfinderInputHit> rungeKuttaInterface::evaluate(trackMomentum& mome
 #if (ARCHITECTURE == CBMROOT)
 
 	TVector3                       startPlane;
-	CbmTrackParP                   startParameter;
+	FairTrackParP                   startParameter;
 	trackfinderInputStation*       actualStation;
 	TVector3                       stopPlane;
-	CbmTrackParP                   stopParameter;
+	FairTrackParP                   stopParameter;
 	trackfinderInputHit            hit;
 
 #endif
@@ -148,7 +148,7 @@ std::list<trackfinderInputHit> rungeKuttaInterface::evaluate(trackMomentum& mome
 	/* The startPlane consists of the position of the starting plane for the propagation */
 	startPlane         = TVector3(0, 0, 0);
 	/* The geaneStartParameter consists of the parameters for the propagation at the starting plane */
-	startParameter = CbmTrackParP(startPlane, TVector3(momentum.get(PX), momentum.get(PY), momentum.get(PZ)), TVector3(0,0,0), TVector3(0,0,0), charge, startPlane, TVector3(1,0,0), TVector3(0,1,0));
+	startParameter = FairTrackParP(startPlane, TVector3(momentum.get(PX), momentum.get(PY), momentum.get(PZ)), TVector3(0,0,0), TVector3(0,0,0), charge, startPlane, TVector3(1,0,0), TVector3(0,1,0));
 
 	for (unsigned short i = 0; i < detector->getNumberOfActiveStations(); i++) {
 

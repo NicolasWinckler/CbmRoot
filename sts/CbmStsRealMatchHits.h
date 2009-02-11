@@ -22,7 +22,7 @@
 #include <set>
 //#include <map>
 #include "TStopwatch.h"
-#include "CbmTask.h"
+#include "FairTask.h"
 
 using std::set;
 using std::map;
@@ -39,7 +39,7 @@ class CbmStsHit;
 
 
 
-class CbmStsRealMatchHits : public CbmTask 
+class CbmStsRealMatchHits : public FairTask 
 {
 
  public:

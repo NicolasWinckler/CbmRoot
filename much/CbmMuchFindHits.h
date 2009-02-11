@@ -14,13 +14,13 @@
 
 #include "CbmMuchGeoScheme.h"
 #include "CbmMuchTask.h"
-#include "CbmTask.h"
+#include "FairTask.h"
 
 #include "TStopwatch.h"
 #include "TClonesArray.h"
 #include "TFile.h"
 
-class CbmMuchFindHits : public CbmTask
+class CbmMuchFindHits : public FairTask
 {
  public :
 

@@ -1,6 +1,6 @@
 #include "CbmEcalShowerLib.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TSystem.h"
 #include "TFile.h"
@@ -273,7 +273,7 @@ Float_t CbmEcalShowerLib::GetSumEThetaPhi(Float_t x, Float_t y, Float_t cell, Fl
 
 /** Constructor to use **/
 CbmEcalShowerLib::CbmEcalShowerLib(const char* libname, Int_t verbose)
-  : CbmTask("CbmEcalShowerLib", verbose), fLibName(libname), fVerb(verbose)
+  : FairTask("CbmEcalShowerLib", verbose), fLibName(libname), fVerb(verbose)
 {
   fSize=0;
   fIX=361;
@@ -291,7 +291,7 @@ CbmEcalShowerLib::CbmEcalShowerLib(const char* libname, Int_t verbose)
 
 /** Default constructor **/
 CbmEcalShowerLib::CbmEcalShowerLib()
-  : CbmTask(), fLibName(""), fVerb(0)
+  : FairTask(), fLibName(""), fVerb(0)
 {
   fSize=0;
   fEs=NULL;
@@ -430,7 +430,7 @@ InitStatus CbmEcalShowerLib::Init()
   f->Close();
   delete en;
 
-  CbmRootManager* fManager=CbmRootManager::Instance();
+  FairRootManager* fManager=FairRootManager::Instance();
   fManager->Register("EcalShowerLib", "ECAL", this, kFALSE);
 
   return kSUCCESS;

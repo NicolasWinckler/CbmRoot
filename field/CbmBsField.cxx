@@ -69,7 +69,7 @@ CbmBsField::~CbmBsField()
   delete fBsBx;
   delete fBsBy;
   delete fBsBz;
-  delete (CbmField*)this;
+  delete (FairField*)this;
 }
 
 void CbmBsField::Init()

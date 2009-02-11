@@ -66,7 +66,7 @@
  * method produces the hits with nothing						*
  ****************************************************************/
 
-void CbmHitProducer::produceNo(double* xPosOut, double* yPosOut, double xPosIn, double yPosIn) {
+void FairHitProducer::produceNo(double* xPosOut, double* yPosOut, double xPosIn, double yPosIn) {
 
 	*xPosOut = xPosIn;
 	*yPosOut = yPosIn;
@@ -77,7 +77,7 @@ void CbmHitProducer::produceNo(double* xPosOut, double* yPosOut, double xPosIn, 
  * method produces the hits with binning						*
  ****************************************************************/
 
-void CbmHitProducer::produceBin(double* xPosOut, double* yPosOut, double xPosIn, double yPosIn) {
+void FairHitProducer::produceBin(double* xPosOut, double* yPosOut, double xPosIn, double yPosIn) {
 
 	*xPosOut = ((double)((int)((xPosIn + binningXResolution / 2) / binningXResolution))) * binningXResolution;
 	*yPosOut = ((double)((int)((yPosIn + binningYResolution / 2) / binningYResolution))) * binningYResolution;
@@ -88,7 +88,7 @@ void CbmHitProducer::produceBin(double* xPosOut, double* yPosOut, double xPosIn,
  * method produces the hits with smearing						*
  ****************************************************************/
 
-void CbmHitProducer::produceSmear(double* xPosOut, double* yPosOut, double xPosIn, double yPosIn) {
+void FairHitProducer::produceSmear(double* xPosOut, double* yPosOut, double xPosIn, double yPosIn) {
 
 	if (gRandom != NULL) {
 
@@ -105,7 +105,7 @@ void CbmHitProducer::produceSmear(double* xPosOut, double* yPosOut, double xPosI
  * Default constructor											*
  ****************************************************************/
 
-CbmHitProducer::CbmHitProducer() {
+FairHitProducer::FairHitProducer() {
 
 	typeOfHitProducer = NONEHITPRODUCER;
 	detector          = NULL;
@@ -116,7 +116,7 @@ CbmHitProducer::CbmHitProducer() {
  * Constructor													*
  ****************************************************************/
 
-CbmHitProducer::CbmHitProducer(int hitProducer, trackfinderInputDetector* actualDetector) {
+FairHitProducer::FairHitProducer(int hitProducer, trackfinderInputDetector* actualDetector) {
 
 	typeOfHitProducer = hitProducer;
 	detector          = actualDetector;
@@ -127,7 +127,7 @@ CbmHitProducer::CbmHitProducer(int hitProducer, trackfinderInputDetector* actual
  * Destructor													*
  ****************************************************************/
 
-CbmHitProducer::~CbmHitProducer() {
+FairHitProducer::~FairHitProducer() {
 
 }
 
@@ -135,7 +135,7 @@ CbmHitProducer::~CbmHitProducer() {
  * method sets the hitProducerType								*
  ****************************************************************/
 
-void CbmHitProducer::setHitProducerType(int hitProducer) {
+void FairHitProducer::setHitProducerType(int hitProducer) {
 
 	typeOfHitProducer = hitProducer;
 
@@ -145,7 +145,7 @@ void CbmHitProducer::setHitProducerType(int hitProducer) {
  * method sets the detector
  */
 
-void CbmHitProducer::setDetector(trackfinderInputDetector* actualDetector) {
+void FairHitProducer::setDetector(trackfinderInputDetector* actualDetector) {
 
 	detector          = actualDetector;
 
@@ -155,7 +155,7 @@ void CbmHitProducer::setDetector(trackfinderInputDetector* actualDetector) {
  * method produces the hits										*
  ****************************************************************/
 
-void CbmHitProducer::produceOld(TClonesArray* mapsHits, TClonesArray* stripHits, TClonesArray* hybridHits, TClonesArray* points) {
+void FairHitProducer::produceOld(TClonesArray* mapsHits, TClonesArray* stripHits, TClonesArray* hybridHits, TClonesArray* points) {
 
 	double                  xPosIn;
 	double                  xPosOut;
@@ -222,7 +222,7 @@ void CbmHitProducer::produceOld(TClonesArray* mapsHits, TClonesArray* stripHits,
 	}
 
 }
-void CbmHitProducer::produceNew(TClonesArray* mvdHits, TClonesArray* stsHits, TClonesArray* mvdPoints, TClonesArray* stsPoints) {
+void FairHitProducer::produceNew(TClonesArray* mvdHits, TClonesArray* stsHits, TClonesArray* mvdPoints, TClonesArray* stsPoints) {
 
 	double                  xPosIn;
 	double                  xPosOut;
@@ -307,7 +307,7 @@ void CbmHitProducer::produceNew(TClonesArray* mvdHits, TClonesArray* stsHits, TC
  * method produce a hit											*
  ****************************************************************/
 
-void CbmHitProducer::produceHit(double* xPosOut, double* yPosOut, double xPosIn, double yPosIn) {
+void FairHitProducer::produceHit(double* xPosOut, double* yPosOut, double xPosIn, double yPosIn) {
 
 	if (xPosOut == NULL)
 		throw cannotAccessPointError();
@@ -332,7 +332,7 @@ void CbmHitProducer::produceHit(double* xPosOut, double* yPosOut, double xPosIn,
 	}
 
 }
-void CbmHitProducer::produceHit(double* xPosOut, double* yPosOut, bool* isMapsType, bool* isHybridType, bool* isStripType, double xPosIn, double yPosIn, int stationId) {
+void FairHitProducer::produceHit(double* xPosOut, double* yPosOut, bool* isMapsType, bool* isHybridType, bool* isStripType, double xPosIn, double yPosIn, int stationId) {
 
 	unsigned int   detectorStations;
 	unsigned short detectorIndex;

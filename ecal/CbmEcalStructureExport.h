@@ -5,12 +5,12 @@
 #ifndef CBMECALSTRUCTUREEXPORT_H
 #define CBMECALSTRUCTUREEXPORT_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TTree;
 class CbmEcalStructure;
 
-class CbmEcalStructureExport : public CbmTask
+class CbmEcalStructureExport : public FairTask
 {
 public:
   /** Default constructor **/

@@ -22,7 +22,7 @@
 #include "TGObject.h"
 #include "TMarker.h"
 #include "TPolyLine.h"
-class CbmMCPoint;
+class FairMCPoint;
 class CbmStsPoint;
 class CbmMuchPoint;
 class CbmMCTrack;
@@ -57,7 +57,7 @@ public:
   void DrawSpread();
   void SetVisible(Bool_t isVisible);
 private:
-  CbmMCPoint *fPoint;       // MC point reference
+  FairMCPoint *fPoint;       // MC point reference
   TMarker* fMarkerIn;       // marker at the IN position
   TMarker* fMarkerOut;      // marker at the OUT position
   Double_t fR;              // spread radius

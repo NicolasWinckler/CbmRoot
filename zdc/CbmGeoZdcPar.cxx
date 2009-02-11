@@ -1,13 +1,13 @@
 #include "CbmGeoZdcPar.h"
 
-#include "CbmParamList.h"
+#include "FairParamList.h"
 
 #include "TObjArray.h"
 
 ClassImp(CbmGeoZdcPar)
 
 CbmGeoZdcPar::CbmGeoZdcPar(const char* name,const char* title,const char* context)
-           : CbmParGenericSet(name,title,context) {
+           : FairParGenericSet(name,title,context) {
 
                fGeoSensNodes = new TObjArray();
                fGeoPassNodes = new TObjArray();
@@ -21,16 +21,16 @@ void CbmGeoZdcPar::clear(void) {
     if(fGeoPassNodes) delete fGeoPassNodes;
 }
 
-void CbmGeoZdcPar::putParams(CbmParamList* l) {
+void CbmGeoZdcPar::putParams(FairParamList* l) {
   if (!l) return;
-   l->addBinary("CbmGeoNodes Sensitive List", fGeoSensNodes);
-   l->addBinary("CbmGeoNodes Passive List", fGeoPassNodes);
+   l->addObject("FairGeoNodes Sensitive List", fGeoSensNodes);
+   l->addObject("FairGeoNodes Passive List", fGeoPassNodes);
 }
 
-Bool_t CbmGeoZdcPar::getParams(CbmParamList* l) {
+Bool_t CbmGeoZdcPar::getParams(FairParamList* l) {
     if (!l) return kFALSE;
-    if (!l->fillBinary("CbmGeoNodes Sensitive List", fGeoSensNodes)) return kFALSE;
-    if (!l->fillBinary("CbmGeoNodes Passive List", fGeoPassNodes)) return kFALSE;
+    if (!l->fillObject("FairGeoNodes Sensitive List", fGeoSensNodes)) return kFALSE;
+    if (!l->fillObject("FairGeoNodes Passive List", fGeoPassNodes)) return kFALSE;
 
   return kTRUE;
 }

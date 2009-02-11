@@ -64,7 +64,7 @@ void run_electrons_qa(Int_t nEvents = 700)
 
 
   // -----   Reconstruction run   -------------------------------------------
-  CbmRunAna *run= new CbmRunAna();
+  FairRunAna *run= new FairRunAna();
   run->SetInputFile(inFile1);
   //run->AddFriend(inFile3);
   run->AddFriend(inFile2);
@@ -78,9 +78,9 @@ void run_electrons_qa(Int_t nEvents = 700)
   TString stsDigi = gSystem->Getenv("VMCWORKDIR");
   stsDigi += "/parameters/sts/";
   stsDigi += stsDigiFile;
-  CbmRuntimeDb* rtdb = run->GetRuntimeDb();
-  CbmParRootFileIo* parIo1 = new CbmParRootFileIo();
-  CbmParAsciiFileIo* parIo2 = new CbmParAsciiFileIo();
+  FairRuntimeDb* rtdb = run->GetRuntimeDb();
+  FairParRootFileIo* parIo1 = new FairParRootFileIo();
+  FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
   parIo1->open(parFile.Data());
   parIo2->open(stsDigi.Data(),"in");
   rtdb->setFirstInput(parIo1);

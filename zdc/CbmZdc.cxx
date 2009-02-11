@@ -10,14 +10,14 @@
 #include "CbmZdcPoint.h"
 
 #include "CbmDetectorList.h"
-#include "CbmGeoInterface.h"
-#include "CbmGeoLoader.h"
-#include "CbmGeoNode.h"
-#include "CbmGeoRootBuilder.h"
-#include "CbmRootManager.h"
-#include "CbmRun.h"
-#include "CbmRuntimeDb.h"
-#include "CbmVolume.h"
+#include "FairGeoInterface.h"
+#include "FairGeoLoader.h"
+#include "FairGeoNode.h"
+#include "FairGeoRootBuilder.h"
+#include "FairRootManager.h"
+#include "FairRun.h"
+#include "FairRuntimeDb.h"
+#include "FairVolume.h"
 
 #include "TClonesArray.h"
 #include "TGeoMCGeometry.h"
@@ -30,7 +30,7 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmZdc::CbmZdc() : CbmDetector("ZDC", kTRUE, kZDC) {
+CbmZdc::CbmZdc() : FairDetector("ZDC", kTRUE, kZDC) {
   fZdcCollection = new TClonesArray("CbmZdcPoint");
   fPosIndex = 0;
 }
@@ -40,7 +40,7 @@ CbmZdc::CbmZdc() : CbmDetector("ZDC", kTRUE, kZDC) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmZdc::CbmZdc(const char* name, Bool_t active)
-  : CbmDetector(name, active, kZDC) {
+  : FairDetector(name, active, kZDC) {
   fZdcCollection = new TClonesArray("CbmZdcPoint");
   fPosIndex = 0;
   fDebug    = "";
@@ -62,7 +62,7 @@ CbmZdc::~CbmZdc() {
 
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t  CbmZdc::ProcessHits(CbmVolume* vol)
+Bool_t  CbmZdc::ProcessHits(FairVolume* vol)
 {
   // Stores all particles at entrance to active detector. 
  
@@ -121,7 +121,7 @@ void CbmZdc::EndOfEvent() {
 
 // -----   Public method Register   ----------------------------------------
 void CbmZdc::Register() {
-  CbmRootManager::Instance()->Register("ZDCPoint", "Zdc", 
+  FairRootManager::Instance()->Register("ZDCPoint", "Zdc", 
   				       fZdcCollection, kTRUE);
 }
 // -------------------------------------------------------------------------
@@ -181,8 +181,8 @@ void CbmZdc::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset){
 // -----   Public method ConstructGeometry   -------------------------------
 void CbmZdc::ConstructGeometry() {
 
-  CbmGeoLoader*    geoLoad = CbmGeoLoader::Instance();
-  CbmGeoInterface* geoFace = geoLoad->getGeoInterface();
+  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
+  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
   CbmGeoZdc*       trdGeo  = new CbmGeoZdc();
   trdGeo->setGeomFile(GetGeometryFileName());
   geoFace->addGeoModule(trdGeo);
@@ -191,18 +191,18 @@ void CbmZdc::ConstructGeometry() {
   if (rc) trdGeo->create(geoLoad->getGeoBuilder());
   TList* volList = trdGeo->getListOfVolumes();
  // store TRD geo parameter
-  CbmRun *fRun = CbmRun::Instance();
-  CbmRuntimeDb *rtdb= CbmRun::Instance()->GetRuntimeDb();
+  FairRun *fRun = FairRun::Instance();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
   CbmGeoZdcPar* par=(CbmGeoZdcPar*)(rtdb->getContainer("CbmGeoZdcPar"));
   TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
   TObjArray *fPassNodes = par->GetGeoPassiveNodes();
 
   TListIter iter(volList);
-  CbmGeoNode* node   = NULL;
-  CbmGeoVolume *aVol=NULL;
+  FairGeoNode* node   = NULL;
+  FairGeoVolume *aVol=NULL;
 
-  while( (node = (CbmGeoNode*)iter.Next()) ) {
-      aVol = dynamic_cast<CbmGeoVolume*> ( node );
+  while( (node = (FairGeoNode*)iter.Next()) ) {
+      aVol = dynamic_cast<FairGeoVolume*> ( node );
        if ( node->isSensitive()  ) {
            fSensNodes->AddLast( aVol );
        }else{

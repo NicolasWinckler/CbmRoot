@@ -4,10 +4,10 @@
 #include "CbmKFMath.h"
 #include "CbmKFHit.h"
 
-#include "CbmGeoNode.h"
-#include "CbmRunAna.h"
-#include "CbmBaseParSet.h"
-#include "CbmField.h"
+#include "FairGeoNode.h"
+#include "FairRunAna.h"
+#include "FairBaseParSet.h"
+#include "FairField.h"
 #include "CbmFieldPar.h"
 #include "CbmMvdGeoPar.h"
 #include "CbmGeoStsPar.h"
@@ -18,7 +18,7 @@
 #include "CbmGeoMuchPar.h"
 #include "CbmGeoPassivePar.h"
 #include "CbmStsStation.h"
-#include "CbmRuntimeDb.h"
+#include "FairRuntimeDb.h"
 
 #include <iostream>
 #include <list>
@@ -37,7 +37,7 @@ ClassImp(CbmKF)
 
 CbmKF *CbmKF::fInstance = 0;
 
-CbmKF::CbmKF(const char *name, Int_t iVerbose ):CbmTask(name,iVerbose){
+CbmKF::CbmKF(const char *name, Int_t iVerbose ):FairTask(name,iVerbose){
   fMethod = 1;
   fMagneticField = 0;
   if( !fInstance ) fInstance = this;
@@ -49,9 +49,9 @@ CbmKF::~CbmKF(){
 
 void CbmKF::SetParContainers()
 {
-  CbmRunAna* ana = CbmRunAna::Instance();
-  CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
-  rtdb->getContainer("CbmBaseParSet");
+  FairRunAna* ana = FairRunAna::Instance();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
+  rtdb->getContainer("FairBaseParSet");
   rtdb->getContainer("CbmGeoPassivePar");
   rtdb->getContainer("CbmMvdGeoPar");
   rtdb->getContainer("CbmGeoStsPar");
@@ -95,8 +95,8 @@ InitStatus CbmKF::ReInit()
 
   fMaterialID2IndexMap.clear();
 
-  CbmRunAna *Run = CbmRunAna::Instance();
-  CbmRuntimeDb *RunDB = Run->GetRuntimeDb();
+  FairRunAna *Run = FairRunAna::Instance();
+  FairRuntimeDb *RunDB = Run->GetRuntimeDb();
 
   {
     CbmGeoStsPar* StsPar = (CbmGeoStsPar*) (RunDB->findContainer("CbmGeoStsPar"));
@@ -106,7 +106,7 @@ InitStatus CbmKF::ReInit()
 
   if( fVerbose ) cout<<"KALMAN FILTER : === INIT MAGNETIC FIELD ==="<<endl;
 
-  fMagneticField = (CbmField*)Run->GetField();
+  fMagneticField = (FairField*)Run->GetField();
   if( fVerbose && fMagneticField ) cout << "Magnetic field done" << endl;
 
   if( !fMagneticField ) cout<<"No Magnetic Field Found"<<endl;
@@ -136,7 +136,7 @@ InitStatus CbmKF::ReInit()
     NMvdStations = mvdNodes->GetEntries();
     
     for ( Int_t ist = 0 ; ist < NMvdStations ; ist++ ) {
-      CbmGeoNode* mvdNode = (CbmGeoNode*)mvdNodes->At(ist);
+      FairGeoNode* mvdNode = (FairGeoNode*)mvdNodes->At(ist);
       if ( ! mvdNode ) {
 	cout << "-W- CbmKF::Init: station#" << ist
 	     << " not found among sensitive nodes " << endl;
@@ -198,17 +198,17 @@ InitStatus CbmKF::ReInit()
 
     if( fVerbose ) cout<<"KALMAN FILTER : === READ RICH MATERIAL ==="<<endl;
 
-    CbmGeoNode* rich1entrance = NULL;             // entrance window
-    CbmGeoNode* rich1exit = NULL;                 // exit window
-    CbmGeoNode* rich1gas = NULL;
-    CbmGeoNode* rich1mgl = NULL;
+    FairGeoNode* rich1entrance = NULL;             // entrance window
+    FairGeoNode* rich1exit = NULL;                 // exit window
+    FairGeoNode* rich1gas = NULL;
+    FairGeoNode* rich1mgl = NULL;
     
     TObjArray *NodesActive = RichPar->GetGeoSensitiveNodes();
     TObjArray *NodesPassive = RichPar->GetGeoPassiveNodes();
     //cout<<"active:"<<endl;
     for( int i=0;i<NodesActive->GetEntries(); i++) { 
 
-      CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (NodesActive->At(i));
+      FairGeoNode *node = dynamic_cast<FairGeoNode*> (NodesActive->At(i));
       if ( !node ) continue;	
       TString name = node->getName();
       //cout<<name<<endl;
@@ -220,7 +220,7 @@ InitStatus CbmKF::ReInit()
     //cout<<"passive:"<<endl;
     for( int i=0;i<NodesPassive->GetEntries(); i++) {
 
-      CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (NodesPassive->At(i));	
+      FairGeoNode *node = dynamic_cast<FairGeoNode*> (NodesPassive->At(i));	
       if ( !node ) continue;
       
       TString name = node->getName();
@@ -291,7 +291,7 @@ InitStatus CbmKF::ReInit()
     TObjArray *Nodes = TrdPar->GetGeoPassiveNodes();
     for( Int_t i=0;i<Nodes->GetEntries(); i++)
       {
-	CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (Nodes->At(i));
+	FairGeoNode *node = dynamic_cast<FairGeoNode*> (Nodes->At(i));
 	if ( !node ) continue;	
 	TString name = node->getName();
 	CbmKFMaterial * kfmat = ReadPassive( node );
@@ -306,7 +306,7 @@ InitStatus CbmKF::ReInit()
     int ista=-1;
     for( Int_t i=0;i<Nodes->GetEntries(); i++)
       {
-	CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (Nodes->At(i));
+	FairGeoNode *node = dynamic_cast<FairGeoNode*> (Nodes->At(i));
 	if ( !node ) continue;
 	
 	TString name = node->getName();	
@@ -343,7 +343,7 @@ InitStatus CbmKF::ReInit()
     if( fVerbose==1 ) cout<<"printout skipped for Verbose mode 1"<<endl;
     TObjArray *Nodes = sttPar->GetGeoPassiveNodes();
     for( Int_t i=0;i<Nodes->GetEntries(); i++) {
-      CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (Nodes->At(i));
+      FairGeoNode *node = dynamic_cast<FairGeoNode*> (Nodes->At(i));
       if ( !node ) continue;	
       TString name = node->getName();
       CbmKFMaterial * kfmat = ReadPassive( node );
@@ -358,7 +358,7 @@ InitStatus CbmKF::ReInit()
     double zold = 0;
     int ista = 0; //-1;
     for (Int_t i = 0; i < Nodes->GetEntries(); ++i) {
-      CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (Nodes->At(i));
+      FairGeoNode *node = dynamic_cast<FairGeoNode*> (Nodes->At(i));
       if ( !node ) continue;
 	
       TString name = node->getName();	
@@ -411,7 +411,7 @@ InitStatus CbmKF::ReInit()
     TObjArray *Nodes = MuchPar->GetGeoPassiveNodes();
     for( Int_t i=0;i<Nodes->GetEntries(); i++)
       {
-	CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (Nodes->At(i));
+	FairGeoNode *node = dynamic_cast<FairGeoNode*> (Nodes->At(i));
 	if( node && TString(node->GetName())=="much1" ) continue; 
 	CbmKFTube tube;
 	if( ReadTube( tube, node) ) continue;
@@ -427,7 +427,7 @@ InitStatus CbmKF::ReInit()
     int ndet=0;
     for( Int_t i=0;i<Nodes->GetEntries(); i++)
       {
-	CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (Nodes->At(i));	
+	FairGeoNode *node = dynamic_cast<FairGeoNode*> (Nodes->At(i));	
 	CbmKFTube tube;
 	if( ReadTube( tube, node) ) continue;
 	
@@ -453,7 +453,7 @@ InitStatus CbmKF::ReInit()
     TObjArray *Nodes = TofPar->GetGeoPassiveNodes();
     for( Int_t i=0;i<Nodes->GetEntries(); i++)
       {
-	CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (Nodes->At(i));
+	FairGeoNode *node = dynamic_cast<FairGeoNode*> (Nodes->At(i));
 	if ( !node ) continue;	
 	TString name = node->getName();
 	CbmKFMaterial * kfmat = ReadPassive( node );
@@ -466,7 +466,7 @@ InitStatus CbmKF::ReInit()
     Nodes = TrdPar->GetGeoSensitiveNodes();
     for( Int_t i=0;i<Nodes->GetEntries(); i++)
       {
-	CbmGeoNode *node = dynamic_cast<CbmGeoNode*> (Nodes->At(i));
+	FairGeoNode *node = dynamic_cast<FairGeoNode*> (Nodes->At(i));
 	if ( !node ) continue;	
 	TString name = node->getName();
 	CbmKFMaterial * kfmat = ReadPassive( node );
@@ -484,23 +484,23 @@ InitStatus CbmKF::ReInit()
   if( PassivePar ){
     
     TObjArray *Nodes = PassivePar->GetGeoPassiveNodes();
-    CbmGeoNode *node=0;
+    FairGeoNode *node=0;
     
     if( fVerbose ) cout<<"KALMAN FILTER : === READ BEAM PIPE MATERIAL ==="<<endl;
 
-    node = dynamic_cast<CbmGeoNode*> (Nodes->FindObject("pipe1")); 
+    node = dynamic_cast<FairGeoNode*> (Nodes->FindObject("pipe1")); 
 
     if( node ){ 
       
       TString name = node->getName();
       TString Sname = node->getShapePointer()->GetName();
       
-      CbmGeoVector nodeV(0,0,0);
+      FairGeoVector nodeV(0,0,0);
       if( node->getMotherNode() ) nodeV = node->getLabTransform()->getTranslation(); //in cm
-      CbmGeoVector centerV = node->getCenterPosition().getTranslation();
+      FairGeoVector centerV = node->getCenterPosition().getTranslation();
       TArrayD *P = node->getParameters();
       Int_t NP = node->getShapePointer()->getNumParam();
-      CbmGeoMedium *material = node->getMedium();
+      FairGeoMedium *material = node->getMedium();
       material->calcRadiationLength();
 
       Double_t z = nodeV.Z()+centerV.Z();
@@ -541,7 +541,7 @@ InitStatus CbmKF::ReInit()
     
     if( fVerbose ) cout<<"KALMAN FILTER : === READ TARGET MATERIAL ==="<<endl;
       
-    node = dynamic_cast<CbmGeoNode*> (Nodes->FindObject("targ"));
+    node = dynamic_cast<FairGeoNode*> (Nodes->FindObject("targ"));
     if( node ){
       CbmKFTube tube;
       if( !ReadTube( tube, node) ){
@@ -631,17 +631,17 @@ Int_t CbmKF::GetMaterialIndex( Int_t uid )
 }
 
 
-Int_t CbmKF::ReadTube( CbmKFTube &tube, CbmGeoNode *node){
+Int_t CbmKF::ReadTube( CbmKFTube &tube, FairGeoNode *node){
 
   if ( !node ) return 1;	
 
   TString name = node->getName();
   TString Sname = node->getShapePointer()->GetName();	
-  CbmGeoVector nodeV = node->getLabTransform()->getTranslation(); //in cm
-  CbmGeoVector centerV = node->getCenterPosition().getTranslation();
+  FairGeoVector nodeV = node->getLabTransform()->getTranslation(); //in cm
+  FairGeoVector centerV = node->getCenterPosition().getTranslation();
   TArrayD *P = node->getParameters();
   Int_t NP = node->getShapePointer()->getNumParam();
-  CbmGeoMedium *material = node->getMedium();
+  FairGeoMedium *material = node->getMedium();
   material->calcRadiationLength();
 
   tube.ID = node->getMCid();
@@ -665,7 +665,7 @@ Int_t CbmKF::ReadTube( CbmKFTube &tube, CbmGeoNode *node){
   int np = node->getNumPoints();
   cout<<"points:"<<endl;
   for( int i=0; i<np; i++ ){
-    CbmGeoVector *v = node->getPoint(i);
+    FairGeoVector *v = node->getPoint(i);
     cout<<v->X()<<" "<<v->Y()<<" "<<v->Z()<<endl;
   }
   */
@@ -750,30 +750,30 @@ Int_t CbmKF::ReadTube( CbmKFTube &tube, CbmGeoNode *node){
 }
 
 
-CbmKFMaterial *CbmKF::ReadPassive( CbmGeoNode *node){
+CbmKFMaterial *CbmKF::ReadPassive( FairGeoNode *node){
 
   if ( !node ) return 0;	
 
   TString name = node->getName();
   TString Sname = node->getShapePointer()->GetName();	
 
-  CbmGeoTransform trans( *node->getLabTransform() );
-  CbmGeoNode *nxt = node;
+  FairGeoTransform trans( *node->getLabTransform() );
+  FairGeoNode *nxt = node;
   while( nxt=nxt->getMotherNode() ){
-    CbmGeoTransform* tm=nxt->getLabTransform();
+    FairGeoTransform* tm=nxt->getLabTransform();
     if( !tm ) break;
     trans.transFrom(*tm);
   }
 
-  //CbmGeoVector nodeV = node->getLabTransform()->getTranslation(); //in cm
-  //CbmGeoVector centerV = node->getCenterPosition().getTranslation();
+  //FairGeoVector nodeV = node->getLabTransform()->getTranslation(); //in cm
+  //FairGeoVector centerV = node->getCenterPosition().getTranslation();
 
-  CbmGeoVector nodeV = trans.getTranslation(); //in cm
-  CbmGeoVector centerV = nodeV + node->getCenterPosition().getTranslation();
+  FairGeoVector nodeV = trans.getTranslation(); //in cm
+  FairGeoVector centerV = nodeV + node->getCenterPosition().getTranslation();
 
   TArrayD *P = node->getParameters();
   Int_t NP = node->getShapePointer()->getNumParam();
-  CbmGeoMedium *material = node->getMedium();
+  FairGeoMedium *material = node->getMedium();
   material->calcRadiationLength();
 
   Int_t ID = node->getMCid();
@@ -843,17 +843,17 @@ CbmKFMaterial *CbmKF::ReadPassive( CbmGeoNode *node){
   else if ( Sname=="TRAP" )
     {
       int np = node->getNumPoints();
-      CbmGeoVector vMin=*node->getPoint(0), vMax=vMin;
+      FairGeoVector vMin=*node->getPoint(0), vMax=vMin;
       for( int i=0; i<np; i++ ){
-	CbmGeoVector *v = node->getPoint(i);
+	FairGeoVector *v = node->getPoint(i);
 	for( int j=0; j<3; j++){
 	  if( vMin(j) > (*v)(j) ) (&vMin.X())[j]=(*v)(j);
 	  if( vMax(j) < (*v)(j) ) (&vMax.X())[j]=(*v)(j);
 	}
       }
-      CbmGeoVector v0 = (vMin+vMax);
+      FairGeoVector v0 = (vMin+vMax);
       v0*=.5/10.;
-      CbmGeoVector dv = vMax-vMin;
+      FairGeoVector dv = vMax-vMin;
       dv/=10.;
       CbmKFBox box( ID, x0+v0(0), y0+v0(1), z0+v0(2), dv(0),dv(1), dv(2), RadLength );
       vPassiveBox.push_back(box);

@@ -3,12 +3,12 @@
 #ifndef CBMECALTRACKIMPORT_H
 #define CBMECALTRACKIMPORT_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TChain;
 class TClonesArray;
 
-class CbmEcalTrackImport : public CbmTask
+class CbmEcalTrackImport : public FairTask
 {
 public:
   /** Only to comply with framework **/

@@ -1,18 +1,18 @@
 #ifndef CBMMVDCONTFACT_H
 #define CBMMVDCONTFACT_H
 
-#include "CbmContFact.h"
+#include "FairContFact.h"
 
-class CbmContainer;
-class CbmParIo;
+class FairContainer;
+class FairParIo;
 
-class CbmMvdContFact : public CbmContFact {
+class CbmMvdContFact : public FairContFact {
 private:
   void setAllContainers();
 public:
   CbmMvdContFact();
   ~CbmMvdContFact() {}
-  CbmParSet* createContainer(CbmContainer*);
+  FairParSet* createContainer(FairContainer*);
   ClassDef( CbmMvdContFact,0) // Factory for all STS parameter containers
 };
 

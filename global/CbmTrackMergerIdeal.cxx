@@ -6,7 +6,7 @@
 
 #include "CbmGlobalTrack.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmStsTrackMatch.h"
 #include "CbmTrdTrackMatch.h"
 
@@ -37,8 +37,8 @@ CbmTrackMergerIdeal::~CbmTrackMergerIdeal() { }
 // -----   Public method Init   --------------------------------------------
 void CbmTrackMergerIdeal::Init() {
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmStsTrackFinderIdeal::Init: "
 	 << "RootManager not instantised!" << endl;

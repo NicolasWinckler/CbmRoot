@@ -23,7 +23,7 @@ CbmTofHit::CbmTofHit()
 // -----   Standard constructor   ------------------------------------------
 
 CbmTofHit::CbmTofHit(Int_t detID, TVector3 pos, TVector3 dpos, Int_t index, Double_t time, Int_t flag)
-: CbmHit(detID, pos, dpos, index)
+: FairHit(detID, pos, dpos, index)
 {
     fTime = time;
     fFlag = flag;
@@ -32,7 +32,7 @@ CbmTofHit::CbmTofHit(Int_t detID, TVector3 pos, TVector3 dpos, Int_t index, Doub
 // -----   Constructor without flag  ------------------------------------------
 
 CbmTofHit::CbmTofHit(Int_t detID, TVector3 pos, TVector3 dpos, Int_t index, Double_t time)
-: CbmHit(detID, pos, dpos, index)
+: FairHit(detID, pos, dpos, index)
 {
     fTime = time;
 }

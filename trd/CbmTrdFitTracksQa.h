@@ -5,13 +5,13 @@
 #ifndef CBMTRDFITTRACKSQA
 #define CBMTRDFITTRACKSQA
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TClonesArray;
 class TH1F;
 
 
-class CbmTrdFitTracksQa : public CbmTask {
+class CbmTrdFitTracksQa : public FairTask {
 
 private:
     TClonesArray *fArrayTrdPoint;    // TRD points

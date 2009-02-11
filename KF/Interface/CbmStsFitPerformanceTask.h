@@ -17,11 +17,11 @@
 
 #include "CbmStsKFTrackFitter.h"
 
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 #include "CbmStsPoint.h"
 #include "CbmMvdPoint.h"
 #include "CbmStsTrack.h"
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmMCTrack.h"
 #include "CbmVertex.h"
 
@@ -30,7 +30,7 @@
 #include "TH1D.h"
 #include "TH2D.h"
 
-class CbmStsFitPerformanceTask : public CbmTask
+class CbmStsFitPerformanceTask : public FairTask
 {
 
 public:
@@ -58,7 +58,7 @@ public:
   void Finish();
 
   /** This function fill state vectors t[], mc[] and covariance 
-   ** matrix c[] from the given CbmTrackParam object and 
+   ** matrix c[] from the given FairTrackParam object and 
    ** related CbmStsPoint object. 
    ** @param in  is set to 1 if in values of position and momentum
    ** are considered.

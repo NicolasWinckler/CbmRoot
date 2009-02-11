@@ -13,13 +13,13 @@
 #define CBMMUCHTASK_H 1
 
 #include "CbmMuchGeoScheme.h"
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "TStopwatch.h"
 #include "TClonesArray.h"
 #include "TString.h"
 
 
-class CbmMuchTask //: public CbmTask
+class CbmMuchTask //: public FairTask
 {
  public :
 

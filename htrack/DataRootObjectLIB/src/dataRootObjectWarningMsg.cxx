@@ -139,8 +139,8 @@ void noTrackWithIdFoundWarningMsg::warningMsg() {
 #if (ARCHITECTURE != PS3)
 
 	char         doubleBuffer[doubleConversion+1];
-	CbmHit*      cbmHit;
-	CbmMCPoint*  cbmPoint;
+	FairHit*      cbmHit;
+	FairMCPoint*  cbmPoint;
 
 #endif
 
@@ -170,7 +170,7 @@ void noTrackWithIdFoundWarningMsg::warningMsg() {
 		cbmHit = hit->getHit();
 		if (cbmHit != NULL) {
 
-			temp += "\nCbmHit-Information:";
+			temp += "\nFairHit-Information:";
 			temp += "\n StationID: ";
 			itos(cbmHit->GetDetectorID(), intBuffer, 10, intConversionDigits);
 			temp += intBuffer;

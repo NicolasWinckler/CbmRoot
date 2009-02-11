@@ -82,10 +82,10 @@
 #include "CbmMvdStation.h"
 
 // Includes from base
-#include "CbmGeoNode.h"
-#include "CbmRootManager.h"
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairGeoNode.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 #include "CbmMCTrack.h"
 
 // Includes from ROOT
@@ -129,7 +129,7 @@ using std::vector;
 
 // -----   Default constructor   ------------------------------------------
 CbmMvdDigitiser::CbmMvdDigitiser()
-    : CbmTask("MVDDigitiser")
+    : FairTask("MVDDigitiser")
 {
     fMode          = 0;
     fBranchName    = "MVDPoint";
@@ -178,7 +178,7 @@ CbmMvdDigitiser::CbmMvdDigitiser()
 // -----   Standard constructor   ------------------------------------------
 CbmMvdDigitiser::CbmMvdDigitiser(const char* name, Int_t iMode,
 				 Int_t iVerbose)
-: CbmTask(name, iVerbose)
+: FairTask(name, iVerbose)
 {
     fMode          = iMode;
     fBranchName    = "MVDPoint";
@@ -863,8 +863,8 @@ Int_t CbmMvdDigitiser::GetMvdGeometry() {
 
 // -----   Virtual private method SetParContainers   -----------------------
 void CbmMvdDigitiser::SetParContainers() {
-    CbmRunAna*    ana  = CbmRunAna::Instance();
-    CbmRuntimeDb* rtdb = ana->GetRuntimeDb();
+    FairRunAna*    ana  = FairRunAna::Instance();
+    FairRuntimeDb* rtdb = ana->GetRuntimeDb();
     fGeoPar  = (CbmMvdGeoPar*)  (rtdb->getContainer("CbmMvdGeoPar"));
 }
 // -------------------------------------------------------------------------
@@ -885,9 +885,9 @@ InitStatus CbmMvdDigitiser::Init() {
   
   // ************* Get input array
   
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) {
-    cout << "-E- " << GetName() << "::Init: No CbmRootManager!" << endl;
+    cout << "-E- " << GetName() << "::Init: No FairRootManager!" << endl;
     return kFATAL;
   }
   fInputPoints = (TClonesArray*) ioman->GetObject(fBranchName);
@@ -994,9 +994,9 @@ void CbmMvdDigitiser::Finish() {
 
 // -----   Private method Register   ---------------------------------------
 void CbmMvdDigitiser::Register() {
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman) Fatal("Register",
-		      "No CbmRootManager");
+		      "No FairRootManager");
   ioman->Register("CbmMvdRaw", "MVDRawData", fDigis, kTRUE);
 
 }

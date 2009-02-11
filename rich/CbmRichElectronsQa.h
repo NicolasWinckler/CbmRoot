@@ -1,7 +1,7 @@
 #ifndef CBMRICHELECTRONSQA_H
 #define CBMRICHELECTRONSQA_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmRichRing.h"
 #include "CbmTrdTrack.h"
 #include "CbmRichElectronIdAnn.h"
@@ -16,7 +16,7 @@
 
 using std::map;
 
-class CbmRichElectronsQa : public CbmTask{
+class CbmRichElectronsQa : public FairTask{
 
 public:
 

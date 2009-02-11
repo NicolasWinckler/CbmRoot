@@ -19,8 +19,8 @@
 #include "L1Algo/L1StsHit.h"
 #include "L1Algo/L1Branch.h"
 
-#include "CbmRunAna.h"
-#include "CbmRuntimeDb.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 #include "CbmGeoStsPar.h"
 #include "CbmStsStation.h"
 #include "CbmStsSector.h"
@@ -58,7 +58,7 @@ CbmL1::CbmL1()
   fDetectorEfficiency = 1.;
 }
 
-CbmL1::CbmL1(const char *name, Int_t iVerbose ):CbmTask(name,iVerbose)
+CbmL1::CbmL1(const char *name, Int_t iVerbose ):FairTask(name,iVerbose)
 {
   if( !fInstance ) fInstance = this;
   fTrackingLevel = 2;
@@ -77,8 +77,8 @@ CbmL1::~CbmL1()
 
 void CbmL1::SetParContainers()
 {
-  CbmRunAna* ana = CbmRunAna::Instance();
-  CbmRuntimeDb* rtdb=ana->GetRuntimeDb();
+  FairRunAna* ana = FairRunAna::Instance();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   rtdb->getContainer("CbmGeoPassivePar");
   rtdb->getContainer("CbmGeoStsPar");
   rtdb->getContainer("CbmStsDigiPar");
@@ -126,10 +126,10 @@ InitStatus CbmL1::Init()
     cout<<endl<<endl;
   }
 
-  CbmRootManager *fManger = CbmRootManager::Instance();
+  FairRootManager *fManger = FairRootManager::Instance();
 
-  CbmRunAna *Run = CbmRunAna::Instance();
-  CbmRuntimeDb *RunDB = Run->GetRuntimeDb();
+  FairRunAna *Run = FairRunAna::Instance();
+  FairRuntimeDb *RunDB = Run->GetRuntimeDb();
   {
     CbmGeoStsPar* StsPar = (CbmGeoStsPar*) (RunDB->findContainer("CbmGeoStsPar"));
     CbmStsDigiPar *digiPar = (CbmStsDigiPar*)(RunDB->findContainer("CbmStsDigiPar"));

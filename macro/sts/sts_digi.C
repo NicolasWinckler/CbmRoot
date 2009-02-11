@@ -64,7 +64,7 @@ void sts_digi(Int_t nEvents = 1)
 
 
   // -----   Reconstruction run   -------------------------------------------
-  CbmRunAna *run= new CbmRunAna();
+  FairRunAna *run= new FairRunAna();
   run->SetInputFile(inFile);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
@@ -72,7 +72,7 @@ void sts_digi(Int_t nEvents = 1)
 
   
   // ---  STS digitizer   ----------------------------------------------------
-  CbmTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
+  FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
   run->AddTask(stsDigitize);
   // ------------------------------------------------------------------------
 
@@ -83,9 +83,9 @@ void sts_digi(Int_t nEvents = 1)
   TString stsDigiFile = gSystem->Getenv("VMCWORKDIR");
   stsDigiFile += "/parameters/sts/";
   stsDigiFile += digiFile;
-  CbmRuntimeDb* rtdb = run->GetRuntimeDb();
-  CbmParRootFileIo*  parIo1 = new CbmParRootFileIo();
-  CbmParAsciiFileIo* parIo2 = new CbmParAsciiFileIo();
+  FairRuntimeDb* rtdb = run->GetRuntimeDb();
+  FairParRootFileIo*  parIo1 = new FairParRootFileIo();
+  FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
   parIo1->open(parFile.Data());
   parIo2->open(stsDigiFile.Data(),"in");
   rtdb->setFirstInput(parIo1);

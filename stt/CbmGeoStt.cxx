@@ -1,5 +1,5 @@
 #include "CbmGeoStt.h"
-//#include "CbmGeoNode.h"
+//#include "FairGeoNode.h"
 
 ClassImp(CbmGeoStt)
 

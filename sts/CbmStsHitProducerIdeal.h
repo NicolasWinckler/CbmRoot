@@ -19,13 +19,13 @@
 #define CBMSTSHITPRODUCERIDEAL_H 1
 
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TClonesArray;
 
 
 
-class CbmStsHitProducerIdeal : public CbmTask
+class CbmStsHitProducerIdeal : public FairTask
 {
 
  public:

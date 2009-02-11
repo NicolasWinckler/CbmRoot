@@ -17,7 +17,7 @@
 #define CBMGLOBALTRACK_H 1
 
 
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 
 #include "TObject.h"
 
@@ -45,8 +45,8 @@ class CbmGlobalTrack : public TObject
   Int_t GetTrdTrackIndex()  const { return fTrdTrack; }
   Int_t GetRichRingIndex()  const { return fRichRing; }
   Int_t GetTofHitIndex()    const { return fTofHit;   }
-  CbmTrackParam* GetParamFirst()       { return &fParamFirst;   }
-  CbmTrackParam* GetParamLast()       { return &fParamLast;   }
+  FairTrackParam* GetParamFirst()       { return &fParamFirst;   }
+  FairTrackParam* GetParamLast()       { return &fParamLast;   }
   Int_t GetPidHypo()        const { return fPidHypo;  }
   Double_t GetChi2()        const { return fChi2;     }
   Int_t GetNDF()            const { return fNDF;      }
@@ -59,8 +59,8 @@ class CbmGlobalTrack : public TObject
   void SetTrdTrackIndex(Int_t iTrd)  { fTrdTrack = iTrd;  }
   void SetRichRingIndex(Int_t iRing) { fRichRing = iRing; }
   void SetTofHitIndex(Int_t iTofHit) { fTofHit = iTofHit; }
-  void SetParamFirst(CbmTrackParam& parFirst)  { fParamFirst    = parFirst;   }
-  void SetParamLast(CbmTrackParam& parLast)  { fParamLast    = parLast;   }
+  void SetParamFirst(FairTrackParam& parFirst)  { fParamFirst    = parFirst;   }
+  void SetParamLast(FairTrackParam& parLast)  { fParamLast    = parLast;   }
   void SetPidHypo(Int_t iPid)        { fPidHypo  = iPid;  }
   void SetChi2(Double_t chi2)        { fChi2     = chi2;  }
   void SetNDF(Int_t ndf)             { fNDF      = ndf;   }
@@ -81,8 +81,8 @@ class CbmGlobalTrack : public TObject
   Int_t fTofHit;
 
   /** Global track parameters at first and last plane **/
-  CbmTrackParam fParamFirst;
-  CbmTrackParam fParamLast;
+  FairTrackParam fParamFirst;
+  FairTrackParam fParamLast;
 
   /** PID hypothesis used for global track fit **/
   Int_t fPidHypo;

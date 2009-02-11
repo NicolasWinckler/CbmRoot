@@ -4,7 +4,7 @@
 // ------------------------------------------------------------------
 #include "CbmL1TrackMerger.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmStsTrackMatch.h"
 #include "CbmTrdTrackMatch.h"
 #include "CbmStsTrack.h"
@@ -75,10 +75,10 @@ CbmL1TrackMerger::~CbmL1TrackMerger()
 void CbmL1TrackMerger::Init()
 {
     // Initialisation
-    CbmRootManager* rootMgr = CbmRootManager::Instance();
+    FairRootManager* rootMgr = FairRootManager::Instance();
     if(NULL == rootMgr) {
 	cout << "-E- CbmL1TrackMerger::Init : "
-	    << "CbmRootManager is not instantiated!" << endl;
+	    << "FairRootManager is not instantiated!" << endl;
         return;
     }
     fArrayStsTrackM = (TClonesArray*) rootMgr->GetObject("STSTrackMatch");
@@ -366,7 +366,7 @@ Int_t CbmL1TrackMerger::MergeImPlane(TClonesArray* stsTracks,
 
 
 // ------------------------------------------------------------------
-Double_t CbmL1TrackMerger::GetChi2XY(CbmKFTrack& kfTrack, CbmTrackParam* trackParam)
+Double_t CbmL1TrackMerger::GetChi2XY(CbmKFTrack& kfTrack, FairTrackParam* trackParam)
 {
     // Get the chi2 from track extrapolation to TRD track parameters
     Double_t dx = kfTrack.GetTrack()[0] - trackParam->GetX();

@@ -3,13 +3,13 @@
 // -----                  Created 14/03/07  by E. Kryshen              -----
 // -------------------------------------------------------------------------
 #include "CbmVisHit.h"
-#include "CbmHit.h"
+#include "FairHit.h"
 #include "CbmMCTrack.h"
 
 
 
 // -------------------------------------------------------------------------
-CbmVisHit::CbmVisHit(CbmHit* hit):TMarker(hit->GetX(),hit->GetY(),21)
+CbmVisHit::CbmVisHit(FairHit* hit):TMarker(hit->GetX(),hit->GetY(),21)
 {
     fDefaultSize = 0.5;
     SetMarkerSize(fDefaultSize);

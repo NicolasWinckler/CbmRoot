@@ -16,7 +16,7 @@
 #include "TDatabasePDG.h"
 
 class CbmStsPoint;
-class CbmTrackParam;
+class FairTrackParam;
 class CbmStsTrack;
 class TClonesArray;
 
@@ -37,10 +37,10 @@ class CbmStsTrackFitterIdeal : public CbmStsTrackFitter
   Int_t DoFit(CbmStsTrack* pTrack, Int_t pidHypo = 211);
 
   void Extrapolate( CbmStsTrack* track, Double_t z,
-		   CbmTrackParam *param ) {}
+		   FairTrackParam *param ) {}
 
   /** Set tracks parameters from the MC point **/
-  void SetTrackParam(CbmStsPoint* point, CbmTrackParam* trackParam, Int_t out = 0);
+  void SetTrackParam(CbmStsPoint* point, FairTrackParam* trackParam, Int_t out = 0);
 
 private:
 

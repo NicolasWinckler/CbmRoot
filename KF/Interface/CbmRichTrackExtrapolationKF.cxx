@@ -32,12 +32,12 @@
 #include "CbmStsKFTrackFitter.h"
 
 #include "CbmRichPoint.h"
-#include "CbmTrackParam.h"
+#include "FairTrackParam.h"
 #include "CbmMCTrack.h"
 #include "CbmStsTrack.h"
 #include "CbmGlobalTrack.h"
-#include "CbmTrackParam.h"
-#include "CbmRootManager.h"
+#include "FairTrackParam.h"
+#include "FairRootManager.h"
 
 // ROOT includes
 #include "TClonesArray.h"
@@ -82,8 +82,8 @@ CbmRichTrackExtrapolationKF::~CbmRichTrackExtrapolationKF() {
 // -----   Public method Init   --------------------------------------------
 void CbmRichTrackExtrapolationKF::Init() {
 
-  // Get and check CbmRootManager
-  CbmRootManager* ioman = CbmRootManager::Instance();
+  // Get and check FairRootManager
+  FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
     cout << "-E- CbmRichTrackExtrapolationKF::Init: "
 	 << "RootManager not instantised!" << endl;
@@ -134,7 +134,7 @@ Int_t CbmRichTrackExtrapolationKF::DoExtrapolate(TClonesArray *gTrackArray, Doub
    Int_t nTracks = gTrackArray->GetEntriesFast();
    for (Int_t iTrack=0; iTrack < nTracks; iTrack++){
      CbmGlobalTrack* gTrack = (CbmGlobalTrack*)gTrackArray->At(iTrack);
-     new((*fTrackParamArray)[iTrack]) CbmTrackParam(0.,0.,0.,0.,0.,0.,covMat);
+     new((*fTrackParamArray)[iTrack]) FairTrackParam(0.,0.,0.,0.,0.,0.,covMat);
      Int_t idSTS = gTrack->GetStsTrackIndex();
    if (fVerbose > 1) cout << "-I- KF-Trackextrapolation, iTrack(STS) " << idSTS
                           << " pointer " << (CbmStsTrack*)fSTSArray->At(idSTS) << endl;
@@ -142,7 +142,7 @@ Int_t CbmRichTrackExtrapolationKF::DoExtrapolate(TClonesArray *gTrackArray, Doub
    pSTStr = (CbmStsTrack*)fSTSArray->At(idSTS);
    if ( ! pSTStr ) continue;
     CbmStsKFTrackFitter KF;
-    CbmTrackParam ExTrack;
+    FairTrackParam ExTrack;
 
     KF.Extrapolate(pSTStr, fZ, &ExTrack);
 
@@ -150,7 +150,7 @@ Int_t CbmRichTrackExtrapolationKF::DoExtrapolate(TClonesArray *gTrackArray, Doub
     if (fVerbose > 1) cout << "-I- KF-Trackextrapolation, iTrack(Global), iTrack(STS), Nsts: " << iTrack << " " << idSTS << " " << Nsts << endl;
 
     if ( Nsts >= fMinNsts) {
-        * (CbmTrackParam*)(fTrackParamArray->At(iTrack)) = ExTrack;
+        * (FairTrackParam*)(fTrackParamArray->At(iTrack)) = ExTrack;
       if (fVerbose > 1) cout << "-I- KF Track Extrapolation - extrapolate track " << iTrack << endl;
       }
 

@@ -1,6 +1,6 @@
 #include "CbmEcalMatching.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 
 #include "TClonesArray.h"
@@ -21,7 +21,7 @@ using namespace std;
 
 /** Standard constructor **/
 CbmEcalMatching::CbmEcalMatching(const char* name, const Int_t verbose, const char* config)
-  : CbmTask(name, verbose)
+  : FairTask(name, verbose)
 {
   fThreshold=0.8;
   fPhotonThr=0.95;
@@ -56,7 +56,7 @@ CbmEcalMatching::CbmEcalMatching(const char* name, const Int_t verbose, const ch
 /** Task initialization **/
 InitStatus CbmEcalMatching::Init()
 {
-  CbmRootManager* io=CbmRootManager::Instance();
+  FairRootManager* io=FairRootManager::Instance();
   if (!io)
   {
     Fatal("Init", "Can't find IOManager.");

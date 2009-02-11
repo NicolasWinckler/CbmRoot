@@ -13,7 +13,7 @@
 
 #include "CbmGeoTofPar.h"
 
-#include "CbmRuntimeDb.h"
+#include "FairRuntimeDb.h"
 
 #include <iostream>
 
@@ -29,14 +29,14 @@ CbmTofContFact::CbmTofContFact() {
   fName="CbmTofContFact";
   fTitle="Factory for parameter containers in libTof";
   setAllContainers();
-  CbmRuntimeDb::instance()->addContFactory(this);
+  FairRuntimeDb::instance()->addContFactory(this);
 }
 
 void CbmTofContFact::setAllContainers() {
   /** Creates the Container objects with all accepted contexts and adds them to
    *  the list of containers for the Tof library.*/
 
-    CbmContainer* p= new CbmContainer("CbmGeoTofPar",
+    FairContainer* p= new FairContainer("CbmGeoTofPar",
                                           "Tof Geometry Parameters",
                                           "TestDefaultContext");
     p->addContext("TestNonDefaultContext");
@@ -44,13 +44,13 @@ void CbmTofContFact::setAllContainers() {
     containers->Add(p);
 }
 
-CbmParSet* CbmTofContFact::createContainer(CbmContainer* c) {
+FairParSet* CbmTofContFact::createContainer(FairContainer* c) {
   /** Calls the constructor of the corresponding parameter container.
    * For an actual context, which is not an empty string and not the default context
    * of this container, the name is concatinated with the context. */
   const char* name=c->GetName();
   cout << " -I container name " << name << endl;
-  CbmParSet* p=0;
+  FairParSet* p=0;
   if (strcmp(name,"CbmGeoTofPar")==0) {
     p=new CbmGeoTofPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
   }

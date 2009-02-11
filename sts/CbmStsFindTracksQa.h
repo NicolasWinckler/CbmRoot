@@ -20,7 +20,7 @@
 #include "TStopwatch.h"
 #include "TVector3.h"
 
-#include "CbmTask.h"
+#include "FairTask.h"
 
 class TCanvas;
 class TClonesArray;
@@ -32,7 +32,7 @@ class CbmGeoStsPar;
 
 
 
-class CbmStsFindTracksQa : public CbmTask
+class CbmStsFindTracksQa : public FairTask
 {
 
  public:

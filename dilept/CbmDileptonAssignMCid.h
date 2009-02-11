@@ -2,7 +2,7 @@
  *  $Id$
  *
  *  Class : CbmDileptonAssignMCid
- *  Descripton: This is a task, derived from CbmTask. This works for the simulated
+ *  Descripton: This is a task, derived from FairTask. This works for the simulated
  *              data stream to assign MC information to the identified electron tracks.
  *              This also generates histograms for identification QA (efficiency,
  *              purity, pion supression etc.
@@ -17,24 +17,24 @@
 #ifndef CBM_DILEPTON_ASSIGN_MCID_H
 #define CBM_DILEPTON_ASSIGN_MCID_H
 
-#include "CbmTask.h"
+#include "FairTask.h"
 #include "CbmStsKFTrackFitter.h"
 
 #include "TStopwatch.h"
 
 class TClonesArray;
-class CbmRootManager;
+class FairRootManager;
 class CbmVertex;
 class CbmDileptonTrackSimCollection;
 class TH1D;
 class TH2D;
 class TFile;
 
-class CbmDileptonAssignMCid : public CbmTask{
+class CbmDileptonAssignMCid : public FairTask{
 
 private:
 
-   CbmRootManager* fRootManager;
+   FairRootManager* fRootManager;
 
    CbmDileptonTrackSimCollection* fTrackSimColl;
    TClonesArray*   fArrayDileptonTrackReal;

@@ -10,7 +10,7 @@ ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/passive
-${CBMROOT_SOURCE_DIR}/sts
+${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/global
 )
 
@@ -30,12 +30,9 @@ CbmGeoTrd.cxx
 CbmGeoTrdPar.cxx 
 CbmTrdContFact.cxx   
 CbmTrd.cxx 		 
-CbmTrdHit.cxx		 
-CbmTrdTrack.cxx		 
 CbmTrdHitProducerIdeal.cxx    
 CbmTrdHitProducer.cxx	 
 CbmTrdHitProducerQa.cxx  
-CbmTrdPoint.cxx	
 CbmTrdRadiator.cxx  
 CbmTrdFindTracks.cxx  
 CbmTrdFindTracksQa.cxx  
@@ -45,7 +42,6 @@ CbmTrdFitTracks.cxx
 CbmTrdFitTracksQa.cxx  
 CbmTrdTrackFitter.cxx  
 CbmTrdTrackFitterIdeal.cxx  
-CbmTrdTrackMatch.cxx  
 CbmTrdMatchTracks.cxx
 CbmTrdSetTracksPidWkn.cxx       
 CbmTrdSetTracksPidLike.cxx     

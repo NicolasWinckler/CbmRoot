@@ -8,11 +8,9 @@ ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
-${CBMROOT_SOURCE_DIR}/sts
+${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/global 
 ${CBMROOT_SOURCE_DIR}/rich 
-${CBMROOT_SOURCE_DIR}/trd
-${CBMROOT_SOURCE_DIR}/tof
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -25,15 +23,12 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(RICH_SRCS
 CbmGeoRich.cxx 
-CbmRichRing.cxx	
 CbmRichRingFinder.cxx 
 CbmRich.cxx 
-CbmRichHit.cxx 
 CbmRichHitProducer.cxx   
 CbmRichProjectionProducer.cxx 
 CbmGeoRichPar.cxx 
 CbmRichContFact.cxx   
-CbmRichPoint.cxx
 CbmRichRingFinderHough.cxx 
 CbmRichRingFinderTrack.cxx
 CbmRichRingFinderIdeal.cxx 
@@ -48,8 +43,6 @@ CbmRichTrackExtrapolation.cxx
 CbmRichTrackExtrapolationIdeal.cxx
 CbmRichTrackExtrapolationMirrorIdeal.cxx
 CbmRichExtrapolateTracks.cxx
-CbmRichRingMatch.cxx 
-CbmRichMatchRings.cxx
 CbmRichRingTrackAssign.cxx 
 CbmRichRingTrackAssignClosestD.cxx
 CbmRichRingTrackAssignIdeal.cxx 
@@ -60,6 +53,7 @@ CbmRichRingQa.cxx
 CbmRichRingSelect.cxx 
 CbmRichRingSelectNeuralNet.cxx
 CbmRichSelectRings.cxx
+CbmRichMatchRings.cxx
 CbmRichRingFitterEllipse.cxx
 CbmRichGeoTest.cxx
 CbmRichRingFitterEllipseTau.cxx

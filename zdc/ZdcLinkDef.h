@@ -8,11 +8,9 @@
 #pragma link off all functions;
  
 #pragma link C++ class  CbmZdc+;
-#pragma link C++ class  CbmZdcPoint+;
 #pragma link C++ class  CbmGeoZdc+;
 #pragma link C++ class  CbmGeoZdcPar;
 #pragma link C++ class  CbmZdcContFact;
 #pragma link C++ class  CbmZdcv1+;
-#pragma link C++ class  CbmZdcEvent+;
 #endif
 

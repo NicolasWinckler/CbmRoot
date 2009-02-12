@@ -9,6 +9,7 @@ ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/cbmbase
+${CBMROOT_SOURCE_DIR}/cbmdata
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -23,9 +24,7 @@ set(ZDC_SRCS
 CbmGeoZdc.cxx 
 CbmGeoZdcPar.cxx 
 CbmZdc.cxx  
-CbmZdcPoint.cxx  
 CbmZdcv1.cxx 
-CbmZdcEvent.cxx
 CbmZdcContFact.cxx
 )
 

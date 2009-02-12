@@ -74,6 +74,7 @@ CbmMuchHit::~CbmMuchHit() { }
 
 
 // -----   Public method Print   -------------------------------------------
+/*
 void CbmMuchHit::Print(Option_t* opt) const {
   cout.precision(5);
   cout << "MuchHit at (" << fX << ", " << fY << ", " << fZ << ") cm, "
@@ -84,13 +85,16 @@ void CbmMuchHit::Print(Option_t* opt) const {
        << ", Sector " << CbmMuchGeoScheme::GetSectorIndex(fDetectorID) 
        << ", Digi " << fRefIndex << endl;
 }
+*/
 // -------------------------------------------------------------------------
 
 
+/*
 Int_t CbmMuchHit::GetStationNr() const{
   CbmMuchGeoScheme* fGeoScheme = CbmMuchGeoScheme::Instance();
   if (!fGeoScheme->IsInitialized()) Fatal("GetStationNr","CbmMuchGeoScheme not initialized");
   return fGeoScheme->GetLayerSideNr(GetDetectorId());
 }
+*/
 
 ClassImp(CbmMuchHit)

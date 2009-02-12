@@ -10,6 +10,7 @@ ${CBMROOT_SOURCE_DIR}/base
 ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/cbmbase
+${CBMROOT_SOURCE_DIR}/cbmdata
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -27,11 +28,7 @@ CbmStt.cxx
 CbmSttContFact.cxx
 CbmGeoStt.cxx
 CbmGeoSttPar.cxx
-CbmSttPoint.cxx
-CbmSttHit.cxx
 CbmSttHitProducer.cxx
-CbmSttTrack.cxx
-CbmSttTrackMatch.cxx
 CbmSttMatchTracks.cxx
 )
 

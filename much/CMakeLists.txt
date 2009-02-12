@@ -4,11 +4,12 @@
 
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
-${CBMROOT_SOURCE_DIR}/much
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
+${CBMROOT_SOURCE_DIR}/cbmdata 
+${CBMROOT_SOURCE_DIR}/much
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -23,17 +24,13 @@ set(MUCH_SRCS
 CbmGeoMuch.cxx  
 CbmGeoMuchPar.cxx 
 CbmMuch.cxx
-CbmMuchCluster.cxx
 CbmMuchContFact.cxx  
-CbmMuchDigi.cxx
-CbmMuchDigiMatch.cxx
 CbmMuchDigitize.cxx
 CbmMuchFindClusters.cxx
 CbmMuchFindHits.cxx
 CbmMuchFindHitsSimple.cxx
 CbmMuchFindTracks.cxx
 CbmMuchGeoScheme.cxx
-CbmMuchHit.cxx 
 CbmMuchHitFinderQa.cxx
 CbmMuchHitProducerIdeal.cxx
 CbmMuchLayer.cxx
@@ -42,16 +39,13 @@ CbmMuchMatchTracks.cxx
 #CbmMuchMaximalChargeQa.cxx
 CbmMuchModule.cxx
 CbmMuchPad.cxx
-CbmMuchPoint.cxx 
 CbmMuchPointInfo.cxx
 #CbmMuchPhysicsQa.cxx
 CbmMuchSector.cxx
 CbmMuchSegmentation.cxx
 CbmMuchStation.cxx
 CbmMuchTask.cxx
-CbmMuchTrack.cxx 
 CbmMuchTrackFinder.cxx
-CbmMuchTrackMatch.cxx
 CbmMuchTrackFinderIdeal.cxx
 )
 

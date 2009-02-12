@@ -11,6 +11,7 @@ ${CBMROOT_SOURCE_DIR}/field
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/passive 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
+${CBMROOT_SOURCE_DIR}/cbmdata 
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -26,9 +27,6 @@ CbmGeoSts.cxx
 CbmGeoStsPar.cxx 
 CbmSts.cxx 
 CbmStsContFact.cxx 
-CbmStsCluster.cxx 
-CbmStsDigi.cxx 
-CbmStsDigiMatch.cxx 
 CbmStsDigiPar.cxx 
 CbmStsDigiScheme.cxx 
 CbmStsDigitize.cxx 
@@ -39,26 +37,22 @@ CbmStsRealFindHits.cxx
 CbmStsFindTracks.cxx 
 CbmStsFindTracksQa.cxx 
 CbmStsFitTracks.cxx 
-CbmStsHit.cxx 
 CbmStsHitProducerIdeal.cxx 
 CbmStsMatchHits.cxx 
 CbmStsRealMatchHits.cxx 
 CbmStsMatchTracks.cxx 
 CbmStsParAsciiFileIo.cxx 
 CbmStsParRootFileIo.cxx 
-CbmStsPoint.cxx 
 CbmStsSensor.cxx 
 CbmStsSensorDigiPar.cxx 
 CbmStsSector.cxx 
 CbmStsSectorDigiPar.cxx 
 CbmStsStation.cxx 
 CbmStsStationDigiPar.cxx 
-CbmStsTrack.cxx 
 CbmStsTrackFinder.cxx 
 CbmStsTrackFinderIdeal.cxx 
 CbmStsTrackFitter.cxx 
 CbmStsTrackFitterIdeal.cxx 
-CbmStsTrackMatch.cxx
 CbmStsSimulationQa.cxx 
 CbmStsFindHitsQa.cxx
 CbmStsReconstructionQa.cxx

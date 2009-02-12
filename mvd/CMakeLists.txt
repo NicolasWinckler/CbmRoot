@@ -11,6 +11,7 @@ ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/field 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
+${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/passive
 ${CBMROOT_SOURCE_DIR}/mvd 
 )
@@ -29,15 +30,10 @@ CbmMvd.cxx
 CbmMvdContFact.cxx 
 CbmMvdGeo.cxx 
 CbmMvdGeoPar.cxx 
-CbmMvdHit.cxx 
-CbmMvdHitMatch.cxx 
 CbmMvdHitProducer.cxx 
 CbmMvdDigitiser.cxx  
 CbmMvdPileupManager.cxx  
-CbmMvdPoint.cxx
-CbmMvdDigi.cxx  
 CbmMvdFindHits.cxx
-CbmMvdCluster.cxx 
 CbmMvdStation.cxx
 MyG4UniversalFluctuationForSi.cxx
 CbmMvdPixelCharge.cxx    

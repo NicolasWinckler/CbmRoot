@@ -8,11 +8,7 @@
 #pragma link C++ class CbmGeoStt;
 #pragma link C++ class CbmGeoSttPar;
 #pragma link C++ class CbmStt+;
-#pragma link C++ class CbmSttPoint+;
-#pragma link C++ class CbmSttHit+;
 #pragma link C++ class CbmSttHitProducer+;
-#pragma link C++ class CbmSttTrack+;
-#pragma link C++ class CbmSttTrackMatch+;
 #pragma link C++ class CbmSttMatchTracks+;
 
 #endif

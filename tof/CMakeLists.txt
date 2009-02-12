@@ -9,6 +9,7 @@ ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
+${CBMROOT_SOURCE_DIR}/cbmdata
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -24,10 +25,8 @@ CbmGeoTof.cxx
 CbmGeoTofPar.cxx 
 CbmTof.cxx 
 CbmTofContFact.cxx 
-CbmTofHit.cxx 
 CbmTofHitProducer.cxx 
 CbmTofHitProducerIdeal.cxx 
-CbmTofPoint.cxx
 )
 
 if(RULE_CHECKER_FOUND)

@@ -18,7 +18,7 @@
 
 #include "TVector3.h"
 #include "CbmTrkHit.h"
-#include "CbmMuchGeoScheme.h"
+//#include "CbmMuchGeoScheme.h"
 
 
 class CbmMuchHit : public CbmTrkHit
@@ -61,12 +61,12 @@ class CbmMuchHit : public CbmTrkHit
   virtual ~CbmMuchHit();
 
   /** Screen output **/
-  virtual void Print(Option_t* opt) const;
+  //  virtual void Print(Option_t* opt) const;
 
 
   /** Accessors **/
   Long64_t GetDetectorId()  const { return fDetectorID; }
-  Int_t    GetStationNr() const;
+  Int_t    GetStationNr() const {};
 
   /** Gets covariance in X and Y **/
   Double_t GetCovXY() const  { return fCovXY; }

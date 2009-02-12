@@ -8,10 +8,6 @@
 
 #pragma link C++ class  CbmRich+;
 
-#pragma link C++ class  CbmRichPoint+;
-#pragma link C++ class  CbmRichHit+;
-#pragma link C++ class  CbmRichRing+;
-
 #pragma link C++ class  CbmRichHitProducer+;
 #pragma link C++ class  CbmRichProjectionProducer+;
 #pragma link C++ class  CbmRichTrackExtrapolation+;
@@ -30,7 +26,6 @@
 #pragma link C++ class  CbmRichRingFitterRobustCOP+;
 #pragma link C++ class  CbmRichRingFitterTAU+;
 #pragma link C++ class  CbmRichFitRings+;
-#pragma link C++ class  CbmRichRingMatch+;
 #pragma link C++ class  CbmRichMatchRings+;
 #pragma link C++ class  CbmRichRingTrackAssign+;
 #pragma link C++ class  CbmRichRingTrackAssignClosestD+;

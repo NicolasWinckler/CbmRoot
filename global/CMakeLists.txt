@@ -9,9 +9,7 @@ ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/cbmbase
-${CBMROOT_SOURCE_DIR}/sts
-${CBMROOT_SOURCE_DIR}/trd 
-${CBMROOT_SOURCE_DIR}/tof 
+${CBMROOT_SOURCE_DIR}/cbmdata
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

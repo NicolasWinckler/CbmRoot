@@ -7,9 +7,6 @@
 #pragma link off all functions;
  
 #pragma link C++ class  CbmTrd+;
-#pragma link C++ class  CbmTrdHit+;
-#pragma link C++ class  CbmTrdPoint+;
-#pragma link C++ class  CbmTrdTrack+;
 #pragma link C++ class  CbmTrdHitProducerIdeal+;
 #pragma link C++ class  CbmTrdHitProducer+;
 #pragma link C++ class  CbmTrdHitProducerQa+;
@@ -25,7 +22,6 @@
 #pragma link C++ class  CbmGeoTrdPar;
 #pragma link C++ class  CbmTrdContFact;
 #pragma link C++ class  CbmTrdRadiator;
-#pragma link C++ class  CbmTrdTrackMatch+;
 #pragma link C++ class  CbmTrdMatchTracks+;
 #pragma link C++ class  CbmTrdSetTracksPidWkn+;
 #pragma link C++ class  CbmTrdSetTracksPidLike+;

@@ -7,7 +7,7 @@
  **/
 
 #include "CbmMuchCluster.h"
-#include "CbmMuchPad.h"
+//#include "CbmMuchPad.h"
 
 
 // ------ Default constructor ----------------------------------------------

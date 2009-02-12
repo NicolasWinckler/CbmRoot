@@ -9,6 +9,7 @@ ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/field 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
+${CBMROOT_SOURCE_DIR}/cbmdata 
 ${CBMROOT_SOURCE_DIR}/ecal
 )
 
@@ -21,15 +22,15 @@ ${ROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(ECAL_SRCS_RULECHECKER
-CbmEcal.cxx CbmEcalDetailed.cxx CbmEcalHit.cxx CbmEcalPoint.cxx	
-CbmEcalPointLite.cxx CbmEcalHitProducer.cxx 
+CbmEcal.cxx CbmEcalDetailed.cxx 	
+CbmEcalHitProducer.cxx 
 CbmGeoEcalPar.cxx CbmEcalDrawer.cxx 
 CbmEcalContFact.cxx CbmGeoEcal.cxx  
 CbmEcalAnalysisDS.cxx CbmEcalAnalysis.cxx 
 CbmEcalCell.cxx CbmEcalModule.cxx CbmEcalStructure.cxx 
-CbmEcalHitFastMC.cxx CbmEcalHitProducerFastMC.cxx 
+CbmEcalHitProducerFastMC.cxx 
 CbmEcalRecParticle.cxx CbmEcalReconstructionFastMC.cxx 
-CbmEcalCluster.cxx CbmEcalClusterFinder.cxx 
+CbmEcalClusterFinder.cxx 
 CbmEcalPhotonCalibrator.cxx CbmEcalShowerCalibrator.cxx 
 CbmEcalUrqmdCalibrator.cxx CbmEcalSCurveLib.cxx 
 CbmEcalSCurveLibRecord.cxx CbmEcalOShowerCalibrator.cxx 

@@ -34,7 +34,7 @@ void CbmFieldCreator::SetParm()
 
 }
 
-FairField* CbmFieldCreator::createCbmField()
+FairField* CbmFieldCreator::createFairField()
 { 
   FairField *fMagneticField=0;
 

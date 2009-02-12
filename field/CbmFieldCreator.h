@@ -16,7 +16,7 @@ class CbmFieldCreator : public FairFieldFactory
 public:
     CbmFieldCreator();
     virtual ~CbmFieldCreator();
-    virtual FairField* createCbmField();
+    virtual FairField* createFairField();
     virtual void SetParm();
     ClassDef(CbmFieldCreator,1);
 protected:

@@ -13,6 +13,7 @@
   gSystem->Load("libParBase");
   gSystem->Load("libBase");
   gSystem->Load("libCbmBase");
+  gSystem->Load("libCbmData");
   gSystem->Load("libField");
   gSystem->Load("libPassive");
   gSystem->Load("libSts");
@@ -60,7 +61,7 @@
   fRun->AddModule(Magnet);
   
   FairDetector *Sts= new CbmSts("STS", kTRUE);
-  Sts->SetGeometryFileName("sts_standard.geo");
+  Sts->SetGeometryFileName("sts_Standard_s3055AAFK5.SecD.geo");
   fRun->AddModule(Sts);
 
   

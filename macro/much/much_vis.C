@@ -17,6 +17,7 @@ void much_vis(const char* mcFile, const char* rcFile, const char* digiFile)
   gSystem->Load("libParBase");
   gSystem->Load("libBase");
   gSystem->Load("libCbmBase");
+  gSystem->Load("libCbmData");
   gSystem->Load("libPassive");
   gSystem->Load("libGen");
   gSystem->Load("libSts");

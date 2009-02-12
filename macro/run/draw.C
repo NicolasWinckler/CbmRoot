@@ -8,6 +8,7 @@
   gSystem->Load("libBase");
   gSystem->Load("libField");
   gSystem->Load("libCbmBase");
+  gSystem->Load("libCbmData");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
   gSystem->Load("libSts");

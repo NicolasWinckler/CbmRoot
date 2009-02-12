@@ -61,6 +61,7 @@
     gSystem->Load("libParBase");
     gSystem->Load("libBase");
     gSystem->Load("libCbmBase");
+  gSystem->Load("libCbmData");
     //gSystem->Load("libMCStack");
     gSystem->Load("libField");
     gSystem->Load("libGen");

@@ -16,6 +16,7 @@ project(CBMROOT)
 # is checked
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
+
 # Load some basic macros which are needed later on
 include(FairMacros)
 include(WriteConfigFile)

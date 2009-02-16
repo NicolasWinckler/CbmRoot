@@ -36,19 +36,12 @@ void CbmRichRingFitterEllipseBase::CalcChi2(CbmRichRing* pRing)
         pRing->SetChi2(-1.);
         return;
     }
-    Double_t c = sqrt ( axisA*axisA - axisB*axisB);
 
-    if (phi > 0.){
-        xf1 = centerX + c*cos(phi);
-        yf1 = centerY + c*sin(phi);
-        xf2 = centerX - c*cos(phi);
-        yf2 = centerY - c*sin(phi);
-    }else{
-        xf1 = centerX + c*cos(TMath::Abs(phi));
-        yf1 = centerY - c*sin(TMath::Abs(phi));
-        xf2 = centerX - c*cos(TMath::Abs(phi));
-        yf2 = centerY + c*sin(TMath::Abs(phi));
-    }
+    xf1 = pRing->GetXF1();
+    yf1 = pRing->GetYF1();
+    xf2 = pRing->GetXF2();
+    yf2 = pRing->GetYF2();
+
 
 ///calculate chi2
     Double_t chi2 = 0.;

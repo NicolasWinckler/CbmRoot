@@ -4,11 +4,12 @@
 #include "CbmLitHit.h"
 #include "CbmLitStripHit.h"
 #include "CbmLitPixelHit.h"
+#include "CbmLitTrack.h"
 
 #include <iostream>
 
-Double_t ChiSq(						
-		const CbmLitTrackParam* par, 						
+Double_t ChiSq(
+		const CbmLitTrackParam* par,
 		const CbmLitHit* hit)
 {
 	if (hit->GetType() == kLITSTRIPHIT) {
@@ -18,8 +19,8 @@ Double_t ChiSq(
 	}
 }
 
-Double_t ChiSq(						
-		const CbmLitTrackParam* par, 						
+Double_t ChiSq(
+		const CbmLitTrackParam* par,
 		const CbmLitStripHit* hit)
 {
 	Double_t C0 = par->GetCovariance(0);
@@ -32,16 +33,16 @@ Double_t ChiSq(
 	Double_t phiCosSq = phiCos * phiCos;
 	Double_t phiSinSq = phiSin * phiSin;
 	Double_t phi2SinCos = 2 * phiCos * phiSin;
-	
+
 	Double_t r = u - par->GetX() * phiCos - par->GetY() * phiSin;
 	Double_t rr = r * r;
 	Double_t norm = duu + C0 * phiCosSq + phi2SinCos * C1 + C5 * phiSinSq;
-	
+
 	return rr / norm;
 }
 
-Double_t ChiSq(						
-		const CbmLitTrackParam* par, 						
+Double_t ChiSq(
+		const CbmLitTrackParam* par,
 		const CbmLitPixelHit* hit)
 {
 	Double_t dxx = hit->GetDx() * hit->GetDx();
@@ -56,17 +57,17 @@ Double_t ChiSq(
 	Double_t norm = -dxx * dyy + dxx * C5 + dyy * C0 - C0 * C5 + dxy * dxy -
 						2 * dxy * C1 + C1 * C1;
 	if (norm == 0.) norm = 1e-10;
-	
+
 	Double_t chi2 = (-dx * dx * (dyy - C5) - dy * dy * (dxx - C0) + 2 * dx * dy * (dxy - C1)) / norm;
 
 	return chi2;
 }
 
 Int_t NDF(
-		Int_t nofHits)
+		const CbmLitTrack* track)
 {
    // TODO check NDF
 //   if (nofHits > 2) return (2 * nofHits - 5);
 //   else return 1;
-	return nofHits;
+	return track->GetNofHits();
 }

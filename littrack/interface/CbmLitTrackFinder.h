@@ -9,12 +9,12 @@ class CbmLitTrackFinder : public CbmLitTool
 public:
 	CbmLitTrackFinder();
 	virtual ~CbmLitTrackFinder();
-	
+
 	virtual LitStatus DoFind(
 			const HitPtrVector& hits,
 			const TrackPtrVector& trackSeeds,
 			TrackPtrVector& tracks) = 0;
-	
+
     ClassDef(CbmLitTrackFinder, 1);
 };
 

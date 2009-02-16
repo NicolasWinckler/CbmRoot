@@ -8,6 +8,7 @@
 
 #include "CbmLitRK4TrackExtrapolator.h"
 #include "CbmLitLineTrackExtrapolator.h"
+#include "CbmLitCleverTrackExtrapolator.h"
 #include "CbmLitTrackPropagatorImp.h"
 #include "CbmLitTrackPropagatorGeane.h"
 #include "CbmLitTrackSelectionEmpty.h"
@@ -33,7 +34,7 @@ CbmLitToolFactory* CbmLitToolFactory::fInstance = NULL;
 CbmLitToolFactory::CbmLitToolFactory()
 {
 	//boost::shared_ptr<int> p(new int(4));
-	
+
 }
 
 CbmLitToolFactory::~CbmLitToolFactory()
@@ -49,41 +50,47 @@ CbmLitToolFactory* CbmLitToolFactory::Instance()
    return fInstance;
 }
 
+CbmLitTrackExtrapolator* CbmLitToolFactory::CreateTrackExtrapolator(
+		const std::string& name)
+{
+	CbmLitTrackExtrapolator* extrapolator = NULL;
+	if(name == "line") {
+		extrapolator = new CbmLitLineTrackExtrapolator();
+		extrapolator->Initialize();
+	} else
+	if (name == "rk4") {
+		extrapolator = new CbmLitRK4TrackExtrapolator();
+		extrapolator->Initialize();
+	} else
+	if (name == "lit") {
+		extrapolator = new CbmLitCleverTrackExtrapolator();
+		extrapolator->Initialize();
+	}
+	return extrapolator;
+}
+
 CbmLitTrackPropagator* CbmLitToolFactory::CreateTrackPropagator(
 		const std::string& name)
 {
 	CbmLitTrackPropagator* propagator = NULL;
-	if(name == "Much") {
-		//TODO delete extrapolator!!!!
-	   CbmLitRK4TrackExtrapolator* extrapolator = new CbmLitRK4TrackExtrapolator();
-	   extrapolator->Initialize();
-	   CbmLitTrackPropagatorImp* litpropagator = new CbmLitTrackPropagatorImp(extrapolator);
-	   litpropagator->Initialize();
-	   return litpropagator;
-	} else 
-	if(name == "Trd") {
-	
-	} else 
-	if(name == "Geane") {
+	if(name == "geane") {
 		propagator = new CbmLitTrackPropagatorGeane();
 	    propagator->Initialize();
-	}
+	} else
+	if(name == "lit") {
+		propagator = new CbmLitTrackPropagatorImp(CreateTrackExtrapolator("lit"));
+	    propagator->Initialize();
+	} else
 	if(name == "rk4") {
-		//TODO delete extrapolator!!!!
-	   CbmLitRK4TrackExtrapolator* extrapolator = new CbmLitRK4TrackExtrapolator();
-	   extrapolator->Initialize();
-	   CbmLitTrackPropagatorImp* litpropagator = new CbmLitTrackPropagatorImp(extrapolator);
+	   CbmLitTrackPropagatorImp* litpropagator = new CbmLitTrackPropagatorImp(CreateTrackExtrapolator("rk4"));
 	   litpropagator->Initialize();
 	   return litpropagator;
-	} else 
+	} else
 	if(name == "line") {
-		//TODO delete extrapolator!!!!
-	   CbmLitLineTrackExtrapolator* extrapolator = new CbmLitLineTrackExtrapolator();
-	   extrapolator->Initialize();
-	   CbmLitTrackPropagatorImp* litpropagator = new CbmLitTrackPropagatorImp(extrapolator);
+	   CbmLitTrackPropagatorImp* litpropagator = new CbmLitTrackPropagatorImp(CreateTrackExtrapolator("line"));
 	   litpropagator->Initialize();
 	   return litpropagator;
-	}	
+	}
 	return propagator;
 }
 
@@ -91,10 +98,10 @@ CbmLitTrackUpdate* CbmLitToolFactory::CreateTrackUpdate(
 		const std::string& name)
 {
 	CbmLitTrackUpdate* update = NULL;
-	if(name == "Much" || name == "Trd") {
+	if(name == "kalman") {
 		update = new CbmLitKalmanFilter();
 		update->Initialize();
-		return update;		    
+		return update;
 	}
 	return update;
 }
@@ -103,41 +110,25 @@ CbmLitTrackFitter* CbmLitToolFactory::CreateTrackFitter(
 		const std::string& name)
 {
 	CbmLitTrackFitter* fitter = NULL;
-	if(name == "Much") {
-		//TODO delete propagator and update after use
-		CbmLitTrackPropagator* propagator = CreateTrackPropagator("Much");
+
+	if(name == "lit_kalman") {
+		CbmLitTrackPropagator* propagator = CreateTrackPropagator("lit");
 		((CbmLitTrackPropagatorImp*) propagator)->IsCalcTransportMatrix(true);
-		CbmLitTrackUpdate* update = CreateTrackUpdate("Much");
-		fitter = new CbmLitTrackFitterImp(propagator, update);
-	    return fitter;
-	} else 
-	if(name == "MuchRobust") {
-		//TODO delete propagator and update and fitter after use
-		CbmLitTrackFitter* fitterImp = CreateTrackFitter("Much");
-		CbmLitTrackFitter* smoother = new CbmLitKalmanSmoother();
-		fitter = new CbmLitTrackFitterRobust(fitterImp, smoother);
-		return fitter;
-	} else
-	if(name == "MuchIter") {
-		//TODO delete propagator and update and fitter after use
-		CbmLitTrackFitter* fitterImp = CreateTrackFitter("Much");
-		CbmLitTrackFitter* smoother = new CbmLitKalmanSmoother();
-		fitter = new CbmLitTrackFitterIter(fitterImp, smoother);
-		return fitter;
-	} else
-	if(name == "Trd") {
-	
-	} else 
-	if(name == "Geane") {
-		CbmLitTrackPropagator* propagator = CreateTrackPropagator("Geane");
-		CbmLitTrackUpdate* update = CreateTrackUpdate("Much");
+		CbmLitTrackUpdate* update = CreateTrackUpdate("kalman");
 		fitter = new CbmLitTrackFitterImp(propagator, update);
 		return fitter;
-	} else 
-	if (name == "Smoother") {
+	} else
+	if(name == "geane_kalman") {
+		CbmLitTrackPropagator* propagator = CreateTrackPropagator("geane");
+		CbmLitTrackUpdate* update = CreateTrackUpdate("kalman");
+		fitter = new CbmLitTrackFitterImp(propagator, update);
+		return fitter;
+	} else
+	if (name == "kalman_smoother") {
 		fitter = new CbmLitKalmanSmoother();
 		return fitter;
 	}
+
 	return fitter;
 }
 
@@ -145,79 +136,66 @@ CbmLitTrackSelection* CbmLitToolFactory::CreateTrackSelection(
 		const std::string& name)
 {
 	CbmLitTrackSelection* selection = NULL;
-	if(name == "Empty") {
+	if(name == "empty") {
 		selection = new CbmLitTrackSelectionEmpty();
 		selection->Initialize();
 		return selection;
 	} else
-	if(name == "Momentum") {
+	if(name == "momentum") {
 		CbmLitTrackSelectionMomentum* momSelection = new CbmLitTrackSelectionMomentum();
 		momSelection->SetMinMomentum(0.1);
 		momSelection->Initialize();
 		return momSelection;
 	} else
-	if(name == "MomentumSeed") {
+	if(name == "momentum_seed") {
 		CbmLitTrackSelectionMomentum* momSelection = new CbmLitTrackSelectionMomentum();
 		momSelection->SetMinMomentum(1.5);
 		momSelection->Initialize();
 		return momSelection;
-	} else	
-	if(name == "Chi2") {
+	} else
+	if(name == "chi_square") {
 		CbmLitTrackSelectionChiSq* chiSqSelection = new CbmLitTrackSelectionChiSq();
 		chiSqSelection->SetMaxChiSq(30);
 		chiSqSelection->Initialize();
 		return chiSqSelection;
-	} else
-	if (name == "MuchRobustSelection") {
-		CbmLitTrackFitter* robustFitter = CreateTrackFitter("MuchRobust");
-		CbmLitTrackFitter* fitter = CreateTrackFitter("Much");
-		CbmLitTrackFitter* smoother = CreateTrackFitter("Smoother");
-		selection = new CbmLitRobustSelection(robustFitter, fitter, smoother);
-		selection->Initialize();
-		return selection;
-	} else 
-	if (name == "MuchRobust") {
-		selection = new CbmLitTrackSelectionMuchRobust();
-		selection->Initialize();
-		return selection;
-	} else 
-	if(name == "MuchFinal") {
+	}
+	if(name == "much_final") {
 		CbmLitTrackSelectionMuch* muchSelection = new CbmLitTrackSelectionMuch();
 		muchSelection->SetNofSharedHits(2);
 		Int_t nofStations = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofStationGroups();
 		muchSelection->SetMinLastPlaneId(nofStations-1);
 		Int_t nofLayers = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofPlanes();
 		muchSelection->SetMinNofHits(1);
-		muchSelection->Initialize(); 
+		muchSelection->Initialize();
 		return muchSelection;
-	} else 
-	if(name == "MuchPreFinal") {
+	} else
+	if(name == "much_pre_final") {
 		CbmLitTrackSelectionD* muchSelection = new CbmLitTrackSelectionD();
 		Int_t nofStations = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofStationGroups();
 		muchSelection->SetMinLastPlaneId(nofStations-1);
 		Int_t nofLayers = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofPlanes();
 		muchSelection->SetMinNofHits(nofLayers - 3);
-		muchSelection->Initialize(); 
+		muchSelection->Initialize();
 		return muchSelection;
-	} else 	
-	if(name == "TrdStation") {
+	} else
+	if(name == "trd_station") {
 		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
 		trdSelection->SetNofSharedHits(2);
 		trdSelection->SetMinNofHits(2);
 		trdSelection->SetMinLastPlaneId(0);
-		trdSelection->Initialize(); 
+		trdSelection->Initialize();
 		return trdSelection;
 	} else
-	if(name == "TrdFinal") {
+	if(name == "trd_final") {
 		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
 		trdSelection->SetNofSharedHits(2);
 		trdSelection->SetMinNofHits(2);
 		Int_t nofStationGroups = CbmLitEnvironment::Instance()->GetTrdLayout().GetNofStationGroups();
 		trdSelection->SetMinLastPlaneId(nofStationGroups-1);
-		trdSelection->Initialize(); 
+		trdSelection->Initialize();
 		return trdSelection;
 	}
 	return selection;
 }
-	
+
 ClassImp(CbmLitToolFactory)

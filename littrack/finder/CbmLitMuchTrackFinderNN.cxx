@@ -1,42 +1,41 @@
-#include "CbmLitMuchTrackFinderRobust.h"
-
+#include "CbmLitMuchTrackFinderNN.h"
 #include "CbmLitToolFactory.h"
-#include "CbmLitMemoryManagment.h"
 #include "CbmLitConverter.h"
 #include "CbmLitEnvironment.h"
+#include "CbmLitMemoryManagment.h"
 
 #include "TClonesArray.h"
 
-#include <iostream>
 #include <algorithm>
 
-CbmLitMuchTrackFinderRobust::CbmLitMuchTrackFinderRobust()
+CbmLitMuchTrackFinderNN::CbmLitMuchTrackFinderNN()
 {
 }
 
-CbmLitMuchTrackFinderRobust::~CbmLitMuchTrackFinderRobust()
+CbmLitMuchTrackFinderNN::~CbmLitMuchTrackFinderNN()
 {
 }
 
-void CbmLitMuchTrackFinderRobust::Init()
+void CbmLitMuchTrackFinderNN::Init()
 {
 	DefaultInit();
 
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fPropagatorToDet =fPropagator = factory->CreateTrackPropagator("lit");
+	fPropagator = factory->CreateTrackPropagator("lit");
 	fSeedSelection = factory->CreateTrackSelection("momentum_seed");
-	fFinalSelection = factory->CreateTrackSelection("empty");
+	fFinalSelection = factory->CreateTrackSelection("much_final");
+	fFilter = factory->CreateTrackUpdate("kalman");
 
 	fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
 
 	fVerbose = 1;
 	fNofIter = 1;
 	fMaxNofMissingHits = 1;
-	fSigmaCoef = 3.5;
+	fSigmaCoef = 3.;
 	fPDG = 13;
 }
 
-Int_t CbmLitMuchTrackFinderRobust::DoFind(
+Int_t CbmLitMuchTrackFinderNN::DoFind(
 		TClonesArray* hitArray,
 		TClonesArray* trackArray)
 {
@@ -47,7 +46,7 @@ Int_t CbmLitMuchTrackFinderRobust::DoFind(
 	CbmLitConverter::MuchHitArrayToHitVector(hitArray, hits);
 	DefaultCreateTrackSeeds(fTrackSeedsArray, trackSeeds, fLayout, fPDG);
 
-	CbmLitTrackFinderRobust::DoFind(hits, trackSeeds, foundTracks);
+	CbmLitTrackFinderNN::DoFind(hits, trackSeeds, foundTracks);
 
 	CbmLitConverter::TrackVectorToMuchTrackArray(foundTracks, trackArray);
 
@@ -61,4 +60,4 @@ Int_t CbmLitMuchTrackFinderRobust::DoFind(
 	return trackArray->GetEntriesFast();
 }
 
-ClassImp(CbmLitMuchTrackFinderRobust);
+ClassImp(CbmLitMuchTrackFinderNN);

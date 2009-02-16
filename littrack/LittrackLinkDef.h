@@ -5,7 +5,7 @@
 #pragma link off all functions;
 
 //ana
-#pragma link C++ class  CbmLitPropAna+;
+#pragma link C++ class  CbmLitPropagationAnalysis+;
 #pragma link C++ class  CbmLitElossAna+;
 #pragma link C++ class  CbmLitRobustAna+;
 
@@ -35,13 +35,16 @@
 
 // finder
 #pragma link C++ class  CbmLitTrackFinderRobust+;
-#pragma link C++ class  CbmLitTrdTrackFinderSts+;
+#pragma link C++ class  CbmLitTrdTrackFinderBranch+;
 #pragma link C++ class  CbmLitTrdTrackFinderS+;
 #pragma link C++ class  CbmLitMuchTrackFinderBranch+;
 #pragma link C++ class  CbmLitMuchTrackFinderRobust+;
 #pragma link C++ class  CbmLitTrdTrackFinderRobust+;
 #pragma link C++ class  CbmLitTrackFinderBase+;
 #pragma link C++ class  CbmLitTrackFinderBranch+;
+#pragma link C++ class  CbmLitStsBasedTrackFinder+;
+#pragma link C++ class  CbmLitTrackFinderNN+;
+#pragma link C++ class  CbmLitMuchTrackFinderNN+;
 //#pragma link C++ class  CbmLitMuchTrackFinderTrigger+;
 
 //fitter
@@ -68,7 +71,8 @@
 #pragma link C++ class  CbmLitTrackPropagatorGeane+;
 #pragma link C++ class  CbmLitGeoNavigatorImp+;
 #pragma link C++ class  CbmLitMaterialInfo+;
-#pragma link C++ class CbmLitMaterialEffectsImp+;
+#pragma link C++ class  CbmLitMaterialEffectsImp+;
+#pragma link C++ class  CbmLitCleverTrackExtrapolator+;
 
 //qa
 #pragma link C++ class  CbmLitRecQa+;

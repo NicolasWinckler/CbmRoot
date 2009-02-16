@@ -15,7 +15,7 @@ CbmPropagatorGeane::CbmPropagatorGeane():
    fPropagator = new FairGeanePro();
 }
 
-CbmPropagatorGeane::~CbmPropagatorGeane() 
+CbmPropagatorGeane::~CbmPropagatorGeane()
 {
 	if (fPropagator) delete fPropagator;
 }
@@ -31,65 +31,65 @@ StatusCode CbmPropagatorGeane::Propagate(
 }
 
 StatusCode CbmPropagatorGeane::Propagate(
-		FairTrackParam *par, 
+		FairTrackParam *par,
         Double_t zOut,
         Int_t pdg)
 {
 	if (std::fabs(zOut - par->GetZ()) < 0.01) return kCBMSUCCESS;
 	if (!IsInParCorrect(par)) return kCBMERROR;
-	
+
    // covariance matrix for GEANE
    std::vector<Double_t> cov(15);
    std::vector<Double_t> gCov(15);
    // fill GEANE covariant matrix
    par->CovMatrix(&cov[0]);
    ToGeaneCovMatrix(cov, gCov);
- 
+
    TVector3 v1(1, 0, 0);
-   TVector3 v2(0, 1, 0);    
+   TVector3 v2(0, 1, 0);
    Bool_t result1 = fPropagator->PropagateFromPlane(v1, v2);
-   
+
    // input parameter for the tracking
-   // the input parameter is defined in the xy plane 
+   // the input parameter is defined in the xy plane
    // which is perpendicular to z axes with origin at Z.
    // In this case X=V, Y=W
    FairTrackParP parStart(par->GetX(), par->GetY(),
-                         par->GetTx(), par->GetTy(), 
-                         par->GetQp(), &gCov[0], 
-                         TVector3(0, 0, par->GetZ()), 
+                         par->GetTx(), par->GetTy(),
+                         par->GetQp(), &gCov[0],
+                         TVector3(0, 0, par->GetZ()),
                          TVector3(1, 0, 0), TVector3(0, 1, 0), 1);
-     
+
    // output track parameter
-   FairTrackParP parEnd; 
-  
+   FairTrackParP parEnd;
+
    // plane to which propagate
    // the plane is perpendicular to z axes
    TVector3 v0(0, 0, zOut);
    Bool_t result2 = fPropagator->PropagateToPlane(v0, v1, v2);
-         
+
 //   pdg code of the particle,
-//   +/- 13 muon code 
+//   +/- 13 muon code
 //   pdg = 13;
 //   if (par->GetQp() > 0) pdg = -13;
 
-   // FairGeanePro is used to propagate the track parameters
+   // CbmGeanePro is used to propagate the track parameters
    Bool_t propResult;
    propResult = fPropagator->Propagate(&parStart, &parEnd, pdg);
-   
+
    // if propagation fails
    if (!propResult) {
 	   //std::cout << "PROPAGATION FAILED!!!!" <<std::endl;
 	   return kCBMERROR;
    }
-     
-   // fill the CBM track parameter representation 
+
+   // fill the CBM track parameter representation
    par->SetX(parEnd.GetV());
    par->SetY(parEnd.GetW());
    par->SetZ(zOut);//parEnd.GetZ());
    par->SetTx(parEnd.GetTV());
    par->SetTy(parEnd.GetTW());
    par->SetQp(parEnd.GetQp());
-   
+
    // fill and reorder covariant matrix
    std::vector<Double_t> covEnd(15);
    std::vector<Double_t> gCovEnd(15);
@@ -99,7 +99,7 @@ StatusCode CbmPropagatorGeane::Propagate(
 
    //std::cout << "out:";
    //pParam->Print();
-   
+
    return kCBMSUCCESS;
 }
 
@@ -120,7 +120,7 @@ void CbmPropagatorGeane::ToGeaneCovMatrix(
 		std::vector<Double_t>& gCov) const
 {
 	// reorder covariant matrix elements CBM->GEANE
-	// for CBM diagonal elements in the following order: 
+	// for CBM diagonal elements in the following order:
 	// [0]=DX, [5]=DY, [9]=DTx, [12]=DTy, [14]=DQp
 	// and for the GEANE:
 	// [0]=DQp, [5]=DTv, [9]=DTw, [12]=DV, [14]=DW

@@ -291,7 +291,7 @@ Bool_t CbmLitTrackFinderBranch::AddTrackCandidate(
 		if (fNofBranches++ > fMaxNofBranches) return false;
 		CbmLitTrack* newTrack = new CbmLitTrack(**it);
 		newTrack->SetLastPlaneId(stationGroup);
-		newTrack->SetNDF(NDF(newTrack->GetNofHits()));
+		newTrack->SetNDF(NDF(newTrack));
 		fFoundTracks.push_back(newTrack);
 	}
 	return true;

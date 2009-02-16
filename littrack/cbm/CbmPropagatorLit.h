@@ -14,27 +14,27 @@ public:
 	CbmPropagatorLit(
 			const std::string& type);
 	virtual ~CbmPropagatorLit();
-	
-    virtual StatusCode Propagate( 
+
+    virtual StatusCode Propagate(
 		   const FairTrackParam *parIn,
            FairTrackParam *parOut,
            Double_t zOut,
            Int_t pdg);
-    
-    virtual StatusCode Propagate( 
-		   FairTrackParam *par, 
+
+    virtual StatusCode Propagate(
+		   FairTrackParam *par,
            Double_t zOut,
            Int_t pdg);
-   
+
     virtual void TransportMatrix(
 		   std::vector<Double_t>& F);
 
     virtual void TransportMatrix(
 		   TMatrixD& F);
-   
+
 private:
     CbmLitTrackPropagator* fPropagator;
-   
+
    ClassDef(CbmPropagatorLit, 1);
 };
 

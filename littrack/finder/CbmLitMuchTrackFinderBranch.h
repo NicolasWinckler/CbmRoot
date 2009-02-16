@@ -5,6 +5,7 @@
 #include "CbmLitTrackFinderBranch.h"
 #include "CbmLitTypes.h"
 #include "CbmLitDetectorLayout.h"
+#include "CbmLitStsBasedTrackFinder.h"
 
 #include <vector>
 
@@ -14,29 +15,20 @@ class CbmLitPixelHit;
 class TClonesArray;
 
 class CbmLitMuchTrackFinderBranch : public CbmMuchTrackFinder,
-									private CbmLitTrackFinderBranch
+									private CbmLitTrackFinderBranch,
+									private CbmLitStsBasedTrackFinder
 {
 public:
 	CbmLitMuchTrackFinderBranch();
 	virtual ~CbmLitMuchTrackFinderBranch();
-	
 
     virtual void Init();
-    
+
     virtual Int_t DoFind(
     		TClonesArray* hitArray,
             TClonesArray* trackArray);
-private:
-	
-	TClonesArray* fTrackSeedsArray;
-	  
-	CbmLitTrackPropagator* fPropagatorToDet;
-    
-	void CreateTrackSeeds(
-    		TClonesArray* trackArray,
-    		TrackPtrVector& trackSeeds);
-	
-	ClassDef(CbmLitMuchTrackFinderBranch, 1);	
+
+	ClassDef(CbmLitMuchTrackFinderBranch, 1);
 };
 
 #endif /*CBMLITMUCHTRACKFINDERBRANCH_H_*/

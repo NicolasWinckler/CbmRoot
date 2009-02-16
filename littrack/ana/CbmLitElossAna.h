@@ -26,37 +26,37 @@ public:
     virtual void Finish();
 
     virtual void SetParContainers();
-  
+
 private:
-	
+
 	void GetGeometry();
-	
-	Double_t CalcLitELoss( 
+
+	Double_t CalcLitELoss(
 	          const CbmLitTrackParam* par,
 	          const CbmLitMaterialInfo* mat) const;
-	          
-	Double_t CalcBBLoss( 
+
+	Double_t CalcBBLoss(
 	          const CbmLitTrackParam* par,
 	          const CbmLitMaterialInfo* mat) const;
-	
-	Double_t CalcBBLossSimple( 
+
+	Double_t CalcBBLossSimple(
 	          const CbmLitTrackParam* par,
 	          const CbmLitMaterialInfo* mat) const;
-	
-	Double_t CalcSigmaQp( 
+
+	Double_t CalcSigmaQp(
 	          const CbmLitTrackParam* par,
 	          const CbmLitMaterialInfo* mat) const;
-	
-	Double_t CalcTheta( 
+
+	Double_t CalcTheta(
 	          const CbmLitTrackParam* par,
 	          const CbmLitMaterialInfo* mat) const;
-	
+
 	Double_t dE(
 			CbmMuchPoint* point);
-	
+
 	Double_t Length(
 			CbmMuchPoint* point);
-	
+
     TClonesArray* fMCTrackArray;
     TClonesArray* fMCPointArray;
 
@@ -64,20 +64,20 @@ private:
     TH1F* fh_eloss_lit;
     TH1F* fh_eloss_bb;
     TH1F* fh_eloss_bb_simple;
-    TH1F* fh_eloss_mpv; 
+    TH1F* fh_eloss_mpv;
     TH1F* fh_qp_err_mc;
-    TH1F* fh_qp_err_calc;    
-    TH1F* fh_pull_qp; 
-    
+    TH1F* fh_qp_err_calc;
+    TH1F* fh_pull_qp;
+
     TH2F* fhm_eloss_mc;
     TH2F* fhm_eloss_lit;
     TH2F* fhm_eloss_bb;
     TH2F* fhm_eloss_bb_simple;
     TH2F* fhm_eloss_mpv;
     TH2F* fhm_qp_err_mc;
-    TH2F* fhm_qp_err_calc;    
-    TH2F* fhm_pull_qp; 
-    
+    TH2F* fhm_qp_err_calc;
+    TH2F* fhm_pull_qp;
+
     TH1F* fh_theta_mc;
     TH1F* fh_theta_calc;
     TH2F* fhm_theta_mc;
@@ -85,7 +85,7 @@ private:
 
     CbmLitMaterialInfo fMaterial;
     CbmLitMaterialEffectsImp* fMatEff;
-    
+
     Int_t fNEvents;
 
     ClassDef(CbmLitElossAna,1);

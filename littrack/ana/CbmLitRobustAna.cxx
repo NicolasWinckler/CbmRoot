@@ -22,11 +22,10 @@ CbmLitRobustAna::CbmLitRobustAna()
 CbmLitRobustAna::~CbmLitRobustAna()
 {
 	WriteToFile();
-	
+
 	if (fInstance != NULL) delete fInstance;
 	fHistoList->Delete();
 	delete fHistoList;
-	std::cout << "CbmLitRobustAna::::~CbmLitRobustAna distructor has been launched" << std::endl;
 }
 
 CbmLitRobustAna* CbmLitRobustAna::Instance()
@@ -67,13 +66,13 @@ void CbmLitRobustAna::FillErrFit(
 {
 	fhEFIter->Fill(iter);
 	fhEFNofHits->Fill(track->GetNofHits());
-	fhEFIterNofHits->Fill(iter, track->GetNofHits());	
+	fhEFIterNofHits->Fill(iter, track->GetNofHits());
 }
 
 void CbmLitRobustAna::CreateHistos()
 {
 	fHistoList = new TList();
-	
+
 	Int_t nofBinsStation = 20;
 	Int_t minStation = 0;
 	Int_t maxStation = 20;
@@ -96,18 +95,18 @@ void CbmLitRobustAna::CreateHistos()
 	fhIterWeight = new TH2D("hIterWeight", "iteration vs. weight",
 			nofBinsIter, minIter, maxIter, nofBinsWeight, minWeight, maxWeight);
 	fHistoList->Add(fhStationNofHits);
-	fHistoList->Add(fhIterChi2);	
-	fHistoList->Add(fhIterWeight);	
-	
+	fHistoList->Add(fhIterChi2);
+	fHistoList->Add(fhIterWeight);
+
 	fhEFIter = new TH1D("hEFIter", "iteration (error fit)",
 			nofBinsIter, minIter, maxIter);
 	fhEFNofHits = new TH1D("hEFNofHits", "nof hits (error fit)",
 			nofBinsNofHits, minNofHits, maxNofHits);
 	fhEFIterNofHits = new TH2D("hEFIterNofHits", "iteration vs. nof hits (error fit)",
 			nofBinsIter, minIter, maxIter, nofBinsNofHits, minNofHits, maxNofHits);
-	fHistoList->Add(fhEFIter);	
+	fHistoList->Add(fhEFIter);
 	fHistoList->Add(fhEFNofHits);
-	fHistoList->Add(fhEFIterNofHits);	
+	fHistoList->Add(fhEFIterNofHits);
 }
 
 void CbmLitRobustAna::WriteToFile()

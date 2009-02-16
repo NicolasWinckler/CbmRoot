@@ -22,7 +22,7 @@ CbmLitTrackPropagatorGeane::CbmLitTrackPropagatorGeane():
    fPropagator = new CbmPropagatorGeane();
 }
 
-CbmLitTrackPropagatorGeane::~CbmLitTrackPropagatorGeane() 
+CbmLitTrackPropagatorGeane::~CbmLitTrackPropagatorGeane()
 {
 	if (fPropagator) delete fPropagator;
 }
@@ -54,13 +54,13 @@ LitStatus CbmLitTrackPropagatorGeane::Propagate(
 {
 	FairTrackParam param;
 	StatusCode result;
-	
+
 	CbmLitConverter::LitTrackParamToTrackParam(par, &param);
-	
+
 	if (pdg == 13) pdg = (par->GetQp() > 0) ? 13 : -13;
-	
+
 	result = fPropagator->Propagate(&param, zOut, pdg);
-	
+
 	if (result == kCBMSUCCESS) {
 		CbmLitConverter::TrackParamToLitTrackParam(&param, par);
 		return kLITSUCCESS;

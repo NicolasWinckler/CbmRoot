@@ -1,15 +1,21 @@
-#ifndef CBMLITTRACKFINDERROBUST_H_
-#define CBMLITTRACKFINDERROBUST_H_
+#ifndef CBMLITTRACKFINDERNN_H_
+#define CBMLITTRACKFINDERNN_H_
 
 #include "CbmLitTrackFinderBase.h"
 
-class CbmLitTrackFinderRobust : public CbmLitTrackFinderBase
+#include "TObject.h"
+
+class CbmLitTrack;
+class CbmLitTrackParam;
+class CbmLitTrackUpdate;
+
+class CbmLitTrackFinderNN : public CbmLitTrackFinderBase
 {
 public:
-	CbmLitTrackFinderRobust();
-	virtual ~CbmLitTrackFinderRobust();
+	CbmLitTrackFinderNN();
+	virtual ~CbmLitTrackFinderNN();
 
-	LitStatus DoFind(
+	virtual LitStatus DoFind(
 			const HitPtrVector& hits,
 			const TrackPtrVector& trackSeeds,
 			TrackPtrVector& tracks);
@@ -17,7 +23,8 @@ public:
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
 
-private:
+protected:
+
 	void FollowTracks(
 			TrackPtrIterator itBegin,
 			TrackPtrIterator itEnd);
@@ -34,11 +41,13 @@ private:
 			Int_t stationGroup,
 			Int_t station);
 
-	Bool_t AddHits(
+	Bool_t AddNearestHit(
 			CbmLitTrack* track,
 			HitPtrIteratorPair bounds);
 
-	ClassDef(CbmLitTrackFinderRobust, 1);
+	CbmLitTrackUpdate* fFilter;
+
+	ClassDef(CbmLitTrackFinderNN, 1);
 };
 
-#endif /*CBMLITTRACKFINDERROBUST_H_*/
+#endif /* CBMLITTRACKFINDERNN_H_ */

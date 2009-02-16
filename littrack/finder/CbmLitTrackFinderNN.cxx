@@ -1,33 +1,34 @@
-#include "CbmLitTrackFinderRobust.h"
-
+#include "CbmLitTrackFinderNN.h"
 #include "CbmLitTrackSelection.h"
-#include "CbmLitTrackPropagator.h"
-#include "CbmLitTrackUpdate.h"
-#include "CbmLitComparators.h"
 #include "CbmLitMemoryManagment.h"
+#include "CbmLitTrack.h"
+#include "CbmLitTrackParam.h"
+#include "CbmLitTrackPropagator.h"
+#include "CbmLitMath.h"
+#include "CbmLitTrackUpdate.h"
 
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 
-CbmLitTrackFinderRobust::CbmLitTrackFinderRobust()
+CbmLitTrackFinderNN::CbmLitTrackFinderNN()
 {
 }
 
-CbmLitTrackFinderRobust::~CbmLitTrackFinderRobust()
+CbmLitTrackFinderNN::~CbmLitTrackFinderNN()
 {
 }
 
-LitStatus CbmLitTrackFinderRobust::Initialize()
-{
-	return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackFinderRobust::Finalize()
+LitStatus CbmLitTrackFinderNN::Initialize()
 {
 	return kLITSUCCESS;
 }
 
-LitStatus CbmLitTrackFinderRobust::DoFind(
+LitStatus CbmLitTrackFinderNN::Finalize()
+{
+	return kLITSUCCESS;
+}
+
+LitStatus CbmLitTrackFinderNN::DoFind(
 		const HitPtrVector& hits,
 		const TrackPtrVector& trackSeeds,
 		TrackPtrVector& tracks)
@@ -54,13 +55,12 @@ LitStatus CbmLitTrackFinderRobust::DoFind(
 		fTracks.clear();
 		fHitData.Clear();
 	}
-
-	std::cout << "-I- CbmLitTrackFinderRobust: " << fEventNo++ << " events processed" << std::endl;
+	std::cout << "-I- CbmLitTrackFinderNN: " << fEventNo++ << " events processed" << std::endl;
 
 	return kLITSUCCESS;
 }
 
-void CbmLitTrackFinderRobust::FollowTracks(
+void CbmLitTrackFinderNN::FollowTracks(
 		TrackPtrIterator itBegin,
 		TrackPtrIterator itEnd)
 {
@@ -69,7 +69,7 @@ void CbmLitTrackFinderRobust::FollowTracks(
 	}
 }
 
-void CbmLitTrackFinderRobust::FollowTrack(
+void CbmLitTrackFinderNN::FollowTrack(
 		CbmLitTrack *track)
 {
 	Int_t nofStationGroups = fLayout.GetNofStationGroups();
@@ -78,7 +78,7 @@ void CbmLitTrackFinderRobust::FollowTrack(
 	}
 }
 
-Bool_t CbmLitTrackFinderRobust::ProcessStationGroup(
+Bool_t CbmLitTrackFinderNN::ProcessStationGroup(
 		CbmLitTrack *track,
 		Int_t stationGroup)
 {
@@ -94,7 +94,7 @@ Bool_t CbmLitTrackFinderRobust::ProcessStationGroup(
 	return true;
 }
 
-Bool_t CbmLitTrackFinderRobust::ProcessStation(
+Bool_t CbmLitTrackFinderNN::ProcessStation(
 		CbmLitTrack *track,
 		Int_t stationGroup,
 		Int_t station)
@@ -107,24 +107,38 @@ Bool_t CbmLitTrackFinderRobust::ProcessStation(
 		fPropagator->Propagate(&par, z, fPDG);
 		track->SetParamLast(&par);
 		HitPtrIteratorPair bounds = MinMaxIndex(&par, stationGroup, station, iSubstation);
-		if (AddHits(track, bounds)) hitAdded = true;
+		if (AddNearestHit(track, bounds)) hitAdded = true;
 	}
 	return hitAdded;
 }
 
-Bool_t CbmLitTrackFinderRobust::AddHits(
+Bool_t CbmLitTrackFinderNN::AddNearestHit(
 		CbmLitTrack* track,
 		HitPtrIteratorPair bounds)
 {
 	Bool_t hitAdded = false;
 	CbmLitTrackParam par(*track->GetParamLast()), uPar, param;
+	HitPtrIterator hit(bounds.second);
+	Double_t chiSq = 1e10;
 	for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
 		if (IsIn(&par, *iHit)) {
-			track->AddHit(*iHit);
-			hitAdded = true;
+			fFilter->Update(&par, &uPar, *iHit);
+			Double_t chi = ChiSq(&uPar, *iHit);
+			if (chi < chiSq) {
+				chiSq = chi;
+				hit = iHit;
+				param = uPar;
+			}
 		}
+	}
+	if (hit != bounds.second) {
+		track->AddHit(*hit);
+		track->SetParamLast(&param);
+		track->SetChi2(track->GetChi2() + chiSq);
+		track->SetNDF(NDF(track));
+		hitAdded = true;
 	}
 	return hitAdded;
 }
 
-ClassImp(CbmLitTrackFinderRobust)
+ClassImp(CbmLitTrackFinderNN);

@@ -42,7 +42,7 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(LITTRACK_SRCS_RULECHECKER
 ana/CbmLitElossAna.cxx
-ana/CbmLitPropAna.cxx
+ana/CbmLitPropagationAnalysis.cxx
 ana/CbmLitRobustAna.cxx
 base/CbmLitTool.cxx
 base/CbmLitSubstation.cxx
@@ -64,13 +64,15 @@ data/CbmLitTrackBranch.cxx
 data/CbmLitFitNode.cxx
 #finder/CbmLitMuchTrackFinderTrigger.cxx
 finder/CbmLitTrackFinderRobust.cxx
-finder/CbmLitTrdTrackFinderSts.cxx
+finder/CbmLitTrdTrackFinderBranch.cxx
 finder/CbmLitTrdTrackFinderS.cxx
 finder/CbmLitMuchTrackFinderBranch.cxx
 finder/CbmLitMuchTrackFinderRobust.cxx
 finder/CbmLitTrdTrackFinderRobust.cxx
 finder/CbmLitTrackFinderBase.cxx
 finder/CbmLitTrackFinderBranch.cxx
+finder/CbmLitTrackFinderNN.cxx
+finder/CbmLitMuchTrackFinderNN.cxx
 fitter/CbmLitTrackFitterImp.cxx
 fitter/CbmLitKalmanFilter.cxx
 fitter/CbmLitTrackFitterRobust.cxx
@@ -91,6 +93,7 @@ propagation/CbmLitTrackPropagatorGeane.cxx
 propagation/CbmLitGeoNavigatorImp.cxx
 propagation/CbmLitMaterialInfo.cxx
 propagation/CbmLitMaterialEffectsImp.cxx
+propagation/CbmLitCleverTrackExtrapolator.cxx
 qa/CbmLitRecQa.cxx
 robust/CbmLitEffHitCalculatorImp.cxx
 robust/CbmLitWeightCalculatorSimple.cxx

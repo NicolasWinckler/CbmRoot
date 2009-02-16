@@ -29,19 +29,19 @@ StatusCode CbmPropagatorLit::Propagate(
 }
 
 StatusCode CbmPropagatorLit::Propagate(
-		FairTrackParam *par, 
+		FairTrackParam *par,
         Double_t zOut,
         Int_t pdg)
 {
    CbmLitTrackParam param;
    LitStatus result;
-   
+
    CbmLitConverter::TrackParamToLitTrackParam(par, &param);
-   
+
    result = fPropagator->Propagate(&param, zOut, pdg);
-   
+
    if (result == kLITSUCCESS) {
-	   CbmLitConverter::LitTrackParamToTrackParam(&param, par);   
+	   CbmLitConverter::LitTrackParamToTrackParam(&param, par);
 	   return kCBMSUCCESS;
    } else {
 	   return kCBMERROR;

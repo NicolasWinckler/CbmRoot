@@ -31,27 +31,27 @@ LitStatus CbmLitKalmanSmoother::Fit(
 		Bool_t downstream)
 {
 	Int_t n = track->GetNofHits();
-	
+
 	std::vector<CbmLitFitNode> nodes = track->GetFitNodes();
 	nodes[n-1].SetSmoothedParam(nodes[n-1].GetUpdatedParam());
 
-	// start with the before the last detector plane 
-	for (Int_t i = n - 1; i > 0; i--) {	
+	// start with the before the last detector plane
+	for (Int_t i = n - 1; i > 0; i--) {
 		Smooth(&nodes[i - 1], &nodes[i]);
 	}
-	
+
 	// Calculate the chi2 of the track
 	track->SetChi2(0.0);
-	for (Int_t i = 0; i < n; i++) {	
+	for (Int_t i = 0; i < n; i++) {
 		Double_t chi2Hit = ChiSq(nodes[i].GetSmoothedParam(), track->GetHit(i));
 		nodes[i].SetChiSqSmoothed(chi2Hit);
-		track->SetChi2(track->GetChi2() + chi2Hit); 
+		track->SetChi2(track->GetChi2() + chi2Hit);
 	}
-    
-	track->SetParamFirst(nodes[0].GetSmoothedParam());	
+
+	track->SetParamFirst(nodes[0].GetSmoothedParam());
 	track->SetFitNodes(nodes);
-	track->SetNDF(NDF(n));
-	
+	track->SetNDF(NDF(track));
+
 	return kLITSUCCESS;
 }
 
@@ -64,38 +64,38 @@ void CbmLitKalmanSmoother::Smooth(
 	TMatrixDSym invPrevPredC(5);
 	prevNode->GetPredictedParam()->GetCovMatrix(invPrevPredC);
 	invPrevPredC.Invert();
-	
+
 	TMatrixD Ft(5, 5);
 	prevNode->GetF(Ft);
 	Ft.T();
-	
+
 	TMatrixDSym thisUpdC(5);
 	thisNode->GetUpdatedParam()->GetCovMatrix(thisUpdC);
-	
+
 	TMatrixD A(5, 5);
 	A = thisUpdC * Ft * invPrevPredC;
-	
+
 	TVectorD thisUpdX(5), prevSmoothedX(5), prevPredX(5);
-	thisNode->GetUpdatedParam()->GetStateVector(thisUpdX);		
+	thisNode->GetUpdatedParam()->GetStateVector(thisUpdX);
 	prevNode->GetSmoothedParam()->GetStateVector(prevSmoothedX);
 	prevNode->GetPredictedParam()->GetStateVector(prevPredX);
-	
+
 	TVectorD thisSmoothedX(thisUpdX + A * (prevSmoothedX - prevPredX));
-	
+
 	TMatrixDSym prevSmoothedC(5), prevPredC(5), Cdiff(5);
 	prevNode->GetSmoothedParam()->GetCovMatrix(prevSmoothedC);
 	prevNode->GetPredictedParam()->GetCovMatrix(prevPredC);
 	Cdiff = prevSmoothedC - prevPredC;
-	
+
 	TMatrixDSym thisSmoothedC(5);
 	thisSmoothedC = thisUpdC + Cdiff.Similarity(A);
-	
+
 	CbmLitTrackParam par;
-	
+
 	par.SetStateVector(thisSmoothedX);
 	par.SetCovMatrix(thisSmoothedC);
 	par.SetZ(thisNode->GetUpdatedParam()->GetZ());
-	
+
 	thisNode->SetSmoothedParam(&par);
 }
 

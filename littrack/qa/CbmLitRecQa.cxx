@@ -37,14 +37,14 @@ CbmLitRecQa::CbmLitRecQa(
   fNormType(1)
 {
 	ZeroGlobalCounters();
-	fNN.open("much_rec_qa_ghost_clones.txt");
+//	fNN.open("much_rec_qa_ghost_clones.txt");
 }
 
 CbmLitRecQa::~CbmLitRecQa()
 {
   fHistoList->Delete();
   delete fHistoList;
-  fNN.close();
+//  fNN.close();
 }
 
 void CbmLitRecQa::SetParContainers()
@@ -55,7 +55,7 @@ void CbmLitRecQa::SetParContainers()
 InitStatus CbmLitRecQa::Init()
 {
     FairRootManager* ioman = FairRootManager::Instance();
-    if (NULL == ioman) Fatal("Init","FairRootManager is not instantiated");
+    if (NULL == ioman) Fatal("Init","CbmRootManager is not instantiated");
 
     fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
     if (NULL == fMCTracks) Fatal("Init","No MCTrack array!");
@@ -422,11 +422,11 @@ void CbmLitRecQa::FillTrackParams(
 		fhLastPlaneIdGhost->Fill(lastPlaneId);
 		fhMomChi2Ghost->Fill(p, chi2);
 	}
-	Int_t type_int;
-	if (type == "ghost") type_int = -1; else type_int = 1;
-	fNN << chi2 << " " << p << " " << nofHits << " "
-	    << radialPos << " " << lastPlaneId << " "
-	    << type_int << std::endl;
+//	Int_t type_int;
+//	if (type == "ghost") type_int = -1; else type_int = 1;
+//	fNN << chi2 << " " << p << " " << nofHits << " "
+//	    << radialPos << " " << lastPlaneId << " "
+//	    << type_int << std::endl;
 }
 
 void CbmLitRecQa::FillTrackParams(
@@ -455,11 +455,11 @@ void CbmLitRecQa::FillTrackParams(
 		fhLastPlaneIdGhost->Fill(lastPlaneId);
 		fhMomChi2Ghost->Fill(p, chi2);
 	}
-	Int_t type_int;
-	if (type == "ghost") type_int = -1; else type_int = 1;
-	fNN << chi2 << " " << p << " " << nofHits << " "
-	    << radialPos << " " << lastPlaneId << " "
-	    << type_int << std::endl;
+//	Int_t type_int;
+//	if (type == "ghost") type_int = -1; else type_int = 1;
+//	fNN << chi2 << " " << p << " " << nofHits << " "
+//	    << radialPos << " " << lastPlaneId << " "
+//	    << type_int << std::endl;
 }
 
 void CbmLitRecQa::CreateHistos()

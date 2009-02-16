@@ -79,10 +79,10 @@ FairField* CbmLitEnvironment::GetField()
 CbmLitDetectorLayout CbmLitEnvironment::GetMuchLayout()
 {
 	if ((TGeoNode*) gGeoManager->GetTopNode()->GetNodes()->FindObject("much1_0") != NULL){
-		std::cout << "OLD MUCH GEOMETRY!!!" << std::endl;
+//		std::cout << "OLD MUCH GEOMETRY!!!" << std::endl;
 		return GetOldMuchLayout();
 	} else {
-		std::cout << "NEW MUCH GEOMETRY!!!" << std::endl;
+//		std::cout << "NEW MUCH GEOMETRY!!!" << std::endl;
 		return GetNewMuchLayout();
 	}
 }
@@ -302,7 +302,7 @@ bool CbmLitEnvironment::IsStraw() const
 {
 	FairRunAna* ana = FairRunAna::Instance();
 	FairRuntimeDb* rtdb = ana->GetRuntimeDb();
-	FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
+	FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("CbmBaseParSet");
 	TObjArray *detList = baseParSet->GetDetList();
 	FairDetector* much = (FairDetector*) detList->FindObject("MUCH");
 	TString name = much->GetGeometryFileName();
@@ -318,7 +318,7 @@ bool CbmLitEnvironment::IsTrdSegmented() const
 {
 	FairRunAna* ana = FairRunAna::Instance();
 	FairRuntimeDb* rtdb = ana->GetRuntimeDb();
-	FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
+	FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("CbmBaseParSet");
 	TObjArray *detList = baseParSet->GetDetList();
 	FairDetector* much = (FairDetector*) detList->FindObject("TRD");
 	TString name = much->GetGeometryFileName();

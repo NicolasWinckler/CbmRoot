@@ -23,9 +23,9 @@ CbmLitTrackParam::~CbmLitTrackParam()
 }
 
 void CbmLitTrackParam::GetDirCos(
-		Double_t& nx, 
-		Double_t& ny, 
-		Double_t& nz) const 
+		Double_t& nx,
+		Double_t& ny,
+		Double_t& nz) const
 {
 	Double_t p  = (std::abs(fQp) != 0.) ? 1./std::abs(fQp) : 1.e20;
 	Double_t pz = std::sqrt(p*p / (fTx*fTx + fTy*fTy + 1));
@@ -34,7 +34,7 @@ void CbmLitTrackParam::GetDirCos(
 	TVector3 unit = TVector3(px, py, pz).Unit();
 	nx = unit.X();
 	ny = unit.Y();
-	nz = unit.Z();		
+	nz = unit.Z();
 }
 
 void CbmLitTrackParam::GetCovMatrix(
@@ -45,19 +45,19 @@ void CbmLitTrackParam::GetCovMatrix(
 	C[0][2] = C[2][0] = GetCovariance(2);
 	C[0][3] = C[3][0] = GetCovariance(3);
 	C[0][4] = C[4][0] = GetCovariance(4);
-	
+
 	C[1][1] = GetCovariance(5);
 	C[1][2] = C[2][1] = GetCovariance(6);
 	C[1][3] = C[3][1] = GetCovariance(7);
 	C[1][4] = C[4][1] = GetCovariance(8);
-	
+
 	C[2][2] = GetCovariance(9);
 	C[2][3] = C[3][2] = GetCovariance(10);
 	C[2][4] = C[4][2] = GetCovariance(11);
-	
+
 	C[3][3] = GetCovariance(12);
 	C[3][4] = C[4][3] = GetCovariance(13);
-	
+
 	C[4][4] = GetCovariance(14);
 }
 
@@ -89,24 +89,24 @@ void CbmLitTrackParam::SetCovMatrix(
 	SetCovariance(2, C[0][2]);
 	SetCovariance(3, C[0][3]);
 	SetCovariance(4, C[0][4]);
-	
+
 	SetCovariance(5, C[1][1]);
 	SetCovariance(6, C[1][2]);
 	SetCovariance(7, C[1][3]);
 	SetCovariance(8, C[1][4]);
-	
+
 	SetCovariance(9, C[2][2]);
 	SetCovariance(10, C[2][3]);
 	SetCovariance(11, C[2][4]);
-	
+
 	SetCovariance(12, C[3][3]);
 	SetCovariance(13, C[3][4]);
-	
+
 	SetCovariance(14, C[4][4]);
 }
 
 void CbmLitTrackParam::SetStateVector(
-		const TVectorD& x) 
+		const TVectorD& x)
 {
 	SetX(x[0]);
 	SetY(x[1]);
@@ -116,7 +116,7 @@ void CbmLitTrackParam::SetStateVector(
 }
 
 void CbmLitTrackParam::SetStateVector(
-		const std::vector<Double_t>& x) 
+		const std::vector<Double_t>& x)
 {
 	SetX(x[0]);
 	SetY(x[1]);
@@ -128,11 +128,11 @@ void CbmLitTrackParam::SetStateVector(
 std::string CbmLitTrackParam::ToString() const
 {
 	std::stringstream ss;
-	ss << "TrackParam: pos=(" << fX << "," << fY << "," << fZ 
-    	      << ") tx=" << fTx << " ty=" << fTy << " qp=" << fQp << std::endl;    	
-//	ss << "cov: ";
-//	for (Int_t i = 0; i < 15; i++) ss << fCovMatrix[i] << " ";
-//	ss << std::endl;
+	ss << "TrackParam: pos=(" << fX << "," << fY << "," << fZ
+    	      << ") tx=" << fTx << " ty=" << fTy << " qp=" << fQp << std::endl;
+	ss << "cov: ";
+	for (Int_t i = 0; i < 15; i++) ss << fCovMatrix[i] << " ";
+	ss << std::endl;
 	return ss.str();
 }
 

@@ -10,22 +10,22 @@
 #include "CbmLitComparators.h"
 #include "CbmLitWeightCalculatorSimple.h"
 #include "CbmLitEffHitCalculatorImp.h"
-#include "CbmLitRobustAna.h"
+//#include "CbmLitRobustAna.h"
 
 #include <vector>
-#include <cmath> 
+#include <cmath>
 #include <iostream>
 
 CbmLitTrackFitterRobust::CbmLitTrackFitterRobust(
 		CbmLitTrackFitter* fitter,
 		CbmLitTrackFitter* smoother)
-{   
+{
 	fFitter = fitter;
 	fSmoother = smoother;
 	//fWeightCalc = new CbmLitWeightCalculatorSimple;
 	fWeightCalcSimple = new CbmLitWeightCalculatorSimple;
 	fEffHitCalc = new CbmLitEffHitCalculatorImp;
-	
+
 	//track fit parameters
 	fNofIterations = 2;
 	// was 0, 81, 9, 4, 1, 1, 1
@@ -35,7 +35,7 @@ CbmLitTrackFitterRobust::CbmLitTrackFitterRobust(
 	fAnnealing.push_back(4.);
 	fAnnealing.push_back(1.);
 	fAnnealing.push_back(1.);
-	fOutlierCut = 1e-20;	
+	fOutlierCut = 1e-20;
 }
 
 CbmLitTrackFitterRobust::~CbmLitTrackFitterRobust()
@@ -59,8 +59,8 @@ LitStatus CbmLitTrackFitterRobust::Fit(
 		CbmLitTrack *track,
 		Bool_t downstream)
 {
-	CbmLitRobustAna::Instance()->Fill(track);
-	
+//	CbmLitRobustAna::Instance()->Fill(track);
+
 	track->SortHits();
 	std::vector<HitPtrIteratorPair> bounds;
 	track->GetHitBounds(bounds);
@@ -72,30 +72,25 @@ LitStatus CbmLitTrackFitterRobust::Fit(
 	for(Int_t iter = 0; iter < fNofIterations; iter++){
 		if (CreateEffTrack(bounds, iter, &etrack) == kLITERROR) {
 			return kLITERROR;
-		}	
-		
+		}
+
 		if (CheckEffTrack(&etrack) == kLITERROR) {
 			return kLITERROR;
-		}	
-		//std::cout << "before fitter" << std::endl;
+		}
 		if (fFitter->Fit(&etrack) == kLITERROR) {
-			//std::cout << "CbmLitTrackFitterRobust::Fit fitter error" << std::endl;
-			//std::cout << etrack.ToString();
-			//std::cout << etrack.GetParamFirst()->ToString();
-			CbmLitRobustAna::Instance()->FillErrFit(track, iter);
+//			CbmLitRobustAna::Instance()->FillErrFit(track, iter);
 			return kLITERROR;
-		}		
-		//std::cout << "after fitter" << std::endl;
+		}
 
 		if (fSmoother->Fit(&etrack) == kLITERROR) {
 			std::cout << "CbmLitTrackFitterRobust::Fit smoother error" << std::endl;
 			return kLITERROR;
 		}
-		
-		CbmLitRobustAna::Instance()->Fill(&etrack, iter);
-		CbmLitRobustAna::Instance()->FillWeight(track, iter);
+
+//		CbmLitRobustAna::Instance()->Fill(&etrack, iter);
+//		CbmLitRobustAna::Instance()->FillWeight(track, iter);
 	}
-	
+
 	return kLITSUCCESS;
 }
 
@@ -116,7 +111,7 @@ void CbmLitTrackFitterRobust::MarkOutliers(
 		HitPtrIterator itEnd) const
 {
 	for(HitPtrIterator it = itBegin; it != itEnd; it++) {
-		if ((*it)->GetW() < fOutlierCut) (*it)->IsOutlier(true); 
+		if ((*it)->GetW() < fOutlierCut) (*it)->IsOutlier(true);
 	}
 }
 
@@ -125,9 +120,9 @@ LitStatus CbmLitTrackFitterRobust::MultivariateGaussWeight(
 		CbmLitHit* hit,
 		Double_t T) const
 {
-	if (hit->GetType() == kLITSTRIPHIT) 
+	if (hit->GetType() == kLITSTRIPHIT)
 		MultivariateGaussWeight(par, static_cast<const CbmLitStripHit*>(hit), T);
-	else if (hit->GetType() == kLITPIXELHIT) 
+	else if (hit->GetType() == kLITPIXELHIT)
 		MultivariateGaussWeight(par, static_cast<const CbmLitPixelHit*>(hit), T);
 }
 
@@ -146,7 +141,7 @@ LitStatus CbmLitTrackFitterRobust::MultivariateGaussWeight(
 {
 	Double_t dim = 2.;
 	const Double_t PI = 3.14159265;
-	
+
 	Double_t dx = hit->GetX() - par->GetX();
 	Double_t dy = hit->GetY() - par->GetY();
 	Double_t dxx = hit->GetDx() * hit->GetDx();
@@ -154,11 +149,11 @@ LitStatus CbmLitTrackFitterRobust::MultivariateGaussWeight(
 	Double_t dxy = hit->GetDxy();
 	Double_t det = dxx * dyy - dxy * dxy;
 	Double_t s = (dx*dx*dyy - 2*dx*dy*dxy + dy*dy*dxx) / det;
-	
+
 	Double_t w = (1./(std::pow(2.*PI, dim/2.) * std::sqrt(T*det))) *
 					std::exp(-s/(2.*T));
 	hit->SetW(w);
-	
+
 	return kLITSUCCESS;
 }
 
@@ -167,9 +162,9 @@ Double_t CbmLitTrackFitterRobust::MultivariateGaussCut(
 		Double_t T,
 		Double_t cutValue) const
 {
-	if (hit->GetType() == kLITSTRIPHIT) 
+	if (hit->GetType() == kLITSTRIPHIT)
 		MultivariateGaussCut(static_cast<const CbmLitStripHit*>(hit), T, cutValue);
-	else if (hit->GetType() == kLITPIXELHIT) 
+	else if (hit->GetType() == kLITPIXELHIT)
 		MultivariateGaussCut(static_cast<const CbmLitPixelHit*>(hit), T, cutValue);
 }
 
@@ -193,7 +188,7 @@ Double_t CbmLitTrackFitterRobust::MultivariateGaussCut(
 	Double_t dyy = hit->GetDy() * hit->GetDy();
 	Double_t dxy = hit->GetDxy();
 	Double_t det = dxx * dyy - dxy * dxy;
-	
+
 	Double_t cut = (1./(std::pow(2.*PI, dim/2.) * std::sqrt(T*det))) *
 					std::exp(-cutValue/(2.*T));
 	return cut;
@@ -210,7 +205,7 @@ LitStatus CbmLitTrackFitterRobust::CalcWeights(
 	} else {
 		Double_t T = fAnnealing[iter];
 		for(HitPtrIterator it = itBegin; it != itEnd; it++) {
-			CbmLitHit* hit = *it; 
+			CbmLitHit* hit = *it;
 			if ((*it)->IsOutlier()) continue;
 			MultivariateGaussWeight(par, *it, T);
 		}
@@ -222,7 +217,7 @@ LitStatus CbmLitTrackFitterRobust::CalcWeights(
 LitStatus CbmLitTrackFitterRobust::Normalize(
 		HitPtrIterator itBegin,
 		HitPtrIterator itEnd) const
-{		
+{
 	//Double_t cutValue = 3.;
 	Double_t sumW = 0.;
 	Double_t sumCut = 0.;
@@ -231,7 +226,7 @@ LitStatus CbmLitTrackFitterRobust::Normalize(
 		sumW += (*it)->GetW();
 		//sumCut += DAFCut(*it, T, cutValue);
 	}
-	
+
 	if (sumW == 0.) {
 		//return kLITERROR;
 	} else {
@@ -252,16 +247,16 @@ LitStatus CbmLitTrackFitterRobust::CreateEffTrack(
 	for (Int_t i = 0; i < bounds.size(); i++) {
 		if (bounds[i].second - bounds[i].first > 1) { // more than 1 hit in station
 
-			const CbmLitTrackParam* param = 
+			const CbmLitTrackParam* param =
 				(iter > 0)? etrack->GetFitNode(i)->GetSmoothedParam() : NULL;
 			if (CalcWeights(param, bounds[i].first, bounds[i].second, iter) == kLITERROR) {
 				return kLITERROR;
 			}
-			
+
 			//TODO check if some of the hit were marked as outliers,
 			// is it neccessary to recalculate the weights
 			MarkOutliers(bounds[i].first, bounds[i].second);
-			
+
 			if (!AreAllOutliers(bounds[i].first, bounds[i].second)) {
 				// TODO DOESN'T WORK NOW TO BE IMPLEMENTED
 				//CbmLitPixelHit ehit = fEffHitCalc->DoCalculate(bounds[i].first, bounds[i].second);
@@ -273,8 +268,8 @@ LitStatus CbmLitTrackFitterRobust::CreateEffTrack(
 			}
 		} else {
 			etrack->AddHit(*bounds[i].first);
-		}	
-	}	
+		}
+	}
 	return kLITSUCCESS;
 }
 
@@ -282,7 +277,7 @@ LitStatus CbmLitTrackFitterRobust::CheckEffTrack(
 		const CbmLitTrack* track) const
 {
 	if (track->GetNofHits() < 5) return kLITERROR;
-	return kLITSUCCESS;	
+	return kLITSUCCESS;
 }
 
 //
@@ -295,7 +290,7 @@ LitStatus CbmLitTrackFitterRobust::CheckEffTrack(
 //			//(*it)->SetW((*it)->GetW() / (sumW + sumCut));
 //		}
 //	}
-//	return kLITSUCCESS;	
+//	return kLITSUCCESS;
 //}
 
 /*
@@ -309,11 +304,11 @@ LitStatus CbmLitTrackFitterRobust::KoshiWeight(
 	Double_t b = 0.16;
 	//Double_t T = 10;
 	//Double_t t = 9 * iter;
-	
-	Double_t tT = 7./Double_t(iter); 
-	
+
+	Double_t tT = 7./Double_t(iter);
+
 	Double_t w = b + (a - b) * std::exp(-tT);
-	
+
 	for(HitIterator it = itBegin; it != itEnd; it++) {
 		Double_t dx = (*it)->GetX() - par->GetX();
 		Double_t dy = (*it)->GetY() - par->GetY();
@@ -324,9 +319,9 @@ LitStatus CbmLitTrackFitterRobust::KoshiWeight(
 	}
 	//std::cout << std::endl;
 	Double_t sum = 0;
-	for(HitIterator it = itBegin; it != itEnd; it++) 
+	for(HitIterator it = itBegin; it != itEnd; it++)
 		sum += (*it)->GetW();
-	
+
 	for(HitIterator it = itBegin; it != itEnd; it++) {
 		(*it)->SetW((*it)->GetW() / sum);
 		if (itEnd - itBegin > 1)std::cout << (*it)->GetW() << " ";
@@ -342,7 +337,7 @@ LitStatus CbmLitTrackFitterRobust::OptimalWeight(
 		Int_t iter)
 {
 	Double_t c = 0.8 - iter*0.1;
-	
+
 	Double_t sumWEE = 0;
 	Double_t sumW = 0;
 	for(HitIterator it = itBegin; it != itEnd; it++) {
@@ -352,8 +347,8 @@ LitStatus CbmLitTrackFitterRobust::OptimalWeight(
 		sumWEE += (*it)->GetW() * ee;
 		sumW += (*it)->GetW();
 	}
-	Double_t sigmaSq = sumWEE / sumW;	
-	
+	Double_t sigmaSq = sumWEE / sumW;
+
 	sumW = 0;
 	for(HitIterator it = itBegin; it != itEnd; it++) {
 		Double_t dx = (*it)->GetX() - par->GetX();
@@ -380,7 +375,7 @@ LitStatus CbmLitTrackFitterRobust::TukeyWeight(
 	Double_t t = 4 - iter;
 	Double_t ct = 2 + t;
 	Double_t ctSq = ct * ct;
-	
+
 	Double_t sumWEE = 0;
 	Double_t sumW = 0;
 	for(HitIterator it = itBegin; it != itEnd; it++) {
@@ -390,8 +385,8 @@ LitStatus CbmLitTrackFitterRobust::TukeyWeight(
 		sumWEE += (*it)->GetW() * ee;
 		sumW += (*it)->GetW();
 	}
-	Double_t sigmaSq = sumWEE / sumW;	
-	
+	Double_t sigmaSq = sumWEE / sumW;
+
 	sumW = 0.;
 	for(HitIterator it = itBegin; it != itEnd; it++) {
 		Double_t dx = (*it)->GetX() - par->GetX();
@@ -402,11 +397,11 @@ LitStatus CbmLitTrackFitterRobust::TukeyWeight(
 			Double_t t = 1 - ee / (ctSq * sigmaSq);
 			w = t * t;
 		}
-		
+
 		(*it)->SetW(w);
 		sumW+=w;
 	}
-	
+
 	for(HitIterator it = itBegin; it != itEnd; it++) {
 		if (sumW == 0.) (*it)->SetW(0.000001);
 		else (*it)->SetW((*it)->GetW() / sumW);

@@ -26,6 +26,8 @@ public:
 
 protected:
 	virtual void CalcChi2(CbmRichRing* pRing);
+	virtual void CalcChi2(Double_t A, Double_t B, Double_t C,
+			Double_t D, Double_t E, Double_t F, CbmRichRing* pRing);
 	virtual void MakeRadiusCorrection(CbmRichRing* pRing);
 	virtual void InitHistForRadiusCorrection();
 

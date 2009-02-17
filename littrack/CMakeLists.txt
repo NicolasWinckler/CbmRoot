@@ -6,6 +6,7 @@ set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
 ${GEANT3_INCLUDE_DIR}
 #${CLHEP_INCLUDE_DIR}
+#${SIMPATH}/basics/boost/include
 ${CBMROOT_SOURCE_DIR}/littrack
 ${CBMROOT_SOURCE_DIR}/littrack/ana
 ${CBMROOT_SOURCE_DIR}/littrack/base
@@ -73,6 +74,7 @@ finder/CbmLitTrackFinderBase.cxx
 finder/CbmLitTrackFinderBranch.cxx
 finder/CbmLitTrackFinderNN.cxx
 finder/CbmLitMuchTrackFinderNN.cxx
+finder/CbmLitStsBasedTrackFinder.cxx
 fitter/CbmLitTrackFitterImp.cxx
 fitter/CbmLitKalmanFilter.cxx
 fitter/CbmLitTrackFitterRobust.cxx

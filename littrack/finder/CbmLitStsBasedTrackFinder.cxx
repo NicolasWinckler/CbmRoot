@@ -8,7 +8,7 @@
 #include "CbmLitTrack.h"
 #include "CbmLitDetectorLayout.h"
 
-#include "CbmRootManager.h"
+#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
@@ -27,7 +27,7 @@ CbmLitStsBasedTrackFinder::~CbmLitStsBasedTrackFinder()
 
 void CbmLitStsBasedTrackFinder::DefaultInit()
 {
-	CbmRootManager* rootMgr = CbmRootManager::Instance();
+	FairRootManager* rootMgr = FairRootManager::Instance();
 	if(NULL == rootMgr) {
 		std::cout << "CbmLitStsBasedTrackFinder::DefaultInit" << "ROOT manager is not instantiated" << std::endl;
 		exit(0);

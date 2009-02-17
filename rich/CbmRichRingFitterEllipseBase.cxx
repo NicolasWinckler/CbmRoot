@@ -61,6 +61,39 @@ void CbmRichRingFitterEllipseBase::CalcChi2(CbmRichRing* pRing)
     pRing->SetChi2(chi2);
 }
 
+//
+void CbmRichRingFitterEllipseBase::CalcChi2(Double_t A, Double_t B, Double_t C,
+		Double_t D, Double_t E, Double_t F, CbmRichRing* pRing)
+{
+    CbmRichHit* hit = NULL;
+
+///ring parameters
+    Int_t nofHits =  pRing->GetNofHits();
+    if (nofHits <= 5){
+        pRing->SetChi2(-1.);
+        return;
+    }
+
+///calculate chi2
+    Double_t chi2 = 0.;
+    for(Int_t iHit = 0; iHit < nofHits; iHit++){
+        hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(iHit));
+        if(!hit) continue;
+        Double_t x = hit->GetX();
+        Double_t y = hit->GetY();
+
+        Double_t d1 = TMath::Abs(A*x*x + B*x*y + C*y*y + D*x + E*y + F);
+        Double_t d2 = sqrt( pow(2*A*x + B*y + D, 2) + pow(B*x + 2*C*y + E, 2) );
+
+        chi2 += (d1*d1)/(d2*d2);
+    }
+
+    chi2 = chi2 / (nofHits - 5);
+
+    pRing->SetChi2(chi2);
+}
+
+
 void CbmRichRingFitterEllipseBase::InitHistForRadiusCorrection()
 {
     TString fileName;

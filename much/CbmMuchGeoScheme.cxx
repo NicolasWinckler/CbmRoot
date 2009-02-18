@@ -379,7 +379,7 @@ vector<CbmMuchLayerSide*> CbmMuchGeoScheme::GetLayerSides(Int_t iStation) {
 
 Int_t CbmMuchGeoScheme::GetLayerSideNr(Long64_t detId) {
 	Long64_t sideId = GetLayerSideByDetId(detId)->GetDetectorId();
-	printf("GetLayerSideNr: %qd %qd\n", detId, sideId);
+//	printf("GetLayerSideNr: %qd %qd\n", detId, sideId);
 	if (fMapSides.find(sideId) == fMapSides.end())
 		Fatal("GetLayerSideNr", "Wrong side id");
 	return fMapSides[sideId] + 1;

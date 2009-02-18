@@ -351,7 +351,7 @@ Bool_t CbmDileptonAssignPid::GetRichPid(Bool_t switchRichMom, Bool_t switchRichS
     // use ring quality cut
 
     fh_rich_selection_NN->Fill(richRing->GetSelectionNN());
-    fh_rich_selection_2D->Fill(richRing->GetSelection2D());
+//    fh_rich_selection_2D->Fill(richRing->GetSelection2D());
 
     if(switchRichSelection){
 	if (fVerbose>2) cout<<"-I- CbmDileptonAssignPid::GetRichPid(): switchRichSelection : "<<switchRichSelection<<", using NN selection cut "<<endl;
@@ -363,8 +363,8 @@ Bool_t CbmDileptonAssignPid::GetRichPid(Bool_t switchRichMom, Bool_t switchRichS
     else {
 	if(fVerbose>2) cout<<"-I- CbmDileptonAssignPid::GetRichPid(): switchRichSelection : "<<switchRichSelection<<",using 2D selection cut "<<endl;
 
-        if(richRing->GetSelection2D() == fRich2D)fh_rich_selection_2D_after->Fill(richRing->GetSelection2D());
-	else return kFALSE;
+//      if(richRing->GetSelection2D() == fRich2D)fh_rich_selection_2D_after->Fill(richRing->GetSelection2D());
+//	else return kFALSE;
     }
 
     // calculate radial

@@ -3,6 +3,7 @@
 #include "CbmLitConverter.h"
 #include "CbmLitEnvironment.h"
 #include "CbmLitMemoryManagment.h"
+#include "CbmLitTrack.h"
 
 #include "TClonesArray.h"
 

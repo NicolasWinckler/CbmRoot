@@ -4,6 +4,7 @@
 #include "CbmLitMemoryManagment.h"
 #include "CbmLitConverter.h"
 #include "CbmLitEnvironment.h"
+#include "CbmLitTrack.h"
 
 #include "TClonesArray.h"
 

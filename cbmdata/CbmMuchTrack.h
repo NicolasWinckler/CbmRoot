@@ -37,7 +37,7 @@ class CbmMuchTrack : public TObject
   Double_t GetChi2()   const { return fChi2; } // much chi^2
   Int_t GetNDF() const { return fNDF; }// much NDF
   FairTrackParam *GetMuchTrack(){ return &fMuchTrack; }
-  Int_t GetFlag() {return fFlag;};
+  Int_t GetFlag() const {return fFlag;};
   
   
   void SetNMissedHits( Int_t n ){ fNMissedHits = n; }

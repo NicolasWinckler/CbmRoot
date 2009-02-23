@@ -88,12 +88,12 @@ class CbmMuchDigitize : public FairTask
   /** Gets time resolution **/
   Double_t GetDTime() { return fDTime; }
 
-  /** Parametrization of sigma for electrons for Lndau distribution 
+  /** Parameterization of sigma for electrons for Landau distribution
    *@param logT  Logarithm of electron kinetic energy (energy in [MeV])
    **/
   static Double_t Sigma_n_e(Double_t Tkin, Double_t mass);
 
-  /** Parametrization of most probable value for electrons for Lndau distribution 
+  /** Parameterization of most probable value for electrons for Landau distribution
    *@param logT  Logarithm of electron kinetic energy (energy in [MeV])
    **/
   static Double_t MPV_n_e(Double_t Tkin, Double_t mass);
@@ -127,14 +127,14 @@ class CbmMuchDigitize : public FairTask
   std::map<Long64_t, Int_t> fChannelMap;
 
   /** Map of channels, wounded by secondary electrons, to CbmMuchDigi.  **/
-  std::map<Long64_t, CbmMuchDigi*> fChargedPads;   
+  std::map<Long64_t, CbmMuchDigi*> fChargedPads;
 
   /** Map of DigiMatches, which matches pads wounded by secondary electrons.  **/
   std::map<Long64_t, CbmMuchDigiMatch*> fChargedMatches;
 
   /** Finish **/
   virtual void Finish();
-    
+
   /** Get parameter containers **/
   virtual void SetParContainers();
 
@@ -168,10 +168,10 @@ class CbmMuchDigitize : public FairTask
    *@param width  Width
    *@param height Height
    **/
-  TPolyLine GetPolygon(Double_t x0, Double_t y0, 
+  TPolyLine GetPolygon(Double_t x0, Double_t y0,
 		       Double_t width, Double_t height);
 
-  /** Verifies whether projections with given coordinates are intersected 
+  /** Verifies whether projections with given coordinates are intersected
    *@param x11     coordinate of one end of the first projection
    *@param x12     coordinate of another end of the first projection
    *@param x21     coordinate of one end of the second projection
@@ -179,14 +179,14 @@ class CbmMuchDigitize : public FairTask
    *@param length  length of intresection
    **/
   Bool_t ProjectionsIntersect(Double_t x11, Double_t x12, Double_t x21, Double_t x22, Double_t& length);
-  
+
   /** Determines whether the two given polygons intersect and calculates the
    *  area of intersection.
    *@param polygon1  Fisrt polygon
    *@param polygon2  Second polygon
    *@param area      Intersection area
    **/
-  Bool_t PolygonsIntersect(CbmMuchSector* sector, TPolyLine polygon1, TPolyLine polygon2, 
+  Bool_t PolygonsIntersect(CbmMuchSector* sector, TPolyLine polygon1, TPolyLine polygon2,
 			   Double_t& area);
 
   /*****************************************************************

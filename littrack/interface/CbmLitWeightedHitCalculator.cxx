@@ -1,11 +1,11 @@
-#include "CbmLitEffHitCalculator.h"
+#include "CbmLitWeightedHitCalculator.h"
 
-CbmLitEffHitCalculator::CbmLitEffHitCalculator()
+CbmLitWeightedHitCalculator::CbmLitWeightedHitCalculator()
 {
 }
 
-CbmLitEffHitCalculator::~CbmLitEffHitCalculator()
+CbmLitWeightedHitCalculator::~CbmLitWeightedHitCalculator()
 {
 }
 
-ClassImp(CbmLitEffHitCalculator)
+ClassImp(CbmLitWeightedHitCalculator)

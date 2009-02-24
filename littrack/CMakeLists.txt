@@ -88,7 +88,7 @@ interface/CbmLitTrackExtrapolator.cxx
 interface/CbmLitTrackSelection.cxx
 interface/CbmLitTrackFinder.cxx
 interface/CbmLitWeightCalculator.cxx
-interface/CbmLitEffHitCalculator.cxx
+interface/CbmLitWeightedHitCalculator.cxx
 propagation/CbmLitTrackPropagatorImp.cxx 
 propagation/CbmLitRK4TrackExtrapolator.cxx
 propagation/CbmLitLineTrackExtrapolator.cxx

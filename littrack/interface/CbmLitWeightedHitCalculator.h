@@ -1,24 +1,27 @@
-#ifndef CBMLITEFFHITCALCULATOR_H_
-#define CBMLITEFFHITCALCULATOR_H_
+#ifndef CBMLITWEIGHTEDHITCALCULATOR_H_
+#define CBMLITWEIGHTEDHITCALCULATOR_H_
 
 #include "CbmLitTool.h"
 #include "CbmLitTypes.h"
-#include "CbmLitPixelHit.h"
 
-class CbmLitEffHitCalculator : public CbmLitTool
+class CbmLitHit;
+
+class CbmLitWeightedHitCalculator : public CbmLitTool
 {
 public:
-	CbmLitEffHitCalculator();
-	virtual ~CbmLitEffHitCalculator();
-	
-	virtual CbmLitPixelHit DoCalculate(
+	CbmLitWeightedHitCalculator();
+	virtual ~CbmLitWeightedHitCalculator();
+
+	virtual void DoCalculate(
 			HitPtrIterator itBegin,
-			HitPtrIterator itEnd) = 0;
-	
-	virtual CbmLitPixelHit DoCalculate(
-			HitPtrVector& hits) = 0;
-	
-	ClassDef(CbmLitEffHitCalculator, 1);
+			HitPtrIterator itEnd,
+			CbmLitHit* hit) = 0;
+
+	virtual void DoCalculate(
+			HitPtrVector& hits,
+			CbmLitHit* hit) = 0;
+
+	ClassDef(CbmLitWeightedHitCalculator, 1);
 };
 
-#endif /*CBMLITEFFHITCALCULATOR_H_*/
+#endif /*CBMLITWEIGHTEDHITCALCULATOR_H_*/

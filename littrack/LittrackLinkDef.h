@@ -61,7 +61,7 @@
 #pragma link C++ class  CbmLitTrackSelection+;
 #pragma link C++ class  CbmLitTrackFinder+;
 #pragma link C++ class  CbmLitWeightCalculator+;
-#pragma link C++ class  CbmLitEffHitCalculator+;
+#pragma link C++ class  CbmLitWeightedHitCalculator+;
 #pragma link C++ class  CbmLitKalmanSmoother+;
 
 // propagation

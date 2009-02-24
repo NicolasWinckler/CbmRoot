@@ -121,8 +121,8 @@ Bool_t CbmLitTrackFinderNN::AddNearestHit(
 	HitPtrIterator hit(bounds.second);
 	Double_t chiSq = 1e10;
 	for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
-		if (IsIn(&par, *iHit)) {
-			fFilter->Update(&par, &uPar, *iHit);
+		fFilter->Update(&par, &uPar, *iHit);
+		if (IsHitInValidationWindow(&uPar, *iHit)) {
 			Double_t chi = ChiSq(&uPar, *iHit);
 			if (chi < chiSq) {
 				chiSq = chi;

@@ -16,7 +16,6 @@
 CbmLitTrackFinderBranch::CbmLitTrackFinderBranch()
 {
 	fMaxNofBranches = 24;
-	fIsAlwaysCreateMissingHit = true;
 }
 
 CbmLitTrackFinderBranch::~CbmLitTrackFinderBranch()
@@ -50,34 +49,21 @@ LitStatus CbmLitTrackFinderBranch::DoFind(
 	fHitData.SetDetectorLayout(fLayout);
 
 	for (Int_t iIter = 0; iIter < fNofIter; iIter++) {
-
 		SetIterationParameters(iIter);
-
 		ArrangeHits(fHitArray.begin(), fHitArray.end());
-
 		InitTrackSeeds(fTrackSeedArray.begin(), fTrackSeedArray.end());
-
 		FollowTracks();
-
 //		fFinalPreSelection->DoSelect(fTracksCopy.begin(), fTracksCopy.end());
-
 //		RefitTracks(fTracksCopy.begin(), fTracksCopy.end());
-
 		fFinalSelection->DoSelect(fTracksCopy.begin(), fTracksCopy.end());
-
 		RemoveHits(fTracksCopy.begin(), fTracksCopy.end());
-
 		CopyToOutput(fTracksCopy.begin(), fTracksCopy.end(), tracks);
 
 		for_each(fTracksCopy.begin(), fTracksCopy.end(), DeleteObject());
 		fTracksCopy.clear();
-
 		fHitData.Clear();
 	}
-
-	std::cout << "-I- CbmLitTrackFinderBranch: " << fEventNo++
-		<< " events processed" << std::endl;
-
+	std::cout << "-I- CbmLitTrackFinderBranch: " << fEventNo++	<< " events processed" << std::endl;
 	return kLITSUCCESS;
 }
 
@@ -232,9 +218,10 @@ Bool_t CbmLitTrackFinderBranch::ProcessSubstation(
    *uPar = *par;
 
    if (hitIt < bounds.second) {
-      if (!IsIn(par, *hitIt)) result = false;
+	  fFilter->Update(uPar,  *hitIt);
+      if (!IsHitInValidationWindow(uPar, *hitIt)) result = false;
       if (result) {
-    	  fFilter->Update(uPar,  *hitIt);
+//    	  fFilter->Update(uPar,  *hitIt);
     	  chiSq[substation] = ChiSq(uPar, *hitIt);
     	  hits[substation] = *hitIt;
       } else {

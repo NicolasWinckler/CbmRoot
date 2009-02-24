@@ -302,7 +302,7 @@ bool CbmLitEnvironment::IsStraw() const
 {
 	FairRunAna* ana = FairRunAna::Instance();
 	FairRuntimeDb* rtdb = ana->GetRuntimeDb();
-	FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("CbmBaseParSet");
+	FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
 	TObjArray *detList = baseParSet->GetDetList();
 	FairDetector* much = (FairDetector*) detList->FindObject("MUCH");
 	TString name = much->GetGeometryFileName();
@@ -318,7 +318,7 @@ bool CbmLitEnvironment::IsTrdSegmented() const
 {
 	FairRunAna* ana = FairRunAna::Instance();
 	FairRuntimeDb* rtdb = ana->GetRuntimeDb();
-	FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("CbmBaseParSet");
+	FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
 	TObjArray *detList = baseParSet->GetDetList();
 	FairDetector* much = (FairDetector*) detList->FindObject("TRD");
 	TString name = much->GetGeometryFileName();

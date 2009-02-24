@@ -7,6 +7,7 @@ ${ROOT_INCLUDE_DIR}
 ${GEANT3_INCLUDE_DIR}
 #${CLHEP_INCLUDE_DIR}
 #${SIMPATH}/basics/boost/include
+#/home/soft/boost/boost_1_38_0/
 ${CBMROOT_SOURCE_DIR}/littrack
 ${CBMROOT_SOURCE_DIR}/littrack/ana
 ${CBMROOT_SOURCE_DIR}/littrack/base
@@ -44,7 +45,7 @@ link_directories( ${LINK_DIRECTORIES})
 set(LITTRACK_SRCS_RULECHECKER
 ana/CbmLitElossAna.cxx
 ana/CbmLitPropagationAnalysis.cxx
-ana/CbmLitRobustAna.cxx
+ana/CbmLitRobustFitterAnalysis.cxx
 base/CbmLitTool.cxx
 base/CbmLitSubstation.cxx
 base/CbmLitStation.cxx
@@ -66,7 +67,7 @@ data/CbmLitFitNode.cxx
 #finder/CbmLitMuchTrackFinderTrigger.cxx
 finder/CbmLitTrackFinderRobust.cxx
 finder/CbmLitTrdTrackFinderBranch.cxx
-finder/CbmLitTrdTrackFinderS.cxx
+finder/CbmLitTrdTrackFinderStandalone.cxx
 finder/CbmLitMuchTrackFinderBranch.cxx
 finder/CbmLitMuchTrackFinderRobust.cxx
 finder/CbmLitTrdTrackFinderRobust.cxx
@@ -97,9 +98,9 @@ propagation/CbmLitMaterialInfo.cxx
 propagation/CbmLitMaterialEffectsImp.cxx
 propagation/CbmLitCleverTrackExtrapolator.cxx
 qa/CbmLitRecQa.cxx
-robust/CbmLitEffHitCalculatorImp.cxx
+robust/CbmLitWeightedHitCalculatorImp.cxx
 robust/CbmLitWeightCalculatorSimple.cxx
-robust/CbmLitRobustSelection.cxx
+robust/CbmLitWeightCalculatorGauss.cxx
 selection/CbmLitTrackSelectionEmpty.cxx
 selection/CbmLitTrackSelectionA.cxx
 selection/CbmLitTrackSelectionB.cxx

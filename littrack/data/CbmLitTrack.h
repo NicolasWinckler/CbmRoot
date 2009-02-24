@@ -34,6 +34,7 @@ public:
 	HitPtrIteratorPair GetHits(Int_t planeId);
 	void GetHitBounds(std::vector<HitPtrIteratorPair>& bounds);
 	Int_t GetNofMissingHits() const {return fNofMissingHits;}
+	Int_t GetRefId() const {return fRefId;}
 
 	void SetQuality(LitTrackQa quality) { fQuality = quality; }
 	void SetChi2(Double_t chi2) { fChi2 = chi2; }
@@ -49,6 +50,7 @@ public:
 	void SetFitNodes(const FitNodeVector& nodes) {fFitNodes = nodes;}
 	void SortHits(Bool_t downstream = true);
 	void SetNofMissingHits(Int_t nofMissingHits) {fNofMissingHits = nofMissingHits;}
+	void SetRefId(Int_t refId) {fRefId = refId;}
 
 	void RemoveHit(Int_t index);
 
@@ -70,6 +72,7 @@ private:
 	Int_t fLastPlaneId;
 	Int_t fPDG;
 	Int_t fNofMissingHits;
+	Int_t fRefId;
 
 	ClassDef(CbmLitTrack, 1);
 };

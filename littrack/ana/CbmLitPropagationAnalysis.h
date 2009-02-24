@@ -37,6 +37,7 @@ public:
 
 private:
 	void CreateHistograms();
+	void ReadDataBranches();
 	void RunTest();
 	void TestPropagation(
 			CbmLitTrack* track,
@@ -93,11 +94,10 @@ private:
 
 	DetectorId fDetId; // kTRD or kMUCH
 
-	std::vector<std::vector<TH1F*> > fHistos;
-	Int_t fNofHistos;
-
-	std::vector<TH1F*> fFitHistosFirst;
-	std::vector<TH1F*> fFitHistosLast;
+	std::vector<std::vector<TH1F*> > fPropagationHistos;
+	std::vector<std::vector<TH1F*> > fFilterHistos;
+	std::vector<std::vector<TH1F*> > fSmootherHistos;
+	Int_t fNofParams;
 
 	Int_t fEvents;
 	Int_t fVerbose;

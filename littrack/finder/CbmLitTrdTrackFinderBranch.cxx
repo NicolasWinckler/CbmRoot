@@ -44,6 +44,7 @@ void CbmLitTrdTrackFinderBranch::Init()
 
 	fVerbose = 1;
 	fNofIter = 1;
+	fUseFastSearch = true;
 	fBeginStationGroup = 0;
 	fEndStationGroup = fLayout.GetNofStationGroups() - 1;
 	fPDG = 11;
@@ -56,6 +57,8 @@ void CbmLitTrdTrackFinderBranch::SetIterationParameters(
 		fMaxNofMissingHits = 2;
 		fIsAlwaysCreateMissingHit = false;
 		fSigmaCoef = 3.7;
+		fChiSqPixelHitCut = 12.;
+		fChiSqStripHitCut = 4.;
 	}
 }
 

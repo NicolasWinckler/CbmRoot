@@ -1,10 +1,10 @@
 // -------------------------------------------------------------------------
-// -----                  CbmLitTrdTrackFinderS source file            -----
+// -----                  CbmLitTrdTrackFinderStandalone source file            -----
 // -----                  Created 06/07/06  by A. Lebedev              -----
 // -------------------------------------------------------------------------
 
 
-#include "CbmLitTrdTrackFinderS.h"
+#include "CbmLitTrdTrackFinderStandalone.h"
 
 #include "CbmLitTrack.h"
 #include "CbmLitPixelHit.h"
@@ -27,16 +27,16 @@
 
 #include <algorithm>
 
-CbmLitTrdTrackFinderS::CbmLitTrdTrackFinderS()
+CbmLitTrdTrackFinderStandalone::CbmLitTrdTrackFinderStandalone()
 {
 }
 
-CbmLitTrdTrackFinderS::~CbmLitTrdTrackFinderS()
+CbmLitTrdTrackFinderStandalone::~CbmLitTrdTrackFinderStandalone()
 {
 }
 
 
-void CbmLitTrdTrackFinderS::Init()
+void CbmLitTrdTrackFinderStandalone::Init()
 {
    fPropagator = new CbmLitTrackPropagatorImp(new CbmLitLineTrackExtrapolator());
    fPropagator->Initialize();
@@ -64,11 +64,12 @@ void CbmLitTrdTrackFinderS::Init()
    fVerbose = 3;
    fNofIter = 1;
    fBeginStationGroup = 0;
+   fUseFastSearch = true;
    fEndStationGroup = fLayout.GetNofStationGroups() - 1;
    fPDG = 211;
 }
 
-void CbmLitTrdTrackFinderS::SetIterationParameters(Int_t iter)
+void CbmLitTrdTrackFinderStandalone::SetIterationParameters(Int_t iter)
 {
 	if (iter == 0) {
 		fMaxNofMissingHits = 1;
@@ -81,7 +82,7 @@ void CbmLitTrdTrackFinderS::SetIterationParameters(Int_t iter)
 }
 
 
-Int_t CbmLitTrdTrackFinderS::DoFind(
+Int_t CbmLitTrdTrackFinderStandalone::DoFind(
 		TClonesArray* hitArray,
         TClonesArray* trackArray)
 {
@@ -104,14 +105,14 @@ Int_t CbmLitTrdTrackFinderS::DoFind(
 	return trackArray->GetEntriesFast();
 }
 
-void CbmLitTrdTrackFinderS::CreateTrackSeeds(
+void CbmLitTrdTrackFinderStandalone::CreateTrackSeeds(
 		const HitPtrVector& hits,
 		TrackPtrVector& trackSeeds)
 {
 
 }
 
-void CbmLitTrdTrackFinderS::CreateHits(
+void CbmLitTrdTrackFinderStandalone::CreateHits(
 		TClonesArray* hitArray,
 		HitPtrVector& hits)
 {
@@ -129,7 +130,7 @@ void CbmLitTrdTrackFinderS::CreateHits(
 	}
 }
 
-void CbmLitTrdTrackFinderS::CopyToOutput(
+void CbmLitTrdTrackFinderStandalone::CopyToOutput(
 		TrackPtrVector& tracks,
 		TClonesArray* trackArray)
 {
@@ -145,7 +146,7 @@ void CbmLitTrdTrackFinderS::CopyToOutput(
 
 
 /*
-void CbmLitTrdTrackFinderS::SetIterPar(Double_t SigmaCoef,
+void CbmLitTrdTrackFinderStandalone::SetIterPar(Double_t SigmaCoef,
                              Double_t Mom,
                              Int_t Flag,
                              Int_t beginStation,
@@ -186,7 +187,7 @@ void CbmLitTrdTrackFinderS::SetIterPar(Double_t SigmaCoef,
 // -----------------------------------------------------------------------
 
 // ----------------Create track candidates on the 1st station-------------
-void CbmLitTrdTrackFinderS::CreateTrdTracks()
+void CbmLitTrdTrackFinderStandalone::CreateTrdTracks()
 {
 
    Int_t IndMin[4];
@@ -212,7 +213,7 @@ void CbmLitTrdTrackFinderS::CreateTrdTracks()
       MinMaxIndex(Xpred[1], IndMin[1], HitCnt[1], 1);
       for ( Int_t iHit1 = IndMin[1]; iHit1 < IndMin[1] + HitCnt[1]; iHit1++){//2
 
-         if ( !IsIn(Ypred[1], fHits[1][iHit1], 1) ) continue;
+         if ( !IsHitInValidationWindow(Ypred[1], fHits[1][iHit1], 1) ) continue;
 
          pHits[1] = fHits[1][iHit1];
 
@@ -224,7 +225,7 @@ void CbmLitTrdTrackFinderS::CreateTrdTracks()
 
          MinMaxIndex(Ypred[2], IndMin[2], HitCnt[2], 2);
          for (Int_t iHit2 = IndMin[2]; iHit2 < IndMin[2] + HitCnt[2]; iHit2++){ //3
-            if ( !IsIn(Xpred[2], fHits[2][iHit2], 2) ) continue;
+            if ( !IsHitInValidationWindow(Xpred[2], fHits[2][iHit2], 2) ) continue;
 
             pHits[2] = fHits[2][iHit2];
 
@@ -243,7 +244,7 @@ void CbmLitTrdTrackFinderS::CreateTrdTracks()
 
             for (Int_t iHit3 = IndMin[3]; iHit3 < IndMin[3] + HitCnt[3]; iHit3++){ //4
 
-	            if ( !IsIn(Ypred[3], fHits[3][iHit3], 3) ) continue;
+	            if ( !IsHitInValidationWindow(Ypred[3], fHits[3][iHit3], 3) ) continue;
 
                pHits[3] = fHits[3][iHit3];
 
@@ -264,14 +265,14 @@ void CbmLitTrdTrackFinderS::CreateTrdTracks()
 //   	CbmTrdHit* TrdHit = fHits[0][iHit0];
 //
 //	if(!TrdHit) {
-//	  cout << "-W- CbmLitTrdTrackFinderS::CreateTrdTracks:"
+//	  cout << "-W- CbmLitTrdTrackFinderStandalone::CreateTrdTracks:"
 //	       << " Wrong TRD Hit!!!!" << endl;
 //	}
 //
 //	int refId =  TrdHit->GetRefIndex();
 //	CbmTrdPoint* TrdPoint = (CbmTrdPoint*) fArrayTrdPoint->At(refId);
 //	if(!TrdPoint) {
-//	  cout << "-W- CbmLitTrdTrackFinderS::CreateTrdTracks:"
+//	  cout << "-W- CbmLitTrdTrackFinderStandalone::CreateTrdTracks:"
 //	       << " Wrong TRD Point!!!!" << endl;
 //	}
 //
@@ -310,14 +311,14 @@ void CbmLitTrdTrackFinderS::CreateTrdTracks()
 
 
    if (fVerbose > 1) {
-      std::cout << "-I- CbmLitTrdTrackFinderS::CreateTrdTracks() : " << std::endl
+      std::cout << "-I- CbmLitTrdTrackFinderStandalone::CreateTrdTracks() : " << std::endl
            << "fTrdTracks.size() = " << fTracks.size() << std::endl;
    }
 }
 // -----------------------------------------------------------------------
 
 // ------------------Defines min and max index of hits -------------------
-void CbmLitTrdTrackFinderS::MinMaxIndex(Double_t pred,
+void CbmLitTrdTrackFinderStandalone::MinMaxIndex(Double_t pred,
                                         Int_t &IndMin,
                                         Int_t &HitCnt,
                                         Int_t layer)
@@ -354,7 +355,7 @@ void CbmLitTrdTrackFinderS::MinMaxIndex(Double_t pred,
 // -----------------------------------------------------------------------
 
 // -------------Checks if the hit in the area near the track--------------
-Bool_t CbmLitTrdTrackFinderS::IsIn(Double_t pred, CbmTrkHit *pHit, Int_t layer)
+Bool_t CbmLitTrdTrackFinderStandalone::IsHitInValidationWindow(Double_t pred, CbmTrkHit *pHit, Int_t layer)
 {
    if (pHit->GetDx() < pHit->GetDy())
       return pHit->GetY() < pred + fSigmaCoef * fSigmaY[layer] &&
@@ -367,7 +368,7 @@ Bool_t CbmLitTrdTrackFinderS::IsIn(Double_t pred, CbmTrkHit *pHit, Int_t layer)
 
 
 // -------------------Adds track candidate--------------------------------
-void CbmLitTrdTrackFinderS::AddTrackCandidate1(CbmLitTrack* pTrack,
+void CbmLitTrdTrackFinderStandalone::AddTrackCandidate1(CbmLitTrack* pTrack,
                                                CbmTrkHit* pHits[])
 {
    CbmTrackParam* par = new CbmTrackParam();
@@ -444,4 +445,4 @@ void CbmLitTrdTrackFinderS::AddTrackCandidate1(CbmLitTrack* pTrack,
 
 */
 
-ClassImp(CbmLitTrdTrackFinderS);
+ClassImp(CbmLitTrdTrackFinderStandalone);

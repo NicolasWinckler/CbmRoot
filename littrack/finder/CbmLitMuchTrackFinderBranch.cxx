@@ -48,7 +48,10 @@ void CbmLitMuchTrackFinderBranch::Init()
 	fEndStationGroup = fLayout.GetNofStationGroups() - 1;
 	fMaxNofMissingHits = 1;
 	fIsAlwaysCreateMissingHit = false;
-	fSigmaCoef = 3.;
+	fUseFastSearch = true;
+	fSigmaCoef = 3.5;
+	fChiSqPixelHitCut = 13.86;
+	fChiSqStripHitCut = 4.;
 	fPDG = 13;
 }
 

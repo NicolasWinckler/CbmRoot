@@ -27,13 +27,18 @@ void CbmLitMuchTrackFinderRobust::Init()
 	fPropagatorToDet =fPropagator = factory->CreateTrackPropagator("lit");
 	fSeedSelection = factory->CreateTrackSelection("momentum_seed");
 	fFinalSelection = factory->CreateTrackSelection("empty");
+	fFitter = factory->CreateTrackFitter("kalman_robust");
+	fFilter = factory->CreateTrackUpdate("kalman");
 
 	fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
 
 	fVerbose = 1;
 	fNofIter = 1;
 	fMaxNofMissingHits = 1;
+	fUseFastSearch = true;
 	fSigmaCoef = 3.5;
+	fChiSqPixelHitCut = 13.86;
+	fChiSqStripHitCut = 4.;
 	fPDG = 13;
 }
 

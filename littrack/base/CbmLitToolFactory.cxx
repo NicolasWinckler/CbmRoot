@@ -17,7 +17,6 @@
 #include "CbmLitTrackSelectionTrd.h"
 #include "CbmLitTrackSelectionMomentum.h"
 #include "CbmLitTrackSelectionMuchRobust.h"
-#include "CbmLitRobustSelection.h"
 #include "CbmLitTrackSelectionD.h"
 #include "CbmLitKalmanFilter.h"
 #include "CbmLitKalmanSmoother.h"
@@ -28,13 +27,14 @@
 
 //#include <boost/tr1/memory.hpp>
 
+//using  std::tr1;
 
 CbmLitToolFactory* CbmLitToolFactory::fInstance = NULL;
 
 CbmLitToolFactory::CbmLitToolFactory()
 {
-	//boost::shared_ptr<int> p(new int(4));
-
+//	std::tr1::shared_ptr<int> p(new int(4));
+//	boost::shared_ptr<int> p(new int(4));
 }
 
 CbmLitToolFactory::~CbmLitToolFactory()
@@ -126,6 +126,12 @@ CbmLitTrackFitter* CbmLitToolFactory::CreateTrackFitter(
 	} else
 	if (name == "kalman_smoother") {
 		fitter = new CbmLitKalmanSmoother();
+		return fitter;
+	} else
+	if (name == "kalman_robust") {
+		CbmLitTrackFitter* fitter = CreateTrackFitter("lit_kalman");
+		CbmLitTrackFitter* smoother = CreateTrackFitter("kalman_smoother");
+		fitter = new CbmLitTrackFitterRobust(fitter, smoother);
 		return fitter;
 	}
 

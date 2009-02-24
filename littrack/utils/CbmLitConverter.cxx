@@ -1,4 +1,3 @@
-
 #include "CbmLitConverter.h"
 
 #include "CbmLitHit.h"
@@ -158,6 +157,8 @@ void CbmLitConverter::MuchTrackToLitTrack(
 	litTrack->SetChi2(muchTrack->GetChi2());
 	litTrack->SetNDF(muchTrack->GetNDF());
 	litTrack->SetPreviousTrackId(muchTrack->GetStsTrackID());
+	litTrack->SetLastPlaneId(muchTrack->GetFlag());
+	litTrack->SetPDG(13);
 	CbmLitTrackParam paramFirst, paramLast;
 	//TODO remove this const typecasting
 	CbmLitConverter::TrackParamToLitTrackParam((const_cast<CbmMuchTrack*> (muchTrack))->GetMuchTrack(), &paramFirst);
@@ -276,10 +277,10 @@ void CbmLitConverter::StsTrackArrayToTrackVector(
        CbmStsTrack* track = (CbmStsTrack*) tracks->At(iTrack);
        if (track == NULL) continue;
        if (track->GetParamLast()->GetQp() == 0) continue;
-       //if (track->GetParamLast()->GetQp() > 1.) continue;
        CbmLitTrack* litTrack = new CbmLitTrack;
        StsTrackToLitTrack(track, litTrack);
        litTrack->SetPreviousTrackId(iTrack);
+       litTrack->SetRefId(iTrack);
        litTracks.push_back(litTrack);
     }
 }
@@ -290,8 +291,7 @@ void CbmLitConverter::TrackVectorToMuchTrackArray(
 {
 	Int_t trackNo = muchTracks->GetEntriesFast();
 	for(TrackPtrIterator iTrack = tracks.begin(); iTrack != tracks.end(); iTrack++) {
-		if (!(*iTrack)->CheckParams()) continue;
-	    CbmMuchTrack track;
+		CbmMuchTrack track;
 	    LitTrackToMuchTrack(*iTrack, &track);
         new ((*muchTracks)[trackNo++]) CbmMuchTrack(track);
 	}

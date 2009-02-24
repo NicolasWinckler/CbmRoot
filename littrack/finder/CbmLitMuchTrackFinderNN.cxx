@@ -22,7 +22,7 @@ void CbmLitMuchTrackFinderNN::Init()
 	DefaultInit();
 
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fPropagator = factory->CreateTrackPropagator("lit");
+	fPropagatorToDet = fPropagator = factory->CreateTrackPropagator("lit");
 	fSeedSelection = factory->CreateTrackSelection("momentum_seed");
 	fFinalSelection = factory->CreateTrackSelection("much_final");
 	fFilter = factory->CreateTrackUpdate("kalman");
@@ -31,8 +31,11 @@ void CbmLitMuchTrackFinderNN::Init()
 
 	fVerbose = 1;
 	fNofIter = 1;
+	fUseFastSearch = true;
 	fMaxNofMissingHits = 1;
 	fSigmaCoef = 3.;
+	fChiSqPixelHitCut = 12.;
+	fChiSqStripHitCut = 4.;
 	fPDG = 13;
 }
 

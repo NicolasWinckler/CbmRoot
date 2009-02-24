@@ -54,8 +54,7 @@ Double_t ChiSq(
 	Double_t dx = hit->GetX() - par->GetX();
 	Double_t dy = hit->GetY() - par->GetY();
 
-	Double_t norm = -dxx * dyy + dxx * C5 + dyy * C0 - C0 * C5 + dxy * dxy -
-						2 * dxy * C1 + C1 * C1;
+	Double_t norm = -dxx * dyy + dxx * C5 + dyy * C0 - C0 * C5 + dxy * dxy - 2 * dxy * C1 + C1 * C1;
 	if (norm == 0.) norm = 1e-10;
 
 	Double_t chi2 = (-dx * dx * (dyy - C5) - dy * dy * (dxx - C0) + 2 * dx * dy * (dxy - C1)) / norm;

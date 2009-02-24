@@ -10,19 +10,21 @@ class CbmLitWeightCalculatorSimple : public CbmLitWeightCalculator
 public:
 	CbmLitWeightCalculatorSimple();
 	virtual ~CbmLitWeightCalculatorSimple();
-	
+
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
-	
+
 	virtual LitStatus DoCalculate(
 			const CbmLitTrackParam* par,
 			HitPtrIterator itBegin,
-			HitPtrIterator itEnd);
-	
+			HitPtrIterator itEnd,
+			Double_t T);
+
 	virtual LitStatus DoCalculate(
 			const CbmLitTrackParam* par,
-			HitPtrVector& hits);
-	
+			HitPtrVector& hits,
+			Double_t T);
+
 	ClassDef(CbmLitWeightCalculatorSimple, 1);
 };
 

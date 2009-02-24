@@ -3,6 +3,9 @@
 
 #include "CbmLitTrackFinderBase.h"
 
+class CbmLitTrackFitter;
+class CbmLitTrackUpdate;
+
 class CbmLitTrackFinderRobust : public CbmLitTrackFinderBase
 {
 public:
@@ -17,7 +20,7 @@ public:
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
 
-private:
+protected:
 	void FollowTracks(
 			TrackPtrIterator itBegin,
 			TrackPtrIterator itEnd);
@@ -37,6 +40,13 @@ private:
 	Bool_t AddHits(
 			CbmLitTrack* track,
 			HitPtrIteratorPair bounds);
+
+	void FitTracks(
+			TrackPtrIterator itBegin,
+			TrackPtrIterator itEnd);
+
+	CbmLitTrackFitter* fFitter;
+	CbmLitTrackUpdate* fFilter;
 
 	ClassDef(CbmLitTrackFinderRobust, 1);
 };

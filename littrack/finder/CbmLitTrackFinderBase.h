@@ -43,7 +43,9 @@ protected:
     Int_t fPDG;
     Double_t fSigmaCoef;
     Double_t fChiSqStripHitCut;
+    Double_t fChiSqPixelHitCut;
     Double_t fMaxCovSq;
+    Bool_t fUseFastSearch;
     Int_t fVerbose;
     Int_t fEventNo;
 
@@ -60,7 +62,7 @@ protected:
     		TrackPtrIterator itBegin,
     		TrackPtrIterator itEnd);
 
-    Bool_t IsIn(
+    Bool_t IsHitInValidationWindow(
     		const CbmLitTrackParam* par,
     		const CbmLitHit* hit) const;
 

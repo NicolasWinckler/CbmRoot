@@ -103,6 +103,7 @@ Bool_t CbmLitTrack::CheckParams() const
 		if (std::abs(covFirst[i]) > 10000. ||
 			std::abs(covLast[i]) > 10000.) return false;
 	}
+	if (GetNofHits() < 1) return false;
 	return true;
 }
 

@@ -11,6 +11,9 @@ class CbmLitTrackSelection;
 
 #include <string>
 
+//#include <boost/shared_ptr.hpp>
+//#include <boost/tr1/memory.hpp>
+
 class CbmLitToolFactory
 {
 

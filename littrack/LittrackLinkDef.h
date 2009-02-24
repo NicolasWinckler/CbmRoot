@@ -7,7 +7,7 @@
 //ana
 #pragma link C++ class  CbmLitPropagationAnalysis+;
 #pragma link C++ class  CbmLitElossAna+;
-#pragma link C++ class  CbmLitRobustAna+;
+#pragma link C++ class  CbmLitRobustFitterAnalysis+;
 
 // base
 #pragma link C++ class  CbmLitTool+;
@@ -36,7 +36,7 @@
 // finder
 #pragma link C++ class  CbmLitTrackFinderRobust+;
 #pragma link C++ class  CbmLitTrdTrackFinderBranch+;
-#pragma link C++ class  CbmLitTrdTrackFinderS+;
+#pragma link C++ class  CbmLitTrdTrackFinderStandalone+;
 #pragma link C++ class  CbmLitMuchTrackFinderBranch+;
 #pragma link C++ class  CbmLitMuchTrackFinderRobust+;
 #pragma link C++ class  CbmLitTrdTrackFinderRobust+;
@@ -78,9 +78,9 @@
 #pragma link C++ class  CbmLitRecQa+;
 
 //robust
-#pragma link C++ class  CbmLitEffHitCalculatorImp+;
+#pragma link C++ class  CbmLitWeightedHitCalculatorImp+;
 #pragma link C++ class  CbmLitWeightCalculatorSimple+;
-#pragma link C++ class  CbmLitRobustSelection+;
+#pragma link C++ class  CbmLitWeightCalculatorGauss+;
 
 //selection
 #pragma link C++ class  CbmLitTrackSelectionA+;

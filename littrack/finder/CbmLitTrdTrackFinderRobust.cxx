@@ -46,6 +46,7 @@ void CbmLitTrdTrackFinderRobust::Init()
    fVerbose = 1;
    fNofIter = 1;
    fMaxNofMissingHits = 1;
+   fUseFastSearch = true;
    fSigmaCoef = 3.5;
    fPDG = 211;
 }

@@ -133,7 +133,7 @@ void CbmLitMuchTrackFinderTrigger::CreateTracks()
 			for (HitIterator iHit = fHits[iLayer].begin(); 
 			       iHit != fHits[iLayer].end(); iHit++){
 				
-				if (!IsIn(xpred, ypred, *iHit)) continue;
+				if (!IsHitInValidationWindow(xpred, ypred, *iHit)) continue;
 				isMissingHit = false;
 				
 				nofTrackHits[iLayer - startLayer]++;
@@ -174,7 +174,7 @@ void CbmLitMuchTrackFinderTrigger::AddTrack(std::vector<CbmLitPixelHit*>& trackH
 // -----------------------------------------------------------------------
 
 // -----------------------------------------------------------------------
-Bool_t CbmLitMuchTrackFinderTrigger::IsIn(Double_t xpred, 
+Bool_t CbmLitMuchTrackFinderTrigger::IsHitInValidationWindow(Double_t xpred, 
 		                                  Double_t ypred,
 		                                  CbmLitPixelHit* pHit)
 {

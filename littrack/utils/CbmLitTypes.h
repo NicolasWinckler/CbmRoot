@@ -25,4 +25,5 @@ typedef std::vector<CbmLitTrack*> TrackPtrVector;
 typedef std::vector<CbmLitFitNode> FitNodeVector;
 typedef std::vector<CbmLitFitNode>::iterator FitNodeIterator;
 
+
 #endif /*CBMLITTYPES_H_*/

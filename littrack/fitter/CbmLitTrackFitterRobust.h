@@ -4,13 +4,13 @@
 #include "CbmLitTrackFitter.h"
 #include "CbmLitTypes.h"
 
-class CbmLitWeightCalculator;
-class CbmLitEffHitCalculator;
-
 class CbmLitTrackParam;
 class CbmLitStripHit;
 class CbmLitPixelHit;
 class CbmLitHit;
+class CbmLitTrack;
+class CbmLitWeightedHitCalculatorImp;
+class CbmLitWeightCalculator;
 
 class CbmLitTrackFitterRobust : public CbmLitTrackFitter
 {
@@ -27,35 +27,21 @@ public:
 	virtual LitStatus Fit(
 			CbmLitTrack *track,
 			Bool_t downstream = true);
+
 private:
+	LitStatus CreateEffectiveTrack(
+			CbmLitTrack* track,
+			Int_t iter,
+			CbmLitTrack* etrack) const;
 
-	LitStatus MultivariateGaussWeight(
+	LitStatus CreateEffectiveHit(
+			HitPtrIterator itBegin,
+			HitPtrIterator itEnd,
 			const CbmLitTrackParam* par,
-			CbmLitHit* hit,
-			Double_t T) const;
-	LitStatus MultivariateGaussWeight(
-			const CbmLitTrackParam* par,
-			CbmLitStripHit* hit,
-			Double_t T) const;
-	LitStatus MultivariateGaussWeight(
-			const CbmLitTrackParam* par,
-			CbmLitPixelHit* hit,
-			Double_t T) const;
+			Int_t iter,
+			CbmLitHit* hit) const;
 
-	Double_t MultivariateGaussCut(
-			const CbmLitHit* hit,
-			Double_t T,
-			Double_t cutValue) const;
-	Double_t MultivariateGaussCut(
-			const CbmLitStripHit* hit,
-			Double_t T,
-			Double_t cutValue) const;
-	Double_t MultivariateGaussCut(
-			const CbmLitPixelHit* hit,
-			Double_t T,
-			Double_t cutValue) const;
-
-	LitStatus CalcWeights(
+	LitStatus CalculateWeights(
 			const CbmLitTrackParam* par,
 			HitPtrIterator itBegin,
 			HitPtrIterator itEnd,
@@ -65,45 +51,22 @@ private:
 			HitPtrIterator itBegin,
 			HitPtrIterator itEnd) const;
 
-	void MarkOutliers(
+	Bool_t MarkOutliers(
 			HitPtrIterator itBegin,
 			HitPtrIterator itEnd) const;
 
-	LitStatus Normalize(
-			HitPtrIterator itBegin,
-			HitPtrIterator itEnd) const;
-
-	LitStatus CreateEffTrack(
-			const std::vector<HitPtrIteratorPair>& bounds,
-			Int_t iter,
-			CbmLitTrack* etrack) const;
-
-	LitStatus CheckEffTrack(
+	LitStatus CheckEffectiveTrack(
 			const CbmLitTrack* track) const;
 
-//	LitStatus KoshiWeight(
-//			const CbmLitTrackParam* par,
-//			HitIterator itBegin,
-//			HitIterator itEnd,
-//			Int_t iter);
-//
-//	LitStatus OptimalWeight(
-//			const CbmLitTrackParam* par,
-//			HitIterator itBegin,
-//			HitIterator itEnd,
-//			Int_t iter);
-//
-//	LitStatus TukeyWeight(
-//			const CbmLitTrackParam* par,
-//			HitIterator itBegin,
-//			HitIterator itEnd,
-//			Int_t iter);
+	LitStatus CreateOutputTrack(
+			CbmLitTrack* track);
 
 	CbmLitTrackFitter* fFitter;
 	CbmLitTrackFitter* fSmoother;
-	CbmLitWeightCalculator* fWeightCalc;
-	CbmLitEffHitCalculator* fEffHitCalc;
-	CbmLitWeightCalculator* fWeightCalcSimple;
+
+	CbmLitWeightedHitCalculatorImp* fWeightedHitCalculator;
+	CbmLitWeightCalculator* fSimpleWeightCalculator;
+	CbmLitWeightCalculator* fGaussWeightCalculator;
 
 	Int_t fNofIterations;
 	std::vector<Double_t> fAnnealing;

@@ -2,6 +2,7 @@
 
 #include "CbmLitTrackSelection.h"
 #include "CbmLitTrackPropagator.h"
+#include "CbmLitTrackFitter.h"
 #include "CbmLitTrackUpdate.h"
 #include "CbmLitComparators.h"
 #include "CbmLitMemoryManagment.h"
@@ -46,6 +47,7 @@ LitStatus CbmLitTrackFinderRobust::DoFind(
 		ArrangeHits(fHitArray.begin(), fHitArray.end());
 		InitTrackSeeds(fTrackSeedArray.begin(), fTrackSeedArray.end());
 		FollowTracks(fTracks.begin(), fTracks.end());
+//		FitTracks(fTracks.begin(), fTracks.end());
 		fFinalSelection->DoSelect(fTracks.begin(), fTracks.end());
 		RemoveHits(fTracks.begin(), fTracks.end());
 		CopyToOutput(fTracks.begin(), fTracks.end(), tracks);
@@ -117,9 +119,10 @@ Bool_t CbmLitTrackFinderRobust::AddHits(
 		HitPtrIteratorPair bounds)
 {
 	Bool_t hitAdded = false;
-	CbmLitTrackParam par(*track->GetParamLast()), uPar, param;
+	CbmLitTrackParam par(*track->GetParamLast()), uPar;
 	for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
-		if (IsIn(&par, *iHit)) {
+		fFilter->Update(&par, &uPar, *iHit);
+		if (IsHitInValidationWindow(&uPar, *iHit)) {
 			track->AddHit(*iHit);
 			hitAdded = true;
 		}
@@ -127,4 +130,14 @@ Bool_t CbmLitTrackFinderRobust::AddHits(
 	return hitAdded;
 }
 
+void CbmLitTrackFinderRobust::FitTracks(
+		TrackPtrIterator itBegin,
+		TrackPtrIterator itEnd)
+{
+	for (TrackPtrIterator it = itBegin; it != itEnd; it++) {
+		if (fFitter->Fit(*it) == kLITERROR) (*it)->SetQuality(kLITBAD);
+//		if ((*it)->GetLastPlaneId() < 20) (*it)->SetQuality(kLITBAD);
+//		if ((*it)->GetChi2() / (*it)->GetNDF() > 9) (*it)->SetQuality(kLITBAD);
+	}
+}
 ClassImp(CbmLitTrackFinderRobust)

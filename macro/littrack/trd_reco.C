@@ -73,7 +73,7 @@ void trd_reco(Int_t nEvents = 20)
   // ------------------------------------------------------------------------
 
 
-  CbmLitRobustAna::Instance()->WriteToFile();
+  CbmLitRobustFitterAnalysis::Instance()->WriteToFile();
 
   // -----   Finish   -------------------------------------------------------
   timer.Stop();

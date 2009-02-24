@@ -1,6 +1,6 @@
 void much_draw3D()
 {
-  TString dir = "/d/cbm02/andrey/events/newmuch/standard/10mu/mu/";
+  TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu_urqmd/";
   TString mcFile = dir + "mc.root";
 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -17,8 +17,8 @@ void much_draw3D()
   geoMan->PrintOverlaps();
 
   TGeoVolume* master = geoMan->GetMasterVolume();
-  //master->Draw("ogl");
+  master->Draw("ogl");
 
-  TGeoVolume* much = master->FindNode("much_0")->GetVolume();
-  much->Draw("ogl");
+//  TGeoVolume* much = master->FindNode("much_0")->GetVolume();
+//  much->Draw("ogl");
 }

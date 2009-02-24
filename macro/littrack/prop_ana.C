@@ -1,9 +1,9 @@
 #include "../../cbmbase/CbmDetectorList.h";
-void prop_ana(Int_t nEvents = 10000)
+void prop_ana(Int_t nEvents = 1000)
 {
   Int_t iVerbose = 0;
 
-  TString dir = "/home/d/andrey/events/newmuch/large/10mu/mu/";
+  TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu/";
 
    TString inFile = dir + "mc.root";
    TString inFile1 = dir + "sts.reco.root";
@@ -37,7 +37,7 @@ void prop_ana(Int_t nEvents = 10000)
    CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
    run->AddTask(muchMatchTracks);
 
-   CbmLitPropAna* propAna = new CbmLitPropAna(kMUCH, 26);
+   CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis(kMUCH);
    run->AddTask(propAna);
    // -------------------------------------------------------------------------
 

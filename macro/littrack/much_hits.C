@@ -2,16 +2,13 @@ void much_hits(Int_t nEvents = 1000)
 {
   Int_t iVerbose = 0;
 
-  TString dir = "/d/cbm02/andrey/events/newmuch/standard/10mu/mu_urqmd/";
+  TString dir = "/home/d/andrey/events/strawmuch/standard/10mu/mu_urqmd/";
   TString mcFile = dir + "mc.root";
   TString parFile = dir + "params.root";
   TString outFile = dir + "much.hits.root";
-  TString digiFile = dir + "much.digi.root";
+//  TString digiFile = dir + "much.digi.root";
 
-   //TString muchDigiFile = "$VMCWORKDIR/much/parameters/much_digi.400x800mic.par";
-   //TString muchDigiFile = "/u/andrey/cbm/svnfeb08/cbmroot/much/parameters/much_large.digi.par";
-    //TString muchDigiFile = "/u/andrey/cbm/svnfeb08/cbmroot/much/parameters/much_compact.2.norot.digi.par";
-  //TString muchDigiFile = "/u/andrey/cbm/svnfeb08/cbmroot/parameters/much/much_standard.digi.par";
+  TString muchDigiFile = TString(gSystem->Getenv("VMCWORKDIR")) + "/parameters/much/much_standard.digi.par";
 
    TStopwatch timer;
    timer.Start();
@@ -33,15 +30,17 @@ void much_hits(Int_t nEvents = 1000)
    // =========================================================================
 
    // ---  MuCh digitizer ----------------------------------------------------
-   CbmMuchDigitize* muchDigitize = new CbmMuchDigitize("MuchDigitize", digiFile.Data(), iVerbose);
-   muchDigitize->SetUseAvalanche(0); // 0 - Not account for avalanches; 1 - Account for avalanches
+   CbmMuchDigitize* muchDigitize = new CbmMuchDigitize("MuchDigitize", iVerbose);
+ //  CbmMuchDigitize* muchDigitize = new CbmMuchDigitize("MuchDigitize", digiFile.Data(), iVerbose);
+ //  muchDigitize->SetUseAvalanche(0); // 0 - Not account for avalanches; 1 - Account for avalanches
    //muchDigitize->SetMeanNoise(0);
    run->AddTask(muchDigitize);
    // ------------------------------------------------------------------------
 
    // ---  MuCh hit finder ---------------------------------------------------
-   CbmMuchFindHits* muchFindHits = new CbmMuchFindHits("MuchFindHits", digiFile.Data(), iVerbose);
-   muchFindHits->SetUseClustering(0);
+   CbmMuchFindHits* muchFindHits = new CbmMuchFindHits("MuchFindHits", iVerbose);
+//   CbmMuchFindHits* muchFindHits = new CbmMuchFindHits("MuchFindHits", digiFile.Data(), iVerbose);
+//   muchFindHits->SetUseClustering(0);
    run->AddTask(muchFindHits);
 
    // -------------------------------------------------------------------------
@@ -52,12 +51,11 @@ void much_hits(Int_t nEvents = 1000)
    // -----  Parameter database   --------------------------------------------
    FairRuntimeDb* rtdb = run->GetRuntimeDb();
    FairParRootFileIo* parIo1 = new FairParRootFileIo();
-//   FairParRootFileIo* parIo2 = new FairParRootFileIo();
-   // FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
+   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
    parIo1->open(parFile.Data());
-//   parIo2->open(mcFile.Data());
+   parIo2->open(muchDigiFile.Data());
    rtdb->setFirstInput(parIo1);
-//   rtdb->setSecondInput(parIo2);
+   rtdb->setSecondInput(parIo2);
    rtdb->setOutput(parIo1);
    rtdb->saveOutput();
    // ------------------------------------------------------------------------

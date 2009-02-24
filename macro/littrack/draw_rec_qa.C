@@ -1,7 +1,7 @@
-//TString dir  = "/d/cbm02/andrey/events/much/compact10/10mu/mu/";
-//TFile *file = new TFile(dir + "much.tracks.root");
-TString dir  = "/d/cbm02/andrey/events/trd/segmented/e_urqmd/";
-TFile *file = new TFile(dir + "trd.reco.root");
+TString dir  = "/home/d/andrey/events/newmuch/standard/10mu/mu_urqmd/";
+TFile *file = new TFile(dir + "much.tracks.root");
+//TString dir  = "/d/cbm02/andrey/events/trd/segmented/e_urqmd/";
+//TFile *file = new TFile(dir + "trd.reco.root");
 
 Int_t lineWidth = 3;
 Int_t markerSize = 3;

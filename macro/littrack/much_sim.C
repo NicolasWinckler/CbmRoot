@@ -1,22 +1,24 @@
-void much_sim(Int_t nEvents = 1000)
+void much_sim(Int_t nEvents = 5)
 {
-  TString dir = "/d/cbm02/andrey/events/newmuch/standard/10mu/mu_urqmd/";
+  TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu_urqmd/";
 
   TString outFile = dir + "mc.root";
   TString parFile = dir + "params.root";
 
-  TString inFileUrqmd = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
+  TString inFileUrqmd = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
 //  TString plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
 
   TString muchGeom   = "much_standard.geo";
 //  TString muchGeom   = "much_straw_new.geo";
+//  TString pipeGeom   = "pipe_standard.geo";//
   TString pipeGeom   = "pipe_much.geo";
   TString shieldGeom = "shield_standard.geo";
 
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
   TString magnetGeom = "magnet_standard.geo";
-  TString stsGeom    = "sts_allstrips.geo";
+  TString stsGeom    = "sts_Standard_s3055AAFK5.SecD.geo";
+//  TString stsGeom    = "sts_allstrips.geo";
   TString trdGeom    = "trd_standard.geo";
   TString tofGeom    = "tof_standard.geo";
 

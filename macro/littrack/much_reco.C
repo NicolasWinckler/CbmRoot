@@ -1,9 +1,9 @@
 #include "../../cbmbase/CbmDetectorList.h";
-void much_reco(Int_t nEvents = 10)
+void much_reco(Int_t nEvents = 100)
 {
   Int_t iVerbose = 0;
 
-  TString dir = "/d/cbm02/andrey/events/newmuch/standard/10mu/mu_urqmd/";
+  TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu_urqmd/";
 
   TString inFile = dir + "mc.root";
   TString inFile1 = dir + "sts.reco.root";
@@ -29,7 +29,7 @@ void much_reco(Int_t nEvents = 10)
 
   FairGeane* Geane = new FairGeane(inFile.Data());
 
-  CbmMuchTrackFinder* muchTrackFinder = new CbmLitMuchTrackFinderBranch();
+  CbmMuchTrackFinder* muchTrackFinder = new CbmLitMuchTrackFinderRobust();
   CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
   muchFindTracks->UseFinder(muchTrackFinder);
   run->AddTask(muchFindTracks);
@@ -40,7 +40,7 @@ void much_reco(Int_t nEvents = 10)
   CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
   run->AddTask(muchMatchTracks);
 
-  CbmLitRecQa* muchRecQa = new CbmLitRecQa(13, 0.7, kMUCH, 1);
+  CbmLitRecQa* muchRecQa = new CbmLitRecQa(12, 0.7, kMUCH, 1);
   muchRecQa->SetNormType(2); // '2' to number of STS tracks
   run->AddTask(muchRecQa);
 
@@ -75,8 +75,4 @@ void much_reco(Int_t nEvents = 10)
   cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
   cout << endl;
   // ------------------------------------------------------------------------
-
-  cout << " Test passed" << endl;
-  cout << " All ok " << endl;
-  exit(0);
 }

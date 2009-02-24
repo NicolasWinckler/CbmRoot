@@ -1,14 +1,14 @@
-void sts_reco(Int_t nEvents = 10000)
+void sts_reco(Int_t nEvents = 5)
 {
-//  TString dir = "/d/cbm02/andrey/events/newmuch/standard/10mu/mu_urqmd/";
+  TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu_urqmd/";
 //  TString dir = "/d/cbm02/andrey/events/muchstraw/large/10mu/mu/";
-  TString dir  = "/d/cbm02/andrey/events/trd/segmented/e/";
+//  TString dir  = "/d/cbm02/andrey/events/trd/segmented/e/";
   TString inFile = dir + "mc.root";
   TString parFile = dir + "params.root";
   TString outFile = dir + "sts.reco.root";
 
-  TString digiFile = "sts_standard.digi.par";
-//  TString digiFile = "sts_allstrips.digi.par";
+//  TString digiFile = "sts_standard.digi.par";
+  TString digiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";//"sts_allstrips.digi.par";
 
   Int_t iVerbose = 1;
 

@@ -69,7 +69,7 @@ Double_t CbmRichElectronIdAnn::DoSelect(CbmRichRing* ring, Double_t momentum)
     nnPar[1] =  ring->GetBaxis();
     nnPar[2] =  ring->GetPhi();
     nnPar[3] =  ring->GetRadialAngle();
-    nnPar[4] =  ring->GetChi2();
+    nnPar[4] =  ring->GetChi2()/ring->GetNDF();
     nnPar[5] =  ring->GetRadialPosition();
     nnPar[6] =  ring->GetNofHits();
     nnPar[7] =  ring->GetDistance();

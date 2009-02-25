@@ -17,7 +17,7 @@
 *  Revision 1.1  2006/09/13 14:53:31  hoehne
 *  initial version
 *
-*  
+*
 *
 *******************************************************************************/
 
@@ -57,7 +57,7 @@ CbmRichRingSelectNeuralNet::~CbmRichRingSelectNeuralNet()
 void CbmRichRingSelectNeuralNet::Init ()
 {
     CbmRichRingSelect::Init();
-    
+
     TTree *simu = new TTree ("MonteCarlo","MontecarloData");
     Float_t x1,x3,x4,x5,x6,x7,x8, x9, x10, x11;
 
@@ -72,7 +72,7 @@ void CbmRichRingSelectNeuralNet::Init ()
     simu->Branch("x9", &x9,"x9/F");
     simu->Branch("x10", &x10,"x10/F");
     simu->Branch("x11", &x11,"x11/F");
-        
+
     fNN = new TMultiLayerPerceptron("x1,x3,x4,x5,x6,x7,x8,x9,x10:20:x11",simu);
     cout << "-I- CbmRichRingSelectNeuralNet: get NeuralNet weight parameters from: " << fNeuralNetWeights << endl;
     fNN->LoadWeights(fNeuralNetWeights);
@@ -82,37 +82,34 @@ void CbmRichRingSelectNeuralNet::Init ()
 void CbmRichRingSelectNeuralNet::DoSelect(CbmRichRing* ring)
 {
     if (fVerbose > 1) ring->Print();
-    
+
     if (ring->GetAaxis() >= 10. || ring->GetAaxis() <= 0. ||
         ring->GetBaxis() >= 10. || ring->GetBaxis() <= 0. ||
         ring->GetNofHits() <= 5. ||
         ring->GetDistance() <= 0. || ring->GetDistance() >= 999. ||
-       // ring->GetAngle() <= -6.5 || ring->GetAngle() >= 6.5 ||
-       // ring->GetNofHitsOnRing() <= 0. ||
         ring->GetRadialPosition() <= 0. || ring->GetRadialPosition() >= 999. ||
         ring->GetPhi() <= -6.5 || ring->GetPhi() >= 6.5 ||
         ring->GetRadialAngle() <=-6.5 || ring->GetRadialAngle() >= 6.5 ){
-        
+
         ring->SetSelectionNN(-1.);
         return;
     }
-    
-    
+
     ring->SetAngle(GetAngle(ring));
     ring->SetNofHitsOnRing(GetNofHitsOnRing(ring));
 
     Double_t nnPar[10];
-    nnPar[0] =  ring->GetNofHits();    
-    //nnPar[1] =  ring->GetDistance();    
+    nnPar[0] =  ring->GetNofHits();
+    //nnPar[1] =  ring->GetDistance();
     nnPar[1] =  ring->GetAngle();
     nnPar[2] =  ring->GetNofHitsOnRing();
     nnPar[3] =  ring->GetRadialPosition();
     nnPar[4] =  ring->GetAaxis();
     nnPar[5] =  ring->GetBaxis();
     nnPar[6] =  ring->GetPhi();
-    nnPar[7] =  ring->GetRadialAngle(); 
-    nnPar[8] =  ring->GetChi2();    
-    
+    nnPar[7] =  ring->GetRadialAngle();
+    nnPar[8] =  ring->GetChi2() / ring->GetNDF();
+
     Double_t nnEval = fNN->Evaluate(0,nnPar);
     if (fVerbose > 1) cout <<"nnEval = "<<nnEval<<endl;
 

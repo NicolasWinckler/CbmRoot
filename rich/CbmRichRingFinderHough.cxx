@@ -11,9 +11,6 @@
 
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
-#include "CbmRichRingFitterCOP.h"
-
-#include "FairTrackParam.h"
 
 #include "TString.h"
 #include "TStopwatch.h"
@@ -69,8 +66,8 @@ void CbmRichRingFinderHough::Init()
     fFitCOP = new CbmRichRingFitterCOP(0, 0);
     fFitCOP->Init();
 
-    fFitEllipse = new CbmRichRingFitterEllipse(0, 0, "muon");
-    fFitEllipse->Init();
+    fFitEllipseTau = new CbmRichRingFitterEllipseTau(0, 0, "muon");
+    fFitEllipseTau->Init();
 
 }
 
@@ -192,29 +189,37 @@ void CbmRichRingFinderHough::SetParameters(TString geometry)
 		fNofBinsY = 15;
 		fNofBinsR = 40;
 
+		fAnnCut = 0.0;
+		fUsedHitsCut = 0.35;
+		fUsedHitsAllCut = 0.45;
+
 		richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights.txt";
     }
 
     if (geometry == "small" || geometry == "compact"){
-        fMaxDistance = 12.;
+        fMaxDistance = 11.5;
         fMinDistance = 2.5;
         fMinDistance2 = fMinDistance*fMinDistance;
         fMaxDistance2 = fMaxDistance*fMaxDistance;
 
-        fMinRadius = 3.;
-        fMaxRadius = 6.0;
+        fMinRadius = 3.3;
+        fMaxRadius = 5.7;
 
-        fHTCut = 90;
-        fHitCut = 10;
+        fHTCut = 50;
+        fHitCut = 5;
 
-        fHTCutR = 40;
-        fHitCutR = 10;
+        fHTCutR = 20;
+        fHitCutR = 3;
 
         fNofBinsX = 15;
         fNofBinsY = 15;
         fNofBinsR = 40;
+
+		fAnnCut = 0.0;
+		fUsedHitsCut = 0.4;
+		fUsedHitsAllCut = 0.4;
+
 	    richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights_Compact.txt";
-	    //richSelectNNFile += "/parameters/rich/nn_1.txt";
     }
 
     fANNSelect = new CbmRichRingSelectNeuralNet(0, richSelectNNFile);
@@ -472,34 +477,32 @@ void CbmRichRingFinderHough::FindMaxBinsXYR(Int_t *maxBinX, Int_t *maxBinY, Int_
 
 void CbmRichRingFinderHough::RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring)
 {
-	Double_t xf1 = ring->GetXF1();
-	Double_t yf1 = ring->GetYF1();
-	Double_t xf2 = ring->GetXF2();
-	Double_t yf2 = ring->GetYF2();
+	Double_t A = ring->GetAPar();
+	Double_t B = ring->GetBPar();
+	Double_t C = ring->GetCPar();
+	Double_t D = ring->GetDPar();
+	Double_t E = ring->GetEPar();
+	Double_t F = ring->GetFPar();
 
-	Double_t drElCut = 0.8*sqrt(ring->GetChi2());
-	if (drElCut > 0.3)	drElCut = 0.3;
-	drElCut = sqrt(drElCut);
+	Double_t rms = TMath::Sqrt( ring->GetChi2()/ring->GetNofHits() );
+	Double_t dCut = rms;
+	if (dCut > 0.3) dCut = 0.3;
 
-	//drElCut = 0.3;
-
-	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
+	for(Int_t j = 0; j < indmax - indmin + 1; j++){
 		Double_t x = fData[j + indmin].fX;
 		Double_t y = fData[j + indmin].fY;
 
-		Double_t d1 = sqrt( (x-xf1)*(x-xf1) + (y-yf1)*(y-yf1));
-		Double_t d2 = sqrt( (x-xf2)*(x-xf2) + (y-yf2)*(y-yf2));
+        Double_t d1 = TMath::Abs(A*x*x + B*x*y + C*y*y + D*x + E*y + F);
+        Double_t d2 = sqrt( pow(2*A*x + B*y + D, 2) + pow(B*x + 2*C*y + E, 2) );
 
-		Double_t dr = fabs(d1 + d2 - 2.* ring->GetAaxis());
-		if (dr < drElCut) {
-			fData[j+indmin].fIsUsed = true;
-		}
+        Double_t d = d1/d2;
+        if (d < dCut) fData[j+indmin].fIsUsed = true;
 	}
 }
 
 void CbmRichRingFinderHough::RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring)
 {
-	Double_t drHitCut = sqrt(ring->GetChi2());
+	Double_t drHitCut = sqrt(ring->GetChi2()/ring->GetNofHits());
 	if (drHitCut > 0.3)	drHitCut = 0.3;
 
 	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
@@ -545,9 +548,6 @@ void CbmRichRingFinderHough::FindPeak(Int_t indmin, Int_t indmax)
 	Double_t drCOPCut = 3*sqrt(ring1.GetChi2());
 	if (drCOPCut > 1.2)	drCOPCut = 1.2;
 
-	//drCOPCut = 1.2;
-	//Ann cut = -0.2
-	//could be also drCOPCut = 1.2, better fake rejection; Ann cut = -0.5
 	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
 		Double_t rx = fData[j + indmin].fX - ring1.GetCenterX();
 		Double_t ry = fData[j + indmin].fY - ring1.GetCenterY();
@@ -559,12 +559,15 @@ void CbmRichRingFinderHough::FindPeak(Int_t indmin, Int_t indmax)
 		}
 	}
 
-	fFitEllipse->DoFit(&ring2);
+	fFitEllipseTau->DoFit(&ring2);
+
+//	fFitEllipse->DoFit(&ring2);
+
 	fANNSelect->DoSelect(&ring2);
 	//remove found hits only for good quality rings
-	if (ring2.GetSelectionNN() > -0.5) {
-		RemoveHitsAroundRing(indmin, indmax, &ring2);
-		//RemoveHitsAroundEllipse(indmin, indmax, &ring2);
+	if (ring2.GetSelectionNN() > fAnnCut) {
+		//RemoveHitsAroundRing(indmin, indmax, &ring2);
+		RemoveHitsAroundEllipse(indmin, indmax, &ring2);
 
 		//fFoundRings.push_back(ring2);
 	}
@@ -593,7 +596,7 @@ void CbmRichRingFinderHough::RingSelection()
 					nofUsedHits++;
 				}
 			}
-			if ((Double_t)nofUsedHits/(Double_t)nofHits > 0.4){
+			if ((Double_t)nofUsedHits/(Double_t)nofHits > fUsedHitsCut){
 				isGoodRing = false;
 				break;
 			}
@@ -608,7 +611,7 @@ void CbmRichRingFinderHough::RingSelection()
 				nofUsedHitsAll++;
 			}
 		}
-		if ((Double_t)nofUsedHitsAll/(Double_t)nofHits > 0.5){
+		if ((Double_t)nofUsedHitsAll/(Double_t)nofHits > fUsedHitsAllCut){
 			isGoodRingAll = false;
 		}
 

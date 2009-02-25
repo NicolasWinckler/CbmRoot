@@ -13,7 +13,7 @@
 *  Revision 1.1  2006/09/13 14:53:31  hoehne
 *  initial version
 *
-*  
+*
 *
 *******************************************************************************/
 #include "CbmRichRingSelect.h"
@@ -36,14 +36,14 @@ using std::atan;
 void CbmRichRingSelect::Init()
 {
 	cout << "CbmRichRingSelect::Init()"<<endl;
-	// Get and check FairRootManager
+	// Get and check CbmRootManager
 	FairRootManager* ioman = FairRootManager::Instance();
 	if (! ioman) {
 		cout << "-E- CbmRichRingSelect::Init()"
 		<< "RootManager not instantised!" << endl;
 		return;
 	}
-	
+
 	// Get hit Array
 	fHitsArray = (TClonesArray*) ioman->GetObject("RichHit");
 	if ( ! fHitsArray) {
@@ -56,18 +56,29 @@ void CbmRichRingSelect::Init()
 Int_t CbmRichRingSelect::GetNofHitsOnRing(CbmRichRing* ring){
     Int_t count = 0;
 	Int_t nHits = ring->GetNofHits();
-	CbmRichHit* hitRing;
+	CbmRichHit* hit;
+	Double_t A = ring->GetAPar();
+	Double_t B = ring->GetBPar();
+	Double_t C = ring->GetCPar();
+	Double_t D = ring->GetDPar();
+	Double_t E = ring->GetEPar();
+	Double_t F = ring->GetFPar();
+
 	for(Int_t iH = 0; iH < nHits; iH++){
-		hitRing = (CbmRichHit*)fHitsArray->At(ring->GetHit(iH));
-		if (!hitRing) {
-			cout << "-E- Double_t CbmRichRing::GetNofHitsOnRing()"<< iH <<endl;
-			continue;
-		}		
-		Double_t rx = hitRing->X() - ring->GetCenterX();
-		Double_t ry = hitRing->Y() - ring->GetCenterY();
-		Double_t r = sqrt(rx*rx + ry*ry) - ring->GetRadius();
-		if ( r < 0.35) count++;
+		hit = (CbmRichHit*)fHitsArray->At(ring->GetHit(iH));
+		if (!hit) continue;
+
+		Double_t x =hit->X();
+		Double_t y = hit->Y();
+
+        Double_t d1 = TMath::Abs(A*x*x + B*x*y + C*y*y + D*x + E*y + F);
+        Double_t d2 = sqrt( pow(2*A*x + B*y + D, 2) + pow(B*x + 2*C*y + E, 2) );
+
+        Double_t d = d1/d2;
+
+        if (d < 0.3) count++;
 	}
+
 	return count;
 }
 
@@ -89,7 +100,7 @@ Double_t CbmRichRingSelect::GetAngle(CbmRichRing* ring){
 			cout << "-E- Double_t CbmRichRing::GetAngle()"<< iHit <<endl;
 			continue;
 		}
-	
+
 		if ((hitRing->Y()-yRing) == 0) {
 			cout << " -W- CbmRichRing 0 in angle determination, y " << endl;
 			return 999.;
@@ -98,7 +109,7 @@ Double_t CbmRichRingSelect::GetAngle(CbmRichRing* ring){
 			cout << " -W- CbmRichRing 0 in angle determination, x " << endl;
 			return 999.;
 		}
-	
+
 		if( hitRing->X() > xRing && hitRing->Y() > yRing ){
 			alpha.push_back(atan(fabs((hitRing->Y()-yRing)/
 					(hitRing->X()-xRing))));

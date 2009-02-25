@@ -39,7 +39,7 @@ CbmRichElectronsQa::CbmRichElectronsQa(const char *name, const char *title, Int_
 
 	fMinNofHitsInRichRing = 5;
 	fMinNofTrdHits = 8;
-	fTrdAnnCut = 0.8;
+	fTrdAnnCut = 0.75;
 
 ///RICH
 	fNofMCRings = 0;
@@ -127,7 +127,7 @@ CbmRichElectronsQa::~CbmRichElectronsQa()
 InitStatus CbmRichElectronsQa::Init()
 {
 	cout << "InitStatus CbmRichElectronsQa::Init()"<<endl;
-	// Get and check FairRootManager
+	// Get and check CbmRootManager
 	FairRootManager* ioman = FairRootManager::Instance();
 	if (!ioman) {
 		cout << "-E- CbmRichElectronsQa::Init: " << "RootManager not instantised!"
@@ -568,12 +568,16 @@ void CbmRichElectronsQa::GlobalTracksMatchEff()
         if (pdg != 11 || motherId != -1) continue;//only primary electrons
 
 		if (richRing->GetRecFlag() == 3 && mcIdSts == mcIdRich && mcIdRich != -1){
-        	fNofTrueMatchStsRichGlobal++;
+			cout << "rich = " <<  iTrack << " " << gTrack->GetTrdTrackIndex() << " ";
+			fNofTrueMatchStsRichGlobal++;
         	fhTrueMatchStsRichGlobal->Fill(momentum);
 		}
 ///TRD
 		Int_t trdIndex = gTrack->GetTrdTrackIndex();
-		if (trdIndex == -1) continue;
+
+		if (trdIndex == -1) {
+			continue;
+		}
 		CbmTrdTrack* trdTrack = (CbmTrdTrack*)fTrdTracks->At(trdIndex);
 		if (!trdTrack)continue;
 		CbmTrdTrackMatch* trdTrackMatch = (CbmTrdTrackMatch*)fTrdTrackMatches->At(trdIndex);
@@ -655,7 +659,9 @@ void CbmRichElectronsQa::GlobalTracksElIdEff()
 
 ///TRD
 		Int_t trdIndex = gTrack->GetTrdTrackIndex();
-		if (trdIndex == -1) continue;
+		if (trdIndex == -1) {
+			continue;
+		}
 		CbmTrdTrack* trdTrack = (CbmTrdTrack*)fTrdTracks->At(trdIndex);
 		if (!trdTrack)continue;
 		CbmTrdTrackMatch* trdTrackMatch = (CbmTrdTrackMatch*)fTrdTrackMatches->At(trdIndex);
@@ -756,7 +762,7 @@ void CbmRichElectronsQa::DiffElandPi()
         Double_t axisB = ring->GetBaxis();
         Double_t phi = ring->GetPhi();
         Double_t radAngle = ring->GetRadialAngle();
-        Double_t chi2 = ring->GetChi2();
+        Double_t chi2 = ring->GetChi2()/ring->GetNDF();
         Double_t radPos = ring->GetRadialPosition();
         Double_t nofHits = ring->GetNofHits();
         Double_t dist = ring->GetDistance();

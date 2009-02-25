@@ -67,6 +67,10 @@ class CbmRichRingFinderHough : public CbmRichRingFinder {
 	Int_t fHTCutR;
 	Int_t fHitCutR;
 
+	Double_t fAnnCut;
+	Double_t fUsedHitsCut;
+	Double_t fUsedHitsAllCut;
+
 	std::vector<CbmRichMyPoint> fData;  ///Rich hits
 
 	std::vector< std::vector<Int_t> > fHist;
@@ -80,7 +84,8 @@ class CbmRichRingFinderHough : public CbmRichRingFinder {
 
 	Int_t fNEvent; /// event number
 	CbmRichRingFitterCOP* fFitCOP;
-	CbmRichRingFitterEllipse* fFitEllipse;
+	CbmRichRingFitterEllipseTau* fFitEllipseTau;
+	//CbmRichRingFitterEllipse* fFitEllipse;
 
 	CbmRichRingSelectNeuralNet* fANNSelect;
 

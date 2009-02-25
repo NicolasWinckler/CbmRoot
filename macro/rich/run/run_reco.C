@@ -19,7 +19,7 @@
 
 #include "../../../cbmbase/CbmDetectorList.h";
 
-void run_reco(Int_t nEvents = 500)
+void run_reco(Int_t nEvents = 800)
 {
 
   // ========================================================================
@@ -29,16 +29,16 @@ void run_reco(Int_t nEvents = 500)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "/d/cbm02/slebedev/rich/FEB09/real/auau.25gev.centr.0001.mc.root";
+  TString inFile = "/d/cbm02/slebedev/rich/MAR09/real/auau.25gev.centr.0000.mc.root";
 
   // Parameter file
-  TString parFile = "/d/cbm02/slebedev/rich/FEB09/real/auau.25gev.centr.0001.params.root";
+  TString parFile = "/d/cbm02/slebedev/rich/MAR09/real/auau.25gev.centr.0000.params.root";
 
   // STS digitisation file
   TString stsDigiFile = "sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/d/cbm02/slebedev/rich/FEB09/real/auau.25gev.centr.0001.reco.root";
+  TString outFile = "/d/cbm02/slebedev/rich/MAR09/real/auau.25gev.centr.0000.reco.root";
 
 
   // In general, the following parts need not be touched
@@ -367,7 +367,7 @@ void run_reco(Int_t nEvents = 500)
   // B-field configuration
   TString field ="muon";  // choose between "muon" or "active"
   Double_t iRingCorr = 0.;      // correction done (default), choose 0 if not
-  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipse(iVerbose, iRingCorr, field);
+  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, iRingCorr, field);
   CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
   run->AddTask(fitRings);
   //--------------------------------------------------------------------------

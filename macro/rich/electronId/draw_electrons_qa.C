@@ -27,9 +27,7 @@ void draw_diff_el_pi(TH1D* h1, TH1D* h2)
 }
 
 void draw_electrons_qa(){
- 	//TFile *file = new TFile("/d/cbm02/slebedev/rich/MAY08/electronId/recoqa.compact.root");
- 	TFile *file = new TFile("/d/cbm02/slebedev/rich/MAY08/real/auau.25gev.centr.0000.qa.root");
- 	//TFile *file = new TFile("/d/cbm02/slebedev/rich/MAY08/electronId/urqmd.0000.reco.newstsrich.lit.root");
+ 	TFile *file = new TFile("/d/cbm02/slebedev/rich/FEB09/real/auau.25gev.centr.0005.reco.qa.L1.root");
 
    gROOT->SetStyle("Plain");
     gStyle->SetPalette(1,0);
@@ -219,9 +217,10 @@ void draw_electrons_qa(){
     sprintf(effTxt,"RICH+TRD el id (%.2f\%)", (Double_t)fhTrueIdRichTrd->GetEntries()/fhAccRings->GetEntries()*100);
     elidLeg1->AddEntry(stsRichTrdEff,effTxt);
     elidLeg1->Draw();
+    gPad->SetGridy(true);
+    gPad->SetGridx(true);
 
 	c7->cd(2);
-
     TH1D* piSuprRich = divide_hist(fhAccPi,fhPiasElRich);
     piSuprRich->SetTitle("Pion supression");
     piSuprRich->GetYaxis()->SetTitle("pion supression");
@@ -230,6 +229,8 @@ void draw_electrons_qa(){
     piSuprRich->SetMarkerSize(2);
     piSuprRich->SetMarkerColor(kRed);
     piSuprRich->Draw();
+    piSuprRich->SetMinimum(5);
+    piSuprRich->SetMaximum(1e5);
 
     TH1D* piSuprRichTrd = divide_hist(fhAccPi, fhPiasElRichTrd);
     piSuprRichTrd->SetLineColor(kGreen+2);
@@ -249,5 +250,7 @@ void draw_electrons_qa(){
     elidLeg2->AddEntry(piSuprRichTrd, effTxt);
     elidLeg2->Draw();
     gPad->SetLogy(true);
+    gPad->SetGridy(true);
+    gPad->SetGridx(true);
 }
 

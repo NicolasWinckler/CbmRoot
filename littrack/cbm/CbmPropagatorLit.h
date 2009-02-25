@@ -2,6 +2,7 @@
 #define CBMPROPAGATORLIT_H_
 
 #include "CbmPropagator.h"
+#include "CbmLitPtrTypes.h"
 
 class FairTrackParam;
 class CbmLitTrackPropagator;
@@ -33,7 +34,7 @@ public:
 		   TMatrixD& F);
 
 private:
-    CbmLitTrackPropagator* fPropagator;
+    TrackPropagatorPtr fPropagator;
 
    ClassDef(CbmPropagatorLit, 1);
 };

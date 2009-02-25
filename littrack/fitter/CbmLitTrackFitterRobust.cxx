@@ -19,14 +19,14 @@
 #include <algorithm>
 
 CbmLitTrackFitterRobust::CbmLitTrackFitterRobust(
-		CbmLitTrackFitter* fitter,
-		CbmLitTrackFitter* smoother)
+		TrackFitterPtr fitter,
+		TrackFitterPtr smoother)
 {
 	fFitter = fitter;
 	fSmoother = smoother;
-	fWeightedHitCalculator = new CbmLitWeightedHitCalculatorImp;
-	fSimpleWeightCalculator = new CbmLitWeightCalculatorSimple;
-	fGaussWeightCalculator = new CbmLitWeightCalculatorGauss;
+	fWeightedHitCalculator = WeightedHitCalculatorPtr(new CbmLitWeightedHitCalculatorImp());
+	fSimpleWeightCalculator = WeightCalculatorPtr(new CbmLitWeightCalculatorSimple());
+	fGaussWeightCalculator = WeightCalculatorPtr(new CbmLitWeightCalculatorGauss());
 
 	//track fit parameters
 	fNofIterations = 2;
@@ -42,9 +42,9 @@ CbmLitTrackFitterRobust::CbmLitTrackFitterRobust(
 
 CbmLitTrackFitterRobust::~CbmLitTrackFitterRobust()
 {
-	delete fWeightedHitCalculator;
-	delete fSimpleWeightCalculator;
-	delete fGaussWeightCalculator;
+//	delete fWeightedHitCalculator;
+//	delete fSimpleWeightCalculator;
+//	delete fGaussWeightCalculator;
 }
 
 LitStatus CbmLitTrackFitterRobust::Initialize()

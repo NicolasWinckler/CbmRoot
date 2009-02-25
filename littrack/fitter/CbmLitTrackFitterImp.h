@@ -2,33 +2,30 @@
 #define CBMLITTRACKFITTERIMP_H_
 
 #include "CbmLitTrackFitter.h"
+#include "CbmLitPtrTypes.h"
 
-class CbmLitTrackPropagator;
-class CbmLitTrackUpdate;
 class CbmLitTrack;
 
 class CbmLitTrackFitterImp : public CbmLitTrackFitter
 {
 public:
 	CbmLitTrackFitterImp(
-			CbmLitTrackPropagator* propagator,
-			CbmLitTrackUpdate* update);
-	
+			TrackPropagatorPtr propagator,
+			TrackUpdatePtr update);
+
 	virtual ~CbmLitTrackFitterImp();
 
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
-	
+
 	virtual LitStatus Fit(
 			CbmLitTrack *track,
 			Bool_t downstream = true);
-
 private:
-	
-	CbmLitTrackPropagator* fPropagator;
-	CbmLitTrackUpdate* fUpdate;
+	TrackPropagatorPtr fPropagator;
+	TrackUpdatePtr fUpdate;
 	Bool_t fDownstream;
-	
+
 	ClassDef(CbmLitTrackFitterImp, 1)
 };
 

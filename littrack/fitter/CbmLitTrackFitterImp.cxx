@@ -10,8 +10,8 @@
 #include <iostream>
 
 CbmLitTrackFitterImp::CbmLitTrackFitterImp(
-		CbmLitTrackPropagator* propagator,
-		CbmLitTrackUpdate* update):
+		TrackPropagatorPtr propagator,
+		TrackUpdatePtr update):
 	fDownstream(true)
 {
 	fPropagator = propagator;

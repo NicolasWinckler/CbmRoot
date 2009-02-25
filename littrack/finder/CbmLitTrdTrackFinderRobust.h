@@ -3,6 +3,7 @@
 
 #include "CbmTrdTrackFinder.h"
 #include "CbmLitTrackFinderRobust.h"
+#include "CbmLitPtrTypes.h"
 
 class CbmLitTrackPropagator;
 
@@ -14,19 +15,19 @@ class CbmLitTrdTrackFinderRobust : public CbmTrdTrackFinder,
 public:
 	CbmLitTrdTrackFinderRobust();
 	virtual ~CbmLitTrdTrackFinderRobust();
-	
+
     virtual void Init();
     virtual Int_t DoFind(TClonesArray* hitArray,
                          TClonesArray* trackArray);
 private:
 	TClonesArray* fTrackSeedsArray;
-	
-	CbmLitTrackPropagator* fPropagatorToDet;
-    
+
+	TrackPropagatorPtr fPropagatorToDet;
+
 	void CreateTrackSeeds(
     		TClonesArray* trackArray,
     		TrackPtrVector& trackSeeds);
-	
+
 	ClassDef(CbmLitTrdTrackFinderRobust, 1);
 };
 

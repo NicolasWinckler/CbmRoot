@@ -15,7 +15,7 @@ CbmPropagatorLit::CbmPropagatorLit(
 
 CbmPropagatorLit::~CbmPropagatorLit()
 {
-	if (fPropagator) delete fPropagator;
+//	if (fPropagator) delete fPropagator;
 }
 
 StatusCode CbmPropagatorLit::Propagate(

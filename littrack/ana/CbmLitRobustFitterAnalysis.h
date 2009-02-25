@@ -6,8 +6,9 @@
 #include "FairTask.h"
 #include "CbmDetectorList.h"
 #include "CbmLitTypes.h"
+#include "CbmLitPtrTypes.h"
 
-class CbmLitTrackFitter;
+//class CbmLitTrackFitter;
 class CbmLitTrack;
 class TList;
 class TH1D;
@@ -45,7 +46,7 @@ private:
 
 	TList* fHistoList;
 
-	CbmLitTrackFitter* fFitter;
+	TrackFitterPtr fFitter;
 
 //	TClonesArray* fMCTracks;
 //	TClonesArray* fMCPoints;

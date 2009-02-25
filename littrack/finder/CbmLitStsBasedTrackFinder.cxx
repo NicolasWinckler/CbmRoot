@@ -22,7 +22,7 @@ CbmLitStsBasedTrackFinder::CbmLitStsBasedTrackFinder()
 
 CbmLitStsBasedTrackFinder::~CbmLitStsBasedTrackFinder()
 {
-	delete fPropagatorToDet;
+//	delete fPropagatorToDet;
 }
 
 void CbmLitStsBasedTrackFinder::DefaultInit()
@@ -42,7 +42,7 @@ void CbmLitStsBasedTrackFinder::DefaultInit()
 	}
 
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fPropagatorToDet = factory->CreateTrackPropagator("Much");
+	fPropagatorToDet = factory->CreateTrackPropagator("lit");
 }
 
 Int_t CbmLitStsBasedTrackFinder::DefaultDoFind(

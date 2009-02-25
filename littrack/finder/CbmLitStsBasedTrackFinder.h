@@ -2,6 +2,7 @@
 #define CBMLITSTSBASEDTRACKFINDER_H_
 
 #include "CbmLitTypes.h"
+#include "CbmLitPtrTypes.h"
 #include "TObject.h"
 
 class CbmLitTrackPropagator;
@@ -27,7 +28,7 @@ public:
     		Int_t pdg);
 
 protected:
-	CbmLitTrackPropagator* fPropagatorToDet;
+	TrackPropagatorPtr fPropagatorToDet;
 	TClonesArray* fTrackSeedsArray;
 
 //	Int_t fVerbose;

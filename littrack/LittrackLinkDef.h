@@ -52,8 +52,11 @@
 #pragma link C++ class  CbmLitKalmanFilter+;
 #pragma link C++ class  CbmLitTrackFitterRobust+;
 #pragma link C++ class  CbmLitTrackFitterIter+;
+#pragma link C++ class  CbmLitKalmanSmoother+;
 
 // interface
+#pragma link C++ class  CbmLitMaterialEffects+;
+#pragma link C++ class  CbmLitGeoNavigator+;
 #pragma link C++ class  CbmLitTrackFitter+;
 #pragma link C++ class  CbmLitTrackExtrapolator+;
 #pragma link C++ class  CbmLitTrackPropagator+;
@@ -62,7 +65,6 @@
 #pragma link C++ class  CbmLitTrackFinder+;
 #pragma link C++ class  CbmLitWeightCalculator+;
 #pragma link C++ class  CbmLitWeightedHitCalculator+;
-#pragma link C++ class  CbmLitKalmanSmoother+;
 
 // propagation
 #pragma link C++ class  CbmLitTrackPropagatorImp+;

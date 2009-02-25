@@ -16,13 +16,13 @@ CbmLitTrackSelectionMuch::CbmLitTrackSelectionMuch():
 	fMinNofHits(0),
 	fMinLastPlaneId(0)
 {
-	fSelectionA = new CbmLitTrackSelectionA();
+	fSelectionA = TrackSelectionPtr(new CbmLitTrackSelectionA());
 	fSelectionA->Initialize();
-	fSelectionB = new CbmLitTrackSelectionB();
+	fSelectionB = TrackSelectionPtr(new CbmLitTrackSelectionB());
 	fSelectionB->Initialize();
-	fSelectionC = new CbmLitTrackSelectionC();
+	fSelectionC = TrackSelectionPtr(new CbmLitTrackSelectionC());
 	fSelectionC->Initialize();
-	fSelectionD = new CbmLitTrackSelectionD();
+	fSelectionD = TrackSelectionPtr(new CbmLitTrackSelectionD());
 	fSelectionD->Initialize();
 }
 
@@ -44,21 +44,21 @@ LitStatus CbmLitTrackSelectionMuch::DoSelect(
 		TrackPtrIterator itBegin,
 		TrackPtrIterator itEnd)
 {
-	
+
 	if (itBegin == itEnd) return kLITSUCCESS;
-	
-	((CbmLitTrackSelectionC*)fSelectionC)->SetNofSharedHits(fNofSharedHits);
-	((CbmLitTrackSelectionD*)fSelectionD)->SetMinNofHits(fMinNofHits);
-	((CbmLitTrackSelectionD*)fSelectionD)->SetMinLastPlaneId(fMinLastPlaneId);
-		
-	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) 
+
+	((CbmLitTrackSelectionC*)fSelectionC.get())->SetNofSharedHits(fNofSharedHits);
+	((CbmLitTrackSelectionD*)fSelectionD.get())->SetMinNofHits(fMinNofHits);
+	((CbmLitTrackSelectionD*)fSelectionD.get())->SetMinLastPlaneId(fMinLastPlaneId);
+
+	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++)
 		(*iTrack)->SetQuality(kLITGOOD);
 
 	//fSelectionA->DoSelect(itBegin, itEnd);
 	//fSelectionB->DoSelect(itBegin, itEnd);
 	fSelectionC->DoSelect(itBegin, itEnd);
 	fSelectionD->DoSelect(itBegin, itEnd);
-	
+
 	return kLITSUCCESS;
 }
 

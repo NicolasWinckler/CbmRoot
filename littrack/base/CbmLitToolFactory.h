@@ -1,33 +1,30 @@
 #ifndef CBMLITTOOLFACTORY_H_
 #define CBMLITTOOLFACTORY_H_
 
-class CbmLitTrackExtrapolator;
-class CbmLitTrackPropagator;
-class CbmLitTrackUpdate;
-class CbmLitTrackFitter;
-class CbmLitTrackSelection;
+#include "CbmLitPtrTypes.h"
 
 #include "TObject.h"
 
 #include <string>
-
-//#include <boost/shared_ptr.hpp>
-//#include <boost/tr1/memory.hpp>
+#include <iostream>
 
 class CbmLitToolFactory
 {
-
 public:
 	virtual ~CbmLitToolFactory();
 
 	static CbmLitToolFactory* Instance();
 
-	CbmLitTrackExtrapolator* CreateTrackExtrapolator(const std::string& name);
-	CbmLitTrackPropagator* CreateTrackPropagator(const std::string& name);
-	CbmLitTrackUpdate* CreateTrackUpdate(const std::string& name);
-	CbmLitTrackFitter* CreateTrackFitter(const std::string& name);
-	CbmLitTrackSelection* CreateTrackSelection(const std::string& name);
-
+	TrackExtrapolatorPtr CreateTrackExtrapolator(
+			const std::string& name);
+	TrackPropagatorPtr CreateTrackPropagator(
+			const std::string& name);
+	TrackUpdatePtr CreateTrackUpdate(
+			const std::string& name);
+	TrackFitterPtr CreateTrackFitter(
+			const std::string& name);
+	TrackSelectionPtr CreateTrackSelection(
+			const std::string& name);
 
 protected:
 	CbmLitToolFactory();

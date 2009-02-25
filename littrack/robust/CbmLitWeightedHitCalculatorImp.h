@@ -1,13 +1,13 @@
 #ifndef CBMLITWEIGHTEDHITCALCULATORIMP_H_
 #define CBMLITWEIGHTEDHITCALCULATORIMP_H_
 
-//#include "CbmLitEffHitCalculator.h"
+#include "CbmLitWeightedHitCalculator.h"
 #include "CbmLitTypes.h"
 class CbmLitHit;
 class CbmLitStripHit;
 class CbmLitPixelHit;
 
-class CbmLitWeightedHitCalculatorImp //: public CbmLitEffHitCalculator
+class CbmLitWeightedHitCalculatorImp : public CbmLitWeightedHitCalculator
 {
 public:
 	CbmLitWeightedHitCalculatorImp();

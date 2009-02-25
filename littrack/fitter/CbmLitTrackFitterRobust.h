@@ -3,21 +3,20 @@
 
 #include "CbmLitTrackFitter.h"
 #include "CbmLitTypes.h"
+#include "CbmLitPtrTypes.h"
 
 class CbmLitTrackParam;
 class CbmLitStripHit;
 class CbmLitPixelHit;
 class CbmLitHit;
 class CbmLitTrack;
-class CbmLitWeightedHitCalculatorImp;
-class CbmLitWeightCalculator;
 
 class CbmLitTrackFitterRobust : public CbmLitTrackFitter
 {
 public:
 	CbmLitTrackFitterRobust(
-			CbmLitTrackFitter* fitter,
-			CbmLitTrackFitter* smoother);
+			TrackFitterPtr fitter,
+			TrackFitterPtr smoother);
 
 	virtual ~CbmLitTrackFitterRobust();
 
@@ -61,12 +60,12 @@ private:
 	LitStatus CreateOutputTrack(
 			CbmLitTrack* track);
 
-	CbmLitTrackFitter* fFitter;
-	CbmLitTrackFitter* fSmoother;
+	TrackFitterPtr fFitter;
+	TrackFitterPtr fSmoother;
 
-	CbmLitWeightedHitCalculatorImp* fWeightedHitCalculator;
-	CbmLitWeightCalculator* fSimpleWeightCalculator;
-	CbmLitWeightCalculator* fGaussWeightCalculator;
+	WeightedHitCalculatorPtr fWeightedHitCalculator;
+	WeightCalculatorPtr fSimpleWeightCalculator;
+	WeightCalculatorPtr fGaussWeightCalculator;
 
 	Int_t fNofIterations;
 	std::vector<Double_t> fAnnealing;

@@ -17,6 +17,7 @@
 #include <iostream>
 #include <algorithm>
 
+#include "CbmLitPtrTypes.h"
 
 CbmLitMuchTrackFinderBranch::CbmLitMuchTrackFinderBranch()
 {
@@ -24,7 +25,7 @@ CbmLitMuchTrackFinderBranch::CbmLitMuchTrackFinderBranch()
 
 CbmLitMuchTrackFinderBranch::~CbmLitMuchTrackFinderBranch()
 {
-	if (fPropagatorToDet) delete fPropagatorToDet;
+//	if (fPropagatorToDet) delete fPropagatorToDet;
 }
 
 void CbmLitMuchTrackFinderBranch::Init()
@@ -41,6 +42,8 @@ void CbmLitMuchTrackFinderBranch::Init()
 	fFinalSelection = factory->CreateTrackSelection("much_final");
 	fFinalPreSelection = factory->CreateTrackSelection("empty");
 	fFitter = factory->CreateTrackFitter("lit_kalman");
+
+//	TrackExtrapolatorPtr ptr = factory->CreateTrackExtrapolator();
 
 	fVerbose = 1;
 	fNofIter = 1;

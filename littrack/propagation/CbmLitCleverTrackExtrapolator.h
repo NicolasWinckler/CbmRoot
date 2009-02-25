@@ -2,8 +2,8 @@
 #define CBMLITCLEVERTRACKEXTRAPOLATOR_H_
 
 #include "CbmLitTrackExtrapolator.h"
+#include "CbmLitPtrTypes.h"
 
-class CbmLitTrackExtrapolator;
 class CbmLitTrackParam;
 
 class CbmLitCleverTrackExtrapolator : public CbmLitTrackExtrapolator
@@ -31,8 +31,8 @@ public:
 		   TMatrixD& F);
 
 private:
-	CbmLitTrackExtrapolator* fLineExtrapolator;
-	CbmLitTrackExtrapolator* fRK4Extrapolator;
+	TrackExtrapolatorPtr fLineExtrapolator;
+	TrackExtrapolatorPtr fRK4Extrapolator;
 
 	Double_t fZMax;
 	Int_t fOption;

@@ -38,35 +38,35 @@ CbmLitTrdTrackFinderStandalone::~CbmLitTrdTrackFinderStandalone()
 
 void CbmLitTrdTrackFinderStandalone::Init()
 {
-   fPropagator = new CbmLitTrackPropagatorImp(new CbmLitLineTrackExtrapolator());
-   fPropagator->Initialize();
-
-   fFilter = new CbmLitKalmanFilter();
-   fFilter->Initialize();
-
-   fFitter = new CbmLitTrackFitterImp(fPropagator, fFilter);
-   fFitter->Initialize();
-   fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
-
-   CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-   fSeedSelection = factory->CreateTrackSelection("Momentum");
-
-   //fTrackSelectionStation = new CbmLitTrackSelectionEmpty();
-   fStationGroupSelection = new CbmLitTrackSelectionTrd();
-   fStationGroupSelection->Initialize();
-
-   fFinalSelection = new CbmLitTrackSelectionTrd();
-   fFinalSelection->Initialize();
-
-   fFinalPreSelection = factory->CreateTrackSelection("Empty");
-
-   fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
-   fVerbose = 3;
-   fNofIter = 1;
-   fBeginStationGroup = 0;
-   fUseFastSearch = true;
-   fEndStationGroup = fLayout.GetNofStationGroups() - 1;
-   fPDG = 211;
+//   fPropagator = new CbmLitTrackPropagatorImp(new CbmLitLineTrackExtrapolator());
+//   fPropagator->Initialize();
+//
+//   fFilter = new CbmLitKalmanFilter();
+//   fFilter->Initialize();
+//
+//   fFitter = new CbmLitTrackFitterImp(fPropagator, fFilter);
+//   fFitter->Initialize();
+//   fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
+//
+//   CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
+//   fSeedSelection = factory->CreateTrackSelection("Momentum");
+//
+//   //fTrackSelectionStation = new CbmLitTrackSelectionEmpty();
+//   fStationGroupSelection = new CbmLitTrackSelectionTrd();
+//   fStationGroupSelection->Initialize();
+//
+//   fFinalSelection = new CbmLitTrackSelectionTrd();
+//   fFinalSelection->Initialize();
+//
+//   fFinalPreSelection = factory->CreateTrackSelection("Empty");
+//
+//   fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
+//   fVerbose = 3;
+//   fNofIter = 1;
+//   fBeginStationGroup = 0;
+//   fUseFastSearch = true;
+//   fEndStationGroup = fLayout.GetNofStationGroups() - 1;
+//   fPDG = 211;
 }
 
 void CbmLitTrdTrackFinderStandalone::SetIterationParameters(Int_t iter)

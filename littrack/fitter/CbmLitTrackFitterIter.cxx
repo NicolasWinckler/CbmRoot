@@ -1,6 +1,5 @@
 #include "CbmLitTrackFitterIter.h"
 
-#include "CbmLitPixelHit.h"
 #include "CbmLitTrack.h"
 #include "CbmLitFitNode.h"
 
@@ -40,15 +39,15 @@ LitStatus CbmLitTrackFitterIter::Fit(
 	for (Int_t iter = 0; iter < fNofIterations; iter++) {
 //		std::cout << "Iter " << iter << " started ;" << std::endl;
 		Bool_t isRefit = false;
-		
+
 		if (fFitter->Fit(track) == kLITERROR) {
 			return kLITERROR;
 		}
-	
+
 		if (fSmoother->Fit(track) == kLITERROR) {
 			return kLITERROR;
 		}
-		
+
 		if (iter < fNofIterations -1) {
 //			std::cout << "chi2: ";
 			for (Int_t i = 0; i < track->GetNofHits(); i++) {

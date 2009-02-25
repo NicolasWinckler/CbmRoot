@@ -12,6 +12,7 @@
 #include "CbmLitTrackSelection.h"
 #include "CbmLitConverter.h"
 #include "CbmLitToolFactory.h"
+#include "CbmLitPtrTypes.h"
 
 #include "TClonesArray.h"
 

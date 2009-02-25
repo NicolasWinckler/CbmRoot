@@ -45,8 +45,8 @@ protected:
 			TrackPtrIterator itBegin,
 			TrackPtrIterator itEnd);
 
-	CbmLitTrackFitter* fFitter;
-	CbmLitTrackUpdate* fFilter;
+	TrackFitterPtr fFitter;
+	TrackUpdatePtr fFilter;
 
 	ClassDef(CbmLitTrackFinderRobust, 1);
 };

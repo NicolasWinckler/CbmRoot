@@ -21,7 +21,7 @@ CbmLitTrdTrackFinderRobust::CbmLitTrdTrackFinderRobust()
 
 CbmLitTrdTrackFinderRobust::~CbmLitTrdTrackFinderRobust()
 {
-	if (fPropagatorToDet) delete fPropagatorToDet;
+//	if (fPropagatorToDet) delete fPropagatorToDet;
 }
 
 void CbmLitTrdTrackFinderRobust::Init()

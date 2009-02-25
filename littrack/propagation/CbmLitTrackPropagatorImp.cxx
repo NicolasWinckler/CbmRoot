@@ -16,20 +16,21 @@
 #include <cmath>
 #include <iostream>
 
-CbmLitTrackPropagatorImp::CbmLitTrackPropagatorImp(CbmLitTrackExtrapolator *extrapolator):
+CbmLitTrackPropagatorImp::CbmLitTrackPropagatorImp(
+		TrackExtrapolatorPtr extrapolator):
    CbmLitTrackPropagator("CbmLitTrackPropagatorImp"),
    fExtrapolator(extrapolator),
    fCalcTransportMatrix(true)
 {
-   fNavigator = new CbmLitGeoNavigatorImp();
-   fMaterial = new CbmLitMaterialEffectsImp();
+   fNavigator = GeoNavigatorPtr(new CbmLitGeoNavigatorImp());
+   fMaterial = MaterialEffectsPtr(new CbmLitMaterialEffectsImp());
 
    fFm.ResizeTo(5,5);
 }
 
 CbmLitTrackPropagatorImp::~CbmLitTrackPropagatorImp()
 {
-	delete fNavigator;
+//	delete fNavigator;
 }
 
 LitStatus CbmLitTrackPropagatorImp::Initialize()

@@ -2,12 +2,13 @@
 #define CBMLITTRACKFINDERNN_H_
 
 #include "CbmLitTrackFinderBase.h"
+#include "CbmLitPtrTypes.h"
 
 #include "TObject.h"
 
 class CbmLitTrack;
 class CbmLitTrackParam;
-class CbmLitTrackUpdate;
+//class CbmLitTrackUpdate;
 
 class CbmLitTrackFinderNN : public CbmLitTrackFinderBase
 {
@@ -45,7 +46,7 @@ protected:
 			CbmLitTrack* track,
 			HitPtrIteratorPair bounds);
 
-	CbmLitTrackUpdate* fFilter;
+	TrackUpdatePtr fFilter;
 
 	ClassDef(CbmLitTrackFinderNN, 1);
 };

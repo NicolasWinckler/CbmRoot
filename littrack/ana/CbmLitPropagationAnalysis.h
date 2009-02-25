@@ -5,13 +5,10 @@
 #include "CbmDetectorList.h"
 #include "CbmLitDetectorLayout.h"
 #include "CbmLitTypes.h"
+#include "CbmLitPtrTypes.h"
 
 #include <vector>
 
-class CbmLitTrackUpdate;
-class CbmLitTrackExtrapolator;
-class CbmLitTrackPropagator;
-class CbmLitTrackFitter;
 class CbmLitTrackParam;
 class CbmLitTrack;
 class CbmLitHit;
@@ -87,10 +84,10 @@ private:
 	TClonesArray* fStsTracks;
 	TClonesArray* fStsTrackMatches;
 
-	CbmLitTrackPropagator *fPropagator;
-	CbmLitTrackUpdate *fFilter;
-	CbmLitTrackFitter *fFitter;
-	CbmLitTrackFitter *fSmoother;
+	TrackPropagatorPtr fPropagator;
+	TrackUpdatePtr fFilter;
+	TrackFitterPtr fFitter;
+	TrackFitterPtr fSmoother;
 
 	DetectorId fDetId; // kTRD or kMUCH
 

@@ -7,8 +7,6 @@
 
 #include <vector>
 
-class CbmLitTrackPropagator;
-class CbmLitTrackExtrapolator;
 class TClonesArray;
 
 class CbmLitTrdTrackFinderBranch: public CbmTrdTrackFinder,
@@ -26,17 +24,8 @@ public:
             TClonesArray* trackArray);
 
 private:
-//	TClonesArray* fTrackSeedsArray;
-//
-//	CbmLitTrackPropagator* fPropagatorToDet;
-//	CbmLitTrackExtrapolator* fExtrapolatorToDet;
-
     virtual void SetIterationParameters(
     		Int_t iter);
-
-//	void CreateTrackSeeds(
-//    		TClonesArray* trackArray,
-//    		TrackPtrVector& trackSeeds);
 
 	ClassDef(CbmLitTrdTrackFinderBranch, 1);
 };

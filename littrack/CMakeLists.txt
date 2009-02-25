@@ -6,8 +6,7 @@ set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
 ${GEANT3_INCLUDE_DIR}
 #${CLHEP_INCLUDE_DIR}
-#${SIMPATH}/basics/boost/include
-#/home/soft/boost/boost_1_38_0/
+${SIMPATH}/basics/boost/include
 ${CBMROOT_SOURCE_DIR}/littrack
 ${CBMROOT_SOURCE_DIR}/littrack/ana
 ${CBMROOT_SOURCE_DIR}/littrack/base
@@ -81,6 +80,8 @@ fitter/CbmLitKalmanFilter.cxx
 fitter/CbmLitTrackFitterRobust.cxx
 fitter/CbmLitKalmanSmoother.cxx
 fitter/CbmLitTrackFitterIter.cxx
+interface/CbmLitGeoNavigator.cxx
+interface/CbmLitMaterialEffects.cxx
 interface/CbmLitTrackFitter.cxx   
 interface/CbmLitTrackPropagator.cxx 
 interface/CbmLitTrackUpdate.cxx  
@@ -114,7 +115,6 @@ selection/CbmLitTrackSelectionChiSq.cxx
 utils/CbmLitComparators.cxx
 utils/CbmLitMemoryManagment.cxx
 utils/CbmLitConverter.cxx
-utils/CbmLitTypes.cxx
 utils/CbmLitMath.cxx
 )
 

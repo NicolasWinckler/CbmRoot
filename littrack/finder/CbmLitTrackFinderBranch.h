@@ -25,10 +25,10 @@ protected:
 	TrackPtrVector fTracksCopy;
 	TrackPtrVector fFoundTracks;
 
-	CbmLitTrackSelection* fFinalPreSelection;
-	CbmLitTrackSelection* fStationGroupSelection;
-	CbmLitTrackUpdate* fFilter;
-	CbmLitTrackFitter* fFitter;
+	TrackSelectionPtr fFinalPreSelection;
+	TrackSelectionPtr fStationGroupSelection;
+	TrackUpdatePtr fFilter;
+	TrackFitterPtr fFitter;
 
 	Int_t fMaxNofBranches;
 	Int_t fNofBranches;

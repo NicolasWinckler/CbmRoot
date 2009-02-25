@@ -69,13 +69,13 @@ InitStatus CbmMuchHitFinderQa::Init()
   fDigis       = (TClonesArray*) fManager->GetObject("MuchDigi");
   fDigiMatches = (TClonesArray*) fManager->GetObject("MuchDigiMatch");
   fClusters    = (TClonesArray*) fManager->GetObject("MuchCluster");
-  
+
   TFile* f = new TFile(fGeoFileName,"R");
   TObjArray* stations = (TObjArray*) f->Get("stations");
   fGeoScheme->Init(stations);
   fGeoScheme->InitGrid();
   fNstations = fGeoScheme->GetNStations();
-  
+
   fNall       = new Int_t[fNstations];
   fNpr        = new Int_t[fNstations];
   fNpi        = new Int_t[fNstations];
@@ -84,7 +84,7 @@ InitStatus CbmMuchHitFinderQa::Init()
   fNka        = new Int_t[fNstations];
   fNprimary   = new Int_t[fNstations];
   fNsecondary = new Int_t[fNstations];
-  
+
 //  Int_t nChannelsTotal = 0;
 //  for (Int_t i=0;i<fNstations;i++){
 //    CbmMuchStation* station = fDigiScheme->GetStation(i);
@@ -232,7 +232,7 @@ InitStatus CbmMuchHitFinderQa::Init()
   fhPullYpads2 = new TH1D*[fnPadSizesY];
   fhPullXpads3 = new TH1D*[fnPadSizesX];
   fhPullYpads3 = new TH1D*[fnPadSizesY];
-  
+
   for (Int_t i=0;i<fnPadSizesX;i++){
     fhPullXpads1[i] = new TH1D(Form("hPullXpads1%i",i),Form("Pull distribution X. Npads = 1 Size =%i; (x_{RC} - x_{MC}) / dx_{RC}",i),100,-5,5);
     fhPullXpads2[i] = new TH1D(Form("hPullXpads2%i",i),Form("Pull distribution X. Npads = 2 Size =%i; (x_{RC} - x_{MC}) / dx_{RC}",i),100,-5,5);
@@ -245,13 +245,13 @@ InitStatus CbmMuchHitFinderQa::Init()
     fhPullYpads3[i] = new TH1D(Form("hPullYpads3%i",i),Form("Pull distribution Y. Npads = 3 Size =%i; (y_{RC} - y_{MC}) / dy_{RC}",i),100,-5,5);
   }
 
-  
-  
+
+
   fhPullX = new TH1D("hPullX","Pull distribution X;(x_{RC} - x_{MC}) / dx_{RC}",100,-5,5);
   fhPullY = new TH1D("hPullY","Pull distribution Y;(y_{RC} - y_{MC}) / dy_{RC}",100,-5,5);
 
   fhNpadsVsS = new TH2D("hNpadsVsS","Number of fired pads vs pad area:area:n pads",10,-5,0,10,0.5,10.5);
-  
+
   return kSUCCESS;
 }
 // -------------------------------------------------------------------------
@@ -275,11 +275,11 @@ void CbmMuchHitFinderQa::Exec(Option_t * option){
   fEvent++;
   Info("Exec",Form("Event:%i",fEvent));
 
-  // PullsQa();
-  // DigitizerQa();
+  //PullsQa();
+  //DigitizerQa();
   OccupancyQa();
-//  StatisticsQa();
-  // ClusterDeconvQa();
+  //StatisticsQa();
+  //ClusterDeconvQa();
 }
 // -------------------------------------------------------------------------
 
@@ -320,7 +320,7 @@ void CbmMuchHitFinderQa::Finish(){
     gPad->Print(".eps");
     c4->cd();
   }
-  
+
   if (fVerbose>3) {
     TCanvas* c4x = new TCanvas("c4x","Pulls",fnPadSizesX*300,3*300);
     c4x->Divide(fnPadSizesX,3);
@@ -342,7 +342,7 @@ void CbmMuchHitFinderQa::Finish(){
       fhPullXpads2[i]->Draw();
       gPad->Print(".gif");
       gPad->Print(".eps");
-      
+
       c4x->cd(2*fnPadSizesX+i+1);
       fhPullXpads3[i]->Sumw2();
       fhPullXpads3[i]->Fit("gaus");
@@ -353,7 +353,7 @@ void CbmMuchHitFinderQa::Finish(){
       gPad->Print(".eps");
     }
   }
-  
+
   if (fVerbose>3) {
     TCanvas* c4y = new TCanvas("c4y","Pulls",fnPadSizesY*300,3*300);
     c4y->Divide(fnPadSizesY,3);
@@ -375,7 +375,7 @@ void CbmMuchHitFinderQa::Finish(){
       fhPullYpads2[i]->Draw();
       gPad->Print(".gif");
       gPad->Print(".eps");
-      
+
       c4y->cd(2*fnPadSizesY+i+1);
       fhPullYpads3[i]->Sumw2();
       fhPullYpads3[i]->Fit("gaus");
@@ -386,7 +386,7 @@ void CbmMuchHitFinderQa::Finish(){
       gPad->Print(".eps");
     }
   }
-  
+
   if (1) {
     TCanvas* c3 = new TCanvas("c3","Occupancy plots",1200,800);
     c3->Divide(3,2);
@@ -399,7 +399,7 @@ void CbmMuchHitFinderQa::Finish(){
     }
     c3->cd();
   }
-  
+
   if (fVerbose>3) {
 
     TCanvas* c1 = new TCanvas("c1","All pad distributions",1200,800);
@@ -518,7 +518,7 @@ void CbmMuchHitFinderQa::Finish(){
     gPad->Print(".gif");
     gPad->Print(".eps");
 
-    
+
     TCanvas* c8 = new TCanvas("c8","Square vs nPads",800,400);
     c8->Divide(2,1);
     c8->cd(1);
@@ -542,7 +542,7 @@ void CbmMuchHitFinderQa::Finish(){
 
   }
 
-  
+
   TFile* performanceFile = new TFile(fFileName, "recreate");
 
    for (Int_t i=0;i<fNstations;i++) {
@@ -745,7 +745,7 @@ void CbmMuchHitFinderQa::OccupancyQa(){
   // Filling occupancy plots
   for (Int_t i=0;i<fDigis->GetEntriesFast();i++){
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
-    Int_t detId = digi->GetDetectorId();
+    Long64_t detId = digi->GetDetectorId();
     CbmMuchPad* pad = fGeoScheme->GetPadByDetId(detId);
     Double_t x0 = pad->GetX0();
     Double_t y0 = pad->GetY0();
@@ -834,14 +834,14 @@ void CbmMuchHitFinderQa::PullsQa(){
     CbmMuchCluster* cluster = (CbmMuchCluster*) fClusters->At(clusterId);
     Bool_t point_unique=1;
     Int_t  pointId=-1;
-    
+
     Double_t xmax = 0;
     Double_t xmin = 0;
     Double_t ymax = 0;
     Double_t ymin = 0;
     Double_t dxmin = 0;
     Double_t dymin = 0;
-    
+
 //    if (cluster->GetNDigis()>1) {if (verbose) printf("\n"); continue;}
     for(Int_t digiId=0;digiId<cluster->GetNDigis();digiId++){
       Int_t index = cluster->GetDigiIndex(digiId);
@@ -872,7 +872,7 @@ void CbmMuchHitFinderQa::PullsQa(){
     Int_t nPadsX=Int_t((xmax-xmin)/dxmin);
     Int_t nPadsY=Int_t((ymax-ymin)/dymin);
     //printf("nPadsX=%i nPadsY=%i\n",nPadsX,nPadsY);
-   
+
     if (verbose) printf(" pointId=%i",pointId);
     CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(pointId);
 
@@ -889,13 +889,13 @@ void CbmMuchHitFinderQa::PullsQa(){
     fhPullX->Fill((xRC-xMC)/dx);
     fhPullY->Fill((yRC-yMC)/dy);
     if (verbose) printf("\n");
-    
+
     Int_t index = cluster->GetDigiIndex(0);
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(index);
     CbmMuchStation* station = fGeoScheme->GetStationByDetId(digi->GetDetectorId());
-    Double_t pad_xmin = TMath::Sqrt(12)*station->GetSigmaXmin(); 
-    Double_t pad_ymin = TMath::Sqrt(12)*station->GetSigmaYmin(); 
-    Int_t padSizeX = Int_t(TMath::Log2(dxmin/pad_xmin)); 
+    Double_t pad_xmin = TMath::Sqrt(12)*station->GetSigmaXmin();
+    Double_t pad_ymin = TMath::Sqrt(12)*station->GetSigmaYmin();
+    Int_t padSizeX = Int_t(TMath::Log2(dxmin/pad_xmin));
     Int_t padSizeY = Int_t(TMath::Log2(dymin/pad_ymin));
     if (padSizeX>=fnPadSizesX || padSizeX<0) { printf("wrong x pad size\n"); continue; }
     if (padSizeY>=fnPadSizesY || padSizeY<0) { printf("wrong y pad size\n"); continue; }
@@ -905,7 +905,7 @@ void CbmMuchHitFinderQa::PullsQa(){
     if (nPadsY==2 && nPadsX==1) fhPullYpads2[padSizeY]->Fill((yRC-yMC)/dy);
     if (nPadsX==3 && nPadsY==1) fhPullXpads3[padSizeX]->Fill((xRC-xMC)/dx);
     if (nPadsY==3 && nPadsX==1) fhPullYpads3[padSizeY]->Fill((yRC-yMC)/dy);
-  
+
   }
 
 }
@@ -918,7 +918,7 @@ void CbmMuchHitFinderQa::ClusterDeconvQa(){
   Int_t nClusters = fClusters->GetEntriesFast();
   vector<Int_t> pIndices;
   vector<Int_t>::iterator it;
-  
+
   for(Int_t iPoint = 0; iPoint < nPoints; ++iPoint){
     if(IsSignalPoint(iPoint)) fSignalPoints++;
   }
@@ -937,7 +937,7 @@ void CbmMuchHitFinderQa::ClusterDeconvQa(){
 	if(it != pIndices.end()) continue;
 	pIndices.push_back(iPoint);
 	if(IsSignalPoint(iPoint)) fSignalHits++;
-      }      
+      }
     }
   }
 }

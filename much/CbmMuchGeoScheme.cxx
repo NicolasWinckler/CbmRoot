@@ -214,7 +214,7 @@ CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSideByDetId(Long64_t detId) {
 CbmMuchModule* CbmMuchGeoScheme::GetModuleByDetId(Long64_t detId) {
 	CbmMuchLayerSide* side = GetLayerSideByDetId(detId);
 	Int_t iModule = GetModuleIndex(detId);
-	return side ? side->GetModule(iModule) : NULL;
+    return side ? side->GetModule(iModule) : NULL;
 }
 // -------------------------------------------------------------------------
 
@@ -230,7 +230,6 @@ CbmMuchSector* CbmMuchGeoScheme::GetSectorByDetId(Long64_t detId) {
 CbmMuchPad* CbmMuchGeoScheme::GetPadByDetId(Long64_t detId) {
 	CbmMuchSector* sector = GetSectorByDetId(detId);
 	Int_t iChannel = GetChannelIndex(detId);
-
 	return sector ? sector->GetPad(iChannel) : NULL;
 }
 // -------------------------------------------------------------------------

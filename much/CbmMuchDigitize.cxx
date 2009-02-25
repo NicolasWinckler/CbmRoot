@@ -163,7 +163,7 @@ Bool_t CbmMuchDigitize::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
 	TVector3 modPos = module->GetPosition();
 	Double_t x0_mod = x0 - modPos[0];
 	Double_t y0_mod = y0 - modPos[1];
-	
+
 	Int_t iGridColumn = (Int_t) ((x0_mod + modLx / 2.) / gridDx);
 	Int_t iGridRow = (Int_t) ((y0_mod + modLy / 2.) / gridDy);
 
@@ -273,16 +273,18 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 	}
 	if (TMath::Abs(particle->Charge()) < 0.1)
 		return kFALSE;
-	TVector3 momentum; // 3-momentum of the particle
+	TVector3 momentum;                                             // 3-momentum of the particle
 	point->Momentum(momentum);
-	Double_t mom = momentum.Mag() * 1e3; // absolute momentum value [MeV/c]
-	Double_t mom2 = mom * mom; // squared momentum of the particle
-	Double_t mass = particle->Mass() * 1e3; // mass of the particle [MeV/c^2]
-	Double_t mass2 = mass * mass; // squared mass of the particle
-	Double_t Tkin = sqrt(mom2 + mass2) - mass; // kinetic energy of the particle
-	Double_t sigma = CbmMuchDigitize::Sigma_n_e(Tkin, mass); // sigma for Landau distribution
-	Double_t mpv = CbmMuchDigitize::MPV_n_e(Tkin, mass); // most probable value for Landau distr.
-	UInt_t nElectrons = (UInt_t) fLandauRnd->Landau(mpv, sigma); // number of prim. electrons per 0.3 cm gap
+	Double_t mom = momentum.Mag() * 1e3;                          // absolute momentum value [MeV/c]
+	Double_t mom2 = mom * mom;                                     // squared momentum of the particle
+	Double_t mass = particle->Mass() * 1e3;                        // mass of the particle [MeV/c^2]
+	Double_t mass2 = mass * mass;                                  // squared mass of the particle
+	Double_t Tkin = sqrt(mom2 + mass2) - mass;                    // kinetic energy of the particle
+	Double_t sigma = CbmMuchDigitize::Sigma_n_e(Tkin, mass);       // sigma for Landau distribution
+	Double_t mpv = CbmMuchDigitize::MPV_n_e(Tkin, mass);           // most probable value for Landau distr.
+	UInt_t nElectrons = (UInt_t) fLandauRnd->Landau(mpv, sigma);  // number of prim. electrons per 0.3 cm gap
+	while(nElectrons > 10000)
+		nElectrons = fLandauRnd->Landau(mpv, sigma);              // restrict Landau tail to increase performance
 	// Number of electrons for current track length
 	if (mass < 100.)
 		nElectrons = (UInt_t) (nElectrons * lTrack / 0.47);
@@ -334,8 +336,8 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 		}
 
 		// Fire pads in intersected sectors
-		for (map<Long64_t, CbmMuchSector*>::iterator it = firedSectors.begin(); it
-				!= firedSectors.end(); it++) {
+		for (map<Long64_t, CbmMuchSector*>::iterator it = firedSectors.begin();
+		        it != firedSectors.end(); it++) {
 			// Get sector and its parameters
 			CbmMuchSector* sector = (*it).second;
 			Long64_t sectorId = (*it).first;
@@ -355,11 +357,9 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 				UInt_t iCharge = (UInt_t) (nSecElectrons * area / spotArea);
 				Long64_t channelId = CbmMuchGeoScheme::GetDetIdFromSector(sectorId,
 						iChannel);
-				//assert(CbmMuchGeoScheme::GetStationIndex(channelId) == CbmMuchGeoScheme::GetStationIndex(sectorId));
 
 				if (chargedPads.find(channelId) == chargedPads.end()) {
 					chargedPads[channelId] = new CbmMuchDigi(channelId, time, fDTime);
-					//	  assert(channelId == chargedPads[channelId]->GetDetectorId());
 				}
 				chargedPads[channelId]->AddCharge(iCharge); // add charge to digi
 			} // loop channels
@@ -382,7 +382,6 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 			iCharge = (Int_t) (TMath::Power(2, 31) - 2);
 		if (fChargedPads.find(channelId) == fChargedPads.end()) {
 			fChargedPads[channelId] = new CbmMuchDigi(digi);
-			//      assert(fChargedPads[channelId]->GetDetectorId() == channelId);
 			fChargedMatches[channelId] = new CbmMuchDigiMatch();
 			fChargedMatches[channelId]->AddPoint(iPoint);
 			fChargedMatches[channelId]->AddCharge(iCharge);

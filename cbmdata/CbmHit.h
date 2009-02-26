@@ -1,10 +1,10 @@
 // -------------------------------------------------------------------------
-// -----                     CbmTrkHit header file                     -----
+// -----                     CbmHit header file                        -----
 // -----                 Created 16/11/07  by V. Friese                -----
 // -------------------------------------------------------------------------
 
-#ifndef CBMTRKHIT_H
-#define CBMTRKHIT_H
+#ifndef CBMHIT_H
+#define CBMHIT_H
 
 
 #include "FairHit.h"
@@ -20,13 +20,13 @@
  **@since 16/11/07
  */
 
-class CbmTrkHit : public FairHit 
+class CbmHit : public FairHit 
 {
 
  public:
 
   /** Default constructor **/
-  CbmTrkHit();
+  CbmHit();
 
 
   /** Constructor with hit parameters 
@@ -36,12 +36,12 @@ class CbmTrkHit : public FairHit
   *@param covXY  Covariance of x and y [cm**2]
   *@param index  Reference index
   **/
-  CbmTrkHit(Int_t detID, TVector3& pos, TVector3& dpos, 
+  CbmHit(Int_t detID, TVector3& pos, TVector3& dpos, 
 	    Double_t covXY, Int_t index);
 
 
   /** Destructor **/
-  virtual ~CbmTrkHit();
+  virtual ~CbmHit();
 
 
   /** Accessors **/
@@ -60,7 +60,7 @@ class CbmTrkHit : public FairHit
 
 
 
-ClassDef(CbmTrkHit,1);
+ClassDef(CbmHit,1);
 
 };
 

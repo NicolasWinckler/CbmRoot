@@ -11,7 +11,7 @@
  **
  ** Data class for a reconstructed hit in the STS
  ** Data level RECO
- ** Derived from CbmTrkHit.
+ ** Derived from CbmHit.
  ** Additional members: Channel numbers and covariance in x and y
  ** In case of pixel sensor backside channel is -1
  **/
@@ -23,12 +23,12 @@
 
 
 
-#include "CbmTrkHit.h"
+#include "CbmHit.h"
 
 #include "TVector3.h"
 
 
-class CbmStsHit : public CbmTrkHit
+class CbmStsHit : public CbmHit
 {
 
  public:

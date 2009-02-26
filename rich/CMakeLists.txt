@@ -9,8 +9,13 @@ ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmdata
+${CBMROOT_SOURCE_DIR}/cbmdata/rich
 ${CBMROOT_SOURCE_DIR}/global 
 ${CBMROOT_SOURCE_DIR}/rich 
+
+${CBMROOT_SOURCE_DIR}/cbmdata/trd
+${CBMROOT_SOURCE_DIR}/cbmdata/sts
+${CBMROOT_SOURCE_DIR}/cbmdata/tof
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

@@ -22,7 +22,7 @@ CbmStsHit::CbmStsHit() {
 // -----   Standard constructor   ------------------------------------------
 CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,  
 		     Double_t covXY, Int_t iDigiF, Int_t iDigiB)
-  : CbmTrkHit(detId, pos, dpos, covXY, -1) {
+  : CbmHit(detId, pos, dpos, covXY, -1) {
   fDigiF = iDigiF;
   fDigiB = iDigiB;
   fPosSX = 0;
@@ -37,7 +37,7 @@ CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,
 CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,  
                      Double_t covXY, Int_t iDigiF, Int_t iDigiB,
                      Int_t iPosSX, Int_t iPosSY, Int_t iLayer)
-  : CbmTrkHit(detId, pos, dpos, covXY, -1) {
+  : CbmHit(detId, pos, dpos, covXY, -1) {
   fDigiF = iDigiF;
   fDigiB = iDigiB;
   fPosSX = iPosSX;
@@ -51,7 +51,7 @@ CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,
 // -----   Standard constructor   ------------------------------------------
 CbmStsHit::CbmStsHit(Int_t detId, TVector3& pos, TVector3& dpos,  
 		     Double_t covXY, Int_t iDigiF, Int_t iDigiB, Double_t dSignalDiv)
-  : CbmTrkHit(detId, pos, dpos, covXY, -1) {
+  : CbmHit(detId, pos, dpos, covXY, -1) {
   
   fDigiF = iDigiF;
   fDigiB = iDigiB;

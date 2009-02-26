@@ -11,7 +11,10 @@ ${CBMROOT_SOURCE_DIR}/base
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/passive
 ${CBMROOT_SOURCE_DIR}/cbmdata
+${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/global
+
+${CBMROOT_SOURCE_DIR}/cbmdata/sts
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

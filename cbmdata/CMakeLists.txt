@@ -4,13 +4,9 @@
 
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
-#${CBMROOT_SOURCE_DIR}/geobase 
-#${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
-#${CBMROOT_SOURCE_DIR}/field 
-${CBMROOT_SOURCE_DIR}/cbmbase 
+//${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmdata 
-#${CBMROOT_SOURCE_DIR}/ecal
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -22,54 +18,59 @@ ${ROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(CBMDATA_SRCS
-CbmEcalHit.cxx 
-CbmEcalPoint.cxx
-CbmEcalPointLite.cxx 
-CbmEcalCluster.cxx 
-CbmEcalHitFastMC.cxx 
+CbmHit.cxx
+CbmMCTrack.cxx
+CbmTrack.cxx
+CbmStack.cxx
 
-CbmMuchHit.cxx 
-CbmMuchPoint.cxx
-CbmMuchCluster.cxx 
-CbmMuchDigi.cxx
-CbmMuchDigiMatch.cxx
-CbmMuchTrack.cxx 
-CbmMuchTrackMatch.cxx
+ecal/CbmEcalHit.cxx 
+ecal/CbmEcalPoint.cxx
+ecal/CbmEcalPointLite.cxx 
+ecal/CbmEcalCluster.cxx 
+ecal/CbmEcalHitFastMC.cxx 
 
-CbmMvdHit.cxx 
-CbmMvdHitMatch.cxx 
-CbmMvdPoint.cxx
-CbmMvdDigi.cxx  
-CbmMvdCluster.cxx 
+much/CbmMuchHit.cxx 
+much/CbmMuchPoint.cxx
+much/CbmMuchCluster.cxx 
+much/CbmMuchDigi.cxx
+much/CbmMuchDigiMatch.cxx
+much/CbmMuchTrack.cxx 
+much/CbmMuchTrackMatch.cxx
 
-CbmRichRing.cxx	
-CbmRichHit.cxx 
-CbmRichPoint.cxx
-CbmRichRingMatch.cxx 
+mvd/CbmMvdHit.cxx 
+mvd/CbmMvdHitMatch.cxx 
+mvd/CbmMvdPoint.cxx
+mvd/CbmMvdDigi.cxx  
+mvd/CbmMvdCluster.cxx 
 
-CbmStsCluster.cxx 
-CbmStsDigi.cxx 
-CbmStsDigiMatch.cxx 
-CbmStsHit.cxx 
-CbmStsPoint.cxx 
-CbmStsTrack.cxx 
-CbmStsTrackMatch.cxx
+rich/CbmRichRing.cxx	
+rich/CbmRichHit.cxx 
+rich/CbmRichPoint.cxx
+rich/CbmRichRingMatch.cxx 
 
-CbmSttPoint.cxx
-CbmSttHit.cxx
-CbmSttTrack.cxx
-CbmSttTrackMatch.cxx
+sts/CbmStsCluster.cxx 
+sts/CbmStsDigi.cxx 
+sts/CbmStsDigiMatch.cxx 
+sts/CbmStsHit.cxx 
+sts/CbmStsPoint.cxx 
+sts/CbmStsTrack.cxx 
+sts/CbmStsTrackMatch.cxx
 
-CbmTofHit.cxx 
-CbmTofPoint.cxx
+stt/CbmSttPoint.cxx
+stt/CbmSttHit.cxx
+stt/CbmSttTrack.cxx
+stt/CbmSttTrackMatch.cxx
 
-CbmTrdHit.cxx		 
-CbmTrdTrack.cxx		 
-CbmTrdPoint.cxx	
-CbmTrdTrackMatch.cxx  
+tof/CbmTofHit.cxx 
+tof/CbmTofPoint.cxx
 
-CbmZdcPoint.cxx  
-CbmZdcEvent.cxx
+trd/CbmTrdHit.cxx		 
+trd/CbmTrdTrack.cxx		 
+trd/CbmTrdPoint.cxx	
+trd/CbmTrdTrackMatch.cxx  
+
+zdc/CbmZdcPoint.cxx  
+zdc/CbmZdcEvent.cxx
 )
 
 if(RULE_CHECKER_FOUND)

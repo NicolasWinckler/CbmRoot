@@ -21,11 +21,11 @@ link_directories( ${LINK_DIRECTORIES})
 set(CBMBASE_SRCS
 CbmDigi.cxx 
 CbmDigiManager.cxx
-CbmStack.cxx 
-CbmTrack.cxx
-CbmTrkHit.cxx
+#CbmStack.cxx 
+#CbmTrack.cxx
+#CbmTrkHit.cxx
 CbmPropagator.cxx
-CbmMCTrack.cxx
+#CbmMCTrack.cxx
 )
 
 if(RULE_CHECKER_FOUND)

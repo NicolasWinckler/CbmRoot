@@ -23,7 +23,7 @@ CbmMvdHit::CbmMvdHit() {
 // -----   Standard constructor   ------------------------------------------
 CbmMvdHit::CbmMvdHit(Int_t statNr, TVector3& pos, TVector3& dpos, 
 		     Int_t flag) 
-  : CbmTrkHit(0, pos, dpos, 0., -1) {
+  : CbmHit(0, pos, dpos, 0., -1) {
   fDetectorID = (statNr << 16) | (1<<24);
   fFlag = flag;
 }

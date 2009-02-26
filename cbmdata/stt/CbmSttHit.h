@@ -1,12 +1,12 @@
 #ifndef CBMSTTHIT_H
 #define CBMSTTHIT_H
 
-#include "CbmTrkHit.h"
+#include "CbmHit.h"
 
 class CbmSttPoint;
 class TVector3;
 
-class CbmSttHit : public CbmTrkHit {
+class CbmSttHit : public CbmHit {
 
 private:
     Int_t           fPlaneID; // unique ID of STT plane in the setup (1 - 18)

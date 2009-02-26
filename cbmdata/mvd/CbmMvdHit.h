@@ -19,11 +19,11 @@
 #define CBMMVDHIT_H 1
 
 
-#include "CbmTrkHit.h"
+#include "CbmHit.h"
 
 #include "TVector3.h"
 
-class CbmMvdHit : public CbmTrkHit 
+class CbmMvdHit : public CbmHit 
 {
 
  public:    

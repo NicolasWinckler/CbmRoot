@@ -17,11 +17,11 @@
 
 
 #include "TVector3.h"
-#include "CbmTrkHit.h"
+#include "CbmHit.h"
 //#include "CbmMuchGeoScheme.h"
 
 
-class CbmMuchHit : public CbmTrkHit
+class CbmMuchHit : public CbmHit
 {
 
  public:

@@ -36,7 +36,7 @@ CbmTrdHit::CbmTrdHit(Int_t detID, TVector3& pos, TVector3& dpos, Int_t index,
 // ------------------------------------------------------------------
 CbmSttHit::CbmSttHit(Int_t detID, TVector3& pos, TVector3& dpos, 
 		     Int_t index, CbmSttPoint *point)
-: CbmTrkHit(detID, pos, dpos, 0., index)
+: CbmHit(detID, pos, dpos, 0., index)
 {
   // Standard constructor
   fPlaneID = point->GetLayerNo() + (point->GetStationNo() - 1) * 6;

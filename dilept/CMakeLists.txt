@@ -8,6 +8,11 @@ ${CMAKE_SOURCE_DIR}/geobase
 ${CMAKE_SOURCE_DIR}/parbase
 ${CMAKE_SOURCE_DIR}/cbmbase
 ${CMAKE_SOURCE_DIR}/cbmdata
+${CMAKE_SOURCE_DIR}/cbmdata/mvd
+${CMAKE_SOURCE_DIR}/cbmdata/sts
+${CMAKE_SOURCE_DIR}/cbmdata/rich
+${CMAKE_SOURCE_DIR}/cbmdata/trd
+${CMAKE_SOURCE_DIR}/cbmdata/tof
 ${CMAKE_SOURCE_DIR}/base
 ${CMAKE_SOURCE_DIR}/field
 ${CMAKE_SOURCE_DIR}/global

@@ -5,7 +5,7 @@
 
 #include "CbmTrack.h"
 
-#include "CbmTrkHit.h"
+#include "CbmHit.h"
 
 #include <iostream>
 #include <map>
@@ -36,7 +36,7 @@ CbmTrack::~CbmTrack() {
 
 
 // -----   Public method AddHit   ------------------------------------------
-void CbmTrack::AddHit(Int_t hitIndex, CbmTrkHit* hit) {
+void CbmTrack::AddHit(Int_t hitIndex, CbmHit* hit) {
   fHitMap[hit->GetZ()] = hitIndex;
 }
 // -------------------------------------------------------------------------

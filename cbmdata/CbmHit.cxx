@@ -1,17 +1,17 @@
 // -------------------------------------------------------------------------
-// -----                       CbmTrkHit source file                   -----
+// -----                         CbmHit source file                    -----
 // -----                   Created 16/11/07  by V. Friese              -----
 // -------------------------------------------------------------------------
 
 
-#include <iostream>
-#include "CbmTrkHit.h"
+#include "CbmHit.h"
 
+#include <iostream>
 using namespace std;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmTrkHit::CbmTrkHit() {
+CbmHit::CbmHit() {
   fCovXY = 0.;
 }
 // -------------------------------------------------------------------------
@@ -19,7 +19,7 @@ CbmTrkHit::CbmTrkHit() {
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmTrkHit::CbmTrkHit(Int_t detId, TVector3& pos, TVector3& dpos, 
+CbmHit::CbmHit(Int_t detId, TVector3& pos, TVector3& dpos, 
 		     Double_t covXY, Int_t index) 
   : FairHit(detId, pos, dpos, index) {
   fCovXY = covXY;
@@ -29,14 +29,14 @@ CbmTrkHit::CbmTrkHit(Int_t detId, TVector3& pos, TVector3& dpos,
 
 
 // -----   Destructor   ----------------------------------------------------
-CbmTrkHit::~CbmTrkHit() { }
+CbmHit::~CbmHit() { }
 // -------------------------------------------------------------------------
 
 
 
 
 // -----   Public method Print   -------------------------------------------
-void CbmTrkHit::Print(Option_t* opt) const {
+void CbmHit::Print(Option_t* opt) const {
   cout.precision(5);
   cout << "Hit at (" << fX << ", " << fY << ", " << fZ << ") cm, "
        << "Detector " << fDetectorID << ", Station " << GetStationNr() 
@@ -46,4 +46,4 @@ void CbmTrkHit::Print(Option_t* opt) const {
 
 
 
-ClassImp(CbmTrkHit)
+ClassImp(CbmHit)

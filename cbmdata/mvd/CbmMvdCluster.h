@@ -15,8 +15,8 @@
 #define CBMMVDCLUSTER_H 1
 
 
-#include "CbmTrkHit.h"
-#include "TVector3.h"
+//#include "CbmHit.h"
+//#include "TVector3.h"
 #include "CbmMvdHit.h"
 
 #include "TVector3.h"

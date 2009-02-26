@@ -8,7 +8,7 @@
  *@author V.Friese <v.friese@gsi.de>
  **
  ** Base class for local tracks in the CBM detectors. 
- ** Holds a list of CbmTrkHits and the fitted track parameters. 
+ ** Holds a list of CbmHits and the fitted track parameters. 
  ** The fit parameters are of type FairTrackParam
  ** and can only be accesssed and modified via this class.
  **/
@@ -24,7 +24,7 @@
 
 #include <map>
 
-class CbmTrkHit;
+class CbmHit;
 
 
 
@@ -42,7 +42,7 @@ class CbmTrack : public TObject
 
 
   /** Add a StsHit to the list **/
-  void AddHit(Int_t hitIndex, CbmTrkHit* hit);
+  void AddHit(Int_t hitIndex, CbmHit* hit);
 
 
   /** Public method Print

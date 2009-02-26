@@ -24,7 +24,7 @@
  * restructured according to new RinfFinder Class:
  * array of hits belonging to a certain ring added
  *
- * 
+ *
  *
  */
 
@@ -59,11 +59,10 @@ CbmRichRing::CbmRichRing()
     fRecFlag(0)
 {
     fSelectionNN  = -1.;
-    fSelection2D  = -1.;
 }
 // -------------------------------------------------------------------------
 
- 
+
 // -----   Standard constructor   ------------------------------------------
 CbmRichRing::CbmRichRing ( Double_t x,
 			   Double_t y,
@@ -77,7 +76,6 @@ CbmRichRing::CbmRichRing ( Double_t x,
     fRecFlag(0)
 {
     fSelectionNN  = -1.;
-    fSelection2D  = -1.;
 }
 // -------------------------------------------------------------------------
 
@@ -94,7 +92,7 @@ void CbmRichRing::SetXYABPhi(Double_t x, Double_t y,
     fCenterY = y;
     fAaxis = a;
     fBaxis = b;
-    fPhi = phi;            
+    fPhi = phi;
 }
 
 Bool_t CbmRichRing::RemoveHit(Int_t hitId)
@@ -111,7 +109,7 @@ Bool_t CbmRichRing::RemoveHit(Int_t hitId)
 }
 
 Double_t CbmRichRing::GetXF1() const
-{	
+{
 	Double_t c = sqrt(fAaxis*fAaxis - fBaxis*fBaxis);
 	Double_t xc = c*cos(fabs(fPhi));
 
@@ -134,7 +132,7 @@ Double_t CbmRichRing::GetXF2() const
 	Double_t c = sqrt(fAaxis*fAaxis - fBaxis*fBaxis);
 	Double_t xc = c*cos(fabs(fPhi));
 
-	return fCenterX-xc;	
+	return fCenterX-xc;
 }
 
 Double_t CbmRichRing::GetYF2() const
@@ -145,22 +143,22 @@ Double_t CbmRichRing::GetYF2() const
 		return fCenterY-yc;
 	}else{
 		return fCenterY+yc;
-	}	
+	}
 }
 
 void CbmRichRing::Print(){
-	cout << " Ring parameters: " << 
-			" Aaxis = " << GetAaxis() << 
-			", Baxis = " << GetBaxis() << 
-			", Phi = " << GetPhi() << 
+	cout << " Ring parameters: " <<
+			" Aaxis = " << GetAaxis() <<
+			", Baxis = " << GetBaxis() <<
+			", Phi = " << GetPhi() <<
 			", CenterX = " << GetCenterX() <<
 			", CenterY = " << GetCenterY() <<
-			", Radius = " << GetRadius() << 
+			", Radius = " << GetRadius() <<
 			", NofHits = " << GetNofHits() <<
-			", RadialPosition = " << GetRadialPosition() << 
+			", RadialPosition = " << GetRadialPosition() <<
 			", Chi2 = " << GetChi2() <<
-			", RingTrackDistance = "<< GetDistance() << 
-			", Angle() = " << GetAngle() << 
+			", RingTrackDistance = "<< GetDistance() <<
+			", Angle() = " << GetAngle() <<
 			", NofHitsOnRing = " << GetNofHitsOnRing() << std::endl;
 }
 
@@ -185,7 +183,7 @@ Double_t CbmRichRing::GetRadialAngle() const{
   /*  if (fCenterY > 0){
             return  atan((100 - fCenterY) / (0 - fCenterX));
     } else {
-            return atan((-100 - fCenterY) / (0 - fCenterX));       
+            return atan((-100 - fCenterY) / (0 - fCenterX));
     }*/
 
     if( fCenterX > 0 && fCenterY > 0 ){
@@ -199,8 +197,8 @@ Double_t CbmRichRing::GetRadialAngle() const{
     }
     if( fCenterX > 0 && fCenterY < 0 ){
         return 2*TMath::Pi() - atan(fabs((-100 - fCenterY) / (0 - fCenterX)));
-    }    
-  
+    }
+
     return 999.;
 }
 

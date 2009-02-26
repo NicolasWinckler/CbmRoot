@@ -1,12 +1,12 @@
 #ifndef CBMTRDHIT_H
 #define CBMTRDHIT_H
 
-#include "CbmTrkHit.h"
+#include "CbmHit.h"
 
 class TVector3;
 
 
-class CbmTrdHit : public CbmTrkHit {
+class CbmTrdHit : public CbmHit {
 
 private:
     Int_t           fPlaneID;      // unique ID of TRD plane in the setup (1 - 12)

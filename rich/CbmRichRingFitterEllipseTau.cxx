@@ -9,7 +9,7 @@
 **********************************************************************************/
 
 #include "CbmRichRingFitterEllipseTau.h"
-#include "FairRootManager.h"
+#include "CbmRootManager.h"
 #include "CbmRichRing.h"
 #include "CbmRichHit.h"
 
@@ -90,7 +90,7 @@ void CbmRichRingFitterEllipseTau::DoFit(CbmRichRing *pRing)
 
 	MakeRadiusCorrection(pRing);
 
-	CalcChi2(pRing);
+	//CalcChi2(pRing);
 }
 
 // -----   Public method: Taubin   -----------------------------------------
@@ -180,6 +180,13 @@ void CbmRichRingFitterEllipseTau::TransEllipse(CbmRichRing *pRing)
 	Double_t Px = fAlgPar[3];
 	Double_t Py = fAlgPar[4];
 	Double_t P = fAlgPar[5];
+	CalcChi2(Pxx, Pxy, Pyy, Px, Py, P, pRing);
+	pRing->SetAPar(Pxx);
+	pRing->SetBPar(Pxy);
+	pRing->SetCPar(Pyy);
+	pRing->SetDPar(Px);
+	pRing->SetEPar(Py);
+	pRing->SetFPar(P);
 
 	Double_t alpha;
 	Double_t QQx, QQy, Qxx, Qyy, Qx, Qy, Q;
@@ -226,6 +233,8 @@ void CbmRichRingFitterEllipseTau::TransEllipse(CbmRichRing *pRing)
 		else
 			pRing->SetPhi(pRing->GetPhi() - 1.57079633);
 	}
+
+
 }
 
 ClassImp(CbmRichRingFitterEllipseTau)

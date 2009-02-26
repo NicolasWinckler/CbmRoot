@@ -270,7 +270,7 @@ void histogramTransformation::filterHistogramLayer(unsigned short layer) {
  * the correspondance to be equal to the eraser-object result.	*
  ****************************************************************/
 
-void histogramTransformation::serializeHistogramLayer(unsigned short layer, std::streambuf* terminal, terminalSequence* statusSequence, unsigned short statusMax) {
+void histogramTransformation::serializeHistogramLayer(unsigned short layer) {
 
 	histogramCell* actualCell;
 	bitArray       comparator;

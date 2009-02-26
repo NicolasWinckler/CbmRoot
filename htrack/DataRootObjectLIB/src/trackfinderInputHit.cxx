@@ -70,7 +70,7 @@ trackfinderInputHit::trackfinderInputHit() {
  * Constructor													*
  ****************************************************************/
 
-trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value) {
+trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value) : TObject(value) {
 
 	if (value.isPointer)
 		this->hit   = value.hit;
@@ -105,7 +105,7 @@ trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value) {
 
 }
 
-trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value, unsigned int order) {
+trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value, unsigned int order) : TObject() {
 
 	if (value.isPointer)
 		this->hit   = value.hit;
@@ -139,7 +139,7 @@ trackfinderInputHit::trackfinderInputHit(const trackfinderInputHit& value, unsig
 	this->hitOrder  = order;
 
 }
-trackfinderInputHit::trackfinderInputHit(FairHit* hitPointer, int index, unsigned int order) {
+trackfinderInputHit::trackfinderInputHit(FairHit* hitPointer, int index, unsigned int order) : TObject() {
 
 	hit       = hitPointer;
 
@@ -154,7 +154,7 @@ trackfinderInputHit::trackfinderInputHit(FairHit* hitPointer, int index, unsigne
 	hitOrder  = order;
 
 }
-trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex, bool maps, bool strip, bool hybrid) {
+trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex, bool maps, bool strip, bool hybrid) : TObject() {
 
 	TVector3 position(posX, posY, posZ);
 	TVector3 positionError(xError, yError, 0);
@@ -199,7 +199,7 @@ trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double pos
 	}
 
 }
-trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex) {
+trackfinderInputHit::trackfinderInputHit(int detectorId, double posX, double posY, double posZ, double xError, double yError, int index, unsigned int order, int pointIndex) : TObject() {
 
 	TVector3 position(posX, posY, posZ);
 	TVector3 positionError(xError, yError, 0);

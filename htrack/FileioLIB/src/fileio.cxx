@@ -36,7 +36,6 @@
 #include "../include/fileioWarningMsg.h"
 #include "../include/fileio.h"
 
-#include <cstdlib>
 
 /****************************************************************
  * allocates memory												*
@@ -388,7 +387,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, in
 }
 void fileio::setHeaderValue(std::ofstream& fileStream, std::string specifier, int value, terminalSequence* statusSequence, int radix) {
 	
-	setHeaderValue(fileStream, specifier.c_str(), value, statusSequence);
+	setHeaderValue(fileStream, specifier.c_str(), value, statusSequence, radix);
 
 }
 
@@ -410,7 +409,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, un
 }
 void fileio::setHeaderValue(std::ofstream& fileStream, std::string specifier, unsigned int value, terminalSequence* statusSequence, int radix) {
 
-	setHeaderValue(fileStream, specifier.c_str(), value, statusSequence);
+	setHeaderValue(fileStream, specifier.c_str(), value, statusSequence, radix);
 
 }
 
@@ -432,7 +431,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, lo
 }
 void fileio::setHeaderValue(std::ofstream& fileStream, std::string specifier, long value, terminalSequence* statusSequence, int radix) {
 
-	setHeaderValue(fileStream, specifier.c_str(), value, statusSequence);
+	setHeaderValue(fileStream, specifier.c_str(), value, statusSequence, radix);
 
 }
 
@@ -454,7 +453,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, un
 }
 void fileio::setHeaderValue(std::ofstream& fileStream, std::string specifier, unsigned long value, terminalSequence* statusSequence, int radix) {
 
-	setHeaderValue(fileStream, specifier.c_str(), value, statusSequence);
+	setHeaderValue(fileStream, specifier.c_str(), value, statusSequence, radix);
 
 }
 
@@ -646,7 +645,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, in
 }
 void fileio::setHeaderValue(std::ofstream& fileStream, std::string specifier, int value, std::string comment, terminalSequence* statusSequence, int radix) {
 	
-	setHeaderValue(fileStream, specifier.c_str(), value, comment.c_str(), statusSequence);
+	setHeaderValue(fileStream, specifier.c_str(), value, comment.c_str(), statusSequence, radix);
 
 }
 
@@ -676,7 +675,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, un
 }
 void fileio::setHeaderValue(std::ofstream& fileStream, std::string specifier, unsigned int value, std::string comment, terminalSequence* statusSequence, int radix) {
 
-	setHeaderValue(fileStream, specifier.c_str(), value, comment.c_str(), statusSequence);
+	setHeaderValue(fileStream, specifier.c_str(), value, comment.c_str(), statusSequence, radix);
 
 }
 
@@ -706,7 +705,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, lo
 }
 void fileio::setHeaderValue(std::ofstream& fileStream, std::string specifier, long value, std::string comment, terminalSequence* statusSequence, int radix) {
 
-	setHeaderValue(fileStream, specifier.c_str(), value, comment.c_str(), statusSequence);
+	setHeaderValue(fileStream, specifier.c_str(), value, comment.c_str(), statusSequence, radix);
 
 }
 
@@ -736,7 +735,7 @@ void fileio::setHeaderValue(std::ofstream& fileStream, const char* specifier, un
 }
 void fileio::setHeaderValue(std::ofstream& fileStream, std::string specifier, unsigned long value, std::string comment, terminalSequence* statusSequence, int radix) {
 
-	setHeaderValue(fileStream, specifier.c_str(), value, comment.c_str(), statusSequence);
+	setHeaderValue(fileStream, specifier.c_str(), value, comment.c_str(), statusSequence, radix);
 
 }
 

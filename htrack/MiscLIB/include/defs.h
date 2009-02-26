@@ -51,8 +51,14 @@
  * This definition enables that the hits of just one track can enter the histogram
  */
 
-//#define DEBUGJUSTONEGOODTRACK    2
+//#define DEBUGJUSTONEGOODTRACK
 #undef DEBUGJUSTONEGOODTRACK
+
+/**
+ * This definition determines the index of the good track which should be debugged
+ */
+
+#define INDEXOFGOODTRACK 2
 
 
 /**

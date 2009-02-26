@@ -469,14 +469,14 @@ public:
  */
 
 	bitfield& operator ++ ();
-	bitfield  operator ++ (int value);
+	bitfield  operator ++ (int);
 
 /**
  * operator -- ()
  */
 
 	bitfield& operator -- ();
-	bitfield  operator -- (int value);
+	bitfield  operator -- (int);
 
 /**
  * Method sets the format of the stream:

@@ -59,14 +59,13 @@ private:
 /**
  * This method does the entries for one layer of the histogram
  * @param border is the actual border to do the entry
- * @param firstBorder is the border.prelut object
  * @param secondBorder is the border.lut object
  * @param hit is the hit-object which corresponds to the border
  */
 
 	void doHistogramLayerEntry(std::vector<lutBorder>::iterator border);
 	void doHistogramLayerEntry(lutBorder* border);
-	void doHistogramLayerEntry(prelutHoughBorder& firstBorder, lutHoughBorder& secondBorder, trackfinderInputHit* hit);
+	void doHistogramLayerEntry(lutHoughBorder& secondBorder, trackfinderInputHit* hit);
 
 public:
 

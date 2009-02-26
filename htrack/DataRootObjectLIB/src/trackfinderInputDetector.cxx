@@ -75,7 +75,7 @@ trackfinderInputStation* trackfinderInputDetector::searchStation(int stationId) 
  * Default constructor											*
  ****************************************************************/
 
-trackfinderInputDetector::trackfinderInputDetector() {
+trackfinderInputDetector::trackfinderInputDetector() : TObject() {
 
 	numberOfStations       = 0;
 	numberOfActiveStations = 0;
@@ -87,7 +87,7 @@ trackfinderInputDetector::trackfinderInputDetector() {
  * Constructor													*
  ****************************************************************/
 
-trackfinderInputDetector::trackfinderInputDetector(const trackfinderInputDetector& value) {
+trackfinderInputDetector::trackfinderInputDetector(const trackfinderInputDetector& value) : TObject(value) {
 
 	this->numberOfStations       = value.numberOfStations;
 	this->numberOfActiveStations = value.numberOfActiveStations;

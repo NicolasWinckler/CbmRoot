@@ -1158,10 +1158,6 @@ void CbmHoughStsTrackFinder::ShowHistogramLayer(unsigned int eventNumber, unsign
 
 #ifndef NOANALYSIS
 
-	std::cout << "WARNING: The anaylsis which is enabled cannot be done because it is not added at compilation!!!" << std::endl;
-
-#else
-
 	if (analyser != NULL) {
 
 		if (analyser->isShowingCreatedHistogramLayerEnabled())
@@ -1177,6 +1173,10 @@ void CbmHoughStsTrackFinder::ShowHistogramLayer(unsigned int eventNumber, unsign
 		std::cout << "WARNING: The anaylsis which is enabled cannot be done because the analysing object is not created yet!!!" << std::endl;
 
 	}
+
+#else
+
+	std::cout << "WARNING: The anaylsis which is enabled cannot be done because it is not added at compilation!!!" << std::endl;
 
 #endif
 
@@ -1266,7 +1266,6 @@ void CbmHoughStsTrackFinder::Init() {
 					configurationFile->getDataReference().trackfinderPrelutFileName,
 					configurationFile->getDataReference().trackfinderLutFileName,
 					eventData->getDetectorPointer(),
-					eventData->getMagneticField(),
 					terminal);
 
 				break;

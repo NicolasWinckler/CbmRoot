@@ -36,8 +36,8 @@
 #include <string>
 
 
-#define NOFILEIOWARNINGMESSAGE	/**< If this is defined, no message would be written to the standard output. */
-//#undef NOFILEIOWARNINGMESSAGE
+//#define NOFILEIOWARNINGMESSAGE	/**< If this is defined, no message would be written to the standard output. */
+#undef NOFILEIOWARNINGMESSAGE
 
 
 /* **************************************************************

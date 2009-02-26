@@ -34,6 +34,7 @@
 #define _RUNGEKUTTAINVERTEDLISTENTRY_H
 
 
+#include "../../MiscLIB/include/defs.h"
 #include "../../DataObjectLIB/include/specialList.h"
 #include "../../DataObjectLIB/include/trackCoordinates.h"
 #include "../include/digitalHit.h"

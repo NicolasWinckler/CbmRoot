@@ -213,6 +213,7 @@ static const initialFileParameter defaultFileParameters = {
 	false,
 	/* EFGC graphic displays */
 	false,
+	false,
 	/* magnetfield displays */
 	false,
 	/* histogram layer */

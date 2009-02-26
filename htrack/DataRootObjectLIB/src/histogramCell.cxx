@@ -224,7 +224,7 @@ double histogramCell::getReservedSizeOfHistogramHitData(unsigned short dimension
 
 #ifndef NOANALYSIS
 
-	return hits.getReservedSizeOfData();
+	return hits.getReservedSizeOfData(dimension);
 
 #else
 
@@ -243,7 +243,7 @@ double histogramCell::getAllocatedSizeOfHistogramHitData(unsigned short dimensio
 
 #ifndef NOANALYSIS
 
-	return hits.getAllocatedSizeOfData();
+	return hits.getAllocatedSizeOfData(dimension);
 
 #else
 
@@ -262,7 +262,7 @@ double histogramCell::getUsedSizeOfHistogramHitData(unsigned short dimension) {
 
 #ifndef NOANALYSIS
 
-	return hits.getUsedSizeOfData();
+	return hits.getUsedSizeOfData(dimension);
 
 #else
 

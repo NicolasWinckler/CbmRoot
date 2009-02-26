@@ -93,7 +93,7 @@ void trackfinderInputMagneticField::readField() {
  * Default constructor											*
  ****************************************************************/
 
-trackfinderInputMagneticField::trackfinderInputMagneticField() {
+trackfinderInputMagneticField::trackfinderInputMagneticField() : TObject() {
 
 	magneticField                               = NULL;
 	isLocalField                                = false;
@@ -111,7 +111,7 @@ trackfinderInputMagneticField::trackfinderInputMagneticField() {
  * Constructor													*
  ****************************************************************/
 
-trackfinderInputMagneticField::trackfinderInputMagneticField(const trackfinderInputMagneticField& value) {
+trackfinderInputMagneticField::trackfinderInputMagneticField(const trackfinderInputMagneticField& value) : TObject(value) {
 
 	if (value.isLocalField)
 		*(this->magneticField)                        = *(value.magneticField);
@@ -127,7 +127,7 @@ trackfinderInputMagneticField::trackfinderInputMagneticField(const trackfinderIn
 	this->magnetfieldFactors                          = value.magnetfieldFactors;
 
 }
-trackfinderInputMagneticField::trackfinderInputMagneticField(const char* fileName, bool isRootFile, const char* mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor) {
+trackfinderInputMagneticField::trackfinderInputMagneticField(const char* fileName, bool isRootFile, const char* mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor) : TObject() {
 
 	this->magneticField                                   = NULL;
 	this->isLocalField                                    = false;
@@ -143,7 +143,7 @@ trackfinderInputMagneticField::trackfinderInputMagneticField(const char* fileNam
 	this->magnetfieldFactors                              = NULL;
 
 }
-trackfinderInputMagneticField::trackfinderInputMagneticField(std::string fileName, bool isRootFile, std::string mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor) {
+trackfinderInputMagneticField::trackfinderInputMagneticField(std::string fileName, bool isRootFile, std::string mapName, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor) : TObject() {
 
 	this->magneticField                                   = NULL;
 	this->isLocalField                                    = false;
@@ -159,7 +159,7 @@ trackfinderInputMagneticField::trackfinderInputMagneticField(std::string fileNam
 	this->magnetfieldFactors                              = NULL;
 
 }
-trackfinderInputMagneticField::trackfinderInputMagneticField(unsigned short numberOfMagnetfieldFactors) {
+trackfinderInputMagneticField::trackfinderInputMagneticField(unsigned short numberOfMagnetfieldFactors) : TObject() {
 
 	magneticField                               = NULL;
 	isLocalField                                = false;
@@ -174,7 +174,7 @@ trackfinderInputMagneticField::trackfinderInputMagneticField(unsigned short numb
 	setNumberOfMagnetfieldFactors(numberOfMagnetfieldFactors);
 
 }
-trackfinderInputMagneticField::trackfinderInputMagneticField(FairField* field, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor) {
+trackfinderInputMagneticField::trackfinderInputMagneticField(FairField* field, unsigned short magneticFieldIntegrationStepwidthPerStation, double magneticFieldIntegrationFactor) : TObject() {
 
 	this->magneticField                                   = field;
 	this->isLocalField                                    = false;

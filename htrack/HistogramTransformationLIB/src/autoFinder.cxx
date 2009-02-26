@@ -512,9 +512,9 @@ void autoFinder::filteringHistogramLayerWithDirectOverwriting() {
 void autoFinder::filteringHistogram(std::streambuf* terminal) {
 
 	if (useSecondFilterMod)
-		filteringHistogramWithoutDirectOverwriting();
+		filteringHistogramWithoutDirectOverwriting(terminal);
 	else
-		filteringHistogramWithDirectOverwriting();
+		filteringHistogramWithDirectOverwriting(terminal);
 
 }
 void autoFinder::filteringHistogramWithoutDirectOverwriting(std::streambuf* terminal) {

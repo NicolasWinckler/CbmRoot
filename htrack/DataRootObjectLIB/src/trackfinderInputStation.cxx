@@ -42,7 +42,7 @@
  * Default constructor											*
  ****************************************************************/
 
-trackfinderInputStation::trackfinderInputStation() {
+trackfinderInputStation::trackfinderInputStation() : TObject() {
 
 	id       = 0;
 	distance = 0;
@@ -56,7 +56,7 @@ trackfinderInputStation::trackfinderInputStation() {
  * Constructor													*
  ****************************************************************/
 
-trackfinderInputStation::trackfinderInputStation(const trackfinderInputStation& value) {
+trackfinderInputStation::trackfinderInputStation(const trackfinderInputStation& value) : TObject(value) {
 
 	this->id       = value.id;
 	this->distance = value.distance;
@@ -70,7 +70,7 @@ trackfinderInputStation::trackfinderInputStation(double stationDistance,
 												  bool stationMaps,
 												  bool stationHybrid,
 												  bool stationStrip,
-												  bool mask) {
+												  bool mask) : TObject() {
 
 	distance = stationDistance;
 	id       = stationId;

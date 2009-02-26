@@ -67,15 +67,15 @@
 
 void houghTransformation::doHistogramLayerEntry(std::vector<lutBorder>::iterator border) {
 
-	doHistogramLayerEntry(border->getPrelutHoughBorder(), border->getLutHoughBorder(), border->getHit());
+	doHistogramLayerEntry(border->getLutHoughBorder(), border->getHit());
 
 }
 void houghTransformation::doHistogramLayerEntry(lutBorder* border) {
 	
-	doHistogramLayerEntry(border->getPrelutHoughBorder(), border->getLutHoughBorder(), border->getHit());
+	doHistogramLayerEntry(border->getLutHoughBorder(), border->getHit());
 
 }
-void houghTransformation::doHistogramLayerEntry(prelutHoughBorder& firstBorder, lutHoughBorder& secondBorder, trackfinderInputHit* hit) {
+void houghTransformation::doHistogramLayerEntry(lutHoughBorder& secondBorder, trackfinderInputHit* hit) {
 
 	unsigned short                         stationIndex;
 	houghBorderPosition                    actualHoughCoord;
@@ -248,14 +248,14 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 	lutBorder            border;
 	terminalSequence     statusSequence;
 
-#if (DEBUGJUSTONEGOODTRACK > 0)
+#ifdef DEBUGJUSTONEGOODTRACK
 
-	int                  goodTrack[DEBUGJUSTONEGOODTRACK];
+	int                  goodTrack[INDEXOFGOODTRACK];
 	int                  numberOfGoodTracks;
 	bool                 isAcceptableTrack;
 	bool                 goodTrackIsFound;
 
-	for (unsigned int a = 0; a < DEBUGJUSTONEGOODTRACK; a++)
+	for (unsigned int a = 0; a < INDEXOFGOODTRACK; a++)
 		goodTrack[a] = -1;
 
 #endif
@@ -280,7 +280,7 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 	createTerminalStatusSequence(&statusSequence, terminal, "\nCreate borders:\t\t\t\t\t", (unsigned int)(*eventData)->getNumberOfHits());
 	terminalInitialize(statusSequence);
 
-#if (DEBUGJUSTONEGOODTRACK > 0)
+#ifdef DEBUGJUSTONEGOODTRACK
 
 	numberOfGoodTracks = 0;
 
@@ -292,12 +292,12 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 		if (hit == NULL)
 			throw cannotAccessHitsOrTracksError(HOUGHTRANSFORMATIONLIB);
 
-#if (DEBUGJUSTONEGOODTRACK > 0)
+#ifdef DEBUGJUSTONEGOODTRACK
 
 		if (hit->getTrack() == NULL)
 			continue;
 
-		if (numberOfGoodTracks < DEBUGJUSTONEGOODTRACK) {
+		if (numberOfGoodTracks < INDEXOFGOODTRACK) {
 
 #ifndef NOANALYSIS
 
@@ -338,7 +338,7 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 
 		}
 
-		if ((hit->getTrack()->getTrackIndex() != goodTrack[DEBUGJUSTONEGOODTRACK - 1]) || (numberOfGoodTracks != DEBUGJUSTONEGOODTRACK)) {
+		if ((hit->getTrack()->getTrackIndex() != goodTrack[INDEXOFGOODTRACK - 1]) || (numberOfGoodTracks != INDEXOFGOODTRACK)) {
 	
 			terminalOverwrite(statusSequence, (unsigned int)(i + 1));
 			continue;
@@ -361,10 +361,10 @@ void houghTransformation::createBorders(std::streambuf* terminal) {
 
 #ifdef DEBUGJUSTONEGOODTRACK
 
-	if (numberOfGoodTracks != DEBUGJUSTONEGOODTRACK)
+	if (numberOfGoodTracks != INDEXOFGOODTRACK)
 		throw noGoodTrackFoundError();
 	else {
-		debugTrackIndex = goodTrack[DEBUGJUSTONEGOODTRACK - 1];
+		debugTrackIndex = goodTrack[INDEXOFGOODTRACK - 1];
 		if ((*eventData)->getTrackByIndex(debugTrackIndex) != NULL) {
 			std::cout << "Correct momentum of the MCTrack (px, py, pz): (";
 			std::cout << (*eventData)->getTrackByIndex(debugTrackIndex)->getMomX();

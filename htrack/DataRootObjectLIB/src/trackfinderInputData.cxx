@@ -188,7 +188,7 @@ void trackfinderInputData::initMagneticField() {
  * Default constructor											*
  ****************************************************************/
 
-trackfinderInputData::trackfinderInputData() {
+trackfinderInputData::trackfinderInputData() : TObject() {
 
 	eventNumber                  = 0;
 	hits                         = NULL;
@@ -205,7 +205,7 @@ trackfinderInputData::trackfinderInputData() {
  * Constructor													*
  ****************************************************************/
 
-trackfinderInputData::trackfinderInputData(const trackfinderInputData& value) {
+trackfinderInputData::trackfinderInputData(const trackfinderInputData& value) : TObject(value) {
 
 	int i;
 
@@ -371,7 +371,7 @@ const trackfinderInputData& trackfinderInputData::operator = (const trackfinderI
  * method initializes the object								*
  ****************************************************************/
 
-void trackfinderInputData::init(char* magneticFieldFileName) {
+void trackfinderInputData::init() {
 
 	initHits();
 	initTracks();
@@ -521,7 +521,7 @@ trackfinderInputTrack* trackfinderInputData::getTrackByIndex(unsigned int index)
 		if (track == NULL)
 			throw cannotAccessHitsOrTracksError(DATAROOTOBJECTLIB);
 
-		if (track->getTrackIndex() == index)
+		if ((unsigned int)track->getTrackIndex() == index)
 			break;
 
 	}

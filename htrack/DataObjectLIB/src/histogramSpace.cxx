@@ -73,10 +73,9 @@ histogramSpace::histogramSpace(const histogramSpace& value) {
 	this->stepValues[DIM3] = value.stepValues[DIM3];
 
 }
-histogramSpace::histogramSpace(double dim1Min, double dim1Max, int dim1Step,
-				   double dim2Min, double dim2Max, int dim2Step,
-				   double dim3Min, double dim3Max, int dim3Step,
-				   bool dummy) {
+histogramSpace::histogramSpace(int dim1Step, double dim1Min, double dim1Max,
+				   int dim2Step, double dim2Min, double dim2Max,
+				   int dim3Step, double dim3Min, double dim3Max) {
 
 	minValues[DIM1]  = dim1Min;
 	minValues[DIM2]  = dim2Min;

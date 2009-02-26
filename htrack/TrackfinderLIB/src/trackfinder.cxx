@@ -511,7 +511,7 @@ void trackfinder::evaluate(std::streambuf* terminal) {
 
 #endif
 
-		histoTransform->serializeHistogramLayer(i, terminal, &statusSequence, houghTransform->getNumberOfHistogramLayers());
+		histoTransform->serializeHistogramLayer(i);
 
 #ifndef NOANALYSIS
 

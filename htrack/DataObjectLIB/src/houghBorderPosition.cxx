@@ -62,7 +62,7 @@ void houghBorderPosition::partString(std::string& basicString, std::string& part
 		throw cannotFindMiddleSeparatorError(basicString, CLASSMEMBERSTRINGSEPARATOR);
 
 	part1 = basicString.substr(0, middleSeparator);
-	part1 = basicString.substr(middleSeparator + 1, std::basic_string<char>::npos);
+	part2 = basicString.substr(middleSeparator + 1, std::basic_string<char>::npos);
 
 }
 

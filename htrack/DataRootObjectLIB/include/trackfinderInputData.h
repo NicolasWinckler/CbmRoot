@@ -205,7 +205,7 @@ public:
  * method initializes the object
  */
 
-	void init(char* magneticFieldFileName = NULL);
+	void init();
 
 /**
  * Method inits the default detector.
@@ -308,7 +308,7 @@ public:
 
 /**
  * method adds a hit to the end of the Hit-TClonesArray
- * @see FairHit()
+ * @see CbmHit()
  */
 
 	void addHit(trackfinderInputHit& hit);

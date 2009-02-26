@@ -1841,7 +1841,7 @@ bytefield& bytefield::operator ++ () {
 	return *this;
 
 }
-bytefield  bytefield::operator ++ (int value) {
+bytefield  bytefield::operator ++ (int) {
 
 	bytefield returnValue;
 
@@ -1867,7 +1867,7 @@ bytefield& bytefield::operator -- () {
 	return *this;
 
 }
-bytefield  bytefield::operator -- (int value) {
+bytefield  bytefield::operator -- (int) {
 
 	bytefield returnValue;
 

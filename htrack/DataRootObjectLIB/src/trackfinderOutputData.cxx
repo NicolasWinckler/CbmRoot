@@ -43,7 +43,7 @@
  * Default constructor											*
  ****************************************************************/
 
-trackfinderOutputData::trackfinderOutputData() {
+trackfinderOutputData::trackfinderOutputData() : TObject() {
 
 	tracks         = NULL;
 	actualTrack    = NULL;
@@ -55,7 +55,7 @@ trackfinderOutputData::trackfinderOutputData() {
  * Constructor													*
  ****************************************************************/
 
-trackfinderOutputData::trackfinderOutputData(const trackfinderOutputData& value) {
+trackfinderOutputData::trackfinderOutputData(const trackfinderOutputData& value) : TObject(value) {
 
 	int index;
 

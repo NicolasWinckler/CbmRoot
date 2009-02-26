@@ -297,7 +297,7 @@ TEllipse* houghPictures::addEllipse(double xCenter, double yCenter, double xRadi
 	else
 		ellipse = (TEllipse**)realloc(ellipse, numberOfEllipses * sizeof(TEllipse*));
 
-	ellipse[numberOfEllipses - 1] = new TEllipse(xCenter, xCenter, xRadius, yRadius, angleMin, angleMax, rotationAngle);
+	ellipse[numberOfEllipses - 1] = new TEllipse(xCenter, yCenter, xRadius, yRadius, angleMin, angleMax, rotationAngle);
 
 	return ellipse[numberOfEllipses - 1];
 

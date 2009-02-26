@@ -87,7 +87,7 @@ double borderCell::getReservedSizeOfData(unsigned short dimension) {
 
 	double returnValue;
 
-	returnValue  = sizeof(layer);
+	returnValue  = (double)sizeof(layer);
 
 	returnValue  = (returnValue / (1 << (10 * dimension)));
 
@@ -106,14 +106,14 @@ double borderCell::getAllocatedSizeOfData(unsigned short dimension) {
 
 	returnValue  = 0;
 
-	for (int i = 0; i < layer.size(); i++) {
+	for (unsigned int i = 0; i < (unsigned int)layer.size(); i++) {
 
 		returnValue += layer[i].getReservedSizeOfData(0);
 		returnValue += layer[i].getAllocatedSizeOfData(0);
 
 	}
 
-	returnValue += (layer.capacity() - layer.size()) * sizeof(lutBorder);
+	returnValue += ((double)layer.capacity() - (double)layer.size()) * (double)sizeof(lutBorder);
 
 	returnValue  = (returnValue / (1 << (10 * dimension)));
 
@@ -132,7 +132,7 @@ double borderCell::getUsedSizeOfData(unsigned short dimension) {
 
 	returnValue  = 0;
 
-	for (int i = 0; i < layer.size(); i++) {
+	for (unsigned int i = 0; i < (unsigned int)layer.size(); i++) {
 
 		returnValue += layer[i].getUsedSizeOfData(0);
 
@@ -172,14 +172,14 @@ double borderCell::getAllocatedSizeOfPrelutData(unsigned short dimension) {
 
 	returnValue  = 0;
 
-	for (int i = 0; i < layer.size(); i++) {
+	for (unsigned int i = 0; i < (unsigned int)layer.size(); i++) {
 
 		returnValue += layer[i].getReservedSizeOfPrelutData(0);
 		returnValue += layer[i].getAllocatedSizeOfPrelutData(0);
 
 	}
 
-	returnValue += (layer.capacity() - layer.size()) * sizeof(prelutHoughBorder);
+	returnValue += ((double)layer.capacity() - (double)layer.size()) * (double)sizeof(prelutHoughBorder);
 
 	returnValue  = (returnValue / (1 << (10 * dimension)));
 
@@ -198,7 +198,7 @@ double borderCell::getUsedSizeOfPrelutData(unsigned short dimension) {
 
 	returnValue  = 0;
 
-	for (int i = 0; i < layer.size(); i++) {
+	for (unsigned int i = 0; i < (unsigned int)layer.size(); i++) {
 
 		returnValue += layer[i].getUsedSizeOfPrelutData(0);
 
@@ -238,14 +238,14 @@ double borderCell::getAllocatedSizeOfLutData(unsigned short dimension) {
 
 	returnValue  = 0;
 
-	for (int i = 0; i < layer.size(); i++) {
+	for (unsigned int i = 0; i < (unsigned int)layer.size(); i++) {
 
 		returnValue += layer[i].getReservedSizeOfLutData(0);
 		returnValue += layer[i].getAllocatedSizeOfLutData(0);
 
 	}
 
-	returnValue += (layer.capacity() - layer.size()) * sizeof(lutHoughBorder);
+	returnValue += ((double)layer.capacity() - (double)layer.size()) * (double)sizeof(lutHoughBorder);
 
 	returnValue  = (returnValue / (1 << (10 * dimension)));
 
@@ -264,7 +264,7 @@ double borderCell::getUsedSizeOfLutData(unsigned short dimension) {
 
 	returnValue  = 0;
 
-	for (int i = 0; i < layer.size(); i++) {
+	for (unsigned int i = 0; i < (unsigned int)layer.size(); i++) {
 
 		returnValue += layer[i].getUsedSizeOfLutData(0);
 
@@ -304,14 +304,14 @@ double borderCell::getAllocatedSizeOfHitData(unsigned short dimension) {
 
 	returnValue  = 0;
 
-	for (int i = 0; i < layer.size(); i++) {
+	for (unsigned int i = 0; i < (unsigned int)layer.size(); i++) {
 
 		returnValue += layer[i].getReservedSizeOfHitData(0);
 		returnValue += layer[i].getAllocatedSizeOfHitData(0);
 
 	}
 
-	returnValue += (layer.capacity() - layer.size()) * sizeof(trackfinderInputHit*);
+	returnValue += ((double)layer.capacity() - (double)layer.size()) * (double)sizeof(trackfinderInputHit*);
 
 	returnValue  = (returnValue / (1 << (10 * dimension)));
 
@@ -330,7 +330,7 @@ double borderCell::getUsedSizeOfHitData(unsigned short dimension) {
 
 	returnValue  = 0;
 
-	for (int i = 0; i < layer.size(); i++) {
+	for (unsigned int i = 0; i < (unsigned int)layer.size(); i++) {
 
 		returnValue += layer[i].getUsedSizeOfHitData(0);
 
@@ -351,9 +351,9 @@ double borderCell::getAllocatedSizeOfAddOnData(unsigned short dimension) {
 
 	double returnValue;
 
-	returnValue  = sizeof(layer);
+	returnValue  = (double)sizeof(layer);
 
-	returnValue += (layer.capacity() - layer.size()) * (sizeof(lutBorder) - sizeof(prelutHoughBorder) - sizeof(lutHoughBorder) - sizeof(trackfinderInputHit*));
+	returnValue += ((double)layer.capacity() - (double)layer.size()) * ((double)sizeof(lutBorder) - (double)sizeof(prelutHoughBorder) - (double)sizeof(lutHoughBorder) - (double)sizeof(trackfinderInputHit*));
 
 	returnValue  = (returnValue / (1 << (10 * dimension)));
 

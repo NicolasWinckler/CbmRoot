@@ -81,10 +81,9 @@ public:
  */
 
 	histogramSpace(const histogramSpace& value);
-	histogramSpace(double dim1Min, double dim1Max, int dim1Step,
-				   double dim2Min, double dim2Max, int dim2Step,
-				   double dim3Min, double dim3Max, int dim3Step,
-				   bool dummy);
+	histogramSpace(int dim1Step, double dim1Min, double dim1Max,
+				   int dim2Step, double dim2Min, double dim2Max,
+				   int dim3Step, double dim3Min, double dim3Max);
 	histogramSpace(double radiusMin, double radiusMax, int radiusStep,
 				   double thetaMin, double thetaMax, int thetaStep,
 				   double gammaMin, double gammaMax, int gammaStep);

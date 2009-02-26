@@ -501,14 +501,14 @@ template<class objectClass> double specialMem<objectClass>::getAllocatedSizeOfDa
 	restorePointer = activeObjectPointer;
 
 	resetActiveObject();
-	for (int i = 0; i < getNumberOfEntries(); i++) {
+	for (unsigned long i = 0; i < getNumberOfEntries(); i++) {
 			
 		object       = readActiveObjectAndMakeNextOneActive();
-		returnValue += sizeof(object);
+		returnValue += (double)sizeof(object);
 
 	}
 
-	returnValue += (stackMem.capacity() - getNumberOfEntries()) * sizeof(objectClass);
+	returnValue += ((double)stackMem.capacity() - (double)getNumberOfEntries()) * (double)sizeof(objectClass);
 
 	activeObjectPointer = restorePointer;
 
@@ -534,16 +534,16 @@ template<class objectClass> double specialMem<objectClass>::getUsedSizeOfData(un
 	restorePointer = activeObjectPointer;
 
 	resetActiveObject();
-	for (int i = 0; i < getNumberOfEntries(); i++) {
+	for (unsigned long i = 0; i < getNumberOfEntries(); i++) {
 			
 		object       = readActiveObjectAndMakeNextOneActive();
-		returnValue += sizeof(object);
+		returnValue += (double)sizeof(object);
 
 	}
 
 	activeObjectPointer = restorePointer;
 
-	returnValue += sizeof(activeObjectPointer);
+	returnValue += (double)sizeof(activeObjectPointer);
 
 	returnValue  = (returnValue / (1 << (10 * dimension)));
 

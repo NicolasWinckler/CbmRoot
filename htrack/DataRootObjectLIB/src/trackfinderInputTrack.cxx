@@ -37,7 +37,7 @@
  * Default constructor											*
  ****************************************************************/
 
-trackfinderInputTrack::trackfinderInputTrack() {
+trackfinderInputTrack::trackfinderInputTrack() : TObject() {
 
 	track                    = NULL;
 	hits.clear();
@@ -53,7 +53,7 @@ trackfinderInputTrack::trackfinderInputTrack() {
  * Constructor													*
  ****************************************************************/
 
-trackfinderInputTrack::trackfinderInputTrack(const trackfinderInputTrack& value) {
+trackfinderInputTrack::trackfinderInputTrack(const trackfinderInputTrack& value) : TObject(value) {
 
 	if (value.isPointer)
 		this->track                = value.track;
@@ -67,7 +67,7 @@ trackfinderInputTrack::trackfinderInputTrack(const trackfinderInputTrack& value)
 	this->charge                   = value.charge;
 
 }
-trackfinderInputTrack::trackfinderInputTrack(CbmMCTrack* mcTrack, int newTrackIndex, double newCharge) {
+trackfinderInputTrack::trackfinderInputTrack(CbmMCTrack* mcTrack, int newTrackIndex, double newCharge) : TObject() {
 
 	track                    = mcTrack;
 	if (track == NULL)
@@ -81,7 +81,7 @@ trackfinderInputTrack::trackfinderInputTrack(CbmMCTrack* mcTrack, int newTrackIn
 	charge                   = newCharge;
 
 }
-trackfinderInputTrack::trackfinderInputTrack(int pdgId, double momX, double momY, double momZ, int newTrackIndex, double newCharge) {
+trackfinderInputTrack::trackfinderInputTrack(int pdgId, double momX, double momY, double momZ, int newTrackIndex, double newCharge) : TObject() {
 
 	track                    = new CbmMCTrack(pdgId, -1, momX, momY, momZ, -1.0, -1.0, -1.0, -1.0, 0);
 	if (track == NULL)

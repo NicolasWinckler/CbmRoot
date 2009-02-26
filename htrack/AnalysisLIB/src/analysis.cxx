@@ -3488,7 +3488,6 @@ void analysis::evaluateLutDistribution(unsigned int* numberOfTracksWithSignature
 
 void analysis::evaluateBothLutsDistribution(unsigned int* numberOfTracksWithHits, std::string terminalString, std::streambuf* terminal) {
 
-	unsigned short           i;
 	terminalSequence         statusSequenceForBothLuts;
 	std::list<findableTrack> findableTracks;
 	trackfinderInputTrack*   track;
@@ -9232,9 +9231,10 @@ void analysis::trackPropagationTotalAnalysisWrite(int eventNumber) {
 
 void analysis::momentumEventAnalysisWrite(int eventNumber) {
 
-	if (momentumAnalyser != NULL)
+	if (momentumAnalyser != NULL) {
 		if (momentumAnalyser->isMomentumToRootEnabled())
 			momentumAnalyser->momentumEventAnalysisWrite(eventNumber);
+	}
 	else {
 
 		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
@@ -9255,9 +9255,10 @@ void analysis::momentumEventAnalysisWrite(int eventNumber) {
 
 void analysis::momentumTotalAnalysisWrite(int eventNumber) {
 
-	if (momentumAnalyser != NULL)
+	if (momentumAnalyser != NULL) {
 		if (momentumAnalyser->isMomentumToRootEnabled())
 			momentumAnalyser->momentumTotalAnalysisWrite(eventNumber);
+	}
 	else {
 
 		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
@@ -9278,9 +9279,10 @@ void analysis::momentumTotalAnalysisWrite(int eventNumber) {
 
 void analysis::projectionEventAnalysisWrite(int eventNumber) {
 
-	if (projectionAnalyser != NULL)
+	if (projectionAnalyser != NULL) {
 		if (projectionAnalyser->isProjectionToRootEnabled())
 			projectionAnalyser->projectionEventAnalysisWrite(eventNumber);
+	}
 	else {
 
 		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
@@ -9301,9 +9303,10 @@ void analysis::projectionEventAnalysisWrite(int eventNumber) {
 
 void analysis::projectionTotalAnalysisWrite(int eventNumber) {
 
-	if (projectionAnalyser != NULL)
+	if (projectionAnalyser != NULL) {
 		if (projectionAnalyser->isProjectionToRootEnabled())
 			projectionAnalyser->projectionTotalAnalysisWrite(eventNumber);
+	}
 	else {
 
 		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();
@@ -9324,9 +9327,10 @@ void analysis::projectionTotalAnalysisWrite(int eventNumber) {
 
 void analysis::magnetfieldAnalysisWrite() {
 
-	if (magnetfieldAnalyser != NULL)
+	if (magnetfieldAnalyser != NULL) {
 		if (magnetfieldAnalyser->isMagnetfieldToRootEnabled())
 			magnetfieldAnalyser->magnetfieldAnalysisWrite();
+	}
 	else {
 
 		displayAnalyserNotFoundWarningMsg* displayAnalyserNotFound = new displayAnalyserNotFoundWarningMsg();

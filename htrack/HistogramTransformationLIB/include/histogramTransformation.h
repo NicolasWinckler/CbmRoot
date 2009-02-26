@@ -156,7 +156,7 @@ public:
  * the correspondance to be equal to the eraser-object result.
  */
 
-	void serializeHistogramLayer(unsigned short layer, std::streambuf* terminal = NULL, terminalSequence* statusSequence = NULL, unsigned short statusMax = 0);
+	void serializeHistogramLayer(unsigned short layer);
 
 /**
  * This method filters the tracks in a speciallized manner

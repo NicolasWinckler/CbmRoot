@@ -461,14 +461,14 @@ public:
  */
 
 	bytefield& operator ++ ();
-	bytefield  operator ++ (int value);
+	bytefield  operator ++ (int);
 
 /**
  * operator -- ()
  */
 
 	bytefield& operator -- ();
-	bytefield  operator -- (int value);
+	bytefield  operator -- (int);
 
 /**
  * Method sets the format of the stream:

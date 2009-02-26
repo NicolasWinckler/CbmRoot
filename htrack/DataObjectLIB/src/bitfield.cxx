@@ -410,7 +410,7 @@ std::bitset<numberOfBits> bitfield::sub(std::bitset<numberOfBits>& operand1, std
 				continue;
 
 			returnValue[i] = carryIn ^ operand1[i] ^ operand2[i];
-			carryOut       = (operand2[i] ^ carryIn) && !operand1[i] || operand2[i] && carryIn;
+			carryOut       = ((operand2[i] ^ carryIn) && !operand1[i]) || (operand2[i] && carryIn);
 			carryIn        = carryOut;
 
 		}
@@ -1679,7 +1679,7 @@ bitfield& bitfield::operator ++ () {
 	return *this;
 
 }
-bitfield  bitfield::operator ++ (int value) {
+bitfield bitfield::operator ++ (int) {
 
 	bitfield operand;
 	bitfield returnValue;
@@ -1706,7 +1706,7 @@ bitfield& bitfield::operator -- () {
 	return *this;
 
 }
-bitfield  bitfield::operator -- (int value) {
+bitfield bitfield::operator -- (int) {
 
 	bitfield operand;
 	bitfield returnValue;

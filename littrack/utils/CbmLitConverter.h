@@ -7,7 +7,7 @@ class CbmLitPixelHit;
 class CbmLitStripHit;
 class CbmLitTrack;
 class CbmLitTrackParam;
-class CbmTrkHit;
+class CbmHit;
 class FairTrackParam;
 class CbmTrdHit;
 class CbmMuchTrack;
@@ -35,7 +35,7 @@ public:
 			FairTrackParam* par);
 
 	static void TrkHitToLitPixelHit(
-			const CbmTrkHit* trkHit,
+			const CbmHit* trkHit,
 			Int_t index,
 			CbmLitPixelHit* litHit);
 

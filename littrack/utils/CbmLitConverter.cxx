@@ -6,7 +6,7 @@
 #include "CbmLitTrack.h"
 #include "CbmLitTrackParam.h"
 
-#include "CbmTrkHit.h"
+#include "CbmHit.h"
 #include "CbmMuchHit.h"
 #include "FairTrackParam.h"
 #include "CbmTrdHit.h"
@@ -59,7 +59,7 @@ void CbmLitConverter::LitTrackParamToTrackParam(
 }
 
 void CbmLitConverter::TrkHitToLitPixelHit(
-		const CbmTrkHit* trkHit,
+		const CbmHit* trkHit,
 		Int_t index,
 		CbmLitPixelHit* litHit)
 {
@@ -240,7 +240,7 @@ void CbmLitConverter::TrkHitArrayToPixelHitVector(
 {
 	Int_t nofHits = hits->GetEntriesFast();
 	for(Int_t iHit = 0; iHit < nofHits; iHit++) {
-		CbmTrkHit* hit = (CbmTrkHit*) hits->At(iHit);
+		CbmHit* hit = (CbmHit*) hits->At(iHit);
 	    if(NULL == hit) continue;
 	    CbmLitPixelHit* litHit = new CbmLitPixelHit;
 	    TrkHitToLitPixelHit(hit, iHit, litHit);

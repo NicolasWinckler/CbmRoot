@@ -12,7 +12,7 @@
 #include "CbmLitTrack.h"
 #include "CbmLitHit.h"
 
-#include "CbmTrkHit.h"
+#include "CbmHit.h"
 #include "CbmStsTrack.h"
 #include "CbmTrdTrack.h"
 #include "CbmMuchHit.h"
@@ -231,7 +231,7 @@ void CbmLitPropagationAnalysis::McTrdTrackToLitTrack(
     FitNodeVector nodes(nofHits);
     for (Int_t i = 0; i < nofHits; i++){
 		Int_t hitIndex = trdTrack->GetTrdHitIndex(i);
-		CbmTrkHit* hit = (CbmTrkHit*) fHits->At(hitIndex);
+		CbmHit* hit = (CbmHit*) fHits->At(hitIndex);
 		Int_t pointIndex = hit->GetRefIndex();
 		if (pointIndex < 0) Fatal("CbmLitPropagationAnalysis", "Wrong point index");
 		FairMCPoint* point = (FairMCPoint*) fMCPoints->At(pointIndex);

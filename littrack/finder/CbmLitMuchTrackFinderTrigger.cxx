@@ -3,7 +3,7 @@
 #include "CbmLitMuchTrackFinderTrigger.h"
 #include "CbmLitEnvironment.h"
 
-#include "CbmTrkHit.h"
+#include "CbmHit.h"
 #include "CbmMuchTrack.h"
 #include "CbmLitConverter.h"
 
@@ -62,7 +62,7 @@ void CbmLitMuchTrackFinderTrigger::ArrangeHits()
    Int_t nofHits = fHitArray->GetEntriesFast();
    for(Int_t iHit = 0; iHit < nofHits; iHit++) {
    
-      CbmTrkHit* hit = (CbmTrkHit*) fHitArray->At(iHit);
+      CbmHit* hit = (CbmHit*) fHitArray->At(iHit);
       
       if(NULL == hit) continue;
       
@@ -76,7 +76,7 @@ void CbmLitMuchTrackFinderTrigger::ArrangeHits()
       
       CbmLitPixelHit* litHit = new CbmLitPixelHit;
       CbmLitConverter::TrkHitToLitHit(hit, iHit, litHit);
-      //litHit->MapFromCbmTrkHit(hit, iHit);
+      //litHit->MapFromCbmHit(hit, iHit);
       fHits[layer].push_back(litHit);
       //fHitIdMap[hit] = iHit;
    }

@@ -133,7 +133,7 @@ class CbmMuchDigitize : public FairTask
   std::map<Long64_t, CbmMuchDigiMatch*> fChargedMatches;
 
   /** Finish **/
-  virtual void Finish();
+  virtual void FinishTask();
 
   /** Get parameter containers **/
   virtual void SetParContainers();

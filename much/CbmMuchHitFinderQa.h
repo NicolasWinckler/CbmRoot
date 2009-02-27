@@ -25,7 +25,7 @@ public:
   virtual ~CbmMuchHitFinderQa();
   virtual InitStatus Init();
   virtual void Exec(Option_t * option);
-  virtual void Finish();
+  virtual void FinishTask();
   virtual void SetParContainers();
   void SetGeoFileName        (TString fileName) { fGeoFileName = fileName; }
   void SetPerformanceFileName(TString fileName) { fFileName    = fileName; }
@@ -68,7 +68,7 @@ private:
   TH1D* fhChargeLog;
   TH1D* fhChargePr_1GeV_3mm;
   TH2D* fhNpadsVsS;
-  
+
   TH1D** fhOccupancyR;
   TH1D** fhPadsTotalR;
   TH1D** fhPadsFiredR;
@@ -78,9 +78,9 @@ private:
   TH1D** fhPullYpads2;
   TH1D** fhPullXpads3;
   TH1D** fhPullYpads3;
-  Int_t  fnPadSizesX; 
-  Int_t  fnPadSizesY; 
-  
+  Int_t  fnPadSizesX;
+  Int_t  fnPadSizesY;
+
   TH1D* fhPullX;
   TH1D* fhPullY;
 
@@ -104,8 +104,8 @@ private:
   /** Defines whether the point with the given index is signal point. **/
   Bool_t IsSignalPoint(Int_t iPoint);
 
-  ClassDef(CbmMuchHitFinderQa,1) 
+  ClassDef(CbmMuchHitFinderQa,1)
 };
 
-#endif 
+#endif
 

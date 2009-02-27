@@ -484,7 +484,7 @@ void CbmMuchDigitize::SetParContainers() {
 // -------------------------------------------------------------------------
 
 // -----   Private method Finish   -----------------------------------------
-void CbmMuchDigitize::Finish() {
+void CbmMuchDigitize::FinishTask() {
 }
 // -------------------------------------------------------------------------
 

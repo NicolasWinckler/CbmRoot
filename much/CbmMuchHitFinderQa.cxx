@@ -75,6 +75,7 @@ InitStatus CbmMuchHitFinderQa::Init()
   fGeoScheme->Init(stations);
   fGeoScheme->InitGrid();
   fNstations = fGeoScheme->GetNStations();
+  printf("Init: fNstations = %i\n", fNstations);
 
   fNall       = new Int_t[fNstations];
   fNpr        = new Int_t[fNstations];
@@ -285,7 +286,7 @@ void CbmMuchHitFinderQa::Exec(Option_t * option){
 
 
 // -------------------------------------------------------------------------
-void CbmMuchHitFinderQa::Finish(){
+void CbmMuchHitFinderQa::FinishTask(){
   gStyle->SetPaperSize(20,20);
 
   Double_t errors[100];

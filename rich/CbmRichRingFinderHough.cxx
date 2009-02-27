@@ -20,7 +20,6 @@
 #include <cmath>
 #include <set>
 #include <algorithm>
-#include <string>
 
 using std::cout;
 using std::endl;
@@ -50,7 +49,7 @@ void CbmRichRingFinderHough::Init()
 {
     if (fVerbose) cout << "CbmRichRingFinderHough::init() "<<endl;
     fNEvent = 0;
-    String geometryType = "compact";
+    TString geometryType = "compact";
     SetParameters(geometryType);
 
     fHist.resize(fNofBinsX);

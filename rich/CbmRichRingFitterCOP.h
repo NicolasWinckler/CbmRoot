@@ -22,9 +22,9 @@
 #ifndef CBM_RICH_RING_FITTER_COP
 #define CBM_RICH_RING_FITTER_COP 1
 
-#include "CbmRichRingFitter.h"
+#include "CbmRichRingFitterImpl.h"
 
-class CbmRichRingFitterCOP : public CbmRichRingFitter
+class CbmRichRingFitterCOP : public CbmRichRingFitterImpl
 {
 
    public:

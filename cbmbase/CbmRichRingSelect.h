@@ -22,8 +22,10 @@
 #define CBM_RICH_RING_SELECT 1
 
 #include "TObject.h"
-#include "CbmRichRing.h"
+//#include "CbmRichRing.h"
 #include "TClonesArray.h"
+
+class CbmRichRing;
 
 class CbmRichRingSelect : public TObject
 {
@@ -36,14 +38,14 @@ class CbmRichRingSelect : public TObject
   /** Destructor **/
   virtual ~CbmRichRingSelect() { };
 
-  virtual void Init();
+  virtual void Init() { };
 
   virtual void DoSelect(CbmRichRing* ring) = 0;
 
    void SetVerbose(Int_t verbose) { fVerbose = verbose; };
    
-  Int_t GetNofHitsOnRing(CbmRichRing* ring);
-  Double_t GetAngle(CbmRichRing* ring);   
+  Int_t GetNofHitsOnRing(CbmRichRing* ring) { };
+  Double_t GetAngle(CbmRichRing* ring) { };   
  protected:
 
   Int_t fVerbose;      // Verbosity level

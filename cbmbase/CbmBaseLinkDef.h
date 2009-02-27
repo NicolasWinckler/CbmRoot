@@ -11,6 +11,19 @@
 //#pragma link C++ class CbmStack+;
 //#pragma link C++ class CbmTrack+;
 //#pragma link C++ class CbmTrkHit+;
+#pragma link C++ class CbmTrdTrackFitter+;
+#pragma link C++ class CbmTrdTrackFinder+;
+
+#pragma link C++ class CbmStsTrackFitter+;
+#pragma link C++ class CbmStsTrackFinder+;
+
+#pragma link C++ class CbmMuchTrackFinder+;
+
+#pragma link C++ class CbmRichTrackExtrapolation+;
+#pragma link C++ class CbmRichRingFinder+;
+#pragma link C++ class CbmRichRingFitter+;
+#pragma link C++ class CbmRichRingTrackAssign+;
+#pragma link C++ class CbmRichRingSelect+;
 
 #endif
 

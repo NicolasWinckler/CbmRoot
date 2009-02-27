@@ -10,13 +10,13 @@
 #ifndef CBMRICHRINGFITTERELLIPSEBASE_H_
 #define CBMRICHRINGFITTERELLIPSEBASE_H_
 
-#include "CbmRichRingFitter.h"
+#include "CbmRichRingFitterImpl.h"
 #include "TH2D.h"
 
 class CbmRichRing;
 
 
-class CbmRichRingFitterEllipseBase: public CbmRichRingFitter{
+class CbmRichRingFitterEllipseBase: public CbmRichRingFitterImpl{
 public:
 	/** Default constructor **/
 	CbmRichRingFitterEllipseBase(){};

@@ -7,6 +7,7 @@ ${ROOT_INCLUDE_DIR}
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
+//${CBMROOT_SOURCE_DIR}/cbmdata/rich
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -21,11 +22,21 @@ link_directories( ${LINK_DIRECTORIES})
 set(CBMBASE_SRCS
 CbmDigi.cxx 
 CbmDigiManager.cxx
-#CbmStack.cxx 
-#CbmTrack.cxx
-#CbmTrkHit.cxx
 CbmPropagator.cxx
-#CbmMCTrack.cxx
+
+CbmTrdTrackFinder.cxx  
+CbmTrdTrackFitter.cxx  
+
+CbmStsTrackFinder.cxx 
+CbmStsTrackFitter.cxx 
+
+CbmMuchTrackFinder.cxx
+
+CbmRichRingFinder.cxx 
+CbmRichRingFitter.cxx 
+CbmRichTrackExtrapolation.cxx 
+CbmRichRingTrackAssign.cxx 
+CbmRichRingSelect.cxx 
 )
 
 if(RULE_CHECKER_FOUND)

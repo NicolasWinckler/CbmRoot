@@ -21,9 +21,9 @@
 #ifndef CBM_RICH_RING_FITTER_CIRCLE
 #define CBM_RICH_RING_FITTER_CIRCLE 1
 
-#include "CbmRichRingFitter.h"
+#include "CbmRichRingFitterImpl.h"
 
-class CbmRichRingFitterCircle : public CbmRichRingFitter
+class CbmRichRingFitterCircle : public CbmRichRingFitterImpl
 {
 
    public:

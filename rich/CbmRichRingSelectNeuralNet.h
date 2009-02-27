@@ -29,13 +29,13 @@
 #include "CbmRichRing.h"
 /*#include "FairTask.h"
 #include "FairRootManager.h"*/
-#include "CbmRichRingSelect.h"
+#include "CbmRichRingSelectImpl.h"
 #include "TMultiLayerPerceptron.h"
 #include "TTree.h"
 
 class TMultiLayerPerceptron;
 
-class CbmRichRingSelectNeuralNet : public CbmRichRingSelect {
+class CbmRichRingSelectNeuralNet : public CbmRichRingSelectImpl {
 
 	  /** Verbosity level **/
   	Int_t fVerbose;

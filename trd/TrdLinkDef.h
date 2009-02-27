@@ -12,11 +12,11 @@
 #pragma link C++ class  CbmTrdHitProducerQa+;
 #pragma link C++ class  CbmTrdFindTracks+;
 #pragma link C++ class  CbmTrdFindTracksQa+;
-#pragma link C++ class  CbmTrdTrackFinder+;
+//#pragma link C++ class  CbmTrdTrackFinder+;
 #pragma link C++ class  CbmTrdTrackFinderIdeal+;
 #pragma link C++ class  CbmTrdFitTracks+;
 #pragma link C++ class  CbmTrdFitTracksQa+;
-#pragma link C++ class  CbmTrdTrackFitter+;
+//#pragma link C++ class  CbmTrdTrackFitter+;
 #pragma link C++ class  CbmTrdTrackFitterIdeal+;
 #pragma link C++ class  CbmGeoTrd+;
 #pragma link C++ class  CbmGeoTrdPar;

@@ -8,10 +8,10 @@
 
 #include "CbmStsTrackFinder.h"
 
-#include "CbmStsDigiScheme.h"
+//#include "CbmStsDigiScheme.h"
 
-#include "FairField.h"
+//#include "FairField.h"
 
-#include "TClonesArray.h"
+//#include "TClonesArray.h"
 
 ClassImp(CbmStsTrackFinder)

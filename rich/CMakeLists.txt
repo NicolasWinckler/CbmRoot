@@ -28,7 +28,6 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(RICH_SRCS
 CbmGeoRich.cxx 
-CbmRichRingFinder.cxx 
 CbmRich.cxx 
 CbmRichHitProducer.cxx   
 CbmRichProjectionProducer.cxx 
@@ -38,27 +37,25 @@ CbmRichRingFinderHough.cxx
 CbmRichRingFinderTrack.cxx
 CbmRichRingFinderIdeal.cxx 
 CbmRichFindRings.cxx
-CbmRichRingFitter.cxx 
 CbmRichRingFitterCircle.cxx 
 CbmRichFitRings.cxx
 CbmRichRingFitterCOP.cxx 
 CbmRichRingFitterRobustCOP.cxx 
 CbmRichRingFitterTAU.cxx
-CbmRichTrackExtrapolation.cxx 
 CbmRichTrackExtrapolationIdeal.cxx
 CbmRichTrackExtrapolationMirrorIdeal.cxx
 CbmRichExtrapolateTracks.cxx
-CbmRichRingTrackAssign.cxx 
 CbmRichRingTrackAssignClosestD.cxx
 CbmRichRingTrackAssignIdeal.cxx 
 CbmRichAssignTrack.cxx
 CbmRichTestSim.cxx 
 CbmRichTestHits.cxx
 CbmRichRingQa.cxx
-CbmRichRingSelect.cxx 
+CbmRichRingSelectImpl.cxx
 CbmRichRingSelectNeuralNet.cxx
 CbmRichSelectRings.cxx
 CbmRichMatchRings.cxx
+CbmRichRingFitterImpl.cxx
 CbmRichRingFitterEllipse.cxx
 CbmRichGeoTest.cxx
 CbmRichRingFitterEllipseTau.cxx

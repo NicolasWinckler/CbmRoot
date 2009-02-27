@@ -23,9 +23,9 @@
 #ifndef CBM_RICH_RING_FITTER_RobustCOP
 #define CBM_RICH_RING_FITTER_RobustCOP 1
 
-#include "CbmRichRingFitter.h"
+#include "CbmRichRingFitterImpl.h"
 
-class CbmRichRingFitterRobustCOP : public CbmRichRingFitter
+class CbmRichRingFitterRobustCOP : public CbmRichRingFitterImpl
 {
 
    public:

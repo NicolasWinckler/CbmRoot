@@ -39,11 +39,9 @@ CbmTrdHitProducerQa.cxx
 CbmTrdRadiator.cxx  
 CbmTrdFindTracks.cxx  
 CbmTrdFindTracksQa.cxx  
-CbmTrdTrackFinder.cxx  
 CbmTrdTrackFinderIdeal.cxx  
 CbmTrdFitTracks.cxx  
 CbmTrdFitTracksQa.cxx  
-CbmTrdTrackFitter.cxx  
 CbmTrdTrackFitterIdeal.cxx  
 CbmTrdMatchTracks.cxx
 CbmTrdSetTracksPidWkn.cxx       

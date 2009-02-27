@@ -29,7 +29,6 @@
 #pragma link C++ class  CbmMuchSegmentation+;
 #pragma link C++ class  CbmMuchStation+;
 #pragma link C++ class  CbmMuchTask+;
-#pragma link C++ class  CbmMuchTrackFinder+;
 #pragma link C++ class  CbmMuchTrackFinderIdeal+;
 
 #endif

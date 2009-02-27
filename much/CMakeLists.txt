@@ -46,7 +46,6 @@ CbmMuchSector.cxx
 CbmMuchSegmentation.cxx
 CbmMuchStation.cxx
 CbmMuchTask.cxx
-CbmMuchTrackFinder.cxx
 CbmMuchTrackFinderIdeal.cxx
 )
 

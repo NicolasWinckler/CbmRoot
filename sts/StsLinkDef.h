@@ -30,9 +30,7 @@
 #pragma link C++ class CbmStsSectorDigiPar+;
 #pragma link C++ class CbmStsStation+;
 #pragma link C++ class CbmStsStationDigiPar+;
-#pragma link C++ class CbmStsTrackFinder+;
 #pragma link C++ class CbmStsTrackFinderIdeal+;
-#pragma link C++ class CbmStsTrackFitter+;
 #pragma link C++ class CbmStsTrackFitterIdeal+;
 #pragma link C++ class CbmStsSimulationQa+;
 #pragma link C++ class CbmStsFindHitsQa+;

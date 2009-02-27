@@ -20,11 +20,12 @@
 *******************************************************************************/
 #ifndef CBM_RICH_RING_FITTER
 #define CBM_RICH_RING_FITTER 1
-#include "TClonesArray.h"
+
+//#include "TClonesArray.h"
 #include "TObject.h"
 
 class CbmRichRing;
-
+class TClonesArray;
 
 class CbmRichRingFitter : public TObject
 {
@@ -42,7 +43,7 @@ class CbmRichRingFitter : public TObject
   /** Virtual method Init. If needed, to be implemented in the
    ** concrete class. Else no action.
    **/
-  virtual void Init();
+  virtual void Init() { };
 
 
   /** Abstract method DoFit. To be implemented in the concrete class.
@@ -64,12 +65,16 @@ class CbmRichRingFitter : public TObject
        Rich Ring fitting algorithms.
        Task: Calculate chi2 for reconstructed ring.
     **/
-   virtual void CalcChi2(CbmRichRing* pRing);
+   virtual void CalcChi2(CbmRichRing* pRing) {};
 
    Int_t fVerbose;      // Verbosity level
 
    TClonesArray* fHitsArray;
+
+ public:
+
   ClassDef(CbmRichRingFitter,1);
+
 
 };
 

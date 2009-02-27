@@ -50,9 +50,7 @@ CbmStsSector.cxx
 CbmStsSectorDigiPar.cxx 
 CbmStsStation.cxx 
 CbmStsStationDigiPar.cxx 
-CbmStsTrackFinder.cxx 
 CbmStsTrackFinderIdeal.cxx 
-CbmStsTrackFitter.cxx 
 CbmStsTrackFitterIdeal.cxx 
 CbmStsSimulationQa.cxx 
 CbmStsFindHitsQa.cxx

@@ -26,9 +26,9 @@
 #ifndef CBM_RICH_RING_FITTER_TAU
 #define CBM_RICH_RING_FITTER_TAU 1
 
-#include "CbmRichRingFitter.h"
+#include "CbmRichRingFitterImpl.h"
 
-class CbmRichRingFitterTAU : public CbmRichRingFitter
+class CbmRichRingFitterTAU : public CbmRichRingFitterImpl
 {
 
    public:

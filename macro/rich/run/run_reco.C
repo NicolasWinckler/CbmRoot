@@ -29,16 +29,16 @@ void run_reco(Int_t nEvents = 800)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "/d/cbm02/slebedev/rich/MAR09/real/auau.25gev.centr.0000.mc.root";
+  TString inFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0001.mc.root";
 
   // Parameter file
-  TString parFile = "/d/cbm02/slebedev/rich/MAR09/real/auau.25gev.centr.0000.params.root";
+  TString parFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0001.params.root";
 
   // STS digitisation file
-  TString stsDigiFile = "sts_standard.digi.par";
+  TString stsDigiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";//"sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/d/cbm02/slebedev/rich/MAR09/real/auau.25gev.centr.0000.reco.root";
+  TString outFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0001.reco.root";
 
 
   // In general, the following parts need not be touched
@@ -273,7 +273,7 @@ void run_reco(Int_t nEvents = 800)
   trackMerger->SetMethod(1);
   CbmL1TofMerger* tofMerger = new CbmL1TofMerger();
   CbmFindGlobalTracks* findGlobal = new CbmFindGlobalTracks(trackMerger,
-							    NULL, tofMerger,
+							    NULL, NULL,
 							    iVerbose);
   run->AddTask(findGlobal);
 
@@ -352,55 +352,29 @@ void run_reco(Int_t nEvents = 800)
   run->AddTask(richFindRings);
   //--------------------------------------------------------------------------
 
-
-  /*
-  //-------------------- RICH Ring Fitting -----------------------------------
-  Double_t iRingCorr = 1.;      // correction done (default), choose 0 if not
-  CbmRichRingFitter* richFitter = new CbmRichRingFitterTAU(iVerbose,
-							   iRingCorr, 2);
-  CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
-  run->AddTask(fitRings);
-  //--------------------------------------------------------------------------
-  */
-
   //-------------------- RICH Ring Fitting -----------------------------------
   // B-field configuration
-  TString field ="muon";  // choose between "muon" or "active"
+  TString field ="compact";  // choose between "compact" or "large"
   Double_t iRingCorr = 0.;      // correction done (default), choose 0 if not
   CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, iRingCorr, field);
   CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
   run->AddTask(fitRings);
   //--------------------------------------------------------------------------
 
-
-
   // ------------------- RICH Ring matching  ---------------------------------
-  CbmRichMatchRings* matchRings = new CbmRichMatchRings(iVerbose);
+  CbmRichMatchRings* matchRings = new CbmRichMatchRings(2);
   run->AddTask(matchRings);
   // -------------------------------------------------------------------------
-
-
 
   //--------------------- RICH ring-track assignment ------------------------
   Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]
   Int_t    richNPoints  = 5;   // Minmum number of hits on ring
   CbmRichRingTrackAssign* richAssign   =
-    new CbmRichRingTrackAssignClosestD(richDistance, richNPoints, iVerbose);
+    new CbmRichRingTrackAssignClosestD(richDistance, richNPoints, 3);
   CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
   assignTrack->UseAssign(richAssign);
   run->AddTask(assignTrack);
   // ------------------------------------------------------------------------
-
-
-  //--------------------- RICH ring selection -------------------------------
-
-  TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
-  richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights.txt";
-  CbmRichRingSelectNeuralNet *ringSelectNN
-    = new CbmRichRingSelectNeuralNet(iVerbose, richSelectNNFile);
-  CbmRichSelectRings* richSelectRingsNN = new CbmRichSelectRings();
-  richSelectRingsNN->UseSelect(ringSelectNN);
-  run->AddTask(richSelectRingsNN);
 
   CbmRichRingQa* richQa   =  new CbmRichRingQa("Qa","qa", 0);
   run->AddTask(richQa);

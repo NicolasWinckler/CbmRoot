@@ -29,7 +29,7 @@ class CbmMuchHit : public CbmHit
   /** Default constructor (not for use) **/
   CbmMuchHit();
 
-  CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dPos, 
+  CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dPos,
 	     Double_t dxy);
 
 
@@ -42,7 +42,7 @@ class CbmMuchHit : public CbmHit
   *@param times      Time since event start [ns]
   *@param dTime     Time resolution [ns]
   **/
-  CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dPos, 
+  CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dPos,
 	     Double_t dxy, Int_t iDigi, Double_t* times,
 	     Double_t dTime);
 
@@ -53,7 +53,7 @@ class CbmMuchHit : public CbmHit
   *@param dxy       Covariance of x and y
   *@param iCluster  Parent cluster index
   **/
-  CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dPos, 
+  CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dPos,
 	     Double_t dxy, Int_t iCluster);
 
 
@@ -66,11 +66,11 @@ class CbmMuchHit : public CbmHit
 
   /** Accessors **/
   Long64_t GetDetectorId()  const { return fDetectorID; }
-  Int_t    GetStationNr() const {};
+  Int_t    GetStationNr() const;
 
   /** Gets covariance in X and Y **/
   Double_t GetCovXY() const  { return fCovXY; }
-  
+
   /** Gets index of the Digi corresponding to this hit **/
   Int_t    GetDigi()  const  {  return fRefIndex; }
 

@@ -22,7 +22,7 @@ void run_radius_correction ()
     gSystem->Load("libParBase");
     gSystem->Load("libBase");
     gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
+    gSystem->Load("libCbmData");
     gSystem->Load("libField");
     gSystem->Load("libGen");
     gSystem->Load("libPassive");
@@ -38,15 +38,26 @@ void run_radius_correction ()
     // ------------------------------------------------------------------------
 
     char fileMC[200], fileRec[200];
-    sprintf(fileRec, "/d/cbm02/slebedev/rich/MAY08/density_study/radius_correction.auau.25gev.centr.0012.recorich.root");
+    
+    sprintf(fileMC,"/d/cbm02/slebedev/rich/MAR09/correction.mc.0000.root");
+    cout<<fileMC<<endl;
+    TFile *f1 = new TFile(fileMC,"R");
+    TTree* t1 = f1->Get("cbmsim");
+    TFolder *fd1 = f1->Get("cbmroot");
+    TClonesArray* fMCTracks = (TClonesArray*) fd1->FindObjectAny("MCTrack");
+    t1->SetBranchAddress(fMCTracks->GetName(),&fMCTracks);
+        
+    sprintf(fileRec, "/d/cbm02/slebedev/rich/MAR09/correction.reco.0000.root");
     TFile *f = new TFile(fileRec,"R");
     TTree* t = f->Get("cbmsim");
     TFolder *fd = f->Get("cbmout");
     TClonesArray *fRichRings = (TClonesArray*) fd->FindObjectAny("RichRing");
     t->SetBranchAddress(fRichRings->GetName(),&fRichRings);
-    
-    Int_t fNofBinsX = 20;
-    Int_t fNofBinsY = 25;
+    TClonesArray *fRichMatches = (TClonesArray*) fd->FindObjectAny("RichRingMatch");
+    t->SetBranchAddress(fRichMatches->GetName(),&fRichMatches);
+
+    Int_t fNofBinsX = 40;
+    Int_t fNofBinsY = 50;
     ///A axis
     TH2D* fh_axisAXYCount;
     TH2D* fh_axisAXYW;
@@ -70,37 +81,57 @@ void run_radius_correction ()
     fh_axisBXYW = new TH2D("fh_axisBXYW","",fNofBinsX,-200,200,fNofBinsY,-250,250);
 	fh_axisAXY = new TH2D("fh_axisAXY","A distribution (x,y);X, [cm];Y, [cm]",fNofBinsX,-200,200,fNofBinsY,-250,250);
 	fh_axisBXY = new TH2D("fh_axisBXY","B distribution (x,y);X, [cm];Y, [cm]",fNofBinsX,-200,200,fNofBinsY,-250,250);
-	fh_axisASigma = new TH2D("fh_axisASigma","RMS A distribution (x,y);X, [cm];Y, [cm]",fNofBinsX,-200,200,fNofBinsY,-250,250);
-	fh_axisBSigma = new TH2D("fh_axisBSigma","RMS B distribution (x,y);X, [cm];Y, [cm]",fNofBinsX,-200,200,fNofBinsY,-250,250);
-
 	
-    ///Set Mean value of A and B axeses
-    Double_t fMeanAaxis = 6.198;
-    Double_t fMeanBaxis = 5.612;
+    Double_t fMinAaxis = 3.;
+    Double_t fMaxAaxis = 8.;
+    
+    ///Set Mean value of A and B axeses, Compact RICH
+    Double_t fMeanAaxis = 5.06;
+    Double_t fMeanBaxis = 4.65;
+    
+    ///Set Mean value of A and B axeses, Large RICH
+   // Double_t fMeanAaxis = 6.198;
+   // Double_t fMeanBaxis = 5.612;
     
     Int_t nEvents=t->GetEntries();
     cout<<" nEvents ="<<nEvents<<endl;
     for(Int_t ievent=0;ievent<nEvents; ievent++ ) {
         cout<<"ievent = "<<ievent;
         CbmRichRing *ring=NULL;
+        CbmRichRingMatch *match=NULL;
         t->GetEntry(ievent);
+        t1->GetEntry(ievent);
         Int_t nofRings = fRichRings->GetEntries();
-        cout<<"  nofRings = "<<nofRings<<endl;
+        cout<<"  nofRings = "<<nofRings;
+        cout<<"  nofMatches = "<< fRichMatches->GetEntries() ;
+        cout<<"  nofMCTracks = "<<fMCTracks->GetEntries() << endl;
+        
         for(Int_t iRing=0; iRing < nofRings; iRing++){
             ring = (CbmRichRing*)fRichRings->At(iRing);
             if (!ring) continue;
-            ///check for primary electrons
-            if (ring->GetRecFlag() != 3) continue;
+            match = (CbmRichRingMatch*)fRichMatches->At(iRing);
+            if (!match) continue;
+            
+            Int_t trackId = match->GetMCTrackID();
+            if (trackId == -1) continue;
+            if (trackId > fMCTracks->GetEntries()) continue;
+
+            CbmMCTrack* mcTrack = (CbmMCTrack*)fMCTracks->At(trackId);
+            if (!mcTrack) continue;
+            Int_t pdg = TMath::Abs(mcTrack->GetPdgCode());
+            Int_t motherId = mcTrack->GetMotherId();
+            if (pdg != 11) continue;
+            if (motherId != -1) continue;
             
             Double_t radius = ring->GetRadius();
             Double_t axisA = ring->GetAaxis();
             Double_t axisB = ring->GetBaxis();
             Double_t centerX = ring->GetCenterX();
             Double_t centerY = ring->GetCenterY();
-            
-            if (axisA > 8. || axisB > 8.) continue;
-            if (axisA < 4. || axisB < 4.) continue;
-            
+
+            if (axisA > fMaxAaxis || axisB > fMaxAaxis) continue;
+            if (axisA < fMinAaxis || axisB < fMinAaxis) continue;
+
             fh_axisAXYW->Fill(centerX, centerY, axisA);
             fh_axisAXYCount->Fill(centerX, centerY);
             
@@ -111,46 +142,7 @@ void run_radius_correction ()
 
     fh_axisAXY->Divide(fh_axisAXYW,fh_axisAXYCount);
     fh_axisBXY->Divide(fh_axisBXYW,fh_axisBXYCount);  
-    
-    
-///calculate RMS for each bin    
-    for(Int_t ievent=0;ievent<nEvents; ievent++ ) {
-        cout<<"ievent = "<<ievent;
-        CbmRichRing *ring=NULL;
-        t->GetEntry(ievent);
-        Int_t nofRings = fRichRings->GetEntries();
-        cout<<"  nofRings = "<<nofRings<<endl;
-        for(Int_t iRing=0; iRing < nofRings; iRing++){
-            ring = (CbmRichRing*)fRichRings->At(iRing);
-            if (!ring) continue;
-            if (ring->GetRecFlag() != 3) continue;
-            
-            Double_t axisA = ring->GetAaxis();
-            Double_t axisB = ring->GetBaxis();
-            Double_t centerX = ring->GetCenterX();
-            Double_t centerY = ring->GetCenterY();            
-            if (axisA > 8. || axisB > 8.) continue;
-            if (axisA < 4. || axisB < 4.) continue;
-            
-            Double_t meanA = fh_axisAXY->GetBinContent(fh_axisAXY->FindBin(centerX,centerY));
-            Double_t meanB = fh_axisBXY->GetBinContent(fh_axisBXY->FindBin(centerX,centerY));
-            Double_t nA = fh_axisAXYCount->GetBinContent(fh_axisAXYCount->FindBin(centerX,centerY));
-            Double_t nB = fh_axisBXYCount->GetBinContent(fh_axisBXYCount->FindBin(centerX,centerY));
-            Double_t devA = (meanA - axisA) * (meanA - axisA)/nA;
-            Double_t devB = (meanB - axisB) * (meanB - axisB)/nB;
-            
-            fh_axisASigma->Fill(centerX, centerY, devA);
-            fh_axisBSigma->Fill(centerX, centerY, devB);
-                    
-        } //iRing
-    } //iEvent        
-    
-    for (Int_t iX = 1; iX < fh_axisASigma->GetNbinsX() + 1; iX++){
-        for (Int_t iY = 1; iY < fh_axisASigma->GetNbinsY() + 1; iY++){
-        	fh_axisASigma->SetBinContent(iX, iY, sqrt(fh_axisASigma->GetBinContent(iX, iY)) );
-        	fh_axisBSigma->SetBinContent(iX, iY, sqrt(fh_axisBSigma->GetBinContent(iX, iY)) );                      
-        }
-    }
+
     
 ///create two correction maps
     for (Int_t iX = 1; iX < mapaxisAXY->GetNbinsX() + 1; iX++){
@@ -188,13 +180,7 @@ void run_radius_correction ()
     mapaxisBXY->SetMinimum(-0.5);
     mapaxisBXY->SetMaximum(0.5); 
     mapaxisBXY->Draw("COLZ");
-    
-    c2_1 = new TCanvas("c2_1","c2_1",10,10,800,800);
-    c2_1->Divide(1,2);
-    c2_1->cd(1);
-    fh_axisBSigma->Draw("COLZ");
-    c2_1->cd(2);  
-    fh_axisBSigma->Draw("COLZ");
+ 
 
 ///// Check correction procedure
     TH1D* fh_Abefore = new TH1D("fh_Abefore","A before;radius, [cm]", 90, 0., 9.);;
@@ -209,20 +195,31 @@ void run_radius_correction ()
        // if (ievent % 100 == 0) cout << ievent << "   ";
         //t1->GetEntry(ievent);
         t->GetEntry(ievent);
-
+        t1->GetEntry(ievent);
         Int_t nofRings = fRichRings->GetEntries();
 
         for(Int_t iRing=0; iRing < nofRings; iRing++){
 
             ring = (CbmRichRing*)fRichRings->At(iRing);
             if (!ring) continue;
+            match = (CbmRichRingMatch*)fRichMatches->At(iRing);
+            if (!match) continue;
             
-            ///check for primary electrons
-            if (ring->GetRecFlag() != 3) continue;
+            Int_t trackId = match->GetMCTrackID();
+            if (trackId == -1) continue;
+            if (trackId > fMCTracks->GetEntries()) continue;
+
+            CbmMCTrack* mcTrack = (CbmMCTrack*)fMCTracks->At(trackId);
+            if (!mcTrack) continue;
+            Int_t pdg = TMath::Abs(mcTrack->GetPdgCode());
+            Int_t motherId = mcTrack->GetMotherId();
+            if (pdg != 11) continue;
+            if (motherId != -1) continue;
+
             Double_t axisA = ring->GetAaxis();
             Double_t axisB = ring->GetBaxis();
-            if (axisA > 8. || axisB > 8.) continue;
-            if (axisA < 4. || axisB < 4.) continue;
+            if (axisA > fMaxAaxis || axisB > fMaxAaxis) continue;
+            if (axisA < fMinAaxis || axisB < fMinAaxis) continue;
             
             Double_t radius = ring->GetRadius();
             Double_t centerX = ring->GetCenterX();
@@ -242,13 +239,15 @@ void run_radius_correction ()
             fh_B->Fill(axisB); 
         } //iRing
     }//iEvent
-    gStyle->SetOptStat(0);
+    
+    
+  //  gStyle->SetOptStat(0);
     c3 = new TCanvas("c3","c3",10,10,800,800);
     c3->Divide(2,2);
     c3->cd(1);
     fh_Abefore->SetMaximum(fh_Abefore->GetMaximum()*1.3);
     fh_Abefore->Draw();
-    fh_Abefore->SetAxisRange(4.0, 8.0);
+    fh_Abefore->SetAxisRange(fMinAaxis, fMaxAaxis);
     fh_Abefore->Fit("gaus");
     Double_t sigmaAb = fh_Abefore->GetFunction("gaus")->GetParameter("Sigma");
     char sigmaTxtAb[30];
@@ -260,7 +259,7 @@ void run_radius_correction ()
     c3->cd(2);
     fh_Bbefore->SetMaximum(fh_Bbefore->GetMaximum()*1.3);
     fh_Bbefore->Draw();
-    fh_Bbefore->SetAxisRange(4.0, 7.0);
+    fh_Bbefore->SetAxisRange(fMinAaxis, fMaxAaxis);
     fh_Bbefore->Fit("gaus");
     Double_t sigmaBb = fh_Bbefore->GetFunction("gaus")->GetParameter("Sigma");
     char sigmaTxtBb[30];
@@ -271,7 +270,7 @@ void run_radius_correction ()
     
     c3->cd(3);
     fh_A->SetMaximum(fh_A->GetMaximum()*1.3);
-    fh_A->SetAxisRange(4.0, 8.0);
+    fh_A->SetAxisRange(fMinAaxis, fMaxAaxis);
     fh_A->Draw(); 
     fh_A->Fit("gaus");
     Double_t sigmaA = fh_A->GetFunction("gaus")->GetParameter("Sigma");
@@ -283,7 +282,7 @@ void run_radius_correction ()
     
     c3->cd(4);
     fh_B->SetMaximum(fh_B->GetMaximum()*1.3);
-    fh_B->SetAxisRange(4.0, 7.0);
+    fh_B->SetAxisRange(fMinAaxis, fMaxAaxis);
     fh_B->Draw();  
     fh_B->Fit("gaus");
     Double_t sigmaB = fh_B->GetFunction("gaus")->GetParameter("Sigma");

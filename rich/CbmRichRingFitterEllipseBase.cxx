@@ -97,17 +97,17 @@ void CbmRichRingFitterEllipseBase::CalcChi2(Double_t A, Double_t B, Double_t C,
 void CbmRichRingFitterEllipseBase::InitHistForRadiusCorrection()
 {
     TString fileName;
-    if (fFieldName == "muon"){
+    if (fFieldName == "large"){
         fileName = gSystem->Getenv("VMCWORKDIR");
-        fileName += "/parameters/rich/muon_radius_correction_map.root";
+        fileName += "/parameters/rich/radius_correction_map_large.root";
     }
-    if(fFieldName == "active"){
+    if(fFieldName == "compact"){
         fileName = gSystem->Getenv("VMCWORKDIR");
-        fileName += "/parameters/rich/active_radius_correction_map.root";
+        fileName += "/parameters/rich/radius_correction_map_compact.root";
     }
-    if (fFieldName != "active" || fFieldName != "muon"){
+    if (fFieldName != "large" && fFieldName != "compact"){
         fileName = gSystem->Getenv("VMCWORKDIR");
-        fileName += "/parameters/rich/muon_radius_correction_map.root";
+        fileName += "/parameters/rich/radius_correction_map_compact.root";
     }
     TDirectory *current = gDirectory;
     TFile *file = new TFile(fileName, "READ");

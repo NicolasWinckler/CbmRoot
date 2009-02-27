@@ -50,8 +50,8 @@ void CbmRichRingFinderHough::Init()
 {
     if (fVerbose) cout << "CbmRichRingFinderHough::init() "<<endl;
     fNEvent = 0;
-
-    SetParameters("compact");
+    String geometryType = "compact";
+    SetParameters(geometryType);
 
     fHist.resize(fNofBinsX);
     for (Int_t i = 0; i < fNofBinsX; i++) fHist[i].resize(fNofBinsY);
@@ -66,7 +66,7 @@ void CbmRichRingFinderHough::Init()
     fFitCOP = new CbmRichRingFitterCOP(0, 0);
     fFitCOP->Init();
 
-    fFitEllipseTau = new CbmRichRingFitterEllipseTau(0, 0, "muon");
+    fFitEllipseTau = new CbmRichRingFitterEllipseTau(0, 0, geometryType);
     fFitEllipseTau->Init();
 
 }
@@ -171,29 +171,29 @@ void CbmRichRingFinderHough::SetParameters(TString geometry)
     TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
 
     if (geometry == "standard" || geometry == "large"){
-		fMaxDistance = 14;
-		fMinDistance = 3.;
-		fMinDistance2 = fMinDistance*fMinDistance;
-		fMaxDistance2 = fMaxDistance*fMaxDistance;
+        fMaxDistance = 14;
+        fMinDistance = 3.;
+        fMinDistance2 = fMinDistance*fMinDistance;
+        fMaxDistance2 = fMaxDistance*fMaxDistance;
 
-		fMinRadius = 4.;
-		fMaxRadius = 7.0;
+        fMinRadius = 4.3;
+        fMaxRadius = 7.0;
 
-		fHTCut = 90;
-		fHitCut = 10;
+        fHTCut = 80;
+        fHitCut = 9;
 
-		fHTCutR = 40;
-		fHitCutR = 10;
+        fHTCutR = 35;
+        fHitCutR = 9;
 
-		fNofBinsX = 15;
-		fNofBinsY = 15;
-		fNofBinsR = 40;
+        fNofBinsX = 15;
+        fNofBinsY = 15;
+        fNofBinsR = 40;
 
-		fAnnCut = 0.0;
-		fUsedHitsCut = 0.35;
-		fUsedHitsAllCut = 0.45;
+        fAnnCut = 0.0;
+        fUsedHitsCut = 0.35;
+        fUsedHitsAllCut = 0.4;
 
-		richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights.txt";
+        richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights.txt";
     }
 
     if (geometry == "small" || geometry == "compact"){

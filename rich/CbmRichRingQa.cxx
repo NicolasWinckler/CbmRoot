@@ -379,7 +379,7 @@ void CbmRichRingQa::Exec(Option_t* option)
 
     CbmRichRingFitterCOP* fitCOP = new CbmRichRingFitterCOP(0,0);
     fitCOP->Init();
-    CbmRichRingFitterEllipseTau* fitEllipse = new CbmRichRingFitterEllipseTau(0,0,"muon");
+    CbmRichRingFitterEllipseTau* fitEllipse = new CbmRichRingFitterEllipseTau(0,0,"compact");
     fitEllipse->Init();
 
     for (itMapWithHits=fRingMapWithHits.begin(); itMapWithHits!=fRingMapWithHits.end(); itMapWithHits++) {

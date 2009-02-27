@@ -27,7 +27,7 @@
 CbmRichRingFitterEllipseTau::CbmRichRingFitterEllipseTau()
 {
     fVerbose      = 1;
-    fFieldName = "muon";
+    fFieldName = "compact";
     InitHistForRadiusCorrection();
 }
 

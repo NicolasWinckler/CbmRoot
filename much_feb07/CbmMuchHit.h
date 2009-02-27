@@ -17,10 +17,10 @@
 
 
 #include "TVector3.h"
-#include "CbmTrkHit.h"
+#include "CbmHit.h"
 
 
-class CbmMuchHit : public CbmTrkHit
+class CbmMuchHit : public CbmHit
 {
 
  public:
@@ -28,7 +28,7 @@ class CbmMuchHit : public CbmTrkHit
   /** Default constructor (not for use) **/
   CbmMuchHit();
 
-  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos, 
+  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos,
 	     Double_t dxy);
 
 
@@ -41,7 +41,7 @@ class CbmMuchHit : public CbmTrkHit
   *@param times      Time since event start [ns]
   *@param dTime     Time resolution [ns]
   **/
-  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos, 
+  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos,
 	     Double_t dxy, Int_t iDigi, Double_t* times,
 	     Double_t dTime);
 
@@ -52,7 +52,7 @@ class CbmMuchHit : public CbmTrkHit
   *@param dxy       Covariance of x and y
   *@param iCluster  Parent cluster index
   **/
-  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos, 
+  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos,
 	     Double_t dxy, Int_t iCluster);
 
 
@@ -70,7 +70,7 @@ class CbmMuchHit : public CbmTrkHit
     const { return ( fDetectorID & (15<<24) ) >> 24; }
 
   /** Gets station number within the system **/
-  virtual Int_t    GetStationNr()          
+  virtual Int_t    GetStationNr()
     const { return ( fDetectorID & (255<<16) ) >> 16; }
 
   /** Gets sector number within the station **/
@@ -79,7 +79,7 @@ class CbmMuchHit : public CbmTrkHit
 
   /** Gets covariance in X and Y **/
   inline Double_t GetCovXY() const  { return fCovXY; }
-  
+
   /** Gets index of the Digi corresponding to this hit **/
   inline Int_t    GetDigi()  const  {  return fRefIndex; }
 

@@ -29,9 +29,9 @@ CbmMuchHit::CbmMuchHit() {
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchHit::CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,  
+CbmMuchHit::CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,
 		     Double_t covXY)
-  : CbmTrkHit(detId, pos, dpos, covXY, -1) {
+  : CbmHit(detId, pos, dpos, covXY, -1) {
   fCluster = -1;
   for(Int_t i=0;i<3;i++){
     fTime[i] = -1;
@@ -43,11 +43,11 @@ CbmMuchHit::CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchHit::CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,  
-		       Double_t covXY, Int_t iDigi, Double_t* times, 
+CbmMuchHit::CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,
+		       Double_t covXY, Int_t iDigi, Double_t* times,
 		       Double_t dTime)
-  : CbmTrkHit(detId, pos, dpos, covXY, iDigi) {
-    fCluster = -1;    
+  : CbmHit(detId, pos, dpos, covXY, iDigi) {
+    fCluster = -1;
     for(Int_t i = 0;i<3;i++){
       fTime[i] = times[i];
     }
@@ -58,9 +58,9 @@ CbmMuchHit::CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchHit::  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos, 
+CbmMuchHit::  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,
 			 Double_t covXY, Int_t iCluster)
-  : CbmTrkHit(detId, pos, dpos, covXY, -1) {
+  : CbmHit(detId, pos, dpos, covXY, -1) {
     fRefIndex = -1;
     fCluster  = iCluster;
 }

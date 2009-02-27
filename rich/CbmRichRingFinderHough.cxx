@@ -20,7 +20,7 @@
 #include <cmath>
 #include <set>
 #include <algorithm>
-
+#include <string>
 
 using std::cout;
 using std::endl;

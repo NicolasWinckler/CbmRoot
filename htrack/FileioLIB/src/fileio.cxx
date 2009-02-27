@@ -36,6 +36,7 @@
 #include "../include/fileioWarningMsg.h"
 #include "../include/fileio.h"
 
+#include <cstdlib>
 
 /****************************************************************
  * allocates memory												*

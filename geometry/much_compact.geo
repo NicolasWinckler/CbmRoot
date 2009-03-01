@@ -1,252 +1,50 @@
-much1
-cave
-PCON
-air
-2
-0. 360.
-0. 102 512
-2125 315 1575
- 
-0. 0. 1025
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchabsorber01
-much1
-PCON
-MUCHiron
-2
-0. 360.
-0 102 512
-200 122 612
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation01
-much1
-PCON
-MUCHargon
-2
-0. 360.
-225 137 623
-228 137 623
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation02
-much1
-PCON
-MUCHargon
-2
-0. 360.
-285 137 623
-288 137 623
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation03
-much1
-PCON
-MUCHargon
-2
-0. 360.
-345 137 623
-348 137 623
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchabsorber02
-much1
-PCON
-MUCHiron
-2
-0. 360.
-380 140 702
-580 160 802
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation04
-much1
-PCON
-MUCHargon
-2
-0. 360.
-605 174 814
-608 174 814
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation05
-much1
-PCON
-MUCHargon
-2
-0. 360.
-665 174 814
-668 174 814
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation06
-much1
-PCON
-MUCHargon
-2
-0. 360.
-725 174 814
-728 174 814
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchabsorber03
-much1
-PCON
-MUCHiron
-2
-0. 360.
-760 178 892
-960 198 992
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation07
-much1
-PCON
-MUCHargon
-2
-0. 360.
-985 214 1005
-988 214 1005
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation08
-much1
-PCON
-MUCHargon
-2
-0. 360.
-1045 214 1005
-1048 214 1005
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation09
-much1
-PCON
-MUCHargon
-2
-0. 360.
-1105 214 1005
-1108 214 1005
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchabsorber04
-much1
-PCON
-MUCHiron
-2
-0. 360.
-1140 216 1082
-1440 246 1232
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation10
-much1
-PCON
-MUCHargon
-2
-0. 360.
-1465 262 1245
-1468 262 1245
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation11
-much1
-PCON
-MUCHargon
-2
-0. 360.
-1525 262 1245
-1528 262 1245
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation12
-much1
-PCON
-MUCHargon
-2
-0. 360.
-1585 262 1245
-1588 262 1245
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchabsorber05
-much1
-PCON
-MUCHiron
-2
-0. 360.
-1620 264 1322
-1970 299 1497
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation13
-much1
-PCON
-MUCHargon
-2
-0. 360.
-1995 315 1510
-1998 315 1510
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation14
-much1
-PCON
-MUCHargon
-2
-0. 360.
-2055 315 1510
-2058 315 1510
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
-muchstation15
-much1
-PCON
-MUCHargon
-2
-0. 360.
-2115 315 1510
-2118 315 1510
- 
-0. 0. 0.
-1.  0.  0.  0.  1.  0.  0.  0.  1.
-//*********************************
+# Remarks:
+# 1. Absorber and station positions are defined relative to MuchCave Zin
+#
+# 2. When defining distances between absorbers and stations keep in mind 
+#    the following technological restrictions:
+#    a) distance from layer center to absorber >= 5.5 cm 
+#    b) distance between layer centers         >=   7 cm 
+#
+# 3. Absorber materials currently implemented:
+#    I - MUCHiron
+#    L - MUCHlead
+#    W - MUCHwolfram
+#    C - MUCHcarbon
+#
+# 4. There is a possibility to switch off detailed module design 
+#    (Use module design = 0). One large module per layer is created 
+#    in this case (at the front side of each layer).
+
+# General information
+MuchCave Zin position [cm]  :     105
+Acceptance tangent min      :     0.1
+Acceptance tangent max      :     0.5
+Number of absorbers         :       5
+Number of stations          :       5
+Use module design (0/1)     :       1
+
+# Absorber specification
+Absorber Zin position [cm]  :       0      38      76     114     162
+Absorber thickness [cm]     :      20      20      20      30      35
+Absorber material           :       I       I       I       I       I
+
+# Station specification
+Station Zceneter [cm]       :      29      67     105     151     206
+Number of layers            :       2       2       2       2       2
+Detector type               :       1       1       1       1       1
+Distance between layers [cm]:       7       7       7       7       7
+Support thickness [cm]      :     1.5     1.5     1.5     1.5     1.5
+Sigma X minimum [cm]        :    0.04    0.04    0.04    0.04    0.04
+Sigma Y minimum [cm]        :    0.04    0.04    0.04    0.04    0.04
+Sigma X maximum [cm]        :    0.32    0.32    0.32    0.32    0.32
+Sigma Y maximum [cm]        :    0.32    0.32    0.32    0.32    0.32
+Maximum occupancy           :    0.05    0.05    0.05    0.05    0.05
+
+# GEM module specification (type 1)
+Active volume lx [cm]       :      30
+Active volume ly [cm]       :      30
+Active volume lz [cm]       :     0.3
+Spacer lx [cm]              :     0.5
+Spacer ly [cm]              :       5
+Overlap along y axis [cm]   :       2

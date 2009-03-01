@@ -66,7 +66,11 @@ Int_t NDF(
 		const CbmLitTrack* track)
 {
    // TODO check NDF
-//   if (nofHits > 2) return (2 * nofHits - 5);
-//   else return 1;
-	return track->GetNofHits();
+	Int_t ndf = 0;
+	for (Int_t i = 0; i < track->GetNofHits(); i++){
+		if (track->GetHit(i)->GetType() == kLITPIXELHIT) ndf += 2;
+		else if (track->GetHit(i)->GetType() == kLITSTRIPHIT) ndf++;
+	}
+	ndf -= 5;
+	if (ndf > 0) return ndf; else return 1;
 }

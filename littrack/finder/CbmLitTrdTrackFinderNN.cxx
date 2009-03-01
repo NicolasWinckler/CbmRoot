@@ -1,63 +1,46 @@
-#include "CbmLitTrdTrackFinderBranch.h"
+#include "CbmLitTrdTrackFinderNN.h"
 
-#include "CbmLitTrack.h"
-#include "CbmLitHit.h"
-#include "CbmLitEnvironment.h"
-#include "CbmLitMemoryManagment.h"
 #include "CbmLitConverter.h"
+#include "CbmLitMemoryManagment.h"
 #include "CbmLitToolFactory.h"
-#include "CbmLitPtrTypes.h"
+#include "CbmLitEnvironment.h"
+#include "CbmLitTrack.h"
 
 #include "TClonesArray.h"
 
-#include <vector>
 #include <algorithm>
 
-CbmLitTrdTrackFinderBranch::CbmLitTrdTrackFinderBranch()
+CbmLitTrdTrackFinderNN::CbmLitTrdTrackFinderNN()
 {
 }
 
-CbmLitTrdTrackFinderBranch::~CbmLitTrdTrackFinderBranch()
+CbmLitTrdTrackFinderNN::~CbmLitTrdTrackFinderNN()
 {
 }
 
-void CbmLitTrdTrackFinderBranch::Init()
+void CbmLitTrdTrackFinderNN::Init()
 {
 	DefaultInit();
 
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
+	fPropagatorToDet = fPropagator = factory->CreateTrackPropagator("lit");
 	fSeedSelection = factory->CreateTrackSelection("momentum");
-	fStationGroupSelection = factory->CreateTrackSelection("trd_station");
 	fFinalSelection = factory->CreateTrackSelection("trd_final");
-	fFinalPreSelection = factory->CreateTrackSelection("empty");
-	fPropagatorToDet = factory->CreateTrackPropagator("lit");
-	fPropagator = factory->CreateTrackPropagator("lit");
 	fFilter = factory->CreateTrackUpdate("kalman");
-	fFitter = factory->CreateTrackFitter("lit_kalman");
 
 	fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
 
 	fVerbose = 1;
 	fNofIter = 1;
 	fUseFastSearch = true;
-	fBeginStationGroup = 0;
-	fEndStationGroup = fLayout.GetNofStationGroups() - 1;
+	fMaxNofMissingHits = 4;
+	fSigmaCoef = 10.;
+	fChiSqPixelHitCut = 20.;
+	fChiSqStripHitCut = 4.;
 	fPDG = 11;
 }
 
-void CbmLitTrdTrackFinderBranch::SetIterationParameters(
-		Int_t iter)
-{
-	if (iter == 0) {
-		fMaxNofMissingHits = 4;
-		fIsAlwaysCreateMissingHit = false;
-		fSigmaCoef = 10.;
-		fChiSqPixelHitCut = 20;//15.84;
-		fChiSqStripHitCut = 4.;
-	}
-}
-
-Int_t CbmLitTrdTrackFinderBranch::DoFind(
+Int_t CbmLitTrdTrackFinderNN::DoFind(
 		TClonesArray* hitArray,
 		TClonesArray* trackArray)
 {
@@ -68,7 +51,7 @@ Int_t CbmLitTrdTrackFinderBranch::DoFind(
 	CbmLitConverter::TrkHitArrayToPixelHitVector(hitArray, hits);
 	DefaultCreateTrackSeeds(fTrackSeedsArray, trackSeeds, fLayout, fPDG);
 
-	CbmLitTrackFinderBranch::DoFind(hits, trackSeeds, foundTracks);
+	CbmLitTrackFinderNN::DoFind(hits, trackSeeds, foundTracks);
 
 	CbmLitConverter::TrackVectorToTrdTrackArray(foundTracks, trackArray);
 
@@ -82,4 +65,4 @@ Int_t CbmLitTrdTrackFinderBranch::DoFind(
 	return trackArray->GetEntriesFast();
 }
 
-ClassImp(CbmLitTrdTrackFinderBranch);
+ClassImp(CbmLitTrdTrackFinderNN);

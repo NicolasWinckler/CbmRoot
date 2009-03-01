@@ -196,7 +196,7 @@ void CbmLitTrdTrackFinderStandalone::CreateTrdTracks()
    Double_t Ypred[4];
 
    CbmLitTrack* trdTrack = new CbmLitTrack();
-   CbmHit* pHits[fNofLayersPerStation[0]];
+   CbmTrkHit* pHits[fNofLayersPerStation[0]];
 
    for (UInt_t iHit0 = 0; iHit0 < fHits[0].size(); iHit0++) { //1
 
@@ -324,9 +324,9 @@ void CbmLitTrdTrackFinderStandalone::MinMaxIndex(Double_t pred,
                                         Int_t layer)
 {
 
-   CbmHit* hit = new CbmTrdHit();
-   std::vector<CbmHit*>::iterator it_min;
-   std::vector<CbmHit*>::iterator it_max;
+   CbmTrkHit* hit = new CbmTrdHit();
+   std::vector<CbmTrkHit*>::iterator it_min;
+   std::vector<CbmTrkHit*>::iterator it_max;
 
    if (fMaxErrY[layer] != 0) {
       hit->SetY(pred - fSigmaCoef * fSigmaY[layer]);
@@ -355,7 +355,7 @@ void CbmLitTrdTrackFinderStandalone::MinMaxIndex(Double_t pred,
 // -----------------------------------------------------------------------
 
 // -------------Checks if the hit in the area near the track--------------
-Bool_t CbmLitTrdTrackFinderStandalone::IsHitInValidationWindow(Double_t pred, CbmHit *pHit, Int_t layer)
+Bool_t CbmLitTrdTrackFinderStandalone::IsHitInValidationWindow(Double_t pred, CbmTrkHit *pHit, Int_t layer)
 {
    if (pHit->GetDx() < pHit->GetDy())
       return pHit->GetY() < pred + fSigmaCoef * fSigmaY[layer] &&
@@ -369,7 +369,7 @@ Bool_t CbmLitTrdTrackFinderStandalone::IsHitInValidationWindow(Double_t pred, Cb
 
 // -------------------Adds track candidate--------------------------------
 void CbmLitTrdTrackFinderStandalone::AddTrackCandidate1(CbmLitTrack* pTrack,
-                                               CbmHit* pHits[])
+                                               CbmTrkHit* pHits[])
 {
    CbmTrackParam* par = new CbmTrackParam();
 

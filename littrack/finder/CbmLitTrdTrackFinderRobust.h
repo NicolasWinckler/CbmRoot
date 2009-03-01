@@ -3,30 +3,22 @@
 
 #include "CbmTrdTrackFinder.h"
 #include "CbmLitTrackFinderRobust.h"
-#include "CbmLitPtrTypes.h"
-
-class CbmLitTrackPropagator;
+#include "CbmLitStsBasedTrackFinder.h"
 
 class TClonesArray;
 
 class CbmLitTrdTrackFinderRobust : public CbmTrdTrackFinder,
-							       private CbmLitTrackFinderRobust
+							       private CbmLitTrackFinderRobust,
+							       private CbmLitStsBasedTrackFinder
 {
 public:
 	CbmLitTrdTrackFinderRobust();
 	virtual ~CbmLitTrdTrackFinderRobust();
 
     virtual void Init();
-    virtual Int_t DoFind(TClonesArray* hitArray,
-                         TClonesArray* trackArray);
-private:
-	TClonesArray* fTrackSeedsArray;
-
-	TrackPropagatorPtr fPropagatorToDet;
-
-	void CreateTrackSeeds(
-    		TClonesArray* trackArray,
-    		TrackPtrVector& trackSeeds);
+    virtual Int_t DoFind(
+    		TClonesArray* hitArray,
+            TClonesArray* trackArray);
 
 	ClassDef(CbmLitTrdTrackFinderRobust, 1);
 };

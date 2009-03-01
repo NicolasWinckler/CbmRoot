@@ -5,8 +5,6 @@
 #include "CbmLitTrackFinderBranch.h"
 #include "CbmLitStsBasedTrackFinder.h"
 
-#include <vector>
-
 class TClonesArray;
 
 class CbmLitTrdTrackFinderBranch: public CbmTrdTrackFinder,

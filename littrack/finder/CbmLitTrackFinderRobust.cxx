@@ -47,7 +47,7 @@ LitStatus CbmLitTrackFinderRobust::DoFind(
 		ArrangeHits(fHitArray.begin(), fHitArray.end());
 		InitTrackSeeds(fTrackSeedArray.begin(), fTrackSeedArray.end());
 		FollowTracks(fTracks.begin(), fTracks.end());
-//		FitTracks(fTracks.begin(), fTracks.end());
+		FitTracks(fTracks.begin(), fTracks.end());
 		fFinalSelection->DoSelect(fTracks.begin(), fTracks.end());
 		RemoveHits(fTracks.begin(), fTracks.end());
 		CopyToOutput(fTracks.begin(), fTracks.end(), tracks);
@@ -136,8 +136,9 @@ void CbmLitTrackFinderRobust::FitTracks(
 {
 	for (TrackPtrIterator it = itBegin; it != itEnd; it++) {
 		if (fFitter->Fit(*it) == kLITERROR) (*it)->SetQuality(kLITBAD);
+		if ((*it)->GetNofHits() < 11) (*it)->SetQuality(kLITBAD);
 //		if ((*it)->GetLastPlaneId() < 20) (*it)->SetQuality(kLITBAD);
-//		if ((*it)->GetChi2() / (*it)->GetNDF() > 9) (*it)->SetQuality(kLITBAD);
+		if ((*it)->GetChi2() / (*it)->GetNDF() > 9) (*it)->SetQuality(kLITBAD);
 	}
 }
 ClassImp(CbmLitTrackFinderRobust)

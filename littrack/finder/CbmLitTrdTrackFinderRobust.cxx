@@ -1,18 +1,13 @@
 #include "CbmLitTrdTrackFinderRobust.h"
 
-#include "CbmLitTrackPropagator.h"
 #include "CbmLitToolFactory.h"
 #include "CbmLitEnvironment.h"
 #include "CbmLitConverter.h"
 #include "CbmLitMemoryManagment.h"
-#include "CbmLitHit.h"
 #include "CbmLitTrack.h"
-
-#include "FairRootManager.h"
 
 #include "TClonesArray.h"
 
-#include <iostream>
 #include <algorithm>
 
 CbmLitTrdTrackFinderRobust::CbmLitTrdTrackFinderRobust()
@@ -21,34 +16,29 @@ CbmLitTrdTrackFinderRobust::CbmLitTrdTrackFinderRobust()
 
 CbmLitTrdTrackFinderRobust::~CbmLitTrdTrackFinderRobust()
 {
-//	if (fPropagatorToDet) delete fPropagatorToDet;
 }
 
 void CbmLitTrdTrackFinderRobust::Init()
 {
-   FairRootManager* rootMgr = FairRootManager::Instance();
-   if(NULL == rootMgr)
-      TObject::Fatal("CbmLitTrdTrackFinderRobust::Init","ROOT manager is not instantiated");
+	DefaultInit();
 
-   fTrackSeedsArray = (TClonesArray*) rootMgr->GetObject("STSTrack");
-   if(NULL == fTrackSeedsArray)
-      TObject::Fatal("CbmLitTrdTrackFinderRobust::Init","no STS track array");
+	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
+	fPropagatorToDet = fPropagator = factory->CreateTrackPropagator("lit");
+	fSeedSelection = factory->CreateTrackSelection("momentum");
+	fFinalSelection = factory->CreateTrackSelection("empty");
+	fFitter = factory->CreateTrackFitter("kalman_robust");
+	fFilter = factory->CreateTrackUpdate("kalman");
 
-   CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-   fPropagatorToDet = factory->CreateTrackPropagator("rk4");
-   fPropagator = factory->CreateTrackPropagator("line");
+	fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
 
-   fSeedSelection = factory->CreateTrackSelection("Momentum");
-   fFinalSelection = factory->CreateTrackSelection("MuchRobust");
-
-   fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
-
-   fVerbose = 1;
-   fNofIter = 1;
-   fMaxNofMissingHits = 1;
-   fUseFastSearch = true;
-   fSigmaCoef = 3.5;
-   fPDG = 211;
+	fVerbose = 1;
+	fNofIter = 1;
+	fMaxNofMissingHits = 4;
+	fUseFastSearch = true;
+	fSigmaCoef = 10.;
+	fChiSqPixelHitCut = 20.;
+	fChiSqStripHitCut = 4.;
+	fPDG = 11;
 }
 
 Int_t CbmLitTrdTrackFinderRobust::DoFind(
@@ -60,7 +50,7 @@ Int_t CbmLitTrdTrackFinderRobust::DoFind(
 	TrackPtrVector foundTracks;
 
 	CbmLitConverter::TrkHitArrayToPixelHitVector(hitArray, hits);
-	CreateTrackSeeds(fTrackSeedsArray, trackSeeds);
+	DefaultCreateTrackSeeds(fTrackSeedsArray, trackSeeds, fLayout, fPDG);
 
 	CbmLitTrackFinderRobust::DoFind(hits, trackSeeds, foundTracks);
 
@@ -74,31 +64,6 @@ Int_t CbmLitTrdTrackFinderRobust::DoFind(
 	trackSeeds.clear();
 
 	return trackArray->GetEntriesFast();
-}
-
-void CbmLitTrdTrackFinderRobust::CreateTrackSeeds(
-		TClonesArray* trackArray,
-		TrackPtrVector& trackSeeds)
-{
-	CbmLitConverter::StsTrackArrayToTrackVector(trackArray, trackSeeds);
-
-    if (fVerbose > 1)
-      std::cout << "-I- CbmLitTrdTrackFinderRobust::CreateTrackSeeds: " << std::endl
-                << trackArray->GetEntriesFast() << " tracks were loaded, "
-                << trackSeeds.size() << " tracks were created" << std::endl;
-
-    Double_t Ze = fLayout.GetSubstation(0, 0, 0).GetZ();
-    for (TrackPtrIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {
-    	CbmLitTrackParam par = *(*iTrack)->GetParamLast();
-       fPropagatorToDet->Propagate(&par, Ze, fPDG);
-       (*iTrack)->SetParamLast(&par);
-       (*iTrack)->SetParamFirst((*iTrack)->GetParamLast());
-       (*iTrack)->SetChi2( 0.0 );
-    }
-
-    if (fVerbose > 1)
-       std::cout << "-I- CbmLitTrdTrackFinderRobust::CreateTrackSeeds: "
-                 << "Extrapolation to detector finished " << std::endl;
 }
 
 ClassImp(CbmLitTrdTrackFinderRobust);

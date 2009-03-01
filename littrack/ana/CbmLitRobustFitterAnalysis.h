@@ -8,8 +8,8 @@
 #include "CbmLitTypes.h"
 #include "CbmLitPtrTypes.h"
 
-//class CbmLitTrackFitter;
 class CbmLitTrack;
+class CbmMuchTrackMatch;
 class TList;
 class TH1D;
 class TH2D;
@@ -35,13 +35,21 @@ protected:
 	void InitTrackParamFromStsTrackParam(
 			Int_t trackIndex,
 			CbmLitTrack* track);
-	void AnalyseTracks();
-	void TestFitter();
+	void FillHistograms(
+			Int_t id);
+	void TestFitter(
+			Int_t id);
+	void MatchTracks(
+			TrackPtrVector& tracks,
+			std::vector<CbmMuchTrackMatch*>& matches);
 
 private:
 	CbmLitDetectorLayout fLayout;
 	DetectorId fDetId;
-	TrackPtrVector fLitTracks;
+	Int_t fNofVars;
+	std::vector<TrackPtrVector> fLitTracks;
+	std::vector<std::vector<CbmMuchTrackMatch*> > fLitTrackMatches;
+
 	Int_t fNofPlanes;
 
 	TList* fHistoList;
@@ -49,22 +57,40 @@ private:
 	TrackFitterPtr fFitter;
 
 //	TClonesArray* fMCTracks;
-//	TClonesArray* fMCPoints;
+	TClonesArray* fPoints;
 	TClonesArray* fHits;
 	TClonesArray* fTracks;
 	TClonesArray* fTrackMatches;
-//	TClonesArray* fDigiMatches;
+	TClonesArray* fDigiMatches;
 	TClonesArray* fStsTracks;
 //	TClonesArray* fStsTrackMatches;
 
+//	Int_t fNof1DParams;
+//	Int_t fNof2DParams;
 	//Histograms
-	TH2D* fhPlaneNofHits;
-	TH2D* fhLastPlaneIdNofHits;
-	TH1D* fhNofHitsInTrack;
-	TH1D* fhNofTrueHitsInTrack;
-	TH1D* fhNofFalseHitsInTrack;
-	TH1D* fhLastPlaneIdInTrack;
-	TH1D* fhNofHitsInPlane;
+//	std::vector<std::vector<TH1D*> > fh1DHistos;
+//	std::vector<std::vector<TH2D*> > fh2DHistos;
+	Int_t fNofParams;
+	std::vector<TH2D*> fhPlaneNofHits;
+	std::vector<TH2D*> fhLastPlaneIdNofHits;
+	std::vector<TH1D*> fhNofHitsInPlane;
+
+	std::vector<TH1D*> fhTrueHitsRatioInTrack;
+
+	std::vector<TH1D*> fhNofHitsInTrack;
+	std::vector<TH1D*> fhNofTrueHitsInTrack;
+	std::vector<TH1D*> fhNofFalseHitsInTrack;
+	std::vector<TH1D*> fhNofHitsInTrueTrack;
+	std::vector<TH1D*> fhNofHitsInGhostTrack;
+
+	std::vector<TH1D*> fhTrackLastPlaneId;
+	std::vector<TH1D*> fhTrueTrackLastPlaneId;
+	std::vector<TH1D*> fhGhostTrackLastPlaneId;
+
+	std::vector<TH1D*> fhTrackChiSq;
+	std::vector<TH1D*> fhTrueTrackChiSq;
+	std::vector<TH1D*> fhGhostTrackChiSq;
+
 
 	Int_t fEvents;
 	Int_t fVerbose;

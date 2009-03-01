@@ -29,10 +29,10 @@ CbmLitTrackFitterRobust::CbmLitTrackFitterRobust(
 	fGaussWeightCalculator = WeightCalculatorPtr(new CbmLitWeightCalculatorGauss());
 
 	//track fit parameters
-	fNofIterations = 2;
+	fNofIterations = 3;
 	// was 0, 81, 9, 4, 1, 1, 1
 	fAnnealing.push_back(0.);
-	fAnnealing.push_back(1.);
+	fAnnealing.push_back(25.);
 	fAnnealing.push_back(1.);
 	fAnnealing.push_back(4.);
 	fAnnealing.push_back(1.);
@@ -42,9 +42,6 @@ CbmLitTrackFitterRobust::CbmLitTrackFitterRobust(
 
 CbmLitTrackFitterRobust::~CbmLitTrackFitterRobust()
 {
-//	delete fWeightedHitCalculator;
-//	delete fSimpleWeightCalculator;
-//	delete fGaussWeightCalculator;
 }
 
 LitStatus CbmLitTrackFitterRobust::Initialize()
@@ -61,15 +58,16 @@ LitStatus CbmLitTrackFitterRobust::Fit(
 		CbmLitTrack *track,
 		Bool_t downstream)
 {
-	if (track->GetLastPlaneId() < 5) return kLITERROR;
-
+//	if (track->GetLastPlaneId() < 5) return kLITERROR;
+	if (track->GetNofHits() < 1) return kLITERROR;
 	track->SortHits();
 
 	CbmLitTrack etrack;
-	etrack.SetParamFirst(track->GetParamFirst());
 	etrack.SetPDG(track->GetPDG());
+	//etrack.SetParamFirst(track->GetParamFirst());
 
 	for(Int_t iter = 0; iter < fNofIterations; iter++){
+		etrack.SetParamFirst(track->GetParamFirst());
 		if (CreateEffectiveTrack(track, iter, &etrack) == kLITERROR) {
 			return kLITERROR;
 		}
@@ -242,148 +240,5 @@ LitStatus CbmLitTrackFitterRobust::CreateOutputTrack(
 
 	return kLITSUCCESS;
 }
-
-
-
-
-
-
-
-
-
-
-
-//
-//LitStatus CbmLitTrackFitterRobust::IsStopIterations(
-//		const std::vector<HitIteratorPair>& bounds) const
-//{
-//	for (Int_t i = 0; i < bounds.size(); i++) {
-//		for(HitIterator it = bounds[i].first; it != bounds[i].second; it++) {
-//			//if ((*it)->IsOutlier()) continue;
-//			//(*it)->SetW((*it)->GetW() / (sumW + sumCut));
-//		}
-//	}
-//	return kLITSUCCESS;
-//}
-
-/*
-LitStatus CbmLitTrackFitterRobust::KoshiWeight(
-		const CbmLitTrackParam* par,
-		HitIterator itBegin,
-		HitIterator itEnd,
-		Int_t iter)
-{
-	Double_t a = 5 - 0.5*iter;
-	Double_t b = 0.16;
-	//Double_t T = 10;
-	//Double_t t = 9 * iter;
-
-	Double_t tT = 7./Double_t(iter);
-
-	Double_t w = b + (a - b) * std::exp(-tT);
-
-	for(HitIterator it = itBegin; it != itEnd; it++) {
-		Double_t dx = (*it)->GetX() - par->GetX();
-		Double_t dy = (*it)->GetY() - par->GetY();
-		Double_t ee = dx * dx + dy * dy;
-		Double_t weight = (w * w) / (ee + w * w);
-		(*it)->SetW(weight);
-		//std::cout << ee << " ee ";
-	}
-	//std::cout << std::endl;
-	Double_t sum = 0;
-	for(HitIterator it = itBegin; it != itEnd; it++)
-		sum += (*it)->GetW();
-
-	for(HitIterator it = itBegin; it != itEnd; it++) {
-		(*it)->SetW((*it)->GetW() / sum);
-		if (itEnd - itBegin > 1)std::cout << (*it)->GetW() << " ";
-	}
-	if (itEnd - itBegin > 1) std::cout << std::endl;
-	return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackFitterRobust::OptimalWeight(
-		const CbmLitTrackParam* par,
-		HitIterator itBegin,
-		HitIterator itEnd,
-		Int_t iter)
-{
-	Double_t c = 0.8 - iter*0.1;
-
-	Double_t sumWEE = 0;
-	Double_t sumW = 0;
-	for(HitIterator it = itBegin; it != itEnd; it++) {
-		Double_t dx = (*it)->GetX() - par->GetX();
-		Double_t dy = (*it)->GetY() - par->GetY();
-		Double_t ee = dx * dx + dy * dy;
-		sumWEE += (*it)->GetW() * ee;
-		sumW += (*it)->GetW();
-	}
-	Double_t sigmaSq = sumWEE / sumW;
-
-	sumW = 0;
-	for(HitIterator it = itBegin; it != itEnd; it++) {
-		Double_t dx = (*it)->GetX() - par->GetX();
-		Double_t dy = (*it)->GetY() - par->GetY();
-		Double_t ee = dx * dx + dy * dy;
-		Double_t w = (1 + c) / (1 + c * std::exp(ee / (2 * sigmaSq)));
-		(*it)->SetW(w);
-		sumW+=w;
-	}
-	for(HitIterator it = itBegin; it != itEnd; it++) {
-		(*it)->SetW((*it)->GetW() / sumW);
-		if (itEnd - itBegin > 1)std::cout << (*it)->GetW() << " ";
-	}
-	if (itEnd - itBegin > 1) std::cout << std::endl;
-	return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackFitterRobust::TukeyWeight(
-		const CbmLitTrackParam* par,
-		HitIterator itBegin,
-		HitIterator itEnd,
-		Int_t iter)
-{
-	Double_t t = 4 - iter;
-	Double_t ct = 2 + t;
-	Double_t ctSq = ct * ct;
-
-	Double_t sumWEE = 0;
-	Double_t sumW = 0;
-	for(HitIterator it = itBegin; it != itEnd; it++) {
-		Double_t dx = (*it)->GetX() - par->GetX();
-		Double_t dy = (*it)->GetY() - par->GetY();
-		Double_t ee = dx * dx + dy * dy;
-		sumWEE += (*it)->GetW() * ee;
-		sumW += (*it)->GetW();
-	}
-	Double_t sigmaSq = sumWEE / sumW;
-
-	sumW = 0.;
-	for(HitIterator it = itBegin; it != itEnd; it++) {
-		Double_t dx = (*it)->GetX() - par->GetX();
-		Double_t dy = (*it)->GetY() - par->GetY();
-		Double_t ee = dx * dx + dy * dy;
-		Double_t w = 0;
-		if (ctSq * sigmaSq > ee) {
-			Double_t t = 1 - ee / (ctSq * sigmaSq);
-			w = t * t;
-		}
-
-		(*it)->SetW(w);
-		sumW+=w;
-	}
-
-	for(HitIterator it = itBegin; it != itEnd; it++) {
-		if (sumW == 0.) (*it)->SetW(0.000001);
-		else (*it)->SetW((*it)->GetW() / sumW);
-		//std::cout << "tukey 4" << std::endl;
-		//if (itEnd - itBegin > 1)std::cout << (*it)->GetW() << " ";
-	}
-	//if (itEnd - itBegin > 1) std::cout << std::endl;
-	return kLITSUCCESS;
-}
-*/
 
 ClassImp(CbmLitTrackFitterRobust)

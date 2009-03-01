@@ -122,7 +122,7 @@ void CbmLitRecQa::Exec(
   IncreaseCounters();
 }
 
-void CbmLitRecQa::Finish()
+void CbmLitRecQa::FinishTask()
 {
 	CalcEffAndRates();
 

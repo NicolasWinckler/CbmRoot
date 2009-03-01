@@ -31,7 +31,7 @@ void CbmLitTrackFinderBase::ArrangeHits(
     for(HitPtrIterator hit = itBegin; hit != itEnd; hit++) {
     	if (fUsedHitsSet.find((*hit)->GetRefId()) != fUsedHitsSet.end()) continue;
     	Int_t planeId = (*hit)->GetPlaneId();
-    	fHitData.AddHit(planeId, *hit);
+     	fHitData.AddHit(planeId, *hit);
     }
 
     if (fVerbose > 1) std::cout << fHitData.ToString();

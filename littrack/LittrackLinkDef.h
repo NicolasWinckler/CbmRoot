@@ -45,6 +45,7 @@
 #pragma link C++ class  CbmLitStsBasedTrackFinder+;
 #pragma link C++ class  CbmLitTrackFinderNN+;
 #pragma link C++ class  CbmLitMuchTrackFinderNN+;
+#pragma link C++ class  CbmLitTrdTrackFinderNN+;
 //#pragma link C++ class  CbmLitMuchTrackFinderTrigger+;
 
 //fitter

@@ -43,7 +43,7 @@ public:
 
 private:
 
-  virtual void Finish();
+  virtual void FinishTask();
 
   void ProcessStsTracks();
   void ProcessMuchTracks();

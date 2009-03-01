@@ -3,7 +3,7 @@
 // -----                  Created 16/07/07  by A. Lebedev               -----
 // -------------------------------------------------------------------------
 
-#define NEWMUCH 1
+//#define NEWMUCH 1
 
 #include "CbmLitEnvironment.h"
 #include "CbmLitMemoryManagment.h"

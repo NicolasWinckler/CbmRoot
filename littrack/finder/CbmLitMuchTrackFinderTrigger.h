@@ -54,8 +54,8 @@ protected:
     
     Int_t fNofTracks;
     
-    // Map from pointer to CbmHit to Hit index
-   // std::map<CbmHit*, Int_t> fHitIdMap;
+    // Map from pointer to CbmTrkHit to Hit index
+   // std::map<CbmTrkHit*, Int_t> fHitIdMap;
     
     void ArrangeHits();
     

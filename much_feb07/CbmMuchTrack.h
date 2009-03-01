@@ -37,9 +37,9 @@ class CbmMuchTrack : public TObject
   Double_t GetChi2()   const { return fChi2; } // much chi^2
   Int_t GetNDF() const { return fNDF; }// much NDF
   FairTrackParam *GetMuchTrack(){ return &fMuchTrack; }
-  Int_t GetFlag() {return fFlag;};
-  
-  
+  Int_t GetFlag() const {return fFlag;};
+
+
   void SetNMissedHits( Int_t n ){ fNMissedHits = n; }
   void SetNMissedStations( Int_t n ){  fNMissedStations = n; }
   void SetChi2( Double_t chi2 ) { fChi2  = chi2; }
@@ -58,7 +58,7 @@ class CbmMuchTrack : public TObject
   FairTrackParam fMuchTrack;
   Double_t fChi2;
   Int_t fNDF;
-  Int_t fFlag; 
+  Int_t fFlag;
 
   ClassDef(CbmMuchTrack,2);
 

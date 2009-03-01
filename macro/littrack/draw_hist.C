@@ -27,4 +27,23 @@ void draw_hist_1D(
 }
 
 
+void draw_hist_2D(
+		TH2* hist,
+		const std::string& titleX,
+		const std::string& titleY,
+		const std::string& titleZ,
+		Bool_t logx = false,
+		Bool_t logy = false,
+		Bool_t logz = false,
+		const std::string& drawOpt = ""
+		)
+{
+	hist->GetXaxis()->SetTitle(titleX.c_str());
+	hist->GetYaxis()->SetTitle(titleY.c_str());
+	hist->GetYaxis()->SetTitle(titleZ.c_str());
+	if (logx) gPad->SetLogx();
+	if (logy) gPad->SetLogy();
+	if (logz) gPad->SetLogz();
+	hist->Draw(drawOpt.c_str());
+}
 

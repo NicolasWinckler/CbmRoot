@@ -5,7 +5,7 @@
 
 // residual (x,y,tx,ty,qp), pull (x,y,tx,ty,qp), resolution p %, chi-square
 const int nofPar = 12;
-const int nofLayers = 13;
+const int nofLayers = 12;
 
 // 0-propagation, 1-filter, 2-smoother
 double sigma[3][nofLayers][nofPar];
@@ -16,11 +16,11 @@ bool drawPropagation = false;
 bool drawFilter = true;
 bool drawSmoother = false;
 
-TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu/";
-TFile *file = new TFile(dir + "much.ana.root");
+//TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu/";
+//TFile *file = new TFile(dir + "much.ana.root");
 
-//TString dir  = "/d/cbm02/andrey/events/trd/standard/e";
-//TFile *file = new TFile(dir + "/trd.ana.auau.25gev.e.centr.root");
+TString dir  = "/home/d/andrey/events/trd/monolithic/10e/e/";
+TFile *file = new TFile(dir + "trd.ana.0000.root");
 
 TString outDir = "./test/";
 
@@ -98,7 +98,7 @@ void DrawHistos(
 		}
 
 		DrawText(i, sigma[v][layer][i], rms[v][layer][i]);
-//		gPad->SetLogy();
+		gPad->SetLogy();
 
 	}
 	stringstream oss1;

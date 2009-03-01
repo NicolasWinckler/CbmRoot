@@ -13,8 +13,16 @@ void cbmrootlibs()
 //   gSystem->Load("libMvd");
    gSystem->Load("libSts");
    gSystem->Load("libRich");
-   gSystem->Load("libMuch");
-//   gSystem->Load("libMuchFeb07");
+
+   TString script = TString(gSystem->Getenv("SCRIPT"));
+   if (script == "yes") {
+	   TString geoType = TString(gSystem->Getenv("GEOTYPE"));
+	   if (geoType.Contains("new")) gSystem->Load("libMuch");
+	   else gSystem->Load("libMuchFeb07");
+   }
+//   gSystem->Load("libMuch");
+   gSystem->Load("libMuchFeb07");
+
    gSystem->Load("libTrd");
    gSystem->Load("libTof");
    gSystem->Load("libEcal");

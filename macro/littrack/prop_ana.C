@@ -1,81 +1,81 @@
 #include "../../cbmbase/CbmDetectorList.h";
 void prop_ana(Int_t nEvents = 1000)
 {
-  Int_t iVerbose = 0;
+	TString dir = "/home/d/andrey/events/trd/monolithic/10e/e/";
+//	TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu/";
 
-  TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu/";
+	TString mcFile = dir + "mc.0000.root";
+	TString stsRecoFile = dir + "sts.reco.0000.root";
+	TString hitsFile = dir + "trd.hits.0000.root";
+	TString parFile = dir + "param.0000.root";
+	TString outFile = dir + "trd.ana.0000.root";
 
-   TString inFile = dir + "mc.root";
-   TString inFile1 = dir + "sts.reco.root";
-   TString inFile2 = dir + "much.hits.root";
-   TString parFile = dir + "params.root";
-   TString outFile = dir + "much.ana.root";
+	TStopwatch timer;
+	timer.Start();
 
-   TStopwatch timer;
-   timer.Start();
+	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
+	basiclibs();
+	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
+	cbmrootlibs();
 
-   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-   basiclibs();
-   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
-   cbmrootlibs();
+	FairRunAna *run= new FairRunAna();
+	run->SetInputFile(mcFile);
+	run->AddFriend(stsRecoFile);
+	run->AddFriend(hitsFile);
+	run->SetOutputFile(outFile);
 
-   FairRunAna *run= new FairRunAna();
-   run->SetInputFile(inFile);
-   run->AddFriend(inFile1);
-   run->AddFriend(inFile2);
-   run->SetOutputFile(outFile);
+//	FairGeane* Geane = new FairGeane(inFile.Data());
 
-   FairGeane* Geane = new FairGeane(inFile.Data());
+	// -------------------------------------------------------------------------
+	// CbmMuchTrackFinder* muchTrackFinder    = new CbmLitMuchTrackFinder();
+//	CbmMuchTrackFinder* muchTrackFinder    = new CbmMuchTrackFinderIdeal();
+//	CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
+//	muchFindTracks->UseFinder(muchTrackFinder);
+//	run->AddTask(muchFindTracks);
+//
+//	CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
+//	run->AddTask(muchMatchTracks);
 
-   // -------------------------------------------------------------------------
-   // CbmMuchTrackFinder* muchTrackFinder    = new CbmLitMuchTrackFinder();
-   CbmMuchTrackFinder* muchTrackFinder    = new CbmMuchTrackFinderIdeal();
-   CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
-   muchFindTracks->UseFinder(muchTrackFinder);
-   run->AddTask(muchFindTracks);
+	CbmTrdTrackFinder* trdTrackFinder    = new CbmTrdTrackFinderIdeal();
+	CbmTrdFindTracks* trdFindTracks = new CbmTrdFindTracks("Trd Track Finder");
+	trdFindTracks->UseFinder(trdTrackFinder);
+	run->AddTask(trdFindTracks);
 
-   CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
-   run->AddTask(muchMatchTracks);
+	CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks();
+	run->AddTask(trdMatchTracks);
 
-   CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis(kMUCH);
-   run->AddTask(propAna);
-   // -------------------------------------------------------------------------
+	CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis(kTRD);
+	run->AddTask(propAna);
+	// -------------------------------------------------------------------------
 
-   // -----  Parameter database   --------------------------------------------
-   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-   FairParRootFileIo* parIo1 = new FairParRootFileIo();
-   //FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
-   parIo1->open(parFile.Data());
-   //parIo2->open(muchDigiFile.Data(),"in");
-   rtdb->setFirstInput(parIo1);
-   //rtdb->setSecondInput(parIo2);
-   rtdb->setOutput(parIo1);
-   rtdb->saveOutput();
-   // ------------------------------------------------------------------------
+	// -----  Parameter database   --------------------------------------------
+	FairRuntimeDb* rtdb = run->GetRuntimeDb();
+	FairParRootFileIo* parIo1 = new FairParRootFileIo();
+	parIo1->open(parFile.Data());
+	rtdb->setFirstInput(parIo1);
+	rtdb->setOutput(parIo1);
+	rtdb->saveOutput();
+	// ------------------------------------------------------------------------
 
-   // -----   Intialise and run   --------------------------------------------
-   run->LoadGeometry();
-   run->Init();
+	// -----   Intialise and run   --------------------------------------------
+	run->LoadGeometry();
+	run->Init();
+//	Geane->SetField(run->GetField());
+	run->Run(0,nEvents);
+	// ------------------------------------------------------------------------
 
-   Geane->SetField(run->GetField());
+	// -----   Finish   -------------------------------------------------------
+	timer.Stop();
+	Double_t rtime = timer.RealTime();
+	Double_t ctime = timer.CpuTime();
+	cout << endl << endl;
+	cout << "Macro finished succesfully." << endl;
+	cout << "Output file is "    << outFile << endl;
+	cout << "Parameter file is " << parFile << endl;
+	cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
+	cout << endl;
+	// ------------------------------------------------------------------------
 
-   cout << "Starting run" << endl;
-   run->Run(0,nEvents);
-   // ------------------------------------------------------------------------
-
-   // -----   Finish   -------------------------------------------------------
-   timer.Stop();
-   Double_t rtime = timer.RealTime();
-   Double_t ctime = timer.CpuTime();
-   cout << endl << endl;
-   cout << "Macro finished succesfully." << endl;
-   cout << "Output file is "    << outFile << endl;
-   cout << "Parameter file is " << parFile << endl;
-   cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
-   cout << endl;
-   // ------------------------------------------------------------------------
-
-   cout << " Test passed" << endl;
-   cout << " All ok " << endl;
-   exit(0);
+	cout << " Test passed" << endl;
+	cout << " All ok " << endl;
 }

@@ -338,7 +338,8 @@ void run_reco(Int_t nEvents = 1)
   
   
   //--------------------- RICH Ring Finding ----------------------------------
-  CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose);
+  TString richGeoType = "compact";//choose between compact or large 
+  CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose, richGeoType);
   CbmRichFindRings* richFindRings = new CbmRichFindRings();
   richFindRings->UseFinder(richFinder);
   run->AddTask(richFindRings);
@@ -355,11 +356,8 @@ void run_reco(Int_t nEvents = 1)
   //--------------------------------------------------------------------------
   */
  
-  //-------------------- RICH Ring Fitting -----------------------------------
-  // B-field configuration 
-  TString field ="muon";  // choose between "muon" or "active"  
-  Double_t iRingCorr = 0.;      // correction done (default), choose 0 if not
-  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipse(iVerbose, iRingCorr, field);
+  //-------------------- RICH Ring Fitting -----------------------------------  
+  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, 1, richGeoType);
   CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
   run->AddTask(fitRings);
   //--------------------------------------------------------------------------
@@ -383,17 +381,6 @@ void run_reco(Int_t nEvents = 1)
   run->AddTask(assignTrack);
   // ------------------------------------------------------------------------
   
-
-  //--------------------- RICH ring selection -------------------------------
-  TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
-  richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights.txt";
-  CbmRichRingSelectNeuralNet *ringSelectNN 
-    = new CbmRichRingSelectNeuralNet(iVerbose, richSelectNNFile);
-  CbmRichSelectRings* richSelectRingsNN = new CbmRichSelectRings();
-  richSelectRingsNN->UseSelect(ringSelectNN);
-  run->AddTask(richSelectRingsNN);
-
-  // ------------------------------------------------------------------------
 
   // ===                 End of RICH local reconstruction                  ===
   // =========================================================================

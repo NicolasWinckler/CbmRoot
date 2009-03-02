@@ -36,7 +36,7 @@ CbmHit::~CbmHit() { }
 
 
 // -----   Public method Print   -------------------------------------------
-void CbmHit::Print(Option_t* opt) const {
+void CbmHit::Print(const Option_t* opt) const {
   cout.precision(5);
   cout << "Hit at (" << fX << ", " << fY << ", " << fZ << ") cm, "
        << "Detector " << fDetectorID << ", Station " << GetStationNr() 

@@ -29,16 +29,16 @@ void run_reco(Int_t nEvents = 800)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0001.mc.root";
+  TString inFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.mc.root";
 
   // Parameter file
-  TString parFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0001.params.root";
+  TString parFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.params.root";
 
   // STS digitisation file
   TString stsDigiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";//"sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0001.reco.root";
+  TString outFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.reco.root";
 
 
   // In general, the following parts need not be touched
@@ -193,8 +193,9 @@ void run_reco(Int_t nEvents = 800)
 
 
   // -----   TRD track finding   ---------------------------------------------
-  CbmTrdTrackFinder* trdTrackFinder    = new CbmL1TrdTrackFinderSts();
-  ((CbmL1TrdTrackFinderSts*)trdTrackFinder)->SetVerbose(iVerbose);
+ // CbmTrdTrackFinder* trdTrackFinder    = new CbmL1TrdTrackFinderSts();
+ // ((CbmL1TrdTrackFinderSts*)trdTrackFinder)->SetVerbose(iVerbose);
+  CbmTrdTrackFinder* trdTrackFinder    = new CbmLitTrdTrackFinderBranch();
   CbmTrdFindTracks* trdFindTracks = new CbmTrdFindTracks("TRD Track Finder");
   trdFindTracks->UseFinder(trdTrackFinder);
   run->AddTask(trdFindTracks);
@@ -231,7 +232,7 @@ void run_reco(Int_t nEvents = 800)
     // ----------------------------------------------------
 
 
-    CbmLitRecQa* litRecQa   =  new CbmLitRecQa(12, 0.7, kTRD, 1);
+    CbmLitRecQa* litRecQa   =  new CbmLitRecQa(8, 0.7, kTRD, 1);
     litRecQa->SetNormType(2); // '2' to number of STS tracks
     run->AddTask(litRecQa);
 
@@ -346,7 +347,8 @@ void run_reco(Int_t nEvents = 800)
 
 
   //--------------------- RICH Ring Finding ----------------------------------
-  CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose);
+  TString richGeoType = "compact";
+  CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose, richGeoType);
   CbmRichFindRings* richFindRings = new CbmRichFindRings();
   richFindRings->UseFinder(richFinder);
   run->AddTask(richFindRings);
@@ -354,9 +356,7 @@ void run_reco(Int_t nEvents = 800)
 
   //-------------------- RICH Ring Fitting -----------------------------------
   // B-field configuration
-  TString field ="compact";  // choose between "compact" or "large"
-  Double_t iRingCorr = 0.;      // correction done (default), choose 0 if not
-  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, iRingCorr, field);
+  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, 1, richGeoType);
   CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
   run->AddTask(fitRings);
   //--------------------------------------------------------------------------

@@ -24,33 +24,21 @@
 using std::cout;
 using std::endl;
 using std::vector;
-//--------------------------------------------------------------------------
-// -----   Default constructor   -------------------------------------------
-CbmRichRingFinderHough::CbmRichRingFinderHough()
-{
 
-
-}
 
 // -----   Standard constructor   ------------------------------------------
-CbmRichRingFinderHough::CbmRichRingFinderHough  ( Int_t verbose )
+CbmRichRingFinderHough::CbmRichRingFinderHough  ( Int_t verbose, TString geometry )
 {
+    cout << "-I- CbmRichRingFinderHough constructor for " << geometry << " RICH geometry"<<endl;
+    if (geometry != "compact" && geometry != "large"){
+        geometry = "compact";
+        cout << "-E- CbmRichRingFinderHough::SetParameters UNKNOWN geometry,  " <<
+        "Set default parameters for "<< geometry << " RICH geometry"<<endl;
+    }
 
-}
-
-// -----   Destructor   ----------------------------------------------------
-CbmRichRingFinderHough::~CbmRichRingFinderHough()
-{
-
-}
-
-
-void CbmRichRingFinderHough::Init()
-{
-    if (fVerbose) cout << "CbmRichRingFinderHough::init() "<<endl;
     fNEvent = 0;
-    TString geometryType = "compact";
-    SetParameters(geometryType);
+
+    SetParameters(geometry);
 
     fHist.resize(fNofBinsX);
     for (Int_t i = 0; i < fNofBinsX; i++) fHist[i].resize(fNofBinsY);
@@ -65,8 +53,13 @@ void CbmRichRingFinderHough::Init()
     fFitCOP = new CbmRichRingFitterCOP(0, 0);
     fFitCOP->Init();
 
-    fFitEllipseTau = new CbmRichRingFitterEllipseTau(0, 0, geometryType);
+    fFitEllipseTau = new CbmRichRingFitterEllipseTau(0, 0, geometry);
     fFitEllipseTau->Init();
+}
+
+// -----   Destructor   ----------------------------------------------------
+CbmRichRingFinderHough::~CbmRichRingFinderHough()
+{
 
 }
 
@@ -161,15 +154,15 @@ void CbmRichRingFinderHough::Finish()
 void CbmRichRingFinderHough::SetParameters(TString geometry)
 {
     cout << "-I- CbmRichRingFinderHough::SetParameters for " << geometry << " RICH geometry"<<endl;
-    if (geometry != "small" && geometry != "compact" && geometry != "standard" && geometry != "large"){
-        geometry = "standard";
+    if (geometry != "compact" && geometry != "large"){
+        geometry = "compact";
         cout << "-E- CbmRichRingFinderHough::SetParameters UNKNOWN geometry,  " <<
         "Set default parameters for "<< geometry << " RICH geometry"<<endl;
     }
 
     TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
 
-    if (geometry == "standard" || geometry == "large"){
+    if (geometry == "large"){
         fMaxDistance = 14;
         fMinDistance = 3.;
         fMinDistance2 = fMinDistance*fMinDistance;
@@ -195,7 +188,7 @@ void CbmRichRingFinderHough::SetParameters(TString geometry)
         richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights.txt";
     }
 
-    if (geometry == "small" || geometry == "compact"){
+    if (geometry == "compact"){
         fMaxDistance = 11.5;
         fMinDistance = 2.5;
         fMinDistance2 = fMinDistance*fMinDistance;

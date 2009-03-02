@@ -93,11 +93,8 @@ class CbmRichRingFinderHough : public CbmRichRingFinder {
 
 public:
 
-  	/** Default constructor **/
-  	CbmRichRingFinderHough();
-
   	/** Standard constructor **/
-  	CbmRichRingFinderHough ( Int_t verbose);
+  	CbmRichRingFinderHough ( Int_t verbose, TString geometry);
 
 	~CbmRichRingFinderHough();
 
@@ -127,8 +124,6 @@ public:
     void RingSelection();
     void RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring);
     void RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring);
-
-	virtual void Init();
 
 	virtual void Finish();
 

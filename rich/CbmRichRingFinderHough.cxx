@@ -35,10 +35,15 @@ CbmRichRingFinderHough::CbmRichRingFinderHough  ( Int_t verbose, TString geometr
         cout << "-E- CbmRichRingFinderHough::SetParameters UNKNOWN geometry,  " <<
         "Set default parameters for "<< geometry << " RICH geometry"<<endl;
     }
+    fGeometryType = geometry;
 
+}
+
+void CbmRichRingFinderHough::Init()
+{
     fNEvent = 0;
 
-    SetParameters(geometry);
+    SetParameters(fGeometryType);
 
     fHist.resize(fNofBinsX);
     for (Int_t i = 0; i < fNofBinsX; i++) fHist[i].resize(fNofBinsY);
@@ -53,7 +58,7 @@ CbmRichRingFinderHough::CbmRichRingFinderHough  ( Int_t verbose, TString geometr
     fFitCOP = new CbmRichRingFitterCOP(0, 0);
     fFitCOP->Init();
 
-    fFitEllipseTau = new CbmRichRingFitterEllipseTau(0, 0, geometry);
+    fFitEllipseTau = new CbmRichRingFitterEllipseTau(0, 0, fGeometryType);
     fFitEllipseTau->Init();
 }
 

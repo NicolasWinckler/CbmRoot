@@ -74,7 +74,7 @@ CbmMuchHit::~CbmMuchHit() { }
 
 
 // -----   Public method Print   -------------------------------------------
-void CbmMuchHit::Print(Option_t* opt) const {
+void CbmMuchHit::Print(const Option_t* opt) const {
   cout.precision(5);
   cout << "MuchHit at (" << fX << ", " << fY << ", " << fZ << ") cm, "
        << "Station " << GetStationNr() << ", Sector " << GetSectorNr()

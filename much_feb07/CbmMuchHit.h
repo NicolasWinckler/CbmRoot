@@ -19,6 +19,7 @@
 #include "TVector3.h"
 #include "CbmHit.h"
 
+#include <iostream>
 
 class CbmMuchHit : public CbmHit
 {
@@ -60,7 +61,7 @@ class CbmMuchHit : public CbmHit
   virtual ~CbmMuchHit();
 
   /** Screen output **/
-  virtual void Print(Option_t* opt) const;
+  virtual void Print(const Option_t* opt) const;
 
 
   /** Accessors **/
@@ -70,8 +71,11 @@ class CbmMuchHit : public CbmHit
     const { return ( fDetectorID & (15<<24) ) >> 24; }
 
   /** Gets station number within the system **/
-  virtual Int_t    GetStationNr()
-    const { return ( fDetectorID & (255<<16) ) >> 16; }
+  virtual Int_t    GetStationNr() const {
+	  Int_t stationNr = ((fDetectorID & (255<<16) ) >> 16);
+	  std::cout << "fDetectorId=" << fDetectorID << " staNr=" << stationNr << std::endl;
+	  return ( fDetectorID & (255<<16) ) >> 16;
+  }
 
   /** Gets sector number within the station **/
   inline Int_t    GetSectorNr()

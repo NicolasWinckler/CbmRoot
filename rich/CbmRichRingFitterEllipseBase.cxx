@@ -88,8 +88,6 @@ void CbmRichRingFitterEllipseBase::CalcChi2(Double_t A, Double_t B, Double_t C,
         chi2 += (d1*d1)/(d2*d2);
     }
 
-    chi2 = chi2 / (nofHits - 5);
-
     pRing->SetChi2(chi2);
 }
 

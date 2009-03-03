@@ -24,22 +24,12 @@ using std::endl;
 using std::map;
 using std::vector;
 
-// -----   Default constructor   -------------------------------------------
-CbmRichElectronsQa::CbmRichElectronsQa() :FairTask("RichRingQa")
-{
-
-}
-// -------------------------------------------------------------------------
 
 //------------  standard constructor (with verbosity level)  ---------------------------------
 CbmRichElectronsQa::CbmRichElectronsQa(const char *name, const char *title, Int_t verbose)
   :FairTask(name)
 {
 	fEventNum = 1;
-
-	fMinNofHitsInRichRing = 5;
-	fMinNofTrdHits = 8;
-	fTrdAnnCut = 0.75;
 
 ///RICH
 	fNofMCRings = 0;
@@ -88,6 +78,10 @@ CbmRichElectronsQa::CbmRichElectronsQa(const char *name, const char *title, Int_
 	fhAaxisPi= new TH1D("fhAaxisPi", "fhAaxisPi;A axis, cm;Entries", 30,3,8);
 	fhBAxisEl= new TH1D("fhBAxisEl", "fhBAxisEl;B axis, cm;Entries", 30,3,8);
 	fhBAxisPi= new TH1D("fhBAxisPi", "fhBAxisPi;B axis, cm;Entries", 30,3,8);
+	fhAaxisCorEl= new TH1D("fhAaxisCorEl", "fhAaxisCorEl;A axis, cm;Entries", 30,3,8);
+	fhAaxisCorPi= new TH1D("fhAaxisCorPi", "fhAaxisCorPi;A axis, cm;Entries", 30,3,8);
+	fhBAxisCorEl= new TH1D("fhBAxisCorEl", "fhBAxisCorEl;B axis, cm;Entries", 30,3,8);
+	fhBAxisCorPi= new TH1D("fhBAxisCorPi", "fhBAxisCorPi;B axis, cm;Entries", 30,3,8);
 	fhDistEl= new TH1D("fhDistEl", "fhDistEl;ring-track distance, cm;Entries", 30,0,3);
 	fhDistPi= new TH1D("fhDistPi", "fhDistPi;ring-track distance, cm;Entries", 30,0,3);
 	fhNofHitsEl= new TH1D("fhNofHitsEl", "fhNofHitsEl;nof hits;Entries", 30,0,45);
@@ -106,23 +100,59 @@ CbmRichElectronsQa::CbmRichElectronsQa(const char *name, const char *title, Int_
 	fhTrdAnnPi= new TH1D("fhTrdAnnPi", "fhTrdAnnPi;ANN output;Entries", 50,-1.2,1.2);
 
 	fOutElandPi.open("ann_el_pi.txt");
-
-    TString richANNFile = gSystem->Getenv("VMCWORKDIR");
-    richANNFile += "/parameters/rich/el_id_ann_weights_rich_compact.txt";
-    fElIdAnn = new CbmRichElectronIdAnn(0, richANNFile);
-    fElIdAnn->Init();
+	SetParameters("compact");
 }
 
-  // -----   Destructor   ----------------------------------------------------
+
 CbmRichElectronsQa::~CbmRichElectronsQa()
 {
 
 
 }
-// -------------------------------------------------------------------------
 
 
-// -----   Initialization   -----------------------------------------------
+void CbmRichElectronsQa::SetParameters(TString richGeo)
+{
+	fMinNofHitsInRichRing = 5;
+	fMinNofTrdHits = 8;
+	fTrdAnnCut = 0.75;
+	fRichAnnCut = -0.3;
+	fUseRichAnn = false;
+
+
+    cout << "-I- CbmRichElectronsQa for " << richGeo << " RICH geometry"<<endl;
+    if (richGeo != "compact" && richGeo != "large"){
+    	richGeo = "compact";
+        cout << "-E- CbmRichElectronsQa::SetParameters UNKNOWN geometry,  " <<
+        "Set default parameters for "<< richGeo << " RICH geometry"<<endl;
+    }
+
+    TString richANNFile = gSystem->Getenv("VMCWORKDIR");
+    if (richGeo == "compact"){
+        richANNFile += "/parameters/rich/el_id_ann_weights_rich_compact.txt";
+        fMeanA = 4.94;
+        fMeanB = 4.50;
+        fRmsA = 0.27;
+        fRmsB = 0.26;
+        fRmsCoeff = 4.;
+        fDistCut = 1.;
+    }
+
+    if (richGeo == "large"){
+        richANNFile += "/parameters/rich/el_id_ann_weights_rich.txt";
+        fMeanA = 6.18;
+        fMeanB = 5.66;
+        fRmsA = 0.3;
+        fRmsB = 0.21;
+        fRmsCoeff = 4.;
+        fDistCut = 1.;
+    }
+
+    fElIdAnn = new CbmRichElectronIdAnn(0, richANNFile);
+    fElIdAnn->Init();
+
+}
+
 
 InitStatus CbmRichElectronsQa::Init()
 {
@@ -691,23 +721,14 @@ Bool_t CbmRichElectronsQa::IsRichElectron(CbmRichRing* ring, Double_t momentum)
     Double_t axisB = ring->GetBaxis();
     Double_t dist = ring->GetDistance();
 
-//    Double_t meanA = 6.18;
-//    Double_t rmsA = 0.3;
-//    Double_t meanB = 5.66;
-//    Double_t rmsB = 0.21;
-    //c =4
-
-//    Double_t meanA = 4.94;
-//    Double_t rmsA = 0.27;
-//    Double_t meanB = 4.50;
-//    Double_t rmsB = 0.26;
-//
-//    if ( fabs(axisA-meanA) < 4*rmsA && fabs(axisB-meanB) < 4*rmsB && dist < 1.) return true;
-//
-//    return false;
+    if (fUseRichAnn == false){
+		if ( fabs(axisA-fMeanA) < fRmsCoeff*fRmsA &&
+		   fabs(axisB-fMeanB) < fRmsCoeff*fRmsB && dist < fDistCut) return true;
+		return false;
+    }
 
 
-    if (fElIdAnn->DoSelect(ring, momentum) > -0.3) return true;
+    if (fElIdAnn->DoSelect(ring, momentum) > fRichAnnCut) return true;
     return false;
 }
 
@@ -760,6 +781,8 @@ void CbmRichElectronsQa::DiffElandPi()
 
         Double_t axisA = ring->GetAaxis();
         Double_t axisB = ring->GetBaxis();
+        Double_t axisACor = ring->GetAaxisCor();
+        Double_t axisBCor= ring->GetBaxisCor();
         Double_t phi = ring->GetPhi();
         Double_t radAngle = ring->GetRadialAngle();
         Double_t chi2 = ring->GetChi2()/ring->GetNDF();
@@ -771,6 +794,8 @@ void CbmRichElectronsQa::DiffElandPi()
 				mcIdSts == mcIdRich && mcIdRich != -1){
 			fhAaxisEl->Fill(axisA);
 			fhBAxisEl->Fill(axisB);
+			fhAaxisCorEl->Fill(axisACor);
+			fhBAxisCorEl->Fill(axisBCor);
 			fhDistEl->Fill(dist);
 			fhNofHitsEl->Fill(nofHits);
 			fhChi2El->Fill(chi2);
@@ -787,6 +812,8 @@ void CbmRichElectronsQa::DiffElandPi()
 		if ( pdg == 211 &&  mcIdRich != -1){
 			fhAaxisPi->Fill(axisA);
 			fhBAxisPi->Fill(axisB);
+			fhAaxisCorPi->Fill(axisACor);
+			fhBAxisCorPi->Fill(axisBCor);
 			fhDistPi->Fill(dist);
 			fhNofHitsPi->Fill(nofHits);
 			fhChi2Pi->Fill(chi2);
@@ -825,7 +852,7 @@ void CbmRichElectronsQa::DiffElandPi()
 }
 
 // -----   Finish Task   ---------------------------------------------------
-void CbmRichElectronsQa::Finish()
+void CbmRichElectronsQa::FinishTask()
 {
 	fhMCRings->Write();
 	fhAccRings->Write();
@@ -850,6 +877,10 @@ void CbmRichElectronsQa::Finish()
 	fhAaxisPi->Write();
 	fhBAxisEl->Write();
 	fhBAxisPi->Write();
+	fhAaxisCorEl->Write();
+	fhAaxisCorPi->Write();
+	fhBAxisCorEl->Write();
+	fhBAxisCorPi->Write();
 	fhDistEl->Write();
 	fhDistPi->Write();
 	fhNofHitsEl->Write();

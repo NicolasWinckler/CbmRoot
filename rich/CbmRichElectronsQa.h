@@ -20,25 +20,13 @@ class CbmRichElectronsQa : public FairTask{
 
 public:
 
-	/** Default constructor **/
-	CbmRichElectronsQa();
-
-	/** Standard Constructor with name, title, and verbosity level
-	 *@param verbose      verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
-	 */
 	CbmRichElectronsQa(const char *name, const char *title, Int_t verbose);
 
-	/** Destructor **/
 	virtual ~CbmRichElectronsQa();
-
-	/** Initialization of the task **/
 	virtual InitStatus Init();
-
-	/** Executed task **/
 	virtual void Exec(Option_t* option);
-
-	/** Finish task **/
-	virtual void Finish();
+	virtual void FinishTask();
+	void SetParameters(TString richGeo);
 
 private:
 	Int_t fEventNum;
@@ -60,6 +48,15 @@ private:
     Int_t fMinNofHitsInRichRing;
     Int_t fMinNofTrdHits;
     Double_t fTrdAnnCut;
+    Double_t fRichAnnCut;
+    Double_t fMeanA;
+    Double_t fMeanB;
+    Double_t fRmsA;
+    Double_t fRmsB;
+    Double_t fRmsCoeff;
+    Double_t fDistCut;
+    Bool_t fUseRichAnn;
+
     Bool_t DoesRingHaveProjection(Int_t trackId);
     Bool_t IsRichElectron(CbmRichRing* ring, Double_t momentum);
     Bool_t IsTrdElectron(CbmTrdTrack* trdTrk);
@@ -125,6 +122,10 @@ private:
 	TH1D* fhAaxisPi;
 	TH1D* fhBAxisEl;
 	TH1D* fhBAxisPi;
+	TH1D* fhAaxisCorEl;
+	TH1D* fhAaxisCorPi;
+	TH1D* fhBAxisCorEl;
+	TH1D* fhBAxisCorPi;
 	TH1D* fhDistEl;
 	TH1D* fhDistPi;
 	TH1D* fhNofHitsEl;

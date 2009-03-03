@@ -817,7 +817,7 @@ void CbmRichRingQa::RingTrackMatchEff()
 }
 
 // -----   Finish Task   ---------------------------------------------------
-void CbmRichRingQa::Finish()
+void CbmRichRingQa::FinishTask()
 {
 
     fRings->Clear();

@@ -27,7 +27,7 @@ void draw_diff_el_pi(TH1D* h1, TH1D* h2)
 }
 
 void draw_electrons_qa(){
- 	TFile *file = new TFile("/d/cbm02/slebedev/rich/FEB09/real/auau.25gev.centr.0005.reco.qa.L1.root");
+ 	TFile *file = new TFile("/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.reco.qa.root");
 
    gROOT->SetStyle("Plain");
     gStyle->SetPalette(1,0);
@@ -158,18 +158,22 @@ void draw_electrons_qa(){
 
 ////
     TCanvas* c4 = new TCanvas();
-    c4->Divide(3,2);
+    c4->Divide(3,3);
     c4->cd(1);
 	draw_diff_el_pi(fhAaxisEl, fhAaxisPi);
     c4->cd(2);
 	draw_diff_el_pi(fhBAxisEl, fhBAxisPi);
     c4->cd(3);
-	draw_diff_el_pi(fhDistEl, fhDistPi);
+	draw_diff_el_pi(fhAaxisCorEl, fhAaxisCorPi);
     c4->cd(4);
-	draw_diff_el_pi(fhNofHitsEl, fhNofHitsPi);
+	draw_diff_el_pi(fhBAxisCorEl, fhBAxisCorPi);
     c4->cd(5);
-	draw_diff_el_pi(fhChi2El,fhChi2Pi);
+	draw_diff_el_pi(fhDistEl, fhDistPi);
     c4->cd(6);
+	draw_diff_el_pi(fhNofHitsEl, fhNofHitsPi);
+    c4->cd(7);
+	draw_diff_el_pi(fhChi2El,fhChi2Pi);
+    c4->cd(8);
 	draw_diff_el_pi(fhRadPosEl,fhRadPosPi);
 
     TCanvas* c5 = new TCanvas();

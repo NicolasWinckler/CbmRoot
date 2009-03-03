@@ -8,22 +8,22 @@ void run_reco_rich(Int_t nEvents = 500)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile1 = "/d/cbm02/slebedev/rich/FEB09/real/auau.25gev.centr.0000.mc.root";
-  TString inFile2 = "/d/cbm02/slebedev/rich/FEB09/real/auau.25gev.centr.0000.reco.root";
+  TString inFile1 = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.mc.root";
+  TString inFile2 = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.reco.root";
   // Parameter file
-  TString parFile = "/d/cbm02/slebedev/rich/FEB09/real/auau.25gev.centr.0000.params.root";
+  TString parFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.params.root";
 
   // STS digitisation file
   TString stsDigiFile = "sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/d/cbm02/slebedev/rich/FEB09/real/auau.25gev.centr.0000.recorich.root";
+  TString outFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.recorich.root";
 
   // In general, the following parts need not be touched
   // ========================================================================
 
 
- 
+
   // ----    Debug option   -------------------------------------------------
   gDebug = 0;
   // ------------------------------------------------------------------------
@@ -65,7 +65,7 @@ void run_reco_rich(Int_t nEvents = 500)
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *run= new FairRunAna();
   run->SetInputFile(inFile1);
-  run->AddFriend(inFile2);  
+  run->AddFriend(inFile2);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
 
@@ -87,13 +87,13 @@ void run_reco_rich(Int_t nEvents = 500)
   Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
   Int_t    richDetType = 4;       // Detector type Hamamatsu H8500-03
   Int_t    richNoise   = 220;     // Number of noise points per event
-  CbmRichHitProducer* richHitProd 
-    = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType, 
+  CbmRichHitProducer* richHitProd
+    = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
 			     richNoise, iVerbose);
   run->AddTask(richHitProd);
   //--------------------------------------------------------------------------
 /*
-       
+
   //----------------------RICH Track Extrapolation ---------------------------
   Int_t    richNSts = 4;     // minimum number of STS hits for extrapolation
   Double_t richZPos = 300.;  // z position for extrapolation [cm]
@@ -107,31 +107,27 @@ void run_reco_rich(Int_t nEvents = 500)
 
   //--------------------- Rich Track Projection to photodetector -------------
   Int_t richZFlag = 1;       // Projetion from IM plane (default)
-  CbmRichProjectionProducer* richProj = 
+  CbmRichProjectionProducer* richProj =
   new CbmRichProjectionProducer(iVerbose, richZFlag);
   run->AddTask(richProj);
   //--------------------------------------------------------------------------
-  
-*/  
+
+*/
   //--------------------- RICH Ring Finding ----------------------------------
  // CbmL1RichENNRingFinder* richFinder = new CbmL1RichENNRingFinder(iVerbose);
-  CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose);
+  TString richGeoType = "compact";
+  CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose, richGeoType);
   CbmRichFindRings* richFindRings = new CbmRichFindRings();
   richFindRings->UseFinder(richFinder);
   run->AddTask(richFindRings);
   //--------------------------------------------------------------------------
 
- 
+
   //-------------------- RICH Ring Fitting -----------------------------------
-  // B-field configuration 
-  TString field ="muon";  // choose between "muon" or "active"  
-  Double_t iRingCorr = 0.;      // correction done (default), choose 0 if not
-  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipse(iVerbose, iRingCorr, field);
+  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, 1, richGeoType);
   CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
   run->AddTask(fitRings);
   //--------------------------------------------------------------------------
-
-
 
   // ------------------- RICH Ring matching  ---------------------------------
   CbmRichMatchRings* matchRings = new CbmRichMatchRings(iVerbose);
@@ -149,23 +145,12 @@ void run_reco_rich(Int_t nEvents = 500)
   assignTrack->UseAssign(richAssign);
   run->AddTask(assignTrack);
   // ------------------------------------------------------------------------
-  
 
-  //--------------------- RICH ring selection -------------------------------
-
-  TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
-  richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights_Ellipse1.txt";
- // richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights.txt";
-  CbmRichRingSelectNeuralNet *ringSelectNN 
-    = new CbmRichRingSelectNeuralNet(iVerbose, richSelectNNFile);
-  CbmRichSelectRings* richSelectRingsNN = new CbmRichSelectRings();
-  richSelectRingsNN->UseSelect(ringSelectNN);
-  run->AddTask(richSelectRingsNN);
 
   CbmRichRingQa* richQa   =  new CbmRichRingQa("Qa","qa", 0);
-  run->AddTask(richQa);    
-  
-  
+  run->AddTask(richQa);
+
+
   // ------------------------------------------------------------------------
 
   // ===                 End of RICH local reconstruction                  ===
@@ -189,7 +174,7 @@ void run_reco_rich(Int_t nEvents = 500)
   // ------------------------------------------------------------------------
 
 
-     
+
   // -----   Intialise and run   --------------------------------------------
   run->LoadGeometry();
   run->Init();

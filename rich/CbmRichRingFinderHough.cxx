@@ -130,16 +130,17 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
     for(UInt_t iRing=0; iRing < fFoundRings.size(); iRing++) {
         if (fFoundRings[iRing].GetRecFlag() == -1) continue;
 
-    	new ((*rRingArray)[ringCount]) CbmRichRing();
-        CbmRichRing * r = (CbmRichRing *)rRingArray->At(ringCount);
-        r->SetCenterX(fFoundRings[iRing].GetCenterX());
-        r->SetCenterY(fFoundRings[iRing].GetCenterY());
-        r->SetRadius(fFoundRings[iRing].GetRadius());
-        for (Int_t ith = 0; ith < fFoundRings[iRing].GetNofHits();ith ++){
-            r->AddHit(fFoundRings[iRing].GetHit(ith));
-        }
-    	fFitEllipseTau->DoFit(r);
-    	fANNSelect->DoSelect(r);
+    	new ((*rRingArray)[ringCount]) CbmRichRing(fFoundRings[iRing]);
+//        CbmRichRing * r = (CbmRichRing *)rRingArray->At(ringCount);
+//
+//        r->SetCenterX(fFoundRings[iRing].GetCenterX());
+//        r->SetCenterY(fFoundRings[iRing].GetCenterY());
+//        r->SetRadius(fFoundRings[iRing].GetRadius());
+//        for (Int_t ith = 0; ith < fFoundRings[iRing].GetNofHits();ith ++){
+//            r->AddHit(fFoundRings[iRing].GetHit(ith));
+//        }
+//    	fFitEllipseTau->DoFit(r);
+//    	fANNSelect->DoSelect(r);
         ringCount++;
     }
 

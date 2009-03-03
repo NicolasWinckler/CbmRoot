@@ -120,7 +120,7 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
     std::sort(fData.begin(), fData.end(), CbmRichMyPoint::CmpUp);
     HoughTransformReconstruction();
 
-//    RingSelection();
+    RingSelection();
 
     //FuzzyKE(rHitArray);
 
@@ -554,7 +554,7 @@ void CbmRichRingFinderHough::FindPeak(Int_t indmin, Int_t indmax)
 
 		Double_t dr = fabs(sqrt(rx * rx + ry * ry) - ring1.GetRadius());
 		if (dr < drCOPCut) {
-			fData[j+indmin].fIsUsed = true;
+			//fData[j+indmin].fIsUsed = true;
 			ring2.AddHit(fData[j + indmin].fId);
 		}
 	}
@@ -565,12 +565,12 @@ void CbmRichRingFinderHough::FindPeak(Int_t indmin, Int_t indmax)
 
 	fANNSelect->DoSelect(&ring2);
 	//remove found hits only for good quality rings
-//	if (ring2.GetSelectionNN() > fAnnCut) {
-//		//RemoveHitsAroundRing(indmin, indmax, &ring2);
-//		RemoveHitsAroundEllipse(indmin, indmax, &ring2);
-//
-//		//fFoundRings.push_back(ring2);
-//	}
+	if (ring2.GetSelectionNN() > fAnnCut) {
+		//RemoveHitsAroundRing(indmin, indmax, &ring2);
+		RemoveHitsAroundEllipse(indmin, indmax, &ring2);
+
+		//fFoundRings.push_back(ring2);
+	}
 	fFoundRings.push_back(ring2);
 
 }

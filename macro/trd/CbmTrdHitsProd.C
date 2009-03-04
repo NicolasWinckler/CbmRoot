@@ -46,7 +46,7 @@
     rtdb->setFirstInput(io1);
     //rtdb->setSecondInput(input2);
 
-    CbmTrdHitProducer *hp = new CbmTrdHitProducer("trd","trd task");
+    CbmTrdHitProducerSmearing *hp = new CbmTrdHitProducerSmearing("trd","trd task");
 
     // Set the sigma for the TRD in Xand Y direction - angle dependant
     // default values
@@ -79,8 +79,8 @@
     fRun->AddTask( hp );
 
     // -------- Performance of hit producer ------------
-    CbmTrdHitProducerQa*  trdHitQa =
-        new CbmTrdHitProducerQa("HitProducerPerformance");
+    CbmTrdHitProducerSmearingQa*  trdHitQa =
+        new CbmTrdHitProducerSmearingQa("HitProducerPerformance");
     fRun->AddTask(trdHitQa);
     // -------------------------------------------------
 

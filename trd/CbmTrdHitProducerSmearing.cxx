@@ -1,4 +1,4 @@
-#include "CbmTrdHitProducer.h"
+#include "CbmTrdHitProducerSmearing.h"
 
 #include "CbmGeoTrdPar.h"
 #include "CbmTrdRadiator.h"
@@ -21,7 +21,7 @@ using std::cout;
 using std::endl;
 
 // ---- Default constructor -------------------------------------------
-CbmTrdHitProducer::CbmTrdHitProducer()
+CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing()
     :FairTask("TrdHitProducer")
 	//:fRef(0)
 {
@@ -48,7 +48,7 @@ CbmTrdHitProducer::CbmTrdHitProducer()
 // --------------------------------------------------------------------
 
 // ---- Constructor ----------------------------------------------------
-CbmTrdHitProducer::CbmTrdHitProducer(const char *name, const char *title)
+CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(const char *name, const char *title)
 	:FairTask(name)
 {
     //	cl=0;
@@ -78,7 +78,7 @@ CbmTrdHitProducer::CbmTrdHitProducer(const char *name, const char *title)
 // --------------------------------------------------------------------
 
 // ---- Destructor ----------------------------------------------------
-CbmTrdHitProducer::~CbmTrdHitProducer()
+CbmTrdHitProducerSmearing::~CbmTrdHitProducerSmearing()
 {
     FairRootManager *ioman =FairRootManager::Instance();
     ioman->Write();
@@ -90,7 +90,7 @@ CbmTrdHitProducer::~CbmTrdHitProducer()
 // --------------------------------------------------------------------
 
 // ----  Initialisation  ----------------------------------------------
-void CbmTrdHitProducer::SetParContainers()
+void CbmTrdHitProducerSmearing::SetParContainers()
 {
     cout<<" * HitProducer * :: SetParContainers() "<<endl;
 
@@ -111,7 +111,7 @@ void CbmTrdHitProducer::SetParContainers()
 // --------------------------------------------------------------------
 
 // ---- ReInit  -------------------------------------------------------
-InitStatus CbmTrdHitProducer::ReInit(){
+InitStatus CbmTrdHitProducerSmearing::ReInit(){
 
     //cout<<" * HitProducer * :: ReInit() "<<endl;
 
@@ -126,7 +126,7 @@ InitStatus CbmTrdHitProducer::ReInit(){
 // --------------------------------------------------------------------
 
 // ---- Init ----------------------------------------------------------
-InitStatus CbmTrdHitProducer::Init()
+InitStatus CbmTrdHitProducerSmearing::Init()
 {
 
     cout<<" * HitProducer * :: Init() "<<endl;
@@ -136,7 +136,7 @@ InitStatus CbmTrdHitProducer::Init()
     FairRootManager *ioman = FairRootManager::Instance();
     fTrdPoints=(TClonesArray *)  ioman->ActivateBranch("TRDPoint");
     if ( ! fTrdPoints ) {
-      cout << "-W CbmTrdHitProducer::Init: No TrdPoints array!" << endl;
+      cout << "-W CbmTrdHitProducerSmearing::Init: No TrdPoints array!" << endl;
       cout << "                            Task will be inactive" << endl;
       return kERROR;
     }
@@ -206,7 +206,7 @@ InitStatus CbmTrdHitProducer::Init()
       cout << "***************************************" <<endl;
       cout << "                                       " <<endl;
       cout << " - FATAL ERROR Unknown geometry version" <<endl;
-      cout << "   in CbmTrdHitProducer                " <<endl;
+      cout << "   in CbmTrdHitProducerSmearing                " <<endl;
       cout << "                                       " <<endl;
       cout << "***************************************" <<endl;
       return kFATAL;
@@ -227,7 +227,7 @@ InitStatus CbmTrdHitProducer::Init()
 
 
 // ---- Exec ----------------------------------------------------------
-void CbmTrdHitProducer::Exec(Option_t * option)
+void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 {
 
     // return;
@@ -374,7 +374,7 @@ void CbmTrdHitProducer::Exec(Option_t * option)
 // --------------------------------------------------------------------
 
 // ---- Add Hit to HitCollection --------------------------------------
-void CbmTrdHitProducer::AddHit(TVector3 &posHit, TVector3 &posHitErr,
+void CbmTrdHitProducerSmearing::AddHit(TVector3 &posHit, TVector3 &posHitErr,
 			       Int_t index, Int_t Plane, Int_t ref,
 			       Double_t ELoss, Double_t ELossTR,
 			       Double_t ELossdEdX){
@@ -398,13 +398,13 @@ void CbmTrdHitProducer::AddHit(TVector3 &posHit, TVector3 &posHitErr,
 // --------------------------------------------------------------------
 
 // ---- Finish --------------------------------------------------------
-void CbmTrdHitProducer::Finish()
+void CbmTrdHitProducerSmearing::Finish()
 {
 }
 // --------------------------------------------------------------------
 
 // ---- Register ------------------------------------------------------
-void CbmTrdHitProducer::Register(){
+void CbmTrdHitProducerSmearing::Register(){
 
   FairRootManager::Instance()->Register("TrdHit","Trd", fHitCollection, kTRUE);
 
@@ -412,7 +412,7 @@ void CbmTrdHitProducer::Register(){
 // --------------------------------------------------------------------
 
 // ---- SetNlayer -----------------------------------------------------
-void CbmTrdHitProducer::SetNlayer(Int_t a) 
+void CbmTrdHitProducerSmearing::SetNlayer(Int_t a) 
 {
       if (a == 0) fNlayer = 12;
       else fNlayer = 9;
@@ -420,14 +420,14 @@ void CbmTrdHitProducer::SetNlayer(Int_t a)
 // --------------------------------------------------------------------
 
 // ---- SetSigmaX -----------------------------------------------------
-void CbmTrdHitProducer::SetSigmaX(Double_t sigma[])
+void CbmTrdHitProducerSmearing::SetSigmaX(Double_t sigma[])
 {
       for(Int_t i = 0; i < 3; i++)    fSigmaX[i] = sigma[i];
 }
 // --------------------------------------------------------------------
 
 // ---- SetSigmaY -----------------------------------------------------
-void CbmTrdHitProducer::SetSigmaY(Double_t s1[], Double_t s2[], Double_t s3[])
+void CbmTrdHitProducerSmearing::SetSigmaY(Double_t s1[], Double_t s2[], Double_t s3[])
 {
       for(Int_t i = 0; i < 7; i++)   fSigmaY[0][i] = s1[i];
       for(Int_t j = 0; j < 7; j++)  fSigmaY[1][j] = s2[j];
@@ -436,7 +436,7 @@ void CbmTrdHitProducer::SetSigmaY(Double_t s1[], Double_t s2[], Double_t s3[])
 // --------------------------------------------------------------------
 
 // ---- GetSigmaX -----------------------------------------------------
-Double_t CbmTrdHitProducer::GetSigmaX (Int_t stack)
+Double_t CbmTrdHitProducerSmearing::GetSigmaX (Int_t stack)
 {  
 	if  (stack == 1)    	return fSigmaX[0];
 	else if (stack == 2)    return fSigmaX[1];
@@ -446,7 +446,7 @@ Double_t CbmTrdHitProducer::GetSigmaX (Int_t stack)
 // --------------------------------------------------------------------
 
 // ---- GetSigmaY -----------------------------------------------------
-Double_t CbmTrdHitProducer::GetSigmaY (Double_t teta, Int_t stack ) 
+Double_t CbmTrdHitProducerSmearing::GetSigmaY (Double_t teta, Int_t stack ) 
 { 
     if (teta <= 50)	                 return fSigmaY[stack - 1][0];
     else if(teta > 50 && teta <= 100)    return fSigmaY[stack - 1][1];
@@ -459,4 +459,4 @@ Double_t CbmTrdHitProducer::GetSigmaY (Double_t teta, Int_t stack )
 }
 // --------------------------------------------------------------------
 
-ClassImp(CbmTrdHitProducer)
+ClassImp(CbmTrdHitProducerSmearing)

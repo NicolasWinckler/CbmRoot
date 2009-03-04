@@ -40,7 +40,7 @@ void trd_hits(Int_t nEvents = 500)
 	Int_t trdNFoils    = 130;       // number of polyetylene foils
 	Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
 	Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
-	CbmTrdHitProducer* trdHitProd = new CbmTrdHitProducer("TRD Hitproducer",
+	CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing("TRD Hitproducer",
 														"TRD task");
 	trdHitProd->SetPar(trdNFoils, trdDFoils, trdDGap);
 	trdHitProd->SetSigmaX(trdSigmaX);

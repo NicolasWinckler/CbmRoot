@@ -27,7 +27,7 @@ void draw_diff_el_pi(TH1D* h1, TH1D* h2)
 }
 
 void draw_electrons_qa(){
- 	TFile *file = new TFile("/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.reco.qa.root");
+ 	TFile *file = new TFile("/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0001.reco.qa.root");
 
    gROOT->SetStyle("Plain");
     gStyle->SetPalette(1,0);
@@ -46,6 +46,7 @@ void draw_electrons_qa(){
 	accEff1->SetMarkerSize(2);
 	accEff1->SetMarkerColor(kViolet+2);
 	accEff1->Draw();
+	accEff1->SetMinimum(0.);
     TH1D* accEff2 = divide_hist(fhAccRichTrdGlobal, fhMCRings);
     accEff2->SetLineColor(kRed);
     accEff2->SetMarkerStyle(25);
@@ -81,6 +82,7 @@ void draw_electrons_qa(){
     ringFindEff->SetMarkerSize(2);
     ringFindEff->SetMarkerColor(kViolet+2);
     ringFindEff->Draw();
+    ringFindEff->SetMinimum(0.);
     TH1D* stsRichEff = divide_hist(fhTrueMatchStsRichGlobal, fhAccRings);
     stsRichEff->SetLineColor(kRed);
     stsRichEff->SetMarkerStyle(25);
@@ -123,6 +125,7 @@ void draw_electrons_qa(){
     sprintf(effTxt,"Mean eff. = (%.2f\%)", (Double_t)fhTrueFoundRings->GetEntries()/fhAccRings->GetEntries()*100);
     TText* t1 = new TText(3, 0.7, effTxt);
     t1->Draw();
+    eff1->SetMinimum(0.);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
@@ -130,6 +133,7 @@ void draw_electrons_qa(){
     TH1D* eff2 = divide_hist(fhTrueMatchStsRichGlobal, fhTrueFoundRings);
     eff2->SetTitle("STS+RICH matching efficiency");
     eff2->Draw();
+    eff2->SetMinimum(0.);
     sprintf(effTxt,"Mean eff. = (%.2f\%)", (Double_t)fhTrueMatchStsRichGlobal->GetEntries()/fhTrueFoundRings->GetEntries()*100);
     TText *t2 = new TText(3, 0.8, effTxt);
     t2->Draw();
@@ -143,6 +147,7 @@ void draw_electrons_qa(){
     sprintf(effTxt,"Mean eff. = (%.2f\%)", (Double_t)fhTrueMatchStsRichTrdGlobal->GetEntries()/fhTrueMatchStsRichGlobal->GetEntries()*100);
     TText *t3 = new TText(3, 0.4, effTxt);
     t3->Draw();
+    eff3->SetMinimum(0.);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
@@ -153,6 +158,7 @@ void draw_electrons_qa(){
     sprintf(effTxt,"Mean eff. = (%.2f\%)", (Double_t)fhTrueMatchStsRichTrdTofGlobal->GetEntries()/fhTrueMatchStsRichTrdGlobal->GetEntries()*100);
     TText *t4 = new TText(3, 0.4, effTxt);
     t4->Draw();
+    eff4->SetMinimum(0.);
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 

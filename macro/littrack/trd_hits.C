@@ -29,23 +29,45 @@ void trd_hits(Int_t nEvents = 500)
 	run->SetOutputFile(trdHitsFile);
 	// ------------------------------------------------------------------------
 
-	// -----   TRD hit producer   ----------------------------------------------
-	Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
-	// Resolutions in y - station and angle dependent [mum]
-	Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
-	Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
-	Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
+	// -----   TRD hit producer   --------------------------------------
 
-	// Update of the values for the radiator F.U. 17.08.07
-	Int_t trdNFoils    = 130;       // number of polyetylene foils
-	Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
-	Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
-	CbmTrdHitProducerSmearing* trdHitProd = new CbmTrdHitProducerSmearing("TRD Hitproducer",
-														"TRD task");
-	trdHitProd->SetPar(trdNFoils, trdDFoils, trdDGap);
-	trdHitProd->SetSigmaX(trdSigmaX);
-	trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
-	run->AddTask(trdHitProd);
+        // Update of the values for the radiator F.U. 17.08.07
+        Int_t trdNFoils    = 130;      // number of polyetylene foils
+        Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
+        Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
+        Bool_t simpleTR = kTRUE;       // use fast and simple version for TR
+                                       // production
+        
+        CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,
+                                             trdDFoils, trdDGap);
+        
+        // -----   TRD hit producer   ----------------------------------------------
+        Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
+        // Resolutions in y - station and angle dependent [mum]
+        Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
+        Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
+        Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
+        
+        CbmTrdHitProducerSmearing* trdHitProd = new
+                 CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
+        
+        trdHitProd->SetSigmaX(trdSigmaX);
+        trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
+        
+        run->AddTask(trdHitProd);
+        
+        // -------------------------------------------------------------------------
+        
+        CbmTrdTrackFinder* trdTrackFinder = new CbmTrdTrackFinderIdeal();
+        CbmTrdFindTracks* trdFindTracks = new CbmTrdFindTracks();
+        trdFindTracks->UseFinder(trdTrackFinder);
+        run->AddTask(trdFindTracks);
+        
+        CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
+        run->AddTask(trdMatchTracks);
+        
+        CbmLitPropAna* propAna = new CbmLitPropAna(kTRD, 12);
+        run->AddTask(propAna);
 	// -------------------------------------------------------------------------
 
 	// -----  Parameter database   --------------------------------------------

@@ -49,7 +49,7 @@ public:
     CbmTrdHitProducerSmearing();
 
     /** Standard constructor **/
-    CbmTrdHitProducerSmearing(const char *name, const char *title="CBM Task");
+    CbmTrdHitProducerSmearing(const char *name, const char *title="CBM Task", CbmTrdRadiator *radiator=NULL);
 
     /** Destructor **/
     virtual ~CbmTrdHitProducerSmearing();
@@ -78,28 +78,15 @@ public:
     void SetSigmaX(Double_t sigma[]) ;
     void SetSigmaY(Double_t s1[], Double_t s2[], Double_t s3[]);
 
-    // set the mode of TR computration
-    void SetSimpleTR(Bool_t s) {fSimpleTR = s; }
-
-
     Double_t GetSigmaX (Int_t stack);
     Float_t GetEfficency () { return fEfficency;}
     Double_t GetSigmaY (Double_t teta, Int_t stack );
-
-    void SetPar(Int_t Nfoils, Float_t FoilThick, Float_t GapThick){
-	fNfoils = Nfoils;
-	fFoilThick = FoilThick;
-        fGapThick = GapThick;
-    }
-
 
 private:
 
     TClonesArray *fTrdPoints; //! TRD MC points
     TClonesArray *fHitCollection; //! TRD hits
     TClonesArray *fListStack;         //Tracks
-    //TRefArray *fRef; //!
-
 
     Double_t fDx;               //!
     Double_t fDy;               //!
@@ -114,12 +101,6 @@ private:
     CbmTrdRadiator*  fRadiator; //!
     CbmGeoTrdPar*    fGeoPar;   //!
     FairBaseParSet*    fBasePar; //!
-
-    // for the CbmTrdRadiator
-    Int_t   fNfoils;       //!
-    Float_t fFoilThick;    //!
-    Float_t fGapThick;     //!
-    Bool_t  fSimpleTR;     //! simple or "full" TR computation
 
     // positions of the active volume for given copyes of the chambers
     // temporary solution

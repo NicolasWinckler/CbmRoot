@@ -25,7 +25,8 @@ class CbmTrdRadiator
   CbmTrdRadiator();
 
   /** Constructor **/
-  CbmTrdRadiator(const char *name, const char *title="Cbm Task");
+  CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, 
+                 Float_t GapThick);
 
   /** Destructor **/
    virtual ~CbmTrdRadiator();
@@ -35,6 +36,9 @@ class CbmTrdRadiator
 
   /** Init function **/
    void Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapTick);
+  /** Init function **/
+   void Init();
+
   /** Spectra production **/
    void ProduceSpectra();
 

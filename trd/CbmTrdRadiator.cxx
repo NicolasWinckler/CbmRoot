@@ -44,7 +44,7 @@ CbmTrdRadiator::CbmTrdRadiator(){
 }
 //-----------------------------------------------------------------------------
 // -----  Constructor   --------------------------------------------------
-CbmTrdRadiator::CbmTrdRadiator(const char *name, const char *title){
+CbmTrdRadiator::CbmTrdRadiator(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapThick){
 
   fSpectrum = NULL;
   fMySpectrum = NULL;
@@ -64,6 +64,13 @@ CbmTrdRadiator::CbmTrdRadiator(const char *name, const char *title){
   fFoilThickCorr = 1.0;
   fGapThickCorr = 1.0;
   fGasThickCorr = 1.0;
+
+
+   // Set initial parameters defining the radiator 
+   fNFoils = Nfoils;
+   fGapThick   = GapThick;
+   fFoilThick  = FoilThick;
+   fSimpleTR   = SimpleTR;
 
   CreateHistograms();
 
@@ -124,20 +131,88 @@ void CbmTrdRadiator::CreateHistograms(){
 // ----- Init function ----------------------------------------------------
 void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Float_t GapThick){
 
+   // Set initial parameters defining the radiator 
+   fNFoils = Nfoils;
+   fGapThick   = GapThick;
+   fFoilThick  = FoilThick;
+   fSimpleTR   = SimpleTR;
+
     CreateHistograms();
-
-
-    // Set initial parameters defining the radiator 
-    fNFoils = Nfoils;
-    fGapThick   = GapThick;
-    fFoilThick  = FoilThick;
-    fSimpleTR   = SimpleTR;
 
     cout << "*********** Initilization of Trd Radiator **************"<<endl;
     cout << "Nr. of foils        : "<< Nfoils << endl;
     cout << "Foil thickness      : "<< setprecision(4) << FoilThick <<" cm"<< endl;
     cout << "Gap thickness       : "<< GapThick << " cm"<<endl;
     cout << "Simple TR production: "<< setprecision(2)<< SimpleTR << endl;
+    cout << "************* End of Trd Radiator Init **************"<<endl;
+
+
+    // material dependend parameters for the radiator material 
+    // (polyethylen)
+    fFoilDens   = 0.92;      // [g/cm3 ]
+    fFoilOmega  = 20.9;      //plasma frequency ( from Anton )
+
+    // material dependent parameters for the gas between the foils of the
+    // radiator
+    // changed gap density at 16.04.07 FU
+    // density of air is 0.001205, 0.00186 
+    //fGapDens    = 0.00186;   // [g/cm3]
+    fGapDens    = 0.001205;   // [g/cm3]
+    fGapOmega   = 0.7;       //plasma frequency  ( from Anton )
+
+    // foil between radiator and gas chamber
+    // TODO: implement kapton foil also in trd geometry
+    fMyDens   = 1.39;           //  [g/cm3]
+    fMyThick  = 0.0025;        // [cm]
+
+
+
+    // Get all the gas properties from CbmTrdGas
+    CbmTrdGas *fTrdGas = CbmTrdGas::Instance();
+    if (fTrdGas==0) {
+       fTrdGas = new CbmTrdGas();
+       fTrdGas->Init();
+    }
+
+    fCom2 = fTrdGas->GetNobleGas();
+    fCom1 = fTrdGas->GetCO2();
+    fDetType = fTrdGas->GetDetType();
+    fGasThick = fTrdGas->GetGasThick();
+
+
+    // If simplified version is used one didn't calculate the TR
+    // for each CbmTrdPoint in full glory, but create at startup
+    // some histograms for several momenta which are later used to
+    // get the TR much faster.
+    if(fSimpleTR == kTRUE){
+
+      ProduceSpectra();
+     
+        TFile* f1 = new TFile("histos.root", "recreate");
+
+        for (Int_t i=0 ; i < fNMom; i++){
+          fFinal[i]->Write();
+        }
+        f1->Close();
+        f1->Delete();
+     
+    }
+
+
+
+}
+//----------------------------------------------------------------------------
+
+// ----- Init function ----------------------------------------------------
+void CbmTrdRadiator::Init(){
+
+    CreateHistograms();
+
+    cout << "*********** Initilization of Trd Radiator **************"<<endl;
+    cout << "Nr. of foils        : "<< fNFoils << endl;
+    cout << "Foil thickness      : "<< setprecision(4) << fFoilThick <<" cm"<< endl;
+    cout << "Gap thickness       : "<< fGapThick << " cm"<<endl;
+    cout << "Simple TR production: "<< setprecision(2)<< fSimpleTR << endl;
     cout << "************* End of Trd Radiator Init **************"<<endl;
 
 

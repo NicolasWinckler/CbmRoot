@@ -46,41 +46,35 @@
     rtdb->setFirstInput(io1);
     //rtdb->setSecondInput(input2);
 
-    CbmTrdHitProducerSmearing *hp = new CbmTrdHitProducerSmearing("trd","trd task");
 
-    // Set the sigma for the TRD in Xand Y direction - angle dependant
-    // default values
-    // SigmaX smaller than 200 is not feasible
-    // SigmaY smaller than 1000 is not feasible
-    Double_t SigmaX[] = {300, 400, 500}; // micrometers
-    Double_t SigmaY1[] = {2700, 3700, 15000, 27600, 33000, 33000, 33000 };   // micrometers
-    Double_t SigmaY2[] = {6300, 8300, 33000, 33000, 33000, 33000, 33000 };   // micrometers
-    Double_t SigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000};   // mictcrometers
-
-    // Set the basic parameters of the radiator
-    // Thickness of the gas detector can not be changed - it is fixed in the
-    // geometry file
-    Int_t   Nfoils    = 150;      // number of polyetylene foils,  default = 150
-    Float_t FoilThick = 0.0015;    // thickness of 1 foil [cm], default = 0.0015
-    Float_t GapThick  = 0.020;    // thickness of the gap between the foils [cm], default = 0.020
-
-    hp->SetPar(Nfoils, FoilThick, GapThick);
-    hp->SetSigmaX(SigmaX);
-    hp->SetSigmaY(SigmaY1, SigmaY2, SigmaY3);
-
-    // Set the detailled (per each electron) or simplified TR production
-    // Matters only for pure electron/positron samples
-    // factor in speed ~ 20
-    // differences in dEdX (TR only) < 5 %
-    // kTRUE - siple and fast, kFALSE - slow and 5% more precise
-    hp->SetSimpleTR(kTRUE);  
-
-    // add the task
-    fRun->AddTask( hp );
+     // Update of the values for the radiator F.U. 17.08.07
+     Int_t trdNFoils    = 130;      // number of polyetylene foils
+     Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
+     Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
+     Bool_t simpleTR = kTRUE;       // use fast and simple version for TR
+                                    // production
+   
+     CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,
+                                          trdDFoils, trdDGap);
+   
+     // -----   TRD hit producer   -------------------------------------------
+     Double_t trdSigmaX[] = {300, 400, 500};  // Resolution in x [mum]
+     // Resolutions in y - station and angle dependent [mum]
+     Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
+     Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
+     Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
+   
+     CbmTrdHitProducerSmearing* trdHitProd = new
+              CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
+   
+     trdHitProd->SetSigmaX(trdSigmaX);
+     trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
+   
+     run->AddTask(trdHitProd);
 
     // -------- Performance of hit producer ------------
-    CbmTrdHitProducerSmearingQa*  trdHitQa =
-        new CbmTrdHitProducerSmearingQa("HitProducerPerformance");
+    CbmTrdHitProducerQa*  trdHitQa =
+        new CbmTrdHitProducerQa("HitProducerPerformance");
     fRun->AddTask(trdHitQa);
     // -------------------------------------------------
 

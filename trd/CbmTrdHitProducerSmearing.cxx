@@ -34,10 +34,12 @@ CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing()
 
     // Default values changed since they better describe the spectrum
     // measured in test experiment
+    /*
     fNfoils = 130;
     fFoilThick = 0.0013;
     fGapThick = 0.02;
     fSimpleTR = kTRUE;
+    */
     fEfficency = 1.;
 
     fRadiator = NULL; //new CbmTrdRadiator();
@@ -48,7 +50,7 @@ CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing()
 // --------------------------------------------------------------------
 
 // ---- Constructor ----------------------------------------------------
-CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(const char *name, const char *title)
+CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(const char *name, const char *title, CbmTrdRadiator *radiator)
 	:FairTask(name)
 {
     //	cl=0;
@@ -58,10 +60,12 @@ CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(const char *name, const cha
 
     // Default values changed since they better describe the spectrum
     // measured in test experiment
+    /*
     fNfoils = 130;
     fFoilThick = 0.0013;
     fGapThick = 0.02;
     fSimpleTR = kTRUE;
+    */
     fEfficency = 1.;
 
     fHitCollection = new TClonesArray("CbmTrdHit");
@@ -70,7 +74,7 @@ CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(const char *name, const cha
     fNlayer = 0;
 
 
-    fRadiator = NULL; //new CbmTrdRadiator();
+    fRadiator = radiator; //new CbmTrdRadiator();
     fGeoPar = NULL;
 
     fNHits=0;
@@ -131,7 +135,7 @@ InitStatus CbmTrdHitProducerSmearing::Init()
 
     cout<<" * HitProducer * :: Init() "<<endl;
 
-    fRadiator = new CbmTrdRadiator();
+    //    fRadiator = new CbmTrdRadiator();
 
     FairRootManager *ioman = FairRootManager::Instance();
     fTrdPoints=(TClonesArray *)  ioman->ActivateBranch("TRDPoint");
@@ -218,7 +222,8 @@ InitStatus CbmTrdHitProducerSmearing::Init()
     // Init the computation of the TR spectra
     // '0.0' stands for the momentum
 
-    fRadiator->Init(fSimpleTR, fNfoils, fFoilThick, fGapThick);
+    //    fRadiator->Init(fSimpleTR, fNfoils, fFoilThick, fGapThick);
+    fRadiator->Init();
 
     return kSUCCESS;
 

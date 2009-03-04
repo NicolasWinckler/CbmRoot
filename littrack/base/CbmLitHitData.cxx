@@ -32,9 +32,9 @@ void CbmLitHitData::SetDetectorLayout(
 			fMaxErr[i][j].resize(nofSubstations);
 			for(Int_t k = 0; k < nofSubstations; k++) {
 				fHits[i][j][k].reserve(1500);
-			}			
+			}
 		}
-	}	
+	}
 }
 
 void CbmLitHitData::AddHit(
@@ -44,7 +44,7 @@ void CbmLitHitData::AddHit(
 		CbmLitHit* hit)
 {
 	fHits[stationGroup][station][substation].push_back(hit);
-	
+
 	if (hit->GetType() == kLITSTRIPHIT) {
 		CbmLitStripHit* stripHit = static_cast<const CbmLitStripHit*>(hit);
 		if (fMaxErr[stationGroup][station][substation].first < stripHit->GetDu())
@@ -65,7 +65,7 @@ void CbmLitHitData::AddHit(
 	Int_t substation;
 	StationByPlaneId(planeId, stationGroup, station, substation);
 	AddHit(stationGroup, station, substation, hit);
-//	std::cout << "AddHit planeId=" << planeId << " stationGroup=" << stationGroup 
+//	std::cout << "AddHit planeId=" << planeId << " stationGroup=" << stationGroup
 //		<< " station=" << station << " substation=" << substation << std::endl;
 }
 
@@ -95,8 +95,8 @@ HitPtrIteratorPair CbmLitHitData::GetHits(
 		Int_t substation)
 {
 	return HitPtrIteratorPair(
-			fHits[stationGroup][station][substation].begin(), 
-			fHits[stationGroup][station][substation].end()); 
+			fHits[stationGroup][station][substation].begin(),
+			fHits[stationGroup][station][substation].end());
 }
 
 HitPtrIteratorPair CbmLitHitData::GetHits(
@@ -125,12 +125,12 @@ void CbmLitHitData::Clear()
 				fHits[i][j][k].clear();
 				fHits[i][j][k].reserve(1500);
 				fMaxErr[i][j][k] = std::pair<Double_t, Char_t>(0., ' ');
-			}			
+			}
 		}
 	}
 }
 
-std::string CbmLitHitData::ToString() const 
+std::string CbmLitHitData::ToString() const
 {
 	std::stringstream ss;
 	ss << "HitData:" << std::endl;
@@ -139,9 +139,9 @@ std::string CbmLitHitData::ToString() const
 		for(Int_t j = 0; j < fHits[i].size(); j++) {
 			ss << "  station " << j << std::endl;
 			for(Int_t k = 0; k < fHits[i][j].size(); k++){
-				ss << "   substation " << k << ": " << GetNofHits(i, j, k) << " hits, " 
+				ss << "   substation " << k << ": " << GetNofHits(i, j, k) << " hits, "
 					<< "max err=(" << GetMaxErr(i, j, k).first << "," << GetMaxErr(i, j, k).second
-					<< ")" << std::endl; 
+					<< ")" << std::endl;
 			}
 		}
 	}
@@ -161,11 +161,11 @@ void CbmLitHitData::StationByPlaneId(
 			if (counter > planeId) {
 				stationGroup = i;
 				station = j;
-				substation = fHits[i][j].size() - (counter - planeId); 
+				substation = fHits[i][j].size() - (counter - planeId);
 				return;
-			}		
+			}
 		}
-	}	
+	}
 }
 
 std::pair<Double_t, Char_t> CbmLitHitData::GetMaxErr(

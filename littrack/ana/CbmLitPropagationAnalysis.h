@@ -29,7 +29,7 @@ public:
 	virtual InitStatus Init();
 	virtual void Exec(
 			Option_t* opt);
-	virtual void Finish();
+	virtual void FinishTask();
 	virtual void SetParContainers();
 
 private:

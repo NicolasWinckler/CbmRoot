@@ -33,8 +33,8 @@ void CbmLitMuchTrackFinderNN::Init()
 	fNofIter = 1;
 	fUseFastSearch = true;
 	fMaxNofMissingHits = 1;
-	fSigmaCoef = 3.;
-	fChiSqPixelHitCut = 12.;
+	fSigmaCoef = 3.5;
+	fChiSqPixelHitCut = 13.86;
 	fChiSqStripHitCut = 4.;
 	fPDG = 13;
 }

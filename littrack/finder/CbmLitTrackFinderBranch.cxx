@@ -15,7 +15,7 @@
 
 CbmLitTrackFinderBranch::CbmLitTrackFinderBranch()
 {
-	fMaxNofBranches = 24;
+	fMaxNofBranches = 32;
 }
 
 CbmLitTrackFinderBranch::~CbmLitTrackFinderBranch()

@@ -10,12 +10,14 @@
 
 #include "CbmMuchTrack.h"
 #include "CbmMuchHit.h"
+#include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 #include "CbmStsTrack.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "CbmMuchTrackMatch.h"
+#include "CbmTrdTrackMatch.h"
 #include "CbmGeoMuchPar.h"
 #include "FairMCPoint.h"
 #include "CbmMuchDigiMatch.h"
@@ -67,7 +69,7 @@ InitStatus CbmLitRobustFitterAnalysis::Init()
 	if (fDetId == kMUCH) fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
 	if (fDetId == kTRD) fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
 	fNofPlanes = fLayout.GetNofPlanes();
-	fNofPlanes = 13;
+	fNofPlanes = 26;
 	fNofVars = 2;
 	fNofParams = 15;
 //	fNof1DParams = 5;
@@ -90,13 +92,15 @@ void CbmLitRobustFitterAnalysis::Exec(
 {
 	CreateTrackArrays();
 
-	MatchTracks(fLitTracks[0], fLitTrackMatches[0]);
+	if(fDetId == kMUCH)	MatchTracks(fLitTracks[0], fLitMuchTrackMatches[0]);
+	if(fDetId == kTRD)	MatchTracks(fLitTracks[0], fLitTrdTrackMatches[0]);
 	std::cout << "MatchTracks finished" << std::endl;
 	FillHistograms(0);
 	std::cout << "FillHistograms(0) finished" << std::endl;
 
 	TestFitter(1);
-	MatchTracks(fLitTracks[1], fLitTrackMatches[1]);
+	if(fDetId == kMUCH)	MatchTracks(fLitTracks[1], fLitMuchTrackMatches[1]);
+	if(fDetId == kTRD)	MatchTracks(fLitTracks[1], fLitTrdTrackMatches[1]);
 	FillHistograms(1);
 
 	DeleteTrackArrays();
@@ -109,12 +113,19 @@ void CbmLitRobustFitterAnalysis::FillHistograms(
 	for(Int_t i = 0; i < fLitTracks[id].size(); i++) {
 		CbmLitTrack* track = fLitTracks[id][i];
 		if (track->GetQuality() == kLITBAD) continue;
-		if (track->GetLastPlaneId() < 20) continue;
-		if (track->GetNofHits() < 11) continue;
+		if (track->GetLastPlaneId() < 5) continue;
+//		if (track->GetNofHits() < 10 && track->GetNofHits() > 20) continue;
 		//if (track->GetChi2()/track->GetNDF() > 5) continue;
-		CbmMuchTrackMatch* trackMatch = fLitTrackMatches[id][i];
-		Int_t nofTrue = trackMatch->GetNofTrueHits();
-		Int_t nofFalse = trackMatch->GetNofWrongHits() + trackMatch->GetNofFakeHits();
+		Int_t nofTrue, nofFalse;
+		if (fDetId == kMUCH) {
+			CbmMuchTrackMatch* trackMatch = fLitMuchTrackMatches[id][i];
+			nofTrue = trackMatch->GetNofTrueHits();
+			nofFalse = trackMatch->GetNofWrongHits() + trackMatch->GetNofFakeHits();
+		} else {
+			CbmTrdTrackMatch* trackMatch = fLitTrdTrackMatches[id][i];
+			nofTrue = trackMatch->GetNofTrueHits();
+			nofFalse = trackMatch->GetNofWrongHits() + trackMatch->GetNofFakeHits();
+		}
 		Int_t nofHits = track->GetNofHits();
 		Double_t ratio = (Double_t) nofTrue/ (Double_t)nofHits;
 		Bool_t isGhost = (ratio < 0.7);
@@ -123,6 +134,8 @@ void CbmLitRobustFitterAnalysis::FillHistograms(
 		for (Int_t j = 0; j < bounds.size(); j++){
 			Int_t nofHits = bounds[j].second - bounds[j].first;
 			Int_t planeId = ((*bounds[j].first)->GetPlaneId());
+			TH2* hist = (TH2*)fHistoList->FindObject("hPlaneNofHits_0");
+			hist->Fill(planeId, nofHits);
 			fhPlaneNofHits[id]->Fill(planeId, nofHits);
 			fhNofHitsInPlane[id]->Fill(nofHits);
 		}
@@ -158,7 +171,8 @@ void CbmLitRobustFitterAnalysis::TestFitter(
 void CbmLitRobustFitterAnalysis::CreateTrackArrays()
 {
 	fLitTracks.resize(2);
-	fLitTrackMatches.resize(2);
+	fLitMuchTrackMatches.resize(2);
+	fLitTrdTrackMatches.resize(2);
 	Int_t nofTracks = fTracks->GetEntriesFast();
 	for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
 		if (fDetId == kMUCH) {
@@ -229,14 +243,48 @@ void CbmLitRobustFitterAnalysis::MatchTracks(
 	} // Track loop
 }
 
+void CbmLitRobustFitterAnalysis::MatchTracks(
+		TrackPtrVector& tracks,
+		std::vector<CbmTrdTrackMatch*>& matches)
+{
+	for (TrackPtrIterator it = tracks.begin(); it < tracks.end(); it++) {
+		std::map<Int_t, Int_t> matchMap;
+		Int_t nofHits = (*it)->GetNofHits();
+		for (Int_t iHit = 0; iHit < nofHits; iHit++) {
+			CbmTrdHit* hit = (CbmTrdHit*) fHits->At((*it)->GetHit(iHit)->GetRefId());
+			Int_t iPoint = hit->GetRefIndex();
+			if (iPoint < 0) {
+				matchMap[-1]++;
+				continue;
+			}
+			FairMCPoint* point = (FairMCPoint*) fPoints->At(iPoint);
+			matchMap[point->GetTrackID()]++;
+	    }
+		Int_t nofTrue = 0;
+		Int_t bestMcTrackId = -1;
+		for (std::map<Int_t, Int_t>::iterator it = matchMap.begin(); it!=matchMap.end(); it++) {
+			if (it->first != -1 && it->second > nofTrue) {
+			   bestMcTrackId = it->first;
+			   nofTrue = it->second;
+			}
+		}
+		Int_t nofFake = 0;
+		Int_t nofWrong = nofHits - nofTrue - nofFake;
+		Int_t nofMcTracks = matchMap.size() - 1;
+
+		matches.push_back(new CbmTrdTrackMatch(bestMcTrackId, nofTrue, nofWrong, nofFake, nofMcTracks));
+
+	} // Track loop
+}
+
 void CbmLitRobustFitterAnalysis::DeleteTrackArrays()
 {
 	for (Int_t i = 0; i < fNofVars; i++) {
 		for_each(fLitTracks[i].begin(), fLitTracks[i].end(), DeleteObject());
-		for_each(fLitTrackMatches[i].begin(), fLitTrackMatches[i].end(), DeleteObject());
+		for_each(fLitMuchTrackMatches[i].begin(), fLitMuchTrackMatches[i].end(), DeleteObject());
 	//	for_each(fLitMcTracks.begin(), fLitMcTracks.end(), DeleteObject());
 		fLitTracks[i].clear();
-		fLitTrackMatches[i].clear();
+		fLitMuchTrackMatches[i].clear();
 	//	fLitMcTracks.clear();
 	}
 }
@@ -298,7 +346,7 @@ void CbmLitRobustFitterAnalysis::CreateHistograms()
 			"nof hits vs. plane", "nof hits vs. last plane id", "nof hits in plane", "true hits ration in track",
 			"nof hits in track", "nof true hits in track", "nof false hits in track",
 			"nof hits in true track", "number of hits in false track",
-			"last plane id for track", "last plane id for true track", "last plane id for ghost track"
+			"last plane id for track", "last plane id for true track", "last plane id for ghost track",
 			"chi square of the track", "chi square of the true track", "chi square of the ghost track"};
 	fhPlaneNofHits.resize(fNofVars);
 	fhLastPlaneIdNofHits.resize(fNofVars);
@@ -321,8 +369,10 @@ void CbmLitRobustFitterAnalysis::CreateHistograms()
 
 	for (Int_t v = 0; v < fNofVars; v++) {
 		std::stringstream histName[fNofParams];
-		for (Int_t j = 0; j < fNofParams; j++)
+		for (Int_t j = 0; j < fNofParams; j++) {
 			histName[j] << names[j] << "_" << v;
+			std::cout << titles[j] << std::endl;
+		}
 
 		fhPlaneNofHits[v] = new TH2D(histName[0].str().c_str(), titles[0].c_str(),
 				nofBinsNofPlanes, minNofPlanes, maxNofPlanes, nofBinsNofHits, minNofHits, maxNofHits);
@@ -370,7 +420,6 @@ void CbmLitRobustFitterAnalysis::CreateHistograms()
 		fHistoList->Add(fhTrueTrackChiSq[v]);
 		fHistoList->Add(fhGhostTrackChiSq[v]);
 
-
 //		fh1DHistos[v].resize(fNof1DParams);
 //		for (Int_t j = 0; j < fNof1DParams; j++){
 //			std::stringstream histName;
@@ -414,8 +463,8 @@ void CbmLitRobustFitterAnalysis::ReadDataBranches()
 	   if (!fTrackMatches) Fatal("Init", "No MuchTrackMatch array!");
 	} else
 	if (fDetId == kTRD) {
-//	   fMCPoints  = (TClonesArray*) ioman->GetObject("TRDPoint");
-//	   if (!fMCPoints) Fatal("Init", "No TRDPoint array!");
+	   fPoints  = (TClonesArray*) ioman->GetObject("TRDPoint");
+	   if (!fPoints) Fatal("Init", "No TRDPoint array!");
 	   fHits = (TClonesArray*) ioman->GetObject("TRDHit");
 	   if (!fHits) Fatal("Init", "No TRDHit array!");
 	   fTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
@@ -427,7 +476,7 @@ void CbmLitRobustFitterAnalysis::ReadDataBranches()
 	}
 }
 
-void CbmLitRobustFitterAnalysis::Finish()
+void CbmLitRobustFitterAnalysis::FinishTask()
 {
 //	for (Int_t v = 0; v < fNofVars; v++) {
 //		for (Int_t j = 0; j < fNof1DParams; j++)

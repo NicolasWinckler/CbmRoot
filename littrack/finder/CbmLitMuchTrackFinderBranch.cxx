@@ -43,8 +43,6 @@ void CbmLitMuchTrackFinderBranch::Init()
 	fFinalPreSelection = factory->CreateTrackSelection("empty");
 	fFitter = factory->CreateTrackFitter("lit_kalman");
 
-//	TrackExtrapolatorPtr ptr = factory->CreateTrackExtrapolator();
-
 	fVerbose = 1;
 	fNofIter = 1;
 	fBeginStationGroup = 0;

@@ -10,6 +10,7 @@
 
 class CbmLitTrack;
 class CbmMuchTrackMatch;
+class CbmTrdTrackMatch;
 class TList;
 class TH1D;
 class TH2D;
@@ -24,7 +25,7 @@ public:
 	virtual InitStatus Init();
 	virtual void Exec(
 			Option_t* opt);
-	virtual void Finish();
+	virtual void FinishTask();
 	virtual void SetParContainers();
 
 protected:
@@ -42,13 +43,16 @@ protected:
 	void MatchTracks(
 			TrackPtrVector& tracks,
 			std::vector<CbmMuchTrackMatch*>& matches);
-
+	void MatchTracks(
+			TrackPtrVector& tracks,
+			std::vector<CbmTrdTrackMatch*>& matches);
 private:
 	CbmLitDetectorLayout fLayout;
 	DetectorId fDetId;
 	Int_t fNofVars;
 	std::vector<TrackPtrVector> fLitTracks;
-	std::vector<std::vector<CbmMuchTrackMatch*> > fLitTrackMatches;
+	std::vector<std::vector<CbmMuchTrackMatch*> > fLitMuchTrackMatches;
+	std::vector<std::vector<CbmTrdTrackMatch*> > fLitTrdTrackMatches;
 
 	Int_t fNofPlanes;
 
@@ -90,6 +94,7 @@ private:
 	std::vector<TH1D*> fhTrackChiSq;
 	std::vector<TH1D*> fhTrueTrackChiSq;
 	std::vector<TH1D*> fhGhostTrackChiSq;
+
 
 
 	Int_t fEvents;

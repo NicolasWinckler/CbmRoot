@@ -203,6 +203,7 @@ void CbmLitConverter::TrdTrackToLitTrack(
 	litTrack->SetChi2(trdTrack->GetChi2());
 	litTrack->SetNDF(trdTrack->GetNDF());
 	litTrack->SetPreviousTrackId(trdTrack->GetStsTrackIndex());
+	litTrack->SetLastPlaneId(trdTrack->GetFlag());
 	CbmLitTrackParam paramFirst, paramLast;
 	//TODO remove this const typecasting
 	CbmLitConverter::TrackParamToLitTrackParam((const_cast<CbmTrdTrack*> (trdTrack))->GetParamFirst(), &paramFirst);
@@ -222,7 +223,7 @@ void CbmLitConverter::LitTrackToTrdTrack(
 	}
 
 	trdTrack->SortHits();
-	trdTrack->SetFlag(litTrack->GetQuality());
+	trdTrack->SetFlag(litTrack->GetLastPlaneId());
 	trdTrack->SetChi2(litTrack->GetChi2());
 	trdTrack->SetNDF(litTrack->GetNDF());
 	trdTrack->SetStsTrackIndex(litTrack->GetPreviousTrackId());

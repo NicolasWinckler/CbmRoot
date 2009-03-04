@@ -78,7 +78,7 @@ InitStatus CbmLitPropagationAnalysis::Init()
 	if (fDetId == kMUCH) fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
 	if (fDetId == kTRD) fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
 	fNofPlanes = fLayout.GetNofPlanes();
-	fNofPlanes = 12;
+	fNofPlanes = 18;
 	fNofParams = 12;
 
 	CreateHistograms();
@@ -414,7 +414,7 @@ void CbmLitPropagationAnalysis::ReadDataBranches()
 	}
 }
 
-void CbmLitPropagationAnalysis::Finish()
+void CbmLitPropagationAnalysis::FinishTask()
 {
 	for(Int_t i = 0; i < fNofPlanes; i++) {
 		for(Int_t j = 0; j < fNofParams; j++) {

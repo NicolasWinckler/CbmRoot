@@ -50,7 +50,7 @@ CbmTrdSetTracksPidANN.cxx
 CbmTrdCreatePidLike.cxx 
 CbmTrdTracksPidQa.cxx
 CbmTrdGas.cxx
-CbmTrdDigitizer.cxx
+#CbmTrdDigitizer.cxx
 #CbmTrdDigi.cxx
 #CbmTrdDigiPar.cxx
 #CbmTrdDigiMatch.cxx

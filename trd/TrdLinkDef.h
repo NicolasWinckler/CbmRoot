@@ -8,7 +8,7 @@
  
 #pragma link C++ class  CbmTrd+;
 #pragma link C++ class  CbmTrdHitProducerIdeal+;
-#pragma link C++ class  CbmTrdHitProducer+;
+#pragma link C++ class  CbmTrdHitProducerSmearing+;
 #pragma link C++ class  CbmTrdHitProducerQa+;
 #pragma link C++ class  CbmTrdFindTracks+;
 #pragma link C++ class  CbmTrdFindTracksQa+;
@@ -29,5 +29,11 @@
 #pragma link C++ class  CbmTrdCreatePidLike+;
 #pragma link C++ class  CbmTrdTracksPidQa+;
 #pragma link C++ class  CbmTrdGas+;
-//#pragma link C++ class  CbmTrdDigitizer+;
+#pragma link C++ class  CbmTrdDigitizer+;
+#pragma link C++ class  CbmTrdDigi+;
+#pragma link C++ class  CbmTrdDigiMatch+;
+#pragma link C++ class  CbmTrdStringToken+;
+#pragma link C++ class  CbmTrdModule+;
+#pragma link C++ class  CbmTrdCreateDigiPar+;
+#pragma link C++ class  CbmTrdDigiPar+;
 #endif

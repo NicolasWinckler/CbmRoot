@@ -63,7 +63,7 @@ CbmMuchFindHits::CbmMuchFindHits() : FairTask("MuchFindHits", 1) {
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchFindHits::CbmMuchFindHits(Int_t iVerbose) 
+CbmMuchFindHits::CbmMuchFindHits(Int_t iVerbose)
   : FairTask("MuchFindHits", iVerbose) {
   fGeoPar  = NULL;
   fDigiPar = NULL;
@@ -79,7 +79,7 @@ CbmMuchFindHits::CbmMuchFindHits(Int_t iVerbose)
 
 
 // -----   Constructor with name   -----------------------------------------
-CbmMuchFindHits::CbmMuchFindHits(const char* name, Int_t iVerbose) 
+CbmMuchFindHits::CbmMuchFindHits(const char* name, Int_t iVerbose)
   : FairTask(name, iVerbose) {
   fGeoPar  = NULL;
   fDigiPar = NULL;
@@ -119,9 +119,9 @@ void CbmMuchFindHits::ExecSimple(Bool_t &warn){
       CbmMuchSector* sector = station->GetSector(iSector);
       set <Int_t> digiSet;
       if ( fDigiMap.find(sector) == fDigiMap.end() ) {
-	      cout << "-E- " << fName << "::Exec: sector " 
-	           << sector->GetSectorNr() << " of station " 
-	           << station->GetStationNr() << "not found in front map!" 
+	      cout << "-E- " << fName << "::Exec: sector "
+	           << sector->GetSectorNr() << " of station "
+	           << station->GetStationNr() << "not found in front map!"
 	           << endl;
 	      warn = kTRUE;
 	      continue;
@@ -130,14 +130,14 @@ void CbmMuchFindHits::ExecSimple(Bool_t &warn){
 
       Int_t nDigisInSector = digiSet.size();
       Int_t nHitsInSector   = FindHits(station, sector, digiSet);
-      if ( fVerbose > 2 ) cout << "Sector " << sector->GetSectorNr() 
-			       << ", Digis " << nDigisInSector 
+      if ( fVerbose > 2 ) cout << "Sector " << sector->GetSectorNr()
+			       << ", Digis " << nDigisInSector
 			       << ", Hits " << nHitsInSector << endl;
       nHitsInStation   += nHitsInSector;
       nDigisInStation += nDigisInSector;
     }      // Sector loop
 
-    if ( fVerbose > 1 ) cout << "Total for station " 
+    if ( fVerbose > 1 ) cout << "Total for station "
 			     << station->GetStationNr() << ": Digis "
 			     << nDigisInStation << ", hits "
 			     << nHitsInStation << endl;
@@ -150,7 +150,7 @@ void CbmMuchFindHits::ExecClusters(){
    Int_t nHits = 0;
    // Find primary clusters
    FindClusters();
-   
+
    Int_t nSecClusters = 0;
    // Find secondary clusters
    Int_t nClusters = fPrimaryClusters->GetEntriesFast();
@@ -161,7 +161,7 @@ void CbmMuchFindHits::ExecClusters(){
       nSecClusters += secondaryClusters.size();
 
       // Produce hits from secondary clusters
-      for(vector<CbmMuchCluster*>::iterator it = secondaryClusters.begin(); 
+      for(vector<CbmMuchCluster*>::iterator it = secondaryClusters.begin();
           it != secondaryClusters.end(); it++){
              CbmMuchCluster* secCluster = (*it);
              Double_t x, y, z;
@@ -190,19 +190,19 @@ void CbmMuchFindHits::ExecClusters(){
              vX  = dx;
              vY  = dy;
              vXY = 0.;
-    
+
              // Transform variances into global c.s.
              Int_t stationNr = pad->GetStationNr();
              CbmMuchStation* station = fDigiScheme->GetStationByNr(stationNr);
              if(!station) continue;
              Double_t sinrot = station->GetSinRot();
              Double_t cosrot = station->GetCosRot();
-             Double_t wX  = vX * vX  * cosrot * cosrot 
+             Double_t wX  = vX * vX  * cosrot * cosrot
                           - 2. * vXY * cosrot * sinrot
                           + vY * vY  * sinrot * sinrot;
              Double_t wY  = vX * vX  * sinrot * sinrot
                           + 2. * vXY * cosrot * sinrot
-                          + vY * vY  * cosrot * cosrot; 
+                          + vY * vY  * cosrot * cosrot;
              Double_t wXY = (vX*vX - vY*vY) * cosrot * sinrot
                           + vXY * ( cosrot*cosrot - sinrot*sinrot );
              Double_t sigmaX = TMath::Sqrt(wX);
@@ -251,7 +251,7 @@ void CbmMuchFindHits::Exec(Option_t* opt) {
   //AZ Hit producer for straw tubes
   Int_t statNr = fDigiScheme->GetNStations() + 1;
   TObjArray* sensNodes = fGeoPar->GetGeoSensitiveNodes();
-  TString statName = Form("muchstation%02iL#1",statNr); 
+  TString statName = Form("muchstation%02iL#1",statNr);
   FairGeoNode* geoStat = (FairGeoNode*) (sensNodes->FindObject(statName));
   if (geoStat) ExecStraws(statNr); // straws
   //AZ
@@ -268,15 +268,15 @@ void CbmMuchFindHits::Exec(Option_t* opt) {
   else {
     if ( warn ) cout << "- ";
     else        cout << "+ ";
-    cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8) 
-	 << fixed << right << fTimer.RealTime() 
-	 << " s, digis " << fDigis->GetEntriesFast() << ", hits: " 
+    cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
+	 << fixed << right << fTimer.RealTime()
+	 << " s, digis " << fDigis->GetEntriesFast() << ", hits: "
 	 << fHits->GetEntriesFast() << endl;
   }
 }
 // -------------------------------------------------------------------------
 
-    
+
 
 
 // -----   Private method SetParContainers   -------------------------------
@@ -363,10 +363,10 @@ InitStatus CbmMuchFindHits::ReInit() {
   if      (fVerbose >= 1) fDigiScheme->Print();
   cout << "-I- " << fName << "::Init: "
        << "MUCH digitization scheme succesfully reinitialised" << endl;
-  cout << "    Stations: " << fDigiScheme->GetNStations() 
-       << ", Sectors: " << fDigiScheme->GetNSectors() << ", Channels: " 
+  cout << "    Stations: " << fDigiScheme->GetNStations()
+       << ", Sectors: " << fDigiScheme->GetNSectors() << ", Channels: "
        << fDigiScheme->GetNChannels() << endl;
-  
+
   return kSUCCESS;
 }
 // -------------------------------------------------------------------------
@@ -421,7 +421,7 @@ void CbmMuchFindHits::SortDigis() {
     if (sector == 0x0) continue; //AZ - to allow straws
     if ( fDigiMap.find(sector) == fDigiMap.end() ) {
       cerr << "-E- " << fName << "::SortDigis:: sector " << sectorNr
-	   << " of station " << stationNr 
+	   << " of station " << stationNr
 	   << " not found in digi scheme (F)!" << endl;
       Fatal("STOP", "STOP");
       continue;
@@ -498,7 +498,7 @@ void CbmMuchFindHits::CreateCluster(Int_t iDigi, vector<Int_t> &digiIndices, Int
       pair<Int_t, Int_t> channelId = (*it).first;
       CbmMuchPad* neighbourPad = (*it).second;
       if(fChannelDigiMap.find(channelId) == fChannelDigiMap.end()) continue;
-      
+
       Int_t digiIndex = fChannelDigiMap[channelId];
       CbmMuchDigi* neighbourDigi = (CbmMuchDigi*)fDigis->At(digiIndex);
       if(!neighbourDigi) continue;
@@ -555,7 +555,7 @@ CbmMuchPad* CbmMuchFindHits::GetPadByDigi(Int_t digiIndex, Int_t &charge){
 
 // -----   Private method FindHits   ---------------------------------------
 Int_t CbmMuchFindHits::FindHits(CbmMuchStation* station,
-				CbmMuchSector* sector, 
+				CbmMuchSector* sector,
 				set<Int_t>& digiSet) {
 
   // Counter
@@ -592,14 +592,14 @@ Int_t CbmMuchFindHits::FindHits(CbmMuchStation* station,
 	 << iType << endl;
     return 0;
   }
-    
+
   // Transform variances into global c.s.
-  Double_t wX  = vX * vX  * cosrot * cosrot 
+  Double_t wX  = vX * vX  * cosrot * cosrot
     - 2. * vXY * cosrot * sinrot
     + vY * vY  * sinrot * sinrot;
   Double_t wY  = vX * vX  * sinrot * sinrot
     + 2. * vXY * cosrot * sinrot
-    + vY * vY  * cosrot * cosrot; 
+    + vY * vY  * cosrot * cosrot;
   Double_t wXY = (vX*vX - vY*vY) * cosrot * sinrot
     + vXY * ( cosrot*cosrot - sinrot*sinrot );
   Double_t sigmaX = TMath::Sqrt(wX);
@@ -633,7 +633,7 @@ Int_t CbmMuchFindHits::FindHits(CbmMuchStation* station,
     iCol  = iChan - iRow * nColumns;
     xint = ( Double_t(iCol) + 0.5 ) * dx;
     yint = ( Double_t(iRow) + 0.5 ) * dy;
-      
+
     // Translation to centre of sector
     xint = xint - lx/2.;
     yint = yint - ly/2.;
@@ -654,7 +654,7 @@ Int_t CbmMuchFindHits::FindHits(CbmMuchStation* station,
 //    Int_t sysId = muchHit->GetSystemId();
 //    cout << "systemId = " << sysId << endl;
     nNew++;
-    if ( fVerbose > 3 ) cout << "New MuchHit at (" << x << ", " << y 
+    if ( fVerbose > 3 ) cout << "New MuchHit at (" << x << ", " << y
 			     << ", " << z << "), station " << stationNr
 			     << ", sector " << sectorNr << ", channel "
 			     << iChan << endl;
@@ -667,7 +667,7 @@ Int_t CbmMuchFindHits::FindHits(CbmMuchStation* station,
 // -------------------------------------------------------------------------
 
 //AZ ---------   Private method ExecStraws   -------------------------------
-void CbmMuchFindHits::ExecStraws(Int_t begStation) 
+void CbmMuchFindHits::ExecStraws(Int_t begStation)
 {
   // Make hits in straw tubes
 
@@ -693,10 +693,10 @@ void CbmMuchFindHits::ExecStraws(Int_t begStation)
       rotMatr[i].invert();
       rotMatr[i].print();
     }
-    // Get inner radia 
+    // Get inner radia
     TObjArray* sensNodes = fGeoPar->GetGeoSensitiveNodes();
     for (Int_t i = 0; i < 3; ++i) {
-      TString statName = Form("muchstation%02iL#1",begStation+3*i); 
+      TString statName = Form("muchstation%02iL#1",begStation+3*i);
       FairGeoNode *node = (FairGeoNode*) sensNodes->FindObject(statName);
       TArrayD *pars = node->getParameters();
       //cout << pars->At(4) << endl;
@@ -713,7 +713,7 @@ void CbmMuchFindHits::ExecStraws(Int_t begStation)
     Int_t signs = digi->GetUniqueID();
     for (Int_t i = 0; i < 3; ++i) {
       xyz[i] = digi->GetTimes()[i];
-      if (signs & (1<<i)) xyz[i] = -xyz[i]; 
+      if (signs & (1<<i)) xyz[i] = -xyz[i];
       //cout << xyz[i] << " ";
       //if (i == 2) cout << endl;
     }
@@ -725,10 +725,10 @@ void CbmMuchFindHits::ExecStraws(Int_t begStation)
     FairGeoVector p(xyz[0], xyz[1], xyz[2]);
     FairGeoVector ploc = rotMatr[rot] * p;
     Double_t xloc = ploc.getX();
-    if (layer % 2 != 0) xloc += diam[station3] / 2.; // half-tube shift 
+    if (layer % 2 != 0) xloc += diam[station3] / 2.; // half-tube shift
     Int_t itube = (Int_t) (xloc / diam[station3]);
     if (xloc < 0) itube--;
-    cout << itube << " " << station3 << endl;
+//    cout << itube << " " << station3 << endl;
     Double_t *times = digi->GetTimes();
 
     if (TMath::Abs(ploc.getX()) < radIn[station3]) {
@@ -749,14 +749,14 @@ void CbmMuchFindHits::ExecStraws(Int_t begStation)
     Int_t detId = digi->GetDetectorId();
     detId = detId & ~(255 << 16); // reset station No.
     detId |= (station << 16);   // station No. on bits 16-23
-    
+
     times[2] = -77777;
-    CbmMuchHit *hit = 
-      new ((*fHits)[nHits++]) CbmMuchHit(detId, pos, dpos, wXY, idig, 
+    CbmMuchHit *hit =
+      new ((*fHits)[nHits++]) CbmMuchHit(detId, pos, dpos, wXY, idig,
 					 times, digi->GetDTime());
     hit->SetCluster(itube); // tube number
     //new ((*fHits)[nHits++]) CbmMuchHit(detId, pos, dpos, wXY, iDigi, digi->GetTimes(), digi->GetDTime());
-  } 
+  }
 }
 
 ClassImp(CbmMuchFindHits)

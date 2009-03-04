@@ -2,7 +2,7 @@ void much_hits(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString dir, mcFile, parFile, muchHitsFile, digiFile;
+	TString dir, mcFile, parFile, muchHitsFile, digiFile, geoType;
 	if (script != "yes") {
 		dir  = "/home/d/andrey/events/newmuch/standard/10mu/mu_urqmd/";
 		mcFile = dir + "mc.0000.root";

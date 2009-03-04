@@ -1,14 +1,14 @@
 #include "../../cbmbase/CbmDetectorList.h";
 void prop_ana(Int_t nEvents = 1000)
 {
-	TString dir = "/home/d/andrey/events/trd/monolithic/10e/e/";
-//	TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu/";
+//	TString dir = "/home/d/andrey/events/trd/monolithic/10e/e/";
+	TString dir = "/home/d/andrey/events/much/standard/10mu/mu/";
 
 	TString mcFile = dir + "mc.0000.root";
 	TString stsRecoFile = dir + "sts.reco.0000.root";
-	TString hitsFile = dir + "trd.hits.0000.root";
+	TString hitsFile = dir + "much.hits.0000.root";
 	TString parFile = dir + "param.0000.root";
-	TString outFile = dir + "trd.ana.0000.root";
+	TString outFile = dir + "much.ana.0000.root";
 
 	TStopwatch timer;
 	timer.Start();
@@ -27,24 +27,23 @@ void prop_ana(Int_t nEvents = 1000)
 //	FairGeane* Geane = new FairGeane(inFile.Data());
 
 	// -------------------------------------------------------------------------
-	// CbmMuchTrackFinder* muchTrackFinder    = new CbmLitMuchTrackFinder();
-//	CbmMuchTrackFinder* muchTrackFinder    = new CbmMuchTrackFinderIdeal();
-//	CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
-//	muchFindTracks->UseFinder(muchTrackFinder);
-//	run->AddTask(muchFindTracks);
+	CbmMuchTrackFinder* muchTrackFinder    = new CbmMuchTrackFinderIdeal();
+	CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
+	muchFindTracks->UseFinder(muchTrackFinder);
+	run->AddTask(muchFindTracks);
+
+	CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
+	run->AddTask(muchMatchTracks);
+
+//	CbmTrdTrackFinder* trdTrackFinder    = new CbmTrdTrackFinderIdeal();
+//	CbmTrdFindTracks* trdFindTracks = new CbmTrdFindTracks("Trd Track Finder");
+//	trdFindTracks->UseFinder(trdTrackFinder);
+//	run->AddTask(trdFindTracks);
 //
-//	CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
-//	run->AddTask(muchMatchTracks);
+//	CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks();
+//	run->AddTask(trdMatchTracks);
 
-	CbmTrdTrackFinder* trdTrackFinder    = new CbmTrdTrackFinderIdeal();
-	CbmTrdFindTracks* trdFindTracks = new CbmTrdFindTracks("Trd Track Finder");
-	trdFindTracks->UseFinder(trdTrackFinder);
-	run->AddTask(trdFindTracks);
-
-	CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks();
-	run->AddTask(trdMatchTracks);
-
-	CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis(kTRD);
+	CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis(kMUCH);
 	run->AddTask(propAna);
 	// -------------------------------------------------------------------------
 

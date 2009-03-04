@@ -1,5 +1,6 @@
 TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu_urqmd/";
-TFile *file = new TFile(dir + "much.robust.ana.root");
+//TString dir = "/home/d/andrey/events/trd/monolithic/10e/e_urqmd/";
+TFile *file = new TFile(dir + "robust.ana.0000.root");
 
 void draw_robust_ana()
 {
@@ -88,7 +89,6 @@ void DrawTrackParameters1D(
 
 	c1->cd(6);
 	draw_hist_1D(hist[1], "true hits ratio in track", "counter", kBlack, 2, 1, 1, kDot, false, true, "");
-
 }
 
 void DrawTrackParameters2D(

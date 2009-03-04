@@ -5,8 +5,9 @@ void much_draw_sectors(){
   gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
   cbmrootlibs();
 
-  TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu_urqmd/";
-  TFile* f = new TFile(dir + "much.digi.root");
+  TString dir = "/home/andrey/cbm/svnmar09/trunk/parameters/much/";
+
+  TFile* f = new TFile(dir + "much_compact.digi.root");
 
   f->ls();
   TObjArray* stations = (TObjArray*) f->Get("stations");

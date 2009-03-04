@@ -1,16 +1,16 @@
 #include "../../cbmbase/CbmDetectorList.h";
-void much_reco(Int_t nEvents = 100)
+void much_reco(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, stsRecoFile, muchHitsFile, muchTracksFile;
 	if (script != "yes") {
-		dir  = "/home/d/andrey/events/much/standard/10mu/mu/";
+		dir  = "/home/d/andrey/events/much/compact/10mu/mu_urqmd/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		stsRecoFile = dir + "sts.reco.0000.root";
 		muchHitsFile = dir + "much.hits.0000.root";
-		muchTracksFile = dir + "much.tracks.0000.root";
+		muchTracksFile = dir + "much.tracks.branch.0000.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -49,7 +49,7 @@ void much_reco(Int_t nEvents = 100)
 	CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
 	run->AddTask(muchMatchTracks);
 
-	CbmLitRecQa* muchRecQa = new CbmLitRecQa(12, 0.7, kMUCH, 1);
+	CbmLitRecQa* muchRecQa = new CbmLitRecQa(15, 0.7, kMUCH, 1);
 	muchRecQa->SetNormType(2); // '2' to number of STS tracks
 	run->AddTask(muchRecQa);
 
@@ -76,7 +76,7 @@ void much_reco(Int_t nEvents = 100)
 	Double_t ctime = timer.CpuTime();
 	cout << endl << endl;
 	cout << "Macro finished succesfully." << endl;
-	cout << "Output file is "    << outFile << endl;
+	cout << "Output file is "    << muchTracksFile << endl;
 	cout << "Parameter file is " << parFile << endl;
 	cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
 	cout << endl;

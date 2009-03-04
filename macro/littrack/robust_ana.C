@@ -3,14 +3,17 @@ void robust_ana(Int_t nEvents = 100)
 {
    Int_t iVerbose = 0;
 
+//   TString dir = "/home/d/andrey/events/trd/monolithic/10e/e_urqmd/";
    TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu_urqmd/";
 
-   TString mcFile = dir + "mc.root";
-   TString stsFile = dir + "sts.reco.root";
-   TString muchHitsFile = dir + "much.hits.root";
-   TString muchTracksFile = dir + "much.tracks.root";
-   TString parFile = dir + "params.root";
-   TString outFile = dir + "much.robust.ana.root";
+   TString mcFile = dir + "mc.0000.root";
+   TString stsFile = dir + "sts.reco.0000.root";
+   TString hitsFile = dir + "much.hits.0000.root";
+   TString tracksFile = dir + "much.tracks.robust.0000.root";
+//   TString hitsFile = dir + "trd.hits.0000.root";
+//   TString tracksFile = dir + "trd.tracks.robust.0000.root";
+   TString parFile = dir + "param.0000.root";
+   TString outFile = dir + "robust.ana.0000.root";
 
    TStopwatch timer;
    timer.Start();
@@ -23,8 +26,8 @@ void robust_ana(Int_t nEvents = 100)
    FairRunAna *run= new FairRunAna();
    run->SetInputFile(mcFile);
    run->AddFriend(stsFile);
-   run->AddFriend(muchHitsFile);
-   run->AddFriend(muchTracksFile);
+   run->AddFriend(hitsFile);
+   run->AddFriend(tracksFile);
    run->SetOutputFile(outFile);
 
 

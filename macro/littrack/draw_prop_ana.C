@@ -5,7 +5,7 @@
 
 // residual (x,y,tx,ty,qp), pull (x,y,tx,ty,qp), resolution p %, chi-square
 const int nofPar = 12;
-const int nofLayers = 12;
+const int nofLayers = 18;
 
 // 0-propagation, 1-filter, 2-smoother
 double sigma[3][nofLayers][nofPar];
@@ -13,14 +13,14 @@ double rms[3][nofLayers][nofPar];
 TCanvas* canvas[3][nofLayers];
 
 bool drawPropagation = false;
-bool drawFilter = true;
-bool drawSmoother = false;
+bool drawFilter = false;
+bool drawSmoother = true;
 
-//TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu/";
-//TFile *file = new TFile(dir + "much.ana.root");
+TString dir = "/home/d/andrey/events/much/standard/10mu/mu/";
+TFile *file = new TFile(dir + "much.ana.0000.root");
 
-TString dir  = "/home/d/andrey/events/trd/monolithic/10e/e/";
-TFile *file = new TFile(dir + "trd.ana.0000.root");
+//TString dir  = "/home/d/andrey/events/trd/monolithic/10e/e/";
+//TFile *file = new TFile(dir + "trd.ana.0000.root");
 
 TString outDir = "./test/";
 

@@ -1,7 +1,7 @@
-//TString dir  = "/home/d/andrey/events/newmuch/standard/10mu/mu_urqmd/";
-//TFile *file = new TFile(dir + "much.tracks.root");
-TString dir  = "/home/d/andrey/events/trd/monolithic/10e/e/";
-TFile *file = new TFile(dir + "trd.tracks.0000.root");
+TString dir  = "/home/d/andrey/events/much/compact/10mu/mu_urqmd/";
+TFile *file = new TFile(dir + "much.tracks.branch.0000.root");
+//TString dir  = "/home/d/andrey/events/trd/monolithic/10e/e_urqmd/";
+//TFile *file = new TFile(dir + "trd.tracks.branch.0000.root");
 
 Int_t lineWidth = 3;
 Int_t markerSize = 3;
@@ -11,13 +11,15 @@ Int_t lineStyleTrue = 1;
 Int_t colorGhost = 2;
 Int_t colorTrue = 4;
 
+Bool_t isMuons = dir.Contains("much");
+
 void draw_rec_qa()
 {
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/draw_hist.C");
 
-//	gStyle->SetOptStat("");
-//	gStyle->SetOptFit(0);
-//	gStyle->SetOptTitle(0);
+	gStyle->SetOptStat("");
+	gStyle->SetOptFit(0);
+	gStyle->SetOptTitle(0);
 
 	draw_eff();
     draw_params();
@@ -26,25 +28,36 @@ void draw_rec_qa()
 
 void draw_eff()
 {
-  TCanvas *c1 = new TCanvas("efficiency","efficiency",1200,1000);
+  TCanvas *c1 = new TCanvas("momentum efficiency","momentum efficiency",1200,1000);
   c1->SetGrid();
+  if (isMuons) draw_eff(hMomEffAll, hMomEffMuons);
+  else draw_eff(hMomEffAll, hMomEffElectrons);
 
-  hMomEffAll->SetMaximum(1);
-  hMomEffAll->SetMinimum(0);
-  draw_hist_1D(hMomEffAll, "Momentum, GeV/c", "Efficiency",
+  TCanvas *c2 = new TCanvas("np efficiency","np efficiency",1200,1000);
+  c2->SetGrid();
+  if (isMuons) draw_eff(hNpEffAll, hNpEffMuons);
+  else draw_eff(hNpEffAll, hNpEffElectron);
+}
+
+void draw_eff(
+		TH1* hist1,
+		TH1* hist2)
+{
+  hist1->SetMaximum(1);
+  hist1->SetMinimum(0);
+  draw_hist_1D(hist1, "Momentum, GeV/c", "Efficiency",
 		  kBlue, lineWidth, 1, markerSize, kCircle, false, false, "");
+  hist1->GetXaxis()->SetLabelSize(0.055);
+  hist1->GetYaxis()->SetLabelSize(0.055);
 
-//  draw_hist_1D(hMomEffMuons, "Momentum, GeV/c", "Efficiency",
-//  		  kRed, lineWidth, 1, markerSize, kFullDotLarge, false, false, "SAME");
-
-  draw_hist_1D(hMomEffElectrons, "Momentum, GeV/c", "Efficiency",
-    		  kRed, lineWidth, 1, markerSize, kFullDotLarge, false, false, "SAME");
+  draw_hist_1D(hist2, "Momentum, GeV/c", "Efficiency",
+  		  kRed, lineWidth, 1, markerSize, kFullDotLarge, false, false, "SAME");
 
   TLegend* l1 = new TLegend(0.5,0.7,0.9,0.9);
   l1->SetHeader("Efficiency");
-  l1->AddEntry(hMomEffAll,"all tracks","lp");
-//  l1->AddEntry(hMomEffMuons,"muon tracks","lp");
-  l1->AddEntry(hMomEffElectrons,"electron tracks","lp");
+  l1->AddEntry(hist1,"all tracks","lp");
+  if (isMuons) l1->AddEntry(hist2,"muon tracks","lp");
+  else l1->AddEntry(hist2,"electron tracks","lp");
   l1->Draw();
 }
 

@@ -1,5 +1,5 @@
 #include "../../cbmbase/CbmDetectorList.h";
-void trd_reco(Int_t nEvents = 100)
+void trd_reco(Int_t nEvents = 500)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -10,7 +10,7 @@ void trd_reco(Int_t nEvents = 100)
 		parFile = dir + "param.0000.root";
 		stsRecoFile = dir + "sts.reco.0000.root";
 		trdHitsFile = dir + "trd.hits.0000.root";
-		trdTracksFile = dir + "trd.tracks.0000.root";
+		trdTracksFile = dir + "trd.tracks.nn.0000.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));

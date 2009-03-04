@@ -1,13 +1,13 @@
-void sts_reco(Int_t nEvents = 5)
+void sts_reco(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, stsRecoFile, detector;
 	if (script != "yes") {
-		dir  = "/d/cbm02/andrey/events/trd/segmented/10e/e/";
-		mcFile = outDir + "mc.0000.root";
-		parFile = outDir + "params.0000.root";
-		stsRecoFile = outDir + "sts.reco.0000.root";
+		dir  = "/home/d/andrey/events/newmuch/compact/10mu/mu_urqmd/";
+		mcFile = dir + "mc.0000.root";
+		parFile = dir + "param.0000.root";
+		stsRecoFile = dir + "sts.reco.0000.root";
 		detector = "much";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));

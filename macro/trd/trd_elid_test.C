@@ -42,98 +42,95 @@ void trd_elid_test()
 
 	Double_t nofElTracks = 0, nofPiTracks = 0;
 
-	char fileMC[200], fileRec[200];
-	for (int iFile = 1; iFile <= 1; iFile++) {
-		sprintf(fileMC, "/d/cbm02/slebedev/trd/FEB09/mom.piel.%.4i.mc.root", iFile);
-		cout << fileMC << endl;
-		TFile *f1 = new TFile(fileMC, "R");
-		TTree* t1 = (TTree*) f1->Get("cbmsim");
-		TFolder *fd1 = f1->Get("cbmroot");
-		TClonesArray* fListStack = (TClonesArray*) fd1->FindObjectAny("MCTrack");
-		t1->SetBranchAddress("MCTrack", &fListStack);
-		TClonesArray *pointsTRD = (TClonesArray*) fd1->FindObjectAny("TRDPoint");
-		t1->SetBranchAddress(pointsTRD->GetName(), &pointsTRD);
+	TString fileMC = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.mc.root";
+	TString fileRec = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.reco.root";
 
-		sprintf(fileRec, "/d/cbm02/slebedev/trd/FEB09/mom.piel.%.4i.reco.root",	iFile);
-		cout << fileRec << endl;
-		TFile *f = new TFile(fileRec, "R");
-		TTree* t = f->Get("cbmsim");
-		TFolder *fd = f->Get("cbmout");
-		TClonesArray *tracksTRD = (TClonesArray*) fd->FindObjectAny("TRDTrack");
-		t->SetBranchAddress(tracksTRD->GetName(), &tracksTRD);
-		TClonesArray *matchTRD = (TClonesArray*) fd->FindObjectAny("TRDTrackMatch");
-		t->SetBranchAddress(matchTRD->GetName(), &matchTRD);
-		TClonesArray *hitsTRD = (TClonesArray*) fd->FindObjectAny("TRDHit");
-		t->SetBranchAddress(hitsTRD->GetName(), &hitsTRD);
+	TFile *f1 = new TFile(fileMC, "R");
+	TTree* t1 = (TTree*) f1->Get("cbmsim");
+	TFolder *fd1 = f1->Get("cbmroot");
+	TClonesArray* fListStack = (TClonesArray*) fd1->FindObjectAny("MCTrack");
+	t1->SetBranchAddress("MCTrack", &fListStack);
+	TClonesArray *pointsTRD = (TClonesArray*) fd1->FindObjectAny("TRDPoint");
+	t1->SetBranchAddress(pointsTRD->GetName(), &pointsTRD);
 
-		CbmTrdTrack *trdtrack = NULL;
-		CbmTrdHit *trdhit = NULL;
-		CbmMCTrack* mctrack = NULL;
-		Int_t nEvents = t->GetEntries();
-		cout << " nEvents =" << nEvents << endl;
-		//Int_t nEvents=5000;
-		for (Int_t ievent = 0; ievent < nEvents; ievent++) {
-			cout << "ievent = " << ievent << endl;
+	TFile *f = new TFile(fileRec, "R");
+	TTree* t = f->Get("cbmsim");
+	TFolder *fd = f->Get("cbmout");
+	TClonesArray *tracksTRD = (TClonesArray*) fd->FindObjectAny("TRDTrack");
+	t->SetBranchAddress(tracksTRD->GetName(), &tracksTRD);
+	TClonesArray *matchTRD = (TClonesArray*) fd->FindObjectAny("TRDTrackMatch");
+	t->SetBranchAddress(matchTRD->GetName(), &matchTRD);
+	TClonesArray *hitsTRD = (TClonesArray*) fd->FindObjectAny("TRDHit");
+	t->SetBranchAddress(hitsTRD->GetName(), &hitsTRD);
 
-			t1->GetEntry(ievent);
-			t->GetEntry(ievent);
+	CbmTrdTrack *trdtrack = NULL;
+	CbmTrdHit *trdhit = NULL;
+	CbmMCTrack* mctrack = NULL;
+	Int_t nEvents = t->GetEntries();
+	cout << " nEvents =" << nEvents << endl;
+	//Int_t nEvents=5000;
+	for (Int_t ievent = 0; ievent < nEvents; ievent++) {
+		cout << "ievent = " << ievent << endl;
 
-			Int_t NofTrdTracks = tracksTRD->GetEntries();
+		t1->GetEntry(ievent);
+		t->GetEntry(ievent);
 
-			for (Int_t iTrdTrack = 0; iTrdTrack < NofTrdTracks; iTrdTrack++) {
+		Int_t NofTrdTracks = tracksTRD->GetEntries();
 
-				CbmTrdTrack* trdtrack = (CbmTrdTrack*) tracksTRD->At(iTrdTrack);
-				Int_t nHits = trdtrack->GetNofTrdHits();
+		for (Int_t iTrdTrack = 0; iTrdTrack < NofTrdTracks; iTrdTrack++) {
 
-				if (nHits < 0) {
-					continue;
-				}
+			CbmTrdTrack* trdtrack = (CbmTrdTrack*) tracksTRD->At(iTrdTrack);
+			Int_t nHits = trdtrack->GetNofTrdHits();
 
-				CbmTrdTrackMatch* match = (CbmTrdTrackMatch*) matchTRD->At(iTrdTrack);
-				Int_t iMC = match->GetMCTrackID();
-				if (iMC == -1)continue;
-				if (iMC > fListStack->GetEntriesFast())	continue;
+			if (nHits < 0) {
+				continue;
+			}
 
-				mctrack = (CbmMCTrack*) fListStack->At(iMC);
-				Int_t partPdg = TMath::Abs(mctrack->GetPdgCode());
-				Double_t momMC = mctrack->GetP();
-				Double_t PtMC = mctrack->GetPt();
-				Double_t Pz = mctrack->GetPz();
-				//cout<<PtMC << endl;
-				Double_t motherId = mctrack->GetMotherId();
+			CbmTrdTrackMatch* match = (CbmTrdTrackMatch*) matchTRD->At(iTrdTrack);
+			Int_t iMC = match->GetMCTrackID();
+			if (iMC == -1)continue;
+			if (iMC > fListStack->GetEntriesFast())	continue;
 
-				if (partPdg == 50000050)continue;
+			mctrack = (CbmMCTrack*) fListStack->At(iMC);
+			Int_t partPdg = TMath::Abs(mctrack->GetPdgCode());
+			Double_t momMC = mctrack->GetP();
+			Double_t PtMC = mctrack->GetPt();
+			Double_t Pz = mctrack->GetPz();
+			//cout<<PtMC << endl;
+			Double_t motherId = mctrack->GetMotherId();
 
-				///only primary tracks
-				if (motherId != -1)	continue;
+			if (partPdg == 50000050)continue;
 
-				Double_t pidANN = trdtrack->GetPidANN();
+			///only primary tracks
+			if (motherId != -1)	continue;
 
-				if (partPdg == 11) {
-					hNofHitsEl->Fill(nHits);
-					nofElTracks++;
-				}
+			Double_t pidANN = trdtrack->GetPidANN();
 
-				if (partPdg == 211) {
-					hNofHitsPi->Fill(nHits);
-					nofPiTracks++;
-				}
+			if (partPdg == 11) {
+				hNofHitsEl->Fill(nHits);
+				nofElTracks++;
+			}
 
-				if (nHits < 6) continue;
-				if (nHits > 12){
-					cout << "-E- nHits = " << nHits << endl;
-					continue;
-				}
-				Int_t indexAr = 12 - nHits;
-				if (partPdg == 11) hPidANNEl[indexAr]->Fill(pidANN);
-				if (partPdg == 211) hPidANNPi[indexAr]->Fill(pidANN);
+			if (partPdg == 211) {
+				hNofHitsPi->Fill(nHits);
+				nofPiTracks++;
+			}
 
-			}//iTrdTrack
+			if (nHits < 6) continue;
+			if (nHits > 12){
+				cout << "-E- nHits = " << nHits << endl;
+				continue;
+			}
+			Int_t indexAr = 12 - nHits;
+			if (partPdg == 11) hPidANNEl[indexAr]->Fill(pidANN);
+			if (partPdg == 211) hPidANNPi[indexAr]->Fill(pidANN);
 
-		} //event
-		f->Close();
-		f1->Close();
-	}//iFile
+		}//iTrdTrack
+
+	} //event
+	f->Close();
+	f1->Close();
+
 	cout << "nofPiTracks = " << nofPiTracks << endl;
 	cout << "nofElTracks = " << nofElTracks << endl;
 

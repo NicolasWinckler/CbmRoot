@@ -51,12 +51,12 @@ CbmTrdCreatePidLike.cxx
 CbmTrdTracksPidQa.cxx
 CbmTrdGas.cxx
 CbmTrdDigitizer.cxx
-CbmTrdDigi.cxx
-CbmTrdDigiPar.cxx
-CbmTrdDigiMatch.cxx
-CbmTrdStringToken.cxx
-CbmTrdModule.cxx
-CbmTrdCreateDigiPar.cxx
+#CbmTrdDigi.cxx
+#CbmTrdDigiPar.cxx
+#CbmTrdDigiMatch.cxx
+#CbmTrdStringToken.cxx
+#CbmTrdModule.cxx
+#CbmTrdCreateDigiPar.cxx
 )
 
 if(RULE_CHECKER_FOUND)

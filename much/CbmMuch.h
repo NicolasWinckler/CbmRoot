@@ -3,7 +3,7 @@
  * @author  M.Ryzhinskiy <m.ryzhinskiy@gsi.de>
  * @version 1.0
  * @since   21.03.07
- * 
+ *
  *  Class for MUon CHambers detector
  *
  */
@@ -32,7 +32,7 @@ class CbmMuch : public FairDetector
 
 
   /** Standard constructor.
-   *@param name    detetcor name
+   *@param name    detector name
    *@param active  sensitivity flag
    **/
   CbmMuch(const char* name, Bool_t active);
@@ -41,7 +41,7 @@ class CbmMuch : public FairDetector
   /** Destructor **/
   virtual ~CbmMuch();
 
- 
+
   /** Virtual method ProcessHits
    **
    ** Defines the action to be taken when a step is inside the
@@ -137,9 +137,9 @@ class CbmMuch : public FairDetector
    **
    ** Adds a MuchPoint to the HitCollection
    **/
-  CbmMuchPoint* AddHit(Int_t trackID, Long64_t detID,
-		       TVector3 posIn, TVector3 posOut, 
-		       TVector3 momIn, TVector3 momOut, 
+  CbmMuchPoint* AddHit(Int_t trackID, Int_t detID,
+		       TVector3 posIn, TVector3 posOut,
+		       TVector3 momIn, TVector3 momOut,
 		       Double_t time, Double_t length, Double_t eLoss);
 
 
@@ -148,7 +148,7 @@ class CbmMuch : public FairDetector
    ** Resets the private members for the track parameters
    **/
   void ResetParameters();
-  Long64_t GetDetId(FairVolume* vol);
+  Int_t GetDetId(FairVolume* vol);
 private:
   Int_t Intersect(Float_t x, Float_t y, Float_t lx, Float_t ly, Float_t r);
   TGeoMedium* CreateMedium(const char* matName);
@@ -171,4 +171,4 @@ inline void CbmMuch::ResetParameters() {
 };
 
 
-#endif 
+#endif

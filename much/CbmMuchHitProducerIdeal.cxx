@@ -3,7 +3,7 @@
  * @author  A.Kiseleva
  * @version 0.0
  * @since   13.04.06
- * 
+ *
  *  Hit producer for MUon CHambers detector
  *
  */
@@ -30,14 +30,14 @@ ClassImp(CbmMuchHitProducerIdeal)
 
 
 // ---- Constructor ----------------------------------------------------
-CbmMuchHitProducerIdeal::CbmMuchHitProducerIdeal(const char *name, Int_t verbose, 
+CbmMuchHitProducerIdeal::CbmMuchHitProducerIdeal(const char *name, Int_t verbose,
 				       Double_t SigmaXY, Double_t SigmaZ )
   :FairTask(name,verbose)
 {
   fVerbose = verbose;
   fSigmaXY = SigmaXY;
   fSigmaZ = SigmaZ;
-  fNHits=0;  
+  fNHits=0;
   fHitCollection = new TClonesArray("CbmMuchHit", 100);
 }
 // --------------------------------------------------------------------
@@ -55,7 +55,7 @@ CbmMuchHitProducerIdeal::~CbmMuchHitProducerIdeal()
 // ---- Init ----------------------------------------------------------
 InitStatus CbmMuchHitProducerIdeal::Init()
 {
-  fMuchPoints=(TClonesArray *) FairRootManager::Instance()->GetObject("MuchPoint");  
+  fMuchPoints=(TClonesArray *) FairRootManager::Instance()->GetObject("MuchPoint");
   Register();
   return kSUCCESS;
 }
@@ -80,14 +80,14 @@ void CbmMuchHitProducerIdeal::Exec(Option_t * option)
   Double_t xHitErr, yHitErr, zHitErr;
 
   for (int j=0; j < nMuchPoint; j++ )
-    {        
+    {
 
       pt1 = (CbmMuchPoint*) fMuchPoints->At(j);
       if(NULL == pt1)continue;
-      
+
       // Get point position
       pt1->Position(pos1);
-      
+
       // Smear position
       delta_x = gRandom->Gaus(0, fSigmaXY);
       delta_y = gRandom->Gaus(0, fSigmaXY);
@@ -95,15 +95,15 @@ void CbmMuchHitProducerIdeal::Exec(Option_t * option)
       if(TMath::Abs(delta_x) > 3*fSigmaXY)delta_x = 3*fSigmaXY*delta_x/TMath::Abs(delta_x);
       if(TMath::Abs(delta_y) > 3*fSigmaXY)delta_y = 3*fSigmaXY*delta_y/TMath::Abs(delta_y);
       if(TMath::Abs(delta_z) > 3*fSigmaZ)delta_z = 3*fSigmaZ*delta_z/TMath::Abs(delta_z);
-      
+
       xHit = pos1.X() + delta_x;
       yHit = pos1.Y() + delta_y;
       zHit = pos1.Z() + delta_z;
-      
+
       xHitErr = fSigmaXY;
       yHitErr = fSigmaXY;
       zHitErr = fSigmaZ;
-      
+
       TVector3 hitPos(xHit, yHit, zHit);
       TVector3 hitPosErr(xHitErr, yHitErr, zHitErr);
       TVector3	mom;
@@ -134,7 +134,7 @@ void CbmMuchHitProducerIdeal::AddHit(Int_t detID, TVector3 &posHit,
 
 
 // ---- Finish --------------------------------------------------------
-void CbmMuchHitProducerIdeal::Finish()
+void CbmMuchHitProducerIdeal::FinishTask()
 {
 }
 // --------------------------------------------------------------------
@@ -163,14 +163,14 @@ void CbmMuchHitProducerIdeal::SetSigmaZ(Double_t sigma)
 // --------------------------------------------------------------------
 // ---- GetSigmaXY -----------------------------------------------------
 Double_t CbmMuchHitProducerIdeal::GetSigmaXY()
-{  
+{
   return  fSigmaXY;
 }
 // --------------------------------------------------------------------
 
 // ---- GetSigmaZ -----------------------------------------------------
 Double_t CbmMuchHitProducerIdeal::GetSigmaZ()
-{  
+{
   return  fSigmaZ;
 }
 // --------------------------------------------------------------------

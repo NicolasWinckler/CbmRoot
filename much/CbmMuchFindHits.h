@@ -24,21 +24,33 @@ class CbmMuchFindHits : public FairTask
 {
  public :
 
-  /** Default constructor **/
+  /** Default constructor. **/
   CbmMuchFindHits();
 
-  /** Standard constructor **/
+  /**
+   * Standard constructor.
+   * @param iVerbose   Verbosity level.
+   */
   CbmMuchFindHits(Int_t iVerbose);
 
-  /** Constructor with task name **/
+  /**
+   * Constructor with task name.
+   * @param name      Task name.
+   * @param digiFile  Input digitization scheme file.
+   * @param iVerbose  Verbosity level.
+   */
   CbmMuchFindHits(const char* name, const char* digiFile, Int_t iVerbose);
 
-  /** Destructor **/
+  /** Destructor. **/
   virtual ~CbmMuchFindHits();
 
-  /** Execution **/
+  /** Execution. **/
   virtual void Exec(Option_t* opt);
 
+  /**
+   * Sets whether to use clustering or not.
+   * @param useClustering  1 if clustering should be used, 0 otherwise (0 by default).
+   */
   void SetUseClustering(Int_t useClustering) {fUseClustering = useClustering;}
 
 
@@ -50,10 +62,10 @@ class CbmMuchFindHits : public FairTask
   /** Get parameter containers **/
   virtual void SetParContainers();
 
-  /** Intialisation **/
+  /** Initialization **/
   virtual InitStatus Init();
 
-  /** Reinitialisation **/
+  /** Reinitialization **/
   virtual InitStatus ReInit();
 
   ClassDef(CbmMuchFindHits,1);

@@ -37,7 +37,7 @@ CbmMuchFindHitsSimple::CbmMuchFindHitsSimple() : CbmMuchTask("MuchFindHits", 1) 
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchFindHitsSimple::CbmMuchFindHitsSimple(Int_t iVerbose) 
+CbmMuchFindHitsSimple::CbmMuchFindHitsSimple(Int_t iVerbose)
   : CbmMuchTask("MuchFindHits", iVerbose) {
   fDigiFile    = NULL;
   fDigis   = NULL;
@@ -45,7 +45,7 @@ CbmMuchFindHitsSimple::CbmMuchFindHitsSimple(Int_t iVerbose)
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name   -----------------------------------------
-CbmMuchFindHitsSimple::CbmMuchFindHitsSimple(const char* name, TFile* digiFile, Int_t iVerbose) 
+CbmMuchFindHitsSimple::CbmMuchFindHitsSimple(const char* name, TFile* digiFile, Int_t iVerbose)
   : CbmMuchTask(name, iVerbose) {
   fDigiFile    = digiFile;
   fDigis   = NULL;
@@ -75,9 +75,10 @@ void CbmMuchFindHitsSimple::Exec(Option_t* opt) {
   for(Int_t iDigi = 0; iDigi < nDigis; ++iDigi){
     CbmMuchDigi* digi = (CbmMuchDigi*)fDigis->At(iDigi);
     if(!digi) continue;
-    Long64_t detectorId = digi->GetDetectorId();
+    Int_t detectorId = digi->GetDetectorId();
+    Int_t channelId  = digi->GetChannelId();
     // Get sector and its properties
-    CbmMuchSector* sector = fGeoScheme->GetSectorByDetId(detectorId);
+    CbmMuchSector* sector = fGeoScheme->GetSectorByDetId(detectorId, channelId);
     if(!sector) continue;
     Double_t xc     = sector->GetPosition()[0];
     Double_t yc     = sector->GetPosition()[1];
@@ -92,13 +93,13 @@ void CbmMuchFindHitsSimple::Exec(Option_t* opt) {
     Double_t sigmaY = dy/TMath::Sqrt(12.);
 
     // Find hit coordinates
-    Int_t iChannel = CbmMuchGeoScheme::GetChannelIndex(detectorId);
+    Int_t iChannel = CbmMuchGeoScheme::GetChannelIndex(channelId);
     Int_t iRow  = Int_t( iChannel / nColumns );
     Int_t iCol  = iChannel - iRow * nColumns;
     Double_t xint = ( Double_t(iCol) + 0.5 ) * dx;
     Double_t yint = ( Double_t(iRow) + 0.5 ) * dy;
-      
-    // Translation to centre of sector
+
+    // Translation to center of sector
     xint = xint - lx/2.;
     yint = yint - ly/2.;
 
@@ -123,9 +124,9 @@ void CbmMuchFindHitsSimple::Exec(Option_t* opt) {
   else {
     if ( warn ) cout << "- ";
     else        cout << "+ ";
-    cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8) 
-	 << fixed << right << fTimer.RealTime() 
-	 << " s, digis " << fDigis->GetEntriesFast() << ", hits: " 
+    cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
+	 << fixed << right << fTimer.RealTime()
+	 << " s, digis " << fDigis->GetEntriesFast() << ", hits: "
 	 << fHits->GetEntriesFast() << endl;
   }
 }

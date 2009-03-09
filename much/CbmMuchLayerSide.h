@@ -3,7 +3,7 @@
  *@version 1.0
  *@since   11.02.08
  **
- ** This class holds the transport geometry parameters 
+ ** This class holds the transport geometry parameters
  ** of one MuCh tracking layer side.
  **
  **/
@@ -25,17 +25,17 @@ class CbmMuchLayerSide : public TObject
   /** Default constructor **/
   CbmMuchLayerSide();
 
-  /** Standard constructor 
-  *@param detId     Detector identofier 
+  /** Standard constructor
+  *@param detId     Detector ID
   *@param z         z position of station centre [cm]
   **/
-  CbmMuchLayerSide(Long64_t detId, Double_t z);
+  CbmMuchLayerSide(Int_t detId, Double_t z);
 
-  /** Standard constructor 
-   *@param iStation  Station ID
-   *@param iLayer    Layer ID 
-   *@param iSide     Defines side (0 - Front, 1 - Back)
-   *@param z         z position of station centre [cm]
+  /** Standard constructor
+   *@param iStation  Station index within the MUCH system.
+   *@param iLayer    Layer index within the station.
+   *@param iSide     Defines side (0 - Front, 1 - Back) within the layer.
+   *@param z         z position of station centre [cm].
    **/
   CbmMuchLayerSide(Int_t iStation, Int_t iLayer, Bool_t iSide, Double_t z);
 
@@ -43,23 +43,23 @@ class CbmMuchLayerSide : public TObject
   virtual ~CbmMuchLayerSide();
 
   /** Accessors **/
-  Long64_t   GetDetectorId() const { return fDetectorId; }
+  Int_t   GetDetectorId() const { return fDetectorId; }
   Int_t      GetNModules()   const { return fModules.GetEntriesFast(); }
   TObjArray* GetModules()          { return &fModules; }
   Double_t   GetZ()                { return fZ;}
   void SetZ(Double_t z) { fZ = z; }
-  
+
   CbmMuchModule* GetModule(Int_t iModule) const { return (CbmMuchModule*)fModules.At(iModule); }
 
-  /** Adds given CbmMuchModule to the internal list. 
+  /** Adds given CbmMuchModule to the internal list.
    *@param module  CbmMuchModule which should be added to the array. **/
   void AddModule(CbmMuchModule* module);
 
-  void DrawModules(Color_t color=kYellow, 
+  void DrawModules(Color_t color=kYellow,
                    Bool_t modulesVisible=true, Bool_t sectorsVisible=true);
-  
+
  protected:
-  Long64_t   fDetectorId;                   // Unique detector ID
+  Int_t   fDetectorId;                      // Unique detector ID
   Double32_t fZ;                            // z position of station centre (midplane) [cm]
   TObjArray  fModules;                      // Array of CbmMuchModule objects
 

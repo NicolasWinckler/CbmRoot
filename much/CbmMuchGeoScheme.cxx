@@ -16,6 +16,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <cassert>
+
 using std::cout;
 using std::endl;
 using std::vector;
@@ -93,10 +95,12 @@ void CbmMuchGeoScheme::Init(TObjArray* stations) {
 		}
 	}
 
-	for (map<Long64_t, Int_t>::iterator it = fMapSides.begin(); it
-			!= fMapSides.end(); it++) {
-		//printf("detId=%i iSide=%i",(*it).first,(*it).second);
-	}
+//	for (map<Int_t, Int_t>::iterator it = fMapSides.begin(); it
+//			!= fMapSides.end(); it++) {
+//		Int_t detId = (*it).first;
+//		printf("iStation=%i, iLayer=%i, iSide=%i, SideNr=%i\n", GetStationIndex(detId),
+//				GetLayerIndex(detId), GetLayerSideIndex(detId), (*it).second);
+//	}
 }
 // -------------------------------------------------------------------------
 
@@ -107,15 +111,19 @@ void CbmMuchGeoScheme::InitGrid() {
 		if (!fStations) Fatal("InitGrid", "No input array of stations.");
 		for (Int_t iStation = 0; iStation < GetNStations(); iStation++) {
 			CbmMuchStation* station = GetStation(iStation);
+			assert(iStation == GetStationIndex(station->GetDetectorId()));
 			if (!station)	continue;
 			for (Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++) {
 				CbmMuchLayer* layer = station->GetLayer(iLayer);
+				assert(iLayer == GetLayerIndex(layer->GetDetectorId()));
 				if (!layer)	continue;
 				for (Int_t iSide = 0; iSide < 2; iSide++) {
 					CbmMuchLayerSide* side = (CbmMuchLayerSide*) layer->GetSide(iSide);
+					assert(iSide == GetLayerSideIndex(side->GetDetectorId()));
 					if (!side) continue;
 					for (Int_t iModule = 0; iModule < side->GetNModules(); iModule++) {
 						CbmMuchModule* module = side->GetModule(iModule);
+						assert(iModule == GetModuleIndex(module->GetDetectorId()));
 						if (!module) continue;
 						if (!module->InitGrid()) continue;
 						module->InitNeighbourSectors();
@@ -188,14 +196,14 @@ CbmMuchPad* CbmMuchGeoScheme::GetPad(Int_t iStation, Int_t iLayer,
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmMuchStation* CbmMuchGeoScheme::GetStationByDetId(Long64_t detId) {
+CbmMuchStation* CbmMuchGeoScheme::GetStationByDetId(Int_t detId) {
 	Int_t iStation = GetStationIndex(detId);
 	return GetStation(iStation);
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmMuchLayer* CbmMuchGeoScheme::GetLayerByDetId(Long64_t detId) {
+CbmMuchLayer* CbmMuchGeoScheme::GetLayerByDetId(Int_t detId) {
 	CbmMuchStation* station = GetStationByDetId(detId);
 	Int_t iLayer = GetLayerIndex(detId);
 	return station ? station->GetLayer(iLayer) : NULL;
@@ -203,7 +211,7 @@ CbmMuchLayer* CbmMuchGeoScheme::GetLayerByDetId(Long64_t detId) {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSideByDetId(Long64_t detId) {
+CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSideByDetId(Int_t detId) {
 	CbmMuchLayer* layer = GetLayerByDetId(detId);
 	Int_t iSide = GetLayerSideIndex(detId);
 	return layer ? layer->GetSide(iSide) : NULL;
@@ -211,7 +219,7 @@ CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSideByDetId(Long64_t detId) {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmMuchModule* CbmMuchGeoScheme::GetModuleByDetId(Long64_t detId) {
+CbmMuchModule* CbmMuchGeoScheme::GetModuleByDetId(Int_t detId) {
 	CbmMuchLayerSide* side = GetLayerSideByDetId(detId);
 	Int_t iModule = GetModuleIndex(detId);
     return side ? side->GetModule(iModule) : NULL;
@@ -219,17 +227,17 @@ CbmMuchModule* CbmMuchGeoScheme::GetModuleByDetId(Long64_t detId) {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmMuchSector* CbmMuchGeoScheme::GetSectorByDetId(Long64_t detId) {
+CbmMuchSector* CbmMuchGeoScheme::GetSectorByDetId(Int_t detId, Int_t channelId) {
 	CbmMuchModule* module = GetModuleByDetId(detId);
-	Int_t iSector = GetSectorIndex(detId);
+	Int_t iSector = GetSectorIndex(channelId);
 	return module ? module->GetSector(iSector) : NULL;
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmMuchPad* CbmMuchGeoScheme::GetPadByDetId(Long64_t detId) {
-	CbmMuchSector* sector = GetSectorByDetId(detId);
-	Int_t iChannel = GetChannelIndex(detId);
+CbmMuchPad* CbmMuchGeoScheme::GetPadByDetId(Int_t detId, Int_t channelId) {
+	CbmMuchSector* sector = GetSectorByDetId(detId, channelId);
+	Int_t iChannel = GetChannelIndex(channelId);
 	return sector ? sector->GetPad(iChannel) : NULL;
 }
 // -------------------------------------------------------------------------
@@ -376,8 +384,8 @@ vector<CbmMuchLayerSide*> CbmMuchGeoScheme::GetLayerSides(Int_t iStation) {
 	return sides;
 }
 
-Int_t CbmMuchGeoScheme::GetLayerSideNr(Long64_t detId) {
-	Long64_t sideId = GetLayerSideByDetId(detId)->GetDetectorId();
+Int_t CbmMuchGeoScheme::GetLayerSideNr(Int_t detId) {
+	Int_t sideId = GetLayerSideByDetId(detId)->GetDetectorId();
 //	printf("GetLayerSideNr: %qd %qd\n", detId, sideId);
 	if (fMapSides.find(sideId) == fMapSides.end())
 		Fatal("GetLayerSideNr", "Wrong side id");

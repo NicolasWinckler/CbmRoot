@@ -1,10 +1,10 @@
 /** CbmMuchModule.h
- * 
+ *
  *@author  M.Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *@version 1.0
  *@since   11.02.08
  **
- ** This class holds geometry parameters of much modules 
+ ** This class holds geometry parameters of much modules
  **
  **/
 
@@ -37,18 +37,18 @@ class CbmMuchModule :
   CbmMuchModule();
 
   /** Standard constructor
-   *@param detId     Unique detector identifier
+   *@param detId     Detector ID
    *@param position  Location of the module center in global c.s. (all dimensions in [cm])
    *@param size      Size of the module (all dimensions in [cm])
    *@param cutRadius Radius of the cut (if any, otherwise = -1.) [cm]
    **/
-  CbmMuchModule(Long64_t detId, TVector3 position, TVector3 size, Double_t cutRadius);
+  CbmMuchModule(Int_t detId, TVector3 position, TVector3 size, Double_t cutRadius);
 
   /** Standard constructor
-   *@param iStation  Station ID
-   *@param iLayer    Layer ID
+   *@param iStation  Station index
+   *@param iLayer    Layer index
    *@param iSide     Defines side of the layer (0 - Front, 1 - Back)
-   *@param iModule   Module ID
+   *@param iModule   Module index
    *@param position  Location of the module center in global c.s. (all dimensions in [cm])
    *@param size      Size of the module (all dimensions in [cm])
    *@param cutRadius Radius of the cut (if any, otherwise = -1.) [cm]
@@ -59,7 +59,7 @@ class CbmMuchModule :
   virtual ~CbmMuchModule();
 
   /** Accessors **/
-  Long64_t GetDetectorId()  const { return fDetectorId; }
+  Int_t    GetDetectorId()  const { return fDetectorId; }
   Int_t    GetNSectors()    const { return fSectors.GetEntriesFast(); }
   Double_t GetCutRadius()   const { return fCutRadius; }
   Double_t GetGridDx()      const { return fGridDx; }
@@ -70,11 +70,11 @@ class CbmMuchModule :
   TVector3 GetPosition()    const { return fPosition; }
 
   /** Gets sector by the given index. **/
-  CbmMuchSector* GetSector(Int_t iSector) const { return (CbmMuchSector*)fSectors.At(iSector); }  
+  CbmMuchSector* GetSector(Int_t iSector) const { return (CbmMuchSector*)fSectors.At(iSector); }
   /** Gets sector by the given numbers of column and row in the grid. **/
   CbmMuchSector* GetSector(Int_t iGridColumn, Int_t iGridRow);
 
-  /** Adds a given sector to the array. 
+  /** Adds a given sector to the array.
   *@param  sector   CbmMuchSector which should be added to the array.**/
   void AddSector(CbmMuchSector* sector);
 
@@ -84,17 +84,17 @@ class CbmMuchModule :
   void InitNeighbourSectors();
   /** Adds to each pad info about neighbour pads **/
   void InitNeighbourPads();
- 
+
   TClonesArray* GetPoints()   const { return fPoints;     }
   TClonesArray* GetHits()     const { return fHits;       }
   TClonesArray* GetClusters() const { return fClusters;   }
   void SetPoints(TClonesArray* points)     { fPoints   = points;   }
   void SetHits  (TClonesArray* hits)       { fHits     = hits;     }
-  void SetClusters(TClonesArray* clusters) { fClusters = clusters; }  
+  void SetClusters(TClonesArray* clusters) { fClusters = clusters; }
   void DrawModule();
 
  protected:
-  Long64_t               fDetectorId;            // Unique detector ID
+  Int_t                  fDetectorId;            // Unique detector ID
   Double_t               fCutRadius;             // Radius of the cut (if any, otherwise = -1.) [cm]
   TVector3               fSize;                  // Size vector of the module (all dimensions in [cm])
   TVector3               fPosition;              // Location vector of the module center in global c.s. (all dimensions in [cm])

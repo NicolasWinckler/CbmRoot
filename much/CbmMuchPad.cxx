@@ -18,8 +18,9 @@ CbmMuchPad::CbmMuchPad():TPolyLine(){}
 // -----  Standard constructor  --------------------------------------------
 CbmMuchPad::CbmMuchPad (CbmMuchSector* sector, Int_t iChannel):TPolyLine(){
   // Generate detectorId
-  Long64_t sectorId = sector->GetDetectorId();
-  fDetectorId = CbmMuchGeoScheme::GetDetIdFromSector(sectorId, iChannel);
+  fDetectorId = sector->GetDetectorId();
+  Int_t iSector = sector->GetSectorIndex();
+  fChannelId = CbmMuchGeoScheme::GetChannelId(iSector, iChannel);
 
   TVector3 secPos = sector->GetPosition();
   TVector3 secSize = sector->GetSize();
@@ -67,28 +68,28 @@ CbmMuchPad::~CbmMuchPad(){
 // -------------------------------------------------------------------------
 Double_t CbmMuchPad::GetSectorX0() const{
 	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-	return geoScheme->GetSectorByDetId(fDetectorId)->GetPosition()[0];
+	return geoScheme->GetSectorByDetId(fDetectorId, fChannelId)->GetPosition()[0];
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 Double_t CbmMuchPad::GetSectorY0() const{
 	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-	return geoScheme->GetSectorByDetId(fDetectorId)->GetPosition()[1];
+	return geoScheme->GetSectorByDetId(fDetectorId, fChannelId)->GetPosition()[1];
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 Double_t CbmMuchPad::GetLx() const{
 	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-	return geoScheme->GetSectorByDetId(fDetectorId)->GetDx();
+	return geoScheme->GetSectorByDetId(fDetectorId, fChannelId)->GetDx();
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 Double_t CbmMuchPad::GetLy() const{
 	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-	return geoScheme->GetSectorByDetId(fDetectorId)->GetDy();
+	return geoScheme->GetSectorByDetId(fDetectorId, fChannelId)->GetDy();
 }
 // -------------------------------------------------------------------------
 
@@ -97,8 +98,8 @@ vector<CbmMuchPad*> CbmMuchPad::GetNeighbours(){
   vector<CbmMuchPad*> pads;
   CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
   for(Int_t i=0; i < fNeighbours.GetSize(); i++){
-    Long64_t detectorId = fNeighbours.At(i);
-    CbmMuchPad* pad = geoScheme->GetPadByDetId(detectorId);
+    Int_t channelId = fNeighbours.At(i);
+    CbmMuchPad* pad = geoScheme->GetPadByDetId(fDetectorId, channelId);
     if(pad) pads.push_back(pad);
   }
   return pads;
@@ -138,7 +139,7 @@ void CbmMuchPad::DrawPad(){
 // -------------------------------------------------------------------------
 TString CbmMuchPad::GetInfo(){
     return Form("Channel:%i fired:%i charge:%i digiId:%i",
-         CbmMuchGeoScheme::GetChannelIndex(fDetectorId),fFired,fCharge,fDigiIndex);
+         CbmMuchGeoScheme::GetChannelIndex(fChannelId),fFired,fCharge,fDigiIndex);
 }
 // -------------------------------------------------------------------------
 

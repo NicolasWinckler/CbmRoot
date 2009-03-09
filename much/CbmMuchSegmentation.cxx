@@ -4,7 +4,7 @@
  *@version 1.0
  **
  ** class for making parameter file for MUCH digitizer
- ** 
+ **
  **/
 
 #include "CbmGeoMuchPar.h"
@@ -45,7 +45,7 @@ CbmMuchSegmentation::CbmMuchSegmentation(char* digiFileName){
 // -------------------------------------------------------------------------
 
 // -----   Destructor   ----------------------------------------------------
-CbmMuchSegmentation::~CbmMuchSegmentation() { 
+CbmMuchSegmentation::~CbmMuchSegmentation() {
 }
 // -------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ InitStatus CbmMuchSegmentation::Init(){
   if(!fStations) Fatal("Init", "No input array of MUCH stations.");
   fNStations = fStations->GetEntries();
   fHistHitDensity = new TH1D*[fNStations];
-  
+
   for (Int_t i=0;i<fNStations;i++) {
     CbmMuchStation* station = (CbmMuchStation*) fStations->At(i);
     fHistHitDensity[i] = new TH1D(Form("hStation%i",i+1),Form("Station %i",i+1), 110, 0, 220);
@@ -99,7 +99,7 @@ void CbmMuchSegmentation::Exec(Option_t * option){
 //    printf("iPoint = %i\n", iPoint);
     assert(iStation >= 0 && iStation < fNStations);
     if(iLayer) continue;
-    TVector3 pos;    
+    TVector3 pos;
     point->Position(pos);
     ((TH1D*) fHistHitDensity[iStation])->Fill(pos.Pt());
   }
@@ -107,7 +107,7 @@ void CbmMuchSegmentation::Exec(Option_t * option){
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-void CbmMuchSegmentation::Finish(){
+void CbmMuchSegmentation::FinishTask(){
   // Create normalization histo
   TH1D* hNorm = new TH1D("hNorm","",110,0,220);
   Double_t binSize = 2.;
@@ -117,10 +117,10 @@ void CbmMuchSegmentation::Finish(){
     Double_t s = TMath::Pi()*(R2*R2-R1*R1);
     hNorm->SetBinContent(l+1,s*fEvents);
   }
-  
+
   for (Int_t i=0;i<fNStations;i++) {
     CbmMuchStation* station = (CbmMuchStation*)fStations->At(i);
-    TH1D* h =fHistHitDensity[i]; 
+    TH1D* h =fHistHitDensity[i];
     h->Divide(hNorm);
     TCanvas* c1 = new TCanvas(Form("cStation%i",i+1),Form("Station %i",i+1),10,10,500,500);
     c1->SetLogy();
@@ -175,7 +175,7 @@ void CbmMuchSegmentation::InitLayerSide(CbmMuchLayerSide* layerSide){
   Int_t nModules = layerSide->GetNModules();
   for(Int_t iModule = 0; iModule < nModules; iModule++){
     CbmMuchModule* module = layerSide->GetModule(iModule);
-    SegmentModule(module);    
+    SegmentModule(module);
   }
 }
 // -------------------------------------------------------------------------
@@ -191,25 +191,25 @@ void CbmMuchSegmentation::SegmentModule(CbmMuchModule* module){
   Double_t modX = position.X();
   Double_t modY = position.Y();
   Double_t modZ = position.Z();
-  
+
   Bool_t result = modLx > modLy;
-  Int_t iRatio = (result) ? (Int_t)((modLx+1e-3)/modLy) 
+  Int_t iRatio = (result) ? (Int_t)((modLx+1e-3)/modLy)
                           : (Int_t)((modLy+1e-3)/modLx);
-  Long64_t moduleId = module->GetDetectorId();
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(moduleId);
-  Int_t iLayer = CbmMuchGeoScheme::GetLayerIndex(moduleId);
-  Int_t iSide = CbmMuchGeoScheme::GetLayerSideIndex(moduleId);
-  Int_t iModule = CbmMuchGeoScheme::GetModuleIndex(moduleId);
+  Int_t detectorId = module->GetDetectorId();
+//  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(moduleId);
+//  Int_t iLayer = CbmMuchGeoScheme::GetLayerIndex(moduleId);
+//  Int_t iSide = CbmMuchGeoScheme::GetLayerSideIndex(moduleId);
+//  Int_t iModule = CbmMuchGeoScheme::GetModuleIndex(moduleId);
   Double_t secLx = (result) ? modLx/iRatio : modLx;
   Double_t secLy = (result) ? modLy : modLy/iRatio;
   for(Int_t i = 0; i< iRatio; i++){
     Double_t secX = (result) ? modX - modLx/2. + (i+0.5)*secLx : modX;
-    Double_t secY = (result) ? modY : modY - modLy/2. + (i+0.5)*secLy; 
-    Long64_t detectorId = CbmMuchGeoScheme::GetDetectorId(iStation, iLayer, iSide, iModule, module->GetNSectors());
+    Double_t secY = (result) ? modY : modY - modLy/2. + (i+0.5)*secLy;
+    Int_t iSector = module->GetNSectors();//CbmMuchGeoScheme::GetDetectorId(iStation, iLayer, iSide, iModule, module->GetNSectors());
 
     TVector3 position(secX, secY, modZ);
-    TVector3 size(secLx, secLy, modLz);    
-    SegmentSector(module, new CbmMuchSector(detectorId, position, size, 8, 16));
+    TVector3 size(secLx, secLy, modLz);
+    SegmentSector(module, new CbmMuchSector(detectorId, iSector, position, size, 8, 16));
   }
 }
 // -------------------------------------------------------------------------
@@ -218,11 +218,11 @@ void CbmMuchSegmentation::SegmentModule(CbmMuchModule* module){
 void CbmMuchSegmentation::SegmentSector(CbmMuchModule* module, CbmMuchSector* sector){
   TVector3 secSize = sector->GetSize();
   TVector3 secPosition = sector->GetPosition();
-  Long64_t moduleId = module->GetDetectorId();  
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(moduleId);
-  Int_t iLayer = CbmMuchGeoScheme::GetLayerIndex(moduleId);
-  Int_t iSide = CbmMuchGeoScheme::GetLayerSideIndex(moduleId);
-  Int_t iModule = CbmMuchGeoScheme::GetModuleIndex(moduleId);
+  Int_t detectorId = module->GetDetectorId();
+  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(detectorId);
+  Int_t iLayer = CbmMuchGeoScheme::GetLayerIndex(detectorId);
+  Int_t iSide = CbmMuchGeoScheme::GetLayerSideIndex(detectorId);
+  Int_t iModule = CbmMuchGeoScheme::GetModuleIndex(detectorId);
   Double_t secLx = secSize.X();
   Double_t secLy = secSize.Y();
   Double_t secLz = secSize.Z();
@@ -237,7 +237,7 @@ void CbmMuchSegmentation::SegmentSector(CbmMuchModule* module, CbmMuchSector* se
 
   Bool_t result1 = ShouldSegmentByX(sector);
   Bool_t result2 = ShouldSegmentByY(sector);
-    
+
   if(result1 || result2){
     delete sector;
   }
@@ -247,12 +247,12 @@ void CbmMuchSegmentation::SegmentSector(CbmMuchModule* module, CbmMuchSector* se
     if((IntersectsRad(sector, module->GetCutRadius())==2) || !IntersectsRad(sector, rMax)){
       delete sector;
       return;
-    }    
+    }
     module->AddSector(sector);
     return;
   }
 
-  Long64_t detectorId;
+  Int_t iSector;
   Double_t newSecX, newSecY, newSecLx, newSecLy;
   Bool_t equal = TMath::Abs(secLx - secLy) < 1e-5;
   Bool_t res = secLx > secLy;
@@ -262,26 +262,26 @@ void CbmMuchSegmentation::SegmentSector(CbmMuchModule* module, CbmMuchSector* se
       res = kTRUE;
     }
     for(Int_t i = 0; i < 2; ++i){
-      detectorId = CbmMuchGeoScheme::GetDetIdFromModule(moduleId, module->GetNSectors());
+      iSector = module->GetNSectors();//CbmMuchGeoScheme::GetDetIdFromModule(moduleId, module->GetNSectors());
       newSecLx = res ? secLx/2. : secLx;
       newSecLy = res ? secLy    : secLy/2.;
       newSecX  = res ? secX + (i - 0.5)*newSecLx : secX;
       newSecY  = res ? secY : secY + (i - 0.5)*newSecLy;
       position.SetXYZ(newSecX, newSecY, secZ);
       size.SetXYZ(newSecLx, newSecLy, secLz);
-      SegmentSector(module, new CbmMuchSector(detectorId, position, size, 8, 16));
+      SegmentSector(module, new CbmMuchSector(detectorId, iSector, position, size, 8, 16));
     }
   }
   else if(result1 || result2){
     for(Int_t i = 0; i < 2; i++){
-      detectorId = CbmMuchGeoScheme::GetDetIdFromModule(moduleId, module->GetNSectors());
+      iSector = module->GetNSectors();//CbmMuchGeoScheme::GetDetIdFromModule(moduleId, module->GetNSectors());
       newSecLx = result1 ? secLx/2. : secLx;
       newSecLy = result1 ? secLy    : secLy/2;
       newSecX  = result1 ? secX + (i - 0.5)*newSecLx : secX;
       newSecY  = result1 ? secY : secY + (i - 0.5)*newSecLy;
       position.SetXYZ(newSecX, newSecY, secZ);
       size.SetXYZ(newSecLx, newSecLy, secLz);
-      SegmentSector(module, new CbmMuchSector(detectorId, position, size, 8, 16));
+      SegmentSector(module, new CbmMuchSector(detectorId, iSector, position, size, 8, 16));
     }
   }
 }
@@ -293,17 +293,17 @@ Bool_t CbmMuchSegmentation::ShouldSegmentByX(CbmMuchSector* sector){
   Double_t secLy = sector->GetSize()[1];
   Double_t secX  = sector->GetPosition()[0];
   Double_t secY  = sector->GetPosition()[1];
-  
+
   Double_t ulR = TMath::Sqrt((secX - secLx/2.)*(secX - secLx/2.) + (secY + secLy/2.)*(secY + secLy/2.));
   Double_t urR = TMath::Sqrt((secX + secLx/2.)*(secX + secLx/2.) + (secY + secLy/2.)*(secY + secLy/2.));
   Double_t blR = TMath::Sqrt((secX - secLx/2.)*(secX - secLx/2.) + (secY - secLy/2.)*(secY - secLy/2.));
   Double_t brR = TMath::Sqrt((secX + secLx/2.)*(secX + secLx/2.) + (secY - secLy/2.)*(secY - secLy/2.));
-  
+
   Double_t uR = (ulR < urR) ? ulR : urR;
   Double_t bR = (blR < brR) ? blR : brR;
   Double_t R  = (uR < bR) ? uR : bR;
-  
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());//sector->GetStationId();
+
+  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
   CbmMuchStation* station = (CbmMuchStation*)fStations->At(iStation);
   // Check minimum and maximum allowed resolution
   Double_t sigmaMax = station->GetSigmaXmax(); //[cm]
@@ -329,16 +329,16 @@ Bool_t CbmMuchSegmentation::ShouldSegmentByY(CbmMuchSector* sector){
   Double_t secLy = sector->GetSize()[1];
   Double_t secX  = sector->GetPosition()[0];
   Double_t secY  = sector->GetPosition()[1];
-  
+
   Double_t ulR = TMath::Sqrt((secX - secLx/2.)*(secX - secLx/2.) + (secY + secLy/2.)*(secY + secLy/2.));
   Double_t urR = TMath::Sqrt((secX + secLx/2.)*(secX + secLx/2.) + (secY + secLy/2.)*(secY + secLy/2.));
   Double_t blR = TMath::Sqrt((secX - secLx/2.)*(secX - secLx/2.) + (secY - secLy/2.)*(secY - secLy/2.));
   Double_t brR = TMath::Sqrt((secX + secLx/2.)*(secX + secLx/2.) + (secY - secLy/2.)*(secY - secLy/2.));
-  
+
   Double_t uR = (ulR < urR) ? ulR : urR;
   Double_t bR = (blR < brR) ? blR : brR;
   Double_t R  = (uR < bR) ? uR : bR;
-  
+
   Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
   CbmMuchStation* station = (CbmMuchStation*)fStations->At(iStation);
   // Check minimum and maximum allowed resolution
@@ -369,7 +369,7 @@ Int_t CbmMuchSegmentation::IntersectsRad(CbmMuchSector* sector, Double_t radius)
   Double_t secLy = sector->GetSize()[1];
   Double_t secX  = sector->GetPosition()[0];
   Double_t secY  = sector->GetPosition()[1];
- 
+
   Double_t ulR = TMath::Sqrt((secX - secLx/2.)*(secX - secLx/2.) + (secY + secLy/2.)*(secY + secLy/2.));
   Double_t urR = TMath::Sqrt((secX + secLx/2.)*(secX + secLx/2.) + (secY + secLy/2.)*(secY + secLy/2.));
   Double_t blR = TMath::Sqrt((secX - secLx/2.)*(secX - secLx/2.) + (secY - secLy/2.)*(secY - secLy/2.));
@@ -379,7 +379,7 @@ Int_t CbmMuchSegmentation::IntersectsRad(CbmMuchSector* sector, Double_t radius)
   if(urR < radius) intersects++;
   if(blR < radius) intersects++;
   if(brR < radius) intersects++;
-  
+
   if(intersects == 4) return 2;
   if(intersects) return 1;
   else return 0;

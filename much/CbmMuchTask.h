@@ -41,10 +41,10 @@ class CbmMuchTask //: public FairTask
   /** Get parameter containers **/
   virtual void SetParContainers(){}
 
-  /** Intialisation **/
+  /** Initialization **/
   virtual InitStatus Init(){}
 
-  /** Reinitialisation **/
+  /** Reinitialization **/
   virtual InitStatus ReInit(){}
 
 
@@ -54,7 +54,7 @@ class CbmMuchTask //: public FairTask
   TStopwatch                       fTimer;             // Timer
   Int_t                            fVerbose;           // Verbosity level
   TString                          fName;              // Name
-  
+
   ClassDef(CbmMuchTask,1);
 };
 

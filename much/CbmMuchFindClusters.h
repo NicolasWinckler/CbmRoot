@@ -35,28 +35,36 @@ class CbmMuchFindClusters : public CbmMuchTask
 
  public :
 
-  /** Default constructor **/
+  /** Default constructor. */
   CbmMuchFindClusters();
 
-  /** Standard constructor **/
+  /**
+   * Standard constructor.
+   * @param iVerbose   Verbosity level.
+   */
   CbmMuchFindClusters(Int_t iVerbose);
 
-  /** Constructor with task name **/
+  /**
+   * Constructor with task name.
+   * @param name      Task name.
+   * @param digiFile  Input digitization scheme file.
+   * @param iVerbose  Verbosity level.
+   */
   CbmMuchFindClusters(const char* name, TFile* digiFile, Int_t iVerbose);
 
-  /** Destructor **/
+  /** Destructor. */
   virtual ~CbmMuchFindClusters();
 
-  /** Execution **/
+  /** Execution. */
   virtual void Exec(Option_t* opt);
 
-  /** Get parameter containers **/
+  /** Get parameter containers. */
   virtual void SetParContainers();
 
-  /** Intialization **/
+  /** Initialization. */
   virtual InitStatus Init();
 
-  /** Reinitialization **/
+  /** Reinitialization. */
   virtual InitStatus ReInit();
 
  private:
@@ -65,14 +73,14 @@ class CbmMuchFindClusters : public CbmMuchTask
   TClonesArray*                    fDigis;             // Input array of CbmMuchDigi
   TClonesArray*                    fDigiMatches;       // Input array of CbmMuchDigiMatch
   TClonesArray*                    fPrimaryClusters;   // Output array of primary CbmMuchCluster objects
-  map<Long64_t, Int_t>             fChannelDigiMap;    // Correspondence between channel and digi index
+  map<pair<Int_t, Int_t>, Int_t>   fChannelDigiMap;    // Correspondence between unique channel id and digi index
   set<Int_t>                       fSelectedDigis;     // Digis already included in clusters
-  
+
 
   /** Fills fPrimaryClusters array with found clusters. **/
   void FindClusters();
 
-  /** Creates correspondence between channel number and digi index. 
+  /** Creates correspondence between channel number and digi index.
    *  Fills fChannelDigiMap. **/
   void FillChannelDigiMap();
 

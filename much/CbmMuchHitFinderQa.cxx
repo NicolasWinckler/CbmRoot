@@ -689,7 +689,7 @@ void CbmMuchHitFinderQa::DigitizerQa(){
     CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(i);
     // Get pad area
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
-    CbmMuchPad* pad = fGeoScheme->GetPadByDetId(digi->GetDetectorId());
+    CbmMuchPad* pad = fGeoScheme->GetPadByDetId(digi->GetDetectorId(), digi->GetChannelId());
     Double_t area = pad->GetLx()*pad->GetLy();
     for (Int_t pt=0;pt<match->GetNPoints();pt++){
       Int_t pointId = match->GetRefIndex(pt);
@@ -746,12 +746,13 @@ void CbmMuchHitFinderQa::OccupancyQa(){
   // Filling occupancy plots
   for (Int_t i=0;i<fDigis->GetEntriesFast();i++){
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
-    Long64_t detId = digi->GetDetectorId();
-    CbmMuchPad* pad = fGeoScheme->GetPadByDetId(detId);
+    Int_t detectorId = digi->GetDetectorId();
+    Int_t channelId  = digi->GetChannelId();
+    CbmMuchPad* pad = fGeoScheme->GetPadByDetId(detectorId, channelId);
     Double_t x0 = pad->GetX0();
     Double_t y0 = pad->GetY0();
     Double_t r0 = TMath::Sqrt(x0*x0+y0*y0);
-    fhPadsFiredR[fGeoScheme->GetStationIndex(detId)]->Fill(r0);
+    fhPadsFiredR[fGeoScheme->GetStationIndex(detectorId)]->Fill(r0);
   }
 }
 // -------------------------------------------------------------------------
@@ -852,7 +853,7 @@ void CbmMuchHitFinderQa::PullsQa(){
       if (match->GetNPoints()>1) { point_unique=0; break; }
       Int_t currentPointId = match->GetRefIndex(0);
       CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(index);
-      CbmMuchPad* pad = fGeoScheme->GetPadByDetId(digi->GetDetectorId());
+      CbmMuchPad* pad = fGeoScheme->GetPadByDetId(digi->GetDetectorId(), digi->GetChannelId());
       Double_t x = pad->GetX0();
       Double_t y = pad->GetY0();
       Double_t dx = pad->GetLx();

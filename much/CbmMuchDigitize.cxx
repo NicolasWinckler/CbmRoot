@@ -56,7 +56,7 @@ CbmMuchDigitize::CbmMuchDigitize() :
 	fNADCChannels = 256;
 	fQMax = 440000;
 	SetQThreshold(3);
-	fMeanNoise = 1500;
+	fMeanNoise = 0; //1500;
 	fUseAvalanche = 0;
 	SetDetectorType(kMICROMEGAS);
 	fMeanGasGain = 1e4;
@@ -79,7 +79,7 @@ CbmMuchDigitize::CbmMuchDigitize(Int_t iVerbose) :
 	fNADCChannels = 256;
 	fQMax = 440000;
 	SetQThreshold(3);
-	fMeanNoise = 1500;
+	fMeanNoise = 0;//1500;
 	fUseAvalanche = 0;
 	SetDetectorType(kMICROMEGAS);
 	fMeanGasGain = 1e4;
@@ -103,7 +103,7 @@ CbmMuchDigitize::CbmMuchDigitize(const char* name, const char* digiFileName,
 	fNADCChannels = 256;
 	fQMax = 440000;
 	SetQThreshold(3);
-	fMeanNoise = 1500;
+	fMeanNoise = 0;//1500;
 	fUseAvalanche = 0;
 	SetDetectorType(kMICROMEGAS);
 	fMeanGasGain = 1e4;
@@ -136,7 +136,8 @@ CbmMuchDigitize::~CbmMuchDigitize() {
 // ------- Private method ExecSimple ---------------------------------------
 Bool_t CbmMuchDigitize::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
 	// Get module for the point
-	CbmMuchModule* module = fGeoScheme->GetModuleByDetId(point->GetDetectorID());
+	Int_t detectorId = point->GetDetectorID();
+	CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
 	if (!module)
 		return kFALSE;
 	if (module->GetNSectors() == 0) {
@@ -159,7 +160,7 @@ Bool_t CbmMuchDigitize::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
 	Double_t x0 = (xIn + xOut) / 2;
 	Double_t y0 = (yIn + yOut) / 2;
 
-        // Translate to module center system
+	// Translate to module center system
 	TVector3 modPos = module->GetPosition();
 	Double_t x0_mod = x0 - modPos[0];
 	Double_t y0_mod = y0 - modPos[1];
@@ -193,24 +194,25 @@ Bool_t CbmMuchDigitize::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
 		return kFALSE;
 	}
 
-	Long64_t channelId = CbmMuchGeoScheme::GetDetIdFromSector(
-			sector->GetDetectorId(), iChannel);
+	Int_t iSector = sector->GetSectorIndex();                            // Sector index within the module
+	Int_t channelId = CbmMuchGeoScheme::GetChannelId(iSector, iChannel); // Channel id within the module
+	pair<Int_t, Int_t> uniqueId(detectorId, channelId);                  // Unique id of the channel within the MUCH
 	Int_t iDigi = -1;
-	if (fChannelMap.find(channelId) == fChannelMap.end()) {
+	if (fChannelMap.find(uniqueId) == fChannelMap.end()) {
 		// Channel not yet active. Create new Digi and Match.
 		iDigi = fDigis->GetEntriesFast();
 		Double_t time = point->GetTime() + gRandom->Gaus(0, fDTime);
-		new ((*fDigis)[iDigi]) CbmMuchDigi(channelId, time, fDTime);
+		new ((*fDigis)[iDigi]) CbmMuchDigi(detectorId, channelId, time, fDTime);
 		new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch();
 		CbmMuchDigiMatch* match =
 				dynamic_cast<CbmMuchDigiMatch*> (fDigiMatches->At(iDigi));
 		if (match)
 			match->AddPoint(iPoint);
 		// Match channelId to index of the Digi.
-		fChannelMap[channelId] = iDigi;
+		fChannelMap[uniqueId] = iDigi;
 	} else {
 		// Channel already active.
-		iDigi = fChannelMap[channelId];
+		iDigi = fChannelMap[uniqueId];
 		CbmMuchDigi* digi = dynamic_cast<CbmMuchDigi*> (fDigis->At(iDigi));
 		Double_t time = point->GetTime() + gRandom->Gaus(0, fDTime);
 		digi->AddTime(time); // add time info
@@ -229,20 +231,22 @@ Bool_t CbmMuchDigitize::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
 // ------- Private method ExecAdvanced -------------------------------------
 Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 	// Get module for the point
-	CbmMuchModule* module = fGeoScheme->GetModuleByDetId(point->GetDetectorID());
+	Int_t detectorId = point->GetDetectorID();
+	CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
 	if (!module)
 		return kFALSE;
 	if (module->GetNSectors() == 0) {
 		fNOutside++;
 		return kFALSE;
 	}
+
 	TVector3 modSize = module->GetSize();
 	Double_t modLx = modSize[0];
 	Double_t modLy = modSize[1];
 	Double_t gridDx = module->GetGridDx();
 	Double_t gridDy = module->GetGridDy();
 
-	// Get track length within the station
+	// Get track length within the module
 	Double_t xIn = point->GetXIn();
 	Double_t yIn = point->GetYIn();
 	Double_t xOut = point->GetXOut();
@@ -252,7 +256,7 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 	Double_t deltaX = xOut - xIn;
 	Double_t deltaY = yOut - yIn;
 	Double_t deltaZ = zOut - zIn;
-	Double_t lTrack = sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ); // track length
+	Double_t lTrack = TMath::Sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ); // track length
 
 	//********** Primary electrons from the track (begin) ************************//
 	// Get particle's characteristics
@@ -273,18 +277,18 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 	}
 	if (TMath::Abs(particle->Charge()) < 0.1)
 		return kFALSE;
-	TVector3 momentum;                                             // 3-momentum of the particle
+	TVector3 momentum;                                            // 3-momentum of the particle
 	point->Momentum(momentum);
-	Double_t mom = momentum.Mag() * 1e3;                          // absolute momentum value [MeV/c]
-	Double_t mom2 = mom * mom;                                     // squared momentum of the particle
-	Double_t mass = particle->Mass() * 1e3;                        // mass of the particle [MeV/c^2]
-	Double_t mass2 = mass * mass;                                  // squared mass of the particle
-	Double_t Tkin = sqrt(mom2 + mass2) - mass;                    // kinetic energy of the particle
-	Double_t sigma = CbmMuchDigitize::Sigma_n_e(Tkin, mass);       // sigma for Landau distribution
-	Double_t mpv = CbmMuchDigitize::MPV_n_e(Tkin, mass);           // most probable value for Landau distr.
-	UInt_t nElectrons = (UInt_t) fLandauRnd->Landau(mpv, sigma);  // number of prim. electrons per 0.3 cm gap
-	while(nElectrons > 10000)
-		nElectrons = fLandauRnd->Landau(mpv, sigma);              // restrict Landau tail to increase performance
+	Double_t mom = momentum.Mag() * 1e3;                         // absolute momentum value [MeV/c]
+	Double_t mom2 = mom * mom;                                    // squared momentum of the particle
+	Double_t mass = particle->Mass() * 1e3;                       // mass of the particle [MeV/c^2]
+	Double_t mass2 = mass * mass;                                 // squared mass of the particle
+	Double_t Tkin = TMath::Sqrt(mom2 + mass2) - mass;            // kinetic energy of the particle
+	Double_t sigma = CbmMuchDigitize::Sigma_n_e(Tkin, mass);      // sigma for Landau distribution
+	Double_t mpv = CbmMuchDigitize::MPV_n_e(Tkin, mass);          // most probable value for Landau distr.
+	UInt_t nElectrons = (UInt_t) fLandauRnd->Landau(mpv, sigma); // number of prim. electrons per 0.3 cm gap
+	while (nElectrons > 100000)
+		nElectrons = fLandauRnd->Landau(mpv, sigma);             // restrict Landau tail to increase performance
 	// Number of electrons for current track length
 	if (mass < 100.)
 		nElectrons = (UInt_t) (nElectrons * lTrack / 0.47);
@@ -296,11 +300,11 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 	Double_t cosphi_tr = deltaX / hypotenuse; // cos of track azim. angle
 	Double_t sinphi_tr = deltaY / hypotenuse; // sin of track azim. angle
 
-	map<Long64_t, CbmMuchDigi*> chargedPads;
+	map<Int_t, CbmMuchDigi*> chargedPads;     // map from a channel id within the module to a fired digi
 	Double_t time = point->GetTime();
-	UInt_t nTrackCharge = 0; // Total charge left by a track
+	UInt_t nTrackCharge = 0;                  // total charge left by a track
 	for (Int_t iElectron = 0; iElectron < nElectrons; iElectron++) {
-		// Coordinates of prim. electrons along the track
+		// Coordinates of primary electrons along the track
 		Double_t aL = fRnd->Rndm() * hypotenuse;
 		Double_t xe = xIn + aL * cosphi_tr;
 		Double_t ye = yIn + aL * sinphi_tr;
@@ -314,7 +318,7 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 		TPolyLine spotPolygon = GetPolygon(xe, ye, spotL, spotL);
 		Double_t* xVertex = spotPolygon.GetX();
 		Double_t* yVertex = spotPolygon.GetY();
-		map<Long64_t, CbmMuchSector*> firedSectors;
+		map<Int_t, CbmMuchSector*> firedSectors; // map from a sector index to a fired sector
 		for (Int_t iVertex = 0; iVertex < spotPolygon.GetN() - 1; iVertex++) {
 			// Translate to module center
 			TVector3 modPos = module->GetPosition();
@@ -329,18 +333,18 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 			CbmMuchSector* sector = module->GetSector(iGridColumn, iGridRow);
 
 			if (sector) {
-				Long64_t detID = sector->GetDetectorId();
-				if (firedSectors.find(detID) == firedSectors.end())
-					firedSectors[detID] = sector;
+				Int_t iSector = sector->GetSectorIndex();
+				if (firedSectors.find(iSector) == firedSectors.end())
+					firedSectors[iSector] = sector;
 			}
 		}
 
 		// Fire pads in intersected sectors
-		for (map<Long64_t, CbmMuchSector*>::iterator it = firedSectors.begin();
-		        it != firedSectors.end(); it++) {
+		for (map<Int_t, CbmMuchSector*>::iterator it = firedSectors.begin(); it
+				!= firedSectors.end(); it++) {
 			// Get sector and its parameters
 			CbmMuchSector* sector = (*it).second;
-			Long64_t sectorId = (*it).first;
+			Int_t iSector = (*it).first;
 			// Find fired pads
 			for (Int_t iChannel = 0; iChannel < sector->GetNChannels(); iChannel++) {
 				Double_t padRad = sector->GetPadRadius();
@@ -355,11 +359,11 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 				if (!PolygonsIntersect(sector, *padPolygon, spotPolygon, area))
 					continue; // detailed search
 				UInt_t iCharge = (UInt_t) (nSecElectrons * area / spotArea);
-				Long64_t channelId = CbmMuchGeoScheme::GetDetIdFromSector(sectorId,
-						iChannel);
+				Int_t channelId = CbmMuchGeoScheme::GetChannelId(iSector, iChannel); // channel id within the module
 
 				if (chargedPads.find(channelId) == chargedPads.end()) {
-					chargedPads[channelId] = new CbmMuchDigi(channelId, time, fDTime);
+					chargedPads[channelId] = new CbmMuchDigi(detectorId,
+							channelId, time, fDTime);
 				}
 				chargedPads[channelId]->AddCharge(iCharge); // add charge to digi
 			} // loop channels
@@ -371,25 +375,26 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 		return kFALSE;
 	}
 
-	for (map<Long64_t, CbmMuchDigi*>::iterator it = chargedPads.begin(); it
+	for (map<Int_t, CbmMuchDigi*>::iterator it = chargedPads.begin(); it
 			!= chargedPads.end(); it++) {
-		Long64_t channelId = (*it).first;
+		Int_t channelId = (*it).first;                      // Channel id within the module
+		pair<Int_t, Int_t> uniqueId(detectorId, channelId); // Unique channel id within the MUCH
 		CbmMuchDigi* digi = (*it).second;
 		if (!digi)
 			continue;
 		Int_t iCharge = digi->GetCharge();
 		if (iCharge < 0)
 			iCharge = (Int_t) (TMath::Power(2, 31) - 2);
-		if (fChargedPads.find(channelId) == fChargedPads.end()) {
-			fChargedPads[channelId] = new CbmMuchDigi(digi);
-			fChargedMatches[channelId] = new CbmMuchDigiMatch();
-			fChargedMatches[channelId]->AddPoint(iPoint);
-			fChargedMatches[channelId]->AddCharge(iCharge);
+		if (fChargedPads.find(uniqueId) == fChargedPads.end()) {
+			fChargedPads[uniqueId] = new CbmMuchDigi(digi);
+			fChargedMatches[uniqueId] = new CbmMuchDigiMatch();
+			fChargedMatches[uniqueId]->AddPoint(iPoint);
+			fChargedMatches[uniqueId]->AddCharge(iCharge);
 		} else {
-			fChargedPads[channelId]->AddTime(time);
-			fChargedPads[channelId]->AddCharge(iCharge);
-			fChargedMatches[channelId]->AddPoint(iPoint);
-			fChargedMatches[channelId]->AddCharge(iCharge);
+			fChargedPads[uniqueId]->AddTime(time);
+			fChargedPads[uniqueId]->AddCharge(iCharge);
+			fChargedMatches[uniqueId]->AddPoint(iPoint);
+			fChargedMatches[uniqueId]->AddCharge(iCharge);
 			fNMulti++;
 		}
 
@@ -425,7 +430,8 @@ void CbmMuchDigitize::Exec(Option_t* opt) {
 		return;
 	}
 	if (!fPoints) {
-		cerr << "-W- " << fName << "::Exec: No input array (MuchPoint) " << endl;
+		cerr << "-W- " << fName << "::Exec: No input array (MuchPoint) "
+				<< endl;
 		cout << "- " << fName << endl;
 		return;
 	}
@@ -444,8 +450,8 @@ void CbmMuchDigitize::Exec(Option_t* opt) {
 		}
 
 		// Get the module the point is in
-		CbmMuchModule* module =
-				fGeoScheme->GetModuleByDetId(point->GetDetectorID());
+		CbmMuchModule* module = fGeoScheme->GetModuleByDetId(
+				point->GetDetectorID());
 		if (!module) {
 			fNFailed++;
 			continue;
@@ -473,8 +479,8 @@ void CbmMuchDigitize::Exec(Option_t* opt) {
 	cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
 			<< fixed << right << fTimer.RealTime() << " s, points " << nPoints
 			<< ", failed " << fNFailed << ", not usable " << notUsable
-			<< ", outside " << fNOutside << ", multihits " << fNMulti << ", digis "
-			<< fDigis->GetEntriesFast() << endl;
+			<< ", outside " << fNOutside << ", multihits " << fNMulti
+			<< ", digis " << fDigis->GetEntriesFast() << endl;
 }
 // -------------------------------------------------------------------------
 
@@ -546,19 +552,19 @@ void CbmMuchDigitize::FirePads() {
 		AddNoise();
 
 	// Apply threshold
-	for (map<Long64_t, CbmMuchDigi*>::iterator it = fChargedPads.begin(); it
-			!= fChargedPads.end(); it++) {
-		Long64_t channelId = (*it).first;
+	for (map<pair<Int_t, Int_t> , CbmMuchDigi*>::iterator it =
+			fChargedPads.begin(); it != fChargedPads.end(); it++) {
+		pair<Int_t, Int_t> uniqueId = (*it).first;
 		CbmMuchDigi* digi = (*it).second;
-		CbmMuchDigiMatch* match = fChargedMatches[channelId];
+		CbmMuchDigiMatch* match = fChargedMatches[uniqueId];
 		if (digi->GetCharge() > fQThreshold) {
 			Int_t iDigi = -1;
-			if (fChannelMap.find(channelId) == fChannelMap.end()) {
+			if (fChannelMap.find(uniqueId) == fChannelMap.end()) {
 				iDigi = fDigis->GetEntriesFast();
 				digi->SetADCCharge(digi->GetCharge() / fNADCChannels);
 				new ((*fDigis)[iDigi]) CbmMuchDigi(digi);
 				new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch(match);
-				fChannelMap[channelId] = iDigi;
+				fChannelMap[uniqueId] = iDigi;
 			}
 		}
 		delete digi;
@@ -580,15 +586,18 @@ void CbmMuchDigitize::AddNoise() {
 void CbmMuchDigitize::AddNoise(CbmMuchPad* pad) {
 	Double_t rndGaus = TMath::Abs(fMeanNoise * fRnd->Gaus());
 	UInt_t iCharge = (UInt_t) rndGaus;
-	Long64_t channelId = pad->GetDetectorId();
-	if (fChargedPads.find(channelId) == fChargedPads.end()) {
+	Int_t detectorId = pad->GetDetectorId();
+	Int_t channelId  = pad->GetChannelId();
+	pair<Int_t, Int_t> uniqueId(detectorId, channelId);
+	if (fChargedPads.find(uniqueId) == fChargedPads.end()) {
 		if (iCharge <= fQThreshold)
 			return;
-		fChargedPads[channelId] = new CbmMuchDigi(channelId, 0, 0); // No time and Dtime info
-		fChargedMatches[channelId] = new CbmMuchDigiMatch();
+		fChargedPads[uniqueId] = new CbmMuchDigi(pad->GetDetectorId(),
+				channelId, 0, 0); // No time and Dtime info
+		fChargedMatches[uniqueId] = new CbmMuchDigiMatch();
 	}
-	fChargedMatches[channelId]->AddCharge(iCharge);
-	fChargedPads[channelId]->AddCharge(iCharge);
+	fChargedMatches[uniqueId]->AddCharge(iCharge);
+	fChargedPads[uniqueId]->AddCharge(iCharge);
 }
 // -------------------------------------------------------------------------
 
@@ -693,8 +702,8 @@ Double_t CbmMuchDigitize::mu_sigma_n_e(Double_t &logT) {
 	const int n = 7;
 	double val = 0;
 	double arg = 1;
-	double p[n] = { 74.5272, -49.7648, 14.4886, -2.23059, 0.188254, -0.00792744,
-			0.00011976 };
+	double p[n] = { 74.5272, -49.7648, 14.4886, -2.23059, 0.188254,
+			-0.00792744, 0.00011976 };
 	for (int i = 0; i < n; i++) {
 		val = val + arg * p[i];
 		arg = arg * logT;
@@ -778,8 +787,8 @@ Double_t CbmMuchDigitize::e_MPV_n_e(Double_t &logT) {
 	const int n = 7;
 	double val = 0;
 	double arg = 1;
-	double p[n] = { 14.654, -0.786582, 2.32435, -0.875594, 0.167237, -0.0162335,
-			0.000616855 };
+	double p[n] = { 14.654, -0.786582, 2.32435, -0.875594, 0.167237,
+			-0.0162335, 0.000616855 };
 	for (int i = 0; i < n; i++) {
 		val = val + arg * p[i];
 		arg = arg * logT;
@@ -788,12 +797,12 @@ Double_t CbmMuchDigitize::e_MPV_n_e(Double_t &logT) {
 }
 void CbmMuchDigitize::SetDetectorType(DetectorType type) {
 	switch (type) {
-		case kGEM:
-			fSpotRadius = 0.15;
-			break;
-		case kMICROMEGAS:
-			fSpotRadius = 0.03;
-			break;
+	case kGEM:
+		fSpotRadius = 0.15;
+		break;
+	case kMICROMEGAS:
+		fSpotRadius = 0.03;
+		break;
 	}
 }
 

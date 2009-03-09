@@ -37,7 +37,6 @@ CbmMuchHitProducerIdeal.cxx
 CbmMuchLayer.cxx
 CbmMuchLayerSide.cxx
 CbmMuchMatchTracks.cxx 
-#CbmMuchMaximalChargeQa.cxx
 CbmMuchModule.cxx
 CbmMuchPad.cxx
 CbmMuchPointInfo.cxx

@@ -3,7 +3,7 @@
  *@version 1.0
  *@since   15.03.07
  **
- ** This class holds the transport geometry parameters 
+ ** This class holds the transport geometry parameters
  ** of one MuCh tracking station.
  **
  **/
@@ -22,8 +22,8 @@ class CbmMuchStation : public TObject{
   CbmMuchStation();
 
 
-  /** Standard constructor 
-  *@param iStation  Station Id
+  /** Standard constructor
+  *@param iStation  Station index
   *@param z         z position of station centre [cm]
   **/
   CbmMuchStation(Int_t iStation, Double_t z);
@@ -41,9 +41,9 @@ class CbmMuchStation : public TObject{
   void SetSigmaYmax   (Double_t sigma) { fSigmaYmax    = sigma; }
   void SetOccupancyMax(Double_t occup) { fOccupancyMax = occup; }
 
-  
+
   /** Accessors **/
-  Long64_t GetDetectorId()   const { return fDetectorId; }
+  Int_t GetDetectorId()   const { return fDetectorId; }
   Double_t GetZ()            const { return fZ; }
   Int_t    GetNLayers()      const { return fLayers.GetEntriesFast(); }
   Double_t GetRmin()         const { return fRmin;         }
@@ -61,7 +61,7 @@ class CbmMuchStation : public TObject{
 
 
  protected:
-  Long64_t   fDetectorId;       // Unique detector ID
+  Int_t   fDetectorId;          // Unique detector ID
   Double32_t fZ;                // z position of station centre (midplane) [cm]
   TObjArray  fLayers;           // Array of CbmMuchLayers
   Double_t   fRmin;             // Minimum radius of the station [cm]
@@ -71,7 +71,7 @@ class CbmMuchStation : public TObject{
   Double_t   fSigmaXmax;        // Maximum sigma in X [mm]
   Double_t   fSigmaYmax;        // Maximum sigma in Y [mm]
   Double_t   fOccupancyMax;     // Maximum occupancy
-  
+
   ClassDef(CbmMuchStation,1);
 };
 #endif

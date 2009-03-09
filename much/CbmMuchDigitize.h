@@ -32,6 +32,7 @@
 #include <set>
 #include <map>
 
+
 class CbmMuchSector;
 class CbmMuchPoint;
 class TFile;
@@ -43,43 +44,67 @@ class CbmMuchDigitize : public FairTask
 
  public:
 
-  /** Default constructor **/
+  /** Default constructor */
   CbmMuchDigitize();
 
-  /** Standard constructor **/
+  /** Standard constructor */
   CbmMuchDigitize(Int_t iVerbose);
 
-  /** Constructor with name **/
+  /** Constructor with name */
   CbmMuchDigitize(const char* name, const char* digiFileName, Int_t iVerbose);
 
-  /** Destructor **/
+  /** Destructor */
   virtual ~CbmMuchDigitize();
 
-  /** Execution **/
+  /** Execution */
   virtual void Exec(Option_t* opt);
 
-  /** Sets switch whether to use (=1) avalanche or not (=0). 0 by default. **/
+  /**
+   * Sets whether to use avalanches or not.
+   * @param useAvalanche  0 if avalanches are not used, 1 otherwise (0 by default).
+   */
   void SetUseAvalanche(Int_t useAvalanche) { fUseAvalanche = useAvalanche; }
 
-  /** Sets radius of a spot from secondary electrons [cm] (0.03 cm by default). **/
+  /**
+   * Sets radius of a spot from secondary electrons.
+   * @param spotRadius    Spot radius [cm] (0.03 cm by default).
+   */
   void SetSpotRadius(Double_t spotRadius) { fSpotRadius = spotRadius; }
 
-  /** Sets detector type used in MUCH. **/
+  /**
+   * Sets detector type used in MUCH.
+   * @param type          Detector type (Micromegas by default).
+   */
   void SetDetectorType(DetectorType type);
 
-  /** Sets mean gas gain value. **/
+  /**
+   * Sets mean gas gain value.
+   * @param gasGain      Mean gas gain value [electrons] (10000 by default).
+   */
   void SetMeanGasGain(Double_t gasGain)   { fMeanGasGain = gasGain; }
 
-  /** Sets maximal charge [electrons] which a pad able to collect. **/
+  /**
+   * Sets maximal charge which a pad able to collect.
+   * @param qMax         Charge value [electrons] (440000 by default).
+   */
   void SetQMaximum(UInt_t qMax) { fQMax = qMax; }
 
-  /** Sets charge threshold [ADC channels] for pads. **/
+  /**
+   * Sets charge threshold [ADC channels] for pads.
+   * @param qThreshold    Charge threshold value [ADC channels] (3 by default).
+   */
   void SetQThreshold(UInt_t qThreshold) { fQThreshold = qThreshold*fQMax/fNADCChannels; }
 
-  /** Sets number of ADC channels. **/
+  /**
+   * Sets number of ADC channels.
+   * @param nADCChannels  number of ADC channels (256 by default).
+   */
   void SetNADCChannels(UInt_t nADCChannels) { fNADCChannels = nADCChannels; }
 
-  /** Sets mean electronics value [electrons]. **/
+  /**
+   * Sets mean electronics noise value.
+   * @param meanNoise     mean noise value [electrons] (0 by default).
+   */
   void SetMeanNoise(UInt_t meanNoise) { fMeanNoise = meanNoise; }
 
   /** Sets the time resolution. **/
@@ -124,13 +149,13 @@ class CbmMuchDigitize : public FairTask
   TStopwatch         fTimer;         // Timer
 
   /** Map of active channels to index of MuchDigi. **/
-  std::map<Long64_t, Int_t> fChannelMap;
+  std::map<std::pair<Int_t, Int_t>, Int_t> fChannelMap;
 
   /** Map of channels, wounded by secondary electrons, to CbmMuchDigi.  **/
-  std::map<Long64_t, CbmMuchDigi*> fChargedPads;
+  std::map<std::pair<Int_t, Int_t>, CbmMuchDigi*> fChargedPads;
 
   /** Map of DigiMatches, which matches pads wounded by secondary electrons.  **/
-  std::map<Long64_t, CbmMuchDigiMatch*> fChargedMatches;
+  std::map<std::pair<Int_t, Int_t>, CbmMuchDigiMatch*> fChargedMatches;
 
   /** Finish **/
   virtual void FinishTask();
@@ -138,10 +163,10 @@ class CbmMuchDigitize : public FairTask
   /** Get parameter containers **/
   virtual void SetParContainers();
 
-  /** Intialisation **/
+  /** Initialization **/
   virtual InitStatus Init();
 
-  /** Reinitialisation **/
+  /** Reinitialization **/
   virtual InitStatus ReInit();
 
   /** Reset eventwise counters **/
@@ -189,12 +214,12 @@ class CbmMuchDigitize : public FairTask
   Bool_t PolygonsIntersect(CbmMuchSector* sector, TPolyLine polygon1, TPolyLine polygon2,
 			   Double_t& area);
 
-  /*****************************************************************
+  /**
    * Function returns a random number distributed according
    * exponential law, which reproduces the gas gain fluctuation
    *@author Volodia Nikulin
    *@since 14/04/2007
-   ****************************************************************/
+   */
   inline Int_t GasGain();
 
   static Double_t e_sigma_n_e(Double_t &logT);

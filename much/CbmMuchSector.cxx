@@ -26,6 +26,7 @@ using std::endl;
 // -----   Default constructor   -------------------------------------------
 CbmMuchSector::CbmMuchSector():TPolyLine(){
   fDetectorId = 0;
+  fSectorIndex = 0;
   fDx = fDy = fPadRadius = 0.;
   fNCols = fNRows = 0;
   fNChannels = 0;
@@ -36,21 +37,22 @@ CbmMuchSector::CbmMuchSector():TPolyLine(){
 
 
 // -----  Standard constructor  --------------------------------------------
-CbmMuchSector::CbmMuchSector(Long64_t detId, TVector3 position,  TVector3 size,
-                             Int_t nCols, Int_t nRows, Int_t iChannels):TPolyLine()
+CbmMuchSector::CbmMuchSector(Int_t detId, Int_t iSector, TVector3 position,  TVector3 size,
+                             Int_t nCols, Int_t nRows, Int_t nChannels):TPolyLine()
 {
-  fDetectorId = detId;
-  fPosition   = position;
-  fSize       = size;
-  fNCols      = nCols;
-  fNRows      = nRows;
+  fDetectorId  = detId;
+  fSectorIndex = iSector;
+  fPosition    = position;
+  fSize        = size;
+  fNCols       = nCols;
+  fNRows       = nRows;
 
-  fDx         = size.X()/fNCols;
-  fDy         = size.Y()/fNRows;
-  fPadRadius  = TMath::Sqrt(fDx*fDx + fDy*fDy)/2.;
+  fDx          = size.X()/fNCols;
+  fDy          = size.Y()/fNRows;
+  fPadRadius   = TMath::Sqrt(fDx*fDx + fDy*fDy)/2.;
 
   // Define number of channels
-  fNChannels = iChannels;
+  fNChannels = nChannels;
   // calculate errors
   fSigmaX  = fDx / TMath::Sqrt(12);
   fSigmaY  = fDy / TMath::Sqrt(12);
@@ -64,7 +66,7 @@ CbmMuchSector::CbmMuchSector(Long64_t detId, TVector3 position,  TVector3 size,
   x[2]= position[0]+size[0]/2;    y[2]=position[1]+size[1]/2.;
   x[3]= position[0]+size[0]/2;    y[3]=position[1]-size[1]/2.;
   x[4]=x[0];                      y[4]=y[0];
-  
+
   SetPolyLine(5,x,y);
 }
 // -------------------------------------------------------------------------
@@ -94,9 +96,9 @@ Int_t CbmMuchSector::GetChannel(Double_t x, Double_t y) {
 
   if (iChan < 0 || iChan > fNChannels-1) {
 //     cout << "-E- CbmMuchSector::GetChannel: "
-//          << "Channel number " << iChan << " exceeds limit " 
+//          << "Channel number " << iChan << " exceeds limit "
 //          << fNChannels << endl << endl;
-//     cout << "StationNr = " <<  GetStationId() << "\t" 
+//     cout << "StationNr = " <<  GetStationId() << "\t"
 //          << "SectorNr = " << GetSectorId() << endl;
 //     cout << "x = " << x << "\t" << "y = " << y << endl;
 //     cout << "xint = " << xint << "\t" << "yint = " << yint << endl;
@@ -124,7 +126,7 @@ Bool_t CbmMuchSector::Inside(Double_t x, Double_t y) {
 void CbmMuchSector::PrintInfo() {
   cout << "   Sector Nr. ";
   cout.width(3);
-  cout << CbmMuchGeoScheme::GetSectorIndex(GetDetectorId()) << ", centre (";
+  cout << fSectorIndex << ", centre (";
   cout.width(6);
   cout << fPosition[0] << ", ";
   cout.width(6);
@@ -132,7 +134,7 @@ void CbmMuchSector::PrintInfo() {
   cout.width(3);
   cout << fSize[0] << " cm, ly = ";
   cout.width(3);
-  cout << fSize[1] << " cm, channels: " << GetNChannels() << endl;
+  cout << fSize[1] << " cm, channels: " << fNChannels << endl;
 }
 // -------------------------------------------------------------------------
 
@@ -141,7 +143,7 @@ void CbmMuchSector::PrintInfo() {
 Bool_t CbmMuchSector::IntCoord(Double_t x, Double_t y,
 			       Double_t& xint, Double_t& yint){
 
-  // Translation into sector centre system
+  // Translation into sector center system
   x = x - fPosition[0];
   y = y - fPosition[1];
 
@@ -176,8 +178,8 @@ vector<CbmMuchSector*> CbmMuchSector::GetNeighbours(){
   vector<CbmMuchSector*> sectors;
   CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
   for(Int_t i=0; i < fNeighbours.GetSize(); i++){
-    Long64_t detectorId = fNeighbours.At(i);
-    CbmMuchSector* sector = geoScheme->GetSectorByDetId(detectorId);
+    Int_t iSector = fNeighbours.At(i);
+    CbmMuchSector* sector = geoScheme->GetSectorByDetId(fDetectorId, iSector);
     if(sector) sectors.push_back(sector);
   }
   return sectors;
@@ -203,7 +205,7 @@ void CbmMuchSector::GetPadVertices(Int_t iChannel, Double_t* xPad, Double_t* yPa
   for (Int_t iVertex = 0; iVertex < 4 ; iVertex++){
     Double_t xInt = (iVertex < 2 ) ? iCol*dx : (iCol+1)*dx;
     Double_t yInt = (iVertex == 0 || iVertex ==3) ? iRow*dy : (iRow+1)*dy;
-    // Translate to centre of the sector
+    // Translate to center of the sector
     Double_t xc = xInt - fSize[0]/2.;
     Double_t yc = yInt - fSize[1]/2.;
     // Translate to global system
@@ -216,7 +218,7 @@ void CbmMuchSector::GetPadVertices(Int_t iChannel, Double_t* xPad, Double_t* yPa
 
 // -------------------------------------------------------------------------
 Double_t CbmMuchSector::GetPadX0(Int_t iChannel){
-  CbmMuchPad* pad = (CbmMuchPad*)fPads.At(iChannel);   
+  CbmMuchPad* pad = (CbmMuchPad*)fPads.At(iChannel);
   return pad->GetX0();
 }
 // -------------------------------------------------------------------------

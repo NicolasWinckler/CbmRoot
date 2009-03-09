@@ -3,7 +3,7 @@
  *@version 1.0
  *@since   11.02.08
  **
- ** This class holds the transport geometry parameters 
+ ** This class holds the transport geometry parameters
  ** of one MuCh tracking layer.
  **/
 
@@ -19,13 +19,13 @@ CbmMuchLayer::CbmMuchLayer() {
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchLayer::CbmMuchLayer(Long64_t detId, Double_t z):
+CbmMuchLayer::CbmMuchLayer(Int_t detId, Double_t z):
   fDetectorId(detId),
   fZ(z){
-  Int_t stId = CbmMuchGeoScheme::GetStationIndex(detId);
-  Int_t layerId = CbmMuchGeoScheme::GetLayerIndex(detId); 
-  fSideF=CbmMuchLayerSide(stId,layerId,0,z);
-  fSideB=CbmMuchLayerSide(stId,layerId,1,z);
+  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(detId);
+  Int_t iLayer = CbmMuchGeoScheme::GetLayerIndex(detId);
+  fSideF=CbmMuchLayerSide(iStation,iLayer,0,z);
+  fSideB=CbmMuchLayerSide(iStation,iLayer,1,z);
 }
 // -------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ CbmMuchLayer::CbmMuchLayer(Long64_t detId, Double_t z):
 CbmMuchLayer::CbmMuchLayer(Int_t iStation, Int_t iLayer, Double_t z)  {
   fDetectorId = CbmMuchGeoScheme::GetDetectorId(iStation, iLayer);
   fZ          = z;
-  
+
   fSideF=CbmMuchLayerSide(iStation,iLayer,0,z);
   fSideB=CbmMuchLayerSide(iStation,iLayer,1,z);
 }

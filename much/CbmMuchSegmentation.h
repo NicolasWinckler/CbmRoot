@@ -4,7 +4,7 @@
  *@version 1.0
  **
  ** class for making parameter file for MUCH digitizer
- ** 
+ **
  **/
 
 #ifndef CBMMUCHSEGMENTATION_H
@@ -35,7 +35,7 @@ class CbmMuchSegmentation : public FairTask{
 
   virtual InitStatus Init();
   virtual void Exec(Option_t * option);
-  virtual void Finish();
+  virtual void FinishTask();
 
   /** Destructor **/
   virtual ~CbmMuchSegmentation();
@@ -46,12 +46,12 @@ class CbmMuchSegmentation : public FairTask{
   TH1D**        fHistHitDensity;
   Int_t         fNStations;
   TObjArray*    fStations;
-  
+
   Char_t*           fDigiFileName;          // Digitization file
   CbmGeoMuchPar*    fGeoPar;                // Geometry parameters container
   vector<Double_t>  fExp0;                  // Fit parameters for EXP distribution for each station
   vector<Double_t>  fExp1;                  // Fit parameters for EXP distribution for each station
-  
+
   /** Get parameter containers **/
   virtual void SetParContainers();
 

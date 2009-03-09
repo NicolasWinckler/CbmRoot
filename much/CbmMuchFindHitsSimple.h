@@ -41,10 +41,10 @@ class CbmMuchFindHitsSimple : public CbmMuchTask
   /** Get parameter containers **/
   virtual void SetParContainers();
 
-  /** Intialisation **/
+  /** Initialization **/
   virtual InitStatus Init();
 
-  /** Reinitialisation **/
+  /** Reinitialization **/
   virtual InitStatus ReInit();
 
  private:

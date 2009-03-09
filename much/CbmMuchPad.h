@@ -20,14 +20,15 @@ public:
   CbmMuchPad (CbmMuchSector* sector, Int_t iChannel);
   ~CbmMuchPad();
 
-  Long64_t GetDetectorId()  const {return fDetectorId; }
+  Int_t    GetDetectorId()  const {return fDetectorId; }
+  Int_t    GetChannelId()   const {return fChannelId; }
   Double_t GetSectorX0()    const ;
   Double_t GetSectorY0()    const ;
   Double_t GetX0()          const {return fX0;}
   Double_t GetY0()          const {return fY0;}
   Double_t GetLx()          const ;
   Double_t GetLy()          const ;
-  void SetNeighbours(TArrayL64 neighbourIDs) {  fNeighbours = neighbourIDs; }
+  void SetNeighbours(TArrayI neighbourIDs) {  fNeighbours = neighbourIDs; }
   vector<CbmMuchPad*> GetNeighbours();
 
 
@@ -38,9 +39,10 @@ public:
   Int_t GetDigiIndex() { return fDigiIndex; }
 
 private:
-  Long64_t            fDetectorId;        // Unique ID of the pad
+  Int_t               fDetectorId;        // Detector ID (including module number)
+  Int_t               fChannelId;         // Channel ID within the module
   Double_t            fX0, fY0;           // Coordinates of the pad center
-  TArrayL64           fNeighbours;        // Array of IDs of neighbour pads
+  TArrayI             fNeighbours;        // Array of channel IDs of neighbour pads
   Bool_t              fFired;             // Defines whether pad is fired
   UInt_t              fCharge;            // Charge collected by the pad
   Int_t               fDigiIndex;         // Index of the corresponding CbmMuchDigi (if any)

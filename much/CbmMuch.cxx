@@ -61,7 +61,7 @@ CbmMuch::CbmMuch() {
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuch::CbmMuch(const char* name, Bool_t active) 
+CbmMuch::CbmMuch(const char* name, Bool_t active)
   : FairDetector(name, active) {
   ResetParameters();
   fMuchCollection = new TClonesArray("CbmMuchPoint");
@@ -106,16 +106,16 @@ Bool_t CbmMuch::ProcessHits(FairVolume* vol) {
        gMC->IsTrackDisappeared()   ) {
     fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
     fVolumeID = vol->getMCid();
-    Long64_t fDetectorId = GetDetId(vol);
+    Int_t fDetectorId = GetDetId(vol);
     if (fVerboseLevel>2){
       printf(" TrackId: %i",fTrackID);
-      printf(" System: %i" , CbmMuchGeoScheme::GetSystemIndex(fDetectorId)); 
-      printf(" Station: %i", CbmMuchGeoScheme::GetStationIndex(fDetectorId)); 
+      printf(" System: %i" , CbmMuchGeoScheme::GetSystemIndex(fDetectorId));
+      printf(" Station: %i", CbmMuchGeoScheme::GetStationIndex(fDetectorId));
       printf(" Layer: %i"  , CbmMuchGeoScheme::GetLayerIndex(fDetectorId));
       printf(" Side: %i"   , CbmMuchGeoScheme::GetLayerSideIndex(fDetectorId));
       printf(" Module: %i" , CbmMuchGeoScheme::GetModuleIndex(fDetectorId));
       printf(" Vol %i \n",fVolumeID);
-    }  
+    }
     Int_t iStation = CbmMuchGeoScheme::GetStationIndex(fDetectorId);
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
@@ -131,7 +131,7 @@ Bool_t CbmMuch::ProcessHits(FairVolume* vol) {
       TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
       TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
       fTime, fLength, fELoss);
-   
+
     // Increment number of MuchPoints for this track
     CbmStack* stack = (CbmStack*) gMC->GetStack();
     stack->AddPoint(kMUCH);
@@ -215,13 +215,13 @@ void CbmMuch::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 
 
 // -----   Private method AddHit   --------------------------------------------
-CbmMuchPoint* CbmMuch::AddHit(Int_t trackID, Long64_t detID, TVector3 posIn,
-			      TVector3 posOut, TVector3 momIn, 
-			      TVector3 momOut, Double_t time, 
+CbmMuchPoint* CbmMuch::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+			      TVector3 posOut, TVector3 momIn,
+			      TVector3 momOut, Double_t time,
 			      Double_t length, Double_t eLoss) {
   TClonesArray& clref = *fMuchCollection;
   Int_t size = clref.GetEntriesFast();
-  if (fVerboseLevel>1) 
+  if (fVerboseLevel>1)
     cout << "-I- CbmMuch: Adding Point at (" << posIn.X() << ", " << posIn.Y()
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
@@ -265,14 +265,14 @@ void CbmMuch::ConstructGeometry() {
   fGeoScheme->ReadGeoFile(fgeoName);
   fGeoScheme->Print();
   fGeoScheme->CreateMuchCave();
-  
+
   // Create much cave
   Double_t muchZ0 = fGeoScheme->GetMuchCaveZ0();
   TGeoCone* shMuch = fGeoScheme->GetMuchCave();
   TGeoVolume*  voMuch = new TGeoVolume("much",shMuch,air);
   gGeoManager->Node("much",0,"cave",0.,0.,muchZ0,0,kTRUE,buf,0);
-  
-  
+
+
   // Create absorbers
   TObjArray* absorbers = fGeoScheme->GetAbsorbers();
   for (Int_t i=0;i<absorbers->GetEntriesFast();i++){
@@ -282,8 +282,8 @@ void CbmMuch::ConstructGeometry() {
       case 'I': mat = iron;    break;
       case 'L': mat = lead;    break;
       case 'W': mat = wolfram; break;
-      default : 
-        mat = iron; 
+      default :
+        mat = iron;
         Warning("CreateGeometry","Absorber material not defined");
     }
     Double_t z0 = fGeoScheme->GetAbsorberZ0(i)-muchZ0;
@@ -291,14 +291,14 @@ void CbmMuch::ConstructGeometry() {
     TGeoVolume* voAbs = new TGeoVolume(absName,shAbs,mat);
     gGeoManager->Node(absName,0,"much",0.,0.,z0,0,kTRUE,buf,0);
   }
-  
+
   // Create rotation matrices
   Int_t krotZ=0;
   Int_t krotY=0;
   gMC->Matrix(krotY,90,180,90,90,180,0);  // 180 degrees around y axis
   gMC->Matrix(krotZ,90,180,90,270,0,0);   // 180 degrees around z axis
 
-  // Create module shape which common for all module volumes 
+  // Create module shape which common for all module volumes
   Double_t activeLx = fGeoScheme->GetActiveLx();
   Double_t activeLy = fGeoScheme->GetActiveLy();
   Double_t activeLz = fGeoScheme->GetActiveLz();
@@ -323,9 +323,9 @@ void CbmMuch::ConstructGeometry() {
     Double_t stRmin = station->GetRmin();
     Double_t stRmax = TMath::Sqrt(supDx*supDx+supDy*supDy)+10;
     Double_t stZ    = station->GetZ() - muchZ0;
-    Double_t layersDz = fGeoScheme->GetLayersDz(st); 
+    Double_t layersDz = fGeoScheme->GetLayersDz(st);
     Double_t stDz   = layersDz*(nLayers-1)/2. + (2*supDz+activeLz)/2.+1;
-    
+
     TString stName = Form("muchstation%i",st+1);
     TGeoTube*   shSt = new TGeoTube(stRmin,stRmax,stDz);
     TGeoVolume* voSt = new TGeoVolume(stName,shSt,air);
@@ -351,15 +351,15 @@ void CbmMuch::ConstructGeometry() {
       TGeoTube*   shLayer = new TGeoTube(stRmin,stRmax,layerDz);
       TGeoVolume* voLayer = new TGeoVolume(layerName,shLayer,air);
       gGeoManager->Node(layerName,0,stName,0.,0.,layerZ,0,kTRUE,buf,0);
-      
+
       TString  supName1  = Form("muchstation%ilayer%isupport1",st+1,l+1);
       TString  supName2  = Form("muchstation%ilayer%isupport2",st+1,l+1);
       TGeoVolume* voSup1 = new TGeoVolume(supName1,shSup,supportMat);
       TGeoVolume* voSup2 = new TGeoVolume(supName2,shSup,supportMat);
       gGeoManager->Node(supName1,0,layerName,+supDx/2.,0.,0.,    0,kTRUE,buf,0);
       gGeoManager->Node(supName2,0,layerName,-supDx/2.,0.,0.,krotZ,kTRUE,buf,0);
-      
-      
+
+
       if (!fGeoScheme->IsModuleDesign()){ // simple design
         CbmMuchLayerSide* side = layer->GetSide(0);
         CbmMuchModule* module = side->GetModule(0);
@@ -385,14 +385,14 @@ void CbmMuch::ConstructGeometry() {
           TString spacerName = Form("muchstation%ilayer%i%cspacer%03i",st+1,l+1,cside,m+1);
           TGeoShape* shActive = shActiveFull;
           TGeoShape* shSpacer = shSpacerFull;
-          
+
           if (cutRadius>0) { // Create composite shape with a hole
             TGeoTranslation* tr = new TGeoTranslation(Form("tr%il%i%cm%02i",st+1,l+1,cside,m+1),-pos[0],-pos[1],0.);
             tr->RegisterYourself();
             shActive = new TGeoCompositeShape(Form("shActiveHoleSt%il%im%02i",st+1,l+1,m+1),Form("shActive-muchst%ihole:tr%il%i%cm%02i",st+1,st+1,l+1,cside,m+1));
             shSpacer = new TGeoCompositeShape(Form("shSpacerHoleSt%il%im%02i",st+1,l+1,m+1),Form("shSpacer-muchst%ihole:tr%il%i%cm%02i",st+1,st+1,l+1,cside,m+1));
           }
-          
+
           TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);
           TGeoVolume* voSpacer = new TGeoVolume(spacerName,shSpacer,noryl);
           gGeoManager->Node(activeName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);
@@ -402,11 +402,11 @@ void CbmMuch::ConstructGeometry() {
       } // sides
     } // layers
   } // stations
-  
+
   TObjArray* fSensNodes = fPar->GetGeoSensitiveNodes();
   TObjArray* fPassNodes = fPar->GetGeoPassiveNodes();
   TGeoNode* ncave = gGeoManager->GetTopNode();
-  TGeoNode* nmuch =(TGeoNode*) ncave->GetNodes()->FindObject("much_0"); 
+  TGeoNode* nmuch =(TGeoNode*) ncave->GetNodes()->FindObject("much_0");
   fPassNodes->Add(nmuch);
   //printf("much =%p\n",nmuch);
   TObjArray* nodes = nmuch->GetNodes();
@@ -416,7 +416,7 @@ void CbmMuch::ConstructGeometry() {
     //printf("nodeName=%s\n",nodeName.Data());
     if (nodeName.Contains("absorber")) fPassNodes->Add(node);
     if (nodeName.Contains("station")) {
-      TObjArray* layers = node->GetNodes(); 
+      TObjArray* layers = node->GetNodes();
       for (Int_t l=0;l<layers->GetEntriesFast();l++){
         TGeoNode* layer = (TGeoNode*) layers->At(l);
         if (!TString(layer->GetName()).Contains("layer")) continue;
@@ -430,14 +430,14 @@ void CbmMuch::ConstructGeometry() {
       }
     }
   }
-  
+
   fPar->setChanged();
   fPar->setInputVersion(fRun->GetRunId(),1);
 }
 // -------------------------------------------------------------------------
 
 
-Long64_t CbmMuch::GetDetId(FairVolume* vol) {
+Int_t CbmMuch::GetDetId(FairVolume* vol) {
   TString name = vol->GetName();
   Int_t  iStation     = TString(name[11]).Atoi()-1;
   Int_t  iLayer       = TString(name[17]).Atoi()-1;
@@ -445,14 +445,14 @@ Long64_t CbmMuch::GetDetId(FairVolume* vol) {
   Char_t cModuleNr[4] = {name[25],name[26],name[27],' '};
   Int_t  iModule      = atoi(cModuleNr)-1;
   if(iSide!=1 && iSide !=0) printf("side = %i", iSide);
-  Long64_t detectorId = CbmMuchGeoScheme::GetDetectorId(iStation, iLayer, iSide, iModule);
+  Int_t detectorId = CbmMuchGeoScheme::GetDetectorId(iStation, iLayer, iSide, iModule);
   assert(CbmMuchGeoScheme::GetStationIndex(detectorId) == iStation);
   assert(CbmMuchGeoScheme::GetLayerIndex(detectorId) == iLayer);
   assert(CbmMuchGeoScheme::GetLayerSideIndex(detectorId) == iSide);
   assert(CbmMuchGeoScheme::GetModuleIndex(detectorId) == iModule);
   assert(detectorId > 0);
   return detectorId;
-  
+
 }
 // -------------------------------------------------------------------------
 

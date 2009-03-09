@@ -3,7 +3,7 @@
  *@version 1.0
  *@since   11.02.08
  **
- ** This class holds the transport geometry parameters 
+ ** This class holds the transport geometry parameters
  ** of one MuCh tracking layer side.
  **/
 
@@ -20,7 +20,7 @@ CbmMuchLayerSide::CbmMuchLayerSide() {
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchLayerSide::CbmMuchLayerSide(Long64_t detId, Double_t z) {
+CbmMuchLayerSide::CbmMuchLayerSide(Int_t detId, Double_t z) {
   fDetectorId = detId;
   fZ          = z;
 }

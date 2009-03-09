@@ -18,7 +18,7 @@
 
 #include "TVector3.h"
 #include "CbmHit.h"
-//#include "CbmMuchGeoScheme.h"
+
 
 
 class CbmMuchHit : public CbmHit
@@ -29,12 +29,12 @@ class CbmMuchHit : public CbmHit
   /** Default constructor (not for use) **/
   CbmMuchHit();
 
-  CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dPos,
+  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos,
 	     Double_t dxy);
 
 
   /** Standard constructor
-  *@param detId     Unique detector ID
+  *@param detId     Unique detector ID (including module number)
   *@param pos       Position in global c.s. [cm]
   *@param dPos      Errors of position in global c.s. [cm]
   *@param dxy       Covariance of x and y
@@ -42,18 +42,18 @@ class CbmMuchHit : public CbmHit
   *@param times      Time since event start [ns]
   *@param dTime     Time resolution [ns]
   **/
-  CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dPos,
+  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos,
 	     Double_t dxy, Int_t iDigi, Double_t* times,
 	     Double_t dTime);
 
   /** Standard constructor (clustering)
-  *@param detId     Unique detector ID
+  *@param detId     Unique detector ID (including module number)
   *@param pos       Position in global c.s. [cm]
   *@param dPos      Errors of position in global c.s. [cm]
   *@param dxy       Covariance of x and y
   *@param iCluster  Parent cluster index
   **/
-  CbmMuchHit(Long64_t detId, TVector3& pos, TVector3& dPos,
+  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos,
 	     Double_t dxy, Int_t iCluster);
 
 
@@ -65,8 +65,8 @@ class CbmMuchHit : public CbmHit
 
 
   /** Accessors **/
-  Long64_t GetDetectorId()  const { return fDetectorID; }
-  Int_t    GetStationNr() const;
+  Int_t GetDetectorId()  const { return fDetectorID; }
+  Int_t GetStationNr() const;
 
   /** Gets covariance in X and Y **/
   Double_t GetCovXY() const  { return fCovXY; }

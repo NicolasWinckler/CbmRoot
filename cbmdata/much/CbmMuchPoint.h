@@ -3,7 +3,7 @@
  * @author  M.Ryzhinskiy <m.ryzhinskiy@gsi.de>
  * @version 1.0
  * @since   21.03.07
- * 
+ *
  *  Class for Monte Carlo points in MUon CHambers detector
  *
  */
@@ -18,7 +18,7 @@
 #include "TObject.h"
 #include "TVector3.h"
 
-class CbmMuchPoint : public FairMCPoint 
+class CbmMuchPoint : public FairMCPoint
 {
 
  public:
@@ -29,8 +29,8 @@ class CbmMuchPoint : public FairMCPoint
 
   /** Constructor with arguments
    *@param trackID  Index of MCTrack
-   *@param detID    Detector ID
-   *@param posIn    Ccoordinates at entrance to active volume [cm]
+   *@param detID    Detector ID (including module number)
+   *@param posIn    Coordinates at entrance to active volume [cm]
    *@param posOut   Coordinates at exit of active volume [cm]
    *@param momIn    Momentum of track at entrance [GeV]
    *@param momOut   Momentum of track at exit [GeV]
@@ -38,7 +38,7 @@ class CbmMuchPoint : public FairMCPoint
    *@param length   Track length since creation [cm]
    *@param eLoss    Energy deposit [GeV]
    **/
-  CbmMuchPoint(Int_t trackID, Long64_t detID, TVector3 posIn, 
+  CbmMuchPoint(Int_t trackID, Int_t detID, TVector3 posIn,
 	       TVector3 posOut, TVector3 momIn, TVector3 momOut,
 	       Double_t tof, Double_t length, Double_t eLoss);
 
@@ -52,7 +52,7 @@ class CbmMuchPoint : public FairMCPoint
 
 
   /** Accessors **/
-  Long64_t GetDetectorId()  const { return fDetectorID; }
+  Int_t GetDetectorId()  const { return fDetectorID; }
   Double_t GetXIn()         const { return fX; }
   Double_t GetYIn()         const { return fY; }
   Double_t GetZIn()         const { return fZ; }

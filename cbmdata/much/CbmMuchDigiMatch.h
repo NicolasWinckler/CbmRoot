@@ -37,22 +37,22 @@ class CbmMuchDigiMatch : public TObject
    *@value Number of indices present **/
   Int_t AddPoint(Int_t iPoint);
 
-  /** Add a charge from a MC point. Index of the point can 
+  /** Add a charge from a MC point. Index of the point can
    * be accessed through GetRefIndex(i). **/
   UInt_t AddCharge(UInt_t iCharge);
 
   /** Accessor to MuchPoint index **/
   Int_t GetRefIndex(Int_t i = 0) const;
-  
+
   /** Gets number of points corresponding to the digi. **/
   Int_t GetNPoints() const {return fRefIndex.GetSize();}
-  
-  /** Gets charge from a MC point. Index of the point can 
+
+  /** Gets charge from a MC point. Index of the point can
    * be accessed through GetRefIndex(i). **/
   UInt_t GetCharge(Int_t i) const;
 
-  Int_t GetCluster() const {return fClusterIndex;}
-  void SetCluster(Int_t i) {fClusterIndex = i;}
+  Int_t GetClusterIndex() const {return fClusterIndex;}
+  void SetClusterIndex(Int_t i) {fClusterIndex = i;}
 
 
  private:
@@ -68,4 +68,4 @@ class CbmMuchDigiMatch : public TObject
 #endif
 
 
-  
+

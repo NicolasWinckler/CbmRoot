@@ -28,13 +28,14 @@ class CbmMuchDigi : public TObject
   /** Default constructor **/
   CbmMuchDigi();
 
-  /** Constructor from station number, sector number, 
+  /** Constructor from station number, sector number,
    ** front/back side and channel number
-   **@param detectorId   Unique detector ID for sector containing this digi
+   **@param detectorId   Unique detector ID (including module number)
+   **@param channelId    Unique channel ID within the module
    **@param time         time since event start [ns]
    **@param dTime        time resolution [ns]
    **/
-  CbmMuchDigi(Long64_t detectorId, Double_t time, Double_t dTime);
+  CbmMuchDigi(Int_t detectorId, Int_t channelId, Double_t time, Double_t dTime);
 
   /** Constructor from a given digi object.
    *@param digi  Digi object
@@ -46,12 +47,13 @@ class CbmMuchDigi : public TObject
 
 
   /** Accessors **/
-  Long64_t GetDetectorId()  const  { return fDetectorId; }
+  Int_t GetDetectorId()  const  { return fDetectorId; }
+  Int_t GetChannelId()   const  { return fChannelId; }
   /** Gets time since event start **/
   Double_t  GetTime(Int_t i)       { return fTime[i]; }
   Double_t* GetTimes()             { return fTime; }
   Double_t  GetDTime()             { return fDTime; }
-  /** Gets charge collected by the channel. **/ 
+  /** Gets charge collected by the channel. **/
   UInt_t GetCharge()        const  { return fCharge; }
   /** Gets charge in ADC channels collected by the channel. **/
   UInt_t GetADCCharge()     const  {return fADCCharge; }
@@ -62,10 +64,11 @@ class CbmMuchDigi : public TObject
   /** Adds charge to digi **/
   UInt_t AddCharge(UInt_t iCharge);
 
-  
+
  private:
 
-  Long64_t fDetectorId;      // Detector Id
+  Int_t    fDetectorId;      // Detector Id (including module number)
+  Int_t    fChannelId;       // Channel Id within the module
   UInt_t   fCharge;          // Charge for the digi
   UInt_t   fADCCharge;       // Charge for the digi in ADC channels
   Double_t fTime[3];         // Time since event start [ns]

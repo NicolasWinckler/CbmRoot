@@ -20,6 +20,7 @@ using std::endl;
 // -----   Default constructor   -------------------------------------------
 CbmMuchDigi::CbmMuchDigi() {
   fDetectorId   =  0;
+  fChannelId = 0;
   fCharge = 0;
   fTime[0] = fTime[1] = fTime[2] = -1;
   fDTime = 8e-2;
@@ -27,8 +28,9 @@ CbmMuchDigi::CbmMuchDigi() {
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchDigi::CbmMuchDigi(Long64_t detectorId, Double_t time, Double_t dTime) {
+CbmMuchDigi::CbmMuchDigi(Int_t detectorId, Int_t channelId, Double_t time, Double_t dTime) {
   fDetectorId = detectorId;
+  fChannelId = channelId;
   fCharge = fADCCharge = 0;
   fDTime = dTime;
   fTime[0] = time;
@@ -39,6 +41,7 @@ CbmMuchDigi::CbmMuchDigi(Long64_t detectorId, Double_t time, Double_t dTime) {
 // -----   Standard constructor   ------------------------------------------
 CbmMuchDigi::CbmMuchDigi(CbmMuchDigi* digi){
   fDetectorId = digi->GetDetectorId();
+  fChannelId  = digi->GetChannelId();
   fCharge     = digi->GetCharge();
   fADCCharge  = digi->GetADCCharge();
   fDTime      = digi->GetDTime();
@@ -57,7 +60,7 @@ CbmMuchDigi::~CbmMuchDigi() { }
 // -------------------------------------------------------------------------
 Int_t CbmMuchDigi::AddTime(Double_t time) {
   if ( time < 0 ) {
-    cout << "-W- CbmMuchDigi::AddTime: Illegal time value " 
+    cout << "-W- CbmMuchDigi::AddTime: Illegal time value "
 	 << time << endl;
     return 0;
   }
@@ -70,9 +73,9 @@ Int_t CbmMuchDigi::AddTime(Double_t time) {
   return 4;
 }
 // -------------------------------------------------------------------------
-UInt_t CbmMuchDigi::AddCharge(UInt_t iCharge) { 
+UInt_t CbmMuchDigi::AddCharge(UInt_t iCharge) {
   fCharge += iCharge;
-  return fCharge; 
+  return fCharge;
 }
 
 ClassImp(CbmMuchDigi)

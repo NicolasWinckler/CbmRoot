@@ -3,7 +3,7 @@
  * @author  M.Ryzhinskiy <m.ryzhinskiy@gsi.de>
  * @version 1.0
  * @since   21.03.07
- * 
+ *
  *  Class for Monte Carlo points in MUon CHambers detector
  *
  */
@@ -25,9 +25,9 @@ CbmMuchPoint::CbmMuchPoint() : FairMCPoint() {
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchPoint::CbmMuchPoint(Int_t trackID, Long64_t detID, TVector3 posIn, 
+CbmMuchPoint::CbmMuchPoint(Int_t trackID, Int_t detID, TVector3 posIn,
 			   TVector3 posOut, TVector3 momIn, TVector3 momOut,
-			   Double_t tof, Double_t length, Double_t eLoss) 
+			   Double_t tof, Double_t length, Double_t eLoss)
   : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
   fX_out  = posOut.X();
   fY_out  = posOut.Y();
@@ -49,13 +49,13 @@ CbmMuchPoint::~CbmMuchPoint() { }
 
 // -----   Public method Print   -------------------------------------------
 void CbmMuchPoint::Print(const Option_t* opt) const {
-  cout << "-I- CbmMuchPoint: MUCH Point for track " << fTrackID 
+  cout << "-I- CbmMuchPoint: MUCH Point for track " << fTrackID
        << " in detector " << fDetectorID << endl;
   cout << "    Position (" << fX << ", " << fY << ", " << fZ
        << ") cm" << endl;
   cout << "    Momentum (" << fPx << ", " << fPy << ", " << fPz
        << ") GeV" << endl;
-  cout << "    Time " << fTime << " ns,  Length " << fLength 
+  cout << "    Time " << fTime << " ns,  Length " << fLength
        << " cm,  Energy loss " << fELoss*1.0e06 << " keV" << endl;
 }
 // -------------------------------------------------------------------------
@@ -102,4 +102,4 @@ ClassImp(CbmMuchPoint)
 
 
 
-  
+

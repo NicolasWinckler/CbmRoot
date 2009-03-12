@@ -33,6 +33,7 @@ void FCNEcalCluster::SetN(Int_t n)
 {
 //  Int_t i;
   fN=n;
+  fNDF=fCluster->Size()-(n*3-fFixClusterEnergy);
 }
 
 vector<Double_t> FCNEcalCluster::Gradient(const vector<Double_t>& par) const
@@ -280,7 +281,7 @@ Double_t FCNEcalCluster::operator()(const vector<Double_t>& par) const
       de*=de; chi2+=de/cellerr;
     }
   }
-  chi2/=fCluster->Size();
+//  chi2/=fCluster->Size();
   return chi2;
 }
 
@@ -307,6 +308,8 @@ void CbmEcalRecoSlow::Exec(Option_t* option)
   {
     fNOld=fN;
     cluster=(CbmEcalClusterV1*)fClusters->At(i);
+    if (cluster->Maxs()>fMaxPhotonsPerCluster)
+      continue;
     for(j=0;j<cluster->Maxs();j++)
     {
       cell=fStr->GetHitCell(cluster->CellNum(j));
@@ -507,7 +510,12 @@ void CbmEcalRecoSlow::FitCluster(CbmEcalClusterV1* clstr)
     Info("FitCluster", "Minimization failed! Last chi2 %f, old chi2 %f.", chi2, oldchi2);
   }
 
+  if (fFCN->NDF()>0)
+    chi2/=fFCN->NDF();
+  else
+    chi2=-chi2;
   clstr->fChi2=chi2;
+
 
   e=fFCN->ClusterEnergy();
   for(i=0;i<n;i++)
@@ -675,7 +683,13 @@ Double_t CbmEcalRecoSlow::CalculateChi2(CbmEcalClusterV1* cluster)
     }
     i++;
   }
-  chi2/=cluster->Size();
+  if (cluster->Size()-(fN*3-fFixClusterEnergy)<=0)
+  {
+    Info("CalculateChi2","NDF is %d.", cluster->Size()-(fN*3-fFixClusterEnergy));
+    chi2=-chi2;
+  }
+  else
+    chi2/=cluster->Size()-(fN*3-fFixClusterEnergy);
   for(p=fNOld;p<fN;p++)
   {
     part=(CbmEcalRecParticle*)fReco->At(p);
@@ -895,6 +909,7 @@ CbmEcalRecoSlow::CbmEcalRecoSlow(const char *name, const Int_t iVerbose, const c
   fCStep=par->GetDouble("cstep");
   fMaxIterations=par->GetInteger("maxiterations");
   fFixClusterEnergy=par->GetInteger("fixclusterenergy");
+  fMaxPhotonsPerCluster=par->GetInteger("maxphotonspercluster");
   fMinMaxE=par->GetDouble("minmaxe");
 
   Info("Constructor", "chi2 threshold is %f, Estep is %f, and Cstep is %f.", fChi2Th, fEStep, fCStep);

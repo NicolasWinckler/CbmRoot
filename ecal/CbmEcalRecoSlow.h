@@ -45,6 +45,8 @@ public:
   void SetCStep(Double_t step) {fCStep=step;}
   Double_t GetEStep() const {return fEStep;}
   Double_t GetCStep() const {return fCStep;}
+  /** NDF of current fit **/
+  Int_t NDF() const {return fNDF;}
 
   /** The chi2 stuff **/
   /** par[n] --- energy, par[n+1] --- x, par[n+2] --- y **/
@@ -86,6 +88,8 @@ private:
   std::vector<CbmEcalCell*> fCells;	//!
   /** Fix sum of energies of cluster particles to energy of cluster **/
   Int_t fFixClusterEnergy;
+  /** NDF of fit **/
+  Int_t fNDF;
 };
 
 class CbmEcalRecoSlow : public FairTask
@@ -199,6 +203,9 @@ private:
   Double_t fChi2Th;
   Double_t fEStep;
   Double_t fCStep;
+  /** Maximum number of photons per cluster for reconstruction
+   ** If cluster contains more local maximums, it rejected. **/
+  Int_t fMaxPhotonsPerCluster;
   /** Maximum number of iterations in fitting process **/
   Int_t fMaxIterations;
   /** Fix sum of energies of cluster particles to energy of cluster **/

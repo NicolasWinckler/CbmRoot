@@ -66,11 +66,11 @@ CbmStsSensor::CbmStsSensor(TString tempName, Int_t detId, Int_t iType, Double_t 
   fStereoB    = stereoB;
   fBackStripShift  = 0.;
   fFrontStripShift = 0.;
-
   Double_t dbNoX = fLx / fDx;
-  Double_t dbNoY = fLy / fDy;
+  
   // Calculate number of channels
   if ( fType == 1 ) {             // Pixel sensor
+    Double_t dbNoY = fLy / fDy;           
     fNChannelsFront = Int_t( TMath::Ceil ( dbNoX ) 
 			    *TMath::Ceil ( dbNoY ));
     fNChannelsBack  = 0;
@@ -110,6 +110,7 @@ CbmStsSensor::CbmStsSensor(TString tempName, Int_t detId, Int_t iType, Double_t 
       fSigmaY  = ((fDx / TMath::Sqrt(24.))*(1./TMath::Sin(fStereoB)));
       fSigmaXY = 0.;
     }
+    
     Int_t sensorNumber = ( fDetectorId & (7<<1) ) >> 1;
 
     if ( sensorNumber == 1 ) {
@@ -179,11 +180,11 @@ CbmStsSensor::CbmStsSensor(Int_t detId, Int_t iType, Double_t x0,
   fStereoB    = stereoB;
   fBackStripShift  = 0.;
   fFrontStripShift = 0.;
-
   Double_t dbNoX = fLx / fDx;
-  Double_t dbNoY = fLy / fDy;
+  
   // Calculate number of channels
   if ( fType == 1 ) {             // Pixel sensor
+    Double_t dbNoY = fLy / fDy;
     fNChannelsFront = Int_t( TMath::Ceil ( dbNoX ) 
 			    *TMath::Ceil ( dbNoY ));
     fNChannelsBack  = 0;
@@ -223,7 +224,7 @@ CbmStsSensor::CbmStsSensor(Int_t detId, Int_t iType, Double_t x0,
       fSigmaY  = ((fDx / TMath::Sqrt(24))*(1./TMath::Sin(fStereoB)));
       fSigmaXY = 0.;
     }
-
+    
     Int_t sensorNumber = ( fDetectorId & (7<<1) ) >> 1;
     if ( sensorNumber  == 1 ) {
       fBackStripShift  = 0.;
@@ -709,8 +710,8 @@ Int_t CbmStsSensor::Intersect(Int_t iFStrip, Int_t iBStrip,
      {
        
        for (Int_t iStrip=nStripBegB; iStrip<=nStripMaxB; iStrip++) {
-       Double_t war = /*GetSensorNr() * TMath::Abs(fLy * tanstrF) +*/ GetSensorNr() * TMath::Abs(fLy * tanstrB);
-       if ( TMath::Abs(x0B-xint) > war ) continue;
+       //Double_t war = /*GetSensorNr() * TMath::Abs(fLy * tanstrF) +*/ GetSensorNr() * TMath::Abs(fLy * tanstrB);
+       //if ( TMath::Abs(x0B-xint) > war ) continue;
        
          
 	 yint = ( x0 - xint - fBackStripShift + Double_t(iStrip) * fLx ) / tanstrB;
@@ -815,7 +816,7 @@ Int_t CbmStsSensor::IntersectClusters(Double_t fChan, Double_t bChan,
   Int_t nStripMaxB = ( fStereoB<0. ? 0 :  Int_t(fLy*tanstrB/fLx)+1 ); // max. number of Bstrips
   Int_t nStripBegB = ( fStereoB>0. ? 0 : -Int_t(fLy*tanstrB/fLx)-1 );
   
-  Int_t nStripMaxF = ( fStereoF<0. ? 0 :  Int_t(fLy*tanstrF/fLx)+1 ); // max. number of Fstrips
+  Int_t nStripMaxF = ( fStereoF<=0. ? 0 :  Int_t(fLy*tanstrF/fLx)+1 ); // max. number of Fstrips
   Int_t nStripBegF = ( fStereoF>0. ? 0 : -Int_t(fLy*tanstrF/fLx)-1 );
 
   Double_t x0  = ( bChan + 0.5 ) * fDx - cosrot*fBackLorentzShift*fD/2. ;

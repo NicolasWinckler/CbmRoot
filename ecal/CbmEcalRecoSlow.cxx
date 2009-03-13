@@ -683,13 +683,13 @@ Double_t CbmEcalRecoSlow::CalculateChi2(CbmEcalClusterV1* cluster)
     }
     i++;
   }
-  if (cluster->Size()-(fN*3-fFixClusterEnergy)<=0)
+  if (cluster->Size()-((fN-fNOld)*3-fFixClusterEnergy)<=0)
   {
-    Info("CalculateChi2","NDF is %d.", cluster->Size()-(fN*3-fFixClusterEnergy));
+    Info("CalculateChi2","NDF is %d.", cluster->Size()-((fN-fNOld)*3-fFixClusterEnergy));
     chi2=-chi2;
   }
   else
-    chi2/=cluster->Size()-(fN*3-fFixClusterEnergy);
+    chi2/=cluster->Size()-((fN-fNOld)*3-fFixClusterEnergy);
   for(p=fNOld;p<fN;p++)
   {
     part=(CbmEcalRecParticle*)fReco->At(p);

@@ -55,7 +55,7 @@ void CbmVisMuchCluster::PrintInfo(){
   for (Int_t i=0;i<fPads.size();i++){
     Int_t digiId = fCluster->GetDigiIndex(i);
     CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(digiId);
-    printf(" %i",match->GetCluster());
+    printf(" %i",match->GetClusterIndex());
   }
   printf("\n");
 }
@@ -75,7 +75,7 @@ void CbmVisMuchCluster::CreateHisto(){
     Int_t id = indices[i];
     CbmMuchDigi* digi  = (CbmMuchDigi*) fDigis->At(id);
     CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(id);
-    CbmMuchSector* sector = CbmMuchGeoScheme::Instance()->GetSectorByDetId(digi->GetDetectorId());
+    CbmMuchSector* sector = CbmMuchGeoScheme::Instance()->GetSectorByDetId(digi->GetDetectorId(),digi->GetChannelId());
     CbmMuchPad* pad = sector->GetPad(CbmMuchGeoScheme::GetChannelIndex(digi->GetDetectorId()));
     if (i==0){
       bin_size_x = pad->GetLx();
@@ -94,7 +94,7 @@ void CbmVisMuchCluster::CreateHisto(){
     Int_t id = indices[iIndex];
     CbmMuchDigi* digi  = (CbmMuchDigi*) fDigis->At(id);
     CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(id);
-    CbmMuchSector* sector = CbmMuchGeoScheme::Instance()->GetSectorByDetId(digi->GetDetectorId());
+    CbmMuchSector* sector = CbmMuchGeoScheme::Instance()->GetSectorByDetId(digi->GetDetectorId(),digi->GetChannelId());
     CbmMuchPad* pad = sector->GetPad(CbmMuchGeoScheme::GetChannelIndex(digi->GetDetectorId()));
     fPads.push_back(pad);
     Double_t x0  = pad->GetX0();

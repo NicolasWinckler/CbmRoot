@@ -49,7 +49,7 @@ CbmVisMuchModuleFrame::CbmVisMuchModuleFrame(CbmMuchModule* module, CbmVisMuch* 
   Double_t l = 2*sqrt(lx*lx+ly*ly)/2;
   Int_t canvas_lx = 600;
   Int_t canvas_ly = Int_t(canvas_lx*ly/lx);
-  
+
   fMain = new TGMainFrame(gClient->GetRoot(),800,800,kVerticalFrame);
   fMain->Connect("CloseWindow()", "CbmVisMuchModuleFrame", this, "CloseWindow()");
 
@@ -59,7 +59,7 @@ CbmVisMuchModuleFrame::CbmVisMuchModuleFrame(CbmMuchModule* module, CbmVisMuch* 
   fScale->Connect("Selected(Int_t)","CbmVisMuchModuleFrame", this,"DoScale(Int_t)");
   fScale->Select(1,kFALSE);
   fScaleValue = 1;
-  
+
   Int_t parts[] = {15,70,15};
   fStatusBar = new TGStatusBar(fMain,50,10,kHorizontalFrame);
   fStatusBar->SetParts(parts,3);
@@ -82,8 +82,8 @@ CbmVisMuchModuleFrame::CbmVisMuchModuleFrame(CbmMuchModule* module, CbmVisMuch* 
 //  sec->Draw("f");
 //  sec->Draw();
 
-// TODO  
-//  fGSector->CreatePads(); 
+// TODO
+//  fGSector->CreatePads();
 //  fStatusBar->SetText(Form("Occupancy:%4.1f",100*fGSector->CalcOccupancy()),0);
 
   fCanvas->Connect("ProcessedEvent(Int_t,Int_t,Int_t,TObject*)",
@@ -177,7 +177,7 @@ void CbmVisMuchModuleFrame::HandleEmbeddedCanvas(Int_t event, Int_t px, Int_t py
         if (id<0) return;
         TClonesArray* digiMatches = fDisplay->GetDigiMatches();
         CbmMuchDigiMatch* match = (CbmMuchDigiMatch*)  digiMatches->At(id);
-        Int_t clusterId = match->GetCluster();
+        Int_t clusterId = match->GetClusterIndex();
         TClonesArray* visClusters = fDisplay->GetVisClusters();
         CbmVisMuchCluster* cluster = (CbmVisMuchCluster*) visClusters->At(clusterId);
         cluster->PrintInfo();
@@ -295,7 +295,7 @@ void CbmVisMuchModuleFrame::UpdateModule(){
   cMin->SetLineColor(kGreen+3);
   cMin->SetLineWidth(2);
   cMin->Draw("f");
-  
+
   DrawPoints();
   DrawHits();
   fCanvas->Update();

@@ -45,7 +45,7 @@ CbmVisMuch::CbmVisMuch():FairTask("Task",0){
   fEvent  = 0;
   fMCTracks    = NULL;
   fPoints      = NULL;
-  fDigis       = NULL; 
+  fDigis       = NULL;
   fDigiMatches = NULL;
   fHits        = NULL;
   fNstations   = 0;
@@ -57,7 +57,7 @@ CbmVisMuch::CbmVisMuch():FairTask("Task",0){
 
 
 // -----   Destructor   ----------------------------------------------------
-CbmVisMuch::~CbmVisMuch() { 
+CbmVisMuch::~CbmVisMuch() {
   if ( fOpenModules ) fOpenModules->Delete(); delete fOpenModules;
 }
 // -------------------------------------------------------------------------
@@ -83,7 +83,7 @@ InitStatus CbmVisMuch::Init() {
   fGeoScheme->CreatePointArrays("CbmVisPoint");
   fGeoScheme->CreateHitArrays("CbmVisHit");
   fGeoScheme->CreateClusterArrays("CbmVisMuchCluster");
-  
+
   fRootManager = FairRootManager::Instance();
   fMCTracks    = (TClonesArray*) fRootManager->GetObject("MCTrack");
   fPoints      = (TClonesArray*) fRootManager->GetObject("MuchPoint");
@@ -159,7 +159,7 @@ void CbmVisMuch::ReadEvent(Int_t event){
   fGeoScheme->ClearClusterArrays();
   fGeoScheme->ResetPads();
   fVisClusters->Clear();
-  
+
 
   printf("Fill arrays of CbmVisPoints... nPoints = %i\n",fPoints->GetEntriesFast());
   //Create arrays of CbmVisPoints
@@ -183,18 +183,18 @@ void CbmVisMuch::ReadEvent(Int_t event){
     new (hits[index]) CbmVisHit(hit);
     //SetHitInfo((CbmVisHit*) hits[index]);
   }
-  
+
   printf("Mark fired pads ... nPads = %i\n",fDigis->GetEntriesFast());
   for (Int_t i=0;i<fDigis->GetEntriesFast();i++){
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
-    CbmMuchSector* sector = fGeoScheme->GetSectorByDetId(digi->GetDetectorId());
+    CbmMuchSector* sector = fGeoScheme->GetSectorByDetId(digi->GetDetectorId(),digi->GetChannelId());
     CbmMuchPad* pad = sector->GetPad(CbmMuchGeoScheme::GetChannelIndex(digi->GetDetectorId()));
     pad->SetFired(i,digi->GetCharge(),digi->GetADCCharge());
   }
-  
+
   printf("Fill arrays of CbmVisMuchClusters... nClusters = %i\n",fClusters->GetEntriesFast());
   for (Int_t i=0;i<fClusters->GetEntriesFast();i++){
-    new ((*fVisClusters)[i]) CbmVisMuchCluster(i); 
+    new ((*fVisClusters)[i]) CbmVisMuchCluster(i);
   }
 
 //  for (Int_t i=0;i<fClusters->GetEntriesFast();i++){

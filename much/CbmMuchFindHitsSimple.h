@@ -14,6 +14,7 @@
 
 #include "CbmMuchTask.h"
 #include "CbmMuchSector.h"
+#include "CbmMuchGeoScheme.h"
 
 #include "FairTask.h"
 

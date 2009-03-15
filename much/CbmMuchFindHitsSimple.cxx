@@ -33,6 +33,7 @@ using std::setprecision;
 CbmMuchFindHitsSimple::CbmMuchFindHitsSimple() : CbmMuchTask("MuchFindHits", 1) {
   fDigiFile    = NULL;
   fDigis   = NULL;
+
 }
 // -------------------------------------------------------------------------
 
@@ -111,7 +112,9 @@ void CbmMuchFindHitsSimple::Exec(Option_t* opt) {
     TVector3 pos, dpos;
     pos.SetXYZ(x, y, z);
     dpos.SetXYZ(sigmaX, sigmaY, 0.);
-    new ((*fHits)[nHits++]) CbmMuchHit(detectorId, pos, dpos, 0, iDigi, digi->GetTimes(), digi->GetDTime());
+    Int_t planeId = fGeoScheme->GetLayerSideNr(detectorId);
+    new ((*fHits)[nHits++]) CbmMuchHit(detectorId, pos, dpos, 0, iDigi,
+        digi->GetTimes(), digi->GetDTime(), planeId);
   }
 
   fTimer.Stop();

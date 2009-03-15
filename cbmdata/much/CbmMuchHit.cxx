@@ -23,6 +23,7 @@ CbmMuchHit::CbmMuchHit() {
     fTime[i] = -1;
   }
   fDTime = 8e-2;
+  fStationNr = -1;
 }
 // -------------------------------------------------------------------------
 
@@ -37,6 +38,7 @@ CbmMuchHit::CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,
     fTime[i] = -1;
   }
   fDTime = 8e-2;
+  fStationNr = -1;
 }
 // -------------------------------------------------------------------------
 
@@ -45,13 +47,14 @@ CbmMuchHit::CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,
 // -----   Standard constructor   ------------------------------------------
 CbmMuchHit::CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,
 		       Double_t covXY, Int_t iDigi, Double_t* times,
-		       Double_t dTime)
+		       Double_t dTime, Int_t stationNr)
   : CbmHit(detId, pos, dpos, covXY, iDigi) {
     fCluster = -1;
     for(Int_t i = 0;i<3;i++){
       fTime[i] = times[i];
     }
     fDTime = dTime;
+    fStationNr = stationNr;
 }
 // -------------------------------------------------------------------------
 
@@ -59,10 +62,11 @@ CbmMuchHit::CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchHit::  CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dpos,
-			 Double_t covXY, Int_t iCluster)
+			 Double_t covXY, Int_t iCluster, Int_t stationNr)
   : CbmHit(detId, pos, dpos, covXY, -1) {
     fRefIndex = -1;
     fCluster  = iCluster;
+    fStationNr = stationNr;
 }
 // -------------------------------------------------------------------------
 
@@ -88,9 +92,5 @@ void CbmMuchHit::Print(Option_t* opt) const {
 */
 // -------------------------------------------------------------------------
 
-
-Int_t CbmMuchHit::GetStationNr() const{
-	return 0;
-}
 
 ClassImp(CbmMuchHit)

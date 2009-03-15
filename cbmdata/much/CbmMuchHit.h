@@ -2,6 +2,8 @@
  *@author Mikhail Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *@version 1.0
  *@since 22.03.07
+ *
+ *
  **
  ** Data class for a reconstructed hit in the MUCH
  ** Data level RECO
@@ -41,10 +43,11 @@ class CbmMuchHit : public CbmHit
   *@param iDigi     Digi index
   *@param times      Time since event start [ns]
   *@param dTime     Time resolution [ns]
+  *@param stationNr plane id (first plane: stationNr=1)
   **/
   CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos,
 	     Double_t dxy, Int_t iDigi, Double_t* times,
-	     Double_t dTime);
+	     Double_t dTime, Int_t stationNr=-1);
 
   /** Standard constructor (clustering)
   *@param detId     Unique detector ID (including module number)
@@ -52,9 +55,10 @@ class CbmMuchHit : public CbmHit
   *@param dPos      Errors of position in global c.s. [cm]
   *@param dxy       Covariance of x and y
   *@param iCluster  Parent cluster index
+  *@param stationNr plane id (first plane: stationNr=1)
   **/
   CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos,
-	     Double_t dxy, Int_t iCluster);
+	     Double_t dxy, Int_t iCluster, Int_t stationNr=-1);
 
 
   /** Destructor **/
@@ -66,7 +70,7 @@ class CbmMuchHit : public CbmHit
 
   /** Accessors **/
   Int_t GetDetectorId()  const { return fDetectorID; }
-  Int_t GetStationNr() const;
+  Int_t GetStationNr()   const { return fStationNr; }
 
   /** Gets covariance in X and Y **/
   Double_t GetCovXY() const  { return fCovXY; }
@@ -86,6 +90,7 @@ class CbmMuchHit : public CbmHit
 
  private:
 
+  Int_t fStationNr;     // plane id for tracking (first plane: stationNr=1)
   Double_t fTime[3];    // Time since event start [ns]
   Double_t fDTime;      // Time resolution [ns]
   Int_t fCluster;       // Index of the parent cluster for the hit

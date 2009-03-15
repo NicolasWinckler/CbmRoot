@@ -41,7 +41,6 @@ CbmMuchFindClusters::CbmMuchFindClusters() :
 	fHits = NULL;
 	fDigiFile = NULL;
 	fPrimaryClusters = NULL;
-	fGeoScheme = CbmMuchGeoScheme::Instance();
 }
 // -------------------------------------------------------------------------
 
@@ -135,8 +134,13 @@ void CbmMuchFindClusters::Exec(Option_t* opt) {
 			TVector3 pos, dpos;
 			pos.SetXYZ(x, y, z);
 			dpos.SetXYZ(sigmaX, sigmaY, 0.);
-			new ((*fHits)[nHits++]) CbmMuchHit(module->GetDetectorId(), pos,
-					dpos, 0, iCluster);
+			Int_t detId = module->GetDetectorId();
+			Int_t planeId = fGeoScheme->GetLayerSideNr(detId);
+			new ((*fHits)[nHits++]) CbmMuchHit(detId, pos,
+					dpos, 0, iCluster,planeId);
+
+			if (planeId>30) printf("planeId=%i\n",planeId);
+
 			if (secCluster)
 				delete secCluster;
 		}

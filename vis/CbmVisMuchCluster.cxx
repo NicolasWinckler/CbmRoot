@@ -76,7 +76,7 @@ void CbmVisMuchCluster::CreateHisto(){
     CbmMuchDigi* digi  = (CbmMuchDigi*) fDigis->At(id);
     CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(id);
     CbmMuchSector* sector = CbmMuchGeoScheme::Instance()->GetSectorByDetId(digi->GetDetectorId(),digi->GetChannelId());
-    CbmMuchPad* pad = sector->GetPad(CbmMuchGeoScheme::GetChannelIndex(digi->GetDetectorId()));
+    CbmMuchPad* pad = sector->GetPad(CbmMuchGeoScheme::GetChannelIndex(digi->GetChannelId()));
     if (i==0){
       bin_size_x = pad->GetLx();
       bin_size_y = pad->GetLy();

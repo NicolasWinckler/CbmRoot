@@ -188,7 +188,7 @@ void CbmVisMuch::ReadEvent(Int_t event){
   for (Int_t i=0;i<fDigis->GetEntriesFast();i++){
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
     CbmMuchSector* sector = fGeoScheme->GetSectorByDetId(digi->GetDetectorId(),digi->GetChannelId());
-    CbmMuchPad* pad = sector->GetPad(CbmMuchGeoScheme::GetChannelIndex(digi->GetDetectorId()));
+    CbmMuchPad* pad = sector->GetPad(CbmMuchGeoScheme::GetChannelIndex(digi->GetChannelId()));
     pad->SetFired(i,digi->GetCharge(),digi->GetADCCharge());
   }
 

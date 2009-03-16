@@ -25,7 +25,7 @@ ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmdata
-#${CBMROOT_SOURCE_DIR}/cbmdata/much
+${CBMROOT_SOURCE_DIR}/cbmdata/much
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/trackbase
@@ -33,7 +33,7 @@ ${CBMROOT_SOURCE_DIR}/geane
 ${CBMROOT_SOURCE_DIR}/field
 ${CBMROOT_SOURCE_DIR}/trd 
 ${CBMROOT_SOURCE_DIR}/sts 
-${CBMROOT_SOURCE_DIR}/much_feb07
+${CBMROOT_SOURCE_DIR}/much
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

@@ -20,8 +20,8 @@ void cbmrootlibs()
 	   if (geoType.Contains("new")) gSystem->Load("libMuch");
 	   else gSystem->Load("libMuchFeb07");
    }
-//   gSystem->Load("libMuch");
-   gSystem->Load("libMuchFeb07");
+   gSystem->Load("libMuch");
+//   gSystem->Load("libMuchFeb07");
 
    gSystem->Load("libTrd");
    gSystem->Load("libTof");

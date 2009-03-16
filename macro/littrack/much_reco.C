@@ -1,11 +1,11 @@
 #include "../../cbmbase/CbmDetectorList.h";
-void much_reco(Int_t nEvents = 1000)
+void much_reco(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, stsRecoFile, muchHitsFile, muchTracksFile;
 	if (script != "yes") {
-		dir  = "/home/d/andrey/events/much/compact/10mu/mu_urqmd/";
+		dir  = "/home/d/andrey/events/newmuch/standard/10mu/mu_urqmd/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		stsRecoFile = dir + "sts.reco.0000.root";
@@ -49,7 +49,7 @@ void much_reco(Int_t nEvents = 1000)
 	CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
 	run->AddTask(muchMatchTracks);
 
-	CbmLitRecQa* muchRecQa = new CbmLitRecQa(15, 0.7, kMUCH, 1);
+	CbmLitRecQa* muchRecQa = new CbmLitRecQa(12, 0.7, kMUCH, 1);
 	muchRecQa->SetNormType(2); // '2' to number of STS tracks
 	run->AddTask(muchRecQa);
 

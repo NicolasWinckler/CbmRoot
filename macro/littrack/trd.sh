@@ -2,23 +2,12 @@
 cd $MYBUILDDIR
 . ./config.sh
 cd -
-root -b <<EOF
-.x trd_sim.C($NEVENTS)
-.q
-EOF
 
-root -b <<EOF
-.x sts_reco.C($NEVENTS)
-.q
-EOF
+root -b -q ./trd_sim.C($NEVENTS)
 
-root -b <<EOF
-.x trd_hits.C($NEVENTS)
-.q
-EOF
+root -b -q ./sts_reco.C($NEVENTS)
 
-root -b <<EOF
-.x trd_reco.C($NEVENTS)
-.q
-EOF
+root -b -q ./trd_hits.C($NEVENTS)
+
+root -b -q ./trd_reco.C($NEVENTS)
 

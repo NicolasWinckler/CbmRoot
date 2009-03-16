@@ -10,6 +10,7 @@
 #include "TObjArray.h"
 #include "TRootEmbeddedCanvas.h"
 #include "TArc.h"
+#include "TMath.h"
 
 #include "TGFrame.h"
 #include "TGComboBox.h"
@@ -45,11 +46,11 @@ CbmVisMuchStationFrame::CbmVisMuchStationFrame(const TGWindow *p, CbmVisMuch* di
   fDisplay = display;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   fGeoScheme->GetNStations();
-  
+
   fMain = new TGVerticalFrame(this,100,100);
   fStationCombo  = new TGComboBox(fMain);
   fLayerCombo    = new TGComboBox(fMain);
-  
+
   fStationNr = 1;
   fLayerNr = 1;
   fShowSide[0] = 1;
@@ -58,8 +59,8 @@ CbmVisMuchStationFrame::CbmVisMuchStationFrame(const TGWindow *p, CbmVisMuch* di
   fShowSectors = 1;
   fShowPoints  = 1;
   fShowHits    = 1;
-  
-  for (Int_t st=0;st<fGeoScheme->GetNStations();st++){ 
+
+  for (Int_t st=0;st<fGeoScheme->GetNStations();st++){
     fStationCombo->AddEntry(Form("Station %i",st+1),st+1);
   }
 
@@ -83,7 +84,7 @@ CbmVisMuchStationFrame::CbmVisMuchStationFrame(const TGWindow *p, CbmVisMuch* di
   fScaleBox   = new TGComboBox(fScaleFrame);
   fScaleFrame->AddFrame(fScaleLabel, new TGLayoutHints(kLHintsCenterY,0,3,0,0));
   fScaleFrame->AddFrame(fScaleBox  , new TGLayoutHints(kLHintsCenterY,3,0,0,0));
-  for (Int_t i=1;i<=3;i++) fScaleBox->AddEntry(Form("x %i",Int_t(pow(2.,i-1))),i);
+  for (Int_t i=1;i<=3;i++) fScaleBox->AddEntry(Form("x %i",Int_t(TMath::Power(2.,i-1))),i);
   fScaleBox->Resize(50,20);
   fScaleBox->Connect("Selected(Int_t)","CbmVisMuchStationFrame", this,"DoScaleStation(Int_t)");
   fScaleBox->Select(1,kFALSE);
@@ -114,14 +115,14 @@ CbmVisMuchStationFrame::CbmVisMuchStationFrame(const TGWindow *p, CbmVisMuch* di
   fSectorsVisibleBtn->SetState(kButtonDown);
   fSectorsVisibleBtn->Connect("Clicked()","CbmVisMuchStationFrame",this,"HandleButtons()");
   fLayoutFrame->AddFrame(fSectorsVisibleBtn,hints);
-   
-  
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
+
+
   // Create checkbox to show/hide points
   fPointsVisibleBtn = new TGCheckButton(fLayoutFrame,"Points",100);
   fPointsVisibleBtn->SetState(kButtonDown);
@@ -280,7 +281,7 @@ void CbmVisMuchStationFrame::DoDrawStation(Int_t stationNr, Int_t layerNr){
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-void CbmVisMuchStationFrame::DrawHits(){ 
+void CbmVisMuchStationFrame::DrawHits(){
   if (!fShowHits) return;
   fCanvas->SetEditable(kTRUE);
   fCanvas->cd();
@@ -306,11 +307,11 @@ void CbmVisMuchStationFrame::DrawHits(){
 
 
 // -------------------------------------------------------------------------
-void CbmVisMuchStationFrame::DrawPoints(){ 
+void CbmVisMuchStationFrame::DrawPoints(){
   if (!fShowPoints) return;
   fCanvas->SetEditable(kTRUE);
   fCanvas->cd();
-  
+
   for (Int_t s=0;s<2;s++){
     if (!fShowSide[s]) continue;
     CbmMuchLayerSide* side = fGeoScheme->GetLayerSide(fStationNr-1,fLayerNr-1,s);
@@ -331,10 +332,10 @@ void CbmVisMuchStationFrame::DrawPoints(){
 
 
 // -------------------------------------------------------------------------
-void CbmVisMuchStationFrame::DrawModules(){ 
+void CbmVisMuchStationFrame::DrawModules(){
   fCanvas->SetEditable(kTRUE);
   fCanvas->cd();
-  
+
   for (Int_t s=1;s>=0;s--){
     if (!fShowSide[s]) continue;
     CbmMuchLayerSide* side = fGeoScheme->GetLayerSide(fStationNr-1,fLayerNr-1,s);
@@ -349,7 +350,7 @@ void CbmVisMuchStationFrame::DrawModules(){
 
 
 // -------------------------------------------------------------------------
-void CbmVisMuchStationFrame::DoScaleStation(Int_t scale){ 
+void CbmVisMuchStationFrame::DoScaleStation(Int_t scale){
 
   TGHScrollBar* hbar = fGCanvas->GetHScrollbar();
   TGVScrollBar* vbar = fGCanvas->GetVScrollbar();
@@ -362,7 +363,7 @@ void CbmVisMuchStationFrame::DoScaleStation(Int_t scale){
 
   Double_t norm=500;
   //Int_t s_old = fECanvas->GetWidth();
-  Int_t s = Int_t( norm*pow(2.,(Double_t)scale-1.));
+  Int_t s = Int_t( norm*TMath::Power(2.,(Double_t)scale-1.));
   fECanvas->SetWidth (s);
   fECanvas->SetHeight(s);
   fECanvasH=s;
@@ -419,16 +420,16 @@ void CbmVisMuchStationFrame::HandleEmbeddedCanvas(Int_t event, Int_t px, Int_t p
       CbmMuchModule* module = fGeoScheme->GetModuleByDetId(sector->GetDetectorId());
       CbmVisMuchModuleFrame* moduleFrame = new CbmVisMuchModuleFrame(module,fDisplay);
       fDisplay->GetOpenModules()->AddAtFree(moduleFrame);
-    }  
+    }
 
     if (!strcmp(selName,"CbmMuchModule")) {
       CbmMuchModule* module = (CbmMuchModule*) sel;
       CbmVisMuchModuleFrame* moduleFrame
          = new CbmVisMuchModuleFrame(module,fDisplay);
       fDisplay->GetOpenModules()->AddAtFree(moduleFrame);
-    }  
+    }
 //    for(Int_t i=0;i<fSectors->GetEntriesFast();i++){
-//      CbmMuchModule* 
+//      CbmMuchModule*
 //      CbmMuchSector* sector = gsector->GetSector();
 //      if (!sector->Inside(x,y)) continue;
 //      printf("sector: %i\n",i+1);
@@ -470,7 +471,7 @@ void CbmVisMuchStationFrame::UpdateStation(Int_t stationNr){
 
 
 void CbmVisMuchStationFrame::UpdateLayer(Int_t layerNr){
-  if (layerNr==0) { layerNr = fLayerNr; } 
+  if (layerNr==0) { layerNr = fLayerNr; }
   DoDrawStation(fStationNr,layerNr);
   DrawPoints();
   DrawHits();
@@ -495,7 +496,7 @@ void CbmVisMuchStationFrame::HandleButtons(){
     fShowSide[1] = !fShowSide[1];
     UpdateLayer();
   }
-  
+
   // SetFrontSideVisible
   if (id==98) {
     fShowModules = !fShowModules;
@@ -506,17 +507,17 @@ void CbmVisMuchStationFrame::HandleButtons(){
     fShowSectors = !fShowSectors;
     UpdateLayer();
   }
-  
+
   if (id==100) {
     fShowPoints = !fShowPoints;
     UpdateLayer();
-  }  
+  }
 
   if (id==100) {
     fShowHits = !fShowHits;
     UpdateLayer();
-  }  
-  
+  }
+
   /*
   // Set points visible
   if (id==100) {

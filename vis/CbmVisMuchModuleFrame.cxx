@@ -6,6 +6,7 @@
 
 
 #include "TClass.h"
+#include "TMath.h"
 #include "CbmVisMuchModuleFrame.h"
 
 #include "TClonesArray.h"
@@ -47,14 +48,14 @@ CbmVisMuchModuleFrame::CbmVisMuchModuleFrame(CbmMuchModule* module, CbmVisMuch* 
   x0 = fModule->GetPosition()[0];
   y0 = fModule->GetPosition()[1];
   Double_t l = 2*sqrt(lx*lx+ly*ly)/2;
-  Int_t canvas_lx = 600;
+  Int_t canvas_lx = 800;
   Int_t canvas_ly = Int_t(canvas_lx*ly/lx);
 
   fMain = new TGMainFrame(gClient->GetRoot(),800,800,kVerticalFrame);
   fMain->Connect("CloseWindow()", "CbmVisMuchModuleFrame", this, "CloseWindow()");
 
   fScale = new TGComboBox(fMain,1);
-  for (Int_t i=1;i<=4;i++) fScale->AddEntry(Form("x %i",Int_t(pow(2.,i-1))),i);
+  for (Int_t i=1;i<=4;i++) fScale->AddEntry(Form("x %i",Int_t(TMath::Power(2.,i-1))),i);
   fScale->Resize(90,20);
   fScale->Connect("Selected(Int_t)","CbmVisMuchModuleFrame", this,"DoScale(Int_t)");
   fScale->Select(1,kFALSE);
@@ -145,7 +146,7 @@ void CbmVisMuchModuleFrame::DoScale(Int_t scale){
   Int_t vrange1 = vbar->GetRange();
 
   Double_t norm=500;
-  Int_t s = Int_t( norm*pow(2.,(Double_t)scale-1.));
+  Int_t s = Int_t( norm*TMath::Power(2.,(Double_t)scale-1.));
   fScaleValue = scale;
   fECanvas->SetWidth (s);
   fECanvas->SetHeight(s);

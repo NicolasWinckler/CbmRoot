@@ -5,7 +5,9 @@
 
 /** CbmMuchMatchTracks.h
  *@author A.Lebedev <Andrey.Lebedev@gsi.de>
- **
+ *
+ * 2009-03-16 E. Kryshen
+ * Matching of hits to clusters with several MC points
  **/
 
 #ifndef CBMMUCHMATCHTRACKS_H_
@@ -28,18 +30,20 @@ public:
   virtual void Finish();
 
 private:
-  TClonesArray* fTracks; 
-  TClonesArray* fPoints; 
+  void DigiToTrackMatch(Int_t digiIndex, std::map<Int_t, Int_t> &matchMap);
+  TClonesArray* fTracks;
+  TClonesArray* fPoints;
   TClonesArray* fHits;
   TClonesArray* fMatches;
   TClonesArray* fDigiMatch;
+  TClonesArray* fClusters;
 
   Int_t fNofHits;
   Int_t fNofTrueHits;
   Int_t fNofWrongHits;
   Int_t fNofFakeHits;
-  
-  Int_t    fNEvents;       
+
+  Int_t    fNEvents;
 
   ClassDef(CbmMuchMatchTracks,1);
 };

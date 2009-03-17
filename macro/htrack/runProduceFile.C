@@ -14,7 +14,7 @@
   //          Adjust this part according to your requirements
 
   // Output folder for the files
-  TString folder      = "files";
+  TString folder      = "data";
 
   // Collision system
   TString system      = "auau";
@@ -56,9 +56,13 @@
   // ========================================================================
 
   // -----   Input file name   ----------------------------------------------
+  TString inDir   = gSystem->Getenv("VMCWORKDIR");
+  TString inFile  = inDir + "/input/urqmd.ftn14";
+/*
   TString inFile      = "/d/cbm03/urqmd/" + system + "/" + beam + "/"
                       + trigger + "/urqmd." + system + "." + beam + "."
                       + trigger + ".0000.ftn14";
+*/
   // ------------------------------------------------------------------------
 
   // ----    Debug option   -------------------------------------------------

@@ -271,7 +271,9 @@ void CbmVisMuchStationFrame::DoDrawStation(Int_t stationNr, Int_t layerNr){
   TArc* cMin = new TArc(0,0,rmin,0,360);
   cMin->SetFillColor(10);
   cMin->Draw("f");
-  TArc* cMax = new TArc(0,0,rmax,0,360); cMax->Draw();
+  TArc* cMax = new TArc(0,0,rmax,0,360);
+  cMax->SetFillStyle(0);
+  cMax->Draw();
   fCanvas->Update();
   fCanvas->SetEditable(kFALSE);
 

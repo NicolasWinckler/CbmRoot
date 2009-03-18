@@ -199,8 +199,8 @@ void CbmVisMuchModuleFrame::HandleEmbeddedCanvas(Int_t event, Int_t px, Int_t py
         Int_t i=0;
         for(it=neighbours.begin(); it!=neighbours.end(); it++){
           CbmMuchPad* pad = *it;
-          fStatusBar->SetText(Form("%i",CbmMuchGeoScheme::GetChannelIndex(pad->GetDetectorId())),2);
-          printf("%i\n",CbmMuchGeoScheme::GetChannelIndex(pad->GetDetectorId()));
+          fStatusBar->SetText(Form("%i",CbmMuchGeoScheme::GetChannelIndex(pad->GetChannelId())),2);
+          printf("%i\n",CbmMuchGeoScheme::GetChannelIndex(pad->GetChannelId()));
           fCanvas->SetEditable(kTRUE);
           fCanvas->cd();
 //          TPolyLine pline = pad->GetPadPolygon();
@@ -301,6 +301,7 @@ void CbmVisMuchModuleFrame::UpdateModule(){
   DrawHits();
   fCanvas->Update();
   fCanvas->SetEditable(kFALSE);
+//  fCanvas->Print("station2.png");
 //  fStatusBar->SetText(Form("Occupancy:%4.1f",100*fGSector->GetOccupancy()),0);
 }
 // -------------------------------------------------------------------------

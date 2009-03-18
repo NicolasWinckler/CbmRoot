@@ -77,8 +77,6 @@ class CbmRichRingFinderHough : public CbmRichRingFinder {
 	std::vector< std::vector< std::vector<Int_t> > > fRingHits;
 	std::vector< Int_t > fHistR;
 	std::vector< std::vector<Int_t> > fRingHitsR;
-	std::vector< std::vector<Int_t> > fFoundRingsHitId;
-
 
 	std::vector<CbmRichRing> fFoundRings;///collect found rings
 

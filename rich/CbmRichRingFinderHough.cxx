@@ -79,9 +79,6 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 
 	  fData.clear();
 	  fFoundRings.clear();
-	  for (Int_t i = 0;  i < fFoundRingsHitId.size();i++)
-		  fFoundRingsHitId[i].clear();
-	  fFoundRingsHitId.clear();
 
 	  std::vector<CbmRichMyPoint> UpH;
 	  std::vector<CbmRichMyPoint> DownH;

@@ -86,8 +86,8 @@ CbmRichElectronsQa::CbmRichElectronsQa(const char *name, const char *title, Int_
 	fhDistPi= new TH1D("fhDistPi", "fhDistPi;ring-track distance, cm;Entries", 30,0,3);
 	fhNofHitsEl= new TH1D("fhNofHitsEl", "fhNofHitsEl;nof hits;Entries", 30,0,45);
 	fhNofHitsPi= new TH1D("fhNofHitsPi", "fhNofHitsPi;nof hits;Entries", 30,0,45);
-	fhChi2El= new TH1D("fhChi2El", "fhChi2El;chi2;Entries", 30,0,1.5);
-	fhChi2Pi= new TH1D("fhChi2Pi", "fhChi2Pi;chi2;Entries", 30,0,1.5);
+	fhChi2El= new TH1D("fhChi2El", "fhChi2El;chi2;Entries", 30,0,1.);
+	fhChi2Pi= new TH1D("fhChi2Pi", "fhChi2Pi;chi2;Entries", 30,0,1.);
 	fhRadPosEl= new TH1D("fhRadPosEl", "fhRadPosEl;radial position, cm;Entries", 30,0,150);
 	fhRadPosPi= new TH1D("fhRadPosPi", "fhRadPosPi;radial position, cm;Entries", 30,0,150);
 	fhAaxisVsMomEl= new TH2D("fhAaxisVsMomEl", "fhAaxisVsMomEl;momentum, GeV/c;A axis, cm",30,0,15, 30,3,8);
@@ -100,7 +100,7 @@ CbmRichElectronsQa::CbmRichElectronsQa(const char *name, const char *title, Int_
 	fhTrdAnnPi= new TH1D("fhTrdAnnPi", "fhTrdAnnPi;ANN output;Entries", 50,-1.2,1.2);
 
 	fOutElandPi.open("ann_el_pi.txt");
-	SetParameters("compact");
+	SetParameters("large");
 }
 
 
@@ -115,9 +115,9 @@ void CbmRichElectronsQa::SetParameters(TString richGeo)
 {
 	fMinNofHitsInRichRing = 5;
 	fMinNofTrdHits = 8;
-	fTrdAnnCut = 0.75;
-	fRichAnnCut = -0.3;
-	fUseRichAnn = false;
+	fTrdAnnCut = 0.96;
+	fRichAnnCut = -0.25;
+	fUseRichAnn = true;
 
 
     cout << "-I- CbmRichElectronsQa for " << richGeo << " RICH geometry"<<endl;
@@ -130,20 +130,20 @@ void CbmRichElectronsQa::SetParameters(TString richGeo)
     TString richANNFile = gSystem->Getenv("VMCWORKDIR");
     if (richGeo == "compact"){
         richANNFile += "/parameters/rich/el_id_ann_weights_rich_compact.txt";
-        fMeanA = 4.94;
-        fMeanB = 4.50;
-        fRmsA = 0.27;
-        fRmsB = 0.26;
-        fRmsCoeff = 4.;
+        fMeanA = 5.02;
+        fMeanB = 4.68;
+        fRmsA = 0.22;
+        fRmsB = 0.167;
+        fRmsCoeff = 3.5;
         fDistCut = 1.;
     }
 
     if (richGeo == "large"){
         richANNFile += "/parameters/rich/el_id_ann_weights_rich.txt";
-        fMeanA = 6.18;
-        fMeanB = 5.66;
-        fRmsA = 0.3;
-        fRmsB = 0.21;
+        fMeanA = 6.10;
+        fMeanB = 5.67;
+        fRmsA = 0.19;
+        fRmsB = 0.17;
         fRmsCoeff = 4.;
         fDistCut = 1.;
     }
@@ -717,11 +717,12 @@ void CbmRichElectronsQa::GlobalTracksElIdEff()
 
 Bool_t CbmRichElectronsQa::IsRichElectron(CbmRichRing* ring, Double_t momentum)
 {
-    Double_t axisA = ring->GetAaxis();
-    Double_t axisB = ring->GetBaxis();
-    Double_t dist = ring->GetDistance();
 
     if (fUseRichAnn == false){
+    	Double_t axisA = ring->GetAaxis();
+    	Double_t axisB = ring->GetBaxis();
+    	Double_t dist = ring->GetDistance();
+    	cout << "0000" << endl;
 		if ( fabs(axisA-fMeanA) < fRmsCoeff*fRmsA &&
 		   fabs(axisB-fMeanB) < fRmsCoeff*fRmsB && dist < fDistCut) return true;
 		return false;
@@ -789,6 +790,8 @@ void CbmRichElectronsQa::DiffElandPi()
         Double_t radPos = ring->GetRadialPosition();
         Double_t nofHits = ring->GetNofHits();
         Double_t dist = ring->GetDistance();
+
+        if (TMath::IsNaN(axisA) || TMath::IsNaN(axisB)) continue;
         //electrons
 		if (pdg == 11 && motherId == -1 && ring->GetRecFlag() == 3 &&
 				mcIdSts == mcIdRich && mcIdRich != -1){

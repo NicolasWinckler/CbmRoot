@@ -111,6 +111,8 @@
     CbmFieldMapSym3* magField = new CbmFieldMapSym3(fieldMap);
   else if ( fieldMap == "FieldAlligator" )
     CbmFieldMapSym2* magField = new CbmFieldMapSym2(fieldMap);
+  else if ( fieldMap == "FieldMuonMagnet" )
+    CbmFieldMapSym3* magField = new CbmFieldMapSym3(fieldMap);
   else {
     CbmField*        magField = NULL;
     cout << "===> ERROR: Field map " << fieldMap << " unknown! " << endl;

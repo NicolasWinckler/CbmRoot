@@ -17,18 +17,21 @@
 #pragma link C++ class  CbmMuchGeoScheme+;
 #pragma link C++ class  CbmMuchHitFinderQa+;
 #pragma link C++ class  CbmMuchHitProducerIdeal+;
-#pragma link C++ class  CbmMuchLayer+;  
+#pragma link C++ class  CbmMuchLayer+;
 #pragma link C++ class  CbmMuchLayerSide+;
 #pragma link C++ class  CbmMuchMatchTracks+;
 //#pragma link C++ class  CbmMuchMaximalChargeQa+;
-#pragma link C++ class  CbmMuchModule+;  
+#pragma link C++ class  CbmMuchModule+;
 #pragma link C++ class  CbmMuchPad+;
 //#pragma link C++ class  CbmMuchPhysicsQa+;
 #pragma link C++ class  CbmMuchPointInfo+;
 #pragma link C++ class  CbmMuchSector+;
 #pragma link C++ class  CbmMuchSegmentation+;
 #pragma link C++ class  CbmMuchStation+;
+#pragma link C++ class  CbmMuchStationGem+;
+#pragma link C++ class  CbmMuchStationStraw+;
 #pragma link C++ class  CbmMuchTask+;
 #pragma link C++ class  CbmMuchTrackFinderIdeal+;
+#pragma link C++ class  CbmMuchFindHitsStraws+;
 
 #endif

@@ -298,7 +298,7 @@ void CbmMuch::ConstructGeometry() {
   gMC->Matrix(krotY,90,180,90,90,180,0);  // 180 degrees around y axis
   gMC->Matrix(krotZ,90,180,90,270,0,0);   // 180 degrees around z axis
 
-  // Create module shape which common for all module volumes
+  // Create GEM module shape which common for all module volumes
   Double_t activeLx = fGeoScheme->GetActiveLx();
   Double_t activeLy = fGeoScheme->GetActiveLy();
   Double_t activeLz = fGeoScheme->GetActiveLz();
@@ -314,28 +314,34 @@ void CbmMuch::ConstructGeometry() {
   // Create stations
   for (Int_t st=0;st<fGeoScheme->GetNStations();st++){
     CbmMuchStation* station = fGeoScheme->GetStation(st);
+
+    // Check if
     Int_t nLayers = station->GetNLayers();
-    if (nLayers<=0) continue;
+    if (nLayers<=0) {
+      Warning("CbmMuch","Station layers are not defined for station %i",st);
+      continue;
+    }
+
+    // Create station volume
+    TString stName = Form("muchstation%i",st+1);
+    Double_t stRmin = station->GetTubeRmin();
+    Double_t stRmax = station->GetTubeRmax();
+    Double_t stDz   = station->GetTubeDz();
+    TGeoTube*   shSt = new TGeoTube(stRmin,stRmax,stDz);
+    TGeoVolume* voSt = new TGeoVolume(stName,shSt,air);
+    gGeoManager->Node(stName,0,"much",0.,0.,station->GetZ()-muchZ0,0,kTRUE,buf,0);
+
+    // Create support shape
     CbmMuchLayer* layerFirst = station->GetLayer(0);
     Double_t supDx  = layerFirst->GetSupportDx();
     Double_t supDy  = layerFirst->GetSupportDy();
     Double_t supDz  = layerFirst->GetSupportDz();
-    Double_t stRmin = station->GetRmin();
-    Double_t stRmax = TMath::Sqrt(supDx*supDx+supDy*supDy)+10;
-    Double_t stZ    = station->GetZ() - muchZ0;
-    Double_t layersDz = fGeoScheme->GetLayersDz(st);
-    Double_t stDz   = layersDz*(nLayers-1)/2. + (2*supDz+activeLz)/2.+1;
 
-    TString stName = Form("muchstation%i",st+1);
-    TGeoTube*   shSt = new TGeoTube(stRmin,stRmax,stDz);
-    TGeoVolume* voSt = new TGeoVolume(stName,shSt,air);
-    gGeoManager->Node(stName,0,"much",0.,0.,stZ,0,kTRUE,buf,0);
-    // Create support shape
     TString supBoxName   = Form("muchst%ibox",st+1);
     TString supHoleName  = Form("muchst%ihole",st+1);
     TString trName       = Form("muchst%itr",st+1);
     TString supShapeName = Form("muchst%ish",st+1);
-    TGeoTube* shHole = new TGeoTube(supHoleName,0.,stRmin,supDz+0.001);
+    TGeoTube* shHole = new TGeoTube(supHoleName,0.,station->GetTubeRmin(),supDz+0.001);
     TGeoBBox* shBox  = new TGeoBBox(supBoxName,supDx/2.,supDy,supDz);
     TGeoTranslation* trHole = new TGeoTranslation(trName,-supDx/2.,0.,0.);
     trHole->RegisterYourself();
@@ -345,12 +351,40 @@ void CbmMuch::ConstructGeometry() {
     // Create layers
     for (Int_t l=0;l<station->GetNLayers();l++){
       CbmMuchLayer* layer = station->GetLayer(l);
-      Double_t layerZ  = layer->GetZ()-station->GetZ();
-      Double_t layerDz = supDz+activeLz/2.+1;
+      Double_t layerZ  = layer->GetZtoStationCenter();
+      Double_t layerDz = layer->GetDz();
       TString layerName   = Form("muchstation%ilayer%i",st+1,l+1);
       TGeoTube*   shLayer = new TGeoTube(stRmin,stRmax,layerDz);
       TGeoVolume* voLayer = new TGeoVolume(layerName,shLayer,air);
       gGeoManager->Node(layerName,0,stName,0.,0.,layerZ,0,kTRUE,buf,0);
+
+
+      // Straws
+
+      if (station->GetDetectorType()==2) {
+        if (station->IsModuleDesign()){
+          Fatal("CbmMuch","Station %i - detailed module design not implemented for straws",st);
+        }
+
+        for (Int_t s=0;s<2;s++){
+          CbmMuchLayerSide* side = layer->GetSide(s);
+          for (Int_t m=0;m<side->GetNModules();m++){
+            Char_t cside = (s==1) ? 'b' : 'f';
+            CbmMuchModule* module = side->GetModule(m);
+            TVector3 pos = module->GetPosition();
+            TVector3 size = module->GetSize();
+            TGeoBBox* shActiveBox = new TGeoBBox(Form("shActiveBoxSt%il%i",st+1,l+1),size[0]/2.,size[1]/2.,size[2]/2.);
+            TGeoShape* shActive = new TGeoCompositeShape(Form("shActiveHoleSt%il%i%cm%02i",st+1,l,cside,m+1),Form("shActiveBoxSt%il%i-muchst%ihole",st+1,l+1,st+1));
+            TString activeName = Form("muchstation%ilayer%i%cactive%03i",st+1,l+1,cside,m+1);
+            TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);
+            gGeoManager->Node(activeName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);
+            AddSensitiveVolume(voActive);
+          }
+        }
+        continue;
+      }
+
+      // GEMs etc.
 
       TString  supName1  = Form("muchstation%ilayer%isupport1",st+1,l+1);
       TString  supName2  = Form("muchstation%ilayer%isupport2",st+1,l+1);
@@ -359,8 +393,7 @@ void CbmMuch::ConstructGeometry() {
       gGeoManager->Node(supName1,0,layerName,+supDx/2.,0.,0.,    0,kTRUE,buf,0);
       gGeoManager->Node(supName2,0,layerName,-supDx/2.,0.,0.,krotZ,kTRUE,buf,0);
 
-
-      if (!fGeoScheme->IsModuleDesign()){ // simple design
+      if (!station->IsModuleDesign()){ // simple design
         CbmMuchLayerSide* side = layer->GetSide(0);
         CbmMuchModule* module = side->GetModule(0);
         TVector3 pos = module->GetPosition();

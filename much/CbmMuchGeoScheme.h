@@ -2,7 +2,6 @@
 // -----                   CbmMuchGeoScheme header file                -----
 // -----                  Created 18/02/08  by E. Kryshen              -----
 // -------------------------------------------------------------------------
-// TODO add comments
 
 /** CbmMuchGeoScheme
  *@author Evgeny Kryshen <e.kryshen@gsi.de>
@@ -236,12 +235,15 @@ public:
 	void ReadGeoFile(const char* geoName);
 	void Print();
 	void CreateMuchCave();
-	Bool_t IsModuleDesign() {return fModuleDesign;}
+//	Bool_t IsModuleDesign() {return fModuleDesign;}
 
 private:
 	CbmMuchGeoScheme();
 	void CreateAbsorbers();
 	void CreateStations();
+  CbmMuchStation* CreateStationGem(Int_t st);
+  CbmMuchStation* CreateStationStraw(Int_t st);
+
 	Int_t Intersect(Float_t x, Float_t y, Float_t dx, Float_t dy, Float_t r);
 	static CbmMuchGeoScheme* fInstance;
 	static Bool_t fInitialized; // Defines whether the instance was initialized
@@ -259,15 +261,17 @@ private:
 	Double_t fAcceptanceTanMax; // Acceptance tangent max
 	Int_t fNabs; // Number of absorbers
 	Int_t fNst; // Number of stations
-	Bool_t fModuleDesign; /* 1 - detailed design (modules at two sides)
-	 * 0 - simple design (1 module per layer)     */
 
+    // GEM module parameters
 	Double_t fActiveLx; // Active volume lx [cm]
 	Double_t fActiveLy; // Active volume ly [cm]
 	Double_t fActiveLz; // Active volume lz [cm]
 	Double_t fSpacerLx; // Spacer lx [cm]
 	Double_t fSpacerLy; // Spacer ly [cm]
 	Double_t fOverlapY; // Overlap along y axis [cm]
+
+    // Straw module parameters
+	Double_t fStrawLz;
 
 	TArrayD fAbsorberZ1; // Absorber Zin position [cm]
 	TArrayD fAbsorberLz; // Absorber thickness [cm]
@@ -282,6 +286,8 @@ private:
 	TArrayD fSigmaXmax; // Sigma X minimum [cm]
 	TArrayD fSigmaYmax; // Sigma Y maximum [cm]
 	TArrayD fOccupancyMax; // Maximum occupancy
+	TArrayD fModuleDesign; /* 1 - detailed design (modules at two sides)
+                          * 0 - simple design (1 module per layer)     */
 
 
 	ClassDef(CbmMuchGeoScheme,1);

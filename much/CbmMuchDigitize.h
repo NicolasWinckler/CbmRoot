@@ -178,6 +178,8 @@ class CbmMuchDigitize : public FairTask
   /** Simple digis production without avalanches **/
   Bool_t ExecSimple(CbmMuchPoint* point, Int_t iPoint);
 
+  Bool_t ExecStraws(CbmMuchPoint* point, Int_t iPoint);
+
   /** Fills output arrays with digis, which have charge above the threshold **/
   void FirePads();
 

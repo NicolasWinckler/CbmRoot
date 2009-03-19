@@ -11,6 +11,7 @@
 #include "CbmMuchHit.h"
 
 #include "CbmMuchStation.h"
+#include "CbmMuchStationGem.h"
 #include "CbmMuchSector.h"
 #include "CbmMuchPad.h"
 
@@ -50,6 +51,8 @@ CbmMuchHitFinderQa::CbmMuchHitFinderQa(const char* name, Int_t verbose)
   fEvent = 0;
   fSignalPoints = fSignalHits = 0;
   fPointInfos = new TClonesArray("CbmMuchPointInfo",10);
+  fPullsQaOn = 1;
+  fOccupancyQaOn = 1;
 }
 // -------------------------------------------------------------------------
 
@@ -205,7 +208,7 @@ InitStatus CbmMuchHitFinderQa::Init()
   fhPadsFiredR = new TH1D*[fNstations];
 
   for (Int_t i=0; i<fNstations; i++){
-    CbmMuchStation* station = fGeoScheme->GetStation(i);
+    CbmMuchStationGem* station = (CbmMuchStationGem*) fGeoScheme->GetStation(i);
     Double_t rMax = station->GetRmax();
     fhPadsTotalR[i] = new TH1D(Form("hPadsTotal%i",i+1),Form("Number of  pads vs radius: station %i;Radius [cm]",i+1),100,0,1.2*rMax);
     fhPadsFiredR[i] = new TH1D(Form("hPadsFired%i",i+1),Form("Number of fired pads vs radius: station %i;Radius [cm]",i+1),100,0,1.2*rMax);
@@ -221,10 +224,11 @@ InitStatus CbmMuchHitFinderQa::Init()
     fhPadsTotalR[stationId]->Fill(r0);
   } // pads
 
-  Double_t xmax = fGeoScheme->GetStation(0)->GetSigmaXmax();
-  Double_t xmin = fGeoScheme->GetStation(0)->GetSigmaXmin();
-  Double_t ymax = fGeoScheme->GetStation(0)->GetSigmaYmax();
-  Double_t ymin = fGeoScheme->GetStation(0)->GetSigmaYmin();
+  CbmMuchStationGem* station0 = (CbmMuchStationGem*) fGeoScheme->GetStation(0);
+  Double_t xmax = station0->GetSigmaXmax();
+  Double_t xmin = station0->GetSigmaXmin();
+  Double_t ymax = station0->GetSigmaYmax();
+  Double_t ymin = station0->GetSigmaYmin();
   fnPadSizesX = Int_t(TMath::Log2(xmax/xmin));
   fnPadSizesY = Int_t(TMath::Log2(ymax/ymin));
   fhPullXpads1 = new TH1D*[fnPadSizesX];
@@ -276,9 +280,9 @@ void CbmMuchHitFinderQa::Exec(Option_t * option){
   fEvent++;
   Info("Exec",Form("Event:%i",fEvent));
 
-  //PullsQa();
+  if (fPullsQaOn) PullsQa();
+  if (fOccupancyQaOn) OccupancyQa();
   //DigitizerQa();
-  OccupancyQa();
   //StatisticsQa();
   //ClusterDeconvQa();
 }
@@ -300,7 +304,7 @@ void CbmMuchHitFinderQa::FinishTask(){
     fhOccupancyR[i]->Divide(fhPadsFiredR[i],fhPadsTotalR[i]);
   }
 
-  if (fVerbose>3) {
+  if (fPullsQaOn && fVerbose>1){
     TCanvas* c4 = new TCanvas("c4","Pulls",800,400);
     c4->Divide(2,1);
     c4->cd(1);
@@ -320,9 +324,7 @@ void CbmMuchHitFinderQa::FinishTask(){
     gPad->Print(".gif");
     gPad->Print(".eps");
     c4->cd();
-  }
 
-  if (fVerbose>3) {
     TCanvas* c4x = new TCanvas("c4x","Pulls",fnPadSizesX*300,3*300);
     c4x->Divide(fnPadSizesX,3);
     for (Int_t i=0;i<fnPadSizesX;i++){
@@ -353,9 +355,7 @@ void CbmMuchHitFinderQa::FinishTask(){
       gPad->Print(".gif");
       gPad->Print(".eps");
     }
-  }
 
-  if (fVerbose>3) {
     TCanvas* c4y = new TCanvas("c4y","Pulls",fnPadSizesY*300,3*300);
     c4y->Divide(fnPadSizesY,3);
     for (Int_t i=0;i<fnPadSizesY;i++){
@@ -388,7 +388,8 @@ void CbmMuchHitFinderQa::FinishTask(){
     }
   }
 
-  if (1) {
+
+  if (fOccupancyQaOn) {
     TCanvas* c3 = new TCanvas("c3","Occupancy plots",1200,800);
     c3->Divide(3,2);
     for (Int_t i=0;i<fNstations;i++) {
@@ -817,10 +818,13 @@ void CbmMuchHitFinderQa::PullsQa(){
   for (Int_t i=0;i<fHits->GetEntriesFast();i++){
     CbmMuchHit* hit = (CbmMuchHit*) fHits->At(i);
     // Select hits from the second station only
+
     Int_t iStation = CbmMuchGeoScheme::GetStationIndex(hit->GetDetectorId());
     Int_t iLayer   = CbmMuchGeoScheme::GetLayerIndex(hit->GetDetectorId());
-    //if(!(iStation == 3 && iLayer == 0)) continue;
+//    if(!(iStation == 0)) continue;
+//    if(!(iStation == 3 && iLayer == 0)) continue;
     if (verbose) printf("   Hit %i, station %i, layer %i ",i,iStation, iLayer);
+
     // Select hits which are unique in the corresponding cluster
     Bool_t hit_unique=1;
     Int_t clusterId = hit->GetCluster();
@@ -847,13 +851,19 @@ void CbmMuchHitFinderQa::PullsQa(){
 //    if (cluster->GetNDigis()>1) {if (verbose) printf("\n"); continue;}
     for(Int_t digiId=0;digiId<cluster->GetNDigis();digiId++){
       Int_t index = cluster->GetDigiIndex(digiId);
+//      printf("%i\n",index);
       CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(index);
       // Not unique if the pad has several mcPoint references
       if (verbose) printf(" n=%i",match->GetNPoints());
+      if (match->GetNPoints()==0) {
+        printf(" noise hit");
+        point_unique=0;
+        break;
+      }
       if (match->GetNPoints()>1) { point_unique=0; break; }
       Int_t currentPointId = match->GetRefIndex(0);
       CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(index);
-      CbmMuchPad* pad = fGeoScheme->GetPadByDetId(digi->GetDetectorId(), digi->GetChannelId());
+      CbmMuchPad* pad = fGeoScheme->GetPadByDetId(digi->GetDetectorId(),digi->GetChannelId());
       Double_t x = pad->GetX0();
       Double_t y = pad->GetY0();
       Double_t dx = pad->GetLx();
@@ -865,9 +875,11 @@ void CbmMuchHitFinderQa::PullsQa(){
       if (digiId==0 || ymin>y-dy/2) ymin=y-dy/2;
       if (digiId==0 || ymax<y+dy/2) ymax=y+dy/2;
       if (digiId==0) { pointId=currentPointId; continue; }
-      // Not unique if mcPoint references differ for diferent digis
+      // Not unique if mcPoint references differ for different digis
       if (currentPointId!=pointId) {point_unique=0; break; }
     }
+
+
     if (verbose) printf(" point_unique=%i",point_unique);
     if (!point_unique) {if (verbose) printf("\n"); continue;}
     //printf(" %f %f %f %f %f %f\n",xmin,xmax,ymin,ymax,dxmin,dymin);
@@ -890,11 +902,17 @@ void CbmMuchHitFinderQa::PullsQa(){
     if (dy<1.e-10) { printf("Anomalously small dy\n"); continue;}
     fhPullX->Fill((xRC-xMC)/dx);
     fhPullY->Fill((yRC-yMC)/dy);
+
+
     if (verbose) printf("\n");
 
     Int_t index = cluster->GetDigiIndex(0);
+
+    // printf("index=%i\n",index);
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(index);
-    CbmMuchStation* station = fGeoScheme->GetStationByDetId(digi->GetDetectorId());
+
+
+    CbmMuchStationGem* station = (CbmMuchStationGem*) fGeoScheme->GetStationByDetId(digi->GetDetectorId());
     Double_t pad_xmin = TMath::Sqrt(12)*station->GetSigmaXmin();
     Double_t pad_ymin = TMath::Sqrt(12)*station->GetSigmaYmin();
     Int_t padSizeX = Int_t(TMath::Log2(dxmin/pad_xmin));
@@ -912,6 +930,9 @@ void CbmMuchHitFinderQa::PullsQa(){
 
 }
 // -------------------------------------------------------------------------
+
+
+
 
 // -------------------------------------------------------------------------
 void CbmMuchHitFinderQa::ClusterDeconvQa(){

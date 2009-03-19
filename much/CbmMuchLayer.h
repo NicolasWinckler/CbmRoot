@@ -27,16 +27,20 @@ class CbmMuchLayer : public TObject
 
   /** Standard constructor
    *@param detId     Detector ID
-   *@param z         z position of station center [cm]
+   *@param z         z position of layer center [cm]
+   *@param zRel      z position of layer center relative to station center [cm]
+   *@param dz        half-thickness of the layer [cm]
    **/
-  CbmMuchLayer(Int_t detId, Double_t z);
+  CbmMuchLayer(Int_t detId, Double_t z, Double_t zRel, Double_t dz);
 
   /** Standard constructor
    *@param iStation  Station index
    *@param iLayer    Layer index
-   *@param z         z position of station center [cm]
+   *@param z         z position of layer center [cm]
+   *@param zRel      z position of layer center relative to station center [cm]
+   *@param dz        half-thickness of the layer [cm]
    **/
-  CbmMuchLayer(Int_t iStation, Int_t iLayer, Double_t z);
+  CbmMuchLayer(Int_t iStation, Int_t iLayer, Double_t z, Double_t zRel, Double_t dz);
 
   /** Destructor **/
   virtual ~CbmMuchLayer();
@@ -53,6 +57,8 @@ class CbmMuchLayer : public TObject
   void SetSupportDy(Double_t supDy) { fSupportDy = supDy; }
   void SetSupportDz(Double_t supDz) { fSupportDz = supDz; }
   Double_t GetZ() { return fZ; }
+  Double_t GetZtoStationCenter() { return fZtoStationCenter; }
+  Double_t GetDz() { return fDz; }
 
  protected:
   Int_t   fDetectorId;  // Unique detector ID
@@ -62,7 +68,9 @@ class CbmMuchLayer : public TObject
   Double_t   fSupportDx;   // Support half-width
   Double_t   fSupportDy;   // Support half-height
   Double_t   fSupportDz;   // Support half-thickness
-
+  Double_t   fZtoStationCenter; // Relative position of the layer center with respect
+                                // to the station center
+  Double_t   fDz;               // Half-thinkness of the layer
 
   ClassDef(CbmMuchLayer,1);
 };

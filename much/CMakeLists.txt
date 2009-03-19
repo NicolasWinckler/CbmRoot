@@ -44,8 +44,11 @@ CbmMuchPointInfo.cxx
 CbmMuchSector.cxx
 CbmMuchSegmentation.cxx
 CbmMuchStation.cxx
+CbmMuchStationGem.cxx
+CbmMuchStationStraw.cxx
 CbmMuchTask.cxx
 CbmMuchTrackFinderIdeal.cxx
+CbmMuchFindHitsStraws.cxx
 )
 
 if(RULE_CHECKER_FOUND)

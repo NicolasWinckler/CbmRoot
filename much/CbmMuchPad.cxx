@@ -125,7 +125,7 @@ void CbmMuchPad::SetFired(Int_t digiId, Int_t charge, Int_t ADCcharge){
 //  if (ch<10) ch = 10;
 //  if (fFired) SetFillColor(TColor::GetColor(255-ch,255-ch,245));
   if (fFired) SetFillColor(TColor::GetColor(255-ADCcharge,255-ADCcharge,245));
-  else SetFillColor(kYellow-7);
+  else SetFillColor(kYellow);
 }
 // -------------------------------------------------------------------------
 

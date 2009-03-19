@@ -13,7 +13,7 @@
 #include "FairRuntimeDb.h"
 #include "FairRootManager.h"
 #include "CbmMuchPoint.h"
-#include "CbmMuchStation.h"
+#include "CbmMuchStationGem.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchModule.h"
 #include "CbmMuchSector.h"
@@ -88,11 +88,16 @@ InitStatus CbmMuchSegmentation::Init(){
 // -------------------------------------------------------------------------
 void CbmMuchSegmentation::Exec(Option_t * option){
   fEvents++;
+  printf("Event: %i\n",fEvents);
+
   gStyle->SetOptStat(0);
   for(Int_t iPoint = 0; iPoint < fPoints->GetEntriesFast(); iPoint++){
     CbmMuchPoint* point = (CbmMuchPoint*)fPoints->At(iPoint);
     if(!point) continue;
     Int_t iStation = CbmMuchGeoScheme::GetStationIndex(point->GetDetectorID());
+    CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);
+    if (station->GetDetectorType()==2) continue;
+
     Int_t iLayer = CbmMuchGeoScheme::GetLayerIndex(point->GetDetectorID());
 //    printf("iStation = %i\n", iStation);
 //    printf("detId = %qd\n", point->GetDetectorID());
@@ -141,6 +146,8 @@ void CbmMuchSegmentation::FinishTask(){
 
   for (Int_t i=0;i<fNStations;i++) {
     CbmMuchStation* station = (CbmMuchStation*)fStations->At(i);
+    if (station->GetDetectorType()==2) continue;
+
     Int_t nLayers = station->GetNLayers();
     for(Int_t iLayer = 0; iLayer < nLayers; iLayer++){
       CbmMuchLayer* layer = station->GetLayer(iLayer);
@@ -304,7 +311,7 @@ Bool_t CbmMuchSegmentation::ShouldSegmentByX(CbmMuchSector* sector){
   Double_t R  = (uR < bR) ? uR : bR;
 
   Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
-  CbmMuchStation* station = (CbmMuchStation*)fStations->At(iStation);
+  CbmMuchStationGem* station = (CbmMuchStationGem*)fStations->At(iStation);
   // Check minimum and maximum allowed resolution
   Double_t sigmaMax = station->GetSigmaXmax(); //[cm]
   Double_t sigmaMin = station->GetSigmaXmin(); //[cm]
@@ -340,7 +347,7 @@ Bool_t CbmMuchSegmentation::ShouldSegmentByY(CbmMuchSector* sector){
   Double_t R  = (uR < bR) ? uR : bR;
 
   Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
-  CbmMuchStation* station = (CbmMuchStation*)fStations->At(iStation);
+  CbmMuchStationGem* station = (CbmMuchStationGem*)fStations->At(iStation);
   // Check minimum and maximum allowed resolution
   Double_t sigmaMax = station->GetSigmaYmax(); //[cm]
   Double_t sigmaMin = station->GetSigmaYmin(); //[cm]

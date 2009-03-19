@@ -3,7 +3,7 @@
  *@version 1.0
  *@since   11.02.08
  **
- ** This class holds the transport geometry parameters 
+ ** This class holds the transport geometry parameters
  ** of one MuCh tracking station.
  **/
 
@@ -20,12 +20,10 @@ CbmMuchStation::CbmMuchStation() {
   fZ = 0.;
   fRmin=0.;             // Minimum radius of the station [cm]
   fRmax=0.;             // Maximum radius of the station [cm]
-  fSigmaXmin=0.;        // Minimum sigma in X [mm]
-  fSigmaYmin=0.;        // Minimum sigma in Y [mm]
-  fSigmaXmax=0.;        // Maximum sigma in X [mm]
-  fSigmaYmax=0.;        // Maximum sigma in Y [mm]
-  fOccupancyMax=0.;     // Maximum occupancy
-  
+  fModuleDesign=0;      // No detailed module design
+  fDetectorType=1;      // Detector type = GEM by default
+  fTubeRmin=0.;         // Station tube Rmin
+  fTubeRmax=0.;         // Station tube Rmax
 }
 // -------------------------------------------------------------------------
 
@@ -35,11 +33,10 @@ CbmMuchStation::CbmMuchStation(Int_t iStation, Double_t z){
   fZ          = z;
   fRmin=0.;             // Minimum radius of the station [cm]
   fRmax=0.;             // Maximum radius of the station [cm]
-  fSigmaXmin=0.;        // Minimum sigma in X [mm]
-  fSigmaYmin=0.;        // Minimum sigma in Y [mm]
-  fSigmaXmax=0.;        // Maximum sigma in X [mm]
-  fSigmaYmax=0.;        // Maximum sigma in Y [mm]
-  fOccupancyMax=0.;     // Maximum occupancy
+  fModuleDesign=0;      // No detailed module design
+  fDetectorType=1;      // Detector type = GEM by default
+  fTubeRmin=0.;         // Station tube Rmin
+  fTubeRmax=0.;         // Station tube Rmax
 }
 // -------------------------------------------------------------------------
 

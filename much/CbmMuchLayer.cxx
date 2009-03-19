@@ -19,9 +19,11 @@ CbmMuchLayer::CbmMuchLayer() {
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchLayer::CbmMuchLayer(Int_t detId, Double_t z):
+CbmMuchLayer::CbmMuchLayer(Int_t detId, Double_t z, Double_t zRel, Double_t dz):
   fDetectorId(detId),
   fZ(z){
+  fZtoStationCenter = zRel;
+  fDz = dz;
   Int_t iStation = CbmMuchGeoScheme::GetStationIndex(detId);
   Int_t iLayer = CbmMuchGeoScheme::GetLayerIndex(detId);
   fSideF=CbmMuchLayerSide(iStation,iLayer,0,z);
@@ -30,9 +32,11 @@ CbmMuchLayer::CbmMuchLayer(Int_t detId, Double_t z):
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchLayer::CbmMuchLayer(Int_t iStation, Int_t iLayer, Double_t z)  {
+CbmMuchLayer::CbmMuchLayer(Int_t iStation, Int_t iLayer, Double_t z, Double_t zRel, Double_t dz)  {
   fDetectorId = CbmMuchGeoScheme::GetDetectorId(iStation, iLayer);
   fZ          = z;
+  fZtoStationCenter = zRel;
+  fDz = dz;
 
   fSideF=CbmMuchLayerSide(iStation,iLayer,0,z);
   fSideB=CbmMuchLayerSide(iStation,iLayer,1,z);

@@ -30,6 +30,9 @@ public:
   void SetGeoFileName        (TString fileName) { fGeoFileName = fileName; }
   void SetPerformanceFileName(TString fileName) { fFileName    = fileName; }
 
+  void SetPullsQaOn(Bool_t on) { fPullsQaOn = on; }
+  void SetOccupancyQaOn(Bool_t on) { fOccupancyQaOn = on; }
+
 protected:
   void PullsQa();
   void DigitizerQa();
@@ -100,6 +103,9 @@ private:
   Int_t fPointsTotal;
   Int_t fPointsUnderCounted;
   Int_t fPointsOverCounted;
+
+  Bool_t fOccupancyQaOn;
+  Bool_t fPullsQaOn;
 
   /** Defines whether the point with the given index is signal point. **/
   Bool_t IsSignalPoint(Int_t iPoint);

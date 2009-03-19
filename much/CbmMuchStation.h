@@ -35,11 +35,12 @@ class CbmMuchStation : public TObject{
   /** Setters **/
   void SetRmin(Double_t rMin) { fRmin = rMin; }
   void SetRmax(Double_t rMax) { fRmax = rMax; }
-  void SetSigmaXmin   (Double_t sigma) { fSigmaXmin    = sigma; }
-  void SetSigmaYmin   (Double_t sigma) { fSigmaYmin    = sigma; }
-  void SetSigmaXmax   (Double_t sigma) { fSigmaXmax    = sigma; }
-  void SetSigmaYmax   (Double_t sigma) { fSigmaYmax    = sigma; }
-  void SetOccupancyMax(Double_t occup) { fOccupancyMax = occup; }
+  void SetModuleDesign(Bool_t on)      { fModuleDesign = on;    }
+  void SetDetectorType(Int_t type)     { fDetectorType = type;  }
+  void SetTubeRmin(Double_t rMin) { fTubeRmin = rMin; }
+  void SetTubeRmax(Double_t rMax) { fTubeRmax = rMax; }
+  void SetTubeDz(Double_t dz)     { fTubeDz   = dz;   }
+  void SetTubeZ(Double_t z)       { fTubeZ    = z;    }
 
 
   /** Accessors **/
@@ -48,11 +49,12 @@ class CbmMuchStation : public TObject{
   Int_t    GetNLayers()      const { return fLayers.GetEntriesFast(); }
   Double_t GetRmin()         const { return fRmin;         }
   Double_t GetRmax()         const { return fRmax;         }
-  Double_t GetSigmaXmin()    const { return fSigmaXmin;    }
-  Double_t GetSigmaYmin()    const { return fSigmaYmin;    }
-  Double_t GetSigmaXmax()    const { return fSigmaXmax;    }
-  Double_t GetSigmaYmax()    const { return fSigmaYmax;    }
-  Double_t GetOccupancyMax() const { return fOccupancyMax; }
+  Double_t GetTubeRmin()     const { return fTubeRmin;     }
+  Double_t GetTubeRmax()     const { return fTubeRmax;     }
+  Double_t GetTubeDz()       const { return fTubeDz;       }
+  Double_t GetTubeZ()        const { return fTubeZ;        }
+  Bool_t   IsModuleDesign()  const { return fModuleDesign; }
+  Int_t    GetDetectorType() const { return fDetectorType; }
 
   CbmMuchLayer* GetLayer(Int_t iLayer) const { return (CbmMuchLayer*)fLayers.At(iLayer); }
 
@@ -61,17 +63,17 @@ class CbmMuchStation : public TObject{
 
 
  protected:
-  Int_t   fDetectorId;          // Unique detector ID
+  Int_t      fDetectorId;       // Unique detector ID
   Double32_t fZ;                // z position of station centre (midplane) [cm]
   TObjArray  fLayers;           // Array of CbmMuchLayers
-  Double_t   fRmin;             // Minimum radius of the station [cm]
-  Double_t   fRmax;             // Maximum radius of the station [cm]
-  Double_t   fSigmaXmin;        // Minimum sigma in X [mm]
-  Double_t   fSigmaYmin;        // Minimum sigma in Y [mm]
-  Double_t   fSigmaXmax;        // Maximum sigma in X [mm]
-  Double_t   fSigmaYmax;        // Maximum sigma in Y [mm]
-  Double_t   fOccupancyMax;     // Maximum occupancy
-
+  Double_t   fRmin;             // Minimum radius of the station acceptance [cm]
+  Double_t   fRmax;             // Maximum radius of the station acceptance [cm]
+  Bool_t     fModuleDesign;     // 1 - detailed module design, 0 - simple 1-module design
+  Int_t      fDetectorType;     // Detector type
+  Double_t   fTubeRmin;         // Station tube Rmin
+  Double_t   fTubeRmax;         // Station tube Rmax
+  Double_t   fTubeDz;           // Station tube Dz
+  Double_t   fTubeZ;            // Station tube z position relative to much cave
   ClassDef(CbmMuchStation,1);
 };
 #endif

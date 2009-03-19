@@ -288,7 +288,7 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 	Double_t mpv = CbmMuchDigitize::MPV_n_e(Tkin, mass);          // most probable value for Landau distr.
 	UInt_t nElectrons = (UInt_t) fLandauRnd->Landau(mpv, sigma); // number of prim. electrons per 0.3 cm gap
 	while (nElectrons > 100000)
-		nElectrons = fLandauRnd->Landau(mpv, sigma);             // restrict Landau tail to increase performance
+		nElectrons = (UInt_t) fLandauRnd->Landau(mpv, sigma);             // restrict Landau tail to increase performance
 	// Number of electrons for current track length
 	if (mass < 100.)
 		nElectrons = (UInt_t) (nElectrons * lTrack / 0.47);

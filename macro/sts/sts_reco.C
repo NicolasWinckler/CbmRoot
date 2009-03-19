@@ -28,8 +28,11 @@ void sts_reco(Int_t nEvents = 1)
   // Parameter file
   TString parFile = "params.root";
   
-  // STS digitisation file
+  // STS digitisation file for stereo angle 0 & 15 deg
   TString digiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";
+  
+  // STS digitisation file for stereo angle -7.5 & +7.5 deg
+  //TString digiFile = "sts_Standard_s3055AAFK5.SecD_7vs7.digi.par";
   
   // Output file
   TString outFile = "sts.reco.root";
@@ -99,6 +102,11 @@ void sts_reco(Int_t nEvents = 1)
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
   
+  // -----   MVD Hitproducer   ----------------------------------------------
+  CbmMvdHitProducer* hitProd = new CbmMvdHitProducer("MVDHitProducer", 0, 
+   						     iVerbose);
+  run->AddTask(hitProd);
+  // ------------------------------------------------------------------------
   
   // -----   STS digitiser   ------------------------------------------------
   FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);

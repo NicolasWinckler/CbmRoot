@@ -44,7 +44,7 @@
 
   // Magnet geometry and field map
   TString magnetGeom  = "magnet_standard.geo";
-  TString fieldMap    = "FieldActive";
+  TString fieldMap    = "FieldMuonMagnet";
   Double_t fieldZ     = 50.;     // z position of field centre
   Double_t fieldScale = 1.;      // field scaling factor
 

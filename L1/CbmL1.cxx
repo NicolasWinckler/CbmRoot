@@ -221,31 +221,12 @@ InitStatus CbmL1::Init()
 	  b_sigma = sector->GetDy()/sqrt(12.);
 	}
 	else{
-	  if (sector->GetStereoF()==0.) {
-	    f_phi +=sector->GetStereoF();
-	    b_phi +=sector->GetStereoB();
-            f_sigma = sector->GetDx() / TMath::Sqrt(12);
-            b_sigma = (f_sigma/TMath::Sqrt(2))*(1./TMath::Sin(b_phi/2.));          
-          }
-          else {
-	    f_phi +=sector->GetStereoF();
-	    b_phi +=sector->GetStereoB();
-            f_sigma  = ((sector->GetDx() / TMath::Sqrt(24))*(1./TMath::Cos(f_phi)));
-            b_sigma  = ((sector->GetDx() / TMath::Sqrt(24))*(1./TMath::Sin(b_phi)));
-          }
-	  /*f_phi +=sector->GetStereoF();
-	  b_phi +=sector->GetStereoB();
-	  f_sigma = (sector->GetDx()/sqrt(24.))*(1./TMath::Cos(sector->GetStereoB()));
-	  b_sigma = (sector->GetDx()/sqrt(24.))*(1./TMath::Sin(sector->GetStereoB()));// sector->GetDy()/sqrt(12.);*/
-	}
-	{
-	  double cb = cos(b_phi);
-	  double sb = sin(b_phi);
-	  double cf = cos(f_phi);
-	  double sf = sin(f_phi);
-	  b_sigma = sqrt( fabs( cb*cb*sector->GetSigmaX()*sector->GetSigmaX()+2*cb*sb*sector->GetSigmaXY()+sb*sb*sector->GetSigmaY()*sector->GetSigmaY()));
-	  f_sigma = sqrt( fabs( cf*cf*sector->GetSigmaX()*sector->GetSigmaX()+2*cf*sf*sector->GetSigmaXY()+sf*sf*sector->GetSigmaY()*sector->GetSigmaY()));
-        }
+          f_phi +=sector->GetStereoF();
+          b_phi +=sector->GetStereoB();
+          f_sigma = sector->GetDx() / TMath::Sqrt(12);
+          b_sigma  = f_sigma;
+            }
+
 	//if( sector->GetType()==2 ){ //!! DEBUG !!
 	//b_phi = sector->GetRotation() + 3.14159265358/2.;
 	//b_sigma = 12./sqrt(12.);

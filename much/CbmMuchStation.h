@@ -39,7 +39,6 @@ class CbmMuchStation : public TObject{
   void SetDetectorType(Int_t type)     { fDetectorType = type;  }
   void SetTubeRmin(Double_t rMin) { fTubeRmin = rMin; }
   void SetTubeRmax(Double_t rMax) { fTubeRmax = rMax; }
-  void SetTubeDz(Double_t dz)     { fTubeDz   = dz;   }
   void SetTubeZ(Double_t z)       { fTubeZ    = z;    }
 
 
@@ -51,7 +50,6 @@ class CbmMuchStation : public TObject{
   Double_t GetRmax()         const { return fRmax;         }
   Double_t GetTubeRmin()     const { return fTubeRmin;     }
   Double_t GetTubeRmax()     const { return fTubeRmax;     }
-  Double_t GetTubeDz()       const { return fTubeDz;       }
   Double_t GetTubeZ()        const { return fTubeZ;        }
   Bool_t   IsModuleDesign()  const { return fModuleDesign; }
   Int_t    GetDetectorType() const { return fDetectorType; }
@@ -61,6 +59,11 @@ class CbmMuchStation : public TObject{
   /** Add one sector to the array **/
   void AddLayer(CbmMuchLayer* layer);
 
+  /*
+   * Automatic calculation of the half-thickness of the layer as
+   * a maximum distance to layer module edges
+   */
+  Double_t GetTubeDz();
 
  protected:
   Int_t      fDetectorId;       // Unique detector ID
@@ -72,7 +75,6 @@ class CbmMuchStation : public TObject{
   Int_t      fDetectorType;     // Detector type
   Double_t   fTubeRmin;         // Station tube Rmin
   Double_t   fTubeRmax;         // Station tube Rmax
-  Double_t   fTubeDz;           // Station tube Dz
   Double_t   fTubeZ;            // Station tube z position relative to much cave
   ClassDef(CbmMuchStation,1);
 };

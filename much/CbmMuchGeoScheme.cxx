@@ -697,7 +697,6 @@ void CbmMuchGeoScheme::CreateStations() {
     Double_t supDz  = layer0->GetSupportDz();
     station->SetTubeRmin(station->GetRmin());
     station->SetTubeRmax(TMath::Sqrt(supDx*supDx+supDy*supDy)+10);
-    station->SetTubeDz(-layer0->GetZtoStationCenter()+layer0->GetDz());
     fStations->Add(station);
   } // stations
 }

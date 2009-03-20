@@ -58,7 +58,12 @@ class CbmMuchLayer : public TObject
   void SetSupportDz(Double_t supDz) { fSupportDz = supDz; }
   Double_t GetZ() { return fZ; }
   Double_t GetZtoStationCenter() { return fZtoStationCenter; }
-  Double_t GetDz() { return fDz; }
+
+  /*
+   * Automatic calculation of the half-thickness of the layer as
+   * a maximum distance to layer module edges
+   */
+  Double_t GetDz();
 
  protected:
   Int_t   fDetectorId;  // Unique detector ID
@@ -70,7 +75,6 @@ class CbmMuchLayer : public TObject
   Double_t   fSupportDz;   // Support half-thickness
   Double_t   fZtoStationCenter; // Relative position of the layer center with respect
                                 // to the station center
-  Double_t   fDz;               // Half-thinkness of the layer
 
   ClassDef(CbmMuchLayer,1);
 };

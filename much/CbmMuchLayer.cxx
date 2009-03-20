@@ -10,6 +10,7 @@
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
 #include "CbmMuchGeoScheme.h"
+#include "CbmMuchModule.h"
 
 // -----   Default constructor   -------------------------------------------
 CbmMuchLayer::CbmMuchLayer() {
@@ -23,7 +24,6 @@ CbmMuchLayer::CbmMuchLayer(Int_t detId, Double_t z, Double_t zRel, Double_t dz):
   fDetectorId(detId),
   fZ(z){
   fZtoStationCenter = zRel;
-  fDz = dz;
   Int_t iStation = CbmMuchGeoScheme::GetStationIndex(detId);
   Int_t iLayer = CbmMuchGeoScheme::GetLayerIndex(detId);
   fSideF=CbmMuchLayerSide(iStation,iLayer,0,z);
@@ -36,7 +36,6 @@ CbmMuchLayer::CbmMuchLayer(Int_t iStation, Int_t iLayer, Double_t z, Double_t zR
   fDetectorId = CbmMuchGeoScheme::GetDetectorId(iStation, iLayer);
   fZ          = z;
   fZtoStationCenter = zRel;
-  fDz = dz;
 
   fSideF=CbmMuchLayerSide(iStation,iLayer,0,z);
   fSideB=CbmMuchLayerSide(iStation,iLayer,1,z);
@@ -48,5 +47,23 @@ CbmMuchLayer::~CbmMuchLayer() {
 }
 // -------------------------------------------------------------------------
 
+
+// -------------------------------------------------------------------------
+Double_t CbmMuchLayer::GetDz(){
+  Double_t dzmax=fSupportDz;
+
+  for (Int_t s=0; s<2; s++){
+    CbmMuchLayerSide* side = GetSide(s);
+    for (Int_t i=0; i<side->GetNModules(); i++) {
+      CbmMuchModule* module = (CbmMuchModule*) side->GetModule(i);
+      Double_t lz = module->GetSize().Z();
+      Double_t z  = module->GetPosition().Z();
+      Double_t dz = TMath::Abs(z-fZ) + lz/2.;
+      if (dz>dzmax) dzmax = dz;
+    }
+  }
+  return dzmax;
+}
+// -------------------------------------------------------------------------
 
 ClassImp(CbmMuchLayer)

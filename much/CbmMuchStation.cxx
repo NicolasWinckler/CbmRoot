@@ -51,4 +51,21 @@ void CbmMuchStation::AddLayer(CbmMuchLayer* layer) {
 }
 // -------------------------------------------------------------------------
 
+
+// -------------------------------------------------------------------------
+Double_t CbmMuchStation::GetTubeDz(){
+  Double_t dzmax=0;
+
+  for (Int_t l=0; l<GetNLayers(); l++){
+    CbmMuchLayer* layer = GetLayer(l);
+    Double_t ldz = layer->GetDz();
+    Double_t z   = layer->GetZ();
+    Double_t dz  = TMath::Abs(z-fZ) + ldz;
+    if (dz>dzmax) dzmax = dz;
+  }
+
+  return dzmax;
+}
+// -------------------------------------------------------------------------
+
 ClassImp(CbmMuchStation)

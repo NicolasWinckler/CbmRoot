@@ -25,6 +25,7 @@ Acceptance tangent max      :     0.5
 Number of absorbers         :       6
 Number of stations          :       6
 
+# Absorber specification
 Absorber Zin position [cm]  :       0      40      80     120     170     225
 Absorber thickness [cm]     :      20      20      20      30      35     100
 Absorber material           :       I       I       I       I       I       I

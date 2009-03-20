@@ -34,7 +34,7 @@ Absorber material           :       I       I       I       I       I       I
 Station Zceneter [cm]       :      30      70     110     160     215     340
 Number of layers            :       2       2       2       3       3       3
 Detector type               :       1       1       1       2       2       2
-Distance between layers [cm]:      10      10      10      10      10      10
+Distance between layers [cm]:      10      10      10       7       7       7
 Support thickness [cm]      :     1.5     1.5     1.5     0.0     0.0     0.0
 Use module design (0/1)     :       1       1       1       0       0       0
 Sigma X minimum [cm]        :    0.04    0.04    0.04    0.04    0.04    0.04

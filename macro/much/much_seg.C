@@ -1,18 +1,18 @@
 // --------------------------------------------------------------------------
 //
-// Macro for segmentation of MUCH stations 
+// Macro for segmentation of MUCH stations
 //
 // To be defined as arguments:
 //    MC transport file
 //    Output digitization file ("*.root")
-//    Number of events to be processed (default = 1)
-//    First event to be processed (default = 1)
-// 
+//    Number of events to be processed (default = 2)
+//    First event to be processed (default = 0)
+//
 // M.Ryzhinskiy
 //
 // --------------------------------------------------------------------------
 
-void much_seg(const char* mcFile = "data/Jpsi.auau.25gev.centr.mc.root", 
+void much_seg(const char* mcFile = "data/Jpsi.auau.25gev.centr.mc.root",
               const char* digiFile = "data/much_digi.root",
 	      Int_t nEvents = 2, Int_t iFirst = 0)
 {
@@ -23,7 +23,7 @@ void much_seg(const char* mcFile = "data/Jpsi.auau.25gev.centr.mc.root",
 
   // Dummy ROOT file (neede as an output)
   TString outFile  = "data/dummy.root";
-  
+
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();

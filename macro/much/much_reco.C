@@ -24,30 +24,30 @@
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "Jpsi.auau.25gev.mbias.mc.root";
+  TString inFile = "data/Jpsi.auau.25gev.centr.mc.root";
 
   // Number of events to process
-  Int_t nEvents = 1;
-
-  // Background file (for MAPS pileup)
-  TString bgFile = "Jpsi.auau.25gev.mbias.mc.root";
-
-  // Parameter file
-  TString parFile = "Jpsi.auau.25gev.mbias.params.root";
+  Int_t nEvents = 2;
 
   // Sts reco file
-  TString stsRecoFile = "Jpsi.auau.25gev.mbias.stsreco.root";
+  TString stsRecoFile = "data/Jpsi.auau.25gev.centr.stsreco.root";
+
+  // Much hits file
+  TString muchHitsFile = "data/Jpsi.auau.25gev.centr.muchhits.root";
 
   // Output file
-  TString outFile = "Jpsi.auau.25gev.mbias.reco.root";
+  TString outFile = "data/Jpsi.auau.25gev.centr.muchreco.root";
 
 
   // ----  Load libraries   -------------------------------------------------
+  gROOT->LoadMacro("$VMCWORKDIR//cbmbase/CbmDetectorList.h");
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
   gSystem->Load("libGeoBase");
   gSystem->Load("libParBase");
   gSystem->Load("libBase");
+  gSystem->Load("libCbmBase");
+  gSystem->Load("libCbmData");
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
@@ -55,18 +55,13 @@
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
-  //gSystem->Load("libEcal");
+  gSystem->Load("libEcal");
   gSystem->Load("libMuch");
   gSystem->Load("libGlobal");
   gSystem->Load("libKF");
   gSystem->Load("libL1");
+  gSystem->Load("liblittrack");
   // ------------------------------------------------------------------------
-
-
-  // ---  Now choose concrete engines for the different tasks   -------------
-  CbmKF* kalman= new CbmKF();
-  // ------------------------------------------------------------------------
-
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -84,7 +79,12 @@
   FairRunAna *fRun= new FairRunAna();
   fRun->SetInputFile(inFile);
   fRun->AddFriend(stsRecoFile);
+  fRun->AddFriend(muchHitsFile);
   fRun->SetOutputFile(outFile);
+
+
+
+
   // ------------------------------------------------------------------------
 
 
@@ -92,40 +92,41 @@
   // -----  Parameter database   --------------------------------------------
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo* parInput1 = new FairParRootFileIo();
-  parInput1->open(parFile.Data());
-  FairParAsciiFileIo* parInput2 = new FairParAsciiFileIo();
-  TString stsDigiFile = gSystem->Getenv("VMCWORKDIR");
-  stsDigiFile += "/parameters/sts/sts_digi.par";
-  parInput2->open(stsDigiFile.Data(),"in");
+  parInput1->open(gFile);
   rtdb->setFirstInput(parInput1);
-  rtdb->setSecondInput(parInput2);
   fRun->LoadGeometry();
   // ------------------------------------------------------------------------
 
+  CbmMuchTrackFinder* muchTrackFinder = new CbmLitMuchTrackFinderBranch();
+  CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
+  muchFindTracks->UseFinder(muchTrackFinder);
+  fRun->AddTask(muchFindTracks);
 
-  fRun->AddTask(kalman);
+//  CbmKF* kalman= new CbmKF();
+//  fRun->AddTask(kalman);
+//  CbmL1MuchFinder *MuchFinder = new CbmL1MuchFinder();
+//  fRun->AddTask(MuchFinder);
  
-  CbmMuchHitProducer *MuchHitProducer = new CbmMuchHitProducer();
-  fRun->AddTask(MuchHitProducer);
+  CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
+  fRun->AddTask(muchMatchTracks);
 
-  CbmL1MuchFinder *MuchFinder = new CbmL1MuchFinder();
-  fRun->AddTask(MuchFinder);
- 
+  CbmLitRecQa* muchRecQa = new CbmLitRecQa(12, 0.7, kMUCH, 1);
+  muchRecQa->SetNormType(2); // '2' to number of STS tracks
+  fRun->AddTask(muchRecQa);
   // -----   Intialise and run   --------------------------------------------
   fRun->Init();
-  fRun->Run();//0,nEvents);
+//  fRun->Run(0,1);
+  fRun->Run(0,nEvents);//0,nEvents);
   // ------------------------------------------------------------------------
-
-
 
   // -----   Finish   -------------------------------------------------------
   timer.Stop();
   Double_t rtime = timer.RealTime();
   Double_t ctime = timer.CpuTime();
   cout << endl << endl;
-  cout << "Macro finished succesfully." << endl;
+  cout << "Macro finished succesfully.2" << endl;
   cout << "Output file is "    << outFile << endl;
-  cout << "Parameter file is " << parFile << endl;
+  cout << "Parameters are in MC file" << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
   cout << endl;
   // ------------------------------------------------------------------------

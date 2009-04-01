@@ -10,15 +10,16 @@
 //    Background input file (UrQMD file)
 //    Output file
 //    Number of events to be processed (default = 1)
-//    First event to be processed (default = 1)
 //
 // Parameters (geometry and field) are stored in the output file.
 //
 // M.Ryzhinskiy
 // --------------------------------------------------------------------------
 
-void much_sim(const char* inputSignal, const char* inputBgr, const char* outFile,
-	      Int_t nEvents = 10, Int_t iFirst = 1)
+void much_sim(const char* inputSignal = "data/jpsi.root", 
+              const char* inputBgr = "../../input/urqmd.ftn14", 
+              const char* outFile = "data/Jpsi.auau.25gev.centr.mc.root",
+	      Int_t nEvents = 2)
 {
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -30,7 +31,6 @@ void much_sim(const char* inputSignal, const char* inputBgr, const char* outFile
   cout << "Second input file is " << inputBgr << endl;
   cout << "Output file       is " << outFile << endl;
   cout << "Events to process:   " << nEvents << endl;
-  cout << "First event       is " << iFirst  << endl;
   cout << "===================================================" << endl;
   cout << endl;
 

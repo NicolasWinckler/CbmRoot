@@ -17,8 +17,10 @@
 //
 // --------------------------------------------------------------------------
 
-void much_hits(const char* inFile, const char* digiFile, const char* outFile,
-	      Int_t nEvents = 10, Int_t iFirst = 1)
+void much_hits(const char* inFile = "data/Jpsi.auau.25gev.centr.mc.root", 
+               const char* digiFile = "data/much_digi.root", 
+               const char* outFile = "data/Jpsi.auau.25gev.centr.muchhits.root",
+ 	       Int_t nEvents = 2, Int_t iFirst = 0)
 {
   // ========================================================================
   //          Adjust this part according to your requirements

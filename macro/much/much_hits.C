@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //
-// Macro for reconstruction of simulated events
-// in the CBM muon setup:
+// Macro for reconstruction of simulated events 
+// in the CBM muon setup: 
 //
 // MUCH digitization
 // MUCH hit production
@@ -10,15 +10,15 @@
 //    MC transport file
 //    Input digitization file ("*.root")
 //    Output file
-//    Number of events to be processed (default = 2)
-//    First event to be processed (default = 0)
-//
+//    Number of events to be processed (default = 1)
+//    First event to be processed (default = 1)
+// 
 // M.Ryzhinskiy
 //
 // --------------------------------------------------------------------------
 
-void much_hits(const char* inFile = "data/Jpsi.auau.25gev.centr.mc.root",
-               const char* digiFile = "data/much_digi.root",
+void much_hits(const char* inFile = "data/Jpsi.auau.25gev.centr.mc.root", 
+               const char* digiFile = "../../parameters/much/much_standard.digi.root", 
                const char* outFile = "data/Jpsi.auau.25gev.centr.muchhits.root",
  	       Int_t nEvents = 2, Int_t iFirst = 0)
 {
@@ -78,10 +78,14 @@ void much_hits(const char* inFile = "data/Jpsi.auau.25gev.centr.mc.root",
   CbmMuchFindHits* muchFindHits = new CbmMuchFindHits("MuchFindHits", digiFile, iVerbose);
   muchFindHits->SetUseClustering(1); // Use clustering algorithm
   fRun->AddTask(muchFindHits);
-  // ------------------------------------------------------------------------
-
+  // ------------------------------------------------------------------------ 
+  
   // -----   Intialise and run   --------------------------------------------
   fRun->Init();
   fRun->Run(iFirst,nEvents);
   // ------------------------------------------------------------------------
+
+  cout << " Test passed" << endl;
+  cout << " All ok " << endl;
+  exit(0);
 }

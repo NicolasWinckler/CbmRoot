@@ -1,22 +1,17 @@
 // --------------------------------------------------------------------------
-//
-// Macro for qualitycheck of the MUCH hit producer 
-//
-// 
+// Macro for qualitycheck of the MUCH hit producer
 // E.Kryshen 22.11.2007
-//
 // --------------------------------------------------------------------------
-{
-  Int_t nEvents = 10;
+void much_hitsQa(){
+  Int_t nEvents = 5;
   Int_t iVerbose = 1;
-  
-  TString mcFile   = "mc.1000.root";
-  TString hitFile  = "much.hits.10.root";
-  TString parFile  = "par.1000.root";
-  TString outFile  = "dummy.root";
-  TString qaFile   = "much.qa.1000.root";
 
-  TString digiFile = "much_digi.400x800mic.par";
+  TString  dir            = "data/";
+  TString  mcFile         = dir + "mc.root";
+  TString  parFile        = dir + "mc.root";
+  TString  digiFile       = dir + "digi.root";
+  TString  muchHitsFile   = dir + "much.hits.root";
+  TString  outFile        = dir + "much.hits.qa.root";
 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
@@ -39,37 +34,43 @@
   gSystem->Load("libL1");
   gSystem->Load("libMuch");
 
+  gROOT->LoadMacro("$VMCWORKDIR/much/much_histo_style.C");
+  much_histo_style();
+
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
   fRun->SetInputFile(mcFile);
-  fRun->AddFriend(hitFile);
+  fRun->AddFriend(muchHitsFile);
   fRun->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
 
 
   // -----  Parameter database   --------------------------------------------
   TString muchDigiFile = gSystem->Getenv("VMCWORKDIR");
-  muchDigiFile += "/much/parameters/";
-  muchDigiFile += digiFile;
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo*  parIo1 = new FairParRootFileIo();
-  FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
   parIo1->open(parFile.Data());
-  parIo2->open(muchDigiFile.Data(),"in");
   rtdb->setFirstInput(parIo1);
-  rtdb->setSecondInput(parIo2);
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
   fRun->LoadGeometry();
   // ------------------------------------------------------------------------
 
-  // ---  MuCh hit finder ---------------------------------------------------
-  CbmMuchHitProducerQa* qa = new CbmMuchHitProducerQa("HitQa",2);
-  qa->SetPerformanceFileName(qaFile);
+  // ---  MuCh hit finder QA-------------------------------------------------
+  CbmMuchHitFinderQa* qa = new CbmMuchHitFinderQa("HitQa",2);
+  qa->SetGeoFileName(digiFile);
+  qa->SetPerformanceFileName(outFile);
+  qa->SetPrintToFile(0);
+  qa->SetPullsQa(1);
+  qa->SetOccupancyQa(1);
+  qa->SetDigitizerQa(1);
+  qa->SetStatisticsQa(1);
+  qa->SetClusterDeconvQa(1);
+
   fRun->AddTask(qa);
-  // ------------------------------------------------------------------------ 
-  
-  // -----   Intialise and run   --------------------------------------------
+  // ------------------------------------------------------------------------
+
+  // -----   Initialise and run --------------------------------------------
   fRun->Init();
   fRun->Run(0,nEvents);
   // ------------------------------------------------------------------------

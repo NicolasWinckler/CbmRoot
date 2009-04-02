@@ -30,14 +30,37 @@ public:
   void SetGeoFileName        (TString fileName) { fGeoFileName = fileName; }
   void SetPerformanceFileName(TString fileName) { fFileName    = fileName; }
 
-  void SetPullsQaOn(Bool_t on) { fPullsQaOn = on; }
-  void SetOccupancyQaOn(Bool_t on) { fOccupancyQaOn = on; }
+  void SetPullsQa(Bool_t on) { fPullsQaOn = on; }
+  void SetOccupancyQa(Bool_t on) { fOccupancyQaOn = on; }
+  void SetDigitizerQa(Bool_t on) { fDigitizerQaOn = on; }
+  void SetStatisticsQa(Bool_t on) { fStatisticsQaOn = on; }
+  void SetClusterDeconvQa(Bool_t on) { fClusterDeconvQaOn = on; }
+
+
+  void SetPrintToFile(Bool_t on) { fPrintToFileOn = on; }
 
 protected:
+  /* Analysis of hit uncertainty (pull) distributions
+   * as function of pad size and cluster shape
+   */
   void PullsQa();
-  void DigitizerQa();
+
+  /* Occupance analysis - all pads,fired pads,
+   * and fired/all distributions as functions of radius
+   */
   void OccupancyQa();
+
+  /* DigitizerQa - analysis of digitizer performance - charge distributions
+   * for tracks. Track length distrivutions. Statistics on particle types
+   */
+  void DigitizerQa();
+
+  /* Information on clusters - number of pads in a cluster, number of points, contributed to
+   * a cluster, number of hits, created from a cluster
+   */
   void StatisticsQa();
+
+  /* Number of points and hits in a cluster for signal muons (MotherId = 0) */
   void ClusterDeconvQa();
 
 private:
@@ -106,6 +129,11 @@ private:
 
   Bool_t fOccupancyQaOn;
   Bool_t fPullsQaOn;
+  Bool_t fDigitizerQaOn;
+  Bool_t fStatisticsQaOn;
+  Bool_t fClusterDeconvQaOn;
+
+  Bool_t fPrintToFileOn;
 
   /** Defines whether the point with the given index is signal point. **/
   Bool_t IsSignalPoint(Int_t iPoint);

@@ -53,6 +53,10 @@ CbmMuchHitFinderQa::CbmMuchHitFinderQa(const char* name, Int_t verbose)
   fPointInfos = new TClonesArray("CbmMuchPointInfo",10);
   fPullsQaOn = 1;
   fOccupancyQaOn = 1;
+  fDigitizerQaOn = 1;
+  fStatisticsQaOn = 1;
+  fClusterDeconvQaOn =1;
+  fPrintToFileOn =1;
 }
 // -------------------------------------------------------------------------
 
@@ -214,23 +218,35 @@ InitStatus CbmMuchHitFinderQa::Init()
     fhPadsFiredR[i] = new TH1D(Form("hPadsFired%i",i+1),Form("Number of fired pads vs radius: station %i;Radius [cm]",i+1),100,0,1.2*rMax);
     fhOccupancyR[i] = new TH1D(Form("hOccupancy%i",i+1),Form("Occupancy vs radius: station %i;Radius [cm];Occupancy",i+1),100,0,1.2*rMax);
   }
+
+  Double_t xmin = -1.;
+  Double_t ymin = -1.;
+  Double_t xmax = -1.;
+  Double_t ymax = -1.;
+
   vector<CbmMuchPad*> pads = fGeoScheme->GetPads();
   for (Int_t p=0;p<pads.size();p++){
     CbmMuchPad* pad = pads[p];
     Int_t stationId = fGeoScheme->GetStationIndex(pad->GetDetectorId());
     Double_t x0 = pad->GetX0();
     Double_t y0 = pad->GetY0();
+    Double_t lx = pad->GetLx();
+    Double_t ly = pad->GetLy();
     Double_t r0 = TMath::Sqrt(x0*x0+y0*y0);
     fhPadsTotalR[stationId]->Fill(r0);
+    if (xmin<0 || xmin>lx) xmin =lx;
+    if (ymin<0 || ymin>ly) ymin =ly;
+    if (xmax<0 || xmax<lx) xmax =lx;
+    if (ymax<0 || ymax<ly) ymax =ly;
   } // pads
 
-  CbmMuchStationGem* station0 = (CbmMuchStationGem*) fGeoScheme->GetStation(0);
-  Double_t xmax = station0->GetSigmaXmax();
-  Double_t xmin = station0->GetSigmaXmin();
-  Double_t ymax = station0->GetSigmaYmax();
-  Double_t ymin = station0->GetSigmaYmin();
-  fnPadSizesX = Int_t(TMath::Log2(xmax/xmin));
-  fnPadSizesY = Int_t(TMath::Log2(ymax/ymin));
+  Info("Init","xmin=%f xmax=%f",xmin,xmax);
+  Info("Init","ymin=%f ymax=%f",ymin,ymax);
+
+  fnPadSizesX = TMath::CeilNint(TMath::Log2(xmax/xmin)+1);
+  fnPadSizesY = TMath::CeilNint(TMath::Log2(ymax/ymin)+1);
+  Info("Init","nPadSizesX=%i",fnPadSizesX);
+  Info("Init","nPadSizesY=%i",fnPadSizesY);
   fhPullXpads1 = new TH1D*[fnPadSizesX];
   fhPullYpads1 = new TH1D*[fnPadSizesY];
   fhPullXpads2 = new TH1D*[fnPadSizesX];
@@ -282,9 +298,9 @@ void CbmMuchHitFinderQa::Exec(Option_t * option){
 
   if (fPullsQaOn) PullsQa();
   if (fOccupancyQaOn) OccupancyQa();
-  //DigitizerQa();
-  //StatisticsQa();
-  //ClusterDeconvQa();
+  if (fDigitizerQaOn) DigitizerQa();
+  if (fStatisticsQaOn) StatisticsQa();
+  if (fClusterDeconvQaOn) ClusterDeconvQa();
 }
 // -------------------------------------------------------------------------
 
@@ -305,6 +321,8 @@ void CbmMuchHitFinderQa::FinishTask(){
   }
 
   if (fPullsQaOn && fVerbose>1){
+    printf("===================================\n");
+    printf("PullsQa:\n");
     TCanvas* c4 = new TCanvas("c4","Pulls",800,400);
     c4->Divide(2,1);
     c4->cd(1);
@@ -313,16 +331,16 @@ void CbmMuchHitFinderQa::FinishTask(){
     fhPullX->GetFunction("gaus")->SetLineWidth(2);
     fhPullX->GetFunction("gaus")->SetLineColor(kBlue);
     fhPullX->Draw();
-    gPad->Print(".gif");
-    gPad->Print(".eps");
+    if (fPrintToFileOn) gPad->Print(".gif");
+    if (fPrintToFileOn) gPad->Print(".eps");
     c4->cd(2);
     fhPullY->Sumw2();
     fhPullY->Fit("gaus");
     fhPullY->GetFunction("gaus")->SetLineWidth(2);
     fhPullY->GetFunction("gaus")->SetLineColor(kBlue);
     fhPullY->Draw();
-    gPad->Print(".gif");
-    gPad->Print(".eps");
+    if (fPrintToFileOn) gPad->Print(".gif");
+    if (fPrintToFileOn) gPad->Print(".eps");
     c4->cd();
 
     TCanvas* c4x = new TCanvas("c4x","Pulls",fnPadSizesX*300,3*300);
@@ -334,8 +352,8 @@ void CbmMuchHitFinderQa::FinishTask(){
       fhPullXpads1[i]->GetFunction("gaus")->SetLineWidth(2);
       fhPullXpads1[i]->GetFunction("gaus")->SetLineColor(kBlue);
       fhPullXpads1[i]->Draw();
-      gPad->Print(".gif");
-      gPad->Print(".eps");
+      if (fPrintToFileOn) gPad->Print(".gif");
+      if (fPrintToFileOn) gPad->Print(".eps");
 
       c4x->cd(fnPadSizesX+i+1);
       fhPullXpads2[i]->Sumw2();
@@ -343,8 +361,8 @@ void CbmMuchHitFinderQa::FinishTask(){
       fhPullXpads2[i]->GetFunction("gaus")->SetLineWidth(2);
       fhPullXpads2[i]->GetFunction("gaus")->SetLineColor(kBlue);
       fhPullXpads2[i]->Draw();
-      gPad->Print(".gif");
-      gPad->Print(".eps");
+      if (fPrintToFileOn) gPad->Print(".gif");
+      if (fPrintToFileOn) gPad->Print(".eps");
 
       c4x->cd(2*fnPadSizesX+i+1);
       fhPullXpads3[i]->Sumw2();
@@ -352,8 +370,8 @@ void CbmMuchHitFinderQa::FinishTask(){
       fhPullXpads3[i]->GetFunction("gaus")->SetLineWidth(2);
       fhPullXpads3[i]->GetFunction("gaus")->SetLineColor(kBlue);
       fhPullXpads3[i]->Draw();
-      gPad->Print(".gif");
-      gPad->Print(".eps");
+      if (fPrintToFileOn) gPad->Print(".gif");
+      if (fPrintToFileOn) gPad->Print(".eps");
     }
 
     TCanvas* c4y = new TCanvas("c4y","Pulls",fnPadSizesY*300,3*300);
@@ -365,8 +383,8 @@ void CbmMuchHitFinderQa::FinishTask(){
       fhPullYpads1[i]->GetFunction("gaus")->SetLineWidth(2);
       fhPullYpads1[i]->GetFunction("gaus")->SetLineColor(kBlue);
       fhPullYpads1[i]->Draw();
-      gPad->Print(".gif");
-      gPad->Print(".eps");
+      if (fPrintToFileOn) gPad->Print(".gif");
+      if (fPrintToFileOn) gPad->Print(".eps");
 
       c4y->cd(fnPadSizesY+i+1);
       fhPullYpads2[i]->Sumw2();
@@ -374,8 +392,8 @@ void CbmMuchHitFinderQa::FinishTask(){
       fhPullYpads2[i]->GetFunction("gaus")->SetLineWidth(2);
       fhPullYpads2[i]->GetFunction("gaus")->SetLineColor(kBlue);
       fhPullYpads2[i]->Draw();
-      gPad->Print(".gif");
-      gPad->Print(".eps");
+      if (fPrintToFileOn) gPad->Print(".gif");
+      if (fPrintToFileOn) gPad->Print(".eps");
 
       c4y->cd(2*fnPadSizesY+i+1);
       fhPullYpads3[i]->Sumw2();
@@ -383,35 +401,23 @@ void CbmMuchHitFinderQa::FinishTask(){
       fhPullYpads3[i]->GetFunction("gaus")->SetLineWidth(2);
       fhPullYpads3[i]->GetFunction("gaus")->SetLineColor(kBlue);
       fhPullYpads3[i]->Draw();
-      gPad->Print(".gif");
-      gPad->Print(".eps");
+      if (fPrintToFileOn) gPad->Print(".gif");
+      if (fPrintToFileOn) gPad->Print(".eps");
     }
   }
 
 
-  if (fOccupancyQaOn) {
-    TCanvas* c3 = new TCanvas("c3","Occupancy plots",1200,800);
-    c3->Divide(3,2);
-    for (Int_t i=0;i<fNstations;i++) {
-      c3->cd(i+1);
-      fhOccupancyR[i]->SetStats(0);
-      fhOccupancyR[i]->Draw();
-      gPad->Print(".gif");
-      gPad->Print(".eps");
-    }
-    c3->cd();
-  }
-
-  if (fVerbose>3) {
-
+  if (fOccupancyQaOn && fVerbose>1) {
+    printf("===================================\n");
+    printf("OccupancyQa:\n");
     TCanvas* c1 = new TCanvas("c1","All pad distributions",1200,800);
     c1->Divide(3,2);
     for (Int_t i=0;i<fNstations;i++) {
       c1->cd(i+1);
       fhPadsTotalR[i]->SetStats(0);
       fhPadsTotalR[i]->Draw("hist");
-      gPad->Print(".gif");
-      gPad->Print(".eps");
+      if (fPrintToFileOn) gPad->Print(".gif");
+      if (fPrintToFileOn) gPad->Print(".eps");
     }
     c1->cd();
 
@@ -421,10 +427,26 @@ void CbmMuchHitFinderQa::FinishTask(){
       c2->cd(i+1);
       fhPadsFiredR[i]->SetStats(0);
       fhPadsFiredR[i]->Draw();
-      gPad->Print(".gif");
-      gPad->Print(".eps");
+      if (fPrintToFileOn) gPad->Print(".gif");
+      if (fPrintToFileOn) gPad->Print(".eps");
     }
     c2->cd();
+
+    TCanvas* c3 = new TCanvas("c3","Occupancy plots",1200,800);
+    c3->Divide(3,2);
+    for (Int_t i=0;i<fNstations;i++) {
+      c3->cd(i+1);
+      fhOccupancyR[i]->SetStats(0);
+      fhOccupancyR[i]->Draw();
+      if (fPrintToFileOn) gPad->Print(".gif");
+      if (fPrintToFileOn) gPad->Print(".eps");
+    }
+    c3->cd();
+  }
+
+  if (fDigitizerQaOn && fVerbose>1) {
+    printf("===================================\n");
+    printf("DigitizerQa:\n");
 
     TF1* fit_el = new TF1("fit_el",LandauMPV,-0.5,4.5,1);
     fit_el->SetParameter(0,0.511);
@@ -467,8 +489,8 @@ void CbmMuchHitFinderQa::FinishTask(){
       if (i==1) fit_el->Draw("same");
       if (i==2) fit_pi->Draw("same");
       if (i==3) fit_pr->Draw("same");
-      gPad->Print(".gif");
-      gPad->Print(".eps");
+      if (fPrintToFileOn) gPad->Print(".gif");
+      if (fPrintToFileOn) gPad->Print(".eps");
     }
 
     for (Int_t i=10;i<14;i++){
@@ -477,49 +499,26 @@ void CbmMuchHitFinderQa::FinishTask(){
       gStyle->SetOptStat(1110);
       TH1D* histo = (TH1D*) fChargeHistos->At(i);
       histo->Draw();
-      gPad->Print(".gif");
-      gPad->Print(".eps");
+      if (fPrintToFileOn) gPad->Print(".gif");
+      if (fPrintToFileOn) gPad->Print(".eps");
     }
-
 
     TCanvas* c6 = new TCanvas("c6","Charge distribution",1200,400);
     c6->Divide(3,1);
     c6->cd(1);
     fhCharge->Draw();
-    gPad->Print(".gif");
-    gPad->Print(".eps");
+    if (fPrintToFileOn) gPad->Print(".gif");
+    if (fPrintToFileOn) gPad->Print(".eps");
 
     c6->cd(2);
     fhChargeLog->Draw();
-    gPad->Print(".gif");
-    gPad->Print(".eps");
+    if (fPrintToFileOn) gPad->Print(".gif");
+    if (fPrintToFileOn) gPad->Print(".eps");
 
     c6->cd(3);
     fhChargePr_1GeV_3mm->Draw();
-    gPad->Print(".gif");
-    gPad->Print(".eps");
-
-    TCanvas* c7 = new TCanvas("c7","Cluster statistics",1200,400);
-    c7->Divide(3,1);
-    c7->cd(1);
-    gStyle->SetOptStat(1110);
-    gPad->SetLogy();
-    fhPointsInCluster->Draw();
-    gPad->Print(".gif");
-    gPad->Print(".eps");
-    c7->cd(2);
-    gStyle->SetOptStat(1110);
-    gPad->SetLogy();
-    fhDigisInCluster->Draw();
-    gPad->Print(".gif");
-    gPad->Print(".eps");
-    c7->cd(3);
-    gStyle->SetOptStat(1110);
-    gPad->SetLogy();
-    fhHitsInCluster->Draw();
-    gPad->Print(".gif");
-    gPad->Print(".eps");
-
+    if (fPrintToFileOn) gPad->Print(".gif");
+    if (fPrintToFileOn) gPad->Print(".eps");
 
     TCanvas* c8 = new TCanvas("c8","Square vs nPads",800,400);
     c8->Divide(2,1);
@@ -542,8 +541,74 @@ void CbmMuchHitFinderQa::FinishTask(){
     TGraph* gNvsS = new TGraph(11,s,nMean);
     //gNvsS->DrawClone();
 
+
+    printf("All tracks: ;");
+    for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNall[i]);
+    printf("\n");
+    printf("------------;");
+    for (Int_t i=0;i<fNstations;i++) printf("---------");
+    printf("\n");
+    printf("Primary:    ;");
+    for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNprimary[i]);
+    printf("\n");
+    printf("Secondary:  ;");
+    for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNsecondary[i]);
+    printf("\n");
+    printf("-------------");
+    for (Int_t i=0;i<fNstations;i++) printf("---------");
+    printf("\n");
+    printf("Protons:    ;");
+    for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNpr[i]);
+    printf("\n");
+    printf("Pions:      ;");
+    for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNpi[i]);
+    printf("\n");
+    printf("Electrons:  ;");
+    for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNel[i]);
+    printf("\n");
+    printf("Muons:      ;");
+    for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNmu[i]);
+    printf("\n");
+    printf("Kaons:      ;");
+    for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNka[i]);
+    printf("\n");
+
   }
 
+
+  if (fStatisticsQaOn){
+    printf("===================================\n");
+    printf("StatisticsQa:\n");
+    TCanvas* c7 = new TCanvas("c7","Cluster statistics",1200,400);
+    c7->Divide(3,1);
+    c7->cd(1);
+    gStyle->SetOptStat(1110);
+    gPad->SetLogy();
+    fhPointsInCluster->Draw();
+    if (fPrintToFileOn) gPad->Print(".gif");
+    if (fPrintToFileOn) gPad->Print(".eps");
+    c7->cd(2);
+    gStyle->SetOptStat(1110);
+    gPad->SetLogy();
+    fhDigisInCluster->Draw();
+    if (fPrintToFileOn) gPad->Print(".gif");
+    if (fPrintToFileOn) gPad->Print(".eps");
+    c7->cd(3);
+    gStyle->SetOptStat(1110);
+    gPad->SetLogy();
+    fhHitsInCluster->Draw();
+    if (fPrintToFileOn) gPad->Print(".gif");
+    if (fPrintToFileOn) gPad->Print(".eps");
+
+    printf("Total number of points: %i\n",fPointsTotal);
+    printf("Points overcounted: %i\n",fPointsOverCounted);
+    printf("Points undercounted: %i\n",fPointsUnderCounted);
+  }
+
+  if (fClusterDeconvQaOn){
+    printf("Signal points: %i\n", fSignalPoints);
+    printf("Signal hits: %i\n", fSignalHits);
+  }
 
   TFile* performanceFile = new TFile(fFileName, "recreate");
 
@@ -565,43 +630,6 @@ void CbmMuchHitFinderQa::FinishTask(){
    fhNpadsVsS->Write();
    performanceFile->Close();
 
-   printf("All tracks: ;");
-   for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNall[i]);
-   printf("\n");
-   printf("------------;");
-   for (Int_t i=0;i<fNstations;i++) printf("---------");
-   printf("\n");
-   printf("Primary:    ;");
-   for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNprimary[i]);
-   printf("\n");
-   printf("Secondary:  ;");
-   for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNsecondary[i]);
-   printf("\n");
-   printf("-------------");
-   for (Int_t i=0;i<fNstations;i++) printf("---------");
-   printf("\n");
-   printf("Protons:    ;");
-   for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNpr[i]);
-   printf("\n");
-   printf("Pions:      ;");
-   for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNpi[i]);
-   printf("\n");
-   printf("Electrons:  ;");
-   for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNel[i]);
-   printf("\n");
-   printf("Muons:      ;");
-   for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNmu[i]);
-   printf("\n");
-   printf("Kaons:      ;");
-   for (Int_t i=0;i<fNstations;i++) printf("%8i;",fNka[i]);
-   printf("\n");
-
-   printf("Total number of points: %i\n",fPointsTotal);
-   printf("Points overcounted: %i\n",fPointsOverCounted);
-   printf("Points undercounted: %i\n",fPointsUnderCounted);
-
-   printf("Signal points: %i\n", fSignalPoints);
-   printf("Signal hits: %i\n", fSignalHits);
 }
 // -------------------------------------------------------------------------
 
@@ -955,11 +983,11 @@ void CbmMuchHitFinderQa::ClusterDeconvQa(){
       CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(iDigi);
       if(!match) continue;
       for(Int_t i=0; i<match->GetNPoints();++i){
-	Int_t iPoint = match->GetRefIndex(i);
-	it = find(pIndices.begin(), pIndices.end(), iPoint);
-	if(it != pIndices.end()) continue;
-	pIndices.push_back(iPoint);
-	if(IsSignalPoint(iPoint)) fSignalHits++;
+        Int_t iPoint = match->GetRefIndex(i);
+        it = find(pIndices.begin(), pIndices.end(), iPoint);
+        if(it != pIndices.end()) continue;
+        pIndices.push_back(iPoint);
+        if(IsSignalPoint(iPoint)) fSignalHits++;
       }
     }
   }

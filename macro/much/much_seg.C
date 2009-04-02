@@ -12,12 +12,21 @@
 //
 // --------------------------------------------------------------------------
 
-void much_seg(const char* mcFile = "data/Jpsi.auau.25gev.centr.mc.root",
-              const char* digiFile = "data/much_digi.root",
-	      Int_t nEvents = 2, Int_t iFirst = 0)
+void much_seg(const char* mcFile = "",
+              const char* digiFile = "",
+	      Int_t nEvents = 2, 
+              Int_t iFirst = 0)
 {
   // ========================================================================
   //          Adjust this part according to your requirements
+
+  if (mcFile = "") {
+    mcFile = "data/Jpsi.auau.25gev.centr.mc.root";
+  }
+  if (digiFile = "") {
+    digiFile = "data/much_digi.root";
+  }
+
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;
 
@@ -72,4 +81,8 @@ void much_seg(const char* mcFile = "data/Jpsi.auau.25gev.centr.mc.root",
   // Run segmentation
   fRun->Init();
   fRun->Run(iFirst,nEvents);
+
+  cout << " Test passed" << endl;
+  cout << " All ok " << endl;
+  exit(0);
 }

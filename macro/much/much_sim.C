@@ -16,13 +16,24 @@
 // M.Ryzhinskiy
 // --------------------------------------------------------------------------
 
-void much_sim(const char* inputSignal = "data/jpsi.root", 
-              const char* inputBgr = "../../input/urqmd.ftn14", 
-              const char* outFile = "data/Jpsi.auau.25gev.centr.mc.root",
+void much_sim(TString inputSignal = "", 
+              TString inputBgr = "", 
+              TString outFile = "",
 	      Int_t nEvents = 2)
 {
   // ========================================================================
   //          Adjust this part according to your requirements
+
+  TString inputdir = gSystem->Getenv("VMCWORKDIR");
+  if (inputSignal = "") {
+    inputSignal = inputdir + "/macro/much/data/jpsi.root";
+  }
+  if (inputBgr = "") {
+    inputBgr = inputdir + "/input/urqmd.ftn14";
+  }
+  if (outFile = "") {
+    outFile = "data/Jpsi.auau.25gev.centr.mc.root";
+  }
 
   // -----   Confirm input parameters    ------------------------------------
   cout << endl;
@@ -239,5 +250,8 @@ void much_sim(const char* inputSignal = "data/jpsi.root",
   cout << endl << endl;
     // ------------------------------------------------------------------------
 
+  cout << " Test passed" << endl;
+  cout << " All ok " << endl;
+  exit(0);
 }
 

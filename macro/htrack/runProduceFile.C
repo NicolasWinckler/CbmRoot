@@ -14,7 +14,7 @@
   //          Adjust this part according to your requirements
 
   // Output folder for the files
-  TString folder      = "data";
+  TString folder      = "files";
 
   // Collision system
   TString system      = "auau";

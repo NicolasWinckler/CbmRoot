@@ -18,10 +18,10 @@
   //          Adjust this part according to your requirements
 
   // Input folder for the files
-  TString inputFolder  = "data";
+  TString inputFolder  = "files";
 
   // Input folder for the files
-  TString outputFolder = "data";
+  TString outputFolder = "files";
 
   // Collision system
   TString system       = "auau";

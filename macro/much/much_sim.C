@@ -16,8 +16,8 @@
 // M.Ryzhinskiy
 // --------------------------------------------------------------------------
 
-void much_sim(TString inputSignal = "", 
-              TString inputBgr = "", 
+void much_sim(TString inputSignal = "",
+              TString inputBgr = "",
               TString outFile = "",
 	      Int_t nEvents = 2)
 {
@@ -25,13 +25,13 @@ void much_sim(TString inputSignal = "",
   //          Adjust this part according to your requirements
 
   TString inputdir = gSystem->Getenv("VMCWORKDIR");
-  if (inputSignal = "") {
+  if (inputSignal == "") {
     inputSignal = inputdir + "/macro/much/data/jpsi.root";
   }
-  if (inputBgr = "") {
+  if (inputBgr == "") {
     inputBgr = inputdir + "/input/urqmd.ftn14";
   }
-  if (outFile = "") {
+  if (outFile == "") {
     outFile = "data/Jpsi.auau.25gev.centr.mc.root";
   }
 

@@ -14,16 +14,16 @@
 
 void much_seg(const char* mcFile = "",
               const char* digiFile = "",
-	      Int_t nEvents = 2, 
+	      Int_t nEvents = 2,
               Int_t iFirst = 0)
 {
   // ========================================================================
   //          Adjust this part according to your requirements
 
-  if (mcFile = "") {
+  if (mcFile == "") {
     mcFile = "data/Jpsi.auau.25gev.centr.mc.root";
   }
-  if (digiFile = "") {
+  if (digiFile == "") {
     digiFile = "data/much_digi.root";
   }
 
@@ -44,7 +44,7 @@ void much_seg(const char* mcFile = "",
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
-  gSystem->Load("libMvd");
+//  gSystem->Load("libMvd");
   gSystem->Load("libSts");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");

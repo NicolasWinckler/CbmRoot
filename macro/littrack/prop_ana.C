@@ -2,7 +2,7 @@
 void prop_ana(Int_t nEvents = 1000)
 {
 //	TString dir = "/home/d/andrey/events/trd/monolithic/10e/e/";
-	TString dir = "/home/d/andrey/events/much/standard/10mu/mu/";
+	TString dir = "/home/d/andrey/test/mu/";//events/much/standard/10mu/mu/";
 
 	TString mcFile = dir + "mc.0000.root";
 	TString stsRecoFile = dir + "sts.reco.0000.root";

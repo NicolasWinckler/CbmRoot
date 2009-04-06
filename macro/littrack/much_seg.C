@@ -1,9 +1,9 @@
 void much_seg(Int_t nEvents = 5)
 {
-  TString dir = "/home/d/andrey/events/newmuch/standard/10mu/mu_urqmd/";
+  TString dir = "/home/d/andrey/test/";//events/newmuch/standard/10mu/mu_urqmd/";
 
-  TString mcFile = dir + "mc.root";
-  TString parFile = dir + "params.root";
+  TString mcFile = dir + "mc.0000.root";
+  TString parFile = dir + "param.0000.root";
   TString digiFile = dir + "much.digi.root";
 
   // Dummy ROOT file (needed as an output)

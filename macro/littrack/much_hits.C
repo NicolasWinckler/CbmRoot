@@ -41,12 +41,12 @@ void much_hits(Int_t nEvents = 1000)
 	// ---  MuCh digitizer ----------------------------------------------------
 	if (geoType.Contains("new")) {
 		CbmMuchDigitize* muchDigitize = new CbmMuchDigitize("MuchDigitize", digiFile.Data(), iVerbose);
-		muchDigitize->SetUseAvalanche(0); // 0 - Not account for avalanches; 1 - Account for avalanches
+		muchDigitize->SetUseAvalanche(1); // 0 - Not account for avalanches; 1 - Account for avalanches
 		//muchDigitize->SetMeanNoise(0);
 		run->AddTask(muchDigitize);
 
 		CbmMuchFindHits* muchFindHits = new CbmMuchFindHits("MuchFindHits", digiFile.Data(), iVerbose);
-		muchFindHits->SetUseClustering(0);
+		muchFindHits->SetUseClustering(1);
 		run->AddTask(muchFindHits);
 	} else {
 		CbmMuchDigitize* muchDigitize = new CbmMuchDigitize("MuchDigitize", iVerbose);

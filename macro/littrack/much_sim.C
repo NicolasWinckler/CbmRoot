@@ -150,7 +150,7 @@ void much_sim(Int_t nEvents = 1)
 	}
 
 	if (urqmd == "yes") {
-		FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFileUrqmd);
+		FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
 		primGen->AddGenerator(urqmdGen);
 	}
 

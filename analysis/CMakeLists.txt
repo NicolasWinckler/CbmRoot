@@ -10,10 +10,15 @@ ${CBMROOT_SOURCE_DIR}/base
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
+${CBMROOT_SOURCE_DIR}/cbmdata/mvd
+${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/trackbase
 ${CBMROOT_SOURCE_DIR}/geane
 ${CBMROOT_SOURCE_DIR}/field
+${CBMROOT_SOURCE_DIR}/mvd 
 ${CBMROOT_SOURCE_DIR}/sts 
+${CBMROOT_SOURCE_DIR}/KF 
+${CBMROOT_SOURCE_DIR}/KF/Interface 
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -26,7 +31,19 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(ANALYSIS_SRCS_RULECHECKER
 hyperon/CbmAnaHypYPtGenerator.cxx
+hyperon/CbmAnaHypTools.cxx
+hyperon/CbmAnaHypSecFinder.cxx
+hyperon/CbmAnaHypSecFinderQa.cxx
+hyperon/CbmAnaHypPair.cxx
+hyperon/CbmAnaHypLambdaCandidate.cxx
+hyperon/CbmAnaHypTrack.cxx
+hyperon/CbmAnaHypRecEff.cxx
+hyperon/CbmAnaHypRecLambda.cxx
+hyperon/CbmAnaHypSelectLambda.cxx
+hyperon/CbmAnaHypRecCascade.cxx
+hyperon/CbmAnaHypMix.cxx
 )
+
 
 SET(ANALYSIS_SRCS ${ANALYSIS_SRCS_RULECHECKER})
 

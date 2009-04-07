@@ -64,7 +64,7 @@ private:
   Double_t fPtMin;               ///< Max value of Pt
   Double_t fPtMax;               ///< Min value of Pt
   Double_t fPDGMass;             ///< Particle mass [GeV]
-  TF1*     fDistPt;              ///< Pointer to the Pt function
+  TF1*     fDistPt;              //! Pointer to the Pt function
 
 ClassDef(CbmAnaHypYPtGenerator,1);
 };

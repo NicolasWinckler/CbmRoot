@@ -150,6 +150,18 @@ Double_t CbmEcalInf::GetVariableStrict(const char* key)
   return val;
 }
 
+TString CbmEcalInf::GetStringVariable(const char* key)
+{
+  TObjString* value=(TObjString*)fVariables->GetValue(key);
+  if (value==NULL)
+  {
+    Fatal("GetStringVariable","Can't find variable named %s.", key);
+  }
+  return value->GetString();
+}
+
+
+
 Double_t CbmEcalInf::GetVariable(const char* key)
 {
   TObjString* value=(TObjString*)fVariables->GetValue(key);

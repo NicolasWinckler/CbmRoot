@@ -21,6 +21,7 @@
 #pragma link C++ class  CbmEcalHitProducerFastMC+;
 #pragma link C++ class  CbmGeoEcal+;
 #pragma link C++ class  CbmEcalRecParticle+;
+#pragma link C++ class  CbmEcalIdParticle+;
 #pragma link C++ class  CbmEcalReconstructionFastMC+;
 #pragma link C++ class  CbmEcalClusterFinder+;
 #pragma link C++ class  CbmEcalDrawer+;
@@ -50,5 +51,7 @@
 #pragma link C++ class  CbmEcalAnalysisNeutron;
 #pragma link C++ class  CbmEcalAnalysisMaterial;
 #pragma link C++ class  CbmEcalTimeDigitizer;
+#pragma link C++ class  CbmEcalIdentification;
+#pragma link C++ class  CbmEcalLightMap;
 
 #endif

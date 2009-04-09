@@ -11,6 +11,9 @@ ${CBMROOT_SOURCE_DIR}/field
 ${CBMROOT_SOURCE_DIR}/cbmbase
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/ecal 
+${CBMROOT_SOURCE_DIR}/cbmdata/sts 
+${CBMROOT_SOURCE_DIR}/cbmdata/trd
+${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/ecal
 )
 
@@ -30,8 +33,8 @@ CbmEcalContFact.cxx CbmGeoEcal.cxx
 CbmEcalAnalysisDS.cxx CbmEcalAnalysis.cxx 
 CbmEcalCell.cxx CbmEcalModule.cxx CbmEcalStructure.cxx 
 CbmEcalHitProducerFastMC.cxx 
-CbmEcalRecParticle.cxx CbmEcalReconstructionFastMC.cxx 
-CbmEcalClusterFinder.cxx 
+CbmEcalRecParticle.cxx CbmEcalIdParticle.cxx
+CbmEcalReconstructionFastMC.cxx CbmEcalClusterFinder.cxx 
 CbmEcalPhotonCalibrator.cxx CbmEcalShowerCalibrator.cxx 
 CbmEcalUrqmdCalibrator.cxx CbmEcalSCurveLib.cxx 
 CbmEcalSCurveLibRecord.cxx CbmEcalOShowerCalibrator.cxx 
@@ -44,6 +47,7 @@ CbmEcalTrackImport.cxx CbmEcalCalibration.cxx
 CbmEcalParam.cxx CbmEcalRecoSlow.cxx CbmEcalMatching.cxx
 CbmEcalAnalysisPi0.cxx CbmEcalAnalysisPair.cxx CbmEcalAnalysisMaterial.cxx
 CbmEcalAnalysisNeutron.cxx CbmEcalTimeDigitizer.cxx
+CbmEcalIdentification.cxx CbmEcalLightMap.cxx
 )
 
 SET(ECAL_SRCS ${ECAL_SRCS_RULECHECKER} CbmEcalInf.cxx)

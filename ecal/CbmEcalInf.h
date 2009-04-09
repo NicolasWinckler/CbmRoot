@@ -122,6 +122,7 @@ public:
    ** GetVariableStrict("aaaa").
    ** If variable not found, will generate Fatal **/
   Double_t GetVariableStrict(const char* key);
+  TString GetStringVariable(const char* key);
 
   void AddVariable(const char* key, const char* value);
   /** Writes Inf to par, if write_str==1 fEcalStr also

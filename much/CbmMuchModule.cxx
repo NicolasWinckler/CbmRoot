@@ -60,13 +60,13 @@ CbmMuchModule::CbmMuchModule(Int_t detId, TVector3 position, TVector3 size,
 	fClusters = NULL;
 	Double_t x[5];
 	Double_t y[5];
-	x[0] = position[0] - size[0] / 2;
+	x[0] = position[0] - size[0] / 2.;
 	y[0] = position[1] - size[1] / 2.;
-	x[1] = position[0] - size[0] / 2;
+	x[1] = position[0] - size[0] / 2.;
 	y[1] = position[1] + size[1] / 2.;
-	x[2] = position[0] + size[0] / 2;
+	x[2] = position[0] + size[0] / 2.;
 	y[2] = position[1] + size[1] / 2.;
-	x[3] = position[0] + size[0] / 2;
+	x[3] = position[0] + size[0] / 2.;
 	y[3] = position[1] - size[1] / 2.;
 	x[4] = x[0];
 	y[4] = y[0];
@@ -94,13 +94,13 @@ CbmMuchModule::CbmMuchModule(Int_t iStation, Int_t iLayer, Bool_t iSide,
 	fClusters = NULL;
 	Double_t x[5];
 	Double_t y[5];
-	x[0] = position[0] - size[0] / 2;
+	x[0] = position[0] - size[0] / 2.;
 	y[0] = position[1] - size[1] / 2.;
-	x[1] = position[0] - size[0] / 2;
+	x[1] = position[0] - size[0] / 2.;
 	y[1] = position[1] + size[1] / 2.;
-	x[2] = position[0] + size[0] / 2;
+	x[2] = position[0] + size[0] / 2.;
 	y[2] = position[1] + size[1] / 2.;
-	x[3] = position[0] + size[0] / 2;
+	x[3] = position[0] + size[0] / 2.;
 	y[3] = position[1] - size[1] / 2.;
 	x[4] = x[0];
 	y[4] = y[0];
@@ -126,7 +126,8 @@ CbmMuchSector* CbmMuchModule::GetSector(Int_t iGridColumn, Int_t iGridRow) {
 	if (iSector != -1) {
 		CbmMuchSector* sector = (CbmMuchSector*) fSectors.At(iSector);
 		return sector;
-	} else
+	}
+	else
 		return NULL;
 }
 // -------------------------------------------------------------------------
@@ -136,12 +137,15 @@ Bool_t CbmMuchModule::InitGrid() {
 	if (GetNSectors() == 0)
 		return kFALSE;
 	CbmMuchSector* muchSector = GetSector(0);
+	Int_t nChannels = muchSector->GetNChannels();
 	TVector3 size = muchSector->GetSize();
 	fGridDx = size[0];
 	fGridDy = size[1];
 	Int_t nSectors = GetNSectors();
 	for (Int_t iSector = 0; iSector < nSectors; iSector++) {
-		TVector3 secSize = GetSector(iSector)->GetSize();
+		CbmMuchSector* s = GetSector(iSector);
+		if(s->GetNChannels() < nChannels) continue;
+		TVector3 secSize = s->GetSize();
 		if (fGridDx > secSize[0])
 			fGridDx = secSize[0];
 		if (fGridDy > secSize[1])
@@ -158,7 +162,7 @@ Bool_t CbmMuchModule::InitGrid() {
 		for (int iCol = 0; iCol < fGridCols; iCol++) {
 			Double_t x = (iCol + 0.5) * fGridDx - fSize[0] / 2. + fPosition[0];
 			bool result = kFALSE;
-			for (int iSector = 0; iSector < GetNSectors(); iSector++) {
+			for (int iSector = 0; iSector < nSectors; iSector++) {
 				CbmMuchSector* sec = (CbmMuchSector*) fSectors.At(iSector);
 				if (sec) {
 					result = sec->Inside(x, y);
@@ -186,12 +190,11 @@ void CbmMuchModule::InitNeighbourSectors() {
 			Double_t secLy = sector->GetSize()[1];
 			Double_t secX0 = sector->GetPosition()[0];
 			Double_t secY0 = sector->GetPosition()[1];
-			Int_t iSector = sector->GetSectorIndex();
 
 			Int_t nCol = (Int_t) ((secLx + fGridDx / 2.) / fGridDx) + 2;
 			Int_t nRow = (Int_t) ((secLy + fGridDy / 2.) / fGridDy) + 2;
-			Double_t x = secX0 - secLx / 2. - fGridDx / 2 - fPosition[0];
-			Double_t y = secY0 - secLy / 2. - fGridDy / 2 - fPosition[1];
+			Double_t x = secX0 - secLx / 2. - fGridDx / 2. - fPosition[0];
+			Double_t y = secY0 - secLy / 2. - fGridDy / 2. - fPosition[1];
 
 			Int_t gCol = (Int_t) ((x + fSize[0] / 2.) / fGridDx);
 			Int_t gRow = (Int_t) ((y + fSize[1] / 2.) / fGridDy);
@@ -202,7 +205,7 @@ void CbmMuchModule::InitNeighbourSectors() {
 				for (Int_t iCol = gCol; iCol < gCol + nCol; iCol++) {
 					if (iCol < 0 || iCol > fGridCols - 1)
 						continue;
-					CbmMuchSector* sec = (CbmMuchSector*) GetSector(iCol, iRow);
+					CbmMuchSector* sec = GetSector(iCol, iRow);
 					if (sec) {
 						Int_t iSec = sec->GetSectorIndex();
 						if (iSec == iSector)

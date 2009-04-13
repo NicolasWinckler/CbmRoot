@@ -110,21 +110,22 @@ vector<CbmMuchPad*> CbmMuchPad::GetNeighbours(){
 void CbmMuchPad::Reset(){
   fDigiIndex = -1;
   fCharge = 0;
-  fFired = 0;
+//  fFired = 0;
   SetFillColor(kYellow);
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-void CbmMuchPad::SetFired(Int_t digiId, Int_t charge, Int_t ADCcharge){
-  fDigiIndex = digiId;
+void CbmMuchPad::SetFired(Int_t iDigi, Int_t charge, Int_t ADCcharge){
+  fDigiIndex = iDigi;
   fCharge = charge;
-  if (fDigiIndex>=0) fFired = 1; else fFired = 0;
+//  if (fDigiIndex>=0) fFired = 1;
+//  else fFired = 0;
 //  Int_t ch = fCharge/1000;
 //  if (ch>255) ch = 255;
 //  if (ch<10) ch = 10;
 //  if (fFired) SetFillColor(TColor::GetColor(255-ch,255-ch,245));
-  if (fFired) SetFillColor(TColor::GetColor(255-ADCcharge,255-ADCcharge,245));
+  if (fDigiIndex>=0) SetFillColor(TColor::GetColor(255-ADCcharge,255-ADCcharge,245));
   else SetFillColor(kYellow);
 }
 // -------------------------------------------------------------------------
@@ -139,7 +140,7 @@ void CbmMuchPad::DrawPad(){
 // -------------------------------------------------------------------------
 TString CbmMuchPad::GetInfo(){
     return Form("Channel:%i fired:%i charge:%i digiId:%i",
-         CbmMuchGeoScheme::GetChannelIndex(fChannelId),fFired,fCharge,fDigiIndex);
+         CbmMuchGeoScheme::GetChannelIndex(fChannelId),fDigiIndex>=0,fCharge,fDigiIndex);
 }
 // -------------------------------------------------------------------------
 

@@ -42,8 +42,7 @@ class CbmMuchSector : public TPolyLine
    *@param nChannels Number of channels (128 by default)
    */
   CbmMuchSector(Int_t detId, Int_t iSector, TVector3 position, TVector3 size,
-		             Int_t nCols, Int_t nRows,
-		             Int_t nChannels = 128);
+		             Int_t nCols, Int_t nRows);
   /** Destructor */
   virtual ~CbmMuchSector();
 

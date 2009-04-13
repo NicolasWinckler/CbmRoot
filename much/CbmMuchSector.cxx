@@ -38,7 +38,7 @@ CbmMuchSector::CbmMuchSector():TPolyLine(){
 
 // -----  Standard constructor  --------------------------------------------
 CbmMuchSector::CbmMuchSector(Int_t detId, Int_t iSector, TVector3 position,  TVector3 size,
-                             Int_t nCols, Int_t nRows, Int_t nChannels):TPolyLine()
+                             Int_t nCols, Int_t nRows):TPolyLine()
 {
   fDetectorId  = detId;
   fSectorIndex = iSector;
@@ -52,7 +52,7 @@ CbmMuchSector::CbmMuchSector(Int_t detId, Int_t iSector, TVector3 position,  TVe
   fPadRadius   = TMath::Sqrt(fDx*fDx + fDy*fDy)/2.;
 
   // Define number of channels
-  fNChannels = nChannels;
+  fNChannels = nCols*nRows;
   // calculate errors
   fSigmaX  = fDx / TMath::Sqrt(12);
   fSigmaY  = fDy / TMath::Sqrt(12);

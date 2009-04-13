@@ -78,7 +78,7 @@ public:
 	 * @return        System index (MUCH).
 	 */
 	static Int_t GetSystemIndex(Int_t detId) {
-		return detId & WL_SYSTEM;
+		return (detId & (WL_SYSTEM << SB_SYSTEM)) >> SB_SYSTEM;
 	}
 	/**
 	 * Gets station index for the given detector Id.
@@ -118,7 +118,7 @@ public:
 	 * @return            Sector index within the module.
 	 */
 	static Int_t GetSectorIndex(Int_t channelId) {
-		return channelId & WL_SECTOR;
+		return (channelId & (WL_SECTOR << SB_SECTOR)) >> SB_SECTOR;
 	}
 	/**
 	 * Gets channel index for the given channel Id.
@@ -135,8 +135,7 @@ public:
 	 * @return           Detector Id.
 	 */
 	static Int_t GetDetectorId(Int_t iStation) {
-		return (kMUCH << SB_SYSTEM) |
-		(iStation << SB_STATION);
+		return (kMUCH << SB_SYSTEM) | (iStation << SB_STATION);
 	}
 	/**
 	 * Gets detector Id by station index and layer index.
@@ -145,9 +144,7 @@ public:
 	 * @return           Detector Id.
 	 */
 	static Int_t GetDetectorId(Int_t iStation, Int_t iLayer) {
-		return (kMUCH << SB_SYSTEM) |
-		(iStation << SB_STATION) |
-		(iLayer << SB_LAYER);
+		return (kMUCH << SB_SYSTEM) | (iStation << SB_STATION) | (iLayer << SB_LAYER);
 	}
 	/**
 	 * Gets detector Id by station index, layer index and layer side index.
@@ -157,9 +154,7 @@ public:
 	 * @return           Detector Id.
 	 */
 	static Int_t GetDetectorId(Int_t iStation, Int_t iLayer, Int_t iSide) {
-		return (kMUCH << SB_SYSTEM) |
-		(iStation << SB_STATION) |
-		(iLayer << SB_LAYER) |
+		return (kMUCH << SB_SYSTEM) | (iStation << SB_STATION) | (iLayer << SB_LAYER) |
 		(iSide << SB_LAYERSIDE);
 	}
 	/**
@@ -171,11 +166,8 @@ public:
 	 * @return           Detector Id.
 	 */
 	static Int_t GetDetectorId(Int_t iStation, Int_t iLayer, Int_t iSide, Int_t iModule) {
-		return (kMUCH << SB_SYSTEM) |
-		(iStation << SB_STATION) |
-		(iLayer << SB_LAYER) |
-		(iSide << SB_LAYERSIDE) |
-		(iModule << SB_MODULE);
+		return (kMUCH << SB_SYSTEM) |	(iStation << SB_STATION) |	(iLayer << SB_LAYER) |
+		(iSide << SB_LAYERSIDE) | (iModule << SB_MODULE);
 	}
 	/**
 	 * Gets channel Id by sector index and channel index.
@@ -241,8 +233,8 @@ private:
 	CbmMuchGeoScheme();
 	void CreateAbsorbers();
 	void CreateStations();
-  CbmMuchStation* CreateStationGem(Int_t st);
-  CbmMuchStation* CreateStationStraw(Int_t st);
+    CbmMuchStation* CreateStationGem(Int_t st);
+    CbmMuchStation* CreateStationStraw(Int_t st);
 
 	Int_t Intersect(Float_t x, Float_t y, Float_t dx, Float_t dy, Float_t r);
 	static CbmMuchGeoScheme* fInstance;

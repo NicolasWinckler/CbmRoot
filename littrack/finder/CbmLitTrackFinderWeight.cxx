@@ -1,4 +1,4 @@
-#include "CbmLitTrackFinderRobust.h"
+#include "CbmLitTrackFinderWeight.h"
 
 #include "CbmLitTrackSelection.h"
 #include "CbmLitTrackPropagator.h"
@@ -10,25 +10,25 @@
 #include <iostream>
 #include <algorithm>
 
-CbmLitTrackFinderRobust::CbmLitTrackFinderRobust()
+CbmLitTrackFinderWeight::CbmLitTrackFinderWeight()
 {
 }
 
-CbmLitTrackFinderRobust::~CbmLitTrackFinderRobust()
+CbmLitTrackFinderWeight::~CbmLitTrackFinderWeight()
 {
 }
 
-LitStatus CbmLitTrackFinderRobust::Initialize()
-{
-	return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackFinderRobust::Finalize()
+LitStatus CbmLitTrackFinderWeight::Initialize()
 {
 	return kLITSUCCESS;
 }
 
-LitStatus CbmLitTrackFinderRobust::DoFind(
+LitStatus CbmLitTrackFinderWeight::Finalize()
+{
+	return kLITSUCCESS;
+}
+
+LitStatus CbmLitTrackFinderWeight::DoFind(
 		const HitPtrVector& hits,
 		const TrackPtrVector& trackSeeds,
 		TrackPtrVector& tracks)
@@ -62,7 +62,7 @@ LitStatus CbmLitTrackFinderRobust::DoFind(
 	return kLITSUCCESS;
 }
 
-void CbmLitTrackFinderRobust::FollowTracks(
+void CbmLitTrackFinderWeight::FollowTracks(
 		TrackPtrIterator itBegin,
 		TrackPtrIterator itEnd)
 {
@@ -71,7 +71,7 @@ void CbmLitTrackFinderRobust::FollowTracks(
 	}
 }
 
-void CbmLitTrackFinderRobust::FollowTrack(
+void CbmLitTrackFinderWeight::FollowTrack(
 		CbmLitTrack *track)
 {
 	Int_t nofStationGroups = fLayout.GetNofStationGroups();
@@ -80,7 +80,7 @@ void CbmLitTrackFinderRobust::FollowTrack(
 	}
 }
 
-Bool_t CbmLitTrackFinderRobust::ProcessStationGroup(
+Bool_t CbmLitTrackFinderWeight::ProcessStationGroup(
 		CbmLitTrack *track,
 		Int_t stationGroup)
 {
@@ -96,7 +96,7 @@ Bool_t CbmLitTrackFinderRobust::ProcessStationGroup(
 	return true;
 }
 
-Bool_t CbmLitTrackFinderRobust::ProcessStation(
+Bool_t CbmLitTrackFinderWeight::ProcessStation(
 		CbmLitTrack *track,
 		Int_t stationGroup,
 		Int_t station)
@@ -114,7 +114,7 @@ Bool_t CbmLitTrackFinderRobust::ProcessStation(
 	return hitAdded;
 }
 
-Bool_t CbmLitTrackFinderRobust::AddHits(
+Bool_t CbmLitTrackFinderWeight::AddHits(
 		CbmLitTrack* track,
 		HitPtrIteratorPair bounds)
 {
@@ -130,7 +130,7 @@ Bool_t CbmLitTrackFinderRobust::AddHits(
 	return hitAdded;
 }
 
-void CbmLitTrackFinderRobust::FitTracks(
+void CbmLitTrackFinderWeight::FitTracks(
 		TrackPtrIterator itBegin,
 		TrackPtrIterator itEnd)
 {
@@ -143,4 +143,4 @@ void CbmLitTrackFinderRobust::FitTracks(
 //		if ((*it)->GetChi2() / (*it)->GetNDF() > 200) (*it)->SetQuality(kLITBAD);
 	}
 }
-ClassImp(CbmLitTrackFinderRobust)
+ClassImp(CbmLitTrackFinderWeight)

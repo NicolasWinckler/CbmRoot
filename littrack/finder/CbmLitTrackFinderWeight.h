@@ -1,16 +1,16 @@
-#ifndef CBMLITTRACKFINDERROBUST_H_
-#define CBMLITTRACKFINDERROBUST_H_
+#ifndef CBMLITTRACKFINDERWEIGHT_H_
+#define CBMLITTRACKFINDERWEIGHT_H_
 
 #include "CbmLitTrackFinderBase.h"
 
 class CbmLitTrackFitter;
 class CbmLitTrackUpdate;
 
-class CbmLitTrackFinderRobust : public CbmLitTrackFinderBase
+class CbmLitTrackFinderWeight : public CbmLitTrackFinderBase
 {
 public:
-	CbmLitTrackFinderRobust();
-	virtual ~CbmLitTrackFinderRobust();
+	CbmLitTrackFinderWeight();
+	virtual ~CbmLitTrackFinderWeight();
 
 	LitStatus DoFind(
 			const HitPtrVector& hits,
@@ -48,7 +48,7 @@ protected:
 	TrackFitterPtr fFitter;
 	TrackUpdatePtr fFilter;
 
-	ClassDef(CbmLitTrackFinderRobust, 1);
+	ClassDef(CbmLitTrackFinderWeight, 1);
 };
 
-#endif /*CBMLITTRACKFINDERROBUST_H_*/
+#endif /*CBMLITTRACKFINDERWEIGHT_H_*/

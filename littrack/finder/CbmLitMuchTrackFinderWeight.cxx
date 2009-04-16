@@ -1,4 +1,4 @@
-#include "CbmLitMuchTrackFinderRobust.h"
+#include "CbmLitMuchTrackFinderWeight.h"
 
 #include "CbmLitToolFactory.h"
 #include "CbmLitMemoryManagment.h"
@@ -11,15 +11,15 @@
 #include <iostream>
 #include <algorithm>
 
-CbmLitMuchTrackFinderRobust::CbmLitMuchTrackFinderRobust()
+CbmLitMuchTrackFinderWeight::CbmLitMuchTrackFinderWeight()
 {
 }
 
-CbmLitMuchTrackFinderRobust::~CbmLitMuchTrackFinderRobust()
+CbmLitMuchTrackFinderWeight::~CbmLitMuchTrackFinderWeight()
 {
 }
 
-void CbmLitMuchTrackFinderRobust::Init()
+void CbmLitMuchTrackFinderWeight::Init()
 {
 	DefaultInit();
 
@@ -42,7 +42,7 @@ void CbmLitMuchTrackFinderRobust::Init()
 	fPDG = 13;
 }
 
-Int_t CbmLitMuchTrackFinderRobust::DoFind(
+Int_t CbmLitMuchTrackFinderWeight::DoFind(
 		TClonesArray* hitArray,
 		TClonesArray* trackArray)
 {
@@ -53,7 +53,7 @@ Int_t CbmLitMuchTrackFinderRobust::DoFind(
 	CbmLitConverter::MuchHitArrayToHitVector(hitArray, hits);
 	DefaultCreateTrackSeeds(fTrackSeedsArray, trackSeeds, fLayout, fPDG);
 
-	CbmLitTrackFinderRobust::DoFind(hits, trackSeeds, foundTracks);
+	CbmLitTrackFinderWeight::DoFind(hits, trackSeeds, foundTracks);
 
 	CbmLitConverter::TrackVectorToMuchTrackArray(foundTracks, trackArray);
 
@@ -67,4 +67,4 @@ Int_t CbmLitMuchTrackFinderRobust::DoFind(
 	return trackArray->GetEntriesFast();
 }
 
-ClassImp(CbmLitMuchTrackFinderRobust);
+ClassImp(CbmLitMuchTrackFinderWeight);

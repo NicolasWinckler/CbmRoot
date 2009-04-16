@@ -1,26 +1,26 @@
-#ifndef CBMLITTRDTRACKFINDERROBUST_H_
-#define CBMLITTRDTRACKFINDERROBUST_H_
+#ifndef CBMLITTRDTRACKFINDERWEIGHT_H_
+#define CBMLITTRDTRACKFINDERWEIGHT_H_
 
 #include "CbmTrdTrackFinder.h"
-#include "CbmLitTrackFinderRobust.h"
+#include "CbmLitTrackFinderWeight.h"
 #include "CbmLitStsBasedTrackFinder.h"
 
 class TClonesArray;
 
-class CbmLitTrdTrackFinderRobust : public CbmTrdTrackFinder,
-							       private CbmLitTrackFinderRobust,
+class CbmLitTrdTrackFinderWeight : public CbmTrdTrackFinder,
+							       private CbmLitTrackFinderWeight,
 							       private CbmLitStsBasedTrackFinder
 {
 public:
-	CbmLitTrdTrackFinderRobust();
-	virtual ~CbmLitTrdTrackFinderRobust();
+	CbmLitTrdTrackFinderWeight();
+	virtual ~CbmLitTrdTrackFinderWeight();
 
     virtual void Init();
     virtual Int_t DoFind(
     		TClonesArray* hitArray,
             TClonesArray* trackArray);
 
-	ClassDef(CbmLitTrdTrackFinderRobust, 1);
+	ClassDef(CbmLitTrdTrackFinderWeight, 1);
 };
 
-#endif /*CBMLITTRDTRACKFINDERROBUST_H_*/
+#endif /*CBMLITTRDTRACKFINDERWEIGHT_H_*/

@@ -4,7 +4,8 @@ void much_hits(Int_t nEvents = 1000)
 
 	TString dir, mcFile, parFile, muchHitsFile, digiFile, geoType;
 	if (script != "yes") {
-		dir  = "/home/d/andrey/events/newmuch/standard/10mu/mu_urqmd/";
+//		dir  = "/home/d/andrey/events/newmuch/standard/10mu/mu_urqmd/";
+		dir  = "/home/d/andrey/test/trunk/mu/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		muchHitsFile = dir + "much.hits.0000.root";
@@ -41,12 +42,12 @@ void much_hits(Int_t nEvents = 1000)
 	// ---  MuCh digitizer ----------------------------------------------------
 	if (geoType.Contains("new")) {
 		CbmMuchDigitize* muchDigitize = new CbmMuchDigitize("MuchDigitize", digiFile.Data(), iVerbose);
-		muchDigitize->SetUseAvalanche(1); // 0 - Not account for avalanches; 1 - Account for avalanches
+		muchDigitize->SetUseAvalanche(0); // 0 - Not account for avalanches; 1 - Account for avalanches
 		//muchDigitize->SetMeanNoise(0);
 		run->AddTask(muchDigitize);
 
 		CbmMuchFindHits* muchFindHits = new CbmMuchFindHits("MuchFindHits", digiFile.Data(), iVerbose);
-		muchFindHits->SetUseClustering(1);
+		muchFindHits->SetUseClustering(0);
 		run->AddTask(muchFindHits);
 	} else {
 		CbmMuchDigitize* muchDigitize = new CbmMuchDigitize("MuchDigitize", iVerbose);

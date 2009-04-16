@@ -1,11 +1,12 @@
 #include "../../cbmbase/CbmDetectorList.h";
-void much_reco(Int_t nEvents = 100)
+void much_reco(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, stsRecoFile, muchHitsFile, muchTracksFile;
 	if (script != "yes") {
-		dir  = "/home/d/andrey/test/";//events/newmuch/standard/10mu/mu_urqmd/";
+//		dir  = "/home/d/andrey/test/";//events/newmuch/standard/10mu/mu_urqmd/";
+		dir  = "/home/d/andrey/test/trunk/mu/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		stsRecoFile = dir + "sts.reco.0000.root";

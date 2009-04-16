@@ -4,7 +4,8 @@ void sts_reco(Int_t nEvents = 1000)
 
 	TString dir, mcFile, parFile, stsRecoFile, detector;
 	if (script != "yes") {
-		dir  = "/home/d/andrey/events/newmuch/compact/10mu/mu_urqmd/";
+//		dir  = "/home/d/andrey/events/newmuch/compact/10mu/mu_urqmd/";
+		dir  = "/home/d/andrey/test/trunk/mu/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		stsRecoFile = dir + "sts.reco.0000.root";

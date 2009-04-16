@@ -67,12 +67,12 @@ data/CbmLitTrack.cxx
 data/CbmLitTrackBranch.cxx
 data/CbmLitFitNode.cxx
 #finder/CbmLitMuchTrackFinderTrigger.cxx
-finder/CbmLitTrackFinderRobust.cxx
+finder/CbmLitTrackFinderWeight.cxx
 finder/CbmLitTrdTrackFinderBranch.cxx
 finder/CbmLitTrdTrackFinderStandalone.cxx
 finder/CbmLitMuchTrackFinderBranch.cxx
-finder/CbmLitMuchTrackFinderRobust.cxx
-finder/CbmLitTrdTrackFinderRobust.cxx
+finder/CbmLitMuchTrackFinderWeight.cxx
+finder/CbmLitTrdTrackFinderWeight.cxx
 finder/CbmLitTrackFinderBase.cxx
 finder/CbmLitTrackFinderBranch.cxx
 finder/CbmLitTrackFinderNN.cxx

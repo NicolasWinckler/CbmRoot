@@ -34,12 +34,12 @@
 #pragma link C++ class  CbmLitFitNode+;
 
 // finder
-#pragma link C++ class  CbmLitTrackFinderRobust+;
+#pragma link C++ class  CbmLitTrackFinderWeight+;
 #pragma link C++ class  CbmLitTrdTrackFinderBranch+;
 #pragma link C++ class  CbmLitTrdTrackFinderStandalone+;
 #pragma link C++ class  CbmLitMuchTrackFinderBranch+;
-#pragma link C++ class  CbmLitMuchTrackFinderRobust+;
-#pragma link C++ class  CbmLitTrdTrackFinderRobust+;
+#pragma link C++ class  CbmLitMuchTrackFinderWeight+;
+#pragma link C++ class  CbmLitTrdTrackFinderWeight+;
 #pragma link C++ class  CbmLitTrackFinderBase+;
 #pragma link C++ class  CbmLitTrackFinderBranch+;
 #pragma link C++ class  CbmLitStsBasedTrackFinder+;

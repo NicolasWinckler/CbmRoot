@@ -64,6 +64,8 @@ private:
   Double_t fPSE;
   /** Energy deposition in preshower in cell hit by track **/
   Double_t fPSE2;
+  /** As PSE2, but track is prolongated to center of PS scintillator **/
+  Double_t fPSE3;
   /** PS energy in 2x2 matrix **/
   Double_t fPSEAll;
   Double_t fShape;
@@ -86,6 +88,8 @@ private:
   Double_t fHack;
   /** Event number **/
   Int_t fEvent;
+  /** Type of cell **/
+  Int_t fCellType;
   /** Number of the id particle **/
   Int_t fN;
 
@@ -102,8 +106,12 @@ private:
   Int_t fPDG;
   /** MC PDG code **/
   Int_t fMCPDG;
+  /** MC PDG code of mother of the track **/
+  Int_t fMotherMCPDG;
   /** Energy of mother MC track**/
   Double_t fMCP;
+  /** Momentum of energy distribution by particle on the calorimeter surface**/
+  Double_t fMCM;
   /** Distance between MC and predicted impact point of the track **/
   Double_t fR;
   /** Energy of the electron on the calorimeter surface **/

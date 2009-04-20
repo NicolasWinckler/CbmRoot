@@ -53,6 +53,7 @@ void CbmEcalIdentification::Exec(Option_t* option)
 void CbmEcalIdentification::Identify(FairTrackParam* tr)
 {
   CbmEcalCell* cell;
+  CbmEcalCell* cell2;
   CbmEcalCell* max=NULL;
   list<CbmEcalCell*> cells;
   list<CbmEcalCell*>::const_iterator p;
@@ -113,13 +114,14 @@ void CbmEcalIdentification::Identify(FairTrackParam* tr)
 
   if (max==NULL) return;
   max->GetNeighborsList(0, cells); te=0;
+  fCellType=max->GetType();
   for(p=cells.begin();p!=cells.end();++p)
     te+=GetEnergy(*p)+GetPSEnergy(*p);
   me=0; fPSEAll=0;
   for(i=1;i<5;i++)
   {
     e=0;
-    max->GetNeighborsList(1, cells);
+    max->GetNeighborsList(i, cells);
     for(p=cells.begin();p!=cells.end();++p)
     {
       fPSEAll+=GetPSEnergy(*p);
@@ -136,7 +138,13 @@ void CbmEcalIdentification::Identify(FairTrackParam* tr)
   te+=me1;
   fShape=me/te;
   fE=fCal->GetEnergy(me, max);
-  //TODO: Verify is better to get some thing different
+  x=fX; x+=trackmom.X()/trackmom.Z()*(fInf->GetPSLead()+fInf->GetPSScin()/2.0);
+  y=fY; y+=trackmom.Y()/trackmom.Z()*(fInf->GetPSLead()+fInf->GetPSScin()/2.0);
+  cell2=fStr->GetCell(x, y);
+  if (cell2)
+    fPSE3=GetPSEnergy(cell2);
+  else
+    fPSE3=-1111;
   fPSE=GetPSEnergy(max);
   fPSE2=GetPSEnergy(cell);
   fPSEAll+=fPSE;
@@ -165,7 +173,7 @@ void CbmEcalIdentification::Identify(FairTrackParam* tr)
     }
   }
   //fEProb=-1111;
-  new((*fId)[fN++]) CbmEcalIdParticle(max, fX, fY, fZ, fE, fPSE2, fShape, fTrackNum, fEProb, fMCTrackNum);
+  new((*fId)[fN++]) CbmEcalIdParticle(max, fX, fY, fZ, fE/tracke, TMath::Max(fPSE, fPSE3), fShape, fTrackNum, fEProb, fMCTrackNum);
 }
 
 /** Write information to the tree **/
@@ -174,6 +182,8 @@ void CbmEcalIdentification::WriteTree()
   fPDG=-1111;
   fMCPDG=-1111;
   fTrdELoss=-1111;
+  fMotherMCPDG=-1111;
+  fMCM=-1111;
   if (fTrackNum>=0)
   {
     CbmGlobalTrack* gtr=(CbmGlobalTrack*)fGlobal->At(fTrackNum);
@@ -199,6 +209,12 @@ void CbmEcalIdentification::WriteTree()
   if (fMCTrackNum>=0&&fUseMC==1)
   {
     CbmMCTrack* mctr=(CbmMCTrack*)fMC->At(fMCTrackNum);
+    CbmMCTrack* mother;
+    if (mctr->GetMotherId()>=0)
+    {
+      mother=(CbmMCTrack*)fMC->At(mctr->GetMotherId());
+      fMotherMCPDG=mother->GetPdgCode();
+    }
     fMCPDG=mctr->GetPdgCode();
     fMCP=mctr->GetP();
 
@@ -208,8 +224,11 @@ void CbmEcalIdentification::WriteTree()
     Int_t n=fMCPoints->GetEntriesFast();
     Int_t i=0;
     Int_t j;
+    Double_t x1;
+    Double_t y1;
     Double_t dx;
     Double_t dy;
+    Double_t r;
     TVector3 mom;
 
     for(i=0;i<n;i++)
@@ -220,8 +239,11 @@ void CbmEcalIdentification::WriteTree()
     }
     if (i!=n)
     {
+      fMCM=0;
       dx=pt->GetX()-fX;
       dy=pt->GetY()-fY;
+      x1=pt->GetX();
+      y1=pt->GetY();
       fR=TMath::Sqrt(dx*dx+dy*dy);
       pt->Momentum(mom);
       fMCSurfE=mom.Mag();
@@ -247,7 +269,12 @@ void CbmEcalIdentification::WriteTree()
 	if (tr)
         {
           pt->Momentum(mom);
-	  fMCCircE+=mom.Mag();
+	  dx=x1-pt->GetX();
+	  dy=y1-pt->GetY();
+	  r=TMath::Sqrt(dx*dx+dy*dy);
+	  fMCM+=r*mom.Mag();
+          if (r<fCircRad)
+  	    fMCCircE+=mom.Mag();
 	}
       }
     }
@@ -332,6 +359,7 @@ void CbmEcalIdentification::InitTree()
   fTree->Branch("e", &fE, "e/D");
   fTree->Branch("pse", &fPSE, "pse/D");
   fTree->Branch("pse2", &fPSE2, "pse2/D");
+  fTree->Branch("pse3", &fPSE3, "pse3/D");
   fTree->Branch("pseall", &fPSEAll, "pseall/D");
   fTree->Branch("shape", &fShape, "shape/D");
   fTree->Branch("eprob", &fEProb, "eprob/D");
@@ -339,8 +367,11 @@ void CbmEcalIdentification::InitTree()
   fTree->Branch("tr", &fTrackNum, "tr/I");
   fTree->Branch("mctr", &fMCTrackNum, "mctr/I");
   fTree->Branch("pdg", &fPDG, "pdg/I");
+  fTree->Branch("tcell", &fCellType, "pdg/I");
   fTree->Branch("mcpdg", &fMCPDG, "mcpdg/I");
+  fTree->Branch("mmcpdg", &fMotherMCPDG, "mmcpdg/I");
   fTree->Branch("mcp", &fMCP, "mcp/D");
+  fTree->Branch("mcm", &fMCM, "mcm/D");
   fTree->Branch("trp", &fTrackP, "trp/D");
   fTree->Branch("r", &fR, "r/D");
   fTree->Branch("mcsurfe", &fMCSurfE, "mcsurfe/D");

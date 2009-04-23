@@ -555,16 +555,9 @@ void CbmMvdHitProducer::ProduceHits(TClonesArray* pointArray,
     }
 
     // Get station number
-    Int_t volId   = point->GetDetectorID();
+    Int_t statNr = point->GetStationNr();
     Int_t trackId = point->GetTrackID();
-    if ( fStationMap.find(volId) == fStationMap.end() ) {
-      cout << "-W- " << GetName() << "::ProduceHits: " 
-	   << "Volume ID " << volId << " not in sensitive nodes!" << endl;
-      mLost++;
-      continue;
-    }
-    Int_t statNr = fStationMap[volId];
-        
+       
     // Point position in the middle of the station
     Double_t xpt = 0.5 * ( point->GetX() + point->GetXOut() );
     Double_t ypt = 0.5 * ( point->GetY() + point->GetYOut() );

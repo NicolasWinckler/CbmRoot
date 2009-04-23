@@ -21,9 +21,11 @@
 #include "FairVolume.h"
 
 #include "TClonesArray.h"
+#include "TGeoManager.h"
 #include "TList.h"
 #include "TObjArray.h"
 #include "TParticle.h"
+#include "TString.h"
 #include "TVirtualMC.h"
 #include "TVirtualMCStack.h"
 
@@ -99,7 +101,7 @@ Bool_t CbmMvd::ProcessHits(FairVolume* vol) {
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
     if (fELoss == 0. ) return kFALSE;
-    AddHit(fTrackID, fPdg, fVolumeID,
+    AddHit(fTrackID, fPdg, fStationMap[fVolumeID],
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
@@ -226,6 +228,22 @@ void CbmMvd::ConstructGeometry() {
   geoPar->setChanged();
   geoPar->setInputVersion(fRun->GetRunId(),1);
   ProcessNodes( volList );
+  
+  // Fill map of station numbers
+  Int_t iStation =  1;
+  Int_t volId    = -1;
+  do {
+    TString volName = Form("mvdstation%02i", iStation);
+    volId = gGeoManager->GetUID(volName);
+    if (volId > -1 ) {
+      fStationMap[volId] = iStation;
+      cout << "-I- " << GetName() << "::ConstructGeometry: "
+           << "Station No. " << iStation << ", volume ID " << volId 
+	   << ", volume name " << volName << endl;
+      iStation++;
+    }
+  } while ( volId > -1 );
+ 
 
 }
 // -------------------------------------------------------------------------
@@ -233,7 +251,7 @@ void CbmMvd::ConstructGeometry() {
 
 
 // -----   Private method AddHit   --------------------------------------------
-CbmMvdPoint* CbmMvd::AddHit(Int_t trackID, Int_t pdg, Int_t detID, 
+CbmMvdPoint* CbmMvd::AddHit(Int_t trackID, Int_t pdg, Int_t stationNr, 
 			    TVector3 posIn, TVector3 posOut, 
 			    TVector3 momIn, TVector3 momOut, Double_t time, 
 			    Double_t length, Double_t eLoss) {
@@ -241,9 +259,9 @@ CbmMvdPoint* CbmMvd::AddHit(Int_t trackID, Int_t pdg, Int_t detID,
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1) 
     cout << "-I- CbmMvd: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
-	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
+	 << ", " << posIn.Z() << ") cm,  station " << stationNr << ", track "
 	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
-  return new(clref[size]) CbmMvdPoint(trackID, pdg, detID, posIn, posOut,
+  return new(clref[size]) CbmMvdPoint(trackID, pdg, stationNr, posIn, posOut,
 				      momIn, momOut, time, length, eLoss);
 }
 // ----------------------------------------------------------------------------

@@ -109,9 +109,9 @@
 #include <map>
 
 #include "gsl/gsl_sf_erf.h"
-#include "CLHEP/Random/RandGauss.h"
-#include "CLHEP/Random/RandPoisson.h"
-#include "CLHEP/Random/RandFlat.h"
+//#include "CLHEP/Random/RandGauss.h"
+//#include "CLHEP/Random/RandPoisson.h"
+//#include "CLHEP/Random/RandFlat.h"
 
 
 using std::cout;
@@ -133,7 +133,6 @@ CbmMvdDigitiser::CbmMvdDigitiser()
 {
     fMode          = 0;
     fBranchName    = "MVDPoint";
-    fDigis         = new TClonesArray("CbmMvdDigi");
     fPixelCharge   = new TClonesArray("CbmMvdPixelCharge");
     fPileupManager = NULL;
     fDeltaManager  = NULL;
@@ -249,18 +248,18 @@ Int_t CbmMvdDigitiser::BuildEvent() {
 
 
   // Some frequently used variables
-  CbmMvdPoint*   point   = NULL;
-  CbmMvdStation* station = NULL;
-  Int_t          volId   = -1;
+  CbmMvdPoint*   point    = NULL;
+  CbmMvdStation* station  = NULL;
+  Int_t          iStation = 0;
 
 
   // ----- First treat standard input file
   for (Int_t i=0; i<fInputPoints->GetEntriesFast(); i++) {
     point = (CbmMvdPoint*) fInputPoints->At(i);
-    volId = point->GetDetectorID();
-    if ( fStationMap.find(volId) == fStationMap.end() ) 
-      Fatal("BuildEvent", "Volume not found");
-    fStationMap[volId]->AddPoint(point);
+    iStation = point->GetStationNr();
+    if ( fStationMap.find(iStation) == fStationMap.end() ) 
+      Fatal("BuildEvent", "Station not found");
+    fStationMap[iStation]->AddPoint(point);
     nOrig++;
   }
 
@@ -286,10 +285,10 @@ Int_t CbmMvdDigitiser::BuildEvent() {
       // Add points from this event to the input arrays
       for (Int_t iPoint=0; iPoint<points->GetEntriesFast(); iPoint++) {
 	point = (CbmMvdPoint*) points->At(iPoint);
-	volId = point->GetDetectorID();
-	if ( fStationMap.find(volId) == fStationMap.end() ) 
-	  Fatal("BuildEvent", "Volume not found");
-	fStationMap[volId]->AddPoint(point);
+	iStation = point->GetStationNr();
+	if ( fStationMap.find(iStation) == fStationMap.end() ) 
+	  Fatal("BuildEvent", "Station not found");
+	fStationMap[iStation]->AddPoint(point);
 	nPile++;
       }
 	
@@ -319,10 +318,10 @@ Int_t CbmMvdDigitiser::BuildEvent() {
       // Add points from this event to the input arrays
       for (Int_t iPoint=0; iPoint<pointsD->GetEntriesFast(); iPoint++) {
 	point = (CbmMvdPoint*) pointsD->At(iPoint);
-	volId = point->GetDetectorID();
-	if ( fStationMap.find(volId) == fStationMap.end() ) 
-	  Fatal("BuildEvent", "Volume not found");
-	fStationMap[volId]->AddPoint(point);
+	iStation = point->GetStationNr();
+	if ( fStationMap.find(iStation) == fStationMap.end() ) 
+	  Fatal("BuildEvent", "Station not found");
+	fStationMap[iStation]->AddPoint(point);
 	nElec++;
       }
 
@@ -402,7 +401,7 @@ void CbmMvdDigitiser::Exec(Option_t* opt) {
 	    {
 		Int_t nDigis = fDigis->GetEntriesFast();
 		new ((*fDigis)[nDigis])
-		    CbmMvdDigi(station->GetVolumeId(),
+		    CbmMvdDigi(station->GetStationNr(),
 			       pixel->GetX(), pixel->GetY(),
 			       pixel->GetCharge(),
 			       fPixelSizeX, fPixelSizeY,
@@ -414,17 +413,12 @@ void CbmMvdDigitiser::Exec(Option_t* opt) {
 	//------------------------------------------------------------------------------
 
     }//loop on mvd stations
+ 
+       
+    cout << "-I- " << GetName() << " Event " << fEvent << ", MvdPoints " 
+         << nPoints << ", MvdDigis " << fDigis->GetEntriesFast() << endl;
 
-    cout << "\n---------------------------------------------------------------------------" << endl;
-    cout << "-I- " << GetName() <<" ******   Event Nr: " << fEvent << "  ******" << endl;
-    cout << "---------------------------------------------------------------------------" << endl;
-    cout << "-I- " << GetName() <<": Event Nr: " << fEvent << " --- nPoints --- " << nPoints << endl;
-    cout << "-I- " << GetName() <<": Number of Digis: " << fDigis->GetEntriesFast() <<"\n"<< endl;
-
-
-
-}// end of exec
-
+}
 // -------------------------------------------------------------------------
 
 
@@ -773,6 +767,7 @@ Int_t CbmMvdDigitiser::GetMvdGeometry() {
   cout << "-I- " << GetName() << " : Reading MVD geometry..." << endl;
   Int_t iStation =  1;
   Int_t volId    = -1;
+  fStationMap.clear();
   
   do {
 
@@ -802,20 +797,19 @@ Int_t CbmMvdDigitiser::GetMvdGeometry() {
       Double_t global[3];                // Global centre of volume
       gGeoManager->LocalToMaster(local, global);
       Double_t z = global[2];
-
-
+      
       // Check for already existing station with the same ID
       // (Just in case, one never knows...)
-      if ( fStationMap.find(volId) != fStationMap.end() ) {
-	cout << "-E- " << GetName() << "::GetMvdGeometry: " 
-	     << "Volume ID " << volId << " already in map!" << endl;
-	Fatal("GetMvdGeometry", "Double volume ID in TGeoManager!");
+      if ( fStationMap.find(iStation) != fStationMap.end() ) {
+        cout << "-E- " << GetName() << "::GetMvdGeometry: " 
+             << "Station " << iStation << " already in map!" << endl;
+        Fatal("GetMvdGeometry", "Double station number in TGeoManager!");
       }
 
       // Create new CbmMvdStation and add it to the map
-      fStationMap[volId] = new CbmMvdStation(volName.Data(), volId, 
-					     z, d, rmin, rmax);
-      fStationMap[volId]->Print();
+      fStationMap[iStation] = new CbmMvdStation(volName.Data(), iStation, volId, 
+				       	        z, d, rmin, rmax);
+      fStationMap[iStation]->Print();
       
       iStation++;
 
@@ -874,47 +868,51 @@ void CbmMvdDigitiser::SetParContainers() {
 // -----    Virtual private method Init   ----------------------------------
 InitStatus CbmMvdDigitiser::Init() {
 
-  // *****  Get MVD geometry
-  Int_t nStations = GetMvdGeometry();
-  if ( ! nStations ) {
-    cout << "-W- " << GetName() << "::Init: No MVD stations in geometry!"
-	 << endl << "   Task will be inactive!" << endl;
-    fActive = kFALSE;
-  }
+  cout << endl;
+  cout << "---------------------------------------------" << endl;
+  cout << "-I- Initialising " << GetName() << " ...." << endl; 
 
   
-  // ************* Get input array
-  
+  // **********  RootManager
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) {
     cout << "-E- " << GetName() << "::Init: No FairRootManager!" << endl;
     return kFATAL;
   }
+
+  // **********  Get input arrays
   fInputPoints = (TClonesArray*) ioman->GetObject(fBranchName);
   fMCTracks    = (TClonesArray*) ioman->GetObject("MCTrack");
   
   
-  Register(); // Register output arrays
+  // **********  Register output array
+  fDigis = new TClonesArray("CbmMvdDigi", 10000);
+  ioman->Register("MVDDigi", "MVDRawData", fDigis, kTRUE);
+  
+  
+  // **********  Get MVD geometry
+  Int_t nStations = GetMvdGeometry();
+  if ( ! nStations ) {
+    cout << "-W- " << GetName() << "::Init: No MVD stations in geometry!"
+	 << endl << "   Task will be inactive!" << endl;
+    return kERROR;
+  }
 
 
-
-  // ************** Check for too many pileup events
-
+  // ********** Check for too many pileup / delta events
   if (fNPileup > 200) {
-      cout << "-E- CbmMvdDigitiser::Init:  Pileup of " << fNPileup
+      cout << "-E- " << GetName() << "::Init:  Pileup of " << fNPileup
 	  << " too large; maximum buffer size is 1000 events." << endl;
       return kERROR;
   }
-
   if (fNDeltaElect > 20000) {
-      cout << "-E- CbmMvdDigitiser::Init:  Delta Pileup of " << fNPileup
+      cout << "-E- " << GetName() << "::Init:  Delta Pileup of " << fNPileup
 	  << " too large; maximum buffer size is 100000 events." << endl;
       return kERROR;
   }
 
 
-  // Create BgManager(s) if necessary
-
+  // **********  Create pileup manager if necessary
   if (fNPileup >= 1 && !(fPileupManager) && fMode == 0 ) {
       if ( fBgFileName == "" ) {
 	  cout << "-E- " << GetName() << "::Init: Pileup events needed, but no "
@@ -925,8 +923,7 @@ InitStatus CbmMvdDigitiser::Init() {
 					       fBranchName, fBgBufferSize);
   }
 
-  // Create Manager for Delta electron file
-
+  // **********   Create delta electron manager if required
   if (fNDeltaElect >= 1 && !(fDeltaManager) && fMode == 0 ) {
       if ( fDeltaFileName == "" ) {
 	  cout << "-E- " << GetName() << "::Init: Pileup events needed, but no "
@@ -937,17 +934,13 @@ InitStatus CbmMvdDigitiser::Init() {
 					      fBranchName, fDeltaBufferSize);
   }
 
-
-
-
   // Screen output
-  cout << endl << "---------------------------------------------" << endl;
   cout << GetName() << " initialised with parameters: " << endl;
   PrintParameters();
   cout << "---------------------------------------------" << endl;
-
-
-
+  
+  
+  return kSUCCESS;
 }
 // -------------------------------------------------------------------------
 
@@ -955,7 +948,15 @@ InitStatus CbmMvdDigitiser::Init() {
 
 // -----   Virtual public method Reinit   ----------------------------------
 InitStatus CbmMvdDigitiser::ReInit() {
-   return Init();
+
+  // **********  Get MVD geometry
+  Int_t nStations = GetMvdGeometry();
+  if ( ! nStations ) {
+    cout << "-W- " << GetName() << "::ReInit: No MVD stations in geometry!"
+	 << endl << "   Task will be inactive!" << endl;
+    return kERROR;
+  }
+   return kSUCCESS;
 }
 // -------------------------------------------------------------------------
 
@@ -991,23 +992,9 @@ void CbmMvdDigitiser::Finish() {
 // -------------------------------------------------------------------------
 
 
-
-// -----   Private method Register   ---------------------------------------
-void CbmMvdDigitiser::Register() {
-  FairRootManager* ioman = FairRootManager::Instance();
-  if ( ! ioman) Fatal("Register",
-		      "No FairRootManager");
-  ioman->Register("CbmMvdRaw", "MVDRawData", fDigis, kTRUE);
-
-}
-// -------------------------------------------------------------------------  
-
-
-
 // -----   Private method Reset   ------------------------------------------
 void CbmMvdDigitiser::Reset() {
     fDigis->Clear("C");
-
 }
 // -------------------------------------------------------------------------  
 

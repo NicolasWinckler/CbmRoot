@@ -10,13 +10,14 @@
 
 #include "CbmDetectorList.h"
 #include "CbmDigi.h"
+#include "CbmMvdDetectorId.h"
 
 #include "TObject.h"
 #include "TMath.h"
 #include "TVector3.h"
 
 
-class CbmMvdDigi : public CbmDigi
+class CbmMvdDigi : public CbmDigi, public CbmMvdDetectorId
 {
 
 public:
@@ -47,7 +48,8 @@ public:
     Int_t    GetFlag(){return fDigiFlag;}
     Float_t  GetDominatorX(){return fDominatingPointX;}
     Float_t  GetDominatorY(){return fDominatingPointY;}
-
+    Int_t    GetStationNr() { return StationNr(fDetectorId); }
+ 
 
     /** Modifiers **/
     void SetCharge(Int_t charge) { fCharge     = charge; };

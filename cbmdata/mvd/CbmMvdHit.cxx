@@ -24,7 +24,7 @@ CbmMvdHit::CbmMvdHit() {
 CbmMvdHit::CbmMvdHit(Int_t statNr, TVector3& pos, TVector3& dpos, 
 		     Int_t flag) 
   : CbmHit(0, pos, dpos, 0., -1) {
-  fDetectorID = (statNr << 16) | (1<<24);
+  fDetectorID = DetectorId(statNr);
   fFlag = flag;
 }
 // -------------------------------------------------------------------------

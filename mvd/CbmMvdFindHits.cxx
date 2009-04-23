@@ -70,7 +70,7 @@ CbmMvdFindHits::CbmMvdFindHits()
     fHits       = new TClonesArray("CbmMvdHit");
     fClusters   = new TClonesArray("CbmMvdCluster");
     fMatches    = new TClonesArray("CbmMvdHitMatch"); //testing purposes
-    fBranchName = "CbmMvdRaw";
+    fBranchName = "MVDDigi";
 
     fAddNoise = kFALSE;
 
@@ -107,7 +107,7 @@ CbmMvdFindHits::CbmMvdFindHits(const char* name, Int_t iMode,
     fHits       = new TClonesArray("CbmMvdHit");
     fClusters   = new TClonesArray("CbmMvdCluster");
     fMatches    = new TClonesArray("CbmMvdHitMatch"); //testing purposes
-    fBranchName = "CbmMvdRaw";
+    fBranchName = "MVDDigi";
 
     fAddNoise = kFALSE;
 
@@ -158,6 +158,10 @@ CbmMvdFindHits::~CbmMvdFindHits() {
 // -----    Virtual private method Init   ----------------------------------
 InitStatus CbmMvdFindHits::Init() {
 
+  cout << endl;
+  cout << "---------------------------------------------" << endl;
+  cout << "-I- Initialising " << GetName() << " ...." << endl; 
+
     //11.12.08 cdritsa: start: copy Volker's code to parametrise mvd-geometry
     // *****  Get MVD geometry
     Int_t nStations = GetMvdGeometry();
@@ -176,8 +180,9 @@ InitStatus CbmMvdFindHits::Init() {
 	return kFATAL;
     }
 
-    fDigis = (TClonesArray*) ioman->GetObject("CbmMvdRaw");
+    fDigis = (TClonesArray*) ioman->GetObject(fBranchName);
     Register();
+  cout << "---------------------------------------------" << endl;
 }
 // -------------------------------------------------------------------------
 
@@ -303,7 +308,7 @@ void CbmMvdFindHits::Exec(Option_t* opt) {
 	    CbmMvdDigi* digi = (CbmMvdDigi*) fDigis->At(k);
 
 	    // test if station is correct and apply fNeighThreshold
-	    if( digi->GetDetectorId()!= station->GetVolumeId() ){ continue; }
+	    if( digi->GetStationNr() != station->GetStationNr() ){ continue; }
 	    if( digi->GetAdcCharge(fAdcDynamic, fAdcOffset, fAdcBits) < fNeighThreshold ) continue;
 
 	    pair<Int_t, Int_t> a (digi->GetPixelX(),digi->GetPixelY());
@@ -319,7 +324,7 @@ void CbmMvdFindHits::Exec(Option_t* opt) {
 
 	    digi = (CbmMvdDigi*) fDigis->At(iDigi);
 
-	    if ( digi->GetDetectorId() != station->GetVolumeId() ) { continue; }
+	    if ( digi->GetStationNr() != station->GetStationNr() ) { continue; }
 
 
 	    /*
@@ -367,7 +372,7 @@ void CbmMvdFindHits::Exec(Option_t* opt) {
 
                	// Save hit into array
 		Int_t nHits = fHits->GetEntriesFast();
-		new ((*fHits)[nHits]) CbmMvdHit(station->GetVolumeId(), pos, dpos, 0);
+		new ((*fHits)[nHits]) CbmMvdHit(station->GetStationNr(), pos, dpos, 0);
                 new ((*fMatches)[nHits]) CbmMvdHitMatch(0, 0, 0, 0, 0);
 
 
@@ -383,7 +388,6 @@ void CbmMvdFindHits::Exec(Option_t* opt) {
 
     delete pixelUsed;
     delete clusterArray;
-    fDigis->Delete();
 }
 
 
@@ -438,16 +442,16 @@ Int_t CbmMvdFindHits::GetMvdGeometry() {
 
       // Check for already existing station with the same ID
       // (Just in case, one never knows...)
-      if ( fStationMap.find(volId) != fStationMap.end() ) {
+      if ( fStationMap.find(iStation) != fStationMap.end() ) {
 	cout << "-E- " << GetName() << "::GetMvdGeometry: " 
-	     << "Volume ID " << volId << " already in map!" << endl;
+	     << "Station " << volId << " already in map!" << endl;
 	Fatal("GetMvdGeometry", "Double volume ID in TGeoManager!");
       }
 
       // Create new CbmMvdStation and add it to the map
-      fStationMap[volId] = new CbmMvdStation(volName.Data(), volId, 
-					     z, d, rmin, rmax);
-      fStationMap[volId]->Print();
+      fStationMap[iStation] = new CbmMvdStation(volName.Data(), iStation, volId, 
+			 		        z, d, rmin, rmax);
+      fStationMap[iStation]->Print();
       
       iStation++;
 

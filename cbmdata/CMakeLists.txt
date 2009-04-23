@@ -37,11 +37,12 @@ much/CbmMuchDigiMatch.cxx
 much/CbmMuchTrack.cxx 
 much/CbmMuchTrackMatch.cxx
 
+mvd/CbmMvdDetectorId.cxx
+mvd/CbmMvdCluster.cxx 
+mvd/CbmMvdDigi.cxx  
 mvd/CbmMvdHit.cxx 
 mvd/CbmMvdHitMatch.cxx 
 mvd/CbmMvdPoint.cxx
-mvd/CbmMvdDigi.cxx  
-mvd/CbmMvdCluster.cxx 
 
 rich/CbmRichRing.cxx	
 rich/CbmRichHit.cxx 

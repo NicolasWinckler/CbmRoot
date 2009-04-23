@@ -20,10 +20,11 @@
 
 
 #include "CbmHit.h"
+#include "CbmMvdDetectorId.h"
 
 #include "TVector3.h"
 
-class CbmMvdHit : public CbmHit 
+class CbmMvdHit : public CbmHit, public CbmMvdDetectorId 
 {
 
  public:    
@@ -45,15 +46,13 @@ class CbmMvdHit : public CbmHit
   virtual ~CbmMvdHit();    
 
 
-  /** Output to screen (not yet implemented) **/
+  /** Output to screen **/
   virtual void Print(const Option_t* opt = 0) const;
 
 
   /** Accessors **/
-  Int_t GetSystemId()  const { 
-    return ( ( fDetectorID & (15<<24) ) >> 24 ); }
-  virtual Int_t GetStationNr() const { 
-    return ( fDetectorID & (255<<16) ) >> 16; }
+  Int_t GetSystemId()  const { return SystemId(fDetectorID); }
+  virtual Int_t GetStationNr() const { return StationNr(fDetectorID); }
   Int_t GetFlag()      const { return fFlag; }; 
 
   

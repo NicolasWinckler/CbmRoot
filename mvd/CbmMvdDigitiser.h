@@ -163,7 +163,7 @@ private:
   Int_t    fBgBufferSize;
 
 
-  /** Map of MC Volume Id to MvdStation **/
+  /** Map from station number to MvdStation **/
   std::map<Int_t, CbmMvdStation*> fStationMap;                  //!   
  
 

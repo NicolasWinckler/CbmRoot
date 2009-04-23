@@ -19,11 +19,12 @@
 #define CBMMVDPOINT_H 1
 
 #include "FairMCPoint.h"
+#include "CbmMvdDetectorId.h"
 
 #include "TObject.h"
 #include "TVector3.h"
 
-class CbmMvdPoint : public FairMCPoint 
+class CbmMvdPoint : public FairMCPoint, CbmMvdDetectorId
 {
 
  public:
@@ -33,16 +34,16 @@ class CbmMvdPoint : public FairMCPoint
 
 
   /** Constructor with arguments
-   *@param trackId  Index of MCTrack
-   *@param pdgCode  Particle type (PDG code)
-   *@param detId    Detector ID
-   *@param posIn    Ccoordinates at entrance to active volume [cm]
-   *@param posOut   Coordinates at exit of active volume [cm]
-   *@param momIn    Momentum of track at entrance [GeV]
-   *@param momOut   Momentum of track at exit [GeV]
-   *@param tof      Time since event start [ns]
-   *@param length   Track length since creation [cm]
-   *@param eLoss    Energy deposit [GeV]
+   *@param trackId    Index of MCTrack
+   *@param pdgCode    Particle type (PDG code)
+   *@param stationNr  Station number
+   *@param posIn      Coordinates at entrance to active volume [cm]
+   *@param posOut     Coordinates at exit of active volume [cm]
+   *@param momIn      Momentum of track at entrance [GeV]
+   *@param momOut     Momentum of track at exit [GeV]
+   *@param tof        Time since event start [ns]
+   *@param length     Track length since creation [cm]
+   *@param eLoss      Energy deposit [GeV]
    **/
   CbmMvdPoint(Int_t trackId, Int_t pdgCode, Int_t detId, TVector3 posIn, 
 	      TVector3 posOut, TVector3 momIn, TVector3 momOut,
@@ -58,13 +59,15 @@ class CbmMvdPoint : public FairMCPoint
 
 
   /** Accessors **/
-  Double_t GetXOut()  const { return fX_out; }
-  Double_t GetYOut()  const { return fY_out; }
-  Double_t GetZOut()  const { return fZ_out; }
-  Double_t GetPxOut() const { return fPx_out; }
-  Double_t GetPyOut() const { return fPy_out; }
-  Double_t GetPzOut() const { return fPz_out; }
-  Int_t GetPdgCode() const {return fPdgCode;}
+  Double_t GetXOut()   const { return fX_out; }
+  Double_t GetYOut()   const { return fY_out; }
+  Double_t GetZOut()   const { return fZ_out; }
+  Double_t GetPxOut()  const { return fPx_out; }
+  Double_t GetPyOut()  const { return fPy_out; }
+  Double_t GetPzOut()  const { return fPz_out; }
+  Int_t GetPdgCode()   const {return fPdgCode;}
+  Int_t GetSystemId()  const { return SystemId(fDetectorID); }
+  Int_t GetStationNr() const { return StationNr(fDetectorID); }
   void PositionOut(TVector3& pos) { pos.SetXYZ(fX_out,fY_out,fZ_out); }
   void MomentumOut(TVector3& mom) { mom.SetXYZ(fPx_out,fPy_out,fPz_out); }
 

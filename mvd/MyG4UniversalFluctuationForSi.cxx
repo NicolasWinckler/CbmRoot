@@ -49,6 +49,7 @@
 #include "CLHEP/Random/RandFlat.h"
 #include <cmath>
 #include <iostream>
+#include "TRandom.h"
 using std::cout;
 using std::endl;
 namespace CLHEP{}    // declare namespace CLHEP for backward compatibility
@@ -133,7 +134,8 @@ double MyG4UniversalFluctuationForSi::SampleFluctuations(const double momentum,
     siga = sqrt(siga);
     do {
      //loss = G4RandGauss::shoot(meanLoss,siga);
-     loss = RandGaussQ::shoot(meanLoss,siga);
+     loss = gRandom->Gaus(meanLoss, siga);
+//     loss = RandGaussQ::shoot(meanLoss,siga);
     } while (loss < 0. || loss > 2.*meanLoss);
 
     return loss;

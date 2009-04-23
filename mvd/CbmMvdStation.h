@@ -39,13 +39,14 @@ class CbmMvdStation : public TNamed
 
   /** Standard constructor 
   *@param name      Volume name of station
+  *@param stationNr Station number
   *@param volumeId  Unique volume identifier 
   *@param z         z position of station centre [cm]
   *@param d         thickness of station [cm]
   *@param rmin      Inner radius [cm]
   *@param rmax      Outer radius [cm]
   **/
-  CbmMvdStation(const char* name, Int_t volumeId,
+  CbmMvdStation(const char* name, Int_t stationNr, Int_t volumeId,
 		Double_t z, Double_t d, Double_t rmin, Double_t rmax);
 
 
@@ -54,6 +55,7 @@ class CbmMvdStation : public TNamed
 
 
   /** Accessors **/
+  Int_t    GetStationNr()  const { return fStationNr; }
   Int_t    GetVolumeId()   const { return fVolumeId; }
   Double_t GetZ()          const { return fZ; }
   Double_t GetD()          const { return fD; }
@@ -78,7 +80,8 @@ class CbmMvdStation : public TNamed
 
  protected:
 
-  Int_t        fVolumeId;         // Unique volume ID
+  Int_t        fStationNr;        // Station identifier
+  Int_t        fVolumeId;         // MC unique volume ID
   Double32_t   fZ;                // z position of station centre [cm]
   Double32_t   fD;                // Thickness of station
   Double32_t   fRmin;             // Inner radius [cm]

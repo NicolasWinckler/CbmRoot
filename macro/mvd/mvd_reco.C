@@ -2,10 +2,11 @@
 //
 // Macro for local MVD reconstruction from MC data
 //
-// Tasks:  CbmMvdHitProducer
+// Tasks:  CbmMvdDigitiser
+//         CbmMvdFindHits
 // 
 //
-// V. Friese   06/02/2007
+// V. Friese   23/04/2009
 //
 // --------------------------------------------------------------------------
 
@@ -29,7 +30,7 @@
   TString parFile = "data/params.root";
  
   // Number of events to process
-  Int_t nEvents = 10;
+  Int_t nEvents = 3;
 
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;
@@ -56,11 +57,13 @@
   gSystem->Load("libGeoBase");
   gSystem->Load("libParBase");
   gSystem->Load("libBase");
-  gSystem->Load("libMCStack");
+  gSystem->Load("libCbmBase");
+  gSystem->Load("libCbmData");
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
   gSystem->Load("libMvd");
+  gSystem->Load("libCLHEP");
   // ------------------------------------------------------------------------
 
 
@@ -72,13 +75,19 @@
   // ------------------------------------------------------------------------
   
   
-  // -----   MVD Hitproducer   ----------------------------------------------
-  CbmMvdHitProducer* hitProd = new CbmMvdHitProducer("MVDHitProducer", 0, 
-  						     iVerbose);
-  fRun->AddTask(hitProd);
+  // -----   MVD Digitiser   ------------------------------------------------
+  FairTask* mvdDigitise = new CbmMvdDigitiser("MVD Digitiser", 0, iVerbose);
+  fRun->AddTask(mvdDigitise);
   // ------------------------------------------------------------------------
 
+  
+  // -----   MVD Hit Finder   -----------------------------------------------
+  FairTask* mvdFindHits = new CbmMvdFindHits("MVD Hit Finder", 0, iVerbose);
+  fRun->AddTask(mvdFindHits);
+  // ------------------------------------------------------------------------
+  
 
+  
   // -----  Parameter database   --------------------------------------------
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo*  parIo = new FairParRootFileIo();
@@ -92,6 +101,7 @@
 
  
   // -----   Run initialisation   -------------------------------------------
+  fRun->LoadGeometry();
   fRun->Init();
   // ------------------------------------------------------------------------
 

@@ -41,7 +41,7 @@ CbmMvdDigi::CbmMvdDigi(Int_t iStation, Int_t iChannelNrX, Int_t iChannelNrY, Int
 	Fatal("", "Illegal station number");
     }
 
-    fDetectorId = iStation;
+    fDetectorId = DetectorId(iStation);
     fChannelNrY = iChannelNrY;
     fCharge  = charge;
     fChannelNrX=iChannelNrX;

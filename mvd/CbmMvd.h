@@ -15,10 +15,14 @@
 #define CBMMVD_H 1
 
 
-#include "FairDetector.h"
+
+#include <map>
 
 #include "TLorentzVector.h"
 #include "TVector3.h"
+
+#include "FairDetector.h"
+
 
 class TClonesArray;
 class TList;
@@ -133,12 +137,13 @@ class CbmMvd : public FairDetector
     TClonesArray*  fCollection;        //!  The hit collection
     Bool_t         kGeoSaved;          //!
     TList*         fGeoPar;            //!  List of geometry parameters
+    std::map<Int_t, Int_t> fStationMap;  //! Map from MC volume ID to station number
 
     /** Private method AddHit
      **
      ** Adds a MvdPoint to the HitCollection
      **/
-    CbmMvdPoint* AddHit(Int_t trackID, Int_t pdg, Int_t detID, 
+    CbmMvdPoint* AddHit(Int_t trackID, Int_t pdg, Int_t stationNr, 
 			TVector3 posIn, TVector3 pos_out, 
 			TVector3 momIn, TVector3 momOut, 
 			Double_t time, Double_t length, Double_t eLoss);

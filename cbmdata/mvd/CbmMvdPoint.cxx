@@ -21,11 +21,11 @@ CbmMvdPoint::CbmMvdPoint() : FairMCPoint() {
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmMvdPoint::CbmMvdPoint(Int_t trackID, Int_t pdgCode, Int_t detID, 
+CbmMvdPoint::CbmMvdPoint(Int_t trackID, Int_t pdgCode, Int_t stationNr, 
 			 TVector3 posIn, TVector3 posOut, TVector3 momIn, 
 			 TVector3 momOut, Double_t tof, Double_t length, 
 			 Double_t eLoss) 
-  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
+  : FairMCPoint(trackID, stationNr, posIn, momIn, tof, length, eLoss) {
   fX_out   = posOut.X();
   fY_out   = posOut.Y();
   fZ_out   = posOut.Z();
@@ -33,6 +33,7 @@ CbmMvdPoint::CbmMvdPoint(Int_t trackID, Int_t pdgCode, Int_t detID,
   fPy_out  = momOut.Py();
   fPz_out  = momOut.Pz();
   fPdgCode = pdgCode;
+  fDetectorID = DetectorId(stationNr);
 }
 // -------------------------------------------------------------------------
 
@@ -48,7 +49,7 @@ CbmMvdPoint::~CbmMvdPoint() { }
 // -----   Public method Print   -------------------------------------------
 void CbmMvdPoint::Print(const Option_t* opt) const {
   cout << "-I- CbmMvdPoint: MVD Point for track " << fTrackID 
-       << " in detector " << fDetectorID << endl;
+       << " in station " << GetStationNr() << endl;
   cout << "    Position (" << fX << ", " << fY << ", " << fZ
        << ") cm" << endl;
   cout << "    Momentum (" << fPx << ", " << fPy << ", " << fPz

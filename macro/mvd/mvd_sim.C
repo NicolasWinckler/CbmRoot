@@ -16,7 +16,7 @@
   TString inFile  = inDir + "/input/urqmd.ftn14";
   
   // Number of events
-  Int_t   nEvents = 10;
+  Int_t   nEvents = 3;
 
   // Output file name
   TString outFile = "data/mvd.mc.root";

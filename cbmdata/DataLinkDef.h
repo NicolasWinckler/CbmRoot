@@ -25,11 +25,12 @@
 #pragma link C++ class CbmMuchTrack+;
 #pragma link C++ class CbmMuchTrackMatch+;
 
+#pragma link C++ class CbmMvdCluster+;
+#pragma link C++ class CbmMvdDetectorId+;
+#pragma link C++ class CbmMvdDigi+;
 #pragma link C++ class CbmMvdHit+;
 #pragma link C++ class CbmMvdHitMatch+;
 #pragma link C++ class CbmMvdPoint+;
-#pragma link C++ class CbmMvdDigi+;
-#pragma link C++ class CbmMvdCluster+;
 
 #pragma link C++ class CbmRichPoint+;
 #pragma link C++ class CbmRichHit+;

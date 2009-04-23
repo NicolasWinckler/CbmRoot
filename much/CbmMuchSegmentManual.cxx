@@ -41,8 +41,8 @@ CbmMuchSegmentManual::~CbmMuchSegmentManual() {
 
 // -----   Public method SetNRegions  --------------------------------------
 void CbmMuchSegmentManual::SetNRegions(Int_t iStation, Int_t nRegions){
-//	if(iStation < 0 || iStation >= fStations->GetEntries())
-//		Fatal("SetNRegions", "iStation is out of range.");
+	//	if(iStation < 0 || iStation >= fStations->GetEntries())
+	//		Fatal("SetNRegions", "iStation is out of range.");
 	fNRegions[iStation] = nRegions;
 	fRadii[iStation].resize(nRegions);
 }
@@ -50,7 +50,7 @@ void CbmMuchSegmentManual::SetNRegions(Int_t iStation, Int_t nRegions){
 
 // -----   Public method SetRegionRadius  ----------------------------------
 void CbmMuchSegmentManual::SetRegionRadius(Int_t iStation, Int_t iRegion, Double_t radius){
-//	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
+	//	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
 	if(iRegion < 0 || iRegion >= fNRegions[iStation]) Fatal("SetRegionRadius", "iRegion is out of range.");
 	fRadii[iStation].at(iRegion) = radius;
 }
@@ -58,28 +58,28 @@ void CbmMuchSegmentManual::SetRegionRadius(Int_t iStation, Int_t iRegion, Double
 
 // -----   Public method SetMinSigmaX  -------------------------------------
 void CbmMuchSegmentManual::SetMinSigmaX(Int_t iStation, Double_t sigmaX){
-//	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
+	//	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
 	fSecLx[iStation].at(0) = fNCols[iStation]*TMath::Sqrt(12.)*sigmaX;
 }
 // -------------------------------------------------------------------------
 
 // -----   Public method SetMinSigmaY  -------------------------------------
 void CbmMuchSegmentManual::SetMinSigmaY(Int_t iStation, Double_t sigmaY){
-//	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
+	//	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
 	fSecLy[iStation].at(0) = fNRows[iStation]*TMath::Sqrt(12.)*sigmaY;
 }
 // -------------------------------------------------------------------------
 
 // -----   Public method SetMinPadLx   -------------------------------------
 void CbmMuchSegmentManual::SetMinPadLx(Int_t iStation, Double_t padLx){
-//	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
+	//	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
 	fSecLx[iStation].at(0) = fNCols[iStation]*padLx;
 }
 // -------------------------------------------------------------------------
 
 // -----   Public method SetMinPadLy   -------------------------------------
 void CbmMuchSegmentManual::SetMinPadLy(Int_t iStation, Double_t padLy){
-//	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
+	//	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
 	fSecLy[iStation].at(0) = fNRows[iStation]*padLy;
 }
 // -------------------------------------------------------------------------
@@ -101,49 +101,49 @@ InitStatus CbmMuchSegmentManual::Init(){
 
 	printf("Number of stations: %i\n", fStations->GetEntries());
 
-    // Define sector sizes for each region
-    for(Int_t iStation=0; iStation<fStations->GetEntries(); ++iStation){
+	// Define sector sizes for each region
+	for(Int_t iStation=0; iStation<fStations->GetEntries(); ++iStation){
 		CbmMuchStation* st = (CbmMuchStation*)fStations->At(iStation);
 		if (st->GetDetectorType()==2) continue;
 		CbmMuchStationGem* station = (CbmMuchStationGem*)st;
 
-    	// Default initialization if required
+		// Default initialization if required
 		if(fNChannels.find(iStation)==fNChannels.end()) fNChannels[iStation] = 128;
-    	if(fNRegions.find(iStation)==fNRegions.end()) fNRegions[iStation] = 1;
-    	if(fRadii.find(iStation)==fRadii.end()) {
-    		vector<Double_t> radii (1, station->GetRmax());
-    		fRadii[iStation] = radii;
-    	}
-    	if(fSecMinLx.find(iStation)==fSecMinLx.end()) fSecMinLx[iStation] = 6.4;
-    	if(fSecMinLy.find(iStation)==fSecMinLy.end()) fSecMinLy[iStation] = 6.4;
-    	if(fSecMaxLx.find(iStation)==fSecMaxLx.end()) fSecMaxLx[iStation] = 20;
-    	if(fSecMaxLy.find(iStation)==fSecMaxLy.end()) fSecMaxLy[iStation] = 20;
+		if(fNRegions.find(iStation)==fNRegions.end()) fNRegions[iStation] = 1;
+		if(fRadii.find(iStation)==fRadii.end()) {
+			vector<Double_t> radii (1, station->GetRmax());
+			fRadii[iStation] = radii;
+		}
+		if(fSecMinLx.find(iStation)==fSecMinLx.end()) fSecMinLx[iStation] = 6.4;
+		if(fSecMinLy.find(iStation)==fSecMinLy.end()) fSecMinLy[iStation] = 6.4;
+		if(fSecMaxLx.find(iStation)==fSecMaxLx.end()) fSecMaxLx[iStation] = 20;
+		if(fSecMaxLy.find(iStation)==fSecMaxLy.end()) fSecMaxLy[iStation] = 20;
 
-    	fSecLx[iStation].push_back(fSecMinLx[iStation]);
-    	fSecLy[iStation].push_back(fSecMinLy[iStation]);
-    	printf("Station %i:\n\tNumber of regions %i\n\tMin sector size %fx%f\n", iStation, fNRegions[iStation], fSecMinLx[iStation], fSecMinLy[iStation]);
-    	printf("\tRadius of the %i region %f\n", 0, fRadii[iStation].at(0));
-    	printf("\tSector size for %i region %fx%f\n", 0, fSecLx[iStation].at(0), fSecLx[iStation].at(0));
+		fSecLx[iStation].push_back(fSecMinLx[iStation]);
+		fSecLy[iStation].push_back(fSecMinLy[iStation]);
+		printf("Station %i:\n\tNumber of regions %i\n\tMin sector size %fx%f\n", iStation, fNRegions[iStation], fSecMinLx[iStation], fSecMinLy[iStation]);
+		printf("\tRadius of the %i region %f\n", 0, fRadii[iStation].at(0));
+		printf("\tSector size for %i region %fx%f\n", 0, fSecLx[iStation].at(0), fSecLx[iStation].at(0));
 		for(Int_t iRegion=1; iRegion<fNRegions[iStation]; ++iRegion){
 			Bool_t result = TMath::Abs(fSecLx[iStation].at(iRegion-1) - fSecLy[iStation].at(iRegion-1)) < 1e-5;
 			fSecLx[iStation].at(iRegion) = result ? fSecLx[iStation].at(iRegion-1)   : 2*fSecLx[iStation].at(iRegion-1);
 			fSecLy[iStation].at(iRegion) = result ? 2*fSecLy[iStation].at(iRegion-1) : fSecLy[iStation].at(iRegion-1);
-	    	printf("\tRadius of the %i region %f\n", iRegion, fRadii[iStation].at(iRegion));
-	    	printf("\tSector size for %i region %fx%f\n", iRegion, fSecLx[iStation].at(iRegion), fSecLy[iStation].at(iRegion));
+			printf("\tRadius of the %i region %f\n", iRegion, fRadii[iStation].at(iRegion));
+			printf("\tSector size for %i region %fx%f\n", iRegion, fSecLx[iStation].at(iRegion), fSecLy[iStation].at(iRegion));
 		}
 
-	    // Deal with channels more universally
+		// Deal with channels more universally
 		Int_t n = TMath::Log2(fNChannels[iStation]) + 1e-2;
 		Int_t nChannels = TMath::Power(2, n) + 1e-2;
 		if(nChannels != fNChannels[iStation]) Fatal("Init", "Number of channels should be equal to two with integer power.");
 		Int_t nPower = n/2;
 		fNCols[iStation] = TMath::Power(2, nPower);
 		fNRows[iStation] = n%2 != 0 ? TMath::Power(2, nPower+1) : fNCols[iStation];
-    }
+	}
 
-    // Segment MuCh
+	// Segment MuCh
 	SegmentMuch();
-    return kSUCCESS;
+	return kSUCCESS;
 }
 // -------------------------------------------------------------------------
 
@@ -213,10 +213,10 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModule* module, Bool_t useModule
 	Int_t iSector;
 	for(Int_t iCol=0; iCol<nCols; ++iCol){
 		secX = useModuleDesign ? modX + nX*((iCol + 0.5)*secMaxLx - modLx/2.)
-				               : secMaxLx*nCols/2. - (0.5 + iCol)*secMaxLx;
+				: secMaxLx*nCols/2. - (0.5 + iCol)*secMaxLx;
 		for(Int_t iRow=0; iRow<nRows; ++iRow){
 			secY = useModuleDesign ? modY + nY*((iRow + 0.5)*secMaxLy - modLy/2.)
-					               : secMaxLy*nRows/2. - (0.5 + iRow)*secMaxLy;
+					: secMaxLy*nRows/2. - (0.5 + iRow)*secMaxLy;
 			iSector = module->GetNSectors();
 			secSize.SetXYZ(secMaxLx, secMaxLy, modLz);
 			secPosition.SetXYZ(secX, secY, modZ);
@@ -224,15 +224,16 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModule* module, Bool_t useModule
 		}
 	}
 
+	// Process incomplete sectors
 	Int_t nPadRows, nPadCols;
 	Double_t ly = useModuleDesign ? modLy - secMaxLy*nRows : (modLy - secMaxLy*nRows)/2.;
 	if(ly > padMaxLy){
 		nPadRows = ly/padMaxLy;
 		secY = useModuleDesign ? modY + nY*(modLy/2. - ly/2.)
-				               : modLy/2. - ly/2.;
+				: modLy/2. - ly/2.;
 		for(Int_t iCol=0; iCol<nCols; ++iCol){
 			secX = useModuleDesign ? modX + nX*((iCol + 0.5)*secMaxLx - modLx/2.)
-					               : secMaxLx*nCols/2. - (0.5 + iCol)*secMaxLx;
+					: secMaxLx*nCols/2. - (0.5 + iCol)*secMaxLx;
 			iSector = module->GetNSectors();
 			secSize.SetXYZ(secMaxLx, ly, modLz);
 			secPosition.SetXYZ(secX, secY, modZ);
@@ -249,10 +250,10 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModule* module, Bool_t useModule
 	if(lx > padMaxLx){
 		nPadCols = lx/padMaxLx;
 		secX = useModuleDesign ? modX + nX*(modLx/2. - lx/2.)
-				               : modLx/2. - lx/2.;
+				: modLx/2. - lx/2.;
 		for(Int_t iRow=0; iRow<nRows; ++iRow){
 			secY = useModuleDesign ? modY + nY*((iRow + 0.5)*secMaxLy - modLy/2.)
-					               : secMaxLy*nRows/2. - (0.5 + iRow)*secMaxLy;
+					: secMaxLy*nRows/2. - (0.5 + iRow)*secMaxLy;
 			iSector = module->GetNSectors();
 			secSize.SetXYZ(lx, secMaxLy, modLz);
 			secPosition.SetXYZ(secX, secY, modZ);
@@ -270,6 +271,7 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModule* module, Bool_t useModule
 		nPadRows = ly/padMaxLy;
 		secX = modX + nX*(modLx/2. - lx/2.);
 		secY = modY + nY*(modLy/2. - ly/2.);
+		iSector = module->GetNSectors();
 		secSize.SetXYZ(lx, ly, modLz);
 		secPosition.SetXYZ(secX, secY, modZ);
 		CbmMuchSector* sector = new CbmMuchSector(detectorId, iSector, secPosition, secSize, nPadCols, nPadRows);
@@ -396,13 +398,13 @@ Bool_t CbmMuchSegmentManual::ShouldSegment(CbmMuchSector* sector, const TString 
 	Double_t R  = TMath::Min(uR, bR);   //(uR < bR) ? uR : bR;
 
 	Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
-//	CbmMuchStationGem* station = (CbmMuchStationGem*)fStations->At(iStation);
+	//	CbmMuchStationGem* station = (CbmMuchStationGem*)fStations->At(iStation);
 	// Check minimum and maximum allowed resolution
-//	Double_t sigmaMax = direction=="X" ? station->GetSigmaXmax() : station->GetSigmaYmax(); //[cm]
-//	Double_t sigmaMin = direction=="X" ? station->GetSigmaXmin() : station->GetSigmaYmin(); //[cm]
-//	Double_t sigma    = direction=="X" ? sector->GetSigmaX() : sector->GetSigmaY();
-//	if(sigma > sigmaMin && sigma/2. < sigmaMin) return false;
-//	if(sigma > sigmaMax) return true;
+	//	Double_t sigmaMax = direction=="X" ? station->GetSigmaXmax() : station->GetSigmaYmax(); //[cm]
+	//	Double_t sigmaMin = direction=="X" ? station->GetSigmaXmin() : station->GetSigmaYmin(); //[cm]
+	//	Double_t sigma    = direction=="X" ? sector->GetSigmaX() : sector->GetSigmaY();
+	//	if(sigma > sigmaMin && sigma/2. < sigmaMin) return false;
+	//	if(sigma > sigmaMax) return true;
 	Double_t secMaxL = direction=="X" ? fSecMaxLx[iStation] : fSecMaxLy[iStation];
 	Double_t secMinL = direction=="X" ? fSecMinLx[iStation] : fSecMinLy[iStation];
 	Double_t secL    = direction=="X" ? secLx : secLy;

@@ -73,6 +73,8 @@ class CbmMuchModule :
   CbmMuchSector* GetSector(Int_t iSector) const { return (CbmMuchSector*)fSectors.At(iSector); }
   /** Gets sector by the given numbers of column and row in the grid. **/
   CbmMuchSector* GetSector(Int_t iGridColumn, Int_t iGridRow);
+  /** Gets sector by the given coordinates in global c.s. */
+  CbmMuchSector* GetSector(Double_t x, Double_t y);
 
   /** Adds a given sector to the array.
   *@param  sector   CbmMuchSector which should be added to the array.**/

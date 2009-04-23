@@ -18,10 +18,10 @@
   //          Adjust this part according to your requirements
 
   // Input folder for the files
-  TString inputFolder  = "files";
+  TString inputFolder  = "data";
 
   // Input folder for the files
-  TString outputFolder = "files";
+  TString outputFolder = "data";
 
   // Collision system
   TString system       = "auau";
@@ -49,7 +49,7 @@
   TString digiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";
 
   // Number of events to process
-  Int_t nEvents        = 1;
+  Int_t nEvents        = 2;
 
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose       = 1;

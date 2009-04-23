@@ -18,10 +18,10 @@
   //          Adjust this part according to your requirements
 
   // Input folder for the files
-  TString inputFolder  = "files";
+  TString inputFolder  = "data";
 
   // Input folder for the files
-  TString outputFolder = "files";
+  TString outputFolder = "data";
 
   // Collision system
   TString system       = "auau";
@@ -45,10 +45,11 @@
   TString anaFile      = outputFolder + "/" + system + "." + beam + "." + trigger + ".ana.5.root";
 
   // Digitisation file
-  TString digiFile     = "sts_standard.digi.par";
+  //  TString digiFile     = "sts_standard.digi.par";
+  TString digiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";
 
   // Number of events to process
-  Int_t nEvents        = 5;
+  Int_t nEvents        = 1;
 
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose       = 1;
@@ -78,14 +79,14 @@
   timer.Start();
   // ------------------------------------------------------------------------
 
-  // -----   GEANE   initialization   ---------------------------------------
-  FairGeane* Geane            = new FairGeane(inFile);
-  // ------------------------------------------------------------------------
-
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun = new FairRunAna();
   fRun->SetInputFile(inFile);
   fRun->SetOutputFile(outFile);
+  // ------------------------------------------------------------------------
+
+  // -----   GEANE   initialization   ---------------------------------------
+  FairGeane* Geane            = new FairGeane(inFile);
   // ------------------------------------------------------------------------
 
   // -----  Parameter database   --------------------------------------------
@@ -146,6 +147,11 @@
   cout << "Parameter file is " << parFile << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
   cout << endl;
+
+  cout << " Test passed" << endl;
+  cout << " All ok " << endl;
+  exit(0);
+
   // ------------------------------------------------------------------------
 
 }

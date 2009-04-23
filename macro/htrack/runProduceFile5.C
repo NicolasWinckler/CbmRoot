@@ -14,7 +14,7 @@
   //          Adjust this part according to your requirements
 
   // Output folder for the files
-  TString folder      = "files";
+  TString folder      = "data";
 
   // Collision system
   TString system      = "auau";
@@ -44,18 +44,23 @@
 
   // Magnet geometry and field map
   TString magnetGeom  = "magnet_standard.geo";
-  TString fieldMap    = "FieldActive";
+  TString fieldMap    = "FieldMuonMagnet";
   Double_t fieldZ     = 50.;     // z position of field centre
   Double_t fieldScale = 1.;      // field scaling factor
 
   // STS geometry
-  TString stsGeom     = "sts_standard.geo";
+  //  TString stsGeom     = "sts_standard.geo";
+  TString stsGeom    = "sts_Standard_s3055AAFK5.SecD.geo";
 
 
   // In general, the following parts need not be touched
   // ========================================================================
 
   // -----   Input file name   ----------------------------------------------
+/*
+  TString inDir   = gSystem->Getenv("VMCWORKDIR");
+  TString inFile  = inDir + "/input/urqmd.ftn14";
+*/
   TString inFile      = "/d/cbm03/urqmd/" + system + "/" + beam + "/"
                       + trigger + "/urqmd." + system + "." + beam + "."
                       + trigger + ".0000.ftn14";
@@ -106,6 +111,8 @@
     CbmFieldMapSym3* magField = new CbmFieldMapSym3(fieldMap);
   else if ( fieldMap == "FieldAlligator" )
     CbmFieldMapSym2* magField = new CbmFieldMapSym2(fieldMap);
+  else if ( fieldMap == "FieldMuonMagnet" )
+    CbmFieldMapSym3* magField = new CbmFieldMapSym3(fieldMap);
   else {
     CbmField*        magField = NULL;
     cout << "===> ERROR: Field map " << fieldMap << " unknown! " << endl;
@@ -167,6 +174,11 @@
   cout << "Parameter file is " << parFile << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime
        << "s" << endl << endl;
+
+  cout << " Test passed" << endl;
+  cout << " All ok " << endl;
+  exit(0);
+
   // ------------------------------------------------------------------------
 
 }

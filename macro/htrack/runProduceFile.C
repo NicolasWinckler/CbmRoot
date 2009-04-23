@@ -14,7 +14,7 @@
   //          Adjust this part according to your requirements
 
   // Output folder for the files
-  TString folder      = "files";
+  TString folder      = "data";
 
   // Collision system
   TString system      = "auau";
@@ -25,7 +25,7 @@
   // Trigger (centrality)
   TString trigger     = "centr";
   // Number of events
-  Int_t   nEvents     = 1;
+  Int_t   nEvents     = 2;
 
   // Output file name
   TString outFile     = folder + "/" + system + "." + beam + "." + trigger + ".mc.root";

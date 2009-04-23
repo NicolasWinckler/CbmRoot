@@ -133,12 +133,12 @@ InitStatus CbmMuchSegmentManual::Init(){
 		}
 
 		// Deal with channels more universally
-		Int_t n = TMath::Log2(fNChannels[iStation]) + 1e-2;
-		Int_t nChannels = TMath::Power(2, n) + 1e-2;
+		Int_t n = (Int_t)(TMath::Log2(fNChannels[iStation]) + 1e-2);
+		Int_t nChannels = (Int_t)(TMath::Power(2, n) + 1e-2);
 		if(nChannels != fNChannels[iStation]) Fatal("Init", "Number of channels should be equal to two with integer power.");
 		Int_t nPower = n/2;
-		fNCols[iStation] = TMath::Power(2, nPower);
-		fNRows[iStation] = n%2 != 0 ? TMath::Power(2, nPower+1) : fNCols[iStation];
+		fNCols[iStation] = (Int_t)TMath::Power(2, nPower);
+		fNRows[iStation] = n%2 != 0 ? (Int_t)TMath::Power(2, nPower+1) : fNCols[iStation];
 	}
 
 	// Segment MuCh
@@ -203,8 +203,8 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModule* module, Bool_t useModule
 	Int_t iStation = CbmMuchGeoScheme::GetStationIndex(detectorId);
 	CbmMuchStationGem* station = (CbmMuchStationGem*)fStations->At(iStation);
 
-	Int_t nCols = modLx/secMaxLx;
-	Int_t nRows = modLy/secMaxLy;
+	Int_t nCols = (Int_t)(modLx/secMaxLx);
+	Int_t nRows = (Int_t)(modLy/secMaxLy);
 	Int_t nX = modX < 0 ? -1 : 1;
 	Int_t nY = modY < 0 ? -1 : 1;
 
@@ -228,7 +228,7 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModule* module, Bool_t useModule
 	Int_t nPadRows, nPadCols;
 	Double_t ly = useModuleDesign ? modLy - secMaxLy*nRows : (modLy - secMaxLy*nRows)/2.;
 	if(ly > padMaxLy){
-		nPadRows = ly/padMaxLy;
+		nPadRows = (Int_t)(ly/padMaxLy);
 		secY = useModuleDesign ? modY + nY*(modLy/2. - ly/2.)
 				: modLy/2. - ly/2.;
 		for(Int_t iCol=0; iCol<nCols; ++iCol){
@@ -248,7 +248,7 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModule* module, Bool_t useModule
 
 	Double_t lx = useModuleDesign ? modLx - secMaxLx*nCols : (modLx - secMaxLx*nCols)/2.;
 	if(lx > padMaxLx){
-		nPadCols = lx/padMaxLx;
+		nPadCols = (Int_t)(lx/padMaxLx);
 		secX = useModuleDesign ? modX + nX*(modLx/2. - lx/2.)
 				: modLx/2. - lx/2.;
 		for(Int_t iRow=0; iRow<nRows; ++iRow){
@@ -267,8 +267,8 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModule* module, Bool_t useModule
 	}
 
 	if(lx > padMaxLx && ly > padMaxLy){
-		nPadCols = lx/padMaxLx;
-		nPadRows = ly/padMaxLy;
+		nPadCols = (Int_t)(lx/padMaxLx);
+		nPadRows = (Int_t)(ly/padMaxLy);
 		secX = modX + nX*(modLx/2. - lx/2.);
 		secY = modY + nY*(modLy/2. - ly/2.);
 		iSector = module->GetNSectors();

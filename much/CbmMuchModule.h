@@ -62,10 +62,6 @@ class CbmMuchModule :
   Int_t    GetDetectorId()  const { return fDetectorId; }
   Int_t    GetNSectors()    const { return fSectors.GetEntriesFast(); }
   Double_t GetCutRadius()   const { return fCutRadius; }
-  Double_t GetGridDx()      const { return fGridDx; }
-  Double_t GetGridDy()      const { return fGridDy; }
-  Int_t    GetGridCols()    const { return fGridCols; }
-  Int_t    GetGridRows()    const { return fGridRows; }
   TVector3 GetSize()        const { return fSize; }
   TVector3 GetPosition()    const { return fPosition; }
 
@@ -108,9 +104,6 @@ class CbmMuchModule :
   TClonesArray*          fPoints;                //!
   TClonesArray*          fHits;                  //!
   TClonesArray*          fClusters;              //!
-
-/*   TH2I                   fGridIndices; */
-/*   vector<vector<Int_t> > GetGridIndices(); */
 
   ClassDef(CbmMuchModule,1);
 };

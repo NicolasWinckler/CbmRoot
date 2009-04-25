@@ -148,8 +148,8 @@ Bool_t CbmMuchDigitize::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
 	TVector3 modSize = module->GetSize();
 	Double_t modLx = modSize[0];
 	Double_t modLy = modSize[1];
-	Double_t gridDx = module->GetGridDx();
-	Double_t gridDy = module->GetGridDy();
+//	Double_t gridDx = module->GetGridDx();
+//	Double_t gridDy = module->GetGridDy();
 
 	// Get entrance and exit coordinates of the point
 	Double_t xIn = point->GetXIn();
@@ -162,17 +162,17 @@ Bool_t CbmMuchDigitize::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
 	Double_t y0 = (yIn + yOut) / 2;
 
 	// Translate to module center system
-	TVector3 modPos = module->GetPosition();
-	Double_t x0_mod = x0 - modPos[0];
-	Double_t y0_mod = y0 - modPos[1];
+//	TVector3 modPos = module->GetPosition();
+//	Double_t x0_mod = x0 - modPos[0];
+//	Double_t y0_mod = y0 - modPos[1];
 
-	Int_t iGridColumn = (Int_t) ((x0_mod + modLx / 2.) / gridDx);
-	Int_t iGridRow = (Int_t) ((y0_mod + modLy / 2.) / gridDy);
+//	Int_t iGridColumn = (Int_t) ((x0_mod + modLx / 2.) / gridDx);
+//	Int_t iGridRow = (Int_t) ((y0_mod + modLy / 2.) / gridDy);
 
-	if (iGridRow > module->GetGridRows() - 1 || iGridColumn
-			> module->GetGridCols() - 1)
-		return kFALSE;
-	CbmMuchSector* sector = module->GetSector(iGridColumn, iGridRow);
+//	if (iGridRow > module->GetGridRows() - 1 || iGridColumn
+//			> module->GetGridCols() - 1)
+//		return kFALSE;
+	CbmMuchSector* sector = module->GetSector(x0, y0);//module->GetSector(iGridColumn, iGridRow);
 	Int_t iChannel = -1;
 	if (sector) {
 		iChannel = sector->GetChannel(x0, y0);
@@ -244,8 +244,6 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 	TVector3 modSize = module->GetSize();
 	Double_t modLx = modSize[0];
 	Double_t modLy = modSize[1];
-	Double_t gridDx = module->GetGridDx();
-	Double_t gridDy = module->GetGridDy();
 
 	// Get track length within the module
 	Double_t xIn = point->GetXIn();
@@ -321,17 +319,7 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 		Double_t* yVertex = spotPolygon.GetY();
 		map<Int_t, CbmMuchSector*> firedSectors; // map from a sector index to a fired sector
 		for (Int_t iVertex = 0; iVertex < spotPolygon.GetN() - 1; iVertex++) {
-			// Translate to module center
-			TVector3 modPos = module->GetPosition();
-			Double_t xVertMod = xVertex[iVertex] - modPos[0];
-			Double_t yVertMod = yVertex[iVertex] - modPos[1];
-			Int_t iGridColumn = (Int_t) ((xVertMod + modLx / 2.) / gridDx);
-			Int_t iGridRow = (Int_t) ((yVertMod + modLy / 2.) / gridDy);
-			if (iGridRow > module->GetGridRows() - 1 || iGridColumn
-					> module->GetGridCols() - 1)
-				continue;
-
-			CbmMuchSector* sector = module->GetSector(iGridColumn, iGridRow);
+			CbmMuchSector* sector = module->GetSector(xVertex[iVertex], yVertex[iVertex]);
 
 			if (sector) {
 				Int_t iSector = sector->GetSectorIndex();

@@ -114,8 +114,8 @@ InitStatus CbmMuchSegmentManual::Init(){
 			vector<Double_t> radii (1, station->GetRmax());
 			fRadii[iStation] = radii;
 		}
-		if(fSecMinLx.find(iStation)==fSecMinLx.end()) fSecMinLx[iStation] = 6.4;
-		if(fSecMinLy.find(iStation)==fSecMinLy.end()) fSecMinLy[iStation] = 6.4;
+		if(fSecMinLx.find(iStation)==fSecMinLx.end()) fSecMinLx[iStation] = 6;
+		if(fSecMinLy.find(iStation)==fSecMinLy.end()) fSecMinLy[iStation] = 6;
 		if(fSecMaxLx.find(iStation)==fSecMaxLx.end()) fSecMaxLx[iStation] = 20;
 		if(fSecMaxLy.find(iStation)==fSecMaxLy.end()) fSecMaxLy[iStation] = 20;
 

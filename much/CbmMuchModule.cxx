@@ -173,8 +173,8 @@ Bool_t CbmMuchModule::InitGrid() {
 		if (fGridDy > secSize[1])
 			fGridDy = secSize[1];
 	}
-	fGridCols = (Int_t) ((fSize[0] + 1e-3) / fGridDx);
-	fGridRows = (Int_t) ((fSize[1] + 1e-3) / fGridDy);
+	fGridCols = Int_t ((fSize[0] + 1e-3) / fGridDx) + 1;
+	fGridRows = Int_t ((fSize[1] + 1e-3) / fGridDy) + 1;
 
 	Int_t nX = fPosition[0] < 0 ? -1 : 1;
 	Int_t nY = fPosition[1] < 0 ? -1 : 1;
@@ -189,12 +189,11 @@ Bool_t CbmMuchModule::InitGrid() {
 			bool result = kFALSE;
 			for (int iSector = 0; iSector < nSectors; iSector++) {
 				CbmMuchSector* sec = (CbmMuchSector*) fSectors.At(iSector);
-				if (sec) {
-					result = sec->Inside(x, y);
-					if (result) {
-						fGridIndices[iRow][iCol] = sec->GetSectorIndex();
-						break;
-					}
+				if(!sec) continue;
+				result = sec->Inside(x, y);
+				if (result) {
+					fGridIndices[iRow][iCol] = sec->GetSectorIndex();
+					break;
 				}
 			}
 			if (!result)
@@ -237,11 +236,12 @@ void CbmMuchModule::InitNeighbourSectors() {
 			for (Int_t iCol = gCol; iCol < gCol + nCol; iCol++) {
 				if (iCol < 0 || iCol > fGridCols - 1)
 					continue;
-				if(iCol > gCol && iCol < gCol + nCol -1 && iRow > gRow && iRow < gRow + nRow - 1) continue;
+				//if(iCol > gCol && iCol < gCol + nCol -1 && iRow > gRow && iRow < gRow + nRow - 1) continue;
 				CbmMuchSector* sec = GetSector(iCol, iRow);
 				if (!sec) continue;
 				Int_t iSec = sec->GetSectorIndex();
-				assert(iSec != iSector);
+				//assert(iSec != iSector);
+				if(iSec==iSector) continue;
 				vector<Int_t>::iterator it = find(neighbours.begin(),
 						neighbours.end(), iSec);
 				if (it == neighbours.end())
@@ -285,8 +285,8 @@ void CbmMuchModule::InitNeighbourPads() {
 			if (dy < minDy)
 				minDy = dy;
 		}
-		Int_t iWidth = (Int_t) ((secDx + minDx / 2.) / minDx);
-		Int_t iLength = (Int_t) ((secDy + minDy / 2.) / minDy);
+		Int_t iWidth = Int_t ((secDx + minDx / 2.) / minDx);
+		Int_t iLength = Int_t ((secDy + minDy / 2.) / minDy);
 
 		// Search for neighbour pads for each given pad
 		for (Int_t iChannel = 0; iChannel < sector->GetNChannels(); iChannel++) {

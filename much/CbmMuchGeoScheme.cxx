@@ -115,21 +115,22 @@ void CbmMuchGeoScheme::InitGrid() {
     if (!fStations) Fatal("InitGrid", "No input array of stations.");
     for (Int_t iStation = 0; iStation < GetNStations(); iStation++) {
       CbmMuchStation* station = GetStation(iStation);
-      assert(iStation == GetStationIndex(station->GetDetectorId()));
       if (!station)  continue;
+      assert(iStation == GetStationIndex(station->GetDetectorId()));
       for (Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++) {
         CbmMuchLayer* layer = station->GetLayer(iLayer);
-        assert(iLayer == GetLayerIndex(layer->GetDetectorId()));
         if (!layer)  continue;
+        assert(iLayer == GetLayerIndex(layer->GetDetectorId()));
         for (Int_t iSide = 0; iSide < 2; iSide++) {
           CbmMuchLayerSide* side = (CbmMuchLayerSide*) layer->GetSide(iSide);
-          assert(iSide == GetLayerSideIndex(side->GetDetectorId()));
           if (!side) continue;
+          assert(iSide == GetLayerSideIndex(side->GetDetectorId()));
+          Bool_t useModuleDesign = side->GetNModules() > 1;
           for (Int_t iModule = 0; iModule < side->GetNModules(); iModule++) {
             CbmMuchModule* module = side->GetModule(iModule);
-            assert(iModule == GetModuleIndex(module->GetDetectorId()));
             if (!module) continue;
-            if (!module->InitGrid()) continue;
+            assert(iModule == GetModuleIndex(module->GetDetectorId()));
+            if (!module->InitGrid(useModuleDesign)) continue;
             module->InitNeighbourSectors();
             for (Int_t iSector = 0; iSector < module->GetNSectors(); iSector++) {
               CbmMuchSector* sector = module->GetSector(iSector);

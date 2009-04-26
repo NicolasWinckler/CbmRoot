@@ -53,6 +53,7 @@ public:
 	 * @param nRegions  Number of regions in the station
 	 */
 	void SetNRegions(Int_t iStation, Int_t nRegions);
+	void SetNRegions(Int_t nRegions[]);
 
 	/** Sets the radius for the given circled region in the given station
 	 * @param iStation Station index
@@ -60,17 +61,31 @@ public:
 	 * @param radius   Radius of the region
 	 */
 	void SetRegionRadius(Int_t iStation, Int_t iRegion, Double_t radius);
+	void SetRegionRadii(Int_t iStation, Double_t radii[]);
 
 	/** Sets number of channels per sector for the given station
 	 * @param iStation   Station index
 	 * @param nChannels  Number of channels
 	 */
 	void SetNChannels(Int_t iStation, Int_t nChannels) { fNChannels[iStation] = nChannels; }
+	void SetNChannels(Int_t nChannels[]);
 
 	void SetMinSigmaX(Int_t iStation, Double_t sigmaX);
 	void SetMinSigmaY(Int_t iStation, Double_t sigmaY);
-	void SetMinPadLx(Int_t iStation, Double_t padLx);
-	void SetMinPadLy(Int_t iStation, Double_t padLy);
+    void SetMinSigmaX(Double_t sigmaX[]);
+    void SetMinSigmaY(Double_t sigmaY[]);
+    void SetMinPadLx(Int_t iStation, Double_t padLx);
+    void SetMinPadLy(Int_t iStation, Double_t padLy);
+    void SetMinPadLx(Double_t padLx[]);
+    void SetMinPadLy(Double_t padLy[]);
+    void SetMaxSigmaX(Int_t iStation, Double_t sigmaX);
+    void SetMaxSigmaY(Int_t iStation, Double_t sigmaY);
+    void SetMaxSigmaX(Double_t sigmaX[]);
+    void SetMaxSigmaY(Double_t sigmaY[]);
+    void SetMaxPadLx(Int_t iStation, Double_t padLx);
+    void SetMaxPadLy(Int_t iStation, Double_t padLy);
+    void SetMaxPadLx(Double_t padLx[]);
+    void SetMaxPadLy(Double_t padLy[]);
 
 private:
 	CbmGeoMuchPar*                fGeoPar;         // Geometry parameters container

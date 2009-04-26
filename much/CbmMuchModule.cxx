@@ -154,6 +154,7 @@ CbmMuchSector* CbmMuchModule::GetSector(Double_t x, Double_t y){
 }
 // -------------------------------------------------------------------------
 
+// -----   Public method GetGridCellX  -------------------------------------
 Double_t CbmMuchModule::GetGridCellX(Int_t iCol){
     Int_t nX;
     if(fUseModuleDesign){
@@ -166,7 +167,9 @@ Double_t CbmMuchModule::GetGridCellX(Int_t iCol){
         return x - nX*(fGridDx/2. - 1e-3);
     }
 }
+// -------------------------------------------------------------------------
 
+// -----   Public method GetGridCellY  -------------------------------------
 Double_t CbmMuchModule::GetGridCellY(Int_t iRow){
     Int_t nY;
     if(fUseModuleDesign){
@@ -179,7 +182,9 @@ Double_t CbmMuchModule::GetGridCellY(Int_t iRow){
         return y - nY*(fGridDy/2. - 1e-3);
     }
 }
+// -------------------------------------------------------------------------
 
+// -----   Public method GetInitX  -----------------------------------------
 Double_t CbmMuchModule::GetInitX(CbmMuchSector* sector){
     Int_t nX;
     Double_t secLx = sector->GetSize()[0];
@@ -199,7 +204,9 @@ Double_t CbmMuchModule::GetInitX(CbmMuchSector* sector){
         return secX0 - nX*(fGridDx/2.) - xCorner;
     }
 }
+// -------------------------------------------------------------------------
 
+// -----   Public method GetInitY  -----------------------------------------
 Double_t CbmMuchModule::GetInitY(CbmMuchSector* sector){
     Int_t nY;
     Double_t secLy = sector->GetSize()[1];
@@ -219,6 +226,7 @@ Double_t CbmMuchModule::GetInitY(CbmMuchSector* sector){
         return secY0 - nY*(fGridDy/2.) - yCorner;
     }
 }
+// -------------------------------------------------------------------------
 
 // -----   Public method InitGrid  -----------------------------------------
 Bool_t CbmMuchModule::InitGrid(Bool_t useModuleDesign) {

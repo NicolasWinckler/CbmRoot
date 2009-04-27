@@ -41,20 +41,25 @@ CbmMuchSegmentManual::~CbmMuchSegmentManual() {
 
 // -----   Public method SetNRegions  --------------------------------------
 void CbmMuchSegmentManual::SetNRegions(Int_t iStation, Int_t nRegions){
-    //	if(iStation < 0 || iStation >= fStations->GetEntries())
-    //		Fatal("SetNRegions", "iStation is out of range.");
+    if(iStation < 0 || iStation >= fNStations)
+    	Fatal("SetNRegions", "iStation is out of range.");
     fNRegions[iStation] = nRegions;
     fRadii[iStation].resize(nRegions);
 }
 // -------------------------------------------------------------------------
 
+// -----   Public method SetNRegions  --------------------------------------
 void CbmMuchSegmentManual::SetNRegions(Int_t nRegions[]){
     for(Int_t iStation=0; iStation < fNStations; ++iStation){
         SetNRegions(iStation, nRegions[iStation]);
     }
 }
+// -------------------------------------------------------------------------
 
+// -----   Public method SetNChannels --------------------------------------
 void CbmMuchSegmentManual::SetNChannels(Int_t iStation, Int_t nChannels){
+    if(iStation < 0 || iStation >= fNStations)
+    	Fatal("SetNChannels", "iStation is out of range.");
 	fNChannels[iStation] = nChannels;
     // Deal with channels more universally
     Int_t n = (Int_t)(TMath::Log2(fNChannels[iStation]) + 1e-2);
@@ -64,129 +69,151 @@ void CbmMuchSegmentManual::SetNChannels(Int_t iStation, Int_t nChannels){
     fNCols[iStation] = (Int_t)TMath::Power(2, nPower);
     fNRows[iStation] = n%2 != 0 ? (Int_t)TMath::Power(2, nPower+1) : fNCols[iStation];
 }
+// -------------------------------------------------------------------------
 
+// -----   Public method SetNChannels --------------------------------------
 void CbmMuchSegmentManual::SetNChannels(Int_t nChannels[]){
     for(Int_t iStation=0; iStation < fNStations; ++iStation){
         SetNChannels(iStation, nChannels[iStation]);
     }
 }
+// -------------------------------------------------------------------------
+
 // -----   Public method SetRegionRadius  ----------------------------------
 void CbmMuchSegmentManual::SetRegionRadius(Int_t iStation, Int_t iRegion, Double_t radius){
-    //	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
+    if(iStation < 0 || iStation >= fNStations) Fatal("SetRegionRadius", "iStation is out of range.");
     if(iRegion < 0 || iRegion >= fNRegions[iStation]) Fatal("SetRegionRadius", "iRegion is out of range.");
     fRadii[iStation].at(iRegion) = radius;
 }
 // -------------------------------------------------------------------------
 
+// -----   Public method SetRegionRadii  -----------------------------------
 void CbmMuchSegmentManual::SetRegionRadii(Int_t iStation, Double_t radii[]){
     for(Int_t iRegion=0;iRegion<fNRegions[iStation]; ++iRegion){
         SetRegionRadius(iStation, iRegion, radii[iRegion]);
     }
 }
+// -------------------------------------------------------------------------
 
 // -----   Public method SetMinSigmaX  -------------------------------------
 void CbmMuchSegmentManual::SetMinSigmaX(Int_t iStation, Double_t sigmaX){
-    //	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
+    if(iStation < 0 || iStation >= fNStations) Fatal("SetMinSigmaX", "iStation is out of range.");
     fSecMinLx[iStation] = fNCols[iStation]*TMath::Sqrt(12.)*sigmaX;
 }
 // -------------------------------------------------------------------------
 
+// -----   Public method SetMinSigmaX  -------------------------------------
 void CbmMuchSegmentManual::SetMinSigmaX(Double_t sigmaX[]){
     for(Int_t iStation=0;iStation<fNStations; ++iStation){
         SetMinSigmaX(iStation, sigmaX[iStation]);
     }
 }
+// -------------------------------------------------------------------------
 
 // -----   Public method SetMinSigmaY  -------------------------------------
 void CbmMuchSegmentManual::SetMinSigmaY(Int_t iStation, Double_t sigmaY){
-    //	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
+    if(iStation < 0 || iStation >= fNStations) Fatal("SetMinSigmaY", "iStation is out of range.");
     fSecMinLy[iStation] = fNRows[iStation]*TMath::Sqrt(12.)*sigmaY;
 }
 // -------------------------------------------------------------------------
 
+// -----   Public method SetMinSigmaY  -------------------------------------
 void CbmMuchSegmentManual::SetMinSigmaY(Double_t sigmaY[]){
     for(Int_t iStation=0;iStation<fNStations; ++iStation){
         SetMinSigmaY(iStation, sigmaY[iStation]);
     }
 }
+// -------------------------------------------------------------------------
 
 // -----   Public method SetMinPadLx   -------------------------------------
 void CbmMuchSegmentManual::SetMinPadLx(Int_t iStation, Double_t padLx){
-    //	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
+    if(iStation < 0 || iStation >= fNStations) Fatal("SetMinPadLx", "iStation is out of range.");
     fSecMinLx[iStation] = fNCols[iStation]*padLx;
 }
 // -------------------------------------------------------------------------
 
+// -----   Public method SetMinPadLx  --------------------------------------
 void CbmMuchSegmentManual::SetMinPadLx(Double_t padLx[]){
     for(Int_t iStation=0;iStation<fNStations; ++iStation){
         SetMinPadLx(iStation, padLx[iStation]);
     }
 }
+// -------------------------------------------------------------------------
 
 // -----   Public method SetMinPadLy   -------------------------------------
 void CbmMuchSegmentManual::SetMinPadLy(Int_t iStation, Double_t padLy){
-    //	if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
+    if(iStation < 0 || iStation >= fNStations) Fatal("SetMinPadLy", "iStation is out of range.");
     fSecMinLy[iStation] = fNRows[iStation]*padLy;
 }
 // -------------------------------------------------------------------------
 
+// -----   Public method SetMinPadLy  --------------------------------------
 void CbmMuchSegmentManual::SetMinPadLy(Double_t padLy[]){
     for(Int_t iStation=0;iStation<fNStations; ++iStation){
         SetMinPadLy(iStation, padLy[iStation]);
     }
 }
+// -------------------------------------------------------------------------
 
 // -----   Public method SetMaxSigmaX  -------------------------------------
 void CbmMuchSegmentManual::SetMaxSigmaX(Int_t iStation, Double_t sigmaX){
-    //  if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
+    if(iStation < 0 || iStation >= fNStations) Fatal("SetMaxSigmaX", "iStation is out of range.");
     fSecMaxLx[iStation] = fNCols[iStation]*TMath::Sqrt(12.)*sigmaX;
 }
 // -------------------------------------------------------------------------
 
+// -----   Public method SetMaxSigmaX --------------------------------------
 void CbmMuchSegmentManual::SetMaxSigmaX(Double_t sigmaX[]){
     for(Int_t iStation=0;iStation<fNStations; ++iStation){
         SetMaxSigmaX(iStation, sigmaX[iStation]);
     }
 }
+// -------------------------------------------------------------------------
 
 // -----   Public method SetMaxSigmaY  -------------------------------------
 void CbmMuchSegmentManual::SetMaxSigmaY(Int_t iStation, Double_t sigmaY){
-    //  if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
+    if(iStation < 0 || iStation >= fNStations) Fatal("SetMaxSigmaY", "iStation is out of range.");
     fSecMaxLy[iStation] = fNRows[iStation]*TMath::Sqrt(12.)*sigmaY;
 }
 // -------------------------------------------------------------------------
 
+// -----   Public method SetMaxSigmaY  -------------------------------------
 void CbmMuchSegmentManual::SetMaxSigmaY(Double_t sigmaY[]){
     for(Int_t iStation=0;iStation<fNStations; ++iStation){
         SetMaxSigmaY(iStation, sigmaY[iStation]);
     }
 }
+// -------------------------------------------------------------------------
 
 // -----   Public method SetMaxPadLx   -------------------------------------
 void CbmMuchSegmentManual::SetMaxPadLx(Int_t iStation, Double_t padLx){
-    //  if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
+    if(iStation < 0 || iStation >= fNStations) Fatal("SetMinPadLx", "iStation is out of range.");
     fSecMaxLx[iStation] = fNCols[iStation]*padLx;
 }
 // -------------------------------------------------------------------------
 
+// -----   Public method SetMaxPadLx  --------------------------------------
 void CbmMuchSegmentManual::SetMaxPadLx(Double_t padLx[]){
     for(Int_t iStation=0;iStation<fNStations; ++iStation){
         SetMaxPadLx(iStation, padLx[iStation]);
     }
 }
+// -------------------------------------------------------------------------
 
 // -----   Public method SetMaxPadLy   -------------------------------------
 void CbmMuchSegmentManual::SetMaxPadLy(Int_t iStation, Double_t padLy){
-    //  if(iStation < 0 || iStation >= fStations->GetEntries()) Fatal("SetRegionRadius", "iStation is out of range.");
+    if(iStation < 0 || iStation >= fNStations) Fatal("SetMaxPadLy", "iStation is out of range.");
     fSecMaxLy[iStation] = fNRows[iStation]*padLy;
 }
 // -------------------------------------------------------------------------
 
+// -----   Public method SetMaxPadLy  --------------------------------------
 void CbmMuchSegmentManual::SetMaxPadLy(Double_t padLy[]){
     for(Int_t iStation=0;iStation<fNStations; ++iStation){
         SetMaxPadLy(iStation, padLy[iStation]);
     }
 }
+// -------------------------------------------------------------------------
 
 // -----   Private method SetParContainers  --------------------------------
 void CbmMuchSegmentManual::SetParContainers() {
@@ -214,10 +241,24 @@ InitStatus CbmMuchSegmentManual::Init(){
 
         // Default initialization if required
         if(fNChannels.find(iStation)==fNChannels.end()) SetNChannels(iStation, 128);
-        if(fNRegions.find(iStation)==fNRegions.end()) SetNRegions(iStation, 2);
+        if(fNRegions.find(iStation)==fNRegions.end()) {
+        	if(iStation == 0) SetNRegions(iStation, 5);
+        	else if(iStation == 1) SetNRegions(iStation, 3);
+        	else SetNRegions(iStation, 1);
+        }
         if(fRadii[iStation].at(0)==0) {
-            Double_t radii[] = {station->GetRmax() - 30., station->GetRmax()};
-            SetRegionRadii(iStation, radii);
+            if(iStation == 0){
+            	Double_t radii[] = {13.99, 19.39, 24.41, 31.51, 64.76};
+            	SetRegionRadii(iStation, radii);
+            }
+            else if(iStation==1){
+            	Double_t radii[] = {22, 24, 90.95};
+            	SetRegionRadii(iStation, radii);
+            }
+            else {
+            	Double_t radii[] = {station->GetRmax()};
+            	SetRegionRadii(iStation, radii);
+            }
         }
         if(fSecMinLx.find(iStation)==fSecMinLx.end()) {
             if(iStation == 0) SetMinPadLx(iStation, 0.1386);

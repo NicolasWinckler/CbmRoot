@@ -34,16 +34,12 @@ public:
 	/** Destructor */
 	virtual ~CbmMuchSegmentManual();
 
-	/**
-	 * Standard constructor
-	 *
-	 * @param digiFileName  Name of the output file with segmentation parameters
+	/** Standard constructor
+	 *@param digiFileName  Name of the output file with segmentation parameters
 	 */
 	CbmMuchSegmentManual(char* digiFileName);
 
 	virtual InitStatus Init();
-//	virtual void Exec(Option_t * option);
-//	virtual void FinishTask();
 
 	/** Performs the segmentation of all stations */
 	void SegmentMuch();
@@ -75,21 +71,60 @@ public:
 	void SetNChannels(Int_t iStation, Int_t nChannels);
 	void SetNChannels(Int_t nChannels[]);
 
+	/** Sets resolution in X for the central region of the given station.
+	 * @param iStation Station index
+	 * @param sigmaX   Resolution in X direction
+	 */
 	void SetMinSigmaX(Int_t iStation, Double_t sigmaX);
-	void SetMinSigmaY(Int_t iStation, Double_t sigmaY);
     void SetMinSigmaX(Double_t sigmaX[]);
+
+    /** Sets resolution in Y for the central region of the given station.
+	 * @param iStation Station index
+	 * @param sigmaY   Resolution in Y direction
+     */
+    void SetMinSigmaY(Int_t iStation, Double_t sigmaY);
     void SetMinSigmaY(Double_t sigmaY[]);
+
+    /** Sets pad width for the central region of the given station.
+	 * @param iStation Station index
+	 * @param padLx    Pad width
+     */
     void SetMinPadLx(Int_t iStation, Double_t padLx);
-    void SetMinPadLy(Int_t iStation, Double_t padLy);
     void SetMinPadLx(Double_t padLx[]);
+
+    /** Sets pad length for the central region of the given station.
+	 * @param iStation Station index
+	 * @param padLy    Pad length
+     */
+    void SetMinPadLy(Int_t iStation, Double_t padLy);
     void SetMinPadLy(Double_t padLy[]);
+
+    /** Sets maximum allowed resolution in X for the given station
+     * @param iStation Station index
+     * @param sigmaX   Maximum allowed resolution in X direction
+     */
     void SetMaxSigmaX(Int_t iStation, Double_t sigmaX);
-    void SetMaxSigmaY(Int_t iStation, Double_t sigmaY);
     void SetMaxSigmaX(Double_t sigmaX[]);
+
+    /** Sets maximum allowed resolution in Y for the given station
+     * @param iStation Station index
+     * @param sigmaY   Maximum allowed resolution in Y direction
+     */
+    void SetMaxSigmaY(Int_t iStation, Double_t sigmaY);
     void SetMaxSigmaY(Double_t sigmaY[]);
+
+    /** Sets maximum allowed pad width for the given station
+     * @param iStation Station index
+     * @param padLx    Maximum allowed pad width
+     */
     void SetMaxPadLx(Int_t iStation, Double_t padLx);
-    void SetMaxPadLy(Int_t iStation, Double_t padLy);
     void SetMaxPadLx(Double_t padLx[]);
+
+    /** Sets maximum allowed pad length for the given station
+     * @param iStation Station index
+     * @param padLx    Maximum allowed pad length
+     */
+    void SetMaxPadLy(Int_t iStation, Double_t padLy);
     void SetMaxPadLy(Double_t padLy[]);
 
 private:

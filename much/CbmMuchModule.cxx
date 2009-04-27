@@ -248,8 +248,13 @@ Bool_t CbmMuchModule::InitGrid(Bool_t useModuleDesign) {
     }
 
     Int_t nCell = fUseModuleDesign ? 1 : 2; // Number of additional columns/rows in the grid
-    fGridCols = Int_t ((fSize[0] + 1e-3) / fGridDx) + nCell;
-    fGridRows = Int_t ((fSize[1] + 1e-3) / fGridDy) + nCell;
+    fGridCols = Int_t ((fSize[0] + 1e-5) / fGridDx) + nCell;
+    fGridRows = Int_t ((fSize[1] + 1e-5) / fGridDy) + nCell;
+
+    if(!fUseModuleDesign){
+    	if(fGridCols%2!=0) fGridCols++;
+    	if(fGridRows%2!=0) fGridRows++;
+    }
 
     // Fill cells with sector numbers
     fGridIndices.resize(fGridRows);

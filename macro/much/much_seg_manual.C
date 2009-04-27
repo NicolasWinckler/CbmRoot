@@ -12,9 +12,9 @@
 //
 // --------------------------------------------------------------------------
 
-void much_seg(const char* mcFile = "data/mc.root",
-              const char* digiFile = "data/digi.root",
-	          Int_t nEvents = 100)
+void much_seg(const char* mcFile = "",
+              const char* digiFile = "",
+	          Int_t nEvents = 2)
 {
   // ========================================================================
   //          Adjust this part according to your requirements

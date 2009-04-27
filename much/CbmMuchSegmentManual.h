@@ -48,6 +48,11 @@ public:
 	/** Performs the segmentation of all stations */
 	void SegmentMuch();
 
+	/** Sets number of stations
+	 *@param nStations  Number of stations
+	 */
+	void SetNStations(Int_t nStations) {fNStations = nStations;}
+
 	/** Sets number of circled regions for the given station
 	 * @param iStation  Station index
 	 * @param nRegions  Number of regions in the station
@@ -67,7 +72,7 @@ public:
 	 * @param iStation   Station index
 	 * @param nChannels  Number of channels
 	 */
-	void SetNChannels(Int_t iStation, Int_t nChannels) { fNChannels[iStation] = nChannels; }
+	void SetNChannels(Int_t iStation, Int_t nChannels);
 	void SetNChannels(Int_t nChannels[]);
 
 	void SetMinSigmaX(Int_t iStation, Double_t sigmaX);
@@ -89,6 +94,7 @@ public:
 
 private:
 	CbmGeoMuchPar*                fGeoPar;         // Geometry parameters container
+	Int_t                         fNStations;      // Number of stations
 	TObjArray*                    fStations;       // Array of stations
 	Char_t*                       fDigiFileName;   // Name of the file with segmentation parameters
 	map<Int_t, Int_t>             fNRegions;       // Map from a station index to a number of circled regions in the station

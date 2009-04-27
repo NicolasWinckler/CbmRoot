@@ -49,13 +49,24 @@ void CbmMuchSegmentManual::SetNRegions(Int_t iStation, Int_t nRegions){
 // -------------------------------------------------------------------------
 
 void CbmMuchSegmentManual::SetNRegions(Int_t nRegions[]){
-    for(Int_t iStation=0; iStation < 6; ++iStation){
+    for(Int_t iStation=0; iStation < fNStations; ++iStation){
         SetNRegions(iStation, nRegions[iStation]);
     }
 }
 
+void CbmMuchSegmentManual::SetNChannels(Int_t iStation, Int_t nChannels){
+	fNChannels[iStation] = nChannels;
+    // Deal with channels more universally
+    Int_t n = (Int_t)(TMath::Log2(fNChannels[iStation]) + 1e-2);
+    Int_t nChans = (Int_t)(TMath::Power(2, n) + 1e-2);
+    if(nChans != fNChannels[iStation]) Fatal("Init", "Number of channels should be equal to two with integer power.");
+    Int_t nPower = n/2;
+    fNCols[iStation] = (Int_t)TMath::Power(2, nPower);
+    fNRows[iStation] = n%2 != 0 ? (Int_t)TMath::Power(2, nPower+1) : fNCols[iStation];
+}
+
 void CbmMuchSegmentManual::SetNChannels(Int_t nChannels[]){
-    for(Int_t iStation=0; iStation < 6; ++iStation){
+    for(Int_t iStation=0; iStation < fNStations; ++iStation){
         SetNChannels(iStation, nChannels[iStation]);
     }
 }
@@ -81,7 +92,7 @@ void CbmMuchSegmentManual::SetMinSigmaX(Int_t iStation, Double_t sigmaX){
 // -------------------------------------------------------------------------
 
 void CbmMuchSegmentManual::SetMinSigmaX(Double_t sigmaX[]){
-    for(Int_t iStation=0;iStation<6; ++iStation){
+    for(Int_t iStation=0;iStation<fNStations; ++iStation){
         SetMinSigmaX(iStation, sigmaX[iStation]);
     }
 }
@@ -94,7 +105,7 @@ void CbmMuchSegmentManual::SetMinSigmaY(Int_t iStation, Double_t sigmaY){
 // -------------------------------------------------------------------------
 
 void CbmMuchSegmentManual::SetMinSigmaY(Double_t sigmaY[]){
-    for(Int_t iStation=0;iStation<6; ++iStation){
+    for(Int_t iStation=0;iStation<fNStations; ++iStation){
         SetMinSigmaY(iStation, sigmaY[iStation]);
     }
 }
@@ -107,7 +118,7 @@ void CbmMuchSegmentManual::SetMinPadLx(Int_t iStation, Double_t padLx){
 // -------------------------------------------------------------------------
 
 void CbmMuchSegmentManual::SetMinPadLx(Double_t padLx[]){
-    for(Int_t iStation=0;iStation<6; ++iStation){
+    for(Int_t iStation=0;iStation<fNStations; ++iStation){
         SetMinPadLx(iStation, padLx[iStation]);
     }
 }
@@ -120,7 +131,7 @@ void CbmMuchSegmentManual::SetMinPadLy(Int_t iStation, Double_t padLy){
 // -------------------------------------------------------------------------
 
 void CbmMuchSegmentManual::SetMinPadLy(Double_t padLy[]){
-    for(Int_t iStation=0;iStation<6; ++iStation){
+    for(Int_t iStation=0;iStation<fNStations; ++iStation){
         SetMinPadLy(iStation, padLy[iStation]);
     }
 }
@@ -133,8 +144,8 @@ void CbmMuchSegmentManual::SetMaxSigmaX(Int_t iStation, Double_t sigmaX){
 // -------------------------------------------------------------------------
 
 void CbmMuchSegmentManual::SetMaxSigmaX(Double_t sigmaX[]){
-    for(Int_t iStation=0;iStation<6; ++iStation){
-        SetMinSigmaX(iStation, sigmaX[iStation]);
+    for(Int_t iStation=0;iStation<fNStations; ++iStation){
+        SetMaxSigmaX(iStation, sigmaX[iStation]);
     }
 }
 
@@ -146,8 +157,8 @@ void CbmMuchSegmentManual::SetMaxSigmaY(Int_t iStation, Double_t sigmaY){
 // -------------------------------------------------------------------------
 
 void CbmMuchSegmentManual::SetMaxSigmaY(Double_t sigmaY[]){
-    for(Int_t iStation=0;iStation<6; ++iStation){
-        SetMinSigmaY(iStation, sigmaY[iStation]);
+    for(Int_t iStation=0;iStation<fNStations; ++iStation){
+        SetMaxSigmaY(iStation, sigmaY[iStation]);
     }
 }
 
@@ -159,8 +170,8 @@ void CbmMuchSegmentManual::SetMaxPadLx(Int_t iStation, Double_t padLx){
 // -------------------------------------------------------------------------
 
 void CbmMuchSegmentManual::SetMaxPadLx(Double_t padLx[]){
-    for(Int_t iStation=0;iStation<6; ++iStation){
-        SetMinPadLx(iStation, padLx[iStation]);
+    for(Int_t iStation=0;iStation<fNStations; ++iStation){
+        SetMaxPadLx(iStation, padLx[iStation]);
     }
 }
 
@@ -172,8 +183,8 @@ void CbmMuchSegmentManual::SetMaxPadLy(Int_t iStation, Double_t padLy){
 // -------------------------------------------------------------------------
 
 void CbmMuchSegmentManual::SetMaxPadLy(Double_t padLy[]){
-    for(Int_t iStation=0;iStation<6; ++iStation){
-        SetMinPadLy(iStation, padLy[iStation]);
+    for(Int_t iStation=0;iStation<fNStations; ++iStation){
+        SetMaxPadLy(iStation, padLy[iStation]);
     }
 }
 
@@ -185,12 +196,13 @@ void CbmMuchSegmentManual::SetParContainers() {
     fGeoPar = (CbmGeoMuchPar*) db->getContainer("CbmGeoMuchPar");
 }
 // -------------------------------------------------------------------------
-#include <cassert>
+
 // -----   Private method Init ---------------------------------------------
 InitStatus CbmMuchSegmentManual::Init(){
     // Get MUCH geometry parameter container
     fStations = fGeoPar->GetStations();
     if(!fStations) Fatal("Init", "No input array of MUCH stations.");
+    if(fStations->GetEntries() != fNStations) Fatal("Init", "Incorrect number of stations.");
 
     printf("Number of stations: %i\n", fStations->GetEntries());
 
@@ -202,15 +214,6 @@ InitStatus CbmMuchSegmentManual::Init(){
 
         // Default initialization if required
         if(fNChannels.find(iStation)==fNChannels.end()) SetNChannels(iStation, 128);
-
-        // Deal with channels more universally
-        Int_t n = (Int_t)(TMath::Log2(fNChannels[iStation]) + 1e-2);
-        Int_t nChannels = (Int_t)(TMath::Power(2, n) + 1e-2);
-        if(nChannels != fNChannels[iStation]) Fatal("Init", "Number of channels should be equal to two with integer power.");
-        Int_t nPower = n/2;
-        fNCols[iStation] = (Int_t)TMath::Power(2, nPower);
-        fNRows[iStation] = n%2 != 0 ? (Int_t)TMath::Power(2, nPower+1) : fNCols[iStation];
-
         if(fNRegions.find(iStation)==fNRegions.end()) SetNRegions(iStation, 2);
         if(fRadii[iStation].at(0)==0) {
             Double_t radii[] = {station->GetRmax() - 30., station->GetRmax()};

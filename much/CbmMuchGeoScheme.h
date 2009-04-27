@@ -17,7 +17,7 @@
  *
  * The channel ID consists of:
  *   sector number  (0-2047),       bits 0-10
- *   channel number (0-127),        bits 11-17
+ *   channel number (0-1024),       bits 11-20
  */
 
 #ifndef CbmMuchGeoScheme_H
@@ -50,7 +50,7 @@ using std::map;
 #define WL_LAYERSIDE 1
 #define WL_MODULE 511
 #define WL_SECTOR 2047
-#define WL_CHANNEL 127
+#define WL_CHANNEL 1023
 // Number of a start bit for each volume
 #define SB_SYSTEM 0
 #define SB_STATION 4

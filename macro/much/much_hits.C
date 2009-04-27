@@ -20,7 +20,7 @@
 void much_hits(const char* inFile = "data/Jpsi.auau.25gev.centr.mc.root", 
                const char* digiFile = "data/much_digi.root", 
                const char* outFile = "data/Jpsi.auau.25gev.centr.muchhits.root",
- 	       Int_t nEvents = 2, Int_t iFirst = 0)
+ 	       Int_t nEvents = 2)
 {
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -39,7 +39,7 @@ void much_hits(const char* inFile = "data/Jpsi.auau.25gev.centr.mc.root",
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
-  gSystem->Load("libMvd");
+//  gSystem->Load("libMvd");
   gSystem->Load("libSts");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");
@@ -82,7 +82,7 @@ void much_hits(const char* inFile = "data/Jpsi.auau.25gev.centr.mc.root",
   
   // -----   Intialise and run   --------------------------------------------
   fRun->Init();
-  fRun->Run(iFirst,nEvents);
+  fRun->Run(0,nEvents);
   // ------------------------------------------------------------------------
 
   cout << " Test passed" << endl;

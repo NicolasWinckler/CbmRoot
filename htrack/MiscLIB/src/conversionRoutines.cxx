@@ -1974,9 +1974,12 @@ int addRadix(int radix, std::string& value) {
 
 	int counts;
 
-	char buffer[3];
+	char buffer[4];
 
 	counts = addRadix(radix, buffer);
+
+	buffer[counts] = '\0';
+
 	value.replace(0, counts, buffer, counts);
 
 	return counts;

@@ -36,7 +36,8 @@ using std::vector;
 ClassImp(CbmL1StsTrackFinder)
 
 // -----   Default constructor   -------------------------------------------
-CbmL1StsTrackFinder::CbmL1StsTrackFinder(){ 
+  CbmL1StsTrackFinder::CbmL1StsTrackFinder() {
+  fName = "STS Track Finder L1";
 }
 // -------------------------------------------------------------------------
 

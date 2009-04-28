@@ -136,6 +136,10 @@ void CbmStsFindTracks::SetParContainers() {
 // -----   Private virtual method Init  ------------------------------------
 InitStatus CbmStsFindTracks::Init() {
 
+  cout << endl;
+  cout << "---------------------------------------------" << endl;
+  cout << "-I- Initialising " << GetName() << " ...." << endl; 
+
   // Get input hit arrays
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
@@ -147,10 +151,9 @@ InitStatus CbmStsFindTracks::Init() {
   if ( fUseMvd ) {
     fMvdHits = (TClonesArray*) ioman->GetObject("MVDHit");
     if ( ! fMvdHits ) {
-      cout << "-E- " << GetName() << "::Init: No MVD hits available!" 
+      cout << "-W- " << GetName() << "::Init: No MVD hits available!" 
 	   << endl;
       cout << "     Running track finding without MVD hits" << endl;
-      fUseMvd = kFALSE;
     }
   }
 
@@ -162,7 +165,7 @@ InitStatus CbmStsFindTracks::Init() {
   if ( fDigiScheme->Init(fGeoPar, fDigiPar) ) {
     if      (fVerbose == 1 || fVerbose == 2) fDigiScheme->Print(kFALSE);
     else if (fVerbose >  2) fDigiScheme->Print(kTRUE);
-    cout << "-I- " << fName << "::Init: "
+    cout << "-I- "
 	 << "STS digitisation scheme succesfully initialised" << endl;
     cout << "    Stations: " << fDigiScheme->GetNStations() 
 	 << ", Sectors: " << fDigiScheme->GetNSectors() << ", Channels: " 
@@ -175,6 +178,9 @@ InitStatus CbmStsFindTracks::Init() {
 	 << endl;
     return kERROR;
   }
+  cout << "-I- Track finder engine " << fFinder->GetName() 
+       << " selected" << endl;
+
 
   // Set members of track finder and verbosity and initialise track finder
   fFinder->SetDigiScheme(fDigiScheme);
@@ -186,10 +192,8 @@ InitStatus CbmStsFindTracks::Init() {
   fFinder->Init();
 
   // Screen output
-  cout << endl << "-I- " << GetName() << " intialised " << endl;
-  cout << "-I- Track finder engine " << fFinder->GetName() 
-       << " selected" << endl;
-  if ( ! fMvdHits ) cout << "-I- No MVD hits available!" << endl;
+  cout << "-I- " << GetName() << " intialised " << endl;
+  cout << "---------------------------------------------" << endl;
 
   return kSUCCESS;
 

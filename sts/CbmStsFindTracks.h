@@ -49,7 +49,7 @@ class CbmStsFindTracks : public FairTask
    **/
   CbmStsFindTracks(Int_t iVerbose, 
 		   CbmStsTrackFinder* finder = NULL, 
-		   Bool_t useMvd = kFALSE,
+		   Bool_t useMvd = kTRUE,
 		   const char* name = "STSFindTracks");
 
 

@@ -12,6 +12,7 @@
  *  Finds tracks using the Cellular Automaton algorithm
  *
  */
+#include "CbmKF.h"
 #include "CbmL1.h"
 #include "CbmStsHit.h"
 #include "CbmStsStation.h"
@@ -146,6 +147,7 @@ void L1Algo::CATrackFinder()
 
     int nlevel[NStations];
     for (int il = 0; il < NStations; ++il) nlevel[il] = 0;    
+    
    
     double SigmaTargetX, SigmaTargetY; // target constraint
 
@@ -183,11 +185,11 @@ void L1Algo::CATrackFinder()
       vTriplets0_m[ih] = dup_init;
     }
 
-cout << "NStations " << NStations << endl;
-
+    //cout << "NStations " << NStations << endl;
+    int NMvdStations = CbmKF::Instance()->vMvdMaterial.size();
+    //cout << "NMvdStations= " << NMvdStations << endl;
     //for (int istal = NStations-2; istal >= 0; istal--){//  //start downstream chambers
     for (int istal = NStations-2; istal >= FIRSTCASTATION; istal--){//  //start downstream chambers
-
       TripStartIndex[istal] = TripStopIndex[istal] = vTriplets.size();
       int nstaltriplets = 0;
       
@@ -206,14 +208,12 @@ cout << "NStations " << NStations << endl;
       if( isec>=2 ) qp1 = 1;
         fvec zl, dzli;
       fvec Infqp = MaxInvMom/3.*MaxInvMom/3.;
-
       const int Portion = 16;
-
       const int MaxPortionHit = Portion;
       const int MaxPortionDup = 10000;
       const int MaxPortionTrip = 10000;
 
-      static L1FieldRegion fld_1[2000];
+      static L1FieldRegion fld_1[20000];
       static L1FieldRegion fld_2[20000];
       static L1TrackPar T_1[20000];
       static L1TrackPar T_2[20000];
@@ -261,7 +261,6 @@ cout << "NStations " << NStations << endl;
       int start_mhit = 0;
       
       for( int start_lh=0; start_lh<NHits_l; start_lh+=Portion ){
-
 	int end_lh = start_lh + Portion;
 	if( end_lh>NHits_l ) end_lh = NHits_l;
 
@@ -278,18 +277,20 @@ cout << "NStations " << NStations << endl;
 	  vTriplets0_l[ilh] = dup_init;
 
 	  //vFake_l[ilh]=1;
-	  
+          	  
 	  L1StsHit &hitl = vStsHits_l[ilh];
-         CbmL1HitStore &hitl_story= vHitStore_l[ilh];
-          
-         CbmStsHit *mh = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitl_story.ExtIndex));
-
+          CbmL1HitStore &hitl_story=vHitStore_l[ilh];
+          CbmStsHit *mh;
+          if (istal < NMvdStations) Z[n1_V][n1_4] = stal.z[0]; 
+          else {    
+          mh = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitl_story.ExtIndex));
+          Z[n1_V][n1_4] = mh->GetZ();
+               }
 	  if( GetFUsed( vSFlag[hitl.f] | vSFlagB[hitl.b] ) ) continue; // if used
 
 	  hitsl_1[n1] = ilh;
 	  u_front[n1_V][n1_4] = vStsStrips[hitl.f];
 	  u_back [n1_V][n1_4] = vStsStripsB[hitl.b];
-          Z[n1_V][n1_4] = mh->GetZ();
 	  n1++;
 	  n1_V= n1/fvecLen;
 	  n1_4= n1%fvecLen;
@@ -409,9 +410,14 @@ cout << "NStations " << NStations << endl;
 	    if( vFake_m[start_mhit] ) continue;
 	    L1StsHit &hitm = vStsHits_m[start_mhit];
 //*********************************************************
+            fvec zl_m;
+            CbmStsHit *mh_m;
             CbmL1HitStore &hitm_story= vHitStore_m[start_mhit];
-            CbmStsHit *mh_m = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitm_story.ExtIndex));
-            fvec zl_m=mh_m->GetZ();
+            if (istam < NMvdStations) zl_m=stam.z[0];
+            else {
+            mh_m = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitm_story.ExtIndex));
+            zl_m=mh_m->GetZ();
+            }
 //**************************************************************
 	    fscal &xx = vStsStrips[hitm.f];
 	    fscal &v = vStsStripsB[hitm.b];
@@ -436,10 +442,15 @@ cout << "NStations " << NStations << endl;
 	    if( vFake_m[imh] ) continue;
 	    L1StsHit &hitm = vStsHits_m[imh];
 //*****************************************************************
+            fvec zl_m;
+            CbmStsHit *mh_m;
             CbmL1HitStore &hitm_story= vHitStore_m[imh];
-            CbmStsHit *mh_m = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitm_story.ExtIndex));
-            fvec zl_m=mh_m->GetZ();
-//***********************************************************************************************88
+            if (istam < NMvdStations) zl_m=stam.z[0];
+            else {  
+            mh_m = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitm_story.ExtIndex));
+            zl_m=mh_m->GetZ();
+            }
+//***********************************************************************************************
 	    fscal &xx = vStsStrips[hitm.f];
 	    fscal &v = vStsStripsB[hitm.b];
             fscal tempX=T_1[i1_V].tx[i1_4]*(zl_m[0]-stam.z[0]);
@@ -570,11 +581,16 @@ break;
           continue;
            }
 
-            //*******************************************
-                
+//********************************************************
+            fvec zl_r;  
+            CbmStsHit *mh_r;    
             CbmL1HitStore &hitr_story= vHitStore_r[irh];
-            CbmStsHit *mh_r = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitr_story.ExtIndex));
-            fvec zl_r=mh_r->GetZ();
+            if (istar < NMvdStations) zl_r=star.z[0];
+            else {
+            mh_r = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitr_story.ExtIndex));
+            zl_r=mh_r->GetZ();
+            }
+
 //*********************************************************
 	    //double yr = hitr.y;
 	    fscal &xxr = vStsStrips[hitr.f];
@@ -823,7 +839,6 @@ break;
     //c_time_find.Stop();    
     //time_find += double(c_time_find.CpuTime()); //ms
     
-
 
 
     //==================================================================

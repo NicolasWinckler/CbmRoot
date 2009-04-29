@@ -10,6 +10,7 @@ class L1Triplet
   unsigned short int w1; // first neighbour(16b) or middle hit(16b)
   unsigned short int w2; // N neighbours(16b) or right hit(16b)
   unsigned char      b0; // chi2(5b) + level(3b)
+  unsigned char      bl; // level
   unsigned char      b1; // qp (8b)
 
  public:
@@ -33,6 +34,7 @@ class L1Triplet
     if( Chi2>31 || !finite(Chi2) ) Chi2 = 31;
     b0 = ( ((unsigned char) Chi2)<<3 ) + (Level%8);
     b1 = Qp;
+    bl = Level;
   }
 
   static unsigned int GetMaxFirstNeighbour(){ 
@@ -60,7 +62,8 @@ class L1Triplet
   }
   
   unsigned char GetLevel() const {
-    return b0%8;
+//    return b0%8;
+      return bl;
   }
 
   unsigned char GetQp() const {

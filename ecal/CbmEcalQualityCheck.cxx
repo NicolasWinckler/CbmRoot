@@ -104,16 +104,19 @@ void CbmEcalQualityCheck::Exec(Option_t* option)
     fMCMotherTrN=tr->GetMotherId();
     fPdgCode=tr->GetPdgCode();
     rmin=2e10; rm=NULL;
+    fX=-1111; fY=-1111; fZ=-1111; fE=-1111; fPX=-1111; fPY=-1111; fPZ=-1111; fChi2=-1111;
     for(j=0;j<rn;j++)
     {
       r=(CbmEcalRecParticle*)fReco->At(j);
-      rad=(fMCX-r->X())*(fMCX-r->X())+(fMCY-r->Y())*(fMCY-r->Y())+(fMCZ-r->Z())*(fMCZ-r->Z());
-      if (rad<rmin)
-      {
-	rmin=rad;
-	rm=r;
-      }
+      if (r->MCTrack()==p->GetTrackID())
+	break;
     }
+    if (j==rn)
+    {
+      fOut->Fill();
+      continue;
+    }
+    rm=r;
     if (rm==NULL)
     {
       Info("Exec", "No reconstructed photons found!");

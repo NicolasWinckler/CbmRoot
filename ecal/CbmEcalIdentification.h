@@ -37,10 +37,13 @@ public:
 private:
   /** Initialize a tree **/
   void InitTree();
+  /** Init variables before writing to tree **/
+  void InitVar();
   /** Identify a track **/
   void Identify(FairTrackParam* tr);
   /** Write information to the tree **/
   void WriteTree();
+  void WriteTreeLight();
   /** Get energy of the cell **/
   Double_t GetEnergy(CbmEcalCell* cell);
   /** Get energy in PS  **/

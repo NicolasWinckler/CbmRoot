@@ -37,6 +37,12 @@ CbmRichRingFitter.cxx
 CbmRichTrackExtrapolation.cxx 
 CbmRichRingTrackAssign.cxx 
 CbmRichRingSelect.cxx 
+
+CbmGlobalTrackFitter.cxx
+CbmPrimaryVertexFinder.cxx
+CbmRichMerger.cxx
+CbmTofMerger.cxx
+CbmTrackMerger.cxx
 )
 
 if(RULE_CHECKER_FOUND)

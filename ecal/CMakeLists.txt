@@ -1,4 +1,4 @@
-# Create a library called "libBase" which includes the source files given in
+# Create a library called "libEcal" which includes the source files given in
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
@@ -7,13 +7,15 @@ ${ROOT_INCLUDE_DIR}
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
-${CBMROOT_SOURCE_DIR}/field 
+
 ${CBMROOT_SOURCE_DIR}/cbmbase
+${CBMROOT_SOURCE_DIR}/field 
 ${CBMROOT_SOURCE_DIR}/cbmdata
-${CBMROOT_SOURCE_DIR}/cbmdata/ecal 
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts 
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
-${CBMROOT_SOURCE_DIR}/global
+${CBMROOT_SOURCE_DIR}/cbmdata/ecal 
+${CBMROOT_SOURCE_DIR}/cbmdata/global
+
 ${CBMROOT_SOURCE_DIR}/ecal
 )
 

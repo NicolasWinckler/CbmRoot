@@ -1,14 +1,13 @@
-# Create a library called "libBase" which includes the source files given in
+# Create a library called "libL1" which includes the source files given in
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
-${CBMROOT_SOURCE_DIR}/L1
-${CBMROOT_SOURCE_DIR}/L1/OffLineInterface
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base 
+
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
@@ -18,9 +17,12 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/rich
 ${CBMROOT_SOURCE_DIR}/cbmdata/much
 ${CBMROOT_SOURCE_DIR}/cbmdata/stt
+${CBMROOT_SOURCE_DIR}/cbmdata/global
+
+${CBMROOT_SOURCE_DIR}/L1
+${CBMROOT_SOURCE_DIR}/L1/OffLineInterface
 ${CBMROOT_SOURCE_DIR}/sts
 ${CBMROOT_SOURCE_DIR}/trd 
-${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/KF
 ${CBMROOT_SOURCE_DIR}/KF/Interface
 )

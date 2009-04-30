@@ -25,5 +25,11 @@
 #pragma link C++ class CbmRichRingTrackAssign+;
 #pragma link C++ class CbmRichRingSelect+;
 
+#pragma link C++ class CbmPrimaryVertexFinder+;
+#pragma link C++ class CbmGlobalTrackFitter+;
+#pragma link C++ class CbmRichMerger+;
+#pragma link C++ class CbmTofMerger+;
+#pragma link C++ class CbmTrackMerger+;
+
 #endif
 

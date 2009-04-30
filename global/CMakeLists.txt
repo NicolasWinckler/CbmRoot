@@ -1,4 +1,4 @@
-# Create a library called "libBase" which includes the source files given in
+# Create a library called "libGlobal" which includes the source files given in
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
@@ -30,17 +30,10 @@ CbmFindGlobalTracksQa.cxx
 CbmFindPrimaryVertex.cxx   
 CbmFitGlobalTracks.cxx 
 CbmFitGlobalTracksQa.cxx 
-CbmGlobalTrackFitter.cxx 
 CbmGlobalTrackFitterIdeal.cxx 
-CbmGlobalTrack.cxx         
 CbmPVFinderIdeal.cxx       
-CbmPrimaryVertexFinder.cxx 
-CbmRichMerger.cxx          
-CbmTrackMerger.cxx         
 CbmTrackMergerIdeal.cxx    
-CbmTofMerger.cxx           
 CbmTofMergerIdeal.cxx 
-CbmVertex.cxx
 )
 
 if(RULE_CHECKER_FOUND)

@@ -23,31 +23,12 @@ CbmMCTrack.cxx
 CbmTrack.cxx
 CbmStack.cxx
 
-ecal/CbmEcalHit.cxx 
-ecal/CbmEcalPoint.cxx
-ecal/CbmEcalPointLite.cxx 
-ecal/CbmEcalCluster.cxx 
-ecal/CbmEcalHitFastMC.cxx 
-
-much/CbmMuchHit.cxx 
-much/CbmMuchPoint.cxx
-much/CbmMuchCluster.cxx 
-much/CbmMuchDigi.cxx
-much/CbmMuchDigiMatch.cxx
-much/CbmMuchTrack.cxx 
-much/CbmMuchTrackMatch.cxx
-
 mvd/CbmMvdDetectorId.cxx
 mvd/CbmMvdCluster.cxx 
 mvd/CbmMvdDigi.cxx  
 mvd/CbmMvdHit.cxx 
 mvd/CbmMvdHitMatch.cxx 
 mvd/CbmMvdPoint.cxx
-
-rich/CbmRichRing.cxx	
-rich/CbmRichHit.cxx 
-rich/CbmRichPoint.cxx
-rich/CbmRichRingMatch.cxx 
 
 sts/CbmStsCluster.cxx 
 sts/CbmStsDigi.cxx 
@@ -57,21 +38,43 @@ sts/CbmStsPoint.cxx
 sts/CbmStsTrack.cxx 
 sts/CbmStsTrackMatch.cxx
 
-stt/CbmSttPoint.cxx
-stt/CbmSttHit.cxx
-stt/CbmSttTrack.cxx
-stt/CbmSttTrackMatch.cxx
+rich/CbmRichRing.cxx	
+rich/CbmRichHit.cxx 
+rich/CbmRichPoint.cxx
+rich/CbmRichRingMatch.cxx 
 
-tof/CbmTofHit.cxx 
-tof/CbmTofPoint.cxx
+much/CbmMuchHit.cxx 
+much/CbmMuchPoint.cxx
+much/CbmMuchCluster.cxx 
+much/CbmMuchDigi.cxx
+much/CbmMuchDigiMatch.cxx
+much/CbmMuchTrack.cxx 
+much/CbmMuchTrackMatch.cxx
 
 trd/CbmTrdHit.cxx		 
 trd/CbmTrdTrack.cxx		 
 trd/CbmTrdPoint.cxx	
 trd/CbmTrdTrackMatch.cxx  
 
+tof/CbmTofHit.cxx 
+tof/CbmTofPoint.cxx
+
+ecal/CbmEcalHit.cxx 
+ecal/CbmEcalPoint.cxx
+ecal/CbmEcalPointLite.cxx 
+ecal/CbmEcalCluster.cxx 
+ecal/CbmEcalHitFastMC.cxx 
+
 zdc/CbmZdcPoint.cxx  
 zdc/CbmZdcEvent.cxx
+
+stt/CbmSttPoint.cxx
+stt/CbmSttHit.cxx
+stt/CbmSttTrack.cxx
+stt/CbmSttTrackMatch.cxx
+
+global/CbmGlobalTrack.cxx
+global/CbmVertex.h
 )
 
 if(RULE_CHECKER_FOUND)

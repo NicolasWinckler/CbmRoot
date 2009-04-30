@@ -1,32 +1,34 @@
-# Create a library called "libField" which includes the source files given in
+# Create a library called "libKF" which includes the source files given in
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
 set(INCLUDE_DIRECTORIES
-${CBMROOT_SOURCE_DIR}/KF
-${CBMROOT_SOURCE_DIR}/KF/Interface 
 ${ROOT_INCLUDE_DIR} 
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
+
 ${CBMROOT_SOURCE_DIR}/cbmbase 
+${CBMROOT_SOURCE_DIR}/field 
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/mvd
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/cbmdata/rich
 ${CBMROOT_SOURCE_DIR}/cbmdata/tof
-${CBMROOT_SOURCE_DIR}/field 
+${CBMROOT_SOURCE_DIR}/cbmdata/global
+
+${CBMROOT_SOURCE_DIR}/KF
+${CBMROOT_SOURCE_DIR}/KF/Interface 
 ${CBMROOT_SOURCE_DIR}/passive 
 ${CBMROOT_SOURCE_DIR}/mvd 
 ${CBMROOT_SOURCE_DIR}/sts 
 ${CBMROOT_SOURCE_DIR}/rich 
-${CBMROOT_SOURCE_DIR}/trd 
-${CBMROOT_SOURCE_DIR}/stt 
-${CBMROOT_SOURCE_DIR}/tof 
 ${CBMROOT_SOURCE_DIR}/much 
+${CBMROOT_SOURCE_DIR}/trd 
+${CBMROOT_SOURCE_DIR}/tof 
 ${CBMROOT_SOURCE_DIR}/ecal
-${CBMROOT_SOURCE_DIR}/global 
+${CBMROOT_SOURCE_DIR}/stt 
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

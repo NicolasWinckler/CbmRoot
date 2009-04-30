@@ -74,7 +74,7 @@ stt/CbmSttTrack.cxx
 stt/CbmSttTrackMatch.cxx
 
 global/CbmGlobalTrack.cxx
-global/CbmVertex.h
+global/CbmVertex.cxx
 )
 
 if(RULE_CHECKER_FOUND)

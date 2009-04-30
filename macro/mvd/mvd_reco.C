@@ -14,8 +14,9 @@
 // --------------------------------------------------------------------------
 
 
-void mvd_reco(Bool_t useDigitisation = kTRUE, Int_t iVerbose = 0, 
-              Int_t nEvents = 3)
+void mvd_reco(Int_t  nEvents = 3,
+              Int_t  iVerbose = 0, 
+              Bool_t useDigitisation = kTRUE)
 {
 
   // ========================================================================

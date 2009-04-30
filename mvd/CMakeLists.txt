@@ -13,7 +13,6 @@ ${CBMROOT_SOURCE_DIR}/field
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/mvd
-${CBMROOT_SOURCE_DIR}/passive
 ${CBMROOT_SOURCE_DIR}/mvd 
 )
 

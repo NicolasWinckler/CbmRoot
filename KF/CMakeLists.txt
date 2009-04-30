@@ -1,4 +1,4 @@
-# Create a library called "libBase" which includes the source files given in
+# Create a library called "libField" which includes the source files given in
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 

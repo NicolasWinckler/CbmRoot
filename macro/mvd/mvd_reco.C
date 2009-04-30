@@ -5,12 +5,17 @@
 // Tasks:  CbmMvdDigitiser
 //         CbmMvdFindHits
 // 
+// Alternative: CbmHitProducer (direct production of MvdHits from MvdPoints).
+//              Is obsolete but kept for reference.
+// 
 //
 // V. Friese   23/04/2009
 //
 // --------------------------------------------------------------------------
 
 
+void mvd_reco(Bool_t useDigitisation = kTRUE, Int_t iVerbose = 0, 
+              Int_t nEvents = 3)
 {
 
   // ========================================================================
@@ -29,11 +34,6 @@
   // Parameter file
   TString parFile = "data/params.root";
  
-  // Number of events to process
-  Int_t nEvents = 3;
-
-  // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
-  Int_t iVerbose = 0;
  
   // In general, the following parts need not be touched
   // ========================================================================
@@ -69,46 +69,61 @@
 
 
   // -----   Reconstruction run   -------------------------------------------
-  FairRunAna *fRun= new FairRunAna();
-  fRun->SetInputFile(inFile);
-  fRun->SetOutputFile(outFile);
+  FairRunAna *run= new FairRunAna();
+  run->SetInputFile(inFile);
+  run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
   
   
-  // -----   MVD Digitiser   ------------------------------------------------
-  FairTask* mvdDigitise = new CbmMvdDigitiser("MVD Digitiser", 0, iVerbose);
-  fRun->AddTask(mvdDigitise);
-  // ------------------------------------------------------------------------
+  // ***** Case: Digitisation and hit finding *******************************
+  if ( useDigitisation ) {
+  
+    // -----   MVD Digitiser   ----------------------------------------------
+    FairTask* mvdDigitise = new CbmMvdDigitiser("MVD Digitiser", 0, iVerbose);
+    run->AddTask(mvdDigitise);
+    // ----------------------------------------------------------------------
 
+    // -----   MVD Hit Finder   ---------------------------------------------
+    FairTask* mvdFindHits = new CbmMvdFindHits("MVD Hit Finder", 0, iVerbose);
+    run->AddTask(mvdFindHits);
+    // ----------------------------------------------------------------------
+    
+  }
   
-  // -----   MVD Hit Finder   -----------------------------------------------
-  FairTask* mvdFindHits = new CbmMvdFindHits("MVD Hit Finder", 0, iVerbose);
-  fRun->AddTask(mvdFindHits);
-  // ------------------------------------------------------------------------
+  // ***** Case: HitProducer ************************************************
+  else {
+  
+    // -----   MVD HitProducer   --------------------------------------------
+    FairTask* mvdHitProd = new CbmMvdHitProducer("MVD HitProducer", 0,
+                                                 iVerbose);
+    run->AddTask(mvdHitProd);
+    // ----------------------------------------------------------------------
+    
+  }
+  
   
 
   
   // -----  Parameter database   --------------------------------------------
-  FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
+  FairRuntimeDb* rtdb = run->GetRuntimeDb();
   FairParRootFileIo*  parIo = new FairParRootFileIo();
   parIo->open(parFile.Data());
   rtdb->setFirstInput(parIo);
   rtdb->setOutput(parIo);
   rtdb->saveOutput();
   rtdb->print();
-  fRun->LoadGeometry();
   // ------------------------------------------------------------------------
 
  
   // -----   Run initialisation   -------------------------------------------
-  fRun->LoadGeometry();
-  fRun->Init();
+  run->LoadGeometry();
+  run->Init();
   // ------------------------------------------------------------------------
 
   
      
   // -----   Start run   ----------------------------------------------------
-  fRun->Run(0,nEvents);
+  run->Run(0,nEvents);
   // ------------------------------------------------------------------------
 
 

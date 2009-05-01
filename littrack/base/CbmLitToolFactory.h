@@ -25,6 +25,10 @@ public:
 			const std::string& name);
 	TrackSelectionPtr CreateTrackSelection(
 			const std::string& name);
+	TrackFinderPtr CreateTrackFinder(
+			const std::string& name);
+	HitToTrackMergerPtr CreateHitToTrackMerger(
+			const std::string& name);
 
 protected:
 	CbmLitToolFactory();

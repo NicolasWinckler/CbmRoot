@@ -24,22 +24,24 @@ void CbmLitMuchTrackFinderWeight::Init()
 	DefaultInit();
 
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fPropagatorToDet =fPropagator = factory->CreateTrackPropagator("lit");
-	fSeedSelection = factory->CreateTrackSelection("momentum_seed");
-	fFinalSelection = factory->CreateTrackSelection("empty");
-	fFitter = factory->CreateTrackFitter("kalman_robust");
-	fFilter = factory->CreateTrackUpdate("kalman");
+	TrackPropagatorPtr propagator = factory->CreateTrackPropagator("lit");
+	SetPropagatorToDet(propagator);
+	SetPropagator(propagator);
+	SetSeedSelection(factory->CreateTrackSelection("momentum_seed"));
+	SetFinalSelection(factory->CreateTrackSelection("empty"));
+	SetFitter(factory->CreateTrackFitter("kalman_robust"));
+	SetFilter(factory->CreateTrackUpdate("kalman"));
 
-	fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
+	SetLayout(CbmLitEnvironment::Instance()->GetMuchLayout());
 
-	fVerbose = 1;
-	fNofIter = 1;
-	fMaxNofMissingHits = 1;
-	fUseFastSearch = true;
-	fSigmaCoef = 3.5;
-	fChiSqPixelHitCut = 13.86;
-	fChiSqStripHitCut = 4.;
-	fPDG = 13;
+	SetVerbose(1);
+	SetNofIter(1);
+	SetMaxNofMissingHits(1);
+	IsUseFastSearch(true);
+	SetSigmaCoef(3.5);
+	SetChiSqPixelHitCut(13.86);
+	SetChiSqStripHitCut(4.);
+	SetPDG(13);
 }
 
 Int_t CbmLitMuchTrackFinderWeight::DoFind(

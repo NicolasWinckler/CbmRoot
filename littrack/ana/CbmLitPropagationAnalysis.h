@@ -70,7 +70,7 @@ private:
 	CbmStsTrack* FindStsTrackByMc(
 			Int_t mcId);
 
-	CbmLitDetectorLayout fLayout;
+//	CbmLitDetectorLayout fLayout;
 	TrackPtrVector fLitTracks;
 	TrackPtrVector fLitMcTracks;
 	Int_t fNofPlanes;
@@ -90,6 +90,8 @@ private:
 	TrackFitterPtr fSmoother;
 
 	DetectorId fDetId; // kTRD or kMUCH
+
+	Bool_t fIsElectronSetup;
 
 	std::vector<std::vector<TH1F*> > fPropagationHistos;
 	std::vector<std::vector<TH1F*> > fFilterHistos;

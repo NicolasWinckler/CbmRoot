@@ -23,21 +23,23 @@ void CbmLitTrdTrackFinderNN::Init()
 	DefaultInit();
 
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fPropagatorToDet = fPropagator = factory->CreateTrackPropagator("lit");
-	fSeedSelection = factory->CreateTrackSelection("momentum");
-	fFinalSelection = factory->CreateTrackSelection("trd_final");
-	fFilter = factory->CreateTrackUpdate("kalman");
+	TrackPropagatorPtr propagator = factory->CreateTrackPropagator("lit");
+	SetPropagatorToDet(propagator);
+	SetPropagator(propagator);
+	SetSeedSelection(factory->CreateTrackSelection("momentum"));
+	SetFinalSelection(factory->CreateTrackSelection("trd_final"));
+	SetFilter(factory->CreateTrackUpdate("kalman"));
 
-	fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
+	SetLayout(CbmLitEnvironment::Instance()->GetTrdLayout());
 
-	fVerbose = 1;
-	fNofIter = 1;
-	fUseFastSearch = true;
-	fMaxNofMissingHits = 4;
-	fSigmaCoef = 10.;
-	fChiSqPixelHitCut = 20.;
-	fChiSqStripHitCut = 4.;
-	fPDG = 11;
+	SetVerbose(1);
+	SetNofIter(1);
+	IsUseFastSearch(true);
+	SetMaxNofMissingHits(4);
+	SetSigmaCoef(10.);
+	SetChiSqPixelHitCut(20.);
+	SetChiSqStripHitCut(4.);
+	SetPDG(11);
 }
 
 Int_t CbmLitTrdTrackFinderNN::DoFind(
@@ -48,7 +50,7 @@ Int_t CbmLitTrdTrackFinderNN::DoFind(
 	TrackPtrVector trackSeeds;
 	TrackPtrVector foundTracks;
 
-	CbmLitConverter::TrkHitArrayToPixelHitVector(hitArray, hits);
+	CbmLitConverter::TrdHitArrayToPixelHitVector(hitArray, hits);
 	DefaultCreateTrackSeeds(fTrackSeedsArray, trackSeeds, fLayout, fPDG);
 
 	CbmLitTrackFinderNN::DoFind(hits, trackSeeds, foundTracks);

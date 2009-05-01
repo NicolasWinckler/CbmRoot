@@ -30,6 +30,7 @@
 #include "TGeoPgon.h"
 #include "TGeoArb8.h"
 #include "TGeoSphere.h"
+#include "TGeoBBox.h"
 #include "TGeoMatrix.h"
 
 #include <set>
@@ -74,6 +75,11 @@ FairField* CbmLitEnvironment::GetField()
       fField = (FairField*) Run->GetField();
    }
    return fField;
+}
+
+CbmLitDetectorLayout CbmLitEnvironment::GetLayout()
+{
+
 }
 
 CbmLitDetectorLayout CbmLitEnvironment::GetMuchLayout()
@@ -248,6 +254,77 @@ CbmLitDetectorLayout CbmLitEnvironment::GetTrdLayout()
 	return fTrdLayout;
 }
 
+CbmLitDetectorLayout CbmLitEnvironment::GetTofLayout()
+{
+	static Bool_t layoutCreated = false;
+
+	if (!layoutCreated) {
+		//std::set<CbmLitStation, CompareStationZLess> stationSet;
+		CbmLitStation station;
+		TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
+		for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+
+			TGeoNode* tof = (TGeoNode*) nodes->At(iNode);
+			if (TString(tof->GetName()).Contains("tof")) {
+				const Double_t* tofPos = tof->GetMatrix()->GetTranslation();
+
+				TGeoNode* gas = (TGeoNode*)tof->GetNodes()->At(0);
+				const Double_t* gasPos = gas->GetMatrix()->GetTranslation();
+
+				TGeoNode* reg = (TGeoNode*)gas->GetNodes()->At(0);
+				const Double_t* regPos = reg->GetMatrix()->GetTranslation();
+
+				TGeoBBox* shape = (TGeoBBox*) reg->GetVolume()->GetShape();
+
+				CbmLitSubstation substation;
+				substation.SetZ(tofPos[2] + gasPos[2] + regPos[2] + shape->GetDZ());// - shape->GetDZ());
+				station.SetType(kLITPIXELHIT);
+				station.AddSubstation(substation);
+			}
+		}
+		CbmLitStationGroup stationGroup;
+		stationGroup.AddStation(station);
+		fTofLayout.AddStationGroup(stationGroup);
+		std::cout << fTofLayout.ToString();
+		layoutCreated = true;
+	}
+
+	return fTofLayout;
+}
+
+CbmLitStation CbmLitEnvironment::GetTofStation()
+{
+	static Bool_t layoutCreated = false;
+	if (!layoutCreated) {
+		CbmLitStation station;
+		TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
+		for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+
+			TGeoNode* tof = (TGeoNode*) nodes->At(iNode);
+			if (TString(tof->GetName()).Contains("tof")) {
+				const Double_t* tofPos = tof->GetMatrix()->GetTranslation();
+
+				TGeoNode* gas = (TGeoNode*)tof->GetNodes()->At(0);
+				const Double_t* gasPos = gas->GetMatrix()->GetTranslation();
+
+				TGeoNode* reg = (TGeoNode*)gas->GetNodes()->At(0);
+				const Double_t* regPos = reg->GetMatrix()->GetTranslation();
+
+				TGeoBBox* shape = (TGeoBBox*) reg->GetVolume()->GetShape();
+
+				CbmLitSubstation substation;
+				substation.SetZ(tofPos[2] + gasPos[2] + regPos[2] + shape->GetDZ());// - shape->GetDZ());
+				station.SetType(kLITPIXELHIT);
+				station.AddSubstation(substation);
+			}
+		}
+		fTofStation = station;
+		std::cout << fTofStation.ToString();
+		layoutCreated = true;
+	}
+	return fTofStation;
+}
+
 void CbmLitEnvironment::DetermineLayout(
 		const std::vector<CbmLitStation>& stations,
 		CbmLitDetectorLayout& layout)
@@ -327,6 +404,37 @@ bool CbmLitEnvironment::IsTrdSegmented() const
 	} else {
 		return true;
 	}
+}
+
+bool CbmLitEnvironment::CheckDetectorPresence(
+		const std::string& name) const
+{
+	TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
+	for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+		TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+		if (TString(node->GetName()).Contains(name.c_str())) return true;
+	}
+	return false;
+}
+
+bool CbmLitEnvironment::IsElectronSetup() const
+{
+	return CheckDetectorPresence("rich");
+}
+
+bool CbmLitEnvironment::IsTrd() const
+{
+	return CheckDetectorPresence("trd");
+}
+
+bool CbmLitEnvironment::IsMuch() const
+{
+	return CheckDetectorPresence("much");
+}
+
+bool CbmLitEnvironment::IsTof() const
+{
+	return CheckDetectorPresence("tof");
 }
 
 ClassImp(CbmLitEnvironment)

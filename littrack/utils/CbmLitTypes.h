@@ -24,9 +24,4 @@ typedef std::vector<CbmLitTrack*> TrackPtrVector;
 typedef std::vector<CbmLitFitNode> FitNodeVector;
 typedef std::vector<CbmLitFitNode>::iterator FitNodeIterator;
 
-//#include <boost/tr1/memory.hpp>
-//#include "CbmLitTrackExtrapolator.h"
-//template <class T> class shared_ptr;
-//typedef shared_ptr<CbmLitTrackExtrapolator> TrackExtrapolatorPtr;
-
 #endif /*CBMLITTYPES_H_*/

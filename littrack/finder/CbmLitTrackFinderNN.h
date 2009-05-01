@@ -4,12 +4,6 @@
 #include "CbmLitTrackFinderBase.h"
 #include "CbmLitPtrTypes.h"
 
-#include "TObject.h"
-
-class CbmLitTrack;
-class CbmLitTrackParam;
-//class CbmLitTrackUpdate;
-
 class CbmLitTrackFinderNN : public CbmLitTrackFinderBase
 {
 public:
@@ -23,6 +17,8 @@ public:
 
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
+
+	void SetFilter(TrackUpdatePtr filter) {fFilter = filter;}
 
 protected:
 
@@ -45,7 +41,7 @@ protected:
 	Bool_t AddNearestHit(
 			CbmLitTrack* track,
 			HitPtrIteratorPair bounds);
-
+private:
 	TrackUpdatePtr fFilter;
 
 	ClassDef(CbmLitTrackFinderNN, 1);

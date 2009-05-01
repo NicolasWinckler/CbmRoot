@@ -3,9 +3,6 @@
 
 #include "CbmLitTrackFinderBase.h"
 
-class CbmLitTrackFitter;
-class CbmLitTrackUpdate;
-
 class CbmLitTrackFinderWeight : public CbmLitTrackFinderBase
 {
 public:
@@ -19,6 +16,9 @@ public:
 
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
+
+	void SetFitter(TrackFitterPtr fitter) { fFitter = fitter;}
+	void SetFilter(TrackUpdatePtr filter) { fFilter = filter;}
 
 protected:
 	void FollowTracks(
@@ -44,7 +44,7 @@ protected:
 	void FitTracks(
 			TrackPtrIterator itBegin,
 			TrackPtrIterator itEnd);
-
+private:
 	TrackFitterPtr fFitter;
 	TrackUpdatePtr fFilter;
 

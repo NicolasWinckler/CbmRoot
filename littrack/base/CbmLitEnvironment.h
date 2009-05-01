@@ -16,7 +16,9 @@
 
 #include "CbmLitDetectorLayout.h"
 #include "TObject.h"
+
 #include <vector>
+#include <string>
 
 class FairField;
 class TGeoNode;
@@ -30,10 +32,18 @@ public:
    static CbmLitEnvironment* Instance();
 
    FairField* GetField();
+   CbmLitDetectorLayout GetLayout();
    CbmLitDetectorLayout GetMuchLayout();
    CbmLitDetectorLayout GetNewMuchLayout();
    CbmLitDetectorLayout GetOldMuchLayout();
    CbmLitDetectorLayout GetTrdLayout();
+   CbmLitDetectorLayout GetTofLayout();
+   CbmLitStation GetTofStation();
+
+   bool IsElectronSetup() const;
+   bool IsTrd() const;
+   bool IsMuch() const;
+   bool IsTof() const;
 
 protected:
    CbmLitEnvironment();
@@ -41,8 +51,11 @@ protected:
 private:
    static CbmLitEnvironment* fInstance;
 
+   CbmLitDetectorLayout fLayout;
    CbmLitDetectorLayout fMuchLayout;
    CbmLitDetectorLayout fTrdLayout;
+   CbmLitDetectorLayout fTofLayout;
+   CbmLitStation fTofStation;
 
    FairField *fField;
 
@@ -55,6 +68,9 @@ private:
 
    bool IsStraw() const;
    bool IsTrdSegmented() const;
+
+   bool CheckDetectorPresence(
+		   const std::string& name) const;
 
    ClassDef(CbmLitEnvironment,1)
 };

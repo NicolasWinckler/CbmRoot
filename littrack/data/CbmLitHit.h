@@ -20,7 +20,8 @@ public:
 	LitHitType GetType() const { return fHitType; }
 	Double_t GetZ() const { return fZ; }
 	Double_t GetDz() const { return fDz; }
-	
+	LitDetectorId GetDetectorId() const {return fDetectorId;}
+
 	void SetPlaneId(Int_t planeId) { fPlaneId = planeId; }
 	void SetRefId(Int_t refId) { fRefId = refId; }
 	void SetW(Double_t w) { fW = w; }
@@ -28,9 +29,10 @@ public:
 	void SetHitType(LitHitType hitType) { fHitType = hitType; }
 	void SetZ(Double_t z) { fZ = z; }
 	void SetDz(Double_t dz) { fDz = dz; }
-	
+	void SetDetectorId(LitDetectorId detectorId) {fDetectorId = detectorId;}
+
 	virtual std::string ToString() const {;}
-	
+
 private:
 	Int_t fPlaneId;
 	Int_t fRefId;
@@ -39,7 +41,8 @@ private:
 	LitHitType fHitType;
 	Double_t fZ;
 	Double_t fDz;
-		
+	LitDetectorId fDetectorId;
+
 	ClassDef(CbmLitHit, 1);
 };
 

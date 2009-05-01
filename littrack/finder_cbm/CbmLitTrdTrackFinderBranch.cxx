@@ -26,34 +26,35 @@ void CbmLitTrdTrackFinderBranch::Init()
 	DefaultInit();
 
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fSeedSelection = factory->CreateTrackSelection("momentum");
-	fStationGroupSelection = factory->CreateTrackSelection("trd_station");
-	fFinalSelection = factory->CreateTrackSelection("trd_final");
-	fFinalPreSelection = factory->CreateTrackSelection("empty");
-	fPropagatorToDet = factory->CreateTrackPropagator("lit");
-	fPropagator = factory->CreateTrackPropagator("lit");
-	fFilter = factory->CreateTrackUpdate("kalman");
-	fFitter = factory->CreateTrackFitter("lit_kalman");
+	SetSeedSelection(factory->CreateTrackSelection("momentum"));
+	SetStationGroupSelection(factory->CreateTrackSelection("trd_station"));
+	SetFinalSelection(factory->CreateTrackSelection("trd_final"));
+	SetFinalPreSelection(factory->CreateTrackSelection("empty"));
+	TrackPropagatorPtr propagator = factory->CreateTrackPropagator("lit");
+	SetPropagatorToDet(propagator);
+	SetPropagator(propagator);
+	SetFilter(factory->CreateTrackUpdate("kalman"));
+	SetFitter(factory->CreateTrackFitter("lit_kalman"));
 
-	fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
+	SetLayout(CbmLitEnvironment::Instance()->GetTrdLayout());
 
-	fVerbose = 1;
-	fNofIter = 1;
-	fUseFastSearch = true;
-	fBeginStationGroup = 0;
-	fEndStationGroup = fLayout.GetNofStationGroups() - 1;
-	fPDG = 11;
+	SetVerbose(1);
+	SetNofIter(1);
+	IsUseFastSearch(true);
+	SetBeginStationGroup(0);
+	SetEndStationGroup(fLayout.GetNofStationGroups() - 1);
+	SetPDG(11);
 }
 
 void CbmLitTrdTrackFinderBranch::SetIterationParameters(
 		Int_t iter)
 {
 	if (iter == 0) {
-		fMaxNofMissingHits = 4;
-		fIsAlwaysCreateMissingHit = false;
-		fSigmaCoef = 10.;
-		fChiSqPixelHitCut = 20;//15.84;
-		fChiSqStripHitCut = 4.;
+		SetMaxNofMissingHits(4);
+		IsAlwaysCreateMissingHit(false);
+		SetSigmaCoef(10.);
+		SetChiSqPixelHitCut(20.);//15.84;
+		SetChiSqStripHitCut(4.);
 	}
 }
 
@@ -65,7 +66,7 @@ Int_t CbmLitTrdTrackFinderBranch::DoFind(
 	TrackPtrVector trackSeeds;
 	TrackPtrVector foundTracks;
 
-	CbmLitConverter::TrkHitArrayToPixelHitVector(hitArray, hits);
+	CbmLitConverter::TrdHitArrayToPixelHitVector(hitArray, hits);
 	DefaultCreateTrackSeeds(fTrackSeedsArray, trackSeeds, fLayout, fPDG);
 
 	CbmLitTrackFinderBranch::DoFind(hits, trackSeeds, foundTracks);

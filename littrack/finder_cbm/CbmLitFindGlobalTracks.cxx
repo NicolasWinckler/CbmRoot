@@ -1,0 +1,207 @@
+#include "CbmLitFindGlobalTracks.h"
+#include "CbmLitEnvironment.h"
+#include "CbmLitConverter.h"
+#include "CbmLitMemoryManagment.h"
+#include "CbmLitHit.h"
+#include "CbmLitPixelHit.h"
+#include "CbmLitStripHit.h"
+#include "CbmLitTrack.h"
+#include "CbmLitToolFactory.h"
+
+#include "CbmStsTrack.h"
+#include "CbmTrdTrack.h"
+#include "CbmMuchTrack.h"
+#include "CbmTrdHit.h"
+#include "CbmMuchHit.h"
+#include "CbmTofHit.h"
+#include "CbmGlobalTrack.h"
+#include "FairRootManager.h"
+
+#include "TClonesArray.h"
+
+#include <iostream>
+
+CbmLitFindGlobalTracks::CbmLitFindGlobalTracks()
+{
+	fEventNo = 0;
+}
+
+CbmLitFindGlobalTracks::~CbmLitFindGlobalTracks()
+{
+
+}
+
+void CbmLitFindGlobalTracks::SetParContainers()
+{
+
+}
+
+InitStatus CbmLitFindGlobalTracks::Init()
+{
+	DetermineSetup();
+	ReadAndCreateDataBranches();
+	InitTrackReconstruction();
+
+	return kSUCCESS;
+}
+
+InitStatus CbmLitFindGlobalTracks::ReInit()
+{
+	return kSUCCESS;
+}
+
+void CbmLitFindGlobalTracks::Exec(
+		Option_t* opt)
+{
+	if (fIsTrd)	fTrdTracks->Clear();
+	if (fIsMuch) fMuchTracks->Clear();
+	fGlobalTracks->Clear();
+
+	ConvertInputData();
+
+	InitStsTrackSeeds();
+
+	RunTrackReconstruction();
+
+	ConvertOutputData();
+
+	ClearArrays();
+
+	std::cout << "Event: " << fEventNo++ << std::endl;
+}
+
+void CbmLitFindGlobalTracks::Finish()
+{
+
+}
+
+void CbmLitFindGlobalTracks::DetermineSetup()
+{
+    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
+    fIsElectronSetup = env->IsElectronSetup();
+    fIsTrd = env->IsTrd();
+    fIsMuch = env->IsMuch();
+    fIsTof = env->IsTof();
+
+    if (fIsElectronSetup) std::cout << "-I- CBM electron setup detected" << std::endl;
+    else std::cout << "-I- CBM muon setup" << std::endl;
+    std::cout << "-I- The following detectors were found in the CBM setup and will be used for global tracking:" << std::endl;
+    if (fIsTrd) std::cout << "TRD" << std::endl;
+    if (fIsMuch) std::cout << "MUCH" << std::endl;
+    if (fIsTof) std::cout << "TOF" << std::endl;
+}
+
+void CbmLitFindGlobalTracks::ReadAndCreateDataBranches()
+{
+	FairRootManager* ioman = FairRootManager::Instance();
+	if (NULL == ioman) Fatal("Init","CbmRootManager is not instantiated");
+
+	//STS data
+	fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
+	if (NULL == fStsTracks) Fatal("Init","No STSTrack array!");
+	std::cout << "-I- STSTrack branch found in tree" << std::endl;
+
+	//MUCH data
+	if (fIsMuch) {
+		fMuchHits = (TClonesArray*) ioman->GetObject("MuchHit");
+		if (NULL == fMuchHits) Fatal("Init", "No MuchHit array!");
+		std::cout << "-I- MuchHit branch found in tree" << std::endl;
+	}
+
+	//TRD data
+	if (fIsTrd) {
+		fTrdHits = (TClonesArray*) ioman->GetObject("TRDHit");
+		if (NULL == fTrdHits) Fatal("Init", "No TRDHit array!");
+		std::cout << "-I- TRDHit branch found in tree" << std::endl;
+	}
+
+	//TOF data
+	if (fIsTof) {
+		fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
+		if (NULL == fTofHits) Fatal("Init", "No TofHit array!");
+		std::cout << "-I- TofHit branch found in tree" << std::endl;
+	}
+
+	// Create and register track arrays
+	fGlobalTracks = new TClonesArray("CbmGlobalTrack",100);
+	ioman->Register("GlobalTrack", "Global", fGlobalTracks, kTRUE);
+
+	if (fIsMuch) {
+		fMuchTracks = new TClonesArray("CbmMuchTrack", 100);
+		ioman->Register("MuchTrack", "Much", fMuchTracks, kTRUE);
+	}
+
+	if (fIsTrd) {
+		fTrdTracks = new TClonesArray("CbmTrdTrack", 100);
+		ioman->Register("TRDTrack", "Trd", fTrdTracks, kTRUE);
+	}
+}
+
+void CbmLitFindGlobalTracks::InitTrackReconstruction()
+{
+	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
+	fFinder = factory->CreateTrackFinder("trd_nn");
+	fMerger = factory->CreateHitToTrackMerger("tof_nearest_hit");
+}
+
+void CbmLitFindGlobalTracks::ConvertInputData()
+{
+	CbmLitConverter::StsTrackArrayToTrackVector(fStsTracks, fLitStsTracks);
+	std::cout << "-I- Number of STS tracks: " << fLitStsTracks.size() << std::endl;
+	if (fIsMuch) {
+		CbmLitConverter::MuchHitArrayToHitVector(fMuchHits, fLitMuchHits);
+		std::cout << "-I- Number of MUCH hits: " << fLitMuchHits.size() << std::endl;
+	}
+	if (fIsTrd) {
+		CbmLitConverter::TrdHitArrayToPixelHitVector(fTrdHits, fLitTrdHits);
+		std::cout << "-I- Number of TRD hits: " << fLitTrdHits.size() << std::endl;
+	}
+	if (fIsTof) {
+		CbmLitConverter::TofHitArrayToPixelHitVector(fTofHits, fLitTofHits);
+		std::cout << "-I- Number of TOF hits: " << fLitTofHits.size() << std::endl;
+	}
+}
+
+void CbmLitFindGlobalTracks::ConvertOutputData()
+{
+	//CbmLitConverter::TrackVectorToTrdTrackArray(fLitTrdTracks, fTrdTracks);
+	CbmLitConverter::LitTrackVectorToGlobalTrackArray(fLitTrdTracks, fGlobalTracks, fTrdTracks, fMuchTracks);
+}
+
+void CbmLitFindGlobalTracks::ClearArrays()
+{
+	// Free memory
+	for_each(fLitStsTracks.begin(), fLitStsTracks.end(), DeleteObject());
+	for_each(fLitTrdTracks.begin(), fLitTrdTracks.end(), DeleteObject());
+	for_each(fLitMuchTracks.begin(), fLitMuchTracks.end(), DeleteObject());
+	for_each(fLitMuchHits.begin(), fLitMuchHits.end(), DeleteObject());
+	for_each(fLitTrdHits.begin(), fLitTrdHits.end(), DeleteObject());
+	for_each(fLitTofHits.begin(), fLitTofHits.end(), DeleteObject());
+	fLitStsTracks.clear();
+	fLitTrdTracks.clear();
+	fLitMuchTracks.clear();
+	fLitMuchHits.clear();
+	fLitTrdHits.clear();
+	fLitTofHits.clear();
+}
+
+void CbmLitFindGlobalTracks::InitStsTrackSeeds()
+{
+//    Double_t Ze = layout.GetSubstation(0, 0, 0).GetZ();
+//    for (TrackPtrIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {
+//    	CbmLitTrackParam par = *(*iTrack)->GetParamLast();
+//    	fPropagatorToDet->Propagate(&par, Ze, pdg);
+//    	(*iTrack)->SetParamLast(&par);
+//    	(*iTrack)->SetParamFirst((*iTrack)->GetParamLast());
+//    	(*iTrack)->SetChi2(0.);
+//    }
+}
+
+void CbmLitFindGlobalTracks::RunTrackReconstruction()
+{
+	fFinder->DoFind(fLitTrdHits, fLitStsTracks, fLitTrdTracks);
+	fMerger->DoMerge(fLitTofHits, fLitTrdTracks);
+}
+
+
+ClassImp(CbmLitFindGlobalTracks);

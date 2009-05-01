@@ -21,19 +21,13 @@ public:
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
 
+	void IsAlwaysCreateMissingHit(Bool_t isAlwaysCreateMissingHit) {fIsAlwaysCreateMissingHit = isAlwaysCreateMissingHit;}
+	void SetFinalPreSelection(TrackSelectionPtr finalPreSelection) {fFinalPreSelection = finalPreSelection;}
+	void SetStationGroupSelection(TrackSelectionPtr stationGroupSelection) {fStationGroupSelection = stationGroupSelection;}
+	void SetFilter(TrackUpdatePtr filter) {fFilter = filter;}
+	void SetFitter(TrackFitterPtr fitter) {fFitter = fitter;}
+
 protected:
-	TrackPtrVector fTracksCopy;
-	TrackPtrVector fFoundTracks;
-
-	TrackSelectionPtr fFinalPreSelection;
-	TrackSelectionPtr fStationGroupSelection;
-	TrackUpdatePtr fFilter;
-	TrackFitterPtr fFitter;
-
-	Int_t fMaxNofBranches;
-	Int_t fNofBranches;
-	Bool_t fIsAlwaysCreateMissingHit;
-
 	void FollowTracks();
 
 	void ProcessStationGroup(
@@ -77,6 +71,19 @@ protected:
 			TrackPtrIterator itEnd);
 
 	void CopyToOutputArray();
+
+private:
+	TrackPtrVector fTracksCopy;
+	TrackPtrVector fFoundTracks;
+
+	TrackSelectionPtr fFinalPreSelection;
+	TrackSelectionPtr fStationGroupSelection;
+	TrackUpdatePtr fFilter;
+	TrackFitterPtr fFitter;
+
+	Int_t fMaxNofBranches;
+	Int_t fNofBranches;
+	Bool_t fIsAlwaysCreateMissingHit;
 
 	ClassDef(CbmLitTrackFinderBranch,1);
 };

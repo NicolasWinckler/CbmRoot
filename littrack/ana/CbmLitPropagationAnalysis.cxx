@@ -3,7 +3,6 @@
 #include "CbmLitTrackUpdate.h"
 #include "CbmLitTrackPropagator.h"
 #include "CbmLitTrackFitter.h"
-#include "CbmLitTrackPropagatorGeane.h"
 #include "CbmLitConverter.h"
 #include "CbmLitEnvironment.h"
 #include "CbmLitToolFactory.h"
@@ -75,10 +74,12 @@ InitStatus CbmLitPropagationAnalysis::Init()
 	fSmoother = factory->CreateTrackFitter("kalman_smoother");
 
 	// Get the layout
-	if (fDetId == kMUCH) fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
-	if (fDetId == kTRD) fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
-	fNofPlanes = fLayout.GetNofPlanes();
-	fNofPlanes = 18;
+	fIsElectronSetup = CbmLitEnvironment::Instance()->IsElectronSetup();
+
+//	if (fDetId == kMUCH) fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
+//	if (fDetId == kTRD) fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
+//	fNofPlanes = fLayout.GetNofPlanes();
+	fNofPlanes = 13;
 	fNofParams = 12;
 
 	CreateHistograms();

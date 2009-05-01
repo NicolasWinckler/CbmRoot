@@ -9,14 +9,29 @@
 
 #include <set>
 
-//class CbmLitTrackSelection;
-//class CbmLitTrackPropagator;
-
 class CbmLitTrackFinderBase : public CbmLitTrackFinder
 {
 public:
 	CbmLitTrackFinderBase();
 	virtual ~CbmLitTrackFinderBase();
+
+	// Setters
+    void SetSeedSelection(TrackSelectionPtr seedSelection) {fSeedSelection=seedSelection;}
+    void SetPropagator(TrackPropagatorPtr propagator) {fPropagator = propagator;}
+	void SetFinalSelection(TrackSelectionPtr finalSelection) {fFinalSelection = finalSelection;}
+	void SetLayout(CbmLitDetectorLayout layout) {fLayout = layout;}
+    void SetDetectorLayout(const CbmLitDetectorLayout& layout) { fLayout = layout; }
+	void SetNofIter(Int_t nofIter) { fNofIter = nofIter; }
+	void SetMaxNofMissingHits(Int_t maxNofMissingHits) { fMaxNofMissingHits = maxNofMissingHits;}
+    void SetBeginStationGroup(Int_t beginStationGroup) { fBeginStationGroup = beginStationGroup;}
+    void SetEndStationGroup(Int_t endStationGroup) { fEndStationGroup = endStationGroup;}
+    void SetPDG(Int_t pdg) { fPDG = pdg; }
+    void SetSigmaCoef(Double_t sigmaCoef) { fSigmaCoef = sigmaCoef;}
+    void SetChiSqStripHitCut(Double_t chiSqStripHitCut) { fChiSqStripHitCut = chiSqStripHitCut;}
+    void SetChiSqPixelHitCut(Double_t chiSqPixelHitCut) { fChiSqPixelHitCut = chiSqPixelHitCut;}
+    void IsUseFastSearch(Bool_t useFastSearch) { fUseFastSearch = useFastSearch;}
+
+    void SetVerbose(Int_t verbose) {fVerbose = verbose;}
 
 protected:
     virtual void SetIterationParameters(
@@ -57,6 +72,8 @@ protected:
     		TrackPtrIterator itEnd,
     		TrackPtrVector& tracks);
 
+
+protected:
     CbmLitDetectorLayout fLayout;
 
     CbmLitHitData fHitData;
@@ -85,6 +102,7 @@ protected:
     Double_t fChiSqPixelHitCut;
     Double_t fMaxCovSq;
     Bool_t fUseFastSearch;
+
     Int_t fVerbose;
     Int_t fEventNo;
 

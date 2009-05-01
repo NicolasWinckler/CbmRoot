@@ -32,28 +32,30 @@ void CbmLitMuchTrackFinderBranch::Init()
 {
 	DefaultInit();
 
-	fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
+	SetLayout(CbmLitEnvironment::Instance()->GetMuchLayout());
 
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fPropagatorToDet = fPropagator = factory->CreateTrackPropagator("lit");
-	fFilter = factory->CreateTrackUpdate("kalman");
-	fSeedSelection = factory->CreateTrackSelection("momentum_seed");
-	fStationGroupSelection = factory->CreateTrackSelection("momentum");
-	fFinalSelection = factory->CreateTrackSelection("much_final");
-	fFinalPreSelection = factory->CreateTrackSelection("empty");
-	fFitter = factory->CreateTrackFitter("lit_kalman");
+	TrackPropagatorPtr propagator = factory->CreateTrackPropagator("lit");
+	SetPropagatorToDet(propagator);
+	SetPropagator(propagator);
+	SetFilter(factory->CreateTrackUpdate("kalman"));
+	SetSeedSelection(factory->CreateTrackSelection("momentum_seed"));
+	SetStationGroupSelection(factory->CreateTrackSelection("momentum"));
+	SetFinalSelection(factory->CreateTrackSelection("much_final"));
+	SetFinalPreSelection(factory->CreateTrackSelection("empty"));
+	SetFitter(factory->CreateTrackFitter("lit_kalman"));
 
-	fVerbose = 1;
-	fNofIter = 1;
-	fBeginStationGroup = 0;
-	fEndStationGroup = fLayout.GetNofStationGroups() - 1;
-	fMaxNofMissingHits = 1;
-	fIsAlwaysCreateMissingHit = false;
-	fUseFastSearch = true;
-	fSigmaCoef = 3.5;
-	fChiSqPixelHitCut = 13.86;
-	fChiSqStripHitCut = 4.;
-	fPDG = 13;
+	SetVerbose(1);
+	SetNofIter(1);
+	SetBeginStationGroup(0);
+	SetEndStationGroup(fLayout.GetNofStationGroups() - 1);
+	SetMaxNofMissingHits(1);
+	IsAlwaysCreateMissingHit(false);
+	IsUseFastSearch(true);
+	SetSigmaCoef(3.5);
+	SetChiSqPixelHitCut(13.86);
+	SetChiSqStripHitCut(4.);
+	SetPDG(13);
 }
 
 Int_t CbmLitMuchTrackFinderBranch::DoFind(

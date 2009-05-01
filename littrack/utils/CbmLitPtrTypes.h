@@ -10,6 +10,8 @@
 #include "CbmLitWeightCalculator.h"
 #include "CbmLitGeoNavigator.h"
 #include "CbmLitMaterialEffects.h"
+#include "CbmLitTrackFinder.h"
+#include "CbmLitHitToTrackMerger.h"
 
 #ifndef __CINT__
 #include <boost/shared_ptr.hpp>
@@ -22,6 +24,8 @@ typedef boost::shared_ptr<CbmLitWeightedHitCalculator> WeightedHitCalculatorPtr;
 typedef boost::shared_ptr<CbmLitWeightCalculator> WeightCalculatorPtr;
 typedef boost::shared_ptr<CbmLitGeoNavigator> GeoNavigatorPtr;
 typedef boost::shared_ptr<CbmLitMaterialEffects> MaterialEffectsPtr;
+typedef boost::shared_ptr<CbmLitTrackFinder> TrackFinderPtr;
+typedef boost::shared_ptr<CbmLitHitToTrackMerger> HitToTrackMergerPtr;
 #else
 template <class T> class shared_ptr;
 typedef shared_ptr<CbmLitTrackExtrapolator> TrackExtrapolatorPtr;
@@ -33,6 +37,8 @@ typedef shared_ptr<CbmLitWeightedHitCalculator> WeightedHitCalculatorPtr;
 typedef shared_ptr<CbmLitWeightCalculator> WeightCalculatorPtr;
 typedef shared_ptr<CbmLitGeoNavigator> GeoNavigatorPtr;
 typedef shared_ptr<CbmLitMaterialEffects> MaterialEffectsPtr;
+typedef shared_ptr<CbmLitTrackFinder> TrackFinderPtr;
+typedef shared_ptr<CbmLitHitToTrackMerger> HitToTrackMergerPtr;
 #endif
 
 #endif

@@ -17,6 +17,10 @@
 #include "CbmLitTrackFitterImp.h"
 #include "CbmLitTrackFitterRobust.h"
 #include "CbmLitTrackFitterIter.h"
+#include "CbmLitTrackFinderNN.h"
+#include "CbmLitTrackFinderBranch.h"
+#include "CbmLitTrackFinderWeight.h"
+#include "CbmLitNearestHitToTrackMerger.h"
 #include "CbmLitEnvironment.h"
 #include "CbmLitPtrTypes.h"
 
@@ -201,6 +205,53 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 		return selection;
 	}
 //	return selection;
+}
+
+TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
+		const std::string& name)
+{
+	if(name == "trd_nn") {
+		CbmLitTrackFinderNN* trdFinderNN = new CbmLitTrackFinderNN();
+		trdFinderNN->SetPropagator(CreateTrackPropagator("lit"));
+		trdFinderNN->SetSeedSelection(CreateTrackSelection("momentum"));
+		trdFinderNN->SetFinalSelection(CreateTrackSelection("trd_final"));
+		trdFinderNN->SetFilter(CreateTrackUpdate("kalman"));
+		trdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetTrdLayout());
+		trdFinderNN->SetVerbose(1);
+		trdFinderNN->SetNofIter(1);
+		trdFinderNN->IsUseFastSearch(true);
+		trdFinderNN->SetMaxNofMissingHits(4);
+		trdFinderNN->SetSigmaCoef(10.);
+		trdFinderNN->SetChiSqPixelHitCut(20.);
+		trdFinderNN->SetChiSqStripHitCut(4.);
+		trdFinderNN->SetPDG(11);
+		trdFinderNN->Initialize();
+		TrackFinderPtr finder(trdFinderNN);
+		return finder;
+	} else
+	if(name == "much_nn") {
+
+//		return finder;
+	}
+}
+
+HitToTrackMergerPtr CbmLitToolFactory::CreateHitToTrackMerger(
+		const std::string& name)
+{
+	if(name == "tof_nearest_hit") {
+		CbmLitNearestHitToTrackMerger* nhMerger = new CbmLitNearestHitToTrackMerger();
+		nhMerger->SetPropagator(CreateTrackPropagator("lit"));
+		nhMerger->SetFilter(CreateTrackUpdate("kalman"));
+		nhMerger->SetPDG(11);
+		nhMerger->SetStation(CbmLitEnvironment::Instance()->GetTofStation());
+		nhMerger->Initialize();
+		HitToTrackMergerPtr merger(nhMerger);
+		return merger;
+	} else
+	if(name == "") {
+
+//		return finder;
+	}
 }
 
 ClassImp(CbmLitToolFactory)

@@ -27,11 +27,13 @@ public:
     		const CbmLitDetectorLayout& layout,
     		Int_t pdg);
 
+    void SetPropagatorToDet(TrackPropagatorPtr propagatorToDet) { fPropagatorToDet = propagatorToDet;}
+
 protected:
-	TrackPropagatorPtr fPropagatorToDet;
 	TClonesArray* fTrackSeedsArray;
 
-//	Int_t fVerbose;
+private:
+	TrackPropagatorPtr fPropagatorToDet;
 
 	ClassDef(CbmLitStsBasedTrackFinder, 1);
 };

@@ -1,30 +1,32 @@
 #include "../../cbmbase/CbmDetectorList.h";
-void much_reco(Int_t nEvents = 100)
+void global_reco(Int_t nEvents = 5)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString dir, mcFile, parFile, stsRecoFile, muchHitsFile, muchTracksFile;
+	TString dir, mcFile, parFile, stsRecoFile, trdHitsFile;
 	if (script != "yes") {
-//		dir  = "/home/d/andrey/test/";//events/newmuch/standard/10mu/mu_urqmd/";
-		dir  = "/home/d/andrey/test/trunk/mu_urqmd_old/";
+//		dir  = "/home/d/andrey/events/trd/segmented/10e/e_urqmd/";
+		dir  = "/home/d/andrey/test/trunk/global_e/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		stsRecoFile = dir + "sts.reco.0000.root";
-		muchHitsFile = dir + "much.hits.0000.root";
-		muchTracksFile = dir + "much.tracks.branch.0000.root";
+		trdHitsFile = dir + "trd.hits.0000.root";
+		tofHitsFile = dir + "tof.hits.0000.root";
+		globalTracksFile = dir + "global.tracks.0000.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
 		stsRecoFile = TString(gSystem->Getenv("STSRECOFILE"));
-		muchHitsFile = TString(gSystem->Getenv("MUCHHITSFILE"));
-		muchTracksFile = TString(gSystem->Getenv("MUCHTRACKSFILE"));
+		trdHitsFile = TString(gSystem->Getenv("TRDHITSFILE"));
+		trdTracksFile = TString(gSystem->Getenv("TRDTRACKSFILE"));
+		tofHitsFile = TString(gSystem->Getenv("TOFHITSFILE"));
+		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
 	}
 
-	Int_t iVerbose = 0;
+	Int_t iVerbose = 1;
 	TStopwatch timer;
 	timer.Start();
 
-	// ----  Load libraries   -------------------------------------------------
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
@@ -34,25 +36,24 @@ void much_reco(Int_t nEvents = 100)
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
 	run->AddFriend(stsRecoFile);
-	run->AddFriend(muchHitsFile);
-	run->SetOutputFile(muchTracksFile);
+	run->AddFriend(trdHitsFile);
+	run->AddFriend(tofHitsFile);
+	run->SetOutputFile(globalTracksFile);
+	// ------------------------------------------------------------------------
 
-//	FairGeane* Geane = new FairGeane(inFile.Data());
 
-	CbmMuchTrackFinder* muchTrackFinder = new CbmLitMuchTrackFinderNN();
-	CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
-	muchFindTracks->UseFinder(muchTrackFinder);
-	run->AddTask(muchFindTracks);
 
-//  CbmL1MuchFinder *MuchFinder = new CbmL1MuchFinder();
-//  run->AddTask(MuchFinder);
+	CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
+	run->AddTask(finder);
 
-	CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
-	run->AddTask(muchMatchTracks);
+	// -----   TRD track matching   --------------------------------------------
+	CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
+	run->AddTask(trdMatchTracks);
 
-	CbmLitRecQa* muchRecQa = new CbmLitRecQa(12, 0.7, kMUCH, 1);
-	muchRecQa->SetNormType(2); // '2' to number of STS tracks
-	run->AddTask(muchRecQa);
+	// -----   TRD track finding QA check   ------------------------------------
+	CbmLitRecQa* trdRecQa = new CbmLitRecQa(8, 0.7, kTRD, 1);
+	trdRecQa->SetNormType(2); // '2' to number of STS tracks
+	run->AddTask(trdRecQa);
 
 
 	// -----  Parameter database   --------------------------------------------
@@ -67,7 +68,6 @@ void much_reco(Int_t nEvents = 100)
 	// -----   Intialise and run   --------------------------------------------
 	run->LoadGeometry();
 	run->Init();
-	//  Geane->SetField(run->GetField());
 	run->Run(0,nEvents);
 	// ------------------------------------------------------------------------
 
@@ -77,9 +77,12 @@ void much_reco(Int_t nEvents = 100)
 	Double_t ctime = timer.CpuTime();
 	cout << endl << endl;
 	cout << "Macro finished succesfully." << endl;
-	cout << "Output file is "    << muchTracksFile << endl;
+	cout << "Output file is "    << globalTracksFile << endl;
 	cout << "Parameter file is " << parFile << endl;
 	cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
 	cout << endl;
 	// ------------------------------------------------------------------------
+
+	cout << " Test passed" << endl;
+	cout << " All ok " << endl;
 }

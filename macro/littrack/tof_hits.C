@@ -1,30 +1,24 @@
 #include "../../cbmbase/CbmDetectorList.h";
-void much_reco(Int_t nEvents = 100)
+void tof_hits(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString dir, mcFile, parFile, stsRecoFile, muchHitsFile, muchTracksFile;
+	TString dir, mcFile, parFile, trdHitsFile;
 	if (script != "yes") {
-//		dir  = "/home/d/andrey/test/";//events/newmuch/standard/10mu/mu_urqmd/";
-		dir  = "/home/d/andrey/test/trunk/mu_urqmd_old/";
+//		dir  = "/d/cbm02/andrey/events/trd/segmented/10e/e/";
+		dir  = "/home/d/andrey/test/trunk/global_e/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
-		stsRecoFile = dir + "sts.reco.0000.root";
-		muchHitsFile = dir + "much.hits.0000.root";
-		muchTracksFile = dir + "much.tracks.branch.0000.root";
+		tofHitsFile = dir + "tof.hits.0000.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
-		stsRecoFile = TString(gSystem->Getenv("STSRECOFILE"));
-		muchHitsFile = TString(gSystem->Getenv("MUCHHITSFILE"));
-		muchTracksFile = TString(gSystem->Getenv("MUCHTRACKSFILE"));
+		tofHitsFile = TString(gSystem->Getenv("TOFHITSFILE"));
 	}
 
-	Int_t iVerbose = 0;
 	TStopwatch timer;
 	timer.Start();
 
-	// ----  Load libraries   -------------------------------------------------
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
@@ -33,26 +27,14 @@ void much_reco(Int_t nEvents = 100)
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
-	run->AddFriend(stsRecoFile);
-	run->AddFriend(muchHitsFile);
-	run->SetOutputFile(muchTracksFile);
+	run->SetOutputFile(tofHitsFile);
+	// ------------------------------------------------------------------------
 
-//	FairGeane* Geane = new FairGeane(inFile.Data());
 
-	CbmMuchTrackFinder* muchTrackFinder = new CbmLitMuchTrackFinderNN();
-	CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
-	muchFindTracks->UseFinder(muchTrackFinder);
-	run->AddTask(muchFindTracks);
-
-//  CbmL1MuchFinder *MuchFinder = new CbmL1MuchFinder();
-//  run->AddTask(MuchFinder);
-
-	CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
-	run->AddTask(muchMatchTracks);
-
-	CbmLitRecQa* muchRecQa = new CbmLitRecQa(12, 0.7, kMUCH, 1);
-	muchRecQa->SetNormType(2); // '2' to number of STS tracks
-	run->AddTask(muchRecQa);
+	// ------   TOF hit producer   ---------------------------------------------
+	CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
+	run->AddTask(tofHitProd);
+	// -------------------------------------------------------------------------
 
 
 	// -----  Parameter database   --------------------------------------------
@@ -64,10 +46,9 @@ void much_reco(Int_t nEvents = 100)
 	rtdb->saveOutput();
 	// ------------------------------------------------------------------------
 
-	// -----   Intialise and run   --------------------------------------------
+	// -----   Initialize and run   --------------------------------------------
 	run->LoadGeometry();
 	run->Init();
-	//  Geane->SetField(run->GetField());
 	run->Run(0,nEvents);
 	// ------------------------------------------------------------------------
 
@@ -77,9 +58,12 @@ void much_reco(Int_t nEvents = 100)
 	Double_t ctime = timer.CpuTime();
 	cout << endl << endl;
 	cout << "Macro finished succesfully." << endl;
-	cout << "Output file is "    << muchTracksFile << endl;
+	cout << "Output file is "    << trdHitsFile << endl;
 	cout << "Parameter file is " << parFile << endl;
 	cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
 	cout << endl;
 	// ------------------------------------------------------------------------
+
+	cout << " Test passed" << endl;
+	cout << " All ok " << endl;
 }

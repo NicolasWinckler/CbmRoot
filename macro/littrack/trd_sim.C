@@ -1,13 +1,13 @@
-void trd_sim(Int_t nEvents = 10000)
+void trd_sim(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString inFile, dir, mcFile, parFile, electrons, urqmd, geoType;
 	if (script != "yes") {
-		inFile  = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
-		dir  = "/d/cbm02/andrey/events/trd/segmented/10e/e/";
-		mcFile = outDir + "mc.0000.root";
-		parFile = outDir + "params.0000.root";
+		inFile  = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
+		dir  = "/home/d/andrey/test/trunk/global_e/";
+		mcFile = dir + "mc.0000.root";
+		parFile = dir + "param.0000.root";
 		electrons = "yes";
 		urqmd = "no";
 		geoType = "segmented";

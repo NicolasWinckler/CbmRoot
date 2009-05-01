@@ -1,10 +1,10 @@
-void much_seg(Int_t nEvents = 5)
+void much_seg(Int_t nEvents = 100)
 {
-  TString dir = "/home/d/andrey/test/";//events/newmuch/standard/10mu/mu_urqmd/";
+  TString dir = "/home/d/andrey/test/trunk/mu_urqmd_old/";//events/newmuch/standard/10mu/mu_urqmd/";
 
   TString mcFile = dir + "mc.0000.root";
   TString parFile = dir + "param.0000.root";
-  TString digiFile = dir + "much.digi.root";
+  TString digiFile = dir + "much_standard.digi.root";
 
   // Dummy ROOT file (needed as an output)
   TString outFile  = dir + "dummy.root";

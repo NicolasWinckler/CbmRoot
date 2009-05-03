@@ -1,21 +1,15 @@
-// --------------------------------------------------------------------------
-//
-// Macro for segmentation of MUCH stations
-//
-// To be defined as arguments:
-//    MC transport file
-//    Output digitization file ("*.root")
-//    Number of events to be processed (default = 2)
-//    First event to be processed (default = 0)
-//
-// M.Ryzhinskiy
-//
-// --------------------------------------------------------------------------
-
+/**
+ * Performs automatic segmentation of Much stations based on
+ * 5% occupancy criterion.
+ *
+ * @author M.Ryzhinskiy m.ryzhinskiy@gsi.de
+ * @param mcFile    Input transport file name
+ * @param digiFile  Output file name containing segmentation parameters
+ * @param nEvents   Number of events to process
+ */
 void much_seg(const char* mcFile = "",
               const char* digiFile = "",
-	      Int_t nEvents = 2,
-              Int_t iFirst = 0)
+	      Int_t nEvents = 2)
 {
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -80,7 +74,7 @@ void much_seg(const char* mcFile = "",
 
   // Run segmentation
   fRun->Init();
-  fRun->Run(iFirst,nEvents);
+  fRun->Run(0,nEvents);
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;

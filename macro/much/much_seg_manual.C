@@ -1,17 +1,12 @@
-// --------------------------------------------------------------------------
-//
-// Macro for segmentation of MUCH stations
-//
-// To be defined as arguments:
-//    MC transport file
-//    Output digitization file ("*.root")
-//    Number of events to be processed (default = 2)
-//    First event to be processed (default = 0)
-//
-// M.Ryzhinskiy
-//
-// --------------------------------------------------------------------------
-
+/**
+ * Performs segmentation of Much stations based on
+ * user specified conditions.
+ *
+ * @author M.Ryzhinskiy m.ryzhinskiy@gsi.de
+ * @param mcFile    Input transport file name
+ * @param digiFile  Output file name containing segmentation parameters
+ * @param nEvents   Number of events to process
+ */
 void much_seg(const char* mcFile = "",
               const char* digiFile = "",
 	          Int_t nEvents = 2)

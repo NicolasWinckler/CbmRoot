@@ -7,11 +7,11 @@ void much_hitsQa(){
   Int_t iVerbose = 1;
 
   TString  dir            = "data/";
-  TString  mcFile         = dir + "mc.root";
-  TString  parFile        = dir + "mc.root";
-  TString  digiFile       = dir + "digi.root";
-  TString  muchHitsFile   = dir + "much.hits.root";
-  TString  outFile        = dir + "much.hits.qa.root";
+  TString  mcFile         = dir + "Jpsi.auau.25gev.centr.mc.root";
+  TString  parFile        = dir + "Jpsi.auau.25gev.centr.mc.root";
+  TString  digiFile       = dir + "much_digi.root";
+  TString  muchHitsFile   = dir + "Jpsi.auau.25gev.centr.muchhits.root";
+  TString  outFile        = dir + "Jpsi.auau.25gev.centr.muchhits.qa.root";
 
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
@@ -70,7 +70,7 @@ void much_hitsQa(){
   fRun->AddTask(qa);
   // ------------------------------------------------------------------------
 
-  // -----   Initialise and run --------------------------------------------
+  // -----   Initialize and run --------------------------------------------
   fRun->Init();
   fRun->Run(0,nEvents);
   // ------------------------------------------------------------------------

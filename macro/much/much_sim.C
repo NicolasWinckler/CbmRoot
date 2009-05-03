@@ -1,25 +1,17 @@
-// --------------------------------------------------------------------------
-//
-// Macro for standard transport simulation with GEEANT3
-// in the CBM muon setup: STS + MUCH + TRD + TOF
-//
-// No MVD nor ECAL
-//
-// To be defined as arguments:
-//    Signal input file (PLUTO file)
-//    Background input file (UrQMD file)
-//    Output file
-//    Number of events to be processed (default = 1)
-//
-// Parameters (geometry and field) are stored in the output file.
-//
-// M.Ryzhinskiy
-// --------------------------------------------------------------------------
-
+/**
+ * Performs standard transport simulation with GEANT3
+ * in the CBM MuCh setup: STS + MUCH.
+ *
+ * @author M.Ryzhinskiy m.ryzhinskiy@gsi.de
+ * @param inputSignal    Input file containing signal
+ * @param inputBgr       Input file containing background
+ * @param outFile        Output file for transport data
+ * @param nEvents        Number of events to process
+ */
 void much_sim(TString inputSignal = "",
               TString inputBgr = "",
               TString outFile = "",
-	      Int_t nEvents = 2)
+              Int_t nEvents = 2)
 {
   // ========================================================================
   //          Adjust this part according to your requirements

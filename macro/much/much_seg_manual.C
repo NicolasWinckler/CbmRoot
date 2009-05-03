@@ -7,7 +7,7 @@
  * @param digiFile  Output file name containing segmentation parameters
  * @param nEvents   Number of events to process
  */
-void much_seg(const char* mcFile = "",
+void much_seg_manual(const char* mcFile = "",
               const char* digiFile = "",
 	          Int_t nEvents = 2)
 {

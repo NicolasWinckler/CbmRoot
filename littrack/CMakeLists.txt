@@ -107,7 +107,7 @@ propagation/CbmLitGeoNavigatorImp.cxx
 propagation/CbmLitMaterialInfo.cxx
 propagation/CbmLitMaterialEffectsImp.cxx
 propagation/CbmLitCleverTrackExtrapolator.cxx
-qa/CbmLitRecQa.cxx
+qa/CbmLitReconstructionQa.cxx
 qa/CbmLitFindGlobalTracksIdeal.cxx
 robust/CbmLitWeightedHitCalculatorImp.cxx
 robust/CbmLitWeightCalculatorSimple.cxx

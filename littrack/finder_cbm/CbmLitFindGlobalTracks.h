@@ -6,6 +6,8 @@
 #include "CbmLitTypes.h"
 #include "CbmLitPtrTypes.h"
 
+#include <string>
+
 class TClonesArray;
 
 class CbmLitFindGlobalTracks : public FairTask
@@ -19,9 +21,11 @@ public:
 	virtual InitStatus ReInit();
 	virtual void Exec(Option_t* opt);
 
+	void SetTrackingType(const std::string& trackingType) { fTrackingType = trackingType;}
+	void SetMergerType(const std::string& mergerType) { fMergerType = mergerType;}
+
 private:
 	virtual void Finish();
-
 	void DetermineSetup();
 	void ReadAndCreateDataBranches();
 	void InitTrackReconstruction();
@@ -46,14 +50,23 @@ private:
 
 	TrackPtrVector fLitStsTracks;
 	HitPtrVector fLitMuchHits;
-	TrackPtrVector fLitMuchTracks;
 	HitPtrVector fLitTrdHits;
-	TrackPtrVector fLitTrdTracks;
 	HitPtrVector fLitTofHits;
+	TrackPtrVector fLitOutputTracks; // output Lit tracks
 
 	// Tools
 	TrackFinderPtr fFinder;
 	HitToTrackMergerPtr fMerger;
+
+	// Settings
+	// Tracking method to be used
+	// "branch" - branching method
+	// "nn" - nearest neighbor method
+	// "weight" - weighting method
+	std::string fTrackingType;
+	// Merger method to be used
+	// "nearest_hit" - assigns nearest hit to the track
+	std::string fMergerType;
 
 	Int_t fEventNo;
 

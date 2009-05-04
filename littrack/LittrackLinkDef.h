@@ -84,7 +84,7 @@
 #pragma link C++ class CbmLitCleverTrackExtrapolator+;
 
 // qa
-#pragma link C++ class CbmLitRecQa+;
+#pragma link C++ class CbmLitReconstructionQa+;
 #pragma link C++ class CbmLitFindGlobalTracksIdeal+;
 
 // robust

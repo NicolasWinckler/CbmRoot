@@ -313,11 +313,11 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
 
 		globalTrack->SetStsTrackIndex(litTrack->GetPreviousTrackId());
 		if (isCreateMuchTrack) {
-			globalTrack->SetRichRingIndex(muchTrackNo); //TODO: change to MUCH here
+			globalTrack->SetRichRingIndex(muchTrackNo - 1); //TODO: change to MUCH here
 			muchTrack->SetStsTrackID(litTrack->GetPreviousTrackId());
 		}
 		if (isCreateTrdTrack) {
-			globalTrack->SetTrdTrackIndex(trdTrackNo);
+			globalTrack->SetTrdTrackIndex(trdTrackNo - 1);
 			trdTrack->SetStsTrackIndex(litTrack->GetPreviousTrackId());
 			trdTrack->SortHits();
 		}

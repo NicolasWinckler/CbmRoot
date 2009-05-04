@@ -24,6 +24,8 @@
 CbmLitFindGlobalTracks::CbmLitFindGlobalTracks()
 {
 	fEventNo = 0;
+	fTrackingType = "branch";
+	fMergerType = "nearest_hit";
 }
 
 CbmLitFindGlobalTracks::~CbmLitFindGlobalTracks()
@@ -84,7 +86,7 @@ void CbmLitFindGlobalTracks::DetermineSetup()
     fIsTof = env->IsTof();
 
     if (fIsElectronSetup) std::cout << "-I- CBM electron setup detected" << std::endl;
-    else std::cout << "-I- CBM muon setup" << std::endl;
+    else std::cout << "-I- CBM muon setup detected" << std::endl;
     std::cout << "-I- The following detectors were found in the CBM setup and will be used for global tracking:" << std::endl;
     if (fIsTrd) std::cout << "TRD" << std::endl;
     if (fIsMuch) std::cout << "MUCH" << std::endl;
@@ -140,8 +142,21 @@ void CbmLitFindGlobalTracks::ReadAndCreateDataBranches()
 void CbmLitFindGlobalTracks::InitTrackReconstruction()
 {
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fFinder = factory->CreateTrackFinder("trd_nn");
-	fMerger = factory->CreateHitToTrackMerger("tof_nearest_hit");
+	if (fIsElectronSetup) {
+		if (fTrackingType == "branch" || fTrackingType == "nn" || fTrackingType == "weight") {
+			std::string st("e_");
+			st += fTrackingType;
+			fFinder = factory->CreateTrackFinder(st);
+		} else
+			TObject::Fatal("CbmLitFindGlobalTracks","Tracking type not found");
+	}
+
+	if (fIsTof) {
+		if (fMergerType == "nearest_hit")
+			fMerger = factory->CreateHitToTrackMerger("tof_nearest_hit");
+		else
+			TObject::Fatal("CbmLitFindGlobalTracks","Merger type not found");
+	}
 }
 
 void CbmLitFindGlobalTracks::ConvertInputData()
@@ -165,21 +180,19 @@ void CbmLitFindGlobalTracks::ConvertInputData()
 void CbmLitFindGlobalTracks::ConvertOutputData()
 {
 	//CbmLitConverter::TrackVectorToTrdTrackArray(fLitTrdTracks, fTrdTracks);
-	CbmLitConverter::LitTrackVectorToGlobalTrackArray(fLitTrdTracks, fGlobalTracks, fTrdTracks, fMuchTracks);
+	CbmLitConverter::LitTrackVectorToGlobalTrackArray(fLitOutputTracks, fGlobalTracks, fTrdTracks, fMuchTracks);
 }
 
 void CbmLitFindGlobalTracks::ClearArrays()
 {
 	// Free memory
 	for_each(fLitStsTracks.begin(), fLitStsTracks.end(), DeleteObject());
-	for_each(fLitTrdTracks.begin(), fLitTrdTracks.end(), DeleteObject());
-	for_each(fLitMuchTracks.begin(), fLitMuchTracks.end(), DeleteObject());
+	for_each(fLitOutputTracks.begin(), fLitOutputTracks.end(), DeleteObject());
 	for_each(fLitMuchHits.begin(), fLitMuchHits.end(), DeleteObject());
 	for_each(fLitTrdHits.begin(), fLitTrdHits.end(), DeleteObject());
 	for_each(fLitTofHits.begin(), fLitTofHits.end(), DeleteObject());
 	fLitStsTracks.clear();
-	fLitTrdTracks.clear();
-	fLitMuchTracks.clear();
+	fLitOutputTracks.clear();
 	fLitMuchHits.clear();
 	fLitTrdHits.clear();
 	fLitTofHits.clear();
@@ -199,8 +212,8 @@ void CbmLitFindGlobalTracks::InitStsTrackSeeds()
 
 void CbmLitFindGlobalTracks::RunTrackReconstruction()
 {
-	fFinder->DoFind(fLitTrdHits, fLitStsTracks, fLitTrdTracks);
-	fMerger->DoMerge(fLitTofHits, fLitTrdTracks);
+	if (fIsTrd)fFinder->DoFind(fLitTrdHits, fLitStsTracks, fLitOutputTracks);
+	if (fIsTof)fMerger->DoMerge(fLitTofHits, fLitOutputTracks);
 }
 
 

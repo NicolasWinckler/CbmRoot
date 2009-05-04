@@ -210,7 +210,7 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		const std::string& name)
 {
-	if(name == "trd_nn") {
+	if(name == "e_nn") {
 		CbmLitTrackFinderNN* trdFinderNN = new CbmLitTrackFinderNN();
 		trdFinderNN->SetPropagator(CreateTrackPropagator("lit"));
 		trdFinderNN->SetSeedSelection(CreateTrackSelection("momentum"));
@@ -221,7 +221,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderNN->SetNofIter(1);
 		trdFinderNN->IsUseFastSearch(true);
 		trdFinderNN->SetMaxNofMissingHits(4);
-		trdFinderNN->SetSigmaCoef(10.);
+		trdFinderNN->SetSigmaCoef(7.);
 		trdFinderNN->SetChiSqPixelHitCut(20.);
 		trdFinderNN->SetChiSqStripHitCut(4.);
 		trdFinderNN->SetPDG(11);
@@ -229,9 +229,48 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		TrackFinderPtr finder(trdFinderNN);
 		return finder;
 	} else
-	if(name == "much_nn") {
-
-//		return finder;
+	if(name == "e_branch") {
+		CbmLitTrackFinderBranch* trdFinderBranch = new CbmLitTrackFinderBranch();
+		trdFinderBranch->SetPropagator(CreateTrackPropagator("lit"));
+		trdFinderBranch->SetSeedSelection(CreateTrackSelection("momentum"));
+		trdFinderBranch->SetStationGroupSelection(CreateTrackSelection("trd_station"));
+		trdFinderBranch->SetFinalSelection(CreateTrackSelection("trd_final"));
+		trdFinderBranch->SetFinalPreSelection(CreateTrackSelection("empty"));
+		trdFinderBranch->SetFilter(CreateTrackUpdate("kalman"));
+		trdFinderBranch->SetFitter(CreateTrackFitter("lit_kalman"));
+		trdFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetTrdLayout());
+		trdFinderBranch->SetVerbose(1);
+		trdFinderBranch->SetNofIter(1);
+		trdFinderBranch->IsUseFastSearch(true);
+		trdFinderBranch->SetBeginStationGroup(0);
+		trdFinderBranch->SetEndStationGroup(CbmLitEnvironment::Instance()->GetTrdLayout().GetNofStationGroups() - 1);
+		trdFinderBranch->SetPDG(11);
+		trdFinderBranch->SetMaxNofMissingHits(4);
+		trdFinderBranch->IsAlwaysCreateMissingHit(false);
+		trdFinderBranch->SetSigmaCoef(10.);
+		trdFinderBranch->SetChiSqPixelHitCut(20.);//15.84;
+		trdFinderBranch->SetChiSqStripHitCut(4.);
+		TrackFinderPtr finder(trdFinderBranch);
+		return finder;
+	} else
+	if(name == "e_weight") {
+		CbmLitTrackFinderWeight* trdFinderWeight = new CbmLitTrackFinderWeight();
+		trdFinderWeight->SetPropagator(CreateTrackPropagator("lit"));
+		trdFinderWeight->SetSeedSelection(CreateTrackSelection("momentum"));
+		trdFinderWeight->SetFinalSelection(CreateTrackSelection("empty"));
+		trdFinderWeight->SetFitter(CreateTrackFitter("kalman_robust"));
+		trdFinderWeight->SetFilter(CreateTrackUpdate("kalman"));
+		trdFinderWeight->SetLayout(CbmLitEnvironment::Instance()->GetTrdLayout());
+		trdFinderWeight->SetVerbose(1);
+		trdFinderWeight->SetNofIter(1);
+		trdFinderWeight->SetMaxNofMissingHits(0);
+		trdFinderWeight->IsUseFastSearch(true);
+		trdFinderWeight->SetSigmaCoef(10.);
+		trdFinderWeight->SetChiSqPixelHitCut(20.);
+		trdFinderWeight->SetChiSqStripHitCut(4.);
+		trdFinderWeight->SetPDG(11);
+		TrackFinderPtr finder(trdFinderWeight);
+		return finder;
 	}
 }
 

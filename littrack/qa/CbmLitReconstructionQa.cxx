@@ -53,11 +53,6 @@ CbmLitReconstructionQa::~CbmLitReconstructionQa()
 	delete fHistoList;
 }
 
-void CbmLitReconstructionQa::SetParContainers()
-{
-
-}
-
 InitStatus CbmLitReconstructionQa::Init()
 {
     DetermineSetup();
@@ -65,11 +60,6 @@ InitStatus CbmLitReconstructionQa::Init()
     CreateHistos();
 
     return kSUCCESS;
-}
-
-InitStatus CbmLitReconstructionQa::ReInit()
-{
-	return kSUCCESS;
 }
 
 void CbmLitReconstructionQa::Exec(
@@ -488,24 +478,24 @@ std::string CbmLitReconstructionQa::EventEfficiencyStatisticsToString(
 		const std::vector<std::vector<TH1F*> >& hist)
 {
 	Double_t allEff = 0., refEff = 0., primEff = 0., secEff = 0., muEff = 0., elEff = 0.;
-	Int_t allRec = hist[ALL][REC]->GetEntries();
-	Int_t allAcc = hist[ALL][ACC]->GetEntries();
-	if (allAcc != 0) allEff = (Double_t) allRec / (Double_t) allAcc;
-	Int_t refRec = hist[REF][REC]->GetEntries();
-	Int_t refAcc = hist[REF][ACC]->GetEntries();
-	if (refAcc != 0) refEff = (Double_t) refRec / (Double_t) refAcc;
-	Int_t primRec = hist[PRIM][REC]->GetEntries();
-	Int_t primAcc = hist[PRIM][ACC]->GetEntries();
-	if (primAcc != 0) primEff = (Double_t) primRec / (Double_t) primAcc;
-	Int_t secRec = hist[SEC][REC]->GetEntries();
-	Int_t secAcc = hist[SEC][ACC]->GetEntries();
-	if (secAcc != 0) secEff = (Double_t) secRec / (Double_t) secAcc;
-	Int_t muRec = hist[MU][REC]->GetEntries();
-	Int_t muAcc = hist[MU][ACC]->GetEntries();
-	if (muAcc != 0) muEff = (Double_t) muRec / (Double_t) muAcc;
-	Int_t elRec = hist[EL][REC]->GetEntries();
-	Int_t elAcc = hist[EL][ACC]->GetEntries();
-	if (elAcc != 0) elEff = (Double_t) elRec / (Double_t) elAcc;
+	Double_t allRec = hist[ALL][REC]->GetEntries();
+	Double_t allAcc = hist[ALL][ACC]->GetEntries();
+	if (allAcc != 0.) allEff = allRec / allAcc;
+	Double_t refRec = hist[REF][REC]->GetEntries();
+	Double_t refAcc = hist[REF][ACC]->GetEntries();
+	if (refAcc != 0.) refEff = refRec / refAcc;
+	Double_t primRec = hist[PRIM][REC]->GetEntries();
+	Double_t primAcc = hist[PRIM][ACC]->GetEntries();
+	if (primAcc != 0.) primEff = primRec / primAcc;
+	Double_t secRec = hist[SEC][REC]->GetEntries();
+	Double_t secAcc = hist[SEC][ACC]->GetEntries();
+	if (secAcc != 0.) secEff = secRec / secAcc;
+	Double_t muRec = hist[MU][REC]->GetEntries();
+	Double_t muAcc = hist[MU][ACC]->GetEntries();
+	if (muAcc != 0.) muEff = muRec / muAcc;
+	Double_t elRec = hist[EL][REC]->GetEntries();
+	Double_t elAcc = hist[EL][ACC]->GetEntries();
+	if (elAcc != 0.) elEff = elRec / elAcc;
 
 	std::stringstream ss;
 	ss.precision(3);

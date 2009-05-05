@@ -69,6 +69,24 @@ void much_seg_auto(const char* mcFile = "",
 
   // -----  Segmentation task  ----------------------------------------------
   CbmMuchSegmentation* seg = new CbmMuchSegmentation(digiFile);
+
+  // Number of stations
+  seg->SetNStations(6);
+
+  // Set minimum allowed resolution for each station
+  Double_t sigmaXmin[] = {0.04, 0.04, 0.04, 0.04, 0.04, 0.04};
+  Double_t sigmaYmin[] = {0.04, 0.04, 0.04, 0.04, 0.04, 0.04};
+  seg->SetSigmaMin(sigmaXmin, sigmaYmin);
+
+  // Set maximum allowed resolution for each station
+  Double_t sigmaXmax[] = {0.32, 0.32, 0.32, 0.32, 0.32, 0.32};
+  Double_t sigmaYmax[] = {0.32, 0.32, 0.32, 0.32, 0.32, 0.32};
+  seg->SetSigmaMax(sigmaXmax, sigmaYmax);
+
+  // Set maximum occupancy for each station
+  Double_t occupancyMax[] = {0.05, 0.05, 0.05, 0.05, 0.05, 0.05};
+  seg->SetOccupancyMax(occupancyMax);
+
   fRun->AddTask(seg);
   // ------------------------------------------------------------------------
 

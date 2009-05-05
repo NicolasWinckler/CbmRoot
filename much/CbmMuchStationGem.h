@@ -31,26 +31,7 @@ class CbmMuchStationGem : public CbmMuchStation{
   /** Destructor **/
   virtual ~CbmMuchStationGem();
 
-  /** Setters **/
-  void SetSigmaXmin   (Double_t sigma) { fSigmaXmin    = sigma; }
-  void SetSigmaYmin   (Double_t sigma) { fSigmaYmin    = sigma; }
-  void SetSigmaXmax   (Double_t sigma) { fSigmaXmax    = sigma; }
-  void SetSigmaYmax   (Double_t sigma) { fSigmaYmax    = sigma; }
-  void SetOccupancyMax(Double_t occup) { fOccupancyMax = occup; }
-
-  /** Accessors **/
-  Double_t GetSigmaXmin()    const { return fSigmaXmin;    }
-  Double_t GetSigmaYmin()    const { return fSigmaYmin;    }
-  Double_t GetSigmaXmax()    const { return fSigmaXmax;    }
-  Double_t GetSigmaYmax()    const { return fSigmaYmax;    }
-  Double_t GetOccupancyMax() const { return fOccupancyMax; }
-
  protected:
-  Double_t   fSigmaXmin;        // Minimum sigma in X [mm]
-  Double_t   fSigmaYmin;        // Minimum sigma in Y [mm]
-  Double_t   fSigmaXmax;        // Maximum sigma in X [mm]
-  Double_t   fSigmaYmax;        // Maximum sigma in Y [mm]
-  Double_t   fOccupancyMax;     // Maximum occupancy
   ClassDef(CbmMuchStationGem,1);
 };
 #endif

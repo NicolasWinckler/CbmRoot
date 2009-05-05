@@ -940,19 +940,19 @@ void CbmMuchHitFinderQa::PullsQa(){
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(index);
 
 
-    CbmMuchStationGem* station = (CbmMuchStationGem*) fGeoScheme->GetStationByDetId(digi->GetDetectorId());
-    Double_t pad_xmin = TMath::Sqrt(12)*station->GetSigmaXmin();
-    Double_t pad_ymin = TMath::Sqrt(12)*station->GetSigmaYmin();
-    Int_t padSizeX = Int_t(TMath::Log2(dxmin/pad_xmin));
-    Int_t padSizeY = Int_t(TMath::Log2(dymin/pad_ymin));
-    if (padSizeX>=fnPadSizesX || padSizeX<0) { printf("wrong x pad size\n"); continue; }
-    if (padSizeY>=fnPadSizesY || padSizeY<0) { printf("wrong y pad size\n"); continue; }
-    if (nPadsX==1 && nPadsY==1) fhPullXpads1[padSizeX]->Fill((xRC-xMC)/dx);
-    if (nPadsY==1 && nPadsX==1) fhPullYpads1[padSizeY]->Fill((yRC-yMC)/dy);
-    if (nPadsX==2 && nPadsY==1) fhPullXpads2[padSizeX]->Fill((xRC-xMC)/dx);
-    if (nPadsY==2 && nPadsX==1) fhPullYpads2[padSizeY]->Fill((yRC-yMC)/dy);
-    if (nPadsX==3 && nPadsY==1) fhPullXpads3[padSizeX]->Fill((xRC-xMC)/dx);
-    if (nPadsY==3 && nPadsX==1) fhPullYpads3[padSizeY]->Fill((yRC-yMC)/dy);
+//    CbmMuchStationGem* station = (CbmMuchStationGem*) fGeoScheme->GetStationByDetId(digi->GetDetectorId());
+//    Double_t pad_xmin = TMath::Sqrt(12)*station->GetSigmaXmin();
+//    Double_t pad_ymin = TMath::Sqrt(12)*station->GetSigmaYmin();
+//    Int_t padSizeX = Int_t(TMath::Log2(dxmin/pad_xmin));
+//    Int_t padSizeY = Int_t(TMath::Log2(dymin/pad_ymin));
+//    if (padSizeX>=fnPadSizesX || padSizeX<0) { printf("wrong x pad size\n"); continue; }
+//    if (padSizeY>=fnPadSizesY || padSizeY<0) { printf("wrong y pad size\n"); continue; }
+//    if (nPadsX==1 && nPadsY==1) fhPullXpads1[padSizeX]->Fill((xRC-xMC)/dx);
+//    if (nPadsY==1 && nPadsX==1) fhPullYpads1[padSizeY]->Fill((yRC-yMC)/dy);
+//    if (nPadsX==2 && nPadsY==1) fhPullXpads2[padSizeX]->Fill((xRC-xMC)/dx);
+//    if (nPadsY==2 && nPadsX==1) fhPullYpads2[padSizeY]->Fill((yRC-yMC)/dy);
+//    if (nPadsX==3 && nPadsY==1) fhPullXpads3[padSizeX]->Fill((xRC-xMC)/dx);
+//    if (nPadsY==3 && nPadsX==1) fhPullYpads3[padSizeY]->Fill((yRC-yMC)/dy);
 
   }
 

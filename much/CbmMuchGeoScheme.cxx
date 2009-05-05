@@ -720,11 +720,11 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
   station->SetModuleDesign(fModuleDesign[st]);
   station->SetDetectorType(fDetType[st]);
 
-  station->SetSigmaXmin(fSigmaXmin[st]);
-  station->SetSigmaYmin(fSigmaYmin[st]);
-  station->SetSigmaXmax(fSigmaXmax[st]);
-  station->SetSigmaYmax(fSigmaYmax[st]);
-  station->SetOccupancyMax(fOccupancyMax[st]);
+//  station->SetSigmaXmin(fSigmaXmin[st]);
+//  station->SetSigmaYmin(fSigmaYmin[st]);
+//  station->SetSigmaXmax(fSigmaXmax[st]);
+//  station->SetSigmaYmax(fSigmaYmax[st]);
+//  station->SetOccupancyMax(fOccupancyMax[st]);
 
   // Create layers
   for (Int_t l = 0; l < fNlayers[st]; l++) {

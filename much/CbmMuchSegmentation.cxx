@@ -49,6 +49,33 @@ CbmMuchSegmentation::~CbmMuchSegmentation() {
 }
 // -------------------------------------------------------------------------
 
+void CbmMuchSegmentation::SetNStations(Int_t nStations){
+   fNStations = nStations;
+   fSigmaXmin.resize(fNStations);
+   fSigmaYmin.resize(fNStations);
+   fSigmaXmax.resize(fNStations);
+   fSigmaYmax.resize(fNStations);
+   fOccupancyMax.resize(fNStations);
+}
+
+void CbmMuchSegmentation::SetSigmaMin(Double_t* sigmaXmin, Double_t* sigmaYmin){
+   for(Int_t iStation = 0; iStation < fNStations; ++iStation){
+      fSigmaXmin.at(iStation) = sigmaXmin[iStation];
+      fSigmaYmin.at(iStation) = sigmaYmin[iStation];
+   }
+}
+void CbmMuchSegmentation::SetSigmaMax(Double_t* sigmaXmax, Double_t* sigmaYmax){
+   for(Int_t iStation = 0; iStation < fNStations; ++iStation){
+      fSigmaXmax.at(iStation) = sigmaXmax[iStation];
+      fSigmaYmax.at(iStation) = sigmaYmax[iStation];
+   }
+}
+
+void CbmMuchSegmentation::SetOccupancyMax(Double_t* occupancyMax){
+   for(Int_t iStation = 0; iStation < fNStations; ++iStation){
+      fOccupancyMax.at(iStation) = occupancyMax[iStation];
+   }
+}
 
 // -----   Private method SetParContainers  --------------------------------
 void CbmMuchSegmentation::SetParContainers() {
@@ -69,7 +96,8 @@ InitStatus CbmMuchSegmentation::Init(){
 
     fStations = fGeoPar->GetStations();
     if(!fStations) Fatal("Init", "No input array of MUCH stations.");
-    fNStations = fStations->GetEntries();
+    if(fNStations != fStations->GetEntries()) Fatal("Init", "Incorrect number of stations set.");
+    //fNStations = fStations->GetEntries();
     fHistHitDensity = new TH1D*[fNStations];
 
     for (Int_t i=0;i<fNStations;i++) {
@@ -311,16 +339,16 @@ Bool_t CbmMuchSegmentation::ShouldSegmentByX(CbmMuchSector* sector){
     Double_t R  = (uR < bR) ? uR : bR;
 
     Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
-    CbmMuchStationGem* station = (CbmMuchStationGem*)fStations->At(iStation);
+    //CbmMuchStationGem* station = (CbmMuchStationGem*)fStations->At(iStation);
     // Check minimum and maximum allowed resolution
-    Double_t sigmaMax = station->GetSigmaXmax(); //[cm]
-    Double_t sigmaMin = station->GetSigmaXmin(); //[cm]
+    Double_t sigmaMax = fSigmaXmax.at(iStation);//station->GetSigmaXmax(); //[cm]
+    Double_t sigmaMin = fSigmaXmin.at(iStation);//station->GetSigmaXmin(); //[cm]
     Double_t sigma    = sector->GetSigmaX();
     if(sigma > sigmaMin && sigma/2. < sigmaMin) return false;
     if(sigma > sigmaMax) return true;
     // Check for occupancy
     Double_t hitDensity   = exp(fExp0.at(iStation) + fExp1.at(iStation)*R);
-    Double_t occupancyMax = station->GetOccupancyMax();
+    Double_t occupancyMax = fOccupancyMax.at(iStation);//station->GetOccupancyMax();
     Double_t sPad  = secLx*secLy/128.;
     Double_t nPads = (1.354-0.304*TMath::Log2(sPad)); // number of pads fired by one track in average
     //printf("nPads:%f\n",nPads);
@@ -347,16 +375,16 @@ Bool_t CbmMuchSegmentation::ShouldSegmentByY(CbmMuchSector* sector){
     Double_t R  = (uR < bR) ? uR : bR;
 
     Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
-    CbmMuchStationGem* station = (CbmMuchStationGem*)fStations->At(iStation);
+    //CbmMuchStationGem* station = (CbmMuchStationGem*)fStations->At(iStation);
     // Check minimum and maximum allowed resolution
-    Double_t sigmaMax = station->GetSigmaYmax(); //[cm]
-    Double_t sigmaMin = station->GetSigmaYmin(); //[cm]
+    Double_t sigmaMax = fSigmaYmax.at(iStation);//station->GetSigmaYmax(); //[cm]
+    Double_t sigmaMin = fSigmaYmin.at(iStation);//station->GetSigmaYmin(); //[cm]
     Double_t sigma    = sector->GetSigmaY();
     if(sigma > sigmaMin && sigma/2. < sigmaMin) return false;
     if(sigma > sigmaMax) return true;
     // Check for occupancy
     Double_t hitDensity   = exp(fExp0.at(iStation) + fExp1.at(iStation)*R);
-    Double_t occupancyMax = station->GetOccupancyMax();
+    Double_t occupancyMax = fOccupancyMax.at(iStation);//station->GetOccupancyMax();
     Double_t sPad  = secLx*secLy/128.;
     Double_t nPads = (1.354-0.304*TMath::Log2(sPad)); // number of pads fired by one track in average
     Double_t occupancy = hitDensity*sPad*nPads;

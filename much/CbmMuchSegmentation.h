@@ -33,6 +33,12 @@ class CbmMuchSegmentation : public FairTask{
   /** Default constructor **/
   CbmMuchSegmentation(char* digiFileName);
 
+  void SetNStations(Int_t nStations);
+  void SetSigmaMin(Double_t* sigmaXmin, Double_t* sigmaYmin);
+  void SetSigmaMax(Double_t* sigmaXmax, Double_t* sigmaYmax);
+  void SetOccupancyMax(Double_t* occupancyMax);
+
+
   virtual InitStatus Init();
   virtual void Exec(Option_t * option);
   virtual void FinishTask();
@@ -51,6 +57,12 @@ class CbmMuchSegmentation : public FairTask{
   CbmGeoMuchPar*    fGeoPar;                // Geometry parameters container
   vector<Double_t>  fExp0;                  // Fit parameters for EXP distribution for each station
   vector<Double_t>  fExp1;                  // Fit parameters for EXP distribution for each station
+
+  vector<Double_t>   fSigmaXmin;        // Minimum sigma in X [mm]
+  vector<Double_t>   fSigmaYmin;        // Minimum sigma in Y [mm]
+  vector<Double_t>   fSigmaXmax;        // Maximum sigma in X [mm]
+  vector<Double_t>   fSigmaYmax;        // Maximum sigma in Y [mm]
+  vector<Double_t>   fOccupancyMax;     // Maximum occupancy
 
   /** Get parameter containers **/
   virtual void SetParContainers();

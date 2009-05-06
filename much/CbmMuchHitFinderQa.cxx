@@ -93,15 +93,6 @@ InitStatus CbmMuchHitFinderQa::Init()
   fNprimary   = new Int_t[fNstations];
   fNsecondary = new Int_t[fNstations];
 
-//  Int_t nChannelsTotal = 0;
-//  for (Int_t i=0;i<fNstations;i++){
-//    CbmMuchStation* station = fDigiScheme->GetStation(i);
-//    Int_t nChannels=station->GetNChannels();
-//    nChannelsTotal+=nChannels;
-//    printf("Station:%i channels:%i\n",i+1,nChannels);
-//  }
-//  printf("Total channels:%i\n",nChannelsTotal);
-
   // Reset counters
   for (Int_t i=0;i<fNstations;i++){
     fNall[i] = 0;
@@ -219,32 +210,47 @@ InitStatus CbmMuchHitFinderQa::Init()
     fhOccupancyR[i] = new TH1D(Form("hOccupancy%i",i+1),Form("Occupancy vs radius: station %i;Radius [cm];Occupancy",i+1),100,0,1.2*rMax);
   }
 
-  Double_t xmin = -1.;
-  Double_t ymin = -1.;
-  Double_t xmax = -1.;
-  Double_t ymax = -1.;
-
   vector<CbmMuchPad*> pads = fGeoScheme->GetPads();
   for (Int_t p=0;p<pads.size();p++){
     CbmMuchPad* pad = pads[p];
     Int_t stationId = fGeoScheme->GetStationIndex(pad->GetDetectorId());
     Double_t x0 = pad->GetX0();
     Double_t y0 = pad->GetY0();
-    Double_t lx = pad->GetLx();
-    Double_t ly = pad->GetLy();
     Double_t r0 = TMath::Sqrt(x0*x0+y0*y0);
     fhPadsTotalR[stationId]->Fill(r0);
-    if (xmin<0 || xmin>lx) xmin =lx;
-    if (ymin<0 || ymin>ly) ymin =ly;
-    if (xmax<0 || xmax<lx) xmax =lx;
-    if (ymax<0 || ymax<ly) ymax =ly;
   } // pads
 
-  Info("Init","xmin=%f xmax=%f",xmin,xmax);
-  Info("Init","ymin=%f ymax=%f",ymin,ymax);
+  fPadMinLx = std::numeric_limits<Double_t>::max();
+  fPadMinLy = std::numeric_limits<Double_t>::max();
+  fPadMaxLx = std::numeric_limits<Double_t>::min();
+  fPadMaxLy = std::numeric_limits<Double_t>::min();
 
-  fnPadSizesX = TMath::CeilNint(TMath::Log2(xmax/xmin)+1);
-  fnPadSizesY = TMath::CeilNint(TMath::Log2(ymax/ymin)+1);
+  Int_t nTotSectors = 0;
+  Int_t nTotChannels = 0;
+  printf("=========================================================================================\n");
+  printf(" Station Nr.\t| Sectors\t| Channels\t| Pad min size\t\t| Pad max length\t \n");
+  printf("-----------------------------------------------------------------------------------------\n");
+  for (Int_t iStation=0;iStation<fNstations;iStation++){
+    Double_t padMinLx = fGeoScheme->GetMinPadSizeX(iStation);
+    Double_t padMinLy = fGeoScheme->GetMinPadSizeY(iStation);
+    Double_t padMaxLx = fGeoScheme->GetMaxPadSizeX(iStation);
+    Double_t padMaxLy = fGeoScheme->GetMaxPadSizeY(iStation);
+    Int_t nChannels  = fGeoScheme->GetNChannels(iStation);
+    Int_t nSectors   = fGeoScheme->GetNSectors(iStation);
+    if (fPadMinLx>padMinLx) fPadMinLx = padMinLx;
+    if (fPadMinLy>padMinLy) fPadMinLy = padMinLy;
+    if (fPadMaxLx<padMaxLx) fPadMaxLx = padMaxLx;
+    if (fPadMaxLy<padMaxLy) fPadMaxLy = padMaxLy;
+    printf("%i\t\t| %i\t\t| %i\t| %5.4fx%5.4f\t\t| %5.4fx%5.4f\n",iStation+1, nSectors, nChannels, padMinLx, padMinLy, padMaxLx, padMaxLy);
+    nTotSectors += nSectors;
+    nTotChannels += nChannels;
+  }
+  printf("-----------------------------------------------------------------------------------------\n");
+  printf(" Total:\t\t| %i\t\t| %i\t| %5.4fx%5.4f\t\t| %5.4fx%5.4f\n", nTotSectors, nTotChannels,fPadMinLx,fPadMinLy,fPadMaxLx,fPadMaxLy);
+  printf("=========================================================================================\n");
+
+  fnPadSizesX = TMath::CeilNint(TMath::Log2(fPadMaxLx/fPadMinLx)+1);
+  fnPadSizesY = TMath::CeilNint(TMath::Log2(fPadMaxLy/fPadMinLy)+1);
   Info("Init","nPadSizesX=%i",fnPadSizesX);
   Info("Init","nPadSizesY=%i",fnPadSizesY);
   fhPullXpads1 = new TH1D*[fnPadSizesX];
@@ -327,7 +333,7 @@ void CbmMuchHitFinderQa::FinishTask(){
     c4->Divide(2,1);
     c4->cd(1);
     fhPullX->Sumw2();
-    fhPullX->Fit("gaus");
+    fhPullX->Fit("gaus","Q");
     fhPullX->GetFunction("gaus")->SetLineWidth(2);
     fhPullX->GetFunction("gaus")->SetLineColor(kBlue);
     fhPullX->Draw();
@@ -335,7 +341,7 @@ void CbmMuchHitFinderQa::FinishTask(){
     if (fPrintToFileOn) gPad->Print(".eps");
     c4->cd(2);
     fhPullY->Sumw2();
-    fhPullY->Fit("gaus");
+    fhPullY->Fit("gaus","Q");
     fhPullY->GetFunction("gaus")->SetLineWidth(2);
     fhPullY->GetFunction("gaus")->SetLineColor(kBlue);
     fhPullY->Draw();
@@ -343,12 +349,12 @@ void CbmMuchHitFinderQa::FinishTask(){
     if (fPrintToFileOn) gPad->Print(".eps");
     c4->cd();
 
-    TCanvas* c4x = new TCanvas("c4x","Pulls",fnPadSizesX*300,3*300);
+    TCanvas* c4x = new TCanvas("c4x","X-pulls vs pad size and cluster size",fnPadSizesX*300,3*300);
     c4x->Divide(fnPadSizesX,3);
     for (Int_t i=0;i<fnPadSizesX;i++){
       c4x->cd(i+1);
       fhPullXpads1[i]->Sumw2();
-      fhPullXpads1[i]->Fit("gaus");
+      fhPullXpads1[i]->Fit("gaus","Q");
       fhPullXpads1[i]->GetFunction("gaus")->SetLineWidth(2);
       fhPullXpads1[i]->GetFunction("gaus")->SetLineColor(kBlue);
       fhPullXpads1[i]->Draw();
@@ -357,7 +363,7 @@ void CbmMuchHitFinderQa::FinishTask(){
 
       c4x->cd(fnPadSizesX+i+1);
       fhPullXpads2[i]->Sumw2();
-      fhPullXpads2[i]->Fit("gaus");
+      fhPullXpads2[i]->Fit("gaus","Q");
       fhPullXpads2[i]->GetFunction("gaus")->SetLineWidth(2);
       fhPullXpads2[i]->GetFunction("gaus")->SetLineColor(kBlue);
       fhPullXpads2[i]->Draw();
@@ -366,7 +372,7 @@ void CbmMuchHitFinderQa::FinishTask(){
 
       c4x->cd(2*fnPadSizesX+i+1);
       fhPullXpads3[i]->Sumw2();
-      fhPullXpads3[i]->Fit("gaus");
+      fhPullXpads3[i]->Fit("gaus","Q");
       fhPullXpads3[i]->GetFunction("gaus")->SetLineWidth(2);
       fhPullXpads3[i]->GetFunction("gaus")->SetLineColor(kBlue);
       fhPullXpads3[i]->Draw();
@@ -374,12 +380,12 @@ void CbmMuchHitFinderQa::FinishTask(){
       if (fPrintToFileOn) gPad->Print(".eps");
     }
 
-    TCanvas* c4y = new TCanvas("c4y","Pulls",fnPadSizesY*300,3*300);
+    TCanvas* c4y = new TCanvas("c4y","Y-pulls vs pad size and cluster size",fnPadSizesY*300,3*300);
     c4y->Divide(fnPadSizesY,3);
     for (Int_t i=0;i<fnPadSizesY;i++){
       c4y->cd(i+1);
       fhPullYpads1[i]->Sumw2();
-      fhPullYpads1[i]->Fit("gaus");
+      fhPullYpads1[i]->Fit("gaus","Q");
       fhPullYpads1[i]->GetFunction("gaus")->SetLineWidth(2);
       fhPullYpads1[i]->GetFunction("gaus")->SetLineColor(kBlue);
       fhPullYpads1[i]->Draw();
@@ -388,7 +394,7 @@ void CbmMuchHitFinderQa::FinishTask(){
 
       c4y->cd(fnPadSizesY+i+1);
       fhPullYpads2[i]->Sumw2();
-      fhPullYpads2[i]->Fit("gaus");
+      fhPullYpads2[i]->Fit("gaus","Q");
       fhPullYpads2[i]->GetFunction("gaus")->SetLineWidth(2);
       fhPullYpads2[i]->GetFunction("gaus")->SetLineColor(kBlue);
       fhPullYpads2[i]->Draw();
@@ -397,7 +403,7 @@ void CbmMuchHitFinderQa::FinishTask(){
 
       c4y->cd(2*fnPadSizesY+i+1);
       fhPullYpads3[i]->Sumw2();
-      fhPullYpads3[i]->Fit("gaus");
+      fhPullYpads3[i]->Fit("gaus","Q");
       fhPullYpads3[i]->GetFunction("gaus")->SetLineWidth(2);
       fhPullYpads3[i]->GetFunction("gaus")->SetLineColor(kBlue);
       fhPullYpads3[i]->Draw();
@@ -849,7 +855,7 @@ void CbmMuchHitFinderQa::PullsQa(){
 
     Int_t iStation = CbmMuchGeoScheme::GetStationIndex(hit->GetDetectorId());
     Int_t iLayer   = CbmMuchGeoScheme::GetLayerIndex(hit->GetDetectorId());
-//    if(!(iStation == 0)) continue;
+    if(!(iStation == 0)) continue;
 //    if(!(iStation == 3 && iLayer == 0)) continue;
     if (verbose) printf("   Hit %i, station %i, layer %i ",i,iStation, iLayer);
 
@@ -940,20 +946,16 @@ void CbmMuchHitFinderQa::PullsQa(){
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(index);
 
 
-//    CbmMuchStationGem* station = (CbmMuchStationGem*) fGeoScheme->GetStationByDetId(digi->GetDetectorId());
-//    Double_t pad_xmin = TMath::Sqrt(12)*station->GetSigmaXmin();
-//    Double_t pad_ymin = TMath::Sqrt(12)*station->GetSigmaYmin();
-//    Int_t padSizeX = Int_t(TMath::Log2(dxmin/pad_xmin));
-//    Int_t padSizeY = Int_t(TMath::Log2(dymin/pad_ymin));
-//    if (padSizeX>=fnPadSizesX || padSizeX<0) { printf("wrong x pad size\n"); continue; }
-//    if (padSizeY>=fnPadSizesY || padSizeY<0) { printf("wrong y pad size\n"); continue; }
-//    if (nPadsX==1 && nPadsY==1) fhPullXpads1[padSizeX]->Fill((xRC-xMC)/dx);
-//    if (nPadsY==1 && nPadsX==1) fhPullYpads1[padSizeY]->Fill((yRC-yMC)/dy);
-//    if (nPadsX==2 && nPadsY==1) fhPullXpads2[padSizeX]->Fill((xRC-xMC)/dx);
-//    if (nPadsY==2 && nPadsX==1) fhPullYpads2[padSizeY]->Fill((yRC-yMC)/dy);
-//    if (nPadsX==3 && nPadsY==1) fhPullXpads3[padSizeX]->Fill((xRC-xMC)/dx);
-//    if (nPadsY==3 && nPadsX==1) fhPullYpads3[padSizeY]->Fill((yRC-yMC)/dy);
-
+    Int_t padSizeX = Int_t(TMath::Log2(dxmin/fPadMinLx));
+    Int_t padSizeY = Int_t(TMath::Log2(dymin/fPadMinLy));
+    if (padSizeX>=fnPadSizesX || padSizeX<0) { printf("wrong x pad size\n"); continue; }
+    if (padSizeY>=fnPadSizesY || padSizeY<0) { printf("wrong y pad size\n"); continue; }
+    if (nPadsX==1 && nPadsY==1) fhPullXpads1[padSizeX]->Fill((xRC-xMC)/dx);
+    if (nPadsY==1 && nPadsX==1) fhPullYpads1[padSizeY]->Fill((yRC-yMC)/dy);
+    if (nPadsX==2 && nPadsY==1) fhPullXpads2[padSizeX]->Fill((xRC-xMC)/dx);
+    if (nPadsY==2 && nPadsX==1) fhPullYpads2[padSizeY]->Fill((yRC-yMC)/dy);
+    if (nPadsX==3 && nPadsY==1) fhPullXpads3[padSizeX]->Fill((xRC-xMC)/dx);
+    if (nPadsY==3 && nPadsX==1) fhPullYpads3[padSizeY]->Fill((yRC-yMC)/dy);
   }
 
 }

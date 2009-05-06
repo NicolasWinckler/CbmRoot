@@ -135,8 +135,15 @@ private:
 
   Bool_t fPrintToFileOn;
 
+  Double_t fPadMinLx;
+  Double_t fPadMinLy;
+  Double_t fPadMaxLx;
+  Double_t fPadMaxLy;
+
+
   /** Defines whether the point with the given index is signal point. **/
   Bool_t IsSignalPoint(Int_t iPoint);
+
 
   ClassDef(CbmMuchHitFinderQa,1)
 };

@@ -138,12 +138,12 @@ Bool_t CbmSts::ProcessHits(FairVolume* vol) {
 	newpos[i] = oldpos[i] - (3*safety*olddirection[i]);
       }
 
-      if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
+      /*if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
 	cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] 
 	     << " with safety = " << safety << endl;
 	cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
 	cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
-      }
+      }*/
 
       fPosOut.SetX(newpos[0]);
       fPosOut.SetY(newpos[1]);

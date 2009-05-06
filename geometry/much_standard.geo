@@ -37,11 +37,6 @@ Detector type               :       1       1       1       1       1       1
 Distance between layers [cm]:      10      10      10      10      10      10
 Support thickness [cm]      :     1.5     1.5     1.5     1.5     1.5     1.5
 Use module design (0/1)     :       1       1       1       1       1       1
-Sigma X minimum [cm]        :    0.04    0.04    0.04    0.04    0.04    0.04
-Sigma Y minimum [cm]        :    0.04    0.04    0.04    0.04    0.04    0.04
-Sigma X maximum [cm]        :    0.32    0.32    0.32    0.32    0.32    0.32
-Sigma Y maximum [cm]        :    0.32    0.32    0.32    0.32    0.32    0.32
-Maximum occupancy           :    0.05    0.05    0.05    0.05    0.05    0.05
 
 # GEM module specification (type 1)
 Active volume lx [cm]       :    25.6

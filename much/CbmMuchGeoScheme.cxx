@@ -54,11 +54,6 @@ CbmMuchGeoScheme::CbmMuchGeoScheme() {
   fLayersDz.Set(0); // Distance between layers [cm]
   fSupportLz.Set(0); // Support thickness [cm]
   fModuleDesign.Set(0); // Support thickness [cm]
-  fSigmaXmin.Set(0); // Sigma X minimum [cm]
-  fSigmaYmin.Set(0); // Sigma Y maximum [cm]
-  fSigmaXmax.Set(0); // Sigma X minimum [cm]
-  fSigmaYmax.Set(0); // Sigma Y maximum [cm]
-  fOccupancyMax.Set(0); // Maximum occupancyO
   fAbsorbers = new TObjArray();
   Info("CbmMuchGeoScheme", "CbmMuchGeoScheme created");
 }
@@ -440,11 +435,6 @@ void CbmMuchGeoScheme::ReadGeoFile(const char* geoName) {
   fLayersDz.Set(fNst); // Distance between layers [cm]
   fSupportLz.Set(fNst); // Support thickness [cm]
   fModuleDesign.Set(fNst); // Module design (0/1)
-  fSigmaXmin.Set(fNst); // Sigma X minimum [cm]
-  fSigmaYmin.Set(fNst); // Sigma Y maximum [cm]
-  fSigmaXmax.Set(fNst); // Sigma X minimum [cm]
-  fSigmaYmax.Set(fNst); // Sigma Y maximum [cm]
-  fOccupancyMax.Set(fNst); // Maximum occupancyO
 
   geo.getline(b, 200);
 
@@ -490,26 +480,6 @@ void CbmMuchGeoScheme::ReadGeoFile(const char* geoName) {
   geo.get(b, 30);
   for (i = 0; i < fNst; i++)
     geo >> fModuleDesign[i];
-  geo.getline(b, 200);
-  geo.get(b, 30);
-  for (i = 0; i < fNst; i++)
-    geo >> fSigmaXmin[i];
-  geo.getline(b, 200);
-  geo.get(b, 30);
-  for (i = 0; i < fNst; i++)
-    geo >> fSigmaYmin[i];
-  geo.getline(b, 200);
-  geo.get(b, 30);
-  for (i = 0; i < fNst; i++)
-    geo >> fSigmaXmax[i];
-  geo.getline(b, 200);
-  geo.get(b, 30);
-  for (i = 0; i < fNst; i++)
-    geo >> fSigmaYmax[i];
-  geo.getline(b, 200);
-  geo.get(b, 30);
-  for (i = 0; i < fNst; i++)
-    geo >> fOccupancyMax[i];
   geo.getline(b, 200);
 
   geo.getline(b, 200);
@@ -598,26 +568,6 @@ void CbmMuchGeoScheme::Print() {
   printf("  Module design (0/1)         :");
   for (i = 0; i < fNst; i++)
     printf("%7i", fModuleDesign[i]);
-  printf("\n");
-  printf("  Sigma X minimum [cm]        :");
-  for (i = 0; i < fNst; i++)
-    printf("%7.2f", fSigmaXmin[i]);
-  printf("\n");
-  printf("  Sigma Y minimum [cm]        :");
-  for (i = 0; i < fNst; i++)
-    printf("%7.2f", fSigmaYmin[i]);
-  printf("\n");
-  printf("  Sigma X maximum [cm]        :");
-  for (i = 0; i < fNst; i++)
-    printf("%7.2f", fSigmaXmax[i]);
-  printf("\n");
-  printf("  Sigma Y maximum [cm]        :");
-  for (i = 0; i < fNst; i++)
-    printf("%7.2f", fSigmaYmax[i]);
-  printf("\n");
-  printf("  Maximum occupancy           :");
-  for (i = 0; i < fNst; i++)
-    printf("%7.2f", fOccupancyMax[i]);
   printf("\n");
 
   printf("\n");
@@ -719,12 +669,6 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
   station->SetRmax(rmax);
   station->SetModuleDesign(fModuleDesign[st]);
   station->SetDetectorType(fDetType[st]);
-
-//  station->SetSigmaXmin(fSigmaXmin[st]);
-//  station->SetSigmaYmin(fSigmaYmin[st]);
-//  station->SetSigmaXmax(fSigmaXmax[st]);
-//  station->SetSigmaYmax(fSigmaYmax[st]);
-//  station->SetOccupancyMax(fOccupancyMax[st]);
 
   // Create layers
   for (Int_t l = 0; l < fNlayers[st]; l++) {

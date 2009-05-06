@@ -80,9 +80,9 @@ class CbmMCTrack : public TObject
   Double_t GetPt()       const { return TMath::Sqrt(fPx*fPx+fPy*fPy); }
   Double_t GetP() const { return TMath::Sqrt(fPx*fPx+fPy*fPy+fPz*fPz); }
   Double_t GetRapidity() const;
-  void GetMomentum(TVector3& momentum); 
-  void Get4Momentum(TLorentzVector& momentum);
-  void GetStartVertex(TVector3& vertex);
+  void GetMomentum(TVector3& momentum) const; 
+  void Get4Momentum(TLorentzVector& momentum) const;
+  void GetStartVertex(TVector3& vertex) const;
 
 
   /** Accessors to the number of MCPoints in the detectors **/
@@ -141,17 +141,17 @@ inline Double_t CbmMCTrack::GetEnergy() const {
 }
 
 
-inline void CbmMCTrack::GetMomentum(TVector3& momentum) { 
+inline void CbmMCTrack::GetMomentum(TVector3& momentum) const { 
   momentum.SetXYZ(fPx,fPy,fPz); 
 }
 
 
-inline void CbmMCTrack::Get4Momentum(TLorentzVector& momentum) {
+inline void CbmMCTrack::Get4Momentum(TLorentzVector& momentum) const {
   momentum.SetXYZT(fPx,fPy,fPz,GetEnergy()); 
 }
 
 
-inline void CbmMCTrack::GetStartVertex(TVector3& vertex) { 
+inline void CbmMCTrack::GetStartVertex(TVector3& vertex) const { 
   vertex.SetXYZ(fStartX,fStartY,fStartZ); 
 }
 

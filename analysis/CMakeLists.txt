@@ -11,6 +11,7 @@ ${CBMROOT_SOURCE_DIR}/cbmbase
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/mvd
+${CBMROOT_SOURCE_DIR}/cbmdata/global
 ${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/trackbase
 ${CBMROOT_SOURCE_DIR}/geane

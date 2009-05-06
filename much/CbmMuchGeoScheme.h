@@ -229,6 +229,13 @@ public:
     void CreateMuchCave();
 //    Bool_t IsModuleDesign() {return fModuleDesign;}
 
+    Double_t GetMinPadSizeX(Int_t iStation);
+    Double_t GetMaxPadSizeX(Int_t iStation);
+    Double_t GetMinPadSizeY(Int_t iStation);
+    Double_t GetMaxPadSizeY(Int_t iStation);
+    Int_t GetNChannels(Int_t iStation);
+    Int_t GetNSectors(Int_t iStation);
+
 private:
     CbmMuchGeoScheme();
     void CreateAbsorbers();

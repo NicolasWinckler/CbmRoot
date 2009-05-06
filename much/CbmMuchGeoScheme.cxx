@@ -811,4 +811,132 @@ Int_t CbmMuchGeoScheme::Intersect(Float_t x, Float_t y, Float_t dx, Float_t dy,
 }
 // -------------------------------------------------------------------------
 
+
+// -------------------------------------------------------------------------
+Double_t CbmMuchGeoScheme::GetMinPadSizeX(Int_t iStation){
+  Double_t padMinLx = std::numeric_limits<Double_t>::max();
+  vector<CbmMuchLayerSide*> vSides = GetLayerSides(iStation);
+
+  for(Int_t iSide = 0; iSide < vSides.size(); ++iSide){
+    CbmMuchLayerSide* side = vSides[iSide];
+    if(!side) continue;
+    for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
+      CbmMuchModule* module = side->GetModule(iModule);
+      if(!module) continue;
+      for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){
+        CbmMuchSector* sector = module->GetSector(iSector);
+        if(!sector) continue;
+        Double_t padLx = sector->GetDx();
+        if(padLx < padMinLx) padMinLx = padLx;
+      }
+    }
+  }
+  return padMinLx;
+}
+
+// -------------------------------------------------------------------------
+Double_t CbmMuchGeoScheme::GetMinPadSizeY(Int_t iStation){
+  Double_t padMinLy = std::numeric_limits<Double_t>::max();
+  vector<CbmMuchLayerSide*> vSides = GetLayerSides(iStation);
+
+  for(Int_t iSide = 0; iSide < vSides.size(); ++iSide){
+    CbmMuchLayerSide* side = vSides[iSide];
+    if(!side) continue;
+    for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
+      CbmMuchModule* module = side->GetModule(iModule);
+      if(!module) continue;
+      for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){
+        CbmMuchSector* sector = module->GetSector(iSector);
+        if(!sector) continue;
+        Double_t padLy = sector->GetDy();
+        if(padLy < padMinLy) padMinLy = padLy;
+      }
+    }
+  }
+  return padMinLy;
+}
+
+
+// -------------------------------------------------------------------------
+Double_t CbmMuchGeoScheme::GetMaxPadSizeX(Int_t iStation){
+  Double_t padMaxLx = std::numeric_limits<Double_t>::min();
+  vector<CbmMuchLayerSide*> vSides = GetLayerSides(iStation);
+
+  for(Int_t iSide = 0; iSide < vSides.size(); ++iSide){
+    CbmMuchLayerSide* side = vSides[iSide];
+    if(!side) continue;
+    for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
+      CbmMuchModule* module = side->GetModule(iModule);
+      if(!module) continue;
+      for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){
+        CbmMuchSector* sector = module->GetSector(iSector);
+        if(!sector) continue;
+        Double_t padLx = sector->GetDx();
+        if(padLx > padMaxLx) padMaxLx = padLx;
+      }
+    }
+  }
+  return padMaxLx;
+}
+
+// -------------------------------------------------------------------------
+Double_t CbmMuchGeoScheme::GetMaxPadSizeY(Int_t iStation){
+  Double_t padMaxLy = std::numeric_limits<Double_t>::min();
+  vector<CbmMuchLayerSide*> vSides = GetLayerSides(iStation);
+
+  for(Int_t iSide = 0; iSide < vSides.size(); ++iSide){
+    CbmMuchLayerSide* side = vSides[iSide];
+    if(!side) continue;
+    for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
+      CbmMuchModule* module = side->GetModule(iModule);
+      if(!module) continue;
+      for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){
+        CbmMuchSector* sector = module->GetSector(iSector);
+        if(!sector) continue;
+        Double_t padLy = sector->GetDy();
+        if(padLy > padMaxLy) padMaxLy = padLy;
+      }
+    }
+  }
+  return padMaxLy;
+}
+
+// -------------------------------------------------------------------------
+Int_t CbmMuchGeoScheme::GetNChannels(Int_t iStation){
+  Int_t nChannels=0;
+  vector<CbmMuchLayerSide*> vSides = GetLayerSides(iStation);
+
+  for(Int_t iSide = 0; iSide < vSides.size(); ++iSide){
+    CbmMuchLayerSide* side = vSides[iSide];
+    if(!side) continue;
+    for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
+      CbmMuchModule* module = side->GetModule(iModule);
+      if(!module) continue;
+      for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){
+        CbmMuchSector* sector = module->GetSector(iSector);
+        if(!sector) continue;
+        nChannels += sector->GetNChannels();
+      }
+    }
+  }
+  return nChannels;
+}
+
+// -------------------------------------------------------------------------
+Int_t CbmMuchGeoScheme::GetNSectors(Int_t iStation){
+  Int_t nSectors=0;
+  vector<CbmMuchLayerSide*> vSides = GetLayerSides(iStation);
+
+  for(Int_t iSide = 0; iSide < vSides.size(); ++iSide){
+    CbmMuchLayerSide* side = vSides[iSide];
+    if(!side) continue;
+    for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
+      CbmMuchModule* module = side->GetModule(iModule);
+      if(!module) continue;
+      nSectors += module->GetNSectors();
+    }
+  }
+  return nSectors;
+}
+
 ClassImp(CbmMuchGeoScheme)

@@ -19,51 +19,173 @@ class TList;
 class CbmLitReconstructionQa : public FairTask
 {
 public:
+    /** Default constructor */
 	CbmLitReconstructionQa();
+
+    /** Destructor */
 	virtual ~CbmLitReconstructionQa();
 
-	// Derived from FairTask
-	virtual void SetParContainers();
+    /**
+     * Derived from FairTask. Executed before starting event-by-event execution.
+     */
 	virtual InitStatus Init();
-	virtual InitStatus ReInit();
-	virtual void Exec(Option_t* opt);
 
+	/**
+     * Derived from FairTask. Executed on each event.
+     * @param opt Options
+     */
+	virtual void Exec(
+			Option_t* opt);
+
+    /**
+     * Sets the minimum number of MC points in STS.
+     * @param minNofPointsSts Minimum number of MC points in STS.
+     */
 	void SetMinNofPointsSts(Int_t minNofPointsSts) {fMinNofPointsSts = minNofPointsSts; }
+
+	/**
+     * Sets the minimum number of MC points in TRD.
+     * @param minNofPointsTrd Minimum number of MC points in TRD.
+     */
 	void SetMinNofPointsTrd(Int_t minNofPointsTrd) { fMinNofPointsTrd = minNofPointsTrd;}
+
+    /**
+     * Sets the minimum number of MC points in MUCH.
+     * @param minNofPointsMuch Minimum number of MC points in MUCH.
+     */
 	void SetMinNofPointsMuch(Int_t minNofPointsMuch) { fMinNofPointsMuch = minNofPointsMuch;}
+
+    /**
+     * Sets the minimum number of MC points in TOF.
+     * @param minNofPointsTof Minimum number of MC points in TOF.
+     */
 	void SetMinNofPointsTof(Int_t minNofPointsTof) { fMinNofPointsTof = minNofPointsTof;}
+
+    /**
+     * Sets the quota value, which is true/all hits for track to be considered correctly reconstructed.
+     * @param quota Quota value.
+     */
 	void SetQuota(Double_t quota) { fQuota = quota;}
+
+    /**
+     * Sets the verbose level for printout.
+     * @param verbose Verbose value.
+     */
 	void SetVerbose(Int_t verbose) { fVerbose = verbose;}
 
 private:
+    /**
+     * Derived from FairTask. Executed after all events are processed.
+     */
 	virtual void Finish();
 
+    /**
+     * Determines the CBM detector setup, based on TGeoManager stored in the input MC file.
+     */
 	void DetermineSetup();
+
+    /**
+     * Reads necessary data branches from the input data files.
+     */
 	void ReadDataBranches();
+
+    /**
+     * Loops over the reconstructed global tracks. Checks if the track is correct
+     * than fills the multimaps <MC track index, reconstructed track index>.
+     */
 	void ProcessGlobalTracks();
+
+	/**
+     * Checks STS track quality based on fQuota value.
+     * @param trackMatch STS track match
+     */
 	Bool_t CheckStsTrackQuality(
 			CbmStsTrackMatch* trackMatch);
+
+	/**
+     * Checks TRD track quality based on fQuota value.
+     * @param trackMatch TRD track match
+     */
 	Bool_t CheckTrdTrackQuality(
 			CbmTrdTrackMatch* trackMatch);
+
+	/**
+     * Checks MUCH track quality based on fQuota value.
+     * @param trackMatch MUCH track match
+     */
 	Bool_t CheckMuchTrackQuality(
 			CbmMuchTrackMatch* trackMatch);
+
+    /**
+     * Loops over the MC tracks. Checks the track acceptance for different cases.
+     * Fills the histograms of the accepted and reconstructed tracks.
+     */
 	void ProcessMcTracks();
+
+    /**
+     * Fills the histograms of the accepted and reconstructed tracks.
+     * @param mcTrack MC track pointer
+     * @param mcId MC track index in the array
+     * @param mcMap Map from MC track index to reconstructed track index. Map is filled in the ProcessGlobalTrack function.
+     * @param hist vector with histograms to be filled
+     * @param par value that will be added in the histos (momentum or number of points)
+     */
 	void FillGlobalReconstructionHistos(
-			CbmMCTrack* mcTrack,
+			const CbmMCTrack* mcTrack,
 			Int_t mcId,
 			const std::multimap<Int_t, Int_t>& mcMap,
 			std::vector<std::vector<TH1F*> >& hist,
 			Double_t par);
+
+    /**
+     * Creates the histograms.
+     */
 	void CreateHistos();
+
+    /**
+     * Divides two histograms.
+     * @param histo1 numerator
+     * @param histo2 denominator
+     * @param histo3 output histogram
+     */
 	void DivideHistos(
 		  TH1* histo1,
 		  TH1* histo2,
 		  TH1* histo3);
+
+    /**
+     * Calculates efficiency histograms.
+     */
 	void CalculateEfficiencyHistos();
+
+    /**
+     * Writes the histograms to output file.
+     */
 	void WriteToFile();
+
+    /**
+     * Increase number of tracks counters.
+     */
+	void IncreaseCounters();
+
+    /**
+     * Prints event-by-event statistics.
+     */
 	void PrintEventStatistics();
+
+    /**
+     * Prints final statistics.
+     */
+	void PrintFinalStatistics();
+
+    /**
+     * Calculates integrated efficiencies and forms string with statistic information.
+     * @param hist vector with histograms
+     * @param opt if 'event' than forms string for event statistics, if 'final' than forms the string with final statistics.
+     */
 	std::string EventEfficiencyStatisticsToString(
-			const std::vector<std::vector<TH1F*> >& hist);
+			const std::vector<std::vector<TH1F*> >& hist,
+			const std::string& opt);
 
 	Int_t fMinNofPointsSts; // Minimal number of MCPoints in STS
 	Int_t fMinNofPointsTrd; // Minimal number of MCPoints in TRD
@@ -114,6 +236,13 @@ private:
 //	TH1F* fhNhClones, *fhNhGhosts;
 
 	TList* fHistoList; // List of histograms
+
+	// Total number of tracks/hits counters
+	Int_t fNofGlobalTracks; // global tracks
+	Int_t fNofStsTracks; // STS tracks
+	Int_t fNofTrdTracks; // TRD tracks
+	Int_t fNofMuchTracks; // MUCH tracks
+	Int_t fNofTofHits; // TOF hits
 
 	Int_t fEventNo; // Event counter
 

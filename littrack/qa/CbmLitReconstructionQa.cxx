@@ -45,6 +45,12 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
 	fRefMomentum = 2.;
 	fNofTypes = 3;
 	fNofCategories = 6;
+
+	fNofGlobalTracks = 0;
+	fNofStsTracks = 0;
+	fNofTrdTracks = 0;
+	fNofMuchTracks = 0;
+	fNofTofHits = 0;
 }
 
 CbmLitReconstructionQa::~CbmLitReconstructionQa()
@@ -68,6 +74,7 @@ void CbmLitReconstructionQa::Exec(
 	ProcessGlobalTracks();
 	ProcessMcTracks();
 	PrintEventStatistics();
+	IncreaseCounters();
 
 	std::cout << "Event: " << fEventNo++ << std::endl;
 }
@@ -76,6 +83,7 @@ void CbmLitReconstructionQa::Finish()
 {
 	CalculateEfficiencyHistos();
 	WriteToFile();
+	PrintFinalStatistics();
 }
 
 void CbmLitReconstructionQa::DetermineSetup()
@@ -311,7 +319,7 @@ void CbmLitReconstructionQa::ProcessMcTracks()
 }
 
 void CbmLitReconstructionQa::FillGlobalReconstructionHistos(
-		CbmMCTrack* mcTrack,
+		const CbmMCTrack* mcTrack,
 		Int_t mcId,
 		const std::multimap<Int_t, Int_t>& mcMap,
 		std::vector<std::vector<TH1F*> >& hist,
@@ -458,6 +466,15 @@ void CbmLitReconstructionQa::WriteToFile()
 	while ( TH1* histo = ((TH1*)next()) ) histo->Write();
 }
 
+void CbmLitReconstructionQa::IncreaseCounters()
+{
+	fNofGlobalTracks += fGlobalTracks->GetEntriesFast();
+	if (fIsSts) fNofStsTracks += fStsMatches->GetEntriesFast();
+	if (fIsTrd) fNofTrdTracks += fTrdMatches->GetEntriesFast();
+	if (fIsMuch) fNofMuchTracks += fMuchMatches->GetEntriesFast();
+	if (fIsTof) fNofTofHits += fTofHits->GetEntriesFast();
+}
+
 void CbmLitReconstructionQa::PrintEventStatistics()
 {
 	std::cout << "Number of rec tracks: global=" << fGlobalTracks->GetEntriesFast();
@@ -467,15 +484,35 @@ void CbmLitReconstructionQa::PrintEventStatistics()
 	if (fIsTof) std::cout << ", TOF=" << fTofHits->GetEntriesFast();
 	std::cout << std::endl;
 
-	std::cout << "Efficiency STS:               " << EventEfficiencyStatisticsToString(fhStsMom);
-	std::cout << "Efficiency STS+TRD(MUCH):     " << EventEfficiencyStatisticsToString(fhHalfGlobalMom);
-	std::cout << "Efficiency STS+TRD(MUCH)+TOF: " << EventEfficiencyStatisticsToString(fhGlobalMom);
-	std::cout << "Efficiency TRD(MUCH):         " << EventEfficiencyStatisticsToString(fhRecMom);
-	std::cout << "Efficiency TOF matching:      " << EventEfficiencyStatisticsToString(fhTofMom);
+	std::cout << "Efficiency STS:               " << EventEfficiencyStatisticsToString(fhStsMom, "event");
+	std::cout << "Efficiency STS+TRD(MUCH):     " << EventEfficiencyStatisticsToString(fhHalfGlobalMom, "event");
+	std::cout << "Efficiency STS+TRD(MUCH)+TOF: " << EventEfficiencyStatisticsToString(fhGlobalMom, "event");
+	std::cout << "Efficiency TRD(MUCH):         " << EventEfficiencyStatisticsToString(fhRecMom, "event");
+	std::cout << "Efficiency TOF matching:      " << EventEfficiencyStatisticsToString(fhTofMom, "event");
+}
+
+void CbmLitReconstructionQa::PrintFinalStatistics()
+{
+	std::cout << "-I- CbmLitReconstructionQa final statistics:" << std::endl;
+	std::cout << "Number of rec tracks (per event/total): " << std::endl;
+	std::cout << "  global=(" << (Double_t)fNofGlobalTracks/(Double_t)fEventNo << "/" << fNofGlobalTracks << ")" << std::endl;
+	if (fIsSts) std::cout << "  STS=(" << (Double_t)fNofStsTracks/(Double_t)fEventNo << "/" << fNofStsTracks << ")" << std::endl;
+	if (fIsTrd) std::cout << "  TRD=(" << (Double_t)fNofTrdTracks/(Double_t)fEventNo << "/" << fNofTrdTracks << ")" << std::endl;
+	if (fIsMuch) std::cout << "  MUCH=(" << (Double_t)fNofMuchTracks/(Double_t)fEventNo << "/" << fNofMuchTracks << ")" << std::endl;
+	if (fIsTof) std::cout << "  TOF=(" << (Double_t)fNofTofHits/(Double_t)fEventNo << "/" << fNofTofHits << ")" << std::endl;
+
+	std::cout << "Efficiency STS:" << std::endl << EventEfficiencyStatisticsToString(fhStsMom, "final");
+	std::cout << "Efficiency STS+TRD(MUCH):" << std::endl << EventEfficiencyStatisticsToString(fhHalfGlobalMom, "final");
+	std::cout << "Efficiency STS+TRD(MUCH)+TOF: " << std::endl << EventEfficiencyStatisticsToString(fhGlobalMom, "final");
+	std::cout << "Efficiency TRD(MUCH):" << std::endl << EventEfficiencyStatisticsToString(fhRecMom, "final");
+	std::cout << "Efficiency TOF matching:" << std::endl << EventEfficiencyStatisticsToString(fhTofMom, "final");
+
+	std::cout << "-------------------------------------------------------------" << std::endl;
 }
 
 std::string CbmLitReconstructionQa::EventEfficiencyStatisticsToString(
-		const std::vector<std::vector<TH1F*> >& hist)
+		const std::vector<std::vector<TH1F*> >& hist,
+		const std::string& opt)
 {
 	Double_t allEff = 0., refEff = 0., primEff = 0., secEff = 0., muEff = 0., elEff = 0.;
 	Double_t allRec = hist[ALL][REC]->GetEntries();
@@ -498,13 +535,30 @@ std::string CbmLitReconstructionQa::EventEfficiencyStatisticsToString(
 	if (elAcc != 0.) elEff = elRec / elAcc;
 
 	std::stringstream ss;
-	ss.precision(3);
-	ss << "all=" << allEff << "(" << allRec << "/" << allAcc << "), "
-		<< "ref=" << refEff << "(" << refRec << "/" << refAcc << "), "
-		<< "prim=" << primEff << "(" << primRec << "/" << primAcc << "), "
-		<< "sec=" << secEff << "(" << secRec << "/" << secAcc << "), "
-		<< "mu=" << muEff << "(" << muRec << "/" << muAcc << "), "
-		<< "el=" << elEff << "(" << elRec << "/" << elAcc << "), " << std::endl;
+	// For each event
+	if (opt == "event") {
+		ss << "all=" << allEff << "(" << allRec << "/" << allAcc << "), ";
+	//		<< "ref=" << refEff << "(" << refRec << "/" << refAcc << "), "
+	//		<< "prim=" << primEff << "(" << primRec << "/" << primAcc << "), "
+	//		<< "sec=" << secEff << "(" << secRec << "/" << secAcc << "), "
+		if (fIsElectronSetup) ss << "el=" << elEff << "(" << elRec << "/" << elAcc << "), " << std::endl;
+		else ss << "mu=" << muEff << "(" << muRec << "/" << muAcc << "), " << std::endl;
+	}
+	// Final statistics
+	if (opt == "final") {
+		ss << "  all=" << allEff << "(" << allRec << "/" << allAcc << "), per event ("
+			<< allRec/fEventNo << "/" << allAcc/fEventNo << ")" << std::endl;
+		ss	<< "  ref=" << refEff << "(" << refRec << "/" << refAcc << "), per event ("
+			<< refRec/fEventNo << "/" << refAcc/fEventNo << ")" << std::endl;
+		ss	<< "  prim=" << primEff << "(" << primRec << "/" << primAcc << "), per event ("
+			<< primRec/fEventNo << "/" << primAcc/fEventNo << ")" << std::endl;
+		ss	<< "  sec=" << secEff << "(" << secRec << "/" << secAcc << "), per event ("
+			<< secRec/fEventNo << "/" << secAcc/fEventNo << ")" << std::endl;
+		if (fIsElectronSetup) ss << "  el=" << elEff << "(" << elRec << "/" << elAcc << "), per event ("
+			<< elRec/fEventNo << "/" << elAcc/fEventNo << ")" << std::endl;
+		else ss << "  mu=" << muEff << "(" << muRec << "/" << muAcc << "), per event ("
+			<< muRec/fEventNo << "/" << muAcc/fEventNo << ")" << std::endl;
+	}
 
 	return ss.str();
 }

@@ -35,7 +35,7 @@ void much_draw_sectors(TString digiFile = ""){
    TObjArray* stations = (TObjArray*) f->Get("stations");
    for (Int_t st=0;st<stations->GetEntriesFast();st++){
       TCanvas* c1 = new TCanvas(Form("station%i",st+1),Form("station%i",st+1),800,800);
-      c1->Range(-200,-200,200,200);
+      c1->Range(-240,-240,240,240);
       CbmMuchStation* station = (CbmMuchStation*) stations->At(st);
       CbmMuchLayer* layer = station->GetLayer(0);
       for (Int_t s=1;s>=0;s--){

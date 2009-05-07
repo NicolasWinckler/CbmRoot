@@ -86,6 +86,7 @@
 // qa
 #pragma link C++ class CbmLitReconstructionQa+;
 #pragma link C++ class CbmLitFindGlobalTracksIdeal+;
+#pragma link C++ class CbmLitRecQa+;
 
 // robust
 #pragma link C++ class CbmLitWeightedHitCalculatorImp+;

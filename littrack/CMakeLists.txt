@@ -109,6 +109,7 @@ propagation/CbmLitMaterialEffectsImp.cxx
 propagation/CbmLitCleverTrackExtrapolator.cxx
 qa/CbmLitReconstructionQa.cxx
 qa/CbmLitFindGlobalTracksIdeal.cxx
+qa/CbmLitRecQa.cxx
 robust/CbmLitWeightedHitCalculatorImp.cxx
 robust/CbmLitWeightCalculatorSimple.cxx
 robust/CbmLitWeightCalculatorGauss.cxx

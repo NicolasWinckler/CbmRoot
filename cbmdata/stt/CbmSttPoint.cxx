@@ -9,15 +9,6 @@ using std::endl;
 CbmSttPoint::CbmSttPoint() : FairMCPoint() { }
 // -------------------------------------------------------------------------
 
-// ------   Copy constructor     ----------------------------------------------
-/*
-CbmSttPoint::CbmSttPoint(const CbmSttPoint& point)
-  : FairMCPoint(point)
-{
- *this = point;
-}
-*/
-// ----------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmSttPoint::CbmSttPoint(Int_t trackID, Int_t detID, TVector3 pos,

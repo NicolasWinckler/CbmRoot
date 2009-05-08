@@ -28,10 +28,6 @@ class CbmSttPoint : public FairMCPoint
   CbmSttPoint(Int_t trackID, Int_t detID, TVector3 pos, TVector3 mom,
                Double_t tof, Double_t length, Double_t eLoss);
 
-  /** Copy constructor **/
-  //CbmSttPoint(const CbmSttPoint& point) { *this = point; };
-  CbmSttPoint(const CbmSttPoint& point);
-
   /** Destructor **/
   virtual ~CbmSttPoint();
 

@@ -21,6 +21,7 @@ set(CBMDATA_SRCS
 CbmHit.cxx
 CbmMCTrack.cxx
 CbmTrack.cxx
+CbmTrackMatch.cxx
 CbmStack.cxx
 
 mvd/CbmMvdDetectorId.cxx

@@ -113,25 +113,27 @@ void much_seg_info(TString digiFile = ""){
 
       // Print output information
       printf("Station %i:\n", st);
-      if(station->GetDetectorType() == 2){
-    	  printf("   Straw tubes station.\n");
-          printf("---------------------------------------------------------------------\n");
-    	  continue;
+      switch(station->GetDetectorType()){
+         case 1:
+            for(Int_t i=0; i<sectors->GetEntries(); ++i){
+               CbmMuchSector* sec = (CbmMuchSector*) sectors->At(i);
+               Int_t nX = sec->GetPosition()[0] < 0 ? -1 : 1;
+               Int_t nY = sec->GetPosition()[1] < 0 ? -1 : 1;
+               Double_t x = nX*(sec->GetPosition()[0] - sec->GetSize()[0]/2.);
+               Double_t y = nY*(sec->GetPosition()[1] - sec->GetSize()[1]/2.);
+               Double_t rad = TMath::Sqrt(x*x + y*y);
+               printf("   Region %i:\n", i);
+               printf("      radius: %6.3f [cm]:\n", rad);
+               printf("      sector size: %4.2fx%4.2f [cm^2]\n", sec->GetSize()[0], sec->GetSize()[1]);
+               printf("      pad size: %4.2fx%4.2f [cm^2]\n", sec->GetDx(), sec->GetDy());
+            }
+            printf("   Number of sectors: %i\n", nSectors);
+            printf("   Number of channels: %i\n", nPads);
+            break;
+         case 2:
+            printf("   Straw tubes station.\n");
+            break;
       }
-      for(Int_t i=0; i<sectors->GetEntries(); ++i){
-         CbmMuchSector* sec = (CbmMuchSector*) sectors->At(i);
-         Int_t nX = sec->GetPosition()[0] < 0 ? -1 : 1;
-         Int_t nY = sec->GetPosition()[1] < 0 ? -1 : 1;
-         Double_t x = nX*(sec->GetPosition()[0] - sec->GetSize()[0]/2.);
-         Double_t y = nY*(sec->GetPosition()[1] - sec->GetSize()[1]/2.);
-         Double_t rad = TMath::Sqrt(x*x + y*y);
-         printf("   Region %i:\n", i);
-         printf("      radius: %6.3f [cm]:\n", rad);
-         printf("      sector size: %4.2fx%4.2f [cm^2]\n", sec->GetSize()[0], sec->GetSize()[1]);
-         printf("      pad size: %4.2fx%4.2f [cm^2]\n", sec->GetDx(), sec->GetDy());
-      }
-      printf("   Number of sectors: %i\n", nSectors);
-      printf("   Number of channels: %i\n", nPads);
       printf("---------------------------------------------------------------------\n");
    }//stations
    printf("Total number of sectors: %i\n", nSectorsTotal);

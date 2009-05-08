@@ -426,7 +426,7 @@ void CbmMuchSegmentation::Print(){
     Int_t nTotSectors = 0;
     Int_t nTotChannels = 0;
     printf("=========================================================================================\n");
-    printf(" Station Nr.\t| Sectors\t| Channels\t| Pad min size\t\t| Pad max length\t \n");
+    printf(" Station Nr.\t| Sectors\t| Channels\t| Pad min size\t\t| Pad max size\t \n");
     printf("-----------------------------------------------------------------------------------------\n");
     for(Int_t iStation=0; iStation < fStations->GetEntries(); ++iStation){
         CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);

@@ -595,6 +595,7 @@ void CbmMuchSegmentManual::Print(){
     printf("-----------------------------------------------------------------------------------------\n");
     for(Int_t iStation=0; iStation < fStations->GetEntries(); ++iStation){
         CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);
+        if(station->GetDetectorType()==2) continue;
         Int_t nSectors = 0;
         Int_t nChannels = 0;
         Double_t padMaxLx = std::numeric_limits<Double_t>::min();

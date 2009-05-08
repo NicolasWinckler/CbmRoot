@@ -280,7 +280,7 @@ private:
     TArrayI fDetType; // Detector type
     TArrayD fLayersDz; // Distance between layers [cm]
     TArrayD fSupportLz; // Support thickness [cm]
-    TArrayD fModuleDesign; /* 1 - detailed design (modules at two sides)
+    TArrayI fModuleDesign; /* 1 - detailed design (modules at two sides)
                           * 0 - simple design (1 module per layer)     */
 
 

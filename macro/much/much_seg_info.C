@@ -113,6 +113,8 @@ void much_seg_info(TString digiFile = ""){
 
       // Print output information
       printf("Station %i:\n", st);
+      if(station->GetDetectorType() == 2)
+    	  printf("   Straw tubes station.");
       for(Int_t i=0; i<sectors->GetEntries(); ++i){
          CbmMuchSector* sec = (CbmMuchSector*) sectors->At(i);
          Int_t nX = sec->GetPosition()[0] < 0 ? -1 : 1;

@@ -162,7 +162,7 @@ void CbmMuchSegmentation::FinishTask(){
         TF1* f1 = new TF1("f1", "exp([0] + [1]*x)");
         f1->SetParameter(0, 0.5);
         f1->SetParameter(1, -0.1);
-        h->Fit("f1","LL","",station->GetRmin(),station->GetRmax());
+        h->Fit("f1","QLL","",station->GetRmin(),station->GetRmax());
         Double_t exp0 = h->GetFunction("f1")->GetParameter(0);
         Double_t exp1 = h->GetFunction("f1")->GetParameter(1);
         fExp0.push_back(exp0);

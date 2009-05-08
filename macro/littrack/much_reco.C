@@ -1,17 +1,17 @@
 #include "../../cbmbase/CbmDetectorList.h";
-void much_reco(Int_t nEvents = 100)
+void much_reco(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, stsRecoFile, muchHitsFile, muchTracksFile;
 	if (script != "yes") {
 //		dir  = "/home/d/andrey/test/";//events/newmuch/standard/10mu/mu_urqmd/";
-		dir  = "/home/d/andrey/test/trunk/mu_urqmd_old/";
+		dir  = "/home/d/andrey/test/trunk/global_mu/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		stsRecoFile = dir + "sts.reco.0000.root";
 		muchHitsFile = dir + "much.hits.0000.root";
-		muchTracksFile = dir + "much.tracks.branch.0000.root";
+		muchTracksFile = dir + "much.tracks.ideal.0000.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -39,7 +39,8 @@ void much_reco(Int_t nEvents = 100)
 
 //	FairGeane* Geane = new FairGeane(inFile.Data());
 
-	CbmMuchTrackFinder* muchTrackFinder = new CbmLitMuchTrackFinderNN();
+//	CbmMuchTrackFinder* muchTrackFinder = new CbmMuchTrackFinderIdeal();
+	CbmMuchTrackFinder* muchTrackFinder = new CbmLitMuchTrackFinderBranch();
 	CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
 	muchFindTracks->UseFinder(muchTrackFinder);
 	run->AddTask(muchFindTracks);

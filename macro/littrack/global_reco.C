@@ -1,16 +1,16 @@
-#include "../../cbmbase/CbmDetectorList.h";
-void global_reco(Int_t nEvents = 5)
+void global_reco(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString dir, mcFile, parFile, stsRecoFile, trdHitsFile;
+	TString dir, mcFile, parFile, stsRecoFile, trdHitsFile, muchHitsFile;
 	if (script != "yes") {
 //		dir  = "/home/d/andrey/events/trd/segmented/10e/e_urqmd/";
-		dir  = "/home/d/andrey/test/trunk/global_e/";
+		dir  = "/home/d/andrey/test/trunk/global_mu/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		stsRecoFile = dir + "sts.reco.0000.root";
 		trdHitsFile = dir + "trd.hits.0000.root";
+		muchHitsFile = dir + "much.hits.0000.root";
 		tofHitsFile = dir + "tof.hits.0000.root";
 		globalTracksFile = dir + "global.tracks.0000.root";
 	} else {
@@ -36,24 +36,36 @@ void global_reco(Int_t nEvents = 5)
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
 	run->AddFriend(stsRecoFile);
-	run->AddFriend(trdHitsFile);
+//	run->AddFriend(trdHitsFile);
+	run->AddFriend(muchHitsFile);
 	run->AddFriend(tofHitsFile);
 	run->SetOutputFile(globalTracksFile);
 	// ------------------------------------------------------------------------
 
-
-
 	CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
+	finder->SetTrackingType("nn");
+	finder->SetMergerType("nearest_hit");
 	run->AddTask(finder);
 
-	// -----   TRD track matching   --------------------------------------------
-	CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
-	run->AddTask(trdMatchTracks);
+//	CbmLitFindGlobalTracksIdeal* finder = new CbmLitFindGlobalTracksIdeal();
 
-	// -----   TRD track finding QA check   ------------------------------------
-	CbmLitRecQa* trdRecQa = new CbmLitRecQa(8, 0.7, kTRD, 1);
-	trdRecQa->SetNormType(2); // '2' to number of STS tracks
-	run->AddTask(trdRecQa);
+	// -----   TRD track matching   --------------------------------------------
+//	CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
+//	run->AddTask(trdMatchTracks);
+
+	// -----   MUCH track matching   --------------------------------------------
+	CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
+	run->AddTask(muchMatchTracks);
+
+	// -----   Track finding QA check   ------------------------------------
+	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
+	reconstructionQa->SetMinNofPointsSts(4);
+	reconstructionQa->SetMinNofPointsTrd(8);
+	reconstructionQa->SetMinNofPointsMuch(12);
+	reconstructionQa->SetMinNofPointsTof(1);
+	reconstructionQa->SetQuota(0.7);
+	reconstructionQa->SetVerbose(1);
+	run->AddTask(reconstructionQa);
 
 
 	// -----  Parameter database   --------------------------------------------

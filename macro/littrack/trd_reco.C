@@ -45,8 +45,8 @@ void trd_reco(Int_t nEvents = 1000)
 	// -----   TRD track finding   ---------------------------------------------
 	//CbmTrdTrackFinder* trdTrackFinder    = new CbmL1TrdTrackFinderSts();
 	//((CbmL1TrdTrackFinderSts*)trdTrackFinder)->SetVerbose(iVerbose);
-//	CbmTrdTrackFinder* trdTrackFinder    = new CbmLitTrdTrackFinderBranch();
-	CbmTrdTrackFinder* trdTrackFinder    = new CbmTrdTrackFinderIdeal();
+	CbmTrdTrackFinder* trdTrackFinder    = new CbmLitTrdTrackFinderBranch();
+//	CbmTrdTrackFinder* trdTrackFinder    = new CbmTrdTrackFinderIdeal();
 	CbmTrdFindTracks* trdFindTracks = new CbmTrdFindTracks("TRD Track Finder");
 	trdFindTracks->UseFinder(trdTrackFinder);
 	run->AddTask(trdFindTracks);

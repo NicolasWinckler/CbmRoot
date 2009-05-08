@@ -6,7 +6,7 @@ void tof_hits(Int_t nEvents = 1000)
 	TString dir, mcFile, parFile, trdHitsFile;
 	if (script != "yes") {
 //		dir  = "/d/cbm02/andrey/events/trd/segmented/10e/e/";
-		dir  = "/home/d/andrey/test/trunk/global_e/";
+		dir  = "/home/d/andrey/test/trunk/global_mu/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		tofHitsFile = dir + "tof.hits.0000.root";

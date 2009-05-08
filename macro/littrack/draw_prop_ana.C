@@ -5,7 +5,7 @@
 
 // residual (x,y,tx,ty,qp), pull (x,y,tx,ty,qp), resolution p %, chi-square
 const int nofPar = 12;
-const int nofLayers = 13;
+const int nofLayers = 14;
 
 // 0-propagation, 1-filter, 2-smoother
 double sigma[3][nofLayers][nofPar];
@@ -13,22 +13,19 @@ double rms[3][nofLayers][nofPar];
 TCanvas* canvas[3][nofLayers];
 
 bool drawPropagation = false;
-bool drawFilter = false;
-bool drawSmoother = true;
+bool drawFilter = true;
+bool drawSmoother = false;
 
-TString dir = "/home/d/andrey/test/mu/";//events/much/standard/10mu/mu/";
-TFile *file = new TFile(dir + "much.ana.0000.root");
-
-//TString dir  = "/home/d/andrey/events/trd/monolithic/10e/e/";
-//TFile *file = new TFile(dir + "trd.ana.0000.root");
+TString dir = "/home/d/andrey/test/trunk/global_e/";//events/much/standard/10mu/mu/";
+TFile *file = new TFile(dir + "propagation.ana.0000.root");
 
 TString outDir = "./test/";
 
 void draw_prop_ana()
 {
-	gStyle->SetOptStat("");
-	gStyle->SetOptFit(0);
-	gStyle->SetOptTitle(0);
+//	gStyle->SetOptStat("");
+//	gStyle->SetOptFit(0);
+//	gStyle->SetOptTitle(0);
 
 	ofstream fout(outDir + "out.txt");
 

@@ -6,7 +6,7 @@ void much_sim(Int_t nEvents = 1000)
 	if (script != "yes") {
 		inFile  = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
-		dir  = "/home/d/andrey/test/trunk/mu_old/";
+		dir  = "/home/d/andrey/test/trunk/global_mu/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		muons = "yes";
@@ -40,7 +40,7 @@ void much_sim(Int_t nEvents = 1000)
 	TString magnetGeom = "magnet_standard.geo";
 	TString stsGeom    = "sts_Standard_s3055AAFK5.SecD.geo";
 	//  TString stsGeom    = "sts_allstrips.geo";
-	TString trdGeom    = "trd_standard.geo";
+	TString trdGeom    = "";//"trd_standard.geo";
 	TString tofGeom    = "tof_standard.geo";
 
 	// -----   Magnetic field   -----------------------------------------------

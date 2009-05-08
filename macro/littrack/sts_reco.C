@@ -1,11 +1,11 @@
-void sts_reco(Int_t nEvents = 100)
+void sts_reco(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, stsRecoFile, detector;
 	if (script != "yes") {
 //		dir  = "/home/d/andrey/events/newmuch/compact/10mu/mu_urqmd/";
-		dir  = "/home/d/andrey/test/trunk/mu_urqmd_old/";
+		dir  = "/home/d/andrey/test/trunk/global_mu/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		stsRecoFile = dir + "sts.reco.0000.root";
@@ -67,7 +67,6 @@ void sts_reco(Int_t nEvents = 100)
 	FairTask* l1 = new CbmL1();
 	run->AddTask(l1);
 	CbmStsTrackFinder* trackFinder    = new CbmL1StsTrackFinder();
-//	CbmStsTrackFinder* trackFinder    = new CbmStsTrackFinderIdeal();
 	FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder);
 	run->AddTask(findTracks);
 	// ------------------------------------------------------------------------
@@ -111,13 +110,11 @@ void sts_reco(Int_t nEvents = 100)
 
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
-	Double_t rtime = timer.RealTime();
-	Double_t ctime = timer.CpuTime();
 	cout << endl << endl;
 	cout << "Macro finished succesfully." << endl;
 	cout << "Output file is "         << stsRecoFile << endl;
 	cout << "Parameter file is "      << parFile << endl;
-	cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
+	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << endl;
 	cout << endl;
 	// ------------------------------------------------------------------------
 }

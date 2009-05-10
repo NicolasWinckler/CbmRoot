@@ -1,4 +1,4 @@
-void much_sim(Int_t nEvents = 1000)
+void much_sim(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -6,11 +6,11 @@ void much_sim(Int_t nEvents = 1000)
 	if (script != "yes") {
 		inFile  = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
-		dir  = "/home/d/andrey/test/trunk/global_mu/";
+		dir  = "/home/d/andrey/test/trunk/global_mu_urqmd/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		muons = "yes";
-		urqmd = "no";
+		urqmd = "yes";
 		pluto = "no";
 		geoType = "new_much_standard";
 	} else {

@@ -1,12 +1,12 @@
 #include "../../cbmbase/CbmDetectorList.h";
-void tof_hits(Int_t nEvents = 1000)
+void tof_hits(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, trdHitsFile;
 	if (script != "yes") {
 //		dir  = "/d/cbm02/andrey/events/trd/segmented/10e/e/";
-		dir  = "/home/d/andrey/test/trunk/global_mu/";
+		dir  = "/home/d/andrey/test/trunk/global_mu_urqmd/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		tofHitsFile = dir + "tof.hits.0000.root";

@@ -1,11 +1,11 @@
-void global_reco(Int_t nEvents = 1000)
+void global_reco(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, stsRecoFile, trdHitsFile, muchHitsFile;
 	if (script != "yes") {
 //		dir  = "/home/d/andrey/events/trd/segmented/10e/e_urqmd/";
-		dir  = "/home/d/andrey/test/trunk/global_mu/";
+		dir  = "/home/d/andrey/test/trunk/global_mu_urqmd/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		stsRecoFile = dir + "sts.reco.0000.root";
@@ -43,7 +43,7 @@ void global_reco(Int_t nEvents = 1000)
 	// ------------------------------------------------------------------------
 
 	CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
-	finder->SetTrackingType("nn");
+	finder->SetTrackingType("branch");
 	finder->SetMergerType("nearest_hit");
 	run->AddTask(finder);
 

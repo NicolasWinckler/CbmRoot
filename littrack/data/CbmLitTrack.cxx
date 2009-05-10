@@ -89,8 +89,10 @@ std::string CbmLitTrack::ToString() const
 void CbmLitTrack::SortHits(
 		Bool_t downstream)
 {
-	if (downstream) std::sort(fHits.begin(), fHits.end(), CompareHitPtrPlaneIdLess());
-	else std::sort(fHits.begin(), fHits.end(), CompareHitPtrPlaneIdMore());
+//	if (downstream) std::sort(fHits.begin(), fHits.end(), CompareHitPtrPlaneIdLess());
+//	else std::sort(fHits.begin(), fHits.end(), CompareHitPtrPlaneIdMore());
+	if (downstream) std::sort(fHits.begin(), fHits.end(), CompareHitPtrZLess());
+	else std::sort(fHits.begin(), fHits.end(), CompareHitPtrZMore());
 }
 
 Bool_t CbmLitTrack::CheckParams() const

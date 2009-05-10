@@ -16,10 +16,9 @@ public:
 	CbmLitFindGlobalTracks();
 	virtual ~CbmLitFindGlobalTracks();
 
-	virtual void SetParContainers();
 	virtual InitStatus Init();
-	virtual InitStatus ReInit();
 	virtual void Exec(Option_t* opt);
+	virtual void SetParContainers();
 
 	void SetTrackingType(const std::string& trackingType) { fTrackingType = trackingType;}
 	void SetMergerType(const std::string& mergerType) { fMergerType = mergerType;}

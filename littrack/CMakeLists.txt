@@ -123,7 +123,6 @@ selection/CbmLitTrackSelectionTrd.cxx
 selection/CbmLitTrackSelectionMuch.cxx
 selection/CbmLitTrackSelectionMuchRobust.cxx
 selection/CbmLitTrackSelectionChiSq.cxx
-utils/CbmLitComparators.cxx
 utils/CbmLitConverter.cxx
 utils/CbmLitMath.cxx
 )

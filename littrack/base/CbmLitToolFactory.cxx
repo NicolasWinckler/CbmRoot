@@ -271,6 +271,68 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderWeight->SetPDG(11);
 		TrackFinderPtr finder(trdFinderWeight);
 		return finder;
+	} else
+	if(name == "mu_nn") {
+		CbmLitTrackFinderNN* muchFinderNN = new CbmLitTrackFinderNN();
+		muchFinderNN->SetPropagator(CreateTrackPropagator("lit"));
+		muchFinderNN->SetSeedSelection(CreateTrackSelection("momentum_seed"));
+		muchFinderNN->SetFinalSelection(CreateTrackSelection("much_final"));
+		muchFinderNN->SetFilter(CreateTrackUpdate("kalman"));
+		muchFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetMuchLayout());
+		muchFinderNN->SetVerbose(1);
+		muchFinderNN->SetNofIter(1);
+		muchFinderNN->IsUseFastSearch(true);
+		muchFinderNN->SetMaxNofMissingHits(1);
+		muchFinderNN->SetSigmaCoef(3.5);
+		muchFinderNN->SetChiSqPixelHitCut(13.86);
+		muchFinderNN->SetChiSqStripHitCut(4.);
+		muchFinderNN->SetPDG(13);
+		muchFinderNN->Initialize();
+		TrackFinderPtr finder(muchFinderNN);
+		return finder;
+	} else
+	if(name == "mu_branch") {
+		CbmLitTrackFinderBranch* muchFinderBranch = new CbmLitTrackFinderBranch();
+		muchFinderBranch->SetPropagator(CreateTrackPropagator("lit"));
+		muchFinderBranch->SetSeedSelection(CreateTrackSelection("momentum_seed"));
+		muchFinderBranch->SetStationGroupSelection(CreateTrackSelection("momentum"));
+		muchFinderBranch->SetFinalSelection(CreateTrackSelection("much_final"));
+		muchFinderBranch->SetFinalPreSelection(CreateTrackSelection("empty"));
+		muchFinderBranch->SetFilter(CreateTrackUpdate("kalman"));
+		muchFinderBranch->SetFitter(CreateTrackFitter("lit_kalman"));
+		muchFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetMuchLayout());
+		muchFinderBranch->SetVerbose(3);
+		muchFinderBranch->SetNofIter(1);
+		muchFinderBranch->IsUseFastSearch(true);
+		muchFinderBranch->SetBeginStationGroup(0);
+		muchFinderBranch->SetEndStationGroup(CbmLitEnvironment::Instance()->GetMuchLayout().GetNofStationGroups() - 1);
+		muchFinderBranch->SetPDG(13);
+		muchFinderBranch->SetMaxNofMissingHits(1);
+		muchFinderBranch->IsAlwaysCreateMissingHit(false);
+		muchFinderBranch->SetSigmaCoef(3.5);
+		muchFinderBranch->SetChiSqPixelHitCut(13.86);
+		muchFinderBranch->SetChiSqStripHitCut(4.);
+		TrackFinderPtr finder(muchFinderBranch);
+		return finder;
+	} else
+	if(name == "mu_weight") {
+		CbmLitTrackFinderWeight* muchFinderWeight = new CbmLitTrackFinderWeight();
+		muchFinderWeight->SetPropagator(CreateTrackPropagator("lit"));
+		muchFinderWeight->SetSeedSelection(CreateTrackSelection("momentum_seed"));
+		muchFinderWeight->SetFinalSelection(CreateTrackSelection("empty"));
+		muchFinderWeight->SetFitter(CreateTrackFitter("kalman_robust"));
+		muchFinderWeight->SetFilter(CreateTrackUpdate("kalman"));
+		muchFinderWeight->SetLayout(CbmLitEnvironment::Instance()->GetMuchLayout());
+		muchFinderWeight->SetVerbose(1);
+		muchFinderWeight->SetNofIter(1);
+		muchFinderWeight->SetMaxNofMissingHits(1);
+		muchFinderWeight->IsUseFastSearch(true);
+		muchFinderWeight->SetSigmaCoef(3.5);
+		muchFinderWeight->SetChiSqPixelHitCut(13.86);
+		muchFinderWeight->SetChiSqStripHitCut(4.);
+		muchFinderWeight->SetPDG(13);
+		TrackFinderPtr finder(muchFinderWeight);
+		return finder;
 	}
 }
 

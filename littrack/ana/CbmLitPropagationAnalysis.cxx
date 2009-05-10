@@ -10,9 +10,13 @@
 #include "CbmLitMath.h"
 #include "CbmLitTrack.h"
 #include "CbmLitHit.h"
+#include "CbmLitPixelHit.h"
+#include "CbmLitStripHit.h"
 
 #include "CbmHit.h"
+#include "CbmGlobalTrack.h"
 #include "CbmStsTrack.h"
+#include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 #include "CbmMuchHit.h"
 #include "CbmMuchTrack.h"
@@ -21,7 +25,6 @@
 #include "CbmMuchTrackMatch.h"
 #include "CbmStsTrackMatch.h"
 #include "CbmTrdTrackMatch.h"
-#include "CbmDetectorList.h"
 #include "FairMCPoint.h"
 #include "CbmMCTrack.h"
 #include "FairRootManager.h"
@@ -42,12 +45,15 @@
 #include <sstream>
 #include <string>
 
-CbmLitPropagationAnalysis::CbmLitPropagationAnalysis(
-		DetectorId detId)
+CbmLitPropagationAnalysis::CbmLitPropagationAnalysis()
 {
 	fVerbose = 1;
 	fEvents = 0;
-	fDetId = detId;
+	fNofParams = 12;
+	fNofPlanes = 14;
+	fNofTrdHits = 0;
+	fNofMuchHits = 13;
+	fNofTofHits = 1;
 }
 
 CbmLitPropagationAnalysis::~CbmLitPropagationAnalysis()
@@ -56,15 +62,8 @@ CbmLitPropagationAnalysis::~CbmLitPropagationAnalysis()
 
 InitStatus CbmLitPropagationAnalysis::Init()
 {
+	DetermineSetup();
 	ReadDataBranches();
-
-#ifdef NEWMUCH
-	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-	FairRuntimeDb* db = FairRuntimeDb::instance();
-	CbmGeoMuchPar* geoPar = (CbmGeoMuchPar*) db->getContainer("CbmGeoMuchPar");
-	TObjArray* stations = (TObjArray*) geoPar->GetStations();
-	geoScheme->Init(stations);
-#endif
 
 	// Create tools
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
@@ -73,21 +72,14 @@ InitStatus CbmLitPropagationAnalysis::Init()
 	fFitter = factory->CreateTrackFitter("lit_kalman");
 	fSmoother = factory->CreateTrackFitter("kalman_smoother");
 
-	// Get the layout
-	fIsElectronSetup = CbmLitEnvironment::Instance()->IsElectronSetup();
-
-//	if (fDetId == kMUCH) fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
-//	if (fDetId == kTRD) fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
-//	fNofPlanes = fLayout.GetNofPlanes();
-	fNofPlanes = 13;
-	fNofParams = 12;
-
 	CreateHistograms();
 }
 
 void CbmLitPropagationAnalysis::SetParContainers()
 {
-
+    FairRunAna* ana = FairRunAna::Instance();
+    FairRuntimeDb* rtdb = ana->GetRuntimeDb();
+    rtdb->getContainer("CbmGeoMuchPar");
 }
 
 void CbmLitPropagationAnalysis::Exec(
@@ -98,6 +90,303 @@ void CbmLitPropagationAnalysis::Exec(
 	DeleteTrackArrays();
 
 	std::cout << "Event: " << fEvents++ << std::endl;
+}
+
+void CbmLitPropagationAnalysis::Finish()
+{
+	for(Int_t i = 0; i < fNofPlanes; i++) {
+		for(Int_t j = 0; j < fNofParams; j++) {
+			fPropagationHistos[i][j]->Write();
+			fFilterHistos[i][j]->Write();
+			fSmootherHistos[i][j]->Write();
+		}
+	}
+}
+
+void CbmLitPropagationAnalysis::DetermineSetup()
+{
+    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
+    fIsElectronSetup = env->IsElectronSetup();
+	fIsSts = true;
+    fIsTrd = env->IsTrd();
+    fIsMuch = env->IsMuch();
+    fIsTof = env->IsTof();
+
+    if (fIsElectronSetup) std::cout << "-I- CBM electron setup detected" << std::endl;
+    else std::cout << "-I- CBM muon setup detected" << std::endl;
+    std::cout << "-I- The following detectors were found in the CBM setup:" << std::endl;
+    if (fIsTrd) std::cout << "TRD" << std::endl;
+    if (fIsMuch) std::cout << "MUCH" << std::endl;
+    if (fIsTof) std::cout << "TOF" << std::endl;
+}
+
+void CbmLitPropagationAnalysis::ReadDataBranches()
+{
+	FairRootManager* ioman = FairRootManager::Instance();
+    if (NULL == ioman) Fatal("Init","CbmRootManager is not instantiated");
+
+    fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
+    if (NULL == fMCTracks) Fatal("Init","No MCTrack array!");
+
+    fGlobalTracks = (TClonesArray*) ioman->GetObject("GlobalTrack");
+    if (NULL == fGlobalTracks) Fatal("Init","No GlobalTrack array!");
+
+   	if (fIsSts) {
+   		fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
+   		if (NULL == fStsTracks) Fatal("Init", "No STSTrack array!");
+//   		fStsTrackMatches = (TClonesArray*) ioman->GetObject("STSTrackMatch");
+//   		if (NULL == fStsTrackMatches) Fatal("Init", "No STSTrackMatch array!");
+   	}
+
+   	if (fIsMuch) {
+		fMuchTracks = (TClonesArray*) ioman->GetObject("MuchTrack");
+		if (NULL == fMuchTracks) Fatal("Init", "No MuchTrack array!");
+		fMuchHits = (TClonesArray*) ioman->GetObject("MuchHit");
+		if (NULL == fMuchHits) Fatal("Init", "No MuchHit array!");
+		fMuchTrackMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
+		if (NULL == fMuchTrackMatches) Fatal("Init", "No MuchTrackMatch array!");
+		fMuchDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
+		if (NULL == fMuchDigiMatches) Fatal("Init", "No MuchDigiMatches array!");
+		fMuchPoints  = (TClonesArray*) ioman->GetObject("MuchPoint");
+		if (NULL == fMuchPoints) Fatal("Init", "No MuchPoint array!");
+   	}
+
+   	if (fIsTrd) {
+		fTrdTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
+		if (NULL == fTrdTracks) Fatal("Init", "No TRDTrack array!");
+		fTrdHits  = (TClonesArray*) ioman->GetObject("TRDHit");
+		if (NULL == fTrdHits) Fatal("Init", "No TRDHit array!");
+		fTrdTrackMatches = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
+		if (!fTrdTrackMatches) Fatal("Init", "No TRDTrackMatch array!");
+		fTrdPoints  = (TClonesArray*) ioman->GetObject("TRDPoint");
+		if (NULL == fTrdPoints) Fatal("Init", "No TRDPoint array!");
+   	}
+
+   	if (fIsTof) {
+		fTofPoints = (TClonesArray*) ioman->GetObject("TOFPoint");
+		if (NULL == fTofPoints) Fatal("Init", "No TofPoint array!");
+		fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
+		if (NULL == fTofHits) Fatal("Init", "No TofHit array!");
+   	}
+}
+
+void CbmLitPropagationAnalysis::CreateHistograms()
+{
+	//0,1,2,3,4 - residuals (x,y,tx,ty,q/p)
+	//5,6,7,8,9 - pulls (x,y,tx,ty,q/p)
+	//11 - relative momentum error
+	//12 - chi-square of the track param and hit
+
+	fPropagationHistos.resize(fNofPlanes);
+	fFilterHistos.resize(fNofPlanes);
+	fSmootherHistos.resize(fNofPlanes);
+	for(Int_t i = 0; i < fNofPlanes; i++) {
+		fPropagationHistos[i].resize(fNofParams);
+		fFilterHistos[i].resize(fNofParams);
+		fSmootherHistos[i].resize(fNofParams);
+	}
+
+	std::stringstream histName;
+	std::stringstream histTitle;
+	std::string names[] = { "h_resx", "h_resy", "h_restx", "h_resty", "h_resqp",
+			           "h_pullx", "h_pully", "h_pulltx", "h_pullty", "h_pullqp",
+			           "h_resp", "h_chisq" };
+	std::string titles[] = { "resolution X at ", "resolution Y at ", "resolution Tx at ",
+			            "resolution Ty at ", "resolution Q/p at ", "pull X at ",
+			            "pull Y at ", "pull Tx at ", "pull Ty at ", "pull Q/p at ",
+			            "relative momentum resolution at ", "chi-square at" };
+	Int_t bins[] = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
+	Double_t boundL[] = {-10., -10., -.15, -.15, -.1, -5., -5., -5., -5., -7., -30., -1.};
+	Double_t boundR[] = { 10.,  10.,  .15,  .15,  .1,  5.,  5.,  5.,  5.,  7.,  30.,  15.};
+	std::string var[] = {"p", "f", "s"};
+	std::string var2[] = {"[propagation]", "[filter]", "[smoother]"};
+
+	for (Int_t v = 0; v < 3; v++) {
+		for (Int_t i = 0; i < fNofPlanes; i++) {
+			for (Int_t j = 0; j < fNofParams; j++) {
+				std::stringstream histName;
+				std::stringstream histTitle;
+				histName << names[j] << "_" << var[v] << "_" << i;
+				histTitle << var2[v] << " " << titles[j] << i << " station";
+				TH1F* hist = new TH1F(histName.str().c_str(), histTitle.str().c_str(),
+						bins[j], boundL[j], boundR[j]);
+				if (v == 0) fPropagationHistos[i][j] = hist;
+				if (v == 1) fFilterHistos[i][j] = hist;
+				if (v == 2) fSmootherHistos[i][j] = hist;
+				std::cout << histName.str() << std::endl << histTitle.str() << std::endl;
+			}
+		}
+	}
+}
+
+void CbmLitPropagationAnalysis::CreateTrackArrays()
+{
+	Int_t nofGlobalTracks = fGlobalTracks->GetEntriesFast();
+	for (Int_t iTrack = 0; iTrack < nofGlobalTracks; iTrack++) {
+		CbmGlobalTrack* globalTrack = (CbmGlobalTrack*) fGlobalTracks->At(iTrack);
+		CbmLitTrack* litTrack = new CbmLitTrack();
+		CbmLitTrack* mcLitTrack = new CbmLitTrack();
+
+		CheckAcceptance(globalTrack);
+
+		GlobalTrackToLitTrack(globalTrack, litTrack);
+		if (fIsElectronSetup) litTrack->SetPDG(11); else litTrack->SetPDG(13);
+
+		GlobalTrackToMCLitTrack(globalTrack, mcLitTrack);
+
+		fLitTracks.push_back(litTrack);
+		fLitMcTracks.push_back(mcLitTrack);
+	}
+
+	if (fLitTracks.size() != fLitMcTracks.size())
+		Fatal("CbmLitpropagationAnalysis", "LitTrack vector size != LitMcVector size");
+}
+
+Bool_t CbmLitPropagationAnalysis::CheckAcceptance(
+		const CbmGlobalTrack* globalTrack)
+{
+	Int_t trdId = globalTrack->GetTrdTrackIndex();
+	Int_t muchId = globalTrack->GetRichRingIndex(); //TODO change to MUCH
+	Int_t tofId = globalTrack->GetTofHitIndex();
+	if (fIsTrd && trdId > -1) {
+		CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTrdTracks->At(trdId);
+//		std::cout << "CHECK ACC: trd hits " << trdTrack->GetNofTrdHits() <<  std::endl;
+		if (trdTrack->GetNofTrdHits() != fNofTrdHits) return false;
+	}
+	if (fIsMuch && muchId > -1) {
+		CbmMuchTrack* muchTrack = (CbmMuchTrack*) fMuchTracks->At(muchId);
+//		std::cout << "CHECK ACC: much hits " << muchTrack->GetNHits() <<  std::endl;
+		if (muchTrack->GetNHits() != fNofMuchHits) return false;
+	}
+
+	if (tofId > -1) return true;
+	return true;
+}
+
+void CbmLitPropagationAnalysis::GlobalTrackToLitTrack(
+		const CbmGlobalTrack* globalTrack,
+		CbmLitTrack* litTrack)
+{
+	Int_t stsId = globalTrack->GetStsTrackIndex();
+	Int_t trdId = globalTrack->GetTrdTrackIndex();
+	Int_t muchId = globalTrack->GetRichRingIndex(); //TODO change to MUCH
+	Int_t tofId = globalTrack->GetTofHitIndex();
+
+	// STS: set initial track parameters from STS track
+	if (stsId > -1) {
+		CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(stsId);
+		CbmLitTrackParam par;
+		CbmLitConverter::TrackParamToLitTrackParam((const_cast<CbmStsTrack*> (stsTrack))->GetParamLast(), &par);
+		litTrack->SetParamLast(&par);
+		litTrack->SetParamFirst(&par);
+	}
+	//MUCH: attach hits from MUCH track
+	if (muchId > -1) {
+		CbmMuchTrack* muchTrack = (CbmMuchTrack*) fMuchTracks->At(muchId);
+		for (int iHit = 0; iHit < muchTrack->GetNHits(); iHit++) {
+			Int_t index = muchTrack->GetHitIndex(iHit);
+			CbmMuchHit* hit = (CbmMuchHit*) fMuchHits->At(index);
+			if (hit->GetTime(2) == -77777) {
+				CbmLitStripHit litHit;
+				CbmLitConverter::MuchHitToLitStripHit(hit, index, &litHit);
+				litTrack->AddHit(&litHit);
+			} else {
+				CbmLitPixelHit litHit;
+				CbmLitConverter::TrkHitToLitPixelHit(hit, index, &litHit);
+				litTrack->AddHit(&litHit);
+			}
+		}
+	}
+	//TRD: attach hits from TRD track
+	if (trdId > -1) {
+		CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTrdTracks->At(trdId);
+		for (int iHit = 0; iHit < trdTrack->GetNofTrdHits(); iHit++) {
+			Int_t index = trdTrack->GetTrdHitIndex(iHit);
+			CbmTrdHit* hit = (CbmTrdHit*) fTrdHits->At(index);
+			CbmLitPixelHit litHit;
+			CbmLitConverter::TrkHitToLitPixelHit(hit, index, &litHit);
+			litTrack->AddHit(&litHit);
+		}
+	}
+	//TOF: attach TOF hit
+	if (tofId > -1) {
+		CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(tofId);
+		CbmLitPixelHit litHit;
+		CbmLitConverter::TofHitToLitPixelHit(tofHit, tofId, &litHit);
+		litTrack->AddHit(&litHit);
+	}
+}
+
+void CbmLitPropagationAnalysis::GlobalTrackToMCLitTrack(
+		const CbmGlobalTrack* globalTrack,
+		CbmLitTrack* litTrack)
+{
+	Int_t trdId = globalTrack->GetTrdTrackIndex();
+	Int_t muchId = globalTrack->GetRichRingIndex(); //TODO change to MUCH
+	Int_t tofId = globalTrack->GetTofHitIndex();
+
+	CbmTrdTrack* trdTrack;
+	CbmMuchTrack* muchTrack;
+	Int_t nofTrdHits = 0, nofMuchHits = 0, nofTofHits = 0;
+
+	if (muchId > -1){
+		muchTrack = (CbmMuchTrack*) fMuchTracks->At(muchId);
+		nofMuchHits = muchTrack->GetNHits();
+	}
+	if (trdId > -1) {
+		trdTrack = (CbmTrdTrack*) fTrdTracks->At(trdId);
+		nofTrdHits = trdTrack->GetNofTrdHits();
+	}
+	if (tofId > -1) nofTofHits = 1;
+
+	FitNodeVector nodes(nofTrdHits + nofMuchHits + nofTofHits);
+	Int_t counter = 0;
+
+	//MUCH
+	if (muchId > -1) {
+		for (Int_t i = 0; i < nofMuchHits; i++){
+			Int_t hitIndex = muchTrack->GetHitIndex(i);
+			CbmMuchHit* hit = (CbmMuchHit*) fMuchHits->At(hitIndex);
+			Int_t digiIndex = hit->GetDigi();
+			CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
+			Int_t pointIndex = digiMatch->GetRefIndex(0);
+			if (pointIndex < 0) Fatal("CbmLitPropagationAnalysis", "Wrong point index");
+			FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(pointIndex);
+			if (point == NULL) Fatal("CbmLitPropagationAnalysis", "NULL pointer");
+			McPointToLitFitNode(point, &nodes[counter++]);
+		}
+	}
+
+	//TRD
+	if (trdId > -1) {
+	    for (Int_t i = 0; i < nofTrdHits; i++){
+			Int_t hitIndex = trdTrack->GetTrdHitIndex(i);
+			CbmHit* hit = (CbmHit*) fTrdHits->At(hitIndex);
+			Int_t pointIndex = hit->GetRefIndex();
+			if (pointIndex < 0) Fatal("CbmLitPropagationAnalysis", "Wrong point index");
+			FairMCPoint* point = (FairMCPoint*) fTrdPoints->At(pointIndex);
+			McPointToLitFitNode(point, &nodes[counter++]);
+	    }
+	}
+
+	//TOF
+	if (tofId > -1) {
+		CbmHit* hit = (CbmHit*) fTofHits->At(tofId);
+		Int_t pointIndex = hit->GetRefIndex();
+		if (pointIndex < 0) Fatal("CbmLitPropagationAnalysis", "Wrong point index");
+		FairMCPoint* point = (FairMCPoint*) fTofPoints->At(pointIndex);
+		McPointToLitFitNode(point, &nodes[counter++]);
+	}
+
+	litTrack->SetFitNodes(nodes);
+}
+
+void CbmLitPropagationAnalysis::DeleteTrackArrays()
+{
+	for_each(fLitTracks.begin(), fLitTracks.end(), DeleteObject());
+	for_each(fLitMcTracks.begin(), fLitMcTracks.end(), DeleteObject());
+	fLitTracks.clear();
+	fLitMcTracks.clear();
 }
 
 void CbmLitPropagationAnalysis::RunTest()
@@ -165,86 +454,6 @@ void CbmLitPropagationAnalysis::FillHistosFitter(
 	}
 }
 
-void CbmLitPropagationAnalysis::CreateTrackArrays()
-{
-	Int_t nofTracks = fTracks->GetEntriesFast();
-	for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
-		if (fDetId == kMUCH) {
-			//std::cout << "MUCH DETECTOR " << iTrack << std::endl;
-			CbmMuchTrack* muchTrack = (CbmMuchTrack*) fTracks->At(iTrack);
-			if (muchTrack->GetNHits() == 0) continue;
-			CbmLitTrack* litTrack = new CbmLitTrack();
-			CbmLitConverter::MuchTrackToLitTrack(muchTrack, litTrack, fHits);
-			if (!InitTrackParamFromStsTrackParam(iTrack, litTrack)) continue;
-			litTrack->SetPDG(13);
-			fLitTracks.push_back(litTrack);
-			CbmLitTrack* mcLitTrack = new CbmLitTrack();
-			McMuchTrackToLitTrack(muchTrack, mcLitTrack);
-			fLitMcTracks.push_back(mcLitTrack);
-		}
-		if (fDetId == kTRD) {
-			//std::cout << "TRD DETECTOR " << iTrack << std::endl;
-			CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTracks->At(iTrack);
-			if (trdTrack->GetNofTrdHits() == 0) continue;
-			CbmLitTrack* litTrack = new CbmLitTrack();
-			CbmLitConverter::TrdTrackToLitTrack(trdTrack, litTrack, fHits);
-			if (!InitTrackParamFromStsTrackParam(iTrack, litTrack)) continue;
-			litTrack->SetPDG(11);
-			fLitTracks.push_back(litTrack);
-			CbmLitTrack* mcLitTrack = new CbmLitTrack();
-			McTrdTrackToLitTrack(trdTrack, mcLitTrack);
-			fLitMcTracks.push_back(mcLitTrack);
-		}
-	}
-}
-
-void CbmLitPropagationAnalysis::DeleteTrackArrays()
-{
-	for_each(fLitTracks.begin(), fLitTracks.end(), DeleteObject());
-	for_each(fLitMcTracks.begin(), fLitMcTracks.end(), DeleteObject());
-	fLitTracks.clear();
-	fLitMcTracks.clear();
-}
-
-void CbmLitPropagationAnalysis::McMuchTrackToLitTrack(
-		CbmMuchTrack* muchTrack,
-		CbmLitTrack* track)
-{
-	Int_t nofHits = muchTrack->GetNHits();
-    FitNodeVector nodes(nofHits);
-	for (Int_t i = 0; i < nofHits; i++){
-		Int_t hitIndex = muchTrack->GetHitIndex(i);
-		CbmMuchHit* hit = (CbmMuchHit*) fHits->At(hitIndex);
-		Int_t digiIndex = hit->GetDigi();
-		CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fDigiMatches->At(digiIndex);
-		Int_t pointIndex = digiMatch->GetRefIndex(0);
-		if (pointIndex < 0) Fatal("CbmLitPropagationAnalysis", "Wrong point index");
-		FairMCPoint* point = (FairMCPoint*) fMCPoints->At(pointIndex);
-		if (point == NULL) Fatal("CbmLitPropagationAnalysis", "NULL pointer");
-		McPointToLitFitNode(point, &nodes[i]);
-	}
-    track->SetFitNodes(nodes);
-    track->SetParamFirst(nodes.front().GetPredictedParam());
-    track->SetParamLast(nodes.back().GetPredictedParam());
-}
-
-void CbmLitPropagationAnalysis::McTrdTrackToLitTrack(
-		const CbmTrdTrack* trdTrack,
-		CbmLitTrack* track)
-{
-    Int_t nofHits = trdTrack->GetNofTrdHits();
-    FitNodeVector nodes(nofHits);
-    for (Int_t i = 0; i < nofHits; i++){
-		Int_t hitIndex = trdTrack->GetTrdHitIndex(i);
-		CbmHit* hit = (CbmHit*) fHits->At(hitIndex);
-		Int_t pointIndex = hit->GetRefIndex();
-		if (pointIndex < 0) Fatal("CbmLitPropagationAnalysis", "Wrong point index");
-		FairMCPoint* point = (FairMCPoint*) fMCPoints->At(pointIndex);
-		McPointToLitFitNode(point, &nodes[i]);
-    }
-    track->SetFitNodes(nodes);
-}
-
 void CbmLitPropagationAnalysis::McPointToLitFitNode(
 		FairMCPoint* point,
 		CbmLitFitNode* node)
@@ -256,7 +465,7 @@ void CbmLitPropagationAnalysis::McPointToLitFitNode(
     if (pdg > 0) q = -1.; else q = 1;
     if (pdg == 13) q = -1.;
     if (pdg == -13) q = 1.;
-//    std::cout << "pdg=" << pdg << " q=" << q << std::endl;
+
     TVector3 mom;
     point->Momentum(mom);
     Double_t qp = q / mom.Mag();
@@ -270,40 +479,6 @@ void CbmLitPropagationAnalysis::McPointToLitFitNode(
     par.SetQp(qp);
 
     node->SetPredictedParam(&par);
-}
-
-Bool_t CbmLitPropagationAnalysis::InitTrackParamFromStsTrackParam(
-		Int_t trackIndex,
-		CbmLitTrack* track)
-{
-	Int_t mcId;
-	if (fDetId == kMUCH) {
-		CbmMuchTrackMatch* trackMatch = (CbmMuchTrackMatch*) fTrackMatches->At(trackIndex);
-		mcId = trackMatch->GetMCTrackId();
-	} else
-	if (fDetId == kTRD) {
-		CbmTrdTrackMatch* trackMatch = (CbmTrdTrackMatch*) fTrackMatches->At(trackIndex);
-		mcId = trackMatch->GetMCTrackID();
-	}
-	CbmStsTrack* stsTrack = FindStsTrackByMc(mcId);
-	if (stsTrack == NULL) return false;
-	CbmLitTrackParam par;
-	CbmLitConverter::TrackParamToLitTrackParam(stsTrack->GetParamLast(), &par);
-	track->SetParamLast(&par);
-	track->SetParamFirst(&par);
-	return true;
-}
-
-CbmStsTrack* CbmLitPropagationAnalysis::FindStsTrackByMc(
-		Int_t mcId)
-{
-	Int_t nofStsTracks = fStsTrackMatches->GetEntriesFast();
-	for (Int_t i = 0; i < nofStsTracks; i++){
-		CbmStsTrackMatch* trackMatch = (CbmStsTrackMatch*) fStsTrackMatches->At(i);
-		Int_t stsMcId = trackMatch->GetMCTrackId();
-		if (mcId == stsMcId) return (CbmStsTrack*)fStsTracks->At(i);
-	}
-	return NULL;
 }
 
 std::vector<Double_t> CbmLitPropagationAnalysis::CalcResidualsAndPulls(
@@ -322,108 +497,7 @@ std::vector<Double_t> CbmLitPropagationAnalysis::CalcResidualsAndPulls(
     if (par->GetCovariance(12) > 0.) r[8] = (r[3]) / (std::sqrt(par->GetCovariance(12)));
     if (par->GetCovariance(14) > 0.) r[9] = (r[4]) / (std::sqrt(par->GetCovariance(14)));
     r[10] = 100 * ((1./par->GetQp() - 1./mcPar->GetQp()) / (std::abs(1./mcPar->GetQp())));
- //   std::cout << "calc=" << 1./par->GetQp() << " mc=" << 1./mcPar->GetQp() << std::endl;
     return r;
-}
-
-void CbmLitPropagationAnalysis::CreateHistograms()
-{
-	//0,1,2,3,4 - residuals (x,y,tx,ty,q/p)
-	//5,6,7,8,9 - pulls (x,y,tx,ty,q/p)
-	//11 - relative momentum error
-	//12 - chi-square of the track param and hit
-
-	fPropagationHistos.resize(fNofPlanes);
-	fFilterHistos.resize(fNofPlanes);
-	fSmootherHistos.resize(fNofPlanes);
-	for(Int_t i = 0; i < fNofPlanes; i++) {
-		fPropagationHistos[i].resize(fNofParams);
-		fFilterHistos[i].resize(fNofParams);
-		fSmootherHistos[i].resize(fNofParams);
-	}
-
-	std::stringstream histName;
-	std::stringstream histTitle;
-	std::string names[] = { "h_resx", "h_resy", "h_restx", "h_resty", "h_resqp",
-			           "h_pullx", "h_pully", "h_pulltx", "h_pullty", "h_pullqp",
-			           "h_resp", "h_chisq" };
-	std::string titles[] = { "resolution X at ", "resolution Y at ", "resolution Tx at ",
-			            "resolution Ty at ", "resolution Q/p at ", "pull X at ",
-			            "pull Y at ", "pull Tx at ", "pull Ty at ", "pull Q/p at ",
-			            "relative momentum resolution at ", "chi-square at" };
-	Int_t bins[] = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
-	Double_t boundL[] = {-10., -10., -.15, -.15, -.1, -5., -5., -5., -5., -7., -30., -1.};
-	Double_t boundR[] = { 10.,  10.,  .15,  .15,  .1,  5.,  5.,  5.,  5.,  7.,  30.,  15.};
-	std::string var[] = {"p", "f", "s"};
-	std::string var2[] = {"[propagation]", "[filter]", "[smoother]"};
-
-	for (Int_t v = 0; v < 3; v++) {
-		for (Int_t i = 0; i < fNofPlanes; i++) {
-			for (Int_t j = 0; j < fNofParams; j++) {
-				std::stringstream histName;
-				std::stringstream histTitle;
-				histName << names[j] << "_" << var[v] << "_" << i;
-				histTitle << var2[v] << " " << titles[j] << i << " station";
-				TH1F* hist = new TH1F(histName.str().c_str(), histTitle.str().c_str(),
-						bins[j], boundL[j], boundR[j]);
-				if (v == 0) fPropagationHistos[i][j] = hist;
-				if (v == 1) fFilterHistos[i][j] = hist;
-				if (v == 2) fSmootherHistos[i][j] = hist;
-				std::cout << histName.str() << std::endl << histTitle.str() << std::endl;
-			}
-		}
-	}
-}
-
-void CbmLitPropagationAnalysis::ReadDataBranches()
-{
-	FairRootManager* ioman = FairRootManager::Instance();
-	if (!ioman ) Fatal("Init", "No CbmRootManager");
-
-	fMCTracks  = (TClonesArray*) ioman->GetObject("MCTrack");
-	if (!fMCTracks) Fatal("Init", "No MCTrack array!");
-	fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
-	if (!fStsTracks) Fatal("Init", "No STSTrack array!");
-	fStsTrackMatches = (TClonesArray*) ioman->GetObject("STSTrackMatch");
-	if (!fStsTrackMatches) Fatal("Init", "No STSTrackMatch array!");
-
-	if (fDetId == kMUCH) {
-		std::cout << "MUCH DETECTOR" << std::endl;
-	   fMCPoints  = (TClonesArray*) ioman->GetObject("MuchPoint");
-	   if (!fMCPoints) Fatal("Init", "No MuchPoint array!");
-	   fHits = (TClonesArray*) ioman->GetObject("MuchHit");
-	   if (!fHits) Fatal("Init", "No MuchHit array!");
-	   fDigiMatches  = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
-	   if (!fDigiMatches) Fatal("Init", "No MuchDigiMatches array!");
-	   fTracks = (TClonesArray*) ioman->GetObject("MuchTrack");
-	   if (!fTracks) Fatal("Init", "No MuchTrack array!");
-	   fTrackMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
-	   if (!fTrackMatches) Fatal("Init", "No MuchTrackMatch array!");
-	} else
-	if (fDetId == kTRD) {
-		std::cout << "TRD DETECTOR" << std::endl;
-	   fMCPoints  = (TClonesArray*) ioman->GetObject("TRDPoint");
-	   if (!fMCPoints) Fatal("Init", "No TRDPoint array!");
-	   fHits = (TClonesArray*) ioman->GetObject("TRDHit");
-	   if (!fHits) Fatal("Init", "No TRDHit array!");
-	   fTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
-	   if (!fTracks) Fatal("Init", "No TRDTrack array!");
-	   fTrackMatches = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
-	   if (!fTrackMatches) Fatal("Init", "No TRDTrackMatch array!");
-	} else {
-	   Fatal("Init", "CbmLitPropagationAnalysis works only with MUCH and TRD!");
-	}
-}
-
-void CbmLitPropagationAnalysis::FinishTask()
-{
-	for(Int_t i = 0; i < fNofPlanes; i++) {
-		for(Int_t j = 0; j < fNofParams; j++) {
-			fPropagationHistos[i][j]->Write();
-			fFilterHistos[i][j]->Write();
-			fSmootherHistos[i][j]->Write();
-		}
-	}
 }
 
 ClassImp(CbmLitPropagationAnalysis)

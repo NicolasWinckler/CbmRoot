@@ -31,24 +31,11 @@ private:
 
 	TClonesArray* fMCTracks;
 
-//	TClonesArray* fStsMCPoints;
-//	TClonesArray* fStsHits;
-//	TClonesArray* fStsTracks;
 	TClonesArray* fStsMatches;
-
-//	TClonesArray* fMuchMCPoints;
-//	TClonesArray* fMuchHits;
-//	TClonesArray* fMuchTracks;
 	TClonesArray* fMuchMatches;
-
-//	TClonesArray* fTrdMCPoints;
-//	TClonesArray* fTrdHits;
-//	TClonesArray* fTrdTracks;
 	TClonesArray* fTrdMatches;
-
 	TClonesArray* fTofMCPoints;
 	TClonesArray* fTofHits;
-
 	TClonesArray* fGlobalTracks;   //output
 
 	std::map<Int_t, Int_t> fMcStsMap;

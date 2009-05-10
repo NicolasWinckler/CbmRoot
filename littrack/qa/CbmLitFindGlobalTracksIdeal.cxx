@@ -41,35 +41,17 @@ InitStatus CbmLitFindGlobalTracksIdeal::Init()
     if (NULL == fMCTracks) Fatal("Init","No MCTrack array!");
 
     //STS data
-//	fStsMCPoints = (TClonesArray*) ioman->GetObject("STSPoint");
-//	if (NULL == fStsMCPoints ) Fatal("Init","No STSPoint array!");
-//	fStsHits = (TClonesArray*) ioman->GetObject("STSHit");
-//	if (NULL == fStsHits) Fatal("Init", "No STSHit array!");
-//	fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
-//	if (NULL == fStsTracks) Fatal("Init","No STSTrack array!");
 	fStsMatches = (TClonesArray*) ioman->GetObject("STSTrackMatch");
 	if (NULL == fStsMatches) Fatal("Init","No STSTrackMatch array!");
 
 	//MUCH data
     if (!fIsElectronSetup) {
-//    	fMuchMCPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
-//    	if (NULL == fMuchMCPoints ) Fatal("Init","No MuchPoint array!");
-//    	fMuchHits = (TClonesArray*) ioman->GetObject("MuchHit");
-//    	if (NULL == fMuchHits) Fatal("Init", "No MuchHit array!");
-//    	fMuchTracks = (TClonesArray*) ioman->GetObject("MuchTrack");
-//    	if (NULL == fMuchTracks) Fatal("Init","No MuchTrack array!");
     	fMuchMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
     	if (NULL == fMuchMatches) Fatal("Init","No MuchTrackMatch array!");
     }
 
     //TRD data
     if (fIsElectronSetup) {
-//    	fTrdMCPoints = (TClonesArray*) ioman->GetObject("TRDPoint");
-//    	if (NULL == fTrdMCPoints ) Fatal("Init","No TRDPoint array!");
-//    	fTrdHits = (TClonesArray*) ioman->GetObject("TRDHit");
-//    	if (NULL == fTrdHits) Fatal("Init", "No TRDHit array!");
-//    	fTrdTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
-//    	if (NULL == fTrdTracks) Fatal("Init","No TRDTrack array!");
     	fTrdMatches = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
     	if (NULL == fTrdMatches) Fatal("Init","No TRDTrackMatch array!");
     }

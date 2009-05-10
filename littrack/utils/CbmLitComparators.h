@@ -13,11 +13,11 @@
 
 
 
-class CompareHitPtrZLess: 
+class CompareHitPtrZLess:
 	public std::binary_function<
 		const CbmLitHit*,
 	    const CbmLitHit*,
-	    bool> 
+	    bool>
 {
 public:
 	bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
@@ -27,11 +27,39 @@ public:
 
 
 
-class CompareHitPtrWLess: 
+class CompareHitPtrZMore:
+	public std::binary_function<
+		const CbmLitHit*,
+		const CbmLitHit*,
+		bool>
+{
+public:
+	bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
+		return hit1->GetZ() > hit2->GetZ();
+	}
+};
+
+
+
+//class CompareHitPtrChiSqLess:
+//	public std::binary_function<
+//		const std::pair<CbmLitHit*, Double_t>&,
+//		const std::pair<CbmLitHit*, Double_t>&,
+//		bool>
+//{
+//public:
+//	bool operator()(const std::pair<CbmLitHit*, Double_t>& hit1, const std::pair<CbmLitHit*, Double_t>& hit2) const {
+//		return hit1.second < hit2.second;
+//	}
+//};
+
+
+
+class CompareHitPtrWLess:
 	public std::binary_function<
 		const CbmLitHit*,
 	    const CbmLitHit*,
-	    bool> 
+	    bool>
 {
 public:
 	bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
@@ -41,11 +69,11 @@ public:
 
 
 
-class CompareTrackParamZLess: 
+class CompareTrackParamZLess:
 	public std::binary_function<
 		const CbmLitTrackParam&,
 	    const CbmLitTrackParam&,
-	    bool> 
+	    bool>
 {
 public:
 	bool operator()(const CbmLitTrackParam& par1, const CbmLitTrackParam& par2) const {
@@ -53,11 +81,11 @@ public:
 	}
 };
 //
-//class CompareHitPtrPlaneIdLess: 
+//class CompareHitPtrPlaneIdLess:
 //	public std::binary_function<
 //		const CbmLitPixelHit*,
 //	    const CbmLitPixelHit*,
-//	    bool> 
+//	    bool>
 //{
 //public:
 //	bool operator()(const CbmLitPixelHit* hit1, const CbmLitPixelHit* hit2) const {
@@ -67,11 +95,11 @@ public:
 //
 //
 //
-//class CompareHitPtrPlaneIdMore: 
+//class CompareHitPtrPlaneIdMore:
 //	public std::binary_function<
 //		const CbmLitPixelHit*,
 //	    const CbmLitPixelHit*,
-//	    bool> 
+//	    bool>
 //{
 //public:
 //	bool operator()(const CbmLitPixelHit* hit1, const CbmLitPixelHit* hit2) const {
@@ -81,11 +109,11 @@ public:
 
 
 
-class CompareHitPtrPlaneIdLess: 
+class CompareHitPtrPlaneIdLess:
 	public std::binary_function<
 		const CbmLitHit*,
 	    const CbmLitHit*,
-	    bool> 
+	    bool>
 {
 public:
 	bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
@@ -95,11 +123,11 @@ public:
 
 
 
-class CompareHitPtrPlaneIdMore: 
+class CompareHitPtrPlaneIdMore:
 	public std::binary_function<
 		const CbmLitHit*,
 	    const CbmLitHit*,
-	    bool> 
+	    bool>
 {
 public:
 	bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
@@ -113,7 +141,7 @@ class ComparePixelHitPtrYLess :
 	public std::binary_function<
 			const CbmLitPixelHit*,
 		    const CbmLitPixelHit*,
-		    bool> 
+		    bool>
 {
 public:
 	bool operator()(const CbmLitPixelHit* hit1, const CbmLitPixelHit* hit2) const {
@@ -122,12 +150,12 @@ public:
 };
 
 
- 
+
 class ComparePixelHitPtrXLess :
 	public std::binary_function<
 			const CbmLitPixelHit*,
 		    const CbmLitPixelHit*,
-		    bool> 
+		    bool>
 {
 public:
 	bool operator()(const CbmLitPixelHit* hit1, const CbmLitPixelHit* hit2) const {
@@ -141,7 +169,7 @@ class CompareHitPtrXULess :
 	public std::binary_function<
 			const CbmLitHit*,
 		    const CbmLitHit*,
-		    bool> 
+		    bool>
 {
 public:
 	bool operator()(const CbmLitHit* hit1, const CbmLitHit* hit2) const {
@@ -166,7 +194,7 @@ class CompareStripHitPtrULess :
 	public std::binary_function<
 			const CbmLitStripHit*,
 		    const CbmLitStripHit*,
-		    bool> 
+		    bool>
 {
 public:
 	bool operator()(const CbmLitStripHit* hit1, const CbmLitStripHit* hit2) const {
@@ -180,7 +208,7 @@ class CompareTrackPtrChi2OverNdfLess :
 	public std::binary_function<
 			const CbmLitTrack*,
 		    const CbmLitTrack*,
-		    bool> 
+		    bool>
 {
 public:
 	bool operator()(const CbmLitTrack* track1, const CbmLitTrack* track2) const {
@@ -194,7 +222,7 @@ class CompareTrackPtrPrevTrackIdLess :
 	public std::binary_function<
 			const CbmLitTrack*,
 		    const CbmLitTrack*,
-		    bool> 
+		    bool>
 {
 public:
 	bool operator()(const CbmLitTrack* track1, const CbmLitTrack* track2) const {
@@ -208,7 +236,7 @@ class CompareTrackPtrNofHitsMore :
 	public std::binary_function<
 			const CbmLitTrack*,
 		    const CbmLitTrack*,
-		    bool> 
+		    bool>
 {
 public:
 	bool operator()(const CbmLitTrack* track1, const CbmLitTrack* track2) const {
@@ -221,7 +249,7 @@ class CompareTrackPtrNofHitsLess :
 	public std::binary_function<
 			const CbmLitTrack*,
 		    const CbmLitTrack*,
-		    bool> 
+		    bool>
 {
 public:
 	bool operator()(const CbmLitTrack* track1, const CbmLitTrack* track2) const {
@@ -234,7 +262,7 @@ class CompareTrackPtrLastPlaneIdMore :
 	public std::binary_function<
 			const CbmLitTrack*,
 		    const CbmLitTrack*,
-		    bool> 
+		    bool>
 {
 public:
 	bool operator()(const CbmLitTrack* track1, const CbmLitTrack* track2) const {
@@ -247,7 +275,7 @@ class CompareStationZLess :
 	public std::binary_function<
 			const CbmLitStation&,
 		    const CbmLitStation&,
-		    bool> 
+		    bool>
 {
 public:
 	bool operator()(const CbmLitStation& st1, const CbmLitStation& st2) const {

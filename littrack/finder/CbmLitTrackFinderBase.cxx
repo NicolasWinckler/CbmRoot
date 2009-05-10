@@ -87,41 +87,6 @@ Bool_t CbmLitTrackFinderBase::IsHitInValidationWindow(
 	if (hit->GetType() == kLITSTRIPHIT) return chiSq < fChiSqStripHitCut;
 	if (hit->GetType() == kLITPIXELHIT) return chiSq < fChiSqPixelHitCut;
 	return false;
-
-//    Double_t C0 = par->GetCovariance(0);
-//    Double_t C5 = par->GetCovariance(5);
-//
-//	if(C0 > fMaxCovSq || C5 > fMaxCovSq) return kFALSE;
-//	if(C0 < 0. || C5 < 0.) return kFALSE;
-//
-//	return ChiSq(par, hit) < fChiSqPixelHitCut;
-//
-//	if (hit->GetType() == kLITSTRIPHIT) {
-//		const CbmLitStripHit* stripHit = static_cast<const CbmLitStripHit*>(hit);
-//		return ChiSq(par, stripHit) < fChiSqStripHitCut;
-//	} else if (hit->GetType() == kLITPIXELHIT) {
-//		const CbmLitPixelHit* pixelHit = static_cast<const CbmLitPixelHit*>(hit);
-//		return ChiSq(par, pixelHit) < fChiSqPixelHitCut;
-//	}
-
-//	else if (hit->GetType() == kLITPIXELHIT) {
-//		const CbmLitPixelHit* pixelHit = static_cast<const CbmLitPixelHit*>(hit);
-//		Double_t x1 = par->GetX();
-//	   	Double_t x2 = pixelHit->GetX();
-//	    Double_t dx2 = pixelHit->GetDx();
-//	   	Double_t y1 = par->GetY();
-//	   	Double_t y2 = pixelHit->GetY();
-//	   	Double_t dy2 = pixelHit->GetDy();
-////	   	Double_t devX = fSigmaCoef * std::sqrt(C0 + dx2 * dx2);
-////		Double_t devY = fSigmaCoef * std::sqrt(C5 + dy2 * dy2);
-//	    Double_t devX = fSigmaCoef * (std::sqrt(C0) + dx2);
-//	    Double_t devY = fSigmaCoef * (std::sqrt(C5) + dy2);
-//
-//	    return ( ( (x1 + devX) >= x2 ) &&
-//	             ( (x1 - devX) <= x2 ) &&
-//	             ( (y1 + devY) >= y2 ) &&
-//		         ( (y1 - devY) <= y2 ) );
-//	}
 }
 
 HitPtrIteratorPair CbmLitTrackFinderBase::MinMaxIndex(

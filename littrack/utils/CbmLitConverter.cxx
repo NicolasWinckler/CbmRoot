@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <set>
 
 CbmLitConverter::CbmLitConverter()
 {
@@ -248,29 +249,77 @@ void CbmLitConverter::LitTrackToTrdTrack(
 	trdTrack->SetParamLast(parLast);
 }
 
-void CbmLitConverter::GlobalTrackToLitTrack(
-		const CbmGlobalTrack* globalTrack,
-		CbmLitTrack* litTrack)
-{
-	Int_t trdId = globalTrack->GetTrdTrackIndex();
-	Int_t muchId = globalTrack->GetRichRingIndex(); //TODO change to MUCH
-	Int_t tofId = globalTrack->GetTofHitIndex();
+//void CbmLitConverter::GlobalTrackArrayToLitTrackVector(
+//		const TClonesArray* globalTracks,
+//		const TClonesArray* stsTracks,
+//		const TClonesArray* trdTracks,
+//		const TClonesArray* muchTracks,
+//		const TClonesArray* tofHits,
+//		const TClonesArray* trdHits,
+//		const TClonesArray* muchHits,
+//		TrackPtrVector& litTracks)
+//{
+//	Int_t nofGlobalTracks = globalTracks->GetEntriesFast();
+//	for (Int_t iTrack = 0; iTrack < nofGlobalTracks; iTrack++) {
+//		CbmGlobalTrack* globalTrack = (CbmGlobalTrack*) globalTracks->At(iTrack);
+//
+//		CbmLitTrack* litTrack = new CbmLitTrack();
+//
+//		Int_t stsId = globalTrack->GetStsTrackIndex();
+//		Int_t trdId = globalTrack->GetTrdTrackIndex();
+//		Int_t muchId = globalTrack->GetRichRingIndex(); //TODO change to MUCH
+//		Int_t tofId = globalTrack->GetTofHitIndex();
+//
+//		// STS: set initial track parameters from STS track
+//		if (stsId > -1) {
+//			CbmStsTrack* stsTrack = (CbmStsTrack*) stsTracks->At(stsId);
+//			CbmLitTrackParam par;
+//			CbmLitConverter::TrackParamToLitTrackParam((const_cast<CbmStsTrack*> (stsTrack))->GetParamLast(), &par);
+//			litTrack->SetParamLast(&par);
+//		}
+//		//TRD: attach hits from TRD track
+//		if (trdId > -1) {
+//			CbmTrdTrack* trdTrack = (CbmTrdTrack*) trdTracks->At(trdId);
+//			for (int iHit = 0; iHit < trdTrack->GetNofTrdHits(); iHit++) {
+//				Int_t index = trdTrack->GetTrdHitIndex(iHit);
+//				CbmTrdHit* hit = (CbmTrdHit*) trdHits->At(index);
+//				CbmLitPixelHit litHit;
+//				TrkHitToLitPixelHit(hit, index, &litHit);
+//				litTrack->AddHit(&litHit);
+//			}
+//		}
+//		//MUCH: attach hits from MUCH track
+//		if (muchId > -1) {
+//			CbmMuchTrack* muchTrack = (CbmMuchTrack*) muchTracks->At(muchId);
+//			for (int iHit = 0; iHit < muchTrack->GetNHits(); iHit++) {
+//				Int_t index = muchTrack->GetHitIndex(iHit);
+//				CbmMuchHit* hit = (CbmMuchHit*) muchHits->At(index);
+//				if (hit->GetTime(2) == -77777) {
+//					CbmLitStripHit litHit;
+//					MuchHitToLitStripHit(hit, index, &litHit);
+//					litTrack->AddHit(&litHit);
+//				} else {
+//					CbmLitPixelHit litHit;
+//					TrkHitToLitPixelHit(hit, index, &litHit);
+//					litTrack->AddHit(&litHit);
+//				}
+//			}
+//		}
+//		//TOF: attach TOF hit
+//		if (tofId > -1) {
+//			CbmTofHit* tofHit = (CbmTofHit*) tofHits->At(tofId);
+//			CbmLitPixelHit litHit;
+//			TofHitToLitPixelHit(tofHit, tofId, &litHit);
+//			litTrack->AddHit(&litHit);
+//		}
+//	}
+//}
 
-	if (trdId > -1) {
-
-	}
-	if (muchId > -1) {
-
-	}
-	if (tofId > -1) {
-
-	}
-
-}
 
 void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
 		const TrackPtrVector& litTracks,
 		TClonesArray* globalTracks,
+		TClonesArray* stsTracks,
 		TClonesArray* trdTracks,
 		TClonesArray* muchTracks)
 {
@@ -278,6 +327,8 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
 	Int_t trdTrackNo, muchTrackNo;
 	if (trdTracks != NULL) trdTrackNo = trdTracks->GetEntriesFast();
 	if (muchTracks != NULL) muchTrackNo = muchTracks->GetEntriesFast();
+
+	std::set<Int_t> stsTracksSet;
 
 	for (Int_t iTrack = 0; iTrack < litTracks.size(); iTrack++) {
 		CbmLitTrack* litTrack = litTracks[iTrack];
@@ -312,6 +363,7 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
 		}
 
 		globalTrack->SetStsTrackIndex(litTrack->GetPreviousTrackId());
+		stsTracksSet.insert(litTrack->GetPreviousTrackId());
 		if (isCreateMuchTrack) {
 			globalTrack->SetRichRingIndex(muchTrackNo - 1); //TODO: change to MUCH here
 			muchTrack->SetStsTrackID(litTrack->GetPreviousTrackId());
@@ -320,6 +372,16 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
 			globalTrack->SetTrdTrackIndex(trdTrackNo - 1);
 			trdTrack->SetStsTrackIndex(litTrack->GetPreviousTrackId());
 			trdTrack->SortHits();
+		}
+	}
+
+	// Loop over STS tracks in order to create additional CbmGlobalTrack,
+	// consisting only of CbmStsTrack
+	for (Int_t iTrack = 0; iTrack < stsTracks->GetEntriesFast(); iTrack++) {
+		// if CbmGlobalTrack for STS track was not created, than create one
+		if (stsTracksSet.find(iTrack) == stsTracksSet.end()) {
+			CbmGlobalTrack* globalTrack = new ((*globalTracks)[globalTrackNo++]) CbmGlobalTrack();
+			globalTrack->SetStsTrackIndex(iTrack);
 		}
 	}
 }

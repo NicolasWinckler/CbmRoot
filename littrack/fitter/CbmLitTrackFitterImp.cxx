@@ -51,6 +51,7 @@ LitStatus CbmLitTrackFitterImp::Fit(
 		track->SetParamFirst(track->GetParamLast());
 		par = *track->GetParamFirst();
 	}
+
 	for (Int_t i = 0; i < nofHits; i++) {
 		const CbmLitHit* hit = track->GetHit(i);
 	    Double_t Ze = hit->GetZ();
@@ -70,7 +71,6 @@ LitStatus CbmLitTrackFitterImp::Fit(
 	    nodes[i].SetChiSqFiltered(chi2Hit);
 	    track->SetChi2(track->GetChi2() + chi2Hit);
 	}
-
 	if (fDownstream) track->SetParamLast(&par);
 	else track->SetParamFirst(&par);
 

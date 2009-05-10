@@ -16,6 +16,8 @@
 #include "CbmTofHit.h"
 #include "CbmGlobalTrack.h"
 #include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 
 #include "TClonesArray.h"
 
@@ -33,22 +35,12 @@ CbmLitFindGlobalTracks::~CbmLitFindGlobalTracks()
 
 }
 
-void CbmLitFindGlobalTracks::SetParContainers()
-{
-
-}
-
 InitStatus CbmLitFindGlobalTracks::Init()
 {
 	DetermineSetup();
 	ReadAndCreateDataBranches();
 	InitTrackReconstruction();
 
-	return kSUCCESS;
-}
-
-InitStatus CbmLitFindGlobalTracks::ReInit()
-{
 	return kSUCCESS;
 }
 
@@ -70,6 +62,20 @@ void CbmLitFindGlobalTracks::Exec(
 	ClearArrays();
 
 	std::cout << "Event: " << fEventNo++ << std::endl;
+}
+
+void CbmLitFindGlobalTracks::SetParContainers()
+{
+    FairRunAna* ana = FairRunAna::Instance();
+    FairRuntimeDb* rtdb = ana->GetRuntimeDb();
+
+//    rtdb->getContainer("FairBaseParSet");
+//    rtdb->getContainer("CbmGeoPassivePar");
+//    rtdb->getContainer("CbmGeoStsPar");
+//    rtdb->getContainer("CbmGeoRichPar");
+    rtdb->getContainer("CbmGeoMuchPar");
+//    rtdb->getContainer("CbmGeoTrdPar");
+//    rtdb->getContainer("CbmFieldPar");
 }
 
 void CbmLitFindGlobalTracks::Finish()
@@ -149,6 +155,13 @@ void CbmLitFindGlobalTracks::InitTrackReconstruction()
 			fFinder = factory->CreateTrackFinder(st);
 		} else
 			TObject::Fatal("CbmLitFindGlobalTracks","Tracking type not found");
+	} else {
+		if (fTrackingType == "branch" || fTrackingType == "nn" || fTrackingType == "weight") {
+			std::string st("mu_");
+			st += fTrackingType;
+			fFinder = factory->CreateTrackFinder(st);
+		} else
+			TObject::Fatal("CbmLitFindGlobalTracks","Tracking type not found");
 	}
 
 	if (fIsTof) {
@@ -180,7 +193,7 @@ void CbmLitFindGlobalTracks::ConvertInputData()
 void CbmLitFindGlobalTracks::ConvertOutputData()
 {
 	//CbmLitConverter::TrackVectorToTrdTrackArray(fLitTrdTracks, fTrdTracks);
-	CbmLitConverter::LitTrackVectorToGlobalTrackArray(fLitOutputTracks, fGlobalTracks, fTrdTracks, fMuchTracks);
+	CbmLitConverter::LitTrackVectorToGlobalTrackArray(fLitOutputTracks, fGlobalTracks, fStsTracks, fTrdTracks, fMuchTracks);
 }
 
 void CbmLitFindGlobalTracks::ClearArrays()
@@ -212,7 +225,8 @@ void CbmLitFindGlobalTracks::InitStsTrackSeeds()
 
 void CbmLitFindGlobalTracks::RunTrackReconstruction()
 {
-	if (fIsTrd)fFinder->DoFind(fLitTrdHits, fLitStsTracks, fLitOutputTracks);
+	if (fIsElectronSetup && fIsTrd) fFinder->DoFind(fLitTrdHits, fLitStsTracks, fLitOutputTracks);
+	if (fIsMuch)fFinder->DoFind(fLitMuchHits, fLitStsTracks, fLitOutputTracks);
 	if (fIsTof)fMerger->DoMerge(fLitTofHits, fLitOutputTracks);
 }
 

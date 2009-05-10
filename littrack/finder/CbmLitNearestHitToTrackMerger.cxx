@@ -12,7 +12,6 @@
 
 #include <iostream>
 
-
 CbmLitNearestHitToTrackMerger::CbmLitNearestHitToTrackMerger()
 {
 }
@@ -48,7 +47,7 @@ LitStatus CbmLitNearestHitToTrackMerger::DoMerge(
 			HitPtrIteratorPair bounds = HitPtrIteratorPair(hits.begin(), hits.end());
 			//TODO: set parameters only if hit was added
 			track->SetParamLast(&par);
-			if (AddNearestHit(track, bounds)) hitAdded = true;
+			hitAdded = AddNearestHit(track, bounds);
 			//update track parameters
 			//calculate chi square
 			//attach nearest hit to track
@@ -82,8 +81,6 @@ Bool_t CbmLitNearestHitToTrackMerger::AddNearestHit(
 		track->SetChi2(track->GetChi2() + chiSq);
 		track->SetNDF(NDF(track));
 		hitAdded = true;
-//		std::cout << "hit added:" << (*hit)->ToString();
-//		std::cout << "chiSq=" << chiSq << std::endl;
 	}
 	return hitAdded;
 }

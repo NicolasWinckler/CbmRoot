@@ -18,7 +18,9 @@ ${ROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(CBMDATA_SRCS
+CbmDigi.cxx
 CbmHit.cxx
+CbmMCEvent.cxx
 CbmMCTrack.cxx
 CbmTrack.cxx
 CbmTrackMatch.cxx

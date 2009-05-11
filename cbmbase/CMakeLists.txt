@@ -7,6 +7,8 @@ ${ROOT_INCLUDE_DIR}
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
+${CBMROOT_SOURCE_DIR}/cbmdata
+
 //${CBMROOT_SOURCE_DIR}/cbmdata/rich
 )
 
@@ -20,8 +22,8 @@ ${CMAKE_SOURCE_DIR}/base
 link_directories( ${LINK_DIRECTORIES})
 
 set(CBMBASE_SRCS
-CbmDigi.cxx 
 CbmDigiManager.cxx
+CbmPrimaryGenerator.cxx
 CbmPropagator.cxx
 
 CbmTrdTrackFinder.cxx  

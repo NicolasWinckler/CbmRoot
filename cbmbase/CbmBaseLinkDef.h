@@ -4,9 +4,9 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class CbmDigi+;
 #pragma link C++ class CbmDigiManager+;
 //#pragma link C++ class CbmMCTrack+;
+#pragma link C++ class CbmPrimaryGenerator+;
 #pragma link C++ class CbmPropagator+;
 //#pragma link C++ class CbmStack+;
 //#pragma link C++ class CbmTrack+;

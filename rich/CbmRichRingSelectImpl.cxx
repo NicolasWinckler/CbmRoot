@@ -81,52 +81,40 @@ Int_t CbmRichRingSelectImpl::GetNofHitsOnRing(CbmRichRing* ring){
         if (d < 0.3) count++;
 	}
 
+
 	return count;
 }
 
 Double_t CbmRichRingSelectImpl::GetAngle(CbmRichRing* ring){
-    vector<Double_t> alpha;
-    vector<Double_t> phi;
-    phi.clear();
-    alpha.clear();
     Double_t Pi = TMath::Pi();
-    CbmRichHit * hitRing;
+    CbmRichHit * hit;
     Int_t nHits = ring->GetNofHits();
     Double_t xRing = ring->GetCenterX();
     Double_t yRing = ring->GetCenterY();
+    Double_t xHit, yHit;
 
-    if (nHits < 2) return 999.;
+    vector<Double_t> alpha;
+    vector<Double_t> phi;
+    alpha.reserve(nHits + 3);
+    phi.reserve(nHits + 3);
+    if (nHits < 3) return 999.;
     for(Int_t iHit = 0; iHit < nHits; iHit++){
-		hitRing = (CbmRichHit*)fHitsArray->At(ring->GetHit(iHit));
-		if (!hitRing) {
-			cout << "-E- Double_t CbmRichRing::GetAngle()"<< iHit <<endl;
-			continue;
-		}
+		hit = (CbmRichHit*)fHitsArray->At(ring->GetHit(iHit));
+		xHit = hit->X();
+		yHit = hit->Y();
 
-		if ((hitRing->Y()-yRing) == 0) {
-			cout << " -W- CbmRichRing 0 in angle determination, y " << endl;
-			return 999.;
-		}
-		if ((hitRing->X()-xRing) == 0) {
-			cout << " -W- CbmRichRing 0 in angle determination, x " << endl;
-			return 999.;
-		}
+		if (!hit) continue;
+		if (yHit-yRing == 0) return 999.;
+		if (xHit-xRing == 0) return 999.;
 
-		if( hitRing->X() > xRing && hitRing->Y() > yRing ){
-			alpha.push_back(atan(fabs((hitRing->Y()-yRing)/
-					(hitRing->X()-xRing))));
-		}
-		if( hitRing->X() < xRing && hitRing->Y() > yRing ){
-			alpha.push_back(Pi - atan(fabs((hitRing->Y()-yRing)/
-					(hitRing->X()-xRing))));
-		}
-		if( hitRing->X() < xRing && hitRing->Y() < yRing ){
-			alpha.push_back(Pi + atan(fabs((hitRing->Y()-yRing)/
-					(hitRing->X()-xRing))));
-		}
-		if( hitRing->X() > xRing && hitRing->Y() < yRing ){
-			alpha.push_back(2*Pi - atan(fabs((hitRing->Y()-yRing)/
-					(hitRing->X()-xRing))));
+		if( xHit > xRing && yHit > yRing ){
+			alpha.push_back(atan(fabs((yHit-yRing)/(xHit-xRing))));
+		}else if( xHit < xRing && yHit > yRing ){
+			alpha.push_back(Pi - atan(fabs((yHit-yRing)/(xHit-xRing))));
+		}else if( xHit < xRing && yHit < yRing ){
+			alpha.push_back(Pi + atan(fabs((yHit-yRing)/(xHit-xRing))));
+		} else if( xHit > xRing && yHit < yRing ){
+			alpha.push_back(2*Pi - atan(fabs((yHit-yRing)/(xHit-xRing))));
 		}
     }
 

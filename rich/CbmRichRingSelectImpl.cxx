@@ -65,7 +65,7 @@ Int_t CbmRichRingSelectImpl::GetNofHitsOnRing(CbmRichRing* ring){
 	Double_t D = ring->GetDPar();
 	Double_t E = ring->GetEPar();
 	Double_t F = ring->GetFPar();
-
+	Double_t t1, t2;
 	for(Int_t iH = 0; iH < nHits; iH++){
 		hit = (CbmRichHit*)fHitsArray->At(ring->GetHit(iH));
 		if (!hit) continue;
@@ -74,7 +74,9 @@ Int_t CbmRichRingSelectImpl::GetNofHitsOnRing(CbmRichRing* ring){
 		Double_t y = hit->Y();
 
         Double_t d1 = TMath::Abs(A*x*x + B*x*y + C*y*y + D*x + E*y + F);
-        Double_t d2 = sqrt( pow(2*A*x + B*y + D, 2) + pow(B*x + 2*C*y + E, 2) );
+        t1 = 2*A*x + B*y + D;
+        t2 = B*x + 2*C*y + E;
+        Double_t d2 = sqrt( t1 * t1 + t2*t2);
 
         Double_t d = d1/d2;
 

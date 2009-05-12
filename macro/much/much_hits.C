@@ -77,9 +77,9 @@ void much_hits(TString inFile = "",
    // ------------------------------------------------------------------------
 
    // ---  MuCh hit finder ---------------------------------------------------
-   CbmMuchFindHits* muchFindHits = new CbmMuchFindHits("MuchFindHits", digiFile, iVerbose);
-   muchFindHits->SetUseClustering(1); // Use clustering algorithm
-   fRun->AddTask(muchFindHits);
+//   CbmMuchFindHitsSimple* findHits = new CbmMuchFindHitsSimple("MuchFindHitsSimple", digiFile, iVerbose);
+   CbmMuchFindClusters* findHits = new CbmMuchFindClusters("MuchFindClusters", digiFile, iVerbose);
+   fRun->AddTask(findHits);
    // ------------------------------------------------------------------------
 
    // -----   Intialise and run   --------------------------------------------

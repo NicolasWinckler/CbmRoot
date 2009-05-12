@@ -1,4 +1,4 @@
-/** CbmMuchFindClusters.h
+/** CbmMuchFindHitsAdvancedGem.h
  *@author Mikhail Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *@since 31.01.08
  *@version 1.0
@@ -12,11 +12,11 @@
 #define CBMMUCHFINDCLUSTERS_H 1
 
 
-#include "CbmMuchTask.h"
 #include "TStopwatch.h"
 #include "TClonesArray.h"
 #include "TFile.h"
 #include "CbmMuchGeoScheme.h"
+#include "FairTask.h"
 
 #include <map>
 #include <vector>
@@ -30,19 +30,19 @@ using std::set;
 class CbmMuchPad;
 class CbmMuchCluster;
 
-class CbmMuchFindClusters : public FairTask
+class CbmMuchFindHitsAdvancedGem : public FairTask
 {
 
  public :
 
   /** Default constructor. */
-  CbmMuchFindClusters();
+  CbmMuchFindHitsAdvancedGem();
 
   /**
    * Standard constructor.
    * @param iVerbose   Verbosity level.
    */
-  CbmMuchFindClusters(Int_t iVerbose);
+  CbmMuchFindHitsAdvancedGem(Int_t iVerbose);
 
   /**
    * Constructor with task name.
@@ -50,10 +50,10 @@ class CbmMuchFindClusters : public FairTask
    * @param digiFile  Input digitization scheme file.
    * @param iVerbose  Verbosity level.
    */
-  CbmMuchFindClusters(const char* name, const char* digiFileName, Int_t iVerbose);
+  CbmMuchFindHitsAdvancedGem(const char* name, const char* digiFileName, Int_t iVerbose);
 
   /** Destructor. */
-  virtual ~CbmMuchFindClusters();
+  virtual ~CbmMuchFindHitsAdvancedGem();
 
   /** Execution. */
   virtual void Exec(Option_t* opt);
@@ -95,7 +95,7 @@ class CbmMuchFindClusters : public FairTask
   /** **/
   CbmMuchPad* GetPadByDigi(Int_t digiIndex, Int_t &charge);
 
-  ClassDef(CbmMuchFindClusters,1);
+  ClassDef(CbmMuchFindHitsAdvancedGem,1);
 };
 
 #endif

@@ -27,9 +27,8 @@ CbmGeoMuchPar.cxx
 CbmMuch.cxx
 CbmMuchContFact.cxx  
 CbmMuchDigitize.cxx
-CbmMuchFindClusters.cxx
-CbmMuchFindHits.cxx
-CbmMuchFindHitsSimple.cxx
+CbmMuchFindHitsAdvancedGem.cxx
+CbmMuchFindHitsSimpleGem.cxx
 CbmMuchFindTracks.cxx
 CbmMuchGeoScheme.cxx
 CbmMuchHitFinderQa.cxx
@@ -47,7 +46,6 @@ CbmMuchSegmentManual.cxx
 CbmMuchStation.cxx
 CbmMuchStationGem.cxx
 CbmMuchStationStraw.cxx
-CbmMuchTask.cxx
 CbmMuchTrackFinderIdeal.cxx
 CbmMuchFindHitsStraws.cxx
 )

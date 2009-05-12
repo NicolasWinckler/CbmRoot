@@ -1,4 +1,4 @@
-/** CbmMuchFindHitsSimple.cxx
+/** CbmMuchFindHitsSimpleGem.cxx
  *@author Mikhail Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *@since 22.03.07
  *@version 1.0
@@ -8,7 +8,7 @@
  ** Produces objects of type CbmMuchHit out of CbmMuchDigi.
  **/
 
-#include "CbmMuchFindHitsSimple.h"
+#include "CbmMuchFindHitsSimpleGem.h"
 #include "CbmMuchDigi.h"
 #include "CbmMuchHit.h"
 #include "CbmMuchStation.h"
@@ -30,7 +30,7 @@ using std::right;
 using std::setprecision;
 
 // -----   Default constructor   ------------------------------------------
-CbmMuchFindHitsSimple::CbmMuchFindHitsSimple() : FairTask("MuchFindHitsSimple", 1) {
+CbmMuchFindHitsSimpleGem::CbmMuchFindHitsSimpleGem() : FairTask("MuchFindHitsSimpleGem", 1) {
   fDigiFile    = NULL;
   fDigis   = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
@@ -38,8 +38,8 @@ CbmMuchFindHitsSimple::CbmMuchFindHitsSimple() : FairTask("MuchFindHitsSimple", 
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchFindHitsSimple::CbmMuchFindHitsSimple(Int_t iVerbose)
-  : FairTask("MuchFindHitsSimple", iVerbose) {
+CbmMuchFindHitsSimpleGem::CbmMuchFindHitsSimpleGem(Int_t iVerbose)
+  : FairTask("MuchFindHitsSimpleGem", iVerbose) {
   fDigiFile    = NULL;
   fDigis   = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
@@ -47,7 +47,7 @@ CbmMuchFindHitsSimple::CbmMuchFindHitsSimple(Int_t iVerbose)
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name   -----------------------------------------
-CbmMuchFindHitsSimple::CbmMuchFindHitsSimple(const char* name, const char* digiFileName, Int_t iVerbose)
+CbmMuchFindHitsSimpleGem::CbmMuchFindHitsSimpleGem(const char* name, const char* digiFileName, Int_t iVerbose)
   : FairTask(name, iVerbose) {
   fDigiFile    = new TFile(digiFileName);
   fDigis   = NULL;
@@ -56,7 +56,7 @@ CbmMuchFindHitsSimple::CbmMuchFindHitsSimple(const char* name, const char* digiF
 // -------------------------------------------------------------------------
 
 // -----   Destructor   ----------------------------------------------------
-CbmMuchFindHitsSimple::~CbmMuchFindHitsSimple() {
+CbmMuchFindHitsSimpleGem::~CbmMuchFindHitsSimpleGem() {
   if ( fHits ) {
     fHits->Delete();
     delete fHits;
@@ -65,7 +65,7 @@ CbmMuchFindHitsSimple::~CbmMuchFindHitsSimple() {
 // -------------------------------------------------------------------------
 
 // -----   Public method Exec   --------------------------------------------
-void CbmMuchFindHitsSimple::Exec(Option_t* opt) {
+void CbmMuchFindHitsSimpleGem::Exec(Option_t* opt) {
   Bool_t warn = kFALSE;
 
   fTimer.Start();
@@ -143,12 +143,12 @@ void CbmMuchFindHitsSimple::Exec(Option_t* opt) {
 // -------------------------------------------------------------------------
 
 // -----   Private method SetParContainers   -------------------------------
-void CbmMuchFindHitsSimple::SetParContainers() {
+void CbmMuchFindHitsSimpleGem::SetParContainers() {
 }
 // -------------------------------------------------------------------------
 
 // -----   Private method Init   -------------------------------------------
-InitStatus CbmMuchFindHitsSimple::Init() {
+InitStatus CbmMuchFindHitsSimpleGem::Init() {
   // Get input array
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
@@ -167,10 +167,10 @@ InitStatus CbmMuchFindHitsSimple::Init() {
 // -------------------------------------------------------------------------
 
 // -----   Private method ReInit   -----------------------------------------
-InitStatus CbmMuchFindHitsSimple::ReInit() {
+InitStatus CbmMuchFindHitsSimpleGem::ReInit() {
   return kSUCCESS;
 }
 // -------------------------------------------------------------------------
 
 
-ClassImp(CbmMuchFindHitsSimple)
+ClassImp(CbmMuchFindHitsSimpleGem)

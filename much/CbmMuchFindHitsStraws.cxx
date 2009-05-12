@@ -9,26 +9,29 @@
 
 
 // -----   Default constructor   ------------------------------------------
-CbmMuchFindHitsStraws::CbmMuchFindHitsStraws() : CbmMuchTask("MuchFindHits", 1) {
+CbmMuchFindHitsStraws::CbmMuchFindHitsStraws() : FairTask("MuchFindHits", 1) {
   fDigiFile    = NULL;
   fDigis   = NULL;
+  fGeoScheme = CbmMuchGeoScheme::Instance();
 
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(Int_t iVerbose)
-  : CbmMuchTask("MuchFindHits", iVerbose) {
+  : FairTask("MuchFindHits", iVerbose) {
   fDigiFile    = NULL;
   fDigis   = NULL;
+  fGeoScheme = CbmMuchGeoScheme::Instance();
 }
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name   -----------------------------------------
-CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(const char* name, TFile* digiFile, Int_t iVerbose)
-  : CbmMuchTask(name, iVerbose) {
-  fDigiFile    = digiFile;
+CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(const char* name, const char* digiFileName, Int_t iVerbose)
+  : FairTask(name, iVerbose) {
+  fDigiFile    = new TFile(digiFileName);
   fDigis   = NULL;
+  fGeoScheme = CbmMuchGeoScheme::Instance();
 }
 // -------------------------------------------------------------------------
 

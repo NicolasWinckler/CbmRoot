@@ -5,15 +5,15 @@
 #ifndef CBMMUCHFINDHITSSTRAWS_H
 #define CBMMUCHFINDHITSSTRAWS_H 1
 
-#include "CbmMuchTask.h"
 #include "CbmMuchSector.h"
 #include "CbmMuchGeoScheme.h"
 
 #include "FairTask.h"
 
 #include "TFile.h"
+#include "TClonesArray.h"
 
-class CbmMuchFindHitsStraws : public CbmMuchTask
+class CbmMuchFindHitsStraws : public FairTask
 {
  public :
 
@@ -24,7 +24,7 @@ class CbmMuchFindHitsStraws : public CbmMuchTask
   CbmMuchFindHitsStraws(Int_t iVerbose);
 
   /** Constructor with task name **/
-  CbmMuchFindHitsStraws(const char* name, TFile* digiFile, Int_t iVerbose);
+  CbmMuchFindHitsStraws(const char* name, const char* digiFileName, Int_t iVerbose);
 
   /** Destructor **/
   virtual ~CbmMuchFindHitsStraws();
@@ -42,8 +42,10 @@ class CbmMuchFindHitsStraws : public CbmMuchTask
   virtual InitStatus ReInit();
 
  private:
+  CbmMuchGeoScheme*                fGeoScheme;         // Geometry scheme
   TFile*                           fDigiFile;          // Digitization file
   TClonesArray*                    fDigis;             // Input array of CbmMuchDigi
+  TClonesArray*                    fHits;              // Output array of CbmMuchHit
 
   ClassDef(CbmMuchFindHitsStraws,1);
 };

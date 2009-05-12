@@ -1,4 +1,4 @@
-/** CbmMuchFindHitsSimple.h
+/** CbmMuchFindHitsSimpleGem.h
  *@author Mikhail Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *@since 22.03.07
  *@version 1.0
@@ -12,29 +12,30 @@
 #ifndef CBMMUCHFINDHITSSIMPLE_H
 #define CBMMUCHFINDHITSSIMPLE_H 1
 
-#include "CbmMuchTask.h"
 #include "CbmMuchSector.h"
 #include "CbmMuchGeoScheme.h"
+#include "TStopwatch.h"
 
 #include "FairTask.h"
 
 #include "TFile.h"
+#include "TClonesArray.h"
 
-class CbmMuchFindHitsSimple : public FairTask
+class CbmMuchFindHitsSimpleGem : public FairTask
 {
  public :
 
   /** Default constructor **/
-  CbmMuchFindHitsSimple();
+  CbmMuchFindHitsSimpleGem();
 
   /** Standard constructor **/
-  CbmMuchFindHitsSimple(Int_t iVerbose);
+  CbmMuchFindHitsSimpleGem(Int_t iVerbose);
 
   /** Constructor with task name **/
-  CbmMuchFindHitsSimple(const char* name, const char* digiFileName, Int_t iVerbose);
+  CbmMuchFindHitsSimpleGem(const char* name, const char* digiFileName, Int_t iVerbose);
 
   /** Destructor **/
-  virtual ~CbmMuchFindHitsSimple();
+  virtual ~CbmMuchFindHitsSimpleGem();
 
   /** Execution **/
   virtual void Exec(Option_t* opt);
@@ -54,7 +55,7 @@ class CbmMuchFindHitsSimple : public FairTask
   virtual InitStatus ReInit();
 
 
-  ClassDef(CbmMuchFindHitsSimple,1);
+  ClassDef(CbmMuchFindHitsSimpleGem,1);
 };
 
 #endif

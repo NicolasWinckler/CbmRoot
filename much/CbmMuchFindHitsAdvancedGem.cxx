@@ -1,4 +1,4 @@
-/** CbmMuchFindClusters.cxx
+/** CbmMuchFindHitsAdvancedGem.cxx
  *@author Mikhail Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *@since 31.01.08
  *@version 1.0
@@ -8,7 +8,7 @@
  ** Produces objects of type CbmMuchCluster.
  **/
 
-#include "CbmMuchFindClusters.h"
+#include "CbmMuchFindHitsAdvancedGem.h"
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchModule.h"
 #include "CbmMuchPad.h"
@@ -34,8 +34,8 @@ using std::right;
 using std::setprecision;
 
 // -----   Default constructor   ------------------------------------------
-CbmMuchFindClusters::CbmMuchFindClusters() :
-  FairTask("MuchFindClusters", 1) {
+CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem() :
+  FairTask("MuchFindHitsAdvancedGem", 1) {
   fDigis = NULL;
   fDigiMatches = NULL;
   fHits = NULL;
@@ -46,8 +46,8 @@ CbmMuchFindClusters::CbmMuchFindClusters() :
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchFindClusters::CbmMuchFindClusters(Int_t iVerbose) :
-  FairTask("MuchFindClusters", iVerbose) {
+CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(Int_t iVerbose) :
+  FairTask("MuchFindHitsAdvancedGem", iVerbose) {
   fDigis = NULL;
   fDigiMatches = NULL;
   fDigiFile = NULL;
@@ -57,7 +57,7 @@ CbmMuchFindClusters::CbmMuchFindClusters(Int_t iVerbose) :
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name   -----------------------------------------
-CbmMuchFindClusters::CbmMuchFindClusters(const char* name, const char* digiFileName,
+CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(const char* name, const char* digiFileName,
     Int_t iVerbose) : FairTask(name, iVerbose) {
   fDigis = NULL;
   fDigiMatches = NULL;
@@ -68,7 +68,7 @@ CbmMuchFindClusters::CbmMuchFindClusters(const char* name, const char* digiFileN
 // -------------------------------------------------------------------------
 
 // -----   Destructor   ----------------------------------------------------
-CbmMuchFindClusters::~CbmMuchFindClusters() {
+CbmMuchFindHitsAdvancedGem::~CbmMuchFindHitsAdvancedGem() {
   if ( fHits ) {
     fHits->Delete();
     delete fHits;
@@ -77,7 +77,7 @@ CbmMuchFindClusters::~CbmMuchFindClusters() {
 // -------------------------------------------------------------------------
 
 // -----   Public method Exec   --------------------------------------------
-void CbmMuchFindClusters::Exec(Option_t* opt) {
+void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
   fTimer.Start();
 
   // Clear output array
@@ -177,12 +177,12 @@ void CbmMuchFindClusters::Exec(Option_t* opt) {
 // -------------------------------------------------------------------------
 
 // -----   Private method SetParContainers   -------------------------------
-void CbmMuchFindClusters::SetParContainers() {
+void CbmMuchFindHitsAdvancedGem::SetParContainers() {
 }
 // -------------------------------------------------------------------------
 
 // -----   Private method Init   -------------------------------------------
-InitStatus CbmMuchFindClusters::Init() {
+InitStatus CbmMuchFindHitsAdvancedGem::Init() {
   // Get input arrays
   FairRootManager* ioman = FairRootManager::Instance();
   if (!ioman)
@@ -206,13 +206,13 @@ InitStatus CbmMuchFindClusters::Init() {
 // -------------------------------------------------------------------------
 
 // -----   Private method ReInit   -----------------------------------------
-InitStatus CbmMuchFindClusters::ReInit() {
+InitStatus CbmMuchFindHitsAdvancedGem::ReInit() {
   return kSUCCESS;
 }
 // -------------------------------------------------------------------------
 
 // -----   Private method FindChannelDigiMap  ------------------------------
-void CbmMuchFindClusters::FillChannelDigiMap() {
+void CbmMuchFindHitsAdvancedGem::FillChannelDigiMap() {
   fChannelDigiMap.clear();
   Int_t nDigis = fDigis->GetEntriesFast();
   for (Int_t iDigi = 0; iDigi < nDigis; iDigi++) {
@@ -234,7 +234,7 @@ void CbmMuchFindClusters::FillChannelDigiMap() {
 // -------------------------------------------------------------------------
 
 // -----   Private method FindClusters  ------------------------------------
-void CbmMuchFindClusters::FindClusters() {
+void CbmMuchFindHitsAdvancedGem::FindClusters() {
   FillChannelDigiMap();
 
   fSelectedDigis.clear();
@@ -260,7 +260,7 @@ void CbmMuchFindClusters::FindClusters() {
 // -------------------------------------------------------------------------
 
 // -----   Private method SetDigiClusterMatch  -----------------------------
-void CbmMuchFindClusters::SetDigiClusterMatch(vector<Int_t> digiIndices,
+void CbmMuchFindHitsAdvancedGem::SetDigiClusterMatch(vector<Int_t> digiIndices,
     Int_t clusterIndex) {
   for (vector<Int_t>::iterator it = digiIndices.begin(); it
   != digiIndices.end(); it++) {
@@ -274,7 +274,7 @@ void CbmMuchFindClusters::SetDigiClusterMatch(vector<Int_t> digiIndices,
 // -------------------------------------------------------------------------
 
 // -----   Private method CreateCluster  -----------------------------------
-void CbmMuchFindClusters::CreateCluster(Int_t iDigi,
+void CbmMuchFindHitsAdvancedGem::CreateCluster(Int_t iDigi,
     vector<Int_t> &digiIndices, Int_t &sumCharge, Int_t &qMax,
     Int_t qThreshold) {
   digiIndices.push_back(iDigi);
@@ -314,7 +314,7 @@ void CbmMuchFindClusters::CreateCluster(Int_t iDigi,
 // -------------------------------------------------------------------------
 
 // -----   Private method ApplyThreshold  ----------------------------------
-void CbmMuchFindClusters::ApplyThreshold(CbmMuchCluster* cluster, vector<
+void CbmMuchFindHitsAdvancedGem::ApplyThreshold(CbmMuchCluster* cluster, vector<
     CbmMuchCluster*> &newClusters) {
   fSelectedDigis.clear();
   Int_t qThreshold = cluster->GetMaxCharge() / 10;
@@ -341,7 +341,7 @@ void CbmMuchFindClusters::ApplyThreshold(CbmMuchCluster* cluster, vector<
 // -------------------------------------------------------------------------
 
 // -----   Private method GetPadByDigi  ------------------------------------
-CbmMuchPad* CbmMuchFindClusters::GetPadByDigi(Int_t digiIndex, Int_t &charge) {
+CbmMuchPad* CbmMuchFindHitsAdvancedGem::GetPadByDigi(Int_t digiIndex, Int_t &charge) {
   CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(digiIndex);
   if (digi) {
     charge = digi->GetCharge();
@@ -358,4 +358,4 @@ CbmMuchPad* CbmMuchFindClusters::GetPadByDigi(Int_t digiIndex, Int_t &charge) {
 }
 // -------------------------------------------------------------------------
 
-ClassImp(CbmMuchFindClusters)
+ClassImp(CbmMuchFindHitsAdvancedGem)

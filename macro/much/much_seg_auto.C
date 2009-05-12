@@ -68,7 +68,7 @@ void much_seg_auto(const char* mcFile = "",
 
 
   // -----  Segmentation task  ----------------------------------------------
-  CbmMuchSegmentation* seg = new CbmMuchSegmentation(digiFile);
+  CbmMuchSegmentAuto* seg = new CbmMuchSegmentAuto(digiFile);
 
   // Number of stations
   seg->SetNStations(6);

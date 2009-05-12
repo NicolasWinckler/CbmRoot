@@ -2,7 +2,7 @@
 //
 // Macro for reconstruction of simulated events
 //
-// STS, RICH and TRD Hitproducers 
+// STS, RICH and TRD Hitproducers
 // STS track finding and fitting
 // TRD track finding and fitting
 // RICH ring finding (ideal) and fitting
@@ -26,18 +26,18 @@
 
   //  Digitisation files
   TList *parFileList = new TList();
- 
+
   TString paramDir = gSystem->Getenv("VMCWORKDIR");
   paramDir += "/parameters/sts/";
 
   TObjString stsDigiFile = paramDir + "sts_Standard_s3055AAFK5.SecD.digi.par";
-  parFileList->Add(&stsDigiFile);  
- 
+  parFileList->Add(&stsDigiFile);
+
   paramDir = gSystem->Getenv("VMCWORKDIR");
   paramDir += "/parameters/much/";
 
   TObjString muchDigiFile = paramDir + "much_standard.digi.par";
-  parFileList->Add(&muchDigiFile);  
+  parFileList->Add(&muchDigiFile);
 
   TString digiFile = "data/much_digi.root";
 
@@ -109,7 +109,7 @@
 
 
   // -----   STS digitizer   -------------------------------------------------
-  FairTask* stsDigitize = new CbmStsDigitize(iVerbose);   
+  FairTask* stsDigitize = new CbmStsDigitize(iVerbose);
   fRun->AddTask(stsDigitize);
   // -------------------------------------------------------------------------
 
@@ -135,7 +135,7 @@
   CbmL1* l1 = new CbmL1();
   fRun->AddTask(l1);
   CbmStsTrackFinder* stsTrackFinder    = new CbmL1StsTrackFinder();
-  FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder);  
+  FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder);
   fRun->AddTask(stsFindTracks);
   // -------------------------------------------------------------------------
 
@@ -160,16 +160,14 @@
   // ------------------------------------------------------------------------
 
   // ---  MuCh digitizer ----------------------------------------------------
-  CbmMuchDigitize* muchDigitize = new CbmMuchDigitize("MuchDigitize", digiFile.Data(), iVerbose);
-  muchDigitize->SetUseAvalanche(1); // Account for avalanches
+  CbmMuchDigitizeAdvancedGem* muchDigitize = new CbmMuchDigitizeAdvancedGem("MuchDigitize", digiFile.Data(), iVerbose);
   fRun->AddTask(muchDigitize);
   // ------------------------------------------------------------------------
 
   // ---  MuCh hit finder ---------------------------------------------------
-  CbmMuchFindHits* muchFindHits = new CbmMuchFindHits("MuchFindHits", digiFile.Data(), iVerbose);
-  muchFindHits->SetUseClustering(1); // Use clustering algorithm
+  CbmMuchFindHitsAdvancedGem* muchFindHits = new CbmMuchFindHitsAdvancedGem("MuchFindHits", digiFile.Data(), iVerbose);
   fRun->AddTask(muchFindHits);
-  // ------------------------------------------------------------------------ 
+  // ------------------------------------------------------------------------
 
 
 
@@ -209,4 +207,4 @@
   cout << " All ok " << endl;
   exit(0);
 }
- 
+

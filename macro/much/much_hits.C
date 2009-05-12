@@ -71,14 +71,14 @@ void much_hits(TString inFile = "",
    // ------------------------------------------------------------------------
 
    // ---  MuCh digitizer ----------------------------------------------------
-   CbmMuchDigitize* muchDigitize = new CbmMuchDigitize("MuchDigitize", digiFile, iVerbose);
-   muchDigitize->SetUseAvalanche(1); // Account for avalanches
-   fRun->AddTask(muchDigitize);
+//   CbmMuchDigitizeSimpleGem* digitize = new CbmMuchDigitizeSimpleGem("MuchDigitizeSimpleGem", digiFile, iVerbose);
+   CbmMuchDigitizeAdvancedGem* digitize = new CbmMuchDigitizeAdvancedGem("MuchDigitizeAdvancedGem", digiFile, iVerbose);
+   fRun->AddTask(digitize);
    // ------------------------------------------------------------------------
 
    // ---  MuCh hit finder ---------------------------------------------------
-//   CbmMuchFindHitsSimple* findHits = new CbmMuchFindHitsSimple("MuchFindHitsSimple", digiFile, iVerbose);
-   CbmMuchFindClusters* findHits = new CbmMuchFindClusters("MuchFindClusters", digiFile, iVerbose);
+//   CbmMuchFindHitsSimpleGem* findHits = new CbmMuchFindHitsSimpleGem("MuchFindHitsSimpleGem", digiFile, iVerbose);
+   CbmMuchFindHitsAdvancedGem* findHits = new CbmMuchFindHitsAdvancedGem("MuchFindHitsAdvancedGem", digiFile, iVerbose);
    fRun->AddTask(findHits);
    // ------------------------------------------------------------------------
 

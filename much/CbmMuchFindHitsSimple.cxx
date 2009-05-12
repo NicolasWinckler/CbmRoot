@@ -30,26 +30,28 @@ using std::right;
 using std::setprecision;
 
 // -----   Default constructor   ------------------------------------------
-CbmMuchFindHitsSimple::CbmMuchFindHitsSimple() : CbmMuchTask("MuchFindHits", 1) {
+CbmMuchFindHitsSimple::CbmMuchFindHitsSimple() : FairTask("MuchFindHitsSimple", 1) {
   fDigiFile    = NULL;
   fDigis   = NULL;
-
+  fGeoScheme = CbmMuchGeoScheme::Instance();
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchFindHitsSimple::CbmMuchFindHitsSimple(Int_t iVerbose)
-  : CbmMuchTask("MuchFindHits", iVerbose) {
+  : FairTask("MuchFindHitsSimple", iVerbose) {
   fDigiFile    = NULL;
   fDigis   = NULL;
+  fGeoScheme = CbmMuchGeoScheme::Instance();
 }
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name   -----------------------------------------
-CbmMuchFindHitsSimple::CbmMuchFindHitsSimple(const char* name, TFile* digiFile, Int_t iVerbose)
-  : CbmMuchTask(name, iVerbose) {
-  fDigiFile    = digiFile;
+CbmMuchFindHitsSimple::CbmMuchFindHitsSimple(const char* name, const char* digiFileName, Int_t iVerbose)
+  : FairTask(name, iVerbose) {
+  fDigiFile    = new TFile(digiFileName);
   fDigis   = NULL;
+  fGeoScheme = CbmMuchGeoScheme::Instance();
 }
 // -------------------------------------------------------------------------
 

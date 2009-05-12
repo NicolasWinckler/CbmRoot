@@ -30,7 +30,7 @@ using std::set;
 class CbmMuchPad;
 class CbmMuchCluster;
 
-class CbmMuchFindClusters : public CbmMuchTask
+class CbmMuchFindClusters : public FairTask
 {
 
  public :
@@ -50,7 +50,7 @@ class CbmMuchFindClusters : public CbmMuchTask
    * @param digiFile  Input digitization scheme file.
    * @param iVerbose  Verbosity level.
    */
-  CbmMuchFindClusters(const char* name, TFile* digiFile, Int_t iVerbose);
+  CbmMuchFindClusters(const char* name, const char* digiFileName, Int_t iVerbose);
 
   /** Destructor. */
   virtual ~CbmMuchFindClusters();
@@ -58,23 +58,24 @@ class CbmMuchFindClusters : public CbmMuchTask
   /** Execution. */
   virtual void Exec(Option_t* opt);
 
-  /** Get parameter containers. */
-  virtual void SetParContainers();
-
-  /** Initialization. */
-  virtual InitStatus Init();
-
-  /** Reinitialization. */
-  virtual InitStatus ReInit();
-
  private:
 
+  CbmMuchGeoScheme*                fGeoScheme;         // Geometry scheme
   TFile*                           fDigiFile;          // Digitization file
+  TClonesArray*                    fHits;              // Output array of CbmMuchHit
   TClonesArray*                    fDigis;             // Input array of CbmMuchDigi
   TClonesArray*                    fDigiMatches;       // Input array of CbmMuchDigiMatch
   TClonesArray*                    fPrimaryClusters;   // Output array of primary CbmMuchCluster objects
   map<pair<Int_t, Int_t>, Int_t>   fChannelDigiMap;    // Correspondence between unique channel id and digi index
   set<Int_t>                       fSelectedDigis;     // Digis already included in clusters
+  TStopwatch                       fTimer;             // Timer
+
+  /** Get parameter containers. */
+  virtual void SetParContainers();
+  /** Initialization. */
+  virtual InitStatus Init();
+  /** Reinitialization. */
+  virtual InitStatus ReInit();
 
 
   /** Fills fPrimaryClusters array with found clusters. **/

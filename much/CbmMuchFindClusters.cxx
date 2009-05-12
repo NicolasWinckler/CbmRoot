@@ -35,38 +35,44 @@ using std::setprecision;
 
 // -----   Default constructor   ------------------------------------------
 CbmMuchFindClusters::CbmMuchFindClusters() :
-  CbmMuchTask("MuchFindClusters", 1) {
+  FairTask("MuchFindClusters", 1) {
   fDigis = NULL;
   fDigiMatches = NULL;
   fHits = NULL;
   fDigiFile = NULL;
   fPrimaryClusters = NULL;
+  fGeoScheme = CbmMuchGeoScheme::Instance();
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchFindClusters::CbmMuchFindClusters(Int_t iVerbose) :
-  CbmMuchTask("MuchFindClusters", iVerbose) {
+  FairTask("MuchFindClusters", iVerbose) {
   fDigis = NULL;
   fDigiMatches = NULL;
   fDigiFile = NULL;
   fPrimaryClusters = NULL;
+  fGeoScheme = CbmMuchGeoScheme::Instance();
 }
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name   -----------------------------------------
-CbmMuchFindClusters::CbmMuchFindClusters(const char* name, TFile* digiFile,
-    Int_t iVerbose) :
-  CbmMuchTask(name, iVerbose) {
+CbmMuchFindClusters::CbmMuchFindClusters(const char* name, const char* digiFileName,
+    Int_t iVerbose) : FairTask(name, iVerbose) {
   fDigis = NULL;
   fDigiMatches = NULL;
-  fDigiFile = digiFile;
+  fDigiFile    = new TFile(digiFileName);
   fPrimaryClusters = NULL;
+  fGeoScheme = CbmMuchGeoScheme::Instance();
 }
 // -------------------------------------------------------------------------
 
 // -----   Destructor   ----------------------------------------------------
 CbmMuchFindClusters::~CbmMuchFindClusters() {
+  if ( fHits ) {
+    fHits->Delete();
+    delete fHits;
+  }
 }
 // -------------------------------------------------------------------------
 
@@ -98,7 +104,7 @@ void CbmMuchFindClusters::Exec(Option_t* opt) {
 
     // Produce hits from secondary clusters
     for (vector<CbmMuchCluster*>::iterator it = secondaryClusters.begin(); it
-        != secondaryClusters.end(); it++) {
+    != secondaryClusters.end(); it++) {
       CbmMuchCluster* secCluster = (*it);
       Double_t x, y, z;
       Double_t xq = 0.0;
@@ -138,7 +144,7 @@ void CbmMuchFindClusters::Exec(Option_t* opt) {
       Int_t planeId = fGeoScheme->GetLayerSideNr(detId);
 
       new ((*fHits)[nHits++]) CbmMuchHit(detId, pos,
-         dpos, 0, iCluster,planeId);
+          dpos, 0, iCluster,planeId);
 
       if (planeId>30) printf("planeId=%i\n",planeId);
 
@@ -152,9 +158,9 @@ void CbmMuchFindClusters::Exec(Option_t* opt) {
   if (fVerbose) {
     cout << "-I- " << fName << ":Event summary" << endl;
     cout << "    Active channels           : " << fDigis->GetEntriesFast()
-        << endl;
+    << endl;
     cout << "    Hits created              : " << fHits->GetEntriesFast()
-        << endl;
+    << endl;
     cout << "    Real time                 : " << fTimer.RealTime() << endl;
     cout << "    Clusters                  : " << nClusters << endl;
     //    for(Int_t i=0; i< fHits->GetEntriesFast(); ++i){
@@ -163,9 +169,9 @@ void CbmMuchFindClusters::Exec(Option_t* opt) {
     //    }
   } else {
     cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
-        << fixed << right << fTimer.RealTime() << " s, digis "
-        << fDigis->GetEntriesFast() << ", hits: "
-        << fHits->GetEntriesFast() << endl;
+    << fixed << right << fTimer.RealTime() << " s, digis "
+    << fDigis->GetEntriesFast() << ", hits: "
+    << fHits->GetEntriesFast() << endl;
   }
 }
 // -------------------------------------------------------------------------
@@ -220,7 +226,7 @@ void CbmMuchFindClusters::FillChannelDigiMap() {
 
     // Unique channel id within the MUCH
     pair<Int_t, Int_t>
-        uniqueId(digi->GetDetectorId(), digi->GetChannelId());
+    uniqueId(digi->GetDetectorId(), digi->GetChannelId());
     if (fChannelDigiMap.find(uniqueId) == fChannelDigiMap.end())
       fChannelDigiMap[uniqueId] = iDigi;
   }
@@ -257,7 +263,7 @@ void CbmMuchFindClusters::FindClusters() {
 void CbmMuchFindClusters::SetDigiClusterMatch(vector<Int_t> digiIndices,
     Int_t clusterIndex) {
   for (vector<Int_t>::iterator it = digiIndices.begin(); it
-      != digiIndices.end(); it++) {
+  != digiIndices.end(); it++) {
     Int_t idx = *it;
     CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fDigiMatches->At(idx);
     if (!digiMatch)
@@ -283,7 +289,7 @@ void CbmMuchFindClusters::CreateCluster(Int_t iDigi,
   vector<CbmMuchPad*> neighbourPads = pad->GetNeighbours();
 
   for (vector<CbmMuchPad*>::iterator it = neighbourPads.begin(); it
-      != neighbourPads.end(); it++) {
+  != neighbourPads.end(); it++) {
     CbmMuchPad* neighbourPad = *it;
     pair<Int_t, Int_t> uniqueId(neighbourPad->GetDetectorId(),
         neighbourPad->GetChannelId());

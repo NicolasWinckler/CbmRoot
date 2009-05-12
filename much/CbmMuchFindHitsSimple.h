@@ -20,7 +20,7 @@
 
 #include "TFile.h"
 
-class CbmMuchFindHitsSimple : public CbmMuchTask
+class CbmMuchFindHitsSimple : public FairTask
 {
  public :
 
@@ -31,7 +31,7 @@ class CbmMuchFindHitsSimple : public CbmMuchTask
   CbmMuchFindHitsSimple(Int_t iVerbose);
 
   /** Constructor with task name **/
-  CbmMuchFindHitsSimple(const char* name, TFile* digiFile, Int_t iVerbose);
+  CbmMuchFindHitsSimple(const char* name, const char* digiFileName, Int_t iVerbose);
 
   /** Destructor **/
   virtual ~CbmMuchFindHitsSimple();
@@ -39,18 +39,20 @@ class CbmMuchFindHitsSimple : public CbmMuchTask
   /** Execution **/
   virtual void Exec(Option_t* opt);
 
-  /** Get parameter containers **/
+ private:
+  CbmMuchGeoScheme*                fGeoScheme;         // Geometry scheme
+  TFile*                           fDigiFile;          // Digitization file
+  TClonesArray*                    fHits;              // Output array of CbmMuchHit
+  TClonesArray*                    fDigis;             // Input array of CbmMuchDigi
+  TStopwatch                       fTimer;             // Timer
+
+  /** Get parameter containers. */
   virtual void SetParContainers();
-
-  /** Initialization **/
+  /** Initialization. */
   virtual InitStatus Init();
-
-  /** Reinitialization **/
+  /** Reinitialization. */
   virtual InitStatus ReInit();
 
- private:
-  TFile*                           fDigiFile;          // Digitization file
-  TClonesArray*                    fDigis;             // Input array of CbmMuchDigi
 
   ClassDef(CbmMuchFindHitsSimple,1);
 };

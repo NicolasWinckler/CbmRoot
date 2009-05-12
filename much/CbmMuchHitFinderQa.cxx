@@ -24,7 +24,7 @@
 #include "TF1.h"
 #include "TFile.h"
 #include "CbmMuchPointInfo.h"
-#include "CbmMuchDigitize.h"
+#include "CbmMuchDigitizeAdvancedGem.h"
 #include "TStyle.h"
 #include "TArrayI.h"
 #include "CbmMuchGeoScheme.h"
@@ -647,7 +647,7 @@ Double_t LandauMPV(Double_t *lg_x, Double_t *par) {
   gaz_gain_mean/=scale;
   Double_t mass = par[0]; // mass in MeV
   Double_t x = TMath::Power(10,lg_x[0]);
-  return gaz_gain_mean*CbmMuchDigitize::MPV_n_e(x,mass);
+  return gaz_gain_mean*CbmMuchDigitizeAdvancedGem::MPV_n_e(x,mass);
 }
 // -------------------------------------------------------------------------
 

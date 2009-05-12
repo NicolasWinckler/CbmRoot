@@ -1,4 +1,4 @@
-/** CbmMuchDigitize.cxx
+/** CbmMuchDigitizeAdvancedGem.cxx
  *@author Mikhail Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *@since 19.03.07
  *@version 1.0
@@ -9,7 +9,7 @@
  **/
 
 // Includes from MUCH
-#include "CbmMuchDigitize.h"
+#include "CbmMuchDigitizeAdvancedGem.h"
 #include "CbmMuchPoint.h"
 #include "CbmMuchSector.h"
 #include "CbmMuchStation.h"
@@ -45,7 +45,7 @@ using std::map;
 using std::pair;
 
 // -----   Default constructor   ------------------------------------------
-CbmMuchDigitize::CbmMuchDigitize() :
+CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
     FairTask("MuchDigitize", 1) {
     fGeoScheme = CbmMuchGeoScheme::Instance();
     fDigiFile = NULL;
@@ -57,7 +57,6 @@ CbmMuchDigitize::CbmMuchDigitize() :
     fQMax = 440000;
     SetQThreshold(3);
     fMeanNoise = 0; //1500;
-    fUseAvalanche = 0;
     SetDetectorType(kMICROMEGAS);
     fMeanGasGain = 1e4;
     fRnd = new TRandom3();
@@ -68,7 +67,7 @@ CbmMuchDigitize::CbmMuchDigitize() :
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchDigitize::CbmMuchDigitize(Int_t iVerbose) :
+CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(Int_t iVerbose) :
     FairTask("MuchDigitize", iVerbose) {
     fGeoScheme = CbmMuchGeoScheme::Instance();
     fDigiFile = NULL;
@@ -80,7 +79,6 @@ CbmMuchDigitize::CbmMuchDigitize(Int_t iVerbose) :
     fQMax = 440000;
     SetQThreshold(3);
     fMeanNoise = 0;//1500;
-    fUseAvalanche = 0;
     SetDetectorType(kMICROMEGAS);
     fMeanGasGain = 1e4;
     fRnd = new TRandom3();
@@ -91,7 +89,7 @@ CbmMuchDigitize::CbmMuchDigitize(Int_t iVerbose) :
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name   -----------------------------------------
-CbmMuchDigitize::CbmMuchDigitize(const char* name, const char* digiFileName,
+CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const char* digiFileName,
         Int_t iVerbose) :
             FairTask(name, iVerbose) {
     fGeoScheme = CbmMuchGeoScheme::Instance();
@@ -104,7 +102,6 @@ CbmMuchDigitize::CbmMuchDigitize(const char* name, const char* digiFileName,
     fQMax = 440000;
     SetQThreshold(3);
     fMeanNoise = 0;//1500;
-    fUseAvalanche = 0;
     SetDetectorType(kMICROMEGAS);
     fMeanGasGain = 1e4;
     fRnd = new TRandom3();
@@ -115,7 +112,7 @@ CbmMuchDigitize::CbmMuchDigitize(const char* name, const char* digiFileName,
 // -------------------------------------------------------------------------
 
 // -----   Destructor   ----------------------------------------------------
-CbmMuchDigitize::~CbmMuchDigitize() {
+CbmMuchDigitizeAdvancedGem::~CbmMuchDigitizeAdvancedGem() {
     if (fDigiFile)
         delete fDigiFile;
     if (fDigis) {
@@ -126,7 +123,6 @@ CbmMuchDigitize::~CbmMuchDigitize() {
         fDigiMatches->Delete();
         delete fDigiMatches;
     }
-    fUseAvalanche = 0;
     SetDetectorType(kMICROMEGAS);
 
     Reset();
@@ -135,7 +131,7 @@ CbmMuchDigitize::~CbmMuchDigitize() {
 
 
 // ------- Private method ExecSimple ---------------------------------------
-Bool_t CbmMuchDigitize::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
+Bool_t CbmMuchDigitizeAdvancedGem::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
     // Get module for the point
     Int_t detectorId = point->GetDetectorID();
     CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
@@ -230,7 +226,7 @@ Bool_t CbmMuchDigitize::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
 // -------------------------------------------------------------------------
 
 // ------- Private method ExecAdvanced -------------------------------------
-Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
+Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
     // Get module for the point
     Int_t detectorId = point->GetDetectorID();
     CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
@@ -283,8 +279,8 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
     Double_t mass = particle->Mass() * 1e3;                       // mass of the particle [MeV/c^2]
     Double_t mass2 = mass * mass;                                 // squared mass of the particle
     Double_t Tkin = TMath::Sqrt(mom2 + mass2) - mass;            // kinetic energy of the particle
-    Double_t sigma = CbmMuchDigitize::Sigma_n_e(Tkin, mass);      // sigma for Landau distribution
-    Double_t mpv = CbmMuchDigitize::MPV_n_e(Tkin, mass);          // most probable value for Landau distr.
+    Double_t sigma = CbmMuchDigitizeAdvancedGem::Sigma_n_e(Tkin, mass);      // sigma for Landau distribution
+    Double_t mpv = CbmMuchDigitizeAdvancedGem::MPV_n_e(Tkin, mass);          // most probable value for Landau distr.
     UInt_t nElectrons = (UInt_t) fLandauRnd->Landau(mpv, sigma); // number of prim. electrons per 0.3 cm gap
     while (nElectrons > 100000)
         nElectrons = (UInt_t) (fLandauRnd->Landau(mpv, sigma));     // restrict Landau tail to increase performance
@@ -399,7 +395,7 @@ Bool_t CbmMuchDigitize::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
 // -------------------------------------------------------------------------
 
 // -----   Public method Exec   --------------------------------------------
-void CbmMuchDigitize::Exec(Option_t* opt) {
+void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
     // Reset all eventwise counters
     fTimer.Start();
     Reset();
@@ -457,19 +453,14 @@ void CbmMuchDigitize::Exec(Option_t* opt) {
             }
 
             // Produce Digis
-            if (!fUseAvalanche) {
-                if (!ExecSimple(point, iPoint))
+            if (!ExecAdvanced(point, iPoint))
                     continue;
-            } else {
-                if (!ExecAdvanced(point, iPoint))
-                    continue;
-            }
+
 
         }
     } // MuchPoint loop
 
-    if (fUseAvalanche)
-        FirePads();
+    FirePads();
 
     // Screen output
     fTimer.Stop();
@@ -487,17 +478,17 @@ void CbmMuchDigitize::Exec(Option_t* opt) {
 // -------------------------------------------------------------------------
 
 // -----   Private method SetParContainers   -------------------------------
-void CbmMuchDigitize::SetParContainers() {
+void CbmMuchDigitizeAdvancedGem::SetParContainers() {
 }
 // -------------------------------------------------------------------------
 
 // -----   Private method Finish   -----------------------------------------
-void CbmMuchDigitize::FinishTask() {
+void CbmMuchDigitizeAdvancedGem::FinishTask() {
 }
 // -------------------------------------------------------------------------
 
 // -----   Private method Init   -------------------------------------------
-InitStatus CbmMuchDigitize::Init() {
+InitStatus CbmMuchDigitizeAdvancedGem::Init() {
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         Fatal("Init", "No FairRootManager");
@@ -528,14 +519,14 @@ InitStatus CbmMuchDigitize::Init() {
 // -------------------------------------------------------------------------
 
 // -----   Private method ReInit   -----------------------------------------
-InitStatus CbmMuchDigitize::ReInit() {
+InitStatus CbmMuchDigitizeAdvancedGem::ReInit() {
 
     return kSUCCESS;
 }
 // -------------------------------------------------------------------------
 
 // -----   Private method Reset   ------------------------------------------
-void CbmMuchDigitize::Reset() {
+void CbmMuchDigitizeAdvancedGem::Reset() {
     fNFailed = fNOutside = fNMulti = 0;
     fChannelMap.clear();
     fChargedPads.clear();
@@ -548,7 +539,7 @@ void CbmMuchDigitize::Reset() {
 // -------------------------------------------------------------------------
 
 // -----   Private method FirePads   ---------------------------------------
-void CbmMuchDigitize::FirePads() {
+void CbmMuchDigitizeAdvancedGem::FirePads() {
     // Add electronics noise
     if (fMeanNoise)
         AddNoise();
@@ -576,7 +567,7 @@ void CbmMuchDigitize::FirePads() {
 // -------------------------------------------------------------------------
 
 // -----   Private method AddNoise   ---------------------------------------
-void CbmMuchDigitize::AddNoise() {
+void CbmMuchDigitizeAdvancedGem::AddNoise() {
     vector<CbmMuchPad*> pads = fGeoScheme->GetPads();
     for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
         AddNoise(*it);
@@ -585,7 +576,7 @@ void CbmMuchDigitize::AddNoise() {
 // -------------------------------------------------------------------------
 
 // -----   Private method AddNoise   ---------------------------------------
-void CbmMuchDigitize::AddNoise(CbmMuchPad* pad) {
+void CbmMuchDigitizeAdvancedGem::AddNoise(CbmMuchPad* pad) {
     Double_t rndGaus = TMath::Abs(fMeanNoise * fRnd->Gaus());
     UInt_t iCharge = (UInt_t) rndGaus;
     Int_t detectorId = pad->GetDetectorId();
@@ -604,7 +595,7 @@ void CbmMuchDigitize::AddNoise(CbmMuchPad* pad) {
 // -------------------------------------------------------------------------
 
 // -----   Private method FirePads   ---------------------------------------
-TPolyLine CbmMuchDigitize::GetPolygon(Double_t x0, Double_t y0, Double_t width,
+TPolyLine CbmMuchDigitizeAdvancedGem::GetPolygon(Double_t x0, Double_t y0, Double_t width,
         Double_t height) {
 
     Double_t x[5], y[5];
@@ -626,7 +617,7 @@ TPolyLine CbmMuchDigitize::GetPolygon(Double_t x0, Double_t y0, Double_t width,
     return pline;
 }
 
-Bool_t CbmMuchDigitize::ProjectionsIntersect(Double_t x11, Double_t x12,
+Bool_t CbmMuchDigitizeAdvancedGem::ProjectionsIntersect(Double_t x11, Double_t x12,
         Double_t x21, Double_t x22, Double_t& length) {
     if (x11 > x22 || x12 < x21)
         return kFALSE;
@@ -644,7 +635,7 @@ Bool_t CbmMuchDigitize::ProjectionsIntersect(Double_t x11, Double_t x12,
     return kTRUE;
 }
 
-Bool_t CbmMuchDigitize::PolygonsIntersect(CbmMuchSector* sector,
+Bool_t CbmMuchDigitizeAdvancedGem::PolygonsIntersect(CbmMuchSector* sector,
         TPolyLine polygon1, TPolyLine polygon2, Double_t& area) {
     Double_t length, width;
     Double_t* x1 = polygon1.GetX();
@@ -660,7 +651,7 @@ Bool_t CbmMuchDigitize::PolygonsIntersect(CbmMuchSector* sector,
     return kTRUE;
 }
 
-Int_t CbmMuchDigitize::GasGain() {
+Int_t CbmMuchDigitizeAdvancedGem::GasGain() {
     //  const Double_t q_mean  = 1.e4;  // mean gas gain, arbitrary value
     Double_t gasGain = -fMeanGasGain * TMath::Log(1 - fRnd->Rndm());
     if (gasGain < 0.)
@@ -668,35 +659,35 @@ Int_t CbmMuchDigitize::GasGain() {
     return (Int_t) gasGain;
 }
 
-Double_t CbmMuchDigitize::Sigma_n_e(Double_t Tkin, Double_t mass) {
+Double_t CbmMuchDigitizeAdvancedGem::Sigma_n_e(Double_t Tkin, Double_t mass) {
     Double_t logT;
     if (mass < 100) {
         logT = log(Tkin * 0.511 / mass);
-        return CbmMuchDigitize::e_sigma_n_e(logT);
+        return CbmMuchDigitizeAdvancedGem::e_sigma_n_e(logT);
     } else if (mass >= 100 && mass < 200) {
         logT = log(Tkin * 105.658 / mass);
-        return CbmMuchDigitize::mu_sigma_n_e(logT);
+        return CbmMuchDigitizeAdvancedGem::mu_sigma_n_e(logT);
     } else {
         logT = log(Tkin * 938.272 / mass);
-        return CbmMuchDigitize::p_sigma_n_e(logT);
+        return CbmMuchDigitizeAdvancedGem::p_sigma_n_e(logT);
     }
 }
 
-Double_t CbmMuchDigitize::MPV_n_e(Double_t Tkin, Double_t mass) {
+Double_t CbmMuchDigitizeAdvancedGem::MPV_n_e(Double_t Tkin, Double_t mass) {
     Double_t logT;
     if (mass < 100.) {
         logT = log(Tkin * 0.511 / mass);
-        return CbmMuchDigitize::e_MPV_n_e(logT);
+        return CbmMuchDigitizeAdvancedGem::e_MPV_n_e(logT);
     } else if (mass >= 100. && mass < 200.) {
         logT = log(Tkin * 105.658 / mass);
-        return CbmMuchDigitize::mu_MPV_n_e(logT);
+        return CbmMuchDigitizeAdvancedGem::mu_MPV_n_e(logT);
     } else {
         logT = log(Tkin * 938.272 / mass);
-        return CbmMuchDigitize::p_MPV_n_e(logT);
+        return CbmMuchDigitizeAdvancedGem::p_MPV_n_e(logT);
     }
 }
 
-Double_t CbmMuchDigitize::mu_sigma_n_e(Double_t &logT) {
+Double_t CbmMuchDigitizeAdvancedGem::mu_sigma_n_e(Double_t &logT) {
     if (logT < -0.916291)
         logT = -0.916291;
     if (logT > 9.21034)
@@ -713,7 +704,7 @@ Double_t CbmMuchDigitize::mu_sigma_n_e(Double_t &logT) {
     return val;
 }
 
-Double_t CbmMuchDigitize::p_sigma_n_e(Double_t &logT) {
+Double_t CbmMuchDigitizeAdvancedGem::p_sigma_n_e(Double_t &logT) {
     if (logT < 1.09861)
         logT = 1.09861;
     if (logT > 9.21034)
@@ -730,7 +721,7 @@ Double_t CbmMuchDigitize::p_sigma_n_e(Double_t &logT) {
     return val;
 }
 
-Double_t CbmMuchDigitize::e_sigma_n_e(Double_t &logT) {
+Double_t CbmMuchDigitizeAdvancedGem::e_sigma_n_e(Double_t &logT) {
     if (logT < -3.21888)
         logT = -3.21888;
     if (logT > 9.21034)
@@ -747,7 +738,7 @@ Double_t CbmMuchDigitize::e_sigma_n_e(Double_t &logT) {
     return val;
 }
 
-Double_t CbmMuchDigitize::mu_MPV_n_e(Double_t &logT) {
+Double_t CbmMuchDigitizeAdvancedGem::mu_MPV_n_e(Double_t &logT) {
     if (logT < -0.916291)
         logT = -0.916291;
     if (logT > 9.21034)
@@ -764,7 +755,7 @@ Double_t CbmMuchDigitize::mu_MPV_n_e(Double_t &logT) {
     return val;
 }
 
-Double_t CbmMuchDigitize::p_MPV_n_e(Double_t &logT) {
+Double_t CbmMuchDigitizeAdvancedGem::p_MPV_n_e(Double_t &logT) {
     if (logT < 1.09861)
         logT = 1.09861;
     if (logT > 9.21034)
@@ -781,7 +772,7 @@ Double_t CbmMuchDigitize::p_MPV_n_e(Double_t &logT) {
     return val;
 }
 
-Double_t CbmMuchDigitize::e_MPV_n_e(Double_t &logT) {
+Double_t CbmMuchDigitizeAdvancedGem::e_MPV_n_e(Double_t &logT) {
     if (logT < -3.21888)
         logT = -3.21888;
     if (logT > 9.21034)
@@ -797,7 +788,7 @@ Double_t CbmMuchDigitize::e_MPV_n_e(Double_t &logT) {
     }
     return val;
 }
-void CbmMuchDigitize::SetDetectorType(DetectorType type) {
+void CbmMuchDigitizeAdvancedGem::SetDetectorType(DetectorType type) {
     switch (type) {
     case kGEM:
         fSpotRadius = 0.15;
@@ -811,7 +802,7 @@ void CbmMuchDigitize::SetDetectorType(DetectorType type) {
 
 
 // -------------------------------------------------------------------------
-Bool_t CbmMuchDigitize::ExecStraws(CbmMuchPoint* point,Int_t iPoint){
+Bool_t CbmMuchDigitizeAdvancedGem::ExecStraws(CbmMuchPoint* point,Int_t iPoint){
     // Digitize straw tube MC point
     Int_t detectorId = point->GetDetectorID();
 
@@ -838,5 +829,5 @@ Bool_t CbmMuchDigitize::ExecStraws(CbmMuchPoint* point,Int_t iPoint){
 // -------------------------------------------------------------------------
 
 
-ClassImp(CbmMuchDigitize)
+ClassImp(CbmMuchDigitizeAdvancedGem)
 

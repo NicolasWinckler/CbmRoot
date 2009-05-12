@@ -1,4 +1,4 @@
-/** CbmMuchDigitize.h
+/** CbmMuchDigitizeAdvancedGem.h
  *@author Mikhail Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *@since 19.03.07
  *@version 1.0
@@ -39,31 +39,25 @@ class TFile;
 
 enum DetectorType {kGEM, kMICROMEGAS};
 
-class CbmMuchDigitize : public FairTask
+class CbmMuchDigitizeAdvancedGem : public FairTask
 {
 
  public:
 
   /** Default constructor */
-  CbmMuchDigitize();
+  CbmMuchDigitizeAdvancedGem();
 
   /** Standard constructor */
-  CbmMuchDigitize(Int_t iVerbose);
+  CbmMuchDigitizeAdvancedGem(Int_t iVerbose);
 
   /** Constructor with name */
-  CbmMuchDigitize(const char* name, const char* digiFileName, Int_t iVerbose);
+  CbmMuchDigitizeAdvancedGem(const char* name, const char* digiFileName, Int_t iVerbose);
 
   /** Destructor */
-  virtual ~CbmMuchDigitize();
+  virtual ~CbmMuchDigitizeAdvancedGem();
 
   /** Execution */
   virtual void Exec(Option_t* opt);
-
-  /**
-   * Sets whether to use avalanches or not.
-   * @param useAvalanche  0 if avalanches are not used, 1 otherwise (0 by default).
-   */
-  void SetUseAvalanche(Int_t useAvalanche) { fUseAvalanche = useAvalanche; }
 
   /**
    * Sets radius of a spot from secondary electrons.
@@ -135,7 +129,6 @@ class CbmMuchDigitize : public FairTask
   Int_t              fNFailed;       // Total number of points which digitization has failed
   Int_t              fNOutside;      // Total number of points which was found outside a detector
   Int_t              fNMulti;        // Total number of channels that was hitby several points
-  Int_t              fUseAvalanche;  // Switch whether to use (=1) avalanches or not (=0). 0 by default.
   UInt_t             fNADCChannels;  // Number of ADC channels
   UInt_t             fQMax;          // Maximum charge that a pad can collect [electrons]
   UInt_t             fQThreshold;    // Charge threshold [electrons]
@@ -231,6 +224,6 @@ class CbmMuchDigitize : public FairTask
   static Double_t p_sigma_n_e(Double_t &logT);
   static Double_t p_MPV_n_e(Double_t &logT);
 
-  ClassDef(CbmMuchDigitize,1)
+  ClassDef(CbmMuchDigitizeAdvancedGem,1)
 };
 #endif

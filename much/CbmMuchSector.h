@@ -19,7 +19,7 @@
 
 #include <vector>
 
-class CbmMuchDigitize;
+
 class CbmMuchPad;
 
 using std::vector;

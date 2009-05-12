@@ -26,7 +26,9 @@ CbmGeoMuch.cxx
 CbmGeoMuchPar.cxx 
 CbmMuch.cxx
 CbmMuchContFact.cxx  
-CbmMuchDigitize.cxx
+CbmMuchDigitizeAdvancedGem.cxx
+CbmMuchDigitizeSimpleGem.cxx
+CbmMuchDigitizeStraws.cxx
 CbmMuchFindHitsAdvancedGem.cxx
 CbmMuchFindHitsSimpleGem.cxx
 CbmMuchFindTracks.cxx

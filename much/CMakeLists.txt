@@ -43,7 +43,7 @@ CbmMuchPad.cxx
 CbmMuchPointInfo.cxx
 #CbmMuchPhysicsQa.cxx
 CbmMuchSector.cxx
-CbmMuchSegmentation.cxx
+CbmMuchSegmentAuto.cxx
 CbmMuchSegmentManual.cxx
 CbmMuchStation.cxx
 CbmMuchStationGem.cxx

@@ -1,4 +1,4 @@
-/** CbmMuchSegmentation.cxx
+/** CbmMuchSegmentAuto.cxx
  *@author Mikhail Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *@since 20.06.07
  *@version 1.0
@@ -8,7 +8,7 @@
  **/
 
 #include "CbmGeoMuchPar.h"
-#include "CbmMuchSegmentation.h"
+#include "CbmMuchSegmentAuto.h"
 
 #include "FairRuntimeDb.h"
 #include "FairRootManager.h"
@@ -27,29 +27,25 @@
 #include "TH1.h"
 #include "TF1.h"
 
-#include <iostream>
 #include <cassert>
 
-using std::cout;
-using std::endl;
-
 // -----   Default constructor   -------------------------------------------
-CbmMuchSegmentation::CbmMuchSegmentation(){
+CbmMuchSegmentAuto::CbmMuchSegmentAuto(){
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchSegmentation::CbmMuchSegmentation(char* digiFileName){
+CbmMuchSegmentAuto::CbmMuchSegmentAuto(char* digiFileName){
     fDigiFileName = digiFileName;
 }
 // -------------------------------------------------------------------------
 
 // -----   Destructor   ----------------------------------------------------
-CbmMuchSegmentation::~CbmMuchSegmentation() {
+CbmMuchSegmentAuto::~CbmMuchSegmentAuto() {
 }
 // -------------------------------------------------------------------------
 
-void CbmMuchSegmentation::SetNStations(Int_t nStations){
+void CbmMuchSegmentAuto::SetNStations(Int_t nStations){
    fNStations = nStations;
    fSigmaXmin.resize(fNStations);
    fSigmaYmin.resize(fNStations);
@@ -58,27 +54,27 @@ void CbmMuchSegmentation::SetNStations(Int_t nStations){
    fOccupancyMax.resize(fNStations);
 }
 
-void CbmMuchSegmentation::SetSigmaMin(Double_t* sigmaXmin, Double_t* sigmaYmin){
+void CbmMuchSegmentAuto::SetSigmaMin(Double_t* sigmaXmin, Double_t* sigmaYmin){
    for(Int_t iStation = 0; iStation < fNStations; ++iStation){
       fSigmaXmin.at(iStation) = sigmaXmin[iStation];
       fSigmaYmin.at(iStation) = sigmaYmin[iStation];
    }
 }
-void CbmMuchSegmentation::SetSigmaMax(Double_t* sigmaXmax, Double_t* sigmaYmax){
+void CbmMuchSegmentAuto::SetSigmaMax(Double_t* sigmaXmax, Double_t* sigmaYmax){
    for(Int_t iStation = 0; iStation < fNStations; ++iStation){
       fSigmaXmax.at(iStation) = sigmaXmax[iStation];
       fSigmaYmax.at(iStation) = sigmaYmax[iStation];
    }
 }
 
-void CbmMuchSegmentation::SetOccupancyMax(Double_t* occupancyMax){
+void CbmMuchSegmentAuto::SetOccupancyMax(Double_t* occupancyMax){
    for(Int_t iStation = 0; iStation < fNStations; ++iStation){
       fOccupancyMax.at(iStation) = occupancyMax[iStation];
    }
 }
 
 // -----   Private method SetParContainers  --------------------------------
-void CbmMuchSegmentation::SetParContainers() {
+void CbmMuchSegmentAuto::SetParContainers() {
     // Get runtime database
     FairRuntimeDb* db = FairRuntimeDb::instance();
     if ( ! db ) Fatal("SetParContainers", "No runtime database");
@@ -89,7 +85,7 @@ void CbmMuchSegmentation::SetParContainers() {
 
 
 // -----   Private method Init  --------------------------------------------
-InitStatus CbmMuchSegmentation::Init(){
+InitStatus CbmMuchSegmentAuto::Init(){
     FairRootManager* fManager = FairRootManager::Instance();
     fPoints = (TClonesArray *) fManager->GetObject("MuchPoint");
     fEvents = 0;
@@ -114,7 +110,7 @@ InitStatus CbmMuchSegmentation::Init(){
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-void CbmMuchSegmentation::Exec(Option_t * option){
+void CbmMuchSegmentAuto::Exec(Option_t * option){
     fEvents++;
     printf("Event: %i\n",fEvents);
 
@@ -140,7 +136,7 @@ void CbmMuchSegmentation::Exec(Option_t * option){
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-void CbmMuchSegmentation::FinishTask(){
+void CbmMuchSegmentAuto::FinishTask(){
     // Create normalization histo
     TH1D* hNorm = new TH1D("hNorm","",110,0,220);
     Double_t binSize = 2.;
@@ -205,7 +201,7 @@ void CbmMuchSegmentation::FinishTask(){
 
 
 // -----   Private method InitLayerSide  -----------------------------------
-void CbmMuchSegmentation::InitLayerSide(CbmMuchLayerSide* layerSide){
+void CbmMuchSegmentAuto::InitLayerSide(CbmMuchLayerSide* layerSide){
     if(!layerSide) Fatal("Init", "Incomplete layer sides array.");
     Int_t nModules = layerSide->GetNModules();
     for(Int_t iModule = 0; iModule < nModules; iModule++){
@@ -217,7 +213,7 @@ void CbmMuchSegmentation::InitLayerSide(CbmMuchLayerSide* layerSide){
 
 
 // -----   Private method SegmentModule  -----------------------------------
-void CbmMuchSegmentation::SegmentModule(CbmMuchModule* module){
+void CbmMuchSegmentAuto::SegmentModule(CbmMuchModule* module){
     TVector3 size = module->GetSize();
     Double_t modLx = size.X();
     Double_t modLy = size.Y();
@@ -250,7 +246,7 @@ void CbmMuchSegmentation::SegmentModule(CbmMuchModule* module){
 // -------------------------------------------------------------------------
 
 // -----  Private method SegmentSector  ------------------------------------
-void CbmMuchSegmentation::SegmentSector(CbmMuchModule* module, CbmMuchSector* sector){
+void CbmMuchSegmentAuto::SegmentSector(CbmMuchModule* module, CbmMuchSector* sector){
     TVector3 secSize = sector->GetSize();
     TVector3 secPosition = sector->GetPosition();
     Int_t detectorId = module->GetDetectorId();
@@ -323,7 +319,7 @@ void CbmMuchSegmentation::SegmentSector(CbmMuchModule* module, CbmMuchSector* se
 // -------------------------------------------------------------------------
 
 // -----  Private method ShouldSegmentByX  ---------------------------------
-Bool_t CbmMuchSegmentation::ShouldSegmentByX(CbmMuchSector* sector){
+Bool_t CbmMuchSegmentAuto::ShouldSegmentByX(CbmMuchSector* sector){
     Double_t secLx = sector->GetSize()[0];
     Double_t secLy = sector->GetSize()[1];
     Double_t secX  = sector->GetPosition()[0];
@@ -359,7 +355,7 @@ Bool_t CbmMuchSegmentation::ShouldSegmentByX(CbmMuchSector* sector){
 // -------------------------------------------------------------------------
 
 // -----  Private method ShouldSegmentByY  ---------------------------------
-Bool_t CbmMuchSegmentation::ShouldSegmentByY(CbmMuchSector* sector){
+Bool_t CbmMuchSegmentAuto::ShouldSegmentByY(CbmMuchSector* sector){
     Double_t secLx = sector->GetSize()[0];
     Double_t secLy = sector->GetSize()[1];
     Double_t secX  = sector->GetPosition()[0];
@@ -395,7 +391,7 @@ Bool_t CbmMuchSegmentation::ShouldSegmentByY(CbmMuchSector* sector){
 
 
 // -----  Private method IntersectsHole  -----------------------------------
-Int_t CbmMuchSegmentation::IntersectsRad(CbmMuchSector* sector, Double_t radius){
+Int_t CbmMuchSegmentAuto::IntersectsRad(CbmMuchSector* sector, Double_t radius){
     if(radius < 0) return 0;
 
     Int_t intersects = 0;
@@ -421,7 +417,7 @@ Int_t CbmMuchSegmentation::IntersectsRad(CbmMuchSector* sector, Double_t radius)
 }
 // -------------------------------------------------------------------------
 
-void CbmMuchSegmentation::Print(){
+void CbmMuchSegmentAuto::Print(){
     printf("Segmentation written to file %s\n", fDigiFileName);
     Int_t nTotSectors = 0;
     Int_t nTotChannels = 0;
@@ -473,4 +469,4 @@ void CbmMuchSegmentation::Print(){
     printf("=========================================================================================\n");
 }
 
-ClassImp(CbmMuchSegmentation)
+ClassImp(CbmMuchSegmentAuto)

@@ -1,4 +1,4 @@
-/** CbmMuchSegmentation.h
+/** CbmMuchSegmentAuto.h
  *@author Mikhail Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *@since 20.06.07
  *@version 1.0
@@ -7,8 +7,8 @@
  **
  **/
 
-#ifndef CBMMUCHSEGMENTATION_H
-#define CBMMUCHSEGMENTATION_H 1
+#ifndef CBMMUCHSEGMENTAUTO_H
+#define CBMMUCHSEGMENTAUTO_H 1
 
 
 #include "FairTask.h"
@@ -24,14 +24,14 @@ class TH1D;
 
 using std::vector;
 
-class CbmMuchSegmentation : public FairTask{
+class CbmMuchSegmentAuto : public FairTask{
  public:
 
   /** Default constructor **/
-  CbmMuchSegmentation();
+  CbmMuchSegmentAuto();
 
   /** Default constructor **/
-  CbmMuchSegmentation(char* digiFileName);
+  CbmMuchSegmentAuto(char* digiFileName);
 
   void SetNStations(Int_t nStations);
   void SetSigmaMin(Double_t* sigmaXmin, Double_t* sigmaYmin);
@@ -44,7 +44,7 @@ class CbmMuchSegmentation : public FairTask{
   virtual void FinishTask();
 
   /** Destructor **/
-  virtual ~CbmMuchSegmentation();
+  virtual ~CbmMuchSegmentAuto();
 
  private:
   Int_t         fEvents;
@@ -76,7 +76,7 @@ class CbmMuchSegmentation : public FairTask{
   Int_t IntersectsRad(CbmMuchSector* sector, Double_t radius);
   void Print();
 
-  ClassDef(CbmMuchSegmentation,1)
+  ClassDef(CbmMuchSegmentAuto,1)
 };
 
 #endif

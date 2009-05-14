@@ -41,7 +41,7 @@ void much_draw_sectors(TString digiFile = ""){
       for (Int_t s=1;s>=0;s--){
          CbmMuchLayerSide* side = layer->GetSide(s);
          for (Int_t m=0;m<side->GetNModules();m++) {
-            CbmMuchModule* module = side->GetModule(m);
+            CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(m);
             module->SetFillStyle(0);
             module->Draw();
             for (Int_t j=0;j<module->GetNSectors();j++){

@@ -15,7 +15,7 @@
 #include "CbmMuchPoint.h"
 #include "CbmMuchStationGem.h"
 #include "CbmMuchLayer.h"
-#include "CbmMuchModule.h"
+#include "CbmMuchModuleGem.h"
 #include "CbmMuchSector.h"
 #include "CbmMuchGeoScheme.h"
 
@@ -205,7 +205,7 @@ void CbmMuchSegmentAuto::InitLayerSide(CbmMuchLayerSide* layerSide){
     if(!layerSide) Fatal("Init", "Incomplete layer sides array.");
     Int_t nModules = layerSide->GetNModules();
     for(Int_t iModule = 0; iModule < nModules; iModule++){
-        CbmMuchModule* module = layerSide->GetModule(iModule);
+        CbmMuchModuleGem* module = (CbmMuchModuleGem*)layerSide->GetModule(iModule);
         SegmentModule(module);
     }
 }
@@ -213,7 +213,7 @@ void CbmMuchSegmentAuto::InitLayerSide(CbmMuchLayerSide* layerSide){
 
 
 // -----   Private method SegmentModule  -----------------------------------
-void CbmMuchSegmentAuto::SegmentModule(CbmMuchModule* module){
+void CbmMuchSegmentAuto::SegmentModule(CbmMuchModuleGem* module){
     TVector3 size = module->GetSize();
     Double_t modLx = size.X();
     Double_t modLy = size.Y();
@@ -246,7 +246,7 @@ void CbmMuchSegmentAuto::SegmentModule(CbmMuchModule* module){
 // -------------------------------------------------------------------------
 
 // -----  Private method SegmentSector  ------------------------------------
-void CbmMuchSegmentAuto::SegmentSector(CbmMuchModule* module, CbmMuchSector* sector){
+void CbmMuchSegmentAuto::SegmentSector(CbmMuchModuleGem* module, CbmMuchSector* sector){
     TVector3 secSize = sector->GetSize();
     TVector3 secPosition = sector->GetPosition();
     Int_t detectorId = module->GetDetectorId();
@@ -442,7 +442,7 @@ void CbmMuchSegmentAuto::Print(){
                 CbmMuchLayerSide* side = layer->GetSide(iSide);
                 if(!side) continue;
                 for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
-                    CbmMuchModule* module = side->GetModule(iModule);
+                    CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(iModule);
                     if(!module) continue;
                     nSectors += module->GetNSectors();
                     for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){

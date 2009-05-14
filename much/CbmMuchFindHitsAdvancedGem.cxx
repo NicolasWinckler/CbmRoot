@@ -163,10 +163,6 @@ void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
     << endl;
     cout << "    Real time                 : " << fTimer.RealTime() << endl;
     cout << "    Clusters                  : " << nClusters << endl;
-    //    for(Int_t i=0; i< fHits->GetEntriesFast(); ++i){
-    //      CbmMuchHit* h = (CbmMuchHit*) fHits->At(i);
-    //      printf("StationNr = %i\n", h->GetStationNr());
-    //    }
   } else {
     cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
     << fixed << right << fTimer.RealTime() << " s, digis "

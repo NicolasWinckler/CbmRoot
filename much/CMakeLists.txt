@@ -39,6 +39,8 @@ CbmMuchLayer.cxx
 CbmMuchLayerSide.cxx
 CbmMuchMatchTracks.cxx 
 CbmMuchModule.cxx
+CbmMuchModuleGem.cxx
+CbmMuchModuleStraws.cxx
 CbmMuchPad.cxx
 CbmMuchPointInfo.cxx
 #CbmMuchPhysicsQa.cxx

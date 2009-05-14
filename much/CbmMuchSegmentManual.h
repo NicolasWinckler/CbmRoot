@@ -20,7 +20,7 @@
 using std::map;
 using std::vector;
 
-class CbmMuchModule;
+class CbmMuchModuleGem;
 class CbmMuchSector;
 class CbmMuchLayerSide;
 class CbmGeoMuchPar;
@@ -154,7 +154,7 @@ class CbmMuchSegmentManual : public FairTask {
      * @return       0 if the module is outside the circle, 1 if it is intersected by
      *               the circle, 2 if it is contained in the circle
      */
-    Int_t IntersectsRad(CbmMuchModule* module, Double_t radius);
+    Int_t IntersectsRad(CbmMuchModuleGem* module, Double_t radius);
 
     /**
      * Checks whether the given sector is intersected by the circle of the given radius
@@ -176,14 +176,14 @@ class CbmMuchSegmentManual : public FairTask {
      * @param module          Module to segment
      * @param useModuleDesign Whether module design is used
      */
-    void SegmentModule(CbmMuchModule* module, Bool_t useModuleDesign);
+    void SegmentModule(CbmMuchModuleGem* module, Bool_t useModuleDesign);
 
     /**
      * Performs segmentation of the given sector in the module
      * @param module Module which contains the given sector
      * @param sector Sector to segment
      */
-    void SegmentSector(CbmMuchModule* module, CbmMuchSector* sector);
+    void SegmentSector(CbmMuchModuleGem* module, CbmMuchSector* sector);
 
     /**
      * Gets maximum sector size for the given module
@@ -192,7 +192,7 @@ class CbmMuchSegmentManual : public FairTask {
      * @return       maximum sector length, if side="Length", maximum
      *               sector width, if side="Width"
      */
-    Double_t GetSectorMaxSize(CbmMuchModule* module, const TString side);
+    Double_t GetSectorMaxSize(CbmMuchModuleGem* module, const TString side);
 
     /**
      * Gets maximum pad size for the given module
@@ -201,7 +201,7 @@ class CbmMuchSegmentManual : public FairTask {
      * @return       maximum pad length, if side="Length", maximum
      *               pad width, if side="Width"
      */
-    Double_t GetPadMaxSize(CbmMuchModule* module, const TString side);
+    Double_t GetPadMaxSize(CbmMuchModuleGem* module, const TString side);
 
     /**
      * Checks whether the given sector should be segmented in the given direction

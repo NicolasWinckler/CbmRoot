@@ -55,7 +55,7 @@ Double_t CbmMuchLayer::GetDz(){
   for (Int_t s=0; s<2; s++){
     CbmMuchLayerSide* side = GetSide(s);
     for (Int_t i=0; i<side->GetNModules(); i++) {
-      CbmMuchModule* module = (CbmMuchModule*) side->GetModule(i);
+      CbmMuchModule* module = side->GetModule(i);
       Double_t lz = module->GetSize().Z();
       Double_t z  = module->GetPosition().Z();
       Double_t dz = TMath::Abs(z-fZ) + lz/2.;

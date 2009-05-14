@@ -18,7 +18,7 @@
 class TClonesArray;
 class CbmGeoMuchPar;
 class CbmMuchLayerSide;
-class CbmMuchModule;
+class CbmMuchModuleGem;
 class CbmMuchSector;
 class TH1D;
 
@@ -69,8 +69,8 @@ class CbmMuchSegmentAuto : public FairTask{
 
   /** Intialisation **/
   void InitLayerSide(CbmMuchLayerSide* layerSide);
-  void SegmentModule(CbmMuchModule* module);
-  void SegmentSector(CbmMuchModule* module, CbmMuchSector* sector);
+  void SegmentModule(CbmMuchModuleGem* module);
+  void SegmentSector(CbmMuchModuleGem* module, CbmMuchSector* sector);
   Bool_t ShouldSegmentByX(CbmMuchSector* sector);
   Bool_t ShouldSegmentByY(CbmMuchSector* sector);
   Int_t IntersectsRad(CbmMuchSector* sector, Double_t radius);

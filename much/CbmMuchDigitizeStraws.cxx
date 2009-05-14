@@ -1,21 +1,13 @@
 /** CbmMuchDigitizeStraws.cxx
- *@author Mikhail Ryzhinskiy <m.ryzhinskiy@gsi.de>
- *@since 12.05.2009
- *@version 1.0
- *
  * Add comment
- **
  **/
 
 // Includes from MUCH
 #include "CbmMuchDigitizeStraws.h"
 #include "CbmMuchPoint.h"
-#include "CbmMuchSector.h"
 #include "CbmMuchStation.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
-#include "CbmMuchModule.h"
-#include "CbmMuchPad.h"
 
 // Includes from base
 #include "FairRootManager.h"

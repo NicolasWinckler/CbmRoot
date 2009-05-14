@@ -51,7 +51,7 @@ class CbmMuchLayerSide : public TObject
 
   CbmMuchModule* GetModule(Int_t iModule) const { return (CbmMuchModule*)fModules.At(iModule); }
 
-  /** Adds given CbmMuchModule to the internal list.
+  /** Adds given CbmMuchModuleGem to the internal list.
    *@param module  CbmMuchModule which should be added to the array. **/
   void AddModule(CbmMuchModule* module);
 
@@ -61,7 +61,7 @@ class CbmMuchLayerSide : public TObject
  protected:
   Int_t   fDetectorId;                      // Unique detector ID
   Double32_t fZ;                            // z position of station centre (midplane) [cm]
-  TObjArray  fModules;                      // Array of CbmMuchModule objects
+  TObjArray  fModules;                      // Array of CbmMuchModuleGem objects
 
   ClassDef(CbmMuchLayerSide,1);
 };

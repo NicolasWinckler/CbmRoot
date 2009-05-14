@@ -19,7 +19,7 @@
 #include "CbmMuchStationGem.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
-#include "CbmMuchModule.h"
+#include "CbmMuchModuleGem.h"
 #include "CbmMuchSector.h"
 
 // -----   Default constructor   -------------------------------------------
@@ -321,7 +321,7 @@ void CbmMuchSegmentManual::SegmentLayerSide(CbmMuchLayerSide* layerSide){
     if(!layerSide) Fatal("SegmentLayerSide", "Incomplete layer sides array.");
     Int_t nModules = layerSide->GetNModules();
     for(Int_t iModule = 0; iModule < nModules; iModule++){
-        CbmMuchModule* module = layerSide->GetModule(iModule);
+        CbmMuchModuleGem* module = (CbmMuchModuleGem*)layerSide->GetModule(iModule);
         if(nModules > 1) SegmentModule(module, true);
         else SegmentModule(module, false);
     }
@@ -329,7 +329,7 @@ void CbmMuchSegmentManual::SegmentLayerSide(CbmMuchLayerSide* layerSide){
 // -------------------------------------------------------------------------
 
 // -----   Private method SegmentSector  -----------------------------------
-void CbmMuchSegmentManual::SegmentModule(CbmMuchModule* module, Bool_t useModuleDesign){
+void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGem* module, Bool_t useModuleDesign){
     Double_t secMaxLx = GetSectorMaxSize(module, "Width");
     Double_t secMaxLy = GetSectorMaxSize(module, "Length");
     Double_t padMaxLx = GetPadMaxSize(module, "Width");
@@ -430,7 +430,7 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModule* module, Bool_t useModule
 // -------------------------------------------------------------------------
 
 // -----   Private method SegmentSector  -----------------------------------
-void CbmMuchSegmentManual::SegmentSector(CbmMuchModule* module, CbmMuchSector* sector){
+void CbmMuchSegmentManual::SegmentSector(CbmMuchModuleGem* module, CbmMuchSector* sector){
     TVector3 secSize = sector->GetSize();
     TVector3 secPosition = sector->GetPosition();
     Int_t detectorId = module->GetDetectorId();
@@ -473,7 +473,7 @@ void CbmMuchSegmentManual::SegmentSector(CbmMuchModule* module, CbmMuchSector* s
 // -------------------------------------------------------------------------
 
 // -----   Private method IntersectsRad  -----------------------------------
-Int_t CbmMuchSegmentManual::IntersectsRad(CbmMuchModule* module, Double_t radius){
+Int_t CbmMuchSegmentManual::IntersectsRad(CbmMuchModuleGem* module, Double_t radius){
     if(radius < 0) return 0;
 
     Int_t intersects = 0;
@@ -565,7 +565,7 @@ Bool_t CbmMuchSegmentManual::ShouldSegment(CbmMuchSector* sector, const TString 
 // -------------------------------------------------------------------------
 
 // -----   Private method GetSectorMaxSize  --------------------------------
-Double_t CbmMuchSegmentManual::GetSectorMaxSize(CbmMuchModule* module, const TString side){
+Double_t CbmMuchSegmentManual::GetSectorMaxSize(CbmMuchModuleGem* module, const TString side){
     Int_t iStation = CbmMuchGeoScheme::GetStationIndex(module->GetDetectorId());
     Int_t nRegions = fNRegions[iStation];
     for(Int_t iRegion=0; iRegion<nRegions; ++iRegion){
@@ -578,7 +578,7 @@ Double_t CbmMuchSegmentManual::GetSectorMaxSize(CbmMuchModule* module, const TSt
 // -------------------------------------------------------------------------
 
 // -----   Private method GetPadMaxSize  -----------------------------------
-Double_t CbmMuchSegmentManual::GetPadMaxSize(CbmMuchModule* module, const TString side){
+Double_t CbmMuchSegmentManual::GetPadMaxSize(CbmMuchModuleGem* module, const TString side){
     Int_t iStation = CbmMuchGeoScheme::GetStationIndex(module->GetDetectorId());
     Double_t sectorSize = GetSectorMaxSize(module, side);
     return side=="Width" ? sectorSize/fNCols[iStation] : sectorSize/fNRows[iStation];
@@ -610,7 +610,7 @@ void CbmMuchSegmentManual::Print(){
                 CbmMuchLayerSide* side = layer->GetSide(iSide);
                 if(!side) continue;
                 for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
-                    CbmMuchModule* module = side->GetModule(iModule);
+                    CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(iModule);
                     if(!module) continue;
                     nSectors += module->GetNSectors();
                     for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){

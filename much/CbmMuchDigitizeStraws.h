@@ -1,10 +1,5 @@
 /** CbmMuchDigitizeStraws.h
- *@author Mikhail Ryzhinskiy <m.ryzhinskiy@gsi.de>
- *@since 12.05.2009
- *@version 1.0
- *
- * Add comment
- **
+  * Add comment
  **/
 
 #ifndef CBMMUCHDIGITIZESTRAWS_H

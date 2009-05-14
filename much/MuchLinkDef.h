@@ -22,6 +22,8 @@
 #pragma link C++ class  CbmMuchLayerSide+;
 #pragma link C++ class  CbmMuchMatchTracks+;
 #pragma link C++ class  CbmMuchModule+;
+#pragma link C++ class  CbmMuchModuleGem+;
+#pragma link C++ class  CbmMuchModuleStraws+;
 #pragma link C++ class  CbmMuchPad+;
 #pragma link C++ class  CbmMuchPointInfo+;
 #pragma link C++ class  CbmMuchSector+;

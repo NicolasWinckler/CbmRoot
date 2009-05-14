@@ -13,7 +13,7 @@
 #include "CbmMuchPoint.h"
 #include "CbmMuchSector.h"
 #include "CbmMuchStation.h"
-#include "CbmMuchModule.h"
+#include "CbmMuchModuleGem.h"
 #include "CbmMuchPad.h"
 
 // Includes from base
@@ -131,7 +131,7 @@ CbmMuchDigitizeAdvancedGem::~CbmMuchDigitizeAdvancedGem() {
 Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoint) {
   // Get module for the point
   Int_t detectorId = point->GetDetectorID();
-  CbmMuchModule* module = fGeoScheme->GetModuleByDetId(detectorId);
+  CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(detectorId);
   if (!module)
     return kFALSE;
   if (module->GetNSectors() == 0) {
@@ -341,7 +341,7 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
     if (station->GetDetectorType()==1) {
 
       // Get the module the point is in
-      CbmMuchModule* module = fGeoScheme->GetModuleByDetId(
+      CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(
           point->GetDetectorID());
       if (!module) {
         fNFailed++;

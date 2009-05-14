@@ -51,15 +51,8 @@ void CbmMuchLayerSide::DrawModules(Color_t color, Bool_t modulesVisible, Bool_t 
       module->SetFillColor(color);
       module->SetFillStyle(3001);
       module->Draw("f");
-//      module->Draw();
     }
-    if (!sectorsVisible) continue;
-    for (Int_t s=0;s<module->GetNSectors();s++){
-      CbmMuchSector* sector = module->GetSector(s);
-      sector->SetFillColor(color);
-      sector->Draw("f");
-      sector->Draw();
-    }
+    module->DrawModule(color);
   }
 }
 ClassImp(CbmMuchLayerSide)

@@ -21,7 +21,6 @@ CbmMuchStation::CbmMuchStation() {
   fRmin=0.;             // Minimum radius of the station [cm]
   fRmax=0.;             // Maximum radius of the station [cm]
   fModuleDesign=0;      // No detailed module design
-  fDetectorType=1;      // Detector type = GEM by default
   fTubeRmin=0.;         // Station tube Rmin
   fTubeRmax=0.;         // Station tube Rmax
 }
@@ -34,7 +33,6 @@ CbmMuchStation::CbmMuchStation(Int_t iStation, Double_t z){
   fRmin=0.;             // Minimum radius of the station [cm]
   fRmax=0.;             // Maximum radius of the station [cm]
   fModuleDesign=0;      // No detailed module design
-  fDetectorType=1;      // Detector type = GEM by default
   fTubeRmin=0.;         // Station tube Rmin
   fTubeRmax=0.;         // Station tube Rmax
 }

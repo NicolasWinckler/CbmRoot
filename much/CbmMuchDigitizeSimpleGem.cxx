@@ -145,7 +145,7 @@ Bool_t CbmMuchDigitizeSimpleGem::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
   }
 
   Int_t iSector = sector->GetSectorIndex();                            // Sector index within the module
-  Int_t channelId = CbmMuchGeoScheme::GetChannelId(iSector, iChannel); // Channel id within the module
+  Int_t channelId = CbmMuchModuleGem::GetChannelId(iSector, iChannel); // Channel id within the module
   pair<Int_t, Int_t> uniqueId(detectorId, channelId);                  // Unique id of the channel within the MUCH
   Int_t iDigi = -1;
   if (fChannelMap.find(uniqueId) == fChannelMap.end()) {
@@ -212,21 +212,17 @@ void CbmMuchDigitizeSimpleGem::Exec(Option_t* opt) {
       continue;
     }
 
-    CbmMuchStation* station = fGeoScheme->GetStationByDetId(point->GetDetectorID());
-
-    if (station->GetDetectorType()==1) {
-
-      // Get the module the point is in
-      CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(
-          point->GetDetectorID());
-      if (!module) {
-        fNFailed++;
-        continue;
-      }
-
-      ExecSimple(point, iPoint);
-
+    // Get the module the point is in
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(
+        point->GetDetectorID());
+    if (!module) {
+      fNFailed++;
+      continue;
     }
+    // Process only appropriate module types
+    if(module->GetDetectorType()!=1) continue;
+    // Produce Digis
+    ExecSimple(point, iPoint);
   } // MuchPoint loop
 
   // Screen output
@@ -263,7 +259,6 @@ InitStatus CbmMuchDigitizeSimpleGem::Init() {
   // Initialize GeoScheme
   TObjArray* stations = (TObjArray*) fDigiFile->Get("stations");
   fGeoScheme->Init(stations);
-  fGeoScheme->InitGrid();
 
   // Get input array of MuchPoints
   fPoints = (TClonesArray*) ioman->GetObject("MuchPoint");

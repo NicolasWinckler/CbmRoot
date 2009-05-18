@@ -15,9 +15,6 @@
  *   layer side     (0-1),          bits 10 [0 - Front, 1 - Back]
  *   module number  (0-511),        bits 11-19
  *
- * The channel ID consists of:
- *   sector number  (0-2047),       bits 0-10
- *   channel number (0-1024),       bits 11-20
  */
 
 #ifndef CbmMuchGeoScheme_H
@@ -29,6 +26,7 @@
 #include "TArrayD.h"
 #include "TArrayI.h"
 #include "TArrayC.h"
+#include "TVector2.h"
 #include "TGeoCone.h"
 #include <vector>
 #include <map>
@@ -49,27 +47,23 @@ using std::map;
 #define WL_LAYER 7
 #define WL_LAYERSIDE 1
 #define WL_MODULE 511
-#define WL_SECTOR 2047
-#define WL_CHANNEL 1023
 // Number of a start bit for each volume
 #define SB_SYSTEM 0
 #define SB_STATION 4
 #define SB_LAYER 7
 #define SB_LAYERSIDE 10
 #define SB_MODULE 11
-#define SB_SECTOR 0
-#define SB_CHANNEL 11
 
 class CbmMuchGeoScheme: public TObject {
 
-public:
+  public:
 
     /** Destructor.     */
     ~CbmMuchGeoScheme();
     static CbmMuchGeoScheme* Instance();
     /** Gets whether the geometry scheme is initialized. */
     Bool_t IsInitialized() {
-        return fInitialized;
+      return fInitialized;
     }
 
     /**
@@ -78,7 +72,7 @@ public:
      * @return        System index (MUCH).
      */
     static Int_t GetSystemIndex(Int_t detId) {
-        return (detId & (WL_SYSTEM << SB_SYSTEM)) >> SB_SYSTEM;
+      return (detId & (WL_SYSTEM << SB_SYSTEM)) >> SB_SYSTEM;
     }
     /**
      * Gets station index for the given detector Id.
@@ -86,7 +80,7 @@ public:
      * @return        Station index within the MUCH system.
      */
     static Int_t GetStationIndex(Int_t detId) {
-        return (detId & (WL_STATION << SB_STATION)) >> SB_STATION;
+      return (detId & (WL_STATION << SB_STATION)) >> SB_STATION;
     }
     /**
      * Gets layer index for the given detector Id.
@@ -94,7 +88,7 @@ public:
      * @return        Layer index within the station.
      */
     static Int_t GetLayerIndex(Int_t detId) {
-        return (detId & (WL_LAYER << SB_LAYER)) >> SB_LAYER;
+      return (detId & (WL_LAYER << SB_LAYER)) >> SB_LAYER;
     }
     /**
      * Gets layer side index for the given detector Id.
@@ -102,7 +96,7 @@ public:
      * @return        Layer side index within the layer.
      */
     static Int_t GetLayerSideIndex(Int_t detId) {
-        return (detId & (WL_LAYERSIDE << SB_LAYERSIDE)) >> SB_LAYERSIDE;
+      return (detId & (WL_LAYERSIDE << SB_LAYERSIDE)) >> SB_LAYERSIDE;
     }
     /**
      * Gets module index for the given detector Id.
@@ -110,23 +104,7 @@ public:
      * @return        Module index within the layer side.
      */
     static Int_t GetModuleIndex(Int_t detId) {
-        return (detId & (WL_MODULE << SB_MODULE)) >> SB_MODULE;
-    }
-    /**
-     * Gets sector index for the given channel Id.
-     * @param channelId   Channel Id.
-     * @return            Sector index within the module.
-     */
-    static Int_t GetSectorIndex(Int_t channelId) {
-        return (channelId & (WL_SECTOR << SB_SECTOR)) >> SB_SECTOR;
-    }
-    /**
-     * Gets channel index for the given channel Id.
-     * @param channelId   Channel Id.
-     * @return            Channel index within the sector.
-     */
-    static Int_t GetChannelIndex(Int_t channelId) {
-        return (channelId & (WL_CHANNEL << SB_CHANNEL)) >> SB_CHANNEL;
+      return (detId & (WL_MODULE << SB_MODULE)) >> SB_MODULE;
     }
 
     /**
@@ -135,7 +113,7 @@ public:
      * @return           Detector Id.
      */
     static Int_t GetDetectorId(Int_t iStation) {
-        return (kMUCH << SB_SYSTEM) | (iStation << SB_STATION);
+      return (kMUCH << SB_SYSTEM) | (iStation << SB_STATION);
     }
     /**
      * Gets detector Id by station index and layer index.
@@ -144,7 +122,7 @@ public:
      * @return           Detector Id.
      */
     static Int_t GetDetectorId(Int_t iStation, Int_t iLayer) {
-        return (kMUCH << SB_SYSTEM) | (iStation << SB_STATION) | (iLayer << SB_LAYER);
+      return (kMUCH << SB_SYSTEM) | (iStation << SB_STATION) | (iLayer << SB_LAYER);
     }
     /**
      * Gets detector Id by station index, layer index and layer side index.
@@ -154,8 +132,8 @@ public:
      * @return           Detector Id.
      */
     static Int_t GetDetectorId(Int_t iStation, Int_t iLayer, Int_t iSide) {
-        return (kMUCH << SB_SYSTEM) | (iStation << SB_STATION) | (iLayer << SB_LAYER) |
-        (iSide << SB_LAYERSIDE);
+      return (kMUCH << SB_SYSTEM) | (iStation << SB_STATION) | (iLayer << SB_LAYER) |
+      (iSide << SB_LAYERSIDE);
     }
     /**
      * Gets detector Id by station index, layer index, layer side index and module index.
@@ -166,17 +144,8 @@ public:
      * @return           Detector Id.
      */
     static Int_t GetDetectorId(Int_t iStation, Int_t iLayer, Int_t iSide, Int_t iModule) {
-        return (kMUCH << SB_SYSTEM) |    (iStation << SB_STATION) |    (iLayer << SB_LAYER) |
-        (iSide << SB_LAYERSIDE) | (iModule << SB_MODULE);
-    }
-    /**
-     * Gets channel Id by sector index and channel index.
-     * @param iSector    Sector index within the module.
-     * @param iChannel   Channel index within the sector.
-     * @return           Detector Id.
-     */
-    static Int_t GetChannelId(Int_t iSector, Int_t iChannel) {
-        return (iSector << SB_SECTOR) | (iChannel << SB_CHANNEL);
+      return (kMUCH << SB_SYSTEM) |    (iStation << SB_STATION) |    (iLayer << SB_LAYER) |
+      (iSide << SB_LAYERSIDE) | (iModule << SB_MODULE);
     }
 
     // Get geometry objects by indices
@@ -184,16 +153,12 @@ public:
     CbmMuchLayer* GetLayer(Int_t iStation, Int_t iLayer);
     CbmMuchLayerSide* GetLayerSide(Int_t iStation, Int_t iLayer, Bool_t iSide);
     CbmMuchModule* GetModule(Int_t iStation, Int_t iLayer, Bool_t iSide, Int_t iModule);
-    CbmMuchSector* GetSector(Int_t iStation, Int_t iLayer, Bool_t iSide, Int_t iModule, Int_t iSector);
-    CbmMuchPad* GetPad(Int_t iStation, Int_t iLayer, Bool_t iSide, Int_t iModule, Int_t iSector, Int_t iChannel);
 
     // Get geometry objects by detector id
     CbmMuchStation* GetStationByDetId(Int_t detId);
     CbmMuchLayer* GetLayerByDetId(Int_t detId);
     CbmMuchLayerSide* GetLayerSideByDetId(Int_t detId);
     CbmMuchModule* GetModuleByDetId(Int_t detId);
-    CbmMuchSector* GetSectorByDetId(Int_t detId, Int_t channelId);
-    CbmMuchPad* GetPadByDetId(Int_t detId, Int_t channelId);
 
     Int_t GetNStations() {return fStations->GetEntries();}
     Int_t GetNAbsorbers() {return fNabs;}
@@ -218,26 +183,23 @@ public:
     void ClearPointArrays();
     void ClearHitArrays();
     void ClearClusterArrays();
-    void InitGrid();
     void ResetPads();
     vector<CbmMuchPad*> GetPads() {return fPads;}
+    vector<CbmMuchModule*> GetModules();
+    vector<CbmMuchModule*> GetModules(Int_t iStation);
     vector<CbmMuchLayerSide*> GetLayerSides(Int_t iStation);
     Int_t GetLayerSideNr(Int_t detId);
 
     void ReadGeoFile(const char* geoName);
     void Print();
     void CreateMuchCave();
-//    Bool_t IsModuleDesign() {return fModuleDesign;}
 
-    Double_t GetMinPadSizeX(Int_t iStation);
-    Double_t GetMaxPadSizeX(Int_t iStation);
-    Double_t GetMinPadSizeY(Int_t iStation);
-    Double_t GetMaxPadSizeY(Int_t iStation);
-    Int_t GetNChannels(Int_t iStation);
-    Int_t GetNSectors(Int_t iStation);
+    TVector2 GetMinPadSize(Int_t iStation);
+    TVector2 GetMaxPadSize(Int_t iStation);
 
-private:
+  private:
     CbmMuchGeoScheme();
+    void InitModules();
     void CreateAbsorbers();
     void CreateStations();
     CbmMuchStation* CreateStationGem(Int_t st);
@@ -245,9 +207,13 @@ private:
 
     Int_t Intersect(Float_t x, Float_t y, Float_t dx, Float_t dy, Float_t r);
     static CbmMuchGeoScheme* fInstance;
-    static Bool_t fInitialized; // Defines whether the instance was initialized
-    static Bool_t fGridInitialized; // Defines whether grid of the instance was initialized
-    vector<CbmMuchPad*> fPads; //!
+    static Bool_t fInitialized;        // Defines whether the instance was initialized
+    static Bool_t fModulesInitialized; // Defines whether grid of the instance was initialized
+
+    vector<CbmMuchPad*> fPads;                     //!
+    vector<vector<CbmMuchModule*> > fModules;      //!
+    vector<vector<CbmMuchLayerSide*> > fSides;     //!
+    vector<vector<CbmMuchSector*> > fSectors;      //!
     map<Int_t,Int_t> fMapSides;
 
     TObjArray* fStations; //!
@@ -281,7 +247,7 @@ private:
     TArrayD fLayersDz; // Distance between layers [cm]
     TArrayD fSupportLz; // Support thickness [cm]
     TArrayI fModuleDesign; /* 1 - detailed design (modules at two sides)
-                          * 0 - simple design (1 module per layer)     */
+     * 0 - simple design (1 module per layer)     */
 
 
     ClassDef(CbmMuchGeoScheme,1);

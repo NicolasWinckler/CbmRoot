@@ -361,28 +361,28 @@ void CbmMuch::ConstructGeometry() {
 
       // Straws
 
-      if (station->GetDetectorType()==2) {
-        if (station->IsModuleDesign()){
-          Fatal("CbmMuch","Station %i - detailed module design not implemented for straws",st);
-        }
-
-        for (Int_t s=0;s<2;s++){
-          CbmMuchLayerSide* side = layer->GetSide(s);
-          for (Int_t m=0;m<side->GetNModules();m++){
-            Char_t cside = (s==1) ? 'b' : 'f';
-            CbmMuchModule* module = side->GetModule(m);
-            TVector3 pos = module->GetPosition();
-            TVector3 size = module->GetSize();
-            TGeoBBox* shActiveBox = new TGeoBBox(Form("shActiveBoxSt%il%i",st+1,l+1),size[0]/2.,size[1]/2.,size[2]/2.);
-            TGeoShape* shActive = new TGeoCompositeShape(Form("shActiveHoleSt%il%i%cm%02i",st+1,l,cside,m+1),Form("shActiveBoxSt%il%i-muchst%ihole",st+1,l+1,st+1));
-            TString activeName = Form("muchstation%ilayer%i%cactive%03i",st+1,l+1,cside,m+1);
-            TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);
-            gGeoManager->Node(activeName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);
-            AddSensitiveVolume(voActive);
-          }
-        }
-        continue;
-      }
+//      if (station->GetDetectorType()==2) {
+//        if (station->IsModuleDesign()){
+//          Fatal("CbmMuch","Station %i - detailed module design not implemented for straws",st);
+//        }
+//
+//        for (Int_t s=0;s<2;s++){
+//          CbmMuchLayerSide* side = layer->GetSide(s);
+//          for (Int_t m=0;m<side->GetNModules();m++){
+//            Char_t cside = (s==1) ? 'b' : 'f';
+//            CbmMuchModule* module = side->GetModule(m);
+//            TVector3 pos = module->GetPosition();
+//            TVector3 size = module->GetSize();
+//            TGeoBBox* shActiveBox = new TGeoBBox(Form("shActiveBoxSt%il%i",st+1,l+1),size[0]/2.,size[1]/2.,size[2]/2.);
+//            TGeoShape* shActive = new TGeoCompositeShape(Form("shActiveHoleSt%il%i%cm%02i",st+1,l,cside,m+1),Form("shActiveBoxSt%il%i-muchst%ihole",st+1,l+1,st+1));
+//            TString activeName = Form("muchstation%ilayer%i%cactive%03i",st+1,l+1,cside,m+1);
+//            TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);
+//            gGeoManager->Node(activeName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);
+//            AddSensitiveVolume(voActive);
+//          }
+//        }
+//        continue;
+//      }
 
       // GEMs etc.
 

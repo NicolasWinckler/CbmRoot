@@ -30,8 +30,6 @@
 #pragma link C++ class  CbmMuchSegmentAuto+;
 #pragma link C++ class  CbmMuchSegmentManual+;
 #pragma link C++ class  CbmMuchStation+;
-#pragma link C++ class  CbmMuchStationGem+;
-#pragma link C++ class  CbmMuchStationStraw+;
 #pragma link C++ class  CbmMuchTrackFinderIdeal+;
 #pragma link C++ class  CbmMuchFindHitsStraws+;
 

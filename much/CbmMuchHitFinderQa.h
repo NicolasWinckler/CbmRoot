@@ -144,6 +144,9 @@ private:
   /** Defines whether the point with the given index is signal point. **/
   Bool_t IsSignalPoint(Int_t iPoint);
 
+  Int_t GetNChannels(Int_t iStation);
+  Int_t GetNSectors(Int_t iStation);
+
 
   ClassDef(CbmMuchHitFinderQa,1)
 };

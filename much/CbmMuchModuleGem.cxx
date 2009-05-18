@@ -27,6 +27,7 @@ using std::vector;
 
 // -----   Default constructor   -------------------------------------------
 CbmMuchModuleGem::CbmMuchModuleGem(): CbmMuchModule() {
+  fDetectorType = 1;
   fGridDx = fGridDy = 0.0;
   fGridCols = fGridRows = 0;
   fPoints = NULL;
@@ -39,6 +40,7 @@ CbmMuchModuleGem::CbmMuchModuleGem(): CbmMuchModule() {
 CbmMuchModuleGem::CbmMuchModuleGem(Int_t detId, TVector3 position, TVector3 size,
     Double_t cutRadius)
 : CbmMuchModule(detId, position, size, cutRadius) {
+  fDetectorType = 1;
   fGridDx = fGridDy = 0.0;
   fGridCols = fGridRows = 0;
   fPoints = NULL;
@@ -51,6 +53,7 @@ CbmMuchModuleGem::CbmMuchModuleGem(Int_t detId, TVector3 position, TVector3 size
 CbmMuchModuleGem::CbmMuchModuleGem(Int_t iStation, Int_t iLayer, Bool_t iSide,
     Int_t iModule, TVector3 position, TVector3 size, Double_t cutRadius)
 :  CbmMuchModule(iStation, iLayer, iSide, iModule, position, size, cutRadius) {
+  fDetectorType = 1;
   fGridDx = fGridDy = 0.0;
   fGridCols = fGridRows = 0;
   fPoints = NULL;
@@ -67,6 +70,33 @@ CbmMuchModuleGem::~CbmMuchModuleGem() {
 // -----   Public method AddSector   ---------------------------------------
 void CbmMuchModuleGem::AddSector(CbmMuchSector* sector) {
   fSectors.Add(sector);
+}
+// -------------------------------------------------------------------------
+
+// -----   Public method GetPad  -------------------------------------------
+CbmMuchPad* CbmMuchModuleGem::GetPad(Int_t channelId) {
+  CbmMuchSector* sector = GetSector(channelId);
+  Int_t iChannel = GetChannelIndex(channelId);
+  return sector ? sector->GetPad(iChannel) : NULL;
+}
+// -------------------------------------------------------------------------
+
+// -----   Public method GetNPads ------------------------------------------
+Int_t CbmMuchModuleGem::GetNPads() {
+  Int_t nChannels = 0;
+  for(Int_t iSector=0; iSector < GetNSectors(); ++iSector){
+    CbmMuchSector* sector = GetSector(iSector);
+    if(!sector) continue;
+    nChannels += sector->GetNChannels();
+  }
+  return nChannels;
+}
+// -------------------------------------------------------------------------
+
+// -----   Public method GetSector   ---------------------------------------
+CbmMuchSector* CbmMuchModuleGem::GetSector(Int_t channelId) {
+  Int_t iSector = GetSectorIndex(channelId);
+  return (CbmMuchSector*)fSectors.At(iSector);
 }
 // -------------------------------------------------------------------------
 
@@ -378,8 +408,19 @@ void CbmMuchModuleGem::InitNeighbourPads() {
 // -------------------------------------------------------------------------
 
 Bool_t CbmMuchModuleGem::InitModule(){
-  if (!InitGrid(fUseModuleDesign)) return kFALSE;
+  Bool_t useModuleDesign = TMath::Abs(fPosition[0]) > 1e-5 || TMath::Abs(fPosition[1]) > 1e-5;
+  if (!InitGrid(useModuleDesign)) return kFALSE;
   InitNeighbourSectors();
+  //            CbmMuchModuleGem* mod = (CbmMuchModuleGem*) module;
+  for (Int_t iSector = 0; iSector < GetNSectors(); iSector++) {
+    CbmMuchSector* sector = GetSector(iSector);
+    if (!sector) continue;
+    sector->AddPads();
+//    for (Int_t iPad = 0; iPad < sector->GetNChannels(); iPad++) {
+//      CbmMuchPad* pad = sector->GetPad(iPad);
+//      if (pad) fPads.push_back(pad);
+//    }
+  }
   InitNeighbourPads();
 }
 

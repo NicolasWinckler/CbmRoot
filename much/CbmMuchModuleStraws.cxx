@@ -5,6 +5,7 @@
 
 // -----   Default constructor   -------------------------------------------
 CbmMuchModuleStraws::CbmMuchModuleStraws(): CbmMuchModule() {
+  fDetectorType = 2;
 }
 // -------------------------------------------------------------------------
 
@@ -12,6 +13,7 @@ CbmMuchModuleStraws::CbmMuchModuleStraws(): CbmMuchModule() {
 CbmMuchModuleStraws::CbmMuchModuleStraws(Int_t detId, TVector3 position, TVector3 size,
     Double_t cutRadius)
 : CbmMuchModule(detId, position, size, cutRadius) {
+  fDetectorType = 2;
 }
 // -------------------------------------------------------------------------
 
@@ -19,6 +21,7 @@ CbmMuchModuleStraws::CbmMuchModuleStraws(Int_t detId, TVector3 position, TVector
 CbmMuchModuleStraws::CbmMuchModuleStraws(Int_t iStation, Int_t iLayer, Bool_t iSide,
     Int_t iModule, TVector3 position, TVector3 size, Double_t cutRadius)
 :  CbmMuchModule(iStation, iLayer, iSide, iModule, position, size, cutRadius) {
+  fDetectorType = 2;
 }
 // -------------------------------------------------------------------------
 

@@ -4,15 +4,13 @@
  *@version 1.0
  **
  ** This class describes the digitization scheme for a sector of the MuCh.
- ** The sector is a rectangle of size fLx and fLy. The following
- ** types are implemented:
- ** 1 = GEMs
- ** 2 = CPCs
+ ** The sector is a rectangle of size fLx and fLy.
  **/
 
 #include "CbmMuchSector.h"
 #include "CbmMuchGeoScheme.h"
 #include "CbmMuchPad.h"
+#include "CbmMuchModuleGem.h"
 
 #include "TPolyLine.h"
 #include "TPave.h"
@@ -177,9 +175,10 @@ Bool_t CbmMuchSector::IsInside(Double_t xint, Double_t yint){
 vector<CbmMuchSector*> CbmMuchSector::GetNeighbours(){
   vector<CbmMuchSector*> sectors;
   CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
+  CbmMuchModuleGem* module = (CbmMuchModuleGem*) geoScheme->GetModuleByDetId(fDetectorId);
   for(Int_t i=0; i < fNeighbours.GetSize(); i++){
     Int_t iSector = fNeighbours.At(i);
-    CbmMuchSector* sector = geoScheme->GetSectorByDetId(fDetectorId, iSector);
+    CbmMuchSector* sector = module->GetSector(iSector);
     if(sector) sectors.push_back(sector);
   }
   return sectors;

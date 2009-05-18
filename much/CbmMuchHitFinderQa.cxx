@@ -11,7 +11,7 @@
 #include "CbmMuchHit.h"
 
 #include "CbmMuchStation.h"
-#include "CbmMuchStationGem.h"
+#include "CbmMuchModuleGem.h"
 #include "CbmMuchSector.h"
 #include "CbmMuchPad.h"
 
@@ -29,6 +29,7 @@
 #include "TArrayI.h"
 #include "CbmMuchGeoScheme.h"
 #include "TObjArray.h"
+
 
 #include "FairRuntimeDb.h"
 #include "CbmGeoMuchPar.h"
@@ -80,7 +81,6 @@ InitStatus CbmMuchHitFinderQa::Init()
   TFile* f = new TFile(fGeoFileName,"R");
   TObjArray* stations = (TObjArray*) f->Get("stations");
   fGeoScheme->Init(stations);
-  fGeoScheme->InitGrid();
   fNstations = fGeoScheme->GetNStations();
   printf("Init: fNstations = %i\n", fNstations);
 
@@ -203,7 +203,7 @@ InitStatus CbmMuchHitFinderQa::Init()
   fhPadsFiredR = new TH1D*[fNstations];
 
   for (Int_t i=0; i<fNstations; i++){
-    CbmMuchStationGem* station = (CbmMuchStationGem*) fGeoScheme->GetStation(i);
+    CbmMuchStation* station = fGeoScheme->GetStation(i);
     Double_t rMax = station->GetRmax();
     fhPadsTotalR[i] = new TH1D(Form("hPadsTotal%i",i+1),Form("Number of  pads vs radius: station %i;Radius [cm]",i+1),100,0,1.2*rMax);
     fhPadsFiredR[i] = new TH1D(Form("hPadsFired%i",i+1),Form("Number of fired pads vs radius: station %i;Radius [cm]",i+1),100,0,1.2*rMax);
@@ -231,12 +231,12 @@ InitStatus CbmMuchHitFinderQa::Init()
   printf(" Station Nr.\t| Sectors\t| Channels\t| Pad min size\t\t| Pad max length\t \n");
   printf("-----------------------------------------------------------------------------------------\n");
   for (Int_t iStation=0;iStation<fNstations;iStation++){
-    Double_t padMinLx = fGeoScheme->GetMinPadSizeX(iStation);
-    Double_t padMinLy = fGeoScheme->GetMinPadSizeY(iStation);
-    Double_t padMaxLx = fGeoScheme->GetMaxPadSizeX(iStation);
-    Double_t padMaxLy = fGeoScheme->GetMaxPadSizeY(iStation);
-    Int_t nChannels  = fGeoScheme->GetNChannels(iStation);
-    Int_t nSectors   = fGeoScheme->GetNSectors(iStation);
+    Double_t padMinLx = fGeoScheme->GetMinPadSize(iStation).X();
+    Double_t padMinLy = fGeoScheme->GetMinPadSize(iStation).Y();
+    Double_t padMaxLx = fGeoScheme->GetMaxPadSize(iStation).X();
+    Double_t padMaxLy = fGeoScheme->GetMaxPadSize(iStation).Y();
+    Int_t nChannels  = GetNChannels(iStation);
+    Int_t nSectors   = GetNSectors(iStation);
     if (fPadMinLx>padMinLx) fPadMinLx = padMinLx;
     if (fPadMinLy>padMinLy) fPadMinLy = padMinLy;
     if (fPadMaxLx<padMaxLx) fPadMaxLx = padMaxLx;
@@ -724,7 +724,9 @@ void CbmMuchHitFinderQa::DigitizerQa(){
     CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(i);
     // Get pad area
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
-    CbmMuchPad* pad = fGeoScheme->GetPadByDetId(digi->GetDetectorId(), digi->GetChannelId());
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(digi->GetDetectorId());
+    if(!module) continue;
+    CbmMuchPad* pad = module->GetPad(digi->GetChannelId());//fGeoScheme->GetPadByDetId(digi->GetDetectorId(), digi->GetChannelId());
     Double_t area = pad->GetLx()*pad->GetLy();
     for (Int_t pt=0;pt<match->GetNPoints();pt++){
       Int_t pointId = match->GetRefIndex(pt);
@@ -783,7 +785,9 @@ void CbmMuchHitFinderQa::OccupancyQa(){
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
     Int_t detectorId = digi->GetDetectorId();
     Int_t channelId  = digi->GetChannelId();
-    CbmMuchPad* pad = fGeoScheme->GetPadByDetId(detectorId, channelId);
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(detectorId);
+    if(!module) continue;
+    CbmMuchPad* pad = module->GetPad(channelId);//fGeoScheme->GetPadByDetId(detectorId, channelId);
     Double_t x0 = pad->GetX0();
     Double_t y0 = pad->GetY0();
     Double_t r0 = TMath::Sqrt(x0*x0+y0*y0);
@@ -839,7 +843,6 @@ void CbmMuchHitFinderQa::StatisticsQa(){
     if (nHits>nPts) fPointsOverCounted+=(nHits-nPts);
     fPointsTotal+=nPts;
   }
-
 }
 // -------------------------------------------------------------------------
 
@@ -897,7 +900,9 @@ void CbmMuchHitFinderQa::PullsQa(){
       if (match->GetNPoints()>1) { point_unique=0; break; }
       Int_t currentPointId = match->GetRefIndex(0);
       CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(index);
-      CbmMuchPad* pad = fGeoScheme->GetPadByDetId(digi->GetDetectorId(),digi->GetChannelId());
+      CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(digi->GetDetectorId());
+      if(!module) continue;
+      CbmMuchPad* pad = module->GetPad(digi->GetChannelId());//fGeoScheme->GetPadByDetId(digi->GetDetectorId(), digi->GetChannelId());
       Double_t x = pad->GetX0();
       Double_t y = pad->GetY0();
       Double_t dx = pad->GetLx();
@@ -1013,6 +1018,30 @@ Bool_t CbmMuchHitFinderQa::IsSignalPoint(Int_t iPoint){
     }
   }
   return kFALSE;
+}
+
+// -------------------------------------------------------------------------
+Int_t CbmMuchHitFinderQa::GetNChannels(Int_t iStation){
+  Int_t nChannels = 0;
+  vector<CbmMuchModule*> modules = fGeoScheme->GetModules(iStation);
+  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*)(*it);
+    if(!module) continue;
+    nChannels += module->GetNPads();
+  }
+  return nChannels;
+}
+
+// -------------------------------------------------------------------------
+Int_t CbmMuchHitFinderQa::GetNSectors(Int_t iStation){
+  Int_t nSectors = 0;
+  vector<CbmMuchModule*> modules = fGeoScheme->GetModules(iStation);
+  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*)(*it);
+    if(!module) continue;
+    nSectors += module->GetNSectors();
+  }
+  return nSectors;
 }
 
 

@@ -3,10 +3,14 @@
  *@author  M.Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *@version 1.0
  *@since   11.02.08
- **
- ** This class holds geometry parameters of much modules
- **
- **/
+ *
+ * This class holds geometry parameters of much modules
+ *
+ * The channel ID consists of:
+ *   sector number  (0-2047),       bits 0-10
+ *   channel number (0-1024),       bits 11-20
+ *
+ */
 
 #ifndef CBMMUCHMODULEGEM_H
 #define CBMMUCHMODULEGEM_H 1
@@ -24,6 +28,15 @@
 #include <vector>
 
 using std::vector;
+
+// Length of the index of the corresponding volume
+#define WL_SECTOR 2047
+#define WL_CHANNEL 1023
+
+// Number of a start bit for each volume
+#define SB_SECTOR 0
+#define SB_CHANNEL 11
+
 
 class CbmMuchSector;
 
@@ -57,20 +70,47 @@ public:
     /** Destructor **/
     virtual ~CbmMuchModuleGem();
 
+    /**
+     * Gets sector index for the given channel Id.
+     * @param channelId   Channel Id.
+     * @return            Sector index within the module.
+     */
+    static Int_t GetSectorIndex(Int_t channelId) {
+        return (channelId & (WL_SECTOR << SB_SECTOR)) >> SB_SECTOR;
+    }
+    /**
+     * Gets channel index for the given channel Id.
+     * @param channelId   Channel Id.
+     * @return            Channel index within the sector.
+     */
+    static Int_t GetChannelIndex(Int_t channelId) {
+        return (channelId & (WL_CHANNEL << SB_CHANNEL)) >> SB_CHANNEL;
+    }
+    /**
+     * Gets channel Id by sector index and channel index.
+     * @param iSector    Sector index within the module.
+     * @param iChannel   Channel index within the sector.
+     * @return           Detector Id.
+     */
+    static Int_t GetChannelId(Int_t iSector, Int_t iChannel) {
+        return (iSector << SB_SECTOR) | (iChannel << SB_CHANNEL);
+    }
+
     /** Accessors **/
     Int_t    GetNSectors()    const { return fSectors.GetEntriesFast(); }
-
-    /** Gets sector by the given index. **/
-    CbmMuchSector* GetSector(Int_t iSector) const { return (CbmMuchSector*)fSectors.At(iSector); }
+    /** Gets sector by the given channel Id. **/
+    CbmMuchSector* GetSector(Int_t channelId);// const { return (CbmMuchSector*)fSectors.At(iSector); }
     /** Gets sector by the given numbers of column and row in the grid. **/
     CbmMuchSector* GetSector(Int_t iGridColumn, Int_t iGridRow);
     /** Gets sector by the given coordinates in global c.s. */
     CbmMuchSector* GetSector(Double_t x, Double_t y);
+    /** Gets pad by the given Id. */
+    CbmMuchPad* GetPad(Int_t channelId);
+    Int_t GetNPads();
 
     /** Adds a given sector to the array.
      *@param  sector   CbmMuchSector which should be added to the array.**/
     void AddSector(CbmMuchSector* sector);
-
 
     TClonesArray* GetPoints()   const { return fPoints;     }
     TClonesArray* GetHits()     const { return fHits;       }
@@ -79,12 +119,6 @@ public:
     void SetHits  (TClonesArray* hits)       { fHits     = hits;     }
     void SetClusters(TClonesArray* clusters) { fClusters = clusters; }
 
-    /** Grid initialization. **/
-    Bool_t InitGrid(Bool_t useModuleDesign);
-    /** Adds to each sector info about neighbour sectors **/
-    void InitNeighbourSectors();
-    /** Adds to each pad info about neighbour pads **/
-    void InitNeighbourPads();
 
     virtual Bool_t InitModule();
     virtual void DrawModule(Color_t color);
@@ -105,6 +139,12 @@ private:
     Double_t GetGridCellX(Int_t iCol);
     Double_t GetInitX(CbmMuchSector* sector);
     Double_t GetInitY(CbmMuchSector* sector);
+    /** Grid initialization. **/
+    Bool_t InitGrid(Bool_t useModuleDesign);
+    /** Adds to each sector info about neighbour sectors **/
+    void InitNeighbourSectors();
+    /** Adds to each pad info about neighbour pads **/
+    void InitNeighbourPads();
 
     ClassDef(CbmMuchModuleGem,1);
 };

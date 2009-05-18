@@ -48,8 +48,6 @@ CbmMuchSector.cxx
 CbmMuchSegmentAuto.cxx
 CbmMuchSegmentManual.cxx
 CbmMuchStation.cxx
-CbmMuchStationGem.cxx
-CbmMuchStationStraw.cxx
 CbmMuchTrackFinderIdeal.cxx
 CbmMuchFindHitsStraws.cxx
 )

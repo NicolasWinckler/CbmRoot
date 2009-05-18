@@ -4,8 +4,6 @@
 // -------------------------------------------------------------------------
 #include "CbmMuchGeoScheme.h"
 #include "CbmMuchStation.h"
-#include "CbmMuchStationGem.h"
-#include "CbmMuchStationStraw.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
 #include "CbmMuchModuleGem.h"
@@ -20,6 +18,7 @@
 #include <fstream>
 #include <vector>
 #include <cassert>
+#include <stdexcept>
 
 using std::cout;
 using std::endl;
@@ -27,7 +26,7 @@ using std::vector;
 
 CbmMuchGeoScheme* CbmMuchGeoScheme::fInstance = NULL;
 Bool_t CbmMuchGeoScheme::fInitialized = kFALSE;
-Bool_t CbmMuchGeoScheme::fGridInitialized = kFALSE;
+Bool_t CbmMuchGeoScheme::fModulesInitialized = kFALSE;
 
 // -------------------------------------------------------------------------
 CbmMuchGeoScheme::CbmMuchGeoScheme() {
@@ -60,7 +59,6 @@ CbmMuchGeoScheme::CbmMuchGeoScheme() {
 }
 // -------------------------------------------------------------------------
 
-
 // -------------------------------------------------------------------------
 CbmMuchGeoScheme::~CbmMuchGeoScheme() {
   if (fInstance != NULL)
@@ -83,36 +81,35 @@ void CbmMuchGeoScheme::Init(TObjArray* stations) {
     fStations = stations;
     fInitialized = kTRUE;
   }
+
+  InitModules();
+
   Int_t iSide = 0;
-  fMapSides.clear();
   for (Int_t iStation = 0; iStation < GetNStations(); iStation++) {
     vector<CbmMuchLayerSide*> sides = GetLayerSides(iStation);
     for (Int_t i = 0; i < sides.size(); i++) {
-      //      printf("iSide=%i detId=%i\n",iSide,sides[i]->GetDetectorId());
-      if (sides[i]->GetNModules()==0) continue;
-      fMapSides[sides[i]->GetDetectorId()] = iSide;
-      iSide++;
+      printf("%i\n", GetLayerSideNr(sides.at(i)->GetDetectorId()));
     }
   }
-
-//  for (map<Int_t, Int_t>::iterator it = fMapSides.begin(); it
-//      != fMapSides.end(); it++) {
-//    Int_t detId = (*it).first;
-//    printf("iStation=%i, iLayer=%i, iSide=%i, SideNr=%i\n", GetStationIndex(detId),
-//        GetLayerIndex(detId), GetLayerSideIndex(detId), (*it).second);
-//  }
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-void CbmMuchGeoScheme::InitGrid() {
-  if (!fGridInitialized) {
-    cout << "-I- Initializing grid... " << endl;
+void CbmMuchGeoScheme::InitModules() {
+  if (!fModulesInitialized) {
     if (!fStations) Fatal("InitGrid", "No input array of stations.");
+    Int_t incSides = 0;
+    fMapSides.clear();
+    fSectors.clear();
+    fSides.clear();
+    fModules.clear();
     for (Int_t iStation = 0; iStation < GetNStations(); iStation++) {
       CbmMuchStation* station = GetStation(iStation);
       if (!station)  continue;
       assert(iStation == GetStationIndex(station->GetDetectorId()));
+      vector<CbmMuchSector*> sectors;
+      vector<CbmMuchLayerSide*> sides;
+      vector<CbmMuchModule*> modules;
       for (Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++) {
         CbmMuchLayer* layer = station->GetLayer(iLayer);
         if (!layer)  continue;
@@ -121,31 +118,34 @@ void CbmMuchGeoScheme::InitGrid() {
           CbmMuchLayerSide* side = (CbmMuchLayerSide*) layer->GetSide(iSide);
           if (!side) continue;
           assert(iSide == GetLayerSideIndex(side->GetDetectorId()));
-          Bool_t useModuleDesign = side->GetNModules() > 1;
+          if(side->GetNModules()!=0) fMapSides[side->GetDetectorId()] = incSides++;
+          sides.push_back(side);
           for (Int_t iModule = 0; iModule < side->GetNModules(); iModule++) {
-            CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(iModule);
-            if (!module) continue;
-            assert(iModule == GetModuleIndex(module->GetDetectorId()));
-//            if(!module->InitModule()) continue;;
-            if (!module->InitGrid(useModuleDesign)) continue;
-            module->InitNeighbourSectors();
-//            CbmMuchModuleGem* mod = (CbmMuchModuleGem*) module;
+            CbmMuchModule* mod = side->GetModule(iModule);
+            if (!mod) continue;
+            assert(iModule == GetModuleIndex(mod->GetDetectorId()));
+            if(!mod->InitModule()) continue;
+            modules.push_back(mod);
+            if(mod->GetDetectorType() != 1) continue;
+            CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
             for (Int_t iSector = 0; iSector < module->GetNSectors(); iSector++) {
               CbmMuchSector* sector = module->GetSector(iSector);
               if (!sector) continue;
-              sector->AddPads();
+              sectors.push_back(sector);
               for (Int_t iPad = 0; iPad < sector->GetNChannels(); iPad++) {
                 CbmMuchPad* pad = sector->GetPad(iPad);
                 if (pad) fPads.push_back(pad);
-              }
-            }
-            module->InitNeighbourPads();
-          }
-        }
-      }
-    }
+              } // Pads
+            } // Sectors
+          } // Modules
+        } // Sides
+      } // Layers
+      fSectors.push_back(sectors);
+      fSides.push_back(sides);
+      fModules.push_back(modules);
+    } // Stations
 
-    fGridInitialized = kTRUE;
+    fModulesInitialized = kTRUE;
   }
 }
 // -------------------------------------------------------------------------
@@ -183,22 +183,6 @@ CbmMuchModule* CbmMuchGeoScheme::GetModule(Int_t iStation, Int_t iLayer,
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-CbmMuchSector* CbmMuchGeoScheme::GetSector(Int_t iStation, Int_t iLayer,
-    Bool_t iSide, Int_t iModule, Int_t iSector) {
-  CbmMuchModuleGem* module = (CbmMuchModuleGem*)GetModule(iStation, iLayer, iSide, iModule);
-  return module ? module->GetSector(iSector) : NULL;
-}
-// -------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------
-CbmMuchPad* CbmMuchGeoScheme::GetPad(Int_t iStation, Int_t iLayer,
-    Bool_t iSide, Int_t iModule, Int_t iSector, Int_t iChannel) {
-  CbmMuchSector* sector = GetSector(iStation, iLayer, iSide, iModule, iSector);
-  return sector ? sector->GetPad(iChannel) : NULL;
-}
-// -------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------
 CbmMuchStation* CbmMuchGeoScheme::GetStationByDetId(Int_t detId) {
   Int_t iStation = GetStationIndex(detId);
   return GetStation(iStation);
@@ -225,142 +209,78 @@ CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSideByDetId(Int_t detId) {
 CbmMuchModule* CbmMuchGeoScheme::GetModuleByDetId(Int_t detId) {
   CbmMuchLayerSide* side = GetLayerSideByDetId(detId);
   Int_t iModule = GetModuleIndex(detId);
-    return side ? side->GetModule(iModule) : NULL;
-}
-// -------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------
-CbmMuchSector* CbmMuchGeoScheme::GetSectorByDetId(Int_t detId, Int_t channelId) {
-  CbmMuchModuleGem* module = (CbmMuchModuleGem*)GetModuleByDetId(detId);
-  Int_t iSector = GetSectorIndex(channelId);
-  return module ? module->GetSector(iSector) : NULL;
-}
-// -------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------
-CbmMuchPad* CbmMuchGeoScheme::GetPadByDetId(Int_t detId, Int_t channelId) {
-  CbmMuchSector* sector = GetSectorByDetId(detId, channelId);
-  Int_t iChannel = GetChannelIndex(channelId);
-  return sector ? sector->GetPad(iChannel) : NULL;
+  return side ? side->GetModule(iModule) : NULL;
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 void CbmMuchGeoScheme::CreatePointArrays(char* pointClassName) {
-  for (Int_t st = 0; st < GetNStations(); st++) {
-    CbmMuchStation* station = GetStation(st);
-    for (Int_t l = 0; l < station->GetNLayers(); l++) {
-      CbmMuchLayer* layer = station->GetLayer(l);
-      for (Int_t s = 0; s < 2; s++) {
-        CbmMuchLayerSide* side = layer->GetSide(s);
-        for (Int_t m = 0; m < side->GetNModules(); m++) {
-          CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(m);
-          module->SetPoints(new TClonesArray(pointClassName, 10));
-        } // module
-      } // side
-    } // layer
-  } // station
+  for(vector<CbmMuchModule*>::iterator it=GetModules().begin(); it!=GetModules().end(); it++){
+    CbmMuchModule* module = (*it);
+    if(module->GetDetectorType()!=1) continue;
+    CbmMuchModuleGem* mod = (CbmMuchModuleGem*)module;
+    mod->SetPoints(new TClonesArray(pointClassName, 10));
+  }
 }
 // -------------------------------------------------------------------------
-
 
 // -------------------------------------------------------------------------
 void CbmMuchGeoScheme::CreateHitArrays(char* hitClassName) {
-  for (Int_t st = 0; st < GetNStations(); st++) {
-    CbmMuchStation* station = GetStation(st);
-    for (Int_t l = 0; l < station->GetNLayers(); l++) {
-      CbmMuchLayer* layer = station->GetLayer(l);
-      for (Int_t s = 0; s < 2; s++) {
-        CbmMuchLayerSide* side = layer->GetSide(s);
-        for (Int_t m = 0; m < side->GetNModules(); m++) {
-          CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(m);
-          module->SetHits(new TClonesArray(hitClassName, 10));
-        } // module
-      } // side
-    } // layer
-  } // station
+  for(vector<CbmMuchModule*>::iterator it=GetModules().begin(); it!=GetModules().end(); it++){
+    CbmMuchModule* module = (*it);
+    if(module->GetDetectorType()!=1) continue;
+    CbmMuchModuleGem* mod = (CbmMuchModuleGem*)module;
+    mod->SetHits(new TClonesArray(hitClassName, 10));
+  }
 }
 // -------------------------------------------------------------------------
-
 
 // -------------------------------------------------------------------------
 void CbmMuchGeoScheme::CreateClusterArrays(char* clusterClassName) {
-  for (Int_t st = 0; st < GetNStations(); st++) {
-    CbmMuchStation* station = GetStation(st);
-    for (Int_t l = 0; l < station->GetNLayers(); l++) {
-      CbmMuchLayer* layer = station->GetLayer(l);
-      for (Int_t s = 0; s < 2; s++) {
-        CbmMuchLayerSide* side = layer->GetSide(s);
-        for (Int_t m = 0; m < side->GetNModules(); m++) {
-          CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(m);
-          module->SetClusters(new TClonesArray(clusterClassName, 10));
-        } // module
-      } // side
-    } // layer
-  } // station
+  for(vector<CbmMuchModule*>::iterator it=GetModules().begin(); it!=GetModules().end(); it++){
+    CbmMuchModule* module = (*it);
+    if(module->GetDetectorType()!=1) continue;
+    CbmMuchModuleGem* mod = (CbmMuchModuleGem*)module;
+    mod->SetClusters(new TClonesArray(clusterClassName, 10));
+  }
 }
 // -------------------------------------------------------------------------
-
 
 // -------------------------------------------------------------------------
 void CbmMuchGeoScheme::ClearPointArrays() {
-  for (Int_t st = 0; st < GetNStations(); st++) {
-    CbmMuchStation* station = GetStation(st);
-    for (Int_t l = 0; l < station->GetNLayers(); l++) {
-      CbmMuchLayer* layer = station->GetLayer(l);
-      for (Int_t s = 0; s < 2; s++) {
-        CbmMuchLayerSide* side = layer->GetSide(s);
-        for (Int_t m = 0; m < side->GetNModules(); m++) {
-          CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(m);
-          TClonesArray* points = module->GetPoints();
-          points->Clear();
-        } // module
-      } // side
-    } // layer
-  } // station
+  for(vector<CbmMuchModule*>::iterator it=GetModules().begin(); it!=GetModules().end(); it++){
+    CbmMuchModule* module = (*it);
+    if(module->GetDetectorType()!=1) continue;
+    CbmMuchModuleGem* mod = (CbmMuchModuleGem*)module;
+    TClonesArray* points = mod->GetPoints();
+    points->Clear();
+  }
 }
 // -------------------------------------------------------------------------
-
 
 // -------------------------------------------------------------------------
 void CbmMuchGeoScheme::ClearHitArrays() {
-  for (Int_t st = 0; st < GetNStations(); st++) {
-    CbmMuchStation* station = GetStation(st);
-    for (Int_t l = 0; l < station->GetNLayers(); l++) {
-      CbmMuchLayer* layer = station->GetLayer(l);
-      for (Int_t s = 0; s < 2; s++) {
-        CbmMuchLayerSide* side = layer->GetSide(s);
-        for (Int_t m = 0; m < side->GetNModules(); m++) {
-          CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(m);
-          TClonesArray* hits = module->GetPoints();
-          hits->Clear();
-        } // module
-      } // side
-    } // layer
-  } // station
+  for(vector<CbmMuchModule*>::iterator it=GetModules().begin(); it!=GetModules().end(); it++){
+    CbmMuchModule* module = (*it);
+    if(module->GetDetectorType()!=1) continue;
+    CbmMuchModuleGem* mod = (CbmMuchModuleGem*)module;
+    TClonesArray* hits = mod->GetPoints();
+    hits->Clear();
+  }
 }
 // -------------------------------------------------------------------------
-
 
 // -------------------------------------------------------------------------
 void CbmMuchGeoScheme::ClearClusterArrays() {
-  for (Int_t st = 0; st < GetNStations(); st++) {
-    CbmMuchStation* station = GetStation(st);
-    for (Int_t l = 0; l < station->GetNLayers(); l++) {
-      CbmMuchLayer* layer = station->GetLayer(l);
-      for (Int_t s = 0; s < 2; s++) {
-        CbmMuchLayerSide* side = layer->GetSide(s);
-        for (Int_t m = 0; m < side->GetNModules(); m++) {
-          CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(m);
-          TClonesArray* clusters = module->GetClusters();
-          clusters->Clear();
-        } // module
-      } // side
-    } // layer
-  } // station
+  for(vector<CbmMuchModule*>::iterator it=GetModules().begin(); it!=GetModules().end(); it++){
+    CbmMuchModule* module = (*it);
+    if(module->GetDetectorType()!=1) continue;
+    CbmMuchModuleGem* mod = (CbmMuchModuleGem*)module;
+    TClonesArray* clusters = mod->GetClusters();
+    clusters->Clear();
+  }
 }
 // -------------------------------------------------------------------------
-
 
 // -------------------------------------------------------------------------
 void CbmMuchGeoScheme::ResetPads() {
@@ -369,33 +289,47 @@ void CbmMuchGeoScheme::ResetPads() {
 }
 // -------------------------------------------------------------------------
 
-
 // -------------------------------------------------------------------------
 vector<CbmMuchLayerSide*> CbmMuchGeoScheme::GetLayerSides(Int_t iStation) {
-  vector<CbmMuchLayerSide*> sides;
-  if (!fStations)
-    Fatal("InitGrid", "No input array of stations.");
-  CbmMuchStation* station = GetStation(iStation);
-  for (Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++) {
-    CbmMuchLayer* layer = station->GetLayer(iLayer);
-    for (Int_t iSide = 0; iSide < 2; iSide++) {
-      CbmMuchLayerSide* side = (CbmMuchLayerSide*) layer->GetSide(iSide);
-      sides.push_back(side);
-    }
+//  vector<CbmMuchLayerSide*> sides;
+//  for(map<Int_t, Int_t>::iterator it=fMapSides.begin(); it!=fMapSides.end(); it++){
+//    Int_t detectorId = (*it).first;
+//    Int_t stationIndex = GetStationIndex(detectorId);
+//    if(stationIndex == iStation) sides.push_back(GetLayerSideByDetId(detectorId));
+//  }
+
+  try
+  {
+    return fSides.at(iStation);
+  }
+  catch ( std::out_of_range exc)
+  {
+    Fatal("GetLayerSides","No input array of stations.");
   }
 
-  return sides;
 }
+
+//Int_t CbmMuchGeoScheme::GetLayerSideNr(Int_t detId){
+//  int i = 0;
+//  Int_t iStation = GetStationIndex(detId);
+//  for(Int_t iSt=0; iSt<=iStation; iSt++){
+//    i++;
+//    vector<CbmMuchLayerSide*> sides = GetLayerSides(iSt);
+//    for(Int_t iSide=0; iSide<sides.size(); iSide++){
+//      i++;
+//    }
+//  }
+// // assert(fMapSides[sideId] + 1 == sideNumber);
+//  return i;
+//}
 
 Int_t CbmMuchGeoScheme::GetLayerSideNr(Int_t detId) {
   Int_t sideId = GetLayerSideByDetId(detId)->GetDetectorId();
-//  printf("GetLayerSideNr: %qd %qd\n", detId, sideId);
   if (fMapSides.find(sideId) == fMapSides.end())
     Fatal("GetLayerSideNr", "Wrong side id or no modules in the layer side");
   return fMapSides[sideId] + 1;
 }
 // -------------------------------------------------------------------------
-
 
 // -------------------------------------------------------------------------
 void CbmMuchGeoScheme::ReadGeoFile(const char* geoName) {
@@ -595,8 +529,8 @@ void CbmMuchGeoScheme::CreateMuchCave() {
   // Calculate Z2 position of much cave according to position of the last
   // station layer
   Double_t muchZ2 = fMuchZ1 + fStationZ0[fNst - 1] + fLayersDz[fNst - 1]
-      * (fNlayers[fNst - 1] - 1) / 2. + (fSupportLz[fNst - 1] + fActiveLz) / 2.
-      + 3.;
+                                                               * (fNlayers[fNst - 1] - 1) / 2. + (fSupportLz[fNst - 1] + fActiveLz) / 2.
+                                                               + 3.;
   // Calculate cave radia
   Double_t muchRmin1 = fMuchZ1 * fAcceptanceTanMin - 0.001;
   Double_t muchRmin2 = muchZ2 * fAcceptanceTanMin - 0.001;
@@ -662,16 +596,15 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
   Double_t stGlobalZ0 = fStationZ0[st] + fMuchZ1;
   TVector3 size = TVector3(fActiveLx, fActiveLy, fActiveLz);
   Double_t stDz = ((fNlayers[st] - 1) * fLayersDz[st] + fSupportLz[st]
-      + fActiveLz) / 2. + 1;
+                                                                   + fActiveLz) / 2. + 1;
   Double_t stGlobalZ2 = stGlobalZ0 + stDz;
   Double_t rmin = stGlobalZ2 * fAcceptanceTanMin;
   Double_t rmax = stGlobalZ2 * fAcceptanceTanMax;
 
-  CbmMuchStationGem* station = new CbmMuchStationGem(st, stGlobalZ0);
+  CbmMuchStation* station = new CbmMuchStation(st, stGlobalZ0);
   station->SetRmin(rmin);
   station->SetRmax(rmax);
   station->SetModuleDesign(fModuleDesign[st]);
-  station->SetDetectorType(fDetType[st]);
 
   // Create layers
   for (Int_t l = 0; l < fNlayers[st]; l++) {
@@ -707,7 +640,7 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
           // Skip module if not in the acceptance
           if (pow(mX - fActiveLx / 2., 2) + pow(mY - fActiveLy / 2., 2)
               > rmax * rmax && pow(mX - fActiveLx / 2., 2) + pow(mY
-              + fActiveLy / 2., 2) > rmax * rmax)
+                  + fActiveLy / 2., 2) > rmax * rmax)
             continue;
           // Create module with positive x
           TVector3 pos = TVector3(mX, mY, mZ + layerGlobalZ0);
@@ -751,11 +684,10 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationStraw(Int_t st){
   Double_t rmin = stGlobalZ2 * fAcceptanceTanMin;
   Double_t rmax = stGlobalZ2 * fAcceptanceTanMax;
 
-  CbmMuchStationStraw* station = new CbmMuchStationStraw(st, stGlobalZ0);
+  CbmMuchStation* station = new CbmMuchStation(st, stGlobalZ0);
   station->SetRmin(rmin);
   station->SetRmax(rmax);
   station->SetModuleDesign(fModuleDesign[st]);
-  station->SetDetectorType(fDetType[st]);
 
 
   // Create layers
@@ -816,130 +748,61 @@ Int_t CbmMuchGeoScheme::Intersect(Float_t x, Float_t y, Float_t dx, Float_t dy,
 
 
 // -------------------------------------------------------------------------
-Double_t CbmMuchGeoScheme::GetMinPadSizeX(Int_t iStation){
+TVector2 CbmMuchGeoScheme::GetMinPadSize(Int_t iStation){
   Double_t padMinLx = std::numeric_limits<Double_t>::max();
-  vector<CbmMuchLayerSide*> vSides = GetLayerSides(iStation);
-
-  for(Int_t iSide = 0; iSide < vSides.size(); ++iSide){
-    CbmMuchLayerSide* side = vSides[iSide];
-    if(!side) continue;
-    for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
-      CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(iModule);
-      if(!module) continue;
-      for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){
-        CbmMuchSector* sector = module->GetSector(iSector);
-        if(!sector) continue;
-        Double_t padLx = sector->GetDx();
-        if(padLx < padMinLx) padMinLx = padLx;
-      }
-    }
-  }
-  return padMinLx;
-}
-
-// -------------------------------------------------------------------------
-Double_t CbmMuchGeoScheme::GetMinPadSizeY(Int_t iStation){
   Double_t padMinLy = std::numeric_limits<Double_t>::max();
-  vector<CbmMuchLayerSide*> vSides = GetLayerSides(iStation);
-
-  for(Int_t iSide = 0; iSide < vSides.size(); ++iSide){
-    CbmMuchLayerSide* side = vSides[iSide];
-    if(!side) continue;
-    for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
-      CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(iModule);
-      if(!module) continue;
-      for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){
-        CbmMuchSector* sector = module->GetSector(iSector);
-        if(!sector) continue;
-        Double_t padLy = sector->GetDy();
-        if(padLy < padMinLy) padMinLy = padLy;
-      }
-    }
+  vector<CbmMuchSector*> sectors = fSectors.at(iStation);
+  for(vector<CbmMuchSector*>::iterator it = sectors.begin(); it!=sectors.end(); it++){
+    CbmMuchSector* sector = (*it);
+    if(!sector) continue;
+    Double_t padLx = sector->GetDx();
+    Double_t padLy = sector->GetDy();
+    if(padLx < padMinLx) padMinLx = padLx;
+    if(padLy < padMinLy) padMinLy = padLy;
   }
-  return padMinLy;
+  return TVector2(padMinLx, padMinLy);
 }
-
+// -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-Double_t CbmMuchGeoScheme::GetMaxPadSizeX(Int_t iStation){
+TVector2 CbmMuchGeoScheme::GetMaxPadSize(Int_t iStation){
   Double_t padMaxLx = std::numeric_limits<Double_t>::min();
-  vector<CbmMuchLayerSide*> vSides = GetLayerSides(iStation);
-
-  for(Int_t iSide = 0; iSide < vSides.size(); ++iSide){
-    CbmMuchLayerSide* side = vSides[iSide];
-    if(!side) continue;
-    for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
-      CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(iModule);
-      if(!module) continue;
-      for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){
-        CbmMuchSector* sector = module->GetSector(iSector);
-        if(!sector) continue;
-        Double_t padLx = sector->GetDx();
-        if(padLx > padMaxLx) padMaxLx = padLx;
-      }
-    }
-  }
-  return padMaxLx;
-}
-
-// -------------------------------------------------------------------------
-Double_t CbmMuchGeoScheme::GetMaxPadSizeY(Int_t iStation){
   Double_t padMaxLy = std::numeric_limits<Double_t>::min();
-  vector<CbmMuchLayerSide*> vSides = GetLayerSides(iStation);
-
-  for(Int_t iSide = 0; iSide < vSides.size(); ++iSide){
-    CbmMuchLayerSide* side = vSides[iSide];
-    if(!side) continue;
-    for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
-      CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(iModule);
-      if(!module) continue;
-      for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){
-        CbmMuchSector* sector = module->GetSector(iSector);
-        if(!sector) continue;
-        Double_t padLy = sector->GetDy();
-        if(padLy > padMaxLy) padMaxLy = padLy;
-      }
-    }
+  vector<CbmMuchSector*> sectors = fSectors.at(iStation);
+  for(vector<CbmMuchSector*>::iterator it = sectors.begin(); it!=sectors.end(); it++){
+    CbmMuchSector* sector = (*it);
+    if(!sector) continue;
+    Double_t padLy = sector->GetDy();
+    Double_t padLx = sector->GetDx();
+    if(padLx > padMaxLx) padMaxLx = padLx;
+    if(padLy > padMaxLy) padMaxLy = padLy;
   }
-  return padMaxLy;
+  return TVector2(padMaxLx, padMaxLy);
 }
+// -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-Int_t CbmMuchGeoScheme::GetNChannels(Int_t iStation){
-  Int_t nChannels=0;
-  vector<CbmMuchLayerSide*> vSides = GetLayerSides(iStation);
-
-  for(Int_t iSide = 0; iSide < vSides.size(); ++iSide){
-    CbmMuchLayerSide* side = vSides[iSide];
-    if(!side) continue;
-    for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
-      CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(iModule);
-      if(!module) continue;
-      for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){
-        CbmMuchSector* sector = module->GetSector(iSector);
-        if(!sector) continue;
-        nChannels += sector->GetNChannels();
-      }
+vector<CbmMuchModule*> CbmMuchGeoScheme::GetModules(){
+  vector<CbmMuchModule*> modules;
+  for(Int_t iStation =0; iStation < GetNStations(); ++iStation){
+    for(vector<CbmMuchModule*>::iterator it=GetModules(iStation).begin(); it!=GetModules(iStation).end(); it++){
+      modules.push_back(*it);
     }
   }
-  return nChannels;
 }
+// -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-Int_t CbmMuchGeoScheme::GetNSectors(Int_t iStation){
-  Int_t nSectors=0;
-  vector<CbmMuchLayerSide*> vSides = GetLayerSides(iStation);
-
-  for(Int_t iSide = 0; iSide < vSides.size(); ++iSide){
-    CbmMuchLayerSide* side = vSides[iSide];
-    if(!side) continue;
-    for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
-      CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(iModule);
-      if(!module) continue;
-      nSectors += module->GetNSectors();
-    }
+vector<CbmMuchModule*> CbmMuchGeoScheme::GetModules(Int_t iStation){
+  try
+  {
+    return fModules.at(iStation);
   }
-  return nSectors;
+  catch ( std::out_of_range exc)
+  {
+    Fatal("GetModules","No input array of stations.");
+  }
 }
+// -------------------------------------------------------------------------
 
 ClassImp(CbmMuchGeoScheme)

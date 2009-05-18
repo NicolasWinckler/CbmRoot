@@ -6,6 +6,7 @@
 #include "CbmMuchPad.h"
 #include "CbmMuchGeoScheme.h"
 #include "TColor.h"
+#include "CbmMuchModuleGem.h"
 #include <iostream>
 
 using std::cout;
@@ -20,7 +21,7 @@ CbmMuchPad::CbmMuchPad (CbmMuchSector* sector, Int_t iChannel):TPolyLine(){
   // Generate detectorId
   fDetectorId = sector->GetDetectorId();
   Int_t iSector = sector->GetSectorIndex();
-  fChannelId = CbmMuchGeoScheme::GetChannelId(iSector, iChannel);
+  fChannelId = CbmMuchModuleGem::GetChannelId(iSector, iChannel);
 
   TVector3 secPos = sector->GetPosition();
   TVector3 secSize = sector->GetSize();
@@ -68,28 +69,36 @@ CbmMuchPad::~CbmMuchPad(){
 // -------------------------------------------------------------------------
 Double_t CbmMuchPad::GetSectorX0() const{
 	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-	return geoScheme->GetSectorByDetId(fDetectorId, fChannelId)->GetPosition()[0];
+//  return geoScheme->GetSectorByDetId(fDetectorId, fChannelId)->GetPosition()[0];
+	CbmMuchModuleGem* module = (CbmMuchModuleGem*) geoScheme->GetModuleByDetId(fDetectorId);
+  return module->GetSector(fChannelId)->GetPosition()[0];
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 Double_t CbmMuchPad::GetSectorY0() const{
 	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-	return geoScheme->GetSectorByDetId(fDetectorId, fChannelId)->GetPosition()[1];
+//	return geoScheme->GetSectorByDetId(fDetectorId, fChannelId)->GetPosition()[1];
+  CbmMuchModuleGem* module = (CbmMuchModuleGem*) geoScheme->GetModuleByDetId(fDetectorId);
+  return module->GetSector(fChannelId)->GetPosition()[1];
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 Double_t CbmMuchPad::GetLx() const{
 	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-	return geoScheme->GetSectorByDetId(fDetectorId, fChannelId)->GetDx();
+//	return geoScheme->GetSectorByDetId(fDetectorId, fChannelId)->GetDx();
+  CbmMuchModuleGem* module = (CbmMuchModuleGem*) geoScheme->GetModuleByDetId(fDetectorId);
+  return module->GetSector(fChannelId)->GetDx();
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 Double_t CbmMuchPad::GetLy() const{
 	CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-	return geoScheme->GetSectorByDetId(fDetectorId, fChannelId)->GetDy();
+//	return geoScheme->GetSectorByDetId(fDetectorId, fChannelId)->GetDy();
+  CbmMuchModuleGem* module = (CbmMuchModuleGem*) geoScheme->GetModuleByDetId(fDetectorId);
+  return module->GetSector(fChannelId)->GetDy();
 }
 // -------------------------------------------------------------------------
 
@@ -99,7 +108,8 @@ vector<CbmMuchPad*> CbmMuchPad::GetNeighbours(){
   CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
   for(Int_t i=0; i < fNeighbours.GetSize(); i++){
     Int_t channelId = fNeighbours.At(i);
-    CbmMuchPad* pad = geoScheme->GetPadByDetId(fDetectorId, channelId);
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*) geoScheme->GetModuleByDetId(fDetectorId);
+    CbmMuchPad* pad = module->GetPad(channelId);//geoScheme->GetPadByDetId(fDetectorId, channelId);
     if(pad) pads.push_back(pad);
   }
   return pads;
@@ -119,12 +129,6 @@ void CbmMuchPad::Reset(){
 void CbmMuchPad::SetFired(Int_t iDigi, Int_t charge, Int_t ADCcharge){
   fDigiIndex = iDigi;
   fCharge = charge;
-//  if (fDigiIndex>=0) fFired = 1;
-//  else fFired = 0;
-//  Int_t ch = fCharge/1000;
-//  if (ch>255) ch = 255;
-//  if (ch<10) ch = 10;
-//  if (fFired) SetFillColor(TColor::GetColor(255-ch,255-ch,245));
   if (fDigiIndex>=0) SetFillColor(TColor::GetColor(255-ADCcharge,255-ADCcharge,245));
   else SetFillColor(kYellow);
 }
@@ -140,7 +144,7 @@ void CbmMuchPad::DrawPad(){
 // -------------------------------------------------------------------------
 TString CbmMuchPad::GetInfo(){
     return Form("Channel:%i fired:%i charge:%i digiId:%i",
-         CbmMuchGeoScheme::GetChannelIndex(fChannelId),fDigiIndex>=0,fCharge,fDigiIndex);
+         CbmMuchModuleGem::GetChannelIndex(fChannelId),fDigiIndex>=0,fCharge,fDigiIndex);
 }
 // -------------------------------------------------------------------------
 

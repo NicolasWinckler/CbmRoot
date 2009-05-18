@@ -49,10 +49,11 @@ public:
   virtual ~CbmMuchModule();
 
   /** Accessors */
-  Int_t    GetDetectorId()  const { return fDetectorId; }
-  Double_t GetCutRadius()   const { return fCutRadius; }
-  TVector3 GetSize()        const { return fSize; }
-  TVector3 GetPosition()    const { return fPosition; }
+  Int_t    GetDetectorId()    const { return fDetectorId; }
+  Double_t GetCutRadius()     const { return fCutRadius; }
+  TVector3 GetSize()           const { return fSize; }
+  TVector3 GetPosition()      const { return fPosition; }
+  Int_t    GetDetectorType()  const { return fDetectorType; }
 
   virtual Bool_t InitModule() {}
   virtual void DrawModule(Color_t color) {}
@@ -60,6 +61,7 @@ public:
 
 protected:
   Int_t                  fDetectorId;            // Unique detector ID
+  Int_t                  fDetectorType;          // Detector type
   Double_t               fCutRadius;             // Radius of the cut (if any, otherwise = -1.) [cm]
   TVector3               fSize;                  // Size vector of the module (all dimensions in [cm])
   TVector3               fPosition;              // Location vector of the module center in global c.s. (all dimensions in [cm])

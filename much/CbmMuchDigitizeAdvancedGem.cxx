@@ -241,18 +241,18 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
         if (dist > padRad + fSpotRadius)
           continue; // rough search
 
-          TPolyLine* padPolygon = sector->GetPad(iChannel);
-          Double_t area;
-          if (!PolygonsIntersect(sector, *padPolygon, spotPolygon, area))
-            continue; // detailed search
-          UInt_t iCharge = (UInt_t) (nSecElectrons * area / spotArea);
-          Int_t channelId = CbmMuchGeoScheme::GetChannelId(iSector, iChannel); // channel id within the module
+        TPolyLine* padPolygon = sector->GetPad(iChannel);
+        Double_t area;
+        if (!PolygonsIntersect(sector, *padPolygon, spotPolygon, area))
+          continue; // detailed search
+        UInt_t iCharge = (UInt_t) (nSecElectrons * area / spotArea);
+        Int_t channelId = CbmMuchModuleGem::GetChannelId(iSector, iChannel); // channel id within the module
 
-          if (chargedPads.find(channelId) == chargedPads.end()) {
-            chargedPads[channelId] = new CbmMuchDigi(detectorId,
-                channelId, time, fDTime);
-          }
-          chargedPads[channelId]->AddCharge(iCharge); // add charge to digi
+        if (chargedPads.find(channelId) == chargedPads.end()) {
+          chargedPads[channelId] = new CbmMuchDigi(detectorId,
+              channelId, time, fDTime);
+        }
+        chargedPads[channelId]->AddCharge(iCharge); // add charge to digi
       } // loop channels
     } // loop fired sectors
   } // loop primary electrons
@@ -336,24 +336,17 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
       continue;
     }
 
-    CbmMuchStation* station = fGeoScheme->GetStationByDetId(point->GetDetectorID());
-
-    if (station->GetDetectorType()==1) {
-
-      // Get the module the point is in
-      CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(
-          point->GetDetectorID());
-      if (!module) {
-        fNFailed++;
-        continue;
-      }
-
-      // Produce Digis
-      if (!ExecAdvanced(point, iPoint))
-        continue;
-
-
+    // Get the module the point is in
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(
+        point->GetDetectorID());
+    if (!module) {
+      fNFailed++;
+      continue;
     }
+    // Process only appropriate module types
+    if(module->GetDetectorType()!=1) continue;
+    // Produce Digis
+    ExecAdvanced(point, iPoint);
   } // MuchPoint loop
 
   FirePads();
@@ -392,7 +385,6 @@ InitStatus CbmMuchDigitizeAdvancedGem::Init() {
   // Initialize GeoScheme
   TObjArray* stations = (TObjArray*) fDigiFile->Get("stations");
   fGeoScheme->Init(stations);
-  fGeoScheme->InitGrid();
 
   // Get input array of MuchPoints
   fPoints = (TClonesArray*) ioman->GetObject("MuchPoint");

@@ -5,137 +5,130 @@
  */
 void much_seg_info(TString digiFile = ""){
 
-   TString inputdir = gSystem->Getenv("VMCWORKDIR");
-   if (digiFile == "") {
-      digiFile = inputdir + "/macro/much/data/much_digi.root";
-   }
+  TString inputdir = gSystem->Getenv("VMCWORKDIR");
+  if (digiFile == "") {
+    digiFile = inputdir + "/macro/much/data/much_digi.root";
+  }
 
-   // ----  Load libraries   -------------------------------------------------
-   cout << endl << "=== much_seg_info.C : Loading libraries ..." << endl;
-   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-   basiclibs();
-   gSystem->Load("libGeoBase");
-   gSystem->Load("libParBase");
-   gSystem->Load("libBase");
-   gSystem->Load("libCbmBase");
-   gSystem->Load("libCbmData");
-   gSystem->Load("libField");
-   gSystem->Load("libGen");
-   gSystem->Load("libPassive");
-   gSystem->Load("libSts");
-   gSystem->Load("libTrd");
-   gSystem->Load("libTof");
-   gSystem->Load("libMuch");
-   // -----------------------------------------------------------------------
+  // ----  Load libraries   -------------------------------------------------
+  cout << endl << "=== much_seg_info.C : Loading libraries ..." << endl;
+  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
+  basiclibs();
+  gSystem->Load("libGeoBase");
+  gSystem->Load("libParBase");
+  gSystem->Load("libBase");
+  gSystem->Load("libCbmBase");
+  gSystem->Load("libCbmData");
+  gSystem->Load("libField");
+  gSystem->Load("libGen");
+  gSystem->Load("libPassive");
+  gSystem->Load("libSts");
+  gSystem->Load("libTrd");
+  gSystem->Load("libTof");
+  gSystem->Load("libMuch");
+  // -----------------------------------------------------------------------
 
 
-   TFile* f = new TFile(digiFile.Data());
-   f->ls();
-   Int_t nPadsTotal = 0;
-   Int_t nSectorsTotal = 0;
-   TObjArray* stations = (TObjArray*) f->Get("stations");
-   printf("\n\n\n---------------------------------------------------------------------\n");
-   for (Int_t st=0;st<stations->GetEntriesFast();st++){
-      Int_t nSectors = 0;
-      Int_t nPads = 0;
-      TObjArray* sectors = new TObjArray();
-      CbmMuchStation* station = (CbmMuchStation*) stations->At(st);
-      for(Int_t iLayer=0; iLayer < station->GetNLayers(); ++iLayer){
-         CbmMuchLayer* layer = station->GetLayer(iLayer);
-         for (Int_t s=1;s>=0;s--){
-            CbmMuchLayerSide* side = layer->GetSide(s);
-            for (Int_t m=0;m<side->GetNModules();m++) {
-               CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(m);
-               nSectors += module->GetNSectors();
-               for (Int_t j=0;j<module->GetNSectors();j++){
-                  CbmMuchSector* sector = module->GetSector(j);
-                  nPads += sector->GetNChannels();
-                  // Find if the sector of such size already in the list
-                  Int_t sec_nX = sector->GetPosition()[0] < 0 ? -1 : 1;
-                  Int_t sec_nY = sector->GetPosition()[1] < 0 ? -1 : 1;
-                  Double_t secLx = sector->GetSize()[0];
-                  Double_t secLy = sector->GetSize()[1];
-                  // Position of the corner closest to the center of the layer
-                  Double_t secX = sec_nX*(sector->GetPosition()[0] - secLx/2.);
-                  Double_t secY = sec_nY*(sector->GetPosition()[1] - secLy/2.);
-                  CbmMuchSector* sec = NULL;
-                  Bool_t exists = false;
-                  Int_t i;
-                  for(i=0; i<sectors->GetEntries(); ++i){
-                     sec = (CbmMuchSector*) sectors->At(i);
-                     Double_t lx = sec->GetSize()[0];
-                     Double_t ly = sec->GetSize()[1];
-                     if(TMath::Abs(lx-secLx) < TMath::Max(lx, secLx)/4. &&
-                           TMath::Abs(ly-secLy) < TMath::Max(ly, secLy)/4.){
-                        exists = true;
-                        break;
-                     }
-                  }
-                  if(exists){
-                     Int_t nX = sec->GetPosition()[0] < 0 ? -1 : 1;
-                     Int_t nY = sec->GetPosition()[1] < 0 ? -1 : 1;
-                     Double_t x = nX*(sec->GetPosition()[0] - sec->GetSize()[0]/2.);
-                     Double_t y = nY*(sec->GetPosition()[1] - sec->GetSize()[1]/2.);
-                     Double_t rad = TMath::Sqrt(x*x + y*y);
-                     Double_t secRad = TMath::Sqrt(secX*secX + secY*secY);
-                     if(rad < secRad) sectors->AddAt(sector, i);
-                  }
-                  else sectors->Add(sector);
-               } // sectors
-            } // modules
-         } // sides
-      } // layers
-
-      nPadsTotal += nPads;
-      nSectorsTotal += nSectors;
-
-      // Sort sectors by their radii
-      for(Int_t i=0; i<sectors->GetEntries(); ++i){
-         for(Int_t j=0; j<sectors->GetEntries() - 1; ++j){
-            CbmMuchSector* sec1 = (CbmMuchSector*)sectors->At(j);
-            Int_t nX1 = sec1->GetPosition()[0] < 0 ? -1 : 1;
-            Int_t nY1 = sec1->GetPosition()[1] < 0 ? -1 : 1;
-            Double_t x1 = nX1*(sec1->GetPosition()[0] - sec1->GetSize()[0]/2.);
-            Double_t y1 = nY1*(sec1->GetPosition()[1] - sec1->GetSize()[1]/2.);
-            Double_t rad1 = TMath::Sqrt(x1*x1 + y1*y1);
-            CbmMuchSector* sec2 = (CbmMuchSector*)sectors->At(j+1);
-            Int_t nX2 = sec2->GetPosition()[0] < 0 ? -1 : 1;
-            Int_t nY2 = sec2->GetPosition()[1] < 0 ? -1 : 1;
-            Double_t x2 = nX2*(sec2->GetPosition()[0] - sec2->GetSize()[0]/2.);
-            Double_t y2 = nY2*(sec2->GetPosition()[1] - sec2->GetSize()[1]/2.);
-            Double_t rad2 = TMath::Sqrt(x2*x2 + y2*y2);
-            if(rad1 > rad2) {
-               sectors->AddAt(sec1, j+1);
-               sectors->AddAt(sec2, j);
+  TFile* f = new TFile(digiFile.Data());
+  f->ls();
+  Int_t nPadsTotal = 0;
+  Int_t nSectorsTotal = 0;
+  TObjArray* stations = (TObjArray*) f->Get("stations");
+  printf("\n\n\n---------------------------------------------------------------------\n");
+  for (Int_t st=0;st<stations->GetEntriesFast();st++){
+    Int_t nSectors = 0;
+    Int_t nPads = 0;
+    TObjArray* sectors = new TObjArray();
+    CbmMuchStation* station = (CbmMuchStation*) stations->At(st);
+    for(Int_t iLayer=0; iLayer < station->GetNLayers(); ++iLayer){
+      CbmMuchLayer* layer = station->GetLayer(iLayer);
+      for (Int_t s=1;s>=0;s--){
+        CbmMuchLayerSide* side = layer->GetSide(s);
+        for (Int_t m=0;m<side->GetNModules();m++) {
+          CbmMuchModuleGem* module = (CbmMuchModuleGem*)side->GetModule(m);
+          nSectors += module->GetNSectors();
+          for (Int_t j=0;j<module->GetNSectors();j++){
+            CbmMuchSector* sector = module->GetSector(j);
+            nPads += sector->GetNChannels();
+            // Find if the sector of such size already in the list
+            Int_t sec_nX = sector->GetPosition()[0] < 0 ? -1 : 1;
+            Int_t sec_nY = sector->GetPosition()[1] < 0 ? -1 : 1;
+            Double_t secLx = sector->GetSize()[0];
+            Double_t secLy = sector->GetSize()[1];
+            // Position of the corner closest to the center of the layer
+            Double_t secX = sec_nX*(sector->GetPosition()[0] - secLx/2.);
+            Double_t secY = sec_nY*(sector->GetPosition()[1] - secLy/2.);
+            CbmMuchSector* sec = NULL;
+            Bool_t exists = false;
+            Int_t i;
+            for(i=0; i<sectors->GetEntries(); ++i){
+              sec = (CbmMuchSector*) sectors->At(i);
+              Double_t lx = sec->GetSize()[0];
+              Double_t ly = sec->GetSize()[1];
+              if(TMath::Abs(lx-secLx) < TMath::Max(lx, secLx)/4. &&
+                  TMath::Abs(ly-secLy) < TMath::Max(ly, secLy)/4.){
+                exists = true;
+                break;
+              }
             }
-         }
-      }
-
-      // Print output information
-      printf("Station %i:\n", st);
-      switch(station->GetDetectorType()){
-         case 1:
-            for(Int_t i=0; i<sectors->GetEntries(); ++i){
-               CbmMuchSector* sec = (CbmMuchSector*) sectors->At(i);
-               Int_t nX = sec->GetPosition()[0] < 0 ? -1 : 1;
-               Int_t nY = sec->GetPosition()[1] < 0 ? -1 : 1;
-               Double_t x = nX*(sec->GetPosition()[0] - sec->GetSize()[0]/2.);
-               Double_t y = nY*(sec->GetPosition()[1] - sec->GetSize()[1]/2.);
-               Double_t rad = TMath::Sqrt(x*x + y*y);
-               printf("   Region %i:\n", i);
-               printf("      radius: %6.3f [cm]:\n", rad);
-               printf("      sector size: %4.2fx%4.2f [cm^2]\n", sec->GetSize()[0], sec->GetSize()[1]);
-               printf("      pad size: %4.2fx%4.2f [cm^2]\n", sec->GetDx(), sec->GetDy());
+            if(exists){
+              Int_t nX = sec->GetPosition()[0] < 0 ? -1 : 1;
+              Int_t nY = sec->GetPosition()[1] < 0 ? -1 : 1;
+              Double_t x = nX*(sec->GetPosition()[0] - sec->GetSize()[0]/2.);
+              Double_t y = nY*(sec->GetPosition()[1] - sec->GetSize()[1]/2.);
+              Double_t rad = TMath::Sqrt(x*x + y*y);
+              Double_t secRad = TMath::Sqrt(secX*secX + secY*secY);
+              if(rad < secRad) sectors->AddAt(sector, i);
             }
-            printf("   Number of sectors: %i\n", nSectors);
-            printf("   Number of channels: %i\n", nPads);
-            break;
-         case 2:
-            printf("   Straw tubes station.\n");
-            break;
+            else sectors->Add(sector);
+          } // sectors
+        } // modules
+      } // sides
+    } // layers
+
+    nPadsTotal += nPads;
+    nSectorsTotal += nSectors;
+
+    // Sort sectors by their radii
+    for(Int_t i=0; i<sectors->GetEntries(); ++i){
+      for(Int_t j=0; j<sectors->GetEntries() - 1; ++j){
+        CbmMuchSector* sec1 = (CbmMuchSector*)sectors->At(j);
+        Int_t nX1 = sec1->GetPosition()[0] < 0 ? -1 : 1;
+        Int_t nY1 = sec1->GetPosition()[1] < 0 ? -1 : 1;
+        Double_t x1 = nX1*(sec1->GetPosition()[0] - sec1->GetSize()[0]/2.);
+        Double_t y1 = nY1*(sec1->GetPosition()[1] - sec1->GetSize()[1]/2.);
+        Double_t rad1 = TMath::Sqrt(x1*x1 + y1*y1);
+        CbmMuchSector* sec2 = (CbmMuchSector*)sectors->At(j+1);
+        Int_t nX2 = sec2->GetPosition()[0] < 0 ? -1 : 1;
+        Int_t nY2 = sec2->GetPosition()[1] < 0 ? -1 : 1;
+        Double_t x2 = nX2*(sec2->GetPosition()[0] - sec2->GetSize()[0]/2.);
+        Double_t y2 = nY2*(sec2->GetPosition()[1] - sec2->GetSize()[1]/2.);
+        Double_t rad2 = TMath::Sqrt(x2*x2 + y2*y2);
+        if(rad1 > rad2) {
+          sectors->AddAt(sec1, j+1);
+          sectors->AddAt(sec2, j);
+        }
       }
-      printf("---------------------------------------------------------------------\n");
-   }//stations
-   printf("Total number of sectors: %i\n", nSectorsTotal);
-   printf("Total number of channels: %i\n", nPadsTotal);
+    }
+
+    // Print output information
+    printf("Station %i:\n", st);
+    for(Int_t i=0; i<sectors->GetEntries(); ++i){
+      CbmMuchSector* sec = (CbmMuchSector*) sectors->At(i);
+      Int_t nX = sec->GetPosition()[0] < 0 ? -1 : 1;
+      Int_t nY = sec->GetPosition()[1] < 0 ? -1 : 1;
+      Double_t x = nX*(sec->GetPosition()[0] - sec->GetSize()[0]/2.);
+      Double_t y = nY*(sec->GetPosition()[1] - sec->GetSize()[1]/2.);
+      Double_t rad = TMath::Sqrt(x*x + y*y);
+      printf("   Region %i:\n", i);
+      printf("      radius: %6.3f [cm]:\n", rad);
+      printf("      sector size: %4.2fx%4.2f [cm^2]\n", sec->GetSize()[0], sec->GetSize()[1]);
+      printf("      pad size: %4.2fx%4.2f [cm^2]\n", sec->GetDx(), sec->GetDy());
+    }
+    printf("   Number of sectors: %i\n", nSectors);
+    printf("   Number of channels: %i\n", nPads);
+    printf("---------------------------------------------------------------------\n");
+  }//stations
+  printf("Total number of sectors: %i\n", nSectorsTotal);
+  printf("Total number of channels: %i\n", nPadsTotal);
 }

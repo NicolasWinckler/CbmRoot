@@ -23,7 +23,7 @@ void much_hitsQa(){
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
-  gSystem->Load("libMvd");
+  //gSystem->Load("libMvd");
   gSystem->Load("libSts");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");

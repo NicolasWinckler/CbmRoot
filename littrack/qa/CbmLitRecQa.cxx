@@ -1,7 +1,7 @@
 #include "CbmLitRecQa.h"
 
 #include "CbmMuchTrack.h"
-#include "CbmMuchTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmMuchHit.h"
 #include "CbmTrdTrack.h"
 #include "CbmTrdTrackMatch.h"
@@ -174,7 +174,7 @@ void CbmLitRecQa::ProcessMuchTracks()
   for (Int_t iRec = 0; iRec < fEvNofRecTracks; iRec++) {
 
 	  CbmMuchTrack* recTrack = (CbmMuchTrack*) fRecTracks->At(iRec);
-	  CbmMuchTrackMatch* recMatch = (CbmMuchTrackMatch*) fRecMatches->At(iRec);
+	  CbmTrackMatch* recMatch = (CbmTrackMatch*) fRecMatches->At(iRec);
 	  if (recTrack == NULL || recMatch == NULL) continue;
 	  Int_t mcIdRec = recMatch->GetMCTrackId();
 

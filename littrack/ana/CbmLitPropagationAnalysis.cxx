@@ -23,7 +23,7 @@
 #include "CbmMuchTrack.h"
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
-#include "CbmMuchTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmStsTrackMatch.h"
 #include "CbmTrdTrackMatch.h"
 #include "FairMCPoint.h"

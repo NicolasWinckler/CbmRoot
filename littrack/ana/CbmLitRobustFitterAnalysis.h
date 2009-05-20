@@ -9,7 +9,7 @@
 #include "CbmLitPtrTypes.h"
 
 class CbmLitTrack;
-class CbmMuchTrackMatch;
+class CbmTrackMatch;
 class CbmTrdTrackMatch;
 class TList;
 class TH1D;
@@ -42,7 +42,7 @@ protected:
 			Int_t id);
 	void MatchTracks(
 			TrackPtrVector& tracks,
-			std::vector<CbmMuchTrackMatch*>& matches);
+			std::vector<CbmTrackMatch*>& matches);
 	void MatchTracks(
 			TrackPtrVector& tracks,
 			std::vector<CbmTrdTrackMatch*>& matches);
@@ -51,7 +51,7 @@ private:
 	DetectorId fDetId;
 	Int_t fNofVars;
 	std::vector<TrackPtrVector> fLitTracks;
-	std::vector<std::vector<CbmMuchTrackMatch*> > fLitMuchTrackMatches;
+	std::vector<std::vector<CbmTrackMatch*> > fLitMuchTrackMatches;
 	std::vector<std::vector<CbmTrdTrackMatch*> > fLitTrdTrackMatches;
 
 	Int_t fNofPlanes;

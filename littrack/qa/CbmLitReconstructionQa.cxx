@@ -9,7 +9,7 @@
 
 #include "CbmGlobalTrack.h"
 #include "CbmStsTrackMatch.h"
-#include "CbmMuchTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmTrdTrackMatch.h"
 #include "CbmTofHit.h"
 #include "CbmTofPoint.h"
@@ -174,9 +174,9 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 			trdTrackMatch = (CbmTrdTrackMatch*) fTrdMatches->At(trdId);
 			isTrdOk = CheckTrdTrackQuality(trdTrackMatch);
 		}
-		CbmMuchTrackMatch* muchTrackMatch;
+		CbmTrackMatch* muchTrackMatch;
 		if (isMuchOk) {
-			muchTrackMatch = (CbmMuchTrackMatch*) fMuchMatches->At(muchId);
+			muchTrackMatch = (CbmTrackMatch*) fMuchMatches->At(muchId);
 			isMuchOk = CheckMuchTrackQuality(muchTrackMatch);
 		}
 
@@ -240,7 +240,7 @@ Bool_t CbmLitReconstructionQa::CheckTrdTrackQuality(
 }
 
 Bool_t CbmLitReconstructionQa::CheckMuchTrackQuality(
-		CbmMuchTrackMatch* trackMatch)
+		CbmTrackMatch* trackMatch)
 {
 	Int_t mcId = trackMatch->GetMCTrackId();
 	if(mcId < 0) return false;

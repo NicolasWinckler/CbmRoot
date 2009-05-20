@@ -101,7 +101,7 @@ private:
 	TClonesArray* fMuchTracks; // CbmMuchTracks array
 	TClonesArray* fMuchHits; // CbmMuchHits array
 	TClonesArray* fMuchPoints; // CbmMuchPoint array
-	TClonesArray* fMuchTrackMatches; // CbmMuchTrackMatch array
+	TClonesArray* fMuchTrackMatches; // CbmTrackMatch array
 	TClonesArray* fMuchDigiMatches; // CbmMuchDigiMatch array
 	TClonesArray* fTrdTracks; // CbmTrdTrack array
 	TClonesArray* fTrdHits; // CbmTrdHit array

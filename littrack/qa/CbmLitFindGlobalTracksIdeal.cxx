@@ -9,7 +9,7 @@
 
 #include "CbmStsTrackMatch.h"
 #include "CbmTrdTrackMatch.h"
-#include "CbmMuchTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmTofHit.h"
 #include "CbmTofPoint.h"
 #include "CbmGlobalTrack.h"
@@ -142,7 +142,7 @@ void CbmLitFindGlobalTracksIdeal::FillMapMuch()
 	fMcMuchMap.clear();
 	Int_t nofMuchTracks = fMuchMatches->GetEntriesFast();
 	for(Int_t iMuchTrack = 0; iMuchTrack < nofMuchTracks; iMuchTrack++) {
-		CbmMuchTrackMatch* muchTrackMatch = (CbmMuchTrackMatch*) fMuchMatches->At(iMuchTrack);
+		CbmTrackMatch* muchTrackMatch = (CbmTrackMatch*) fMuchMatches->At(iMuchTrack);
 		if (muchTrackMatch == NULL) continue;
 		Int_t mcId = muchTrackMatch->GetMCTrackId();
 		if(mcId == -1) continue;

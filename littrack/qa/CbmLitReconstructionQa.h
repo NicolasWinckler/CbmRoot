@@ -18,7 +18,7 @@
 
 class CbmStsTrackMatch;
 class CbmTrdTrackMatch;
-class CbmMuchTrackMatch;
+class CbmTrackMatch;
 class CbmMCTrack;
 class TClonesArray;
 class TH1;
@@ -123,7 +123,7 @@ private:
      * @param trackMatch MUCH track match
      */
 	Bool_t CheckMuchTrackQuality(
-			CbmMuchTrackMatch* trackMatch);
+			CbmTrackMatch* trackMatch);
 
     /**
      * Loops over the MC tracks. Checks the track acceptance for different cases.
@@ -220,7 +220,7 @@ private:
 	TClonesArray* fMCTracks; // CbmMCTrack array
 	TClonesArray* fGlobalTracks; // CbmGlobalTrack array
 	TClonesArray* fStsMatches; // CbmStsTrackMatch array
-	TClonesArray* fMuchMatches; // CbmMuchTrackMatch array
+	TClonesArray* fMuchMatches; // CbmTrackMatch array
 	TClonesArray* fTrdMatches; // CbmTrdTrackMatch array
 	TClonesArray* fTofPoints; // CbmTofPoint array
 	TClonesArray* fTofHits; // CbmTofHit array

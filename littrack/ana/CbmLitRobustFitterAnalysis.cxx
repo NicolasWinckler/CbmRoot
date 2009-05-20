@@ -16,7 +16,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
-#include "CbmMuchTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmTrdTrackMatch.h"
 #include "CbmGeoMuchPar.h"
 #include "FairMCPoint.h"
@@ -118,7 +118,7 @@ void CbmLitRobustFitterAnalysis::FillHistograms(
 		//if (track->GetChi2()/track->GetNDF() > 5) continue;
 		Int_t nofTrue, nofFalse;
 		if (fDetId == kMUCH) {
-			CbmMuchTrackMatch* trackMatch = fLitMuchTrackMatches[id][i];
+			CbmTrackMatch* trackMatch = fLitMuchTrackMatches[id][i];
 			nofTrue = trackMatch->GetNofTrueHits();
 			nofFalse = trackMatch->GetNofWrongHits() + trackMatch->GetNofFakeHits();
 		} else {
@@ -206,7 +206,7 @@ void CbmLitRobustFitterAnalysis::CreateTrackArrays()
 
 void CbmLitRobustFitterAnalysis::MatchTracks(
 		TrackPtrVector& tracks,
-		std::vector<CbmMuchTrackMatch*>& matches)
+		std::vector<CbmTrackMatch*>& matches)
 {
 	for (TrackPtrIterator it = tracks.begin(); it < tracks.end(); it++) {
 		std::map<Int_t, Int_t> matchMap;
@@ -238,7 +238,7 @@ void CbmLitRobustFitterAnalysis::MatchTracks(
 		Int_t nofWrong = nofHits - nofTrue - nofFake;
 		Int_t nofMcTracks = matchMap.size() - 1;
 
-		matches.push_back(new CbmMuchTrackMatch(bestMcTrackId, nofTrue, nofWrong, nofFake, nofMcTracks));
+		matches.push_back(new CbmTrackMatch(bestMcTrackId, nofTrue, nofWrong, nofFake, nofMcTracks));
 //		std::cout << "match added" << std::endl;
 	} // Track loop
 }

@@ -197,8 +197,8 @@ void much_sim(TString inputSignal = "",
   // ------------------------------------------------------------------------
 
 
-  // -----   Run initialisation   -------------------------------------------
-  cout << endl << "=== much_sim.C : Initialise run ..." << endl;
+  // -----   Run initialization   -------------------------------------------
+  cout << endl << "=== much_sim.C : Initialize run ..." << endl;
   fRun->Init();
   // ------------------------------------------------------------------------
 

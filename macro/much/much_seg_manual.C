@@ -66,7 +66,6 @@ void much_seg_manual(const char* mcFile = "",
   fRun->LoadGeometry();
   // ------------------------------------------------------------------------
 
-
   // -----  Segmentation task  ----------------------------------------------
   CbmMuchSegmentManual* seg = new CbmMuchSegmentManual(digiFile);
   // Number of stations
@@ -95,23 +94,20 @@ void much_seg_manual(const char* mcFile = "",
   seg->SetRegionRadii(5, st5_rad);
 
   // Set minimum pad size/resolution [cm] in the center region for each station
-  Double_t padLx[] = {0.1386, 0.4, 0.8, 0.8 ,0.8, 0.8};
-  Double_t padLy[] = {0.1386, 0.4, 0.8, 0.8 ,0.8, 0.8};
-  seg->SetMinPadLx(padLx);
-  seg->SetMinPadLy(padLy);
+  Double_t padLx[] = {0.1486, 0.4, 0.8, 0.8 ,0.8, 0.8};
+  Double_t padLy[] = {0.1486, 0.4, 0.8, 0.8 ,0.8, 0.8};
+  seg->SetMinPadSize(padLx, padLy);
 
   // Set maximum allowed pad size/resolution [cm] for each station
   Double_t sigmaX[] = {0.32, 0.32, 0.32, 0.32, 0.32, 0.32};
   Double_t sigmaY[] = {0.32, 0.32, 0.32, 0.32, 0.32, 0.32};
-  seg->SetMaxSigmaX(sigmaX);
-  seg->SetMaxSigmaY(sigmaY);
+  seg->SetMaxSigma(sigmaX, sigmaY);
 
   fRun->AddTask(seg);
   // ------------------------------------------------------------------------
 
   // Run segmentation
   fRun->Init();
-  //fRun->Run(0,nEvents);
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;

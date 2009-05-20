@@ -50,6 +50,7 @@ void much_seg_info(TString digiFile = ""){
           for (Int_t j=0;j<module->GetNSectors();j++){
             CbmMuchSector* sector = module->GetSector(j);
             nPads += sector->GetNChannels();
+            if(sector->GetNChannels() < module->GetSector(0)->GetNChannels()) continue;
             // Find if the sector of such size already in the list
             Int_t sec_nX = sector->GetPosition()[0] < 0 ? -1 : 1;
             Int_t sec_nY = sector->GetPosition()[1] < 0 ? -1 : 1;

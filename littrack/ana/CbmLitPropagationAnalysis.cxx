@@ -12,6 +12,7 @@
 #include "CbmLitHit.h"
 #include "CbmLitPixelHit.h"
 #include "CbmLitStripHit.h"
+#include "CbmLitSimpleGeometryConstructor.h"
 
 #include "CbmHit.h"
 #include "CbmGlobalTrack.h"
@@ -65,6 +66,9 @@ InitStatus CbmLitPropagationAnalysis::Init()
 	DetermineSetup();
 	ReadDataBranches();
 
+//	fGeoConstructor.ConstructGeometry();
+//	fGeoConstructor.Draw();
+
 	// Create tools
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
 	fPropagator = factory->CreateTrackPropagator("lit");
@@ -73,6 +77,8 @@ InitStatus CbmLitPropagationAnalysis::Init()
 	fSmoother = factory->CreateTrackFitter("kalman_smoother");
 
 	CreateHistograms();
+
+
 }
 
 void CbmLitPropagationAnalysis::SetParContainers()
@@ -101,6 +107,8 @@ void CbmLitPropagationAnalysis::Finish()
 			fSmootherHistos[i][j]->Write();
 		}
 	}
+
+	PrintStopwatchStatistics();
 }
 
 void CbmLitPropagationAnalysis::DetermineSetup()
@@ -213,7 +221,7 @@ void CbmLitPropagationAnalysis::CreateHistograms()
 				if (v == 0) fPropagationHistos[i][j] = hist;
 				if (v == 1) fFilterHistos[i][j] = hist;
 				if (v == 2) fSmootherHistos[i][j] = hist;
-				std::cout << histName.str() << std::endl << histTitle.str() << std::endl;
+//				std::cout << histName.str() << std::endl << histTitle.str() << std::endl;
 			}
 		}
 	}
@@ -403,6 +411,7 @@ void CbmLitPropagationAnalysis::TestPropagation(
 		CbmLitTrack* mcTrack)
 {
 	CbmLitTrackParam par(*track->GetParamLast());
+	fPropagationWatch.Start(kFALSE);
 	for (Int_t i = 0; i < track->GetNofHits(); i++){
 		Double_t zOut = track->GetHit(i)->GetZ();
          if (fPropagator->Propagate(&par, zOut, track->GetPDG()) == kLITERROR) continue;
@@ -410,6 +419,7 @@ void CbmLitPropagationAnalysis::TestPropagation(
          FillHistosPropagation(&par, mcTrack->GetFitNode(i)->GetPredictedParam(), track->GetHit(i), i);
 //         if (fFilter->Update(&par, track->GetHit(i)) == kLITERROR) continue;
 	}
+	fPropagationWatch.Stop();
 }
 
 void CbmLitPropagationAnalysis::TestFitter(
@@ -417,8 +427,12 @@ void CbmLitPropagationAnalysis::TestFitter(
 		CbmLitTrack* mcTrack)
 {
 	LitStatus fitStatus, smoothStatus;
+	fFitterWatch.Start(kFALSE);
 	fitStatus = fFitter->Fit(track);
+	fFitterWatch.Stop();
+	fSmootherWatch.Start(kFALSE);
 	if (fitStatus == kLITSUCCESS) smoothStatus = fSmoother->Fit(track);
+	fSmootherWatch.Stop();
 	if (fitStatus == kLITSUCCESS && smoothStatus == kLITSUCCESS)
 		FillHistosFitter(track, mcTrack);
 }
@@ -498,6 +512,26 @@ std::vector<Double_t> CbmLitPropagationAnalysis::CalcResidualsAndPulls(
     if (par->GetCovariance(14) > 0.) r[9] = (r[4]) / (std::sqrt(par->GetCovariance(14)));
     r[10] = 100 * ((1./par->GetQp() - 1./mcPar->GetQp()) / (std::abs(1./mcPar->GetQp())));
     return r;
+}
+
+void CbmLitPropagationAnalysis::PrintStopwatchStatistics()
+{
+	std::cout << "Stopwatch: " << std::endl;
+	std::cout << "propagation: counts=" << fPropagationWatch.Counter()
+		<< ", real=" << fPropagationWatch.RealTime()/fPropagationWatch.Counter()
+		<< "/" << fPropagationWatch.RealTime()
+		<< " s, cpu=" << fPropagationWatch.CpuTime()/fPropagationWatch.Counter()
+		<< "/" << fPropagationWatch.CpuTime() << std::endl;
+	std::cout << "fitter: real=" << fFitterWatch.Counter()
+		<< ", real=" << fFitterWatch.RealTime()/fFitterWatch.Counter()
+		<< "/" << fFitterWatch.RealTime()
+		<< " s, cpu=" << fFitterWatch.CpuTime()/fFitterWatch.Counter()
+		<< "/" << fFitterWatch.CpuTime() << std::endl;
+	std::cout << "smoother: real=" << fSmootherWatch.Counter()
+		<< ", real=" << fSmootherWatch.RealTime()/fSmootherWatch.Counter()
+		<< "/" << fSmootherWatch.RealTime()
+		<< " s, cpu=" << fSmootherWatch.CpuTime()/fSmootherWatch.Counter()
+		<< "/" << fSmootherWatch.CpuTime() << std::endl;
 }
 
 ClassImp(CbmLitPropagationAnalysis)

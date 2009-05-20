@@ -7,6 +7,7 @@
 #include "CbmLitStripHit.h"
 #include "CbmLitTrack.h"
 #include "CbmLitToolFactory.h"
+//#include "CbmLitSimpleGeometryConstructor.h"
 
 #include "CbmStsTrack.h"
 #include "CbmTrdTrack.h"
@@ -39,6 +40,10 @@ InitStatus CbmLitFindGlobalTracks::Init()
 {
 	DetermineSetup();
 	ReadAndCreateDataBranches();
+
+//	CbmLitSimpleGeometryConstructor geoConstructor;
+//	geoConstructor.ConstructGeometry();
+
 	InitTrackReconstruction();
 
 	return kSUCCESS;
@@ -80,7 +85,7 @@ void CbmLitFindGlobalTracks::SetParContainers()
 
 void CbmLitFindGlobalTracks::Finish()
 {
-
+	PrintStopwatchStatistics();
 }
 
 void CbmLitFindGlobalTracks::DetermineSetup()
@@ -192,7 +197,6 @@ void CbmLitFindGlobalTracks::ConvertInputData()
 
 void CbmLitFindGlobalTracks::ConvertOutputData()
 {
-	//CbmLitConverter::TrackVectorToTrdTrackArray(fLitTrdTracks, fTrdTracks);
 	CbmLitConverter::LitTrackVectorToGlobalTrackArray(fLitOutputTracks, fGlobalTracks, fStsTracks, fTrdTracks, fMuchTracks);
 }
 
@@ -225,10 +229,36 @@ void CbmLitFindGlobalTracks::InitStsTrackSeeds()
 
 void CbmLitFindGlobalTracks::RunTrackReconstruction()
 {
-	if (fIsElectronSetup && fIsTrd) fFinder->DoFind(fLitTrdHits, fLitStsTracks, fLitOutputTracks);
-	if (fIsMuch)fFinder->DoFind(fLitMuchHits, fLitStsTracks, fLitOutputTracks);
-	if (fIsTof)fMerger->DoMerge(fLitTofHits, fLitOutputTracks);
+	if (fIsElectronSetup && fIsTrd) {
+		fTrackingWatch.Start(kFALSE);
+		fFinder->DoFind(fLitTrdHits, fLitStsTracks, fLitOutputTracks);
+		fTrackingWatch.Stop();
+	}
+	if (fIsMuch) {
+		fTrackingWatch.Start(kFALSE);
+		fFinder->DoFind(fLitMuchHits, fLitStsTracks, fLitOutputTracks);
+		fTrackingWatch.Stop();
+	}
+	if (fIsTof){
+		fMergerWatch.Start(kFALSE);
+		fMerger->DoMerge(fLitTofHits, fLitOutputTracks);
+		fMergerWatch.Stop();
+	}
 }
 
+void CbmLitFindGlobalTracks::PrintStopwatchStatistics()
+{
+	std::cout << "Stopwatch: " << std::endl;
+	std::cout << "tracking: counts=" << fTrackingWatch.Counter()
+		<< ", real=" << fTrackingWatch.RealTime()/fTrackingWatch.Counter()
+		<< "/" << fTrackingWatch.RealTime()
+		<< " s, cpu=" << fTrackingWatch.CpuTime()/fTrackingWatch.Counter()
+		<< "/" << fTrackingWatch.CpuTime() << std::endl;
+	std::cout << "fitter: real=" << fMergerWatch.Counter()
+		<< ", real=" << fMergerWatch.RealTime()/fMergerWatch.Counter()
+		<< "/" << fMergerWatch.RealTime()
+		<< " s, cpu=" << fMergerWatch.CpuTime()/fMergerWatch.Counter()
+		<< "/" << fMergerWatch.CpuTime() << std::endl;
+}
 
 ClassImp(CbmLitFindGlobalTracks);

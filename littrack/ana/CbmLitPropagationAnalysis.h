@@ -4,6 +4,9 @@
 #include "FairTask.h"
 #include "CbmLitTypes.h"
 #include "CbmLitPtrTypes.h"
+#include "CbmLitSimpleGeometryConstructor.h"
+
+#include "TStopwatch.h"
 
 #include <vector>
 
@@ -73,6 +76,8 @@ private:
 			const CbmLitTrackParam* par,
 			const CbmLitTrackParam* mcPar);
 
+	void PrintStopwatchStatistics();
+
 	Bool_t fIsElectronSetup; // If "electron" setup detected than true
 	Bool_t fIsSts; // If STS detected than true
 	Bool_t fIsTrd; // If TRD detected than true
@@ -123,8 +128,15 @@ private:
 	std::vector<std::vector<TH1F*> > fSmootherHistos; // for smoother analysis
 	Int_t fNofParams; // number of parameters = 12
 
+	//Time analysis
+	TStopwatch fPropagationWatch; // for the propagation
+	TStopwatch fFitterWatch; // for the track fitter
+	TStopwatch fSmootherWatch; // for the track smoother
+
 	Int_t fEvents; // Event counter
 	Int_t fVerbose; // Verbose level
+
+	CbmLitSimpleGeometryConstructor fGeoConstructor;
 
 	ClassDef(CbmLitPropagationAnalysis,1);
 };

@@ -8,6 +8,7 @@
 #pragma link C++ class CbmLitPropagationAnalysis+;
 #pragma link C++ class CbmLitElossAna+;
 #pragma link C++ class CbmLitRobustFitterAnalysis+;
+#pragma link C++ class CbmLitCheckSimpleGeo+;
 
 // base
 #pragma link C++ class CbmLitTool+;
@@ -74,14 +75,17 @@
 #pragma link C++ class CbmLitHitToTrackMerger+;
 
 // propagation
-#pragma link C++ class CbmLitTrackPropagatorImp+;
+#pragma link C++ class CbmLitTGeoTrackPropagator+;
 #pragma link C++ class CbmLitRK4TrackExtrapolator+;
 #pragma link C++ class CbmLitLineTrackExtrapolator+;
 #pragma link C++ class CbmLitTrackPropagatorGeane+;
-#pragma link C++ class CbmLitGeoNavigatorImp+;
+#pragma link C++ class CbmLitTGeoNavigator+;
 #pragma link C++ class CbmLitMaterialInfo+;
 #pragma link C++ class CbmLitMaterialEffectsImp+;
 #pragma link C++ class CbmLitCleverTrackExtrapolator+;
+#pragma link C++ class CbmLitSimpleGeometryConstructor+;
+#pragma link C++ class CbmLitMyGeoNavigator+;
+#pragma link C++ class CbmLitMyTrackPropagator+;
 
 // qa
 #pragma link C++ class CbmLitReconstructionQa+;

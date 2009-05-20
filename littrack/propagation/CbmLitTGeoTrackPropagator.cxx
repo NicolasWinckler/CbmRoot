@@ -1,13 +1,12 @@
-// -------------------------------------------------------------------------
-// -----                  CbmLitTrackPropagatorImp source file         -----
-// -----                  Created 16/07/07  by A. Lebedev              -----
-// -------------------------------------------------------------------------
+/** CbmLitTGeoTrackPropagator.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2007
+ * @version 1.0
+ **/
 
-#include "CbmLitTrackPropagatorImp.h"
-#include "CbmLitEnvironment.h"
-#include "CbmLitComparators.h"
+#include "CbmLitTGeoTrackPropagator.h"
 #include "CbmLitTrackExtrapolator.h"
-#include "CbmLitGeoNavigatorImp.h"
+#include "CbmLitTGeoNavigator.h"
 #include "CbmLitMaterialEffectsImp.h"
 #include "CbmLitMaterialInfo.h"
 #include "CbmLitTrackParam.h"
@@ -16,44 +15,43 @@
 #include <cmath>
 #include <iostream>
 
-CbmLitTrackPropagatorImp::CbmLitTrackPropagatorImp(
+CbmLitTGeoTrackPropagator::CbmLitTGeoTrackPropagator(
 		TrackExtrapolatorPtr extrapolator):
-   CbmLitTrackPropagator("CbmLitTrackPropagatorImp"),
+   CbmLitTrackPropagator("CbmLitTGeoTrackPropagator"),
    fExtrapolator(extrapolator),
    fCalcTransportMatrix(true)
 {
-   fNavigator = GeoNavigatorPtr(new CbmLitGeoNavigatorImp());
-   fMaterial = MaterialEffectsPtr(new CbmLitMaterialEffectsImp());
+	fNavigator = GeoNavigatorPtr(new CbmLitTGeoNavigator());
+	fMaterial = MaterialEffectsPtr(new CbmLitMaterialEffectsImp());
 
-   fFm.ResizeTo(5,5);
+	fFm.ResizeTo(5,5);
 }
 
-CbmLitTrackPropagatorImp::~CbmLitTrackPropagatorImp()
+CbmLitTGeoTrackPropagator::~CbmLitTGeoTrackPropagator()
 {
-//	delete fNavigator;
 }
 
-LitStatus CbmLitTrackPropagatorImp::Initialize()
-{
-   return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackPropagatorImp::Finalize()
+LitStatus CbmLitTGeoTrackPropagator::Initialize()
 {
 	return kLITSUCCESS;
 }
 
-LitStatus CbmLitTrackPropagatorImp::Propagate(
+LitStatus CbmLitTGeoTrackPropagator::Finalize()
+{
+	return kLITSUCCESS;
+}
+
+LitStatus CbmLitTGeoTrackPropagator::Propagate(
 		const CbmLitTrackParam *parIn,
         CbmLitTrackParam *parOut,
         Double_t zOut,
         Int_t pdg)
 {
-   *parOut = *parIn;
-   return Propagate(parOut, zOut, pdg);
+	*parOut = *parIn;
+	return Propagate(parOut, zOut, pdg);
 }
 
-LitStatus CbmLitTrackPropagatorImp::Propagate(
+LitStatus CbmLitTGeoTrackPropagator::Propagate(
 		CbmLitTrackParam *par,
         Double_t zOut,
         Int_t pdg)
@@ -84,7 +82,7 @@ LitStatus CbmLitTrackPropagatorImp::Propagate(
 	//Loop over steps + additional step to propagate to virtual plane at zOut
 	for (Int_t iStep = 0; iStep < nofSteps + 1; iStep++) {
 		if (!IsParCorrect(par)) {
-			//std::cout << "ERROR CbmLitTrackPropagatorImp::Propagate parameters incorrect " << std::endl;
+			//std::cout << "ERROR CbmLitTGeoTrackPropagator::Propagate parameters incorrect " << std::endl;
 			//par->Print();
 			return kLITERROR;
 		}
@@ -97,7 +95,7 @@ LitStatus CbmLitTrackPropagatorImp::Propagate(
 		//Get intersections with the materials for this step
 		std::vector<CbmLitMaterialInfo> inter;
 		if (fNavigator->FindIntersections(par, z, inter) == kLITERROR) {
-			//std::cout << "ERROR CbmLitTrackPropagatorImp::Propagate navigation failed" << std::endl;
+//			std::cout << "ERROR CbmLitTGeoTrackPropagator::Propagate navigation failed" << std::endl;
 			return kLITERROR;
 		}
 
@@ -113,7 +111,7 @@ LitStatus CbmLitTrackPropagatorImp::Propagate(
 
 			// extrapolate to the next boundary
 			if (fExtrapolator->Extrapolate(par, mat.GetZpos()) == kLITERROR) {
-				//std::cout << "ERROR CbmLitTrackPropagatorImp::Propagate extrapolation failed" << std::endl;
+				//std::cout << "ERROR CbmLitTGeoTrackPropagator::Propagate extrapolation failed" << std::endl;
 				return kLITERROR;
 			}
 
@@ -132,26 +130,27 @@ LitStatus CbmLitTrackPropagatorImp::Propagate(
 	if (!IsParCorrect(par)) return kLITERROR;
 	else return kLITSUCCESS;
 }
-void CbmLitTrackPropagatorImp::TransportMatrix(
+
+void CbmLitTGeoTrackPropagator::TransportMatrix(
 		   std::vector<Double_t>& F)
 {
 	F.assign(fFm.GetMatrixArray(), fFm.GetMatrixArray() + fFm.GetNoElements());
 }
 
-void CbmLitTrackPropagatorImp::TransportMatrix(
+void CbmLitTGeoTrackPropagator::TransportMatrix(
 		   TMatrixD& F)
 {
 	F = fFm;
 }
 
-void CbmLitTrackPropagatorImp::UpdateF(
+void CbmLitTGeoTrackPropagator::UpdateF(
 		TMatrixD& F,
 		const TMatrixD& newF)
 {
 	F = newF * F;
 }
 
-Bool_t CbmLitTrackPropagatorImp::IsParCorrect(
+Bool_t CbmLitTGeoTrackPropagator::IsParCorrect(
 		const CbmLitTrackParam* par)
 {
 	Double_t maxSlope = 5.;
@@ -168,4 +167,4 @@ Bool_t CbmLitTrackPropagatorImp::IsParCorrect(
 	return true;
 }
 
-ClassImp(CbmLitTrackPropagatorImp)
+ClassImp(CbmLitTGeoTrackPropagator)

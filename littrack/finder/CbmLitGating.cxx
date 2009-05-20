@@ -14,11 +14,11 @@
 
 CbmLitGating::CbmLitGating()
 {
-	fSigmaCoef = 3.5;
+	fSigmaCoef = 7.0;
 	fMaxCovSq = 400.;
 	fChiSqStripHitCut = 10.;
-	fChiSqPixelHitCut = 15.;
-	fUseFastSearch = true;
+	fChiSqPixelHitCut = 25.;
+	fUseFastSearch = false;//true;
 }
 
 CbmLitGating::~CbmLitGating()

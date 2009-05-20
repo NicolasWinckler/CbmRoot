@@ -1,4 +1,4 @@
-#include "CbmLitGeoNavigatorImp.h"
+#include "CbmLitTGeoNavigator.h"
 
 #include "CbmLitTrackParam.h"
 
@@ -10,105 +10,106 @@
 #include <iostream>
 #include <cmath>
 
-CbmLitGeoNavigatorImp::CbmLitGeoNavigatorImp()
+CbmLitTGeoNavigator::CbmLitTGeoNavigator()
+{
+	fGeo = gGeoManager;
+}
+
+CbmLitTGeoNavigator::~CbmLitTGeoNavigator()
 {
 }
 
-CbmLitGeoNavigatorImp::~CbmLitGeoNavigatorImp()
-{
-}
-
-LitStatus CbmLitGeoNavigatorImp::Initialize()
+LitStatus CbmLitTGeoNavigator::Initialize()
 {
    return kLITSUCCESS;
 }
 
-LitStatus CbmLitGeoNavigatorImp::Finalize()
+LitStatus CbmLitTGeoNavigator::Finalize()
 {
 	return kLITSUCCESS;
 }
 
-LitStatus CbmLitGeoNavigatorImp::FindIntersections(
+LitStatus CbmLitTGeoNavigator::FindIntersections(
 		const CbmLitTrackParam* par,
 		Double_t zOut,
 		std::vector<CbmLitMaterialInfo>& inter)
 {
 	InitTrack(par);
-	if(gGeoManager->IsOutside()) return kLITERROR;
-	
+	if(fGeo->IsOutside()) return kLITERROR;
+
 	CbmLitMaterialInfo stepInfo;
 	Bool_t last = false;
-	
+
 	while (!last) {
-		gGeoManager->PushPoint();
+		fGeo->PushPoint();
 		stepInfo = MakeStep();
-		if(gGeoManager->IsOutside()) {
-			gGeoManager->PopDummy();
+		if(fGeo->IsOutside()) {
+			fGeo->PopDummy();
 			return kLITERROR;
 		}
 		if (stepInfo.GetZpos() > zOut) {
-			gGeoManager->PopPoint();
+			fGeo->PopPoint();
 			Double_t l = CalcLength(zOut);
 			stepInfo = MakeStep(l);
 			last = true;
 		} else {
-			gGeoManager->PopDummy();
+			fGeo->PopDummy();
 		}
 		inter.push_back(stepInfo);
-	}	
+	}
 	return kLITSUCCESS;
 }
 
-void CbmLitGeoNavigatorImp::InitTrack(
+void CbmLitTGeoNavigator::InitTrack(
 		const CbmLitTrackParam* par) const
 {
 	Double_t nx, ny, nz;
 	par->GetDirCos(nx, ny, nz);
-	gGeoManager->InitTrack(par->GetX(), par->GetY(), par->GetZ(), 
+	fGeo->InitTrack(par->GetX(), par->GetY(), par->GetZ(),
 			               nx, ny, nz);
 }
 
-CbmLitMaterialInfo CbmLitGeoNavigatorImp::MakeStep(
+CbmLitMaterialInfo CbmLitTGeoNavigator::MakeStep(
 		Double_t step) const
 {
 	// fill current material information and then make a step
 	CbmLitMaterialInfo matInfo;
-	TGeoMaterial* mat = gGeoManager->GetCurrentNode()->GetMedium()->GetMaterial();
+	TGeoMaterial* mat = fGeo->GetCurrentNode()->GetMedium()->GetMaterial();
 	matInfo.SetRL(mat->GetRadLen());
 	matInfo.SetRho(mat->GetDensity());
 	matInfo.SetZ(mat->GetZ());
 	matInfo.SetA(mat->GetA());
-	
-	if (step == 0.) {
-		gGeoManager->FindNextBoundaryAndStep(15.);
-	} else {
-		gGeoManager->SetStep(step);
-		gGeoManager->Step(kFALSE);
-	}
-	
-	matInfo.SetLength(gGeoManager->GetStep());
-	matInfo.SetZpos(gGeoManager->GetCurrentPoint()[2]);
 
-	return matInfo;	 
+	if (step == 0.) {
+		fGeo->FindNextBoundaryAndStep(15.);
+	} else {
+		fGeo->SetStep(step);
+		fGeo->Step(kFALSE);
+	}
+
+	matInfo.SetLength(fGeo->GetStep());
+	matInfo.SetZpos(fGeo->GetCurrentPoint()[2]);
+
+	return matInfo;
 }
 
-Double_t CbmLitGeoNavigatorImp::CalcLength(
+Double_t CbmLitTGeoNavigator::CalcLength(
 		Double_t zOut) const
 {
 	//find intersection point of straight line with plane
-	Double_t nx = gGeoManager->GetCurrentDirection()[0];
-	Double_t ny = gGeoManager->GetCurrentDirection()[1];
-	Double_t nz = gGeoManager->GetCurrentDirection()[2];
-	Double_t z = gGeoManager->GetCurrentPoint()[2];
-	
+	Double_t nx = fGeo->GetCurrentDirection()[0];
+	Double_t ny = fGeo->GetCurrentDirection()[1];
+	Double_t nz = fGeo->GetCurrentDirection()[2];
+	Double_t z = fGeo->GetCurrentPoint()[2];
+
 	Double_t t0 = (zOut - z) / nz;
-	
+
 	Double_t dx = nx * t0;
 	Double_t dy = ny * t0;
 	Double_t dz = (zOut - z);//nz * t0;
-	
+
 	//calculate distance between two points
 	return std::sqrt( dx * dx + dy * dy + dz * dz);
 }
 
-ClassImp(CbmLitGeoNavigatorImp)
+ClassImp(CbmLitTGeoNavigator)

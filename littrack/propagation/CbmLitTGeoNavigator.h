@@ -1,5 +1,5 @@
-#ifndef CBMLITGEONAVIGATORIMP_H_
-#define CBMLITGEONAVIGATORIMP_H_
+#ifndef CBMLITTGEONAVIGATOR_H_
+#define CBMLITTGEONAVIGATOR_H_
 
 #include "CbmLitGeoNavigator.h"
 #include "CbmLitMaterialInfo.h"
@@ -7,12 +7,13 @@
 #include <vector>
 
 class CbmLitTrackParam;
+class TGeoManager;
 
-class CbmLitGeoNavigatorImp : public CbmLitGeoNavigator
+class CbmLitTGeoNavigator : public CbmLitGeoNavigator
 {
 public:
-	CbmLitGeoNavigatorImp();
-	virtual ~CbmLitGeoNavigatorImp();
+	CbmLitTGeoNavigator();
+	virtual ~CbmLitTGeoNavigator();
 
 	// derived from CbmTool
 	virtual LitStatus Initialize();
@@ -33,7 +34,9 @@ private:
 	Double_t CalcLength(
 			Double_t zOut) const;
 
-	ClassDef(CbmLitGeoNavigatorImp,1);
+	TGeoManager* fGeo;
+
+	ClassDef(CbmLitTGeoNavigator,1);
 };
 
-#endif /*CBMLITGEONAVIGATORIMP_H_*/
+#endif /*CBMLITTGEONAVIGATOR_H_*/

@@ -6,6 +6,8 @@
 #include "CbmLitTypes.h"
 #include "CbmLitPtrTypes.h"
 
+#include "TStopwatch.h"
+
 #include <string>
 
 class TClonesArray;
@@ -33,6 +35,7 @@ private:
 	void ClearArrays();
 	void InitStsTrackSeeds();
 	void RunTrackReconstruction();
+	void PrintStopwatchStatistics();
 
 	Bool_t fIsElectronSetup;
 	Bool_t fIsTrd;
@@ -66,6 +69,10 @@ private:
 	// Merger method to be used
 	// "nearest_hit" - assigns nearest hit to the track
 	std::string fMergerType;
+
+	// stopwatches
+	TStopwatch fTrackingWatch; // stopwatch for tracking
+	TStopwatch fMergerWatch; // stopwatch for merger
 
 	Int_t fEventNo;
 

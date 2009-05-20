@@ -1,3 +1,12 @@
+/** CbmLitReconstructionQa.h
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2007
+ * @version 2.0
+ **
+ ** CBM task class for global track reconstruction quality.
+ ** Produces efficiency histograms. Calculates different statistics.
+ **/
+
 #ifndef CBMLITRECONSTRUCTIONQA_H_
 #define CBMLITRECONSTRUCTIONQA_H_
 

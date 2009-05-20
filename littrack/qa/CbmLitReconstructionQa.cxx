@@ -1,3 +1,9 @@
+/** CbmLitReconstructionQa.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2007
+ * @version 2.0
+ **/
+
 #include "CbmLitReconstructionQa.h"
 #include "CbmLitEnvironment.h"
 
@@ -185,33 +191,22 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 			tofMCId = tofPoint->GetTrackID();
 		}
 
-//		std::cout << "stsId=" << stsId << ", stsMCId=" << stsMCId << " | "
-//			<< "trdId=" << trdId << ", trdMCId=" << trdMCId << " | "
-//			<< "muchId=" << muchId << ", muchMCId=" << muchMCId << " | "
-//			<< "tofId=" << tofId << ", tofMCId=" << tofMCId << std::endl;
-
 		// select STS tracks only
 		if (isStsOk && stsMCId != -1) {
 			fMcStsMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
-//			std::cout << "STS" << std::endl;
 		}
 		// select STS+TRD(MUCH) tracks
 		if ((isStsOk && stsMCId != -1) &&
 				((isTrdOk && stsMCId == trdMCId) || (isMuchOk && stsMCId == muchMCId))) {
 			fMcHalfGlobalMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
-//			std::cout << "STS+TRD(MUCH)" << std::endl;
 		}
 		// select the longest tracks STS+TRD(MUCH)+TOF
 		if ( (isStsOk && stsMCId != -1) &&
 				((isTrdOk && stsMCId == trdMCId) || (isMuchOk && stsMCId == muchMCId)) &&
 				(isTofOk && stsMCId == tofMCId) ) {
 			fMcGlobalMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
-//			std::cout << "STS+TRD(MUCH)+TOF" << std::endl;
 		}
 	}
-//	std::cout << "-I- number of all/STS/STS+TRD(MUCH)/STS+TRD(MUCH)+TOF tracks: "
-//		<< nofGlobalTracks << " / " << fMcStsMap.size() << " / "
-//		<< fMcHalfGlobalMap.size() << " / " << fMcGlobalMap.size() << std::endl;
 }
 
 Bool_t CbmLitReconstructionQa::CheckStsTrackQuality(
@@ -295,9 +290,6 @@ void CbmLitReconstructionQa::ProcessMcTracks()
 		}
 		// acceptance: STS+TRD(MUCH)+TOF
 		if (isStsOk && (isTrdOk || isMuchOk) && isTofOk) {
-//			std::cout << "STS+TRD(MUCH)+TOF: sts=" << nofPointsSts
-//							<< " trd=" << nofPointsTrd << " much=" << nofPointsMuch << " tof="
-//							<< nofPointsTof << std::endl;
 			// momentum dependence histograms
 			FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcGlobalMap, fhGlobalMom, mcTrack->GetP());
 		}

@@ -1,3 +1,9 @@
+/** CbmLitFindGlobalTracksIdeal.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
+ **/
+
 #include "CbmLitFindGlobalTracksIdeal.h"
 #include "CbmLitEnvironment.h"
 
@@ -24,63 +30,21 @@ CbmLitFindGlobalTracksIdeal::~CbmLitFindGlobalTracksIdeal()
 
 }
 
-void CbmLitFindGlobalTracksIdeal::SetParContainers()
-{
-
-}
-
 InitStatus CbmLitFindGlobalTracksIdeal::Init()
 {
-    FairRootManager* ioman = FairRootManager::Instance();
-    if (NULL == ioman) Fatal("Init","CbmRootManager is not instantiated");
+	DetermineSetup();
+	ReadDataBranches();
 
-    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-    fIsElectronSetup = env->IsElectronSetup();
-
-    fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
-    if (NULL == fMCTracks) Fatal("Init","No MCTrack array!");
-
-    //STS data
-	fStsMatches = (TClonesArray*) ioman->GetObject("STSTrackMatch");
-	if (NULL == fStsMatches) Fatal("Init","No STSTrackMatch array!");
-
-	//MUCH data
-    if (!fIsElectronSetup) {
-    	fMuchMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
-    	if (NULL == fMuchMatches) Fatal("Init","No MuchTrackMatch array!");
-    }
-
-    //TRD data
-    if (fIsElectronSetup) {
-    	fTrdMatches = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
-    	if (NULL == fTrdMatches) Fatal("Init","No TRDTrackMatch array!");
-    }
-
-    //TOF data
-	fTofMCPoints = (TClonesArray*) ioman->GetObject("TOFPoint");
-	if (NULL == fTofMCPoints ) Fatal("Init","No TOFPoint array!");
-	fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
-	if (NULL == fTofHits) Fatal("Init", "No TofHit array!");
-
-	// Create and register GlobalTrack array
-	fGlobalTracks = new TClonesArray("CbmGlobalTrack",100);
-	ioman->Register("GlobalTrack", "Global", fGlobalTracks, kTRUE);
-
-	return kSUCCESS;
-}
-
-InitStatus CbmLitFindGlobalTracksIdeal::ReInit()
-{
 	return kSUCCESS;
 }
 
 void CbmLitFindGlobalTracksIdeal::Exec(
 		Option_t* opt)
 {
-	FillMapSts();
-	if (fIsElectronSetup) FillMapTrd();
-	else FillMapMuch();
-	FillMapTof();
+	if (fIsSts) FillMapSts();
+	if (fIsTrd) FillMapTrd();
+	if (fIsMuch) FillMapMuch();
+	if (fIsTof) FillMapTof();
 
 	CreateGlobalTracks();
 
@@ -89,6 +53,62 @@ void CbmLitFindGlobalTracksIdeal::Exec(
 
 void CbmLitFindGlobalTracksIdeal::Finish()
 {
+}
+
+void CbmLitFindGlobalTracksIdeal::DetermineSetup()
+{
+    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
+    fIsElectronSetup = env->IsElectronSetup();
+	fIsSts = true;
+    fIsTrd = env->IsTrd();
+    fIsMuch = env->IsMuch();
+    fIsTof = env->IsTof();
+
+    if (fIsElectronSetup) std::cout << "-I- CBM electron setup detected" << std::endl;
+    else std::cout << "-I- CBM muon setup detected" << std::endl;
+    std::cout << "-I- The following detectors were found in the CBM setup:" << std::endl;
+    if (fIsTrd) std::cout << "TRD" << std::endl;
+    if (fIsMuch) std::cout << "MUCH" << std::endl;
+    if (fIsTof) std::cout << "TOF" << std::endl;
+}
+
+void CbmLitFindGlobalTracksIdeal::ReadDataBranches()
+{
+    FairRootManager* ioman = FairRootManager::Instance();
+    if (NULL == ioman) Fatal("Init","CbmRootManager is not instantiated");
+
+    fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
+    if (NULL == fMCTracks) Fatal("Init","No MCTrack array!");
+
+    //STS data
+    if (fIsSts) {
+    	fStsMatches = (TClonesArray*) ioman->GetObject("STSTrackMatch");
+    	if (NULL == fStsMatches) Fatal("Init","No STSTrackMatch array!");
+    }
+
+	//MUCH data
+    if (!fIsMuch) {
+    	fMuchMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
+    	if (NULL == fMuchMatches) Fatal("Init","No MuchTrackMatch array!");
+    }
+
+    //TRD data
+    if (fIsTrd) {
+    	fTrdMatches = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
+    	if (NULL == fTrdMatches) Fatal("Init","No TRDTrackMatch array!");
+    }
+
+    //TOF data
+    if (fIsTof) {
+		fTofMCPoints = (TClonesArray*) ioman->GetObject("TOFPoint");
+		if (NULL == fTofMCPoints ) Fatal("Init","No TOFPoint array!");
+		fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
+		if (NULL == fTofHits) Fatal("Init", "No TofHit array!");
+    }
+
+	// Create and register CbmGlobalTrack array
+	fGlobalTracks = new TClonesArray("CbmGlobalTrack",100);
+	ioman->Register("GlobalTrack", "Global", fGlobalTracks, kTRUE);
 }
 
 void CbmLitFindGlobalTracksIdeal::FillMapSts()
@@ -154,25 +174,18 @@ void CbmLitFindGlobalTracksIdeal::CreateGlobalTracks()
 		CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(iMCTrack);
 		if (mcTrack==NULL) continue;
 		Int_t stsId = -1, trdId = -1, muchId = -1, tofId = -1;
-		if (fMcStsMap.find(iMCTrack) != fMcStsMap.end()) stsId = fMcStsMap[iMCTrack];
-		if (fIsElectronSetup)
-			if (fMcTrdMap.find(iMCTrack) != fMcTrdMap.end()) trdId = fMcTrdMap[iMCTrack];
-		if (!fIsElectronSetup)
-			if (fMcMuchMap.find(iMCTrack) != fMcMuchMap.end()) muchId = fMcMuchMap[iMCTrack];
-		if (fMcTofMap.find(iMCTrack) != fMcTofMap.end()) tofId = fMcTofMap[iMCTrack];
+		if (fIsSts && (fMcStsMap.find(iMCTrack) != fMcStsMap.end())) stsId = fMcStsMap[iMCTrack];
+		if (fIsTrd && (fMcTrdMap.find(iMCTrack) != fMcTrdMap.end())) trdId = fMcTrdMap[iMCTrack];
+		if (fIsMuch && (fMcMuchMap.find(iMCTrack) != fMcMuchMap.end())) muchId = fMcMuchMap[iMCTrack];
+		if (fIsTof && (fMcTofMap.find(iMCTrack) != fMcTofMap.end())) tofId = fMcTofMap[iMCTrack];
 
-//		std::cout << "before iMCTrack=" << iMCTrack << ", stsId=" << stsId << ", trdId=" << trdId << ", muchId=" << muchId
-//			<< "tofId=" << tofId << std::endl;
 		if (stsId == -1 && trdId == -1 && muchId == -1 && tofId == -1) continue;
-//		std::cout << "after iMCTrack=" << iMCTrack << ", stsId=" << stsId << ", trdId=" << trdId << ", muchId=" << muchId
-//			<< "tofId=" << tofId << std::endl;
-
 
 		CbmGlobalTrack* globalTrack = new ((*fGlobalTracks)[nGlobalTracks++]) CbmGlobalTrack();
 		globalTrack->SetStsTrackIndex(stsId);
 		globalTrack->SetTrdTrackIndex(trdId);
 		globalTrack->SetTofHitIndex(tofId);
-		globalTrack->SetRichRingIndex(muchId); //TODO chage to MUCH
+		globalTrack->SetRichRingIndex(muchId); //TODO change to MUCH
 	}
 }
 

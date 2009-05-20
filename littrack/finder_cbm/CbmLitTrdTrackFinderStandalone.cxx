@@ -11,7 +11,7 @@
 #include "CbmLitLineTrackExtrapolator.h"
 #include "CbmLitKalmanFilter.h"
 #include "CbmLitTrackFitterImp.h"
-#include "CbmLitTrackPropagatorImp.h"
+#include "CbmLitTGeoTrackPropagator.h"
 #include "CbmLitEnvironment.h"
 #include "CbmLitTrackSelection.h"
 #include "CbmLitTrackSelectionTrd.h"
@@ -38,7 +38,7 @@ CbmLitTrdTrackFinderStandalone::~CbmLitTrdTrackFinderStandalone()
 
 void CbmLitTrdTrackFinderStandalone::Init()
 {
-//   fPropagator = new CbmLitTrackPropagatorImp(new CbmLitLineTrackExtrapolator());
+//   fPropagator = new CbmLitTGeoTrackPropagator(new CbmLitLineTrackExtrapolator());
 //   fPropagator->Initialize();
 //
 //   fFilter = new CbmLitKalmanFilter();

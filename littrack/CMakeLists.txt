@@ -35,6 +35,7 @@ ${CBMROOT_SOURCE_DIR}/geane
 ${CBMROOT_SOURCE_DIR}/field
 ${CBMROOT_SOURCE_DIR}/much
 ${CBMROOT_SOURCE_DIR}/global
+${CBMROOT_SOURCE_DIR}/sts
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -49,6 +50,7 @@ set(LITTRACK_SRCS_RULECHECKER
 ana/CbmLitElossAna.cxx
 ana/CbmLitPropagationAnalysis.cxx
 ana/CbmLitRobustFitterAnalysis.cxx
+ana/CbmLitCheckSimpleGeo.cxx
 base/CbmLitTool.cxx
 base/CbmLitSubstation.cxx
 base/CbmLitStation.cxx
@@ -99,14 +101,17 @@ interface/CbmLitTrackFinder.cxx
 interface/CbmLitWeightCalculator.cxx
 interface/CbmLitWeightedHitCalculator.cxx
 interface/CbmLitHitToTrackMerger.cxx
-propagation/CbmLitTrackPropagatorImp.cxx 
+propagation/CbmLitTGeoTrackPropagator.cxx 
 propagation/CbmLitRK4TrackExtrapolator.cxx
 propagation/CbmLitLineTrackExtrapolator.cxx
 propagation/CbmLitTrackPropagatorGeane.cxx
-propagation/CbmLitGeoNavigatorImp.cxx
+propagation/CbmLitTGeoNavigator.cxx
 propagation/CbmLitMaterialInfo.cxx
 propagation/CbmLitMaterialEffectsImp.cxx
 propagation/CbmLitCleverTrackExtrapolator.cxx
+propagation/CbmLitSimpleGeometryConstructor.cxx
+propagation/CbmLitMyGeoNavigator.cxx
+propagation/CbmLitMyTrackPropagator.cxx
 qa/CbmLitReconstructionQa.cxx
 qa/CbmLitFindGlobalTracksIdeal.cxx
 qa/CbmLitRecQa.cxx

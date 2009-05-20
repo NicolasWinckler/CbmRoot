@@ -12,8 +12,6 @@ CbmLitCleverTrackExtrapolator::CbmLitCleverTrackExtrapolator():
 
 CbmLitCleverTrackExtrapolator::~CbmLitCleverTrackExtrapolator()
 {
-//	delete fLineExtrapolator;
-//	delete fRK4Extrapolator;
 }
 
 LitStatus CbmLitCleverTrackExtrapolator::Initialize()

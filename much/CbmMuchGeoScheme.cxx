@@ -87,9 +87,9 @@ void CbmMuchGeoScheme::Init(TObjArray* stations) {
   Int_t iSide = 0;
   for (Int_t iStation = 0; iStation < GetNStations(); iStation++) {
     vector<CbmMuchLayerSide*> sides = GetLayerSides(iStation);
-    for (Int_t i = 0; i < sides.size(); i++) {
-      printf("%i\n", GetLayerSideNr(sides.at(i)->GetDetectorId()));
-    }
+//    for (Int_t i = 0; i < sides.size(); i++) {
+//      printf("%i\n", GetLayerSideNr(sides.at(i)->GetDetectorId()));
+//    }
   }
 }
 // -------------------------------------------------------------------------
@@ -291,13 +291,6 @@ void CbmMuchGeoScheme::ResetPads() {
 
 // -------------------------------------------------------------------------
 vector<CbmMuchLayerSide*> CbmMuchGeoScheme::GetLayerSides(Int_t iStation) {
-//  vector<CbmMuchLayerSide*> sides;
-//  for(map<Int_t, Int_t>::iterator it=fMapSides.begin(); it!=fMapSides.end(); it++){
-//    Int_t detectorId = (*it).first;
-//    Int_t stationIndex = GetStationIndex(detectorId);
-//    if(stationIndex == iStation) sides.push_back(GetLayerSideByDetId(detectorId));
-//  }
-
   try
   {
     return fSides.at(iStation);

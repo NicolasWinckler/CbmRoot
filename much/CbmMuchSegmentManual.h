@@ -71,61 +71,37 @@ class CbmMuchSegmentManual : public FairTask {
     void SetNChannels(Int_t iStation, Int_t nChannels);
     void SetNChannels(Int_t nChannels[]);
 
-    /** Sets resolution in X for the central region of the given station.
+    /** Sets resolution for the central region of the given station.
      * @param iStation Station index
      * @param sigmaX   Resolution in X direction
-     */
-    void SetMinSigmaX(Int_t iStation, Double_t sigmaX);
-    void SetMinSigmaX(Double_t sigmaX[]);
-
-    /** Sets resolution in Y for the central region of the given station.
-     * @param iStation Station index
      * @param sigmaY   Resolution in Y direction
      */
-    void SetMinSigmaY(Int_t iStation, Double_t sigmaY);
-    void SetMinSigmaY(Double_t sigmaY[]);
+    void SetMinSigma(Int_t iStation, Double_t sigmaX, Double_t sigmaY);
+    void SetMinSigma(Double_t sigmaX[], Double_t sigmaY[]);
 
-    /** Sets pad width for the central region of the given station.
+    /** Sets pad size for the central region of the given station.
      * @param iStation Station index
      * @param padLx    Pad width
-     */
-    void SetMinPadLx(Int_t iStation, Double_t padLx);
-    void SetMinPadLx(Double_t padLx[]);
-
-    /** Sets pad length for the central region of the given station.
-     * @param iStation Station index
      * @param padLy    Pad length
      */
-    void SetMinPadLy(Int_t iStation, Double_t padLy);
-    void SetMinPadLy(Double_t padLy[]);
+    void SetMinPadSize(Int_t iStation, Double_t padLx, Double_t padLy);
+    void SetMinPadSize(Double_t padLx[], Double_t padLy[]);
 
-    /** Sets maximum allowed resolution in X for the given station
+    /** Sets maximum allowed resolution for the given station
      * @param iStation Station index
      * @param sigmaX   Maximum allowed resolution in X direction
-     */
-    void SetMaxSigmaX(Int_t iStation, Double_t sigmaX);
-    void SetMaxSigmaX(Double_t sigmaX[]);
-
-    /** Sets maximum allowed resolution in Y for the given station
-     * @param iStation Station index
      * @param sigmaY   Maximum allowed resolution in Y direction
      */
-    void SetMaxSigmaY(Int_t iStation, Double_t sigmaY);
-    void SetMaxSigmaY(Double_t sigmaY[]);
+    void SetMaxSigma(Int_t iStation, Double_t sigmaX, Double_t sigmaY);
+    void SetMaxSigma(Double_t sigmaX[], Double_t sigmaY[]);
 
-    /** Sets maximum allowed pad width for the given station
+    /** Sets maximum allowed pad size for the given station
      * @param iStation Station index
      * @param padLx    Maximum allowed pad width
+     * @param padLy    Maximum allowed pad length
      */
-    void SetMaxPadLx(Int_t iStation, Double_t padLx);
-    void SetMaxPadLx(Double_t padLx[]);
-
-    /** Sets maximum allowed pad length for the given station
-     * @param iStation Station index
-     * @param padLx    Maximum allowed pad length
-     */
-    void SetMaxPadLy(Int_t iStation, Double_t padLy);
-    void SetMaxPadLy(Double_t padLy[]);
+    void SetMaxPadSize(Int_t iStation, Double_t padLx, Double_t padLy);
+    void SetMaxPadSize(Double_t padLx[], Double_t padLy[]);
 
   private:
     CbmGeoMuchPar*                fGeoPar;         // Geometry parameters container

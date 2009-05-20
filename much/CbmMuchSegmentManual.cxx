@@ -94,122 +94,66 @@ void CbmMuchSegmentManual::SetRegionRadii(Int_t iStation, Double_t radii[]){
 }
 // -------------------------------------------------------------------------
 
-// -----   Public method SetMinSigmaX  -------------------------------------
-void CbmMuchSegmentManual::SetMinSigmaX(Int_t iStation, Double_t sigmaX){
-  if(iStation < 0 || iStation >= fNStations) Fatal("SetMinSigmaX", "iStation is out of range.");
+// -----   Public method SetMinSigma   -------------------------------------
+void CbmMuchSegmentManual::SetMinSigma(Int_t iStation, Double_t sigmaX, Double_t sigmaY){
+  if(iStation < 0 || iStation >= fNStations) Fatal("SetMinSigma", "iStation is out of range.");
   fSecMinLx[iStation] = fNCols[iStation]*TMath::Sqrt(12.)*sigmaX;
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method SetMinSigmaX  -------------------------------------
-void CbmMuchSegmentManual::SetMinSigmaX(Double_t sigmaX[]){
-  for(Int_t iStation=0;iStation<fNStations; ++iStation){
-    SetMinSigmaX(iStation, sigmaX[iStation]);
-  }
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method SetMinSigmaY  -------------------------------------
-void CbmMuchSegmentManual::SetMinSigmaY(Int_t iStation, Double_t sigmaY){
-  if(iStation < 0 || iStation >= fNStations) Fatal("SetMinSigmaY", "iStation is out of range.");
   fSecMinLy[iStation] = fNRows[iStation]*TMath::Sqrt(12.)*sigmaY;
 }
 // -------------------------------------------------------------------------
 
-// -----   Public method SetMinSigmaY  -------------------------------------
-void CbmMuchSegmentManual::SetMinSigmaY(Double_t sigmaY[]){
+// -----   Public method SetMinSigma   -------------------------------------
+void CbmMuchSegmentManual::SetMinSigma(Double_t sigmaX[], Double_t sigmaY[]){
   for(Int_t iStation=0;iStation<fNStations; ++iStation){
-    SetMinSigmaY(iStation, sigmaY[iStation]);
+    SetMinSigma(iStation, sigmaX[iStation], sigmaY[iStation]);
   }
 }
 // -------------------------------------------------------------------------
 
-// -----   Public method SetMinPadLx   -------------------------------------
-void CbmMuchSegmentManual::SetMinPadLx(Int_t iStation, Double_t padLx){
-  if(iStation < 0 || iStation >= fNStations) Fatal("SetMinPadLx", "iStation is out of range.");
+// -----   Public method SetMinPadSize -------------------------------------
+void CbmMuchSegmentManual::SetMinPadSize(Int_t iStation, Double_t padLx, Double_t padLy){
+  if(iStation < 0 || iStation >= fNStations) Fatal("SetMinPadSize", "iStation is out of range.");
   fSecMinLx[iStation] = fNCols[iStation]*padLx;
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method SetMinPadLx  --------------------------------------
-void CbmMuchSegmentManual::SetMinPadLx(Double_t padLx[]){
-  for(Int_t iStation=0;iStation<fNStations; ++iStation){
-    SetMinPadLx(iStation, padLx[iStation]);
-  }
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method SetMinPadLy   -------------------------------------
-void CbmMuchSegmentManual::SetMinPadLy(Int_t iStation, Double_t padLy){
-  if(iStation < 0 || iStation >= fNStations) Fatal("SetMinPadLy", "iStation is out of range.");
   fSecMinLy[iStation] = fNRows[iStation]*padLy;
 }
 // -------------------------------------------------------------------------
 
-// -----   Public method SetMinPadLy  --------------------------------------
-void CbmMuchSegmentManual::SetMinPadLy(Double_t padLy[]){
+// -----   Public method SetMinPadSize  ------------------------------------
+void CbmMuchSegmentManual::SetMinPadSize(Double_t padLx[], Double_t padLy[]){
   for(Int_t iStation=0;iStation<fNStations; ++iStation){
-    SetMinPadLy(iStation, padLy[iStation]);
+    SetMinPadSize(iStation, padLx[iStation], padLy[iStation]);
   }
 }
 // -------------------------------------------------------------------------
 
-// -----   Public method SetMaxSigmaX  -------------------------------------
-void CbmMuchSegmentManual::SetMaxSigmaX(Int_t iStation, Double_t sigmaX){
-  if(iStation < 0 || iStation >= fNStations) Fatal("SetMaxSigmaX", "iStation is out of range.");
+// -----   Public method SetMaxSigma   -------------------------------------
+void CbmMuchSegmentManual::SetMaxSigma(Int_t iStation, Double_t sigmaX, Double_t sigmaY){
+  if(iStation < 0 || iStation >= fNStations) Fatal("SetMaxSigma", "iStation is out of range.");
   fSecMaxLx[iStation] = fNCols[iStation]*TMath::Sqrt(12.)*sigmaX;
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method SetMaxSigmaX --------------------------------------
-void CbmMuchSegmentManual::SetMaxSigmaX(Double_t sigmaX[]){
-  for(Int_t iStation=0;iStation<fNStations; ++iStation){
-    SetMaxSigmaX(iStation, sigmaX[iStation]);
-  }
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method SetMaxSigmaY  -------------------------------------
-void CbmMuchSegmentManual::SetMaxSigmaY(Int_t iStation, Double_t sigmaY){
-  if(iStation < 0 || iStation >= fNStations) Fatal("SetMaxSigmaY", "iStation is out of range.");
   fSecMaxLy[iStation] = fNRows[iStation]*TMath::Sqrt(12.)*sigmaY;
 }
 // -------------------------------------------------------------------------
 
-// -----   Public method SetMaxSigmaY  -------------------------------------
-void CbmMuchSegmentManual::SetMaxSigmaY(Double_t sigmaY[]){
+// -----   Public method SetMaxSigma  --------------------------------------
+void CbmMuchSegmentManual::SetMaxSigma(Double_t sigmaX[], Double_t sigmaY[]){
   for(Int_t iStation=0;iStation<fNStations; ++iStation){
-    SetMaxSigmaY(iStation, sigmaY[iStation]);
+    SetMaxSigma(iStation, sigmaX[iStation], sigmaY[iStation]);
   }
 }
 // -------------------------------------------------------------------------
 
-// -----   Public method SetMaxPadLx   -------------------------------------
-void CbmMuchSegmentManual::SetMaxPadLx(Int_t iStation, Double_t padLx){
-  if(iStation < 0 || iStation >= fNStations) Fatal("SetMinPadLx", "iStation is out of range.");
+// -----   Public method SetMaxPadSize -------------------------------------
+void CbmMuchSegmentManual::SetMaxPadSize(Int_t iStation, Double_t padLx, Double_t padLy){
+  if(iStation < 0 || iStation >= fNStations) Fatal("SetMinPadSize", "iStation is out of range.");
   fSecMaxLx[iStation] = fNCols[iStation]*padLx;
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method SetMaxPadLx  --------------------------------------
-void CbmMuchSegmentManual::SetMaxPadLx(Double_t padLx[]){
-  for(Int_t iStation=0;iStation<fNStations; ++iStation){
-    SetMaxPadLx(iStation, padLx[iStation]);
-  }
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method SetMaxPadLy   -------------------------------------
-void CbmMuchSegmentManual::SetMaxPadLy(Int_t iStation, Double_t padLy){
-  if(iStation < 0 || iStation >= fNStations) Fatal("SetMaxPadLy", "iStation is out of range.");
   fSecMaxLy[iStation] = fNRows[iStation]*padLy;
 }
 // -------------------------------------------------------------------------
 
-// -----   Public method SetMaxPadLy  --------------------------------------
-void CbmMuchSegmentManual::SetMaxPadLy(Double_t padLy[]){
+// -----   Public method SetMaxPadSize -------------------------------------
+void CbmMuchSegmentManual::SetMaxPadSize(Double_t padLx[], Double_t padLy[]){
   for(Int_t iStation=0;iStation<fNStations; ++iStation){
-    SetMaxPadLy(iStation, padLy[iStation]);
+    SetMaxPadSize(iStation, padLx[iStation], padLy[iStation]);
   }
 }
 // -------------------------------------------------------------------------
@@ -235,8 +179,6 @@ InitStatus CbmMuchSegmentManual::Init(){
   // Define sector sizes for each region
   for(Int_t iStation=0; iStation<fStations->GetEntries(); ++iStation){
     CbmMuchStation* station = (CbmMuchStation*)fStations->At(iStation);
-    //        if (st->GetDetectorType()==2) continue;
-    //        CbmMuchStationGem* station = (CbmMuchStationGem*)st;
 
     // Default initialization if required
     if(fNChannels.find(iStation)==fNChannels.end()) SetNChannels(iStation, 128);
@@ -260,17 +202,11 @@ InitStatus CbmMuchSegmentManual::Init(){
       }
     }
     if(fSecMinLx.find(iStation)==fSecMinLx.end()) {
-      if(iStation == 0) SetMinPadLx(iStation, 0.1386);
-      else if(iStation == 1) SetMinPadLx(iStation, 0.4);
-      else SetMinPadLx(iStation, 0.8);
+      if(iStation == 0) SetMinPadSize(iStation, 0.1386, 0.1386);
+      else if(iStation == 1) SetMinPadSize(iStation, 0.4, 0.4);
+      else SetMinPadSize(iStation, 0.8, 0.8);
     }
-    if(fSecMinLy.find(iStation)==fSecMinLy.end()){
-      if(iStation == 0) SetMinPadLy(iStation, 0.1386);
-      else if(iStation == 1) SetMinPadLy(iStation, 0.4);
-      else SetMinPadLy(iStation, 0.8);
-    }
-    if(fSecMaxLx.find(iStation)==fSecMaxLx.end()) SetMaxSigmaX(iStation, 0.32);
-    if(fSecMaxLy.find(iStation)==fSecMaxLy.end()) SetMaxSigmaY(iStation, 0.32);
+    if(fSecMaxLx.find(iStation)==fSecMaxLx.end()) SetMaxSigma(iStation, 0.32, 0.32);
 
     fSecLx[iStation].push_back(fSecMinLx[iStation]);
     fSecLy[iStation].push_back(fSecMinLy[iStation]);
@@ -293,7 +229,6 @@ InitStatus CbmMuchSegmentManual::Init(){
 void CbmMuchSegmentManual::SegmentMuch(){
   for(Int_t iStation=0; iStation<fStations->GetEntries(); ++iStation){
     CbmMuchStation* station = (CbmMuchStation*)fStations->At(iStation);
-    //        if (station->GetDetectorType()==2) continue;
 
     Int_t nLayers = station->GetNLayers();
     for(Int_t iLayer = 0; iLayer < nLayers; ++iLayer){
@@ -352,12 +287,12 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGem* module, Bool_t useMod
   Int_t nX = modX < 0 ? -1 : 1;
   Int_t nY = modY < 0 ? -1 : 1;
 
-  Double_t secX, secY;
+  Double_t secX, secY, secLx, secLy;
   TVector3 secSize, secPosition;
   Int_t iSector;
   for(Int_t iCol=0; iCol<nCols; ++iCol){
-    secX = useModuleDesign ? modX + nX*((iCol + 0.5)*secMaxLx - modLx/2.)
-        : secMaxLx*nCols/2. - (0.5 + iCol)*secMaxLx;
+      secX = useModuleDesign ? modX + nX*((iCol + 0.5)*secMaxLx - modLx/2.)
+          : secMaxLx*nCols/2. - (0.5 + iCol)*secMaxLx;
     for(Int_t iRow=0; iRow<nRows; ++iRow){
       secY = useModuleDesign ? modY + nY*((iRow + 0.5)*secMaxLy - modLy/2.)
           : secMaxLy*nRows/2. - (0.5 + iRow)*secMaxLy;
@@ -383,12 +318,7 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGem* module, Bool_t useMod
         iSector = module->GetNSectors();
         secSize.SetXYZ(secMaxLx, ly, modLz);
         secPosition.SetXYZ(secX, secY, modZ);
-        CbmMuchSector* sector = new CbmMuchSector(detectorId, iSector, secPosition, secSize, fNCols[iStation], nPadRows);
-        if(!IntersectsRad(sector, station->GetRmax())) {
-          delete sector;
-          continue;
-        }
-        module->AddSector(sector);
+        SegmentSector(module, new CbmMuchSector(detectorId, iSector, secPosition, secSize, fNCols[iStation], nPadRows));
       }
     }
   }
@@ -405,12 +335,7 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGem* module, Bool_t useMod
         iSector = module->GetNSectors();
         secSize.SetXYZ(lx, secMaxLy, modLz);
         secPosition.SetXYZ(secX, secY, modZ);
-        CbmMuchSector* sector = new CbmMuchSector(detectorId, iSector, secPosition, secSize, nPadCols, fNRows[iStation]);
-        if(!IntersectsRad(sector, station->GetRmax())) {
-          delete sector;
-          continue;;
-        }
-        module->AddSector(sector);
+        SegmentSector(module, new CbmMuchSector(detectorId, iSector, secPosition, secSize, nPadCols, fNRows[iStation]));
       }
     }
   }
@@ -423,9 +348,7 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGem* module, Bool_t useMod
     iSector = module->GetNSectors();
     secSize.SetXYZ(lx, ly, modLz);
     secPosition.SetXYZ(secX, secY, modZ);
-    CbmMuchSector* sector = new CbmMuchSector(detectorId, iSector, secPosition, secSize, nPadCols, nPadRows);
-    if(!IntersectsRad(sector, station->GetRmax())) delete sector;
-    else module->AddSector(sector);
+    SegmentSector(module, new CbmMuchSector(detectorId, iSector, secPosition, secSize, nPadCols, nPadRows));
   }
 }
 // -------------------------------------------------------------------------
@@ -439,9 +362,13 @@ void CbmMuchSegmentManual::SegmentSector(CbmMuchModuleGem* module, CbmMuchSector
   Double_t secLx = secSize.X();
   Double_t secLy = secSize.Y();
   Double_t secLz = secSize.Z();
+  Double_t padLx = sector->GetDx();
+  Double_t padLy = sector->GetDy();
   Double_t secX  = secPosition.X();
   Double_t secY  = secPosition.Y();
   Double_t secZ  = secPosition.Z();
+  Int_t nX = secX < 0 ? -1 : 1;
+  Int_t nY = secY < 0 ? -1 : 1;
 
   Bool_t resultX = ShouldSegment(sector, "X");
   Bool_t resultY = ShouldSegment(sector, "Y");
@@ -449,7 +376,7 @@ void CbmMuchSegmentManual::SegmentSector(CbmMuchModuleGem* module, CbmMuchSector
   if(!resultX && !resultY){
     CbmMuchStation* station = (CbmMuchStation*)fStations->At(iStation);
     Double_t rMax = station->GetRmax();
-    if((IntersectsRad(sector, module->GetCutRadius())==2) || !IntersectsRad(sector, rMax)){
+    if(IntersectsRad(sector, module->GetCutRadius())==2 || !IntersectsRad(sector, rMax)){
       delete sector;
       return;
     }
@@ -457,18 +384,29 @@ void CbmMuchSegmentManual::SegmentSector(CbmMuchModuleGem* module, CbmMuchSector
     return;
   }
 
+  // Needed for the case of incomplete sectors
+  Int_t nC = Int_t(padLx/GetPadMaxSize(module, "Width"));
+  Double_t pLx = nC == 0 ? padLx : nC*GetPadMaxSize(module, "Width");
+  Int_t nR = Int_t(padLy/GetPadMaxSize(module, "Length"));
+  Double_t pLy = nR == 0 ? padLy : nR*GetPadMaxSize(module, "Length");
+
   delete sector;
   Int_t iSector;
   TVector3 position, size;
+  Double_t newSecLx, newSecLy, newSecX, newSecY;
   for(Int_t i=0; i<2; ++i){
-    Double_t newSecLx = resultX ? secLx/2. : secLx;
-    Double_t newSecLy = resultY ? secLy/2. : secLy;
-    Double_t newSecX  = resultX ? secX + (i - 0.5)*newSecLx : secX;
-    Double_t newSecY  = resultY ? secY + (i - 0.5)*newSecLy : secY;
+    newSecLx = resultX ? i*(secLx - newSecLx) - (i-1)*pLx/2.*fNCols[iStation] : secLx;
+    newSecLy = resultY ? i*(secLy - newSecLy) - (i-1)*pLy/2.*fNRows[iStation] : secLy;
+    newSecX  = resultX ? secX - TMath::Power(-1, i)*nX*(secLx/2. - newSecLx/2.) : secX;
+    newSecY  = resultY ? secY - TMath::Power(-1, i)*nY*(secLy/2. - newSecLy/2.) : secY;
+    Double_t newPadLx = resultX ? pLx/2. : padLx;
+    Double_t newPadLy = resultY ? pLy/2. : padLy;
+    Int_t nCols = Int_t(newSecLx/newPadLx);
+    Int_t nRows = Int_t(newSecLy/newPadLy);
     position.SetXYZ(newSecX, newSecY, secZ);
     size.SetXYZ(newSecLx, newSecLy, secLz);
     iSector = module->GetNSectors();
-    SegmentSector(module, new CbmMuchSector(detectorId, iSector, position, size, fNCols[iStation], fNRows[iStation]));
+    SegmentSector(module, new CbmMuchSector(detectorId, iSector, position, size, nCols, nRows));
   }
 }
 // -------------------------------------------------------------------------
@@ -535,7 +473,7 @@ Bool_t CbmMuchSegmentManual::ShouldSegment(CbmMuchSector* sector, const TString 
   Double_t secY  = sector->GetPosition()[1];
 
   if(TMath::Abs(secLx - secLy) < 1e-5 && direction=="Y") return false;
-  if(secLy > secLx && direction=="X") return false;
+  if(secLy > secLx && TMath::Abs(secLx - secLy) > 1e-5 && direction=="X") return false;
 
   Double_t ulR = TMath::Sqrt((secX - secLx/2.)*(secX - secLx/2.) + (secY + secLy/2.)*(secY + secLy/2.));
   Double_t urR = TMath::Sqrt((secX + secLx/2.)*(secX + secLx/2.) + (secY + secLy/2.)*(secY + secLy/2.));
@@ -557,8 +495,8 @@ Bool_t CbmMuchSegmentManual::ShouldSegment(CbmMuchSector* sector, const TString 
   for(Int_t iRegion=0; iRegion<fNRegions[iStation]; ++iRegion){
     Double_t regionRad = fRadii[iStation].at(iRegion);
     if(R > regionRad) continue;
-    if(direction=="X" && fSecLx[iStation].at(iRegion) < secLx) return true;
-    if(direction=="Y" && fSecLy[iStation].at(iRegion) < secLy) return true;
+    if(direction=="X" && fSecLx[iStation].at(iRegion) < secLx && TMath::Abs(fSecLx[iStation].at(iRegion) - secLx) > 1e-5) return true;
+    if(direction=="Y" && fSecLy[iStation].at(iRegion) < secLy && TMath::Abs(fSecLy[iStation].at(iRegion) - secLy) > 1e-5) return true;
     break;
   }
   return false;

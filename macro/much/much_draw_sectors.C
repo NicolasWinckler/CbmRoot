@@ -36,7 +36,7 @@ void much_draw_sectors(TString digiFile = ""){
    for (Int_t st=0;st<stations->GetEntriesFast();st++){
       TCanvas* c1 = new TCanvas(Form("station%i",st+1),Form("station%i",st+1),800,800);
       c1->SetFillColor(0);
-      c1->Range(-130,-130,130,130);//(-27,-2,0,25);
+      c1->Range(-230,-230,230,230);//(-27,-2,0,25);
       CbmMuchStation* station = (CbmMuchStation*) stations->At(st);
       CbmMuchLayer* layer = station->GetLayer(0);
       for (Int_t s=1;s>=0;s--){
@@ -48,9 +48,10 @@ void much_draw_sectors(TString digiFile = ""){
             module->Draw();
             for (Int_t j=0;j<module->GetNSectors();j++){
                CbmMuchSector* sector = module->GetSector(j);
-               if(sector->GetNChannels() < module->GetSector(0)->GetNChannels())
-                 sector->SetFillColor(kRed);
-               else sector->SetFillColor(s ? kOrange : kYellow);
+//               if(sector->GetNChannels() < module->GetSector(0)->GetNChannels())
+//                 sector->SetFillColor(kRed);
+//               else
+               sector->SetFillColor(s ? kOrange : kYellow);
                sector->Draw("f");
                sector->Draw();
             } // sectors

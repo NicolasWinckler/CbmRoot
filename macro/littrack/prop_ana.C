@@ -1,6 +1,6 @@
-void prop_ana(Int_t nEvents = 1000)
+void prop_ana(Int_t nEvents = 10000)
 {
-	TString dir = "/home/d/andrey/test/trunk/global_e/";
+	TString dir = "/home/d/andrey/test/trunk/global_mu/";
 	TString mcFile = dir + "mc.0000.root";
 	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
 	TString parFile = dir + "param.0000.root";
@@ -23,18 +23,22 @@ void prop_ana(Int_t nEvents = 1000)
 
 	// -------------------------------------------------------------------------
 	CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis();
-	propAna->SetNofPlanes(13);
-	propAna->SetNofTrdHits(12);
-	propAna->SetNofMuchHits(0);
+	propAna->SetNofPlanes(14);
+	propAna->SetNofTrdHits(0);
+	propAna->SetNofMuchHits(13);
 	propAna->SetNofTofHits(1);
 	run->AddTask(propAna);
 	// -------------------------------------------------------------------------
-
+	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
+	TString stsDigiFile = parDir+ "/sts/sts_Standard_s3055AAFK5.SecD.digi.par";
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();
 	FairParRootFileIo* parIo1 = new FairParRootFileIo();
+	FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
 	parIo1->open(parFile.Data());
+	parIo2->open(stsDigiFile.Data(),"in");
 	rtdb->setFirstInput(parIo1);
+	rtdb->setSecondInput(parIo2);
 	rtdb->setOutput(parIo1);
 	rtdb->saveOutput();
 	// ------------------------------------------------------------------------

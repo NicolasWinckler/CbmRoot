@@ -16,7 +16,7 @@ bool drawPropagation = false;
 bool drawFilter = true;
 bool drawSmoother = false;
 
-TString dir = "/home/d/andrey/test/trunk/global_e/";//events/much/standard/10mu/mu/";
+TString dir = "/home/d/andrey/test/trunk/global_mu/";//events/much/standard/10mu/mu/";
 TFile *file = new TFile(dir + "propagation.ana.0000.root");
 
 TString outDir = "./test/";

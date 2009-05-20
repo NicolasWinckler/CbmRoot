@@ -1,4 +1,4 @@
-TString dir  = "/home/d/andrey/test/trunk/global_mu_urqmd/";
+TString dir  = "/home/d/andrey/test/trunk/global_e_urqmd/";
 TFile *file = new TFile(dir + "global.tracks.0000.root");
 
 Int_t lineWidth = 2;
@@ -29,23 +29,23 @@ void draw_eff()
 	TH1F* hist2 = (TH1F*) file->Get("hHalfGlobalMomEffAll");
 	TH1F* hist3 = (TH1F*) file->Get("hGlobalMomEffAll");
 	c1->cd(1);
-	draw_eff(hist1, hist2, hist3, "STS", "STS+MUCH", "STS+MUCH+TOF");
+	draw_eff(hist1, hist2, hist3, "STS", "STS+MUCH", "STS+TRD+TOF");
 
-	TH1F* hist1 = (TH1F*) file->Get("hStsMomEffMuon");
-	TH1F* hist2 = (TH1F*) file->Get("hHalfGlobalMomEffMuon");
-	TH1F* hist3 = (TH1F*) file->Get("hGlobalMomEffMuon");
+	TH1F* hist1 = (TH1F*) file->Get("hStsMomEffElectron");
+	TH1F* hist2 = (TH1F*) file->Get("hHalfGlobalMomEffElectron");
+	TH1F* hist3 = (TH1F*) file->Get("hGlobalMomEffElectron");
 	c1->cd(2);
-	draw_eff(hist1, hist2, hist3, "STS", "STS+MUCH", "STS+MUCH+TOF");
+	draw_eff(hist1, hist2, hist3, "STS", "STS+MUCH", "STS+TRD+TOF");
 
 	TH1F* hist1 = (TH1F*) file->Get("hRecMomEffAll");
-	TH1F* hist2 = (TH1F*) file->Get("hRecMomEffMuon");
+	TH1F* hist2 = (TH1F*) file->Get("hRecMomEffElectron");
 	c1->cd(3);
-	draw_eff(hist1, hist2, NULL, "MUCH: all tracks", "MUCH: muon tracks", "");
+	draw_eff(hist1, hist2, NULL, "TRD: all tracks", "TRD: electron tracks", "");
 
 	TH1F* hist1 = (TH1F*) file->Get("hTofMomEffAll");
-	TH1F* hist2 = (TH1F*) file->Get("hTofMomEffMuon");
+	TH1F* hist2 = (TH1F*) file->Get("hTofMomEffElectron");
 	c1->cd(4);
-	draw_eff(hist1, hist2, NULL, "TOF: all tracks", "TOF: muon tracks", "");
+	draw_eff(hist1, hist2, NULL, "TOF: all tracks", "TOF: electron tracks", "");
 }
 
 void draw_eff(

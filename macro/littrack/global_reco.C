@@ -12,7 +12,7 @@ void global_reco(Int_t nEvents = 100)
 		trdHitsFile = dir + "trd.hits.0000.root";
 		muchHitsFile = dir + "much.hits.0000.root";
 		tofHitsFile = dir + "tof.hits.0000.root";
-		globalTracksFile = dir + "global.tracks.0000.root";
+		globalTracksFile = dir + "global.tracks.sg.0000.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -47,8 +47,6 @@ void global_reco(Int_t nEvents = 100)
 	finder->SetMergerType("nearest_hit");
 	run->AddTask(finder);
 
-//	CbmLitFindGlobalTracksIdeal* finder = new CbmLitFindGlobalTracksIdeal();
-
 	// -----   TRD track matching   --------------------------------------------
 //	CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
 //	run->AddTask(trdMatchTracks);
@@ -60,13 +58,13 @@ void global_reco(Int_t nEvents = 100)
 	// -----   Track finding QA check   ------------------------------------
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
-	reconstructionQa->SetMinNofPointsTrd(8);
+	reconstructionQa->SetMinNofPointsTrd(10);
 	reconstructionQa->SetMinNofPointsMuch(12);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetVerbose(1);
 	run->AddTask(reconstructionQa);
-
+	// ------------------------------------------------------------------------
 
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();
@@ -77,7 +75,7 @@ void global_reco(Int_t nEvents = 100)
 	rtdb->saveOutput();
 	// ------------------------------------------------------------------------
 
-	// -----   Intialise and run   --------------------------------------------
+	// -----   Initialize and run   --------------------------------------------
 	run->LoadGeometry();
 	run->Init();
 	run->Run(0,nEvents);
@@ -85,16 +83,11 @@ void global_reco(Int_t nEvents = 100)
 
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
-	Double_t rtime = timer.RealTime();
-	Double_t ctime = timer.CpuTime();
 	cout << endl << endl;
-	cout << "Macro finished succesfully." << endl;
+	cout << "Macro finished successfully." << endl;
 	cout << "Output file is "    << globalTracksFile << endl;
 	cout << "Parameter file is " << parFile << endl;
-	cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
+	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << endl;
 	cout << endl;
 	// ------------------------------------------------------------------------
-
-	cout << " Test passed" << endl;
-	cout << " All ok " << endl;
 }

@@ -1,4 +1,4 @@
-void much_hits(Int_t nEvents = 100)
+void much_hits(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 

@@ -1,20 +1,9 @@
-#include "../../cbmbase/CbmDetectorList.h";
-void tof_hits(Int_t nEvents = 100)
+void simple_geo(Int_t nEvents = 1)
 {
-	TString script = TString(gSystem->Getenv("SCRIPT"));
-
-	TString dir, mcFile, parFile, trdHitsFile;
-	if (script != "yes") {
-//		dir  = "/d/cbm02/andrey/events/trd/segmented/10e/e/";
-		dir  = "/home/d/andrey/test/trunk/global_mu_urqmd/";
-		mcFile = dir + "mc.0000.root";
-		parFile = dir + "param.0000.root";
-		tofHitsFile = dir + "tof.hits.0000.root";
-	} else {
-		mcFile = TString(gSystem->Getenv("MCFILE"));
-		parFile = TString(gSystem->Getenv("PARFILE"));
-		tofHitsFile = TString(gSystem->Getenv("TOFHITSFILE"));
-	}
+	TString dir = "/home/d/andrey/test/trunk/global_mu_urqmd/";
+	TString mcFile = dir + "mc.0000.root";
+	TString parFile = dir + "param.0000.root";
+	TString outFile = dir + "simple.geo.0000.root";
 
 	TStopwatch timer;
 	timer.Start();
@@ -24,29 +13,32 @@ void tof_hits(Int_t nEvents = 100)
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
 	cbmrootlibs();
 
-	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
-	run->SetOutputFile(tofHitsFile);
-	// ------------------------------------------------------------------------
+	run->SetOutputFile(outFile);
 
-
-	// ------   TOF hit producer   ---------------------------------------------
-	CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
-	run->AddTask(tofHitProd);
+	// -------------------------------------------------------------------------
+	CbmLitCheckSimpleGeo* geo = new CbmLitCheckSimpleGeo();
+	run->AddTask(geo);
 	// -------------------------------------------------------------------------
 
+
+	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
+	TString stsDigiFile = parDir+ "/sts/sts_Standard_s3055AAFK5.SecD.digi.par";
 
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();
 	FairParRootFileIo* parIo1 = new FairParRootFileIo();
+	FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
 	parIo1->open(parFile.Data());
+	parIo2->open(stsDigiFile.Data(),"in");
 	rtdb->setFirstInput(parIo1);
+	rtdb->setSecondInput(parIo2);
 	rtdb->setOutput(parIo1);
 	rtdb->saveOutput();
 	// ------------------------------------------------------------------------
 
-	// -----   Initialize and run   --------------------------------------------
+	// -----   Intialise and run   --------------------------------------------
 	run->LoadGeometry();
 	run->Init();
 	run->Run(0,nEvents);
@@ -56,7 +48,7 @@ void tof_hits(Int_t nEvents = 100)
 	timer.Stop();
 	cout << endl << endl;
 	cout << "Macro finished succesfully." << endl;
-	cout << "Output file is "    << trdHitsFile << endl;
+	cout << "Output file is "    << outFile << endl;
 	cout << "Parameter file is " << parFile << endl;
 	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << endl;
 	cout << endl;

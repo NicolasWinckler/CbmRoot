@@ -1,11 +1,11 @@
-void global_reco_ideal(Int_t nEvents = 1000)
+void global_reco_ideal(Int_t nEvents = 10000)
 {
-	TString dir  = "/home/d/andrey/test/trunk/global_e/";
+	TString dir  = "/home/d/andrey/test/trunk/global_mu/";
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
 
-	Bool_t isElectronSetup = true;
+	Bool_t isElectronSetup = false;
 
 	Int_t iVerbose = 1;
 	TStopwatch timer;
@@ -53,13 +53,13 @@ void global_reco_ideal(Int_t nEvents = 1000)
 
 	if (!isElectronSetup) {
 	// ----- MUCH reconstruction   --------------------------------------------
-		CbmMuchDigitize* muchDigitize = new CbmMuchDigitize("MuchDigitize", muchDigiFile.Data(), iVerbose);
-		muchDigitize->SetUseAvalanche(0); // 0 - Not account for avalanches; 1 - Account for avalanches
+		CbmMuchDigitizeSimpleGem* muchDigitize = new CbmMuchDigitizeSimpleGem("MuchDigitize", muchDigiFile.Data(), iVerbose);
+//		muchDigitize->SetUseAvalanche(0); // 0 - Not account for avalanches; 1 - Account for avalanches
 		//muchDigitize->SetMeanNoise(0);
 		run->AddTask(muchDigitize);
 
-		CbmMuchFindHits* muchFindHits = new CbmMuchFindHits("MuchFindHits", muchDigiFile.Data(), iVerbose);
-		muchFindHits->SetUseClustering(0);
+		CbmMuchFindHitsSimpleGem* muchFindHits = new CbmMuchFindHitsSimpleGem("MuchFindHits", muchDigiFile.Data(), iVerbose);
+//		muchFindHits->SetUseClustering(0);
 		run->AddTask(muchFindHits);
 
 		CbmMuchTrackFinder* muchTrackFinder = new CbmMuchTrackFinderIdeal();

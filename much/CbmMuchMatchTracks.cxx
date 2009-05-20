@@ -2,7 +2,7 @@
 
 #include "CbmMuchHit.h"
 #include "CbmMuchTrack.h"
-#include "CbmMuchTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchCluster.h"
 
@@ -76,7 +76,7 @@ void CbmMuchMatchTracks::Exec(Option_t* opt)
     Int_t nofWrong = nofHits - nofTrue - nofFake;
     Int_t nofMcTracks = matchMap.size() - 1;
 
-    new ((*fMatches)[iTrack]) CbmMuchTrackMatch(
+    new ((*fMatches)[iTrack]) CbmTrackMatch(
             bestMcTrackId, nofTrue, nofWrong, nofFake, nofMcTracks);
 
     fNofHits += nofHits;

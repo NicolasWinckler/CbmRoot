@@ -129,7 +129,7 @@ void CbmMuchFindHitsSimpleGem::Exec(Option_t* opt) {
     pos.SetXYZ(x, y, z);
     dpos.SetXYZ(sigmaX, sigmaY, 0.);
     Int_t planeId = fGeoScheme->GetLayerSideNr(detectorId);
-    new ((*fHits)[nHits]) CbmMuchHit(detectorId, pos, dpos, 0, iDigi,
+    new ((*fHits)[nHits]) CbmMuchHit(detectorId, pos, dpos, 0, nHits,
         digi->GetTimes(), digi->GetDTime(), planeId);
 
     // Create a cluster consisting of only one digi

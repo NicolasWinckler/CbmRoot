@@ -40,13 +40,13 @@ class CbmMuchHit : public CbmHit
   *@param pos       Position in global c.s. [cm]
   *@param dPos      Errors of position in global c.s. [cm]
   *@param dxy       Covariance of x and y
-  *@param iDigi     Digi index
-  *@param times      Time since event start [ns]
+  *@param iCluster  Parent cluster index
+  *@param times     Time since event start [ns]
   *@param dTime     Time resolution [ns]
   *@param stationNr plane id (first plane: stationNr=1)
   **/
   CbmMuchHit(Int_t detId, TVector3& pos, TVector3& dPos,
-	     Double_t dxy, Int_t iDigi, Double_t* times,
+	     Double_t dxy, Int_t iCluster, Double_t* times,
 	     Double_t dTime, Int_t stationNr=-1);
 
   /** Standard constructor (clustering)

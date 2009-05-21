@@ -5,20 +5,11 @@
 // Includes from MUCH
 #include "CbmMuchDigitizeStraws.h"
 #include "CbmMuchPoint.h"
-#include "CbmMuchStation.h"
-#include "CbmMuchLayer.h"
-#include "CbmMuchLayerSide.h"
 #include "CbmMuchModuleStraws.h"
 
 // Includes from base
 #include "FairRootManager.h"
-#include "CbmMCTrack.h"
-#include "FairMCPoint.h"
 
-// Includes from ROOT
-#include "TObjArray.h"
-#include "TDatabasePDG.h"
-#include "TFile.h"
 
 #include <iostream>
 #include <iomanip>
@@ -162,8 +153,7 @@ void CbmMuchDigitizeStraws::FinishTask() {
 // -----   Private method Init   -------------------------------------------
 InitStatus CbmMuchDigitizeStraws::Init() {
   FairRootManager* ioman = FairRootManager::Instance();
-  if (!ioman)
-    Fatal("Init", "No FairRootManager");
+  if (!ioman) Fatal("Init", "No FairRootManager");
 
   // Initialize GeoScheme
   TObjArray* stations = (TObjArray*) fDigiFile->Get("stations");
@@ -172,13 +162,19 @@ InitStatus CbmMuchDigitizeStraws::Init() {
   // Get input array of MuchPoints
   fPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
 
-  // Register output array MuchDigi
-  fDigis = new TClonesArray("CbmMuchDigi", 1000);
-  ioman->Register("MuchDigi", "Digital response in MUCH", fDigis, kTRUE);
+  // Get Digi array from memory
+  fDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
+  if (! fDigis) {
+    fDigis = new TClonesArray("CbmMuchDigi", 1000);
+    ioman->Register("MuchDigi", "Digi in MUCH", fDigis, kTRUE);
+  }
 
-  // Register output array MuchDigiMatches
-  fDigiMatches = new TClonesArray("CbmMuchDigiMatch", 1000);
-  ioman->Register("MuchDigiMatch", "Digi Match in MUCH", fDigiMatches, kTRUE);
+  // Get DigiMatch array from memory
+  fDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
+  if (! fDigiMatches) {
+    fDigiMatches = new TClonesArray("CbmMuchDigiMatch", 1000);
+    ioman->Register("MuchDigiMatch", "Digi Match in MUCH", fDigiMatches, kTRUE);
+  }
 
   fEvent = 0;
 
@@ -208,12 +204,10 @@ Bool_t CbmMuchDigitizeStraws::ExecStraws(CbmMuchPoint* point,Int_t iPoint){
   // Digitize straw tube MC point
   Int_t detectorId = point->GetDetectorID();
 
-  //new ((*fDigis)[fNDigis]) CbmMuchDigi(stationNr, sectorNr, iChannel, time, fDTime);
   Int_t iDigi = fDigis->GetEntriesFast();
   CbmMuchDigi *digi = new ((*fDigis)[iDigi]) CbmMuchDigi(detectorId, 0, -1, 0);
   CbmMuchDigiMatch* match = new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch();
   match->AddPoint(iPoint);
-  //cout << detID << " " << stationNr << " " << layer << " " << digi->GetDetectorId() << endl;
   Double_t coord[3];
   coord[0] = (point->GetXIn() + point->GetXOut()) / 2.;
   coord[1] = (point->GetYIn() + point->GetYOut()) / 2.;
@@ -225,7 +219,6 @@ Bool_t CbmMuchDigitizeStraws::ExecStraws(CbmMuchPoint* point,Int_t iPoint){
     if (coord[i] < 0) signs |= (1 << i);
   }
   digi->SetUniqueID(signs);
-  //cout << " Straw digi: " << coord[0] << " " << coord[1] << " " << coord[2] << " " << signs << endl;
   return kTRUE;
 }
 // -------------------------------------------------------------------------

@@ -214,8 +214,8 @@ Bool_t CbmMuchDigitizeStraws::ExecStraws(CbmMuchPoint* point,Int_t iPoint){
   coord[2] = (point->GetZIn() + point->GetZOut()) / 2.;
   // Pass abs values of coordinates and their sign in some stupid manner
   Int_t signs = 0;
+  digi->AddTime(point->GetTime() + gRandom->Gaus(0, 8e-2));
   for (Int_t i = 0; i < 3; ++i) {
-    digi->AddTime(TMath::Abs(coord[i]));
     if (coord[i] < 0) signs |= (1 << i);
   }
   digi->SetUniqueID(signs);

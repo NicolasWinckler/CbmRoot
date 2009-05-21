@@ -19,7 +19,7 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws() : FairTask("MuchFindHits", 1) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(Int_t iVerbose)
-  : FairTask("MuchFindHits", iVerbose) {
+: FairTask("MuchFindHits", iVerbose) {
   fDigiFile    = NULL;
   fDigis   = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
@@ -28,7 +28,7 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(Int_t iVerbose)
 
 // -----   Constructor with name   -----------------------------------------
 CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(const char* name, const char* digiFileName, Int_t iVerbose)
-  : FairTask(name, iVerbose) {
+: FairTask(name, iVerbose) {
   fDigiFile    = new TFile(digiFileName);
   fDigis   = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
@@ -61,14 +61,9 @@ InitStatus CbmMuchFindHitsStraws::Init() {
   TObjArray* stations = (TObjArray*) fDigiFile->Get("stations");
   fGeoScheme->Init(stations);
 
-  // Get Hit array from memory
-  fHits = (TClonesArray*) ioman->GetObject("MuchHit");
-  // register if not in memory
-  if (! fHits) {
-    // Register hit array
-    fHits = new TClonesArray("CbmMuchHit", 1000);
-    ioman->Register("MuchHit", "Hit in MUCH", fHits, kTRUE);
-  }
+  // Register hit array
+  fHits = new TClonesArray("CbmMuchStrawHit", 1000);
+  ioman->Register("MuchStrawHit", "Straw hit in MUCH", fHits, kTRUE);
 
   return kSUCCESS;
 }
@@ -83,7 +78,7 @@ InitStatus CbmMuchFindHitsStraws::ReInit() {
 
 // -----   Public method Exec   --------------------------------------------
 void CbmMuchFindHitsStraws::Exec(Option_t* opt) {
-/*
+  /*
   // Make hits in straw tubes
 
   static Int_t first = 1;
@@ -171,7 +166,7 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt) {
     hit->SetCluster(itube); // tube number
     //new ((*fHits)[nHits++]) CbmMuchHit(detId, pos, dpos, wXY, iDigi, digi->GetTimes(), digi->GetDTime());
   }
-*/
+   */
 }
 // -------------------------------------------------------------------------
 

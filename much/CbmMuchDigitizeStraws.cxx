@@ -6,6 +6,7 @@
 #include "CbmMuchDigitizeStraws.h"
 #include "CbmMuchPoint.h"
 #include "CbmMuchModuleStraws.h"
+#include "TRandom.h"
 
 // Includes from base
 #include "FairRootManager.h"

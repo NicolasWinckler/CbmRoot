@@ -9,10 +9,10 @@
 #ifndef CBMMUCHCLUSTER_H
 #define CBMMUCHCLUSTER_H 1
 
-#include <vector>
-
 #include "TObject.h"
 #include "TArrayI.h"
+
+#include <vector>
 
 using std::vector;
 
@@ -20,12 +20,26 @@ class CbmMuchCluster : public TObject{
 
 public:
 
+  /**
+   * Default constructor.
+   */
   CbmMuchCluster();
+  /**
+   * Standard constructor.
+   * @param digiIndices Indices of the digis that are contained in the cluster
+   * @param charge      The whole cluster charge
+   */
   CbmMuchCluster(vector<Int_t> digiIndices, Int_t charge);
+  /**
+   * Standard constructor.
+   * @param digiIndices Indices of the digis that are contained in the cluster
+   * @param charge      The whole cluster charge
+   * @param qMax        Maximum charge on a pad from the cluster
+   */
   CbmMuchCluster(vector<Int_t> digiIndices, Int_t charge, Int_t qMax);
 
   ~CbmMuchCluster();
-  
+
   TArrayI GetDigis()                const {return fDigiIndices;}
   Int_t   GetNDigis()               const {return fDigiIndices.GetSize();}
   Int_t   GetDigiIndex(Int_t iDigi) const {return fDigiIndices.At(iDigi);}

@@ -51,21 +51,14 @@ class CbmMuchDigiMatch : public TObject
    * be accessed through GetRefIndex(i). **/
   UInt_t GetCharge(Int_t i) const;
 
-  Int_t GetClusterIndex() const {return fClusterIndex;}
-  void SetClusterIndex(Int_t i) {fClusterIndex = i;}
-
 
  private:
 
   TArrayI fRefIndex;      // Array of MC point indices
   TArrayI fCharge;        // Array of charges from each MC point
-  Int_t   fClusterIndex;  // Index of a cluster which a digi belongs to
 
   ClassDef(CbmMuchDigiMatch,1);
 
 };
 
 #endif
-
-
-

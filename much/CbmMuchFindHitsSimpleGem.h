@@ -9,17 +9,16 @@
  **/
 
 
-#ifndef CBMMUCHFINDHITSSIMPLE_H
-#define CBMMUCHFINDHITSSIMPLE_H 1
+#ifndef CBMMUCHFINDHITSSIMPLEGEM_H
+#define CBMMUCHFINDHITSSIMPLEGEM_H 1
 
-#include "CbmMuchSector.h"
 #include "CbmMuchGeoScheme.h"
-#include "TStopwatch.h"
 
 #include "FairTask.h"
 
-#include "TFile.h"
-#include "TClonesArray.h"
+#include "TStopwatch.h"
+
+class TFile;
 
 class CbmMuchFindHitsSimpleGem : public FairTask
 {
@@ -44,6 +43,7 @@ class CbmMuchFindHitsSimpleGem : public FairTask
   CbmMuchGeoScheme*                fGeoScheme;         // Geometry scheme
   TFile*                           fDigiFile;          // Digitization file
   TClonesArray*                    fHits;              // Output array of CbmMuchHit
+  TClonesArray*                    fClusters;          // Output array of CbmMuchCluster
   TClonesArray*                    fDigis;             // Input array of CbmMuchDigi
   TStopwatch                       fTimer;             // Timer
 

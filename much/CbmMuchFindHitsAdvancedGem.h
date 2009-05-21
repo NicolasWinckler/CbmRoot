@@ -8,8 +8,8 @@
  ** Produces objects of type CbmMuchCluster.
  **/
 
-#ifndef CBMMUCHFINDCLUSTERS_H
-#define CBMMUCHFINDCLUSTERS_H 1
+#ifndef CBMMUCHFINDHITSADVANCEDGEM_H
+#define CBMMUCHFINDHITSADVANCEDGEM_H 1
 
 
 #include "TStopwatch.h"
@@ -87,9 +87,6 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
 
   /**  **/
   void CreateCluster(Int_t iDigi, vector<Int_t> &digiIndices, Int_t &sumCharge, Int_t &qMax, Int_t qThreshold = 0);
-
-  /** **/
-  void SetDigiClusterMatch(vector<Int_t> digiIndices, Int_t clusterIndex);
 
   void ApplyThreshold(CbmMuchCluster* cluster, vector<CbmMuchCluster*> &newClusters);
   /** **/

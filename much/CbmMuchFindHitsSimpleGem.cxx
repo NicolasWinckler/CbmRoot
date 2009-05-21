@@ -9,16 +9,18 @@
  **/
 
 #include "CbmMuchFindHitsSimpleGem.h"
+#include "CbmMuchSector.h"
 #include "CbmMuchDigi.h"
 #include "CbmMuchHit.h"
+#include "CbmMuchCluster.h"
 #include "CbmMuchModuleGem.h"
 #include "FairRootManager.h"
 
 #include "TMath.h"
-#include "TVector3.h"
 
 #include <iostream>
 #include <iomanip>
+#include <vector>
 
 using std::cout;
 using std::cerr;
@@ -28,6 +30,7 @@ using std::fixed;
 using std::left;
 using std::right;
 using std::setprecision;
+using std::vector;
 
 // -----   Default constructor   ------------------------------------------
 CbmMuchFindHitsSimpleGem::CbmMuchFindHitsSimpleGem() : FairTask("MuchFindHitsSimpleGem", 1) {
@@ -61,6 +64,10 @@ CbmMuchFindHitsSimpleGem::~CbmMuchFindHitsSimpleGem() {
     fHits->Delete();
     delete fHits;
   }
+  if ( fClusters ) {
+    fClusters->Delete();
+    delete fClusters;
+  }
 }
 // -------------------------------------------------------------------------
 
@@ -72,8 +79,10 @@ void CbmMuchFindHitsSimpleGem::Exec(Option_t* opt) {
 
   // Clear output array
   if(fHits) fHits->Clear();
+  if(fClusters) fClusters->Clear();
   Int_t nHits=0;
 
+  if(!fDigis) printf("FUCK!!!\n");
   Int_t nDigis = fDigis->GetEntriesFast();
   for(Int_t iDigi = 0; iDigi < nDigis; ++iDigi){
     CbmMuchDigi* digi = (CbmMuchDigi*)fDigis->At(iDigi);
@@ -86,7 +95,7 @@ void CbmMuchFindHitsSimpleGem::Exec(Option_t* opt) {
     if(!module) continue;
 
     // Get sector and its properties
-    CbmMuchSector* sector = module->GetSector(channelId);//fGeoScheme->GetSectorByDetId(detectorId, channelId);
+    CbmMuchSector* sector = module->GetSector(channelId);
     if(!sector) continue;
     Double_t xc     = sector->GetPosition()[0];
     Double_t yc     = sector->GetPosition()[1];
@@ -101,7 +110,7 @@ void CbmMuchFindHitsSimpleGem::Exec(Option_t* opt) {
     Double_t sigmaY = dy/TMath::Sqrt(12.);
 
     // Find hit coordinates
-    Int_t iChannel = CbmMuchModuleGem::GetChannelIndex(channelId);//CbmMuchGeoScheme::GetChannelIndex(channelId);
+    Int_t iChannel = CbmMuchModuleGem::GetChannelIndex(channelId);
     Int_t iRow  = Int_t( iChannel / nColumns );
     Int_t iCol  = iChannel - iRow * nColumns;
     Double_t xint = ( Double_t(iCol) + 0.5 ) * dx;
@@ -120,8 +129,13 @@ void CbmMuchFindHitsSimpleGem::Exec(Option_t* opt) {
     pos.SetXYZ(x, y, z);
     dpos.SetXYZ(sigmaX, sigmaY, 0.);
     Int_t planeId = fGeoScheme->GetLayerSideNr(detectorId);
-    new ((*fHits)[nHits++]) CbmMuchHit(detectorId, pos, dpos, 0, iDigi,
+    new ((*fHits)[nHits]) CbmMuchHit(detectorId, pos, dpos, 0, iDigi,
         digi->GetTimes(), digi->GetDTime(), planeId);
+
+    // Create a cluster consisting of only one digi
+    vector<Int_t> digiIndices;
+    digiIndices.push_back(iDigi);
+    new ((*fClusters)[nHits++]) CbmMuchCluster(digiIndices, 0, 0);
   }
 
   fTimer.Stop();
@@ -161,6 +175,8 @@ InitStatus CbmMuchFindHitsSimpleGem::Init() {
   // Register output array
   fHits = new TClonesArray("CbmMuchHit", 1000);
   ioman->Register("MuchHit", "Hit in MUCH", fHits, kTRUE);
+  fClusters = new TClonesArray("CbmMuchCluster", 1000);
+  ioman->Register("MuchCluster", "Cluster in MUCH", fClusters, kTRUE);
 
   return kSUCCESS;
 }

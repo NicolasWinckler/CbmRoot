@@ -11,6 +11,9 @@ ${CBMROOT_SOURCE_DIR}/cbmbase
 ${CBMROOT_SOURCE_DIR}/cbmdata 
 ${CBMROOT_SOURCE_DIR}/cbmdata/much 
 ${CBMROOT_SOURCE_DIR}/much
+${CBMROOT_SOURCE_DIR}/much/geo
+${CBMROOT_SOURCE_DIR}/much/reco
+${CBMROOT_SOURCE_DIR}/much/tracking
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -22,34 +25,35 @@ ${ROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(MUCH_SRCS
-CbmGeoMuch.cxx  
-CbmGeoMuchPar.cxx 
-CbmMuch.cxx
-CbmMuchContFact.cxx  
-CbmMuchDigitizeAdvancedGem.cxx
-CbmMuchDigitizeSimpleGem.cxx
-CbmMuchDigitizeStraws.cxx
-CbmMuchFindHitsAdvancedGem.cxx
-CbmMuchFindHitsSimpleGem.cxx
-CbmMuchFindTracks.cxx
-CbmMuchGeoScheme.cxx
-CbmMuchHitFinderQa.cxx
-CbmMuchHitProducerIdeal.cxx
-CbmMuchLayer.cxx
-CbmMuchLayerSide.cxx
-CbmMuchMatchTracks.cxx 
-CbmMuchModule.cxx
-CbmMuchModuleGem.cxx
-CbmMuchModuleStraws.cxx
-CbmMuchPad.cxx
-CbmMuchPointInfo.cxx
-#CbmMuchPhysicsQa.cxx
-CbmMuchSector.cxx
-CbmMuchSegmentAuto.cxx
-CbmMuchSegmentManual.cxx
-CbmMuchStation.cxx
-CbmMuchTrackFinderIdeal.cxx
-CbmMuchFindHitsStraws.cxx
+geo/CbmGeoMuch.cxx  
+geo/CbmGeoMuchPar.cxx 
+geo/CbmMuch.cxx
+geo/CbmMuchContFact.cxx  
+geo/CbmMuchGeoScheme.cxx
+geo/CbmMuchLayer.cxx
+geo/CbmMuchLayerSide.cxx
+geo/CbmMuchModule.cxx
+geo/CbmMuchModuleGem.cxx
+geo/CbmMuchModuleStraws.cxx
+geo/CbmMuchPad.cxx
+geo/CbmMuchSector.cxx
+geo/CbmMuchSegmentAuto.cxx
+geo/CbmMuchSegmentManual.cxx
+geo/CbmMuchStation.cxx
+
+reco/CbmMuchDigitizeAdvancedGem.cxx
+reco/CbmMuchDigitizeSimpleGem.cxx
+reco/CbmMuchDigitizeStraws.cxx
+reco/CbmMuchFindHitsAdvancedGem.cxx
+reco/CbmMuchFindHitsSimpleGem.cxx
+reco/CbmMuchFindHitsStraws.cxx
+reco/CbmMuchHitFinderQa.cxx
+reco/CbmMuchHitProducerIdeal.cxx
+reco/CbmMuchPointInfo.cxx
+
+tracking/CbmMuchFindTracks.cxx
+tracking/CbmMuchMatchTracks.cxx 
+tracking/CbmMuchTrackFinderIdeal.cxx
 )
 
 if(RULE_CHECKER_FOUND)

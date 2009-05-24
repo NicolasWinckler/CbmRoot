@@ -9,13 +9,13 @@
 #pragma link C++ class  CbmGeoMuchPar;
 #pragma link C++ class  CbmMuch+;
 #pragma link C++ class  CbmMuchContFact;
+#pragma link C++ class  CbmMuchGeoScheme+;
 #pragma link C++ class  CbmMuchDigitizeAdvancedGem+;
 #pragma link C++ class  CbmMuchDigitizeSimpleGem+;
 #pragma link C++ class  CbmMuchDigitizeStraws+;
 #pragma link C++ class  CbmMuchFindHitsAdvancedGem+;
 #pragma link C++ class  CbmMuchFindHitsSimpleGem+;
 #pragma link C++ class  CbmMuchFindTracks+;
-#pragma link C++ class  CbmMuchGeoScheme+;
 #pragma link C++ class  CbmMuchHitFinderQa+;
 #pragma link C++ class  CbmMuchHitProducerIdeal+;
 #pragma link C++ class  CbmMuchLayer+;

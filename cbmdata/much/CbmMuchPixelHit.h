@@ -29,6 +29,7 @@ public:
 	 * @param dz Z position error of the hit [cm]
 	 * @param dxy XY correlation of the hit
 	 * @param refId some reference ID
+	 * @param planeId detector plane identifier
 	 **/
 	CbmMuchPixelHit(
 			Int_t detectorId,
@@ -48,6 +49,7 @@ public:
       *@param err Errors of position in global c.s. [cm]
 	  *@param dxy  Covariance of x and y
 	  *@param refId Index of digi or cluster
+	  *@param planeId detectro plane identifier
 	  **/
 	CbmMuchPixelHit(
 			Int_t detectorId,
@@ -63,6 +65,7 @@ public:
 	  *@param err       Errors of position in global c.s. [cm]
 	  *@param dxy       Covariance of x and y
 	  *@param refId     index of digi or cluster
+	  *@param planeId   detectror plane identifier
 	  *@param times     Time since event start [ns]
 	  *@param dTime     Time resolution [ns]
 	**/

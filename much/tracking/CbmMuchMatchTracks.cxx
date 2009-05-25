@@ -102,7 +102,7 @@ InitStatus CbmMuchMatchTracks::Init()
   FairRootManager* ioman = FairRootManager::Instance();
   if (ioman == NULL) Fatal("Init", "RootManager not instantised!");
 
-  fHits = (TClonesArray*) ioman->GetObject("MuchHit");
+  fHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
   if (fHits == NULL) Fatal("Init", "No MuchHit array!");
 
   fTracks = (TClonesArray*) ioman->GetObject("MuchTrack");

@@ -25,6 +25,8 @@ CbmMCTrack.cxx
 CbmTrack.cxx
 CbmTrackMatch.cxx
 CbmStack.cxx
+CbmBaseHit.cxx
+CbmStripHit.cxx
 
 mvd/CbmMvdDetectorId.cxx
 mvd/CbmMvdCluster.cxx 
@@ -53,6 +55,7 @@ much/CbmMuchDigi.cxx
 much/CbmMuchDigiMatch.cxx
 much/CbmMuchTrack.cxx 
 much/CbmMuchTrackMatch.cxx
+much/CbmMuchStrawHit.cxx
 
 trd/CbmTrdHit.cxx		 
 trd/CbmTrdTrack.cxx		 

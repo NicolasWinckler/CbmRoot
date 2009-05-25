@@ -11,6 +11,8 @@
 #pragma link C++ class CbmTrack+;
 #pragma link C++ class CbmTrackMatch+;
 #pragma link C++ class CbmStack+;
+#pragma link C++ class CbmBaseHit+;
+#pragma link C++ class CbmStripHit+;
 
 #pragma link C++ class CbmMvdCluster+;
 #pragma link C++ class CbmMvdDetectorId+;
@@ -39,6 +41,7 @@
 #pragma link C++ class CbmMuchDigiMatch+;
 #pragma link C++ class CbmMuchTrack+;
 #pragma link C++ class CbmMuchTrackMatch+;
+#pragma link C++ class CbmMuchStrawHit+;
 
 #pragma link C++ class CbmTrdHit+;
 #pragma link C++ class CbmTrdPoint+;

@@ -66,7 +66,7 @@ Int_t CbmLitMuchTrackFinderBranch::DoFind(
 	TrackPtrVector trackSeeds;
 	TrackPtrVector foundTracks;
 
-	CbmLitConverter::MuchHitArrayToHitVector(hitArray, hits);
+	CbmLitConverter::HitArrayToHitVector(hitArray, hits);
 	DefaultCreateTrackSeeds(fTrackSeedsArray, trackSeeds, fLayout, fPDG);
 
 	CbmLitTrackFinderBranch::DoFind(hits, trackSeeds, foundTracks);

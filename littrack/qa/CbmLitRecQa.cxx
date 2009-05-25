@@ -1,8 +1,11 @@
 #include "CbmLitRecQa.h"
 
+#include "CbmBaseHit.h"
+#include "CbmPixelHit.h"
+#include "CbmStripHit.h"
 #include "CbmMuchTrack.h"
 #include "CbmTrackMatch.h"
-#include "CbmMuchHit.h"
+//#include "CbmMuchHit.h"
 #include "CbmTrdTrack.h"
 #include "CbmTrdTrackMatch.h"
 #include "CbmTrdHit.h"

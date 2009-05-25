@@ -9,11 +9,14 @@
 #include "CbmLitToolFactory.h"
 //#include "CbmLitSimpleGeometryConstructor.h"
 
+#include "CbmBaseHit.h"
+#include "CbmPixelHit.h"
+#include "CbmStripHit.h"
 #include "CbmStsTrack.h"
 #include "CbmTrdTrack.h"
 #include "CbmMuchTrack.h"
 #include "CbmTrdHit.h"
-#include "CbmMuchHit.h"
+//#include "CbmMuchHit.h"
 #include "CbmTofHit.h"
 #include "CbmGlobalTrack.h"
 #include "FairRootManager.h"
@@ -116,8 +119,8 @@ void CbmLitFindGlobalTracks::ReadAndCreateDataBranches()
 
 	//MUCH data
 	if (fIsMuch) {
-		fMuchHits = (TClonesArray*) ioman->GetObject("MuchHit");
-		if (NULL == fMuchHits) Fatal("Init", "No MuchHit array!");
+		fMuchHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
+		if (NULL == fMuchHits) Fatal("Init", "No MuchPixelHit array!");
 		std::cout << "-I- MuchHit branch found in tree" << std::endl;
 	}
 
@@ -182,7 +185,7 @@ void CbmLitFindGlobalTracks::ConvertInputData()
 	CbmLitConverter::StsTrackArrayToTrackVector(fStsTracks, fLitStsTracks);
 	std::cout << "-I- Number of STS tracks: " << fLitStsTracks.size() << std::endl;
 	if (fIsMuch) {
-		CbmLitConverter::MuchHitArrayToHitVector(fMuchHits, fLitMuchHits);
+		CbmLitConverter::HitArrayToHitVector(fMuchHits, fLitMuchHits);
 		std::cout << "-I- Number of MUCH hits: " << fLitMuchHits.size() << std::endl;
 	}
 	if (fIsTrd) {

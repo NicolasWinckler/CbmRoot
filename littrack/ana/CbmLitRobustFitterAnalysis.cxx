@@ -8,8 +8,11 @@
 #include "CbmLitTypes.h"
 #include "CbmLitTrackFitter.h"
 
+#include "CbmBaseHit.h"
+#include "CbmPixelHit.h"
+#include "CbmStripHit.h"
 #include "CbmMuchTrack.h"
-#include "CbmMuchHit.h"
+//#include "CbmMuchHit.h"
 #include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 #include "CbmStsTrack.h"
@@ -212,8 +215,8 @@ void CbmLitRobustFitterAnalysis::MatchTracks(
 		std::map<Int_t, Int_t> matchMap;
 		Int_t nofHits = (*it)->GetNofHits();
 		for (Int_t iHit = 0; iHit < nofHits; iHit++) {
-			CbmMuchHit* pHit = (CbmMuchHit*) fHits->At((*it)->GetHit(iHit)->GetRefId());
-			Int_t digiIndex = pHit->GetDigi();
+			CbmPixelHit* pHit = (CbmPixelHit*) fHits->At((*it)->GetHit(iHit)->GetRefId());
+			Int_t digiIndex = pHit->GetRefId();
 			CbmMuchDigiMatch* pDigiMatch = (CbmMuchDigiMatch*) fDigiMatches->At(digiIndex);
 			for (Int_t iDigi = 0; iDigi < pDigiMatch->GetNPoints(); iDigi++) {
 			   Int_t pointIndex = pDigiMatch->GetRefIndex(iDigi);

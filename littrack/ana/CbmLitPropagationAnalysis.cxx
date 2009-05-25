@@ -15,11 +15,14 @@
 #include "CbmLitSimpleGeometryConstructor.h"
 
 #include "CbmHit.h"
+#include "CbmBaseHit.h"
+#include "CbmPixelHit.h"
+#include "CbmStripHit.h"
 #include "CbmGlobalTrack.h"
 #include "CbmStsTrack.h"
 #include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
-#include "CbmMuchHit.h"
+//#include "CbmMuchHit.h"
 #include "CbmMuchTrack.h"
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
@@ -149,8 +152,9 @@ void CbmLitPropagationAnalysis::ReadDataBranches()
    	if (fIsMuch) {
 		fMuchTracks = (TClonesArray*) ioman->GetObject("MuchTrack");
 		if (NULL == fMuchTracks) Fatal("Init", "No MuchTrack array!");
-		fMuchHits = (TClonesArray*) ioman->GetObject("MuchHit");
-		if (NULL == fMuchHits) Fatal("Init", "No MuchHit array!");
+		fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
+		fMuchStrawHits = (TClonesArray*) ioman->GetObject("MuchStrawHit");
+		if (NULL == fMuchPixelHits && NULL == fMuchStrawHits) Fatal("Init", "No MuchPixelHit AND/OR MuchStrawHit arrays!");
 		fMuchTrackMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
 		if (NULL == fMuchTrackMatches) Fatal("Init", "No MuchTrackMatch array!");
 		fMuchDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
@@ -293,16 +297,17 @@ void CbmLitPropagationAnalysis::GlobalTrackToLitTrack(
 		CbmMuchTrack* muchTrack = (CbmMuchTrack*) fMuchTracks->At(muchId);
 		for (int iHit = 0; iHit < muchTrack->GetNHits(); iHit++) {
 			Int_t index = muchTrack->GetHitIndex(iHit);
-			CbmMuchHit* hit = (CbmMuchHit*) fMuchHits->At(index);
-			if (hit->GetTime(2) == -77777) {
-				CbmLitStripHit litHit;
-				CbmLitConverter::MuchHitToLitStripHit(hit, index, &litHit);
-				litTrack->AddHit(&litHit);
-			} else {
+			//TODO: add straw hits here!!!!!
+			CbmPixelHit* hit = (CbmPixelHit*) fMuchPixelHits->At(index);
+//			if (hit->GetTime(2) == -77777) {
+//				CbmLitStripHit litHit;
+//				CbmLitConverter::MuchHitToLitStripHit(hit, index, &litHit);
+//				litTrack->AddHit(&litHit);
+//			} else {
 				CbmLitPixelHit litHit;
-				CbmLitConverter::TrkHitToLitPixelHit(hit, index, &litHit);
+				CbmLitConverter::PixelHitToLitPixelHit(hit, index, &litHit);
 				litTrack->AddHit(&litHit);
-			}
+//			}
 		}
 	}
 	//TRD: attach hits from TRD track
@@ -354,8 +359,9 @@ void CbmLitPropagationAnalysis::GlobalTrackToMCLitTrack(
 	if (muchId > -1) {
 		for (Int_t i = 0; i < nofMuchHits; i++){
 			Int_t hitIndex = muchTrack->GetHitIndex(i);
-			CbmMuchHit* hit = (CbmMuchHit*) fMuchHits->At(hitIndex);
-			Int_t digiIndex = hit->GetDigi();
+			//TODO: add strip hit
+			CbmPixelHit* hit = (CbmPixelHit*) fMuchPixelHits->At(hitIndex);
+			Int_t digiIndex = hit->GetRefId();
 			CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
 			Int_t pointIndex = digiMatch->GetRefIndex(0);
 			if (pointIndex < 0) Fatal("CbmLitPropagationAnalysis", "Wrong point index");

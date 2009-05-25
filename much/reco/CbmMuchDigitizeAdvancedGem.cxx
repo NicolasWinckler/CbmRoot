@@ -456,6 +456,16 @@ void CbmMuchDigitizeAdvancedGem::FirePads() {
 
 // -----   Private method AddNoise   ---------------------------------------
 void CbmMuchDigitizeAdvancedGem::AddNoise() {
+//  vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
+//  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
+//    CbmMuchModule* mod = (*it);
+//    if(mod->GetDetectorType() != 1) continue;
+//    CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
+//    vector<CbmMuchPad*> pads = module->GetPads();
+//    for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
+//      AddNoise(*it);
+//    }
+//  }
   vector<CbmMuchPad*> pads = fGeoScheme->GetPads();
   for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
     AddNoise(*it);

@@ -210,6 +210,21 @@ InitStatus CbmMuchHitFinderQa::Init()
     fhOccupancyR[i] = new TH1D(Form("hOccupancy%i",i+1),Form("Occupancy vs radius: station %i;Radius [cm];Occupancy",i+1),100,0,1.2*rMax);
   }
 
+//  vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
+//  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
+//    CbmMuchModule* mod = (*it);
+//    if(mod->GetDetectorType() != 1) continue;
+//    CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
+//    vector<CbmMuchPad*> pads = module->GetPads();
+//    for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
+//      CbmMuchPad* pad = (*it);
+//      Int_t stationId = fGeoScheme->GetStationIndex(pad->GetDetectorId());
+//      Double_t x0 = pad->GetX0();
+//      Double_t y0 = pad->GetY0();
+//      Double_t r0 = TMath::Sqrt(x0*x0+y0*y0);
+//      fhPadsTotalR[stationId]->Fill(r0);
+//    }
+//  }
   vector<CbmMuchPad*> pads = fGeoScheme->GetPads();
   for (Int_t p=0;p<pads.size();p++){
     CbmMuchPad* pad = pads[p];
@@ -850,7 +865,6 @@ void CbmMuchHitFinderQa::StatisticsQa(){
 // -------------------------------------------------------------------------
 void CbmMuchHitFinderQa::PullsQa(){
   Bool_t verbose = (fVerbose>2);
-  vector<CbmMuchPad*> pads = fGeoScheme->GetPads();
   // Filling residuals and pools for hits at the first layer
   for (Int_t i=0;i<fHits->GetEntriesFast();i++){
     CbmMuchHit* hit = (CbmMuchHit*) fHits->At(i);

@@ -411,7 +411,6 @@ Bool_t CbmMuchModuleGem::InitModule(){
   Bool_t useModuleDesign = TMath::Abs(fPosition[0]) > 1e-5 || TMath::Abs(fPosition[1]) > 1e-5;
   if (!InitGrid(useModuleDesign)) return kFALSE;
   InitNeighbourSectors();
-  //            CbmMuchModuleGem* mod = (CbmMuchModuleGem*) module;
   for (Int_t iSector = 0; iSector < GetNSectors(); iSector++) {
     CbmMuchSector* sector = GetSector(iSector);
     if (!sector) continue;

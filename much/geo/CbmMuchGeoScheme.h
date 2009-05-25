@@ -60,11 +60,10 @@ class CbmMuchGeoScheme: public TObject {
 
     /** Destructor.     */
     ~CbmMuchGeoScheme();
+
     static CbmMuchGeoScheme* Instance();
     /** Gets whether the geometry scheme is initialized. */
-    Bool_t IsInitialized() {
-      return fInitialized;
-    }
+    Bool_t IsInitialized() { return fInitialized; }
 
     /**
      * Gets system index for the given detector Id.
@@ -149,25 +148,25 @@ class CbmMuchGeoScheme: public TObject {
     }
 
     // Get geometry objects by indices
-    CbmMuchStation* GetStation(Int_t iStation);
-    CbmMuchLayer* GetLayer(Int_t iStation, Int_t iLayer);
+    CbmMuchStation*   GetStation(Int_t iStation);
+    CbmMuchLayer*     GetLayer(Int_t iStation, Int_t iLayer);
     CbmMuchLayerSide* GetLayerSide(Int_t iStation, Int_t iLayer, Bool_t iSide);
-    CbmMuchModule* GetModule(Int_t iStation, Int_t iLayer, Bool_t iSide, Int_t iModule);
+    CbmMuchModule*    GetModule(Int_t iStation, Int_t iLayer, Bool_t iSide, Int_t iModule);
 
     // Get geometry objects by detector id
-    CbmMuchStation* GetStationByDetId(Int_t detId);
-    CbmMuchLayer* GetLayerByDetId(Int_t detId);
+    CbmMuchStation*   GetStationByDetId(Int_t detId);
+    CbmMuchLayer*     GetLayerByDetId(Int_t detId);
     CbmMuchLayerSide* GetLayerSideByDetId(Int_t detId);
-    CbmMuchModule* GetModuleByDetId(Int_t detId);
+    CbmMuchModule*    GetModuleByDetId(Int_t detId);
 
-    Int_t GetNStations() {return fStations->GetEntries();}
-    Int_t GetNAbsorbers() {return fNabs;}
+    Int_t      GetNStations() {return fStations->GetEntries();}
+    Int_t      GetNAbsorbers() {return fNabs;}
     TObjArray* GetStations() {return fStations;}
     TObjArray* GetAbsorbers() {return fAbsorbers;}
-    TGeoCone* GetMuchCave() {return fMuchCave;}
-    Double_t GetMuchCaveZ0() {return fMuchZ1+fMuchCave->GetDz();}
-    Double_t GetAbsorberZ0(Int_t i) {return fMuchZ1+fAbsorberZ1[i]+((TGeoCone*) fAbsorbers->At(i))->GetDz();}
-    Char_t GetAbsorberMat(Int_t i) {return fAbsorberMat[i];}
+    TGeoCone*  GetMuchCave() {return fMuchCave;}
+    Double_t   GetMuchCaveZ0() {return fMuchZ1+fMuchCave->GetDz();}
+    Double_t   GetAbsorberZ0(Int_t i) {return fMuchZ1+fAbsorberZ1[i]+((TGeoCone*) fAbsorbers->At(i))->GetDz();}
+    Char_t     GetAbsorberMat(Int_t i) {return fAbsorberMat[i];}
 
     Double_t GetActiveLx() {return fActiveLx;}
     Double_t GetActiveLy() {return fActiveLy;}
@@ -184,9 +183,9 @@ class CbmMuchGeoScheme: public TObject {
     void ClearHitArrays();
     void ClearClusterArrays();
     void ResetPads();
-    vector<CbmMuchPad*> GetPads() {return fPads;}
-    vector<CbmMuchModule*> GetModules();
-    vector<CbmMuchModule*> GetModules(Int_t iStation);
+    vector<CbmMuchPad*>       GetPads() {return fPads;}
+    vector<CbmMuchModule*>    GetModules();
+    vector<CbmMuchModule*>    GetModules(Int_t iStation);
     vector<CbmMuchLayerSide*> GetLayerSides(Int_t iStation);
     Int_t GetLayerSideNr(Int_t detId);
 

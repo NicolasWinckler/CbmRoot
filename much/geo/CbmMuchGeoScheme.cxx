@@ -87,9 +87,6 @@ void CbmMuchGeoScheme::Init(TObjArray* stations) {
   Int_t iSide = 0;
   for (Int_t iStation = 0; iStation < GetNStations(); iStation++) {
     vector<CbmMuchLayerSide*> sides = GetLayerSides(iStation);
-//    for (Int_t i = 0; i < sides.size(); i++) {
-//      printf("%i\n", GetLayerSideNr(sides.at(i)->GetDetectorId()));
-//    }
   }
 }
 // -------------------------------------------------------------------------
@@ -97,7 +94,7 @@ void CbmMuchGeoScheme::Init(TObjArray* stations) {
 // -------------------------------------------------------------------------
 void CbmMuchGeoScheme::InitModules() {
   if (!fModulesInitialized) {
-    if (!fStations) Fatal("InitGrid", "No input array of stations.");
+    if (!fStations) Fatal("InitModules", "No input array of stations.");
     Int_t incSides = 0;
     fMapSides.clear();
     fSectors.clear();
@@ -299,7 +296,6 @@ vector<CbmMuchLayerSide*> CbmMuchGeoScheme::GetLayerSides(Int_t iStation) {
   {
     Fatal("GetLayerSides","No input array of stations.");
   }
-
 }
 
 //Int_t CbmMuchGeoScheme::GetLayerSideNr(Int_t detId){
@@ -782,6 +778,7 @@ vector<CbmMuchModule*> CbmMuchGeoScheme::GetModules(){
       modules.push_back(*it);
     }
   }
+  return modules;
 }
 // -------------------------------------------------------------------------
 

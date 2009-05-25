@@ -21,7 +21,7 @@
 #include "FairDetector.h"
 #include "FairRootManager.h"
 #include "CbmMuchPoint.h"
-#include "CbmMuchHit.h"
+#include "CbmMuchPixelHit.h"
 
 using std::cout;
 using std::endl;
@@ -121,9 +121,9 @@ void CbmMuchHitProducerIdeal::Exec(Option_t * option)
 void CbmMuchHitProducerIdeal::AddHit(Int_t detID, TVector3 &posHit,
 				TVector3 &posHitErr, Int_t ref )
 {
-  new((*fHitCollection)[fNHits]) CbmMuchHit(detID, posHit, posHitErr, ref );
+  new((*fHitCollection)[fNHits]) CbmMuchPixelHit(detID, posHit, posHitErr, 0, ref, -1);
   if(fVerbose > 1) {
-    CbmMuchHit* MuchHit = (CbmMuchHit*) fHitCollection->At(fNHits);
+    CbmMuchPixelHit* MuchHit = (CbmMuchPixelHit*) fHitCollection->At(fNHits);
     //MuchHit->Print();
     cout << endl;
   }

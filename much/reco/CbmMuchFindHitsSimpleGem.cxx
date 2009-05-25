@@ -11,7 +11,7 @@
 #include "CbmMuchFindHitsSimpleGem.h"
 #include "CbmMuchSector.h"
 #include "CbmMuchDigi.h"
-#include "CbmMuchHit.h"
+#include "CbmMuchPixelHit.h"
 #include "CbmMuchCluster.h"
 #include "CbmMuchModuleGem.h"
 #include "FairRootManager.h"
@@ -129,8 +129,7 @@ void CbmMuchFindHitsSimpleGem::Exec(Option_t* opt) {
     pos.SetXYZ(x, y, z);
     dpos.SetXYZ(sigmaX, sigmaY, 0.);
     Int_t planeId = fGeoScheme->GetLayerSideNr(detectorId);
-    new ((*fHits)[nHits]) CbmMuchHit(detectorId, pos, dpos, 0, nHits,
-        digi->GetTimes(), digi->GetDTime(), planeId);
+    new ((*fHits)[nHits]) CbmMuchPixelHit(detectorId, pos, dpos, 0, nHits, planeId);
 
     // Create a cluster consisting of only one digi
     vector<Int_t> digiIndices;
@@ -173,8 +172,8 @@ InitStatus CbmMuchFindHitsSimpleGem::Init() {
   fGeoScheme->Init(stations);
 
   // Register output array
-  fHits = new TClonesArray("CbmMuchHit", 1000);
-  ioman->Register("MuchHit", "Hit in MUCH", fHits, kTRUE);
+  fHits = new TClonesArray("CbmMuchPixelHit", 1000);
+  ioman->Register("MuchPixelHit", "Hit in MUCH", fHits, kTRUE);
   fClusters = new TClonesArray("CbmMuchCluster", 1000);
   ioman->Register("MuchCluster", "Cluster in MUCH", fClusters, kTRUE);
 

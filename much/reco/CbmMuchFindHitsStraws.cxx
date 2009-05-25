@@ -3,7 +3,7 @@
 
 #include "CbmMuchFindHitsStraws.h"
 #include "CbmMuchDigi.h"
-#include "CbmMuchHit.h"
+#include "CbmMuchStrawHit.h"
 #include "FairRootManager.h"
 
 

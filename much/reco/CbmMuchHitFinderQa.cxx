@@ -8,7 +8,7 @@
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchCluster.h"
-#include "CbmMuchHit.h"
+#include "CbmMuchPixelHit.h"
 
 #include "CbmMuchStation.h"
 #include "CbmMuchModuleGem.h"
@@ -816,8 +816,8 @@ void CbmMuchHitFinderQa::StatisticsQa(){
   for (Int_t i=0;i<nClusters;i++) pointsInCluster[i]=0;
 
   for (Int_t i=0;i<fHits->GetEntriesFast();i++){
-    CbmMuchHit* hit = (CbmMuchHit*) fHits->At(i);
-    Int_t clusterId = hit->GetCluster();
+    CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fHits->At(i);
+    Int_t clusterId = hit->GetRefId();
     hitsInCluster[clusterId]++;
   }
 
@@ -858,7 +858,7 @@ void CbmMuchHitFinderQa::PullsQa(){
   Bool_t verbose = (fVerbose>2);
   // Filling residuals and pools for hits at the first layer
   for (Int_t i=0;i<fHits->GetEntriesFast();i++){
-    CbmMuchHit* hit = (CbmMuchHit*) fHits->At(i);
+    CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fHits->At(i);
     // Select hits from the second station only
 
     Int_t iStation = CbmMuchGeoScheme::GetStationIndex(hit->GetDetectorId());
@@ -869,11 +869,11 @@ void CbmMuchHitFinderQa::PullsQa(){
 
     // Select hits which are unique in the corresponding cluster
     Bool_t hit_unique=1;
-    Int_t clusterId = hit->GetCluster();
+    Int_t clusterId = hit->GetRefId();
     for (Int_t j=i+1;j<fHits->GetEntriesFast();j++){
-      CbmMuchHit* hit1 = (CbmMuchHit*) fHits->At(j);
+      CbmMuchPixelHit* hit1 = (CbmMuchPixelHit*) fHits->At(j);
       //if (hit1->GetStationNr()>stationNr) break;
-      if (hit1->GetCluster()==clusterId) { hit_unique=0; break;}
+      if (hit1->GetRefId()==clusterId) { hit_unique=0; break;}
     }
     if (verbose) printf("hit_unique=%i",hit_unique);
     if (!hit_unique) {if (verbose) printf("\n"); continue;}

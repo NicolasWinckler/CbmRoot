@@ -14,7 +14,7 @@
 #include "CbmMuchPad.h"
 #include "CbmMuchCluster.h"
 #include "CbmMuchDigi.h"
-#include "CbmMuchHit.h"
+#include "CbmMuchPixelHit.h"
 #include "CbmMuchStation.h"
 #include "FairRootManager.h"
 
@@ -143,8 +143,9 @@ void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
       Int_t detId = module->GetDetectorId();
       Int_t planeId = fGeoScheme->GetLayerSideNr(detId);
 
-      new ((*fHits)[nHits++]) CbmMuchHit(detId, pos,
-          dpos, 0, iCluster,planeId);
+      new ((*fHits)[nHits++]) CbmMuchPixelHit(detId, pos, dpos, 0, iCluster, planeId);
+//      (detId, pos,
+//          dpos, 0, iCluster,planeId);
 
       if (planeId>30) printf("planeId=%i\n",planeId);
 
@@ -193,8 +194,8 @@ InitStatus CbmMuchFindHitsAdvancedGem::Init() {
   // Register output arrays
   fPrimaryClusters = new TClonesArray("CbmMuchCluster", 1000);
   ioman->Register("MuchCluster", "Cluster in MUCH", fPrimaryClusters, kTRUE);
-  fHits = new TClonesArray("CbmMuchHit", 1000);
-  ioman->Register("MuchHit", "Hit in MUCH", fHits, kTRUE);
+  fHits = new TClonesArray("CbmMuchPixelHit", 1000);
+  ioman->Register("MuchPixelHit", "Hit in MUCH", fHits, kTRUE);
 
   return kSUCCESS;
 }

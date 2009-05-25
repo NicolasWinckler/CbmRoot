@@ -1,6 +1,6 @@
 #include "CbmMuchMatchTracks.h"
 
-#include "CbmMuchHit.h"
+#include "CbmMuchPixelHit.h"
 #include "CbmMuchTrack.h"
 #include "CbmTrackMatch.h"
 #include "CbmMuchDigiMatch.h"
@@ -43,18 +43,21 @@ void CbmMuchMatchTracks::Exec(Option_t* opt)
 
     Int_t nofHits = pTrack->GetNHits();
     for (Int_t iHit = 0; iHit < nofHits; iHit++) {
-      CbmMuchHit* pHit = (CbmMuchHit*) fHits->At(pTrack->GetHitIndex(iHit));
+      CbmMuchPixelHit* pHit = (CbmMuchPixelHit*) fHits->At(pTrack->GetHitIndex(iHit));
       if (!pHit) continue;
 
       if (fClusters==NULL){
         // No Cluster array = Simple hit-production algorithm was used
         // use simplified hit-to-digi-to-point-to-mctrack matching
-        Int_t digiIndex = pHit->GetDigi();
+        // TODO verify please
+        Int_t clusterId = pHit->GetRefId();//GetDigi();
+        CbmMuchCluster* cluster = (CbmMuchCluster*) fClusters->At(clusterId);
+        Int_t digiIndex = cluster->GetDigiIndex(0);
         DigiToTrackMatch(digiIndex,matchMap);
       } else {
         // Cluster array present
         // use hit-to-cluster-to-digi-to-point-to-mctrack matching
-        Int_t clusterId = pHit->GetCluster();
+        Int_t clusterId = pHit->GetRefId();//GetCluster();
         CbmMuchCluster* cluster = (CbmMuchCluster*) fClusters->At(clusterId);
         for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
           Int_t digiIndex = cluster->GetDigiIndex(iDigi);

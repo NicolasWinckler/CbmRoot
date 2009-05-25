@@ -76,10 +76,12 @@ void CbmMuchGeoScheme::Init(TObjArray* stations) {
 
   InitModules();
 
-  Int_t iSide = 0;
-  for (Int_t iStation = 0; iStation < GetNStations(); iStation++) {
-    vector<CbmMuchLayerSide*> sides = GetLayerSides(iStation);
-  }
+  GetLayerSideNr(GetDetectorId(1,1,1));
+
+//  Int_t iSide = 0;
+//  for (Int_t iStation = 0; iStation < GetNStations(); iStation++) {
+//    vector<CbmMuchLayerSide*> sides = GetLayerSides(iStation);
+//  }
 }
 // -------------------------------------------------------------------------
 
@@ -271,15 +273,16 @@ vector<CbmMuchLayerSide*> CbmMuchGeoScheme::GetLayerSides(Int_t iStation) {
 
 //Int_t CbmMuchGeoScheme::GetLayerSideNr(Int_t detId){
 //  int i = 0;
+//  Int_t sideId = GetLayerSideByDetId(detId)->GetDetectorId();
 //  Int_t iStation = GetStationIndex(detId);
 //  for(Int_t iSt=0; iSt<=iStation; iSt++){
-//    i++;
 //    vector<CbmMuchLayerSide*> sides = GetLayerSides(iSt);
 //    for(Int_t iSide=0; iSide<sides.size(); iSide++){
 //      i++;
 //    }
 //  }
-// // assert(fMapSides[sideId] + 1 == sideNumber);
+//  printf("%i, %i\n",fMapSides[sideId] + 1, i);
+//  assert(fMapSides[sideId] + 1 == i);
 //  return i;
 //}
 

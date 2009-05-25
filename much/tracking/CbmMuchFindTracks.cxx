@@ -7,7 +7,7 @@
 #include "CbmMuchFindTracks.h"
 
 #include "CbmMuchTrackFinder.h"
-#include "CbmMuchHit.h"
+#include "CbmMuchPixelHit.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
@@ -32,9 +32,9 @@ CbmMuchFindTracks::CbmMuchFindTracks()
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchFindTracks::CbmMuchFindTracks(const char* name, 
-				   const char* title, 
-				   CbmMuchTrackFinder* finder) 
+CbmMuchFindTracks::CbmMuchFindTracks(const char* name,
+				   const char* title,
+				   CbmMuchTrackFinder* finder)
 : FairTask(name)
 {
   fFinder         = finder;
@@ -119,9 +119,9 @@ void CbmMuchFindTracks::SetParContainers()
 void CbmMuchFindTracks::Exec(Option_t* opt)
 {
   fTrackArray->Delete();
-  
+
   fNofTracks = fFinder->DoFind(fMuchHitArray, fTrackArray);
-  
+
 }
 // -------------------------------------------------------------------------
 

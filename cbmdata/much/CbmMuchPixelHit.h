@@ -39,7 +39,8 @@ public:
 			Double_t dy,
 			Double_t dz,
 			Double_t dxy,
-			Int_t refId);
+			Int_t refId,
+			Int_t planeId);
 
 	/** Standard constructor
 	  *@param detId  Unique detector ID (including module number)
@@ -53,7 +54,8 @@ public:
 			const TVector3& pos,
 			const TVector3& err,
 			Double_t dxy,
-			Int_t refId);
+			Int_t refId,
+			Int_t planeId);
 
 	/** Standard constructor
 	  *@param detId     Unique detector ID (including module number)
@@ -64,28 +66,32 @@ public:
 	  *@param times     Time since event start [ns]
 	  *@param dTime     Time resolution [ns]
 	**/
-//	CbmMuchPixelHit(
-//			Int_t detectorId,
-//			const TVector3& pos,
-//			const TVector3& err,
-//			Double_t dxy,
-//			Int_t refId,
-//			const Double_t* times,
-//			Double_t dtime);
+	CbmMuchPixelHit(
+			Int_t detectorId,
+			const TVector3& pos,
+			const TVector3& err,
+			Double_t dxy,
+			Int_t refId,
+			Int_t planeId,
+			const Double_t* times,
+			Double_t dtime);
 
 	virtual ~CbmMuchPixelHit();
 
-//	Double_t GetTime(Int_t i) const {return fTime[i];}
-//	const Double_t* GetTimes() const {return fTime;}
-//	Double_t GetDTime() const {return fDTime;}
-//
-//	void SetTime(Double_t time, Int_t i) {fTime[i] = time;}
-//	void SetTimes(const Double_t* time) {fTime[0] = time[0]; fTime[1] = time[1]; fTime[2] = time[2];}
-//	void SetDTime(Double_t dtime) {fDTime = dtime;}
+	virtual Int_t GetPlaneId() const { return fPlaneId; }
 
-//private:
-//	Double_t fTime[3];    // Time since event start [ns]
-//	Double_t fDTime;      // Time resolution [ns]
+	Double_t GetTime(Int_t i) const {return fTime[i];}
+	const Double_t* GetTimes() const {return fTime;}
+	Double_t GetDTime() const {return fDTime;}
+
+	void SetTime(Double_t time, Int_t i) {fTime[i] = time;}
+	void SetTimes(const Double_t* time) {fTime[0] = time[0]; fTime[1] = time[1]; fTime[2] = time[2];}
+	void SetDTime(Double_t dtime) {fDTime = dtime;}
+
+private:
+  Int_t fPlaneId;          // Plane number
+	Double_t fTime[3];    // Time since event start [ns]
+	Double_t fDTime;      // Time resolution [ns]
 
 	ClassDef(CbmMuchPixelHit, 1);
 };

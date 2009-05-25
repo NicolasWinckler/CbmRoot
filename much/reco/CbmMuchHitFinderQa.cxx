@@ -73,7 +73,7 @@ InitStatus CbmMuchHitFinderQa::Init()
   FairRootManager* fManager = FairRootManager::Instance();
   fMCTracks    = (TClonesArray*) fManager->GetObject("MCTrack");
   fPoints      = (TClonesArray*) fManager->GetObject("MuchPoint");
-  fHits        = (TClonesArray*) fManager->GetObject("MuchHit");
+  fHits        = (TClonesArray*) fManager->GetObject("MuchPixelHit");
   fDigis       = (TClonesArray*) fManager->GetObject("MuchDigi");
   fDigiMatches = (TClonesArray*) fManager->GetObject("MuchDigiMatch");
   fClusters    = (TClonesArray*) fManager->GetObject("MuchCluster");

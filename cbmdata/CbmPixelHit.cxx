@@ -1,10 +1,12 @@
-/*
- * CbmPixelHit.cxx
- *
- *  Created on: Mar 17, 2009
- *      Author: andrey
- */
-
+/** CbmPixelHit.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
+ **
+ ** Base class for pixel hits used for tracking in CBM.
+ ** Derives from CbmBaseHit.
+ ** Additional members are x, y coordinates and x, y, dxy covariances.
+ **/
 #include "CbmPixelHit.h"
 
 #include "TVector3.h"

@@ -1,10 +1,8 @@
-/*
- * CbmBaseHit.cxx
- *
- *  Created on: Mar 17, 2009
- *      Author: andrey
- */
-
+/** CbmBaseHit.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
+ **/
 #include "CbmBaseHit.h"
 
 CbmBaseHit::CbmBaseHit():

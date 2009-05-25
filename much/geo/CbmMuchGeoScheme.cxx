@@ -8,21 +8,13 @@
 #include "CbmMuchLayerSide.h"
 #include "CbmMuchModuleGem.h"
 #include "CbmMuchModuleStraws.h"
-#include "CbmMuchSector.h"
-#include "CbmMuchPad.h"
 #include "TObjArray.h"
 #include "TFile.h"
 #include "TMath.h"
 #include "TGeoCone.h"
-#include <iostream>
 #include <fstream>
-#include <vector>
 #include <cassert>
 #include <stdexcept>
-
-using std::cout;
-using std::endl;
-using std::vector;
 
 CbmMuchGeoScheme* CbmMuchGeoScheme::fInstance = NULL;
 Bool_t CbmMuchGeoScheme::fInitialized = kFALSE;
@@ -97,14 +89,12 @@ void CbmMuchGeoScheme::InitModules() {
     if (!fStations) Fatal("InitModules", "No input array of stations.");
     Int_t incSides = 0;
     fMapSides.clear();
-    fSectors.clear();
     fSides.clear();
     fModules.clear();
     for (Int_t iStation = 0; iStation < GetNStations(); iStation++) {
       CbmMuchStation* station = GetStation(iStation);
       if (!station)  continue;
       assert(iStation == GetStationIndex(station->GetDetectorId()));
-      vector<CbmMuchSector*> sectors;
       vector<CbmMuchLayerSide*> sides;
       vector<CbmMuchModule*> modules;
       for (Int_t iLayer = 0; iLayer < station->GetNLayers(); iLayer++) {
@@ -123,21 +113,9 @@ void CbmMuchGeoScheme::InitModules() {
             assert(iModule == GetModuleIndex(mod->GetDetectorId()));
             if(!mod->InitModule()) continue;
             modules.push_back(mod);
-            if(mod->GetDetectorType() != 1) continue;
-            CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
-            for (Int_t iSector = 0; iSector < module->GetNSectors(); iSector++) {
-              CbmMuchSector* sector = module->GetSector(iSector);
-              if (!sector) continue;
-              sectors.push_back(sector);
-              for (Int_t iPad = 0; iPad < sector->GetNChannels(); iPad++) {
-                CbmMuchPad* pad = sector->GetPad(iPad);
-                if (pad) fPads.push_back(pad);
-              } // Pads
-            } // Sectors
           } // Modules
         } // Sides
       } // Layers
-      fSectors.push_back(sectors);
       fSides.push_back(sides);
       fModules.push_back(modules);
     } // Stations
@@ -276,13 +254,6 @@ void CbmMuchGeoScheme::ClearClusterArrays() {
     TClonesArray* clusters = mod->GetClusters();
     clusters->Clear();
   }
-}
-// -------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------
-void CbmMuchGeoScheme::ResetPads() {
-  for (Int_t i = 0; i < fPads.size(); i++)
-    fPads[i]->Reset();
 }
 // -------------------------------------------------------------------------
 
@@ -732,41 +703,6 @@ Int_t CbmMuchGeoScheme::Intersect(Float_t x, Float_t y, Float_t dx, Float_t dy,
   if (!nCornersInside && x1 < r && y1 < 0 && y2 > 0)
     return 1;
   return 0;
-}
-// -------------------------------------------------------------------------
-
-
-// -------------------------------------------------------------------------
-TVector2 CbmMuchGeoScheme::GetMinPadSize(Int_t iStation){
-  Double_t padMinLx = std::numeric_limits<Double_t>::max();
-  Double_t padMinLy = std::numeric_limits<Double_t>::max();
-  vector<CbmMuchSector*> sectors = fSectors.at(iStation);
-  for(vector<CbmMuchSector*>::iterator it = sectors.begin(); it!=sectors.end(); it++){
-    CbmMuchSector* sector = (*it);
-    if(!sector) continue;
-    Double_t padLx = sector->GetDx();
-    Double_t padLy = sector->GetDy();
-    if(padLx < padMinLx) padMinLx = padLx;
-    if(padLy < padMinLy) padMinLy = padLy;
-  }
-  return TVector2(padMinLx, padMinLy);
-}
-// -------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------
-TVector2 CbmMuchGeoScheme::GetMaxPadSize(Int_t iStation){
-  Double_t padMaxLx = std::numeric_limits<Double_t>::min();
-  Double_t padMaxLy = std::numeric_limits<Double_t>::min();
-  vector<CbmMuchSector*> sectors = fSectors.at(iStation);
-  for(vector<CbmMuchSector*>::iterator it = sectors.begin(); it!=sectors.end(); it++){
-    CbmMuchSector* sector = (*it);
-    if(!sector) continue;
-    Double_t padLy = sector->GetDy();
-    Double_t padLx = sector->GetDx();
-    if(padLx > padMaxLx) padMaxLx = padLx;
-    if(padLy > padMaxLy) padMaxLy = padLy;
-  }
-  return TVector2(padMaxLx, padMaxLy);
 }
 // -------------------------------------------------------------------------
 

@@ -26,7 +26,6 @@
 #include "TArrayD.h"
 #include "TArrayI.h"
 #include "TArrayC.h"
-#include "TVector2.h"
 #include "TGeoCone.h"
 #include <vector>
 #include <map>
@@ -35,7 +34,6 @@ class CbmMuchStation;
 class CbmMuchLayer;
 class CbmMuchLayerSide;
 class CbmMuchModule;
-class CbmMuchSector;
 class CbmMuchPad;
 
 using std::vector;
@@ -182,8 +180,6 @@ class CbmMuchGeoScheme: public TObject {
     void ClearPointArrays();
     void ClearHitArrays();
     void ClearClusterArrays();
-    void ResetPads();
-    vector<CbmMuchPad*>       GetPads() {return fPads;}
     vector<CbmMuchModule*>    GetModules();
     vector<CbmMuchModule*>    GetModules(Int_t iStation);
     vector<CbmMuchLayerSide*> GetLayerSides(Int_t iStation);
@@ -193,8 +189,6 @@ class CbmMuchGeoScheme: public TObject {
     void Print();
     void CreateMuchCave();
 
-    TVector2 GetMinPadSize(Int_t iStation);
-    TVector2 GetMaxPadSize(Int_t iStation);
 
   private:
     CbmMuchGeoScheme();
@@ -209,10 +203,8 @@ class CbmMuchGeoScheme: public TObject {
     static Bool_t fInitialized;        // Defines whether the instance was initialized
     static Bool_t fModulesInitialized; // Defines whether grid of the instance was initialized
 
-    vector<CbmMuchPad*> fPads;                     //!
     vector<vector<CbmMuchModule*> > fModules;      //!
     vector<vector<CbmMuchLayerSide*> > fSides;     //!
-    vector<vector<CbmMuchSector*> > fSectors;      //!
     map<Int_t,Int_t> fMapSides;
 
     TObjArray* fStations; //!

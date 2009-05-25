@@ -99,13 +99,15 @@ public:
     /** Accessors **/
     Int_t    GetNSectors()    const { return fSectors.GetEntriesFast(); }
     /** Gets sector by the given channel Id. **/
-    CbmMuchSector* GetSector(Int_t channelId);// const { return (CbmMuchSector*)fSectors.At(iSector); }
+    CbmMuchSector* GetSector(Int_t channelId);
     /** Gets sector by the given numbers of column and row in the grid. **/
     CbmMuchSector* GetSector(Int_t iGridColumn, Int_t iGridRow);
     /** Gets sector by the given coordinates in global c.s. */
     CbmMuchSector* GetSector(Double_t x, Double_t y);
     /** Gets pad by the given Id. */
     CbmMuchPad* GetPad(Int_t channelId);
+    /** Gets array of pads for this module. */
+    vector<CbmMuchPad*> GetPads();
     Int_t GetNPads();
 
     /** Adds a given sector to the array.
@@ -118,7 +120,6 @@ public:
     void SetPoints(TClonesArray* points)     { fPoints   = points;   }
     void SetHits  (TClonesArray* hits)       { fHits     = hits;     }
     void SetClusters(TClonesArray* clusters) { fClusters = clusters; }
-
 
     virtual Bool_t InitModule();
     virtual void DrawModule(Color_t color);

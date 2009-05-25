@@ -73,6 +73,22 @@ void CbmMuchModuleGem::AddSector(CbmMuchSector* sector) {
 }
 // -------------------------------------------------------------------------
 
+// -----   Public method GetPads -------------------------------------------
+vector<CbmMuchPad*> CbmMuchModuleGem::GetPads() {
+  vector<CbmMuchPad*> pads;
+  for(Int_t iSector = 0; iSector < GetNSectors(); ++iSector){
+    CbmMuchSector* sector = GetSector(iSector);
+    if(!sector) continue;
+    for(Int_t iPad=0; iPad<sector->GetNChannels(); ++iPad){
+      CbmMuchPad* pad = sector->GetPad(iPad);
+      if(!pad) continue;
+      pads.push_back(pad);
+    }
+  }
+  return pads;
+}
+// -------------------------------------------------------------------------
+
 // -----   Public method GetPad  -------------------------------------------
 CbmMuchPad* CbmMuchModuleGem::GetPad(Int_t channelId) {
   CbmMuchSector* sector = GetSector(channelId);

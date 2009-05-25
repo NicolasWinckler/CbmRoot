@@ -15,6 +15,7 @@
 
 class CbmMuchGeoScheme;
 class TObjArray;
+class TVector2;
 
 Double_t LandauMPV(Double_t *x, Double_t *par);
 
@@ -146,6 +147,8 @@ private:
 
   Int_t GetNChannels(Int_t iStation);
   Int_t GetNSectors(Int_t iStation);
+  TVector2 GetMinPadSize(Int_t iStation);
+  TVector2 GetMaxPadSize(Int_t iStation);
 
 
   ClassDef(CbmMuchHitFinderQa,1)

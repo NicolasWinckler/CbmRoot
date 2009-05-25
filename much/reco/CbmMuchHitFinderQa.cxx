@@ -210,30 +210,21 @@ InitStatus CbmMuchHitFinderQa::Init()
     fhOccupancyR[i] = new TH1D(Form("hOccupancy%i",i+1),Form("Occupancy vs radius: station %i;Radius [cm];Occupancy",i+1),100,0,1.2*rMax);
   }
 
-//  vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
-//  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
-//    CbmMuchModule* mod = (*it);
-//    if(mod->GetDetectorType() != 1) continue;
-//    CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
-//    vector<CbmMuchPad*> pads = module->GetPads();
-//    for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
-//      CbmMuchPad* pad = (*it);
-//      Int_t stationId = fGeoScheme->GetStationIndex(pad->GetDetectorId());
-//      Double_t x0 = pad->GetX0();
-//      Double_t y0 = pad->GetY0();
-//      Double_t r0 = TMath::Sqrt(x0*x0+y0*y0);
-//      fhPadsTotalR[stationId]->Fill(r0);
-//    }
-//  }
-  vector<CbmMuchPad*> pads = fGeoScheme->GetPads();
-  for (Int_t p=0;p<pads.size();p++){
-    CbmMuchPad* pad = pads[p];
-    Int_t stationId = fGeoScheme->GetStationIndex(pad->GetDetectorId());
-    Double_t x0 = pad->GetX0();
-    Double_t y0 = pad->GetY0();
-    Double_t r0 = TMath::Sqrt(x0*x0+y0*y0);
-    fhPadsTotalR[stationId]->Fill(r0);
-  } // pads
+  vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
+  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
+    CbmMuchModule* mod = (*it);
+    if(mod->GetDetectorType() != 1) continue;
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
+    vector<CbmMuchPad*> pads = module->GetPads();
+    for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
+      CbmMuchPad* pad = (*it);
+      Int_t stationId = fGeoScheme->GetStationIndex(pad->GetDetectorId());
+      Double_t x0 = pad->GetX0();
+      Double_t y0 = pad->GetY0();
+      Double_t r0 = TMath::Sqrt(x0*x0+y0*y0);
+      fhPadsTotalR[stationId]->Fill(r0);
+    }
+  }
 
   fPadMinLx = std::numeric_limits<Double_t>::max();
   fPadMinLy = std::numeric_limits<Double_t>::max();
@@ -246,10 +237,10 @@ InitStatus CbmMuchHitFinderQa::Init()
   printf(" Station Nr.\t| Sectors\t| Channels\t| Pad min size\t\t| Pad max length\t \n");
   printf("-----------------------------------------------------------------------------------------\n");
   for (Int_t iStation=0;iStation<fNstations;iStation++){
-    Double_t padMinLx = fGeoScheme->GetMinPadSize(iStation).X();
-    Double_t padMinLy = fGeoScheme->GetMinPadSize(iStation).Y();
-    Double_t padMaxLx = fGeoScheme->GetMaxPadSize(iStation).X();
-    Double_t padMaxLy = fGeoScheme->GetMaxPadSize(iStation).Y();
+    Double_t padMinLx = GetMinPadSize(iStation).X();
+    Double_t padMinLy = GetMinPadSize(iStation).Y();
+    Double_t padMaxLx = GetMaxPadSize(iStation).X();
+    Double_t padMaxLy = GetMaxPadSize(iStation).Y();
     Int_t nChannels  = GetNChannels(iStation);
     Int_t nSectors   = GetNSectors(iStation);
     if (fPadMinLx>padMinLx) fPadMinLx = padMinLx;
@@ -1057,6 +1048,46 @@ Int_t CbmMuchHitFinderQa::GetNSectors(Int_t iStation){
   }
   return nSectors;
 }
+
+// -------------------------------------------------------------------------
+TVector2 CbmMuchHitFinderQa::GetMinPadSize(Int_t iStation){
+  Double_t padMinLx = std::numeric_limits<Double_t>::max();
+  Double_t padMinLy = std::numeric_limits<Double_t>::max();
+  vector<CbmMuchModule*> modules = fGeoScheme->GetModules(iStation);
+  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
+    CbmMuchModule* mod = (*it);
+    if(mod->GetDetectorType() != 1) continue;
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
+    vector<CbmMuchPad*> pads = module->GetPads();
+    for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
+      CbmMuchPad* pad = (*it);
+      if(pad->GetLx() < padMinLx) padMinLx = pad->GetLx();
+      if(pad->GetLy() < padMinLy) padMinLy = pad->GetLy();
+    }
+  }
+  return TVector2(padMinLx, padMinLy);
+}
+// -------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------
+TVector2 CbmMuchHitFinderQa::GetMaxPadSize(Int_t iStation){
+  Double_t padMaxLx = std::numeric_limits<Double_t>::min();
+  Double_t padMaxLy = std::numeric_limits<Double_t>::min();
+  vector<CbmMuchModule*> modules = fGeoScheme->GetModules(iStation);
+  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
+    CbmMuchModule* mod = (*it);
+    if(mod->GetDetectorType() != 1) continue;
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
+    vector<CbmMuchPad*> pads = module->GetPads();
+    for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
+      CbmMuchPad* pad = (*it);
+      if(pad->GetLx() > padMaxLx) padMaxLx = pad->GetLx();
+      if(pad->GetLy() > padMaxLy) padMaxLy = pad->GetLy();
+    }
+  }
+  return TVector2(padMaxLx, padMaxLy);
+}
+// -------------------------------------------------------------------------
 
 
 ClassImp(CbmMuchHitFinderQa)

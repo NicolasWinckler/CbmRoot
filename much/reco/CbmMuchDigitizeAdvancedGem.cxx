@@ -456,19 +456,15 @@ void CbmMuchDigitizeAdvancedGem::FirePads() {
 
 // -----   Private method AddNoise   ---------------------------------------
 void CbmMuchDigitizeAdvancedGem::AddNoise() {
-//  vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
-//  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
-//    CbmMuchModule* mod = (*it);
-//    if(mod->GetDetectorType() != 1) continue;
-//    CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
-//    vector<CbmMuchPad*> pads = module->GetPads();
-//    for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
-//      AddNoise(*it);
-//    }
-//  }
-  vector<CbmMuchPad*> pads = fGeoScheme->GetPads();
-  for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
-    AddNoise(*it);
+  vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
+  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
+    CbmMuchModule* mod = (*it);
+    if(mod->GetDetectorType() != 1) continue;
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
+    vector<CbmMuchPad*> pads = module->GetPads();
+    for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
+      AddNoise(*it);
+    }
   }
 }
 // -------------------------------------------------------------------------
@@ -481,8 +477,7 @@ void CbmMuchDigitizeAdvancedGem::AddNoise(CbmMuchPad* pad) {
   Int_t channelId  = pad->GetChannelId();
   pair<Int_t, Int_t> uniqueId(detectorId, channelId);
   if (fChargedPads.find(uniqueId) == fChargedPads.end()) {
-    if (iCharge <= fQThreshold)
-      return;
+    if (iCharge <= fQThreshold) return;
     fChargedPads[uniqueId] = new CbmMuchDigi(pad->GetDetectorId(),
         channelId, 0, 0); // No time and Dtime info
     fChargedMatches[uniqueId] = new CbmMuchDigiMatch();

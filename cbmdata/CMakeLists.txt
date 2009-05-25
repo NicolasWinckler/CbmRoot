@@ -54,7 +54,6 @@ much/CbmMuchCluster.cxx
 much/CbmMuchDigi.cxx
 much/CbmMuchDigiMatch.cxx
 much/CbmMuchTrack.cxx 
-much/CbmMuchTrackMatch.cxx
 much/CbmMuchStrawHit.cxx
 
 trd/CbmTrdHit.cxx		 

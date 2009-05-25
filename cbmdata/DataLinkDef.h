@@ -40,7 +40,6 @@
 #pragma link C++ class CbmMuchDigi+;
 #pragma link C++ class CbmMuchDigiMatch+;
 #pragma link C++ class CbmMuchTrack+;
-#pragma link C++ class CbmMuchTrackMatch+;
 #pragma link C++ class CbmMuchStrawHit+;
 
 #pragma link C++ class CbmTrdHit+;

@@ -75,13 +75,6 @@ void CbmMuchGeoScheme::Init(TObjArray* stations) {
   }
 
   InitModules();
-
-  GetLayerSideNr(GetDetectorId(1,1,1));
-
-//  Int_t iSide = 0;
-//  for (Int_t iStation = 0; iStation < GetNStations(); iStation++) {
-//    vector<CbmMuchLayerSide*> sides = GetLayerSides(iStation);
-//  }
 }
 // -------------------------------------------------------------------------
 

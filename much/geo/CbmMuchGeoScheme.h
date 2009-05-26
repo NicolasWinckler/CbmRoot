@@ -174,9 +174,9 @@ class CbmMuchGeoScheme: public TObject {
     Double_t GetLayersDz(Int_t st) {return fLayersDz[st];}
 
     void Init(TObjArray* stations);
-    void CreatePointArrays(char* pointClassName);
-    void CreateHitArrays(char* hitClassName);
-    void CreateClusterArrays(char* clusterClassName);
+    void CreatePointArrays();
+    void CreateHitArrays();
+    void CreateClusterArrays();
     void ClearPointArrays();
     void ClearHitArrays();
     void ClearClusterArrays();

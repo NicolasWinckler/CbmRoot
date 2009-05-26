@@ -184,34 +184,35 @@ CbmMuchModule* CbmMuchGeoScheme::GetModuleByDetId(Int_t detId) {
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-void CbmMuchGeoScheme::CreatePointArrays(char* pointClassName) {
+void CbmMuchGeoScheme::CreatePointArrays() {
   for(vector<CbmMuchModule*>::iterator it=GetModules().begin(); it!=GetModules().end(); it++){
-    CbmMuchModule* module = (*it);
-    if(module->GetDetectorType()!=1) continue;
-    CbmMuchModuleGem* mod = (CbmMuchModuleGem*)module;
-    mod->SetPoints(new TClonesArray(pointClassName, 10));
+    (*it)->SetPoints(new TClonesArray("CbmVisPoint", 1));
   }
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-void CbmMuchGeoScheme::CreateHitArrays(char* hitClassName) {
+void CbmMuchGeoScheme::CreateHitArrays() {
   for(vector<CbmMuchModule*>::iterator it=GetModules().begin(); it!=GetModules().end(); it++){
     CbmMuchModule* module = (*it);
-    if(module->GetDetectorType()!=1) continue;
-    CbmMuchModuleGem* mod = (CbmMuchModuleGem*)module;
-    mod->SetHits(new TClonesArray(hitClassName, 10));
+    if (module->GetDetectorType()==1) {
+      CbmMuchModuleGem* mod = (CbmMuchModuleGem*)module;
+      mod->SetHits(new TClonesArray("CbmVisHit",1));
+    } else if (module->GetDetectorType()==2) {
+      CbmMuchModuleStraws* mod = (CbmMuchModuleStraws*)module;
+      mod->SetHits(new TClonesArray("CbmVisHit",1));
+    }
   }
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-void CbmMuchGeoScheme::CreateClusterArrays(char* clusterClassName) {
+void CbmMuchGeoScheme::CreateClusterArrays() {
   for(vector<CbmMuchModule*>::iterator it=GetModules().begin(); it!=GetModules().end(); it++){
     CbmMuchModule* module = (*it);
     if(module->GetDetectorType()!=1) continue;
     CbmMuchModuleGem* mod = (CbmMuchModuleGem*)module;
-    mod->SetClusters(new TClonesArray(clusterClassName, 10));
+    mod->SetClusters(new TClonesArray("CbmVisMuchCluster", 1));
   }
 }
 // -------------------------------------------------------------------------
@@ -219,11 +220,7 @@ void CbmMuchGeoScheme::CreateClusterArrays(char* clusterClassName) {
 // -------------------------------------------------------------------------
 void CbmMuchGeoScheme::ClearPointArrays() {
   for(vector<CbmMuchModule*>::iterator it=GetModules().begin(); it!=GetModules().end(); it++){
-    CbmMuchModule* module = (*it);
-    if(module->GetDetectorType()!=1) continue;
-    CbmMuchModuleGem* mod = (CbmMuchModuleGem*)module;
-    TClonesArray* points = mod->GetPoints();
-    points->Clear();
+    (*it)->Clear();
   }
 }
 // -------------------------------------------------------------------------
@@ -231,11 +228,7 @@ void CbmMuchGeoScheme::ClearPointArrays() {
 // -------------------------------------------------------------------------
 void CbmMuchGeoScheme::ClearHitArrays() {
   for(vector<CbmMuchModule*>::iterator it=GetModules().begin(); it!=GetModules().end(); it++){
-    CbmMuchModule* module = (*it);
-    if(module->GetDetectorType()!=1) continue;
-    CbmMuchModuleGem* mod = (CbmMuchModuleGem*)module;
-    TClonesArray* hits = mod->GetPoints();
-    hits->Clear();
+    (*it)->Clear();
   }
 }
 // -------------------------------------------------------------------------

@@ -21,7 +21,7 @@
 #include "CbmKFVertex.h"
 
 #include "CbmMCTrack.h"
-#include "CbmStsTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmStsHit.h"
 #include "FairRootManager.h"
 #include "FairMCApplication.h"
@@ -60,13 +60,13 @@ void writedir2current( TObject *obj ){
 }
 
 void CbmStsFitPerformanceTask::CreateTrackHisto(TH1D* hist[10], const char* name, const char* title ){
-  struct {    
+  struct {
     const char *name;
     const char *title;
     Int_t n;
     Double_t l,r;
-  } Table[10]= 
-    { 
+  } Table[10]=
+    {
       {"x",  "Residual X [#mum]",                   100, -100., 100.},
       {"y",  "Residual Y [#mum]",                   100, -100., 100.},
       {"tx", "Residual Tx [mrad]",                  100,   -2.,   2.},
@@ -88,13 +88,13 @@ void CbmStsFitPerformanceTask::CreateTrackHisto(TH1D* hist[10], const char* name
 }
 
 void CbmStsFitPerformanceTask::CreateVertexHisto(TH1D* hist[9], const char* name, const char* title ){
-  struct {    
+  struct {
     const char *name;
     const char *title;
     Int_t n;
     Double_t l,r;
-  } Table[9]= 
-    { 
+  } Table[9]=
+    {
       {"x",  "Residual X [#mum]",                   100, -5., 5.},
       {"y",  "Residual Y [#mum]",                   100, -5., 5.},
       {"z",  "Residual Z [#mum]",                   100, -40., 40.},
@@ -115,13 +115,13 @@ void CbmStsFitPerformanceTask::CreateVertexHisto(TH1D* hist[9], const char* name
 }
 
 void CbmStsFitPerformanceTask::CreateD0Histo(TH1D* hist[15], const char* name, const char* title ){
-  struct {    
+  struct {
     const char *name;
     const char *title;
     Int_t n;
     Double_t l,r;
-  } Table[14]= 
-    { 
+  } Table[14]=
+    {
       {"x",  "Residual X [#mum]",                   100, -100., 100.},
       {"y",  "Residual Y [#mum]",                   100, -100., 100.},
       {"z",  "Residual Z [#mum]",                   100, -500., 500.},
@@ -192,7 +192,7 @@ InitStatus CbmStsFitPerformanceTask::Init(){
 
     fhExtraTracks2ndMVD = new TH2D("hExtraTracks2ndMVD","ExtraTracks in the 2nd MVD",200, -10.0, 10.0, 200, -10.0, 10.0);
 
-    gDirectory->mkdir("AtFirstHit");  
+    gDirectory->mkdir("AtFirstHit");
     gDirectory->cd("AtFirstHit");
     CreateTrackHisto( fhFrst, "fst", "at first STS Hit" );
     gDirectory->cd("..");
@@ -216,7 +216,7 @@ InitStatus CbmStsFitPerformanceTask::Init(){
     gDirectory->cd("FittedToVertex");
     CreateTrackHisto( fhVfit, "vfit", "for vertex fitted track" );
     gDirectory->cd("..");
-  
+
     gDirectory->mkdir("PSlidesOnP");
     gDirectory->cd("PSlidesOnP");
     fhPq = new TH2D("Pq","Resolution P/Q at impact point vs P", 100, 0, 10, 100,  -.1 ,  .1 );
@@ -240,7 +240,7 @@ InitStatus CbmStsFitPerformanceTask::Init(){
   fhTrackDensity[6] = new TH1D("hTrackDensity10","Track Density 10cm",300,0,300);
   fhTrackDensity[7] = new TH1D("hTrackDensity100","Track Density 1m",300,0,300);
 
-  gDirectory->mkdir("VertexFit");  
+  gDirectory->mkdir("VertexFit");
   gDirectory->cd("VertexFit");
   {
     CreateVertexHisto( fhVtx, "vtx", "for Primary Vertex" );
@@ -270,7 +270,7 @@ InitStatus CbmStsFitPerformanceTask::Init(){
   gDirectory->cd("D0Fit");
   {
     gDirectory->mkdir("No constraints");
-    gDirectory->cd("No constraints");  
+    gDirectory->cd("No constraints");
     CreateD0Histo( fhD0[0], "D0", "for D0 Sec. Vertex" );
     gDirectory->cd("..");
     gDirectory->mkdir("Topological constraint");
@@ -284,10 +284,10 @@ InitStatus CbmStsFitPerformanceTask::Init(){
     gDirectory->mkdir("Mass+Topological constraint");
     gDirectory->cd("Mass+Topological constraint");
     CreateD0Histo( fhD0[3], "D0TM", "for D0 Topo+Mass Sec. Vertex" );
-    gDirectory->cd("..");  
+    gDirectory->cd("..");
   }
   gDirectory->cd("..");
-  
+
   curdir->cd();
   return ReInit();
 }
@@ -295,7 +295,7 @@ InitStatus CbmStsFitPerformanceTask::Init(){
 // -----   ReInit CbmStsFitPerformanceTask task   -------------------------------
 InitStatus CbmStsFitPerformanceTask::ReInit(){
 
-  FairRootManager* fManger =FairRootManager::Instance();	
+  FairRootManager* fManger =FairRootManager::Instance();
   fMCTrackArray     = (TClonesArray*) fManger->GetObject("MCTrack");
   fStsPointArray    = (TClonesArray*) fManger->GetObject("STSPoint");
   fMvdPointArray    = (TClonesArray*) fManger->GetObject("MvdPoint");
@@ -329,15 +329,15 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
     Quality[iTrack]=0;
     CbmStsTrack*   track= (CbmStsTrack*) fRecStsTrackArray->At(iTrack);
     if( !track ) continue;
-    CbmStsTrackMatch *m = (CbmStsTrackMatch*) fSTSTrackMatch->At(iTrack);
+    CbmTrackMatch *m = (CbmTrackMatch*) fSTSTrackMatch->At(iTrack);
     if( !m ) continue;
-    if( m->GetNofTrueHits() < 
-	0.7*(m->GetNofTrueHits()+m->GetNofWrongHits()+m->GetNofFakeHits()) 
+    if( m->GetNofTrueHits() <
+	0.7*(m->GetNofTrueHits()+m->GetNofWrongHits()+m->GetNofFakeHits())
 	) continue;
-    Int_t mcTrackID = m->GetMCTrackId();    
+    Int_t mcTrackID = m->GetMCTrackId();
     if (mcTrackID<0)  continue;
     if (!IsLong(track)) continue;
-  
+
     CbmMCTrack*  mcTrack= (CbmMCTrack*)  fMCTrackArray->At(mcTrackID);
     if( !mcTrack ) continue;
     if (fabs((mcTrack->GetStartZ()))>1.) continue;
@@ -351,20 +351,20 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
     int nStsHits = fStsHitArray->GetEntries();
     int nMvdHits = fMvdHitArray->GetEntries();
     cout<<"Mvd hit density..."<<endl;
-    for( int ih=0; ih<nMvdHits; ih++){	      
+    for( int ih=0; ih<nMvdHits; ih++){
       if( ih%100 ==0 ) cout<<ih<<endl;
       CbmMvdHit* h1 = (CbmMvdHit*) fMvdHitArray->At(ih);
       if( !h1 ) continue;
-      double V[3] = { 2*h1->GetDx()*h1->GetDx(), 2*0, 2*h1->GetDy()*h1->GetDy()};	
+      double V[3] = { 2*h1->GetDx()*h1->GetDx(), 2*0, 2*h1->GetDy()*h1->GetDy()};
       Double_t v = 1./(V[0]*V[2] - V[1]*V[1]) ;
       V[0]*=v;
       V[1]*=v;
       V[2]*=v;
       double D2 = 1.e10;
-      for( int jh=0; jh<nMvdHits; jh++){	      
+      for( int jh=0; jh<nMvdHits; jh++){
 	if( ih==jh ) continue;
 	CbmMvdHit* h2 = (CbmMvdHit*) fMvdHitArray->At(jh);
-	if( !h2 ) continue;	      
+	if( !h2 ) continue;
 	if( h1->GetStationNr() != h2->GetStationNr() ) continue;
 	Double_t dx = h1->GetX() - h2->GetX();
 	Double_t dy = h1->GetY() - h2->GetY();
@@ -374,20 +374,20 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
       fhHitDensity[h1->GetStationNr()-1]->Fill(sqrt(D2/2.));
     }
     cout<<"Sts hit density..."<<endl;
-    for( int ih=0; ih<nStsHits; ih++){	      
+    for( int ih=0; ih<nStsHits; ih++){
       if( ih%1000 ==0 ) cout<<ih<<endl;
       CbmStsHit* h1 = (CbmStsHit*) fStsHitArray->At(ih);
       if( !h1 ) continue;
-      double V[3] = { 2*h1->GetDx()*h1->GetDx(), 2*h1->GetCovXY(), 2*h1->GetDy()*h1->GetDy()};	
+      double V[3] = { 2*h1->GetDx()*h1->GetDx(), 2*h1->GetCovXY(), 2*h1->GetDy()*h1->GetDy()};
       Double_t v = 1./(V[0]*V[2] - V[1]*V[1]) ;
       V[0]*=v;
       V[1]*=v;
       V[2]*=v;
       double D2 = 1.e10;
-      for( int jh=0; jh<nStsHits; jh++){	      
+      for( int jh=0; jh<nStsHits; jh++){
 	if( ih==jh ) continue;
 	CbmStsHit* h2 = (CbmStsHit*) fStsHitArray->At(jh);
-	if( !h2 ) continue;	      
+	if( !h2 ) continue;
 	if( h1->GetStationNr() != h2->GetStationNr() ) continue;
 	if( h1->GetDigi(1)>=0 ){
 	  if( h1->GetDigi(0)!=h2->GetDigi(0) &&
@@ -407,9 +407,9 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
     bool flag[nTracks];
     double sC[nTracks][8][15];
     double sT[nTracks][8][5];
-    for (Int_t iTrack=0;iTrack<nTracks;iTrack++){  
+    for (Int_t iTrack=0;iTrack<nTracks;iTrack++){
       flag[iTrack] = 0;
-      
+
       CbmStsTrack*   trackI= (CbmStsTrack*) fRecStsTrackArray->At(iTrack);
       if( !IsLong(trackI) ) continue;
       flag[iTrack] = 1;
@@ -417,14 +417,14 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
       for( int iz=0; iz<8; iz++ ){
 	FairTrackParam paramI;
 	fFitter.Extrapolate(trackI, z[iz], &paramI);
-	CbmKFMath::CopyTrackParam2TC( &paramI, sT[iTrack][iz], sC[iTrack][iz] );      
+	CbmKFMath::CopyTrackParam2TC( &paramI, sT[iTrack][iz], sC[iTrack][iz] );
 	if( !finite(sC[iTrack][iz][0]) || sC[iTrack][iz][0]<0 || sC[iTrack][iz][0]>10. ){
 	  flag[iTrack] = 0;
 	  break;
 	}
       }
     }
-    for (Int_t iTrack=0;iTrack<nTracks;iTrack++){  
+    for (Int_t iTrack=0;iTrack<nTracks;iTrack++){
       CbmStsTrack*   trackI= (CbmStsTrack*) fRecStsTrackArray->At(iTrack);
       if( iTrack%10==0 ) cout<<iTrack<<endl;
       if (!flag[iTrack]) continue;
@@ -436,7 +436,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	if( jTrack==iTrack ) continue;
 	if (!flag[jTrack]) continue;
 	CbmStsTrack*   trackJ= (CbmStsTrack*) fRecStsTrackArray->At(jTrack);
-	
+
 	for( int iz=0; iz<8; iz++ ){
 	  Double_t C[15], d[5];
 	  for( int i=0; i<15; i++ ) C[i] = sC[iTrack][iz][i] + sC[jTrack][iz][i];
@@ -451,7 +451,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	  }
 	  chi2 = fabs(chi2);
 	  if( chi2<Chi2[iz] ) Chi2[iz] = chi2;
-	  
+
 	  if( iz==0 ){
 	    chi2=0;
 	    for( int i=0; i<4; i++ ){
@@ -465,20 +465,20 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	}
       }
       for( int iz=0; iz<8; iz++ ){
-	fhTrackDensity[iz]->Fill(sqrt(Chi2[iz]/5));      
+	fhTrackDensity[iz]->Fill(sqrt(Chi2[iz]/5));
       }
-      fhTrackDensity0L->Fill(sqrt(Chi2L/4));      
+      fhTrackDensity0L->Fill(sqrt(Chi2L/4));
     }
   }
   if( fTrackAnalysis ){
-    for (Int_t iTrack=0;iTrack<nTracks;iTrack++){      
-     if( Quality[iTrack]<1 ) continue;      
+    for (Int_t iTrack=0;iTrack<nTracks;iTrack++){
+     if( Quality[iTrack]<1 ) continue;
       CbmStsTrack*   track= (CbmStsTrack*) fRecStsTrackArray->At(iTrack);
-      CbmStsTrackMatch *m = (CbmStsTrackMatch*) fSTSTrackMatch->At(iTrack);
+      CbmTrackMatch *m = (CbmTrackMatch*) fSTSTrackMatch->At(iTrack);
       CbmMCTrack*  mcTrack= (CbmMCTrack*)  fMCTrackArray->At(m->GetMCTrackId());
 
       if( mcTrack->GetMotherId() !=-1 ) continue; // not primary track //IK
-      
+
       // Get MC points;
       vector<CbmStsPoint*> vPoints;
       for( Int_t i=0; i<track->GetNStsHits(); i++ ){
@@ -486,7 +486,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	if( hitID<0 ) continue;
 	CbmStsHit* hit = (CbmStsHit*) fStsHitArray->At(hitID);
 	if( !hit ) continue;
-	Int_t pointID = hit->GetRefIndex(); 
+	Int_t pointID = hit->GetRefIndex();
 	if( pointID<0 ) continue;
 	CbmStsPoint *point = (CbmStsPoint*) fStsPointArray->At(pointID);
 	if( !point ) continue;
@@ -498,7 +498,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	if( hitID<0 ) continue;
 	CbmMvdHit* hit = (CbmMvdHit*) fMvdHitArray->At(hitID);
 	if( !hit ) continue;
-	Int_t pointID = hit->GetRefIndex(); 
+	Int_t pointID = hit->GetRefIndex();
 	if( pointID<0 ) continue;
 	CbmMvdPoint *point = (CbmMvdPoint*) fMvdPointArray->At(pointID);
 	if( !point ) continue;
@@ -515,7 +515,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
       mci[4] = (fabs(mcTrack->GetP())>1.e-4 ) ? GetCharge(mcTrack) / mcTrack->GetP() :0;
       mci[5] = mcTrack->GetStartZ();
       if( !vPoints.empty() )
-	{	  
+	{
 	  if( track->GetNStsHits()+track->GetNMvdHits()>=8 ){
 	    Double_t p1 = mcTrack->GetP();
 	    TVector3 mom;
@@ -543,39 +543,39 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	  fhZRecol->Fill(track->GetParamLast()->GetZ());
 
 	  // impact point
-	  
-	  if(TMath::Abs(mcTrack->GetPdgCode())==211) FillTrackHisto(mci,track,fhImpPi);    
-	  else 
-	    FillTrackHisto(mci,track,fhImp);    
+
+	  if(TMath::Abs(mcTrack->GetPdgCode())==211) FillTrackHisto(mci,track,fhImpPi);
+	  else
+	    FillTrackHisto(mci,track,fhImp);
 
 	  // 4th station (check smoother)
-	  
+
 	  for( vector<CbmStsPoint*>::iterator i=vPoints.begin(); i!=vPoints.end(); i++){
 	    int id = (*i)->GetDetectorID();
 	    CbmKF &KF = *CbmKF::Instance();
 	    if( KF.StsStationIDMap.find(id) == KF.StsStationIDMap.end() ) continue;
 	    if( KF.StsStationIDMap[id] != 3 ) continue;
 	    FillMCStateVectors(*i,mc,1);
-	    //FillTrackHisto( mc, track, fhMid );	  
+	    //FillTrackHisto( mc, track, fhMid );
 	    break;
-	  }	
+	  }
 	}
-    
-      if( fPrimaryVertex && mcTrack->GetMotherId() ==-1 ){      
-	
+
+      if( fPrimaryVertex && mcTrack->GetMotherId() ==-1 ){
+
 	// fit track to Primary Vertex
-	
+
 	CbmStsTrack tt(*track);
 	fFitter.FitToVertex( &tt, fPrimaryVertex, tt.GetParamFirst() );
 	//FillTrackHisto(mci,&tt,fhVfit);
-      
-	// fill momentum resolution 
-	
+
+	// fill momentum resolution
+
 	double z = mci[5];
 	FairTrackParam param;
 	fFitter.Extrapolate(track, z, &param);
 	if( fabs(mci[4])>1.e-4 && fabs( param.GetQp() )>1.e-4 )
-	  fhPq->Fill( fabs(1./mci[4]), (mci[4]/param.GetQp() - 1.) );      
+	  fhPq->Fill( fabs(1./mci[4]), (mci[4]/param.GetQp() - 1.) );
       }
 
       if( track->GetNDF()>0 ){
@@ -588,7 +588,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
   if( fPrimaryVertex ){
 
     // find MC Primary vertex
-    
+
     TVector3 MC_V(0,0,0);
     Bool_t Is_MC_V = 0;
     {
@@ -607,20 +607,20 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	  }
 	  mcTrack->GetStartVertex(MC_Vcurr);
 	  nvtrackscurr = 1;
-	}else nvtrackscurr++;      
+	}else nvtrackscurr++;
       }
       if( nvtrackscurr > nvtracks ) MC_V = MC_Vcurr;
     }
 
-    
+
     if( Is_MC_V ){
 
       // primary vertex fit performance
- 
+
       FillVertexHisto( MC_V, fPrimaryVertex, fhVtx);
-    
+
       if( fVertexAnalysis ){
-	
+
 	CbmPVFinderKF Finder;
 	TClonesArray TracksToFit("CbmStsTrack");
 	Int_t N=0;
@@ -633,25 +633,25 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	  Int_t i = N/50;
 	  if( i>=13 ) continue;
 	  CbmVertex V;
-	  Finder.FindPrimaryVertex( &TracksToFit, &V );	
+	  Finder.FindPrimaryVertex( &TracksToFit, &V );
 	  FillVertexHisto( MC_V, &V, fhV[i] );
 	}
 	CbmVertex V;
-	Finder.FindPrimaryVertex( &TracksToFit, &V );	
+	Finder.FindPrimaryVertex( &TracksToFit, &V );
 	FillVertexHisto( MC_V, &V, fhV[0] );
-      } 
-    
+      }
+
       // D0 fit performance (if there are)
 
       if( fD0Analysis&&fabs(MC_V.Z())<1.e-5 ){
 	// search for  Kaon
 	for (Int_t iK=0;iK<nTracks;iK++){
 	  if( Quality[iK]<1 ) continue;
-	  CbmStsTrack*   tK= (CbmStsTrack*) fRecStsTrackArray->At(iK);	  
-	  CbmStsTrackMatch *m = (CbmStsTrackMatch*) fSTSTrackMatch->At(iK);
+	  CbmStsTrack*   tK= (CbmStsTrack*) fRecStsTrackArray->At(iK);
+	  CbmTrackMatch *m = (CbmTrackMatch*) fSTSTrackMatch->At(iK);
 	  CbmMCTrack*  mcK = (CbmMCTrack*)  fMCTrackArray->At(m->GetMCTrackId());
 	  if( mcK->GetMotherId() !=-1 ) continue; // not primary or D0 track
-	  if( abs(mcK->GetPdgCode())!=321 ) continue;	  
+	  if( abs(mcK->GetPdgCode())!=321 ) continue;
 	  double zK = mcK->GetPz();
 	  if( zK-MC_V.Z()<1.e-5 ) continue; // primary
 	  double MCPK = mcK->GetP();
@@ -660,17 +660,17 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	  for (Int_t iP=0;iP<nTracks;iP++){
 	    if( Quality[iP]<1 ) continue;
 	    CbmStsTrack*   tP= (CbmStsTrack*) fRecStsTrackArray->At(iP);
-	    m = (CbmStsTrackMatch*) fSTSTrackMatch->At(iP);
+	    m = (CbmTrackMatch*) fSTSTrackMatch->At(iP);
 	    CbmMCTrack*  mcP = (CbmMCTrack*)  fMCTrackArray->At(m->GetMCTrackId());
 	    if( mcP->GetMotherId() !=-1 ) continue; // not primary or D0 track
-	    if( abs(mcP->GetPdgCode())!=211 ) continue;	
+	    if( abs(mcP->GetPdgCode())!=211 ) continue;
 	    if( mcK->GetPdgCode()*mcP->GetPdgCode() >=0 ) continue; //same charge
 	    double zP = mcP->GetStartZ();
 	    if( fabs(zP-zK)>1.e-8 ) continue; // different vertex
 	    double MCPP = mcP->GetP();
-	    
+
 	    const double D0 = 1.8645 ;
-	    
+
 	    TVector3 mc;
 	    mcK->GetStartVertex(mc);
 
@@ -679,21 +679,21 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	    SVFinder.AddTrack(tP);
 
 	    for( int iconst=0; iconst<4; iconst++){
-	      
+
 	      switch( iconst ){
-	      case 0: 
+	      case 0:
 		SVFinder.SetMassConstraint(); // no constraints
 		SVFinder.SetTopoConstraint();
 		break;
-	      case 1: 
+	      case 1:
 		SVFinder.SetMassConstraint();// Topo constraint
 		SVFinder.SetTopoConstraint(fPrimaryVertex);
 		break;
-	      case 2: 
+	      case 2:
 		SVFinder.SetMassConstraint(D0);// Mass constraint
 		SVFinder.SetTopoConstraint();
 		break;
-	      case 3: 
+	      case 3:
 		SVFinder.SetMassConstraint(D0);// Topo + Mass constraint
 		SVFinder.SetTopoConstraint(fPrimaryVertex);
 		break;
@@ -701,7 +701,7 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 		break;
 	      }
 	      SVFinder.Fit();
-	      CbmVertex sv;	    
+	      CbmVertex sv;
 	      //FairTrackParam KFitted, PFitted;
 	      Double_t mass, mass_err;
 	      SVFinder.GetVertex(sv);
@@ -726,19 +726,19 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 		fhD0[iconst][7]->Fill( TMath::Prob(sv.GetChi2(),sv.GetNDF()) );
 	      }
 	      fhD0[iconst][8]->Fill( (mass-D0) );
-	      if( mass_err>1.e-10 ) fhD0[iconst][9]->Fill( (mass-D0)/mass_err );	    
+	      if( mass_err>1.e-10 ) fhD0[iconst][9]->Fill( (mass-D0)/mass_err );
 	      //fhD0[iconst][10]->Fill( ( fabs(1./KFitted.GetQp()) - MCPK)/MCPK );
 	      //fhD0[iconst][11]->Fill( (fabs(1./PFitted.GetQp()) - MCPP)/MCPP );
 	      if( fabs(tK->GetParamFirst()->GetQp())>1.e-4 && MCPK>1.e-4)
 		fhD0[iconst][12]->Fill( ( fabs(1./tK->GetParamFirst()->GetQp()) - MCPK)/MCPK );
 	      if( fabs(tP->GetParamFirst()->GetQp())>1.e-4 && MCPP>1.e-4)
-		fhD0[iconst][13]->Fill( ( fabs(1./tP->GetParamFirst()->GetQp()) - MCPP)/MCPP );	    
+		fhD0[iconst][13]->Fill( ( fabs(1./tP->GetParamFirst()->GetQp()) - MCPP)/MCPP );
 	    }
 	  }
 	}
-      }    
+      }
     }
-  }// vertex analysis 
+  }// vertex analysis
 }
 // -------------------------------------------------------------------------
 
@@ -780,9 +780,9 @@ void CbmStsFitPerformanceTask::FillTrackHisto(const Double_t mc[6], CbmStsTrack 
   hist[3]->Fill( 1.E3*(t[3] - mc[3]) );
   if ( fabs( t[4] )>1.e-10 ) hist[4]->Fill( (mc[4]/t[4] - 1.) );
   //if (z < 7.0) // first hit
-  //if ( fabs( t[4] )>1.e-10 ) fhRes_vs_Mom_f->Fill(fabs(1.0/t[4]),1.E3*(t[2] - mc[2])); 
+  //if ( fabs( t[4] )>1.e-10 ) fhRes_vs_Mom_f->Fill(fabs(1.0/t[4]),1.E3*(t[2] - mc[2]));
   //if (z > 80.0) // last hit
-  //if ( fabs( t[4] )>1.e-10 ) fhRes_vs_Mom_l->Fill(fabs(1.0/t[4]),1.E3*(t[2] - mc[2])); 
+  //if ( fabs( t[4] )>1.e-10 ) fhRes_vs_Mom_l->Fill(fabs(1.0/t[4]),1.E3*(t[2] - mc[2]));
 
   if ( c[ 0] >1.e-10 ) hist[5]->Fill( ( t[0] - mc[0] )/sqrt(c[ 0]) );
   if ( c[ 2] >1.e-10 ) hist[6]->Fill( ( t[1] - mc[1] )/sqrt(c[ 2]) );
@@ -800,7 +800,7 @@ void CbmStsFitPerformanceTask::FillVertexHisto( TVector3 &mc, CbmVertex *V, TH1D
   Double_t s2x = V->GetCovariance(0,0);
   Double_t s2y = V->GetCovariance(1,1);
   Double_t s2z = V->GetCovariance(2,2);
-	  
+
   hist[0]->Fill(1.E4*dx);
   hist[1]->Fill(1.E4*dy);
   hist[2]->Fill(1.E4*dz);
@@ -809,13 +809,13 @@ void CbmStsFitPerformanceTask::FillVertexHisto( TVector3 &mc, CbmVertex *V, TH1D
   if ( s2z >1.e-10 ) hist[5]->Fill( dz/sqrt(s2z) );
   hist[6]->Fill( V->GetChi2()/V->GetNDF() );
   hist[7]->Fill( TMath::Prob(V->GetChi2(),V->GetNDF()));
-  hist[8]->Fill( V->GetNTracks() );		
+  hist[8]->Fill( V->GetNTracks() );
 }
 
 // -------------------------------------------------------------------------
 void CbmStsFitPerformanceTask::FillMCStateVectors( CbmStsPoint* point, Double_t mc[], Bool_t out){
   if( !point ) return;
-  Int_t mcTrackID = point->GetTrackID();  
+  Int_t mcTrackID = point->GetTrackID();
   CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTrackArray->At(mcTrackID);
   if( !mcTrack ) return;
   Double_t q=GetCharge(mcTrack);
@@ -823,25 +823,25 @@ void CbmStsFitPerformanceTask::FillMCStateVectors( CbmStsPoint* point, Double_t 
   // Get MC state vector
   TVector3 r,p;
   if( !out ){
-    point->Momentum(p);    
-    point->Position(r);    
+    point->Momentum(p);
+    point->Position(r);
   }else{
-    point->MomentumOut(p);    
-    point->PositionOut(r);    
+    point->MomentumOut(p);
+    point->PositionOut(r);
   }
   double pzi = p.z();
   if( fabs(pzi)>1.e-4 ) pzi = 1./pzi;
   mc[2]=p.x()*pzi;
   mc[3]=p.y()*pzi;
-  mc[4]=p.Mag()>1.e-4 ? q/p.Mag() :0;  
+  mc[4]=p.Mag()>1.e-4 ? q/p.Mag() :0;
   mc[0]=r.x();
-  mc[1]=r.y();  
+  mc[1]=r.y();
   mc[5]=r.z();
 }
 
 void CbmStsFitPerformanceTask::FillMCStateVectors( CbmMvdPoint* point, Double_t mc[], Bool_t out){
   if( !point ) return;
-  Int_t mcTrackID = point->GetTrackID();  
+  Int_t mcTrackID = point->GetTrackID();
   CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTrackArray->At(mcTrackID);
   if( !mcTrack ) return;
   Double_t q=GetCharge(mcTrack);
@@ -849,22 +849,22 @@ void CbmStsFitPerformanceTask::FillMCStateVectors( CbmMvdPoint* point, Double_t 
   // Get MC state vector
   TVector3 r,p;
   if( !out ){
-    point->Momentum(p);    
-    point->Position(r);    
+    point->Momentum(p);
+    point->Position(r);
   }else{
-    point->MomentumOut(p);    
-    point->PositionOut(r);    
+    point->MomentumOut(p);
+    point->PositionOut(r);
   }
   double pzi = p.z();
   if( fabs(pzi)>1.e-4 ) pzi = 1./pzi;
   mc[2]=p.x()*pzi;
   mc[3]=p.y()*pzi;
-  mc[4]=p.Mag()>1.e-4 ? q/p.Mag() :0;  
+  mc[4]=p.Mag()>1.e-4 ? q/p.Mag() :0;
   mc[0]=r.x();
-  mc[1]=r.y();  
+  mc[1]=r.y();
   mc[5]=r.z();
 }
- 
+
 
 // -----   GetCharge   ----------------------------------------------------
 Double_t CbmStsFitPerformanceTask::GetCharge(CbmMCTrack* mcTrack){

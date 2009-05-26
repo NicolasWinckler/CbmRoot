@@ -10,7 +10,7 @@ SET (CTEST_UPDATE_CHECKOUT  " ${CTEST_UPDATE_COMMAND} update ")
 SET (BUILD_COMMAND "make")
 SET (CTEST_BUILD_COMMAND "${BUILD_COMMAND} -j$ENV{number_of_processors}")
 
-#if($ENV{ctest_model} MATCHES Nightly)
+if($ENV{ctest_model} MATCHES Nightly)
   # get the information about conflicting or localy modified files
   # from svn, extract the relavant information about the file name
   # and put the result in the output variable
@@ -32,7 +32,7 @@ SET (CTEST_BUILD_COMMAND "${BUILD_COMMAND} -j$ENV{number_of_processors}")
 
   CTEST_EMPTY_BINARY_DIRECTORY(${CTEST_BINARY_DIRECTORY})
 
-#endif($ENV{ctest_model} MATCHES Nightly)
+endif($ENV{ctest_model} MATCHES Nightly)
 
 CTEST_START ($ENV{ctest_model})
 CTEST_UPDATE (SOURCE "${CTEST_SOURCE_DIRECTORY}")

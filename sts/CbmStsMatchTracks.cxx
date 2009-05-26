@@ -6,7 +6,7 @@
 
 #include "CbmStsHit.h"
 #include "CbmStsTrack.h"
-#include "CbmStsTrackMatch.h"
+#include "CbmTrackMatch.h"
 
 #include "FairMCPoint.h"
 #include "FairRootManager.h"
@@ -27,7 +27,7 @@ using std::setprecision;
 using std::map;
 
 // -----   Default constructor   -------------------------------------------
-CbmStsMatchTracks::CbmStsMatchTracks() 
+CbmStsMatchTracks::CbmStsMatchTracks()
   : FairTask("STSMatchTracks") {
   fTracks  = NULL;
   fPoints  = NULL;
@@ -35,7 +35,7 @@ CbmStsMatchTracks::CbmStsMatchTracks()
   fMatches = NULL;
   fTime    = 0.;
   fNTrackMatches = 0.;
-  fNAllHits      = 0.;   
+  fNAllHits      = 0.;
   fNTrueHits     = 0.;
   fNEvents        = 0;
   fNEventsFailed  = 0;
@@ -45,7 +45,7 @@ CbmStsMatchTracks::CbmStsMatchTracks()
 
 
 // -----   Standard constructor  -------------------------------------------
-CbmStsMatchTracks::CbmStsMatchTracks(Int_t iVerbose) 
+CbmStsMatchTracks::CbmStsMatchTracks(Int_t iVerbose)
   : FairTask("STSMatchTracks", iVerbose) {
   fTracks  = NULL;
   fPoints  = NULL;
@@ -53,7 +53,7 @@ CbmStsMatchTracks::CbmStsMatchTracks(Int_t iVerbose)
   fMatches = NULL;
   fTime    = 0.;
   fNTrackMatches = 0.;
-  fNAllHits      = 0.;   
+  fNAllHits      = 0.;
   fNTrueHits     = 0.;
   fNEvents        = 0;
   fNEventsFailed  = 0;
@@ -63,7 +63,7 @@ CbmStsMatchTracks::CbmStsMatchTracks(Int_t iVerbose)
 
 
 // -----   Constructor with task name   ------------------------------------
-CbmStsMatchTracks::CbmStsMatchTracks(const char* name, Int_t iVerbose) 
+CbmStsMatchTracks::CbmStsMatchTracks(const char* name, Int_t iVerbose)
   : FairTask(name, iVerbose) {
   fTracks  = NULL;
   fPoints  = NULL;
@@ -71,7 +71,7 @@ CbmStsMatchTracks::CbmStsMatchTracks(const char* name, Int_t iVerbose)
   fMatches = NULL;
   fTime    = 0.;
   fNTrackMatches = 0.;
-  fNAllHits      = 0.;   
+  fNAllHits      = 0.;
   fNTrueHits     = 0.;
 }
 // -------------------------------------------------------------------------
@@ -118,7 +118,7 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
   for (Int_t iTrack=0; iTrack<nTracks; iTrack++) {
     track = (CbmStsTrack*) fTracks->At(iTrack);
     if ( ! track) {
-      cout << "-W- CbmStsMatchTracks::Exec: Empty StsTrack at " 
+      cout << "-W- CbmStsMatchTracks::Exec: Empty StsTrack at "
 	   << iTrack << endl;
       warn = kTRUE;
       continue;
@@ -126,7 +126,7 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
     nHits = track->GetNStsHits();
     nAll = nTrue = nWrong = nFake = nMCTracks = 0;
     fMatchMap.clear();
-    if (fVerbose > 2) cout << endl << "Track " << iTrack << ", Hits " 
+    if (fVerbose > 2) cout << endl << "Track " << iTrack << ", Hits "
 			   << nHits << endl;
 
     // Loop over StsHits of track
@@ -153,35 +153,35 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
       }
       iMCTrack = point->GetTrackID();
       if ( fVerbose > 2 ) cout << "Track " << iTrack << ", MAPS hit "
-			       << track->GetStsHitIndex(iHit) 
+			       << track->GetStsHitIndex(iHit)
 			       << ", STSPoint " << iPoint << ", MCTrack "
 			       << iMCTrack << endl;
       fMatchMap[iMCTrack]++;
     }
 
- 
+
     // Search for best matching MCTrack
     iMCTrack = -1;
     for (it=fMatchMap.begin(); it!=fMatchMap.end(); it++) {
-      if (fVerbose > 2) cout << it->second 
-			     << " common points wth MCtrack " 
+      if (fVerbose > 2) cout << it->second
+			     << " common points wth MCtrack "
 			     << it->first << endl;
       nMCTracks++;
       nAll += it->second;
       if ( it->second > nTrue ) {
 	iMCTrack = it->first;
-	nTrue    = it->second;	
+	nTrue    = it->second;
       }
     }
     nWrong = nAll - nTrue;
-    if (fVerbose>1) cout << "-I- CbmStsMatchTracks: STSTrack " << iTrack 
-			 << ", MCTrack " << iMCTrack << ", true " 
-			 << nTrue << ", wrong " << nWrong << ", fake " 
+    if (fVerbose>1) cout << "-I- CbmStsMatchTracks: STSTrack " << iTrack
+			 << ", MCTrack " << iMCTrack << ", true "
+			 << nTrue << ", wrong " << nWrong << ", fake "
 			 << nFake << ", #MCTracks " << nMCTracks << endl;
 
     // Create StsTrackMatch
-    new ((*fMatches)[iTrack]) CbmStsTrackMatch(iMCTrack, nTrue, 
-					       nWrong, nFake, 
+    new ((*fMatches)[iTrack]) CbmTrackMatch(iMCTrack, nTrue,
+					       nWrong, nFake,
 					       nMCTracks);
 
     // Some statistics
@@ -202,7 +202,7 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
     Double_t qFake  = Double_t(nFakeSum)  / Double_t(nHitSum) * 100.;
     Double_t qMC    = Double_t(nMCTrackSum) / Double_t(nTracks);
     cout << endl;
-    cout << "-------------------------------------------------------" 
+    cout << "-------------------------------------------------------"
 	 << endl;
     cout << "-I-              STS Track Matching                 -I-"
 	 << endl;
@@ -211,17 +211,17 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
     cout << "Wrong hit assignments   : " << qWrong << " %" << endl;
     cout << "Fake  hit assignments   : " << qFake  << " %" << endl;
     cout << "MCTracks per STSTrack   : " << qMC << endl;
-    cout << "--------------------------------------------------------" 
+    cout << "--------------------------------------------------------"
 	 << endl;
   }
   if (fVerbose == 1) {
     if ( warn) cout << "- ";
     else       cout << "+ ";
     cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
-	 << fixed << right << fTimer.RealTime() << " s, matches " 
+	 << fixed << right << fTimer.RealTime() << " s, matches "
 	 << nTracks << ", hit quota " << qTrue << " %" << endl;
   }
-  
+
   // Run statistics
   if ( warn ) fNEventsFailed++;
   else {
@@ -231,7 +231,7 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
     fNAllHits      += Double_t(nHitSum);
     fNTrueHits     += Double_t(nTrueSum);
   }
-  
+
 }
 // -------------------------------------------------------------------------
 
@@ -239,7 +239,7 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
 
 // -----   Virtual private method Init   -----------------------------------
 InitStatus CbmStsMatchTracks::Init() {
-  
+
   // Get FairRootManager
   FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
@@ -270,7 +270,7 @@ InitStatus CbmStsMatchTracks::Init() {
   }
 
   // Create and register StsTrackMatch array
-  fMatches = new TClonesArray("CbmStsTrackMatch",100);
+  fMatches = new TClonesArray("CbmTrackMatch",100);
   ioman->Register("STSTrackMatch", "STS", fMatches, kTRUE);
 
   return kSUCCESS;
@@ -280,7 +280,7 @@ InitStatus CbmStsMatchTracks::Init() {
 
 
 
-    
+
 // -----   Virtual private method Finish   ---------------------------------
 void CbmStsMatchTracks::Finish() {
 
@@ -306,10 +306,10 @@ void CbmStsMatchTracks::Finish() {
 // -------------------------------------------------------------------------
 
 
-    
+
 ClassImp(CbmStsMatchTracks)
 
 
-      
 
-      
+
+

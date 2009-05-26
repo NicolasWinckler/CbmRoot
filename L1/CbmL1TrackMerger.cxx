@@ -5,8 +5,7 @@
 #include "CbmL1TrackMerger.h"
 
 #include "FairRootManager.h"
-#include "CbmStsTrackMatch.h"
-#include "CbmTrdTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmStsTrack.h"
 #include "CbmTrdTrack.h"
 #include "CbmGlobalTrack.h"
@@ -188,8 +187,8 @@ Int_t CbmL1TrackMerger::MergeImPlane(TClonesArray* stsTracks,
     CbmKFTrack kfTrack;
     CbmTrdTrack* trdTrack;
     CbmGlobalTrack* glbTrack;
-    CbmStsTrackMatch* stsTrackM;
-    CbmTrdTrackMatch* trdTrackM;
+    CbmTrackMatch* stsTrackM;
+    CbmTrackMatch* trdTrackM;
     Int_t nGlb = 0;
     Int_t nMerged = 0;
     Double_t dx;
@@ -210,7 +209,7 @@ Int_t CbmL1TrackMerger::MergeImPlane(TClonesArray* stsTracks,
 	// Get pointer to the STS track and track match
 	stsTrack = (CbmStsTrack*) stsTracks->At(iStsTrack);
 	if(NULL == stsTrack) continue;
-	stsTrackM = (CbmStsTrackMatch*) fArrayStsTrackM->At(iStsTrack);
+	stsTrackM = (CbmTrackMatch*) fArrayStsTrackM->At(iStsTrack);
         if(NULL == stsTrackM) continue;
 
 	// Create global track
@@ -231,7 +230,7 @@ Int_t CbmL1TrackMerger::MergeImPlane(TClonesArray* stsTracks,
 	    // Get pointer to the TRD track and track match
 	    trdTrack = (CbmTrdTrack*) trdTracks->At(iTrdTrack);
 	    if(NULL == trdTrack) continue;
-	    trdTrackM = (CbmTrdTrackMatch*) fArrayTrdTrackM->At(iTrdTrack);
+	    trdTrackM = (CbmTrackMatch*) fArrayTrdTrackM->At(iTrdTrack);
             if(NULL == trdTrackM) continue;
 	    // Extrapolate STS track to the first plane of TRD track
 	    kfTrack.Extrapolate(trdTrack->GetParamFirst()->GetZ());
@@ -245,7 +244,7 @@ Int_t CbmL1TrackMerger::MergeImPlane(TClonesArray* stsTracks,
 		TMath::ACos(1./TMath::Sqrt(1+
 					   TMath::Power(kfTrack.GetTrack()[2],2)+
 					   TMath::Power(kfTrack.GetTrack()[3],2)));
-	    if(stsTrackM->GetMCTrackId() == trdTrackM->GetMCTrackID()) {
+	    if(stsTrackM->GetMCTrackId() == trdTrackM->GetMCTrackId()) {
                 fh_dx_true->Fill(dx, theta);
 	    } else {
                 fh_dx_false->Fill(dx, theta);
@@ -273,7 +272,7 @@ Int_t CbmL1TrackMerger::MergeImPlane(TClonesArray* stsTracks,
 	    }
 	    if(TMath::Abs(dx) > dx_cut) continue;
 	    // Fill histogramms
-	    if(stsTrackM->GetMCTrackId() == trdTrackM->GetMCTrackID()) {
+	    if(stsTrackM->GetMCTrackId() == trdTrackM->GetMCTrackId()) {
                 fh_dy_true->Fill(dy, theta);
 	    } else {
                 fh_dy_false->Fill(dy, theta);
@@ -299,7 +298,7 @@ Int_t CbmL1TrackMerger::MergeImPlane(TClonesArray* stsTracks,
 	    }
 	    if(TMath::Abs(dy) > dy_cut) continue;
             // Fill histogramms
-	    if(stsTrackM->GetMCTrackId() == trdTrackM->GetMCTrackID()) {
+	    if(stsTrackM->GetMCTrackId() == trdTrackM->GetMCTrackId()) {
                 fh_dtx_true->Fill(dtx, theta);
 	    } else {
                 fh_dtx_false->Fill(dtx, theta);
@@ -324,7 +323,7 @@ Int_t CbmL1TrackMerger::MergeImPlane(TClonesArray* stsTracks,
             dtx_cut *= 10;
 	    if(TMath::Abs(dtx) > dtx_cut) continue;
             // Fill histogramms
-	    if(stsTrackM->GetMCTrackId() == trdTrackM->GetMCTrackID()) {
+	    if(stsTrackM->GetMCTrackId() == trdTrackM->GetMCTrackId()) {
                 fh_dty_true->Fill(dty, theta);
 	    } else {
                 fh_dty_false->Fill(dty, theta);

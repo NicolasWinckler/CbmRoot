@@ -15,8 +15,8 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/mvd
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/rich
-${CBMROOT_SOURCE_DIR}/cbmdata/much
-${CBMROOT_SOURCE_DIR}/cbmdata/stt
+#${CBMROOT_SOURCE_DIR}/cbmdata/much
+#${CBMROOT_SOURCE_DIR}/cbmdata/stt
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
 
 ${CBMROOT_SOURCE_DIR}/L1
@@ -49,14 +49,14 @@ CbmL1TrackMerger.cxx
 CbmL1TofMerger.cxx 
 OffLineInterface/CbmL1RichENNRingFinder.cxx 
 OffLineInterface/CbmL1StsTrackFinder.cxx 
-OffLineInterface/CbmL1MuchFinder.cxx 
-OffLineInterface/CbmL1MuchHit.cxx 
-OffLineInterface/CbmL1MuchTrack.cxx 
-OffLineInterface/CbmL1MuchFinderQa.cxx
+#OffLineInterface/CbmL1MuchFinder.cxx 
+#OffLineInterface/CbmL1MuchHit.cxx 
+#OffLineInterface/CbmL1MuchTrack.cxx 
+#OffLineInterface/CbmL1MuchFinderQa.cxx
 OffLineInterface/CbmL1RichRingQa.cxx 
-OffLineInterface/CbmL1SttHit.cxx 
-OffLineInterface/CbmL1SttTrackFinder.cxx 
-OffLineInterface/CbmL1SttTrack.cxx 
+#OffLineInterface/CbmL1SttHit.cxx 
+#OffLineInterface/CbmL1SttTrackFinder.cxx 
+#OffLineInterface/CbmL1SttTrack.cxx 
 )
 
 set(L1_HEADERS
@@ -72,16 +72,16 @@ CbmL1TrdTrackFinderSts.h
 CbmL1TrdTracklet4.h
 CbmL1TrdTracklet.h
 CbmL1Vtx.h
-OffLineInterface/CbmL1MuchFinder.h
-OffLineInterface/CbmL1MuchFinderQa.h
-OffLineInterface/CbmL1MuchHit.h
-OffLineInterface/CbmL1MuchTrack.h
+#OffLineInterface/CbmL1MuchFinder.h
+#OffLineInterface/CbmL1MuchFinderQa.h
+#OffLineInterface/CbmL1MuchHit.h
+#OffLineInterface/CbmL1MuchTrack.h
 OffLineInterface/CbmL1RichENNRingFinder.h
 OffLineInterface/CbmL1RichRingQa.h
 OffLineInterface/CbmL1StsTrackFinder.h
-OffLineInterface/CbmL1SttHit.h
-OffLineInterface/CbmL1SttTrackFinder.h
-OffLineInterface/CbmL1SttTrack.h
+#OffLineInterface/CbmL1SttHit.h
+#OffLineInterface/CbmL1SttTrackFinder.h
+#OffLineInterface/CbmL1SttTrack.h
 )
 
 

@@ -13,7 +13,7 @@
 #include "CbmTrdPoint.h"
 #include "CbmTrdHit.h"
 #include "CbmStsTrack.h"
-#include "CbmStsTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmTrdTrack.h"
 #include "CbmKFTrack.h"
 #include "CbmKFTrdHit.h"
@@ -55,7 +55,7 @@ CbmL1TrdTrackFinderSts::CbmL1TrdTrackFinderSts()
     fArrayStsTrack = NULL;
     fArrayStsTrackM = NULL;
     fArrayKFTrdHit = new TClonesArray("CbmKFTrdHit");
-    fArrayTrdTrack = NULL;  
+    fArrayTrdTrack = NULL;
     fVerbose = 1;
     fPid = 211;
 }
@@ -71,7 +71,7 @@ CbmL1TrdTrackFinderSts::CbmL1TrdTrackFinderSts(Int_t verbose)
     fArrayStsTrack = NULL;
     fArrayStsTrackM = NULL;
     fArrayKFTrdHit = new TClonesArray("CbmKFTrdHit");
-    fArrayTrdTrack = NULL;  
+    fArrayTrdTrack = NULL;
     fVerbose = verbose;
     fPid = 211;
 }
@@ -84,9 +84,9 @@ CbmL1TrdTrackFinderSts::~CbmL1TrdTrackFinderSts()
     // Destructor
   if(fArrayKFTrdHit)fArrayKFTrdHit->Delete();
   delete fArrayKFTrdHit;
-  // why delete the trdtrack array? This pointer 
+  // why delete the trdtrack array? This pointer
   // is passed from CbmTrdFindTracks and is registered with the iomanager...
-  // should be not our business to delete the TClonesArray pointer  
+  // should be not our business to delete the TClonesArray pointer
   if(fArrayTrdTrack)fArrayTrdTrack->Delete();
   //  delete fArrayTrdTrack;
 }
@@ -122,20 +122,20 @@ Int_t CbmL1TrdTrackFinderSts::DoFind(TClonesArray* hitArray,
   }
   fArrayTrdHit = hitArray;
   fArrayTrdTrack = trackArray;
-  
+
   fmapHitUsed.clear();
   fLostTracks.clear();
 
   // Sort the TRD hits by plane number
   SortTrdHits();
-  
+
   // Main part of algorithm
   // Follow the track in TRD
-  
+
   Process();
-  
+
   Int_t nTrdTracks = fArrayTrdTrack->GetEntriesFast();
-  
+
   // Event output
   if(fVerbose > 0) {
     cout << "---------------------------------------" << endl
@@ -154,14 +154,14 @@ Int_t CbmL1TrdTrackFinderSts::DoFind(TClonesArray* hitArray,
 
   // Clear array of KF trd hits
   fArrayKFTrdHit->Clear();
-  
+
   // Increment number of events
   fEvents += 1;
-  
+
   // control output
   cout << "-I- CbmL1TrdTrackFinder : "
        << fEvents << " events processed" << endl;
-  
+
   // Return number of found TRD tracks
   return nTrdTracks;
 }
@@ -277,7 +277,7 @@ void CbmL1TrdTrackFinderSts::ProcessAllStations()
     vector<CbmTrdTrack*>::iterator iter;
     int itr=0;
     for(iter = fvTrdTrack.begin(); iter != fvTrdTrack.end(); iter++) {
-      // Attach hits to track           
+      // Attach hits to track
       ProcessStation(*iter, station);
       // Update track
       UpdateTrack(station, *iter);
@@ -320,9 +320,9 @@ void CbmL1TrdTrackFinderSts::ProcessStation(CbmTrdTrack* pTrack,
 {
   // Extrapolate track parameters to the layers of current station,
   // and pick up the closest hits
-  
+
   // Track parameters
-  
+
   CbmKFTrack kfTrack;
   kfTrack.SetTrackParam(*pTrack->GetParamLast());
   kfTrack.SetPID(fPid);
@@ -347,10 +347,10 @@ void CbmL1TrdTrackFinderSts::ProcessStation(CbmTrdTrack* pTrack,
   if(stsTrackIndex < 0) {
     Fatal("ProcessStation", "Invalid track index");
   }
-  CbmStsTrackMatch *stsM = (CbmStsTrackMatch*) fArrayStsTrackM->
+  CbmTrackMatch *stsM = (CbmTrackMatch*) fArrayStsTrackM->
     At(stsTrackIndex);
   Int_t trackID = stsM->GetMCTrackId();
-  
+
   // Loop over layers in this station
   for(Int_t iLayer = 0; iLayer < fNoTrdPerStation; iLayer++) {
 
@@ -365,13 +365,13 @@ void CbmL1TrdTrackFinderSts::ProcessStation(CbmTrdTrack* pTrack,
     ze = ((CbmTrdHit*)fArrayTrdHit->At(fTrdHitIndex[plane][0]))->GetZ();
     // Extrapolate to the plane
     kfTrack.Extrapolate(ze, &qp0);
-    
+
     minChi2 = 1e16;
     indexOfClosest = -1;
-    
+
     // Loop over TRD hits in this plane
     for(Int_t iHit = 0; iHit < fNoTrdHits[plane]; iHit++) {
-      
+
       // Get hit index
       hitIndex = fTrdHitIndex[plane][iHit];
       // If the hit is used, skip
@@ -389,8 +389,8 @@ void CbmL1TrdTrackFinderSts::ProcessStation(CbmTrdTrack* pTrack,
       else c1 = 100;
       if( finite(c2) && c2>1.e-10 ) c2 = ( T[1]-pos.Y())/TMath::Sqrt(c2);
       else c2 = 0;
-      
-      if(trdPoint->GetTrackID() == trackID) {	 
+
+      if(trdPoint->GetTrackID() == trackID) {
 	fh_resx_plane_true->Fill( T[0]-pos.X(), plane);
 	fh_resy_plane_true->Fill( T[1]-pos.Y(), plane);
 	fh_pullx_plane_true->Fill( c1, plane);

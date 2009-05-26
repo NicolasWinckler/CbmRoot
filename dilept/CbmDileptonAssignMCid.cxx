@@ -23,7 +23,7 @@
 #include "FairRootManager.h"
 #include "CbmGlobalTrack.h"
 #include "CbmStsTrack.h"
-#include "CbmStsTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmRichRing.h"
 #include "CbmRichRingMatch.h"
 #include "CbmTrdTrack.h"
@@ -171,7 +171,7 @@ InitStatus CbmDileptonAssignMCid::Init(){
         cout << "-E- CbmDileptonAssignMCid::Init: DileptonTrackReal No  array!" << endl;
         return kFATAL;
     }
-    
+
     fRootManager->Register("DileptonTrackSim","Dilepton", fTrackSimColl->DileptonTracksSim(),kTRUE);
 
     // initialize KF-Fitter
@@ -194,7 +194,7 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
     Int_t nTrackReal =  fArrayDileptonTrackReal->GetEntriesFast();
 
     if (fVerbose>0) cout<<" -I-  CbmDileptonAssignMCid::Exec() : real tracks : "<<nTrackReal<<endl;
-   
+
 
     for(Int_t iTrackReal=0; iTrackReal<nTrackReal; iTrackReal++){
 
@@ -212,7 +212,7 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
 	Int_t globalTrackIndex = trackReal->GetGlobalIndex();
 
         if (fVerbose>0)  cout<<" -I-  CbmDileptonAssignMCid::Exec() : real track, global track: "<< iTrackReal<<" "<<globalTrackIndex<<endl;
-         
+
 	//Get the global track
 	CbmGlobalTrack* gTrack=(CbmGlobalTrack*)fArrayGlobalTrack->At(globalTrackIndex);
 
@@ -225,7 +225,7 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
 
 
         CbmStsTrack* stsTrack      = NULL;
-        CbmStsTrackMatch* stsMatch = NULL;
+        CbmTrackMatch* stsMatch = NULL;
         CbmMCTrack* mcTrack        = NULL;
 
 	Int_t stsMCid = -99;
@@ -239,12 +239,12 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
 	stsTrack = (CbmStsTrack*)fArrayStsTrack->At(stsTrackIndex);
 	if (!stsTrack) goto add;
 
-	stsMatch = (CbmStsTrackMatch*)fArrayStsTrackMatch->At(stsTrackIndex);
+	stsMatch = (CbmTrackMatch*)fArrayStsTrackMatch->At(stsTrackIndex);
 	if (!stsMatch) goto add;
 
 	stsMCid = stsMatch->GetMCTrackId();
         if (stsMCid == -1) goto add;
-	
+
         if(((Double_t)(stsMatch->GetNofTrueHits()))/((Double_t)(stsTrack->GetNStsHits()))< 0.6) FakeTrack = true;
 
 	mcTrack = (CbmMCTrack*)fArrayMCTrack->At(stsMCid);
@@ -288,7 +288,7 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
 	Bool_t isTof  = trackReal->GetTof();
 	Double_t chi = trackReal->GetChiPrimary();
 	TVector3 momentum = trackReal->GetMomentum();
-       
+
 
         // Get identified particles
 
@@ -353,7 +353,7 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
 		    }
 		    else if(211 == TMath::Abs(MCPdg)) fh_momentum_rich_tof_true_pi->Fill(momentum.Mag());
 		    else if(2212 == TMath::Abs(MCPdg)) fh_momentum_rich_tof_true_p->Fill(momentum.Mag());
-		
+
 		}
 
 		if(isRich && isTrd && isTof){
@@ -410,7 +410,7 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
 
 	for (Int_t iGlobal=0; iGlobal<fArrayGlobalTrack->GetEntriesFast(); iGlobal++){
 
-     
+
 	//Get Global Track
 	CbmGlobalTrack* fGlobalTrack= (CbmGlobalTrack*)fArrayGlobalTrack->At(iGlobal);
 
@@ -421,7 +421,7 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
         CbmStsTrack* stsTrack = (CbmStsTrack*)fArrayStsTrack->At(stsTrackIndex);
 	if (!stsTrack) continue;
 
-        CbmStsTrackMatch *stsMatch = (CbmStsTrackMatch*)fArrayStsTrackMatch->At(stsTrackIndex);
+        CbmTrackMatch *stsMatch = (CbmTrackMatch*)fArrayStsTrackMatch->At(stsTrackIndex);
 	if (!stsMatch) continue;
 	Int_t stsMCid = stsMatch->GetMCTrackId();
 	if (stsMCid == -1)continue;
@@ -448,7 +448,7 @@ void  CbmDileptonAssignMCid::Exec(Option_t* option){
 
 	if (chiPrimary > fCutChiPrimary)continue;
 	if (nStsFound < fCutStsHit) continue;
-      
+
 	FairTrackParam* richTrack = (FairTrackParam*)fArrayRichProjection->At(iGlobal);
 
 	Double_t TcentreX = richTrack->GetX();

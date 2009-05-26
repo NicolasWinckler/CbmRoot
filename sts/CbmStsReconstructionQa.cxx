@@ -11,7 +11,7 @@
 #include "CbmStsDigi.h"
 #include "CbmStsPoint.h"
 #include "CbmStsTrack.h"
-#include "CbmStsTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmGeoStsPar.h"
 
 // Includes from base
@@ -51,8 +51,8 @@ using std::setprecision;
 using std::flush;
 
 // -----   Default constructor   -------------------------------------------
-CbmStsReconstructionQa::CbmStsReconstructionQa(Int_t iVerbose) 
-  : FairTask("STSReconstructionQA", iVerbose) { 
+CbmStsReconstructionQa::CbmStsReconstructionQa(Int_t iVerbose)
+  : FairTask("STSReconstructionQA", iVerbose) {
   fOnlineAnalysis = kFALSE;
   fMinHits = 4;
   fQuota   = 0.7;
@@ -66,7 +66,7 @@ CbmStsReconstructionQa::CbmStsReconstructionQa(Int_t iVerbose)
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsReconstructionQa::CbmStsReconstructionQa(Bool_t visualizeBool, Int_t minHits, Double_t quota,
-				       Int_t iVerbose) 
+				       Int_t iVerbose)
   : FairTask("STSReconstructionQA", iVerbose) {
   fOnlineAnalysis = visualizeBool;
   fMinHits = minHits;
@@ -89,10 +89,10 @@ CbmStsReconstructionQa::CbmStsReconstructionQa(Bool_t visualizeBool, Int_t minHi
 }
 // -------------------------------------------------------------------------
 
-  
-  
+
+
 // -----   Destructor   ----------------------------------------------------
-CbmStsReconstructionQa::~CbmStsReconstructionQa() { 
+CbmStsReconstructionQa::~CbmStsReconstructionQa() {
 
   fHistoList->Delete();
   delete fHistoList;
@@ -109,7 +109,7 @@ void CbmStsReconstructionQa::SetParContainers() {
   // Get Run
   FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) {
-    cout << "-E- " << GetName() << "::SetParContainers: No FairRunAna!" 
+    cout << "-E- " << GetName() << "::SetParContainers: No FairRunAna!"
 	 << endl;
     return;
   }
@@ -117,7 +117,7 @@ void CbmStsReconstructionQa::SetParContainers() {
   // Get Runtime Database
   FairRuntimeDb* runDb = run->GetRuntimeDb();
   if ( ! run ) {
-    cout << "-E- " << GetName() << "::SetParContainers: No runtime database!" 
+    cout << "-E- " << GetName() << "::SetParContainers: No runtime database!"
 	 << endl;
     return;
   }
@@ -171,7 +171,7 @@ InitStatus CbmStsReconstructionQa::Init() {
     cout << "-E- " << GetName() << "::Init: No StsPoint array!" << endl;
     return kFATAL;
   }
-   
+
   // Get StsHit array
   fStsHits = (TClonesArray*) ioman->GetObject("STSHit");
   if ( ! fStsHits ) {
@@ -189,7 +189,7 @@ InitStatus CbmStsReconstructionQa::Init() {
   // Get StsTrackMatch array
   fMatches = (TClonesArray*) ioman->GetObject("STSTrackMatch");
   if ( ! fMatches ) {
-    cout << "-E- " << GetName() << "::Init: No StsTrackMatch array!" 
+    cout << "-E- " << GetName() << "::Init: No StsTrackMatch array!"
 	 << endl;
     return kERROR;
   }
@@ -197,7 +197,7 @@ InitStatus CbmStsReconstructionQa::Init() {
   // Get StsDigis array
   fStsDigis = (TClonesArray*) ioman->GetObject("STSDigi");
   if ( ! fMatches ) {
-    cout << "-E- " << GetName() << "::Init: No StsDigi array!" 
+    cout << "-E- " << GetName() << "::Init: No StsDigi array!"
 	 << endl;
     return kERROR;
   }
@@ -206,7 +206,7 @@ InitStatus CbmStsReconstructionQa::Init() {
   //  fPVertex = (CbmVertex*) ioman->GetObject("PrimaryVertex");
 //   CbmVertex* hohoho = (CbmVertex*) ioman->GetObject("PrimaryVertex");
 //   if ( ! hohoho ) {
-//     cout << "-E- " << GetName() << "::Init: No PrimaryVertex array!" 
+//     cout << "-E- " << GetName() << "::Init: No PrimaryVertex array!"
 // 	 << endl;
 //     return kERROR;
 //   }
@@ -239,7 +239,7 @@ InitStatus CbmStsReconstructionQa::Init() {
       fOnlinePad[ipad]->SetBorderMode(0);
       fOnlinePad[ipad]->Draw();
     }
-    
+
     fOnlinePad[0]->cd();
     TLegend* brp = new TLegend(0.1,0.1,0.9,0.9,"Online STS reconstruction");
     brp->SetTextAlign(22);
@@ -254,7 +254,7 @@ InitStatus CbmStsReconstructionQa::Init() {
   // Output
   cout << "   Minimum number of STS hits   : " << fMinHits << endl;
   cout << "   Matching quota               : " << fQuota << endl;
-  cout << "   Target position ( " << fTargetPos.X() << ", " 
+  cout << "   Target position ( " << fTargetPos.X() << ", "
        << fTargetPos.Y() << ", " << fTargetPos.Z() << ") " << endl;
   cout << "   Number of STS stations : " << fNStations << endl;
   if (fActive) cout << "   *****   Task is ACTIVE   *****" << endl;
@@ -284,7 +284,7 @@ InitStatus CbmStsReconstructionQa::ReInit() {
   }
 
   // Output
-  cout << "   Target position ( " << fTargetPos.X() << ", " 
+  cout << "   Target position ( " << fTargetPos.X() << ", "
        << fTargetPos.Y() << ", " << fTargetPos.Z() << ") " << endl;
   cout << "   Number of STS stations : " << fNStations << endl;
   if (fActive) cout << "   *****   Task is ACTIVE   *****" << endl;
@@ -328,7 +328,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
       fNofHits[istat][isect] = 0;
       for ( Int_t iside = 0 ; iside < 2 ; iside++ ) {
 	fNofFiredDigis[istat][isect][iside] = 0;
-	for ( Int_t ichip = 0 ; ichip < 8 ; ichip++ ) 
+	for ( Int_t ichip = 0 ; ichip < 8 ; ichip++ )
 	  fNofDigisPChip[istat][isect][iside][ichip] = 0;
       }
     }
@@ -360,9 +360,9 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
       toSave = (Int_t)((momentum.Z()-.1)*10.);
       //  if ( TMath::Abs(momentum.Z()-1.)<0.5 )
 
-    if ( isPrim ) 
+    if ( isPrim )
       if ( toSave >= 0 ) {
-	if ( pdgC > 0 ) 
+	if ( pdgC > 0 )
 	  fhDirEmiPrimP[toSave]->Fill(momentum.X(),momentum.Y());
 	else
 	  fhDirEmiPrimM[toSave]->Fill(momentum.X(),momentum.Y());
@@ -396,7 +396,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
       fhMomAccPrim->Fill(mom);
       fhNpAccPrim->Fill(Double_t(nHits));
       if ( toSave >= 0 ) {
-	if ( pdgC > 0 ) 
+	if ( pdgC > 0 )
 	  fhDirAccPrimP[toSave]->Fill(momentum.X(),momentum.Y());
 	else
 	  fhDirAccPrimM[toSave]->Fill(momentum.X(),momentum.Y());
@@ -414,7 +414,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
     Bool_t   isRec = kFALSE;
     if (fMatchMap.find(iMC) != fMatchMap.end() ) {
       /*      if ( isPrim ) {
-	cout << "mc mom = " << mom << "  (" 
+	cout << "mc mom = " << mom << "  ("
 	     << mcTrack->GetMomentum().X() << ", "
 	     << mcTrack->GetMomentum().Y() << ", "
 	     << mcTrack->GetMomentum().Z() << ") " << endl;
@@ -434,7 +434,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
 	     << "criterion ( " << quali << ")" << endl;
 	Fatal("Exec", "Match below matching quota");
       }
-      CbmStsTrackMatch* match = (CbmStsTrackMatch*) fMatches->At(iRec);
+      CbmTrackMatch* match = (CbmTrackMatch*) fMatches->At(iRec);
       if ( ! match ) {
 	cout << "-E- " << GetName() << "::Exec: "
 	     << "No StsTrackMatch for matched MCTrack " << iMC << endl;
@@ -454,7 +454,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
       if ( fVerbose > 4 )
 	cout << "-I- " << GetName() << ": "
 	     << "MCTrack " << iMC << ", hits "
-	     << nHits << ", StsTrack " << iRec << ", hits " << nHits 
+	     << nHits << ", StsTrack " << iRec << ", hits " << nHits
 	     << ", true hits " << nTrue << endl;
 
       // Fill histograms for reconstructed tracks
@@ -469,7 +469,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
 	fhNpRecPrim->Fill(Double_t(nHits));
 
 	if ( toSave >= 0 ) {
-	  if ( pdgC > 0 ) 
+	  if ( pdgC > 0 )
 	    fhDirRecPrimP[toSave]->Fill(momentum.X(),momentum.Y());
 	  else
 	    fhDirRecPrimM[toSave]->Fill(momentum.X(),momentum.Y());
@@ -495,9 +495,9 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
       if ( fPartPdgTable[itemp] == -7777 ) break;
       if ( fPartPdgTable[itemp] != partPdgCode ) continue;
       fhMomAccPart[itemp]->Fill(mom);
-      if ( isRec ) 
+      if ( isRec )
 	fhMomRecPart[itemp]->Fill(mom);
-    }    
+    }
 
   } // Loop over MCTracks
 
@@ -552,7 +552,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
 
     Int_t startHit = hitStationLimits[0][fStationNrFromMcId[stsPoint->GetDetectorID()]];
     Int_t finalHit = hitStationLimits[1][fStationNrFromMcId[stsPoint->GetDetectorID()]];
-    
+
     //    fhEnergyLoss[fStationNrFromMcId[stsPoint->GetDetectorID()]]->Fill(stsPoint->GetXIn(),stsPoint->GetYIn(),stsPoint->GetEnergyLoss());
 
 //     Float_t zP = stsPoint->GetZ();
@@ -560,7 +560,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
 //     Float_t yP = stsPoint->GetY(zP);
 
     if ( startHit == -1 && finalHit == -1 ) continue;
-    
+
     for ( Int_t ihit = startHit ; ihit < finalHit ; ihit++ ) {
       CbmStsHit *stsHit= (CbmStsHit*)fStsHits->At(ihit);
       if ( ( TMath::Abs(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ())) < .1 ) &&
@@ -573,7 +573,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
 //  										   stsHit->GetY()-stsPoint->GetY(stsPoint->GetZ()));
     }
   }*/
-  
+
   // Calculate efficiencies
   Double_t effAll  = 1.;
   if ( nAcc ) effAll  = Double_t(nRecAll)  / Double_t(nAcc);
@@ -593,23 +593,23 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
 	 << endl;
     cout << "MCTracks   : " << nAll << ", reconstructable: " << nAcc
 	 << ", reconstructed: " << nRecAll << endl;
-    cout << "Vertex     : reconstructable: " << nPrim << ", reconstructed: " 
+    cout << "Vertex     : reconstructable: " << nPrim << ", reconstructed: "
 	 << nRecPrim << ", efficiency " << effPrim*100. << "%" << endl;
-    cout << "Reference  : reconstructable: " << nRef  << ", reconstructed: " 
+    cout << "Reference  : reconstructable: " << nRef  << ", reconstructed: "
 	 << nRecRef  << ", efficiency " << effRef*100. << "%" << endl;
     cout << "Non-vertex : reconstructable: " << nSec << ", reconstructed: "
 	 << nRecSec << ", efficiency " << effSec*100. << "%" << endl;
-    cout << "STSTracks " << nRec << ", ghosts " << nGhosts 
+    cout << "STSTracks " << nRec << ", ghosts " << nGhosts
 	 << ", clones " << nClones << endl;
-    cout << "-----------------------------------------------------------" 
+    cout << "-----------------------------------------------------------"
 	 << endl;
     cout << endl;
   }
   if ( fVerbose == 1 ) {
-    cout << "\r+ " << setw(15) << left << fName << ": event " << fNEvents+1 << "  " << setprecision(4) 
+    cout << "\r+ " << setw(15) << left << fName << ": event " << fNEvents+1 << "  " << setprecision(4)
 	 << setw(8) << fixed << right << fTimer.RealTime()
-	 << " s, efficiency all " << effAll*100. << " %, vertex " 
-	 << effPrim*100. << " %, reference " << effRef*100. << " %" << endl; 
+	 << " s, efficiency all " << effAll*100. << " %, vertex "
+	 << effPrim*100. << " %, reference " << effRef*100. << " %" << endl;
   }
 
   // Increase counters
@@ -659,7 +659,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
     oneLine->Draw();
     fOnlinePad[1]->Update();
     fOnlinePad[2]->cd();
-    if ( fhMomResPrim->Integral() ) 
+    if ( fhMomResPrim->Integral() )
       fOnlinePad[2]->SetLogz();
     fhMomResPrim->SetAxisRange(0.,3.,"Y");
     fhMomResPrim->Draw("cont0");
@@ -755,19 +755,19 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
     fhMomEffAll->Fit(allEffFit,"QN","",1,10);
     Double_t allEff = allEffFit->GetParameter(0);
     effAll = 1.;
-    if ( fhMomAccAll->Integral() )  
+    if ( fhMomAccAll->Integral() )
       effAll = fhMomRecAll->Integral()/fhMomAccAll->Integral();
     TF1* primEffFit = new TF1 ("primEffFit","pol0",1.,10.);
     fhMomEffPrim->Fit(primEffFit,"QN","",1,10);
     Double_t primEff = primEffFit->GetParameter(0);
     effPrim = 1.;
-    if ( fhMomAccPrim->Integral() ) 
+    if ( fhMomAccPrim->Integral() )
       effPrim = fhMomRecPrim->Integral()/fhMomAccPrim->Integral();
     TF1* secEffFit = new TF1 ("secEffFit","pol0",1.,10.);
     fhMomEffSec->Fit(secEffFit,"QN","",1,10);
     Double_t secEff = secEffFit->GetParameter(0);
     effSec = 1.;
-    if ( fhMomAccSec->Integral() ) 
+    if ( fhMomAccSec->Integral() )
       effSec = fhMomRecSec->Integral()/fhMomAccSec->Integral();
 
     TF1*  momentumResFuncPrim = new TF1("momentumResFuncPrim","gaus",-10.,10.);
@@ -865,13 +865,13 @@ void CbmStsReconstructionQa::Finish() {
   cout << "===== Average time  : " << setprecision(4) << setw(8) << right
        << fTime / Double_t(fNEvents)  << " s" << endl;
   cout << "===== " << endl;
-  cout << "===== Efficiency all tracks       : " << effAll*100 << " % (" 
+  cout << "===== Efficiency all tracks       : " << effAll*100 << " % ("
        << fNRecAll << "/" << fNAccAll <<")" << endl;
-  cout << "===== Efficiency vertex tracks    : " << effPrim*100 << " % (" 
+  cout << "===== Efficiency vertex tracks    : " << effPrim*100 << " % ("
        << fNRecPrim << "/" << fNAccPrim <<")" << endl;
-  cout << "===== Efficiency reference tracks : " << effRef*100 << " % (" 
+  cout << "===== Efficiency reference tracks : " << effRef*100 << " % ("
        << fNRecRef << "/" << fNAccRef <<")" << endl;
-  cout << "===== Efficiency secondary tracks : " << effSec*100 << " % (" 
+  cout << "===== Efficiency secondary tracks : " << effSec*100 << " % ("
        << fNRecSec << "/" << fNAccSec <<")" << endl;
   cout << "===== Ghost rate " << rateGhosts << " per event" << endl;
   cout << "===== Clone rate " << rateClones << " per event" << endl;
@@ -908,14 +908,14 @@ InitStatus CbmStsReconstructionQa::GetGeometry() {
   }
   TObjArray* passNodes = fPassGeo->GetGeoPassiveNodes();
   if ( ! passNodes ) {
-    cout << "-W- " << GetName() << "::GetGeometry: No passive node array" 
+    cout << "-W- " << GetName() << "::GetGeometry: No passive node array"
 	 << endl;
     fTargetPos.SetXYZ(0., 0., 0.);
     return kERROR;
   }
   FairGeoNode* target = (FairGeoNode*) passNodes->FindObject("targ");
   if ( ! target ) {
-    cout << "-E- " << GetName() << "::GetGeometry: No target node" 
+    cout << "-E- " << GetName() << "::GetGeometry: No target node"
 	 << endl;
     fTargetPos.SetXYZ(0., 0., 0.);
     return kERROR;
@@ -926,7 +926,7 @@ InitStatus CbmStsReconstructionQa::GetGeometry() {
   Double_t targetY = targetPos.Y() + centerPos.Y();
   Double_t targetZ = targetPos.Z() + centerPos.Z();
   fTargetPos.SetXYZ(targetX, targetY, targetZ);
-  
+
   // Get STS geometry
   if ( ! fStsGeo ) {
     cout << "-W- " << GetName() << "::GetGeometry: No passive geometry!"
@@ -936,15 +936,15 @@ InitStatus CbmStsReconstructionQa::GetGeometry() {
   }
   TObjArray* stsNodes = fStsGeo->GetGeoSensitiveNodes();
   if ( ! stsNodes ) {
-    cout << "-E- " << GetName() << "::GetGeometry: No STS node array" 
+    cout << "-E- " << GetName() << "::GetGeometry: No STS node array"
 	 << endl;
     fNStations = 0;
     return kERROR;
   }
   Int_t tempNofStations = stsNodes->GetEntries();
 
-  if ( fVerbose > 2 )  
-    cout << "There are " << tempNofStations << " nodes" 
+  if ( fVerbose > 2 )
+    cout << "There are " << tempNofStations << " nodes"
 	 << (tempNofStations > 10 ? "!!!" : "" ) << endl;
 
   TString geoNodeName;
@@ -954,7 +954,7 @@ InitStatus CbmStsReconstructionQa::GetGeometry() {
 
   for ( Int_t istat = 0 ; istat < 20 ; istat++ )
     fNSectors[istat] = 0;
-  
+
   for ( Int_t ist = 0 ; ist < tempNofStations ; ist++ ) {
 
     FairGeoNode* stsNode = (FairGeoNode*)stsNodes->At(ist);
@@ -997,9 +997,9 @@ InitStatus CbmStsReconstructionQa::GetGeometry() {
     fNStations++;
 
     if ( fVerbose > 3 )
-      cout << "station #" << fNStations << " has MCID = " 
+      cout << "station #" << fNStations << " has MCID = "
 	   << stsNode->getMCid() << " and name " << stsNode->GetName() << endl;
-    
+
     //    fStationsMCId[fNStations] = stsNode->getMCid(); // not used
   }
   cout << "    Stations: " << fNStations << " contain" << flush;
@@ -1094,11 +1094,11 @@ void CbmStsReconstructionQa::CreateHistos() {
     fHistoList->Add(fhDirEffPrimP[itemp]);
   }
 
-  
+
   for ( Int_t itemp = 0 ; itemp < 10 ; itemp++ ) {
     if ( fPartPdgTable[itemp] == -7777 ) break;
-    if ( fVerbose > 3 ) 
-      cout << "fpart pdg table content for itemp = " << itemp 
+    if ( fVerbose > 3 )
+      cout << "fpart pdg table content for itemp = " << itemp
 	   << " equals " << fPartPdgTable[itemp] << endl;
     fhMomAccPart[itemp] = new TH1F(Form("hMomAccPart%s%d",(fPartPdgTable[itemp]>0?"P":"M"),TMath::Abs(fPartPdgTable[itemp])),
 				   Form("reconstruable particle%d tracks",fPartPdgTable[itemp]),
@@ -1194,7 +1194,7 @@ void CbmStsReconstructionQa::CreateHistos() {
     fhHitPointCorrelation[ist] = new TH2F(Form("hHitPointCorrelation%i",ist+1),
 					  Form("Hit vs point correlation at station %i",ist+1),
 					  500,-.1, .1,500,-.1,.1);
-    fhHitPointCorrelation[ist]->SetXTitle("#Delta x [cm]");  
+    fhHitPointCorrelation[ist]->SetXTitle("#Delta x [cm]");
     fhHitPointCorrelation[ist]->SetYTitle("#Delta y [cm]");
     fHistoList->Add(fhHitPointCorrelation[ist]);
     }*/
@@ -1290,7 +1290,7 @@ void CbmStsReconstructionQa::CreateHistos() {
     binningNofHits[itemp+301] = 602.5+3.*(Double_t)itemp;
     binningNofHits[itemp+401] = 902.5+3.*(Double_t)itemp;
   }
-//   for ( Int_t itemp = 0 ; itemp < 501 ; itemp++ ) 
+//   for ( Int_t itemp = 0 ; itemp < 501 ; itemp++ )
 //     cout << binningNofHits[itemp] << " " << flush;
 //   cout << endl;
 
@@ -1298,13 +1298,13 @@ void CbmStsReconstructionQa::CreateHistos() {
     fhEnergyLoss[istat] = new TH2F(Form("hEnergyLossSt%d",istat+1),
 				   Form("Energy loss on station %d",istat+1),
 				   200,-100.,100.,200,-100.,100.);
-    fOccupHList->Add(fhEnergyLoss[istat]); 
+    fOccupHList->Add(fhEnergyLoss[istat]);
     for ( Int_t isect = 0 ; isect < fNSectors[istat] ; isect++ ) {
       fhNofHits[istat][isect] = new TH1F(Form("hNofHitsSt%dSect%d",istat+1,isect+1),
 					 Form("Number of hits in sector %d of station %d",isect+1,istat+1),
 					 500,binningNofHits);
 					 //					 500,-0.5,500.5);
-      fOccupHList->Add(fhNofHits[istat][isect]); 
+      fOccupHList->Add(fhNofHits[istat][isect]);
 
       Int_t nofChips = (Int_t)(TMath::Ceil(fWidthSectors[istat][isect]/7.5));  // fwidth in mm, 7.5mm = 125(channels)*60mum(pitch)
       Int_t lastChip = (Int_t)(TMath::Ceil(10.*fWidthSectors[istat][isect]));
@@ -1321,13 +1321,13 @@ void CbmStsReconstructionQa::CreateHistos() {
 	fhNofFiredDigis[istat][isect][iside] = new TH1F(Form("hNofFiredDigis%cSt%dSect%d",(iside==0?'F':'B'),istat+1,isect+1),
 							Form("Number of digis on %s of sector %d of station %d",(iside==0?"front":"back"),isect+1,istat+1),
 							501,-0.5,500.5);
-	fOccupHList->Add(fhNofFiredDigis[istat][isect][iside]); 
-	
+	fOccupHList->Add(fhNofFiredDigis[istat][isect][iside]);
+
 	for ( Int_t ichip = 0 ; ichip < nofChips ; ichip++ ) {
 	  fhNofDigisPChip[istat][isect][iside][ichip] = new TH1F(Form("hNofFiredDigis%cSt%dSect%dChip%d",(iside==0?'F':'B'),istat+1,isect+1,ichip+1),
 								 Form("Number of digis on %s on chip %d of sector %d of station %d%s",(iside==0?"front":"back"),ichip+1,isect+1,istat+1,(ichip==nofChips-1?addInfo.Data():"")),
 								 101,-0.5,100.5);
-	  fOccupHList->Add(fhNofDigisPChip[istat][isect][iside][ichip]); 
+	  fOccupHList->Add(fhNofDigisPChip[istat][isect][iside][ichip]);
 	}
       }
     }
@@ -1369,7 +1369,7 @@ void CbmStsReconstructionQa::FillHitMap() {
 }
 // -------------------------------------------------------------------------
 
-    
+
 
 // ------   Private method FillMatchMap   ----------------------------------
 void CbmStsReconstructionQa::FillMatchMap(Int_t& nRec, Int_t& nGhosts,
@@ -1378,7 +1378,7 @@ void CbmStsReconstructionQa::FillMatchMap(Int_t& nRec, Int_t& nGhosts,
   // Clear matching maps
   fMatchMap.clear();
   fQualiMap.clear();
-  
+
   // Loop over StsTracks. Check matched MCtrack and fill maps.
   nGhosts = 0;
   nClones = 0;
@@ -1399,7 +1399,7 @@ void CbmStsReconstructionQa::FillMatchMap(Int_t& nRec, Int_t& nGhosts,
       Fatal("Exec", "No StsTrack in array");
       }
     Int_t nHits = stsTrack->GetNStsHits();
-      
+
     FairTrackParam* trParF = (FairTrackParam*)stsTrack->GetParamFirst();
     FairTrackParam* trParL = (FairTrackParam*)stsTrack->GetParamLast();
     fhStsTrackFPos[0]->Fill(trParF->GetX());
@@ -1422,7 +1422,7 @@ void CbmStsReconstructionQa::FillMatchMap(Int_t& nRec, Int_t& nGhosts,
     fhStsTrackLMom->Fill(trParL->GetQp());
     fhStsTrackChiSq->Fill(stsTrack->GetChi2());
 
-    CbmStsTrackMatch* match = (CbmStsTrackMatch*) fMatches->At(iRec);
+    CbmTrackMatch* match = (CbmTrackMatch*) fMatches->At(iRec);
     if ( ! match ) {
       cout << "-E- " << GetName() << "::Exec: "
 	   << "No StsTrackMatch at index " << iRec << endl;
@@ -1432,11 +1432,11 @@ void CbmStsReconstructionQa::FillMatchMap(Int_t& nRec, Int_t& nGhosts,
 
     Int_t iMC = match->GetMCTrackId();
     if (iMC == -1 ) {       // no common point with MC, really ghastly!
-      if ( fVerbose > 4 ) 
-	cout << "-I- " << GetName() << ":" 
+      if ( fVerbose > 4 )
+	cout << "-I- " << GetName() << ":"
 	     << "No MC match for StsTrack " << iRec << endl;
       fhNhGhosts->Fill(nHits);
-      if ( stsTrack->GetParamFirst()->GetQp() ) 
+      if ( stsTrack->GetParamFirst()->GetQp() )
 	fhMomGhosts->Fill(1./TMath::Abs(stsTrack->GetParamFirst()->GetQp()));
       nGhosts++;
       continue;
@@ -1444,7 +1444,7 @@ void CbmStsReconstructionQa::FillMatchMap(Int_t& nRec, Int_t& nGhosts,
 
     // Check matching criterion (quota)
     Double_t quali = 1.;
-    if ( nHits ) 
+    if ( nHits )
       quali = Double_t(nTrue) / Double_t(nHits);
     if ( quali >= fQuota ) {
 
@@ -1456,15 +1456,15 @@ void CbmStsReconstructionQa::FillMatchMap(Int_t& nRec, Int_t& nGhosts,
 
       // Previous match; take the better one
       else {
-	if ( fVerbose > 4 ) 
+	if ( fVerbose > 4 )
 	  cout << "-I- " << GetName() << ": "
 	       << "MCTrack " << iMC << " doubly matched."
-	       << "Current match " << iRec 
-	       << ", previous match " << fMatchMap[iMC] 
+	       << "Current match " << iRec
+	       << ", previous match " << fMatchMap[iMC]
 	       << endl;
 	if ( fQualiMap[iMC] < quali ) {
-	  CbmStsTrack* oldTrack 
-	    = (CbmStsTrack*) fStsTracks->At(fMatchMap[iMC]);	  
+	  CbmStsTrack* oldTrack
+	    = (CbmStsTrack*) fStsTracks->At(fMatchMap[iMC]);
 	  fhNhClones->Fill(Double_t(oldTrack->GetNStsHits()));
 	  if ( oldTrack->GetParamFirst()->GetQp() )
 	    fhMomClones->Fill(1./TMath::Abs(oldTrack->GetParamFirst()->GetQp()));
@@ -1480,11 +1480,11 @@ void CbmStsReconstructionQa::FillMatchMap(Int_t& nRec, Int_t& nGhosts,
       }
 
     }
-    
+
     // If not matched, it's a ghost
     else {
       if ( fVerbose > 4 )
-	cout << "-I- " << GetName() << ":" 
+	cout << "-I- " << GetName() << ":"
 	     << "StsTrack " << iRec << " below matching criterion "
 	     << "(" << quali << ")" << endl;
       fhNhGhosts->Fill(nHits);
@@ -1503,7 +1503,7 @@ void CbmStsReconstructionQa::FillMatchMap(Int_t& nRec, Int_t& nGhosts,
 // -----   Private method DivideHistos   -----------------------------------
 void CbmStsReconstructionQa::DivideHistos(TH1* histo1, TH1* histo2,
 				      TH1* histo3) {
-  
+
   if ( !histo1 || !histo2 || !histo3 ) {
     cout << "-E- " << GetName() << "::DivideHistos: "
 	 << "NULL histogram pointer" << endl;

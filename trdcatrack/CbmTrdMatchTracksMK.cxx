@@ -12,7 +12,8 @@
 #include "FairRootManager.h"
 #include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
-#include "CbmTrdTrackMatch.h"
+#include "CbmTrackMatch.h"
+//#include "CbmTrdTrackMatch.h"
 
 #include "TStopwatch.h"
 #include "TClonesArray.h"
@@ -27,7 +28,7 @@
 using namespace std;
 
 // -----   Default constructor   -------------------------------------------
-CbmTrdMatchTracksMK::CbmTrdMatchTracksMK() 
+CbmTrdMatchTracksMK::CbmTrdMatchTracksMK()
   : FairTask("TRD track match") {
   fTracks  = NULL;
   fPoints  = NULL;
@@ -75,8 +76,8 @@ CbmTrdMatchTracksMK::CbmTrdMatchTracksMK(Int_t verbose)
   RECO_Tot_PrimaryRefSlow = 0;
   RECO_Tot_PrimaryRefAll = 0;
   RECO_Tot_AllRefFast = 0;
-  RECO_Tot_AllRefSlow = 0; 
-  RECO_Tot_AllRefAll = 0; 
+  RECO_Tot_AllRefSlow = 0;
+  RECO_Tot_AllRefAll = 0;
   RECO_Tot_ExtraRefFast = 0;
   RECO_Tot_ExtraRefSlow = 0;
   RECO_Tot_ExtraRefAll = 0;
@@ -136,7 +137,7 @@ InitStatus CbmTrdMatchTracksMK::Init() {
   }
 
   // Create and register TrdTrackMatch array
-  fMatches = new TClonesArray("CbmTrdTrackMatch",100);
+  fMatches = new TClonesArray("CbmTrackMatch",100);
   ioman->Register("TRDTrackMatch", "TRD", fMatches, kTRUE);
 
   MC_Tot_PrimaryRefFast = 0;
@@ -154,8 +155,8 @@ InitStatus CbmTrdMatchTracksMK::Init() {
   RECO_Tot_PrimaryRefSlow = 0;
   RECO_Tot_PrimaryRefAll = 0;
   RECO_Tot_AllRefFast = 0;
-  RECO_Tot_AllRefSlow = 0; 
-  RECO_Tot_AllRefAll = 0; 
+  RECO_Tot_AllRefSlow = 0;
+  RECO_Tot_AllRefAll = 0;
 
   return kSUCCESS;
 }
@@ -190,7 +191,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     //  Int_t nFakeSum    = 0;
     //  Int_t nMCTrackSum = 0;
     Int_t nMCTrackPrim = 0;
-  
+
     //  map<Int_t, Int_t>::iterator it = 0;
     map<Int_t, Int_t>::iterator it;;
 
@@ -215,7 +216,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
       clonePrimarySlow = 0,
       cloneExtraFast        = 0,
       cloneExtraSlow        = 0;
-    
+
     //A:calculating the number of reference primaries, 12 hits in trd, mom > 1GeV
     map<Int_t, Int_t> MC_nOfPrimaryRefFastTracks;
     map<Int_t, Int_t> MC_nOfPrimaryRefSlowTracks;
@@ -254,7 +255,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     cArray.Start();
     TVector3 momentum;
 
-    //creating an array of primary ref fast and slow MC tracks  
+    //creating an array of primary ref fast and slow MC tracks
     for(int j=0; j<fPoints->GetEntriesFast();j++) {  // loop over TRDPoints
       trdPt = (CbmTrdPoint*)fPoints->At(j);
       if( ! trdPt) continue;
@@ -296,10 +297,10 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 	iNOfTrdPoints++) {
       MC_highMomPrims.push_back(iNOfTrdPoints->first);  //vector of high mom tracks
       MC_PrimaryRefFast++;
-	  
+
       //      nMCTrackPrim++;
     }
-  
+
     for(iNOfTrdPoints = MC_nOfPrimaryRefSlowTracks.begin();
 	iNOfTrdPoints != MC_nOfPrimaryRefSlowTracks.end();
 	iNOfTrdPoints++) {
@@ -318,10 +319,10 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 	iNOfTrdPoints++) {
       MC_highMomAll.push_back(iNOfTrdPoints->first);  //vector of high mom tracks
       MC_AllRefFast++;
-	  
+
       //      nMCTrackPrim++;
     }
-  
+
     for(iNOfTrdPoints = MC_nOfAllRefSlow.begin();
 	iNOfTrdPoints != MC_nOfAllRefSlow.end();
 	iNOfTrdPoints++) {
@@ -338,8 +339,8 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     MC_AllRefAll = MC_AllRefFast + MC_AllRefSlow;
 
 
-	
-    Int_t  
+
+    Int_t
       My_PrimaryRefFast =  MC_highMomPrims.size(),
       My_PrimaryRefSlow =  MC_lowMomPrims.size(),
       My_PrimaryRefAll  =  MC_nOfPrimaryRefAllTracks.size(),
@@ -353,7 +354,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 
 
     if(fVerbose > 2) {
-      cout 
+      cout
 	<< "My_PrimaryRefFast  = " << My_PrimaryRefFast << endl
 	<< "My_PrimaryRefSlow  = " << My_PrimaryRefSlow << endl
 	<< "My_PrimaryRefAll   = " << My_PrimaryRefAll  << endl
@@ -361,8 +362,8 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 	<< "My_AllRefSlow  = " << My_AllRefSlow << endl
 	<< "My_AllRefAll   = " << My_AllRefAll  << endl;
 
-  
-      cout 
+
+      cout
 	<< "MC_PrimaryRefFast  = " << MC_PrimaryRefFast << endl
 	<< "MC_PrimaryRefSlow  = " << MC_PrimaryRefSlow << endl
 	<< "MC_PrimaryRefAll   = " << MC_PrimaryRefAll  << endl
@@ -375,7 +376,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     }
 
     //  cout << "\nMC_nOfPrimaryRefFastTracks = " << MC_nOfPrimaryRefFastTracks.size() << endl;
-  
+
 
     //   for(int i=0;i<fMCTracks->GetEntries();i++) {
     //     mcTrack = (CbmMCTrack*)fMCTracks->At(i);
@@ -421,7 +422,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 
     cHighMomPrims.Start();
 
-  
+
     TVector3 momMcTrack;
     if(fVerbose > 1) cout << "--- making high mom prims...\n";
     for(iMC_highMomPrims = MC_highMomPrims.begin();
@@ -462,13 +463,13 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     if(fVerbose > 1) cout << " Low mom prims = " << MC_lowMomPrims.size() << endl;
 
     //  for(
-  
+
     if(fVerbose > 1) cout << "Engaging loop over reco tracks..." << endl;
     Int_t noGhost = 0, noOther = 0;
 
 
     //  Double_t meanZ;
-    Int_t 
+    Int_t
       total1 = 0,
       total2 = 0;
 
@@ -505,7 +506,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
       RECO_ExtraRefSlow     = 0,
       RECO_ExtraRefAll      = 0;
 
-  
+
 
     map<Int_t,Int_t> noTrackHits;
     Int_t hitsum = 0;
@@ -524,7 +525,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
       //    noPrimaries = 0,
       noReferences = 0,
       noIter = 0;
-  
+
     Int_t noTrcks = Int_t(fTracks->GetEntries());
     Int_t noHts;
     //  map<Int_t,Int_t>::iterator it1;
@@ -540,22 +541,22 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 	  cout << "checking for good hits...\n";
 	  cout << "Number of hits per track: " << trdTr1->GetNofTrdHits() << endl;
 	}
-      
+
 	noHts = trdTr1->GetNofTrdHits();
 	//if(fVerbose > 2) cout << "noHits= " << noHts << endl;
 	for(int iHit=0;iHit < noHts;iHit++) { //checking for good hits
 	  //a condition was here, probably by mistake
 	  if(fVerbose > 2)
 	    cout << "We have a TrdHit here." << endl;
-	  
+
 	  trdHit1 = (CbmTrdHit*)fHits->At(trdTr1->GetTrdHitIndex(iHit));
 	  if( ! trdHit1) { cout << "!!! Empty pointer to TrdHit !!!" << endl; continue; }
 	  trdPoint1 = (CbmTrdPoint*)fPoints->At(trdHit1->GetRefIndex());
 	  if(fVerbose > 2) {
-	    cout 
+	    cout
 	      << "TrdHitIndex= " << trdTr1->GetTrdHitIndex(iHit)
 	      << "TrdPointIndex= " << trdHit1->GetRefIndex() << endl;
-	      
+
 	  }
 	  noTrackHits[trdPoint1->GetTrackID()]++;
 	  hitsum++;
@@ -563,17 +564,17 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 	}
 
 	//      recoInd = trdPoint1->GetTrackID();
-    
+
 	//if(recoInd == trdPoint2->GetTrackID()) { //if reco_tr_id == mc_tr_id
 	isGhost = true;
-	
-	if(fVerbose > 2) 
+
+	if(fVerbose > 2)
 	  cout << "Hitsum = " << hitsum << endl;
 	//      if(noTrackHits.size() <=2) {//if not a ghost track, size<=2 means at least good 4 hits, 70%
 	//not exactly!!
-	
+
 	//      cout << "checking for ghosts...\n";
-      	
+
 	for(it = noTrackHits.begin();
 	    it != noTrackHits.end();
 	    it++) {
@@ -589,24 +590,24 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 	//chi2 = trdTr1->GetChi2();
 	FairTrackParam *param;
 	param = (FairTrackParam*)trdTr1->GetParamLast();
-      
+
 	Double_t tx = param->GetTx();
-	Double_t ty = param->GetTy();      
-	Double_t Y  = param->GetY();      
-	Double_t X  = param->GetX();      
-      
+	Double_t ty = param->GetTy();
+	Double_t Y  = param->GetY();
+	Double_t X  = param->GetX();
+
 	//cout <<"(tx, ty) "<< tx <<", "<< ty << endl;
 
 	TVector3 momG;
 
 	if(!isGhost) { //is not a ghost, 70% hits are ok
 	  //	  cout << "it's not a ghost...\n";
-	
+
 
 	  mcTrack = (CbmMCTrack*)fMCTracks->At(recoInd);
 	  //if(mcTrack->GetMotherId() == -1) { // noPrimaries++;
 	  if(mcTrack->GetNPoints(kTRD) == 12) { //ref
-	    if(fVerbose > 2) 
+	    if(fVerbose > 2)
 	      cout << "it's a reference track...\n";
 	    noReferences++;
 	    mapAllRefAll[recoInd]++;
@@ -617,15 +618,15 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 	    fh_mom_trdtrack_good->Fill(mom);
 
 	    if(mcTrack->GetMotherId() == -1) { //primary
-	      if(fVerbose > 2) 
+	      if(fVerbose > 2)
 		cout << "it's a primary track...\n";
-	      //	    Int_t 
+	      //	    Int_t
 	      noAllTrack++;
 	      mapPrimRefAll[recoInd]++;
 
-	      mcTrack->GetMomentum(momG);  
+	      mcTrack->GetMomentum(momG);
 	      if(momG.Mag() >= 1) { //fast
-		if(fVerbose > 2) 
+		if(fVerbose > 2)
 		  cout << "it's a fast track...\n";
 		noRefFast++;
 		//fh_Chi2_CorrectFast->Fill(chi2);
@@ -636,7 +637,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 		//RECO_PrimaryRefFast++;//
 		//	      refFast[recoInd]++;
 	      } else { //slow
-		if(fVerbose > 2) 
+		if(fVerbose > 2)
 		  cout << "it's a slow track...\n";
 		noRefSlow++;
 		//fh_Chi2_CorrectSlow->Fill(chi2);
@@ -645,9 +646,9 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 		fh_Y_CorrectSlow->Fill(Y);
 		fh_X_CorrectSlow->Fill(X);
 		//	      refSlow[recoInd]++;
-	      }	
+	      }
 	      total1++;
-	      if(fVerbose > 2) 
+	      if(fVerbose > 2)
 		cout << "Let's see it it corresponds to an MC track...\n";
 
 	      // ------------------------------------
@@ -667,8 +668,8 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 
 	    }else { //not primary
 	      mcTrack->GetMomentum(momG);
-	      if(momG.Mag() >= 1) { //fast 
-	    
+	      if(momG.Mag() >= 1) { //fast
+
 		// -----------------------------------
 		if(MC_nOfAllRefFast.find(recoInd) != MC_nOfAllRefFast.end()) {
 		  allRefFast[recoInd]++;
@@ -677,7 +678,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 		// ------------------------------------
 
 	      } else { //slow
-	      
+
 		// -----------------------------
 		if(MC_nOfAllRefSlow.find(recoInd) != MC_nOfAllRefSlow.end()) {
 		  allRefSlow[recoInd]++;
@@ -744,7 +745,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
       // Fill histogramms
       fh_mom_mctrack_reco->Fill(mom);
     }// Loop over MC tracks
-  
+
 
 
 
@@ -752,8 +753,8 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 
 
     cMainLoop.Stop();
-  
-  
+
+
     //    }
     //  }
 
@@ -768,7 +769,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     for(irecoToMc  = recoToMc.begin();
 	irecoToMc != recoToMc.end();
 	irecoToMc++) {
-    
+
       mcTrack = (CbmMCTrack*)fMCTracks->At(irecoToMc->first);
 
       mcTrack->GetMomentum(momN);
@@ -779,7 +780,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     for(irecoToMc  = recoToLowMc.begin();
 	irecoToMc != recoToLowMc.end();
 	irecoToMc++) {
-    
+
       mcTrack = (CbmMCTrack*)fMCTracks->At(irecoToMc->first);
       mcTrack->GetMomentum(momN);
       Int_t iMapBin = Int_t(momN.Mag()*10);
@@ -791,7 +792,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     RECO_PrimaryRefFast = recoToMc.size();
     RECO_PrimaryRefSlow = recoToLowMc.size();
     RECO_PrimaryRefAll = mapPrimRefAll.size();
-  
+
     RECO_AllRefFast = allRefFast.size() + RECO_PrimaryRefFast;
     RECO_AllRefSlow = allRefSlow.size() + RECO_PrimaryRefSlow;
     RECO_AllRefAll = mapAllRefAll.size();
@@ -801,7 +802,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     RECO_ExtraRefAll   = RECO_ExtraRefFast + RECO_ExtraRefSlow;
 
     if(fVerbose > 1) {
-      cout 
+      cout
 	<< "RECO_PrimaryRefFast = " << RECO_PrimaryRefFast << endl
 	<< "RECO_PrimaryRefSlow = " << RECO_PrimaryRefSlow << endl
 	<< " RECO_PrimaryRefAll = " << RECO_PrimaryRefAll << endl
@@ -841,7 +842,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
       // if( mcTr->GetMotherId() < 0) {
       clonePrimaryFast += irecoToMc->second - 1;
       //    }
-      //    } 
+      //    }
     }
 
     for(irecoToMc  = recoToLowMc.begin();
@@ -853,8 +854,8 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
       //    cout << "clone second Prim Slow=" << irecoToMc->second << endl;
 
       //    if(irecoToMc->second == 5) noFours++;
-      MC_ind = irecoToMc->first; 
-      //    cout << 
+      MC_ind = irecoToMc->first;
+      //    cout <<
       //    mcTr = (CbmMCTrack*)fMCTracks->At(MC_ind); //see the particle momentum
       //    cout << "ID = " << MC_ind << ", P=" << mcTr->GetMomentum().Mag() << endl;
       //    if(mcTr->GetMomentum().Mag() < 1) {
@@ -864,7 +865,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
       //    }
       //  }
     }
-  
+
     for(irecoToMc  = allRefFast.begin();
 	irecoToMc != allRefFast.end();
 	irecoToMc++) {
@@ -888,41 +889,41 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
       //    MC_ind = irecoToMc->first;
       cloneExtraSlow += irecoToMc->second - 1;
     }
-  
+
     cCloneCount.Stop();
 
     if(fVerbose > 2) {
       cout << "We have " << noFours << " fours." << endl;
       cout << "We have " << noAllSeg << " segments." << endl;
-    
+
       cout << "We have " << noClones << " clones." << endl;
     }
 
     // Count the number of ghost----------------------------
     //   for(irecoToMcGhost  = recoToMcGhost.begin();
     //       irecoToMcGhost != recoToMcGhost.end();
-    //       irecoToMcGhost++) {   
-    
+    //       irecoToMcGhost++) {
+
     //     //if(usedMCTracks[irecoToMcGhost->first]) {
     //     noGhost =+ irecoToMcGhost->second;
     //     //} else noOther =+ irecoToMcGhost->second;
-    
+
     //   }
     //------------------------------------------------------
 
     if(fVerbose > 2)  cout << "We have " << noGhost << " ghosts." << endl
-			   << "We have " << noOther << " others." 
+			   << "We have " << noOther << " others."
 			   << endl;
 
     Int_t noPrimaryRefFast = 0;
 
     if(fVerbose > 2) cout << "\nComparing two maps...\n";
-  
+
     if(fVerbose > 2) cout << "Number of a common matches = " << noPrimaryRefFast
 			  << endl;
 
-      
-  
+
+
     //----------------------------------------------------------------
 
 
@@ -933,7 +934,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     RECO_Tot_PrimaryRefFast    += RECO_PrimaryRefFast;
     RECO_Tot_PrimaryRefSlow    += RECO_PrimaryRefSlow;
     RECO_Tot_PrimaryRefAll     += RECO_PrimaryRefAll;
-  
+
     RECO_Tot_AllRefFast        += RECO_AllRefFast;
     RECO_Tot_AllRefSlow        += RECO_AllRefSlow;
     RECO_Tot_AllRefAll         += RECO_AllRefAll;
@@ -943,7 +944,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     RECO_Tot_ExtraRefAll       += RECO_ExtraRefAll;
 
     if(fVerbose > 1) {
-      cout 
+      cout
 	<< "MC_Tot_PrimaryRefFast = " << MC_Tot_PrimaryRefFast << endl
 	<< "    MC_PrimaryRefFast = " << MC_PrimaryRefFast << endl;
     }
@@ -988,19 +989,19 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 
       Double_t qGhosts = -42;
       if(nTracks) qGhosts  = Double_t(noGhost)/Double_t(nTracks)*1.;
-      
+
       Double_t qClones = -42.;
       if(My_AllRefFast+My_AllRefSlow) qClones  = Double_t(noClones)/Double_t(My_AllRefFast+My_AllRefSlow)*1.;
-      
+
       Double_t qPrimaryRefFast = -42.;
       if(MC_PrimaryRefFast) qPrimaryRefFast = Double_t(RECO_PrimaryRefFast)/Double_t(MC_PrimaryRefFast)*1.;
-      
+
       Double_t qPrimaryRefSlow = -42.;
       if(MC_PrimaryRefSlow) qPrimaryRefSlow = Double_t(RECO_PrimaryRefSlow)/Double_t(MC_PrimaryRefSlow)*1.;
 
       Double_t qPrimaryRefAll = -42.;
       if(MC_PrimaryRefAll) qPrimaryRefAll = Double_t(RECO_PrimaryRefAll)/Double_t(MC_PrimaryRefAll)*1.;
-    
+
       Double_t qAllRefFast = -42.;
       if(My_AllRefFast) qAllRefFast = Double_t(RECO_AllRefFast)/Double_t(My_AllRefFast)*1.;
 
@@ -1018,7 +1019,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 
       Double_t qExtraRefAll = -42.;
       if(My_ExtraRefAll) qExtraRefAll = Double_t(RECO_ExtraRefAll)/Double_t(My_ExtraRefAll)*1.;
-    
+
       Double_t qClonesPrimFast = -42.;
       if(MC_PrimaryRefFast) qClonesPrimFast = Double_t(clonePrimaryFast)/Double_t(MC_PrimaryRefFast)*1.;
 
@@ -1028,7 +1029,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
       Double_t qClonesFast = -42.;
       if(My_AllRefFast) qClonesFast = Double_t(cloneExtraFast+clonePrimaryFast)/Double_t(My_AllRefFast)*1.;
 
-      Double_t qClonesSlow = -42.; 
+      Double_t qClonesSlow = -42.;
       if(My_AllRefSlow) qClonesSlow = Double_t(cloneExtraSlow+clonePrimarySlow)/Double_t(My_AllRefSlow)*1.;
 
       Double_t qExtraClonesFast = -42.;
@@ -1044,16 +1045,16 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
       cout.precision(3);
 
       cout << endl;
-      cout << "-------------------------------------------------------" 
+      cout << "-------------------------------------------------------"
 	   << endl;
       cout << "-I-                TRD Event #" << NO_TOTAL_EVENTS << " Summary              -I-"
 	   << endl;
        cout << "        Reconstructed TRDTracks   : " << std::setw(mW+1) << nTracks << endl;
-    
-      cout// << fixed 
+
+      cout// << fixed
 	<< "    Eff. of primary reference all : " << std::setw(mW) << qPrimaryRefAll << "" << std::setw(mW) << RECO_PrimaryRefAll << endl
 	<< "   Eff. of primary reference fast : " << std::setw(mW) << qPrimaryRefFast <<"" << std::setw(mW) <<RECO_PrimaryRefFast << endl
-	<< "   Eff. of primary reference slow : " <<std::setw(mW) << qPrimaryRefSlow << "" << std::setw(mW) <<RECO_PrimaryRefSlow << endl 
+	<< "   Eff. of primary reference slow : " <<std::setw(mW) << qPrimaryRefSlow << "" << std::setw(mW) <<RECO_PrimaryRefSlow << endl
 	<< "-------------------------------------------------------" << endl
 	<< "      Eff. of extra reference all : " << std::setw(mW) <<  qExtraRefAll << "" << std::setw(mW) <<RECO_ExtraRefAll << endl
 	<< "     Eff. of extra reference fast : " << std::setw(mW) <<  qExtraRefFast << "" << std::setw(mW) <<RECO_ExtraRefFast << endl
@@ -1092,7 +1093,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
       for(int j=0;j<Int_t(RECO_noPrimRefAll.size());j++) {
 	RECO_sum += RECO_noPrimRefAll[j];
       }
-  
+
       for(int j=0;j<Int_t(MC_noPrimRefAll.size());j++) {
 	MC_sum += MC_noPrimRefAll[j];
       }
@@ -1104,21 +1105,21 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 
       map<Int_t, Int_t> effDiff;
 
-    
+
       for(int m=0;m<100;m++) {
 	//      Double_t denom;
 	Double_t qEff;
 	if(MC_noPrimRefAll[m] == 0) qEff = 0;
-	else 
+	else
 	  qEff = 100*Double_t(RECO_noPrimRefAll[m])/Double_t(MC_noPrimRefAll[m]);
-      
-	Int_t 
+
+	Int_t
 	  reco = RECO_noPrimRefAll[m],
 	  mc = MC_noPrimRefAll[m];
-      
+
 	Double_t mom = Double_t(m);
 
-	//      cout << "Filling the values: (" << mom << ", " << qEff << ")" << endl; 
+	//      cout << "Filling the values: (" << mom << ", " << qEff << ")" << endl;
 	for(int k=0;k<RECO_noPrimRefAll[m];k++) {
 	  fEffVsMom->Fill(mom/10, 100);
 	}
@@ -1135,7 +1136,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     }
 
     //-----------------------------------------
-  
+
     Double_t qTotPrimaryRefFast = Double_t(RECO_Tot_PrimaryRefFast)/Double_t(MC_Tot_PrimaryRefFast)*100;
     Double_t qTotPrimaryRefSlow = -42.;
     if(MC_Tot_PrimaryRefSlow) qTotPrimaryRefSlow = Double_t(RECO_Tot_PrimaryRefSlow)/Double_t(MC_Tot_PrimaryRefSlow)*100;
@@ -1144,11 +1145,11 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 
     Double_t qTotAllRefFast = Double_t(RECO_Tot_AllRefFast)/Double_t(MC_Tot_AllRefFast)*100;
 
-    Double_t qTotAllRefSlow = -42.;    
+    Double_t qTotAllRefSlow = -42.;
     if(MC_Tot_AllRefSlow) qTotAllRefSlow = Double_t(RECO_Tot_AllRefSlow)/Double_t(MC_Tot_AllRefSlow)*100;
 
     Double_t qTotAllRefAll = -42.;
-    if(MC_Tot_AllRefAll) qTotAllRefAll = Double_t(RECO_Tot_AllRefAll)/Double_t(MC_Tot_AllRefAll)*100;    
+    if(MC_Tot_AllRefAll) qTotAllRefAll = Double_t(RECO_Tot_AllRefAll)/Double_t(MC_Tot_AllRefAll)*100;
 
     Double_t qTotExtraRefFast = -42.;
     if(MC_Tot_ExtraRefFast) qTotExtraRefFast = Double_t(RECO_Tot_ExtraRefFast)/Double_t(MC_Tot_ExtraRefFast)*100;
@@ -1187,15 +1188,15 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 
 
     //-----------------------------------------
-    
-    
+
+
     Double_t qTotEvents = Double_t(NO_TOTAL_RECO_TRACKS)/Double_t(NO_TOTAL_EVENTS);
-    
+
     Int_t verb = 1;
 
     if(verb > 1)
       {
-	cout 
+	cout
 	  << " RECO_Tot_PrimaryRefFast = " << RECO_Tot_PrimaryRefFast << endl
 	  << "   MC_Tot_PrimaryRefFast = " << MC_Tot_PrimaryRefFast << endl
 	  << "      qTotPrimaryRefFast = " << qTotPrimaryRefFast << endl
@@ -1203,7 +1204,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 	  << " RECO_Tot_PrimaryRefSlow = " << RECO_Tot_PrimaryRefSlow << endl
 	  << "   MC_Tot_PrimaryRefSlow = " << MC_Tot_PrimaryRefSlow << endl
 	  << "      qTotPrimaryRefSlow = " << qTotPrimaryRefSlow << endl
-	  
+
 	  << endl;
       }
 
@@ -1221,7 +1222,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     //   cout << "  Efficiency for ref. primaries   : " << qTotEff <<"% " << noTotCommonMatches << endl;
     //   cout << "                         Ghosts   : " << qTotGhosts << "% " << noTotGhost << endl;
     //   cout << "                         Clones   : " << qTotClones << "% " << noTotClones << endl;
-    //   cout << "#######################################################" 
+    //   cout << "#######################################################"
     //        << endl;
 
     //    cout.width(10);
@@ -1263,12 +1264,12 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 	 << "           All fast clone level : " << std::setw(mW) <<  qTotClonesFast << "% " <<  std::setw(mW) << NO_TOTAL_CLONES_PRIM_FAST+NO_TOTAL_CLONES_FAST << endl
 	 << "           All slow clone level : " << std::setw(mW) <<  qTotClonesSlow << "% " <<  std::setw(mW) << NO_TOTAL_CLONES_PRIM_SLOW+NO_TOTAL_CLONES_SLOW << endl
 
-	 << "######################################################" 
+	 << "######################################################"
 	 <<endl;
 
     //     cout << "        Reconstructed TRDTracks : " << qTotEvents << " /event" << endl
     // 	 << " Eff. of primary reference fast : " << qTotPrimaryRefFast <<"% " << double(RECO_Tot_PrimaryRefFast)/double(NO_TOTAL_EVENTS) << " /event" << endl
-    // 	 << " Eff. of primary reference slow : " << qTotPrimaryRefSlow << "% " << double(RECO_Tot_PrimaryRefSlow)/double(NO_TOTAL_EVENTS) << " /event" << endl 
+    // 	 << " Eff. of primary reference slow : " << qTotPrimaryRefSlow << "% " << double(RECO_Tot_PrimaryRefSlow)/double(NO_TOTAL_EVENTS) << " /event" << endl
     // 	 << "  Eff. of primary reference all : " << qTotPrimaryRefAll << "% " << double(RECO_Tot_PrimaryRefAll)/double(NO_TOTAL_EVENTS) << " /event" << endl
     // 	 << "-------------------------------------------------------" << endl
 
@@ -1297,20 +1298,20 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     // 	 << "           All fast clone level : " << qTotClonesFast << "% " << Double_t(NO_TOTAL_CLONES_PRIM_FAST+NO_TOTAL_CLONES_FAST)/Double_t(NO_TOTAL_EVENTS) << endl
     // 	 << "           All slow clone level : " << qTotClonesSlow << "% " << Double_t(NO_TOTAL_CLONES_PRIM_SLOW+NO_TOTAL_CLONES_SLOW)/Double_t(NO_TOTAL_EVENTS) << endl
 
-    // 	 << "######################################################" 
+    // 	 << "######################################################"
     // 	 <<endl;
-    
+
     //   else cout << "-I- CbmTrdMatchTracksMK: rec. " << nTracks << ", quota "
     // 	    << qTrue << " % " << endl;
-    
+
     //   cout << "----------------------------------------------------------" << endl
-    //        << "-I- CbmTrdMatchTracksMK: " << endl 
+    //        << "-I- CbmTrdMatchTracksMK: " << endl
     //        << "       noHighMomTracks= " << noHighMomTracks << endl
     //        << "        noLowMomTracks= " << noLowMomTracks << endl
     //        << "          noMCTruePrim= " << noMCTruePrim << endl
     //        << "        noDoubleTracks= " << noDoubleTracks << endl
     //        << "         noGhostTracks= " << noGhostTracks << endl
-    //        << "----------------------------------------------------------" 
+    //        << "----------------------------------------------------------"
     //        << endl;
     //    WriteHistogramms();
 
@@ -1319,46 +1320,46 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
       Double_t rtime;
       Double_t ctime;
       //      Double_t qtime = Double_t(fNofEvents);
-  
+
       cout << "        cArray : ";
       rtime = cArray.RealTime();
       ctime = cArray.CpuTime();
-      printf("RealTime=%4.2f s, CpuTime=%4.2f s\n",rtime,ctime);	
+      printf("RealTime=%4.2f s, CpuTime=%4.2f s\n",rtime,ctime);
 
       cout << "        cMCRef : ";
       rtime = cMCRef.RealTime();
       ctime = cMCRef.CpuTime();
-      printf("RealTime=%4.2f s, CpuTime=%4.2f s\n",rtime,ctime);	
+      printf("RealTime=%4.2f s, CpuTime=%4.2f s\n",rtime,ctime);
 
       cout << " cHighMomPrims : ";
       rtime = cHighMomPrims.RealTime();
       ctime = cHighMomPrims.CpuTime();
-      printf("RealTime=%4.2f s, CpuTime=%4.2f s\n",rtime,ctime);	
+      printf("RealTime=%4.2f s, CpuTime=%4.2f s\n",rtime,ctime);
 
       cout << "  cLowMomPrims : ";
       rtime = cLowMomPrims.RealTime();
       ctime = cLowMomPrims.CpuTime();
-      printf("RealTime=%4.2f s, CpuTime=%4.2f s\n",rtime,ctime);	
+      printf("RealTime=%4.2f s, CpuTime=%4.2f s\n",rtime,ctime);
 
       cout << "     cMainLoop : ";
       rtime = cMainLoop.RealTime();
       ctime = cMainLoop.CpuTime();
-      printf("RealTime=%4.2f s, CpuTime=%4.2f s\n",rtime,ctime);	
+      printf("RealTime=%4.2f s, CpuTime=%4.2f s\n",rtime,ctime);
 
       cout << "     cIndexing : ";
       rtime = cIndexing.RealTime();
       ctime = cIndexing.CpuTime();
-      printf("RealTime=%4.2f s, CpuTime=%4.2f s\n",rtime,ctime);	
+      printf("RealTime=%4.2f s, CpuTime=%4.2f s\n",rtime,ctime);
 
       cout << "   cCloneCount : ";
       rtime = cCloneCount.RealTime();
       ctime = cCloneCount.CpuTime();
-      printf("RealTime=%4.2f s, CpuTime=%4.2f s\n",rtime,ctime);	
+      printf("RealTime=%4.2f s, CpuTime=%4.2f s\n",rtime,ctime);
       cout << endl;
     }
 
 
-    
+
     MC_nOfPrimaryRefFastTracks.clear();
     mcToReco.clear();
     recoToMc.clear();
@@ -1373,7 +1374,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 
 void CbmTrdMatchTracksMK::CreateHistogramms()
 {
-  //Define some histogramms  
+  //Define some histogramms
 
   //fEffVsMom = new TProfile("EffVsMom","EffVsMom",100,0,100);
   //  fEffVsMom = new TH2F("EffVsMom","EffVsMom",100,0,100,100,0,100);
@@ -1382,17 +1383,17 @@ void CbmTrdMatchTracksMK::CreateHistogramms()
   fh_mom_trdtrack_good = new TH1F("h_mom_trdtrack_good","h_mom_trdtrack_good",100, 0,10);
   fh_mom_mctrack_reco  = new TH1F("h_mom_mctrack_reco","h_mom_mctrack_reco",100, 0,10);
 
-  
+
   //  cout << "\n!!!!Creating histogramms!!!!\n";
   fNoHitsPerTrack = new TH1F("noHitsPerTrack","noHitsPerTrack",12,1,13);
   fNoTrueHits = new TH1F("noTrueHits","noTrueHits",12,1,13);
-  fNoTracks = new TH1F("noTracks","noTracks",100,0,5000);  
+  fNoTracks = new TH1F("noTracks","noTracks",100,0,5000);
   fNoPrimHighMom = new TH1F("NoPrimHighMom","fNoPrimHighMom",100,0,100);
   fNoPrimLowMom = new TH1F("NoPrimLowMom","fNoPrimLowMom",100,0,100);
   fPartTy = new TH1F("PartTy","PartTy",100,0,1);
   fGhostTracks_meanZ = new TH1F("GhostTracks_meanZ","GhostTracks_meanZ",100,300,900);
-  
-  
+
+
 
   //
   fXDistShort14 = new TH1F("XDistShort14","XDistShort14",100,0,6);
@@ -1462,8 +1463,8 @@ void CbmTrdMatchTracksMK::CreateHistogramms()
 
 void CbmTrdMatchTracksMK::WriteHistogramms()
 {
-  //Define some histogramms  
-  
+  //Define some histogramms
+
   fEffVsMom->Write();
 
   fh_mom_trdtrack_good->Write();
@@ -1492,11 +1493,11 @@ void CbmTrdMatchTracksMK::WriteHistogramms()
 
   //
 
-  fXDistLong45->Write(); 
+  fXDistLong45->Write();
   fYDistLong45->Write();
 
 
-  fXDistLongGh45->Write(); 
+  fXDistLongGh45->Write();
   fYDistLongGh45->Write();
 
   //
@@ -1510,11 +1511,11 @@ void CbmTrdMatchTracksMK::WriteHistogramms()
 
   //
 
-  fXDistLong89->Write(); 
+  fXDistLong89->Write();
   fYDistLong89->Write();
 
 
-  fXDistLongGh89->Write(); 
+  fXDistLongGh89->Write();
   fYDistLongGh89->Write();
 
   //
@@ -1547,17 +1548,17 @@ void CbmTrdMatchTracksMK::WriteHistogramms()
   fh_X_CorrectFast->Write();
   fh_X_CorrectSlow->Write();
 }
-    
+
 Int_t CbmTrdMatchTracksMK::GetMCIndex(CbmTrdTrack* trdTrack)
 {
-  Int_t 
+  Int_t
     nTrackEnries = trdTrack->GetNofTrdHits(),
     trdPtInd = -1,
     mcIndex = -1,
     trueInd = -1,
     trueVal = -1,
     tempVal;
-  
+
   CbmTrdHit* trdHit;
   FairMCPoint* mcPoint;
 
@@ -1615,12 +1616,12 @@ Double_t CbmTrdMatchTracksMK::DistTracklet(TClonesArray* fHit,
   Double_t Y = (firstPosZ*secondPosY)/secondPosZ;
   dist = fabs(Y-firstPosY);
 
-  //   cout << "From the coords (y,z) = (" 
+  //   cout << "From the coords (y,z) = ("
   //        << firstPosY << ", " << firstPosZ << endl
-  //        << "From the coords (y,z) = (" 
+  //        << "From the coords (y,z) = ("
   //        << secondPosY << ", " << secondPosZ << endl
   //        << "     we get the value = "
-  //        << dist 
+  //        << dist
   //        << endl;
 
 
@@ -1658,13 +1659,13 @@ void CbmTrdMatchTracksMK::Finish() { }
 // -------------------------------------------------------------------------
 
 
-    
+
 ClassImp(CbmTrdMatchTracksMK)
 
 
-      
 
-      
-  
-  
-  
+
+
+
+
+

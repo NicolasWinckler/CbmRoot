@@ -10,8 +10,7 @@
 #include "CbmMCTrack.h"
 #include "CbmTofPoint.h"
 #include "CbmTofHit.h"
-#include "CbmStsTrackMatch.h"
-#include "CbmTrdTrackMatch.h"
+#include "CbmTrackMatch.h"
 
 #include "TClonesArray.h"
 #include "TH1F.h"
@@ -151,7 +150,7 @@ void CbmFindGlobalTracksQa::Exec(Option_t* option)
     map<Int_t, Bool_t> mapStsGood;
 
     // Loop over STS track matches
-    CbmStsTrackMatch* stsTrackMatch;
+    CbmTrackMatch* stsTrackMatch;
     Double_t qual;
     Double_t old_qual;
     Int_t mcTrackIndex;
@@ -159,7 +158,7 @@ void CbmFindGlobalTracksQa::Exec(Option_t* option)
 	iStsTrack < fArrayStsTrackMatch->GetEntriesFast();
 	iStsTrack++) {
 	// Get pointer to the STS track match
-	stsTrackMatch = (CbmStsTrackMatch*) fArrayStsTrackMatch->
+	stsTrackMatch = (CbmTrackMatch*) fArrayStsTrackMatch->
 	    At(iStsTrack);
 	if(NULL == stsTrackMatch) {
 	    mapSts2MC[iStsTrack] = -1;
@@ -212,19 +211,19 @@ void CbmFindGlobalTracksQa::Exec(Option_t* option)
     map<Int_t, Bool_t> mapTrdGood;
 
     // Loop over TRD track matches
-    CbmTrdTrackMatch* trdTrackMatch;
+    CbmTrackMatch* trdTrackMatch;
     for(Int_t iTrdTrack = 0;
 	iTrdTrack < fArrayTrdTrackMatch->GetEntriesFast();
 	iTrdTrack++) {
 	// Get pointer to the TRD track match
-	trdTrackMatch = (CbmTrdTrackMatch*) fArrayTrdTrackMatch->
+	trdTrackMatch = (CbmTrackMatch*) fArrayTrdTrackMatch->
 	    At(iTrdTrack);
 	if(NULL == trdTrackMatch) {
             mapTrd2MC[iTrdTrack] = -1;
 	    continue;
 	}
 	// Mark this MC track as reco in TRD
-        matchTrd.insert(trdTrackMatch->GetMCTrackID());
+        matchTrd.insert(trdTrackMatch->GetMCTrackId());
 	// Get quality
 	qual = (Double_t) trdTrackMatch->GetNofTrueHits() /
 	    (Double_t) (trdTrackMatch->GetNofTrueHits() +
@@ -236,7 +235,7 @@ void CbmFindGlobalTracksQa::Exec(Option_t* option)
 	    continue;
 	}
 	// Get MC track index
-        mcTrackIndex = trdTrackMatch->GetMCTrackID();
+        mcTrackIndex = trdTrackMatch->GetMCTrackId();
 	// Look for another TRD track mathed with this MC track
 	if(mapMC2Trd.find(mcTrackIndex) == mapMC2Trd.end()) {
 	    mapMC2Trd[mcTrackIndex] = iTrdTrack;

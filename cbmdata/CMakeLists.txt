@@ -42,7 +42,7 @@ sts/CbmStsDigiMatch.cxx
 sts/CbmStsHit.cxx 
 sts/CbmStsPoint.cxx 
 sts/CbmStsTrack.cxx 
-sts/CbmStsTrackMatch.cxx
+#sts/CbmStsTrackMatch.cxx
 
 rich/CbmRichRing.cxx	
 rich/CbmRichHit.cxx 
@@ -60,7 +60,7 @@ much/CbmMuchStrawHit.cxx
 trd/CbmTrdHit.cxx		 
 trd/CbmTrdTrack.cxx		 
 trd/CbmTrdPoint.cxx	
-trd/CbmTrdTrackMatch.cxx  
+#trd/CbmTrdTrackMatch.cxx  
 
 tof/CbmTofHit.cxx 
 tof/CbmTofPoint.cxx

@@ -31,7 +31,7 @@
 #include "FairRootManager.h"
 #include "FairTrackParam.h"
 #include "CbmGlobalTrack.h"
-#include "CbmStsTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmRichRingMatch.h"
 
 #include "TParticle.h"
@@ -143,7 +143,7 @@ void CbmRichRingTrackAssignIdeal::DoAssign(TClonesArray *pRingArray, TClonesArra
 //  CbmRichRing *pRingT;
   CbmGlobalTrack *gTrack;
   CbmRichRingMatch *pRingMatch;
-  CbmStsTrackMatch *pTrackMatch;
+  CbmTrackMatch *pTrackMatch;
 
   Int_t ringID;
 
@@ -160,7 +160,7 @@ void CbmRichRingTrackAssignIdeal::DoAssign(TClonesArray *pRingArray, TClonesArra
     if (pRing->GetNofHits() < fNpoints) continue;
 
     if (pRing->GetTrackID() != -1) cout << "-E- Ring Track ID of found Rings != -1" << endl;
-    
+
     pRingMatch = (CbmRichRingMatch*)fRingMatchArray->At(iRing);
     ringID = pRingMatch->GetMCTrackID();
     xRing = pRing->GetCenterX();
@@ -170,17 +170,17 @@ void CbmRichRingTrackAssignIdeal::DoAssign(TClonesArray *pRingArray, TClonesArra
       pTrack = (FairTrackParam*)pTringArray->At(iTrack);
       xTrack = pTrack->GetX();
       yTrack = pTrack->GetY();
-      
+
       if (xTrack == 0 && yTrack == 0) continue;          // no projection to photodetector plane
-      
+
       gTrack = (CbmGlobalTrack*)gTrackArray->At(iTrack);
-      
+
       if (gTrack->GetStsTrackIndex() == -1) {
       if (fVerbose> 1) cout << "-W- CbmRichRingTrackAssignIdeal: gTrack->GetStsTrackIndex() = -1 " << endl;
 	 continue;
       }
-      
-      pTrackMatch = (CbmStsTrackMatch*)fTrackMatchArray->At(gTrack->GetStsTrackIndex());
+
+      pTrackMatch = (CbmTrackMatch*)fTrackMatchArray->At(gTrack->GetStsTrackIndex());
 
       if (pTrackMatch->GetMCTrackId() == ringID){
          gTrack -> SetRichRingIndex(iRing);
@@ -189,7 +189,7 @@ void CbmRichRingTrackAssignIdeal::DoAssign(TClonesArray *pRingArray, TClonesArra
          dist_RingTrack = TMath::Sqrt( (xRing-xTrack)*(xRing-xTrack) +
 				            (yRing-yTrack)*(yRing-yTrack) );
 	 pRing -> SetDistance(dist_RingTrack);
-	 
+
 	if (fVerbose > 1) cout << " -I- RingTrackAssignIdeal: distance of ring " << iRing <<
                        " and track " << iTrack << " = " << dist_RingTrack << endl;
 

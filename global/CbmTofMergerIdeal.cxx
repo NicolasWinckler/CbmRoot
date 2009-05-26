@@ -9,8 +9,7 @@
 #include "FairRootManager.h"
 #include "CbmTofPoint.h"
 #include "CbmTofHit.h"
-#include "CbmStsTrackMatch.h"
-#include "CbmTrdTrackMatch.h"
+#include "CbmTrackMatch.h"
 
 #include "TClonesArray.h"
 
@@ -98,8 +97,8 @@ Int_t CbmTofMergerIdeal::DoMerge(TClonesArray* glbTracks,
     // Declare variables outside the loop
     CbmTofPoint* tofPoint;
     CbmTofHit* tofHit;
-    CbmStsTrackMatch* stsMatch;
-    CbmTrdTrackMatch* trdMatch;
+    CbmTrackMatch* stsMatch;
+    CbmTrackMatch* trdMatch;
     CbmGlobalTrack* glbTrack;
     Int_t tofPointIndex;
     Int_t mcTrackIndex;
@@ -138,17 +137,17 @@ Int_t CbmTofMergerIdeal::DoMerge(TClonesArray* glbTracks,
 	// Get pointer to the STS or TRD track match
 	stsTrackIndex = glbTrack->GetStsTrackIndex();
 	if(stsTrackIndex >= 0) {
-	    stsMatch = (CbmStsTrackMatch*) fArrayStsTrackMatch->
+	    stsMatch = (CbmTrackMatch*) fArrayStsTrackMatch->
 		At(stsTrackIndex);
 	    if(NULL == stsMatch) continue;
             mcTrackIndex = stsMatch->GetMCTrackId();
 	} else {
 	    trdTrackIndex = glbTrack->GetTrdTrackIndex();
 	    if(trdTrackIndex < 0) continue;
-	    trdMatch = (CbmTrdTrackMatch*) fArrayTrdTrackMatch->
+	    trdMatch = (CbmTrackMatch*) fArrayTrdTrackMatch->
 		At(trdTrackIndex);
 	    if(NULL == trdMatch) continue;
-            mcTrackIndex = trdMatch->GetMCTrackID();
+            mcTrackIndex = trdMatch->GetMCTrackId();
 	}
 	// Get TOF hit index
         if(mapMCTof.find(mcTrackIndex)==mapMCTof.end()) continue;

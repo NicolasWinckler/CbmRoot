@@ -15,7 +15,7 @@
 
 #include "CbmGlobalTrack.h"
 #include "CbmTrdTrack.h"
-#include "CbmStsTrackMatch.h"
+#include "CbmTrackMatch.h"
 
 #include "TTree.h"
 #include "TClonesArray.h"
@@ -180,7 +180,7 @@ void CbmEcalIdentification::Identify(FairTrackParam* tr)
     Int_t stsn=gtr->GetStsTrackIndex();
     if (stsn>=0)
     {
-      CbmStsTrackMatch* ststr=(CbmStsTrackMatch*)fStsTracksMatch->At(stsn);
+      CbmTrackMatch* ststr=(CbmTrackMatch*)fStsTracksMatch->At(stsn);
       if (ststr)
 	fMCTrackNum=ststr->GetMCTrackId();
     }
@@ -203,7 +203,7 @@ void CbmEcalIdentification::WriteTreeLight()
     Int_t stsn=gtr->GetStsTrackIndex();
     if (stsn>=0)
     {
-      CbmStsTrackMatch* ststr=(CbmStsTrackMatch*)fStsTracksMatch->At(stsn);
+      CbmTrackMatch* ststr=(CbmTrackMatch*)fStsTracksMatch->At(stsn);
       if (ststr)
 	fMCTrackNum=ststr->GetMCTrackId();
     }
@@ -404,7 +404,7 @@ Double_t CbmEcalIdentification::GetEnergy(CbmEcalCell* cell)
 {
   if (fUseHack==0)
     return cell->GetEnergy();
-  
+
   map<Int_t, Float_t>::const_iterator q;
   Double_t e=0;
   CbmMCTrack* tr;
@@ -432,7 +432,7 @@ Double_t CbmEcalIdentification::GetPSEnergy(CbmEcalCell* cell)
 {
   if (fUseHack==0)
     return cell->GetPSEnergy();
-   
+
   map<Int_t, Float_t>::const_iterator q;
   Double_t e=0;
   CbmMCTrack* tr;
@@ -555,7 +555,7 @@ InitStatus CbmEcalIdentification::Init()
     return kFATAL;
   }
   fStr=(CbmEcalStructure*)fManager->GetObject("EcalStructure");
-  if (!fStr) 
+  if (!fStr)
   {
     Fatal("Init()", "Can't find calorimeter structure in the system.");
     return kFATAL;

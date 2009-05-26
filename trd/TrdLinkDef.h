@@ -11,7 +11,6 @@
 #pragma link C++ class  CbmTrdHitProducerSmearing+;
 #pragma link C++ class  CbmTrdHitProducerQa+;
 #pragma link C++ class  CbmTrdFindTracks+;
-#pragma link C++ class  CbmTrdFindTracksQa+;
 //#pragma link C++ class  CbmTrdTrackFinder+;
 #pragma link C++ class  CbmTrdTrackFinderIdeal+;
 #pragma link C++ class  CbmTrdFitTracks+;

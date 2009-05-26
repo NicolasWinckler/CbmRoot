@@ -37,7 +37,7 @@
 #include "FairTrackParam.h"
 #include "CbmGlobalTrack.h"
 #include "CbmMCTrack.h"
-#include "CbmStsTrackMatch.h"
+#include "CbmTrackMatch.h"
 
 #include <map>
 #include <vector>
@@ -497,7 +497,7 @@ Bool_t CbmRichRingQa::DoesRingHaveProjection(Int_t trackId){
         }
         CbmGlobalTrack* gtrack = (CbmGlobalTrack*)gTrackArray->At(iProj);
         if (gtrack->GetStsTrackIndex() == -1) continue;
-        CbmStsTrackMatch* trackMatch = (CbmStsTrackMatch*)fTrackMatch->At(gtrack->GetStsTrackIndex());
+        CbmTrackMatch* trackMatch = (CbmTrackMatch*)fTrackMatch->At(gtrack->GetStsTrackIndex());
 
         if (!trackMatch) cout << "-E- no matched track!: fake?"<< endl;
         if (!trackMatch) continue;
@@ -517,8 +517,8 @@ Double_t CbmRichRingQa::GetStsMomentum(CbmRichRing * ring)
 
     CbmGlobalTrack* gtrack = (CbmGlobalTrack*)gTrackArray->At(ringTrackId);
     if (gtrack->GetStsTrackIndex() == -1) return 0.0;
-    CbmStsTrackMatch* stsMatch  =
-            (CbmStsTrackMatch*) fTrackMatch->At(gtrack->GetStsTrackIndex());
+    CbmTrackMatch* stsMatch  =
+            (CbmTrackMatch*) fTrackMatch->At(gtrack->GetStsTrackIndex());
     if (!stsMatch){
         cout << "-E- CbmRichRingQa::GetStsMomentum() no matched track!: fake?"<< endl;
         return 0.0;
@@ -796,8 +796,8 @@ void CbmRichRingQa::RingTrackMatchEff()
         if (ringTrackId > gTrackArray->GetEntriesFast() || ringTrackId < 0) continue;
         CbmGlobalTrack* gtrack = (CbmGlobalTrack*)gTrackArray->At(ringTrackId);
         if (gtrack->GetStsTrackIndex() == -1) continue;
-        CbmStsTrackMatch* stsMatch  =
-                (CbmStsTrackMatch*) fTrackMatch->At(gtrack->GetStsTrackIndex());
+        CbmTrackMatch* stsMatch  =
+                (CbmTrackMatch*) fTrackMatch->At(gtrack->GetStsTrackIndex());
 
         if (!stsMatch) cout << "-E- no matched track!: fake?"<< endl;
         if (!stsMatch) continue;

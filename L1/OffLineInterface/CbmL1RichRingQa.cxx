@@ -8,7 +8,7 @@
 #include "CbmRichRing.h"
 #include "CbmMCTrack.h"
 #include "CbmRichRingMatch.h"
-#include "CbmStsTrackMatch.h"
+//#include "CbmStsTrackMatch.h"
 
 #include "TH1.h"
 #include "TH2.h"
@@ -91,9 +91,9 @@ InitStatus CbmL1RichRingQa::Init()
 
 
 void CbmL1RichRingQa::CirFit( list<pair<Double_t,Double_t> > &P, Double_t *X, Double_t *Y, Double_t *R )
-{  
+{
   Double_t S[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-  Int_t n=0;  
+  Int_t n=0;
   for( list<pair<Double_t,Double_t> >::iterator i=P.begin(); i!=P.end(); ++i )
     {
       Double_t &x = i->first;
@@ -125,26 +125,26 @@ void CbmL1RichRingQa::CirFit( list<pair<Double_t,Double_t> > &P, Double_t *X, Do
 
 void CbmL1RichRingQa::Exec(Option_t* option)
 {
-  // histogramms 
+  // histogramms
 
-  static TH1F 
-    *h_MC_radius, 
-    *h_MC_nhits, 
-    *h_MC_primary_nhits, 
+  static TH1F
+    *h_MC_radius,
+    *h_MC_nhits,
+    *h_MC_primary_nhits,
     *h_MC_momentum,
     *h_MC_primary_momentum,
     *h_MC_resolution,
     *h_MC_ref_resolution,
     *h_MC_extra_resolution,
     *h_ghost_nhits;
- 
-  static TH2F 
+
+  static TH2F
     *h_MC_primary_res_vs_momentum;
- 
-  static TProfile 
+
+  static TProfile
     *p_ref_eff_vs_nhits,
     *p_extra_eff_vs_nhits;
- 
+
   static TList *listHisto;
   static bool first_call_performance = 1;
 
@@ -160,29 +160,29 @@ void CbmL1RichRingQa::Exec(Option_t* option)
       h_MC_primary_nhits  = new TH1F("h_MC_primary_nhits", "Hits per primary MC ring", 50, 0.0, 50.);
       h_MC_momentum = new TH1F("h_MC_momentum", "MC track momentum (GeV)", 100, 0.0, 15.);
       h_MC_primary_momentum = new TH1F("h_MC_primary_momentum", "MC primary track momentum (GeV)", 100, 0.0, 15.);
-      h_MC_resolution = 
+      h_MC_resolution =
 	new TH1F("h_MC_resolution", "Hit deviation from MC ring (cm)", 500, -5.0, 5.0);
-      h_MC_ref_resolution = 
+      h_MC_ref_resolution =
 	new TH1F("h_MC_ref_resolution", "Hit deviation from REF MC ring (cm)", 500, -5.0, 5.0);
-      h_MC_extra_resolution = 
+      h_MC_extra_resolution =
 	new TH1F("h_MC_extra_resolution", "Hit deviation from EXTRA MC ring (cm)", 500, -5.0, 5.0);
- 
+
       h_ghost_nhits = new TH1F("h_ghost_nhits", "Hits per ghost ring", 50, 0.0, 50.);
 
-      h_MC_primary_res_vs_momentum = 
-	new TH2F("h_MC_primary_res_vs_momentum", "Hit deviation from ptimary MC ring (cm) vs P", 
+      h_MC_primary_res_vs_momentum =
+	new TH2F("h_MC_primary_res_vs_momentum", "Hit deviation from ptimary MC ring (cm) vs P",
 		  100, 0., 15., 500, -5.0, 5.0 );
- 
-      p_ref_eff_vs_nhits = 
+
+      p_ref_eff_vs_nhits =
 	new TProfile("p_ref_eff_vs_nhits", "Refset efficiency vs N Hits", 100, 0.0, 50.0, 0.0, 1.0 );
-   
-      p_extra_eff_vs_nhits = 
+
+      p_extra_eff_vs_nhits =
 	new TProfile("p_extra_eff_vs_nhits", "Extraset efficiency vs N Hits", 100, 0.0, 50.0, 0.0, 1.0 );
 
       // ----- Create list of all histogram pointers
       listHisto = gDirectory->GetList();
-      
-      curdir->cd(); 
+
+      curdir->cd();
     }
 
   // Create hit vector
@@ -190,18 +190,18 @@ void CbmL1RichRingQa::Exec(Option_t* option)
   if( !fHitArray || !fMCTrackArray || !fMCPointArray || !fRingArray ) return;
 
   int NHits = fHitArray->GetEntriesFast();
-  PerfHit Hits[NHits]; 
+  PerfHit Hits[NHits];
 
   map < void*, int > pHitIndex;
 
   for( Int_t i = 0; i<NHits; i++ ){
-    
+
     PerfHit &hit = Hits[i];
-    hit.index = i;	
+    hit.index = i;
     hit.x = 0;
     hit.y = 0;
     hit.MCTrackID = - 1;
-    
+
     CbmRichHit * phit = (CbmRichHit*) fHitArray->At( i );
     if ( !phit ) continue;
     pHitIndex.insert(pair<void*, int>(phit,i));
@@ -217,11 +217,11 @@ void CbmL1RichRingQa::Exec(Option_t* option)
     if( !track || track->GetPdgCode() != 50000050 ) continue; // select only Cherenkov photons
     hit.MCTrackID = track->GetMotherId();
   }
-  
+
   // Create map of MC rings
-  
+
   map < Int_t, MCRing> MCRingMap;
-  
+
   // match hits
 
   for( int ih = 0; ih<NHits; ih++ ){
@@ -235,47 +235,47 @@ void CbmL1RichRingQa::Exec(Option_t* option)
     MCRingMap[ID].NHits++;
     MCRingMap[ID].Hits.push_back(ih);
   }
-  
+
   // fit MC rings & set parameters
-  
+
   for( map<Int_t,MCRing>::iterator i=MCRingMap.begin(); i!=MCRingMap.end(); ++i )
     {
       MCRing &ring = i->second;
       ring.MCTrackID = i->first;
-      ring.primary = 0;       
+      ring.primary = 0;
       ring.P = 0;
       ring.PDG = 0;
-      ring.Reconstructed = 0;      
+      ring.Reconstructed = 0;
       ring.kind = 0;
-      
+
       // find momentum & vertex
       if( !fMCTrackArray || ring.MCTrackID < 0 ) continue;
 
       CbmMCTrack *pm= (CbmMCTrack*) fMCTrackArray->At( ring.MCTrackID );
       if ( pm ){
 	ring.PDG = pm->GetPdgCode();  // get PDG code of mother
-	    
+
 	Double_t vx = pm->GetStartX();
 	Double_t vy = pm->GetStartY();
 	Double_t vz = pm->GetStartZ();
-	
+
 	if (fabs(vx)<0.1 && fabs(vy)<0.1 && fabs(vz)<0.1) ring.primary = 1;
-	
+
 	ring.P = pm->GetP();
       }
-    
-      // fit the MC ring 
-      
+
+      // fit the MC ring
+
       list<pair<Double_t,Double_t> > L;
       for( vector<int>::iterator j=ring.Hits.begin(); j!=ring.Hits.end(); ++j ){
 	L.push_back(pair<Double_t,Double_t>( Hits[(*j)].x, Hits[(*j)].y) );
       }
       CirFit( L, &ring.x, &ring.y, &ring.r );
-          
+
       // define the kind of the ring
-      
+
       if ( ring.r>3. && ring.r<7. && ring.NHits >=5 )
-	{ 
+	{
 	  if ( ring.NHits >=15 && ring.primary )
 	    {
 	      ring.kind = 2;
@@ -285,25 +285,25 @@ void CbmL1RichRingQa::Exec(Option_t* option)
       else ring.kind = 0;
     }
 
-  
+
   // match reconstructed->simulated rings, calc. ghost
-   
+
   Int_t NGhost = 0;
   Int_t NReco = fRingArray->GetEntriesFast();
 
   for( Int_t ir = 0; ir<NReco; ir++ ){
-    
+
     map< Int_t, Int_t > hitmap;
     CbmRichRing *r = (CbmRichRing*) fRingArray->At(ir);
     Int_t nh = r->GetNofHits();
 
     for( int ih=0; ih<nh; ih++ )
       {
-	  
+
 	CbmRichHit *h = (CbmRichHit *)fHitArray->At(r->GetHit(ih));
 	Int_t jh = pHitIndex[h];
 	int ID = Hits[jh].MCTrackID;
-	if( hitmap.find( ID )==hitmap.end() ) hitmap.insert( pair<Int_t,Int_t>( ID, 0 ) );	  
+	if( hitmap.find( ID )==hitmap.end() ) hitmap.insert( pair<Int_t,Int_t>( ID, 0 ) );
 	hitmap[ ID ]++;
       }
     Bool_t ghost = 1;
@@ -314,7 +314,7 @@ void CbmL1RichRingQa::Exec(Option_t* option)
 	ghost = 0;
 	break;
       }
-    if ( ghost ) 
+    if ( ghost )
       {
 	h_ghost_nhits->Fill( nh );
 	NGhost ++;
@@ -323,19 +323,19 @@ void CbmL1RichRingQa::Exec(Option_t* option)
 
   // get statistics from MC rings
 
-  Int_t 
-    NAll = 0, NRef = 0, NExtra = 0, 
-    NAllReco = 0, NRefReco = 0, NExtraReco = 0, 
+  Int_t
+    NAll = 0, NRef = 0, NExtra = 0,
+    NAllReco = 0, NRefReco = 0, NExtraReco = 0,
     NClone = 0;
-  
+
   for( map<Int_t,MCRing>::iterator i=MCRingMap.begin(); i!=MCRingMap.end(); ++i )
-    {       
+    {
       MCRing &ring = i->second;
       if ( ring.kind==0 ) continue;
-      NAll++;      
+      NAll++;
       if ( ring.kind==1 ) NExtra++;
       if ( ring.kind==2 ) NRef++;
-      if ( ring.Reconstructed ) 
+      if ( ring.Reconstructed )
 	{
 	  NAllReco++;
 	  NClone += i->second.Reconstructed - 1 ;
@@ -343,16 +343,16 @@ void CbmL1RichRingQa::Exec(Option_t* option)
 	  else NExtraReco++;
 	}
     }
-  
 
-  // accumulated statistics 
 
-  static Int_t 
+  // accumulated statistics
+
+  static Int_t
     S_NAll = 0, S_NRef = 0, S_NExtra = 0, S_NReco = 0,
-    S_NAllReco = 0, S_NRefReco = 0, S_NExtraReco = 0, 
+    S_NAllReco = 0, S_NRefReco = 0, S_NExtraReco = 0,
     S_NClone = 0, S_NGhost = 0,
     S_NEvents = 0;
-  
+
   S_NAll       += NAll;
   S_NRef       += NRef;
   S_NExtra     += NExtra;
@@ -397,18 +397,18 @@ void CbmL1RichRingQa::Exec(Option_t* option)
   cout << "ghost  probability     : " << p_ghost         << endl;
   cout << endl;
   cout << "Reco time (ms)         : " << fRecoTime/1000. << endl;
-   
+
   cout << endl;
   */
-   
+
   Double_t S_p_all   = (S_NAll   >0)  ? (Double_t) S_NAllReco / S_NAll : 0.;
   Double_t S_p_ref   = (S_NRef   >0)  ? (Double_t) S_NRefReco / S_NRef : 0.;
   Double_t S_p_extra = (S_NExtra >0)  ? (Double_t) S_NExtraReco / S_NExtra : 0.;
   Double_t S_p_clone = (S_NReco  >0)  ? (Double_t) S_NClone / S_NReco : 0.;
   Double_t S_p_ghost = (S_NReco  >0)  ? (Double_t) S_NGhost / S_NReco : 0.;
 
-  cout << "ACCUMULATED STAT : " << S_NEvents << " EVENTS "               << endl << endl; 
-  
+  cout << "ACCUMULATED STAT : " << S_NEvents << " EVENTS "               << endl << endl;
+
   cout << "Refset efficiency      : " << S_p_ref       <<" | "<< S_NRef << endl;
   cout << "Allset efficiency      : " << S_p_all       <<" | "<< S_NAll << endl;
   cout << "Extra  efficiency      : " << S_p_extra     <<" | "<< S_NExtra << endl;
@@ -416,24 +416,24 @@ void CbmL1RichRingQa::Exec(Option_t* option)
   cout << "ghost  probability     : " << S_p_ghost     <<" | "<< S_NGhost << endl;
   cout << "MC rings/event found   : " << Int_t(Double_t(S_NAllReco)/Double_t(S_NEvents)) << endl;
   cout << endl;
-  cout << "Reco time (ms)         : " << 0.*1000./S_NEvents 
+  cout << "Reco time (ms)         : " << 0.*1000./S_NEvents
        << endl;
-  
+
   cout << endl;
 
 
-  // fill histogramms 
+  // fill histogramms
 
   for( map<Int_t,MCRing>::iterator i=MCRingMap.begin(); i!=MCRingMap.end(); ++i )
-    {       
+    {
       MCRing &ring = i->second;
-       
+
       h_MC_radius->Fill( ring.r );
-      h_MC_nhits->Fill( ring.NHits );       
+      h_MC_nhits->Fill( ring.NHits );
       h_MC_momentum->Fill( ring.P );
       if ( ring.primary )
 	{
-	  h_MC_primary_nhits->Fill( ring.NHits );       
+	  h_MC_primary_nhits->Fill( ring.NHits );
 	  h_MC_primary_momentum->Fill( ring.P );
 	}
 
@@ -459,7 +459,7 @@ void CbmL1RichRingQa::Exec(Option_t* option)
   TIter hiter(listHisto);
   while (TObject* obj = hiter()) obj->Write();
   outfile->Close();
-  curr->cd(); 
+  curr->cd();
 }
 
 void CbmL1RichRingQa::Finish()

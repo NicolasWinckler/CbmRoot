@@ -40,7 +40,7 @@ CbmPrimaryGenerator::~CbmPrimaryGenerator() {
 // -----   Public method Init   --------------------------------------------
 void CbmPrimaryGenerator::Init() {
 
-  cout << "CBMPriamryGenerator::INit" << endl << endl << endl << endl;
+//  cout << "CBMPriamryGenerator::INit" << endl << endl << endl << endl;
 
   // Create and register MCEvent
   UInt_t runId=  FairRunSim::Instance()->GetRunId();

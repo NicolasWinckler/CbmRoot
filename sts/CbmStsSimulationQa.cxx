@@ -7,7 +7,7 @@
 
 #include "CbmStsPoint.h"
 #include "CbmStsTrack.h"
-#include "CbmStsTrackMatch.h"
+//#include "CbmStsTrackMatch.h"
 #include "CbmGeoStsPar.h"
 
 #include "CbmDetectorList.h"
@@ -43,7 +43,7 @@ using std::setprecision;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStsSimulationQa::CbmStsSimulationQa() { 
+CbmStsSimulationQa::CbmStsSimulationQa() {
   fOnlineAnalysis = kFALSE;
 }
 // -------------------------------------------------------------------------
@@ -51,16 +51,16 @@ CbmStsSimulationQa::CbmStsSimulationQa() {
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmStsSimulationQa::CbmStsSimulationQa(Bool_t visualizeBool, Int_t iVerbose) 
+CbmStsSimulationQa::CbmStsSimulationQa(Bool_t visualizeBool, Int_t iVerbose)
   : FairTask("STS Simulation QA", iVerbose) {
   fOnlineAnalysis = visualizeBool;
 }
 // -------------------------------------------------------------------------
 
-  
-  
+
+
 // -----   Destructor   ----------------------------------------------------
-CbmStsSimulationQa::~CbmStsSimulationQa() { 
+CbmStsSimulationQa::~CbmStsSimulationQa() {
 
   fHistoList->Delete();
   delete fHistoList;
@@ -75,7 +75,7 @@ void CbmStsSimulationQa::SetParContainers() {
   // Get Run
   FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) {
-    cout << "-E- " << GetName() << "::SetParContainers: No FairRunAna!" 
+    cout << "-E- " << GetName() << "::SetParContainers: No FairRunAna!"
 	 << endl;
     return;
   }
@@ -83,7 +83,7 @@ void CbmStsSimulationQa::SetParContainers() {
   // Get Runtime Database
   FairRuntimeDb* runDb = run->GetRuntimeDb();
   if ( ! run ) {
-    cout << "-E- " << GetName() << "::SetParContainers: No runtime database!" 
+    cout << "-E- " << GetName() << "::SetParContainers: No runtime database!"
 	 << endl;
     return;
   }
@@ -137,7 +137,7 @@ InitStatus CbmStsSimulationQa::Init() {
     cout << "-E- " << GetName() << "::Init: No STSPoint array!" << endl;
     return kERROR;
   }
-  
+
   // Get the geometry of target and STS
   InitStatus geoStatus = GetGeometry();
   if ( geoStatus != kSUCCESS ) {
@@ -145,7 +145,7 @@ InitStatus CbmStsSimulationQa::Init() {
 	 << endl;
     return geoStatus;
   }
-  
+
   // Create histograms
   CreateHistos();
   Reset();
@@ -166,7 +166,7 @@ InitStatus CbmStsSimulationQa::Init() {
       fOnlinePad[ipad]->SetBorderMode(0);
       fOnlinePad[ipad]->Draw();
     }
-    
+
     fOnlinePad[0]->cd();
     TLegend* brp = new TLegend(0.1,0.1,0.9,0.9,"Online STS simulation");
     brp->SetTextAlign(22);
@@ -244,25 +244,25 @@ void CbmStsSimulationQa::Exec(Option_t* opt) {
     mctrack->GetMomentum(mom);
     Float_t pT  = mom.Pt();
     Float_t p   = mom.Mag();
-    
-    TVector3 startvtx; 
+
+    TVector3 startvtx;
     mctrack->GetStartVertex(startvtx);
     Float_t vertexZ  = startvtx.z();
-    
+
     TLorentzVector mom4;
     mctrack->Get4Momentum(mom4);
     Float_t rapidity =  mom4.Rapidity();
-    
+
     Int_t stsPoints = mctrack->GetNPoints(kSTS);
-    
-    if(stsPoints>0 && vertexZ<=100) { 
+
+    if(stsPoints>0 && vertexZ<=100) {
       fhMomAll      ->Fill(p);
       fhYPtMapAll   ->Fill(rapidity,pT);
       fhPdgCodeAll  ->Fill(pdgCode);
       fhStsPointsAll->Fill(stsPoints);
       fhMomStsPoints->Fill(stsPoints,p);
     }
-    if(stsPoints>3 && vertexZ<=100) { 
+    if(stsPoints>3 && vertexZ<=100) {
       fhMomRec      ->Fill(p);
       fhYPtMapRec   ->Fill(rapidity,pT);
       fhPdgCodeRec  ->Fill(pdgCode);
@@ -274,20 +274,20 @@ void CbmStsSimulationQa::Exec(Option_t* opt) {
 
   for ( Int_t ipnt = 0 ; ipnt < nofSTSPoints ; ipnt++ ) {
     CbmStsPoint *stsPoint= (CbmStsPoint*)fSTSPoints->At(ipnt);
-    Float_t z  = stsPoint->GetZ(); // [cm] 
-    Float_t x  = stsPoint->GetX(z); // [cm] 
-    Float_t y  = stsPoint->GetY(z); // [cm] 
-    
+    Float_t z  = stsPoint->GetZ(); // [cm]
+    Float_t x  = stsPoint->GetX(z); // [cm]
+    Float_t y  = stsPoint->GetY(z); // [cm]
+
     fhStsPointsPosition->Fill(z,x,y);
-//     cout << "filled 3d,    MCId = " << stsPoint->GetDetectorID() 
+//     cout << "filled 3d,    MCId = " << stsPoint->GetDetectorID()
 // 	 << "             nr = " << fStationNrFromMcId[stsPoint->GetDetectorID()] << endl;
     fhStationPoints[fStationNrFromMcId[stsPoint->GetDetectorID()]]->Fill(x,y);
-//     cout << "filled 2d for MCId = " << stsPoint->GetDetectorID() 
+//     cout << "filled 2d for MCId = " << stsPoint->GetDetectorID()
 // 	 << " and station nr = " << fStationNrFromMcId[stsPoint->GetDetectorID()] << endl;
   }
 
   //  cout << "hello" << endl;
-    
+
   Double_t tracksPerEvent = (Double_t)(fhMomAll->GetEntries())/((Double_t)fNEvents+1);
   Double_t pointsPerEvent = (Double_t)(fhStsPointsPosition->GetEntries())/((Double_t)fNEvents+1);
 
@@ -322,7 +322,7 @@ void CbmStsSimulationQa::Exec(Option_t* opt) {
 	}
       }
     }
-    
+
     fOnlinePad[8]->cd();
     TPaveText* printoutPave = new TPaveText(0.1,0.1,0.9,0.9);
     printoutPave->SetTextAlign(22);
@@ -339,8 +339,8 @@ void CbmStsSimulationQa::Exec(Option_t* opt) {
   }
 
   //  cout << "\rEvent #" << fNEvents+1 << flush;
-  cout << "\rEvent #" << fNEvents+1 << " --> " 
-       << setprecision(6) << tracksPerEvent << " tracks/event >--< " 
+  cout << "\rEvent #" << fNEvents+1 << " --> "
+       << setprecision(6) << tracksPerEvent << " tracks/event >--< "
        << setprecision(7) << pointsPerEvent << " points/event >--" << flush;
 
   fNEvents++;
@@ -352,14 +352,14 @@ void CbmStsSimulationQa::Exec(Option_t* opt) {
 
 
 // -----   Private method Finish   -----------------------------------------
-void CbmStsSimulationQa::Finish() 
+void CbmStsSimulationQa::Finish()
 {
   // Run summary to screen
   cout << endl << endl;
-  cout << "=======================================================" 
+  cout << "======================================================="
        << endl;
   cout << "            StsSimulationQa: Run summary" << endl << endl;
-  cout << "=======================================================" 
+  cout << "======================================================="
        << endl;
   cout << endl << endl;
 
@@ -386,7 +386,7 @@ InitStatus CbmStsSimulationQa::GetGeometry() {
   }
   TObjArray* stsNodes = fStsGeo->GetGeoSensitiveNodes();
   if ( ! stsNodes ) {
-    cout << "-E- " << GetName() << "::GetGeometry: No STS node array" 
+    cout << "-E- " << GetName() << "::GetGeometry: No STS node array"
 	 << endl;
     fNStations = 0;
     return kERROR;
@@ -454,7 +454,7 @@ InitStatus CbmStsSimulationQa::GetGeometry() {
     fNStations++;
 
     cout << "station #" << fNStations << " has MCID = " << stsNode->getMCid() << " and name " << stsNode->GetName() << endl;
-    
+
     //    fStationsMCId[fNStations] = stsNode->getMCid(); // not used
   }
   cout << "There are " << fNStations << " stations" << endl;

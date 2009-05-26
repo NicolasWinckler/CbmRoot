@@ -2,11 +2,10 @@
 
 #include "FairTrackParam.h"
 #include "CbmGlobalTrack.h"
-#include "CbmStsTrackMatch.h"
 #include "CbmRichRing.h"
 #include "CbmRichRingMatch.h"
 #include "CbmTrdTrack.h"
-#include "CbmTrdTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "FairRootManager.h"
 #include "FairMCPoint.h"
 #include "CbmMCTrack.h"
@@ -516,7 +515,7 @@ void CbmRichElectronsQa::RingTrackMatch()
         if (ringTrackId > fGlobalTracks->GetEntriesFast() || ringTrackId < 0) continue;
         CbmGlobalTrack* gtrack = (CbmGlobalTrack*)fGlobalTracks->At(ringTrackId);
         if (gtrack->GetStsTrackIndex() == -1) continue;
-        CbmStsTrackMatch* stsMatch  = (CbmStsTrackMatch*) fStsTrackMatches->At(gtrack->GetStsTrackIndex());
+        CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(gtrack->GetStsTrackIndex());
 
         if (!stsMatch) continue;
         Int_t ringMCTrackId = stsMatch->GetMCTrackId();
@@ -551,7 +550,7 @@ Bool_t CbmRichElectronsQa::DoesRingHaveProjection(Int_t trackId){
 
 		CbmGlobalTrack* gtrack = (CbmGlobalTrack*)fGlobalTracks->At(iProj);
 		if (gtrack->GetStsTrackIndex() == -1) continue;
-		CbmStsTrackMatch* trackMatch = (CbmStsTrackMatch*)fStsTrackMatches->At(gtrack->GetStsTrackIndex());
+		CbmTrackMatch* trackMatch = (CbmTrackMatch*)fStsTrackMatches->At(gtrack->GetStsTrackIndex());
 
 		if (!trackMatch) cout << "-E- no matched track!: fake?"<< endl;
 		if (!trackMatch) continue;
@@ -582,7 +581,7 @@ void CbmRichElectronsQa::GlobalTracksMatchEff()
 		CbmRichRing* richRing = (CbmRichRing*)fRichRings->At(richIndex);
 		if (!stsTrack) continue;
 
-		CbmStsTrackMatch* stsTrackMatch = (CbmStsTrackMatch*)fStsTrackMatches->At(stsIndex);
+		CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*)fStsTrackMatches->At(stsIndex);
 		if (!stsTrackMatch) continue;
 		CbmRichRingMatch* richRingMatch = (CbmRichRingMatch*)fRichRingMatches->At(richIndex);
 		if (!stsTrackMatch) continue;
@@ -610,9 +609,9 @@ void CbmRichElectronsQa::GlobalTracksMatchEff()
 		}
 		CbmTrdTrack* trdTrack = (CbmTrdTrack*)fTrdTracks->At(trdIndex);
 		if (!trdTrack)continue;
-		CbmTrdTrackMatch* trdTrackMatch = (CbmTrdTrackMatch*)fTrdTrackMatches->At(trdIndex);
+		CbmTrackMatch* trdTrackMatch = (CbmTrackMatch*)fTrdTrackMatches->At(trdIndex);
 		if (!trdTrackMatch)continue;
-		Int_t mcIdTrd = trdTrackMatch->GetMCTrackID();
+		Int_t mcIdTrd = trdTrackMatch->GetMCTrackId();
 
 		if (richRing->GetRecFlag() == 3 &&
 			mcIdSts == mcIdRich &&
@@ -660,7 +659,7 @@ void CbmRichElectronsQa::GlobalTracksElIdEff()
 		CbmRichRing* richRing = (CbmRichRing*)fRichRings->At(richIndex);
 		if (!stsTrack) continue;
 
-		CbmStsTrackMatch* stsTrackMatch = (CbmStsTrackMatch*)fStsTrackMatches->At(stsIndex);
+		CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*)fStsTrackMatches->At(stsIndex);
 		if (!stsTrackMatch) continue;
 		CbmRichRingMatch* richRingMatch = (CbmRichRingMatch*)fRichRingMatches->At(richIndex);
 		if (!stsTrackMatch) continue;
@@ -694,9 +693,9 @@ void CbmRichElectronsQa::GlobalTracksElIdEff()
 		}
 		CbmTrdTrack* trdTrack = (CbmTrdTrack*)fTrdTracks->At(trdIndex);
 		if (!trdTrack)continue;
-		CbmTrdTrackMatch* trdTrackMatch = (CbmTrdTrackMatch*)fTrdTrackMatches->At(trdIndex);
+		CbmTrackMatch* trdTrackMatch = (CbmTrackMatch*)fTrdTrackMatches->At(trdIndex);
 		if (!trdTrackMatch)continue;
-		Int_t mcIdTrd = trdTrackMatch->GetMCTrackID();
+		Int_t mcIdTrd = trdTrackMatch->GetMCTrackId();
 
 		if (pdg == 11 && motherId == -1 && richRing->GetRecFlag() == 3 &&
 				mcIdSts == mcIdRich && mcIdRich != -1 &&
@@ -766,7 +765,7 @@ void CbmRichElectronsQa::DiffElandPi()
 		CbmRichRing* ring = (CbmRichRing*)fRichRings->At(richIndex);
 		if (!ring) continue;
 
-		CbmStsTrackMatch* stsTrackMatch = (CbmStsTrackMatch*)fStsTrackMatches->At(stsIndex);
+		CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*)fStsTrackMatches->At(stsIndex);
 		if (!stsTrackMatch) continue;
 		CbmRichRingMatch* richRingMatch = (CbmRichRingMatch*)fRichRingMatches->At(richIndex);
 		if (!richRingMatch) continue;
@@ -834,9 +833,9 @@ void CbmRichElectronsQa::DiffElandPi()
 		if (trdIndex == -1) continue;
 		CbmTrdTrack* trdTrack = (CbmTrdTrack*)fTrdTracks->At(trdIndex);
 		if (!trdTrack)continue;
-		CbmTrdTrackMatch* trdTrackMatch = (CbmTrdTrackMatch*)fTrdTrackMatches->At(trdIndex);
+		CbmTrackMatch* trdTrackMatch = (CbmTrackMatch*)fTrdTrackMatches->At(trdIndex);
 		if (!trdTrackMatch)continue;
-		Int_t mcIdTrd = trdTrackMatch->GetMCTrackID();
+		Int_t mcIdTrd = trdTrackMatch->GetMCTrackId();
 
 		//electrons
 		if (pdg == 11 && motherId == -1 && ring->GetRecFlag() == 3 &&

@@ -28,7 +28,7 @@
 #pragma link C++ class CbmStsHit+;
 #pragma link C++ class CbmStsPoint+;
 #pragma link C++ class CbmStsTrack+;
-#pragma link C++ class CbmStsTrackMatch+;
+//#pragma link C++ class CbmStsTrackMatch+;
 
 #pragma link C++ class CbmRichPoint+;
 #pragma link C++ class CbmRichHit+;
@@ -46,7 +46,7 @@
 #pragma link C++ class CbmTrdHit+;
 #pragma link C++ class CbmTrdPoint+;
 #pragma link C++ class CbmTrdTrack+;
-#pragma link C++ class CbmTrdTrackMatch+;
+//#pragma link C++ class CbmTrdTrackMatch+;
 
 #pragma link C++ class CbmTofHit+;
 #pragma link C++ class CbmTofPoint+;

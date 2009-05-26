@@ -12,17 +12,17 @@
 #pragma link C++ class  CbmL1TrdTrackFinderSts+;
 #pragma link C++ class  CbmL1TrackMerger+;
 #pragma link C++ class  CbmL1TofMerger+;
-#pragma link C++ class  CbmL1MuchFinder+;
-#pragma link C++ class  CbmL1MuchHit+;
-#pragma link C++ class  CbmL1MuchTrack+;
-#pragma link C++ class  CbmL1MuchFinderQa+;
+//#pragma link C++ class  CbmL1MuchFinder+;
+//#pragma link C++ class  CbmL1MuchHit+;
+//#pragma link C++ class  CbmL1MuchTrack+;
+//#pragma link C++ class  CbmL1MuchFinderQa+;
 #pragma link C++ class  CbmL1RichRingQa+;
 #pragma link C++ class  CbmL1TrdTracklet+;
 #pragma link C++ class  CbmL1TrdTracklet4+;
 #pragma link C++ class  CbmL1CATrdTrackFinderSA+;
-#pragma link C++ class  CbmL1SttHit+;
-#pragma link C++ class  CbmL1SttTrackFinder+;
-#pragma link C++ class  CbmL1SttTrack+;
+//#pragma link C++ class  CbmL1SttHit+;
+//#pragma link C++ class  CbmL1SttTrackFinder+;
+//#pragma link C++ class  CbmL1SttTrack+;
 
 #endif
 

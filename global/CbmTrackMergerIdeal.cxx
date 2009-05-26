@@ -7,8 +7,7 @@
 #include "CbmGlobalTrack.h"
 
 #include "FairRootManager.h"
-#include "CbmStsTrackMatch.h"
-#include "CbmTrdTrackMatch.h"
+#include "CbmTrackMatch.h"
 
 #include "TClonesArray.h"
 
@@ -21,7 +20,7 @@ using std::map;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmTrackMergerIdeal::CbmTrackMergerIdeal() { 
+CbmTrackMergerIdeal::CbmTrackMergerIdeal() {
   fVerbose = 1;
 }
 // -------------------------------------------------------------------------
@@ -83,8 +82,8 @@ Int_t CbmTrackMergerIdeal::DoMerge(TClonesArray* stsTracks,
   Int_t nSts    = 0;
   Int_t nTrd    = 0;
   Int_t iMC     = 0;
-  CbmStsTrackMatch* stsMatch = NULL;
-  CbmTrdTrackMatch* trdMatch = NULL;
+  CbmTrackMatch* stsMatch = NULL;
+  CbmTrackMatch* trdMatch = NULL;
 
   // Create map from TrdTrack index to StsTrack index
   map<Int_t, Int_t> trdStsMap;
@@ -114,13 +113,13 @@ Int_t CbmTrackMergerIdeal::DoMerge(TClonesArray* stsTracks,
     }
   }
 
-  if (fVerbose>1) cout << endl << "-I- CbmTrackMergerIdeal: " << nSts 
+  if (fVerbose>1) cout << endl << "-I- CbmTrackMergerIdeal: " << nSts
 		       << " StsTracks, " << nTrd << " TrdTracks" << endl;
 
   // Loop over TrdTracks and fill map to MCTrack index
   for (Int_t iTrd=0; iTrd<nTrd; iTrd++) {
-    trdMatch = (CbmTrdTrackMatch*) fTrdMatch->At(iTrd);
-    iMC = trdMatch->GetMCTrackID();
+    trdMatch = (CbmTrackMatch*) fTrdMatch->At(iTrd);
+    iMC = trdMatch->GetMCTrackId();
     if ( ! trdMatch ) {
       cout << "-W- CbmTrackMergerIdeal::DoMerge: "
 	   << "Empty TrdTrackMatch at position " << iTrd << endl;
@@ -137,13 +136,13 @@ Int_t CbmTrackMergerIdeal::DoMerge(TClonesArray* stsTracks,
 
   // Loop over STS tracks, create Global track and attach TrdTrack
   for (Int_t iSts=0; iSts<nSts; iSts++) {
-    stsMatch = (CbmStsTrackMatch*) fStsMatch->At(iSts);
+    stsMatch = (CbmTrackMatch*) fStsMatch->At(iSts);
     if ( ! stsMatch ) {
       cout << "-W- CbmTrackMergerIdeal::DoMerge: "
 	   << "Empty StsTrackMatch at position " << iSts << endl;
       continue;
     }
-    CbmGlobalTrack* gTrack 
+    CbmGlobalTrack* gTrack
       = new((*glbTracks)[nGlb++]) CbmGlobalTrack();
     gTrack->SetStsTrackIndex(iSts);
     iMC = stsMatch->GetMCTrackId();
@@ -156,7 +155,7 @@ Int_t CbmTrackMergerIdeal::DoMerge(TClonesArray* stsTracks,
   if (fVerbose>1) {
     cout << "-I- CbmTrackMergerIdeal: " << nGlb
 	 << " GlobalTracks created from StsTracks" << endl;
-    cout << "-I- CbmTrackMergerIdeal: " << nMerged 
+    cout << "-I- CbmTrackMergerIdeal: " << nMerged
 	 << " StsTracks merged with TrdTracks" << endl;
   }
 
@@ -164,7 +163,7 @@ Int_t CbmTrackMergerIdeal::DoMerge(TClonesArray* stsTracks,
   Int_t nTrdOnly = 0;
   for (Int_t iTrd=0; iTrd<nTrd; iTrd++) {
     if ( trdStsMap.find(iTrd) == trdStsMap.end() ) {
-      CbmGlobalTrack* gTrack 
+      CbmGlobalTrack* gTrack
 	= new ((*glbTracks)[nGlb++]) CbmGlobalTrack();
       gTrack->SetTrdTrackIndex(iTrd);
       nTrdOnly++;
@@ -173,7 +172,7 @@ Int_t CbmTrackMergerIdeal::DoMerge(TClonesArray* stsTracks,
   if (fVerbose>1) {
     cout << "-I- CbmTrackMergerIdeal: " << nTrdOnly
 	 << " GlobalTracks created from TrdTracks" << endl;
-    cout << "-I- CbmTrackMergerIdeal: Total " << nGlb 
+    cout << "-I- CbmTrackMergerIdeal: Total " << nGlb
 	 << " GlobalTracks created" << endl;
   }
 
@@ -182,7 +181,7 @@ Int_t CbmTrackMergerIdeal::DoMerge(TClonesArray* stsTracks,
 }
 // -------------------------------------------------------------------------
 
-	
-      
-      
+
+
+
 

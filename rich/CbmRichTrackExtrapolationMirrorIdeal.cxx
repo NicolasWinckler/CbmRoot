@@ -32,7 +32,7 @@
 #include "FairTrackParam.h"
 #include "CbmMCTrack.h"
 #include "CbmStsTrack.h"
-#include "CbmStsTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmGlobalTrack.h"
 #include "FairRootManager.h"
 
@@ -158,15 +158,15 @@ Int_t CbmRichTrackExtrapolationMirrorIdeal::DoExtrapolate(TClonesArray *gTrackAr
   }
 
    CbmStsTrack*      pSTStr = NULL;
-   CbmStsTrackMatch* pTrackMatch = NULL;
+   CbmTrackMatch* pTrackMatch = NULL;
    CbmRichPoint*     pMirror = NULL;
 
    // some default variables
    Double_t tx,ty,qp;
-   Double_t charge = 1.;   
+   Double_t charge = 1.;
    TMatrixFSym covMat(5);
    for(Int_t i=0;i<5;i++) for(Int_t j=0; j<=i; j++) covMat(i,j) = 0;
-   covMat(0,0) = covMat(1,1) = covMat(2,2) = covMat(3,3) = covMat(4,4) = 1.e-4; 
+   covMat(0,0) = covMat(1,1) = covMat(2,2) = covMat(3,3) = covMat(4,4) = 1.e-4;
 
    TVector3 pos, mom;
 
@@ -185,7 +185,7 @@ Int_t CbmRichTrackExtrapolationMirrorIdeal::DoExtrapolate(TClonesArray *gTrackAr
      Nsts = pSTStr->GetNStsHits() + pSTStr->GetNMvdHits();
      if (fVerbose > 1) cout << "-I- Ideal-Trackextrapolation, iTrack(global), iTrack(STS), Nsts: " << iTrack << " " << idSTS << " " << Nsts << endl;
      if ( Nsts >= fMinNsts) {
-       pTrackMatch = (CbmStsTrackMatch*)fTrackMatchArray->At(idSTS);
+       pTrackMatch = (CbmTrackMatch*)fTrackMatchArray->At(idSTS);
        if (!pTrackMatch) cout << "no matched track!: fake?"<< endl;
        if (!pTrackMatch) continue;
        Int_t iMCmatch = pTrackMatch->GetMCTrackId();
@@ -206,7 +206,7 @@ Int_t CbmRichTrackExtrapolationMirrorIdeal::DoExtrapolate(TClonesArray *gTrackAr
 	             ((CbmMCTrack*)fMCTrackArray->At(iMCmatch))->GetPdgCode() << " " <<
 		      endl;
 	     }
-    
+
 	 }
        }
 

@@ -30,7 +30,6 @@
 #include "FairRootManager.h"
 #include "FairTrackParam.h"
 #include "CbmGlobalTrack.h"
-#include "CbmStsTrackMatch.h"
 #include "CbmRichRingMatch.h"
 #include "CbmTrdTrack.h"
 
@@ -82,7 +81,7 @@ CbmRichRingTrackAssignClosestD::~CbmRichRingTrackAssignClosestD()
 //------------------------------------------------------------------------------
 
 // -----   Public method Init   --------------------------------------------
-void CbmRichRingTrackAssignClosestD::Init() 
+void CbmRichRingTrackAssignClosestD::Init()
 {
 	// Get and check FairRootManager
 	FairRootManager* ioman = FairRootManager::Instance();
@@ -124,11 +123,11 @@ void CbmRichRingTrackAssignClosestD::DoAssign(TClonesArray *pRingArray, TClonesA
 	Double_t xTrack, yTrack;
 	Double_t dist_RingTrack, rMin;
 	Int_t iTrackMin;
-	
+
 	vector<Int_t> trackIndex;
-	vector<Double_t> trackDist;	
+	vector<Double_t> trackDist;
 	trackIndex.resize(fNRings);
-	trackDist.resize(fNRings);	
+	trackDist.resize(fNRings);
 	for (UInt_t i = 0; i < trackIndex.size(); i++){
 		trackIndex[i] = -1;
 		trackDist[i] = 999.;
@@ -136,29 +135,29 @@ void CbmRichRingTrackAssignClosestD::DoAssign(TClonesArray *pRingArray, TClonesA
 	for (Int_t iIter = 0; iIter < 4; iIter++){
 		for (Int_t iRing=0; iRing < fNRings; iRing++) {
 			if (trackIndex[iRing] != -1) continue;
-			
+
 			pRing = (CbmRichRing*)pRingArray->At(iRing);
-		
+
 			if (pRing->GetNofHits() < fNpoints) continue;
-		
+
 			xRing = pRing->GetCenterX();
 			yRing = pRing->GetCenterY();
-		
+
 			rMin = 999.;
 			iTrackMin = -1;
-		
+
 			for (Int_t iTrack=0; iTrack < fNTracks; iTrack++) {
 				vector<Int_t>::iterator it = find(trackIndex.begin(), trackIndex.end(), iTrack);
 				if (it != trackIndex.end()) continue;
-				
+
 				pTrack = (FairTrackParam*)pTringArray->At(iTrack);
 				xTrack = pTrack->GetX();
 				yTrack = pTrack->GetY();
-		
+
 				if (xTrack == 0 && yTrack == 0) continue; // no projection to photodetector plane
-				  
+
 				//if (!IsTrdElectron(iTrack)) continue;
-	
+
 				dist_RingTrack = TMath::Sqrt( (xRing-xTrack)*(xRing-xTrack) +
 						(yRing-yTrack)*(yRing-yTrack) );
 
@@ -170,7 +169,7 @@ void CbmRichRingTrackAssignClosestD::DoAssign(TClonesArray *pRingArray, TClonesA
 			trackIndex[iRing] = iTrackMin;
 			trackDist[iRing] = rMin;
 		}//loop rings
-		
+
 		for (UInt_t i1 = 0; i1 < trackIndex.size(); i1++){
 			for (UInt_t i2 = 0; i2 < trackIndex.size(); i2++){
 				if (i1 == i2) continue;
@@ -184,9 +183,9 @@ void CbmRichRingTrackAssignClosestD::DoAssign(TClonesArray *pRingArray, TClonesA
 					}
 				}
 			}
-		}		
+		}
 	}//iIter
-	
+
 	// fill global tracks
 	for (UInt_t i = 0; i < trackIndex.size(); i++){
 		pRing = (CbmRichRing*)pRingArray->At(i);
@@ -203,16 +202,16 @@ Bool_t CbmRichRingTrackAssignClosestD::IsTrdElectron(Int_t iTrack)
 	CbmGlobalTrack* gTrack = (CbmGlobalTrack*)gTrackArray->At(iTrack);
 	Int_t trdIndex = gTrack->GetTrdTrackIndex();
 	if (trdIndex == -1) return false;
-	
+
 	CbmTrdTrack* trdTrack = (CbmTrdTrack*)fTrdTracks->At(trdIndex);
     if (!trdTrack)return false;
 
     if (trdTrack->GetPidANN() > -0.5) {
     	return true;
     }
-    
+
     return false;
-			
+
 }
 
 //------------------------------------------------------------------------------

@@ -175,7 +175,7 @@ void run_sim(Int_t nEvents = 50)
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
-  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
   FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
   primGen->AddGenerator(urqmdGen);
   FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, 5);

@@ -165,7 +165,7 @@ void run_sim_geotest(Int_t nEvents = 100)
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
-  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
 //  FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
 //  primGen->AddGenerator(urqmdGen);
   // ------------------------------------------------------------------------

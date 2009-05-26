@@ -43,7 +43,7 @@ void eloss_sim(Int_t nEvents = 200000)
   CbmFieldMap* magField = NULL;
   fRun->SetField(magField);
 
-  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
 
   Double_t minMom = 10.; //minimum momentum
   Double_t maxMom = 10.; //maximum momentum

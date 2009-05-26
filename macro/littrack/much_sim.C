@@ -142,7 +142,7 @@ void much_sim(Int_t nEvents = 100)
 	fRun->SetField(magField);
 
 	// ------------------------------------------------------------------------
-	FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+	CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
 
 	if (pluto == "yes") {
 		FairPlutoGenerator *plutoGen= new FairPlutoGenerator(plutoFile);

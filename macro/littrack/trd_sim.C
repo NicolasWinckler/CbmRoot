@@ -135,7 +135,7 @@ void trd_sim(Int_t nEvents = 1000)
 	// ------------------------------------------------------------------------
 
 	// ------------------------------------------------------------------------
-	FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+	CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
 
 	if (urqmd == "yes") {
 		FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);

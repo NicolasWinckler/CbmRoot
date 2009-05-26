@@ -148,7 +148,7 @@
 
 
     // -----   Create PrimaryGenerator   --------------------------------------
-    FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+    CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
 
     FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inUrqmdFile);
     primGen->AddGenerator(urqmdGen);

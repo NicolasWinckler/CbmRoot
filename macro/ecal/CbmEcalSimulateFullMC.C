@@ -178,7 +178,7 @@
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
-  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
   FairBoxGenerator* boxGen = new FairBoxGenerator(22, 1);
   boxGen->SetPtRange(1.,1.01);
   boxGen->SetThetaRange(4.,4.01);

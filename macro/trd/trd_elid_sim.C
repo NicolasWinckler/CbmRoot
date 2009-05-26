@@ -169,7 +169,7 @@ void trd_elid_sim(Int_t nEvents = 500)
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
-  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
   // ------------------------------------------------------------------------
   Int_t kfCode1=11;   // electrons
   Int_t kfCode2=-11;   // positrons

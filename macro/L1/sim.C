@@ -88,7 +88,7 @@
  // Create and Set Event Generator
  //-------------------------------
 
-  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
+  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
   fRun->SetGenerator(primGen);
 
  // Urqmd  Generator

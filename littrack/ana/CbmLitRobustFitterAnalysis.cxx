@@ -13,7 +13,7 @@
 #include "CbmStripHit.h"
 #include "CbmMuchTrack.h"
 //#include "CbmMuchHit.h"
-#include "CbmTrdHit.h"
+//#include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 #include "CbmStsTrack.h"
 #include "FairRootManager.h"
@@ -254,8 +254,8 @@ void CbmLitRobustFitterAnalysis::MatchTrdTracks(
 		std::map<Int_t, Int_t> matchMap;
 		Int_t nofHits = (*it)->GetNofHits();
 		for (Int_t iHit = 0; iHit < nofHits; iHit++) {
-			CbmTrdHit* hit = (CbmTrdHit*) fHits->At((*it)->GetHit(iHit)->GetRefId());
-			Int_t iPoint = hit->GetRefIndex();
+			CbmPixelHit* hit = (CbmPixelHit*) fHits->At((*it)->GetHit(iHit)->GetRefId());
+			Int_t iPoint = hit->GetRefId();
 			if (iPoint < 0) {
 				matchMap[-1]++;
 				continue;

@@ -51,7 +51,7 @@ Int_t CbmLitTrdTrackFinderWeight::DoFind(
 	TrackPtrVector trackSeeds;
 	TrackPtrVector foundTracks;
 
-	CbmLitConverter::TrdHitArrayToPixelHitVector(hitArray, hits);
+	CbmLitConverter::HitArrayToHitVector(hitArray, hits);
 	DefaultCreateTrackSeeds(fTrackSeedsArray, trackSeeds, fLayout, fPDG);
 
 	CbmLitTrackFinderWeight::DoFind(hits, trackSeeds, foundTracks);

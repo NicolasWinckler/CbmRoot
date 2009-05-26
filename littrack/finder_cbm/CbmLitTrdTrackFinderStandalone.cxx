@@ -121,11 +121,11 @@ void CbmLitTrdTrackFinderStandalone::CreateHits(
 
 	for(Int_t iHit = 0; iHit < nofHits; iHit++) {
 
-		CbmHit* hit = (CbmHit*) hitArray->At(iHit);
+		CbmPixelHit* hit = (CbmPixelHit*) hitArray->At(iHit);
 	    if(NULL == hit) continue;
 
 	    CbmLitPixelHit* litHit = new CbmLitPixelHit;
-	    CbmLitConverter::TrkHitToLitPixelHit(hit, iHit, litHit);
+	    CbmLitConverter::PixelHitToLitPixelHit(hit, iHit, litHit);
 	    hits.push_back(litHit);
 	}
 }

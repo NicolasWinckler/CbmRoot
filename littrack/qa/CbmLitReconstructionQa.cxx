@@ -185,7 +185,7 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 		if (isMuchOk) muchMCId = muchTrackMatch->GetMCTrackId();
 		if (isTofOk) {
 			CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(tofId);
-			CbmTofPoint* tofPoint = (CbmTofPoint*) fTofPoints->At(tofHit->GetRefIndex());
+			CbmTofPoint* tofPoint = (CbmTofPoint*) fTofPoints->At(tofHit->GetRefId());
 			tofMCId = tofPoint->GetTrackID();
 		}
 

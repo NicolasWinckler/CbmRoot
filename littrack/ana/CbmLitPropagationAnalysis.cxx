@@ -20,7 +20,7 @@
 #include "CbmStripHit.h"
 #include "CbmGlobalTrack.h"
 #include "CbmStsTrack.h"
-#include "CbmTrdHit.h"
+//#include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 #include "CbmMuchTrack.h"
 #include "CbmMuchDigi.h"
@@ -312,9 +312,9 @@ void CbmLitPropagationAnalysis::GlobalTrackToLitTrack(
 		CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTrdTracks->At(trdId);
 		for (int iHit = 0; iHit < trdTrack->GetNofTrdHits(); iHit++) {
 			Int_t index = trdTrack->GetTrdHitIndex(iHit);
-			CbmTrdHit* hit = (CbmTrdHit*) fTrdHits->At(index);
+			CbmPixelHit* hit = (CbmPixelHit*) fTrdHits->At(index);
 			CbmLitPixelHit litHit;
-			CbmLitConverter::TrkHitToLitPixelHit(hit, index, &litHit);
+			CbmLitConverter::PixelHitToLitPixelHit(hit, index, &litHit);
 			litTrack->AddHit(&litHit);
 		}
 	}

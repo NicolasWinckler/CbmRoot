@@ -95,21 +95,21 @@ void CbmLitConverter::StripHitToLitStripHit(
 	litHit->SetRefId(index);
 }
 
-void CbmLitConverter::TrkHitToLitPixelHit(
-		const CbmHit* trkHit,
-		Int_t index,
-		CbmLitPixelHit* litHit)
-{
-	litHit->SetX(trkHit->GetX());
-	litHit->SetY(trkHit->GetY());
-	litHit->SetZ(trkHit->GetZ());
-	litHit->SetDx(trkHit->GetDx());
-	litHit->SetDy(trkHit->GetDy());
-	litHit->SetDz(trkHit->GetDz());
-	litHit->SetDxy(trkHit->GetCovXY());
-	litHit->SetPlaneId(trkHit->GetStationNr() - 1);
-	litHit->SetRefId(index);
-}
+//void CbmLitConverter::TrkHitToLitPixelHit(
+//		const CbmHit* trkHit,
+//		Int_t index,
+//		CbmLitPixelHit* litHit)
+//{
+//	litHit->SetX(trkHit->GetX());
+//	litHit->SetY(trkHit->GetY());
+//	litHit->SetZ(trkHit->GetZ());
+//	litHit->SetDx(trkHit->GetDx());
+//	litHit->SetDy(trkHit->GetDy());
+//	litHit->SetDz(trkHit->GetDz());
+//	litHit->SetDxy(trkHit->GetCovXY());
+//	litHit->SetPlaneId(trkHit->GetStationNr() - 1);
+//	litHit->SetRefId(index);
+//}
 
 //void CbmLitConverter::MuchHitToLitStripHit(
 //		CbmMuchHit* muchHit,
@@ -244,7 +244,7 @@ void CbmLitConverter::TrdTrackToLitTrack(
 		Int_t index = trdTrack->GetTrdHitIndex(iHit);
 		CbmTrdHit* hit = (CbmTrdHit*) hits->At(index);
 		CbmLitPixelHit litHit;
-		TrkHitToLitPixelHit(hit, index, &litHit);
+		PixelHitToLitPixelHit(hit, index, &litHit);
 		litTrack->AddHit(&litHit);
 	}
 
@@ -423,20 +423,20 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
 	}
 }
 
-void CbmLitConverter::TrdHitArrayToPixelHitVector(
-		const TClonesArray* hits,
-		HitPtrVector& litHits)
-{
-	Int_t nofHits = hits->GetEntriesFast();
-	for(Int_t iHit = 0; iHit < nofHits; iHit++) {
-		CbmHit* hit = (CbmHit*) hits->At(iHit);
-	    if(NULL == hit) continue;
-	    CbmLitPixelHit* litHit = new CbmLitPixelHit;
-	    TrkHitToLitPixelHit(hit, iHit, litHit);
-	    litHit->SetDetectorId(kLITTRD);
-	    litHits.push_back(litHit);
-	}
-}
+//void CbmLitConverter::TrdHitArrayToPixelHitVector(
+//		const TClonesArray* hits,
+//		HitPtrVector& litHits)
+//{
+//	Int_t nofHits = hits->GetEntriesFast();
+//	for(Int_t iHit = 0; iHit < nofHits; iHit++) {
+//		CbmHit* hit = (CbmHit*) hits->At(iHit);
+//	    if(NULL == hit) continue;
+//	    CbmLitPixelHit* litHit = new CbmLitPixelHit;
+//	    TrkHitToLitPixelHit(hit, iHit, litHit);
+//	    litHit->SetDetectorId(kLITTRD);
+//	    litHits.push_back(litHit);
+//	}
+//}
 
 void CbmLitConverter::TofHitArrayToPixelHitVector(
 		const TClonesArray* hits,
@@ -471,7 +471,9 @@ void CbmLitConverter::HitArrayToHitVector(
 	    	CbmLitPixelHit* litHit = new CbmLitPixelHit();
 	    	CbmPixelHit* pixelHit = static_cast<CbmPixelHit*>(hit);
 	    	PixelHitToLitPixelHit(pixelHit, iHit, litHit);
-	    	litHit->SetDetectorId(kLITMUCH);
+	    	if (hit->GetType() == kMUCHPIXELHIT) litHit->SetDetectorId(kLITMUCH);
+	    	if (hit->GetType() == kTRDHIT) litHit->SetDetectorId(kLITTRD);
+	    	if (hit->GetType() == kTOFHIT) litHit->SetDetectorId(kLITTOF);
 	    	litHits.push_back(litHit);
 	    }
 	}

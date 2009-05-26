@@ -155,7 +155,7 @@ void CbmLitFindGlobalTracksIdeal::FillMapTof()
 	for(Int_t iTofHit = 0; iTofHit < nofTofHits; iTofHit++) {
 		CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(iTofHit);
 		if (tofHit == NULL) continue;
-		CbmTofPoint* tofPoint = (CbmTofPoint*) fTofMCPoints->At(tofHit->GetRefIndex());
+		CbmTofPoint* tofPoint = (CbmTofPoint*) fTofMCPoints->At(tofHit->GetRefId());
 		if (tofPoint == NULL) continue;
 		Int_t mcId = tofPoint->GetTrackID();
 		if(mcId == -1) continue;

@@ -15,7 +15,7 @@
 #include "CbmStsTrack.h"
 #include "CbmTrdTrack.h"
 #include "CbmMuchTrack.h"
-#include "CbmTrdHit.h"
+//#include "CbmTrdHit.h"
 //#include "CbmMuchHit.h"
 #include "CbmTofHit.h"
 #include "CbmGlobalTrack.h"
@@ -189,7 +189,7 @@ void CbmLitFindGlobalTracks::ConvertInputData()
 		std::cout << "-I- Number of MUCH hits: " << fLitMuchHits.size() << std::endl;
 	}
 	if (fIsTrd) {
-		CbmLitConverter::TrdHitArrayToPixelHitVector(fTrdHits, fLitTrdHits);
+		CbmLitConverter::HitArrayToHitVector(fTrdHits, fLitTrdHits);
 		std::cout << "-I- Number of TRD hits: " << fLitTrdHits.size() << std::endl;
 	}
 	if (fIsTof) {

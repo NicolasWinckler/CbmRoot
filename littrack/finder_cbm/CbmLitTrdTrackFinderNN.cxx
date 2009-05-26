@@ -50,7 +50,7 @@ Int_t CbmLitTrdTrackFinderNN::DoFind(
 	TrackPtrVector trackSeeds;
 	TrackPtrVector foundTracks;
 
-	CbmLitConverter::TrdHitArrayToPixelHitVector(hitArray, hits);
+	CbmLitConverter::HitArrayToHitVector(hitArray, hits);
 	DefaultCreateTrackSeeds(fTrackSeedsArray, trackSeeds, fLayout, fPDG);
 
 	CbmLitTrackFinderNN::DoFind(hits, trackSeeds, foundTracks);

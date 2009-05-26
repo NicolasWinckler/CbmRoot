@@ -106,6 +106,7 @@ void CbmMuchGeoScheme::InitModules() {
             CbmMuchModule* mod = side->GetModule(iModule);
             if (!mod) continue;
             assert(iModule == GetModuleIndex(mod->GetDetectorId()));
+            assert(iStation == GetStationIndex(mod->GetDetectorId()));
             if(!mod->InitModule()) continue;
             modules.push_back(mod);
           } // Modules
@@ -699,8 +700,11 @@ Int_t CbmMuchGeoScheme::Intersect(Float_t x, Float_t y, Float_t dx, Float_t dy,
 vector<CbmMuchModule*> CbmMuchGeoScheme::GetModules(){
   vector<CbmMuchModule*> modules;
   for(Int_t iStation =0; iStation < GetNStations(); ++iStation){
-    for(vector<CbmMuchModule*>::iterator it=GetModules(iStation).begin(); it!=GetModules(iStation).end(); it++){
-      modules.push_back(*it);
+    vector<CbmMuchModule*> stationModules = GetModules(iStation);
+    for(vector<CbmMuchModule*>::iterator it=stationModules.begin(); it!=stationModules.end(); it++){
+      CbmMuchModule* module = (*it);
+      modules.push_back(module);
+      assert(GetStationIndex(module->GetDetectorId()) == iStation);
     }
   }
   return modules;

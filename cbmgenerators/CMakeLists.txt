@@ -24,6 +24,7 @@ CbmDirectPhotonGenerator.cxx
 CbmEcalGenerator.cxx
 CbmHsdLvmGenerator.cxx
 CbmUnigenGenerator.cxx
+CbmUrqmdGenerator.cxx
 URun.cxx
 UEvent.cxx
 UParticle.cxx

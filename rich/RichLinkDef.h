@@ -15,7 +15,7 @@
 #pragma link C++ class  CbmRichExtrapolateTracks+;
 #pragma link C++ class  CbmGeoRich+;
 #pragma link C++ class  CbmRichRingFinderHough+;
-//#pragma link C++ class  CbmRichRingFinderTrack+;
+#pragma link C++ class  CbmRichRingFinderTrack+;
 #pragma link C++ class  CbmRichRingFinderIdeal+;
 #pragma link C++ class  CbmRichFindRings+;
 #pragma link C++ class  CbmRichRingFitterCircle+;

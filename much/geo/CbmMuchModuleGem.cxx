@@ -30,8 +30,6 @@ CbmMuchModuleGem::CbmMuchModuleGem(): CbmMuchModule() {
   fDetectorType = 1;
   fGridDx = fGridDy = 0.0;
   fGridCols = fGridRows = 0;
-  fPoints = NULL;
-  fHits = NULL;
   fClusters = NULL;
 }
 // -------------------------------------------------------------------------

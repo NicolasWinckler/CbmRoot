@@ -20,7 +20,7 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "CbmTrackMatch.h"
-#include "CbmTrdTrackMatch.h"
+//#include "CbmTrdTrackMatch.h"
 #include "CbmGeoMuchPar.h"
 #include "FairMCPoint.h"
 #include "CbmMuchDigiMatch.h"
@@ -95,15 +95,15 @@ void CbmLitRobustFitterAnalysis::Exec(
 {
 	CreateTrackArrays();
 
-	if(fDetId == kMUCH)	MatchTracks(fLitTracks[0], fLitMuchTrackMatches[0]);
-	if(fDetId == kTRD)	MatchTracks(fLitTracks[0], fLitTrdTrackMatches[0]);
+	if(fDetId == kMUCH)	MatchMuchTracks(fLitTracks[0], fLitMuchTrackMatches[0]);
+	if(fDetId == kTRD)	MatchTrdTracks(fLitTracks[0], fLitTrdTrackMatches[0]);
 	std::cout << "MatchTracks finished" << std::endl;
 	FillHistograms(0);
 	std::cout << "FillHistograms(0) finished" << std::endl;
 
 	TestFitter(1);
-	if(fDetId == kMUCH)	MatchTracks(fLitTracks[1], fLitMuchTrackMatches[1]);
-	if(fDetId == kTRD)	MatchTracks(fLitTracks[1], fLitTrdTrackMatches[1]);
+	if(fDetId == kMUCH)	MatchMuchTracks(fLitTracks[1], fLitMuchTrackMatches[1]);
+	if(fDetId == kTRD)	MatchTrdTracks(fLitTracks[1], fLitTrdTrackMatches[1]);
 	FillHistograms(1);
 
 	DeleteTrackArrays();
@@ -125,7 +125,7 @@ void CbmLitRobustFitterAnalysis::FillHistograms(
 			nofTrue = trackMatch->GetNofTrueHits();
 			nofFalse = trackMatch->GetNofWrongHits() + trackMatch->GetNofFakeHits();
 		} else {
-			CbmTrdTrackMatch* trackMatch = fLitTrdTrackMatches[id][i];
+			CbmTrackMatch* trackMatch = fLitTrdTrackMatches[id][i];
 			nofTrue = trackMatch->GetNofTrueHits();
 			nofFalse = trackMatch->GetNofWrongHits() + trackMatch->GetNofFakeHits();
 		}
@@ -207,7 +207,7 @@ void CbmLitRobustFitterAnalysis::CreateTrackArrays()
 	}
 }
 
-void CbmLitRobustFitterAnalysis::MatchTracks(
+void CbmLitRobustFitterAnalysis::MatchMuchTracks(
 		TrackPtrVector& tracks,
 		std::vector<CbmTrackMatch*>& matches)
 {
@@ -246,9 +246,9 @@ void CbmLitRobustFitterAnalysis::MatchTracks(
 	} // Track loop
 }
 
-void CbmLitRobustFitterAnalysis::MatchTracks(
+void CbmLitRobustFitterAnalysis::MatchTrdTracks(
 		TrackPtrVector& tracks,
-		std::vector<CbmTrdTrackMatch*>& matches)
+		std::vector<CbmTrackMatch*>& matches)
 {
 	for (TrackPtrIterator it = tracks.begin(); it < tracks.end(); it++) {
 		std::map<Int_t, Int_t> matchMap;
@@ -275,7 +275,7 @@ void CbmLitRobustFitterAnalysis::MatchTracks(
 		Int_t nofWrong = nofHits - nofTrue - nofFake;
 		Int_t nofMcTracks = matchMap.size() - 1;
 
-		matches.push_back(new CbmTrdTrackMatch(bestMcTrackId, nofTrue, nofWrong, nofFake, nofMcTracks));
+		matches.push_back(new CbmTrackMatch(bestMcTrackId, nofTrue, nofWrong, nofFake, nofMcTracks));
 
 	} // Track loop
 }

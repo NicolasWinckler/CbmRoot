@@ -16,8 +16,6 @@
 #include <string>
 #include <vector>
 
-class CbmStsTrackMatch;
-class CbmTrdTrackMatch;
 class CbmTrackMatch;
 class CbmMCTrack;
 class TClonesArray;
@@ -109,14 +107,14 @@ private:
      * @param trackMatch STS track match
      */
 	Bool_t CheckStsTrackQuality(
-			CbmStsTrackMatch* trackMatch);
+			CbmTrackMatch* trackMatch);
 
 	/**
      * Checks TRD track quality based on fQuota value.
      * @param trackMatch TRD track match
      */
 	Bool_t CheckTrdTrackQuality(
-			CbmTrdTrackMatch* trackMatch);
+			CbmTrackMatch* trackMatch);
 
 	/**
      * Checks MUCH track quality based on fQuota value.
@@ -221,7 +219,7 @@ private:
 	TClonesArray* fGlobalTracks; // CbmGlobalTrack array
 	TClonesArray* fStsMatches; // CbmStsTrackMatch array
 	TClonesArray* fMuchMatches; // CbmTrackMatch array
-	TClonesArray* fTrdMatches; // CbmTrdTrackMatch array
+	TClonesArray* fTrdMatches; // CbmTrackMatch array
 	TClonesArray* fTofPoints; // CbmTofPoint array
 	TClonesArray* fTofHits; // CbmTofHit array
 

@@ -8,9 +8,7 @@
 #include "CbmLitEnvironment.h"
 
 #include "CbmGlobalTrack.h"
-#include "CbmStsTrackMatch.h"
 #include "CbmTrackMatch.h"
-#include "CbmTrdTrackMatch.h"
 #include "CbmTofHit.h"
 #include "CbmTofPoint.h"
 #include "CbmMCTrack.h"
@@ -164,14 +162,14 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 		Bool_t isTofOk = tofId > -1 && fIsTof;
 
 		// check the quality of track segments
-		CbmStsTrackMatch* stsTrackMatch;
+		CbmTrackMatch* stsTrackMatch;
 		if (isStsOk) {
-			stsTrackMatch = (CbmStsTrackMatch*) fStsMatches->At(stsId);
+			stsTrackMatch = (CbmTrackMatch*) fStsMatches->At(stsId);
 			isStsOk = CheckStsTrackQuality(stsTrackMatch);
 		}
-		CbmTrdTrackMatch* trdTrackMatch;
+		CbmTrackMatch* trdTrackMatch;
 		if (isTrdOk) {
-			trdTrackMatch = (CbmTrdTrackMatch*) fTrdMatches->At(trdId);
+			trdTrackMatch = (CbmTrackMatch*) fTrdMatches->At(trdId);
 			isTrdOk = CheckTrdTrackQuality(trdTrackMatch);
 		}
 		CbmTrackMatch* muchTrackMatch;
@@ -183,7 +181,7 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 		// Get MC indices of track segments
 		Int_t stsMCId = -1, trdMCId = -1, muchMCId = -1, tofMCId = -1;
 		if (isStsOk) stsMCId = stsTrackMatch->GetMCTrackId();
-		if (isTrdOk) trdMCId = trdTrackMatch->GetMCTrackID();
+		if (isTrdOk) trdMCId = trdTrackMatch->GetMCTrackId();
 		if (isMuchOk) muchMCId = muchTrackMatch->GetMCTrackId();
 		if (isTofOk) {
 			CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(tofId);
@@ -210,7 +208,7 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 }
 
 Bool_t CbmLitReconstructionQa::CheckStsTrackQuality(
-		CbmStsTrackMatch* trackMatch)
+		CbmTrackMatch* trackMatch)
 {
 	Int_t mcId = trackMatch->GetMCTrackId();
 	if(mcId < 0) return false;
@@ -225,9 +223,9 @@ Bool_t CbmLitReconstructionQa::CheckStsTrackQuality(
 }
 
 Bool_t CbmLitReconstructionQa::CheckTrdTrackQuality(
-		CbmTrdTrackMatch* trackMatch)
+		CbmTrackMatch* trackMatch)
 {
-	Int_t mcId = trackMatch->GetMCTrackID();
+	Int_t mcId = trackMatch->GetMCTrackId();
 	if(mcId < 0) return false;
 
 	Int_t nofTrue = trackMatch->GetNofTrueHits();

@@ -89,8 +89,8 @@ private:
 	// Pointers to data arrays
 	TClonesArray* fMCTracks; // CbmMCTrack
 	TClonesArray* fStsMatches; // CbmStsTrackMatch
-	TClonesArray* fMuchMatches; // CbmMuchTrackMatch
-	TClonesArray* fTrdMatches; // CbmTrdTrackMatch
+	TClonesArray* fMuchMatches; // CbmTrackMatch
+	TClonesArray* fTrdMatches; // CbmTrackMatch
 	TClonesArray* fTofMCPoints; // CbmTofPoint
 	TClonesArray* fTofHits; // CbmTofHit
 	TClonesArray* fGlobalTracks; //output: CbmGlobalTrack

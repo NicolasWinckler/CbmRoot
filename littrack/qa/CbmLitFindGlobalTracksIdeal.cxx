@@ -7,8 +7,6 @@
 #include "CbmLitFindGlobalTracksIdeal.h"
 #include "CbmLitEnvironment.h"
 
-#include "CbmStsTrackMatch.h"
-#include "CbmTrdTrackMatch.h"
 #include "CbmTrackMatch.h"
 #include "CbmTofHit.h"
 #include "CbmTofPoint.h"
@@ -116,7 +114,7 @@ void CbmLitFindGlobalTracksIdeal::FillMapSts()
 	fMcStsMap.clear();
 	Int_t nofStsTracks = fStsMatches->GetEntriesFast();
 	for(Int_t iStsTrack = 0; iStsTrack < nofStsTracks; iStsTrack++) {
-		CbmStsTrackMatch* stsTrackMatch = (CbmStsTrackMatch*) fStsMatches->At(iStsTrack);
+		CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*) fStsMatches->At(iStsTrack);
 		if (stsTrackMatch == NULL) continue;
 		Int_t mcId = stsTrackMatch->GetMCTrackId();
 		if(mcId == -1) continue;
@@ -129,9 +127,9 @@ void CbmLitFindGlobalTracksIdeal::FillMapTrd()
 	fMcTrdMap.clear();
 	Int_t nofTrdTracks = fTrdMatches->GetEntriesFast();
 	for(Int_t iTrdTrack = 0; iTrdTrack < nofTrdTracks; iTrdTrack++) {
-		CbmTrdTrackMatch* trdTrackMatch = (CbmTrdTrackMatch*) fTrdMatches->At(iTrdTrack);
+		CbmTrackMatch* trdTrackMatch = (CbmTrackMatch*) fTrdMatches->At(iTrdTrack);
 		if (trdTrackMatch == NULL) continue;
-		Int_t mcId = trdTrackMatch->GetMCTrackID();
+		Int_t mcId = trdTrackMatch->GetMCTrackId();
 		if(mcId == -1) continue;
 		fMcTrdMap.insert(std::pair<Int_t, Int_t>(mcId, iTrdTrack));
 	}

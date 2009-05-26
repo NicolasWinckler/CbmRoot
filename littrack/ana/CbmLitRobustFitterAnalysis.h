@@ -10,7 +10,7 @@
 
 class CbmLitTrack;
 class CbmTrackMatch;
-class CbmTrdTrackMatch;
+//class CbmTrdTrackMatch;
 class TList;
 class TH1D;
 class TH2D;
@@ -40,19 +40,19 @@ protected:
 			Int_t id);
 	void TestFitter(
 			Int_t id);
-	void MatchTracks(
+	void MatchMuchTracks(
 			TrackPtrVector& tracks,
 			std::vector<CbmTrackMatch*>& matches);
-	void MatchTracks(
+	void MatchTrdTracks(
 			TrackPtrVector& tracks,
-			std::vector<CbmTrdTrackMatch*>& matches);
+			std::vector<CbmTrackMatch*>& matches);
 private:
 	CbmLitDetectorLayout fLayout;
 	DetectorId fDetId;
 	Int_t fNofVars;
 	std::vector<TrackPtrVector> fLitTracks;
 	std::vector<std::vector<CbmTrackMatch*> > fLitMuchTrackMatches;
-	std::vector<std::vector<CbmTrdTrackMatch*> > fLitTrdTrackMatches;
+	std::vector<std::vector<CbmTrackMatch*> > fLitTrdTrackMatches;
 
 	Int_t fNofPlanes;
 

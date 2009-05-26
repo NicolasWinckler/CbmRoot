@@ -5,12 +5,9 @@
 #include "CbmStripHit.h"
 #include "CbmMuchTrack.h"
 #include "CbmTrackMatch.h"
-//#include "CbmMuchHit.h"
 #include "CbmTrdTrack.h"
-#include "CbmTrdTrackMatch.h"
 #include "CbmTrdHit.h"
 #include "CbmStsTrack.h"
-#include "CbmStsTrackMatch.h"
 #include "FairTrackParam.h"
 #include "FairMCPoint.h"
 #include "CbmMCTrack.h"
@@ -145,7 +142,7 @@ void CbmLitRecQa::ProcessStsTracks()
   if (fNormType == 2) { // Normalization to number of Sts AND Much tracks
 	fEvNofStsTracks = fStsTracks->GetEntriesFast();
     for(Int_t iStsTrack = 0; iStsTrack < fEvNofStsTracks; iStsTrack++) {
-      CbmStsTrackMatch* stsTrackM = (CbmStsTrackMatch*) fStsMatches->At(iStsTrack);
+      CbmTrackMatch* stsTrackM = (CbmTrackMatch*) fStsMatches->At(iStsTrack);
       if (stsTrackM == NULL) continue;
 
       Int_t mcId = stsTrackM->GetMCTrackId();
@@ -216,9 +213,9 @@ void CbmLitRecQa::ProcessTrdTracks()
   for (Int_t iRec = 0; iRec < fEvNofRecTracks; iRec++) {
 
 	  CbmTrdTrack* recTrack = (CbmTrdTrack*) fRecTracks->At(iRec);
-	  CbmTrdTrackMatch* recMatch = (CbmTrdTrackMatch*) fRecMatches->At(iRec);
+	  CbmTrackMatch* recMatch = (CbmTrackMatch*) fRecMatches->At(iRec);
 	  if (recTrack == NULL || recMatch == NULL) continue;
-	  Int_t mcIdRec = recMatch->GetMCTrackID();
+	  Int_t mcIdRec = recMatch->GetMCTrackId();
 
 	  if (mcIdRec == -1){
       	  fEvNofGhosts++;

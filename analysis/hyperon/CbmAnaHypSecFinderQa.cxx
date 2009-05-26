@@ -707,7 +707,7 @@ void CbmAnaHypSecFinderQa::Performance(){
   Int_t nRC = rcTrackArray->GetEntriesFast();
   Int_t nRC_good = 0;
   for (Int_t i=0;i<nRC;i++){
-    CbmStsTrackMatch* match = (CbmStsTrackMatch*) fTrackMatch->At(i);
+    CbmTrackMatch* match = (CbmTrackMatch*) fTrackMatch->At(i);
     if (fTools->GetTrackId(match)>=0) nRC_good++;
   }
   Int_t nRC_fake = nRC-nRC_good;
@@ -716,7 +716,7 @@ void CbmAnaHypSecFinderQa::Performance(){
   Int_t nSR_good = 0;
   for (Int_t i=0;i<nSR;i++){
     CbmStsTrack* track = (CbmStsTrack*) newTrackArray->At(i);
-    CbmStsTrackMatch* match = (CbmStsTrackMatch*) fTrackMatch->At(i);
+    CbmTrackMatch* match = (CbmTrackMatch*) fTrackMatch->At(i);
     printf("chi2=%8.2f",track->GetChi2()/track->GetNDF());
     if (fTools->GetTrackId(match)>=0) {
       nSR_good++;

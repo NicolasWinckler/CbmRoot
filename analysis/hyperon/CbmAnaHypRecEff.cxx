@@ -12,7 +12,7 @@
 
 #include "CbmMCTrack.h"
 #include "CbmStsTrack.h"
-#include "CbmStsTrackMatch.h"
+#include "CbmTrackMatch.h"
 
 using std::vector;
 using std::map;
@@ -121,7 +121,7 @@ void CbmAnaHypRecEff::Exec(Option_t* option){
   // Reconstructed
   Double_t quota = 0.7;
   for (Int_t i=0;i<fRCMatch->GetEntriesFast();i++){
-      CbmStsTrackMatch* match = (CbmStsTrackMatch*) fRCMatch->At(i);
+      CbmTrackMatch* match = (CbmTrackMatch*) fRCMatch->At(i);
       Int_t mcId = match->GetMCTrackId();
       if(mcId<0 || quota > (Double_t) match->GetNofTrueHits()
           /(match->GetNofTrueHits() + match->GetNofWrongHits()

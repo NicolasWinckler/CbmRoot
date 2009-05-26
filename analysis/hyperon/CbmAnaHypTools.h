@@ -13,7 +13,7 @@ class CbmKFTrack;
 class CbmVertex;
 class TVector3;
 class TTree;
-class CbmStsTrackMatch;
+class CbmTrackMatch;
 
 using std::vector;
 using std::map;
@@ -24,7 +24,7 @@ public:
   CbmAnaHypTools(){};
   ~CbmAnaHypTools(){};
   void Init();
-  Int_t GetTrackId(CbmStsTrackMatch* match);
+  Int_t GetTrackId(CbmTrackMatch* match);
   Int_t GetTrackId(CbmHit* hit);
   void CopyTrack(CbmStsTrack* trackIn, CbmStsTrack* trackOut);
   void SetFlags();

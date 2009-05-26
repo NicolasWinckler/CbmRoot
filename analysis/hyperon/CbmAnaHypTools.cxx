@@ -12,7 +12,7 @@
 #include "CbmVertex.h"
 #include "CbmKFFieldMath.h"
 #include "CbmKFParticle.h"
-#include "CbmStsTrackMatch.h"
+#include "CbmTrackMatch.h"
 
 void CbmAnaHypTools::Init(){
   FairRootManager* ioman = FairRootManager::Instance();
@@ -28,7 +28,7 @@ void CbmAnaHypTools::Init(){
   fPV->Position(pv);
 }
 
-Int_t CbmAnaHypTools::GetTrackId(CbmStsTrackMatch* match){
+Int_t CbmAnaHypTools::GetTrackId(CbmTrackMatch* match){
   Int_t trackId = match->GetMCTrackId();
   if (trackId<=0) return -1;
   Int_t nTrue  = match->GetNofTrueHits();
@@ -56,7 +56,7 @@ Int_t CbmAnaHypTools::GetTrackId(CbmHit* hit){
 void CbmAnaHypTools::SetFlags(){
   for (Int_t i=0;i<fListRCTracks->GetEntriesFast();i++){
     CbmStsTrack* track = (CbmStsTrack*) fListRCTracks->At(i);
-    CbmStsTrackMatch* match = (CbmStsTrackMatch*) fTrackMatch->At(i);
+    CbmTrackMatch* match = (CbmTrackMatch*) fTrackMatch->At(i);
     CbmKFTrack kf(*track);
     kf.Extrapolate(pv[2]);
     Double_t* T=kf.GetTrack();
@@ -72,7 +72,7 @@ void CbmAnaHypTools::SetFlags(){
 void CbmAnaHypTools::SetFlagsOnly(){
   for (Int_t i=0;i<fListRCTracks->GetEntriesFast();i++){
     CbmStsTrack* track = (CbmStsTrack*) fListRCTracks->At(i);
-    CbmStsTrackMatch* match = (CbmStsTrackMatch*) fTrackMatch->At(i);
+    CbmTrackMatch* match = (CbmTrackMatch*) fTrackMatch->At(i);
     Int_t flag = GetTrackId(match);
     track->SetFlag(flag);
   }

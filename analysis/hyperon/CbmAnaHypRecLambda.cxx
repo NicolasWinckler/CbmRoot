@@ -12,7 +12,7 @@
 
 #include "FairRootManager.h"
 #include "CbmStsTrack.h"
-#include "CbmStsTrackMatch.h"
+#include "CbmTrackMatch.h"
 #include "CbmVertex.h"
 #include "CbmKF.h"
 #include "CbmKFSecondaryVertexFinder.h"
@@ -176,7 +176,7 @@ void CbmAnaHypRecLambda::Exec(Option_t* option){
 Int_t CbmAnaHypRecLambda::GetMCTrack(Int_t iRC){
     Double_t quota=0.7;
 
-    CbmStsTrackMatch* match = (CbmStsTrackMatch*) fRCMatch->At(iRC);
+    CbmTrackMatch* match = (CbmTrackMatch*) fRCMatch->At(iRC);
     Int_t mcId = match->GetMCTrackId();
     if(  mcId<0 || quota > (Double_t) match->GetNofTrueHits()
          /(match->GetNofTrueHits()

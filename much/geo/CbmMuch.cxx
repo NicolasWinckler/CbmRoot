@@ -132,6 +132,8 @@ Bool_t CbmMuch::ProcessHits(FairVolume* vol) {
       TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
       fTime, fLength, fELoss);
 
+    //if (fPosOut.Z()>250) printf("%f\n",fPosOut.Z());
+
     // Increment number of MuchPoints for this track
     CbmStack* stack = (CbmStack*) gMC->GetStack();
     stack->AddPoint(kMUCH);
@@ -358,34 +360,7 @@ void CbmMuch::ConstructGeometry() {
       TGeoVolume* voLayer = new TGeoVolume(layerName,shLayer,air);
       gGeoManager->Node(layerName,0,stName,0.,0.,layerZ,0,kTRUE,buf,0);
 
-
-      // Straws
-
-//      if (station->GetDetectorType()==2) {
-//        if (station->IsModuleDesign()){
-//          Fatal("CbmMuch","Station %i - detailed module design not implemented for straws",st);
-//        }
-//
-//        for (Int_t s=0;s<2;s++){
-//          CbmMuchLayerSide* side = layer->GetSide(s);
-//          for (Int_t m=0;m<side->GetNModules();m++){
-//            Char_t cside = (s==1) ? 'b' : 'f';
-//            CbmMuchModule* module = side->GetModule(m);
-//            TVector3 pos = module->GetPosition();
-//            TVector3 size = module->GetSize();
-//            TGeoBBox* shActiveBox = new TGeoBBox(Form("shActiveBoxSt%il%i",st+1,l+1),size[0]/2.,size[1]/2.,size[2]/2.);
-//            TGeoShape* shActive = new TGeoCompositeShape(Form("shActiveHoleSt%il%i%cm%02i",st+1,l,cside,m+1),Form("shActiveBoxSt%il%i-muchst%ihole",st+1,l+1,st+1));
-//            TString activeName = Form("muchstation%ilayer%i%cactive%03i",st+1,l+1,cside,m+1);
-//            TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);
-//            gGeoManager->Node(activeName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);
-//            AddSensitiveVolume(voActive);
-//          }
-//        }
-//        continue;
-//      }
-
-      // GEMs etc.
-
+      // Create support
       TString  supName1  = Form("muchstation%ilayer%isupport1",st+1,l+1);
       TString  supName2  = Form("muchstation%ilayer%isupport2",st+1,l+1);
       TGeoVolume* voSup1 = new TGeoVolume(supName1,shSup,supportMat);
@@ -393,27 +368,32 @@ void CbmMuch::ConstructGeometry() {
       gGeoManager->Node(supName1,0,layerName,+supDx/2.,0.,0.,    0,kTRUE,buf,0);
       gGeoManager->Node(supName2,0,layerName,-supDx/2.,0.,0.,krotZ,kTRUE,buf,0);
 
-      if (!station->IsModuleDesign()){ // simple design
-        CbmMuchLayerSide* side = layer->GetSide(0);
-        CbmMuchModule* module = side->GetModule(0);
-        TVector3 pos = module->GetPosition();
-        TVector3 size = module->GetSize();
-        TGeoBBox* shActiveBox = new TGeoBBox(Form("shActiveBoxSt%il%i",st+1,l+1),size[0]/2.,size[1]/2.,size[2]/2.);
-        TGeoShape* shActive = new TGeoCompositeShape(Form("shActiveHoleSt%il%im%02i",st+1,1,1),Form("shActiveBoxSt%il%i-muchst%ihole",st+1,l+1,st+1));
-        TString activeName = Form("muchstation%ilayer%i%cactive%03i",st+1,l+1,'f',1);
-        TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);
-        gGeoManager->Node(activeName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);
-        AddSensitiveVolume(voActive);
-        continue;
-      }
-      // Create detailed modules
+      // Create layer sides
       for (Int_t s=0;s<2;s++){
         CbmMuchLayerSide* side = layer->GetSide(s);
+        Char_t cside = (s==1) ? 'b' : 'f';
+
+        // Create modules
         for (Int_t m=0;m<side->GetNModules();m++){
           CbmMuchModule* module = side->GetModule(m);
           TVector3 pos = module->GetPosition();
+          TVector3 size = module->GetSize();
           Double_t cutRadius = module->GetCutRadius();
-          Char_t cside = (s==1) ? 'b' : 'f';
+
+          if (!station->IsModuleDesign()){ // simple design
+            TGeoBBox* shActiveBox = new TGeoBBox(Form("shActiveBoxSt%il%i",st+1,l+1),size[0]/2.,size[1]/2.,size[2]/2.);
+            TGeoShape* shActive = new TGeoCompositeShape(Form("shActiveHoleSt%il%i%cm%02i",st+1,l,cside,m+1),Form("shActiveBoxSt%il%i-muchst%ihole",st+1,l+1,st+1));
+            TString activeName = Form("muchstation%ilayer%i%cactive%03i",st+1,l+1,cside,m+1);
+            TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);
+            gGeoManager->Node(activeName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);
+            AddSensitiveVolume(voActive);
+            continue;
+          }
+
+          if (module->GetDetectorType()==2) {
+            Fatal("CbmMuch","Station %i - detailed module design not implemented for straws",st);
+          }
+
           TString activeName = Form("muchstation%ilayer%i%cactive%03i",st+1,l+1,cside,m+1);
           TString spacerName = Form("muchstation%ilayer%i%cspacer%03i",st+1,l+1,cside,m+1);
           TGeoShape* shActive = shActiveFull;

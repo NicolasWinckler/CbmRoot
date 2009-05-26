@@ -666,7 +666,7 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationStraw(Int_t st){
     TVector3 posB = TVector3(0, 0, +sideDz + layerGlobalZ0);
     TVector3 size = TVector3(2 * rmax, 2 * rmax, fStrawLz);
     layer->GetSideF()->AddModule(new CbmMuchModuleStraws(st, l, 0, 0, posF, size, rmin));
-    layer->GetSideB()->AddModule(new CbmMuchModuleStraws(st, l, 0, 0, posB, size, rmin));
+    layer->GetSideB()->AddModule(new CbmMuchModuleStraws(st, l, 1, 0, posB, size, rmin));
 
     layer->SetSupportDx(rmax);
     layer->SetSupportDy(rmax);

@@ -48,7 +48,7 @@ rich/CbmRichHit.cxx
 rich/CbmRichPoint.cxx
 rich/CbmRichRingMatch.cxx 
 
-much/CbmMuchHit.cxx 
+much/CbmMuchPixelHit.cxx 
 much/CbmMuchPoint.cxx
 much/CbmMuchCluster.cxx 
 much/CbmMuchDigi.cxx

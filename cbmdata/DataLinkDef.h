@@ -35,7 +35,7 @@
 #pragma link C++ class CbmRichRingMatch+;
 
 #pragma link C++ class CbmMuchCluster+;
-#pragma link C++ class CbmMuchHit+;
+#pragma link C++ class CbmMuchPixelHit+;
 #pragma link C++ class CbmMuchPoint+;
 #pragma link C++ class CbmMuchDigi+;
 #pragma link C++ class CbmMuchDigiMatch+;

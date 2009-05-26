@@ -29,16 +29,16 @@ void run_reco(Int_t nEvents = 800)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.mc.root";
+  TString inFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0000.mc.root";
 
   // Parameter file
-  TString parFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.params.root";
+  TString parFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0000.params.root";
 
   // STS digitisation file
-  TString stsDigiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";//"sts_standard.digi.par";
+  TString stsDigiFile = "sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.reco.root";
+  TString outFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0000.reco.root";
 
 
   // In general, the following parts need not be touched
@@ -91,31 +91,6 @@ void run_reco(Int_t nEvents = 800)
   run->SetInputFile(inFile);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
-
-
-
-
-  // =========================================================================
-  // ===                     MVD local reconstruction                      ===
-  // =========================================================================
-
-  /*
-  // -----   MVD Hitproducer   -----------------------------------------------
-  CbmMvdHitProducer* mvdHitProd = new CbmMvdHitProducer("MVDHitProducer", 0,
-  			  			       iVerbose);
-  run->AddTask(mvdHitProd);
-  // -------------------------------------------------------------------------
-  */
-
-
-
-  // ===                 End of MVD local reconstruction                   ===
-  // =========================================================================
-
-
-
-
-
 
   // =========================================================================
   // ===                      STS local reconstruction                     ===
@@ -176,10 +151,10 @@ void run_reco(Int_t nEvents = 800)
   Int_t trdNFoils    = 130;      // number of polyetylene foils
   Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
   Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
-  Bool_t simpleTR = kTRUE;       // use fast and simple version for TR 
+  Bool_t simpleTR = kTRUE;       // use fast and simple version for TR
                                  // production
-  
-  CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils, 
+
+  CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,
                                        trdDFoils, trdDGap);
 
   // -----   TRD hit producer   ----------------------------------------------
@@ -187,9 +162,9 @@ void run_reco(Int_t nEvents = 800)
   // Resolutions in y - station and angle dependent [mum]
   Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
   Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
-  Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };  
+  Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
-  CbmTrdHitProducerSmearing* trdHitProd = new 
+  CbmTrdHitProducerSmearing* trdHitProd = new
            CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
 
   trdHitProd->SetSigmaX(trdSigmaX);
@@ -363,7 +338,6 @@ void run_reco(Int_t nEvents = 800)
   //--------------------------------------------------------------------------
 
   //-------------------- RICH Ring Fitting -----------------------------------
-  // B-field configuration
   CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, 1, richGeoType);
   CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
   run->AddTask(fitRings);

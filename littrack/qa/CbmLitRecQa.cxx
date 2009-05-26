@@ -63,8 +63,8 @@ InitStatus CbmLitRecQa::Init()
     if (fDetId == kMUCH) {
     	fMCPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
     	if (NULL == fMCPoints ) Fatal("Init","No MuchPoint array!");
-    	fRecHits = (TClonesArray*) ioman->GetObject("MuchHit");
-    	if (NULL == fRecHits) Fatal("Init", "No MuchHit array!");
+    	fRecHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
+    	if (NULL == fRecHits) Fatal("Init", "No MuchPixelHit array!");
     	fRecTracks = (TClonesArray*) ioman->GetObject("MuchTrack");
     	if (NULL == fRecTracks) Fatal("Init","No MuchTrack array!");
     	fRecMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");

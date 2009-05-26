@@ -1,13 +1,10 @@
-// -------------------------------------------------------------------------
-// -----                   CbmMuchFindTracks source file                -----
-// -----                  Created 01/10/07  by A. Lebedev               -----
-// -----                                                               -----
-// -------------------------------------------------------------------------
-
+/** CbmMuchFindTracks.cxx
+ *@author A.Lebedev <Andrey.Lebedev@gsi.de>
+ *@since 2007
+ **/
 #include "CbmMuchFindTracks.h"
 
 #include "CbmMuchTrackFinder.h"
-#include "CbmMuchPixelHit.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
@@ -16,86 +13,60 @@
 #include "TClonesArray.h"
 
 #include <iostream>
-using std::cout;
-using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmMuchFindTracks::CbmMuchFindTracks()
 {
-  fFinder         = NULL;
-  fMuchHitArray    = NULL;
-  fTrackArray     = NULL;
-  fNofTracks      = 0;
+	fFinder = NULL;
+	fMuchPixelHitArray = NULL;
+	fTrackArray = NULL;
+	fNofTracks = 0;
 }
 // -------------------------------------------------------------------------
-
-
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchFindTracks::CbmMuchFindTracks(const char* name,
-				   const char* title,
-				   CbmMuchTrackFinder* finder)
+CbmMuchFindTracks::CbmMuchFindTracks(
+		const char* name,
+		const char* title,
+		CbmMuchTrackFinder* finder)
 : FairTask(name)
 {
-  fFinder         = finder;
-  fMuchHitArray    = NULL;
-  fTrackArray     = NULL;
-  fNofTracks      = 0;
+	fFinder = finder;
+	fMuchPixelHitArray = NULL;
+	fTrackArray = NULL;
+	fNofTracks = 0;
 }
 // -------------------------------------------------------------------------
-
-
 
 // -----   Destructor   ----------------------------------------------------
 CbmMuchFindTracks::~CbmMuchFindTracks()
 {
-  fTrackArray->Delete();
+	fTrackArray->Delete();
 }
 // -------------------------------------------------------------------------
-
-
 
 // -----   Public method Init (abstract in base class)  --------------------
 InitStatus CbmMuchFindTracks::Init()
 {
+	// Check for Track finder
+	if (fFinder == NULL) Fatal("CbmMuchFindTracks::Init", "No track finder selected!");
 
-  // Check for Track finder
-  if (! fFinder) {
-    cout << "-W- CbmMuchFindTracks::Init: No track finder selected!" << endl;
-    return kERROR;
-  }
+	// Get and check FairRootManager
+	FairRootManager* ioman = FairRootManager::Instance();
+	if (ioman == NULL) Fatal("CbmMuchFindTracks::Init", "RootManager not instantised!");
 
-  // Get and check FairRootManager
-  FairRootManager* ioman = FairRootManager::Instance();
-  if (! ioman) {
-    cout << "-E- CbmMuchFindTracks::Init: "
-	 << "RootManager not instantised!" << endl;
-    return kFATAL;
-  }
+	// Get MUCH pixel hit Array
+	fMuchPixelHitArray = (TClonesArray*) ioman->GetObject("MuchPixelHit");
+	if (fMuchPixelHitArray == NULL) Fatal("CbmMuchFindTracks::Init", "No MuchPixelHit array!");
 
-  // Get TRD hit Array
-  fMuchHitArray
-    = (TClonesArray*) ioman->GetObject("MuchPixelHit");
-  if ( ! fMuchHitArray) {
-    cout << "-W- CbmMuchFindTracks::Init: No MuchHit array!"
-	 << endl;
-    return kERROR;
-  }
+	// Create and register MuchTrack array
+	fTrackArray = new TClonesArray("CbmMuchTrack",100);
+	ioman->Register("MuchTrack", "Much", fTrackArray, kTRUE);
 
-  // Create and register MuchTrack array
-  fTrackArray = new TClonesArray("CbmMuchTrack",100);
-  ioman->Register("MuchTrack", "Much", fTrackArray, kTRUE);
-
-
-  // Call the Init method of the track finder
-  fFinder->Init();
-
-  return kSUCCESS;
-
+	fFinder->Init();
+	return kSUCCESS;
 }
 // -------------------------------------------------------------------------
-
-
 
 // -----  SetParContainers -------------------------------------------------
 void CbmMuchFindTracks::SetParContainers()
@@ -113,19 +84,15 @@ void CbmMuchFindTracks::SetParContainers()
 }
 // -------------------------------------------------------------------------
 
-
-
 // -----   Public method Exec   --------------------------------------------
-void CbmMuchFindTracks::Exec(Option_t* opt)
+void CbmMuchFindTracks::Exec(
+		Option_t* opt)
 {
   fTrackArray->Delete();
 
-  fNofTracks = fFinder->DoFind(fMuchHitArray, fTrackArray);
-
+  fNofTracks = fFinder->DoFind(fMuchPixelHitArray, fTrackArray);
 }
 // -------------------------------------------------------------------------
-
-
 
 // -----   Public method Finish   ------------------------------------------
 void CbmMuchFindTracks::Finish()
@@ -134,7 +101,4 @@ void CbmMuchFindTracks::Finish()
 }
 // -------------------------------------------------------------------------
 
-
-
-
-ClassImp(CbmMuchFindTracks)
+ClassImp(CbmMuchFindTracks);

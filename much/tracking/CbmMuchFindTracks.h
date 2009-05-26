@@ -1,24 +1,16 @@
-// -------------------------------------------------------------------------
-// -----                   CbmMuchFindTracks header file               -----
-// -----                  Created 01/10/07  by A. Lebedev              -----
-// -----                                                               -----
-// -------------------------------------------------------------------------
-
-
-/** CbmMuchFindTracks
+/** CbmMuchFindTracks.h
  *@author A.Lebedev <Andrey.Lebedev@gsi.de>
+ *@since 2007
  **
  ** Task class for track finding in the MUCH.
- ** Input: TClonesArray of CbmMuchHit
+ ** Input: TClonesArray of CbmMuchPixelHit
  ** Output: TClonesArray of CbmMuchTrack
  **
  ** Uses as track finding algorithm classes derived from CbmMuchTrackFinder.
  **/
 
-
-#ifndef CbmMuchFindTracks_H
-#define CbmMuchFindTracks_H 1
-
+#ifndef CBMMUCHFINDTRACKS_H
+#define CBMMUCHFINDTRACKS_H 1
 
 #include "FairTask.h"
 
@@ -27,63 +19,50 @@ class TClonesArray;
 
 class CbmMuchFindTracks : public FairTask
 {
+public:
+	/** Default constructor **/
+	CbmMuchFindTracks();
 
- public:
+	/** Standard constructor
+	*@param name   Name of class
+	*@param title  Task title
+	*@param finder Pointer to STS track finder concrete class
+	**/
+	CbmMuchFindTracks(
+			const char* name,
+			const char* title = "FairTask",
+			CbmMuchTrackFinder* finder = NULL);
 
-  /** Default constructor **/
-  CbmMuchFindTracks();
+	/** Destructor **/
+	virtual ~CbmMuchFindTracks();
 
+	/** Initialisation **/
+	virtual InitStatus Init();
 
-  /** Standard constructor 
-   **
-   *@param name   Name of class
-   *@param title  Task title
-   *@param finder Pointer to STS track finder concrete class
-   **/
-  CbmMuchFindTracks( const char* name, 
-                     const char* title = "FairTask", 
-                     CbmMuchTrackFinder* finder = NULL);
+	/** Task execution **/
+	virtual void Exec(
+			Option_t* opt);
 
+	/** Finish at the end **/
+	virtual void Finish();
 
-  /** Destructor **/
-  virtual ~CbmMuchFindTracks();
+	/** SetParContainers **/
+	virtual void SetParContainers();
 
+	/** Accessors **/
+	CbmMuchTrackFinder* GetFinder() { return fFinder; };
+	Int_t GetNofTracks()           { return fNofTracks; };
 
-  /** Initialisation at beginning of each event **/
-  virtual InitStatus Init();
+	/** Set concrete track finder **/
+	void UseFinder(CbmMuchTrackFinder* finder) { fFinder = finder; };
 
-  /** Task execution **/
-  virtual void Exec(Option_t* opt);
+private:
+	CbmMuchTrackFinder* fFinder;       // Pointer to TrackFinder concrete class
+	TClonesArray* fMuchPixelHitArray;  // Input array of MUCH pixel hits
+	TClonesArray* fTrackArray;         // Output array of CbmTrdTracks
+	Int_t fNofTracks;                  // Number of tracks created
 
-
-  /** Finish at the end **/
-  virtual void Finish();
-
-
-  /** SetParContainers **/
-  virtual void SetParContainers();
-
-
-  /** Accessors **/
-  CbmMuchTrackFinder* GetFinder() { return fFinder; };
-  Int_t GetNofTracks()           { return fNofTracks; };
-
-
-  /** Set concrete track finder **/
-  void UseFinder(CbmMuchTrackFinder* finder) { fFinder = finder; };
-
-
-
- private:
-
-  CbmMuchTrackFinder* fFinder;    // Pointer to TrackFinder concrete class
-  TClonesArray* fMuchHitArray;    // Input array of TRD hits
-  TClonesArray* fTrackArray;     // Output array of CbmTrdTracks 
-  Int_t fNofTracks;              // Number of tracks created
-
-
-  ClassDef(CbmMuchFindTracks,1);
-
+	ClassDef(CbmMuchFindTracks,1);
 };
 
 #endif

@@ -6,6 +6,7 @@
 
 #pragma link C++ class CbmDirectPhotonGenerator+;
 #pragma link C++ class CbmEcalGenerator+;
+#pragma link C++ class CbmHsdLvmGenerator+;
 #pragma link C++ class CbmUnigenGenerator+;
 #pragma link C++ class URun+;
 #pragma link C++ class UEvent+;

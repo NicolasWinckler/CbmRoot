@@ -1,11 +1,12 @@
-# Create a library called "libCbmBase" which includes the source files given in
+# Create a library called "libCbmGenerators" which includes the source files given in
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
-#${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/base 
+${CBMROOT_SOURCE_DIR}/cbmbase
+${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmgenerators
 )
 
@@ -21,6 +22,7 @@ link_directories( ${LINK_DIRECTORIES})
 set(CBMGENERATORS_SRCS
 CbmDirectPhotonGenerator.cxx
 CbmEcalGenerator.cxx
+CbmHsdLvmGenerator.cxx
 CbmUnigenGenerator.cxx
 URun.cxx
 UEvent.cxx

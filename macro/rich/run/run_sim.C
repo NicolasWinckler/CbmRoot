@@ -7,7 +7,7 @@
 //
 // --------------------------------------------------------------------------
 
-void run_sim(Int_t nEvents = 50)
+void run_sim(Int_t nEvents = 800)
 {
 
   // ========================================================================
@@ -16,11 +16,12 @@ void run_sim(Int_t nEvents = 50)
   // ----- Paths and file names  --------------------------------------------
  // TString inDir   = gSystem->Getenv("VMCWORKDIR");
  // TString inFile  = inDir + "/input/urqmd.ftn14";
-  TString inDir   = "/d/cbm03/urqmd/auau/25gev/centr";
-  TString inFile  = inDir + "/urqmd.auau.25gev.centr.0006.ftn14";
+ // TString inDir   = "/d/cbm03/urqmd/auau/25gev/centr";
+//  TString inFile  = inDir + "/urqmd.auau.25gev.centr.0006.ftn14";
+    TString inFile = "/d/cbm02/slebedev/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
   TString outDir  = "data";
-  TString outFile = "/d/cbm02/slebedev/rich/FEB09/real/auau.25gev.centr.0001.mc.root";;
-  TString parFile = "/d/cbm02/slebedev/rich/FEB09/real/auau.25gev.centr.0001.params.root";;
+  TString outFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0000.mc.root";;
+  TString parFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0000.params.root";;
 
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
@@ -31,7 +32,7 @@ void run_sim(Int_t nEvents = 50)
   mvdGeom = "";
   TString stsGeom    = "sts_standard.geo";
   TString richGeom   = "rich_standard.geo";
-  TString trdGeom    = "trd_monolithic.geo";
+  TString trdGeom    = "trd_standard.geo";
   TString tofGeom    = "tof_standard.geo";
  // TString ecalGeom   = "ecal_FastMC.geo";
 

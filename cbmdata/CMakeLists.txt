@@ -18,15 +18,16 @@ ${ROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(CBMDATA_SRCS
+CbmBaseHit.cxx
 CbmDigi.cxx
 CbmHit.cxx
 CbmMCEvent.cxx
 CbmMCTrack.cxx
+CbmPixelHit.cxx
+CbmStack.cxx
+CbmStripHit.cxx
 CbmTrack.cxx
 CbmTrackMatch.cxx
-CbmStack.cxx
-CbmBaseHit.cxx
-CbmStripHit.cxx
 
 mvd/CbmMvdDetectorId.cxx
 mvd/CbmMvdCluster.cxx 

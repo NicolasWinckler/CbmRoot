@@ -298,17 +298,17 @@ void CbmRichRingQa::Exec(Option_t* option)
         continue;
         }
         Double_t radPos;
-        if (hit->Y() > 0){
-            radPos = sqrt((hit->X() - 0)*(hit->X() - 0) +
-                          (hit->Y() - 110)*(hit->Y() - 110));
+        if (hit->GetY() > 0){
+            radPos = sqrt((hit->GetX() - 0)*(hit->GetX() - 0) +
+                          (hit->GetY() - 110)*(hit->GetY() - 110));
         } else {
-            radPos = sqrt((hit->X() - 0)*(hit->X() - 0) +
-                          (hit->Y() + 110)* (hit->Y() + 110));
+            radPos = sqrt((hit->GetX() - 0)*(hit->GetX() - 0) +
+                          (hit->GetY() + 110)* (hit->GetY() + 110));
         }
         fh_HitsRadPos->Fill(radPos);
 
-        fh_HitsXY->Fill(hit->X(), hit->Y());
-        iPoint = hit->GetRefIndex();
+        fh_HitsXY->Fill(hit->GetX(), hit->GetY());
+        iPoint = hit->GetRefId();
 
         if ( iPoint < 0 )continue; // Fake or background hit
         //Get the MC Point corresponding to the hit

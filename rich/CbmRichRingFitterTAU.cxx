@@ -153,8 +153,8 @@ void CbmRichRingFitterTAU::DoFit(CbmRichRing *pRing)
 
 	for(i = 0; i < fNhits; i++) {
 		CbmRichHit* hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
-		x.push_back(hit->X());
-		y.push_back(hit->Y());
+		x.push_back(hit->GetX());
+		y.push_back(hit->GetY());
 		a.push_back(hit->GetAmplitude());
 //		cout<<"x =  "<<x[i]<<";   y="<<y[i]<<";   a="<<a[i]<<endl;
 	}

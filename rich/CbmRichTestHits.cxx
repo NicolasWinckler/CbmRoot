@@ -202,7 +202,7 @@ void CbmRichTestHits::Exec(Option_t* option)
 
     Int_t nHits = fRichHitArray->GetEntriesFast();
     Int_t nMCTracks = fMCTrackArray->GetEntriesFast();
-    
+
 
     for(Int_t iHit=0; iHit<nHits; iHit++){
 
@@ -222,11 +222,11 @@ void CbmRichTestHits::Exec(Option_t* option)
 	fh_Det1ev_zoom->Fill(position.X(),position.Y());
       }
 
-      if ((pHit->GetRefIndex()) < 0) {
+      if ((pHit->GetRefId()) < 0) {
          Nnoise++;
          continue;     // noise hit!
 	 }
-      pPoint = (CbmRichPoint*)fMCRichPointArray->At(pHit->GetRefIndex());
+      pPoint = (CbmRichPoint*)fMCRichPointArray->At(pHit->GetRefId());
       pTrack = (CbmMCTrack*)fMCTrackArray->At(pPoint->GetTrackID());
       Int_t gcode = pTrack->GetPdgCode();
       if (gcode != 50000050) Nhad++;

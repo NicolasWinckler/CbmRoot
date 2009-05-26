@@ -70,8 +70,8 @@ Int_t CbmRichRingSelectImpl::GetNofHitsOnRing(CbmRichRing* ring){
 		hit = (CbmRichHit*)fHitsArray->At(ring->GetHit(iH));
 		if (!hit) continue;
 
-		Double_t x =hit->X();
-		Double_t y = hit->Y();
+		Double_t x =hit->GetX();
+		Double_t y = hit->GetY();
 
         Double_t d1 = TMath::Abs(A*x*x + B*x*y + C*y*y + D*x + E*y + F);
         t1 = 2*A*x + B*y + D;
@@ -99,11 +99,11 @@ Double_t CbmRichRingSelectImpl::GetAngle(CbmRichRing* ring){
     vector<Double_t> phi;
     alpha.reserve(nHits + 3);
     phi.reserve(nHits + 3);
-    if (nHits < 3) return 999.;
+    if (nHits < 4) return 999.;
     for(Int_t iHit = 0; iHit < nHits; iHit++){
 		hit = (CbmRichHit*)fHitsArray->At(ring->GetHit(iHit));
-		xHit = hit->X();
-		yHit = hit->Y();
+		xHit = hit->GetX();
+		yHit = hit->GetY();
 
 		if (!hit) continue;
 		if (yHit-yRing == 0) return 999.;

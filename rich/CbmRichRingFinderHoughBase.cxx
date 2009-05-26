@@ -124,12 +124,12 @@ Int_t CbmRichRingFinderHoughBase::DoFind(TClonesArray* rHitArray,
 		CbmRichHit * hit = (CbmRichHit*) rHitArray->At(iHit);
 		if (hit) {
 			CbmRichHoughHit tempPoint;
-			tempPoint.fX = hit->X();
-			tempPoint.fY = hit->Y();
-			tempPoint.fX2plusY2 = hit->X() * hit->X() + hit->Y() * hit->Y();
+			tempPoint.fX = hit->GetX();
+			tempPoint.fY = hit->GetY();
+			tempPoint.fX2plusY2 = hit->GetX() * hit->GetX() + hit->GetY() * hit->GetY();
 			tempPoint.fId = iHit;
 			tempPoint.fIsUsed = false;
-			if (hit->Y() >= 0)
+			if (hit->GetY() >= 0)
 				UpH.push_back(tempPoint);
 			else
 				DownH.push_back(tempPoint);

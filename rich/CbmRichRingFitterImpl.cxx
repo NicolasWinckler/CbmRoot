@@ -64,7 +64,7 @@ void CbmRichRingFitterImpl::CalcChi2(CbmRichRing* pRing)
     }
 
     Double_t Xd2, Yd2;
-    Double_t ChiSquare = 0.;
+    Double_t chi2 = 0.;
     Double_t Xcenter, Ycenter, Radius;
 
     Radius  = pRing->GetRadius();
@@ -75,18 +75,15 @@ void CbmRichRingFitterImpl::CalcChi2(CbmRichRing* pRing)
 
         CbmRichHit *hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
 
-		Xd2 = Xcenter - hit->X();
-		Yd2 = Ycenter - hit->Y();
+		Xd2 = Xcenter - hit->GetX();
+		Yd2 = Ycenter - hit->GetY();
 
 		Xd2 *= Xd2;
 		Yd2 *= Yd2;
 
 		Double_t d = TMath::Sqrt( Xd2 + Yd2 ) - Radius;
-        ChiSquare += d*d;
+        chi2 += d*d;
     }
-
-    if (fNhits == 3) cout << " -W- CbmRichRingFitterImpl: division by 0 " << endl;
-    Double_t chi2 = ChiSquare / (fNhits - 3);
 
     pRing->SetChi2(chi2);
 

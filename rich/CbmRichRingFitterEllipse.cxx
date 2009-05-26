@@ -78,8 +78,8 @@ void CbmRichRingFitterEllipse::DoFit(CbmRichRing *pRing)
     hitY.clear();
     for(Int_t i = 0; i < nofHits; i++) {
         hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
-        hitX.push_back(hit->X());
-        hitY.push_back(hit->Y());
+        hitX.push_back(hit->GetX());
+        hitY.push_back(hit->GetY());
     }
 
     std::vector<Double_t> fpar;

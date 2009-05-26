@@ -69,7 +69,6 @@ CbmRichRingFitterCOP::~CbmRichRingFitterCOP()
 }
 // -------------------------------------------------------------------------
 
-
 // -----   Public method DoFit   ------------------------------------------
 void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 {
@@ -115,8 +114,8 @@ void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 
   for(i = 0; i < fNhits; i++) {
      CbmRichHit* hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
-     Mx += hit->X();
-     My += hit->Y();
+     Mx += hit->GetX();
+     My += hit->GetY();
   }
 
     Mx /= M0;
@@ -127,8 +126,8 @@ void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 
     for (i = 0; i < fNhits; i++) {
         CbmRichHit* hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
-        Xi = hit->X() - Mx;
-        Yi = hit->Y() - My;
+        Xi = hit->GetX() - Mx;
+        Yi = hit->GetY() - My;
         Zi = Xi*Xi + Yi*Yi;
 
         Mxy += Xi*Yi;

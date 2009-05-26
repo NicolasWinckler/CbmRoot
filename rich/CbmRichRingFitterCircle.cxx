@@ -127,19 +127,19 @@ if (nHits < 3) {
 
     CbmRichHit* hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(iHit));
 
-    b1 += (hit->X()*hit->X() + hit->Y()*hit->Y()) * hit->X();
-    b2 += (hit->X()*hit->X() + hit->Y()*hit->Y()) * hit->Y();
-    b3 += (hit->X()*hit->X() + hit->Y()*hit->Y());
+    b1 += (hit->GetX()*hit->GetX() + hit->GetY()*hit->GetY()) * hit->GetX();
+    b2 += (hit->GetX()*hit->GetX() + hit->GetY()*hit->GetY()) * hit->GetY();
+    b3 += (hit->GetX()*hit->GetX() + hit->GetY()*hit->GetY());
 
-    b12 += hit->X();
-    b22 += hit->Y();
+    b12 += hit->GetX();
+    b22 += hit->GetY();
 
-    a11 += 2*hit->X()*hit->X();
-    a12 += 2*hit->X()*hit->Y();
-    a22 += 2*hit->Y()*hit->Y();
+    a11 += 2*hit->GetX()*hit->GetX();
+    a12 += 2*hit->GetX()*hit->GetY();
+    a22 += 2*hit->GetY()*hit->GetY();
 
-    fMeanX = fMeanX + hit->X();
-    fMeanY = fMeanY + hit->Y();
+    fMeanX = fMeanX + hit->GetX();
+    fMeanY = fMeanY + hit->GetY();
 
   }
 

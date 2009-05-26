@@ -198,12 +198,12 @@ InitStatus CbmRichHitProducer::Init()
    // fdetR(1) = 0
    // fdetR(2) = -sin(phi)
    // fdetR(3) = -sin(theta)sin(phi)
-   // fdetR(4) = cos(theta) 
+   // fdetR(4) = cos(theta)
    // fdetR(5) = -sin(theta)cos(phi)
    // fdetR(6) = cos(theta)sin(phi)
    // fdetR(7) = sin(theta)
    // fdetR(8) = cos(theta)cos(phi)
-   
+
   // theta = tilting angle around x-axis
   theta = TMath::ASin(fdetR(7));
   // phi = tilting angle around y-axis
@@ -212,7 +212,7 @@ InitStatus CbmRichHitProducer::Init()
   << " degrees" << endl;
   if (fVerbose) cout << "Rich Photodetector was tilted around y by " << phi*180./TMath::Pi()
   << " degrees" << endl;
-  
+
   // get refractive index of gas
   FairGeoNode *gas= dynamic_cast<FairGeoNode*> (fPassNodes->FindObject("rich1gas1"));
   if (! gas) cout << " -I no RICH Geo Node  found !!!!!  " << endl;
@@ -233,7 +233,7 @@ InitStatus CbmRichHitProducer::Init()
    */
   nrefrac = cerpar[3];
   if (fVerbose) cout << " refractive index for lowest photon energies (n-1)*10000  " << (nrefrac-1.0)*10000.0 << endl;
-  
+
   // transform nominal detector position (for tilted photodetector), x>0, y>0:
     Double_t fDetY_org,fDetX_org;
     fDetZ_org = fDetZ;
@@ -259,9 +259,9 @@ InitStatus CbmRichHitProducer::Init()
     cout << "   number of noise hits (to be reduced by geometrical efficiency) " << fNoise << endl;
     cout << "--------------------------------------------------------------------------------" << endl;
   }
-  
-  
-  
+
+
+
 
   //------------- example for getting more parameters from the data base: -------------------
 /*
@@ -344,7 +344,7 @@ void CbmRichHitProducer::Exec(Option_t* option)
       fPhotomulRadius = 0.8;
       fPhotomulDist = 0.5;
      }
- 
+
   if (fVerbose > 0){
     cout << " --------------------- RICH Hit Producer ---------------------------------------" << endl;
     cout << "   Settings chosen for PMT plane (fDetType = " << fDetType << ")" << endl;
@@ -384,23 +384,23 @@ void CbmRichHitProducer::Exec(Option_t* option)
   fHitCollection->Clear();
   fNHits = 0;
   fNDoubleHits = 0;
-  
-  
+
+
 
   for(Int_t j=0; j<fListRICHpts->GetEntries(); j++) {
     pt = (CbmRichPoint*)fListRICHpts->At(j);
-    
+
     TVector3 posPoint;
     pt->Position(posPoint);
-    
+
     Double_t xDet,yDet,zDet;
     xDet = posPoint.X();
-    
-    // tilt points by 
-    // -theta, -phi for x>0, y>0 
-    //  theta, -phi for x>0, y<0 
-    //  theta,  phi for x<0, y<0 
-    // -theta,  phi for x<0, y>0 
+
+    // tilt points by
+    // -theta, -phi for x>0, y>0
+    //  theta, -phi for x>0, y<0
+    //  theta,  phi for x<0, y<0
+    // -theta,  phi for x<0, y>0
     // and shift x position in order to avoid overlap
     //-----------------------------------------------
     if (posPoint.X() > 0 && posPoint.Y() > 0) {
@@ -423,9 +423,9 @@ void CbmRichHitProducer::Exec(Option_t* option)
       yDet = posPoint.X()*TMath::Sin(theta)*TMath::Sin(phi) + posPoint.Y()*TMath::Cos(theta) + posPoint.Z()*TMath::Sin(theta)*TMath::Cos(phi);
       zDet = posPoint.X()*TMath::Cos(theta)*TMath::Sin(phi) - posPoint.Y()*TMath::Sin(theta) + posPoint.Z()*TMath::Cos(theta)*TMath::Cos(phi);
       }
-    TVector3 detPoint(xDet,yDet,zDet); 
+    TVector3 detPoint(xDet,yDet,zDet);
 
-    
+
     if (fVerbose > 1) cout << " position in Labsystem " << posPoint.X() << " " << posPoint.Y() << " " << posPoint.Z() << endl;
     if (fVerbose > 1) cout << " tilted position in Labsystem " << detPoint.X() << " " << detPoint.Y() << " " << detPoint.Z() << endl;
 
@@ -437,8 +437,8 @@ void CbmRichHitProducer::Exec(Option_t* option)
 
     if ((fVerbose) && ((zDet < (fDetZ-0.25)) || (zDet > (fDetZ+0.25)))) {
       cout << " z-position not at " << fDetZ << " but " << zDet << endl;
-    } 
-    
+    }
+
 
 
     //hit position as a center of PMT
@@ -455,7 +455,7 @@ void CbmRichHitProducer::Exec(Option_t* option)
     if (fDetType == 2 || fDetType == 4) FindRichHitPositionMAPMT(detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
     if (fDetType == 3) FindRichHitPositionCsI(detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
 
-    //Double_t zHit = detPoint.Z();           
+    //Double_t zHit = detPoint.Z();
     Double_t zHit = fDetZ;           // fix z-position to nominal value: either tilted (fDetZ = zDet) or untilted (fDetZ_org)
     TVector3 posHit(xHit,yHit,zHit);
 
@@ -481,7 +481,7 @@ void CbmRichHitProducer::Exec(Option_t* option)
       if (gcode == 50000050) {
 	//for photons weight with efficiency of PMT
 	TVector3 mom;
-	pt->Momentum(mom); 
+	pt->Momentum(mom);
 	Double_t etot = sqrt(mom.Px()*mom.Px()+mom.Py()*mom.Py()+
 			     mom.Pz()*mom.Pz());
 	Double_t lambda=c/nrefrac*h/e/etot;   // wavelength in nm
@@ -491,12 +491,12 @@ void CbmRichHitProducer::Exec(Option_t* option)
 	  Double_t rand = gRandom->Rndm();
 	  detection = 0;
 
-	  if (efficiency[ilambda] > rand ) detection = 1;   
-//          detection = 1;   
+	  if (efficiency[ilambda] > rand ) detection = 1;
+//          detection = 1;
 
 	} // min <= lambda < max
       }  // if photon
-      
+
       // detection efficiency for hadrons crossing the PMT-cathodes?
       //      else if (gcode ==  211) detection=1;  //pi+-
       //      else if (gcode ==  321) detection=1;  //K+-
@@ -524,14 +524,14 @@ void CbmRichHitProducer::Exec(Option_t* option)
 	   << xHit << " " << yHit << " " << detection << " " << pmtID << endl;
     }
   }   // loop over input points
-  
+
   //   for (Int_t iHit=0; iHit<fNHits; iHit++)
   //     ((CbmRichHit*)fHitCollection->At(iHit))->Print();
 
   // add noise hits
   for(Int_t j=0; j < fNoise; j++) {
 
-    
+
     Double_t rand = gRandom->Rndm();
     Double_t xRand = (fDetX-fDetZ_org*TMath::Sin(phi))-fDetWidthX + rand*2.*fDetWidthX;
     rand = gRandom->Rndm();
@@ -567,7 +567,7 @@ void CbmRichHitProducer::Exec(Option_t* option)
       AddHit(posHit,posHitErr,RichDetID,pmtID,ampl,-1);
       }
   }
-  
+
   if (fVerbose > 0) {
     cout <<"  --->  Number of hits: "<<fHitCollection->GetEntries()<<endl;
     cout <<"  --->  Fraction of double hits: "<<(Double_t)(fNDoubleHits)/(Double_t)(fNHits) <<endl;
@@ -588,7 +588,7 @@ void CbmRichHitProducer::AddHit(TVector3 &posHit, TVector3 &posHitErr,
   // Check if there was any hit in the same PMT
   for (Int_t iHit=0; iHit<fNHits; iHit++) {
     hit = (CbmRichHit*)fHitCollection->At(iHit);
-    if (pmtID == hit->GetPmtID() && detID==hit->GetDetectorID()) {
+    if (pmtID == hit->GetPmtId() && detID==hit->GetDetectorId()) {
       hit->SetNPhotons(hit->GetNPhotons()+1);
       hit->SetAmplitude(GetAmplitude()+ampl);
       hitMerged = kTRUE;
@@ -603,11 +603,11 @@ void CbmRichHitProducer::AddHit(TVector3 &posHit, TVector3 &posHitErr,
     hit = (CbmRichHit*)fHitCollection->At(fNHits);
     hit->SetPosition     (posHit);
     hit->SetPositionError(posHitErr);
-    hit->SetDetectorID(detID);
-    hit->SetPmtID(pmtID);
+    hit->SetDetectorId(detID);
+    hit->SetPmtId(pmtID);
     hit->SetNPhotons(1);
     hit->SetAmplitude(GetAmplitude());
-    hit->SetRefIndex(index);
+    hit->SetRefId(index);
     fNHits++;
   }
 }
@@ -881,8 +881,8 @@ void CbmRichHitProducer::FindRichHitPositionMAPMT(Double_t xPoint, Double_t yPoi
     ==> use as effective values   fPhotomulRadius = 6.125mm = 0.6125cm
                                   fPhotomulDist = 0.5mm + 1.5mm = 2mm = 0.2cm
     **/
-    
-    
+
+
   xHit = 0.;
   yHit = 0.;
 
@@ -891,13 +891,13 @@ void CbmRichHitProducer::FindRichHitPositionMAPMT(Double_t xPoint, Double_t yPoi
 
 //  if (fVerbose > 3 ) cout << "FindHitPos_MAPMT: " << nPixel << " " << length << " " <<  fPhotomulRadius << " " << fPhotomulDist << endl;
 
-  
+
   // Transformation of global (x,y) coordinates to local coordinates in photodetector plane (u,v)
   //                  the center of (u,v) CS is in the lower left corner of each photodetector
 
   Double_t uPoint, vPoint;
   Double_t uPMT, vPMT, uPMTs, vPMTs;
-  
+
   uPoint = 2.*fDetWidthX + xPoint;
   if (yPoint > 0)
     vPoint = - fDetY + fDetWidthY + yPoint;
@@ -933,7 +933,7 @@ void CbmRichHitProducer::FindRichHitPositionMAPMT(Double_t xPoint, Double_t yPoi
     if (yPoint<0.) pmtID = -1*pmtID;
 
   } // point in effective area ?
-  
+
   if (fVerbose > 3) cout << "FindHitPos_MAPMT: " << xPoint << " " << yPoint << " " << xHit << " " << yHit << endl;
 
 }
@@ -963,7 +963,7 @@ void CbmRichHitProducer::FindRichHitPositionCsI(Double_t xPoint, Double_t yPoint
 
   Double_t uPoint, vPoint;
   Double_t uPMT, vPMT, uPMTs, vPMTs;
-  
+
   uPoint = 2.*fDetWidthX + xPoint;
   if (yPoint > 0)
     vPoint = - fDetY + fDetWidthY + yPoint;

@@ -170,7 +170,7 @@ Int_t CbmRichRingFinderIdeal::DoFind(TClonesArray* hitArray, TClonesArray* projA
   for (Int_t iHit = 0; iHit<nRichHits; iHit++) {
     pRhit = (CbmRichHit*) hitArray->At(iHit);
     if ( ! pRhit ) continue;
-    ptIndex = pRhit->GetRefIndex();
+    ptIndex = pRhit->GetRefId();
     if (ptIndex < 0) continue;           // fake or background hit
     pMCpt = (CbmRichPoint*) (fMCRichPointArray->At(ptIndex));
     if ( ! pMCpt ) continue;
@@ -223,7 +223,7 @@ Int_t CbmRichRingFinderIdeal::DoFind(TClonesArray* hitArray, TClonesArray* projA
       nNoRichHit++;
       continue;
     }
-    ptIndex = pRhit->GetRefIndex();
+    ptIndex = pRhit->GetRefId();
 
     if (ptIndex < 0) continue;       // fake or background hit
     pMCpt = (CbmRichPoint*) (fMCRichPointArray->At(ptIndex));

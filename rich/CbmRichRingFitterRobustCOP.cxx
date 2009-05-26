@@ -125,8 +125,8 @@ void CbmRichRingFitterRobustCOP::DoFit(CbmRichRing *pRing)
     Mx=My=0.;
     for(i = 0; i < fNhits; i++) {
         hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
-        Mx += hit->X();
-        My += hit->Y();
+        Mx += hit->GetX();
+        My += hit->GetY();
     }
 
     M0 = fNhits;
@@ -138,8 +138,8 @@ void CbmRichRingFitterRobustCOP::DoFit(CbmRichRing *pRing)
 		if(i_iter != 0){
 			for(i = 0; i < fNhits; i++){
                                 hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
-				dx = Mx - hit->X();
-				dy = My - hit->Y();
+				dx = Mx - hit->GetX();
+				dy = My - hit->GetY();
 				d[i] = sqrt(dx*dx + dy*dy) - Radius;
 				SumS1 += w[i]*d[i]*d[i];
 				SumS2 += w[i];
@@ -161,8 +161,8 @@ void CbmRichRingFitterRobustCOP::DoFit(CbmRichRing *pRing)
 		for (i = 0; i < fNhits; i++) {
 			hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
 			if(w[i] != 0.){
-				Xi = hit->X() - Mx;
-				Yi = hit->Y() - My;
+				Xi = hit->GetX() - Mx;
+				Yi = hit->GetY() - My;
 				Zi = Xi*Xi + Yi*Yi;
 				Mxy += Xi*Yi;
 				Mxx += Xi*Xi;
@@ -179,8 +179,8 @@ void CbmRichRingFitterRobustCOP::DoFit(CbmRichRing *pRing)
 			M0 = 0;
 			for (i = 0; i < fNhits; i++) {
 				hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
-				Xi = hit->X() - Mx;
-				Yi = hit->Y() - My;
+				Xi = hit->GetX() - Mx;
+				Yi = hit->GetY() - My;
 				Zi = Xi*Xi + Yi*Yi;
 				Mxy += Xi*Yi;
 				Mxx += Xi*Xi;

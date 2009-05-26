@@ -343,7 +343,7 @@ void CbmRichElectronsQa::AccTracks()
 		CbmRichHit* hit = (CbmRichHit*) fRichHits->At(iHit);
 		if ( !hit)	continue;
 
-		Int_t iPoint = hit->GetRefIndex();
+		Int_t iPoint = hit->GetRefId();
 
 		if (iPoint < 0)	continue; // Fake or background hit
 		//Get the MC Point corresponding to the hit

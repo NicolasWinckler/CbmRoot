@@ -79,8 +79,8 @@ void CbmRichRingFitterEllipseTau::DoFit(CbmRichRing *pRing)
 	CbmRichHit* hit= NULL;
 	for (Int_t i = 0; i < fNumHits; i++) {
 		hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
-		fX.push_back(hit->X());
-		fY.push_back(hit->Y());
+		fX.push_back(hit->GetX());
+		fY.push_back(hit->GetY());
 	}
 
 	InitMatrices();

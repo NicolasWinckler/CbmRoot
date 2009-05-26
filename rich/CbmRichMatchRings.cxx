@@ -95,7 +95,7 @@ CbmRichMatchRings::~CbmRichMatchRings() { }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus CbmRichMatchRings::Init() {
-  
+
   // Get FairRootManager
   FairRootManager* ioman = FairRootManager::Instance();
   if (! ioman) {
@@ -103,7 +103,7 @@ InitStatus CbmRichMatchRings::Init() {
 	 << "RootManager not instantised!" << endl;
     return kFATAL;
   }
-  
+
   // Get hit Array
   fHits
     = (TClonesArray*) ioman->GetObject("RichHit");
@@ -111,34 +111,34 @@ InitStatus CbmRichMatchRings::Init() {
     cout << "-W- CbmRichMatchRings::Init: No RichHit array!"
 	 << endl;
   }
-  
+
   // Get RichRing Array
   fRings = (TClonesArray*) ioman->GetObject("RichRing");
   if ( ! fRings ) {
     cout << "-E- CbmRichMatchRings::Init: No RichRing array!" << endl;
     return kERROR;
   }
-  
+
   // Get MC Point array
   fPoints = (TClonesArray*) ioman->GetObject("RichPoint");
   if ( ! fPoints ) {
     cout << "-E- CbmRichMatchRings::Init: No RichPoint array!" << endl;
     return kERROR;
   }
-  
+
   // Get MC Point array
   fTracks = (TClonesArray*) ioman->GetObject("MCTrack");
   if ( ! fTracks ) {
     cout << "-E- CbmRichMatchRings::Init: No MCTrack array!" << endl;
     return kERROR;
   }
-  
+
   // Create and register RichRingMatch array
   fMatches = new TClonesArray("CbmRichRingMatch",100);
   ioman->Register("RichRingMatch", "RICH", fMatches, kTRUE);
-  
+
   return kSUCCESS;
-  
+
 }
 // -------------------------------------------------------------------------
 
@@ -176,9 +176,9 @@ void CbmRichMatchRings::Exec(Option_t* opt) {
   //-------S.Lebedev-------------
   //calculate number of hits in MC ring to
   //compare its with number of hits in found ring
-  
+
   fMatchMCMap.clear();
-  
+
   // Loop over Rich hits
   Int_t nRichHits = fHits->GetEntriesFast();
   for (Int_t iHit=0; iHit < nRichHits; iHit++) {
@@ -188,15 +188,15 @@ void CbmRichMatchRings::Exec(Option_t* opt) {
 	   << "No Hit " << iHit << endl;
       continue;
     }
-    iPoint = hit->GetRefIndex();
-    
+    iPoint = hit->GetRefId();
+
     if ( iPoint < 0 ) {        // Fake or background hit
       nFake++;
       continue;
     }
-    
+
     //Get the MC Point corresponding to the hit
-    
+
     point = (FairMCPoint*) fPoints->At(iPoint);
     if ( ! point ) {
       cout << "-E- CbmRichMatchRings::Exec: "
@@ -211,36 +211,36 @@ void CbmRichMatchRings::Exec(Option_t* opt) {
     iMother = track->GetMotherId();
     fMatchMCMap[iMother]++;
   }
-  
-  
+
+
   // Loop over RichRings
   Int_t nRings = fRings->GetEntriesFast();
   for (Int_t iRing=0; iRing<nRings; iRing++) {
     ring = (CbmRichRing*) fRings->At(iRing);
-    
+
     if ( ! ring) {
       cout << "-W- CbmRichMatchRings::Exec: Empty RichRing at "
 	   << iRing << endl;
       continue;
     }
-    
+
     nHits = ring->GetNofHits();
     nAll = nTrue = nWrong = nFake = nMCTracks = 0;
     fMatchMap.clear();
-    
+
     if (fVerbose > 2) cout << endl << "Ring " << iRing << ", Hits "<<nHits << endl;
-    
+
     // Loop over Hits of ring
     for (Int_t iHit=0; iHit<nHits; iHit++) {
       hit = (CbmRichHit*) fHits->At(ring->GetHit(iHit));
-      
+
       if ( ! hit ) {
 	cout << "-E- CbmRichMatchRings::Exec: "
 	     << "No Hit " << iHit << " for ring " << iRing << endl;
 	continue;
       }
-      
-      iPoint = hit->GetRefIndex();
+
+      iPoint = hit->GetRefId();
       /*
 	iFlag  = mHit->GetFlag();
 	if ( iFlag ) {
@@ -253,9 +253,9 @@ void CbmRichMatchRings::Exec(Option_t* opt) {
 	nFake++;
 	continue;
       }
-      
+
       //Get the MC Point corresponding to the hit
-      
+
       point = (FairMCPoint*) fPoints->At(iPoint);
       if ( ! point ) {
 	cout << "-E- CbmRichMatchRings::Exec: "
@@ -263,21 +263,21 @@ void CbmRichMatchRings::Exec(Option_t* opt) {
 	     << " (ring " << iRing << ")" << endl;
 	continue;
       }
-      
+
       //Get the MC Track ID corresponding to the MC Point
-      
+
       iMCTrack = point->GetTrackID();
       if ( fVerbose > 2 ) cout << "Ring " << iRing << ", hit "
 			       << ring->GetHit(iHit)
 			       << ", RichPoint " << iPoint << ", MCTrack "
 			       << iMCTrack << endl;
-      
+
       // Get the MC Track corresponding to the ID
-      
+
       track   = (CbmMCTrack*)fTracks->At(iMCTrack);
       iMother = track->GetMotherId();
       fMatchMap[iMother]++;
-      
+
     } //Hit loop
 
     // Search for best matching MCTrack
@@ -295,7 +295,7 @@ void CbmRichMatchRings::Exec(Option_t* opt) {
     }
     nMCHits = fMatchMCMap[iMCTrack];//number of hits in MC ring
 //    if(Float_t(nTrue)/Float_t(nMCHits) < 0.5) iMCTrack =-1;
-    
+
     nWrong = nAll - nTrue;
     if (fVerbose>1)
       cout<< "-I- CbmRingMatchRings: RichRing " << iRing
@@ -303,22 +303,22 @@ void CbmRichMatchRings::Exec(Option_t* opt) {
 	  << ", true " << nTrue << ", wrong " << nWrong
 	  << ", fake " << nFake << ", #MCTracks "
 	  <<  nMCTracks << endl;
-    
+
     // Create RichRingMatch
     new ((*fMatches)[iRing]) CbmRichRingMatch(iMCTrack, nTrue,
 					      nWrong, nFake,
 					      nMCHits, nMCTracks);
-    
+
     // Set the MCMotherID for the ring
     ring->SetMCMotherID(iMCTrack);
-    
+
     // Some statistics
     nHitSum     += nHits;
     nTrueSum    += nTrue;
     nWrongSum   += nWrong;
     nFakeSum    += nFake;
     nMCTrackSum += nMCTracks;
-    
+
   } // Ring loop
 
   // Event statistics
@@ -354,10 +354,10 @@ void CbmRichMatchRings::Finish() { }
 // -------------------------------------------------------------------------
 
 
-    
+
 ClassImp(CbmRichMatchRings)
 
 
-      
 
-      
+
+

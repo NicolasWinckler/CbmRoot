@@ -303,7 +303,7 @@ void CbmFindGlobalTracksQa::Exec(Option_t* option)
 		    // Check for double hit
 		    if(1 == tofHit->GetFlag()) {
 			// Check for MC track ID
-			pointIndex = tofHit->GetRefIndex();
+			pointIndex = tofHit->GetRefId();
 			if(pointIndex >= 0) {
 			    tofPoint = (CbmTofPoint*) fArrayTofPoint->At(pointIndex);
 			    if(NULL != tofPoint) {

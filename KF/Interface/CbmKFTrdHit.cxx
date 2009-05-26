@@ -29,7 +29,7 @@ void CbmKFTrdHit::Create(CbmTrdHit* hit)
         return;
     }
     // Get index of material
-    MaterialIndex =  KF->GetMaterialIndex( hit->GetPlaneID() );
+    MaterialIndex =  KF->GetMaterialIndex( hit->GetPlaneId() );
     // Store pointer to the material
     wall = (MaterialIndex>=0) ? (CbmKFWall*)KF->vMaterial[MaterialIndex]:0;
 
@@ -78,7 +78,7 @@ Int_t CbmKFTrdHit::Filter(CbmKFTrackInterface& track, Bool_t downstream,
 */
 //    wall->Pass( zfst, zthick, track, downstream, QP0 );
 //    KF->Propagate( track, FitPoint.z, QP0 );
-  
+
   err = err || track.Propagate( FitPoint.z, QP0);
   err = err || FitPoint.Filter( track );
 

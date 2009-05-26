@@ -81,7 +81,7 @@ Int_t CbmTrdTrackFitterIdeal::DoFit(CbmTrdTrack* pTrack)
     if(hitIndex < 0) return 0;
     CbmTrdHit* hit = (CbmTrdHit*) fArrayTrdHit->At(hitIndex);
     if(NULL == hit) return 0;
-    Int_t pointIndex = hit->GetRefIndex();
+    Int_t pointIndex = hit->GetRefId();
     if(pointIndex < 0) return 0;
     CbmTrdPoint* point = (CbmTrdPoint*) fArrayTrdPoint->At(pointIndex);
     if(NULL == point) return 0;
@@ -92,7 +92,7 @@ Int_t CbmTrdTrackFitterIdeal::DoFit(CbmTrdTrack* pTrack)
     if(hitIndex < 0) return 0;
     hit = (CbmTrdHit*) fArrayTrdHit->At(hitIndex);
     if(NULL == hit) return 0;
-    pointIndex = hit->GetRefIndex();
+    pointIndex = hit->GetRefId();
     if(pointIndex < 0) return 0;
     point = (CbmTrdPoint*) fArrayTrdPoint->At(pointIndex);
     if(NULL == point) return 0;

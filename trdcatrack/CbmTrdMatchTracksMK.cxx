@@ -551,11 +551,11 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 
 	  trdHit1 = (CbmTrdHit*)fHits->At(trdTr1->GetTrdHitIndex(iHit));
 	  if( ! trdHit1) { cout << "!!! Empty pointer to TrdHit !!!" << endl; continue; }
-	  trdPoint1 = (CbmTrdPoint*)fPoints->At(trdHit1->GetRefIndex());
+	  trdPoint1 = (CbmTrdPoint*)fPoints->At(trdHit1->GetRefId());
 	  if(fVerbose > 2) {
 	    cout
 	      << "TrdHitIndex= " << trdTr1->GetTrdHitIndex(iHit)
-	      << "TrdPointIndex= " << trdHit1->GetRefIndex() << endl;
+	      << "TrdPointIndex= " << trdHit1->GetRefId() << endl;
 
 	  }
 	  noTrackHits[trdPoint1->GetTrackID()]++;
@@ -716,7 +716,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
       trdHit = (CbmTrdHit*) fHits->At(iHit);
       if(NULL == trdHit) continue;
       // Get index of point
-      pointIndex = trdHit->GetRefIndex();
+      pointIndex = trdHit->GetRefId();
       if(pointIndex < 0) continue;
       // Get pointer to the TRD point
       trdPoint = (CbmTrdPoint*) fPoints->At(pointIndex);
@@ -1568,7 +1568,7 @@ Int_t CbmTrdMatchTracksMK::GetMCIndex(CbmTrdTrack* trdTrack)
   for(int i=0;i<nTrackEnries;i++)
     {
       trdHit = (CbmTrdHit*)fHits->At(trdTrack->GetTrdHitIndex(i));
-      trdPtInd = trdHit->GetRefIndex();
+      trdPtInd = trdHit->GetRefId();
       mcPoint = (FairMCPoint*)fPoints->At(trdPtInd);
       mcIndex = mcPoint->GetTrackID();
       indeksy[mcIndex]+=1;

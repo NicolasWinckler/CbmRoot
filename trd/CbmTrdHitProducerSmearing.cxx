@@ -269,7 +269,7 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 
         // if random value above fEfficency reject point
         if (gRandom->Rndm() > fEfficency ) continue;
-       
+
         //if (j%1000 == 0) cout <<"** "<<j<<" points processed "<<endl;
         pt = (CbmTrdPoint*) fTrdPoints->At(j);
 
@@ -305,7 +305,7 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 	if(fTrdPerStation == 10){
 	  if (Station == 1) Plane = Layer;
           else if (Station == 2) Plane = 4 + Layer;
-          else if (Station == 3) Plane = 7 + Layer; 
+          else if (Station == 3) Plane = 7 + Layer;
 	}
 
 	ELossdEdX = pt->GetEnergyLoss();
@@ -314,7 +314,7 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 	// TR
 	// Sorry, Electrons & Positrons only
 	//	if(TMath::Abs(pdgCode) == 11 && mom.Z() > 0.5){  //0.5
-	if(TMath::Abs(pdgCode) == 11){ 
+	if(TMath::Abs(pdgCode) == 11){
 
 	    ELossTR = fRadiator->GetTR(mom);
 
@@ -382,20 +382,22 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 void CbmTrdHitProducerSmearing::AddHit(TVector3 &posHit, TVector3 &posHitErr,
 			       Int_t index, Int_t Plane, Int_t ref,
 			       Double_t ELoss, Double_t ELossTR,
-			       Double_t ELossdEdX){
-    CbmTrdHit* hit;
+			       Double_t ELossdEdX)
+{
+	new((*fHitCollection)[fNHits]) CbmTrdHit(0, posHit, posHitErr, 0., ref, Plane, ELossTR, ELossdEdX, ELoss);
 
-    new((*fHitCollection)[fNHits]) CbmTrdHit();
-    hit = (CbmTrdHit*)fHitCollection->At(fNHits); // iHit
-
-
-    hit->SetPosition     (posHit);
-    hit->SetPositionError(posHitErr);
-    hit->SetPlaneID(Plane);
-    hit->SetRefIndex(ref);
-    hit->SetELoss(ELoss);
-    hit->SetELossTR(ELossTR);
-    hit->SetELossdEdx(ELossdEdX);
+//	CbmTrdHit* hit;
+//
+//    new((*fHitCollection)[fNHits]) CbmTrdHit();
+//    hit = (CbmTrdHit*)fHitCollection->At(fNHits); // iHit
+//
+//    hit->SetPosition     (posHit);
+//    hit->SetPositionError(posHitErr);
+//    hit->SetPlaneID(Plane);
+//    hit->SetRefIndex(ref);
+//    hit->SetELoss(ELoss);
+//    hit->SetELossTR(ELossTR);
+//    hit->SetELossdEdx(ELossdEdX);
 
     fNHits++;
 }
@@ -417,7 +419,7 @@ void CbmTrdHitProducerSmearing::Register(){
 // --------------------------------------------------------------------
 
 // ---- SetNlayer -----------------------------------------------------
-void CbmTrdHitProducerSmearing::SetNlayer(Int_t a) 
+void CbmTrdHitProducerSmearing::SetNlayer(Int_t a)
 {
       if (a == 0) fNlayer = 12;
       else fNlayer = 9;
@@ -442,17 +444,17 @@ void CbmTrdHitProducerSmearing::SetSigmaY(Double_t s1[], Double_t s2[], Double_t
 
 // ---- GetSigmaX -----------------------------------------------------
 Double_t CbmTrdHitProducerSmearing::GetSigmaX (Int_t stack)
-{  
+{
 	if  (stack == 1)    	return fSigmaX[0];
 	else if (stack == 2)    return fSigmaX[1];
-    	else if (stack == 3)     return fSigmaX[2]; 
+    	else if (stack == 3)     return fSigmaX[2];
       	else return 0;
 }
 // --------------------------------------------------------------------
 
 // ---- GetSigmaY -----------------------------------------------------
-Double_t CbmTrdHitProducerSmearing::GetSigmaY (Double_t teta, Int_t stack ) 
-{ 
+Double_t CbmTrdHitProducerSmearing::GetSigmaY (Double_t teta, Int_t stack )
+{
     if (teta <= 50)	                 return fSigmaY[stack - 1][0];
     else if(teta > 50 && teta <= 100)    return fSigmaY[stack - 1][1];
     else if(teta > 100 && teta <= 200)   return fSigmaY[stack - 1][2];

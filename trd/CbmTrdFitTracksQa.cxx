@@ -160,8 +160,8 @@ void CbmTrdFitTracksQa::Exec(Option_t* option)
                 << "no hit : " << pFirstHit << ", " << pLastHit
                 << " !" << endl;
         }
-        Int_t firstPointIndex = pFirstHit->GetRefIndex();
-        Int_t lastPointIndex = pLastHit->GetRefIndex();
+        Int_t firstPointIndex = pFirstHit->GetRefId();
+        Int_t lastPointIndex = pLastHit->GetRefId();
         pFirstPoint = (CbmTrdPoint*) fArrayTrdPoint->At(firstPointIndex);
         pLastPoint = (CbmTrdPoint*) fArrayTrdPoint->At(lastPointIndex);
         if(NULL==pFirstPoint || NULL==pLastPoint) {

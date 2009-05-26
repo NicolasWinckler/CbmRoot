@@ -625,7 +625,7 @@ void CbmRichElectronsQa::GlobalTracksMatchEff()
 		if (tofIndex == -1) continue;
 		CbmTofHit* tofHit = (CbmTofHit*)fTofHits->At(tofIndex);
 		if (!tofHit)continue;
-		Int_t tofPointIndex = tofHit->GetRefIndex();
+		Int_t tofPointIndex = tofHit->GetRefId();
 		if (tofPointIndex < 0) continue;
 		FairMCPoint* tofPoint = (FairMCPoint*)fTofPoints->At(tofPointIndex);
 		if (!tofPoint)continue;

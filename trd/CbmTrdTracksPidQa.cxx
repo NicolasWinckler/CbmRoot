@@ -121,7 +121,7 @@ void CbmTrdTracksPidQa::Exec(Option_t* option)
 
     Int_t partID;
     Int_t nrtrdpoints;
-    TVector3 mom; 
+    TVector3 mom;
     Double_t momentum;
 
     // Event counters
@@ -136,21 +136,21 @@ void CbmTrdTracksPidQa::Exec(Option_t* option)
 
         trdHit = (CbmTrdHit*) fTrdHitCollection->At(trdTrack->GetTrdHitIndex(1));
 	if(NULL == trdHit) continue;
-  
-        mcPoint = (CbmTrdPoint*) fMCPointArray->At(trdHit->GetRefIndex());
+
+        mcPoint = (CbmTrdPoint*) fMCPointArray->At(trdHit->GetRefId());
 	if(NULL == mcPoint) continue;
- 
+
 
         NrTRDHits->Fill(nrtrdpoints);
 
         if (nrtrdpoints == 12) {
 
-          partID = (((CbmMCTrack*)fMCTrackArray->At(mcPoint->GetTrackID()))->GetPdgCode()); 
-          (((CbmMCTrack*)fMCTrackArray->At(mcPoint->GetTrackID()))->GetMomentum(mom)); 
+          partID = (((CbmMCTrack*)fMCTrackArray->At(mcPoint->GetTrackID()))->GetPdgCode());
+          (((CbmMCTrack*)fMCTrackArray->At(mcPoint->GetTrackID()))->GetMomentum(mom));
           momentum=mom.Mag();
 
           PartID->Fill(partID);
-          if (TMath::Abs(partID) == 11){          	
+          if (TMath::Abs(partID) == 11){
             WknEL->Fill(trdTrack->GetPidWkn());
             AnnEL->Fill(trdTrack->GetPidANN());
             LikeEL->Fill(trdTrack->GetPidLikeEL());
@@ -187,7 +187,7 @@ void CbmTrdTracksPidQa::Exec(Option_t* option)
               AnnHighPI->Fill(trdTrack->GetPidANN());
 	    }
           }
-          if (!(TMath::Abs(partID) == 11)){          	
+          if (!(TMath::Abs(partID) == 11)){
             WknALL->Fill(trdTrack->GetPidWkn());
             AnnALL->Fill(trdTrack->GetPidANN());
             LikeALL->Fill(trdTrack->GetPidLikeEL());
@@ -226,39 +226,39 @@ void CbmTrdTracksPidQa::Finish()
 void CbmTrdTracksPidQa::PrepareHistograms()
 {
 
-    WknPI     = new TH1F("WknPI","Wkn for pions ",10000,0.,2000.); 
-    WknEL      = new TH1F("WknEL","Wkn for electrons ",10000,0.,2000.); 
+    WknPI     = new TH1F("WknPI","Wkn for pions ",10000,0.,2000.);
+    WknEL      = new TH1F("WknEL","Wkn for electrons ",10000,0.,2000.);
     WknALL    = new TH1F("WknALL","Wkn for all particles except electrons ",10000,0.,2000.);
-    WknLowPI     = new TH1F("WknLowPI","Wkn for pions ",10000,0.,2000.); 
-    WknLowEL      = new TH1F("WknLowEL","Wkn for electrons ",10000,0.,2000.); 
+    WknLowPI     = new TH1F("WknLowPI","Wkn for pions ",10000,0.,2000.);
+    WknLowEL      = new TH1F("WknLowEL","Wkn for electrons ",10000,0.,2000.);
     WknLowALL    = new TH1F("WknLowALL","Wkn for all particles except electrons ",10000,0.,2000.);
-    WknHighPI     = new TH1F("WknHighPI","Wkn for pions ",10000,0.,2000.); 
-    WknHighEL      = new TH1F("WknHighEL","Wkn for electrons ",10000,0.,2000.); 
+    WknHighPI     = new TH1F("WknHighPI","Wkn for pions ",10000,0.,2000.);
+    WknHighEL      = new TH1F("WknHighEL","Wkn for electrons ",10000,0.,2000.);
     WknHighALL    = new TH1F("WknHighALL","Wkn for all particles except electrons ",10000,0.,2000.);
 
 
-    AnnPI    = new TH1F("AnnPI","Ann for pions ",400,-2.,2.); 
-    AnnEL    = new TH1F("AnnEL","Ann for electrons ",400,-2.,2.); 
-    AnnALL   = new TH1F("AnnALL","Ann for all except electrons ",400,-2.,2.); 
-    AnnHighPI    = new TH1F("AnnHighPI","Ann for pions ",400,-2.,2.); 
-    AnnHighEL    = new TH1F("AnnHighEL","Ann for electrons ",400,-2.,2.); 
-    AnnHighALL   = new TH1F("AnnHighALL","Ann for all except electrons ",400,-2.,2.); 
-    AnnLowPI    = new TH1F("AnnLowPI","Ann for pions ",400,-2.,2.); 
-    AnnLowEL    = new TH1F("AnnLowEL","Ann for electrons ",400,-2.,2.); 
-    AnnLowALL   = new TH1F("AnnLowALL","Ann for all except electrons ",400,-2.,2.); 
+    AnnPI    = new TH1F("AnnPI","Ann for pions ",400,-2.,2.);
+    AnnEL    = new TH1F("AnnEL","Ann for electrons ",400,-2.,2.);
+    AnnALL   = new TH1F("AnnALL","Ann for all except electrons ",400,-2.,2.);
+    AnnHighPI    = new TH1F("AnnHighPI","Ann for pions ",400,-2.,2.);
+    AnnHighEL    = new TH1F("AnnHighEL","Ann for electrons ",400,-2.,2.);
+    AnnHighALL   = new TH1F("AnnHighALL","Ann for all except electrons ",400,-2.,2.);
+    AnnLowPI    = new TH1F("AnnLowPI","Ann for pions ",400,-2.,2.);
+    AnnLowEL    = new TH1F("AnnLowEL","Ann for electrons ",400,-2.,2.);
+    AnnLowALL   = new TH1F("AnnLowALL","Ann for all except electrons ",400,-2.,2.);
 
 
-    LikePI    = new TH1F("LikePI","Likelihood for pions ",400,-2.,2.); 
-    LikeEL    = new TH1F("LikeEL","Likelihood for electrons ",400,-2.,2.); 
-    LikeALL   = new TH1F("LikeALL","Likelihood for all except electrons ",400,-2.,2.); 
-    LikeHighPI    = new TH1F("LikeHighPI","Likelihood for pions ",400,-2.,2.); 
-    LikeHighEL    = new TH1F("LikeHighEL","Likelihood for electrons ",400,-2.,2.); 
-    LikeHighALL   = new TH1F("LikeHighALL","Likelihood for all except electrons ",400,-2.,2.); 
-    LikeLowPI    = new TH1F("LikeLowPI","Likelihood for pions ",400,-2.,2.); 
-    LikeLowEL    = new TH1F("LikeLowEL","Likelihood for electrons ",400,-2.,2.); 
-    LikeLowALL   = new TH1F("LikeLowALL","Likelihood for all except electrons ",400,-2.,2.); 
+    LikePI    = new TH1F("LikePI","Likelihood for pions ",400,-2.,2.);
+    LikeEL    = new TH1F("LikeEL","Likelihood for electrons ",400,-2.,2.);
+    LikeALL   = new TH1F("LikeALL","Likelihood for all except electrons ",400,-2.,2.);
+    LikeHighPI    = new TH1F("LikeHighPI","Likelihood for pions ",400,-2.,2.);
+    LikeHighEL    = new TH1F("LikeHighEL","Likelihood for electrons ",400,-2.,2.);
+    LikeHighALL   = new TH1F("LikeHighALL","Likelihood for all except electrons ",400,-2.,2.);
+    LikeLowPI    = new TH1F("LikeLowPI","Likelihood for pions ",400,-2.,2.);
+    LikeLowEL    = new TH1F("LikeLowEL","Likelihood for electrons ",400,-2.,2.);
+    LikeLowALL   = new TH1F("LikeLowALL","Likelihood for all except electrons ",400,-2.,2.);
 
-    PartID    = new TH1F("PartID","Particle ID of the Track",4600,-2300.,2300.); 
+    PartID    = new TH1F("PartID","Particle ID of the Track",4600,-2300.,2300.);
     NrTRDHits = new TH1F("NrTRDHits","Nr. of TRD Hits for track",20,0.,20.);
 
     ELossPI   = new TH1F("ELossPI","summed ELoss for pions",2000, 0.,200.);

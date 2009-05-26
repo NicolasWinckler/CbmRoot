@@ -186,10 +186,10 @@ Int_t CbmTrdTrackFinderIdeal::DoFind(TClonesArray* hitArray,
 	 << "MCPoint array missing! " << endl;
     return -1;
   }
-    
+
   if ( !hitArray ) {
     cout << "-E- CbmTrdTrackFinderIdeal::DoFind: "
-	 << "Hit arrays missing! " 
+	 << "Hit arrays missing! "
 	 << hitArray << endl;
     return -1;
   }
@@ -199,7 +199,7 @@ Int_t CbmTrdTrackFinderIdeal::DoFind(TClonesArray* hitArray,
 	 << "Track array missing! " << endl;
     return -1;
   }
-    
+
   // Initialise control counters
   Int_t nNoMCTrack   = 0;
   Int_t nNoTrack     = 0;
@@ -230,7 +230,7 @@ Int_t CbmTrdTrackFinderIdeal::DoFind(TClonesArray* hitArray,
       if(NULL == pHit) continue;
       // if(pHit->GetFlag()) continue; // lost hit
       // Get point index
-      ptIndex = pHit->GetRefIndex();
+      ptIndex = pHit->GetRefId();
       if(ptIndex < 0) continue; // fake or background hit
       // Get pointer to MC point
       pMCpt = (FairMCPoint*) fMCPointArray->At(ptIndex);
@@ -302,7 +302,7 @@ Int_t CbmTrdTrackFinderIdeal::DoFind(TClonesArray* hitArray,
       continue;
     }
 //    if ( pHit->GetFlag() ) continue;    // lost hit
-    ptIndex = pHit->GetRefIndex();
+    ptIndex = pHit->GetRefId();
     if (ptIndex < 0) continue;           // fake or background hit
     pMCpt = (FairMCPoint*) (fMCPointArray->At(ptIndex));
     if ( ! pMCpt ) {
@@ -322,7 +322,7 @@ Int_t CbmTrdTrackFinderIdeal::DoFind(TClonesArray* hitArray,
     pTrck = (CbmTrdTrack*) trackArray->At(trackIndex);
     if ( ! pTrck ) {
       cout << "-E- CbmTrdTrackFinderIdeal::DoFind: "
-	   << "No TrdTrack pointer. " << iHit << " " << ptIndex 
+	   << "No TrdTrack pointer. " << iHit << " " << ptIndex
 	   << " " << mcTrackIndex << " " << trackIndex << endl;
       nNoTrack++;
       continue;
@@ -364,6 +364,6 @@ Int_t CbmTrdTrackFinderIdeal::DoFind(TClonesArray* hitArray,
 
 ClassImp(CbmTrdTrackFinderIdeal)
 
-    
 
-  
+
+

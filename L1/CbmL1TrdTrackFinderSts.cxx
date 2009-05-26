@@ -379,7 +379,7 @@ void CbmL1TrdTrackFinderSts::ProcessStation(CbmTrdTrack* pTrack,
       // Get pointer to the hit
       pHit = (CbmTrdHit*) fArrayTrdHit->At(hitIndex);
       // Get MC point
-      pointIndex = pHit->GetRefIndex();
+      pointIndex = pHit->GetRefId();
       trdPoint = (CbmTrdPoint*) fArrayTrdPoint->At(pointIndex);
       trdPoint->Position(pos);
 
@@ -880,7 +880,7 @@ void CbmL1TrdTrackFinderSts::SortTrdHits()
         kfHit = (CbmKFTrdHit*) fArrayKFTrdHit->At(iHit);
         kfHit->Create(hit);
         // Get plane number
-        planeNumber = hit->GetPlaneID() - 1;
+        planeNumber = hit->GetPlaneId() - 1;
         if(planeNumber < 0 || planeNumber > 12) {
             cout << "-W- CbmL1TrdTrackFinderSts::SortTrdHits : "
                 << "wrong plane number." << endl;

@@ -113,7 +113,7 @@ void CbmTrdCreatePidLike::Exec(Option_t* option) {
         if(NULL == trdHit)
             continue;
 
-        trdPoint = (CbmTrdPoint*) fTrdPointCollection->At(trdHit->GetRefIndex());
+        trdPoint = (CbmTrdPoint*) fTrdPointCollection->At(trdHit->GetRefId());
         if(NULL == trdPoint)
             continue;
 

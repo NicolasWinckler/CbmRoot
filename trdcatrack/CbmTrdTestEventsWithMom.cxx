@@ -640,7 +640,7 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
       for( int k=0;k<noHits;k++ ) {
 	Int_t hitIndex = trdTr1->GetTrdHitIndex(k);
 	CbmTrdHit *Hit = (CbmTrdHit*)fHits->At(hitIndex);
-	Int_t refMCIndex = Hit->GetRefIndex();
+	Int_t refMCIndex = Hit->GetRefId();
 	trdPt = (CbmTrdPoint*)fPoints->At(refMCIndex);
 	iMCTrack = trdPt->GetTrackID();
 	trackIndexes[iMCTrack]++;
@@ -2237,7 +2237,7 @@ TVector3 CbmTrdTestEventsWithMom::GetMCMomentum(Int_t trdRecoTrackID) {
   //  for(int i=0;i<12;i++) {
   hitIndex = trdTr->GetTrdHitIndex(0);
   trdHit = (CbmTrdHit*)fHits->At(hitIndex);
-  trdPt = (CbmTrdPoint*)fPoints->At(trdHit->GetRefIndex());
+  trdPt = (CbmTrdPoint*)fPoints->At(trdHit->GetRefId());
   MCTrackIndex = trdPt->GetTrackID();
   //     cout << "MCTrackID: " << MCTrackIndex << ", ";
   //   }

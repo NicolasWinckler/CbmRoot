@@ -120,7 +120,7 @@ Int_t CbmTofMergerIdeal::DoMerge(TClonesArray* glbTracks,
 	tofHit = (CbmTofHit*) tofHits->At(iTofHit);
 	if(NULL == tofHit) continue;
 	// Get pointer to the TOF point
-	tofPointIndex = tofHit->GetRefIndex();
+	tofPointIndex = tofHit->GetRefId();
 	if(tofPointIndex < 0) continue;
 	tofPoint = (CbmTofPoint*) fArrayTofPoint->At(tofPointIndex);
 	if(NULL == tofPoint) continue;

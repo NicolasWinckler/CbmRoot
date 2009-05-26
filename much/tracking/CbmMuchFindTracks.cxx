@@ -75,7 +75,7 @@ InitStatus CbmMuchFindTracks::Init()
 
   // Get TRD hit Array
   fMuchHitArray
-    = (TClonesArray*) ioman->GetObject("MuchHit");
+    = (TClonesArray*) ioman->GetObject("MuchPixelHit");
   if ( ! fMuchHitArray) {
     cout << "-W- CbmMuchFindTracks::Init: No MuchHit array!"
 	 << endl;

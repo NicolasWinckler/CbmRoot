@@ -12,7 +12,7 @@
 
 #include "CbmBaseHit.h"
 
-class TVector3;
+#include "TVector3.h"
 
 class CbmPixelHit : public CbmBaseHit
 {
@@ -83,6 +83,18 @@ public:
 	Double_t GetDxy() const {return fDxy;}
 
 	/**
+	 * Copies hit position to pos
+	 * @param pos Output hit position
+	 */
+	void Position(TVector3& pos) const;
+
+	/**
+	 * Copies hit position error to pos
+	 * @param pos Output hit position error
+	 */
+	void PositionError(TVector3& dpos) const;
+
+	/**
 	 * Sets X position of the hit.
 	 * @param x new X position of the hit [cm]
 	 **/
@@ -112,6 +124,18 @@ public:
 	 **/
 	void SetDxy(Double_t dxy) {fDxy = dxy;}
 
+	/**
+	 * Sets position of the hit.
+	 * @param pos new hit position
+	 **/
+	void SetPosition(const TVector3& pos);
+
+	/**
+	 * Sets position error of the hit.
+	 * @param dpos new hit position error
+	 **/
+	void SetPositionError(const TVector3& dpos);
+
 private:
 	Double_t fX, fY; // X, Y positions of hit [cm]
 	Double_t fDx, fDy; // X, Y errors [cm]
@@ -119,5 +143,31 @@ private:
 
 	ClassDef(CbmPixelHit, 1);
 };
+
+
+inline void CbmPixelHit::Position(TVector3& pos) const
+{
+	pos.SetXYZ(GetX(), GetY(), GetZ());
+}
+
+
+inline void CbmPixelHit::PositionError(TVector3& dpos) const
+{
+	dpos.SetXYZ(GetDx(), GetDy(), GetDz());
+}
+
+inline void CbmPixelHit::SetPosition(const TVector3& pos)
+{
+	SetX(pos.X());
+	SetY(pos.Y());
+	SetZ(pos.Z());
+}
+
+inline void CbmPixelHit::SetPositionError(const TVector3& dpos)
+{
+	SetDx(dpos.X());
+	SetDy(dpos.Y());
+	SetDz(dpos.Z());
+}
 
 #endif /* CBMPIXELHIT_H_ */

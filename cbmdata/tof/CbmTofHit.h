@@ -1,18 +1,17 @@
 //CbmTofHit
 //Author E. Cordier
 //Modified by D. Gonzalez-Diaz 06/09/06
+//Modified by A.Lebedev 26/05/09
 //From CbmTofPoint to smeared hits
 
 #ifndef CBMTOFHIT_H
 #define CBMTOFHIT_H
 
-#include "FairHit.h"
+#include "CbmPixelHit.h"
 
-class CbmTofHit : public FairHit
+class CbmTofHit : public CbmPixelHit
 {
-
- public:
-
+public:
   /** Default constructor **/
   CbmTofHit();
 
@@ -25,31 +24,28 @@ class CbmTofHit : public FairHit
   /** Destructor **/
   virtual ~CbmTofHit();
 
-  void Print(const Option_t* opt = 0) const;
+  void Print() const;
 
   /** Accessors **/
   Double_t GetTime()       const { return fTime; };
-  Int_t    GetFlag()       const { return fFlag; }; 
+  Int_t    GetFlag()       const { return fFlag; };
 
-  Int_t GetCell()   const   {return ((fDetectorID>>4) & 1023);};
-  Int_t GetModule() const   {return ((fDetectorID>>14) & 1023);};
-  Int_t GetRegion() const   {return fDetectorID>>24;};
- 
+  Int_t GetCell()   const   {return ((GetDetectorId()>>4) & 1023);};
+  Int_t GetModule() const   {return ((GetDetectorId()>>14) & 1023);};
+  Int_t GetRegion() const   {return GetDetectorId()>>24;};
+
+  Int_t GetPlaneId() const { return 0; }
 
   /** Modifiers **/
   void SetTime(Double_t time)        { fTime = time; };
   void SetFlag(Int_t flag)           { fFlag = flag; };
 
-  
-
- protected:
+protected:
 
   Double32_t fTime;              // Time since event start [ns]
   Int_t      fFlag;              // Flag for general purposes [TDC, event tagging...]
 
   ClassDef(CbmTofHit,1)
-
 };
-
 
 #endif

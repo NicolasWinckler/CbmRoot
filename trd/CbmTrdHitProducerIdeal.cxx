@@ -118,7 +118,7 @@ void CbmTrdHitProducerIdeal::Exec(Option_t *option)
         iPlane = (point->GetStationNo()-1)*fNoTrdPerStation + point->GetLayerNo();
 	// Create hit
 	new ((*fArrayTrdHit)[nHit]) CbmTrdHit(point->GetDetectorID(),
-					      pos, dpos, iPoint,
+					      pos, dpos, 0., iPoint,
 					      iPlane, 0.,
 					      point->GetEnergyLoss(),
 					      point->GetEnergyLoss());

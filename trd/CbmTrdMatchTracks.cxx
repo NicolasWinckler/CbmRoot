@@ -138,7 +138,7 @@ void CbmTrdMatchTracks::Exec(Option_t* opt)
 			cout << "-E- CbmTrdMatchTracks::Exec: " << "No TrdHit " << iHit << " for track " << iTrack << endl;
 			continue;
 		}
-		iPoint = hit->GetRefIndex();
+		iPoint = hit->GetRefId();
 		if (iPoint < 0) { // Fake or background hit
 			nFake++;
 			continue;

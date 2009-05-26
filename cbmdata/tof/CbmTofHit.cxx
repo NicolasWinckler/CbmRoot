@@ -2,6 +2,7 @@
 //----                     CbmTofHit                                    ----
 //----                Created Everard Cordier 14/09/05                  ----
 //----                Modified by D. Gonzalez-Diaz 06/09/06             ----
+//----                Modified by A.Lebedev 26/05/09                    ----
 //--------------------------------------------------------------------------
 
 #include "CbmTofHit.h"
@@ -23,18 +24,20 @@ CbmTofHit::CbmTofHit()
 // -----   Standard constructor   ------------------------------------------
 
 CbmTofHit::CbmTofHit(Int_t detID, TVector3 pos, TVector3 dpos, Int_t index, Double_t time, Int_t flag)
-: FairHit(detID, pos, dpos, index)
+: CbmPixelHit(detID, pos, dpos, 0., index)
 {
     fTime = time;
     fFlag = flag;
+    SetType(kTOFHIT);
 }
 
 // -----   Constructor without flag  ------------------------------------------
 
 CbmTofHit::CbmTofHit(Int_t detID, TVector3 pos, TVector3 dpos, Int_t index, Double_t time)
-: FairHit(detID, pos, dpos, index)
+: CbmPixelHit(detID, pos, dpos, 0., index)
 {
     fTime = time;
+    SetType(kTOFHIT);
 }
 
 // -----   Destructor   ----------------------------------------------------
@@ -42,21 +45,21 @@ CbmTofHit::~CbmTofHit() { }
 
 
 // -----  Print  -----------------------------------------------------------
-void CbmTofHit::Print(const Option_t* opt) const
+void CbmTofHit::Print() const
 {
   cout << "-I- CbmTofHit" << endl;
-  cout << "    DetectorID: " << fDetectorID << endl;
-  cout << "    Position: (" << fX
-       << ", " << fY
-       << ", " << fZ << ") cm"
+  cout << "    DetectorID: " << GetDetectorId() << endl;
+  cout << "    Position: (" << GetX()
+       << ", " << GetY()
+       << ", " << GetZ() << ") cm"
        << endl;
-  cout << "    Position error: (" << fDx
-       << ", " << fDy
-       << ", " << fDz << ") cm"
+  cout << "    Position error: (" << GetDx()
+       << ", " << GetDy()
+       << ", " << GetDz() << ") cm"
        << endl;
-  cout << "    Time: " << fTime << " ns" 
+  cout << "    Time: " << GetTime() << " ns"
        << endl;
-  cout << "    Flag: " << fFlag
+  cout << "    Flag: " << GetFlag()
        << endl;
 }
 // -------------------------------------------------------------------------

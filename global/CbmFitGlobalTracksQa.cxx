@@ -167,7 +167,7 @@ void CbmFitGlobalTracksQa::Exec(Option_t* option)
 		    stsHit = (CbmStsHit*) fArrayStsHit->At(stsHitIndex);
 		    if(NULL != stsHit) {
 			stsPointIndex = stsHit->GetRefIndex();
-		    } 
+		    }
 		} else {
 		    cout << "-W- CbmFitGlobalTracksQa::Exec : "
 			<< "STS track " << stsTrackIndex << " is empty!" << endl;
@@ -203,7 +203,7 @@ void CbmFitGlobalTracksQa::Exec(Option_t* option)
 		    trdHitIndex = trdTrack->GetTrdHitIndex(0);
 		    trdHit = (CbmTrdHit*) fArrayTrdHit->At(trdHitIndex);
 		    if(NULL != trdHit) {
-			trdPointIndex = trdHit->GetRefIndex();
+			trdPointIndex = trdHit->GetRefId();
 		    }
 		} else {
 		    cout << "-W- CbmFitGlobalTracksQa::Exec : "
@@ -244,7 +244,7 @@ void CbmFitGlobalTracksQa::Exec(Option_t* option)
 		    trdHitIndex = trdTrack->GetTrdHitIndex(trdTrack->GetNofTrdHits()-1);
 		    trdHit = (CbmTrdHit*) fArrayTrdHit->At(trdHitIndex);
 		    if(NULL != trdHit) {
-			trdPointIndex = trdHit->GetRefIndex();
+			trdPointIndex = trdHit->GetRefId();
 		    }
 		} else {
 		    cout << "-W- CbmFitGlobalTracksQa::Exec : "

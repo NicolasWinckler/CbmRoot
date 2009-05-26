@@ -15,8 +15,14 @@ enum HitType {
 	kHIT,
 	kPIXELHIT,
 	kSTRIPHIT,
+	kSTSHIT,
+	kMVDHIT,
+	kRICHHIT,
 	kMUCHPIXELHIT,
-	kMUCHSTRAWHIT
+	kMUCHSTRAWHIT,
+	kTRDHIT,
+	kTOFHIT,
+	kECALHIT
 };
 
 #include "TObject.h"

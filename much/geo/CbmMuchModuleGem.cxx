@@ -43,8 +43,6 @@ CbmMuchModuleGem::CbmMuchModuleGem(Int_t detId, TVector3 position, TVector3 size
   fDetectorType = 1;
   fGridDx = fGridDy = 0.0;
   fGridCols = fGridRows = 0;
-  fPoints = NULL;
-  fHits = NULL;
   fClusters = NULL;
 }
 // -------------------------------------------------------------------------
@@ -56,8 +54,6 @@ CbmMuchModuleGem::CbmMuchModuleGem(Int_t iStation, Int_t iLayer, Bool_t iSide,
   fDetectorType = 1;
   fGridDx = fGridDy = 0.0;
   fGridCols = fGridRows = 0;
-  fPoints = NULL;
-  fHits = NULL;
   fClusters = NULL;
 }
 // -------------------------------------------------------------------------

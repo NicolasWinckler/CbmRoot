@@ -114,11 +114,7 @@ public:
      *@param  sector   CbmMuchSector which should be added to the array.**/
     void AddSector(CbmMuchSector* sector);
 
-    TClonesArray* GetPoints()   const { return fPoints;     }
-    TClonesArray* GetHits()     const { return fHits;       }
     TClonesArray* GetClusters() const { return fClusters;   }
-    void SetPoints(TClonesArray* points)     { fPoints   = points;   }
-    void SetHits  (TClonesArray* hits)       { fHits     = hits;     }
     void SetClusters(TClonesArray* clusters) { fClusters = clusters; }
 
     virtual Bool_t InitModule();
@@ -131,8 +127,6 @@ private:
     Int_t                  fGridCols;              // Number of columns in the grid
     Int_t                  fGridRows;              // Number of rows in the grid
     vector<vector<Int_t> > fGridIndices;           // 2D-vector of sector numbers
-    TClonesArray*          fPoints;                //!
-    TClonesArray*          fHits;                  //!
     TClonesArray*          fClusters;              //!
 
 

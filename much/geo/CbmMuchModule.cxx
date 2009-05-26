@@ -31,6 +31,9 @@ CbmMuchModule::CbmMuchModule() : TPave() {
   fCutRadius = 0;
   fPosition = TVector3();
   fSize = TVector3();
+  fPoints = NULL;
+  fHits = NULL;
+
 }
 // -------------------------------------------------------------------------
 
@@ -43,6 +46,8 @@ CbmMuchModule::CbmMuchModule(Int_t detId, TVector3 position, TVector3 size,
   fPosition = position;
   fSize = size;
   fCutRadius = cutRadius;
+  fPoints = NULL;
+  fHits = NULL;
 }
 // -------------------------------------------------------------------------
 
@@ -56,6 +61,8 @@ CbmMuchModule::CbmMuchModule(Int_t iStation, Int_t iLayer, Bool_t iSide,
   fPosition = position;
   fSize = size;
   fCutRadius = cutRadius;
+  fPoints = NULL;
+  fHits = NULL;
 }
 // -------------------------------------------------------------------------
 

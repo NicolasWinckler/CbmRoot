@@ -54,10 +54,14 @@ public:
   TVector3 GetSize()           const { return fSize; }
   TVector3 GetPosition()      const { return fPosition; }
   Int_t    GetDetectorType()  const { return fDetectorType; }
+  TClonesArray* GetPoints()   const { return fPoints;     }
+  TClonesArray* GetHits()     const { return fHits;       }
 
   virtual Bool_t InitModule() {}
   virtual void DrawModule(Color_t color) {}
 
+  void SetPoints(TClonesArray* points)     { fPoints   = points;   }
+  void SetHits  (TClonesArray* hits)       { fHits     = hits;     }
 
 protected:
   Int_t                  fDetectorId;            // Unique detector ID
@@ -65,6 +69,8 @@ protected:
   Double_t               fCutRadius;             // Radius of the cut (if any, otherwise = -1.) [cm]
   TVector3               fSize;                  // Size vector of the module (all dimensions in [cm])
   TVector3               fPosition;              // Location vector of the module center in global c.s. (all dimensions in [cm])
+  TClonesArray*          fPoints;                //!
+  TClonesArray*          fHits;                  //!
 
   ClassDef(CbmMuchModule,1);
 };

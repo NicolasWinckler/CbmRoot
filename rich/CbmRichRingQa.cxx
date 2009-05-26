@@ -911,6 +911,13 @@ void CbmRichRingQa::FinishTask()
 
     rich->cd();
     current->cd();
+
+    ofstream fout;
+    fout.open("opt_param_ht.txt",std::ios_base::app);
+    fout << (Double_t)fNofCloneRings/fEventNumber<< " " <<
+		(Double_t)fNofFakeRings/fEventNumber << " " <<
+		(Double_t)fNofTrueFoundElRingsProjHitCut/(Double_t)fNofElRingsProjHitCut << endl;
+
 }
 
 // -------------------------------------------------------------------------

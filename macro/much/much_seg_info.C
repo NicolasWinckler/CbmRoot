@@ -1,6 +1,7 @@
 /**
  * Prints out some details about segmentation.
  *
+ * @author M.Ryzhinskiy m.ryzhinskiy@gsi.de
  * @param digiFile  Input file containing segmentation parameters
  */
 void much_seg_info(TString digiFile = ""){
@@ -57,8 +58,8 @@ void much_seg_info(TString digiFile = ""){
             Double_t secLx = sector->GetSize()[0];
             Double_t secLy = sector->GetSize()[1];
             // Position of the corner closest to the center of the layer
-            Double_t secX = sec_nX*(sector->GetPosition()[0] - secLx/2.);
-            Double_t secY = sec_nY*(sector->GetPosition()[1] - secLy/2.);
+            Double_t secX = sector->GetPosition()[0] - sec_nX*secLx/2.;
+            Double_t secY = sector->GetPosition()[1] - sec_nY*secLy/2.;
             CbmMuchSector* sec = NULL;
             Bool_t exists = false;
             Int_t i;
@@ -66,8 +67,10 @@ void much_seg_info(TString digiFile = ""){
               sec = (CbmMuchSector*) sectors->At(i);
               Double_t lx = sec->GetSize()[0];
               Double_t ly = sec->GetSize()[1];
-              if(TMath::Abs(lx-secLx) < TMath::Max(lx, secLx)/4. &&
-                  TMath::Abs(ly-secLy) < TMath::Max(ly, secLy)/4.){
+              if(TMath::Abs(lx-secLx) < 1e-5 &&
+                  TMath::Abs(ly-secLy) < 1e-5){
+//              if(TMath::Abs(lx-secLx) < TMath::Max(lx, secLx)/4. &&
+//                  TMath::Abs(ly-secLy) < TMath::Max(ly, secLy)/4.){
                 exists = true;
                 break;
               }
@@ -75,8 +78,8 @@ void much_seg_info(TString digiFile = ""){
             if(exists){
               Int_t nX = sec->GetPosition()[0] < 0 ? -1 : 1;
               Int_t nY = sec->GetPosition()[1] < 0 ? -1 : 1;
-              Double_t x = nX*(sec->GetPosition()[0] - sec->GetSize()[0]/2.);
-              Double_t y = nY*(sec->GetPosition()[1] - sec->GetSize()[1]/2.);
+              Double_t x = sec->GetPosition()[0] - nX*sec->GetSize()[0]/2.;
+              Double_t y = sec->GetPosition()[1] - nY*sec->GetSize()[1]/2.;
               Double_t rad = TMath::Sqrt(x*x + y*y);
               Double_t secRad = TMath::Sqrt(secX*secX + secY*secY);
               if(rad < secRad) sectors->AddAt(sector, i);

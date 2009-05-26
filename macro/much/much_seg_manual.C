@@ -94,8 +94,8 @@ void much_seg_manual(const char* mcFile = "",
   seg->SetRegionRadii(5, st5_rad);
 
   // Set minimum pad size/resolution [cm] in the center region for each station
-  Double_t padLx[] = {0.1486, 0.4, 0.8, 0.8 ,0.8, 0.8};
-  Double_t padLy[] = {0.1486, 0.4, 0.8, 0.8 ,0.8, 0.8};
+  Double_t padLx[] = {0.1386, 0.4, 0.8, 0.8 ,0.8, 0.8};
+  Double_t padLy[] = {0.1386, 0.4, 0.8, 0.8 ,0.8, 0.8};
   seg->SetMinPadSize(padLx, padLy);
 
   // Set maximum allowed pad size/resolution [cm] for each station

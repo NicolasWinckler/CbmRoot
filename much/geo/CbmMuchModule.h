@@ -57,7 +57,7 @@ public:
   TClonesArray* GetPoints()   const { return fPoints;     }
   TClonesArray* GetHits()     const { return fHits;       }
 
-  virtual Bool_t InitModule() {}
+  virtual Bool_t InitModule() {return kTRUE;}
   virtual void DrawModule(Color_t color) {}
 
   void SetPoints(TClonesArray* points)     { fPoints   = points;   }

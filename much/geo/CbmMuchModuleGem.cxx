@@ -431,6 +431,7 @@ Bool_t CbmMuchModuleGem::InitModule(){
 //    }
   }
   InitNeighbourPads();
+  return kTRUE;
 }
 
 void CbmMuchModuleGem::DrawModule(Color_t color) {

@@ -38,7 +38,7 @@ public:
     virtual ~CbmMuchModuleStraws();
 
 
-    virtual Bool_t InitModule(){}
+    virtual Bool_t InitModule(){ return kTRUE;}
     virtual void DrawModule(Color_t color){}
 
 

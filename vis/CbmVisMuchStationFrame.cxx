@@ -64,18 +64,12 @@ CbmVisMuchStationFrame::CbmVisMuchStationFrame(const TGWindow *p, CbmVisMuch* di
     fStationCombo->AddEntry(Form("Station %i",st+1),st+1);
   }
 
-  CbmMuchStation* station = fGeoScheme->GetStation(0);
-  for (Int_t l=0;l<station->GetNLayers();l++){
-    fLayerCombo->AddEntry(Form("Layer %i",l+1),l+1);
-  }
-
   fStationCombo->Resize(85, 20);
   fStationCombo->Connect("Selected(Int_t)","CbmVisMuchStationFrame",this,"UpdateStation(Int_t)");
   fStationCombo->Select(fStationNr,kFALSE);
 
   fLayerCombo->Resize(85, 20);
   fLayerCombo->Connect("Selected(Int_t)","CbmVisMuchStationFrame",this,"UpdateLayer(Int_t)");
-  fLayerCombo->Select(fLayerNr,kFALSE);
 
 
   // Create scale frame
@@ -320,8 +314,6 @@ void CbmVisMuchStationFrame::DrawPoints(){
     for (Int_t m=0;m<side->GetNModules();m++){
       CbmMuchModule* module = side->GetModule(m);
       TClonesArray* points = module->GetPoints();
-//      printf("m=%i points %i\n",m,points);
-      printf("points %i\n",points);
       for (Int_t i=0;i<points->GetEntriesFast();i++){
         CbmVisPoint* point = (CbmVisPoint*) points->At(i);
         point->DrawSpread();
@@ -469,10 +461,20 @@ void CbmVisMuchStationFrame::HandleEmbeddedCanvas(Int_t event, Int_t px, Int_t p
 
 void CbmVisMuchStationFrame::UpdateStation(Int_t stationNr){
   Int_t layerNr = 1;
+
   if (stationNr==0) { stationNr = fStationNr; layerNr = fLayerNr; }
   DoDrawStation(stationNr,layerNr);
   DrawPoints();
   DrawHits();
+
+  // Update selector of layers
+  CbmMuchStation* station = fGeoScheme->GetStation(stationNr-1);
+  fLayerCombo->RemoveAll();
+  for (Int_t l=0;l<station->GetNLayers();l++){
+    fLayerCombo->AddEntry(Form("Layer %i",l+1),l+1);
+  }
+  fLayerCombo->Select(fLayerNr,kFALSE);
+
 }
 
 

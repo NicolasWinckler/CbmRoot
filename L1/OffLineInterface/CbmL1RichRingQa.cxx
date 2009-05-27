@@ -205,9 +205,9 @@ void CbmL1RichRingQa::Exec(Option_t* option)
     CbmRichHit * phit = (CbmRichHit*) fHitArray->At( i );
     if ( !phit ) continue;
     pHitIndex.insert(pair<void*, int>(phit,i));
-    hit.x = phit->X();
-    hit.y = phit->Y();
-    Int_t pointID = phit->GetRefIndex();
+    hit.x = phit->GetX();
+    hit.y = phit->GetY();
+    Int_t pointID = phit->GetRefId();
     if (pointID < 0) continue;
     CbmRichPoint* point = (CbmRichPoint*) (fMCPointArray->At(pointID));
     if ( !point ) continue;

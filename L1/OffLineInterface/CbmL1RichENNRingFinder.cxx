@@ -69,8 +69,8 @@ Int_t CbmL1RichENNRingFinder::DoFind( TClonesArray* HitArray, TClonesArray* Proj
     CbmRichHit * hit = (CbmRichHit*) HitArray->At( i );
     if ( !hit ) continue;
     ENNHit tmp;
-    tmp.x = hit->X();
-    tmp.y = hit->Y();
+    tmp.x = hit->GetX();
+    tmp.y = hit->GetY();
     tmp.index = i;
     tmp.quality = 0;    
     if ( tmp.y > 0. ) Up.push_back(tmp);

@@ -77,10 +77,33 @@ public:
 //	void SetTime(Double_t time, Int_t i) {fTime[i] = time;}
 //	void SetTimes(const Double_t* time) {fTime[0] = time[0]; fTime[1] = time[1]; fTime[2] = time[2];}
 //	void SetDTime(Double_t dtime) {fDTime = dtime;}
-//
-//private:
+        Double_t GetX() const {return fX;}
+        Double_t GetY() const {return fY;}
+        Double_t* GetDouble() { return fDouble; }
+        Int_t* GetInt() { return fInt; }
+        Int_t GetFlag() const { return fFlag; }
+        Int_t GetPlaneId() const { printf(" !!! CbmMuchStrawHit::GetPlaneId(): Implement me !!! \n"); exit(0); }
+        Int_t GetTube() const { return fTube; }
+        Int_t GetSegment() const { return fSegment; }
+
+        void SetX(Double_t x) {fX = x;}
+        void SetY(Double_t y) {fY = y;}
+        void SetDouble(Int_t n, Double_t *arr) { for (Int_t i=0; i<n; ++i) fDouble[i]=arr[i]; } // set double array
+        void SetInt(Int_t n, Int_t *arr) { for (Int_t i=0; i<n; ++i) fInt[i]=arr[i]; } ; // set integer array
+        void SetFlag(Int_t flag) { fFlag = flag; }
+        void SetTube(Int_t tube) { fTube = tube; }
+        void SetSegment(Int_t segm) { fSegment = segm; }
+
+private:
 //	Double_t fTime[3];    // Time since event start [ns]
 //	Double_t fDTime;      // Time resolution [ns]
+        Double32_t fX;        // Global X-coord.
+        Double32_t fY;        // Global Y-coord.
+        Double_t fDouble[5];  //! Auxiliary double array
+        Int_t fInt[5];        //! Auxiliary integer array
+        Int_t fFlag;          // Flag
+        Int_t fTube;          // Tube number
+        Int_t fSegment;       // Tube segment
 
 	ClassDef(CbmMuchStrawHit, 1);
 };

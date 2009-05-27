@@ -82,7 +82,7 @@ void CbmMuchFindHitsSimpleGem::Exec(Option_t* opt) {
   if(fClusters) fClusters->Clear();
   Int_t nHits=0;
 
-  if(!fDigis) printf("FUCK!!!\n");
+  if(!fDigis) printf("No digi array!!!\n");
   Int_t nDigis = fDigis->GetEntriesFast();
   for(Int_t iDigi = 0; iDigi < nDigis; ++iDigi){
     CbmMuchDigi* digi = (CbmMuchDigi*)fDigis->At(iDigi);

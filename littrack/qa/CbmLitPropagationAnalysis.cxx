@@ -76,8 +76,6 @@ InitStatus CbmLitPropagationAnalysis::Init()
 	fSmoother = factory->CreateTrackFitter("kalman_smoother");
 
 	CreateHistograms();
-
-
 }
 
 void CbmLitPropagationAnalysis::SetParContainers()

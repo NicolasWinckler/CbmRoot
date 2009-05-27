@@ -48,10 +48,6 @@ ${ROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(LITTRACK_SRCS_RULECHECKER
-ana/CbmLitElossAna.cxx
-ana/CbmLitPropagationAnalysis.cxx
-ana/CbmLitRobustFitterAnalysis.cxx
-ana/CbmLitCheckSimpleGeo.cxx
 base/CbmLitTool.cxx
 base/CbmLitSubstation.cxx
 base/CbmLitStation.cxx
@@ -116,6 +112,10 @@ propagation/CbmLitMyTrackPropagator.cxx
 qa/CbmLitReconstructionQa.cxx
 qa/CbmLitFindGlobalTracksIdeal.cxx
 qa/CbmLitRecQa.cxx
+qa/CbmLitElossAna.cxx
+qa/CbmLitPropagationAnalysis.cxx
+qa/CbmLitRobustFitterAnalysis.cxx
+qa/CbmLitCheckSimpleGeo.cxx
 robust/CbmLitWeightedHitCalculatorImp.cxx
 robust/CbmLitWeightCalculatorSimple.cxx
 robust/CbmLitWeightCalculatorGauss.cxx

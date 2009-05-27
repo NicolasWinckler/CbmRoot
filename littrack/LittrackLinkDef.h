@@ -4,12 +4,6 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-// ana
-#pragma link C++ class CbmLitPropagationAnalysis+;
-#pragma link C++ class CbmLitElossAna+;
-#pragma link C++ class CbmLitRobustFitterAnalysis+;
-#pragma link C++ class CbmLitCheckSimpleGeo+;
-
 // base
 #pragma link C++ class CbmLitTool+;
 #pragma link C++ class CbmLitPDG+;
@@ -91,6 +85,10 @@
 #pragma link C++ class CbmLitReconstructionQa+;
 #pragma link C++ class CbmLitFindGlobalTracksIdeal+;
 #pragma link C++ class CbmLitRecQa+;
+#pragma link C++ class CbmLitPropagationAnalysis+;
+#pragma link C++ class CbmLitElossAna+;
+#pragma link C++ class CbmLitRobustFitterAnalysis+;
+#pragma link C++ class CbmLitCheckSimpleGeo+;
 
 // robust
 #pragma link C++ class CbmLitWeightedHitCalculatorImp+;

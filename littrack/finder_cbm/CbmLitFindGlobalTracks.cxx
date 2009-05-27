@@ -15,9 +15,6 @@
 #include "CbmStsTrack.h"
 #include "CbmTrdTrack.h"
 #include "CbmMuchTrack.h"
-//#include "CbmTrdHit.h"
-//#include "CbmMuchHit.h"
-#include "CbmTofHit.h"
 #include "CbmGlobalTrack.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
@@ -193,7 +190,7 @@ void CbmLitFindGlobalTracks::ConvertInputData()
 		std::cout << "-I- Number of TRD hits: " << fLitTrdHits.size() << std::endl;
 	}
 	if (fIsTof) {
-		CbmLitConverter::TofHitArrayToPixelHitVector(fTofHits, fLitTofHits);
+		CbmLitConverter::HitArrayToHitVector(fTofHits, fLitTofHits);
 		std::cout << "-I- Number of TOF hits: " << fLitTofHits.size() << std::endl;
 	}
 }

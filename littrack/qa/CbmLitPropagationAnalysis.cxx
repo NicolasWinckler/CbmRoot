@@ -20,7 +20,6 @@
 #include "CbmStripHit.h"
 #include "CbmGlobalTrack.h"
 #include "CbmStsTrack.h"
-//#include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 #include "CbmMuchTrack.h"
 #include "CbmMuchDigi.h"
@@ -320,9 +319,9 @@ void CbmLitPropagationAnalysis::GlobalTrackToLitTrack(
 	}
 	//TOF: attach TOF hit
 	if (tofId > -1) {
-		CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(tofId);
+		CbmPixelHit* tofHit = (CbmPixelHit*) fTofHits->At(tofId);
 		CbmLitPixelHit litHit;
-		CbmLitConverter::TofHitToLitPixelHit(tofHit, tofId, &litHit);
+		CbmLitConverter::PixelHitToLitPixelHit(tofHit, tofId, &litHit);
 		litTrack->AddHit(&litHit);
 	}
 }

@@ -8,15 +8,14 @@ class CbmLitStripHit;
 class CbmLitTrack;
 class CbmLitTrackParam;
 class CbmHit;
+class CbmTrdHit;
 class CbmBaseHit;
 class CbmPixelHit;
 class CbmStripHit;
 class FairTrackParam;
-class CbmTrdHit;
 class CbmMuchTrack;
 class CbmTrdTrack;
 class CbmStsTrack;
-class CbmTofHit;
 class CbmGlobalTrack;
 class TClonesArray;
 
@@ -45,25 +44,6 @@ public:
 			const CbmStripHit* hit,
 			Int_t index,
 			CbmLitStripHit* litHit);
-
-//	static void TrkHitToLitPixelHit(
-//			const CbmHit* trkHit,
-//			Int_t index,
-//			CbmLitPixelHit* litHit);
-
-//	static void MuchHitToLitStripHit(
-//			CbmMuchHit* muchHit,
-//			Int_t index,
-//			CbmLitStripHit* litHit);
-
-	static void TofHitToLitPixelHit(
-			const CbmTofHit* trkHit,
-			Int_t index,
-			CbmLitPixelHit* litHit);
-
-	static void LitHitToTrdHit(
-			const CbmLitHit* litHit,
-			CbmTrdHit* trdHit);
 
 	static void StsTrackToLitTrack(
 			const CbmStsTrack* stsTrack,
@@ -103,14 +83,6 @@ public:
 			TClonesArray* stsTracks,
 			TClonesArray* trdTracks,
 			TClonesArray* muchTracks);
-
-//	static void TrdHitArrayToPixelHitVector(
-//			const TClonesArray* hits,
-//			HitPtrVector& litHits);
-
-	static void TofHitArrayToPixelHitVector(
-			const TClonesArray* hits,
-			HitPtrVector& litHits);
 
 	static void HitArrayToHitVector(
 			const TClonesArray* hits,

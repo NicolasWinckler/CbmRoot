@@ -7,16 +7,15 @@
 #include "CbmLitTrackParam.h"
 
 #include "CbmHit.h"
+#include "CbmTrdHit.h"
 #include "CbmBaseHit.h"
 #include "CbmPixelHit.h"
 #include "CbmStripHit.h"
 #include "FairTrackParam.h"
-#include "CbmTrdHit.h"
 #include "CbmStsTrack.h"
 #include "CbmTrdTrack.h"
 #include "CbmMuchTrack.h"
 #include "CbmLitEnvironment.h"
-#include "CbmTofHit.h"
 #include "CbmGlobalTrack.h"
 
 #include "TClonesArray.h"
@@ -93,71 +92,6 @@ void CbmLitConverter::StripHitToLitStripHit(
 	litHit->SetSinPhi(std::sin(hit->GetPhi()));
 	litHit->SetPlaneId(hit->GetPlaneId() - 1);
 	litHit->SetRefId(index);
-}
-
-//void CbmLitConverter::TrkHitToLitPixelHit(
-//		const CbmHit* trkHit,
-//		Int_t index,
-//		CbmLitPixelHit* litHit)
-//{
-//	litHit->SetX(trkHit->GetX());
-//	litHit->SetY(trkHit->GetY());
-//	litHit->SetZ(trkHit->GetZ());
-//	litHit->SetDx(trkHit->GetDx());
-//	litHit->SetDy(trkHit->GetDy());
-//	litHit->SetDz(trkHit->GetDz());
-//	litHit->SetDxy(trkHit->GetCovXY());
-//	litHit->SetPlaneId(trkHit->GetStationNr() - 1);
-//	litHit->SetRefId(index);
-//}
-
-//void CbmLitConverter::MuchHitToLitStripHit(
-//		CbmMuchHit* muchHit,
-//		Int_t index,
-//		CbmLitStripHit* litHit)
-//{
-//	litHit->SetU(muchHit->GetTime(0));
-//	litHit->SetDu(muchHit->GetDx());
-//	litHit->SetZ(muchHit->GetZ());
-//	litHit->SetDz(muchHit->GetDz());
-//	litHit->SetPhi(std::asin(muchHit->GetCovXY()));
-//	litHit->SetCosPhi(std::cos(litHit->GetPhi()));
-//	litHit->SetSinPhi(muchHit->GetCovXY());
-//	litHit->SetPlaneId(muchHit->GetStationNr() - 1);
-//	litHit->SetRefId(index);
-//}
-
-void CbmLitConverter::TofHitToLitPixelHit(
-		const CbmTofHit* tofHit,
-		Int_t index,
-		CbmLitPixelHit* litHit)
-{
-	litHit->SetX(tofHit->GetX());
-	litHit->SetY(tofHit->GetY());
-	litHit->SetZ(tofHit->GetZ());
-	litHit->SetDx(tofHit->GetDx());
-	litHit->SetDy(tofHit->GetDy());
-	litHit->SetDz(tofHit->GetDz());
-	litHit->SetDxy(0.);
-	litHit->SetPlaneId(0);
-	litHit->SetRefId(index);
-}
-
-void CbmLitConverter::LitHitToTrdHit(
-		const CbmLitHit* litHit,
-		CbmTrdHit* trdHit)
-{
-	if (litHit->GetType() == kLITPIXELHIT) {
-		const CbmLitPixelHit* hit = static_cast<const CbmLitPixelHit*>(litHit);
-		trdHit->SetX(hit->GetX());
-		trdHit->SetY(hit->GetY());
-		trdHit->SetZ(hit->GetZ());
-		trdHit->SetDx(hit->GetDx());
-		trdHit->SetDy(hit->GetDy());
-		trdHit->SetDz(hit->GetDz());
-	} else if (litHit->GetType() == kLITSTRIPHIT) {
-		std::cout << "LitHitToTrdHit NOT IMPLEMENTED FOR STRIP" << std::cout;
-	}
 }
 
 void CbmLitConverter::StsTrackToLitTrack(
@@ -269,7 +203,8 @@ void CbmLitConverter::LitTrackToTrdTrack(
 		const CbmLitHit* hit = litTrack->GetHit(iHit);
 		if (hit->GetDetectorId() != kLITTRD) continue;
 		CbmTrdHit trdHit;
-		CbmLitConverter::LitHitToTrdHit(hit, &trdHit);
+		trdHit.SetZ(hit->GetZ());
+		//CbmLitConverter::LitHitToTrdHit(hit, &trdHit);
 		trdTrack->AddHit(hit->GetRefId(), &trdHit);
 	}
 
@@ -388,7 +323,8 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
 			LitDetectorId detId = hit->GetDetectorId();
 			if (detId == kLITTRD && isCreateTrdTrack) {
 				CbmTrdHit trdHit;
-				CbmLitConverter::LitHitToTrdHit(hit, &trdHit);
+				trdHit.SetZ(hit->GetZ());
+//				CbmLitConverter::LitHitToTrdHit(hit, &trdHit);
 				trdTrack->AddHit(hit->GetRefId(), &trdHit);
 			}
 			if (detId == kLITMUCH && isCreateMuchTrack) {
@@ -420,36 +356,6 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
 			CbmGlobalTrack* globalTrack = new ((*globalTracks)[globalTrackNo++]) CbmGlobalTrack();
 			globalTrack->SetStsTrackIndex(iTrack);
 		}
-	}
-}
-
-//void CbmLitConverter::TrdHitArrayToPixelHitVector(
-//		const TClonesArray* hits,
-//		HitPtrVector& litHits)
-//{
-//	Int_t nofHits = hits->GetEntriesFast();
-//	for(Int_t iHit = 0; iHit < nofHits; iHit++) {
-//		CbmHit* hit = (CbmHit*) hits->At(iHit);
-//	    if(NULL == hit) continue;
-//	    CbmLitPixelHit* litHit = new CbmLitPixelHit;
-//	    TrkHitToLitPixelHit(hit, iHit, litHit);
-//	    litHit->SetDetectorId(kLITTRD);
-//	    litHits.push_back(litHit);
-//	}
-//}
-
-void CbmLitConverter::TofHitArrayToPixelHitVector(
-		const TClonesArray* hits,
-		HitPtrVector& litHits)
-{
-	Int_t nofHits = hits->GetEntriesFast();
-	for(Int_t iHit = 0; iHit < nofHits; iHit++) {
-		CbmTofHit* hit = (CbmTofHit*) hits->At(iHit);
-	    if(NULL == hit) continue;
-	    CbmLitPixelHit* litHit = new CbmLitPixelHit;
-	    TofHitToLitPixelHit(hit, iHit, litHit);
-	    litHit->SetDetectorId(kLITTOF);
-	    litHits.push_back(litHit);
 	}
 }
 

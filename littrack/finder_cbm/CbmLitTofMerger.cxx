@@ -57,7 +57,7 @@ Int_t CbmLitTofMerger::DoMerge(
 {
 //	CbmLitConverter::TrdTrackArrayToTrackVector(fTrdTracks, fLitTracks, fTrdHits);
 	GlobalTrackArrayToTrackVector(fTrdTracks, fLitTracks, fTrdHits, glbTracks);
-	CbmLitConverter::TofHitArrayToPixelHitVector(tofHits, fLitHits);
+	CbmLitConverter::HitArrayToHitVector(tofHits, fLitHits);
 
 	//for (int i = 0; i < fLitHits.size(); i++) std::cout << fLitHits[i]->ToString();
 

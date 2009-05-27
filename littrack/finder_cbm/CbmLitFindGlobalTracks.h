@@ -66,6 +66,7 @@ private:
 	// "nn" - nearest neighbor method
 	// "weight" - weighting method
 	std::string fTrackingType;
+
 	// Merger method to be used
 	// "nearest_hit" - assigns nearest hit to the track
 	std::string fMergerType;

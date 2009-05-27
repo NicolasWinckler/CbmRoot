@@ -165,17 +165,29 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 		CbmTrackMatch* stsTrackMatch;
 		if (isStsOk) {
 			stsTrackMatch = (CbmTrackMatch*) fStsMatches->At(stsId);
-			isStsOk = CheckStsTrackQuality(stsTrackMatch);
+			isStsOk = CheckTrackQuality(stsTrackMatch);
+			if (!isStsOk) { // ghost track
+				Int_t nofHits = stsTrackMatch->GetNofTrueHits() + stsTrackMatch->GetNofWrongHits() + stsTrackMatch->GetNofFakeHits();
+				fhStsGhostNh->Fill(nofHits);
+			}
 		}
 		CbmTrackMatch* trdTrackMatch;
 		if (isTrdOk) {
 			trdTrackMatch = (CbmTrackMatch*) fTrdMatches->At(trdId);
-			isTrdOk = CheckTrdTrackQuality(trdTrackMatch);
+			isTrdOk = CheckTrackQuality(trdTrackMatch);
+			if (!isTrdOk) { // ghost track
+				Int_t nofHits = trdTrackMatch->GetNofTrueHits() + trdTrackMatch->GetNofWrongHits() + trdTrackMatch->GetNofFakeHits();
+				fhRecGhostNh->Fill(nofHits);
+			}
 		}
 		CbmTrackMatch* muchTrackMatch;
 		if (isMuchOk) {
 			muchTrackMatch = (CbmTrackMatch*) fMuchMatches->At(muchId);
-			isMuchOk = CheckMuchTrackQuality(muchTrackMatch);
+			isMuchOk = CheckTrackQuality(muchTrackMatch);
+			if (!isMuchOk) { // ghost track
+				Int_t nofHits = muchTrackMatch->GetNofTrueHits() + muchTrackMatch->GetNofWrongHits() + muchTrackMatch->GetNofFakeHits();
+				fhRecGhostNh->Fill(nofHits);
+			}
 		}
 
 		// Get MC indices of track segments
@@ -207,37 +219,7 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 	}
 }
 
-Bool_t CbmLitReconstructionQa::CheckStsTrackQuality(
-		CbmTrackMatch* trackMatch)
-{
-	Int_t mcId = trackMatch->GetMCTrackId();
-	if(mcId < 0) return false;
-
-	Int_t nofTrue = trackMatch->GetNofTrueHits();
-	Int_t nofWrong = trackMatch->GetNofWrongHits();
-	Int_t nofFake = trackMatch->GetNofFakeHits();
-	Int_t nofHits = nofTrue + nofWrong + nofFake;
-	Double_t quali = Double_t(nofTrue) / Double_t(nofHits);
-	if (quali < fQuota) return false;
-	return true;
-}
-
-Bool_t CbmLitReconstructionQa::CheckTrdTrackQuality(
-		CbmTrackMatch* trackMatch)
-{
-	Int_t mcId = trackMatch->GetMCTrackId();
-	if(mcId < 0) return false;
-
-	Int_t nofTrue = trackMatch->GetNofTrueHits();
-	Int_t nofWrong = trackMatch->GetNofWrongHits();
-	Int_t nofFake = trackMatch->GetNofFakeHits();
-	Int_t nofHits = nofTrue + nofWrong + nofFake;
-	Double_t quali = Double_t(nofTrue) / Double_t(nofHits);
-	if (quali < fQuota) return false;
-	return true;
-}
-
-Bool_t CbmLitReconstructionQa::CheckMuchTrackQuality(
+Bool_t CbmLitReconstructionQa::CheckTrackQuality(
 		CbmTrackMatch* trackMatch)
 {
 	Int_t mcId = trackMatch->GetMCTrackId();
@@ -424,6 +406,12 @@ void CbmLitReconstructionQa::CreateHistos()
 			fHistoList->Add(fhTofMom[i][j]);
 		}
 	}
+
+	//Create histograms for ghost tracks
+	fhStsGhostNh = new TH1F("hStsGhostNh", "STS: ghost tracks", nBinsNofPoints, minNofPoints, maxNofPoints);
+	fHistoList->Add(fhStsGhostNh);
+	fhRecGhostNh = new TH1F("hRecGhostNh", "TRD(MUCH): ghost tracks", nBinsNofPoints, minNofPoints, maxNofPoints);
+	fHistoList->Add(fhRecGhostNh);
 }
 
 void CbmLitReconstructionQa::DivideHistos(
@@ -433,7 +421,7 @@ void CbmLitReconstructionQa::DivideHistos(
 {
 	histo1->Sumw2();
 	histo2->Sumw2();
-	histo3->Divide(histo1, histo2, 1, 1, "B");
+	histo3->Divide(histo1, histo2, 1, 1, "");
 }
 
 void CbmLitReconstructionQa::CalculateEfficiencyHistos()
@@ -497,6 +485,13 @@ void CbmLitReconstructionQa::PrintFinalStatistics()
 	std::cout << "Efficiency TRD(MUCH):" << std::endl << EventEfficiencyStatisticsToString(fhRecMom, "final");
 	std::cout << "Efficiency TOF matching:" << std::endl << EventEfficiencyStatisticsToString(fhTofMom, "final");
 
+	Double_t stsGhosts, recGhosts;
+	stsGhosts = fhStsGhostNh->GetEntries();
+	recGhosts = fhRecGhostNh->GetEntries();
+	if (fIsSts)
+		std::cout << "Ghosts STS (per event/total): " << stsGhosts/fEventNo << "/" << stsGhosts << std::endl;
+	if (fIsMuch || fIsTrd)
+		std::cout << "Ghosts TRD(MUCH) (per event/total): " << recGhosts/fEventNo << "/" << recGhosts << std::endl;
 	std::cout << "-------------------------------------------------------------" << std::endl;
 }
 

@@ -103,27 +103,13 @@ private:
 	void ProcessGlobalTracks();
 
 	/**
-     * Checks STS track quality based on fQuota value.
-     * @param trackMatch STS track match
+     * Checks track quality based on fQuota value.
+     * @param trackMatch  Track match
      */
-	Bool_t CheckStsTrackQuality(
+	Bool_t CheckTrackQuality(
 			CbmTrackMatch* trackMatch);
 
 	/**
-     * Checks TRD track quality based on fQuota value.
-     * @param trackMatch TRD track match
-     */
-	Bool_t CheckTrdTrackQuality(
-			CbmTrackMatch* trackMatch);
-
-	/**
-     * Checks MUCH track quality based on fQuota value.
-     * @param trackMatch MUCH track match
-     */
-	Bool_t CheckMuchTrackQuality(
-			CbmTrackMatch* trackMatch);
-
-    /**
      * Loops over the MC tracks. Checks the track acceptance for different cases.
      * Fills the histograms of the accepted and reconstructed tracks.
      */
@@ -239,8 +225,11 @@ private:
 	std::vector<std::vector<TH1F*> > fhRecMom; // TRD(MUCH): momentum dependence
 	std::vector<std::vector<TH1F*> > fhRecNp; // TRD(MUCH): number of points dependence
 	std::vector<std::vector<TH1F*> > fhTofMom; // TOF: momentum dependence
-
-//	TH1F* fhNhClones, *fhNhGhosts;
+	// histograms for ghost tracks
+	// STS: ghost tracks (number of hits dependence)
+	TH1F *fhStsGhostNh;
+	// TRD(MUCH): ghost tracks (number of hits dependence)
+	TH1F *fhRecGhostNh;
 
 	TList* fHistoList; // List of histograms
 

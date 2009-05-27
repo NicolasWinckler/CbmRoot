@@ -11,7 +11,6 @@
 // Includes from base
 #include "FairRootManager.h"
 
-
 #include <iostream>
 #include <iomanip>
 
@@ -52,8 +51,7 @@ CbmMuchDigitizeStraws::CbmMuchDigitizeStraws(Int_t iVerbose) :
 
 // -----   Constructor with name   -----------------------------------------
 CbmMuchDigitizeStraws::CbmMuchDigitizeStraws(const char* name, const char* digiFileName,
-    Int_t iVerbose) :
-      FairTask(name, iVerbose) {
+    Int_t iVerbose) : FairTask(name, iVerbose) {
   fGeoScheme = CbmMuchGeoScheme::Instance();
   fDigiFile = new TFile(digiFileName);
   fPoints = NULL;
@@ -164,17 +162,17 @@ InitStatus CbmMuchDigitizeStraws::Init() {
   fPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
 
   // Get Digi array from memory
-  fDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
+  fDigis = (TClonesArray*) ioman->GetObject("MuchStrawDigi");
   if (! fDigis) {
     fDigis = new TClonesArray("CbmMuchDigi", 1000);
-    ioman->Register("MuchDigi", "Digi in MUCH", fDigis, kTRUE);
+    ioman->Register("MuchStrawDigi", "Digi in MUCH", fDigis, kTRUE);
   }
 
   // Get DigiMatch array from memory
-  fDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
+  fDigiMatches = (TClonesArray*) ioman->GetObject("MuchStrawDigiMatch");
   if (! fDigiMatches) {
     fDigiMatches = new TClonesArray("CbmMuchDigiMatch", 1000);
-    ioman->Register("MuchDigiMatch", "Digi Match in MUCH", fDigiMatches, kTRUE);
+    ioman->Register("MuchStrawDigiMatch", "Digi Match in MUCH", fDigiMatches, kTRUE);
   }
 
   fEvent = 0;
@@ -206,6 +204,7 @@ Bool_t CbmMuchDigitizeStraws::ExecStraws(CbmMuchPoint* point,Int_t iPoint){
   Int_t detectorId = point->GetDetectorID();
 
   Int_t iDigi = fDigis->GetEntriesFast();
+  //cout << iDigi << endl; //AZ
   CbmMuchDigi *digi = new ((*fDigis)[iDigi]) CbmMuchDigi(detectorId, 0, -1, 0);
   CbmMuchDigiMatch* match = new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch();
   match->AddPoint(iPoint);
@@ -215,8 +214,8 @@ Bool_t CbmMuchDigitizeStraws::ExecStraws(CbmMuchPoint* point,Int_t iPoint){
   coord[2] = (point->GetZIn() + point->GetZOut()) / 2.;
   // Pass abs values of coordinates and their sign in some stupid manner
   Int_t signs = 0;
-  digi->AddTime(point->GetTime() + gRandom->Gaus(0, 8e-2));
   for (Int_t i = 0; i < 3; ++i) {
+    digi->AddTime(TMath::Abs(coord[i]));
     if (coord[i] < 0) signs |= (1 << i);
   }
   digi->SetUniqueID(signs);

@@ -32,5 +32,6 @@
 #pragma link C++ class  CbmMuchStation+;
 #pragma link C++ class  CbmMuchTrackFinderIdeal+;
 #pragma link C++ class  CbmMuchFindHitsStraws+;
+#pragma link C++ class  CbmMuchStrawHitFinderQa+;
 
 #endif

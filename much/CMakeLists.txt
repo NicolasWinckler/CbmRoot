@@ -50,6 +50,7 @@ reco/CbmMuchFindHitsStraws.cxx
 reco/CbmMuchHitFinderQa.cxx
 reco/CbmMuchHitProducerIdeal.cxx
 reco/CbmMuchPointInfo.cxx
+reco/CbmMuchStrawHitFinderQa.cxx
 
 tracking/CbmMuchFindTracks.cxx
 tracking/CbmMuchMatchTracks.cxx 

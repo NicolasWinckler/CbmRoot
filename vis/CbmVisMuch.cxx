@@ -25,7 +25,7 @@
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchCluster.h"
-#include "CbmMuchHit.h"
+#include "CbmMuchPixelHit.h"
 #include "CbmMuchGeoScheme.h"
 
 #include "CbmVisMuchStationFrame.h"
@@ -36,6 +36,7 @@
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
 #include "CbmMuchModule.h"
+#include "CbmMuchModuleGem.h"
 #include "CbmMuchPad.h"
 #include "TColor.h"
 
@@ -79,15 +80,14 @@ InitStatus CbmVisMuch::Init() {
   TObjArray* stations = (TObjArray*) f->Get("stations");
   fGeoScheme=CbmMuchGeoScheme::Instance();
   fGeoScheme->Init(stations);
-  fGeoScheme->InitGrid();
-  fGeoScheme->CreatePointArrays("CbmVisPoint");
-  fGeoScheme->CreateHitArrays("CbmVisHit");
-  fGeoScheme->CreateClusterArrays("CbmVisMuchCluster");
+  fGeoScheme->CreatePointArrays();
+  fGeoScheme->CreateHitArrays();
+  fGeoScheme->CreateClusterArrays();
 
   fRootManager = FairRootManager::Instance();
   fMCTracks    = (TClonesArray*) fRootManager->GetObject("MCTrack");
   fPoints      = (TClonesArray*) fRootManager->GetObject("MuchPoint");
-  fHits        = (TClonesArray*) fRootManager->GetObject("MuchHit");
+  fHits        = (TClonesArray*) fRootManager->GetObject("MuchPixelHit");
   fDigis       = (TClonesArray*) fRootManager->GetObject("MuchDigi");
   fDigiMatches = (TClonesArray*) fRootManager->GetObject("MuchDigiMatch");
   fClusters    = (TClonesArray*) fRootManager->GetObject("MuchCluster");
@@ -157,7 +157,7 @@ void CbmVisMuch::ReadEvent(Int_t event){
   fGeoScheme->ClearPointArrays();
   fGeoScheme->ClearHitArrays();
   fGeoScheme->ClearClusterArrays();
-  fGeoScheme->ResetPads();
+//  fGeoScheme->ResetPads();
   fVisClusters->Clear();
 
 
@@ -176,7 +176,7 @@ void CbmVisMuch::ReadEvent(Int_t event){
   printf("Fill arrays of CbmVisHits... nHits = %i\n",fHits->GetEntriesFast());
   //Create arrays of CbmVisHits
   for (Int_t i=0;i<fHits->GetEntriesFast();i++){
-    CbmMuchHit* hit = (CbmMuchHit*) fHits->At(i);
+    CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fHits->At(i);
     CbmMuchModule* module = fGeoScheme->GetModuleByDetId(hit->GetDetectorId());
     TClonesArray &hits = *(module->GetHits());
     Int_t index = hits.GetEntriesFast();
@@ -187,8 +187,10 @@ void CbmVisMuch::ReadEvent(Int_t event){
   printf("Mark fired pads ... nPads = %i\n",fDigis->GetEntriesFast());
   for (Int_t i=0;i<fDigis->GetEntriesFast();i++){
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
-    CbmMuchSector* sector = fGeoScheme->GetSectorByDetId(digi->GetDetectorId(),digi->GetChannelId());
-    CbmMuchPad* pad = sector->GetPad(CbmMuchGeoScheme::GetChannelIndex(digi->GetChannelId()));
+    CbmMuchModule* module = (CbmMuchModule*) fGeoScheme->GetModuleByDetId(digi->GetDetectorId());
+    if (module->GetDetectorType()!=1) continue;
+    CbmMuchModuleGem* gem_module = (CbmMuchModuleGem*) module;
+    CbmMuchPad* pad = gem_module->GetPad(digi->GetChannelId());
     pad->SetFired(i,digi->GetCharge(),digi->GetADCCharge());
   }
 
@@ -256,24 +258,23 @@ Int_t CbmVisMuch::SetPointInfo(CbmVisPoint* vpoint){
 
 // -------------------------------------------------------------------------
 Int_t CbmVisMuch::SetHitInfo(CbmVisHit* vhit){
-  CbmMuchHit* hit  = (CbmMuchHit*) vhit->GetHit();
-  Int_t digiId = hit->GetDigi();
-  CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(digiId);
-
-  Int_t pointId = match->GetRefIndex();
-  vhit->SetPointId(pointId);
-
-  if (pointId<0) return 1;
-  FairMCPoint*  point  = (FairMCPoint*) fPoints->At(pointId);
-  Int_t trackId = point->GetTrackID();
-  vhit->SetTrackId(trackId);
-
-  if (trackId<0) return 2;
-  CbmMCTrack* track = (CbmMCTrack*) fMCTracks->At(trackId);
-  if (!track) return 3;
-  vhit->SetTrack(track);
-  vhit->SetMotherPdg(GetMotherPdg(track));
-
+//  CbmMuchPixelHit* hit  = (CbmMuchPixelHit*) vhit->GetHit();
+//  Int_t digiId = hit->GetDigi();
+//  CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(digiId);
+//
+//  Int_t pointId = match->GetRefIndex();
+//  vhit->SetPointId(pointId);
+//
+//  if (pointId<0) return 1;
+//  FairMCPoint*  point  = (FairMCPoint*) fPoints->At(pointId);
+//  Int_t trackId = point->GetTrackID();
+//  vhit->SetTrackId(trackId);
+//
+//  if (trackId<0) return 2;
+//  CbmMCTrack* track = (CbmMCTrack*) fMCTracks->At(trackId);
+//  if (!track) return 3;
+//  vhit->SetTrack(track);
+//  vhit->SetMotherPdg(GetMotherPdg(track));
   return 0;
 }
 // -------------------------------------------------------------------------

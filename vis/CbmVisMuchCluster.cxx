@@ -18,6 +18,7 @@
 #include "CbmVisPoint.h"
 #include "TClonesArray.h"
 #include "CbmMuchGeoScheme.h"
+#include "CbmMuchModuleGem.h"
 
 // -------------------------------------------------------------------------
 CbmVisMuchCluster::CbmVisMuchCluster(Int_t id){
@@ -55,7 +56,7 @@ void CbmVisMuchCluster::PrintInfo(){
   for (Int_t i=0;i<fPads.size();i++){
     Int_t digiId = fCluster->GetDigiIndex(i);
     CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(digiId);
-    printf(" %i",match->GetClusterIndex());
+//    printf(" %i",match->GetClusterIndex());
   }
   printf("\n");
 }
@@ -75,8 +76,12 @@ void CbmVisMuchCluster::CreateHisto(){
     Int_t id = indices[i];
     CbmMuchDigi* digi  = (CbmMuchDigi*) fDigis->At(id);
     CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(id);
-    CbmMuchSector* sector = CbmMuchGeoScheme::Instance()->GetSectorByDetId(digi->GetDetectorId(),digi->GetChannelId());
-    CbmMuchPad* pad = sector->GetPad(CbmMuchGeoScheme::GetChannelIndex(digi->GetChannelId()));
+
+    CbmMuchModule* module = (CbmMuchModule*) CbmMuchGeoScheme::Instance()->GetModuleByDetId(digi->GetDetectorId());
+    if (module->GetDetectorType()!=1) Fatal("CreateHisto","Wrong digi type in a cluster array");
+    CbmMuchModuleGem* gem_module = (CbmMuchModuleGem*) module;
+    CbmMuchPad* pad = gem_module->GetPad(digi->GetChannelId());
+
     if (i==0){
       bin_size_x = pad->GetLx();
       bin_size_y = pad->GetLy();
@@ -94,8 +99,10 @@ void CbmVisMuchCluster::CreateHisto(){
     Int_t id = indices[iIndex];
     CbmMuchDigi* digi  = (CbmMuchDigi*) fDigis->At(id);
     CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(id);
-    CbmMuchSector* sector = CbmMuchGeoScheme::Instance()->GetSectorByDetId(digi->GetDetectorId(),digi->GetChannelId());
-    CbmMuchPad* pad = sector->GetPad(CbmMuchGeoScheme::GetChannelIndex(digi->GetChannelId()));
+    CbmMuchModule* module = (CbmMuchModule*) CbmMuchGeoScheme::Instance()->GetModuleByDetId(digi->GetDetectorId());
+    if (module->GetDetectorType()!=1) Fatal("CreateHisto","Wrong digi type in a cluster array");
+    CbmMuchModuleGem* gem_module = (CbmMuchModuleGem*) module;
+    CbmMuchPad* pad = gem_module->GetPad(digi->GetChannelId());
     fPads.push_back(pad);
     Double_t x0  = pad->GetX0();
     Double_t y0  = pad->GetY0();

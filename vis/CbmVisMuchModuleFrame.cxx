@@ -22,7 +22,7 @@
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchStation.h"
-#include "CbmMuchModule.h"
+#include "CbmMuchModuleGem.h"
 #include "CbmMuchSector.h"
 #include "CbmVisMuch.h"
 #include "CbmVisPad.h"
@@ -34,7 +34,7 @@
 #include "TArc.h"
 using std::map;
 // -------------------------------------------------------------------------
-CbmVisMuchModuleFrame::CbmVisMuchModuleFrame(CbmMuchModule* module, CbmVisMuch* display){
+CbmVisMuchModuleFrame::CbmVisMuchModuleFrame(CbmMuchModuleGem* module, CbmVisMuch* display){
   fNHits = 0;
   fNPoints = 0;
   fPlineSize = 0;
@@ -178,11 +178,11 @@ void CbmVisMuchModuleFrame::HandleEmbeddedCanvas(Int_t event, Int_t px, Int_t py
         if (id<0) return;
         TClonesArray* digiMatches = fDisplay->GetDigiMatches();
         CbmMuchDigiMatch* match = (CbmMuchDigiMatch*)  digiMatches->At(id);
-        Int_t clusterId = match->GetClusterIndex();
-        TClonesArray* visClusters = fDisplay->GetVisClusters();
-        CbmVisMuchCluster* cluster = (CbmVisMuchCluster*) visClusters->At(clusterId);
-        cluster->PrintInfo();
-        cluster->DrawHisto();
+//        Int_t clusterId = match->GetClusterIndex();
+//        TClonesArray* visClusters = fDisplay->GetVisClusters();
+//        CbmVisMuchCluster* cluster = (CbmVisMuchCluster*) visClusters->At(clusterId);
+//        cluster->PrintInfo();
+//        cluster->DrawHisto();
       }
     }
 
@@ -199,8 +199,8 @@ void CbmVisMuchModuleFrame::HandleEmbeddedCanvas(Int_t event, Int_t px, Int_t py
         Int_t i=0;
         for(it=neighbours.begin(); it!=neighbours.end(); it++){
           CbmMuchPad* pad = *it;
-          fStatusBar->SetText(Form("%i",CbmMuchGeoScheme::GetChannelIndex(pad->GetChannelId())),2);
-          printf("%i\n",CbmMuchGeoScheme::GetChannelIndex(pad->GetChannelId()));
+//          fStatusBar->SetText(Form("%i",CbmMuchGeoScheme::GetChannelIndex(pad->GetChannelId())),2);
+//          printf("%i\n",CbmMuchGeoScheme::GetChannelIndex(pad->GetChannelId()));
           fCanvas->SetEditable(kTRUE);
           fCanvas->cd();
 //          TPolyLine pline = pad->GetPadPolygon();

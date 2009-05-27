@@ -30,13 +30,13 @@ class TCanvas;
 class TGCanvas;
 class TRootEmbeddedCanvas;
 class TGComboBox;
-class CbmMuchModule;
+class CbmMuchModuleGem;
 
 class CbmVisMuchModuleFrame : public TObject{
 RQ_OBJECT("CbmVisMuchModuleFrame")
 ClassDef(CbmVisMuchModuleFrame,1)
 public:
-   CbmVisMuchModuleFrame(CbmMuchModule* module, CbmVisMuch* display);
+   CbmVisMuchModuleFrame(CbmMuchModuleGem* module, CbmVisMuch* display);
    virtual ~CbmVisMuchModuleFrame();
    void CloseWindow();
    void HandleEmbeddedCanvas(Int_t event, Int_t x, Int_t y, TObject *sel);
@@ -58,7 +58,7 @@ public:
    TRootEmbeddedCanvas *fECanvas;
    TCanvas             *fCanvas;
    TGComboBox          *fSectorCombo;
-   CbmMuchModule       *fModule;
+   CbmMuchModuleGem    *fModule;
 
    CbmVisMuch          *fDisplay;
 

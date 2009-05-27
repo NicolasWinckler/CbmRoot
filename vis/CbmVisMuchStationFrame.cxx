@@ -320,6 +320,8 @@ void CbmVisMuchStationFrame::DrawPoints(){
     for (Int_t m=0;m<side->GetNModules();m++){
       CbmMuchModule* module = side->GetModule(m);
       TClonesArray* points = module->GetPoints();
+//      printf("m=%i points %i\n",m,points);
+      printf("points %i\n",points);
       for (Int_t i=0;i<points->GetEntriesFast();i++){
         CbmVisPoint* point = (CbmVisPoint*) points->At(i);
         point->DrawSpread();
@@ -420,14 +422,16 @@ void CbmVisMuchStationFrame::HandleEmbeddedCanvas(Int_t event, Int_t px, Int_t p
     if (!strcmp(selName,"CbmMuchSector")) {
       CbmMuchSector* sector = (CbmMuchSector*) sel;
       CbmMuchModule* module = fGeoScheme->GetModuleByDetId(sector->GetDetectorId());
-      CbmVisMuchModuleFrame* moduleFrame = new CbmVisMuchModuleFrame(module,fDisplay);
+      if (module->GetDetectorType()!=1) return;
+      CbmMuchModuleGem* gem_module = (CbmMuchModuleGem*) module;
+      CbmVisMuchModuleFrame* moduleFrame = new CbmVisMuchModuleFrame(gem_module,fDisplay);
       fDisplay->GetOpenModules()->AddAtFree(moduleFrame);
     }
 
-    if (!strcmp(selName,"CbmMuchModule")) {
-      CbmMuchModule* module = (CbmMuchModule*) sel;
+    if (!strcmp(selName,"CbmMuchModuleGem")) {
+      CbmMuchModuleGem* gem_module = (CbmMuchModuleGem*) sel;
       CbmVisMuchModuleFrame* moduleFrame
-         = new CbmVisMuchModuleFrame(module,fDisplay);
+         = new CbmVisMuchModuleFrame(gem_module,fDisplay);
       fDisplay->GetOpenModules()->AddAtFree(moduleFrame);
     }
 //    for(Int_t i=0;i<fSectors->GetEntriesFast();i++){

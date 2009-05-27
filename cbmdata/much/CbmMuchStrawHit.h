@@ -82,7 +82,7 @@ public:
         Double_t* GetDouble() { return fDouble; }
         Int_t* GetInt() { return fInt; }
         Int_t GetFlag() const { return fFlag; }
-        Int_t GetPlaneId() const { printf(" !!! CbmMuchStrawHit::GetPlaneId(): Implement me !!! \n"); exit(0); }
+        Int_t GetPlaneId() const { Fatal(" !!! CbmMuchStrawHit::GetPlaneId()"," !!! CbmMuchStrawHit::GetPlaneId()"); }
         Int_t GetTube() const { return fTube; }
         Int_t GetSegment() const { return fSegment; }
 

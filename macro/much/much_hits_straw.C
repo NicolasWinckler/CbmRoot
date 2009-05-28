@@ -8,7 +8,7 @@
  * @param outFile        Output file for reconstruction data
  * @param nEvents        Number of events to process
  */
-void much_hits(TString inFile = "",
+void much_hits_straw(TString inFile = "",
       TString digiFile = "",
       TString outFile = "",
       Int_t nEvents = 2)

@@ -208,6 +208,7 @@ void CbmMuchSegmentAuto::InitLayerSide(CbmMuchLayerSide* layerSide){
     CbmMuchModule* mod = layerSide->GetModule(iModule);
     if(mod->GetDetectorType()!=1) continue;
     CbmMuchModuleGem* module = (CbmMuchModuleGem*)mod;
+    module->SetNSectorChannels(128);
     SegmentModule(module);
   }
 }

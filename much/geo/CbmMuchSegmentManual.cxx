@@ -126,37 +126,37 @@ void CbmMuchSegmentManual::SetMinPadSize(Double_t padLx[], Double_t padLy[]){
 }
 // -------------------------------------------------------------------------
 
-// -----   Public method SetMaxSigma   -------------------------------------
-void CbmMuchSegmentManual::SetMaxSigma(Int_t iStation, Double_t sigmaX, Double_t sigmaY){
-  if(iStation < 0 || iStation >= fNStations) Fatal("SetMaxSigma", "iStation is out of range.");
-  fSecMaxLx[iStation] = fNCols[iStation]*TMath::Sqrt(12.)*sigmaX;
-  fSecMaxLy[iStation] = fNRows[iStation]*TMath::Sqrt(12.)*sigmaY;
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method SetMaxSigma  --------------------------------------
-void CbmMuchSegmentManual::SetMaxSigma(Double_t sigmaX[], Double_t sigmaY[]){
-  for(Int_t iStation=0;iStation<fNStations; ++iStation){
-    SetMaxSigma(iStation, sigmaX[iStation], sigmaY[iStation]);
-  }
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method SetMaxPadSize -------------------------------------
-void CbmMuchSegmentManual::SetMaxPadSize(Int_t iStation, Double_t padLx, Double_t padLy){
-  if(iStation < 0 || iStation >= fNStations) Fatal("SetMinPadSize", "iStation is out of range.");
-  fSecMaxLx[iStation] = fNCols[iStation]*padLx;
-  fSecMaxLy[iStation] = fNRows[iStation]*padLy;
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method SetMaxPadSize -------------------------------------
-void CbmMuchSegmentManual::SetMaxPadSize(Double_t padLx[], Double_t padLy[]){
-  for(Int_t iStation=0;iStation<fNStations; ++iStation){
-    SetMaxPadSize(iStation, padLx[iStation], padLy[iStation]);
-  }
-}
-// -------------------------------------------------------------------------
+//// -----   Public method SetMaxSigma   -------------------------------------
+//void CbmMuchSegmentManual::SetMaxSigma(Int_t iStation, Double_t sigmaX, Double_t sigmaY){
+//  if(iStation < 0 || iStation >= fNStations) Fatal("SetMaxSigma", "iStation is out of range.");
+//  fSecMaxLx[iStation] = fNCols[iStation]*TMath::Sqrt(12.)*sigmaX;
+//  fSecMaxLy[iStation] = fNRows[iStation]*TMath::Sqrt(12.)*sigmaY;
+//}
+//// -------------------------------------------------------------------------
+//
+//// -----   Public method SetMaxSigma  --------------------------------------
+//void CbmMuchSegmentManual::SetMaxSigma(Double_t sigmaX[], Double_t sigmaY[]){
+//  for(Int_t iStation=0;iStation<fNStations; ++iStation){
+//    SetMaxSigma(iStation, sigmaX[iStation], sigmaY[iStation]);
+//  }
+//}
+//// -------------------------------------------------------------------------
+//
+//// -----   Public method SetMaxPadSize -------------------------------------
+//void CbmMuchSegmentManual::SetMaxPadSize(Int_t iStation, Double_t padLx, Double_t padLy){
+//  if(iStation < 0 || iStation >= fNStations) Fatal("SetMinPadSize", "iStation is out of range.");
+//  fSecMaxLx[iStation] = fNCols[iStation]*padLx;
+//  fSecMaxLy[iStation] = fNRows[iStation]*padLy;
+//}
+//// -------------------------------------------------------------------------
+//
+//// -----   Public method SetMaxPadSize -------------------------------------
+//void CbmMuchSegmentManual::SetMaxPadSize(Double_t padLx[], Double_t padLy[]){
+//  for(Int_t iStation=0;iStation<fNStations; ++iStation){
+//    SetMaxPadSize(iStation, padLx[iStation], padLy[iStation]);
+//  }
+//}
+//// -------------------------------------------------------------------------
 
 // -----   Private method SetParContainers  --------------------------------
 void CbmMuchSegmentManual::SetParContainers() {
@@ -206,7 +206,7 @@ InitStatus CbmMuchSegmentManual::Init(){
       else if(iStation == 1) SetMinPadSize(iStation, 0.4, 0.4);
       else SetMinPadSize(iStation, 0.8, 0.8);
     }
-    if(fSecMaxLx.find(iStation)==fSecMaxLx.end()) SetMaxSigma(iStation, 0.32, 0.32);
+//    if(fSecMaxLx.find(iStation)==fSecMaxLx.end()) SetMaxSigma(iStation, 0.32, 0.32);
 
     fSecLx[iStation].push_back(fSecMinLx[iStation]);
     fSecLy[iStation].push_back(fSecMinLy[iStation]);
@@ -244,6 +244,7 @@ void CbmMuchSegmentManual::SegmentMuch(){
   // Save parameters
   TFile* f = new TFile(fDigiFileName, "RECREATE");
   fStations->Write("stations",1);
+
   f->Close();
 
   Print();
@@ -266,6 +267,10 @@ void CbmMuchSegmentManual::SegmentLayerSide(CbmMuchLayerSide* layerSide){
 
 // -----   Private method SegmentSector  -----------------------------------
 void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGem* module, Bool_t useModuleDesign){
+  Int_t detectorId = module->GetDetectorId();
+  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(detectorId);
+  CbmMuchStation* station = (CbmMuchStation*)fStations->At(iStation);
+  module->SetNSectorChannels(fNChannels[iStation]);
   Double_t secMaxLx = GetSectorMaxSize(module, "Width");
   Double_t secMaxLy = GetSectorMaxSize(module, "Length");
   Double_t padMaxLx = GetPadMaxSize(module, "Width");
@@ -278,9 +283,6 @@ void CbmMuchSegmentManual::SegmentModule(CbmMuchModuleGem* module, Bool_t useMod
   Double_t modX = position.X();
   Double_t modY = position.Y();
   Double_t modZ = position.Z();
-  Int_t detectorId = module->GetDetectorId();
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(detectorId);
-  CbmMuchStation* station = (CbmMuchStation*)fStations->At(iStation);
 
   Int_t nCols = Int_t(modLx/secMaxLx);
   Int_t nRows = Int_t(modLy/secMaxLy);
@@ -485,11 +487,11 @@ Bool_t CbmMuchSegmentManual::ShouldSegment(CbmMuchSector* sector, const TString 
   Double_t R  = TMath::Min(uR, bR);
 
   Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
-  Double_t secMaxL = direction=="X" ? fSecMaxLx[iStation] : fSecMaxLy[iStation];
+//  Double_t secMaxL = direction=="X" ? fSecMaxLx[iStation] : fSecMaxLy[iStation];
   Double_t secMinL = direction=="X" ? fSecMinLx[iStation] : fSecMinLy[iStation];
   Double_t secL    = direction=="X" ? secLx : secLy;
   if(secL > secMinL && secL/2. < secMinL) return false;
-  if(secL > secMaxL) return true;
+//  if(secL > secMaxL) return true;
 
   // Check sector size in the corresponding region
   for(Int_t iRegion=0; iRegion<fNRegions[iStation]; ++iRegion){

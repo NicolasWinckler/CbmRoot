@@ -120,6 +120,9 @@ public:
     virtual Bool_t InitModule();
     virtual void DrawModule(Color_t color);
 
+    Int_t GetNSectorChannels() const { return fNSectorChannels; }
+    void SetNSectorChannels(Int_t nSectorChannels) { fNSectorChannels = nSectorChannels; }
+
 private:
     Bool_t                 fUseModuleDesign;       // Whether to use module or monolithic design
     TObjArray              fSectors;               // Array of sectors within this module
@@ -128,7 +131,7 @@ private:
     Int_t                  fGridRows;              // Number of rows in the grid
     vector<vector<Int_t> > fGridIndices;           // 2D-vector of sector numbers
     TClonesArray*          fClusters;              //!
-
+    Int_t                  fNSectorChannels;       // Number of channels per "complete" sector
 
     Double_t GetGridCellY(Int_t iRow);
     Double_t GetGridCellX(Int_t iCol);

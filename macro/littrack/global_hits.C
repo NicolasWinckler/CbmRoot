@@ -1,17 +1,17 @@
-void global_reco(Int_t nEvents = 10)
+void global_hits(Int_t nEvents = 10)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString dir, mcFile, parFile, globalRecoFile;
+	TString dir, mcFile, parFile, globalHitsFile;
 	if (script != "yes") {
 		dir  = "/home/d/andrey/test/trunk/global_mu_urqmd/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
-		globalRecoFile = dir + "global.reco.0000.root";
+		globalHitsFile = dir + "global.hits.0000.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
-		globalRecoFile = TString(gSystem->Getenv("GLOBALRECOFILE"));
+		globalHitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
 	}
 
 	Int_t iVerbose = 1;
@@ -26,7 +26,7 @@ void global_reco(Int_t nEvents = 10)
 
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
-	run->SetOutputFile(globalRecoFile);
+	run->SetOutputFile(globalHitsFile);
 
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 	TString stsDigiFile = parDir+ "/sts/sts_Standard_s3055AAFK5.SecD.digi.par";
@@ -106,34 +106,6 @@ void global_reco(Int_t nEvents = 10)
 	// ------------------------------------------------------------------------
 	}
 
-	// ------ Global track reconstruction -------------------------------------
-	CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
-	finder->SetTrackingType("branch");
-	finder->SetMergerType("nearest_hit");
-	run->AddTask(finder);
-	// ------------------------------------------------------------------------
-
-	if (IsTrd(mcFile)) {
-		CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
-		run->AddTask(trdMatchTracks);
-	}
-
-	if (IsMuch(mcFile)) {
-		CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
-		run->AddTask(muchMatchTracks);
-	}
-
-	// -----   Track finding QA check   ------------------------------------
-	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
-	reconstructionQa->SetMinNofPointsSts(4);
-	reconstructionQa->SetMinNofPointsTrd(10);
-	reconstructionQa->SetMinNofPointsMuch(12);
-	reconstructionQa->SetMinNofPointsTof(1);
-	reconstructionQa->SetQuota(0.7);
-	reconstructionQa->SetVerbose(1);
-	run->AddTask(reconstructionQa);
-	// ------------------------------------------------------------------------
-
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();
 	FairParRootFileIo* parIo1 = new FairParRootFileIo();
@@ -146,17 +118,17 @@ void global_reco(Int_t nEvents = 10)
 	rtdb->saveOutput();
 	// ------------------------------------------------------------------------
 
-	// -----   Initialize and run   --------------------------------------------
+	// -----   Intialise and run   --------------------------------------------
 	run->LoadGeometry();
 	run->Init();
-	run->Run(0,nEvents);
+	run->Run(0, nEvents);
 	// ------------------------------------------------------------------------
 
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
 	cout << endl << endl;
-	cout << "Macro finished successfully." << endl;
-	cout << "Output file is "    << globalRecoFile << endl;
+	cout << "Macro finished succesfully." << endl;
+	cout << "Output file is " << globalHitsFile << endl;
 	cout << "Parameter file is " << parFile << endl;
 	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << endl;
 	cout << endl;

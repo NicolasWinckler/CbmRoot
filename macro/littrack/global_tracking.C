@@ -1,21 +1,22 @@
-#include "../../cbmbase/CbmDetectorList.h";
-void tof_hits(Int_t nEvents = 10000)
+void global_tracking(Int_t nEvents = 10)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString dir, mcFile, parFile, trdHitsFile;
+	TString dir, mcFile, parFile, globalHitsFile, globalTracksFile;
 	if (script != "yes") {
-//		dir  = "/d/cbm02/andrey/events/trd/segmented/10e/e/";
-		dir  = "/home/d/andrey/test/trunk/global_e/";
+		dir  = "/home/d/andrey/test/trunk/global_mu_urqmd/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
-		tofHitsFile = dir + "tof.hits.0000.root";
+		globalHitsFile = dir + "global.hits.0000.root";
+		globalTracksFile = dir + "global.tracks.0000.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
-		tofHitsFile = TString(gSystem->Getenv("TOFHITSFILE"));
+		globalHitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
+		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
 	}
 
+	Int_t iVerbose = 1;
 	TStopwatch timer;
 	timer.Start();
 
@@ -23,19 +24,40 @@ void tof_hits(Int_t nEvents = 10000)
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
 	cbmrootlibs();
+	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
 
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
-	run->SetOutputFile(tofHitsFile);
+	run->AddFriend(globalHitsFile);
+	run->SetOutputFile(globalTracksFile);
 	// ------------------------------------------------------------------------
 
+	CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
+	finder->SetTrackingType("branch");
+	finder->SetMergerType("nearest_hit");
+	run->AddTask(finder);
 
-	// ------   TOF hit producer   ---------------------------------------------
-	CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
-	run->AddTask(tofHitProd);
-	// -------------------------------------------------------------------------
+	if (IsTrd(mcFile)) {
+		CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
+		run->AddTask(trdMatchTracks);
+	}
 
+	if (IsMuch(mcFile)) {
+		CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
+		run->AddTask(muchMatchTracks);
+	}
+
+	// -----   Track finding QA check   ------------------------------------
+	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
+	reconstructionQa->SetMinNofPointsSts(4);
+	reconstructionQa->SetMinNofPointsTrd(10);
+	reconstructionQa->SetMinNofPointsMuch(12);
+	reconstructionQa->SetMinNofPointsTof(1);
+	reconstructionQa->SetQuota(0.7);
+	reconstructionQa->SetVerbose(1);
+	run->AddTask(reconstructionQa);
+	// ------------------------------------------------------------------------
 
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();
@@ -55,8 +77,8 @@ void tof_hits(Int_t nEvents = 10000)
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
 	cout << endl << endl;
-	cout << "Macro finished succesfully." << endl;
-	cout << "Output file is "    << trdHitsFile << endl;
+	cout << "Macro finished successfully." << endl;
+	cout << "Output file is "    << globalTracksFile << endl;
 	cout << "Parameter file is " << parFile << endl;
 	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << endl;
 	cout << endl;

@@ -6,7 +6,7 @@ void much_reco(Int_t nEvents = 100)
 	TString dir, mcFile, parFile, stsRecoFile, muchHitsFile, muchTracksFile;
 	if (script != "yes") {
 //		dir  = "/home/d/andrey/test/";//events/newmuch/standard/10mu/mu_urqmd/";
-		dir  = "/home/d/andrey/test/trunk/global_mu_urqmd/";
+		dir  = "/home/d/andrey/test/trunk/global_mu/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		stsRecoFile = dir + "sts.reco.0000.root";

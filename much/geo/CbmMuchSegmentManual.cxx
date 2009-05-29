@@ -531,12 +531,13 @@ void CbmMuchSegmentManual::Print(){
   printf("Segmentation written to file %s\n", fDigiFileName);
   Int_t nTotSectors = 0;
   Int_t nTotChannels = 0;
-  printf("=========================================================================================\n");
-  printf(" Station Nr.\t| Sectors\t| Channels\t| Pad min size\t\t| Pad max size\t \n");
-  printf("-----------------------------------------------------------------------------------------\n");
+  Int_t nTotGems = 0;
+  Int_t nTotStraws = 0;
+  printf("=================================================================================================\n");
   for(Int_t iStation=0; iStation < fStations->GetEntries(); ++iStation){
     CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);
-    //if(station->GetDetectorType()==2) continue;
+    Int_t nGems = 0;
+    Int_t nStraws = 0;
     Int_t nSectors = 0;
     Int_t nChannels = 0;
     Double_t padMaxLx = std::numeric_limits<Double_t>::min();
@@ -552,33 +553,47 @@ void CbmMuchSegmentManual::Print(){
         if(!side) continue;
         for(Int_t iModule=0; iModule < side->GetNModules(); ++iModule){
           CbmMuchModule* mod = side->GetModule(iModule);
-          if(mod->GetDetectorType()!=1) continue;
-          CbmMuchModuleGem* module = (CbmMuchModuleGem*)mod;
-          if(!module) continue;
-          nSectors += module->GetNSectors();
-          for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){
-            CbmMuchSector* sector = module->GetSector(iSector);
-            if(!sector) continue;
-            Double_t padLx = sector->GetDx();
-            Double_t padLy = sector->GetDy();
-            if(padLx > padMaxLx) padMaxLx = padLx;
-            if(padLx < padMinLx) padMinLx = padLx;
-            if(padLy > padMaxLy) padMaxLy = padLy;
-            if(padLy < padMinLy) padMinLy = padLy;
-            nChannels += sector->GetNChannels();
+          if(!mod) continue;
+          switch(mod->GetDetectorType()){
+            case 1:{ // GEMs
+              CbmMuchModuleGem* module = (CbmMuchModuleGem*)mod;
+              if(!module) continue;
+              nGems++;
+              nSectors += module->GetNSectors();
+              for(Int_t iSector=0; iSector<module->GetNSectors(); ++iSector){
+                CbmMuchSector* sector = module->GetSector(iSector);
+                if(!sector) continue;
+                Double_t padLx = sector->GetDx();
+                Double_t padLy = sector->GetDy();
+                if(padLx > padMaxLx) padMaxLx = padLx;
+                if(padLx < padMinLx) padMinLx = padLx;
+                if(padLy > padMaxLy) padMaxLy = padLy;
+                if(padLy < padMinLy) padMinLy = padLy;
+                nChannels += sector->GetNChannels();
+              }
+              break;
+            }
+            case 2: // Straw tubes
+              nStraws++;
+              break;
           }
         }
       }
     }
-    printf("%i\t\t| %i\t\t| %i\t| %5.4fx%5.4f\t\t| %5.4fx%5.4f\n",iStation+1, nSectors, nChannels, padMinLx, padMinLy, padMaxLx, padMaxLy);
+    printf("Station %i:\n", iStation+1);
+    printf("   GEM modules: %i\n", nGems);
+    printf("      Sectors: %i,  Pads: %i, Min.Pad size:%3.2fx%3.2f, Min.Pad size:%3.2fx%3.2f\n",nSectors, nChannels, padMinLx, padMinLy, padMaxLx, padMaxLy);
+    printf("   Straw modules: %i\n", nStraws);
     nTotSectors += nSectors;
     nTotChannels += nChannels;
+    nTotGems += nGems;
+    nTotStraws += nStraws;
   }
-  printf("-----------------------------------------------------------------------------------------\n");
-  printf(" Total:\t\t| %i\t\t| %i\t| \t\t\t|\n", nTotSectors, nTotChannels);
-  printf("=========================================================================================\n");
+  printf("-------------------------------------------------------------------------------------------------\n");
+  printf(" Summary: \n   GEM modules: %i\n      Sectors: %i, Pads: %i\n   Straw modules: %i\n",
+      nTotGems, nTotSectors, nTotChannels, nTotStraws);
+  printf("=================================================================================================\n");
 }
-// -------------------------------------------------------------------------
 
 ClassImp(CbmMuchSegmentManual)
 

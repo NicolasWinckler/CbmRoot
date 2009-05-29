@@ -75,7 +75,7 @@ class CbmTrdTrackFinderIdeal : public CbmTrdTrackFinder
    ** 3 - debug (maximal output)
    **/
   Int_t fVerbose;
-
+  Int_t fEventNum;
 
  public:
 

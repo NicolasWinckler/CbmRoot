@@ -116,7 +116,7 @@ void CbmTrdTrackFinderIdeal::Init()
           << " no TRD detector!" << endl;
       return;
   }
-
+  fEventNum = 0;
 
   /*
     CbmGeoTrdPar* par=(CbmGeoTrdPar*)(rtdb->getContainer("CbmGeoTrdPar"));
@@ -174,6 +174,7 @@ void CbmTrdTrackFinderIdeal::Init()
 Int_t CbmTrdTrackFinderIdeal::DoFind(TClonesArray* hitArray,
                                      TClonesArray* trackArray)
 {
+
   // Check pointers
   if ( !fMCTrackArray ) {
     cout << "-E- CbmTrdTrackFinderIdeal::DoFind: "
@@ -337,11 +338,11 @@ Int_t CbmTrdTrackFinderIdeal::DoFind(TClonesArray* hitArray,
             << "added to TRD track " << trackIndex << endl;
     }
   }
-
+  fEventNum++;
   if(fVerbose) {
       cout << endl;
       cout << "------------------------------------------------------" << endl;
-      cout << "         CbmTrdTrackFinderIdeal: Event summary" << endl;
+      cout << "         CbmTrdTrackFinderIdeal: Event summary # " << fEventNum <<  endl;
       cout << "TRD hits: " << nTrdHit << endl;
       cout << "MC tracks total: " << nMCTracks << ", accepted: "
           << nMCacc << ", reconstructable: " << nTracks << endl;

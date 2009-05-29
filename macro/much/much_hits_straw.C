@@ -18,7 +18,7 @@ void much_hits_straw(TString inFile = "",
       inFile = inputdir + "/macro/much/data/Jpsi.auau.25gev.centr.mc.root";
    }
    if (digiFile == "") {
-      digiFile = inputdir + "/parameters/much/much_standard_straws.digi.root";//"/macro/much/data/much_digi.root";
+      digiFile = inputdir + "/parameters/much/much_standard_straw.digi.root";//"/macro/much/data/much_digi.root";
    }
    if (outFile == "") {
       outFile = inputdir + "/macro/much/data/Jpsi.auau.25gev.centr.muchhits.root";

@@ -475,7 +475,7 @@ void CbmMuchSegmentAuto::Print(){
     }
     printf("Station %i:\n", iStation+1);
     printf("   GEM modules: %i\n", nGems);
-    printf("      Sectors: %i,  Pads: %i, Min.Pad size:%3.2fx%3.2f, Min.Pad size:%3.2fx%3.2f\n",nSectors, nChannels, padMinLx, padMinLy, padMaxLx, padMaxLy);
+    if(nGems) printf("      Sectors: %i,  Pads: %i, Min.Pad size:%3.2fx%3.2f, Min.Pad size:%3.2fx%3.2f\n",nSectors, nChannels, padMinLx, padMinLy, padMaxLx, padMaxLy);
     printf("   Straw modules: %i\n", nStraws);
     nTotSectors += nSectors;
     nTotChannels += nChannels;

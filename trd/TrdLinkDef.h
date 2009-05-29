@@ -5,7 +5,7 @@
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
- 
+
 #pragma link C++ class  CbmTrd+;
 #pragma link C++ class  CbmTrdHitProducerIdeal+;
 #pragma link C++ class  CbmTrdHitProducerSmearing+;
@@ -28,6 +28,8 @@
 #pragma link C++ class  CbmTrdCreatePidLike+;
 #pragma link C++ class  CbmTrdTracksPidQa+;
 #pragma link C++ class  CbmTrdGas+;
+#pragma link C++ class CbmTrdElectronsQa+;
+
 //#pragma link C++ class  CbmTrdDigitizer+;
 //#pragma link C++ class  CbmTrdDigi+;
 //#pragma link C++ class  CbmTrdDigiMatch+;

@@ -7,12 +7,12 @@
 
 CbmMuchPixelHit::CbmMuchPixelHit()
 {
-
+	SetType(kMUCHPIXELHIT);
 }
 
 CbmMuchPixelHit::~CbmMuchPixelHit()
 {
-	SetType(kMUCHPIXELHIT);
+
 }
 
 CbmMuchPixelHit::CbmMuchPixelHit(

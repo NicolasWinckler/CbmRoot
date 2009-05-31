@@ -47,7 +47,7 @@ public:
 	  *@param detId  Unique detector ID (including module number)
 	  *@param pos Position in global c.s. [cm]
       *@param err Errors of position in global c.s. [cm]
-	  *@param dxy  Covariance of x and y
+	  *@param dxy  XY correlation of the hit
 	  *@param refId Index of digi or cluster
 	  *@param planeId detectro plane identifier
 	  **/

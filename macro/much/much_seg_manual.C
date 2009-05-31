@@ -74,16 +74,16 @@ void much_seg_manual(const char* mcFile = "",
   seg->SetNChannels(nChannels);
 
   // Number of regions for each station
-  Int_t nRegions[] = {1, 1, 1, 1, 1, 1};
+  Int_t nRegions[] = {5, 3, 1, 1, 1, 1};
   seg->SetNRegions(nRegions);
 
   // Set region radii for each station
-  Double_t st0_rad[] = {75};//{13.99, 19.39, 24.41, 31.51, 64.76};
-  Double_t st1_rad[] = {100};//{22, 24, 90.95};
-  Double_t st2_rad[] = {125};//{110.95};
-  Double_t st3_rad[] = {155};//{135.95};
-  Double_t st4_rad[] = {177.5};//{163.45};
-  Double_t st5_rad[] = {247.5};//{228.45};
+  Double_t st0_rad[] = {14, 20, 25, 32, 65};
+  Double_t st1_rad[] = {22, 24, 91};
+  Double_t st2_rad[] = {111};
+  Double_t st3_rad[] = {136};
+  Double_t st4_rad[] = {164};
+  Double_t st5_rad[] = {229};
   seg->SetRegionRadii(0, st0_rad);
   seg->SetRegionRadii(1, st1_rad);
   seg->SetRegionRadii(2, st2_rad);
@@ -92,8 +92,8 @@ void much_seg_manual(const char* mcFile = "",
   seg->SetRegionRadii(5, st5_rad);
 
   // Set minimum pad size/resolution [cm] in the center region for each station
-  Double_t padLx[] = {0.28, 0.28, 0.56, 0.56 ,1.12, 1.12};//{0.1386, 0.4, 0.8, 0.8 ,0.8, 0.8};
-  Double_t padLy[] = {0.28, 0.56, 0.56, 1.12 ,1.12, 1.12};//{0.1386, 0.4, 0.8, 0.8 ,0.8, 0.8};
+  Double_t padLx[] = {0.134, 0.4, 0.8, 0.8 ,0.8, 0.8};
+  Double_t padLy[] = {0.134, 0.4, 0.8, 0.8 ,0.8, 0.8};
   seg->SetMinPadSize(padLx, padLy);
 
   fRun->AddTask(seg);

@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <cassert>
 
 using std::string;
 
@@ -380,6 +381,7 @@ void CbmMuchSegmentManual::SegmentSector(CbmMuchModuleGem* module, CbmMuchSector
   Int_t nR = Int_t(padLy/GetPadMaxSize(module, "Length"));
   Double_t pLy = nR == 0 ? padLy : nR*GetPadMaxSize(module, "Length");
 
+  assert(resultX || resultY);
   delete sector;
   Int_t iSector;
   TVector3 position, size;
@@ -463,7 +465,8 @@ Bool_t CbmMuchSegmentManual::ShouldSegment(CbmMuchSector* sector, const TString 
   Double_t secY  = sector->GetPosition()[1];
 
   if(TMath::Abs(secLx - secLy) < 1e-5 && direction=="Y") return false;
-  if(secLy > secLx && TMath::Abs(secLx - secLy) > 1e-5 && direction=="X") return false;
+  //if(!ShouldSegment(sector, "Y") && secLy > secLx && TMath::Abs(secLx - secLy) > 1e-5 && direction=="X")
+  if(secLy > secLx && direction=="X" && ShouldSegment(sector, "Y") && TMath::Abs(secLx - secLy) > 1e-5) return false;
 
   Double_t ulR = TMath::Sqrt((secX - secLx/2.)*(secX - secLx/2.) + (secY + secLy/2.)*(secY + secLy/2.));
   Double_t urR = TMath::Sqrt((secX + secLx/2.)*(secX + secLx/2.) + (secY + secLy/2.)*(secY + secLy/2.));
@@ -475,11 +478,9 @@ Bool_t CbmMuchSegmentManual::ShouldSegment(CbmMuchSector* sector, const TString 
   Double_t R  = TMath::Min(uR, bR);
 
   Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
-//  Double_t secMaxL = direction=="X" ? fSecMaxLx[iStation] : fSecMaxLy[iStation];
   Double_t secMinL = direction=="X" ? fSecMinLx[iStation] : fSecMinLy[iStation];
   Double_t secL    = direction=="X" ? secLx : secLy;
   if(secL > secMinL && secL/2. < secMinL) return false;
-//  if(secL > secMaxL) return true;
 
   // Check sector size in the corresponding region
   for(Int_t iRegion=0; iRegion<fNRegions[iStation]; ++iRegion){
@@ -608,7 +609,7 @@ void CbmMuchSegmentManual::DrawSegmentation(){
     fprintf(outfile, "----------------------------------------------------------------------------\n");
     TCanvas* c1 = new TCanvas(Form("station%i",iStation+1),Form("station%i",iStation+1),800,800);
     c1->SetFillColor(0);
-    c1->Range(-250,-250,250,250);//(-27,-2,0,25);
+    c1->Range(-250,-250,250,250);
     CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);
     CbmMuchLayer* layer = station->GetLayer(0);
     for (Int_t iSide=1;iSide>=0;iSide--){

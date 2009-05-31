@@ -551,13 +551,6 @@ void CbmMuchSegmentAuto::DrawSegmentation(){
       } // modules
     } // sides
 
-//    for(Int_t iRegion=0; iRegion < radii.size(); ++iRegion){
-//      TArc* arc = new TArc(0.,0.,radii.at(iRegion));
-//      arc->SetLineColor(kBlue);
-//      arc->SetLineWidth(2);
-//      arc->SetFillStyle(0);
-//      arc->Draw();
-//    }
     c1->Print(Form("station%i.eps",iStation+1));
     c1->Print(Form("station%i.png",iStation+1));
   }//stations

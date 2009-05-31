@@ -87,22 +87,6 @@ class CbmMuchSegmentManual : public FairTask {
     void SetMinPadSize(Int_t iStation, Double_t padLx, Double_t padLy);
     void SetMinPadSize(Double_t padLx[], Double_t padLy[]);
 
-//    /** Sets maximum allowed resolution for the given station
-//     * @param iStation Station index
-//     * @param sigmaX   Maximum allowed resolution in X direction
-//     * @param sigmaY   Maximum allowed resolution in Y direction
-//     */
-//    void SetMaxSigma(Int_t iStation, Double_t sigmaX, Double_t sigmaY);
-//    void SetMaxSigma(Double_t sigmaX[], Double_t sigmaY[]);
-//
-//    /** Sets maximum allowed pad size for the given station
-//     * @param iStation Station index
-//     * @param padLx    Maximum allowed pad width
-//     * @param padLy    Maximum allowed pad length
-//     */
-//    void SetMaxPadSize(Int_t iStation, Double_t padLx, Double_t padLy);
-//    void SetMaxPadSize(Double_t padLx[], Double_t padLy[]);
-
   private:
     CbmGeoMuchPar*                fGeoPar;         // Geometry parameters container
     Int_t                         fNStations;      // Number of stations
@@ -114,8 +98,6 @@ class CbmMuchSegmentManual : public FairTask {
     map<Int_t, vector<Double_t> > fSecLy;          // Map from a station index to a vector of sector lengths for each region
     map<Int_t, Double_t>          fSecMinLx;       // Map from a station index to a minimum allowed width of a sector
     map<Int_t, Double_t>          fSecMinLy;       // Map from a station index to a minimum allowed length of a sector
-//    map<Int_t, Double_t>          fSecMaxLx;       // Map from a station index to a maximum allowed width of a sector
-//    map<Int_t, Double_t>          fSecMaxLy;       // Map from a station index to a maximum allowed length of a sector
     map<Int_t, Int_t>             fNChannels;      // Map from a station index to a number of channels per sector
     map<Int_t, Int_t>             fNCols;          // Map from a station index to a number of columns in a sector
     map<Int_t, Int_t>             fNRows;          // Map from a station index to a number of rows in a sector
@@ -186,6 +168,9 @@ class CbmMuchSegmentManual : public FairTask {
      * @return          true if segmentation is required, false otherwise
      */
     Bool_t ShouldSegment(CbmMuchSector* sector, const TString direction);
+
+    /** Draws segmentedstations. */
+    void DrawSegmentation();
 
     /** Prints summary */
     void Print();

@@ -67,13 +67,14 @@ class CbmMuchSegmentAuto : public FairTask{
   /** Get parameter containers **/
   virtual void SetParContainers();
 
-  /** Intialisation **/
+  /** Initialization **/
   void InitLayerSide(CbmMuchLayerSide* layerSide);
   void SegmentModule(CbmMuchModuleGem* module);
   void SegmentSector(CbmMuchModuleGem* module, CbmMuchSector* sector);
   Bool_t ShouldSegmentByX(CbmMuchSector* sector);
   Bool_t ShouldSegmentByY(CbmMuchSector* sector);
   Int_t IntersectsRad(CbmMuchSector* sector, Double_t radius);
+  void DrawSegmentation();
   void Print();
 
   ClassDef(CbmMuchSegmentAuto,1)

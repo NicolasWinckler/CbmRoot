@@ -22,12 +22,18 @@
 #include "TMath.h"
 #include "TClonesArray.h"
 #include "TCanvas.h"
+#include "TArc.h"
+#include "TColor.h"
 #include "TStyle.h"
 #include "TFile.h"
 #include "TH1.h"
 #include "TF1.h"
 
 #include <cassert>
+#include <stdio.h>
+#include <string>
+
+using std::string;
 
 // -----   Default constructor   -------------------------------------------
 CbmMuchSegmentAuto::CbmMuchSegmentAuto(){
@@ -183,17 +189,13 @@ void CbmMuchSegmentAuto::FinishTask(){
     printf("Station%i segmented\n",i+1);
   }
 
-  //   // Write full segmentation (sectors + pads + grid)
-  //   CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-  //   geoScheme->Init(fStations);
-  //   geoScheme->InitGrid();
-
   // Save parameters
   TFile* f = new TFile(fDigiFileName, "RECREATE");
   fStations->Write("stations",1);
 
   f->Close();
 
+  DrawSegmentation();
 
   Print();
 }
@@ -475,7 +477,7 @@ void CbmMuchSegmentAuto::Print(){
     }
     printf("Station %i:\n", iStation+1);
     printf("   GEM modules: %i\n", nGems);
-    if(nGems) printf("      Sectors: %i,  Pads: %i, Min.Pad size:%3.2fx%3.2f, Min.Pad size:%3.2fx%3.2f\n",nSectors, nChannels, padMinLx, padMinLy, padMaxLx, padMaxLy);
+    if(nGems) printf("      Sectors: %i,  Pads: %i, Min.Pad size:%3.2fx%3.2f, Max.Pad size:%3.2fx%3.2f\n",nSectors, nChannels, padMinLx, padMinLy, padMaxLx, padMaxLy);
     printf("   Straw modules: %i\n", nStraws);
     nTotSectors += nSectors;
     nTotChannels += nChannels;
@@ -486,6 +488,80 @@ void CbmMuchSegmentAuto::Print(){
   printf(" Summary: \n   GEM modules: %i\n      Sectors: %i, Pads: %i\n   Straw modules: %i\n",
       nTotGems, nTotSectors, nTotChannels, nTotStraws);
   printf("=================================================================================================\n");
+}
+
+void CbmMuchSegmentAuto::DrawSegmentation(){
+  string digifile(fDigiFileName);
+  Int_t startIndex = digifile.size() - 4;
+  string txtfile  = digifile.erase(startIndex, 4);
+  txtfile.append("txt");
+  FILE* outfile;
+  outfile = fopen(txtfile.c_str(), "w");
+
+  Int_t colors[] = {kGreen, kBlue, kViolet, kRed, kYellow, kOrange, kMagenta, kCyan,  kSpring, kPink, kAzure, kTeal,
+      kGreen+10, kBlue+10, kViolet+10, kRed+10, kYellow+10, kOrange+10, kMagenta+10, kCyan+10,  kSpring+10, kPink+10, kAzure+10, kTeal+10};
+
+  CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
+  geoScheme->Init(fStations);
+
+  vector<CbmMuchModule*> modules = geoScheme->GetModules();
+  Double_t secMinLx = std::numeric_limits<Double_t>::max();
+  Double_t secMinLy = std::numeric_limits<Double_t>::max();
+  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!= modules.end(); it++){
+    CbmMuchModule* mod = (*it);
+    if(mod->GetDetectorType()!= 1) continue;
+    CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
+    for(Int_t iSector=0;iSector<module->GetNSectors();++iSector){
+      CbmMuchSector* sector = module->GetSector(iSector);
+      if(sector->GetSize()[0] < secMinLx) secMinLx = sector->GetSize()[0];
+      if(sector->GetSize()[1] < secMinLy) secMinLy = sector->GetSize()[1];
+    }
+  }
+
+  for (Int_t iStation=0;iStation<fStations->GetEntriesFast();++iStation){
+    fprintf(outfile, "===========================================================================\n");
+    fprintf(outfile, "Station %i\n", iStation+1);
+    fprintf(outfile, "Sector size, cm   Sector position, cm   Number of pads   Side   Pad size, cm\n");
+    fprintf(outfile, "----------------------------------------------------------------------------\n");
+    TCanvas* c1 = new TCanvas(Form("station%i",iStation+1),Form("station%i",iStation+1),800,800);
+    c1->SetFillColor(0);
+    c1->Range(-250,-250,250,250);//(-27,-2,0,25);
+    CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);
+    CbmMuchLayer* layer = station->GetLayer(0);
+    for (Int_t iSide=1;iSide>=0;iSide--){
+      CbmMuchLayerSide* side = layer->GetSide(iSide);
+      for (Int_t iModule=0;iModule<side->GetNModules();++iModule) {
+        CbmMuchModule* mod = side->GetModule(iModule);
+        mod->SetFillStyle(0);
+        mod->Draw();
+        if(mod->GetDetectorType() != 1) continue;
+        CbmMuchModuleGem* module = (CbmMuchModuleGem*)mod;
+        for (Int_t iSector=0;iSector<module->GetNSectors();++iSector){
+          CbmMuchSector* sector = module->GetSector(iSector);
+          Int_t i = Int_t((sector->GetSize()[0]+1e-3)/secMinLx) - 1;
+          Int_t j = Int_t((sector->GetSize()[1]+1e-3)/secMinLy) - 1;
+          sector->SetFillColor(iSide ? TColor::GetColorDark(colors[i+j]) : colors[i+j]);
+          sector->Draw("f");
+          sector->Draw();
+          const char* side = iSide ? "Back" : "Front";
+          fprintf(outfile, "%-4.2fx%-10.2f   %-6.2fx%-12.2f   %-14i   %-5s   ", sector->GetSize()[0], sector->GetSize()[1],
+              sector->GetPosition()[0], sector->GetPosition()[1], sector->GetNChannels(), side);
+          fprintf(outfile, "%-4.2fx%-4.2f\n", sector->GetSize()[0], sector->GetSize()[1], sector->GetNChannels(), sector->GetDx(), sector->GetDy());
+        } // sectors
+      } // modules
+    } // sides
+
+//    for(Int_t iRegion=0; iRegion < radii.size(); ++iRegion){
+//      TArc* arc = new TArc(0.,0.,radii.at(iRegion));
+//      arc->SetLineColor(kBlue);
+//      arc->SetLineWidth(2);
+//      arc->SetFillStyle(0);
+//      arc->Draw();
+//    }
+    c1->Print(Form("station%i.eps",iStation+1));
+    c1->Print(Form("station%i.png",iStation+1));
+  }//stations
+  fclose(outfile);
 }
 
 ClassImp(CbmMuchSegmentAuto)

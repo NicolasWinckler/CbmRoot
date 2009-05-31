@@ -8,18 +8,25 @@
  */
 
 #include "CbmMuchSegmentManual.h"
-#include "TFile.h"
-#include "TMath.h"
-
-#include "FairRuntimeDb.h"
-
 #include "CbmGeoMuchPar.h"
-
 #include "CbmMuchStation.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
 #include "CbmMuchModuleGem.h"
 #include "CbmMuchSector.h"
+
+#include "FairRuntimeDb.h"
+
+#include "TFile.h"
+#include "TMath.h"
+#include "TCanvas.h"
+#include "TArc.h"
+#include "TColor.h"
+
+#include <stdio.h>
+#include <string>
+
+using std::string;
 
 // -----   Default constructor   -------------------------------------------
 CbmMuchSegmentManual::CbmMuchSegmentManual(){
@@ -99,6 +106,12 @@ void CbmMuchSegmentManual::SetMinSigma(Int_t iStation, Double_t sigmaX, Double_t
   if(iStation < 0 || iStation >= fNStations) Fatal("SetMinSigma", "iStation is out of range.");
   fSecMinLx[iStation] = fNCols[iStation]*TMath::Sqrt(12.)*sigmaX;
   fSecMinLy[iStation] = fNRows[iStation]*TMath::Sqrt(12.)*sigmaY;
+  if(TMath::Abs(fSecMinLy[iStation]-fSecMinLx[iStation]) < 1e-5) return;
+  if(TMath::Abs(fSecMinLy[iStation]/fSecMinLx[iStation]-2.) > 1e-5){
+    fNCols[iStation] *=2;
+    fNRows[iStation] /=2;
+    SetMinSigma(iStation, sigmaX, sigmaY);
+  }
 }
 // -------------------------------------------------------------------------
 
@@ -115,6 +128,12 @@ void CbmMuchSegmentManual::SetMinPadSize(Int_t iStation, Double_t padLx, Double_
   if(iStation < 0 || iStation >= fNStations) Fatal("SetMinPadSize", "iStation is out of range.");
   fSecMinLx[iStation] = fNCols[iStation]*padLx;
   fSecMinLy[iStation] = fNRows[iStation]*padLy;
+  if(TMath::Abs(fSecMinLy[iStation]-fSecMinLx[iStation]) < 1e-5) return;
+  if(TMath::Abs(fSecMinLy[iStation]/fSecMinLx[iStation]-2.) > 1e-5){
+    fNCols[iStation] *=2;
+    fNRows[iStation] /=2;
+    SetMinPadSize(iStation, padLx, padLy);
+  }
 }
 // -------------------------------------------------------------------------
 
@@ -125,38 +144,6 @@ void CbmMuchSegmentManual::SetMinPadSize(Double_t padLx[], Double_t padLy[]){
   }
 }
 // -------------------------------------------------------------------------
-
-//// -----   Public method SetMaxSigma   -------------------------------------
-//void CbmMuchSegmentManual::SetMaxSigma(Int_t iStation, Double_t sigmaX, Double_t sigmaY){
-//  if(iStation < 0 || iStation >= fNStations) Fatal("SetMaxSigma", "iStation is out of range.");
-//  fSecMaxLx[iStation] = fNCols[iStation]*TMath::Sqrt(12.)*sigmaX;
-//  fSecMaxLy[iStation] = fNRows[iStation]*TMath::Sqrt(12.)*sigmaY;
-//}
-//// -------------------------------------------------------------------------
-//
-//// -----   Public method SetMaxSigma  --------------------------------------
-//void CbmMuchSegmentManual::SetMaxSigma(Double_t sigmaX[], Double_t sigmaY[]){
-//  for(Int_t iStation=0;iStation<fNStations; ++iStation){
-//    SetMaxSigma(iStation, sigmaX[iStation], sigmaY[iStation]);
-//  }
-//}
-//// -------------------------------------------------------------------------
-//
-//// -----   Public method SetMaxPadSize -------------------------------------
-//void CbmMuchSegmentManual::SetMaxPadSize(Int_t iStation, Double_t padLx, Double_t padLy){
-//  if(iStation < 0 || iStation >= fNStations) Fatal("SetMinPadSize", "iStation is out of range.");
-//  fSecMaxLx[iStation] = fNCols[iStation]*padLx;
-//  fSecMaxLy[iStation] = fNRows[iStation]*padLy;
-//}
-//// -------------------------------------------------------------------------
-//
-//// -----   Public method SetMaxPadSize -------------------------------------
-//void CbmMuchSegmentManual::SetMaxPadSize(Double_t padLx[], Double_t padLy[]){
-//  for(Int_t iStation=0;iStation<fNStations; ++iStation){
-//    SetMaxPadSize(iStation, padLx[iStation], padLy[iStation]);
-//  }
-//}
-//// -------------------------------------------------------------------------
 
 // -----   Private method SetParContainers  --------------------------------
 void CbmMuchSegmentManual::SetParContainers() {
@@ -206,7 +193,6 @@ InitStatus CbmMuchSegmentManual::Init(){
       else if(iStation == 1) SetMinPadSize(iStation, 0.4, 0.4);
       else SetMinPadSize(iStation, 0.8, 0.8);
     }
-//    if(fSecMaxLx.find(iStation)==fSecMaxLx.end()) SetMaxSigma(iStation, 0.32, 0.32);
 
     fSecLx[iStation].push_back(fSecMinLx[iStation]);
     fSecLy[iStation].push_back(fSecMinLy[iStation]);
@@ -248,6 +234,8 @@ void CbmMuchSegmentManual::SegmentMuch(){
   f->Close();
 
   Print();
+
+  DrawSegmentation();
 }
 // -------------------------------------------------------------------------
 
@@ -544,6 +532,10 @@ void CbmMuchSegmentManual::Print(){
     Double_t padMinLx = std::numeric_limits<Double_t>::max();
     Double_t padMaxLy = std::numeric_limits<Double_t>::min();
     Double_t padMinLy = std::numeric_limits<Double_t>::max();
+    Double_t secMaxLx = std::numeric_limits<Double_t>::min();
+    Double_t secMinLx = std::numeric_limits<Double_t>::max();
+    Double_t secMaxLy = std::numeric_limits<Double_t>::min();
+    Double_t secMinLy = std::numeric_limits<Double_t>::max();
     if(!station) continue;
     for(Int_t iLayer = 0; iLayer < station->GetNLayers(); ++iLayer){
       CbmMuchLayer* layer = station->GetLayer(iLayer);
@@ -565,10 +557,10 @@ void CbmMuchSegmentManual::Print(){
                 if(!sector) continue;
                 Double_t padLx = sector->GetDx();
                 Double_t padLy = sector->GetDy();
-                if(padLx > padMaxLx) padMaxLx = padLx;
-                if(padLx < padMinLx) padMinLx = padLx;
-                if(padLy > padMaxLy) padMaxLy = padLy;
-                if(padLy < padMinLy) padMinLy = padLy;
+                if(padLx > padMaxLx) { padMaxLx = padLx; secMaxLx = sector->GetNCols()*padLx; }
+                if(padLx < padMinLx) { padMinLx = padLx; secMinLx = sector->GetNCols()*padLx; }
+                if(padLy > padMaxLy) { padMaxLy = padLy; secMaxLy = sector->GetNRows()*padLy; }
+                if(padLy < padMinLy) { padMinLy = padLy; secMinLy = sector->GetNRows()*padLy; }
                 nChannels += sector->GetNChannels();
               }
               break;
@@ -582,7 +574,10 @@ void CbmMuchSegmentManual::Print(){
     }
     printf("Station %i:\n", iStation+1);
     printf("   GEM modules: %i\n", nGems);
-    if(nGems) printf("      Sectors: %i,  Pads: %i, Min.Pad size:%3.2fx%3.2f, Min.Pad size:%3.2fx%3.2f\n",nSectors, nChannels, padMinLx, padMinLy, padMaxLx, padMaxLy);
+    if(nGems) {
+      printf("      Sectors: %i, Min.Sector size:%3.2fx%3.2f, Max.Sector size:%3.2fx%3.2f\n",nSectors, secMinLx, secMinLy, secMaxLx, secMaxLy);
+      printf("      Pads: %i, Min.Pad size:%3.2fx%3.2f, Max.Pad size:%3.2fx%3.2f\n", nChannels, padMinLx, padMinLy, padMaxLx, padMaxLy);
+    }
     printf("   Straw modules: %i\n", nStraws);
     nTotSectors += nSectors;
     nTotChannels += nChannels;
@@ -595,5 +590,72 @@ void CbmMuchSegmentManual::Print(){
   printf("=================================================================================================\n");
 }
 
+
+void CbmMuchSegmentManual::DrawSegmentation(){
+  string digifile(fDigiFileName);
+  Int_t startIndex = digifile.size() - 4;
+  string txtfile  = digifile.erase(startIndex, 4);
+  txtfile.append("txt");
+
+  FILE* outfile;
+  outfile = fopen(txtfile.c_str(), "w");
+  Int_t colors[] = {kGreen, kMagenta, kCyan, kRed, kBlue, kYellow, kTeal, kPink, kAzure, kOrange, kViolet, kSpring,
+      kGreen+10, kMagenta+10, kCyan+10, kRed+10, kBlue+10, kYellow+10, kTeal+10, kPink+10, kAzure+10, kOrange+10, kViolet+10, kSpring+10};
+  for (Int_t iStation=0;iStation<fStations->GetEntriesFast();++iStation){
+    fprintf(outfile, "===========================================================================\n");
+    fprintf(outfile, "Station %i\n", iStation+1);
+    fprintf(outfile, "Sector size, cm   Sector position, cm   Number of pads   Side   Pad size, cm\n");
+    fprintf(outfile, "----------------------------------------------------------------------------\n");
+    TCanvas* c1 = new TCanvas(Form("station%i",iStation+1),Form("station%i",iStation+1),800,800);
+    c1->SetFillColor(0);
+    c1->Range(-250,-250,250,250);//(-27,-2,0,25);
+    CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);
+    CbmMuchLayer* layer = station->GetLayer(0);
+    for (Int_t iSide=1;iSide>=0;iSide--){
+      CbmMuchLayerSide* side = layer->GetSide(iSide);
+      for (Int_t iModule=0;iModule<side->GetNModules();++iModule) {
+        CbmMuchModule* mod = side->GetModule(iModule);
+        mod->SetFillStyle(0);
+        mod->Draw();
+        CbmMuchModuleGem* module = (CbmMuchModuleGem*)mod;
+        for (Int_t iSector=0;iSector<module->GetNSectors();++iSector){
+          CbmMuchSector* sector = module->GetSector(iSector);
+          // Reject incomplete sectors by size
+          Double_t secLx = sector->GetSize()[0];
+          Double_t secLy = sector->GetSize()[1];
+          Double_t less = TMath::Min(secLx, secLy);
+          Double_t more = TMath::Max(secLx, secLy);
+          Int_t nReal = Int_t((more+1e-5)/less);
+          Int_t nPow = Int_t(TMath::Log2(nReal) + 1e-2);
+          Double_t more1 = less*TMath::Power(2,nPow);
+          if(TMath::Abs(more1-more ) > 1e-5 || sector->GetNChannels() < module->GetNSectorChannels())
+            iSide ? sector->SetFillColor(TColor::GetColorDark(kGray+1)) : sector->SetFillColor(kGray + 1) ;
+          else{
+            Int_t i = Int_t((secLx+1e-5)/fSecMinLx[0]) - 1;
+            Int_t j = Int_t((secLy+1e-5)/fSecMinLy[0]) - 1;
+            sector->SetFillColor(iSide ? TColor::GetColorDark(colors[i+j]) : colors[i+j]);
+          }
+          sector->Draw("f");
+          sector->Draw();
+          const char* side = iSide ? "Back" : "Front";
+          fprintf(outfile, "%-4.2fx%-10.2f   %-6.2fx%-12.2f   %-14i   %-5s   ", secLx, secLy,
+              sector->GetPosition()[0], sector->GetPosition()[1], sector->GetNChannels(), side);
+          fprintf(outfile, "%-4.2fx%-4.2f\n", secLx, secLy, sector->GetNChannels(), sector->GetDx(), sector->GetDy());
+        } // sectors
+      } // modules
+    } // sides
+
+    for(Int_t iRegion=0; iRegion < fNRegions[iStation]; ++iRegion){
+      TArc* arc = new TArc(0.,0.,fRadii[iStation].at(iRegion));
+      arc->SetLineColor(kBlue);
+      arc->SetLineWidth(2);
+      arc->SetFillStyle(0);
+      arc->Draw();
+    }
+    c1->Print(Form("station%i.eps",iStation+1));
+    c1->Print(Form("station%i.png",iStation+1));
+  }//stations
+  fclose(outfile);
+}
 ClassImp(CbmMuchSegmentManual)
 

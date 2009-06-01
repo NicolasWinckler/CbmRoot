@@ -93,4 +93,98 @@ void trd_elid_qa_draw()
     c1->cd(6);
     fhElELoss->Draw();
 
+	fhNofTrdHitsEl->SetLineWidth(3);
+    fhNofTrdHitsPi->SetLineWidth(3);
+    fhNofTrdHitsEl->SetLineStyle(2);
+	char histName[50];
+	TH1D* fhPidANNEl[7];
+	TH1D* fhPidANNPi[7];
+    for (Int_t i = 0; i < 7; i++){
+    	sprintf(histName, "fhPidANNEl%d", i);
+    	fhPidANNEl[i] = (TH1D*)file->Get(histName);
+    	sprintf(histName, "fhPidANNPi%d", i);
+    	fhPidANNPi[i] = (TH1D*)file->Get(histName);
+
+		fhPidANNEl[i]->SetLineWidth(3);
+		fhPidANNPi[i]->SetLineWidth(3);
+		fhPidANNEl[i]->SetLineStyle(2);
+    }
+
+    c2 = new TCanvas("c2","c2",10,10,800,800);
+    c2->Divide(3,3);
+    c2->cd(1);
+    fhNofTrdHitsEl->Draw();
+    fhNofTrdHitsPi->Draw("same");
+	gPad->SetLogy(true);
+
+    for (Int_t i = 0; i < 7; i++){
+    	c2->cd(i+2);
+    	fhPidANNEl[i]->Draw();
+    	fhPidANNPi[i]->Draw("same");
+    	gPad->SetLogy(true);
+    }
+
+	TCanvas* c3 = new TCanvas();
+	c3->Divide(4, 3);
+	TH1D *fhElossSortPi[12];
+	TH1D *fhElossSortEl[12];
+
+	char legTxt1[100];
+	for (int i = 0; i < 12; i++){
+		c3->cd(i+1);
+		sprintf(histName,"fhElossSortPi%d",i);
+		fhElossSortPi[i] = (TH1D*)file->Get(histName);
+		fhElossSortPi[i]->SetLineWidth(3);
+		fhElossSortPi[i]->SetStats(false);
+		fhElossSortPi[i]->Draw();
+
+		sprintf(histName,"fhElossSortEl%d",i);
+		fhElossSortEl[i] = (TH1D*)file->Get(histName);
+		fhElossSortEl[i]->SetLineWidth(3);
+		fhElossSortEl[i]->SetLineStyle(2);
+		fhElossSortEl[i]->SetStats(false);
+		fhElossSortEl[i]->Draw("same");
+
+		TLegend* leg1 = new TLegend(0.4,0.7, 0.99, 0.99, "mean value");
+		sprintf(legTxt1,"electrons (%.1e)", fhElossSortEl[i]->GetMean());
+		leg1->AddEntry(fhElossSortEl[i], legTxt1);
+		sprintf(legTxt1,"pions (%.1e)",fhElossSortPi[i]->GetMean());
+		leg1->AddEntry(fhElossSortPi[i], legTxt1);
+		leg1->DrawClone();
+
+    	gPad->SetLogy(true);
+        //gPad->SetGridy(true);
+        gPad->SetGridx(true);
+	}
+
+
+	TCanvas* c4 = new TCanvas();
+	c4->Divide(4, 3);
+	TH1D *fhCumProbSortPi[12];
+	TH1D *fhCumProbSortEl[12];
+
+	for (int i = 0; i < 12; i++){
+		c4->cd(i+1);
+		sprintf(histName,"fhCumProbSortPi%d",i);
+		fhElossSortPi[i] = (TH1D*)file->Get(histName);
+		fhElossSortPi[i]->SetLineWidth(3);
+		fhElossSortPi[i]->SetStats(false);
+		fhElossSortPi[i]->Draw();
+
+		sprintf(histName,"fhCumProbSortEl%d",i);
+		fhElossSortEl[i] = (TH1D*)file->Get(histName);
+		fhElossSortEl[i]->SetLineWidth(3);
+		fhElossSortEl[i]->SetLineStyle(2);
+		fhElossSortEl[i]->SetStats(false);
+		fhElossSortEl[i]->Draw("same");
+
+		TLegend* leg1 = new TLegend(0.5,0.15, 0.99, 0.4);
+		leg1->AddEntry(fhElossSortEl[i], "electrons");
+		leg1->AddEntry(fhElossSortPi[i], "pions");
+		leg1->DrawClone();
+
+    	//gPad->SetLogy(true);
+        //gPad->SetGridy(true);
+        gPad->SetGridx(true);
+	}
 }

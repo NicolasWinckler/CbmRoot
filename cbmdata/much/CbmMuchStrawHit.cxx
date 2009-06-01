@@ -23,10 +23,12 @@ CbmMuchStrawHit::CbmMuchStrawHit(
 		Double_t du,
 		Double_t dphi,
 		Double_t dz,
-		Int_t refId):
+		Int_t refId,
+		Int_t planeId):
 	CbmStripHit(detectorId, u, phi, z, du, dphi, dz, refId)
 {
 	SetType(kMUCHSTRAWHIT);
+        fPlaneId = planeId;
 }
 
 CbmMuchStrawHit::CbmMuchStrawHit(

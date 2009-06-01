@@ -38,7 +38,8 @@ public:
 			Double_t du,
 			Double_t dphi,
 			Double_t dz,
-			Int_t refId);
+			Int_t refId,
+			Int_t planeId);
 
 	/** Standard constructor
 		*@param detId Unique detector ID (including module number)
@@ -82,7 +83,8 @@ public:
         Double_t* GetDouble() { return fDouble; }
         Int_t* GetInt() { return fInt; }
         Int_t GetFlag() const { return fFlag; }
-        Int_t GetPlaneId() const { Fatal(" !!! CbmMuchStrawHit::GetPlaneId()"," !!! CbmMuchStrawHit::GetPlaneId()"); }
+	//Int_t GetPlaneId() const { Fatal(" !!! CbmMuchStrawHit::GetPlaneId()"," !!! CbmMuchStrawHit::GetPlaneId()"); }
+        Int_t GetPlaneId() const { return fPlaneId; }
         Int_t GetTube() const { return fTube; }
         Int_t GetSegment() const { return fSegment; }
 
@@ -91,6 +93,7 @@ public:
         void SetDouble(Int_t n, Double_t *arr) { for (Int_t i=0; i<n; ++i) fDouble[i]=arr[i]; } // set double array
         void SetInt(Int_t n, Int_t *arr) { for (Int_t i=0; i<n; ++i) fInt[i]=arr[i]; } ; // set integer array
         void SetFlag(Int_t flag) { fFlag = flag; }
+        void SetPlaneId(Int_t planeId) { fPlaneId = planeId; }
         void SetTube(Int_t tube) { fTube = tube; }
         void SetSegment(Int_t segm) { fSegment = segm; }
 
@@ -102,6 +105,7 @@ private:
         Double_t fDouble[5];  //! Auxiliary double array
         Int_t fInt[5];        //! Auxiliary integer array
         Int_t fFlag;          // Flag
+        Int_t fPlaneId;       // Plane ID
         Int_t fTube;          // Tube number
         Int_t fSegment;       // Tube segment
 

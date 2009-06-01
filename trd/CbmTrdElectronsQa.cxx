@@ -12,6 +12,7 @@
 #include "TClonesArray.h"
 
 #include <iostream>
+#include <vector>
 using std::cout;
 using std::endl;
 
@@ -31,13 +32,45 @@ CbmTrdElectronsQa::~CbmTrdElectronsQa()
 void CbmTrdElectronsQa::InitHistos()
 {
 
-    fhPiELoss = new TH1F("fhPiELoss","Energy loss for pions in one layer;energy loss, keV;entries",100, 0, 50);
-    fhPiELossSum = new TH1F("fhPiELossSum","Sum of energy losses for pions in all layers;energy loss, GeV;entries",100, 0, 3.e-4);
-    fhEldEdX = new TH1F("fhEldEdX","dEdX for electrons in one layer;dEdX, GeV;entries",100, 0, 1.5e-5);
-    fhElTR = new TH1F("fhElTR","TR for electrons in one layer;TR, GeV;entries",100, 0, 1.5e-5);
-    fhElELoss = new TH1F("fhElELoss","Energy loss (dEdX+TR) for electrons in one layer;energy loss, GeV;entries",100, 0, 5.0e-5);
-    fhElElossSum = new TH1F("fhElELossSum","Sum of energy losses (dEdX+TR) for electrons in all layers;energy loss, GeV;entries",100, 0, 3.e-4);
-    fhElNofZeroTR = new TH1F("fhElNofZeroTR","Number of Zero TR layers;number of layers; entries",13, 0., 13.);
+    fhPiELoss = new TH1D("fhPiELoss","Energy loss for pions in the first layer;energy loss, keV;entries",100, 0, 50);
+    fhPiELossSum = new TH1D("fhPiELossSum","Sum of energy losses for pions in all layers;energy loss, GeV;entries",100, 0, 3.e-4);
+    fhEldEdX = new TH1D("fhEldEdX","dEdX for electrons in the first layer;dEdX, GeV;entries",100, 0, 1.5e-5);
+    fhElTR = new TH1D("fhElTR","TR for electrons in the first layer;TR, GeV;entries",100, 0, 1.5e-5);
+    fhElELoss = new TH1D("fhElELoss","Energy loss (dEdX+TR) for electrons in the first layer;energy loss, GeV;entries",100, 0, 5.0e-5);
+    fhElElossSum = new TH1D("fhElELossSum","Sum of energy losses (dEdX+TR) for electrons in all layers;energy loss, GeV;entries",100, 0, 3.e-4);
+    fhElNofZeroTR = new TH1D("fhElNofZeroTR","Number of Zero TR layers;number of layers; entries",13, 0., 13.);
+
+	fhNofTrdHitsEl = new TH1D("fhNofTrdHitsEl", "Number of hits in TRD track for electrons;Nof hits;Entries", 13, 0, 13);
+	fhNofTrdHitsPi = new TH1D("fhNofTrdHitsPi", "Number of hits in TRD track for pions;Nof hits;Entries", 13, 0, 13);
+	char histTitle[50], histName[50];
+	for (Int_t i = 0; i < 7; i++){
+		sprintf(histName, "fhPidANNEl%d", i);
+		sprintf(histTitle, "%d hits in track;ANN output;Entries", 12 - i);
+		fhPidANNEl[i] = new TH1D(histName, histTitle, 100, -1.2, 1.2);
+		sprintf(histName, "fhPidANNPi%d", i);
+		sprintf(histTitle, "%d hits in track;ANN output;Entries", 12 - i);
+		fhPidANNPi[i] = new TH1D(histName, histTitle, 100, -1.2, 1.2);
+	}
+
+
+	Double_t histMax[]={5e-6, 7e-6, 10e-6, 12e-6, 14e-6, 15e-6, 18e-6, 22e-6, 25e-6, 35e-6, 45e-6, 80e-6};
+	Double_t histMaxMB[]={10e-6, 14e-6, 20e-6, 24e-6, 28e-6, 30e-6, 36e-6, 44e-6, 50e-6, 60e-6, 70e-6, 130e-6};
+	Int_t nofSortBins = 200;
+
+	for (Int_t i = 0; i < 12; i++){
+		sprintf(histName,"fhElossSortEl%d",i);
+		sprintf(histTitle, "Energy loss in %d hit;Energy loss, GeV;Entries", i);
+		fhElossSortEl[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMaxMB[i]);
+		sprintf(histName,"fhElossSortPi%d",i);
+		fhElossSortPi[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMaxMB[i]);
+
+		sprintf(histName,"fhCumProbSortEl%d",i);
+		sprintf(histTitle, "Cumulative prob. in %d hit;Energy loss, GeV;cumulative probability", i);
+		fhCumProbSortEl[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMaxMB[i]);
+		sprintf(histName,"fhCumProbSortPi%d",i);
+		fhCumProbSortPi[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMaxMB[i]);
+	}
+
 
 	fOutPi.open((const char*)fOutFileNamePi);
 	fOutEl.open((const char*)fOutFileNameEl);
@@ -102,7 +135,10 @@ void CbmTrdElectronsQa::Exec(Option_t* option)
 		MakeTxtFile();
 	}
 
-	BuildEnergyLossesAnaHistos();
+	FillEnergyLossesAnaHistos();
+	FillTestHistos();
+	ElIdAnalysis();
+
 }
 
 Double_t CbmTrdElectronsQa::GetMomAtFirstTrdLayer(CbmTrdTrack* trdtrack)
@@ -179,8 +215,9 @@ void CbmTrdElectronsQa::MakeTxtFile()
 	}//iTrdTrack
 }
 
-void CbmTrdElectronsQa::BuildEnergyLossesAnaHistos()
+void CbmTrdElectronsQa::FillEnergyLossesAnaHistos()
 {
+	cout << "-I- fill energy losses analysis histograms" << endl;
 	Int_t nofTrdTracks = fTrdTracks->GetEntries();
 
 	for(Int_t iTrdTrack=0; iTrdTrack < nofTrdTracks; iTrdTrack++){
@@ -230,6 +267,119 @@ void CbmTrdElectronsQa::BuildEnergyLossesAnaHistos()
 	}//iTrdTrack
 }
 
+void CbmTrdElectronsQa::FillTestHistos()
+{
+	cout << "-I- fill test histograms" << endl;
+	Int_t nofTrdTracks = fTrdTracks->GetEntries();
+
+	for (Int_t iTrdTrack = 0; iTrdTrack < nofTrdTracks; iTrdTrack++) {
+
+		CbmTrdTrack* trdtrack = (CbmTrdTrack*) fTrdTracks->At(iTrdTrack);
+		Int_t nHits = trdtrack->GetNofTrdHits();
+
+		if (nHits < 0) continue;
+
+		CbmTrackMatch* match = (CbmTrackMatch*) fTrdTrackMatches->At(iTrdTrack);
+		Int_t iMC = match->GetMCTrackId();
+		if (iMC == -1)	continue;
+		if (iMC > fMCTracks->GetEntriesFast())	continue;
+
+		CbmMCTrack* mctrack = (CbmMCTrack*) fMCTracks->At(iMC);
+		Int_t partPdg = TMath::Abs(mctrack->GetPdgCode());
+		Double_t motherId = mctrack->GetMotherId();
+
+		if (partPdg == 50000050)continue;
+
+		///only primary tracks
+		if (motherId != -1)	continue;
+
+		Double_t pidANN = trdtrack->GetPidANN();
+
+		if (partPdg == 11) {
+			fhNofTrdHitsEl->Fill(nHits);
+		}
+
+		if (partPdg == 211) {
+			fhNofTrdHitsPi->Fill(nHits);
+		}
+
+		if (nHits < 6)	continue;
+		if (nHits > 12) {
+			cout << "-E- nHits = " << nHits << endl;
+			continue;
+		}
+		Int_t indexAr = 12 - nHits;
+		if (partPdg == 11)
+			fhPidANNEl[indexAr]->Fill(pidANN);
+		if (partPdg == 211)
+			fhPidANNPi[indexAr]->Fill(pidANN);
+
+	}//iTrdTrack
+
+}
+
+void CbmTrdElectronsQa::ElIdAnalysis()
+{
+	cout << "-I- electron identification analysis" << endl;
+
+	Int_t nofTrdTracks = fTrdTracks->GetEntries();
+	std::vector<Double_t> vec;
+	vec.resize(12);
+	for (Int_t iTrdTrack = 0; iTrdTrack < nofTrdTracks; iTrdTrack++) {
+
+		CbmTrdTrack* trdtrack = (CbmTrdTrack*) fTrdTracks->At(iTrdTrack);
+		Int_t nHits = trdtrack->GetNofTrdHits();
+
+		if (nHits != 12) continue;
+
+		CbmTrackMatch* match = (CbmTrackMatch*) fTrdTrackMatches->At(iTrdTrack);
+		Int_t iMC = match->GetMCTrackId();
+		if (iMC == -1)	continue;
+		if (iMC > fMCTracks->GetEntriesFast())	continue;
+
+		CbmMCTrack* mctrack = (CbmMCTrack*) fMCTracks->At(iMC);
+		Int_t partPdg = TMath::Abs(mctrack->GetPdgCode());
+		Double_t motherId = mctrack->GetMotherId();
+
+		if (partPdg == 50000050)continue;
+
+		///only primary tracks
+		if (motherId != -1)	continue;
+		Double_t sumELoss = 0;
+	    Double_t eLossdEdX[12], eLossTR[12], eLoss[12];
+	    GetELossInfo(trdtrack, &sumELoss, eLossdEdX, eLossTR, eLoss);
+	    for (int i = 0; i < 12; i++){
+	    	vec[i] = eLoss[i];
+	    }
+	    std::sort(vec.begin(), vec.end());
+	    for (int i = 0; i < 12; i++){
+			if (partPdg == 11) {
+				fhElossSortEl[i]->Fill(vec[i]);
+			}
+
+			if (partPdg == 211) {
+				fhElossSortPi[i]->Fill(vec[i]);
+			}
+	    }
+	}//iTrdTrack
+
+//fill cumulative probability histograms
+	for (Int_t iL=0; iL < 12; iL++){
+		Double_t cumProbPi = 0.;
+		Double_t cumProbEl = 0.;
+		Double_t nofPi = fhElossSortPi[iL]->GetEntries();
+		Double_t nofEl = fhElossSortEl[iL]->GetEntries();
+		for (Int_t i = 1; i <= fhElossSortEl[iL]->GetNbinsX(); i++) {
+			cumProbPi += fhElossSortPi[iL]->GetBinContent(i);
+			fhCumProbSortPi[iL]->SetBinContent(i, cumProbPi/nofPi);
+
+			cumProbEl += fhElossSortEl[iL]->GetBinContent(i);
+			fhCumProbSortEl[iL]->SetBinContent(i, cumProbEl / nofEl);
+		}
+	}
+
+}
+
 void CbmTrdElectronsQa::Finish()
 {
 	fhPiELossSum->Write();
@@ -239,6 +389,20 @@ void CbmTrdElectronsQa::Finish()
 	fhElTR->Write();
 	fhEldEdX->Write();
 	fhElELoss->Write();
+
+	fhNofTrdHitsEl->Write();
+	fhNofTrdHitsPi->Write();
+	for (Int_t i = 0; i < 7; i++){
+		fhPidANNEl[i]->Write();
+		fhPidANNPi[i]->Write();
+	}
+
+	for (Int_t i = 0; i < 12; i++){
+		fhElossSortEl[i]->Write();
+		fhElossSortPi[i]->Write();
+		fhCumProbSortEl[i]->Write();
+		fhCumProbSortPi[i]->Write();
+	}
 }
 
 

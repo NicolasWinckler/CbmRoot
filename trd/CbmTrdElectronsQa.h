@@ -11,7 +11,7 @@
 #include "FairTask.h"
 #include "CbmTrdTrack.h"
 
-#include "TH1F.h"
+#include "TH1D.h"
 
 class TClonesArray;
 
@@ -31,7 +31,9 @@ public:
 	virtual void Finish();
 	void MakeTxtFile();
 	void InitHistos();
-	void BuildEnergyLossesAnaHistos();
+	void FillEnergyLossesAnaHistos();
+	void FillTestHistos();
+	void ElIdAnalysis();
 
 	void SetOutFileNamePi(TString name){fOutFileNamePi = name;}
 	void SetOutFileNameEl(TString name){fOutFileNameEl = name;}
@@ -52,14 +54,25 @@ private:
 	TString fOutFileNamePi;
 	TString fOutFileNameEl;
 
-    TH1F* fhPiELoss;
-    TH1F* fhPiELossSum;
-    TH1F* fhEldEdX;
-    TH1F* fhElTR;
-    TH1F* fhElELoss;
-    TH1F* fhElElossSum;
-    TH1F* fhElNofZeroTR;
+    TH1D* fhPiELoss;
+    TH1D* fhPiELossSum;
+    TH1D* fhEldEdX;
+    TH1D* fhElTR;
+    TH1D* fhElELoss;
+    TH1D* fhElElossSum;
+    TH1D* fhElNofZeroTR;
 
+
+// Histograms for testing current Pid routines in TRD
+	TH1D* fhNofTrdHitsEl;
+	TH1D* fhNofTrdHitsPi;
+	TH1D* fhPidANNEl[7];
+	TH1D* fhPidANNPi[7];
+
+	TH1D* fhElossSortPi[12];
+	TH1D* fhElossSortEl[12];
+	TH1D* fhCumProbSortEl[12];
+	TH1D* fhCumProbSortPi[12];
 
 	Int_t fEventNum;
 

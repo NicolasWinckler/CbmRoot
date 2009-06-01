@@ -171,7 +171,6 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
 
     // Global coordinates in rotated coordinate system
     Double_t errU = gRandom->Gaus(0,sigmaX);
-    //hit->SetU(ploc.getX()+errU);
     Double_t wXY = rotMatr[rot](1);
     //cout << station3 << " " << layer << " " << " " << wXY << endl;
 
@@ -179,14 +178,20 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
     dpos.SetXYZ(sigmaX, sigmaY, 0.);
 
     //times[2] = -77777;
-    CbmMuchStrawHit *hit = new ((*fHits)[nHits++]) CbmMuchStrawHit(detId, pos, dpos, idig);
-    //hit->GetPlaneId(); // test
+    //CbmMuchStrawHit(detectorId,u,phi,z,du,dphi,dz,refId,planeId);
+    CbmMuchStrawHit *hit = new ((*fHits)[nHits++]) CbmMuchStrawHit(detId, 
+                           ploc.getX()+errU, TMath::ASin(wXY), pos[2], sigmaX, 0, 0, 
+                           idig, fGeoScheme->GetLayerSideNr(detId));
+    /*
+    hit->SetPlaneId(fGeoScheme->GetLayerSideNr(detId));
+    cout << " Plane Id: " << hit->GetPlaneId() << endl; // test
     hit->SetU (ploc.getX() + errU);
     hit->SetDu(sigmaX);
     hit->SetPhi(TMath::ASin(wXY));
+    */
     hit->SetX(pos[0]);
     hit->SetY(pos[1]);
-    hit->SetZ(pos[2]);
+    //hit->SetZ(pos[2]);
     hit->SetTube(itube);
     hit->SetSegment(iSegment);
     //hit->SetZ(fGeoScheme->GetLayerSideByDetId(detId)->GetZ());

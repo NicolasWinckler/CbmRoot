@@ -96,5 +96,4 @@ void much_seg_auto(const char* mcFile = "",
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
-  exit(0);
 }

@@ -2,10 +2,10 @@ void trd_elid_qa(){
 
 	Int_t nEvents = 1000;
 
-	TString fileNumber = "0000";
+	TString fileNumber = "0009";
 
 	TString inFile = "/d/cbm02/slebedev/trd/JUN09/MB/piel."+fileNumber+".mc.root";
-	//TString inFile2 = "/d/cbm02/slebedev/trd/JUN09/MB/piel."+fileNumber+".mc_1.root";
+//	TString inFile2 = "/d/cbm02/slebedev/trd/JUN09/MB/piel."+fileNumber+".mc_1.root";
 	TString inFile3 = "/d/cbm02/slebedev/trd/JUN09/MB/piel."+fileNumber+".reco.root";
 
 	TString parFile = "/d/cbm02/slebedev/trd/JUN09/MB/piel."+fileNumber+".params.root";
@@ -15,8 +15,8 @@ void trd_elid_qa(){
 	TString outFile = "/d/cbm02/slebedev/trd/JUN09/MB/piel."+fileNumber+".electronsQa.root";
 
 //set file name to "" if you don't want to convert energy losses to txt file
-	TString outTxtFileNameEl("electrons_mom_0.txt");
-	TString outTxtFileNamePi("pions_mom_0.txt");
+	TString outTxtFileNameEl = "mb_electrons_mom_"+fileNumber+".txt";
+	TString outTxtFileNamePi = "mb_pions_mom_"+fileNumber+".txt";
 
 	gDebug = 0;
 
@@ -40,8 +40,8 @@ void trd_elid_qa(){
 
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(inFile);
-	//  run->AddFile(inFile2);
 	run->AddFriend(inFile3);
+ //   run->AddFile(inFile2);
 	run->SetOutputFile(outFile);
 
 

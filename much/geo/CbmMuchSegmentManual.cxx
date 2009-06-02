@@ -641,7 +641,7 @@ void CbmMuchSegmentManual::DrawSegmentation(){
           const char* side = iSide ? "Back" : "Front";
           fprintf(outfile, "%-4.2fx%-10.2f   %-6.2fx%-12.2f   %-14i   %-5s   ", secLx, secLy,
               sector->GetPosition()[0], sector->GetPosition()[1], sector->GetNChannels(), side);
-          fprintf(outfile, "%-4.2fx%-4.2f\n", secLx, secLy, sector->GetNChannels(), sector->GetDx(), sector->GetDy());
+          fprintf(outfile, "%-4.2fx%-4.2f\n", sector->GetDx(), sector->GetDy());
         } // sectors
       } // modules
     } // sides

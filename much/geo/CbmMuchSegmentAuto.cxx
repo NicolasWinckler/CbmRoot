@@ -519,7 +519,7 @@ void CbmMuchSegmentAuto::DrawSegmentation(){
   }
 
   for (Int_t iStation=0;iStation<fStations->GetEntriesFast();++iStation){
-    fprintf(outfile, "===========================================================================\n");
+    fprintf(outfile, "============================================================================\n");
     fprintf(outfile, "Station %i\n", iStation+1);
     fprintf(outfile, "Sector size, cm   Sector position, cm   Number of pads   Side   Pad size, cm\n");
     fprintf(outfile, "----------------------------------------------------------------------------\n");
@@ -538,6 +538,7 @@ void CbmMuchSegmentAuto::DrawSegmentation(){
         CbmMuchModuleGem* module = (CbmMuchModuleGem*)mod;
         for (Int_t iSector=0;iSector<module->GetNSectors();++iSector){
           CbmMuchSector* sector = module->GetSector(iSector);
+
           Int_t i = Int_t((sector->GetSize()[0]+1e-3)/secMinLx) - 1;
           Int_t j = Int_t((sector->GetSize()[1]+1e-3)/secMinLy) - 1;
           sector->SetFillColor(iSide ? TColor::GetColorDark(colors[i+j]) : colors[i+j]);
@@ -546,7 +547,7 @@ void CbmMuchSegmentAuto::DrawSegmentation(){
           const char* side = iSide ? "Back" : "Front";
           fprintf(outfile, "%-4.2fx%-10.2f   %-6.2fx%-12.2f   %-14i   %-5s   ", sector->GetSize()[0], sector->GetSize()[1],
               sector->GetPosition()[0], sector->GetPosition()[1], sector->GetNChannels(), side);
-          fprintf(outfile, "%-4.2fx%-4.2f\n", sector->GetSize()[0], sector->GetSize()[1], sector->GetNChannels(), sector->GetDx(), sector->GetDy());
+          fprintf(outfile, "%-4.2fx%-4.2f\n", sector->GetDx(), sector->GetDy());
         } // sectors
       } // modules
     } // sides

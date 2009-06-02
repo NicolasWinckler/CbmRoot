@@ -2,15 +2,17 @@ void trd_elid_qa(){
 
 	Int_t nEvents = 1000;
 
-	TString inFile = "/d/cbm02/slebedev/trd/JUN09/MB/piel.0000.mc.root";
-	//TString inFile2 = "/d/cbm02/slebedev/trd/JUN09/MB/piel.0006.mc_1.root";
-	TString inFile3 = "/d/cbm02/slebedev/trd/JUN09/MB/piel.0000.reco.root";
+	TString fileNumber = "0000";
 
-	TString parFile = "/d/cbm02/slebedev/trd/JUN09/MB/piel.0000.params.root";
+	TString inFile = "/d/cbm02/slebedev/trd/JUN09/MB/piel."+fileNumber+".mc.root";
+	//TString inFile2 = "/d/cbm02/slebedev/trd/JUN09/MB/piel."+fileNumber+".mc_1.root";
+	TString inFile3 = "/d/cbm02/slebedev/trd/JUN09/MB/piel."+fileNumber+".reco.root";
+
+	TString parFile = "/d/cbm02/slebedev/trd/JUN09/MB/piel."+fileNumber+".params.root";
 
 	TString stsDigiFile = "sts_standard.digi.par";
 
-	TString outFile = "/d/cbm02/slebedev/trd/JUN09/MB/piel.0000.electronsQa.root";
+	TString outFile = "/d/cbm02/slebedev/trd/JUN09/MB/piel."+fileNumber+".electronsQa.root";
 
 //set file name to "" if you don't want to convert energy losses to txt file
 	TString outTxtFileNameEl("electrons_mom_0.txt");
@@ -45,7 +47,7 @@ void trd_elid_qa(){
 
 	CbmTrdElectronsQa* elQa = new CbmTrdElectronsQa();
 	elQa->SetOutFileNameEl((const char*)outTxtFileNameEl);
-	elQa->SetOutFileNamePi((const char*)outTxtFileNameEl);
+	elQa->SetOutFileNamePi((const char*)outTxtFileNamePi);
 	run->AddTask(elQa);
 
 	// -----  Parameter database   --------------------------------------------

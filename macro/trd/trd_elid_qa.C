@@ -12,6 +12,10 @@ void trd_elid_qa(){
 
 	TString outFile = "/d/cbm02/slebedev/trd/JUN09/MB/piel.0000.electronsQa.root";
 
+//set file name to "" if you don't want to convert energy losses to txt file
+	TString outTxtFileNameEl("electrons_mom_0.txt");
+	TString outTxtFileNamePi("pions_mom_0.txt");
+
 	gDebug = 0;
 
 	TStopwatch timer;
@@ -40,9 +44,8 @@ void trd_elid_qa(){
 
 
 	CbmTrdElectronsQa* elQa = new CbmTrdElectronsQa();
-	//set file name to "" if you don't want to convert energy losses to txt file
-	elQa->SetOutFileNameEl("electrons_mom_0.txt");
-	elQa->SetOutFileNamePi("pions_mom_0.txt");
+	elQa->SetOutFileNameEl((const char*)outTxtFileNameEl);
+	elQa->SetOutFileNamePi((const char*)outTxtFileNameEl);
 	run->AddTask(elQa);
 
 	// -----  Parameter database   --------------------------------------------

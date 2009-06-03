@@ -22,6 +22,7 @@ CbmTrdElectronsQa::CbmTrdElectronsQa()
 	fEventNum = 0;
 	fOutFileNamePi = "";
 	fOutFileNameEl = "";
+	fGeoType = "st";
 }
 
 CbmTrdElectronsQa::~CbmTrdElectronsQa()
@@ -52,23 +53,33 @@ void CbmTrdElectronsQa::InitHistos()
 		fhPidANNPi[i] = new TH1D(histName, histTitle, 100, -1.2, 1.2);
 	}
 
-
-	Double_t histMax[]={5e-6, 7e-6, 10e-6, 12e-6, 14e-6, 15e-6, 18e-6, 22e-6, 25e-6, 35e-6, 45e-6, 80e-6};
+	Double_t *histMax;
+	Double_t histMaxSt[]={5e-6, 7e-6, 10e-6, 12e-6, 14e-6, 15e-6, 18e-6, 22e-6, 25e-6, 35e-6, 45e-6, 80e-6};
 	Double_t histMaxMB[]={10e-6, 14e-6, 20e-6, 24e-6, 28e-6, 30e-6, 36e-6, 44e-6, 50e-6, 60e-6, 70e-6, 130e-6};
+	if (fGeoType == "st" || fGeoType == "ST"){
+		histMax = histMaxSt;
+	}else if (fGeoType == "mb" || fGeoType == "MB" ){
+		histMax = histMaxMB;
+	}else{
+		cout << "-E- CbmTrdElectronsQa::InitHistos wrong geo type " << fGeoType << endl;
+		histMax = histMaxSt;
+	}
+
 	Int_t nofSortBins = 200;
+
 
 	for (Int_t i = 0; i < 12; i++){
 		sprintf(histName,"fhElossSortEl%d",i);
 		sprintf(histTitle, "Energy loss in %d hit;Energy loss, GeV;Entries", i);
-		fhElossSortEl[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMaxMB[i]);
+		fhElossSortEl[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
 		sprintf(histName,"fhElossSortPi%d",i);
-		fhElossSortPi[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMaxMB[i]);
+		fhElossSortPi[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
 
 		sprintf(histName,"fhCumProbSortEl%d",i);
 		sprintf(histTitle, "Cumulative prob. in %d hit;Energy loss, GeV;cumulative probability", i);
-		fhCumProbSortEl[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMaxMB[i]);
+		fhCumProbSortEl[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
 		sprintf(histName,"fhCumProbSortPi%d",i);
-		fhCumProbSortPi[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMaxMB[i]);
+		fhCumProbSortPi[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
 	}
 
 

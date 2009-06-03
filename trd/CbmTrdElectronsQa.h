@@ -37,7 +37,7 @@ public:
 
 	void SetOutFileNamePi(TString name){fOutFileNamePi = name;}
 	void SetOutFileNameEl(TString name){fOutFileNameEl = name;}
-
+	void SetGeoType(TString geoType){fGeoType = geoType;}
 private:
 	Double_t GetMomAtFirstTrdLayer(CbmTrdTrack* trdtrack);
 	void GetELossInfo(CbmTrdTrack* trdtrack, Double_t *sumELoss, Double_t  eLossdEdX[],
@@ -53,6 +53,7 @@ private:
 	std::ofstream fOutEl;
 	TString fOutFileNamePi;
 	TString fOutFileNameEl;
+	TString fGeoType;
 
     TH1D* fhPiELoss;
     TH1D* fhPiELossSum;

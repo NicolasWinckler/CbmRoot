@@ -15,6 +15,8 @@
 	std::vector<Float_t> inVector2;
 	Float_t xOut;
 	Bool_t doTraining = false;
+	TString fileNum = "0000";
+	TString geoType = "ST";
 
 void transformInputData1(std::vector<Float_t> &inVector)
 {
@@ -53,10 +55,11 @@ void trd_elid_tmva() {
 	inVector.resize(fNofLayers);
 	inVector1.resize(fNofLayers);
 	inVector2.resize(fNofLayers);
-	TString fileNameEl("electrons_mom_0.txt");
-	TString fileNamePi("pions_mom_0.txt");
-	TString fileNameTestEl("electrons_mom_0.txt");
-	TString fileNameTestPi("pions_mom_0.txt");
+	TString inputDir = "/d/cbm02/slebedev/trd/JUN09/"+geoType+"/";
+	TString fileNameEl = "electrons_mom_"+fileNum+".txt";
+	TString fileNamePi = "pions_mom_"+fileNum+".txt";
+	TString fileNameTestEl = "electrons_mom_"+fileNum+".txt";
+	TString fileNameTestPi = "pions_mom_"+fileNum+".txt";
 	Int_t NofPi = 0, NofEl = 0;
 	//Max number of electrons and pions for training samples
 	Int_t MaxNofPi = 30000, MaxNofEl = 30000;
@@ -64,7 +67,7 @@ void trd_elid_tmva() {
 	Double_t ANNCoef1 = 3.88;
 	Double_t ANNCoef2 = 1.28;
 
-	TFile* f = new TFile("/d/cbm02/slebedev/trd/JUN09/MB/piel.0000.electronsQa.root", "READ");
+	TFile* f = new TFile("/d/cbm02/slebedev/trd/JUN09/"+geoType+"/piel."+fileNum+".electronsQa.root", "READ");
 	char hName[50];
 	for (int i = 0; i < fNofLayers; i++) {
 		sprintf(hName, "fhCumProbSortPi%d", i);

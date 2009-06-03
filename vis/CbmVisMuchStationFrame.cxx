@@ -33,6 +33,8 @@
 #include "CbmVisMuchModuleFrame.h"
 #include "CbmVisPoint.h"
 #include "CbmVisHit.h"
+#include "CbmVisPixelHit.h"
+#include "CbmVisStripHit.h"
 
 CbmVisMuchStationFrame::CbmVisMuchStationFrame(const TGWindow *p, CbmVisMuch* display): /*FOLD00*/
     TGHorizontalFrame(p)
@@ -288,9 +290,18 @@ void CbmVisMuchStationFrame::DrawHits(){
     for (Int_t m=0;m<side->GetNModules();m++){
       CbmMuchModule* module = side->GetModule(m);
       TClonesArray* hits = module->GetHits();
-      for (Int_t i=0;i<hits->GetEntriesFast();i++){
-        CbmVisHit* hit = (CbmVisHit*) hits->At(i);
-        hit->Draw();
+      if (module->GetDetectorType()==1) {
+        for (Int_t i=0;i<hits->GetEntriesFast();i++){
+          CbmVisPixelHit* hit = (CbmVisPixelHit*) hits->At(i);
+          hit->Draw();
+        }
+      }
+      else if (module->GetDetectorType()==2) {
+        for (Int_t i=0;i<hits->GetEntriesFast();i++){
+          printf("!!!\n");
+          CbmVisStripHit* hit = (CbmVisStripHit*) hits->At(i);
+          hit->Draw("NDC");
+        }
       }
     }
   }

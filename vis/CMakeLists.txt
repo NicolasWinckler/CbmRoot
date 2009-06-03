@@ -29,6 +29,8 @@ set(VIS_SRCS
 CbmVisMuch.cxx
 CbmVisPoint.cxx
 CbmVisHit.cxx
+CbmVisStripHit.cxx
+CbmVisPixelHit.cxx
 CbmVisMuchStationFrame.cxx  
 CbmVisMuchCluster.cxx 
 CbmVisMuchModuleFrame.cxx 

@@ -56,7 +56,8 @@ class CbmVisMuch : public FairTask{
   TClonesArray*      GetMCTracks()   { return fMCTracks;    }
   TClonesArray*      GetPoints()     { return fPoints;      }
   TClonesArray*      GetDigis()      { return fDigis;       }
-  TClonesArray*      GetHits()       { return fHits;        }
+  TClonesArray*      GetPixelHits()  { return fPixelHits;   }
+  TClonesArray*      GetStripHits()  { return fStripHits;   }
   TClonesArray*      GetVisClusters(){ return fVisClusters; }
   TClonesArray*      GetDigiMatches(){ return fDigiMatches; }
 
@@ -79,13 +80,14 @@ class CbmVisMuch : public FairTask{
 private:
   Char_t*            fDigiFileName;
   CbmMuchGeoScheme*  fGeoScheme;
-  
+
   CbmGeoMuchPar*     fGeoPar;
 
   FairRootManager* fRootManager;
   TClonesArray*   fMCTracks;
   TClonesArray*   fPoints;
-  TClonesArray*   fHits;
+  TClonesArray*   fPixelHits;
+  TClonesArray*   fStripHits;
   TClonesArray*   fDigis;
   TClonesArray*   fDigiMatches;
   TClonesArray*   fClusters;
@@ -98,7 +100,7 @@ private:
   TObjArray* fOpenModules;
 
   TObjArray* fStations;
-  
+
   Int_t fEvent;
   Int_t fNpoints;
   Int_t fNhits;

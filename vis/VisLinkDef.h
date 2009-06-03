@@ -7,6 +7,8 @@
 #pragma link C++ class CbmVisMuch+;
 #pragma link C++ class CbmVisPoint+;
 #pragma link C++ class CbmVisHit+;
+#pragma link C++ class CbmVisStripHit+;
+#pragma link C++ class CbmVisPixelHit+;
 #pragma link C++ class CbmVisMuchCluster+;
 #pragma link C++ class CbmVisMuchStationFrame+;
 #pragma link C++ class CbmVisMuchModuleFrame+;

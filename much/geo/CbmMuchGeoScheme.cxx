@@ -201,10 +201,10 @@ void CbmMuchGeoScheme::CreateHitArrays() {
     CbmMuchModule* module = (*it);
     if (module->GetDetectorType()==1) {
       CbmMuchModuleGem* mod = (CbmMuchModuleGem*)module;
-      mod->SetHits(new TClonesArray("CbmVisHit",1));
+      mod->SetHits(new TClonesArray("CbmVisPixelHit",1));
     } else if (module->GetDetectorType()==2) {
       CbmMuchModuleStraws* mod = (CbmMuchModuleStraws*)module;
-      mod->SetHits(new TClonesArray("CbmVisHit",1));
+      mod->SetHits(new TClonesArray("CbmVisStripHit",1));
     }
   }
 }

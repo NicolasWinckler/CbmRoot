@@ -29,6 +29,7 @@
 #include "CbmMuchPad.h"
 #include "CbmVisPoint.h"
 #include "CbmVisHit.h"
+#include "CbmVisPixelHit.h"
 #include "CbmVisMuchCluster.h"
 #include "CbmMuchGeoScheme.h"
 #include "TArc.h"
@@ -246,7 +247,7 @@ void CbmVisMuchModuleFrame::DrawHits(){
   fNHits=0;
   TClonesArray* hits = fModule->GetHits();
   for (Int_t i=0;i<hits->GetEntriesFast();i++){
-    CbmVisHit* hit = (CbmVisHit*) hits->At(i);
+    CbmVisPixelHit* hit = (CbmVisPixelHit*) hits->At(i);
     hit->SetMarkerSize(1);
     hit->SetMarkerStyle(20);
     hit->Draw();

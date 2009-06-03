@@ -9,37 +9,32 @@
  *@version 1.0
  **
  **/
-
-
-
-
 #ifndef CBMVISHIT_H
 #define CBMVISHIT_H 1
 
-#include "TMarker.h"
-class CbmPixelHit;
+#include "TObject.h"
+#include "TString.h"
+
 class CbmMCTrack;
 
-class CbmVisHit : public TMarker{
+class CbmVisHit {
 public:
-  CbmVisHit(CbmPixelHit* hit);
-  ~CbmVisHit(){};
+  CbmVisHit();
+  virtual ~CbmVisHit(){};
   void SetPointId(Int_t id)         {fPointId   = id;     }
   void SetTrackId(Int_t id)         {fTrackId   = id;     }
   void SetMotherPdg(Int_t pdg)      {fMotherPdg = pdg;    }
   void SetTrack(CbmMCTrack* track);
-  void SetVisible(Bool_t isVisible);
-  Bool_t GetVisible() {return fVisible;}
+  virtual void SetVisible(Bool_t isVisible){};
 
-  CbmPixelHit* GetHit() {return fHit; }
-  TString GetInfo();
+  virtual TString GetInfo() {};
+  Bool_t GetVisible() {return fVisible;}
   Int_t GetTrackPdg()  {return fTrackPdg;}
   Int_t GetMotherPdg() {return fMotherPdg;}
   Int_t GetTrackId()   {return fTrackId;}
   Int_t GetMotherId()  {return fMotherId;}
 
-private:
-  CbmPixelHit* fHit;
+protected:
   Int_t        fPointId;
   Int_t        fTrackId;
   Int_t        fTrackPdg;

@@ -26,12 +26,15 @@
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchCluster.h"
 #include "CbmMuchPixelHit.h"
+#include "CbmMuchStrawHit.h"
 #include "CbmMuchGeoScheme.h"
 
 #include "CbmVisMuchStationFrame.h"
 #include "CbmVisMuchModuleFrame.h"
 #include "CbmVisPoint.h"
 #include "CbmVisHit.h"
+#include "CbmVisPixelHit.h"
+#include "CbmVisStripHit.h"
 #include "CbmVisMuchCluster.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
@@ -48,7 +51,8 @@ CbmVisMuch::CbmVisMuch():FairTask("Task",0){
   fPoints      = NULL;
   fDigis       = NULL;
   fDigiMatches = NULL;
-  fHits        = NULL;
+  fPixelHits   = NULL;
+  fStripHits   = NULL;
   fNstations   = 0;
   fOpenModules = new TObjArray();
   fSumEvents   = kFALSE;
@@ -87,7 +91,8 @@ InitStatus CbmVisMuch::Init() {
   fRootManager = FairRootManager::Instance();
   fMCTracks    = (TClonesArray*) fRootManager->GetObject("MCTrack");
   fPoints      = (TClonesArray*) fRootManager->GetObject("MuchPoint");
-  fHits        = (TClonesArray*) fRootManager->GetObject("MuchPixelHit");
+  fPixelHits   = (TClonesArray*) fRootManager->GetObject("MuchPixelHit");
+  fStripHits   = (TClonesArray*) fRootManager->GetObject("MuchStrawHit");
   fDigis       = (TClonesArray*) fRootManager->GetObject("MuchDigi");
   fDigiMatches = (TClonesArray*) fRootManager->GetObject("MuchDigiMatch");
   fClusters    = (TClonesArray*) fRootManager->GetObject("MuchCluster");
@@ -173,14 +178,25 @@ void CbmVisMuch::ReadEvent(Int_t event){
     SetPointInfo((CbmVisPoint*) points[index]);
   }
 
-  printf("Fill arrays of CbmVisHits... nHits = %i\n",fHits->GetEntriesFast());
+  printf("Fill arrays of CbmVisPixelHits... nHits = %i\n",fPixelHits->GetEntriesFast());
   //Create arrays of CbmVisHits
-  for (Int_t i=0;i<fHits->GetEntriesFast();i++){
-    CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fHits->At(i);
+  for (Int_t i=0;i<fPixelHits->GetEntriesFast();i++){
+    CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fPixelHits->At(i);
     CbmMuchModule* module = fGeoScheme->GetModuleByDetId(hit->GetDetectorId());
     TClonesArray &hits = *(module->GetHits());
     Int_t index = hits.GetEntriesFast();
-    new (hits[index]) CbmVisHit(hit);
+    new (hits[index]) CbmVisPixelHit(hit);
+    //SetHitInfo((CbmVisHit*) hits[index]);
+  }
+
+  printf("Fill arrays of CbmVisStripHits... nHits = %i\n",fStripHits->GetEntriesFast());
+  //Create arrays of CbmVisHits
+  for (Int_t i=0;i<fStripHits->GetEntriesFast();i++){
+    CbmMuchStrawHit* hit = (CbmMuchStrawHit*) fStripHits->At(i);
+    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(hit->GetDetectorId());
+    TClonesArray &hits = *(module->GetHits());
+    Int_t index = hits.GetEntriesFast();
+    new (hits[index]) CbmVisStripHit(hit);
     //SetHitInfo((CbmVisHit*) hits[index]);
   }
 

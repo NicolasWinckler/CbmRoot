@@ -9,7 +9,7 @@ Double_t fitFunction(Double_t *x, Double_t *par)
 
 void trd_elid_qa_draw()
 {
-	TFile* file = new TFile("/d/cbm02/slebedev/trd/JUN09/MB/piel.0000.electronsQa.root");
+	TFile* file = new TFile("/d/cbm02/slebedev/trd/JUN09/ST/piel.0009.electronsQa.root");
 
 
     gStyle->SetPalette(1,0);
@@ -116,20 +116,28 @@ void trd_elid_qa_draw()
     fhNofTrdHitsEl->Draw();
     fhNofTrdHitsPi->Draw("same");
 	gPad->SetLogy(true);
+	char legTxt1[100];
 
     for (Int_t i = 0; i < 7; i++){
     	c2->cd(i+2);
+
     	fhPidANNEl[i]->Draw();
     	fhPidANNPi[i]->Draw("same");
     	gPad->SetLogy(true);
+
+		TLegend* leg1 = new TLegend(0.3,0.6, 0.7, 0.85, "mean value");
+		sprintf(legTxt1,"electrons (%.2f)", fhPidANNEl[i]->GetMean());
+		leg1->AddEntry(fhPidANNEl[i], legTxt1);
+		sprintf(legTxt1,"pions (%.2f)", fhPidANNPi[i]->GetMean());
+		leg1->AddEntry(fhPidANNPi[i], legTxt1);
+		leg1->DrawClone();
     }
 
-	TCanvas* c3 = new TCanvas();
+	TCanvas* c3 = new TCanvas("c3","c3",10,10,800,800);
 	c3->Divide(4, 3);
 	TH1D *fhElossSortPi[12];
 	TH1D *fhElossSortEl[12];
 
-	char legTxt1[100];
 	for (int i = 0; i < 12; i++){
 		c3->cd(i+1);
 		sprintf(histName,"fhElossSortPi%d",i);
@@ -158,7 +166,7 @@ void trd_elid_qa_draw()
 	}
 
 
-	TCanvas* c4 = new TCanvas();
+	TCanvas* c4 = new TCanvas("c4","c4",10,10,800,800);
 	c4->Divide(4, 3);
 	TH1D *fhCumProbSortPi[12];
 	TH1D *fhCumProbSortEl[12];

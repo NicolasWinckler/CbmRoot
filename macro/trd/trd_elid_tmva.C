@@ -14,9 +14,10 @@
 	std::vector<Float_t> inVector1;
 	std::vector<Float_t> inVector2;
 	Float_t xOut;
+
 	Bool_t doTraining = false;
-	TString fileNum = "0000";
-	TString geoType = "ST";
+	TString fileNum = "0001";
+	TString geoType = "st";
 
 void transformInputData1(std::vector<Float_t> &inVector)
 {
@@ -56,10 +57,10 @@ void trd_elid_tmva() {
 	inVector1.resize(fNofLayers);
 	inVector2.resize(fNofLayers);
 	TString inputDir = "/d/cbm02/slebedev/trd/JUN09/"+geoType+"/";
-	TString fileNameEl = "electrons_mom_"+fileNum+".txt";
-	TString fileNamePi = "pions_mom_"+fileNum+".txt";
-	TString fileNameTestEl = "electrons_mom_"+fileNum+".txt";
-	TString fileNameTestPi = "pions_mom_"+fileNum+".txt";
+	TString fileNameEl = inputDir + geoType+"_"+"electrons_mom_"+fileNum+".txt";
+	TString fileNamePi = inputDir + geoType+"_"+"pions_mom_"+fileNum+".txt";
+	TString fileNameTestEl = inputDir + geoType+"_"+"electrons_mom_"+fileNum+".txt";
+	TString fileNameTestPi = inputDir + geoType+"_"+"pions_mom_"+fileNum+".txt";
 	Int_t NofPi = 0, NofEl = 0;
 	//Max number of electrons and pions for training samples
 	Int_t MaxNofPi = 30000, MaxNofEl = 30000;
@@ -269,6 +270,7 @@ void trd_elid_tmva() {
 	Int_t NofElTest = 0;
 	Int_t NofPiTest = 0;
 
+	cout << "Reading electrons..." << endl;
 	while (!finElTest.eof()) {
 		for (Int_t iStation = 0; iStation < 12; iStation++) {
 			finElTest >> dEdX >> tr >> inVector[iStation];
@@ -287,6 +289,7 @@ void trd_elid_tmva() {
 			NofElLikePi++;
 	}
 
+	cout << "Reading pions..." << endl;
 	while (!finPiTest.eof()) {
 		for (Int_t iStation = 0; iStation < 12; iStation++) {
 			finPiTest >> dEdX >> tr >> inVector[iStation];

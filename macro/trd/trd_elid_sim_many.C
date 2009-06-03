@@ -32,8 +32,8 @@ void trd_elid_sim_many(Int_t fileNum, Int_t trdGeoType)
     if (trdGeoType == 2) trdGeomFile = "trd_monolithic_MB.geo";
 
   TString outDir;
-  if (trdGeoType == 1) outDir  = "/d/cbm02/slebedev/trd/JUN09/ST/";
-  if (trdGeoType == 2) outDir  = "/d/cbm02/slebedev/trd/JUN09/MB/";
+  if (trdGeoType == 1) outDir  = "/d/cbm02/slebedev/trd/JUN09/st/";
+  if (trdGeoType == 2) outDir  = "/d/cbm02/slebedev/trd/JUN09/mb/";
 
   TString outFile = outDir + "piel.000"+fileNumSt+".mc.root";
   TString parFile = outDir + "piel.000"+fileNumSt+".params.root";

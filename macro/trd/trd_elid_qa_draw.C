@@ -9,7 +9,7 @@ Double_t fitFunction(Double_t *x, Double_t *par)
 
 void trd_elid_qa_draw()
 {
-	TFile* file = new TFile("/d/cbm02/slebedev/trd/JUN09/ST/piel.0009.electronsQa.root");
+	TFile* file = new TFile("/d/cbm02/slebedev/trd/JUN09/st/piel.0009.electronsQa.root");
 
 
     gStyle->SetPalette(1,0);

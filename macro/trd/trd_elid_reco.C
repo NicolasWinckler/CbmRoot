@@ -3,7 +3,7 @@
  Author : Simeon Lebedev
  E-mail : S.Lebedev@gsi.de
  */
-void trd_elid_reco(Int_t nEvents = 500)
+void trd_elid_reco(Int_t nEvents = 1000)
 {
 
   // ========================================================================
@@ -13,16 +13,17 @@ void trd_elid_reco(Int_t nEvents = 500)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "/d/cbm02/slebedev/trd/FEB09/mom.piel.0000.mc.root";
+  TString inFile = "/d/cbm02/slebedev/trd/JUN09/st/piel.0009.mc.root";
+  TString inFile2 = "/d/cbm02/slebedev/trd/JUN09/mb/piel.0009.mc_1.root";
 
   // Parameter file
-  TString parFile = "/d/cbm02/slebedev/trd/FEB09/mom.piel.0000.params.root";
+  TString parFile = "/d/cbm02/slebedev/trd/JUN09/st/piel.0009.params.root";
 
   // STS digitisation file
   TString stsDigiFile = "sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/d/cbm02/slebedev/trd/FEB09/mom.piel.0000.reco.root";
+  TString outFile = "/d/cbm02/slebedev/trd/JUN09/st/piel.0009.reco.root";
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -69,8 +70,10 @@ void trd_elid_reco(Int_t nEvents = 500)
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *run= new FairRunAna();
   run->SetInputFile(inFile);
+  run->AddFile(inFile2);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
+
 
 
   // =========================================================================

@@ -646,6 +646,10 @@ void CbmMuchSegmentManual::DrawSegmentation(){
       } // modules
     } // sides
 
+    // Draw a hole
+    TArc* arc = new TArc(0.,0.,station->GetRmin());
+    arc->Draw();
+
     for(Int_t iRegion=0; iRegion < fNRegions[iStation]; ++iRegion){
       TArc* arc = new TArc(0.,0.,fRadii[iStation].at(iRegion));
       arc->SetLineColor(kBlue);

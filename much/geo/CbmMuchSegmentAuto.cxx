@@ -552,6 +552,10 @@ void CbmMuchSegmentAuto::DrawSegmentation(){
       } // modules
     } // sides
 
+    // Draw a hole
+    TArc* arc = new TArc(0.,0.,station->GetRmin());
+    arc->Draw();
+
     c1->Print(Form("station%i.eps",iStation+1));
     c1->Print(Form("station%i.png",iStation+1));
   }//stations

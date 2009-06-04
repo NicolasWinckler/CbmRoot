@@ -44,9 +44,12 @@ class CbmMuchFindHitsStraws : public FairTask
   Int_t GetEff() const { return fEffic; }
   Int_t GetMerge() const { return fMerge; }
   Int_t GetMirror() const { return fMirror; }
+  Double_t GetPhi(Int_t i) const { return fPhis[i]; }
   void SetEff(Int_t eff) { fEffic = eff; }
   void SetMerge(Int_t merge) { fMerge = merge; }
   void SetMirror(Int_t mirror) { fMirror = mirror; }
+  void SetPhi(Int_t i, Double_t phi) { fPhis[i] = phi; } // set doublets rotation angles (degs)
+  void SetPhis(Double_t ph0, Double_t ph1, Double_t ph2) { fPhis[0] = ph0; fPhis[1] = ph1; fPhis[2] = ph2;} // set doublets rotation angles (degs)
 
  private:
 
@@ -63,6 +66,7 @@ class CbmMuchFindHitsStraws : public FairTask
   Int_t                            fEffic;             // Efficiency correction flag
   Int_t                            fMerge;             // merging flag 
   Int_t                            fMirror;            // mirror flag (left-right ambiguity)
+  Double_t                         fPhis[3];           // rotation angles of doublets
 
   ClassDef(CbmMuchFindHitsStraws,1);
 };

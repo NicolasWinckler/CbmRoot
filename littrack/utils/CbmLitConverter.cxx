@@ -286,7 +286,7 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
 		globalTrack->SetStsTrackIndex(litTrack->GetPreviousTrackId());
 		stsTracksSet.insert(litTrack->GetPreviousTrackId());
 		if (isCreateMuchTrack) {
-			globalTrack->SetRichRingIndex(muchTrackNo - 1); //TODO: change to MUCH here
+			globalTrack->SetMuchTrackIndex(muchTrackNo - 1);
 			muchTrack->SetPreviousTrackId(litTrack->GetPreviousTrackId());
 		}
 		if (isCreateTrdTrack) {

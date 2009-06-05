@@ -159,7 +159,7 @@ void CbmLitFindGlobalTracksIdeal::CreateGlobalTracks()
 		globalTrack->SetStsTrackIndex(stsId);
 		globalTrack->SetTrdTrackIndex(trdId);
 		globalTrack->SetTofHitIndex(tofId);
-		globalTrack->SetRichRingIndex(muchId); //TODO change to MUCH
+		globalTrack->SetMuchTrackIndex(muchId);
 	}
 }
 

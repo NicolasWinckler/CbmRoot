@@ -154,7 +154,7 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 		// get track segments indices
 		Int_t stsId = globalTrack->GetStsTrackIndex();
 		Int_t trdId = globalTrack->GetTrdTrackIndex();
-		Int_t muchId = globalTrack->GetRichRingIndex(); //TODO:change to MUCH
+		Int_t muchId = globalTrack->GetMuchTrackIndex();
 		Int_t tofId = globalTrack->GetTofHitIndex();
 
 		// check track segments

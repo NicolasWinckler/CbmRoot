@@ -255,7 +255,7 @@ Bool_t CbmLitPropagationAnalysis::CheckAcceptance(
 		const CbmGlobalTrack* globalTrack)
 {
 	Int_t trdId = globalTrack->GetTrdTrackIndex();
-	Int_t muchId = globalTrack->GetRichRingIndex(); //TODO change to MUCH
+	Int_t muchId = globalTrack->GetMuchTrackIndex();
 	Int_t tofId = globalTrack->GetTofHitIndex();
 	if (fIsTrd && trdId > -1) {
 		CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTrdTracks->At(trdId);
@@ -276,7 +276,7 @@ void CbmLitPropagationAnalysis::GlobalTrackToLitTrack(
 {
 	Int_t stsId = globalTrack->GetStsTrackIndex();
 	Int_t trdId = globalTrack->GetTrdTrackIndex();
-	Int_t muchId = globalTrack->GetRichRingIndex(); //TODO change to MUCH
+	Int_t muchId = globalTrack->GetMuchTrackIndex();
 	Int_t tofId = globalTrack->GetTofHitIndex();
 
 	// STS: set initial track parameters from STS track
@@ -331,7 +331,7 @@ void CbmLitPropagationAnalysis::GlobalTrackToMCLitTrack(
 		CbmLitTrack* litTrack)
 {
 	Int_t trdId = globalTrack->GetTrdTrackIndex();
-	Int_t muchId = globalTrack->GetRichRingIndex(); //TODO change to MUCH
+	Int_t muchId = globalTrack->GetMuchTrackIndex();
 	Int_t tofId = globalTrack->GetTofHitIndex();
 
 	CbmTrdTrack* trdTrack;

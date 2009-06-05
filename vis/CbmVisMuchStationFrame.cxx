@@ -298,9 +298,8 @@ void CbmVisMuchStationFrame::DrawHits(){
       }
       else if (module->GetDetectorType()==2) {
         for (Int_t i=0;i<hits->GetEntriesFast();i++){
-          printf("!!!\n");
           CbmVisStripHit* hit = (CbmVisStripHit*) hits->At(i);
-          hit->Draw("NDC");
+          hit->Draw();
         }
       }
     }

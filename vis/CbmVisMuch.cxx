@@ -163,6 +163,16 @@ void CbmVisMuch::ReadEvent(Int_t event){
   fGeoScheme->ClearHitArrays();
   fGeoScheme->ClearClusterArrays();
 
+  printf("Reset pads\n");
+  vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
+  for (Int_t i=0;i<modules.size();i++){
+    CbmMuchModule* module = modules[i];
+    if (module->GetDetectorType()!=1) continue;
+    CbmMuchModuleGem* gem_module = (CbmMuchModuleGem*) module;
+    vector<CbmMuchPad*> pads = gem_module->GetPads();
+    for (Int_t i=0;i<pads.size();i++) pads[i]->Reset();
+  }
+
   fVisClusters->Clear();
 
 

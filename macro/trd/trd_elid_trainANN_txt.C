@@ -23,10 +23,19 @@ void coeffCalc(double mom, double* coeff1, double* coeff2) {
 }
 
 void trd_elid_trainANN_txt() {
+	TString fileNum = "0001";
+	TString geoType = "st";
+	TString inputDir = "/d/cbm02/slebedev/trd/JUN09/"+geoType+"/";
+	TString fileNameEl = inputDir + geoType+"_"+"electrons_mom_"+fileNum+".txt";
+	TString fileNamePi = inputDir + geoType+"_"+"pions_mom_"+fileNum+".txt";
+	TString fileNameTestEl = inputDir + geoType+"_"+"electrons_mom_"+fileNum+".txt";
+	TString fileNameTestPi = inputDir + geoType+"_"+"pions_mom_"+fileNum+".txt";
+
+
 	//input files for electrons and pions
 	//these files could be produced with pions.C macro
-	std::ifstream finEl("electrons_mom_MB.txt");
-	std::ifstream finPi("pions_mom_MB.txt");
+	std::ifstream finEl((const char*) fileNameEl);
+	std::ifstream finPi((const char*) fileNamePi);
 
 	///load libraries for neural net
 	if (!gROOT->GetClass("TMultiLayerPerceptron"))
@@ -86,7 +95,7 @@ void trd_elid_trainANN_txt() {
 		sort(inVector.begin(), inVector.end());
 		for (Int_t j = 0; j<inVector.size(); j++)
 			inVector[j]=TMath::LandauI(inVector[j]);
-		///------------------transform Data END----------------------------      
+		///------------------transform Data END----------------------------
 
 		simu->Fill();
 		NofPi++;
@@ -115,7 +124,7 @@ void trd_elid_trainANN_txt() {
 		sort(inVector.begin(), inVector.end());
 		for (Int_t j = 0; j<inVector.size(); j++)
 			inVector[j]=TMath::LandauI(inVector[j]);
-		///------------------transform Data END----------------------------        
+		///------------------transform Data END----------------------------
 
 		simu->Fill();
 		NofEl++;
@@ -131,7 +140,7 @@ void trd_elid_trainANN_txt() {
     fNN->DumpWeights("Neural_Net_Weights_El_ID_MB_6.txt");
 
 	/////////////////////////////////////////////////////////////////////////
-	//////////////////////////TEST///////////////////////////////////////////    
+	//////////////////////////TEST///////////////////////////////////////////
 	cout << "TESTING......." << endl;
 	Double_t params[12];
 	Double_t maxEval = 1.3;
@@ -146,10 +155,11 @@ void trd_elid_trainANN_txt() {
 
 	//cut on the output value of ANN
 	Double_t ANNCut = 0.79;
-	
+
 	//input data for testing
-	std::ifstream finPiTest("pions_mom_MB.txt");
-	std::ifstream finElTest("electrons_mom_MB.txt");
+	std::ifstream finPiTest((const char*) fileNameTestPi);
+	std::ifstream finElTest((const char*) fileNameTestEl);
+
 	Int_t NofPiLikeEl = 0;
 	Int_t NofElLikePi = 0;
 	Int_t NofElTest = 0;
@@ -172,7 +182,7 @@ void trd_elid_trainANN_txt() {
 		sort(inVector.begin(), inVector.end());
 		for (Int_t j = 0; j<inVector.size(); j++)
 			inVector[j]=TMath::LandauI(inVector[j]);
-		///------------------transform Data END----------------------------  
+		///------------------transform Data END----------------------------
 		for (UInt_t k = 0; k < inVector.size(); k++)
 			params[k] = inVector[k];
 		Double_t nnEval = fNN->Evaluate(0, params);
@@ -205,7 +215,7 @@ void trd_elid_trainANN_txt() {
 		sort(inVector.begin(), inVector.end());
 		for (Int_t j = 0; j<inVector.size(); j++)
 			inVector[j]=TMath::LandauI(inVector[j]);
-		///------------------transform Data END----------------------------  
+		///------------------transform Data END----------------------------
 		for (UInt_t k = 0; k < inVector.size(); k++)
 			params[k] = inVector[k];
 		Double_t nnEval = fNN->Evaluate(0, params);

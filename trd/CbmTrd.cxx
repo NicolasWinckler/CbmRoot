@@ -224,8 +224,7 @@ Bool_t  CbmTrd::ProcessHits(FairVolume* vol)
 
 
 	 fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
-	 fVolumeID = vol->getMCid();
-	
+
          if ( 0 == fSimple) {
          
           Int_t id1 = gMC->CurrentVolOffID(1, mod);
@@ -270,10 +269,29 @@ Bool_t  CbmTrd::ProcessHits(FairVolume* vol)
           fmodnumber=mod;
 
 
-          fVolumeID = fstation*100000 + flayer * 10000 + fmodtype * 1000 + fmodnumber;
+          Int_t sector=0;
+          Int_t detInfo_array[6]={kTRD, fstation,flayer,fmodtype,fmodnumber,sector};         
+          fVolumeID = fTrdId.SetDetectorInfo(detInfo_array);
 
+	 } else {            
+          Int_t sector=0;
 
-  	}             
+	  fVolumeID = vol->getMCid();
+	  gMC->CurrentVolID(fCopyNo); //  Returns the current volume ID and copy number
+	  flayer=fCopyNo; // Set the layer of the station which is equal to the copy number
+	  if(fVolumeID==fVolid1 ) fstation=1; // compare Volume id with stored one to get the detector station
+	  if(fVolumeID==fVolid2 ) fstation=2;
+	  if(fVolumeID==fVolid3 ) fstation=3;
+	  if(fVolumeID==fVolid4 ) fstation=4;
+	  if(fVolumeID==fVolid5 ) fstation=5;
+	  if(fVolumeID==fVolid6 ) fstation=6;
+          fmodtype=0;
+          fmodnumber=0;
+
+          Int_t detInfo_array[6]={kTRD, fstation,flayer,fmodtype,fmodnumber,sector};
+
+          fVolumeID = fTrdId.SetDetectorInfo(detInfo_array);
+	 }
 
 	CbmTrdPoint *fPoint= AddHit(fTrackID, fVolumeID, 
                             TVector3(fPosIn.X(),  fPosIn.Y(),  fPosIn.Z()),
@@ -281,24 +299,6 @@ Bool_t  CbmTrd::ProcessHits(FairVolume* vol)
                             TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 			    TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
                             fTime, fLength, fELoss);
-
-        // According to different geometry
-	if(1 == fSimple){
-
-	    gMC->CurrentVolID(fCopyNo); //  Returns the current volume ID and copy number
-	    fPoint->SetLayerNo(fCopyNo); // Set the layer of the station which is equal to the copy number
-	    if(fVolumeID==fVolid1 ) fPoint->SetStationNo(1); // compare Volume id with stored one to get the detector station
-	    if(fVolumeID==fVolid2 ) fPoint->SetStationNo(2);
-	    if(fVolumeID==fVolid3 ) fPoint->SetStationNo(3);
-	    if(fVolumeID==fVolid4 ) fPoint->SetStationNo(4);
-	    if(fVolumeID==fVolid5 ) fPoint->SetStationNo(5);
-	    if(fVolumeID==fVolid6 ) fPoint->SetStationNo(6);
-	}
-        else {
-          fPoint->SetLayerNo(flayer);
-          fPoint->SetStationNo(fstation);
-	}
-
 
 	// Increment number of trd points in TParticle
 	CbmStack* stack = (CbmStack*) gMC->GetStack();

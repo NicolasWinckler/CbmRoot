@@ -8,6 +8,10 @@
 
 #include "FairTask.h"
 
+#include "CbmTrdDetectorId.h"
+
+#include <vector>
+
 class TClonesArray;
 
 
@@ -17,8 +21,10 @@ private:
     TClonesArray *fArrayTrdPoint;  // Array of TRD points
     TClonesArray *fArrayTrdHit;    // Array of TRD hits
     Int_t fEvents;                 // Number of events processed
-    Int_t fNoTrdStations;          // Number of TRD stations
-    Int_t fNoTrdPerStation;        // Number of layers per station
+
+    CbmTrdDetectorId fDetId;      //! Get detector info from detector id
+
+    std::vector<Int_t> fLayersBeforeStation; //! 
 
 public:
     CbmTrdHitProducerIdeal();

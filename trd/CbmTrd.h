@@ -18,6 +18,8 @@
 
 #include "FairDetector.h"
 
+#include "CbmTrdDetectorId.h"
+
 #include "TLorentzVector.h"
 #include "TVector3.h"
 
@@ -146,6 +148,7 @@ class CbmTrd : public FairDetector
   Int_t Trd3_Module2_ID;	     //! MC ID of middle module of third TRD 
   Int_t Trd3_Module3_ID;	     //! MC ID of big module of third TRD    
 
+  CbmTrdDetectorId fTrdId;
   /** Private method AddHit
    **
    ** Adds a CbmTrdPoint to the HitCollection

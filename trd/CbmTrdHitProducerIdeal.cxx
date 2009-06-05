@@ -12,6 +12,8 @@
 
 #include "TClonesArray.h"
 #include "TVector3.h"
+#include "TGeoVolume.h"
+#include "TGeoManager.h"
 
 #include <iostream>
 using std::cout;
@@ -34,8 +36,6 @@ CbmTrdHitProducerIdeal::CbmTrdHitProducerIdeal()
     fArrayTrdPoint = NULL;
     fArrayTrdHit = new TClonesArray("CbmTrdHit", 100);
     fEvents = 0;
-    fNoTrdStations = 3;
-    fNoTrdPerStation = 4;
 }
 // ------------------------------------------------------------------
 
@@ -49,8 +49,6 @@ CbmTrdHitProducerIdeal::CbmTrdHitProducerIdeal(const char *name,
     fArrayTrdPoint = NULL;
     fArrayTrdHit = new TClonesArray("CbmTrdHit", 100);
     fEvents = 0;
-    fNoTrdStations = 3;
-    fNoTrdPerStation = 4;
 }
 // ------------------------------------------------------------------
 
@@ -76,16 +74,59 @@ InitStatus CbmTrdHitProducerIdeal::Init()
 	    << "ROOT manager is not instantiated!" << endl;
         return kFATAL;
     }
+
     // Activate data branches
     fArrayTrdPoint = (TClonesArray*) rootMgr->GetObject("TRDPoint");
     if(NULL == fArrayTrdPoint) {
 	cout << "-W- CbmTrdHitProducerIdeal::Init: "
             << "no TRD point array!" << endl;
     }
+
     // Register
     rootMgr->Register("TRDHit", "TRD", fArrayTrdHit, kTRUE);
     cout << "-I- CbmTrdHitProducerIdeal::Init: "
 	<<"initialisation completed." << endl;
+
+    // Extract information about the number of TRD stations and
+    // the number of layers per TRD station from the geomanager.
+    // Store the information about the number of layers at the entrance
+    // of subsequent stations in a vector. 
+    // This allows to calculate the layer number starting with 1 for the
+    // first layer of the first station at a later stage by only adding 
+    // the layer number in the station to the number of layers in 
+    // previous stations 
+    TGeoVolume *fm=NULL;
+    Int_t stationNr = 1;
+    Int_t totalNrOfLayers = 0;
+    fLayersBeforeStation.push_back(totalNrOfLayers);
+    char volumeName[10];
+    sprintf(volumeName, "trd%d", stationNr);
+    fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject(volumeName);  
+    if (fm){
+      Int_t nrOfLayers = fm->GetNdaughters();
+      totalNrOfLayers += nrOfLayers;
+      fLayersBeforeStation.push_back(totalNrOfLayers);
+      do {
+	stationNr++;
+        sprintf(volumeName, "trd%d", stationNr);
+	fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject(volumeName);  
+        if (fm) {
+          nrOfLayers = fm->GetNdaughters();
+	  totalNrOfLayers += nrOfLayers;
+	  fLayersBeforeStation.push_back(totalNrOfLayers);
+	}
+      } while (fm);
+    } else {
+      cout << "***************************************" <<endl;
+      cout << "                                       " <<endl;
+      cout << " - FATAL ERROR Unknown geometry version" <<endl;
+      cout << "   in CbmTrdHitProducerSmearing        " <<endl;
+      cout << " No TRD stations found in the geometry " <<endl;
+      cout << "                                       " <<endl;
+      cout << "***************************************" <<endl;
+      return kFATAL;
+    }
+
     return kSUCCESS;
 }
 // ------------------------------------------------------------------
@@ -114,16 +155,20 @@ void CbmTrdHitProducerIdeal::Exec(Option_t *option)
 	if(NULL == point) continue;
 	// Get position
 	point->Position(pos);
+
 	// Calculate plane number
-        iPlane = (point->GetStationNo()-1)*fNoTrdPerStation + point->GetLayerNo();
+        Int_t* detInfo = fDetId.GetDetectorInfo(point->GetDetectorID()); 
+        iPlane=fLayersBeforeStation[(detInfo[1]-1)]+detInfo[2];
+
 	// Create hit
 	new ((*fArrayTrdHit)[nHit]) CbmTrdHit(point->GetDetectorID(),
 					      pos, dpos, 0., iPoint,
-					      iPlane, 0.,
+     					      iPlane, 0.,
 					      point->GetEnergyLoss(),
 					      point->GetEnergyLoss());
         nHit++;
     }
+
     cout << "-I- CbmTrdHitProducerIdeal::Exec:  "
 	<< "event: " << fEvents << ",  TRD points: " << nPoint
 	<< ",  TRD hits created: " << nHit << endl;

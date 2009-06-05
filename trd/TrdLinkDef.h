@@ -28,13 +28,12 @@
 #pragma link C++ class  CbmTrdCreatePidLike+;
 #pragma link C++ class  CbmTrdTracksPidQa+;
 #pragma link C++ class  CbmTrdGas+;
+#pragma link C++ class  CbmTrdDigitizer+;
+#pragma link C++ class  CbmTrdStringToken+;
+#pragma link C++ class  CbmTrdModule+;
+#pragma link C++ class  CbmTrdCreateDigiPar+;
+#pragma link C++ class  CbmTrdDigiPar+;
+#pragma link C++ class  CbmTrdHitProducerDigi+;
+//#pragma link C++ class  CbmTrdDetectorId+;
 #pragma link C++ class CbmTrdElectronsQa+;
-
-//#pragma link C++ class  CbmTrdDigitizer+;
-//#pragma link C++ class  CbmTrdDigi+;
-//#pragma link C++ class  CbmTrdDigiMatch+;
-//#pragma link C++ class  CbmTrdStringToken+;
-//#pragma link C++ class  CbmTrdModule+;
-//#pragma link C++ class  CbmTrdCreateDigiPar+;
-//#pragma link C++ class  CbmTrdDigiPar+;
 #endif

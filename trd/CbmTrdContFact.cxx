@@ -12,6 +12,7 @@
 #include "CbmTrdContFact.h"
 
 #include "CbmGeoTrdPar.h"
+#include "CbmTrdDigiPar.h"
 
 #include "FairRuntimeDb.h"
 
@@ -37,6 +38,13 @@ void CbmTrdContFact::setAllContainers() {
     p->addContext("TestNonDefaultContext");
 
     containers->Add(p);
+ 
+    FairContainer* p1= new FairContainer("CbmTrdDigiPar",
+                                          "Trd Digi Parameters",
+                                          "TestDefaultContext");
+    p1->addContext("TestNonDefaultContext");
+
+    containers->Add(p1);
 }
 
 FairParSet* CbmTrdContFact::createContainer(FairContainer* c) {
@@ -48,6 +56,9 @@ FairParSet* CbmTrdContFact::createContainer(FairContainer* c) {
   FairParSet* p=0;
   if (strcmp(name,"CbmGeoTrdPar")==0) {
       p=new CbmGeoTrdPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
+  }
+  if (strcmp(name,"CbmTrdDigiPar")==0) {
+      p=new CbmTrdDigiPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
   }
   return p;
 }

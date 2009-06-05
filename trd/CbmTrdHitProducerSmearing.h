@@ -28,20 +28,20 @@
 #ifndef CBMTRDHITPRODUCERSMEARING_H
 #define CBMTRDHITPRODUCERSMEARING_H
 
+#include "CbmTrdDetectorId.h"
 
 #include "FairTask.h"
 
 #include "TVector3.h"
 
+#include <vector>
+
 class TClonesArray;
-class FairBaseParSet;
-class CbmGeoTrdPar;
 class CbmTrdHit;
 class CbmTrdRadiator;
 
-
-    class CbmTrdHitProducerSmearing : public FairTask {
-public:
+class CbmTrdHitProducerSmearing : public FairTask {
+  public:
 
     
 
@@ -49,7 +49,8 @@ public:
     CbmTrdHitProducerSmearing();
 
     /** Standard constructor **/
-    CbmTrdHitProducerSmearing(const char *name, const char *title="CBM Task", CbmTrdRadiator *radiator=NULL);
+    CbmTrdHitProducerSmearing(const char *name, const char *title="CBM Task", 
+                              CbmTrdRadiator *radiator=NULL);
 
     /** Destructor **/
     virtual ~CbmTrdHitProducerSmearing();
@@ -65,54 +66,47 @@ public:
     /** Finish task **/
     virtual void Finish();
 
-    //TRefArray *GetRef(){return fRef;}
-    void AddHit(TVector3 &posHit, TVector3 &posHitErr,
-		Int_t TrackID, Int_t PlaneID, Int_t ref, Double_t ELoss,
-		Double_t ELossTR, Double_t ELossdEdX);
-    void SmearingXY( Double_t dx , Double_t dy ) { fDx = dx; fDy=dy ;}
-    void SmearingX(Double_t dx) {fDx = dx;}
-    void SmearingY(Double_t dy) {fDy = dy;}
     void Register();
-    void SetNlayer(Int_t a) ;
-    void SetEfficency(Float_t eff) {fEfficency=eff;}
+
+    void AddHit(Int_t trdId, TVector3 &posHit, 
+                TVector3 &posHitErr,
+		Int_t ref, Int_t Plane, 
+		Double_t ELoss, Double_t ELossTR,
+		Double_t ELossdEdX);
+
     void SetSigmaX(Double_t sigma[]) ;
     void SetSigmaY(Double_t s1[], Double_t s2[], Double_t s3[]);
 
+    void SetEfficency(Float_t eff) {fEfficency=eff;}
+    void SmearingXY( Double_t dx , Double_t dy ) { fDx = dx; fDy=dy ;}
+    void SmearingX(Double_t dx) {fDx = dx;}
+    void SmearingY(Double_t dy) {fDy = dy;}
+
     Double_t GetSigmaX (Int_t stack);
-    Float_t GetEfficency () { return fEfficency;}
     Double_t GetSigmaY (Double_t teta, Int_t stack );
+
+    Float_t  GetEfficency () { return fEfficency;}
 
 private:
 
-    TClonesArray *fTrdPoints; //! TRD MC points
+    TClonesArray *fTrdPoints;     //! TRD MC points
     TClonesArray *fHitCollection; //! TRD hits
-    TClonesArray *fListStack;         //Tracks
+    TClonesArray *fListStack;     //Tracks
 
     Double_t fDx;               //!
     Double_t fDy;               //!
     Double_t fSigmaX[3];        //!
     Double_t fSigmaY[3] [7];    //!
-    Int_t    fTrdPerStation;    //!
-    Int_t    fNlayer;           //!
-    TString  fVersion;          //!
     Int_t    fNHits;            //!
     Float_t  fEfficency;        //! Hit finding efficency (0-100%)
 
     CbmTrdRadiator*  fRadiator; //!
-    CbmGeoTrdPar*    fGeoPar;   //!
-    FairBaseParSet*    fBasePar; //!
 
-    // positions of the active volume for given copyes of the chambers
-    // temporary solution
+    CbmTrdDetectorId fDetId;  //!
 
-    Float_t ftrdU1[8];      //!
-    Float_t ftrdU2[8];      //!
-    Float_t ftrdU3[8];      //!
-    Float_t ftrdR1[8];      //!
-    Float_t ftrdR2[8];      //!
-    Float_t ftrdR3[8];      //!
+    std::vector<Int_t> fLayersBeforeStation; //! 
 
-    ClassDef(CbmTrdHitProducerSmearing,1) //CBMTRDHitProducer
+    ClassDef(CbmTrdHitProducerSmearing,2) //CBMTRDHitProducer
 
 };
 #endif //CBMTRDHITPRODUCERSMEARING_H

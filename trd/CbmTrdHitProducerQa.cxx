@@ -92,6 +92,8 @@ InitStatus CbmTrdHitProducerQa::Init()
       return kFATAL;
     }
 
+    /*
+
     // Get the pointer to the singleton FairRunAna object
     FairRunAna* ana = FairRunAna::Instance();
     if(NULL == ana) {
@@ -169,6 +171,7 @@ InitStatus CbmTrdHitProducerQa::Init()
       cout << "***************************************" <<endl;
       return kFATAL;
     }
+    */
 
     return kSUCCESS;
 
@@ -304,6 +307,24 @@ void CbmTrdHitProducerQa::Finish()
 
 void CbmTrdHitProducerQa::PrepareHistograms()
 {
+
+    fHitPoolsX=NULL;
+    fHitPoolsY=NULL; 
+
+    S1L1eTR15=NULL; 
+    S1L1edEdx15=NULL;
+    S1L1edE15=NULL; 
+    S1L1edEall=NULL;
+    S1L1pidE15=NULL;
+    S1L1pidEall=NULL;
+
+    S3L4eTR15=NULL;
+    S3L4edEdx15=NULL;
+    S3L4edE15=NULL;
+    S3L4edEall=NULL;
+    S3L4pidE15=NULL;
+    S3L4pidEall=NULL;
+
     fHitPoolsX = new TH1F("fHitPoolsX", "", 500, -5, 5);
     fHitPoolsY = new TH1F("fHitPoolsY", "", 500, -5, 5);
 

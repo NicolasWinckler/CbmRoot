@@ -1,10 +1,10 @@
-void global_hits(Int_t nEvents = 10)
+void global_hits(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, globalHitsFile;
 	if (script != "yes") {
-		dir  = "/home/d/andrey/test/trunk/global_mu_urqmd/";
+		dir  = "/home/d/andrey/test/trunk/global_e/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalHitsFile = dir + "global.hits.0000.root";
@@ -30,7 +30,9 @@ void global_hits(Int_t nEvents = 10)
 
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 	TString stsDigiFile = parDir+ "/sts/sts_Standard_s3055AAFK5.SecD.digi.par";
-	TString muchDigiFile = parDir + "/much/much_standard.digi.root";
+//	TString muchDigiFile = parDir + "/much/much_standard.digi.root";
+//	TString muchDigiFile = parDir + "/much/much_standard_trd.digi.root";
+	TString muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
 
 	// ----- STS reconstruction   ---------------------------------------------
 	FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);

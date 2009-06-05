@@ -2,7 +2,7 @@ void trd_sim(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString inFile, dir, mcFile, parFile, electrons, urqmd, geoType;
+	TString inFile, dir, mcFile, parFile, electrons, urqmd, trdGeom;
 	if (script != "yes") {
 		inFile  = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
 		dir  = "/home/d/andrey/test/trunk/global_e/";
@@ -10,20 +10,17 @@ void trd_sim(Int_t nEvents = 1000)
 		parFile = dir + "param.0000.root";
 		electrons = "yes";
 		urqmd = "no";
-		geoType = "segmented";
+		trdGeom = "trd_standard.geo";
+//		trdGeom = "trd_monolithic.geo";
 	} else {
 		inFile  = TString(gSystem->Getenv("INFILE"));
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
 		electrons = TString(gSystem->Getenv("ELECTRONS"));
 		urqmd = TString(gSystem->Getenv("URQMD"));
-		geoType = TString(gSystem->Getenv("GEOTYPE"));
+		trdGeom = TString(gSystem->Getenv("TRDGEOM"));
 	}
 
-	// -----  Geometries  -----------------------------------------------------
-	TString trdGeom;
-	if (geoType == "segmented") trdGeom = "trd_standard.geo";
-	if (geoType == "monolithic") trdGeom = "trd_monolithic.geo";
 
 	TString caveGeom   = "cave.geo";
 	TString targetGeom = "target_au_250mu.geo";
@@ -127,7 +124,7 @@ void trd_sim(Int_t nEvents = 1000)
 		magField = new CbmFieldMapSym3(fieldMap);
 	else {
 		cout << "===> ERROR: Field map " << fieldMap << " unknown! " << endl;
-		exit;
+		exit(1);
 	}
 	magField->SetPosition(0., 0., fieldZ);
 	magField->SetScale(fieldScale);
@@ -184,17 +181,10 @@ void trd_sim(Int_t nEvents = 1000)
 
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
-	Double_t rtime = timer.RealTime();
-	Double_t ctime = timer.CpuTime();
-	cout << endl << endl;
 	cout << "Macro finished succesfully." << endl;
 	cout << "Output file is "    << mcFile << endl;
 	cout << "Parameter file is " << parFile << endl;
-	cout << "Real time " << rtime << " s, CPU time " << ctime
-	   << "s" << endl << endl;
+	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << "s" << endl << endl;
 	// ------------------------------------------------------------------------
-
-	cout << " Test passed" << endl;
-	cout << " All ok " << endl;
 }
 

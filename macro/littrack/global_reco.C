@@ -108,8 +108,16 @@ void global_reco(Int_t nEvents = 10)
 
 	// ------ Global track reconstruction -------------------------------------
 	CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
+	// Tracking method to be used
+	// "branch" - branching tracking
+	// "nn" - nearest neighbor tracking
+	// "weight" - weighting tracking
 	finder->SetTrackingType("branch");
+
+	// Hit-to-track merger method to be used
+	// "nearest_hit" - assigns nearest hit to the track
 	finder->SetMergerType("nearest_hit");
+
 	run->AddTask(finder);
 	// ------------------------------------------------------------------------
 
@@ -130,6 +138,8 @@ void global_reco(Int_t nEvents = 10)
 	reconstructionQa->SetMinNofPointsMuch(12);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
+	reconstructionQa->SetMinNofHitsTrd(3);
+	reconstructionQa->SetMinNofHitsMuch(12);
 	reconstructionQa->SetVerbose(1);
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------

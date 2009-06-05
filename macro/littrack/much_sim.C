@@ -1,18 +1,19 @@
-void much_sim(Int_t nEvents = 100)
+void much_sim(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString geoType, inFile, dir, mcFile, parFile, plutoFile, muons, urqmd, pluto;
+	TString muchGeom, trdGeom, inFile, dir, mcFile, parFile, plutoFile, muons, urqmd, pluto;
 	if (script != "yes") {
 		inFile  = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
-		dir  = "/home/d/andrey/test/trunk/global_mu_urqmd/";
+		dir  = "/home/d/andrey/test/trunk/global_mustraw/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		muons = "yes";
-		urqmd = "yes";
+		urqmd = "no";
 		pluto = "no";
-		geoType = "new_much_standard";
+		muchGeom = "much_standard_straw.geo";
+		trdGeom = "";//"trd_muon_setup_new.geo";
 	} else {
 		inFile  = TString(gSystem->Getenv("INFILE"));
 		plutoFile  = TString(gSystem->Getenv("PLUTOFILE"));
@@ -21,16 +22,10 @@ void much_sim(Int_t nEvents = 100)
 		electrons = TString(gSystem->Getenv("MUONS"));
 		urqmd = TString(gSystem->Getenv("URQMD"));
 		pluto = TString(gSystem->Getenv("PLUTO"));
-		geoType = TString(gSystem->Getenv("GEOTYPE"));
+		muchGeom = TString(gSystem->Getenv("MUCHGEOM"));
+		trdGeom = TString(gSystem->Getenv("TRDGEOM"));
 		muons = TString(gSystem->Getenv("MUONS"));
 	}
-
-	TString muchGeom;
-	if (geoType == "new_much_standard")	muchGeom = "much_standard.geo";
-	if (geoType == "new_much_compact")	muchGeom = "much_compact.geo";
-	if (geoType == "straw_much_standard") muchGeom   = "much_straw_feb07.geo";
-	if (geoType == "much_standard") muchGeom   = "much_standard_feb07.geo";
-	if (geoType == "much_compact") muchGeom   = "much_compact_feb07.geo";
 
 	TString pipeGeom   = "pipe_much.geo";
 	TString shieldGeom = "shield_standard.geo";
@@ -39,13 +34,11 @@ void much_sim(Int_t nEvents = 100)
 	TString targetGeom = "target_au_250mu.geo";
 	TString magnetGeom = "magnet_standard.geo";
 	TString stsGeom    = "sts_Standard_s3055AAFK5.SecD.geo";
-	//  TString stsGeom    = "sts_allstrips.geo";
-	TString trdGeom    = "";//"trd_standard.geo";
 	TString tofGeom    = "tof_standard.geo";
 
 	// -----   Magnetic field   -----------------------------------------------
 	TString  fieldMap   = "FieldMuonMagnet";   // name of field map
-	Double_t fieldZ     = 50.;                 // field centre z position
+	Double_t fieldZ     = 50.;                 // field center z position
 	Double_t fieldScale =  1.;                 // field scaling factor
 
 	TStopwatch timer;
@@ -156,10 +149,10 @@ void much_sim(Int_t nEvents = 100)
 
 	if (muons == "yes") {
 		Double_t minMom, maxMom;
-		if (geoType.Contains("standard")) {
+		if (muchGeom.Contains("standard")) {
 			minMom = 2.5;
 			maxMom = 25.;
-		} else if (geoType.Contains("compact")) {
+		} else if (muchGeom.Contains("compact")) {
 			minMom = 1.5;
 			maxMom = 10.;
 		}
@@ -215,6 +208,4 @@ void much_sim(Int_t nEvents = 100)
 	cout << "=== much_sim.C : CPU time used : " << ctime << "s " << endl;
 	cout << endl << endl;
 	// ------------------------------------------------------------------------
-
 }
-

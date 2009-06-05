@@ -1,11 +1,9 @@
-void global_reco_ideal(Int_t nEvents = 10000)
+void global_reco_ideal(Int_t nEvents = 1000)
 {
 	TString dir  = "/home/d/andrey/test/trunk/global_mu/";
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
-
-	Bool_t isElectronSetup = false;
 
 	Int_t iVerbose = 1;
 	TStopwatch timer;
@@ -15,6 +13,7 @@ void global_reco_ideal(Int_t nEvents = 10000)
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
 	cbmrootlibs();
+	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
 
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
@@ -22,7 +21,8 @@ void global_reco_ideal(Int_t nEvents = 10000)
 
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 	TString stsDigiFile = parDir+ "/sts/sts_Standard_s3055AAFK5.SecD.digi.par";
-	TString muchDigiFile = parDir + "/much/much_standard.digi.root";
+//	TString muchDigiFile = parDir + "/much/much_standard.digi.root";
+	TString muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
 
 	// ----- STS reconstruction   ---------------------------------------------
 	FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
@@ -51,16 +51,17 @@ void global_reco_ideal(Int_t nEvents = 10000)
 	run->AddTask(fitTracks);
 	// ------------------------------------------------------------------------
 
-	if (!isElectronSetup) {
+	if (IsMuch(mcFile)) {
 	// ----- MUCH reconstruction   --------------------------------------------
 		CbmMuchDigitizeSimpleGem* muchDigitize = new CbmMuchDigitizeSimpleGem("MuchDigitize", muchDigiFile.Data(), iVerbose);
-//		muchDigitize->SetUseAvalanche(0); // 0 - Not account for avalanches; 1 - Account for avalanches
-		//muchDigitize->SetMeanNoise(0);
 		run->AddTask(muchDigitize);
+		CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws("MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
+		run->AddTask(strawDigitize);
 
 		CbmMuchFindHitsSimpleGem* muchFindHits = new CbmMuchFindHitsSimpleGem("MuchFindHits", muchDigiFile.Data(), iVerbose);
-//		muchFindHits->SetUseClustering(0);
 		run->AddTask(muchFindHits);
+		CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws("MuchFindHitsStraws", muchDigiFile.Data(), iVerbose);
+		run->AddTask(strawFindHits);
 
 		CbmMuchTrackFinder* muchTrackFinder = new CbmMuchTrackFinderIdeal();
 		CbmMuchFindTracks* muchFindTracks = new CbmMuchFindTracks("Much Track Finder");
@@ -72,7 +73,7 @@ void global_reco_ideal(Int_t nEvents = 10000)
 	// ------------------------------------------------------------------------
 	}
 
-	if (isElectronSetup){
+	if (IsTrd(mcFile)){
 	// ----- TRD reconstruction -- --------------------------------------------
 		// Update of the values for the radiator F.U. 17.08.07
 		Int_t trdNFoils    = 130;      // number of polyetylene foils
@@ -106,10 +107,12 @@ void global_reco_ideal(Int_t nEvents = 10000)
 	// ------------------------------------------------------------------------
 	}
 
+	if (IsTof(mcFile)) {
 	// ------ TOF reconstruction ----------------------------------------------
-	CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
-	run->AddTask(tofHitProd);
+		CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
+		run->AddTask(tofHitProd);
 	// ------------------------------------------------------------------------
+	}
 
 	// ------ Ideal global tracking -------------------------------------------
 	CbmLitFindGlobalTracksIdeal* findGlobal = new CbmLitFindGlobalTracksIdeal();

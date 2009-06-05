@@ -1,10 +1,10 @@
-void global_tracking(Int_t nEvents = 10)
+void global_tracking(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, globalHitsFile, globalTracksFile;
 	if (script != "yes") {
-		dir  = "/home/d/andrey/test/trunk/global_mu_urqmd/";
+		dir  = "/home/d/andrey/test/trunk/global_mu/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalHitsFile = dir + "global.hits.0000.root";
@@ -34,8 +34,16 @@ void global_tracking(Int_t nEvents = 10)
 	// ------------------------------------------------------------------------
 
 	CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
+	// Tracking method to be used
+	// "branch" - branching tracking
+	// "nn" - nearest neighbor tracking
+	// "weight" - weighting tracking
 	finder->SetTrackingType("branch");
+
+	// Hit-to-track merger method to be used
+	// "nearest_hit" - assigns nearest hit to the track
 	finder->SetMergerType("nearest_hit");
+
 	run->AddTask(finder);
 
 	if (IsTrd(mcFile)) {
@@ -55,6 +63,8 @@ void global_tracking(Int_t nEvents = 10)
 	reconstructionQa->SetMinNofPointsMuch(12);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
+	reconstructionQa->SetMinNofHitsTrd(8);
+	reconstructionQa->SetMinNofHitsMuch(12);
 	reconstructionQa->SetVerbose(1);
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------

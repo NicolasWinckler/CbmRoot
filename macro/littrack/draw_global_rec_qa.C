@@ -4,8 +4,15 @@
  * @version 3.0
  * Macro for drawing histograms produced by CbmLitReconstructionQa class.
  **/
+#include <string>
+#include <sstream>
+#include <ostream>
+#include <iomanip>
 
-TFile *file = new TFile("/home/d/andrey/test/trunk/global_mu/global.tracks.0000.root");
+TString dir = "/home/d/andrey/test/trunk/global_mu/";
+TFile *file = new TFile(dir + "global.tracks.0000.root");
+
+TString mcFile = dir + "mc.0000.root";
 
 const Int_t lineWidth = 2;
 const Int_t markerSize = 1;
@@ -70,19 +77,45 @@ void draw_eff()
 	c1->Divide(2,2);
 	c1->SetGrid();
 
-	std::string hname1("STS"), hname2("STS+MUCH"), hname3("STS+MUCH+TOF");
+	std::string sname("STS");
+	std::string rname;
+	if (IsMuch(mcFile) && !IsTrd(mcFile)) rname = "MUCH";
+	else if (IsTrd(mcFile) && !IsMuch(mcFile)) rname = "TRD";
+	else if (IsTrd(mcFile) && IsMuch(mcFile)) rname = "MUCH+TRD";
+	std::string hgname(sname + "+" + rname);
+	std::string gname = hgname += "+TOF";
 
+	std::string signal;
+	if (IsMuch(mcFile)) signal = "muons"; else signal = "electrons";
+
+	std::string hname1(sname), hname2(hgname), hname3(gname);
+	hname1 += "(" + eff(histStsMom[ALL][REC], histStsMom[ALL][ACC]) + ")";
+	hname2 += "(" + eff(histHalfGlobalMom[ALL][REC], histHalfGlobalMom[ALL][ACC]) + ")";
+	hname3 += "(" + eff(histGlobalMom[ALL][REC], histGlobalMom[ALL][ACC]) + ")";
 	c1->cd(1);
 	draw_eff(histStsMom[ALL][EFF], histHalfGlobalMom[ALL][EFF], histGlobalMom[ALL][EFF], hname1, hname2, hname3);
 
+	Int_t cat;
+	if (IsMuch(mcFile)) cat = MU; else cat = EL;
+	std::string hname1(sname), hname2(hgname), hname3(gname);
+	hname1 += "(" + eff(histStsMom[cat][REC], histStsMom[cat][ACC])+ ")";
+	hname2 += "(" + eff(histHalfGlobalMom[cat][REC], histHalfGlobalMom[cat][ACC]) + ")";
+	hname3 += "(" + eff(histGlobalMom[cat][REC], histGlobalMom[cat][ACC]) + ")";
 	c1->cd(2);
-	draw_eff(histStsMom[MU][EFF], histHalfGlobalMom[MU][EFF], histGlobalMom[MU][EFF], hname1, hname2, hname3);
+	draw_eff(histStsMom[cat][EFF], histHalfGlobalMom[cat][EFF], histGlobalMom[cat][EFF], hname1, hname2, hname3);
 
+
+	std::string hname1(rname + ": all"), hname2(rname + ": " + signal);
 	c1->cd(3);
-	draw_eff(histRecMom[ALL][EFF], histRecMom[MU][EFF], NULL, "MUCH: all tracks", "MUCH: muon tracks", "");
+	hname1 += "(" + eff(histRecMom[ALL][REC], histRecMom[ALL][ACC])+ ")";
+	hname2 += "(" + eff(histRecMom[cat][REC], histRecMom[cat][ACC]) + ")";
+	draw_eff(histRecMom[ALL][EFF], histRecMom[cat][EFF], NULL, hname1, hname2, "");
 
+	std::string hname1("TOF: all"), hname2("TOF: " + signal);
+	hname1 += "(" + eff(histTofMom[ALL][REC], histTofMom[ALL][ACC])+ ")";
+	hname2 += "(" + eff(histTofMom[cat][REC], histTofMom[cat][ACC]) + ")";
 	c1->cd(4);
-	draw_eff(histTofMom[ALL][EFF], histTofMom[MU][EFF], NULL, "TOF: all tracks", "TOF: muon tracks", "");
+	draw_eff(histTofMom[ALL][EFF], histTofMom[cat][EFF], NULL, hname1, hname2, "");
 }
 
 void draw_eff(
@@ -115,4 +148,15 @@ void draw_eff(
 	if (hist2 != NULL) l1->AddEntry(hist2,hist2label.c_str(),"lp");
 	if (hist3 != NULL) l1->AddEntry(hist3,hist3label.c_str(),"lp");
 	l1->Draw();
+}
+
+std::string eff(
+		TH1* histRec,
+		TH1* histAcc)
+{
+	Double_t eff = histRec->GetEntries() / histAcc->GetEntries();
+	std::stringstream ss;
+	ss.precision(3);
+	ss << eff;
+	return ss.str();
 }

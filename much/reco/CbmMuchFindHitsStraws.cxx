@@ -122,10 +122,10 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
     Double_t phi[3] = {fPhis[0], fPhis[1], fPhis[2]}; // rotation angles of views (doublets)
     for (Int_t i = 0; i < 3; ++i) {
       phi[i] *= TMath::DegToRad();
-      rotMatr[i].setElement(TMath::Cos(phi[i]*TMath::DegToRad()),0);
-      rotMatr[i].setElement(TMath::Cos(phi[i]*TMath::DegToRad()),4);
-      rotMatr[i].setElement(TMath::Sin(phi[i]*TMath::DegToRad()),1);
-      rotMatr[i].setElement(-TMath::Sin(phi[i]*TMath::DegToRad()),3);
+      rotMatr[i].setElement(TMath::Cos(phi[i]),0);
+      rotMatr[i].setElement(TMath::Cos(phi[i]),4);
+      rotMatr[i].setElement(TMath::Sin(phi[i]),1);
+      rotMatr[i].setElement(-TMath::Sin(phi[i]),3);
       rotMatr[i].print();
       rotMatr[i].invert();
       rotMatr[i].print();

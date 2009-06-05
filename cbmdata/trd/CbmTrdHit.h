@@ -21,7 +21,7 @@ public:
 	/** Standard constructor
 	  *@param detectorId Unique detector ID
 	  *@param pos Position in global c.s. [cm]
-      *@param dpos Errors of position in global c.s. [cm]
+          *@param dpos Errors of position in global c.s. [cm]
 	  *@param dxy XY correlation of the hit
 	  *@param refId Index of digi or cluster
 	  *@param planeId Detector plane identifier
@@ -52,10 +52,10 @@ public:
 	void SetELossdEdx(Double_t loss) { fELossdEdx = loss; }
 
 private:
-    Int_t           fPlaneId;      // unique ID of TRD plane in the setup (1 - 12)
-    Double32_t      fELossTR;      // energy losses of electron via TR
-    Double32_t      fELossdEdx;    // energy deposition in the detector without TR
-    Double32_t      fELoss;        // TR + dEdx
+    Int_t           fPlaneId;   // unique ID of TRD plane in the setup 
+    Double32_t      fELossTR;   // energy losses of electron via TR
+    Double32_t      fELossdEdx; // energy deposition in the detector without TR
+    Double32_t      fELoss;     // TR + dEdx
 
     ClassDef(CbmTrdHit, 1);
 };

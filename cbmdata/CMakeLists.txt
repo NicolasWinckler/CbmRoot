@@ -60,7 +60,9 @@ much/CbmMuchStrawHit.cxx
 trd/CbmTrdHit.cxx		 
 trd/CbmTrdTrack.cxx		 
 trd/CbmTrdPoint.cxx	
-#trd/CbmTrdTrackMatch.cxx  
+trd/CbmTrdDigi.cxx  
+trd/CbmTrdDigiMatch.cxx  
+trd/CbmTrdDetectorId.cxx
 
 tof/CbmTofHit.cxx 
 tof/CbmTofPoint.cxx

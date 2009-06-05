@@ -31,11 +31,6 @@ CbmTrdPoint::CbmTrdPoint(Int_t trackID, Int_t detID, TVector3 posIn,
         fPx_out = momOut.Px();
         fPy_out = momOut.Py();
         fPz_out = momOut.Pz();
-
-  	fLayer =0; 
-	fStation=0;
-	fChamber =0;
-        fPosition =0;
   }
 // -------------------------------------------------------------------------
 
@@ -60,10 +55,6 @@ void CbmTrdPoint::Print(const Option_t* opt) const {
        << ") GeV" << endl;
   cout << "    Time " << fTime << " ns,  Length " << fLength 
        << " cm,  Energy loss " << fELoss*1.0e06 << " keV" << endl;
-  cout << "Layer No. " << fLayer << endl;
-  cout << "Station No. " << fStation << endl;
-  cout << "Chamber No. " << fChamber << endl;
-  cout << "Posiiton " << fPosition << endl;
 }
 // -------------------------------------------------------------------------
 

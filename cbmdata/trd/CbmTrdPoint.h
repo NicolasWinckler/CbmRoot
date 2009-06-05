@@ -54,12 +54,6 @@ public:
     /** Output to screen **/
     virtual void Print(const Option_t* opt) const;
 
-    /** Modifiers **/
-    void  SetLayerNo(Int_t fL)    {fLayer = fL; }
-    void  SetStationNo(Int_t fS)  {fStation = fS; }
-    void  SetChamberNo(Int_t Ch)  {fChamber = Ch; }
-    void  SetPositionNo(Int_t P)  {fPosition = P; }
-
     /** Accessors **/
     Double_t GetXIn()   const { return fX; }
     Double_t GetYIn()   const { return fY; }
@@ -74,25 +68,13 @@ public:
     Double_t GetPyIn()  const { return fPy; }
     Double_t GetPzIn()  const { return fPz; }
  
-
-    Int_t GetStationNo()    {return fStation; }
-    Int_t GetLayerNo()      {return fLayer; }
-    Int_t GetChamberNo()    {return fChamber; }
-    Int_t GetPositionNo()   {return fPosition; }
-
-
 private:
-
-    Int_t fStation;    // TRD station Number
-    Int_t fLayer;      // TRD layer Number
-    Int_t fChamber;    // Single TRD chamber Number
-    Int_t fPosition;   // "copy" nuber of TRD chamber - not a real copy number
 
     Double32_t fX_out,  fY_out,  fZ_out;
     Double32_t fPx_out, fPy_out, fPz_out;
 
 
-    ClassDef(CbmTrdPoint,2)
+    ClassDef(CbmTrdPoint,3)
 
 };
 

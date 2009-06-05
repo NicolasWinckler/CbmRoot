@@ -25,7 +25,6 @@
 #include "CbmMuchModuleGem.h"
 #include "CbmMuchSector.h"
 #include "CbmVisMuch.h"
-#include "CbmVisPad.h"
 #include "CbmMuchPad.h"
 #include "CbmVisPoint.h"
 #include "CbmVisHit.h"
@@ -187,33 +186,31 @@ void CbmVisMuchModuleFrame::HandleEmbeddedCanvas(Int_t event, Int_t px, Int_t py
       }
     }
 
-    if (event == kButton3Down) {
-      if (!strcmp(selName,"CbmVisPad")) {
-        CbmVisPad* vpad = (CbmVisPad*) sel;
-        CbmMuchSector* sector = vpad->GetSector();
-        CbmMuchPad* mpad = sector->GetPad(vpad->GetChannel());
-        vector<CbmMuchPad*> neighbours=mpad->GetNeighbours();
-        vector<CbmMuchPad*>::iterator it;
-        fPlineSize = neighbours.size();
-//        fPline = new TPolyLine[fPlineSize];
-        printf("%i\n",fPlineSize);
-        Int_t i=0;
-        for(it=neighbours.begin(); it!=neighbours.end(); it++){
-          CbmMuchPad* pad = *it;
-//          fStatusBar->SetText(Form("%i",CbmMuchGeoScheme::GetChannelIndex(pad->GetChannelId())),2);
-//          printf("%i\n",CbmMuchGeoScheme::GetChannelIndex(pad->GetChannelId()));
-          fCanvas->SetEditable(kTRUE);
-          fCanvas->cd();
-//          TPolyLine pline = pad->GetPadPolygon();
-//          fPline[i] = ;
-//          fPline[i].SetFillColor(kGreen);
-//          fPline[i].Draw("f");
-          fCanvas->Update();
-          fCanvas->SetEditable(kFALSE);
-          i++;
-        }
-      }
-    }
+//    if (event == kButton3Down) {
+//      if (!strcmp(selName,"CbmVisPad")) {
+//        CbmPad* vpad = (CbmVisPad*) sel;
+//        CbmMuchSector* sector = vpad->GetSector();
+//        CbmMuchPad* mpad = sector->GetPad(vpad->GetChannel());
+//        vector<CbmMuchPad*> neighbours=mpad->GetNeighbours();
+//        vector<CbmMuchPad*>::iterator it;
+//        fPlineSize = neighbours.size();
+////        fPline = new TPolyLine[fPlineSize];
+//        printf("%i\n",fPlineSize);
+//        Int_t i=0;
+//        for(it=neighbours.begin(); it!=neighbours.end(); it++){
+//          CbmMuchPad* pad = *it;
+////          fStatusBar->SetText(Form("%i",CbmMuchGeoScheme::GetChannelIndex(pad->GetChannelId())),2);
+////          printf("%i\n",CbmMuchGeoScheme::GetChannelIndex(pad->GetChannelId()));
+//          fCanvas->SetEditable(kTRUE);
+//          fCanvas->cd();
+////          TPolyLine pline = pad->GetPadPolygon();
+////          fPline[i] = ;
+////          fPline[i].SetFillColor(kGreen);
+////          fPline[i].Draw("f");
+//          fCanvas->Update();
+//          fCanvas->SetEditable(kFALSE);
+//          i++;
+//        }
 
     if (event == kButton3Up && fPlineSize>0) {
 //       delete [] fPline;

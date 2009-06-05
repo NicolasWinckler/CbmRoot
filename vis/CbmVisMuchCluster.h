@@ -15,7 +15,6 @@
 #define CBMVISMUCHCLUSTER_H 1
 
 #include <vector>
-#include "CbmVisPad.h"
 
 class CbmMuchCluster;
 class TClonesArray;

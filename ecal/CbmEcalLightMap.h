@@ -6,7 +6,7 @@
 class CbmEcalLightMap : public TNamed
 {
 public:
-  CbmEcalLightMap() {};
+  CbmEcalLightMap() {fData=NULL;}
   CbmEcalLightMap(const char* fname, const char* title="Light collection efficiency map");
   Double_t Data(Double_t x, Double_t y)
     {Int_t n=GetNum(x,y); if (n<0) return n; return fData[n];}
@@ -28,11 +28,11 @@ private:
   /** Set average efficiency of light collection to 1.0 **/
   void Normalize();
   /** Step of the light map **/
-  Double_t fSSide;
+  Double_t fSSide;		//!
   /** Size of side of the light map in steps**/
-  Int_t fS;
+  Int_t fS;			//!
   /** Size of the light map **/
-  Int_t fSize;
+  Int_t fSize;			//!
   /** Light collection efficiency map **/
   Double_t* fData;		//!
   ClassDef(CbmEcalLightMap, 1)

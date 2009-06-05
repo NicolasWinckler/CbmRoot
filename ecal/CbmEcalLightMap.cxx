@@ -23,7 +23,7 @@ void CbmEcalLightMap::Init(const char* filename)
 {
   TString fn=filename;
   gSystem->ExpandPathName(fn);
-  ifstream f(fn.Data());
+  ifstream f(fn);
   list<Double_t> lst;
   string buf;
   string token;
@@ -85,8 +85,13 @@ void CbmEcalLightMap::Init(const char* filename)
     if (p==lst.end()) break; v=(*p); ++p;
     x/=xsize; y/=ysize;
     n=GetNum(x ,y);
+    if (n>=fSize)
+    {
+      Info("Init","Data is not selfconsistent (%f, %f), %d", x, y, fSize);
+    }
     fData[n]=v;
   }
+  lst.clear();
   FillGaps();
   Normalize();
 }

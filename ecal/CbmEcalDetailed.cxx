@@ -10,6 +10,7 @@
 #include "CbmEcalPoint.h"
 #include "CbmGeoEcal.h"
 #include "CbmGeoEcalPar.h"
+#include "CbmEcalLightMap.h"
 
 #include "CbmDetectorList.h"
 #include "FairGeoInterface.h"
@@ -75,6 +76,9 @@ CbmEcalDetailed::CbmEcalDetailed(const char* name, Bool_t active, const char* fi
    ** TGeo geometry
    **/
 
+  fLiteCollection=new TClonesArray("CbmEcalPointLite");
+  fEcalCollection=new TClonesArray("CbmEcalPoint");
+  fVerboseLevel=1;
   Int_t i;
   Int_t j;
   TString nm;
@@ -107,9 +111,6 @@ CbmEcalDetailed::CbmEcalDetailed(const char* name, Bool_t active, const char* fi
   
   fPosIndex=0;
   fDebug="";
-  fEcalCollection=new TClonesArray("CbmEcalPoint");
-  fLiteCollection=NULL;
-  fVerboseLevel = 1;
 
   fHoleRad=fInf->GetVariableStrict("holeradius");
   fFiberRad=fInf->GetVariableStrict("fiberradius");
@@ -121,8 +122,6 @@ CbmEcalDetailed::CbmEcalDetailed(const char* name, Bool_t active, const char* fi
   for(i=kN-1;i>-1;i--)
     fVolArr[i]=-1111;
 
-  if (fInf->GetFastMC()==1) return;
-  fLiteCollection=new TClonesArray("CbmEcalPointLite");
 
   for(i=0;i<cMaxModuleType;i++)
   {
@@ -134,6 +133,8 @@ CbmEcalDetailed::CbmEcalDetailed(const char* name, Bool_t active, const char* fi
     fHolePos[i]=NULL;
     fTileEdging[i]=NULL;
     fModulesWithType[i]=0;
+    fLightMapNames[i]="";
+    fLightMaps[i]=NULL;
   }
   for(i=0;i<2;i++)
   {
@@ -154,7 +155,10 @@ CbmEcalDetailed::CbmEcalDetailed(const char* name, Bool_t active, const char* fi
     if (fModulesWithType[i]==0) continue;
     nm="nh[";nm+=i; nm+="]";
     fNH[i]=(Int_t)fInf->GetVariableStrict(nm);
-    Info("CbmEcalDetailed", "Number of modules of type %d is %d (%d channels)", i, fModulesWithType[i], fModulesWithType[i]*i*i);
+    nm="lightmap["; nm+=i; nm+="]";
+    fLightMapNames[i]=fInf->GetStringVariable(nm);
+    fLightMaps[i]=new CbmEcalLightMap(fLightMapNames[i],nm);
+    Info("CbmEcalDetailed", "Number of modules of type %d is %d (%d channels), lightmap %s", i, fModulesWithType[i], fModulesWithType[i]*i*i, fLightMapNames[i].Data());
     fXCell[i]=(fModuleSize-2.0*fThicknessSteel)/i-2.0*fEdging;
     fYCell[i]=(fModuleSize-2.0*fThicknessSteel)/i-2.0*fEdging;
     Info("CbmEcalDetailed", "Size of cell of type %d is %f cm.", i, fXCell[i]);
@@ -169,7 +173,7 @@ void CbmEcalDetailed::Initialize()
   FairRun* sim = FairRun::Instance();
   FairRuntimeDb* rtdb=sim->GetRuntimeDb();
   CbmGeoEcalPar *par=new CbmGeoEcalPar();
-  fInf->FillGeoPar(par,0);
+//  fInf->FillGeoPar(par,0);
   rtdb->addContainer(par);
 }
 
@@ -206,19 +210,19 @@ void CbmEcalDetailed::SetEcalCuts(Int_t medium)
     gMC->Gstpar(medium,"CUTMUO",fInf->GetHadronCut());
     gMC->Gstpar(medium,"PPCUTM",fInf->GetHadronCut());
   }
+  ;
 }
 // -------------------------------------------------------------------------
 
 void CbmEcalDetailed::FinishPrimary()
 {
-  if (fInf->GetFastMC()==1) return;
   fFirstNumber=fLiteCollection->GetEntriesFast();
 }
 
 //_____________________________________________________________________________
 void CbmEcalDetailed::ChangeHit(CbmEcalPointLite* oldHit)
 {
-  Double_t edep = gMC->Edep();
+  Double_t edep = fELoss;
   Double_t el=oldHit->GetEnergyLoss();
   Double_t ttime=gMC->TrackTime()*1.0e9;
   oldHit->SetEnergyLoss(el+edep);
@@ -232,15 +236,11 @@ void CbmEcalDetailed::SetSpecialPhysicsCuts()
   /** Change the special tracking cuts for
    ** two ECAL media, Scintillator and Lead
    **/
-
-  if (fInf->GetFastMC()==1) return;
-
   FairRun* fRun = FairRun::Instance();
   if (strcmp(fRun->GetName(),"TGeant3") == 0) {
     Int_t mediumID;
     mediumID = gGeoManager->GetMedium("Scintillator")->GetId();
     SetEcalCuts(mediumID);
-    if (fInf->GetFastMC()==1) return;
     mediumID = gGeoManager->GetMedium("Lead")->GetId();
     SetEcalCuts(mediumID);
     mediumID = gGeoManager->GetMedium("Tyvek")->GetId();
@@ -262,7 +262,6 @@ void CbmEcalDetailed::SetSpecialPhysicsCuts()
 Bool_t  CbmEcalDetailed::ProcessHits(FairVolume* vol)
 {
   /** Fill MC point for sensitive ECAL volumes **/
-
   fELoss   = gMC->Edep();
   fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
   fTime    = gMC->TrackTime()*1.0e09;
@@ -304,13 +303,18 @@ Bool_t  CbmEcalDetailed::ProcessHits(FairVolume* vol)
     gMC->CurrentVolOffID(2, cell); cell--;
     Int_t id=(my*100+mx)*100+cell+1;
     fVolumeID=id;
-    FillLitePoint(0);
-//    type=fInf->GetType(mx, my);
-//    cx=cell%type;
-//    cy=cell/type;
-//    px=mx*fModuleSize-fEcalSize[0]/2.0+cx*fModuleSize/type+1.0;
-//    py=my*fModuleSize-fEcalSize[1]/2.0+cy*fModuleSize/type+1.0;
-//    cout << "(" << px << ", " << py << "|" << type << "): ";
+    type=fInf->GetType(mx, my);
+    cx=cell%type;
+    cy=cell/type;
+    px=mx*fModuleSize-fEcalSize[0]/2.0+cx*fModuleSize/type;
+    py=my*fModuleSize-fEcalSize[1]/2.0+cy*fModuleSize/type;
+    px=(x-px)/fXCell[type];
+    py=(y-py)/fYCell[type];
+    if (px>=0&&px<1&&py>=0&&py<1)
+    {
+      fELoss*=fLightMaps[type]->Data(px-0.5, py-0.5);
+      FillLitePoint(0);
+    }
 //    for(i=0;i<8;i++)
 //    {
 //      Int_t t;
@@ -417,8 +421,7 @@ void CbmEcalDetailed::EndOfEvent() {
   if (fVerboseLevel) Print();
   fEcalCollection->Clear();
 
-  if (fInf->GetFastMC()==0)
-    fLiteCollection->Clear();
+  fLiteCollection->Clear();
   fPosIndex = 0;
   fFirstNumber=0;
 }
@@ -428,7 +431,6 @@ void CbmEcalDetailed::EndOfEvent() {
 TClonesArray* CbmEcalDetailed::GetCollection(Int_t iColl) const
 {
   if (iColl == 0) return fEcalCollection;
-  if (fInf->GetFastMC()==1) return NULL;
   if (iColl == 1) return fLiteCollection;
   else return NULL;
 }
@@ -438,8 +440,7 @@ TClonesArray* CbmEcalDetailed::GetCollection(Int_t iColl) const
 void CbmEcalDetailed::Reset()
 {
   fEcalCollection->Clear();
-  if (fInf->GetFastMC()==0)
-    fLiteCollection->Clear();
+  fLiteCollection->Clear();
   ResetParameters();
   fFirstNumber=0;
 }
@@ -455,16 +456,16 @@ void CbmEcalDetailed::Print() const
   cout << "-I- CbmEcalDetailed: " << nHits << " points registered in this event.";
   cout << endl;
 
-  if (fInf->GetFastMC()==0) {
-    nLiteHits = fLiteCollection->GetEntriesFast();
-    cout << "-I- CbmEcalDetailed: " << nLiteHits << " lite points registered in this event.";
-    cout << endl;
-  }
+  nLiteHits=fLiteCollection->GetEntriesFast();
+  cout << "-I- CbmEcalDetailed: " << nLiteHits << " lite points registered in this event.";
+  cout << endl;
 
-  if (fVerboseLevel>1) {
-    for (i=0; i<nHits; i++) (*fEcalCollection)[i]->Print();
-    if (fInf->GetFastMC()==0)
-      for (i=0; i<nLiteHits; i++) (*fLiteCollection)[i]->Print();
+  if (fVerboseLevel>1)
+  {
+    for (i=0;i<nHits;i++)
+      (*fEcalCollection)[i]->Print();
+    for (i=0;i<nLiteHits;i++)
+      (*fLiteCollection)[i]->Print();
   }
 }
 // -------------------------------------------------------------------------
@@ -508,8 +509,8 @@ void CbmEcalDetailed::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t off
 void CbmEcalDetailed::Register()
 {
   FairRootManager::Instance()->Register("ECALPoint","Ecal",fEcalCollection,kTRUE);
-  if (fInf->GetFastMC()==0)
-    FairRootManager::Instance()->Register("ECALPointLite","EcalLite",fLiteCollection,kTRUE);
+  FairRootManager::Instance()->Register("ECALPointLite","EcalLite",fLiteCollection,kTRUE);
+  ;
 }
 // -------------------------------------------------------------------------
 
@@ -539,6 +540,7 @@ void CbmEcalDetailed::ConstructGeometry()
 
   /** Initialize all media **/
   InitMedia();
+
   par[0]=fEcalSize[0]/2.0+0.1;
   par[1]=fEcalSize[1]/2.0+0.1;
   par[2]=moduleth/2.0+0.1;
@@ -552,22 +554,22 @@ void CbmEcalDetailed::ConstructGeometry()
   for(i=1;i<cMaxModuleType;i++)
     if (fModulesWithType[i]>0)
       ConstructModule(i);
-  
+ 
   TGeoVolume* vol=new TGeoVolumeAssembly("EcalStructure");
   for(i=0;i<fYSize;i++)
   {
-    cout << i << "	" << flush;
+//    cout << i << "	" << flush;
     volume=ConstructRaw(i);
     if (volume==NULL) 
     {
-      cout << endl;
+//      cout << endl;
       continue;
     }
     nm=volume->GetName();
     y=(i-fYSize/2.0+0.5)*fModuleSize;
-    cout << volume->GetName() << flush;
+//    cout << volume->GetName() << flush;
     gGeoManager->Node(nm.Data(), i+1, "EcalStructure", 0.0, y, 0.0, 0, kTRUE, buf, 0);
-    cout << endl << flush;
+//    cout << endl << flush;
   }
   gGeoManager->Node("EcalStructure", 1, "Ecal", 0.0, 0.0, 0.0, 0, kTRUE, buf, 0);
 }
@@ -616,6 +618,7 @@ TGeoVolume* CbmEcalDetailed::ConstructRaw(Int_t num)
 // ----- Public method BeginEvent  -----------------------------------------
 void CbmEcalDetailed::BeginEvent()
 {
+  ;
 }
 // -------------------------------------------------------------------------
 
@@ -650,6 +653,7 @@ void CbmEcalDetailed::ConstructModule(Int_t type)
   ConstructCell(type);
 
   TString nm="EcalModule"; nm+=type;
+  TString nm1;
   TString cellname="EcalCell"; cellname+=type;
   Int_t i;
   Int_t j;
@@ -663,12 +667,14 @@ void CbmEcalDetailed::ConstructModule(Int_t type)
   if (fSteelTapes[0]==NULL)
   {
     TGeoBBox* st1=new TGeoBBox(fThicknessSteel/2.0, fModuleSize/2.0-fThicknessSteel, moduleth/2.0);
-    fSteelTapes[0]=new TGeoVolume("EcalModuleSteelTape1", st1, gGeoManager->GetMedium("ECALSteel"));
+    nm1="EcalModuleSteelTape1_"; //nm1+=type;
+    fSteelTapes[0]=new TGeoVolume(nm1.Data(), st1, gGeoManager->GetMedium("ECALSteel"));
   }
   if (fSteelTapes[1]==NULL)
   {
     TGeoBBox* st2=new TGeoBBox(fModuleSize/2.0-fThicknessSteel, fThicknessSteel/2.0, moduleth/2.0);
-    fSteelTapes[1]=new TGeoVolume("EcalModuleSteelTape2", st2, gGeoManager->GetMedium("ECALSteel"));
+    nm1="EcalModuleSteelTape2_"; //nm1+=type;
+    fSteelTapes[1]=new TGeoVolume(nm1.Data(), st2, gGeoManager->GetMedium("ECALSteel"));
   }
 
 
@@ -684,10 +690,12 @@ void CbmEcalDetailed::ConstructModule(Int_t type)
     n=i+j*type+1;
     gGeoManager->Node(cellname.Data(), n, nm.Data(), x, y, 0.0, 0, kTRUE, buf, 0);
   }
-  gGeoManager->Node("EcalModuleSteelTape1", 1, nm.Data(), -fThicknessSteel/2.0+fModuleSize/2.0, 0.0, 0.0, 0, kTRUE, buf, 0);
-  gGeoManager->Node("EcalModuleSteelTape1", 2, nm.Data(), +fThicknessSteel/2.0-fModuleSize/2.0, 0.0, 0.0, 0, kTRUE, buf, 0);
-  gGeoManager->Node("EcalModuleSteelTape2", 1, nm.Data(), 0.0, -fThicknessSteel/2.0+fModuleSize/2.0, 0.0, 0, kTRUE, buf, 0);
-  gGeoManager->Node("EcalModuleSteelTape2", 2, nm.Data(), 0.0, +fThicknessSteel/2.0-fModuleSize/2.0, 0.0, 0, kTRUE, buf, 0);
+  nm1="EcalModuleSteelTape1_"; //nm1+=type;
+  gGeoManager->Node(nm1.Data(), 1, nm.Data(), -fThicknessSteel/2.0+fModuleSize/2.0, 0.0, 0.0, 0, kTRUE, buf, 0);
+  gGeoManager->Node(nm1.Data(), 2, nm.Data(), +fThicknessSteel/2.0-fModuleSize/2.0, 0.0, 0.0, 0, kTRUE, buf, 0);
+  nm1="EcalModuleSteelTape2_"; //nm1+=type;
+  gGeoManager->Node(nm1.Data(), 1, nm.Data(), 0.0, -fThicknessSteel/2.0+fModuleSize/2.0, 0.0, 0, kTRUE, buf, 0);
+  gGeoManager->Node(nm1.Data(), 2, nm.Data(), 0.0, +fThicknessSteel/2.0-fModuleSize/2.0, 0.0, 0, kTRUE, buf, 0);
   fModuleLenght=moduleth;
 }
 // -------------------------------------------------------------------------
@@ -699,8 +707,7 @@ void CbmEcalDetailed::ConstructCell(Int_t type)
 
   ConstructTile(type, 0);
   ConstructTile(type, 1);
-  if (fThicknessTyvk>0)
-    ConstructTile(type, 2);
+  if (fThicknessTyvk>0) ConstructTile(type, 2);
 
   Double_t thickness=fThicknessLead+fThicknessScin+fThicknessTyvk*2;
   Int_t i;
@@ -778,6 +785,8 @@ void CbmEcalDetailed::ConstructTile(Int_t type, Int_t material)
   Int_t i;
   Int_t j;
   TString nm;
+  TString nm1;
+  TString nm2;
   TString medium;
   Double_t x;
   Double_t y;
@@ -785,6 +794,7 @@ void CbmEcalDetailed::ConstructTile(Int_t type, Int_t material)
   TGeoVolume* tilev;
   TGeoBBox* edging;
   TGeoVolume* edgingv;
+  Double_t* buf=NULL;
 
   switch (material)
   {
@@ -797,10 +807,12 @@ void CbmEcalDetailed::ConstructTile(Int_t type, Int_t material)
   // Holes in the tiles
   if (fHoleRad>0)
   {
+    nm1="ECALHole_"; nm1+=material;
+    nm2="ECALFiber_"; nm2+=material;
     if (fHoleVol[material]==NULL)
     {
       TGeoTube* holetube=new TGeoTube(0, fHoleRad, thickness);
-      fHoleVol[material]=new TGeoVolume("ECALHole", holetube,  gGeoManager->GetMedium("ECALAir"));
+      fHoleVol[material]=new TGeoVolume(nm1.Data(), holetube,  gGeoManager->GetMedium("ECALAir"));
     }
     hole=fHoleVol[material];
     // Fibers in holes 
@@ -809,15 +821,15 @@ void CbmEcalDetailed::ConstructTile(Int_t type, Int_t material)
       if (fFiberVol[material]==NULL)
       {
         TGeoTube* fibertube=new TGeoTube(0, fFiberRad, thickness);
-        fFiberVol[material]=new TGeoVolume("ECALFiber", fibertube,  gGeoManager->GetMedium("ECALFiber"));
-        hole->AddNode(fiber, 1);
+        fFiberVol[material]=new TGeoVolume(nm2.Data(), fibertube,  gGeoManager->GetMedium("ECALFiber"));
+        gGeoManager->Node(nm2.Data(), 1, nm1.Data(), 0.0, 0.0, 0.0, 0, kTRUE, buf, 0);
       }
       fiber=fFiberVol[material];
       // TODO: Cerenkoff !!!
       //AddSensitiveVolume(fiber);
     }
   }
-
+/*
   if (fHolePos[type]==NULL)
   {
     tr=new TGeoTranslation*[nh*nh];
@@ -836,7 +848,7 @@ void CbmEcalDetailed::ConstructTile(Int_t type, Int_t material)
     fHolePos[type]=tr;
   }
   tr=fHolePos[type];
-
+*/
   /** Building tile **/
   switch (material)
   {
@@ -854,13 +866,29 @@ void CbmEcalDetailed::ConstructTile(Int_t type, Int_t material)
   tilev=new TGeoVolume(nm, tile, gGeoManager->GetMedium(medium));
   if (fHoleRad>0)
   {
+    nm1="ECALHole_"; nm1+=material;
+    for(i=0;i<nh;i++)
+    for(j=0;j<nh;j++)
+    {
+      x=(i-nh/2+0.5)*fXCell[type]/nh;
+      y=(j-nh/2+0.5)*fYCell[type]/nh;
+      gGeoManager->Node(nm1.Data(), j*nh+i+1, nm.Data(), x, y, 0.0, 0, kTRUE, buf, 0);
+    }
+    if (nh%2==0)
+      gGeoManager->Node(nm1.Data(), j*nh+i+1, nm.Data(), 0.0, 0.0, 0.0, 0, kTRUE, buf, 0);
+
+  }
+/*
+  if (fHoleRad>0)
+  {
     for(i=0;i<nh;i++)
     for(j=0;j<nh;j++)
       tilev->AddNode(hole, j*nh+i+1, tr[j*nh+i]);
-    /** Clear Fiber**/
+    // Clear Fiber
     if (nh%2==0)
       tilev->AddNode(hole, j*nh+i+1);
   }
+*/
   /** Adding edging to scintillator **/
   if (material==0)
   {

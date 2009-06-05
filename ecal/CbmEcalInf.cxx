@@ -264,6 +264,8 @@ CbmEcalInf::CbmEcalInf(const char* filename)
     variable=variable.substr(0,variable.find_first_of(" 	"));
     value=message.substr(message.find("=")+1);
     value=value.substr(value.find_first_not_of(" 	"));	//Skiping initial spaces
+    value=value.substr(0,value.find_first_of(" 	"));
+/*
     value=value.substr(0,value.find_first_not_of("1234567890-+e."));
     val=strtod(value.c_str(),err);
     if (err) {
@@ -272,6 +274,7 @@ CbmEcalInf::CbmEcalInf(const char* filename)
       file.close();
       return;
     }
+*/
     AddVariable(variable.c_str(), value.c_str());
   }
   file.close();

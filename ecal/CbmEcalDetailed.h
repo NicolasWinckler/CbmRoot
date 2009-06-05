@@ -24,6 +24,7 @@
 class CbmEcalPoint; 
 class FairVolume;
 class TGeoTranslation;
+class CbmEcalLightMap;
 
 #define kNumberOfECALSensitiveVolumes 6
 const Int_t cMaxModuleType=5;
@@ -42,7 +43,7 @@ public:
    *@param active  sensitivity flag
    **/
   CbmEcalDetailed(const char* name, Bool_t active, 
-	  const char* fileGeo="ecal_FastMC.geo");
+	  const char* fileGeo="ecal_Detailed.geo");
 
 
   /** Destructor **/
@@ -104,95 +105,99 @@ private:
   CbmEcalPointLite* FindHit(Int_t VolId, Int_t TrackId);
 
 private:
-  CbmEcalInf*  fInf;	//!
-  Option_t* fDebug;	//!
+  CbmEcalInf*  fInf;			//!
+  Option_t* fDebug;			//!
 
   /** returns type of volume **/
   Int_t GetVolType(Int_t volnum);
   /** Track information to be stored until the track leaves the
       active volume. **/
   /**  track index **/
-  Int_t          fTrackID;           //!  
+  Int_t          fTrackID;           	//!  
   /** volume id **/
-  Int_t          fVolumeID;          //!  
+  Int_t          fVolumeID;          	//!  
   /** position **/
-  TLorentzVector fPos;               //!  
+  TLorentzVector fPos;               	//!  
   /** momentum **/
-  TLorentzVector fMom;               //!  
+  TLorentzVector fMom;               	//!  
   /** time **/
-  Double32_t     fTime;              //!
+  Double32_t     fTime;              	//!
   /** length **/
-  Double32_t     fLength;            //!
+  Double32_t     fLength;            	//!
   /** energy loss **/
-  Double32_t     fELoss;             //!
+  Double32_t     fELoss;             	//!
   /** **/ 
-  Int_t          fPosIndex;          //!
+  Int_t          fPosIndex;          	//!
 
   /** MC point collection on ECAL wall **/ 
-  TClonesArray*  fEcalCollection;    //! 
+  TClonesArray*  fEcalCollection;	//! 
   /** MC point collection inside ECAL **/ 
-  TClonesArray*  fLiteCollection;    //! 
+  TClonesArray*  fLiteCollection;	//! 
   /** ECAL geometry parameters **/
   /** x,y,z size of outer ECAL box [cm] **/
-  Float_t fEcalSize[3];	//!
+  Float_t fEcalSize[3];			//!
   /** Size of the ECAL in modules **/
-  Int_t fXSize;
-  Int_t fYSize;
+  Int_t fXSize;				//!
+  Int_t fYSize;				//!
   /** transverce cell size [cm] **/
-  Float_t fCellSize;	//!
+  Float_t fCellSize;			//!
   /** Size of calorimeter module [cm] **/
-  Float_t fModuleSize;	//!
+  Float_t fModuleSize;			//!
   /** Z-position of ECAL from the target [cm] **/
-  Float_t fZEcal;	//!
+  Float_t fZEcal;			//!
   /** thickness of one lead layer [cm] **/
-  Float_t fThicknessLead;	//!
+  Float_t fThicknessLead;		//!
   /** thickness of one scintillator layer [cm] **/
-  Float_t fThicknessScin;	//!
+  Float_t fThicknessScin;		//!
   /** thickness of one tyvek layer [cm] **/
-  Float_t fThicknessTyvk;	//!
+  Float_t fThicknessTyvk;		//!
   /** total thickness of one layer [cm] **/
-  Float_t fThicknessLayer;	//!
+  Float_t fThicknessLayer;		//!
   /** total thickness of steel layer [cm] **/
-  Float_t fThicknessSteel;
+  Float_t fThicknessSteel;		//!
   /** Thickness of tile edging [cm] **/
-  Float_t fEdging;
+  Float_t fEdging;			//!
   /** Radius of holes in the calorimeter [cm] **/
-  Float_t fHoleRad;
+  Float_t fHoleRad;			//!
   /** Radius of fibers in calorimeter [cm] **/
-  Float_t fFiberRad;
+  Float_t fFiberRad;			//!
   /** XY Size of cell **/
-  Float_t fXCell[cMaxModuleType];
-  Float_t fYCell[cMaxModuleType];
+  Float_t fXCell[cMaxModuleType];	//!
+  Float_t fYCell[cMaxModuleType];	//!
   /** Number of holes in modules  **/
-  Int_t fNH[cMaxModuleType];
+  Int_t fNH[cMaxModuleType];		//!
+  /** Names of light maps **/
+  TString fLightMapNames[cMaxModuleType];		//!
+  /** Light maps **/
+  CbmEcalLightMap* fLightMaps[cMaxModuleType];		//!
   /** number of layers per cell **/
-  Int_t   fNLayers;	//!
+  Int_t   fNLayers;			//!
   /** Lenght of calorimeter module **/
-  Float_t fModuleLenght;	//!
+  Float_t fModuleLenght;		//!
   /** scall factor for fCellSize and fThicknessLayer **/
-  Float_t fGeoScale;	//!
+  Float_t fGeoScale;			//!
   /** Number of columns in ECAL1 **/
-  Int_t   fNColumns1;	//!
+  Int_t   fNColumns1;			//!
   /** Number of rows in ECAL1 **/
-  Int_t   fNRows1;	//!
+  Int_t   fNRows1;			//!
   /** Number of columns in ECAL2 **/
-  Int_t   fNColumns2;	//!
+  Int_t   fNColumns2;			//!
   /** Number of rows in ECAL2 **/
-  Int_t   fNRows2;	//!
+  Int_t   fNRows2;			//!
   /** thickness of preshower lead [cm] **/
-  Float_t fThicknessPSlead;	//!
+  Float_t fThicknessPSlead;		//!
   /** thickness of preshower scintillator [cm] **/
-  Float_t fThicknessPSscin;	//!
+  Float_t fThicknessPSscin;		//!
   /** gap between ECAL cell and preshower [cm] **/
-  Float_t fEcalPSgap;	//!
+  Float_t fEcalPSgap;			//!
   /** max number of columns in ECAL1 or ECAL2 **/
-  Int_t   fNColumns;	//!
+  Int_t   fNColumns;			//!
   /** max number of rows in ECAL1 or ECAL2 **/
-  Int_t   fNRows;	//!
+  Int_t   fNRows;			//!
   /** Max number of ECAL cells **/
-  Int_t   fVolIdMax;	//!
+  Int_t   fVolIdMax;			//!
   /** Number of first hit for current primary **/
-  Int_t fFirstNumber;	//!
+  Int_t fFirstNumber;			//!
   /** Map of volumes in ECAL
    ** fVolArr[0]==code of sensivite wall
    ** fVolArr[1]==code of PS Lead
@@ -201,7 +206,7 @@ private:
    ** fVolArr[3]==code of Tyveec
    ** fVolArr[5]==code of scintillator
    **/
-  Int_t fVolArr[kNumberOfECALSensitiveVolumes];
+  Int_t fVolArr[kNumberOfECALSensitiveVolumes];		//!
 
   /** Construct a raw of modules **/
   TGeoVolume* ConstructRaw(Int_t number);
@@ -225,7 +230,7 @@ private:
   std::list<std::pair<Int_t, TGeoVolume*> > fRawNumber;	//! List of constructed raws
 
   /** Volume ID of calorimeter structure **/
-  Int_t fStructureId;		//!
+  Int_t fStructureId;			//!
   /** Initialize medium with given name **/
   Int_t InitMedium(const char* name);
   /** Initialize all calorimter media **/

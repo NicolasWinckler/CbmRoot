@@ -217,7 +217,7 @@ void CbmVisMuch::ReadEvent(Int_t event){
     if (module->GetDetectorType()!=1) continue;
     CbmMuchModuleGem* gem_module = (CbmMuchModuleGem*) module;
     CbmMuchPad* pad = gem_module->GetPad(digi->GetChannelId());
-    pad->SetFired(i,digi->GetCharge(),digi->GetADCCharge());
+    pad->SetFired(i,digi->GetADCCharge());
   }
 
   printf("Fill arrays of CbmVisMuchClusters... nClusters = %i\n",fClusters->GetEntriesFast());

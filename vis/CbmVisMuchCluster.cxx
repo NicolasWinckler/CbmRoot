@@ -116,7 +116,8 @@ void CbmVisMuchCluster::CreateHisto(){
     Double_t ymin = y-dy/2+bin_size_y/2;
     Int_t nx = TMath::Nint(dx/bin_size_x);
     Int_t ny = TMath::Nint(dy/bin_size_y);
-    Double_t charge = ((Double_t)digi->GetCharge())/((Double_t)nx*ny);
+    // TODO Set ADC charge
+    Double_t charge = 0; //((Double_t)digi->GetCharge())/((Double_t)nx*ny);
     for (Int_t i=1;i<=nx;i++){
       for (Int_t j=1;j<=ny;j++){
          fX.push_back(xmin+bin_size_x*i);

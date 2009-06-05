@@ -119,16 +119,14 @@ vector<CbmMuchPad*> CbmMuchPad::GetNeighbours(){
 // -------------------------------------------------------------------------
 void CbmMuchPad::Reset(){
   fDigiIndex = -1;
-  fCharge = 0;
 //  fFired = 0;
   SetFillColor(kYellow);
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-void CbmMuchPad::SetFired(Int_t iDigi, Int_t charge, Int_t ADCcharge){
+void CbmMuchPad::SetFired(Int_t iDigi, Int_t ADCcharge){
   fDigiIndex = iDigi;
-  fCharge = charge;
   if (fDigiIndex>=0) SetFillColor(TColor::GetColor(255-ADCcharge,255-ADCcharge,245));
   else SetFillColor(kYellow);
 }
@@ -143,8 +141,8 @@ void CbmMuchPad::DrawPad(){
 
 // -------------------------------------------------------------------------
 TString CbmMuchPad::GetInfo(){
-    return Form("Channel:%i fired:%i charge:%i digiId:%i",
-         CbmMuchModuleGem::GetChannelIndex(fChannelId),fDigiIndex>=0,fCharge,fDigiIndex);
+    return Form("Channel:%i fired:%i digiId:%i",
+         CbmMuchModuleGem::GetChannelIndex(fChannelId),fDigiIndex>=0,fDigiIndex);
 }
 // -------------------------------------------------------------------------
 

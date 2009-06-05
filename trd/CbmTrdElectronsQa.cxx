@@ -154,7 +154,7 @@ void CbmTrdElectronsQa::Exec(Option_t* option)
 
 Double_t CbmTrdElectronsQa::GetMomAtFirstTrdLayer(CbmTrdTrack* trdtrack)
 {
-	Int_t hitIndex = trdtrack->GetTrdHitIndex(0);
+	Int_t hitIndex = trdtrack->GetHitIndex(0);
 	CbmTrdHit* trdhit = (CbmTrdHit*) fTrdHits->At(hitIndex);
 	Int_t iPoint = trdhit->GetRefId();
 	if (iPoint < 0)	return 0.0;
@@ -168,7 +168,7 @@ void CbmTrdElectronsQa::GetELossInfo(CbmTrdTrack* trdtrack, Double_t *sumELoss, 
 		  Double_t  eLossTR[], Double_t  eLoss[])
 {
 	for (Int_t iHit = 0; iHit < 12; iHit++) {
-		Int_t hitIndex = trdtrack->GetTrdHitIndex(iHit);
+		Int_t hitIndex = trdtrack->GetHitIndex(iHit);
 		CbmTrdHit* trdhit = (CbmTrdHit*) fTrdHits->At(hitIndex);
 
 		eLoss[iHit] = trdhit->GetELoss();
@@ -185,7 +185,7 @@ void CbmTrdElectronsQa::MakeTxtFile()
 
 	for(Int_t iTrdTrack=0; iTrdTrack < nofTrdTracks; iTrdTrack++){
 		CbmTrdTrack* trdtrack = (CbmTrdTrack*) fTrdTracks->At(iTrdTrack);
-		Int_t nHits = trdtrack->GetNofTrdHits();
+		Int_t nHits = trdtrack->GetNofHits();
 		if (nHits < 12) continue;
 
 		CbmTrackMatch* trdmatch = (CbmTrackMatch*) fTrdTrackMatches->At(iTrdTrack);
@@ -233,7 +233,7 @@ void CbmTrdElectronsQa::FillEnergyLossesAnaHistos()
 
 	for(Int_t iTrdTrack=0; iTrdTrack < nofTrdTracks; iTrdTrack++){
 		CbmTrdTrack* trdtrack = (CbmTrdTrack*) fTrdTracks->At(iTrdTrack);
-		Int_t nHits = trdtrack->GetNofTrdHits();
+		Int_t nHits = trdtrack->GetNofHits();
 		if (nHits < 12) continue;
 
 		CbmTrackMatch* trdmatch = (CbmTrackMatch*) fTrdTrackMatches->At(iTrdTrack);
@@ -286,7 +286,7 @@ void CbmTrdElectronsQa::FillTestHistos()
 	for (Int_t iTrdTrack = 0; iTrdTrack < nofTrdTracks; iTrdTrack++) {
 
 		CbmTrdTrack* trdtrack = (CbmTrdTrack*) fTrdTracks->At(iTrdTrack);
-		Int_t nHits = trdtrack->GetNofTrdHits();
+		Int_t nHits = trdtrack->GetNofHits();
 
 		if (nHits < 0) continue;
 
@@ -339,7 +339,7 @@ void CbmTrdElectronsQa::ElIdAnalysis()
 	for (Int_t iTrdTrack = 0; iTrdTrack < nofTrdTracks; iTrdTrack++) {
 
 		CbmTrdTrack* trdtrack = (CbmTrdTrack*) fTrdTracks->At(iTrdTrack);
-		Int_t nHits = trdtrack->GetNofTrdHits();
+		Int_t nHits = trdtrack->GetNofHits();
 
 		if (nHits != 12) continue;
 

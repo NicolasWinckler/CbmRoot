@@ -141,13 +141,13 @@ Int_t CbmTrdTrackFitterKF_CA::DoFit(CbmTrdTrack* pTrack)
     // Store parameters at first layer
     fKfTrack->GetTrackParam(*(const_cast<FairTrackParam*>(pTrack->GetParamFirst())));
     if(fVerbose > 2) {
-        pTrack->GetParamFirst()->Print();
+//        pTrack->GetParamFirst()->Print();
     }
     fKfTrack->Fit(1);
     // Store parameters at last layer
     fKfTrack->GetTrackParam(*(const_cast<FairTrackParam*>(pTrack->GetParamLast())));
     if(fVerbose > 2) {
-        pTrack->GetParamLast()->Print();
+//        pTrack->GetParamLast()->Print();
     }
 
     // Store chi2 of fit

@@ -33,10 +33,10 @@ CbmGlobalTrack::~CbmGlobalTrack() { }
 void CbmGlobalTrack::Print() const {
   cout << endl << "StsTrack " << fStsTrack << ", TrdTrack " << fTrdTrack << ", MuchTrack " << fMuchTrack
        << ", RichRing " << fRichRing << ", TofHit " << fTofHit << endl;
-  cout << "Parameters at first plane: " << endl;
-  fParamFirst.Print();
-  cout << "Parameters at last plane: " << endl;
-  fParamLast.Print();
+//  cout << "Parameters at first plane: " << endl;
+//  fParamFirst.Print();
+//  cout << "Parameters at last plane: " << endl;
+//  fParamLast.Print();
   cout << "chi2 = " << fChi2 << ", NDF = " << fNDF
        << ", Quality flag " << fFlag << endl;
   cout << "length = " << fLength << endl;

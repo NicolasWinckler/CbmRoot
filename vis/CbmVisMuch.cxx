@@ -162,7 +162,7 @@ void CbmVisMuch::ReadEvent(Int_t event){
   fGeoScheme->ClearPointArrays();
   fGeoScheme->ClearHitArrays();
   fGeoScheme->ClearClusterArrays();
-//  fGeoScheme->ResetPads();
+
   fVisClusters->Clear();
 
 

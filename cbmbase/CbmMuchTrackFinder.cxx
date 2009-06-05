@@ -1,12 +1,6 @@
-// -------------------------------------------------------------------------
-// -----                   CbmMuchTrackFinder source file              -----
-// -----                  Created 01/10/07  by A. Lebedev              -----
-// -----                                                               -----
-// -------------------------------------------------------------------------
-
-
-
+/** CbmMuchTrackFinder.h
+ *@author A.Lebedev <Andrey.Lebedev@gsi.de>
+ **/
 #include "CbmMuchTrackFinder.h"
 
-
-ClassImp(CbmMuchTrackFinder)
+ClassImp(CbmMuchTrackFinder);

@@ -602,7 +602,7 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
     //    if(fVerbose > 3) cout << "Marchewka 5" << endl;
 
 
-    Int_t noHits = trdTr1->GetNofTrdHits();
+    Int_t noHits = trdTr1->GetNofHits();
     if( noHits < 12 ) continue;
     //    cout << "NofTrdHits = " << noHits << endl;
 
@@ -638,7 +638,7 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
 
 
       for( int k=0;k<noHits;k++ ) {
-	Int_t hitIndex = trdTr1->GetTrdHitIndex(k);
+	Int_t hitIndex = trdTr1->GetHitIndex(k);
 	CbmTrdHit *Hit = (CbmTrdHit*)fHits->At(hitIndex);
 	Int_t refMCIndex = Hit->GetRefId();
 	trdPt = (CbmTrdPoint*)fPoints->At(refMCIndex);
@@ -698,18 +698,18 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
     //    trdTrackFitter->SetPid(11);
 
     Double_t chi_2 = trdTrackFitterKF->FitToVertex( trdTr1, &vtx, &v_track2 );
-    (trdTr1->GetParamFirst())->SetQp(v_track2.GetQp());
-    (trdTr1->GetParamLast())->SetQp(v_track2.GetQp());
+    (const_cast<FairTrackParam*>(trdTr1->GetParamFirst()))->SetQp(v_track2.GetQp());
+    (const_cast<FairTrackParam*>(trdTr1->GetParamLast()))->SetQp(v_track2.GetQp());
     trdTrackFitter->DoFit(trdTr1);
 
     chi_2 = trdTrackFitter->FitToVertex(trdTr1, &vtx, &v_track2);
-    (trdTr1->GetParamFirst())->SetQp(v_track2.GetQp());
-    (trdTr1->GetParamLast())->SetQp(v_track2.GetQp());
+    (const_cast<FairTrackParam*>(trdTr1->GetParamFirst()))->SetQp(v_track2.GetQp());
+    (const_cast<FairTrackParam*>(trdTr1->GetParamLast()))->SetQp(v_track2.GetQp());
     trdTrackFitter->DoFit(trdTr1);
 
     chi_2 = trdTrackFitter->FitToVertex(trdTr1, &vtx, &v_track2);
-    (trdTr1->GetParamFirst())->SetQp(v_track2.GetQp());
-    (trdTr1->GetParamLast())->SetQp(v_track2.GetQp());
+    (const_cast<FairTrackParam*>(trdTr1->GetParamFirst()))->SetQp(v_track2.GetQp());
+    (const_cast<FairTrackParam*>(trdTr1->GetParamLast()))->SetQp(v_track2.GetQp());
     trdTrackFitter->DoFit(trdTr1);
 
 
@@ -788,7 +788,7 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
 
 
       if(fVerbose > 1)
-	cout << "Initial chi2 of a track = " << trdTr1->GetChi2() << endl;
+	cout << "Initial chi2 of a track = " << trdTr1->GetChiSq() << endl;
 
       //chi = trdTrackFitterKF->FitToVertex( trdTr1, &vtx, &v_track );
       v_track = v_track2;
@@ -798,7 +798,7 @@ void CbmTrdTestEventsWithMom::Exec(Option_t* opt) { //CbmTrdTestEventsWithMom::E
 	cout << "After fit chi2 of a track = " << chi << endl;
 
       if(trdTr1->GetNDF() != 0) {
-	chi2 = trdTr1->GetChi2()/Double_t((trdTr1->GetNDF()));
+	chi2 = trdTr1->GetChiSq()/Double_t((trdTr1->GetNDF()));
       } else chi2 = 9; //mk
 
 
@@ -2221,7 +2221,7 @@ void CbmTrdTestEventsWithMom::Finish() {
 TVector3 CbmTrdTestEventsWithMom::GetMCMomentum(Int_t trdRecoTrackID) {
 
   CbmTrdTrack *trdTr = (CbmTrdTrack*)fTracks->At(trdRecoTrackID);
-  trdTr->SortHits();
+//  trdTr->SortHits();
   Int_t hitIndex;
   CbmTrdHit *trdHit;
   Int_t MCTrackIndex;
@@ -2235,7 +2235,7 @@ TVector3 CbmTrdTestEventsWithMom::GetMCMomentum(Int_t trdRecoTrackID) {
   //   cout << endl;
 
   //  for(int i=0;i<12;i++) {
-  hitIndex = trdTr->GetTrdHitIndex(0);
+  hitIndex = trdTr->GetHitIndex(0);
   trdHit = (CbmTrdHit*)fHits->At(hitIndex);
   trdPt = (CbmTrdPoint*)fPoints->At(trdHit->GetRefId());
   MCTrackIndex = trdPt->GetTrackID();
@@ -2261,7 +2261,7 @@ Double_t CbmTrdTestEventsWithMom::GetBydl(CbmTrdTrack *trdTrack, Double_t pMC, I
   //method calculates mean field constant Byld using MC info
   if ( trdTrack == NULL ) return 0;
   Double_t Bydl = 0;
-  FairTrackParam *param;
+  const FairTrackParam *param;
   //  const Double_t zMag = 50; //in centimeters
 
   param = trdTrack->GetParamFirst();
@@ -2296,7 +2296,7 @@ Double_t CbmTrdTestEventsWithMom::EstimateMomentum(CbmTrdTrack *trdTrack, Double
   //method calculates q/p using given mean field constant
   if(trdTrack == NULL) return 0;
   Double_t qp = 0;
-  FairTrackParam *param;
+  const FairTrackParam *param;
   //  const Double_t zMag = 50; //in centimeters
 
   param = trdTrack->GetParamFirst();
@@ -2324,7 +2324,7 @@ Double_t CbmTrdTestEventsWithMom::GetKickPt(CbmTrdTrack *trdTrack) {
   const Double_t e = 0.2998; //charge of the electron, [GeV/c/(T*m)]
   const Double_t B = 6;
 
-  FairTrackParam *param;
+  const FairTrackParam *param;
   FairTrackParam
     extParam2,
     extParam1;

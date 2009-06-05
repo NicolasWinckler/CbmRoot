@@ -132,9 +132,9 @@ void CbmTrdTracksPidQa::Exec(Option_t* option)
 	trdTrack = (CbmTrdTrack*) fTrdTrackCollection->At(iTrack);
 	if(NULL == trdTrack) continue;
 
-        nrtrdpoints = trdTrack->GetNofTrdHits();
+        nrtrdpoints = trdTrack->GetNofHits();
 
-        trdHit = (CbmTrdHit*) fTrdHitCollection->At(trdTrack->GetTrdHitIndex(1));
+        trdHit = (CbmTrdHit*) fTrdHitCollection->At(trdTrack->GetHitIndex(1));
 	if(NULL == trdHit) continue;
 
         mcPoint = (CbmTrdPoint*) fMCPointArray->At(trdHit->GetRefId());

@@ -14,13 +14,14 @@
 
 #include "CbmTrdTrackFinder.h"
 
+#include "CbmTrdTrack.h"
+
 #include "TStopwatch.h"
 #include <vector>
 #include <map>
 #include <set>
 
 class TClonesArray;
-class CbmTrdTrack;
 class CbmTrdHit;
 class CbmKF;
 class CbmKFTrack;
@@ -92,7 +93,7 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
  private:
 
   CbmGeoTrdPar *TrdPar;
-    
+
   /** Event counter **/
   Int_t fEvents;
   Int_t fNofEvents;
@@ -103,7 +104,7 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
 
   /** Traxk fitter **/
   CbmTrdTrackFitterKF* trdTrackFitterKF;
-    
+
   /** Verbosity level **/
   Int_t fVerbose;
 
@@ -114,11 +115,11 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
   /** Arrays for TRD tracks **/
   std::vector<CbmTrdTrack*> fvTempArray;
   std::vector<CbmTrdTrack*> fvFoundTracks;
-  
+
   inline static Bool_t CompareY(LayerWithHits A, LayerWithHits B){
     return (A.Y < B.Y);
   };
-  
+
   /** Structure contains temporary values of track candidates **/
   struct TempTrackStruct
   {
@@ -135,8 +136,8 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
   std::vector<Int_t>::iterator iStation1;
   std::vector<Int_t>::iterator iStation2;
 
-  std::vector<Int_t>::iterator fImapSt1; 
-  std::vector<Int_t>::iterator fImapSt2; 
+  std::vector<Int_t>::iterator fImapSt1;
+  std::vector<Int_t>::iterator fImapSt2;
 
   std::vector<CbmL1TrdTracklet4*>::iterator itTrackletsLeft;
   std::vector<CbmL1TrdTracklet4*>::iterator itTrackletsRight;
@@ -174,7 +175,7 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
     secondLoopTime,
     refittingKF,
     thirdLoopTime;
-  
+
   Double_t
     totCreateSegments,
     totFindNeighbour,
@@ -195,12 +196,12 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
   void  DeleteTracklets(std::vector<CbmL1TrdTracklet*> vect);
 
   Double_t DistTwoTrackletsX(Int_t iIndexFirst,
-			     Int_t iIndexSecond, 
+			     Int_t iIndexSecond,
 			     Double_t zed);
-  
+
   Double_t DistTwoTrackletsY(Int_t iIndexFirst,
-			     Int_t iIndexSecond, 
-			     Double_t zed);  
+			     Int_t iIndexSecond,
+			     Double_t zed);
 
   void CreateSpacePoints(std::vector<LayerWithHits> vTrdHitArrayA,
 			 std::vector<LayerWithHits> vTrdHitArrayB,
@@ -215,7 +216,7 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
   void TagSegments(std::vector<CbmL1TrdTracklet4*> &clTrackletsA,
 		   std::vector<CbmL1TrdTracklet4*> &clTrackletsB,
 		   Int_t noCombSegments = 0);
-  
+
   void CreateTracks(std::vector<CbmL1TrdTracklet4*> clTracklets14,
 		    std::vector<CbmL1TrdTracklet4*> clTracklets58,
 		    std::vector<CbmL1TrdTracklet4*> clTracklets912,
@@ -223,7 +224,7 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
 		    Bool_t removeUsedHits,
 		    Bool_t competition = true,
 		    Int_t nrLoop = 0);
- 
+
   void CreateAndManageSegments(std::vector<CbmL1TrdTracklet4*> clTracklets14,
 			       std::vector<CbmL1TrdTracklet4*> clTracklets58,
 			       std::vector<CbmL1TrdTracklet4*> clTracklets912);
@@ -233,10 +234,10 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
   void FindNeighbour(std::vector<CbmL1TrdTracklet4*> &v1,
 		     std::vector<CbmL1TrdTracklet4*> &v2,
 		     Double_t dY, Double_t dX);
-  
+
   /** Fitting procedures **/
-  Double_t FitLinear(CbmTrdTrack *tr, Int_t var); //var = {1,2} => which coordinate to use   
-  Double_t FitLinear(Int_t M[], Int_t var); //var = {1,2} => which coordinate to use   
+  Double_t FitLinear(CbmTrdTrack *tr, Int_t var); //var = {1,2} => which coordinate to use
+  Double_t FitLinear(Int_t M[], Int_t var); //var = {1,2} => which coordinate to use
   Double_t Fit(CbmTrdTrack *tr);
   Double_t Fit(Int_t M[]);
   Double_t FitKF(CbmTrdTrack* pTrack);
@@ -266,7 +267,7 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
 
   /** Public accessors **/
   inline const Int_t& GetVerbose() const {return fVerbose;};
-   
+
   /** Public modifiers **/
   inline void SetVerbose(const Int_t& verbose) {fVerbose = verbose;};
 
@@ -327,10 +328,16 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
     *fUsedHitsPerPlane,
     *fUnUsedHitsPerPlane;
 
-  
+
   std::map<Int_t, Int_t> fRUsedHits;
   std::map<Int_t, Int_t> fRUnUsedHits;
   std::map<Int_t, Int_t> fTotHits;
+
+  /** Function for sorting **/
+    static Bool_t CompareChi2TrdTrack(const CbmTrdTrack* a, const CbmTrdTrack* b)
+    {
+        return ( a->GetChiSq()/(Double_t)a->GetNDF() < b->GetChiSq()/(Double_t)b->GetNDF() );
+    };
 
   ClassDef(CbmL1CATrdTrackFinderSA, 1);
 

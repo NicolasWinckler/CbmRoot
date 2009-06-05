@@ -93,13 +93,13 @@ Int_t CbmEcalTrackExtrapolationKF::DoExtrapolate(TClonesArray *gTrackArray, TClo
     if (!tr) continue;
     if (tr->GetStsTrackIndex()<0||tr->GetTrdTrackIndex()<0)
       continue;
-    kfTr.SetTrackParam(*(tr->GetParamLast()));
+    kfTr.SetTrackParam(*(const_cast<FairTrackParam*>(tr->GetParamLast())));
     kfTr.Extrapolate(Str()->GetEcalInf()->GetZPos());
     kfTr.GetTrackParam(trpar);
     Map()[nTr]=i;
     new ((*fTrackParamArray)[nTr++]) FairTrackParam(trpar);
   }
-  
+
   return nTr;
 }
 // -------------------------------------------------------------------------

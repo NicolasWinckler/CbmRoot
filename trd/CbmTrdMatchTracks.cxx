@@ -126,14 +126,14 @@ void CbmTrdMatchTracks::Exec(Option_t* opt)
 		cout << "-W- CbmTrdMatchTracks::Exec: Empty TrdTrack at " << iTrack << endl;
 		continue;
 	}
-	nHits = track->GetNofTrdHits();
+	nHits = track->GetNofHits();
 	nAll = nTrue = nWrong = nFake = nMCTracks = 0;
 	fMatchMap.clear();
 	if (fVerbose > 2) cout << endl << "Track " << iTrack << ", TrdHits " << nHits << endl;
 
 	// Loop over TRDHits of track
 	for (Int_t iHit=0; iHit<nHits; iHit++) {
-		hit = (CbmTrdHit*) fHits->At(track->GetTrdHitIndex(iHit));
+		hit = (CbmTrdHit*) fHits->At(track->GetHitIndex(iHit));
 		if (!hit) {
 			cout << "-E- CbmTrdMatchTracks::Exec: " << "No TrdHit " << iHit << " for track " << iTrack << endl;
 			continue;
@@ -151,7 +151,7 @@ void CbmTrdMatchTracks::Exec(Option_t* opt)
 		}
 		iMCTrack = point->GetTrackID();
 		if ( fVerbose > 2 )
-			cout << "Track " << iTrack << ", TRD hit " << track->GetTrdHitIndex(iHit)
+			cout << "Track " << iTrack << ", TRD hit " << track->GetHitIndex(iHit)
 				   << ", TRDPoint " << iPoint << ", MCTrack " << iMCTrack << endl;
 		fMatchMap[iMCTrack]++;
 	}

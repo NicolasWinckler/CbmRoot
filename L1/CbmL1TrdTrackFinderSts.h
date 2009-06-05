@@ -8,11 +8,12 @@
 
 #include "CbmTrdTrackFinder.h"
 
+#include "CbmTrdTrack.h"
+
 #include <map>
 #include <vector>
 
 class TClonesArray;
-class CbmTrdTrack;
 class CbmTrdHit;
 class CbmKFTrack;
 class TH1F;
@@ -78,6 +79,11 @@ public:
     void WriteHistogramms();
 
     inline void SetVerbose(Int_t verbose) {fVerbose = verbose;}
+
+	static Bool_t CompareChi2(const CbmTrdTrack* a, const CbmTrdTrack* b)
+	{
+		return ( a->GetChiSq()/(Double_t)a->GetNDF() < b->GetChiSq()/(Double_t)b->GetNDF() );
+	};
 
     ClassDef(CbmL1TrdTrackFinderSts, 1);
 };

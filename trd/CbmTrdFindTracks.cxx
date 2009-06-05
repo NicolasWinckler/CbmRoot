@@ -33,9 +33,9 @@ CbmTrdFindTracks::CbmTrdFindTracks()
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmTrdFindTracks::CbmTrdFindTracks(const char* name, 
-				   const char* title, 
-				   CbmTrdTrackFinder* finder) 
+CbmTrdFindTracks::CbmTrdFindTracks(const char* name,
+				   const char* title,
+				   CbmTrdTrackFinder* finder)
 : FairTask(name)
 {
   fFinder         = finder;
@@ -124,13 +124,12 @@ void CbmTrdFindTracks::Exec(Option_t* opt)
   fNofTracks = fFinder->DoFind(fTrdHitArray, fTrackArray);
   for (Int_t iTrack=0; iTrack<fTrackArray->GetEntriesFast(); iTrack++) {
     CbmTrdTrack* track = (CbmTrdTrack*) fTrackArray->At(iTrack);
-    track->SortHits();
     Double_t eloss = 0;
-    for (Int_t iTRD=0; iTRD < track->GetNofTrdHits(); iTRD++){
-      Int_t TRDindex = track->GetTrdHitIndex(iTRD);
+    for (Int_t iTRD=0; iTRD < track->GetNofHits(); iTRD++){
+      Int_t TRDindex = track->GetHitIndex(iTRD);
       CbmTrdHit* trdHit = (CbmTrdHit*) fTrdHitArray->At(TRDindex);
       eloss += trdHit->GetELoss();
-    } 
+    }
     track->SetELoss(eloss);
   }
 }

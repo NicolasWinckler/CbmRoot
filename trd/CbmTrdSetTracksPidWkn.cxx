@@ -78,7 +78,7 @@ InitStatus CbmTrdSetTracksPidWkn::Init() {
   }
 
   // Get TrdHit array
-  fTrdHitArray  = (TClonesArray*) ioman->GetObject("TRDHit"); 
+  fTrdHitArray  = (TClonesArray*) ioman->GetObject("TRDHit");
   if ( ! fTrdHitArray) {
     cout << "-E- CbmTrdSetTracksPidWkn::Init: No TrdHit array!"
 	 << endl;
@@ -95,11 +95,11 @@ InitStatus CbmTrdSetTracksPidWkn::Init() {
 // -----   Public method Exec   --------------------------------------------
 void CbmTrdSetTracksPidWkn::Exec(Option_t* opt) {
 
-  if ( !fTrackArray ) return; 
+  if ( !fTrackArray ) return;
 
   Int_t nTracks = fTrackArray->GetEntriesFast();
 
-  Double_t result_wkn;  
+  Double_t result_wkn;
 
   Int_t i,j,k,n;
   Int_t Ndec = 12;
@@ -119,17 +119,17 @@ void CbmTrdSetTracksPidWkn::Exec(Option_t* opt) {
 
     // Up to now only for tracks with twelve hits the Wkn can be calculated
     // This should be changed in the future.
-    if (pTrack->GetNofTrdHits() < 12 ) {
+    if (pTrack->GetNofHits() < 12 ) {
       fNofTracks++;
       pTrack->SetPidWkn(-2.);
       continue;
     }
 
-    for (Int_t iTRD=0; iTRD < pTrack->GetNofTrdHits(); iTRD++){
-      Int_t TRDindex = pTrack->GetTrdHitIndex(iTRD);
+    for (Int_t iTRD=0; iTRD < pTrack->GetNofHits(); iTRD++){
+      Int_t TRDindex = pTrack->GetHitIndex(iTRD);
       CbmTrdHit* trdHit = (CbmTrdHit*) fTrdHitArray->At(TRDindex);
       eloss[iTRD] = trdHit->GetELoss();
-    } 
+    }
 
     // calculate the lambda parameter for each TRD layer
     for (i=0;i<Ndec;i++)
@@ -139,15 +139,15 @@ void CbmTrdSetTracksPidWkn::Exec(Option_t* opt) {
     }
 
     // sort array tmp in increasing order
-    TMath::Sort(Ndec, (const Double_t *)tmp, index_sorted , kFALSE); 
+    TMath::Sort(Ndec, (const Double_t *)tmp, index_sorted , kFALSE);
 
     for (i=0;i<Ndec;i++) {
-      Ye_tmp [i] =  TMath::LandauI (tmp [index_sorted[i]]); 
+      Ye_tmp [i] =  TMath::LandauI (tmp [index_sorted[i]]);
     }
 
 
-    i = 1;            //  first index used in the ordered sample 
-    k = 8;            //  statistics degree 
+    i = 1;            //  first index used in the ordered sample
+    k = 8;            //  statistics degree
     n = Ndec - i + 1; //  sample size
 
     for (j=0;j<n;j++) {
@@ -171,7 +171,7 @@ void CbmTrdSetTracksPidWkn::Finish() { }
 Double_t CbmTrdSetTracksPidWkn::CbmWknStat (Double_t *Y,Int_t k, Int_t n)
 {
   Double_t
-    wkn0, 
+    wkn0,
     S = 0,
     ty,ti,
     k1=k+1;

@@ -199,8 +199,8 @@ void CbmFitGlobalTracksQa::Exec(Option_t* option)
 	    trdTrack = (CbmTrdTrack*) fArrayTrdTrack->At(trdTrackIndex);
 	    if(NULL != trdTrack) {
 		trdPointIndex = -1;
-		if(trdTrack->GetNofTrdHits()) {
-		    trdHitIndex = trdTrack->GetTrdHitIndex(0);
+		if(trdTrack->GetNofHits()) {
+		    trdHitIndex = trdTrack->GetHitIndex(0);
 		    trdHit = (CbmTrdHit*) fArrayTrdHit->At(trdHitIndex);
 		    if(NULL != trdHit) {
 			trdPointIndex = trdHit->GetRefId();
@@ -240,8 +240,8 @@ void CbmFitGlobalTracksQa::Exec(Option_t* option)
 	    trdTrack = (CbmTrdTrack*) fArrayTrdTrack->At(trdTrackIndex);
 	    if(NULL != trdTrack) {
 		trdPointIndex = -1;
-		if(trdTrack->GetNofTrdHits()) {
-		    trdHitIndex = trdTrack->GetTrdHitIndex(trdTrack->GetNofTrdHits()-1);
+		if(trdTrack->GetNofHits()) {
+		    trdHitIndex = trdTrack->GetHitIndex(trdTrack->GetNofHits()-1);
 		    trdHit = (CbmTrdHit*) fArrayTrdHit->At(trdHitIndex);
 		    if(NULL != trdHit) {
 			trdPointIndex = trdHit->GetRefId();

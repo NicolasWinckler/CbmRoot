@@ -275,7 +275,9 @@ Int_t CbmTrdTrackFinderIdeal::DoFind(TClonesArray* hitArray,
 
     pTrck = (CbmTrdTrack*) trackArray->At(nTracks);
     Double_t mom = pMCtr->GetP();
-    pTrck->GetParamLast()->SetQp(1./mom);
+    FairTrackParam par(*pTrck->GetParamLast());
+    par.SetQp(1./mom);
+    pTrck->SetParamLast(&par);
 
     if(fVerbose > 1) {
         cout << "-I- CbmTrdTrackFinderIdeal : "
@@ -328,7 +330,7 @@ Int_t CbmTrdTrackFinderIdeal::DoFind(TClonesArray* hitArray,
       nNoTrack++;
       continue;
     }
-    pTrck->AddHit(iHit, pHit);
+    pTrck->AddHit(iHit, kTRDHIT);
 
     //    eloss = pHit->GetELoss();
     //pTrck->SetELoss(pTrck->GetELoss()+eloss);

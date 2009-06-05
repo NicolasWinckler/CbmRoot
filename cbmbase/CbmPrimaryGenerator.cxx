@@ -15,7 +15,9 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmPrimaryGenerator::CbmPrimaryGenerator() : FairPrimaryGenerator() {
+CbmPrimaryGenerator::CbmPrimaryGenerator() : FairPrimaryGenerator()
+{
+  fTimeProb=NULL;
 }
 // -------------------------------------------------------------------------
 
@@ -24,7 +26,9 @@ CbmPrimaryGenerator::CbmPrimaryGenerator() : FairPrimaryGenerator() {
 // -----   Constructor with title and name   -------------------------------
 CbmPrimaryGenerator::CbmPrimaryGenerator(const char* name, 
 					 const char* title) 
-  : FairPrimaryGenerator(name, title) {
+  : FairPrimaryGenerator(name, title)
+{
+  fTimeProb=NULL;
 }
 // -------------------------------------------------------------------------
 

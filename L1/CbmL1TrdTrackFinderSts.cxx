@@ -248,12 +248,12 @@ void CbmL1TrdTrackFinderSts::Sts2Trd(Double_t pmin, Double_t pmax,
         // Create TRD track
         trdTrack = new CbmTrdTrack();
         // Copy track parameters at plane of last hit
-	trdTrack->SetParamLast( *stsTrack->GetParamLast() );
+	trdTrack->SetParamLast( stsTrack->GetParamLast() );
         // Copy chi2
-        trdTrack->SetChi2(stsTrack->GetChi2());
+        trdTrack->SetChiSq(stsTrack->GetChi2());
         trdTrack->SetNDF(stsTrack->GetNDF());
         // Set sts track index
-        trdTrack->SetStsTrackIndex(iStsTrack);
+        trdTrack->SetPreviousTrackId(iStsTrack);
         // Add it to the array
         fvTrdTrack.push_back(trdTrack);
         // Control output
@@ -324,7 +324,7 @@ void CbmL1TrdTrackFinderSts::ProcessStation(CbmTrdTrack* pTrack,
   // Track parameters
 
   CbmKFTrack kfTrack;
-  kfTrack.SetTrackParam(*pTrack->GetParamLast());
+  kfTrack.SetTrackParam(*(const_cast<FairTrackParam*>(pTrack->GetParamLast())));
   kfTrack.SetPID(fPid);
   Double_t qp0 = pTrack->GetParamLast()->GetQp();
   Double_t *T = kfTrack.GetTrack();
@@ -343,7 +343,7 @@ void CbmL1TrdTrackFinderSts::ProcessStation(CbmTrdTrack* pTrack,
   CbmTrdPoint *trdPoint;
   TVector3 pos;
 
-  Int_t stsTrackIndex = pTrack->GetStsTrackIndex();
+  Int_t stsTrackIndex = pTrack->GetPreviousTrackId();
   if(stsTrackIndex < 0) {
     Fatal("ProcessStation", "Invalid track index");
   }
@@ -445,12 +445,12 @@ void CbmL1TrdTrackFinderSts::ProcessStation(CbmTrdTrack* pTrack,
 
     // Add hit to the track
     if(indexOfClosest != -1) {
-      pTrack->AddHit(indexOfClosest, closestHit);
+      pTrack->AddHit(indexOfClosest, kTRDHIT);
     } else {
       pTrack->SetFlag(1);
     }
   } // Loop over layers
-  pTrack->SortHits();
+//  pTrack->SortHits();
 }
 // -----------------------------------------------------------------------
 
@@ -462,15 +462,15 @@ void CbmL1TrdTrackFinderSts::UpdateTrack(Int_t station, CbmTrdTrack* pTrack)
     // Update track parameters using Kalman Filter
 
     // Get number of hits
-    Int_t nHits = pTrack->GetNofTrdHits();
+    Int_t nHits = pTrack->GetNofHits();
     if( nHits < (Int_t)((station+1)*fNoTrdPerStation) ) {
         pTrack->SetFlag(1);
         return;
     }
     // Kalman filter track
     CbmKFTrack kfTrack;
-    kfTrack.SetTrackParam(*pTrack->GetParamLast());
-    kfTrack.GetRefChi2() = pTrack->GetChi2();
+    kfTrack.SetTrackParam(*(const_cast<FairTrackParam*>(pTrack->GetParamLast())));
+    kfTrack.GetRefChi2() = pTrack->GetChiSq();
     kfTrack.GetRefNDF() = pTrack->GetNDF();
     kfTrack.SetPID(fPid);
     // Loop over hits
@@ -481,7 +481,7 @@ void CbmL1TrdTrackFinderSts::UpdateTrack(Int_t station, CbmTrdTrack* pTrack)
     for(Int_t iHit = (Int_t)station*fNoTrdPerStation;
 	iHit < nHits; iHit++) {
 	// Get hit index
-        hitIndex = pTrack->GetTrdHitIndex(iHit);
+        hitIndex = pTrack->GetHitIndex(iHit);
         // Get pointer to the hit
         pHit = (CbmTrdHit*) fArrayTrdHit->At(hitIndex);
         // Extrapolate to this hit
@@ -492,11 +492,11 @@ void CbmL1TrdTrackFinderSts::UpdateTrack(Int_t station, CbmTrdTrack* pTrack)
         pKFHit->Filter(kfTrack, kTRUE, qp0);
     } // Loop over hits
     // Set track parameters
-    kfTrack.GetTrackParam( *pTrack->GetParamLast() );
-    pTrack->SetChi2(kfTrack.GetRefChi2());
+    kfTrack.GetTrackParam( *(const_cast<FairTrackParam*>(pTrack->GetParamLast())) );
+    pTrack->SetChiSq(kfTrack.GetRefChi2());
     pTrack->SetNDF(kfTrack.GetRefNDF());
     if(station == (fNoTrdStations-1)) {
-	if(pTrack->GetChi2()/(Double_t)pTrack->GetNDF() > 100) pTrack->SetFlag(1);
+	if(pTrack->GetChiSq()/(Double_t)pTrack->GetNDF() > 100) pTrack->SetFlag(1);
     }
 }
 // -----------------------------------------------------------------------
@@ -532,8 +532,7 @@ void CbmL1TrdTrackFinderSts::RemoveFakes()
     map<Int_t, Bool_t> mapStsTrackUsed;
 
     // Sort found tracks by chi2
-    sort(fvTrdTrack.begin(), fvTrdTrack.end(),
-	 CbmTrdTrack::CompareChi2);
+    sort(fvTrdTrack.begin(), fvTrdTrack.end(), CompareChi2);
 
     Int_t n_false;
 
@@ -554,11 +553,11 @@ void CbmL1TrdTrackFinderSts::RemoveFakes()
 
         // Loop over hits of this track, check if they are already
         // attached
-	nHits = track->GetNofTrdHits();
+	nHits = track->GetNofHits();
         n_false = 0;
         for(Int_t iHit = 0; iHit < nHits; iHit++) {
             // Get hit index
-            hitIndex = track->GetTrdHitIndex(iHit);
+            hitIndex = track->GetHitIndex(iHit);
             // Check flag
 	    if(fmapHitUsed[hitIndex]) {
                 n_false += 1;
@@ -570,7 +569,7 @@ void CbmL1TrdTrackFinderSts::RemoveFakes()
 	    track->SetFlag(1);
 	}
 
-        if( mapStsTrackUsed[ track->GetStsTrackIndex() ] ) {
+        if( mapStsTrackUsed[ track->GetPreviousTrackId() ] ) {
             track->SetFlag(1);
         }
 
@@ -584,12 +583,12 @@ void CbmL1TrdTrackFinderSts::RemoveFakes()
         // Mark hits as attached
         for(Int_t iHit = 0; iHit < nHits; iHit++) {
             // Get hit index
-            hitIndex = track->GetTrdHitIndex(iHit);
+            hitIndex = track->GetHitIndex(iHit);
             // Set flag
             fmapHitUsed[hitIndex] = kTRUE;
         } // Loop over hits
 
-        mapStsTrackUsed[ track->GetStsTrackIndex() ] = kTRUE;
+        mapStsTrackUsed[ track->GetPreviousTrackId() ] = kTRUE;
     } // Loop over tracks
 }
 // -----------------------------------------------------------------------

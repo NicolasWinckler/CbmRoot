@@ -77,7 +77,7 @@ Int_t CbmTrdTrackFitterIdeal::DoFit(CbmTrdTrack* pTrack)
        NULL == fArrayTrdHit) return 0;
 
     // Parameters at the first plane
-    Int_t hitIndex = pTrack->GetTrdHitIndex(0);
+    Int_t hitIndex = pTrack->GetHitIndex(0);
     if(hitIndex < 0) return 0;
     CbmTrdHit* hit = (CbmTrdHit*) fArrayTrdHit->At(hitIndex);
     if(NULL == hit) return 0;
@@ -85,10 +85,12 @@ Int_t CbmTrdTrackFitterIdeal::DoFit(CbmTrdTrack* pTrack)
     if(pointIndex < 0) return 0;
     CbmTrdPoint* point = (CbmTrdPoint*) fArrayTrdPoint->At(pointIndex);
     if(NULL == point) return 0;
-    SetTrackParam(point, pTrack->GetParamFirst());
+    FairTrackParam par1;
+    SetTrackParam(point, &par1);
+    pTrack->SetParamFirst(&par1);
 
     // Parameters at the last plane
-    hitIndex = pTrack->GetTrdHitIndex( pTrack->GetNofTrdHits()-1 );
+    hitIndex = pTrack->GetHitIndex( pTrack->GetNofHits()-1 );
     if(hitIndex < 0) return 0;
     hit = (CbmTrdHit*) fArrayTrdHit->At(hitIndex);
     if(NULL == hit) return 0;
@@ -96,7 +98,9 @@ Int_t CbmTrdTrackFitterIdeal::DoFit(CbmTrdTrack* pTrack)
     if(pointIndex < 0) return 0;
     point = (CbmTrdPoint*) fArrayTrdPoint->At(pointIndex);
     if(NULL == point) return 0;
-    SetTrackParam(point, pTrack->GetParamLast());
+    FairTrackParam par2;
+    SetTrackParam(point, &par2);
+    pTrack->SetParamLast(&par2);
 
     return 1;
 }

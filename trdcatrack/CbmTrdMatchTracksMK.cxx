@@ -539,22 +539,22 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 	noTrackHits.clear();
 	if(fVerbose > 2) {
 	  cout << "checking for good hits...\n";
-	  cout << "Number of hits per track: " << trdTr1->GetNofTrdHits() << endl;
+	  cout << "Number of hits per track: " << trdTr1->GetNofHits() << endl;
 	}
 
-	noHts = trdTr1->GetNofTrdHits();
+	noHts = trdTr1->GetNofHits();
 	//if(fVerbose > 2) cout << "noHits= " << noHts << endl;
 	for(int iHit=0;iHit < noHts;iHit++) { //checking for good hits
 	  //a condition was here, probably by mistake
 	  if(fVerbose > 2)
 	    cout << "We have a TrdHit here." << endl;
 
-	  trdHit1 = (CbmTrdHit*)fHits->At(trdTr1->GetTrdHitIndex(iHit));
+	  trdHit1 = (CbmTrdHit*)fHits->At(trdTr1->GetHitIndex(iHit));
 	  if( ! trdHit1) { cout << "!!! Empty pointer to TrdHit !!!" << endl; continue; }
 	  trdPoint1 = (CbmTrdPoint*)fPoints->At(trdHit1->GetRefId());
 	  if(fVerbose > 2) {
 	    cout
-	      << "TrdHitIndex= " << trdTr1->GetTrdHitIndex(iHit)
+	      << "TrdHitIndex= " << trdTr1->GetHitIndex(iHit)
 	      << "TrdPointIndex= " << trdHit1->GetRefId() << endl;
 
 	  }
@@ -1552,7 +1552,7 @@ void CbmTrdMatchTracksMK::WriteHistogramms()
 Int_t CbmTrdMatchTracksMK::GetMCIndex(CbmTrdTrack* trdTrack)
 {
   Int_t
-    nTrackEnries = trdTrack->GetNofTrdHits(),
+    nTrackEnries = trdTrack->GetNofHits(),
     trdPtInd = -1,
     mcIndex = -1,
     trueInd = -1,
@@ -1567,7 +1567,7 @@ Int_t CbmTrdMatchTracksMK::GetMCIndex(CbmTrdTrack* trdTrack)
 
   for(int i=0;i<nTrackEnries;i++)
     {
-      trdHit = (CbmTrdHit*)fHits->At(trdTrack->GetTrdHitIndex(i));
+      trdHit = (CbmTrdHit*)fHits->At(trdTrack->GetHitIndex(i));
       trdPtInd = trdHit->GetRefId();
       mcPoint = (FairMCPoint*)fPoints->At(trdPtInd);
       mcIndex = mcPoint->GetTrackID();

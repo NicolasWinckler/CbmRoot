@@ -23,7 +23,7 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmTrdSetTracksPidLike::CbmTrdSetTracksPidLike() 
+CbmTrdSetTracksPidLike::CbmTrdSetTracksPidLike()
   :fTrackArray(0), fTrdHitArray(0), fHistdEdx(0), InputFile(0),
    fNofTracks(0), fTrackMomentum(0), fNBins(0), fBinSize(0)
 {
@@ -75,7 +75,7 @@ Bool_t CbmTrdSetTracksPidLike::ReadData()
   }
   TString InputFile = fTrdGas->GetFileName("Like");
 
-  // Open ROOT file with the histograms  
+  // Open ROOT file with the histograms
   TFile *histFile = new TFile(InputFile, "READ");
   if (!histFile || !histFile->IsOpen()) {
     cout << " -E- CbmTrdSetTracksPidWkn::ReadData "<<endl;
@@ -102,8 +102,8 @@ Bool_t CbmTrdSetTracksPidLike::ReadData()
       case CbmTrdSetTracksPidLike::kProton:   particleKey = "PR"; break;
       case CbmTrdSetTracksPidLike::kMuon:     particleKey = "MU"; break;
     }
-    
-    for (Int_t imom = 0; imom < fNMom; imom++) 
+
+    for (Int_t imom = 0; imom < fNMom; imom++)
     {
       if (imom<9){
         sprintf(text, "h1dEdx%s%01d", particleKey, imom+1);
@@ -117,15 +117,15 @@ Bool_t CbmTrdSetTracksPidLike::ReadData()
 
     }
   }
-  
+
   histFile->Close();
   delete histFile;
-  
+
   // Calculate number of bins and bin size
   TH1F* hist = (TH1F*) fHistdEdx->At(GetHistID(CbmTrdSetTracksPidLike::kPion, 1));
   fNBins   = hist->GetNbinsX();
   fBinSize = hist->GetBinWidth(1);
-  
+
   return kTRUE;
 
 }
@@ -144,7 +144,7 @@ InitStatus CbmTrdSetTracksPidLike::Init() {
   for (Int_t imom = 0; imom < fNMom; imom++) {
     fTrackMomentum[imom] = trackMomentum[imom];
   }
-  
+
   fHistdEdx = new TObjArray(fNParts * fNMom);
   fHistdEdx->SetOwner();                        // ?????
 
@@ -173,7 +173,7 @@ InitStatus CbmTrdSetTracksPidLike::Init() {
   }
 
 
- 
+
 
  // Get GlobalTack array
   fglobalTrackArray  = (TClonesArray*) ioman->GetObject("GlobalTrack");
@@ -190,7 +190,7 @@ InitStatus CbmTrdSetTracksPidLike::Init() {
          << endl;
     return kFATAL;
   }
-  
+
 
   // Get TrdTrack array
   fTrackArray  = (TClonesArray*) ioman->GetObject("TRDTrack"); //=>SG
@@ -223,14 +223,14 @@ void CbmTrdSetTracksPidLike::Exec(Option_t* opt) {
   Double_t prob_total;
 
 
-  if ( !fTrackArray ) return; 
+  if ( !fTrackArray ) return;
 
   Int_t nTracks = fglobalTrackArray->GetEntriesFast();
   //Int_t nTracks = fTrackArray->GetEntriesFast();
   cout << nTracks <<" global tracks" << endl;
 
   for (Int_t iTrack=0; iTrack<nTracks; iTrack++) {
-    
+
     CbmGlobalTrack* gTrack = (CbmGlobalTrack*)fglobalTrackArray->At(iTrack);
 
 
@@ -250,16 +250,16 @@ void CbmTrdSetTracksPidLike::Exec(Option_t* opt) {
     if (!pTrack){
       cout <<" -W- CbmTrdSetTracksPidLike::Exec : no Trd track pointer"<<endl;
       continue;
-    } 
+    }
 
 
- 
+
     CbmStsTrack* stsTrack = (CbmStsTrack*)fstsTrackArray->At(stsTrackIndex);
     if (!stsTrack){
       cout <<" -W- CbmTrdSetTracksPidLike::Exec : no Sts track pointer"<<endl;
       continue;
-    }  
-   
+    }
+
 
     /*
     CbmTrdTrack* pTrack = (CbmTrdTrack*)fTrackArray->At(iTrack);
@@ -269,7 +269,7 @@ void CbmTrdSetTracksPidLike::Exec(Option_t* opt) {
     //    cout <<"Trd Hits: "<< pTrack->GetNofTrdHits() << endl;
 
     // Up to now only for tracks with twelve hits the Like can be calculated
-    if (pTrack->GetNofTrdHits() < 12 ) {
+    if (pTrack->GetNofHits() < 12 ) {
       fNofTracks++;
       continue;
     }
@@ -298,15 +298,15 @@ void CbmTrdSetTracksPidLike::Exec(Option_t* opt) {
     }
 
     //    cout <<"Momentum: "<<momentum<<endl;
- 
-    Double_t dEdx;    
 
-    for (Int_t iTRD=0; iTRD < pTrack->GetNofTrdHits(); iTRD++){
-      Int_t TRDindex = pTrack->GetTrdHitIndex(iTRD);
+    Double_t dEdx;
+
+    for (Int_t iTRD=0; iTRD < pTrack->GetNofHits(); iTRD++){
+      Int_t TRDindex = pTrack->GetHitIndex(iTRD);
       CbmTrdHit* trdHit = (CbmTrdHit*) fTrdHitArray->At(TRDindex);
 
       dEdx = trdHit->GetELoss()*1000000;
-      
+
       for (Int_t iSpecies = 0; iSpecies < fNParts; iSpecies++) {
 
         prob[iSpecies] *= GetProbability(iSpecies, momentum, dEdx);
@@ -333,7 +333,7 @@ void CbmTrdSetTracksPidLike::Exec(Option_t* opt) {
     pTrack->SetPidLikeKA(prob[CbmTrdSetTracksPidLike::kKaon]);
     pTrack->SetPidLikePR(prob[CbmTrdSetTracksPidLike::kProton]);
     pTrack->SetPidLikeMU(prob[CbmTrdSetTracksPidLike::kMuon]);
-    
+
   }
 }
 // -------------------------------------------------------------------------
@@ -342,21 +342,21 @@ Double_t CbmTrdSetTracksPidLike::GetProbability(Int_t k, Double_t mom, Double_t 
 {
   //
   // Gets the Probability of having dedx at a given momentum (mom)
-  // and particle type k from the precalculated de/dx distributions 
+  // and particle type k from the precalculated de/dx distributions
   //
-  
+
   Int_t    iEnBin = ((Int_t) (dedx/fBinSize+1));
   if(iEnBin > fNBins) iEnBin = fNBins;
 
   if (k < 0 || k > fNParts) {
     return 1;
   }
-  
+
   TH1F* hist1 = 0;
   TH1F* hist2 = 0;
   Double_t mom1 = 0;
   Double_t mom2 = 0;
-  
+
   // Lower limit
   if (mom<=fTrackMomentum[0])  {
     hist1 = (TH1F*) fHistdEdx->At(GetHistID(k,1));
@@ -364,7 +364,7 @@ Double_t CbmTrdSetTracksPidLike::GetProbability(Int_t k, Double_t mom, Double_t 
     mom1 = fTrackMomentum[1];
     mom2 = fTrackMomentum[0];
   }
-    
+
   // Upper Limit
   if(mom>=fTrackMomentum[fNMom-1]) {
     hist2 = (TH1F*) fHistdEdx->At(GetHistID(k,fNMom-1));
@@ -372,7 +372,7 @@ Double_t CbmTrdSetTracksPidLike::GetProbability(Int_t k, Double_t mom, Double_t 
     mom2 = fTrackMomentum[fNMom-1];
     mom1 = fTrackMomentum[fNMom-2];
   }
-    
+
   // In the range
   for (Int_t ip=1; ip<fNMom; ip++) {
     if ((fTrackMomentum[ip-1]<= mom) && (mom<fTrackMomentum[ip])) {
@@ -382,8 +382,8 @@ Double_t CbmTrdSetTracksPidLike::GetProbability(Int_t k, Double_t mom, Double_t 
       mom2 = fTrackMomentum[ip-1];
     }
   }
-  
-  Double_t slop = (hist1->GetBinContent(iEnBin) - hist2->GetBinContent(iEnBin)) 
+
+  Double_t slop = (hist1->GetBinContent(iEnBin) - hist2->GetBinContent(iEnBin))
                 / (mom1 - mom2);
   return hist2->GetBinContent(iEnBin) + slop * (mom - mom2);
 

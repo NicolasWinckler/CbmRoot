@@ -112,8 +112,8 @@ void CbmTrdFitTracksQa::Exec(Option_t* option)
     CbmTrdPoint* pLastPoint = NULL;
     CbmTrdHit* pFirstHit = NULL;
     CbmTrdHit* pLastHit = NULL;
-    FairTrackParam* pFirstParam = NULL;
-    FairTrackParam* pLastParam = NULL;
+    const FairTrackParam* pFirstParam = NULL;
+    const FairTrackParam* pLastParam = NULL;
     CbmTrdTrack* pTrack = NULL;
 
     // Loop over TRD tracks
@@ -134,10 +134,10 @@ void CbmTrdFitTracksQa::Exec(Option_t* option)
 	// Fill chi2/NDF histogramms
         Int_t ndf = pTrack->GetNDF();
 	if(ndf > 0) {
-	    fh_chi2ndf->Fill( pTrack->GetChi2()/(Double_t)ndf );
+	    fh_chi2ndf->Fill( pTrack->GetChiSq()/(Double_t)ndf );
 	}
 
-	if(pTrack->GetNofTrdHits() < 2) continue;
+	if(pTrack->GetNofHits() < 2) continue;
 
         // Get parameters at first and last TRD layer
         pFirstParam = pTrack->GetParamFirst();
@@ -150,9 +150,8 @@ void CbmTrdFitTracksQa::Exec(Option_t* option)
         }
 
         // Get the pointer to TRD point at first and last layer
-        Int_t firstHitIndex = pTrack->GetTrdHitIndex(0);
-        Int_t lastHitIndex = pTrack->
-            GetTrdHitIndex( pTrack->GetNofTrdHits()-1 );
+        Int_t firstHitIndex = pTrack->GetHitIndex(0);
+        Int_t lastHitIndex = pTrack->GetHitIndex( pTrack->GetNofHits()-1 );
         pFirstHit = (CbmTrdHit*) fArrayTrdHit->At(firstHitIndex);
         pLastHit = (CbmTrdHit*) fArrayTrdHit->At(lastHitIndex);
         if(NULL==pFirstHit || NULL==pLastHit) {

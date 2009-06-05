@@ -18,6 +18,8 @@
 #include <vector>
 #include <map>
 
+class CbmStsTrack;
+
 using std::cout;
 using std::endl;
 using std::map;

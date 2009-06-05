@@ -149,7 +149,7 @@ Int_t CbmL1TofMerger::DoMerge(TClonesArray* glbTracks,
 	    }
 
 	    // Set track parameters
-	    kfTrack.SetTrackParam(*trdTrack->GetParamLast());
+	    kfTrack.SetTrackParam(*(const_cast<FairTrackParam*>(trdTrack->GetParamLast())));
 	    chi2min = 1e16;
 	    indexOfClosest = -1;
 

@@ -1,31 +1,23 @@
 // -------------------------------------------------------------------------
 // -----                    CbmGlobalTrack header file                 -----
 // -----                  Created 01/12/05  by V. Friese               -----
+// -----                  Modified 04/06/09  by A. Lebedev             -----
 // -------------------------------------------------------------------------
-
 
 /**  CbmGlobalTrack.h
  *@author V.Friese <v.friese@gsi.de>
  **
  ** Data class for Global CBM track. Data level RECO.
- ** It consists of local tracks in STS and TRD and a RICH ring. 
- ** 
+ ** It consists of local tracks in STS, MUCH and TRD and a RICH ring.
+ **
  **/
 
-
-#ifndef CBMGLOBALTRACK_H
-#define CBMGLOBALTRACK_H 1
-
+#ifndef CBMGLOBALTRACK_H_
+#define CBMGLOBALTRACK_H_ 1
 
 #include "FairTrackParam.h"
 
 #include "TObject.h"
-
-class CbmStsTrack;
-class CbmTrdTrack;
-class CbmRichRing;
-
-
 
 class CbmGlobalTrack : public TObject
 {
@@ -43,10 +35,11 @@ class CbmGlobalTrack : public TObject
   /** Accessors **/
   Int_t GetStsTrackIndex()  const { return fStsTrack; }
   Int_t GetTrdTrackIndex()  const { return fTrdTrack; }
+  Int_t GetMuchTrackIndex()  const { return fMuchTrack; }
   Int_t GetRichRingIndex()  const { return fRichRing; }
   Int_t GetTofHitIndex()    const { return fTofHit;   }
-  FairTrackParam* GetParamFirst()       { return &fParamFirst;   }
-  FairTrackParam* GetParamLast()       { return &fParamLast;   }
+  const FairTrackParam* GetParamFirst() const { return &fParamFirst;   }
+  const FairTrackParam* GetParamLast() const { return &fParamLast;   }
   Int_t GetPidHypo()        const { return fPidHypo;  }
   Double_t GetChi2()        const { return fChi2;     }
   Int_t GetNDF()            const { return fNDF;      }
@@ -57,10 +50,11 @@ class CbmGlobalTrack : public TObject
   /** Modifiers **/
   void SetStsTrackIndex(Int_t iSts)  { fStsTrack = iSts;  }
   void SetTrdTrackIndex(Int_t iTrd)  { fTrdTrack = iTrd;  }
+  void SetMuchTrackIndex(Int_t iMuch)  { fMuchTrack = iMuch;  }
   void SetRichRingIndex(Int_t iRing) { fRichRing = iRing; }
   void SetTofHitIndex(Int_t iTofHit) { fTofHit = iTofHit; }
-  void SetParamFirst(FairTrackParam& parFirst)  { fParamFirst    = parFirst;   }
-  void SetParamLast(FairTrackParam& parLast)  { fParamLast    = parLast;   }
+  void SetParamFirst(const FairTrackParam* parFirst) { fParamFirst = *parFirst;}
+  void SetParamLast(const FairTrackParam* parLast) { fParamLast = *parLast;}
   void SetPidHypo(Int_t iPid)        { fPidHypo  = iPid;  }
   void SetChi2(Double_t chi2)        { fChi2     = chi2;  }
   void SetNDF(Int_t ndf)             { fNDF      = ndf;   }
@@ -69,14 +63,15 @@ class CbmGlobalTrack : public TObject
 
 
   /** Output to screen **/
-  void Print();
+  void Print() const;
 
 
  private:
 
-  /** Indices of local StsTrack, TrdTrack, RichRing and TofHit **/
+  /** Indices of local StsTrack, TrdTrack, MuchTrack, RichRing and TofHit **/
   Int_t fStsTrack;
   Int_t fTrdTrack;
+  Int_t fMuchTrack;
   Int_t fRichRing;
   Int_t fTofHit;
 
@@ -100,7 +95,7 @@ class CbmGlobalTrack : public TObject
   Double32_t fLength;
 
 
-  ClassDef(CbmGlobalTrack,1);
+  ClassDef(CbmGlobalTrack, 2);
 
 };
 

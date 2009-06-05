@@ -102,9 +102,9 @@ Int_t CbmTrdTrackFitterKF_CA::DoFit(CbmTrdTrack* pTrack)
     Double_t eLoss = 0.;
 
     // Loop over TRD hits of the track
-    for(Int_t iHit = 0; iHit < pTrack->GetNofTrdHits(); iHit++) {
+    for(Int_t iHit = 0; iHit < pTrack->GetNofHits(); iHit++) {
         // Get current hit index
-        hitIndex = pTrack->GetTrdHitIndex(iHit);
+        hitIndex = pTrack->GetHitIndex(iHit);
         //Get the pointer to the CbmTrdHit
         pHit = (CbmTrdHit*) fArrayTrdHit->At(hitIndex);
         if(NULL == pHit) {
@@ -132,26 +132,26 @@ Int_t CbmTrdTrackFitterKF_CA::DoFit(CbmTrdTrack* pTrack)
 
     fKfTrack->GetRefChi2() = 0.;
     fKfTrack->GetRefNDF() = 0;
-    fKfTrack->SetTrackParam( *pTrack->GetParamLast() );
+    fKfTrack->SetTrackParam( *(const_cast<FairTrackParam*>(pTrack->GetParamLast())) );
     fKfTrack->SetPID(fPid);
 
     fKfTrack->Fit(0);
     fKfTrack->Fit(1);
     fKfTrack->Fit(0);
     // Store parameters at first layer
-    fKfTrack->GetTrackParam(*pTrack->GetParamFirst());
+    fKfTrack->GetTrackParam(*(const_cast<FairTrackParam*>(pTrack->GetParamFirst())));
     if(fVerbose > 2) {
         pTrack->GetParamFirst()->Print();
     }
     fKfTrack->Fit(1);
     // Store parameters at last layer
-    fKfTrack->GetTrackParam(*pTrack->GetParamLast());
+    fKfTrack->GetTrackParam(*(const_cast<FairTrackParam*>(pTrack->GetParamLast())));
     if(fVerbose > 2) {
         pTrack->GetParamLast()->Print();
     }
 
     // Store chi2 of fit
-    pTrack->SetChi2(fKfTrack->GetRefChi2());
+    pTrack->SetChiSq(fKfTrack->GetRefChi2());
     pTrack->SetNDF(fKfTrack->GetRefNDF());
 
     // Store accumulated TR energy loss
@@ -166,7 +166,7 @@ Int_t CbmTrdTrackFitterKF_CA::DoFit(CbmTrdTrack* pTrack)
     fKfTrack->fHits.clear();
 
     if(fVerbose > 1) {
-        cout << "TRD track fitted. chi2/ndf = " << pTrack->GetChi2()/pTrack->GetNDF()
+        cout << "TRD track fitted. chi2/ndf = " << pTrack->GetChiSq()/pTrack->GetNDF()
             << endl;
         if(fVerbose > 2) {
             cout << endl << endl;
@@ -181,65 +181,65 @@ Int_t CbmTrdTrackFitterKF_CA::DoFit(CbmTrdTrack* pTrack)
 
 Double_t CbmTrdTrackFitterKF_CA::FitToVertex( CbmTrdTrack* track, CbmVertex *vtx, FairTrackParam *v_track )
 {
-   
-   
+
+
       Double_t ret = 100.;
       if( !track || !vtx || !v_track ) return ret;
       FairTrackParam param = *(track->GetParamFirst());
       //CbmKFTrack T( &(track->GetParamFirst()) );
       CbmKFTrack T( param );
-   
+
       T.SetPID( track->GetPidHypo() );
-      T.GetRefChi2() = track->GetChi2();
+      T.GetRefChi2() = track->GetChiSq();
       T.GetRefNDF() = track->GetNDF();
-   
+
       CbmKFVertex V( *vtx );
       T.Fit2Vertex( V );
       T.GetTrackParam( *v_track );
       if( T.GetRefNDF()>0 && T.GetRefChi2()>=0 )
      {
-	
+
 	      ret = T.GetRefChi2()/T.GetRefNDF();
 	      if( finite(ret) ) ret =  sqrt(ret);
      }
-   
+
       return ret;
 }
 
 
 void CbmTrdTrackFitterKF_CA::Extrapolate( CbmTrdTrack* track, Double_t z, FairTrackParam* e_track )
 {
-   
-   
+
+
         if( !track ) return;
         CbmKFTrack T;
         T.SetPID( track->GetPidHypo() );
-        FairTrackParam *fpar = track->GetParamFirst(), *lpar = track->GetParamLast();
-   
-   
-   
-   
+        const FairTrackParam *fpar = track->GetParamFirst(), *lpar = track->GetParamLast();
+
+
+
+
         if( z<=fpar->GetZ() )
      {
-	
-	        T.SetTrackParam( *fpar );
+
+	        T.SetTrackParam( *(const_cast<FairTrackParam*>(fpar)) );
 	        T.Extrapolate( z );
      }
-   
-   
+
+
       else if (z >= lpar->GetZ() )
      {
-	
-	
-	        T.SetTrackParam( *lpar );
+
+
+	        T.SetTrackParam( *(const_cast<FairTrackParam*>(lpar)) );
 	        T.Extrapolate( z );
      }
-   
-   
-   
-   
+
+
+
+
            if( e_track ) T.GetTrackParam( *e_track );
-   
+
 }
 
 

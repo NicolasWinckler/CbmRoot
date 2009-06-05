@@ -137,15 +137,15 @@ Int_t CbmL1TrackMerger::MergeSimple(TClonesArray* stsTracks,
 	glbTrack = new ((*glbTracks)[nGlb]) CbmGlobalTrack();
 	nGlb += 1;
 	// Set STS and TRD track indices
-	glbTrack->SetStsTrackIndex(trdTrack->GetStsTrackIndex());
+	glbTrack->SetStsTrackIndex(trdTrack->GetPreviousTrackId());
 	glbTrack->SetTrdTrackIndex(iTrdTrack);
 	// Mark STS track as used
-        mapStsTrackUsed[trdTrack->GetStsTrackIndex()] = kTRUE;
+        mapStsTrackUsed[trdTrack->GetPreviousTrackId()] = kTRUE;
 	if(fVerbose > 1) {
 	    cout << "-I- CbmL1TrackMerger::MergeSimple" << endl
 		<< "                      global track : " << nGlb-1
 		<< "                         sts track : "
-		<< trdTrack->GetStsTrackIndex() << endl
+		<< trdTrack->GetPreviousTrackId() << endl
 		<< "                         trd track : " << iTrdTrack
                 << endl;
 	}
@@ -332,7 +332,7 @@ Int_t CbmL1TrackMerger::MergeImPlane(TClonesArray* stsTracks,
 	    if(TMath::Abs(dty) > dtx_cut) continue;
 
 	    // Get chi2
-	    chi2XY = GetChi2XY(kfTrack, trdTrack->GetParamFirst());
+	    chi2XY = GetChi2XY(kfTrack, const_cast<FairTrackParam*>(trdTrack->GetParamFirst()));
             // Choose the closest
 	    if(chi2XY < minChi2XY) {
 		minChi2XY = chi2XY;

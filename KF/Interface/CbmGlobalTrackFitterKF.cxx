@@ -143,9 +143,9 @@ void CbmGlobalTrackFitterKF::DoFit(CbmGlobalTrack* glbTrack)
 	    CbmTrdHit* trdHit;
 	    CbmKFTrdHit* kfTrdHit;
 	    // Loop over hits of the TRD track
-	    for(Int_t iTrd = 0; iTrd < trdTrack->GetNofTrdHits(); iTrd++) {
+	    for(Int_t iTrd = 0; iTrd < trdTrack->GetNofHits(); iTrd++) {
 		// Get hit index
-		trdHitIndex = trdTrack->GetTrdHitIndex(iTrd);
+		trdHitIndex = trdTrack->GetHitIndex(iTrd);
 		// Get hit
 		trdHit = (CbmTrdHit*) fArrayTrdHit->At(trdHitIndex);
 		// Create KF hit
@@ -168,10 +168,14 @@ void CbmGlobalTrackFitterKF::DoFit(CbmGlobalTrack* glbTrack)
 	fKfTrack->Fit(0);
         fKfTrack->Fit(1);
 	// Store parameters at the last plane
-	fKfTrack->GetTrackParam(*glbTrack->GetParamLast());
+    FairTrackParam parLast;
+	fKfTrack->GetTrackParam(parLast);
+	glbTrack->SetParamLast(&parLast);
 	fKfTrack->Fit(1);
 	// Store parameters at the first plane
-        fKfTrack->GetTrackParam(*glbTrack->GetParamFirst());
+	    FairTrackParam parFirst;
+        fKfTrack->GetTrackParam(parFirst);
+        glbTrack->SetParamFirst(&parFirst);
 	glbTrack->SetChi2(fKfTrack->GetRefChi2());
 	glbTrack->SetNDF(fKfTrack->GetRefNDF());
 	if(fVerbose > 1) {

@@ -1,6 +1,7 @@
 // -------------------------------------------------------------------------
 // -----                    CbmGlobalTrack source file                 -----
 // -----                  Created 01/12/05  by V. Friese               -----
+// -----                  Modified 04/06/09  by A. Lebedev             -----
 // -------------------------------------------------------------------------
 #include "CbmGlobalTrack.h"
 
@@ -13,7 +14,7 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmGlobalTrack::CbmGlobalTrack() {
-  fStsTrack = fTrdTrack = fRichRing = fTofHit = -1;
+  fStsTrack = fTrdTrack = fMuchTrack = fRichRing = fTofHit = -1;
   fPidHypo = fFlag = fNDF = 0;
   fChi2 = 0.;
   fLength = 0.;
@@ -29,8 +30,8 @@ CbmGlobalTrack::~CbmGlobalTrack() { }
 
 
 // -----   Public method Print   -------------------------------------------
-void CbmGlobalTrack::Print() {
-  cout << endl << "StsTrack " << fStsTrack << ", TrdTrack " << fTrdTrack 
+void CbmGlobalTrack::Print() const {
+  cout << endl << "StsTrack " << fStsTrack << ", TrdTrack " << fTrdTrack << ", MuchTrack " << fMuchTrack
        << ", RichRing " << fRichRing << ", TofHit " << fTofHit << endl;
   cout << "Parameters at first plane: " << endl;
   fParamFirst.Print();

@@ -1354,7 +1354,7 @@ Double_t CbmL1CATrdTrackFinderSA::FitLinear(CbmTrdTrack *tr,
 
 
   //  cout << ">>> Trying to fit a track..." << endl;
-  Int_t noHits = tr->GetNofTrdHits();
+  Int_t noHits = tr->GetNofHits();
   //  cout << "No Hits in the track : " << noHits << endl;
   Int_t iHit;
   CbmTrdHit *hit;
@@ -1375,7 +1375,7 @@ Double_t CbmL1CATrdTrackFinderSA::FitLinear(CbmTrdTrack *tr,
 
   for(int i=0;i<noHits;i++) {
 
-    iHit = tr->GetTrdHitIndex(i);
+    iHit = tr->GetHitIndex(i);
     hit = (CbmTrdHit*)fArrayTrdHit->At(iHit);
 
     C1[i] = hit->GetX();
@@ -1920,9 +1920,9 @@ void CbmL1CATrdTrackFinderSA::CreateTracks(vector<CbmL1TrdTracklet4*> clTracklet
 	  trdInd = (*ikol).M[we];
 	  hit1 = (CbmTrdHit*)fArrayTrdHit->At(trdInd);
 
-	  tr1->AddHit(trdInd, hit1);
+	  tr1->AddHit(trdInd, kTRDHIT);
 	}
-	tr1->SortHits();
+//	tr1->SortHits();
 	//tr1->SetChi2((*ikol).Chi2);
 	//cout << tempTrack.Chi2 << endl;
 
@@ -1946,8 +1946,8 @@ void CbmL1CATrdTrackFinderSA::CreateTracks(vector<CbmL1TrdTracklet4*> clTracklet
 	  //-------------------------------------------------------------
 	  */
 
-	tr1->SetParamFirst(*trParam);
-	tr1->SetParamLast(*trParam);
+	tr1->SetParamFirst(trParam);
+	tr1->SetParamLast(trParam);
 
 	//FitKF(tr1);
 	//  if(tr1->GetChi2() < chiMax){
@@ -1994,7 +1994,7 @@ void CbmL1CATrdTrackFinderSA::CreateTracks(vector<CbmL1TrdTracklet4*> clTracklet
     }
     refittingKF.Stop();
 
-    sort(vTempTrdTrackCand.begin(),vTempTrdTrackCand.end(),CbmTrdTrack::CompareChi2);
+    sort(vTempTrdTrackCand.begin(),vTempTrdTrackCand.end(),CompareChi2TrdTrack);
   }
 
   CbmTrdTrack *trCand;
@@ -2010,13 +2010,13 @@ void CbmL1CATrdTrackFinderSA::CreateTracks(vector<CbmL1TrdTracklet4*> clTracklet
     // if(nrLoop == 2) removeUsedHits = false;
 
     if(removeUsedHits) {//RemoveHits
-      Int_t noHitsA = trCand->GetNofTrdHits();
+      Int_t noHitsA = trCand->GetNofHits();
 
       bTrueTrack = true;
       firstHitSunk = 0;
 
       for(int i = 0; i < noHitsA; i++) {
-	iHit = trCand->GetTrdHitIndex(i);
+	iHit = trCand->GetHitIndex(i);
 	iglobalSetUsedHits = globalSetUsedHits.find(iHit);
 
 	if(iglobalSetUsedHits != globalSetUsedHits.end()) {
@@ -2045,7 +2045,7 @@ void CbmL1CATrdTrackFinderSA::CreateTracks(vector<CbmL1TrdTracklet4*> clTracklet
 	new ((*fArrayTrdTrack)[trackArrayInd]) CbmTrdTrack(*trCand);
 	trackArrayInd++;
 	for(int i = 0; i < noHitsA; i++){
-	  iHit = trCand->GetTrdHitIndex(i);
+	  iHit = trCand->GetHitIndex(i);
 	  globalSetUsedHits.insert(iHit);
 	}
 	delete trCand;
@@ -2548,21 +2548,21 @@ void CbmL1CATrdTrackFinderSA::CreateAndManageSegments(vector<CbmL1TrdTracklet4*>
 
     indTrdHit1 = clTrdSeg->GetInd(0);
     hit1 = (CbmTrdHit*)fArrayTrdHit->At(indTrdHit1);
-    tr1->AddHit(indTrdHit1, hit1);
+    tr1->AddHit(indTrdHit1, kTRDHIT);
 
     indTrdHit2 = clTrdSeg->GetInd(1);
     hit2 = (CbmTrdHit*)fArrayTrdHit->At(indTrdHit2);
-    tr1->AddHit(indTrdHit2, hit2);
+    tr1->AddHit(indTrdHit2, kTRDHIT);
 
     indTrdHit3 = clTrdSeg->GetInd(2);
     hit3 = (CbmTrdHit*)fArrayTrdHit->At(indTrdHit3);
-    tr1->AddHit(indTrdHit3, hit3);
+    tr1->AddHit(indTrdHit3, kTRDHIT);
 
     indTrdHit4 = clTrdSeg->GetInd(3);
     hit4 = (CbmTrdHit*)fArrayTrdHit->At(indTrdHit4);
-    tr1->AddHit(indTrdHit4, hit4);
+    tr1->AddHit(indTrdHit4, kTRDHIT);
 
-    tr1->SortHits();
+//    tr1->SortHits();
 
     new ((*fArrayTrdTrack)[trackArrayInd]) CbmTrdTrack(*tr1);
 
@@ -2579,21 +2579,21 @@ void CbmL1CATrdTrackFinderSA::CreateAndManageSegments(vector<CbmL1TrdTracklet4*>
 
     indTrdHit1 = clTrdSeg->GetInd(0);
     hit1 = (CbmTrdHit*)fArrayTrdHit->At(indTrdHit1);
-    tr1->AddHit(indTrdHit1, hit1);
+    tr1->AddHit(indTrdHit1, kTRDHIT);
 
     indTrdHit2 = clTrdSeg->GetInd(1);
     hit2 = (CbmTrdHit*)fArrayTrdHit->At(indTrdHit2);
-    tr1->AddHit(indTrdHit2, hit2);
+    tr1->AddHit(indTrdHit2, kTRDHIT);
 
     indTrdHit3 = clTrdSeg->GetInd(2);
     hit3 = (CbmTrdHit*)fArrayTrdHit->At(indTrdHit3);
-    tr1->AddHit(indTrdHit3, hit3);
+    tr1->AddHit(indTrdHit3, kTRDHIT);
 
     indTrdHit4 = clTrdSeg->GetInd(3);
     hit4 = (CbmTrdHit*)fArrayTrdHit->At(indTrdHit4);
-    tr1->AddHit(indTrdHit4, hit4);
+    tr1->AddHit(indTrdHit4, kTRDHIT);
 
-    tr1->SortHits();
+//    tr1->SortHits();
 
     new ((*fArrayTrdTrack)[trackArrayInd]) CbmTrdTrack(*tr1);
 
@@ -2610,21 +2610,21 @@ void CbmL1CATrdTrackFinderSA::CreateAndManageSegments(vector<CbmL1TrdTracklet4*>
 
     indTrdHit1 = clTrdSeg->GetInd(0);
     hit1 = (CbmTrdHit*)fArrayTrdHit->At(indTrdHit1);
-    tr1->AddHit(indTrdHit1, hit1);
+    tr1->AddHit(indTrdHit1, kTRDHIT);
 
     indTrdHit2 = clTrdSeg->GetInd(1);
     hit2 = (CbmTrdHit*)fArrayTrdHit->At(indTrdHit2);
-    tr1->AddHit(indTrdHit2, hit2);
+    tr1->AddHit(indTrdHit2, kTRDHIT);
 
     indTrdHit3 = clTrdSeg->GetInd(2);
     hit3 = (CbmTrdHit*)fArrayTrdHit->At(indTrdHit3);
-    tr1->AddHit(indTrdHit3, hit3);
+    tr1->AddHit(indTrdHit3, kTRDHIT);
 
     indTrdHit4 = clTrdSeg->GetInd(3);
     hit4 = (CbmTrdHit*)fArrayTrdHit->At(indTrdHit4);
-    tr1->AddHit(indTrdHit4, hit4);
+    tr1->AddHit(indTrdHit4, kTRDHIT);
 
-    tr1->SortHits();
+//    tr1->SortHits();
 
     new ((*fArrayTrdTrack)[trackArrayInd]) CbmTrdTrack(*tr1);
 
@@ -2658,10 +2658,10 @@ Double_t CbmL1CATrdTrackFinderSA::Fit(CbmTrdTrack *tr)
   Double_t yS1 = 0;
   Double_t yS2 = 0;
 
-  Int_t noHits = tr->GetNofTrdHits();
+  Int_t noHits = tr->GetNofHits();
 
   for(int i = 0; i < noHits; i++){
-    iHit = tr->GetTrdHitIndex(i);
+    iHit = tr->GetHitIndex(i);
 
     pHit[i]  = (CbmTrdHit*) fArrayTrdHit->At(iHit);
   }
@@ -2991,10 +2991,10 @@ Double_t CbmL1CATrdTrackFinderSA::FitKF(CbmTrdTrack* pTrack) {
   Double_t eLoss = 0.;
 
   // Loop over TRD hits of the track
-  Int_t nTracks = pTrack->GetNofTrdHits();
+  Int_t nTracks = pTrack->GetNofHits();
   for(Int_t iHit = 0; iHit < nTracks; iHit++) {
     // Get current hit index
-    hitIndex = pTrack->GetTrdHitIndex(iHit);
+    hitIndex = pTrack->GetHitIndex(iHit);
     //Get the pointer to the CbmTrdHit
     pHit = (CbmTrdHit*) fArrayTrdHit->At(hitIndex);
     // Accumulate TR energy loss
@@ -3009,15 +3009,15 @@ Double_t CbmL1CATrdTrackFinderSA::FitKF(CbmTrdTrack* pTrack) {
 
   fKfTrack->GetRefChi2() = 0.;
   fKfTrack->GetRefNDF() = 0;
-  fKfTrack->SetTrackParam(*pTrack->GetParamLast());
+  fKfTrack->SetTrackParam(*(const_cast<FairTrackParam*>(pTrack->GetParamLast())));
 
   fKfTrack->Fit();
   // Store parameters at first layer
-  fKfTrack->GetTrackParam(*pTrack->GetParamFirst());
+  fKfTrack->GetTrackParam(*(const_cast<FairTrackParam*>(pTrack->GetParamFirst())));
   // Store parameters at last layer
-  fKfTrack->GetTrackParam(*pTrack->GetParamLast());
+  fKfTrack->GetTrackParam(*(const_cast<FairTrackParam*>(pTrack->GetParamLast())));
   // Store chi2 of fit
-  pTrack->SetChi2(fKfTrack->GetRefChi2());
+  pTrack->SetChiSq(fKfTrack->GetRefChi2());
   pTrack->SetNDF(fKfTrack->GetRefNDF());
 
   // Store accumulated TR energy loss

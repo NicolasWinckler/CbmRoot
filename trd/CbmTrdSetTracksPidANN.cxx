@@ -219,14 +219,14 @@ void CbmTrdSetTracksPidANN::Exec(Option_t* opt) {
 
 		CbmTrdTrack* pTrack = (CbmTrdTrack*)fTrackArray->At(iTrack);
 
-		if (pTrack->GetNofTrdHits() < 6 || pTrack->GetNofTrdHits() > 12) {
+		if (pTrack->GetNofHits() < 6 || pTrack->GetNofHits() > 12) {
 			fNofTracks++;
 			pTrack->SetPidANN(-2);
 			continue;
 		}
 
-		for (Int_t iTRD=0; iTRD < pTrack->GetNofTrdHits(); iTRD++) {
-			Int_t TRDindex = pTrack->GetTrdHitIndex(iTRD);
+		for (Int_t iTRD=0; iTRD < pTrack->GetNofHits(); iTRD++) {
+			Int_t TRDindex = pTrack->GetHitIndex(iTRD);
 			CbmTrdHit* trdHit = (CbmTrdHit*) fTrdHitArray->At(TRDindex);
 			eLossVector.push_back(trdHit->GetELoss());
 		}

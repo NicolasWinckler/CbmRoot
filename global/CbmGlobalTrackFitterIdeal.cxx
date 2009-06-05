@@ -85,16 +85,16 @@ void CbmGlobalTrackFitterIdeal::DoFit(CbmGlobalTrack* glbTrack)
 	if(NULL == stsTrack) {
             return;
 	}
-        glbTrack->SetParamFirst(*stsTrack->GetParamFirst());
-        glbTrack->SetParamLast(*stsTrack->GetParamLast());
+        glbTrack->SetParamFirst(stsTrack->GetParamFirst());
+        glbTrack->SetParamLast(stsTrack->GetParamLast());
     } else if(glbTrack->GetStsTrackIndex() < 0 &&
 	      glbTrack->GetTrdTrackIndex() >= 0) {
 	CbmTrdTrack* trdTrack = (CbmTrdTrack*) fArrayTrdTrack->At(glbTrack->GetTrdTrackIndex());
 	if(NULL == trdTrack) {
             return;
 	}
-        glbTrack->SetParamFirst(*trdTrack->GetParamFirst());
-        glbTrack->SetParamLast(*trdTrack->GetParamLast());
+        glbTrack->SetParamFirst(trdTrack->GetParamFirst());
+        glbTrack->SetParamLast(trdTrack->GetParamLast());
     } else {
 	CbmStsTrack* stsTrack = (CbmStsTrack*) fArrayStsTrack->At(glbTrack->GetStsTrackIndex());
 	if(NULL == stsTrack) {
@@ -104,8 +104,8 @@ void CbmGlobalTrackFitterIdeal::DoFit(CbmGlobalTrack* glbTrack)
 	if(NULL == trdTrack) {
             return;
 	}
-        glbTrack->SetParamFirst(*stsTrack->GetParamFirst());
-        glbTrack->SetParamLast(*trdTrack->GetParamLast());
+        glbTrack->SetParamFirst(stsTrack->GetParamFirst());
+        glbTrack->SetParamLast(trdTrack->GetParamLast());
     }
 }
 // ------------------------------------------------------------------

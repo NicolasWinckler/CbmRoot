@@ -234,9 +234,9 @@ void CbmMuchSegmentManual::SegmentMuch(){
 
   f->Close();
 
-  Print();
-
   DrawSegmentation();
+
+  Print();
 }
 // -------------------------------------------------------------------------
 

@@ -69,6 +69,12 @@ class CbmMuchDigiMatch : public TObject
    */
   UInt_t GetCharge(Int_t i) const;
 
+  /**
+   * Gets total charge from a all MC points contributed to the digi.
+   * @value Total charge from the corresponding [electrons]
+   */
+  UInt_t GetTotalCharge() const;
+
 
  private:
 

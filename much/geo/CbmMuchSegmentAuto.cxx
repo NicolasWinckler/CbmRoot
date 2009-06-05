@@ -501,21 +501,24 @@ void CbmMuchSegmentAuto::DrawSegmentation(){
   Int_t colors[] = {kGreen, kBlue, kViolet, kRed, kYellow, kOrange, kMagenta, kCyan,  kSpring, kPink, kAzure, kTeal,
       kGreen+10, kBlue+10, kViolet+10, kRed+10, kYellow+10, kOrange+10, kMagenta+10, kCyan+10,  kSpring+10, kPink+10, kAzure+10, kTeal+10};
 
-  CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-  geoScheme->Init(fStations);
-
-  vector<CbmMuchModule*> modules = geoScheme->GetModules();
   Double_t secMinLx = std::numeric_limits<Double_t>::max();
   Double_t secMinLy = std::numeric_limits<Double_t>::max();
-  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!= modules.end(); it++){
-    CbmMuchModule* mod = (*it);
-    if(mod->GetDetectorType()!= 1) continue;
-    CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
-    for(Int_t iSector=0;iSector<module->GetNSectors();++iSector){
-      CbmMuchSector* sector = module->GetSector(iSector);
-      if(sector->GetSize()[0] < secMinLx) secMinLx = sector->GetSize()[0];
-      if(sector->GetSize()[1] < secMinLy) secMinLy = sector->GetSize()[1];
-    }
+  for(Int_t iStation=0; iStation < fNStations; ++iStation){
+    CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);
+    CbmMuchLayer* layer = station->GetLayer(0);
+    for (Int_t iSide=1;iSide>=0;iSide--){
+      CbmMuchLayerSide* side = layer->GetSide(iSide);
+      for (Int_t iModule=0;iModule<side->GetNModules();++iModule) {
+        CbmMuchModule* mod = side->GetModule(iModule);
+        if(mod->GetDetectorType()!= 1) continue;
+        CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
+        for(Int_t iSector=0;iSector<module->GetNSectors();++iSector){
+          CbmMuchSector* sector = module->GetSector(iSector);
+          if(sector->GetSize()[0] < secMinLx) secMinLx = sector->GetSize()[0];
+          if(sector->GetSize()[1] < secMinLy) secMinLy = sector->GetSize()[1];
+        }
+      } // modules
+    } // sides
   }
 
   for (Int_t iStation=0;iStation<fStations->GetEntriesFast();++iStation){
@@ -525,7 +528,7 @@ void CbmMuchSegmentAuto::DrawSegmentation(){
     fprintf(outfile, "----------------------------------------------------------------------------\n");
     TCanvas* c1 = new TCanvas(Form("station%i",iStation+1),Form("station%i",iStation+1),800,800);
     c1->SetFillColor(0);
-    c1->Range(-250,-250,250,250);//(-27,-2,0,25);
+    c1->Range(-250,-250,250,250);
     CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);
     CbmMuchLayer* layer = station->GetLayer(0);
     for (Int_t iSide=1;iSide>=0;iSide--){

@@ -198,6 +198,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
   Double_t sinphi_tr = deltaY / hypotenuse; // sin of track azim. angle
 
   map<Int_t, CbmMuchDigi*> chargedPads;     // map from a channel id within the module to a fired digi
+  map<Int_t, CbmMuchDigiMatch*> chargedMatches;     // the same for digimatch
   Double_t time = point->GetTime();
   UInt_t nTrackCharge = 0;                  // total charge left by a track
   for (Int_t iElectron = 0; iElectron < nElectrons; iElectron++) {
@@ -243,16 +244,16 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
 
         TPolyLine* padPolygon = sector->GetPad(iChannel);
         Double_t area;
-        if (!PolygonsIntersect(sector, *padPolygon, spotPolygon, area))
-          continue; // detailed search
+        if (!PolygonsIntersect(sector, *padPolygon, spotPolygon, area))  continue; // detailed search
         UInt_t iCharge = (UInt_t) (nSecElectrons * area / spotArea);
         Int_t channelId = CbmMuchModuleGem::GetChannelId(iSector, iChannel); // channel id within the module
 
-        if (chargedPads.find(channelId) == chargedPads.end()) {
-          chargedPads[channelId] = new CbmMuchDigi(detectorId,
-              channelId, time, fDTime);
+        if (chargedMatches.find(channelId) == chargedMatches.end()) {
+          chargedPads[channelId] = new CbmMuchDigi(detectorId, channelId, time, fDTime);
+          chargedMatches[channelId] = new CbmMuchDigiMatch();
         }
-        chargedPads[channelId]->AddCharge(iCharge); // add charge to digi
+        chargedMatches[channelId]->AddPoint(iPoint);
+        chargedMatches[channelId]->AddCharge(iCharge); // add charge to digimatch
       } // loop channels
     } // loop fired sectors
   } // loop primary electrons
@@ -262,24 +263,21 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
     return kFALSE;
   }
 
-  for (map<Int_t, CbmMuchDigi*>::iterator it = chargedPads.begin(); it
-  != chargedPads.end(); it++) {
+  for (map<Int_t, CbmMuchDigiMatch*>::iterator it = chargedMatches.begin(); it
+  != chargedMatches.end(); it++) {
     Int_t channelId = (*it).first;                      // Channel id within the module
     pair<Int_t, Int_t> uniqueId(detectorId, channelId); // Unique channel id within the MUCH
-    CbmMuchDigi* digi = (*it).second;
-    if (!digi)
-      continue;
-    Int_t iCharge = digi->GetCharge();
+    CbmMuchDigiMatch* match = (*it).second;
+    CbmMuchDigi* digi = chargedPads[channelId];
+    if (!match || ! digi)  continue;
+    Int_t iCharge = match->GetTotalCharge();
     if (iCharge < 0)
       iCharge = (Int_t) (TMath::Power(2, 31) - 2);
     if (fChargedPads.find(uniqueId) == fChargedPads.end()) {
       fChargedPads[uniqueId] = new CbmMuchDigi(digi);
-      fChargedMatches[uniqueId] = new CbmMuchDigiMatch();
-      fChargedMatches[uniqueId]->AddPoint(iPoint);
-      fChargedMatches[uniqueId]->AddCharge(iCharge);
+      fChargedMatches[uniqueId] = new CbmMuchDigiMatch(match);
     } else {
       fChargedPads[uniqueId]->AddTime(time);
-      fChargedPads[uniqueId]->AddCharge(iCharge);
       fChargedMatches[uniqueId]->AddPoint(iPoint);
       fChargedMatches[uniqueId]->AddCharge(iCharge);
       fNMulti++;
@@ -290,6 +288,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
   }
 
   chargedPads.clear();
+  chargedMatches.clear();
 
   return kTRUE;
   //**************  Simulate avalanche (end) **********************************//
@@ -429,8 +428,7 @@ void CbmMuchDigitizeAdvancedGem::Reset() {
 // -----   Private method FirePads   ---------------------------------------
 void CbmMuchDigitizeAdvancedGem::FirePads() {
   // Add electronics noise
-  if (fMeanNoise)
-    AddNoise();
+  if (fMeanNoise) AddNoise();
 
   // Apply threshold
   for (map<pair<Int_t, Int_t> , CbmMuchDigi*>::iterator it =
@@ -438,11 +436,11 @@ void CbmMuchDigitizeAdvancedGem::FirePads() {
     pair<Int_t, Int_t> uniqueId = (*it).first;
     CbmMuchDigi* digi = (*it).second;
     CbmMuchDigiMatch* match = fChargedMatches[uniqueId];
-    if (digi->GetCharge() > fQThreshold) {
+    if (match->GetTotalCharge() > fQThreshold) {
       Int_t iDigi = -1;
       if (fChannelMap.find(uniqueId) == fChannelMap.end()) {
         iDigi = fDigis->GetEntriesFast();
-        digi->SetADCCharge(digi->GetCharge() / fNADCChannels);
+        digi->SetADCCharge(match->GetTotalCharge() / fNADCChannels);
         new ((*fDigis)[iDigi]) CbmMuchDigi(digi);
         new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch(match);
         fChannelMap[uniqueId] = iDigi;
@@ -483,7 +481,6 @@ void CbmMuchDigitizeAdvancedGem::AddNoise(CbmMuchPad* pad) {
     fChargedMatches[uniqueId] = new CbmMuchDigiMatch();
   }
   fChargedMatches[uniqueId]->AddCharge(iCharge);
-  fChargedPads[uniqueId]->AddCharge(iCharge);
 }
 // -------------------------------------------------------------------------
 

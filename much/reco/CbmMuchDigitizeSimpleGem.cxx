@@ -148,16 +148,17 @@ Bool_t CbmMuchDigitizeSimpleGem::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
   Int_t channelId = CbmMuchModuleGem::GetChannelId(iSector, iChannel); // Channel id within the module
   pair<Int_t, Int_t> uniqueId(detectorId, channelId);                  // Unique id of the channel within the MUCH
   Int_t iDigi = -1;
+  CbmMuchDigiMatch* match;
   if (fChannelMap.find(uniqueId) == fChannelMap.end()) {
     // Channel not yet active. Create new Digi and Match.
     iDigi = fDigis->GetEntriesFast();
     Double_t time = point->GetTime() + gRandom->Gaus(0, fDTime);
     new ((*fDigis)[iDigi]) CbmMuchDigi(detectorId, channelId, time, fDTime);
     new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch();
-    CbmMuchDigiMatch* match =
-      dynamic_cast<CbmMuchDigiMatch*> (fDigiMatches->At(iDigi));
-      if (match)
+    match = dynamic_cast<CbmMuchDigiMatch*> (fDigiMatches->At(iDigi));
+      if (match){
         match->AddPoint(iPoint);
+      }
       // Match channelId to index of the Digi.
       fChannelMap[uniqueId] = iDigi;
   } else {
@@ -166,13 +167,15 @@ Bool_t CbmMuchDigitizeSimpleGem::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
     CbmMuchDigi* digi = dynamic_cast<CbmMuchDigi*> (fDigis->At(iDigi));
     Double_t time = point->GetTime() + gRandom->Gaus(0, fDTime);
     digi->AddTime(time); // add time info
-    CbmMuchDigiMatch* match =
-      dynamic_cast<CbmMuchDigiMatch*> (fDigiMatches->At(iDigi));
+    match = dynamic_cast<CbmMuchDigiMatch*> (fDigiMatches->At(iDigi));
       if (match) {
         match->AddPoint(iPoint);
         fNMulti++;
       }
   }
+
+  CbmMuchDigi* digi = dynamic_cast<CbmMuchDigi*> (fDigis->At(iDigi));
+  if(digi) digi->SetADCCharge(100);
 
   return kTRUE;
 }

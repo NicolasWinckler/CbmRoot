@@ -53,23 +53,18 @@ class CbmMuchDigi : public TObject
   Double_t  GetTime(Int_t i)       { return fTime[i]; }
   Double_t* GetTimes()             { return fTime; }
   Double_t  GetDTime()             { return fDTime; }
-  /** Gets charge collected by the channel. **/
-  UInt_t GetCharge()        const  { return fCharge; }
   /** Gets charge in ADC channels collected by the channel. **/
   UInt_t GetADCCharge()     const  {return fADCCharge; }
   /** Sets charge in ADC channels collected by the channel. **/
   void SetADCCharge(UInt_t adcCharge) { fADCCharge = adcCharge; }
   /** Adds one more time information **/
   Int_t AddTime(Double_t time);
-  /** Adds charge to digi **/
-  UInt_t AddCharge(UInt_t iCharge);
 
 
  private:
 
   Int_t    fDetectorId;      // Detector Id (including module number)
   Int_t    fChannelId;       // Channel Id within the module
-  UInt_t   fCharge;          // Charge for the digi
   UInt_t   fADCCharge;       // Charge for the digi in ADC channels
   Double_t fTime[3];         // Time since event start [ns]
   Double_t fDTime;           // Time resolution [ns]

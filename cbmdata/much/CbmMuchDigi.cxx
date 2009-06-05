@@ -7,7 +7,6 @@
  ** Data class for digital MUCH information
  ** Data level: RAW
  **
- **
  **/
 
 #include "CbmMuchDigi.h"
@@ -21,7 +20,6 @@ using std::endl;
 CbmMuchDigi::CbmMuchDigi() {
   fDetectorId   =  0;
   fChannelId = 0;
-  fCharge = 0;
   fTime[0] = fTime[1] = fTime[2] = -1;
   fDTime = 8e-2;
 }
@@ -31,7 +29,7 @@ CbmMuchDigi::CbmMuchDigi() {
 CbmMuchDigi::CbmMuchDigi(Int_t detectorId, Int_t channelId, Double_t time, Double_t dTime) {
   fDetectorId = detectorId;
   fChannelId = channelId;
-  fCharge = fADCCharge = 0;
+  fADCCharge = 0;
   fDTime = dTime;
   fTime[0] = time;
   fTime[1] = fTime[2] = -1;
@@ -42,7 +40,6 @@ CbmMuchDigi::CbmMuchDigi(Int_t detectorId, Int_t channelId, Double_t time, Doubl
 CbmMuchDigi::CbmMuchDigi(CbmMuchDigi* digi){
   fDetectorId = digi->GetDetectorId();
   fChannelId  = digi->GetChannelId();
-  fCharge     = digi->GetCharge();
   fADCCharge  = digi->GetADCCharge();
   fDTime      = digi->GetDTime();
   for(int i=0;i<3;i++){
@@ -71,11 +68,6 @@ Int_t CbmMuchDigi::AddTime(Double_t time) {
     }
   }
   return 4;
-}
-// -------------------------------------------------------------------------
-UInt_t CbmMuchDigi::AddCharge(UInt_t iCharge) {
-  fCharge += iCharge;
-  return fCharge;
 }
 
 ClassImp(CbmMuchDigi)

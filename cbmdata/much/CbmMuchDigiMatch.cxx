@@ -3,7 +3,7 @@
  **@since   23.03.07
  **@version 1.0
  **
- ** Data class for matching CbmMuchDigi with CbmMuchPoint. 
+ ** Data class for matching CbmMuchDigi with CbmMuchPoint.
  ** The indizes of CbmMuchDigi and CbmMuchDigiMatch correspond in their
  ** respective arrays.
  ** The class holds the indices of all MuchPoints corresponding to
@@ -50,7 +50,7 @@ CbmMuchDigiMatch::~CbmMuchDigiMatch() { };
 // -----   Public method AddPoint   ----------------------------------------
 Int_t CbmMuchDigiMatch::AddPoint(Int_t iPoint) {
   if ( iPoint < 0 ) {
-    cout << "-W- CbmMuchDigiMatch::AddPoint: Illegal MuchPoint index " 
+    cout << "-W- CbmMuchDigiMatch::AddPoint: Illegal MuchPoint index "
 	 << iPoint << endl;
     return 0;
   }
@@ -75,7 +75,7 @@ Int_t CbmMuchDigiMatch::GetRefIndex(Int_t i) const {
 // -----   Public method AddCharge  ----------------------------------------
 UInt_t CbmMuchDigiMatch::AddCharge(UInt_t iCharge) {
   if ( iCharge < 0 ) {
-    cout << "-W- CbmMuchDigiMatch::AddCharge: Illegal charge value " 
+    cout << "-W- CbmMuchDigiMatch::AddCharge: Illegal charge value "
 	 << iCharge << endl;
     return 0;
   }
@@ -94,7 +94,17 @@ UInt_t CbmMuchDigiMatch::GetCharge(Int_t i) const {
     return 0;
   }
   return fCharge.At(i);
-}  
+}
+// -------------------------------------------------------------------------
+
+// -----   Public method GetTotalCharge  -----------------------------------
+UInt_t CbmMuchDigiMatch::GetTotalCharge() const {
+  UInt_t totCharge = 0;
+  for(Int_t iRef = 0; iRef < GetNPoints(); ++iRef){
+    totCharge += fCharge.At(iRef);
+  }
+  return totCharge;
+}
 // -------------------------------------------------------------------------
 
 ClassImp(CbmMuchDigiMatch)

@@ -19,6 +19,9 @@
 	//cut on the output value of ANN
 	Double_t ANNCut = 0.98;
 
+	TH1D* fhCumProbSortPi[12];
+	TH1D* fhCumProbSortEl[12];
+
 void coeffCalc(double mom, double* coeff1, double* coeff2) {
 	double momAr[] = { 1., 1.5, 2., 3., 4., 5., 7., 9., 11., 13. };
 	double coeffAr1[] = { 1.04, 1.105, 1.154, 1.277, 1.333, 1.394, 1.47, 1.50,
@@ -45,12 +48,30 @@ void transform1()
 		inVector[j]=TMath::LandauI(inVector[j]);
 }
 
+void transform2()
+{
+	sort(inVector.begin(), inVector.end());
+//	for (Int_t j = 0; j < inVector.size(); j++) {
+//		Int_t binNum = fhCumProbSortEl[j]->FindBin(inVector[j]);
+//		if (binNum > fhCumProbSortEl[j]->GetNbinsX())
+//			binNum = fhCumProbSortEl[j]->GetNbinsX();
+//		inVector[j] = fhCumProbSortEl[j]->GetBinContent(binNum);
+//	}
+
+	for (Int_t j = 0; j < inVector.size(); j++) {
+		Int_t binNum = fhCumProbSortPi[j]->FindBin(inVector[j]);
+		if (binNum > fhCumProbSortPi[j]->GetNbinsX())
+			binNum = fhCumProbSortPi[j]->GetNbinsX();
+		inVector[j] = fhCumProbSortPi[j]->GetBinContent(binNum);
+	}
+}
+
 void trd_elid_trainANN_txt() {
 	///load libraries for neural net
 	if (!gROOT->GetClass("TMultiLayerPerceptron"))
 		gSystem->Load("libMLP");
 
-	TString fileNum = "0002";
+	TString fileNum = "0001";
 	TString geoType = "st";
 	TString inputDir = "/d/cbm02/slebedev/trd/JUN09/"+geoType+"/";
 	TString fileNameEl = inputDir + geoType+"_"+"electrons_mom_"+fileNum+".txt";
@@ -62,6 +83,15 @@ void trd_elid_trainANN_txt() {
 //	TString fileNamePi = "/d/cbm02/slebedev/trd/MAY08/pions_mom_8.txt";
 //	TString fileNameTestEl = "/d/cbm02/slebedev/trd/MAY08/electrons_mom_8.txt";
 //	TString fileNameTestPi = "/d/cbm02/slebedev/trd/MAY08/pions_mom_8.txt";
+
+	TFile* f = new TFile("/d/cbm02/slebedev/trd/JUN09/"+geoType+"/piel."+fileNum+".electronsQa.root", "READ");
+	char hName[50];
+	for (int i = 0; i < fNofLayers; i++) {
+		sprintf(hName, "fhCumProbSortPi%d", i);
+		fhCumProbSortPi[i] = (TH1D*) f->Get(hName);
+		sprintf(hName, "fhCumProbSortEl%d", i);
+		fhCumProbSortEl[i] = (TH1D*) f->Get(hName);
+	}
 
 	//input files for electrons and pions
 	std::ifstream finEl((const char*) fileNameEl);
@@ -107,7 +137,7 @@ void trd_elid_trainANN_txt() {
 			finPi >> mom;
 			x13 = -1.;
 			// coeffCalc(mom, &ANNCoef1, &ANNCoef2);
-			transform1();
+			transform2();
 
 			simu->Fill();
 			NofPi++;
@@ -127,7 +157,7 @@ void trd_elid_trainANN_txt() {
 
 			x13 = 1.;
 			// coeffCalc(mom, &ANNCoef1, &ANNCoef2);
-			transform1();
+			transform2();
 
 			simu->Fill();
 			NofEl++;
@@ -139,7 +169,7 @@ void trd_elid_trainANN_txt() {
 
 	TMultiLayerPerceptron* fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
 	if (doTraining){
-		fNN->Train(250, "+text,update=1");
+		fNN->Train(80, "+text,update=1");
 		fNN->DumpWeights((const char*)mlpWeightsFile);
 	}else{
 		fNN->LoadWeights((const char*)mlpWeightsFile);
@@ -177,7 +207,7 @@ void trd_elid_trainANN_txt() {
 			inVector[i] = inVectorTemp[i];
 		finElTest >> mom;
 		//coeffCalc(mom, &ANNCoef1, &ANNCoef2);
-		transform1();
+		transform2();
 
 		for (UInt_t k = 0; k < inVector.size(); k++)
 			params[k] = inVector[k];
@@ -203,7 +233,7 @@ void trd_elid_trainANN_txt() {
 		finPiTest >> mom;
 
 		//coeffCalc(mom, &ANNCoef1, &ANNCoef2);
-		transform1();
+		transform2();
 
 		for (UInt_t k = 0; k < inVector.size(); k++)
 			params[k] = inVector[k];
@@ -223,8 +253,12 @@ void trd_elid_trainANN_txt() {
 	cout <<"NofPi = " <<NofPiTest<<endl;
 	cout <<"Pi like El = " <<NofPiLikeEl<<endl;
 	cout <<"El like Pi = " <<NofElLikePi<<endl;
-	cout << "Pion supression = "<< NofPiTest<< "/"<< NofPiLikeEl<< " = "
-			<< (double) NofPiTest / NofPiLikeEl << endl;
+	cout << "Pion supression = "<< NofPiTest<< "/"<< NofPiLikeEl<< " = ";
+	if (NofPiLikeEl != 0){
+		cout<< (double) NofPiTest / NofPiLikeEl << endl;
+	}else {
+		cout<< " no misidentified pi" << endl;
+	}
 	cout << "Electron efficiency loss in % = " << NofElLikePi << "/"
 			<< NofElTest << " = " << (double) NofElLikePi/NofElTest *100
 			<< endl;

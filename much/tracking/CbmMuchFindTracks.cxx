@@ -15,12 +15,11 @@
 #include <iostream>
 
 // -----   Default constructor   -------------------------------------------
-CbmMuchFindTracks::CbmMuchFindTracks()
+CbmMuchFindTracks::CbmMuchFindTracks():
+	fFinder(NULL),
+	fTrackArray(NULL),
+	fNofTracks(0)
 {
-	fFinder = NULL;
-	fMuchPixelHitArray = NULL;
-	fTrackArray = NULL;
-	fNofTracks = 0;
 }
 // -------------------------------------------------------------------------
 
@@ -29,12 +28,11 @@ CbmMuchFindTracks::CbmMuchFindTracks(
 		const char* name,
 		const char* title,
 		CbmMuchTrackFinder* finder)
-: FairTask(name)
+: FairTask(name),
+	fFinder(finder),
+	fTrackArray(NULL),
+	fNofTracks(0)
 {
-	fFinder = finder;
-	fMuchPixelHitArray = NULL;
-	fTrackArray = NULL;
-	fNofTracks = 0;
 }
 // -------------------------------------------------------------------------
 
@@ -54,10 +52,6 @@ InitStatus CbmMuchFindTracks::Init()
 	// Get and check FairRootManager
 	FairRootManager* ioman = FairRootManager::Instance();
 	if (ioman == NULL) Fatal("CbmMuchFindTracks::Init", "RootManager not instantised!");
-
-	// Get MUCH pixel hit Array
-	fMuchPixelHitArray = (TClonesArray*) ioman->GetObject("MuchPixelHit");
-	if (fMuchPixelHitArray == NULL) Fatal("CbmMuchFindTracks::Init", "No MuchPixelHit array!");
 
 	// Create and register MuchTrack array
 	fTrackArray = new TClonesArray("CbmMuchTrack",100);
@@ -90,7 +84,7 @@ void CbmMuchFindTracks::Exec(
 {
   fTrackArray->Delete();
 
-  fNofTracks = fFinder->DoFind(fMuchPixelHitArray, fTrackArray);
+  fNofTracks = fFinder->DoFind(fTrackArray);
 }
 // -------------------------------------------------------------------------
 

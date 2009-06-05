@@ -1,9 +1,10 @@
-/** CbmMuchTrackFinderIdeal
+/** CbmMuchTrackFinderIdeal.cxx
  * @author A.Lebedev <Andrey.Lebedev@gsi.de>
  * @since 2007
  **/
 #include "CbmMuchTrackFinderIdeal.h"
 
+#include "CbmMuchStrawHit.h"
 #include "CbmMuchPixelHit.h"
 #include "CbmMuchTrack.h"
 #include "CbmMuchCluster.h"
@@ -24,11 +25,13 @@
 CbmMuchTrackFinderIdeal::CbmMuchTrackFinderIdeal():
 	fVerbose(1),
 	fEvents(0),
-	fMcTracks(NULL),
-	fMcPoints(NULL),
-	fMuchPixelHits(NULL),
-	fMuchTracks(NULL),
-	fMuchDigiMatches(NULL),
+	fMCTracks(NULL),
+	fMCPoints(NULL),
+	fPixelHits(NULL),
+	fStrawHits(NULL),
+	fTracks(NULL),
+	fPixelDigiMatches(NULL),
+	fStrawDigiMatches(NULL),
 	fClusters(NULL)
 {
 }
@@ -40,84 +43,96 @@ CbmMuchTrackFinderIdeal::~CbmMuchTrackFinderIdeal()
 void CbmMuchTrackFinderIdeal::Init()
 {
 	FairRootManager* ioman = FairRootManager::Instance();
-	if (ioman == NULL) Fatal("Init", "No FairRootManager!");
+	if (ioman == NULL) Fatal("CbmMuchTrackFinderIdeal::Init", "No FairRootManager!");
 
-	fMcTracks  = (TClonesArray*) ioman->GetObject("MCTrack");
-	if (fMcTracks == NULL) Fatal("Init", "No MCTrack array!");
+	fMCTracks  = (TClonesArray*) ioman->GetObject("MCTrack");
+	if (fMCTracks == NULL) Fatal("CbmMuchTrackFinderIdeal::Init", "No MCTrack array!");
 
-	fMcPoints  = (TClonesArray*) ioman->GetObject("MuchPoint");
-	if (fMcPoints == NULL) Fatal("Init", "No MuchPoint array!");
+	fMCPoints  = (TClonesArray*) ioman->GetObject("MuchPoint");
+	if (fMCPoints == NULL) Fatal("CbmMuchTrackFinderIdeal::Init", "No MuchPoint array!");
 
-	fMuchDigiMatches  = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
-	if (fMuchDigiMatches == NULL) Fatal("Init", "No MuchDigiMatches array!");
+	fPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
+	fStrawHits = (TClonesArray*) ioman->GetObject("MuchStrawHit");
+	if (fPixelHits == NULL && fStrawHits == NULL) Fatal("CbmMuchTrackFinderIdeal::Init", "No MuchPixelHit && MuchStrawHit array!");
+
+	fPixelDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
+	fStrawDigiMatches = (TClonesArray*) ioman->GetObject("MuchStrawDigiMatch");
+	if (fPixelDigiMatches == NULL && fStrawDigiMatches == NULL) Fatal("CbmMuchTrackFinderIdeal::Init", "No MuchDigiMatch && MuchStrawDigiMatch array!");
 
 	fClusters = (TClonesArray*) ioman->GetObject("MuchCluster");
-	if (fClusters == NULL) Fatal("Init","No MuchCluster array!");
+	if (fClusters == NULL) Info("CbmMuchTrackFinderIdeal::Init", "No cluster array -- simple hit to digi matching will be used");
 }
 
 Int_t CbmMuchTrackFinderIdeal::DoFind(
-		TClonesArray* hitArray,
         TClonesArray* trackArray)
 {
-	fMuchPixelHits = hitArray;
-	fMuchTracks = trackArray;
+	fTracks = trackArray;
 
-	// MCTrack index to MuchTrack index
-	std::map<Int_t, Int_t> muchTrackMap;
-	Int_t nofMuchTracks = 0;
-	Int_t nofMcTracks = fMcTracks->GetEntriesFast();
-	for (Int_t iMcTrack=0; iMcTrack < nofMcTracks; iMcTrack++) {
-		CbmMCTrack*  pMcTrack = (CbmMCTrack*) fMcTracks->At(iMcTrack);
-		if (pMcTrack == NULL) continue;
-		if (std::abs(pMcTrack->GetPdgCode()) != 13 ) continue;
-		if (pMcTrack->GetMotherId() != -1) continue;
+	fTrackMap.clear();
+	Int_t nofTracks = 0;
+	Int_t nofMCTracks = fMCTracks->GetEntriesFast();
+	for (Int_t iMCTrack=0; iMCTrack < nofMCTracks; iMCTrack++) {
+		CbmMCTrack*  mcTrack = (CbmMCTrack*) fMCTracks->At(iMCTrack);
+		if (mcTrack == NULL) continue;
+		if (std::abs(mcTrack->GetPdgCode()) != 13 ) continue;
+		if (mcTrack->GetMotherId() != -1) continue;
 
-		new((*fMuchTracks)[nofMuchTracks]) CbmMuchTrack();
-		muchTrackMap[iMcTrack] = nofMuchTracks;
-		nofMuchTracks++;
+		new((*fTracks)[nofTracks]) CbmMuchTrack();
+		fTrackMap[iMCTrack] = nofTracks;
+		nofTracks++;
 	}
 
-	Int_t nofMuchHits = fMuchPixelHits->GetEntriesFast();
-	for (Int_t iHit = 0; iHit < nofMuchHits; iHit++) {
-		CbmMuchPixelHit* pHit = (CbmMuchPixelHit*) fMuchPixelHits->At(iHit);
-		if (!pHit) continue;
-
-		Int_t clusterId = pHit->GetRefId();
+	// Process MUCH pixel hits
+	for (Int_t iHit = 0; iHit < fPixelHits->GetEntriesFast(); iHit++) {
+		CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fPixelHits->At(iHit);
+		if (!hit) continue;
+		Int_t clusterId = hit->GetRefId();
 		CbmMuchCluster* cluster = (CbmMuchCluster*) fClusters->At(clusterId);
 		for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
-			Int_t digiIndex = cluster->GetDigiIndex(iDigi);
+			ProcessDigiMatches(fPixelDigiMatches, cluster->GetDigiIndex(iDigi), iHit, kMUCHPIXELHIT);
+		} // loop over digis in cluster
+	} // loop over hits
 
-			CbmMuchDigiMatch* pDigiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
-			if (!pDigiMatch) continue;
-
-			for (Int_t iDigi = 0; iDigi < pDigiMatch->GetNPoints(); iDigi++){
-				Int_t pointIndex = pDigiMatch->GetRefIndex(iDigi);
-				if (pointIndex < 0) continue;
-
-				FairMCPoint* pMcPoint = (FairMCPoint*) (fMcPoints->At(pointIndex));
-				if (pMcPoint == NULL) continue;
-
-				Int_t mcTrackIndex = pMcPoint->GetTrackID();
-				if (mcTrackIndex < 0) continue;
-
-				CbmMCTrack*  pMcTrack = (CbmMCTrack*) fMcTracks->At(mcTrackIndex);
-				if (pMcTrack == NULL) continue;
-
-				if (muchTrackMap.find(mcTrackIndex) == muchTrackMap.end()) continue;
-
-				Int_t muchTrackIndex = muchTrackMap[mcTrackIndex];
-				CbmMuchTrack* pMuchTrack = (CbmMuchTrack*) fMuchTracks->At(muchTrackIndex);
-				pMuchTrack->AddHitIndex(iHit);
-
-				if (pMuchTrack->GetNHits() == 1){
-				 SetTrackParam(pMcTrack, pMcPoint, pMuchTrack);
-				}
-			} // loop over digis
-		} // loop over clusters
+	// Process MUCH straw hits
+	for (Int_t iHit = 0; iHit < fStrawHits->GetEntriesFast(); iHit++) {
+		CbmMuchStrawHit* hit = (CbmMuchStrawHit*) fStrawHits->At(iHit);
+		if (!hit) continue;
+		ProcessDigiMatches(fStrawDigiMatches, hit->GetRefId(), iHit, kMUCHSTRAWHIT);
 	} // loop over hits
 
 	std::cout << "Event: " << fEvents++ << std::endl;
-	return nofMuchTracks;
+	return nofTracks;
+}
+
+void CbmMuchTrackFinderIdeal::ProcessDigiMatches(
+		const TClonesArray* digiMatches,
+		Int_t digiIndex,
+		Int_t hitIndex,
+		HitType hitType)
+{
+	CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) digiMatches->At(digiIndex);
+	if (!digiMatch) return;
+
+	for (Int_t iDigi = 0; iDigi < digiMatch->GetNPoints(); iDigi++){
+		Int_t pointIndex = digiMatch->GetRefIndex(iDigi);
+		if (pointIndex < 0) return;
+		FairMCPoint* mcPoint = (FairMCPoint*) (fMCPoints->At(pointIndex));
+		if (mcPoint == NULL) return;
+		Int_t mcTrackIndex = mcPoint->GetTrackID();
+		if (mcTrackIndex < 0) return;
+		CbmMCTrack*  mcTrack = (CbmMCTrack*) fMCTracks->At(mcTrackIndex);
+		if (mcTrack == NULL) return;
+
+		if (fTrackMap.find(mcTrackIndex) == fTrackMap.end()) continue;
+
+		Int_t trackIndex = fTrackMap[mcTrackIndex];
+		CbmMuchTrack* track = (CbmMuchTrack*) fTracks->At(trackIndex);
+		track->AddHit(hitIndex, hitType);
+
+		if (track->GetNofHits() == 1){
+			SetTrackParam(mcTrack, mcPoint, track);
+		}
+	} // loop over digis
 }
 
 void CbmMuchTrackFinderIdeal::SetTrackParam(
@@ -142,7 +157,8 @@ void CbmMuchTrackFinderIdeal::SetTrackParam(
                                                   cov[12]= 1e-9; cov[13]= 1e-9;
                                                                  cov[14]= 1e-9;
     par.SetCovMatrix(cov);
-    track->SetMuchTrack(&par);
+    track->SetParamLast(&par);
+    track->SetParamFirst(&par);
 }
 
-ClassImp(CbmMuchTrackFinderIdeal)
+ClassImp(CbmMuchTrackFinderIdeal);

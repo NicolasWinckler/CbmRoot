@@ -1,13 +1,10 @@
-// -------------------------------------------------------------------------
-// -----                  CbmMuchMatchTracks header file                -----
-// -----                  Created 10/10/07  by A. Lebedev              -----
-// -------------------------------------------------------------------------
-
 /** CbmMuchMatchTracks.h
  *@author A.Lebedev <Andrey.Lebedev@gsi.de>
  *
  * 2009-03-16 E. Kryshen
  * Matching of hits to clusters with several MC points
+ * 2009-06-01 A.Lebedev
+ * Include matching for straw hits
  **/
 
 #ifndef CBMMUCHMATCHTRACKS_H_
@@ -22,30 +19,45 @@ class TClonesArray;
 class CbmMuchMatchTracks : public FairTask
 {
 public:
-  CbmMuchMatchTracks();
-  virtual ~CbmMuchMatchTracks();
+	CbmMuchMatchTracks();
+	virtual ~CbmMuchMatchTracks();
 
-  virtual InitStatus Init();
-  virtual void Exec(Option_t* opt);
-  virtual void Finish();
+	virtual InitStatus Init();
+	virtual void Exec(
+		  Option_t* opt);
+	virtual void Finish();
 
 private:
-  void DigiToTrackMatch(Int_t digiIndex, std::map<Int_t, Int_t> &matchMap);
-  TClonesArray* fTracks;
-  TClonesArray* fPoints;
-  TClonesArray* fHits;
-  TClonesArray* fMatches;
-  TClonesArray* fDigiMatch;
-  TClonesArray* fClusters;
+	void ExecPixel(
+			std::map<Int_t, Int_t> &matchMap,
+			Int_t index);
 
-  Int_t fNofHits;
-  Int_t fNofTrueHits;
-  Int_t fNofWrongHits;
-  Int_t fNofFakeHits;
+	void ExecStraw(
+			std::map<Int_t, Int_t> &matchMap,
+			Int_t index);
 
-  Int_t    fNEvents;
+	void DigiToTrackMatch(
+			const TClonesArray* digiMatches,
+			Int_t digiIndex,
+			std::map<Int_t, Int_t> &matchMap);
 
-  ClassDef(CbmMuchMatchTracks,1);
+	TClonesArray* fTracks;
+	TClonesArray* fPoints;
+	TClonesArray* fPixelHits;
+	TClonesArray* fStrawHits;
+	TClonesArray* fMatches;
+	TClonesArray* fPixelDigiMatches;
+	TClonesArray* fStrawDigiMatches;
+	TClonesArray* fClusters;
+
+	Int_t fNofHits;
+	Int_t fNofTrueHits;
+	Int_t fNofWrongHits;
+	Int_t fNofFakeHits;
+
+	Int_t fNEvents;
+
+	ClassDef(CbmMuchMatchTracks,1);
 };
 
 #endif

@@ -9,8 +9,8 @@
  ** Uses as track finding algorithm classes derived from CbmMuchTrackFinder.
  **/
 
-#ifndef CBMMUCHFINDTRACKS_H
-#define CBMMUCHFINDTRACKS_H 1
+#ifndef CBMMUCHFINDTRACKS_H_
+#define CBMMUCHFINDTRACKS_H_ 1
 
 #include "FairTask.h"
 
@@ -58,7 +58,6 @@ public:
 
 private:
 	CbmMuchTrackFinder* fFinder;       // Pointer to TrackFinder concrete class
-	TClonesArray* fMuchPixelHitArray;  // Input array of MUCH pixel hits
 	TClonesArray* fTrackArray;         // Output array of CbmTrdTracks
 	Int_t fNofTracks;                  // Number of tracks created
 

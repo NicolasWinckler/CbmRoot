@@ -10,6 +10,7 @@
 
 #include "FairRootManager.h"
 #include "CbmGlobalTrack.h"
+#include "CbmTrdTrack.h"
 
 #include "TClonesArray.h"
 
@@ -125,7 +126,7 @@ void CbmLitTofMerger::GlobalTrackArrayToTrackVector(
 	   CbmTrdTrack* trdTrack = (CbmTrdTrack*) trdTracks->At(track->GetTrdTrackIndex());
 	   //if (track->GetParamLast()->GetQp() == 0) continue;
 	   CbmLitTrack* litTrack = new CbmLitTrack;
-	   CbmLitConverter::TrdTrackToLitTrack(trdTrack, litTrack, trdHits);
+	   CbmLitConverter::TrackToLitTrack(trdTrack, litTrack, trdHits, NULL);
 	   //litTrack->SetPreviousTrackId(iTrack);
 	   litTrack->SetRefId(iTrack);
 	   litTracks.push_back(litTrack);

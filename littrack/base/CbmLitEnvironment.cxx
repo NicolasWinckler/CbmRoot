@@ -21,6 +21,7 @@
 #include "CbmMuchStation.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
+#include "CbmMuchModule.h"
 #endif
 
 #include "TGeoNode.h"
@@ -79,21 +80,37 @@ FairField* CbmLitEnvironment::GetField()
 
 CbmLitDetectorLayout CbmLitEnvironment::GetLayout()
 {
+	static Bool_t layoutCreated = false;
 
+	if (!layoutCreated) {
+		if (IsMuch() && !IsTrd()) {
+			MuchLayout();
+			fLayout = fMuchLayout;
+		} else
+		if (IsTrd() && !IsMuch()){
+			TrdLayout();
+			fLayout = fTrdLayout;
+		} else
+		if (IsMuch() && IsTrd()) {
+			CombineMuchAndTrd();
+			fLayout = fMuchTrdLayout;
+		}
+		std::cout << fLayout.ToString();
+		layoutCreated = true;
+	}
+	return fLayout;
 }
 
-CbmLitDetectorLayout CbmLitEnvironment::GetMuchLayout()
+void CbmLitEnvironment::MuchLayout()
 {
 	if ((TGeoNode*) gGeoManager->GetTopNode()->GetNodes()->FindObject("much1_0") != NULL){
-//		std::cout << "OLD MUCH GEOMETRY!!!" << std::endl;
-		return GetOldMuchLayout();
+		OldMuchLayout();
 	} else {
-//		std::cout << "NEW MUCH GEOMETRY!!!" << std::endl;
-		return GetNewMuchLayout();
+		NewMuchLayout();
 	}
 }
 
-CbmLitDetectorLayout CbmLitEnvironment::GetOldMuchLayout()
+void CbmLitEnvironment::OldMuchLayout()
 {
 	static Bool_t layoutCreated = false;
 
@@ -148,14 +165,13 @@ CbmLitDetectorLayout CbmLitEnvironment::GetOldMuchLayout()
 
 		std::vector<CbmLitStation> stationVec(stationSet.begin(), stationSet.end());
 		DetermineLayout(stationVec, fMuchLayout);
-		std::cout << fMuchLayout.ToString();
+//		std::cout << fMuchLayout.ToString();
 		layoutCreated = true;
 	}
-	return fMuchLayout;
 }
 
 
-CbmLitDetectorLayout CbmLitEnvironment::GetNewMuchLayout()
+void CbmLitEnvironment::NewMuchLayout()
 {
 #ifdef NEWMUCH
 	static Bool_t layoutCreated = false;
@@ -185,19 +201,21 @@ CbmLitDetectorLayout CbmLitEnvironment::GetNewMuchLayout()
 				litStation.AddSubstation(litSubstationFront);
 				litStation.AddSubstation(litSubstationBack);
 
+				Int_t type = layer->GetSideF()->GetModule(0)->GetDetectorType();
+				if (type == 2) litStation.SetType(kLITSTRIPHIT);
+				else litStation.SetType(kLITPIXELHIT);
+
 				litStationGroup.AddStation(litStation);
 			}
 			fMuchLayout.AddStationGroup(litStationGroup);
 		}
-		std::cout << fMuchLayout.ToString();
+//		std::cout << fMuchLayout.ToString();
 		layoutCreated = true;
 	}
-	return fMuchLayout;
 #endif
 }
 
-
-CbmLitDetectorLayout CbmLitEnvironment::GetTrdLayout()
+void CbmLitEnvironment::TrdLayout()
 {
 	static Bool_t layoutCreated = false;
 
@@ -244,14 +262,29 @@ CbmLitDetectorLayout CbmLitEnvironment::GetTrdLayout()
 		}
 
 		std::vector<CbmLitStation> stationVec(stationSet.begin(), stationSet.end());
-//		for (int i = 0; i < stationVec.size(); i++ )
-//			std::cout << stationVec[i].ToString();
 		DetermineLayout(stationVec, fTrdLayout);
-		std::cout << fTrdLayout.ToString();
+//		std::cout << fTrdLayout.ToString();
 		layoutCreated = true;
 	}
+}
 
-	return fTrdLayout;
+void CbmLitEnvironment::CombineMuchAndTrd()
+{
+	static Bool_t layoutCreated = false;
+
+	if (!layoutCreated) {
+		MuchLayout();
+		TrdLayout();
+
+		fMuchTrdLayout = fMuchLayout;
+
+		for(Int_t i = 0; i < fTrdLayout.GetNofStationGroups(); i++){
+			fMuchTrdLayout.AddStationGroup(fTrdLayout.GetStationGroup(i));
+		}
+
+//		std::cout << fLayout.ToString();
+		layoutCreated = true;
+	}
 }
 
 CbmLitDetectorLayout CbmLitEnvironment::GetTofLayout()

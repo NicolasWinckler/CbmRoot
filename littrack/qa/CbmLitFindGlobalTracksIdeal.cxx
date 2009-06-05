@@ -39,9 +39,9 @@ InitStatus CbmLitFindGlobalTracksIdeal::Init()
 void CbmLitFindGlobalTracksIdeal::Exec(
 		Option_t* opt)
 {
-	if (fIsSts) FillMapSts();
-	if (fIsTrd) FillMapTrd();
-	if (fIsMuch) FillMapMuch();
+	if (fIsSts) FillTrackMap(fMcStsMap, fStsMatches);
+	if (fIsTrd) FillTrackMap(fMcTrdMap, fTrdMatches);
+	if (fIsMuch) FillTrackMap(fMcMuchMap, fMuchMatches);
 	if (fIsTof) FillMapTof();
 
 	CreateGlobalTracks();
@@ -85,7 +85,7 @@ void CbmLitFindGlobalTracksIdeal::ReadDataBranches()
     }
 
 	//MUCH data
-    if (!fIsMuch) {
+    if (fIsMuch) {
     	fMuchMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
     	if (NULL == fMuchMatches) Fatal("Init","No MuchTrackMatch array!");
     }
@@ -109,42 +109,18 @@ void CbmLitFindGlobalTracksIdeal::ReadDataBranches()
 	ioman->Register("GlobalTrack", "Global", fGlobalTracks, kTRUE);
 }
 
-void CbmLitFindGlobalTracksIdeal::FillMapSts()
+void CbmLitFindGlobalTracksIdeal::FillTrackMap(
+		std::map<Int_t, Int_t>& mcMap,
+		const TClonesArray* matches)
 {
-	fMcStsMap.clear();
-	Int_t nofStsTracks = fStsMatches->GetEntriesFast();
-	for(Int_t iStsTrack = 0; iStsTrack < nofStsTracks; iStsTrack++) {
-		CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*) fStsMatches->At(iStsTrack);
-		if (stsTrackMatch == NULL) continue;
-		Int_t mcId = stsTrackMatch->GetMCTrackId();
+	mcMap.clear();
+	Int_t nofTracks = matches->GetEntriesFast();
+	for(Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
+		CbmTrackMatch* trackMatch = (CbmTrackMatch*) matches->At(iTrack);
+		if (trackMatch == NULL) continue;
+		Int_t mcId = trackMatch->GetMCTrackId();
 		if(mcId == -1) continue;
-		fMcStsMap.insert(std::pair<Int_t, Int_t>(mcId, iStsTrack));
-	}
-}
-
-void CbmLitFindGlobalTracksIdeal::FillMapTrd()
-{
-	fMcTrdMap.clear();
-	Int_t nofTrdTracks = fTrdMatches->GetEntriesFast();
-	for(Int_t iTrdTrack = 0; iTrdTrack < nofTrdTracks; iTrdTrack++) {
-		CbmTrackMatch* trdTrackMatch = (CbmTrackMatch*) fTrdMatches->At(iTrdTrack);
-		if (trdTrackMatch == NULL) continue;
-		Int_t mcId = trdTrackMatch->GetMCTrackId();
-		if(mcId == -1) continue;
-		fMcTrdMap.insert(std::pair<Int_t, Int_t>(mcId, iTrdTrack));
-	}
-}
-
-void CbmLitFindGlobalTracksIdeal::FillMapMuch()
-{
-	fMcMuchMap.clear();
-	Int_t nofMuchTracks = fMuchMatches->GetEntriesFast();
-	for(Int_t iMuchTrack = 0; iMuchTrack < nofMuchTracks; iMuchTrack++) {
-		CbmTrackMatch* muchTrackMatch = (CbmTrackMatch*) fMuchMatches->At(iMuchTrack);
-		if (muchTrackMatch == NULL) continue;
-		Int_t mcId = muchTrackMatch->GetMCTrackId();
-		if(mcId == -1) continue;
-		fMcMuchMap.insert(std::pair<Int_t, Int_t>(mcId, iMuchTrack));
+		mcMap.insert(std::pair<Int_t, Int_t>(mcId, iTrack));
 	}
 }
 

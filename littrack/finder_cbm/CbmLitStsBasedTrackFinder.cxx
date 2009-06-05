@@ -41,6 +41,13 @@ void CbmLitStsBasedTrackFinder::DefaultInit()
 	   //TObject::Fatal("CbmLitStsBasedTrackFinder::DefaultInit","no STS track array");
 	}
 
+	fHitsArray = (TClonesArray*) rootMgr->GetObject("MuchPixelHit");
+	if(NULL == fHitsArray){
+		std::cout << "CbmLitStsBasedTrackFinder::DefaultInit" << "no MuchPixelhit array" << std::endl;
+		exit(0);
+	   //TObject::Fatal("CbmLitStsBasedTrackFinder::DefaultInit","no STS track array");
+	}
+
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
 	fPropagatorToDet = factory->CreateTrackPropagator("lit");
 }

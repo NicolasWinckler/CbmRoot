@@ -32,7 +32,7 @@ void CbmLitMuchTrackFinderBranch::Init()
 {
 	DefaultInit();
 
-	SetLayout(CbmLitEnvironment::Instance()->GetMuchLayout());
+	SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
 	TrackPropagatorPtr propagator = factory->CreateTrackPropagator("lit");
@@ -59,14 +59,13 @@ void CbmLitMuchTrackFinderBranch::Init()
 }
 
 Int_t CbmLitMuchTrackFinderBranch::DoFind(
-		TClonesArray* hitArray,
 		TClonesArray* trackArray)
 {
 	HitPtrVector hits;
 	TrackPtrVector trackSeeds;
 	TrackPtrVector foundTracks;
 
-	CbmLitConverter::HitArrayToHitVector(hitArray, hits);
+	CbmLitConverter::HitArrayToHitVector(fHitsArray, hits);
 	DefaultCreateTrackSeeds(fTrackSeedsArray, trackSeeds, fLayout, fPDG);
 
 	CbmLitTrackFinderBranch::DoFind(hits, trackSeeds, foundTracks);

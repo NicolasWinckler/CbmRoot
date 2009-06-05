@@ -32,7 +32,7 @@ void CbmLitMuchTrackFinderWeight::Init()
 	SetFitter(factory->CreateTrackFitter("kalman_robust"));
 	SetFilter(factory->CreateTrackUpdate("kalman"));
 
-	SetLayout(CbmLitEnvironment::Instance()->GetMuchLayout());
+	SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 
 	SetVerbose(1);
 	SetNofIter(1);
@@ -45,14 +45,13 @@ void CbmLitMuchTrackFinderWeight::Init()
 }
 
 Int_t CbmLitMuchTrackFinderWeight::DoFind(
-		TClonesArray* hitArray,
 		TClonesArray* trackArray)
 {
 	HitPtrVector hits;
 	TrackPtrVector trackSeeds;
 	TrackPtrVector foundTracks;
 
-	CbmLitConverter::HitArrayToHitVector(hitArray, hits);
+	CbmLitConverter::HitArrayToHitVector(fHitsArray, hits);
 	DefaultCreateTrackSeeds(fTrackSeedsArray, trackSeeds, fLayout, fPDG);
 
 	CbmLitTrackFinderWeight::DoFind(hits, trackSeeds, foundTracks);

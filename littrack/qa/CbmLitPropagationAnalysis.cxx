@@ -14,7 +14,6 @@
 #include "CbmLitStripHit.h"
 #include "CbmLitSimpleGeometryConstructor.h"
 
-#include "CbmHit.h"
 #include "CbmBaseHit.h"
 #include "CbmPixelHit.h"
 #include "CbmStripHit.h"
@@ -24,6 +23,7 @@
 #include "CbmMuchTrack.h"
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
+#include "CbmMuchCluster.h"
 #include "CbmTrackMatch.h"
 #include "FairMCPoint.h"
 #include "CbmMCTrack.h"
@@ -128,51 +128,54 @@ void CbmLitPropagationAnalysis::DetermineSetup()
 void CbmLitPropagationAnalysis::ReadDataBranches()
 {
 	FairRootManager* ioman = FairRootManager::Instance();
-    if (NULL == ioman) Fatal("Init","CbmRootManager is not instantiated");
+    if (NULL == ioman) Fatal("CbmLitPropagationAnalysis::Init","CbmRootManager is not instantiated");
 
     fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
-    if (NULL == fMCTracks) Fatal("Init","No MCTrack array!");
+    if (NULL == fMCTracks) Fatal("CbmLitPropagationAnalysis::Init","No MCTrack array!");
 
     fGlobalTracks = (TClonesArray*) ioman->GetObject("GlobalTrack");
-    if (NULL == fGlobalTracks) Fatal("Init","No GlobalTrack array!");
+    if (NULL == fGlobalTracks) Fatal("CbmLitPropagationAnalysis::Init","No GlobalTrack array!");
 
    	if (fIsSts) {
    		fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
-   		if (NULL == fStsTracks) Fatal("Init", "No STSTrack array!");
+   		if (NULL == fStsTracks) Fatal("CbmLitPropagationAnalysis::Init", "No STSTrack array!");
 //   		fStsTrackMatches = (TClonesArray*) ioman->GetObject("STSTrackMatch");
-//   		if (NULL == fStsTrackMatches) Fatal("Init", "No STSTrackMatch array!");
+//   		if (NULL == fStsTrackMatches) Fatal("CbmLitPropagationAnalysis::Init", "No STSTrackMatch array!");
    	}
 
    	if (fIsMuch) {
 		fMuchTracks = (TClonesArray*) ioman->GetObject("MuchTrack");
-		if (NULL == fMuchTracks) Fatal("Init", "No MuchTrack array!");
+		if (NULL == fMuchTracks) Fatal("CbmLitPropagationAnalysis::Init", "No MuchTrack array!");
 		fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
 		fMuchStrawHits = (TClonesArray*) ioman->GetObject("MuchStrawHit");
-		if (NULL == fMuchPixelHits && NULL == fMuchStrawHits) Fatal("Init", "No MuchPixelHit AND/OR MuchStrawHit arrays!");
+		if (NULL == fMuchPixelHits && NULL == fMuchStrawHits) Fatal("CbmLitPropagationAnalysis::Init", "No MuchPixelHit AND MuchStrawHit arrays!");
 		fMuchTrackMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
-		if (NULL == fMuchTrackMatches) Fatal("Init", "No MuchTrackMatch array!");
-		fMuchDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
-		if (NULL == fMuchDigiMatches) Fatal("Init", "No MuchDigiMatches array!");
+		if (NULL == fMuchTrackMatches) Fatal("CbmLitPropagationAnalysis::Init", "No MuchTrackMatch array!");
+		fMuchPixelDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
+		fMuchStrawDigiMatches = (TClonesArray*) ioman->GetObject("MuchStrawDigiMatch");
+		if (NULL == fMuchPixelDigiMatches && NULL == fMuchStrawDigiMatches) Fatal("CbmLitPropagationAnalysis::Init", "No MuchDigiMatches array!");
+		fMuchClusters  = (TClonesArray*) ioman->GetObject("MuchCluster");
+		if (NULL == fMuchClusters) Fatal("CbmLitPropagationAnalysis::Init", "No MuchCluster array!");
 		fMuchPoints  = (TClonesArray*) ioman->GetObject("MuchPoint");
-		if (NULL == fMuchPoints) Fatal("Init", "No MuchPoint array!");
+		if (NULL == fMuchPoints) Fatal("CbmLitPropagationAnalysis::Init", "No MuchPoint array!");
    	}
 
    	if (fIsTrd) {
 		fTrdTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
-		if (NULL == fTrdTracks) Fatal("Init", "No TRDTrack array!");
+		if (NULL == fTrdTracks) Fatal("CbmLitPropagationAnalysis::Init", "No TRDTrack array!");
 		fTrdHits  = (TClonesArray*) ioman->GetObject("TRDHit");
-		if (NULL == fTrdHits) Fatal("Init", "No TRDHit array!");
+		if (NULL == fTrdHits) Fatal("CbmLitPropagationAnalysis::Init", "No TRDHit array!");
 		fTrdTrackMatches = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
-		if (!fTrdTrackMatches) Fatal("Init", "No TRDTrackMatch array!");
+		if (!fTrdTrackMatches) Fatal("CbmLitPropagationAnalysis::Init", "No TRDTrackMatch array!");
 		fTrdPoints  = (TClonesArray*) ioman->GetObject("TRDPoint");
-		if (NULL == fTrdPoints) Fatal("Init", "No TRDPoint array!");
+		if (NULL == fTrdPoints) Fatal("CbmLitPropagationAnalysis::Init", "No TRDPoint array!");
    	}
 
    	if (fIsTof) {
 		fTofPoints = (TClonesArray*) ioman->GetObject("TOFPoint");
-		if (NULL == fTofPoints) Fatal("Init", "No TofPoint array!");
+		if (NULL == fTofPoints) Fatal("CbmLitPropagationAnalysis::Init", "No TofPoint array!");
 		fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
-		if (NULL == fTofHits) Fatal("Init", "No TofHit array!");
+		if (NULL == fTofHits) Fatal("CbmLitPropagationAnalysis::Init", "No TofHit array!");
    	}
 }
 
@@ -233,7 +236,7 @@ void CbmLitPropagationAnalysis::CreateTrackArrays()
 		CbmLitTrack* litTrack = new CbmLitTrack();
 		CbmLitTrack* mcLitTrack = new CbmLitTrack();
 
-		CheckAcceptance(globalTrack);
+		if (!CheckAcceptance(globalTrack)) continue;
 
 		GlobalTrackToLitTrack(globalTrack, litTrack);
 		if (fIsElectronSetup) litTrack->SetPDG(11); else litTrack->SetPDG(13);
@@ -256,13 +259,11 @@ Bool_t CbmLitPropagationAnalysis::CheckAcceptance(
 	Int_t tofId = globalTrack->GetTofHitIndex();
 	if (fIsTrd && trdId > -1) {
 		CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTrdTracks->At(trdId);
-//		std::cout << "CHECK ACC: trd hits " << trdTrack->GetNofTrdHits() <<  std::endl;
-		if (trdTrack->GetNofTrdHits() != fNofTrdHits) return false;
+		if (trdTrack->GetNofHits() != fNofTrdHits) return false;
 	}
 	if (fIsMuch && muchId > -1) {
 		CbmMuchTrack* muchTrack = (CbmMuchTrack*) fMuchTracks->At(muchId);
-//		std::cout << "CHECK ACC: much hits " << muchTrack->GetNHits() <<  std::endl;
-		if (muchTrack->GetNHits() != fNofMuchHits) return false;
+		if (muchTrack->GetNofHits() != fNofMuchHits) return false;
 	}
 
 	if (tofId > -1) return true;
@@ -289,26 +290,27 @@ void CbmLitPropagationAnalysis::GlobalTrackToLitTrack(
 	//MUCH: attach hits from MUCH track
 	if (muchId > -1) {
 		CbmMuchTrack* muchTrack = (CbmMuchTrack*) fMuchTracks->At(muchId);
-		for (int iHit = 0; iHit < muchTrack->GetNHits(); iHit++) {
+		for (int iHit = 0; iHit < muchTrack->GetNofHits(); iHit++) {
 			Int_t index = muchTrack->GetHitIndex(iHit);
-			//TODO: add straw hits here!!!!!
-			CbmPixelHit* hit = (CbmPixelHit*) fMuchPixelHits->At(index);
-//			if (hit->GetTime(2) == -77777) {
-//				CbmLitStripHit litHit;
-//				CbmLitConverter::MuchHitToLitStripHit(hit, index, &litHit);
-//				litTrack->AddHit(&litHit);
-//			} else {
+			HitType type = muchTrack->GetHitType(iHit);
+			if (type == kMUCHPIXELHIT) {
+				CbmPixelHit* hit = (CbmPixelHit*) fMuchPixelHits->At(index);
 				CbmLitPixelHit litHit;
 				CbmLitConverter::PixelHitToLitPixelHit(hit, index, &litHit);
 				litTrack->AddHit(&litHit);
-//			}
+			} else if (type == kMUCHSTRAWHIT) {
+				CbmStripHit* hit = (CbmStripHit*) fMuchStrawHits->At(index);
+				CbmLitStripHit litHit;
+				CbmLitConverter::StripHitToLitStripHit(hit, index, &litHit);
+				litTrack->AddHit(&litHit);
+			}
 		}
 	}
 	//TRD: attach hits from TRD track
 	if (trdId > -1) {
 		CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTrdTracks->At(trdId);
-		for (int iHit = 0; iHit < trdTrack->GetNofTrdHits(); iHit++) {
-			Int_t index = trdTrack->GetTrdHitIndex(iHit);
+		for (int iHit = 0; iHit < trdTrack->GetNofHits(); iHit++) {
+			Int_t index = trdTrack->GetHitIndex(iHit);
 			CbmPixelHit* hit = (CbmPixelHit*) fTrdHits->At(index);
 			CbmLitPixelHit litHit;
 			CbmLitConverter::PixelHitToLitPixelHit(hit, index, &litHit);
@@ -338,11 +340,11 @@ void CbmLitPropagationAnalysis::GlobalTrackToMCLitTrack(
 
 	if (muchId > -1){
 		muchTrack = (CbmMuchTrack*) fMuchTracks->At(muchId);
-		nofMuchHits = muchTrack->GetNHits();
+		nofMuchHits = muchTrack->GetNofHits();
 	}
 	if (trdId > -1) {
 		trdTrack = (CbmTrdTrack*) fTrdTracks->At(trdId);
-		nofTrdHits = trdTrack->GetNofTrdHits();
+		nofTrdHits = trdTrack->GetNofHits();
 	}
 	if (tofId > -1) nofTofHits = 1;
 
@@ -353,25 +355,33 @@ void CbmLitPropagationAnalysis::GlobalTrackToMCLitTrack(
 	if (muchId > -1) {
 		for (Int_t i = 0; i < nofMuchHits; i++){
 			Int_t hitIndex = muchTrack->GetHitIndex(i);
-			//TODO: add strip hit
-			CbmPixelHit* hit = (CbmPixelHit*) fMuchPixelHits->At(hitIndex);
-			Int_t digiIndex = hit->GetRefId();
-			CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchDigiMatches->At(digiIndex);
-			Int_t pointIndex = digiMatch->GetRefIndex(0);
-			if (pointIndex < 0) Fatal("CbmLitPropagationAnalysis", "Wrong point index");
-			FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(pointIndex);
-			if (point == NULL) Fatal("CbmLitPropagationAnalysis", "NULL pointer");
-			McPointToLitFitNode(point, &nodes[counter++]);
+			HitType hitType = muchTrack->GetHitType(i);
+			if (hitType == kMUCHPIXELHIT) {
+				CbmPixelHit* hit = (CbmPixelHit*) fMuchPixelHits->At(hitIndex);
+				Int_t clusterIndex = hit->GetRefId();
+				CbmMuchCluster* cluster = (CbmMuchCluster*) fMuchClusters->At(clusterIndex);
+				Int_t digiIndex = cluster->GetDigiIndex(0);
+				CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchPixelDigiMatches->At(digiIndex);
+				Int_t pointIndex = digiMatch->GetRefIndex(0);
+				FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(pointIndex);
+				McPointToLitFitNode(point, &nodes[counter++]);
+			} else if (hitType == kMUCHSTRAWHIT){
+				CbmStripHit* hit = (CbmStripHit*) fMuchStrawHits->At(hitIndex);
+				Int_t digiIndex = hit->GetRefId();
+				CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) fMuchStrawDigiMatches->At(digiIndex);
+				Int_t pointIndex = digiMatch->GetRefIndex(0);
+				FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(pointIndex);
+				McPointToLitFitNode(point, &nodes[counter++]);
+			}
 		}
 	}
 
 	//TRD
 	if (trdId > -1) {
 	    for (Int_t i = 0; i < nofTrdHits; i++){
-			Int_t hitIndex = trdTrack->GetTrdHitIndex(i);
-			CbmHit* hit = (CbmHit*) fTrdHits->At(hitIndex);
-			Int_t pointIndex = hit->GetRefIndex();
-			if (pointIndex < 0) Fatal("CbmLitPropagationAnalysis", "Wrong point index");
+			Int_t hitIndex = trdTrack->GetHitIndex(i);
+			CbmPixelHit* hit = (CbmPixelHit*) fTrdHits->At(hitIndex);
+			Int_t pointIndex = hit->GetRefId();
 			FairMCPoint* point = (FairMCPoint*) fTrdPoints->At(pointIndex);
 			McPointToLitFitNode(point, &nodes[counter++]);
 	    }
@@ -379,9 +389,8 @@ void CbmLitPropagationAnalysis::GlobalTrackToMCLitTrack(
 
 	//TOF
 	if (tofId > -1) {
-		CbmHit* hit = (CbmHit*) fTofHits->At(tofId);
-		Int_t pointIndex = hit->GetRefIndex();
-		if (pointIndex < 0) Fatal("CbmLitPropagationAnalysis", "Wrong point index");
+		CbmPixelHit* hit = (CbmPixelHit*) fTofHits->At(tofId);
+		Int_t pointIndex = hit->GetRefId();
 		FairMCPoint* point = (FairMCPoint*) fTofPoints->At(pointIndex);
 		McPointToLitFitNode(point, &nodes[counter++]);
 	}

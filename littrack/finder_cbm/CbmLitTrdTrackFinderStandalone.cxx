@@ -137,7 +137,7 @@ void CbmLitTrdTrackFinderStandalone::CopyToOutput(
 	Int_t trackNo = trackArray->GetEntriesFast();
 	for(TrackPtrIterator iTrack = tracks.begin();iTrack != tracks.end(); iTrack++) {
 	   CbmTrdTrack track;
-	   CbmLitConverter::LitTrackToTrdTrack(*iTrack, &track);
+	   CbmLitConverter::LitTrackToTrack(*iTrack, &track);
        new ((*trackArray)[trackNo++]) CbmTrdTrack(track);
        delete (*iTrack);
 	}

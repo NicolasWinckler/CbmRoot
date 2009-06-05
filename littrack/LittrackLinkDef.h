@@ -45,7 +45,7 @@
 #pragma link C++ class CbmLitMuchTrackFinderNN+;
 #pragma link C++ class CbmLitMuchTrackFinderWeight+;
 #pragma link C++ class CbmLitStsBasedTrackFinder+;
-#pragma link C++ class CbmLitTofMerger+;
+//#pragma link C++ class CbmLitTofMerger+;
 #pragma link C++ class CbmLitFindGlobalTracks+;
 
 // fitter

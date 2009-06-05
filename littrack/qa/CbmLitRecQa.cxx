@@ -188,7 +188,7 @@ void CbmLitRecQa::ProcessMuchTracks()
 	  if (mcTrack == NULL) continue;
 //	  std::cout << "mcTrack->GetPdgCode()=" << mcTrack->GetPdgCode() << std::endl;
 	  Int_t nofPoints = mcTrack->GetNPoints(fDetId);
-	  Int_t nofHits = recTrack->GetNHits();
+	  Int_t nofHits = recTrack->GetNofHits();
 	  Int_t nofTrue = recMatch->GetNofTrueHits();
 	  Double_t qualiNofHits = Double_t(nofHits) / Double_t(nofPoints);
 	  Double_t quali = Double_t(nofTrue) / Double_t(nofHits);
@@ -225,7 +225,7 @@ void CbmLitRecQa::ProcessTrdTracks()
 	  CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(mcIdRec);
 	  if (mcTrack == NULL) continue;
 	  Int_t nofPoints = mcTrack->GetNPoints(fDetId);
-	  Int_t nofHits = recTrack->GetNofTrdHits();
+	  Int_t nofHits = recTrack->GetNofHits();
 	  Int_t nofTrue = recMatch->GetNofTrueHits();
 	  Double_t qualiNofHits = Double_t(nofHits) / Double_t(nofPoints);
 	  Double_t quali = Double_t(nofTrue) / Double_t(nofHits);
@@ -367,12 +367,12 @@ Bool_t CbmLitRecQa::IsMismatch(
     	if (fDetId == kMUCH) {
 	    	CbmMuchTrack* track = (CbmMuchTrack*) fRecTracks->At((*i).second);
 	    	if (track == NULL) return true;
-	    	stsId = track->GetStsTrackID();
+	    	stsId = track->GetPreviousTrackId();
     	} else
     	if (fDetId == kTRD) {
     		CbmTrdTrack* track = (CbmTrdTrack*) fRecTracks->At((*i).second);
     		if (track == NULL) return true;
-    		stsId = track->GetStsTrackIndex();
+    		stsId = track->GetPreviousTrackId();
     	}
 
     	for (Iterator iSts = boundsSts.first; iSts != boundsSts.second; iSts++) {
@@ -401,11 +401,11 @@ void CbmLitRecQa::FillTrackParams(
 		const std::string& type)
 {
 	Double_t radialPos = std::sqrt(
-	    	track->GetMuchTrack()->GetX()*track->GetMuchTrack()->GetX() +
-			track->GetMuchTrack()->GetY()*track->GetMuchTrack()->GetY());
-	Double_t chi2 = track->GetChi2() / track->GetNDF();
-	Double_t p = std::abs(1. / track->GetMuchTrack()->GetQp());
-	Int_t nofHits = track->GetNHits();
+	    	track->GetParamLast()->GetX()*track->GetParamLast()->GetX() +
+			track->GetParamLast()->GetY()*track->GetParamLast()->GetY());
+	Double_t chi2 = track->GetChiSq() / track->GetNDF();
+	Double_t p = std::abs(1. / track->GetParamLast()->GetQp());
+	Int_t nofHits = track->GetNofHits();
 	Int_t lastPlaneId = track->GetFlag();
 	if (type == "true") {
 		fhChi2True->Fill(chi2);
@@ -436,9 +436,9 @@ void CbmLitRecQa::FillTrackParams(
 	Double_t radialPos = std::sqrt(
 	    	track->GetParamLast()->GetX()*track->GetParamLast()->GetX() +
 			track->GetParamLast()->GetY()*track->GetParamLast()->GetY());
-	Double_t chi2 = track->GetChi2() / track->GetNDF();
+	Double_t chi2 = track->GetChiSq() / track->GetNDF();
 	Double_t p = std::abs(1. / track->GetParamLast()->GetQp());
-	Int_t nofHits = track->GetNofTrdHits();
+	Int_t nofHits = track->GetNofHits();
 	Int_t lastPlaneId = track->GetFlag();
 	if (type == "true") {
 		fhChi2True->Fill(chi2);

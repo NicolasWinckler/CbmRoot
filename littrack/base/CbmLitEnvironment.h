@@ -33,10 +33,9 @@ public:
 
    FairField* GetField();
    CbmLitDetectorLayout GetLayout();
-   CbmLitDetectorLayout GetMuchLayout();
-   CbmLitDetectorLayout GetNewMuchLayout();
-   CbmLitDetectorLayout GetOldMuchLayout();
-   CbmLitDetectorLayout GetTrdLayout();
+
+   CbmLitDetectorLayout GetMuchLayout() {return fMuchLayout;}
+
    CbmLitDetectorLayout GetTofLayout();
    CbmLitStation GetTofStation();
 
@@ -48,10 +47,17 @@ public:
 protected:
    CbmLitEnvironment();
 
+   void CombineMuchAndTrd();
+   void MuchLayout();
+   void NewMuchLayout();
+   void OldMuchLayout();
+   void TrdLayout();
+
 private:
    static CbmLitEnvironment* fInstance;
 
    CbmLitDetectorLayout fLayout;
+   CbmLitDetectorLayout fMuchTrdLayout;
    CbmLitDetectorLayout fMuchLayout;
    CbmLitDetectorLayout fTrdLayout;
    CbmLitDetectorLayout fTofLayout;

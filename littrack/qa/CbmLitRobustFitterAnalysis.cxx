@@ -66,8 +66,8 @@ InitStatus CbmLitRobustFitterAnalysis::Init()
 	fFitter = factory->CreateTrackFitter("kalman_robust");
 
 	// Get the layout
-	if (fDetId == kMUCH) fLayout = CbmLitEnvironment::Instance()->GetMuchLayout();
-	if (fDetId == kTRD) fLayout = CbmLitEnvironment::Instance()->GetTrdLayout();
+	if (fDetId == kMUCH) fLayout = CbmLitEnvironment::Instance()->GetLayout();
+	if (fDetId == kTRD) fLayout = CbmLitEnvironment::Instance()->GetLayout();
 	fNofPlanes = fLayout.GetNofPlanes();
 	fNofPlanes = 26;
 	fNofVars = 2;
@@ -179,8 +179,8 @@ void CbmLitRobustFitterAnalysis::CreateTrackArrays()
 			CbmMuchTrack* muchTrack = (CbmMuchTrack*) fTracks->At(iTrack);
 			//if (muchTrack->GetNHits() == 0) continue;
 			CbmLitTrack* litTrack = new CbmLitTrack();
-			CbmLitConverter::MuchTrackToLitTrack(muchTrack, litTrack, fHits);
-			InitTrackParamFromStsTrackParam(muchTrack->GetStsTrackID(), litTrack);
+			CbmLitConverter::TrackToLitTrack(muchTrack, litTrack, fHits, NULL);
+			InitTrackParamFromStsTrackParam(muchTrack->GetPreviousTrackId(), litTrack);
 			litTrack->SetRefId(iTrack);
 			fLitTracks[0].push_back(litTrack);
 			fLitTracks[1].push_back(new CbmLitTrack(*litTrack));
@@ -192,8 +192,8 @@ void CbmLitRobustFitterAnalysis::CreateTrackArrays()
 			CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTracks->At(iTrack);
 			//if (trdTrack->GetNofTrdHits() == 0) continue;
 			CbmLitTrack* litTrack = new CbmLitTrack();
-			CbmLitConverter::TrdTrackToLitTrack(trdTrack, litTrack, fHits);
-			InitTrackParamFromStsTrackParam(trdTrack->GetStsTrackIndex(), litTrack);
+			CbmLitConverter::TrackToLitTrack(trdTrack, litTrack, fHits, NULL);
+			InitTrackParamFromStsTrackParam(trdTrack->GetPreviousTrackId(), litTrack);
 			litTrack->SetRefId(iTrack);
 			fLitTracks[0].push_back(litTrack);
 			fLitTracks[1].push_back(new CbmLitTrack(*litTrack));

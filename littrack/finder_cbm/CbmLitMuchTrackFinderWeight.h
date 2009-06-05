@@ -18,7 +18,6 @@ public:
     virtual void Init();
 
     virtual Int_t DoFind(
-    		TClonesArray* hitArray,
             TClonesArray* trackArray);
 
 	ClassDef(CbmLitMuchTrackFinderWeight, 1);

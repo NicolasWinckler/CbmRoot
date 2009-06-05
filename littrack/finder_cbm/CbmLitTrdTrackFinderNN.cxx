@@ -30,7 +30,7 @@ void CbmLitTrdTrackFinderNN::Init()
 	SetFinalSelection(factory->CreateTrackSelection("trd_final"));
 	SetFilter(factory->CreateTrackUpdate("kalman"));
 
-	SetLayout(CbmLitEnvironment::Instance()->GetTrdLayout());
+	SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 
 	SetVerbose(1);
 	SetNofIter(1);

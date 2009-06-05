@@ -31,6 +31,7 @@ public:
 
 protected:
 	TClonesArray* fTrackSeedsArray;
+	TClonesArray* fHitsArray;
 
 private:
 	TrackPropagatorPtr fPropagatorToDet;

@@ -55,20 +55,12 @@ private:
      */
 	void ReadDataBranches();
 
-    /**
-     * Fills map from <MC track index> to <reconstructed STS track index>
+	/**
+     * Fills map from <MC track index> to <reconstructed track index>
      */
-	void FillMapSts();
-
-    /**
-     * Fills map from <MC track index> to <reconstructed TRD track index>
-     */
-	void FillMapTrd();
-
-    /**
-     * Fills map from <MC track index> to <reconstructed MUCH track index>
-     */
-	void FillMapMuch();
+	void FillTrackMap(
+			std::map<Int_t, Int_t>& mcMap,
+			const TClonesArray* matches);
 
     /**
      * Fills map from <MC track index> to <TOF hit index>

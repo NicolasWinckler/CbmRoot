@@ -36,7 +36,7 @@ void CbmLitTrdTrackFinderBranch::Init()
 	SetFilter(factory->CreateTrackUpdate("kalman"));
 	SetFitter(factory->CreateTrackFitter("lit_kalman"));
 
-	SetLayout(CbmLitEnvironment::Instance()->GetTrdLayout());
+	SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 
 	SetVerbose(1);
 	SetNofIter(1);

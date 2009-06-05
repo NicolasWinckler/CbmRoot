@@ -167,9 +167,9 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 	if(name == "much_final") {
 		CbmLitTrackSelectionMuch* muchSelection = new CbmLitTrackSelectionMuch();
 		muchSelection->SetNofSharedHits(2);
-		Int_t nofStations = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofStationGroups();
-		muchSelection->SetMinLastPlaneId(nofStations-1);
-		Int_t nofLayers = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofPlanes();
+//		Int_t nofStations = CbmLitEnvironment::Instance()->GetLayout().GetNofStationGroups();
+//		muchSelection->SetMinLastPlaneId(nofStations-1);
+//		Int_t nofLayers = CbmLitEnvironment::Instance()->GetLayout().GetNofPlanes();
 		muchSelection->SetMinNofHits(1);
 		muchSelection->Initialize();
 		TrackSelectionPtr selection(muchSelection);
@@ -177,9 +177,9 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 	} else
 	if(name == "much_pre_final") {
 		CbmLitTrackSelectionD* muchSelection = new CbmLitTrackSelectionD();
-		Int_t nofStations = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofStationGroups();
+		Int_t nofStations = CbmLitEnvironment::Instance()->GetLayout().GetNofStationGroups();
 		muchSelection->SetMinLastPlaneId(nofStations-1);
-		Int_t nofLayers = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofPlanes();
+		Int_t nofLayers = CbmLitEnvironment::Instance()->GetLayout().GetNofPlanes();
 		muchSelection->SetMinNofHits(nofLayers - 3);
 		muchSelection->Initialize();
 		TrackSelectionPtr selection(muchSelection);
@@ -216,7 +216,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderNN->SetSeedSelection(CreateTrackSelection("momentum"));
 		trdFinderNN->SetFinalSelection(CreateTrackSelection("trd_final"));
 		trdFinderNN->SetFilter(CreateTrackUpdate("kalman"));
-		trdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetTrdLayout());
+		trdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 		trdFinderNN->SetVerbose(1);
 		trdFinderNN->SetNofIter(1);
 		trdFinderNN->IsUseFastSearch(true);
@@ -238,12 +238,12 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderBranch->SetFinalPreSelection(CreateTrackSelection("empty"));
 		trdFinderBranch->SetFilter(CreateTrackUpdate("kalman"));
 		trdFinderBranch->SetFitter(CreateTrackFitter("lit_kalman"));
-		trdFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetTrdLayout());
+		trdFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 		trdFinderBranch->SetVerbose(1);
 		trdFinderBranch->SetNofIter(1);
 		trdFinderBranch->IsUseFastSearch(true);
 		trdFinderBranch->SetBeginStationGroup(0);
-		trdFinderBranch->SetEndStationGroup(CbmLitEnvironment::Instance()->GetTrdLayout().GetNofStationGroups() - 1);
+		trdFinderBranch->SetEndStationGroup(CbmLitEnvironment::Instance()->GetLayout().GetNofStationGroups() - 1);
 		trdFinderBranch->SetPDG(11);
 		trdFinderBranch->SetMaxNofMissingHits(4);
 		trdFinderBranch->IsAlwaysCreateMissingHit(false);
@@ -260,7 +260,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderWeight->SetFinalSelection(CreateTrackSelection("empty"));
 		trdFinderWeight->SetFitter(CreateTrackFitter("kalman_robust"));
 		trdFinderWeight->SetFilter(CreateTrackUpdate("kalman"));
-		trdFinderWeight->SetLayout(CbmLitEnvironment::Instance()->GetTrdLayout());
+		trdFinderWeight->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 		trdFinderWeight->SetVerbose(1);
 		trdFinderWeight->SetNofIter(1);
 		trdFinderWeight->SetMaxNofMissingHits(0);
@@ -278,7 +278,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderNN->SetSeedSelection(CreateTrackSelection("momentum_seed"));
 		muchFinderNN->SetFinalSelection(CreateTrackSelection("much_final"));
 		muchFinderNN->SetFilter(CreateTrackUpdate("kalman"));
-		muchFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetMuchLayout());
+		muchFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 		muchFinderNN->SetVerbose(1);
 		muchFinderNN->SetNofIter(1);
 		muchFinderNN->IsUseFastSearch(true);
@@ -300,12 +300,12 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderBranch->SetFinalPreSelection(CreateTrackSelection("empty"));
 		muchFinderBranch->SetFilter(CreateTrackUpdate("kalman"));
 		muchFinderBranch->SetFitter(CreateTrackFitter("lit_kalman"));
-		muchFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetMuchLayout());
+		muchFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 		muchFinderBranch->SetVerbose(1);
 		muchFinderBranch->SetNofIter(1);
 		muchFinderBranch->IsUseFastSearch(true);
 		muchFinderBranch->SetBeginStationGroup(0);
-		muchFinderBranch->SetEndStationGroup(CbmLitEnvironment::Instance()->GetMuchLayout().GetNofStationGroups() - 1);
+		muchFinderBranch->SetEndStationGroup(CbmLitEnvironment::Instance()->GetLayout().GetNofStationGroups() - 1);
 		muchFinderBranch->SetPDG(13);
 		muchFinderBranch->SetMaxNofMissingHits(1);
 		muchFinderBranch->IsAlwaysCreateMissingHit(false);
@@ -322,7 +322,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderWeight->SetFinalSelection(CreateTrackSelection("empty"));
 		muchFinderWeight->SetFitter(CreateTrackFitter("kalman_robust"));
 		muchFinderWeight->SetFilter(CreateTrackUpdate("kalman"));
-		muchFinderWeight->SetLayout(CbmLitEnvironment::Instance()->GetMuchLayout());
+		muchFinderWeight->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 		muchFinderWeight->SetVerbose(1);
 		muchFinderWeight->SetNofIter(1);
 		muchFinderWeight->SetMaxNofMissingHits(1);

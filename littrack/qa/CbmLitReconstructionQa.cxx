@@ -46,6 +46,8 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
 	fMinNofPointsMuch = 10;
 	fMinNofPointsTof = 1;
 	fQuota = 0.7;
+	fMinNofHitsTrd = 8;
+	fMinNofHitsMuch = 10;
 	fRefMomentum = 2.;
 	fNofTypes = 3;
 	fNofCategories = 6;
@@ -174,19 +176,27 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 		CbmTrackMatch* trdTrackMatch;
 		if (isTrdOk) {
 			trdTrackMatch = (CbmTrackMatch*) fTrdMatches->At(trdId);
-			isTrdOk = CheckTrackQuality(trdTrackMatch);
-			if (!isTrdOk) { // ghost track
-				Int_t nofHits = trdTrackMatch->GetNofTrueHits() + trdTrackMatch->GetNofWrongHits() + trdTrackMatch->GetNofFakeHits();
-				fhRecGhostNh->Fill(nofHits);
+			Int_t nofHits = trdTrackMatch->GetNofTrueHits() + trdTrackMatch->GetNofWrongHits() + trdTrackMatch->GetNofFakeHits();
+			if (nofHits >= fMinNofHitsTrd) {
+				isTrdOk = CheckTrackQuality(trdTrackMatch);
+				if (!isTrdOk) { // ghost track
+					fhRecGhostNh->Fill(nofHits);
+				}
+			} else {
+				isTrdOk = false;
 			}
 		}
 		CbmTrackMatch* muchTrackMatch;
 		if (isMuchOk) {
 			muchTrackMatch = (CbmTrackMatch*) fMuchMatches->At(muchId);
-			isMuchOk = CheckTrackQuality(muchTrackMatch);
-			if (!isMuchOk) { // ghost track
-				Int_t nofHits = muchTrackMatch->GetNofTrueHits() + muchTrackMatch->GetNofWrongHits() + muchTrackMatch->GetNofFakeHits();
-				fhRecGhostNh->Fill(nofHits);
+			Int_t nofHits = muchTrackMatch->GetNofTrueHits() + muchTrackMatch->GetNofWrongHits() + muchTrackMatch->GetNofFakeHits();
+			if (nofHits >= fMinNofHitsMuch) {
+				isMuchOk = CheckTrackQuality(muchTrackMatch);
+				if (!isMuchOk) { // ghost track
+					fhRecGhostNh->Fill(nofHits);
+				}
+			} else {
+				isMuchOk = false;
 			}
 		}
 
@@ -254,6 +264,7 @@ void CbmLitReconstructionQa::ProcessMcTracks()
 		Bool_t isTofOk = nofPointsTof >= fMinNofPointsTof && fIsTof;
 		Bool_t isStsReconstructed = fMcStsMap.find(iMCTrack) != fMcStsMap.end();
 		Bool_t isHalfGlobalReconstructed = fMcHalfGlobalMap.find(iMCTrack) != fMcHalfGlobalMap.end();
+		Bool_t isRecOk = (fIsMuch && fIsTrd) ? (isTrdOk && isMuchOk) : (isTrdOk || isMuchOk); // MUCH+TRD
 
 		// Check accepted tracks cutting on minimal number of MC points
 		// acceptance: STS tracks only
@@ -264,18 +275,18 @@ void CbmLitReconstructionQa::ProcessMcTracks()
 			FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsNp, nofPointsSts);
 		}
 		// acceptance: STS+TRD(MUCH)
-		if (isStsOk && (isTrdOk || isMuchOk)){
+		if (isStsOk && isRecOk){
 			// momentum dependence histograms
 			FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, fhHalfGlobalMom, mcTrack->GetP());
 		}
 		// acceptance: STS+TRD(MUCH)+TOF
-		if (isStsOk && (isTrdOk || isMuchOk) && isTofOk) {
+		if (isStsOk && isRecOk && isTofOk) {
 			// momentum dependence histograms
 			FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcGlobalMap, fhGlobalMom, mcTrack->GetP());
 		}
 
 		// acceptance: STS as 100% + local TRD(MUCH) track cutting on number of points
-		if ( isStsReconstructed && isStsOk && (isTrdOk || isMuchOk) ){
+		if ( isStsReconstructed && isStsOk && isRecOk ){
 			// momentum dependence histograms
 			FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, fhRecMom, mcTrack->GetP());
 			// number of points dependence histograms
@@ -283,7 +294,7 @@ void CbmLitReconstructionQa::ProcessMcTracks()
 			FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, fhRecNp, np);
 		}
 
-		if (isHalfGlobalReconstructed && isStsOk && (isTrdOk || isMuchOk) && isTofOk) {
+		if (isHalfGlobalReconstructed && isStsOk && isRecOk && isTofOk) {
 			// momentum dependence histograms
 			FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcGlobalMap, fhTofMom, mcTrack->GetP());
 		}

@@ -74,6 +74,18 @@ public:
      */
 	void SetQuota(Double_t quota) { fQuota = quota;}
 
+	/**
+     * Sets the minimum number of hits in TRD track.
+     * @param minNofPointsTrd Minimum number of MC points in TRD.
+     */
+	void SetMinNofHitsTrd(Int_t minNofHitsTrd) { fMinNofHitsTrd = minNofHitsTrd;}
+
+    /**
+     * Sets the minimum number of hits in MUCH track.
+     * @param minNofHitsMuch Minimum number of hits in MUCH track.
+     */
+	void SetMinNofHitsMuch(Int_t minNofHitsMuch) { fMinNofHitsMuch = minNofHitsMuch;}
+
     /**
      * Sets the verbose level for printout.
      * @param verbose Verbose value.
@@ -185,6 +197,9 @@ private:
 	Int_t fMinNofPointsMuch; // Minimal number of MCPoints in MUCH
 	Int_t fMinNofPointsTof; // Minimal number of MCPoints in TOF
 	Double_t fQuota;  // True/all hits for track to be considered correctly reconstructed
+
+	Int_t fMinNofHitsTrd; // Minimal number of hits in TRD track
+	Int_t fMinNofHitsMuch; // Minimal number of hits in MUCH track
 
 	Bool_t fIsElectronSetup; // If "electron" setup detected than true
 	Bool_t fIsSts; // If STS detected than true

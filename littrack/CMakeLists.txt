@@ -80,7 +80,7 @@ finder_cbm/CbmLitMuchTrackFinderBranch.cxx
 finder_cbm/CbmLitMuchTrackFinderNN.cxx
 finder_cbm/CbmLitMuchTrackFinderWeight.cxx
 finder_cbm/CbmLitStsBasedTrackFinder.cxx
-finder_cbm/CbmLitTofMerger.cxx
+#finder_cbm/CbmLitTofMerger.cxx
 finder_cbm/CbmLitFindGlobalTracks.cxx
 fitter/CbmLitTrackFitterImp.cxx
 fitter/CbmLitKalmanFilter.cxx

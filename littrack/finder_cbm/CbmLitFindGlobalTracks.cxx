@@ -1,3 +1,9 @@
+/** CbmLitFindGlobalTracks.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
+ **/
+
 #include "CbmLitFindGlobalTracks.h"
 #include "CbmLitEnvironment.h"
 #include "CbmLitConverter.h"
@@ -29,6 +35,14 @@ CbmLitFindGlobalTracks::CbmLitFindGlobalTracks()
 	fEventNo = 0;
 	fTrackingType = "branch";
 	fMergerType = "nearest_hit";
+	fStsTracks = NULL;
+	fMuchPixelHits = NULL;
+	fMuchStrawHits = NULL;
+	fMuchTracks = NULL;
+	fTrdHits = NULL;
+	fTrdTracks = NULL;
+	fTofHits = NULL;
+	fGlobalTracks = NULL;
 }
 
 CbmLitFindGlobalTracks::~CbmLitFindGlobalTracks()
@@ -57,8 +71,6 @@ void CbmLitFindGlobalTracks::Exec(
 	fGlobalTracks->Clear();
 
 	ConvertInputData();
-
-	InitStsTrackSeeds();
 
 	RunTrackReconstruction();
 
@@ -116,9 +128,11 @@ void CbmLitFindGlobalTracks::ReadAndCreateDataBranches()
 
 	//MUCH data
 	if (fIsMuch) {
-		fMuchHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
-		if (NULL == fMuchHits) Fatal("Init", "No MuchPixelHit array!");
-		std::cout << "-I- MuchHit branch found in tree" << std::endl;
+		fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
+		fMuchStrawHits = (TClonesArray*) ioman->GetObject("MuchStrawHit");
+		if (NULL == fMuchPixelHits && NULL == fMuchStrawHits) Fatal("Init", "No MuchPixelHit or MuchStrawHit array!");
+		if (fMuchPixelHits) std::cout << "-I- MuchPixelHit branch found in tree" << std::endl;
+		if (fMuchStrawHits) std::cout << "-I- MuchStrawHit branch found in tree" << std::endl;
 	}
 
 	//TRD data
@@ -181,15 +195,22 @@ void CbmLitFindGlobalTracks::ConvertInputData()
 {
 	CbmLitConverter::StsTrackArrayToTrackVector(fStsTracks, fLitStsTracks);
 	std::cout << "-I- Number of STS tracks: " << fLitStsTracks.size() << std::endl;
-	if (fIsMuch) {
-		CbmLitConverter::HitArrayToHitVector(fMuchHits, fLitMuchHits);
-		std::cout << "-I- Number of MUCH hits: " << fLitMuchHits.size() << std::endl;
+	if (fMuchPixelHits) CbmLitConverter::HitArrayToHitVector(fMuchPixelHits, fLitHits);
+	if (fMuchStrawHits) CbmLitConverter::HitArrayToHitVector(fMuchStrawHits, fLitHits);
+	if (fTrdHits) {
+		CbmLitConverter::HitArrayToHitVector(fTrdHits, fLitHits);
+		//If MUCH-TRD setup, than shift plane id for the TRD hits
+		if (fIsMuch && fIsTrd) {
+			Int_t nofPlanes = CbmLitEnvironment::Instance()->GetMuchLayout().GetNofPlanes();
+			for (Int_t i = 0; i < fLitHits.size(); i++) {
+				CbmLitHit* hit = fLitHits[i];
+				if (hit->GetDetectorId() == kLITTRD) hit->SetPlaneId(hit->GetPlaneId() + nofPlanes);
+			}
+		}
 	}
-	if (fIsTrd) {
-		CbmLitConverter::HitArrayToHitVector(fTrdHits, fLitTrdHits);
-		std::cout << "-I- Number of TRD hits: " << fLitTrdHits.size() << std::endl;
-	}
-	if (fIsTof) {
+	std::cout << "-I- Number of hits: " << fLitHits.size() << std::endl;
+
+	if (fTofHits) {
 		CbmLitConverter::HitArrayToHitVector(fTofHits, fLitTofHits);
 		std::cout << "-I- Number of TOF hits: " << fLitTofHits.size() << std::endl;
 	}
@@ -205,38 +226,19 @@ void CbmLitFindGlobalTracks::ClearArrays()
 	// Free memory
 	for_each(fLitStsTracks.begin(), fLitStsTracks.end(), DeleteObject());
 	for_each(fLitOutputTracks.begin(), fLitOutputTracks.end(), DeleteObject());
-	for_each(fLitMuchHits.begin(), fLitMuchHits.end(), DeleteObject());
-	for_each(fLitTrdHits.begin(), fLitTrdHits.end(), DeleteObject());
+	for_each(fLitHits.begin(), fLitHits.end(), DeleteObject());
 	for_each(fLitTofHits.begin(), fLitTofHits.end(), DeleteObject());
 	fLitStsTracks.clear();
 	fLitOutputTracks.clear();
-	fLitMuchHits.clear();
-	fLitTrdHits.clear();
+	fLitHits.clear();
 	fLitTofHits.clear();
-}
-
-void CbmLitFindGlobalTracks::InitStsTrackSeeds()
-{
-//    Double_t Ze = layout.GetSubstation(0, 0, 0).GetZ();
-//    for (TrackPtrIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {
-//    	CbmLitTrackParam par = *(*iTrack)->GetParamLast();
-//    	fPropagatorToDet->Propagate(&par, Ze, pdg);
-//    	(*iTrack)->SetParamLast(&par);
-//    	(*iTrack)->SetParamFirst((*iTrack)->GetParamLast());
-//    	(*iTrack)->SetChi2(0.);
-//    }
 }
 
 void CbmLitFindGlobalTracks::RunTrackReconstruction()
 {
-	if (fIsElectronSetup && fIsTrd) {
+	if (fIsMuch || fIsTrd) {
 		fTrackingWatch.Start(kFALSE);
-		fFinder->DoFind(fLitTrdHits, fLitStsTracks, fLitOutputTracks);
-		fTrackingWatch.Stop();
-	}
-	if (fIsMuch) {
-		fTrackingWatch.Start(kFALSE);
-		fFinder->DoFind(fLitMuchHits, fLitStsTracks, fLitOutputTracks);
+		fFinder->DoFind(fLitHits, fLitStsTracks, fLitOutputTracks);
 		fTrackingWatch.Stop();
 	}
 	if (fIsTof){

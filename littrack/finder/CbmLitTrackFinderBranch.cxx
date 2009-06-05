@@ -23,7 +23,6 @@
 
 CbmLitTrackFinderBranch::CbmLitTrackFinderBranch()
 {
-//	fMaxNofBranches = 32;
 	fMaxNofHitsInValidationGate = 4;
 }
 

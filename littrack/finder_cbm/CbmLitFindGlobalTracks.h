@@ -1,3 +1,19 @@
+/** CbmLitFindGlobalTracks.h
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
+ **
+ ** CBM task class for global track reconstruction.
+ ** Output is reconstructed global tracks CbmGlobalTrack and
+ ** local track segments CbmMuchTrack, CbmTrdTrack.
+ ** The task automatically determines the setup based on the
+ ** geometry stored in the MC transport file.
+ ** The tracking is performed in the MUCH and TRD detectors, than
+ ** the hit-to-track merger attaches the TOF hit.
+ ** If TRD detector presences in the muon detector setup,
+ ** than the tracking is done in MUCH+TRD detectors in one goal.
+ **/
+
 #ifndef CBMLITFINDGLOBALTRACKS_H_
 #define CBMLITFINDGLOBALTRACKS_H_
 
@@ -15,50 +31,115 @@ class TClonesArray;
 class CbmLitFindGlobalTracks : public FairTask
 {
 public:
+    /** Default constructor */
 	CbmLitFindGlobalTracks();
+
+    /** Destructor */
 	virtual ~CbmLitFindGlobalTracks();
 
+    /**
+     * Derived from FairTask. Executed before starting event-by-event execution.
+     */
 	virtual InitStatus Init();
+
+	/**
+     * Derived from FairTask. Executed on each event.
+     * @param opt Options
+     */
 	virtual void Exec(Option_t* opt);
+
+	/**
+     * Derived from FairTask. Set parameter containers.
+     */
 	virtual void SetParContainers();
 
+	/**
+     * Sets the tracking algorithm to be used.
+     * @param trackingType Name of the tracking algorithm.
+     * "branch" - branching tracking
+     * "nn" - nearest neighbor tracking
+     * "weight" - weighting tracking
+     */
 	void SetTrackingType(const std::string& trackingType) { fTrackingType = trackingType;}
+
+	/**
+     * Sets the hit-to-track merger algorithm to be used.
+     * @param mergerType Name of the hit-to-track algorithm.
+     * "nearest_hit" - attaches hit-to-track based on the closest statistical distance
+     */
 	void SetMergerType(const std::string& mergerType) { fMergerType = mergerType;}
 
 private:
+    /**
+     * Derived from FairTask. Executed after all events are processed.
+     */
 	virtual void Finish();
+
+    /**
+     * Determines the CBM detector setup, based on TGeoManager stored in the input MC file.
+     */
 	void DetermineSetup();
+
+    /**
+     * Reads necessary data branches from the input data files and
+     * creates branches for CbmGlobalTrack, CbmTrdTrack, CbmMuchTrack
+     */
 	void ReadAndCreateDataBranches();
+
+    /**
+     * Create and initializes track finder and track merger objects.
+     */
 	void InitTrackReconstruction();
+
+    /**
+     * Converts input data from CBMROOT data classes to LIT data classes.
+     */
 	void ConvertInputData();
+
+    /**
+     * Converts output data LIT data classes to CBMROOT data classes.
+     */
 	void ConvertOutputData();
+
+    /**
+     * Clear arrays and frees the memory.
+     */
 	void ClearArrays();
-	void InitStsTrackSeeds();
+
+    /**
+     * Runs the track reconstruction
+     */
 	void RunTrackReconstruction();
+
+    /**
+     * Prints output stopwatch statistics for track-finder and hit-to-track merger.
+     */
 	void PrintStopwatchStatistics();
 
-	Bool_t fIsElectronSetup;
-	Bool_t fIsTrd;
-	Bool_t fIsMuch;
-	Bool_t fIsTof;
+	Bool_t fIsElectronSetup; // If "electron" setup detected than true
+	Bool_t fIsTrd; // If TRD detected than true
+	Bool_t fIsMuch; // If MUCH detected than true
+	Bool_t fIsTof; // If TOF detected than true
 
-	TClonesArray* fStsTracks;
-	TClonesArray* fMuchHits;
-	TClonesArray* fMuchTracks; //output
-	TClonesArray* fTrdHits;
-	TClonesArray* fTrdTracks; //output
-	TClonesArray* fTofHits;
-	TClonesArray* fGlobalTracks;   //output
+	// Pointers to data arrays
+	TClonesArray* fStsTracks; // CbmStsTrack array
+	TClonesArray* fMuchPixelHits; // CbmMuchPixelHit array
+	TClonesArray* fMuchStrawHits; // CbmMuchStrawHit array
+	TClonesArray* fMuchTracks; // output CbmMuchTrack array
+	TClonesArray* fTrdHits; // CbmTrdHit array
+	TClonesArray* fTrdTracks; // output CbmTrdTrack array
+	TClonesArray* fTofHits; // CbmTofHit array
+	TClonesArray* fGlobalTracks; //output CbmGlobalTrack array
 
-	TrackPtrVector fLitStsTracks;
-	HitPtrVector fLitMuchHits;
-	HitPtrVector fLitTrdHits;
-	HitPtrVector fLitTofHits;
+	// LIT data arrays
+	TrackPtrVector fLitStsTracks; // STS tracks
+	HitPtrVector fLitHits; // MUCH+TRD hits
+	HitPtrVector fLitTofHits; // TOF hits
 	TrackPtrVector fLitOutputTracks; // output Lit tracks
 
 	// Tools
-	TrackFinderPtr fFinder;
-	HitToTrackMergerPtr fMerger;
+	TrackFinderPtr fFinder; // track finder
+	HitToTrackMergerPtr fMerger; // hit-to-track merger
 
 	// Settings
 	// Tracking method to be used
@@ -75,7 +156,7 @@ private:
 	TStopwatch fTrackingWatch; // stopwatch for tracking
 	TStopwatch fMergerWatch; // stopwatch for merger
 
-	Int_t fEventNo;
+	Int_t fEventNo; // event counter
 
 	ClassDef(CbmLitFindGlobalTracks, 1);
 };

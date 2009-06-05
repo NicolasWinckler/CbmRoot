@@ -31,7 +31,7 @@ void CbmLitTrdTrackFinderWeight::Init()
 	SetFitter(factory->CreateTrackFitter("kalman_robust"));
 	SetFilter(factory->CreateTrackUpdate("kalman"));
 
-	SetLayout(CbmLitEnvironment::Instance()->GetTrdLayout());
+	SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 
 	SetVerbose(1);
 	SetNofIter(1);

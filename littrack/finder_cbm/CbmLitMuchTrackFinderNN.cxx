@@ -29,7 +29,7 @@ void CbmLitMuchTrackFinderNN::Init()
 	SetFinalSelection(factory->CreateTrackSelection("much_final"));
 	SetFilter(factory->CreateTrackUpdate("kalman"));
 
-	SetLayout(CbmLitEnvironment::Instance()->GetMuchLayout());
+	SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 
 	SetVerbose(1);
 	SetNofIter(1);
@@ -42,14 +42,13 @@ void CbmLitMuchTrackFinderNN::Init()
 }
 
 Int_t CbmLitMuchTrackFinderNN::DoFind(
-		TClonesArray* hitArray,
 		TClonesArray* trackArray)
 {
 	HitPtrVector hits;
 	TrackPtrVector trackSeeds;
 	TrackPtrVector foundTracks;
 
-	CbmLitConverter::HitArrayToHitVector(hitArray, hits);
+	CbmLitConverter::HitArrayToHitVector(fHitsArray, hits);
 	DefaultCreateTrackSeeds(fTrackSeedsArray, trackSeeds, fLayout, fPDG);
 
 	CbmLitTrackFinderNN::DoFind(hits, trackSeeds, foundTracks);

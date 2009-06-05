@@ -1,5 +1,5 @@
-#ifndef CBMLITPROPAGATIONANALYSIS_H
-#define CBMLITPROPAGATIONANALYSIS_H 1
+#ifndef CBMLITPROPAGATIONANALYSIS_H_
+#define CBMLITPROPAGATIONANALYSIS_H_ 1
 
 #include "FairTask.h"
 #include "CbmLitTypes.h"
@@ -15,9 +15,6 @@ class CbmLitTrack;
 class CbmLitHit;
 class FairMCPoint;
 class CbmMCTrack;
-class CbmStsTrack;
-class CbmTrdTrack;
-class CbmMuchTrack;
 class CbmGlobalTrack;
 class TClonesArray;
 class TH1F;
@@ -103,7 +100,9 @@ private:
 	TClonesArray* fMuchStrawHits; // CbmMuchStrawHits array
 	TClonesArray* fMuchPoints; // CbmMuchPoint array
 	TClonesArray* fMuchTrackMatches; // CbmTrackMatch array
-	TClonesArray* fMuchDigiMatches; // CbmMuchDigiMatch array
+	TClonesArray* fMuchPixelDigiMatches; // CbmMuchDigiMatch array for pixel hits
+	TClonesArray* fMuchStrawDigiMatches; // CbmMuchDigiMatch array for straw hits
+	TClonesArray* fMuchClusters; // CbmMuchCluster array
 	TClonesArray* fTrdTracks; // CbmTrdTrack array
 	TClonesArray* fTrdHits; // CbmTrdHit array
 	TClonesArray* fTrdPoints; // CbmTrdPoint array

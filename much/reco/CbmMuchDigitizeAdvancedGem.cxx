@@ -362,12 +362,12 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
 
   FirePads();
 
-  for(Int_t i=0; i< fDigiMatches->GetEntriesFast(); ++i){
-    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(i);
-    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
-    //assert(match->GetTotalCharge() == digi->GetCharge());
-    printf("points = %i, charge = %i\n", match->GetNPoints(), match->GetTotalCharge());
-  }
+//  for(Int_t i=0; i< fDigiMatches->GetEntriesFast(); ++i){
+//    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(i);
+//    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
+//    printf("points = %i, charge = %i, ADC channel = %i\n",
+//        match->GetNPoints(), match->GetTotalCharge(), digi->GetADCCharge());
+//  }
 
   // Screen output
   fTimer.Stop();
@@ -461,7 +461,8 @@ void CbmMuchDigitizeAdvancedGem::FirePads() {
       Int_t iDigi = -1;
       if (fChannelMap.find(uniqueId) == fChannelMap.end()) {
         iDigi = fDigis->GetEntriesFast();
-        digi->SetADCCharge(match->GetTotalCharge() / fNADCChannels);
+        Int_t adcChannel = match->GetTotalCharge() * fNADCChannels/ fQMax;
+        digi->SetADCCharge(adcChannel > fNADCChannels ? fNADCChannels : adcChannel);
         new ((*fDigis)[iDigi]) CbmMuchDigi(digi);
         new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch(match);
         fChannelMap[uniqueId] = iDigi;

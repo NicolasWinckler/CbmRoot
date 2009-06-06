@@ -161,6 +161,11 @@ Bool_t CbmMuchDigitizeSimpleGem::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
       }
       // Match channelId to index of the Digi.
       fChannelMap[uniqueId] = iDigi;
+
+      CbmMuchDigi* digi = dynamic_cast<CbmMuchDigi*> (fDigis->At(iDigi));
+
+      // Set ADC charge (for visualization)
+      digi->SetADCCharge(100);
   } else {
     // Channel already active.
     iDigi = fChannelMap[uniqueId];

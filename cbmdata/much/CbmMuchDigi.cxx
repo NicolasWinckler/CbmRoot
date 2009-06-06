@@ -7,6 +7,7 @@
  ** Data class for digital MUCH information
  ** Data level: RAW
  **
+ **
  **/
 
 #include "CbmMuchDigi.h"
@@ -49,7 +50,6 @@ CbmMuchDigi::CbmMuchDigi(CbmMuchDigi* digi){
 
 // -------------------------------------------------------------------------
 
-
 // -----   Destructor   ----------------------------------------------------
 CbmMuchDigi::~CbmMuchDigi() { }
 // -------------------------------------------------------------------------
@@ -69,5 +69,6 @@ Int_t CbmMuchDigi::AddTime(Double_t time) {
   }
   return 4;
 }
+// -------------------------------------------------------------------------
 
 ClassImp(CbmMuchDigi)

@@ -131,7 +131,8 @@ void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
       Double_t sigmaX = dx / TMath::Sqrt(12.);
       Double_t sigmaY = dy / TMath::Sqrt(12.);
 
-      CbmMuchModule* module = fGeoScheme->GetModuleByDetId(pad->GetDetectorId());
+      CbmMuchModule* module = fGeoScheme->GetModuleByDetId(
+          pad->GetDetectorId());
       x = xq / secCluster->GetCharge();
       y = yq / secCluster->GetCharge();
       z = module->GetPosition()[2];
@@ -143,10 +144,13 @@ void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
       Int_t planeId = fGeoScheme->GetLayerSideNr(detId);
 
       new ((*fHits)[nHits++]) CbmMuchPixelHit(detId, pos, dpos, 0, iCluster, planeId);
+//      (detId, pos,
+//          dpos, 0, iCluster,planeId);
 
       if (planeId>30) printf("planeId=%i\n",planeId);
 
-      if (secCluster) delete secCluster;
+      if (secCluster)
+        delete secCluster;
     }
     secondaryClusters.clear();
   }
@@ -270,9 +274,8 @@ void CbmMuchFindHitsAdvancedGem::CreateCluster(Int_t iDigi,
     if (fChannelDigiMap.find(uniqueId) == fChannelDigiMap.end()) continue;
 
     Int_t digiIndex = fChannelDigiMap[uniqueId];
-//    CbmMuchDigi* neighbourDigi = (CbmMuchDigi*) fDigis->At(digiIndex);
     CbmMuchDigiMatch* neighbourMatch = (CbmMuchDigiMatch*) fDigiMatches->At(digiIndex);
-    if (!neighbourMatch)  continue;
+    if (!neighbourMatch) continue;
     Int_t digiCharge = neighbourMatch->GetTotalCharge();
     if (digiCharge <= qThreshold)
       continue;
@@ -296,11 +299,14 @@ void CbmMuchFindHitsAdvancedGem::ApplyThreshold(CbmMuchCluster* cluster, vector<
     Int_t digiIndex = cluster->GetDigiIndex(iDigi);
     Int_t charge = 0;
     CbmMuchPad* pad = GetPadByDigi(digiIndex, charge);
-    if (!pad) continue;
-    if (charge <= qThreshold) continue;
+    if (!pad)
+      continue;
+    if (charge <= qThreshold)
+      continue;
 
     // Selection
-    if (fSelectedDigis.find(digiIndex) != fSelectedDigis.end()) continue;
+    if (fSelectedDigis.find(digiIndex) != fSelectedDigis.end())
+      continue;
 
     vector<Int_t> digiIndices;
     Int_t sumCharge = 0;
@@ -319,7 +325,7 @@ CbmMuchPad* CbmMuchFindHitsAdvancedGem::GetPadByDigi(Int_t digiIndex, Int_t &cha
     Int_t detectorId = digi->GetDetectorId();
     Int_t channelId = digi->GetChannelId();
     CbmMuchModuleGem* module = (CbmMuchModuleGem*) fGeoScheme->GetModuleByDetId(detectorId);
-    CbmMuchPad* pad = module->GetPad(channelId);
+    CbmMuchPad* pad = module->GetPad(channelId);//fGeoScheme->GetPadByDetId(detectorId, channelId);
     if (pad){
       assert(pad->GetDetectorId() == digi->GetDetectorId());
       assert(pad->GetChannelId() == digi->GetChannelId());

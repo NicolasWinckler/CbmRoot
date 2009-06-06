@@ -71,7 +71,7 @@ Int_t CbmMuchDigiMatch::GetRefIndex(Int_t i) const {
   return fRefIndex.At(i);
 }
 // -------------------------------------------------------------------------
-
+#include <cassert>
 // -----   Public method AddCharge  ----------------------------------------
 UInt_t CbmMuchDigiMatch::AddCharge(UInt_t iCharge) {
   if ( iCharge < 0 ) {
@@ -82,6 +82,7 @@ UInt_t CbmMuchDigiMatch::AddCharge(UInt_t iCharge) {
   Int_t n = fCharge.GetSize();
   fCharge.Set(n+1);
   fCharge.AddAt(iCharge, n);
+  assert(fCharge.At(n) == iCharge);
   return n+1;
 }
 // -------------------------------------------------------------------------
@@ -100,8 +101,8 @@ UInt_t CbmMuchDigiMatch::GetCharge(Int_t i) const {
 // -----   Public method GetTotalCharge  -----------------------------------
 UInt_t CbmMuchDigiMatch::GetTotalCharge() const {
   UInt_t totCharge = 0;
-  for(Int_t iRef = 0; iRef < GetNPoints(); ++iRef){
-    totCharge += fCharge.At(iRef);
+  for(Int_t iRef=0; iRef<GetNPoints(); ++iRef){
+    totCharge += GetCharge(iRef);
   }
   return totCharge;
 }

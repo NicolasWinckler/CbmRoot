@@ -208,6 +208,7 @@ CbmEcalInf::CbmEcalInf(const char* filename)
   string value;
   TObjString* str=NULL;
   char** err=NULL;
+  char winend[2]={13, 0};
   int ssize=-1;
 
   fSuccess=1;
@@ -226,6 +227,8 @@ CbmEcalInf::CbmEcalInf(const char* filename)
     linenum++;
     message=buffer.substr(buffer.find_first_not_of(" 	"));	//Skiping initial spaces
     message=message.substr(0,message.find("#"));	//Removing comments
+    // Threat windows end of strings correctly
+    message=message.substr(0,message.find(winend));
     if (message.empty()) continue;		//This was just a comment
     variable=message.substr(0,message.find("="));
     if (variable=="structure") {
@@ -235,6 +238,10 @@ CbmEcalInf::CbmEcalInf(const char* filename)
 	message=buffer.substr(buffer.find_first_not_of(" 	"));	//Skiping initial spaces
 	message=message.substr(0,message.find("#"));	//Removing comments
 	message=message.substr(0,message.find_last_not_of(" 	")+1);	//Skiping ending spaces
+
+        // Threat windows end of strings correctly
+        message=message.substr(0,message.find(winend));
+
 	if (!message.empty()) {
 	  if (-1==ssize)
 	    ssize=message.size();

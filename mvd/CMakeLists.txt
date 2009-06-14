@@ -31,7 +31,8 @@ CbmMvdContFact.cxx
 CbmMvdGeo.cxx 
 CbmMvdGeoPar.cxx 
 CbmMvdHitProducer.cxx 
-CbmMvdDigitiser.cxx  
+CbmMvdDigitize.cxx  
+CbmMvdDigitizeL.cxx  
 CbmMvdPileupManager.cxx  
 CbmMvdFindHits.cxx
 CbmMvdStation.cxx

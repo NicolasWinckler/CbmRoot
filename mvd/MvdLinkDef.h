@@ -9,7 +9,8 @@
 #pragma link C++ class CbmMvdGeo+;
 #pragma link C++ class CbmMvdGeoPar;
 #pragma link C++ class CbmMvdHitProducer+;
-#pragma link C++ class CbmMvdDigitiser+;
+#pragma link C++ class CbmMvdDigitize+;
+#pragma link C++ class CbmMvdDigitizeL+;
 #pragma link C++ class CbmMvdPileupManager+;
 #pragma link C++ class CbmMvdFindHits+;
 #pragma link C++ class CbmMvdStation+;

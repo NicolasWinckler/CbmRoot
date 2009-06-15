@@ -118,7 +118,7 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
     // Some initialization - should go somewhere else
     cout << " Processing straws ... " << endl;
     first = 0;
-    //Double_t phi[3] = {0., 90., 45. }; // view rotation angles
+    //Double_t phi[3] = {45., 45., 45. }; // view rotation angles
     Double_t phi[3] = {fPhis[0], fPhis[1], fPhis[2]}; // rotation angles of views (doublets)
     for (Int_t i = 0; i < 3; ++i) {
       phi[i] *= TMath::DegToRad();
@@ -127,8 +127,8 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
       rotMatr[i].setElement(TMath::Sin(phi[i]),1);
       rotMatr[i].setElement(-TMath::Sin(phi[i]),3);
       rotMatr[i].print();
-      rotMatr[i].invert();
-      rotMatr[i].print();
+      //rotMatr[i].invert();
+      //rotMatr[i].print();
     }
     // Get inner radia of stations
     Int_t nSt = fGeoScheme->GetNStations();
@@ -160,6 +160,7 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
     FairGeoVector p(xyz[0], xyz[1], xyz[2]);
     FairGeoVector ploc = rotMatr[rot] * p;
     Double_t xloc = ploc.getX();
+    //cout << " Local: " << ploc.getX() << " " << ploc.getY() << " " << ploc.getZ() << endl;
     if (layer % 2 != 0) xloc += diam[station3] / 2. * TMath::Sign(1.,xloc); // half-tube shift
     Int_t itube = (Int_t) (xloc / diam[station3]), iSegment;
     if (xloc < 0) itube--;
@@ -182,8 +183,9 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
 
     //times[2] = -77777;
     //CbmMuchStrawHit(detectorId,u,phi,z,du,dphi,dz,refId,planeId);
+    //cout << " Local: " << ploc.getX()+errU << " " << ploc.getY() << " " << ploc.getZ() << endl;
     CbmMuchStrawHit *hit = new ((*fHits)[nHits++]) CbmMuchStrawHit(detId, 
-                           ploc.getX()+errU, TMath::ASin(wXY), pos[2], sigmaX, 0, 0, 
+			   ploc.getX()+errU, TMath::ASin(wXY), pos[2], sigmaX, 0, 0, 
                            idig, fGeoScheme->GetLayerSideNr(detId));
     /*
     hit->SetPlaneId(fGeoScheme->GetLayerSideNr(detId));

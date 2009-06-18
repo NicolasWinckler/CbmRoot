@@ -23,6 +23,7 @@ set(CBMGENERATORS_SRCS
 CbmDirectPhotonGenerator.cxx
 CbmEcalGenerator.cxx
 CbmHsdLvmGenerator.cxx
+CbmShieldGenerator.cxx
 CbmUnigenGenerator.cxx
 CbmUrqmdGenerator.cxx
 URun.cxx

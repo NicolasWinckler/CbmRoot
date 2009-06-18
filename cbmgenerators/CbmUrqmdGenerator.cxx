@@ -1,26 +1,24 @@
 // -------------------------------------------------------------------------
-// -----                FairUrqmdGenerator source file                  -----
+// -----                CbmUrqmdGenerator source file                  -----
 // -----                Created 24/06/04  by V. Friese                 -----
 // -------------------------------------------------------------------------
+
 #include "CbmUrqmdGenerator.h"
+
+#include "TLorentzVector.h"
+#include "TMath.h"
+#include "TRandom.h"
 
 #include "CbmPrimaryGenerator.h"
 #include "CbmMCEvent.h"
 
-#include "TMCProcess.h"
-#include "TObjArray.h"
-#include "TPDGCode.h"
-#include "TParticle.h"
-#include "TRandom.h"
-#include "TString.h"
-#include "TVirtualMCStack.h"
-#include "TLorentzVector.h"
-
 #include <iostream>
 #include <cstring>
 
+
 using std::cout;
 using std::endl;
+
 
 const Double_t kProtonMass = 0.938271998;
 

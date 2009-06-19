@@ -1,15 +1,14 @@
  /****************************************************************************
- *  $Id: CbmJpsiTrackCollection.h,v 1.2 2006/01/26 09:58:37 hoehne Exp $
- *
+ *  
  *  Class : CbmJpsiTrackCollection
  *  Descripton: This is the container to hold the data class
  *              CbmJpsiTrackCollection.
  *
- *  Author: Supriya Das
- *  E-mail: S.Das@gsi.de
+ *  Author: Alla Maevskaya
+ *  E-mail: alla@inr.ru
  *****************************************************************************
- *  $Log : CbmJpsiTrackCollectionCollection.h,v $
- *****************************************************************************/
+ *  $Log : CbmJpsiTrackCollection.h ,v $
+ ***************************************************************************/
 
 #ifndef CBM_JPSI_TRACK_COLLECTION_H
 #define CBM_JPSI_TRACK_COLLECTION_H

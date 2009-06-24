@@ -199,15 +199,17 @@ void CbmVisMuch::ReadEvent(Int_t event){
     //SetHitInfo((CbmVisHit*) hits[index]);
   }
 
-  printf("Fill arrays of CbmVisStripHits... nHits = %i\n",fStripHits->GetEntriesFast());
-  //Create arrays of CbmVisHits
-  for (Int_t i=0;i<fStripHits->GetEntriesFast();i++){
-    CbmMuchStrawHit* hit = (CbmMuchStrawHit*) fStripHits->At(i);
-    CbmMuchModule* module = fGeoScheme->GetModuleByDetId(hit->GetDetectorId());
-    TClonesArray &hits = *(module->GetHits());
-    Int_t index = hits.GetEntriesFast();
-    new (hits[index]) CbmVisStripHit(hit);
-    //SetHitInfo((CbmVisHit*) hits[index]);
+  if (fStripHits) {
+    printf("Fill arrays of CbmVisStripHits... nHits = %i\n",fStripHits->GetEntriesFast());
+    //Create arrays of CbmVisHits
+    for (Int_t i=0;i<fStripHits->GetEntriesFast();i++){
+      CbmMuchStrawHit* hit = (CbmMuchStrawHit*) fStripHits->At(i);
+      CbmMuchModule* module = fGeoScheme->GetModuleByDetId(hit->GetDetectorId());
+      TClonesArray &hits = *(module->GetHits());
+      Int_t index = hits.GetEntriesFast();
+      new (hits[index]) CbmVisStripHit(hit);
+      //SetHitInfo((CbmVisHit*) hits[index]);
+    }
   }
 
   printf("Mark fired pads ... nPads = %i\n",fDigis->GetEntriesFast());

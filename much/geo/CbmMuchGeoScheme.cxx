@@ -156,6 +156,7 @@ CbmMuchModule* CbmMuchGeoScheme::GetModule(Int_t iStation, Int_t iLayer,
 // -------------------------------------------------------------------------
 CbmMuchStation* CbmMuchGeoScheme::GetStationByDetId(Int_t detId) {
   Int_t iStation = GetStationIndex(detId);
+  assert(iStation < GetNStations());
   return GetStation(iStation);
 }
 // -------------------------------------------------------------------------
@@ -164,6 +165,7 @@ CbmMuchStation* CbmMuchGeoScheme::GetStationByDetId(Int_t detId) {
 CbmMuchLayer* CbmMuchGeoScheme::GetLayerByDetId(Int_t detId) {
   CbmMuchStation* station = GetStationByDetId(detId);
   Int_t iLayer = GetLayerIndex(detId);
+  assert(iLayer < station->GetNLayers());
   return station ? station->GetLayer(iLayer) : NULL;
 }
 // -------------------------------------------------------------------------
@@ -172,6 +174,7 @@ CbmMuchLayer* CbmMuchGeoScheme::GetLayerByDetId(Int_t detId) {
 CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSideByDetId(Int_t detId) {
   CbmMuchLayer* layer = GetLayerByDetId(detId);
   Int_t iSide = GetLayerSideIndex(detId);
+  assert(iSide < 2);
   return layer ? layer->GetSide(iSide) : NULL;
 }
 // -------------------------------------------------------------------------
@@ -180,6 +183,7 @@ CbmMuchLayerSide* CbmMuchGeoScheme::GetLayerSideByDetId(Int_t detId) {
 CbmMuchModule* CbmMuchGeoScheme::GetModuleByDetId(Int_t detId) {
   CbmMuchLayerSide* side = GetLayerSideByDetId(detId);
   Int_t iModule = GetModuleIndex(detId);
+  assert(iModule < side->GetNModules());
   return side ? side->GetModule(iModule) : NULL;
 }
 // -------------------------------------------------------------------------
@@ -556,7 +560,7 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
                                                                    + fActiveLz) / 2. + 1;
   Double_t stGlobalZ2 = stGlobalZ0 + stDz;
   Double_t rmin = stGlobalZ2 * fAcceptanceTanMin;
-  Double_t rmax = stGlobalZ2 * fAcceptanceTanMax;
+  Double_t rmax = stGlobalZ2 * fAcceptanceTanMax + 20;
 
   CbmMuchStation* station = new CbmMuchStation(st, stGlobalZ0);
   station->SetRmin(rmin);
@@ -639,7 +643,7 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationStraw(Int_t st){
   Double_t stDz = ((fNlayers[st] - 1) * fLayersDz[st] + fStrawLz) / 2. + 1;
   Double_t stGlobalZ2 = stGlobalZ0 + stDz;
   Double_t rmin = stGlobalZ2 * fAcceptanceTanMin;
-  Double_t rmax = stGlobalZ2 * fAcceptanceTanMax;
+  Double_t rmax = stGlobalZ2 * fAcceptanceTanMax + 20;
 
   CbmMuchStation* station = new CbmMuchStation(st, stGlobalZ0);
   station->SetRmin(rmin);

@@ -5,7 +5,7 @@
 
 // residual (x,y,tx,ty,qp), pull (x,y,tx,ty,qp), resolution p %, chi-square
 const int nofPar = 12;
-const int nofLayers = 25;
+const int nofLayers = 14;
 
 // 0-propagation, 1-filter, 2-smoother
 double sigma[3][nofLayers][nofPar];
@@ -16,7 +16,7 @@ bool drawPropagation = false;
 bool drawFilter = true;
 bool drawSmoother = false;
 
-TString dir = "/home/d/andrey/test/trunk/global_mustraw/";//events/much/standard/10mu/mu/";
+TString dir = "/home/d/andrey/jun09/global_mu/";//events/much/standard/10mu/mu/";
 TFile *file = new TFile(dir + "propagation.ana.0000.root");
 
 TString outDir = "./test/";
@@ -26,6 +26,9 @@ void draw_prop_ana()
 //	gStyle->SetOptStat("");
 //	gStyle->SetOptFit(0);
 //	gStyle->SetOptTitle(0);
+
+	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/style.C");
+	style();
 
 	ofstream fout(outDir + "out.txt");
 

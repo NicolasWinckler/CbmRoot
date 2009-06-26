@@ -21,8 +21,8 @@ void global_reco_ideal(Int_t nEvents = 1000)
 
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 	TString stsDigiFile = parDir+ "/sts/sts_Standard_s3055AAFK5.SecD.digi.par";
-//	TString muchDigiFile = parDir + "/much/much_standard.digi.root";
-	TString muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
+	TString muchDigiFile = parDir + "/much/much_standard.digi.root";
+//	TString muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
 
 	// ----- STS reconstruction   ---------------------------------------------
 	FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);

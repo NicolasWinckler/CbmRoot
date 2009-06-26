@@ -4,7 +4,7 @@ void global_reco(Int_t nEvents = 10)
 
 	TString dir, mcFile, parFile, globalRecoFile;
 	if (script != "yes") {
-		dir  = "/home/d/andrey/test/trunk/global_mu_urqmd/";
+		dir  = "/home/d/andrey/test/trunk/global_mu/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalRecoFile = dir + "global.reco.0000.root";
@@ -139,7 +139,7 @@ void global_reco(Int_t nEvents = 10)
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(3);
-	reconstructionQa->SetMinNofHitsMuch(12);
+	reconstructionQa->SetMinNofHitsMuch(11);
 	reconstructionQa->SetVerbose(1);
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------

@@ -6,13 +6,13 @@ void much_sim(Int_t nEvents = 1000)
 	if (script != "yes") {
 		inFile  = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
-		dir  = "/home/d/andrey/test/trunk/global_mustraw/";
+		dir  = "/home/d/andrey/test/trunk/global_mu_low/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		muons = "yes";
 		urqmd = "no";
 		pluto = "no";
-		muchGeom = "much_standard_straw.geo";
+		muchGeom = "much_standard.geo";
 		trdGeom = "";//"trd_muon_setup_new.geo";
 	} else {
 		inFile  = TString(gSystem->Getenv("INFILE"));
@@ -160,7 +160,8 @@ void much_sim(Int_t nEvents = 1000)
 		FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, 5);
 		boxGen1->SetPRange(minMom, maxMom);
 		boxGen1->SetPhiRange(0.,360.);
-		boxGen1->SetThetaRange(2.5, 25.);
+//		boxGen1->SetThetaRange(2.5, 25.);
+		boxGen1->SetThetaRange(1.5, 15.);
 		boxGen1->SetCosTheta();
 		boxGen1->Init();
 		primGen->AddGenerator(boxGen1);
@@ -168,7 +169,8 @@ void much_sim(Int_t nEvents = 1000)
 		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-13, 5);
 		boxGen2->SetPRange(minMom, maxMom);
 		boxGen2->SetPhiRange(0.,360.);
-		boxGen2->SetThetaRange(2.5, 25.);
+//		boxGen2->SetThetaRange(2.5, 25.);
+		boxGen2->SetThetaRange(1.5, 15.);
 		boxGen2->SetCosTheta();
 		boxGen2->Init();
 		primGen->AddGenerator(boxGen2);

@@ -1,18 +1,12 @@
-// -------------------------------------------------------------------------
-// -----                  CbmLitKalmanFilter header file               -----
-// -----                  Created 16/07/07  by A. Lebedev               -----
-// -------------------------------------------------------------------------
-
-
 /** CbmLitKalmanFilter.h
  *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2007
  **
- ** 
- **/ 
+ **
+ **/
 
-
-#ifndef CBMLITKALMANFILTER_H
-#define CBMLITKALMANFILTER_H
+#ifndef CBMLITKALMANFILTER_H_
+#define CBMLITKALMANFILTER_H_
 
 #include "CbmLitTrackUpdate.h"
 
@@ -21,40 +15,36 @@ class CbmLitStripHit;
 class CbmLitPixelHit;
 class CbmLitTrackParam;
 
-class CbmLitKalmanFilter: public CbmLitTrackUpdate 
+class CbmLitKalmanFilter: public CbmLitTrackUpdate
 {
-
 public:
-
    CbmLitKalmanFilter();
-   
+
    virtual ~CbmLitKalmanFilter();
-   
+
    // derived from CbmTool
    virtual LitStatus Initialize();
    virtual LitStatus Finalize();
-   
+
    // Filter
    virtual LitStatus Update(
 		   const CbmLitTrackParam *parIn,
            CbmLitTrackParam *parOut,
            const CbmLitHit *hit);
-                              
-   virtual LitStatus Update( 
-		   CbmLitTrackParam *par, 
+
+   virtual LitStatus Update(
+		   CbmLitTrackParam *par,
 		   const CbmLitHit *hit);
-   
+
 private:
-	LitStatus Update( 
-		   CbmLitTrackParam *par, 
+	LitStatus Update(
+		   CbmLitTrackParam *par,
 		   const CbmLitPixelHit *hit);
-	
-	LitStatus Update( 
-		   CbmLitTrackParam *par, 
+
+	LitStatus Update(
+		   CbmLitTrackParam *par,
 		   const CbmLitStripHit *hit);
-   
-	ClassDef(CbmLitKalmanFilter,1)
-}; 
+};
 
 #endif //CbmLitKalmanFilter
 

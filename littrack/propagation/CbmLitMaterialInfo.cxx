@@ -1,6 +1,7 @@
 #include "CbmLitMaterialInfo.h"
 
 #include <iostream>
+#include <sstream>
 
 CbmLitMaterialInfo::CbmLitMaterialInfo():
 	fLength(0.),
@@ -16,10 +17,11 @@ CbmLitMaterialInfo::~CbmLitMaterialInfo()
 {
 }
 
-void CbmLitMaterialInfo::Print() const
+std::string CbmLitMaterialInfo::ToString() const
 {
-	std::cout << "MaterialInfo: length=" << fLength << " rl=" << fRL 
-		<< " rho=" << fRho << " Z=" << fZ << " A=" << fA << " zpos=" << fZpos 
+	std::stringstream ss;
+	ss << "MaterialInfo: length=" << fLength << " rl=" << fRL
+		<< " rho=" << fRho << " Z=" << fZ << " A=" << fA << " zpos=" << fZpos
 		<< std::endl;
+	return ss.str();
 }
-ClassImp(CbmLitMaterialInfo)

@@ -10,19 +10,16 @@ public:
 
 	CbmLitTrackSelectionEmpty();
 	virtual ~CbmLitTrackSelectionEmpty();
-		
+
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
-	
+
 	virtual LitStatus DoSelect(
 			TrackPtrIterator itBegin,
 			TrackPtrIterator itEnd);
-	
+
 	virtual LitStatus DoSelect(
 			TrackPtrVector& tracks);
-
-
-	ClassDef(CbmLitTrackSelectionEmpty, 1);
 };
 
 #endif /*CBMLITTRACKSELECTIONEMPTY_H_*/

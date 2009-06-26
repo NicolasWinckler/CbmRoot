@@ -132,6 +132,3 @@ void CbmLitTrackSelectionC::CheckSharedHits(
 	}
 	hitsId.clear();
 }
-
-
-ClassImp(CbmLitTrackSelectionC)

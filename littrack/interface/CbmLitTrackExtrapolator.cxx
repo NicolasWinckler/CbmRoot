@@ -1,8 +1,3 @@
-// -------------------------------------------------------------------------
-// -----                  CbmLitTrackExtrapolator source file               -----
-// -----                  Created 04/06/08  by A. Lebedev               -----
-// -------------------------------------------------------------------------
- 
 #include "CbmLitTrackExtrapolator.h"
 
 CbmLitTrackExtrapolator::CbmLitTrackExtrapolator():
@@ -16,8 +11,6 @@ CbmLitTrackExtrapolator::CbmLitTrackExtrapolator(
 {
 }
 
-CbmLitTrackExtrapolator::~CbmLitTrackExtrapolator() 
+CbmLitTrackExtrapolator::~CbmLitTrackExtrapolator()
 {
 }
-
-ClassImp(CbmLitTrackExtrapolator)

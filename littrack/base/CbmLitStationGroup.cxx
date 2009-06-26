@@ -10,11 +10,9 @@ CbmLitStationGroup::~CbmLitStationGroup()
 {
 }
 
-std::string CbmLitStationGroup::ToString() const 
+std::string CbmLitStationGroup::ToString() const
 {
 	std::stringstream ss;
 	ss << "Station group: nofStations=" << GetNofStations() << std::endl;
 	return ss.str();
 }
-
-ClassImp(CbmLitStationGroup);

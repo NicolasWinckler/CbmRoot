@@ -20,7 +20,7 @@ public:
     virtual Int_t DoFind(
             TClonesArray* trackArray);
 
-	ClassDef(CbmLitMuchTrackFinderWeight, 1);
+    ClassDef(CbmLitMuchTrackFinderWeight, 1);
 };
 
 #endif /*CBMLITMUCHTRACKFINDERWEIGHT_H_*/

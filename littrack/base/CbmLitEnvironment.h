@@ -1,21 +1,14 @@
-// -------------------------------------------------------------------------
-// -----                  CbmLitEnvironment header file               -----
-// -----                  Created 16/07/07  by A. Lebedev               -----
-// -------------------------------------------------------------------------
-
-
 /** CbmLitEnvironment.h
  *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2007
  **
  **
  **/
-
 
 #ifndef CBMLITENVIRONMENT_H_
 #define CBMLITENVIRONMENT_H_
 
 #include "CbmLitDetectorLayout.h"
-#include "TObject.h"
 
 #include <vector>
 #include <string>
@@ -24,8 +17,8 @@ class FairField;
 class TGeoNode;
 class TGeoMaterial;
 
-class CbmLitEnvironment: public TObject {
-
+class CbmLitEnvironment
+{
 public:
    virtual ~CbmLitEnvironment();
 
@@ -77,8 +70,6 @@ private:
 
    bool CheckDetectorPresence(
 		   const std::string& name) const;
-
-   ClassDef(CbmLitEnvironment,1)
 };
 
 #endif // CBMLITENVIRONMENT_H_

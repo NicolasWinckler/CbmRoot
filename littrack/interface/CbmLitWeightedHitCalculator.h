@@ -20,8 +20,6 @@ public:
 	virtual void DoCalculate(
 			HitPtrVector& hits,
 			CbmLitHit* hit) = 0;
-
-	ClassDef(CbmLitWeightedHitCalculator, 1);
 };
 
 #endif /*CBMLITWEIGHTEDHITCALCULATOR_H_*/

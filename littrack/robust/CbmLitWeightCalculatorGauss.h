@@ -57,8 +57,6 @@ private:
 	LitStatus Normalize(
 			HitPtrIterator itBegin,
 			HitPtrIterator itEnd) const;
-
-	ClassDef(CbmLitWeightCalculatorGauss, 1);
 };
 
 #endif /* CBMLITWEIGHTCALCULATORGAUSS_H_ */

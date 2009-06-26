@@ -7,5 +7,3 @@ CbmLitHitToTrackMerger::CbmLitHitToTrackMerger()
 CbmLitHitToTrackMerger::~CbmLitHitToTrackMerger()
 {
 }
-
-ClassImp(CbmLitHitToTrackMerger);

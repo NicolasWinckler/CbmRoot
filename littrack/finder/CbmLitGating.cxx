@@ -35,11 +35,11 @@ LitStatus CbmLitGating::Finalize()
 	return kLITSUCCESS;
 }
 
-Bool_t CbmLitGating::IsHitInValidationGate(
+bool CbmLitGating::IsHitInValidationGate(
 		const CbmLitTrackParam* par,
 		const CbmLitHit* hit) const
 {
-	Double_t chiSq = ChiSq(par, hit);
+	double chiSq = ChiSq(par, hit);
 	if (hit->GetType() == kLITSTRIPHIT) return chiSq < fChiSqStripHitCut;
 	if (hit->GetType() == kLITPIXELHIT) return chiSq < fChiSqPixelHitCut;
 	return false;
@@ -50,7 +50,7 @@ Bool_t CbmLitGating::IsHitInValidationGate(
 //		const CbmLitTrackParam* par,
 //		HitPtrVector& hits,
 //		const CbmLitStation& station,
-//		const std::pair<Double_t, Char_t>& maxErr) const
+//		const std::pair<double, Char_t>& maxErr) const
 //{
 //	HitPtrIteratorPair bounds;
 //	if (station.GetType() == kLITSTRIPHIT || station.GetType() == kLITMIXHIT || !fUseFastSearch) {
@@ -58,9 +58,9 @@ Bool_t CbmLitGating::IsHitInValidationGate(
 //	} else
 //	if (station.GetType() == kLITPIXELHIT) {
 //		CbmLitPixelHit hit;
-//		Double_t C0 = par->GetCovariance(0);
+//		double C0 = par->GetCovariance(0);
 //		if(C0 > fMaxCovSq || C0 < 0.) return bounds;
-//		Double_t devX = fSigmaCoef * (std::sqrt(C0) + maxErr.first);
+//		double devX = fSigmaCoef * (std::sqrt(C0) + maxErr.first);
 //	    hit.SetX(par->GetX() - devX);
 //	    bounds.first = std::lower_bound(hits.begin(), hits.end(), &hit, CompareHitPtrXULess());
 //	    hit.SetX(par->GetX() + devX);
@@ -73,9 +73,9 @@ HitPtrIteratorPair CbmLitGating::MinMaxIndex(
 		const CbmLitTrackParam* par,
 		CbmLitHitData& hitData, //TODO : investigate const here
 		const CbmLitDetectorLayout& layout,
-		Int_t stationGroup,
-		Int_t station,
-		Int_t substation) const
+		int stationGroup,
+		int station,
+		int substation) const
 {
 	HitPtrIteratorPair bounds;
 	CbmLitStation st = layout.GetStationGroup(stationGroup).GetStation(station);
@@ -84,11 +84,11 @@ HitPtrIteratorPair CbmLitGating::MinMaxIndex(
 	} else if (st.GetType() == kLITPIXELHIT){
 		CbmLitPixelHit hit;
 		HitPtrIteratorPair hits = hitData.GetHits(stationGroup, station, substation);
-		Double_t C0 = par->GetCovariance(0);
+		double C0 = par->GetCovariance(0);
 		if(C0 > fMaxCovSq || C0 < 0.) return bounds;
-		Double_t devX = fSigmaCoef * (std::sqrt(C0) + hitData.GetMaxErr(stationGroup, station, substation).first);
-//		Double_t devX = fSigmaCoef * (std::sqrt(C0) + maxErr.first);
-//		Double_t devX = CalcDevX(par, hitData, stationGroup, station, substation);
+		double devX = fSigmaCoef * (std::sqrt(C0) + hitData.GetMaxErr(stationGroup, station, substation).first);
+//		double devX = fSigmaCoef * (std::sqrt(C0) + maxErr.first);
+//		double devX = CalcDevX(par, hitData, stationGroup, station, substation);
 //		if (devX == 0.) return bounds;
 	    hit.SetX(par->GetX() - devX);
 	    bounds.first = std::lower_bound(hits.first, hits.second, &hit, CompareHitPtrXULess());
@@ -98,28 +98,25 @@ HitPtrIteratorPair CbmLitGating::MinMaxIndex(
     return bounds;
 }
 
-//Double_t CbmLitGating::CalcDevX(
+//double CbmLitGating::CalcDevX(
 //		const CbmLitTrackParam* par,
 //		const CbmLitHitData& hitData,
-//		Int_t stationGroup,
-//		Int_t station,
-//		Int_t substation) const
+//		int stationGroup,
+//		int station,
+//		int substation) const
 //{
-//	Double_t C0 = par->GetCovariance(0);
+//	double C0 = par->GetCovariance(0);
 //	if(C0 > fMaxCovSq || C0 < 0.) return 0.;
 //	return fSigmaCoef * (std::sqrt(C0) + hitData.GetMaxErr(stationGroup, station, substation).first);
 //}
 
 
-
-ClassImp(CbmLitGating);
-
-//Bool_t CbmLitGating::IsHitInValidationGate(
+//bool CbmLitGating::IsHitInValidationGate(
 //		const CbmLitTrackParam* par,
 //		const CbmLitHit* hit) const
 //{
-//    Double_t C0 = par->GetCovariance(0);
-//    Double_t C5 = par->GetCovariance(5);
+//    double C0 = par->GetCovariance(0);
+//    double C5 = par->GetCovariance(5);
 //
 //	if(C0 > fMaxCovSq || C5 > fMaxCovSq) return kFALSE;
 //	if(C0 < 0. || C5 < 0.) return kFALSE;
@@ -136,16 +133,16 @@ ClassImp(CbmLitGating);
 
 //	else if (hit->GetType() == kLITPIXELHIT) {
 //		const CbmLitPixelHit* pixelHit = static_cast<const CbmLitPixelHit*>(hit);
-//		Double_t x1 = par->GetX();
-//	   	Double_t x2 = pixelHit->GetX();
-//	    Double_t dx2 = pixelHit->GetDx();
-//	   	Double_t y1 = par->GetY();
-//	   	Double_t y2 = pixelHit->GetY();
-//	   	Double_t dy2 = pixelHit->GetDy();
-////	   	Double_t devX = fSigmaCoef * std::sqrt(C0 + dx2 * dx2);
-////		Double_t devY = fSigmaCoef * std::sqrt(C5 + dy2 * dy2);
-//	    Double_t devX = fSigmaCoef * (std::sqrt(C0) + dx2);
-//	    Double_t devY = fSigmaCoef * (std::sqrt(C5) + dy2);
+//		double x1 = par->GetX();
+//	   	double x2 = pixelHit->GetX();
+//	    double dx2 = pixelHit->GetDx();
+//	   	double y1 = par->GetY();
+//	   	double y2 = pixelHit->GetY();
+//	   	double dy2 = pixelHit->GetDy();
+////	   	double devX = fSigmaCoef * std::sqrt(C0 + dx2 * dx2);
+////		double devY = fSigmaCoef * std::sqrt(C5 + dy2 * dy2);
+//	    double devX = fSigmaCoef * (std::sqrt(C0) + dx2);
+//	    double devY = fSigmaCoef * (std::sqrt(C5) + dy2);
 //
 //	    return ( ( (x1 + devX) >= x2 ) &&
 //	             ( (x1 - devX) <= x2 ) &&
@@ -153,5 +150,4 @@ ClassImp(CbmLitGating);
 //		         ( (y1 - devY) <= y2 ) );
 //	}
 //}
-
 

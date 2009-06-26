@@ -60,5 +60,3 @@ LitStatus CbmLitTrackSelectionTrd::DoSelect(
 {
 	return DoSelect(tracks.begin(), tracks.end());
 }
-
-ClassImp(CbmLitTrackSelectionTrd)

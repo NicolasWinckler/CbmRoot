@@ -135,5 +135,3 @@ std::string CbmLitTrackParam::ToString() const
 //	ss << std::endl;
 	return ss.str();
 }
-
-ClassImp(CbmLitTrackParam)

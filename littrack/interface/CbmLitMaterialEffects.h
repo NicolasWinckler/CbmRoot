@@ -15,10 +15,8 @@ public:
 	virtual LitStatus Update(
 			CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat,
-	        Int_t pdg,
-	        Bool_t downstream) = 0;
-
-	ClassDef(CbmLitMaterialEffects, 1);
+	        int pdg,
+	        bool downstream) = 0;
 };
 
 #endif /*CBMLITMATERIALEFFECTS_H_*/

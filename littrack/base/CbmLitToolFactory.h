@@ -3,10 +3,10 @@
 
 #include "CbmLitPtrTypes.h"
 
-#include "TObject.h"
-
 #include <string>
 #include <iostream>
+
+//#include <boost/shared_ptr.hpp>
 
 class CbmLitToolFactory
 {
@@ -35,8 +35,6 @@ protected:
 
 private:
 	static CbmLitToolFactory* fInstance;
-
-	ClassDef(CbmLitToolFactory, 1);
 };
 
 #endif /*CBMLITTOOLFACTORY_H_*/

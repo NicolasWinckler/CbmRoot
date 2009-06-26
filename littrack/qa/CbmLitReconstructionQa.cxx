@@ -559,4 +559,4 @@ std::string CbmLitReconstructionQa::EventEfficiencyStatisticsToString(
 	return ss.str();
 }
 
-ClassImp(CbmLitReconstructionQa)
+ClassImp(CbmLitReconstructionQa);

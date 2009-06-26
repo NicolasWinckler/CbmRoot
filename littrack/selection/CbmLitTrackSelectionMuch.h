@@ -38,8 +38,6 @@ private:
 	Int_t fNofSharedHits;
 	Int_t fMinNofHits;
 	Int_t fMinLastPlaneId;
-
-	ClassDef(CbmLitTrackSelectionMuch, 1);
 };
 
 #endif /*CBMLITTRACKSELECTIONMUCH_H_*/

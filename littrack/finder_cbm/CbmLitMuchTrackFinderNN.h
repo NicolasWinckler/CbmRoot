@@ -21,7 +21,7 @@ public:
     virtual Int_t DoFind(
             TClonesArray* trackArray);
 
-	ClassDef(CbmLitMuchTrackFinderNN, 1);
+    ClassDef(CbmLitMuchTrackFinderNN, 1);
 };
 
 #endif /* CBMLITMUCHTRACKFINDERNN_H_ */

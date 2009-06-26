@@ -1,8 +1,3 @@
-// -------------------------------------------------------------------------
-// -----                  CbmLitTool source file               -----
-// -----                  Created 16/07/07  by A. Lebedev               -----
-// -------------------------------------------------------------------------
-
 #include "CbmLitTool.h"
 
 CbmLitTool::CbmLitTool():
@@ -10,7 +5,8 @@ CbmLitTool::CbmLitTool():
 {
 }
 
-CbmLitTool::CbmLitTool(const std::string& name):
+CbmLitTool::CbmLitTool(
+		const std::string& name):
    fName(name)
 {
 }
@@ -18,5 +14,3 @@ CbmLitTool::CbmLitTool(const std::string& name):
 CbmLitTool::~CbmLitTool()
 {
 }
-
-ClassImp(CbmLitTool)

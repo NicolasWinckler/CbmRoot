@@ -7,5 +7,3 @@ CbmLitGeoNavigator::CbmLitGeoNavigator()
 CbmLitGeoNavigator::~CbmLitGeoNavigator()
 {
 }
-
-ClassImp(CbmLitGeoNavigator)

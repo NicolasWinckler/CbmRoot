@@ -26,13 +26,13 @@ LitStatus CbmLitTrackSelectionChiSq::DoSelect(
 		TrackPtrIterator itEnd)
 {
 	if (itBegin == itEnd) return kLITSUCCESS;
-	
+
 	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
 		if ((*iTrack)->GetQuality() == kLITBAD) continue;
-		if ((*iTrack)->GetChi2() / (*iTrack)->GetNDF() > fMaxChiSq) 
-			(*iTrack)->SetQuality(kLITBAD);		
-	}	
-	
+		if ((*iTrack)->GetChi2() / (*iTrack)->GetNDF() > fMaxChiSq)
+			(*iTrack)->SetQuality(kLITBAD);
+	}
+
 	return kLITSUCCESS;
 }
 
@@ -41,5 +41,3 @@ LitStatus CbmLitTrackSelectionChiSq::DoSelect(
 {
 	return DoSelect(tracks.begin(), tracks.end());
 }
-
-ClassImp(CbmLitTrackSelectionChiSq)

@@ -34,12 +34,12 @@ LitStatus CbmLitTrackFitterImp::Finalize()
 
 LitStatus CbmLitTrackFitterImp::Fit(
 		CbmLitTrack *track,
-		Bool_t downstream)
+		bool downstream)
 {
 	fDownstream = downstream;
 	track->SortHits(fDownstream);
 	track->SetChi2(0.0);
-	Int_t nofHits = track->GetNofHits();
+	int nofHits = track->GetNofHits();
 	FitNodeVector nodes(nofHits);
 	CbmLitTrackParam par;
 	TMatrixD F(5,5);
@@ -52,7 +52,7 @@ LitStatus CbmLitTrackFitterImp::Fit(
 		par = *track->GetParamFirst();
 	}
 
-	for (Int_t i = 0; i < nofHits; i++) {
+	for (int i = 0; i < nofHits; i++) {
 		const CbmLitHit* hit = track->GetHit(i);
 	    Double_t Ze = hit->GetZ();
 	    if (fPropagator->Propagate(&par, Ze, track->GetPDG()) == kLITERROR) {
@@ -79,5 +79,3 @@ LitStatus CbmLitTrackFitterImp::Fit(
 
 	return kLITSUCCESS;
 }
-
-ClassImp(CbmLitTrackFitterImp);

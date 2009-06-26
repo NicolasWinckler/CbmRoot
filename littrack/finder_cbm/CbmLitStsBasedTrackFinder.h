@@ -3,13 +3,12 @@
 
 #include "CbmLitTypes.h"
 #include "CbmLitPtrTypes.h"
-#include "TObject.h"
 
 class CbmLitTrackPropagator;
 class CbmLitDetectorLayout;
 class TClonesArray;
 
-class CbmLitStsBasedTrackFinder //: public TObject
+class CbmLitStsBasedTrackFinder
 {
 public:
 	CbmLitStsBasedTrackFinder();

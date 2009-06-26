@@ -7,6 +7,7 @@
 #include "CbmLitTGeoTrackPropagator.h"
 #include "CbmLitTrackExtrapolator.h"
 #include "CbmLitTGeoNavigator.h"
+//#include "CbmLitMyGeoNavigator.h"
 #include "CbmLitMaterialEffectsImp.h"
 #include "CbmLitMaterialInfo.h"
 #include "CbmLitTrackParam.h"
@@ -19,7 +20,8 @@ CbmLitTGeoTrackPropagator::CbmLitTGeoTrackPropagator(
 		TrackExtrapolatorPtr extrapolator):
    CbmLitTrackPropagator("CbmLitTGeoTrackPropagator"),
    fExtrapolator(extrapolator),
-   fCalcTransportMatrix(true)
+   fCalcTransportMatrix(true),
+   fMaxStepSize(10.)
 {
 	fNavigator = GeoNavigatorPtr(new CbmLitTGeoNavigator());
 	fMaterial = MaterialEffectsPtr(new CbmLitMaterialEffectsImp());
@@ -44,8 +46,8 @@ LitStatus CbmLitTGeoTrackPropagator::Finalize()
 LitStatus CbmLitTGeoTrackPropagator::Propagate(
 		const CbmLitTrackParam *parIn,
         CbmLitTrackParam *parOut,
-        Double_t zOut,
-        Int_t pdg)
+        double zOut,
+        int pdg)
 {
 	*parOut = *parIn;
 	return Propagate(parOut, zOut, pdg);
@@ -53,16 +55,16 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 
 LitStatus CbmLitTGeoTrackPropagator::Propagate(
 		CbmLitTrackParam *par,
-        Double_t zOut,
-        Int_t pdg)
+        double zOut,
+        int pdg)
 
 {
 	if (!IsParCorrect(par)) return kLITERROR;
 
 	fPDG = pdg;
 
-	Double_t zIn = par->GetZ();
-	Double_t dz = zOut - zIn;
+	double zIn = par->GetZ();
+	double dz = zOut - zIn;
 
 	if(std::fabs(dz) < 1e-3) return kLITSUCCESS;
 
@@ -72,46 +74,41 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 
 	if (fCalcTransportMatrix) fFm.UnitMatrix();
 
-	Double_t fMaxStepSize = 10.0; //cm
-	Int_t nofSteps = Int_t(std::abs(dz) / fMaxStepSize);
-	Double_t stepSize;
-	if (nofSteps == 0) stepSize = dz;
-	else  stepSize = fMaxStepSize;
-	Double_t z = zIn;
+	int nofSteps = int(std::abs(dz) / fMaxStepSize);
+	double stepSize;
+	if (nofSteps == 0) stepSize = dz; else  stepSize = fMaxStepSize;
+	double z = zIn;
 
 	//Loop over steps + additional step to propagate to virtual plane at zOut
-	for (Int_t iStep = 0; iStep < nofSteps + 1; iStep++) {
+	for (int iStep = 0; iStep < nofSteps + 1; iStep++) {
 		if (!IsParCorrect(par)) {
-			//std::cout << "ERROR CbmLitTGeoTrackPropagator::Propagate parameters incorrect " << std::endl;
-			//par->Print();
+			std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: incorrect track parameters" << std::endl;
 			return kLITERROR;
 		}
 
-		//std::cout << "step " << iStep << " z=" << z << std::endl;
 		// update current z position
-		if (iStep != nofSteps) z += stepSize;
-		else z = zOut;
-		//pParam->Print();
+		if (iStep != nofSteps) z += stepSize; else z = zOut;
+
 		//Get intersections with the materials for this step
 		std::vector<CbmLitMaterialInfo> inter;
 		if (fNavigator->FindIntersections(par, z, inter) == kLITERROR) {
-//			std::cout << "ERROR CbmLitTGeoTrackPropagator::Propagate navigation failed" << std::endl;
+			std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: navigation failed" << std::endl;
 			return kLITERROR;
 		}
 
 		//Loop over the materials
-		for(std::vector<CbmLitMaterialInfo>::iterator iMat = inter.begin(); iMat != inter.end() ; iMat++) {
-			CbmLitMaterialInfo mat = *iMat;
-			//mat.Print();
-			//pParam->Print();
-			//if ((mat.GetLength() / mat.GetRL()) < 1.e-4) continue;
-			//mat.Print();
+		for(unsigned int  iMat = 0; iMat < inter.size() ; iMat++) {
+			CbmLitMaterialInfo mat = inter[iMat];
+
 			// check if track parameters are correct
-			if (!IsParCorrect(par)) return kLITERROR;
+			if (!IsParCorrect(par)) {
+				std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: incorrect track parameters" << std::endl;
+				return kLITERROR;
+			}
 
 			// extrapolate to the next boundary
 			if (fExtrapolator->Extrapolate(par, mat.GetZpos()) == kLITERROR) {
-				//std::cout << "ERROR CbmLitTGeoTrackPropagator::Propagate extrapolation failed" << std::endl;
+				std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: extrapolation failed" << std::endl;
 				return kLITERROR;
 			}
 
@@ -132,7 +129,7 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 }
 
 void CbmLitTGeoTrackPropagator::TransportMatrix(
-		   std::vector<Double_t>& F)
+		   std::vector<double>& F)
 {
 	F.assign(fFm.GetMatrixArray(), fFm.GetMatrixArray() + fFm.GetNoElements());
 }
@@ -150,12 +147,12 @@ void CbmLitTGeoTrackPropagator::UpdateF(
 	F = newF * F;
 }
 
-Bool_t CbmLitTGeoTrackPropagator::IsParCorrect(
+bool CbmLitTGeoTrackPropagator::IsParCorrect(
 		const CbmLitTrackParam* par)
 {
-	Double_t maxSlope = 5.;
-	Double_t minSlope = 1e-6;
-	Double_t maxQp = 1000.; // p = 10 MeV
+	double maxSlope = 5.;
+	double minSlope = 1e-6;
+	double maxQp = 1000.; // p = 10 MeV
 
 	if (std::abs(par->GetTx()) > maxSlope ||
 		std::abs(par->GetTy()) > maxSlope ||
@@ -166,5 +163,3 @@ Bool_t CbmLitTGeoTrackPropagator::IsParCorrect(
 	}
 	return true;
 }
-
-ClassImp(CbmLitTGeoTrackPropagator)

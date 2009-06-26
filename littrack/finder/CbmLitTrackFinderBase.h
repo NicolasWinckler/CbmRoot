@@ -21,47 +21,47 @@ public:
 	void SetFinalSelection(TrackSelectionPtr finalSelection) {fFinalSelection = finalSelection;}
 	void SetLayout(CbmLitDetectorLayout layout) {fLayout = layout;}
     void SetDetectorLayout(const CbmLitDetectorLayout& layout) { fLayout = layout; }
-	void SetNofIter(Int_t nofIter) { fNofIter = nofIter; }
-	void SetMaxNofMissingHits(Int_t maxNofMissingHits) { fMaxNofMissingHits = maxNofMissingHits;}
-    void SetBeginStationGroup(Int_t beginStationGroup) { fBeginStationGroup = beginStationGroup;}
-    void SetEndStationGroup(Int_t endStationGroup) { fEndStationGroup = endStationGroup;}
-    void SetPDG(Int_t pdg) { fPDG = pdg; }
-    void SetSigmaCoef(Double_t sigmaCoef) { fSigmaCoef = sigmaCoef;}
-    void SetChiSqStripHitCut(Double_t chiSqStripHitCut) { fChiSqStripHitCut = chiSqStripHitCut;}
-    void SetChiSqPixelHitCut(Double_t chiSqPixelHitCut) { fChiSqPixelHitCut = chiSqPixelHitCut;}
-    void IsUseFastSearch(Bool_t useFastSearch) { fUseFastSearch = useFastSearch;}
+	void SetNofIter(int nofIter) { fNofIter = nofIter; }
+	void SetMaxNofMissingHits(int maxNofMissingHits) { fMaxNofMissingHits = maxNofMissingHits;}
+    void SetBeginStationGroup(int beginStationGroup) { fBeginStationGroup = beginStationGroup;}
+    void SetEndStationGroup(int endStationGroup) { fEndStationGroup = endStationGroup;}
+    void SetPDG(int pdg) { fPDG = pdg; }
+    void SetSigmaCoef(double sigmaCoef) { fSigmaCoef = sigmaCoef;}
+    void SetChiSqStripHitCut(double chiSqStripHitCut) { fChiSqStripHitCut = chiSqStripHitCut;}
+    void SetChiSqPixelHitCut(double chiSqPixelHitCut) { fChiSqPixelHitCut = chiSqPixelHitCut;}
+    void IsUseFastSearch(bool useFastSearch) { fUseFastSearch = useFastSearch;}
 
-    void SetVerbose(Int_t verbose) {fVerbose = verbose;}
+    void SetVerbose(int verbose) {fVerbose = verbose;}
 
 protected:
     virtual void SetIterationParameters(
-    		Int_t iter){}
+    		int iter){;}
 
     // Arranges hits by stations
     void ArrangeHits(
     		HitPtrIterator itBegin,
     		HitPtrIterator itEnd);
 
-    // Initialises track seeds
+    // Initializes track seeds
     void InitTrackSeeds(
     		TrackPtrIterator itBegin,
     		TrackPtrIterator itEnd);
 
-    Bool_t IsHitInValidationWindow(
+    bool IsHitInValidationWindow(
     		const CbmLitTrackParam* par,
     		const CbmLitHit* hit) const;
 
     HitPtrIteratorPair MinMaxIndex(
     		const CbmLitTrackParam* par,
-    		Int_t stationGroup,
-    		Int_t station,
-    		Int_t substation);
+    		int stationGroup,
+    		int station,
+    		int substation);
 
-    Double_t CalcDevX(
+    double CalcDevX(
     		const CbmLitTrackParam* par,
-    		Int_t stationGroup,
-    		Int_t station,
-    		Int_t substation) const;
+    		int stationGroup,
+    		int station,
+    		int substation) const;
 
     void RemoveHits(
     		TrackPtrIterator itBegin,
@@ -88,25 +88,23 @@ protected:
 	TrackSelectionPtr fFinalSelection;
 
     // sets with hits and track seeds that have been used
-    std::set<Int_t> fUsedHitsSet;
-    std::set<Int_t> fSeedsIdSet;
+    std::set<int> fUsedHitsSet;
+    std::set<int> fSeedsIdSet;
 
     // Tracking parameters
-	Int_t fNofIter;
-	Int_t fMaxNofMissingHits;
-    Int_t fBeginStationGroup;
-    Int_t fEndStationGroup;
-    Int_t fPDG;
-    Double_t fSigmaCoef;
-    Double_t fChiSqStripHitCut;
-    Double_t fChiSqPixelHitCut;
-    Double_t fMaxCovSq;
-    Bool_t fUseFastSearch;
+	int fNofIter;
+	int fMaxNofMissingHits;
+    int fBeginStationGroup;
+    int fEndStationGroup;
+    int fPDG;
+    double fSigmaCoef;
+    double fChiSqStripHitCut;
+    double fChiSqPixelHitCut;
+    double fMaxCovSq;
+    bool fUseFastSearch;
 
-    Int_t fVerbose;
-    Int_t fEventNo;
-
-	ClassDef(CbmLitTrackFinderBase, 1);
+    int fVerbose;
+    int fEventNo;
 };
 
 #endif /*CBMLITTRACKFINDERBASE_H_*/

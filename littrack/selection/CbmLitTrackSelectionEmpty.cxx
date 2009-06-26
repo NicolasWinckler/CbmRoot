@@ -1,4 +1,3 @@
-
 #include "CbmLitTrackSelectionEmpty.h"
 
 CbmLitTrackSelectionEmpty::CbmLitTrackSelectionEmpty()
@@ -8,7 +7,7 @@ CbmLitTrackSelectionEmpty::CbmLitTrackSelectionEmpty()
 
 CbmLitTrackSelectionEmpty::~CbmLitTrackSelectionEmpty()
 {
-	
+
 }
 
 LitStatus CbmLitTrackSelectionEmpty::Initialize()
@@ -33,4 +32,3 @@ LitStatus CbmLitTrackSelectionEmpty::DoSelect(
 {
 	return DoSelect(tracks.begin(), tracks.end());
 }
-ClassImp(CbmLitTrackSelectionEmpty)

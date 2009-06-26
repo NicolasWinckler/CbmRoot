@@ -88,7 +88,7 @@ InitStatus CbmLitElossAna::Init()
     fMatEff = new CbmLitMaterialEffectsImp();
 
     GetGeometry();
-    fMaterial.Print();
+    std::cout << fMaterial.ToString();
 
     return kSUCCESS;
 }
@@ -295,4 +295,4 @@ Double_t CbmLitElossAna::Length(
     return length;
 }
 
-ClassImp(CbmLitElossAna)
+ClassImp(CbmLitElossAna);

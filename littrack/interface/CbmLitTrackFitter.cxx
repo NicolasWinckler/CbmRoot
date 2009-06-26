@@ -1,8 +1,3 @@
-// -------------------------------------------------------------------------
-// -----                  CbmLitTrackFitter source file               -----
-// -----                  Created 04/06/08  by A. Lebedev               -----
-// -------------------------------------------------------------------------
-
 #include "CbmLitTrackFitter.h"
 
 CbmLitTrackFitter::CbmLitTrackFitter():
@@ -16,8 +11,6 @@ CbmLitTrackFitter::CbmLitTrackFitter(
 {
 }
 
-CbmLitTrackFitter::~CbmLitTrackFitter() 
+CbmLitTrackFitter::~CbmLitTrackFitter()
 {
 }
-
-ClassImp(CbmLitTrackFitter)

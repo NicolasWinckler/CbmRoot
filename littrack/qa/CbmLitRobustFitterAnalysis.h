@@ -95,8 +95,6 @@ private:
 	std::vector<TH1D*> fhTrueTrackChiSq;
 	std::vector<TH1D*> fhGhostTrackChiSq;
 
-
-
 	Int_t fEvents;
 	Int_t fVerbose;
 

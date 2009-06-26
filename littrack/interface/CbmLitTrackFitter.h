@@ -1,14 +1,9 @@
-// -------------------------------------------------------------------------
-// -----                  CbmLitTrackFitter header file               -----
-// -----                  Created 05/06/08  by A. Lebedev               -----
-// -------------------------------------------------------------------------
-
-
 /** CbmLitTrackFitter.h
  *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2008
  **
  ** Base class for all LIT track fitter algorithms
- **/ 
+ **/
 
 #ifndef CBMLITTRACKFITTER_H_
 #define CBMLITTRACKFITTER_H_
@@ -17,21 +12,18 @@
 
 class CbmLitTrack;
 
-class CbmLitTrackFitter : public CbmLitTool {
-
+class CbmLitTrackFitter : public CbmLitTool
+{
 public:
-
    CbmLitTrackFitter();
-   CbmLitTrackFitter(const std::string& name);
-      
+   CbmLitTrackFitter(
+		   const std::string& name);
+
    virtual ~CbmLitTrackFitter();
 
    virtual LitStatus Fit(
 		   CbmLitTrack *track,
-		   Bool_t downstream = true) = 0;
-   
-   ClassDef(CbmLitTrackFitter,1)
+		   bool downstream = true) = 0;
 };
 
-#endif //CbmLitTrackFitter
-
+#endif

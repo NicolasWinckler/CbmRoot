@@ -150,5 +150,3 @@ void CbmLitWeightedHitCalculatorImp::Inverse(
 		u11 = 1. / v11;
 	}
 }
-
-ClassImp(CbmLitWeightedHitCalculatorImp)

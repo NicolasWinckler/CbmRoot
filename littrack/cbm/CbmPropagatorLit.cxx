@@ -59,5 +59,3 @@ void CbmPropagatorLit::TransportMatrix(
 {
 	fPropagator->TransportMatrix(F);
 }
-
-ClassImp(CbmPropagatorLit)

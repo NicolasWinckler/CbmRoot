@@ -38,7 +38,7 @@ private:
 			TrackPtrVector& tracks,
 			TClonesArray* trackArray);
 
-    ClassDef(CbmLitTrdTrackFinderStandalone, 1);
+	ClassDef(CbmLitTrdTrackFinderStandalone, 1);
 };
 
 #endif /*CBMLITTRDTRACKFINDERS_H_*/

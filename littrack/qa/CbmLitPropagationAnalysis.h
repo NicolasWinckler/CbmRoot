@@ -4,7 +4,7 @@
 #include "FairTask.h"
 #include "CbmLitTypes.h"
 #include "CbmLitPtrTypes.h"
-#include "CbmLitSimpleGeometryConstructor.h"
+//#include "CbmLitSimpleGeometryConstructor.h"
 
 #include "TStopwatch.h"
 
@@ -136,9 +136,9 @@ private:
 	Int_t fEvents; // Event counter
 	Int_t fVerbose; // Verbose level
 
-	CbmLitSimpleGeometryConstructor fGeoConstructor;
+//	CbmLitSimpleGeometryConstructor fGeoConstructor;
 
-	ClassDef(CbmLitPropagationAnalysis,1);
+	ClassDef(CbmLitPropagationAnalysis, 1);
 };
 
 #endif

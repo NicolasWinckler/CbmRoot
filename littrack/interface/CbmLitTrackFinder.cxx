@@ -7,5 +7,3 @@ CbmLitTrackFinder::CbmLitTrackFinder()
 CbmLitTrackFinder::~CbmLitTrackFinder()
 {
 }
-
-ClassImp(CbmLitTrackFinder)

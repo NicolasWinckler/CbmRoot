@@ -4,6 +4,7 @@
 //#include "CbmLitTool.h"
 
 #include "CbmLitTypes.h"
+#include "CbmLitEnums.h"
 
 #include <utility>
 
@@ -23,7 +24,7 @@ public:
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
 
-	Bool_t IsHitInValidationGate(
+	bool IsHitInValidationGate(
 			const CbmLitTrackParam* par,
 			const CbmLitHit* hit) const;
 //
@@ -31,32 +32,29 @@ public:
 //			const CbmLitTrackParam* par,
 //			HitPtrVector& hits,
 //			const CbmLitStation& station,
-//			const std::pair<Double_t, Char_t>& maxErr) const;
+//			const std::pair<double, Char_t>& maxErr) const;
 
 	HitPtrIteratorPair MinMaxIndex(
 			const CbmLitTrackParam* par,
 			CbmLitHitData& hitData,
 			const CbmLitDetectorLayout& layout,
-			Int_t stationGroup,
-			Int_t station,
-			Int_t substation) const;
+			int stationGroup,
+			int station,
+			int substation) const;
 
-//	Double_t CalcDevX(
+//	double CalcDevX(
 //			const CbmLitTrackParam* par,
 //			const CbmLitHitData& hitData,
-//			Int_t stationGroup,
-//			Int_t station,
-//			Int_t substation) const;
+//			int stationGroup,
+//			int station,
+//			int substation) const;
 
 protected:
-
-	Double_t fChiSqStripHitCut;
-	Double_t fChiSqPixelHitCut;
-	Bool_t fUseFastSearch;
-	Double_t fMaxCovSq;
-	Double_t fSigmaCoef;
-
-	ClassDef(CbmLitGating, 1);
+	double fChiSqStripHitCut;
+	double fChiSqPixelHitCut;
+	bool fUseFastSearch;
+	double fMaxCovSq;
+	double fSigmaCoef;
 };
 
 #endif /* CBMLITGATING_H_ */

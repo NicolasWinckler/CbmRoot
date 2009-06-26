@@ -1,11 +1,6 @@
-// -------------------------------------------------------------------------
-// -----                  CbmLitRK4TrackExtrapolator header file               -----
-// -----                  Created 16/07/07  by A. Lebedev               -----
-// -------------------------------------------------------------------------
-
-
 /** CbmLitRK4TrackExtrapolator.h
  *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2007
  **
  **
  **/
@@ -32,41 +27,38 @@ public:
    virtual LitStatus Extrapolate(
 		   const CbmLitTrackParam *parIn,
            CbmLitTrackParam *parOut,
-           Double_t zOut);
+           double zOut);
 
    virtual LitStatus Extrapolate(
 		   CbmLitTrackParam *par,
-           Double_t zOut );
+           double zOut );
 
    virtual void TransportMatrix(
-		   std::vector<Double_t>& F);
+		   std::vector<double>& F);
    virtual void TransportMatrix(
 		   TMatrixD& F);
 
 protected:
 
    void RK4Order(
-		   const std::vector<Double_t>& xIn,
-		   Double_t zIn,
-		   std::vector<Double_t>& xOut,
-           Double_t zOut,
-           std::vector<Double_t>& derivs) const;
+		   const std::vector<double>& xIn,
+		   double zIn,
+		   std::vector<double>& xOut,
+           double zOut,
+           std::vector<double>& derivs) const;
 
-   Double_t CalcOut(
-   		Double_t in,
-   		const Double_t k[4]) const;
+   double CalcOut(
+   		double in,
+   		const double k[4]) const;
 
    void TransportC(
-   		const std::vector<Double_t>& cIn,
-   		const std::vector<Double_t>& F,
-   		std::vector<Double_t>& cOut) const;
+   		const std::vector<double>& cIn,
+   		const std::vector<double>& F,
+   		std::vector<double>& cOut) const;
 
 private:
-
-	std::vector<Double_t> fF;
+	std::vector<double> fF;
 	FairField *fMagneticField;
-
-   ClassDef(CbmLitRK4TrackExtrapolator,1)
 };
 
 #endif //CBMLITRK4TRACKEXTRAPOLATOR_H_

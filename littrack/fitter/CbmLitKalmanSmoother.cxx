@@ -28,22 +28,22 @@ LitStatus CbmLitKalmanSmoother::Finalize()
 
 LitStatus CbmLitKalmanSmoother::Fit(
 		CbmLitTrack *track,
-		Bool_t downstream)
+		bool downstream)
 {
-	Int_t n = track->GetNofHits();
+	int n = track->GetNofHits();
 
 	std::vector<CbmLitFitNode> nodes = track->GetFitNodes();
 	nodes[n-1].SetSmoothedParam(nodes[n-1].GetUpdatedParam());
 
 	// start with the before the last detector plane
-	for (Int_t i = n - 1; i > 0; i--) {
+	for (int i = n - 1; i > 0; i--) {
 		Smooth(&nodes[i - 1], &nodes[i]);
 	}
 
 	// Calculate the chi2 of the track
 	track->SetChi2(0.0);
-	for (Int_t i = 0; i < n; i++) {
-		Double_t chi2Hit = ChiSq(nodes[i].GetSmoothedParam(), track->GetHit(i));
+	for (int i = 0; i < n; i++) {
+		double chi2Hit = ChiSq(nodes[i].GetSmoothedParam(), track->GetHit(i));
 		nodes[i].SetChiSqSmoothed(chi2Hit);
 		track->SetChi2(track->GetChi2() + chi2Hit);
 	}
@@ -98,5 +98,3 @@ void CbmLitKalmanSmoother::Smooth(
 
 	thisNode->SetSmoothedParam(&par);
 }
-
-ClassImp(CbmLitKalmanSmoother)

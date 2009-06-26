@@ -25,32 +25,32 @@ public:
 
 	virtual LitStatus Fit(
 			CbmLitTrack *track,
-			Bool_t downstream = true);
+			bool downstream = true);
 
 private:
 	LitStatus CreateEffectiveTrack(
 			CbmLitTrack* track,
-			Int_t iter,
+			int iter,
 			CbmLitTrack* etrack) const;
 
 	LitStatus CreateEffectiveHit(
 			HitPtrIterator itBegin,
 			HitPtrIterator itEnd,
 			const CbmLitTrackParam* par,
-			Int_t iter,
+			int iter,
 			CbmLitHit* hit) const;
 
 	LitStatus CalculateWeights(
 			const CbmLitTrackParam* par,
 			HitPtrIterator itBegin,
 			HitPtrIterator itEnd,
-			Int_t iter) const;
+			int iter) const;
 
-	Bool_t AreAllOutliers(
+	bool AreAllOutliers(
 			HitPtrIterator itBegin,
 			HitPtrIterator itEnd) const;
 
-	Bool_t MarkOutliers(
+	bool MarkOutliers(
 			HitPtrIterator itBegin,
 			HitPtrIterator itEnd) const;
 
@@ -67,11 +67,9 @@ private:
 	WeightCalculatorPtr fSimpleWeightCalculator;
 	WeightCalculatorPtr fGaussWeightCalculator;
 
-	Int_t fNofIterations;
-	std::vector<Double_t> fAnnealing;
-	Double_t fOutlierCut;
-
-	ClassDef(CbmLitTrackFitterRobust, 1);
+	int fNofIterations;
+	std::vector<double> fAnnealing;
+	double fOutlierCut;
 };
 
 #endif /*CBMLITTRACKFITTERROBUST_H_*/

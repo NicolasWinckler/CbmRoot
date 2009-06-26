@@ -10,7 +10,7 @@ class CbmLitTrackPropagator;
 class CbmLitTrackUpdate;
 
 class CbmLitNearestHitToTrackMerger : public CbmLitHitToTrackMerger,
-                                      public CbmLitGating
+                                       public CbmLitGating
 {
 public:
 	CbmLitNearestHitToTrackMerger();
@@ -27,10 +27,10 @@ public:
 	void SetStation(const CbmLitStation& station) {fStation = station;}
 	void SetPropagator(TrackPropagatorPtr propagator) {fPropagator = propagator;}
 	void SetFilter(TrackUpdatePtr filter) {fFilter = filter;}
-	void SetPDG(Int_t pdg) {fPDG = pdg;}
+	void SetPDG(int pdg) {fPDG = pdg;}
 
 private:
-	Bool_t AddNearestHit(
+	bool AddNearestHit(
 			CbmLitTrack* track,
 			HitPtrIteratorPair bounds) const;
 
@@ -38,9 +38,7 @@ private:
 	TrackPropagatorPtr fPropagator;
 	TrackUpdatePtr fFilter;
 	CbmLitStation fStation;
-	Int_t fPDG;
-
-	ClassDef(CbmLitNearestHitToTrackMerger, 1);
+	int fPDG;
 };
 
 #endif /* CBMLITNEARESTHITTOTRACKMERGER_H_ */

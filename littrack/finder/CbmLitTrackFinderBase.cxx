@@ -30,17 +30,17 @@ void CbmLitTrackFinderBase::ArrangeHits(
 {
     for(HitPtrIterator hit = itBegin; hit != itEnd; hit++) {
     	if (fUsedHitsSet.find((*hit)->GetRefId()) != fUsedHitsSet.end()) continue;
-    	Int_t planeId = (*hit)->GetPlaneId();
+    	int planeId = (*hit)->GetPlaneId();
      	fHitData.AddHit(planeId, *hit);
     }
 
     if (fVerbose > 1) std::cout << fHitData.ToString();
 
-    for (Int_t i = 0; i < fLayout.GetNofStationGroups(); i++){
-    	for (Int_t j = 0; j < fLayout.GetNofStations(i); j++){
+    for (int i = 0; i < fLayout.GetNofStationGroups(); i++){
+    	for (int j = 0; j < fLayout.GetNofStations(i); j++){
     		CbmLitStation station = fLayout.GetStation(i, j);
     		if (station.GetType() == kLITPIXELHIT) {
-    			for (Int_t k = 0; k < fLayout.GetNofSubstations(i, j); k++){
+    			for (int k = 0; k < fLayout.GetNofSubstations(i, j); k++){
     				HitPtrIteratorPair hits = fHitData.GetHits(i, j, k);
     				std::sort(hits.first, hits.second, CompareHitPtrXULess());
 //    				std::cout << "station group " << i << " station " << j
@@ -70,7 +70,7 @@ void CbmLitTrackFinderBase::InitTrackSeeds(
 
 	// extrapolate to the begin station group for the tracking
 	if (fBeginStationGroup > 0) {
-		Double_t Ze = fLayout.GetSubstation(fBeginStationGroup, 0, 0).GetZ();
+		double Ze = fLayout.GetSubstation(fBeginStationGroup, 0, 0).GetZ();
 		for (TrackPtrIterator track = fTracks.begin(); track != fTracks.end(); track++) {
 			CbmLitTrackParam par(*(*track)->GetParamLast());
 			fPropagator->Propagate(&par, Ze, fPDG);
@@ -79,11 +79,11 @@ void CbmLitTrackFinderBase::InitTrackSeeds(
 	}
 }
 
-Bool_t CbmLitTrackFinderBase::IsHitInValidationWindow(
+bool CbmLitTrackFinderBase::IsHitInValidationWindow(
 		const CbmLitTrackParam* par,
 		const CbmLitHit* hit) const
 {
-	Double_t chiSq = ChiSq(par, hit);
+	double chiSq = ChiSq(par, hit);
 	if (hit->GetType() == kLITSTRIPHIT) return chiSq < fChiSqStripHitCut;
 	if (hit->GetType() == kLITPIXELHIT) return chiSq < fChiSqPixelHitCut;
 	return false;
@@ -91,9 +91,9 @@ Bool_t CbmLitTrackFinderBase::IsHitInValidationWindow(
 
 HitPtrIteratorPair CbmLitTrackFinderBase::MinMaxIndex(
 		const CbmLitTrackParam* par,
-		Int_t stationGroup,
-		Int_t station,
-		Int_t substation)
+		int stationGroup,
+		int station,
+		int substation)
 {
 	HitPtrIteratorPair bounds;
 	CbmLitStation st = fLayout.GetStationGroup(stationGroup).GetStation(station);
@@ -102,7 +102,7 @@ HitPtrIteratorPair CbmLitTrackFinderBase::MinMaxIndex(
 	} else if (st.GetType() == kLITPIXELHIT){
 		CbmLitPixelHit hit;
 		HitPtrIteratorPair hits = fHitData.GetHits(stationGroup, station, substation);
-		Double_t devX = CalcDevX(par, stationGroup, station, substation);
+		double devX = CalcDevX(par, stationGroup, station, substation);
 		if (devX == 0.) return bounds;
 	    hit.SetX(par->GetX() - devX);
 	    bounds.first = std::lower_bound(hits.first, hits.second, &hit, CompareHitPtrXULess());
@@ -113,13 +113,13 @@ HitPtrIteratorPair CbmLitTrackFinderBase::MinMaxIndex(
     return bounds;
 }
 
-Double_t CbmLitTrackFinderBase::CalcDevX(
+double CbmLitTrackFinderBase::CalcDevX(
 		const CbmLitTrackParam* par,
-		Int_t stationGroup,
-		Int_t station,
-		Int_t substation) const
+		int stationGroup,
+		int station,
+		int substation) const
 {
-	Double_t C0 = par->GetCovariance(0);
+	double C0 = par->GetCovariance(0);
 	if(C0 > fMaxCovSq || C0 < 0.) return 0.;
 //	return fSigmaCoef * (std::sqrt(C0) + fHitData.GetMaxErr(stationGroup, station, substation).first);
 	return fSigmaCoef * (std::sqrt(C0) + fHitData.GetMaxErr(stationGroup, station, substation).first);
@@ -131,7 +131,7 @@ void CbmLitTrackFinderBase::RemoveHits(
 {
    for(TrackPtrIterator it = itBegin; it != itEnd; it++) {
       if((*it)->GetQuality() == kLITBAD) continue;
-      for (Int_t hit = 0; hit < (*it)->GetNofHits(); hit++)
+      for (int hit = 0; hit < (*it)->GetNofHits(); hit++)
     	  fUsedHitsSet.insert((*it)->GetHit(hit)->GetRefId());
    }
 }
@@ -148,5 +148,3 @@ void CbmLitTrackFinderBase::CopyToOutput(
 	    fSeedsIdSet.insert((*it)->GetPreviousTrackId());
 	}
 }
-
-ClassImp(CbmLitTrackFinderBase);

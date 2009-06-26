@@ -29,22 +29,20 @@ protected:
 	void FollowTrack(
 			CbmLitTrack *track);
 
-	Bool_t ProcessStationGroup(
+	bool ProcessStationGroup(
 			CbmLitTrack *track,
-			Int_t stationGroup);
+			int stationGroup);
 
-	Bool_t ProcessStation(
+	bool ProcessStation(
 			CbmLitTrack *track,
-			Int_t stationGroup,
-			Int_t station);
+			int stationGroup,
+			int station);
 
-	Bool_t AddNearestHit(
+	bool AddNearestHit(
 			CbmLitTrack* track,
 			HitPtrIteratorPair bounds);
 private:
 	TrackUpdatePtr fFilter;
-
-	ClassDef(CbmLitTrackFinderNN, 1);
 };
 
 #endif /* CBMLITTRACKFINDERNN_H_ */

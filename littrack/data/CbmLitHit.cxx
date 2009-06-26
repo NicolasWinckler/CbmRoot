@@ -14,5 +14,3 @@ CbmLitHit::CbmLitHit():
 CbmLitHit::~CbmLitHit()
 {
 }
-
-ClassImp(CbmLitHit);

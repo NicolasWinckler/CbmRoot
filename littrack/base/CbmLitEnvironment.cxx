@@ -469,5 +469,3 @@ bool CbmLitEnvironment::IsTof() const
 {
 	return CheckDetectorPresence("tof");
 }
-
-ClassImp(CbmLitEnvironment)

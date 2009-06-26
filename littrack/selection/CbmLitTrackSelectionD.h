@@ -8,32 +8,28 @@
 class CbmLitTrackSelectionD : public CbmLitTrackSelection
 {
 public:
-	
 	CbmLitTrackSelectionD();
 	virtual ~CbmLitTrackSelectionD();
-	
+
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
-	
+
 	virtual LitStatus DoSelect(
 			TrackPtrIterator itBegin,
 			TrackPtrIterator itEnd);
-	
+
 	virtual LitStatus DoSelect(
 			TrackPtrVector& tracks);
-	
+
 	Int_t GetMinLastPlaneId() const {return fMinLastPlaneId;}
 	Int_t GetMinNofHits() const {return fMinNofHits;}
-	
+
 	void SetMinLastPlaneId(Int_t minLastPlaneId) {fMinLastPlaneId = minLastPlaneId;}
 	void SetMinNofHits(Int_t minNofHits) {fMinNofHits = minNofHits;}
-	
+
 private:
-	
 	Int_t fMinLastPlaneId;
 	Int_t fMinNofHits;
-
-	ClassDef(CbmLitTrackSelectionD, 1);	
 };
 
 #endif /*CBMLITTRACKSELECTIOND_H_*/

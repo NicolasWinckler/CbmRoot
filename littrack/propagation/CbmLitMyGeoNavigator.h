@@ -4,6 +4,8 @@
 #include "CbmLitGeoNavigator.h"
 #include "CbmLitMaterialInfo.h"
 
+#include <vector>
+
 class CbmLitMyGeoNavigator : public CbmLitGeoNavigator
 {
 public:
@@ -16,10 +18,11 @@ public:
 
 	LitStatus FindIntersections(
 			const CbmLitTrackParam* par,
-			Double_t zOut,
+			double zOut,
 			std::vector<CbmLitMaterialInfo>& inter);
+private:
 
-	ClassDef(CbmLitMyGeoNavigator, 1);
+	std::vector<CbmLitMaterialInfo> fMyGeoNodes;
 };
 
 #endif /* CBMLITMYGEONAVIGATOR_H_ */

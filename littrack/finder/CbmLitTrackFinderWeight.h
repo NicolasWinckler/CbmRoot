@@ -28,16 +28,16 @@ protected:
 	void FollowTrack(
 			CbmLitTrack *track);
 
-	Bool_t ProcessStationGroup(
+	bool ProcessStationGroup(
 			CbmLitTrack *track,
-			Int_t stationGroup);
+			int stationGroup);
 
-	Bool_t ProcessStation(
+	bool ProcessStation(
 			CbmLitTrack *track,
-			Int_t stationGroup,
-			Int_t station);
+			int stationGroup,
+			int station);
 
-	Bool_t AddHits(
+	bool AddHits(
 			CbmLitTrack* track,
 			HitPtrIteratorPair bounds);
 
@@ -47,8 +47,6 @@ protected:
 private:
 	TrackFitterPtr fFitter;
 	TrackUpdatePtr fFilter;
-
-	ClassDef(CbmLitTrackFinderWeight, 1);
 };
 
 #endif /*CBMLITTRACKFINDERWEIGHT_H_*/

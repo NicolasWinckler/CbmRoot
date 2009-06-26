@@ -16,8 +16,6 @@ public:
 	virtual LitStatus DoMerge(
 			HitPtrVector& hits,
 			TrackPtrVector& tracks) = 0;
-
-	ClassDef(CbmLitHitToTrackMerger, 1);
 };
 
 #endif /* CBMLITHITTOTRACKMERGER_H_ */

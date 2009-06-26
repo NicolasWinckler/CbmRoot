@@ -148,5 +148,3 @@ LitStatus CbmLitWeightCalculatorGauss::Normalize(
 	}
 	return kLITSUCCESS;
 }
-
-ClassImp(CbmLitWeightCalculatorGauss)

@@ -174,5 +174,3 @@ Bool_t CbmPropagatorGeane::IsInParCorrect(
 	}
 	return true;
 }
-
-ClassImp(CbmPropagatorGeane)

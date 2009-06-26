@@ -49,8 +49,8 @@ public:
 	virtual LitStatus Propagate(
 	   const CbmLitTrackParam *parIn,
 	   CbmLitTrackParam *parOut,
-	   Double_t zOut,
-	   Int_t pdg);
+	   double zOut,
+	   int pdg);
 
 	/**
      * Derived from CbmLitTrackPropagator. Implements the track propagation.
@@ -60,15 +60,15 @@ public:
      */
 	virtual LitStatus Propagate(
 	   CbmLitTrackParam *par,
-	   Double_t zOut,
-	   Int_t pdg);
+	   double zOut,
+	   int pdg);
 
 	/**
      * Derived from CbmLitTrackPropagator. Getter for the transport matrix.
-     * @param F Transport matrix as an std::vector<Double_t>.
+     * @param F Transport matrix as an std::vector<double>.
      */
 	virtual void TransportMatrix(
-	   std::vector<Double_t>& F);
+	   std::vector<double>& F);
 
 	/**
      * Derived from CbmLitTrackPropagator. Getter for the transport matrix.
@@ -80,13 +80,13 @@ public:
 	/**
      * If true, than transport matrix will be calculated during the propagation.
      */
-	Bool_t IsCalcTransportMatrix() const {return fCalcTransportMatrix;}
+	bool IsCalcTransportMatrix() const {return fCalcTransportMatrix;}
 
 	/**
      * Sets whether calculate transport matrix or not.
      * @param calcTransportMatrix If true, than transport matrix will be calculated during the propagation.
      */
-	void IsCalcTransportMatrix(Bool_t calcTransportMatrix) {fCalcTransportMatrix = calcTransportMatrix;}
+	void IsCalcTransportMatrix(bool calcTransportMatrix) {fCalcTransportMatrix = calcTransportMatrix;}
 
 protected:
 	/**
@@ -99,10 +99,10 @@ protected:
 		const TMatrixD& newF);
 
 	/**
-     * Check if the track parameters are correct by checking their maximum acceptable values.
+     * Check if the track parameters are c	orrect by checking their maximum acceptable values.
      * @param par Track parameter to be checked.
      */
-	Bool_t IsParCorrect(
+	bool IsParCorrect(
 		const CbmLitTrackParam* par);
 
 private:
@@ -112,12 +112,12 @@ private:
 
 	TMatrixD fFm; // Transport matrix
 
-	Bool_t fDownstream; // if true than downstream propagation
-	Int_t fPDG; // PDG of the particle
+	double fMaxStepSize; // Maximum step size in cm
 
-	Bool_t fCalcTransportMatrix; // if true than transport matrix is calculated
+	bool fDownstream; // if true than downstream propagation
+	int fPDG; // PDG of the particle
 
-	ClassDef(CbmLitTGeoTrackPropagator,1);
+	bool fCalcTransportMatrix; // if true than transport matrix is calculated
 };
 
 #endif //CBMLITTGEOTRACKPROPAGATOR_H_

@@ -32,10 +32,8 @@ std::string CbmLitTrackBranch::ToString() const
 }
 
 void CbmLitTrackBranch::SortHits(
-		Bool_t downstream)
+		bool downstream)
 {
 	if (downstream) std::sort(fHits.begin(), fHits.end(), CompareHitPtrPlaneIdLess());
 	else std::sort(fHits.begin(), fHits.end(), CompareHitPtrPlaneIdMore());
 }
-
-ClassImp(CbmLitTrackBranch);

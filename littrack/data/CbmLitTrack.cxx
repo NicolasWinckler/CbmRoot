@@ -87,7 +87,7 @@ std::string CbmLitTrack::ToString() const
 }
 
 void CbmLitTrack::SortHits(
-		Bool_t downstream)
+		bool downstream)
 {
 //	if (downstream) std::sort(fHits.begin(), fHits.end(), CompareHitPtrPlaneIdLess());
 //	else std::sort(fHits.begin(), fHits.end(), CompareHitPtrPlaneIdMore());
@@ -95,7 +95,7 @@ void CbmLitTrack::SortHits(
 	else std::sort(fHits.begin(), fHits.end(), CompareHitPtrZMore());
 }
 
-Bool_t CbmLitTrack::CheckParams() const
+bool CbmLitTrack::CheckParams() const
 {
 	//TODO improve parameters check for the track
 
@@ -109,8 +109,8 @@ Bool_t CbmLitTrack::CheckParams() const
 	return true;
 }
 
-Int_t CbmLitTrack::GetNofHits(
-		Int_t planeId)
+int CbmLitTrack::GetNofHits(
+		int planeId)
 {
 	CbmLitHit value;
 	value.SetPlaneId(planeId);
@@ -120,7 +120,7 @@ Int_t CbmLitTrack::GetNofHits(
 }
 
 HitPtrIteratorPair CbmLitTrack::GetHits(
-		Int_t planeId)
+		int planeId)
 {
 	CbmLitHit value;
 	value.SetPlaneId(planeId);
@@ -133,13 +133,11 @@ void CbmLitTrack::GetHitBounds(
 		std::vector<HitPtrIteratorPair>& bounds)
 {
 	bounds.clear();
-	Int_t min = fHits.front()->GetPlaneId();
-	Int_t max = fHits.back()->GetPlaneId();
-	for (Int_t i = min; i <= max; i++) {
+	int min = fHits.front()->GetPlaneId();
+	int max = fHits.back()->GetPlaneId();
+	for (int i = min; i <= max; i++) {
 		HitPtrIteratorPair b = GetHits(i);
 		if(b.first == b.second) continue;
 		bounds.push_back(b);
 	}
 }
-
-ClassImp(CbmLitTrack);

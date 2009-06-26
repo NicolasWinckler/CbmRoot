@@ -88,7 +88,7 @@ private:
 
     Int_t fNEvents;
 
-    ClassDef(CbmLitElossAna,1);
+    ClassDef(CbmLitElossAna, 1);
 };
 
 #endif /*CBMLITELOSSANA_H_*/

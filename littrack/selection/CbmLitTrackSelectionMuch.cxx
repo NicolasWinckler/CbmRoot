@@ -66,6 +66,3 @@ LitStatus CbmLitTrackSelectionMuch::DoSelect(
 {
 	return DoSelect(tracks.begin(), tracks.end());
 }
-
-ClassImp(CbmLitTrackSelectionMuch)
-

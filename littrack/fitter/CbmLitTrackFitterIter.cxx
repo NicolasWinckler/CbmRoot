@@ -32,13 +32,13 @@ LitStatus CbmLitTrackFitterIter::Finalize()
 
 LitStatus CbmLitTrackFitterIter::Fit(
 		CbmLitTrack *track,
-		Bool_t downstream)
+		bool downstream)
 {
 //	std::cout << "FIT start. ";
 //	std::cout << "nofHits = " << track->GetNofHits() << " ;";
-	for (Int_t iter = 0; iter < fNofIterations; iter++) {
+	for (int iter = 0; iter < fNofIterations; iter++) {
 //		std::cout << "Iter " << iter << " started ;" << std::endl;
-		Bool_t isRefit = false;
+		bool isRefit = false;
 
 		if (fFitter->Fit(track) == kLITERROR) {
 			return kLITERROR;
@@ -50,8 +50,8 @@ LitStatus CbmLitTrackFitterIter::Fit(
 
 		if (iter < fNofIterations -1) {
 //			std::cout << "chi2: ";
-			for (Int_t i = 0; i < track->GetNofHits(); i++) {
-				Double_t chiSq = track->GetFitNode(i)->GetChiSqSmoothed();
+			for (int i = 0; i < track->GetNofHits(); i++) {
+				double chiSq = track->GetFitNode(i)->GetChiSqSmoothed();
 //				std::cout << " " << chiSq;
 				if (chiSq > fChiSqCut) {
 					track->RemoveHit(i);
@@ -68,5 +68,3 @@ LitStatus CbmLitTrackFitterIter::Fit(
 	}
 	return kLITSUCCESS;
 }
-
-ClassImp(CbmLitTrackFitterIter);

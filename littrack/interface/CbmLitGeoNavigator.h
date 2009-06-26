@@ -16,10 +16,8 @@ public:
 
 	virtual LitStatus FindIntersections(
 			const CbmLitTrackParam* par,
-			Double_t zOut,
+			double zOut,
 			std::vector<CbmLitMaterialInfo>& inter) = 0;
-
-	ClassDef(CbmLitGeoNavigator,1);
 };
 
 #endif /*CBMLITGEONAVIGATOR_H_*/

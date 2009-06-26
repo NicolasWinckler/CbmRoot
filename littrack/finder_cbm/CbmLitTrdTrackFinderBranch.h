@@ -25,7 +25,7 @@ private:
     virtual void SetIterationParameters(
     		Int_t iter);
 
-	ClassDef(CbmLitTrdTrackFinderBranch, 1);
+    ClassDef(CbmLitTrdTrackFinderBranch, 1);
 };
 
 #endif /*CBMLITTRDTRACKFINDERBRANCH_H_*/

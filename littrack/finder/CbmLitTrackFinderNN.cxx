@@ -42,7 +42,7 @@ LitStatus CbmLitTrackFinderNN::DoFind(
 	fUsedHitsSet.clear();
 	fHitData.SetDetectorLayout(fLayout);
 
-	for (Int_t iIter = 0; iIter < fNofIter; iIter++) {
+	for (int iIter = 0; iIter < fNofIter; iIter++) {
 		SetIterationParameters(iIter);
 		ArrangeHits(fHitArray.begin(), fHitArray.end());
 		InitTrackSeeds(fTrackSeedArray.begin(), fTrackSeedArray.end());
@@ -72,18 +72,18 @@ void CbmLitTrackFinderNN::FollowTracks(
 void CbmLitTrackFinderNN::FollowTrack(
 		CbmLitTrack *track)
 {
-	Int_t nofStationGroups = fLayout.GetNofStationGroups();
-	for(Int_t iStationGroup = 0; iStationGroup < nofStationGroups; iStationGroup++) {
+	int nofStationGroups = fLayout.GetNofStationGroups();
+	for(int iStationGroup = 0; iStationGroup < nofStationGroups; iStationGroup++) {
 		if (!ProcessStationGroup(track, iStationGroup)) return;
 	}
 }
 
-Bool_t CbmLitTrackFinderNN::ProcessStationGroup(
+bool CbmLitTrackFinderNN::ProcessStationGroup(
 		CbmLitTrack *track,
-		Int_t stationGroup)
+		int stationGroup)
 {
-	Int_t nofStations = fLayout.GetNofStations(stationGroup);
-	for(Int_t iStation = 0; iStation < nofStations; iStation++){
+	int nofStations = fLayout.GetNofStations(stationGroup);
+	for(int iStation = 0; iStation < nofStations; iStation++){
 		if (!ProcessStation(track, stationGroup, iStation)) {
 			track->SetNofMissingHits(track->GetNofMissingHits() + 1);
 			if (track->GetNofMissingHits() > fMaxNofMissingHits) return false;
@@ -94,16 +94,16 @@ Bool_t CbmLitTrackFinderNN::ProcessStationGroup(
 	return true;
 }
 
-Bool_t CbmLitTrackFinderNN::ProcessStation(
+bool CbmLitTrackFinderNN::ProcessStation(
 		CbmLitTrack *track,
-		Int_t stationGroup,
-		Int_t station)
+		int stationGroup,
+		int station)
 {
-	Bool_t hitAdded = false;
+	bool hitAdded = false;
 	CbmLitTrackParam par(*track->GetParamLast());
-	Int_t nofSubstations = fLayout.GetNofSubstations(stationGroup, station);
-	for (Int_t iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
-		Double_t z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
+	int nofSubstations = fLayout.GetNofSubstations(stationGroup, station);
+	for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
+		double z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
 		fPropagator->Propagate(&par, z, fPDG);
 		track->SetParamLast(&par);
 		HitPtrIteratorPair bounds = MinMaxIndex(&par, stationGroup, station, iSubstation);
@@ -112,18 +112,18 @@ Bool_t CbmLitTrackFinderNN::ProcessStation(
 	return hitAdded;
 }
 
-Bool_t CbmLitTrackFinderNN::AddNearestHit(
+bool CbmLitTrackFinderNN::AddNearestHit(
 		CbmLitTrack* track,
 		HitPtrIteratorPair bounds)
 {
-	Bool_t hitAdded = false;
+	bool hitAdded = false;
 	CbmLitTrackParam par(*track->GetParamLast()), uPar, param;
 	HitPtrIterator hit(bounds.second);
-	Double_t chiSq = 1e10;
+	double chiSq = 1e10;
 	for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
 		fFilter->Update(&par, &uPar, *iHit);
 		if (IsHitInValidationWindow(&uPar, *iHit)) {
-			Double_t chi = ChiSq(&uPar, *iHit);
+			double chi = ChiSq(&uPar, *iHit);
 			if (chi < chiSq) {
 				chiSq = chi;
 				hit = iHit;
@@ -140,5 +140,3 @@ Bool_t CbmLitTrackFinderNN::AddNearestHit(
 	}
 	return hitAdded;
 }
-
-ClassImp(CbmLitTrackFinderNN);

@@ -17,44 +17,44 @@ public:
 	CbmLitTrack& operator=(const CbmLitTrack& track);
 	CbmLitTrack(const CbmLitTrack& track) { *this = track; };
 
-	Int_t GetNofHits() const { return fHits.size(); }
-	Int_t GetNofHits(Int_t planeId);
+	int GetNofHits() const { return fHits.size(); }
+	int GetNofHits(int planeId);
 	LitTrackQa GetQuality() const { return fQuality; }
-	Double_t GetChi2() const { return fChi2; }
-	Int_t GetNDF() const { return fNDF; }
-	Int_t GetPreviousTrackId() const { return fPreviousTrackId; }
-	Int_t GetPDG() const {return fPDG;};
+	double GetChi2() const { return fChi2; }
+	int GetNDF() const { return fNDF; }
+	int GetPreviousTrackId() const { return fPreviousTrackId; }
+	int GetPDG() const {return fPDG;};
 	const CbmLitTrackParam* GetParamFirst() const { return &fParamFirst; }
 	const CbmLitTrackParam* GetParamLast() const { return &fParamLast; }
-	Int_t GetLastPlaneId() const { return fLastPlaneId; };
-	const CbmLitHit* GetHit(Int_t index) const { return fHits[index];}
+	int GetLastPlaneId() const { return fLastPlaneId; };
+	const CbmLitHit* GetHit(int index) const { return fHits[index];}
 	const HitPtrVector& GetHits() const { return fHits;}
-	const CbmLitFitNode* GetFitNode(Int_t index) const {return &fFitNodes[index];}
+	const CbmLitFitNode* GetFitNode(int index) const {return &fFitNodes[index];}
 	const FitNodeVector& GetFitNodes() const {return fFitNodes;}
-	HitPtrIteratorPair GetHits(Int_t planeId);
+	HitPtrIteratorPair GetHits(int planeId);
 	void GetHitBounds(std::vector<HitPtrIteratorPair>& bounds);
-	Int_t GetNofMissingHits() const {return fNofMissingHits;}
-	Int_t GetRefId() const {return fRefId;}
+	int GetNofMissingHits() const {return fNofMissingHits;}
+	int GetRefId() const {return fRefId;}
 
 	void SetQuality(LitTrackQa quality) { fQuality = quality; }
-	void SetChi2(Double_t chi2) { fChi2 = chi2; }
-	void SetNDF(Int_t ndf) { fNDF = ndf; }
-	void SetPreviousTrackId(Int_t id) { fPreviousTrackId = id; }
-	void SetPDG(Int_t pdg) { fPDG = pdg; }
+	void SetChi2(double chi2) { fChi2 = chi2; }
+	void SetNDF(int ndf) { fNDF = ndf; }
+	void SetPreviousTrackId(int id) { fPreviousTrackId = id; }
+	void SetPDG(int pdg) { fPDG = pdg; }
 	void SetParamFirst(const CbmLitTrackParam* par) { fParamFirst = *par; }
 	void SetParamLast(const CbmLitTrackParam* par) { fParamLast = *par; }
 	//TODO temporarily needed for equal_range algorithm
-	void SetNofHits(Int_t nofHits) { fHits.resize(nofHits); }
-	void SetLastPlaneId(Int_t lastPlaneId) { fLastPlaneId = lastPlaneId; }
+	void SetNofHits(int nofHits) { fHits.resize(nofHits); }
+	void SetLastPlaneId(int lastPlaneId) { fLastPlaneId = lastPlaneId; }
 	void AddHit(const CbmLitHit* hit);
 	void SetFitNodes(const FitNodeVector& nodes) {fFitNodes = nodes;}
-	void SortHits(Bool_t downstream = true);
-	void SetNofMissingHits(Int_t nofMissingHits) {fNofMissingHits = nofMissingHits;}
-	void SetRefId(Int_t refId) {fRefId = refId;}
+	void SortHits(bool downstream = true);
+	void SetNofMissingHits(int nofMissingHits) {fNofMissingHits = nofMissingHits;}
+	void SetRefId(int refId) {fRefId = refId;}
 
-	void RemoveHit(Int_t index);
+	void RemoveHit(int index);
 
-	Bool_t CheckParams() const;
+	bool CheckParams() const;
 	void ClearHits();
 
 	std::string ToString() const;
@@ -66,15 +66,13 @@ private:
 	CbmLitTrackParam fParamLast;
 	FitNodeVector fFitNodes;
 	LitTrackQa fQuality;
-	Double_t fChi2;
-	Int_t fNDF;
-	Int_t fPreviousTrackId;
-	Int_t fLastPlaneId;
-	Int_t fPDG;
-	Int_t fNofMissingHits;
-	Int_t fRefId;
-
-	ClassDef(CbmLitTrack, 1);
+	double fChi2;
+	int fNDF;
+	int fPreviousTrackId;
+	int fLastPlaneId;
+	int fPDG;
+	int fNofMissingHits;
+	int fRefId;
 };
 
 #endif /*CBMLITTRACK_H_*/

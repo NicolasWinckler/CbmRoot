@@ -10,28 +10,25 @@ class CbmLitTrackSelectionB : public CbmLitTrackSelection
 public:
 	CbmLitTrackSelectionB();
 	virtual ~CbmLitTrackSelectionB();
-	
+
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
-	
+
 	virtual LitStatus DoSelect(
 			TrackPtrIterator itBegin,
 			TrackPtrIterator itEnd);
-	
+
 	virtual LitStatus DoSelect(
 			TrackPtrVector& tracks);
 
 private:
-	
 	//Int_t fNofSharedHits;
-	
+
 	CbmLitTrackSelection* fSelection;
-	
+
 	void SortLastPlaneId(
 			TrackPtrIterator itBegin,
 			TrackPtrIterator itEnd);
-	
-	ClassDef(CbmLitTrackSelectionB, 1);	
 };
 
 #endif /*CBMLITTRACKSELECTIONB_H_*/

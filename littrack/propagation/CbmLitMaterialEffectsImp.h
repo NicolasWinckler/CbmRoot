@@ -19,8 +19,8 @@ public:
 	LitStatus Update(
 			CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat,
-	        Int_t pdg,
-	        Bool_t downstream);
+	        int pdg,
+	        bool downstream);
 public:
 
 	void AddThinScatter(
@@ -35,63 +35,61 @@ public:
 			CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	Double_t CalcThetaSq(
+	double CalcThetaSq(
 			const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	Double_t BetheBlochSimple(
+	double BetheBlochSimple(
 	        const CbmLitMaterialInfo* mat) const;
 
-	Double_t BetheBloch(
+	double BetheBloch(
 			const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	Double_t BetheBlochElectron(
+	double BetheBlochElectron(
 			const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	Double_t EnergyLoss(
+	double EnergyLoss(
 			const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	Double_t dEdx(
+	double dEdx(
 			const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	Double_t CalcQpAfterEloss(
-			Double_t qp,
-	        Double_t eloss) const;
+	double CalcQpAfterEloss(
+			double qp,
+	        double eloss) const;
 
-	Double_t CalcSigmaSqQp(
+	double CalcSigmaSqQp(
 			   const CbmLitTrackParam* par,
 	           const CbmLitMaterialInfo* mat) const;
 
-	Double_t CalcSigmaSqQpElectron(
+	double CalcSigmaSqQpElectron(
 	          const CbmLitTrackParam* par,
 	          const CbmLitMaterialInfo* mat) const;
 
-	Double_t MPVEnergyLoss(
+	double MPVEnergyLoss(
 	        const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	Double_t BetheHeitler(
+	double BetheHeitler(
 	        const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	Double_t PairProduction(
+	double PairProduction(
 	        const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	Double_t CalcI(
-			Double_t Z) const;
+	double CalcI(
+			double Z) const;
 private:
-	Double_t fEnergyLoss;
-	Bool_t fDownstream;
-	Double_t fMass;
-	Bool_t fIsElectron;
-	Bool_t fIsMuon;
-
-	ClassDef(CbmLitMaterialEffectsImp, 1);
+	double fEnergyLoss;
+	bool fDownstream;
+	double fMass;
+	bool fIsElectron;
+	bool fIsMuon;
 };
 
 #endif /*CBMLITMATERIALEFFECTSIMP_H_*/

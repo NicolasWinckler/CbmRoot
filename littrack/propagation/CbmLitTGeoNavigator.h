@@ -21,7 +21,7 @@ public:
 
 	LitStatus FindIntersections(
 			const CbmLitTrackParam* par,
-			Double_t zOut,
+			double zOut,
 			std::vector<CbmLitMaterialInfo>& inter);
 
 private:
@@ -29,14 +29,12 @@ private:
 			const CbmLitTrackParam* par) const;
 
 	CbmLitMaterialInfo MakeStep(
-			Double_t step = 0.) const;
+			double step = 0.) const;
 
-	Double_t CalcLength(
-			Double_t zOut) const;
+	double CalcLength(
+			double zOut) const;
 
 	TGeoManager* fGeo;
-
-	ClassDef(CbmLitTGeoNavigator,1);
 };
 
 #endif /*CBMLITTGEONAVIGATOR_H_*/

@@ -12,23 +12,21 @@ public:
 			CbmLitTrackFitter* fitter,
 			CbmLitTrackFitter* smoother);
 	virtual ~CbmLitTrackFitterIter();
-	
+
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
-	
+
 	virtual LitStatus Fit(
 			CbmLitTrack *track,
-			Bool_t downstream = true);
-	
+			bool downstream = true);
+
 private:
 	CbmLitTrackFitter* fFitter;
-	CbmLitTrackFitter* fSmoother;	
-	
-	Int_t fNofIterations;
-	Double_t fChiSqCut;
-	Int_t fMinNofHits;
-	
-	ClassDef(CbmLitTrackFitterIter, 1);
+	CbmLitTrackFitter* fSmoother;
+
+	int fNofIterations;
+	double fChiSqCut;
+	int fMinNofHits;
 };
 
 #endif /*CBMLITTRACKFITTERITER_H_*/

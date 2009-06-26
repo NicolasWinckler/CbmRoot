@@ -24,8 +24,6 @@ public:
 			const CbmLitTrackParam* par,
 			HitPtrVector& hits,
 			Double_t T);
-
-	ClassDef(CbmLitWeightCalculatorSimple, 1);
 };
 
 #endif /*CBMLITWEIGHTCALCULATORSIMPLE_H_*/

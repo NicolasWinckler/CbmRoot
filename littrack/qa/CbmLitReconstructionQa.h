@@ -257,7 +257,7 @@ private:
 
 	Int_t fEventNo; // Event counter
 
-	ClassDef(CbmLitReconstructionQa,1);
+	ClassDef(CbmLitReconstructionQa, 1);
 };
 
 #endif /* CBMLITRECONSTRUCTIONQA_H_ */

@@ -1,12 +1,12 @@
 #ifndef CBMLITSIMPLEGEOMETRYCONSTRUCTOR_H_
 #define CBMLITSIMPLEGEOMETRYCONSTRUCTOR_H_
 
-#include "TObject.h"
+#include "CbmLitMaterialInfo.h"
 
 #include <string>
 #include <map>
 #include <vector>
-#include <sstream>
+//#include <sstream>
 
 class TGeoManager;
 class TGeoMedium;
@@ -18,17 +18,17 @@ class TGeoVolume;
 //public:
 //	const std::string& GetName() const {return fName; }
 //	const std::string& GetMediumName() const {return fMediumName; }
-//	Double_t GetZ() const {return fZ;}
-//	Double_t GetDz() const {return fDz;}
-//	Double_t GetRmin() const {return fRmin;}
-//	Double_t GetRmax() const {return fRmax;}
+//	double GetZ() const {return fZ;}
+//	double GetDz() const {return fDz;}
+//	double GetRmin() const {return fRmin;}
+//	double GetRmax() const {return fRmax;}
 //
 //	void SetName(const std::string& name) {fName = name;}
 //	void SetMediumName(const std::string& mediumName) {fMediumName = mediumName;}
-//	void SetZ(Double_t z) {fZ = z;}
-//	void SetDz(Double_t dz) {fDz = dz;}
-//	void SetRmin(Double_t rmin) {fRmin = rmin;}
-//	void SetRmax(Double_t rmax) {fRmax = rmax;}
+//	void SetZ(double z) {fZ = z;}
+//	void SetDz(double dz) {fDz = dz;}
+//	void SetRmin(double rmin) {fRmin = rmin;}
+//	void SetRmax(double rmax) {fRmax = rmax;}
 //
 //	std::string ToString() const {
 //		std::stringstream ss;
@@ -41,10 +41,10 @@ class TGeoVolume;
 //private:
 //	std::string fName;
 //	std::string fMediumName;
-//	Double_t fZ;
-//	Double_t fDz;
-//	Double_t fRmin;
-//	Double_t fRmax;
+//	double fZ;
+//	double fDz;
+//	double fRmin;
+//	double fRmax;
 //
 ////	ClassDef(CbmLitGeoNode, 1);
 //};
@@ -54,11 +54,11 @@ class TGeoVolume;
 //	CbmLitGeoMaterial() {};
 //	CbmLitGeoMaterial(
 //			const std::string& name,
-//			Double_t a,
-//			Double_t z,
-//			Double_t density,
-//			Double_t radLen,
-//			Double_t intLen):
+//			double a,
+//			double z,
+//			double density,
+//			double radLen,
+//			double intLen):
 //				fName(name),
 //				fA(a),
 //				fZ(z),
@@ -68,18 +68,18 @@ class TGeoVolume;
 //	~CbmLitGeoMaterial();
 //
 //	const std::string& GetName() const {return fName;}
-//	Double_t GetA() const {return fA;}
-//	Double_t GetZ() const {return fZ;}
-//	Double_t GetDensity() const {return fDensity;}
-//	Double_t GetRadLen() const {return fRadLen;}
-//	Double_t GetIntLen() const {return fIntLen;}
+//	double GetA() const {return fA;}
+//	double GetZ() const {return fZ;}
+//	double GetDensity() const {return fDensity;}
+//	double GetRadLen() const {return fRadLen;}
+//	double GetIntLen() const {return fIntLen;}
 //
 //	void SetName(const std::string& name) {fName = name;}
-//	void SetA(Double_t a) {fA = a;}
-//	void SetZ(Double_t z) {fZ = z;}
-//	void SetDensity(Double_t density) {fDensity = density;}
-//	void SetRadLen(Double_t radLen) {fRadLen = radLen;}
-//	void SetIntLen(Double_t intLen) {fIntLen = intLen;}
+//	void SetA(double a) {fA = a;}
+//	void SetZ(double z) {fZ = z;}
+//	void SetDensity(double density) {fDensity = density;}
+//	void SetRadLen(double radLen) {fRadLen = radLen;}
+//	void SetIntLen(double intLen) {fIntLen = intLen;}
 //
 //	std::string ToString() const {
 //		std::stringstream ss;
@@ -90,11 +90,11 @@ class TGeoVolume;
 //	}
 //private:
 //	std::string fName;
-//	Double_t fA;
-//	Double_t fZ;
-//	Double_t fDensity;
-//	Double_t fRadLen;
-//	Double_t fIntLen;
+//	double fA;
+//	double fZ;
+//	double fDensity;
+//	double fRadLen;
+//	double fIntLen;
 //
 ////	ClassDef(CbmLitGeoMaterial, 1);
 //};
@@ -106,7 +106,7 @@ class TGeoVolume;
 //	CbmLitGeoMedium(	) {;}
 //	CbmLitGeoMedium(
 //			const std::string& name,
-//			Int_t id,
+//			int id,
 //			const CbmLitGeoMaterial& material):
 //				fName(name),
 //				fId(id),
@@ -114,11 +114,11 @@ class TGeoVolume;
 //	~CbmLitGeoMedium() {;}
 //
 //	const std::string& GetName() const {return fName;}
-//	Int_t GetId() const {return fId;}
+//	int GetId() const {return fId;}
 //	const CbmLitGeoMaterial& GetMaterial() const {return fMaterial;}
 //
 //	void SetName(const std::string& name) {fName = name;}
-//	void SetId(Int_t id) {fId = id;}
+//	void SetId(int id) {fId = id;}
 //	void SetMaterial(const CbmLitGeoMaterial& material) {fMaterial = material;}
 //
 //	std::string ToString() const {
@@ -130,7 +130,7 @@ class TGeoVolume;
 //
 //private:
 //	std::string fName;
-//	Int_t fId;
+//	int fId;
 //	CbmLitGeoMaterial fMaterial;
 //
 ////	ClassDef(CbmLitGeoMedium, 1);
@@ -140,28 +140,39 @@ class TGeoVolume;
 
 class CbmLitSimpleGeometryConstructor {
 public:
-	CbmLitSimpleGeometryConstructor();
+	static CbmLitSimpleGeometryConstructor* Instance();
 	virtual ~CbmLitSimpleGeometryConstructor();
 
-	void ConstructGeometry();
+	const std::vector<CbmLitMaterialInfo>& GetMyGeoNodes() const{return fMyGeoNodes;}
+
 	void Draw();
 
+protected:
+	CbmLitSimpleGeometryConstructor();
+
 private:
+	void ConstructGeometry();
+
 	TGeoMedium* CreateMedium(
 			const std::string& matName);
 
 	void CreateMediumList();
+	void GeoMediumToMaterialInfo(
+			const TGeoMedium* med,
+			CbmLitMaterialInfo& mat);
 
 	void ConstructSts();
 	void ConstructMuch();
 	void ConstructTof();
+
+	static CbmLitSimpleGeometryConstructor* fInstance;
 
 	TGeoManager* fGeo;
 	TGeoManager* fSimpleGeo;
 
 	std::map<std::string, TGeoMedium*> fMedium;
 
-	ClassDef(CbmLitSimpleGeometryConstructor, 1);
+	std::vector<CbmLitMaterialInfo> fMyGeoNodes;
 };
 
 #endif /* CBMLITSIMPLEGEOMETRYCONSTRUCTOR_H_ */

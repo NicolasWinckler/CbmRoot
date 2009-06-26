@@ -38,8 +38,8 @@ LitStatus CbmLitNearestHitToTrackMerger::DoMerge(
 	for (TrackPtrIterator it = tracks.begin(); it != tracks.end(); it++) {
 		CbmLitTrack* track = *it;
 		CbmLitTrackParam par(*track->GetParamLast());
-		Bool_t hitAdded = false;
-		for (Int_t substation = 0; substation < fStation.GetNofSubstations(); substation++) {
+		bool hitAdded = false;
+		for (int substation = 0; substation < fStation.GetNofSubstations(); substation++) {
 			//propagate each track to plane where to merge
 			fPropagator->Propagate(&par, fStation.GetSubstation(substation).GetZ(), fPDG);
 			//fast search of hits (optional)
@@ -55,19 +55,19 @@ LitStatus CbmLitNearestHitToTrackMerger::DoMerge(
 	}
 }
 
-Bool_t CbmLitNearestHitToTrackMerger::AddNearestHit(
+bool CbmLitNearestHitToTrackMerger::AddNearestHit(
 		CbmLitTrack* track,
 		HitPtrIteratorPair bounds) const
 {
-	Bool_t hitAdded = false;
+	bool hitAdded = false;
 	const CbmLitTrackParam* par = track->GetParamLast();
 	CbmLitTrackParam uPar, param;
 	HitPtrIterator hit(bounds.second);
-	Double_t chiSq = 1e10;
+	double chiSq = 1e10;
 	for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
 		fFilter->Update(par, &uPar, *iHit);
 		if (IsHitInValidationGate(&uPar, *iHit)) {
-			Double_t chi = ChiSq(&uPar, *iHit);
+			double chi = ChiSq(&uPar, *iHit);
 			if (chi < chiSq) {
 				chiSq = chi;
 				hit = iHit;
@@ -84,5 +84,3 @@ Bool_t CbmLitNearestHitToTrackMerger::AddNearestHit(
 	}
 	return hitAdded;
 }
-
-ClassImp(CbmLitNearestHitToTrackMerger);

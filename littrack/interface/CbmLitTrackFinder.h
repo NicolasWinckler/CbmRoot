@@ -14,8 +14,6 @@ public:
 			const HitPtrVector& hits,
 			const TrackPtrVector& trackSeeds,
 			TrackPtrVector& tracks) = 0;
-
-    ClassDef(CbmLitTrackFinder, 1);
 };
 
 #endif /*CBMLITTRACKFINDER_H_*/

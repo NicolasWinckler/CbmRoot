@@ -34,7 +34,7 @@ LitStatus CbmLitMaterialEffectsImp::Update(
 		CbmLitTrackParam* par,
         const CbmLitMaterialInfo* mat,
         Int_t pdg,
-        Bool_t downstream)
+        bool downstream)
 {
 	if (mat->GetLength() * mat->GetRho() < 1e-10) return kLITSUCCESS;
 
@@ -55,10 +55,10 @@ void CbmLitMaterialEffectsImp::AddEnergyLoss(
 		CbmLitTrackParam* par,
 		const CbmLitMaterialInfo* mat) const
 {
-   Double_t Eloss = EnergyLoss(par, mat);
+   double Eloss = EnergyLoss(par, mat);
    par->SetQp(CalcQpAfterEloss(par->GetQp(), Eloss));
 
-   Double_t cov = par->GetCovariance(14);
+   double cov = par->GetCovariance(14);
    if (fIsElectron) cov += CalcSigmaSqQpElectron(par, mat);
    else cov += CalcSigmaSqQp(par, mat);
    par->SetCovariance(14, cov);
@@ -70,23 +70,23 @@ void CbmLitMaterialEffectsImp::AddThickScatter(
 {
 	if (mat->GetLength() < 1e-10) return;
 
-   Double_t tx = par->GetTx();
-   Double_t ty = par->GetTy();
-   Double_t l = mat->GetLength(); //cm
-   Double_t thetaSq = CalcThetaSq(par, mat);
+   double tx = par->GetTx();
+   double ty = par->GetTy();
+   double l = mat->GetLength(); //cm
+   double thetaSq = CalcThetaSq(par, mat);
 
-   Double_t t = 1 + tx * tx + ty * ty;
+   double t = 1 + tx * tx + ty * ty;
 
-   Double_t Q33 = (1 + tx * tx) * t * thetaSq;
-   Double_t Q44 = (1 + ty * ty) * t * thetaSq;
-   Double_t Q34 = tx * ty * t * thetaSq;
+   double Q33 = (1 + tx * tx) * t * thetaSq;
+   double Q44 = (1 + ty * ty) * t * thetaSq;
+   double Q34 = tx * ty * t * thetaSq;
 
-   Double_t T23 = (l * l) / 3.0;
-   Double_t T2 = l / 2.0;
+   double T23 = (l * l) / 3.0;
+   double T2 = l / 2.0;
 
-   Double_t D = (fDownstream) ? 1. : -1.;
+   double D = (fDownstream) ? 1. : -1.;
 
-   std::vector<Double_t> C = par->GetCovMatrix();
+   std::vector<double> C = par->GetCovMatrix();
 
    C[0] += Q33 * T23;
    C[1] += Q34 * T23;
@@ -110,55 +110,55 @@ void CbmLitMaterialEffectsImp::AddThinScatter(
 		const CbmLitMaterialInfo* mat) const
 {
 	 if (mat->GetLength() < 1e-10) return;
-	 Double_t tx = par->GetTx();
-	 Double_t ty = par->GetTy();
-	 Double_t thetaSq = CalcThetaSq(par, mat);
+	 double tx = par->GetTx();
+	 double ty = par->GetTy();
+	 double thetaSq = CalcThetaSq(par, mat);
 
-	 Double_t t = 1 + tx * tx + ty * ty;
+	 double t = 1 + tx * tx + ty * ty;
 
-	 Double_t Q33 = (1 + tx * tx) * t * thetaSq;
-	 Double_t Q44 = (1 + ty * ty) * t * thetaSq;
-	 Double_t Q34 = tx * ty * t * thetaSq;
+	 double Q33 = (1 + tx * tx) * t * thetaSq;
+	 double Q44 = (1 + ty * ty) * t * thetaSq;
+	 double Q34 = tx * ty * t * thetaSq;
 
-     std::vector<Double_t> C = par->GetCovMatrix();
+     std::vector<double> C = par->GetCovMatrix();
      C[9] += Q33;
      C[12] += Q44;
      C[10] += Q34;
      par->SetCovMatrix(C);
 }
 
-Double_t CbmLitMaterialEffectsImp::CalcThetaSq(
+double CbmLitMaterialEffectsImp::CalcThetaSq(
 		const CbmLitTrackParam* par,
         const CbmLitMaterialInfo* mat) const
 {
-   Double_t p = 1. / par->GetQp(); //GeV
-   Double_t E = std::sqrt(fMass * fMass + p * p);
-   Double_t beta = p / E;
-   Double_t x = mat->GetLength(); //cm
-   Double_t X0 = mat->GetRL(); //cm
-   Double_t bcp = beta * p;
-   Double_t z = 1.;
+   double p = 1. / par->GetQp(); //GeV
+   double E = std::sqrt(fMass * fMass + p * p);
+   double beta = p / E;
+   double x = mat->GetLength(); //cm
+   double X0 = mat->GetRL(); //cm
+   double bcp = beta * p;
+   double z = 1.;
 
-   Double_t theta = 0.0136 * (1./bcp) * z * std::sqrt(x/X0) *
+   double theta = 0.0136 * (1./bcp) * z * std::sqrt(x/X0) *
    					(1. + 0.038 * std::log(x/X0));
    return theta * theta;
 }
 
-Double_t CbmLitMaterialEffectsImp::EnergyLoss(
+double CbmLitMaterialEffectsImp::EnergyLoss(
 		const CbmLitTrackParam* par,
         const CbmLitMaterialInfo* mat) const
 {
-	Double_t length = mat->GetRho() * mat->GetLength();
+	double length = mat->GetRho() * mat->GetLength();
 	if (!fIsElectron) return dEdx(par, mat) * length;
 	else return BetheBlochSimple(mat) * length;
 	//return MPVEnergyLoss(par, mat);
 }
 
-Double_t CbmLitMaterialEffectsImp::dEdx(
+double CbmLitMaterialEffectsImp::dEdx(
 		const CbmLitTrackParam* par,
         const CbmLitMaterialInfo* mat) const
 {
-	Double_t dedx;
+	double dedx;
 	if (fIsElectron) dedx = BetheBlochElectron(par, mat);
 	else dedx = BetheBloch(par, mat);
 	dedx += BetheHeitler(par, mat);
@@ -166,55 +166,55 @@ Double_t CbmLitMaterialEffectsImp::dEdx(
 	return dedx;
 }
 
-Double_t CbmLitMaterialEffectsImp::BetheBloch(
+double CbmLitMaterialEffectsImp::BetheBloch(
 		const CbmLitTrackParam* par,
         const CbmLitMaterialInfo* mat) const
 {
-	Double_t K = 0.000307075; // GeV * g^-1 * cm^2
-	Double_t z = (par->GetQp() > 0.) ? 1 : -1.;
-	Double_t Z = mat->GetZ();
-	Double_t A = mat->GetA();
+	double K = 0.000307075; // GeV * g^-1 * cm^2
+	double z = (par->GetQp() > 0.) ? 1 : -1.;
+	double Z = mat->GetZ();
+	double A = mat->GetA();
 
-	Double_t M = fMass;
-	Double_t p = std::abs(1. / par->GetQp()); //GeV
-	Double_t E = std::sqrt(M * M + p * p);
-	Double_t beta = p / E;
-	Double_t betaSq = beta * beta;
-	Double_t gamma = E / M;
-	Double_t gammaSq = gamma * gamma;
+	double M = fMass;
+	double p = std::abs(1. / par->GetQp()); //GeV
+	double E = std::sqrt(M * M + p * p);
+	double beta = p / E;
+	double betaSq = beta * beta;
+	double gamma = E / M;
+	double gammaSq = gamma * gamma;
 
-	Double_t I = CalcI(Z) * 1e-9; // GeV
+	double I = CalcI(Z) * 1e-9; // GeV
 
-	Double_t me = 0.000511; // GeV
-	Double_t ratio = me/M;
-	Double_t Tmax = (2*me*betaSq*gammaSq) / (1+2*gamma*ratio+ratio*ratio);
+	double me = 0.000511; // GeV
+	double ratio = me/M;
+	double Tmax = (2*me*betaSq*gammaSq) / (1+2*gamma*ratio+ratio*ratio);
 
 	// density correction
-	Double_t dc = 0.;
+	double dc = 0.;
 	if (p > 0.5) { // for particles above 1 Gev
-		Double_t rho = mat->GetRho();
-		Double_t hwp = 28.816 * std::sqrt(rho*Z/A) * 1e-9 ; // GeV
+		double rho = mat->GetRho();
+		double hwp = 28.816 * std::sqrt(rho*Z/A) * 1e-9 ; // GeV
 		dc = std::log(hwp/I) + std::log(beta*gamma) - 0.5;
 	}
 
 	return K*z*z*(Z/A)*(1./betaSq) * (0.5*std::log(2*me*betaSq*gammaSq*Tmax/(I*I))-betaSq - dc);
 }
 
-Double_t CbmLitMaterialEffectsImp::BetheBlochElectron(
+double CbmLitMaterialEffectsImp::BetheBlochElectron(
 		const CbmLitTrackParam* par,
         const CbmLitMaterialInfo* mat) const
 {
-	Double_t K = 0.000307075; // GeV * g^-1 * cm^2
-	//Double_t z = (par->GetQp() > 0.) ? 1 : -1.;
-	Double_t Z = mat->GetZ();
-	Double_t A = mat->GetA();
+	double K = 0.000307075; // GeV * g^-1 * cm^2
+	//double z = (par->GetQp() > 0.) ? 1 : -1.;
+	double Z = mat->GetZ();
+	double A = mat->GetA();
 
-	Double_t me = 0.000511; // GeV;
-	Double_t p = std::abs(1. / par->GetQp()); //GeV
-	Double_t E = std::sqrt(me * me + p * p);
-	Double_t gamma = E / me;
+	double me = 0.000511; // GeV;
+	double p = std::abs(1. / par->GetQp()); //GeV
+	double E = std::sqrt(me * me + p * p);
+	double gamma = E / me;
 
-	Double_t I = CalcI(Z) * 1e-9; // GeV
+	double I = CalcI(Z) * 1e-9; // GeV
 
 	if (par->GetQp() > 0) { // electrons
 		return K*(Z/A) * (std::log(2*me/I)+1.5*std::log(gamma) - 0.975);
@@ -223,17 +223,17 @@ Double_t CbmLitMaterialEffectsImp::BetheBlochElectron(
 	}
 }
 
-Double_t CbmLitMaterialEffectsImp::CalcQpAfterEloss(
-		Double_t qp,
-        Double_t eloss) const
+double CbmLitMaterialEffectsImp::CalcQpAfterEloss(
+		double qp,
+        double eloss) const
 {
-	Double_t massSq = fMass*fMass;
-	Double_t p = 1./qp;
-	Double_t E = std::sqrt(p*p + massSq);
-	Double_t q = (qp>0) ? 1.: -1.;
+	double massSq = fMass*fMass;
+	double p = 1./qp;
+	double E = std::sqrt(p*p + massSq);
+	double q = (qp>0) ? 1.: -1.;
 	if (!fDownstream) eloss *= -1.0; // TODO check this
-	Double_t Enew = E-eloss;
-	Double_t pnew = (Enew > fMass) ? std::sqrt(Enew * Enew - massSq) : 0.;
+	double Enew = E-eloss;
+	double pnew = (Enew > fMass) ? std::sqrt(Enew * Enew - massSq) : 0.;
 	if (pnew != 0) return q/pnew;
 	else return 1e5;
 	//if (!fDownstream) eloss *= -1.0;
@@ -242,126 +242,124 @@ Double_t CbmLitMaterialEffectsImp::CalcQpAfterEloss(
 	//return 1./p;
 }
 
-Double_t CbmLitMaterialEffectsImp::CalcSigmaSqQp(
+double CbmLitMaterialEffectsImp::CalcSigmaSqQp(
           const CbmLitTrackParam* par,
           const CbmLitMaterialInfo* mat) const
 {
-	Double_t P = (1. / par->GetQp()); // GeV
-	Double_t XMASS = fMass; // GeV
-	Double_t E = std::sqrt(P * P + XMASS * XMASS);
-	Double_t Z = mat->GetZ();
-	Double_t A = mat->GetA();
-	Double_t RHO = mat->GetRho();
-	Double_t STEP = mat->GetLength();
-	Double_t EMASS = 0.511 * 1e-3; // GeV
+	double P = (1. / par->GetQp()); // GeV
+	double XMASS = fMass; // GeV
+	double E = std::sqrt(P * P + XMASS * XMASS);
+	double Z = mat->GetZ();
+	double A = mat->GetA();
+	double RHO = mat->GetRho();
+	double STEP = mat->GetLength();
+	double EMASS = 0.511 * 1e-3; // GeV
 
-	Double_t BETA = P/E;
-	Double_t GAMMA = E/XMASS;
+	double BETA = P/E;
+	double GAMMA = E/XMASS;
 
 	// Calculate xi factor (KeV).
-	Double_t XI = (153.5*Z*STEP*RHO)/(A*BETA*BETA);
+	double XI = (153.5*Z*STEP*RHO)/(A*BETA*BETA);
 
 	// Maximum energy transfer to atomic electron (KeV).
-	Double_t ETA = BETA*GAMMA;
-	Double_t ETASQ = ETA*ETA;
-	Double_t RATIO = EMASS/XMASS;
-	Double_t F1 = 2.*EMASS*ETASQ;
-	Double_t F2 = 1.+2.*RATIO*GAMMA+RATIO*RATIO;
-	Double_t EMAX = 1e6 * F1/F2;
+	double ETA = BETA*GAMMA;
+	double ETASQ = ETA*ETA;
+	double RATIO = EMASS/XMASS;
+	double F1 = 2.*EMASS*ETASQ;
+	double F2 = 1.+2.*RATIO*GAMMA+RATIO*RATIO;
+	double EMAX = 1e6 * F1/F2;
 
-	Double_t DEDX2 = XI*EMAX*(1.-(BETA*BETA/2.))*1e-12;
+	double DEDX2 = XI*EMAX*(1.-(BETA*BETA/2.))*1e-12;
 
-	Double_t SDEDX = (E*E*DEDX2) / std::pow(P, 6);
+	double SDEDX = (E*E*DEDX2) / std::pow(P, 6);
 
 	return std::abs(SDEDX);
 }
 
-Double_t CbmLitMaterialEffectsImp::CalcSigmaSqQpElectron(
+double CbmLitMaterialEffectsImp::CalcSigmaSqQpElectron(
           const CbmLitTrackParam* par,
           const CbmLitMaterialInfo* mat) const
 {
-	Double_t x = mat->GetLength(); //cm
-	Double_t X0 = mat->GetRL(); //cm
+	double x = mat->GetLength(); //cm
+	double X0 = mat->GetRL(); //cm
 	return par->GetQp() * par->GetQp() *
 	           (std::exp(-x/X0 * std::log(3.0)/std::log(2.0)) -
 	        	std::exp(-2.0 * x/X0));
 }
 
-Double_t CbmLitMaterialEffectsImp::CalcI(
-		Double_t Z) const
+double CbmLitMaterialEffectsImp::CalcI(
+		double Z) const
 {
 	// mean excitation energy in eV
 	if (Z > 16.) return 10 * Z;
 	else return 16 * std::pow(Z, 0.9);
 }
 
-Double_t CbmLitMaterialEffectsImp::BetheHeitler(
+double CbmLitMaterialEffectsImp::BetheHeitler(
         const CbmLitTrackParam* par,
         const CbmLitMaterialInfo* mat) const
 {
-   Double_t M = fMass; //GeV
-   Double_t p = std::abs(1. / par->GetQp());  // GeV
-   Double_t rho = mat->GetRho();
-   Double_t X0 = mat->GetRL();
-   Double_t me = 0.000511; // GeV
-   Double_t E = std::sqrt(M * M + p * p);
-   Double_t ratio = me/M;
+   double M = fMass; //GeV
+   double p = std::abs(1. / par->GetQp());  // GeV
+   double rho = mat->GetRho();
+   double X0 = mat->GetRL();
+   double me = 0.000511; // GeV
+   double E = std::sqrt(M * M + p * p);
+   double ratio = me/M;
 
    return (E*ratio*ratio)/(X0*rho);
 }
 
-Double_t CbmLitMaterialEffectsImp::PairProduction(
+double CbmLitMaterialEffectsImp::PairProduction(
         const CbmLitTrackParam* par,
         const CbmLitMaterialInfo* mat) const
 {
-   Double_t p = std::abs(1. / par->GetQp());  // GeV
-   Double_t M = fMass; //GeV
-   Double_t rho = mat->GetRho();
-   Double_t X0 = mat->GetRL();
-   Double_t E = std::sqrt(M * M + p * p);
+   double p = std::abs(1. / par->GetQp());  // GeV
+   double M = fMass; //GeV
+   double rho = mat->GetRho();
+   double X0 = mat->GetRL();
+   double E = std::sqrt(M * M + p * p);
 
    return 7e-5*E/(X0*rho);
 }
 
-Double_t CbmLitMaterialEffectsImp::BetheBlochSimple(
+double CbmLitMaterialEffectsImp::BetheBlochSimple(
         const CbmLitMaterialInfo* mat) const
 {
 	return fEnergyLoss * mat->GetZ() / mat->GetA();
 }
 
-Double_t CbmLitMaterialEffectsImp::MPVEnergyLoss(
+double CbmLitMaterialEffectsImp::MPVEnergyLoss(
         const CbmLitTrackParam* par,
         const CbmLitMaterialInfo* mat) const
 {
-   Double_t M = fMass * 1e3; //MeV
-   Double_t p = std::abs(1. / par->GetQp()) * 1e3;  // MeV
+   double M = fMass * 1e3; //MeV
+   double p = std::abs(1. / par->GetQp()) * 1e3;  // MeV
 
-//   Double_t rho = mat->GetRho();
-   Double_t Z = mat->GetZ();
-   Double_t A = mat->GetA();
-   Double_t x = mat->GetRho() * mat->GetLength();
+//   double rho = mat->GetRho();
+   double Z = mat->GetZ();
+   double A = mat->GetA();
+   double x = mat->GetRho() * mat->GetLength();
 
-   Double_t I = CalcI(Z) * 1e-6; // MeV
+   double I = CalcI(Z) * 1e-6; // MeV
 
-   Double_t K = 0.307075; // MeV g^-1 cm^2
-   Double_t j = 0.200;
+   double K = 0.307075; // MeV g^-1 cm^2
+   double j = 0.200;
 
-   Double_t E = std::sqrt(M * M + p * p);
-   Double_t beta = p / E;
-   Double_t betaSq = beta * beta;
-   Double_t gamma = E / M;
-   Double_t gammaSq = gamma * gamma;
+   double E = std::sqrt(M * M + p * p);
+   double beta = p / E;
+   double betaSq = beta * beta;
+   double gamma = E / M;
+   double gammaSq = gamma * gamma;
 
-   Double_t ksi = (K/2.)*(Z/A)*(x/betaSq); // MeV
+   double ksi = (K/2.)*(Z/A)*(x/betaSq); // MeV
 
-//   Double_t hwp = 28.816 * std::sqrt(rho*Z/A) * 1e-6 ; // MeV
-//   Double_t dc = std::log(hwp/I) + std::log(beta*gamma) - 0.5;
+//   double hwp = 28.816 * std::sqrt(rho*Z/A) * 1e-6 ; // MeV
+//   double dc = std::log(hwp/I) + std::log(beta*gamma) - 0.5;
 //   dc *= 2;
-   Double_t dc = 0.;
+   double dc = 0.;
 
-   Double_t eloss = ksi * (std::log(2*M*betaSq*gammaSq / I) + std::log(ksi/I) + j - betaSq - dc);
+   double eloss = ksi * (std::log(2*M*betaSq*gammaSq / I) + std::log(ksi/I) + j - betaSq - dc);
 
    return eloss * 1e-3; //GeV
 }
-
-ClassImp(CbmLitMaterialEffectsImp);

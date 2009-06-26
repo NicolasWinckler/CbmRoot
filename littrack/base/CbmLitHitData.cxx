@@ -19,18 +19,18 @@ CbmLitHitData::~CbmLitHitData()
 void CbmLitHitData::SetDetectorLayout(
 		const CbmLitDetectorLayout& layout)
 {
-	Int_t nofGroups = layout.GetNofStationGroups();
+	int nofGroups = layout.GetNofStationGroups();
 	fHits.resize(nofGroups);
 	fMaxErr.resize(nofGroups);
-	for(Int_t i = 0; i < nofGroups; i++) {
-		Int_t nofStations = layout.GetNofStations(i);
+	for(int i = 0; i < nofGroups; i++) {
+		int nofStations = layout.GetNofStations(i);
 		fHits[i].resize(nofStations);
 		fMaxErr[i].resize(nofStations);
-		for(Int_t j = 0; j < nofStations; j++) {
-			Int_t nofSubstations = layout.GetNofSubstations(i, j);
+		for(int j = 0; j < nofStations; j++) {
+			int nofSubstations = layout.GetNofSubstations(i, j);
 			fHits[i][j].resize(nofSubstations);
 			fMaxErr[i][j].resize(nofSubstations);
-			for(Int_t k = 0; k < nofSubstations; k++) {
+			for(int k = 0; k < nofSubstations; k++) {
 				fHits[i][j][k].reserve(1500);
 			}
 		}
@@ -38,9 +38,9 @@ void CbmLitHitData::SetDetectorLayout(
 }
 
 void CbmLitHitData::AddHit(
-		Int_t stationGroup,
-		Int_t station,
-		Int_t substation,
+		int stationGroup,
+		int station,
+		int substation,
 		CbmLitHit* hit)
 {
 	fHits[stationGroup][station][substation].push_back(hit);
@@ -48,21 +48,21 @@ void CbmLitHitData::AddHit(
 	if (hit->GetType() == kLITSTRIPHIT) {
 		CbmLitStripHit* stripHit = static_cast<const CbmLitStripHit*>(hit);
 		if (fMaxErr[stationGroup][station][substation].first < stripHit->GetDu())
-			fMaxErr[stationGroup][station][substation] = std::pair<Double_t, Char_t>(stripHit->GetDu(), 'U');
+			fMaxErr[stationGroup][station][substation] = std::pair<double, Char_t>(stripHit->GetDu(), 'U');
 	} else if (hit->GetType() == kLITPIXELHIT) {
 		CbmLitPixelHit* pixelHit = static_cast<const CbmLitPixelHit*>(hit);
 		if (fMaxErr[stationGroup][station][substation].first < pixelHit->GetDx())
-			fMaxErr[stationGroup][station][substation] = std::pair<Double_t, Char_t>(pixelHit->GetDx(), 'X');
+			fMaxErr[stationGroup][station][substation] = std::pair<double, Char_t>(pixelHit->GetDx(), 'X');
 	}
 }
 
 void CbmLitHitData::AddHit(
-		Int_t planeId,
+		int planeId,
 		CbmLitHit* hit)
 {
-	Int_t stationGroup;
-	Int_t station;
-	Int_t substation;
+	int stationGroup;
+	int station;
+	int substation;
 	StationByPlaneId(planeId, stationGroup, station, substation);
 	AddHit(stationGroup, station, substation, hit);
 //	std::cout << "AddHit planeId=" << planeId << " stationGroup=" << stationGroup
@@ -70,29 +70,29 @@ void CbmLitHitData::AddHit(
 }
 
 const CbmLitHit* CbmLitHitData::GetHit(
-		Int_t stationGroup,
-		Int_t station,
-		Int_t substation,
-		Int_t hitId) const
+		int stationGroup,
+		int station,
+		int substation,
+		int hitId) const
 {
 	return fHits[stationGroup][station][substation][hitId];
 }
 
 const CbmLitHit* CbmLitHitData::GetHit(
-		Int_t planeId,
-		Int_t hitId) const
+		int planeId,
+		int hitId) const
 {
-	Int_t stationGroup;
-	Int_t station;
-	Int_t substation;
+	int stationGroup;
+	int station;
+	int substation;
 	StationByPlaneId(planeId, stationGroup, station, substation);
 	return GetHit(stationGroup, station, substation, hitId);
 }
 
 HitPtrIteratorPair CbmLitHitData::GetHits(
-		Int_t stationGroup,
-		Int_t station,
-		Int_t substation)
+		int stationGroup,
+		int station,
+		int substation)
 {
 	return HitPtrIteratorPair(
 			fHits[stationGroup][station][substation].begin(),
@@ -100,31 +100,31 @@ HitPtrIteratorPair CbmLitHitData::GetHits(
 }
 
 HitPtrIteratorPair CbmLitHitData::GetHits(
-		Int_t planeId)
+		int planeId)
 {
-	Int_t stationGroup;
-	Int_t station;
-	Int_t substation;
+	int stationGroup;
+	int station;
+	int substation;
 	StationByPlaneId(planeId, stationGroup, station, substation);
 	return GetHits(stationGroup, station, substation);
 }
 
-Int_t CbmLitHitData::GetNofHits(
-		Int_t stationGroup,
-		Int_t station,
-		Int_t substation) const
+int CbmLitHitData::GetNofHits(
+		int stationGroup,
+		int station,
+		int substation) const
 {
 	return fHits[stationGroup][station][substation].size();
 }
 
 void CbmLitHitData::Clear()
 {
-	for(Int_t i = 0; i < fHits.size(); i++) {
-		for(Int_t j = 0; j < fHits[i].size(); j++) {
-			for(Int_t k = 0; k < fHits[i][j].size(); k++){
+	for(int i = 0; i < fHits.size(); i++) {
+		for(int j = 0; j < fHits[i].size(); j++) {
+			for(int k = 0; k < fHits[i][j].size(); k++){
 				fHits[i][j][k].clear();
 				fHits[i][j][k].reserve(1500);
-				fMaxErr[i][j][k] = std::pair<Double_t, Char_t>(0., ' ');
+				fMaxErr[i][j][k] = std::pair<double, Char_t>(0., ' ');
 			}
 		}
 	}
@@ -134,11 +134,11 @@ std::string CbmLitHitData::ToString() const
 {
 	std::stringstream ss;
 	ss << "HitData:" << std::endl;
-	for(Int_t i = 0; i < fHits.size(); i++) {
+	for(int i = 0; i < fHits.size(); i++) {
 		ss << " station group " << i << std::endl;
-		for(Int_t j = 0; j < fHits[i].size(); j++) {
+		for(int j = 0; j < fHits[i].size(); j++) {
 			ss << "  station " << j << std::endl;
-			for(Int_t k = 0; k < fHits[i][j].size(); k++){
+			for(int k = 0; k < fHits[i][j].size(); k++){
 				ss << "   substation " << k << ": " << GetNofHits(i, j, k) << " hits, "
 					<< "max err=(" << GetMaxErr(i, j, k).first << "," << GetMaxErr(i, j, k).second
 					<< ")" << std::endl;
@@ -149,14 +149,14 @@ std::string CbmLitHitData::ToString() const
 }
 
 void CbmLitHitData::StationByPlaneId(
-		Int_t planeId,
-		Int_t& stationGroup,
-		Int_t& station,
-		Int_t& substation) const
+		int planeId,
+		int& stationGroup,
+		int& station,
+		int& substation) const
 {
-	Int_t counter = 0;
-	for(Int_t i = 0; i < fHits.size(); i++) {
-		for(Int_t j = 0; j < fHits[i].size(); j++) {
+	int counter = 0;
+	for(int i = 0; i < fHits.size(); i++) {
+		for(int j = 0; j < fHits[i].size(); j++) {
 			counter += fHits[i][j].size();
 			if (counter > planeId) {
 				stationGroup = i;
@@ -168,22 +168,20 @@ void CbmLitHitData::StationByPlaneId(
 	}
 }
 
-std::pair<Double_t, Char_t> CbmLitHitData::GetMaxErr(
-		Int_t stationGroup,
-		Int_t station,
-		Int_t substation) const
+std::pair<double, Char_t> CbmLitHitData::GetMaxErr(
+		int stationGroup,
+		int station,
+		int substation) const
 {
 	return fMaxErr[stationGroup][station][substation];
 }
 
-std::pair<Double_t, Char_t> CbmLitHitData::GetMaxErr(
-		Int_t planeId) const
+std::pair<double, Char_t> CbmLitHitData::GetMaxErr(
+		int planeId) const
 {
-	Int_t stationGroup;
-	Int_t station;
-	Int_t substation;
+	int stationGroup;
+	int station;
+	int substation;
 	StationByPlaneId(planeId, stationGroup, station, substation);
 	return GetMaxErr(stationGroup, station, substation);
 }
-
-ClassImp(CbmLitHitData);

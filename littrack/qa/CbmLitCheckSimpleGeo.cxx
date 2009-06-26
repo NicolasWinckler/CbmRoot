@@ -1,5 +1,7 @@
 #include "CbmLitCheckSimpleGeo.h"
 
+#include "CbmLitSimpleGeometryConstructor.h"
+
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
@@ -13,8 +15,8 @@ CbmLitCheckSimpleGeo::~CbmLitCheckSimpleGeo()
 
 InitStatus CbmLitCheckSimpleGeo::Init()
 {
-	fGeoConstructor.ConstructGeometry();
-	fGeoConstructor.Draw();
+	fGeoConstructor = CbmLitSimpleGeometryConstructor::Instance();
+	fGeoConstructor->Draw();
 }
 
 void CbmLitCheckSimpleGeo::SetParContainers()

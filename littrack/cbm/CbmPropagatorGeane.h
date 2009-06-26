@@ -48,8 +48,6 @@ private:
 
    Double_t fMinSlope;
    Double_t fMaxSlope;
-
-   ClassDef(CbmPropagatorGeane,1);
 };
 
 #endif //CbmPropagatorGeane

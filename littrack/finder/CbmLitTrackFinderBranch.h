@@ -11,15 +11,15 @@ class CbmLitHitChiSq
 {
 public:
 	void SetHit(const CbmLitHit* hit) {fHit = hit;}
-	void SetChiSq(Double_t chiSq) {fChiSq = chiSq;}
+	void SetChiSq(double chiSq) {fChiSq = chiSq;}
 	void SetParam(const CbmLitTrackParam* param) {fParam = *param;}
 
 	const CbmLitHit* GetHit() const {return fHit;}
-	Double_t GetChiSq() const {return fChiSq;}
+	double GetChiSq() const {return fChiSq;}
 	const CbmLitTrackParam* GetParam() const {return &fParam;}
 private:
 	const CbmLitHit* fHit;
-	Double_t fChiSq;
+	double fChiSq;
 	CbmLitTrackParam fParam;
 };
 
@@ -50,7 +50,7 @@ public:
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
 
-	void IsAlwaysCreateMissingHit(Bool_t isAlwaysCreateMissingHit) {fIsAlwaysCreateMissingHit = isAlwaysCreateMissingHit;}
+	void IsAlwaysCreateMissingHit(bool isAlwaysCreateMissingHit) {fIsAlwaysCreateMissingHit = isAlwaysCreateMissingHit;}
 	void SetFinalPreSelection(TrackSelectionPtr finalPreSelection) {fFinalPreSelection = finalPreSelection;}
 	void SetStationGroupSelection(TrackSelectionPtr stationGroupSelection) {fStationGroupSelection = stationGroupSelection;}
 	void SetFilter(TrackUpdatePtr filter) {fFilter = filter;}
@@ -61,44 +61,44 @@ protected:
 
 	void ProcessStationGroup(
 			const CbmLitTrack *track,
-			Int_t stationGroup);
+			int stationGroup);
 
-	Bool_t ProcessStation(
+	bool ProcessStation(
 			const CbmLitTrack* track,
-			Int_t stationGroup,
-			Int_t station,
+			int stationGroup,
+			int station,
 			TrackPtrVector& tracksOut);
 
-	Bool_t ProcessStation1(
+	bool ProcessStation1(
 			const CbmLitTrack *track,
-			Int_t stationGroup,
-			Int_t station,
+			int stationGroup,
+			int station,
 			TrackPtrVector& tracksOut);
 
-//	Bool_t ProcessSubstation(
-//			Int_t substation,
+//	bool ProcessSubstation(
+//			int substation,
 //			HitPtrIterator hitIt,
 //			HitPtrIteratorPair bounds,
 //			const CbmLitTrackParam* par,
 //			CbmLitTrackParam* uPar,
 //			HitPtrVector& hits,
-//			std::vector<Double_t>& chiSq);
+//			std::vector<double>& chiSq);
 
 	void ProcessSubstation(
 			const CbmLitTrackParam* par,
 			HitPtrIteratorPair bounds,
 			std::vector<CbmLitHitChiSq>& hits);
 
-//	Bool_t AddTrackBranch(
+//	bool AddTrackBranch(
 //			const CbmLitTrack* track,
 //			const HitPtrVector& hits,
-//			const std::vector<Double_t>& chiSq,
+//			const std::vector<double>& chiSq,
 //			const CbmLitTrackParam* par,
 //			TrackPtrVector& tracksOut);
 
-	Bool_t AddTrackCandidate(
+	bool AddTrackCandidate(
 			TrackPtrVector& tracks,
-			Int_t stationGroup);
+			int stationGroup);
 
 //	void RefitTracks(
 //			TrackPtrIterator itBegin,
@@ -115,12 +115,10 @@ private:
 	TrackUpdatePtr fFilter;
 	TrackFitterPtr fFitter;
 
-	Int_t fMaxNofHitsInValidationGate;
-//	Int_t fMaxNofBranches;
-//	Int_t fNofBranches;
-	Bool_t fIsAlwaysCreateMissingHit;
-
-	ClassDef(CbmLitTrackFinderBranch,1);
+	int fMaxNofHitsInValidationGate;
+//	int fMaxNofBranches;
+//	int fNofBranches;
+	bool fIsAlwaysCreateMissingHit;
 };
 
 #endif /*CBMLITTRACKFINDERBASEBRANCH_H_*/

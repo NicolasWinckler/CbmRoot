@@ -6,20 +6,16 @@
 
 class CbmLitTrackSelection : public CbmLitTool
 {
-
 public:
-
 	CbmLitTrackSelection();
 	virtual ~CbmLitTrackSelection();
-	
+
 	virtual LitStatus DoSelect(
 			TrackPtrIterator itBegin,
 			TrackPtrIterator itEnd) = 0;
-	
+
 	virtual LitStatus DoSelect(
 			TrackPtrVector& tracks) = 0;
-		
-	ClassDef(CbmLitTrackSelection, 1);
 };
 
 #endif /*CBMLITTRACKSELECTION_H_*/

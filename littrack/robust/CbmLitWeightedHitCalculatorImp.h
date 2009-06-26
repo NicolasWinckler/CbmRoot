@@ -38,8 +38,6 @@ private:
 	inline void Inverse(
 			Double_t v00, Double_t v01, Double_t v11,
 			Double_t& u00, Double_t& u01, Double_t& u11);
-
-	ClassDef(CbmLitWeightedHitCalculatorImp, 1);
 };
 
 #endif /*CBMLITWEIGHTEDHITCALCULATORIMP_H_*/

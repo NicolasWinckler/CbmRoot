@@ -20,13 +20,11 @@ public:
 
 	virtual LitStatus Fit(
 			CbmLitTrack *track,
-			Bool_t downstream = true);
+			bool downstream = true);
 private:
 	TrackPropagatorPtr fPropagator;
 	TrackUpdatePtr fUpdate;
-	Bool_t fDownstream;
-
-	ClassDef(CbmLitTrackFitterImp, 1)
+	bool fDownstream;
 };
 
 #endif /*CBMLITTRACKFITTERIMP_H_*/

@@ -15,17 +15,15 @@ public:
 
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
-	
+
 	virtual LitStatus Fit(
 			CbmLitTrack *track,
-			Bool_t downstream = false);
+			bool downstream = false);
 private:
-	
+
 	void Smooth(
 			CbmLitFitNode* thisNode,
 			const CbmLitFitNode* prevNode);
-	
-	ClassDef(CbmLitKalmanSmoother,1);
 };
 
 #endif /*CBMLITKALMANSMOOTHER_H_*/

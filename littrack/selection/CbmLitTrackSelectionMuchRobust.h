@@ -27,8 +27,8 @@ public:
 	void SetNofSharedHits(Int_t nofHits) {fNofSharedHits = nofHits;}
 	void SetMinLastPlaneId(Int_t minLastPlaneId) {fMinLastPlaneId = minLastPlaneId;}
 	void SetMinNofHits(Int_t minNofHits) {fMinNofHits = minNofHits;}
-private:
 
+private:
 	TrackSelectionPtr fSelectionRobust;
 	TrackSelectionPtr fSelectionA;
 	TrackSelectionPtr fSelectionD;
@@ -39,8 +39,6 @@ private:
 	Int_t fMinNofHits;
 	Int_t fMinLastPlaneId;
 	Int_t fMaxChi2;
-
-	ClassDef(CbmLitTrackSelectionMuchRobust, 1);
 };
 
 #endif /*CBMLITTRACKSELECTIONMUCHROBUST_H_*/

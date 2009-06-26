@@ -7,5 +7,3 @@ CbmLitWeightedHitCalculator::CbmLitWeightedHitCalculator()
 CbmLitWeightedHitCalculator::~CbmLitWeightedHitCalculator()
 {
 }
-
-ClassImp(CbmLitWeightedHitCalculator)

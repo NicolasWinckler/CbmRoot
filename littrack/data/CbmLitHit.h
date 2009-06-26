@@ -3,8 +3,6 @@
 
 #include "CbmLitEnums.h"
 
-#include "TObject.h"
-
 #include <string>
 
 class CbmLitHit
@@ -13,37 +11,35 @@ public:
 	CbmLitHit();
 	virtual ~CbmLitHit();
 
-	Int_t GetPlaneId() const { return fPlaneId; }
-	Int_t GetRefId() const { return fRefId; }
-	Double_t GetW() const { return fW; }
-	Bool_t IsOutlier() const { return fIsOutlier; }
+	int GetPlaneId() const { return fPlaneId; }
+	int GetRefId() const { return fRefId; }
+	double GetW() const { return fW; }
+	bool IsOutlier() const { return fIsOutlier; }
 	LitHitType GetType() const { return fHitType; }
-	Double_t GetZ() const { return fZ; }
-	Double_t GetDz() const { return fDz; }
+	double GetZ() const { return fZ; }
+	double GetDz() const { return fDz; }
 	LitDetectorId GetDetectorId() const {return fDetectorId;}
 
-	void SetPlaneId(Int_t planeId) { fPlaneId = planeId; }
-	void SetRefId(Int_t refId) { fRefId = refId; }
-	void SetW(Double_t w) { fW = w; }
-	void IsOutlier(Bool_t isOutlier) { fIsOutlier = isOutlier;}
+	void SetPlaneId(int planeId) { fPlaneId = planeId; }
+	void SetRefId(int refId) { fRefId = refId; }
+	void SetW(double w) { fW = w; }
+	void IsOutlier(bool isOutlier) { fIsOutlier = isOutlier;}
 	void SetHitType(LitHitType hitType) { fHitType = hitType; }
-	void SetZ(Double_t z) { fZ = z; }
-	void SetDz(Double_t dz) { fDz = dz; }
+	void SetZ(double z) { fZ = z; }
+	void SetDz(double dz) { fDz = dz; }
 	void SetDetectorId(LitDetectorId detectorId) {fDetectorId = detectorId;}
 
 	virtual std::string ToString() const {;}
 
 private:
-	Int_t fPlaneId;
-	Int_t fRefId;
-	Double_t fW;
-	Bool_t fIsOutlier;
+	int fPlaneId;
+	int fRefId;
+	double fW;
+	bool fIsOutlier;
 	LitHitType fHitType;
-	Double_t fZ;
-	Double_t fDz;
+	double fZ;
+	double fDz;
 	LitDetectorId fDetectorId;
-
-	ClassDef(CbmLitHit, 1);
 };
 
 #endif /*CBMLITHIT_H_*/

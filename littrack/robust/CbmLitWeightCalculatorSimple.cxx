@@ -1,4 +1,5 @@
 #include "CbmLitWeightCalculatorSimple.h"
+#include "CbmLitHit.h"
 
 CbmLitWeightCalculatorSimple::CbmLitWeightCalculatorSimple()
 {
@@ -41,5 +42,3 @@ LitStatus CbmLitWeightCalculatorSimple::DoCalculate(
 {
 	return DoCalculate(par, hits.begin(), hits.end(), T);
 }
-
-ClassImp(CbmLitWeightCalculatorSimple)

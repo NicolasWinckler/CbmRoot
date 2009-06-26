@@ -3,8 +3,6 @@
 
 #include "CbmLitTypes.h"
 
-#include "TObject.h"
-
 #include <string>
 
 class CbmLitTrackParam;
@@ -16,15 +14,15 @@ public:
 	CbmLitTrackBranch();
 	virtual ~CbmLitTrackBranch();
 
-	Int_t GetNofHits() const { return fHits.size(); }
-	Double_t GetChi2() const { return fChi2; }
-	Int_t GetNDF() const { return fNDF; }
+	int GetNofHits() const { return fHits.size(); }
+	double GetChi2() const { return fChi2; }
+	int GetNDF() const { return fNDF; }
 	const CbmLitTrackParam* GetParam() const { return &fParam; }
-	const CbmLitHit* GetHit(Int_t index) const { return fHits[index];}
+	const CbmLitHit* GetHit(int index) const { return fHits[index];}
 	const HitPtrVector& GetHits() const { return fHits;}
 
-	void SetChi2(Double_t chi2) { fChi2 = chi2; }
-	void SetNDF(Int_t ndf) { fNDF = ndf; }
+	void SetChi2(double chi2) { fChi2 = chi2; }
+	void SetNDF(int ndf) { fNDF = ndf; }
 	void SetParam(const CbmLitTrackParam* par) { fParam = *par; }
 	void AddHit(CbmLitHit* hit);
 	void SortHits(Bool_t downstream = true);
@@ -34,10 +32,8 @@ public:
 private:
 	HitPtrVector fHits;
 	CbmLitTrackParam fParam;
-	Double_t fChi2;
-	Int_t fNDF;
-
-	ClassDef(CbmLitTrackBranch, 1);
+	double fChi2;
+	int fNDF;
 };
 
 #endif /*CBMLITTRACKBRANCH_H_*/

@@ -2,13 +2,13 @@
 #define CBMLITTYPES_H_
 
 #include "CbmLitFitNode.h"
-#include "CbmLitHit.h"
+//#include "CbmLitHit.h"
 //#include "CbmLitTrack.h"
 //#include "CbmLitTrackBranch.h"
 
 #include <vector>
 
-//class CbmLitHit;
+class CbmLitHit;
 class CbmLitTrack;
 //class CbmLitTrackBranch;
 

@@ -1,6 +1,7 @@
 #include "CbmLitRobustFitterAnalysis.h"
 
 #include "CbmLitTrack.h"
+#include "CbmLitHit.h"
 #include "CbmLitEnvironment.h"
 #include "CbmLitConverter.h"
 #include "CbmLitToolFactory.h"
@@ -487,4 +488,5 @@ void CbmLitRobustFitterAnalysis::FinishTask()
 	TIter next(fHistoList);
 	while ( TH1* histo = ((TH1*)next()) ) histo->Write();
 }
+
 ClassImp(CbmLitRobustFitterAnalysis);

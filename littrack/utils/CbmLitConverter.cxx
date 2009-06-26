@@ -372,5 +372,3 @@ void CbmLitConverter::TrackVectorToTrdTrackArray(
        new ((*trdTracks)[trackNo++]) CbmTrdTrack(track);
 	}
 }
-
-ClassImp(CbmLitConverter);

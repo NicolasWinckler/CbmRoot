@@ -20,7 +20,7 @@ public:
     		TClonesArray* hitArray,
             TClonesArray* trackArray);
 
-	ClassDef(CbmLitTrdTrackFinderWeight, 1);
+    ClassDef(CbmLitTrdTrackFinderWeight, 1);
 };
 
 #endif /*CBMLITTRDTRACKFINDERWEIGHT_H_*/

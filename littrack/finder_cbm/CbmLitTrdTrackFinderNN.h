@@ -19,7 +19,7 @@ public:
     		TClonesArray* hitArray,
             TClonesArray* trackArray);
 
-	ClassDef(CbmLitTrdTrackFinderNN, 1);
+    ClassDef(CbmLitTrdTrackFinderNN, 1);
 };
 
 #endif /* CBMLITTRDTRACKFINDERNN_H_ */

@@ -1,9 +1,9 @@
 #ifndef CBMLITCHECKSIMPLEGEO_H_
 #define CBMLITCHECKSIMPLEGEO_H_
 
-#include "CbmLitSimpleGeometryConstructor.h"
-
 #include "FairTask.h"
+
+class CbmLitSimpleGeometryConstructor;
 
 class CbmLitCheckSimpleGeo : public FairTask
 {
@@ -18,7 +18,7 @@ public:
 	virtual void SetParContainers();
 
 private:
-	CbmLitSimpleGeometryConstructor fGeoConstructor;
+	CbmLitSimpleGeometryConstructor* fGeoConstructor;
 
 	ClassDef(CbmLitCheckSimpleGeo, 1);
 };

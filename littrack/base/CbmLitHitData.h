@@ -20,45 +20,45 @@ public:
 			const CbmLitDetectorLayout& layout);
 
 	void AddHit(
-			Int_t stationGroup,
-			Int_t station,
-			Int_t substation,
+			int stationGroup,
+			int station,
+			int substation,
 			CbmLitHit* hit);
 
 	void AddHit(
-			Int_t planeId,
+			int planeId,
 			CbmLitHit* hit);
 
 	const CbmLitHit* GetHit(
-			Int_t stationGroup,
-			Int_t station,
-			Int_t substation,
-			Int_t hitId) const;
+			int stationGroup,
+			int station,
+			int substation,
+			int hitId) const;
 
 	const CbmLitHit* GetHit(
-			Int_t planeId,
-			Int_t hitId) const;
+			int planeId,
+			int hitId) const;
 
 	HitPtrIteratorPair GetHits(
-			Int_t stationGroup,
-			Int_t station,
-			Int_t substation);
+			int stationGroup,
+			int station,
+			int substation);
 
 	HitPtrIteratorPair GetHits(
-			Int_t planeId);
+			int planeId);
 
-	Int_t GetNofHits(
-			Int_t stationGroup,
-			Int_t station,
-			Int_t substation) const;
+	int GetNofHits(
+			int stationGroup,
+			int station,
+			int substation) const;
 
-	std::pair<Double_t, Char_t> GetMaxErr(
-			Int_t stationGroup,
-			Int_t station,
-			Int_t substation) const;
+	std::pair<double, Char_t> GetMaxErr(
+			int stationGroup,
+			int station,
+			int substation) const;
 
-	std::pair<Double_t, Char_t> GetMaxErr(
-			Int_t planeId) const;
+	std::pair<double, Char_t> GetMaxErr(
+			int planeId) const;
 
 	void Clear();
 
@@ -66,15 +66,13 @@ public:
 
 private:
 	void StationByPlaneId(
-			Int_t planeId,
-			Int_t& stationGroup,
-			Int_t& station,
-			Int_t& substation) const;
+			int planeId,
+			int& stationGroup,
+			int& station,
+			int& substation) const;
 
 	std::vector<std::vector<std::vector<HitPtrVector> > > fHits;
-	std::vector<std::vector<std::vector<std::pair<Double_t, Char_t> > > > fMaxErr;
-
-	ClassDef(CbmLitHitData, 1);
+	std::vector<std::vector<std::vector<std::pair<double, Char_t> > > > fMaxErr;
 };
 
 #endif /*CBMLITHITDATA_H_*/

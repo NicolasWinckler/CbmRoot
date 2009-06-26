@@ -7,4 +7,3 @@ CbmLitWeightCalculator::CbmLitWeightCalculator()
 CbmLitWeightCalculator::~CbmLitWeightCalculator()
 {
 }
-ClassImp(CbmLitWeightCalculator)

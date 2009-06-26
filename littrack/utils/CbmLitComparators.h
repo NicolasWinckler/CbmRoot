@@ -7,9 +7,24 @@
 #include "CbmLitTrack.h"
 #include "CbmLitTrackParam.h"
 #include "CbmLitDetectorLayout.h"
+#include "CbmLitMaterialInfo.h"
 
 #include <functional>
 #include <iostream>
+
+
+
+class CompareMaterialInfoZLess:
+	public std::binary_function<
+		const CbmLitMaterialInfo&,
+	    const CbmLitMaterialInfo&,
+	    bool>
+{
+public:
+	bool operator()(const CbmLitMaterialInfo& mat1, const CbmLitMaterialInfo& mat2) const {
+		return mat1.GetZpos() < mat2.GetZpos();
+	}
+};
 
 
 

@@ -1,8 +1,3 @@
-// -------------------------------------------------------------------------
-// -----                  CbmLitTrackPropagatorGeane source file               -----
-// -----                  Created 22/11/07  by A. Lebedev               -----
-// -------------------------------------------------------------------------
-
 #include "CbmLitTrackPropagatorGeane.h"
 
 #include "CbmLitTrackParam.h"
@@ -68,5 +63,3 @@ LitStatus CbmLitTrackPropagatorGeane::Propagate(
 		return kLITERROR;
 	}
 }
-
-ClassImp(CbmLitTrackPropagatorGeane)

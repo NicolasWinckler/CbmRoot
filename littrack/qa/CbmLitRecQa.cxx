@@ -978,6 +978,4 @@ void CbmLitRecQa::WriteToFile()
 	//  olddir->cd();
 }
 
-
-
-ClassImp(CbmLitRecQa)
+ClassImp(CbmLitRecQa);

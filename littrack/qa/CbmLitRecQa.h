@@ -223,7 +223,8 @@ private:
 
   //Int_t fNofTrue[20];
 
-  ClassDef(CbmLitRecQa,1);
+  ClassDef(CbmLitRecQa, 1);
+
 };
 
 #endif

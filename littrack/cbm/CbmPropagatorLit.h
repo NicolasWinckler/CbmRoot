@@ -35,8 +35,6 @@ public:
 
 private:
     TrackPropagatorPtr fPropagator;
-
-   ClassDef(CbmPropagatorLit, 1);
 };
 
 #endif /*CBMPROPAGATORLIT_H_*/

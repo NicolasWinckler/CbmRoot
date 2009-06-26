@@ -4,6 +4,8 @@
 #include "CbmLitTrackPropagator.h"
 #include "CbmLitPtrTypes.h"
 
+#include "TMatrixD.h"
+
 class CbmLitMyTrackPropagator : public CbmLitTrackPropagator
 {
 public:
@@ -19,21 +21,34 @@ public:
 	virtual LitStatus Propagate(
 		   const CbmLitTrackParam *parIn,
 		   CbmLitTrackParam *parOut,
-		   Double_t zOut,
-		   Int_t pdg);
+		   double zOut,
+		   int pdg);
 
 	virtual LitStatus Propagate(
 		   CbmLitTrackParam *par,
-		   Double_t zOut,
-		   Int_t pdg);
+		   double zOut,
+		   int pdg);
 
 	virtual void TransportMatrix(
-		   std::vector<Double_t>& F);
+		   std::vector<double>& F);
 
 	virtual void TransportMatrix(
 		   TMatrixD& F);
 
-	ClassDef(CbmLitMyTrackPropagator, 1);
+	void UpdateF(
+			TMatrixD& F,
+			const TMatrixD& newF);
+
+private:
+	GeoNavigatorPtr fNavigator; // Geo Navigator tool
+	TrackExtrapolatorPtr fExtrapolator; // Track extrapolator tool
+	MaterialEffectsPtr fMaterial; // Material Effects tool
+
+	bool fDownstream; // if true than downstream propagation
+	int fPDG; // PDG of the particle
+
+	TMatrixD fFm; // Transport matrix
+	bool fCalcTransportMatrix; // if true than transport matrix is calculated
 };
 
 #endif /* CBMLITMYTRACKPROPAGATOR_H_ */

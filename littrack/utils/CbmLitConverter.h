@@ -16,8 +16,6 @@ class CbmStsTrack;
 class CbmGlobalTrack;
 class TClonesArray;
 
-#include "TObject.h"
-
 class CbmLitConverter
 {
 public:
@@ -88,8 +86,6 @@ public:
 	static void TrackVectorToTrdTrackArray(
 			TrackPtrVector& tracks,
 			TClonesArray* trdTracks);
-
-	ClassDef(CbmLitConverter, 1);
 };
 
 #endif /*CBMLITCONVERTER_H_*/

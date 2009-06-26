@@ -31,7 +31,7 @@ LitStatus CbmLitCleverTrackExtrapolator::Finalize()
 LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 		const CbmLitTrackParam *parIn,
         CbmLitTrackParam *parOut,
-        Double_t zOut)
+        double zOut)
 {
    *parOut = *parIn;
    return Extrapolate(parOut, zOut);
@@ -39,9 +39,9 @@ LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 
 LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 		CbmLitTrackParam *par,
-        Double_t zOut)
+        double zOut)
 {
-	Double_t zIn = par->GetZ();
+	double zIn = par->GetZ();
 	fOption = -1;
 
 	if (zIn >= fZMax && zOut >= fZMax) {
@@ -69,7 +69,7 @@ LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 }
 
 void CbmLitCleverTrackExtrapolator::TransportMatrix(
-		   std::vector<Double_t>& F)
+		   std::vector<double>& F)
 {
 	TMatrixD F1;
 	F1.Use(5, 5, &F[0]);
@@ -102,5 +102,3 @@ void CbmLitCleverTrackExtrapolator::TransportMatrix(
 		return;
 	}
 }
-
-ClassImp(CbmLitCleverTrackExtrapolator);

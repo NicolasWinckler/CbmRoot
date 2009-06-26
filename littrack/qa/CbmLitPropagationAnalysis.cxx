@@ -12,7 +12,7 @@
 #include "CbmLitHit.h"
 #include "CbmLitPixelHit.h"
 #include "CbmLitStripHit.h"
-#include "CbmLitSimpleGeometryConstructor.h"
+//#include "CbmLitSimpleGeometryConstructor.h"
 
 #include "CbmBaseHit.h"
 #include "CbmPixelHit.h"
@@ -70,9 +70,9 @@ InitStatus CbmLitPropagationAnalysis::Init()
 
 	// Create tools
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fPropagator = factory->CreateTrackPropagator("lit");
+	fPropagator = factory->CreateTrackPropagator("mylit");
 	fFilter = factory->CreateTrackUpdate("kalman");
-	fFitter = factory->CreateTrackFitter("lit_kalman");
+	fFitter = factory->CreateTrackFitter("mylit_kalman");
 	fSmoother = factory->CreateTrackFitter("kalman_smoother");
 
 	CreateHistograms();
@@ -410,6 +410,7 @@ void CbmLitPropagationAnalysis::RunTest()
 {
 	for(Int_t i = 0; i < fLitTracks.size(); i++){
 		if (fLitTracks[i]->GetNofHits() != fNofPlanes) continue;
+		fLitTracks[i]->SortHits();
 		TestPropagation(fLitTracks[i], fLitMcTracks[i]);
 		TestFitter(fLitTracks[i], fLitMcTracks[i]);
 	}
@@ -423,7 +424,7 @@ void CbmLitPropagationAnalysis::TestPropagation(
 	fPropagationWatch.Start(kFALSE);
 	for (Int_t i = 0; i < track->GetNofHits(); i++){
 		Double_t zOut = track->GetHit(i)->GetZ();
-         if (fPropagator->Propagate(&par, zOut, track->GetPDG()) == kLITERROR) continue;
+        if (fPropagator->Propagate(&par, zOut, track->GetPDG()) == kLITERROR) continue;
 //         if (fFilter->Update(&par, track->GetHit(i)) == kLITERROR) continue;
          FillHistosPropagation(&par, mcTrack->GetFitNode(i)->GetPredictedParam(), track->GetHit(i), i);
 //         if (fFilter->Update(&par, track->GetHit(i)) == kLITERROR) continue;
@@ -543,4 +544,4 @@ void CbmLitPropagationAnalysis::PrintStopwatchStatistics()
 		<< "/" << fSmootherWatch.CpuTime() << std::endl;
 }
 
-ClassImp(CbmLitPropagationAnalysis)
+ClassImp(CbmLitPropagationAnalysis);

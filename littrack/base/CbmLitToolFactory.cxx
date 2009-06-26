@@ -4,6 +4,7 @@
 #include "CbmLitLineTrackExtrapolator.h"
 #include "CbmLitCleverTrackExtrapolator.h"
 #include "CbmLitTGeoTrackPropagator.h"
+#include "CbmLitMyTrackPropagator.h"
 #include "CbmLitTrackPropagatorGeane.h"
 #include "CbmLitTrackSelectionEmpty.h"
 #include "CbmLitTrackSelectionChiSq.h"
@@ -79,6 +80,11 @@ TrackPropagatorPtr CbmLitToolFactory::CreateTrackPropagator(
 	    propagator->Initialize();
 	    return propagator;
 	} else
+	if(name == "mylit") {
+		TrackPropagatorPtr propagator(new CbmLitMyTrackPropagator(CreateTrackExtrapolator("lit")));
+		propagator->Initialize();
+		return propagator;
+	} else
 	if(name == "rk4") {
 	   TrackPropagatorPtr propagator(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("rk4")));
 	   propagator->Initialize();
@@ -129,6 +135,13 @@ TrackFitterPtr CbmLitToolFactory::CreateTrackFitter(
 		TrackFitterPtr smoother = CreateTrackFitter("kalman_smoother");
 		TrackFitterPtr rfitter(new CbmLitTrackFitterRobust(fitter, smoother));
 		return rfitter;
+	} else
+	if (name == "mylit_kalman") {
+		TrackPropagatorPtr propagator = CreateTrackPropagator("mylit");
+		//((CbmLitTGeoTrackPropagator*) propagator)->IsCalcTransportMatrix(true);
+		TrackUpdatePtr update = CreateTrackUpdate("kalman");
+		TrackFitterPtr fitter(new CbmLitTrackFitterImp(propagator, update));
+		return fitter;
 	}
 //	return fitter;
 }
@@ -282,7 +295,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderNN->SetVerbose(1);
 		muchFinderNN->SetNofIter(1);
 		muchFinderNN->IsUseFastSearch(true);
-		muchFinderNN->SetMaxNofMissingHits(1);
+		muchFinderNN->SetMaxNofMissingHits(2);
 		muchFinderNN->SetSigmaCoef(3.5);
 		muchFinderNN->SetChiSqPixelHitCut(13.86);
 		muchFinderNN->SetChiSqStripHitCut(4.);
@@ -307,7 +320,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderBranch->SetBeginStationGroup(0);
 		muchFinderBranch->SetEndStationGroup(CbmLitEnvironment::Instance()->GetLayout().GetNofStationGroups() - 1);
 		muchFinderBranch->SetPDG(13);
-		muchFinderBranch->SetMaxNofMissingHits(1);
+		muchFinderBranch->SetMaxNofMissingHits(2);
 		muchFinderBranch->IsAlwaysCreateMissingHit(false);
 		muchFinderBranch->SetSigmaCoef(3.5);
 		muchFinderBranch->SetChiSqPixelHitCut(15.0);//13.86);
@@ -325,7 +338,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderWeight->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 		muchFinderWeight->SetVerbose(1);
 		muchFinderWeight->SetNofIter(1);
-		muchFinderWeight->SetMaxNofMissingHits(1);
+		muchFinderWeight->SetMaxNofMissingHits(2);
 		muchFinderWeight->IsUseFastSearch(true);
 		muchFinderWeight->SetSigmaCoef(3.5);
 		muchFinderWeight->SetChiSqPixelHitCut(13.86);
@@ -354,5 +367,3 @@ HitToTrackMergerPtr CbmLitToolFactory::CreateHitToTrackMerger(
 //		return finder;
 	}
 }
-
-ClassImp(CbmLitToolFactory)

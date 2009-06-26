@@ -78,10 +78,6 @@ private:
     TH1F*         S3L4pidE15; // 
     TH1F*         S3L4pidEall; // 
 
-    TH1F*         momentumhist; // 
-    TH1F*         planehist; // 
-    TH1F*         parthist; // 
-
 private:
 
     /* Prepare test histograms */
@@ -96,5 +92,6 @@ public:
 
     ClassDef(CbmTrdHitProducerQa, 2)
 };
+
 
 #endif

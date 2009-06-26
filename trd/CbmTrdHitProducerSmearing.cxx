@@ -38,7 +38,9 @@ CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing()
 
     fEfficency = 1.;
 
-    fRadiator = NULL; //new CbmTrdRadiator();
+
+    fRadiator = new CbmTrdRadiator(kTRUE , 130 ,
+                                   0.0013, 0.02);
 
 }
 // --------------------------------------------------------------------
@@ -215,6 +217,9 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 	ELossdEdX = pt->GetEnergyLoss();
 	ELoss = ELossdEdX;
 
+	pt->Position(pos);
+	pt->Momentum(mom);
+
 	// TR
 	// Sorry, Electrons & Positrons only
 	if(TMath::Abs(pdgCode) == 11){
@@ -225,8 +230,6 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 
 	}
 
-	pt->Position(pos);
-	pt->Momentum(mom);
 	X = pos(0);
 	Y = pos(1);
 	Z = pos(2);

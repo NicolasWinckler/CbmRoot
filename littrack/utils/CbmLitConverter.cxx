@@ -37,15 +37,17 @@ void CbmLitConverter::TrackParamToLitTrackParam(
 		const FairTrackParam* par,
 		CbmLitTrackParam* litPar)
 {
-	litPar->SetX(par->GetX());
-	litPar->SetY(par->GetY());
-	litPar->SetZ(par->GetZ());
-	litPar->SetTx(par->GetTx());
-	litPar->SetTy(par->GetTy());
-	litPar->SetQp(par->GetQp());
-	std::vector<Double_t> cov(15);
-	par->CovMatrix(&cov[0]);
-	litPar->SetCovMatrix(cov);
+	litPar->SetX((myf)par->GetX());
+	litPar->SetY((myf)par->GetY());
+	litPar->SetZ((myf)par->GetZ());
+	litPar->SetTx((myf)par->GetTx());
+	litPar->SetTy((myf)par->GetTy());
+	litPar->SetQp((myf)par->GetQp());
+	double cov[15];
+	par->CovMatrix(cov);
+	std::vector<myf> covVec(15);
+	for (unsigned int i = 0; i < 15; ++i) covVec[i] = (myf) cov[i];
+	litPar->SetCovMatrix(covVec);
 }
 
 void CbmLitConverter::LitTrackParamToTrackParam(
@@ -58,7 +60,10 @@ void CbmLitConverter::LitTrackParamToTrackParam(
 	par->SetTx(litPar->GetTx());
 	par->SetTy(litPar->GetTy());
 	par->SetQp(litPar->GetQp());
-	par->SetCovMatrix((Double_t *)&(litPar->GetCovMatrix()[0]));
+	double cov[15];
+	std::vector<myf> covVec(litPar->GetCovMatrix());
+	for (unsigned int i = 0; i < 15; ++i) cov[i] = (double) covVec[i];
+	par->SetCovMatrix(cov);
 }
 
 void CbmLitConverter::PixelHitToLitPixelHit(

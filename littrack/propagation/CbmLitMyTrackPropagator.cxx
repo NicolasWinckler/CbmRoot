@@ -1,6 +1,8 @@
 #include "CbmLitMyTrackPropagator.h"
 #include "CbmLitMyGeoNavigator.h"
 #include "CbmLitMaterialEffectsImp.h"
+#include "CbmLitMath.h"
+#include "CbmLitMatrixMath.h"
 
 #include <cmath>
 #include <iostream>
@@ -12,7 +14,7 @@ CbmLitMyTrackPropagator::CbmLitMyTrackPropagator(
 {
 	fNavigator = GeoNavigatorPtr(new CbmLitMyGeoNavigator());
 	fMaterial = MaterialEffectsPtr(new CbmLitMaterialEffectsImp());
-	fFm.ResizeTo(5,5);
+	fFm.resize(25);
 }
 
 CbmLitMyTrackPropagator::~CbmLitMyTrackPropagator()
@@ -33,7 +35,7 @@ LitStatus CbmLitMyTrackPropagator::Finalize()
 LitStatus CbmLitMyTrackPropagator::Propagate(
 		const CbmLitTrackParam *parIn,
         CbmLitTrackParam *parOut,
-        double zOut,
+        myf zOut,
         int pdg)
 {
    *parOut = *parIn;
@@ -42,19 +44,22 @@ LitStatus CbmLitMyTrackPropagator::Propagate(
 
 LitStatus CbmLitMyTrackPropagator::Propagate(
 		CbmLitTrackParam *par,
-        double zOut,
+        myf zOut,
         int pdg)
 
 {
 	fPDG = pdg;
-	double zIn = par->GetZ();
-	double dz = zOut - zIn;
+	myf zIn = par->GetZ();
+	myf dz = zOut - zIn;
 	if(std::fabs(dz) < 1e-3) return kLITSUCCESS;
 
 	//Check whether upstream or downstream
 	fDownstream = dz > 0;
 
-	if (fCalcTransportMatrix) fFm.UnitMatrix();
+	if (fCalcTransportMatrix) {
+		std::fill(fFm.begin(), fFm.end(), 0.);
+		fFm[0] = 1.; fFm[6] = 1.; fFm[12] = 1.; fFm[18] = 1.; fFm[24] = 1.;
+	}
 
 	std::vector<CbmLitMaterialInfo> inter;
 	if (fNavigator->FindIntersections(par, zOut, inter) == kLITERROR) {
@@ -72,13 +77,13 @@ LitStatus CbmLitMyTrackPropagator::Propagate(
 
 		// update transport matrix
 		if (fCalcTransportMatrix) {
-			TMatrixD Fnew(5,5);
+			std::vector<myf> Fnew(25);
 			fExtrapolator->TransportMatrix(Fnew);
 			UpdateF(fFm, Fnew);
 		}
 
 		//scale material length
-		double norm = std::sqrt(1. + par->GetTx() * par->GetTx() + par->GetTy() * par->GetTy());
+		myf norm = std::sqrt(1. + par->GetTx() * par->GetTx() + par->GetTy() * par->GetTy());
 		mat.SetLength(mat.GetLength() * norm);
 		// add material effects
 		fMaterial->Update(par, &mat, fPDG, fDownstream);
@@ -88,21 +93,17 @@ LitStatus CbmLitMyTrackPropagator::Propagate(
 }
 
 void CbmLitMyTrackPropagator::TransportMatrix(
-		   std::vector<double>& F)
+		   std::vector<myf>& F)
 {
-	F.assign(fFm.GetMatrixArray(), fFm.GetMatrixArray() + fFm.GetNoElements());
-}
-
-void CbmLitMyTrackPropagator::TransportMatrix(
-		   TMatrixD& F)
-{
-	F = fFm;
+	F.assign(fFm.begin(), fFm.end());
 }
 
 void CbmLitMyTrackPropagator::UpdateF(
-		TMatrixD& F,
-		const TMatrixD& newF)
+		std::vector<myf>& F,
+		const std::vector<myf>& newF)
 {
-	F = newF * F;
+	std::vector<myf> A(25);
+	Mult25(newF, F, A);
+	F.assign(A.begin(), A.end());
+//	F = newF * F;
 }
-

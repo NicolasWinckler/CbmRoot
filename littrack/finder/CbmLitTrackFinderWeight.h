@@ -10,17 +10,24 @@ public:
 	virtual ~CbmLitTrackFinderWeight();
 
 	LitStatus DoFind(
-			const HitPtrVector& hits,
-			const TrackPtrVector& trackSeeds,
+			HitPtrVector& hits,
+			TrackPtrVector& trackSeeds,
 			TrackPtrVector& tracks);
 
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
 
+	void SetSeedSelection(TrackSelectionPtr seedSelection) {fSeedSelection=seedSelection;}
+	void SetPropagator(TrackPropagatorPtr propagator) {fPropagator = propagator;}
+	void SetFinalSelection(TrackSelectionPtr finalSelection) {fFinalSelection = finalSelection;}
 	void SetFitter(TrackFitterPtr fitter) { fFitter = fitter;}
 	void SetFilter(TrackUpdatePtr filter) { fFilter = filter;}
 
 protected:
+    void InitTrackSeeds(
+    		TrackPtrIterator itBegin,
+    		TrackPtrIterator itEnd);
+
 	void FollowTracks(
 			TrackPtrIterator itBegin,
 			TrackPtrIterator itEnd);
@@ -45,8 +52,13 @@ protected:
 			TrackPtrIterator itBegin,
 			TrackPtrIterator itEnd);
 private:
+	TrackPtrVector fTracks;
+
 	TrackFitterPtr fFitter;
 	TrackUpdatePtr fFilter;
+    TrackSelectionPtr fSeedSelection;
+    TrackSelectionPtr fFinalSelection;
+    TrackPropagatorPtr fPropagator;
 };
 
 #endif /*CBMLITTRACKFINDERWEIGHT_H_*/

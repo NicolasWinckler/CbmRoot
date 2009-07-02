@@ -27,37 +27,35 @@ public:
    virtual LitStatus Extrapolate(
 		   const CbmLitTrackParam *parIn,
            CbmLitTrackParam *parOut,
-           double zOut);
+           myf zOut);
 
    virtual LitStatus Extrapolate(
 		   CbmLitTrackParam *par,
-           double zOut );
+           myf zOut );
 
    virtual void TransportMatrix(
-		   std::vector<double>& F);
-   virtual void TransportMatrix(
-		   TMatrixD& F);
+		   std::vector<myf>& F);
 
 protected:
 
    void RK4Order(
-		   const std::vector<double>& xIn,
-		   double zIn,
-		   std::vector<double>& xOut,
-           double zOut,
-           std::vector<double>& derivs) const;
+		   const std::vector<myf>& xIn,
+		   myf zIn,
+		   std::vector<myf>& xOut,
+           myf zOut,
+           std::vector<myf>& derivs) const;
 
-   double CalcOut(
-   		double in,
-   		const double k[4]) const;
+   myf CalcOut(
+   		myf in,
+   		const myf k[4]) const;
 
    void TransportC(
-   		const std::vector<double>& cIn,
-   		const std::vector<double>& F,
-   		std::vector<double>& cOut) const;
+   		const std::vector<myf>& cIn,
+   		const std::vector<myf>& F,
+   		std::vector<myf>& cOut) const;
 
 private:
-	std::vector<double> fF;
+	std::vector<myf> fF;
 	FairField *fMagneticField;
 };
 

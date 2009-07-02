@@ -1,6 +1,7 @@
 #ifndef CBMLITTRDTRACKFINDERSTANDALONE_H_
 #define CBMLITTRDTRACKFINDERSTANDALONE_H_
 
+#include "CbmLitFloat.h"
 #include "CbmTrdTrackFinder.h"
 #include "CbmLitTrackFinderBranch.h"
 #include "CbmLitTypes.h"
@@ -22,9 +23,9 @@ public:
             TClonesArray* trackArray);
 
 private:
-    Double_t fMom;
+    myf fMom;
 
-    virtual void SetIterationParameters(Int_t iter);
+    virtual void SetIterationParameters(int iter);
 
 	void CreateTrackSeeds(
 			const HitPtrVector& hits,

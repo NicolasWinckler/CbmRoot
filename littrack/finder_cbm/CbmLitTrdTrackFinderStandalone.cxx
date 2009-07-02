@@ -69,15 +69,16 @@ void CbmLitTrdTrackFinderStandalone::Init()
 //   fPDG = 211;
 }
 
-void CbmLitTrdTrackFinderStandalone::SetIterationParameters(Int_t iter)
+void CbmLitTrdTrackFinderStandalone::SetIterationParameters(
+		int iter)
 {
 	if (iter == 0) {
 		fMaxNofMissingHits = 1;
-		fSigmaCoef = 3.5;
+//		fSigmaCoef = 3.5;
 	} else
 	if (iter == 1) {
 		fMaxNofMissingHits = 2;
-		fSigmaCoef = 5.;
+//		fSigmaCoef = 5.;
 	}
 }
 
@@ -283,7 +284,7 @@ void CbmLitTrdTrackFinderStandalone::CreateTrdTracks()
 //	par->SetY(TrdPoint->GetY());
 //	par->SetTx(TrdPoint->GetPx() / TrdPoint->GetPz());
 //	par->SetTy(TrdPoint->GetPy() / TrdPoint->GetPz());
-//   	double p = TMath::Sqrt(TrdPoint->GetPx() * TrdPoint->GetPx() +
+//   	Double p = TMath::Sqrt(TrdPoint->GetPx() * TrdPoint->GetPx() +
 //			       TrdPoint->GetPy() * TrdPoint->GetPy() +
 //			       TrdPoint->GetPz() * TrdPoint->GetPz());
 //

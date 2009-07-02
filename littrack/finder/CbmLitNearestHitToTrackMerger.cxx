@@ -63,11 +63,11 @@ bool CbmLitNearestHitToTrackMerger::AddNearestHit(
 	const CbmLitTrackParam* par = track->GetParamLast();
 	CbmLitTrackParam uPar, param;
 	HitPtrIterator hit(bounds.second);
-	double chiSq = 1e10;
+	myf chiSq = 1e10;
 	for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
 		fFilter->Update(par, &uPar, *iHit);
 		if (IsHitInValidationGate(&uPar, *iHit)) {
-			double chi = ChiSq(&uPar, *iHit);
+			myf chi = ChiSq(&uPar, *iHit);
 			if (chi < chiSq) {
 				chiSq = chi;
 				hit = iHit;

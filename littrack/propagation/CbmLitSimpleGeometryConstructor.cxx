@@ -164,7 +164,7 @@ void CbmLitSimpleGeometryConstructor::ConstructMuch()
 
 			TGeoMedium* medium = fMedium[med->GetName()];
 
-			double Z = muchPos[2] + muchNode->GetMatrix()->GetTranslation()[2];
+			myf Z = muchPos[2] + muchNode->GetMatrix()->GetTranslation()[2];
 
 			TGeoVolume* volume = new TGeoVolume(muchNode->GetName(), shape, medium);
 			TGeoMatrix* matrix = new TGeoTranslation(0, 0, Z);
@@ -197,7 +197,7 @@ void CbmLitSimpleGeometryConstructor::ConstructMuch()
 						TGeoMedium* medium = fMedium[med->GetName()];
 
 						TGeoVolume* volume = new TGeoVolume(active->GetName(), shape, medium);
-						double z = muchPos[2] + muchNode->GetMatrix()->GetTranslation()[2]
+						myf z = muchPos[2] + muchNode->GetMatrix()->GetTranslation()[2]
 						       + sideNode->GetMatrix()->GetTranslation()[2] + active->GetMatrix()->GetTranslation()[2];
 						std::cout << std::cout.precision(5) << "z station MUCH: " << z << std::endl;
 						TGeoMatrix* matrix = new TGeoTranslation(0, 0, z);
@@ -233,7 +233,7 @@ void CbmLitSimpleGeometryConstructor::ConstructTof()
 	TGeoNode* cel = (TGeoNode*) mod->GetNodes()->FindObject("t1reg1cel_1");
 	const double* celPos  = cel->GetMatrix()->GetTranslation();
 
-	double Z = tofPos[2] + gasPos[2] + modPos[2] + celPos[2];
+	myf Z = tofPos[2] + gasPos[2] + modPos[2] + celPos[2];
 
 	for (int i = 0; i < cel->GetNodes()->GetEntriesFast(); ++i) {
 		TGeoNode* ele = (TGeoNode*) cel->GetNodes()->At(i);

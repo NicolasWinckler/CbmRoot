@@ -2,6 +2,7 @@
 #define CBMLITMATERIALEFFECTSIMP_H_
 
 #include "CbmLitMaterialEffects.h"
+#include "CbmLitFloat.h"
 
 class CbmLitTrackParam;
 class CbmLitMaterialInfo;
@@ -35,59 +36,59 @@ public:
 			CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	double CalcThetaSq(
+	myf CalcThetaSq(
 			const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	double BetheBlochSimple(
+	myf BetheBlochSimple(
 	        const CbmLitMaterialInfo* mat) const;
 
-	double BetheBloch(
+	myf BetheBloch(
 			const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	double BetheBlochElectron(
+	myf BetheBlochElectron(
 			const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	double EnergyLoss(
+	myf EnergyLoss(
 			const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	double dEdx(
+	myf dEdx(
 			const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	double CalcQpAfterEloss(
-			double qp,
-	        double eloss) const;
+	myf CalcQpAfterEloss(
+			myf qp,
+	        myf eloss) const;
 
-	double CalcSigmaSqQp(
+	myf CalcSigmaSqQp(
 			   const CbmLitTrackParam* par,
 	           const CbmLitMaterialInfo* mat) const;
 
-	double CalcSigmaSqQpElectron(
+	myf CalcSigmaSqQpElectron(
 	          const CbmLitTrackParam* par,
 	          const CbmLitMaterialInfo* mat) const;
 
-	double MPVEnergyLoss(
+	myf MPVEnergyLoss(
 	        const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	double BetheHeitler(
+	myf BetheHeitler(
 	        const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	double PairProduction(
+	myf PairProduction(
 	        const CbmLitTrackParam* par,
 	        const CbmLitMaterialInfo* mat) const;
 
-	double CalcI(
-			double Z) const;
+	myf CalcI(
+			myf Z) const;
 private:
-	double fEnergyLoss;
+	myf fEnergyLoss;
 	bool fDownstream;
-	double fMass;
+	myf fMass;
 	bool fIsElectron;
 	bool fIsMuon;
 };

@@ -58,12 +58,12 @@ public:
 
 //class CompareHitPtrChiSqLess:
 //	public std::binary_function<
-//		const std::pair<CbmLitHit*, Double_t>&,
-//		const std::pair<CbmLitHit*, Double_t>&,
+//		const std::pair<CbmLitHit*, myf>&,
+//		const std::pair<CbmLitHit*, myf>&,
 //		bool>
 //{
 //public:
-//	bool operator()(const std::pair<CbmLitHit*, Double_t>& hit1, const std::pair<CbmLitHit*, Double_t>& hit2) const {
+//	bool operator()(const std::pair<CbmLitHit*, myf>& hit1, const std::pair<CbmLitHit*, myf>& hit2) const {
 //		return hit1.second < hit2.second;
 //	}
 //};
@@ -198,7 +198,7 @@ public:
 			return shit1->GetU() < shit2->GetU();
 		} else {
 			std::cout << "CompareHitPtrXULess: HIT TYPE NOT SUPPORTED" << std::endl;
-			return kFALSE;
+			return false;
 		}
 	}
 };

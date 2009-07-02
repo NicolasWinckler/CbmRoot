@@ -14,8 +14,6 @@
 
 #include <vector>
 
-#include "TMatrixD.h"
-
 class CbmLitTGeoTrackPropagator: public CbmLitTrackPropagator
 {
 public:
@@ -49,7 +47,7 @@ public:
 	virtual LitStatus Propagate(
 	   const CbmLitTrackParam *parIn,
 	   CbmLitTrackParam *parOut,
-	   double zOut,
+	   myf zOut,
 	   int pdg);
 
 	/**
@@ -60,22 +58,15 @@ public:
      */
 	virtual LitStatus Propagate(
 	   CbmLitTrackParam *par,
-	   double zOut,
+	   myf zOut,
 	   int pdg);
 
 	/**
      * Derived from CbmLitTrackPropagator. Getter for the transport matrix.
-     * @param F Transport matrix as an std::vector<double>.
+     * @param F Transport matrix as an std::vector<myf>.
      */
 	virtual void TransportMatrix(
-	   std::vector<double>& F);
-
-	/**
-     * Derived from CbmLitTrackPropagator. Getter for the transport matrix.
-     * @param F Transport matrix as TMatrixD.
-     */
-	virtual void TransportMatrix(
-	   TMatrixD& F);
+	   std::vector<myf>& F);
 
 	/**
      * If true, than transport matrix will be calculated during the propagation.
@@ -90,13 +81,13 @@ public:
 
 protected:
 	/**
-     * Updates the transport matrix F=F*newF.
+     * Updates the transport matrix F = newF * F.
      * @param F Input/output Current transport matrix.
      * @param newF Transport matrix to be included in the current transport matrix.
      */
 	void UpdateF(
-		TMatrixD& F,
-		const TMatrixD& newF);
+			std::vector<myf>& F,
+			const std::vector<myf>& newF);
 
 	/**
      * Check if the track parameters are c	orrect by checking their maximum acceptable values.
@@ -110,9 +101,9 @@ private:
 	GeoNavigatorPtr fNavigator; // Track navigator tool
 	MaterialEffectsPtr fMaterial; // Material effects tool
 
-	TMatrixD fFm; // Transport matrix
+	std::vector<myf> fFm; // Transport matrix
 
-	double fMaxStepSize; // Maximum step size in cm
+	myf fMaxStepSize; // Maximum step size in cm
 
 	bool fDownstream; // if true than downstream propagation
 	int fPDG; // PDG of the particle

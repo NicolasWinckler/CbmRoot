@@ -19,12 +19,12 @@ public:
 	virtual LitStatus DoSelect(
 			TrackPtrVector& tracks);
 
-	Double_t GetMaxChiSq() const {return fMaxChiSq;}
+	myf GetMaxChiSq() const {return fMaxChiSq;}
 
-	void SetMaxChiSq(Double_t maxChiSq) {fMaxChiSq = maxChiSq;}
+	void SetMaxChiSq(myf maxChiSq) {fMaxChiSq = maxChiSq;}
 
 private:
-	Double_t fMaxChiSq;
+	myf fMaxChiSq;
 };
 
 #endif /*CBMLITTRACKSELECTIONCHISQ_H_*/

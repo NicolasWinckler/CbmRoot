@@ -35,8 +35,8 @@ LitStatus CbmLitTrackPropagatorGeane::Finalize()
 LitStatus CbmLitTrackPropagatorGeane::Propagate(
 		const CbmLitTrackParam *parIn,
         CbmLitTrackParam *parOut,
-        Double_t zOut,
-        Int_t pdg)
+        myf zOut,
+        int pdg)
 {
    *parOut = *parIn;
    return Propagate(parOut, zOut, pdg);
@@ -44,8 +44,8 @@ LitStatus CbmLitTrackPropagatorGeane::Propagate(
 
 LitStatus CbmLitTrackPropagatorGeane::Propagate(
 		CbmLitTrackParam *par,
-        Double_t zOut,
-        Int_t pdg)
+        myf zOut,
+        int pdg)
 {
 	FairTrackParam param;
 	StatusCode result;

@@ -6,12 +6,8 @@
 #include "CbmLitTypes.h"
 #include "CbmLitEnums.h"
 
-#include <utility>
-
 class CbmLitTrackParam;
 class CbmLitHit;
-class CbmLitHitData;
-class CbmLitDetectorLayout;
 class CbmLitStation;
 
 class CbmLitGating //: public CbmLitTool
@@ -27,34 +23,29 @@ public:
 	bool IsHitInValidationGate(
 			const CbmLitTrackParam* par,
 			const CbmLitHit* hit) const;
-//
-//	HitPtrIteratorPair MinMaxIndex(
-//			const CbmLitTrackParam* par,
-//			HitPtrVector& hits,
-//			const CbmLitStation& station,
-//			const std::pair<double, Char_t>& maxErr) const;
 
 	HitPtrIteratorPair MinMaxIndex(
 			const CbmLitTrackParam* par,
-			CbmLitHitData& hitData,
-			const CbmLitDetectorLayout& layout,
-			int stationGroup,
-			int station,
-			int substation) const;
+			HitPtrIteratorPair hits,
+			const CbmLitStation& station,
+			const std::pair<myf, char>& maxErr) const;
 
-//	double CalcDevX(
-//			const CbmLitTrackParam* par,
-//			const CbmLitHitData& hitData,
-//			int stationGroup,
-//			int station,
-//			int substation) const;
+    void SetSigmaCoef(myf sigmaCoef) { fSigmaCoef = sigmaCoef;}
+    void SetChiSqStripHitCut(myf chiSqStripHitCut) { fChiSqStripHitCut = chiSqStripHitCut;}
+    void SetChiSqPixelHitCut(myf chiSqPixelHitCut) { fChiSqPixelHitCut = chiSqPixelHitCut;}
+    void IsUseFastSearch(bool useFastSearch) { fUseFastSearch = useFastSearch;}
 
-protected:
-	double fChiSqStripHitCut;
-	double fChiSqPixelHitCut;
+    myf GetSigmaCoef() const { return fSigmaCoef;}
+    myf GetChiSqStripHitCut() const { return fChiSqStripHitCut;}
+    myf GetChiSqPixelHitCut() const { return fChiSqPixelHitCut;}
+    bool IsUseFastSearch() const { return fUseFastSearch;}
+
+private:
+	myf fChiSqStripHitCut;
+	myf fChiSqPixelHitCut;
 	bool fUseFastSearch;
-	double fMaxCovSq;
-	double fSigmaCoef;
+	myf fSigmaCoef;
+	myf fMaxCovSq;
 };
 
 #endif /* CBMLITGATING_H_ */

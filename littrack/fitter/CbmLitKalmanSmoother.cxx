@@ -2,9 +2,7 @@
 
 #include "CbmLitTrack.h"
 #include "CbmLitMath.h"
-
-#include "TMatrixD.h"
-#include "TMatrixDSym.h"
+#include "CbmLitMatrixMath.h"
 
 #include <iostream>
 
@@ -41,9 +39,9 @@ LitStatus CbmLitKalmanSmoother::Fit(
 	}
 
 	// Calculate the chi2 of the track
-	track->SetChi2(0.0);
+	track->SetChi2(0.);
 	for (int i = 0; i < n; i++) {
-		double chi2Hit = ChiSq(nodes[i].GetSmoothedParam(), track->GetHit(i));
+		myf chi2Hit = ChiSq(nodes[i].GetSmoothedParam(), track->GetHit(i));
 		nodes[i].SetChiSqSmoothed(chi2Hit);
 		track->SetChi2(track->GetChi2() + chi2Hit);
 	}
@@ -61,34 +59,63 @@ void CbmLitKalmanSmoother::Smooth(
 		CbmLitFitNode* thisNode,
 		const CbmLitFitNode* prevNode)
 {
-	TMatrixDSym invPrevPredC(5);
-	prevNode->GetPredictedParam()->GetCovMatrix(invPrevPredC);
-	invPrevPredC.Invert();
+//	TMatrixDSym invPrevPredC(5);
+//	prevNode->GetPredictedParam()->GetCovMatrix(invPrevPredC);
+//	invPrevPredC.Invert();
+	std::vector<myf> invPrevPredC(prevNode->GetPredictedParam()->GetCovMatrix());
+	InvSym15(invPrevPredC);
 
-	TMatrixD Ft(5, 5);
-	prevNode->GetF(Ft);
-	Ft.T();
+//	TMatrixD Ft(5, 5);
+//	prevNode->GetF(Ft);
+//	Ft.T();
+	std::vector<myf> Ft(prevNode->GetF());
+	Transpose25(Ft);
 
-	TMatrixDSym thisUpdC(5);
-	thisNode->GetUpdatedParam()->GetCovMatrix(thisUpdC);
+//	TMatrixDSym thisUpdC(5);
+//	thisNode->GetUpdatedParam()->GetCovMatrix(thisUpdC);
+	const std::vector<myf>& thisUpdC = thisNode->GetUpdatedParam()->GetCovMatrix();
 
-	TMatrixD A(5, 5);
-	A = thisUpdC * Ft * invPrevPredC;
+//	TMatrixD A(5, 5);
+//	A = thisUpdC * Ft * invPrevPredC;
+	std::vector<myf> A(25);
+	std::vector<myf> temp1(25);
+	Mult15On25(thisUpdC, Ft, temp1);
+	Mult25On15(temp1, invPrevPredC, A);
 
-	TVectorD thisUpdX(5), prevSmoothedX(5), prevPredX(5);
-	thisNode->GetUpdatedParam()->GetStateVector(thisUpdX);
-	prevNode->GetSmoothedParam()->GetStateVector(prevSmoothedX);
-	prevNode->GetPredictedParam()->GetStateVector(prevPredX);
+//	TVectorD thisUpdX(5), prevSmoothedX(5), prevPredX(5);
+//	thisNode->GetUpdatedParam()->GetStateVector(thisUpdX);
+//	prevNode->GetSmoothedParam()->GetStateVector(prevSmoothedX);
+//	prevNode->GetPredictedParam()->GetStateVector(prevPredX);
+//	TVectorD thisSmoothedX(thisUpdX + A * (prevSmoothedX - prevPredX));
 
-	TVectorD thisSmoothedX(thisUpdX + A * (prevSmoothedX - prevPredX));
+	const std::vector<myf>& thisUpdX = thisNode->GetUpdatedParam()->GetStateVector();
+	const std::vector<myf>& prevSmoothedX = prevNode->GetSmoothedParam()->GetStateVector();
+	const std::vector<myf>& prevPredX = prevNode->GetPredictedParam()->GetStateVector();
 
-	TMatrixDSym prevSmoothedC(5), prevPredC(5), Cdiff(5);
-	prevNode->GetSmoothedParam()->GetCovMatrix(prevSmoothedC);
-	prevNode->GetPredictedParam()->GetCovMatrix(prevPredC);
-	Cdiff = prevSmoothedC - prevPredC;
+	std::vector<myf> temp2(5), temp3(5);
+	Subtract(prevSmoothedX, prevPredX, temp2);
+	Mult25On5(A, temp2, temp3);
+	std::vector<myf> thisSmoothedX(5);
+	Add(thisUpdX, temp3, thisSmoothedX);
 
-	TMatrixDSym thisSmoothedC(5);
-	thisSmoothedC = thisUpdC + Cdiff.Similarity(A);
+
+//	TMatrixDSym prevSmoothedC(5), prevPredC(5), Cdiff(5);
+//	prevNode->GetSmoothedParam()->GetCovMatrix(prevSmoothedC);
+//	prevNode->GetPredictedParam()->GetCovMatrix(prevPredC);
+//	Cdiff = prevSmoothedC - prevPredC;
+
+	const std::vector<myf>& prevSmoothedC = prevNode->GetSmoothedParam()->GetCovMatrix();
+	const std::vector<myf>& prevPredC = prevNode->GetPredictedParam()->GetCovMatrix();
+	std::vector<myf> temp4(15);
+	Subtract(prevSmoothedC, prevPredC, temp4);
+
+
+//	TMatrixDSym thisSmoothedC(5);
+//	thisSmoothedC = thisUpdC + Cdiff.Similarity(A);
+	std::vector<myf> temp5(15);
+	Similarity(A, temp4, temp5);
+	std::vector<myf> thisSmoothedC(15);
+	Add(thisUpdC, temp5, thisSmoothedC);
 
 	CbmLitTrackParam par;
 

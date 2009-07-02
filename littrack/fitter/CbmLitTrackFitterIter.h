@@ -2,6 +2,7 @@
 #define CBMLITTRACKFITTERITER_H_
 
 #include "CbmLitTrackFitter.h"
+#include "CbmLitPtrTypes.h"
 
 class CbmLitTrack;
 
@@ -9,8 +10,8 @@ class CbmLitTrackFitterIter : public CbmLitTrackFitter
 {
 public:
 	CbmLitTrackFitterIter(
-			CbmLitTrackFitter* fitter,
-			CbmLitTrackFitter* smoother);
+			TrackFitterPtr fitter,
+			TrackFitterPtr smoother);
 	virtual ~CbmLitTrackFitterIter();
 
 	virtual LitStatus Initialize();
@@ -21,11 +22,11 @@ public:
 			bool downstream = true);
 
 private:
-	CbmLitTrackFitter* fFitter;
-	CbmLitTrackFitter* fSmoother;
+	TrackFitterPtr fFitter;
+	TrackFitterPtr fSmoother;
 
 	int fNofIterations;
-	double fChiSqCut;
+	myf fChiSqCut;
 	int fMinNofHits;
 };
 

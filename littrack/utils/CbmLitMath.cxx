@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-Double_t ChiSq(
+myf ChiSq(
 		const CbmLitTrackParam* par,
 		const CbmLitHit* hit)
 {
@@ -19,55 +19,55 @@ Double_t ChiSq(
 	}
 }
 
-Double_t ChiSq(
+myf ChiSq(
 		const CbmLitTrackParam* par,
 		const CbmLitStripHit* hit)
 {
-	Double_t C0 = par->GetCovariance(0);
-	Double_t C5 = par->GetCovariance(5);
-	Double_t C1 = par->GetCovariance(1);
-	Double_t u = hit->GetU();
-	Double_t duu = hit->GetDu() * hit->GetDu();
-	Double_t phiCos = hit->GetCosPhi();
-	Double_t phiSin = hit->GetSinPhi();
-	Double_t phiCosSq = phiCos * phiCos;
-	Double_t phiSinSq = phiSin * phiSin;
-	Double_t phi2SinCos = 2 * phiCos * phiSin;
+	myf C0 = par->GetCovariance(0);
+	myf C5 = par->GetCovariance(5);
+	myf C1 = par->GetCovariance(1);
+	myf u = hit->GetU();
+	myf duu = hit->GetDu() * hit->GetDu();
+	myf phiCos = hit->GetCosPhi();
+	myf phiSin = hit->GetSinPhi();
+	myf phiCosSq = phiCos * phiCos;
+	myf phiSinSq = phiSin * phiSin;
+	myf phi2SinCos = 2 * phiCos * phiSin;
 
-	Double_t r = u - par->GetX() * phiCos - par->GetY() * phiSin;
-	Double_t rr = r * r;
-	Double_t norm = duu + C0 * phiCosSq + phi2SinCos * C1 + C5 * phiSinSq;
+	myf r = u - par->GetX() * phiCos - par->GetY() * phiSin;
+	myf rr = r * r;
+	myf norm = duu + C0 * phiCosSq + phi2SinCos * C1 + C5 * phiSinSq;
 
 	return rr / norm;
 }
 
-Double_t ChiSq(
+myf ChiSq(
 		const CbmLitTrackParam* par,
 		const CbmLitPixelHit* hit)
 {
-	Double_t dxx = hit->GetDx() * hit->GetDx();
-	Double_t dxy = hit->GetDxy();
-	Double_t dyy = hit->GetDy() * hit->GetDy();
-	Double_t C0 = par->GetCovariance(0);
-	Double_t C5 = par->GetCovariance(5);
-	Double_t C1 = par->GetCovariance(1);
-	Double_t dx = hit->GetX() - par->GetX();
-	Double_t dy = hit->GetY() - par->GetY();
+	myf dxx = hit->GetDx() * hit->GetDx();
+	myf dxy = hit->GetDxy();
+	myf dyy = hit->GetDy() * hit->GetDy();
+	myf C0 = par->GetCovariance(0);
+	myf C5 = par->GetCovariance(5);
+	myf C1 = par->GetCovariance(1);
+	myf dx = hit->GetX() - par->GetX();
+	myf dy = hit->GetY() - par->GetY();
 
-	Double_t norm = -dxx * dyy + dxx * C5 + dyy * C0 - C0 * C5 + dxy * dxy - 2 * dxy * C1 + C1 * C1;
+	myf norm = -dxx * dyy + dxx * C5 + dyy * C0 - C0 * C5 + dxy * dxy - 2 * dxy * C1 + C1 * C1;
 	if (norm == 0.) norm = 1e-10;
 
-	Double_t chi2 = (-dx * dx * (dyy - C5) - dy * dy * (dxx - C0) + 2 * dx * dy * (dxy - C1)) / norm;
+	myf chi2 = (-dx * dx * (dyy - C5) - dy * dy * (dxx - C0) + 2 * dx * dy * (dxy - C1)) / norm;
 
 	return chi2;
 }
 
-Int_t NDF(
+int NDF(
 		const CbmLitTrack* track)
 {
    // TODO check NDF
-	Int_t ndf = 0;
-	for (Int_t i = 0; i < track->GetNofHits(); i++){
+	int ndf = 0;
+	for (int i = 0; i < track->GetNofHits(); i++){
 		if (track->GetHit(i)->GetType() == kLITPIXELHIT) ndf += 2;
 		else if (track->GetHit(i)->GetType() == kLITSTRIPHIT) ndf++;
 	}

@@ -42,13 +42,11 @@ void CbmLitMuchTrackFinderBranch::Init()
 	SetSeedSelection(factory->CreateTrackSelection("momentum_seed"));
 	SetStationGroupSelection(factory->CreateTrackSelection("momentum"));
 	SetFinalSelection(factory->CreateTrackSelection("much_final"));
-	SetFinalPreSelection(factory->CreateTrackSelection("empty"));
-	SetFitter(factory->CreateTrackFitter("lit_kalman"));
 
 	SetVerbose(1);
 	SetNofIter(1);
-	SetBeginStationGroup(0);
-	SetEndStationGroup(fLayout.GetNofStationGroups() - 1);
+//	SetBeginStationGroup(0);
+//	SetEndStationGroup(fLayout.GetNofStationGroups() - 1);
 	SetMaxNofMissingHits(1);
 	IsAlwaysCreateMissingHit(false);
 	IsUseFastSearch(true);

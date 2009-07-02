@@ -11,25 +11,25 @@ public:
 	CbmLitPixelHit();
 	virtual ~CbmLitPixelHit();
 
-	double GetX() const { return fX; }
-	double GetY() const { return fY; }
-	double GetDx() const { return fDx; }
-	double GetDy() const { return fDy; }
-	double GetDxy() const { return fDxy; }
+	myf GetX() const { return fX; }
+	myf GetY() const { return fY; }
+	myf GetDx() const { return fDx; }
+	myf GetDy() const { return fDy; }
+	myf GetDxy() const { return fDxy; }
 
-	void SetX(double x) { fX = x; }
-	void SetY(double y) { fY = y; }
-	void SetDx(double dx) { fDx = dx; }
-	void SetDy(double dy) { fDy = dy; }
-	void SetDxy(double dxy) { fDxy = dxy; }
+	void SetX(myf x) { fX = x; }
+	void SetY(myf y) { fY = y; }
+	void SetDx(myf dx) { fDx = dx; }
+	void SetDy(myf dy) { fDy = dy; }
+	void SetDxy(myf dxy) { fDxy = dxy; }
 
 	virtual std::string ToString() const;
 
 private:
 
-	double fX, fY;
-	double fDx, fDy;
-	double fDxy;
+	myf fX, fY;
+	myf fDx, fDy;
+	myf fDxy;
 };
 
 #endif /*CBMLITPIXELHIT_H_*/

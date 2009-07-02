@@ -18,7 +18,7 @@ public:
 
 	LitStatus FindIntersections(
 			const CbmLitTrackParam* par,
-			double zOut,
+			myf zOut,
 			std::vector<CbmLitMaterialInfo>& inter);
 private:
 

@@ -52,12 +52,12 @@ public:
 			int station,
 			int substation) const;
 
-	std::pair<double, Char_t> GetMaxErr(
+	std::pair<myf, char> GetMaxErr(
 			int stationGroup,
 			int station,
 			int substation) const;
 
-	std::pair<double, Char_t> GetMaxErr(
+	std::pair<myf, char> GetMaxErr(
 			int planeId) const;
 
 	void Clear();
@@ -72,7 +72,7 @@ private:
 			int& substation) const;
 
 	std::vector<std::vector<std::vector<HitPtrVector> > > fHits;
-	std::vector<std::vector<std::vector<std::pair<double, Char_t> > > > fMaxErr;
+	std::vector<std::vector<std::vector<std::pair<myf, char> > > > fMaxErr;
 };
 
 #endif /*CBMLITHITDATA_H_*/

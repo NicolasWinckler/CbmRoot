@@ -10,8 +10,6 @@
 
 #include "CbmLitTrackPropagator.h"
 
-#include "TMatrixD.h"
-
 #include <vector>
 
 class CbmPropagator;
@@ -29,22 +27,19 @@ public:
    virtual LitStatus Propagate(
 		   const CbmLitTrackParam *parIn,
            CbmLitTrackParam *parOut,
-           Double_t zOut,
-           Int_t pdg);
+           myf zOut,
+           int pdg);
 
    virtual LitStatus Propagate(
 		   CbmLitTrackParam *pParam,
-           Double_t zOut,
-           Int_t pdg);
+           myf zOut,
+           int pdg);
 
    virtual void TransportMatrix(
-		   std::vector<Double_t>& F){
+		   std::vector<myf>& F){
 	   //TODO: implement transport matrix for geane
    }
-   virtual void TransportMatrix(
-		   TMatrixD& F){
-	   //TODO: implement transport matrix for geane
-   }
+
 
 private:
    CbmPropagator *fPropagator;

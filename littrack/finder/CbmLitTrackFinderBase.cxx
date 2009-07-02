@@ -13,11 +13,10 @@
 #include <cmath>
 #include <algorithm>
 
-CbmLitTrackFinderBase::CbmLitTrackFinderBase()
+CbmLitTrackFinderBase::CbmLitTrackFinderBase():
+	fVerbose(1),
+	fEventNo(0)
 {
-	fMaxCovSq = 20. * 20.;
-	fVerbose = 1;
-	fEventNo = 0;
 }
 
 CbmLitTrackFinderBase::~CbmLitTrackFinderBase()
@@ -28,10 +27,10 @@ void CbmLitTrackFinderBase::ArrangeHits(
 		HitPtrIterator itBegin,
 		HitPtrIterator itEnd)
 {
-    for(HitPtrIterator hit = itBegin; hit != itEnd; hit++) {
-    	if (fUsedHitsSet.find((*hit)->GetRefId()) != fUsedHitsSet.end()) continue;
-    	int planeId = (*hit)->GetPlaneId();
-     	fHitData.AddHit(planeId, *hit);
+    for(HitPtrIterator it = itBegin; it != itEnd; it++) {
+    	CbmLitHit* hit = *it;
+    	if (fUsedHitsSet.find(hit->GetRefId()) != fUsedHitsSet.end()) continue;
+     	fHitData.AddHit(hit->GetPlaneId(), hit);
     }
 
     if (fVerbose > 1) std::cout << fHitData.ToString();
@@ -53,87 +52,16 @@ void CbmLitTrackFinderBase::ArrangeHits(
     }
 }
 
-void CbmLitTrackFinderBase::InitTrackSeeds(
-		TrackPtrIterator itBegin,
-		TrackPtrIterator itEnd)
-{
-	//TODO if more than one iteration, restore the state of the seeds
-	fSeedSelection->DoSelect(itBegin, itEnd);
-
-	for (TrackPtrIterator track = itBegin; track != itEnd; track++) {
-		if ((*track)->GetQuality() == kLITBAD) continue;
-		if (fSeedsIdSet.find((*track)->GetPreviousTrackId())
-				!= fSeedsIdSet.end()) continue;
-		(*track)->SetPDG(fPDG);
-		fTracks.push_back(new CbmLitTrack(*(*track)));
-	}
-
-	// extrapolate to the begin station group for the tracking
-	if (fBeginStationGroup > 0) {
-		double Ze = fLayout.GetSubstation(fBeginStationGroup, 0, 0).GetZ();
-		for (TrackPtrIterator track = fTracks.begin(); track != fTracks.end(); track++) {
-			CbmLitTrackParam par(*(*track)->GetParamLast());
-			fPropagator->Propagate(&par, Ze, fPDG);
-			(*track)->SetParamLast(&par);
-		}
-	}
-}
-
-bool CbmLitTrackFinderBase::IsHitInValidationWindow(
-		const CbmLitTrackParam* par,
-		const CbmLitHit* hit) const
-{
-	double chiSq = ChiSq(par, hit);
-	if (hit->GetType() == kLITSTRIPHIT) return chiSq < fChiSqStripHitCut;
-	if (hit->GetType() == kLITPIXELHIT) return chiSq < fChiSqPixelHitCut;
-	return false;
-}
-
-HitPtrIteratorPair CbmLitTrackFinderBase::MinMaxIndex(
-		const CbmLitTrackParam* par,
-		int stationGroup,
-		int station,
-		int substation)
-{
-	HitPtrIteratorPair bounds;
-	CbmLitStation st = fLayout.GetStationGroup(stationGroup).GetStation(station);
-	if (st.GetType() == kLITSTRIPHIT || st.GetType() == kLITMIXHIT || !fUseFastSearch) {
-		bounds = fHitData.GetHits(stationGroup, station, substation);
-	} else if (st.GetType() == kLITPIXELHIT){
-		CbmLitPixelHit hit;
-		HitPtrIteratorPair hits = fHitData.GetHits(stationGroup, station, substation);
-		double devX = CalcDevX(par, stationGroup, station, substation);
-		if (devX == 0.) return bounds;
-	    hit.SetX(par->GetX() - devX);
-	    bounds.first = std::lower_bound(hits.first, hits.second, &hit, CompareHitPtrXULess());
-	    hit.SetX(par->GetX() + devX);
-	    bounds.second =	std::lower_bound(hits.first, hits.second, &hit, CompareHitPtrXULess());
-	}
-
-    return bounds;
-}
-
-double CbmLitTrackFinderBase::CalcDevX(
-		const CbmLitTrackParam* par,
-		int stationGroup,
-		int station,
-		int substation) const
-{
-	double C0 = par->GetCovariance(0);
-	if(C0 > fMaxCovSq || C0 < 0.) return 0.;
-//	return fSigmaCoef * (std::sqrt(C0) + fHitData.GetMaxErr(stationGroup, station, substation).first);
-	return fSigmaCoef * (std::sqrt(C0) + fHitData.GetMaxErr(stationGroup, station, substation).first);
-}
-
 void CbmLitTrackFinderBase::RemoveHits(
 		TrackPtrIterator itBegin,
 		TrackPtrIterator itEnd)
 {
-   for(TrackPtrIterator it = itBegin; it != itEnd; it++) {
-      if((*it)->GetQuality() == kLITBAD) continue;
-      for (int hit = 0; hit < (*it)->GetNofHits(); hit++)
-    	  fUsedHitsSet.insert((*it)->GetHit(hit)->GetRefId());
-   }
+	for(TrackPtrIterator it = itBegin; it != itEnd; it++) {
+		CbmLitTrack* track = *it;
+		if(track->GetQuality() == kLITBAD) continue;
+		for (int hit = 0; hit < track->GetNofHits(); hit++)
+			fUsedHitsSet.insert(track->GetHit(hit)->GetRefId());
+	}
 }
 
 void CbmLitTrackFinderBase::CopyToOutput(
@@ -142,9 +70,10 @@ void CbmLitTrackFinderBase::CopyToOutput(
 		TrackPtrVector& tracks)
 {
 	for(TrackPtrIterator it = itBegin; it != itEnd; it++) {
-		if( (*it)->GetQuality() == kLITBAD) continue;
-		if (!(*it)->CheckParams()) continue;
-		tracks.push_back(new CbmLitTrack(*(*it)));
-	    fSeedsIdSet.insert((*it)->GetPreviousTrackId());
+		CbmLitTrack* track = *it;
+		if(track->GetQuality() == kLITBAD) continue;
+		if (!track->CheckParams()) continue;
+		fUsedSeedsSet.insert(track->GetPreviousTrackId());
+		tracks.push_back(new CbmLitTrack(*track));
 	}
 }

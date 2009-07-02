@@ -21,12 +21,12 @@ public:
 	virtual LitStatus DoSelect(
 			TrackPtrVector& tracks);
 
-	Double_t GetMinMomentum() const {return fMinMomentum;}
+	myf GetMinMomentum() const {return fMinMomentum;}
 
-	void SetMinMomentum(Double_t minMomentum) {fMinMomentum = minMomentum;}
+	void SetMinMomentum(myf minMomentum) {fMinMomentum = minMomentum;}
 
 private:
-	Double_t fMinMomentum; // in GeV
+	myf fMinMomentum; // in GeV
 };
 
 #endif /*CBMLITTRACKSELECTIONMOMENTUM_H_*/

@@ -23,13 +23,13 @@ public:
 	virtual LitStatus DoSelect(
 			TrackPtrVector& tracks);
 
-	Int_t GetNofSharedHits() const {return fNofSharedHits;}
+	int GetNofSharedHits() const {return fNofSharedHits;}
 
-	void SetNofSharedHits(Int_t nofHits) {fNofSharedHits = nofHits;}
+	void SetNofSharedHits(int nofHits) {fNofSharedHits = nofHits;}
 
 private:
 
-	Int_t fNofSharedHits;
+	int fNofSharedHits;
 
 	void CheckSharedHits(
 			TrackPtrIterator itBegin,

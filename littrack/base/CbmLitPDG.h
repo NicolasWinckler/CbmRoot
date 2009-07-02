@@ -1,13 +1,15 @@
 #ifndef CBMLITPDG_H_
 #define CBMLITPDG_H_
 
+#include "CbmLitFloat.h"
+
 class CbmLitPDG
 {
 public:
 	CbmLitPDG();
 	virtual ~CbmLitPDG();
 
-	static double GetMass(
+	static myf GetMass(
 			int pdg);
 
 	static bool IsElectron(

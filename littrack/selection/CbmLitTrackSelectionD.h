@@ -21,15 +21,15 @@ public:
 	virtual LitStatus DoSelect(
 			TrackPtrVector& tracks);
 
-	Int_t GetMinLastPlaneId() const {return fMinLastPlaneId;}
-	Int_t GetMinNofHits() const {return fMinNofHits;}
+	int GetMinLastPlaneId() const {return fMinLastPlaneId;}
+	int GetMinNofHits() const {return fMinNofHits;}
 
-	void SetMinLastPlaneId(Int_t minLastPlaneId) {fMinLastPlaneId = minLastPlaneId;}
-	void SetMinNofHits(Int_t minNofHits) {fMinNofHits = minNofHits;}
+	void SetMinLastPlaneId(int minLastPlaneId) {fMinLastPlaneId = minLastPlaneId;}
+	void SetMinNofHits(int minNofHits) {fMinNofHits = minNofHits;}
 
 private:
-	Int_t fMinLastPlaneId;
-	Int_t fMinNofHits;
+	int fMinLastPlaneId;
+	int fMinNofHits;
 };
 
 #endif /*CBMLITTRACKSELECTIOND_H_*/

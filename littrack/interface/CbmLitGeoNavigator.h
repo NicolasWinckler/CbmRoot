@@ -3,6 +3,7 @@
 
 #include "CbmLitTool.h"
 #include "CbmLitMaterialInfo.h"
+#include "CbmLitFloat.h"
 
 #include <vector>
 
@@ -16,7 +17,7 @@ public:
 
 	virtual LitStatus FindIntersections(
 			const CbmLitTrackParam* par,
-			double zOut,
+			myf zOut,
 			std::vector<CbmLitMaterialInfo>& inter) = 0;
 };
 

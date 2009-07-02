@@ -32,12 +32,12 @@ public:
 
 	static void PixelHitToLitPixelHit(
 			const CbmPixelHit* hit,
-			Int_t index,
+			int index,
 			CbmLitPixelHit* litHit);
 
 	static void StripHitToLitStripHit(
 			const CbmStripHit* hit,
-			Int_t index,
+			int index,
 			CbmLitStripHit* litHit);
 
 	static void StsTrackToLitTrack(

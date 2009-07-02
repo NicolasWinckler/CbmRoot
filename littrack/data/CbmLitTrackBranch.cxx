@@ -2,14 +2,18 @@
 
 #include "CbmLitHit.h"
 #include "CbmLitComparators.h"
-#include "CbmLitMemoryManagment.h"
 
 #include <sstream>
 #include <algorithm>
 
 CbmLitTrackBranch::CbmLitTrackBranch():
-	fChi2(0),
-	fNDF(0)
+	fChi2(0.),
+	fNDF(0.),
+	fNofMissingHits(0),
+	fRefId(-1),
+	fQuality(kLITBAD),
+	fPreviousTrackId(-1),
+	fLastPlaneId(0)
 {
 }
 
@@ -26,7 +30,7 @@ void CbmLitTrackBranch::AddHit(
 std::string CbmLitTrackBranch::ToString() const
 {
 	std::stringstream ss;
-	ss << "TrackCand: chi2=" << fChi2 << ", ndf=" << fNDF
+	ss << "TrackBranch: chi2=" << fChi2 << ", ndf=" << fNDF
 		<< ", nofHits=" << fHits.size() << std::endl;
 	return ss.str();
 }
@@ -34,6 +38,6 @@ std::string CbmLitTrackBranch::ToString() const
 void CbmLitTrackBranch::SortHits(
 		bool downstream)
 {
-	if (downstream) std::sort(fHits.begin(), fHits.end(), CompareHitPtrPlaneIdLess());
-	else std::sort(fHits.begin(), fHits.end(), CompareHitPtrPlaneIdMore());
+	if (downstream) std::sort(fHits.begin(), fHits.end(), CompareHitPtrZLess());
+	else std::sort(fHits.begin(), fHits.end(), CompareHitPtrZMore());
 }

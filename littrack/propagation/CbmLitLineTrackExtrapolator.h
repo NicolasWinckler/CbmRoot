@@ -10,8 +10,6 @@
 
 #include "CbmLitTrackExtrapolator.h"
 
-#include "TMatrixD.h"
-
 class CbmLitTrackParam;
 
 class CbmLitLineTrackExtrapolator: public CbmLitTrackExtrapolator {
@@ -27,19 +25,17 @@ public:
    virtual LitStatus Extrapolate(
 		   const CbmLitTrackParam *parIn,
            CbmLitTrackParam *parOut,
-           double zOut);
+           myf zOut);
 
    virtual LitStatus Extrapolate(
 		   CbmLitTrackParam *par,
-           double zOut );
+           myf zOut );
 
    virtual void TransportMatrix(
-		   std::vector<double>& F);
-   virtual void TransportMatrix(
-		   TMatrixD& F);
+		   std::vector<myf>& F);
 
 private:
-	double fDz;
+	myf fDz;
 };
 
 #endif //CbmLitLineTrackExtrapolator

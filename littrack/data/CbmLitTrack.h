@@ -1,6 +1,7 @@
 #ifndef CBMLITTRACK_H_
 #define CBMLITTRACK_H_
 
+#include "CbmLitFloat.h"
 #include "CbmLitTrackParam.h"
 #include "CbmLitFitNode.h"
 #include "CbmLitTypes.h"
@@ -20,7 +21,7 @@ public:
 	int GetNofHits() const { return fHits.size(); }
 	int GetNofHits(int planeId);
 	LitTrackQa GetQuality() const { return fQuality; }
-	double GetChi2() const { return fChi2; }
+	myf GetChi2() const { return fChi2; }
 	int GetNDF() const { return fNDF; }
 	int GetPreviousTrackId() const { return fPreviousTrackId; }
 	int GetPDG() const {return fPDG;};
@@ -37,7 +38,7 @@ public:
 	int GetRefId() const {return fRefId;}
 
 	void SetQuality(LitTrackQa quality) { fQuality = quality; }
-	void SetChi2(double chi2) { fChi2 = chi2; }
+	void SetChi2(myf chi2) { fChi2 = chi2; }
 	void SetNDF(int ndf) { fNDF = ndf; }
 	void SetPreviousTrackId(int id) { fPreviousTrackId = id; }
 	void SetPDG(int pdg) { fPDG = pdg; }
@@ -66,7 +67,7 @@ private:
 	CbmLitTrackParam fParamLast;
 	FitNodeVector fFitNodes;
 	LitTrackQa fQuality;
-	double fChi2;
+	myf fChi2;
 	int fNDF;
 	int fPreviousTrackId;
 	int fLastPlaneId;

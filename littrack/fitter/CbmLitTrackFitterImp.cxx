@@ -42,7 +42,7 @@ LitStatus CbmLitTrackFitterImp::Fit(
 	int nofHits = track->GetNofHits();
 	FitNodeVector nodes(nofHits);
 	CbmLitTrackParam par;
-	TMatrixD F(5,5);
+	std::vector<myf> F(25);
 
 	if (fDownstream) {
 	    track->SetParamLast(track->GetParamFirst());
@@ -54,20 +54,20 @@ LitStatus CbmLitTrackFitterImp::Fit(
 
 	for (int i = 0; i < nofHits; i++) {
 		const CbmLitHit* hit = track->GetHit(i);
-	    Double_t Ze = hit->GetZ();
+	    myf Ze = hit->GetZ();
 	    if (fPropagator->Propagate(&par, Ze, track->GetPDG()) == kLITERROR) {
-	    	//std::cout << "ERROR CbmLitTrackFitterImp::Fit propagation failed" << std::endl;
+	    	//std::cout << "-E- CbmLitTrackFitterImp::Fit: propagation failed" << std::endl;
 	    	return kLITERROR;
 	    }
 	    nodes[i].SetPredictedParam(&par);
 	    fPropagator->TransportMatrix(F);
 	    nodes[i].SetF(F);
 	    if (fUpdate->Update(&par, hit) == kLITERROR) {
-	    	//std::cout << "ERROR CbmLitTrackFitterImp::Fit track update failed" << std::endl;
+	    	//std::cout << "-E- CbmLitTrackFitterImp::Fit: track update failed" << std::endl;
 	    	return kLITERROR;
 	    }
 	    nodes[i].SetUpdatedParam(&par);
-	    Double_t chi2Hit = ChiSq(&par, hit);
+	    myf chi2Hit = ChiSq(&par, hit);
 	    nodes[i].SetChiSqFiltered(chi2Hit);
 	    track->SetChi2(track->GetChi2() + chi2Hit);
 	}

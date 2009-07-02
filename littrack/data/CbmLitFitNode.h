@@ -1,9 +1,8 @@
 #ifndef CBMLITFITNODE_H_
 #define CBMLITFITNODE_H_
 
+#include "CbmLitFloat.h"
 #include "CbmLitTrackParam.h"
-
-#include "TMatrixD.h"
 
 class CbmLitFitNode
 {
@@ -11,32 +10,30 @@ public:
 	CbmLitFitNode();
 	virtual ~CbmLitFitNode();
 
-	const std::vector<double>& GetF() const { return fF; }
-	void GetF(TMatrixD& F) const;
+	const std::vector<myf>& GetF() const { return fF; }
 	const CbmLitTrackParam* GetPredictedParam() const { return &fPredictedParam; }
 	const CbmLitTrackParam* GetUpdatedParam() const { return &fUpdatedParam; }
 	const CbmLitTrackParam* GetSmoothedParam() const { return &fSmoothedParam; }
-	double GetChiSqFiltered() const { return fChiSqFiltered; }
-	double GetChiSqSmoothed() const { return fChiSqSmoothed; }
+	myf GetChiSqFiltered() const { return fChiSqFiltered; }
+	myf GetChiSqSmoothed() const { return fChiSqSmoothed; }
 
-	void SetF(const std::vector<double>& F);
-	void SetF(const TMatrixD& F);
+	void SetF(const std::vector<myf>& F);
 	void SetPredictedParam(const CbmLitTrackParam* par) { fPredictedParam = *par;}
 	void SetUpdatedParam(const CbmLitTrackParam* par) { fUpdatedParam = *par;}
 	void SetSmoothedParam(const CbmLitTrackParam* par) { fSmoothedParam = *par;}
-	void SetChiSqFiltered(double chiSq) { fChiSqFiltered = chiSq; }
-	void SetChiSqSmoothed(double chiSq) { fChiSqSmoothed = chiSq; }
+	void SetChiSqFiltered(myf chiSq) { fChiSqFiltered = chiSq; }
+	void SetChiSqSmoothed(myf chiSq) { fChiSqSmoothed = chiSq; }
 
 private:
 	// transport matrix
-	std::vector<double> fF;
+	std::vector<myf> fF;
 
 	CbmLitTrackParam fPredictedParam;
 	CbmLitTrackParam fUpdatedParam;
 	CbmLitTrackParam fSmoothedParam;
 
-	double fChiSqFiltered;
-	double fChiSqSmoothed;
+	myf fChiSqFiltered;
+	myf fChiSqSmoothed;
 };
 
 #endif /*CBMLITFITNODE_H_*/

@@ -19,22 +19,20 @@ public:
 	virtual LitStatus Extrapolate(
 		   const CbmLitTrackParam *parIn,
 		   CbmLitTrackParam *parOut,
-		   double zOut);
+		   myf zOut);
 
 	virtual LitStatus Extrapolate(
 		   CbmLitTrackParam *par,
-		   double zOut );
+		   myf zOut );
 
 	virtual void TransportMatrix(
-		   std::vector<double>& F);
-	virtual void TransportMatrix(
-		   TMatrixD& F);
+		   std::vector<myf>& F);
 
 private:
 	TrackExtrapolatorPtr fLineExtrapolator;
 	TrackExtrapolatorPtr fRK4Extrapolator;
 
-	double fZMax;
+	myf fZMax;
 	int fOption;
 };
 

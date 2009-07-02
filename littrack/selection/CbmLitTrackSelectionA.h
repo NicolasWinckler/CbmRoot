@@ -24,7 +24,7 @@ public:
 			TrackPtrVector& tracks);
 
 private:
-	Bool_t IsHitSharing(
+	bool IsHitSharing(
 			const CbmLitTrack* track0,
 			const CbmLitTrack* track1);
 };

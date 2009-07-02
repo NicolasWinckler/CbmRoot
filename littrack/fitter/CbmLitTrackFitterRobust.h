@@ -68,8 +68,8 @@ private:
 	WeightCalculatorPtr fGaussWeightCalculator;
 
 	int fNofIterations;
-	std::vector<double> fAnnealing;
-	double fOutlierCut;
+	std::vector<myf> fAnnealing;
+	myf fOutlierCut;
 };
 
 #endif /*CBMLITTRACKFITTERROBUST_H_*/

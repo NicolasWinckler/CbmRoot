@@ -52,7 +52,7 @@ void CbmLitStsBasedTrackFinder::DefaultInit()
 	fPropagatorToDet = factory->CreateTrackPropagator("lit");
 }
 
-Int_t CbmLitStsBasedTrackFinder::DefaultDoFind(
+int CbmLitStsBasedTrackFinder::DefaultDoFind(
 		TClonesArray* hitArray,
 		TClonesArray* trackArray)
 {
@@ -71,7 +71,7 @@ void CbmLitStsBasedTrackFinder::DefaultCreateTrackSeeds(
 //                << trackArray->GetEntriesFast() << " tracks were loaded, "
 //                << trackSeeds.size() << " tracks were created" << std::endl;
 
-    Double_t Ze = layout.GetSubstation(0, 0, 0).GetZ();
+    myf Ze = layout.GetSubstation(0, 0, 0).GetZ();
     for (TrackPtrIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {
     	CbmLitTrackParam par = *(*iTrack)->GetParamLast();
     	fPropagatorToDet->Propagate(&par, Ze, pdg);

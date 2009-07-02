@@ -18,17 +18,17 @@ class TGeoVolume;
 //public:
 //	const std::string& GetName() const {return fName; }
 //	const std::string& GetMediumName() const {return fMediumName; }
-//	double GetZ() const {return fZ;}
-//	double GetDz() const {return fDz;}
-//	double GetRmin() const {return fRmin;}
-//	double GetRmax() const {return fRmax;}
+//	myf GetZ() const {return fZ;}
+//	myf GetDz() const {return fDz;}
+//	myf GetRmin() const {return fRmin;}
+//	myf GetRmax() const {return fRmax;}
 //
 //	void SetName(const std::string& name) {fName = name;}
 //	void SetMediumName(const std::string& mediumName) {fMediumName = mediumName;}
-//	void SetZ(double z) {fZ = z;}
-//	void SetDz(double dz) {fDz = dz;}
-//	void SetRmin(double rmin) {fRmin = rmin;}
-//	void SetRmax(double rmax) {fRmax = rmax;}
+//	void SetZ(myf z) {fZ = z;}
+//	void SetDz(myf dz) {fDz = dz;}
+//	void SetRmin(myf rmin) {fRmin = rmin;}
+//	void SetRmax(myf rmax) {fRmax = rmax;}
 //
 //	std::string ToString() const {
 //		std::stringstream ss;
@@ -41,10 +41,10 @@ class TGeoVolume;
 //private:
 //	std::string fName;
 //	std::string fMediumName;
-//	double fZ;
-//	double fDz;
-//	double fRmin;
-//	double fRmax;
+//	myf fZ;
+//	myf fDz;
+//	myf fRmin;
+//	myf fRmax;
 //
 ////	ClassDef(CbmLitGeoNode, 1);
 //};
@@ -54,11 +54,11 @@ class TGeoVolume;
 //	CbmLitGeoMaterial() {};
 //	CbmLitGeoMaterial(
 //			const std::string& name,
-//			double a,
-//			double z,
-//			double density,
-//			double radLen,
-//			double intLen):
+//			myf a,
+//			myf z,
+//			myf density,
+//			myf radLen,
+//			myf intLen):
 //				fName(name),
 //				fA(a),
 //				fZ(z),
@@ -68,18 +68,18 @@ class TGeoVolume;
 //	~CbmLitGeoMaterial();
 //
 //	const std::string& GetName() const {return fName;}
-//	double GetA() const {return fA;}
-//	double GetZ() const {return fZ;}
-//	double GetDensity() const {return fDensity;}
-//	double GetRadLen() const {return fRadLen;}
-//	double GetIntLen() const {return fIntLen;}
+//	myf GetA() const {return fA;}
+//	myf GetZ() const {return fZ;}
+//	myf GetDensity() const {return fDensity;}
+//	myf GetRadLen() const {return fRadLen;}
+//	myf GetIntLen() const {return fIntLen;}
 //
 //	void SetName(const std::string& name) {fName = name;}
-//	void SetA(double a) {fA = a;}
-//	void SetZ(double z) {fZ = z;}
-//	void SetDensity(double density) {fDensity = density;}
-//	void SetRadLen(double radLen) {fRadLen = radLen;}
-//	void SetIntLen(double intLen) {fIntLen = intLen;}
+//	void SetA(myf a) {fA = a;}
+//	void SetZ(myf z) {fZ = z;}
+//	void SetDensity(myf density) {fDensity = density;}
+//	void SetRadLen(myf radLen) {fRadLen = radLen;}
+//	void SetIntLen(myf intLen) {fIntLen = intLen;}
 //
 //	std::string ToString() const {
 //		std::stringstream ss;
@@ -90,11 +90,11 @@ class TGeoVolume;
 //	}
 //private:
 //	std::string fName;
-//	double fA;
-//	double fZ;
-//	double fDensity;
-//	double fRadLen;
-//	double fIntLen;
+//	myf fA;
+//	myf fZ;
+//	myf fDensity;
+//	myf fRadLen;
+//	myf fIntLen;
 //
 ////	ClassDef(CbmLitGeoMaterial, 1);
 //};

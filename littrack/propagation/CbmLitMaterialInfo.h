@@ -1,6 +1,7 @@
 #ifndef CBMLITMATERIALINFO_H_
 #define CBMLITMATERIALINFO_H_
 
+#include "CbmLitFloat.h"
 #include <string>
 
 class CbmLitMaterialInfo
@@ -8,12 +9,12 @@ class CbmLitMaterialInfo
 public:
 	CbmLitMaterialInfo();
 	CbmLitMaterialInfo(
-			double length,
-			double rl,
-			double rho,
-			double Z,
-			double A,
-			double zpos):
+			myf length,
+			myf rl,
+			myf rho,
+			myf Z,
+			myf A,
+			myf zpos):
 		fLength(length),
 		fRL(rl),
 		fRho(rho),
@@ -22,29 +23,29 @@ public:
 		fZpos(zpos){;}
 	virtual ~CbmLitMaterialInfo();
 
-	double GetLength() const { return fLength;}
-	double GetRL() const { return fRL;}
-	double GetRho() const { return fRho;}
-	double GetZ() const { return fZ;}
-	double GetA() const { return fA;}
-	double GetZpos() const { return fZpos;}
+	myf GetLength() const { return fLength;}
+	myf GetRL() const { return fRL;}
+	myf GetRho() const { return fRho;}
+	myf GetZ() const { return fZ;}
+	myf GetA() const { return fA;}
+	myf GetZpos() const { return fZpos;}
 
-	void SetLength(double length) {fLength = length;}
-	void SetRL(double rl) {fRL = rl;}
-	void SetRho(double rho) {fRho = rho;}
-	void SetZ(double Z) {fZ = Z;}
-	void SetA(double A) {fA = A;}
-	void SetZpos(double zpos) {fZpos = zpos;}
+	void SetLength(myf length) {fLength = length;}
+	void SetRL(myf rl) {fRL = rl;}
+	void SetRho(myf rho) {fRho = rho;}
+	void SetZ(myf Z) {fZ = Z;}
+	void SetA(myf A) {fA = A;}
+	void SetZpos(myf zpos) {fZpos = zpos;}
 
 	virtual std::string ToString() const;
 
 private:
-	double fLength; // cm
-	double fRL; // cm
-	double fRho; // g/cm^3
-	double fZ;
-	double fA;
-	double fZpos; // z position
+	myf fLength; // cm
+	myf fRL; // cm
+	myf fRho; // g/cm^3
+	myf fZ;
+	myf fA;
+	myf fZpos; // z position
 };
 
 #endif /*CBMLITMATERIALINFO_H_*/

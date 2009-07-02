@@ -16,6 +16,13 @@ public:
 
 	virtual LitStatus DoSelect(
 			TrackPtrVector& tracks) = 0;
+
+//	virtual LitStatus DoSelect(
+//			TrackBranchPtrIterator itBegin,
+//			TrackBranchPtrIterator itEnd) = 0;
+//
+//	virtual LitStatus DoSelect(
+//			TrackBranchPtrVector& tracks) = 0;
 };
 
 #endif /*CBMLITTRACKSELECTION_H_*/

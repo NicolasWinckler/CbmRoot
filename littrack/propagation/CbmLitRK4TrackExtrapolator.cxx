@@ -28,7 +28,7 @@ LitStatus CbmLitRK4TrackExtrapolator::Finalize()
 LitStatus CbmLitRK4TrackExtrapolator::Extrapolate(
 		const CbmLitTrackParam *parIn,
         CbmLitTrackParam *parOut,
-        double zOut)
+        myf zOut)
 {
    *parOut = *parIn;
    return Extrapolate(parOut, zOut);
@@ -36,19 +36,20 @@ LitStatus CbmLitRK4TrackExtrapolator::Extrapolate(
 
 LitStatus CbmLitRK4TrackExtrapolator::Extrapolate(
 		CbmLitTrackParam *par,
-        double zOut)
+        myf zOut)
 {
-   double zIn = par->GetZ();
+   myf zIn = par->GetZ();
 
-   std::vector<double> xIn = par->GetStateVector();
-   std::vector<double> xOut(5, 0.);
+   std::vector<myf> xIn = par->GetStateVector();
+   std::vector<myf> xOut(5, 0.);
    fF.assign(25, 0.);
 
    RK4Order(xIn, zIn, xOut, zOut, fF);
 
-   std::vector<double> cIn = par->GetCovMatrix();
-   std::vector<double> cOut(15);
+   std::vector<myf> cIn = par->GetCovMatrix();
+   std::vector<myf> cOut(15);
    TransportC(cIn, fF, cOut);
+//   Similarity(fF, cIn, cOut);
 
    par->SetStateVector(xOut);
    par->SetCovMatrix(cOut);
@@ -58,38 +59,32 @@ LitStatus CbmLitRK4TrackExtrapolator::Extrapolate(
 }
 
 void CbmLitRK4TrackExtrapolator::TransportMatrix(
-		   std::vector<double>& F)
+		   std::vector<myf>& F)
 {
 	F.assign(fF.begin(), fF.end());
 }
 
-void CbmLitRK4TrackExtrapolator::TransportMatrix(
-		   TMatrixD& F)
-{
-	F.SetMatrixArray(&fF[0]);
-}
-
 void CbmLitRK4TrackExtrapolator::RK4Order(
-		const std::vector<double>& xIn,
-		double zIn,
-		std::vector<double>& xOut,
-        double zOut,
-        std::vector<double>& derivs) const
+		const std::vector<myf>& xIn,
+		myf zIn,
+		std::vector<myf>& xOut,
+        myf zOut,
+        std::vector<myf>& derivs) const
 {
-   const double fC = 0.000299792458;
+   const myf fC = 0.000299792458;
 
-   double coef[4] = {0.0, 0.5, 0.5, 1.0};
+   myf coef[4] = {0.0, 0.5, 0.5, 1.0};
 
-   double Ax[4], Ay[4];
-   double dAx_dtx[4], dAy_dtx[4], dAx_dty[4], dAy_dty[4];
-   double k[4][4];
+   myf Ax[4], Ay[4];
+   myf dAx_dtx[4], dAy_dtx[4], dAx_dty[4], dAy_dty[4];
+   myf k[4][4];
 
-   double h = zOut - zIn;
-   double hC   = h * fC;
-   double hCqp = h * fC * xIn[4];
-   double x0[4];
+   myf h = zOut - zIn;
+   myf hC   = h * fC;
+   myf hCqp = h * fC * xIn[4];
+   myf x0[4];
 
-   double x[4] = {xIn[0], xIn[1], xIn[2], xIn[3]};
+   myf x[4] = {xIn[0], xIn[1], xIn[2], xIn[3]};
 
    for (unsigned int iStep = 0; iStep < 4; iStep++) { // 1
       if (iStep > 0) {
@@ -98,18 +93,19 @@ void CbmLitRK4TrackExtrapolator::RK4Order(
          }
       }
 
+      //TODO:: change doouble to myf here
       double pos[3] = {x[0], x[1], zIn + coef[iStep] * h};
       double B[3];
       fMagneticField->GetFieldValue(pos, B);
 
-      double tx = x[2];
-      double ty = x[3];
-      double txtx = tx * tx;
-      double tyty = ty * ty;
-      double txty = tx * ty;
-      double txtxtyty1= 1.0 + txtx + tyty;
-      double t1 = std::sqrt(txtxtyty1);
-      double t2 = 1.0 / txtxtyty1;
+      myf tx = x[2];
+      myf ty = x[3];
+      myf txtx = tx * tx;
+      myf tyty = ty * ty;
+      myf txty = tx * ty;
+      myf txtxtyty1= 1.0 + txtx + tyty;
+      myf t1 = std::sqrt(txtxtyty1);
+      myf t2 = 1.0 / txtxtyty1;
 
       Ax[iStep] = ( txty * B[0] + ty * B[2] - ( 1.0 + txtx ) * B[1] ) * t1;
       Ay[iStep] = (-txty * B[1] - tx * B[2] + ( 1.0 + tyty ) * B[0] ) * t1;
@@ -230,32 +226,32 @@ void CbmLitRK4TrackExtrapolator::RK4Order(
    // end calculation of the derivatives
 }
 
-double CbmLitRK4TrackExtrapolator::CalcOut(
-		double in,
-		const double k[4]) const
+myf CbmLitRK4TrackExtrapolator::CalcOut(
+		myf in,
+		const myf k[4]) const
 {
 	return in + k[0]/6. + k[1]/3. + k[2]/3. + k[3]/6.;
 }
 
 void CbmLitRK4TrackExtrapolator::TransportC(
-		const std::vector<double>& cIn,
-		const std::vector<double>& F,
-		std::vector<double>& cOut) const
+		const std::vector<myf>& cIn,
+		const std::vector<myf>& F,
+		std::vector<myf>& cOut) const
 {
 	// F*C*Ft
-	double A = cIn[2] + F[2] * cIn[9] + F[3] * cIn[10] + F[4] * cIn[11];
-	double B = cIn[3] + F[2] * cIn[10] + F[3] * cIn[12] + F[4] * cIn[13];
-	double C = cIn[4] + F[2] * cIn[11] + F[3] * cIn[13] + F[4] * cIn[14];
+	myf A = cIn[2] + F[2] * cIn[9] + F[3] * cIn[10] + F[4] * cIn[11];
+	myf B = cIn[3] + F[2] * cIn[10] + F[3] * cIn[12] + F[4] * cIn[13];
+	myf C = cIn[4] + F[2] * cIn[11] + F[3] * cIn[13] + F[4] * cIn[14];
 
-	double D = cIn[6] + F[7] * cIn[9] + F[8] * cIn[10] + F[9] * cIn[11];
-	double E = cIn[7] + F[7] * cIn[10] + F[8] * cIn[12] + F[9] * cIn[13];
-	double G = cIn[8] + F[7] * cIn[11] + F[8] * cIn[13] + F[9] * cIn[14];
+	myf D = cIn[6] + F[7] * cIn[9] + F[8] * cIn[10] + F[9] * cIn[11];
+	myf E = cIn[7] + F[7] * cIn[10] + F[8] * cIn[12] + F[9] * cIn[13];
+	myf G = cIn[8] + F[7] * cIn[11] + F[8] * cIn[13] + F[9] * cIn[14];
 
-	double H = cIn[9] + F[13] * cIn[10] + F[14] * cIn[11];
-	double I = cIn[10] + F[13] * cIn[12] + F[14] * cIn[13];
-	double J = cIn[11] + F[13] * cIn[13] + F[14] * cIn[14];
+	myf H = cIn[9] + F[13] * cIn[10] + F[14] * cIn[11];
+	myf I = cIn[10] + F[13] * cIn[12] + F[14] * cIn[13];
+	myf J = cIn[11] + F[13] * cIn[13] + F[14] * cIn[14];
 
-	double K = cIn[13] + F[17] * cIn[11] + F[19] * cIn[14];
+	myf K = cIn[13] + F[17] * cIn[11] + F[19] * cIn[14];
 
 	cOut[0] = cIn[0] + F[2] * cIn[2] + F[3] * cIn[3] + F[4] * cIn[4] + A * F[2] + B * F[3] + C * F[4];
 	cOut[1] = cIn[1] + F[2] * cIn[6] + F[3] * cIn[7] + F[4] * cIn[8] + A * F[7] + B * F[8] + C * F[9];

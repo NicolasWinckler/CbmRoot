@@ -51,11 +51,11 @@ StatusCode CbmPropagatorLit::Propagate(
 void CbmPropagatorLit::TransportMatrix(
 		   std::vector<Double_t>& F)
 {
-	fPropagator->TransportMatrix(F);
+//	fPropagator->TransportMatrix(F);
 }
 
 void CbmPropagatorLit::TransportMatrix(
 		   TMatrixD& F)
 {
-	fPropagator->TransportMatrix(F);
+//	fPropagator->TransportMatrix(F);
 }

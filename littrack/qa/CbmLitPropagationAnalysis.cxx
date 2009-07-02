@@ -70,9 +70,9 @@ InitStatus CbmLitPropagationAnalysis::Init()
 
 	// Create tools
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fPropagator = factory->CreateTrackPropagator("mylit");
+	fPropagator = factory->CreateTrackPropagator("lit");
 	fFilter = factory->CreateTrackUpdate("kalman");
-	fFitter = factory->CreateTrackFitter("mylit_kalman");
+	fFitter = factory->CreateTrackFitter("lit_kalman");
 	fSmoother = factory->CreateTrackFitter("kalman_smoother");
 
 	CreateHistograms();

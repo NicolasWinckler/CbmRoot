@@ -186,7 +186,7 @@ LitStatus CbmLitTrackFitterRobust::CalculateWeights(
 	if (iter == 0) {
 		fSimpleWeightCalculator->DoCalculate(par, itBegin, itEnd, 0);
 	} else {
-		double T = fAnnealing[iter];
+		myf T = fAnnealing[iter];
 		fGaussWeightCalculator->DoCalculate(par, itBegin, itEnd, T);
 	}
 	return kLITSUCCESS;

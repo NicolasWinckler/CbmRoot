@@ -49,48 +49,48 @@ void CbmLitWeightedHitCalculatorImp::CalculateWeightedHit(
 		CbmLitPixelHit* hit)
 {
 	//calculate effective weight matrix G
-	Double_t eG00 = 0., eG01 = 0., eG11 = 0.;
+	myf eG00 = 0., eG01 = 0., eG11 = 0.;
 	for (HitPtrIterator it = itBegin; it != itEnd; it++) {
 		CbmLitPixelHit* h = static_cast<const CbmLitPixelHit*>(*it);
 		if (h->IsOutlier()) continue;
-		Double_t dxx = h->GetDx() * h->GetDx();
-		Double_t dyy = h->GetDy() * h->GetDy();
-		Double_t dxy = h->GetDxy();
+		myf dxx = h->GetDx() * h->GetDx();
+		myf dyy = h->GetDy() * h->GetDy();
+		myf dxy = h->GetDxy();
 
-		Double_t G00, G01, G11;
+		myf G00, G01, G11;
 		Inverse(dxx, dxy, dyy, G00, G01, G11);
 
-		Double_t w = h->GetW();
+		myf w = h->GetW();
 		eG00 += w * G00;
 		eG01 += w * G01;
 		eG11 += w * G11;
 	}
 
 	//calculate effective cov matrix V
-	Double_t eV00, eV01, eV11;
+	myf eV00, eV01, eV11;
 	Inverse(eG00, eG01, eG11, eV00, eV01, eV11);
 
 	// calculate effective x and y
-	Double_t m0 = 0., m1 = 0.;
+	myf m0 = 0., m1 = 0.;
 	for (HitPtrIterator it = itBegin; it != itEnd; it++) {
 		CbmLitPixelHit* h = static_cast<const CbmLitPixelHit*>(*it);
 		if (h->IsOutlier()) continue;
-		Double_t dxx = h->GetDx() * h->GetDx();
-		Double_t dyy = h->GetDy() * h->GetDy();
-		Double_t dxy = h->GetDxy();
-		Double_t x = h->GetX();
-		Double_t y = h->GetY();
+		myf dxx = h->GetDx() * h->GetDx();
+		myf dyy = h->GetDy() * h->GetDy();
+		myf dxy = h->GetDxy();
+		myf x = h->GetX();
+		myf y = h->GetY();
 
-		Double_t G00, G01, G11;
+		myf G00, G01, G11;
 		Inverse(dxx, dxy, dyy, G00, G01, G11);
 
-		Double_t w = h->GetW();
+		myf w = h->GetW();
 
 		m0 += w * (G00 * x + G01 * y);
 		m1 += w * (G11 * y + G01 * x);
 	}
-	Double_t x = eV00 * m0 + eV01 * m1;
-	Double_t y = eV11 * m1 + eV01 * m0;
+	myf x = eV00 * m0 + eV01 * m1;
+	myf y = eV11 * m1 + eV01 * m0;
 
 	hit->SetX(x);
 	hit->SetY(y);
@@ -107,27 +107,27 @@ void CbmLitWeightedHitCalculatorImp::CalculateWeightedHit(
 		CbmLitStripHit* hit)
 {
 	//calculate effective weight matrix G
-	Double_t eG = 0.;
+	myf eG = 0.;
 	for (HitPtrIterator it = itBegin; it != itEnd; it++) {
 		CbmLitStripHit* h = static_cast<const CbmLitStripHit*>(*it);
 		if (h->IsOutlier()) continue;
-		Double_t duu = h->GetDu() * h->GetDu();
-		Double_t w = h->GetW();
-		Double_t G = 1./duu;
+		myf duu = h->GetDu() * h->GetDu();
+		myf w = h->GetW();
+		myf G = 1./duu;
 		eG += w * G;
 	}
-	Double_t eV = 1./eG;
+	myf eV = 1./eG;
 
-	Double_t m0 = 0.;
+	myf m0 = 0.;
 	for (HitPtrIterator it = itBegin; it != itEnd; it++) {
 		CbmLitStripHit* h = static_cast<const CbmLitStripHit*>(*it);
 		if (h->IsOutlier()) continue;
-		Double_t duu = h->GetDu() * h->GetDu();
-		Double_t u = h->GetU();
-		Double_t w = h->GetW();
+		myf duu = h->GetDu() * h->GetDu();
+		myf u = h->GetU();
+		myf w = h->GetW();
 		m0 += w * (1./duu) * u;
 	}
-	Double_t eU = eV * m0;
+	myf eU = eV * m0;
 
 	hit->SetU(eU);
 	hit->SetZ((*itBegin)->GetZ());
@@ -136,11 +136,11 @@ void CbmLitWeightedHitCalculatorImp::CalculateWeightedHit(
 }
 
 void CbmLitWeightedHitCalculatorImp::Inverse(
-		Double_t v00, Double_t v01, Double_t v11,
-		Double_t& u00, Double_t& u01, Double_t& u11)
+		myf v00, myf v01, myf v11,
+		myf& u00, myf& u01, myf& u11)
 {
 	if (v01 != 0.) {
-		Double_t norm = v00 * v11 - v01 * v01;
+		myf norm = v00 * v11 - v01 * v01;
 		u00 = v11 / norm;
 		u01 = -v01 / norm;
 		u11 = v00 / norm;

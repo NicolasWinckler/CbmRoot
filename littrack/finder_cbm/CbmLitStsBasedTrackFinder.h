@@ -4,6 +4,8 @@
 #include "CbmLitTypes.h"
 #include "CbmLitPtrTypes.h"
 
+#include "TObject.h"
+
 class CbmLitTrackPropagator;
 class CbmLitDetectorLayout;
 class TClonesArray;
@@ -16,7 +18,7 @@ public:
 
 	void DefaultInit();
 
-    Int_t DefaultDoFind(
+    int DefaultDoFind(
     		TClonesArray* hitArray,
             TClonesArray* trackArray);
 
@@ -24,7 +26,7 @@ public:
     		TClonesArray* trackArray,
     		TrackPtrVector& trackSeeds,
     		const CbmLitDetectorLayout& layout,
-    		Int_t pdg);
+    		int pdg);
 
     void SetPropagatorToDet(TrackPropagatorPtr propagatorToDet) { fPropagatorToDet = propagatorToDet;}
 

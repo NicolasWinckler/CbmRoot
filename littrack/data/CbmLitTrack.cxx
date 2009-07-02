@@ -32,7 +32,7 @@ CbmLitTrack& CbmLitTrack::operator=(
 {
 	for_each(fHits.begin(), fHits.end(), DeleteObject());
 	fHits.clear();
-	for (Int_t iHit = 0; iHit < track.GetNofHits(); iHit++)
+	for (int iHit = 0; iHit < track.GetNofHits(); iHit++)
 		AddHit(track.GetHit(iHit));
 
 	SetParamFirst(track.GetParamFirst());
@@ -63,7 +63,7 @@ void CbmLitTrack::AddHit(
 }
 
 void CbmLitTrack::RemoveHit(
-		Int_t index)
+		int index)
 {
 	delete fHits[index];
 	fHits.erase(fHits.begin() + index);
@@ -99,8 +99,8 @@ bool CbmLitTrack::CheckParams() const
 {
 	//TODO improve parameters check for the track
 
-	std::vector<Double_t> covFirst(fParamFirst.GetCovMatrix());
-	std::vector<Double_t> covLast(fParamLast.GetCovMatrix());
+	std::vector<myf> covFirst(fParamFirst.GetCovMatrix());
+	std::vector<myf> covLast(fParamLast.GetCovMatrix());
 	for (int i = 0; i < 15; i++) {
 		if (std::abs(covFirst[i]) > 10000. ||
 			std::abs(covLast[i]) > 10000.) return false;

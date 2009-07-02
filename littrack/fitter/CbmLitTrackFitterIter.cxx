@@ -6,13 +6,13 @@
 #include <iostream>
 
 CbmLitTrackFitterIter::CbmLitTrackFitterIter(
-		CbmLitTrackFitter* fitter,
-		CbmLitTrackFitter* smoother)
+		TrackFitterPtr fitter,
+		TrackFitterPtr smoother)
 {
 	fFitter = fitter;
 	fSmoother = smoother;
 	fNofIterations = 1;
-	fChiSqCut = 10;
+	fChiSqCut = 10.;
 	fMinNofHits = 2;
 }
 
@@ -34,10 +34,7 @@ LitStatus CbmLitTrackFitterIter::Fit(
 		CbmLitTrack *track,
 		bool downstream)
 {
-//	std::cout << "FIT start. ";
-//	std::cout << "nofHits = " << track->GetNofHits() << " ;";
 	for (int iter = 0; iter < fNofIterations; iter++) {
-//		std::cout << "Iter " << iter << " started ;" << std::endl;
 		bool isRefit = false;
 
 		if (fFitter->Fit(track) == kLITERROR) {
@@ -49,20 +46,15 @@ LitStatus CbmLitTrackFitterIter::Fit(
 		}
 
 		if (iter < fNofIterations -1) {
-//			std::cout << "chi2: ";
 			for (int i = 0; i < track->GetNofHits(); i++) {
-				double chiSq = track->GetFitNode(i)->GetChiSqSmoothed();
-//				std::cout << " " << chiSq;
+				myf chiSq = track->GetFitNode(i)->GetChiSqSmoothed();
 				if (chiSq > fChiSqCut) {
 					track->RemoveHit(i);
 					isRefit = true;
 				}
 			}
-//			std::cout << std::endl;
 		}
 
-//		std::cout << "nofHits = " << track->GetNofHits() << " ; ";
-//		std::cout << "Iter " << iter << " finished" << std::endl;
 		if (track->GetNofHits() < fMinNofHits) return kLITERROR;
 		if (!isRefit) return kLITSUCCESS;
 	}

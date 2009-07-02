@@ -131,6 +131,7 @@ selection/CbmLitTrackSelectionMuchRobust.cxx
 selection/CbmLitTrackSelectionChiSq.cxx
 utils/CbmLitConverter.cxx
 utils/CbmLitMath.cxx
+utils/CbmLitMatrixMath.cxx
 )
 
 SET(LITTRACK_SRCS ${LITTRACK_SRCS_RULECHECKER})

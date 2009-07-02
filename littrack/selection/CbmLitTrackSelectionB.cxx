@@ -38,12 +38,12 @@ LitStatus CbmLitTrackSelectionB::DoSelect(
 
 	std::sort(itBegin, itEnd, CompareTrackPtrPrevTrackIdLess());
 
-	Int_t minId = (*itBegin)->GetPreviousTrackId();
-	Int_t maxId = (*(itEnd-1))->GetPreviousTrackId();
+	int minId = (*itBegin)->GetPreviousTrackId();
+	int maxId = (*(itEnd-1))->GetPreviousTrackId();
 
 	//std::cout << "minId=" << minId << ", maxId=" << maxId << std::endl;
 
-	for (Int_t iId = minId; iId <= maxId; iId++) {
+	for (int iId = minId; iId <= maxId; iId++) {
 		CbmLitTrack value;
 		value.SetPreviousTrackId(iId);
 		//if (!std::binary_search(tracks.begin(), tracks.end(), &value, CompareTrackPtrNofHitsMore())) continue;
@@ -82,10 +82,10 @@ void CbmLitTrackSelectionB::SortLastPlaneId(
 //			std::cout << (*iTrack)->GetLastPlaneId() << " ";
 //	std::cout << std::endl << "NofTracks = " << tracks.size() << std::endl;
 
-	Int_t maxPlaneId = (*itBegin)->GetLastPlaneId();
-	Int_t minPlaneId = (*(itEnd-1))->GetLastPlaneId();
+	int maxPlaneId = (*itBegin)->GetLastPlaneId();
+	int minPlaneId = (*(itEnd-1))->GetLastPlaneId();
 
-	for (Int_t iPlaneId = minPlaneId; iPlaneId <= maxPlaneId; iPlaneId++) {
+	for (int iPlaneId = minPlaneId; iPlaneId <= maxPlaneId; iPlaneId++) {
 		CbmLitTrack value;
 		value.SetLastPlaneId(iPlaneId);
 		//if (!std::binary_search(tracks.begin(), tracks.end(), &value, CompareTrackPtrLastPlaneIdMore())) continue;

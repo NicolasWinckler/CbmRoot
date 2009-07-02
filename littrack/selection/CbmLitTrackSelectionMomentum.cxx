@@ -36,7 +36,7 @@ LitStatus CbmLitTrackSelectionMomentum::DoSelect(
 			(*iTrack)->SetQuality(kLITBAD);
 			continue;
 		}
-		Double_t mom = std::abs(1. / (*iTrack)->GetParamLast()->GetQp());
+		myf mom = std::abs(1. / (*iTrack)->GetParamLast()->GetQp());
 		if (mom < fMinMomentum) (*iTrack)->SetQuality(kLITBAD);
 	}
 	return kLITSUCCESS;

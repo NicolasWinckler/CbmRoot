@@ -11,16 +11,22 @@ public:
 	virtual ~CbmLitTrackFinderNN();
 
 	virtual LitStatus DoFind(
-			const HitPtrVector& hits,
-			const TrackPtrVector& trackSeeds,
+			HitPtrVector& hits,
+			TrackPtrVector& trackSeeds,
 			TrackPtrVector& tracks);
 
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
 
+	void SetSeedSelection(TrackSelectionPtr seedSelection) {fSeedSelection=seedSelection;}
+	void SetPropagator(TrackPropagatorPtr propagator) {fPropagator = propagator;}
+	void SetFinalSelection(TrackSelectionPtr finalSelection) {fFinalSelection = finalSelection;}
 	void SetFilter(TrackUpdatePtr filter) {fFilter = filter;}
 
 protected:
+    void InitTrackSeeds(
+    		TrackPtrIterator itBegin,
+    		TrackPtrIterator itEnd);
 
 	void FollowTracks(
 			TrackPtrIterator itBegin,
@@ -42,7 +48,12 @@ protected:
 			CbmLitTrack* track,
 			HitPtrIteratorPair bounds);
 private:
+	TrackPtrVector fTracks;
+
 	TrackUpdatePtr fFilter;
+	TrackSelectionPtr fSeedSelection;
+	TrackSelectionPtr fFinalSelection;
+	TrackPropagatorPtr fPropagator;
 };
 
 #endif /* CBMLITTRACKFINDERNN_H_ */

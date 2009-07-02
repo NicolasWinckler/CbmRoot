@@ -3,6 +3,8 @@
 #include "CbmLitToolFactory.h"
 #include "CbmLitTrackParam.h"
 #include "CbmLitEnums.h"
+#include "CbmLitMath.h"
+#include "CbmLitMatrixMath.h"
 
 CbmLitCleverTrackExtrapolator::CbmLitCleverTrackExtrapolator():
 	fZMax(450.),
@@ -31,7 +33,7 @@ LitStatus CbmLitCleverTrackExtrapolator::Finalize()
 LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 		const CbmLitTrackParam *parIn,
         CbmLitTrackParam *parOut,
-        double zOut)
+        myf zOut)
 {
    *parOut = *parIn;
    return Extrapolate(parOut, zOut);
@@ -39,9 +41,9 @@ LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 
 LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 		CbmLitTrackParam *par,
-        double zOut)
+        myf zOut)
 {
-	double zIn = par->GetZ();
+	myf zIn = par->GetZ();
 	fOption = -1;
 
 	if (zIn >= fZMax && zOut >= fZMax) {
@@ -69,15 +71,7 @@ LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 }
 
 void CbmLitCleverTrackExtrapolator::TransportMatrix(
-		   std::vector<double>& F)
-{
-	TMatrixD F1;
-	F1.Use(5, 5, &F[0]);
-	TransportMatrix(F1);
-}
-
-void CbmLitCleverTrackExtrapolator::TransportMatrix(
-		   TMatrixD& F)
+		std::vector<myf>& F)
 {
 	if (fOption == 0) {
 		fLineExtrapolator->TransportMatrix(F);
@@ -88,17 +82,17 @@ void CbmLitCleverTrackExtrapolator::TransportMatrix(
 		return;
 	} else
 	if (fOption == 2) {
-		TMatrixD F1(5,5), F2(5,5);
+		std::vector<myf> F1(25), F2(25);
 		fRK4Extrapolator->TransportMatrix(F1);
 		fLineExtrapolator->TransportMatrix(F2);
-		F = F1 * F2;
+		Mult25(F1, F2, F);
 		return;
 	} else
 	if (fOption == 3) {
-		TMatrixD F1(5,5), F2(5,5);
+		std::vector<myf> F1(25), F2(25);
 		fLineExtrapolator->TransportMatrix(F1);
 		fRK4Extrapolator->TransportMatrix(F2);
-		F = F1 * F2;
+		Mult25(F1, F2, F);
 		return;
 	}
 }

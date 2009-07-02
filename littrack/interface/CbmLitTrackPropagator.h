@@ -11,8 +11,7 @@
 #define CBMLITTRACKPROPAGATOR_H_
 
 #include "CbmLitTool.h"
-
-#include "TMatrixD.h"
+#include "CbmLitFloat.h"
 
 #include <vector>
 
@@ -29,19 +28,16 @@ public:
    virtual LitStatus Propagate(
 		   const CbmLitTrackParam *parIn,
            CbmLitTrackParam *parOut,
-           Double_t zOut,
-           Int_t pdg) = 0;
+           myf zOut,
+           int pdg) = 0;
 
    virtual LitStatus Propagate(
 		   CbmLitTrackParam *par,
-           Double_t zOut,
-           Int_t pdg) = 0;
+           myf zOut,
+           int pdg) = 0;
 
    virtual void TransportMatrix(
-		   std::vector<Double_t>& F) = 0;
-
-   virtual void TransportMatrix(
-		   TMatrixD& F) = 0;
+		   std::vector<myf>& F) = 0;
 };
 
 #endif //CbmLitTrackPropagator

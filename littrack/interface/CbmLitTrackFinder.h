@@ -11,8 +11,8 @@ public:
 	virtual ~CbmLitTrackFinder();
 
 	virtual LitStatus DoFind(
-			const HitPtrVector& hits,
-			const TrackPtrVector& trackSeeds,
+			HitPtrVector& hits,
+			TrackPtrVector& trackSeeds,
 			TrackPtrVector& tracks) = 0;
 };
 

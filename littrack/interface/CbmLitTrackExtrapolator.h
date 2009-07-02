@@ -11,8 +11,7 @@
 #define CBMLITTRACKEXTRAPOLATOR_H_
 
 #include "CbmLitTool.h"
-
-#include "TMatrixD.h"
+#include "CbmLitFloat.h"
 
 #include <vector>
 
@@ -29,17 +28,14 @@ public:
    virtual LitStatus Extrapolate(
 		   const CbmLitTrackParam *parIn,
            CbmLitTrackParam *parOut,
-           double zOut) = 0;
+           myf zOut) = 0;
 
    virtual LitStatus Extrapolate(
 		   CbmLitTrackParam *par,
-           double zOut ) = 0;
+           myf zOut ) = 0;
 
    virtual void TransportMatrix(
-		   std::vector<double>& F) = 0;
-
-   virtual void TransportMatrix(
-		   TMatrixD& F) = 0;
+		   std::vector<myf>& F) = 0;
 };
 
 #endif

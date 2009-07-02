@@ -9,26 +9,26 @@ public:
 	CbmLitStripHit();
 	virtual ~CbmLitStripHit();
 
-	double GetU() const { return fU; }
-	double GetDu() const { return fDu; }
-	double GetPhi() const { return fPhi; }
-	double GetCosPhi() const { return fCosPhi; }
-	double GetSinPhi() const { return fSinPhi; }
+	myf GetU() const { return fU; }
+	myf GetDu() const { return fDu; }
+	myf GetPhi() const { return fPhi; }
+	myf GetCosPhi() const { return fCosPhi; }
+	myf GetSinPhi() const { return fSinPhi; }
 
-	void SetU(double u) { fU = u; }
-	void SetDu(double du) { fDu = du; }
-	void SetPhi(double phi) { fPhi = phi; }
-	void SetCosPhi(double cosPhi) { fCosPhi = cosPhi; }
-	void SetSinPhi(double sinPhi) { fSinPhi = sinPhi; }
+	void SetU(myf u) { fU = u; }
+	void SetDu(myf du) { fDu = du; }
+	void SetPhi(myf phi) { fPhi = phi; }
+	void SetCosPhi(myf cosPhi) { fCosPhi = cosPhi; }
+	void SetSinPhi(myf sinPhi) { fSinPhi = sinPhi; }
 
 	virtual std::string ToString() const;
 
 protected:
-	double fU;
-	double fDu;
-	double fPhi;
-	double fCosPhi;
-	double fSinPhi;
+	myf fU;
+	myf fDu;
+	myf fPhi;
+	myf fCosPhi;
+	myf fSinPhi;
 };
 
 #endif /*CBMLITSTRIPHIT_H_*/

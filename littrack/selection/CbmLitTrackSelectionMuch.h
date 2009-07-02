@@ -21,13 +21,13 @@ public:
 	virtual LitStatus DoSelect(
 			TrackPtrVector& tracks);
 
-	Int_t GetNofSharedHits() const {return fNofSharedHits;}
-	Int_t GetMinLastPlaneId() const {return fMinLastPlaneId;}
-	Int_t GetMinNofHits() const {return fMinNofHits;}
+	int GetNofSharedHits() const {return fNofSharedHits;}
+	int GetMinLastPlaneId() const {return fMinLastPlaneId;}
+	int GetMinNofHits() const {return fMinNofHits;}
 
-	void SetNofSharedHits(Int_t nofHits) {fNofSharedHits = nofHits;}
-	void SetMinLastPlaneId(Int_t minLastPlaneId) {fMinLastPlaneId = minLastPlaneId;}
-	void SetMinNofHits(Int_t minNofHits) {fMinNofHits = minNofHits;}
+	void SetNofSharedHits(int nofHits) {fNofSharedHits = nofHits;}
+	void SetMinLastPlaneId(int minLastPlaneId) {fMinLastPlaneId = minLastPlaneId;}
+	void SetMinNofHits(int minNofHits) {fMinNofHits = minNofHits;}
 
 private:
 	TrackSelectionPtr fSelectionA;
@@ -35,9 +35,9 @@ private:
 	TrackSelectionPtr fSelectionC;
 	TrackSelectionPtr fSelectionD;
 
-	Int_t fNofSharedHits;
-	Int_t fMinNofHits;
-	Int_t fMinLastPlaneId;
+	int fNofSharedHits;
+	int fMinNofHits;
+	int fMinLastPlaneId;
 };
 
 #endif /*CBMLITTRACKSELECTIONMUCH_H_*/

@@ -31,7 +31,7 @@ LitStatus CbmLitTGeoNavigator::Finalize()
 
 LitStatus CbmLitTGeoNavigator::FindIntersections(
 		const CbmLitTrackParam* par,
-		double zOut,
+		myf zOut,
 		std::vector<CbmLitMaterialInfo>& inter)
 {
 	InitTrack(par);
@@ -49,7 +49,7 @@ LitStatus CbmLitTGeoNavigator::FindIntersections(
 		}
 		if (stepInfo.GetZpos() > zOut) {
 			fGeo->PopPoint();
-			double l = CalcLength(zOut);
+			myf l = CalcLength(zOut);
 			stepInfo = MakeStep(l);
 			last = true;
 		} else {
@@ -63,14 +63,14 @@ LitStatus CbmLitTGeoNavigator::FindIntersections(
 void CbmLitTGeoNavigator::InitTrack(
 		const CbmLitTrackParam* par) const
 {
-	double nx, ny, nz;
+	myf nx, ny, nz;
 	par->GetDirCos(nx, ny, nz);
 	fGeo->InitTrack(par->GetX(), par->GetY(), par->GetZ(),
 			               nx, ny, nz);
 }
 
 CbmLitMaterialInfo CbmLitTGeoNavigator::MakeStep(
-		double step) const
+		myf step) const
 {
 	// fill current material information and then make a step
 	CbmLitMaterialInfo matInfo;
@@ -93,20 +93,20 @@ CbmLitMaterialInfo CbmLitTGeoNavigator::MakeStep(
 	return matInfo;
 }
 
-double CbmLitTGeoNavigator::CalcLength(
-		double zOut) const
+myf CbmLitTGeoNavigator::CalcLength(
+		myf zOut) const
 {
 	//find intersection point of straight line with plane
-	double nx = fGeo->GetCurrentDirection()[0];
-	double ny = fGeo->GetCurrentDirection()[1];
-	double nz = fGeo->GetCurrentDirection()[2];
-	double z = fGeo->GetCurrentPoint()[2];
+	myf nx = fGeo->GetCurrentDirection()[0];
+	myf ny = fGeo->GetCurrentDirection()[1];
+	myf nz = fGeo->GetCurrentDirection()[2];
+	myf z = fGeo->GetCurrentPoint()[2];
 
-	double t0 = (zOut - z) / nz;
+	myf t0 = (zOut - z) / nz;
 
-	double dx = nx * t0;
-	double dy = ny * t0;
-	double dz = (zOut - z);//nz * t0;
+	myf dx = nx * t0;
+	myf dy = ny * t0;
+	myf dz = (zOut - z);//nz * t0;
 
 	//calculate distance between two points
 	return std::sqrt( dx * dx + dy * dy + dz * dz);

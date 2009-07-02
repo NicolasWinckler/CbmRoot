@@ -48,11 +48,11 @@ void CbmLitHitData::AddHit(
 	if (hit->GetType() == kLITSTRIPHIT) {
 		CbmLitStripHit* stripHit = static_cast<const CbmLitStripHit*>(hit);
 		if (fMaxErr[stationGroup][station][substation].first < stripHit->GetDu())
-			fMaxErr[stationGroup][station][substation] = std::pair<double, Char_t>(stripHit->GetDu(), 'U');
+			fMaxErr[stationGroup][station][substation] = std::pair<myf, char>(stripHit->GetDu(), 'U');
 	} else if (hit->GetType() == kLITPIXELHIT) {
 		CbmLitPixelHit* pixelHit = static_cast<const CbmLitPixelHit*>(hit);
 		if (fMaxErr[stationGroup][station][substation].first < pixelHit->GetDx())
-			fMaxErr[stationGroup][station][substation] = std::pair<double, Char_t>(pixelHit->GetDx(), 'X');
+			fMaxErr[stationGroup][station][substation] = std::pair<myf, char>(pixelHit->GetDx(), 'X');
 	}
 }
 
@@ -124,7 +124,7 @@ void CbmLitHitData::Clear()
 			for(int k = 0; k < fHits[i][j].size(); k++){
 				fHits[i][j][k].clear();
 				fHits[i][j][k].reserve(1500);
-				fMaxErr[i][j][k] = std::pair<double, Char_t>(0., ' ');
+				fMaxErr[i][j][k] = std::pair<myf, char>(0., ' ');
 			}
 		}
 	}
@@ -168,7 +168,7 @@ void CbmLitHitData::StationByPlaneId(
 	}
 }
 
-std::pair<double, Char_t> CbmLitHitData::GetMaxErr(
+std::pair<myf, char> CbmLitHitData::GetMaxErr(
 		int stationGroup,
 		int station,
 		int substation) const
@@ -176,7 +176,7 @@ std::pair<double, Char_t> CbmLitHitData::GetMaxErr(
 	return fMaxErr[stationGroup][station][substation];
 }
 
-std::pair<double, Char_t> CbmLitHitData::GetMaxErr(
+std::pair<myf, char> CbmLitHitData::GetMaxErr(
 		int planeId) const
 {
 	int stationGroup;

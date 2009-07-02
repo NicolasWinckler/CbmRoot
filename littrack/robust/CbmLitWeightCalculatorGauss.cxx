@@ -29,7 +29,7 @@ LitStatus CbmLitWeightCalculatorGauss::DoCalculate(
 		const CbmLitTrackParam* par,
 		HitPtrIterator itBegin,
 		HitPtrIterator itEnd,
-		Double_t T)
+		myf T)
 {
 	for(HitPtrIterator it = itBegin; it != itEnd; it++) {
 		if ((*it)->IsOutlier()) continue;
@@ -43,7 +43,7 @@ LitStatus CbmLitWeightCalculatorGauss::DoCalculate(
 LitStatus CbmLitWeightCalculatorGauss::DoCalculate(
 		const CbmLitTrackParam* par,
 		HitPtrVector& hits,
-		Double_t T)
+		myf T)
 {
 	return DoCalculate(par, hits.begin(), hits.end(), T);
 }
@@ -51,7 +51,7 @@ LitStatus CbmLitWeightCalculatorGauss::DoCalculate(
 LitStatus CbmLitWeightCalculatorGauss::MultivariateGaussWeight(
 		const CbmLitTrackParam* par,
 		CbmLitHit* hit,
-		Double_t T) const
+		myf T) const
 {
 	if (hit->GetType() == kLITSTRIPHIT)
 		return MultivariateGaussWeight(par, static_cast<const CbmLitStripHit*>(hit), T);
@@ -62,7 +62,7 @@ LitStatus CbmLitWeightCalculatorGauss::MultivariateGaussWeight(
 LitStatus CbmLitWeightCalculatorGauss::MultivariateGaussWeight(
 		const CbmLitTrackParam* par,
 		CbmLitStripHit* hit,
-		Double_t T) const
+		myf T) const
 {
 	std::cout << "MultivariateGaussWeight NOT IMPLEMENTED FOR STRIP HIT!!!!"<< std::endl;
 }
@@ -70,28 +70,28 @@ LitStatus CbmLitWeightCalculatorGauss::MultivariateGaussWeight(
 LitStatus CbmLitWeightCalculatorGauss::MultivariateGaussWeight(
 		const CbmLitTrackParam* par,
 		CbmLitPixelHit* hit,
-		Double_t T) const
+		myf T) const
 {
-	const Double_t PI = 3.14159265;
+	const myf PI = 3.14159265;
 
-	Double_t dx = hit->GetX() - par->GetX();
-	Double_t dy = hit->GetY() - par->GetY();
-	Double_t dxx = hit->GetDx() * hit->GetDx();
-	Double_t dyy = hit->GetDy() * hit->GetDy();
-	Double_t dxy = hit->GetDxy();
-	Double_t det = dxx * dyy - dxy * dxy;
-	Double_t s = (dx*dx*dyy - 2*dx*dy*dxy + dy*dy*dxx) / det;
+	myf dx = hit->GetX() - par->GetX();
+	myf dy = hit->GetY() - par->GetY();
+	myf dxx = hit->GetDx() * hit->GetDx();
+	myf dyy = hit->GetDy() * hit->GetDy();
+	myf dxy = hit->GetDxy();
+	myf det = dxx * dyy - dxy * dxy;
+	myf s = (dx*dx*dyy - 2*dx*dy*dxy + dy*dy*dxx) / det;
 
-	Double_t w = (1./((2.*PI) * std::sqrt(T*det))) * std::exp(-s/(2.*T));
+	myf w = (1./((2.*PI) * std::sqrt(T*det))) * std::exp(-s/(2.*T));
 	hit->SetW(w);
 
 	return kLITSUCCESS;
 }
 
-Double_t CbmLitWeightCalculatorGauss::MultivariateGaussCut(
+myf CbmLitWeightCalculatorGauss::MultivariateGaussCut(
 		const CbmLitHit* hit,
-		Double_t T,
-		Double_t cutValue) const
+		myf T,
+		myf cutValue) const
 {
 	if (hit->GetType() == kLITSTRIPHIT)
 		MultivariateGaussCut(static_cast<const CbmLitStripHit*>(hit), T, cutValue);
@@ -99,28 +99,28 @@ Double_t CbmLitWeightCalculatorGauss::MultivariateGaussCut(
 		MultivariateGaussCut(static_cast<const CbmLitPixelHit*>(hit), T, cutValue);
 }
 
-Double_t CbmLitWeightCalculatorGauss::MultivariateGaussCut(
+myf CbmLitWeightCalculatorGauss::MultivariateGaussCut(
 		const CbmLitStripHit* hit,
-		Double_t T,
-		Double_t cutValue) const
+		myf T,
+		myf cutValue) const
 {
 	std::cout << "MultivariateGaussCut NOT IMPLEMENTED FOR STRIP HIT!!!!"<< std::endl;
 }
 
-Double_t CbmLitWeightCalculatorGauss::MultivariateGaussCut(
+myf CbmLitWeightCalculatorGauss::MultivariateGaussCut(
 		const CbmLitPixelHit* hit,
-		Double_t T,
-		Double_t cutValue) const
+		myf T,
+		myf cutValue) const
 {
-	Double_t dim = 2.;
-	const Double_t PI = 3.14159265;
+	myf dim = 2.;
+	const myf PI = 3.14159265;
 
-	Double_t dxx = hit->GetDx() * hit->GetDx();
-	Double_t dyy = hit->GetDy() * hit->GetDy();
-	Double_t dxy = hit->GetDxy();
-	Double_t det = dxx * dyy - dxy * dxy;
+	myf dxx = hit->GetDx() * hit->GetDx();
+	myf dyy = hit->GetDy() * hit->GetDy();
+	myf dxy = hit->GetDxy();
+	myf det = dxx * dyy - dxy * dxy;
 
-	Double_t cut = (1./(std::pow(2.*PI, dim/2.) * std::sqrt(T*det))) *
+	myf cut = (1./(std::pow(2.*PI, dim/2.) * std::sqrt(T*det))) *
 					std::exp(-cutValue/(2.*T));
 	return cut;
 }
@@ -129,9 +129,9 @@ LitStatus CbmLitWeightCalculatorGauss::Normalize(
 		HitPtrIterator itBegin,
 		HitPtrIterator itEnd) const
 {
-	//Double_t cutValue = 3.;
-	Double_t sumW = 0.;
-	Double_t sumCut = 0.;
+	//myf cutValue = 3.;
+	myf sumW = 0.;
+	myf sumCut = 0.;
 	for(HitPtrIterator it = itBegin; it != itEnd; it++) {
 		if ((*it)->IsOutlier()) continue;
 		sumW += (*it)->GetW();

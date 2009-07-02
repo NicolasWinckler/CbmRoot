@@ -16,12 +16,12 @@ public:
 			const CbmLitTrackParam* par,
 			HitPtrIterator itBegin,
 			HitPtrIterator itEnd,
-			double T) = 0;
+			myf T) = 0;
 
 	virtual LitStatus DoCalculate(
 			const CbmLitTrackParam* par,
 			HitPtrVector& hits,
-			double T) = 0;
+			myf T) = 0;
 };
 
 #endif /*CBMLITWEIGHTCALCULATOR_H_*/

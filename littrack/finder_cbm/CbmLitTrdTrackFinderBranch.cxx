@@ -29,20 +29,18 @@ void CbmLitTrdTrackFinderBranch::Init()
 	SetSeedSelection(factory->CreateTrackSelection("momentum"));
 	SetStationGroupSelection(factory->CreateTrackSelection("trd_station"));
 	SetFinalSelection(factory->CreateTrackSelection("trd_final"));
-	SetFinalPreSelection(factory->CreateTrackSelection("empty"));
 	TrackPropagatorPtr propagator = factory->CreateTrackPropagator("lit");
 	SetPropagatorToDet(propagator);
 	SetPropagator(propagator);
 	SetFilter(factory->CreateTrackUpdate("kalman"));
-	SetFitter(factory->CreateTrackFitter("lit_kalman"));
 
 	SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 
 	SetVerbose(1);
 	SetNofIter(1);
 	IsUseFastSearch(true);
-	SetBeginStationGroup(0);
-	SetEndStationGroup(fLayout.GetNofStationGroups() - 1);
+//	SetBeginStationGroup(0);
+//	SetEndStationGroup(fLayout.GetNofStationGroups() - 1);
 	SetPDG(11);
 }
 

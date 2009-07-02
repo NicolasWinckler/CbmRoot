@@ -11,15 +11,15 @@ class CbmLitHitChiSq
 {
 public:
 	void SetHit(const CbmLitHit* hit) {fHit = hit;}
-	void SetChiSq(double chiSq) {fChiSq = chiSq;}
+	void SetChiSq(myf chiSq) {fChiSq = chiSq;}
 	void SetParam(const CbmLitTrackParam* param) {fParam = *param;}
 
 	const CbmLitHit* GetHit() const {return fHit;}
-	double GetChiSq() const {return fChiSq;}
+	myf GetChiSq() const {return fChiSq;}
 	const CbmLitTrackParam* GetParam() const {return &fParam;}
 private:
 	const CbmLitHit* fHit;
-	double fChiSq;
+	myf fChiSq;
 	CbmLitTrackParam fParam;
 };
 
@@ -43,24 +43,29 @@ public:
 	virtual ~CbmLitTrackFinderBranch();
 
 	LitStatus DoFind(
-			const HitPtrVector& hits,
-			const TrackPtrVector& trackSeeds,
+			HitPtrVector& hits,
+			TrackPtrVector& trackSeeds,
 			TrackPtrVector& tracks);
 
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
 
 	void IsAlwaysCreateMissingHit(bool isAlwaysCreateMissingHit) {fIsAlwaysCreateMissingHit = isAlwaysCreateMissingHit;}
-	void SetFinalPreSelection(TrackSelectionPtr finalPreSelection) {fFinalPreSelection = finalPreSelection;}
 	void SetStationGroupSelection(TrackSelectionPtr stationGroupSelection) {fStationGroupSelection = stationGroupSelection;}
+	void SetFinalSelection(TrackSelectionPtr finalSelection) {fFinalSelection = finalSelection;}
+	void SetSeedSelection(TrackSelectionPtr seedSelection) {fSeedSelection=seedSelection;}
 	void SetFilter(TrackUpdatePtr filter) {fFilter = filter;}
-	void SetFitter(TrackFitterPtr fitter) {fFitter = fitter;}
+	void SetPropagator(TrackPropagatorPtr propagator) {fPropagator = propagator;}
 
 protected:
+    void InitTrackSeeds(
+    		TrackPtrIterator itBegin,
+    		TrackPtrIterator itEnd);
+
 	void FollowTracks();
 
 	void ProcessStationGroup(
-			const CbmLitTrack *track,
+			const CbmLitTrack* track,
 			int stationGroup);
 
 	bool ProcessStation(
@@ -70,54 +75,34 @@ protected:
 			TrackPtrVector& tracksOut);
 
 	bool ProcessStation1(
-			const CbmLitTrack *track,
+			const CbmLitTrack* track,
 			int stationGroup,
 			int station,
 			TrackPtrVector& tracksOut);
-
-//	bool ProcessSubstation(
-//			int substation,
-//			HitPtrIterator hitIt,
-//			HitPtrIteratorPair bounds,
-//			const CbmLitTrackParam* par,
-//			CbmLitTrackParam* uPar,
-//			HitPtrVector& hits,
-//			std::vector<double>& chiSq);
 
 	void ProcessSubstation(
 			const CbmLitTrackParam* par,
 			HitPtrIteratorPair bounds,
 			std::vector<CbmLitHitChiSq>& hits);
 
-//	bool AddTrackBranch(
-//			const CbmLitTrack* track,
-//			const HitPtrVector& hits,
-//			const std::vector<double>& chiSq,
-//			const CbmLitTrackParam* par,
-//			TrackPtrVector& tracksOut);
-
 	bool AddTrackCandidate(
 			TrackPtrVector& tracks,
 			int stationGroup);
 
-//	void RefitTracks(
-//			TrackPtrIterator itBegin,
-//			TrackPtrIterator itEnd);
-
 	void CopyToOutputArray();
 
 private:
+	TrackPtrVector fTracks;
 	TrackPtrVector fTracksCopy;
 	TrackPtrVector fFoundTracks;
 
-	TrackSelectionPtr fFinalPreSelection;
+	TrackSelectionPtr fSeedSelection;
+	TrackSelectionPtr fFinalSelection;
 	TrackSelectionPtr fStationGroupSelection;
+	TrackPropagatorPtr fPropagator;
 	TrackUpdatePtr fFilter;
-	TrackFitterPtr fFitter;
 
 	int fMaxNofHitsInValidationGate;
-//	int fMaxNofBranches;
-//	int fNofBranches;
 	bool fIsAlwaysCreateMissingHit;
 };
 

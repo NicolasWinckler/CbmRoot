@@ -4,8 +4,6 @@
 #include "CbmLitTrackPropagator.h"
 #include "CbmLitPtrTypes.h"
 
-#include "TMatrixD.h"
-
 class CbmLitMyTrackPropagator : public CbmLitTrackPropagator
 {
 public:
@@ -21,23 +19,20 @@ public:
 	virtual LitStatus Propagate(
 		   const CbmLitTrackParam *parIn,
 		   CbmLitTrackParam *parOut,
-		   double zOut,
+		   myf zOut,
 		   int pdg);
 
 	virtual LitStatus Propagate(
 		   CbmLitTrackParam *par,
-		   double zOut,
+		   myf zOut,
 		   int pdg);
 
 	virtual void TransportMatrix(
-		   std::vector<double>& F);
-
-	virtual void TransportMatrix(
-		   TMatrixD& F);
+		   std::vector<myf>& F);
 
 	void UpdateF(
-			TMatrixD& F,
-			const TMatrixD& newF);
+			std::vector<myf>& F,
+			const std::vector<myf>& newF);
 
 private:
 	GeoNavigatorPtr fNavigator; // Geo Navigator tool
@@ -47,7 +42,7 @@ private:
 	bool fDownstream; // if true than downstream propagation
 	int fPDG; // PDG of the particle
 
-	TMatrixD fFm; // Transport matrix
+	std::vector<myf> fFm; // Transport matrix
 	bool fCalcTransportMatrix; // if true than transport matrix is calculated
 };
 

@@ -51,10 +51,10 @@ void CbmLitTrackSelectionC::SortNofHits(
 {
 	std::sort(itBegin, itEnd, CompareTrackPtrNofHitsMore());
 
-	Int_t maxNofHits = (*itBegin)->GetNofHits();
-	Int_t minNofHits = (*(itEnd-1))->GetNofHits();
+	int maxNofHits = (*itBegin)->GetNofHits();
+	int minNofHits = (*(itEnd-1))->GetNofHits();
 
-	for (Int_t iNofHits = minNofHits; iNofHits <= maxNofHits; iNofHits++) {
+	for (int iNofHits = minNofHits; iNofHits <= maxNofHits; iNofHits++) {
 		CbmLitTrack value;
 		value.SetNofHits(iNofHits);
 		//if (!std::binary_search(tracks.begin(), tracks.end(), &value, CompareTrackPtrNofHitsMore())) continue;
@@ -78,10 +78,10 @@ void CbmLitTrackSelectionC::SortLastPlaneId(
 //			std::cout << (*iTrack)->GetLastPlaneId() << " ";
 //	std::cout << std::endl << "NofTracks = " << tracks.size() << std::endl;
 
-	Int_t maxPlaneId = (*itBegin)->GetLastPlaneId();
-	Int_t minPlaneId = (*(itEnd-1))->GetLastPlaneId();
+	int maxPlaneId = (*itBegin)->GetLastPlaneId();
+	int minPlaneId = (*(itEnd-1))->GetLastPlaneId();
 
-	for (Int_t iPlaneId = minPlaneId; iPlaneId <= maxPlaneId; iPlaneId++) {
+	for (int iPlaneId = minPlaneId; iPlaneId <= maxPlaneId; iPlaneId++) {
 		CbmLitTrack value;
 		value.SetLastPlaneId(iPlaneId);
 		//if (!std::binary_search(tracks.begin(), tracks.end(), &value, CompareTrackPtrLastPlaneIdMore())) continue;
@@ -103,17 +103,17 @@ void CbmLitTrackSelectionC::CheckSharedHits(
 		TrackPtrIterator itBegin,
 		TrackPtrIterator itEnd)
 {
-	std::set<Int_t> hitsId;
+	std::set<int> hitsId;
 
 	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
 
 		if ((*iTrack)->GetQuality() == kLITBAD) continue;
 
-	    Int_t nofSharedHits = 0;
-	    Int_t nofHits = (*iTrack)->GetNofHits();
+	    int nofSharedHits = 0;
+	    int nofHits = (*iTrack)->GetNofHits();
 
-	    for(Int_t iHit = 0; iHit < nofHits; iHit++) {
-	    	Int_t hitId = (*iTrack)->GetHit(iHit)->GetRefId();
+	    for(int iHit = 0; iHit < nofHits; iHit++) {
+	    	int hitId = (*iTrack)->GetHit(iHit)->GetRefId();
 	    	if(hitsId.find(hitId) != hitsId.end()) {
 	            nofSharedHits++;
 	            if (nofSharedHits > fNofSharedHits) {
@@ -125,8 +125,8 @@ void CbmLitTrackSelectionC::CheckSharedHits(
 
 	    if ( (*iTrack)->GetQuality() == kLITBAD) continue;
 
-	    for(Int_t iHit = 0; iHit < nofHits; iHit++) {
-	    	Int_t hitId = (*iTrack)->GetHit(iHit)->GetRefId();
+	    for(int iHit = 0; iHit < nofHits; iHit++) {
+	    	int hitId = (*iTrack)->GetHit(iHit)->GetRefId();
 	        hitsId.insert(hitId);
 	    }
 	}

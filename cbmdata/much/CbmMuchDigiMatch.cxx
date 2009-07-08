@@ -4,7 +4,7 @@
  **@version 1.0
  **
  ** Data class for matching CbmMuchDigi with CbmMuchPoint.
- ** The indizes of CbmMuchDigi and CbmMuchDigiMatch correspond in their
+ ** The indices of CbmMuchDigi and CbmMuchDigiMatch correspond in their
  ** respective arrays.
  ** The class holds the indices of all MuchPoints corresponding to
  ** the MuchDigi.
@@ -14,6 +14,7 @@
 #include "CbmMuchDigiMatch.h"
 
 #include <iostream>
+#include <limits>
 
 using std::cout;
 using std::endl;
@@ -102,7 +103,9 @@ UInt_t CbmMuchDigiMatch::GetCharge(Int_t i) const {
 UInt_t CbmMuchDigiMatch::GetTotalCharge() const {
   UInt_t totCharge = 0;
   for(Int_t iRef=0; iRef<GetNPoints(); ++iRef){
+    UInt_t first = totCharge;
     totCharge += GetCharge(iRef);
+    if(totCharge < first || totCharge < GetCharge(iRef)) totCharge = std::numeric_limits<Int_t>::max();
   }
   return totCharge;
 }

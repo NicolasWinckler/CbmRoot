@@ -47,4 +47,5 @@ CbmMuchCluster::~CbmMuchCluster(){
 }
 // -------------------------------------------------------------------------
 
+
 ClassImp(CbmMuchCluster)

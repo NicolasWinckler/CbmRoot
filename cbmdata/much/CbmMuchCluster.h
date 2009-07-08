@@ -40,11 +40,23 @@ public:
 
   ~CbmMuchCluster();
 
-  TArrayI GetDigis()                const {return fDigiIndices;}
-  Int_t   GetNDigis()               const {return fDigiIndices.GetSize();}
-  Int_t   GetDigiIndex(Int_t iDigi) const {return fDigiIndices.At(iDigi);}
-  Int_t   GetCharge()               const {return fCharge;}
-  Int_t   GetMaxCharge()            const {return fQMax;}
+  /** Gets TArrayI of digi indices. */
+  TArrayI GetDigiIndices() const {return fDigiIndices;}
+
+  /** Gets number of digis in the cluster. */
+  Int_t GetNDigis() const {return fDigiIndices.GetSize();}
+
+  /**
+   * Gets the index of a digi.
+   * @param iDigi Zero based ordinal number of digi in the internal list.
+   */
+  Int_t GetDigiIndex(Int_t iDigi) const {return fDigiIndices.At(iDigi);}
+
+  /** Gets total charge in the cluster. */
+  Int_t GetCharge() const {return fCharge;}
+
+  /** Maximum charge collected by one of the cluster's pad. */
+  Int_t GetMaxCharge() const {return fQMax;}
 
 
 private:

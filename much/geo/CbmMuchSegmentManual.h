@@ -169,7 +169,7 @@ class CbmMuchSegmentManual : public FairTask {
      */
     Bool_t ShouldSegment(CbmMuchSector* sector, const TString direction);
 
-    /** Draws segmentedstations. */
+    /** Draws segmented stations. */
     void DrawSegmentation();
 
     /** Prints summary */

@@ -184,7 +184,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
   Double_t sigma = CbmMuchDigitizeAdvancedGem::Sigma_n_e(Tkin, mass);      // sigma for Landau distribution
   Double_t mpv = CbmMuchDigitizeAdvancedGem::MPV_n_e(Tkin, mass);          // most probable value for Landau distr.
   UInt_t nElectrons = (UInt_t) fLandauRnd->Landau(mpv, sigma); // number of prim. electrons per 0.3 cm gap
-  while (nElectrons > 100000)
+  while (nElectrons > 50000)
     nElectrons = (UInt_t) (fLandauRnd->Landau(mpv, sigma));     // restrict Landau tail to increase performance
   // Number of electrons for current track length
   if (mass < 100.)
@@ -256,8 +256,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
         }
         chargedMatches[channelId]->AddPoint(iPoint);
         chargedMatches[channelId]->AddCharge(iCharge);
-//        chargedPads[channelId]->AddCharge(iCharge); // add charge to digi
-//        assert(chargedMatches[channelId]->GetTotalCharge()==chargedPads[channelId]->GetCharge());
+
       } // loop channels
     } // loop fired sectors
   } // loop primary electrons
@@ -275,11 +274,9 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
     CbmMuchDigiMatch* match = chargedMatches[channelId];
     if(!match) continue;
     if (!digi) continue;
-//    Int_t iCharge = digi->GetCharge();
     Int_t iCharge = match->GetTotalCharge();
-//    assert(ch == iCharge);
-    if (iCharge < 0)
-      iCharge = (Int_t) (TMath::Power(2, 31) - 2);
+//    if (iCharge < 0)
+//      iCharge = (Int_t) (TMath::Power(2, 31) - 2);
     if (fChargedPads.find(uniqueId) == fChargedPads.end()) {
       fChargedPads[uniqueId] = new CbmMuchDigi(digi);
       fChargedMatches[uniqueId] = new CbmMuchDigiMatch();
@@ -287,13 +284,11 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
       fChargedMatches[uniqueId]->AddCharge(iCharge);
     } else {
       fChargedPads[uniqueId]->AddTime(time);
-//      fChargedPads[uniqueId]->AddCharge(iCharge);
       fChargedMatches[uniqueId]->AddPoint(iPoint);
       fChargedMatches[uniqueId]->AddCharge(iCharge);
       fNMulti++;
     }
 
-//    assert(fChargedPads[uniqueId]->GetCharge() == fChargedMatches[uniqueId]->GetTotalCharge());
     // Clear memory
     delete digi;
     delete match;
@@ -362,12 +357,6 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
 
   FirePads();
 
-//  for(Int_t i=0; i< fDigiMatches->GetEntriesFast(); ++i){
-//    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(i);
-//    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
-//    printf("points = %i, charge = %i, ADC channel = %i\n",
-//        match->GetNPoints(), match->GetTotalCharge(), digi->GetADCCharge());
-//  }
 
   // Screen output
   fTimer.Stop();
@@ -462,7 +451,7 @@ void CbmMuchDigitizeAdvancedGem::FirePads() {
       if (fChannelMap.find(uniqueId) == fChannelMap.end()) {
         iDigi = fDigis->GetEntriesFast();
         Int_t adcChannel = match->GetTotalCharge() * fNADCChannels/ fQMax;
-        digi->SetADCCharge(adcChannel > fNADCChannels ? fNADCChannels : adcChannel);
+        digi->SetADCCharge(adcChannel > fNADCChannels ? fNADCChannels-1 : adcChannel);
         new ((*fDigis)[iDigi]) CbmMuchDigi(digi);
         new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch(match);
         fChannelMap[uniqueId] = iDigi;

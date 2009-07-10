@@ -67,6 +67,7 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
 
   /**
    * Sets the clustering algorithm to use.
+   * 0 - Spatial separation (clusters are sets of neighbor fired pads)
    * 1 - Simple
    * 2 - Ward's fuzzy clustering
    * 3 - Simple + Ward's clustering
@@ -81,8 +82,8 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
   /** Execution. */
   virtual void Exec(Option_t* opt);
 
-//  void SetClusterCharges(Int_t stationNr, Int_t clusterSize, Int_t* padCharges);
-//  void SetClusterDistanceLimits(Int_t stationNr, Int_t clusterSize, Double_t* distanceLimits);
+  void SetClusterCharges(Int_t stationNr, Int_t clusterSize, Int_t* padCharges);
+  void SetClusterDistanceLimits(Int_t stationNr, Int_t clusterSize, Double_t* distanceLimits);
 
 //  void SetAnalysisStation(Int_t iStation) {fAnalysisStationIndex = iStation;}
 //  void SetAnalysisClusterSize(Int_t nPads) {fAnalysisClusterSize = nPads;}
@@ -102,8 +103,8 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
   TStopwatch                       fTimer;             // Timer
   Double_t                         fDistanceLimit;     // Limit for the ESS increment
   Int_t                            fChargeLimit;       // Limit of charge
-//  map<Int_t, map<Int_t, vector<Double_t> > > fDistanceLimits; // Map from station index to the list of distance limits for each cluster size
-//  map<Int_t, map<Int_t, vector<Int_t> > > fChargeLimits;     // Map from station index to the list of charge limits for each cluster size
+  map<Int_t, map<Int_t, vector<Double_t> > > fDistanceLimits; // Map from station index to the list of distance limits for each cluster size
+  map<Int_t, map<Int_t, vector<Int_t> > > fChargeLimits;     // Map from station index to the list of charge limits for each cluster size
 
 //  // Analysis variables
 //  map<Int_t, CbmMuchCluster*> fAnalysisClusters;  // Clusters to analyze

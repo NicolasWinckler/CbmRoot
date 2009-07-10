@@ -234,49 +234,49 @@ void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
 }
 // -------------------------------------------------------------------------
 
-//// -------------------------------------------------------------------------
-//void CbmMuchFindHitsAdvancedGem::SetClusterDistanceLimits(Int_t stationNr, Int_t clusterSize, Double_t *distanceLimits){
-//  Int_t iStation = stationNr-1;
-//  // Fill vector of distances for the given station and cluster size
-//  vector<Double_t> distances;
-//  for(Int_t iDistance=0; iDistance<*distanceLimits; ++iDistance){
-//    Double_t distance = distanceLimits[iDistance+1];
-//    distances.push_back(distance);
-//  }
-//
-//  // Put the vector into appropriate place in the staionXclusterSize matrix
-//  if(fDistanceLimits.find(iStation) == fDistanceLimits.end()){
-//    map<Int_t, vector<Double_t> > stationDistances;
-//    stationDistances[clusterSize]= distances;
-//    fDistanceLimits[iStation] = stationDistances;
-//  }
-//  else{
-//    fDistanceLimits[iStation][clusterSize] = distances;
-//  }
-//}
-//// -------------------------------------------------------------------------
-//
-//// -------------------------------------------------------------------------
-//void CbmMuchFindHitsAdvancedGem::SetClusterCharges(Int_t stationNr, Int_t clusterSize, Int_t *padCharges){
-//  Int_t iStation = stationNr-1;
-//  // Fill vector of charges for the given station and cluster size
-//  vector<Int_t> charges;
-//  for(Int_t iCharge=0; iCharge<*padCharges; ++iCharge){
-//    Double_t distance = padCharges[iCharge+1];
-//    charges.push_back(distance);
-//  }
-//
-//  // Put the vector into appropriate place in the staionXclusterSize matrix
-//  if(fChargeLimits.find(iStation) == fChargeLimits.end()){
-//    map<Int_t, vector<Int_t> > stationCharges;
-//    stationCharges[clusterSize]= charges;
-//    fChargeLimits[iStation] = stationCharges;
-//  }
-//  else{
-//    fChargeLimits[iStation][clusterSize] = charges;
-//  }
-//}
-//// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+void CbmMuchFindHitsAdvancedGem::SetClusterDistanceLimits(Int_t stationNr, Int_t clusterSize, Double_t *distanceLimits){
+  Int_t iStation = stationNr-1;
+  // Fill vector of distances for the given station and cluster size
+  vector<Double_t> distances;
+  for(Int_t iDistance=0; iDistance<*distanceLimits; ++iDistance){
+    Double_t distance = distanceLimits[iDistance+1];
+    distances.push_back(distance);
+  }
+
+  // Put the vector into appropriate place in the staionXclusterSize matrix
+  if(fDistanceLimits.find(iStation) == fDistanceLimits.end()){
+    map<Int_t, vector<Double_t> > stationDistances;
+    stationDistances[clusterSize]= distances;
+    fDistanceLimits[iStation] = stationDistances;
+  }
+  else{
+    fDistanceLimits[iStation][clusterSize] = distances;
+  }
+}
+// -------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------
+void CbmMuchFindHitsAdvancedGem::SetClusterCharges(Int_t stationNr, Int_t clusterSize, Int_t *padCharges){
+  Int_t iStation = stationNr-1;
+  // Fill vector of charges for the given station and cluster size
+  vector<Int_t> charges;
+  for(Int_t iCharge=0; iCharge<*padCharges; ++iCharge){
+    Double_t distance = padCharges[iCharge+1];
+    charges.push_back(distance);
+  }
+
+  // Put the vector into appropriate place in the staionXclusterSize matrix
+  if(fChargeLimits.find(iStation) == fChargeLimits.end()){
+    map<Int_t, vector<Int_t> > stationCharges;
+    stationCharges[clusterSize]= charges;
+    fChargeLimits[iStation] = stationCharges;
+  }
+  else{
+    fChargeLimits[iStation][clusterSize] = charges;
+  }
+}
+// -------------------------------------------------------------------------
 
 // -----   Public method StatInfo  -----------------------------------------
 void CbmMuchFindHitsAdvancedGem::StatInfo(){
@@ -793,40 +793,41 @@ void CbmMuchFindHitsAdvancedGem::GroupDigisDivisive(vector<vector<Int_t> > &digi
 
 // -----   Private method ShouldDivideDivisive  ----------------------------
 Bool_t CbmMuchFindHitsAdvancedGem::ShouldDivideDivisive(vector<Int_t> digiGroup){
-  if(digiGroup.size() == 0) return false; // Don't consider emty group
+  if(digiGroup.size() == 0) return false; // Don't consider empty group
 
-//  Int_t iStation = -1;
-//  Int_t nDigis = digiGroup.size(); // Cluster size
-//  Double_t distanceLimit = -1; // Default distance limit
-//
-//  // Calculate mean pad-charge in the group
-//  Double_t meanCharge = 0;
-//  for(Int_t i=0; i<digiGroup.size(); ++i){
-//    Int_t iDigi = digiGroup.at(i);
-//    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
-//    if(iStation<0) iStation = fGeoScheme->GetStationIndex(digi->GetDetectorId());
-//    meanCharge += digi->GetADCCharge();
-//  }
-//  meanCharge /= digiGroup.size();
-//  assert(iStation==0);
-//
-//    if(iStation==0){
-//      map<Int_t, vector<Int_t> > chargeLimits = fChargeLimits[iStation];
-//      map<Int_t, vector<Double_t> > distanceLimits = fDistanceLimits[iStation];
-//      if(chargeLimits.find(nDigis) != chargeLimits.end()){
-//        vector<Int_t> charges = chargeLimits[nDigis];
-//        vector<Double_t> distances = distanceLimits[nDigis];
-//        for(Int_t iCharge=0; iCharge< charges.size(); ++iCharge){
-//          Int_t charge = charges.at(iCharge);
-//          if(meanCharge < charge){
-//            distanceLimit = distances.at(iCharge);
-//          }
-//        }
-//      }
-//    }
-  if(GetMeanDistance(digiGroup) > fDistanceLimit) return true;
-//    if(distanceLimit < 0) return false;
-//  if(GetMeanDistance(digiGroup) > distanceLimit) return true;
+  Double_t distance = 100; // Distance threshold (100 by default)
+  Int_t iStation = -1; // Index of the station
+  Int_t nPads = digiGroup.size(); // Cluster size
+  Int_t meanPadCharge = 0; // Mean pad-charge in the cluster
+
+  // Calculate mean-pad charge
+  for(Int_t i=0; i<digiGroup.size(); ++i){
+    Int_t iDigi = digiGroup.at(i);
+    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
+    if (iStation<0) iStation = fGeoScheme->GetStationIndex(digi->GetDetectorId());
+    meanPadCharge += digi->GetADCCharge();
+  }
+  meanPadCharge /= nPads;
+
+  // Get user-distance corresponding to this cluster pad-charge and size
+  if(fDistanceLimits.find(iStation) != fDistanceLimits.end()){
+    assert(fChargeLimits.find(iStation) != fChargeLimits.end());
+    map<Int_t, vector<Double_t> > clusterDistances = fDistanceLimits[iStation];
+    map<Int_t, vector<Int_t> > clusterCharges = fChargeLimits[iStation];
+    if(clusterDistances.find(nPads) != clusterDistances.end()){
+      assert(clusterCharges.find(nPads) != clusterCharges.end());
+      vector<Double_t> distances = clusterDistances[nPads];
+      vector<Int_t> charges = clusterCharges[nPads];
+      assert(charges.size() == distances.size());
+      Int_t i;
+      for(i=0; i<charges.size(); ++i)
+        if(meanPadCharge < charges.at(i)) break;
+      distance = distances.at(i);
+    }
+  }
+
+//  if(GetMeanDistance(digiGroup) > fDistanceLimit) return true;
+  if(GetMeanDistance(digiGroup) > distance) return true;
   return false;
 }
 // -------------------------------------------------------------------------

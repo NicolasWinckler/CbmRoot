@@ -1,17 +1,20 @@
 void global_reco(Int_t nEvents = 10)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
+	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir, mcFile, parFile, globalRecoFile;
+	TString dir, mcFile, parFile, globalRecoFile, muchDigiFile;
 	if (script != "yes") {
 		dir  = "/home/d/andrey/test/trunk/global_mu/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalRecoFile = dir + "global.reco.0000.root";
+		muchDigiFile = parDir + "/much/much_standard.digi.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
 		globalRecoFile = TString(gSystem->Getenv("GLOBALRECOFILE"));
+		muchDigiFile = TString(gSystem->Getenv("MUCHDIGI"));
 	}
 
 	Int_t iVerbose = 1;
@@ -28,9 +31,7 @@ void global_reco(Int_t nEvents = 10)
 	run->SetInputFile(mcFile);
 	run->SetOutputFile(globalRecoFile);
 
-	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 	TString stsDigiFile = parDir+ "/sts/sts_Standard_s3055AAFK5.SecD.digi.par";
-	TString muchDigiFile = parDir + "/much/much_standard.digi.root";
 
 	// ----- STS reconstruction   ---------------------------------------------
 	FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);

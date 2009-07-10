@@ -1,17 +1,22 @@
-void global_hits(Int_t nEvents = 1000)
+void global_hits(Int_t nEvents = 500)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
+	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir, mcFile, parFile, globalHitsFile;
+	TString dir, mcFile, parFile, globalHitsFile, muchDigiFile;
 	if (script != "yes") {
-		dir  = "/home/d/andrey/test/trunk/global_mu_low/";
+		dir  = "/home/d/andrey/test/trunk/global_e_urqmd/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalHitsFile = dir + "global.hits.0000.root";
+		muchDigiFile = parDir + "/much/much_standard.digi.root";
+//		muchDigiFile = parDir + "/much/much_standard_trd.digi.root";
+//		muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
 		globalHitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
+		muchDigiFile = TString(gSystem->Getenv("MUCHDIGI"));
 	}
 
 	Int_t iVerbose = 1;
@@ -28,11 +33,7 @@ void global_hits(Int_t nEvents = 1000)
 	run->SetInputFile(mcFile);
 	run->SetOutputFile(globalHitsFile);
 
-	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 	TString stsDigiFile = parDir+ "/sts/sts_Standard_s3055AAFK5.SecD.digi.par";
-	TString muchDigiFile = parDir + "/much/much_standard.digi.root";
-//	TString muchDigiFile = parDir + "/much/much_standard_trd.digi.root";
-//	TString muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
 
 	// ----- STS reconstruction   ---------------------------------------------
 	FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);

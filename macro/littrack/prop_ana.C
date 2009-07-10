@@ -1,6 +1,6 @@
 void prop_ana(Int_t nEvents = 1000)
 {
-	TString dir = "/home/d/andrey/jun09/global_mu/";
+	TString dir = "/home/d/andrey/test/trunk/global_mu/";
 	TString mcFile = dir + "mc.0000.root";
 	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
 	TString parFile = dir + "param.0000.root";

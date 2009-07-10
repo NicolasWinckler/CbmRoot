@@ -8,7 +8,7 @@ void global_tracking(Int_t nEvents = 100)
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalHitsFile = dir + "global.hits.0000.root";
-		globalTracksFile = dir + "global.tracks.0000.root";
+		globalTracksFile = dir + "global.tracks.nn.parallel.0000.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -20,11 +20,14 @@ void global_tracking(Int_t nEvents = 100)
 	TStopwatch timer;
 	timer.Start();
 
+//	gSystem->Load("/home/soft/temp/tbb21_017oss/libtbb");
+
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
 	cbmrootlibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
+
 
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
@@ -60,7 +63,7 @@ void global_tracking(Int_t nEvents = 100)
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
 	reconstructionQa->SetMinNofPointsTrd(10);
-	reconstructionQa->SetMinNofPointsMuch(11);
+	reconstructionQa->SetMinNofPointsMuch(12);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(8);

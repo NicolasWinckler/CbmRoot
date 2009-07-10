@@ -2,22 +2,34 @@ void trd_sim(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString inFile, dir, mcFile, parFile, electrons, urqmd, trdGeom;
+	TString inFile, plutoFile, dir, mcFile, parFile, electrons, urqmd, trdGeom;
 	if (script != "yes") {
+		//input UrQMD file
 		inFile  = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
+		//if necessary specify input pluto file to embed signal particles
+		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
+		//directory for output simulation files
 		dir  = "/home/d/andrey/test/trunk/global_e/";
+		//MC file name
 		mcFile = dir + "mc.0000.root";
+		//Parameter file name
 		parFile = dir + "param.0000.root";
+		//If "yes" than 10 primary muons will be generated
 		electrons = "yes";
+		//If "yes" than UrQMD will be used as background
 		urqmd = "no";
+		//If "yes" PLUTO particles will be embedded
+		pluto = "no";
+		//TRD geometry file name
 		trdGeom = "trd_standard.geo";
-//		trdGeom = "trd_monolithic.geo";
 	} else {
 		inFile  = TString(gSystem->Getenv("INFILE"));
+		plutoFile  = TString(gSystem->Getenv("PLUTOFILE"));
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
 		electrons = TString(gSystem->Getenv("ELECTRONS"));
 		urqmd = TString(gSystem->Getenv("URQMD"));
+		pluto = TString(gSystem->Getenv("PLUTO"));
 		trdGeom = TString(gSystem->Getenv("TRDGEOM"));
 	}
 
@@ -133,6 +145,11 @@ void trd_sim(Int_t nEvents = 1000)
 
 	// ------------------------------------------------------------------------
 	CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+
+	if (pluto == "yes") {
+		FairPlutoGenerator *plutoGen= new FairPlutoGenerator(plutoFile);
+		primGen->AddGenerator(plutoGen);
+	}
 
 	if (urqmd == "yes") {
 		FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);

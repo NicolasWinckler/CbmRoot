@@ -14,7 +14,6 @@ void cbmrootlibs()
    gSystem->Load("libSts");
    gSystem->Load("libRich");
    gSystem->Load("libMuch");
-//   gSystem->Load("libMuchFeb07");
    gSystem->Load("libTrd");
    gSystem->Load("libTof");
    gSystem->Load("libEcal");

@@ -3,28 +3,38 @@ void much_sim(Int_t nEvents = 1000)
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString muchGeom, trdGeom, inFile, dir, mcFile, parFile, plutoFile, muons, urqmd, pluto;
+	//if SCRIPT environment variable is set to "yes", i.e. macro is run via script
 	if (script != "yes") {
+		//input UrQMD file
 		inFile  = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
+		//if necessary specify input pluto file to embed signal particles
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
+		//directory for output simulation files
 		dir  = "/home/d/andrey/test/trunk/global_mu_low/";
+		//MC file name
 		mcFile = dir + "mc.0000.root";
+		//Parameter file name
 		parFile = dir + "param.0000.root";
+		//If "yes" than 10 primary muons will be generated
 		muons = "yes";
+		//If "yes" than UrQMD will be used as background
 		urqmd = "no";
+		//If "yes" PLUTO particles will be embedded
 		pluto = "no";
+		//MUCH geometry file name
 		muchGeom = "much_standard.geo";
+		//TRD geometry file name
 		trdGeom = "";//"trd_muon_setup_new.geo";
 	} else {
 		inFile  = TString(gSystem->Getenv("INFILE"));
 		plutoFile  = TString(gSystem->Getenv("PLUTOFILE"));
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
-		electrons = TString(gSystem->Getenv("MUONS"));
+		muons = TString(gSystem->Getenv("MUONS"));
 		urqmd = TString(gSystem->Getenv("URQMD"));
 		pluto = TString(gSystem->Getenv("PLUTO"));
 		muchGeom = TString(gSystem->Getenv("MUCHGEOM"));
 		trdGeom = TString(gSystem->Getenv("TRDGEOM"));
-		muons = TString(gSystem->Getenv("MUONS"));
 	}
 
 	TString pipeGeom   = "pipe_much.geo";
@@ -160,8 +170,7 @@ void much_sim(Int_t nEvents = 1000)
 		FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, 5);
 		boxGen1->SetPRange(minMom, maxMom);
 		boxGen1->SetPhiRange(0.,360.);
-//		boxGen1->SetThetaRange(2.5, 25.);
-		boxGen1->SetThetaRange(1.5, 15.);
+		boxGen1->SetThetaRange(2.5, 25.);
 		boxGen1->SetCosTheta();
 		boxGen1->Init();
 		primGen->AddGenerator(boxGen1);
@@ -169,8 +178,7 @@ void much_sim(Int_t nEvents = 1000)
 		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-13, 5);
 		boxGen2->SetPRange(minMom, maxMom);
 		boxGen2->SetPhiRange(0.,360.);
-//		boxGen2->SetThetaRange(2.5, 25.);
-		boxGen2->SetThetaRange(1.5, 15.);
+		boxGen2->SetThetaRange(2.5, 25.);
 		boxGen2->SetCosTheta();
 		boxGen2->Init();
 		primGen->AddGenerator(boxGen2);
@@ -180,7 +188,6 @@ void much_sim(Int_t nEvents = 1000)
 
 	fRun->Init();
 
-
 	// -----   Runtime database   ---------------------------------------------
 	CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
 	fieldPar->SetParameters(magField);
@@ -188,14 +195,13 @@ void much_sim(Int_t nEvents = 1000)
 	fieldPar->setInputVersion(fRun->GetRunId(),1);
 	Bool_t kParameterMerged = kTRUE;
 	FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
-	parOut->open(parFile.Data());//gFile);
+	parOut->open(parFile.Data());
 	rtdb->setOutput(parOut);
 	rtdb->saveOutput();
 	rtdb->print();
 	// ------------------------------------------------------------------------
 
 	// -----   Start run   ----------------------------------------------------
-	cout << endl << "=== much_sim.C : Start run ..." << endl;
 	fRun->Run(nEvents);
 	// ------------------------------------------------------------------------
 
@@ -204,10 +210,9 @@ void much_sim(Int_t nEvents = 1000)
 	Double_t rtime = timer.RealTime();
 	Double_t ctime = timer.CpuTime();
 	cout << endl << endl;
-	cout << "=== much_sim.C : Macro finished successfully." << endl;
-	cout << "=== much_sim.C : Output file is " << mcFile << endl;
-	cout << "=== much_sim.C : Real time used: " << rtime << "s " << endl;
-	cout << "=== much_sim.C : CPU time used : " << ctime << "s " << endl;
-	cout << endl << endl;
+	cout << "Macro finished successfully." << endl;
+	cout << "Output file is " << mcFile << endl;
+	cout << "Real time used: " << rtime << "s " << endl;
+	cout << "CPU time used : " << ctime << "s " << endl << endl << endl;
 	// ------------------------------------------------------------------------
 }

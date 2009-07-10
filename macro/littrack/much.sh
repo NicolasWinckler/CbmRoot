@@ -5,9 +5,8 @@ cd -
 
 root -b -q "./much_sim.C($NEVENTS)"
 
-root -b -q "./sts_reco.C($NEVENTS)"
+root -b -q "./global_hits.C($NEVENTS)"
 
-root -b -q "./much_hits.C($NEVENTS)"
+root -b -q "./global_tracking.C($NEVENTS)"
 
-root -b -q "./much_reco.C($NEVENTS)"
-
+#root -b -q "./global_reco.C($NEVENTS)"

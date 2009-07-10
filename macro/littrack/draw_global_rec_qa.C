@@ -9,10 +9,10 @@
 #include <ostream>
 #include <iomanip>
 
-TString dir = "/home/d/andrey/test/trunk/global_mu/";
-TFile *file = new TFile(dir + "global.tracks.0000.root");
+const TString dir = "/home/d/andrey/test/trunk/global_e_urqmd/";
+const TFile *file = new TFile(dir + "global.tracks.branch.0000.root");
 
-TString mcFile = dir + "mc.0000.root";
+const TString mcFile = dir + "mc.0000.root";
 
 const Int_t lineWidth = 2;
 const Int_t markerSize = 1;

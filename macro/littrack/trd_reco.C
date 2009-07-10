@@ -3,20 +3,17 @@ void trd_reco(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString dir, mcFile, parFile, stsRecoFile, trdHitsFile, trdTracksFile;
+	TString dir, mcFile, parFile, hitsFile, trdTracksFile;
 	if (script != "yes") {
-//		dir  = "/home/d/andrey/events/trd/segmented/10e/e_urqmd/";
-		dir  = "/home/d/andrey/test/trunk/e/";
+		dir  = "/home/d/andrey/test/trunk/global_e/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
-		stsRecoFile = dir + "sts.reco.0000.root";
-		trdHitsFile = dir + "trd.hits.0000.root";
-		trdTracksFile = dir + "trd.tracks.ideal.0000.root";
+		hitsFile = dir + "global.hits.0000.root";
+		trdTracksFile = dir + "trd.tracks.0000.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
-		stsRecoFile = TString(gSystem->Getenv("STSRECOFILE"));
-		trdHitsFile = TString(gSystem->Getenv("TRDHITSFILE"));
+		hitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
 		trdTracksFile = TString(gSystem->Getenv("TRDTRACKSFILE"));
 	}
 
@@ -32,8 +29,7 @@ void trd_reco(Int_t nEvents = 1000)
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
-	run->AddFriend(stsRecoFile);
-	run->AddFriend(trdHitsFile);
+	run->AddFriend(hitsFile);
 	run->SetOutputFile(trdTracksFile);
 	// ------------------------------------------------------------------------
 
@@ -57,9 +53,9 @@ void trd_reco(Int_t nEvents = 1000)
 	run->AddTask(trdMatchTracks);
 
 	// -----   TRD track finding QA check   ------------------------------------
-	CbmLitRecQa* trdRecQa = new CbmLitRecQa(8, 0.7, kTRD, 1);
-	trdRecQa->SetNormType(2); // '2' to number of STS tracks
-	run->AddTask(trdRecQa);
+//	CbmLitRecQa* trdRecQa = new CbmLitRecQa(8, 0.7, kTRD, 1);
+//	trdRecQa->SetNormType(2); // '2' to number of STS tracks
+//	run->AddTask(trdRecQa);
 
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();

@@ -24,7 +24,7 @@
 #include "CbmLitNearestHitToTrackMerger.h"
 #include "CbmLitEnvironment.h"
 #include "CbmLitPtrTypes.h"
-#include "CbmLitTrackFinderNNParallel.h"
+//#include "CbmLitTrackFinderNNParallel.h"
 
 
 CbmLitToolFactory* CbmLitToolFactory::fInstance = NULL;

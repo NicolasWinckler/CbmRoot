@@ -25,7 +25,6 @@ CbmLitMuchTrackFinderBranch::CbmLitMuchTrackFinderBranch()
 
 CbmLitMuchTrackFinderBranch::~CbmLitMuchTrackFinderBranch()
 {
-//	if (fPropagatorToDet) delete fPropagatorToDet;
 }
 
 void CbmLitMuchTrackFinderBranch::Init()
@@ -45,9 +44,7 @@ void CbmLitMuchTrackFinderBranch::Init()
 
 	SetVerbose(1);
 	SetNofIter(1);
-//	SetBeginStationGroup(0);
-//	SetEndStationGroup(fLayout.GetNofStationGroups() - 1);
-	SetMaxNofMissingHits(1);
+	SetMaxNofMissingHits(2);
 	IsAlwaysCreateMissingHit(false);
 	IsUseFastSearch(true);
 	SetSigmaCoef(3.5);
@@ -63,8 +60,8 @@ Int_t CbmLitMuchTrackFinderBranch::DoFind(
 	TrackPtrVector trackSeeds;
 	TrackPtrVector foundTracks;
 
-	CbmLitConverter::HitArrayToHitVector(fHitsArray, hits);
-	DefaultCreateTrackSeeds(fTrackSeedsArray, trackSeeds, fLayout, fPDG);
+//	CbmLitConverter::HitArrayToHitVector(fHitsArray, hits);
+//	DefaultCreateTrackSeeds(fTrackSeedsArray, trackSeeds, fLayout, fPDG);
 
 	CbmLitTrackFinderBranch::DoFind(hits, trackSeeds, foundTracks);
 

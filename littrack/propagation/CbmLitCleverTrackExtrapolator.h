@@ -31,8 +31,6 @@ public:
 private:
 	TrackExtrapolatorPtr fLineExtrapolator;
 	TrackExtrapolatorPtr fRK4Extrapolator;
-
-	myf fZMax;
 	int fOption;
 };
 

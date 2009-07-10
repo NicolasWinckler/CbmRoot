@@ -2,7 +2,9 @@
  *@author A.Lebedev <alebedev@jinr.ru>
  *@since 2007
  **
- **
+ ** The class is an interface to the CBM detector classes and field.
+ ** The detector geometries in the form of CbmLitDetectorLayout class
+ ** can be got via this class.
  **/
 
 #ifndef CBMLITENVIRONMENT_H_
@@ -20,56 +22,56 @@ class TGeoMaterial;
 class CbmLitEnvironment
 {
 public:
-   virtual ~CbmLitEnvironment();
+	virtual ~CbmLitEnvironment();
 
-   static CbmLitEnvironment* Instance();
+	static CbmLitEnvironment* Instance();
 
-   FairField* GetField();
-   CbmLitDetectorLayout GetLayout();
+	FairField* GetField();
+	CbmLitDetectorLayout GetLayout();
 
-   CbmLitDetectorLayout GetMuchLayout() {return fMuchLayout;}
+	CbmLitDetectorLayout GetMuchLayout() {return fMuchLayout;}
 
-   CbmLitDetectorLayout GetTofLayout();
-   CbmLitStation GetTofStation();
+	CbmLitDetectorLayout GetTofLayout();
+	CbmLitStation GetTofStation();
 
-   bool IsElectronSetup() const;
-   bool IsTrd() const;
-   bool IsMuch() const;
-   bool IsTof() const;
+	bool IsElectronSetup() const;
+	bool IsTrd() const;
+	bool IsMuch() const;
+	bool IsTof() const;
 
 protected:
-   CbmLitEnvironment();
+	CbmLitEnvironment();
 
-   void CombineMuchAndTrd();
-   void MuchLayout();
-   void NewMuchLayout();
-   void OldMuchLayout();
-   void TrdLayout();
+	void CombineMuchAndTrd();
+	void MuchLayout();
+	void NewMuchLayout();
+	void OldMuchLayout();
+	void TrdLayout();
 
 private:
-   static CbmLitEnvironment* fInstance;
+	void DetermineLayout(
+		const std::vector<CbmLitStation>& stations,
+		CbmLitDetectorLayout& layout);
 
-   CbmLitDetectorLayout fLayout;
-   CbmLitDetectorLayout fMuchTrdLayout;
-   CbmLitDetectorLayout fMuchLayout;
-   CbmLitDetectorLayout fTrdLayout;
-   CbmLitDetectorLayout fTofLayout;
-   CbmLitStation fTofStation;
+	std::vector<CbmLitStation> DivideToSubstations(
+			const std::vector<CbmLitStation>& stations);
 
-   FairField *fField;
+	bool IsStraw() const;
+	bool IsTrdSegmented() const;
 
-   void DetermineLayout(
-		   const std::vector<CbmLitStation>& stations,
-		   CbmLitDetectorLayout& layout);
+	bool CheckDetectorPresence(
+			const std::string& name) const;
 
-   std::vector<CbmLitStation> DivideToSubstations(
-		   const std::vector<CbmLitStation>& stations);
+	static CbmLitEnvironment* fInstance;
 
-   bool IsStraw() const;
-   bool IsTrdSegmented() const;
+	CbmLitDetectorLayout fLayout;
+	CbmLitDetectorLayout fMuchTrdLayout;
+	CbmLitDetectorLayout fMuchLayout;
+	CbmLitDetectorLayout fTrdLayout;
+	CbmLitDetectorLayout fTofLayout;
+	CbmLitStation fTofStation;
 
-   bool CheckDetectorPresence(
-		   const std::string& name) const;
+	FairField *fField;
 };
 
 #endif // CBMLITENVIRONMENT_H_

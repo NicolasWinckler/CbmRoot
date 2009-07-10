@@ -5,9 +5,9 @@
 #include "CbmLitEnums.h"
 #include "CbmLitMath.h"
 #include "CbmLitMatrixMath.h"
+#include "CbmLitDefaultSettings.h"
 
 CbmLitCleverTrackExtrapolator::CbmLitCleverTrackExtrapolator():
-	fZMax(450.),
 	fOption(-1)
 {
 }
@@ -45,24 +45,25 @@ LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 {
 	myf zIn = par->GetZ();
 	fOption = -1;
+	myf zStart = lit::LINE_EXTRAPOLATION_START_Z;
 
-	if (zIn >= fZMax && zOut >= fZMax) {
+	if (zIn >= zStart && zOut >= zStart) {
 		fOption = 0;
 		return fLineExtrapolator->Extrapolate(par, zOut);
 	} else
-	if (zIn < fZMax && zOut < fZMax) {
+	if (zIn < zStart && zOut < zStart) {
 		fOption = 1;
 		return fRK4Extrapolator->Extrapolate(par, zOut);
 	} else
-	if (zOut > zIn && zIn < fZMax && zOut > fZMax) {
+	if (zOut > zIn && zIn < zStart && zOut > zStart) {
 		fOption = 2;
-		LitStatus result = fRK4Extrapolator->Extrapolate(par, fZMax);
+		LitStatus result = fRK4Extrapolator->Extrapolate(par, zStart);
 		if (result == kLITERROR) return result;
 		else return fLineExtrapolator->Extrapolate(par, zOut);
 	} else
-	if (zOut < zIn && zIn > fZMax && zOut < fZMax) {
+	if (zOut < zIn && zIn > zStart && zOut < zStart) {
 		fOption = 3;
-		LitStatus result = fLineExtrapolator->Extrapolate(par, fZMax);
+		LitStatus result = fLineExtrapolator->Extrapolate(par, zStart);
 		if (result == kLITERROR) return result;
 		else return fRK4Extrapolator->Extrapolate(par, zOut);
 	}

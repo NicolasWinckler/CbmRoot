@@ -258,45 +258,106 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
 	for (Int_t iTrack = 0; iTrack < litTracks.size(); iTrack++) {
 		CbmLitTrack* litTrack = litTracks[iTrack];
 
+		if (litTrack->GetNofHits() < 2) continue;
+		if (litTrack->GetNofHits() != litTrack->GetFitNodes().size()) {
+//			std::cout << "-E- CbmLitConverter::LitTrackVectorToGlobalTrackArray: unequal number of hits and fit nodes" << std::endl;
+			continue;
+		}
+
+
 		CbmGlobalTrack* globalTrack = new ((*globalTracks)[globalTrackNo++]) CbmGlobalTrack();
 
 		Bool_t isCreateMuchTrack = false, isCreateTrdTrack = false;
 		for (int iHit = 0; iHit < litTrack->GetNofHits(); iHit++) {
-			LitDetectorId detId = litTrack->GetHit(iHit)->GetDetectorId();
-			if (detId == kLITMUCH && muchTracks != NULL) isCreateMuchTrack = true;
-			if (detId == kLITTRD && trdTracks != NULL) isCreateTrdTrack = true;
+			const CbmLitHit* thisHit = litTrack->GetHit(iHit);
+			LitDetectorId thisDetId = thisHit->GetDetectorId();
+			if (thisDetId == kLITMUCH && muchTracks != NULL) isCreateMuchTrack = true;
+			if (thisDetId == kLITTRD && trdTracks != NULL) isCreateTrdTrack = true;
 		}
+
+		std::vector<std::pair<LitDetectorId, int> > vDetId;
+		vDetId.push_back(std::make_pair(litTrack->GetHit(0)->GetDetectorId(), 0));
+		for (int iHit = 0; iHit < litTrack->GetNofHits(); iHit++) {
+			const CbmLitHit* thisHit = litTrack->GetHit(iHit);
+			LitDetectorId thisDetId = thisHit->GetDetectorId();
+			if (vDetId.back().first != thisDetId) {
+				vDetId.push_back(std::make_pair(thisDetId, iHit));
+			}
+		}
+		int muchFirst = -1, muchLast = -1, trdFirst = -1, trdLast = -1;
+		for (int i = 0; i < vDetId.size(); i++){
+			if (vDetId[i].first == kLITMUCH) {
+				muchFirst = vDetId[i].second;
+				if (i < vDetId.size() - 1) muchLast = vDetId[i + 1].second - 1;
+				else muchLast = litTrack->GetNofHits() - 1;
+			}
+			if (vDetId[i].first == kLITTRD) {
+				trdFirst = vDetId[i].second;
+				if (i < vDetId.size() - 1) trdLast = vDetId[i + 1].second - 1;
+				else trdLast = litTrack->GetNofHits() - 1;
+			}
+		}
+
 		CbmMuchTrack* muchTrack = NULL;
 		CbmTrdTrack* trdTrack = NULL;
 		if (isCreateMuchTrack) muchTrack = new ((*muchTracks)[muchTrackNo++]) CbmMuchTrack();
 		if (isCreateTrdTrack) trdTrack = new ((*trdTracks)[trdTrackNo++]) CbmTrdTrack();
 
+		double chiSqMuch = 0., chiSqTrd = 0.;
+		int ndfMuch = 0, ndfTrd = 0;
 		for (int iHit = 0; iHit < litTrack->GetNofHits(); iHit++) {
 			const CbmLitHit* hit = litTrack->GetHit(iHit);
+			const CbmLitFitNode* node = litTrack->GetFitNode(iHit);
 			LitDetectorId detId = hit->GetDetectorId();
 			if (detId == kLITTRD && isCreateTrdTrack) {
 				trdTrack->AddHit(hit->GetRefId(), kTRDHIT);
+				chiSqTrd += node->GetChiSqFiltered();
+				ndfTrd += 2;
 			}
 			if (detId == kLITMUCH && isCreateMuchTrack) {
-				if (hit->GetType() == kLITPIXELHIT)
+				if (hit->GetType() == kLITPIXELHIT) {
 					muchTrack->AddHit(hit->GetRefId(), kMUCHPIXELHIT);
-				else
+					ndfMuch += 2;
+				} else {
 					muchTrack->AddHit(hit->GetRefId(), kMUCHSTRAWHIT);
+					ndfMuch++;
+				}
+				chiSqMuch += node->GetChiSqFiltered();
 			}
 			if (detId == kLITTOF) {
 				globalTrack->SetTofHitIndex(hit->GetRefId());
 			}
 		}
+		ndfMuch -= 5;
+		ndfTrd -= 5;
+		if (ndfMuch <= 0) ndfMuch = 1;
+		if (ndfTrd <= 0) ndfTrd = 1;
 
 		globalTrack->SetStsTrackIndex(litTrack->GetPreviousTrackId());
 		stsTracksSet.insert(litTrack->GetPreviousTrackId());
 		if (isCreateMuchTrack) {
 			globalTrack->SetMuchTrackIndex(muchTrackNo - 1);
 			muchTrack->SetPreviousTrackId(litTrack->GetPreviousTrackId());
+			muchTrack->SetChiSq(chiSqMuch);
+			muchTrack->SetNDF(ndfMuch);
+
+			FairTrackParam parLast, parFirst;
+			CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetFitNode(muchLast)->GetUpdatedParam(), &parLast);
+			CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetFitNode(muchFirst)->GetUpdatedParam(), &parFirst);
+			muchTrack->SetParamLast(&parLast);
+			muchTrack->SetParamFirst(&parFirst);
 		}
 		if (isCreateTrdTrack) {
 			globalTrack->SetTrdTrackIndex(trdTrackNo - 1);
 			trdTrack->SetPreviousTrackId(litTrack->GetPreviousTrackId());
+			trdTrack->SetChiSq(chiSqTrd);
+			trdTrack->SetNDF(ndfTrd);
+
+			FairTrackParam parLast, parFirst;
+			CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetFitNode(trdLast)->GetUpdatedParam(), &parLast);
+			CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetFitNode(trdFirst)->GetUpdatedParam(), &parFirst);
+			trdTrack->SetParamLast(&parLast);
+			trdTrack->SetParamFirst(&parFirst);
 		}
 	}
 

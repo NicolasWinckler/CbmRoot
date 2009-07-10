@@ -37,12 +37,14 @@ ${CBMROOT_SOURCE_DIR}/much
 ${CBMROOT_SOURCE_DIR}/much/geo
 ${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/sts
+#/home/soft/temp/tbb21_017oss/include
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
+#/home/soft/temp/tbb21_017oss/build/linux_em64t_gcc_cc4.3.2_libc2.9_kernel2.6.27.7_release
 )
  
 link_directories( ${LINK_DIRECTORIES})
@@ -72,15 +74,15 @@ finder/CbmLitTrackFinderBranch.cxx
 finder/CbmLitTrackFinderNN.cxx
 finder/CbmLitNearestHitToTrackMerger.cxx
 finder/CbmLitGating.cxx
+#finder/CbmLitTrackFinderNNParallel.cxx
 finder_cbm/CbmLitTrdTrackFinderBranch.cxx
 finder_cbm/CbmLitTrdTrackFinderNN.cxx
 finder_cbm/CbmLitTrdTrackFinderWeight.cxx
 finder_cbm/CbmLitTrdTrackFinderStandalone.cxx
-finder_cbm/CbmLitMuchTrackFinderBranch.cxx
-finder_cbm/CbmLitMuchTrackFinderNN.cxx
-finder_cbm/CbmLitMuchTrackFinderWeight.cxx
+#finder_cbm/CbmLitMuchTrackFinderBranch.cxx
+#finder_cbm/CbmLitMuchTrackFinderNN.cxx
+#finder_cbm/CbmLitMuchTrackFinderWeight.cxx
 finder_cbm/CbmLitStsBasedTrackFinder.cxx
-#finder_cbm/CbmLitTofMerger.cxx
 finder_cbm/CbmLitFindGlobalTracks.cxx
 fitter/CbmLitTrackFitterImp.cxx
 fitter/CbmLitKalmanFilter.cxx
@@ -111,7 +113,6 @@ propagation/CbmLitMyGeoNavigator.cxx
 propagation/CbmLitMyTrackPropagator.cxx
 qa/CbmLitReconstructionQa.cxx
 qa/CbmLitFindGlobalTracksIdeal.cxx
-qa/CbmLitRecQa.cxx
 qa/CbmLitElossAna.cxx
 qa/CbmLitPropagationAnalysis.cxx
 qa/CbmLitRobustFitterAnalysis.cxx

@@ -49,7 +49,6 @@ LitStatus CbmLitRK4TrackExtrapolator::Extrapolate(
    std::vector<myf> cIn = par->GetCovMatrix();
    std::vector<myf> cOut(15);
    TransportC(cIn, fF, cOut);
-//   Similarity(fF, cIn, cOut);
 
    par->SetStateVector(xOut);
    par->SetCovMatrix(cOut);

@@ -86,7 +86,7 @@ public:
 	myf CalcI(
 			myf Z) const;
 private:
-	myf fEnergyLoss;
+//	myf fEnergyLoss;
 	bool fDownstream;
 	myf fMass;
 	bool fIsElectron;

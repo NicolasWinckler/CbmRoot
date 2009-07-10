@@ -1,3 +1,11 @@
+/** CbmLitEnums.h
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ *
+ * Header defines some of the enumerations used in the track reconstruction.
+ **/
+
 #ifndef CBMLITENUMS_H_
 #define CBMLITENUMS_H_
 

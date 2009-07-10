@@ -17,12 +17,10 @@
 
 CbmLitStsBasedTrackFinder::CbmLitStsBasedTrackFinder()
 {
-//	fVerbose = 1;
 }
 
 CbmLitStsBasedTrackFinder::~CbmLitStsBasedTrackFinder()
 {
-//	delete fPropagatorToDet;
 }
 
 void CbmLitStsBasedTrackFinder::DefaultInit()
@@ -37,13 +35,6 @@ void CbmLitStsBasedTrackFinder::DefaultInit()
 	fTrackSeedsArray = (TClonesArray*) rootMgr->GetObject("STSTrack");
 	if(NULL == fTrackSeedsArray){
 		std::cout << "CbmLitStsBasedTrackFinder::DefaultInit" << "no STS track array" << std::endl;
-		exit(0);
-	   //TObject::Fatal("CbmLitStsBasedTrackFinder::DefaultInit","no STS track array");
-	}
-
-	fHitsArray = (TClonesArray*) rootMgr->GetObject("MuchPixelHit");
-	if(NULL == fHitsArray){
-		std::cout << "CbmLitStsBasedTrackFinder::DefaultInit" << "no MuchPixelhit array" << std::endl;
 		exit(0);
 	   //TObject::Fatal("CbmLitStsBasedTrackFinder::DefaultInit","no STS track array");
 	}
@@ -66,11 +57,6 @@ void CbmLitStsBasedTrackFinder::DefaultCreateTrackSeeds(
 {
 	CbmLitConverter::StsTrackArrayToTrackVector(trackArray, trackSeeds);
 
-//    if (fVerbose > 1)
-//      std::cout << "-I- CbmLitStsBasedTrackFinder::CreateTrackSeeds: " << std::endl
-//                << trackArray->GetEntriesFast() << " tracks were loaded, "
-//                << trackSeeds.size() << " tracks were created" << std::endl;
-
     myf Ze = layout.GetSubstation(0, 0, 0).GetZ();
     for (TrackPtrIterator iTrack = trackSeeds.begin(); iTrack != trackSeeds.end(); iTrack++) {
     	CbmLitTrackParam par = *(*iTrack)->GetParamLast();
@@ -79,10 +65,6 @@ void CbmLitStsBasedTrackFinder::DefaultCreateTrackSeeds(
     	(*iTrack)->SetParamFirst((*iTrack)->GetParamLast());
     	(*iTrack)->SetChi2(0.);
     }
-
-//    if (fVerbose > 1)
-//       std::cout << "-I- CbmLitStsBasedTrackFinder::CreateTrackSeeds: "
-//                 << "Extrapolation to detector finished " << std::endl;
 }
 
 ClassImp(CbmLitStsBasedTrackFinder);

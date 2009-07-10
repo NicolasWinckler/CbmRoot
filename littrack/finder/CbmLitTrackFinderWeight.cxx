@@ -150,7 +150,7 @@ void CbmLitTrackFinderWeight::FitTracks(
 		if ((*it)->GetNofHits() < 11) (*it)->SetQuality(kLITBAD);
 		if ((*it)->GetLastPlaneId() < 5) {(*it)->SetQuality(kLITBAD); continue;}
 		if (fFitter->Fit(*it) == kLITERROR) (*it)->SetQuality(kLITBAD);
-		if ((*it)->GetNofHits() < 12) (*it)->SetQuality(kLITBAD);
+		if ((*it)->GetNofHits() < 11) (*it)->SetQuality(kLITBAD);
 //		if ((*it)->GetLastPlaneId() < 40) (*it)->SetQuality(kLITBAD);
 //		if ((*it)->GetChi2() / (*it)->GetNDF() > 200) (*it)->SetQuality(kLITBAD);
 	}

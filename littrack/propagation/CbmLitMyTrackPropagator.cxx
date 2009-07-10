@@ -3,6 +3,7 @@
 #include "CbmLitMaterialEffectsImp.h"
 #include "CbmLitMath.h"
 #include "CbmLitMatrixMath.h"
+#include "CbmLitDefaultSettings.h"
 
 #include <cmath>
 #include <iostream>
@@ -51,7 +52,7 @@ LitStatus CbmLitMyTrackPropagator::Propagate(
 	fPDG = pdg;
 	myf zIn = par->GetZ();
 	myf dz = zOut - zIn;
-	if(std::fabs(dz) < 1e-3) return kLITSUCCESS;
+	if(std::fabs(dz) < lit::MINIMUM_PROPAGATION_DISTANCE) return kLITSUCCESS;
 
 	//Check whether upstream or downstream
 	fDownstream = dz > 0;
@@ -105,5 +106,4 @@ void CbmLitMyTrackPropagator::UpdateF(
 	std::vector<myf> A(25);
 	Mult25(newF, F, A);
 	F.assign(A.begin(), A.end());
-//	F = newF * F;
 }

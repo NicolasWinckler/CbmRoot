@@ -9,7 +9,7 @@
  ** The task automatically determines the setup based on the
  ** geometry stored in the MC transport file.
  ** The tracking is performed in the MUCH and TRD detectors, than
- ** the hit-to-track merger attaches the TOF hit.
+ ** the hit-to-track merger attaches the TOF hit finally the track is refitted.
  ** If TRD detector presences in the muon detector setup,
  ** than the tracking is done in MUCH+TRD detectors in one goal.
  **/
@@ -68,6 +68,13 @@ public:
      * "nearest_hit" - attaches hit-to-track based on the closest statistical distance
      */
 	void SetMergerType(const std::string& mergerType) { fMergerType = mergerType;}
+
+	/**
+     * Sets track fitter algorithm to be used for the final track fit.
+     * @param fitterType Name fitter algorithm.
+     * "lit_kalman" - forward Kalman filter track fit with TGeo geometry
+     */
+	void SetFitterType(const std::string& fitterType) { fFitterType = fitterType;}
 
 private:
     /**
@@ -140,6 +147,7 @@ private:
 	// Tools
 	TrackFinderPtr fFinder; // track finder
 	HitToTrackMergerPtr fMerger; // hit-to-track merger
+	TrackFitterPtr fFitter; // track fitter
 
 	// Settings
 	// Tracking method to be used
@@ -151,6 +159,10 @@ private:
 	// Merger method to be used
 	// "nearest_hit" - assigns nearest hit to the track
 	std::string fMergerType;
+
+	// Track fitter to be used for the final track fit
+	// "lit_kalman" - forward Kalman track fit with LIT propagation and TGeo navigation
+	std::string fFitterType;
 
 	// stopwatches
 	TStopwatch fTrackingWatch; // stopwatch for tracking

@@ -1,8 +1,7 @@
-// -------------------------------------------------------------------------
-// -----                  CbmLitEnvironment source file               -----
-// -----                  Created 16/07/07  by A. Lebedev               -----
-// -------------------------------------------------------------------------
-
+/** CbmLitEnvironment.cxx
+ *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2007
+ **/
 #define NEWMUCH 1
 
 #include "CbmLitEnvironment.h"

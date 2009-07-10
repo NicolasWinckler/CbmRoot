@@ -1,3 +1,9 @@
+/** CbmLitHitData.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ **/
+
 #include "CbmLitHitData.h"
 
 #include "CbmLitDetectorLayout.h"
@@ -65,8 +71,6 @@ void CbmLitHitData::AddHit(
 	int substation;
 	StationByPlaneId(planeId, stationGroup, station, substation);
 	AddHit(stationGroup, station, substation, hit);
-//	std::cout << "AddHit planeId=" << planeId << " stationGroup=" << stationGroup
-//		<< " station=" << station << " substation=" << substation << std::endl;
 }
 
 const CbmLitHit* CbmLitHitData::GetHit(

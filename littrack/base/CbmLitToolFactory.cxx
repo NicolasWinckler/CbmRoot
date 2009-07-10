@@ -24,6 +24,8 @@
 #include "CbmLitNearestHitToTrackMerger.h"
 #include "CbmLitEnvironment.h"
 #include "CbmLitPtrTypes.h"
+#include "CbmLitTrackFinderNNParallel.h"
+
 
 CbmLitToolFactory* CbmLitToolFactory::fInstance = NULL;
 
@@ -235,7 +237,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderNN->IsUseFastSearch(true);
 		trdFinderNN->SetMaxNofMissingHits(4);
 		trdFinderNN->SetSigmaCoef(7.);
-		trdFinderNN->SetChiSqPixelHitCut(20.);
+		trdFinderNN->SetChiSqPixelHitCut(25.);
 		trdFinderNN->SetChiSqStripHitCut(4.);
 		trdFinderNN->SetPDG(11);
 		trdFinderNN->Initialize();
@@ -275,7 +277,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderWeight->SetMaxNofMissingHits(0);
 		trdFinderWeight->IsUseFastSearch(true);
 		trdFinderWeight->SetSigmaCoef(10.);
-		trdFinderWeight->SetChiSqPixelHitCut(20.);
+		trdFinderWeight->SetChiSqPixelHitCut(25.);
 		trdFinderWeight->SetChiSqStripHitCut(4.);
 		trdFinderWeight->SetPDG(11);
 		TrackFinderPtr finder(trdFinderWeight);
@@ -315,7 +317,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderBranch->SetMaxNofMissingHits(2);
 		muchFinderBranch->IsAlwaysCreateMissingHit(false);
 		muchFinderBranch->SetSigmaCoef(3.5);
-		muchFinderBranch->SetChiSqPixelHitCut(15.0);//13.86);
+		muchFinderBranch->SetChiSqPixelHitCut(13.86);
 		muchFinderBranch->SetChiSqStripHitCut(4.);
 		TrackFinderPtr finder(muchFinderBranch);
 		return finder;

@@ -12,6 +12,7 @@
 #include "CbmLitTrackParam.h"
 #include "CbmLitMath.h"
 #include "CbmLitMatrixMath.h"
+#include "CbmLitDefaultSettings.h"
 
 #include <vector>
 #include <cmath>
@@ -21,8 +22,7 @@ CbmLitTGeoTrackPropagator::CbmLitTGeoTrackPropagator(
 		TrackExtrapolatorPtr extrapolator):
    CbmLitTrackPropagator("CbmLitTGeoTrackPropagator"),
    fExtrapolator(extrapolator),
-   fCalcTransportMatrix(true),
-   fMaxStepSize(10.)
+   fCalcTransportMatrix(true)
 {
 	fNavigator = GeoNavigatorPtr(new CbmLitTGeoNavigator());
 	fMaterial = MaterialEffectsPtr(new CbmLitMaterialEffectsImp());
@@ -67,7 +67,7 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 	myf zIn = par->GetZ();
 	myf dz = zOut - zIn;
 
-	if(std::fabs(dz) < 1e-3) return kLITSUCCESS;
+	if(std::fabs(dz) < lit::MINIMUM_PROPAGATION_DISTANCE) return kLITSUCCESS;
 
 	//Check whether upstream or downstream
 	//TODO check upstream/downstream
@@ -78,15 +78,15 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 		fFm[0] = 1.; fFm[6] = 1.; fFm[12] = 1.; fFm[18] = 1.; fFm[24] = 1.;
 	}
 
-	int nofSteps = int(std::abs(dz) / fMaxStepSize);
+	int nofSteps = int(std::abs(dz) / lit::MAXIMUM_PROPAGATION_STEP_SIZE);
 	myf stepSize;
-	if (nofSteps == 0) stepSize = dz; else  stepSize = fMaxStepSize;
+	if (nofSteps == 0) stepSize = dz; else  stepSize = lit::MAXIMUM_PROPAGATION_STEP_SIZE;
 	myf z = zIn;
 
 	//Loop over steps + additional step to propagate to virtual plane at zOut
 	for (int iStep = 0; iStep < nofSteps + 1; iStep++) {
 		if (!IsParCorrect(par)) {
-			std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: incorrect track parameters" << std::endl;
+//			std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: incorrect track parameters" << std::endl;
 			return kLITERROR;
 		}
 
@@ -96,7 +96,7 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 		//Get intersections with the materials for this step
 		std::vector<CbmLitMaterialInfo> inter;
 		if (fNavigator->FindIntersections(par, z, inter) == kLITERROR) {
-			std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: navigation failed" << std::endl;
+//			std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: navigation failed" << std::endl;
 			return kLITERROR;
 		}
 
@@ -106,13 +106,13 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 
 			// check if track parameters are correct
 			if (!IsParCorrect(par)) {
-				std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: incorrect track parameters" << std::endl;
+//				std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: incorrect track parameters" << std::endl;
 				return kLITERROR;
 			}
 
 			// extrapolate to the next boundary
 			if (fExtrapolator->Extrapolate(par, mat.GetZpos()) == kLITERROR) {
-				std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: extrapolation failed" << std::endl;
+//				std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: extrapolation failed" << std::endl;
 				return kLITERROR;
 			}
 
@@ -145,7 +145,6 @@ void CbmLitTGeoTrackPropagator::UpdateF(
 	std::vector<myf> A(25);
 	Mult25(newF, F, A);
 	F.assign(A.begin(), A.end());
-//	F = newF * F;
 }
 
 bool CbmLitTGeoTrackPropagator::IsParCorrect(

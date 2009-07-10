@@ -41,9 +41,9 @@
 #pragma link C++ class CbmLitTrdTrackFinderNN+;
 #pragma link C++ class CbmLitTrdTrackFinderWeight+;
 #pragma link C++ class CbmLitTrdTrackFinderStandalone+;
-#pragma link C++ class CbmLitMuchTrackFinderBranch+;
-#pragma link C++ class CbmLitMuchTrackFinderNN+;
-#pragma link C++ class CbmLitMuchTrackFinderWeight+;
+//#pragma link C++ class CbmLitMuchTrackFinderBranch+;
+//#pragma link C++ class CbmLitMuchTrackFinderNN+;
+//#pragma link C++ class CbmLitMuchTrackFinderWeight+;
 #pragma link C++ class CbmLitStsBasedTrackFinder+;
 //#pragma link C++ class CbmLitTofMerger+;
 #pragma link C++ class CbmLitFindGlobalTracks+;
@@ -84,7 +84,6 @@
 // qa
 #pragma link C++ class CbmLitReconstructionQa+;
 #pragma link C++ class CbmLitFindGlobalTracksIdeal+;
-#pragma link C++ class CbmLitRecQa+;
 #pragma link C++ class CbmLitPropagationAnalysis+;
 #pragma link C++ class CbmLitElossAna+;
 #pragma link C++ class CbmLitRobustFitterAnalysis+;

@@ -3,13 +3,13 @@
 #include "CbmLitTrackParam.h"
 #include "CbmLitMaterialInfo.h"
 #include "CbmLitPDG.h"
+#include "CbmLitDefaultSettings.h"
 
 #include <iostream>
 #include <cmath>
 
 CbmLitMaterialEffectsImp::CbmLitMaterialEffectsImp():
 	fMass(0.105),
-	fEnergyLoss(0.00354), //0.00354
 	fDownstream(true),
 	fIsElectron(false),
 	fIsMuon(true)
@@ -326,7 +326,7 @@ myf CbmLitMaterialEffectsImp::PairProduction(
 myf CbmLitMaterialEffectsImp::BetheBlochSimple(
         const CbmLitMaterialInfo* mat) const
 {
-	return fEnergyLoss * mat->GetZ() / mat->GetA();
+	return lit::ENERGY_LOSS_CONST * mat->GetZ() / mat->GetA();
 }
 
 myf CbmLitMaterialEffectsImp::MPVEnergyLoss(

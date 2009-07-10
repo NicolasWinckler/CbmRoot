@@ -1,6 +1,7 @@
 #include "CbmLitTGeoNavigator.h"
 
 #include "CbmLitTrackParam.h"
+#include "CbmLitDefaultSettings.h"
 
 #include "TGeoManager.h"
 #include "TGeoNode.h"
@@ -81,7 +82,7 @@ CbmLitMaterialInfo CbmLitTGeoNavigator::MakeStep(
 	matInfo.SetA(mat->GetA());
 
 	if (step == 0.) {
-		fGeo->FindNextBoundaryAndStep(30.);
+		fGeo->FindNextBoundaryAndStep(lit::MAXIMUM_TGEO_NAVIGATION_DISTANCE);
 	} else {
 		fGeo->SetStep(step);
 		fGeo->Step(kFALSE);

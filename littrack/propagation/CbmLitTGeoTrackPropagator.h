@@ -103,8 +103,6 @@ private:
 
 	std::vector<myf> fFm; // Transport matrix
 
-	myf fMaxStepSize; // Maximum step size in cm
-
 	bool fDownstream; // if true than downstream propagation
 	int fPDG; // PDG of the particle
 

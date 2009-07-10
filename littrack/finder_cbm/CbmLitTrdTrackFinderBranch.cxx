@@ -39,8 +39,6 @@ void CbmLitTrdTrackFinderBranch::Init()
 	SetVerbose(1);
 	SetNofIter(1);
 	IsUseFastSearch(true);
-//	SetBeginStationGroup(0);
-//	SetEndStationGroup(fLayout.GetNofStationGroups() - 1);
 	SetPDG(11);
 }
 
@@ -51,7 +49,7 @@ void CbmLitTrdTrackFinderBranch::SetIterationParameters(
 		SetMaxNofMissingHits(4);
 		IsAlwaysCreateMissingHit(false);
 		SetSigmaCoef(10.);
-		SetChiSqPixelHitCut(20.);//15.84;
+		SetChiSqPixelHitCut(25.);//15.84;
 		SetChiSqStripHitCut(4.);
 	}
 }

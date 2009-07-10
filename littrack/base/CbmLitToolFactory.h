@@ -6,8 +6,6 @@
 #include <string>
 #include <iostream>
 
-//#include <boost/shared_ptr.hpp>
-
 class CbmLitToolFactory
 {
 public:

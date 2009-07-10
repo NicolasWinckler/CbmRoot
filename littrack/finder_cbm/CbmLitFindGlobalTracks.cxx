@@ -13,7 +13,6 @@
 #include "CbmLitStripHit.h"
 #include "CbmLitTrack.h"
 #include "CbmLitToolFactory.h"
-//#include "CbmLitSimpleGeometryConstructor.h"
 
 #include "CbmBaseHit.h"
 #include "CbmPixelHit.h"
@@ -30,19 +29,20 @@
 
 #include <iostream>
 
-CbmLitFindGlobalTracks::CbmLitFindGlobalTracks()
+CbmLitFindGlobalTracks::CbmLitFindGlobalTracks():
+	fEventNo(0),
+	fTrackingType("branch"),
+	fMergerType("nearest_hit"),
+	fFitterType("lit_kalman"),
+	fStsTracks(NULL),
+	fMuchPixelHits(NULL),
+	fMuchStrawHits(NULL),
+	fMuchTracks(NULL),
+	fTrdHits(NULL),
+	fTrdTracks(NULL),
+	fTofHits(NULL),
+	fGlobalTracks(NULL)
 {
-	fEventNo = 0;
-	fTrackingType = "branch";
-	fMergerType = "nearest_hit";
-	fStsTracks = NULL;
-	fMuchPixelHits = NULL;
-	fMuchStrawHits = NULL;
-	fMuchTracks = NULL;
-	fTrdHits = NULL;
-	fTrdTracks = NULL;
-	fTofHits = NULL;
-	fGlobalTracks = NULL;
 }
 
 CbmLitFindGlobalTracks::~CbmLitFindGlobalTracks()
@@ -54,9 +54,6 @@ InitStatus CbmLitFindGlobalTracks::Init()
 {
 	DetermineSetup();
 	ReadAndCreateDataBranches();
-
-//	CbmLitSimpleGeometryConstructor geoConstructor;
-//	geoConstructor.ConstructGeometry();
 
 	InitTrackReconstruction();
 
@@ -86,13 +83,7 @@ void CbmLitFindGlobalTracks::SetParContainers()
     FairRunAna* ana = FairRunAna::Instance();
     FairRuntimeDb* rtdb = ana->GetRuntimeDb();
 
-//    rtdb->getContainer("FairBaseParSet");
-//    rtdb->getContainer("CbmGeoPassivePar");
-//    rtdb->getContainer("CbmGeoStsPar");
-//    rtdb->getContainer("CbmGeoRichPar");
     rtdb->getContainer("CbmGeoMuchPar");
-//    rtdb->getContainer("CbmGeoTrdPar");
-//    rtdb->getContainer("CbmFieldPar");
 }
 
 void CbmLitFindGlobalTracks::Finish()
@@ -189,6 +180,11 @@ void CbmLitFindGlobalTracks::InitTrackReconstruction()
 		else
 			TObject::Fatal("CbmLitFindGlobalTracks","Merger type not found");
 	}
+
+	if (fFitterType == "lit_kalman")
+		fFitter = factory->CreateTrackFitter("lit_kalman");
+	else
+		TObject::Fatal("CbmLitFindGlobalTracks","Fitter type not found");
 }
 
 void CbmLitFindGlobalTracks::ConvertInputData()
@@ -245,6 +241,12 @@ void CbmLitFindGlobalTracks::RunTrackReconstruction()
 		fMergerWatch.Start(kFALSE);
 		fMerger->DoMerge(fLitTofHits, fLitOutputTracks);
 		fMergerWatch.Stop();
+	}
+
+	//Refit found tracks
+	for(TrackPtrIterator it = fLitOutputTracks.begin(); it != fLitOutputTracks.end(); it++){
+		CbmLitTrack* track = *it;
+		fFitter->Fit(track);
 	}
 }
 

@@ -262,8 +262,8 @@ void CbmMuchFindHitsAdvancedGem::SetClusterCharges(Int_t stationNr, Int_t cluste
   // Fill vector of charges for the given station and cluster size
   vector<Int_t> charges;
   for(Int_t iCharge=0; iCharge<*padCharges; ++iCharge){
-    Double_t distance = padCharges[iCharge+1];
-    charges.push_back(distance);
+    Int_t charge = padCharges[iCharge+1];
+    charges.push_back(charge);
   }
 
   // Put the vector into appropriate place in the staionXclusterSize matrix

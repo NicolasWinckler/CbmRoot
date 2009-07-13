@@ -12,50 +12,47 @@
 #define CBMMUCHHITPRODUCERIDEAL_H
 
 #include "FairTask.h"
-#include "TH2.h"
-#include "TClonesArray.h"
-#include "TString.h"
 
+class TClonesArray;
+class TString;
 
 class CbmMuchHitProducerIdeal : public FairTask {
 
-public:
+  public:
 
-  CbmMuchHitProducerIdeal(const char *name="MuchHitProducer", Int_t verbose = 1,
-		     Double_t SigmaXY = 0.0100, Double_t SigmaZ = 0. );
+    CbmMuchHitProducerIdeal(const char *name="MuchHitProducer", Int_t verbose = 1,
+        Double_t SigmaXY = 0.0100, Double_t SigmaZ = 0. );
 
-  virtual ~CbmMuchHitProducerIdeal();
+    virtual ~CbmMuchHitProducerIdeal();
 
-  virtual InitStatus Init();// *MENU*
-  virtual void Exec(Option_t * option);
-  virtual void FinishTask();// *MENU*
+    virtual InitStatus Init();// *MENU*
+    virtual void Exec(Option_t * option);
+    virtual void FinishTask();// *MENU*
 
-  void Register();
+    void Register();
 
-  void AddHit(Int_t detID, TVector3 &posHit, TVector3 &posHitErr, Int_t ref );
+    void AddHit(Int_t detID, TVector3 &posHit, TVector3 &posHitErr, Int_t ref );
 
-  void SetSigmaXY(Double_t sigma);
-  void SetSigmaZ(Double_t sigma);
+    void SetSigmaXY(Double_t sigma);
+    void SetSigmaZ(Double_t sigma);
 
-  Double_t GetSigmaXY();
-  Double_t GetSigmaZ();
+    Double_t GetSigmaXY();
+    Double_t GetSigmaZ();
 
-private:
+  private:
 
-  Int_t fVerbose;
+    Int_t fVerbose;
 
-  TClonesArray *fMuchPoints; //! Much MC points
-  TClonesArray *fHitCollection; //! Much hits
+    TClonesArray *fMuchPoints; //! Much MC points
+    TClonesArray *fHitCollection; //! Much hits
 
-  Double_t fSigmaXY;//!
-  Double_t fSigmaZ; //!
+    Double_t fSigmaXY;//!
+    Double_t fSigmaZ; //!
 
-  TString fVersion; //!
-  Int_t  fNHits;    //!!
+    TString fVersion; //!
+    Int_t  fNHits;    //!!
 
- public:
-
-  ClassDef(CbmMuchHitProducerIdeal,1)
+    ClassDef(CbmMuchHitProducerIdeal,1)
 };
 
 #endif

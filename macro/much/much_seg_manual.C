@@ -6,7 +6,7 @@
  * @param mcFile    Input transport file name
  * @param digiFile  Output file name containing segmentation parameters
  */
-void much_seg_manual(const char* mcFile = "",
+void much_seg_manual(const char* mcFile = "data/mc.standard.500.root",
               const char* digiFile = "")
 {
   // ========================================================================
@@ -22,7 +22,7 @@ void much_seg_manual(const char* mcFile = "",
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;
 
-  // Dummy ROOT file (neede as an output)
+  // Dummy ROOT file (needed as an output)
   TString outFile  = "data/dummy.root";
 
   // ----  Load libraries   -------------------------------------------------
@@ -74,16 +74,16 @@ void much_seg_manual(const char* mcFile = "",
   seg->SetNChannels(nChannels);
 
   // Number of regions for each station
-  Int_t nRegions[] = {5, 3, 1, 1, 1, 1};
+  Int_t nRegions[] = {4, 7, 5, 3, 1, 1};
   seg->SetNRegions(nRegions);
 
   // Set region radii for each station
-  Double_t st0_rad[] = {14, 20, 25, 32, 65};
-  Double_t st1_rad[] = {22, 24, 91};
-  Double_t st2_rad[] = {111};
-  Double_t st3_rad[] = {136};
-  Double_t st4_rad[] = {164};
-  Double_t st5_rad[] = {229};
+  Double_t st0_rad[] = {50,70,70, 90};
+  Double_t st1_rad[] = {30, 30, 30, 50, 75, 75, 110};
+  Double_t st2_rad[] = {30, 30, 30,  60, 130};
+  Double_t st3_rad[] = {30, 60, 155};
+  Double_t st4_rad[] = {184};
+  Double_t st5_rad[] = {249};
   seg->SetRegionRadii(0, st0_rad);
   seg->SetRegionRadii(1, st1_rad);
   seg->SetRegionRadii(2, st2_rad);
@@ -92,8 +92,8 @@ void much_seg_manual(const char* mcFile = "",
   seg->SetRegionRadii(5, st5_rad);
 
   // Set minimum pad size/resolution [cm] in the center region for each station
-  Double_t padLx[] = {0.134, 0.4, 0.8, 0.8 ,0.8, 0.8};
-  Double_t padLy[] = {0.134, 0.4, 0.8, 0.8 ,0.8, 0.8};
+  Double_t padLx[] = {0.4, 0.4, 0.4, 0.8, 3.2, 3.2};
+  Double_t padLy[] = {0.4, 0.2, 0.8, 1.6, 3.2, 3.2};
   seg->SetMinPadSize(padLx, padLy);
 
   fRun->AddTask(seg);

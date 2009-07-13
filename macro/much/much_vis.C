@@ -14,7 +14,7 @@ void much_vis(TString mcFile="", TString rcFile="", TString digiFile="")
      mcFile = inputdir + "/macro/much/data/Jpsi.auau.25gev.centr.mc.root";
   }
   if (digiFile == "") {
-     digiFile = inputdir + "/macro/much/data/much_digi.root";
+     digiFile = inputdir + "/macro/much/data/much_digi.root";//"/parameters/much/much_standard.digi.root";
   }
   if (rcFile == "") {
      rcFile = inputdir + "/macro/much/data/Jpsi.auau.25gev.centr.muchhits.root";

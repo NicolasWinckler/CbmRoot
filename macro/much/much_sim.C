@@ -9,9 +9,9 @@
  * @param nEvents        Number of events to process
  */
 void much_sim(TString inputSignal = "",
-              TString inputBgr = "",
-              TString outFile = "",
-              Int_t nEvents = 2)
+              TString inputBgr = "",//"/home/mike/urqmd.auau.25gev.centr.0000.ftn14",
+              TString outFile = "",//"data/mc.standard.500.root",
+              Int_t nEvents = 5)
 {
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -41,7 +41,7 @@ void much_sim(TString inputSignal = "",
   // much_standard.geo: 6 absorbers, 6 stations (12 detectors)
   // much_compact.geo: 5 absorbers, 5 stations (10 detectors)
   // Use pipe_much.geo for the beam pipe in both cases.
-  // In case you want the addtional W shielding around the pipe,
+  // In case you want the additional W shielding around the pipe,
   // use shield_standard.geo or shield_compact.geo, respective to the
   // MUCH geometry. Otherwise, define an empty string.
   TString muchGeom   = "much_standard.geo";
@@ -66,7 +66,7 @@ void much_sim(TString inputSignal = "",
 
 
   // -----   Set unique random generator seed   -----------------------------
-  // Comment this out if you want to have a defined seed for reproducability.
+  // Comment this out if you want to have a defined seed for reproducibility.
   gRandom->SetSeed(1);
   // ------------------------------------------------------------------------
 
@@ -108,7 +108,7 @@ void much_sim(TString inputSignal = "",
   // ------------------------------------------------------------------------
 
   // -----   Create detectors and passive volumes   -------------------------
-  cout << endl << "=== much_sim.C : Create geeometry ..." << endl;
+  cout << endl << "=== much_sim.C : Create geometry ..." << endl;
   if ( caveGeom != "" ) {
     FairModule* cave = new CbmCave("CAVE");
     cave->SetGeometryFileName(caveGeom);

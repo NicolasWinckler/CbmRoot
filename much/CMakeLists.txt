@@ -51,6 +51,7 @@ reco/CbmMuchHitFinderQa.cxx
 reco/CbmMuchHitProducerIdeal.cxx
 reco/CbmMuchPointInfo.cxx
 reco/CbmMuchStrawHitFinderQa.cxx
+reco/CbmMuchClusterAnalysis.cxx
 
 tracking/CbmMuchFindTracks.cxx
 tracking/CbmMuchMatchTracks.cxx 

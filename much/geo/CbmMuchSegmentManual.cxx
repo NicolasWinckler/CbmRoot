@@ -124,6 +124,29 @@ void CbmMuchSegmentManual::SetMinSigma(Double_t sigmaX[], Double_t sigmaY[]){
 }
 // -------------------------------------------------------------------------
 
+//// -----   Public method SetSigma  -----------------------------------------
+//void CbmMuchSegmentManual::SetSigma(Int_t iStation, Int_t iRegion, Double_t sigmaX, Double_t sigmaY){
+//  if(iStation < 0 || iStation >= fNStations) Fatal("SetSigma", "iStation is out of range.");
+//  if(iRegion < 0 || iRegion >= fNRegions[iStation]) Fatal("SetSigma", "iRegion is out of range.");
+//  fSecLx[iStation].at(iRegion) = fNCols[iStation]*TMath::Sqrt(12.)*sigmaX;
+//  fSecLy[iStation].at(iRegion) = fNRows[iStation]*TMath::Sqrt(12.)*sigmaY;
+//  if(TMath::Abs(fSecLy[iStation]-fSecLx[iStation]) < 1e-5) return;
+//  if(TMath::Abs(fSecLy[iStation]/fSecLx[iStation]-2.) > 1e-5){
+//    fNCols[iStation] *=2;
+//    fNRows[iStation] /=2;
+//    SetSigma(iStation, iRegion, sigmaX, sigmaY);
+//  }
+//}
+//// -------------------------------------------------------------------------
+//
+//// -----   Public method SetSigmas  ----------------------------------------
+//void CbmMuchSegmentManual::SetSigmas(Int_t iStation, Double_t sigmaX[], Double_t sigmaY[]){
+//  for(Int_t iStation=0;iStation<fNStations; ++iStation){
+//    SetMinSigma(iStation, sigmaX[iStation], sigmaY[iStation]);
+//  }
+//}
+//// -------------------------------------------------------------------------
+
 // -----   Public method SetMinPadSize -------------------------------------
 void CbmMuchSegmentManual::SetMinPadSize(Int_t iStation, Double_t padLx, Double_t padLy){
   if(iStation < 0 || iStation >= fNStations) Fatal("SetMinPadSize", "iStation is out of range.");

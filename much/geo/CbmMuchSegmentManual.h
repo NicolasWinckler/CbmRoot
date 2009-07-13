@@ -10,8 +10,6 @@
 #ifndef CBMMUCHSEGMENTMANUAL_H
 #define CBMMUCHSEGMENTMANUAL_H 1
 
-#include "TObject.h"
-#include "TObjArray.h"
 #include "FairTask.h"
 
 #include <vector>
@@ -24,6 +22,7 @@ class CbmMuchModuleGem;
 class CbmMuchSector;
 class CbmMuchLayerSide;
 class CbmGeoMuchPar;
+class TObjArray;
 
 class CbmMuchSegmentManual : public FairTask {
 
@@ -78,6 +77,8 @@ class CbmMuchSegmentManual : public FairTask {
      */
     void SetMinSigma(Int_t iStation, Double_t sigmaX, Double_t sigmaY);
     void SetMinSigma(Double_t sigmaX[], Double_t sigmaY[]);
+    void SetSigma(Int_t iStation, Int_t iRegion, Double_t sigmaX, Double_t sigmaY);
+    void SetSigmas(Int_t iStation, Double_t sigmaX[], Double_t sigmaY[]);
 
     /** Sets pad size for the central region of the given station.
      * @param iStation Station index
@@ -86,6 +87,8 @@ class CbmMuchSegmentManual : public FairTask {
      */
     void SetMinPadSize(Int_t iStation, Double_t padLx, Double_t padLy);
     void SetMinPadSize(Double_t padLx[], Double_t padLy[]);
+    void SetPadSize(Int_t iStation, Int_t iRegion, Double_t padLx, Double_t padLy);
+    void SetPadSizes(Int_t iStation, Double_t padLx[], Double_t padLy[]);
 
   private:
     CbmGeoMuchPar*                fGeoPar;         // Geometry parameters container
@@ -96,8 +99,8 @@ class CbmMuchSegmentManual : public FairTask {
     map<Int_t, vector<Double_t> > fRadii;          // Map from a station index to a vector of circled regions radii
     map<Int_t, vector<Double_t> > fSecLx;          // Map from a station index to a vector of sector widths for each region
     map<Int_t, vector<Double_t> > fSecLy;          // Map from a station index to a vector of sector lengths for each region
-    map<Int_t, Double_t>          fSecMinLx;       // Map from a station index to a minimum allowed width of a sector
-    map<Int_t, Double_t>          fSecMinLy;       // Map from a station index to a minimum allowed length of a sector
+    map<Int_t, Double_t>          fSecMinLx;       // Map from a station index to a minimum width of a sector
+    map<Int_t, Double_t>          fSecMinLy;       // Map from a station index to a minimum length of a sector
     map<Int_t, Int_t>             fNChannels;      // Map from a station index to a number of channels per sector
     map<Int_t, Int_t>             fNCols;          // Map from a station index to a number of columns in a sector
     map<Int_t, Int_t>             fNRows;          // Map from a station index to a number of rows in a sector

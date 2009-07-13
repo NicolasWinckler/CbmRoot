@@ -21,7 +21,8 @@ void much_histo_style(){
 
   gStyle->SetPadGridX(1);
   gStyle->SetPadGridY(1);
-  gStyle->SetGridWidth(1);
+  //gStyle->SetGridWidth(1);
+
 
   gStyle->SetPadBottomMargin(0.12);
   gStyle->SetPadTopMargin(0.1);

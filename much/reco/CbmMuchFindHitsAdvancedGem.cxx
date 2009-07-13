@@ -55,7 +55,7 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem() :
   fAlgorithm = 0;
 
 //  fDebug = 0;
-//  fEvent=0;
+  fEvent=0;
 }
 // -------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(Int_t iVerbose) :
   fAlgorithm = 0;
 
 //  fDebug = 0;
-//  fEvent=0;
+  fEvent=0;
 }
 // -------------------------------------------------------------------------
 
@@ -87,7 +87,7 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(const char* name, const c
   fAlgorithm = 0;
 
 //  fDebug = 0;
-//  fEvent=0;
+  fEvent=0;
 }
 // -------------------------------------------------------------------------
 
@@ -107,7 +107,7 @@ CbmMuchFindHitsAdvancedGem::~CbmMuchFindHitsAdvancedGem() {
 // -----   Public method Exec   --------------------------------------------
 void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
   fTimer.Start();
-//  fEvent++;
+  fEvent++;
 
   // Clear output array
   if (fHits) fHits->Clear();
@@ -230,13 +230,21 @@ void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
     << fDigis->GetEntriesFast() << ", hits: "
     << fHits->GetEntriesFast() << endl;
   }
-  //StatInfo();
+  StatInfo();
 }
 // -------------------------------------------------------------------------
 
+void CbmMuchFindHitsAdvancedGem::FinishTask(){
+  printf("----------------------- Some statistics -----------------------------\n");
+  // Loop over stations
+  for(Int_t iStation=0; iStation < fGeoScheme->GetNStations(); ++iStation){
+    printf("Station %i: losts = %f%, fakes = %f%\n", iStation+1, fLosts.at(iStation)/fEvent*100, fFakes.at(iStation)/fEvent*100);
+  }
+  printf("---------------------------------------------------------------------\n");
+}
+
 // -------------------------------------------------------------------------
-void CbmMuchFindHitsAdvancedGem::SetClusterDistanceLimits(Int_t stationNr, Int_t clusterSize, Double_t *distanceLimits){
-  Int_t iStation = stationNr-1;
+void CbmMuchFindHitsAdvancedGem::SetClusterDistanceLimits(Int_t iStation, Int_t clusterSize, Double_t *distanceLimits){
   // Fill vector of distances for the given station and cluster size
   vector<Double_t> distances;
   for(Int_t iDistance=0; iDistance<*distanceLimits; ++iDistance){
@@ -257,8 +265,7 @@ void CbmMuchFindHitsAdvancedGem::SetClusterDistanceLimits(Int_t stationNr, Int_t
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-void CbmMuchFindHitsAdvancedGem::SetClusterCharges(Int_t stationNr, Int_t clusterSize, Int_t *padCharges){
-  Int_t iStation = stationNr-1;
+void CbmMuchFindHitsAdvancedGem::SetClusterCharges(Int_t iStation, Int_t clusterSize, Int_t *padCharges){
   // Fill vector of charges for the given station and cluster size
   vector<Int_t> charges;
   for(Int_t iCharge=0; iCharge<*padCharges; ++iCharge){
@@ -280,7 +287,6 @@ void CbmMuchFindHitsAdvancedGem::SetClusterCharges(Int_t stationNr, Int_t cluste
 
 // -----   Public method StatInfo  -----------------------------------------
 void CbmMuchFindHitsAdvancedGem::StatInfo(){
-  printf("----------------------- Some statistics -----------------------------\n");
   Int_t nHitsTotal = 0; // Total number of hits
   Int_t nPointsTotal = 0; // Total number of processed points
   Double_t frFakes = 0.; // Fraction of fake hits
@@ -347,21 +353,21 @@ void CbmMuchFindHitsAdvancedGem::StatInfo(){
 //    printf("Station %i: losts = %f%, fakes = %f%\n", iStation+1, frStationLosts*100, frStationFakes*100);
 //    printf("nStationPointsTotal = %i, nStationHitsTotal = %i\n", nStationPointsTotal, nStationHitsTotal);
 
-//    if(fFakes.size() == iStation){
-//      fFakes.push_back(0);
-//    }
-//    fFakes.at(iStation) += frStationFakes;
-//
-//    if(fLosts.size() == iStation){
-//      fLosts.push_back(0);
-//    }
-//    fLosts.at(iStation) += frStationLosts;
+    if(fFakes.size() == iStation){
+      fFakes.push_back(0);
+    }
+    fFakes.at(iStation) += frStationFakes;
+
+    if(fLosts.size() == iStation){
+      fLosts.push_back(0);
+    }
+    fLosts.at(iStation) += frStationLosts;
   }
   frLosts /= nPointsTotal;
   frFakes /= nHitsTotal;
-  printf("Total: losts = %f%, fakes = %f%\n", frLosts*100, frFakes*100);
-  printf("nPointsTotal = %i, nHitsTotal = %i\n", nPointsTotal, nHitsTotal);
-  printf("---------------------------------------------------------------------\n");
+//  printf("Total: losts = %f%, fakes = %f%\n", frLosts*100, frFakes*100);
+//  printf("nPointsTotal = %i, nHitsTotal = %i\n", nPointsTotal, nHitsTotal);
+//  printf("---------------------------------------------------------------------\n");
 }
 // -------------------------------------------------------------------------
 
@@ -795,7 +801,8 @@ void CbmMuchFindHitsAdvancedGem::GroupDigisDivisive(vector<vector<Int_t> > &digi
 Bool_t CbmMuchFindHitsAdvancedGem::ShouldDivideDivisive(vector<Int_t> digiGroup){
   if(digiGroup.size() == 0) return false; // Don't consider empty group
 
-  Double_t distance = 100; // Distance threshold (100 by default)
+  const Double_t defaultDistance = 0;
+  Double_t distance = defaultDistance; // Distance threshold (100 by default)
   Int_t iStation = -1; // Index of the station
   Int_t nPads = digiGroup.size(); // Cluster size
   Int_t meanPadCharge = 0; // Mean pad-charge in the cluster
@@ -820,9 +827,10 @@ Bool_t CbmMuchFindHitsAdvancedGem::ShouldDivideDivisive(vector<Int_t> digiGroup)
       vector<Int_t> charges = clusterCharges[nPads];
       assert(charges.size() == distances.size());
       Int_t i;
-      for(i=0; i<charges.size(); ++i)
+      for(i=0; i<charges.size(); i++)
         if(meanPadCharge < charges.at(i)) break;
-      distance = distances.at(i);
+
+      distance = i < distances.size() ? distances.at(i) : defaultDistance;
     }
   }
 

@@ -8,20 +8,20 @@
  * @param outFile        Output file for reconstruction data
  * @param nEvents        Number of events to process
  */
-void much_hits_gem(TString inFile = "",
+void much_hits_gem(TString inFile = "",//"data/mc.standard.500.root",
       TString digiFile = "",
-      TString outFile = "",
-      Int_t nEvents = 2)
+      TString outFile = "",//"data/hits.standard.500.root",
+      Int_t nEvents = 5)
 {
    TString inputdir = gSystem->Getenv("VMCWORKDIR");
    if (inFile == "") {
-      inFile = inputdir + "/macro/much/data/Jpsi.auau.25gev.centr.mc.root";
+      inFile = "data/Jpsi.auau.25gev.centr.mc.root";
    }
    if (digiFile == "") {
-      digiFile = inputdir + "/parameters/much/much_standard.digi.root";//"/macro/much/data/much_digi.root";
+      digiFile = "data/much_digi.root";//inputdir + "/parameters/much/much_standard.digi.root";
    }
    if (outFile == "") {
-      outFile = inputdir + "/macro/much/data/Jpsi.auau.25gev.centr.muchhits.root";
+      outFile = "data/Jpsi.auau.25gev.centr.muchhits.root";
    }
 
    // ========================================================================
@@ -73,16 +73,61 @@ void much_hits_gem(TString inFile = "",
    // ---  MuCh digitizer ----------------------------------------------------
 //   CbmMuchDigitizeSimpleGem* digitize = new CbmMuchDigitizeSimpleGem("MuchDigitizeSimpleGem", digiFile, iVerbose);
    CbmMuchDigitizeAdvancedGem* digitize = new CbmMuchDigitizeAdvancedGem("MuchDigitizeAdvancedGem", digiFile, iVerbose);
+   digitize->SetSpotRadius(0.15);
+   digitize->SetQThreshold(3);
+   digitize->SetQMaximum(500000);
+   digitize->SetNADCChannels(256);
    fRun->AddTask(digitize);
    // ------------------------------------------------------------------------
 
    // ---  MuCh hit finder ---------------------------------------------------
 //   CbmMuchFindHitsSimpleGem* findHits = new CbmMuchFindHitsSimpleGem("MuchFindHitsSimpleGem", digiFile, iVerbose);
    CbmMuchFindHitsAdvancedGem* findHits = new CbmMuchFindHitsAdvancedGem("MuchFindHitsAdvancedGem", digiFile, iVerbose);
+   findHits->SetAlgorithm(4);
+
+   // ============================== Parameters for the 1st station ==========================================
+   const Int_t iStation = 0; // Station number for which parameters should be set
+   const Int_t nLimits = 2; // Number of limits (number of contributed MC-points) for the cluster in the given station
+   const Int_t nDim = nLimits+1;
+   Double_t distancesSt1Pad2[nDim] = {nLimits, 50, 70}; // Distances for the 2-pad clusters
+   Double_t distancesSt1Pad3[nDim] = {nLimits, 60, 80}; // Distances for the 3-pad clusters
+   Double_t distancesSt1Pad4[nDim] = {nLimits, 70, 90}; // Distances for the 4-pad clusters
+   Int_t chargesSt1Pad2[nDim] = {nLimits, 40, 55};   // Charges for the 2-pad clusters
+   Int_t chargesSt1Pad3[nDim] = {nLimits, 68, 78};   // Charges for the 3-pad clusters
+   Int_t chargesSt1Pad4[nDim] = {nLimits, 65, 87};   // Charges for the 4-pad clusters
+
+   findHits->SetClusterDistanceLimits(iStation, 2, distancesSt1Pad2); // Set mean distances for 2-pad cluster
+   findHits->SetClusterCharges(iStation, 2, chargesSt1Pad2); // Set mean charges for 2-pad cluster
+   findHits->SetClusterDistanceLimits(iStation, 3, distancesSt1Pad3); // Set mean distances for 3-pad cluster
+   findHits->SetClusterCharges(iStation, 3, chargesSt1Pad3); // Set mean charges for 3-pad cluster
+   findHits->SetClusterDistanceLimits(iStation, 4, distancesSt1Pad4); // Set mean distances for 4-pad cluster
+   findHits->SetClusterCharges(iStation, 4, chargesSt1Pad4); // Set mean charges for 4-pad cluster
+   // ========================================================================================================
+
+   // ============================== Parameters for the 2nd station ==========================================
+   // Set parameters for the 2nd station (if needed)
+   // ========================================================================================================
+
+   // ============================== Parameters for the 3rd station ==========================================
+   // Set parameters for the 3rd station (if needed)
+   // ========================================================================================================
+
+   // ============================== Parameters for the 4th station ==========================================
+   // Set parameters for the 4th station (if needed)
+   // ========================================================================================================
+
+   // ============================== Parameters for the 5th station ==========================================
+   // Set parameters for the 5th station (if needed)
+   // ========================================================================================================
+
+   // ============================== Parameters for the 6th station ==========================================
+   // Set parameters for the 6th station (if needed)
+   // ========================================================================================================
+
    fRun->AddTask(findHits);
    // ------------------------------------------------------------------------
 
-   // -----   Intialise and run   --------------------------------------------
+   // -----   Initialize and run   -------------------------------------------
    fRun->Init();
    fRun->Run(0,nEvents);
    // ------------------------------------------------------------------------

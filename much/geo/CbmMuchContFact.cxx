@@ -10,8 +10,6 @@
 #include "CbmMuchContFact.h"
 
 #include "CbmGeoMuchPar.h"
-// #include "CbmMuchParRootFileIo.h"
-// #include "CbmMuchParAsciiFileIo.h"
 
 #include "FairRuntimeDb.h"
 #include "FairParRootFileIo.h"

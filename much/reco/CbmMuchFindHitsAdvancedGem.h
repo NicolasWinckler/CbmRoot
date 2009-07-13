@@ -82,8 +82,8 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
   /** Execution. */
   virtual void Exec(Option_t* opt);
 
-  void SetClusterCharges(Int_t stationNr, Int_t clusterSize, Int_t* padCharges);
-  void SetClusterDistanceLimits(Int_t stationNr, Int_t clusterSize, Double_t* distanceLimits);
+  void SetClusterCharges(Int_t iStation, Int_t clusterSize, Int_t* padCharges);
+  void SetClusterDistanceLimits(Int_t iStation, Int_t clusterSize, Double_t* distanceLimits);
 
 //  void SetAnalysisStation(Int_t iStation) {fAnalysisStationIndex = iStation;}
 //  void SetAnalysisClusterSize(Int_t nPads) {fAnalysisClusterSize = nPads;}
@@ -106,15 +106,16 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
   map<Int_t, map<Int_t, vector<Double_t> > > fDistanceLimits; // Map from station index to the list of distance limits for each cluster size
   map<Int_t, map<Int_t, vector<Int_t> > > fChargeLimits;     // Map from station index to the list of charge limits for each cluster size
 
-//  // Analysis variables
+  // Analysis variables
+  vector<Double_t> fFakes; // Fakes fraction
+  vector<Double_t> fLosts; // Losts fraction
+  Int_t fEvent;
+
 //  map<Int_t, CbmMuchCluster*> fAnalysisClusters;  // Clusters to analyze
 //  Int_t fAnalysisStationIndex; // Index of the station to analyze
 //  Int_t fAnalysisClusterSize; // Size of the clusters to analyze
 //  Int_t fAnalysisNPoints; // Number of points in the clusters to analyze
-//  vector<Double_t> fFakes; // Fakes fraction
-//  vector<Double_t> fLosts; // Losts fraction
 //  Int_t fDebug;
-//  Int_t fEvent;
 
 
   /** Get parameter containers. */
@@ -123,6 +124,7 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
   virtual InitStatus Init();
   /** Re-initialization. */
   virtual InitStatus ReInit();
+  virtual void FinishTask();
 
   /** Groups neighbour digis into clusters (should be disentangled in the future)
    * and fills output fClusters array. */

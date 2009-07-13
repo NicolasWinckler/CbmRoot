@@ -15,6 +15,7 @@
 #include "TMath.h"
 #include "TStyle.h"
 #include "TCanvas.h"
+#include "TClonesArray.h"
 
 #include "CbmMuchHitProducerIdeal.h"
 #include "FairMCApplication.h"

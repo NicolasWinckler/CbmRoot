@@ -7,9 +7,9 @@
  * @param digiFile  Output file name containing segmentation parameters
  * @param nEvents   Number of events to process
  */
-void much_seg_auto(const char* mcFile = "",
+void much_seg_auto(const char* mcFile = "",//"data/mc.standard.500.root",
               const char* digiFile = "",
-	      Int_t nEvents = 2)
+	      Int_t nEvents = 5)
 {
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -74,13 +74,13 @@ void much_seg_auto(const char* mcFile = "",
   seg->SetNStations(6);
 
   // Set minimum allowed resolution for each station
-  Double_t sigmaXmin[] = {0.04, 0.04, 0.04, 0.04, 0.04, 0.04};
-  Double_t sigmaYmin[] = {0.04, 0.04, 0.04, 0.04, 0.04, 0.04};
+  Double_t sigmaXmin[] = {0.08, 0.08, 0.08, 0.08, 0.08, 0.08};
+  Double_t sigmaYmin[] = {0.08, 0.08, 0.08, 0.08, 0.08, 0.08};
   seg->SetSigmaMin(sigmaXmin, sigmaYmin);
 
   // Set maximum allowed resolution for each station
-  Double_t sigmaXmax[] = {0.32, 0.32, 0.32, 0.32, 0.32, 0.32};
-  Double_t sigmaYmax[] = {0.32, 0.32, 0.32, 0.32, 0.32, 0.32};
+  Double_t sigmaXmax[] = {0.6, 0.6, 0.6, 0.6, 0.8, 1.};
+  Double_t sigmaYmax[] = {0.6, 0.6, 0.6, 0.6, 0.8, 1.};
   seg->SetSigmaMax(sigmaXmax, sigmaYmax);
 
   // Set maximum occupancy for each station

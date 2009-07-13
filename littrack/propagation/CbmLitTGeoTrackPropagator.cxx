@@ -128,6 +128,8 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 		}
 	}
 
+	par->SetZ(zOut);
+
 	if (!IsParCorrect(par)) return kLITERROR;
 	else return kLITSUCCESS;
 }

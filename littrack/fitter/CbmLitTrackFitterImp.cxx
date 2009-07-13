@@ -55,8 +55,15 @@ LitStatus CbmLitTrackFitterImp::Fit(
 	for (int i = 0; i < nofHits; i++) {
 		const CbmLitHit* hit = track->GetHit(i);
 	    myf Ze = hit->GetZ();
+	    if (Ze > 500. && hit->GetDetectorId() != kLITTOF) {
+	    	std::cout << std::endl << std::endl << std::endl;
+	    	std::cout << "WWAAAAAAAAAAAAAAAARNINNNNNNNNNNNNNNNNNNGGGGGGGGG!!!!!!!!" << std::endl;
+	    	std::cout << hit->ToString();
+	    	std::cout << track->ToString();
+	    }
 	    if (fPropagator->Propagate(&par, Ze, track->GetPDG()) == kLITERROR) {
 	    	//std::cout << "-E- CbmLitTrackFitterImp::Fit: propagation failed" << std::endl;
+	    	track->SetQuality(kLITBAD);
 	    	return kLITERROR;
 	    }
 	    nodes[i].SetPredictedParam(&par);
@@ -64,6 +71,7 @@ LitStatus CbmLitTrackFitterImp::Fit(
 	    nodes[i].SetF(F);
 	    if (fUpdate->Update(&par, hit) == kLITERROR) {
 	    	//std::cout << "-E- CbmLitTrackFitterImp::Fit: track update failed" << std::endl;
+	    	track->SetQuality(kLITBAD);
 	    	return kLITERROR;
 	    }
 	    nodes[i].SetUpdatedParam(&par);

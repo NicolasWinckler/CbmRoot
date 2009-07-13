@@ -198,8 +198,16 @@ private:
 	Int_t fMinNofPointsTof; // Minimal number of MCPoints in TOF
 	Double_t fQuota;  // True/all hits for track to be considered correctly reconstructed
 
-	Int_t fMinNofHitsTrd; // Minimal number of hits in TRD track
-	Int_t fMinNofHitsMuch; // Minimal number of hits in MUCH track
+	// Minimal number of hits in track to be considered as accepted.
+	// This is needed because the definition of the correctly reconstructed track
+	// is 70% of hits in the reconstructed track are from the same MC track.
+	// But this can lead to the situation when a reconstructed track has 4 hits,
+	// all of them from the same MC track, which means that the track is correctly
+	// reconstructed. BUT the real MC track has 12 points(hits). This is especcially
+	// important for the MUCH detector. To avoid such situations on has to put
+	// such cut.
+	Int_t fMinNofHitsTrd; // for TRD track
+	Int_t fMinNofHitsMuch; // for MUCH track
 
 	Bool_t fIsElectronSetup; // If "electron" setup detected than true
 	Bool_t fIsSts; // If STS detected than true

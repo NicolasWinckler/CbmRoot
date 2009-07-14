@@ -185,6 +185,7 @@ void CbmLitEnvironment::NewMuchLayout()
 		Int_t nofStations = geoScheme->GetNStations();
 		for (Int_t iStation = 0; iStation < nofStations; iStation++){
 			CbmMuchStation* station = geoScheme->GetStation(iStation);
+
 			Int_t nofLayers = station->GetNLayers();
 			CbmLitStationGroup litStationGroup;
 			for (Int_t iLayer = 0; iLayer < nofLayers; iLayer++) {
@@ -198,7 +199,7 @@ void CbmLitEnvironment::NewMuchLayout()
 
 				CbmLitStation litStation;
 				litStation.AddSubstation(litSubstationFront);
-				litStation.AddSubstation(litSubstationBack);
+				if (station->IsModuleDesign()) litStation.AddSubstation(litSubstationBack);
 
 				Int_t type = layer->GetSideF()->GetModule(0)->GetDetectorType();
 				if (type == 2) litStation.SetType(kLITSTRIPHIT);

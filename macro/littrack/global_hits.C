@@ -1,11 +1,11 @@
-void global_hits(Int_t nEvents = 500)
+void global_hits(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
 	TString dir, mcFile, parFile, globalHitsFile, muchDigiFile;
 	if (script != "yes") {
-		dir  = "/home/d/andrey/test/trunk/global_e_urqmd/";
+		dir  = "/home/d/andrey/test/trunk/global_mu_low/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalHitsFile = dir + "global.hits.0000.root";

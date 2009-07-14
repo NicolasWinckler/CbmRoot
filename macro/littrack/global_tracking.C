@@ -1,14 +1,14 @@
-void global_tracking(Int_t nEvents = 100)
+void global_tracking(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, globalHitsFile, globalTracksFile;
 	if (script != "yes") {
-		dir  = "/home/d/andrey/test/trunk/global_mu_urqmd/";
+		dir  = "/home/d/andrey/test/trunk/global_mon_mu/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalHitsFile = dir + "global.hits.0000.root";
-		globalTracksFile = dir + "global.tracks.nn.parallel.0000.root";
+		globalTracksFile = dir + "global.tracks.test.0000.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -63,11 +63,11 @@ void global_tracking(Int_t nEvents = 100)
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
 	reconstructionQa->SetMinNofPointsTrd(10);
-	reconstructionQa->SetMinNofPointsMuch(12);
+	reconstructionQa->SetMinNofPointsMuch(9);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(8);
-	reconstructionQa->SetMinNofHitsMuch(11);
+	reconstructionQa->SetMinNofHitsMuch(8);
 	reconstructionQa->SetVerbose(1);
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------

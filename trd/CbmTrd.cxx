@@ -19,6 +19,8 @@
 #include "TParticle.h"
 #include "TVirtualMC.h"
 #include "TGeoManager.h"
+#include "TGeoMaterial.h"
+#include "TMath.h"
 
 #include <iostream>
 using std::cout;
@@ -157,33 +159,73 @@ void CbmTrd::Initialize()
 
 void CbmTrd::SetSpecialPhysicsCuts(){
     FairRun* fRun = FairRun::Instance();
+ 
+    // Setting the properties for the TRDgas is only tested
+    // with TGeant3, so we check for the simulation engine
+    // and change the standard properties only for TGeant3
     if (strcmp(fRun->GetName(),"TGeant3") == 0) {
-   	  Int_t mat = gGeoManager->GetMaterialIndex("TRDgas");
-	   gMC->Gstpar(mat+1,"STRA",1.0);
-	   gMC->Gstpar(mat+1,"PAIR",1.0);
-	   gMC->Gstpar(mat+1,"COMP",1.0);
-	   gMC->Gstpar(mat+1,"PHOT",1.0);
-	   gMC->Gstpar(mat+1,"LOSS",2.0);
-           //gMC->Gstpar(mat+1,"PFIS",0.0);
- 	   gMC->Gstpar(mat+1,"ANNI",1.0);
-	   gMC->Gstpar(mat+1,"BREM",1.0);
-	   gMC->Gstpar(mat+1,"HADR",1.0);
-	   //gMC->Gstpar(mat+1,"MUNU",1.0);
-	   gMC->Gstpar(mat+1,"DCAY",1.0);
-	   gMC->Gstpar(mat+1,"MULS",1.0);
-	   //gMC->Gstpar(mat+1,"LABS",0.0);
-	   gMC->Gstpar(mat+1,"DRAY",1.0);
-	   gMC->Gstpar(mat+1,"RAYL",1.0);
-           gMC->Gstpar(mat+1,"CUTELE",10.e-6);
-           gMC->Gstpar(mat+1,"CUTGAM",10.e-6);
-           gMC->Gstpar(mat+1,"CUTNEU",10.e-4);
-           gMC->Gstpar(mat+1,"CUTHAD",10.e-4);
-           gMC->Gstpar(mat+1,"CUTMUO",10.e-6);
-	   gMC->Gstpar(mat+1,"BCUTE",10.e-6);
-           gMC->Gstpar(mat+1,"BCUTM",10.e-6);
-           gMC->Gstpar(mat+1,"DCUTE",10.e-6);
-           gMC->Gstpar(mat+1,"DCUTM",10.e-6);
-           gMC->Gstpar(mat+1,"PPCUTM",-1.);
+
+      // Get Material Id and some material properties from
+      // the geomanager
+      Int_t mat = gGeoManager->GetMaterialIndex("TRDgas");
+      TGeoMaterial *trdgas =  gGeoManager->GetMaterial(mat);
+      Double_t mass = trdgas->GetA();
+      Double_t charge = trdgas->GetZ();
+      
+      // Get the material properties for material with id+1
+      // (of-by-one problem) from the Virtual Monte Carlo
+      Int_t matIdVMC = mat+1;
+      char name[20];
+      Double_t a[1]={0.};
+      Double_t z[1]={0.};
+      Double_t dens[1]={0.};
+      Double_t radl[1]={0.};
+      Double_t absl[1]={0.};
+      Double_t *ubuf;
+      Int_t nbuf[1]={0.};
+      gMC->Gfmate(matIdVMC,name, *a, *z, *dens, *radl, *absl, ubuf, *nbuf);
+
+      // Check if the material properties are the same for TGeoManager
+      // and TVirtualMC. If not stop the execution of the simulation.
+      // This is done to stop the program whenever the
+      // of-by-one problem is fixed in the Virtual Monte Carlo
+      if ( ( TMath::Abs(mass - a[0]) > 0.0001 ) ||  
+	   ( TMath::Abs(charge - z[0]) ) > 0.0001 ) {
+	cout<<"**********************************"<<endl;
+        cout<<TMath::Abs(mass - a[0])<<" , "<<TMath::Abs(charge - z[0])<<endl;
+	cout <<"Parameters from Geomanager:"<<endl;
+	trdgas->Print();
+	cout <<"Parameters from Virtual Montecarlo:"<<endl;
+	cout <<"Name "<<name<<" Aeff="<<a[0]<<" Zeff="<<z[0]<<endl;
+	Fatal("SetSpecialPhysicsCuts","Material parameters different between TVirtualMC and TGeomanager");
+      }
+
+      // Set new properties, physics cuts etc. for the TRDgas
+      gMC->Gstpar(matIdVMC,"STRA",1.0);
+      gMC->Gstpar(matIdVMC,"PAIR",1.0);
+      gMC->Gstpar(matIdVMC,"COMP",1.0);
+      gMC->Gstpar(matIdVMC,"PHOT",1.0);
+      gMC->Gstpar(matIdVMC,"LOSS",2.0);
+      //gMC->Gstpar(matIdVMC,"PFIS",0.0);
+      gMC->Gstpar(matIdVMC,"ANNI",1.0);
+      gMC->Gstpar(matIdVMC,"BREM",1.0);
+      gMC->Gstpar(matIdVMC,"HADR",1.0);
+      //gMC->Gstpar(matIdVMC,"MUNU",1.0);
+      gMC->Gstpar(matIdVMC,"DCAY",1.0);
+      gMC->Gstpar(matIdVMC,"MULS",1.0);
+      //gMC->Gstpar(matIdVMC,"LABS",0.0);
+      gMC->Gstpar(matIdVMC,"DRAY",1.0);
+      gMC->Gstpar(matIdVMC,"RAYL",1.0);
+      gMC->Gstpar(matIdVMC,"CUTELE",10.e-6);
+      gMC->Gstpar(matIdVMC,"CUTGAM",10.e-6);
+      gMC->Gstpar(matIdVMC,"CUTNEU",10.e-4);
+      gMC->Gstpar(matIdVMC,"CUTHAD",10.e-4);
+      gMC->Gstpar(matIdVMC,"CUTMUO",10.e-6);
+      gMC->Gstpar(matIdVMC,"BCUTE",10.e-6);
+      gMC->Gstpar(matIdVMC,"BCUTM",10.e-6);
+      gMC->Gstpar(matIdVMC,"DCUTE",10.e-6);
+      gMC->Gstpar(matIdVMC,"DCUTM",10.e-6);
+      gMC->Gstpar(matIdVMC,"PPCUTM",-1.);
     }
 }
 

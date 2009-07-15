@@ -801,7 +801,7 @@ void CbmMuchFindHitsAdvancedGem::GroupDigisDivisive(vector<vector<Int_t> > &digi
 Bool_t CbmMuchFindHitsAdvancedGem::ShouldDivideDivisive(vector<Int_t> digiGroup){
   if(digiGroup.size() == 0) return false; // Don't consider empty group
 
-  const Double_t defaultDistance = 0;
+  const Double_t defaultDistance = 100;
   Double_t distance = defaultDistance; // Distance threshold (100 by default)
   Int_t iStation = -1; // Index of the station
   Int_t nPads = digiGroup.size(); // Cluster size

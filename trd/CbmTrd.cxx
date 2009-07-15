@@ -182,7 +182,7 @@ void CbmTrd::SetSpecialPhysicsCuts(){
       Double_t radl[1]={0.};
       Double_t absl[1]={0.};
       Double_t *ubuf;
-      Int_t nbuf[1]={0.};
+      Int_t nbuf[1]={0};
       gMC->Gfmate(matIdVMC,name, *a, *z, *dens, *radl, *absl, ubuf, *nbuf);
 
       // Check if the material properties are the same for TGeoManager

@@ -76,6 +76,7 @@
 #include "TGeoManager.h"
 #include "TLorentzVector.h"
 #include "TParticle.h"
+#include "TParticlePDG.h"
 #include "TVirtualMC.h"
 #include "TGeoMatrix.h"
 #include "TGeoNode.h"

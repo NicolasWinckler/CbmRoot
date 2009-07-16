@@ -41,7 +41,10 @@ void sts_sim(Int_t nEvents = 1)
   TString mvdGeom = "mvd_standard.geo";
 
   // STS geometry
-  TString stsGeom = "sts_Standard_s3055AAFK5.SecD.geo";
+  TString stsGeom = "sts_standard.geo";
+  
+  //STS geometry for the same z position of all sensors
+  //TString stsGeom = "sts_same_z.geo";
 
   // In general, the following parts need not be touched
   // ========================================================================

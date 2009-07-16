@@ -1,17 +1,17 @@
 int checkFields (const char *field_basename, double field_Z_origin=0, 
-double fixed_coord=170, int flag_yx_zx_z=0)
+		 double fixed_coord=170, int flag_yx_zx_z=0, double xyz_shift=0)
 {
   // -------------------------------------------------------------------------------
   //
   // Macro to plot selected parts of magnetic field (map or B-splined) and auto save to pdf 
   //
   // E.Litvinenko   12/05/2006    -  file "checkFields.C"
-  // last update - litvin 05/04/2007      
+  // last update - litvinen  08/07/2009      
   //
   // usage examples:
-  //    .x checkFields.C ("FieldActive",   50,145,0) - map     field, centre in Z=50 sm, fixed z=145, 6 pads B(y),B(x)
-  //    .x checkFields.C ("FieldActive_Bs",50,20,1)  - splined field, centre in Z=50 sm, fixed y=20,  6 pads B(z),B(x)
-  //    .x checkFields.C ("FieldHeraS",0,20,2)       - map     field, centre in Z=0 sm,  fixed y=20,  6 pads B(z),|B|(z)
+  //    .x checkFields.C ("FieldSC_16x13",   50,145,0)  - map     field, centre in Z=50 sm, fixed z=145, 6 pads B(y),B(x)
+  //    .x checkFields.C ("FieldActive_Bs",50,0,1)      - splined field, centre in Z=50 sm, fixed y=0,   6 pads B(z),B(x)
+  //    .x checkFields.C ("FieldSCmuon_16x13",0,20,2)   - map     field, centre in Z=0 sm,  fixed y=20,  6 pads B(z),|B|(z)
   // ----------------------------------------------------------------------------------
 
 
@@ -46,16 +46,19 @@ double fixed_coord=170, int flag_yx_zx_z=0)
 
   //  Possible magnetic fields:
 
-  //  FieldActive                  - default magnetic field map               (cvs) (svn)
-  //  FieldIron                    - not good    (May2006 -  Mar2007)         (cvs) (svn)
-  //      FieldAlligator_v04       - former  FIELD.v04_pavel
-  //      FieldAlligator           - former  FIELD.v05_pavel                  (cvs) (svn)
-  //  FieldActive_Bs               - B-splined default magnetic field         (cvs) (svn)
-  //      FieldDipole              - field map with angular acceptance 17 deg       (svn)
-  //  FieldMuonMagnet              - magnetic field map for muon mode               (svn)
-  //      FieldHera                - field map for HERA-B magnet                    (svn)
-  //      FieldHeraS               - field map for updated HERA-B magnet            (svn)
- //      FieldHermes               - field map for HERMES magnet            
+  //  FieldActive                     - old default magnetic field map               
+  //  FieldIron                       - not good    (May2006 -  Mar2007)        
+  //      FieldAlligator_v04          - former  FIELD.v04_pavel
+  //      FieldAlligator              - former  FIELD.v05_pavel                
+  //  FieldActive_Bs                  - B-splined default magnetic field         
+  //      FieldDipole                 - field map with angular acceptance 17 deg   
+  //  FieldMuonMagnet              - magnetic field map for muon mode (default)                            (Sep2006)   
+  //      FieldHera                    - field map for HERA-B magnet             
+  //      FieldHeraS                   - field map for updated HERA-B magnet      
+  //      FieldHermes                 - field map for HERMES magnet            
+  //     FieldSC                   - magnetic field map for muon mode with gap (in center) 1520x1200 mm^2  (Mar2009)
+  //     FieldSCmuon_16x13         - magnetic field map for muon mode with gap (in center) 1600x1300 mm^2  (Jul2009)
+  //     FieldSC_16x13             - magnetic field map for rich mode with gap (in center) 1600x1300 mm^2  (Jul2009)
 
   if ( fieldName == "FieldActive" || fieldName == "FieldIron" || fieldName == "FieldMuonMagnet") 
     {
@@ -64,8 +67,10 @@ double fixed_coord=170, int flag_yx_zx_z=0)
   else 
     {   
 
-      if ( fieldName == "FieldAlligator" ||  fieldName == "FieldDipole" || fieldName == "FieldHera" || 
-	   fieldName == "FieldHeraP" || fieldName == "FieldHeraS" || fieldName == "FieldHermes"  )
+      if ( fieldName == "FieldSC_16x13" || fieldName == "FieldSCmuon_16x13" || fieldName == "FieldSC"
+// 	    || fieldName == "FieldAlligator" ||  fieldName == "FieldDipole" || fieldName == "FieldHera" || 
+// 	   fieldName == "FieldHeraP" || fieldName == "FieldHeraS" || fieldName == "FieldHermes"  
+	   )
 	field = new CbmFieldMapSym2(field_basename);
       else 
 	{
@@ -117,10 +122,10 @@ double fixed_coord=170, int flag_yx_zx_z=0)
   Double_t fdy = (fymax-fymin) / Double_t(fny);
   Double_t fdz = (fzmax-fzmin) / Double_t(fnz);
 
-  Int_t i,j,k;
+  Int_t i,j,k, bin;
   char name[200],*nnam[3]={"x","y","z"},*nnam1[3]={"xz","xy","xyz"};
-  Int_t xyz[5]={-20,-10,0,10,20};
-  Int_t h_colors[5]={25,33,1,4,2};
+  Int_t xyz[5]={-20+xyz_shift,-10+xyz_shift,0+xyz_shift,10+xyz_shift,20+xyz_shift};
+  Int_t h_colors[5]={kGray+2, kCyan, kBlack, kBlue, kRed} ; // 25,33,1,4,2};
 
   if (!flag_yx_zx_z)               // "yx"
     {
@@ -160,28 +165,30 @@ double fixed_coord=170, int flag_yx_zx_z=0)
 	  y = fymin + Double_t(iy) * fdy;
 	  for (k=0;k<5;k++)
 	    {
+	      bin=iy; // (h[k][0][0])->FindBin(y);
 	      x=xyz[k];
 	      po[0]=x; po[1]=y; po[2]=z;
 	      field->GetFieldValue(po,BB);
-	      (h[k][0][0])->SetBinContent(iy+1,BB[0]/ 10.);
-	      (h[k][1][0])->SetBinContent(iy+1,BB[1]/ 10.);
-	      (h[k][2][0])->SetBinContent(iy+1,BB[2]/ 10.);
+	      (h[k][0][0])->SetBinContent(bin,BB[0]/ 10.);  //  iy+1
+	      (h[k][1][0])->SetBinContent(bin,BB[1]/ 10.); //  iy+1
+	      (h[k][2][0])->SetBinContent(bin,BB[2]/ 10.); //  iy+1
 	    }
 	}
 
       // ---> Loop over x axis 
-      cout << "                           ... x axis: 4-5-6" << endl;
+      cout << "                           ... x axis: 4-5-6   "  << fxmin << " " << fdx << " " << fxmax << endl;
       for (Int_t ix=0; ix<=fnx; ix++) 
 	{
 	  x = fxmin + Double_t(ix) * fdx;
 	  for (k=0;k<5;k++)
 	    {
+	      bin=ix; //(h[k][0][1])->FindBin(x);
 	      y=xyz[k];
 	      po[0]=x; po[1]=y; po[2]=z;
 	      field->GetFieldValue(po,BB);
-	      (h[k][0][1])->SetBinContent(ix+1,BB[0]/ 10.);
-	      (h[k][1][1])->SetBinContent(ix+1,BB[1]/ 10.);
-	      (h[k][2][1])->SetBinContent(ix+1,BB[2]/ 10.);
+	      (h[k][0][1])->SetBinContent(bin,BB[0]/ 10.);  // ix+1
+	      (h[k][1][1])->SetBinContent(bin,BB[1]/ 10.);  // ix+1
+	      (h[k][2][1])->SetBinContent(bin,BB[2]/ 10.);  // ix+1
 	    }
 	}
     }
@@ -216,7 +223,7 @@ double fixed_coord=170, int flag_yx_zx_z=0)
 		    sprintf(name,"hB_%d_%s%d",k,nnam[i],xyz[k]);
 		  h[k][i][j]=new TH1D(name,name,fnx,minx,maxx);
 		  (h[k][i][j])->SetLineColor(h_colors[k]);
-		  (h[k][i][j])->SetLineWidth(1+(k<2));
+		  (h[k][i][j])->SetLineWidth(1+1*((k>0)&&(k<3)));
 		  (h[k][i][j])->SetStats(0);
 		}
 	      if ((flag_yx_zx_z<2)||(j==0))
@@ -236,12 +243,13 @@ double fixed_coord=170, int flag_yx_zx_z=0)
 	  z = fzmin + Double_t(iz) * fdz;
 	  for (k=0;k<5;k++)
 	    {
+	      bin=iz; // (h[k][0][0])->FindBin(z);
 	      x=xyz[k];
 	      po[0]=x; po[1]=y; po[2]=z;
 	      field->GetFieldValue(po,BB);
-	      (h[k][0][0])->SetBinContent(iz+1,BB[0]/ 10.);
-	      (h[k][1][0])->SetBinContent(iz+1,BB[1]/ 10.);
-	      (h[k][2][0])->SetBinContent(iz+1,BB[2]/ 10.);
+	      (h[k][0][0])->SetBinContent(bin,BB[0]/ 10.);  // iz+1
+	      (h[k][1][0])->SetBinContent(bin,BB[1]/ 10.);  // iz+1
+	      (h[k][2][0])->SetBinContent(bin,BB[2]/ 10.);  // iz+1
 	      if (flag_yx_zx_z>=2)   // "z"
 		{
 		  bx = BB[0]/ 10.; by = BB[1]/ 10.; bz = BB[2]/ 10.;
@@ -258,18 +266,20 @@ double fixed_coord=170, int flag_yx_zx_z=0)
       if (flag_yx_zx_z<2)   // "zx"
 	{
 	  // ---> Loop over x axis 
-	  cout << "                           ... x axis: 4-5-6" << endl;
+	  //	  cout << "                           ... x axis: 4-5-6" << endl;
+      cout << "                           ... x axis: 4-5-6   "  << fxmin << " " << fdx << " " << fxmax << endl;
 	  for (Int_t ix=0; ix<=fnx; ix++) 
 	    {
 	      x = fxmin + Double_t(ix) * fdx;
 	      for (k=0;k<5;k++)
 		{
+		  bin=ix; // (h[k][0][1])->FindBin(x);
 		  z=xyz[k];
 		  po[0]=x; po[1]=y; po[2]=z;
 		  field->GetFieldValue(po,BB);
-		  (h[k][0][1])->SetBinContent(ix+1,BB[0]/ 10.);
-		  (h[k][1][1])->SetBinContent(ix+1,BB[1]/ 10.);
-		  (h[k][2][1])->SetBinContent(ix+1,BB[2]/ 10.);
+		  (h[k][0][1])->SetBinContent(bin,BB[0]/ 10.);  // ix+1 
+		  (h[k][1][1])->SetBinContent(bin,BB[1]/ 10.);  // ix+1 
+		  (h[k][2][1])->SetBinContent(bin,BB[2]/ 10.);  // ix+1 
 		}
 	    }
 	}
@@ -322,6 +332,7 @@ double fixed_coord=170, int flag_yx_zx_z=0)
 	    }
 	  (h[k][kpad%3][(kpad>=3)])->Draw("same");
 	}
+      gPad->BuildLegend();
     }
 
    padinf->cd();

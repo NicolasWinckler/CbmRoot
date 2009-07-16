@@ -29,10 +29,14 @@ void sts_reco(Int_t nEvents = 1)
   TString parFile = "params.root";
   
   // STS digitisation file for stereo angle 0 & 15 deg
-  TString digiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";
+  //TString digiFile = "sts_standard.digi.par";
   
   // STS digitisation file for stereo angle -7.5 & +7.5 deg
-  //TString digiFile = "sts_Standard_s3055AAFK5.SecD_7vs7.digi.par";
+  TString digiFile = "sts_standard_7vs7.digi.par";
+  
+  //STS digitisation file for the same z position of all sensors
+  //TString digiFile = "sts_same_z.digi.par";
+  
   
   // Output file
   TString outFile = "sts.reco.root";

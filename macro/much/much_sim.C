@@ -52,7 +52,7 @@ void much_sim(TString inputSignal = "",
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
   TString magnetGeom = "magnet_standard.geo";
-  TString stsGeom    = "sts_Standard_s3055AAFK5.SecD.geo";
+  TString stsGeom    = "sts_standard.geo";
   TString trdGeom    = "";
   TString tofGeom    = "";
 

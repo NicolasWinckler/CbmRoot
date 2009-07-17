@@ -31,7 +31,7 @@ void much_reco(Int_t nEvents = 10)
 	run->SetInputFile(mcFile);
 	run->SetOutputFile(globalRecoFile);
 
-	TString stsDigiFile = parDir+ "/sts/sts_Standard_s3055AAFK5.SecD.digi.par";
+	TString stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
 
 	// ----- STS reconstruction   ---------------------------------------------
 	FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);

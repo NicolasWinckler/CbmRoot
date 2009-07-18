@@ -65,6 +65,10 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
   /** Destructor. */
   virtual ~CbmMuchFindHitsAdvancedGem();
 
+  /** Sets ration to multiply on maximal pad-charge in a cluster to obtain
+   * charge threshold (appropriate only for simple clustering). */
+  void SetThresholdRatio(Double_t thresholdRatio) {fThresholdRatio = thresholdRatio;}
+
   /**
    * Sets the clustering algorithm to use.
    * 0 - Spatial separation (clusters are sets of neighbor fired pads)
@@ -99,10 +103,10 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
   TClonesArray*                    fClusters;          // Output array of CbmMuchCluster objects
   map<pair<Int_t, Int_t>, Int_t>   fChannelDigiMap;    // Correspondence between unique channel id and digi index
   set<Int_t>                       fSelectedDigis;     // Digis already included in clusters
+  Double_t                         fThresholdRatio;    // Multiplied by maximal pad-charge gives the charge ratio (for simple clustering only)
   Int_t                            fAlgorithm;         // Defines which algorithm to use
   TStopwatch                       fTimer;             // Timer
   Double_t                         fDistanceLimit;     // Limit for the ESS increment
-  Int_t                            fChargeLimit;       // Limit of charge
   map<Int_t, map<Int_t, vector<Double_t> > > fDistanceLimits; // Map from station index to the list of distance limits for each cluster size
   map<Int_t, map<Int_t, vector<Int_t> > > fChargeLimits;     // Map from station index to the list of charge limits for each cluster size
 
@@ -124,6 +128,7 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
   virtual InitStatus Init();
   /** Re-initialization. */
   virtual InitStatus ReInit();
+  /** Finish task. */
   virtual void FinishTask();
 
   /** Groups neighbour digis into clusters (should be disentangled in the future)
@@ -198,7 +203,6 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
   void MoveDigisDivisive(vector<vector<Int_t> > &digiGroups, Int_t iGroup, Int_t jGroup);
   // -----------------------------------------------------------------------------------------------------
 
-
   /**
    * Gets mean Euclidean distance between the given digi
    * and digis in the supplied group.
@@ -207,11 +211,16 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
    */
   Double_t GetMeanDistance(vector<Int_t> digiGroup, Int_t iDigi);
   /**
-   * Gets mean Euclidean distance between the given digi
-   * and digis in the supplied group.
-   * @param digiGroup Group of digis.
+   * Gets mean Euclidean distance between the digis
+   * in the supplied cluster.
+   * @param cluster The cluster to process.
    */
   Double_t GetMeanDistance(CbmMuchCluster* cluster);
+  /**
+   * Gets mean Euclidean distance between the digis
+   * in the supplied group.
+   * @param digiGroup Group of digis.
+   */
   Double_t GetMeanDistance(vector<Int_t> digiGroup);
   /**
    * Gets the Euclidean distance between the two digis.
@@ -231,6 +240,11 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
    * @param iCluster Index of the parent cluster for clusters.
    */
   void CreateHits(vector<CbmMuchCluster*> clusters, Int_t iCluster);
+  /**
+   * Creates a hit from the given cluster.
+   * @param cluster  Cluster to create a hit from.
+   * @param iCluster Index of the cluster, which is parent for the supplied one.
+   */
   void CreateHits(CbmMuchCluster* cluster, Int_t iCluster);
   /**
    * Gets CbmMuchPad object corresponding to the given digi index.

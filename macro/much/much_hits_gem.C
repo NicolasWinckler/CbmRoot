@@ -18,7 +18,7 @@ void much_hits_gem(TString inFile = "",//"data/mc.standard.500.root",
       inFile = "data/Jpsi.auau.25gev.centr.mc.root";
    }
    if (digiFile == "") {
-      digiFile = "data/much_digi.root";//inputdir + "/parameters/much/much_standard.digi.root";
+      digiFile = inputdir + "/parameters/much/much_standard.digi.root";
    }
    if (outFile == "") {
       outFile = "data/Jpsi.auau.25gev.centr.muchhits.root";

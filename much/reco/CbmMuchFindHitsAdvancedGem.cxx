@@ -8,6 +8,7 @@
  *  clustering algorithms. Clustering algorithms can be chosen
  *  by the switch SetAlgorithm(Int_t iAlgorithm)
  *  Several clustering algorithms are supported
+ *  0 - Spatial separation (clusters are sets of neighbor fired pads)
  *  1 - Simple
  *  2 - Ward (fuzzy clustering)
  *  3 - Simple + Ward
@@ -51,6 +52,7 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem() :
   fDigiFile = NULL;
   fClusters = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
+  fThresholdRatio = 0.1;
   fDistanceLimit = 0.5;
   fAlgorithm = 0;
 
@@ -67,6 +69,7 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(Int_t iVerbose) :
   fDigiFile = NULL;
   fClusters = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
+  fThresholdRatio = 0.1;
   fDistanceLimit = 0.5;
   fAlgorithm = 0;
 
@@ -83,6 +86,7 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(const char* name, const c
   fDigiFile    = new TFile(digiFileName);
   fClusters = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
+  fThresholdRatio = 0.1;
   fDistanceLimit = 0.5;
   fAlgorithm = 0;
 
@@ -568,7 +572,7 @@ CbmMuchPad* CbmMuchFindHitsAdvancedGem::GetPadByDigi(Int_t digiIndex, Int_t &cha
 // -----   Private method ExecClusteringSimple  ----------------------------
 void CbmMuchFindHitsAdvancedGem::ExecClusteringSimple(CbmMuchCluster* cluster, vector<CbmMuchCluster*> &clusters) {
   fSelectedDigis.clear();
-  Int_t qThreshold = cluster->GetMaxCharge() / 10;
+  Int_t qThreshold = fThresholdRatio*cluster->GetMaxCharge();
   Int_t dummy = 0;
   for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++) {
     Int_t digiIndex = cluster->GetDigiIndex(iDigi);

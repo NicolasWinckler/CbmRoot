@@ -11,14 +11,14 @@
 void much_hits_straw(TString inFile = "",
       TString digiFile = "",
       TString outFile = "",
-      Int_t nEvents = 2)
+      Int_t nEvents = 5)
 {
    TString inputdir = gSystem->Getenv("VMCWORKDIR");
    if (inFile == "") {
       inFile = inputdir + "/macro/much/data/Jpsi.auau.25gev.centr.mc.root";
    }
    if (digiFile == "") {
-      digiFile = inputdir + "/parameters/much/much_standard_straw.digi.root";//"/macro/much/data/much_digi.root";
+      digiFile = inputdir + "/parameters/much/much_standard_straw.digi.root";
    }
    if (outFile == "") {
       outFile = inputdir + "/macro/much/data/Jpsi.auau.25gev.centr.muchhits.root";

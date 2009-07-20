@@ -5,7 +5,7 @@
 #
 # Format:
 # StationNr global_rot nSectors
-# sect iType x0        y0       angle    lx       ly      dx       dy     stereoF	stereoB
+# sect iType     x0        y0         z0       angle    lx       ly      lz      dx       dy     stereoF   stereoB
 #################################################################
 [CbmStsDigiPar]
 1   0.000000        84

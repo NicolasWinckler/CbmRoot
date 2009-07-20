@@ -19,6 +19,8 @@
 #include "TSystem.h"
 #include "TROOT.h"
 
+#include <cmath>
+
 //using std::vector;
 //using std::endl;
 //using std::cout;

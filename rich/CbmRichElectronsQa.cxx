@@ -17,6 +17,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <cmath>
 
 class CbmStsTrack;
 
@@ -24,7 +25,7 @@ using std::cout;
 using std::endl;
 using std::map;
 using std::vector;
-
+using std::fabs;
 
 //------------  standard constructor (with verbosity level)  ---------------------------------
 CbmRichElectronsQa::CbmRichElectronsQa(const char *name, const char *title, Int_t verbose)

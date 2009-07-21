@@ -12,7 +12,7 @@ void run_sim(Int_t nEvents = 2)
 
   // ========================================================================
   //          Adjust this part according to your requirements
-  
+
   // ----- Paths and file names  --------------------------------------------
   TString inDir   = gSystem->Getenv("VMCWORKDIR");
   TString inFile  = inDir + "/input/urqmd.ftn14";
@@ -219,6 +219,5 @@ void run_sim(Int_t nEvents = 2)
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
-  exit(0);
 }
 

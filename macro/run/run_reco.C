@@ -77,6 +77,7 @@ void run_reco(Int_t nEvents = 2)
   gSystem->Load("libGlobal");
   gSystem->Load("libKF");
   gSystem->Load("libL1");
+  gSystem->Load("libLitTrack");
   gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
   // ------------------------------------------------------------------------
 
@@ -95,13 +96,13 @@ void run_reco(Int_t nEvents = 2)
   // ===                     MVD local reconstruction                      ===
   // =========================================================================
 
-  /*
+  
   // -----   MVD Hitproducer   -----------------------------------------------
   CbmMvdHitProducer* mvdHitProd = new CbmMvdHitProducer("MVDHitProducer", 0, 
   			  			       iVerbose);
   run->AddTask(mvdHitProd);
   // -------------------------------------------------------------------------
-  */
+ 
   
 
 
@@ -197,8 +198,7 @@ void run_reco(Int_t nEvents = 2)
 
 
   // -----   TRD track finding   ---------------------------------------------
-  CbmTrdTrackFinder* trdTrackFinder    = new CbmL1TrdTrackFinderSts();
-  ((CbmL1TrdTrackFinderSts*)trdTrackFinder)->SetVerbose(iVerbose);
+  CbmTrdTrackFinder* trdTrackFinder    = new CbmLitTrdTrackFinderNN();
   CbmTrdFindTracks* trdFindTracks = new CbmTrdFindTracks("TRD Track Finder");
   trdFindTracks->UseFinder(trdTrackFinder);
   run->AddTask(trdFindTracks);
@@ -453,5 +453,4 @@ void run_reco(Int_t nEvents = 2)
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
-  exit(0);
 }

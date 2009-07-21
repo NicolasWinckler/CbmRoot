@@ -61,7 +61,7 @@
   fRun->AddModule(Magnet);
   
   FairDetector *Sts= new CbmSts("STS", kTRUE);
-  Sts->SetGeometryFileName("sts_Standard_s3055AAFK5.SecD.geo");
+  Sts->SetGeometryFileName("sts_standard.geo");
   fRun->AddModule(Sts);
 
   
@@ -171,6 +171,5 @@
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
-  exit(0);
 }  
   

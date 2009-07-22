@@ -9,7 +9,7 @@
  */
 void much_seg_auto(const char* mcFile = "",//"data/mc.standard.500.root",
               const char* digiFile = "",
-	      Int_t nEvents = 5)
+	      Int_t nEvents = 2)
 {
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -96,4 +96,5 @@ void much_seg_auto(const char* mcFile = "",//"data/mc.standard.500.root",
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
+//  exit(0);
 }

@@ -11,7 +11,7 @@
 void much_sim(TString inputSignal = "",
               TString inputBgr = "",//"/home/mike/urqmd.auau.25gev.centr.0000.ftn14",
               TString outFile = "",//"data/mc.standard.500.root",
-              Int_t nEvents = 5)
+              Int_t nEvents = 2)
 {
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -244,6 +244,6 @@ void much_sim(TString inputSignal = "",
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
-  exit(0);
+//  exit(0);
 }
 

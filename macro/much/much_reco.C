@@ -1,21 +1,13 @@
-void much_reco(Int_t nEvents = 10)
+void much_reco(Int_t nEvents = 2)
 {
-	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
 	TString dir, mcFile, parFile, globalRecoFile, muchDigiFile;
-	if (script != "yes") {
-		dir  = "/home/d/andrey/test/trunk/global_mu/";
-		mcFile = dir + "mc.0000.root";
-		parFile = dir + "param.0000.root";
-		globalRecoFile = dir + "global.reco.0000.root";
-		muchDigiFile = parDir + "/much/much_standard.digi.root";
-	} else {
-		mcFile = TString(gSystem->Getenv("MCFILE"));
-		parFile = TString(gSystem->Getenv("PARFILE"));
-		globalRecoFile = TString(gSystem->Getenv("GLOBALRECOFILE"));
-		muchDigiFile = TString(gSystem->Getenv("MUCHDIGI"));
-	}
+        dir  = TString(gSystem->Getenv("VMCWORKDIR")) + "/macro/much/data/";
+	mcFile = dir + "Jpsi.auau.25gev.centr.mc.root";
+	globalRecoFile = dir + "global.reco.0000.root";
+	muchDigiFile = parDir + "/much/much_standard.digi.root";
+
 
 	Int_t iVerbose = 1;
 	TStopwatch timer;
@@ -149,7 +141,7 @@ void much_reco(Int_t nEvents = 10)
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();
 	FairParRootFileIo* parIo1 = new FairParRootFileIo();
 	FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
-	parIo1->open(parFile.Data());
+	parIo1->open(gFile);
 	parIo2->open(stsDigiFile.Data(),"in");
 	rtdb->setFirstInput(parIo1);
 	rtdb->setSecondInput(parIo2);
@@ -166,10 +158,13 @@ void much_reco(Int_t nEvents = 10)
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
 	cout << endl << endl;
+	cout << "Test passed" << endl;
+	cout << "All ok" << endl;
 	cout << "Macro finished successfully." << endl;
 	cout << "Output file is "    << globalRecoFile << endl;
 	cout << "Parameter file is " << parFile << endl;
 	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << endl;
 	cout << endl;
 	// ------------------------------------------------------------------------
+//        exit(0);
 }

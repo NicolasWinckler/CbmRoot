@@ -49,8 +49,8 @@
   Double_t fieldScale = 1.;      // field scaling factor
 
   // STS geometry
-  //  TString stsGeom     = "sts_standard.geo";
-  TString stsGeom    = "sts_Standard_s3055AAFK5.SecD.geo";
+  TString stsGeom     = "sts_standard.geo";
+  //TString stsGeom    = "sts_Standard_s3055AAFK5.SecD.geo";
 
 
   // In general, the following parts need not be touched
@@ -177,7 +177,7 @@
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
-  exit(0);
+//  exit(0);
 
   // ------------------------------------------------------------------------
 

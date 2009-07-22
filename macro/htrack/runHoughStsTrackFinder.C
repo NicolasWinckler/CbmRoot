@@ -45,8 +45,8 @@
   TString anaFile      = outputFolder + "/" + system + "." + beam + "." + trigger + ".ana.root";
 
   // Digitisation file
-  //  TString digiFile     = "sts_standard.digi.par";
-  TString digiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";
+  TString digiFile     = "sts_standard.digi.par";
+  //TString digiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";
 
   // Number of events to process
   Int_t nEvents        = 2;
@@ -150,7 +150,7 @@
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
-  exit(0);
+//  exit(0);
 
   // ------------------------------------------------------------------------
 

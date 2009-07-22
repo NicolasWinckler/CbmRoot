@@ -9,8 +9,8 @@
  * @param nEvents        Number of events to process
  */
 void much_sim(TString inputSignal = "",
-              TString inputBgr = "",//"/home/mike/urqmd.auau.25gev.centr.0000.ftn14",
-              TString outFile = "",//"data/mc.standard.500.root",
+              TString inputBgr = "",
+              TString outFile = "",
               Int_t nEvents = 2)
 {
   // ========================================================================

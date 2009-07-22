@@ -77,7 +77,7 @@ void run_reco(Int_t nEvents = 2)
   gSystem->Load("libGlobal");
   gSystem->Load("libKF");
   gSystem->Load("libL1");
-  gSystem->Load("libLitTrack");
+  gSystem->Load("libLittrack");
   gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
   // ------------------------------------------------------------------------
 

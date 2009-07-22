@@ -4,8 +4,8 @@ void much_reco(Int_t nEvents = 2)
 
 	TString dir, mcFile, parFile, globalRecoFile, muchDigiFile;
         dir  = TString(gSystem->Getenv("VMCWORKDIR")) + "/macro/much/data/";
-	mcFile = dir + "Jpsi.auau.25gev.centr.mc.root";
-	globalRecoFile = dir + "global.reco.0000.root";
+	mcFile = "data/Jpsi.auau.25gev.centr.mc.root";
+	globalRecoFile = "data/global.reco.0000.root";
 	muchDigiFile = parDir + "/much/much_standard.digi.root";
 
 

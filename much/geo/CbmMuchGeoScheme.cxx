@@ -487,12 +487,22 @@ void CbmMuchGeoScheme::Print() {
 
 // -------------------------------------------------------------------------
 void CbmMuchGeoScheme::CreateMuchCave() {
-  // Calculate Z2 position of much cave according to position of the last
-  // station layer
-  Double_t muchZ2 = fMuchZ1 + fStationZ0[fNst - 1] + fLayersDz[fNst - 1]
-                                                               * (fNlayers[fNst - 1] - 1) / 2. + (fSupportLz[fNst - 1] + fActiveLz) / 2.
-                                                               + 3.;
-  // Calculate cave radia
+  CreateAbsorbers();
+  CreateStations();
+
+  // Determine Z2;
+  Double_t muchZ2=fMuchZ1;
+  for (Int_t i = 0; i <fAbsorbers->GetEntries(); i++) {
+    TGeoCone* absorber = (TGeoCone*) fAbsorbers->At(i);
+    Double_t z2 = fMuchZ1+fAbsorberZ1[i]+2*absorber->GetDz();
+    if (z2 > muchZ2) muchZ2 = z2;
+  }
+
+  for (Int_t i = 0; i <fStations->GetEntries(); i++) {
+    CbmMuchStation* station = (CbmMuchStation*) fStations->At(i);
+    Double_t z2=station->GetZ()+station->GetTubeDz();
+    if (z2>muchZ2) muchZ2=z2;
+  }
   Double_t muchRmin1 = fMuchZ1 * fAcceptanceTanMin - 0.001;
   Double_t muchRmin2 = muchZ2 * fAcceptanceTanMin - 0.001;
   Double_t muchRmax2 = muchZ2 * fAcceptanceTanMax + 200; // 100 cm added for safety
@@ -502,8 +512,6 @@ void CbmMuchGeoScheme::CreateMuchCave() {
   // Calculate cone position
   Double_t fMuchZ0 = fMuchZ1 + muchDz;
   fMuchCave = new TGeoCone(muchDz, muchRmin1, muchRmax1, muchRmin2, muchRmax2);
-  CreateAbsorbers();
-  CreateStations();
 }
 // -------------------------------------------------------------------------
 

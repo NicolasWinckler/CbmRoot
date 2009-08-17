@@ -60,10 +60,15 @@ class CbmMuchClusterAnalysis: public FairTask {
      * Mean Euclidean distance between pads in the cluster.
      */
     Double_t GetMeanDistance(CbmMuchCluster* cluster);
+
     /**
      * Euclidean distance between two given pads.
      */
     Double_t GetDistance(Int_t iDigi, Int_t jDigi);
+
+    /**
+     * Gets pad by digi index.
+     */
     CbmMuchPad* GetPadByDigi(Int_t iDigi);
 
     ClassDef(CbmMuchClusterAnalysis,1)

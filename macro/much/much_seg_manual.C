@@ -3,11 +3,13 @@
  * user specified conditions.
  *
  * @author M.Ryzhinskiy m.ryzhinskiy@gsi.de
- * @param mcFile    Input transport file name
- * @param digiFile  Output file name containing segmentation parameters
+ * @param mcFile      Input transport file name
+ * @param inDigiFile  Input file name containing initial segmentation parameters
+ * @param outDigiFile Output file name containing segmentation parameters
  */
-void much_seg_manual(const char* mcFile = "data/mc.standard.500.root",
-              const char* digiFile = "")
+void much_seg_manual(const char* mcFile = "",
+                       const char* inDigiFile = "",
+                       const char* outDigiFile = "")
 {
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -15,8 +17,11 @@ void much_seg_manual(const char* mcFile = "data/mc.standard.500.root",
   if (mcFile == "") {
     mcFile = "data/Jpsi.auau.25gev.centr.mc.root";
   }
-  if (digiFile == "") {
-    digiFile = "data/much_digi.root";
+  if (inDigiFile == "") {
+    inDigiFile = "data/much_digi.seg";
+  }
+  if (outDigiFile == "") {
+    outDigiFile = "data/much_digi.root";
   }
 
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
@@ -65,37 +70,7 @@ void much_seg_manual(const char* mcFile = "data/mc.standard.500.root",
   // ------------------------------------------------------------------------
 
   // -----  Segmentation task  ----------------------------------------------
-  CbmMuchSegmentManual* seg = new CbmMuchSegmentManual(digiFile);
-  // Number of stations
-  seg->SetNStations(6);
-
-  // Number of channels for each station
-  Int_t nChannels[] = {128, 128, 128, 128, 128, 128};
-  seg->SetNChannels(nChannels);
-
-  // Number of regions for each station
-  Int_t nRegions[] = {4, 7, 5, 3, 1, 1};
-  seg->SetNRegions(nRegions);
-
-  // Set region radii for each station
-  Double_t st0_rad[] = {50,70,70, 90};
-  Double_t st1_rad[] = {30, 30, 30, 50, 75, 75, 110};
-  Double_t st2_rad[] = {30, 30, 30,  60, 130};
-  Double_t st3_rad[] = {30, 60, 155};
-  Double_t st4_rad[] = {184};
-  Double_t st5_rad[] = {249};
-  seg->SetRegionRadii(0, st0_rad);
-  seg->SetRegionRadii(1, st1_rad);
-  seg->SetRegionRadii(2, st2_rad);
-  seg->SetRegionRadii(3, st3_rad);
-  seg->SetRegionRadii(4, st4_rad);
-  seg->SetRegionRadii(5, st5_rad);
-
-  // Set minimum pad size/resolution [cm] in the center region for each station
-  Double_t padLx[] = {0.4, 0.4, 0.4, 0.8, 3.2, 3.2};
-  Double_t padLy[] = {0.4, 0.2, 0.8, 1.6, 3.2, 3.2};
-  seg->SetMinPadSize(padLx, padLy);
-
+  CbmMuchSegmentManual* seg = new CbmMuchSegmentManual(inDigiFile, outDigiFile);
   fRun->AddTask(seg);
   // ------------------------------------------------------------------------
 

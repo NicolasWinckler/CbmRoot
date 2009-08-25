@@ -163,14 +163,15 @@ void CbmMuchSegmentManual::SetParContainers() {
 
 // -----   Private method Init ---------------------------------------------
 InitStatus CbmMuchSegmentManual::Init(){
+  printf("\n=============================  Inputs segmentation parameters  ================================\n");
   ReadInputFile();
+  printf("\n===============================================================================================\n");
+
 
   // Get MUCH geometry parameter container
   fStations = fGeoPar->GetStations();
   if(!fStations) Fatal("Init", "No input array of MUCH stations.");
   if(fStations->GetEntries() != fNStations) Fatal("Init", "Incorrect number of stations.");
-
-  printf("Number of stations: %i\n", fStations->GetEntries());
 
   if(fDebug){
     for(Int_t iStation = 0; iStation < fNStations; ++iStation){
@@ -713,104 +714,96 @@ void CbmMuchSegmentManual::DrawSegmentation(){
   fclose(outfile);
 }
 
-void CbmMuchSegmentManual::ReadInputFile(){
-  FILE* infile;
-  infile = fopen(fInputFileName, "r");
+#include <fstream>
+#include <iostream>
+using std::cout;
+using std::endl;
 
-  char str[300];
-  while(!feof(infile)){
-    fgets(str, 300, infile);
-    if(str[0] != '#') break;
+void CbmMuchSegmentManual::ReadInputFile(){
+  ifstream infile;
+  infile.open(fInputFileName);
+  if(!infile){
+    Fatal("ReadInputFile","Error: Cannot open the input file.");
   }
 
-  vector<char*> tokens;
-  char* token;
+  Int_t index;
+  string str;
+  vector<string> strs;
 
   // Set number of stations
-  fgets(str, 300, infile);
-  fgets(str, 300, infile);
-  printf(str);
-  token = strtok(str, " ");
-  while(token != NULL){
-    if(token != " ") tokens.push_back(token);
-    token = strtok(NULL, " ");
-  }
-  SetNStations(atoi(tokens[tokens.size()-1]));
-  fgets(str, 300, infile);
-  fgets(str, 300, infile);
+  OmitDummyLines(infile, str);
+  strs = Split(str, ' ');
+  index = strs.size()-1;
+  Int_t nStations;
+  StrToNum(strs.at(index), nStations);
+  SetNStations(nStations);
+  printf("Number of stations: \t%i", fNStations);
 
-  // Set number of channels per sector
-  fgets(str, 300, infile);
-  printf(str);
-  token = strtok(str, " ");
-  tokens.clear();
-  while(token != NULL){
-    if(token != " ") tokens.push_back(token);
-    token = strtok(NULL, " ");
-  }
+  // Set number of channels
+  OmitDummyLines(infile, str);
+  strs = Split(str, ' ');
+  printf("\nNumber of channels: ");
   for(Int_t iStation = 0; iStation < fNStations; ++iStation){
-    SetNChannels(iStation, atoi(tokens[tokens.size()-fNStations + iStation]));
+    index = strs.size() - fNStations + iStation;
+    Int_t nChannels;
+    StrToNum(strs.at(index), nChannels);
+    SetNChannels(iStation, nChannels);
+    printf("\t%i", fNChannels[iStation]);
   }
 
   // Set number of regions
-  fgets(str, 300, infile);
-  printf(str);
-  token = strtok(str, " ");
-  tokens.clear();
-  while(token != NULL){
-    if(token != " ") tokens.push_back(token);
-    token = strtok(NULL, " ");
-  }
+  OmitDummyLines(infile, str);
+  strs = Split(str, ' ');
+  printf("\nNumber of regions: ");
   for(Int_t iStation = 0; iStation < fNStations; ++iStation){
-    SetNRegions(iStation, atoi(tokens[tokens.size() - fNStations + iStation]));
-    printf("Station %i: nRegions = %i\n",iStation, atoi(tokens[tokens.size()- fNStations + iStation]));
+    index = strs.size() - fNStations + iStation;
+    Int_t nRegions;
+    StrToNum(strs.at(index), nRegions);
+    SetNRegions(iStation, nRegions);
+    printf("\t%i", fNRegions[iStation]);
   }
 
   for(Int_t iStation = 0; iStation < fNStations; ++iStation){
-    vector<char*> regionRadii;
-    vector<char*> padWidths;
-    vector<char*> padLengths;
+    vector<Double_t> padWidth(fNRegions[iStation], 0);
+    vector<Double_t> padLength(fNRegions[iStation], 0);
 
-    fgets(str, 300, infile);
-    fgets(str, 300, infile);
-
-    // Region radii
-    fgets(str, 300, infile);
-    printf(str);
-    token = strtok(str, " ");
-
-    while(token != NULL){
-      if(token != " ") regionRadii.push_back(token);
-      token = strtok(NULL, " ");
+    // Set region radii
+    OmitDummyLines(infile, str);
+    strs = Split(str, ' ');
+    printf("\nStation %i", iStation + 1);
+    printf("\n   Region radii [cm]: ");
+    for(Int_t iRegion = 0; iRegion < fNRegions[iStation]; ++iRegion){
+      index = strs.size() - fNRegions[iStation] + iRegion;
+      Double_t radius;
+      StrToNum(strs.at(index), radius);
+      SetRegionRadius(iStation, iRegion, radius);
+      printf("\t%4.2f", fRadii[iStation].at(iRegion));
     }
 
-    // Pad width
-    char str1[300];
-    fgets(str1, 300, infile);
-    printf(str1);
-    token = strtok(str1, " ");
-    while(token != NULL){
-      if(token != " ") padWidths.push_back(token);
-      token = strtok(NULL, " ");
+    // Set pad width
+    OmitDummyLines(infile, str);
+    strs = Split(str, ' ');
+    printf("\n   Pad width [cm]: ");
+    for(Int_t iRegion = 0; iRegion < fNRegions[iStation]; ++iRegion){
+      index = strs.size() - fNRegions[iStation] + iRegion;
+      StrToNum(strs.at(index), padWidth.at(iRegion));
+      printf("\t%4.2f", padWidth.at(iRegion));
     }
 
-    char str2[300];
-    fgets(str2, 300, infile);
-    printf(str2);
-    token = strtok(str2, " ");
-    while(token != NULL){
-      if(token != " ") padLengths.push_back(token);
-      token = strtok(NULL, " ");
-    }
-    for(Int_t iRegion=0; iRegion < fNRegions[iStation]; ++iRegion){
-      SetRegionRadius(iStation, iRegion, atof(regionRadii[regionRadii.size() - fNRegions[iStation] + iRegion]));
-      SetPadSize(iStation, iRegion, atof(padWidths[padWidths.size() - fNRegions[iStation] + iRegion]),
-          atof(padLengths[padLengths.size() - fNRegions[iStation] + iRegion]));
+    // Set pad length
+    OmitDummyLines(infile, str);
+    strs = Split(str, ' ');
+    printf("\n   Pad length [cm]: ");
+    for(Int_t iRegion = 0; iRegion < fNRegions[iStation]; ++iRegion){
+      index = strs.size() - fNRegions[iStation] + iRegion;
+      StrToNum(strs.at(index), padLength.at(iRegion));
+      printf("\t%4.2f", padLength.at(iRegion));
     }
 
+    for(Int_t iRegion = 0; iRegion < fNRegions[iStation]; ++iRegion)
+      SetPadSize(iStation, iRegion, padWidth.at(iRegion), padLength.at(iRegion));
   }
-
-  fclose(infile);
+  infile.close();
 }
 
 ClassImp(CbmMuchSegmentManual)

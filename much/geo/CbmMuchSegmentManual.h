@@ -14,9 +14,20 @@
 
 #include <vector>
 #include <map>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
+
 
 using std::map;
 using std::vector;
+using std::string;
+using std::stringstream;
+using std::istream_iterator;
+//using std::back_inserter()
 
 class CbmMuchModuleGem;
 class CbmMuchSector;
@@ -55,7 +66,6 @@ class CbmMuchSegmentManual : public FairTask {
      * @param nRegions  Number of regions in the station
      */
     void SetNRegions(Int_t iStation, Int_t nRegions);
-//    void SetNRegions(Int_t nRegions[]);
 
     /** Sets the radius for the given circled region in the given station.
      * @param iStation Station index
@@ -63,14 +73,12 @@ class CbmMuchSegmentManual : public FairTask {
      * @param radius   Radius of the region
      */
     void SetRegionRadius(Int_t iStation, Int_t iRegion, Double_t radius);
-//    void SetRegionRadii(Int_t iStation, Double_t radii[]);
 
     /** Sets number of channels per sector for the given station.
      * @param iStation   Station index
      * @param nChannels  Number of channels
      */
     void SetNChannels(Int_t iStation, Int_t nChannels);
-//    void SetNChannels(Int_t nChannels[]);
 
     /** Sets resolution for the given region of the given station.
      * @param iStation Station index
@@ -79,7 +87,6 @@ class CbmMuchSegmentManual : public FairTask {
      * @param sigmaY   Resolution in Y direction
      */
     void SetSigma(Int_t iStation, Int_t iRegion, Double_t sigmaX, Double_t sigmaY);
-//    void SetSigmas(Int_t iStation, Double_t sigmaX[], Double_t sigmaY[]);
 
     /** Sets pad size for the given region of the given station.
      * @param iStation Station index
@@ -88,7 +95,6 @@ class CbmMuchSegmentManual : public FairTask {
      * @param padLy    Pad length
      */
     void SetPadSize(Int_t iStation, Int_t iRegion, Double_t padLx, Double_t padLy);
-//    void SetPadSizes(Int_t iStation, Double_t padLx[], Double_t padLy[]);
 
     void DebugSwitchOn() {fDebug = 1;}
 
@@ -197,6 +203,57 @@ class CbmMuchSegmentManual : public FairTask {
 
     /** Reads input parameters for the segmentation. */
     void ReadInputFile();
+
+
+
+    // -------------------- Methods for working with strings --------------------------
+    void Trim(string& str)
+    {
+      string::size_type pos1 = str.find_first_not_of(' ');
+      string::size_type pos2 = str.find_last_not_of(' ');
+      str = str.substr(pos1 == string::npos ? 0 : pos1,
+        pos2 == string::npos ? str.length() - 1 : pos2 - pos1 + 1);
+    }
+
+    Bool_t IsDummyLine(string& str){
+      Trim(str);
+      return str[0] == '#' || str.length() == 0;
+    }
+
+    void OmitDummyLines(ifstream &infile, string &str){
+      getline(infile, str);
+      while(IsDummyLine(str)) getline(infile, str);
+    }
+
+    vector<std::string> &Split(const string &s, char delim, vector<string> &elems) {
+        stringstream ss(s);
+        string item;
+        while(getline(ss, item, delim)) {
+          if(item.length() != 0) elems.push_back(item);
+        }
+        return elems;
+    }
+
+
+    vector<string> Split(const string &s, char delim) {
+        vector<string> elems;
+        return Split(s, delim, elems);
+    }
+
+    template<class T>
+    void StrToNum(string &str, T &number){
+      try
+      {
+          stringstream ss(str);
+          if ((ss >> number).fail() || !(ss >> std::ws).eof())
+              throw std::bad_cast();
+      }
+      catch(std::bad_cast exc)
+      {
+          Fatal("","Invalid cast.\n");
+      }
+    }
+    // --------------------------------------------------------------------------------
 
     ClassDef(CbmMuchSegmentManual,1)
 };

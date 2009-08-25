@@ -117,9 +117,9 @@ qa/CbmLitElossAna.cxx
 qa/CbmLitPropagationAnalysis.cxx
 qa/CbmLitRobustFitterAnalysis.cxx
 qa/CbmLitCheckSimpleGeo.cxx
-robust/CbmLitWeightedHitCalculatorImp.cxx
-robust/CbmLitWeightCalculatorSimple.cxx
-robust/CbmLitWeightCalculatorGauss.cxx
+weight/CbmLitWeightedHitCalculatorImp.cxx
+weight/CbmLitWeightCalculatorSimple.cxx
+weight/CbmLitWeightCalculatorGauss.cxx
 selection/CbmLitTrackSelectionEmpty.cxx
 selection/CbmLitTrackSelectionA.cxx
 selection/CbmLitTrackSelectionB.cxx

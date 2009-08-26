@@ -17,7 +17,7 @@ ${CBMROOT_SOURCE_DIR}/littrack/fitter
 ${CBMROOT_SOURCE_DIR}/littrack/interface
 ${CBMROOT_SOURCE_DIR}/littrack/propagation
 ${CBMROOT_SOURCE_DIR}/littrack/qa
-${CBMROOT_SOURCE_DIR}/littrack/robust
+${CBMROOT_SOURCE_DIR}/littrack/weight
 ${CBMROOT_SOURCE_DIR}/littrack/selection
 ${CBMROOT_SOURCE_DIR}/littrack/utils
 ${CBMROOT_SOURCE_DIR}/geobase
@@ -120,6 +120,7 @@ qa/CbmLitCheckSimpleGeo.cxx
 weight/CbmLitWeightedHitCalculatorImp.cxx
 weight/CbmLitWeightCalculatorSimple.cxx
 weight/CbmLitWeightCalculatorGauss.cxx
+weight/CbmLitWeightCalculatorOptimal.cxx
 selection/CbmLitTrackSelectionEmpty.cxx
 selection/CbmLitTrackSelectionA.cxx
 selection/CbmLitTrackSelectionB.cxx

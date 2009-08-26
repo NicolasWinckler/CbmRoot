@@ -120,7 +120,8 @@ qa/CbmLitCheckSimpleGeo.cxx
 weight/CbmLitWeightedHitCalculatorImp.cxx
 weight/CbmLitWeightCalculatorSimple.cxx
 weight/CbmLitWeightCalculatorGauss.cxx
-weight/CbmLitWeightCalculatorOptimal.cxx
+#weight/CbmLitWeightCalculatorOptimal.cxx
+#weight/CbmLitWeightCalculatorTukey.cxx
 selection/CbmLitTrackSelectionEmpty.cxx
 selection/CbmLitTrackSelectionA.cxx
 selection/CbmLitTrackSelectionB.cxx

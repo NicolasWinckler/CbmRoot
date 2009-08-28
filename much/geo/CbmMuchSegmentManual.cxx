@@ -24,10 +24,11 @@
 #include "TColor.h"
 
 #include <stdio.h>
-#include <string>
 #include <cassert>
+#include <iostream>
 
-using std::string;
+using std::cout;
+using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmMuchSegmentManual::CbmMuchSegmentManual(){
@@ -645,6 +646,7 @@ void CbmMuchSegmentManual::DrawSegmentation(){
     if(fDigiFileName[iChar] == '.') break;
   }
   strncpy(txtfile, fDigiFileName, iChar+1);
+  txtfile[iChar+1] = '\0';
   strcat(txtfile, "txt");
 
   FILE* outfile;
@@ -713,11 +715,6 @@ void CbmMuchSegmentManual::DrawSegmentation(){
   }//stations
   fclose(outfile);
 }
-
-#include <fstream>
-#include <iostream>
-using std::cout;
-using std::endl;
 
 void CbmMuchSegmentManual::ReadInputFile(){
   ifstream infile;

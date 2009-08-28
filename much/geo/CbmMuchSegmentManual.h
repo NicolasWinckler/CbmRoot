@@ -15,7 +15,6 @@
 #include <vector>
 #include <map>
 #include <fstream>
-#include <iostream>
 #include <string>
 #include <sstream>
 #include <algorithm>
@@ -27,7 +26,6 @@ using std::vector;
 using std::string;
 using std::stringstream;
 using std::istream_iterator;
-//using std::back_inserter()
 
 class CbmMuchModuleGem;
 class CbmMuchSector;
@@ -217,7 +215,7 @@ class CbmMuchSegmentManual : public FairTask {
 
     Bool_t IsDummyLine(string& str){
       Trim(str);
-      return str[0] == '#' || str.length() == 0;
+      return str[0] == '#' || str.length() == 0 || str[0] == '\0' || str[0] == '\n';
     }
 
     void OmitDummyLines(ifstream &infile, string &str){

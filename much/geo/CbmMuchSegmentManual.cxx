@@ -69,7 +69,7 @@ void CbmMuchSegmentManual::SetNRegions(Int_t iStation, Int_t nRegions){
   Int_t nChans = Int_t(TMath::Power(2, n) + 1e-2);
   if(nChans != fNChannels[iStation]) Fatal("Init", "Number of channels should be equal to two with integer power.");
   Int_t nPower = n/2;
-  for(Int_t iRegion; iRegion < fNRegions[iStation]; ++iRegion){
+  for(Int_t iRegion = 0; iRegion < fNRegions[iStation]; ++iRegion){
     fNCols[iStation].at(iRegion) = (Int_t)TMath::Power(2, nPower);
     fNRows[iStation].at(iRegion) = n%2 != 0 ? (Int_t)TMath::Power(2, nPower+1) : fNCols[iStation].at(iRegion);
 

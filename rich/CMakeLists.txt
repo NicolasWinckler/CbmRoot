@@ -38,15 +38,18 @@ CbmGeoRich.cxx
 CbmRich.cxx 
 CbmRichHitProducer.cxx   
 CbmGeoRichPar.cxx 
-CbmRichContFact.cxx   
+CbmRichContFact.cxx
+CbmRichMatchRings.cxx
+CbmRichElectronIdAnn.cxx
 finder/CbmRichRingFinderHough.cxx
 finder/CbmRichRingFinderTrack.cxx
 finder/CbmRichRingFinderIdeal.cxx 
 finder/CbmRichFindRings.cxx
 finder/CbmRichFuzzyKE.cxx
 #finder/CbmRichRingFinderHoughSimd.cxx
-finder/CbmRichRingFinderHoughBase.cxx
+finder/CbmRichRingFinderHoughImpl.cxx
 finder/CbmRichRingFinderHoughParallel.cxx
+finder/CbmRichRingFinderHoughImpl.cxx
 fitter/CbmRichRingFitterCircle.cxx 
 fitter/CbmRichFitRings.cxx
 fitter/CbmRichRingFitterCOP.cxx 
@@ -72,8 +75,6 @@ qa/CbmRichElectronsQa.cxx
 selection/CbmRichRingSelectImpl.cxx
 selection/CbmRichRingSelectNeuralNet.cxx
 selection/CbmRichSelectRings.cxx
-CbmRichMatchRings.cxx
-CbmRichElectronIdAnn.cxx
 #LhcbRingFinder.cxx
 )
 

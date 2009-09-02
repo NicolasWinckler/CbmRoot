@@ -44,6 +44,8 @@
 #pragma link C++ class CbmRichElectronIdAnn+;
 #pragma link C++ class CbmRichRingFitterEllipseBase+;
 #pragma link C++ class CbmRichRingFinderHoughBase;
+#pragma link C++ class CbmRichRingFinderHoughParallel;
+
 //#pragma link C++ class CbmRichRingFinderHoughSimd;
 
 #pragma link C++ class CbmRichContFact;

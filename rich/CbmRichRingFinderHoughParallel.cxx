@@ -3,8 +3,10 @@
 // Base class for ring finders based on on HT method
 // Implementation: Semen Lebedev (s.lebedev@gsi.de)
 
-#include "CbmRichRingFinderHoughBase.h"
-//#include "CbmRichFuzzyKE.h"
+//#include "tbb/task_scheduler_init.h"
+//#include "tbb/task.h"
+
+#include "CbmRichRingFinderHoughParallel.h"
 
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
@@ -24,21 +26,41 @@
 using std::cout;
 using std::endl;
 using std::vector;
+//
+//class FinderTask: public tbb::task {
+//
+//public:
+//	string st;
+//
+//	FinderTask(string st1) {
+//		st = st1;
+//	}
+//
+//	tbb::task* execute() {
+//		for (int i = 0; 1000000; i ++){
+//			if ( i % 1000000  ==0 ) cout << st << " " << i <<endl;;
+//			sqrt(sqrt(sqrt((float)i)));
+//		}
+//		return NULL;
+//	}
+//};
+
+
 
 // -----   Standard constructor   ------------------------------------------
-CbmRichRingFinderHoughBase::CbmRichRingFinderHoughBase  ( Int_t verbose, TString geometry )
+CbmRichRingFinderHoughParallel::CbmRichRingFinderHoughParallel  ( Int_t verbose, TString geometry )
 {
-    cout << "-I- CbmRichRingFinderHoughBase constructor for " << geometry << " RICH geometry"<<endl;
+    cout << "-I- CbmRichRingFinderHoughParallel constructor for " << geometry << " RICH geometry"<<endl;
     if (geometry != "compact" && geometry != "large"){
         geometry = "compact";
-        cout << "-E- CbmRichRingFinderHoughBase::SetParameters UNKNOWN geometry,  " <<
+        cout << "-E- CbmRichRingFinderHoughParallel::SetParameters UNKNOWN geometry,  " <<
         "Set default parameters for "<< geometry << " RICH geometry"<<endl;
     }
     fGeometryType = geometry;
     fIsFindOptPar = false;
 }
 
-void CbmRichRingFinderHoughBase::Init()
+void CbmRichRingFinderHoughParallel::Init()
 {
     fNEvent = 0;
     fRingCount = 0;
@@ -75,20 +97,26 @@ void CbmRichRingFinderHoughBase::Init()
 
     fExecTime.resize(2);
 }
-CbmRichRingFinderHoughBase::CbmRichRingFinderHoughBase()
+CbmRichRingFinderHoughParallel::CbmRichRingFinderHoughParallel()
 {
 
 
 }
 // -----   Destructor   ----------------------------------------------------
-CbmRichRingFinderHoughBase::~CbmRichRingFinderHoughBase()
+CbmRichRingFinderHoughParallel::~CbmRichRingFinderHoughParallel()
 {
 
 }
 
-Int_t CbmRichRingFinderHoughBase::DoFind(TClonesArray* rHitArray,
-                                      TClonesArray* rProjArray,
+Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
+                                            TClonesArray* rProjArray,
                                          TClonesArray* rRingArray) {
+
+//	tbb::task_scheduler_init init;
+//	FinderTask& a = *new( tbb::task::allocate_root() ) FinderTask("Task 1 ");
+//	a.spawn(a);
+//	FinderTask& b = *new( tbb::task::allocate_root() ) FinderTask("Task 2 ");
+//	tbb::task::spawn_root_and_wait(b);
 
 	TStopwatch timer;
 	timer.Start();
@@ -107,17 +135,17 @@ Int_t CbmRichRingFinderHoughBase::DoFind(TClonesArray* rHitArray,
 	std::vector<CbmRichHoughHit> DownH;
 
 	if (!rHitArray) {
-		cout << "-E- CbmRichRingFinderHoughBase::DoFind: Hit array missing! "<< rHitArray << endl;
+		cout << "-E- CbmRichRingFinderHoughParallel::DoFind: Hit array missing! "<< rHitArray << endl;
 		return -1;
 	}
 	const Int_t nhits = rHitArray->GetEntriesFast();
 	if (!nhits) {
-		cout << "-E- CbmRichRingFinderHoughBase::DoFind:No hits in this event."	<< endl;
+		cout << "-E- CbmRichRingFinderHoughParallel::DoFind:No hits in this event."	<< endl;
 		return -1;
 	}
 	if (nhits > kMAX_NOF_HITS) {
 		cout
-				<< "-E- CbmRichRingFinderHoughBase::DoFind: Number of hits is more than "<< kMAX_NOF_HITS << endl;
+				<< "-E- CbmRichRingFinderHoughParallel::DoFind: Number of hits is more than "<< kMAX_NOF_HITS << endl;
 		return -1;
 	}
 	for (Int_t iHit = 0; iHit < nhits; iHit++) {
@@ -138,7 +166,8 @@ Int_t CbmRichRingFinderHoughBase::DoFind(TClonesArray* rHitArray,
 
 	///fill track projections array
 	if (!rProjArray) {
-		cout<< "-E- CbmRichRingFinderHoughBase::DoFind: track projections array missing! "
+		cout
+				<< "-E- CbmRichRingFinderHoughParallel::DoFind: track projections array missing! "
 				<< rProjArray << endl;
 	}
 	if (rProjArray) {
@@ -205,12 +234,12 @@ Int_t CbmRichRingFinderHoughBase::DoFind(TClonesArray* rHitArray,
 	return 1;
 }
 
-void CbmRichRingFinderHoughBase::Finish()
+void CbmRichRingFinderHoughParallel::Finish()
 {
 
 }
 
-void CbmRichRingFinderHoughBase::SetParameters( Int_t nofParts,
+void CbmRichRingFinderHoughParallel::SetParameters( Int_t nofParts,
 		Float_t maxDistance, Float_t minDistance,
 		Float_t minRadius, Float_t maxRadius,
 		Int_t HTCut, Int_t hitCut,
@@ -263,7 +292,7 @@ void CbmRichRingFinderHoughBase::SetParameters( Int_t nofParts,
 }
 
 ///Set Parameters for specify geometry
-void CbmRichRingFinderHoughBase::SetParameters(TString geometry)
+void CbmRichRingFinderHoughParallel::SetParameters(TString geometry)
 {
     cout << "-I- CbmRichRingFinderHough::SetParameters for " << geometry << " RICH geometry"<<endl;
     if (geometry != "compact" && geometry != "large"){
@@ -361,7 +390,7 @@ void CbmRichRingFinderHoughBase::SetParameters(TString geometry)
     fANNSelect->Init();
 }
 
-void CbmRichRingFinderHoughBase::AddRingsToOutputArray(TClonesArray *rRingArray)
+void CbmRichRingFinderHoughParallel::AddRingsToOutputArray(TClonesArray *rRingArray)
 {
 	for (UInt_t iRing = 0; iRing < fFoundRings.size(); iRing++) {
 		if (fFoundRings[iRing].GetRecFlag() == -1)	continue;
@@ -370,7 +399,7 @@ void CbmRichRingFinderHoughBase::AddRingsToOutputArray(TClonesArray *rRingArray)
 	}
 }
 
-void CbmRichRingFinderHoughBase::DefineLocalAreaAndHits(Float_t x0, Float_t y0,
+void CbmRichRingFinderHoughParallel::DefineLocalAreaAndHits(Float_t x0, Float_t y0,
 		Int_t *indmin, Int_t *indmax)
 {
     CbmRichHoughHit mpnt;
@@ -441,7 +470,7 @@ void CbmRichRingFinderHoughBase::DefineLocalAreaAndHits(Float_t x0, Float_t y0,
 
 }
 
-void CbmRichRingFinderHoughBase::HoughTransform(unsigned short int indmin, unsigned short int indmax)
+void CbmRichRingFinderHoughParallel::HoughTransform(unsigned short int indmin, unsigned short int indmax)
 {
 	register Float_t r12, r13, r23;
     register Float_t rx[3], ry[3], x[3], y[3];
@@ -539,10 +568,11 @@ void CbmRichRingFinderHoughBase::HoughTransform(unsigned short int indmin, unsig
 		}//iHit2
 	}//iHit3
     }//iPart
+
 }
 
 
-void CbmRichRingFinderHoughBase::CalculateRingParameters(Float_t x2y2[],
+void CbmRichRingFinderHoughParallel::CalculateRingParameters(Float_t x2y2[],
                              Float_t rx[],
                              Float_t ry[],
                              Float_t x0,
@@ -574,7 +604,7 @@ void CbmRichRingFinderHoughBase::CalculateRingParameters(Float_t x2y2[],
     }
 }
 
-void CbmRichRingFinderHoughBase::CalculateRingParametersOld(Float_t x[],
+void CbmRichRingFinderHoughParallel::CalculateRingParametersOld(Float_t x[],
 			Float_t y[],
 			Float_t *xc,
 			Float_t *yc,
@@ -605,7 +635,7 @@ void CbmRichRingFinderHoughBase::CalculateRingParametersOld(Float_t x[],
     *r = sqrt(t21 + t41);
 }
 
-void CbmRichRingFinderHoughBase::FindMaxBinsXYR(Int_t *maxBinXY, Int_t *maxBinR)
+void CbmRichRingFinderHoughParallel::FindMaxBinsXYR(Int_t *maxBinXY, Int_t *maxBinR)
 {
     Int_t maxBin = -1, binXY = -1, binR = -1;
 
@@ -628,7 +658,7 @@ void CbmRichRingFinderHoughBase::FindMaxBinsXYR(Int_t *maxBinXY, Int_t *maxBinR)
     *maxBinR = binR;
 }
 
-void CbmRichRingFinderHoughBase::FindPrelimXYR(Float_t *xc, Float_t *yc, Float_t *r)
+void CbmRichRingFinderHoughParallel::FindPrelimXYR(Float_t *xc, Float_t *yc, Float_t *r)
 {
     Int_t iXY, iR;
 	FindMaxBinsXYR(&iXY, &iR);
@@ -638,7 +668,7 @@ void CbmRichRingFinderHoughBase::FindPrelimXYR(Float_t *xc, Float_t *yc, Float_t
 	*r = (iR + 0.5)* fDr;
 }
 
-void CbmRichRingFinderHoughBase::RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring)
+void CbmRichRingFinderHoughParallel::RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring)
 {
 	Double_t A = ring->GetAPar();
 	Double_t B = ring->GetBPar();
@@ -663,7 +693,7 @@ void CbmRichRingFinderHoughBase::RemoveHitsAroundEllipse(Int_t indmin, Int_t ind
 	}
 }
 
-void CbmRichRingFinderHoughBase::RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring)
+void CbmRichRingFinderHoughParallel::RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring)
 {
 	Double_t drHitCut = sqrt(ring->GetChi2()/ring->GetNofHits());
 	if (drHitCut > 0.3)	drHitCut = 0.3;
@@ -680,7 +710,7 @@ void CbmRichRingFinderHoughBase::RemoveHitsAroundRing(Int_t indmin, Int_t indmax
 }
 
 
-void CbmRichRingFinderHoughBase::FindPeak(Int_t indmin, Int_t indmax)
+void CbmRichRingFinderHoughParallel::FindPeak(Int_t indmin, Int_t indmax)
 {
     Int_t maxXY, maxR;
 	FindMaxBinsXYR(&maxXY, &maxR);
@@ -756,7 +786,7 @@ void CbmRichRingFinderHoughBase::FindPeak(Int_t indmin, Int_t indmax)
 	fFoundRings.push_back(ring2);
 }
 
-void CbmRichRingFinderHoughBase::RingSelection()
+void CbmRichRingFinderHoughParallel::RingSelection()
 {
 	std::sort(fFoundRings.begin(), fFoundRings.end(), CbmRichRingComparatorMore());
 	std::vector<std::set<Int_t> > usedHits;
@@ -809,100 +839,4 @@ void CbmRichRingFinderHoughBase::RingSelection()
 	}
 }
 
-
-void CbmRichRingFinderHoughBase::FuzzyKE(TClonesArray* rHitArray)
-{
-/*	Int_t nofRings = fFoundRings.size();
-	vector<CbmRichRing> foundRingsFuzzy;
-	vector<Ellipse> rings;
-	vector<Int_t> ringsId;
-	vector<Hit> hits;
-	rings.clear();
-	std::set<Int_t> hitSet;
-
-
-
-	for (Int_t iR = 0; iR < nofRings; iR++){
-		CbmRichRing ring = fFoundRings[iR];
-		if (fabs(ring.GetAaxis()) > 10) continue;
-		Double_t x0 = ring.GetCenterX();
-		Double_t y0 = ring.GetCenterY();
-		rings.clear();
-		ringsId.clear();
-		hits.clear();
-		hitSet.clear();
-
-		rings.push_back(CbmRichFuzzyKE::ParTransform(&ring));
-		ringsId.push_back(iR);
-		Int_t nofHits = ring.GetNofHits();
-		for (Int_t iH = 0; iH < nofHits; iH++){
-			hitSet.insert(ring.GetHit(iH));
-		}
-		for (Int_t iR1 = 0; iR1 < nofRings; iR1++){
-			if (iR == iR1) continue;
-			CbmRichRing ring1 = fFoundRings[iR1];
-			Double_t x01 = ring1.GetCenterX();
-			Double_t y01 = ring1.GetCenterY();
-			Double_t d = sqrt ( (x0-x01)*(x0-x01) + (y0-y01)*(y0-y01) );
-			if (d > 2.*fMaxRadius) continue;
-			rings.push_back(CbmRichFuzzyKE::ParTransform(&ring1));
-			ringsId.push_back(iR1);
-
-			Int_t nofHits1 = ring1.GetNofHits();
-			for (Int_t iH = 0; iH < nofHits1; iH++){
-				hitSet.insert(ring1.GetHit(iH));
-			}
-		}
-		std::set<Int_t>::iterator it;
-		//cout << "hitSet.size() = " << hitSet.size()<<endl;
-		for (it=hitSet.begin(); it!=hitSet.end(); it++){
-	        CbmRichHit* hit = (CbmRichHit*)rHitArray->At(*it);
-	        Hit hit1;
-	        hit1.fX = hit->GetX();
-	        hit1.fY = hit->GetY();
-	        hit1.fHitId = *it;
-	        hits.push_back(hit1);
-		}
-
-		CbmRichFuzzyKE* fuzzy = new CbmRichFuzzyKE();
-		fuzzy->SetHits(hits);
-		fuzzy->SetEllipses(rings);
-		fuzzy->Minimize();
-
-		std::vector<vector<Double_t> > u;
-		std::vector<Ellipse> minEllipses;
-		u = fuzzy->GetU();
-		minEllipses = fuzzy->GetEllipses();
-
-		CbmRichRing ringFuzzy;
-		//we need only first ellipse parameters, because this is our main ellipse
-		for (Int_t iH = 0; iH < u[0].size(); iH++){
-			//find out if there is a u[i][j] more than u[0][j]
-			Bool_t u0Max=true;
-			for (Int_t iUR = 1; iUR < u.size(); iUR++){
-				//if (u[0][iH] < 0.5) continue;
-				if (u[0][iH] < u[iUR][iH]){
-					u0Max = false;
-					break;
-				}
-			}//iUR
-			if(u0Max){
-				ringFuzzy.AddHit(hits[iH].fHitId);
-				for (Int_t iUR = 1; iUR < u.size(); iUR++){
-					fFoundRings[ringsId[iUR]].RemoveHit(hits[iH].fHitId);
-				}//iUR
-			}
-		}//iH
-
-		fFitEllipse->DoFit(&ringFuzzy);
-		fFoundRings[iR] = ringFuzzy;
-		foundRingsFuzzy.push_back(ringFuzzy);
-
-		//cout << "rings.size() = "<< rings.size()<< endl;
-	}//iR
-
-	//fFoundRings.clear();
-	//fFoundRings.assign(foundRingsFuzzy.begin(), foundRingsFuzzy.end());*/
-}
-
-ClassImp(CbmRichRingFinderHoughBase)
+ClassImp(CbmRichRingFinderHoughParallel)

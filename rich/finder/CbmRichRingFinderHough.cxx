@@ -1,16 +1,14 @@
 // --------------------------------------------------------------------------------------
-// -----                 CbmRichRingFinderHough source file                         -----
-// ----- Algorithm idea: G.A. Ososkov (ososkov@jinr.ru) and Simeon Lebedev (salebedev@jinr.ru)                            -----
-// ----- Implementation: Simeon Lebedev (salebedev@jinr.ru)  and Andrei Lebedev (alebedev@jinr.ru)-----
-
-//This program performs the procedure of the ring recognition from data obtained from
-//the CBM RICH detector.
+// CbmRichRingFinderHough source file
+// Base class for ring finders based on on HT method
+// Implementation: Semen Lebedev (s.lebedev@gsi.de)
 
 #include "CbmRichRingFinderHough.h"
 //#include "CbmRichFuzzyKE.h"
 
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
+#include "FairTrackParam.h"
 
 #include "TString.h"
 #include "TStopwatch.h"
@@ -20,6 +18,8 @@
 #include <cmath>
 #include <set>
 #include <algorithm>
+#include <iostream>
+
 
 using std::cout;
 using std::endl;
@@ -34,7 +34,21 @@ CbmRichRingFinderHough::CbmRichRingFinderHough  ( Int_t verbose, TString geometr
         cout << "-E- CbmRichRingFinderHough::SetParameters UNKNOWN geometry,  " <<
         "Set default parameters for "<< geometry << " RICH geometry"<<endl;
     }
+
     fGeometryType = geometry;
+    fIsFindOptPar = false;
+    fRingCount = 0;
+}
+
+void CbmRichRingFinderHough::Init()
+{
+	fHTImpl = new CbmRichRingFinderHoughImpl(fGeometryType);
+	fHTImpl->Init();
+}
+
+CbmRichRingFinderHough::CbmRichRingFinderHough()
+{
+
 
 }
 
@@ -44,24 +58,102 @@ CbmRichRingFinderHough::~CbmRichRingFinderHough()
 
 }
 
-void CbmRichRingFinderHough::HoughTransformReconstruction()
+Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
+                                         TClonesArray* rProjArray,
+                                         TClonesArray* rRingArray)
 {
-    Int_t indmin, indmax;
 
-    for (UInt_t iHit = 0; iHit < fData.size(); iHit++)
-    {
-        if (fData[iHit].fIsUsed == true) continue;
+	TStopwatch timer;
+	timer.Start();
 
-        fCurMinX = fData[iHit].fX  - fMaxDistance;
-		fCurMinY = fData[iHit].fY - fMaxDistance;
+	fNEvent++;
+	if (fVerbose)
+		cout << "-------------------------    Event no. " << fNEvent<< "   -------------------------" << endl;
 
-		DefineLocalAreaAndHits(fData[iHit].fX, fData[iHit].fY , &indmin, &indmax);
-		HoughTransform(indmin, indmax);
-		FindPeak(indmin, indmax);
+	std::vector<CbmRichHoughHit> UpH;
+	std::vector<CbmRichHoughHit> DownH;
+    fRingCount = 0;
 
-    }//main loop over hits
+	if (!rHitArray) {
+		cout << "-E- CbmRichRingFinderHough::DoFind: Hit array missing! "<< rHitArray << endl;
+		return -1;
+	}
+	const Int_t nhits = rHitArray->GetEntriesFast();
+	if (!nhits) {
+		cout << "-E- CbmRichRingFinderHough::DoFind:No hits in this event."	<< endl;
+		return -1;
+	}
+
+	for(Int_t iHit = 0; iHit < nhits; iHit++) {
+		CbmRichHit * hit = (CbmRichHit*) rHitArray->At(iHit);
+		if (hit) {
+			CbmRichHoughHit tempPoint;
+			tempPoint.fX = hit->GetX();
+			tempPoint.fY = hit->GetY();
+			tempPoint.fX2plusY2 = hit->GetX() * hit->GetX() + hit->GetY() * hit->GetY();
+			tempPoint.fId = iHit;
+			tempPoint.fIsUsed = false;
+			if (hit->GetY() >= 0)
+				UpH.push_back(tempPoint);
+			else
+				DownH.push_back(tempPoint);
+		}
+	}
+
+	std::vector<CbmRichRing> foundRings1;
+	std::vector<CbmRichRing> foundRings2;
+
+	fHTImpl->DoFind(UpH, foundRings1);
+	AddRingsToOutputArray(rRingArray, foundRings1);
+
+	fHTImpl->DoFind(DownH, foundRings2);
+	AddRingsToOutputArray(rRingArray, foundRings2);
+
+	timer.Stop();
+	fExecTime += timer.CpuTime();
+
+	if (fVerbose)cout << "CbmRichRingFinderHough: Number of output rings: "<< rRingArray->GetEntriesFast() << endl;
+
+	cout << "Exec time : " << fExecTime << endl;
+
+	if (fIsFindOptPar == true ){
+		ofstream fout;
+		fout.open("opt_param_ht.txt",std::ios_base::app);
+		fout << fExecTime << " ";
+	}
+
+	return 1;
 }
 
+void CbmRichRingFinderHough::Finish()
+{
 
+}
+
+void CbmRichRingFinderHough::SetParameters( Int_t nofParts,
+		Float_t maxDistance, Float_t minDistance,
+		Float_t minRadius, Float_t maxRadius,
+		Int_t HTCut, Int_t hitCut,
+		Int_t HTCutR, Int_t hitCutR,
+		Int_t nofBinsX, Int_t nofBinsY,
+		Int_t nofBinsR, Float_t annCut,
+		Float_t usedHitsCut, Float_t usedHitsAllCut,
+		Float_t rmsCoeffEl, Float_t maxCutEl,
+		Float_t rmsCoeffCOP, Float_t maxCutCOP)
+{
+    ofstream fout;
+    fout.open("opt_param_ht.txt",std::ios_base::app);
+    fout << HTCut << " " << hitCut  << endl;
+}
+
+void CbmRichRingFinderHough::AddRingsToOutputArray(TClonesArray *rRingArray,
+		std::vector<CbmRichRing>& rings)
+{
+	for (UInt_t iRing = 0; iRing < rings.size(); iRing++) {
+		if (rings[iRing].GetRecFlag() == -1)	continue;
+		new ((*rRingArray)[fRingCount]) CbmRichRing(rings[iRing]);
+		fRingCount++;
+	}
+}
 
 ClassImp(CbmRichRingFinderHough)

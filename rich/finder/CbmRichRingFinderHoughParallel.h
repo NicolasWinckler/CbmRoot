@@ -5,8 +5,7 @@
 
 #ifndef CBM_RICH_RING_FINDER_HOUGH_PARALLEL_H
 #define CBM_RICH_RING_FINDER_HOUGH_PARALLEL_H
-
-#include "CbmRichRingFinderHoughBase.h"
+#include "CbmRichRingFinderHoughImpl.h"
 #include "CbmRichRing.h"
 #include "CbmRichRingFinder.h"
 #include "CbmRichRingFitterCOP.h"

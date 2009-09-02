@@ -6,10 +6,10 @@
 #ifndef CBM_RICH_RING_FINDER_TRACK_H
 #define CBM_RICH_RING_FINDER_TRACK_H
 
-#include "CbmRichRingFinderHoughBase.h"
+#include "CbmRichRingFinder.h"
 
 
-class CbmRichRingFinderTrack : public CbmRichRingFinderHoughBase {
+class CbmRichRingFinderTrack : public CbmRichRingFinder {
 
 public:
   	CbmRichRingFinderTrack ( Int_t verbose, TString geometry);

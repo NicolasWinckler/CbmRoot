@@ -1,10 +1,10 @@
 // --------------------------------------------------------------------------------------
-// -----                 CbmRichRingFinderHough source file                         -----
-// ----- Algorithm idea: G.A. Ososkov (ososkov@jinr.ru) and Semen Lebedev (salebedev@jinr.ru)                            -----
-// ----- Implementation: Semen Lebedev (salebedev@jinr.ru)-----
+// -----                 CbmRichRingFinderHoughImpl source file                         -----
+// ----- Algorithm idea: G.A. Ososkov (ososkov@jinr.ru) and Semen Lebedev (s.lebedev@gsi.de)                            -----
+// ----- Implementation: Semen Lebedev (s.lebedev@gsi.de)-----
 
-#ifndef CBM_RICH_RING_FINDER_HOUGH_BASE_H
-#define CBM_RICH_RING_FINDER_HOUGH_BASE_H
+#ifndef CBM_RICH_RING_FINDER_HOUGH_IMPL_H
+#define CBM_RICH_RING_FINDER_HOUGH_IMPL_H
 
 #include "CbmRichRing.h"
 #include "CbmRichRingFinder.h"
@@ -53,12 +53,11 @@ public:
 	}
 };
 
-class CbmRichRingFinderHoughBase : public CbmRichRingFinder {
+class CbmRichRingFinderHoughImpl{
 
 protected:
 	static const unsigned short int kMAX_NOF_HITS = 65500;
 	unsigned short int kMAX_NOF_HITS_IN_AREA;
-	Bool_t fIsFindOptPar;
 
 	Float_t fMaxDistance;
 	Float_t fMinDistance;
@@ -98,7 +97,6 @@ protected:
 	Float_t fCurMinY;
 
 	vector<CbmRichHoughHit> fData;  ///Rich hits
-	vector<pair<Float_t, Float_t> > fTrackProj; // x and y coordinate of projected tracks
 
 	vector<unsigned short> fHist;
 	vector< vector<unsigned short> > fRingHits;
@@ -107,26 +105,20 @@ protected:
     vector< vector<unsigned short> > fHitInd;
 
 	vector<CbmRichRing> fFoundRings;///collect found rings
-	Int_t fRingCount;
 
-	Int_t fNEvent; /// event number
 	CbmRichRingFitterCOP* fFitCOP;
 	CbmRichRingFitterEllipseTau* fFitEllipseTau;
-
 	CbmRichRingSelectNeuralNet* fANNSelect;
 
-	Int_t fVerbose; /// Verbosity level
 	TString fGeometryType;
 
-	std::vector<Double_t> fExecTime;//evaluate execution time
-
 public:
-  	CbmRichRingFinderHoughBase ();
+  	CbmRichRingFinderHoughImpl ();
 
   	/** Standard constructor **/
-  	CbmRichRingFinderHoughBase ( Int_t verbose, TString geometry);
+  	CbmRichRingFinderHoughImpl (TString geometry);
 
-	virtual ~CbmRichRingFinderHoughBase();
+	virtual ~CbmRichRingFinderHoughImpl();
 	void SetParameters(Int_t nofParts,
 			Float_t maxDistance, Float_t minDistance,
 			Float_t minRadius, Float_t maxRadius,
@@ -155,9 +147,7 @@ public:
 				Float_t *yc,
 				Float_t *r);
 
-	virtual void HoughTransformReconstruction(){
-		;
-	}
+	void HoughTransformReconstruction();
 	void DefineLocalAreaAndHits(Float_t x0, Float_t y0, Int_t *indmin, Int_t *indmax);
 	void HoughTransform(unsigned short int indmin, unsigned short int indmax);
 	void FindPeak(Int_t indmin, Int_t indmax);
@@ -167,19 +157,12 @@ public:
     void RingSelection();
     void RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring);
     void RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring);
-    void AddRingsToOutputArray(TClonesArray *rRingArray);
 
-	virtual void Init();
+	void Init();
+	void DoFind(const vector<CbmRichHoughHit>& data, vector<CbmRichRing>& rings);
 
-	virtual void Finish();
 
-	virtual Int_t DoFind(TClonesArray* rHitArray,
-	 		      		 TClonesArray* rProjArray,
-		       	      	 TClonesArray* rRingArray);
-
-	void SetFindOptPar(Bool_t findOptPar){fIsFindOptPar = findOptPar;}
-
-	ClassDef(CbmRichRingFinderHoughBase,1)
+	ClassDef(CbmRichRingFinderHoughImpl,1)
 
 };
-#endif // CBM_RICH_RING_FINDER_HOUGH_BASE_H
+#endif // CBM_RICH_RING_FINDER_HOUGH_IMPL_H

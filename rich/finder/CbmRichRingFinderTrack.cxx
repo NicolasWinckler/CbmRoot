@@ -25,7 +25,7 @@ CbmRichRingFinderTrack::CbmRichRingFinderTrack(Int_t verbose, TString geometry )
         cout << "-E- CbmRichRingFinderHoughBase::SetParameters UNKNOWN geometry,  " <<
         "Set default parameters for "<< geometry << " RICH geometry"<<endl;
     }
-    fGeometryType = geometry;
+    //fGeometryType = geometry;
 }
 
 
@@ -37,28 +37,28 @@ CbmRichRingFinderTrack::~CbmRichRingFinderTrack()
 
 void CbmRichRingFinderTrack::HoughTransformReconstruction()
 {
-    if (fVerbose > 1) cout << "void CbmRichRingFinderHough::HoughTransformReconstruction()"<< endl;
-
-    Int_t indmin, indmax;
-    Float_t x0, y0;
-
-    fMaxDistance = 7.;
-    fMaxDistanceSq = fMaxDistance*fMaxDistance;
-
-    for (UInt_t iProj = 0; iProj < fTrackProj.size(); iProj++)
-    {
-
-		x0 = fTrackProj[iProj].first;
-		y0 = fTrackProj[iProj].second;
-
-        fCurMinX = x0  - fMaxDistance;
-		fCurMinY = y0 - fMaxDistance;
-
-		DefineLocalAreaAndHits(x0, y0, &indmin, &indmax);
-		HoughTransform(indmin, indmax);
-		FindPeak(indmin, indmax);
-
-    }//main loop
+//    if (fVerbose > 1) cout << "void CbmRichRingFinderHough::HoughTransformReconstruction()"<< endl;
+//
+//    Int_t indmin, indmax;
+//    Float_t x0, y0;
+//
+//    fMaxDistance = 7.;
+//    fMaxDistanceSq = fMaxDistance*fMaxDistance;
+//
+//    for (UInt_t iProj = 0; iProj < fTrackProj.size(); iProj++)
+//    {
+//
+//		x0 = fTrackProj[iProj].first;
+//		y0 = fTrackProj[iProj].second;
+//
+//        fCurMinX = x0  - fMaxDistance;
+//		fCurMinY = y0 - fMaxDistance;
+//
+//		DefineLocalAreaAndHits(x0, y0, &indmin, &indmax);
+//		HoughTransform(indmin, indmax);
+//		FindPeak(indmin, indmax);
+//
+//    }//main loop
 
 }
 // -------------------------------------------------------------------------

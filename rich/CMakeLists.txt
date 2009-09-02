@@ -9,6 +9,7 @@ ${CBMROOT_SOURCE_DIR}/rich/fitter
 ${CBMROOT_SOURCE_DIR}/rich/finder
 ${CBMROOT_SOURCE_DIR}/rich/qa
 ${CBMROOT_SOURCE_DIR}/rich/tracks
+${CBMROOT_SOURCE_DIR}/rich/selection
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
@@ -68,9 +69,9 @@ qa/CbmRichRingQa.cxx
 qa/CbmRichGeoTest.cxx
 qa/CbmRichRingFitterQa.cxx
 qa/CbmRichElectronsQa.cxx
-CbmRichRingSelectImpl.cxx
-CbmRichRingSelectNeuralNet.cxx
-CbmRichSelectRings.cxx
+selection/CbmRichRingSelectImpl.cxx
+selection/CbmRichRingSelectNeuralNet.cxx
+selection/CbmRichSelectRings.cxx
 CbmRichMatchRings.cxx
 CbmRichElectronIdAnn.cxx
 #LhcbRingFinder.cxx

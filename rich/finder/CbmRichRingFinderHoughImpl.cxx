@@ -26,7 +26,7 @@ using std::endl;
 using std::vector;
 
 // -----   Standard constructor   ------------------------------------------
-CbmRichRingFinderHoughImpl::CbmRichRingFinderHoughImpl  (TString geometry )
+CbmRichRingFinderHoughImpl::CbmRichRingFinderHoughImpl  (TString geometry)
 {
     cout << "-I- CbmRichRingFinderHoughImpl constructor for " << geometry << " RICH geometry"<<endl;
     if (geometry != "compact" && geometry != "large"){
@@ -76,26 +76,20 @@ CbmRichRingFinderHoughImpl::~CbmRichRingFinderHoughImpl()
 	delete fANNSelect;
 }
 
-void CbmRichRingFinderHoughImpl::DoFind(const vector<CbmRichHoughHit>& data,
-		vector<CbmRichRing>& rings)
+void CbmRichRingFinderHoughImpl::DoFind()
 {
 
-	if (data.size() > kMAX_NOF_HITS) {
+	if (fData.size() > kMAX_NOF_HITS) {
 		cout<< "-E- CbmRichRingFinderHoughImpl::DoFind: Number of hits is more than "<< kMAX_NOF_HITS << endl;
 		return ;
 	}
 
-	fData.clear();
-	fData = data;
 	fFoundRings.clear();
 	fFoundRings.reserve(100);
 
 	std::sort(fData.begin(), fData.end(), CbmRichHoughHitCmpUp());
 	HoughTransformReconstruction();
 	RingSelection();
-	rings.assign(fFoundRings.begin(), fFoundRings.end());
-	fFoundRings.clear();
-	fData.clear();
 }
 
 void CbmRichRingFinderHoughImpl::SetParameters( Int_t nofParts,

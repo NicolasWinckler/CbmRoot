@@ -159,8 +159,16 @@ public:
     void RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring);
 
 	void Init();
-	void DoFind(const vector<CbmRichHoughHit>& data, vector<CbmRichRing>& rings);
+	void DoFind();
 
+	void SetData(const vector<CbmRichHoughHit>& data){
+		fData.clear();
+		fData = data;
+	}
+
+	vector<CbmRichRing>& GetFoundRings(){
+		return fFoundRings;
+	}
 
 	ClassDef(CbmRichRingFinderHoughImpl,1)
 

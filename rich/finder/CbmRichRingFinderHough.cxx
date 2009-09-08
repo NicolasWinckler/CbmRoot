@@ -103,11 +103,13 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 	std::vector<CbmRichRing> foundRings1;
 	std::vector<CbmRichRing> foundRings2;
 
-	fHTImpl->DoFind(UpH, foundRings1);
-	AddRingsToOutputArray(rRingArray, foundRings1);
+	fHTImpl->SetData(UpH);
+	fHTImpl->DoFind();
+	AddRingsToOutputArray(rRingArray, fHTImpl->GetFoundRings());
 
-	fHTImpl->DoFind(DownH, foundRings2);
-	AddRingsToOutputArray(rRingArray, foundRings2);
+	fHTImpl->SetData(DownH);
+	fHTImpl->DoFind();
+	AddRingsToOutputArray(rRingArray, fHTImpl->GetFoundRings());
 
 	timer.Stop();
 	fExecTime += timer.CpuTime();

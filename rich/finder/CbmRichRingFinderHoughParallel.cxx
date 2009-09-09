@@ -3,9 +3,9 @@
 // Base class for ring finders based on on HT method
 // Implementation: Semen Lebedev (s.lebedev@gsi.de)
 
-//#include "tbb/task_scheduler_init.h"
-//#include "tbb/task.h"
-//#include "tbb/tick_count.h"
+#include "tbb/task_scheduler_init.h"
+#include "tbb/task.h"
+#include "tbb/tick_count.h"
 
 #include "CbmRichRingFinderHoughParallel.h"
 #include "CbmRichRingFinderHoughImpl.h"
@@ -83,74 +83,74 @@ CbmRichRingFinderHoughParallel::~CbmRichRingFinderHoughParallel()
 Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
                                             TClonesArray* rProjArray,
                                          TClonesArray* rRingArray) {
-//
-//	//TStopwatch timer;
-//	//timer.Start();
-//
-//	tbb::tick_count t0 = tbb::tick_count::now();
-//
-//    fRingCount = 0;
-//
-//	fNEvent++;
-//	if (fVerbose)
-//		cout << "-------------------------    Event no. " << fNEvent<< "   -------------------------" << endl;
-//
-//	std::vector<CbmRichHoughHit> UpH;
-//	std::vector<CbmRichHoughHit> DownH;
-//
-//	if (!rHitArray) {
-//		cout << "-E- CbmRichRingFinderHoughParallel::DoFind: Hit array missing! "<< rHitArray << endl;
-//		return -1;
-//	}
-//	const Int_t nhits = rHitArray->GetEntriesFast();
-//	if (!nhits) {
-//		cout << "-E- CbmRichRingFinderHoughParallel::DoFind:No hits in this event."	<< endl;
-//		return -1;
-//	}
-//	for (Int_t iHit = 0; iHit < nhits; iHit++) {
-//		CbmRichHit * hit = (CbmRichHit*) rHitArray->At(iHit);
-//		if (hit) {
-//			CbmRichHoughHit tempPoint;
-//			tempPoint.fX = hit->GetX();
-//			tempPoint.fY = hit->GetY();
-//			tempPoint.fX2plusY2 = hit->GetX() * hit->GetX() + hit->GetY() * hit->GetY();
-//			tempPoint.fId = iHit;
-//			tempPoint.fIsUsed = false;
-//			if (hit->GetY() >= 0)
-//				UpH.push_back(tempPoint);
-//			else
-//				DownH.push_back(tempPoint);
-//		}
-//	}
-//
-//
-//	fHTImpl1->SetData(UpH);
-//	fHTImpl2->SetData(DownH);
-//	tbb::task_scheduler_init init;
-//	tbb::task_list tl;
-//	FinderTask& a = *new( tbb::task::allocate_root() ) FinderTask(fHTImpl1);
-//	FinderTask& b = *new( tbb::task::allocate_root() ) FinderTask(fHTImpl2);
-//	tl.push_back(a);
-//	tl.push_back(b);
-//	tbb::task::spawn_root_and_wait(tl);
-//
-//	AddRingsToOutputArray(rRingArray, fHTImpl2->GetFoundRings());
-//	AddRingsToOutputArray(rRingArray, fHTImpl1->GetFoundRings());
-//
-//	//timer.Stop();
-//	//fExecTime += timer.CpuTime();
-//
-//	tbb::tick_count t1 = tbb::tick_count::now();
-//	fExecTime += (t1-t0).seconds();
-//
-//	//FuzzyKE(rHitArray);
-//	if (fVerbose)
-//		cout << "CbmRichRingFinderHough: Number of output rings: "
-//				<< rRingArray->GetEntriesFast() << endl;
-//
-//	cout << "Exec time : " << fExecTime<< endl;
-//
-//	return 1;
+
+	//TStopwatch timer;
+	//timer.Start();
+
+	tbb::tick_count t0 = tbb::tick_count::now();
+
+    fRingCount = 0;
+
+	fNEvent++;
+	if (fVerbose)
+		cout << "-------------------------    Event no. " << fNEvent<< "   -------------------------" << endl;
+
+	std::vector<CbmRichHoughHit> UpH;
+	std::vector<CbmRichHoughHit> DownH;
+
+	if (!rHitArray) {
+		cout << "-E- CbmRichRingFinderHoughParallel::DoFind: Hit array missing! "<< rHitArray << endl;
+		return -1;
+	}
+	const Int_t nhits = rHitArray->GetEntriesFast();
+	if (!nhits) {
+		cout << "-E- CbmRichRingFinderHoughParallel::DoFind:No hits in this event."	<< endl;
+		return -1;
+	}
+	for (Int_t iHit = 0; iHit < nhits; iHit++) {
+		CbmRichHit * hit = (CbmRichHit*) rHitArray->At(iHit);
+		if (hit) {
+			CbmRichHoughHit tempPoint;
+			tempPoint.fX = hit->GetX();
+			tempPoint.fY = hit->GetY();
+			tempPoint.fX2plusY2 = hit->GetX() * hit->GetX() + hit->GetY() * hit->GetY();
+			tempPoint.fId = iHit;
+			tempPoint.fIsUsed = false;
+			if (hit->GetY() >= 0)
+				UpH.push_back(tempPoint);
+			else
+				DownH.push_back(tempPoint);
+		}
+	}
+
+
+	fHTImpl1->SetData(UpH);
+	fHTImpl2->SetData(DownH);
+	tbb::task_scheduler_init init;
+	tbb::task_list tl;
+	FinderTask& a = *new( tbb::task::allocate_root() ) FinderTask(fHTImpl1);
+	FinderTask& b = *new( tbb::task::allocate_root() ) FinderTask(fHTImpl2);
+	tl.push_back(a);
+	tl.push_back(b);
+	tbb::task::spawn_root_and_wait(tl);
+
+	AddRingsToOutputArray(rRingArray, fHTImpl2->GetFoundRings());
+	AddRingsToOutputArray(rRingArray, fHTImpl1->GetFoundRings());
+
+	//timer.Stop();
+	//fExecTime += timer.CpuTime();
+
+	tbb::tick_count t1 = tbb::tick_count::now();
+	fExecTime += (t1-t0).seconds();
+
+	//FuzzyKE(rHitArray);
+	if (fVerbose)
+		cout << "CbmRichRingFinderHough: Number of output rings: "
+				<< rRingArray->GetEntriesFast() << endl;
+
+	cout << "Exec time : " << fExecTime<< endl;
+
+	return 1;
 }
 
 void CbmRichRingFinderHoughParallel::Finish()

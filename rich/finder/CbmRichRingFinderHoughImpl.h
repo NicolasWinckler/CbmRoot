@@ -40,7 +40,6 @@ public:
 	}
 };
 
-
 class CbmRichRingComparatorMore:
        public std::binary_function<
 	          const CbmRichRing*,
@@ -149,7 +148,10 @@ public:
 
 	void HoughTransformReconstruction();
 	void DefineLocalAreaAndHits(Float_t x0, Float_t y0, Int_t *indmin, Int_t *indmax);
-	void HoughTransform(unsigned short int indmin, unsigned short int indmax);
+	virtual void HoughTransform(unsigned short int indmin,
+			unsigned short int indmax);
+	virtual void HoughTransformGroup(unsigned short int indmin,
+			unsigned short int indmax, Int_t iPart);
 	void FindPeak(Int_t indmin, Int_t indmax);
 	void FindMaxBinsXYR(Int_t *maxBinXY, Int_t *maxBinR);
 	void FindPrelimXYR(Float_t *xc, Float_t *yc, Float_t *r);

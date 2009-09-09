@@ -331,6 +331,14 @@ void CbmRichRingFinderHoughImpl::DefineLocalAreaAndHits(Float_t x0, Float_t y0,
 
 void CbmRichRingFinderHoughImpl::HoughTransform(unsigned short int indmin, unsigned short int indmax)
 {
+    for (Int_t iPart = 0; iPart < fNofParts; iPart++){
+    	HoughTransformGroup(indmin, indmax, iPart);
+    }//iPart
+}
+
+void CbmRichRingFinderHoughImpl::HoughTransformGroup(unsigned short int indmin,
+		unsigned short int indmax, Int_t iPart)
+{
 	register Float_t r12, r13, r23;
     register Float_t rx[3], ry[3], x[3], y[3];
     register Float_t xc, yc, r;
@@ -346,7 +354,6 @@ void CbmRichRingFinderHoughImpl::HoughTransform(unsigned short int indmin, unsig
     register Float_t t5, t10, t19, t21, t41, det, t6, t7;
     register Float_t dx = 1.0f/fDx, dy = 1.0f/fDy, dr = 1.0f/fDr;
 
-    for (Int_t iPart = 0; iPart < fNofParts; iPart++){
     Int_t nofHits = fHitInd[iPart].size();
     if (nofHits <= fMinNofHitsInArea) return;
     iPmulNofHits = iPart * nofHitsNorm;
@@ -379,14 +386,6 @@ void CbmRichRingFinderHoughImpl::HoughTransform(unsigned short int indmin, unsig
 				ry[2] = fData[iH2].fY - fData[iH3].fY;//ry23
 				r23 = rx[2] * rx[2] + ry[2] * ry[2];
 				if (r23	< fMinDistanceSq || r23 > fMaxDistanceSq)continue;
-
-//              x[0] = fData[iH1].fX;  y[0] = fData[iH1].fY;
-//              x[1] = fData[iH2].fX;  y[1] = fData[iH2].fY;
-//              x[2] = fData[iH3].fX;  y[2] = fData[iH3].fY;
-//              CalculateRingParametersOld(x, y, &xc, &yc, &r);
-
-				//CalculateRingParameters(x2y2, rx, ry, fData[iH1].fX,
-				//		fData[iH1].fY, &xc, &yc, &r);
 
 			    det = rx[2]*ry[0] - rx[0]*ry[2];
 			    if (det == 0.0f) continue;
@@ -426,7 +425,6 @@ void CbmRichRingFinderHoughImpl::HoughTransform(unsigned short int indmin, unsig
 			}//iHit1
 		}//iHit2
 	}//iHit3
-    }//iPart
 }
 
 

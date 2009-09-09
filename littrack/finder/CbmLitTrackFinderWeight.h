@@ -1,7 +1,8 @@
 #ifndef CBMLITTRACKFINDERWEIGHT_H_
 #define CBMLITTRACKFINDERWEIGHT_H_
 
-#include "CbmLitTrackFinderBase.h"
+#include "finder/CbmLitTrackFinderBase.h"
+#include "data/CbmLitHitChiSq.h"
 
 class CbmLitTrackFinderWeight : public CbmLitTrackFinderBase
 {
@@ -46,7 +47,8 @@ protected:
 
 	bool AddHits(
 			CbmLitTrack* track,
-			HitPtrIteratorPair bounds);
+			HitPtrIteratorPair bounds,
+			std::vector<CbmLitHitChiSq>& hits);
 
 	void FitTracks(
 			TrackPtrIterator itBegin,
@@ -59,6 +61,8 @@ private:
     TrackSelectionPtr fSeedSelection;
     TrackSelectionPtr fFinalSelection;
     TrackPropagatorPtr fPropagator;
+
+	int fMaxNofHitsInValidationGate;
 };
 
 #endif /*CBMLITTRACKFINDERWEIGHT_H_*/

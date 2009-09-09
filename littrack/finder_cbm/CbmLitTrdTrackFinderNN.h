@@ -1,8 +1,8 @@
 #ifndef CBMLITTRDTRACKFINDERNN_H_
 #define CBMLITTRDTRACKFINDERNN_H_
 
-#include "CbmLitTrackFinderNN.h"
 #include "CbmTrdTrackFinder.h"
+#include "CbmLitTrackFinderNN.h"
 #include "CbmLitStsBasedTrackFinder.h"
 
 class CbmLitTrdTrackFinderNN : public CbmTrdTrackFinder,

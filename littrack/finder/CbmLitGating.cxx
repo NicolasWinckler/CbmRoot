@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <cmath>
-//#include <utility>
 
 CbmLitGating::CbmLitGating():
 	fSigmaCoef(3.5),

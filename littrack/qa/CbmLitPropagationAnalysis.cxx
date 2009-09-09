@@ -12,7 +12,6 @@
 #include "CbmLitHit.h"
 #include "CbmLitPixelHit.h"
 #include "CbmLitStripHit.h"
-//#include "CbmLitSimpleGeometryConstructor.h"
 
 #include "CbmBaseHit.h"
 #include "CbmPixelHit.h"
@@ -65,14 +64,11 @@ InitStatus CbmLitPropagationAnalysis::Init()
 	DetermineSetup();
 	ReadDataBranches();
 
-//	fGeoConstructor.ConstructGeometry();
-//	fGeoConstructor.Draw();
-
 	// Create tools
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fPropagator = factory->CreateTrackPropagator("lit");
+	fPropagator = factory->CreateTrackPropagator("mylit");
 	fFilter = factory->CreateTrackUpdate("kalman");
-	fFitter = factory->CreateTrackFitter("lit_kalman");
+	fFitter = factory->CreateTrackFitter("mylit_kalman");
 	fSmoother = factory->CreateTrackFitter("kalman_smoother");
 
 	CreateHistograms();

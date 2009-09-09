@@ -1,3 +1,9 @@
+/** CbmLitLineTrackExtrapolator.cxx
+ *@author A.Lebedev <andrey.lebedev@gsi.de>
+ *@since 2007
+ **
+ **/
+
 #include "CbmLitLineTrackExtrapolator.h"
 #include "CbmLitTrackParam.h"
 
@@ -23,21 +29,23 @@ LitStatus CbmLitLineTrackExtrapolator::Finalize()
 LitStatus CbmLitLineTrackExtrapolator::Extrapolate(
 		const CbmLitTrackParam *parIn,
         CbmLitTrackParam *parOut,
-        myf zOut)
+        myf zOut,
+        std::vector<myf>* F)
 {
    *parOut = *parIn;
-   return Extrapolate(parOut, zOut);
+   return Extrapolate(parOut, zOut, F);
 }
 
 LitStatus CbmLitLineTrackExtrapolator::Extrapolate(
 		CbmLitTrackParam *par,
-        myf zOut)
+        myf zOut,
+        std::vector<myf>* F)
 {
       myf X[5] = { par->GetX(), par->GetY(),
                         par->GetTx(), par->GetTy(),
                         par->GetQp()};
 
-      myf dz = fDz = zOut - par->GetZ();
+      myf dz = zOut - par->GetZ();
 
       //transport state vector F*X*F.T()
       X[0] = X[0] + dz * X[2];
@@ -65,18 +73,17 @@ LitStatus CbmLitLineTrackExtrapolator::Extrapolate(
       par->SetCovMatrix(C);
       par->SetZ(zOut);
 
-      return kLITSUCCESS;
-}
+      // Transport matrix calculation
+      if (F != NULL) {
+		  F->assign(25, 0.);
+		  (*F)[0] = 1.;
+		  (*F)[6] = 1.;
+		  (*F)[12] = 1.;
+		  (*F)[18] = 1.;
+		  (*F)[24] = 1.;
+		  (*F)[2] = dz;
+		  (*F)[8] = dz;
+	  }
 
-void CbmLitLineTrackExtrapolator::TransportMatrix(
-		   std::vector<myf>& F)
-{
-	F.assign(25, 0.);
-	F[0] = 1.;
-	F[6] = 1.;
-	F[12] = 1.;
-	F[18] = 1.;
-	F[24] = 1.;
-    F[2] = fDz;
-    F[8] = fDz;
+      return kLITSUCCESS;
 }

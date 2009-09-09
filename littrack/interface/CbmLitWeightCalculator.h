@@ -9,8 +9,8 @@ class CbmLitTrackParam;
 class CbmLitWeightCalculator : public CbmLitTool
 {
 public:
-	CbmLitWeightCalculator();
-	virtual ~CbmLitWeightCalculator();
+	CbmLitWeightCalculator(){};
+	virtual ~CbmLitWeightCalculator(){};
 
 	virtual LitStatus DoCalculate(
 			const CbmLitTrackParam* par,

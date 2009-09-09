@@ -1,10 +1,10 @@
 #ifndef CBMLITNEARESTHITTOTRACKMERGER_H_
 #define CBMLITNEARESTHITTOTRACKMERGER_H_
 
-#include "CbmLitHitToTrackMerger.h"
-#include "CbmLitGating.h"
-#include "CbmLitPtrTypes.h"
-#include "CbmLitStation.h"
+#include "interface/CbmLitHitToTrackMerger.h"
+#include "finder/CbmLitGating.h"
+#include "base/CbmLitPtrTypes.h"
+#include "base/CbmLitStation.h"
 
 class CbmLitTrackPropagator;
 class CbmLitTrackUpdate;

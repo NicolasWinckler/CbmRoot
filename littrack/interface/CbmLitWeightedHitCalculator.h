@@ -9,8 +9,8 @@ class CbmLitHit;
 class CbmLitWeightedHitCalculator : public CbmLitTool
 {
 public:
-	CbmLitWeightedHitCalculator();
-	virtual ~CbmLitWeightedHitCalculator();
+	CbmLitWeightedHitCalculator(){};
+	virtual ~CbmLitWeightedHitCalculator(){};
 
 	virtual void DoCalculate(
 			HitPtrIterator itBegin,

@@ -1,3 +1,11 @@
+/** CbmLitMaterialEffectsImp.h
+ *@author A.Lebedev <andrey.lebedev@gsi.de>
+ *@since 2008
+ **
+ ** The class performs calculation of the material effects, such as multiple
+ ** scattering and energy losses, on the track parameters.
+ **/
+
 #ifndef CBMLITMATERIALEFFECTSIMP_H_
 #define CBMLITMATERIALEFFECTSIMP_H_
 

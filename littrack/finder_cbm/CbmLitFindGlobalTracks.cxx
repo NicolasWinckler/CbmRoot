@@ -166,7 +166,7 @@ void CbmLitFindGlobalTracks::InitTrackReconstruction()
 		} else
 			TObject::Fatal("CbmLitFindGlobalTracks","Tracking type not found");
 	} else {
-		if (fTrackingType == "branch" || fTrackingType == "nn" || fTrackingType == "weight") {
+		if (fTrackingType == "branch" || fTrackingType == "nn" || fTrackingType == "weight" || fTrackingType == "nn_parallel") {
 			std::string st("mu_");
 			st += fTrackingType;
 			fFinder = factory->CreateTrackFinder(st);

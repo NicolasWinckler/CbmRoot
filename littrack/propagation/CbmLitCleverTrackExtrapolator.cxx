@@ -1,3 +1,10 @@
+/** CbmLitCleverTrackExtrapolator.cxx
+ *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2009
+ **
+ **
+ **/
+
 #include "CbmLitCleverTrackExtrapolator.h"
 #include "CbmLitTrackExtrapolator.h"
 #include "CbmLitToolFactory.h"
@@ -7,9 +14,13 @@
 #include "CbmLitMatrixMath.h"
 #include "CbmLitDefaultSettings.h"
 
-CbmLitCleverTrackExtrapolator::CbmLitCleverTrackExtrapolator():
-	fOption(-1)
+CbmLitCleverTrackExtrapolator::CbmLitCleverTrackExtrapolator(
+		const std::string& type)
 {
+	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
+	fLineExtrapolator = factory->CreateTrackExtrapolator("line");
+	if (type == "myfield") fRK4Extrapolator = factory->CreateTrackExtrapolator("rk4myfield");
+	else if (type == "") fRK4Extrapolator = factory->CreateTrackExtrapolator("rk4");
 }
 
 CbmLitCleverTrackExtrapolator::~CbmLitCleverTrackExtrapolator()
@@ -18,10 +29,6 @@ CbmLitCleverTrackExtrapolator::~CbmLitCleverTrackExtrapolator()
 
 LitStatus CbmLitCleverTrackExtrapolator::Initialize()
 {
-	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fLineExtrapolator = factory->CreateTrackExtrapolator("line");
-	fRK4Extrapolator = factory->CreateTrackExtrapolator("rk4");
-
 	return kLITSUCCESS;
 }
 
@@ -33,67 +40,57 @@ LitStatus CbmLitCleverTrackExtrapolator::Finalize()
 LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 		const CbmLitTrackParam *parIn,
         CbmLitTrackParam *parOut,
-        myf zOut)
+        myf zOut,
+		std::vector<myf>* F)
 {
    *parOut = *parIn;
-   return Extrapolate(parOut, zOut);
+   return Extrapolate(parOut, zOut, F);
 }
 
 LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 		CbmLitTrackParam *par,
-        myf zOut)
+        myf zOut,
+		std::vector<myf>* F)
 {
 	myf zIn = par->GetZ();
-	fOption = -1;
 	myf zStart = lit::LINE_EXTRAPOLATION_START_Z;
 
 	if (zIn >= zStart && zOut >= zStart) {
-		fOption = 0;
-		return fLineExtrapolator->Extrapolate(par, zOut);
+		return fLineExtrapolator->Extrapolate(par, zOut, F);
 	} else
 	if (zIn < zStart && zOut < zStart) {
-		fOption = 1;
-		return fRK4Extrapolator->Extrapolate(par, zOut);
+		return fRK4Extrapolator->Extrapolate(par, zOut, F);
 	} else
 	if (zOut > zIn && zIn < zStart && zOut > zStart) {
-		fOption = 2;
-		LitStatus result = fRK4Extrapolator->Extrapolate(par, zStart);
-		if (result == kLITERROR) return result;
-		else return fLineExtrapolator->Extrapolate(par, zOut);
+		std::vector<myf> F1(25), F2(25);
+		LitStatus result;
+		if (F != NULL) result = fRK4Extrapolator->Extrapolate(par, zStart, &F1);
+		else result = fRK4Extrapolator->Extrapolate(par, zStart, NULL);
+		if (result == kLITERROR) {
+			return result;
+		} else {
+			LitStatus result;
+			if (F != NULL) result = fLineExtrapolator->Extrapolate(par, zOut, &F2);
+			else result = fLineExtrapolator->Extrapolate(par, zOut, NULL);
+			if (F != NULL && result == kLITSUCCESS) Mult25(F1, F2, *F);
+			return result;
+	    };
 	} else
 	if (zOut < zIn && zIn > zStart && zOut < zStart) {
-		fOption = 3;
-		LitStatus result = fLineExtrapolator->Extrapolate(par, zStart);
-		if (result == kLITERROR) return result;
-		else return fRK4Extrapolator->Extrapolate(par, zOut);
+		std::vector<myf> F1(25), F2(25);
+		LitStatus result;
+		if (F != NULL) result = fLineExtrapolator->Extrapolate(par, zStart, &F1);
+		else result = fLineExtrapolator->Extrapolate(par, zStart, NULL);
+		if (result == kLITERROR) {
+			return result;
+		} else {
+			LitStatus result;
+			if (F != NULL) result = fRK4Extrapolator->Extrapolate(par, zOut, &F2);
+			else result = fRK4Extrapolator->Extrapolate(par, zOut, NULL);
+			if (F != NULL && result == kLITSUCCESS) Mult25(F1, F2, *F);
+			return result;
+		}
 	}
 
 	return kLITSUCCESS;
-}
-
-void CbmLitCleverTrackExtrapolator::TransportMatrix(
-		std::vector<myf>& F)
-{
-	if (fOption == 0) {
-		fLineExtrapolator->TransportMatrix(F);
-		return;
-	} else
-	if (fOption == 1) {
-		fRK4Extrapolator->TransportMatrix(F);
-		return;
-	} else
-	if (fOption == 2) {
-		std::vector<myf> F1(25), F2(25);
-		fRK4Extrapolator->TransportMatrix(F1);
-		fLineExtrapolator->TransportMatrix(F2);
-		Mult25(F1, F2, F);
-		return;
-	} else
-	if (fOption == 3) {
-		std::vector<myf> F1(25), F2(25);
-		fLineExtrapolator->TransportMatrix(F1);
-		fRK4Extrapolator->TransportMatrix(F2);
-		Mult25(F1, F2, F);
-		return;
-	}
 }

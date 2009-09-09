@@ -51,7 +51,7 @@
 // fitter
 //#pragma link C++ class CbmLitTrackFitterImp+;
 //#pragma link C++ class CbmLitKalmanFilter+;
-//#pragma link C++ class CbmLitTrackFitterRobust+;
+//#pragma link C++ class CbmLitTrackFitterWeight+;
 //#pragma link C++ class CbmLitTrackFitterIter+;
 //#pragma link C++ class CbmLitKalmanSmoother+;
 
@@ -88,6 +88,7 @@
 #pragma link C++ class CbmLitElossAna+;
 #pragma link C++ class CbmLitRobustFitterAnalysis+;
 #pragma link C++ class CbmLitCheckSimpleGeo+;
+#pragma link C++ class CbmLitCheckField+;
 
 // robust
 //#pragma link C++ class CbmLitWeightedHitCalculatorImp+;

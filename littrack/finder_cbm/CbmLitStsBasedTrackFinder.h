@@ -1,8 +1,8 @@
 #ifndef CBMLITSTSBASEDTRACKFINDER_H_
 #define CBMLITSTSBASEDTRACKFINDER_H_
 
-#include "CbmLitTypes.h"
-#include "CbmLitPtrTypes.h"
+#include "base/CbmLitTypes.h"
+#include "base/CbmLitPtrTypes.h"
 
 #include "TObject.h"
 

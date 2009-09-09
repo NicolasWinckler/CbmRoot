@@ -7,8 +7,8 @@
 class CbmLitTrackSelection : public CbmLitTool
 {
 public:
-	CbmLitTrackSelection();
-	virtual ~CbmLitTrackSelection();
+	CbmLitTrackSelection(){};
+	virtual ~CbmLitTrackSelection(){};
 
 	virtual LitStatus DoSelect(
 			TrackPtrIterator itBegin,

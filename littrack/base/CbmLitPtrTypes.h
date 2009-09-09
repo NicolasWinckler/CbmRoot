@@ -1,17 +1,17 @@
 #ifndef CBMLITPTRTYPES_H_
 #define CBMLITPTRTYPES_H_
 
-#include "CbmLitTrackExtrapolator.h"
-#include "CbmLitTrackPropagator.h"
-#include "CbmLitTrackFitter.h"
-#include "CbmLitTrackSelection.h"
-#include "CbmLitTrackUpdate.h"
-#include "CbmLitWeightedHitCalculator.h"
-#include "CbmLitWeightCalculator.h"
-#include "CbmLitGeoNavigator.h"
-#include "CbmLitMaterialEffects.h"
-#include "CbmLitTrackFinder.h"
-#include "CbmLitHitToTrackMerger.h"
+#include "interface/CbmLitTrackExtrapolator.h"
+#include "interface/CbmLitTrackPropagator.h"
+#include "interface/CbmLitTrackFitter.h"
+#include "interface/CbmLitTrackSelection.h"
+#include "interface/CbmLitTrackUpdate.h"
+#include "interface/CbmLitWeightedHitCalculator.h"
+#include "interface/CbmLitWeightCalculator.h"
+#include "interface/CbmLitGeoNavigator.h"
+#include "interface/CbmLitMaterialEffects.h"
+#include "interface/CbmLitTrackFinder.h"
+#include "interface/CbmLitHitToTrackMerger.h"
 
 #ifndef __CINT__
 #include <boost/shared_ptr.hpp>

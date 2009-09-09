@@ -6,12 +6,13 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 class CbmLitStation
 {
 public:
-	CbmLitStation();
-	virtual ~CbmLitStation();
+	CbmLitStation():fType(kLITPIXELHIT){};
+	virtual ~CbmLitStation(){};
 
 	void SetType(LitHitType type) {fType = type;}
 	void SetSubstations(const std::vector<CbmLitSubstation>& substations){
@@ -25,7 +26,12 @@ public:
 	const CbmLitSubstation& GetSubstation(int i) const {return fSubstations[i];}
 	int GetNofSubstations() const {return fSubstations.size();}
 
-	virtual std::string ToString() const;
+	virtual std::string ToString() const {
+		std::stringstream ss;
+		ss << "Station: type=" << GetType()
+			<< " nofSubstations=" << GetNofSubstations() << std::endl;
+		return ss.str();;
+	}
 
 private:
 	LitHitType fType;

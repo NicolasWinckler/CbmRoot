@@ -24,7 +24,10 @@
 #include "CbmLitNearestHitToTrackMerger.h"
 #include "CbmLitEnvironment.h"
 #include "CbmLitPtrTypes.h"
-//#include "CbmLitTrackFinderNNParallel.h"
+#include "CbmLitTrackFinderNNParallel.h"
+#include "CbmLitField.h"
+#include "CbmLitMapField.h"
+#include "CbmLitMyField.h"
 
 
 CbmLitToolFactory* CbmLitToolFactory::fInstance = NULL;
@@ -56,12 +59,25 @@ TrackExtrapolatorPtr CbmLitToolFactory::CreateTrackExtrapolator(
 		return extrapolator;
 	} else
 	if (name == "rk4") {
-		TrackExtrapolatorPtr extrapolator(new CbmLitRK4TrackExtrapolator());
+		CbmLitEnvironment* env = CbmLitEnvironment::Instance();
+		CbmLitField* field = new CbmLitMapField(env->GetField());
+		TrackExtrapolatorPtr extrapolator(new CbmLitRK4TrackExtrapolator(field));
+		extrapolator->Initialize();
+		return extrapolator;
+	} else
+	if (name == "rk4myfield") {
+		CbmLitField* field = new CbmLitMyField();
+		TrackExtrapolatorPtr extrapolator(new CbmLitRK4TrackExtrapolator(field));
 		extrapolator->Initialize();
 		return extrapolator;
 	} else
 	if (name == "lit") {
-		TrackExtrapolatorPtr extrapolator(new CbmLitCleverTrackExtrapolator());
+		TrackExtrapolatorPtr extrapolator(new CbmLitCleverTrackExtrapolator(""));
+		extrapolator->Initialize();
+		return extrapolator;
+	} else
+	if (name == "litmyfield") {
+		TrackExtrapolatorPtr extrapolator(new CbmLitCleverTrackExtrapolator("myfield"));
 		extrapolator->Initialize();
 		return extrapolator;
 	}
@@ -83,12 +99,17 @@ TrackPropagatorPtr CbmLitToolFactory::CreateTrackPropagator(
 	    return propagator;
 	} else
 	if(name == "mylit") {
-		TrackPropagatorPtr propagator(new CbmLitMyTrackPropagator(CreateTrackExtrapolator("lit")));
+		TrackPropagatorPtr propagator(new CbmLitMyTrackPropagator(CreateTrackExtrapolator("litmyfield")));
 		propagator->Initialize();
 		return propagator;
 	} else
 	if(name == "rk4") {
 	   TrackPropagatorPtr propagator(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("rk4")));
+	   propagator->Initialize();
+	   return propagator;
+	} else
+	if(name == "rk4myfield") {
+	   TrackPropagatorPtr propagator(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("rk4myfield")));
 	   propagator->Initialize();
 	   return propagator;
 	} else
@@ -135,7 +156,7 @@ TrackFitterPtr CbmLitToolFactory::CreateTrackFitter(
 	if (name == "kalman_robust") {
 		TrackFitterPtr fitter = CreateTrackFitter("lit_kalman");
 		TrackFitterPtr smoother = CreateTrackFitter("kalman_smoother");
-		TrackFitterPtr rfitter(new CbmLitTrackFitterRobust(fitter, smoother));
+		TrackFitterPtr rfitter(new CbmLitTrackFitterWeight(fitter, smoother));
 		return rfitter;
 	} else
 	if (name == "mylit_kalman") {
@@ -167,7 +188,7 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 	} else
 	if(name == "momentum_seed") {
 		CbmLitTrackSelectionMomentum* momSelection = new CbmLitTrackSelectionMomentum();
-		momSelection->SetMinMomentum(1.5);
+		momSelection->SetMinMomentum(0.5);
 		momSelection->Initialize();
 		TrackSelectionPtr selection(momSelection);
 		return selection;
@@ -286,6 +307,25 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 	if(name == "mu_nn") {
 		CbmLitTrackFinderNN* muchFinderNN = new CbmLitTrackFinderNN();
 		muchFinderNN->SetPropagator(CreateTrackPropagator("lit"));
+		muchFinderNN->SetSeedSelection(CreateTrackSelection("momentum_seed"));
+		muchFinderNN->SetFinalSelection(CreateTrackSelection("much_final"));
+		muchFinderNN->SetFilter(CreateTrackUpdate("kalman"));
+		muchFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
+		muchFinderNN->SetVerbose(1);
+		muchFinderNN->SetNofIter(1);
+		muchFinderNN->IsUseFastSearch(true);
+		muchFinderNN->SetMaxNofMissingHits(2);
+		muchFinderNN->SetSigmaCoef(3.5);
+		muchFinderNN->SetChiSqPixelHitCut(13.86);
+		muchFinderNN->SetChiSqStripHitCut(4.);
+		muchFinderNN->SetPDG(13);
+		muchFinderNN->Initialize();
+		TrackFinderPtr finder(muchFinderNN);
+		return finder;
+	} else
+	if(name == "mu_nn_parallel") {
+		CbmLitTrackFinderNNParallel* muchFinderNN = new CbmLitTrackFinderNNParallel();
+		muchFinderNN->SetPropagator(CreateTrackPropagator("mylit"));
 		muchFinderNN->SetSeedSelection(CreateTrackSelection("momentum_seed"));
 		muchFinderNN->SetFinalSelection(CreateTrackSelection("much_final"));
 		muchFinderNN->SetFilter(CreateTrackUpdate("kalman"));

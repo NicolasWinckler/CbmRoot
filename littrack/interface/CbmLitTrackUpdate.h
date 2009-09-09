@@ -16,11 +16,11 @@ class CbmLitTrackParam;
 class CbmLitTrackUpdate : public CbmLitTool
 {
 public:
-   CbmLitTrackUpdate();
+   CbmLitTrackUpdate(){};
    CbmLitTrackUpdate(
-		   const std::string& name);
+		   const std::string& name):CbmLitTool(name){};
 
-   virtual ~CbmLitTrackUpdate();
+   virtual ~CbmLitTrackUpdate(){};
 
    virtual LitStatus Update(
 		   const CbmLitTrackParam *pParamIn,

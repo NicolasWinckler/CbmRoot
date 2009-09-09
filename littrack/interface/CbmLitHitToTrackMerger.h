@@ -10,8 +10,8 @@ class CbmLitDetectorLayout;
 class CbmLitHitToTrackMerger : public CbmLitTool
 {
 public:
-	CbmLitHitToTrackMerger();
-	virtual ~CbmLitHitToTrackMerger();
+	CbmLitHitToTrackMerger() {};
+	virtual ~CbmLitHitToTrackMerger() {};
 
 	virtual LitStatus DoMerge(
 			HitPtrVector& hits,

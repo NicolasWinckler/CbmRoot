@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
 
 class CbmLitStationGroup
 {
@@ -22,7 +23,11 @@ public:
 	const CbmLitStation& GetStation(int i) const {return fStations[i];}
 	int GetNofStations() const {return fStations.size();}
 
-	virtual std::string ToString() const;
+	virtual std::string ToString() const {
+		std::stringstream ss;
+		ss << "Station group: nofStations=" << GetNofStations() << std::endl;
+		return ss.str();
+	}
 
 private:
 	std::vector<CbmLitStation> fStations;

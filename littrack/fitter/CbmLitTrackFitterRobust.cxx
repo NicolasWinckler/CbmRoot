@@ -9,6 +9,7 @@
 #include "CbmLitWeightCalculator.h"
 #include "CbmLitWeightCalculatorSimple.h"
 #include "CbmLitWeightCalculatorGauss.h"
+#include "CbmLitWeightCalculatorTukey.h"
 #include "CbmLitWeightedHitCalculatorImp.h"
 #include "CbmLitMemoryManagment.h"
 #include "CbmLitEnums.h"
@@ -18,7 +19,7 @@
 #include <iostream>
 #include <algorithm>
 
-CbmLitTrackFitterRobust::CbmLitTrackFitterRobust(
+CbmLitTrackFitterWeight::CbmLitTrackFitterWeight(
 		TrackFitterPtr fitter,
 		TrackFitterPtr smoother)
 {
@@ -26,45 +27,41 @@ CbmLitTrackFitterRobust::CbmLitTrackFitterRobust(
 	fSmoother = smoother;
 	fWeightedHitCalculator = WeightedHitCalculatorPtr(new CbmLitWeightedHitCalculatorImp());
 	fSimpleWeightCalculator = WeightCalculatorPtr(new CbmLitWeightCalculatorSimple());
-	fGaussWeightCalculator = WeightCalculatorPtr(new CbmLitWeightCalculatorGauss());
+//	fGaussWeightCalculator = WeightCalculatorPtr(new CbmLitWeightCalculatorGauss());
+	fTukeyWeightCalculator = WeightCalculatorPtr(new CbmLitWeightCalculatorTukey());
 
 	//track fit parameters
-	fNofIterations = 2;
-	// was 0, 81, 9, 4, 1, 1, 1
+	fNofIterations = 3;
 	fAnnealing.push_back(0.);
-	fAnnealing.push_back(1.);
-	fAnnealing.push_back(1.);
-	fAnnealing.push_back(4.);
-	fAnnealing.push_back(1.);
-	fAnnealing.push_back(1.);
+	fAnnealing.push_back(30.);
+	fAnnealing.push_back(15.);
 	fOutlierCut = 1e-20;
 }
 
-CbmLitTrackFitterRobust::~CbmLitTrackFitterRobust()
+CbmLitTrackFitterWeight::~CbmLitTrackFitterWeight()
 {
 }
 
-LitStatus CbmLitTrackFitterRobust::Initialize()
-{
-	return kLITSUCCESS;
-}
-
-LitStatus CbmLitTrackFitterRobust::Finalize()
+LitStatus CbmLitTrackFitterWeight::Initialize()
 {
 	return kLITSUCCESS;
 }
 
-LitStatus CbmLitTrackFitterRobust::Fit(
+LitStatus CbmLitTrackFitterWeight::Finalize()
+{
+	return kLITSUCCESS;
+}
+
+LitStatus CbmLitTrackFitterWeight::Fit(
 		CbmLitTrack *track,
 		bool downstream)
 {
-//	if (track->GetLastPlaneId() < 5) return kLITERROR;
 	if (track->GetNofHits() < 1) return kLITERROR;
 	track->SortHits();
 
 	CbmLitTrack etrack;
 	etrack.SetPDG(track->GetPDG());
-	//etrack.SetParamFirst(track->GetParamFirst());
+//	etrack.SetParamFirst(track->GetParamFirst());
 	for(int iter = 0; iter < fNofIterations; iter++){
 		etrack.SetParamFirst(track->GetParamFirst());
 		if (CreateEffectiveTrack(track, iter, &etrack) == kLITERROR) {
@@ -85,7 +82,7 @@ LitStatus CbmLitTrackFitterRobust::Fit(
 	return kLITSUCCESS;
 }
 
-LitStatus CbmLitTrackFitterRobust::CreateEffectiveTrack(
+LitStatus CbmLitTrackFitterWeight::CreateEffectiveTrack(
 		CbmLitTrack* track,
 		int iter,
 		CbmLitTrack* etrack) const
@@ -93,8 +90,6 @@ LitStatus CbmLitTrackFitterRobust::CreateEffectiveTrack(
 	std::vector<HitPtrIteratorPair> bounds;
 	track->GetHitBounds(bounds);
 	etrack->ClearHits();
-//	std::cout << "-------iter " << iter << "--------" << std::endl;
-//	std::cout << track->ToString();
 	for (int i = 0; i < bounds.size(); i++) {
 		int nofHits = bounds[i].second - bounds[i].first;
 		if (nofHits > 1) {
@@ -105,10 +100,6 @@ LitStatus CbmLitTrackFitterRobust::CreateEffectiveTrack(
 			if ((*bounds[i].first)->GetType() == kLITSTRIPHIT) ehit = new CbmLitStripHit;
 			const CbmLitTrackParam* par = (iter > 0)? etrack->GetFitNode(i)->GetSmoothedParam() : NULL;
 			LitStatus result = CreateEffectiveHit(bounds[i].first, bounds[i].second, par, iter, ehit);
-			if (iter>0){
-//			std::cout << "iter=" << iter << " " << par->ToString();
-//			std::cout << "ehit " << result << " " << ehit->ToString();
-			}
 			if (result == kLITSUCCESS) {
 				etrack->AddHit(ehit);
 			} else {
@@ -120,11 +111,10 @@ LitStatus CbmLitTrackFitterRobust::CreateEffectiveTrack(
 			etrack->AddHit(*bounds[i].first);
 		}
 	}
-//	std::cout << "etrack " << etrack->ToString();
 	return kLITSUCCESS;
 }
 
-LitStatus CbmLitTrackFitterRobust::CreateEffectiveHit(
+LitStatus CbmLitTrackFitterWeight::CreateEffectiveHit(
 		HitPtrIterator itBegin,
 		HitPtrIterator itEnd,
 		const CbmLitTrackParam* par,
@@ -142,16 +132,12 @@ LitStatus CbmLitTrackFitterRobust::CreateEffectiveHit(
 	// repeat weights recalculation until none of the weights will be marked
 //	} while (MarkOutliers(itBegin, itEnd));
 
-//	std::cout << "-iter-" << iter << "-----------------------------" << std::endl;
-//	for (HitPtrIterator it = itBegin; it != itEnd; it++)
-//		std::cout << (*it)->ToString();
 	fWeightedHitCalculator->DoCalculate(itBegin, itEnd, hit);
-//	std::cout << "weighted " << hit->ToString();
 
 	return kLITSUCCESS;
 }
 
-bool CbmLitTrackFitterRobust::AreAllOutliers(
+bool CbmLitTrackFitterWeight::AreAllOutliers(
 		HitPtrIterator itBegin,
 		HitPtrIterator itEnd) const
 {
@@ -163,7 +149,7 @@ bool CbmLitTrackFitterRobust::AreAllOutliers(
 	return true;
 }
 
-bool CbmLitTrackFitterRobust::MarkOutliers(
+bool CbmLitTrackFitterWeight::MarkOutliers(
 		HitPtrIterator itBegin,
 		HitPtrIterator itEnd) const
 {
@@ -177,7 +163,7 @@ bool CbmLitTrackFitterRobust::MarkOutliers(
 	return result;
 }
 
-LitStatus CbmLitTrackFitterRobust::CalculateWeights(
+LitStatus CbmLitTrackFitterWeight::CalculateWeights(
 		const CbmLitTrackParam* par,
 		HitPtrIterator itBegin,
 		HitPtrIterator itEnd,
@@ -187,20 +173,20 @@ LitStatus CbmLitTrackFitterRobust::CalculateWeights(
 		fSimpleWeightCalculator->DoCalculate(par, itBegin, itEnd, 0);
 	} else {
 		myf T = fAnnealing[iter];
-		fGaussWeightCalculator->DoCalculate(par, itBegin, itEnd, T);
+		fTukeyWeightCalculator->DoCalculate(par, itBegin, itEnd, T);
 	}
 	return kLITSUCCESS;
 }
 
 
-LitStatus CbmLitTrackFitterRobust::CheckEffectiveTrack(
+LitStatus CbmLitTrackFitterWeight::CheckEffectiveTrack(
 		const CbmLitTrack* track) const
 {
 	if (track->GetNofHits() < 8) return kLITERROR;
 	return kLITSUCCESS;
 }
 
-LitStatus CbmLitTrackFitterRobust::CreateOutputTrack(
+LitStatus CbmLitTrackFitterWeight::CreateOutputTrack(
 		CbmLitTrack* track)
 {
 	//find hit with the best weight for each station
@@ -211,18 +197,13 @@ LitStatus CbmLitTrackFitterRobust::CreateOutputTrack(
 
 	HitPtrVector newHits;
 	for (int i = 0; i < bounds.size(); i++) {
-//		if (bounds[i].second - bounds[i].first < 2){
-//			newHits.push_back(**bounds[i].first);
-//			continue;
-//		}
 		std::sort(bounds[i].first, bounds[i].second, CompareHitPtrWLess());
 		CbmLitHit* hit = (*(bounds[i].second-1));
-		//std::cout << "best " << hit->ToString();
 		if (!hit->IsOutlier()) {
-			if (hit->GetType() == kLITSTRIPHIT){
+			if (hit->GetType() == kLITSTRIPHIT) {
 				CbmLitStripHit* newHit = new CbmLitStripHit(*static_cast<const CbmLitStripHit*>(hit));
 				newHits.push_back(newHit);
-			}else if (hit->GetType() == kLITPIXELHIT){
+			} else if (hit->GetType() == kLITPIXELHIT) {
 				CbmLitPixelHit* newHit = new CbmLitPixelHit(*static_cast<const CbmLitPixelHit*>(hit));
 				newHits.push_back(newHit);
 			}
@@ -232,10 +213,6 @@ LitStatus CbmLitTrackFitterRobust::CreateOutputTrack(
 	for (int i = 0; i < newHits.size(); i++)
 		track->AddHit(newHits[i]);
 	for_each(newHits.begin(), newHits.end(), DeleteObject());
-
-//	std::cout << "created " << track->ToString();
-//	for (int i = 0; i < track->GetNofHits(); i++)
-//		std::cout << track->GetHit(i)->ToString();
 
 	if (track->GetNofHits() == 0) return kLITERROR;
 

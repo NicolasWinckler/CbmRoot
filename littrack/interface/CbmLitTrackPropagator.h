@@ -2,9 +2,9 @@
  *@author A.Lebedev <alebedev@jinr.ru>
  *@since 2008
  **
- ** Base class for LIT all track propagation algorithms.
+ ** Base class for LIT track propagation algorithms.
  ** Propagation algorithm has to take into account material and
- ** may use CbmExtrapolation to extrapolate tracks between the material layers.
+ ** may use CbmLitTrackExtrapolation to extrapolate tracks between material layers.
  **/
 
 #ifndef CBMLITTRACKPROPAGATOR_H_
@@ -18,27 +18,45 @@
 class CbmLitTrackParam;
 
 class CbmLitTrackPropagator : public CbmLitTool {
-
 public:
-   CbmLitTrackPropagator();
-   CbmLitTrackPropagator(const std::string& name);
-   virtual ~CbmLitTrackPropagator();
+	/* Constructor */
+	CbmLitTrackPropagator(){};
 
-   // Pure virtual functions for track parameters propagation
-   virtual LitStatus Propagate(
+	/* Constructor with tool name
+	 * @param name Name of the tool
+	 */
+	CbmLitTrackPropagator(const std::string& name):CbmLitTool(name){};
+
+	/* Destructor */
+	virtual ~CbmLitTrackPropagator(){};
+
+	/* Pure virtual functions for track parameters propagation.
+	 * @param parIn Pointer to the initial track parameters.
+	 * @param parOut Pointer to the output track parameters.
+	 * @param zOut Z position to propagate to [cm].
+	 * @param pdg PDG code of the particle.
+	 * @param F Output transport matrix. If F == NULL than transport matrix is not calculated.
+	 * @return Propagation status.
+	 */
+	virtual LitStatus Propagate(
 		   const CbmLitTrackParam *parIn,
-           CbmLitTrackParam *parOut,
-           myf zOut,
-           int pdg) = 0;
+		   CbmLitTrackParam *parOut,
+		   myf zOut,
+		   int pdg,
+		   std::vector<myf>* F = NULL) = 0;
 
-   virtual LitStatus Propagate(
+	/* Pure virtual functions for track parameters propagation.
+	 * @param par Pointer to the initial and output track parameters.
+	 * @param zOut Z position to propagate to [cm].
+	 * @param pdg PDG code of the particle.
+	 * @param F Output transport matrix. If F == NULL than transport matrix is not calculated.
+	 * @return Propagation status.
+	 */
+	virtual LitStatus Propagate(
 		   CbmLitTrackParam *par,
-           myf zOut,
-           int pdg) = 0;
-
-   virtual void TransportMatrix(
-		   std::vector<myf>& F) = 0;
+		   myf zOut,
+		   int pdg,
+		   std::vector<myf>* F = NULL) = 0;
 };
 
 #endif //CbmLitTrackPropagator
-

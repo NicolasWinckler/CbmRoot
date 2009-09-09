@@ -17,30 +17,33 @@ class CbmLitTool
 {
 public:
 	/* Constructor */
-	CbmLitTool();
+	CbmLitTool():fName("") {};
 
 	/* Constructor with name
-	 *@param name Name of the tool
+	 *@param name Name of the tool.
 	 */
-	CbmLitTool(const std::string& name);
+	CbmLitTool(const std::string& name):fName(name){};
 
 	/* Destructor */
-	virtual ~CbmLitTool();
+	virtual ~CbmLitTool(){};
 
-	/* Sets name of the concrete CbmLitTool object.*/
+	/* Returns name of the tool.
+	 * @return Name of the tool.
+	 */
 	const std::string& GetName() const { return fName;}
 
-	/* Gets name of the concrete CbmLitTool object. */
+	/* Sets name of the tool. */
 	void SetName(const std::string& name) { fName = name; }
 
-	/* Initialization of the CbmLitTool. It allows to complete
+	/* Initialization of the tool. It allows to complete
 	 * the initialization that could not be done with a constructor.
+	 * @return Status.
 	 */
 	virtual LitStatus Initialize() = 0;
 
-	/* Finalization of the CbmLitTool. This method is called before
-	* the CbmLitTool is destructed.
-	*/
+	/* Finalization of the tool. This method is called before the destructor is called.
+	 * @return Status.
+	 */
 	virtual LitStatus Finalize() = 0;
 
 private:

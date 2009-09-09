@@ -2,7 +2,8 @@
  *@author A.Lebedev <alebedev@jinr.ru>
  *@since 2007
  **
- **
+ ** The class implements an interface between GEANE track propagation tool and
+ ** Littrack package.
  **/
 
 #ifndef CBMLITTRACKPROPAGATORGEANE_H
@@ -16,33 +17,35 @@ class CbmPropagator;
 
 class CbmLitTrackPropagatorGeane: public CbmLitTrackPropagator {
 public:
-   CbmLitTrackPropagatorGeane();
-   virtual ~CbmLitTrackPropagatorGeane();
+	/* Constructor */
+	CbmLitTrackPropagatorGeane();
 
-   // derived from CbmTool
-   virtual LitStatus Initialize();
-   virtual LitStatus Finalize();
+	/* Destructor */
+	virtual ~CbmLitTrackPropagatorGeane();
 
-   // Propagator
-   virtual LitStatus Propagate(
+	/* Inherited from CbmLitTool */
+	virtual LitStatus Initialize();
+
+	/* Inherited from CbmLitTool */
+	virtual LitStatus Finalize();
+
+    /* Inherited from CbmLitTrackPropagator */
+	virtual LitStatus Propagate(
 		   const CbmLitTrackParam *parIn,
-           CbmLitTrackParam *parOut,
-           myf zOut,
-           int pdg);
+		   CbmLitTrackParam *parOut,
+		   myf zOut,
+		   int pdg,
+		   std::vector<myf>* F);
 
-   virtual LitStatus Propagate(
+	/* Inherited from CbmLitTrackPropagator */
+	virtual LitStatus Propagate(
 		   CbmLitTrackParam *pParam,
-           myf zOut,
-           int pdg);
-
-   virtual void TransportMatrix(
-		   std::vector<myf>& F){
-	   //TODO: implement transport matrix for geane
-   }
-
+		   myf zOut,
+		   int pdg,
+		   std::vector<myf>* F);
 
 private:
-   CbmPropagator *fPropagator;
+	CbmPropagator *fPropagator; // FairRoot interface to GEANE
 };
 
 #endif //CbmLitTrackPropagatorGeane

@@ -1,3 +1,9 @@
+/** CbmLitTrackFitterWeight.h
+ *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2008
+ **
+ **
+ **/
 #ifndef CBMLITTRACKFITTERROBUST_H_
 #define CBMLITTRACKFITTERROBUST_H_
 
@@ -11,14 +17,14 @@ class CbmLitPixelHit;
 class CbmLitHit;
 class CbmLitTrack;
 
-class CbmLitTrackFitterRobust : public CbmLitTrackFitter
+class CbmLitTrackFitterWeight : public CbmLitTrackFitter
 {
 public:
-	CbmLitTrackFitterRobust(
+	CbmLitTrackFitterWeight(
 			TrackFitterPtr fitter,
 			TrackFitterPtr smoother);
 
-	virtual ~CbmLitTrackFitterRobust();
+	virtual ~CbmLitTrackFitterWeight();
 
 	virtual LitStatus Initialize();
 	virtual LitStatus Finalize();
@@ -65,7 +71,8 @@ private:
 
 	WeightedHitCalculatorPtr fWeightedHitCalculator;
 	WeightCalculatorPtr fSimpleWeightCalculator;
-	WeightCalculatorPtr fGaussWeightCalculator;
+//	WeightCalculatorPtr fGaussWeightCalculator;
+	WeightCalculatorPtr fTukeyWeightCalculator;
 
 	int fNofIterations;
 	std::vector<myf> fAnnealing;

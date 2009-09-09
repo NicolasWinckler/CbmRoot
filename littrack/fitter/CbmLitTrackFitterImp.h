@@ -24,7 +24,6 @@ public:
 private:
 	TrackPropagatorPtr fPropagator;
 	TrackUpdatePtr fUpdate;
-	bool fDownstream;
 };
 
 #endif /*CBMLITTRACKFITTERIMP_H_*/

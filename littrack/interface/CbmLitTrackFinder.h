@@ -7,8 +7,8 @@
 class CbmLitTrackFinder : public CbmLitTool
 {
 public:
-	CbmLitTrackFinder();
-	virtual ~CbmLitTrackFinder();
+	CbmLitTrackFinder() {};
+	virtual ~CbmLitTrackFinder() {};
 
 	virtual LitStatus DoFind(
 			HitPtrVector& hits,

@@ -1,8 +1,8 @@
 /** CbmLitLineTrackExtrapolator.h
- *@author A.Lebedev <alebedev@jinr.ru>
+ *@author A.Lebedev <andrey.lebedev@gsi.de>
  *@since 2007
  **
- **
+ ** The class performs line track extrapolation of the track parameters.
  **/
 
 #ifndef CBMLITLINETRACKEXTRAPOLATOR_H_
@@ -13,29 +13,31 @@
 class CbmLitTrackParam;
 
 class CbmLitLineTrackExtrapolator: public CbmLitTrackExtrapolator {
-
 public:
-   CbmLitLineTrackExtrapolator();
-   virtual ~CbmLitLineTrackExtrapolator();
+	/* Constructor */
+	CbmLitLineTrackExtrapolator();
 
-   // Derived from CbmTool
-   virtual LitStatus Initialize();
-   virtual LitStatus Finalize();
+	/* Destructor */
+	virtual ~CbmLitLineTrackExtrapolator();
 
-   virtual LitStatus Extrapolate(
+	/* Inherited from CbmLitTool */
+	virtual LitStatus Initialize();
+
+	/* Inherited from CbmLitTool */
+	virtual LitStatus Finalize();
+
+	/* Inherited from CbmLitTrackExtrapolator */
+	virtual LitStatus Extrapolate(
 		   const CbmLitTrackParam *parIn,
-           CbmLitTrackParam *parOut,
-           myf zOut);
+		   CbmLitTrackParam *parOut,
+		   myf zOut,
+		   std::vector<myf>* F);
 
-   virtual LitStatus Extrapolate(
+	/* Inherited from CbmLitTrackExtrapolator */
+	virtual LitStatus Extrapolate(
 		   CbmLitTrackParam *par,
-           myf zOut );
-
-   virtual void TransportMatrix(
-		   std::vector<myf>& F);
-
-private:
-	myf fDz;
+		   myf zOut,
+		   std::vector<myf>* F);
 };
 
 #endif //CbmLitLineTrackExtrapolator

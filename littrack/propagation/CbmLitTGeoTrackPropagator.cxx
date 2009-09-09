@@ -21,13 +21,10 @@
 CbmLitTGeoTrackPropagator::CbmLitTGeoTrackPropagator(
 		TrackExtrapolatorPtr extrapolator):
    CbmLitTrackPropagator("CbmLitTGeoTrackPropagator"),
-   fExtrapolator(extrapolator),
-   fCalcTransportMatrix(true)
+   fExtrapolator(extrapolator)
 {
 	fNavigator = GeoNavigatorPtr(new CbmLitTGeoNavigator());
 	fMaterial = MaterialEffectsPtr(new CbmLitMaterialEffectsImp());
-
-	fFm.resize(25);
 }
 
 CbmLitTGeoTrackPropagator::~CbmLitTGeoTrackPropagator()
@@ -48,21 +45,21 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 		const CbmLitTrackParam *parIn,
         CbmLitTrackParam *parOut,
         myf zOut,
-        int pdg)
+        int pdg,
+        std::vector<myf>* F)
 {
 	*parOut = *parIn;
-	return Propagate(parOut, zOut, pdg);
+	return Propagate(parOut, zOut, pdg, F);
 }
 
 LitStatus CbmLitTGeoTrackPropagator::Propagate(
 		CbmLitTrackParam *par,
         myf zOut,
-        int pdg)
+        int pdg,
+        std::vector<myf>* F)
 
 {
 	if (!IsParCorrect(par)) return kLITERROR;
-
-	fPDG = pdg;
 
 	myf zIn = par->GetZ();
 	myf dz = zOut - zIn;
@@ -71,11 +68,11 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 
 	//Check whether upstream or downstream
 	//TODO check upstream/downstream
-	fDownstream = dz > 0;
+	bool downstream = dz > 0;
 
-	if (fCalcTransportMatrix) {
-		std::fill(fFm.begin(), fFm.end(), 0.);
-		fFm[0] = 1.; fFm[6] = 1.; fFm[12] = 1.; fFm[18] = 1.; fFm[24] = 1.;
+	if (F != NULL) {
+		F->assign(25, 0.);
+		(*F)[0] = 1.; (*F)[6] = 1.; (*F)[12] = 1.; (*F)[18] = 1.; (*F)[24] = 1.;
 	}
 
 	int nofSteps = int(std::abs(dz) / lit::MAXIMUM_PROPAGATION_STEP_SIZE);
@@ -110,21 +107,20 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 				return kLITERROR;
 			}
 
+			std::vector<myf>* Fnew = NULL;
+		    if (F != NULL) Fnew = new std::vector<myf>(25, 0.);
 			// extrapolate to the next boundary
-			if (fExtrapolator->Extrapolate(par, mat.GetZpos()) == kLITERROR) {
+			if (fExtrapolator->Extrapolate(par, mat.GetZpos(), Fnew) == kLITERROR) {
 //				std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: extrapolation failed" << std::endl;
 				return kLITERROR;
 			}
 
 			// update transport matrix
-			if (fCalcTransportMatrix) {
-				std::vector<myf> Fnew(25);
-				fExtrapolator->TransportMatrix(Fnew);
-				UpdateF(fFm, Fnew);
-			}
+			if (F != NULL) UpdateF(*F, *Fnew);
+			delete Fnew;
 
 			// add material effects
-			fMaterial->Update(par, &mat, fPDG, fDownstream);
+			fMaterial->Update(par, &mat, pdg, downstream);
 		}
 	}
 
@@ -132,12 +128,6 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 
 	if (!IsParCorrect(par)) return kLITERROR;
 	else return kLITSUCCESS;
-}
-
-void CbmLitTGeoTrackPropagator::TransportMatrix(
-		   std::vector<myf>& F)
-{
-	F.assign(fFm.begin(), fFm.end());
 }
 
 void CbmLitTGeoTrackPropagator::UpdateF(

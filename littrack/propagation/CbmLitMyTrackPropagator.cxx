@@ -1,3 +1,9 @@
+/** CbmLitMyTrackPropagator.cxx
+ *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2009
+ **
+ **/
+
 #include "CbmLitMyTrackPropagator.h"
 #include "CbmLitMyGeoNavigator.h"
 #include "CbmLitMaterialEffectsImp.h"
@@ -10,17 +16,14 @@
 
 CbmLitMyTrackPropagator::CbmLitMyTrackPropagator(
 		TrackExtrapolatorPtr extrapolator):
-			fExtrapolator(extrapolator),
-			fCalcTransportMatrix(true)
+			fExtrapolator(extrapolator)
 {
 	fNavigator = GeoNavigatorPtr(new CbmLitMyGeoNavigator());
 	fMaterial = MaterialEffectsPtr(new CbmLitMaterialEffectsImp());
-	fFm.resize(25);
 }
 
 CbmLitMyTrackPropagator::~CbmLitMyTrackPropagator()
 {
-
 }
 
 LitStatus CbmLitMyTrackPropagator::Initialize()
@@ -37,29 +40,29 @@ LitStatus CbmLitMyTrackPropagator::Propagate(
 		const CbmLitTrackParam *parIn,
         CbmLitTrackParam *parOut,
         myf zOut,
-        int pdg)
+        int pdg,
+        std::vector<myf>* F)
 {
    *parOut = *parIn;
-   return Propagate(parOut, zOut, pdg);
+   return Propagate(parOut, zOut, pdg, F);
 }
 
 LitStatus CbmLitMyTrackPropagator::Propagate(
 		CbmLitTrackParam *par,
         myf zOut,
-        int pdg)
-
+        int pdg,
+        std::vector<myf>* F)
 {
-	fPDG = pdg;
 	myf zIn = par->GetZ();
 	myf dz = zOut - zIn;
 	if(std::fabs(dz) < lit::MINIMUM_PROPAGATION_DISTANCE) return kLITSUCCESS;
 
 	//Check whether upstream or downstream
-	fDownstream = dz > 0;
+	bool downstream = dz > 0;
 
-	if (fCalcTransportMatrix) {
-		std::fill(fFm.begin(), fFm.end(), 0.);
-		fFm[0] = 1.; fFm[6] = 1.; fFm[12] = 1.; fFm[18] = 1.; fFm[24] = 1.;
+	if (F != NULL) {
+		F->assign(25, 0.);
+		(*F)[0] = 1.; (*F)[6] = 1.; (*F)[12] = 1.; (*F)[18] = 1.; (*F)[24] = 1.;
 	}
 
 	std::vector<CbmLitMaterialInfo> inter;
@@ -71,32 +74,30 @@ LitStatus CbmLitMyTrackPropagator::Propagate(
 	for(unsigned int iMat = 0; iMat < inter.size(); iMat++) {
 		CbmLitMaterialInfo mat = inter[iMat];
 
-		if (fExtrapolator->Extrapolate(par, mat.GetZpos()) == kLITERROR) {
+		std::vector<myf>* Fnew = NULL;
+		if (F != NULL) Fnew = new std::vector<myf>(25, 0.);
+		if (fExtrapolator->Extrapolate(par, mat.GetZpos(), Fnew) == kLITERROR) {
 			std::cout << "-E- CbmLitMyTrackPropagator::Propagate extrapolation failed" << std::endl;
 			return kLITERROR;
 		}
 
 		// update transport matrix
-		if (fCalcTransportMatrix) {
-			std::vector<myf> Fnew(25);
-			fExtrapolator->TransportMatrix(Fnew);
-			UpdateF(fFm, Fnew);
-		}
+		if (F != NULL) UpdateF(*F, *Fnew);
+		delete Fnew;
 
 		//scale material length
 		myf norm = std::sqrt(1. + par->GetTx() * par->GetTx() + par->GetTy() * par->GetTy());
 		mat.SetLength(mat.GetLength() * norm);
 		// add material effects
-		fMaterial->Update(par, &mat, fPDG, fDownstream);
+		fMaterial->Update(par, &mat, pdg, downstream);
 	}
-	fExtrapolator->Extrapolate(par, zOut);
-	return kLITSUCCESS;
-}
+	std::vector<myf>* Fnew = NULL;
+	if (F != NULL) Fnew = new std::vector<myf>(25, 0.);
+	fExtrapolator->Extrapolate(par, zOut, Fnew);
+	if (F != NULL) UpdateF(*F, *Fnew);
+	delete Fnew;
 
-void CbmLitMyTrackPropagator::TransportMatrix(
-		   std::vector<myf>& F)
-{
-	F.assign(fFm.begin(), fFm.end());
+	return kLITSUCCESS;
 }
 
 void CbmLitMyTrackPropagator::UpdateF(

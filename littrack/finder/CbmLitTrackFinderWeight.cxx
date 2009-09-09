@@ -6,11 +6,14 @@
 #include "CbmLitTrackUpdate.h"
 #include "CbmLitComparators.h"
 #include "CbmLitMemoryManagment.h"
+#include "CbmLitHitChiSq.h"
+#include "CbmLitMath.h"
 
 #include <iostream>
 #include <algorithm>
 
-CbmLitTrackFinderWeight::CbmLitTrackFinderWeight()
+CbmLitTrackFinderWeight::CbmLitTrackFinderWeight():
+	fMaxNofHitsInValidationGate(4)
 {
 }
 
@@ -115,31 +118,52 @@ bool CbmLitTrackFinderWeight::ProcessStation(
 	bool hitAdded = false;
 	CbmLitTrackParam par(*track->GetParamLast());
 	int nofSubstations = fLayout.GetNofSubstations(stationGroup, station);
+	std::vector<CbmLitHitChiSq> hits;
 	for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
 		myf z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
 		fPropagator->Propagate(&par, z, fPDG);
 		track->SetParamLast(&par);
 		HitPtrIteratorPair bounds = MinMaxIndex(&par, fHitData.GetHits(stationGroup, station, iSubstation),
 				fLayout.GetStation(stationGroup, station), fHitData.GetMaxErr(stationGroup, station, iSubstation));
-		if (AddHits(track, bounds)) hitAdded = true;
+		AddHits(track, bounds, hits);
 	}
+
+	if (hits.empty()) return false;
+	int nofHits = hits.size();
+	// if too many hits in the validation gate,
+	// sort hits in the validation gate by the chi-square
+	if (nofHits > fMaxNofHitsInValidationGate){
+		std::sort(hits.begin(), hits.end(), CompareHitChiSqLess());
+	}
+
+	//Select the best hits to be attached
+	int N = (nofHits > fMaxNofHitsInValidationGate) ? fMaxNofHitsInValidationGate : nofHits;
+	for (int iHit = 0; iHit < N; iHit++) {
+	    track->AddHit(hits[iHit].GetHit());
+		hitAdded = true;
+	}
+
 	return hitAdded;
 }
 
 bool CbmLitTrackFinderWeight::AddHits(
 		CbmLitTrack* track,
-		HitPtrIteratorPair bounds)
+		HitPtrIteratorPair bounds,
+		std::vector<CbmLitHitChiSq>& hits)
 {
 	bool hitAdded = false;
 	CbmLitTrackParam par(*track->GetParamLast()), uPar;
 	for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
 		fFilter->Update(&par, &uPar, *iHit);
 		if (IsHitInValidationGate(&uPar, *iHit)) {
-			track->AddHit(*iHit);
-			hitAdded = true;
+			myf chi = ChiSq(&uPar, *iHit);
+			CbmLitHitChiSq h;
+			h.SetHit(*iHit);
+			h.SetParam(&uPar);
+			h.SetChiSq(chi);
+			hits.push_back(h);
 		}
 	}
-	return hitAdded;
 }
 
 void CbmLitTrackFinderWeight::FitTracks(

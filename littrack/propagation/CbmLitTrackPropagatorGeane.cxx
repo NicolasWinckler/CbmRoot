@@ -1,3 +1,7 @@
+/** CbmTrackPropagatorGeane.cxx
+ *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2007
+ **/
 #include "CbmLitTrackPropagatorGeane.h"
 
 #include "CbmLitTrackParam.h"
@@ -36,16 +40,18 @@ LitStatus CbmLitTrackPropagatorGeane::Propagate(
 		const CbmLitTrackParam *parIn,
         CbmLitTrackParam *parOut,
         myf zOut,
-        int pdg)
+        int pdg,
+        std::vector<myf>* F)
 {
    *parOut = *parIn;
-   return Propagate(parOut, zOut, pdg);
+   return Propagate(parOut, zOut, pdg, F);
 }
 
 LitStatus CbmLitTrackPropagatorGeane::Propagate(
 		CbmLitTrackParam *par,
         myf zOut,
-        int pdg)
+        int pdg,
+        std::vector<myf>* F)
 {
 	FairTrackParam param;
 	StatusCode result;

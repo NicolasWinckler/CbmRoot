@@ -8,7 +8,6 @@ ${GEANT3_INCLUDE_DIR}
 #${CLHEP_INCLUDE_DIR}
 ${SIMPATH}/basics/boost/include
 ${CBMROOT_SOURCE_DIR}/littrack
-${CBMROOT_SOURCE_DIR}/littrack/ana
 ${CBMROOT_SOURCE_DIR}/littrack/base
 ${CBMROOT_SOURCE_DIR}/littrack/cbm
 ${CBMROOT_SOURCE_DIR}/littrack/data
@@ -37,37 +36,30 @@ ${CBMROOT_SOURCE_DIR}/much
 ${CBMROOT_SOURCE_DIR}/much/geo
 ${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/sts
-#/home/soft/temp/tbb21_017oss/include
+#/home/soft/tbb22_004oss/include
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
-#/home/soft/temp/tbb21_017oss/build/linux_em64t_gcc_cc4.3.2_libc2.9_kernel2.6.27.7_release
 )
  
 link_directories( ${LINK_DIRECTORIES})
 
 set(LITTRACK_SRCS_RULECHECKER
-base/CbmLitTool.cxx
-base/CbmLitSubstation.cxx
-base/CbmLitStation.cxx
-base/CbmLitStationGroup.cxx
 base/CbmLitDetectorLayout.cxx
 base/CbmLitPDG.cxx
 base/CbmLitEnvironment.cxx  
 base/CbmLitToolFactory.cxx
 base/CbmLitHitData.cxx
+base/CbmLitFieldFitter.cxx
+base/CbmLitMyField.cxx
 cbm/CbmPropagatorGeane.cxx
 cbm/CbmPropagatorLit.cxx
-data/CbmLitHit.cxx
-data/CbmLitPixelHit.cxx
-data/CbmLitStripHit.cxx
 data/CbmLitTrackParam.cxx
 data/CbmLitTrack.cxx
 data/CbmLitTrackBranch.cxx
-data/CbmLitFitNode.cxx
 finder/CbmLitTrackFinderWeight.cxx
 finder/CbmLitTrackFinderBase.cxx
 finder/CbmLitTrackFinderBranch.cxx
@@ -89,17 +81,6 @@ fitter/CbmLitKalmanFilter.cxx
 fitter/CbmLitTrackFitterRobust.cxx
 fitter/CbmLitKalmanSmoother.cxx
 fitter/CbmLitTrackFitterIter.cxx
-interface/CbmLitGeoNavigator.cxx
-interface/CbmLitMaterialEffects.cxx
-interface/CbmLitTrackFitter.cxx   
-interface/CbmLitTrackPropagator.cxx 
-interface/CbmLitTrackUpdate.cxx  
-interface/CbmLitTrackExtrapolator.cxx
-interface/CbmLitTrackSelection.cxx
-interface/CbmLitTrackFinder.cxx
-interface/CbmLitWeightCalculator.cxx
-interface/CbmLitWeightedHitCalculator.cxx
-interface/CbmLitHitToTrackMerger.cxx
 propagation/CbmLitTGeoTrackPropagator.cxx 
 propagation/CbmLitRK4TrackExtrapolator.cxx
 propagation/CbmLitLineTrackExtrapolator.cxx
@@ -117,11 +98,12 @@ qa/CbmLitElossAna.cxx
 qa/CbmLitPropagationAnalysis.cxx
 qa/CbmLitRobustFitterAnalysis.cxx
 qa/CbmLitCheckSimpleGeo.cxx
+qa/CbmLitCheckField.cxx
 weight/CbmLitWeightedHitCalculatorImp.cxx
 weight/CbmLitWeightCalculatorSimple.cxx
 weight/CbmLitWeightCalculatorGauss.cxx
 #weight/CbmLitWeightCalculatorOptimal.cxx
-#weight/CbmLitWeightCalculatorTukey.cxx
+weight/CbmLitWeightCalculatorTukey.cxx
 selection/CbmLitTrackSelectionEmpty.cxx
 selection/CbmLitTrackSelectionA.cxx
 selection/CbmLitTrackSelectionB.cxx
@@ -137,6 +119,28 @@ utils/CbmLitMath.cxx
 utils/CbmLitMatrixMath.cxx
 )
 
+set(LITTRACK_HEADERS
+cbm/CbmPropagatorGeane.h
+cbm/CbmPropagatorLit.h
+finder_cbm/CbmLitTrdTrackFinderBranch.h
+finder_cbm/CbmLitTrdTrackFinderNN.h
+finder_cbm/CbmLitTrdTrackFinderWeight.h
+finder_cbm/CbmLitTrdTrackFinderStandalone.h
+#finder_cbm/CbmLitMuchTrackFinderBranch.h
+#finder_cbm/CbmLitMuchTrackFinderNN.h
+#finder_cbm/CbmLitMuchTrackFinderWeight.h
+finder_cbm/CbmLitStsBasedTrackFinder.h
+finder_cbm/CbmLitFindGlobalTracks.h
+qa/CbmLitReconstructionQa.h
+qa/CbmLitFindGlobalTracksIdeal.h
+qa/CbmLitElossAna.h
+qa/CbmLitPropagationAnalysis.h
+qa/CbmLitRobustFitterAnalysis.h
+qa/CbmLitCheckSimpleGeo.h
+qa/CbmLitCheckField.h
+)
+
+
 SET(LITTRACK_SRCS ${LITTRACK_SRCS_RULECHECKER})
 
 if(RULE_CHECKER_FOUND)
@@ -145,7 +149,7 @@ endif(RULE_CHECKER_FOUND)
 
 # fill list of header files from list of source files
 # by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h LITTRACK_HEADERS "${LITTRACK_SRCS}")
+#CHANGE_FILE_EXTENSION(*.cxx *.h LITTRACK_HEADERS "${LITTRACK_SRCS}")
 
 set(LITTRACK_LINKDEF  LittrackLinkDef.h)
 set(LITTRACK_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/CbmLittrackDict.cxx) 

@@ -53,11 +53,12 @@ public:
 			int planeId,
 			CbmLitHit* hit);
 
-	/* Gets the hit using station group, station and substation indices
+	/* Returns the hit using station group, station and substation indices
 	 *@param stationGroup Index of the station group in the detector
 	 *@param station Index of the station in the station group
 	 *@param substation Index of the substation in the station
 	 *@param hitId Hit index in the array of hits for the specified substation
+	 *@return Hit pointer
 	 */
 	const CbmLitHit* GetHit(
 			int stationGroup,
@@ -68,15 +69,17 @@ public:
 	/* Returns the hit using absolute detector plane (substation) index in the detector
 	 *@param planeId Index of the detector plane (substation) in the detector
 	 *@param hitId Hit index in the array of hits for the specified substation
+	 *@return Hit pointer
 	 */
 	const CbmLitHit* GetHit(
 			int planeId,
 			int hitId) const;
 
-	/* Returns hits iterators using station group, station and substation indices
+	/* Returns hit iterators using station group, station and substation indices
 	 *@param stationGroup Index of the station group in the detector
 	 *@param station Index of the station in the station group
 	 *@param substation Index of the substation in the station
+	 *@return Hit iterators
 	 */
 	HitPtrIteratorPair GetHits(
 			int stationGroup,
@@ -85,6 +88,7 @@ public:
 
 	/* Returns hits iterators using absolute detector plane (substation) index in the detector
 	 *@param planeId Index of the detector plane (substation) in the detector
+	 *@return Hit iterators
 	 */
 	HitPtrIteratorPair GetHits(
 			int planeId);
@@ -93,6 +97,7 @@ public:
 	 *@param stationGroup Index of the station group in the detector
 	 *@param station Index of the station in the station group
 	 *@param substation Index of the substation in the station
+	 *@return Number of hits
 	 */
 	int GetNofHits(
 			int stationGroup,
@@ -104,6 +109,7 @@ public:
 	 *@param stationGroup Index of the station group in the detector
 	 *@param station Index of the station in the station group
 	 *@param substation Index of the substation in the station
+	 *@return Pair of hit error and and coordinate ID
 	 */
 	std::pair<myf, char> GetMaxErr(
 			int stationGroup,
@@ -113,6 +119,7 @@ public:
 	/* Returns maximum hit error in [cm] and the name of the coordinate
 	 * ("X", "Y", "U")for the specified substation.
 	 *@param planeId Index of the detector plane (substation) in the detector
+	 *@return Pair of hit error and and coordinate ID
 	 */
 	std::pair<myf, char> GetMaxErr(
 			int planeId) const;
@@ -120,7 +127,9 @@ public:
 	/* Clears the hit arrays */
 	void Clear();
 
-	/* Returns std::string representation of this class */
+	/* Returns std::string representation of this class
+	 * @return String representation of the class
+	 */
 	virtual std::string ToString() const;
 
 private:

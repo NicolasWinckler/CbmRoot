@@ -1,14 +1,18 @@
+/** CbmLitRK4TrackExtrapolator.cxx
+ *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2007
+ **/
+
 #include "CbmLitRK4TrackExtrapolator.h"
-#include "CbmLitEnvironment.h"
+#include "CbmLitField.h"
 
 #include <cmath>
 
-CbmLitRK4TrackExtrapolator::CbmLitRK4TrackExtrapolator():
-   CbmLitTrackExtrapolator("CbmLitRK4TrackExtrapolator")
+CbmLitRK4TrackExtrapolator::CbmLitRK4TrackExtrapolator(
+		CbmLitField* field):
+   CbmLitTrackExtrapolator("CbmLitRK4TrackExtrapolator"),
+   fField(field)
 {
-   CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-   fMagneticField = env->GetField();
-   fF.resize(25);
 }
 
 CbmLitRK4TrackExtrapolator::~CbmLitRK4TrackExtrapolator()
@@ -28,39 +32,37 @@ LitStatus CbmLitRK4TrackExtrapolator::Finalize()
 LitStatus CbmLitRK4TrackExtrapolator::Extrapolate(
 		const CbmLitTrackParam *parIn,
         CbmLitTrackParam *parOut,
-        myf zOut)
+        myf zOut,
+        std::vector<myf>* F)
 {
    *parOut = *parIn;
-   return Extrapolate(parOut, zOut);
+   return Extrapolate(parOut, zOut, F);
 }
 
 LitStatus CbmLitRK4TrackExtrapolator::Extrapolate(
 		CbmLitTrackParam *par,
-        myf zOut)
+        myf zOut,
+        std::vector<myf>* F)
 {
    myf zIn = par->GetZ();
 
    std::vector<myf> xIn = par->GetStateVector();
    std::vector<myf> xOut(5, 0.);
-   fF.assign(25, 0.);
+   std::vector<myf> F1(25, 0.);
 
-   RK4Order(xIn, zIn, xOut, zOut, fF);
+   RK4Order(xIn, zIn, xOut, zOut, F1);
 
    std::vector<myf> cIn = par->GetCovMatrix();
    std::vector<myf> cOut(15);
-   TransportC(cIn, fF, cOut);
+   TransportC(cIn, F1, cOut);
 
    par->SetStateVector(xOut);
    par->SetCovMatrix(cOut);
    par->SetZ(zOut);
 
-   return kLITSUCCESS;
-}
+   if (F != NULL) F->assign(F1.begin(), F1.end());
 
-void CbmLitRK4TrackExtrapolator::TransportMatrix(
-		   std::vector<myf>& F)
-{
-	F.assign(fF.begin(), fF.end());
+   return kLITSUCCESS;
 }
 
 void CbmLitRK4TrackExtrapolator::RK4Order(
@@ -92,10 +94,12 @@ void CbmLitRK4TrackExtrapolator::RK4Order(
          }
       }
 
-      //TODO:: change doouble to myf here
-      double pos[3] = {x[0], x[1], zIn + coef[iStep] * h};
-      double B[3];
-      fMagneticField->GetFieldValue(pos, B);
+      CbmLitFieldValue B;
+      fField->GetFieldValue(x[0], x[1], zIn + coef[iStep] * h, B);
+
+      myf Bx = B.GetBx();
+      myf By = B.GetBy();
+      myf Bz = B.GetBz();
 
       myf tx = x[2];
       myf ty = x[3];
@@ -106,13 +110,13 @@ void CbmLitRK4TrackExtrapolator::RK4Order(
       myf t1 = std::sqrt(txtxtyty1);
       myf t2 = 1.0 / txtxtyty1;
 
-      Ax[iStep] = ( txty * B[0] + ty * B[2] - ( 1.0 + txtx ) * B[1] ) * t1;
-      Ay[iStep] = (-txty * B[1] - tx * B[2] + ( 1.0 + tyty ) * B[0] ) * t1;
+      Ax[iStep] = ( txty * Bx + ty * Bz - ( 1.0 + txtx ) * By ) * t1;
+      Ay[iStep] = (-txty * By - tx * Bz + ( 1.0 + tyty ) * Bx ) * t1;
 
-      dAx_dtx[iStep] = Ax[iStep] * tx * t2 + ( ty * B[0] - 2.0 * tx * B[1] ) * t1;
-      dAx_dty[iStep] = Ax[iStep] * ty * t2 + ( tx * B[0] + B[2] ) * t1;
-      dAy_dtx[iStep] = Ay[iStep] * tx * t2 + (-ty * B[1] - B[2] ) * t1;
-      dAy_dty[iStep] = Ay[iStep] * ty * t2 + (-tx * B[1] + 2.0 * ty * B[0] ) * t1;
+      dAx_dtx[iStep] = Ax[iStep] * tx * t2 + ( ty * Bx - 2.0 * tx * By ) * t1;
+      dAx_dty[iStep] = Ax[iStep] * ty * t2 + ( tx * Bx + Bz ) * t1;
+      dAy_dtx[iStep] = Ay[iStep] * tx * t2 + (-ty * By - Bz ) * t1;
+      dAy_dty[iStep] = Ay[iStep] * ty * t2 + (-tx * By + 2.0 * ty * Bx ) * t1;
 
       k[0][iStep] = tx * h;
       k[1][iStep] = ty * h;

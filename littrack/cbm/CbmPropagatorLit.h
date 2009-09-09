@@ -2,7 +2,7 @@
 #define CBMPROPAGATORLIT_H_
 
 #include "CbmPropagator.h"
-#include "CbmLitPtrTypes.h"
+#include "base/CbmLitPtrTypes.h"
 
 class FairTrackParam;
 class CbmLitTrackPropagator;

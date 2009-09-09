@@ -2,8 +2,8 @@
 #define CBMLITTRDTRACKFINDERBRANCH_H_
 
 #include "CbmTrdTrackFinder.h"
-#include "CbmLitTrackFinderBranch.h"
-#include "CbmLitStsBasedTrackFinder.h"
+#include "finder/CbmLitTrackFinderBranch.h"
+#include "finder_cbm/CbmLitStsBasedTrackFinder.h"
 
 class TClonesArray;
 

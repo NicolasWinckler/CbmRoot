@@ -1,9 +1,17 @@
+/** CbmLitGeoNavigator.h
+ *@author A.Lebedev <alebedev@jinr.ru>
+ *@since 2008
+ **
+ ** Base class for LIT geometry navigation algorithms.
+ **/
+
 #ifndef CBMLITGEONAVIGATOR_H_
 #define CBMLITGEONAVIGATOR_H_
 
 #include "CbmLitTool.h"
-#include "CbmLitMaterialInfo.h"
 #include "CbmLitFloat.h"
+#include "CbmLitMaterialInfo.h"
+
 
 #include <vector>
 
@@ -12,9 +20,17 @@ class CbmLitTrackParam;
 class CbmLitGeoNavigator : public CbmLitTool
 {
 public:
-	CbmLitGeoNavigator();
-	virtual ~CbmLitGeoNavigator();
+	/* Constructor */
+	CbmLitGeoNavigator() {};
 
+	/* Destructor */
+	virtual ~CbmLitGeoNavigator() {};
+
+	/* Finds intersection points with detector materials on a certain interval.
+	 * @param par Input track parameters. Defines initial direction and Z position.
+	 * @param zOut Output Z position [cm].
+	 * @param inter Output vector with crossed material information.
+	 */
 	virtual LitStatus FindIntersections(
 			const CbmLitTrackParam* par,
 			myf zOut,

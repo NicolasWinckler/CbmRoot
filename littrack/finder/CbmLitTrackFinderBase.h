@@ -1,13 +1,13 @@
 #ifndef CBMLITTRACKFINDERBASE_H_
 #define CBMLITTRACKFINDERBASE_H_
 
-#include "CbmLitTrackFinder.h"
-#include "CbmLitGating.h"
-#include "CbmLitFloat.h"
-#include "CbmLitTypes.h"
-#include "CbmLitDetectorLayout.h"
-#include "CbmLitHitData.h"
-#include "CbmLitPtrTypes.h"
+#include "interface/CbmLitTrackFinder.h"
+#include "finder/CbmLitGating.h"
+#include "base/CbmLitFloat.h"
+#include "base/CbmLitTypes.h"
+#include "base/CbmLitDetectorLayout.h"
+#include "base/CbmLitHitData.h"
+#include "base/CbmLitPtrTypes.h"
 
 #include <set>
 

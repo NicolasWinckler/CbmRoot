@@ -1,11 +1,11 @@
 #ifndef CBMLITTRACK_H_
 #define CBMLITTRACK_H_
 
-#include "CbmLitFloat.h"
-#include "CbmLitTrackParam.h"
-#include "CbmLitFitNode.h"
-#include "CbmLitTypes.h"
-#include "CbmLitEnums.h"
+#include "base/CbmLitFloat.h"
+#include "base/CbmLitTypes.h"
+#include "base/CbmLitEnums.h"
+#include "data/CbmLitTrackParam.h"
+#include "data/CbmLitFitNode.h"
 
 #include <string>
 

@@ -16,11 +16,11 @@ class CbmLitTrack;
 class CbmLitTrackFitter : public CbmLitTool
 {
 public:
-   CbmLitTrackFitter();
+   CbmLitTrackFitter(){};
    CbmLitTrackFitter(
-		   const std::string& name);
+		   const std::string& name):CbmLitTool(name) {};
 
-   virtual ~CbmLitTrackFitter();
+   virtual ~CbmLitTrackFitter() {};
 
    virtual LitStatus Fit(
 		   CbmLitTrack *track,

@@ -3,8 +3,9 @@
 // Base class for ring finders based on on HT method
 // Implementation: Semen Lebedev (s.lebedev@gsi.de)
 
-#include "tbb/task_scheduler_init.h"
-#include "tbb/task.h"
+//#include "tbb/task_scheduler_init.h"
+//#include "tbb/task.h"
+//#include "tbb/tick_count.h"
 
 #include "CbmRichRingFinderHoughParallel.h"
 #include "CbmRichRingFinderHoughImpl.h"
@@ -31,9 +32,9 @@ using std::vector;
 class FinderTask: public tbb::task {
 
 public:
-	CbmRichRingFinderHoughImpl* fHTImpl;
+	CbmRichRingFinderHoughParallelImpl* fHTImpl;
 
-	FinderTask(CbmRichRingFinderHoughImpl* HTImpl) {
+	FinderTask(CbmRichRingFinderHoughParallelImpl* HTImpl) {
 		fHTImpl = HTImpl;
 	}
 
@@ -62,9 +63,9 @@ void CbmRichRingFinderHoughParallel::Init()
     fNEvent = 0;
     fRingCount = 0;
 
-	fHTImpl1 = new CbmRichRingFinderHoughImpl(fGeometryType);
+	fHTImpl1 = new CbmRichRingFinderHoughParallelImpl(fGeometryType);
 	fHTImpl1->Init();
-	fHTImpl2 = new CbmRichRingFinderHoughImpl(fGeometryType);
+	fHTImpl2 = new CbmRichRingFinderHoughParallelImpl(fGeometryType);
 	fHTImpl2->Init();
 }
 
@@ -83,10 +84,11 @@ Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
                                             TClonesArray* rProjArray,
                                          TClonesArray* rRingArray) {
 
+	//TStopwatch timer;
+	//timer.Start();
 
+	tbb::tick_count t0 = tbb::tick_count::now();
 
-	TStopwatch timer;
-	timer.Start();
     fRingCount = 0;
 
 	fNEvent++;
@@ -135,8 +137,11 @@ Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
 	AddRingsToOutputArray(rRingArray, fHTImpl2->GetFoundRings());
 	AddRingsToOutputArray(rRingArray, fHTImpl1->GetFoundRings());
 
-	timer.Stop();
-	fExecTime += timer.CpuTime();
+	//timer.Stop();
+	//fExecTime += timer.CpuTime();
+
+	tbb::tick_count t1 = tbb::tick_count::now();
+	fExecTime += (t1-t0).seconds();
 
 	//FuzzyKE(rHitArray);
 	if (fVerbose)

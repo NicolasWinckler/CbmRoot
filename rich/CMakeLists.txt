@@ -20,7 +20,7 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
-#/u/slebedev/Baykal/tbb21_017oss/include
+/u/slebedev/Baykal/tbb21_017oss/include
 
 ${CBMROOT_SOURCE_DIR}/rich 
 )
@@ -48,8 +48,9 @@ finder/CbmRichFindRings.cxx
 finder/CbmRichFuzzyKE.cxx
 #finder/CbmRichRingFinderHoughSimd.cxx
 finder/CbmRichRingFinderHoughImpl.cxx
-finder/CbmRichRingFinderHoughParallel.cxx
+#finder/CbmRichRingFinderHoughParallel.cxx
 finder/CbmRichRingFinderHoughImpl.cxx
+#finder/CbmRichRingFinderHoughParallelImpl.cxx
 fitter/CbmRichRingFitterCircle.cxx 
 fitter/CbmRichFitRings.cxx
 fitter/CbmRichRingFitterCOP.cxx 

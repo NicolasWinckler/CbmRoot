@@ -6,8 +6,8 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class  CbmRich+;
-#pragma link C++ class  CbmRichHitProducer+;
+#pragma link C++ class CbmRich+;
+#pragma link C++ class CbmRichHitProducer+;
 #pragma link C++ class CbmGeoRich+;
 #pragma link C++ class CbmRichMatchRings+;
 #pragma link C++ class CbmRichElectronIdAnn+;
@@ -31,10 +31,11 @@
 #pragma link C++ class CbmRichRingFinderTrack+;
 #pragma link C++ class CbmRichRingFinderIdeal+;
 #pragma link C++ class CbmRichFindRings+;
-#pragma link C++ class CbmRichRingFinderHoughParallel;
+//#pragma link C++ class CbmRichRingFinderHoughParallel;
 #pragma link C++ class CbmRichFuzzyKE+;
 //#pragma link C++ class CbmRichRingFinderHoughSimd;
 #pragma link C++ class CbmRichRingFinderHoughImpl;
+//#pragma link C++ class CbmRichRingFinderHoughParallelImpl;
 
 //qa
 #pragma link C++ class  CbmRichTestSim+;

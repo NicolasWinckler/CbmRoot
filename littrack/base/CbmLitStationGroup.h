@@ -10,8 +10,8 @@
 class CbmLitStationGroup
 {
 public:
-	CbmLitStationGroup();
-	virtual ~CbmLitStationGroup();
+	CbmLitStationGroup(){};
+	virtual ~CbmLitStationGroup(){};
 
 	void SetStations(const std::vector<CbmLitStation>& stations){
 		fStations = stations;

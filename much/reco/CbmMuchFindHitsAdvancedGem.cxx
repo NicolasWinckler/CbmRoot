@@ -587,7 +587,7 @@ CbmMuchPad* CbmMuchFindHitsAdvancedGem::GetPadByDigi(Int_t digiIndex, Int_t &cha
 // -----   Private method ExecClusteringSimple  ----------------------------
 void CbmMuchFindHitsAdvancedGem::ExecClusteringSimple(CbmMuchCluster* cluster, vector<CbmMuchCluster*> &clusters) {
   fSelectedDigis.clear();
-  Int_t qThreshold = fThresholdRatio*cluster->GetMaxCharge();
+  Int_t qThreshold = (Int_t) fThresholdRatio*cluster->GetMaxCharge();
   Int_t dummy = 0;
   for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++) {
     Int_t digiIndex = cluster->GetDigiIndex(iDigi);

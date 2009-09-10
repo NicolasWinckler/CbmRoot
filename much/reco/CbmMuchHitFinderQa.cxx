@@ -970,7 +970,7 @@ void CbmMuchHitFinderQa::PullsQa(){
     Double_t dx   = hit->GetDx();
     Double_t dy   = hit->GetDy();
     
-    Double_t tRC  = hit->GetTime(0);
+    Double_t tRC  = hit->GetTime();
     Double_t dt   = hit->GetDTime();
     
     

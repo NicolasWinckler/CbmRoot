@@ -198,10 +198,13 @@ void CbmLitEnvironment::NewMuchLayout()
 				litSubstationBack.SetZ(zBack);
 
 				CbmLitStation litStation;
-				litStation.AddSubstation(litSubstationFront);
-				if (station->IsModuleDesign()) litStation.AddSubstation(litSubstationBack);
 
 				Int_t type = layer->GetSideF()->GetModule(0)->GetDetectorType();
+
+				litStation.AddSubstation(litSubstationFront);
+				//if (station->IsModuleDesign()) litStation.AddSubstation(litSubstationBack);
+				if (station->IsModuleDesign() || type == 2) litStation.AddSubstation(litSubstationBack);
+
 				if (type == 2) litStation.SetType(kLITSTRIPHIT);
 				else litStation.SetType(kLITPIXELHIT);
 

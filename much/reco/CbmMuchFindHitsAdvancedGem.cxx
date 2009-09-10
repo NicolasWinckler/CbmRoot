@@ -439,7 +439,7 @@ void CbmMuchFindHitsAdvancedGem::CreateHits(CbmMuchCluster* cluster, Int_t iClus
 
   new ((*fHits)[iHit]) CbmMuchPixelHit(detId, pos, dpos, 0, iCluster, planeId, time, dtime);
 
-  printf("time = %f, dtime = %f, size = %i\n", time, dtime, cluster->GetNDigis());
+//  printf("time = %f, dtime = %f, size = %i\n", time, dtime, cluster->GetNDigis());
 }
 // -------------------------------------------------------------------------
 

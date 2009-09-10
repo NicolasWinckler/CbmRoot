@@ -435,7 +435,7 @@ void CbmMuchFindHitsAdvancedGem::CreateHits(CbmMuchCluster* cluster, Int_t iClus
     dtime += TMath::Power(digi->GetDTime(), 2);
   }
   time /= cluster->GetNDigis();
-  dtime = TMath::Sqrt(dtime)/cluster->GetNDigis();
+  dtime = TMath::Sqrt(dtime/cluster->GetNDigis());
 
   new ((*fHits)[iHit]) CbmMuchPixelHit(detId, pos, dpos, 0, iCluster, planeId, time, dtime);
 

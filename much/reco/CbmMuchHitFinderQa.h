@@ -108,6 +108,9 @@ private:
   Int_t  fnPadSizesX;
   Int_t  fnPadSizesY;
 
+  TH1D** fhPullT;
+  Int_t fNTimingPulls;
+  
   TH1D* fhPullX;
   TH1D* fhPullY;
 

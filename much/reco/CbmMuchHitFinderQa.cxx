@@ -58,6 +58,7 @@ CbmMuchHitFinderQa::CbmMuchHitFinderQa(const char* name, Int_t verbose)
   fStatisticsQaOn = 1;
   fClusterDeconvQaOn =1;
   fPrintToFileOn =1;
+  fNTimingPulls = 8;
 }
 // -------------------------------------------------------------------------
 
@@ -78,6 +79,14 @@ InitStatus CbmMuchHitFinderQa::Init()
   fDigiMatches = (TClonesArray*) fManager->GetObject("MuchDigiMatch");
   fClusters    = (TClonesArray*) fManager->GetObject("MuchCluster");
 
+//  printf(" %i",fMCTracks);
+//  printf(" %i",fPoints);
+//  printf(" %i",fHits);
+//  printf(" %i",fDigis);
+//  printf(" %i",fDigiMatches);
+//  printf(" %i",fClusters);
+//  printf("\n");
+  
   TFile* f = new TFile(fGeoFileName,"R");
   TObjArray* stations = (TObjArray*) f->Get("stations");
   fGeoScheme->Init(stations);
@@ -170,6 +179,7 @@ InitStatus CbmMuchHitFinderQa::Init()
                                "Number of hits in cluster",
                                10,0,10);
 
+  
   fhCharge   ->GetXaxis()->SetTitle("Charge [10^{6} electrons]");
   fhChargeLog->GetXaxis()->SetTitle("Lg (Charge) [Number of electrons]");
   fhChargePr_1GeV_3mm->GetXaxis()->SetTitle("Charge [10^{6} electrons]");
@@ -265,7 +275,8 @@ InitStatus CbmMuchHitFinderQa::Init()
   fhPullYpads2 = new TH1D*[fnPadSizesY];
   fhPullXpads3 = new TH1D*[fnPadSizesX];
   fhPullYpads3 = new TH1D*[fnPadSizesY];
-
+  fhPullT      = new TH1D*[fNTimingPulls];
+  
   for (Int_t i=0;i<fnPadSizesX;i++){
     fhPullXpads1[i] = new TH1D(Form("hPullXpads1%i",i),Form("Pull distribution X. Npads = 1 Size =%i; (x_{RC} - x_{MC}) / dx_{RC}",i),100,-5,5);
     fhPullXpads2[i] = new TH1D(Form("hPullXpads2%i",i),Form("Pull distribution X. Npads = 2 Size =%i; (x_{RC} - x_{MC}) / dx_{RC}",i),100,-5,5);
@@ -278,7 +289,10 @@ InitStatus CbmMuchHitFinderQa::Init()
     fhPullYpads3[i] = new TH1D(Form("hPullYpads3%i",i),Form("Pull distribution Y. Npads = 3 Size =%i; (y_{RC} - y_{MC}) / dy_{RC}",i),100,-5,5);
   }
 
-
+  fhPullT[0] = new TH1D("hPullT","Pull distribution T, all pads; (t_{RC} - t_{MC}) / dt_{RC}",100,-5,5);
+  for (Int_t i=1;i<fNTimingPulls;i++){
+    fhPullT[i] = new TH1D(Form("hPullT%i",i),Form("Pull distribution T. Npads = %i; (t_{RC} - t_{MC}) / dt_{RC}",i),100,-5,5);
+  }
 
   fhPullX = new TH1D("hPullX","Pull distribution X;(x_{RC} - x_{MC}) / dx_{RC}",100,-5,5);
   fhPullY = new TH1D("hPullY","Pull distribution Y;(y_{RC} - y_{MC}) / dy_{RC}",100,-5,5);
@@ -335,6 +349,15 @@ void CbmMuchHitFinderQa::FinishTask(){
   if (fPullsQaOn && fVerbose>1){
     printf("===================================\n");
     printf("PullsQa:\n");
+
+    TCanvas* cTiming = new TCanvas("cTiming","Timing pulls",250*4,250*2);
+    cTiming->Divide(4,2);
+    for (Int_t i=0;i<fNTimingPulls;i++){
+      cTiming->cd(i+1);
+      fhPullT[i]->Fit("gaus");
+      fhPullT[i]->Draw("e");
+    }
+    
     TCanvas* c4 = new TCanvas("c4","Pulls",800,400);
     c4->Divide(2,1);
     c4->cd(1);
@@ -354,6 +377,10 @@ void CbmMuchHitFinderQa::FinishTask(){
     if (fPrintToFileOn) gPad->Print(".gif");
     if (fPrintToFileOn) gPad->Print(".eps");
     c4->cd();
+
+    TCanvas* c_alone = new TCanvas("c_alone","Pulls",400,400);
+    fhPullX->Draw();
+    gPad->Print(".gif");
 
     TCanvas* c4x = new TCanvas("c4x","X-pulls vs pad size and cluster size",fnPadSizesX*300,3*300);
     c4x->Divide(fnPadSizesX,3);
@@ -936,18 +963,25 @@ void CbmMuchHitFinderQa::PullsQa(){
 
     Double_t xMC  = 0.5*(point->GetXIn()+point->GetXOut());
     Double_t yMC  = 0.5*(point->GetYIn()+point->GetYOut());
-
+    Double_t tMC  = point->GetTime();
+    
     Double_t xRC  = hit->GetX();
     Double_t yRC  = hit->GetY();
     Double_t dx   = hit->GetDx();
     Double_t dy   = hit->GetDy();
-
+    
+    Double_t tRC  = hit->GetTime(0);
+    Double_t dt   = hit->GetDTime();
+    
+    
     if (dx<1.e-10) { printf("Anomalously small dx\n"); continue;}
     if (dy<1.e-10) { printf("Anomalously small dy\n"); continue;}
     fhPullX->Fill((xRC-xMC)/dx);
     fhPullY->Fill((yRC-yMC)/dy);
-
-
+    fhPullT[0]->Fill((tRC-tMC)/dt);
+    Int_t nDigis = cluster->GetNDigis();
+    if (nDigis<=fNTimingPulls) fhPullT[nDigis]->Fill((tRC-tMC)/dt);
+    
     if (verbose) printf("\n");
 
     Int_t index = cluster->GetDigiIndex(0);

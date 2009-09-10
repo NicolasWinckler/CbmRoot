@@ -113,9 +113,8 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
 
   private:
 
-    CbmMuchGeoScheme*  fGeoScheme;     // TODO add comments
+    CbmMuchGeoScheme*  fGeoScheme;     // Main object responsible for geometry
     TFile*             fDigiFile;      // Digitization file
-
     TClonesArray*      fPoints;        // Input array of CbmMuchPoint
     TClonesArray*      fMCTracks;      // Input array of MCTrack
     TClonesArray*      fDigis;         // Output array of CbmMuchDigi

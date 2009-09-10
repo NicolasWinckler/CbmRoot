@@ -424,7 +424,22 @@ void CbmMuchFindHitsAdvancedGem::CreateHits(CbmMuchCluster* cluster, Int_t iClus
   Int_t planeId = fGeoScheme->GetLayerSideNr(detId);
 
   Int_t iHit = fHits->GetEntriesFast();
-  new ((*fHits)[iHit]) CbmMuchPixelHit(detId, pos, dpos, 0, iCluster, planeId);
+
+  // Calculate time stamp for hit
+  Double_t time = 0;
+  Double_t dtime = 0;
+  for(Int_t i = 0; i < cluster->GetNDigis(); ++i){
+    Int_t iDigi = cluster->GetDigiIndex(i);
+    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
+    time += digi->GetTime();
+    dtime += TMath::Power(digi->GetDTime(), 2);
+  }
+  time /= cluster->GetNDigis();
+  dtime = TMath::Sqrt(dtime)/cluster->GetNDigis();
+
+  new ((*fHits)[iHit]) CbmMuchPixelHit(detId, pos, dpos, 0, iCluster, planeId, time, dtime);
+
+  printf("time = %f, dtime = %f, size = %i\n", time, dtime, cluster->GetNDigis());
 }
 // -------------------------------------------------------------------------
 

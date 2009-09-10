@@ -171,7 +171,6 @@ Bool_t CbmMuchDigitizeSimpleGem::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
     iDigi = fChannelMap[uniqueId];
     CbmMuchDigi* digi = dynamic_cast<CbmMuchDigi*> (fDigis->At(iDigi));
     Double_t time = point->GetTime() + gRandom->Gaus(0, fDTime);
-    digi->AddTime(time); // add time info
     match = dynamic_cast<CbmMuchDigiMatch*> (fDigiMatches->At(iDigi));
       if (match) {
         match->AddPoint(iPoint);

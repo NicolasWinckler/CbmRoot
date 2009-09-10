@@ -21,7 +21,7 @@ using std::endl;
 CbmMuchDigi::CbmMuchDigi() {
   fDetectorId   =  0;
   fChannelId = 0;
-  fTime[0] = fTime[1] = fTime[2] = -1;
+  fTime = -1;
   fDTime = 8e-2;
 }
 // -------------------------------------------------------------------------
@@ -32,8 +32,7 @@ CbmMuchDigi::CbmMuchDigi(Int_t detectorId, Int_t channelId, Double_t time, Doubl
   fChannelId = channelId;
   fADCCharge = 0;
   fDTime = dTime;
-  fTime[0] = time;
-  fTime[1] = fTime[2] = -1;
+  fTime = time;
 }
 // -------------------------------------------------------------------------
 
@@ -43,32 +42,14 @@ CbmMuchDigi::CbmMuchDigi(CbmMuchDigi* digi){
   fChannelId  = digi->GetChannelId();
   fADCCharge  = digi->GetADCCharge();
   fDTime      = digi->GetDTime();
-  for(int i=0;i<3;i++){
-    fTime[i] = digi->GetTime(i);
-  }
+  fTime       = digi->GetTime();
 }
-
 // -------------------------------------------------------------------------
+
 
 // -----   Destructor   ----------------------------------------------------
 CbmMuchDigi::~CbmMuchDigi() { }
 // -------------------------------------------------------------------------
 
-// -------------------------------------------------------------------------
-Int_t CbmMuchDigi::AddTime(Double_t time) {
-  if ( time < 0 ) {
-    cout << "-W- CbmMuchDigi::AddTime: Illegal time value "
-	 << time << endl;
-    return 0;
-  }
-  for (Int_t i=0; i<3; i++) {
-    if ( fTime[i] < 0 ) {
-      fTime[i] = time;
-      return i+1;
-    }
-  }
-  return 4;
-}
-// -------------------------------------------------------------------------
 
 ClassImp(CbmMuchDigi)

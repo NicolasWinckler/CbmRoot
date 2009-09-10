@@ -12,6 +12,8 @@
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchModuleGem.h"
 #include "CbmMuchPad.h"
+#include "CbmMuchPoint.h"
+#include "CbmMCTrack.h"
 
 #include "FairRootManager.h"
 
@@ -58,6 +60,10 @@ InitStatus CbmMuchClusterAnalysis::Init()
     // Cluster size distribution
     TH1F* clusterSizeHist = new TH1F(Form("Cluster size, station %i",iStation+1), Form("Station %i",iStation+1), 9, 1,10);
     fClusterSize.push_back(clusterSizeHist);
+
+    // Single muon clusters distribution
+    TH1F* singleMuCluster = new TH1F(Form("Single mu clusters, station %i",iStation+1), Form("Station %i",iStation+1), 10, 0,1);
+    fSingleMuCluster.push_back(singleMuCluster);
 
     vector<TH1F*> clusterPointsHistos;
     vector<vector<TH1F*> > clusterPadCharges;
@@ -114,6 +120,9 @@ void CbmMuchClusterAnalysis::Exec(Option_t * option){
   if(fEvent%50==0)
     Info("Exec",Form("Event:%i",fEvent));
 
+  Int_t nStations = fGeoScheme->GetNStations();
+  vector<Int_t> nSingleMuClusters(nStations, 0);
+
   // Loop over clusters
   Int_t nClusters = fClusters->GetEntriesFast();
   for(Int_t iCluster=0; iCluster<nClusters; ++iCluster){
@@ -122,9 +131,10 @@ void CbmMuchClusterAnalysis::Exec(Option_t * option){
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
     Int_t iStation = CbmMuchGeoScheme::GetStationIndex(digi->GetDetectorId());
 
-    Int_t nPads = cluster->GetNDigis();
+    if(IsSingleMuCluster(cluster)) nSingleMuClusters.at(iStation)++;
 
     // Fill cluster size histogram
+    Int_t nPads = cluster->GetNDigis();
     fClusterSize.at(iStation)->Fill(nPads);
 
     Double_t xNominator = 0;
@@ -175,12 +185,58 @@ void CbmMuchClusterAnalysis::Exec(Option_t * option){
       fClusterPadsCharge[iStation][iPad][nPoints-1]->Fill(charge);
     }
   }
+
+  vector<Int_t> nSignalMuons = GetNSignalMuons();
+  for(Int_t iStation = 0; iStation < nStations; ++iStation){
+    fSingleMuCluster.at(iStation)->Fill((Double_t)nSingleMuClusters.at(iStation)/nSignalMuons.at(iStation));
+  }
+}
+// -------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------
+Bool_t CbmMuchClusterAnalysis::IsSingleMuCluster(CbmMuchCluster* cluster){
+  Int_t iPoint = -1;
+  for(Int_t i = 0; i < cluster->GetNDigis(); ++i){
+    Int_t iDigi = cluster->GetDigiIndex(i);
+    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(iDigi);
+    // Only one point in the pad
+    if(match->GetNPoints() > 1) return false;
+    // The same point as in previous pads
+    if(iPoint < 0) iPoint = match->GetRefIndex();
+    if(iPoint != match->GetRefIndex()) return false;
+  }
+  Bool_t isParticle = iPoint >= 0; // Avoid noise
+
+  CbmMuchPoint* point = (CbmMuchPoint*)fPoints->At(iPoint);
+  Int_t trackId = point->GetTrackID();
+  CbmMCTrack* track = (CbmMCTrack*) fMCTracks->At(trackId);
+  Int_t pdgCode = track->GetPdgCode();
+
+  Bool_t isMuon = TMath::Abs(pdgCode) == 13; // Only muons
+  Bool_t isSignal = track->GetMotherId() == 0; // Only signal
+  return  isParticle && isSignal && isMuon;
+}
+// -------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------
+vector<Int_t> CbmMuchClusterAnalysis::GetNSignalMuons(){
+  Int_t nStations = fGeoScheme->GetNStations();
+  vector<Int_t> signalMuons(nStations, 0);
+  for(Int_t iPoint = 0; iPoint < fPoints->GetEntriesFast(); +iPoint){
+    CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(iPoint);
+    Int_t iStation = fGeoScheme->GetStationIndex(point->GetDetectorId());
+    Int_t trackId = point->GetTrackID();
+    CbmMCTrack* track = (CbmMCTrack*)fMCTracks->At(trackId);
+    Int_t pdgCode = track->GetPdgCode();
+    if(TMath::Abs(pdgCode) == 13 && track->GetMotherId() == 0)
+      signalMuons.at(iStation)++;
+  }
+  return signalMuons;
 }
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
 void CbmMuchClusterAnalysis::FinishTask(){
-//  gStyle->SetPaperSize(20,20);
   gStyle->SetOptStat(1111110);
 
   TCanvas *c = new TCanvas("Charge", "Charge", 10,10, 400,400);
@@ -188,18 +244,27 @@ void CbmMuchClusterAnalysis::FinishTask(){
   fChargeTotal->GetXaxis()->SetTitle("ADC channels");
   fChargeTotal->Scale(1./fChargeTotal->Integral());
   fChargeTotal->Draw();
-//  sprintf(name, "%s.eps", c->GetName());
   c->Print(".eps");
   c->Print(".png");
 
   TCanvas *c1 = new TCanvas(Form("Cluster size"), Form("Cluster size"), 20, 20, 1200, 800);
   c1->Divide(3,2);
+
+  TCanvas *c6 = new TCanvas(Form("Single mu clusters fraction"),
+      Form("Single mu clusters fraction"), 30, 30, 2000, 400);
+  c6->Divide(3,2);
   for(Int_t iStation=0; iStation<fGeoScheme->GetNStations(); ++iStation){
     // Cluster size
     c1->cd(iStation+1);
     fClusterSize[iStation]->GetXaxis()->SetTitle("Cluster size");
     fClusterSize[iStation]->Scale(1./fClusterSize[iStation]->Integral());
     fClusterSize[iStation]->Draw();
+
+    // Single muon clusters fraction
+    c6->cd(iStation+1);
+    fSingleMuCluster[iStation]->GetXaxis()->SetTitle("Single mu clusters fraction");
+    fSingleMuCluster[iStation]->Scale(1./fSingleMuCluster[iStation]->Integral());
+    fSingleMuCluster[iStation]->Draw();
 
     // Number of points in different size clusters
     TCanvas *c2 = new TCanvas(Form("Number of points, station %i", iStation+1), Form("Number of points, station %i", iStation+1), 30, 30, 1200, 800);
@@ -288,10 +353,12 @@ void CbmMuchClusterAnalysis::FinishTask(){
     printf("\n\n");
     c5->Print(".eps");
     c5->Print(".png");
-
   } // Station loop
   c1->Print(".eps");
   c1->Print(".png");
+
+  c6->Print(".eps");
+  c6->Print(".png");
 }
 // -------------------------------------------------------------------------
 

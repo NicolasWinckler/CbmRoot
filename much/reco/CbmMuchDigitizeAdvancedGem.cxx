@@ -50,7 +50,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
   fPoints = NULL;
   fDigis = NULL;
   fDigiMatches = NULL;
-  fDTime = 8e-2;
+  fDTime = 3;
   fNADCChannels = 256;
   fQMax = 440000;
   SetQThreshold(3);
@@ -72,7 +72,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(Int_t iVerbose) :
   fPoints = NULL;
   fDigis = NULL;
   fDigiMatches = NULL;
-  fDTime = 8e-2;
+  fDTime = 3;
   fNADCChannels = 256;
   fQMax = 440000;
   SetQThreshold(3);
@@ -95,7 +95,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const c
   fPoints = NULL;
   fDigis = NULL;
   fDigiMatches = NULL;
-  fDTime = 8e-2;
+  fDTime = 3;
   fNADCChannels = 256;
   fQMax = 440000;
   SetQThreshold(3);
@@ -174,16 +174,16 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
   }
   if (TMath::Abs(particle->Charge()) < 0.1)
     return kFALSE;
-  TVector3 momentum;                                            // 3-momentum of the particle
+  TVector3 momentum;                                // 3-momentum of the particle
   point->Momentum(momentum);
-  Double_t mom = momentum.Mag() * 1e3;                         // absolute momentum value [MeV/c]
-  Double_t mom2 = mom * mom;                                    // squared momentum of the particle
-  Double_t mass = particle->Mass() * 1e3;                       // mass of the particle [MeV/c^2]
-  Double_t mass2 = mass * mass;                                 // squared mass of the particle
-  Double_t Tkin = TMath::Sqrt(mom2 + mass2) - mass;            // kinetic energy of the particle
+  Double_t mom = momentum.Mag() * 1e3;              // absolute momentum value [MeV/c]
+  Double_t mom2 = mom * mom;                        // squared momentum of the particle
+  Double_t mass = particle->Mass() * 1e3;           // mass of the particle [MeV/c^2]
+  Double_t mass2 = mass * mass;                     // squared mass of the particle
+  Double_t Tkin = TMath::Sqrt(mom2 + mass2) - mass; // kinetic energy of the particle
   Double_t sigma = CbmMuchDigitizeAdvancedGem::Sigma_n_e(Tkin, mass);      // sigma for Landau distribution
   Double_t mpv = CbmMuchDigitizeAdvancedGem::MPV_n_e(Tkin, mass);          // most probable value for Landau distr.
-  UInt_t nElectrons = (UInt_t) fLandauRnd->Landau(mpv, sigma); // number of prim. electrons per 0.3 cm gap
+  UInt_t nElectrons = (UInt_t) fLandauRnd->Landau(mpv, sigma);  // number of prim. electrons per 0.3 cm gap
   while (nElectrons > 50000)
     nElectrons = (UInt_t) (fLandauRnd->Landau(mpv, sigma));     // restrict Landau tail to increase performance
   // Number of electrons for current track length
@@ -199,7 +199,8 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
 
   map<Int_t, CbmMuchDigi*> chargedPads;     // map from a channel id within the module to a fired digi
   map<Int_t, CbmMuchDigiMatch*> chargedMatches;     // the same for digi matches
-  Double_t time = point->GetTime();
+  Double_t time = -1;
+  while(time < 0) time = point->GetTime()  + gRandom->Gaus(0, fDTime);
   UInt_t nTrackCharge = 0;                  // total charge left by a track
   for (Int_t iElectron = 0; iElectron < nElectrons; iElectron++) {
     // Coordinates of primary electrons along the track
@@ -275,15 +276,12 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
     if(!match) continue;
     if (!digi) continue;
     Int_t iCharge = match->GetTotalCharge();
-//    if (iCharge < 0)
-//      iCharge = (Int_t) (TMath::Power(2, 31) - 2);
     if (fChargedPads.find(uniqueId) == fChargedPads.end()) {
       fChargedPads[uniqueId] = new CbmMuchDigi(digi);
       fChargedMatches[uniqueId] = new CbmMuchDigiMatch();
       fChargedMatches[uniqueId]->AddPoint(iPoint);
       fChargedMatches[uniqueId]->AddCharge(iCharge);
     } else {
-      fChargedPads[uniqueId]->AddTime(time);
       fChargedMatches[uniqueId]->AddPoint(iPoint);
       fChargedMatches[uniqueId]->AddCharge(iCharge);
       fNMulti++;
@@ -357,6 +355,9 @@ void CbmMuchDigitizeAdvancedGem::Exec(Option_t* opt) {
 
   FirePads();
 
+//  for(Int_t iDigi = 0; iDigi < fDigis->GetEntriesFast(); ++iDigi){
+//    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
+//  }
 
   // Screen output
   fTimer.Stop();
@@ -493,7 +494,6 @@ void CbmMuchDigitizeAdvancedGem::AddNoise(CbmMuchPad* pad) {
   }
   fChargedMatches[uniqueId]->AddPoint(-1);
   fChargedMatches[uniqueId]->AddCharge(iCharge);
-  //fChargedPads[uniqueId]->AddCharge(iCharge);
 }
 // -------------------------------------------------------------------------
 

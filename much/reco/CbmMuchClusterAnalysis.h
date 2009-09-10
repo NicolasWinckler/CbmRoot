@@ -55,21 +55,39 @@ class CbmMuchClusterAnalysis: public FairTask {
     vector<vector<vector<TH1F*> > > fClusterPadsCharge; // Distributions of pad-charge for definite cluster sizes and number of contributed points
     vector<vector<vector<TH1F*> > > fClusterRadii; // Distributions of cluster radii for definite cluster sizes and number of contributed points
     vector<vector<vector<TH1F*> > > fClusterMeanEuclide; // Mean Euclidean distance between cluster pads
+    vector<TH1F*> fSingleMuCluster; // Fraction of signal muons which formed single clusters
 
     /**
      * Mean Euclidean distance between pads in the cluster.
+     * @param cluster Cluster to process
      */
     Double_t GetMeanDistance(CbmMuchCluster* cluster);
 
     /**
      * Euclidean distance between two given pads.
+     * @param iDigi Index of the digi corresponding to the first pad
+     * @param jDigi Index of the digi corresponding to the second pad
      */
     Double_t GetDistance(Int_t iDigi, Int_t jDigi);
 
     /**
      * Gets pad by digi index.
+     * @param iDigi Index of the digi
      */
     CbmMuchPad* GetPadByDigi(Int_t iDigi);
+
+    /**
+     * Defines whether the given cluster is produced by a
+     * signal muon only.
+     * @param cluster Cluster to process
+     */
+    Bool_t IsSingleMuCluster(CbmMuchCluster* cluster);
+
+    /**
+     * Gets total number of signal muons in each station.
+     */
+    vector<Int_t> GetNSignalMuons();
+
 
     ClassDef(CbmMuchClusterAnalysis,1)
 };

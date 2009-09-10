@@ -146,12 +146,12 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
     CbmMuchDigi *digi = (CbmMuchDigi*) fDigis->UncheckedAt(idig);
     //if (digi->GetStationNr() < begStation) continue; // not straw
     Int_t signs = digi->GetUniqueID();
-    for (Int_t i = 0; i < 3; ++i) {
-      xyz[i] = digi->GetTimes()[i];
-      if (signs & (1<<i)) xyz[i] = -xyz[i];
-      //cout << xyz[i] << " ";
-      //if (i == 2) cout << endl;
-    }
+//    for (Int_t i = 0; i < 3; ++i) {
+//      xyz[i] = digi->GetTime(i);
+//      if (signs & (1<<i)) xyz[i] = -xyz[i];
+//      //cout << xyz[i] << " ";
+//      //if (i == 2) cout << endl;
+//    }
 
     Int_t detId =  digi->GetDetectorId();
     Int_t station3 = fGeoScheme->GetStationIndex(detId);

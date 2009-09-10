@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include "TObject.h"
+#include "TArrayD.h"
 
 
 
@@ -49,16 +50,16 @@ class CbmMuchDigi : public TObject
   /** Accessors **/
   Int_t GetDetectorId()  const  { return fDetectorId; }
   Int_t GetChannelId()   const  { return fChannelId; }
-  /** Gets time since event start **/
-  Double_t  GetTime(Int_t i)       { return fTime[i]; }
-  Double_t* GetTimes()             { return fTime; }
-  Double_t  GetDTime()             { return fDTime; }
+  /** Gets time since event start [ns] **/
+  Double_t  GetTime() const {return fTime;}
+  /** Gets time resolution [ns] */
+  Double_t  GetDTime() const { return fDTime; }
   /** Gets charge in ADC channels collected by the channel. **/
-  UInt_t GetADCCharge()     const  {return fADCCharge; }
+  UInt_t GetADCCharge() const  {return fADCCharge; }
   /** Sets charge in ADC channels collected by the channel. **/
   void SetADCCharge(UInt_t adcCharge) { fADCCharge = adcCharge; }
   /** Adds one more time information **/
-  Int_t AddTime(Double_t time);
+  void SetTime(Double_t time) {fTime = time;}
 
 
  private:
@@ -66,7 +67,7 @@ class CbmMuchDigi : public TObject
   Int_t    fDetectorId;      // Detector Id (including module number)
   Int_t    fChannelId;       // Channel Id within the module
   UInt_t   fADCCharge;       // Charge for the digi in ADC channels
-  Double_t fTime[3];         // Time since event start [ns]
+  Double_t fTime;            // Time since event start [ns]
   Double_t fDTime;           // Time resolution [ns]
 
   ClassDef(CbmMuchDigi,1);

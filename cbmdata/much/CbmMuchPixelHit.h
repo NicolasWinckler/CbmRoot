@@ -66,7 +66,7 @@ public:
 	  *@param dxy       Covariance of x and y
 	  *@param refId     index of digi or cluster
 	  *@param planeId   detectror plane identifier
-	  *@param times     Time since event start [ns]
+	  *@param time      Time since event start [ns]
 	  *@param dTime     Time resolution [ns]
 	**/
 	CbmMuchPixelHit(
@@ -76,24 +76,22 @@ public:
 			Double_t dxy,
 			Int_t refId,
 			Int_t planeId,
-			const Double_t* times,
+			Double_t time,
 			Double_t dtime);
 
 	virtual ~CbmMuchPixelHit();
 
 	virtual Int_t GetPlaneId() const { return fPlaneId; }
 
-	Double_t GetTime(Int_t i) const {return fTime[i];}
-	const Double_t* GetTimes() const {return fTime;}
+	Double_t GetTime() const {return fTime;}
 	Double_t GetDTime() const {return fDTime;}
 
-	void SetTime(Double_t time, Int_t i) {fTime[i] = time;}
-	void SetTimes(const Double_t* time) {fTime[0] = time[0]; fTime[1] = time[1]; fTime[2] = time[2];}
+	void SetTime(Double_t time) {fTime = time;}
 	void SetDTime(Double_t dtime) {fDTime = dtime;}
 
 private:
-  Int_t fPlaneId;          // Plane number
-	Double_t fTime[3];    // Time since event start [ns]
+  Int_t fPlaneId;       // Plane number
+  Double_t fTime;       // Time since event start [ns]
 	Double_t fDTime;      // Time resolution [ns]
 
 	ClassDef(CbmMuchPixelHit, 1);

@@ -248,7 +248,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 {
 	if(name == "e_nn") {
 		CbmLitTrackFinderNN* trdFinderNN = new CbmLitTrackFinderNN();
-		trdFinderNN->SetPropagator(CreateTrackPropagator("lit"));
+		trdFinderNN->SetPropagator(CreateTrackPropagator("geane"));
 		trdFinderNN->SetSeedSelection(CreateTrackSelection("momentum"));
 		trdFinderNN->SetFinalSelection(CreateTrackSelection("trd_final"));
 		trdFinderNN->SetFilter(CreateTrackUpdate("kalman"));
@@ -257,17 +257,18 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderNN->SetNofIter(1);
 		trdFinderNN->IsUseFastSearch(true);
 		trdFinderNN->SetMaxNofMissingHits(4);
-		trdFinderNN->SetSigmaCoef(7.);
+		trdFinderNN->SetSigmaCoef(10.);
 		trdFinderNN->SetChiSqPixelHitCut(25.);
 		trdFinderNN->SetChiSqStripHitCut(4.);
 		trdFinderNN->SetPDG(11);
+		trdFinderNN->IsProcessSubstationsTogether(true);
 		trdFinderNN->Initialize();
 		TrackFinderPtr finder(trdFinderNN);
 		return finder;
 	} else
 	if(name == "e_branch") {
 		CbmLitTrackFinderBranch* trdFinderBranch = new CbmLitTrackFinderBranch();
-		trdFinderBranch->SetPropagator(CreateTrackPropagator("lit"));
+		trdFinderBranch->SetPropagator(CreateTrackPropagator("geane"));
 		trdFinderBranch->SetSeedSelection(CreateTrackSelection("momentum"));
 		trdFinderBranch->SetStationGroupSelection(CreateTrackSelection("trd_station"));
 		trdFinderBranch->SetFinalSelection(CreateTrackSelection("trd_final"));
@@ -311,7 +312,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderNN->SetFinalSelection(CreateTrackSelection("much_final"));
 		muchFinderNN->SetFilter(CreateTrackUpdate("kalman"));
 		muchFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-		muchFinderNN->SetVerbose(1);
+		muchFinderNN->SetVerbose(3);
 		muchFinderNN->SetNofIter(1);
 		muchFinderNN->IsUseFastSearch(true);
 		muchFinderNN->SetMaxNofMissingHits(2);
@@ -319,6 +320,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderNN->SetChiSqPixelHitCut(13.86);
 		muchFinderNN->SetChiSqStripHitCut(4.);
 		muchFinderNN->SetPDG(13);
+		muchFinderNN->IsProcessSubstationsTogether(false);
 		muchFinderNN->Initialize();
 		TrackFinderPtr finder(muchFinderNN);
 		return finder;
@@ -350,7 +352,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderBranch->SetFinalSelection(CreateTrackSelection("much_final"));
 		muchFinderBranch->SetFilter(CreateTrackUpdate("kalman"));
 		muchFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-		muchFinderBranch->SetVerbose(1);
+		muchFinderBranch->SetVerbose(3);
 		muchFinderBranch->SetNofIter(1);
 		muchFinderBranch->IsUseFastSearch(true);
 		muchFinderBranch->SetPDG(13);

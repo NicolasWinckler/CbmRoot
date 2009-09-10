@@ -1,7 +1,7 @@
 #ifndef CBMLITTYPES_H_
 #define CBMLITTYPES_H_
 
-#include "data/CbmLitFitNode.h"
+#include "CbmLitFitNode.h"
 //#include "CbmLitHit.h"
 //#include "CbmLitTrack.h"
 //#include "CbmLitTrackBranch.h"

@@ -1,3 +1,9 @@
+/** CbmLitTrackFinderNN.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ **/
+
 #include "CbmLitTrackFinderNN.h"
 #include "CbmLitTrackSelection.h"
 #include "CbmLitMemoryManagment.h"
@@ -10,7 +16,8 @@
 #include <algorithm>
 #include <iostream>
 
-CbmLitTrackFinderNN::CbmLitTrackFinderNN()
+CbmLitTrackFinderNN::CbmLitTrackFinderNN():
+	fIsProcessSubstationsTogether(false)
 {
 }
 
@@ -50,6 +57,10 @@ LitStatus CbmLitTrackFinderNN::DoFind(
 		for_each(fTracks.begin(), fTracks.end(), DeleteObject());
 		fTracks.clear();
 		fHitData.Clear();
+	}
+
+	for (int i = 0; i < tracks.size(); i++) {
+		std::cout << tracks[i]->ToString();
 	}
 	std::cout << "-I- CbmLitTrackFinderNN: " << fEventNo++ << " events processed" << std::endl;
 
@@ -113,29 +124,37 @@ bool CbmLitTrackFinderNN::ProcessStation(
 	bool hitAdded = false;
 	CbmLitTrackParam par(*track->GetParamLast());
 	int nofSubstations = fLayout.GetNofSubstations(stationGroup, station);
+	HitPtrVector hits;
 	for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
 		myf z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
 		fPropagator->Propagate(&par, z, fPDG);
 		track->SetParamLast(&par);
 		HitPtrIteratorPair bounds = MinMaxIndex(&par, fHitData.GetHits(stationGroup, station, iSubstation),
 				fLayout.GetStation(stationGroup, station), fHitData.GetMaxErr(stationGroup, station, iSubstation));
-		if (AddNearestHit(track, bounds)) hitAdded = true;
+		hits.insert(hits.end(), bounds.first, bounds.second);
+		if (!fIsProcessSubstationsTogether) {
+			if (AddNearestHit(track, hits)) hitAdded = true;
+			hits.clear();
+		}
 	}
+	if (fIsProcessSubstationsTogether && AddNearestHit(track, hits)) hitAdded = true;
 	return hitAdded;
 }
 
 bool CbmLitTrackFinderNN::AddNearestHit(
 		CbmLitTrack* track,
-		HitPtrIteratorPair bounds)
+		HitPtrVector& hits)
 {
 	bool hitAdded = false;
 	CbmLitTrackParam par(*track->GetParamLast()), uPar, param;
-	HitPtrIterator hit(bounds.second);
+	HitPtrIterator hit(hits.end());
 	myf chiSq = 1e10;
-	for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
+	for (HitPtrIterator iHit = hits.begin(); iHit != hits.end(); iHit++) {
+		//First update track parameters with KF, than check whether the hit is in the validation gate.
 		fFilter->Update(&par, &uPar, *iHit);
 		if (IsHitInValidationGate(&uPar, *iHit)) {
 			myf chi = ChiSq(&uPar, *iHit);
+			// Check if current hit is closer by statistical distance than the previous ones
 			if (chi < chiSq) {
 				chiSq = chi;
 				hit = iHit;
@@ -143,7 +162,8 @@ bool CbmLitTrackFinderNN::AddNearestHit(
 			}
 		}
 	}
-	if (hit != bounds.second) {
+	// if hit was attached than change track information
+	if (hit != hits.end()) {
 		track->AddHit(*hit);
 		track->SetParamLast(&param);
 		track->SetChi2(track->GetChi2() + chiSq);

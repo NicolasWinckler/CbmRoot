@@ -1,3 +1,9 @@
+/** CbmLitPropagationAnalysis.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2007
+ * @version 2.0
+ **/
+
 #include "CbmLitPropagationAnalysis.h"
 
 #include "CbmLitTrackUpdate.h"
@@ -66,9 +72,9 @@ InitStatus CbmLitPropagationAnalysis::Init()
 
 	// Create tools
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fPropagator = factory->CreateTrackPropagator("mylit");
+	fPropagator = factory->CreateTrackPropagator("geane");
 	fFilter = factory->CreateTrackUpdate("kalman");
-	fFitter = factory->CreateTrackFitter("mylit_kalman");
+	fFitter = factory->CreateTrackFitter("geane_kalman");
 	fSmoother = factory->CreateTrackFitter("kalman_smoother");
 
 	CreateHistograms();
@@ -222,6 +228,22 @@ void CbmLitPropagationAnalysis::CreateHistograms()
 			}
 		}
 	}
+
+	fStsHistos.resize(2);
+	fStsHistos[0].resize(fNofParams);
+	fStsHistos[1].resize(fNofParams);
+	std::string vr[] = {"stsl","stsf"};
+	for (Int_t v = 0; v < 2; v++) {
+		for (Int_t j = 0; j < fNofParams; j++) {
+			std::stringstream histName;
+			std::stringstream histTitle;
+			histName << names[j] << "_" << vr[v];
+			histTitle << titles[j] << " " << vr[v];
+			TH1F* hist = new TH1F(histName.str().c_str(), histTitle.str().c_str(),
+					bins[j], boundL[j], boundR[j]);
+			fStsHistos[v][j] = hist;
+		}
+	}
 }
 
 void CbmLitPropagationAnalysis::CreateTrackArrays()
@@ -244,7 +266,7 @@ void CbmLitPropagationAnalysis::CreateTrackArrays()
 	}
 
 	if (fLitTracks.size() != fLitMcTracks.size())
-		Fatal("CbmLitpropagationAnalysis", "LitTrack vector size != LitMcVector size");
+		Fatal("CbmLitPropagationAnalysis", "LitTrack vector size != LitMcVector size");
 }
 
 Bool_t CbmLitPropagationAnalysis::CheckAcceptance(

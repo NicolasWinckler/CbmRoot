@@ -58,7 +58,8 @@ LitStatus CbmLitTrackPropagatorGeane::Propagate(
 
 	CbmLitConverter::LitTrackParamToTrackParam(par, &param);
 
-	if (pdg == 13) pdg = (par->GetQp() > 0) ? 13 : -13;
+	if (std::abs(pdg) == 13) pdg = (par->GetQp() < 0) ? 13 : -13;
+	if (std::abs(pdg) == 11) pdg = (par->GetQp() < 0) ? 11 : -11;
 
 	result = fPropagator->Propagate(&param, zOut, pdg);
 

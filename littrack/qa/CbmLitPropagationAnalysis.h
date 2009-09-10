@@ -1,3 +1,11 @@
+/** CbmLitPropagationAnalysis.h
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2007
+ * @version 2.0
+ **
+ ** CBM task class for analysis of the track propagation and track fit.
+ **/
+
 #ifndef CBMLITPROPAGATIONANALYSIS_H_
 #define CBMLITPROPAGATIONANALYSIS_H_ 1
 
@@ -127,6 +135,9 @@ private:
 	std::vector<std::vector<TH1F*> > fFilterHistos; // for fitter analysis
 	std::vector<std::vector<TH1F*> > fSmootherHistos; // for smoother analysis
 	Int_t fNofParams; // number of parameters = 12
+
+	// Histograms for first and last STS parameters
+	std::vector<std::vector<TH1F*> > fStsHistos;
 
 	//Time analysis
 	TStopwatch fPropagationWatch; // for the propagation

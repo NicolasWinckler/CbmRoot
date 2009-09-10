@@ -18,7 +18,7 @@
 // here in the CbmLitTrackFinderBase class.
 
 CbmLitTrackFinderBranch::CbmLitTrackFinderBranch():
-	fMaxNofHitsInValidationGate(4)
+	fMaxNofHitsInValidationGate(3)
 {
 }
 

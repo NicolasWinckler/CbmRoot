@@ -16,6 +16,8 @@
 #pragma link C++ class CbmAnaHypMix+;
 
 #pragma link C++ class CbmAnaMuch+;
+#pragma link C++ class CbmPolarizedGenerator+;
+
 
 #endif
 

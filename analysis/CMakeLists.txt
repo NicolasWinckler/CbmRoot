@@ -46,6 +46,7 @@ hyperon/CbmAnaHypRecCascade.cxx
 hyperon/CbmAnaHypMix.cxx
 
 much/CbmAnaMuch.cxx
+much/CbmPolarizedGenerator.cxx
 )
 
 

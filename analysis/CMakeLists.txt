@@ -10,6 +10,7 @@ ${CBMROOT_SOURCE_DIR}/base
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
+${CBMROOT_SOURCE_DIR}/cbmdata/much
 ${CBMROOT_SOURCE_DIR}/cbmdata/mvd
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
 ${CBMROOT_SOURCE_DIR}/global
@@ -43,6 +44,8 @@ hyperon/CbmAnaHypRecLambda.cxx
 hyperon/CbmAnaHypSelectLambda.cxx
 hyperon/CbmAnaHypRecCascade.cxx
 hyperon/CbmAnaHypMix.cxx
+
+much/CbmAnaMuch.cxx
 )
 
 

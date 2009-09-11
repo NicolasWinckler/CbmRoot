@@ -15,6 +15,7 @@
 #pragma link C++ class CbmAnaHypRecCascade+;
 #pragma link C++ class CbmAnaHypMix+;
 
+#pragma link C++ class CbmAnaMuch+;
 
 #endif
 

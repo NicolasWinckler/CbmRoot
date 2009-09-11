@@ -382,7 +382,7 @@ Double_t CbmMuchClusterAnalysis::GetDistance(Int_t iDigi, Int_t jDigi){
   CbmMuchDigi* digi2 = (CbmMuchDigi*) fDigis->At(jDigi);
   Double_t charge1 = digi1->GetADCCharge();
   Double_t charge2 = digi2->GetADCCharge();
-  Int_t deltaCharge = charge1 - charge2;
+  Int_t deltaCharge = Int_t(charge1 - charge2);
   CbmMuchPad* pad1 = GetPadByDigi(iDigi);
   CbmMuchPad* pad2 = GetPadByDigi(jDigi);
   // Normalized space distances (because of different pad sizes)

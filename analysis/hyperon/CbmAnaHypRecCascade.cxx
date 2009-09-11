@@ -149,11 +149,11 @@ void CbmAnaHypRecCascade::CreatePair(CbmAnaHypTrack da, CbmAnaHypLambdaCandidate
   fSVF->AddTrack(&la);
   fSVF->AddTrack(&da);
   fSVF->SetApproximation(&kfPV);
-  fSVF->Fit(1); //TODO
+  fSVF->Fit(); //TODO fSVF->Fit(1);
   fSVF->GetVertex(vtx);
   fSVF->GetVertex(kfVtx);
   fSVF->SetApproximation(&kfVtx);
-  fSVF->Fit(1); //TODO
+  fSVF->Fit(); //TODO fSVF->Fit(1); 
   fSVF->GetVertex(vtx);
   fSVF->GetMass(&m,0);
 

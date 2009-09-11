@@ -201,24 +201,22 @@ void CbmMuchDigitizeStraws::Reset() {
 // -------------------------------------------------------------------------
 Bool_t CbmMuchDigitizeStraws::ExecStraws(CbmMuchPoint* point,Int_t iPoint){
   // Digitize straw tube MC point
+  // (Pass coordinates in even mode stupid manner than before)
   Int_t detectorId = point->GetDetectorID();
 
-  Int_t iDigi = fDigis->GetEntriesFast();
-  //cout << iDigi << endl; //AZ
-  CbmMuchDigi *digi = new ((*fDigis)[iDigi]) CbmMuchDigi(detectorId, 0, -1, 0);
-  CbmMuchDigiMatch* match = new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch();
-  match->AddPoint(iPoint);
-  Double_t coord[3];
+  Float_t coord[3];
   coord[0] = (point->GetXIn() + point->GetXOut()) / 2.;
   coord[1] = (point->GetYIn() + point->GetYOut()) / 2.;
   coord[2] = (point->GetZIn() + point->GetZOut()) / 2.;
-  // Pass abs values of coordinates and their sign in some stupid manner
-  Int_t signs = 0;
-//  for (Int_t i = 0; i < 3; ++i) {
-//    digi->AddTime(TMath::Abs(coord[i]));
-//    if (coord[i] < 0) signs |= (1 << i);
-//  }
-  digi->SetUniqueID(signs);
+  //cout << "Digitizer: " << coord[0] << " " << coord[1] << " " << coord[2] << endl;
+  Int_t iDigi = fDigis->GetEntriesFast();
+  //cout << iDigi << endl; //AZ
+  CbmMuchDigi *digi = new ((*fDigis)[iDigi]) CbmMuchDigi(detectorId, 0, coord[0], coord[1]);
+  CbmMuchDigiMatch* match = new ((*fDigiMatches)[iDigi]) CbmMuchDigiMatch();
+  match->AddPoint(iPoint);
+
+  UInt_t iz = *((UInt_t*) &coord[2]); // pass float through int 
+  digi->SetADCCharge(iz);
   return kTRUE;
 }
 // -------------------------------------------------------------------------

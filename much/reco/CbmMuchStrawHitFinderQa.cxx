@@ -164,10 +164,8 @@ void CbmMuchStrawHitFinderQa::Exec(Option_t * option)
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->UncheckedAt(i);
     Int_t detId =  digi->GetDetectorId();
     Int_t station3 = fGeoScheme->GetStationIndex(detId);
-    Int_t signs = digi->GetUniqueID();
-    Double_t x = 0;//digi->GetTime();
+    Double_t x = digi->GetTime();
     Double_t tubeNo = x / diam[station3];
-    //if (signs & (1<<0)) x = -x; 
     if (TMath::Abs(x) > fRadIn[station3]) {
       fhOccup[station3]->Fill(x);
       fhOccTub[station3]->Fill(tubeNo);

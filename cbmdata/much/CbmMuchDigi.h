@@ -58,8 +58,10 @@ class CbmMuchDigi : public TObject
   UInt_t GetADCCharge() const  {return fADCCharge; }
   /** Sets charge in ADC channels collected by the channel. **/
   void SetADCCharge(UInt_t adcCharge) { fADCCharge = adcCharge; }
-  /** Adds one more time information **/
+  /** Set time **/
   void SetTime(Double_t time) {fTime = time;}
+  /** Set time uncertainty**/
+  void SetDTime(Double_t dtime) {fDTime = dtime;}
 
 
  private:

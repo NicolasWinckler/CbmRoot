@@ -22,12 +22,21 @@ void trd_elid_reco_many(Int_t fileNum, Int_t trdGeoType)
 	if (trdGeoType == 1)dir = "/d/cbm02/slebedev/trd/JUL09/st/";
 	if (trdGeoType == 2)dir = "/d/cbm02/slebedev/trd/JUL09/mb/";
 
+	TString geoTypeSt;
+	if (trdGeoType == 1) geoTypeSt = "st";
+	if (trdGeoType == 2) geoTypeSt = "mb";
+
 	TString inFile = dir + "piel.000" + fileNumSt + ".mc.root";
 	TString parFile = dir + "piel.000" + fileNumSt + ".params.root";
 	TString outFile = dir + "piel.000" + fileNumSt + ".reco.root";
 
+	TString outTxtFileNameEl =
+		"/d/cbm02/slebedev/trd/JUL09/"+geoTypeSt+"/"+geoTypeSt+"_electrons_mom_000"+fileNumSt+".txt";
+	TString outTxtFileNamePi =
+		"/d/cbm02/slebedev/trd/JUL09/"+geoTypeSt+"/"+geoTypeSt+"_pions_mom_000"+fileNumSt+".txt";
+
 	Int_t iVerbose = 0;
-	TString stsDigiFile = "sts_standard.digi.par";
+	//TString stsDigiFile = "sts_standard.digi.par";
 
 	gDebug = 0;
 
@@ -97,6 +106,14 @@ void trd_elid_reco_many(Int_t fileNum, Int_t trdGeoType)
 			"Ann", "Ann");
 	//trdSetTracksPidAnnTask->SetTRDGeometryType("mb");
 	run->AddTask(trdSetTracksPidAnnTask);
+
+
+	CbmTrdElectronsQa* elQa = new CbmTrdElectronsQa();
+	elQa->SetOutFileNameEl((const char*)outTxtFileNameEl);
+	elQa->SetOutFileNamePi((const char*)outTxtFileNamePi);
+	elQa->SetGeoType(geoTypeSt);
+	run->AddTask(elQa);
+
 
 	// -----  Parameter database   --------------------------------------------
 	//TString stsDigi = gSystem->Getenv("VMCWORKDIR");

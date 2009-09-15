@@ -1,7 +1,7 @@
 
 void trd_elid_sim_many(Int_t fileNum, Int_t trdGeoType)
 {
-	 Int_t nEvents = 1000;
+	 Int_t nEvents = 100;
 
     TString fileNumSt, trdGeomFile;
 
@@ -31,33 +31,28 @@ void trd_elid_sim_many(Int_t fileNum, Int_t trdGeoType)
     if (trdGeoType == 1) trdGeomFile = "trd_monolithic.geo";
     if (trdGeoType == 2) trdGeomFile = "trd_monolithic_MB.geo";
 
-  TString outDir;
-  if (trdGeoType == 1) outDir  = "/d/cbm02/slebedev/trd/JUN09/st/";
-  if (trdGeoType == 2) outDir  = "/d/cbm02/slebedev/trd/JUN09/mb/";
+    TString outDir;
+	if (trdGeoType == 1) outDir = "/d/cbm02/slebedev/trd/JUL09/st/";
+	if (trdGeoType == 2) outDir = "/d/cbm02/slebedev/trd/JUL09/mb/";
 
-  TString outFile = outDir + "piel.000"+fileNumSt+".mc.root";
-  TString parFile = outDir + "piel.000"+fileNumSt+".params.root";
+	TString outFile = outDir + "piel.000" + fileNumSt + ".mc.root";
+	TString parFile = outDir + "piel.000" + fileNumSt + ".params.root";
 
-  // -----  Geometries  -----------------------------------------------------
-  TString caveGeom   = "cave.geo";
-  TString targetGeom = "target.geo";
-  TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "magnet_active.geo";
-  TString mvdGeom    = "";//"mvd_standard.geo";
-  TString stsGeom    = "sts_standard.geo";
-  TString richGeom   = "rich_standard.geo";
-  TString trdGeom    = trdGeomFile;
+	// -----  Geometries  -----------------------------------------------------
+	TString caveGeom = "cave.geo";
+	TString targetGeom = "target_au_250mu.geo";
+	TString pipeGeom = "pipe_standard.geo";
+	TString magnetGeom = "magnet_standard.geo";
+	TString mvdGeom = "mvd_standard.geo";
+	mvdGeom = "";
+	TString stsGeom = "sts_standard.geo";
+	TString richGeom = "rich_standard.geo";
+	TString trdGeom = trdGeomFile;
 
-  // -----   Magnetic field   -----------------------------------------------
-  TString fieldMap    = "FieldMuonMagnet";   // name of field map
-  Double_t fieldZ     = 50.;             // field centre z position
-  Double_t fieldScale =  1.;             // field scaling factor
-
-  // In general, the following parts need not be touched
-  // ========================================================================
-
-
-
+	// -----   Magnetic field   -----------------------------------------------
+	TString fieldMap = "FieldMuonMagnet"; // name of field map
+	Double_t fieldZ = 50.; // field center z position
+	Double_t fieldScale = 1.; // field scaling factor
 
   // ----    Debug option   -------------------------------------------------
   gDebug = 0;

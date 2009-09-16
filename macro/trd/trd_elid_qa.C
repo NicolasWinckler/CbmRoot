@@ -1,23 +1,26 @@
 void trd_elid_qa(){
 
-	Int_t nEvents = 1000;
+	Int_t nEvents = 700;
 
-	TString fileNumber = "0009";
+	TString fileNumber = "0000";
+	TString geoType = "mb";
 
-	TString inFile = "/d/cbm02/slebedev/trd/JUN09/st/piel."+fileNumber+".mc.root";
+	TString inFile = "/d/cbm02/slebedev/trd/JUL09/"+geoType+"/piel."+fileNumber+".mc.root";
 //	TString inFile2 = "/d/cbm02/slebedev/trd/JUN09/st/piel."+fileNumber+".mc_1.root";
-	TString inFile3 = "/d/cbm02/slebedev/trd/JUN09/st/piel."+fileNumber+".reco.root";
+	TString inFile3 = "/d/cbm02/slebedev/trd/JUL09/"+geoType+"/piel."+fileNumber+".reco.root";
 
-	TString parFile = "/d/cbm02/slebedev/trd/JUN09/st/piel."+fileNumber+".params.root";
+	TString parFile = "/d/cbm02/slebedev/trd/JUL09/"+geoType+"/piel."+fileNumber+".params.root";
 
 	TString stsDigiFile = "sts_standard.digi.par";
 
-	TString outFile = "/d/cbm02/slebedev/trd/JUN09/st/piel."+fileNumber+".electronsQa.root";
+	TString outFile = "/d/cbm02/slebedev/trd/JUL09/"+geoType+"/piel."+fileNumber+".electronsQa.root";
 
 //set file name to "" if you don't want to convert energy losses to txt file
-	TString outTxtFileNameEl = "";//"st_electrons_mom_"+fileNumber+".txt";
-	TString outTxtFileNamePi = "";//"st_pions_mom_"+fileNumber+".txt";
-	TString geoType = "st";
+	TString outTxtFileNameEl =
+		"/d/cbm02/slebedev/trd/JUL09/"+geoType+"/"+geoType+"_electrons_mom_"+fileNumber+".txt";
+	TString outTxtFileNamePi =
+		"/d/cbm02/slebedev/trd/JUL09/"+geoType+"/"+geoType+"_pions_mom_"+fileNumber+".txt";
+
 
 	gDebug = 0;
 

@@ -9,7 +9,7 @@ Double_t fitFunction(Double_t *x, Double_t *par)
 
 double* getPiEloss(TH1D* h)
 {
-	h->Draw();
+	//h->Draw();
 	double maxX = 50., minX = 0.;
 	TF1 *fitFcn = new TF1("fitLogNorm", fitFunction, minX, maxX, 3);
 	fitFcn->SetParameter(1, 1000.);
@@ -35,7 +35,6 @@ double* getPiEloss(TH1D* h)
 		}
 		curX += dx;
 	}
-	cout << "-------maximumX" << maximumX << endl;
 	curX = 0.;
 	double halfMaxF = maximum / 2.;
 	double x0 = -1.;
@@ -51,7 +50,9 @@ double* getPiEloss(TH1D* h)
 	}
 	par[3] = x1 - x0;
 	par[4] = maximumX;
-	cout << "par[4] " << par[4] << endl;
+
+	delete fitFcn;
+
 	return par;
 }
 
@@ -86,6 +87,7 @@ void trd_elid_qa_draw()
     fhElELossSum->Draw("same");
 
     c1->cd(2);
+    fhPiELoss->Draw();
 	double par[5] = getPiEloss(fhPiELoss);
 	cout << "  MaximumX = " << par[4] << endl;
 	cout << "  FWHM = " << par[3]	<< "  FWHM/4.02 = " << par[3] / 4.02 << endl;

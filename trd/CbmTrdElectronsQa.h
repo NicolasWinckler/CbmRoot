@@ -42,6 +42,9 @@ private:
 	Double_t GetMomAtFirstTrdLayer(CbmTrdTrack* trdtrack);
 	void GetELossInfo(CbmTrdTrack* trdtrack, Double_t *sumELoss, Double_t  eLossdEdX[],
 			  Double_t  eLossTR[], Double_t  eLoss[]);
+	Int_t GetNofClusters(CbmTrdTrack* trdtrack);
+
+	Double_t fEnergyCutForClusters;
 
 	TClonesArray* fMCTracks;
 	TClonesArray* fTrdPoints;
@@ -62,7 +65,8 @@ private:
     TH1D* fhElELoss;
     TH1D* fhElElossSum;
     TH1D* fhElNofZeroTR;
-
+    TH1D* fhElNofClusters;
+    TH1D* fhPiNofClusters;
 
 // Histograms for testing current Pid routines in TRD
 	TH1D* fhNofTrdHitsEl;

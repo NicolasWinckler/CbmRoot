@@ -40,6 +40,9 @@ void CbmTrdElectronsQa::InitHistos()
     fhElELoss = new TH1D("fhElELoss","Energy loss (dEdX+TR) for electrons in the first layer;energy loss, GeV;entries",100, 0, 5.0e-5);
     fhElElossSum = new TH1D("fhElELossSum","Sum of energy losses (dEdX+TR) for electrons in all layers;energy loss, GeV;entries",100, 0, 3.e-4);
     fhElNofZeroTR = new TH1D("fhElNofZeroTR","Number of Zero TR layers;number of layers; entries",13, 0., 13.);
+    fhElNofClusters = new TH1D("fhElNofClusters","Number of clusters;number of clusters; entries",13, 0, 13);
+    fhPiNofClusters = new TH1D("fhPiNofClusters","Number of clusters;number of clusters; entries",13, 0., 13.);
+
 
 	fhNofTrdHitsEl = new TH1D("fhNofTrdHitsEl", "Number of hits in TRD track for electrons;Nof hits;Entries", 13, 0, 13);
 	fhNofTrdHitsPi = new TH1D("fhNofTrdHitsPi", "Number of hits in TRD track for pions;Nof hits;Entries", 13, 0, 13);
@@ -82,6 +85,7 @@ void CbmTrdElectronsQa::InitHistos()
 		fhCumProbSortPi[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
 	}
 
+	fEnergyCutForClusters = 5e-6; //GeV
 
 	fOutPi.open((const char*)fOutFileNamePi);
 	fOutEl.open((const char*)fOutFileNameEl);
@@ -178,6 +182,20 @@ void CbmTrdElectronsQa::GetELossInfo(CbmTrdTrack* trdtrack, Double_t *sumELoss, 
 	} //iHit
 }
 
+Int_t CbmTrdElectronsQa::GetNofClusters(CbmTrdTrack* trdtrack)
+{
+	Int_t nofClusters = 0;
+	for (Int_t iHit = 0; iHit < 12; iHit++) {
+		Int_t hitIndex = trdtrack->GetHitIndex(iHit);
+		CbmTrdHit* trdhit = (CbmTrdHit*) fTrdHits->At(hitIndex);
+
+		if ( trdhit->GetELoss() > fEnergyCutForClusters){
+			nofClusters++;
+		}
+	} //iHit
+	return nofClusters;
+}
+
 void CbmTrdElectronsQa::MakeTxtFile()
 {
 	cout << "-I- make txt file" << endl;
@@ -254,11 +272,13 @@ void CbmTrdElectronsQa::FillEnergyLossesAnaHistos()
 		Double_t sumELoss = 0;
 	    Double_t eLossdEdX[12], eLossTR[12], eLoss[12];
 	    GetELossInfo(trdtrack, &sumELoss, eLossdEdX, eLossTR, eLoss);
+	    Int_t nofClusters = GetNofClusters(trdtrack);
 
 		///pions
 		if (TMath::Abs(partPdg) == 211){
 			fhPiELossSum->Fill(sumELoss);
 			fhPiELoss->Fill(eLossdEdX[0] * 1e6);
+			fhPiNofClusters->Fill(nofClusters);
 		}
 
 		Int_t nofZeroTRLayers = 0;
@@ -273,6 +293,7 @@ void CbmTrdElectronsQa::FillEnergyLossesAnaHistos()
 			fhElTR->Fill(eLossTR[0]);
 			fhEldEdX->Fill(eLossdEdX[0]);
 			fhElELoss->Fill(eLoss[0]);
+			fhElNofClusters->Fill(nofClusters);
 		}
 
 	}//iTrdTrack
@@ -400,6 +421,8 @@ void CbmTrdElectronsQa::Finish()
 	fhElTR->Write();
 	fhEldEdX->Write();
 	fhElELoss->Write();
+	fhElNofClusters->Write();
+	fhPiNofClusters->Write();
 
 	fhNofTrdHitsEl->Write();
 	fhNofTrdHitsPi->Write();

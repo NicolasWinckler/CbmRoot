@@ -56,8 +56,6 @@ double* getPiEloss(TH1D* h)
 	return par;
 }
 
-
-
 void trd_elid_qa_draw()
 {
 	TFile* file = new TFile("/d/cbm02/slebedev/trd/JUL09/st/piel.0009.reco.root");
@@ -206,4 +204,11 @@ void trd_elid_qa_draw()
         //gPad->SetGridy(true);
         gPad->SetGridx(true);
 	}
+
+	TCanvas* c5 = new TCanvas("c5","c5",10,10,800,800);
+	fhElNofClusters->SetLineWidth(3);
+	fhPiNofClusters->SetLineWidth(3);
+	fhElNofClusters->SetLineStyle(2);
+	fhElNofClusters->Draw();
+	fhPiNofClusters->Draw("same");
 }

@@ -1,6 +1,6 @@
 void draw3D()
 {
-	TString dir = "/home/d/andrey/test/trunk/global_mon_mu/";
+	TString dir = "/home/d/andrey/test/";
 	TString mcFile = dir + "mc.0000.root";
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");

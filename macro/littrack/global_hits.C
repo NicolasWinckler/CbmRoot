@@ -33,7 +33,7 @@ void global_hits(Int_t nEvents = 1000)
 	run->SetInputFile(mcFile);
 	run->SetOutputFile(globalHitsFile);
 
-	TString stsDigiFile = parDir+ "/sts/sts_Standard_s3055AAFK5.SecD.digi.par";
+	TString stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
 
 	// ----- STS reconstruction   ---------------------------------------------
 	FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);

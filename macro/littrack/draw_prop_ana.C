@@ -1,24 +1,50 @@
+/** draw_prop_ana.C
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2007
+ * @version 1.0
+ * Macro draws histograms produced by CbmLitPropagationAnalysis class.
+ **/
 #include <string>
 #include <sstream>
 #include <ostream>
 #include <iomanip>
 
-// residual (x,y,tx,ty,qp), pull (x,y,tx,ty,qp), resolution p %, chi-square
+/** Number of parameters.
+ * [0-4] - residuals (x,y,tx,ty,qp)
+ * [5-9] - pulls (x,y,tx,ty,qp)
+ * [10] - resolution p %
+ * [11] - chi-square
+ */
 const int nofPar = 12;
+
+/** Number of detector planes. */
 const int nofLayers = 14;
 
-// 0-propagation, 1-filter, 2-smoother
-double sigma[3][nofLayers][nofPar];
-double rms[3][nofLayers][nofPar];
-TCanvas* canvas[3][nofLayers];
-
+// Drawing options. If true than specified histograms is drawn.
 bool drawPropagation = false;
 bool drawFilter = false;
 bool drawSmoother = true;
 
+/* Arrays to store RMS and sigma values of the histogram fits.
+ * First index: 0-propagation, 1-filter, 2-smoother.
+ * Second index: plane number.
+ * Third index: parameter number.
+ */
+double sigma[3][nofLayers][nofPar];
+double rms[3][nofLayers][nofPar];
+
+/* Canvases for drawing.
+ * First index is parameter (0-propagation, 1-filter, 2-smoother).
+ * Second index is a plane number.
+ */
+TCanvas* canvas[3][nofLayers];
+
+// Input directory
 TString dir = "/home/d/andrey/test/trunk/global_mu/";//events/much/standard/10mu/mu/";
+// Input file with propagation analysis
 TFile *file = new TFile(dir + "propagation.ana.0000.root");
 
+//Output directory for images and fit results.
 TString outDir = "./test/";
 
 void draw_prop_ana()

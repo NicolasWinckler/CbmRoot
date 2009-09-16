@@ -43,7 +43,7 @@ void much_sim(Int_t nEvents = 1000)
 	TString caveGeom   = "cave.geo";
 	TString targetGeom = "target_au_250mu.geo";
 	TString magnetGeom = "magnet_standard.geo";
-	TString stsGeom    = "sts_Standard_s3055AAFK5.SecD.geo";
+	TString stsGeom    = "sts_standard.geo";
 	TString tofGeom    = "tof_standard.geo";
 
 	// -----   Magnetic field   -----------------------------------------------

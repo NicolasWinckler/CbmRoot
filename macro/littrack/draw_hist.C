@@ -1,4 +1,23 @@
+/** draw_hist.C
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ * Some help functions for drawing 1D and 2D histograms.
+ **/
 
+/* Draws 1D histogram.
+ * @param hist Pointer to the histogram.
+ * @param titleX X axis title.
+ * @param titleY Y axis title.
+ * @param color Color.
+ * @param lineWidth Line width.
+ * @param lineStyle Line style (see ROOT documentation for details).
+ * @param markerSize Marker size.
+ * @param markerStyle Marker style (see ROOt documentation for details).
+ * @param logx If true than X axis is plotted in logarithmic scale.
+ * @param logy If true than Y axis is plotted in logarithmic scale.
+ * @param drawOpt Other drawing options (see ROOT documentation for details).
+ */
 void draw_hist_1D(
 		TH1* hist,
 		const std::string& titleX,
@@ -26,7 +45,16 @@ void draw_hist_1D(
 	hist->Draw(drawOpt.c_str());
 }
 
-
+/* Draws 1D histogram.
+ * @param hist Pointer to the histogram.
+ * @param titleX X axis title.
+ * @param titleY Y axis title.
+ * @param titleZ Z axis title.
+ * @param logx If true than X axis is plotted in logarithmic scale.
+ * @param logy If true than Y axis is plotted in logarithmic scale.
+ * @param logz If true than Z axis is plotted in logarithmic scale.
+ * @param drawOpt Other drawing options (see ROOT documentation for details).
+ */
 void draw_hist_2D(
 		TH2* hist,
 		const std::string& titleX,

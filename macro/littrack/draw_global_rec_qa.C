@@ -2,18 +2,22 @@
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2007
  * @version 3.0
- * Macro for drawing histograms produced by CbmLitReconstructionQa class.
+ * Macro draws histograms produced by CbmLitReconstructionQa class.
  **/
 #include <string>
 #include <sstream>
 #include <ostream>
 #include <iomanip>
 
+//Input directory.
 const TString dir = "/home/d/andrey/test/trunk/global_e_urqmd/";
+//Input reconstruction file.
 const TFile *file = new TFile(dir + "global.tracks.branch.0000.root");
 
+// Input MC file. Used to automotize some text drawings.
 const TString mcFile = dir + "mc.0000.root";
 
+//Some drawing settings.
 const Int_t lineWidth = 2;
 const Int_t markerSize = 1;
 const Double_t labelSize = 0.055;
@@ -34,11 +38,11 @@ const Int_t NTYPES = 3; // ACC, REC, EFF
 const Int_t NCATS = 6; // ALL, REF, PRIM, SEC, MU, EL
 
 //histograms
-TH1F* histStsMom[NCATS][NTYPES];
-TH1F* histHalfGlobalMom[NCATS][NTYPES];
-TH1F* histGlobalMom[NCATS][NTYPES];
-TH1F* histRecMom[NCATS][NTYPES];
-TH1F* histTofMom[NCATS][NTYPES];
+TH1F* histStsMom[NCATS][NTYPES]; // STS tracking efficiency in  dependence on momentum
+TH1F* histHalfGlobalMom[NCATS][NTYPES]; // STS+TRD(MUCH) tracking efficiency in  dependence on momentum
+TH1F* histGlobalMom[NCATS][NTYPES]; // STS+TRD(MUCH)+TOF tracking efficiency in  dependence on momentum
+TH1F* histRecMom[NCATS][NTYPES]; // TRD(MUCH) tracking efficiency in dependence on momentum
+TH1F* histTofMom[NCATS][NTYPES]; // TOF hit to track matching efficiency in dependence on momentum
 
 void draw_global_rec_qa()
 {

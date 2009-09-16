@@ -1,3 +1,10 @@
+/** cbmrootlibs.C
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2008
+ * @version 1.0
+ * Macro loads CBMROOT libraries.
+ **/
+
 void cbmrootlibs()
 {
    gSystem->Load("libGeoBase");
@@ -21,4 +28,5 @@ void cbmrootlibs()
    gSystem->Load("libKF");
    gSystem->Load("libL1");
    gSystem->Load("libLittrack");
+   gSystem->Load("libMinuit2"); // Needed for field fitter
 }

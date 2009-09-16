@@ -8,7 +8,7 @@ export MYBUILDDIR=/home/andrey/cbm/trunk/build/
 
 #Parameters for muon simulation
 #Output directory for simulation files
-export DIR=/home/d/andrey/test/trunk/global_mon_mu
+export DIR=/home/d/andrey/test
 
 #If "yes" than 10 primary muons will be generated
 export MUONS=yes
@@ -20,7 +20,7 @@ export URQMD=no
 export PLUTO=no
 
 #MUCH geometry file name
-export MUCHGEOM=much_standard_mon.geo
+export MUCHGEOM=much_standard.geo
 
 #MUCH digitization file
 export MUCHDIGI=$VMCWORKDIR/parameters/much/much_standard.digi.root
@@ -29,7 +29,7 @@ export MUCHDIGI=$VMCWORKDIR/parameters/much/much_standard.digi.root
 export TRDGEOM=
 
 #number of events for each thread
-export NEVENTS=1000
+export NEVENTS=100
 
 for Y in 0; do
  for X in 0; do

@@ -58,7 +58,7 @@ double* getPiEloss(TH1D* h)
 
 void trd_elid_qa_draw()
 {
-	TFile* file = new TFile("/d/cbm02/slebedev/trd/JUL09/st/piel.0009.reco.root");
+	TFile* file = new TFile("/d/cbm02/slebedev/trd/JUL09/st/piel.0001.reco.root");
 
 
     gStyle->SetPalette(1,0);
@@ -183,21 +183,21 @@ void trd_elid_qa_draw()
 	for (int i = 0; i < 12; i++){
 		c4->cd(i+1);
 		sprintf(histName,"fhCumProbSortPi%d",i);
-		fhElossSortPi[i] = (TH1D*)file->Get(histName);
-		fhElossSortPi[i]->SetLineWidth(3);
-		fhElossSortPi[i]->SetStats(false);
-		fhElossSortPi[i]->Draw();
+		fhCumProbSortPi[i] = (TH1D*)file->Get(histName);
+		fhCumProbSortPi[i]->SetLineWidth(3);
+		fhCumProbSortPi[i]->SetStats(false);
+		fhCumProbSortPi[i]->Draw();
 
 		sprintf(histName,"fhCumProbSortEl%d",i);
-		fhElossSortEl[i] = (TH1D*)file->Get(histName);
-		fhElossSortEl[i]->SetLineWidth(3);
-		fhElossSortEl[i]->SetLineStyle(2);
-		fhElossSortEl[i]->SetStats(false);
-		fhElossSortEl[i]->Draw("same");
+		fhCumProbSortEl[i] = (TH1D*)file->Get(histName);
+		fhCumProbSortEl[i]->SetLineWidth(3);
+		fhCumProbSortEl[i]->SetLineStyle(2);
+		fhCumProbSortEl[i]->SetStats(false);
+		fhCumProbSortEl[i]->Draw("same");
 
 		TLegend* leg1 = new TLegend(0.5,0.15, 0.99, 0.4);
-		leg1->AddEntry(fhElossSortEl[i], "electrons");
-		leg1->AddEntry(fhElossSortPi[i], "pions");
+		leg1->AddEntry(fhCumProbSortEl[i], "electrons");
+		leg1->AddEntry(fhCumProbSortPi[i], "pions");
 		leg1->DrawClone();
 
     	//gPad->SetLogy(true);
@@ -205,7 +205,36 @@ void trd_elid_qa_draw()
         gPad->SetGridx(true);
 	}
 
-	TCanvas* c5 = new TCanvas("c5","c5",10,10,800,800);
+	TCanvas* c5 = new TCanvas("c5", "c5", 10, 10, 800, 800);
+	TH1D *fhElossDiffPi[12];
+	TH1D *fhElossDiffEl[12];
+	c5->Divide(4, 3);
+	for (int i = 0; i < 12; i++) {
+		c5->cd(i + 1);
+		sprintf(histName, "fhElossDiffPi%d", i);
+		fhElossDiffPi[i] = (TH1D*) file->Get(histName);
+		fhElossDiffPi[i]->SetLineWidth(3);
+		fhElossDiffPi[i]->SetStats(false);
+		fhElossDiffPi[i]->Draw();
+
+		sprintf(histName, "fhElossDiffEl%d", i);
+		fhElossDiffEl[i] = (TH1D*) file->Get(histName);
+		fhElossDiffEl[i]->SetLineWidth(3);
+		fhElossDiffEl[i]->SetLineStyle(2);
+		fhElossDiffEl[i]->SetStats(false);
+		fhElossDiffEl[i]->Draw("same");
+
+		TLegend* leg1 = new TLegend(0.5, 0.15, 0.99, 0.4);
+		leg1->AddEntry(fhElossDiffEl[i], "electrons");
+		leg1->AddEntry(fhElossDiffPi[i], "pions");
+		leg1->DrawClone();
+
+		//gPad->SetLogy(true);
+		//gPad->SetGridy(true);
+		gPad->SetGridx(true);
+	}
+
+	TCanvas* c6 = new TCanvas("c6","c6",10,10,800,800);
 	fhElNofClusters->SetLineWidth(3);
 	fhPiNofClusters->SetLineWidth(3);
 	fhElNofClusters->SetLineStyle(2);

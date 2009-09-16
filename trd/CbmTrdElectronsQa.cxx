@@ -78,6 +78,12 @@ void CbmTrdElectronsQa::InitHistos()
 		sprintf(histName,"fhElossSortPi%d",i);
 		fhElossSortPi[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
 
+		sprintf(histName,"fhElossDiffEl%d",i);
+		sprintf(histTitle, "Eloss diff. between %d-%d hits;Energy loss difference, GeV;Entries", i, i-1);
+		fhElossDiffEl[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
+		sprintf(histName,"fhElossDiffPi%d",i);
+		fhElossDiffPi[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
+
 		sprintf(histName,"fhCumProbSortEl%d",i);
 		sprintf(histTitle, "Cumulative prob. in %d hit;Energy loss, GeV;cumulative probability", i);
 		fhCumProbSortEl[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
@@ -387,11 +393,21 @@ void CbmTrdElectronsQa::ElIdAnalysis()
 	    for (int i = 0; i < 12; i++){
 			if (partPdg == 11) {
 				fhElossSortEl[i]->Fill(vec[i]);
-			}
+				if (i != 11){
+					fhElossDiffEl[i]->Fill(vec[i+1] - vec[i]);
+				}else {
+					fhElossDiffEl[i]->Fill(vec[i] - vec[0]);
+				}
+			}//pdg == 11
 
 			if (partPdg == 211) {
 				fhElossSortPi[i]->Fill(vec[i]);
-			}
+				if (i != 11){
+					fhElossDiffPi[i]->Fill(vec[i+1] - vec[i]);
+				}else {
+					fhElossDiffPi[i]->Fill(vec[i] - vec[0]);
+				}
+			}//pdg == 211
 	    }
 	}//iTrdTrack
 
@@ -434,6 +450,8 @@ void CbmTrdElectronsQa::Finish()
 	for (Int_t i = 0; i < 12; i++){
 		fhElossSortEl[i]->Write();
 		fhElossSortPi[i]->Write();
+		fhElossDiffEl[i]->Write();
+		fhElossDiffPi[i]->Write();
 		fhCumProbSortEl[i]->Write();
 		fhCumProbSortPi[i]->Write();
 	}

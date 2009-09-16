@@ -76,8 +76,11 @@ private:
 
 	TH1D* fhElossSortPi[12];
 	TH1D* fhElossSortEl[12];
+	TH1D* fhElossDiffPi[12];
+	TH1D* fhElossDiffEl[12];
 	TH1D* fhCumProbSortEl[12];
 	TH1D* fhCumProbSortPi[12];
+
 
 	Int_t fEventNum;
 

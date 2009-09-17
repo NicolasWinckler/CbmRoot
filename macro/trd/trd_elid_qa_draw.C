@@ -229,15 +229,37 @@ void trd_elid_qa_draw()
 		leg1->AddEntry(fhElossDiffPi[i], "pions");
 		leg1->DrawClone();
 
-		//gPad->SetLogy(true);
+		gPad->SetLogy(true);
 		//gPad->SetGridy(true);
 		gPad->SetGridx(true);
 	}
 
 	TCanvas* c6 = new TCanvas("c6","c6",10,10,800,800);
+	c6->Divide(2,2);
 	fhElNofClusters->SetLineWidth(3);
 	fhPiNofClusters->SetLineWidth(3);
+    fhElElossRMS->SetLineWidth(3);
+    fhPiElossRMS->SetLineWidth(3);
+    fhElElossMediana->SetLineWidth(3);
+    fhPiElossMediana->SetLineWidth(3);
+
 	fhElNofClusters->SetLineStyle(2);
+	fhElElossRMS->SetLineStyle(2);
+	fhElElossMediana->SetLineStyle(2);
+	c6->cd(1);
 	fhElNofClusters->Draw();
 	fhPiNofClusters->Draw("same");
+	gPad->SetLogy(true);
+	c6->cd(2);
+	fhElElossRMS->Draw();
+	fhPiElossRMS->Draw("same");
+	gPad->SetLogy(true);
+	c6->cd(3);
+	fhElElossMediana->Draw();
+	fhPiElossMediana->Draw("same");
+	gPad->SetLogy(true);
+	c6->cd(4);
+	fhElElossRMSMed->Draw();
+	fhPiElossRMSMed->Draw("same");
+	gPad->SetLogy(true);
 }

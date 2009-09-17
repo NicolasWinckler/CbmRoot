@@ -43,7 +43,8 @@ private:
 	void GetELossInfo(CbmTrdTrack* trdtrack, Double_t *sumELoss, Double_t  eLossdEdX[],
 			  Double_t  eLossTR[], Double_t  eLoss[]);
 	Int_t GetNofClusters(CbmTrdTrack* trdtrack);
-
+	Double_t GetElossRMS(CbmTrdTrack* trdtrack);
+	Double_t GetRMSMediana(CbmTrdTrack* trdtrack, Double_t mediana);
 	Double_t fEnergyCutForClusters;
 
 	TClonesArray* fMCTracks;
@@ -67,6 +68,12 @@ private:
     TH1D* fhElNofZeroTR;
     TH1D* fhElNofClusters;
     TH1D* fhPiNofClusters;
+    TH1D* fhElElossRMS;
+    TH1D* fhPiElossRMS;
+    TH1D* fhElElossMediana;
+    TH1D* fhPiElossMediana;
+    TH1D* fhElElossRMSMed;
+    TH1D* fhPiElossRMSMed;
 
 // Histograms for testing current Pid routines in TRD
 	TH1D* fhNofTrdHitsEl;

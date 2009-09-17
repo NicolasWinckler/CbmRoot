@@ -42,6 +42,12 @@ void CbmTrdElectronsQa::InitHistos()
     fhElNofZeroTR = new TH1D("fhElNofZeroTR","Number of Zero TR layers;number of layers; entries",13, 0., 13.);
     fhElNofClusters = new TH1D("fhElNofClusters","Number of clusters;number of clusters; entries",13, 0, 13);
     fhPiNofClusters = new TH1D("fhPiNofClusters","Number of clusters;number of clusters; entries",13, 0., 13.);
+    fhElElossRMS= new TH1D("fhElElossRMS","Eloss RMS;Eloss RMS, GeV; entries",100, 0, 50e-6);
+    fhPiElossRMS = new TH1D("fhPiElossRMS","Eloss RMS;Eloss RMS, GeV; entries",100, 0., 50e-6);
+    fhElElossMediana= new TH1D("fhElElossMediana","Eloss mediana;mediana, GeV; entries",100, 0, 50e-6);
+    fhPiElossMediana = new TH1D("fhPiElossMediana","Eloss mediana;mediana, GeV; entries",100, 0., 50e-6);
+    fhElElossRMSMed= new TH1D("fhElElossRMSMed","Eloss RMS-mediana;mediana, GeV; entries",100, 0, 50e-6);
+    fhPiElossRMSMed = new TH1D("fhPiElossRMSMed","Eloss RMS-mediana;mediana, GeV; entries",100, 0., 50e-6);
 
 
 	fhNofTrdHitsEl = new TH1D("fhNofTrdHitsEl", "Number of hits in TRD track for electrons;Nof hits;Entries", 13, 0, 13);
@@ -200,6 +206,44 @@ Int_t CbmTrdElectronsQa::GetNofClusters(CbmTrdTrack* trdtrack)
 		}
 	} //iHit
 	return nofClusters;
+}
+
+Double_t CbmTrdElectronsQa::GetElossRMS(CbmTrdTrack* trdtrack)
+{
+	Double_t rms = 0.;
+	Double_t mean = 0.;
+	Double_t nHits = 12;
+	for (Int_t iHit = 0; iHit < 12; iHit++) {
+		Int_t hitIndex = trdtrack->GetHitIndex(iHit);
+		CbmTrdHit* trdhit = (CbmTrdHit*) fTrdHits->At(hitIndex);
+		mean += trdhit->GetELoss();
+	} //iHit
+	mean = mean / nHits;
+
+	for (Int_t iHit = 0; iHit < 12; iHit++) {
+		Int_t hitIndex = trdtrack->GetHitIndex(iHit);
+		CbmTrdHit* trdhit = (CbmTrdHit*) fTrdHits->At(hitIndex);
+		Double_t eLoss = trdhit->GetELoss();
+
+		rms += (mean - eLoss) * (mean - eLoss) / nHits;
+	} //iHit
+
+	return sqrt(rms);
+}
+
+Double_t CbmTrdElectronsQa::GetRMSMediana(CbmTrdTrack* trdtrack, Double_t mediana)
+{
+	Double_t nHits = 12.;
+	Double_t rms = 0.;
+	for (Int_t iHit = 0; iHit < 12; iHit++) {
+		Int_t hitIndex = trdtrack->GetHitIndex(iHit);
+		CbmTrdHit* trdhit = (CbmTrdHit*) fTrdHits->At(hitIndex);
+		Double_t eLoss = trdhit->GetELoss();
+
+		rms += (mediana - eLoss) * (mediana - eLoss) / nHits;
+	} //iHit
+
+	return sqrt(rms);
 }
 
 void CbmTrdElectronsQa::MakeTxtFile()
@@ -390,6 +434,21 @@ void CbmTrdElectronsQa::ElIdAnalysis()
 	    	vec[i] = eLoss[i];
 	    }
 	    std::sort(vec.begin(), vec.end());
+
+	    Double_t rms = GetElossRMS(trdtrack);
+	    Double_t mediana = (vec[5] + vec[6])/2.;
+	    Double_t rmsMed = GetRMSMediana(trdtrack, mediana);
+
+		if (partPdg == 11) {
+			fhElElossRMS->Fill(rms);
+			fhElElossMediana->Fill(mediana);
+			fhElElossRMSMed->Fill(rmsMed);
+		}
+	    if (partPdg == 211) {
+			fhPiElossRMS->Fill(rms);
+			fhPiElossMediana->Fill(mediana);
+			fhPiElossRMSMed->Fill(rmsMed);
+		}
 	    for (int i = 0; i < 12; i++){
 			if (partPdg == 11) {
 				fhElossSortEl[i]->Fill(vec[i]);
@@ -398,7 +457,8 @@ void CbmTrdElectronsQa::ElIdAnalysis()
 				}else {
 					fhElossDiffEl[i]->Fill(vec[i] - vec[0]);
 				}
-			}//pdg == 11
+
+			}//electrons
 
 			if (partPdg == 211) {
 				fhElossSortPi[i]->Fill(vec[i]);
@@ -407,7 +467,8 @@ void CbmTrdElectronsQa::ElIdAnalysis()
 				}else {
 					fhElossDiffPi[i]->Fill(vec[i] - vec[0]);
 				}
-			}//pdg == 211
+
+			}//pions
 	    }
 	}//iTrdTrack
 
@@ -439,9 +500,16 @@ void CbmTrdElectronsQa::Finish()
 	fhElELoss->Write();
 	fhElNofClusters->Write();
 	fhPiNofClusters->Write();
+    fhElElossRMS->Write();
+    fhPiElossRMS->Write();
+    fhElElossMediana->Write();
+    fhPiElossMediana->Write();
+    fhElElossRMSMed->Write();
+    fhPiElossRMSMed->Write();
 
 	fhNofTrdHitsEl->Write();
 	fhNofTrdHitsPi->Write();
+
 	for (Int_t i = 0; i < 7; i++){
 		fhPidANNEl[i]->Write();
 		fhPidANNPi[i]->Write();

@@ -58,6 +58,7 @@ CbmTrdCreateDigiPar.cxx
 CbmTrdHitProducerDigi.cxx
 #CbmTrdDetectorId.cxx
 CbmTrdElectronsQa.cxx
+CbmTrdElectronsTrainAnn.cxx
 )
 
 if(RULE_CHECKER_FOUND)

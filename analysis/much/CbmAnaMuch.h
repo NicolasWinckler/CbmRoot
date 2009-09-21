@@ -1,4 +1,4 @@
-/** CbmMuchAnalysis.h
+/** CbmAnaMuch.h
  *@author E.Kryshen <e.kryshen@gsi.de>
  *@since 2009-09-08
  **
@@ -48,7 +48,7 @@ public:
   /** Return -1 if match->GetTrackId()<0
    *  Return -2 if trueHits/totalHits<quota
    */
-  Int_t GetTrackId(CbmTrackMatch* match, Double_t quota=0.7);
+  static Int_t GetTrackId(CbmTrackMatch* match, Double_t quota=0.7);
   
   // Set STS acceptance criteria as a number of STS points
   void SetStsPointsAccQuota(Int_t nPoints) { fStsPointsAccQuota = nPoints; }
@@ -76,7 +76,8 @@ private:
   
   TH2D* hMuPlusYPt;                 //!
   TH2D* hMuMinusYPt;                //!
-  
+  TH1D* hJpsiM;                     //!
+  TH2D* hJpsiYPt;                   //!
   
   Int_t    fStsPointsAccQuota;
   Double_t fStsTrueHitQuota;

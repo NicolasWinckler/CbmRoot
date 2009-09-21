@@ -5,6 +5,7 @@
 #define PBINNING 50,0.,20.
 #define PTBINNING 50,0.,5.
 #define YBINNING 50,0.,4.
+#define JPSIMBINNING 50,2.,4.
 
 #include "CbmAnaMuch.h"
 #include "CbmMCTrack.h"
@@ -23,6 +24,8 @@
 #include "TLegend.h"
 #include "TCanvas.h"
 #include "TFile.h"
+#include "TLorentzVector.h"
+#include "TF1.h"
 
 // -----   Default constructor   -------------------------------------------
 CbmAnaMuch::CbmAnaMuch(){
@@ -101,6 +104,9 @@ InitStatus CbmAnaMuch::Init()
   hMuPlusYPt  = new TH2D("hMuPlusYPt" ,"y-pt distribution for signal muons; y; p_{T} [GeV/c]",YBINNING,PTBINNING);
   hMuMinusYPt = new TH2D("hMuMinusYPt","y-pt distribution for signal muons; y; p_{T} [GeV/c]",YBINNING,PTBINNING);
   
+  hJpsiYPt = new TH2D("hJpsiYPt","y-pt distribution for J/#Psi; y; p_{T} [GeV/c]",YBINNING,PTBINNING);
+  hJpsiM   = new TH1D("hJpsiM","Dimuon invariant mass;M [GeV/c];Entries",JPSIMBINNING);
+  
   return kSUCCESS;
 }
 // -------------------------------------------------------------------------
@@ -173,19 +179,30 @@ void CbmAnaMuch::Exec(Option_t* opt){
   Int_t nAccMuchMuons = 0;
   Int_t nRecStsMuons = 0;
   Int_t nRecMuchMuons = 0;
-
+  
+  TLorentzVector momMuPlus;
+  TLorentzVector momMuMinus;
   for (Int_t iTrack=0;iTrack<nMCTracks;iTrack++){
     CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(iTrack);
     Int_t pdgCode = mcTrack->GetPdgCode();
     if (fVerbose>1) printf(" %5i",pdgCode);
     if (fVerbose>1) printf("\n");
+
+    if (TMath::Abs(pdgCode)!=13) continue;
+
     Double_t p  = mcTrack->GetP();
     Double_t pt = mcTrack->GetPt();
     Double_t y  = mcTrack->GetRapidity();
-    if (pdgCode== 13) hMuPlusYPt->Fill(y,pt);
-    if (pdgCode==-13) hMuMinusYPt->Fill(y,pt);
+
+    if (pdgCode== 13) { 
+      mcTrack->Get4Momentum(momMuPlus);
+      hMuPlusYPt->Fill(y,pt);
+    }
+    if (pdgCode==-13) {
+      mcTrack->Get4Momentum(momMuMinus);
+      hMuMinusYPt->Fill(y,pt);
+    }
     
-    if (TMath::Abs(pdgCode)!=13) continue;
     nAllMuons++;
     hAllP->Fill(p);
     if (mapAccSts[iTrack]<fStsPointsAccQuota) continue; 
@@ -202,6 +219,10 @@ void CbmAnaMuch::Exec(Option_t* opt){
     nRecMuchMuons++;
   }
   
+  TLorentzVector momJpsi = momMuPlus + momMuMinus;
+  Double_t yJpsi   = momJpsi.Rapidity();
+  Double_t ptJpsi  = momJpsi.Pt();
+  hJpsiYPt->Fill(yJpsi,ptJpsi);
   
   if (0) {
     Int_t nReconstructedMuons=0;
@@ -265,15 +286,34 @@ void CbmAnaMuch::Finish(){
   hAcceptanceMuchP->SetMaximum(1);
   hRecEfficiencyStsP->SetMaximum(1);
   hRecEfficiencyMuchP->SetMaximum(1);
+
+  // Jpsi distributions
+  TH1D* hJpsiY   = hJpsiYPt->ProjectionX();
+  TH1D* hJpsiPt  = hJpsiYPt->ProjectionY();
   
-  TCanvas* cMuDistributionsYPt = new TCanvas("cMuDistributionsYPt","Muon y-pt distributions",300*2,300*2);
-  cMuDistributionsYPt->Divide(2,2);
-  cMuDistributionsYPt->cd(1);
+  TCanvas* cJpsiDistrYPt = new TCanvas("cJpsiDistrYPt","J/#Psi y-pt distributions",300*3,300);
+  cJpsiDistrYPt->Divide(3,1);
+  cJpsiDistrYPt->cd(1);
+  hJpsiYPt->Draw("colz");
+  cJpsiDistrYPt->cd(2);
+  hJpsiY->Fit("gaus");
+  hJpsiY->Draw("e");
+  cJpsiDistrYPt->cd(3);
+  TF1* fDistPt = new TF1("distPt","[1]*x*exp(-sqrt(x*x+3.096616*3.096616)/[0])",0.,5.);
+  fDistPt->SetParameter(0,0.150);
+  fDistPt->SetParameter(1,1.);
+  hJpsiPt->Fit("distPt");
+  hJpsiPt->Draw("e");
+  
+  
+  TCanvas* cMuDistrYPt = new TCanvas("cMuDistrYPt","Muon y-pt distributions",300*2,300);
+  cMuDistrYPt->Divide(2,1);
+  cMuDistrYPt->cd(1);
   hMuMinusYPt->Draw("colz");
-  cMuDistributionsYPt->cd(2);
+  cMuDistrYPt->cd(2);
   hMuPlusYPt->Draw("colz");
   
-  TCanvas* cAllDistributionsP = new TCanvas("cAllDistributionsP","All Distributions vs P",500,400);
+  TCanvas* cAllDistrP = new TCanvas("cAllDistrP","All Distributions vs P",500,400);
 
   hAllP->Draw("e");
   hAccStsP->Draw("same");
@@ -309,12 +349,14 @@ void CbmAnaMuch::Finish(){
   hRecMuchP->Write();
   hMuPlusYPt->Write();
   hMuMinusYPt->Write();
+  hJpsiYPt->Write();
   hAcceptanceStsP->Write();
   hAcceptanceMuchP->Write();
   hRecEfficiencyStsP->Write();
   hRecEfficiencyMuchP->Write();
-  cAllDistributionsP->Write();
-  cMuDistributionsYPt->Write();
+  cAllDistrP->Write();
+  cMuDistrYPt->Write();
+  cJpsiDistrYPt->Write();
   f->Close();
   
   printf("=========== Summary ============\n");

@@ -1,14 +1,27 @@
-void global_tracking(Int_t nEvents = 1000)
+/** global_tracking.C
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
+ *
+ * Macro runs Littrack global track reconstruction.
+ **/
+
+void global_tracking(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, globalHitsFile, globalTracksFile;
 	if (script != "yes") {
-		dir  = "/home/d/andrey/test/trunk/global_mon_mu/";
+		// Output directory
+		dir  = "/home/d/andrey/std_10mu_urqmd/";
+		// MC transport file
 		mcFile = dir + "mc.0000.root";
+		// Parameter file
 		parFile = dir + "param.0000.root";
+		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
 		globalHitsFile = dir + "global.hits.0000.root";
-		globalTracksFile = dir + "global.tracks.test.0000.root";
+		// Output file with global tracks
+		globalTracksFile = dir + "global.tracks.0000.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -20,7 +33,7 @@ void global_tracking(Int_t nEvents = 1000)
 	TStopwatch timer;
 	timer.Start();
 
-//	gSystem->Load("/home/soft/temp/tbb21_017oss/libtbb");
+	gSystem->Load("/home/soft/tbb22_004oss/libtbb.so");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -41,7 +54,7 @@ void global_tracking(Int_t nEvents = 1000)
 	// "branch" - branching tracking
 	// "nn" - nearest neighbor tracking
 	// "weight" - weighting tracking
-	finder->SetTrackingType("branch");
+	finder->SetTrackingType("nn_parallel");
 
 	// Hit-to-track merger method to be used
 	// "nearest_hit" - assigns nearest hit to the track
@@ -63,11 +76,11 @@ void global_tracking(Int_t nEvents = 1000)
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
 	reconstructionQa->SetMinNofPointsTrd(10);
-	reconstructionQa->SetMinNofPointsMuch(9);
+	reconstructionQa->SetMinNofPointsMuch(12);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(8);
-	reconstructionQa->SetMinNofHitsMuch(8);
+	reconstructionQa->SetMinNofHitsMuch(11);
 	reconstructionQa->SetVerbose(1);
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------
@@ -84,7 +97,7 @@ void global_tracking(Int_t nEvents = 1000)
 	// -----   Initialize and run   --------------------------------------------
 	run->LoadGeometry();
 	run->Init();
-	run->Run(0,nEvents);
+	run->Run(0, nEvents);
 	// ------------------------------------------------------------------------
 
 	// -----   Finish   -------------------------------------------------------

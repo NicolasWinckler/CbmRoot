@@ -1,6 +1,8 @@
+
+
 void global_reco_ideal(Int_t nEvents = 1000)
 {
-	TString dir  = "/home/d/andrey/test/trunk/global_mu/";
+	TString dir  = "/home/d/andrey/straw_10mu/";
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
@@ -20,9 +22,9 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	run->SetOutputFile(globalTracksFile);
 
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
-	TString stsDigiFile = parDir+ "/sts/sts_Standard_s3055AAFK5.SecD.digi.par";
-	TString muchDigiFile = parDir + "/much/much_standard.digi.root";
-//	TString muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
+	TString stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
+//	TString muchDigiFile = parDir + "/much/much_standard.digi.root";
+	TString muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
 
 	// ----- STS reconstruction   ---------------------------------------------
 	FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);

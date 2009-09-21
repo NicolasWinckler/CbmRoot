@@ -1,6 +1,6 @@
 void prop_ana(Int_t nEvents = 1000)
 {
-	TString dir = "/home/d/andrey/test/trunk/global_mu/";
+	TString dir = "/home/d/andrey/straw_10mu/";
 	TString mcFile = dir + "mc.0000.root";
 	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
 	TString parFile = dir + "param.0000.root";
@@ -23,14 +23,14 @@ void prop_ana(Int_t nEvents = 1000)
 
 	// -------------------------------------------------------------------------
 	CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis();
-	propAna->SetNofPlanes(14);
+	propAna->SetNofPlanes(25);
 	propAna->SetNofTrdHits(0);
-	propAna->SetNofMuchHits(13);
+	propAna->SetNofMuchHits(24);
 	propAna->SetNofTofHits(1);
 	run->AddTask(propAna);
 	// -------------------------------------------------------------------------
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
-	TString stsDigiFile = parDir+ "/sts/sts_Standard_s3055AAFK5.SecD.digi.par";
+	TString stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();
 	FairParRootFileIo* parIo1 = new FairParRootFileIo();

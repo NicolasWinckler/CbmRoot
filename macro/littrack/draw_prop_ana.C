@@ -4,6 +4,7 @@
  * @version 1.0
  * Macro draws histograms produced by CbmLitPropagationAnalysis class.
  **/
+
 #include <string>
 #include <sstream>
 #include <ostream>
@@ -20,10 +21,10 @@ const int nofPar = 12;
 /** Number of detector planes. */
 const int nofLayers = 14;
 
-// Drawing options. If true than specified histograms is drawn.
+// Drawing options. If true than specified histograms are drawn.
 bool drawPropagation = false;
-bool drawFilter = false;
-bool drawSmoother = true;
+bool drawFilter = true;
+bool drawSmoother = false;
 
 /* Arrays to store RMS and sigma values of the histogram fits.
  * First index: 0-propagation, 1-filter, 2-smoother.
@@ -40,7 +41,7 @@ double rms[3][nofLayers][nofPar];
 TCanvas* canvas[3][nofLayers];
 
 // Input directory
-TString dir = "/home/d/andrey/test/trunk/global_mu/";//events/much/standard/10mu/mu/";
+TString dir = "/home/d/andrey/straw_10mu/";
 // Input file with propagation analysis
 TFile *file = new TFile(dir + "propagation.ana.0000.root");
 

@@ -1,3 +1,13 @@
+/** global_hits.C
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
+ *
+ * Macro runs STS hit and track reconstruction and TRD, MUCH and TOF digitizers
+ * and hit finders. Than output file can be used for the Littrack global
+ * tracking. See example in macro/littrack/global_tracking.C.
+ **/
+
 void global_hits(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
@@ -5,13 +15,19 @@ void global_hits(Int_t nEvents = 1000)
 
 	TString dir, mcFile, parFile, globalHitsFile, muchDigiFile;
 	if (script != "yes") {
-		dir  = "/home/d/andrey/test/trunk/global_mu_low/";
+		// Output directory
+		dir  = "/home/d/andrey/straw_2mu/";
+		// MC transport file
 		mcFile = dir + "mc.0000.root";
+		// Parameter file
 		parFile = dir + "param.0000.root";
+		// Output file with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis.
 		globalHitsFile = dir + "global.hits.0000.root";
-		muchDigiFile = parDir + "/much/much_standard.digi.root";
+		// Digi scheme file for MUCH.
+		// MUST be consistent with MUCH geometry used in MC transport.
+//		muchDigiFile = parDir + "/much/much_standard.digi.root";
 //		muchDigiFile = parDir + "/much/much_standard_trd.digi.root";
-//		muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
+		muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));

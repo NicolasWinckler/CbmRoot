@@ -1,3 +1,15 @@
+/** global_reco.C
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
+ *
+ * Macro runs STS hit and track reconstruction and TRD, MUCH and TOF digitizers
+ * and hit finders and finally Littrack global tracking.
+ * Instead of this macro one may also run macro/littrack/global_hits.C
+ * and macro/littrack/global_tracking.C consequently, to run Littrack
+ * global tracking independently.
+ **/
+
 void global_reco(Int_t nEvents = 10)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
@@ -5,11 +17,19 @@ void global_reco(Int_t nEvents = 10)
 
 	TString dir, mcFile, parFile, globalRecoFile, muchDigiFile;
 	if (script != "yes") {
+		// Output directory
 		dir  = "/home/d/andrey/test/trunk/global_mu/";
+		// MC transport file
 		mcFile = dir + "mc.0000.root";
+		// Parameters file
 		parFile = dir + "param.0000.root";
+		// Output file with reconstructed tracks and hits
 		globalRecoFile = dir + "global.reco.0000.root";
+		// Digi scheme file for MUCH.
+		// MUST be consistent with MUCH geometry used in MC transport.
 		muchDigiFile = parDir + "/much/much_standard.digi.root";
+//		muchDigiFile = parDir + "/much/much_standard_trd.digi.root";
+//		muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));

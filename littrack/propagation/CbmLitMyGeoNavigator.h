@@ -1,6 +1,6 @@
 /** CbmLitMyGeoNavigator.h
  *@author A.Lebedev <andrey.lebedev@gsi.de>
- *@since 2008
+ *@since 2009
  **
  ** The class performs geometry navigation in the simplified geometry.
  **/

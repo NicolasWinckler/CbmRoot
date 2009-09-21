@@ -320,7 +320,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderNN->SetChiSqPixelHitCut(13.86);
 		muchFinderNN->SetChiSqStripHitCut(4.);
 		muchFinderNN->SetPDG(13);
-		muchFinderNN->IsProcessSubstationsTogether(false);
+		muchFinderNN->IsProcessSubstationsTogether(true);
 		muchFinderNN->Initialize();
 		TrackFinderPtr finder(muchFinderNN);
 		return finder;
@@ -352,7 +352,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderBranch->SetFinalSelection(CreateTrackSelection("much_final"));
 		muchFinderBranch->SetFilter(CreateTrackUpdate("kalman"));
 		muchFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-		muchFinderBranch->SetVerbose(3);
+		muchFinderBranch->SetVerbose(1);
 		muchFinderBranch->SetNofIter(1);
 		muchFinderBranch->IsUseFastSearch(true);
 		muchFinderBranch->SetPDG(13);
@@ -360,7 +360,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderBranch->IsAlwaysCreateMissingHit(false);
 		muchFinderBranch->SetSigmaCoef(3.5);
 		muchFinderBranch->SetChiSqPixelHitCut(13.86);
-		muchFinderBranch->SetChiSqStripHitCut(4.);
+		muchFinderBranch->SetChiSqStripHitCut(10.);
 		TrackFinderPtr finder(muchFinderBranch);
 		return finder;
 	} else

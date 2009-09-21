@@ -3,8 +3,8 @@
 
 //#include "CbmLitTool.h"
 
-#include "base/CbmLitTypes.h"
-#include "base/CbmLitEnums.h"
+#include "CbmLitTypes.h"
+#include "CbmLitEnums.h"
 
 class CbmLitTrackParam;
 class CbmLitHit;

@@ -12,8 +12,8 @@
 CbmLitGating::CbmLitGating():
 	fSigmaCoef(3.5),
 	fMaxCovSq(20. * 20.),
-	fChiSqStripHitCut(10.),
-	fChiSqPixelHitCut(25.),
+	fChiSqStripHitCut(4.),
+	fChiSqPixelHitCut(15.),
 	fUseFastSearch(true)
 {
 }

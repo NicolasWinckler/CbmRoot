@@ -3,7 +3,7 @@
  *@since 2008
  **
  ** The class performs calculation of the material effects, such as multiple
- ** scattering and energy losses, on the track parameters.
+ ** scattering and energy loss, on the track parameters.
  **/
 
 #ifndef CBMLITMATERIALEFFECTSIMP_H_

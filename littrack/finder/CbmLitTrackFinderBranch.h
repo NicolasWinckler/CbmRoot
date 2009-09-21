@@ -1,8 +1,19 @@
+/** CbmLitTrackFinderBranch.h
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2007
+ * @version 1.0
+ **
+ ** Branching tracking implementation. As input to tracking
+ ** arrays with track seeds and hits from the detector are used.
+ ** The track is prolongated from station to station and the new
+ ** track branches are started from hits in the validation gate.
+ **/
+
 #ifndef CBMLITTRACKFINDERBASEBRANCH_H_
 #define CBMLITTRACKFINDERBASEBRANCH_H_
 
-#include "finder/CbmLitTrackFinderBase.h"
-#include "data/CbmLitHitChiSq.h"
+#include "CbmLitTrackFinderBase.h"
+#include "CbmLitHitChiSq.h"
 
 class CbmLitTrackSelection;
 class CbmLitTrackUpdate;

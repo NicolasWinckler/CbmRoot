@@ -36,6 +36,7 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "CbmGeoMuchPar.h"
+#include "CbmMuchPoint.h"
 
 #ifdef NEWMUCH
 #include "CbmMuchGeoScheme.h"
@@ -72,9 +73,9 @@ InitStatus CbmLitPropagationAnalysis::Init()
 
 	// Create tools
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fPropagator = factory->CreateTrackPropagator("geane");
+	fPropagator = factory->CreateTrackPropagator("lit");
 	fFilter = factory->CreateTrackUpdate("kalman");
-	fFitter = factory->CreateTrackFitter("geane_kalman");
+	fFitter = factory->CreateTrackFitter("lit_kalman");
 	fSmoother = factory->CreateTrackFitter("kalman_smoother");
 
 	CreateHistograms();
@@ -483,9 +484,12 @@ void CbmLitPropagationAnalysis::FillHistosFitter(
 		const CbmLitTrack* mcTrack)
 {
 	Int_t nofHits = track->GetNofHits();
+//	std::cout << "Track:" << std::endl;
 	for (Int_t i = 0; i < nofHits; i++){
 		const CbmLitFitNode* node = track->GetFitNode(i);
 		std::vector<Double_t> rFilter = CalcResidualsAndPulls(node->GetUpdatedParam(), mcTrack->GetFitNode(i)->GetPredictedParam());
+//		std::cout << i << " predicted:" << node->GetPredictedParam()->ToString();
+//		std::cout <<i << " updated:" << node->GetUpdatedParam()->ToString();
 		std::vector<Double_t> rSmoother = CalcResidualsAndPulls(node->GetSmoothedParam(), mcTrack->GetFitNode(i)->GetPredictedParam());
 		for (Int_t j = 0; j < 11; j++){
 			fFilterHistos[i][j]->Fill(rFilter[j]);
@@ -507,15 +511,23 @@ void CbmLitPropagationAnalysis::McPointToLitFitNode(
     if (pdg > 0) q = -1.; else q = 1;
     if (pdg == 13) q = -1.;
     if (pdg == -13) q = 1.;
+    if (pdg == 11) q = -1.;
+    if (pdg == -11) q = 1.;
 
     TVector3 mom;
     point->Momentum(mom);
     Double_t qp = q / mom.Mag();
 
     CbmLitTrackParam par;
-    par.SetX(point->GetX());
-    par.SetY(point->GetY());
-    par.SetZ(point->GetZ());
+//    par.SetX(point->GetX());
+//    par.SetY(point->GetY());
+//    par.SetZ(point->GetZ());
+    //TODO: temporarily done to check for straw tubes
+    CbmMuchPoint* p = (CbmMuchPoint*) point;
+    par.SetX((p->GetXIn()+p->GetXOut())/2);
+    par.SetY((p->GetYIn()+p->GetYOut())/2);
+    par.SetZ((p->GetZIn()+p->GetZOut())/2);
+    //
     par.SetTx(point->GetPx()/point->GetPz());
     par.SetTy(point->GetPy()/point->GetPz());
     par.SetQp(qp);

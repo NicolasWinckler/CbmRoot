@@ -1,6 +1,6 @@
 /** CbmLitMyGeoNavigator.cxx
  *@author A.Lebedev <andrey.lebedev@gsi.de>
- *@since 2008
+ *@since 2009
  **/
 
 #include "CbmLitMyGeoNavigator.h"

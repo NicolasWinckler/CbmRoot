@@ -5,6 +5,7 @@
 #include "CbmLitTrackParam.h"
 
 #include <iostream>
+#include <cmath>
 
 CbmLitKalmanFilter::CbmLitKalmanFilter():
    CbmLitTrackUpdate("CbmLitKalmanFilter")
@@ -143,6 +144,7 @@ LitStatus CbmLitKalmanFilter::Update(
 	 // residual
 	 myf r = u - xIn[0] * phiCos - xIn[1] * phiSin;
 	 myf norm = duu + cIn[0] * phiCosSq + phi2SinCos * cIn[1] + cIn[5] * phiSinSq;
+//	 myf norm = duu + cIn[0] * phiCos + cIn[5] * phiSin;
 	 myf R = 1./norm;
 
 	 //std::cout << "r=" << r << " R=" << 1./R

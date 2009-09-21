@@ -37,6 +37,7 @@ myf ChiSq(
 	myf r = u - par->GetX() * phiCos - par->GetY() * phiSin;
 	myf rr = r * r;
 	myf norm = duu + C0 * phiCosSq + phi2SinCos * C1 + C5 * phiSinSq;
+//	myf norm = duu + C0 * phiCos + C5 * phiSin;
 
 	return rr / norm;
 }

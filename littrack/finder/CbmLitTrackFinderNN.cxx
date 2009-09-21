@@ -58,10 +58,6 @@ LitStatus CbmLitTrackFinderNN::DoFind(
 		fTracks.clear();
 		fHitData.Clear();
 	}
-
-	for (int i = 0; i < tracks.size(); i++) {
-		std::cout << tracks[i]->ToString();
-	}
 	std::cout << "-I- CbmLitTrackFinderNN: " << fEventNo++ << " events processed" << std::endl;
 
 	return kLITSUCCESS;

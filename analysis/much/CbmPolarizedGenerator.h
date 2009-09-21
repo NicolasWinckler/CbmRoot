@@ -51,12 +51,13 @@ public:
   inline void SetDistributionPt (Double_t T=0.154319) {fT=T;};
   inline void SetDistributionY  (Double_t y0=1.98604, Double_t sigma=0.617173) {fY0=y0;fSigma=sigma;};
   inline void SetRangePt        (Double_t ptMin=0, Double_t ptMax=3) {fPtMin=ptMin;fPtMax=ptMax;};
+  inline void SetRangeY         (Double_t yMin=0, Double_t yMax=4) {fYMin=yMin;fYMax=yMax;};
   Bool_t GenerateDaughters(const TVector3 p, FairPrimaryGenerator* primGen);
   void SetAlpha(Double_t alpha=0)                  {fAlpha=alpha;}
   void SetRefFrame(Frame_t frame=kColSop)          {fFrame=frame;}
   void SetDecayMode(DecayMode_t decayMode=kDiMuon) {fDecayMode=decayMode;}
   void SetBeamMomentum(Double_t mom)               {fBeamMomentum = mom;}
-
+  void SetBox(Bool_t box)                          {fBox = box;}
   /** Initializer */
   void Init();
 
@@ -73,6 +74,8 @@ private:
   Double_t fSigma;        ///< Simga in the rapidity distribution
   Double_t fPtMin;        ///< Max value of Pt
   Double_t fPtMax;        ///< Min value of Pt
+  Double_t fYMin;        ///< Max value of Pt
+  Double_t fYMax;        ///< Min value of Pt
   Double_t fPDGMass;      ///< Particle mass [GeV]
   TF1*     fDistPt;       //! Pointer to the Pt function
   Double_t fAlpha;        //< Polarization parameter in the helicity frame
@@ -80,6 +83,7 @@ private:
   DecayMode_t fDecayMode; //< Reference system for polarization  
   Double_t fBeamMomentum; //< Beam momentum in lab frame
   TF1*     fPol;          //! Polarization function
+  Bool_t   fBox;          // fBox = 1 Box generator, fBox = 0 - termal pt and gaussian y 
 
   ClassDef(CbmPolarizedGenerator,1);
 };

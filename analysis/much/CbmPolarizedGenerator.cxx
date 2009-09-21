@@ -22,6 +22,7 @@ CbmPolarizedGenerator::CbmPolarizedGenerator():FairGenerator(){
   fFrame = kHelicity;
   fDecayMode = kDiMuon;
   fPol = NULL;
+  fBox = 0;
 }
 // ------------------------------------------------------------------------
 
@@ -37,9 +38,11 @@ CbmPolarizedGenerator::CbmPolarizedGenerator(Int_t pdgid, Int_t mult)
   fFrame = kHelicity;
   fDecayMode = kDiMuon;
   fPol = NULL;
+  fBox = 0;
   SetDistributionPt();
   SetDistributionY();
   SetRangePt();
+  SetRangeY();
 }
 // ------------------------------------------------------------------------
 
@@ -70,10 +73,12 @@ Bool_t CbmPolarizedGenerator::ReadEvent(FairPrimaryGenerator* primGen){
   for (Int_t k = 0; k < fMult; k++) {
 
     phi = gRandom->Uniform(0,TMath::TwoPi());
-    pt  = fDistPt->GetRandom(fPtMin,fPtMax);
+    if (fBox) pt = gRandom->Uniform(fPtMin,fPtMax);
+    else pt  = fDistPt->GetRandom(fPtMin,fPtMax);
     px  = pt*TMath::Cos(phi);
     py  = pt*TMath::Sin(phi);
-    y   = gRandom->Gaus(fY0,fSigma);
+    if (fBox) y =  gRandom->Uniform(fYMin,fYMax);
+    else y   = gRandom->Gaus(fY0,fSigma);
     mt  = TMath::Sqrt(fPDGMass*fPDGMass + pt*pt);
     pz  = mt * TMath::SinH(y);
 //    Info("ReadEvent","Particle generated: pdg=%i pt=%f y=%f",fPDGType,pt,y);

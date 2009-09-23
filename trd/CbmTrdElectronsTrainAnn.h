@@ -12,6 +12,8 @@
 #include "TString.h"
 #include "TTree.h"
 #include "TMultiLayerPerceptron.h"
+#include "TMVA/Factory.h"
+#include "TMVA/Reader.h"
 
 #include <fstream>
 #include <vector>
@@ -27,17 +29,30 @@ public:
 	~CbmTrdElectronsTrainAnn();
 	void Init();
 	void Run();
+	void RunMany();
+
 	void DoTrain();
 	void DoTest();
-	TTree* CreateTreeForAnn();
+	void DoTrainTmva();
+	void DoTestTmva();
+	TTree* CreateTree();
 	TString CreateAnnString();
+	TMVA::Factory* CreateFactory(TTree* simu);
+	TMVA::Reader* CreateTmvaReader();
+	void DrawHistos();
 
 	void Transform();
 	void Transform1();
 	void Transform2();
+	void Transform3();
 	Double_t FindOptimalCut();
 	void CreateCumProbHistos();
 	void CreateROCDiagramm();
+	Int_t GetNofClusters();
+	Double_t Eval(Bool_t isEl);
+	void SetAnnCut(Double_t annCut){fAnnCut = annCut;}
+	void SetIsDoTrain(Bool_t doTrain){fIsDoTrain = doTrain;}
+	void SetTransformType(Int_t type){fTransformType = type;}
 
 private:
 	TString fFileNameEl;
@@ -45,13 +60,14 @@ private:
 	TString fFileNameTestEl;
 	TString fFileNameTestPi;
 	Bool_t fIsDoTrain;
+	Int_t fTransformType;
 
 	TH1D* fhCumProbSortPi[12];
 	TH1D* fhCumProbSortEl[12];
 
-	vector<Double_t> fElossVec;
-	vector<Double_t> fInVector;
-	Double_t fXOut;
+	vector<Float_t> fElossVec;
+	vector<Float_t> fInVector;
+	Float_t fXOut;
 	Double_t fAnnCut;
 	Int_t fNofInputNeurons;
 	Int_t fNofHiddenNeurons;
@@ -60,6 +76,8 @@ private:
 	Double_t fMinEval;
 	TString fAnnWeightsFile;
 	TMultiLayerPerceptron* fNN;
+	TMVA::Reader* fReader;
+
 
 // Histogramms for testing
 	TH1D* fhAnnOutputPi;
@@ -67,7 +85,10 @@ private:
 	TH1D* fhCumProbPi;
 	TH1D* fhCumProbEl;
 
-
+    TH1D* fhElNofClusters;
+    TH1D* fhPiNofClusters;
+    TH1D* fhElElossMediana;
+    TH1D* fhPiElossMediana;
 	ClassDef(CbmTrdElectronsTrainAnn,1);
 
 };

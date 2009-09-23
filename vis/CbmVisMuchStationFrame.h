@@ -81,7 +81,6 @@ private:
   TGCheckButton*       fHitsVisibleBtn;
   TGCheckButton*       fPdgBtn[10];
   TGCheckButton*       fMoPdgBtn[10];
-  Int_t fPdgs[10];
 
   
   CbmVisMuch*        fDisplay;

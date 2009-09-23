@@ -42,6 +42,7 @@
 #include "CbmMuchModuleGem.h"
 #include "CbmMuchPad.h"
 #include "TColor.h"
+#include "TFile.h"
 
 // -----   Default constructor   ------------------------------------------
 CbmVisMuch::CbmVisMuch():FairTask("Task",0){
@@ -70,18 +71,18 @@ CbmVisMuch::~CbmVisMuch() {
 
 // -----   Private method SetParContainers   -------------------------------
 void CbmVisMuch::SetParContainers() {
-  FairRunAna* fRun = FairRunAna::Instance();
-  FairRuntimeDb* db = fRun->GetRuntimeDb();
-  fGeoPar  = (CbmGeoMuchPar*)  db->getContainer("CbmGeoMuchPar");
+//  FairRunAna* fRun = FairRunAna::Instance();
+//  FairRuntimeDb* db = fRun->GetRuntimeDb();
+//  fGeoPar  = (CbmGeoMuchPar*)  db->getContainer("CbmGeoMuchPar");
 }
 // -------------------------------------------------------------------------
 
 
 // -------------------------------------------------------------------------
 InitStatus CbmVisMuch::Init() {
-  TFile* f = new TFile(fDigiFileName,"R");
-  if (!f->IsOpen()) Fatal("Init","Geo file failed to open");
-  TObjArray* stations = (TObjArray*) f->Get("stations");
+  TObjArray* stations = (TObjArray*) fDigiFile->Get("stations");
+  if (!stations) Fatal("Init","No array of CbmMuchStations");
+
   fGeoScheme=CbmMuchGeoScheme::Instance();
   fGeoScheme->Init(stations);
   fGeoScheme->CreatePointArrays();
@@ -165,12 +166,12 @@ void CbmVisMuch::ReadEvent(Int_t event){
 
   printf("Reset pads\n");
   vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
-  for (Int_t i=0;i<modules.size();i++){
-    CbmMuchModule* module = modules[i];
+  for (Int_t im=0;im<modules.size();im++){
+    CbmMuchModule* module = modules[im];
     if (module->GetDetectorType()!=1) continue;
     CbmMuchModuleGem* gem_module = (CbmMuchModuleGem*) module;
     vector<CbmMuchPad*> pads = gem_module->GetPads();
-    for (Int_t i=0;i<pads.size();i++) pads[i]->Reset();
+    for (Int_t ip=0;ip<pads.size();ip++) pads[ip]->Reset();
   }
 
   fVisClusters->Clear();

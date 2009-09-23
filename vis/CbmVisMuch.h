@@ -17,6 +17,7 @@
 #include "RQ_OBJECT.h"
 #include "TGFrame.h"
 #include "FairTask.h"
+#include "TFile.h"
 
 class TClonesArray;
 class TObjArray;
@@ -72,7 +73,11 @@ class CbmVisMuch : public FairTask{
 
   Int_t GetNStations() {return fNstations;}
 
-  void SetDigiFileName(Char_t* name) {fDigiFileName = name; }
+  void SetDigiFileName(Char_t* name) {
+    fDigiFileName = name; 
+    fDigiFile = new TFile(fDigiFileName,"R");
+    if (!fDigiFile->IsOpen()) Fatal("Init","Geo file failed to open");
+  }
 
   void SetWindowName(TString name) {fDisplay->SetWindowName(name);}
   void CloseWindow();
@@ -116,6 +121,8 @@ private:
   TGTextButton*           fPrev;
   TGTextButton*           fExit;
   CbmVisMuchStationFrame* fStationFrame;
+
+  TFile* fDigiFile;
 };
 
 

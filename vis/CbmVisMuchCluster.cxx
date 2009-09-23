@@ -65,7 +65,7 @@ void CbmVisMuchCluster::PrintInfo(){
 
 void CbmVisMuchCluster::CreateHisto(){
 //  printf("CbmVisMuchCluster::CreateHisto()\n");
-  TArrayI indices = fCluster->GetDigis();
+  TArrayI indices = fCluster->GetDigiIndices();
 
   Int_t size = indices.GetSize();
   //Define minimum pad dimensions in the cluster

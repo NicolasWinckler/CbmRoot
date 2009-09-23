@@ -38,7 +38,7 @@ public:
 
 
   void Reset();
-  void SetFired(Int_t iDigi, Int_t ADCcharge, Int_t nADCChannels);
+  void SetFired(Int_t iDigi, Int_t ADCcharge, Int_t nADCChannels=256);
   void DrawPad();
   TString GetInfo();
   Int_t GetDigiIndex() { return fDigiIndex; }

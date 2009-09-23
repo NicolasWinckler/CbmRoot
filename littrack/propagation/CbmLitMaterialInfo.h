@@ -23,7 +23,7 @@ public:
 		fRho(0.),
 		fZ(0.),
 		fA(0.),
-		fZpos(0.) {};
+		fZpos(0.) {}
 
 	/* Constructor with assignment
 	 * @param length Length of the material [cm]
@@ -48,7 +48,7 @@ public:
 		fZpos(zpos){}
 
 	/* Destructor */
-	virtual ~CbmLitMaterialInfo();
+	virtual ~CbmLitMaterialInfo() {};
 
 	/*@return Length of the material */
 	myf GetLength() const { return fLength;}

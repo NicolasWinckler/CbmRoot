@@ -36,32 +36,14 @@ void trd_elid_trainANN_txt()
 	  gSystem->Load("libField");
 	  gSystem->Load("libGen");
 	  gSystem->Load("libPassive");
+	  gSystem->Load("libTMVA");
 	  gSystem->Load("libTrd");
 	  // ------------------------------------------------------------------------
 
 	CbmTrdElectronsTrainAnn* trainer = new CbmTrdElectronsTrainAnn();
+	trainer->SetAnnCut(0.7059);
+	trainer->SetIsDoTrain(false);
+	trainer->SetTransformType(2);
 	trainer->Run();
-
-
-	TCanvas* c1 = new TCanvas();
-	c1->Divide(2, 2);
-	c1->cd(1);
-	fhAnnOutputEl->SetLineStyle(2);
-	fhAnnOutputEl->SetLineWidth(3);
-	fhAnnOutputPi->SetLineWidth(3);
-	fhAnnOutputEl->Rebin(10);
-	fhAnnOutputPi->Rebin(10);
-	fhAnnOutputEl->Draw();
-	fhAnnOutputPi->Draw("Same");
-	gPad->SetLogy();
-
-	c1->cd(2);
-	fhCumProbPi->SetLineWidth(3.);
-	fhCumProbPi->Draw();
-	fhCumProbEl->SetLineStyle(2);
-	fhCumProbEl->SetLineWidth(3.);
-	fhCumProbEl->Draw("same");
-	gPad->SetGridx();
-	gPad->SetGridy();
 
 }

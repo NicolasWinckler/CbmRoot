@@ -221,13 +221,13 @@ InitStatus CbmMuchHitFinderQa::Init()
   }
 
   vector<CbmMuchModule*> modules = fGeoScheme->GetModules();
-  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
-    CbmMuchModule* mod = (*it);
+  for(vector<CbmMuchModule*>::iterator im = modules.begin(); im!=modules.end(); im++){
+    CbmMuchModule* mod = (*im);
     if(mod->GetDetectorType() != 1) continue;
     CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
     vector<CbmMuchPad*> pads = module->GetPads();
-    for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
-      CbmMuchPad* pad = (*it);
+    for (vector<CbmMuchPad*>::iterator ip = pads.begin(); ip != pads.end(); ++ip) {
+      CbmMuchPad* pad = (*ip);
       Int_t stationId = fGeoScheme->GetStationIndex(pad->GetDetectorId());
       Double_t x0 = pad->GetX0();
       Double_t y0 = pad->GetY0();
@@ -1024,12 +1024,12 @@ void CbmMuchHitFinderQa::ClusterDeconvQa(){
     CbmMuchCluster* cluster = (CbmMuchCluster*)fClusters->At(iCluster);
     if(!cluster) continue;
     Int_t nDigis = cluster->GetNDigis();
-    for(Int_t i = 0; i < nDigis; ++i){
-      Int_t iDigi = cluster->GetDigiIndex(i);
+    for(Int_t id=0; id < nDigis; ++id){
+      Int_t iDigi = cluster->GetDigiIndex(id);
       CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(iDigi);
       if(!match) continue;
-      for(Int_t i=0; i<match->GetNPoints();++i){
-        Int_t iPoint = match->GetRefIndex(i);
+      for(Int_t ip=0; ip<match->GetNPoints();++ip){
+        Int_t iPoint = match->GetRefIndex(ip);
         it = find(pIndices.begin(), pIndices.end(), iPoint);
         if(it != pIndices.end()) continue;
         pIndices.push_back(iPoint);
@@ -1088,13 +1088,13 @@ TVector2 CbmMuchHitFinderQa::GetMinPadSize(Int_t iStation){
   Double_t padMinLx = std::numeric_limits<Double_t>::max();
   Double_t padMinLy = std::numeric_limits<Double_t>::max();
   vector<CbmMuchModule*> modules = fGeoScheme->GetModules(iStation);
-  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
-    CbmMuchModule* mod = (*it);
+  for(vector<CbmMuchModule*>::iterator im = modules.begin(); im!=modules.end(); im++){
+    CbmMuchModule* mod = (*im);
     if(mod->GetDetectorType() != 1) continue;
     CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
     vector<CbmMuchPad*> pads = module->GetPads();
-    for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
-      CbmMuchPad* pad = (*it);
+    for (vector<CbmMuchPad*>::iterator ip = pads.begin(); ip != pads.end(); ++ip) {
+      CbmMuchPad* pad = (*ip);
       if(pad->GetLx() < padMinLx) padMinLx = pad->GetLx();
       if(pad->GetLy() < padMinLy) padMinLy = pad->GetLy();
     }
@@ -1108,13 +1108,13 @@ TVector2 CbmMuchHitFinderQa::GetMaxPadSize(Int_t iStation){
   Double_t padMaxLx = std::numeric_limits<Double_t>::min();
   Double_t padMaxLy = std::numeric_limits<Double_t>::min();
   vector<CbmMuchModule*> modules = fGeoScheme->GetModules(iStation);
-  for(vector<CbmMuchModule*>::iterator it = modules.begin(); it!=modules.end(); it++){
-    CbmMuchModule* mod = (*it);
+  for(vector<CbmMuchModule*>::iterator im = modules.begin(); im!=modules.end(); im++){
+    CbmMuchModule* mod = (*im);
     if(mod->GetDetectorType() != 1) continue;
     CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
     vector<CbmMuchPad*> pads = module->GetPads();
-    for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
-      CbmMuchPad* pad = (*it);
+    for (vector<CbmMuchPad*>::iterator ip = pads.begin(); ip != pads.end(); ++ip) {
+      CbmMuchPad* pad = (*ip);
       if(pad->GetLx() > padMaxLx) padMaxLx = pad->GetLx();
       if(pad->GetLy() > padMaxLy) padMaxLy = pad->GetLy();
     }

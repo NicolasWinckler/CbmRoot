@@ -237,9 +237,9 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
       // Find fired pads
       for (Int_t iChannel = 0; iChannel < sector->GetNChannels(); iChannel++) {
         Double_t padRad = sector->GetPadRadius();
-        Double_t deltaX = xe - sector->GetPadX0(iChannel);
-        Double_t deltaY = ye - sector->GetPadY0(iChannel);
-        Double_t dist = TMath::Sqrt(deltaX * deltaX + deltaY * deltaY);
+        Double_t distX = xe - sector->GetPadX0(iChannel);
+        Double_t distY = ye - sector->GetPadY0(iChannel);
+        Double_t dist = TMath::Sqrt(distX * distX + distY * distY);
         if (dist > padRad + fSpotRadius)
           continue; // rough search
 
@@ -472,8 +472,8 @@ void CbmMuchDigitizeAdvancedGem::AddNoise() {
     if(mod->GetDetectorType() != 1) continue;
     CbmMuchModuleGem* module = (CbmMuchModuleGem*) mod;
     vector<CbmMuchPad*> pads = module->GetPads();
-    for (vector<CbmMuchPad*>::iterator it = pads.begin(); it != pads.end(); ++it) {
-      AddNoise(*it);
+    for (vector<CbmMuchPad*>::iterator iter = pads.begin(); iter != pads.end(); ++iter) {
+      AddNoise(*iter);
     }
   }
 }

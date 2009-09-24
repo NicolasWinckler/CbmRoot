@@ -85,9 +85,9 @@ InitStatus CbmMuchClusterAnalysis::Init()
         chargesVector.push_back(clusterPadCharge);
 
         // Cluster radii distribution
-        TH1F* clusterRadii = new TH1F(Form("Cluster radii for %i-pad clusters with %i points, station %i",iSize+1, iPoint+1, iStation+1),
+        TH1F* clusterRadius = new TH1F(Form("Cluster radii for %i-pad clusters with %i points, station %i",iSize+1, iPoint+1, iStation+1),
             Form("%i-pad clusters",iSize+1), 80,0,250);
-        radiiVector.push_back(clusterRadii);
+        radiiVector.push_back(clusterRadius);
 
         // Mean Euclidean distance distribution
         TH1F* meanEuclide = new TH1F(Form("Mean Euclidean distance for %i-pad clusters with %i points, station %i",iSize+1, iPoint+1, iStation+1),

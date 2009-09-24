@@ -319,13 +319,13 @@ void CbmMuchModuleGem::InitNeighbourPads() {
     Int_t nRows = sector->GetNRows();
     Double_t secDx = sector->GetDx();
     Double_t secDy = sector->GetDy();
-    vector<CbmMuchSector*> neighbours = sector->GetNeighbours();
+    vector<CbmMuchSector*> neighbourSectors = sector->GetNeighbours();
 
     // Define minimal pad size among neighbour sectors
     Double_t minDx = secDx;
     Double_t minDy = secDy;
-    for (vector<CbmMuchSector*>::iterator it = neighbours.begin(); it
-    != neighbours.end(); it++) {
+    for (vector<CbmMuchSector*>::iterator it = neighbourSectors.begin(); it
+    != neighbourSectors.end(); it++) {
       CbmMuchSector* s = *it;
       Double_t dx = s->GetDx();
       Double_t dy = s->GetDy();

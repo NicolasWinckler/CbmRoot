@@ -219,14 +219,14 @@ void CbmMuchSegmentAuto::InitLayerSide(CbmMuchLayerSide* layerSide){
 
 // -----   Private method SegmentModule  -----------------------------------
 void CbmMuchSegmentAuto::SegmentModule(CbmMuchModuleGem* module){
-  TVector3 size = module->GetSize();
-  Double_t modLx = size.X();
-  Double_t modLy = size.Y();
-  Double_t modLz = size.Z();
-  TVector3 position = module->GetPosition();
-  Double_t modX = position.X();
-  Double_t modY = position.Y();
-  Double_t modZ = position.Z();
+  TVector3 modSize = module->GetSize();
+  Double_t modLx = modSize.X();
+  Double_t modLy = modSize.Y();
+  Double_t modLz = modSize.Z();
+  TVector3 modPosition = module->GetPosition();
+  Double_t modX = modPosition.X();
+  Double_t modY = modPosition.Y();
+  Double_t modZ = modPosition.Z();
 
   Bool_t result = modLx > modLy;
   Int_t iRatio = (result) ? (Int_t)((modLx+1e-3)/modLy)
@@ -243,9 +243,9 @@ void CbmMuchSegmentAuto::SegmentModule(CbmMuchModuleGem* module){
     Double_t secY = (result) ? modY : modY - modLy/2. + (i+0.5)*secLy;
     Int_t iSector = module->GetNSectors();//CbmMuchGeoScheme::GetDetectorId(iStation, iLayer, iSide, iModule, module->GetNSectors());
 
-    TVector3 position(secX, secY, modZ);
-    TVector3 size(secLx, secLy, modLz);
-    SegmentSector(module, new CbmMuchSector(detectorId, iSector, position, size, 8, 16));
+    TVector3 sectorPosition(secX, secY, modZ);
+    TVector3 sectorSize(secLx, secLy, modLz);
+    SegmentSector(module, new CbmMuchSector(detectorId, iSector, sectorPosition, sectorSize, 8, 16));
   }
 }
 // -------------------------------------------------------------------------
@@ -532,9 +532,9 @@ void CbmMuchSegmentAuto::DrawSegmentation(){
     CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);
     CbmMuchLayer* layer = station->GetLayer(0);
     for (Int_t iSide=1;iSide>=0;iSide--){
-      CbmMuchLayerSide* side = layer->GetSide(iSide);
-      for (Int_t iModule=0;iModule<side->GetNModules();++iModule) {
-        CbmMuchModule* mod = side->GetModule(iModule);
+      CbmMuchLayerSide* layerSide = layer->GetSide(iSide);
+      for (Int_t iModule=0;iModule<layerSide->GetNModules();++iModule) {
+        CbmMuchModule* mod = layerSide->GetModule(iModule);
         mod->SetFillStyle(0);
         mod->Draw();
         if(mod->GetDetectorType() != 1) continue;

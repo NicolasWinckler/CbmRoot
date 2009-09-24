@@ -669,9 +669,9 @@ void CbmMuchSegmentManual::DrawSegmentation(){
     CbmMuchStation* station = (CbmMuchStation*) fStations->At(iStation);
     CbmMuchLayer* layer = station->GetLayer(0);
     for (Int_t iSide=1;iSide>=0;iSide--){
-      CbmMuchLayerSide* side = layer->GetSide(iSide);
-      for (Int_t iModule=0;iModule<side->GetNModules();++iModule) {
-        CbmMuchModule* mod = side->GetModule(iModule);
+      CbmMuchLayerSide* layerSide = layer->GetSide(iSide);
+      for (Int_t iModule=0;iModule<layerSide->GetNModules();++iModule) {
+        CbmMuchModule* mod = layerSide->GetModule(iModule);
         mod->SetFillStyle(0);
         mod->Draw();
         CbmMuchModuleGem* module = (CbmMuchModuleGem*)mod;
@@ -700,8 +700,8 @@ void CbmMuchSegmentManual::DrawSegmentation(){
     } // sides
 
     // Draw a hole
-    TArc* arc = new TArc(0.,0.,station->GetRmin());
-    arc->Draw();
+    TArc* holeArc = new TArc(0.,0.,station->GetRmin());
+    holeArc->Draw();
 
     for(Int_t iRegion=0; iRegion < fNRegions[iStation]; ++iRegion){
       TArc* arc = new TArc(0.,0.,fRadii[iStation].at(iRegion));

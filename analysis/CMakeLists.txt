@@ -21,6 +21,7 @@ ${CBMROOT_SOURCE_DIR}/mvd
 ${CBMROOT_SOURCE_DIR}/sts 
 ${CBMROOT_SOURCE_DIR}/KF 
 ${CBMROOT_SOURCE_DIR}/KF/Interface 
+${CBMROOT_SOURCE_DIR}/much/geo
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

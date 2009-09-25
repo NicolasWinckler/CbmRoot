@@ -12,6 +12,8 @@
 #include "TString.h"
 #include <map>
 
+class CbmMuchGeoScheme;
+class CbmMuchTrack;
 class CbmAnaMuch;
 class TClonesArray;
 class CbmTrackMatch;
@@ -28,7 +30,7 @@ public:
   *@param name   Name of class
   *@param title  Task title
   **/
-  CbmAnaMuch(const char* name, TString histoFileName);
+  CbmAnaMuch(const char* name, TString digiFileName, TString histoFileName);
 
   /** Destructor **/
   virtual ~CbmAnaMuch();
@@ -54,7 +56,10 @@ public:
   void SetStsPointsAccQuota(Int_t nPoints) { fStsPointsAccQuota = nPoints; }
   void SetStsTrueHitQuota(Double_t quota)  { fStsTrueHitQuota = quota; }
   
+  Bool_t IsReconstructed(CbmMuchTrack* track);
 private:
+  TString fDigiFileName;            //!
+  CbmMuchGeoScheme* fGeoScheme;     //!
   Int_t         fEvent;             //!
   TClonesArray* fMCTracks;          //!
   TClonesArray* fStsTracks;         //!

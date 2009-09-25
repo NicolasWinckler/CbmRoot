@@ -12,6 +12,9 @@
 #include "CbmStsTrack.h"
 #include "CbmMuchTrack.h"
 #include "CbmTrackMatch.h"
+#include "CbmMuchGeoScheme.h"
+#include "CbmMuchPixelHit.h"
+#include "CbmMuchStation.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
@@ -26,6 +29,8 @@
 #include "TFile.h"
 #include "TLorentzVector.h"
 #include "TF1.h"
+#include "TObjArray.h"
+#include <vector>
 
 // -----   Default constructor   -------------------------------------------
 CbmAnaMuch::CbmAnaMuch(){
@@ -35,12 +40,13 @@ CbmAnaMuch::CbmAnaMuch(){
   fMuchPointsAccQuota=13;
   fMuchTrueHitQuota=0.7;
   fHistoFileName="histo.root";
+  fGeoScheme=CbmMuchGeoScheme::Instance();
 }
 // -------------------------------------------------------------------------
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmAnaMuch::CbmAnaMuch(const char* name,TString histoFileName)
+CbmAnaMuch::CbmAnaMuch(const char* name, TString digiFileName, TString histoFileName)
 :FairTask(name){
   fEvent=0;
   fStsPointsAccQuota=4;
@@ -48,6 +54,8 @@ CbmAnaMuch::CbmAnaMuch(const char* name,TString histoFileName)
   fMuchPointsAccQuota=13;
   fMuchTrueHitQuota=0.7;
   fHistoFileName=histoFileName;
+  fDigiFileName=digiFileName;
+  fGeoScheme=CbmMuchGeoScheme::Instance();
 }
 
 // -------------------------------------------------------------------------
@@ -74,8 +82,14 @@ void CbmAnaMuch::SetParContainers(){
 
 
 // -----   Public method Init (abstract in base class)  --------------------
-InitStatus CbmAnaMuch::Init()
-{
+InitStatus CbmAnaMuch::Init(){
+  TFile* f = new TFile(fDigiFileName,"R");
+  if (!f->IsOpen()) Fatal("Init","Digi file failed to open");
+  TObjArray* stations = (TObjArray*) f->Get("stations");
+  if (!stations) Fatal("Init","No array of stations");
+  // Init geo scheme
+  fGeoScheme->Init(stations);
+  
   // Get and check FairRootManager
   FairRootManager* fManager = FairRootManager::Instance();
   fMCTracks         = (TClonesArray*) fManager->GetObject("MCTrack");
@@ -169,6 +183,7 @@ void CbmAnaMuch::Exec(Option_t* opt){
 
   for (Int_t iTrack=0;iTrack<nMuchTracks;iTrack++){
     CbmMuchTrack*  muchTrack      = (CbmMuchTrack*)  fMuchTracks->At(iTrack);
+    if (!IsReconstructed(muchTrack)) continue;
     CbmTrackMatch* muchTrackMatch = (CbmTrackMatch*) fMuchTrackMatches->At(iTrack);
     Int_t trackId = GetTrackId(muchTrackMatch,fMuchTrueHitQuota);
     mapRecMuch[trackId]=iTrack;
@@ -382,5 +397,33 @@ Int_t CbmAnaMuch::GetTrackId(CbmTrackMatch* match, Double_t quota){
   return trackId;
 }
 // -------------------------------------------------------------------------
+
+Bool_t CbmAnaMuch::IsReconstructed(CbmMuchTrack* track){
+  Int_t nStations = fGeoScheme->GetNStations();
+  Int_t nTriggerLayers = fGeoScheme->GetStation(nStations-1)->GetNLayers();
+  Int_t nHits = track->GetNofHits();
+  Int_t* triggerPlaneId = new Int_t[nTriggerLayers];
+  Int_t* triggeredPlanes = new Int_t[nTriggerLayers];
+  Int_t* hitsInStations = new Int_t[nStations];
+  Int_t* layersInStations = new Int_t[nStations];
+  
+  for (Int_t iStation=0; iStation<nStations; iStation++){
+    CbmMuchStation* station = fGeoScheme->GetStation(iStation);
+    layersInStations[iStation] = station->GetNLayers();
+  }
+  
+  for (Int_t i=0;i<nHits;i++){
+    CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fMuchHits->At(track->GetHitIndex(i));
+    Int_t iStation = fGeoScheme->GetStationIndex(hit->GetDetectorId());
+    hitsInStations[iStation]++;
+  }
+  
+  Bool_t isReconstructed = 1;
+  for (Int_t iStation=0;iStation<nStations-1;iStation++){
+    isReconstructed*=hitsInStations[iStation];
+  }
+  isReconstructed*=(hitsInStations[nStations-1]>=layersInStations[nStations-1]);
+  return isReconstructed;
+}
 
 ClassImp(CbmAnaMuch);

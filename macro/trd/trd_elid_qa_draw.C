@@ -234,31 +234,96 @@ void trd_elid_qa_draw()
 		gPad->SetGridx(true);
 	}
 
-	TCanvas* c6 = new TCanvas("c6","c6",10,10,800,800);
-	c6->Divide(2,2);
+	TCanvas* c6 = new TCanvas("c6", "c6", 10, 10, 800, 800);
+	TH1D *fhElProbSortPi[12];
+	TH1D *fhElProbSortEl[12];
+	c6->Divide(4, 3);
+	for (int i = 0; i < 12; i++) {
+		c6->cd(i + 1);
+		sprintf(histName, "fhElProbSortPi%d", i);
+		fhElProbSortPi[i] = (TH1D*) file->Get(histName);
+		fhElProbSortPi[i]->SetLineWidth(3);
+		fhElProbSortPi[i]->SetStats(false);
+		fhElProbSortPi[i]->SetMinimum(1);
+		fhElProbSortPi[i]->Draw();
+
+		sprintf(histName, "fhElProbSortEl%d", i);
+		fhElProbSortEl[i] = (TH1D*) file->Get(histName);
+		fhElProbSortEl[i]->SetLineWidth(3);
+		fhElProbSortEl[i]->SetLineStyle(2);
+		fhElProbSortEl[i]->SetStats(false);
+		fhElProbSortEl[i]->SetMinimum(1);
+		fhElProbSortEl[i]->Draw("same");
+
+		TLegend* leg1 = new TLegend(0.5, 0.15, 0.99, 0.4);
+		leg1->AddEntry(fhElossDiffEl[i], "electrons");
+		leg1->AddEntry(fhElossDiffPi[i], "pions");
+		leg1->DrawClone();
+
+		gPad->SetLogy(true);
+		//gPad->SetGridy(true);
+		gPad->SetGridx(true);
+	}
+
+	TCanvas* c7 = new TCanvas("c7", "c7", 10, 10, 800, 800);
+	TH1D *fhPiProbSortPi[12];
+	TH1D *fhPiProbSortEl[12];
+	c7->Divide(4, 3);
+	for (int i = 0; i < 12; i++) {
+		c7->cd(i + 1);
+		sprintf(histName, "fhPiProbSortPi%d", i);
+		fhPiProbSortPi[i] = (TH1D*) file->Get(histName);
+		fhPiProbSortPi[i]->SetLineWidth(3);
+		fhPiProbSortPi[i]->SetStats(false);
+		fhPiProbSortPi[i]->SetMinimum(1);
+		fhPiProbSortPi[i]->Draw();
+
+		sprintf(histName, "fhPiProbSortEl%d", i);
+		fhPiProbSortEl[i] = (TH1D*) file->Get(histName);
+		fhPiProbSortEl[i]->SetLineWidth(3);
+		fhPiProbSortEl[i]->SetLineStyle(2);
+		fhPiProbSortEl[i]->SetStats(false);
+		fhPiProbSortEl[i]->SetMinimum(1);
+		fhPiProbSortEl[i]->Draw("same");
+
+		TLegend* leg1 = new TLegend(0.5, 0.15, 0.99, 0.4);
+		leg1->AddEntry(fhElossDiffEl[i], "electrons");
+		leg1->AddEntry(fhElossDiffPi[i], "pions");
+		leg1->DrawClone();
+
+		gPad->SetLogy(true);
+		//gPad->SetGridy(true);
+		gPad->SetGridx(true);
+	}
+
+	TCanvas* c8 = new TCanvas("c8","c8",10,10,800,800);
+	c8->Divide(2,2);
 	fhElNofClusters->SetLineWidth(3);
 	fhPiNofClusters->SetLineWidth(3);
     fhElElossRMS->SetLineWidth(3);
     fhPiElossRMS->SetLineWidth(3);
     fhElElossMediana->SetLineWidth(3);
     fhPiElossMediana->SetLineWidth(3);
+	fhElElossRMSMed->SetLineWidth(3);
+	fhPiElossRMSMed->SetLineWidth(3);
 
 	fhElNofClusters->SetLineStyle(2);
 	fhElElossRMS->SetLineStyle(2);
 	fhElElossMediana->SetLineStyle(2);
-	c6->cd(1);
+	fhElElossRMSMed->SetLineStyle(2);
+	c8->cd(1);
 	fhElNofClusters->Draw();
 	fhPiNofClusters->Draw("same");
 	gPad->SetLogy(true);
-	c6->cd(2);
+	c8->cd(2);
 	fhElElossRMS->Draw();
 	fhPiElossRMS->Draw("same");
 	gPad->SetLogy(true);
-	c6->cd(3);
+	c8->cd(3);
 	fhElElossMediana->Draw();
 	fhPiElossMediana->Draw("same");
 	gPad->SetLogy(true);
-	c6->cd(4);
+	c8->cd(4);
 	fhElElossRMSMed->Draw();
 	fhPiElossRMSMed->Draw("same");
 	gPad->SetLogy(true);

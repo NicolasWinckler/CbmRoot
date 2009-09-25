@@ -41,8 +41,8 @@ void trd_elid_trainANN_txt()
 	  // ------------------------------------------------------------------------
 
 	CbmTrdElectronsTrainAnn* trainer = new CbmTrdElectronsTrainAnn();
-	trainer->SetAnnCut(0.7059);
-	trainer->SetIsDoTrain(false);
+	trainer->SetAnnCut(0.7579);
+	trainer->SetIsDoTrain(true);
 	trainer->SetTransformType(2);
 	trainer->Run();
 

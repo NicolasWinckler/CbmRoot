@@ -22,8 +22,8 @@ class CbmTrdModule : public TNamed
    *@param padsizex  size of the readout pad in x [cm]
    *@param padsizey  size of the readout pad in y [cm]
    **/
-  CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z, 
-               Double_t sizex, Double_t sizey);
+//  CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z, 
+//               Double_t sizex, Double_t sizey);
 
   CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z, 
                Double_t sizex, Double_t sizey, 

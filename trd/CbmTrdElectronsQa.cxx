@@ -74,7 +74,7 @@ void CbmTrdElectronsQa::InitHistos()
 		histMax = histMaxSt;
 	}
 
-	Int_t nofSortBins = 200;
+	Int_t nofSortBins = 1000;
 
 
 	for (Int_t i = 0; i < 12; i++){
@@ -95,6 +95,18 @@ void CbmTrdElectronsQa::InitHistos()
 		fhCumProbSortEl[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
 		sprintf(histName,"fhCumProbSortPi%d",i);
 		fhCumProbSortPi[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
+
+		sprintf(histName,"fhPiProbSortEl%d",i);
+		sprintf(histTitle, "Pi prob. in %d hit;Probability;Entries", i);
+		fhPiProbSortEl[i] = new TH1D(histName, histTitle, 100, -0.1, 1.1);
+		sprintf(histName,"fhPiProbSortPi%d",i);
+		fhPiProbSortPi[i] = new TH1D(histName, histTitle, 100, -0.1, 1.1);
+
+		sprintf(histName,"fhElProbSortEl%d",i);
+		sprintf(histTitle, "El prob. in %d hit;Probability;Entries", i);
+		fhElProbSortEl[i] = new TH1D(histName, histTitle, 100, -0.1, 1.1);
+		sprintf(histName,"fhElProbSortPi%d",i);
+		fhElProbSortPi[i] = new TH1D(histName, histTitle, 100, -0.1, 1.1);
 	}
 
 	fEnergyCutForClusters = 5e-6; //GeV
@@ -443,11 +455,13 @@ void CbmTrdElectronsQa::ElIdAnalysis()
 			fhElElossRMS->Fill(rms);
 			fhElElossMediana->Fill(mediana);
 			fhElElossRMSMed->Fill(rmsMed);
+			FillProbabilityHistos(vec, true);
 		}
 	    if (partPdg == 211) {
 			fhPiElossRMS->Fill(rms);
 			fhPiElossMediana->Fill(mediana);
 			fhPiElossRMSMed->Fill(rmsMed);
+			FillProbabilityHistos(vec, false);
 		}
 	    for (int i = 0; i < 12; i++){
 			if (partPdg == 11) {
@@ -487,6 +501,34 @@ void CbmTrdElectronsQa::ElIdAnalysis()
 		}
 	}
 
+
+
+}
+
+void CbmTrdElectronsQa::FillProbabilityHistos(const std::vector<Double_t>& vec, Bool_t isEl)
+{
+	for (Int_t j = 0; j < vec.size(); j++) {
+		Int_t binNum = fhCumProbSortEl[j]->FindBin(vec[j]);
+		if (binNum > fhCumProbSortEl[j]->GetNbinsX())
+			binNum = fhCumProbSortEl[j]->GetNbinsX();
+		if (isEl) {
+			fhElProbSortEl[j]->Fill(fhCumProbSortEl[j]->GetBinContent(binNum));
+		}else {
+			fhElProbSortPi[j]->Fill(fhCumProbSortEl[j]->GetBinContent(binNum));
+		}
+	}
+
+	for (Int_t j = 0; j < vec.size(); j++) {
+		Int_t binNum = fhCumProbSortPi[j]->FindBin(vec[j]);
+		if (binNum > fhCumProbSortPi[j]->GetNbinsX()){
+			binNum = fhCumProbSortPi[j]->GetNbinsX();
+		}
+		if (isEl) {
+			fhPiProbSortEl[j]->Fill(fhCumProbSortPi[j]->GetBinContent(binNum));
+		}else {
+			fhPiProbSortPi[j]->Fill(fhCumProbSortPi[j]->GetBinContent(binNum));
+		}
+	}
 }
 
 void CbmTrdElectronsQa::Finish()
@@ -522,6 +564,10 @@ void CbmTrdElectronsQa::Finish()
 		fhElossDiffPi[i]->Write();
 		fhCumProbSortEl[i]->Write();
 		fhCumProbSortPi[i]->Write();
+		fhPiProbSortEl[i]->Write();
+		fhPiProbSortPi[i]->Write();
+		fhElProbSortEl[i]->Write();
+		fhElProbSortPi[i]->Write();
 	}
 }
 

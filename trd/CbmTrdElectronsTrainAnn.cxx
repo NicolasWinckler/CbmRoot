@@ -60,8 +60,8 @@ void CbmTrdElectronsTrainAnn::Init()
 	fhCumProbEl = new TH1D("fhCumProbEl","Cumulative probability;ANN output;Cumulative probability",nofBins, fMinEval, fMaxEval);
     fhElNofClusters = new TH1D("fhElNofClusters","Number of clusters;number of clusters; entries",13, 0, 13);
     fhPiNofClusters = new TH1D("fhPiNofClusters","Number of clusters;number of clusters; entries",13, 0., 13.);
-    fhElElossMediana= new TH1D("fhElElossMediana","Eloss mediana;mediana, GeV; entries",100, 0, 50e-6);
-    fhPiElossMediana = new TH1D("fhPiElossMediana","Eloss mediana;mediana, GeV; entries",100, 0., 50e-6);
+    fhElElossMediana= new TH1D("fhElElossMediana","Eloss mediana;mediana, GeV; entries",100, 0, 1);
+    fhPiElossMediana = new TH1D("fhPiElossMediana","Eloss mediana;mediana, GeV; entries",100, 0., 1);
 
 }
 
@@ -100,23 +100,15 @@ void CbmTrdElectronsTrainAnn::Transform1()
 void CbmTrdElectronsTrainAnn::Transform2()
 {
 	sort(fElossVec.begin(), fElossVec.end());
-//	for (Int_t j = 0; j < fElossVec.size(); j++) {
-//		Int_t binNum = fhCumProbSortEl[j]->FindBin(fElossVec[j]);
-//		if (binNum > fhCumProbSortEl[j]->GetNbinsX())
-//			binNum = fhCumProbSortEl[j]->GetNbinsX();
-//		fInVector[j] = fhCumProbSortEl[j]->GetBinContent(binNum);
-//	}
 
 	for (Int_t j = 0; j < fElossVec.size(); j++) {
 		Int_t binNum = fhCumProbSortPi[j]->FindBin(fElossVec[j]);
 		if (binNum > fhCumProbSortPi[j]->GetNbinsX()){
 			binNum = fhCumProbSortPi[j]->GetNbinsX();
 		}
-		if (binNum > fhCumProbSortPi[j]->GetNbinsX() || binNum < 0){
-			cout << "-E- bin num < 0" << endl;
-		}
 		fInVector[j] = fhCumProbSortPi[j]->GetBinContent(binNum);
 	}
+
 	//fInVector[fNofInputNeurons-2] = (fElossVec[5] + fElossVec[6])/2.;//GetNofClusters();
 	//fInVector[fNofInputNeurons-1] = GetNofClusters();
 }
@@ -124,20 +116,22 @@ void CbmTrdElectronsTrainAnn::Transform2()
 void CbmTrdElectronsTrainAnn::Transform3()
 {
 	sort(fElossVec.begin(), fElossVec.end());
-	for (Int_t j = 0; j < fElossVec.size(); j++) {
-		Int_t binNum = fhCumProbSortEl[j]->FindBin(fElossVec[j]);
-		if (binNum > fhCumProbSortEl[j]->GetNbinsX())
-			binNum = fhCumProbSortEl[j]->GetNbinsX();
-		fInVector[j] = fhCumProbSortEl[j]->GetBinContent(binNum);
-	}
 
 	for (Int_t j = 0; j < fElossVec.size(); j++) {
 		Int_t binNum = fhCumProbSortPi[j]->FindBin(fElossVec[j]);
 		if (binNum > fhCumProbSortPi[j]->GetNbinsX()){
 			binNum = fhCumProbSortPi[j]->GetNbinsX();
 		}
-		fInVector[j+12] = fhCumProbSortPi[j]->GetBinContent(binNum);
+		fInVector[j] = fhCumProbSortPi[j]->GetBinContent(binNum);
 	}
+
+	for (Int_t j = 0; j < 1; j++) {
+		Int_t binNum = fhCumProbSortEl[j]->FindBin(fElossVec[j]);
+		if (binNum > fhCumProbSortEl[j]->GetNbinsX())
+			binNum = fhCumProbSortEl[j]->GetNbinsX();
+		fInVector[j+12] = fhCumProbSortEl[j]->GetBinContent(binNum);
+	}
+
 	//fInVector[fNofInputNeurons-2] = (fElossVec[5] + fElossVec[6])/2.;//GetNofClusters();
 	//fInVector[fNofInputNeurons-1] = GetNofClusters();
 }
@@ -237,14 +231,43 @@ Double_t CbmTrdElectronsTrainAnn::Eval(Bool_t isEl)
 	//	    fhPiNofClusters->Fill(GetNofClusters());
 	//	    fhPiElossMediana->Fill(eval);
 	//	}
+
+//	sort(fElossVec.begin(), fElossVec.end());
+//
+//	for (Int_t j = 0; j < fElossVec.size(); j++) {
+//		Int_t binNum = fhCumProbSortEl[j]->FindBin(fElossVec[j]);
+//		if (binNum > fhCumProbSortEl[j]->GetNbinsX()){
+//			binNum = fhCumProbSortEl[j]->GetNbinsX();
+//		}
+//		fInVector[j] = fhCumProbSortEl[j]->GetBinContent(binNum);
+//	}
+//	if(isEl){
+//	    fhElNofClusters->Fill(GetNofClusters());
+//	    fhElElossMediana->Fill(fInVector[3]);
+//	}else {
+//	    fhPiNofClusters->Fill(GetNofClusters());
+//	    fhPiElossMediana->Fill(fInVector[3]);
+//	}
+//
+//	if (fInVector[8] > 0.8  || fInVector[0] > 0.85  ||fInVector[1] > 0.7  ||
+//			fInVector[2] > 0.6  ||fInVector[3] > 0.6  ||
+//			fInVector[4] > 0.4  || fInVector[5] > 0.33 ||
+//			fInVector[6] > 0.4 || fInVector[7] > 0.35)
+//		return 1.;
+//	return -1.;
 //
 //	if (eval > 4){
 //		return 1;
 //	} else {
 //		return -1;
 //	}
+
+
+
 	return fReader->EvaluateMVA("BDT");
-	//return fNN->Evaluate(0, &fInVector[0]);
+//	Double_t par[12];
+//	for (Int_t i = 0; i <12; i++) par[i] = fInVector[i];
+//	return fNN->Evaluate(0, par);
 }
 
 void CbmTrdElectronsTrainAnn::DoTest()

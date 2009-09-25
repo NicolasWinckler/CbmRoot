@@ -34,6 +34,7 @@ public:
 	void FillEnergyLossesAnaHistos();
 	void FillTestHistos();
 	void ElIdAnalysis();
+	void FillProbabilityHistos(const std::vector<Double_t>& vec, Bool_t isEl);
 
 	void SetOutFileNamePi(TString name){fOutFileNamePi = name;}
 	void SetOutFileNameEl(TString name){fOutFileNameEl = name;}
@@ -87,7 +88,10 @@ private:
 	TH1D* fhElossDiffEl[12];
 	TH1D* fhCumProbSortEl[12];
 	TH1D* fhCumProbSortPi[12];
-
+	TH1D* fhPiProbSortEl[12];
+	TH1D* fhPiProbSortPi[12];
+	TH1D* fhElProbSortEl[12];
+	TH1D* fhElProbSortPi[12];
 
 	Int_t fEventNum;
 

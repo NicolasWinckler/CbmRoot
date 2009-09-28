@@ -5,22 +5,21 @@
 #ifndef CBM_RICH_RING_FINDER_HOUGH_SIMD_H
 #define CBM_RICH_RING_FINDER_HOUGH_SIMD_H
 
-#include "CbmRichRingFinderHoughBase.h"
+#include "CbmRichRingFinderHoughImpl.h"
 
 
-class CbmRichRingFinderHoughSimd : public CbmRichRingFinderHoughBase {
-
+class CbmRichRingFinderHoughSimd : public CbmRichRingFinderHoughImpl {
 
 public:
 
   	/** Standard constructor **/
-  	CbmRichRingFinderHoughSimd ( Int_t verbose, TString geometry);
+  	CbmRichRingFinderHoughSimd ( TString geometry);
 
-	~CbmRichRingFinderHoughSimd();
+	~CbmRichRingFinderHoughSimd(){;}
 
 	virtual void HoughTransformReconstruction();
-	virtual void HoughTransformSimd(unsigned short int indmin, unsigned short int indmax);
-	virtual void HoughTransformSimd2(unsigned short int indmin, unsigned short int indmax);
+	virtual void HoughTransformGroup(unsigned short int indmin, unsigned short int indmax, Int_t iPart);
+
 	ClassDef(CbmRichRingFinderHoughSimd,1)
 
 };

@@ -9,40 +9,8 @@
 fvec m0_5 = fvec(0.5f);
 fvec m1 = fvec(1.0f);
 
-void CalculateRingParametersOldVec(fvec x[],
-			fvec y[],
-			fvec *xc,
-			fvec *yc,
-			fvec *r){
-	fvec t1, t2, t3, t4, t5, t6, t8, t9,
-        t10, t11, t14, t16, t19, t21, t41;
-
-
-    t1 = x[1] * x[1];
-    t2 = x[2] * x[2];
-    t3 = y[1] * y[1];
-    t4 = y[2] * y[2];
-    t5 = t1 - t2 + t3 - t4;
-    t6 = y[0] - y[1];
-    t8 = x[0] * x[0];
-    t9 = y[0] * y[0];
-    t10 = t8 - t1 + t9 - t3;
-    t11 = y[1] - y[2];
-    t14 = x[1] - x[2];
-    t16 = x[0] - x[1];
-    t19 = m1 / (t14 * t6 - t16 * t11);
-
-    *xc = m0_5 * (t5 * t6 - t10 * t11) * t19;
-    *yc = m0_5 * (t10 * t14 - t5 * t16) * t19;
-
-    t21 = (x[0] - *xc)*(x[0] - *xc);
-    t41 = (y[0] - *yc)*(y[0] - *yc);
-    *r = sqrt(t21 + t41);
-
-}
-
 // -----   Standard constructor   ------------------------------------------
-CbmRichRingFinderHoughSimd::CbmRichRingFinderHoughSimd  ( Int_t verbose, TString geometry )
+CbmRichRingFinderHoughSimd::CbmRichRingFinderHoughSimd  ( TString geometry )
 {
     cout << "-I- CbmRichRingFinderHough constructor for " << geometry << " RICH geometry"<<endl;
     if (geometry != "compact" && geometry != "large"){
@@ -54,268 +22,134 @@ CbmRichRingFinderHoughSimd::CbmRichRingFinderHoughSimd  ( Int_t verbose, TString
 
 }
 
-// -----   Destructor   ----------------------------------------------------
-CbmRichRingFinderHoughSimd::~CbmRichRingFinderHoughSimd()
+void CbmRichRingFinderHoughSimd::HoughTransformGroup(unsigned short int indmin,
+		unsigned short int indmax, Int_t iPart)
 {
+//	register Float_t r12, r13, r23;
+//    register Float_t rx0, rx1, rx2, ry0, ry1,ry2; //rx[3], ry[3];//, x[3], y[3];
+    //register Float_t xc, yc, r;
+    //register Float_t xcs, ycs; // xcs = xc - fCurMinX
+    register Int_t intX, intY, intR;
+    register Int_t indXY;
 
-}
-
-
-void CbmRichRingFinderHoughSimd::HoughTransformSimd(unsigned short int indmin, unsigned short int indmax)
-{
-    fvec xcv, ycv, rv;
-    fvec xv[3], yv[3];
-    fvec rx13v, rx23v, ry13v, ry23v, rx12v, ry12v;
-    fvec r12v, r13v, r23v;
-    fvec curMinX = fvec(fCurMinX);
-    fvec curMinY = fvec(fCurMinY);
-    fvec t5, t10, t19, t21, t41, det;
-    fvec t4, t6;
-    Float_t r12, rx12, ry12;
-    Int_t intX, intY, intR, indXY;
-    Float_t xc, yc, r;
-    Int_t nofHits;
-
-    register unsigned short int iH1, iH2, iH3;
+    register unsigned short int iH11, iH12, iH13, iH14, iH2, iH3;
     register unsigned short int iH1_1, iH2_1, iH3_1;
     register Int_t nofHitsNorm = fHitInd[0].size() + 1;
-    Int_t iPmulNofHits;
+    register Int_t iPmulNofHits;
 
+    //register Float_t t5, t10, t19, det, t6, t7;
+    //register Float_t dx = 1.0f/fDx, dy = 1.0f/fDy, dr = 1.0f/fDr;
+    //register Float_t iH1X, iH1Y, iH2X, iH2Y, iH3X, iH3Y;
 
-    for (Int_t iPart = 0; iPart < fNofParts; iPart++){
+    fvec xcs, ycs;
+    fvec fCurMinXV = fvec(fCurMinX), fCurMinYV = fvec(fCurMinY);
+    fvec xc, yc, r;
+	fvec r12, r13, r23;
+    fvec rx0, rx1, rx2, ry0, ry1,ry2; //rx[3], ry[3];//, x[3], y[3];
+    fvec t5, t10, t19, det, t6, t7;
+    fvec dx = fvec(1.0f/fDx), dy = fvec(1.0f/fDy), dr = fvec(1.0f/fDr);
+    fvec iH1X, iH1Y, iH2X, iH2Y, iH3X, iH3Y;
+
     Int_t nofHits = fHitInd[iPart].size();
     if (nofHits <= fMinNofHitsInArea) return;
     iPmulNofHits = iPart * nofHitsNorm;
 
-	for (Int_t iHit1 = 0; iHit1 < nofHits; iHit1++)
-	{
-		iH1 = fHitInd[iPart][iHit1];
+
+	for (unsigned short int iHit1 = 0; iHit1 < (nofHits & ~3); iHit1+=4) {
+		iH11 = fHitInd[iPart][iHit1];
+		iH12 = fHitInd[iPart][iHit1+1];
+		iH13 = fHitInd[iPart][iHit1+2];
+		iH14 = fHitInd[iPart][iHit1+3];
+
 		iH1_1 = iPmulNofHits + iHit1;
+		iH1X = fvec(fData[iH11].fX, fData[iH12].fX, fData[iH13].fX, fData[iH14].fX);
+		iH1Y = fvec(fData[iH11].fY, fData[iH12].fY, fData[iH13].fY, fData[iH14].fY);
 
-		xv[0] = fvec(fData[iH1].fX);
-		yv[0] = fvec(fData[iH1].fY);
-
-		for (Int_t iHit2 = iHit1 + 1; iHit2 < nofHits; iHit2++)
-		{
-			iH2 = fHitInd[iPart][iHit2];
-			iH2_1 = iPmulNofHits + iHit2;
-
-			rx12 = fData[iH1].fX - fData[iH2].fX;//rx12
-			ry12 = fData[iH1].fY - fData[iH2].fY;//ry12
-			r12 = rx12 * rx12 + ry12 * ry12;
-			if (r12 < fMinDistanceSq || r12 > fMaxDistanceSq) continue;
-
-			xv[1] = fvec(fData[iH2].fX);
-			yv[1] = fvec(fData[iH2].fY);
-			t10 = fvec(fData[iH1].fX2plusY2 - fData[iH2].fX2plusY2);
-			r12v = fvec(r12);
-			t4 = fvec(fData[iH2].fX2plusY2);
-
-			for (Int_t iHit3 = iHit2 + 1; iHit3 < nofHits - 3; iHit3+=4)
-			{
-				iH3 = fHitInd[iPart][iHit3];
-				iH3_1 = iPmulNofHits + iHit3;
-
-				xv[2] = fvec(fData[ fHitInd[iPart][iHit3] ].fX,fData[ fHitInd[iPart][iHit3+1] ].fX,
-						fData[ fHitInd[iPart][iHit3+2] ].fX,fData[ fHitInd[iPart][iHit3+3] ].fX);
-
-				yv[2] = fvec(fData[ fHitInd[iPart][iHit3] ].fY,
-						fData[ fHitInd[iPart][iHit3+1] ].fY,
-						fData[ fHitInd[iPart][iHit3+2] ].fY,
-						fData[ fHitInd[iPart][iHit3+3] ].fY);
-
-				t6 = fvec(fData[ fHitInd[iPart][iHit3] ].fX2plusY2,
-						fData[ fHitInd[iPart][iHit3+1] ].fX2plusY2,
-						fData[ fHitInd[iPart][iHit3+2] ].fX2plusY2,
-						fData[ fHitInd[iPart][iHit3+3] ].fX2plusY2);
-
-				t5 = t4 - t6;
-
-				rx13v = xv[0] - xv[2];//fData[iH1].fX - fData[iH3].fX;//rx13
-				rx23v = xv[1] - xv[2];//fData[iH2].fX - fData[iH3].fX;//rx23
-
-				ry13v = yv[0] - yv[2];// fData[iH1].fY - fData[iH3].fY;//ry13
-				ry23v = yv[1] - yv[2];// fData[iH2].fY - fData[iH3].fY;//ry23
-
-				r13v = rx13v * rx13v + ry13v * ry13v;
-				r23v = rx23v * rx23v + ry23v * ry23v;
-
-			    det = rx23v*ry12v - rx12v*ry23v;
-			   // if (det == 0.0f) continue;
-				t19 = m0_5 / det;
-				xcv = (t5 * ry12v - t10 * ry23v) * t19;
-				ycv = (t10 * rx23v - t5 * rx12v) * t19;
-
-				 //radius calculation
-				t21 = (xv[0] - xcv) * (xv[0] - xcv);
-				t41 = (yv[0] - ycv) * (yv[0] - ycv);
-				rv = sqrt(t21 + t41);
-
-				xcv = xcv - curMinX;
-				ycv = ycv - curMinY;
-
-				for (int iv = 0; iv < 4; iv++){
-					if (r13v[iv] < fMinDistanceSq || r13v[iv] > fMaxDistanceSq ||
-					 r23v[iv] < fMinDistanceSq || r23v[iv] > fMaxDistanceSq ) continue;
-
-					intX = (int)(xcv[iv] / fDx);
-					intY = (int)(ycv[iv] / fDy);
-					intR = (int)(rv[iv] / fDr);
-
-					if (intX < 0 || intX >= fNofBinsX ||
-						intY < 0 || intY >= fNofBinsY) continue;
-					if (rv[iv] < fMinRadius || rv[iv] > fMaxRadius) continue;
-					cout << rv[iv] << " ";
-					indXY = intX * fNofBinsX + intY;
-					fHist[indXY]++;
-					fRingHits[indXY][iH1_1]++;
-					fRingHits[indXY][iH2_1]++;
-					fRingHits[indXY][iH3_1+ iv]++;
-					fHistR[intR]++;
-					fRingHitsR[intR][iH1_1]++;
-					fRingHitsR[intR][iH2_1]++;
-					fRingHitsR[intR][iH3_1+ iv]++;
-				}//iv
-			}//iHit1
-		}//iHit2
-	}//iHit3
-    }//iPart
-}
-
-void CbmRichRingFinderHoughSimd::HoughTransformSimd2(unsigned short int indmin, unsigned short int indmax)
-{
-    Float_t r12, r13, r23;
-    register Float_t rx[3], ry[3], x[3], y[3];
-    register Float_t xc, yc, r;
-    register Float_t xcs, ycs; // xcs = xc - fCurMinX
-    Int_t intX, intY, intR;
-    Int_t indXY;
-    register unsigned short int iH1, iH2, iH3;
-    register unsigned short int iH1_1, iH2_1, iH3_1;
-    register Int_t nofHitsNorm = fHitInd[0].size() + 1;
-    Int_t iPmulNofHits;
-    //register Float_t t5, t10, t19, t21, t41, det;
-
-    fvec xv[3], yv[3];
-    fvec rxv[3], ryv[3];
-    fvec r12v, r13v, r23v;
-    fvec t5v, t10v, t19v, t21v, t41v, detv;
-    fvec xcv, ycv, rv;
-    fvec curMinXv = fvec(fCurMinX);
-    fvec curMinYv = fvec(fCurMinY);
-    fvec intXv, intYv, intRv;
-    fvec dxv = fvec(1.0f/fDx);
-    fvec dyv = fvec(1.0f/fDy);
-    fvec drv = fvec(1.0f/fDr);
-
-
-    for (Int_t iPart = 0; iPart < fNofParts; iPart++){
-    Int_t nofHits = fHitInd[iPart].size();
-    if (nofHits <= fMinNofHitsInArea) return;
-    iPmulNofHits = iPart * nofHitsNorm;
-
-	for (unsigned short int iHit1 = 0; iHit1 < nofHits; iHit1++) {
-		iH1 = fHitInd[iPart][iHit1];
-		iH1_1 = iPmulNofHits + iHit1;
-
-		xv[0] = fvec(fData[iH1].fX);
-		yv[0] = fvec(fData[iH1].fY);
 		for (unsigned short int iHit2 = iHit1 + 1; iHit2 < nofHits; iHit2++) {
 			iH2 = fHitInd[iPart][iHit2];
 			iH2_1 = iPmulNofHits + iHit2;
+			iH2X = fvec(fData[iH2].fX);
+			iH2Y = fvec(fData[iH2].fY);
 
-			xv[1] = fvec(fData[iH2].fX);
-			yv[1] = fvec(fData[iH2].fY);
+			rx0 = iH1X - iH2X;//rx12
+			ry0 = iH1Y- iH2Y;//ry12
+			//r12 = rx0 * rx0 + ry0 * ry0;
+			//if (r12 < fMinDistanceSq || r12 > fMaxDistanceSq)	continue;
 
-			rx[0] = fData[iH1].fX - fData[iH2].fX;//rx12
-			ry[0] = fData[iH1].fY - fData[iH2].fY;//ry12
-			r12 = rx[0] * rx[0] + ry[0] * ry[0];
-			if (r12 < fMinDistanceSq || r12 > fMaxDistanceSq)	continue;
-
-			t10v = fvec(fData[iH1].fX2plusY2 - fData[iH2].fX2plusY2);
-			rxv[0] = fvec(rx[0]);
-			ryv[0] = fvec(ry[0]);
-
-			for (unsigned short int iHit3 = iHit2 + 1; iHit3 < nofHits + 4; iHit3+=4) {
+			t10 = fvec(fData[iH11].fX2plusY2 - fData[iH2].fX2plusY2,
+					fData[iH12].fX2plusY2 - fData[iH2].fX2plusY2,
+					fData[iH13].fX2plusY2 - fData[iH2].fX2plusY2,
+					fData[iH14].fX2plusY2 - fData[iH2].fX2plusY2);
+			iH3_1= iPmulNofHits+iHit2;
+			for (unsigned short int iHit3 = iHit2 + 1; iHit3 < nofHits; iHit3++) {
 				iH3 = fHitInd[iPart][iHit3];
-				iH3_1 = iPmulNofHits + iHit3;
+				iH3_1++;//iH3_1 = iPmulNofHits + iHit3;
+				iH3X = fvec(fData[iH3].fX);
+				iH3Y = fvec(fData[iH3].fY);
 
-				if (iHit3+3 < nofHits){
-					xv[2] = fvec(fData[ fHitInd[iPart][iHit3] ].fX,	fData[ fHitInd[iPart][iHit3+1] ].fX,
-							fData[ fHitInd[iPart][iHit3+2] ].fX, fData[ fHitInd[iPart][iHit3+3] ].fX);
-					yv[2] = fvec(fData[ fHitInd[iPart][iHit3] ].fY,	fData[ fHitInd[iPart][iHit3+1] ].fY,
-							fData[ fHitInd[iPart][iHit3+2] ].fY, fData[ fHitInd[iPart][iHit3+3] ].fY);
-				}else if (iHit3+2 < nofHits){
-					xv[2] = fvec(fData[ fHitInd[iPart][iHit3] ].fX,	fData[ fHitInd[iPart][iHit3+1] ].fX,
-							fData[ fHitInd[iPart][iHit3+2] ].fX, 0.0f);
-					yv[2] = fvec(fData[ fHitInd[iPart][iHit3] ].fY,	fData[ fHitInd[iPart][iHit3+1] ].fY,
-							fData[ fHitInd[iPart][iHit3+2] ].fY, 0.0f);
-				}else if (iHit3+1 < nofHits){
-					xv[2] = fvec(fData[ fHitInd[iPart][iHit3] ].fX,	fData[ fHitInd[iPart][iHit3+1] ].fX,
-							0.0f, 0.0f);
-					yv[2] = fvec(fData[ fHitInd[iPart][iHit3] ].fY,	fData[ fHitInd[iPart][iHit3+1] ].fY,
-							0.0f, 0.0f);
-				}else if (iHit3 < nofHits){
-					xv[2] = fvec(fData[ fHitInd[iPart][iHit3] ].fX, 0.0f, 0.0f, 0.0f);
-					yv[2] = fvec(fData[ fHitInd[iPart][iHit3] ].fY,	0.0f, 0.0f, 0.0f);
-				}
+				//rx1 = iH1X - iH3X;//rx13
+				//ry1 = iH1Y - iH3Y;//ry13
+				//r13 = rx1 * rx1 + ry1 * ry1;
+				//if (r13 < fMinDistanceSq || r13 > fMaxDistanceSq)continue;
 
-				rxv[1] = xv[0]- xv[2];//rx13
-				ryv[1] = yv[0] - yv[2];//ry13
-				r13v = rxv[1] * rxv[1] + ryv[1] * ryv[1];
+				rx2 = iH2X - iH3X;//rx23
+				ry2 = iH2Y - iH3Y;//ry23
+				//r23 = rx2 * rx2 + ry2 * ry2;
+				//if (r23	< fMinDistanceSq || r23 > fMaxDistanceSq)continue;
 
-				rxv[2] = xv[1] - xv[2];//rx23
-				ryv[2] = yv[1] - yv[2];//ry23
-				r23v = rxv[2] * rxv[2] + ryv[2] * ryv[2];
+			    det = rx2*ry0 - rx0*ry2;
+			    //if (det == 0.0f) continue;
+				t19 = 0.5f / det;
+				t5 = fvec(fData[iH2].fX2plusY2 - fData[iH3].fX2plusY2);
 
-			    detv = rxv[2]*ryv[0] - rxv[0]*ryv[2];
-				t19v = m0_5 / detv;
-				t5v = xv[1]*xv[1]+ yv[1]*yv[1] - xv[2]*xv[2]- yv[2]*yv[2];
+				xc = (t5 * ry0 - t10 * ry2) * t19;
+				xcs = xc - fCurMinXV;
+				//intX = int( xcs *dx);
+				//if (intX < 0 || intX >= fNofBinsX ) continue;
 
-				xcv = (t5v * ryv[0] - t10v * ryv[2]) * t19v;
-				ycv = (t10v * rxv[2] - t5v * rxv[0]) * t19v;
+				yc = (t10 * rx2 - t5 * rx0) * t19;
+				ycs = yc - fCurMinYV;
+				//intY = int( ycs *dy);
+				//if (intY < 0 || intY >= fNofBinsY ) continue;
+
 				 //radius calculation
-				t21v = (xv[0] - xcv) * (xv[0] - xcv);
-				t41v = (yv[0] - ycv) * (yv[0] - ycv);
-				rv = sqrt(t21v + t41v);
+				t6 = iH1X - xc;
+				t7 = iH1Y - yc;
+				r = sqrt(t6 * t6 + t7 * t7);
 
-				xcv = xcv - curMinXv;
-				ycv = ycv - curMinYv;
-
-				intXv = xcv * dxv;
-				intYv = ycv * dyv;
-				intRv = rv * drv;
-
+				//intR = int(r *dr);
+				//if (intR < 0 || intR > fNofBinsR) continue;
+				//indXY = intX * fNofBinsX + intY;
 				for (Int_t iv = 0; iv < 4; iv++){
-					if (xv[0][iv] == 0.0f) continue;
-
-					if (r13v[iv] < fMinDistanceSq || r13v[iv] > fMaxDistanceSq)continue;
-					if (r23v[iv]	< fMinDistanceSq || r23v[iv] > fMaxDistanceSq)continue;
-
-					intX = (int)intXv[iv];
-					if (intX < 0 || intX >= fNofBinsX ) continue;
-					intY = (int)intYv[iv];
-					if (intY < 0 || intY >= fNofBinsY ) continue;
-					intR = (int)intRv[iv];
-					if (rv[iv] < fMinRadius || rv[iv] > fMaxRadius) continue;
-
+					intX = int( xcs[iv] *dx[iv]);
+					intY = int( ycs[iv] *dy[iv]);
+					intR = int(r[iv] *dr[iv]);
 					indXY = intX * fNofBinsX + intY;
 
+					//if (r12 < fMinDistanceSq || r12 > fMaxDistanceSq)	continue;
+					//if (r13 < fMinDistanceSq || r13 > fMaxDistanceSq)continue;
+					//if (r23	< fMinDistanceSq || r23 > fMaxDistanceSq)continue;
+					if (intX < 0 || intX >= fNofBinsX ) continue;
+					if (intY < 0 || intY >= fNofBinsY ) continue;
+					if (intR < 0 || intR > fNofBinsR) continue;
+
 					fHist[indXY]++;
-					fRingHits[indXY][iH1_1]++;
+					fRingHits[indXY][iH1_1+iv]++;
 					fRingHits[indXY][iH2_1]++;
-					fRingHits[indXY][iH3_1 + iv]++;
+					fRingHits[indXY][iH3_1]++;
 					fHistR[intR]++;
-					fRingHitsR[intR][iH1_1]++;
+
+					fRingHitsR[intR][iH1_1+iv]++;
 					fRingHitsR[intR][iH2_1]++;
-					fRingHitsR[intR][iH3_1 + iv]++;
-				}//iv
+					fRingHitsR[intR][iH3_1]++;
+				}
+
 			}//iHit1
 		}//iHit2
 	}//iHit3
-    }//iPart
-
 }
+
+
 
 void CbmRichRingFinderHoughSimd::HoughTransformReconstruction()
 {
@@ -333,7 +167,7 @@ void CbmRichRingFinderHoughSimd::HoughTransformReconstruction()
 		fCurMinY = y0 - fMaxDistance;
 
 		DefineLocalAreaAndHits(x0, y0, &indmin, &indmax);
-		HoughTransformSimd2(indmin, indmax);
+		HoughTransform(indmin, indmax);
 		FindPeak(indmin, indmax);
 
     }//main loop over hits

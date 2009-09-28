@@ -38,7 +38,7 @@ void CbmRichRingFinderHoughSimd::HoughTransformGroup(unsigned short int indmin,
     register Int_t iPmulNofHits;
 
     //register Float_t t5, t10, t19, det, t6, t7;
-    //register Float_t dx = 1.0f/fDx, dy = 1.0f/fDy, dr = 1.0f/fDr;
+    register Float_t dx = 1.0f/fDx, dy = 1.0f/fDy, dr = 1.0f/fDr;
     //register Float_t iH1X, iH1Y, iH2X, iH2Y, iH3X, iH3Y;
 
     fvec xcs, ycs;
@@ -47,7 +47,6 @@ void CbmRichRingFinderHoughSimd::HoughTransformGroup(unsigned short int indmin,
 	fvec r12, r13, r23;
     fvec rx0, rx1, rx2, ry0, ry1,ry2; //rx[3], ry[3];//, x[3], y[3];
     fvec t5, t10, t19, det, t6, t7;
-    fvec dx = fvec(1.0f/fDx), dy = fvec(1.0f/fDy), dr = fvec(1.0f/fDr);
     fvec iH1X, iH1Y, iH2X, iH2Y, iH3X, iH3Y;
 
     Int_t nofHits = fHitInd[iPart].size();
@@ -121,9 +120,9 @@ void CbmRichRingFinderHoughSimd::HoughTransformGroup(unsigned short int indmin,
 				//if (intR < 0 || intR > fNofBinsR) continue;
 				//indXY = intX * fNofBinsX + intY;
 				for (Int_t iv = 0; iv < 4; iv++){
-					intX = int( xcs[iv] *dx[iv]);
-					intY = int( ycs[iv] *dy[iv]);
-					intR = int(r[iv] *dr[iv]);
+					intX = int( xcs[iv] *dx);
+					intY = int( ycs[iv] *dy);
+					intR = int(r[iv] *dr);
 					indXY = intX * fNofBinsX + intY;
 
 					//if (r12 < fMinDistanceSq || r12 > fMaxDistanceSq)	continue;

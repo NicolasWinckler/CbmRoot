@@ -60,6 +60,8 @@ CbmLitPropagationAnalysis::CbmLitPropagationAnalysis()
 	fNofTrdHits = 0;
 	fNofMuchHits = 13;
 	fNofTofHits = 1;
+
+	fIsTestFastPropagation = true;
 }
 
 CbmLitPropagationAnalysis::~CbmLitPropagationAnalysis()
@@ -73,10 +75,14 @@ InitStatus CbmLitPropagationAnalysis::Init()
 
 	// Create tools
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	fPropagator = factory->CreateTrackPropagator("lit");
-	fFilter = factory->CreateTrackUpdate("kalman");
-	fFitter = factory->CreateTrackFitter("lit_kalman");
-	fSmoother = factory->CreateTrackFitter("kalman_smoother");
+	if (!fIsTestFastPropagation) {
+		fPropagator = factory->CreateTrackPropagator("lit");
+		fFilter = factory->CreateTrackUpdate("kalman");
+		fFitter = factory->CreateTrackFitter("lit_kalman");
+		fSmoother = factory->CreateTrackFitter("kalman_smoother");
+	} else {
+		fParallelFitter = factory->CreateTrackFitter("kalman_parallel");
+	}
 
 	CreateHistograms();
 }
@@ -430,8 +436,12 @@ void CbmLitPropagationAnalysis::RunTest()
 	for(Int_t i = 0; i < fLitTracks.size(); i++){
 		if (fLitTracks[i]->GetNofHits() != fNofPlanes) continue;
 		fLitTracks[i]->SortHits();
-		TestPropagation(fLitTracks[i], fLitMcTracks[i]);
-		TestFitter(fLitTracks[i], fLitMcTracks[i]);
+		if (!fIsTestFastPropagation) {
+			TestPropagation(fLitTracks[i], fLitMcTracks[i]);
+			TestFitter(fLitTracks[i], fLitMcTracks[i]);
+		} else {
+			TestFastPropagation(fLitTracks[i], fLitMcTracks[i]);
+		}
 	}
 }
 
@@ -477,6 +487,20 @@ void CbmLitPropagationAnalysis::FillHistosPropagation(
 		 fPropagationHistos[plane][i]->Fill(r[i]);
 	 }
 	 fPropagationHistos[plane][11]->Fill(ChiSq(par, hit));
+}
+
+void CbmLitPropagationAnalysis::FillHistosFilter(
+		const CbmLitTrackParam* par,
+		const CbmLitTrackParam* mcPar,
+		const CbmLitHit* hit,
+		Int_t plane,
+		float chisq)
+{
+	 std::vector<Double_t> r = CalcResidualsAndPulls(par, mcPar);
+	 for (Int_t i = 0; i < 11; i++){
+		 fFilterHistos[plane][i]->Fill(r[i]);
+	 }
+	 fFilterHistos[plane][11]->Fill(chisq);//ChiSq(par, hit));
 }
 
 void CbmLitPropagationAnalysis::FillHistosFitter(
@@ -572,6 +596,17 @@ void CbmLitPropagationAnalysis::PrintStopwatchStatistics()
 		<< "/" << fSmootherWatch.RealTime()
 		<< " s, cpu=" << fSmootherWatch.CpuTime()/fSmootherWatch.Counter()
 		<< "/" << fSmootherWatch.CpuTime() << std::endl;
+}
+
+void CbmLitPropagationAnalysis::TestFastPropagation(
+		CbmLitTrack* track,
+		CbmLitTrack* mcTrack)
+{
+	fParallelFitter->Fit(track);
+	for (Int_t i = 0; i < track->GetNofHits(); i++){
+         FillHistosPropagation(track->GetFitNode(i)->GetPredictedParam(), mcTrack->GetFitNode(i)->GetPredictedParam(), track->GetHit(i), i);
+         FillHistosFilter(track->GetFitNode(i)->GetUpdatedParam(), mcTrack->GetFitNode(i)->GetPredictedParam(), track->GetHit(i), i, track->GetFitNode(i)->GetChiSqFiltered());
+	}
 }
 
 ClassImp(CbmLitPropagationAnalysis);

@@ -12,7 +12,6 @@
 #include "FairTask.h"
 #include "CbmLitTypes.h"
 #include "CbmLitPtrTypes.h"
-//#include "CbmLitSimpleGeometryConstructor.h"
 
 #include "TStopwatch.h"
 
@@ -43,6 +42,7 @@ public:
 	void SetNofTrdHits(Int_t nofTrdHits) {fNofTrdHits = nofTrdHits;}
 	void SetNofMuchHits(Int_t nofMuchHits) {fNofMuchHits = nofMuchHits;}
 	void SetNofTofHits(Int_t nofTofHits) {fNofTofHits = nofTofHits;}
+	void SetTestFastPropagation(Bool_t isTestFastPropagation){fIsTestFastPropagation = isTestFastPropagation;}
 
 private:
 	void DetermineSetup();
@@ -70,6 +70,13 @@ private:
 			const CbmLitTrackParam* mcPar,
 			const CbmLitHit* hit,
 			Int_t plane);
+	void FillHistosFilter(
+			const CbmLitTrackParam* par,
+			const CbmLitTrackParam* mcPar,
+			const CbmLitHit* hit,
+			Int_t plane,
+			float chisq);
+
 	void FillHistosFitter(
 			const CbmLitTrack* track,
 			const CbmLitTrack* mcTrack);
@@ -82,6 +89,10 @@ private:
 			const CbmLitTrackParam* mcPar);
 
 	void PrintStopwatchStatistics();
+
+	void TestFastPropagation(
+			CbmLitTrack* track,
+			CbmLitTrack* mcTrack);
 
 	Bool_t fIsElectronSetup; // If "electron" setup detected than true
 	Bool_t fIsSts; // If STS detected than true
@@ -123,6 +134,7 @@ private:
 	TrackUpdatePtr fFilter; // track update tool
 	TrackFitterPtr fFitter; // track fitter tool
 	TrackFitterPtr fSmoother; // track smoother tool
+	TrackFitterPtr fParallelFitter; // parallel track fitter tool
 
 	// Histograms
 	// histogram[plane number][parameter]
@@ -147,7 +159,7 @@ private:
 	Int_t fEvents; // Event counter
 	Int_t fVerbose; // Verbose level
 
-//	CbmLitSimpleGeometryConstructor fGeoConstructor;
+	Bool_t fIsTestFastPropagation;
 
 	ClassDef(CbmLitPropagationAnalysis, 1);
 };

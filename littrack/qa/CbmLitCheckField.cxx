@@ -60,9 +60,9 @@ InitStatus CbmLitCheckField::Init()
 
 	// Fit the magnetic field
 	CbmLitFieldFitter ff;
-	ff.Fit();
-	ff.GetFieldSlices(fSlices);
-	ff.GetInputInfo(fZpos, fXpos, fYpos, fNofBinsX, fNofBinsY);
+//	ff.Fit();
+//	ff.GetFieldSlices(fSlices);
+//	ff.GetInputInfo(fZpos, fXpos, fYpos, fNofBinsX, fNofBinsY);
 
 	CreateHistos();
 	FillHistos();

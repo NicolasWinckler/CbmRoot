@@ -8,7 +8,7 @@
 
 CbmLitTrackBranch::CbmLitTrackBranch():
 	fChi2(0.),
-	fNDF(0.),
+	fNDF(0),
 	fNofMissingHits(0),
 	fRefId(-1),
 	fQuality(kLITBAD),

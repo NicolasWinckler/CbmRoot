@@ -266,7 +266,8 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
 		if (litTrack->GetQuality() == kLITBAD) continue;
 		if (litTrack->GetNofHits() < 2) continue;
 		if (litTrack->GetNofHits() != litTrack->GetFitNodes().size()) {
-//			std::cout << "-E- CbmLitConverter::LitTrackVectorToGlobalTrackArray: unequal number of hits and fit nodes" << std::endl;
+			std::cout << "-E- CbmLitConverter::LitTrackVectorToGlobalTrackArray: unequal number of hits and fit nodes" << std::endl;
+			std::cout << litTrack->ToString();
 			continue;
 		}
 
@@ -352,15 +353,6 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
 			CbmLitConverter::LitTrackParamToTrackParam(litTrack->GetFitNode(muchFirst)->GetUpdatedParam(), &parFirst);
 			muchTrack->SetParamLast(&parLast);
 			muchTrack->SetParamFirst(&parFirst);
-
-//			if (parLast.GetZ() > 500.) {
-//				std::cout << std::endl << std::endl;
-//				std::cout << "WAAAAAAAAAAAAAAAAAARRRRNIIIIING!!!!!!!!!!!!!!!!" << std::endl;
-//				std::cout << litTrack->ToString() << litTrack->GetFitNode(muchLast)->GetUpdatedParam()->ToString();
-//				int nofHits = litTrack->GetNofHits();
-//				for (int i = 0; i < nofHits; i++)
-//					std::cout << litTrack->GetHit(i)->ToString();
-//			}
 		}
 		if (isCreateTrdTrack) {
 			globalTrack->SetTrdTrackIndex(trdTrackNo - 1);

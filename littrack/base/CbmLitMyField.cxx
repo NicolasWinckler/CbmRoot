@@ -21,8 +21,8 @@ public:
 CbmLitMyField::CbmLitMyField()
 {
 	CbmLitFieldFitter ff;
-	ff.Fit();
-	ff.GetFieldSlices(fSlices);
+//	ff.Fit();
+//	ff.GetFieldSlices(fSlices);
 	std::sort(fSlices.begin(), fSlices.end(), CompareFieldSliceZLess());
 }
 

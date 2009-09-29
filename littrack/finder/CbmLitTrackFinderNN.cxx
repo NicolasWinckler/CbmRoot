@@ -118,48 +118,64 @@ bool CbmLitTrackFinderNN::ProcessStation(
 		int station)
 {
 	bool hitAdded = false;
-	CbmLitTrackParam par(*track->GetParamLast());
 	int nofSubstations = fLayout.GetNofSubstations(stationGroup, station);
-	HitPtrVector hits;
+	CbmLitTrackParam par[nofSubstations];
+	par[0] = *track->GetParamLast();
+	HitPtrIteratorPair hits[nofSubstations];
 	for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
 		myf z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
-		fPropagator->Propagate(&par, z, fPDG);
-		track->SetParamLast(&par);
-		HitPtrIteratorPair bounds = MinMaxIndex(&par, fHitData.GetHits(stationGroup, station, iSubstation),
+		fPropagator->Propagate(&par[iSubstation], z, fPDG);
+		if (iSubstation < nofSubstations - 1) par[iSubstation + 1] = par[iSubstation];
+//		track->SetParamLast(&par);
+		HitPtrIteratorPair bounds = MinMaxIndex(&par[iSubstation], fHitData.GetHits(stationGroup, station, iSubstation),
 				fLayout.GetStation(stationGroup, station), fHitData.GetMaxErr(stationGroup, station, iSubstation));
-		hits.insert(hits.end(), bounds.first, bounds.second);
-		if (!fIsProcessSubstationsTogether) {
-			if (AddNearestHit(track, hits)) hitAdded = true;
-			hits.clear();
-		}
+//		std::cout << "before: substation=" << iSubstation << " size=" << hits.size() << std::endl;
+//		hits.insert(hits.end(), bounds.first, bounds.second);
+		hits[iSubstation] = bounds;
+//		std::cout << "after: substation=" << iSubstation << " size=" << hits.size() << std::endl;
+//		if (!fIsProcessSubstationsTogether) {
+//			if (AddNearestHit(track, hits)) hitAdded = true;
+//			hits.clear();
+//		}
 	}
-	if (fIsProcessSubstationsTogether && AddNearestHit(track, hits)) hitAdded = true;
+//	if (fIsProcessSubstationsTogether && AddNearestHit(track, hits, par, nofSubstations)) hitAdded = true;
+	if (AddNearestHit(track, hits, par, nofSubstations)) hitAdded = true;
 	return hitAdded;
 }
 
 bool CbmLitTrackFinderNN::AddNearestHit(
 		CbmLitTrack* track,
-		HitPtrVector& hits)
+		HitPtrIteratorPair hits[],
+		const CbmLitTrackParam par[],
+		int nofSubstations)
 {
+	//TODO implement !fProcessSubstations together !!!
+
 	bool hitAdded = false;
-	CbmLitTrackParam par(*track->GetParamLast()), uPar, param;
-	HitPtrIterator hit(hits.end());
+//	CbmLitTrackParam par(*track->GetParamLast()), uPar, param;
+	CbmLitTrackParam uPar, param;
+	HitPtrIterator hit(hits[0].second);
 	myf chiSq = 1e10;
-	for (HitPtrIterator iHit = hits.begin(); iHit != hits.end(); iHit++) {
-		//First update track parameters with KF, than check whether the hit is in the validation gate.
-		fFilter->Update(&par, &uPar, *iHit);
-		if (IsHitInValidationGate(&uPar, *iHit)) {
-			myf chi = ChiSq(&uPar, *iHit);
-			// Check if current hit is closer by statistical distance than the previous ones
-			if (chi < chiSq) {
-				chiSq = chi;
-				hit = iHit;
-				param = uPar;
+	for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
+		for (HitPtrIterator iHit = hits[iSubstation].first; iHit != hits[iSubstation].second; iHit++) {
+			//First update track parameters with KF, than check whether the hit is in the validation gate.
+			fFilter->Update(&par[iSubstation], &uPar, *iHit);
+			if (IsHitInValidationGate(&uPar, *iHit)) {
+				myf chi = ChiSq(&uPar, *iHit);
+				// Check if current hit is closer by statistical distance than the previous ones
+				if (chi < chiSq) {
+					chiSq = chi;
+					hit = iHit;
+					param = uPar;
+				}
 			}
 		}
+//		if (!fIsProcessSubstationsTogether) {
+//
+//		}
 	}
 	// if hit was attached than change track information
-	if (hit != hits.end()) {
+	if (hit != hits[0].second) {
 		track->AddHit(*hit);
 		track->SetParamLast(&param);
 		track->SetChi2(track->GetChi2() + chiSq);

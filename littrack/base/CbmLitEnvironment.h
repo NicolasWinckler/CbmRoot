@@ -11,6 +11,7 @@
 #define CBMLITENVIRONMENT_H_
 
 #include "CbmLitDetectorLayout.h"
+#include "parallel/LitDetectorGeometry.h"
 
 #include <vector>
 #include <string>
@@ -30,6 +31,13 @@ public:
 	CbmLitDetectorLayout GetLayout();
 
 	CbmLitDetectorLayout GetMuchLayout() {return fMuchLayout;}
+
+	void GetMuchLayout(LitDetectorLayout& layout);
+	int MaterialId(
+			int stationGroup,
+			int station,
+			int substation,
+			CbmLitDetectorLayout& layout) const;
 
 	CbmLitDetectorLayout GetTofLayout();
 	CbmLitStation GetTofStation();

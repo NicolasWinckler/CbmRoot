@@ -45,13 +45,13 @@ public:
     		double x,
     		double y,
     		const std::vector<double>& par) const {
-		float x2 = x*x;
-		float y2 = y*y;
-		float xy = x*y;
-		float x3 = x2*x;
-		float y3 = y2*y;
-		float xy2 = x*y2;
-		float x2y = x2*y;
+		double x2 = x*x;
+		double y2 = y*y;
+		double xy = x*y;
+		double x3 = x2*x;
+		double y3 = y2*y;
+		double xy2 = x*y2;
+		double x2y = x2*y;
 
 		return par[0] + par[1]*x + par[2]*y + par[3]*x2 + par[4]*xy + par[5]*y2 + par[6]*x3 + par[7]*x2y + par[8]*xy2 + par[9]*y3;
     }
@@ -63,36 +63,37 @@ private:
 };
 
 
-CbmLitFieldFitter::CbmLitFieldFitter():
-	fNofSlices(12)
+CbmLitFieldFitter::CbmLitFieldFitter()
+//:
+//	fNofSlices(12)
 {
-	fZpos.resize(fNofSlices);
-	fXpos.resize(fNofSlices);
-	fYpos.resize(fNofSlices);
-	fNofBinsX.resize(fNofSlices);
-	fNofBinsY.resize(fNofSlices);
-	fZpos[0] = 0.;
-	fZpos[1] = 20.;
-	fZpos[2] = 40.;
-	fZpos[3] = 70.;
-	fZpos[4] = 100.;
-	fZpos[5] = 130.;
-	fZpos[6] = 170.;
-	fZpos[7] = 210.;
-	fZpos[8] = 250.;
-	fZpos[9] = 300.;
-	fZpos[10] = 370.;
-	fZpos[11] = 450.;
+//	fZpos.resize(fNofSlices);
+//	fXpos.resize(fNofSlices);
+//	fYpos.resize(fNofSlices);
+//	fNofBinsX.resize(fNofSlices);
+//	fNofBinsY.resize(fNofSlices);
+//	fZpos[0] = 0.;
+//	fZpos[1] = 20.;
+//	fZpos[2] = 40.;
+//	fZpos[3] = 70.;
+//	fZpos[4] = 100.;
+//	fZpos[5] = 130.;
+//	fZpos[6] = 170.;
+//	fZpos[7] = 210.;
+//	fZpos[8] = 250.;
+//	fZpos[9] = 300.;
+//	fZpos[10] = 370.;
+//	fZpos[11] = 450.;
 
-	Double_t tan25 = std::tan(25*3.14159265/180);
-	for(Int_t i = 0; i < fNofSlices; i++){
-		fXpos[i] = fZpos[i] * tan25;
-		fYpos[i] = fZpos[i] * tan25;;
-		fNofBinsX[i] = 30;
-		fNofBinsY[i] = 30;
-		std::cout << "z=" << fZpos[i] << " x=" << fXpos[i] << " y=" << fYpos[i]
-		          << " nbinsx=" << fNofBinsX[i] << " nbinsy=" << fNofBinsY[i] << std::endl;
-	}
+//	Double_t tan25 = std::tan(25*3.14159265/180);
+//	for(Int_t i = 0; i < fNofSlices; i++){
+//		fXpos[i] = fZpos[i] * tan25;
+//		fYpos[i] = fZpos[i] * tan25;;
+//		fNofBinsX[i] = 30;
+//		fNofBinsY[i] = 30;
+//		std::cout << "z=" << fZpos[i] << " x=" << fXpos[i] << " y=" << fYpos[i]
+//		          << " nbinsx=" << fNofBinsX[i] << " nbinsy=" << fNofBinsY[i] << std::endl;
+//	}
 
 	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
 	fField = env->GetField();
@@ -103,42 +104,83 @@ CbmLitFieldFitter::~CbmLitFieldFitter()
 
 }
 
-void CbmLitFieldFitter::Fit()
+//void CbmLitFieldFitter::Fit()
+//{
+//	for (int i = 0; i < fNofSlices; i++) { // loop over z positions
+//		double Z = fZpos[i];
+//		double HX = 2 * fXpos[i] / fNofBinsX[i]; // step size for X position
+//		double HY = 2 * fYpos[i] / fNofBinsY[i]; // step size for Y position
+//		std::vector<double> x;
+//		std::vector<double> y;
+//		std::vector<double> Bx;
+//		std::vector<double> By;
+//		std::vector<double> Bz;
+//		std::vector<double> parBx;
+//		std::vector<double> parBy;
+//		std::vector<double> parBz;
+//		for (int j = 0; j < fNofBinsX[i]; j++) { // loop over x position
+//			double X = -fXpos[i] + j * HX;
+//			for (int k = 0; k < fNofBinsY[i]; k++) { // loop over y position
+//				double Y = -fYpos[i] + k * HY;
+//
+//				// get field value
+//				double pos[3] = {X, Y, Z};
+//				double B[3];
+//				fField->GetFieldValue(pos, B);
+//
+//				x.push_back(X);
+//				y.push_back(Y);
+//				Bx.push_back(B[0]);
+//				By.push_back(B[1]);
+//				Bz.push_back(B[2]);
+//			}
+//		}
+//		FitSlice(x, y, Bx, parBx);
+//		FitSlice(x, y, By, parBy);
+//		FitSlice(x, y, Bz, parBz);
+//		fSlices.push_back(CbmLitFieldSlice(&parBx[0], &parBy[0], &parBz[0], Z));
+//	}
+//}
+
+void CbmLitFieldFitter::FitSlice(
+		double Z,
+		std::vector<double>& parBx,
+		std::vector<double>& parBy,
+		std::vector<double>& parBz)
 {
-	for (int i = 0; i < fNofSlices; i++) { // loop over z positions
-		double Z = fZpos[i];
-		double HX = 2 * fXpos[i] / fNofBinsX[i]; // step size for X position
-		double HY = 2 * fYpos[i] / fNofBinsY[i]; // step size for Y position
-		std::vector<double> x;
-		std::vector<double> y;
-		std::vector<double> Bx;
-		std::vector<double> By;
-		std::vector<double> Bz;
-		std::vector<double> parBx;
-		std::vector<double> parBy;
-		std::vector<double> parBz;
-		for (int j = 0; j < fNofBinsX[i]; j++) { // loop over x position
-			double X = -fXpos[i] + j * HX;
-			for (int k = 0; k < fNofBinsY[i]; k++) { // loop over y position
-				double Y = -fYpos[i] + k * HY;
+	double tan25 = std::tan(25*3.14159265/180); // tan of 25 degrees. CBM acceptance
+	double Xmax = Z * tan25;
+	double Ymax = Z * tan25;;
+	int nofBinsX = 30;
+	int nofBinsY = 30;
 
-				// get field value
-				double pos[3] = {X, Y, Z};
-				double B[3];
-				fField->GetFieldValue(pos, B);
+	double HX = 2 * Xmax / nofBinsX; // step size for X position
+	double HY = 2 * Ymax / nofBinsY; // step size for Y position
+	std::vector<double> x;
+	std::vector<double> y;
+	std::vector<double> Bx;
+	std::vector<double> By;
+	std::vector<double> Bz;
+	for (int j = 0; j < nofBinsX; j++) { // loop over x position
+		double X = -Xmax + j * HX;
+		for (int k = 0; k < nofBinsY; k++) { // loop over y position
+			double Y = -Ymax + k * HY;
 
-				x.push_back(X);
-				y.push_back(Y);
-				Bx.push_back(B[0]);
-				By.push_back(B[1]);
-				Bz.push_back(B[2]);
-			}
+			// get field value
+			double pos[3] = {X, Y, Z};
+			double B[3];
+			fField->GetFieldValue(pos, B);
+
+			x.push_back(X);
+			y.push_back(Y);
+			Bx.push_back(B[0]);
+			By.push_back(B[1]);
+			Bz.push_back(B[2]);
 		}
-		FitSlice(x, y, Bx, parBx);
-		FitSlice(x, y, By, parBy);
-		FitSlice(x, y, Bz, parBz);
-		fSlices.push_back(CbmLitFieldSlice(&parBx[0], &parBy[0], &parBz[0], Z));
 	}
+	FitSlice(x, y, Bx, parBx);
+	FitSlice(x, y, By, parBy);
+	FitSlice(x, y, Bz, parBz);
 }
 
 void CbmLitFieldFitter::FitSlice(

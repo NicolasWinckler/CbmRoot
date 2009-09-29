@@ -7,6 +7,8 @@
 #include "CbmLitEnvironment.h"
 #include "CbmLitMemoryManagment.h"
 #include "CbmLitComparators.h"
+#include "CbmLitFieldFitter.h"
+#include "CbmLitSimpleGeometryConstructor.h"
 
 #include "FairField.h"
 #include "FairRunAna.h"
@@ -252,12 +254,12 @@ void CbmLitEnvironment::TrdLayout()
 						if (TString(layerPart->GetName()).Contains("gas")) {
 							const Double_t* pos = layerPart->GetMatrix()->GetTranslation();
 							TGeoPgon* shape = (TGeoPgon*) layerPart->GetVolume()->GetShape();
-							CbmLitStation station;
+							CbmLitStation sta;
 							CbmLitSubstation substation;
 							substation.SetZ(stationPos[2] + layerPos[2] + pos[2] - shape->GetDZ());
-							station.SetType(kLITPIXELHIT);
-							station.AddSubstation(substation);
-							stationSet.insert(station);
+							sta.SetType(kLITPIXELHIT);
+							sta.AddSubstation(substation);
+							stationSet.insert(sta);
 						}
 					}
 				}
@@ -359,6 +361,118 @@ CbmLitStation CbmLitEnvironment::GetTofStation()
 		layoutCreated = true;
 	}
 	return fTofStation;
+}
+
+void CbmLitEnvironment::GetMuchLayout(
+		LitDetectorLayout& layout)
+{
+	std::cout << "Getting layout for parallel version of tracking..." << std::endl;
+	CbmLitFieldFitter fieldFitter;
+	std::cout << "Field fitter initialized" << std::endl;
+	CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
+	std::cout << "Simple geometry constructor initialized" << std::endl;
+	std::vector<CbmLitMaterialInfo> muchMaterial = geoConstructor->GetMyMuchGeoNodes();
+
+	MuchLayout();
+	CbmLitDetectorLayout muchLayout = GetMuchLayout();
+	std::cout << muchLayout.ToString();
+	for (int isg = 0; isg < muchLayout.GetNofStationGroups(); isg++) {
+		CbmLitStationGroup stationGroup = muchLayout.GetStationGroup(isg);
+		LitStationGroup sg;
+
+		// Add absorber
+		// Fit the field at Z front and Z back of the absorber
+		int absorberMatId = MaterialId(isg, 0, 0, muchLayout) - 1;
+		CbmLitMaterialInfo amat = muchMaterial[absorberMatId];
+		double aZ[2] = {amat.GetZpos() - amat.GetLength(), amat.GetZpos()};
+		std::vector<double> aparBx[2], aparBy[2], aparBz[2];
+
+		fieldFitter.FitSlice(aZ[0], aparBx[0], aparBy[0], aparBz[0]);
+		fieldFitter.FitSlice(aZ[1], aparBx[1], aparBy[1], aparBz[1]);
+		sg.absorber.fieldSliceFront.Z = aZ[0];
+		sg.absorber.fieldSliceBack.Z = aZ[1];
+		for (int i = 0; i < 10; i++) {
+			sg.absorber.fieldSliceFront.cx[i] = aparBx[0][i];
+			sg.absorber.fieldSliceFront.cy[i] = aparBy[0][i];
+			sg.absorber.fieldSliceFront.cz[i] = aparBz[0][i];
+			sg.absorber.fieldSliceBack.cx[i] = aparBx[1][i];
+			sg.absorber.fieldSliceBack.cy[i] = aparBy[1][i];
+			sg.absorber.fieldSliceBack.cz[i] = aparBz[1][i];
+		}
+
+		sg.absorber.material.A = amat.GetA();
+		sg.absorber.material.Z = amat.GetZ();
+		sg.absorber.material.I = (amat.GetZ() > 16)? 10 * amat.GetZ() * 1e-9 :
+			16 * std::pow(amat.GetZ(), 0.9) * 1e-9;
+		sg.absorber.material.Rho = amat.GetRho();
+		sg.absorber.material.Thickness = amat.GetLength();
+		sg.absorber.material.X0 = amat.GetRL();
+		sg.absorber.material.Zpos = amat.GetZpos();
+
+		sg.absorber.Z = amat.GetZpos();
+		//end add absorber
+
+
+		for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
+			CbmLitStation station = stationGroup.GetStation(ist);
+			LitStation st;
+			st.type = station.GetType();
+			for(int iss = 0; iss < station.GetNofSubstations(); iss++) {
+				CbmLitSubstation substation = station.GetSubstation(iss);
+				LitSubstation ss;
+				ss.Z = substation.GetZ();
+
+				// Fit the field at Z position of the substation
+				std::vector<double> parBx, parBy, parBz;
+				ss.fieldSlice.Z = substation.GetZ();
+				fieldFitter.FitSlice(substation.GetZ(), parBx, parBy, parBz);
+				for (int i = 0; i < 10; i++) {
+					ss.fieldSlice.cx[i] = parBx[i];
+					ss.fieldSlice.cy[i] = parBy[i];
+					ss.fieldSlice.cz[i] = parBz[i];
+				}
+
+				int matId = MaterialId(isg, ist, iss, muchLayout);
+				CbmLitMaterialInfo mat = muchMaterial[matId];
+				ss.material.A = mat.GetA();
+				ss.material.Z = mat.GetZ();
+				ss.material.I = (mat.GetZ() > 16)? 10 * mat.GetZ() * 1e-9 :
+					16 * std::pow(mat.GetZ(), 0.9) * 1e-9;
+				ss.material.Rho = mat.GetRho();
+				ss.material.Thickness = mat.GetLength();
+				ss.material.X0 = mat.GetRL();
+				ss.material.Zpos = mat.GetZpos();
+
+				st.AddSubstation(ss);
+			} // loop over substations
+			sg.AddStation(st);
+		} // loop over stations
+		layout.AddStationGroup(sg);
+	} // loop over station groups
+}
+
+int CbmLitEnvironment::MaterialId(
+		int stationGroup,
+		int station,
+		int substation,
+		CbmLitDetectorLayout& layout) const
+{
+	int counter = 0;
+	for(int i = 0; i < stationGroup; i++) {
+		for(int j = 0; j < layout.GetNofStations(i); j++) {
+			counter += layout.GetNofSubstations(i, j);
+		}
+		counter++; // count for absorber
+	}
+	counter++;//again count for absorber
+	for(int j = 0; j < station; j++) {
+		counter += layout.GetNofSubstations(stationGroup, j);
+	}
+	counter += substation;
+
+	std::cout << "MaterialId: " << stationGroup << " " << station << " " << substation
+		<< " " << counter << std::endl;
+	return counter;
 }
 
 void CbmLitEnvironment::DetermineLayout(

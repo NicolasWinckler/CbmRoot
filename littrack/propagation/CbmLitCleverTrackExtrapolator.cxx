@@ -69,11 +69,11 @@ LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 		if (result == kLITERROR) {
 			return result;
 		} else {
-			LitStatus result;
-			if (F != NULL) result = fLineExtrapolator->Extrapolate(par, zOut, &F2);
-			else result = fLineExtrapolator->Extrapolate(par, zOut, NULL);
-			if (F != NULL && result == kLITSUCCESS) Mult25(F1, F2, *F);
-			return result;
+			LitStatus result1;
+			if (F != NULL) result1 = fLineExtrapolator->Extrapolate(par, zOut, &F2);
+			else result1 = fLineExtrapolator->Extrapolate(par, zOut, NULL);
+			if (F != NULL && result1 == kLITSUCCESS) Mult25(F1, F2, *F);
+			return result1;
 	    };
 	} else
 	if (zOut < zIn && zIn > zStart && zOut < zStart) {
@@ -84,11 +84,11 @@ LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 		if (result == kLITERROR) {
 			return result;
 		} else {
-			LitStatus result;
-			if (F != NULL) result = fRK4Extrapolator->Extrapolate(par, zOut, &F2);
-			else result = fRK4Extrapolator->Extrapolate(par, zOut, NULL);
-			if (F != NULL && result == kLITSUCCESS) Mult25(F1, F2, *F);
-			return result;
+			LitStatus result1;
+			if (F != NULL) result1 = fRK4Extrapolator->Extrapolate(par, zOut, &F2);
+			else result1 = fRK4Extrapolator->Extrapolate(par, zOut, NULL);
+			if (F != NULL && result1 == kLITSUCCESS) Mult25(F1, F2, *F);
+			return result1;
 		}
 	}
 

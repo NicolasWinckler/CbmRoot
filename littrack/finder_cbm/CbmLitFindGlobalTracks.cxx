@@ -239,7 +239,7 @@ void CbmLitFindGlobalTracks::RunTrackReconstruction()
 	}
 	if (fIsTof){
 		fMergerWatch.Start(kFALSE);
-		fMerger->DoMerge(fLitTofHits, fLitOutputTracks);
+//		fMerger->DoMerge(fLitTofHits, fLitOutputTracks);
 		fMergerWatch.Stop();
 	}
 

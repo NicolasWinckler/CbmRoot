@@ -25,7 +25,19 @@ public:
 	virtual ~CbmLitFieldFitter();
 
 	/* Fits the magnetic field. */
-	void Fit();
+//	void Fit();
+
+	/* Fits the (X, Y) slice of the magnetic field at Z position.
+	 * @param Z Z position of the slice.
+	 * @param parBx Output vector with polynom coefficients for Bx.
+	 * @param parBy Output vector with polynom coefficients for By.
+	 * @param parBz Output vector with polynom coefficients for Bz.
+	 */
+	void FitSlice(
+			double Z,
+			std::vector<double>& parBx,
+			std::vector<double>& parBy,
+			std::vector<double>& parBz);
 
 	/* Fits the (X, Y) slice of the magnetic field.
 	 * @param x Vector with X coordinates.
@@ -40,14 +52,14 @@ public:
 			std::vector<double>& par);
 
 	/* @return Number of field slices. */
-	int GetNofFieldSlices() const {return fNofSlices;}
+//	int GetNofFieldSlices() const {return fNofSlices;}
 
 	/* Copies field slices to output vector
 	 * @param slices Output field slices.
 	 */
-	void GetFieldSlices(std::vector<CbmLitFieldSlice>& slices) const {
-		slices.assign(fSlices.begin(), fSlices.end());
-	}
+//	void GetFieldSlices(std::vector<CbmLitFieldSlice>& slices) const {
+//		slices.assign(fSlices.begin(), fSlices.end());
+//	}
 
 	/* Returns some information used in the fit.
 	 * This is used to check the accuracy of the fit.
@@ -57,29 +69,29 @@ public:
 	 * @param nbinsx Vector with number of bins for X coordinate.
 	 * @param nbinsy Vector with number of bins for Y coordinate.
 	 */
-	void GetInputInfo(
-			std::vector<double>& z,
-			std::vector<double>& x,
-			std::vector<double>& y,
-			std::vector<int>& nbinsx,
-			std::vector<int>& nbinsy) const {
-		z.assign(fZpos.begin(), fZpos.end());
-		x.assign(fXpos.begin(), fXpos.end());
-		y.assign(fYpos.begin(), fYpos.end());
-		nbinsx.assign(fNofBinsX.begin(), fNofBinsX.end());
-		nbinsy.assign(fNofBinsY.begin(), fNofBinsY.end());
-	}
+//	void GetInputInfo(
+//			std::vector<double>& z,
+//			std::vector<double>& x,
+//			std::vector<double>& y,
+//			std::vector<int>& nbinsx,
+//			std::vector<int>& nbinsy) const {
+//		z.assign(fZpos.begin(), fZpos.end());
+//		x.assign(fXpos.begin(), fXpos.end());
+//		y.assign(fYpos.begin(), fYpos.end());
+//		nbinsx.assign(fNofBinsX.begin(), fNofBinsX.end());
+//		nbinsy.assign(fNofBinsY.begin(), fNofBinsY.end());
+//	}
 
 private:
 	FairField* fField; // Magnetic field
-	int fNofSlices; // Number of slices
-    std::vector<double> fZpos; // Z positions of the field slice
-    std::vector<double> fXpos; // X outer radius of the field slice
-    std::vector<double> fYpos; // Y outer radius of the field slice
-    std::vector<int> fNofBinsX; // Number of bins for X
-    std::vector<int> fNofBinsY; // Number of bins for Y
+//	int fNofSlices; // Number of slices
+//    std::vector<double> fZpos; // Z positions of the field slice
+//    std::vector<double> fXpos; // X outer radius of the field slice
+//    std::vector<double> fYpos; // Y outer radius of the field slice
+//    std::vector<int> fNofBinsX; // Number of bins for X
+//    std::vector<int> fNofBinsY; // Number of bins for Y
 
-    std::vector<CbmLitFieldSlice> fSlices; // Vector with field slices
+//    std::vector<CbmLitFieldSlice> fSlices; // Vector with field slices
 };
 
 #endif /* CBMLITFIELDFITTER_H_ */

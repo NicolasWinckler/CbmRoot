@@ -51,8 +51,10 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
 {
 	std::cout << "-I- Simple geometry construction started" << std::endl;
 	fGeo = gGeoManager;
+	fGeo->Print();
 
 	CreateMediumList();
+	std::cout << "Medium list created" << std::endl;
 
 	gGeoManager = 0;
 
@@ -63,7 +65,7 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
 
 	ConstructSts();
 	ConstructMuch();
-	ConstructTof();
+//	ConstructTof();
 
 	fSimpleGeo->CloseGeometry();
 	fSimpleGeo->Print();
@@ -72,10 +74,15 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
 	fSimpleGeo->Write();
 
 	std::sort(fMyGeoNodes.begin(), fMyGeoNodes.end(), CompareMaterialInfoZLess());
+	std::sort(fMyMuchGeoNodes.begin(), fMyMuchGeoNodes.end(), CompareMaterialInfoZLess());
 
 	std::cout << "My Simple Geometry:" << std::endl;
 	for (size_t i = 0; i < fMyGeoNodes.size(); ++i)
 		std::cout << i << " " << fMyGeoNodes[i].ToString();
+
+	std::cout << "My MUCH Simple Geometry:" << std::endl;
+		for (size_t i = 0; i < fMyMuchGeoNodes.size(); ++i)
+			std::cout << i << " " << fMyMuchGeoNodes[i].ToString();
 
 	std::cout << "-I- Simple geometry construction finished" << std::endl;
 }
@@ -107,9 +114,9 @@ void CbmLitSimpleGeometryConstructor::CreateMediumList()
 	fMedium["silicon"] = CreateMedium("silicon");
 	fMedium["MUCHiron"] = CreateMedium("MUCHiron");
 	fMedium["MUCHargon"] = CreateMedium("MUCHargon");
-	fMedium["aluminium"] = CreateMedium("aluminium");
-	fMedium["RPCgas"] = CreateMedium("RPCgas");
-	fMedium["RPCglass"] = CreateMedium("RPCglass");
+//	fMedium["aluminium"] = CreateMedium("aluminium");
+//	fMedium["RPCgas"] = CreateMedium("RPCgas");
+//	fMedium["RPCglass"] = CreateMedium("RPCglass");
 }
 
 void CbmLitSimpleGeometryConstructor::ConstructSts()
@@ -175,6 +182,7 @@ void CbmLitSimpleGeometryConstructor::ConstructMuch()
 			litMaterial.SetZpos(Z + sh->GetDz());
 			GeoMediumToMaterialInfo(medium, litMaterial);
 			fMyGeoNodes.push_back(litMaterial);
+			fMyMuchGeoNodes.push_back(litMaterial);
 		}
 
 		if (TString(muchNode->GetName()).Contains("station")) {
@@ -208,6 +216,7 @@ void CbmLitSimpleGeometryConstructor::ConstructMuch()
 						litMaterial.SetZpos(z);
 						GeoMediumToMaterialInfo(medium, litMaterial);
 						fMyGeoNodes.push_back(litMaterial);
+						fMyMuchGeoNodes.push_back(litMaterial);
 
 						bactive = TString(active->GetName()).Contains("bactive");
 						factive = TString(active->GetName()).Contains("factive");

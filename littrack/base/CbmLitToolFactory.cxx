@@ -28,6 +28,7 @@
 #include "CbmLitField.h"
 #include "CbmLitMapField.h"
 #include "CbmLitMyField.h"
+#include "CbmLitParallelTrackFitterTest.h"
 
 
 CbmLitToolFactory* CbmLitToolFactory::fInstance = NULL;
@@ -164,6 +165,10 @@ TrackFitterPtr CbmLitToolFactory::CreateTrackFitter(
 		//((CbmLitTGeoTrackPropagator*) propagator)->IsCalcTransportMatrix(true);
 		TrackUpdatePtr update = CreateTrackUpdate("kalman");
 		TrackFitterPtr fitter(new CbmLitTrackFitterImp(propagator, update));
+		return fitter;
+	} else
+	if (name == "kalman_parallel") {
+		TrackFitterPtr fitter(new CbmLitParallelTrackFitterTest());
 		return fitter;
 	}
 //	return fitter;
@@ -312,7 +317,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderNN->SetFinalSelection(CreateTrackSelection("much_final"));
 		muchFinderNN->SetFilter(CreateTrackUpdate("kalman"));
 		muchFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-		muchFinderNN->SetVerbose(3);
+		muchFinderNN->SetVerbose(1);
 		muchFinderNN->SetNofIter(1);
 		muchFinderNN->IsUseFastSearch(true);
 		muchFinderNN->SetMaxNofMissingHits(2);
@@ -327,19 +332,19 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 	} else
 	if(name == "mu_nn_parallel") {
 		CbmLitTrackFinderNNParallel* muchFinderNN = new CbmLitTrackFinderNNParallel();
-		muchFinderNN->SetPropagator(CreateTrackPropagator("mylit"));
-		muchFinderNN->SetSeedSelection(CreateTrackSelection("momentum_seed"));
-		muchFinderNN->SetFinalSelection(CreateTrackSelection("much_final"));
-		muchFinderNN->SetFilter(CreateTrackUpdate("kalman"));
-		muchFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-		muchFinderNN->SetVerbose(1);
-		muchFinderNN->SetNofIter(1);
-		muchFinderNN->IsUseFastSearch(true);
-		muchFinderNN->SetMaxNofMissingHits(2);
-		muchFinderNN->SetSigmaCoef(3.5);
-		muchFinderNN->SetChiSqPixelHitCut(13.86);
-		muchFinderNN->SetChiSqStripHitCut(4.);
-		muchFinderNN->SetPDG(13);
+//		muchFinderNN->SetPropagator(CreateTrackPropagator("mylit"));
+//		muchFinderNN->SetSeedSelection(CreateTrackSelection("momentum_seed"));
+//		muchFinderNN->SetFinalSelection(CreateTrackSelection("much_final"));
+//		muchFinderNN->SetFilter(CreateTrackUpdate("kalman"));
+//		muchFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
+//		muchFinderNN->SetVerbose(1);
+//		muchFinderNN->SetNofIter(1);
+//		muchFinderNN->IsUseFastSearch(true);
+//		muchFinderNN->SetMaxNofMissingHits(2);
+//		muchFinderNN->SetSigmaCoef(3.5);
+//		muchFinderNN->SetChiSqPixelHitCut(13.86);
+//		muchFinderNN->SetChiSqStripHitCut(4.);
+//		muchFinderNN->SetPDG(13);
 		muchFinderNN->Initialize();
 		TrackFinderPtr finder(muchFinderNN);
 		return finder;

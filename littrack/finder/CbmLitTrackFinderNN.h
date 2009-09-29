@@ -15,6 +15,7 @@
 
 #include "CbmLitTrackFinderBase.h"
 #include "CbmLitPtrTypes.h"
+#include "CbmLitTypes.h"
 
 class CbmLitTrackFinderNN : public CbmLitTrackFinderBase
 {
@@ -125,7 +126,9 @@ protected:
 	 */
 	bool AddNearestHit(
 			CbmLitTrack* track,
-			HitPtrVector& hits);
+			HitPtrIteratorPair hits[],
+			const CbmLitTrackParam par[],
+			int nofSubstations);
 private:
 	TrackPtrVector fTracks; // local copy of tracks
 

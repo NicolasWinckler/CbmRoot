@@ -15,9 +15,11 @@ Bool_t CheckDetectorPresence(
 		const char* name)
 {
 	TFile* f = new TFile(mcFile);
-	TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
+        f->Get("FairBaseParSet");
+       
+//	TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
 
-	TObjArray* nodes = geoMan->GetTopNode()->GetNodes();
+	TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
 	for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
 		TGeoNode* node = (TGeoNode*) nodes->At(iNode);
 		if (TString(node->GetName()).Contains(name)) return true;

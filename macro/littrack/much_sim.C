@@ -10,7 +10,7 @@ void much_sim(Int_t nEvents = 1000)
 		//if necessary specify input pluto file to embed signal particles
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
 		//directory for output simulation files
-		dir  = "/home/d/andrey/straw_2mu/";
+		dir  = "/home/d/andrey/parallel_10mu/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
@@ -22,7 +22,7 @@ void much_sim(Int_t nEvents = 1000)
 		//If "yes" PLUTO particles will be embedded
 		pluto = "no";
 		//MUCH geometry file name
-		muchGeom = "much_standard_straw.geo";
+		muchGeom = "much_standard.geo";
 		//TRD geometry file name
 		trdGeom = "";//"trd_muon_setup_new.geo";
 	} else {
@@ -44,7 +44,7 @@ void much_sim(Int_t nEvents = 1000)
 	TString targetGeom = "target_au_250mu.geo";
 	TString magnetGeom = "magnet_standard.geo";
 	TString stsGeom    = "sts_standard.geo";
-	TString tofGeom    = "tof_standard.geo";
+	TString tofGeom    = "";//"tof_standard.geo";
 
 	// -----   Magnetic field   -----------------------------------------------
 	TString  fieldMap   = "FieldMuonMagnet";   // name of field map

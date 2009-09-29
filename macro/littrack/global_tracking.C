@@ -33,7 +33,7 @@ void global_tracking(Int_t nEvents = 100)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/home/soft/tbb22_004oss/libtbb.so");
+	gSystem->Load("/home/soft/tbb22_004oss/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -76,8 +76,8 @@ void global_tracking(Int_t nEvents = 100)
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
 	reconstructionQa->SetMinNofPointsTrd(10);
-	reconstructionQa->SetMinNofPointsMuch(12);
-	reconstructionQa->SetMinNofPointsTof(1);
+	reconstructionQa->SetMinNofPointsMuch(11);
+	reconstructionQa->SetMinNofPointsTof(0);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(8);
 	reconstructionQa->SetMinNofHitsMuch(11);
@@ -98,6 +98,7 @@ void global_tracking(Int_t nEvents = 100)
 	run->LoadGeometry();
 	run->Init();
 	run->Run(0, nEvents);
+//	run->Run(98, 100);
 	// ------------------------------------------------------------------------
 
 	// -----   Finish   -------------------------------------------------------

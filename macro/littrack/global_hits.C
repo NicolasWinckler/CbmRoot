@@ -16,7 +16,7 @@ void global_hits(Int_t nEvents = 1000)
 	TString dir, mcFile, parFile, globalHitsFile, muchDigiFile;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/home/d/andrey/straw_2mu/";
+		dir  = "/home/d/andrey/parallel_10mu/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file
@@ -25,9 +25,9 @@ void global_hits(Int_t nEvents = 1000)
 		globalHitsFile = dir + "global.hits.0000.root";
 		// Digi scheme file for MUCH.
 		// MUST be consistent with MUCH geometry used in MC transport.
-//		muchDigiFile = parDir + "/much/much_standard.digi.root";
+		muchDigiFile = parDir + "/much/much_standard.digi.root";
 //		muchDigiFile = parDir + "/much/much_standard_trd.digi.root";
-		muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
+//		muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));

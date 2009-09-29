@@ -55,15 +55,14 @@ void CbmTrdElectronsTrainAnn::Init()
 	Int_t nofBins = 2000;
 	fMaxEval = 1.3;
 	fMinEval = -1.3;
-	fhAnnOutputPi = new TH1D("fhAnnOutputPi","ANN output;ANN output;Entries",nofBins, fMinEval, fMaxEval);
-	fhAnnOutputEl = new TH1D("fhAnnOutputEl","ANN optput;ANN output;Entries",nofBins, fMinEval, fMaxEval);
+	fhAnnOutputPi = new TH1D("fhAnnOutputPi","Output;Output;Entries",nofBins, fMinEval, fMaxEval);
+	fhAnnOutputEl = new TH1D("fhAnnOutputEl","Optput;Output;Entries",nofBins, fMinEval, fMaxEval);
 	fhCumProbPi = new TH1D("fhCumProbPi","Cumulative probability;ANN output;Cumulative probability",nofBins, fMinEval, fMaxEval);
 	fhCumProbEl = new TH1D("fhCumProbEl","Cumulative probability;ANN output;Cumulative probability",nofBins, fMinEval, fMaxEval);
     fhElNofClusters = new TH1D("fhElNofClusters","Number of clusters;number of clusters; entries",13, 0, 13);
     fhPiNofClusters = new TH1D("fhPiNofClusters","Number of clusters;number of clusters; entries",13, 0., 13.);
     fhElElossMediana= new TH1D("fhElElossMediana","Eloss mediana;mediana, GeV; entries",100, 0, 1);
     fhPiElossMediana = new TH1D("fhPiElossMediana","Eloss mediana;mediana, GeV; entries",100, 0., 1);
-
 }
 
 void CbmTrdElectronsTrainAnn::Run()

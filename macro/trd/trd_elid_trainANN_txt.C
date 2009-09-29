@@ -5,6 +5,7 @@
  E-mail : S.Lebedev@gsi.de
  */
 #include <vector>
+//#include "../../trd/CbmTrdElectronsTrainAnn.h"
 
 void coeffCalc(double mom, double* coeff1, double* coeff2) {
 	double momAr[] = { 1., 1.5, 2., 3., 4., 5., 7., 9., 11., 13. };
@@ -41,9 +42,11 @@ void trd_elid_trainANN_txt()
 	  // ------------------------------------------------------------------------
 
 	CbmTrdElectronsTrainAnn* trainer = new CbmTrdElectronsTrainAnn();
-	trainer->SetAnnCut(0.7579);
+	//trainer->SetAnnCut(0.7631);
 	trainer->SetIsDoTrain(true);
 	trainer->SetTransformType(2);
+//kANN = 0, kBDT = 1, kCLUSTERS = 2, kMEDIANA = 3
+	trainer->SetIdMethod(0);
 	trainer->Run();
 
 }

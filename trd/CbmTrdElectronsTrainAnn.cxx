@@ -34,10 +34,11 @@ void CbmTrdElectronsTrainAnn::Init()
 
 	fIsDoTrain = true;
 	fAnnCut = 0.9789;
+	fIdMethod == kBDT;
 	fTransformType = 1;
 	fAnnWeightsFile = "Neural_Net_Weights.txt";
 	fNofInputNeurons = 12;
-	fNofHiddenNeurons = 20;
+	fNofHiddenNeurons = 12;
 	fNofLayers = 12;
 	TFile* f = new TFile("/d/cbm02/slebedev/trd/JUL09/"+geoType+"/piel."+fileNum+".reco.root", "READ");
 	char hName[50];
@@ -51,7 +52,7 @@ void CbmTrdElectronsTrainAnn::Init()
 	//delete f;
 
 //Histogramms for testing
-	Int_t nofBins = 1000;
+	Int_t nofBins = 2000;
 	fMaxEval = 1.3;
 	fMinEval = -1.3;
 	fhAnnOutputPi = new TH1D("fhAnnOutputPi","ANN output;ANN output;Entries",nofBins, fMinEval, fMaxEval);
@@ -67,20 +68,31 @@ void CbmTrdElectronsTrainAnn::Init()
 
 void CbmTrdElectronsTrainAnn::Run()
 {
-	if (fIsDoTrain) DoTrainTmva();
-	DoTestTmva();
+	if (fIdMethod == kBDT){
+		if (fIsDoTrain) DoTrainTmva();
+		DoTest();
+	}else if (fIdMethod == kANN){
+		if (fIsDoTrain) DoTrain();
+		DoTest();
+	}else if (fIdMethod == kCLUSTERS){
+		DoTest();
+	}else if (fIdMethod == kMEDIANA){
+		DoTest();
+	}
 	DrawHistos();
 
 }
 
 void CbmTrdElectronsTrainAnn::Transform()
 {
-	if (fTransformType == 1){
-		Transform1();
-	} else if (fTransformType == 2){
-		Transform2();
-	} else if (fTransformType == 3) {
-		Transform3();
+	if (fIdMethod == kBDT || fIdMethod == kANN){
+		if (fTransformType == 1){
+			Transform1();
+		} else if (fTransformType == 2){
+			Transform2();
+		} else if (fTransformType == 3) {
+			Transform3();
+		}
 	}
 }
 
@@ -100,8 +112,9 @@ void CbmTrdElectronsTrainAnn::Transform1()
 void CbmTrdElectronsTrainAnn::Transform2()
 {
 	sort(fElossVec.begin(), fElossVec.end());
-
-	for (Int_t j = 0; j < fElossVec.size(); j++) {
+	Int_t size = fElossVec.size();
+	//size = 11;
+	for (Int_t j = 0; j < size; j++) {
 		Int_t binNum = fhCumProbSortPi[j]->FindBin(fElossVec[j]);
 		if (binNum > fhCumProbSortPi[j]->GetNbinsX()){
 			binNum = fhCumProbSortPi[j]->GetNbinsX();
@@ -117,49 +130,55 @@ void CbmTrdElectronsTrainAnn::Transform3()
 {
 	sort(fElossVec.begin(), fElossVec.end());
 
-	for (Int_t j = 0; j < fElossVec.size(); j++) {
-		Int_t binNum = fhCumProbSortPi[j]->FindBin(fElossVec[j]);
-		if (binNum > fhCumProbSortPi[j]->GetNbinsX()){
-			binNum = fhCumProbSortPi[j]->GetNbinsX();
-		}
-		fInVector[j] = fhCumProbSortPi[j]->GetBinContent(binNum);
-	}
-
-	for (Int_t j = 0; j < 1; j++) {
+//	for (Int_t j = 0; j < fElossVec.size(); j++) {
+//		Int_t binNum = fhCumProbSortPi[j]->FindBin(fElossVec[j]);
+//		if (binNum > fhCumProbSortPi[j]->GetNbinsX()){
+//			binNum = fhCumProbSortPi[j]->GetNbinsX();
+//		}
+//		fInVector[j] = fhCumProbSortPi[j]->GetBinContent(binNum);
+//	}
+	Int_t size = fElossVec.size();
+	for (Int_t j = 0; j < size; j++) {
 		Int_t binNum = fhCumProbSortEl[j]->FindBin(fElossVec[j]);
 		if (binNum > fhCumProbSortEl[j]->GetNbinsX())
 			binNum = fhCumProbSortEl[j]->GetNbinsX();
-		fInVector[j+12] = fhCumProbSortEl[j]->GetBinContent(binNum);
+		fInVector[j] = fhCumProbSortEl[j]->GetBinContent(binNum);
 	}
 
 	//fInVector[fNofInputNeurons-2] = (fElossVec[5] + fElossVec[6])/2.;//GetNofClusters();
 	//fInVector[fNofInputNeurons-1] = GetNofClusters();
 }
 
-
-//void CbmTrdElectronsTrainAnn::Transform3()
-//{
-//	sort(fElossVec.begin(), fElossVec.end());
-//
-//	for (Int_t i = 0; i < fElossVec.size(); i++) {
-//		if (i != 11){
-//			fInVector[i] = fElossVec[i+1] - fElossVec[i];
-//		}else {
-//			fInVector[i] = fElossVec[i] - fElossVec[0];
-//		}
-//	}
-//	fInVector[fNofInputNeurons-1] = GetNofClusters();
-//}
-
 Int_t CbmTrdElectronsTrainAnn::GetNofClusters()
 {
 	Int_t nofClusters = 0;
 	for (Int_t iHit = 0; iHit < fElossVec.size(); iHit++) {
-		if ( fElossVec[iHit] > 5e-6){
+		if ( fElossVec[iHit] > 7.e-6){
 			nofClusters++;
 		}
 	} //iHit
 	return nofClusters;
+}
+
+Double_t CbmTrdElectronsTrainAnn::Eval(Bool_t isEl)
+{
+
+	if (fIdMethod == kBDT){
+		return fReader->EvaluateMVA("BDT");
+	}else if (fIdMethod == kANN){
+		Double_t par[12];
+		for (UInt_t i = 0; i <fInVector.size(); i++) par[i] = fInVector[i];
+		return fNN->Evaluate(0, par);
+	}else if (fIdMethod == kCLUSTERS){
+		Double_t eval = GetNofClusters();
+		if (eval > 4.5) return 1.;
+		return -1.;
+	}else if (fIdMethod == kMEDIANA){
+		sort(fElossVec.begin(), fElossVec.end());
+		Double_t eval = (fElossVec[5] + fElossVec[6])/2.;
+		if (eval > 4.56e-6) return 1.;
+		return -1.;
+	}
 }
 
 void CbmTrdElectronsTrainAnn::DoTrain()
@@ -193,7 +212,7 @@ void CbmTrdElectronsTrainAnn::DoTrain()
 		nofPi++;
 		if (nofPi >= maxNofPi) break;
 	}
-
+	finPi.close();
 	while (!finEl.eof()) {
 		for (Int_t iStation = 0; iStation < 12; iStation++) {
 			finEl >> dEdX >> tr >> inVectorTemp[iStation];
@@ -209,143 +228,14 @@ void CbmTrdElectronsTrainAnn::DoTrain()
 		nofEl++;
 		if (nofEl >= maxNofEl) break;
 	}
-
+	finEl.close();
 	if (!fNN) delete fNN;
 	TString mlpString = CreateAnnString();
 	cout << "-I- create ANN: "<< mlpString << endl;
 
 	fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
-	fNN->Train(250, "+text,update=10");
+	fNN->Train(1000, "text,update=10");
 	fNN->DumpWeights((const char*)fAnnWeightsFile);
-}
-
-Double_t CbmTrdElectronsTrainAnn::Eval(Bool_t isEl)
-{
-	//	//sort(fElossVec.begin(), fElossVec.end());
-	//	//Double_t eval = (fElossVec[5] + fElossVec[6])/2.;
-	//	Double_t eval = GetNofClusters();
-	//	if(isEl){
-	//	    fhElNofClusters->Fill(GetNofClusters());
-	//	    fhElElossMediana->Fill(eval);
-	//	}else {
-	//	    fhPiNofClusters->Fill(GetNofClusters());
-	//	    fhPiElossMediana->Fill(eval);
-	//	}
-
-//	sort(fElossVec.begin(), fElossVec.end());
-//
-//	for (Int_t j = 0; j < fElossVec.size(); j++) {
-//		Int_t binNum = fhCumProbSortEl[j]->FindBin(fElossVec[j]);
-//		if (binNum > fhCumProbSortEl[j]->GetNbinsX()){
-//			binNum = fhCumProbSortEl[j]->GetNbinsX();
-//		}
-//		fInVector[j] = fhCumProbSortEl[j]->GetBinContent(binNum);
-//	}
-//	if(isEl){
-//	    fhElNofClusters->Fill(GetNofClusters());
-//	    fhElElossMediana->Fill(fInVector[3]);
-//	}else {
-//	    fhPiNofClusters->Fill(GetNofClusters());
-//	    fhPiElossMediana->Fill(fInVector[3]);
-//	}
-//
-//	if (fInVector[8] > 0.8  || fInVector[0] > 0.85  ||fInVector[1] > 0.7  ||
-//			fInVector[2] > 0.6  ||fInVector[3] > 0.6  ||
-//			fInVector[4] > 0.4  || fInVector[5] > 0.33 ||
-//			fInVector[6] > 0.4 || fInVector[7] > 0.35)
-//		return 1.;
-//	return -1.;
-//
-//	if (eval > 4){
-//		return 1;
-//	} else {
-//		return -1;
-//	}
-
-
-
-	return fReader->EvaluateMVA("BDT");
-//	Double_t par[12];
-//	for (Int_t i = 0; i <12; i++) par[i] = fInVector[i];
-//	return fNN->Evaluate(0, par);
-}
-
-void CbmTrdElectronsTrainAnn::DoTest()
-{
-	if (fNN != NULL) delete fNN;
-	fElossVec.clear();
-	fElossVec.resize(fNofLayers);
-
-	TTree* simu = CreateTree();
-	TString mlpString = CreateAnnString();
-	fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
-	fNN->LoadWeights((const char*)fAnnWeightsFile);
-
-	Double_t dEdX, tr, mom;
-	std::vector<Double_t> inVectorTemp;
-	inVectorTemp.resize(12);
-	//input data for testing
-	std::ifstream finPiTest((const char*) fFileNameTestPi);
-	std::ifstream finElTest((const char*) fFileNameTestEl);
-
-	Int_t nofPiLikeEl = 0;
-	Int_t nofElLikePi = 0;
-	Int_t nofElTest = 0;
-	Int_t nofPiTest = 0;
-
-	while (!finElTest.eof()) {
-		for (Int_t iStation = 0; iStation < 12; iStation++) {
-			finElTest >> dEdX >> tr >> inVectorTemp[iStation];
-		}
-		finElTest >> mom;
-		for (int i = 0; i < fNofLayers; i++)
-			fElossVec[i] = inVectorTemp[i];
-
-		Transform();
-		Double_t nnEval = Eval(true);
-		if (nnEval > fMaxEval)nnEval = fMaxEval - 0.01;
-		if (nnEval < fMinEval)nnEval = fMinEval + 0.01;
-		fhAnnOutputEl->Fill(nnEval);
-		nofElTest++;
-		if (nnEval < fAnnCut)nofElLikePi++;
-	}
-
-	while (!finPiTest.eof()) {
-		for (Int_t iStation = 0; iStation < 12; iStation++) {
-			finPiTest >> dEdX >> tr >> inVectorTemp[iStation];
-		}
-		for (int i = 0; i < fNofLayers; i++)
-			fElossVec[i] = inVectorTemp[i];
-		finPiTest >> mom;
-
-		Transform();
-		Double_t nnEval = Eval(false);
-		if (nnEval > fMaxEval)nnEval = fMaxEval - 0.01;
-		if (nnEval < fMinEval)nnEval = fMinEval + 0.01;
-		fhAnnOutputPi->Fill(nnEval);
-		nofPiTest++;
-		if (nnEval > fAnnCut)nofPiLikeEl++;
-	}
-	cout << "Testing results:" <<endl;
-	cout <<"nof El = " <<nofElTest<<endl;
-	cout <<"nof Pi = " <<nofPiTest<<endl;
-	cout <<"nof Pi identified as El = " <<nofPiLikeEl<<endl;
-	cout <<"nof El identified as Pi = " <<nofElLikePi<<endl;
-	cout << "pion supression = "<< nofPiTest<< "/"<< nofPiLikeEl<< " = ";
-	if (nofPiLikeEl != 0){
-		cout<< (Double_t) nofPiTest / nofPiLikeEl << endl;
-	}else {
-		cout<< " no misidentified pi" << endl;
-	}
-	cout << "electron efficiency loss in % = " << nofElLikePi << "/"
-			<< nofElTest << " = " << (Double_t) nofElLikePi/nofElTest *100. << endl;
-
-	CreateCumProbHistos();
-
-	Double_t optimalCut = FindOptimalCut();
-	cout << " optimal cut = " << optimalCut
-			<< "    90% electron efficiency loss" << endl;
-
 }
 
 void CbmTrdElectronsTrainAnn::DoTrainTmva()
@@ -377,7 +267,7 @@ void CbmTrdElectronsTrainAnn::DoTrainTmva()
 		nofPi++;
 		if (nofPi >= maxNofPi) break;
 	}
-
+	finPi.close();
 	while (!finEl.eof()) {
 		for (Int_t iStation = 0; iStation < 12; iStation++) {
 			finEl >> dEdX >> tr >> inVectorTemp[iStation];
@@ -391,7 +281,7 @@ void CbmTrdElectronsTrainAnn::DoTrainTmva()
 		nofEl++;
 		if (nofEl >= maxNofEl) break;
 	}
-
+	finEl.close();
 
 	TMVA::Factory* factory = CreateFactory(simu);
 
@@ -415,16 +305,98 @@ void CbmTrdElectronsTrainAnn::DoTrainTmva()
 	//outputFile->Close();
 }
 
-void CbmTrdElectronsTrainAnn::DoTestTmva()
+void CbmTrdElectronsTrainAnn::DoPreTest()
 {
+	cout << "-I- Start pretesting " << endl;
+	if (fIdMethod == kBDT){
+		cout << "-I- IdMethod = kBDT " << endl;
+	}else if (fIdMethod == kANN){
+		cout << "-I- IdMethod = kANN " << endl;
+	}else if (fIdMethod == kCLUSTERS){
+		cout << "-I- IdMethod = kCLUSTERS " << endl;
+	}else if (fIdMethod == kMEDIANA){
+		cout << "-I- IdMethod = kMEDIANA " << endl;
+	}
+
+	fElossVec.clear();
+	fElossVec.resize(fNofLayers);
+
+	if (fIdMethod == kBDT){
+		fReader = CreateTmvaReader();
+		//reader->BookMVA("TMlpANN", "weights/TMVAnalysis_TMlpANN.weights.txt");
+		fReader->BookMVA("BDT", "weights/TMVAnalysis_BDT.weights.txt");
+	} else if (fIdMethod == kANN){
+		if (fNN != NULL) delete fNN;
+		TTree* simu = CreateTree();
+		TString mlpString = CreateAnnString();
+		fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
+		fNN->LoadWeights((const char*)fAnnWeightsFile);
+	}
+
+	Double_t dEdX, tr, mom;
+	std::vector<Double_t> inVectorTemp;
+	inVectorTemp.resize(12);
+	//input data for testing
+	std::ifstream finPiTest((const char*) fFileNameTestPi);
+	std::ifstream finElTest((const char*) fFileNameTestEl);
+
+	while (!finElTest.eof()) {
+		for (Int_t iStation = 0; iStation < 12; iStation++) {
+			finElTest >> dEdX >> tr >> inVectorTemp[iStation];
+		}
+		finElTest >> mom;
+		for (int i = 0; i < fNofLayers; i++)
+			fElossVec[i] = inVectorTemp[i];
+
+		Transform();
+		Double_t nnEval = Eval(true);
+		if (nnEval > fMaxEval)nnEval = fMaxEval - 0.01;
+		if (nnEval < fMinEval)nnEval = fMinEval + 0.01;
+		fhAnnOutputEl->Fill(nnEval);
+	}
+	finElTest.close();
+
+	while (!finPiTest.eof()) {
+		for (Int_t iStation = 0; iStation < 12; iStation++) {
+			finPiTest >> dEdX >> tr >> inVectorTemp[iStation];
+		}
+		for (int i = 0; i < fNofLayers; i++)
+			fElossVec[i] = inVectorTemp[i];
+		finPiTest >> mom;
+
+		Transform();
+		Double_t nnEval = Eval(false);
+		if (nnEval > fMaxEval)nnEval = fMaxEval - 0.01;
+		if (nnEval < fMinEval)nnEval = fMinEval + 0.01;
+		fhAnnOutputPi->Fill(nnEval);
+	}
+	finPiTest.close();
+	CreateCumProbHistos();
+}
+
+
+void CbmTrdElectronsTrainAnn::DoTest()
+{
+	DoPreTest();
+	fAnnCut = FindOptimalCut();
+	cout << " optimal cut = " << fAnnCut
+			<< " for 90% electron efficiency" << endl;
+
 	cout << "-I- Start testing " << endl;
 	fElossVec.clear();
 	fElossVec.resize(fNofLayers);
 
-	fReader = CreateTmvaReader();
-
-	//reader->BookMVA("TMlpANN", "weights/TMVAnalysis_TMlpANN.weights.txt");
-	fReader->BookMVA("BDT", "weights/TMVAnalysis_BDT.weights.txt");
+	if (fIdMethod == kBDT){
+		fReader = CreateTmvaReader();
+		//reader->BookMVA("TMlpANN", "weights/TMVAnalysis_TMlpANN.weights.txt");
+		fReader->BookMVA("BDT", "weights/TMVAnalysis_BDT.weights.txt");
+	} else if (fIdMethod == kANN){
+		if (fNN != NULL) delete fNN;
+		TTree* simu = CreateTree();
+		TString mlpString = CreateAnnString();
+		fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
+		fNN->LoadWeights((const char*)fAnnWeightsFile);
+	}
 
 	Double_t dEdX, tr, mom;
 	std::vector<Double_t> inVectorTemp;
@@ -451,10 +423,11 @@ void CbmTrdElectronsTrainAnn::DoTestTmva()
 		Double_t nnEval = Eval(true);
 		if (nnEval > fMaxEval)nnEval = fMaxEval - 0.01;
 		if (nnEval < fMinEval)nnEval = fMinEval + 0.01;
-		fhAnnOutputEl->Fill(nnEval);
+		//fhAnnOutputEl->Fill(nnEval);
 		nofElTest++;
 		if (nnEval < fAnnCut)nofElLikePi++;
 	}
+	finElTest.close();
 
 	while (!finPiTest.eof()) {
 		for (Int_t iStation = 0; iStation < 12; iStation++) {
@@ -468,17 +441,19 @@ void CbmTrdElectronsTrainAnn::DoTestTmva()
 		Double_t nnEval = Eval(false);
 		if (nnEval > fMaxEval)nnEval = fMaxEval - 0.01;
 		if (nnEval < fMinEval)nnEval = fMinEval + 0.01;
-		fhAnnOutputPi->Fill(nnEval);
+		//fhAnnOutputPi->Fill(nnEval);
 		nofPiTest++;
 		if (nnEval > fAnnCut)nofPiLikeEl++;
 	}
+	finPiTest.close();
 
-	cout << "Testing results:" <<endl;
+	cout << "Testing results:" << endl;
+	cout << "cut = " << fAnnCut << endl;
 	cout <<"nof El = " <<nofElTest<<endl;
 	cout <<"nof Pi = " <<nofPiTest<<endl;
 	cout <<"nof Pi identified as El = " <<nofPiLikeEl<<endl;
 	cout <<"nof El identified as Pi = " <<nofElLikePi<<endl;
-	cout << "pion supression = "<< nofPiTest<< "/"<< nofPiLikeEl<< " = ";
+	cout << "pion suppression = "<< nofPiTest<< "/"<< nofPiLikeEl<< " = ";
 	if (nofPiLikeEl != 0){
 		cout<< (Double_t) nofPiTest / nofPiLikeEl << endl;
 	}else {
@@ -487,15 +462,7 @@ void CbmTrdElectronsTrainAnn::DoTestTmva()
 	cout << "electron efficiency loss in % = " << nofElLikePi << "/"
 			<< nofElTest << " = " << (Double_t) nofElLikePi/nofElTest *100. << endl;
 
-	CreateCumProbHistos();
-
-	Double_t optimalCut = FindOptimalCut();
-	cout << " optimal cut = " << optimalCut
-			<< "    90% electron efficiency loss" << endl;
-
 }
-
-
 
 void CbmTrdElectronsTrainAnn::CreateCumProbHistos()
 {
@@ -595,7 +562,7 @@ TMVA::Reader* CbmTrdElectronsTrainAnn::CreateTmvaReader()
 	char txt1[100];
 	for (Int_t i = 0; i < fNofInputNeurons; i++){
 		sprintf(txt1, "x%d",i);
-		cout << txt1 << endl;
+		//cout << txt1 << endl;
 		reader->AddVariable(txt1, &fInVector[i]);
 	}
 	return reader;

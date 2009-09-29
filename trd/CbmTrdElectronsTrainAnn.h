@@ -20,6 +20,9 @@
 
 using std::vector;
 
+enum IdMethod {kANN = 0, kBDT = 1, kCLUSTERS = 2, kMEDIANA = 3};
+
+
 class CbmTrdElectronsTrainAnn
 {
 public:
@@ -32,9 +35,9 @@ public:
 	void RunMany();
 
 	void DoTrain();
-	void DoTest();
 	void DoTrainTmva();
-	void DoTestTmva();
+	void DoTest();
+	void DoPreTest();
 	TTree* CreateTree();
 	TString CreateAnnString();
 	TMVA::Factory* CreateFactory(TTree* simu);
@@ -53,6 +56,7 @@ public:
 	void SetAnnCut(Double_t annCut){fAnnCut = annCut;}
 	void SetIsDoTrain(Bool_t doTrain){fIsDoTrain = doTrain;}
 	void SetTransformType(Int_t type){fTransformType = type;}
+	void SetIdMethod(IdMethod idMethod){fIdMethod = idMethod;}
 
 private:
 	TString fFileNameEl;
@@ -77,7 +81,7 @@ private:
 	TString fAnnWeightsFile;
 	TMultiLayerPerceptron* fNN;
 	TMVA::Reader* fReader;
-
+	IdMethod fIdMethod;
 
 // Histogramms for testing
 	TH1D* fhAnnOutputPi;

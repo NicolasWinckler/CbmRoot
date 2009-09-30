@@ -49,12 +49,16 @@ void global_tracking(Int_t nEvents = 100)
 	run->SetOutputFile(globalTracksFile);
 	// ------------------------------------------------------------------------
 
+//	FairGeane* Geane = new FairGeane(parFile.Data());
+	FairGeane *Geane = new FairGeane();
+	run->AddTask(Geane);
+
 	CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
 	// Tracking method to be used
 	// "branch" - branching tracking
 	// "nn" - nearest neighbor tracking
 	// "weight" - weighting tracking
-	finder->SetTrackingType("nn_parallel");
+	finder->SetTrackingType("branch");
 
 	// Hit-to-track merger method to be used
 	// "nearest_hit" - assigns nearest hit to the track
@@ -62,12 +66,12 @@ void global_tracking(Int_t nEvents = 100)
 
 	run->AddTask(finder);
 
-	if (IsTrd(mcFile)) {
+	if (IsTrd(parFile)) {
 		CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
 		run->AddTask(trdMatchTracks);
 	}
 
-	if (IsMuch(mcFile)) {
+	if (IsMuch(parFile)) {
 		CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
 		run->AddTask(muchMatchTracks);
 	}
@@ -97,8 +101,8 @@ void global_tracking(Int_t nEvents = 100)
 	// -----   Initialize and run   --------------------------------------------
 	run->LoadGeometry();
 	run->Init();
+	Geane->SetField(run->GetField());
 	run->Run(0, nEvents);
-//	run->Run(98, 100);
 	// ------------------------------------------------------------------------
 
 	// -----   Finish   -------------------------------------------------------

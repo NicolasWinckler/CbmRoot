@@ -16,7 +16,7 @@ void global_hits(Int_t nEvents = 1000)
 	TString dir, mcFile, parFile, globalHitsFile, muchDigiFile;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/home/d/andrey/parallel_10mu/";
+		dir  = "/home/d/andrey/std_10mu/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file
@@ -50,6 +50,8 @@ void global_hits(Int_t nEvents = 1000)
 	run->SetOutputFile(globalHitsFile);
 
 	TString stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
+//	TString stsDigiFile = parDir+ "/sts/sts_same_z.digi.par";
+//	TString stsDigiFile = parDir+ "/sts/sts_9st_sameZ.digi.par";
 
 	// ----- STS reconstruction   ---------------------------------------------
 	FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
@@ -78,7 +80,7 @@ void global_hits(Int_t nEvents = 1000)
 	run->AddTask(fitTracks);
 	// ------------------------------------------------------------------------
 
-	if (IsMuch(mcFile)) {
+	if (IsMuch(parFile)) {
 	// ----- MUCH hits----------   --------------------------------------------
 		CbmMuchDigitizeSimpleGem* muchDigitize = new CbmMuchDigitizeSimpleGem("MuchDigitize", muchDigiFile.Data(), iVerbose);
 		run->AddTask(muchDigitize);
@@ -92,7 +94,7 @@ void global_hits(Int_t nEvents = 1000)
 	// ------------------------------------------------------------------------
 	}
 
-	if (IsTrd(mcFile)){
+	if (IsTrd(parFile)){
 	// ----- TRD hits ---------------------------------------------------------
 		// Update of the values for the radiator F.U. 17.08.07
 		Int_t trdNFoils    = 130;      // number of polyetylene foils
@@ -118,7 +120,7 @@ void global_hits(Int_t nEvents = 1000)
 	// ------------------------------------------------------------------------
 	}
 
-	if (IsTof(mcFile)) {
+	if (IsTof(parFile)) {
 	// ------ TOF hits --------------------------------------------------------
 		CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
 		run->AddTask(tofHitProd);

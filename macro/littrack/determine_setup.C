@@ -6,15 +6,15 @@
  **/
 
 /* Determines detector presence in the TGeo by its name.
- * @param mcFile Name of the MC file with TGeo.
+ * @param parFile Name of the parameter file with TGeo.
  * @param name Detector name.
  * @return True if detector presents in the TGeo.
  */
 Bool_t CheckDetectorPresence(
-		const TString& mcFile,
+		const TString& parFile,
 		const char* name)
 {
-	TFile* f = new TFile(mcFile);
+	TFile* f = new TFile(parFile);
         f->Get("FairBaseParSet");
        
 //	TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
@@ -28,31 +28,31 @@ Bool_t CheckDetectorPresence(
 }
 
 /* Determines TRD detector presence in the TGeo.
- * @param mcFile Name of the MC file with TGeo.
+ * @param parFile Name of the parameter file with TGeo.
  * @return True if TRD presents in the TGeo.
  */
 Bool_t IsTrd(
-		const TString& mcFile)
+		const TString& parFile)
 {
-	return CheckDetectorPresence(mcFile, "trd");
+	return CheckDetectorPresence(parFile, "trd");
 }
 
 /* Determines MUCH detector presence in the TGeo.
- * @param mcFile Name of the MC file with TGeo.
+ * @param parFile Name of the parameter file with TGeo.
  * @return True if MUCH presents in the TGeo.
  */
 Bool_t IsMuch(
-		const TString& mcFile)
+		const TString& parFile)
 {
-	return CheckDetectorPresence(mcFile, "much");
+	return CheckDetectorPresence(parFile, "much");
 }
 
 /* Determines TOFdetector presence in the TGeo.
- * @param mcFile Name of the MC file with TGeo.
+ * @param parFile Name of the parameter file with TGeo.
  * @return True if TOF presents in the TGeo.
  */
 Bool_t IsTof(
-		const TString& mcFile)
+		const TString& parFile)
 {
-	return CheckDetectorPresence(mcFile, "tof");
+	return CheckDetectorPresence(parFile, "tof");
 }

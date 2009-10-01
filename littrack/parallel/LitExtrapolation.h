@@ -81,6 +81,7 @@ inline void LitRK4Extrapolation(
    field.GetFieldValue(zIn + coef[3] * h, B[3]);
 
    // Calculation for zero step
+   {
    fvec Bx = B[0].Bx;
    fvec By = B[0].By;
    fvec Bz = B[0].Bz;
@@ -106,6 +107,7 @@ inline void LitRK4Extrapolation(
    k[1][0] = ty * h;
    k[2][0] = Ax[0] * hCqp;
    k[3][0] = Ay[0] * hCqp;
+   }
    // end calculation for zero step
 
    // Calculate for steps starting from 1

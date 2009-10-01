@@ -36,7 +36,7 @@ ${CBMROOT_SOURCE_DIR}/much
 ${CBMROOT_SOURCE_DIR}/much/geo
 ${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/sts
-#/home/soft/tbb22_004oss/include
+/home/soft/tbb22_004oss/include
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -81,7 +81,7 @@ fitter/CbmLitKalmanFilter.cxx
 fitter/CbmLitTrackFitterRobust.cxx
 fitter/CbmLitKalmanSmoother.cxx
 fitter/CbmLitTrackFitterIter.cxx
-parallel/LitTrackFinderNNParallel.cxx
+#parallel/LitTrackFinderNNParallel.cxx
 propagation/CbmLitTGeoTrackPropagator.cxx 
 propagation/CbmLitRK4TrackExtrapolator.cxx
 propagation/CbmLitLineTrackExtrapolator.cxx

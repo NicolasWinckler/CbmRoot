@@ -153,8 +153,9 @@ myf CbmLitMaterialEffectsImp::EnergyLoss(
         const CbmLitMaterialInfo* mat) const
 {
 	myf length = mat->GetRho() * mat->GetLength();
-	if (!fIsElectron) return dEdx(par, mat) * length;
-	else return BetheBlochSimple(mat) * length;
+	return dEdx(par, mat) * length;
+//	if (!fIsElectron) return dEdx(par, mat) * length;
+//	else return BetheBlochSimple(mat) * length;
 	//return MPVEnergyLoss(par, mat);
 }
 

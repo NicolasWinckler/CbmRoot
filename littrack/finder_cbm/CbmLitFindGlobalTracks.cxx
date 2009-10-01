@@ -83,6 +83,7 @@ void CbmLitFindGlobalTracks::SetParContainers()
     FairRunAna* ana = FairRunAna::Instance();
     FairRuntimeDb* rtdb = ana->GetRuntimeDb();
 
+    rtdb->getContainer("FairBaseParSet");
     rtdb->getContainer("CbmGeoMuchPar");
 }
 

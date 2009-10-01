@@ -13,9 +13,9 @@
 
 #include "CbmLitMemoryManagment.h"
 
-//#include "tbb/task_scheduler_init.h"
-//#include "tbb/parallel_for.h"
-//#include "tbb/blocked_range.h"
+#include "tbb/task_scheduler_init.h"
+#include "tbb/parallel_for.h"
+#include "tbb/blocked_range.h"
 
 #include <algorithm>
 #include <iostream>
@@ -36,29 +36,72 @@ public:
 };
 
 
-//class Follow
-//{
-//	TrackPtrVector& fTracks;
-//	CbmLitTrackFinderNNParallel* fFinder;
-//public:
-//	void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
-//		for (unsigned int i = r.begin(); i != r.end(); ++i) {
-//			CbmLitTrack* track = fTracks[i];
-//			fFinder->FollowTrack(track);
-//		}
-//	}
-//	Follow(CbmLitTrackFinderNNParallel* finder, TrackPtrVector& tracks) :
-//		fFinder(finder),
-//		fTracks(tracks){}
-//};
+class PropagateThroughAbsorberClass
+{
+	TrackVector& fTracks;
+	LitTrackFinderNNParallel* fFinder;
+	LitAbsorber& fAbsorber;
+	std::vector<unsigned int>& fTracksId;
+public:
+	void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
+		for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
+			unsigned int start = fvecLen * iTrack;
+			// Collect track group
+			LitTrack* tracks[fvecLen];
+			for(unsigned int i = 0; i < fvecLen; i++) tracks[i] = fTracks[fTracksId[start + i]];
+			fFinder->PropagateThroughAbsorber(tracks, fAbsorber);
+		}
+	}
+	PropagateThroughAbsorberClass(
+			LitTrackFinderNNParallel* finder,
+			TrackVector& tracks,
+			std::vector<unsigned int>& tracksId,
+			LitAbsorber& absorber) :
+		fFinder(finder),
+		fTracks(tracks),
+		fTracksId(tracksId),
+		fAbsorber(absorber) {}
+};
+
+
+
+class ProcessStationClass
+{
+	TrackVector& fTracks;
+	LitTrackFinderNNParallel* fFinder;
+	std::vector<unsigned int>& fTracksId;
+	unsigned char fStationGroup;
+	unsigned char fStation;
+public:
+	void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
+		for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
+			unsigned int start = fvecLen * iTrack;
+			// Collect track group
+			LitTrack* tracks[fvecLen];
+			for(unsigned int i = 0; i < fvecLen; i++) tracks[i] = fTracks[fTracksId[start + i]];
+			fFinder->ProcessStation(tracks, fStationGroup, fStation);
+		}
+	}
+	ProcessStationClass(
+			LitTrackFinderNNParallel* finder,
+			TrackVector& tracks,
+			std::vector<unsigned int>& tracksId,
+			unsigned char stationGroup,
+			unsigned char station) :
+		fFinder(finder),
+		fTracks(tracks),
+		fTracksId(tracksId),
+		fStationGroup(stationGroup),
+		fStation(station){}
+};
+
 
 LitTrackFinderNNParallel::LitTrackFinderNNParallel():
 	fMaxNofMissingHits(2),
-	fIsProcessSubstationsTogether(true),
 	fSigmaCoef(3.5),
 	fMaxCovSq(20.*20.)
 {
-//	tbb::task_scheduler_init init;
+	tbb::task_scheduler_init init;
 }
 
 LitTrackFinderNNParallel::~LitTrackFinderNNParallel()
@@ -70,11 +113,6 @@ void LitTrackFinderNNParallel::DoFind(
 		TrackVector& trackSeeds,
 		TrackVector& tracks)
 {
-//	fTracks.clear();
-//	fUsedSeedsSet.clear();
-//	fUsedHitsSet.clear();
-//	fHitData.SetDetectorLayout(fLayout);
-
 //	std::cout << fLayout;
 
 //	for (int iIter = 0; iIter < fNofIter; iIter++) {
@@ -99,14 +137,13 @@ void LitTrackFinderNNParallel::DoFind(
 		fTracks.clear();
 		fHitData.Clear();
 //	}
-//	std::cout << "-I- LitTrackFinderNNParallel: " << fEventNo++ << " events processed" << std::endl;
-//
-//	return kLITSUCCESS;
+
 }
 
 void LitTrackFinderNNParallel::ArrangeHits(
 		ScalPixelHitVector& hits)
 {
+	// TODO : add threads here
     for(ScalPixelHitIterator it = hits.begin(); it != hits.end(); it++) {
     	LitScalPixelHit* hit = *it;
 //    	if (fUsedHitsSet.find(hit->GetRefId()) != fUsedHitsSet.end()) continue;
@@ -115,6 +152,7 @@ void LitTrackFinderNNParallel::ArrangeHits(
 
 //    std::cout << fHitData;
 
+    // TODO : add threads here
     for (int i = 0; i < fLayout.GetNofStationGroups(); i++){
     	for (int j = 0; j < fLayout.GetNofStations(i); j++){
     		LitStation station = fLayout.GetStation(i, j);
@@ -153,6 +191,7 @@ void LitTrackFinderNNParallel::InitTrackSeeds(
 		TrackVector& seeds)
 {
 	fscal QpCut = 1./1.5;
+	//TODO : add threads here
 	for (TrackIterator it = seeds.begin(); it != seeds.end(); it++) {
 		LitTrack* track = *it;
 		if (fabs(track->paramLast.Qp) > QpCut) continue;
@@ -166,21 +205,13 @@ void LitTrackFinderNNParallel::InitTrackSeeds(
 		newTrack->paramLast = newTrack->paramFirst;
 		fTracks.push_back(newTrack);
 	}
-	std::cout << "TrackSeed.size=" << seeds.size() << ", created:" << fTracks.size() << std::endl;
+//	std::cout << "TrackSeed.size=" << seeds.size() << ", created:" << fTracks.size() << std::endl;
 }
 
 
 void LitTrackFinderNNParallel::FollowTracks()
 {
-//	for (TrackIterator it = fTracks.begin(); it != fTracks.end(); it++) {
-//		FollowTrack(*it);
-//	}
-
-//	unsigned int N = std::distance(itBegin, itEnd);
-//	std::cout << "N=" << N << std::endl;
-//	tbb::parallel_for(tbb::blocked_range<unsigned int>(0, N), Follow(this, fTracks), tbb::auto_partitioner());
-
-	// temporary array to store track indexes from the fTracks array
+	// temporary arrays to store track indexes from the fTracks array
 	std::vector<unsigned int> tracksId1(fTracks.size());
 	std::vector<unsigned int> tracksId2;
 
@@ -199,13 +230,15 @@ void LitTrackFinderNNParallel::FollowTracks()
 //			<< " dTracks=" << dTracks << std::endl;
 
 		// loop over fTracks, pack data and propagate through the absorber
-		for (unsigned int iTrack = 0; iTrack < nofTracksVec; iTrack++) {
-			unsigned int start = fvecLen * iTrack;
-			// Collect track group
-			LitTrack* tracks[fvecLen];
-			for(unsigned int i = 0; i < fvecLen; i++) tracks[i] = fTracks[tracksId1[start + i]];
-			PropagateTroughAbsorber(tracks, stg.absorber);
-		} // loop over tracks
+		tbb::parallel_for(tbb::blocked_range<unsigned int>(0, nofTracksVec),
+				PropagateThroughAbsorberClass(this, fTracks, tracksId1, stg.absorber), tbb::auto_partitioner());
+//		for (unsigned int iTrack = 0; iTrack < nofTracksVec; iTrack++) {
+//			unsigned int start = fvecLen * iTrack;
+//			// Collect track group
+//			LitTrack* tracks[fvecLen];
+//			for(unsigned int i = 0; i < fvecLen; i++) tracks[i] = fTracks[tracksId1[start + i]];
+//			PropagateTroughAbsorber(tracks, stg.absorber);
+//		} // loop over tracks
 		// Propagate remaining dTracks through the absorber
 		if (dTracks > 0){
 			LitTrack* tracks[fvecLen];
@@ -215,7 +248,7 @@ void LitTrackFinderNNParallel::FollowTracks()
 			if (dTracks < fvecLen) {
 				for(unsigned int i = 0; i < fvecLen - dTracks; i++) tracks[dTracks+i] = tracks[dTracks-1];
 			}
-			PropagateTroughAbsorber(tracks, stg.absorber);
+			PropagateThroughAbsorber(tracks, stg.absorber);
 		}
 		// end propagation through the absorber
 
@@ -230,13 +263,15 @@ void LitTrackFinderNNParallel::FollowTracks()
 //			std::cout << "iStation --> nofTracks=" << nofTracks << " nofTracksVec=" << nofTracksVec
 //				<< " dTracks=" << dTracks << std::endl;
 
-			for (unsigned int iTrack = 0; iTrack < nofTracksVec; iTrack++) { // loop over tracks
-				unsigned int start = fvecLen * iTrack;
-				// Collect track group
-				LitTrack* tracks[fvecLen];
-				for(unsigned int i = 0; i < fvecLen; i++) tracks[i] = fTracks[tracksId1[start + i]];
-				ProcessStation(tracks, iStationGroup, iStation);
-			} // loop over tracks
+			tbb::parallel_for(tbb::blocked_range<unsigned int>(0, nofTracksVec),
+					ProcessStationClass(this, fTracks, tracksId1, iStationGroup, iStation), tbb::auto_partitioner());
+//			for (unsigned int iTrack = 0; iTrack < nofTracksVec; iTrack++) { // loop over tracks
+//				unsigned int start = fvecLen * iTrack;
+//				// Collect track group
+//				LitTrack* tracks[fvecLen];
+//				for(unsigned int i = 0; i < fvecLen; i++) tracks[i] = fTracks[tracksId1[start + i]];
+//				ProcessStation(tracks, iStationGroup, iStation);
+//			} // loop over tracks
 			// Propagate remaining dTracks
 			if (dTracks > 0){
 				LitTrack* tracks[fvecLen];
@@ -252,7 +287,6 @@ void LitTrackFinderNNParallel::FollowTracks()
 			for (unsigned int iTrack = 0; iTrack < nofTracks; iTrack++) {
 				unsigned int id = tracksId1[iTrack];
 				if (fTracks[id]->nofMissingHits <= fMaxNofMissingHits) {
-//					std::cout << "mh=" << (int)fTracks[id]->nofMissingHits << std::endl;
 					tracksId2.push_back(id);
 				}
 			}
@@ -264,7 +298,7 @@ void LitTrackFinderNNParallel::FollowTracks()
 	} // loop over station groups
 }
 
-void LitTrackFinderNNParallel::PropagateTroughAbsorber(
+void LitTrackFinderNNParallel::PropagateThroughAbsorber(
 		LitTrack* tracks[],
 		LitAbsorber& absorber)
 {
@@ -325,33 +359,35 @@ void LitTrackFinderNNParallel::ProcessStation(
 	// Collect hits
 //	ScalPixelHitVector hits[fvecLen];
 	std::pair<ScalPixelHitIterator, ScalPixelHitIterator> hits[nofSubstations][fvecLen];
+	unsigned int nofHits[fvecLen];
+	for(unsigned int i = 0; i < fvecLen; i++) nofHits[i] = 0;
 	for (unsigned char iSubstation = 0; iSubstation < nofSubstations; iSubstation++) { // loop over substations
 		//Unpack data
 		UnpackTrackParam(lpar[iSubstation], par[iSubstation]);
 		for(unsigned int i = 0; i < fvecLen; i++) tracks[i]->paramLast = par[iSubstation][i];
 
-//		ScalPixelHitIterator first, last;
 		ScalPixelHitVector& hitvec = fHitData.GetHits(stationGroup, station, iSubstation);
 		fscal err = fHitData.GetMaxErr(stationGroup, station, iSubstation);
 		for(unsigned int i = 0; i < fvecLen; i++) { // loop over fvecLen
 			MinMaxIndex(&par[iSubstation][i], hitvec, err, hits[iSubstation][i].first, hits[iSubstation][i].second);
-
-//			hits[i].insert(hits[i].end(), first, last);
-//			hits[i].insert(hits[i].end(), hitvec.begin(), hitvec.end());
+			nofHits[i] += std::distance(hits[iSubstation][i].first, hits[iSubstation][i].second);
 		} // loop over fvecLen
 	} // loop over substations
 
 	for(unsigned int i = 0; i < fvecLen; i++) { // loop over fvecLen
 		bool hitAdded = false;
-
-		std::pair<ScalPixelHitIterator, ScalPixelHitIterator> ahits[nofSubstations];
-		LitScalTrackParam ainpar[nofSubstations];
+		LitScalPixelHit* ahits[nofHits[i]];
+		LitScalTrackParam* apars[nofHits[i]];
+		unsigned int cnt = 0;
 		for(unsigned char iss = 0; iss < nofSubstations; iss++) {
-			ahits[iss] = hits[iss][i];
-			ainpar[iss] = par[iss][i];
+			for (ScalPixelHitIterator it = hits[iss][i].first; it != hits[iss][i].second; it++) {
+				ahits[cnt] = (*it);
+				apars[cnt] = &par[iss][i];
+				cnt++;
+			}
 		}
 
-		if (AddNearestHit(tracks[i], ahits, ainpar, nofSubstations)) hitAdded = true;
+		if (AddNearestHit(tracks[i], ahits, apars, nofHits[i])) hitAdded = true;
 		// Check if hit was added, if not than increase number of missing hits
 		if (!hitAdded) tracks[i]->nofMissingHits++;
 	} // loop over fvecLen
@@ -361,44 +397,88 @@ void LitTrackFinderNNParallel::ProcessStation(
 
 bool LitTrackFinderNNParallel::AddNearestHit(
 		LitTrack* track,
-		std::pair<ScalPixelHitIterator, ScalPixelHitIterator> hits[],
-		LitScalTrackParam inpar[],
-		unsigned char nofSubstations)
+		LitScalPixelHit* hits[],
+		LitScalTrackParam* pars[],
+		unsigned int nofHits)
 {
 	bool hitAdded = false;
-	ScalPixelHitIterator hita(hits[0].second);
-	LitTrackParam param;
+	LitScalPixelHit* hita = NULL;
+	LitScalTrackParam param;
 	fscal chiSq = 1e10;
-	for (unsigned char iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
-		for (ScalPixelHitIterator it = hits[iSubstation].first; it != hits[iSubstation].second; it++) {
-			// Pack hit
-			LitScalPixelHit hit[] = {*(*it), *(*it), *(*it), *(*it)};
-			LitPixelHit lhit;
-			PackPixelHit(hit, lhit);
-			// Pack track parameters
-			LitScalTrackParam par[fvecLen] = {inpar[iSubstation], inpar[iSubstation], inpar[iSubstation], inpar[iSubstation]};
-			LitTrackParam lpar;
-			PackTrackParam(par, lpar);
 
-			//First update track parameters with KF, than check whether the hit is in the validation gate.
-			LitFiltration(lpar, lhit);
-			cnst CHISQCUT = 15.;
-			fvec chisq = ChiSq(lpar, lhit);
-			if (chisq[0] < CHISQCUT[0]) {
-				if (chisq[0] < chiSq) {
-					chiSq = chisq[0];
-					hita = it;
-					param = lpar;
-				}
+	unsigned int nofHitsVec = nofHits / fvecLen; // number of hits grouped in vectors
+	unsigned int dHits = nofHits - fvecLen * nofHitsVec; // number of hits remained after grouping in vectors
+	for (unsigned int iHit = 0; iHit < nofHitsVec; iHit++) {
+		unsigned int start = fvecLen * iHit;
+
+		// Pack hit
+		LitScalPixelHit hit[fvecLen];
+		for(unsigned int i = 0; i < fvecLen; i++) hit[i] = *hits[start + i];
+		LitPixelHit lhit;
+		PackPixelHit(hit, lhit);
+		// Pack track parameters
+		LitScalTrackParam par[fvecLen];
+		for(unsigned int i = 0; i < fvecLen; i++) par[i] = *pars[start + i];
+		LitTrackParam lpar;
+		PackTrackParam(par, lpar);
+
+		//First update track parameters with KF, than check whether the hit is in the validation gate.
+		LitFiltration(lpar, lhit);
+		cnst CHISQCUT = 15.;
+		fvec chisq = ChiSq(lpar, lhit);
+
+		// Unpack track parameters
+		UnpackTrackParam(lpar, par);
+		for (unsigned int i = 0; i < fvecLen; i++) {
+			if (chisq[i] < CHISQCUT[i] && chisq[i] < chiSq) {
+				chiSq = chisq[i];
+				hita = hits[start + i];
+				param = par[i];
 			}
 		}
 	}
+	if (dHits > 0){
+		unsigned int start = fvecLen * nofHitsVec;
+		LitScalPixelHit hit[fvecLen];
+		LitPixelHit lhit;
+		LitScalTrackParam par[fvecLen];
+		LitTrackParam lpar;
+		for(unsigned int i = 0; i < dHits; i++) {
+			hit[i] = *hits[start + i];
+			par[i] = *pars[start + i];
+		}
+		// Check if the number of remaining tracks is less than fvecLen.
+		if (dHits < fvecLen) {
+			for(unsigned int i = 0; i < fvecLen - dHits; i++) {
+				hit[dHits+i] = *hits[nofHits-1];
+				par[dHits+i] = *pars[nofHits-1];
+			}
+		}
+		PackPixelHit(hit, lhit);
+		PackTrackParam(par, lpar);
+
+		//First update track parameters with KF, than check whether the hit is in the validation gate.
+		LitFiltration(lpar, lhit);
+		cnst CHISQCUT = 15.;
+		fvec chisq = ChiSq(lpar, lhit);
+
+		// Unpack track parameters
+		UnpackTrackParam(lpar, par);
+		for (unsigned int i = 0; i < fvecLen; i++) {
+			if (chisq[i] < CHISQCUT[i] && chisq[i] < chiSq) {
+				chiSq = chisq[i];
+				hita = hits[start + i];
+				param = par[i];
+			}
+		}
+	}
+
 	// if hit was attached than change track information
-	if (hita != hits[0].second) {
-		track->hits.push_back(*hita);
-		LitScalTrackParam prm[fvecLen];
-		UnpackTrackParam(param, prm);
-		track->paramLast = prm[0];
+	if (hita != NULL) {
+		track->hits.push_back(hita);
+//		LitScalTrackParam prm[fvecLen];
+//		UnpackTrackParam(param, prm);
+		track->paramLast = param;
 		track->chiSq += chiSq;
 		track->NDF = NDF(*track);
 		hitAdded = true;

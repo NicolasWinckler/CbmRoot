@@ -543,14 +543,14 @@ void CbmLitPropagationAnalysis::McPointToLitFitNode(
     Double_t qp = q / mom.Mag();
 
     CbmLitTrackParam par;
-//    par.SetX(point->GetX());
-//    par.SetY(point->GetY());
-//    par.SetZ(point->GetZ());
+    par.SetX(point->GetX());
+    par.SetY(point->GetY());
+    par.SetZ(point->GetZ());
     //TODO: temporarily done to check for straw tubes
-    CbmMuchPoint* p = (CbmMuchPoint*) point;
-    par.SetX((p->GetXIn()+p->GetXOut())/2);
-    par.SetY((p->GetYIn()+p->GetYOut())/2);
-    par.SetZ((p->GetZIn()+p->GetZOut())/2);
+//    CbmMuchPoint* p = (CbmMuchPoint*) point;
+//    par.SetX((p->GetXIn()+p->GetXOut())/2);
+//    par.SetY((p->GetYIn()+p->GetYOut())/2);
+//    par.SetZ((p->GetZIn()+p->GetZOut())/2);
     //
     par.SetTx(point->GetPx()/point->GetPz());
     par.SetTy(point->GetPy()/point->GetPz());

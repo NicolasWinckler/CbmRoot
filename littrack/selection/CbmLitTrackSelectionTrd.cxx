@@ -50,7 +50,7 @@ LitStatus CbmLitTrackSelectionTrd::DoSelect(
 //			std::bind2nd(std::mem_fun(&CbmLitTrack::SetQuality),kLITGOOD));
 
 	fSelectionC->DoSelect(itBegin, itEnd);
-	fSelectionD->DoSelect(itBegin, itEnd);
+//	fSelectionD->DoSelect(itBegin, itEnd);
 
 	return kLITSUCCESS;
 }

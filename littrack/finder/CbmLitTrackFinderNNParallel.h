@@ -48,6 +48,8 @@ private:
 
 	LitTrackFinderNNParallel fTrackFinder;
 
+	double fTime;
+
 	int fEventNo;
 };
 

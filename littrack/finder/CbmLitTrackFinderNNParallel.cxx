@@ -15,6 +15,8 @@
 
 #include <iostream>
 
+#include "tbb/tick_count.h"
+
 //class Follow
 //{
 //	TrackPtrVector& fTracks;
@@ -32,7 +34,8 @@
 //};
 
 CbmLitTrackFinderNNParallel::CbmLitTrackFinderNNParallel():
-	fEventNo(0)
+	fEventNo(1),
+	fTime(0.)
 {
 	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
 	LitDetectorLayout layout;
@@ -66,7 +69,17 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
 	ConvertHits(hits, lhits);
 	ConvertSeeds(trackSeeds, lseeds);
 
+	tbb::tick_count t0 = tbb::tick_count::now();
+
 	fTrackFinder.DoFind(lhits, lseeds, ltracks);
+
+	tbb::tick_count t1 = tbb::tick_count::now();
+
+	double dtime = (t1-t0).seconds();
+	fTime += dtime;
+	std::cout << "Time: " << dtime << " sec" << std::endl;
+	std::cout << "Total:" << fTime << " sec / " << fEventNo << " events." << std::endl;
+	std::cout << "Average per event:" << fTime / fEventNo << " sec." << std::endl;
 
 	ConvertTracks(ltracks, tracks);
 

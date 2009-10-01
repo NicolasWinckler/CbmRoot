@@ -254,11 +254,11 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 	if(name == "e_nn") {
 		CbmLitTrackFinderNN* trdFinderNN = new CbmLitTrackFinderNN();
 		trdFinderNN->SetPropagator(CreateTrackPropagator("geane"));
-		trdFinderNN->SetSeedSelection(CreateTrackSelection("momentum"));
+		trdFinderNN->SetSeedSelection(CreateTrackSelection("empty"));//"momentum"));
 		trdFinderNN->SetFinalSelection(CreateTrackSelection("trd_final"));
 		trdFinderNN->SetFilter(CreateTrackUpdate("kalman"));
 		trdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-		trdFinderNN->SetVerbose(1);
+		trdFinderNN->SetVerbose(3);
 		trdFinderNN->SetNofIter(1);
 		trdFinderNN->IsUseFastSearch(true);
 		trdFinderNN->SetMaxNofMissingHits(4);
@@ -273,7 +273,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 	} else
 	if(name == "e_branch") {
 		CbmLitTrackFinderBranch* trdFinderBranch = new CbmLitTrackFinderBranch();
-		trdFinderBranch->SetPropagator(CreateTrackPropagator("geane"));
+		trdFinderBranch->SetPropagator(CreateTrackPropagator("lit"));
 		trdFinderBranch->SetSeedSelection(CreateTrackSelection("momentum"));
 		trdFinderBranch->SetStationGroupSelection(CreateTrackSelection("trd_station"));
 		trdFinderBranch->SetFinalSelection(CreateTrackSelection("trd_final"));

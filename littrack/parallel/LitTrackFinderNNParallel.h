@@ -3,12 +3,10 @@
  * @since 2009
  * @version 1.0
  **
- ** Parallel (multithreading and SIMDized) version of the nearest
+ ** Parallel (multithreaded and SIMDized) version of the nearest
  ** neighbor tracking. As input to tracking arrays with track seeds
  ** and hits from the detector are used. The track is prolongated
  ** from station to station and the nearest hit is attached to track.
- ** Flag fIsProcessSubstationsTogether defines which nearest hits
- ** should be attached to track.
  ** Threading Building Blocks library is used for multithreading.
  **/
 
@@ -36,15 +34,6 @@ public:
 			ScalPixelHitVector& hits,
 			TrackVector& trackSeeds,
 			TrackVector& tracks);
-
-	/* Sets the flag which defines which nearest hits will be attached to track.
-	 * If true than only one nearest hit from all substations in station will be attached to track.
-	 * If false than the nearest hit from each substation in station will be attached to the track.
-	 * @param isProcessSubstationsTogether Flag value.
-	 */
-	void IsProcessSubstationsTogether(bool isProcessSubstationsTogether) {
-		fIsProcessSubstationsTogether = isProcessSubstationsTogether;
-	}
 
 	void SetDetectorLayout(LitDetectorLayout& layout) {
 		fLayout = layout;
@@ -78,7 +67,7 @@ public:
 	/* TODO: Add comments
 	 *
 	 */
-	inline void PropagateTroughAbsorber(
+	inline void PropagateThroughAbsorber(
 			LitTrack* tracks[],
 			LitAbsorber& absorber);
 
@@ -97,9 +86,9 @@ public:
 	 */
 	bool AddNearestHit(
 			LitTrack* track,
-			std::pair<ScalPixelHitIterator, ScalPixelHitIterator> hits[],
-			LitScalTrackParam inpar[],
-			unsigned char nofSubstations);
+			LitScalPixelHit* hits[],
+			LitScalTrackParam* pars[],
+			unsigned int nofHits);
 
 private:
 	TrackVector fTracks; // local copy of tracks
@@ -110,10 +99,6 @@ private:
 	unsigned char fMaxNofMissingHits;
 	fscal fSigmaCoef;
 	fscal fMaxCovSq;
-
-	// If true than only one nearest hit from all substations in station will be attached to track.
-	// If false than the nearest hit from each substation in station will be attached to the track.
-	bool fIsProcessSubstationsTogether;
 };
 
 //#undef cnst

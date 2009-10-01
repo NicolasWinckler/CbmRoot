@@ -1,7 +1,7 @@
 
 void trd_elid_sim_many(Int_t fileNum, Int_t trdGeoType)
 {
-	 Int_t nEvents = 100;
+	 Int_t nEvents = 600;
 
     TString fileNumSt, trdGeomFile;
 
@@ -28,11 +28,22 @@ void trd_elid_sim_many(Int_t fileNum, Int_t trdGeoType)
     if (fileNum == 8) momentum = 11.0;
     if (fileNum == 9) momentum = 13.0;
 
+
+    Double_t thetaMin, thetaMax;
+//    if (fileNum == 0) theta = 0.;
+//    if (fileNum == 1) theta = 5.;
+//    if (fileNum == 2) theta = 10.;
+//    if (fileNum == 3) theta = 15.;
+//    if (fileNum == 4) theta = 20.;
+//    if (fileNum == 5) theta = 25.0;
+    thetaMin = 2.5;
+    thetaMax = 25.;
+
     if (trdGeoType == 1) trdGeomFile = "trd_monolithic.geo";
     if (trdGeoType == 2) trdGeomFile = "trd_monolithic_MB.geo";
 
     TString outDir;
-	if (trdGeoType == 1) outDir = "/d/cbm02/slebedev/trd/JUL09/st/";
+	if (trdGeoType == 1) outDir = "/d/cbm02/slebedev/trd/JUL09/simtest/old/";
 	if (trdGeoType == 2) outDir = "/d/cbm02/slebedev/trd/JUL09/mb/";
 
 	TString outFile = outDir + "piel.000" + fileNumSt + ".mc.root";
@@ -164,32 +175,36 @@ void trd_elid_sim_many(Int_t fileNum, Int_t trdGeoType)
 
 	FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, 60);
 	boxGen1->SetPRange(minMomentum, maxMomentum);
+//	boxGen1->SetXYZ(50., 50., 450.);
 	boxGen1->SetPhiRange(0., 360.);
-	boxGen1->SetThetaRange(2.5, 25.);
+	boxGen1->SetThetaRange(thetaMin, thetaMax);
 	boxGen1->SetCosTheta();
 	boxGen1->Init();
 	primGen->AddGenerator(boxGen1);
 
 	FairBoxGenerator* boxGen2 = new FairBoxGenerator(-11, 60);
 	boxGen2->SetPRange(minMomentum, maxMomentum);
+//	boxGen2->SetXYZ(50., 50., 450.);
 	boxGen2->SetPhiRange(0., 360.);
-	boxGen2->SetThetaRange(2.5, 25.);
+	boxGen2->SetThetaRange(thetaMin, thetaMax);
 	boxGen1->SetCosTheta();
 	boxGen2->Init();
 	primGen->AddGenerator(boxGen2);
 
 	FairBoxGenerator* boxGen3 = new FairBoxGenerator(211, 60);
 	boxGen3->SetPRange(minMomentum, maxMomentum);
+//	boxGen3->SetXYZ(50., 50., 450.);
 	boxGen3->SetPhiRange(0., 360.);
-	boxGen3->SetThetaRange(2.5, 25.);
+	boxGen3->SetThetaRange(thetaMin, thetaMax);
 	boxGen1->SetCosTheta();
 	boxGen3->Init();
 	primGen->AddGenerator(boxGen3);
 
 	FairBoxGenerator* boxGen4 = new FairBoxGenerator(-211, 60);
 	boxGen4->SetPRange(minMomentum, maxMomentum);
+//	boxGen4->SetXYZ(50., 50., 450.);
 	boxGen4->SetPhiRange(0., 360.);
-	boxGen4->SetThetaRange(2.5, 25.);
+	boxGen4->SetThetaRange(thetaMin, thetaMax);
 	boxGen1->SetCosTheta();
 	boxGen4->Init();
 	primGen->AddGenerator(boxGen4);

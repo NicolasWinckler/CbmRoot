@@ -66,7 +66,7 @@ finder/CbmLitTrackFinderBranch.cxx
 finder/CbmLitTrackFinderNN.cxx
 finder/CbmLitNearestHitToTrackMerger.cxx
 finder/CbmLitGating.cxx
-finder/CbmLitTrackFinderNNParallel.cxx
+#finder/CbmLitTrackFinderNNParallel.cxx
 finder_cbm/CbmLitTrdTrackFinderBranch.cxx
 finder_cbm/CbmLitTrdTrackFinderNN.cxx
 finder_cbm/CbmLitTrdTrackFinderWeight.cxx

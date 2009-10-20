@@ -1,10 +1,11 @@
-/*
- * LitConverter.h
+/** LitConverter.h
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
  *
- *  Created on: Sep 28, 2009
- *      Author: andrey
- */
-
+ * Functions to convert from Littrack serial data classes
+ * to data classes used in the Littrack parallel version.
+ **/
 #ifndef LITCONVERTER_H_
 #define LITCONVERTER_H_
 
@@ -16,7 +17,10 @@
 #include "LitHit.h"
 #include "LitTrack.h"
 
-
+/* Converts CbmLitPixelHit to LitScalPixelHit.
+ * @param hit Pointer to CbmlitPixelHit.
+ * @param lhit Pointer to LitScalPixelHit.
+ */
 void CbmLitPixelHitToLitScalPixelHit(
 		const CbmLitPixelHit* hit,
 		LitScalPixelHit* lhit)
@@ -31,6 +35,10 @@ void CbmLitPixelHitToLitScalPixelHit(
 		lhit->Z = hit->GetZ();
 }
 
+/* Converts CbmLitTrackparam to LitScalTrackParam.
+ * @param par Pointer to CbmLitTrackParam.
+ * @param lpar Pointer to LitScalTrackParam.
+ */
 void CbmLitTrackParamToLitScalTrackParam(
 		const CbmLitTrackParam* par,
 		LitScalTrackParam* lpar)
@@ -58,8 +66,12 @@ void CbmLitTrackParamToLitScalTrackParam(
 	lpar->C14 = par->GetCovariance(14);
 }
 
+/* Converts LitScalTrackParam to CbmLitTrackParam.
+ * @param lpar Pointer to LitScalTrackParam.
+ * @param par Pointer to CbmLitTrackParam.
+ */
 void LitScalTrackParamToCbmLitTrackParam(
-		LitScalTrackParam* lpar,
+		const LitScalTrackParam* lpar,
 		CbmLitTrackParam* par)
 {
 	par->SetX(lpar->X);
@@ -85,6 +97,10 @@ void LitScalTrackParamToCbmLitTrackParam(
 	par->SetCovariance(14, lpar->C14);
 }
 
+/* Concerts LitTrack to CbmLitTrack.
+ * @param ltrack Pointer to LitTrack.
+ * @param track Pointer to CbmLitTrack.
+ */
 inline void LitTrackToCbmLitTrack(
 		LitTrack* ltrack,
 		CbmLitTrack* track)
@@ -120,6 +136,5 @@ inline void LitTrackToCbmLitTrack(
 		track->AddHit(newHit);
 	}
 }
-
 
 #endif /* LITCONVERTER_H_ */

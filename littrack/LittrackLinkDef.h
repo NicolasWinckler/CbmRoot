@@ -89,6 +89,7 @@
 #pragma link C++ class CbmLitRobustFitterAnalysis+;
 #pragma link C++ class CbmLitCheckSimpleGeo+;
 #pragma link C++ class CbmLitCheckField+;
+#pragma link C++ class CbmLitCheckEnergyLoss+;
 
 // robust
 //#pragma link C++ class CbmLitWeightedHitCalculatorImp+;

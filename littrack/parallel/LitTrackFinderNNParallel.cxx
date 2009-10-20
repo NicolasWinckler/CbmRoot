@@ -17,6 +17,8 @@
 #include "tbb/parallel_for.h"
 #include "tbb/blocked_range.h"
 
+#include <emmintrin.h>
+
 #include <algorithm>
 #include <iostream>
 #include <algorithm>
@@ -96,12 +98,63 @@ public:
 };
 
 
+
+//class ArrangeHitsClass
+//{
+//	ScalPixelHitVector& fHits;
+//	LitHitData& fHitData;
+//public:
+//	void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
+//		for (unsigned int i = r.begin(); i != r.end(); ++i) {
+//			LitScalPixelHit* hit = fHits[i];
+//			fHitData.AddHit(hit->planeId, hit);
+//		}
+//	}
+//	ArrangeHitsClass(
+//			ScalPixelHitVector& hits,
+//			LitHitData& hitData) :
+//		fHits(hits),
+//		fHitData(hitData) {}
+//};
+
+//class InitTrackSeedsClass
+//{
+//	TrackVector& fSeeds;
+//	TrackVector& fTracks;
+//public:
+//	void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
+//		fscal QpCut = 1./1.5;
+//		unsigned int nofSeeds = fSeeds.size();
+//		for (unsigned int i = r.begin(); i != r.end(); ++i) {
+//			LitTrack* track = fSeeds[i];
+//			if (fabs(track->paramLast.Qp) > QpCut) continue;
+//		//		if (fUsedSeedsSet.find((*track)->GetPreviousTrackId()) != fUsedSeedsSet.end()) continue;
+//		//		track->SetPDG(fPDG);
+//			track->previouseTrackId = i;
+//		//		std::cout << track->previouseTrackId << "   ";
+//
+//			LitTrack* newTrack = new LitTrack(*track);
+//		//		newTrack->paramFirst = newTrack->paramLast;
+//			newTrack->paramLast = newTrack->paramFirst;
+//
+//			fTracks.push_back(newTrack);
+//		}
+//	}
+//	InitTrackSeedsClass(
+//			TrackVector& seeds,
+//			TrackVector& tracks) :
+//		fSeeds(seeds),
+//		fTracks(tracks) {}
+//};
+
 LitTrackFinderNNParallel::LitTrackFinderNNParallel():
 	fMaxNofMissingHits(2),
 	fSigmaCoef(3.5),
 	fMaxCovSq(20.*20.)
 {
 	tbb::task_scheduler_init init;
+
+	__m128i my;
 }
 
 LitTrackFinderNNParallel::~LitTrackFinderNNParallel()
@@ -149,13 +202,15 @@ void LitTrackFinderNNParallel::ArrangeHits(
 //    	if (fUsedHitsSet.find(hit->GetRefId()) != fUsedHitsSet.end()) continue;
      	fHitData.AddHit(hit->planeId, hit);
     }
+//    tbb::parallel_for(tbb::blocked_range<unsigned int>(0, hits.size()),
+//    				ArrangeHitsClass(hits, fHitData), tbb::auto_partitioner());
 
 //    std::cout << fHitData;
 
     // TODO : add threads here
     for (int i = 0; i < fLayout.GetNofStationGroups(); i++){
     	for (int j = 0; j < fLayout.GetNofStations(i); j++){
-    		LitStation station = fLayout.GetStation(i, j);
+//    		LitStation& station = fLayout.GetStation(i, j);
 //    		if (station.type == kLITPIXELHIT) {
     			for (int k = 0; k < fLayout.GetNofSubstations(i, j); k++){
     				ScalPixelHitVector& shits = fHitData.GetHits(i, j, k);
@@ -190,6 +245,9 @@ void LitTrackFinderNNParallel::MinMaxIndex(
 void LitTrackFinderNNParallel::InitTrackSeeds(
 		TrackVector& seeds)
 {
+//	tbb::parallel_for(tbb::blocked_range<unsigned int>(0, seeds.size()),
+//	    				InitTrackSeedsClass(seeds, fTracks), tbb::auto_partitioner());
+
 	fscal QpCut = 1./1.5;
 	//TODO : add threads here
 	for (TrackIterator it = seeds.begin(); it != seeds.end(); it++) {
@@ -237,7 +295,7 @@ void LitTrackFinderNNParallel::FollowTracks()
 //			// Collect track group
 //			LitTrack* tracks[fvecLen];
 //			for(unsigned int i = 0; i < fvecLen; i++) tracks[i] = fTracks[tracksId1[start + i]];
-//			PropagateTroughAbsorber(tracks, stg.absorber);
+//			PropagateThroughAbsorber(tracks, stg.absorber);
 //		} // loop over tracks
 		// Propagate remaining dTracks through the absorber
 		if (dTracks > 0){
@@ -352,6 +410,7 @@ void LitTrackFinderNNParallel::ProcessStation(
 		LitSubstation substation = stg.stations[station].substations[iSubstation];
 		// Propagation through station
 		LitRK4Extrapolation(lpar[iSubstation], substation.Z, field);
+//		LitLineExtrapolation(lpar[iSubstation], substation.Z);
 		LitAddMaterial(lpar[iSubstation], substation.material);
 		if (iSubstation < nofSubstations - 1) lpar[iSubstation + 1] = lpar[iSubstation];
 	} // loop over substations
@@ -369,6 +428,8 @@ void LitTrackFinderNNParallel::ProcessStation(
 		ScalPixelHitVector& hitvec = fHitData.GetHits(stationGroup, station, iSubstation);
 		fscal err = fHitData.GetMaxErr(stationGroup, station, iSubstation);
 		for(unsigned int i = 0; i < fvecLen; i++) { // loop over fvecLen
+//			hits[iSubstation][i].first = hitvec.begin();
+//			hits[iSubstation][i].second = hitvec.end();
 			MinMaxIndex(&par[iSubstation][i], hitvec, err, hits[iSubstation][i].first, hits[iSubstation][i].second);
 			nofHits[i] += std::distance(hits[iSubstation][i].first, hits[iSubstation][i].second);
 		} // loop over fvecLen
@@ -476,8 +537,6 @@ bool LitTrackFinderNNParallel::AddNearestHit(
 	// if hit was attached than change track information
 	if (hita != NULL) {
 		track->hits.push_back(hita);
-//		LitScalTrackParam prm[fvecLen];
-//		UnpackTrackParam(param, prm);
 		track->paramLast = param;
 		track->chiSq += chiSq;
 		track->NDF = NDF(*track);

@@ -11,7 +11,6 @@ public:
 	virtual ~CbmLitCheckEnergyLoss();
 
 	virtual void Check();
-//	virtual void SetParContainers();
 
 	void FillTableIron();
 	void FillTableTungsten();

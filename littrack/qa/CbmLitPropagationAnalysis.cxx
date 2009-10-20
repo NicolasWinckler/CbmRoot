@@ -76,9 +76,9 @@ InitStatus CbmLitPropagationAnalysis::Init()
 	// Create tools
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
 	if (!fIsTestFastPropagation) {
-		fPropagator = factory->CreateTrackPropagator("lit");
+		fPropagator = factory->CreateTrackPropagator("geane");
 		fFilter = factory->CreateTrackUpdate("kalman");
-		fFitter = factory->CreateTrackFitter("lit_kalman");
+		fFitter = factory->CreateTrackFitter("geane_kalman");
 		fSmoother = factory->CreateTrackFitter("kalman_smoother");
 	} else {
 		fParallelFitter = factory->CreateTrackFitter("kalman_parallel");
@@ -548,9 +548,9 @@ void CbmLitPropagationAnalysis::McPointToLitFitNode(
     par.SetZ(point->GetZ());
     //TODO: temporarily done to check for straw tubes
 //    CbmMuchPoint* p = (CbmMuchPoint*) point;
-//    par.SetX((p->GetXIn()+p->GetXOut())/2);
-//    par.SetY((p->GetYIn()+p->GetYOut())/2);
-//    par.SetZ((p->GetZIn()+p->GetZOut())/2);
+//    par.SetX((p->GetXIn()+p->GetXOut())/2.);
+//    par.SetY((p->GetYIn()+p->GetYOut())/2.);
+//    par.SetZ((p->GetZIn()+p->GetZOut())/2.);
     //
     par.SetTx(point->GetPx()/point->GetPz());
     par.SetTy(point->GetPy()/point->GetPz());

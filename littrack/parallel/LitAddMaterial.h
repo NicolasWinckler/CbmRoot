@@ -3,7 +3,8 @@
  * @since 2009
  * @version 1.0
  *
- * Functions for calculation of the material effects.
+ * Functions for calculation of the material effects used in the
+ * parallel version of the tracking.
  **/
 
 #ifndef LITADDMATERIAL_H_
@@ -14,6 +15,11 @@
 
 #define cnst static const fvec
 
+/* Function calculates effects from the material on the
+ * track parameters and its covariance matrix.
+ * @param par Reference to INPUT/OUTPUT vectorized track parameters.
+ * @param mat Reference to material
+ */
 inline void LitAddMaterial(
 		LitTrackParam& par,
 		const LitMaterialInfo& mat) {

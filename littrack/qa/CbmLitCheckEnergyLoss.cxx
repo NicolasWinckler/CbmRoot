@@ -68,7 +68,7 @@ void CbmLitCheckEnergyLoss::Check()
 
 void CbmLitCheckEnergyLoss::DrawGraphs()
 {
-	TCanvas *c1 = new TCanvas("energy loss","c1",1200,1000);
+	TCanvas *c1 = new TCanvas("energy_loss","c1",800, 800);
 //    c1->SetGrid();
 
 	for (int i = 0; i < 4; i++) {
@@ -76,13 +76,13 @@ void CbmLitCheckEnergyLoss::DrawGraphs()
 		fTable[i]->SetLineColor(2);
 		fTable[i]->SetMarkerColor(2);
 		fTable[i]->SetLineWidth(3);
-		fTable[i]->SetMarkerSize(3);
+		fTable[i]->SetMarkerSize(2);
 
 		fCalc[i]->SetLineStyle(1);
 		fCalc[i]->SetLineColor(4);
 		fCalc[i]->SetMarkerColor(4);
 		fCalc[i]->SetLineWidth(3);
-		fCalc[i]->SetMarkerSize(3);
+		fCalc[i]->SetMarkerSize(2);
 	}
 	fTable[0]->SetMarkerStyle(20);
 	fTable[1]->SetMarkerStyle(26);
@@ -116,7 +116,7 @@ void CbmLitCheckEnergyLoss::DrawGraphs()
 //	mg->GetYaxis()->SetLabelSize(0.055);
 //	mg->GetYaxis()->SetNdivisions(505, kTRUE);
 
-	TLegend* l1 = new TLegend(0.6, 0.1, 0.9, 0.4);
+	TLegend* l1 = new TLegend(0.20, 0.97, 0.9, 0.7);
 	l1->SetFillColor(kWhite);
 	l1->SetHeader("Energy losses for muons in iron vs. momentum");
 	l1->AddEntry(fTable[0],"total (table)","lp");
@@ -128,6 +128,10 @@ void CbmLitCheckEnergyLoss::DrawGraphs()
 	l1->AddEntry(fTable[3],"pair production (table)","lp");
 	l1->AddEntry(fCalc[3],"pair production (calculation)","lp");
 	l1->Draw();
+
+	c1->SaveAs("energy_loss.eps");
+	c1->SaveAs("energy_loss.svg");
+
 }
 
 void CbmLitCheckEnergyLoss::CalcEloss()

@@ -61,7 +61,10 @@ inline void LitRK4Extrapolation(
 
    fvec Ax[4], Ay[4];
    fvec dAx_dtx[4], dAy_dtx[4], dAx_dty[4], dAy_dty[4];
-   fvec k[4][4];
+   fvec kx[4];
+   fvec ky[4];
+   fvec ktx[4];
+   fvec kty[4];
 
    fvec zIn = par.Z;
    fvec h = zOut - zIn;
@@ -103,24 +106,19 @@ inline void LitRK4Extrapolation(
    dAy_dtx[0] = Ay[0] * tx * t2 + (-ty * By - Bz ) * t1;
    dAy_dty[0] = Ay[0] * ty * t2 + (-tx * By + TWO * ty * Bx ) * t1;
 
-   k[0][0] = tx * h;
-   k[1][0] = ty * h;
-   k[2][0] = Ax[0] * hCqp;
-   k[3][0] = Ay[0] * hCqp;
+   kx[0] = tx * h;
+   ky[0] = ty * h;
+   ktx[0] = Ax[0] * hCqp;
+   kty[0] = Ay[0] * hCqp;
    }
    // end calculation for zero step
 
    // Calculate for steps starting from 1
    for (unsigned int iStep = 1; iStep < 4; iStep++) { // 1
-//      if (iStep > 0) {
-    	  x[0] = par.X  + coef[iStep] * k[0][iStep - 1];
-    	  x[1] = par.Y  + coef[iStep] * k[1][iStep - 1];
-    	  x[2] = par.Tx + coef[iStep] * k[2][iStep - 1];
-    	  x[3] = par.Ty + coef[iStep] * k[3][iStep - 1];
-//    	 for(unsigned int i = 0; i < 4; i++) {
-//            x[i] = xIn[i] + coef[iStep] * k[i][iStep - 1];
-//         }
-//      }
+   	  x[0] = par.X  + coef[iStep] * kx[iStep - 1];
+   	  x[1] = par.Y  + coef[iStep] * ky[iStep - 1];
+   	  x[2] = par.Tx + coef[iStep] * ktx[iStep - 1];
+   	  x[3] = par.Ty + coef[iStep] * kty[iStep - 1];
 
       fvec Bx = B[iStep].Bx;
       fvec By = B[iStep].By;
@@ -143,19 +141,19 @@ inline void LitRK4Extrapolation(
       dAy_dtx[iStep] = Ay[iStep] * tx * t2 + (-ty * By - Bz ) * t1;
       dAy_dty[iStep] = Ay[iStep] * ty * t2 + (-tx * By + TWO * ty * Bx ) * t1;
 
-      k[0][iStep] = tx * h;
-      k[1][iStep] = ty * h;
-      k[2][iStep] = Ax[iStep] * hCqp;
-      k[3][iStep] = Ay[iStep] * hCqp;
+      kx[iStep] = tx * h;
+      ky[iStep] = ty * h;
+      ktx[iStep] = Ax[iStep] * hCqp;
+      kty[iStep] = Ay[iStep] * hCqp;
 
    } // 1
 
    // Calculate output state vector
 //   for (unsigned int i = 0; i < 4; i++) xOut[i] = CalcOut(xIn[i], k[i]);
-   par.X  += k[0][0] * C1_6 + k[0][1] * C1_3 + k[0][2] * C1_3 + k[0][3] * C1_6;
-   par.Y  += k[1][0] * C1_6 + k[1][1] * C1_3 + k[1][2] * C1_3 + k[1][3] * C1_6;
-   par.Tx += k[2][0] * C1_6 + k[2][1] * C1_3 + k[2][2] * C1_3 + k[2][3] * C1_6;
-   par.Ty += k[3][0] * C1_6 + k[3][1] * C1_3 + k[3][2] * C1_3 + k[3][3] * C1_6;
+   par.X  += kx[0] * C1_6 + kx[1] * C1_3 + kx[2] * C1_3 + kx[3] * C1_6;
+   par.Y  += ky[0] * C1_6 + ky[1] * C1_3 + ky[2] * C1_3 + ky[3] * C1_6;
+   par.Tx += ktx[0] * C1_6 + ktx[1] * C1_3 + ktx[2] * C1_3 + ktx[3] * C1_6;
+   par.Ty += kty[0] * C1_6 + kty[1] * C1_3 + kty[2] * C1_3 + kty[3] * C1_6;
 //   xOut[4] = xIn[4];
 
 
@@ -183,34 +181,27 @@ inline void LitRK4Extrapolation(
    x[3] = x0[3] = ZERO;
 
    //Calculate for zero step
-   k[0][0] = x[2] * h;
-   k[1][0] = x[3] * h;
-   //k[2][0] = (dAx_dtx[iStep] * x[2] + dAx_dty[iStep] * x[3]) * hCqp;
-   k[3][0] = (dAy_dtx[0] * x[2] + dAy_dty[0] * x[3]) * hCqp;
+   kx[0] = x[2] * h;
+   ky[0] = x[3] * h;
+   //ktx[0] = (dAx_dtx[iStep] * x[2] + dAx_dty[iStep] * x[3]) * hCqp;
+   kty[0] = (dAy_dtx[0] * x[2] + dAy_dty[0] * x[3]) * hCqp;
    // Calculate for steps starting from 1
    for (unsigned int iStep = 1; iStep < 4; iStep++) { // 2
-//      if (iStep > 0) {
-    	  x[0] = x0[0] + coef[iStep] * k[0][iStep - 1];
-    	  x[1] = x0[1] + coef[iStep] * k[1][iStep - 1];
-//    	  x[2] = x0[2] + coef[iStep] * k[2][iStep - 1];
-    	  x[3] = x0[3] + coef[iStep] * k[3][iStep - 1];
-//         for (unsigned int i = 0; i < 4; i++) {
-//            if (i != 2) {
-//               x[i] = x0[i] + coef[iStep] * k[i][iStep - 1];
-//            }
-//         }
-//      }
+   	  x[0] = x0[0] + coef[iStep] * kx[iStep - 1];
+   	  x[1] = x0[1] + coef[iStep] * ky[iStep - 1];
+//    	  x[2] = x0[2] + coef[iStep] * ktx[iStep - 1];
+   	  x[3] = x0[3] + coef[iStep] * kty[iStep - 1];
 
-      k[0][iStep] = x[2] * h;
-      k[1][iStep] = x[3] * h;
-      //k[2][iStep] = (dAx_dtx[iStep] * x[2] + dAx_dty[iStep] * x[3]) * hCqp;
-      k[3][iStep] = (dAy_dtx[iStep] * x[2] + dAy_dty[iStep] * x[3]) * hCqp;
+      kx[iStep] = x[2] * h;
+      ky[iStep] = x[3] * h;
+      //ktx[iStep] = (dAx_dtx[iStep] * x[2] + dAx_dty[iStep] * x[3]) * hCqp;
+      kty[iStep] = (dAy_dtx[iStep] * x[2] + dAy_dty[iStep] * x[3]) * hCqp;
    } // 2
 
-   F[2]  = x0[0] + k[0][0] * C1_6 + k[0][1] * C1_3 + k[0][2] * C1_3 + k[0][3] * C1_6;//CalcOut(x0[0], k[0]);
-   F[7]  = x0[1] + k[1][0] * C1_6 + k[1][1] * C1_3 + k[1][2] * C1_3 + k[1][3] * C1_6;//CalcOut(x0[1], k[1]);
+   F[2]  = x0[0] + kx[0] * C1_6 + kx[1] * C1_3 + kx[2] * C1_3 + kx[3] * C1_6;//CalcOut(x0[0], k[0]);
+   F[7]  = x0[1] + ky[0] * C1_6 + ky[1] * C1_3 + ky[2] * C1_3 + ky[3] * C1_6;//CalcOut(x0[1], k[1]);
    F[12] = ONE;
-   F[17] = x0[3] + k[3][0] * C1_6 + k[3][1] * C1_3 + k[3][2] * C1_3 + k[3][3] * C1_6;//CalcOut(x0[3], k[3]);
+   F[17] = x0[3] + kty[0] * C1_6 + kty[1] * C1_3 + kty[2] * C1_3 + kty[3] * C1_6;//CalcOut(x0[3], k[3]);
    F[22] = ZERO;
    // end of derivatives dx/dtx
 
@@ -221,33 +212,26 @@ inline void LitRK4Extrapolation(
    x[3] = x0[3] = ONE;
 
    //Calculate for zero step
-   k[0][0] = x[2] * h;
-   k[1][0] = x[3] * h;
-   k[2][0] = (dAx_dtx[0] * x[2] + dAx_dty[0] * x[3]) * hCqp;
-   //k[3][0] = (dAy_dtx[iStep] * x[2] + dAy_dty[iStep] * x[3]) * hCqp;
+   kx[0] = x[2] * h;
+   ky[0] = x[3] * h;
+   ktx[0] = (dAx_dtx[0] * x[2] + dAx_dty[0] * x[3]) * hCqp;
+   //kty[0] = (dAy_dtx[iStep] * x[2] + dAy_dty[iStep] * x[3]) * hCqp;
    //Calculate for steps starting from 1
    for (unsigned int iStep = 1; iStep < 4; iStep++) { // 4
-//      if (iStep > 0) {
-    	  x[0] = x0[0] + coef[iStep] * k[0][iStep - 1];
-    	  x[1] = x0[1] + coef[iStep] * k[1][iStep - 1];
-    	  x[2] = x0[2] + coef[iStep] * k[2][iStep - 1];
-//    	  x[3] = x0[0] + coef[iStep] * k[0][iStep - 1];
-//         for(unsigned int i = 0; i < 4; i++) {
-//            if(i!=3) {
-//               x[i] = x0[i] + coef[iStep] * k[i][iStep - 1];
-//            }
-//         }
-//      }
+		x[0] = x0[0] + coef[iStep] * kx[iStep - 1];
+		x[1] = x0[1] + coef[iStep] * ky[iStep - 1];
+		x[2] = x0[2] + coef[iStep] * ktx[iStep - 1];
+//    	  x[3] = x0[0] + coef[iStep] * kty[iStep - 1];
 
-      k[0][iStep] = x[2] * h;
-      k[1][iStep] = x[3] * h;
-      k[2][iStep] = (dAx_dtx[iStep] * x[2] + dAx_dty[iStep] * x[3]) * hCqp;
-      //k[3][iStep] = (dAy_dtx[iStep] * x[2] + dAy_dty[iStep] * x[3]) * hCqp;
+		kx[iStep] = x[2] * h;
+		ky[iStep] = x[3] * h;
+		ktx[iStep] = (dAx_dtx[iStep] * x[2] + dAx_dty[iStep] * x[3]) * hCqp;
+		//kty[iStep] = (dAy_dtx[iStep] * x[2] + dAy_dty[iStep] * x[3]) * hCqp;
    }  // 4
 
-   F[3]  = x0[0] + k[0][0] * C1_6 + k[0][1] * C1_3 + k[0][2] * C1_3 + k[0][3] * C1_6;// CalcOut(x0[0], k[0]);
-   F[8]  = x0[1] + k[1][0] * C1_6 + k[1][1] * C1_3 + k[1][2] * C1_3 + k[1][3] * C1_6;//CalcOut(x0[1], k[1]);
-   F[13] = x0[2] + k[2][0] * C1_6 + k[2][1] * C1_3 + k[2][2] * C1_3 + k[2][3] * C1_6;//CalcOut(x0[2], k[2]);
+   F[3]  = x0[0] + kx[0] * C1_6 + kx[1] * C1_3 + kx[2] * C1_3 + kx[3] * C1_6;// CalcOut(x0[0], k[0]);
+   F[8]  = x0[1] + ky[0] * C1_6 + ky[1] * C1_3 + ky[2] * C1_3 + ky[3] * C1_6;//CalcOut(x0[1], k[1]);
+   F[13] = x0[2] + ktx[0] * C1_6 + ktx[1] * C1_3 + ktx[2] * C1_3 + ktx[3] * C1_6;//CalcOut(x0[2], k[2]);
    F[18] = ONE;
    F[23] = ZERO;
    // end of derivatives dx/dty
@@ -259,32 +243,27 @@ inline void LitRK4Extrapolation(
    x[3] = x0[3] = ZERO;
 
    //Calculate for zero step
-   k[0][0] = x[2] * h;
-   k[1][0] = x[3] * h;
-   k[2][0] = Ax[0] * hC + hCqp * (dAx_dtx[0] * x[2] + dAx_dty[0] * x[3]);
-   k[3][0] = Ay[0] * hC + hCqp * (dAy_dtx[0] * x[2] + dAy_dty[0] * x[3]);
+   kx[0] = x[2] * h;
+   ky[0] = x[3] * h;
+   ktx[0] = Ax[0] * hC + hCqp * (dAx_dtx[0] * x[2] + dAx_dty[0] * x[3]);
+   kty[0] = Ay[0] * hC + hCqp * (dAy_dtx[0] * x[2] + dAy_dty[0] * x[3]);
    //Calculate for steps starting from 1
    for (unsigned int iStep = 1; iStep < 4; iStep++) { // 4
-//      if (iStep > 0) {
-    	  x[0] = x0[0] + coef[iStep] * k[0][iStep - 1];
-    	  x[1] = x0[1] + coef[iStep] * k[1][iStep - 1];
-    	  x[2] = x0[2] + coef[iStep] * k[2][iStep - 1];
-    	  x[3] = x0[3] + coef[iStep] * k[3][iStep - 1];
-//         for(unsigned int i = 0; i < 4; i++) {
-//            x[i] = x0[i] + coef[iStep] * k[i][iStep - 1];
-//         }
-//      }
+		x[0] = x0[0] + coef[iStep] * kx[iStep - 1];
+		x[1] = x0[1] + coef[iStep] * ky[iStep - 1];
+		x[2] = x0[2] + coef[iStep] * ktx[iStep - 1];
+		x[3] = x0[3] + coef[iStep] * kty[iStep - 1];
 
-      k[0][iStep] = x[2] * h;
-      k[1][iStep] = x[3] * h;
-      k[2][iStep] = Ax[iStep] * hC + hCqp * (dAx_dtx[iStep] * x[2] + dAx_dty[iStep] * x[3]);
-      k[3][iStep] = Ay[iStep] * hC + hCqp * (dAy_dtx[iStep] * x[2] + dAy_dty[iStep] * x[3]);
+		kx[iStep] = x[2] * h;
+		ky[iStep] = x[3] * h;
+		ktx[iStep] = Ax[iStep] * hC + hCqp * (dAx_dtx[iStep] * x[2] + dAx_dty[iStep] * x[3]);
+		kty[iStep] = Ay[iStep] * hC + hCqp * (dAy_dtx[iStep] * x[2] + dAy_dty[iStep] * x[3]);
    }  // 4
 
-   F[4]  = x0[0] + k[0][0] * C1_6 + k[0][1] * C1_3 + k[0][2] * C1_3 + k[0][3] * C1_6; //CalcOut(x0[0], k[0]);
-   F[9]  = x0[1] + k[1][0] * C1_6 + k[1][1] * C1_3 + k[1][2] * C1_3 + k[1][3] * C1_6; //CalcOut(x0[1], k[1]);
-   F[14] = x0[2] + k[2][0] * C1_6 + k[2][1] * C1_3 + k[2][2] * C1_3 + k[2][3] * C1_6; //CalcOut(x0[2], k[2]);
-   F[19] = x0[3] + k[3][0] * C1_6 + k[3][1] * C1_3 + k[3][2] * C1_3 + k[3][3] * C1_6; //CalcOut(x0[3], k[3]);
+   F[4]  = x0[0] + kx[0] * C1_6 + kx[1] * C1_3 + kx[2] * C1_3 + kx[3] * C1_6; //CalcOut(x0[0], k[0]);
+   F[9]  = x0[1] + ky[0] * C1_6 + ky[1] * C1_3 + ky[2] * C1_3 + ky[3] * C1_6; //CalcOut(x0[1], k[1]);
+   F[14] = x0[2] + ktx[0] * C1_6 + ktx[1] * C1_3 + ktx[2] * C1_3 + ktx[3] * C1_6; //CalcOut(x0[2], k[2]);
+   F[19] = x0[3] + kty[0] * C1_6 + kty[1] * C1_3 + kty[2] * C1_3 + kty[3] * C1_6; //CalcOut(x0[3], k[3]);
    F[24] = 1.;
    // end of derivatives dx/dqp
 

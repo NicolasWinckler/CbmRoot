@@ -2,6 +2,9 @@
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2009
  * @version 1.0
+ *
+ * Classe for geometry description for the Littrack parallel
+ * version of the tracking.
  **/
 
 #ifndef LITDETECTORGEOMETRY_H_
@@ -33,11 +36,6 @@ public:
 class LitStation
 {
 public:
-	/* Constructor */
-	LitStation() {}
-
-	/* Destructor */
-	virtual ~LitStation() {}
 
 	void AddSubstation(const LitSubstation& substation) {
 		substations.push_back(substation);
@@ -115,11 +113,6 @@ public:
 class LitDetectorLayout
 {
 public:
-	/* Constructor */
-	LitDetectorLayout() {}
-
-	/* Destructor */
-	virtual ~LitDetectorLayout() {}
 
 	void AddStationGroup(const LitStationGroup& stationGroup) {
 		stationGroups.push_back(stationGroup);

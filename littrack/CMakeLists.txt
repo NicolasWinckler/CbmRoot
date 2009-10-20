@@ -100,6 +100,7 @@ qa/CbmLitRobustFitterAnalysis.cxx
 qa/CbmLitCheckSimpleGeo.cxx
 qa/CbmLitCheckField.cxx
 qa/CbmLitParallelTrackFitterTest.cxx
+qa/CbmLitCheckEnergyLoss.cxx
 weight/CbmLitWeightedHitCalculatorImp.cxx
 weight/CbmLitWeightCalculatorSimple.cxx
 weight/CbmLitWeightCalculatorGauss.cxx
@@ -139,6 +140,7 @@ qa/CbmLitPropagationAnalysis.h
 qa/CbmLitRobustFitterAnalysis.h
 qa/CbmLitCheckSimpleGeo.h
 qa/CbmLitCheckField.h
+qa/CbmLitCheckEnergyLoss.h
 )
 
 

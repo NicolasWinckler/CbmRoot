@@ -2,8 +2,6 @@
 #define CBMLITCHECKFIELD_H_
 
 #include "FairTask.h"
-#include "CbmLitMyField.h"
-#include "CbmLitFieldSlice.h"
 
 #include <vector>
 
@@ -26,6 +24,10 @@ public:
 	virtual void Finish();
 	virtual void SetParContainers();
 
+	void SetZpos(const std::vector<Double_t>& z) {
+		fZpos = z;
+	}
+
 	Bool_t IsDrawBx() const {return fDrawBx;}
 	Bool_t IsDrawBy() const {return fDrawBy;}
 	Bool_t IsDrawBz() const {return fDrawBz;}
@@ -35,31 +37,30 @@ public:
 	void IsDrawBz(Bool_t drawBz) {fDrawBz = drawBz;}
 
 private:
-	void FillHistos();
 	void CreateHistos();
-	void WriteToFile();
-//	void FitHistos(Int_t v);
-	void FindErrors();
+	void FillBHistos();
+	void FillErrHistos();
 	void DrawHistos(Int_t v);
-	void DrawFunc(Int_t v);
 
 	FairField* fField;
 
 	TList* fHistoList;
 
-	std::vector<CbmLitFieldSlice> fSlices;
+	Int_t fNofSlices;
 
-//	Int_t fNZ;
     std::vector<Double_t> fZpos;
     std::vector<Double_t> fXpos;
     std::vector<Double_t> fYpos;
-    std::vector<Int_t> fNofBinsX;
-    std::vector<Int_t> fNofBinsY;
-	std::vector<std::vector<TH2D*> >fhB;
-//	std::vector<CbmLitFieldSlice> fhSlices;
+    std::vector<std::vector<Double_t> > fCx;
+    std::vector<std::vector<Double_t> > fCy;
+    std::vector<std::vector<Double_t> > fCz;
+
+    std::vector<std::vector<TH2D*> >fhB;
+
 	std::vector<std::vector<TH2D*> >fhBErrH2D;
 	std::vector<std::vector<TH1D*> >fhBErrH1D;
 	std::vector<std::vector<TH1D*> >fhBRelErrH1D;
+	std::vector<std::vector<TH2D*> >fhBRelErrH2D;
 
 	Bool_t fDrawBx;
 	Bool_t fDrawBy;

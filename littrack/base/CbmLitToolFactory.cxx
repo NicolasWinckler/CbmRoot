@@ -193,7 +193,7 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 	} else
 	if(name == "momentum_seed") {
 		CbmLitTrackSelectionMomentum* momSelection = new CbmLitTrackSelectionMomentum();
-		momSelection->SetMinMomentum(0.5);
+		momSelection->SetMinMomentum(1.5);
 		momSelection->Initialize();
 		TrackSelectionPtr selection(momSelection);
 		return selection;
@@ -317,13 +317,13 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderNN->SetFinalSelection(CreateTrackSelection("much_final"));
 		muchFinderNN->SetFilter(CreateTrackUpdate("kalman"));
 		muchFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-		muchFinderNN->SetVerbose(1);
+		muchFinderNN->SetVerbose(3);
 		muchFinderNN->SetNofIter(1);
 		muchFinderNN->IsUseFastSearch(true);
 		muchFinderNN->SetMaxNofMissingHits(2);
 		muchFinderNN->SetSigmaCoef(3.5);
 		muchFinderNN->SetChiSqPixelHitCut(13.86);
-		muchFinderNN->SetChiSqStripHitCut(4.);
+		muchFinderNN->SetChiSqStripHitCut(9.);
 		muchFinderNN->SetPDG(13);
 		muchFinderNN->IsProcessSubstationsTogether(true);
 		muchFinderNN->Initialize();

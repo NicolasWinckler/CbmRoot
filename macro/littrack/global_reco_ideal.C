@@ -1,6 +1,6 @@
-void global_reco_ideal(Int_t nEvents = 1000)
+void global_reco_ideal(Int_t nEvents = 10000)
 {
-	TString dir  = "/home/d/andrey/parallel_10mu/";
+	TString dir  = "/home/d/andrey/std_10mu/";
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
@@ -8,6 +8,8 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	Int_t iVerbose = 1;
 	TStopwatch timer;
 	timer.Start();
+
+	gSystem->Load("/home/soft/tbb22_004oss/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -51,7 +53,7 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	run->AddTask(fitTracks);
 	// ------------------------------------------------------------------------
 
-	if (IsMuch(mcFile)) {
+	if (IsMuch(parFile)) {
 	// ----- MUCH reconstruction   --------------------------------------------
 		CbmMuchDigitizeSimpleGem* muchDigitize = new CbmMuchDigitizeSimpleGem("MuchDigitize", muchDigiFile.Data(), iVerbose);
 		run->AddTask(muchDigitize);
@@ -73,7 +75,7 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	// ------------------------------------------------------------------------
 	}
 
-	if (IsTrd(mcFile)){
+	if (IsTrd(parFile)){
 	// ----- TRD reconstruction -- --------------------------------------------
 		// Update of the values for the radiator F.U. 17.08.07
 		Int_t trdNFoils    = 130;      // number of polyetylene foils
@@ -107,7 +109,7 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	// ------------------------------------------------------------------------
 	}
 
-	if (IsTof(mcFile)) {
+	if (IsTof(parFile)) {
 	// ------ TOF reconstruction ----------------------------------------------
 		CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
 		run->AddTask(tofHitProd);

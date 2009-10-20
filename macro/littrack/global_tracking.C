@@ -50,15 +50,15 @@ void global_tracking(Int_t nEvents = 100)
 	// ------------------------------------------------------------------------
 
 //	FairGeane* Geane = new FairGeane(parFile.Data());
-	FairGeane *Geane = new FairGeane();
-	run->AddTask(Geane);
+//	FairGeane *Geane = new FairGeane();
+//	run->AddTask(Geane);
 
 	CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
 	// Tracking method to be used
 	// "branch" - branching tracking
 	// "nn" - nearest neighbor tracking
 	// "weight" - weighting tracking
-	finder->SetTrackingType("branch");
+	finder->SetTrackingType("nn_parallel");
 
 	// Hit-to-track merger method to be used
 	// "nearest_hit" - assigns nearest hit to the track
@@ -80,8 +80,8 @@ void global_tracking(Int_t nEvents = 100)
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
 	reconstructionQa->SetMinNofPointsTrd(10);
-	reconstructionQa->SetMinNofPointsMuch(11);
-	reconstructionQa->SetMinNofPointsTof(0);
+	reconstructionQa->SetMinNofPointsMuch(12);
+	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(8);
 	reconstructionQa->SetMinNofHitsMuch(11);
@@ -101,7 +101,7 @@ void global_tracking(Int_t nEvents = 100)
 	// -----   Initialize and run   --------------------------------------------
 	run->LoadGeometry();
 	run->Init();
-	Geane->SetField(run->GetField());
+//	Geane->SetField(run->GetField());
 	run->Run(0, nEvents);
 	// ------------------------------------------------------------------------
 

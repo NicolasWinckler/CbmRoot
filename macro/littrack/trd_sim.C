@@ -1,4 +1,4 @@
-void trd_sim(Int_t nEvents = 1000)
+void trd_sim(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -9,7 +9,7 @@ void trd_sim(Int_t nEvents = 1000)
 		//if necessary specify input pluto file to embed signal particles
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
 		//directory for output simulation files
-		dir  = "/home/d/andrey/test/trunk/global_e/";
+		dir  = "/home/d/andrey/std_10e_sameZ/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
@@ -39,7 +39,7 @@ void trd_sim(Int_t nEvents = 1000)
 	TString pipeGeom   = "pipe_standard.geo";
 	TString magnetGeom = "magnet_standard.geo";
 	TString mvdGeom    = "";//"mvd_standard.geo";
-	TString stsGeom    = "sts_Standard_s3055AAFK5.SecD.geo";//"sts_standard.geo";
+	TString stsGeom    = "sts_standard.geo";
 	TString richGeom   = "rich_standard.geo";
 	TString tofGeom    = "tof_standard.geo";
 	TString ecalGeom   = "";//"ecal_FastMC.geo";
@@ -52,6 +52,7 @@ void trd_sim(Int_t nEvents = 1000)
 	TStopwatch timer;
 	timer.Start();
 
+	gSystem->Load("/home/soft/tbb22_004oss/libtbb");
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");

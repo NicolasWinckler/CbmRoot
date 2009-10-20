@@ -8,13 +8,13 @@ export MYBUILDDIR=/home/andrey/cbm/trunk/build/
 
 #Parameters for muon simulation
 #Output directory for simulation files
-export DIR=/home/d/andrey/test
+export DIR=/home/d/andrey/std_10e_urqmd
 
 #If "yes" than 10 primary muons will be generated
 export ELECTRONS=yes
 
 #If "yes" than UrQMD will be used as background
-export URQMD=no
+export URQMD=yes
 
 #If "yes" PLUTO particles will be embedded
 export PLUTO=no
@@ -29,7 +29,7 @@ for Y in 0; do
  for X in 0; do
   XXXX=00$Y$X
   echo batch $XXXX submitted
-  export INFILE=/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.$XXXX.ftn14
+  export INFILE=/home/d/events/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.$XXXX.ftn14
   export PLUTOFILE=/u/andrey/cbm/much/pluto/omega/25gev/omega.$XXXX.root
   export MCFILE=$DIR/mc.$XXXX.root
   export PARFILE=$DIR/param.$XXXX.root

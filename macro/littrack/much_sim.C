@@ -1,4 +1,4 @@
-void much_sim(Int_t nEvents = 1000)
+void much_sim(Int_t nEvents = 10000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -10,7 +10,7 @@ void much_sim(Int_t nEvents = 1000)
 		//if necessary specify input pluto file to embed signal particles
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
 		//directory for output simulation files
-		dir  = "/home/d/andrey/parallel_10mu/";
+		dir  = "/home/d/andrey/std_10mu/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
@@ -44,7 +44,7 @@ void much_sim(Int_t nEvents = 1000)
 	TString targetGeom = "target_au_250mu.geo";
 	TString magnetGeom = "magnet_standard.geo";
 	TString stsGeom    = "sts_standard.geo";
-	TString tofGeom    = "";//"tof_standard.geo";
+	TString tofGeom    = "tof_standard.geo";
 
 	// -----   Magnetic field   -----------------------------------------------
 	TString  fieldMap   = "FieldMuonMagnet";   // name of field map
@@ -53,6 +53,8 @@ void much_sim(Int_t nEvents = 1000)
 
 	TStopwatch timer;
 	timer.Start();
+
+	gSystem->Load("/home/soft/tbb22_004oss/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();

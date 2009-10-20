@@ -19,12 +19,12 @@
 const int nofPar = 12;
 
 /** Number of detector planes. */
-const int nofLayers = 13;
+const int nofLayers = 14;
 
 // Drawing options. If true than specified histograms are drawn.
 bool drawPropagation = true;
-bool drawFilter = false;
-bool drawSmoother = false;
+bool drawFilter = true;
+bool drawSmoother = true;
 
 /* Arrays to store RMS and sigma values of the histogram fits.
  * First index: 0-propagation, 1-filter, 2-smoother.
@@ -40,19 +40,20 @@ double rms[3][nofLayers][nofPar];
  */
 TCanvas* canvas[3][nofLayers];
 
+
 // Input directory
-TString dir = "/home/d/andrey/parallel_10mu/";
+TString dir = "/home/d/andrey/std_10mu/";
 // Input file with propagation analysis
-TFile *file = new TFile(dir + "propagation.ana.0000.root");
+TFile *file = new TFile(dir + "propagation.ana.fast.0000.root");
 
 //Output directory for images and fit results.
-TString outDir = "./test/";
+TString outDir = "./phd/fast_lit_prop/";
 
 void draw_prop_ana()
 {
-//	gStyle->SetOptStat("");
-//	gStyle->SetOptFit(0);
-//	gStyle->SetOptTitle(0);
+	gStyle->SetOptStat("");
+	gStyle->SetOptFit(0);
+	gStyle->SetOptTitle(0);
 
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/style.C");
 	style();
@@ -74,8 +75,14 @@ void draw_prop_ana()
 		Print(fout, 2);
 	}
 
+	DrawForPhd(0);
+	DrawForPhd(1);
+	DrawForPhd(2);
+
 	fout.close();
 }
+
+
 
 void CreateCanvas()
 {
@@ -127,10 +134,22 @@ void DrawHistos(
 		DrawText(i, sigma[v][layer][i], rms[v][layer][i]);
 		gPad->SetLogy();
 
+//		stringstream oss1;
+//		oss1 << outDir << "layer" << var[v] << layer << "_" << names[i] << ".eps";
+//		hist1->SaveAs(TString(oss1.str().c_str()));
+//
+//		stringstream oss2;
+//		oss2 << outDir << "layer" << var[v] << layer << "_" << names[i] << ".svg";
+//		hist1->SaveAs(TString(oss2.str().c_str()));
+
 	}
 	stringstream oss1;
-	oss1 << outDir << "layer" << var[v] << layer << ".gif";
+	oss1 << outDir << "layer" << var[v] << layer << ".eps";
 	canvas[v][layer]->SaveAs(TString(oss1.str().c_str()));
+
+	stringstream oss2;
+	oss2 << outDir << "layer" << var[v] << layer << ".svg";
+	canvas[v][layer]->SaveAs(TString(oss2.str().c_str()));
 }
 
 void Print(
@@ -168,3 +187,69 @@ void DrawText(
 	text.DrawTextNDC(0.8, 0.7, oss2.str().c_str());
 }
 
+
+void DrawForPhd(
+		int v)
+{
+	std::string var[] = {"_p_", "_f_", "_s_"};
+
+	const Int_t NC = 3;
+	TCanvas* canvas[NC];
+	for(Int_t i = 0; i < NC; i++) {
+		stringstream oss;
+		oss << var[v] << i;
+		canvas[i] = new TCanvas(oss.str().c_str(),oss.str().c_str(),1200, 500);
+		canvas[i]->Divide(3, 1);
+	}
+
+	const Int_t NH = 3;
+	TH1F* hist[NC][NH];
+	Int_t stnum[NC] = {0, 6, 12};
+	std::string hname[] = {"h_resx", "h_pullx", "h_resp"};
+	for (Int_t i = 0; i < NC; i++) {
+		for (Int_t j = 0; j < NH; j++) {
+			stringstream oss;
+			oss<< hname[j] << var[v] << stnum[i];
+			hist[i][j] = (TH1F*) file->Get(oss.str().c_str());
+			std::cout << oss.str() << std::endl;
+			if (!hist[i][j]) std::cout << "-E- no histogram " << oss.str() << std::endl;
+		}
+	}
+
+	Double_t sigma[NC][NH], rms[NC][NH];
+
+	for (int i = 0; i < NC; i++) {
+		for (int j = 0; j < NH; j++) {
+			canvas[i]->cd(j+1);
+			hist[i][j]->Fit("gaus");
+			hist[i][j]->SetMaximum(hist[i][j]->GetMaximum() * 2.5);
+			hist[i][j]->GetXaxis()->SetLabelSize(0.075);
+			hist[i][j]->GetXaxis()->SetNdivisions(505, kTRUE);
+			hist[i][j]->GetYaxis()->SetLabelSize(0.075);
+
+			hist[i][j]->Draw();
+			TF1 *fit1 = hist[i][j]->GetFunction("gaus");
+			sigma[i][j] = fit1->GetParameter(2);
+			rms[i][j] = hist[i][j]->GetRMS();
+
+			DrawText(j, sigma[i][j], rms[i][j]);
+			gPad->SetLogy();
+
+	//		stringstream oss1;
+	//		oss1 << outDir << "layer" << var[v] << layer << "_" << names[i] << ".eps";
+	//		hist1->SaveAs(TString(oss1.str().c_str()));
+	//
+	//		stringstream oss2;
+	//		oss2 << outDir << "layer" << var[v] << layer << "_" << names[i] << ".svg";
+	//		hist1->SaveAs(TString(oss2.str().c_str()));
+
+		}
+		stringstream oss1;
+		oss1 << outDir << "phd_layer" << var[v] << i << ".eps";
+		canvas[i]->SaveAs(TString(oss1.str().c_str()));
+
+		stringstream oss2;
+		oss2 << outDir << "phd_layer" << var[v] << i << ".svg";
+		canvas[i]->SaveAs(TString(oss2.str().c_str()));
+	}
+}

@@ -1,13 +1,15 @@
-void prop_ana(Int_t nEvents = 1000)
+void prop_ana(Int_t nEvents = 10000)
 {
-	TString dir = "/home/d/andrey/parallel_10mu/";
+	TString dir = "/home/d/andrey/std_10mu/";
 	TString mcFile = dir + "mc.0000.root";
 	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
 	TString parFile = dir + "param.0000.root";
-	TString outFile = dir + "propagation.ana.0000.root";
+	TString outFile = dir + "propagation.ana.fast.0000.root";
 
 	TStopwatch timer;
 	timer.Start();
+
+	gSystem->Load("/home/soft/tbb22_004oss/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -20,13 +22,16 @@ void prop_ana(Int_t nEvents = 1000)
 	run->SetOutputFile(outFile);
 
 //	FairGeane* Geane = new FairGeane(inFile.Data());
+//	FairGeane* Geane = new FairGeane(parFile.Data());
+//	FairGeane *Geane = new FairGeane();
+//	run->AddTask(Geane);
 
 	// -------------------------------------------------------------------------
 	CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis();
-	propAna->SetNofPlanes(13);
+	propAna->SetNofPlanes(14);
 	propAna->SetNofTrdHits(0);
 	propAna->SetNofMuchHits(13);
-	propAna->SetNofTofHits(0);
+	propAna->SetNofTofHits(1);
 	propAna->SetTestFastPropagation(true);
 	run->AddTask(propAna);
 	// -------------------------------------------------------------------------

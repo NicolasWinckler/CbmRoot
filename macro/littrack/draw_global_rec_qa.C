@@ -10,12 +10,12 @@
 #include <iomanip>
 
 //Input directory.
-const TString dir = "/home/d/andrey/test/trunk/global_e_urqmd/";
+const TString dir = "/home/d/andrey/std_10mu_urqmd/";
 //Input reconstruction file.
-const TFile *file = new TFile(dir + "global.tracks.branch.0000.root");
+const TFile *file = new TFile(dir + "global.tracks.0000.root");
 
 // Input MC file. Used to automotize some text drawings.
-const TString mcFile = dir + "mc.0000.root";
+const TString parFile = dir + "param.0000.root";
 
 //Some drawing settings.
 const Int_t lineWidth = 2;
@@ -46,6 +46,13 @@ TH1F* histTofMom[NCATS][NTYPES]; // TOF hit to track matching efficiency in depe
 
 void draw_global_rec_qa()
 {
+	gSystem->Load("/home/soft/tbb22_004oss/libtbb");
+
+	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
+	basiclibs();
+	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
+	cbmrootlibs();
+
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/draw_hist.C");
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/style.C");
@@ -83,14 +90,14 @@ void draw_eff()
 
 	std::string sname("STS");
 	std::string rname;
-	if (IsMuch(mcFile) && !IsTrd(mcFile)) rname = "MUCH";
-	else if (IsTrd(mcFile) && !IsMuch(mcFile)) rname = "TRD";
-	else if (IsTrd(mcFile) && IsMuch(mcFile)) rname = "MUCH+TRD";
+	if (IsMuch(parFile) && !IsTrd(parFile)) rname = "MUCH";
+	else if (IsTrd(parFile) && !IsMuch(parFile)) rname = "TRD";
+	else if (IsTrd(parFile) && IsMuch(parFile)) rname = "MUCH+TRD";
 	std::string hgname(sname + "+" + rname);
 	std::string gname = hgname += "+TOF";
 
 	std::string signal;
-	if (IsMuch(mcFile)) signal = "muons"; else signal = "electrons";
+	if (IsMuch(parFile)) signal = "muons"; else signal = "electrons";
 
 	std::string hname1(sname), hname2(hgname), hname3(gname);
 	hname1 += "(" + eff(histStsMom[ALL][REC], histStsMom[ALL][ACC]) + ")";
@@ -100,7 +107,7 @@ void draw_eff()
 	draw_eff(histStsMom[ALL][EFF], histHalfGlobalMom[ALL][EFF], histGlobalMom[ALL][EFF], hname1, hname2, hname3);
 
 	Int_t cat;
-	if (IsMuch(mcFile)) cat = MU; else cat = EL;
+	if (IsMuch(parFile)) cat = MU; else cat = EL;
 	std::string hname1(sname), hname2(hgname), hname3(gname);
 	hname1 += "(" + eff(histStsMom[cat][REC], histStsMom[cat][ACC])+ ")";
 	hname2 += "(" + eff(histHalfGlobalMom[cat][REC], histHalfGlobalMom[cat][ACC]) + ")";
@@ -158,7 +165,8 @@ std::string eff(
 		TH1* histRec,
 		TH1* histAcc)
 {
-	Double_t eff = histRec->GetEntries() / histAcc->GetEntries();
+	Double_t eff;
+	if (histAcc->GetEntries() == 0) eff = 0.; else	eff = histRec->GetEntries() / histAcc->GetEntries();
 	std::stringstream ss;
 	ss.precision(3);
 	ss << eff;

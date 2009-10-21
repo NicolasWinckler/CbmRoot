@@ -551,7 +551,9 @@ void CbmTrdElectronsTrainAnn::CreateROCDiagramm()
 		x[i-1] = 100.*fhCumProbEl->GetBinContent(i);
 	}
 	fROCGraph = new TGraph(nBins, x, y);
-	fROCGraph->SetTitle("ROC diagramm");
+	fROCGraph->SetTitle("ROC diagram");
+	fROCGraph->GetXaxis()->SetTitle("Electron efficiency");
+	fROCGraph->GetYaxis()->SetTitle("Pion suppression");
 }
 
 Double_t CbmTrdElectronsTrainAnn::FindOptimalCut()

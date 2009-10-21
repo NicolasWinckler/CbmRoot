@@ -11,6 +11,7 @@
 #include "TH1D.h"
 #include "TString.h"
 #include "TTree.h"
+#include "TGraph.h"
 #include "TMultiLayerPerceptron.h"
 #include "TMVA/Factory.h"
 #include "TMVA/Reader.h"
@@ -104,6 +105,8 @@ private:
     TH1D* fhPiNofClusters;
     TH1D* fhElElossMediana;
     TH1D* fhPiElossMediana;
+
+    TGraph* fROCGraph;
 	ClassDef(CbmTrdElectronsTrainAnn,1);
 
 };

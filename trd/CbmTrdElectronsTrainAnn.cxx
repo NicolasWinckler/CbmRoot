@@ -415,6 +415,7 @@ void CbmTrdElectronsTrainAnn::DoPreTest()
 	}
 	finPiTest.close();
 	CreateCumProbHistos();
+	CreateROCDiagramm();
 }
 
 
@@ -540,7 +541,17 @@ void CbmTrdElectronsTrainAnn::RunMany()
 
 void CbmTrdElectronsTrainAnn::CreateROCDiagramm()
 {
+	Int_t nBins = fhCumProbEl->GetNbinsX();
+	Double_t x[nBins], y[nBins];
 
+	for (Int_t i = 1; i <= nBins; i++) {
+		Double_t cpi = 100.*fhCumProbPi->GetBinContent(i);
+		if (cpi == 100.)cpi = 100. - 0.0001;
+		y[i-1] = 100./(100. - cpi);
+		x[i-1] = 100.*fhCumProbEl->GetBinContent(i);
+	}
+	fROCGraph = new TGraph(nBins, x, y);
+	fROCGraph->SetTitle("ROC diagramm");
 }
 
 Double_t CbmTrdElectronsTrainAnn::FindOptimalCut()
@@ -646,6 +657,12 @@ void CbmTrdElectronsTrainAnn::DrawHistos()
 	gPad->SetGridx();
 	gPad->SetGridy();
 
+	c1->cd(3);
+	fROCGraph->SetLineWidth(3);
+	fROCGraph->Draw("AL");
+
+	TCanvas* c2 = new TCanvas();
+	c2->Divide(2, 1);
 	fhElNofClusters->SetLineWidth(3);
 	fhPiNofClusters->SetLineWidth(3);
     fhElElossMediana->SetLineWidth(3);
@@ -654,13 +671,15 @@ void CbmTrdElectronsTrainAnn::DrawHistos()
 	fhElNofClusters->SetLineStyle(2);
 	fhElElossMediana->SetLineStyle(2);
 
-	c1->cd(3);
+	c2->cd(1);
 	fhElNofClusters->Draw();
 	fhPiNofClusters->Draw("same");
 	gPad->SetLogy(true);
-	c1->cd(4);
+	c2->cd(2);
 	fhElElossMediana->Draw();
 	fhPiElossMediana->Draw("same");
+
+
 }
 
 Bool_t CbmTrdElectronsTrainAnn::FileExists(TString fileName)

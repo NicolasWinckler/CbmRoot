@@ -27,26 +27,41 @@ void trd_elid_trainANN_txt()
 	///load libraries for neural net
 	if (!gROOT->GetClass("TMultiLayerPerceptron"))
 		gSystem->Load("libMLP");
-	  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-	  basiclibs();
-	  gSystem->Load("libGeoBase");
-	  gSystem->Load("libParBase");
-	  gSystem->Load("libBase");
-	  gSystem->Load("libCbmBase");
-	  gSystem->Load("libCbmData");
-	  gSystem->Load("libField");
-	  gSystem->Load("libGen");
-	  gSystem->Load("libPassive");
-	  gSystem->Load("libTMVA");
-	  gSystem->Load("libTrd");
-	  // ------------------------------------------------------------------------
+	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
+	basiclibs();
+	gSystem->Load("libGeoBase");
+	gSystem->Load("libParBase");
+	gSystem->Load("libBase");
+	gSystem->Load("libCbmBase");
+	gSystem->Load("libCbmData");
+	gSystem->Load("libField");
+	gSystem->Load("libGen");
+	gSystem->Load("libPassive");
+	gSystem->Load("libTMVA");
+	gSystem->Load("libTrd");
+	// ------------------------------------------------------------------------
+
+	TString fileNum = "0001";
+	TString geoType = "st";
+	TString inputDir = "/d/cbm02/slebedev/trd/JUL09/" + geoType + "/";
+	fileNameEl = inputDir + geoType + "_" + "electrons_mom_" + fileNum	+ ".txt";
+	fileNamePi = inputDir + geoType + "_" + "pions_mom_" + fileNum + ".txt";
+	fileNameTestEl = inputDir + geoType + "_" + "electrons_mom_" + fileNum	+ ".txt";
+	fileNameTestPi = inputDir + geoType + "_" + "pions_mom_" + fileNum	+ ".txt";
+	fileNameCumHistos ="/d/cbm02/slebedev/trd/JUL09/"+geoType+"/piel."+fileNum+".reco.root";
 
 	CbmTrdElectronsTrainAnn* trainer = new CbmTrdElectronsTrainAnn();
-	//trainer->SetAnnCut(0.7631);
+	trainer->SetFileNameEl(fileNameEl);
+	trainer->SetFileNamePi(fileNamePi);
+	trainer->SetFileNameTestEl(fileNameTestEl);
+	trainer->SetFileNameTestPi(fileNameTestPi);
+	trainer->SetFileNameCumHistos(fileNameCumHistos);
+
+	//Cut will be calculated automatically, taken into account 90% of electron efficiency
 	trainer->SetIsDoTrain(true);
 	trainer->SetTransformType(2);
-//kANN = 0, kBDT = 1, kCLUSTERS = 2, kMEDIANA = 3
-	trainer->SetIdMethod(0);
+	//kANN = 0, kBDT = 1, kCLUSTERS = 2, kMEDIANA = 3
+	trainer->SetIdMethod(1);
 	trainer->Run();
 
 }

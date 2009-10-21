@@ -58,7 +58,7 @@ void trd_elid_trainANN_txt()
 	trainer->SetFileNameCumHistos(fileNameCumHistos);
 
 	//Cut will be calculated automatically, taken into account 90% of electron efficiency
-	trainer->SetIsDoTrain(true);
+	trainer->SetIsDoTrain(false);
 	trainer->SetTransformType(2);
 	//kANN = 0, kBDT = 1, kCLUSTERS = 2, kMEDIANA = 3
 	trainer->SetIdMethod(1);

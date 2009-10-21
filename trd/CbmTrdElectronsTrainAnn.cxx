@@ -24,14 +24,6 @@ CbmTrdElectronsTrainAnn::~CbmTrdElectronsTrainAnn()
 void CbmTrdElectronsTrainAnn::Init()
 {
 
-	TString fileNum = "0001";
-	TString geoType = "st";
-	TString inputDir = "/d/cbm02/slebedev/trd/JUL09/"+geoType+"/";
-	fFileNameEl = inputDir + geoType+"_"+"electrons_mom_"+fileNum+".txt";
-	fFileNamePi = inputDir + geoType+"_"+"pions_mom_"+fileNum+".txt";
-	fFileNameTestEl = inputDir + geoType+"_"+"electrons_mom_"+fileNum+".txt";
-	fFileNameTestPi = inputDir + geoType+"_"+"pions_mom_"+fileNum+".txt";
-
 	fIsDoTrain = true;
 	fAnnCut = 0.9789;
 	fIdMethod == kBDT;
@@ -40,16 +32,7 @@ void CbmTrdElectronsTrainAnn::Init()
 	fNofInputNeurons = 12;
 	fNofHiddenNeurons = 12;
 	fNofLayers = 12;
-	TFile* f = new TFile("/d/cbm02/slebedev/trd/JUL09/"+geoType+"/piel."+fileNum+".reco.root", "READ");
-	char hName[50];
-	for (int i = 0; i < fNofLayers; i++) {
-		sprintf(hName, "fhCumProbSortPi%d", i);
-		fhCumProbSortPi[i] = (TH1D*) f->Get(hName)->Clone();
-		sprintf(hName, "fhCumProbSortEl%d", i);
-		fhCumProbSortEl[i] = (TH1D*) f->Get(hName)->Clone();
-	}
-	//f->Close();
-	//delete f;
+	InitCumHistos();
 
 //Histogramms for testing
 	Int_t nofBins = 2000;
@@ -63,6 +46,33 @@ void CbmTrdElectronsTrainAnn::Init()
     fhPiNofClusters = new TH1D("fhPiNofClusters","Number of clusters;number of clusters; entries",13, 0., 13.);
     fhElElossMediana= new TH1D("fhElElossMediana","Eloss mediana;mediana, GeV; entries",100, 0, 1);
     fhPiElossMediana = new TH1D("fhPiElossMediana","Eloss mediana;mediana, GeV; entries",100, 0., 1);
+}
+
+void CbmTrdElectronsTrainAnn::InitCumHistos()
+{
+	cout << 0 << endl;
+	for (int i = 0; i < fNofLayers; i++) {
+		if (!fhCumProbSortPi[i]) delete fhCumProbSortPi[i];
+		if (!fhCumProbSortEl[i]) delete fhCumProbSortEl[i];
+	}
+	cout << 1 << endl;
+	TFile* f = new TFile(fFileNameCumHistos, "READ");
+	if (!f->IsOpen()){
+		cout << "-E- FILE NOT FOUND fFileNameCumHistos: "<< fFileNameCumHistos << endl;
+		cout << "-E- NO TRAINING WILL BE PERFORMED!!!" << endl;
+		return;
+	}
+	cout << 2 << endl;
+	char hName[50];
+	for (int i = 0; i < fNofLayers; i++) {
+		sprintf(hName, "fhCumProbSortPi%d", i);
+		fhCumProbSortPi[i] = (TH1D*) f->Get(hName)->Clone();
+		sprintf(hName, "fhCumProbSortEl%d", i);
+		fhCumProbSortEl[i] = (TH1D*) f->Get(hName)->Clone();
+	}
+	cout << 3 << endl;
+	//f->Close();
+	//delete f;
 }
 
 void CbmTrdElectronsTrainAnn::Run()
@@ -112,7 +122,7 @@ void CbmTrdElectronsTrainAnn::Transform2()
 {
 	sort(fElossVec.begin(), fElossVec.end());
 	Int_t size = fElossVec.size();
-	//size = 11;
+	//size = 6;
 	for (Int_t j = 0; j < size; j++) {
 		Int_t binNum = fhCumProbSortPi[j]->FindBin(fElossVec[j]);
 		if (binNum > fhCumProbSortPi[j]->GetNbinsX()){
@@ -177,11 +187,23 @@ Double_t CbmTrdElectronsTrainAnn::Eval(Bool_t isEl)
 		Double_t eval = (fElossVec[5] + fElossVec[6])/2.;
 		if (eval > 4.56e-6) return 1.;
 		return -1.;
+
 	}
 }
 
 void CbmTrdElectronsTrainAnn::DoTrain()
 {
+	if (!FileExists(fFileNameEl) ){
+		cout << "-E- FILE NOT FOUND fFileNameEl: "<< fFileNameEl << endl;
+		cout << "-E- NO TRAINING WILL BE PERFORMED!!!" << endl;
+		return;
+	}
+	if (!FileExists(fFileNamePi)){
+		cout << "-E- FILE NOT FOUND fFileNamePi: "<< fFileNamePi << endl;
+		cout << "-E- NO TRAINING WILL BE PERFORMED!!!" << endl;
+		return;
+	}
+
 	std::ifstream finEl((const char*) fFileNameEl);
 	std::ifstream finPi((const char*) fFileNamePi);
 
@@ -233,12 +255,23 @@ void CbmTrdElectronsTrainAnn::DoTrain()
 	cout << "-I- create ANN: "<< mlpString << endl;
 
 	fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
-	fNN->Train(1000, "text,update=10");
+	fNN->Train(250, "+text,update=10");
 	fNN->DumpWeights((const char*)fAnnWeightsFile);
 }
 
 void CbmTrdElectronsTrainAnn::DoTrainTmva()
 {
+	if (!FileExists(fFileNameEl) ){
+		cout << "-E- FILE NOT FOUND fFileNameEl: "<< fFileNameEl << endl;
+		cout << "-E- NO TRAINING WILL BE PERFORMED!!!" << endl;
+		return;
+	}
+	if (!FileExists(fFileNamePi)){
+		cout << "-E- FILE NOT FOUND fFileNamePi: "<< fFileNamePi << endl;
+		cout << "-E- NO TRAINING WILL BE PERFORMED!!!" << endl;
+		return;
+	}
+
 	TTree* simu = CreateTree();
 
 	std::ifstream finEl((const char*) fFileNameEl);
@@ -306,6 +339,17 @@ void CbmTrdElectronsTrainAnn::DoTrainTmva()
 
 void CbmTrdElectronsTrainAnn::DoPreTest()
 {
+	if (!FileExists(fFileNameTestEl) ){
+		cout << "-E- FILE NOT FOUND fFileNameTestEl: "<< fFileNameTestEl << endl;
+		cout << "-E- NO TESTING WILL BE PERFORMED!!!" << endl;
+		return;
+	}
+	if (!FileExists(fFileNameTestPi)){
+		cout << "-E- FILE NOT FOUND fFileNameTestPi: "<< fFileNameTestPi << endl;
+		cout << "-E- NO TESTING WILL BE PERFORMED!!!" << endl;
+		return;
+	}
+
 	cout << "-I- Start pretesting " << endl;
 	if (fIdMethod == kBDT){
 		cout << "-I- IdMethod = kBDT " << endl;
@@ -376,11 +420,22 @@ void CbmTrdElectronsTrainAnn::DoPreTest()
 
 void CbmTrdElectronsTrainAnn::DoTest()
 {
+	if (!FileExists(fFileNameTestEl) ){
+		cout << "-E- FILE NOT FOUND fFileNameTestEl: "<< fFileNameTestEl << endl;
+		cout << "-E- NO TESTING WILL BE PERFORMED!!!" << endl;
+		return;
+	}
+	if (!FileExists(fFileNameTestPi)){
+		cout << "-E- FILE NOT FOUND fFileNameTestPi: "<< fFileNameTestPi << endl;
+		cout << "-E- NO TESTING WILL BE PERFORMED!!!" << endl;
+		return;
+	}
+
 	DoPreTest();
 	fAnnCut = FindOptimalCut();
 	cout << " optimal cut = " << fAnnCut
 			<< " for 90% electron efficiency" << endl;
-
+	//fAnnCut = 0.5;
 	cout << "-I- Start testing " << endl;
 	fElossVec.clear();
 	fElossVec.resize(fNofLayers);
@@ -606,6 +661,18 @@ void CbmTrdElectronsTrainAnn::DrawHistos()
 	c1->cd(4);
 	fhElElossMediana->Draw();
 	fhPiElossMediana->Draw("same");
+}
+
+Bool_t CbmTrdElectronsTrainAnn::FileExists(TString fileName)
+{
+	bool flag = false;
+	fstream fin;
+	fin.open((const char*) fileName, std::ios::in);
+	if (fin.is_open()) {
+		flag = true;
+	}
+	fin.close();
+	return flag;
 }
 
 ClassImp(CbmTrdElectronsTrainAnn)

@@ -31,6 +31,7 @@ public:
 
 	~CbmTrdElectronsTrainAnn();
 	void Init();
+	void InitCumHistos();
 	void Run();
 	void RunMany();
 
@@ -57,12 +58,22 @@ public:
 	void SetIsDoTrain(Bool_t doTrain){fIsDoTrain = doTrain;}
 	void SetTransformType(Int_t type){fTransformType = type;}
 	void SetIdMethod(IdMethod idMethod){fIdMethod = idMethod;}
-
+	void SetFileNameEl(TString fileNameEl){fFileNameEl = fileNameEl;}
+	void SetFileNamePi(TString fileNamePi){fFileNamePi = fileNamePi;}
+	void SetFileNameTestEl(TString fileNameTestEl){fFileNameTestEl = fileNameTestEl;}
+	void SetFileNameTestPi(TString fileNameTestPi){fFileNameTestPi = fileNameTestPi;}
+	void SetFileNameCumHistos(TString fileNameCumHistos){
+		fFileNameCumHistos = fileNameCumHistos;
+		InitCumHistos();
+	}
+	Bool_t FileExists(TString fileName);
 private:
 	TString fFileNameEl;
 	TString fFileNamePi;
 	TString fFileNameTestEl;
 	TString fFileNameTestPi;
+	TString fFileNameCumHistos;
+
 	Bool_t fIsDoTrain;
 	Int_t fTransformType;
 

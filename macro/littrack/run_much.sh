@@ -8,28 +8,28 @@ export MYBUILDDIR=/home/andrey/cbm/trunk/build/
 
 #Parameters for muon simulation
 #Output directory for simulation files
-export DIR=/home/d/andrey/std_10mu_urqmd
+export DIR=/home/d/andrey/straw_10mu
 
 #If "yes" than 10 primary muons will be generated
 export MUONS=yes
 
 #If "yes" than UrQMD will be used as background
-export URQMD=yes
+export URQMD=no
 
 #If "yes" PLUTO particles will be embedded
 export PLUTO=no
 
 #MUCH geometry file name
-export MUCHGEOM=much_standard.geo
+export MUCHGEOM=much_standard_straw.geo
 
 #MUCH digitization file
-export MUCHDIGI=$VMCWORKDIR/parameters/much/much_standard.digi.root
+export MUCHDIGI=$VMCWORKDIR/parameters/much/much_standard_straw.digi.root
 
 #TRD geometry file name
 export TRDGEOM=
 
 #number of events for each thread
-export NEVENTS=100
+export NEVENTS=1000
 
 for Y in 0; do
  for X in 0; do

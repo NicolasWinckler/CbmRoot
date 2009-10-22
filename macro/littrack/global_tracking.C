@@ -13,7 +13,7 @@ void global_tracking(Int_t nEvents = 100)
 	TString dir, mcFile, parFile, globalHitsFile, globalTracksFile;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/home/d/andrey/std_10mu_urqmd/";
+		dir  = "/home/d/andrey/straw_2mu/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file
@@ -58,7 +58,7 @@ void global_tracking(Int_t nEvents = 100)
 	// "branch" - branching tracking
 	// "nn" - nearest neighbor tracking
 	// "weight" - weighting tracking
-	finder->SetTrackingType("nn_parallel");
+	finder->SetTrackingType("branch");
 
 	// Hit-to-track merger method to be used
 	// "nearest_hit" - assigns nearest hit to the track
@@ -80,7 +80,7 @@ void global_tracking(Int_t nEvents = 100)
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
 	reconstructionQa->SetMinNofPointsTrd(10);
-	reconstructionQa->SetMinNofPointsMuch(12);
+	reconstructionQa->SetMinNofPointsMuch(24);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(8);

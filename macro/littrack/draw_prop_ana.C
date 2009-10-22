@@ -19,12 +19,12 @@
 const int nofPar = 12;
 
 /** Number of detector planes. */
-const int nofLayers = 14;
+const int nofLayers = 24;
 
 // Drawing options. If true than specified histograms are drawn.
-bool drawPropagation = true;
+bool drawPropagation = false;
 bool drawFilter = true;
-bool drawSmoother = true;
+bool drawSmoother = false;
 
 /* Arrays to store RMS and sigma values of the histogram fits.
  * First index: 0-propagation, 1-filter, 2-smoother.
@@ -42,9 +42,9 @@ TCanvas* canvas[3][nofLayers];
 
 
 // Input directory
-TString dir = "/home/d/andrey/std_10mu/";
+TString dir = "/home/d/andrey/straw_10mu/";
 // Input file with propagation analysis
-TFile *file = new TFile(dir + "propagation.ana.fast.0000.root");
+TFile *file = new TFile(dir + "propagation.ana.0000.root");
 
 //Output directory for images and fit results.
 TString outDir = "./phd/fast_lit_prop/";
@@ -75,9 +75,9 @@ void draw_prop_ana()
 		Print(fout, 2);
 	}
 
-	DrawForPhd(0);
-	DrawForPhd(1);
-	DrawForPhd(2);
+//	DrawForPhd(0);
+//	DrawForPhd(1);
+//	DrawForPhd(2);
 
 	fout.close();
 }
@@ -94,7 +94,7 @@ void CreateCanvas()
 		for (int i = 0; i < nofLayers; i++) {
 			stringstream oss;
 			oss << var[c] << i;
-			canvas[c][i] = new TCanvas(oss.str().c_str(),oss.str().c_str(),1200,1000);
+			canvas[c][i] = new TCanvas(oss.str().c_str(),oss.str().c_str(),1200,800);
 			canvas[c][i]->Divide(4, 3);
 		}
 	}

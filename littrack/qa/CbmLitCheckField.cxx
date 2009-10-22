@@ -51,6 +51,16 @@ CbmLitCheckField::CbmLitCheckField():
 	gStyle->SetStatColor(kWhite);
 	gStyle->SetTitleFillColor(kWhite);
 	gStyle->SetPalette(1);
+	gStyle->SetOptStat(0);
+
+	fZpos.push_back(25.);
+	fZpos.push_back(50.);
+	fZpos.push_back(75.);
+	fZpos.push_back(100.);
+	fZpos.push_back(125.);
+	fZpos.push_back(150.);
+
+	fNofSlices = fZpos.size();
 
 	// Fill maximum X and Y positions
 	fXpos.resize(fNofSlices);
@@ -139,10 +149,10 @@ void CbmLitCheckField::CreateHistos()
 	Int_t nofBinsX = 30;
 	Int_t nofBinsY = 30;
 	Int_t nofBinsErrB = 100;
-	Double_t minErrB = 2.;
-	Double_t maxErrB = 2.;
+	Double_t minErrB = -0.5;
+	Double_t maxErrB = 0.5;
 	Int_t nofBinsRelErrB = 100;
-	Double_t minRelErrB = 10.;
+	Double_t minRelErrB = -10.;
 	Double_t maxRelErrB = 10.;
 
 	// Create histograms
@@ -163,7 +173,7 @@ void CbmLitCheckField::CreateHistos()
 			std::stringstream histName3, histTitle3;
 			histName3 << "h" << namesErrH2D[v] << i;
 			histTitle3 << namesErrH2D[v] << " at z=" << fZpos[i];
-			fhBErrH2D[v][i] = new TH2D(histName3.str().c_str(), histTitle3.str().c_str(), nofBinsErrB, -fXpos[i], fXpos[i], nofBinsErrB, -fYpos[i], fYpos[i]);
+			fhBErrH2D[v][i] = new TH2D(histName3.str().c_str(), histTitle3.str().c_str(), nofBinsX, -fXpos[i], fXpos[i], nofBinsY, -fYpos[i], fYpos[i]);
 			fHistoList->Add(fhBErrH2D[v][i]);
 
 			std::stringstream histName4, histTitle4;
@@ -175,7 +185,7 @@ void CbmLitCheckField::CreateHistos()
 			std::stringstream histName5, histTitle5;
 			histName5 << "h" << namesRelErrH2D[v] << i;
 			histTitle5 << namesRelErrH2D[v] << " at z=" << fZpos[i];
-			fhBRelErrH2D[v][i] = new TH2D(histName5.str().c_str(), histTitle5.str().c_str(), nofBinsRelErrB, -fXpos[i], fXpos[i], nofBinsRelErrB, -fYpos[i], fYpos[i]);
+			fhBRelErrH2D[v][i] = new TH2D(histName5.str().c_str(), histTitle5.str().c_str(), nofBinsX, -fXpos[i], fXpos[i], nofBinsY, -fYpos[i], fYpos[i]);
 			fHistoList->Add(fhBRelErrH2D[v][i]);
 		}
 	}
@@ -191,9 +201,9 @@ void CbmLitCheckField::FillBHistos()
 		double HX = 2 * fXpos[i] / nofBinsX; // step size for X position
 		double HY = 2 * fYpos[i] / nofBinsY; // step size for Y position
 		for (int j = 0; j < nofBinsX; j++) { // loop over x position
-			double X = -fXpos[i] + j * HX;
+			double X = -fXpos[i] + (j+0.5) * HX;
 			for (int k = 0; k < nofBinsY; k++) { // loop over y position
-				double Y = -fYpos[i] + k * HY;
+				double Y = -fYpos[i] + (k+0.5)  * HY;
 
 				// get field value
 				double pos[3] = {X, Y, Z};
@@ -218,9 +228,9 @@ void CbmLitCheckField::FillErrHistos()
 		Double_t HX = 2 * fXpos[i] / nofBinsX; // step size for X position
 		Double_t HY = 2 * fYpos[i] / nofBinsY; // step size for Y position
 		for (int j = 0; j < nofBinsX; j++) { // loop over x position
-			Double_t X = -fXpos[i] + j * HX;
+			Double_t X = -fXpos[i] + (j+0.5) * HX;
 			for (int k = 0; k < nofBinsY; k++) { // loop over y position
-				Double_t Y = -fYpos[i] + k * HY;
+				Double_t Y = -fYpos[i] + (k+0.5) * HY;
 
 				// get field value
 				Double_t pos[3] = {X, Y, Z};

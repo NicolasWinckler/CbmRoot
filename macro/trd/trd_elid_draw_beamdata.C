@@ -1,9 +1,11 @@
+#include "Style.h"
+
 void calculateRMS(Float_t* eloss_exp, Float_t* yield, TH1D* fhElELoss)
 {
 	Double_t rms = 0.;
 	for (Int_t i = 0; i < 100; i++) {
 		if (eloss_exp[i] < 5.) continue;
-		Int_t binNum  = fhElELoss->FindBin(eloss_exp[i]/10e5);
+		Int_t binNum  = fhElELoss->FindBin(eloss_exp[i]/10e6);
 		Double_t binCont = fhElELoss->GetBinContent(binNum);
 		Double_t d = yield[i] - binCont;
 		rms += d*d;
@@ -13,6 +15,15 @@ void calculateRMS(Float_t* eloss_exp, Float_t* yield, TH1D* fhElELoss)
 }
 void trd_elid_draw_beamdata(Int_t trdNFoils = 0, Float_t trdDFoils = 0.0, Float_t trdDGap = 0.0)
 {
+	gStyle->SetCanvasColor(kWhite);
+	gStyle->SetFrameFillColor(kWhite);
+	gStyle->SetPadColor(kWhite);
+	gStyle->SetStatColor(kWhite);
+	gStyle->SetTitleFillColor(kWhite);
+	gStyle->SetPalette(1);
+	gStyle->SetOptStat(0);
+	gStyle->SetOptTitle(0);
+
 	Bool_t doSave = true;
 
 	TString outFile = "/d/cbm02/slebedev/trd/JUL09/simtest/piel.0000.reco.root";
@@ -35,6 +46,7 @@ void trd_elid_draw_beamdata(Int_t trdNFoils = 0, Float_t trdDFoils = 0.0, Float_
 					&err_yield_pim[i], &yield_em[i], &err_yield_em[i]);
 //			printf("%f %f %f %f %f\n", eloss_exp[i], yield_pim[i],
 //					err_yield_pim[i], yield_em[i], err_yield_em[i]);
+			eloss_exp[i] = eloss_exp[i] /10.; // should be in keV
 			err_eloss_exp[i] = 0;
 			if (yield_em[i] > maxExpEl)	maxExpEl = yield_em[i];
 			if (yield_pim[i] > maxExpPi)maxExpPi = yield_pim[i];
@@ -60,7 +72,7 @@ void trd_elid_draw_beamdata(Int_t trdNFoils = 0, Float_t trdDFoils = 0.0, Float_
 	for (int i = 0; i < 100; i++) {
 		yield_sim_el[i] = fhElELoss->GetBinContent(i);
 		yield_sim_pi[i] = fhPiELoss->GetBinContent(i);
-		eloss_sim[i] = fhElELoss->GetBinCenter(i) * 10e5;
+		eloss_sim[i] = fhElELoss->GetBinCenter(i) * 10e6;
 		err_eloss_sim[i] = 0;
 		err_yield_sim_el[i] = 0.;//fhElELoss->GetBinError(i);
 		err_yield_sim_pi[i] = 0.;//fhPiELoss->GetBinError(i);
@@ -79,6 +91,8 @@ void trd_elid_draw_beamdata(Int_t trdNFoils = 0, Float_t trdDFoils = 0.0, Float_
 	calculateRMS(eloss_exp, yield_em, fhElELoss);
 
 	TCanvas* c1 = new TCanvas("c1", "c1");
+	em_yield->GetXaxis()->SetTitle("energy loss, keV");
+	em_yield->GetYaxis()->SetTitle("yield");
 	em_yield->Draw("AL*");
 	graphElSim->Draw("L");
 	gPad->SetGridx(true);
@@ -90,6 +104,8 @@ void trd_elid_draw_beamdata(Int_t trdNFoils = 0, Float_t trdDFoils = 0.0, Float_
 	}
 
 	TCanvas* c2 = new TCanvas("c2", "c2");
+	pim_yield->GetXaxis()->SetTitle("energy loss, keV");
+	pim_yield->GetYaxis()->SetTitle("yield");
 	pim_yield->Draw("AL*");
 	graphPiSim->Draw("L");
 	gPad->SetGridx(true);

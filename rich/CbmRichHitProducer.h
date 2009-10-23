@@ -69,6 +69,16 @@ public:
    */
   CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_t det_type, Int_t noise, Int_t verbose);
 
+/** Standard constructor
+   *@param pmt_rad      radius of photomultiplier [cm]
+   *@param pmt_dis      distance between PMT tubel [cm]
+   *@param det_type     detector type (choose: 1=Protvino, 2=CsI, 3=Hamamatsu
+   *@param noise        number of noise hits
+   *@param verbose      verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
+   *@param colleff      collection efficiency for photoelectrons in PMT optics
+   */
+  CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_t det_type, Int_t noise, Int_t verbose, Double_t colleff);
+
   /** Constructor with name and title. Puts default parameter values. */
   CbmRichHitProducer(const char *name, const char *title);
 
@@ -95,7 +105,7 @@ public:
   /** method: FindRichHitPosition-> finds hit position in PMT plane **/	      
   void FindRichHitPositionSinglePMT(Double_t xPoint, Double_t yPoint,
 			Double_t& xHit, Double_t& yHit, Int_t & pmtID);
-  void FindRichHitPositionMAPMT(Double_t xPoint, Double_t yPoint,
+  void FindRichHitPositionMAPMT(Double_t sigma, Double_t xPoint, Double_t yPoint,
 			Double_t& xHit, Double_t& yHit, Int_t & pmtID);
   void FindRichHitPositionCsI(Double_t xPoint, Double_t yPoint,
 			Double_t& xHit, Double_t& yHit, Int_t & pmtID);
@@ -146,6 +156,7 @@ private:
   Double_t fPhotomulDist;     //** radius of photomultiplier */
   Int_t  fDetType;            //** detector type */
   Int_t  fNoise;              //** number of noise hits */
+  Double_t  fColl;            //** collection efficiency for photoelectrons in PMT optics */
   
   Double_t theta;   //** theta = angle by which photodetector was tilted (around x-axis)*/ 
   Double_t phi;   //** phi = angle by which photodetector was tilted (around y-axis)*/ 

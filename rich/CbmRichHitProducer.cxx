@@ -119,6 +119,28 @@ CbmRichHitProducer::CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_
 }
 // -------------------------------------------------------------------------
 
+// -----   Standard constructor with verbosity level  -------------------------------------------
+CbmRichHitProducer::CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_t det_type,
+                                       Int_t noise, Int_t verbose, Double_t colleff)
+  :FairTask("RichHitProducer")
+{
+  fPhotomulRadius = pmt_rad;
+  fPhotomulDist = pmt_dist;
+  fDetType = det_type;
+  fNoise = noise;
+  fVerbose = verbose;
+  fColl = colleff;
+
+  c = 2.998E8;                // speed of light
+  h = 6.626E-34;              // Plancks constant
+  e = 1.6022E-19;             // Eulers constant
+
+  nevents = 0;
+  fNHits  = 0;
+  fNDoubleHits = 0;
+}
+// -------------------------------------------------------------------------
+
 // -------------------------------------------------------------------------
 /** Constructor with name and title */
 CbmRichHitProducer::CbmRichHitProducer(const char *name, const char *title)
@@ -142,6 +164,7 @@ CbmRichHitProducer::~CbmRichHitProducer()
   fDetType          = 4;
   fNoise            = 220;
   fVerbose = 1;
+  fColl = 0.7;
 }
 // -------------------------------------------------------------------------
 
@@ -334,15 +357,18 @@ void CbmRichHitProducer::Exec(Option_t* option)
 
     if (fDetType == 0){
      fPhotomulRadius = 0.;
-      fPhotomulDist = 0.;
+     fPhotomulDist = 0.;
+     fColl = 1.;
     }
-    if (fDetType == 2 || fDetType == 4) {
+    if (fDetType == 2 || fDetType == 4 || fDetType == 5) {
       fPhotomulRadius = 0.6125;
       fPhotomulDist = 0.2;
+      fColl = 0.7;
      }
     if (fDetType == 3) {
       fPhotomulRadius = 0.8;
       fPhotomulDist = 0.5;
+      fColl = 1.;
      }
 
   if (fVerbose > 0){
@@ -356,7 +382,7 @@ void CbmRichHitProducer::Exec(Option_t* option)
     cout << "   single PMTs (Protvino q.e.) chosen with: " << endl;
     cout << "   PMT radius and distance between tubes (cm)" << fPhotomulRadius << " " << fPhotomulDist << endl;
     }
-    if (fDetType == 2 || fDetType == 4) {
+    if (fDetType == 2 || fDetType == 4 || fDetType == 5) {
     cout << "   Hamamatsu MAPMT H8500 (8x8 pixel): " << endl;
     cout << "   pixel length and height " << fPhotomulRadius << " cm" << endl;
     cout << "   effective distance between units " << 2*fPhotomulDist << " cm" << endl;
@@ -444,6 +470,8 @@ void CbmRichHitProducer::Exec(Option_t* option)
     //hit position as a center of PMT
     Double_t xHit, yHit;
     Int_t pmtID;
+    Double_t sigma0 = 0.; 
+    Double_t sigma = 0.19;  // sigma (cm) for additional smearing of HitPosition due to WLS film or scattering on mirror
 
     //FindRichHitPosition
     if (fDetType == 0) {
@@ -452,16 +480,17 @@ void CbmRichHitProducer::Exec(Option_t* option)
     pmtID = j;
     }
     if (fDetType == 1) FindRichHitPositionSinglePMT(detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
-    if (fDetType == 2 || fDetType == 4) FindRichHitPositionMAPMT(detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
+    if (fDetType == 2 || fDetType == 4 || fDetType == 5) FindRichHitPositionMAPMT(sigma0,detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
     if (fDetType == 3) FindRichHitPositionCsI(detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
 
     //Double_t zHit = detPoint.Z();
     Double_t zHit = fDetZ;           // fix z-position to nominal value: either tilted (fDetZ = zDet) or untilted (fDetZ_org)
-    TVector3 posHit(xHit,yHit,zHit);
+//    TVector3 posHit(xHit,yHit,zHit);
 
     //error of hit position
     //at the moment nothing better than +-tube_radius
     TVector3 posHitErr(fPhotomulRadius,fPhotomulRadius,0.);
+
 
     // add Hit: Hit assigned only if xHit and yHit != 0
     if (xHit!=0.0 && yHit!=0.0) {
@@ -477,6 +506,12 @@ void CbmRichHitProducer::Exec(Option_t* option)
           cout << "-E- RichHitProducer: wrongly assigned Hits (distance point-hit too large)! " <<
 	  detPoint.X() << " " << xHit << " " << detPoint.Y() << " " << yHit << endl;
 	  }
+     if (fDetType == 5) {      // fDetType 5: additional smearing with RMS=3mm due to WLS film
+      if (fVerbose)
+      if (TMath::Abs(detPoint.X()-xHit) > fPhotomulRadius+1.5 || TMath::Abs(detPoint.Y()-yHit) > fPhotomulRadius+1.5)
+          cout << "-E- RichHitProducer: wrongly assigned Hits ? (point-hit distance larger than 5sigma of smearing)! " <<
+	  detPoint.X() << " " << xHit << " " << detPoint.Y() << " " << yHit << endl;
+	  }
 
       if (gcode == 50000050) {
 	//for photons weight with efficiency of PMT
@@ -490,8 +525,11 @@ void CbmRichHitProducer::Exec(Option_t* option)
 	  Int_t ilambda=(Int_t)((lambda-lambda_min)/lambda_step);
 	  Double_t rand = gRandom->Rndm();
 	  detection = 0;
+          if (fDetType == 5 && lambda < 300.) {   // smear Hit position for lambda < 300 nm (WLS film!)
+              FindRichHitPositionMAPMT(sigma,detPoint.X(),detPoint.Y(),xHit,yHit,pmtID);
+            }
 
-	  if (efficiency[ilambda] > rand ) detection = 1;
+	  if (efficiency[ilambda]*fColl > rand ) detection = 1;
 //          detection = 1;
 
 	} // min <= lambda < max
@@ -506,6 +544,8 @@ void CbmRichHitProducer::Exec(Option_t* option)
       // which will be detected
 	detection=1;
 	}
+
+      TVector3 posHit(xHit,yHit,zHit);
 
       if (detection==1) {
 
@@ -551,7 +591,7 @@ void CbmRichHitProducer::Exec(Option_t* option)
     pmtID = -j;
     }
     if (fDetType == 1) FindRichHitPositionSinglePMT(xRand,yRand,xHit,yHit,pmtID);
-    if (fDetType == 2 || fDetType == 4) FindRichHitPositionMAPMT(xRand,yRand,xHit,yHit,pmtID);
+    if (fDetType == 2 || fDetType == 4 || fDetType == 5) FindRichHitPositionMAPMT(0,xRand,yRand,xHit,yHit,pmtID);
     if (fDetType == 3) FindRichHitPositionCsI(xRand,yRand,xHit,yHit,pmtID);
 
     // add Hit
@@ -622,13 +662,13 @@ void CbmRichHitProducer::Finish()
 // -------------------------------------------------------------------------
 
 // -----  protected method: Set Photodetector Parameters ----------------------------
-void CbmRichHitProducer::SetPhotoDetPar(Int_t fDetType, Double_t& fLambdaMin, Double_t& fLambdaMax, Double_t& fLambdaStep, Double_t fEfficiency[])
+void CbmRichHitProducer::SetPhotoDetPar(Int_t det_type, Double_t& fLambdaMin, Double_t& fLambdaMax, Double_t& fLambdaStep, Double_t fEfficiency[])
 {
 // gives parameters for a chosen photodetector type
 
   if (fVerbose > 0) cout << "SetPhotoDetPar routine called for PMT type " << fDetType << endl;
 
-if (fDetType == 1){
+if (det_type == 1){
 
   /** PMT efficiencies for Protvino-type PMT
        corresponding range in lambda: (100nm)120nm - 700nm in steps of 20nm */
@@ -705,7 +745,7 @@ if (fDetType == 1){
   */
 
   }
- else if (fDetType == 3){
+ else if (det_type == 3){
 
   /** quantum efficiency for CsI photocathode
       approximately read off from fig.3 in NIM A 433 (1999) 201 (HADES)*/
@@ -724,7 +764,7 @@ if (fDetType == 1){
     fEfficiency[7] = 0.03;
 
    }
-  else if (fDetType == 2){
+  else if (det_type == 2){
 
   /** PMT efficiencies for Hamamatsu H8500
                         (Flat type Multianode Photomultiplier)
@@ -760,7 +800,7 @@ if (fDetType == 1){
     fEfficiency[23] = 0.00002;
 
    }
-   else if (fDetType == 4){
+   else if (det_type == 4){
 
   /** PMT efficiencies for Hamamatsu H8500-03
                         (Flat type Multianode Photomultiplier with UV window)
@@ -794,7 +834,44 @@ if (fDetType == 1){
     fEfficiency[21] = 0.0033;
 
    }
-    else if (fDetType == 0){
+
+else if (det_type == 5){
+
+  /** PMT efficiencies for Hamamatsu H8500 + WLS film
+                        (Flat type Multianode Photomultiplier with UV window)
+   corresponding range in lambda: 150nm - 650nm in steps of 20nm */
+
+    fLambdaMin = 160.;
+    fLambdaMax = 640.;
+    fLambdaStep = 20.;
+
+    fEfficiency[0] = 0.1;
+    fEfficiency[1] = 0.2;
+    fEfficiency[2] = 0.2;
+    fEfficiency[3] = 0.2;
+    fEfficiency[4] = 0.2;
+    fEfficiency[5] = 0.2;
+    fEfficiency[6] = 0.23;
+    fEfficiency[7] = 0.24;
+    fEfficiency[8] = 0.25;
+    fEfficiency[9] = 0.25;
+    fEfficiency[10] = 0.24;
+    fEfficiency[11] = 0.24;
+    fEfficiency[12] = 0.23;
+    fEfficiency[13] = 0.22;
+    fEfficiency[14] = 0.2;
+    fEfficiency[15] = 0.16;
+    fEfficiency[16] = 0.14;
+    fEfficiency[17] = 0.1;
+    fEfficiency[18] = 0.065;
+    fEfficiency[19] = 0.045;
+    fEfficiency[20] = 0.02;
+    fEfficiency[21] = 0.017;
+    fEfficiency[22] = 0.007;
+    fEfficiency[23] = 0.0033;
+
+   }
+    else if (det_type == 0){ 
 
   /** ideal detector */
 
@@ -869,7 +946,7 @@ void CbmRichHitProducer::FindRichHitPositionSinglePMT(Double_t xPoint, Double_t 
 
 
 // -----  protected method: Find Hit Position   ----------------------------
-void CbmRichHitProducer::FindRichHitPositionMAPMT(Double_t xPoint, Double_t yPoint,
+void CbmRichHitProducer::FindRichHitPositionMAPMT(Double_t sigma, Double_t xPoint, Double_t yPoint,
 				         Double_t& xHit, Double_t& yHit,
                                          Int_t & pmtID)
 {
@@ -880,6 +957,8 @@ void CbmRichHitProducer::FindRichHitPositionMAPMT(Double_t xPoint, Double_t yPoi
     assume some spacing between single units of s=1mm
     ==> use as effective values   fPhotomulRadius = 6.125mm = 0.6125cm
                                   fPhotomulDist = 0.5mm + 1.5mm = 2mm = 0.2cm
+
+    sigma (cm) : add WLS film --> hits smeared with sigma
     **/
 
 
@@ -897,6 +976,12 @@ void CbmRichHitProducer::FindRichHitPositionMAPMT(Double_t xPoint, Double_t yPoi
 
   Double_t uPoint, vPoint;
   Double_t uPMT, vPMT, uPMTs, vPMTs;
+
+// smear Point if photon is converted via WLS film:
+  if (sigma > 0.) {
+   xPoint = xPoint + gRandom->Gaus(0,sigma);
+   yPoint = yPoint + gRandom->Gaus(0,sigma);
+  }
 
   uPoint = 2.*fDetWidthX + xPoint;
   if (yPoint > 0)

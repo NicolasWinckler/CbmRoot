@@ -43,12 +43,12 @@ void trd_elid_trainANN_txt()
 
 	TString fileNum = "0001";
 	TString geoType = "st";
-	TString inputDir = "/d/cbm02/slebedev/trd/JUL09/" + geoType + "/";
+	TString inputDir = "/d/cbm02/slebedev/trd/JUL09/tr_params/";
 	fileNameEl = inputDir + geoType + "_" + "electrons_mom_" + fileNum	+ ".txt";
 	fileNamePi = inputDir + geoType + "_" + "pions_mom_" + fileNum + ".txt";
 	fileNameTestEl = inputDir + geoType + "_" + "electrons_mom_" + fileNum	+ ".txt";
 	fileNameTestPi = inputDir + geoType + "_" + "pions_mom_" + fileNum	+ ".txt";
-	fileNameCumHistos ="/d/cbm02/slebedev/trd/JUL09/"+geoType+"/piel."+fileNum+".reco.root";
+	fileNameCumHistos ="/d/cbm02/slebedev/trd/JUL09/tr_params/piel."+fileNum+".reco.root";
 
 	CbmTrdElectronsTrainAnn* trainer = new CbmTrdElectronsTrainAnn();
 	trainer->SetFileNameEl(fileNameEl);
@@ -56,12 +56,16 @@ void trd_elid_trainANN_txt()
 	trainer->SetFileNameTestEl(fileNameTestEl);
 	trainer->SetFileNameTestPi(fileNameTestPi);
 	trainer->SetFileNameCumHistos(fileNameCumHistos);
+	trainer->SetNofHiddenNeurons(12);
+	trainer->SetNofAnnEpochs(250);
+	trainer->SetMaxNofTrainPi(6000);
+	trainer->SetMaxNofTrainEl(6000);
 
 	//Cut will be calculated automatically, taken into account 90% of electron efficiency
-	trainer->SetIsDoTrain(false);
+	trainer->SetIsDoTrain(true);
 	trainer->SetTransformType(2);
 	//kANN = 0, kBDT = 1, kCLUSTERS = 2, kMEDIANA = 3
-	trainer->SetIdMethod(1);
+	trainer->SetIdMethod(0);
 	trainer->Run();
 
 }

@@ -67,6 +67,11 @@ public:
 		fFileNameCumHistos = fileNameCumHistos;
 		InitCumHistos();
 	}
+	void SetNofHiddenNeurons(Int_t nofHiddenNeurons){fNofHiddenNeurons=nofHiddenNeurons;}
+	void SetNofAnnEpochs(Int_t nofAnnEpochs){fNofAnnEpochs=nofAnnEpochs;}
+	void SetMaxNofTrainPi(Int_t nofPi){fMaxNofTrainPi = nofPi;}
+	void SetMaxNofTrainEl(Int_t nofEl){fMaxNofTrainEl = nofEl;}
+
 	Bool_t FileExists(TString fileName);
 private:
 	TString fFileNameEl;
@@ -94,6 +99,9 @@ private:
 	TMultiLayerPerceptron* fNN;
 	TMVA::Reader* fReader;
 	IdMethod fIdMethod;
+	Int_t fNofAnnEpochs;
+	Int_t fMaxNofTrainPi;
+	Int_t fMaxNofTrainEl;
 
 // Histogramms for testing
 	TH1D* fhAnnOutputPi;

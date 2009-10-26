@@ -31,6 +31,7 @@ void CbmTrdElectronsTrainAnn::Init()
 	fAnnWeightsFile = "Neural_Net_Weights.txt";
 	fNofInputNeurons = 12;
 	fNofHiddenNeurons = 12;
+	fNofAnnEpochs = 250;
 	fNofLayers = 12;
 	InitCumHistos();
 
@@ -50,19 +51,18 @@ void CbmTrdElectronsTrainAnn::Init()
 
 void CbmTrdElectronsTrainAnn::InitCumHistos()
 {
-	cout << 0 << endl;
 	for (int i = 0; i < fNofLayers; i++) {
 		if (!fhCumProbSortPi[i]) delete fhCumProbSortPi[i];
 		if (!fhCumProbSortEl[i]) delete fhCumProbSortEl[i];
 	}
-	cout << 1 << endl;
+
 	TFile* f = new TFile(fFileNameCumHistos, "READ");
 	if (!f->IsOpen()){
 		cout << "-E- FILE NOT FOUND fFileNameCumHistos: "<< fFileNameCumHistos << endl;
 		cout << "-E- NO TRAINING WILL BE PERFORMED!!!" << endl;
 		return;
 	}
-	cout << 2 << endl;
+
 	char hName[50];
 	for (int i = 0; i < fNofLayers; i++) {
 		sprintf(hName, "fhCumProbSortPi%d", i);
@@ -70,7 +70,6 @@ void CbmTrdElectronsTrainAnn::InitCumHistos()
 		sprintf(hName, "fhCumProbSortEl%d", i);
 		fhCumProbSortEl[i] = (TH1D*) f->Get(hName)->Clone();
 	}
-	cout << 3 << endl;
 	//f->Close();
 	//delete f;
 }
@@ -208,8 +207,6 @@ void CbmTrdElectronsTrainAnn::DoTrain()
 	std::ifstream finPi((const char*) fFileNamePi);
 
 	Int_t nofPi = 0, nofEl = 0;
-	//Max number of electrons and pions for training samples
-	Int_t maxNofPi = 3000, maxNofEl = 3000;
 	Double_t dEdX, tr, mom;
 	std::vector<Double_t> inVectorTemp;
 	inVectorTemp.resize(12);
@@ -231,7 +228,7 @@ void CbmTrdElectronsTrainAnn::DoTrain()
 
 		simu->Fill();
 		nofPi++;
-		if (nofPi >= maxNofPi) break;
+		if (nofPi >= fMaxNofTrainPi) break;
 	}
 	finPi.close();
 	while (!finEl.eof()) {
@@ -247,15 +244,15 @@ void CbmTrdElectronsTrainAnn::DoTrain()
 
 		simu->Fill();
 		nofEl++;
-		if (nofEl >= maxNofEl) break;
+		if (nofEl >= fMaxNofTrainEl) break;
 	}
 	finEl.close();
 	if (!fNN) delete fNN;
 	TString mlpString = CreateAnnString();
 	cout << "-I- create ANN: "<< mlpString << endl;
-
+	cout << "-I- number of training epochs = " << fNofAnnEpochs << endl;
 	fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
-	fNN->Train(250, "+text,update=10");
+	fNN->Train(fNofAnnEpochs, "+text,update=10");
 	fNN->DumpWeights((const char*)fAnnWeightsFile);
 }
 
@@ -278,8 +275,6 @@ void CbmTrdElectronsTrainAnn::DoTrainTmva()
 	std::ifstream finPi((const char*) fFileNamePi);
 
 	Int_t nofPi = 0, nofEl = 0;
-	//Max number of electrons and pions for training samples
-	Int_t maxNofPi = 6000, maxNofEl = 6000;
 	Double_t dEdX, tr, mom;
 	std::vector<Double_t> inVectorTemp;
 	inVectorTemp.resize(12);
@@ -297,7 +292,7 @@ void CbmTrdElectronsTrainAnn::DoTrainTmva()
 		Transform();
 		simu->Fill();
 		nofPi++;
-		if (nofPi >= maxNofPi) break;
+		if (nofPi >= fMaxNofTrainPi) break;
 	}
 	finPi.close();
 	while (!finEl.eof()) {
@@ -311,7 +306,7 @@ void CbmTrdElectronsTrainAnn::DoTrainTmva()
 		Transform();
 		simu->Fill();
 		nofEl++;
-		if (nofEl >= maxNofEl) break;
+		if (nofEl >= fMaxNofTrainEl) break;
 	}
 	finEl.close();
 
@@ -320,7 +315,7 @@ void CbmTrdElectronsTrainAnn::DoTrainTmva()
 	TCut mycuts = "";
 	TCut mycutb = "";
 	factory->PrepareTrainingAndTestTree(mycuts, mycutb,
-			"NSigTrain=3000:NBkgTrain=3000:SplitMode=Random:NormMode=NumEvents:!V");
+			"NSigTrain=0:NBkgTrain=0:SplitMode=Random:NormMode=NumEvents:!V");
 
 	//factory->BookMethod(TMVA::Types::kTMlpANN, "TMlpANN","!H:!V:NCycles=50:HiddenLayers=N+1");
 

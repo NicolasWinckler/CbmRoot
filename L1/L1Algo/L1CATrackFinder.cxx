@@ -110,13 +110,13 @@ void L1Algo::CATrackFinder()
   Draw1();
 #endif
 
-  //for (int isec = 0; isec <= 0; isec++){ // D0 !!!
-  //for (int isec = 0; isec <= 1; isec++){
+//  for (int isec = 0; isec <= 0; isec++){ // D0 !!!
+//  for (int isec = 0; isec <= 1; isec++){
 
   for (int isec = 0; isec <= 2; isec++){ // all finder
 
   //for (int isec = 0; isec <= fTrackingLevel; isec++){ // 
-    
+
     unsigned int stat_n_trip = 0;
     
     //cout << "isec " << isec << " : ";
@@ -129,18 +129,35 @@ void L1Algo::CATrackFinder()
     //TStopwatch c_time_find;
     
     TRACK_CHI2_CUT = 10.0; // SG
+
+   // double Pick_m = 4.0;
+   // double Pick_m_y = 4.0;
  
+    double Pick_m = 5.0;
+    double Pick_m_y = 5.0;
+    double Pick_r = 5.0;
+    double Pick_r_y = 3.0;
+    double Pick_gather = 5.0; //!!!
+    if (isec == 0){
+      Pick_m =  2.0;
+      Pick_m_y = 5.0;
+//      Pick_m_y = 4.0;
+    }
+
+
+
+/* 
     double Pick_m = 3.0;
     double Pick_r = 5.0;
     double Pick_gather = 5.0; //!!!
     if (isec == 0){
       Pick_m =  2.0;
     }
-
+*/
     //double MaxInvMom = 1.0/1.;
     double MaxInvMom = 1.0/0.5;
     //if (isec == 1) MaxInvMom =  1.0/0.2;
-    if (isec == 1) MaxInvMom =  1.0/0.1;
+    if (isec == 1) MaxInvMom =  1.0/0.15;
     //if (isec == 2) MaxInvMom =  1.0/0.2;
     if (isec == 2) MaxInvMom =  1.0/0.1;
     if (isec == fTrackingLevel )  MaxInvMom = 1./fMomentumCutOff;
@@ -210,25 +227,25 @@ void L1Algo::CATrackFinder()
       fvec Infqp = MaxInvMom/3.*MaxInvMom/3.;
       const int Portion = 16;
       const int MaxPortionHit = Portion;
-      const int MaxPortionDup = 10000;
-      const int MaxPortionTrip = 10000;
+      const int MaxPortionDup = 100000;
+      const int MaxPortionTrip = 100000;
 
-      static L1FieldRegion fld_1[20000];
-      static L1FieldRegion fld_2[20000];
-      static L1TrackPar T_1[20000];
-      static L1TrackPar T_2[20000];
+      static L1FieldRegion fld_1[200000];
+      static L1FieldRegion fld_2[200000];
+      static L1TrackPar T_1[200000];
+      static L1TrackPar T_2[200000];
       static L1TrackPar *T_3 = T_1;
 
       static unsigned short int hitsl_2[MaxPortionDup];
       static unsigned short int hitsl_3[MaxPortionTrip];
       static unsigned short int *hitsl_1 = hitsl_3;
 
-      static unsigned short int hitsm_2[10000];
-      static unsigned short int hitsm_3[10000];
-      static unsigned short int hitsr_3[10000];
+      static unsigned short int hitsm_2[100000];
+      static unsigned short int hitsm_3[100000];
+      static unsigned short int hitsr_3[100000];
       
-      static fvec u_front[20000], u_back[20000], Z[20000];
-      static fvec x_minusV[20000], x_plusV[20000], y_minusV[20000], y_plusV[20000];
+      static fvec u_front[200000], u_back[200000], Z[200000];
+      static fvec x_minusV[200000], x_plusV[200000], y_minusV[200000], y_plusV[200000];
       static fscal *x_minus = (fscal*) x_minusV;
       static fscal *x_plus  = (fscal*) x_plusV;
       static fscal *y_minus = (fscal*) y_minusV;
@@ -360,12 +377,22 @@ void L1Algo::CATrackFinder()
 	  T.C00 = stal.XYInfo.C00;
 	  T.C10 = stal.XYInfo.C10;
 	  T.C11 = stal.XYInfo.C11;
-	  T.C22 = T.C33 = vINF; T.C44 = Infqp;
+          fvec dz;
+          dz = targZ - zl;
+          T.C44 = Infqp;
+
+          fvec KOR=0.003; 
+          fvec KOR1=0.0003;
+          //if (isec == 1) {KOR=0.005; KOR1=0.0005;}
+          if (isec == 2) {KOR=0.006; KOR1=0.0012;}
+          T.C22=(T.tx*T.tx+1.0)*KOR*KOR*dz*dz + 2.0*stal.XYInfo.C00[0]/(dz*dz);
+          T.C33=(T.ty*T.ty+1.0)*KOR1*KOR1*dz*dz + 2.0*stal.XYInfo.C11[0]/(dz*dz);
+	  //T.C22 = T.C33 = vINF; T.C44 = Infqp;
 	  //add the target
 	  {
 	    fvec eX, eY, J04, J14;
-	    fvec dz; 
-	    dz = targZ - zl;
+	  //  fvec dz; 
+	  //  dz = targZ - zl;
 	    L1ExtrapolateJXY0(T.tx, T.ty, dz, fld, eX, eY, J04, J14 );
 	    fvec J[6];
 	    J[0]= dz; J[1] = 0; J[2]= J04;
@@ -373,12 +400,18 @@ void L1Algo::CATrackFinder()
 	    L1FilterVtx( T, targX, targY, TargetXYInfo, eX, eY, J );
 	  }
 
-	  L1AddMaterial( T, stal.materialInfo, qp1 );	  
+	  //L1AddMaterial( T, stal.materialInfo, qp1 );	  
+          for (int ista = 0; ista<=istal; ista++){
+          if (ista==NMvdStations) L1AddMaterial_pipe( T, qp1);
+          L1Station &stal1 = vStations[ista];
+          L1AddMaterial( T, stal1.materialInfo, qp1 );
+          }
+
 	  L1Extrapolate0( T, stam.z, fld );
 
 	  fvec dxm_est = Pick_m*sqrt(fabs(T.C00+stam.XYInfo.C00));
-	  fvec dym_est = Pick_m*sqrt(fabs(T.C11+stam.XYInfo.C11));
-
+	  //fvec dym_est = Pick_m*sqrt(fabs(T.C11+stam.XYInfo.C11));
+          fvec dym_est = Pick_m_y*sqrt(fabs(T.C11+stam.XYInfo.C11));
 	  x_minusV[i1_V] = T.x - dxm_est;
 	  x_plusV [i1_V] = T.x + dxm_est;
 	  y_minusV[i1_V] = T.y - dym_est;
@@ -539,7 +572,8 @@ break;
 	  L1AddMaterial( T2, stam.materialInfo, T2.qp );
 	  L1Extrapolate( T2, star.z, T2.qp, f2 );	
 	  fvec dxm_est = Pick_r*sqrt(fabs(T2.C00+star.XYInfo.C00));
-	  fvec dym_est = Pick_r*sqrt(fabs(T2.C11+star.XYInfo.C11));	
+	  //fvec dym_est = Pick_r*sqrt(fabs(T2.C11+star.XYInfo.C11));
+          fvec dym_est = Pick_r_y*sqrt(fabs(T2.C11+star.XYInfo.C11)); 	
 	  x_minusV[i2_V] = T2.x - dxm_est;
 	  x_plusV [i2_V] = T2.x + dxm_est;	  
 	  y_minusV[i2_V] = T2.y - dym_est;
@@ -569,15 +603,6 @@ break;
 	    L1StsHit &hitr = vStsHits_r[irh];
        
           if ( (irh+StsHitsStartIndex[istar]) > StsHitsStopIndex[istar]) { 
-  /*
-       cout << "istar= " << istar << endl;
-           cout << "irh+StsHitsStartIndex[istar]= " << (irh+StsHitsStartIndex[istar]) 
-           << " StsHitsStopIndex[istar]= " << StsHitsStopIndex[istar] << endl;
-           cout << "irh= " << irh << endl;
-           cout << "duplet_b= " << duplet_b << " duplet_e= " << duplet_e << endl;  
-         cout << "mrDuplets_hits[duplet_b]= " << mrDuplets_hits[duplet_b] 
-         << " mrDuplets_hits[duplet_e]= " << mrDuplets_hits[duplet_e] << endl;
- */ 
           continue;
            }
 

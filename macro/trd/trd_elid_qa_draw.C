@@ -1,64 +1,64 @@
 
-Double_t fitFunction(Double_t *x, Double_t *par)
-{
-	Double_t xx = x[0];
-	Double_t c = ( (par[0]/( sqrt(2*TMath::Pi()) ) * par[1] * xx ) );
-	Double_t c1 = TMath::Exp( (-1. / (2. * par[1] * par[1])) * pow(log(xx) - par[2], 2) );
-	return c * c1;
-}
-
-double* getPiEloss(TH1D* h)
-{
-	//h->Draw();
-	double maxX = 50., minX = 0.;
-	TF1 *fitFcn = new TF1("fitLogNorm", fitFunction, minX, maxX, 3);
-	fitFcn->SetParameter(1, 1000.);
-	fitFcn->SetParameter(2, 0.7);
-	h->Fit("fitLogNorm", "", "", minX, maxX);
-	//fhPiELoss->Fit("landau");
-
-	double par[5];
-	par[0] = fitFcn->GetParameter(0);
-	par[1] = fitFcn->GetParameter(1);
-	par[2] = fitFcn->GetParameter(2);
-
-	int nofPoints = 5000;
-	double curX = 0.;
-	double dx = maxX/nofPoints;
-	double maximum = 0.;//fitFcn->GetMaximum();
-	double maximumX = 0.;//fitFcn->GetMaximumX();
-	for (int i = 0; i < nofPoints; i++) {
-		double y = fitFunction(&curX, par);
-		if (y > maximum) {
-			maximum = y;
-			maximumX = curX;
-		}
-		curX += dx;
-	}
-	curX = 0.;
-	double halfMaxF = maximum / 2.;
-	double x0 = -1.;
-	double x1 = -1.;
-	for (int i = 0; i < nofPoints; i++) {
-		double y = fitFunction(&curX, par);
-		if (y > halfMaxF && x0 == -1) x0 = curX;
-		if (y < halfMaxF && x0 != -1) {
-			x1 = curX;
-			break;
-		}
-		curX += dx;
-	}
-	par[3] = x1 - x0;
-	par[4] = maximumX;
-
-	delete fitFcn;
-
-	return par;
-}
+//Double_t fitFunction(Double_t *x, Double_t *par)
+//{
+//	Double_t xx = x[0];
+//	Double_t c = ( (par[0]/( sqrt(2*TMath::Pi()) ) * par[1] * xx ) );
+//	Double_t c1 = TMath::Exp( (-1. / (2. * par[1] * par[1])) * pow(log(xx) - par[2], 2) );
+//	return c * c1;
+//}
+//
+//double* getPiEloss(TH1D* h)
+//{
+//	//h->Draw();
+//	double maxX = 50., minX = 0.;
+//	TF1 *fitFcn = new TF1("fitLogNorm", fitFunction, minX, maxX, 3);
+//	fitFcn->SetParameter(1, 1000.);
+//	fitFcn->SetParameter(2, 0.7);
+//	h->Fit("fitLogNorm", "", "", minX, maxX);
+//	//fhPiELoss->Fit("landau");
+//
+//	double par[5];
+//	par[0] = fitFcn->GetParameter(0);
+//	par[1] = fitFcn->GetParameter(1);
+//	par[2] = fitFcn->GetParameter(2);
+//
+//	int nofPoints = 5000;
+//	double curX = 0.;
+//	double dx = maxX/nofPoints;
+//	double maximum = 0.;//fitFcn->GetMaximum();
+//	double maximumX = 0.;//fitFcn->GetMaximumX();
+//	for (int i = 0; i < nofPoints; i++) {
+//		double y = fitFunction(&curX, par);
+//		if (y > maximum) {
+//			maximum = y;
+//			maximumX = curX;
+//		}
+//		curX += dx;
+//	}
+//	curX = 0.;
+//	double halfMaxF = maximum / 2.;
+//	double x0 = -1.;
+//	double x1 = -1.;
+//	for (int i = 0; i < nofPoints; i++) {
+//		double y = fitFunction(&curX, par);
+//		if (y > halfMaxF && x0 == -1) x0 = curX;
+//		if (y < halfMaxF && x0 != -1) {
+//			x1 = curX;
+//			break;
+//		}
+//		curX += dx;
+//	}
+//	par[3] = x1 - x0;
+//	par[4] = maximumX;
+//
+//	delete fitFcn;
+//
+//	return par;
+//}
 
 void trd_elid_qa_draw()
 {
-	TFile* file = new TFile("/d/cbm02/slebedev/trd/JUL09/st/piel.0001.reco.root");
+	TFile* file = new TFile("/d/cbm02/slebedev/trd/JUL09/reco/param3/st/piel.0009.reco.root");
 
 
     gStyle->SetPalette(1,0);
@@ -86,9 +86,15 @@ void trd_elid_qa_draw()
 
     c1->cd(2);
     fhPiELoss->Draw();
-	double par[5] = getPiEloss(fhPiELoss);
-	cout << "  MaximumX = " << par[4] << endl;
-	cout << "  FWHM = " << par[3]	<< "  FWHM/4.02 = " << par[3] / 4.02 << endl;
+
+	fhPiELoss->Fit("landau");
+	TF1 *fitFcn = fhPiELoss->GetFunction("landau");
+	cout << "MP = " << fitFcn->GetParameter(1) << endl;
+	cout << "Sigma = " << fitFcn->GetParameter(2) << endl;
+
+//	double par[5] = getPiEloss(fhPiELoss);
+//	cout << "  MaximumX = " << par[4] << endl;
+//	cout << "  FWHM = " << par[3]	<< "  FWHM/4.02 = " << par[3] / 4.02 << endl;
 
     c1->cd(3);
     fhElNofZeroTR->Draw();

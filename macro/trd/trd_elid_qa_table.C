@@ -10,28 +10,29 @@ void trd_elid_qa_table()
     std::vector<Double_t> fPiELossSum;
     std::vector<Double_t> fElELossSum;
     std::vector<Double_t> fElNofZeroTR;
-    std::vector<Double_t> fFWHM;
+    std::vector<Double_t> fSigma;
     std::vector<Double_t> fMP;
 
     fPiELossSum.resize(nofFiles);
     fElELossSum.resize(nofFiles);
     fElNofZeroTR.resize(nofFiles);
-    fFWHM.resize(nofFiles);
+    fSigma.resize(nofFiles);
     fMP.resize(nofFiles);
 
 	char recoFileName[150];
 	double* par;
 //fill arrays
 	for (Int_t iFile = 0; iFile < nofFiles; iFile++){
-        sprintf(recoFileName,"/d/cbm02/slebedev/trd/JUL09/st/piel.%.4i.reco.root",iFile);
+        sprintf(recoFileName,"/d/cbm02/slebedev/trd/JUL09/reco/param3/st/piel.%.4i.reco.root",iFile);
 		TFile* file = new TFile(recoFileName);
 
 		fPiELossSum[iFile] = fhPiELossSum->GetMean();
 		fElELossSum[iFile] = fhElELossSum->GetMean();
 		fElNofZeroTR[iFile] = fhElNofZeroTR->GetMean();
-		par = getPiEloss(fhPiELoss);
-		fFWHM[iFile] = par[3];
-		fMP[iFile] = par[4];
+		fhPiELoss->Fit("landau");
+		TF1 *fitFcn = fhPiELoss->GetFunction("landau");
+		fSigma[iFile] = fitFcn->GetParameter(2);
+		fMP[iFile] = fitFcn->GetParameter(1);;
 	}
 
 //print arrays
@@ -48,7 +49,7 @@ void trd_elid_qa_table()
 	cout.width(15);
 	cout << "nof zero TR ";
 	cout.width(15);
-	cout << "FWHM/4.02 ";
+	cout << "Sigma ";
 	cout.width(15);
 	cout << "MP " << endl;
 	for (Int_t iFile = 0; iFile < nofFiles; iFile++){
@@ -64,7 +65,7 @@ void trd_elid_qa_table()
 		cout.width(15);
 		cout << fElNofZeroTR[iFile] << " ";
 		cout.width(15);
-		cout << fFWHM[iFile]/4.02 << " ";
+		cout << fSigma[iFile]<< " ";
 		cout.width(15);
 		cout << fMP[iFile] << " " << endl;
 	}

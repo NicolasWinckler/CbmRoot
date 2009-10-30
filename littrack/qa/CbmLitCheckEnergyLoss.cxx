@@ -11,6 +11,8 @@
 #include "TLegend.h"
 #include "TStyle.h"
 
+#include <cstdlib>
+
 CbmLitCheckEnergyLoss::CbmLitCheckEnergyLoss():
 	fMat("iron")
 {

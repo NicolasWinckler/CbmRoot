@@ -24,10 +24,6 @@ public:
 	virtual void Finish();
 	virtual void SetParContainers();
 
-	void SetZpos(const std::vector<Double_t>& z) {
-		fZpos = z;
-	}
-
 	Bool_t IsDrawBx() const {return fDrawBx;}
 	Bool_t IsDrawBy() const {return fDrawBy;}
 	Bool_t IsDrawBz() const {return fDrawBz;}
@@ -36,11 +32,19 @@ public:
 	void IsDrawBy(Bool_t drawBy) {fDrawBy = drawBy;}
 	void IsDrawBz(Bool_t drawBz) {fDrawBz = drawBz;}
 
+	void SetXangle(double xangle) {fXangle = xangle;}
+	void SetYangle(double yangle) {fYangle = yangle;}
+	void SetNofBinsX(double nofBinsX) {fNofBinsX = nofBinsX;}
+	void SetNofBinsY(double nofBinsY) {fNofBinsY = nofBinsY;}
+	void SetUseEllipseAcc(bool useEllipseAcc) {fUseEllipseAcc = useEllipseAcc;}
+	void SetOutputDir(const std::string& dir) {fOutputDir = dir;}
+
 private:
 	void CreateHistos();
 	void FillBHistos();
 	void FillErrHistos();
 	void DrawHistos(Int_t v);
+	void DrawHistosPhd(Int_t v);
 
 	FairField* fField;
 
@@ -69,6 +73,16 @@ private:
 	const Int_t BX;
 	const Int_t BY;
 	const Int_t BZ;
+
+	double fXangle; // acceptance angle for X
+	double fYangle; // acceptance angle for Y
+
+	int fNofBinsX; // number of bins for X
+	int fNofBinsY; // number of bins for Y
+
+	bool fUseEllipseAcc; // if true than only values inside a certain ellipse will be fitted
+
+	std::string fOutputDir; // iutput directory for images
 
 	ClassDef(CbmLitCheckField, 1);
 };

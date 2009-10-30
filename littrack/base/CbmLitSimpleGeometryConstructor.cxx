@@ -1,6 +1,7 @@
 #include "CbmLitSimpleGeometryConstructor.h"
 
 #include "CbmLitComparators.h"
+#include "CbmLitEnvironment.h"
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
@@ -53,6 +54,11 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
 	fGeo = gGeoManager;
 	fGeo->Print();
 
+	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
+	fIsTrd = env->IsTrd();
+	fIsMuch = env->IsMuch();
+	fIsTof = env->IsTof();
+
 	CreateMediumList();
 	std::cout << "Medium list created" << std::endl;
 
@@ -63,9 +69,11 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
 	TGeoVolume* topVolume = fSimpleGeo->MakeBox("cave", fMedium["air"], 20000., 20000., 20000.);
 	fSimpleGeo->SetTopVolume(topVolume);
 
+
 	ConstructSts();
-	ConstructMuch();
-//	ConstructTof();
+	if (fIsMuch) ConstructMuch();
+	if (fIsTrd) ConstructTrd();
+	if (fIsTof) ConstructTof();
 
 	fSimpleGeo->CloseGeometry();
 	fSimpleGeo->Print();
@@ -80,9 +88,14 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
 	for (size_t i = 0; i < fMyGeoNodes.size(); ++i)
 		std::cout << i << " " << fMyGeoNodes[i].ToString();
 
-	std::cout << "My MUCH Simple Geometry:" << std::endl;
-		for (size_t i = 0; i < fMyMuchGeoNodes.size(); ++i)
-			std::cout << i << " " << fMyMuchGeoNodes[i].ToString();
+//	std::cout << "My MUCH Simple Geometry:" << std::endl;
+//		for (size_t i = 0; i < fMyMuchGeoNodes.size(); ++i)
+//			std::cout << i << " " << fMyMuchGeoNodes[i].ToString();
+//
+//	std::cout << "My TRD Simple Geometry:" << std::endl;
+//		for (size_t i = 0; i < fMyTrdGeoNodes.size(); ++i)
+//			std::cout << i << " " << fMyTrdGeoNodes[i].ToString();
+
 
 	std::cout << "-I- Simple geometry construction finished" << std::endl;
 }
@@ -97,7 +110,7 @@ TGeoMedium* CbmLitSimpleGeometryConstructor::CreateMedium(
 	return newmed;
 }
 
-void CbmLitSimpleGeometryConstructor:: GeoMediumToMaterialInfo(
+void CbmLitSimpleGeometryConstructor::GeoMediumToMaterialInfo(
 		const TGeoMedium* med,
 		CbmLitMaterialInfo& mat)
 {
@@ -110,13 +123,28 @@ void CbmLitSimpleGeometryConstructor:: GeoMediumToMaterialInfo(
 
 void CbmLitSimpleGeometryConstructor::CreateMediumList()
 {
+	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
+
 	fMedium["air"] = CreateMedium("air");
 	fMedium["silicon"] = CreateMedium("silicon");
-	fMedium["MUCHiron"] = CreateMedium("MUCHiron");
-	fMedium["MUCHargon"] = CreateMedium("MUCHargon");
-//	fMedium["aluminium"] = CreateMedium("aluminium");
-//	fMedium["RPCgas"] = CreateMedium("RPCgas");
-//	fMedium["RPCglass"] = CreateMedium("RPCglass");
+
+	if (fIsMuch) {
+		fMedium["MUCHiron"] = CreateMedium("MUCHiron");
+		fMedium["MUCHargon"] = CreateMedium("MUCHargon");
+	}
+	if (fIsTrd) {
+		fMedium["polypropylene"] = CreateMedium("polypropylene");
+		fMedium["TRDgas"] = CreateMedium("TRDgas");
+		fMedium["goldcoatedcopper"] = CreateMedium("goldcoatedcopper");
+		fMedium["mylar"] = CreateMedium("mylar");
+		fMedium["carbon"] = CreateMedium("carbon");
+	}
+	if (fIsTof) {
+		fMedium["aluminium"] = CreateMedium("aluminium");
+		fMedium["RPCgas"] = CreateMedium("RPCgas");
+		fMedium["RPCglass"] = CreateMedium("RPCglass");
+	}
+
 }
 
 void CbmLitSimpleGeometryConstructor::ConstructSts()
@@ -228,6 +256,50 @@ void CbmLitSimpleGeometryConstructor::ConstructMuch()
 		}
 	}
 	std::cout << "-I- Construction of the MUCH geometry finished" << std::endl;
+}
+
+void CbmLitSimpleGeometryConstructor::ConstructTrd()
+{
+	std::cout << "-I- Construction of the TRD geometry started" << std::endl;
+	std::string trds[] = {"trd1_0", "trd2_0", "trd3_0"};
+	std::string mods[] = {"trd1mod1_1", "trd2mod1_1", "trd3mod3_1"};
+
+	for (int iTrds = 0; iTrds < 3; iTrds++) {
+		TGeoNode* trd = (TGeoNode*) fGeo->GetTopNode()->GetNodes()->FindObject(trds[iTrds].c_str());
+		TObjArray* trdLayers = trd->GetNodes();
+		for (int iTrdLayer = 0; iTrdLayer < trdLayers->GetEntriesFast(); iTrdLayer++) {
+			TGeoNode* trdLayer = (TGeoNode*) trdLayers->At(iTrdLayer);
+
+			TGeoNode* module = (TGeoNode*) trdLayer->GetNodes()->FindObject(mods[iTrds].c_str());
+			TObjArray* parts = module->GetNodes();
+			for (int iPart = 0; iPart < parts->GetEntriesFast(); iPart++) {
+				TGeoNode* part = (TGeoNode*) parts->At(iPart);
+				if (!TString(part->GetName()).Contains("carbon")) {
+
+					TGeoBBox* sh = (TGeoBBox*) part->GetVolume()->GetShape();
+					TGeoMedium* med = part->GetVolume()->GetMedium();
+
+					TGeoShape* shape = new TGeoCone(sh->GetDZ(), 0., 500., 	0.,	500.);
+					TGeoMedium* medium = fMedium[med->GetName()];
+
+					TGeoVolume* volume = new TGeoVolume(part->GetName(), shape, medium);
+					myf z = trd->GetMatrix()->GetTranslation()[2] + trdLayer->GetMatrix()->GetTranslation()[2]
+						   + module->GetMatrix()->GetTranslation()[2] + part->GetMatrix()->GetTranslation()[2];
+
+					TGeoMatrix* matrix = new TGeoTranslation(0, 0, z);
+					fSimpleGeo->GetTopVolume()->AddNode(volume, 0, matrix);
+
+					CbmLitMaterialInfo litMaterial;
+					litMaterial.SetLength(2. * sh->GetDZ());
+					litMaterial.SetZpos(z);
+					GeoMediumToMaterialInfo(medium, litMaterial);
+					fMyGeoNodes.push_back(litMaterial);
+					fMyTrdGeoNodes.push_back(litMaterial);
+				}
+			}
+		}
+	}
+	std::cout << "-I- Construction of the TRD geometry finished" << std::endl;
 }
 
 void CbmLitSimpleGeometryConstructor::ConstructTof()

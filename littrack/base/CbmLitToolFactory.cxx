@@ -66,19 +66,8 @@ TrackExtrapolatorPtr CbmLitToolFactory::CreateTrackExtrapolator(
 		extrapolator->Initialize();
 		return extrapolator;
 	} else
-	if (name == "rk4myfield") {
-		CbmLitField* field = new CbmLitMyField();
-		TrackExtrapolatorPtr extrapolator(new CbmLitRK4TrackExtrapolator(field));
-		extrapolator->Initialize();
-		return extrapolator;
-	} else
 	if (name == "lit") {
 		TrackExtrapolatorPtr extrapolator(new CbmLitCleverTrackExtrapolator(""));
-		extrapolator->Initialize();
-		return extrapolator;
-	} else
-	if (name == "litmyfield") {
-		TrackExtrapolatorPtr extrapolator(new CbmLitCleverTrackExtrapolator("myfield"));
 		extrapolator->Initialize();
 		return extrapolator;
 	}
@@ -100,17 +89,12 @@ TrackPropagatorPtr CbmLitToolFactory::CreateTrackPropagator(
 	    return propagator;
 	} else
 	if(name == "mylit") {
-		TrackPropagatorPtr propagator(new CbmLitMyTrackPropagator(CreateTrackExtrapolator("litmyfield")));
+		TrackPropagatorPtr propagator(new CbmLitMyTrackPropagator(CreateTrackExtrapolator("lit")));
 		propagator->Initialize();
 		return propagator;
 	} else
 	if(name == "rk4") {
 	   TrackPropagatorPtr propagator(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("rk4")));
-	   propagator->Initialize();
-	   return propagator;
-	} else
-	if(name == "rk4myfield") {
-	   TrackPropagatorPtr propagator(new CbmLitTGeoTrackPropagator(CreateTrackExtrapolator("rk4myfield")));
 	   propagator->Initialize();
 	   return propagator;
 	} else
@@ -208,20 +192,7 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 	if(name == "much_final") {
 		CbmLitTrackSelectionMuch* muchSelection = new CbmLitTrackSelectionMuch();
 		muchSelection->SetNofSharedHits(2);
-//		Int_t nofStations = CbmLitEnvironment::Instance()->GetLayout().GetNofStationGroups();
-//		muchSelection->SetMinLastPlaneId(nofStations-1);
-//		Int_t nofLayers = CbmLitEnvironment::Instance()->GetLayout().GetNofPlanes();
 		muchSelection->SetMinNofHits(1);
-		muchSelection->Initialize();
-		TrackSelectionPtr selection(muchSelection);
-		return selection;
-	} else
-	if(name == "much_pre_final") {
-		CbmLitTrackSelectionD* muchSelection = new CbmLitTrackSelectionD();
-		Int_t nofStations = CbmLitEnvironment::Instance()->GetLayout().GetNofStationGroups();
-		muchSelection->SetMinLastPlaneId(nofStations-1);
-		Int_t nofLayers = CbmLitEnvironment::Instance()->GetLayout().GetNofPlanes();
-		muchSelection->SetMinNofHits(nofLayers - 3);
 		muchSelection->Initialize();
 		TrackSelectionPtr selection(muchSelection);
 		return selection;
@@ -239,8 +210,7 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
 		trdSelection->SetNofSharedHits(2);
 		trdSelection->SetMinNofHits(6);
-		//Int_t nofStationGroups = CbmLitEnvironment::Instance()->GetTrdLayout().GetNofStationGroups();
-		trdSelection->SetMinLastPlaneId(0);//nofStationGroups-1);
+		trdSelection->SetMinLastPlaneId(0);
 		trdSelection->Initialize();
 		TrackSelectionPtr selection(trdSelection);
 		return selection;
@@ -253,16 +223,16 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 {
 	if(name == "e_nn") {
 		CbmLitTrackFinderNN* trdFinderNN = new CbmLitTrackFinderNN();
-		trdFinderNN->SetPropagator(CreateTrackPropagator("geane"));
+		trdFinderNN->SetPropagator(CreateTrackPropagator("lit"));
 		trdFinderNN->SetSeedSelection(CreateTrackSelection("empty"));//"momentum"));
 		trdFinderNN->SetFinalSelection(CreateTrackSelection("trd_final"));
 		trdFinderNN->SetFilter(CreateTrackUpdate("kalman"));
 		trdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-		trdFinderNN->SetVerbose(3);
+		trdFinderNN->SetVerbose(1);
 		trdFinderNN->SetNofIter(1);
 		trdFinderNN->IsUseFastSearch(true);
-		trdFinderNN->SetMaxNofMissingHits(4);
-		trdFinderNN->SetSigmaCoef(10.);
+		trdFinderNN->SetMaxNofMissingHits(3);
+		trdFinderNN->SetSigmaCoef(5.);
 		trdFinderNN->SetChiSqPixelHitCut(25.);
 		trdFinderNN->SetChiSqStripHitCut(4.);
 		trdFinderNN->SetPDG(11);
@@ -283,10 +253,10 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderBranch->SetNofIter(1);
 		trdFinderBranch->IsUseFastSearch(true);
 		trdFinderBranch->SetPDG(11);
-		trdFinderBranch->SetMaxNofMissingHits(4);
+		trdFinderBranch->SetMaxNofMissingHits(3);
 		trdFinderBranch->IsAlwaysCreateMissingHit(false);
-		trdFinderBranch->SetSigmaCoef(10.);
-		trdFinderBranch->SetChiSqPixelHitCut(25.);//15.84;
+		trdFinderBranch->SetSigmaCoef(5.);
+		trdFinderBranch->SetChiSqPixelHitCut(25.);
 		trdFinderBranch->SetChiSqStripHitCut(4.);
 		TrackFinderPtr finder(trdFinderBranch);
 		return finder;
@@ -304,7 +274,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderWeight->SetMaxNofMissingHits(0);
 		trdFinderWeight->IsUseFastSearch(true);
 		trdFinderWeight->SetSigmaCoef(10.);
-		trdFinderWeight->SetChiSqPixelHitCut(25.);
+		trdFinderWeight->SetChiSqPixelHitCut(20.);
 		trdFinderWeight->SetChiSqStripHitCut(4.);
 		trdFinderWeight->SetPDG(11);
 		TrackFinderPtr finder(trdFinderWeight);
@@ -317,7 +287,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderNN->SetFinalSelection(CreateTrackSelection("much_final"));
 		muchFinderNN->SetFilter(CreateTrackUpdate("kalman"));
 		muchFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-		muchFinderNN->SetVerbose(3);
+		muchFinderNN->SetVerbose(1);
 		muchFinderNN->SetNofIter(1);
 		muchFinderNN->IsUseFastSearch(true);
 		muchFinderNN->SetMaxNofMissingHits(2);

@@ -76,9 +76,9 @@ InitStatus CbmLitPropagationAnalysis::Init()
 	// Create tools
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
 	if (!fIsTestFastPropagation) {
-		fPropagator = factory->CreateTrackPropagator("geane");
+		fPropagator = factory->CreateTrackPropagator("lit");
 		fFilter = factory->CreateTrackUpdate("kalman");
-		fFitter = factory->CreateTrackFitter("geane_kalman");
+		fFitter = factory->CreateTrackFitter("lit_kalman");
 		fSmoother = factory->CreateTrackFitter("kalman_smoother");
 	} else {
 		fParallelFitter = factory->CreateTrackFitter("kalman_parallel");
@@ -215,7 +215,7 @@ void CbmLitPropagationAnalysis::CreateHistograms()
 			            "relative momentum resolution at ", "chi-square at" };
 	Int_t bins[] = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
 	Double_t boundL[] = {-10., -10., -.15, -.15, -.1, -5., -5., -5., -5., -7., -30., -1.};
-	Double_t boundR[] = { 10.,  10.,  .15,  .15,  .1,  5.,  5.,  5.,  5.,  7.,  30.,  15.};
+	Double_t boundR[] = { 10.,  10.,  .15,  .15,  .1,  5.,  5.,  5.,  5.,  7.,  30.,  100.};
 	std::string var[] = {"p", "f", "s"};
 	std::string var2[] = {"[propagation]", "[filter]", "[smoother]"};
 

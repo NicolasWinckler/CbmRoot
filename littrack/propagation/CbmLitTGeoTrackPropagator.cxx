@@ -97,9 +97,11 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 			return kLITERROR;
 		}
 
+//		std::cout << "nof intersections=" << inter.size()  << " zIn=" << par->GetZ() << " zOut=" << z << std::endl;
 		//Loop over the materials
 		for(unsigned int  iMat = 0; iMat < inter.size() ; iMat++) {
 			CbmLitMaterialInfo mat = inter[iMat];
+
 
 			// check if track parameters are correct
 			if (!IsParCorrect(par)) {
@@ -123,8 +125,12 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 			fMaterial->Update(par, &mat, pdg, downstream);
 		}
 	}
-
-	par->SetZ(zOut);
+	std::vector<myf>* Fnew = NULL;
+	if (F != NULL) Fnew = new std::vector<myf>(25, 0.);
+	fExtrapolator->Extrapolate(par, zOut, Fnew);
+	if (F != NULL) UpdateF(*F, *Fnew);
+	delete Fnew;
+//	par->SetZ(zOut);
 
 	if (!IsParCorrect(par)) return kLITERROR;
 	else return kLITSUCCESS;

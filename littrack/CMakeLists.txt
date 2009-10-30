@@ -54,6 +54,7 @@ base/CbmLitEnvironment.cxx
 base/CbmLitToolFactory.cxx
 base/CbmLitHitData.cxx
 base/CbmLitFieldFitter.cxx
+base/CbmLitSimpleGeometryConstructor.cxx
 base/CbmLitMyField.cxx
 cbm/CbmPropagatorGeane.cxx
 cbm/CbmPropagatorLit.cxx
@@ -89,7 +90,6 @@ propagation/CbmLitTrackPropagatorGeane.cxx
 propagation/CbmLitTGeoNavigator.cxx
 propagation/CbmLitMaterialEffectsImp.cxx
 propagation/CbmLitCleverTrackExtrapolator.cxx
-propagation/CbmLitSimpleGeometryConstructor.cxx
 propagation/CbmLitMyGeoNavigator.cxx
 propagation/CbmLitMyTrackPropagator.cxx
 qa/CbmLitReconstructionQa.cxx

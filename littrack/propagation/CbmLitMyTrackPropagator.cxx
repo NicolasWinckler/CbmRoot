@@ -65,37 +65,55 @@ LitStatus CbmLitMyTrackPropagator::Propagate(
 		(*F)[0] = 1.; (*F)[6] = 1.; (*F)[12] = 1.; (*F)[18] = 1.; (*F)[24] = 1.;
 	}
 
-	std::vector<CbmLitMaterialInfo> inter;
-	if (fNavigator->FindIntersections(par, zOut, inter) == kLITERROR) {
-		std::cout << "-E- CbmLitMyTrackPropagator::Propagate: navigation failed" << std::endl;
-		return kLITERROR;
-	}
+	int nofSteps = int(std::abs(dz) / lit::MAXIMUM_PROPAGATION_STEP_SIZE);
+	myf stepSize;
+	if (nofSteps == 0) stepSize = dz; else  stepSize = lit::MAXIMUM_PROPAGATION_STEP_SIZE;
+	myf z = zIn;
 
-	for(unsigned int iMat = 0; iMat < inter.size(); iMat++) {
-		CbmLitMaterialInfo mat = inter[iMat];
+	//Loop over steps + additional step to propagate to virtual plane at zOut
+	for (int iStep = 0; iStep < nofSteps + 1; iStep++) {
+//		if (!IsParCorrect(par)) {
+////			std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: incorrect track parameters" << std::endl;
+//			return kLITERROR;
+//		}
 
-		std::vector<myf>* Fnew = NULL;
-		if (F != NULL) Fnew = new std::vector<myf>(25, 0.);
-		if (fExtrapolator->Extrapolate(par, mat.GetZpos(), Fnew) == kLITERROR) {
-			std::cout << "-E- CbmLitMyTrackPropagator::Propagate extrapolation failed" << std::endl;
+		// update current z position
+		if (iStep != nofSteps) z += stepSize; else z = zOut;
+
+		std::vector<CbmLitMaterialInfo> inter;
+		if (fNavigator->FindIntersections(par, z, inter) == kLITERROR) {
+			std::cout << "-E- CbmLitMyTrackPropagator::Propagate: navigation failed" << std::endl;
 			return kLITERROR;
 		}
 
-		// update transport matrix
-		if (F != NULL) UpdateF(*F, *Fnew);
-		delete Fnew;
+		for(unsigned int iMat = 0; iMat < inter.size(); iMat++) {
+			CbmLitMaterialInfo mat = inter[iMat];
 
-		//scale material length
-		myf norm = std::sqrt(1. + par->GetTx() * par->GetTx() + par->GetTy() * par->GetTy());
-		mat.SetLength(mat.GetLength() * norm);
-		// add material effects
-		fMaterial->Update(par, &mat, pdg, downstream);
-	}
+			std::vector<myf>* Fnew = NULL;
+			if (F != NULL) Fnew = new std::vector<myf>(25, 0.);
+			if (fExtrapolator->Extrapolate(par, mat.GetZpos(), Fnew) == kLITERROR) {
+				std::cout << "-E- CbmLitMyTrackPropagator::Propagate extrapolation failed" << std::endl;
+				return kLITERROR;
+			}
+
+			// update transport matrix
+			if (F != NULL) UpdateF(*F, *Fnew);
+			delete Fnew;
+
+			//scale material length
+			myf norm = std::sqrt(1. + par->GetTx() * par->GetTx() + par->GetTy() * par->GetTy());
+			mat.SetLength(mat.GetLength() * norm);
+			// add material effects
+			fMaterial->Update(par, &mat, pdg, downstream);
+		}
+	} // loop over steps
+
 	std::vector<myf>* Fnew = NULL;
 	if (F != NULL) Fnew = new std::vector<myf>(25, 0.);
 	fExtrapolator->Extrapolate(par, zOut, Fnew);
 	if (F != NULL) UpdateF(*F, *Fnew);
 	delete Fnew;
+//	par->SetZ(zOut);
 
 	return kLITSUCCESS;
 }

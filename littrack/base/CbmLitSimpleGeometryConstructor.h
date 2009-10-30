@@ -17,8 +17,8 @@ public:
 	virtual ~CbmLitSimpleGeometryConstructor();
 
 	const std::vector<CbmLitMaterialInfo>& GetMyGeoNodes() const{return fMyGeoNodes;}
-
 	const std::vector<CbmLitMaterialInfo>& GetMyMuchGeoNodes() const{return fMyMuchGeoNodes;}
+	const std::vector<CbmLitMaterialInfo>& GetMyTrdGeoNodes() const{return fMyTrdGeoNodes;}
 
 	void Draw();
 
@@ -39,6 +39,7 @@ private:
 	void ConstructSts();
 	void ConstructMuch();
 	void ConstructTof();
+	void ConstructTrd();
 
 	static CbmLitSimpleGeometryConstructor* fInstance;
 
@@ -49,6 +50,11 @@ private:
 
 	std::vector<CbmLitMaterialInfo> fMyGeoNodes;
 	std::vector<CbmLitMaterialInfo> fMyMuchGeoNodes;
+	std::vector<CbmLitMaterialInfo> fMyTrdGeoNodes;
+
+	bool fIsTrd;
+	bool fIsMuch;
+	bool fIsTof;
 };
 
 #endif /* CBMLITSIMPLEGEOMETRYCONSTRUCTOR_H_ */

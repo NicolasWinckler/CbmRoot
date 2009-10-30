@@ -21,15 +21,15 @@
 
 double my2Dfunc(double *p, double *par)
 {
-    float x = p[0];
-    float y = p[1];
-	float x2 = x*x;
-    float y2 = y*y;
-    float xy = x*y;
-    float x3 = x2*x;
-    float y3 = y2*y;
-    float xy2 = x*y2;
-    float x2y = x2*y;
+    double x = p[0];
+    double y = p[1];
+	double x2 = x*x;
+    double y2 = y*y;
+    double xy = x*y;
+    double x3 = x2*x;
+    double y3 = y2*y;
+    double xy2 = x*y2;
+    double x2y = x2*y;
 
     return par[0] + par[1]*x + par[2]*y + par[3]*x2 + par[4]*xy + par[5]*y2 + par[6]*x3 + par[7]*x2y + par[8]*xy2 + par[9]*y3;
 }
@@ -42,7 +42,22 @@ CbmLitCheckField::CbmLitCheckField():
 	fDrawBx(true),
 	fDrawBy(true),
 	fDrawBz(true),
-	fNofSlices(0)
+	fNofSlices(0),
+	fXangle(25.),
+	fYangle(25.),
+	fNofBinsX(30),
+	fNofBinsY(30),
+	fUseEllipseAcc(true),
+	fOutputDir("field/")
+{
+
+}
+
+CbmLitCheckField::~CbmLitCheckField()
+{
+}
+
+InitStatus CbmLitCheckField::Init()
 {
 	// Some style settings for drawing
 	gStyle->SetCanvasColor(kWhite);
@@ -53,12 +68,10 @@ CbmLitCheckField::CbmLitCheckField():
 	gStyle->SetPalette(1);
 	gStyle->SetOptStat(0);
 
-	fZpos.push_back(25.);
+	fZpos.push_back(30.);
 	fZpos.push_back(50.);
-	fZpos.push_back(75.);
 	fZpos.push_back(100.);
 	fZpos.push_back(125.);
-	fZpos.push_back(150.);
 
 	fNofSlices = fZpos.size();
 
@@ -66,24 +79,17 @@ CbmLitCheckField::CbmLitCheckField():
 	fXpos.resize(fNofSlices);
 	fYpos.resize(fNofSlices);
 	for (Int_t i = 0; i < fNofSlices; i++){
-		double tan25 = std::tan(25*3.14159265/180); // tan of 25 degrees. CBM acceptance
-		fXpos[i] = fZpos[i] * tan25;
-		fYpos[i] = fZpos[i] * tan25;
+		double tanXangle = std::tan(fXangle*3.14159265/180); //
+		double tanYangle = std::tan(fYangle*3.14159265/180); //
+
+		fXpos[i] = fZpos[i] * tanXangle;
+		fYpos[i] = fZpos[i] * tanYangle;
 	}
 
 	// Vectors with coefficients
 	fCx.resize(fNofSlices);
 	fCy.resize(fNofSlices);
 	fCz.resize(fNofSlices);
-}
-
-CbmLitCheckField::~CbmLitCheckField()
-{
-}
-
-InitStatus CbmLitCheckField::Init()
-{
-
 }
 
 void CbmLitCheckField::SetParContainers()
@@ -103,6 +109,11 @@ void CbmLitCheckField::Exec(
 
 	// Fit the magnetic field
 	CbmLitFieldFitter ff;
+	ff.SetXangle(fXangle);
+	ff.SetYangle(fYangle);
+	ff.SetNofBinsX(fNofBinsX);
+	ff.SetNofBinsY(fNofBinsY);
+	ff.SetUseEllipseAcc(fUseEllipseAcc);
 	for(Int_t i = 0; i < fNofSlices; i++) {
 		std::cout << "Fit slice at " << fZpos[i] << std::endl;
 		ff.FitSlice(fZpos[i], fCx[i], fCy[i], fCz[i]);
@@ -115,6 +126,10 @@ void CbmLitCheckField::Exec(
 	if (IsDrawBx()) DrawHistos(BX);
 	if (IsDrawBy()) DrawHistos(BY);
 	if (IsDrawBz()) DrawHistos(BZ);
+
+//	if (IsDrawBx()) DrawHistosPhd(BX);
+//	if (IsDrawBy()) DrawHistosPhd(BY);
+//	if (IsDrawBz()) DrawHistosPhd(BZ);
 }
 
 void CbmLitCheckField::Finish()
@@ -155,6 +170,9 @@ void CbmLitCheckField::CreateHistos()
 	Double_t minRelErrB = -10.;
 	Double_t maxRelErrB = 10.;
 
+	Int_t nofBinsErrX = 100;
+	Int_t nofBinsErrY = 100;
+
 	// Create histograms
 	for (Int_t v = 0; v < 3; v++) {
 		for (Int_t i = 0; i < fNofSlices; i++) {
@@ -173,7 +191,7 @@ void CbmLitCheckField::CreateHistos()
 			std::stringstream histName3, histTitle3;
 			histName3 << "h" << namesErrH2D[v] << i;
 			histTitle3 << namesErrH2D[v] << " at z=" << fZpos[i];
-			fhBErrH2D[v][i] = new TH2D(histName3.str().c_str(), histTitle3.str().c_str(), nofBinsX, -fXpos[i], fXpos[i], nofBinsY, -fYpos[i], fYpos[i]);
+			fhBErrH2D[v][i] = new TH2D(histName3.str().c_str(), histTitle3.str().c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
 			fHistoList->Add(fhBErrH2D[v][i]);
 
 			std::stringstream histName4, histTitle4;
@@ -185,7 +203,7 @@ void CbmLitCheckField::CreateHistos()
 			std::stringstream histName5, histTitle5;
 			histName5 << "h" << namesRelErrH2D[v] << i;
 			histTitle5 << namesRelErrH2D[v] << " at z=" << fZpos[i];
-			fhBRelErrH2D[v][i] = new TH2D(histName5.str().c_str(), histTitle5.str().c_str(), nofBinsX, -fXpos[i], fXpos[i], nofBinsY, -fYpos[i], fYpos[i]);
+			fhBRelErrH2D[v][i] = new TH2D(histName5.str().c_str(), histTitle5.str().c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
 			fHistoList->Add(fhBRelErrH2D[v][i]);
 		}
 	}
@@ -193,29 +211,61 @@ void CbmLitCheckField::CreateHistos()
 
 void CbmLitCheckField::FillBHistos()
 {
-	Int_t nofBinsX = 30;
-	Int_t nofBinsY = 30;
+	const double LARGE = 1e5;
 	for (unsigned int i = 0; i < fNofSlices; i++) { // loop over z positions
+//		double max[3] = {-LARGE, -LARGE, -LARGE};
+//		double min[3] = {LARGE, LARGE, LARGE};
+
 		double Z = fZpos[i];
 
-		double HX = 2 * fXpos[i] / nofBinsX; // step size for X position
-		double HY = 2 * fYpos[i] / nofBinsY; // step size for Y position
-		for (int j = 0; j < nofBinsX; j++) { // loop over x position
+		double HX = 2 * fXpos[i] / fNofBinsX; // step size for X position
+		double HY = 2 * fYpos[i] / fNofBinsY; // step size for Y position
+		for (int j = 0; j < fNofBinsX; j++) { // loop over x position
 			double X = -fXpos[i] + (j+0.5) * HX;
-			for (int k = 0; k < nofBinsY; k++) { // loop over y position
+			for (int k = 0; k < fNofBinsY; k++) { // loop over y position
 				double Y = -fYpos[i] + (k+0.5)  * HY;
+
+//				fhB[BX][i]->SetBinContent(j+1, k+1, LARGE);
+//				fhB[BY][i]->SetBinContent(j+1, k+1, LARGE);
+//				fhB[BZ][i]->SetBinContent(j+1, k+1, LARGE);
+
+				//check the acceptance
+				if (fUseEllipseAcc) {
+					double el = (X*X)/(fXpos[i]*fXpos[i]) + (Y*Y)/(fYpos[i]*fYpos[i]);
+					if (el > 1.) continue;
+				}
 
 				// get field value
 				double pos[3] = {X, Y, Z};
 				double B[3];
 				fField->GetFieldValue(pos, B);
 
-				// fill histograms
+				// find maximum entry in the histogram
+//				if (max[BX] < B[0]) max[BX] = B[0];
+//				if (max[BY] < B[1]) max[BY] = B[1];
+//				if (max[BZ] < B[2]) max[BZ] = B[2];
+//				//find minimum entry in the histogram
+//				if (min[BX] > B[0]) min[BX] = B[0];
+//				if (min[BY] > B[1]) min[BY] = B[1];
+//				if (min[BZ] > B[2]) min[BZ] = B[2];
+
 				fhB[BX][i]->Fill(X, Y, B[0]);
 				fhB[BY][i]->Fill(X, Y, B[1]);
 				fhB[BZ][i]->Fill(X, Y, B[2]);
+
+//				fhB[BX][i]->SetBinContent(j+1, k+1, B[0]);
+//				fhB[BY][i]->SetBinContent(j+1, k+1, B[1]);
+//				fhB[BZ][i]->SetBinContent(j+1, k+1, B[2]);
 			}
 		}
+//		fhB[BX][i]->SetMinimum(min[BX] - 0.1 * std::abs(min[BX]));
+//		fhB[BY][i]->SetMinimum(min[BY] - 0.1 * std::abs(min[BY]));
+//		fhB[BZ][i]->SetMinimum(min[BZ] - 0.1 * std::abs(min[BZ]));
+//
+//		fhB[BX][i]->SetMaximum(max[BX] + 0.1 * std::abs(max[BX]));
+//		fhB[BY][i]->SetMaximum(max[BY] + 0.1 * std::abs(max[BY]));
+//		fhB[BZ][i]->SetMaximum(max[BZ] + 0.1 * std::abs(max[BZ]));
+
 	}
 }
 
@@ -232,6 +282,13 @@ void CbmLitCheckField::FillErrHistos()
 			for (int k = 0; k < nofBinsY; k++) { // loop over y position
 				Double_t Y = -fYpos[i] + (k+0.5) * HY;
 
+				//check the acceptance
+				if (fUseEllipseAcc) {
+					double el = (X*X)/(fXpos[i]*fXpos[i]) + (Y*Y)/(fYpos[i]*fYpos[i]);
+					if (el > 1.) continue;
+				}
+
+
 				// get field value
 				Double_t pos[3] = {X, Y, Z};
 				Double_t B[3];
@@ -246,9 +303,9 @@ void CbmLitCheckField::FillErrHistos()
 				Double_t errBy = B[1] - aprBy;
 				Double_t errBz = B[2] - aprBz;
 				Double_t relErrBx = 0., relErrBy = 0., relErrBz = 0.;
-				if (B[0] != 0.) relErrBx = (errBx / B[0]) * 100.;
-				if (B[1] != 0.) relErrBy = (errBy / B[1]) * 100.;
-				if (B[2] != 0.) relErrBz = (errBz / B[2]) * 100.;
+				if (B[0] != 0.) relErrBx = (errBx / B[0]) * 100.; else relErrBx = 0.;
+				if (B[1] != 0.) relErrBy = (errBy / B[1]) * 100.; else relErrBy = 0.;
+				if (B[2] != 0.) relErrBz = (errBz / B[2]) * 100.; else relErrBz = 0.;
 
 				fhBErrH2D[BX][i]->Fill(X, Y, errBx);
 				fhBErrH1D[BX][i]->Fill(errBx);
@@ -285,12 +342,14 @@ void CbmLitCheckField::DrawHistos(
 		hist1->GetXaxis()->SetTitle("X [cm]");
 		hist1->GetYaxis()->SetTitle("Y [cm]");
 		hist1->GetZaxis()->SetTitle("B [kGauss]");
+		hist1->GetZaxis()->SetTitleOffset(1.7);
 		gPad->SetRightMargin(0.2);
 		hist1->Draw("colz");
 
 		canvas[i]->cd(2);
 		TH1D* hist2 = fhBErrH1D[v][i];
-		hist2->GetZaxis()->SetTitle("B [kGauss]");
+		hist2->GetXaxis()->SetTitle("B [kGauss]");
+		gPad->SetLogy();
 		hist2->Draw();
 
 		canvas[i]->cd(3);
@@ -298,12 +357,14 @@ void CbmLitCheckField::DrawHistos(
 		hist3->GetXaxis()->SetTitle("X [cm]");
 		hist3->GetYaxis()->SetTitle("Y [cm]");
 		hist3->GetZaxis()->SetTitle("B [kGauss]");
+		hist3->GetZaxis()->SetTitleOffset(1.7);
 		gPad->SetRightMargin(0.2);
 		hist3->Draw("colz");
 
 		canvas[i]->cd(4);
 		TH1D* hist4 = fhBRelErrH1D[v][i];
-		hist4->GetZaxis()->SetTitle("Relative error [%]");
+		hist4->GetXaxis()->SetTitle("Relative error [%]");
+		gPad->SetLogy();
 		hist4->Draw();
 
 		canvas[i]->cd(5);
@@ -311,6 +372,7 @@ void CbmLitCheckField::DrawHistos(
 		hist5->GetXaxis()->SetTitle("X [cm]");
 		hist5->GetYaxis()->SetTitle("Y [cm]");
 		hist5->GetZaxis()->SetTitle("B [kGauss]");
+		hist5->GetZaxis()->SetTitleOffset(1.7);
 		gPad->SetRightMargin(0.2);
 		hist5->Draw("colz");
 
@@ -324,13 +386,63 @@ void CbmLitCheckField::DrawHistos(
 		func->GetXaxis()->SetTitle("X [cm]");
 		func->GetYaxis()->SetTitle("Y [cm]");
 		func->GetZaxis()->SetTitle("B [kGauss]");
+		func->GetXaxis()->SetTitleOffset(1.7);
+		func->GetYaxis()->SetTitleOffset(2);
+		func->GetZaxis()->SetTitleOffset(1.8);
+		gPad->SetLeftMargin(0.2);
 		func->Draw("surf1");
 
 		std::string name(canvas[i]->GetName());
-		canvas[i]->SaveAs(std::string("field/" + name + ".gif").c_str());
-		canvas[i]->SaveAs(std::string("field/" + name + ".eps").c_str());
-		canvas[i]->SaveAs(std::string("field/" + name + ".svg").c_str());
+		canvas[i]->SaveAs(std::string(fOutputDir + name + ".gif").c_str());
+		canvas[i]->SaveAs(std::string(fOutputDir + name + ".eps").c_str());
+		canvas[i]->SaveAs(std::string(fOutputDir + name + ".svg").c_str());
+	}
+}
 
+void CbmLitCheckField::DrawHistosPhd(
+		Int_t v)
+{
+	gStyle->SetOptTitle(0);
+	std::string names[] = {"phd_Bx", "phd_By", "phd_Bz"};
+	TCanvas* canvas[fNofSlices];
+	for (Int_t s = 0; s < fNofSlices; s++) {
+		std::stringstream ss;
+		ss << names[v] << " at z=" << fZpos[s];
+		canvas[s] = new TCanvas(ss.str().c_str(), ss.str().c_str(), 800,400);
+		canvas[s]->Divide(2, 1);
+	}
+
+	for (int i = 0; i < fNofSlices; i++) {
+		canvas[i]->cd(1);
+		std::stringstream funcName;
+		funcName << names[v] << "Func" << i;
+		TF2 * func = new TF2(funcName.str().c_str(), my2Dfunc, -fXpos[i], fXpos[i], -fYpos[i], fYpos[i], 10);
+		if (v == BX) func->SetParameters(&fCx[i][0]); else
+		if (v == BY) func->SetParameters(&fCy[i][0]); else
+		if (v == BZ) func->SetParameters(&fCz[i][0]);
+		func->GetXaxis()->SetTitle("X [cm]");
+		func->GetYaxis()->SetTitle("Y [cm]");
+		func->GetZaxis()->SetTitle("B [kGauss]");
+		func->GetXaxis()->SetTitleOffset(1.7);
+		func->GetYaxis()->SetTitleOffset(2);
+		func->GetZaxis()->SetTitleOffset(1.8);
+		gPad->SetLeftMargin(0.2);
+		func->Draw("surf1");
+//		func->Draw("colz");
+
+		canvas[i]->cd(2);
+		TH2D* hist3 = fhBErrH2D[v][i];
+		hist3->GetXaxis()->SetTitle("X [cm]");
+		hist3->GetYaxis()->SetTitle("Y [cm]");
+		hist3->GetZaxis()->SetTitle("B [kGauss]");
+		hist3->GetZaxis()->SetTitleOffset(1.7);
+		gPad->SetRightMargin(0.2);
+		hist3->Draw("colz");
+
+		std::string name(canvas[i]->GetName());
+		canvas[i]->SaveAs(std::string(fOutputDir + name + ".gif").c_str());
+		canvas[i]->SaveAs(std::string(fOutputDir + name + ".eps").c_str());
+		canvas[i]->SaveAs(std::string(fOutputDir + name + ".svg").c_str());
 	}
 }
 

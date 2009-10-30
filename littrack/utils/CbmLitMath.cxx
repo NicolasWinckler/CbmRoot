@@ -19,6 +19,29 @@ myf ChiSq(
 	}
 }
 
+//myf ChiSq(
+//		const CbmLitTrackParam* par,
+//		const CbmLitStripHit* hit)
+//{
+//	myf C0 = par->GetCovariance(0);
+//	myf C5 = par->GetCovariance(5);
+//	myf C1 = par->GetCovariance(1);
+//	myf u = hit->GetU();
+//	myf duu = hit->GetDu() * hit->GetDu();
+//	myf phiCos = hit->GetCosPhi();
+//	myf phiSin = hit->GetSinPhi();
+//	myf phiCosSq = phiCos * phiCos;
+//	myf phiSinSq = phiSin * phiSin;
+//	myf phi2SinCos = 2 * phiCos * phiSin;
+//
+//	myf r = u - par->GetX() * phiCos - par->GetY() * phiSin;
+//	myf rr = r * r;
+//	myf norm = duu + C0 * phiCosSq + phi2SinCos * C1 + C5 * phiSinSq;
+////	myf norm = duu + C0 * phiCos + C5 * phiSin;
+//
+//	return rr / norm;
+//}
+
 myf ChiSq(
 		const CbmLitTrackParam* par,
 		const CbmLitStripHit* hit)
@@ -30,16 +53,28 @@ myf ChiSq(
 	myf duu = hit->GetDu() * hit->GetDu();
 	myf phiCos = hit->GetCosPhi();
 	myf phiSin = hit->GetSinPhi();
-	myf phiCosSq = phiCos * phiCos;
-	myf phiSinSq = phiSin * phiSin;
-	myf phi2SinCos = 2 * phiCos * phiSin;
+//	myf phiCosSq = phiCos * phiCos;
+//	myf phiSinSq = phiSin * phiSin;
+//	myf phi2SinCos = 2 * phiCos * phiSin;
 
-	myf r = u - par->GetX() * phiCos - par->GetY() * phiSin;
-	myf rr = r * r;
-	myf norm = duu + C0 * phiCosSq + phi2SinCos * C1 + C5 * phiSinSq;
-//	myf norm = duu + C0 * phiCos + C5 * phiSin;
+	  myf zeta = phiCos*par->GetX() + phiSin*par->GetY() - u;
 
-	return rr / norm;
+	  // F = CH'
+	  myf F0 = phiCos*C0 + phiSin*C1;
+	  myf F1 = phiCos*C1 + phiSin*C5;
+
+	  myf HCH = ( F0*phiCos + F1*phiSin );
+
+	  myf wi = 1./(duu +HCH);
+	  myf zetawi = zeta *wi;
+	 return  zeta * zetawi;
+
+//	myf r = u - par->GetX() * phiCos - par->GetY() * phiSin;
+//	myf rr = r * r;
+//	myf norm = duu + C0 * phiCosSq + phi2SinCos * C1 + C5 * phiSinSq;
+////	myf norm = duu + C0 * phiCos + C5 * phiSin;
+//
+//	return rr / norm;
 }
 
 myf ChiSq(

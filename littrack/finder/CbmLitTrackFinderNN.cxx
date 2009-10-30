@@ -12,6 +12,7 @@
 #include "CbmLitTrackPropagator.h"
 #include "CbmLitMath.h"
 #include "CbmLitTrackUpdate.h"
+#include "CbmLitHit.h"
 
 #include <algorithm>
 #include <iostream>
@@ -126,19 +127,11 @@ bool CbmLitTrackFinderNN::ProcessStation(
 		myf z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
 		fPropagator->Propagate(&par[iSubstation], z, fPDG);
 		if (iSubstation < nofSubstations - 1) par[iSubstation + 1] = par[iSubstation];
-//		track->SetParamLast(&par);
 		HitPtrIteratorPair bounds = MinMaxIndex(&par[iSubstation], fHitData.GetHits(stationGroup, station, iSubstation),
 				fLayout.GetStation(stationGroup, station), fHitData.GetMaxErr(stationGroup, station, iSubstation));
-//		std::cout << "before: substation=" << iSubstation << " size=" << hits.size() << std::endl;
-//		hits.insert(hits.end(), bounds.first, bounds.second);
 		hits[iSubstation] = bounds;
-//		std::cout << "after: substation=" << iSubstation << " size=" << hits.size() << std::endl;
-//		if (!fIsProcessSubstationsTogether) {
-//			if (AddNearestHit(track, hits)) hitAdded = true;
-//			hits.clear();
-//		}
 	}
-//	if (fIsProcessSubstationsTogether && AddNearestHit(track, hits, par, nofSubstations)) hitAdded = true;
+
 	if (AddNearestHit(track, hits, par, nofSubstations)) hitAdded = true;
 	return hitAdded;
 }
@@ -152,7 +145,6 @@ bool CbmLitTrackFinderNN::AddNearestHit(
 	//TODO implement !fProcessSubstations together !!!
 
 	bool hitAdded = false;
-//	CbmLitTrackParam par(*track->GetParamLast()), uPar, param;
 	CbmLitTrackParam uPar, param;
 	HitPtrIterator hit(hits[0].second);
 	myf chiSq = 1e10;
@@ -170,9 +162,6 @@ bool CbmLitTrackFinderNN::AddNearestHit(
 				}
 			}
 		}
-//		if (!fIsProcessSubstationsTogether) {
-//
-//		}
 	}
 	// if hit was attached than change track information
 	if (hit != hits[0].second) {

@@ -17,22 +17,6 @@
 
 #include "tbb/tick_count.h"
 
-//class Follow
-//{
-//	TrackPtrVector& fTracks;
-//	CbmLitTrackFinderNNParallel* fFinder;
-//public:
-//	void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
-//		for (unsigned int i = r.begin(); i != r.end(); ++i) {
-//			CbmLitTrack* track = fTracks[i];
-//			fFinder->FollowTrack(track);
-//		}
-//	}
-//	Follow(CbmLitTrackFinderNNParallel* finder, TrackPtrVector& tracks) :
-//		fFinder(finder),
-//		fTracks(tracks){}
-//};
-
 CbmLitTrackFinderNNParallel::CbmLitTrackFinderNNParallel():
 	fEventNo(1),
 	fTime(0.)

@@ -63,7 +63,12 @@ private:
 };
 
 
-CbmLitFieldFitter::CbmLitFieldFitter()
+CbmLitFieldFitter::CbmLitFieldFitter():
+	fXangle(25.),
+	fYangle(25.),
+	fNofBinsX(30),
+	fNofBinsY(30),
+	fUseEllipseAcc(false)
 {
 	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
 	fField = env->GetField();
@@ -80,23 +85,29 @@ void CbmLitFieldFitter::FitSlice(
 		std::vector<double>& parBy,
 		std::vector<double>& parBz)
 {
-	double tan25 = std::tan(25*3.14159265/180); // tan of 25 degrees. CBM acceptance
-	double Xmax = Z * tan25;
-	double Ymax = Z * tan25;;
-	int nofBinsX = 30;
-	int nofBinsY = 30;
+	double tanXangle = std::tan(fXangle*3.14159265/180); //
+	double tanYangle = std::tan(fYangle*3.14159265/180); //
 
-	double HX = 2 * Xmax / nofBinsX; // step size for X position
-	double HY = 2 * Ymax / nofBinsY; // step size for Y position
+	double Xmax = Z * tanXangle;
+	double Ymax = Z * tanYangle;
+
+	double HX = 2 * Xmax / fNofBinsX; // step size for X position
+	double HY = 2 * Ymax / fNofBinsY; // step size for Y position
 	std::vector<double> x;
 	std::vector<double> y;
 	std::vector<double> Bx;
 	std::vector<double> By;
 	std::vector<double> Bz;
-	for (int j = 0; j < nofBinsX; j++) { // loop over x position
+	for (int j = 0; j < fNofBinsX; j++) { // loop over x position
 		double X = -Xmax + j * HX;
-		for (int k = 0; k < nofBinsY; k++) { // loop over y position
+		for (int k = 0; k < fNofBinsY; k++) { // loop over y position
 			double Y = -Ymax + k * HY;
+
+			//check the acceptance
+			if (fUseEllipseAcc) {
+				double el = (X*X)/(Xmax*Xmax) + (Y*Y)/(Ymax*Ymax);
+				if (el > 1.) continue;
+			}
 
 			// get field value
 			double pos[3] = {X, Y, Z};

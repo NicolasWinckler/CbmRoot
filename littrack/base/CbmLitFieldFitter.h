@@ -48,8 +48,22 @@ public:
 			const std::vector<double>& z,
 			std::vector<double>& par);
 
+	void SetXangle(double xangle) {fXangle = xangle;}
+	void SetYangle(double yangle) {fYangle = yangle;}
+	void SetNofBinsX(double nofBinsX) {fNofBinsX = nofBinsX;}
+	void SetNofBinsY(double nofBinsY) {fNofBinsY = nofBinsY;}
+	void SetUseEllipseAcc(bool useEllipseAcc) {fUseEllipseAcc = useEllipseAcc;}
+
 private:
 	FairField* fField; // Magnetic field
+
+	double fXangle; // acceptance angle for X
+	double fYangle; // acceptance angle for Y
+
+	int fNofBinsX; // number of bins for X
+	int fNofBinsY; // number of bins for Y
+
+	bool fUseEllipseAcc; // if true than only values inside a certain ellipse will be fitted
 };
 
 #endif /* CBMLITFIELDFITTER_H_ */

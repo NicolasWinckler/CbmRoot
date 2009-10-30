@@ -1,37 +1,50 @@
 void event_display()
 {
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
-  cbmrootlibs();
-  gSystem->Load("libEve");
-  gSystem->Load("libEventDisplay");
+	TString dir  = "/home/d/andrey/std_1e+/";
+	// MC transport file
+	TString mcFile = dir + "mc.0000.root";
+	// Parameter file
+	TString parFile = dir + "param.0000.root";
 
-  // -----   Reconstruction run   -------------------------------------------
-  FairRunAna *fRun= new FairRunAna();
-  fRun->SetInputFile("data/test.mc.root");
-  //fRun->SetInputFile("../dsk/sim_dsk.root");
- // fRun->SetInputFile("../dsk/sim_dsk.g4native.root");
-  fRun->SetOutputFile("test.root");
-  fRun->LoadGeometry();
+	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
+	basiclibs();
+	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
+	cbmrootlibs();
+	gSystem->Load("libEve");
+	gSystem->Load("libEventDisplay");
 
-  FairEventManager *fMan= new FairEventManager();
-  FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
-  FairMCPointDraw *RichPoint =   new FairMCPointDraw ("RichPoint",kOrange,  kFullSquare);
-  FairMCPointDraw *TofPoint =    new FairMCPointDraw ("TOFPoint",kBlue,  kFullSquare);
-  //FairMCPointDraw *TrdPoint= new FairMCPointDraw ("TRDPoint",kTeal,  kFullSquare);
-  FairMCPointDraw *ECalPoint =    new FairMCPointDraw ("ECALPoint",kYellow,  kFullSquare);
-  FairMCPointDraw *RefPlanePoint = new FairMCPointDraw ("RefPlanePoint",kPink,  kFullSquare);
-  FairMCPointDraw *STSPoint = new FairMCPointDraw ("STSPoint",kCyan,  kFullSquare);
+	FairRunAna *run= new FairRunAna();
 
-  fMan->AddTask(Track);
+	run->SetInputFile(mcFile);
+	run->SetOutputFile("test.root");
+	run->LoadGeometry();
 
-  fMan->AddTask(RichPoint);
-  fMan->AddTask(ECalPoint);
-  fMan->AddTask(TofPoint);
-  //fMan->AddTask(TrdPoint);
-  fMan->AddTask(RefPlanePoint);
-  fMan->AddTask(STSPoint);
+	FairEventManager *fMan= new FairEventManager();
+	FairMCTracks *Track = new FairMCTracks ("Monte-Carlo Tracks");
+	FairMCPointDraw *RichPoint = new FairMCPointDraw ("RichPoint",kOrange,  kFullSquare);
+	FairMCPointDraw *TofPoint = new FairMCPointDraw ("TOFPoint",kBlue,  kFullSquare);
+	FairMCPointDraw *TrdPoint = new FairMCPointDraw ("TRDPoint",kTeal,  kFullSquare);
+	FairMCPointDraw *ECalPoint = new FairMCPointDraw ("ECALPoint",kYellow,  kFullSquare);
+	FairMCPointDraw *RefPlanePoint = new FairMCPointDraw ("RefPlanePoint",kPink,  kFullSquare);
+	FairMCPointDraw *STSPoint = new FairMCPointDraw ("STSPoint",kCyan,  kFullSquare);
 
-  fMan->Init();
+	fMan->AddTask(Track);
+	fMan->AddTask(RichPoint);
+	fMan->AddTask(ECalPoint);
+	fMan->AddTask(TofPoint);
+	fMan->AddTask(TrdPoint);
+	fMan->AddTask(RefPlanePoint);
+	fMan->AddTask(STSPoint);
+
+
+	// -----  Parameter database   --------------------------------------------
+	FairRuntimeDb* rtdb = run->GetRuntimeDb();
+	FairParRootFileIo* parIo1 = new FairParRootFileIo();
+	parIo1->open(parFile.Data());
+	rtdb->setFirstInput(parIo1);
+	rtdb->setOutput(parIo1);
+	rtdb->saveOutput();
+	// ------------------------------------------------------------------------
+
+	fMan->Init();
 }

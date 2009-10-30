@@ -14,16 +14,26 @@ Bool_t CheckDetectorPresence(
 		const TString& parFile,
 		const char* name)
 {
+
 	TFile* f = new TFile(parFile);
-        f->Get("FairBaseParSet");
+    f->Get("FairBaseParSet");
        
 //	TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
 
 	TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
+	std::cout << "Number of nodes:" << nodes->GetEntriesFast() << std::endl;
 	for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+		std::cout << "  node " << iNode;
 		TGeoNode* node = (TGeoNode*) nodes->At(iNode);
-		if (TString(node->GetName()).Contains(name)) return true;
+		std::cout << " " << node->GetName() << std::endl;
+		if (TString(node->GetName()).Contains(name)) {
+			f->Close();
+			delete f;
+			return true;
+		}
 	}
+	f->Close();
+	delete f;
 	return false;
 }
 

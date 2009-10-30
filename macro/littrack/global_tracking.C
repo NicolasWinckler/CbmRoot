@@ -6,14 +6,14 @@
  * Macro runs Littrack global track reconstruction.
  **/
 
-void global_tracking(Int_t nEvents = 100)
+void global_tracking(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, globalHitsFile, globalTracksFile;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/home/d/andrey/straw_2mu/";
+		dir  = "/home/d/andrey/std_10e/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file
@@ -49,16 +49,16 @@ void global_tracking(Int_t nEvents = 100)
 	run->SetOutputFile(globalTracksFile);
 	// ------------------------------------------------------------------------
 
-//	FairGeane* Geane = new FairGeane(parFile.Data());
-//	FairGeane *Geane = new FairGeane();
-//	run->AddTask(Geane);
+	FairGeane* Geane = new FairGeane(parFile.Data());
+	FairGeane *Geane = new FairGeane();
+	run->AddTask(Geane);
 
 	CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
 	// Tracking method to be used
 	// "branch" - branching tracking
 	// "nn" - nearest neighbor tracking
 	// "weight" - weighting tracking
-	finder->SetTrackingType("branch");
+	finder->SetTrackingType("nn");
 
 	// Hit-to-track merger method to be used
 	// "nearest_hit" - assigns nearest hit to the track
@@ -80,10 +80,10 @@ void global_tracking(Int_t nEvents = 100)
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
 	reconstructionQa->SetMinNofPointsTrd(10);
-	reconstructionQa->SetMinNofPointsMuch(24);
+	reconstructionQa->SetMinNofPointsMuch(12);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
-	reconstructionQa->SetMinNofHitsTrd(8);
+	reconstructionQa->SetMinNofHitsTrd(9);
 	reconstructionQa->SetMinNofHitsMuch(11);
 	reconstructionQa->SetVerbose(1);
 	run->AddTask(reconstructionQa);
@@ -101,7 +101,7 @@ void global_tracking(Int_t nEvents = 100)
 	// -----   Initialize and run   --------------------------------------------
 	run->LoadGeometry();
 	run->Init();
-//	Geane->SetField(run->GetField());
+	Geane->SetField(run->GetField());
 	run->Run(0, nEvents);
 	// ------------------------------------------------------------------------
 

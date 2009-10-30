@@ -1,6 +1,6 @@
 void simple_geo(Int_t nEvents = 1)
 {
-	TString dir = "/home/d/andrey/test/trunk/global_mu_urqmd/";
+	TString dir = "/home/d/andrey/std_1e+/";
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString outFile = dir + "simple.geo.0000.root";
@@ -24,7 +24,7 @@ void simple_geo(Int_t nEvents = 1)
 
 
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
-	TString stsDigiFile = parDir+ "/sts/sts_Standard_s3055AAFK5.SecD.digi.par";
+	TString stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
 
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();

@@ -8,23 +8,26 @@
 void draw3D()
 {
 	//Input directory
-	TString dir = "/home/d/andrey/test/";
+	TString dir = "/home/d/andrey/std_1e-/";
 	//Input MC file with TGeo
-	TString mcFile = dir + "mc.0000.root";
+//	TString mcFile = dir + "mc.0000.root";
+	TString parFile = dir + "param.0000.root";
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
 	cbmrootlibs();
 
-	TFile* f = new TFile(mcFile);
-	TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
-	geoMan->SetVisLevel(4);
+	TFile* f = new TFile(parFile);
+	f->Get("FairBaseParSet");
+//	TFile* f = new TFile(mcFile);
+//	TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
+	gGeoManager->SetVisLevel(4);
 
 	// Check overlaps
-	geoMan->CheckOverlaps(0.0000001);
-	geoMan->PrintOverlaps();
+//	gGeoManager->CheckOverlaps(0.0001);
+//	gGeoManager->PrintOverlaps();
 
-	TGeoVolume* master = geoMan->GetMasterVolume();
+	TGeoVolume* master = gGeoManager->GetMasterVolume();
 	master->Draw("ogl");
 }

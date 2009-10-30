@@ -1,4 +1,4 @@
-void trd_sim(Int_t nEvents = 100)
+void trd_sim(Int_t nEvents = 10)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -9,7 +9,7 @@ void trd_sim(Int_t nEvents = 100)
 		//if necessary specify input pluto file to embed signal particles
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
 		//directory for output simulation files
-		dir  = "/home/d/andrey/std_10e_sameZ/";
+		dir  = "/home/d/andrey/mono_1e-/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
@@ -21,7 +21,7 @@ void trd_sim(Int_t nEvents = 100)
 		//If "yes" PLUTO particles will be embedded
 		pluto = "no";
 		//TRD geometry file name
-		trdGeom = "trd_standard.geo";
+		trdGeom = "trd_monolithic.geo";
 	} else {
 		inFile  = TString(gSystem->Getenv("INFILE"));
 		plutoFile  = TString(gSystem->Getenv("PLUTOFILE"));
@@ -158,15 +158,15 @@ void trd_sim(Int_t nEvents = 100)
 	}
 
 	if (electrons == "yes") {
-		FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, 5);
-		boxGen1->SetPtRange(0.,3.);
-		boxGen1->SetPhiRange(0.,360.);
-		boxGen1->SetThetaRange(2.5,25.);
-		boxGen1->SetCosTheta();
-		boxGen1->Init();
-		primGen->AddGenerator(boxGen1);
+//		FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, 1);
+//		boxGen1->SetPtRange(0.,3.);
+//		boxGen1->SetPhiRange(0.,360.);
+//		boxGen1->SetThetaRange(2.5,25.);
+//		boxGen1->SetCosTheta();
+//		boxGen1->Init();
+//		primGen->AddGenerator(boxGen1);
 
-		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-11, 5);
+		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-11, 1);
 		boxGen2->SetPtRange(0.,3.);
 		boxGen2->SetPhiRange(0.,360.);
 		boxGen2->SetThetaRange(2.5,25.);

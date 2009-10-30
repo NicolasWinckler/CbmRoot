@@ -19,7 +19,7 @@
 const int nofPar = 12;
 
 /** Number of detector planes. */
-const int nofLayers = 24;
+const int nofLayers = 13;
 
 // Drawing options. If true than specified histograms are drawn.
 bool drawPropagation = false;
@@ -42,12 +42,12 @@ TCanvas* canvas[3][nofLayers];
 
 
 // Input directory
-TString dir = "/home/d/andrey/straw_10mu/";
+TString dir = "/home/d/andrey/std_10e/";
 // Input file with propagation analysis
 TFile *file = new TFile(dir + "propagation.ana.0000.root");
 
 //Output directory for images and fit results.
-TString outDir = "./phd/fast_lit_prop/";
+TString outDir = "./prop_trd/";
 
 void draw_prop_ana()
 {
@@ -150,6 +150,10 @@ void DrawHistos(
 	stringstream oss2;
 	oss2 << outDir << "layer" << var[v] << layer << ".svg";
 	canvas[v][layer]->SaveAs(TString(oss2.str().c_str()));
+
+	stringstream oss2;
+	oss2 << outDir << "layer" << var[v] << layer << ".gif";
+	canvas[v][layer]->SaveAs(TString(oss2.str().c_str()));
 }
 
 void Print(
@@ -181,7 +185,7 @@ void DrawText(
 	oss1 << sigma << " / " << rms;
 	TLatex text;
 	text.SetTextAlign(21);
-	text.SetTextSize(0.1);
+	text.SetTextSize(0.08); //0.1
 	text.DrawTextNDC(0.5, 0.83, oss1.str().c_str());
 	oss2 << char(index+97) << ")";
 	text.DrawTextNDC(0.8, 0.7, oss2.str().c_str());
@@ -206,6 +210,7 @@ void DrawForPhd(
 	TH1F* hist[NC][NH];
 	Int_t stnum[NC] = {0, 6, 12};
 	std::string hname[] = {"h_resx", "h_pullx", "h_resp"};
+	std::string xtitles[] = {"residual X [cm]", "pull X", "relative momentum error [%]"};
 	for (Int_t i = 0; i < NC; i++) {
 		for (Int_t j = 0; j < NH; j++) {
 			stringstream oss;
@@ -223,10 +228,14 @@ void DrawForPhd(
 			canvas[i]->cd(j+1);
 			hist[i][j]->Fit("gaus");
 			hist[i][j]->SetMaximum(hist[i][j]->GetMaximum() * 2.5);
-			hist[i][j]->GetXaxis()->SetLabelSize(0.075);
+			hist[i][j]->GetXaxis()->SetLabelSize(0.055);
 			hist[i][j]->GetXaxis()->SetNdivisions(505, kTRUE);
-			hist[i][j]->GetYaxis()->SetLabelSize(0.075);
+			hist[i][j]->GetYaxis()->SetLabelSize(0.055);
+			hist[i][j]->GetXaxis()->SetTitleOffset(1.0);
+			hist[i][j]->GetXaxis()->SetTitleSize(0.055);
+			hist[i][j]->GetXaxis()->SetTitle(xtitles[j].c_str());
 
+			gPad->SetBottomMargin(0.15);
 			hist[i][j]->Draw();
 			TF1 *fit1 = hist[i][j]->GetFunction("gaus");
 			sigma[i][j] = fit1->GetParameter(2);

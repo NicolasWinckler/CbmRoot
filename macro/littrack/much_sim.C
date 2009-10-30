@@ -1,4 +1,4 @@
-void much_sim(Int_t nEvents = 10000)
+void much_sim(Int_t nEvents = 1)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -10,7 +10,7 @@ void much_sim(Int_t nEvents = 10000)
 		//if necessary specify input pluto file to embed signal particles
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
 		//directory for output simulation files
-		dir  = "/home/d/andrey/std_10mu/";
+		dir  = "/home/d/andrey/new_field_much/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
@@ -42,13 +42,15 @@ void much_sim(Int_t nEvents = 10000)
 
 	TString caveGeom   = "cave.geo";
 	TString targetGeom = "target_au_250mu.geo";
-	TString magnetGeom = "magnet_standard.geo";
 	TString stsGeom    = "sts_standard.geo";
 	TString tofGeom    = "tof_standard.geo";
 
 	// -----   Magnetic field   -----------------------------------------------
-	TString  fieldMap   = "FieldMuonMagnet";   // name of field map
-	Double_t fieldZ     = 50.;                 // field center z position
+//	TString fieldMap = "FieldMuonMagnet";   // name of field map
+//	TString magnetGeom = "magnet_standard.geo";
+	TString fieldMap = "FieldSCmuon_16x13";   // name of field map
+	TString magnetGeom = "magnet_scmuon_16x13.geo";
+	Double_t fieldZ = 50.;                 // field center z position
 	Double_t fieldScale =  1.;                 // field scaling factor
 
 	TStopwatch timer;
@@ -134,7 +136,7 @@ void much_sim(Int_t nEvents = 10000)
 	CbmFieldMap* magField = NULL;
 	if ( fieldMap == "FieldActive" || fieldMap == "FieldIron")
 		magField = new CbmFieldMapSym3(fieldMap);
-	else if ( fieldMap == "FieldAlligator" )
+	else if ( fieldMap == "FieldSCmuon_16x13" || fieldMap == "FieldAlligator" )
 		magField = new CbmFieldMapSym2(fieldMap);
 	else if ( fieldMap = "FieldMuonMagnet" )
 		magField = new CbmFieldMapSym3(fieldMap);

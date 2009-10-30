@@ -49,7 +49,7 @@ finder/CbmRichFuzzyKE.cxx
 #finder/CbmRichRingFinderHoughSimd.cxx
 finder/CbmRichRingFinderHoughImpl.cxx
 #finder/CbmRichRingFinderHoughParallel.cxx
-finder/CbmRichRingFinderHoughImpl.cxx
+#finder/CbmRichRingFinderHoughImpl.cxx
 #finder/CbmRichRingFinderHoughParallelImpl.cxx
 fitter/CbmRichRingFitterCircle.cxx 
 fitter/CbmRichFitRings.cxx

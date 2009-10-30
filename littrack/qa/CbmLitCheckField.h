@@ -34,8 +34,8 @@ public:
 
 	void SetXangle(double xangle) {fXangle = xangle;}
 	void SetYangle(double yangle) {fYangle = yangle;}
-	void SetNofBinsX(double nofBinsX) {fNofBinsX = nofBinsX;}
-	void SetNofBinsY(double nofBinsY) {fNofBinsY = nofBinsY;}
+	void SetNofBinsX(int nofBinsX) {fNofBinsX = nofBinsX;}
+	void SetNofBinsY(int nofBinsY) {fNofBinsY = nofBinsY;}
 	void SetUseEllipseAcc(bool useEllipseAcc) {fUseEllipseAcc = useEllipseAcc;}
 	void SetOutputDir(const std::string& dir) {fOutputDir = dir;}
 

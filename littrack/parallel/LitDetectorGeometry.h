@@ -14,8 +14,10 @@
 #include "LitMaterialInfo.h"
 #include "LitField.h"
 #include "CbmLitEnums.h"
-#include <iostream>
-#include <vector>
+
+const unsigned char MAX_NOF_STATION_GROUPS = 6;
+const unsigned char MAX_NOF_STATIONS = 4;
+const unsigned char MAX_NOF_SUBSTATIONS = 2;
 
 class LitSubstation
 {
@@ -36,19 +38,22 @@ public:
 class LitStation
 {
 public:
+	LitStation():nofSubstations(0){}
 
 	void AddSubstation(const LitSubstation& substation) {
-		substations.push_back(substation);
+		substations[nofSubstations++] = substation;
 	}
 
 	unsigned char GetNofSubstations() const {
-		return substations.size();
+		return nofSubstations;
 	}
 
 	// Type of hits on the station
 	LitHitType type;
 	// array with substations in the station
-	std::vector<LitSubstation> substations;
+	LitSubstation substations[MAX_NOF_SUBSTATIONS];
+	// number of substations
+	unsigned char nofSubstations;
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitStation &station){
 		strm << "LitStation: type" << station.type << ", nofSubstations=" << station.GetNofSubstations() << std::endl;
@@ -83,19 +88,23 @@ public:
 class LitStationGroup
 {
 public:
-	LitStationGroup() {}
+	LitStationGroup():nofStations(0) {}
 
 	virtual ~LitStationGroup() {}
 
 	void AddStation(const LitStation& station) {
-		stations.push_back(station);
+		stations[nofStations++] = station;
 	}
 
 	unsigned char GetNofStations() const {
-		return stations.size();
+		return nofStations;
 	}
 
-	std::vector<LitStation> stations;
+	// array with stations in the station group
+	LitStation stations[MAX_NOF_STATIONS];
+	// number of stations in the station group
+	unsigned char nofStations;
+	// absorber
 	LitAbsorber absorber;
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitStationGroup &stationGroup){
@@ -113,13 +122,14 @@ public:
 class LitDetectorLayout
 {
 public:
+	LitDetectorLayout():nofStationGroups(0){};
 
 	void AddStationGroup(const LitStationGroup& stationGroup) {
-		stationGroups.push_back(stationGroup);
+		stationGroups[nofStationGroups++] = stationGroup;
 	}
 
 	unsigned char GetNofStationGroups() const {
-		return stationGroups.size();
+		return nofStationGroups;
 	}
 
 	unsigned char GetNofStations(unsigned char stationGroup) const {
@@ -143,7 +153,9 @@ public:
 	}
 
 	// array with station groups
-    std::vector<LitStationGroup> stationGroups;
+    LitStationGroup stationGroups[MAX_NOF_STATION_GROUPS];
+    //number of station groups
+    unsigned char nofStationGroups;
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitDetectorLayout &layout){
 		strm << "LitDetectorLayout: " << "nofStationGroups=" << layout.GetNofStationGroups() << std::endl;
@@ -152,6 +164,7 @@ public:
 		}
 		return strm;
 	}
+
 } _fvecalignment;
 
 #endif

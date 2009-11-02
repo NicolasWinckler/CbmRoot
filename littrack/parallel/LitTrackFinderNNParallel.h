@@ -20,6 +20,8 @@
 
 #define cnst static const fvec
 
+const unsigned int MAX_NOF_TRACKS = 1500;
+
 class LitTrackFinderNNParallel
 {
 public:
@@ -31,9 +33,12 @@ public:
 
 	/* Inherited from CbmLitTrackFinder */
 	virtual void DoFind(
-			ScalPixelHitVector& hits,
-			TrackVector& trackSeeds,
-			TrackVector& tracks);
+			LitScalPixelHit* hits[],
+			unsigned int nofHits,
+			LitTrack* trackSeeds[],
+			unsigned int nofTrackSeeds,
+			LitTrack* tracks[],
+			unsigned int &nofTracks);
 
 	void SetDetectorLayout(LitDetectorLayout& layout) {
 		fLayout = layout;
@@ -42,21 +47,25 @@ public:
 
 public:
 	void ArrangeHits(
-			ScalPixelHitVector& hits);
+			LitScalPixelHit* hits[],
+			unsigned int nofHits);
 
 	/* Initialize the track seeds, i.e. selects with the track selection tool
 	 * proper ones and copies to local array.
 	 * @param itBegin Iterator to the first track seed.
 	 * @param itEnd iterator to the last track seed.
 	 */
-	void InitTrackSeeds(TrackVector& seeds);
+	void InitTrackSeeds(
+			LitTrack* trackSeeds[],
+			unsigned int nofTrackSeeds);
 
 	inline void MinMaxIndex(
 			const LitScalTrackParam* par,
-			ScalPixelHitVector& hits,
+			LitScalPixelHit** hits,
+			unsigned int nofHits,
 			fscal maxErr,
-			ScalPixelHitIterator& first,
-			ScalPixelHitIterator& last) const;
+			unsigned int &first,
+			unsigned int &last);
 
 	/* Follows tracks through the detector
 	 * @param itBegin Iterator to the first track.
@@ -91,7 +100,8 @@ public:
 			unsigned int nofHits);
 
 private:
-	TrackVector fTracks; // local copy of tracks
+	LitTrack* fTracks[MAX_NOF_TRACKS]; // local copy of tracks
+	unsigned int fNofTracks;
 
 	LitDetectorLayout fLayout; // detector geometry
 	LitHitData fHitData; // arranged hits

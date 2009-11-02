@@ -120,7 +120,7 @@ inline void LitTrackToCbmLitTrack(
 //	track->SetRefId(std::distance(ltracks.begin(), it));
 
 	// Convert hits
-	for (int i = 0; i < ltrack->hits.size(); i++){
+	for (int i = 0; i < ltrack->nofHits; i++){
 		CbmLitPixelHit* newHit = new CbmLitPixelHit;
 		newHit->SetX(ltrack->hits[i]->X);
 		newHit->SetY(ltrack->hits[i]->Y);

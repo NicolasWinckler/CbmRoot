@@ -55,7 +55,7 @@ inline unsigned short NDF(const LitTrack& track)
 {
    // TODO check NDF
 
-	unsigned short ndf =  2 * track.hits.size() - 5;
+	unsigned short ndf =  2 * track.nofHits - 5;
 	if (ndf > 0) return ndf; else return 1;
 
 //	int ndf = 0;

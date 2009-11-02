@@ -9,12 +9,4 @@
 
 //#include "vectors/PSEUDO_F64vec1.h"
 
-class LitScalPixelHit;
-class LitTrack;
-#include <vector>
-typedef std::vector<LitScalPixelHit*> ScalPixelHitVector;
-typedef std::vector<LitScalPixelHit*>::iterator ScalPixelHitIterator;
-typedef std::vector<LitTrack*> TrackVector;
-typedef std::vector<LitTrack*>::iterator TrackIterator;
-
 #endif /* LITTYPES_H_ */

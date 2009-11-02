@@ -21,7 +21,6 @@
 
 #include <algorithm>
 #include <iostream>
-#include <algorithm>
 
 #define cnst static const fvec
 
@@ -40,10 +39,10 @@ public:
 
 class PropagateThroughAbsorberClass
 {
-	TrackVector& fTracks;
+	LitTrack** fTracks;
 	LitTrackFinderNNParallel* fFinder;
 	LitAbsorber& fAbsorber;
-	std::vector<unsigned int>& fTracksId;
+	unsigned int* fTracksId;
 public:
 	void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
 		for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
@@ -56,8 +55,8 @@ public:
 	}
 	PropagateThroughAbsorberClass(
 			LitTrackFinderNNParallel* finder,
-			TrackVector& tracks,
-			std::vector<unsigned int>& tracksId,
+			LitTrack* tracks[],
+			unsigned int* tracksId,
 			LitAbsorber& absorber) :
 		fFinder(finder),
 		fTracks(tracks),
@@ -69,9 +68,9 @@ public:
 
 class ProcessStationClass
 {
-	TrackVector& fTracks;
+	LitTrack** fTracks;
 	LitTrackFinderNNParallel* fFinder;
-	std::vector<unsigned int>& fTracksId;
+	unsigned int* fTracksId;
 	unsigned char fStationGroup;
 	unsigned char fStation;
 public:
@@ -86,8 +85,8 @@ public:
 	}
 	ProcessStationClass(
 			LitTrackFinderNNParallel* finder,
-			TrackVector& tracks,
-			std::vector<unsigned int>& tracksId,
+			LitTrack** tracks,
+			unsigned int* tracksId,
 			unsigned char stationGroup,
 			unsigned char station) :
 		fFinder(finder),
@@ -153,8 +152,6 @@ LitTrackFinderNNParallel::LitTrackFinderNNParallel():
 	fMaxCovSq(20.*20.)
 {
 	tbb::task_scheduler_init init;
-
-	__m128i my;
 }
 
 LitTrackFinderNNParallel::~LitTrackFinderNNParallel()
@@ -162,43 +159,46 @@ LitTrackFinderNNParallel::~LitTrackFinderNNParallel()
 }
 
 void LitTrackFinderNNParallel::DoFind(
-		ScalPixelHitVector& hits,
-		TrackVector& trackSeeds,
-		TrackVector& tracks)
+		LitScalPixelHit* hits[],
+		unsigned int nofHits,
+		LitTrack* trackSeeds[],
+		unsigned int nofTrackSeeds,
+		LitTrack* tracks[],
+		unsigned int &nofTracks)
 {
-//	std::cout << fLayout;
+	ArrangeHits(hits, nofHits);
+	InitTrackSeeds(trackSeeds, nofTrackSeeds);
+	FollowTracks();
 
-//	for (int iIter = 0; iIter < fNofIter; iIter++) {
-//		SetIterationParameters(iIter);
-		ArrangeHits(hits);
-		InitTrackSeeds(trackSeeds);
-		FollowTracks();
-//		fFinalSelection->DoSelect(fTracks.begin(), fTracks.end());
-//		RemoveHits(fTracks.begin(), fTracks.end());
-//		CopyToOutput(fTracks.begin(), fTracks.end(), tracks);
-//
-		//Copy tracks to output
-		for (TrackIterator it = fTracks.begin(); it != fTracks.end(); it++) {
-			LitTrack* track = *it;
-//			std::cout << track;
-			if (track->hits.size() < 11) continue;
-//			std::cout << "cut 11" << track;
-			tracks.push_back(new LitTrack(*track));
-		}
+	//Copy tracks to output
+	nofTracks = 0;
+	for (unsigned int i = 0; i < fNofTracks; i++) {
+		LitTrack* track = fTracks[i];
+//		std::cout << track;
+		if (track->nofHits < 11) continue;
+//		std::cout << *track;
+		tracks[nofTracks++] = new LitTrack(*track);
+	}
 
-		for_each(fTracks.begin(), fTracks.end(), DeleteObject());
-		fTracks.clear();
-		fHitData.Clear();
-//	}
+//	for (unsigned int i = 0; i < nofTracks; i++)
+//		std::cout << *tracks[i];
 
+	for (unsigned int i = 0; i < fNofTracks; i++) {
+		delete fTracks[i];
+	}
+	fNofTracks = 0;
+//	for_each(fTracks.begin(), fTracks.end(), DeleteObject());
+//	fTracks.clear();
+	fHitData.Clear();
 }
 
 void LitTrackFinderNNParallel::ArrangeHits(
-		ScalPixelHitVector& hits)
+		LitScalPixelHit* hits[],
+		unsigned int nofHits)
 {
 	// TODO : add threads here
-    for(ScalPixelHitIterator it = hits.begin(); it != hits.end(); it++) {
-    	LitScalPixelHit* hit = *it;
+    for(unsigned int i = 0; i < nofHits; i++) {
+    	LitScalPixelHit* hit = hits[i];
 //    	if (fUsedHitsSet.find(hit->GetRefId()) != fUsedHitsSet.end()) continue;
      	fHitData.AddHit(hit->planeId, hit);
     }
@@ -213,55 +213,83 @@ void LitTrackFinderNNParallel::ArrangeHits(
 //    		LitStation& station = fLayout.GetStation(i, j);
 //    		if (station.type == kLITPIXELHIT) {
     			for (int k = 0; k < fLayout.GetNofSubstations(i, j); k++){
-    				ScalPixelHitVector& shits = fHitData.GetHits(i, j, k);
-    				std::sort(shits.begin(), shits.end(), ComparePixelHitXLess());
+    				unsigned int nh = fHitData.GetNofHits(i, j, k);
+    				LitScalPixelHit** shits = fHitData.GetHits(i, j, k);
+    				LitScalPixelHit** begin = &shits[0];
+    				LitScalPixelHit** end = &shits[0] + fHitData.GetNofHits(i, j, k);
+    				std::sort(begin, end, ComparePixelHitXLess());
 //    				std::cout << "station group " << i << " station " << j
 //    					<< " substation " << k << std::endl;
-//    				for(ScalPixelHitIterator it = shits.begin(); it != shits.end(); it++)
-//    					std::cout << *it;
-//    			}
-    		}
+//    				for(unsigned int i = 0; i < nh; i++)
+//    					std::cout << *shits[i];
+    			}
+//    		}
     	}
     }
 }
 
 void LitTrackFinderNNParallel::MinMaxIndex(
 		const LitScalTrackParam* par,
-		ScalPixelHitVector& hits,
+		LitScalPixelHit** hits,
+		unsigned int nofHits,
 		fscal maxErr,
-		ScalPixelHitIterator& first,
-		ScalPixelHitIterator& last) const
+		unsigned int &first,
+		unsigned int &last)
 {
 	LitScalPixelHit hit;
-	if(par->C0 > fMaxCovSq || par->C0 < 0.) return;
+	first = 0;
+	last = 0;
+	if (par->C0 > fMaxCovSq || par->C0 < 0.) return;
+	if (nofHits == 0) return;
+
 	fscal devX = fSigmaCoef * (std::sqrt(par->C0) + maxErr);
 //	fscal devX = fSigmaCoef * std::sqrt(par->C0 + maxErr * maxErr);
+	LitScalPixelHit** begin = &hits[0];
+	LitScalPixelHit** end = &hits[0] + nofHits;
 	hit.X = par->X - devX;
-	first = std::lower_bound(hits.begin(), hits.end(), &hit, ComparePixelHitXLess());
+	first = std::distance(begin, std::lower_bound(begin, end, &hit, ComparePixelHitXLess()));
+//	std::cout << "---first:" << "hit.X=" << hit.X << " hits[first]->X" << hits[first]->X << std::endl;
+
+	if (first >= nofHits) {
+//		std::cout << "----EEEEE----- firstID >= nofHits" << first << " " << nofHits  << std::endl;
+		first = 0;
+		last = 0;
+		return;
+	}
+
 	hit.X = par->X + devX;
-	last = std::lower_bound(hits.begin(), hits.end(), &hit, ComparePixelHitXLess());
+	last = std::distance(begin, std::lower_bound(begin, end, &hit, ComparePixelHitXLess()));
+//	std::cout << "---last:" << "hit.X=" << hit.X << " hits[last]->X" << hits[last]->X << std::endl;
+	if (last >= nofHits) {
+//		std::cout << "----EEEEE----- lastID >= nofHits"  << last << " " << nofHits << std::endl;
+//		first = 0;
+		last = nofHits;
+	}
 }
 
 void LitTrackFinderNNParallel::InitTrackSeeds(
-		TrackVector& seeds)
+		LitTrack* trackSeeds[],
+		unsigned int nofTrackSeeds)
 {
 //	tbb::parallel_for(tbb::blocked_range<unsigned int>(0, seeds.size()),
 //	    				InitTrackSeedsClass(seeds, fTracks), tbb::auto_partitioner());
 
+	fNofTracks = 0;
 	fscal QpCut = 1./1.5;
 	//TODO : add threads here
-	for (TrackIterator it = seeds.begin(); it != seeds.end(); it++) {
-		LitTrack* track = *it;
+	for (unsigned int i = 0; i < nofTrackSeeds; i++) {
+		LitTrack* track = trackSeeds[i];
 		if (fabs(track->paramLast.Qp) > QpCut) continue;
 //		if (fUsedSeedsSet.find((*track)->GetPreviousTrackId()) != fUsedSeedsSet.end()) continue;
 //		track->SetPDG(fPDG);
-		track->previouseTrackId = std::distance(seeds.begin(), it);
+		track->previouseTrackId = i;
 //		std::cout << track->previouseTrackId << "   ";
 
 		LitTrack* newTrack = new LitTrack(*track);
 //		newTrack->paramFirst = newTrack->paramLast;
 		newTrack->paramLast = newTrack->paramFirst;
-		fTracks.push_back(newTrack);
+		fTracks[fNofTracks++] = newTrack;
+//		fTracks.push_back(newTrack);
 	}
 //	std::cout << "TrackSeed.size=" << seeds.size() << ", created:" << fTracks.size() << std::endl;
 }
@@ -270,18 +298,20 @@ void LitTrackFinderNNParallel::InitTrackSeeds(
 void LitTrackFinderNNParallel::FollowTracks()
 {
 	// temporary arrays to store track indexes from the fTracks array
-	std::vector<unsigned int> tracksId1(fTracks.size());
-	std::vector<unsigned int> tracksId2;
+	unsigned int tracksId1[fNofTracks];
+	unsigned int tracksId2[fNofTracks];
+	unsigned int nofTracksId1 = fNofTracks;
+	unsigned int nofTracksId2 = 0;
 
 	//Initially use all tracks from fTracks array
-	for (unsigned int i = 0; i < fTracks.size(); i++) tracksId1[i] = i;
+	for (unsigned int i = 0; i < nofTracksId1; i++) tracksId1[i] = i;
 
 	// Main loop over station groups for track following
-	int nofStationGroups = fLayout.GetNofStationGroups();
-	for(int iStationGroup = 0; iStationGroup < nofStationGroups; iStationGroup++) { // loop over station groups
+	unsigned char nofStationGroups = fLayout.GetNofStationGroups();
+	for(unsigned char iStationGroup = 0; iStationGroup < nofStationGroups; iStationGroup++) { // loop over station groups
 		LitStationGroup stg = fLayout.stationGroups[iStationGroup];
 
-		unsigned int nofTracks = tracksId1.size(); // number of tracks
+		unsigned int nofTracks = nofTracksId1; // number of tracks
 		unsigned int nofTracksVec = nofTracks / fvecLen; // number of tracks grouped in vectors
 		unsigned int dTracks = nofTracks - fvecLen * nofTracksVec; // number of tracks remained after grouping in vectors
 //		std::cout << "nofTracks=" << nofTracks << " nofTracksVec=" << nofTracksVec
@@ -300,11 +330,12 @@ void LitTrackFinderNNParallel::FollowTracks()
 		// Propagate remaining dTracks through the absorber
 		if (dTracks > 0){
 			LitTrack* tracks[fvecLen];
+			LitTrack dummyTracks[fvecLen - dTracks];
 			unsigned int start = fvecLen * nofTracksVec;
 			for(unsigned int i = 0; i < dTracks; i++) tracks[i] = fTracks[tracksId1[start + i]];
 			// Check if the number of remaining tracks is less than fvecLen.
 			if (dTracks < fvecLen) {
-				for(unsigned int i = 0; i < fvecLen - dTracks; i++) tracks[dTracks+i] = tracks[dTracks-1];
+				for(unsigned int i = 0; i < fvecLen - dTracks; i++) tracks[dTracks+i] = &dummyTracks[i];//tracks[dTracks-1];
 			}
 			PropagateThroughAbsorber(tracks, stg.absorber);
 		}
@@ -315,7 +346,7 @@ void LitTrackFinderNNParallel::FollowTracks()
 		for(unsigned char iStation = 0; iStation < nofStations; iStation++) { // loop over stations
 
 //			std::cout << "tracksId1.size()=" << tracksId1.size() << std::endl;
-			unsigned int nofTracks = tracksId1.size(); // number of tracks
+			unsigned int nofTracks = nofTracksId1; // number of tracks
 			unsigned int nofTracksVec = nofTracks / fvecLen; // number of tracks grouped in vectors
 			unsigned int dTracks = nofTracks - fvecLen * nofTracksVec; // number of tracks remained after grouping in vectors
 //			std::cout << "iStation --> nofTracks=" << nofTracks << " nofTracksVec=" << nofTracksVec
@@ -333,11 +364,12 @@ void LitTrackFinderNNParallel::FollowTracks()
 			// Propagate remaining dTracks
 			if (dTracks > 0){
 				LitTrack* tracks[fvecLen];
+				LitTrack dummyTracks[fvecLen - dTracks];
 				unsigned int start = fvecLen * nofTracksVec;
 				for(unsigned int i = 0; i < dTracks; i++) tracks[i] = fTracks[tracksId1[start + i]];
 				// Check if the number of remaining tracks is less than fvecLen.
 				if (dTracks < fvecLen) {
-					for(unsigned int i = 0; i < fvecLen - dTracks; i++) tracks[dTracks+i] = tracks[dTracks-1];
+					for(unsigned int i = 0; i < fvecLen - dTracks; i++) tracks[dTracks+i] = &dummyTracks[i];//tracks[dTracks-1];
 				}
 				ProcessStation(tracks, iStationGroup, iStation);
 			}
@@ -345,12 +377,12 @@ void LitTrackFinderNNParallel::FollowTracks()
 			for (unsigned int iTrack = 0; iTrack < nofTracks; iTrack++) {
 				unsigned int id = tracksId1[iTrack];
 				if (fTracks[id]->nofMissingHits <= fMaxNofMissingHits) {
-					tracksId2.push_back(id);
+					tracksId2[nofTracksId2++]= id;
 				}
 			}
-			tracksId1.assign(tracksId2.begin(), tracksId2.end());
-			tracksId2.clear();
-
+			for (unsigned int i = 0; i < nofTracksId2; i++) tracksId1[i] = tracksId2[i];
+			nofTracksId1 = nofTracksId2;
+			nofTracksId2 = 0;
 		} // loop over stations
 
 	} // loop over station groups
@@ -416,8 +448,7 @@ void LitTrackFinderNNParallel::ProcessStation(
 	} // loop over substations
 
 	// Collect hits
-//	ScalPixelHitVector hits[fvecLen];
-	std::pair<ScalPixelHitIterator, ScalPixelHitIterator> hits[nofSubstations][fvecLen];
+	std::pair<unsigned int, unsigned int> hits[nofSubstations][fvecLen];
 	unsigned int nofHits[fvecLen];
 	for(unsigned int i = 0; i < fvecLen; i++) nofHits[i] = 0;
 	for (unsigned char iSubstation = 0; iSubstation < nofSubstations; iSubstation++) { // loop over substations
@@ -425,13 +456,12 @@ void LitTrackFinderNNParallel::ProcessStation(
 		UnpackTrackParam(lpar[iSubstation], par[iSubstation]);
 		for(unsigned int i = 0; i < fvecLen; i++) tracks[i]->paramLast = par[iSubstation][i];
 
-		ScalPixelHitVector& hitvec = fHitData.GetHits(stationGroup, station, iSubstation);
+		LitScalPixelHit** hitvec = fHitData.GetHits(stationGroup, station, iSubstation);
+		unsigned int nh = fHitData.GetNofHits(stationGroup, station, iSubstation);
 		fscal err = fHitData.GetMaxErr(stationGroup, station, iSubstation);
 		for(unsigned int i = 0; i < fvecLen; i++) { // loop over fvecLen
-//			hits[iSubstation][i].first = hitvec.begin();
-//			hits[iSubstation][i].second = hitvec.end();
-			MinMaxIndex(&par[iSubstation][i], hitvec, err, hits[iSubstation][i].first, hits[iSubstation][i].second);
-			nofHits[i] += std::distance(hits[iSubstation][i].first, hits[iSubstation][i].second);
+			MinMaxIndex(&par[iSubstation][i], hitvec, nh, err, hits[iSubstation][i].first, hits[iSubstation][i].second);
+			nofHits[i] += hits[iSubstation][i].second - hits[iSubstation][i].first;
 		} // loop over fvecLen
 	} // loop over substations
 
@@ -441,8 +471,9 @@ void LitTrackFinderNNParallel::ProcessStation(
 		LitScalTrackParam* apars[nofHits[i]];
 		unsigned int cnt = 0;
 		for(unsigned char iss = 0; iss < nofSubstations; iss++) {
-			for (ScalPixelHitIterator it = hits[iss][i].first; it != hits[iss][i].second; it++) {
-				ahits[cnt] = (*it);
+			LitScalPixelHit** hitvec = fHitData.GetHits(stationGroup, station, iss);
+			for (unsigned int j = hits[iss][i].first; j < hits[iss][i].second; j++) {
+				ahits[cnt] = hitvec[j];
 				apars[cnt] = &par[iss][i];
 				cnt++;
 			}
@@ -536,7 +567,7 @@ bool LitTrackFinderNNParallel::AddNearestHit(
 
 	// if hit was attached than change track information
 	if (hita != NULL) {
-		track->hits.push_back(hita);
+		track->AddHit(hita);
 		track->paramLast = param;
 		track->chiSq += chiSq;
 		track->NDF = NDF(*track);

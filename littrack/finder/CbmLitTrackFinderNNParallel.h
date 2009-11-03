@@ -36,14 +36,15 @@ public:
 private:
 	void ConvertHits(
 			HitPtrVector& hits,
-			ScalPixelHitVector& lhits);
+			LitScalPixelHit* lhits[]);
 
 	void ConvertSeeds(
 			TrackPtrVector& seeds,
-			TrackVector& lseeds);
+			LitTrack* lseeds[]);
 
 	void ConvertTracks(
-			TrackVector& ltracks,
+			LitTrack* ltracks[],
+			unsigned int nofTracks,
 			TrackPtrVector& tracks);
 
 	LitTrackFinderNNParallel fTrackFinder;

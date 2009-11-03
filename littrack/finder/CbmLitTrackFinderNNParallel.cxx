@@ -46,17 +46,18 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
 		TrackPtrVector& trackSeeds,
 		TrackPtrVector& tracks)
 {
-	ScalPixelHitVector lhits;
-	TrackVector lseeds;
-	TrackVector ltracks;
+	const unsigned int NHITS = hits.size();
+	LitScalPixelHit* lhits[NHITS];
+	const unsigned int NTRACKS = trackSeeds.size();
+	LitTrack* lseeds[NTRACKS];
+	LitTrack* ltracks[NTRACKS];
 
 	ConvertHits(hits, lhits);
 	ConvertSeeds(trackSeeds, lseeds);
+	unsigned int nofTracks = 0;
 
 	tbb::tick_count t0 = tbb::tick_count::now();
-
-	fTrackFinder.DoFind(lhits, lseeds, ltracks);
-
+	fTrackFinder.DoFind(lhits, hits.size(), lseeds, trackSeeds.size(), ltracks, nofTracks);
 	tbb::tick_count t1 = tbb::tick_count::now();
 
 	double dtime = (t1-t0).seconds();
@@ -65,14 +66,23 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
 	std::cout << "Total:" << fTime << " sec / " << fEventNo << " events." << std::endl;
 	std::cout << "Average per event:" << fTime / fEventNo << " sec." << std::endl;
 
-	ConvertTracks(ltracks, tracks);
+	ConvertTracks(ltracks, nofTracks, tracks);
 
-	for_each(lhits.begin(), lhits.end(), DeleteObject());
-	lhits.clear();
-	for_each(lseeds.begin(), lseeds.end(), DeleteObject());
-	lseeds.clear();
-	for_each(ltracks.begin(), ltracks.end(), DeleteObject());
-	ltracks.clear();
+	for (unsigned int i = 0; i < NHITS; i++) {
+		delete lhits[i];
+	}
+//	for_each(lhits.begin(), lhits.end(), DeleteObject());
+//	lhits.clear();
+	for (unsigned int i = 0; i < NTRACKS; i++) {
+		delete lseeds[i];
+	}
+//	for_each(lseeds.begin(), lseeds.end(), DeleteObject());
+//	lseeds.clear();
+	for (unsigned int i = 0; i < nofTracks; i++) {
+		delete ltracks[i];
+	}
+//	for_each(ltracks.begin(), ltracks.end(), DeleteObject());
+//	ltracks.clear();
 
 	std::cout << "Event: " << fEventNo++ << std::endl;
 
@@ -81,22 +91,22 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
 
 void CbmLitTrackFinderNNParallel::ConvertHits(
 		HitPtrVector& hits,
-		ScalPixelHitVector& lhits)
+		LitScalPixelHit* lhits[])
 {
-	for (HitPtrIterator it = hits.begin(); it != hits.end(); it++){
-		CbmLitPixelHit* hit = (CbmLitPixelHit*) *it;
+	for (unsigned int i = 0; i < hits.size(); i++){
+		CbmLitPixelHit* hit = (CbmLitPixelHit*) hits[i];
 		LitScalPixelHit* lhit = new LitScalPixelHit;
 		CbmLitPixelHitToLitScalPixelHit(hit, lhit);
-		lhits.push_back(lhit);
+		lhits[i] = lhit;
 	}
 }
 
 void CbmLitTrackFinderNNParallel::ConvertSeeds(
 		TrackPtrVector& seeds,
-		TrackVector& lseeds)
+		LitTrack* lseeds[])
 {
-	for (TrackPtrIterator it = seeds.begin(); it != seeds.end(); it++){
-		CbmLitTrack* track = (CbmLitTrack*) *it;
+	for (unsigned int i = 0; i < seeds.size(); i++){
+		CbmLitTrack* track = (CbmLitTrack*) seeds[i];
 		const CbmLitTrackParam* par = track->GetParamLast();
 		LitTrack* ltrack = new LitTrack;
 
@@ -105,16 +115,17 @@ void CbmLitTrackFinderNNParallel::ConvertSeeds(
 
 //		ltrack->previouseTrackId = std::distance(seeds.begin(), it);
 
-		lseeds.push_back(ltrack);
+		lseeds[i] = ltrack;
 	}
 }
 
 void CbmLitTrackFinderNNParallel::ConvertTracks(
-		TrackVector& ltracks,
+		LitTrack* ltracks[],
+		unsigned int nofTracks,
 		TrackPtrVector& tracks)
 {
-	for (TrackIterator it = ltracks.begin(); it != ltracks.end(); it++){
-		LitTrack* ltrack = *it;
+	for (unsigned int i = 0; i < nofTracks; i++){
+		LitTrack* ltrack = ltracks[i];
 		CbmLitTrack* track = new CbmLitTrack;
 		LitTrackToCbmLitTrack(ltrack, track);
 		tracks.push_back(track);

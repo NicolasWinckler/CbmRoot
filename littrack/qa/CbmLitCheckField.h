@@ -8,6 +8,7 @@
 class FairField;
 class TH1D;
 class TH2D;
+class TGraph2D;
 class TList;
 class TF1;
 class TF2;
@@ -60,6 +61,7 @@ private:
     std::vector<std::vector<Double_t> > fCz;
 
     std::vector<std::vector<TH2D*> >fhB;
+    std::vector<std::vector<TGraph2D*> >fhBGraph;
 
 	std::vector<std::vector<TH2D*> >fhBErrH2D;
 	std::vector<std::vector<TH1D*> >fhBErrH1D;

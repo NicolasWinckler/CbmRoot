@@ -6,6 +6,7 @@
 #include "CbmLitTrackPropagator.h"
 #include "CbmLitTrackUpdate.h"
 #include "CbmLitMath.h"
+#include "CbmLitStripHit.h"
 
 #include <iostream>
 

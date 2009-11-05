@@ -215,7 +215,7 @@ void CbmLitPropagationAnalysis::CreateHistograms()
 			            "relative momentum resolution at ", "chi-square at" };
 	Int_t bins[] = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
 	Double_t boundL[] = {-10., -10., -.15, -.15, -.1, -5., -5., -5., -5., -7., -30., -1.};
-	Double_t boundR[] = { 10.,  10.,  .15,  .15,  .1,  5.,  5.,  5.,  5.,  7.,  30.,  100.};
+	Double_t boundR[] = { 10.,  10.,  .15,  .15,  .1,  5.,  5.,  5.,  5.,  7.,  30.,  20.};
 	std::string var[] = {"p", "f", "s"};
 	std::string var2[] = {"[propagation]", "[filter]", "[smoother]"};
 

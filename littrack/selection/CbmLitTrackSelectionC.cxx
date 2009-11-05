@@ -104,29 +104,35 @@ void CbmLitTrackSelectionC::CheckSharedHits(
 		TrackPtrIterator itEnd)
 {
 	std::set<int> hitsId;
+	const int STRIPSTART = 1000000;
 
 	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
+		CbmLitTrack* track = *iTrack;
 
-		if ((*iTrack)->GetQuality() == kLITBAD) continue;
+		if (track->GetQuality() == kLITBAD) continue;
 
 	    int nofSharedHits = 0;
-	    int nofHits = (*iTrack)->GetNofHits();
+	    int nofHits = track->GetNofHits();
 
 	    for(int iHit = 0; iHit < nofHits; iHit++) {
-	    	int hitId = (*iTrack)->GetHit(iHit)->GetRefId();
+	    	int hitId = track->GetHit(iHit)->GetRefId();
+	    	LitHitType type = track->GetHit(iHit)->GetType();
+	    	if (type == kLITSTRIPHIT) hitId += STRIPSTART;
 	    	if(hitsId.find(hitId) != hitsId.end()) {
 	            nofSharedHits++;
 	            if (nofSharedHits > fNofSharedHits) {
-	               (*iTrack)->SetQuality(kLITBAD);
+	               track->SetQuality(kLITBAD);
 	               break;
 	            }
 	        }
 	    }
 
-	    if ( (*iTrack)->GetQuality() == kLITBAD) continue;
+	    if (track->GetQuality() == kLITBAD) continue;
 
 	    for(int iHit = 0; iHit < nofHits; iHit++) {
-	    	int hitId = (*iTrack)->GetHit(iHit)->GetRefId();
+	    	int hitId = track->GetHit(iHit)->GetRefId();
+	    	LitHitType type = track->GetHit(iHit)->GetType();
+	    	if (type == kLITSTRIPHIT) hitId += STRIPSTART;
 	        hitsId.insert(hitId);
 	    }
 	}

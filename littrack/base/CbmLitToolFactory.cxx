@@ -191,8 +191,9 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 	}
 	if(name == "much_final") {
 		CbmLitTrackSelectionMuch* muchSelection = new CbmLitTrackSelectionMuch();
-		muchSelection->SetNofSharedHits(2);
+		muchSelection->SetNofSharedHits(3);
 		muchSelection->SetMinNofHits(1);
+		muchSelection->SetMinLastPlaneId(0);
 		muchSelection->Initialize();
 		TrackSelectionPtr selection(muchSelection);
 		return selection;
@@ -208,7 +209,7 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 	} else
 	if(name == "trd_final") {
 		CbmLitTrackSelectionTrd* trdSelection = new CbmLitTrackSelectionTrd();
-		trdSelection->SetNofSharedHits(2);
+		trdSelection->SetNofSharedHits(3);
 		trdSelection->SetMinNofHits(6);
 		trdSelection->SetMinLastPlaneId(0);
 		trdSelection->Initialize();
@@ -327,7 +328,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderBranch->SetFinalSelection(CreateTrackSelection("much_final"));
 		muchFinderBranch->SetFilter(CreateTrackUpdate("kalman"));
 		muchFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-		muchFinderBranch->SetVerbose(1);
+		muchFinderBranch->SetVerbose(3);
 		muchFinderBranch->SetNofIter(1);
 		muchFinderBranch->IsUseFastSearch(true);
 		muchFinderBranch->SetPDG(13);
@@ -335,7 +336,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderBranch->IsAlwaysCreateMissingHit(false);
 		muchFinderBranch->SetSigmaCoef(3.5);
 		muchFinderBranch->SetChiSqPixelHitCut(13.86);
-		muchFinderBranch->SetChiSqStripHitCut(10.);
+		muchFinderBranch->SetChiSqStripHitCut(9.);
 		TrackFinderPtr finder(muchFinderBranch);
 		return finder;
 	} else

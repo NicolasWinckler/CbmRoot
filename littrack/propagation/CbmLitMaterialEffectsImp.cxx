@@ -155,7 +155,21 @@ myf CbmLitMaterialEffectsImp::EnergyLoss(
 	myf length = mat->GetRho() * mat->GetLength();
 //	return dEdx(par, mat) * length;
 	if (!fIsElectron) return dEdx(par, mat) * length;
-	else return BetheBlochSimple(mat) * length;
+//	else {
+//		myf M = fMass; //GeV
+//		myf p = std::abs(1. / par->GetQp());  // GeV
+//		myf rho = mat->GetRho();
+//		myf X0 = mat->GetRL();
+////		myf me = 0.000511; // GeV
+//		myf E = std::sqrt(M * M + p * p);
+////		myf ratio = me/M;
+//
+////		std::cout << "p=" << p << " E=" << E << " eloss=" << std::abs(E * (std::exp(-length/X0)))<< std::endl;
+//
+//		return std::abs(E - E * std::exp(-mat->GetLength()/X0));
+//	}
+//	else return BetheBlochSimple(mat) * length;
+	else return BetheBlochElectron(par, mat) * length;
 	//return MPVEnergyLoss(par, mat);
 }
 

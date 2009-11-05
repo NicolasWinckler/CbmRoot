@@ -8,7 +8,7 @@
  * tracking. See example in macro/littrack/global_tracking.C.
  **/
 
-void global_hits(Int_t nEvents = 10)
+void global_hits(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
@@ -16,7 +16,7 @@ void global_hits(Int_t nEvents = 10)
 	TString dir, mcFile, parFile, globalHitsFile, muchDigiFile;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/home/d/andrey/mono_1e-/";
+		dir  = "/home/d/andrey/straw_10mu_urqmd/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file

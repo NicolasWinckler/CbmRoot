@@ -19,7 +19,7 @@
 const int nofPar = 12;
 
 /** Number of detector planes. */
-const int nofLayers = 13;
+const int nofLayers = 25;
 
 // Drawing options. If true than specified histograms are drawn.
 bool drawPropagation = false;
@@ -42,12 +42,12 @@ TCanvas* canvas[3][nofLayers];
 
 
 // Input directory
-TString dir = "/home/d/andrey/std_10e/";
+TString dir = "/home/d/andrey/straw_10mu/";
 // Input file with propagation analysis
 TFile *file = new TFile(dir + "propagation.ana.0000.root");
 
 //Output directory for images and fit results.
-TString outDir = "./prop_trd/";
+TString outDir = "./phd/";
 
 void draw_prop_ana()
 {

@@ -6,14 +6,14 @@
  * Macro runs Littrack global track reconstruction.
  **/
 
-void global_tracking(Int_t nEvents = 1000)
+void global_tracking(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, globalHitsFile, globalTracksFile;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/home/d/andrey/std_10e/";
+		dir  = "/home/d/andrey/std_10mu_urqmd/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file
@@ -49,9 +49,9 @@ void global_tracking(Int_t nEvents = 1000)
 	run->SetOutputFile(globalTracksFile);
 	// ------------------------------------------------------------------------
 
-	FairGeane* Geane = new FairGeane(parFile.Data());
-	FairGeane *Geane = new FairGeane();
-	run->AddTask(Geane);
+//	FairGeane* Geane = new FairGeane(parFile.Data());
+//	FairGeane *Geane = new FairGeane();
+//	run->AddTask(Geane);
 
 	CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
 	// Tracking method to be used
@@ -80,7 +80,7 @@ void global_tracking(Int_t nEvents = 1000)
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
 	reconstructionQa->SetMinNofPointsTrd(10);
-	reconstructionQa->SetMinNofPointsMuch(12);
+	reconstructionQa->SetMinNofPointsMuch(11);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(9);
@@ -101,7 +101,6 @@ void global_tracking(Int_t nEvents = 1000)
 	// -----   Initialize and run   --------------------------------------------
 	run->LoadGeometry();
 	run->Init();
-	Geane->SetField(run->GetField());
 	run->Run(0, nEvents);
 	// ------------------------------------------------------------------------
 

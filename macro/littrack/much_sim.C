@@ -1,4 +1,4 @@
-void much_sim(Int_t nEvents = 1)
+void much_sim(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -6,11 +6,11 @@ void much_sim(Int_t nEvents = 1)
 	//if SCRIPT environment variable is set to "yes", i.e. macro is run via script
 	if (script != "yes") {
 		//input UrQMD file
-		inFile  = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
+		inFile  = "/home/d/events/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
 		//if necessary specify input pluto file to embed signal particles
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
 		//directory for output simulation files
-		dir  = "/home/d/andrey/new_field_much/";
+		dir  = "/home/d/andrey/straw_10mu_urqmd/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
@@ -18,11 +18,11 @@ void much_sim(Int_t nEvents = 1)
 		//If "yes" than 10 primary muons will be generated
 		muons = "yes";
 		//If "yes" than UrQMD will be used as background
-		urqmd = "no";
+		urqmd = "yes";
 		//If "yes" PLUTO particles will be embedded
 		pluto = "no";
 		//MUCH geometry file name
-		muchGeom = "much_standard.geo";
+		muchGeom = "much_standard_straw.geo";
 		//TRD geometry file name
 		trdGeom = "";//"trd_muon_setup_new.geo";
 	} else {
@@ -46,10 +46,10 @@ void much_sim(Int_t nEvents = 1)
 	TString tofGeom    = "tof_standard.geo";
 
 	// -----   Magnetic field   -----------------------------------------------
-//	TString fieldMap = "FieldMuonMagnet";   // name of field map
-//	TString magnetGeom = "magnet_standard.geo";
-	TString fieldMap = "FieldSCmuon_16x13";   // name of field map
-	TString magnetGeom = "magnet_scmuon_16x13.geo";
+	TString fieldMap = "FieldMuonMagnet";   // name of field map
+	TString magnetGeom = "magnet_standard.geo";
+//	TString fieldMap = "FieldSCmuon_16x13";   // name of field map
+//	TString magnetGeom = "magnet_scmuon_16x13.geo";
 	Double_t fieldZ = 50.;                 // field center z position
 	Double_t fieldScale =  1.;                 // field scaling factor
 

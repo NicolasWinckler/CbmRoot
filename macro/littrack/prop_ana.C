@@ -1,6 +1,6 @@
-void prop_ana(Int_t nEvents = 1000)
+void prop_ana(Int_t nEvents = 10)
 {
-	TString dir = "/home/d/andrey/std_10e/";
+	TString dir = "/home/d/andrey/straw_1mu-/";
 	TString mcFile = dir + "mc.0000.root";
 	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
 	TString parFile = dir + "param.0000.root";
@@ -28,9 +28,9 @@ void prop_ana(Int_t nEvents = 1000)
 
 	// -------------------------------------------------------------------------
 	CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis();
-	propAna->SetNofPlanes(13);
-	propAna->SetNofTrdHits(12);
-	propAna->SetNofMuchHits(0);
+	propAna->SetNofPlanes(25);
+	propAna->SetNofTrdHits(0);
+	propAna->SetNofMuchHits(24);
 	propAna->SetNofTofHits(1);
 	propAna->SetTestFastPropagation(false);
 	run->AddTask(propAna);

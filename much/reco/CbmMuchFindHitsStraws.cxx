@@ -29,7 +29,8 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws()
   fDigiFile    = NULL;
   fDigis   = fDigiMatches = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
-  SetPhis(0., 90., 45.);
+  //SetPhis(0., 90., 45.);
+  SetPhis(-10., 0., 10.);
 }
 // -------------------------------------------------------------------------
 
@@ -41,7 +42,8 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(Int_t iVerbose)
   fDigiFile    = NULL;
   fDigis   = fDigiMatches = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
-  SetPhis(0., 90., 45.);
+  //SetPhis(0., 90., 45.);
+  SetPhis(-10., 0., 10.);
 }
 // -------------------------------------------------------------------------
 
@@ -53,7 +55,8 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(const char* name, const char* digiF
   fDigiFile    = new TFile(digiFileName);
   fDigis   = fDigiMatches = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
-  SetPhis(0., 90., 45.);
+  //SetPhis(0., 90., 45.);
+  SetPhis(-10., 0, 10.);
 }
 // -------------------------------------------------------------------------
 
@@ -99,7 +102,7 @@ InitStatus CbmMuchFindHitsStraws::ReInit() {
 // -------------------------------------------------------------------------
 
 // -----   Public method Exec   --------------------------------------------
-void CbmMuchFindHitsStraws::Exec(Option_t* opt) 
+void CbmMuchFindHitsStraws::Exec(Option_t* opt)
 {
   //*
   // Make hits in straw tubes
@@ -109,27 +112,16 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
   if(fHits) fHits->Clear();
 
   static Int_t first = 1;
-  static FairGeoRotation rotMatr[3];
   static Double_t radIn[6];
   Double_t diam[6] = {0.42, 0.42, 0.42, 0.42, 0.42, 0.42}; // tube diameters
   Double_t sigmaX = 0.02, sigmaY = 0.02; // 200um
+
+  Double_t phi[3] = {fPhis[0] * TMath::DegToRad(), fPhis[1] * TMath::DegToRad(), fPhis[2] * TMath::DegToRad()}; // rotation angles of views (doublets)
 
   if (first) {
     // Some initialization - should go somewhere else
     cout << " Processing straws ... " << endl;
     first = 0;
-    //Double_t phi[3] = {45., 45., 45. }; // view rotation angles
-    Double_t phi[3] = {fPhis[0], fPhis[1], fPhis[2]}; // rotation angles of views (doublets)
-    for (Int_t i = 0; i < 3; ++i) {
-      phi[i] *= TMath::DegToRad();
-      rotMatr[i].setElement(TMath::Cos(phi[i]),0);
-      rotMatr[i].setElement(TMath::Cos(phi[i]),4);
-      rotMatr[i].setElement(TMath::Sin(phi[i]),1);
-      rotMatr[i].setElement(-TMath::Sin(phi[i]),3);
-      rotMatr[i].print();
-      //rotMatr[i].invert();
-      //rotMatr[i].print();
-    }
     // Get inner radia of stations
     Int_t nSt = fGeoScheme->GetNStations();
     for (Int_t i = 0; i < nSt; ++i) {
@@ -144,7 +136,6 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
   Double_t xyz[3] = {0}, array[5] = {0};
   for (Int_t idig = 0; idig < nDigis; ++idig) {
     CbmMuchDigi *digi = (CbmMuchDigi*) fDigis->UncheckedAt(idig);
-    //if (digi->GetStationNr() < begStation) continue; // not straw
     xyz[0] = digi->GetTime();
     xyz[1] = digi->GetDTime();
     UInt_t iz = digi->GetADCCharge();
@@ -155,9 +146,10 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
     Int_t station3 = fGeoScheme->GetStationIndex(detId);
     Int_t layer = fGeoScheme->GetLayerIndex(detId);
     Int_t rot = layer % 3;
-    FairGeoVector p(xyz[0], xyz[1], xyz[2]);
-    FairGeoVector ploc = rotMatr[rot] * p;
-    Double_t xloc = ploc.getX();
+    Double_t plocX = xyz[0] * TMath::Cos(phi[rot]) + xyz[1] * TMath::Sin(phi[rot]);
+    Double_t plocY = -xyz[0] * TMath::Sin(phi[rot]) + xyz[1] * TMath::Cos(phi[rot]);
+//    std::cout << "phi=" << phi[rot] << " x=" << xyz[0] << " y=" << xyz[1] << " z=" << xyz[2] << " plocX=" << plocX << " plocY=" << plocY << std::endl;
+    Double_t xloc = plocX;
     //cout << " Local: " << ploc.getX() << " " << ploc.getY() << " " << ploc.getZ() << endl;
     if (layer % 2 != 0) xloc += diam[station3] / 2. * TMath::Sign(1.,xloc); // half-tube shift
     Int_t itube = (Int_t) (xloc / diam[station3]), iSegment;
@@ -166,35 +158,26 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
     Double_t xwire = (itube + 0.5) * diam[station3]; // wire position
     Double_t times[3] = {0};
 
-    if (TMath::Abs(ploc.getX()) < radIn[station3]) {
-      if (ploc.getY() > 0) iSegment = 1;
+    if (TMath::Abs(plocX) < radIn[station3]) {
+      if (plocY > 0) iSegment = 1;
       else iSegment = -1;
     } else iSegment = 0;
 
     // Global coordinates in rotated coordinate system
     Double_t errU = gRandom->Gaus(0,sigmaX);
-    Double_t wXY = rotMatr[rot](1);
+    Double_t wXY = TMath::Sin(phi[rot]);
     //cout << station3 << " " << layer << " " << " " << wXY << endl;
 
     pos.SetXYZ(xyz[0], xyz[1], xyz[2]);
     dpos.SetXYZ(sigmaX, sigmaY, 0.);
 
-    //times[2] = -77777;
     //CbmMuchStrawHit(detectorId,u,phi,z,du,dphi,dz,refId,planeId);
     //cout << " Local: " << ploc.getX()+errU << " " << ploc.getY() << " " << ploc.getZ() << endl;
-    CbmMuchStrawHit *hit = new ((*fHits)[nHits++]) CbmMuchStrawHit(detId, 
-			   ploc.getX()+errU, TMath::ASin(wXY), pos[2], sigmaX, 0, 0, 
+    CbmMuchStrawHit *hit = new ((*fHits)[nHits++]) CbmMuchStrawHit(detId,
+			   plocX + errU, TMath::ASin(wXY), pos[2], sigmaX, 0, 0,
                            idig, fGeoScheme->GetLayerSideNr(detId));
-    /*
-    hit->SetPlaneId(fGeoScheme->GetLayerSideNr(detId));
-    cout << " Plane Id: " << hit->GetPlaneId() << endl; // test
-    hit->SetU (ploc.getX() + errU);
-    hit->SetDu(sigmaX);
-    hit->SetPhi(TMath::ASin(wXY));
-    */
     hit->SetX(pos[0]);
     hit->SetY(pos[1]);
-    //hit->SetZ(pos[2]);
     hit->SetTube(itube);
     hit->SetSegment(iSegment);
     //hit->SetZ(fGeoScheme->GetLayerSideByDetId(detId)->GetZ());
@@ -224,6 +207,7 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
 }
 // -------------------------------------------------------------------------
 
+
 // ---------   Private method Effic   -------------------------------
 void CbmMuchFindHitsStraws::Effic(Double_t *diam) 
 {
@@ -232,7 +216,6 @@ void CbmMuchFindHitsStraws::Effic(Double_t *diam)
   Int_t nHits = fHits->GetEntriesFast();
   for (Int_t ihit = 0; ihit < nHits; ++ihit) {
     CbmMuchStrawHit *hit = (CbmMuchStrawHit*) fHits->UncheckedAt(ihit);
-    //if (hit->GetTime(2) > -66666) continue; // not a straw
 
     // Apply inefficiency
     Double_t drift = hit->GetDouble()[1];
@@ -254,7 +237,6 @@ void CbmMuchFindHitsStraws::Merge()
   for (Int_t ihit = 0; ihit < nHits; ++ihit) {
     CbmMuchStrawHit *hit = (CbmMuchStrawHit*) fHits->UncheckedAt(ihit);
     if (hit == 0x0) continue;
-    //if (hit->GetTime(2) > -66666) continue; // not a straw
     Double_t drift = TMath::Abs (hit->GetDouble()[1]);
     //CbmMuchDigiMatch *digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit->GetDigi());
     CbmMuchDigiMatch *digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(ihit);
@@ -262,7 +244,6 @@ void CbmMuchFindHitsStraws::Merge()
     for (Int_t jhit = ihit+1; jhit < nHits; ++jhit) {
       CbmMuchStrawHit *hit1 = (CbmMuchStrawHit*) fHits->UncheckedAt(jhit);
       if (hit1 == 0x0) continue;
-      //if (hit1->GetTime(2) > -66666) continue; // not a straw
 
       if (hit1->GetTube() != hit->GetTube()) continue; // different tubes
       if (hit1->GetDetectorId() != hit->GetDetectorId()) continue; // different layers
@@ -297,7 +278,6 @@ void CbmMuchFindHitsStraws::Mirror()
   Int_t nHits = nHits0;
   for (Int_t ihit = 0; ihit < nHits0; ++ihit) {
     CbmMuchStrawHit *hit = (CbmMuchStrawHit*) fHits->UncheckedAt(ihit);
-    //if (hit->GetTime(2) > -66666) continue; // not a straw
 
     // Add mirror hit
     Double_t xwire = hit->GetDouble()[0];

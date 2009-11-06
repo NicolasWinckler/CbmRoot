@@ -326,11 +326,11 @@ void CbmMuchStrawHitFinderQa::CheckMirrors()
       digi = (CbmMuchDigi*) fDigis->UncheckedAt(hit->GetRefId());
       Int_t detId1 =  digi->GetDetectorId();
       Int_t stat3 = fGeoScheme->GetStationIndex(detId1);
-      Int_t rot = fGeoScheme->GetLayerIndex(detId1); // view
-      Int_t layer = fGeoScheme->GetLayerSideIndex(detId1); // layer of the doublet
+      Int_t rot1 = fGeoScheme->GetLayerIndex(detId1); // view
+      Int_t layer1 = fGeoScheme->GetLayerSideIndex(detId1); // layer of the doublet
       //cout << stat3 << " " << hit->GetCluster() << endl;
       if (stat3 != station3) continue;
-      if (rot != 0 || layer != 0) continue;
+      if (rot1 != 0 || layer1 != 0) continue;
       // Check if the second hit is the mirror of the first
       if (hit->GetTube() != hits[0]->GetTube()) continue; // different tube
       if (hit->GetSegment() != hits[0]->GetSegment()) continue; // different segments
@@ -354,45 +354,45 @@ void CbmMuchStrawHitFinderQa::CheckMirrors()
     CbmMuchStrawHit* hitMin = 0x0, *hitMin1 = 0x0;
     for (Int_t i1 = 0; i1 < nHits; ++i1) {
       //CbmMuchHit* hit = (CbmMuchHit*) fHits->UncheckedAt(i1);
-      CbmMuchStrawHit* hit = tmp[i1];
-      if (!hit) continue;
-      if (hit == hits[0] || hit == hits[1]) continue;
+      CbmMuchStrawHit* hit1 = tmp[i1];
+      if (!hit1) continue;
+      if (hit1 == hits[0] || hit1 == hits[1]) continue;
       //if (hit->GetTime(2) > -66666) continue; // not a straw hit
-      CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->UncheckedAt(hit->GetRefId());
-      Int_t detId1 =  digi->GetDetectorId();
+      CbmMuchDigi* digi1 = (CbmMuchDigi*) fDigis->UncheckedAt(hit1->GetRefId());
+      Int_t detId1 =  digi1->GetDetectorId();
       Int_t stat3 = fGeoScheme->GetStationIndex(detId1);
       if (stat3 != station3) continue;
-      Int_t rot = fGeoScheme->GetLayerIndex(detId1); // view
-      Int_t layer = fGeoScheme->GetLayerSideIndex(detId1); // layer of the doublet
-      if (rot != 0 || layer == 0) continue;
-      if (hit->GetSegment() != hits[0]->GetSegment()) continue; // different segments
-      digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit->GetRefId());
+      Int_t rot1 = fGeoScheme->GetLayerIndex(detId1); // view
+      Int_t layer1 = fGeoScheme->GetLayerSideIndex(detId1); // layer of the doublet
+      if (rot1 != 0 || layer1 == 0) continue;
+      if (hit1->GetSegment() != hits[0]->GetSegment()) continue; // different segments
+      digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit1->GetRefId());
       nP = digiM->GetNPoints();
       for (Int_t i2 = 0; i2 < nP; ++i2) {
 	FairMCPoint *p = (FairMCPoint*) fPoints->UncheckedAt(digiM->GetRefIndex(i2));
 	if (p->GetTrackID() != id) continue;
-	if (id < 2 && hit->GetFlag()%2 > 0) fhAll->Fill(station3+1.1);
+	if (id < 2 && hit1->GetFlag()%2 > 0) fhAll->Fill(station3+1.1);
 	break;
       }
-      if (TMath::Abs(hit->GetTube()-hits[0]->GetTube()) > 2) continue; // tubes far away
-      Double_t angPos = TMath::ATan2 (hit->GetU(), hit->GetZ()); // angular position
+      if (TMath::Abs(hit1->GetTube()-hits[0]->GetTube()) > 2) continue; // tubes far away
+      Double_t angPos = TMath::ATan2 (hit1->GetU(), hit1->GetZ()); // angular position
       for (Int_t j = 0; j < 2; ++j) {
-	Double_t ang = TMath::ATan2 (hit->GetU()-hits[j]->GetU(), hit->GetZ()-hits[j]->GetZ());
-	cout << ang << " " << hits[j]->GetFlag() << " " << hit->GetFlag() << " " << hits[j]->GetTube() << " " << hit->GetTube() << " " << hits[j]->GetU() << " " << hit->GetU() << " " << TMath::ATan2(hits[j]->GetU(),hits[j]->GetZ()) << " " << TMath::ATan2(hit->GetU(),hit->GetZ()) << endl;
+	Double_t ang = TMath::ATan2 (hit1->GetU()-hits[j]->GetU(), hit1->GetZ()-hits[j]->GetZ());
+	cout << ang << " " << hits[j]->GetFlag() << " " << hit1->GetFlag() << " " << hits[j]->GetTube() << " " << hit1->GetTube() << " " << hits[j]->GetU() << " " << hit1->GetU() << " " << TMath::ATan2(hits[j]->GetU(),hits[j]->GetZ()) << " " << TMath::ATan2(hit1->GetU(),hit1->GetZ()) << endl;
 	if (TMath::Abs(ang-angPos) < TMath::Abs(angMin)) {
 	  angMin1 = angMin; 
 	  iMin1 = iMin;
 	  hitMin1 = hitMin;
 	  iMin = j;
 	  angMin = ang-angPos;
-	  hitMin = hit;
+	  hitMin = hit1;
 	} else if (TMath::Abs(ang-angPos) < TMath::Abs(angMin1)) {
 	  angMin1 = ang - angPos;
 	  iMin1 = j;
-	  hitMin1 = hit;
+	  hitMin1 = hit1;
 	}
       }
-    }
+    } // for (Int_t i1 = 0; i1 < nHits;
     if (hitMin == 0x0) continue;
     digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hitMin->GetRefId());
     Int_t ok = 1;

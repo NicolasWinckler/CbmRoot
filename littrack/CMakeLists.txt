@@ -36,7 +36,7 @@ ${CBMROOT_SOURCE_DIR}/much
 ${CBMROOT_SOURCE_DIR}/much/geo
 ${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/sts
-/home/soft/tbb22_004oss/include
+#/home/soft/tbb22_004oss/include
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -67,7 +67,7 @@ finder/CbmLitTrackFinderBranch.cxx
 finder/CbmLitTrackFinderNN.cxx
 finder/CbmLitNearestHitToTrackMerger.cxx
 finder/CbmLitGating.cxx
-finder/CbmLitTrackFinderNNParallel.cxx
+#finder/CbmLitTrackFinderNNParallel.cxx
 finder_cbm/CbmLitTrdTrackFinderBranch.cxx
 finder_cbm/CbmLitTrdTrackFinderNN.cxx
 finder_cbm/CbmLitTrdTrackFinderWeight.cxx
@@ -82,7 +82,7 @@ fitter/CbmLitKalmanFilter.cxx
 fitter/CbmLitTrackFitterRobust.cxx
 fitter/CbmLitKalmanSmoother.cxx
 fitter/CbmLitTrackFitterIter.cxx
-parallel/LitTrackFinderNNParallel.cxx
+#parallel/LitTrackFinderNNParallel.cxx
 propagation/CbmLitTGeoTrackPropagator.cxx 
 propagation/CbmLitRK4TrackExtrapolator.cxx
 propagation/CbmLitLineTrackExtrapolator.cxx

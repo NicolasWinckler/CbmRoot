@@ -82,16 +82,16 @@ CbmEcalCell* CbmEcalStructure::GetCell(Int_t volId, Int_t& ten, Bool_t& isPS)
   if (fHash[volId]==NULL)
   {
     Bool_t lisPS;
-    Int_t ten;
+    Int_t iten;
     Float_t x;
     Float_t y;
     fHash[volId]=new __CbmEcalCellWrapper();
     if (fEcalVersion==0)
-      lisPS=CbmEcal::GetCellCoord(volId,x,y,ten);
+      lisPS=CbmEcal::GetCellCoord(volId,x,y,iten);
     if (fEcalVersion==1)
-      lisPS=CbmEcalDetailed::GetCellCoordInf(volId, x, y, ten);
+      lisPS=CbmEcalDetailed::GetCellCoordInf(volId, x, y, iten);
     fHash[volId]->cell=GetCell(x+0.25,y+0.25);
-    fHash[volId]->isPsTen=ten*2;
+    fHash[volId]->isPsTen=iten*2;
     if (lisPS) fHash[volId]->isPsTen+=1;
   }
   ten=fHash[volId]->isPsTen/2;

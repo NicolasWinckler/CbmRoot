@@ -214,6 +214,7 @@ CbmEcal::CbmEcal(const char* name, Bool_t active, const char* fileGeo)
   fEcalCollection=new TClonesArray("CbmEcalPoint");
   fLiteCollection=NULL;
   fVerboseLevel = 1;
+  fAbsorber=fInf->GetStringVariable("absorber");
 
   fInf->AddVariable("ecalversion", "0");
   for(i=kN-1;i>-1;i--)
@@ -305,7 +306,7 @@ void CbmEcal::SetSpecialPhysicsCuts()
     SetEcalCuts(mediumID);
   if (fInf->GetFastMC()==1) return;
   if (fInf->GetFastMC()==1) return;
-    mediumID = gGeoManager->GetMedium("Lead")->GetId();
+    mediumID = gGeoManager->GetMedium(fAbsorber)->GetId();
     SetEcalCuts(mediumID);
     mediumID = gGeoManager->GetMedium("Tyvek")->GetId();
     SetEcalCuts(mediumID);
@@ -771,9 +772,9 @@ void CbmEcal::ConstructGeometry()
   }
   Int_t kMedVac = geobuild->createMedium(CbmMedium);
 
-  CbmMedium=Media->getMedium("Lead");
+  CbmMedium=Media->getMedium(fAbsorber);
   if (!CbmMedium) {
-    Fatal("CbmEcal","Material Lead not defined in media file.");
+    Fatal("CbmEcal","Material %s not defined in media file.", fAbsorber.Data());
   }
   Int_t kMedLead = geobuild->createMedium(CbmMedium);
 

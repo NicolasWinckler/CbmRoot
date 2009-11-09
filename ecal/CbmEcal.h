@@ -231,6 +231,8 @@ private:
   Int_t   fVolIdMax;	//!
   /** Number of first hit for current primary **/
   Int_t fFirstNumber;	//!
+  /** Material of ther absorber **/
+  TString fAbsorber;	//!
   /** Map of volumes in ECAL
    ** fVolArr[0]==code of sensivite wall
    ** fVolArr[1]==code of PS Lead

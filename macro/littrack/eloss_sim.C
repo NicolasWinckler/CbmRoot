@@ -61,8 +61,6 @@ void eloss_sim(Int_t nEvents = 200000)
 
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
-	Double_t rtime = timer.RealTime();
-	Double_t ctime = timer.CpuTime();
 	cout << endl << endl;
 	cout << "Macro finished successfully." << endl;
 	cout << "Output file is " << outFile << endl;

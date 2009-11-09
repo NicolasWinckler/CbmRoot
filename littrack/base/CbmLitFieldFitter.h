@@ -3,7 +3,7 @@
  * @since 2009
  * @version 1.0
  **
- ** The class performs fit of the magnetic field with the 3rd order polynom.
+ ** The class performs fit of the magnetic field with the 0-9 degree polynom.
  ** MINUIT is used for minimization.
  **/
 
@@ -16,10 +16,22 @@
 
 class FairField;
 
+
+class CbmLitPolynom
+{
+public:
+	virtual double Calculate(
+			double x,
+			double y,
+			double c[]) const = 0;
+
+	virtual unsigned int GetNofCoefficients() const = 0;
+};
+
 class CbmLitFieldFitter {
 public:
 	/* Constructor */
-	CbmLitFieldFitter();
+	CbmLitFieldFitter(unsigned int polynomDegree);
 
 	/* Destructor */
 	virtual ~CbmLitFieldFitter();
@@ -54,6 +66,8 @@ public:
 	void SetNofBinsY(int nofBinsY) {fNofBinsY = nofBinsY;}
 	void SetUseEllipseAcc(bool useEllipseAcc) {fUseEllipseAcc = useEllipseAcc;}
 
+	const CbmLitPolynom* GetPolynom() const {return fPolynom;}
+
 private:
 	FairField* fField; // Magnetic field
 
@@ -64,6 +78,9 @@ private:
 	int fNofBinsY; // number of bins for Y
 
 	bool fUseEllipseAcc; // if true than only values inside a certain ellipse will be fitted
+
+	unsigned int fPolynomDegree; // degree of the polynom to be used for the field fit
+	CbmLitPolynom* fPolynom; // polynom to be used in the field fit
 };
 
 #endif /* CBMLITFIELDFITTER_H_ */

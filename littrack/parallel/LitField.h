@@ -29,15 +29,13 @@ public:
 			LitFieldValue &B) const {
 		fvec x2 = x*x;
 		fvec y2 = y*y;
-		fvec xy = x*y;
+		fvec yx2 = y*x2;
+		fvec xy2 = x*y2;
 		fvec x3 = x2*x;
 		fvec y3 = y2*y;
-		fvec xy2 = x*y2;
-		fvec x2y = x2*y;
-
-		B.Bx = cx[0] +cx[1]*x +cx[2]*y +cx[3]*x2 +cx[4]*xy +cx[5]*y2 +cx[6]*x3 +cx[7]*x2y +cx[8]*xy2 +cx[9]*y3;
-		B.By = cy[0] +cy[1]*x +cy[2]*y +cy[3]*x2 +cy[4]*xy +cy[5]*y2 +cy[6]*x3 +cy[7]*x2y +cy[8]*xy2 +cy[9]*y3;
-		B.Bz = cz[0] +cz[1]*x +cz[2]*y +cz[3]*x2 +cz[4]*xy +cz[5]*y2 +cz[6]*x3 +cz[7]*x2y +cz[8]*xy2 +cz[9]*y3;
+		B.Bx = cx[0] + cx[1]*x + cx[2]*y + cx[3]*x*y + cx[4]*x2 + cx[5]*y2 + cx[6]*xy2 + cx[7]*yx2 + cx[8]*x3 + cx[9]*y3;
+		B.By = cy[0] + cy[1]*x + cy[2]*y + cy[3]*x*y + cy[4]*x2 + cy[5]*y2 + cy[6]*xy2 + cy[7]*yx2 + cy[8]*x3 + cy[9]*y3;
+		B.Bz = cz[0] + cz[1]*x + cz[2]*y + cz[3]*x*y + cz[4]*x2 + cz[5]*y2 + cz[6]*xy2 + cz[7]*yx2 + cz[8]*x3 + cz[9]*y3;
     }
 
 	fvec cx[10], cy[10], cz[10]; // polinom coefficients

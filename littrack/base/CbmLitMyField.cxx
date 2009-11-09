@@ -20,7 +20,7 @@ public:
 
 CbmLitMyField::CbmLitMyField()
 {
-	CbmLitFieldFitter ff;
+	CbmLitFieldFitter ff(3);
 //	ff.Fit();
 //	ff.GetFieldSlices(fSlices);
 	std::sort(fSlices.begin(), fSlices.end(), CompareFieldSliceZLess());

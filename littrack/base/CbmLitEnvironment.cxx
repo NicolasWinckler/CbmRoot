@@ -367,7 +367,7 @@ void CbmLitEnvironment::GetMuchLayout(
 		LitDetectorLayout& layout)
 {
 	std::cout << "Getting layout for parallel version of tracking..." << std::endl;
-	CbmLitFieldFitter fieldFitter;
+	CbmLitFieldFitter fieldFitter(3);
 	std::cout << "Field fitter initialized" << std::endl;
 	CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
 	std::cout << "Simple geometry constructor initialized" << std::endl;

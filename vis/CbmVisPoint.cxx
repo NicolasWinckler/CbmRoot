@@ -136,7 +136,7 @@ void CbmVisPoint::DrawSpread(){
 
 // -------------------------------------------------------------------------
 TString CbmVisPoint::GetInfo(){
-  if (!fPoint) return 0;
+  if (!fPoint) return TString("");
   Int_t iStation   = CbmMuchGeoScheme::GetStationIndex(fPoint->GetDetectorID());
   Int_t iLayer     = CbmMuchGeoScheme::GetLayerIndex(fPoint->GetDetectorID());
   Int_t iLayerSide = CbmMuchGeoScheme::GetLayerSideIndex(fPoint->GetDetectorID());

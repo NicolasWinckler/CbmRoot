@@ -84,7 +84,7 @@ vector<CbmMuchPad*> CbmMuchModuleGem::GetPads() {
 // -------------------------------------------------------------------------
 
 // -----   Public method GetPad  -------------------------------------------
-CbmMuchPad* CbmMuchModuleGem::GetPad(Int_t channelId) {
+CbmMuchPad* CbmMuchModuleGem::GetPad(Long64_t channelId) {
   CbmMuchSector* sector = GetSector(channelId);
   Int_t iChannel = GetChannelIndex(channelId);
   return sector ? sector->GetPad(iChannel) : NULL;
@@ -104,7 +104,7 @@ Int_t CbmMuchModuleGem::GetNPads() {
 // -------------------------------------------------------------------------
 
 // -----   Public method GetSector   ---------------------------------------
-CbmMuchSector* CbmMuchModuleGem::GetSector(Int_t channelId) {
+CbmMuchSector* CbmMuchModuleGem::GetSector(Long64_t channelId) {
   Int_t iSector = GetSectorIndex(channelId);
   return (CbmMuchSector*)fSectors.At(iSector);
 }
@@ -339,8 +339,8 @@ void CbmMuchModuleGem::InitNeighbourPads() {
     for (Int_t iChannel = 0; iChannel < sector->GetNChannels(); iChannel++) {
       CbmMuchPad* pad = sector->GetPad(iChannel);
       if (!pad) continue;
-      vector<Int_t> neighbours;
-      Int_t channelId = pad->GetChannelId();
+      vector<Long64_t> neighbours;
+      Long64_t channelId = pad->GetChannelId();
       Int_t iRow = iChannel / nCols;
       Int_t iCol = iChannel - iRow * nCols;
 
@@ -351,9 +351,9 @@ void CbmMuchModuleGem::InitNeighbourPads() {
             Int_t chan = j * nCols + i;
             CbmMuchPad* p = sector->GetPad(chan);
             if(!p) continue;
-            Int_t chanId = p->GetChannelId();
+            Long64_t chanId = p->GetChannelId();
             if (chanId == channelId) continue;
-            vector<Int_t>::iterator it =
+            vector<Long64_t>::iterator it =
               find(neighbours.begin(), neighbours.end(),
                   chanId);
             if (it == neighbours.end()) neighbours.push_back(chanId);
@@ -396,9 +396,9 @@ void CbmMuchModuleGem::InitNeighbourPads() {
             Int_t chan = i_row * n_cols + i_col;
             CbmMuchPad* p = sec->GetPad(chan);
             if (!p) continue;
-            Int_t chanId = p->GetChannelId();
+            Long64_t chanId = p->GetChannelId();
             if (chanId == channelId) continue;
-            vector<Int_t>::iterator it =
+            vector<Long64_t>::iterator it =
               find(neighbours.begin(), neighbours.end(),
                   chanId);
             if (it == neighbours.end())
@@ -407,10 +407,10 @@ void CbmMuchModuleGem::InitNeighbourPads() {
           }
         }
       }
-      // Set TArrayI
+      // Set TArrayL64
       Int_t nSize = neighbours.size();
       if (nSize == 0) continue;
-      TArrayI array(nSize, &neighbours[0]);
+      TArrayL64 array(nSize, &neighbours[0]);
       pad->SetNeighbours(array);
     }
   }
@@ -425,17 +425,12 @@ Bool_t CbmMuchModuleGem::InitModule(){
     CbmMuchSector* sector = GetSector(iSector);
     if (!sector) continue;
     sector->AddPads();
-//    for (Int_t iPad = 0; iPad < sector->GetNChannels(); iPad++) {
-//      CbmMuchPad* pad = sector->GetPad(iPad);
-//      if (pad) fPads.push_back(pad);
-//    }
   }
   InitNeighbourPads();
   return kTRUE;
 }
 
 void CbmMuchModuleGem::DrawModule(Color_t color) {
-//  if (!sectorsVisible) return;
   for (Int_t s=0;s<GetNSectors();s++){
     CbmMuchSector* sector = GetSector(s);
     sector->SetFillColor(color);

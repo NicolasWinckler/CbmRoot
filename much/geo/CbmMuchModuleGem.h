@@ -30,12 +30,12 @@
 using std::vector;
 
 // Length of the index of the corresponding volume
-#define WL_SECTOR 2047
-#define WL_CHANNEL 1023
+#define WL_SECTOR 2147483647LL //2047
+#define WL_CHANNEL 1023LL
 
 // Number of a start bit for each volume
-#define SB_SECTOR 0
-#define SB_CHANNEL 11
+#define SB_SECTOR 0LL
+#define SB_CHANNEL 32LL //11
 
 
 class CbmMuchSector;
@@ -43,7 +43,7 @@ class CbmMuchSector;
 class CbmMuchModuleGem : public CbmMuchModule
 {
 
-public:
+  public:
 
     /** Default constructor **/
     CbmMuchModuleGem();
@@ -75,16 +75,16 @@ public:
      * @param channelId   Channel Id.
      * @return            Sector index within the module.
      */
-    static Int_t GetSectorIndex(Int_t channelId) {
-        return (channelId & (WL_SECTOR << SB_SECTOR)) >> SB_SECTOR;
+    static Int_t GetSectorIndex(Long64_t channelId) {
+      return (channelId & (WL_SECTOR << SB_SECTOR)) >> SB_SECTOR;
     }
     /**
      * Gets channel index for the given channel Id.
      * @param channelId   Channel Id.
      * @return            Channel index within the sector.
      */
-    static Int_t GetChannelIndex(Int_t channelId) {
-        return (channelId & (WL_CHANNEL << SB_CHANNEL)) >> SB_CHANNEL;
+    static Int_t GetChannelIndex(Long64_t channelId) {
+      return (channelId & (WL_CHANNEL << SB_CHANNEL)) >> SB_CHANNEL;
     }
     /**
      * Gets channel Id by sector index and channel index.
@@ -92,20 +92,20 @@ public:
      * @param iChannel   Channel index within the sector.
      * @return           Detector Id.
      */
-    static Int_t GetChannelId(Int_t iSector, Int_t iChannel) {
-        return (iSector << SB_SECTOR) | (iChannel << SB_CHANNEL);
+    static Long64_t GetChannelId(Int_t iSector, Int_t iChannel) {
+      return ((Long64_t)iSector << SB_SECTOR) | ((Long64_t)iChannel << SB_CHANNEL);
     }
 
     /** Accessors **/
     Int_t    GetNSectors()    const { return fSectors.GetEntriesFast(); }
     /** Gets sector by the given channel Id. **/
-    CbmMuchSector* GetSector(Int_t channelId);
+    CbmMuchSector* GetSector(Long64_t channelId);
     /** Gets sector by the given numbers of column and row in the grid. **/
     CbmMuchSector* GetSector(Int_t iGridColumn, Int_t iGridRow);
     /** Gets sector by the given coordinates in global c.s. */
     CbmMuchSector* GetSector(Double_t x, Double_t y);
     /** Gets pad by the given Id. */
-    CbmMuchPad* GetPad(Int_t channelId);
+    CbmMuchPad* GetPad(Long64_t channelId);
     /** Gets array of pads for this module. */
     vector<CbmMuchPad*> GetPads();
     Int_t GetNPads();
@@ -123,7 +123,7 @@ public:
     Int_t GetNSectorChannels() const { return fNSectorChannels; }
     void SetNSectorChannels(Int_t nSectorChannels) { fNSectorChannels = nSectorChannels; }
 
-private:
+  private:
     Bool_t                 fUseModuleDesign;       // Whether to use module or monolithic design
     TObjArray              fSectors;               // Array of sectors within this module
     Double_t               fGridDx, fGridDy;       // Size of the grid cell (for fast search purpose)

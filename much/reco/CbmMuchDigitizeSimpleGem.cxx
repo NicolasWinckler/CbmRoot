@@ -145,8 +145,8 @@ Bool_t CbmMuchDigitizeSimpleGem::ExecSimple(CbmMuchPoint* point, Int_t iPoint) {
   }
 
   Int_t iSector = sector->GetSectorIndex();                            // Sector index within the module
-  Int_t channelId = CbmMuchModuleGem::GetChannelId(iSector, iChannel); // Channel id within the module
-  pair<Int_t, Int_t> uniqueId(detectorId, channelId);                  // Unique id of the channel within the MUCH
+  Long64_t channelId = CbmMuchModuleGem::GetChannelId(iSector, iChannel); // Channel id within the module
+  pair<Int_t, Long64_t> uniqueId(detectorId, channelId);                  // Unique id of the channel within the MUCH
   Int_t iDigi = -1;
   CbmMuchDigiMatch* match;
   if (fChannelMap.find(uniqueId) == fChannelMap.end()) {

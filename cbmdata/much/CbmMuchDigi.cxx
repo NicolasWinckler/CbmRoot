@@ -20,14 +20,14 @@ using std::endl;
 // -----   Default constructor   -------------------------------------------
 CbmMuchDigi::CbmMuchDigi() {
   fDetectorId   =  0;
-  fChannelId = 0;
+  fChannelId = 0LL;
   fTime = -1;
   fDTime = 8e-2;
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmMuchDigi::CbmMuchDigi(Int_t detectorId, Int_t channelId, Double_t time, Double_t dTime) {
+CbmMuchDigi::CbmMuchDigi(Int_t detectorId, Long64_t channelId, Double_t time, Double_t dTime) {
   fDetectorId = detectorId;
   fChannelId = channelId;
   fADCCharge = 0;

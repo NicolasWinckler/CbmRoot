@@ -93,17 +93,6 @@ Int_t CbmMuchSector::GetChannel(Double_t x, Double_t y) {
 
 
   if (iChan < 0 || iChan > fNChannels-1) {
-//     cout << "-E- CbmMuchSector::GetChannel: "
-//          << "Channel number " << iChan << " exceeds limit "
-//          << fNChannels << endl << endl;
-//     cout << "StationNr = " <<  GetStationId() << "\t"
-//          << "SectorNr = " << GetSectorId() << endl;
-//     cout << "x = " << x << "\t" << "y = " << y << endl;
-//     cout << "xint = " << xint << "\t" << "yint = " << yint << endl;
-//     cout << "Lx = " << fSize[0] << "\t" << "Ly = " << fSize[1] << endl;
-//     cout << "dx = " << fDx << "\t" << "dy = " << fDy << endl;
-//     cout << "x = " << fPosition[0] << "\t" << "y = " << fPosition[1] << endl;
-//     cout << "fNCol = " << fNCols << "\t" << "iCol = " << iCol << "iRow = " << iRow << endl << endl;
     Fatal("GetChannel", "illegal channel number");
   }
 

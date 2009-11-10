@@ -817,7 +817,7 @@ void CbmMuchHitFinderQa::OccupancyQa(){
   for (Int_t i=0;i<fDigis->GetEntriesFast();i++){
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(i);
     Int_t detectorId = digi->GetDetectorId();
-    Int_t channelId  = digi->GetChannelId();
+    Long64_t channelId  = digi->GetChannelId();
     CbmMuchModuleGem* module = (CbmMuchModuleGem*)fGeoScheme->GetModuleByDetId(detectorId);
     if(!module) continue;
     CbmMuchPad* pad = module->GetPad(channelId);//fGeoScheme->GetPadByDetId(detectorId, channelId);

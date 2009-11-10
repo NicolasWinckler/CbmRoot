@@ -135,13 +135,13 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     TStopwatch         fTimer;         // Timer
 
     /** Map of active channels to index of MuchDigi. **/
-    std::map<std::pair<Int_t, Int_t>, Int_t> fChannelMap;
+    std::map<std::pair<Int_t, Long64_t>, Int_t> fChannelMap;
 
     /** Map of channels, wounded by secondary electrons, to CbmMuchDigi.  **/
-    std::map<std::pair<Int_t, Int_t>, CbmMuchDigi*> fChargedPads;
+    std::map<std::pair<Int_t, Long64_t>, CbmMuchDigi*> fChargedPads;
 
     /** Map of DigiMatches, which matches pads wounded by secondary electrons.  **/
-    std::map<std::pair<Int_t, Int_t>, CbmMuchDigiMatch*> fChargedMatches;
+    std::map<std::pair<Int_t, Long64_t>, CbmMuchDigiMatch*> fChargedMatches;
 
     /** Finish **/
     virtual void FinishTask();
@@ -152,7 +152,7 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     /** Initialization **/
     virtual InitStatus Init();
 
-    /** Reinitialization **/
+    /** Re-initialization **/
     virtual InitStatus ReInit();
 
     /** Reset eventwise counters **/

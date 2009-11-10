@@ -13,6 +13,8 @@
 #include "CbmMuchSector.h"
 #include "CbmMuchGeoScheme.h"
 
+#include "TArrayL64.h"
+
 class CbmMuchPad : public TPolyLine {
 
 public:
@@ -26,14 +28,14 @@ public:
   ~CbmMuchPad();
 
   Int_t    GetDetectorId()  const {return fDetectorId; }
-  Int_t    GetChannelId()   const {return fChannelId; }
+  Long64_t    GetChannelId()   const {return fChannelId; }
   Double_t GetSectorX0()    const ;
   Double_t GetSectorY0()    const ;
   Double_t GetX0()          const {return fX0;}
   Double_t GetY0()          const {return fY0;}
   Double_t GetLx()          const ;
   Double_t GetLy()          const ;
-  void SetNeighbours(TArrayI neighbourIDs) {  fNeighbours = neighbourIDs; }
+  void SetNeighbours(TArrayL64 neighbourIDs) {  fNeighbours = neighbourIDs; }
   vector<CbmMuchPad*> GetNeighbours();
 
 
@@ -45,9 +47,9 @@ public:
 
 private:
   Int_t               fDetectorId;        // Detector ID (including module number)
-  Int_t               fChannelId;         // Channel ID within the module
+  Long64_t               fChannelId;         // Channel ID within the module
   Double_t            fX0, fY0;           // Coordinates of the pad center
-  TArrayI             fNeighbours;        // Array of channel IDs of neighbour pads
+  TArrayL64             fNeighbours;        // Array of channel IDs of neighbour pads
   Int_t               fDigiIndex;         // Index of the corresponding CbmMuchDigi (if any)
   ClassDef(CbmMuchPad,1);
 };

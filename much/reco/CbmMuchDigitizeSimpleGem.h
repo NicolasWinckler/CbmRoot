@@ -65,7 +65,7 @@ public:
 
 private:
 
-  CbmMuchGeoScheme*  fGeoScheme;     // TODO add comments
+  CbmMuchGeoScheme*  fGeoScheme;     // Object responsible for geometry description
   TFile*             fDigiFile;      // Digitization file
 
   TClonesArray*      fPoints;        // Input array of CbmMuchPoint
@@ -79,7 +79,7 @@ private:
   TStopwatch         fTimer;         // Timer
 
   /** Map of active channels to index of MuchDigi. **/
-  std::map<std::pair<Int_t, Int_t>, Int_t> fChannelMap;
+  std::map<std::pair<Int_t, Long64_t>, Int_t> fChannelMap;
 
   /** Finish **/
   virtual void FinishTask();
@@ -90,7 +90,7 @@ private:
   /** Initialization **/
   virtual InitStatus Init();
 
-  /** Reinitialization **/
+  /** Re-initialization **/
   virtual InitStatus ReInit();
 
   /** Reset eventwise counters **/

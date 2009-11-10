@@ -1,7 +1,7 @@
 /*
  * CbmMuchFindHitsAdvancedGem.h
  *
- *  Created on: Jun 17, 2007
+ *  Created on: June 17, 2007
  *      Author: M.Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *
  *  Produces hits in GEM-like modules using different
@@ -101,7 +101,7 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
   TClonesArray*                    fDigis;             // Input array of CbmMuchDigi
   TClonesArray*                    fDigiMatches;       // Input array of CbmMuchDigiMatch
   TClonesArray*                    fClusters;          // Output array of CbmMuchCluster objects
-  map<pair<Int_t, Int_t>, Int_t>   fChannelDigiMap;    // Correspondence between unique channel id and digi index
+  map<pair<Int_t, Long64_t>, Int_t>   fChannelDigiMap;    // Correspondence between unique channel id and digi index
   set<Int_t>                       fSelectedDigis;     // Digis already included in clusters
   Double_t                         fThresholdRatio;    // Multiplied by maximal pad-charge gives the charge ratio (for simple clustering only)
   Int_t                            fAlgorithm;         // Defines which algorithm to use
@@ -169,7 +169,7 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
   Double_t GetESS(vector<Int_t> digiGroup1, vector<Int_t> digiGroup2);
   /**
    * Gets Error Sum of Squares for the given cluster.
-   * @parameter digiGroup  The set of digi indices.
+   * @parameter digiGroup   The set of digi indices.
    * @return                ESS for the cluster.
    */
   Double_t GetESS(vector<Int_t> digiGroup);

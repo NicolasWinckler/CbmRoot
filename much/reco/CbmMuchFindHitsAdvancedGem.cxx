@@ -1,7 +1,7 @@
 /*
  * CbmMuchFindHitsAdvancedGem.cxx
  *
- *  Created on: Jun 17, 2007
+ *  Created on: June 17, 2007
  *      Author: M.Ryzhinskiy <m.ryzhinskiy@gsi.de>
  *
  *  Produces hits in GEM-like modules using different
@@ -490,7 +490,7 @@ void CbmMuchFindHitsAdvancedGem::FillChannelDigiMap() {
     if(module->GetDetectorType()!=1) continue;
 
     // Unique channel id within the MUCH
-    pair<Int_t, Int_t> uniqueId(digi->GetDetectorId(), digi->GetChannelId());
+    pair<Int_t, Long64_t> uniqueId(digi->GetDetectorId(), digi->GetChannelId());
     if (fChannelDigiMap.find(uniqueId) == fChannelDigiMap.end())
       fChannelDigiMap[uniqueId] = iDigi;
   }
@@ -539,7 +539,7 @@ void CbmMuchFindHitsAdvancedGem::CreateCluster(Int_t iDigi,
   for (vector<CbmMuchPad*>::iterator it = neighbourPads.begin(); it
   != neighbourPads.end(); it++) {
     CbmMuchPad* neighbourPad = *it;
-    pair<Int_t, Int_t> uniqueId(neighbourPad->GetDetectorId(),
+    pair<Int_t, Long64_t> uniqueId(neighbourPad->GetDetectorId(),
         neighbourPad->GetChannelId());
     if (fChannelDigiMap.find(uniqueId) == fChannelDigiMap.end()) continue;
 
@@ -567,7 +567,7 @@ CbmMuchPad* CbmMuchFindHitsAdvancedGem::GetPadByDigi(Int_t digiIndex, Int_t &cha
     charge = match->GetTotalCharge();
 
     Int_t detectorId = digi->GetDetectorId();
-    Int_t channelId = digi->GetChannelId();
+    Long64_t channelId = digi->GetChannelId();
 
     CbmMuchModule* mod = (CbmMuchModule*) fGeoScheme->GetModuleByDetId(detectorId);
     assert(mod->GetDetectorType() == 1);

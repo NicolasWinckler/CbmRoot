@@ -1,7 +1,7 @@
 /*
  * CbmMuchClusterAnalysis.cxx
  *
- *  Created on: Jul 2, 2009
+ *  Created on: July 2, 2009
  *      Author: M. Ryzhinskiy <m.ryzhinskiy@gsi.de>
  */
 

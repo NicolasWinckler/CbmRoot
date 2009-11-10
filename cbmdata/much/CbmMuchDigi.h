@@ -36,7 +36,7 @@ class CbmMuchDigi : public TObject
    **@param time         time since event start [ns]
    **@param dTime        time resolution [ns]
    **/
-  CbmMuchDigi(Int_t detectorId, Int_t channelId, Double_t time, Double_t dTime);
+  CbmMuchDigi(Int_t detectorId, Long64_t channelId, Double_t time, Double_t dTime);
 
   /** Constructor from a given digi object.
    *@param digi  Digi object
@@ -49,7 +49,7 @@ class CbmMuchDigi : public TObject
 
   /** Accessors **/
   Int_t GetDetectorId()  const  { return fDetectorId; }
-  Int_t GetChannelId()   const  { return fChannelId; }
+  Long64_t GetChannelId()   const  { return fChannelId; }
   /** Gets time since event start [ns] **/
   Double_t  GetTime() const {return fTime;}
   /** Gets time resolution [ns] */
@@ -67,7 +67,7 @@ class CbmMuchDigi : public TObject
  private:
 
   Int_t    fDetectorId;      // Detector Id (including module number)
-  Int_t    fChannelId;       // Channel Id within the module
+  Long64_t    fChannelId;       // Channel Id within the module
   UInt_t   fADCCharge;       // Charge for the digi in ADC channels
   Double_t fTime;            // Time since event start [ns]
   Double_t fDTime;           // Time resolution [ns]

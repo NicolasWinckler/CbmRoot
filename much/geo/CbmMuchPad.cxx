@@ -99,36 +99,11 @@ Double_t CbmMuchPad::GetLy() const{
 // -------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------
-//Double_t CbmMuchPad::GetX0() const{
-//  CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-//  CbmMuchModuleGem* module = (CbmMuchModuleGem*) geoScheme->GetModuleByDetId(fDetectorId);
-//  CbmMuchSector *sector =  module->GetSector(fChannelId);
-//  Int_t iChannel = module->GetChannelIndex(fChannelId);
-//  Int_t iRow = iChannel/sector->GetNCols();
-//  Int_t iCol = iChannel - iRow*sector->GetNCols();
-//  return (iCol + 0.5)*sector->GetDx();
-//}
-//// -------------------------------------------------------------------------
-//
-//// -------------------------------------------------------------------------
-//Double_t CbmMuchPad::GetY0() const{
-//  CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
-//  CbmMuchModuleGem* module = (CbmMuchModuleGem*) geoScheme->GetModuleByDetId(fDetectorId);
-//  CbmMuchSector *sector =  module->GetSector(fChannelId);
-//  Int_t iChannel = module->GetChannelIndex(fChannelId);
-//  Int_t iRow = iChannel/sector->GetNCols();
-//  Int_t iCol = iChannel - iRow*sector->GetNCols();
-//  return (iRow + 0.5)*sector->GetDy();
-//}
-//// -------------------------------------------------------------------------
-
-
-// -------------------------------------------------------------------------
 vector<CbmMuchPad*> CbmMuchPad::GetNeighbours(){
   vector<CbmMuchPad*> pads;
   CbmMuchGeoScheme* geoScheme = CbmMuchGeoScheme::Instance();
   for(Int_t i=0; i < fNeighbours.GetSize(); i++){
-    Int_t channelId = fNeighbours.At(i);
+    Long64_t channelId = fNeighbours.At(i);
     CbmMuchModuleGem* module = (CbmMuchModuleGem*) geoScheme->GetModuleByDetId(fDetectorId);
     CbmMuchPad* pad = module->GetPad(channelId);
     if(pad) pads.push_back(pad);

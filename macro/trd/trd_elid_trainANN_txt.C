@@ -22,7 +22,7 @@ void coeffCalc(double mom, double* coeff1, double* coeff2) {
 	}
 }
 
-void trd_elid_trainANN_txt()
+void trd_elid_trainANN_txt(Int_t paramNum = 1, Int_t fileNum = 0)
 {
 	///load libraries for neural net
 	if (!gROOT->GetClass("TMultiLayerPerceptron"))
@@ -39,16 +39,32 @@ void trd_elid_trainANN_txt()
 	gSystem->Load("libPassive");
 	gSystem->Load("libTMVA");
 	gSystem->Load("libTrd");
-	// ------------------------------------------------------------------------
 
-	TString fileNum = "0001";
+	TString fileNumSt;
+	if (fileNum == 0)fileNumSt = "0000";
+	if (fileNum == 1)fileNumSt = "0001";
+	if (fileNum == 2)fileNumSt = "0002";
+	if (fileNum == 3)fileNumSt = "0003";
+	if (fileNum == 4)fileNumSt = "0004";
+	if (fileNum == 5)fileNumSt = "0005";
+	if (fileNum == 6)fileNumSt = "0006";
+	if (fileNum == 7)fileNumSt = "0007";
+	if (fileNum == 8)fileNumSt = "0008";
+	if (fileNum == 9)fileNumSt = "0009";
+
+	TString paramSt;
+	if (paramNum == 1)paramSt = "param1";
+	if (paramNum == 2)paramSt = "param2";
+	if (paramNum == 3)paramSt = "param3";
+
+	cout << "-I- Current file number is " << fileNumSt << endl;
 	TString geoType = "st";
-	TString inputDir = "/d/cbm02/slebedev/trd/JUL09/tr_params/";
-	fileNameEl = inputDir + geoType + "_" + "electrons_mom_" + fileNum	+ ".txt";
-	fileNamePi = inputDir + geoType + "_" + "pions_mom_" + fileNum + ".txt";
-	fileNameTestEl = inputDir + geoType + "_" + "electrons_mom_" + fileNum	+ ".txt";
-	fileNameTestPi = inputDir + geoType + "_" + "pions_mom_" + fileNum	+ ".txt";
-	fileNameCumHistos ="/d/cbm02/slebedev/trd/JUL09/tr_params/piel."+fileNum+".reco.root";
+	TString inputDir = "/d/cbm02/slebedev/trd/JUL09/reco/"+paramSt+"/st/";
+	fileNameEl = inputDir + geoType + "_" + "electrons_mom_" + fileNumSt	+ ".txt";
+	fileNamePi = inputDir + geoType + "_" + "pions_mom_" + fileNumSt + ".txt";
+	fileNameTestEl = inputDir + geoType + "_" + "electrons_mom_" + fileNumSt	+ ".txt";
+	fileNameTestPi = inputDir + geoType + "_" + "pions_mom_" + fileNumSt	+ ".txt";
+	fileNameCumHistos ="/d/cbm02/slebedev/trd/JUL09/reco/"+paramSt+"/st/piel."+fileNumSt+".reco.root";
 
 	CbmTrdElectronsTrainAnn* trainer = new CbmTrdElectronsTrainAnn();
 	trainer->SetFileNameEl(fileNameEl);
@@ -63,9 +79,10 @@ void trd_elid_trainANN_txt()
 
 	//Cut will be calculated automatically, taken into account 90% of electron efficiency
 	trainer->SetIsDoTrain(true);
-	trainer->SetTransformType(2);
-	//kANN = 0, kBDT = 1, kCLUSTERS = 2, kMEDIANA = 3
+	trainer->SetTransformType(3);
+	//kANN = 0, kBDT = 1, kCLUSTERS = 2, kMEDIANA = 3, kLIKELIHOOD = 4
 	trainer->SetIdMethod(0);
 	trainer->Run();
+	//trainer->DrawHistos();
 
 }

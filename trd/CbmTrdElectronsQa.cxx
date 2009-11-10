@@ -32,23 +32,20 @@ CbmTrdElectronsQa::~CbmTrdElectronsQa()
 
 void CbmTrdElectronsQa::InitHistos()
 {
-
-    fhPiELoss = new TH1D("fhPiELoss","Energy loss for pions in the first layer;energy loss, keV;entries",100, 0, 50);
-    fhPiELossSum = new TH1D("fhPiELossSum","Sum of energy losses for pions in all layers;energy loss, GeV;entries",100, 0, 3.e-4);
-    fhEldEdX = new TH1D("fhEldEdX","dEdX for electrons in the first layer;dEdX, GeV;entries",100, 0, 1.5e-5);
-    fhElTR = new TH1D("fhElTR","TR for electrons in the first layer;TR, GeV;entries",100, 0, 1.5e-5);
-    fhElELoss = new TH1D("fhElELoss","Energy loss (dEdX+TR) for electrons in the first layer;energy loss, GeV;entries",100, 0, 5.0e-5);
-    fhElElossSum = new TH1D("fhElELossSum","Sum of energy losses (dEdX+TR) for electrons in all layers;energy loss, GeV;entries",100, 0, 3.e-4);
+	Int_t nofELossBins = 500;
+    fhPiELoss = new TH1D("fhPiELoss","Energy loss for pions in the first layer;energy loss, keV;entries",nofELossBins, 0, 50);
+    fhPiELossSum = new TH1D("fhPiELossSum","Sum of energy losses for pions in all layers;energy loss, GeV;entries",nofELossBins, 0, 3.e-4);
+    fhEldEdX = new TH1D("fhEldEdX","dEdX for electrons in the first layer;dEdX, GeV;entries",nofELossBins, 0, 1.5e-5);
+    fhElTR = new TH1D("fhElTR","TR for electrons in the first layer;TR, GeV;entries",nofELossBins, 0, 1.5e-5);
+    fhElELoss = new TH1D("fhElELoss","Energy loss (dEdX+TR) for electrons in the first layer;energy loss, GeV;entries",nofELossBins, 0, 5.0e-5);
+    fhElElossSum = new TH1D("fhElELossSum","Sum of energy losses (dEdX+TR) for electrons in all layers;energy loss, GeV;entries",nofELossBins, 0, 3.e-4);
     fhElNofZeroTR = new TH1D("fhElNofZeroTR","Number of Zero TR layers;number of layers; entries",13, 0., 13.);
     fhElNofClusters = new TH1D("fhElNofClusters","Number of clusters;number of clusters; entries",13, 0, 13);
     fhPiNofClusters = new TH1D("fhPiNofClusters","Number of clusters;number of clusters; entries",13, 0., 13.);
-    fhElElossRMS= new TH1D("fhElElossRMS","Eloss RMS;Eloss RMS, GeV; entries",100, 0, 50e-6);
-    fhPiElossRMS = new TH1D("fhPiElossRMS","Eloss RMS;Eloss RMS, GeV; entries",100, 0., 50e-6);
-    fhElElossMediana= new TH1D("fhElElossMediana","Eloss mediana;mediana, GeV; entries",100, 0, 50e-6);
-    fhPiElossMediana = new TH1D("fhPiElossMediana","Eloss mediana;mediana, GeV; entries",100, 0., 50e-6);
-    fhElElossRMSMed= new TH1D("fhElElossRMSMed","Eloss RMS-mediana;mediana, GeV; entries",100, 0, 50e-6);
-    fhPiElossRMSMed = new TH1D("fhPiElossRMSMed","Eloss RMS-mediana;mediana, GeV; entries",100, 0., 50e-6);
-
+    fhElElossRMS= new TH1D("fhElElossRMS","Eloss RMS;Eloss RMS, GeV; entries",nofELossBins, 0, 50e-6);
+    fhPiElossRMS = new TH1D("fhPiElossRMS","Eloss RMS;Eloss RMS, GeV; entries",nofELossBins, 0., 50e-6);
+    fhElElossMediana= new TH1D("fhElElossMediana","Eloss mediana;mediana, GeV; entries",nofELossBins, 0, 50e-6);
+    fhPiElossMediana = new TH1D("fhPiElossMediana","Eloss mediana;mediana, GeV; entries",nofELossBins, 0., 50e-6);
 
 	fhNofTrdHitsEl = new TH1D("fhNofTrdHitsEl", "Number of hits in TRD track for electrons;Nof hits;Entries", 13, 0, 13);
 	fhNofTrdHitsPi = new TH1D("fhNofTrdHitsPi", "Number of hits in TRD track for pions;Nof hits;Entries", 13, 0, 13);
@@ -63,7 +60,7 @@ void CbmTrdElectronsQa::InitHistos()
 	}
 
 	Double_t *histMax;
-	Double_t histMaxSt[]={5e-6, 7e-6, 10e-6, 12e-6, 14e-6, 15e-6, 18e-6, 22e-6, 25e-6, 35e-6, 45e-6, 80e-6};
+	Double_t histMaxSt[]={6e-6, 8e-6, 12e-6, 14e-6, 16e-6, 16e-6, 20e-6, 26e-6, 30e-6, 40e-6, 50e-6, 90e-6};
 	Double_t histMaxMB[]={10e-6, 14e-6, 20e-6, 24e-6, 28e-6, 30e-6, 36e-6, 44e-6, 50e-6, 60e-6, 70e-6, 130e-6};
 	if (fGeoType == "st" || fGeoType == "ST"){
 		histMax = histMaxSt;
@@ -74,8 +71,7 @@ void CbmTrdElectronsQa::InitHistos()
 		histMax = histMaxSt;
 	}
 
-	Int_t nofSortBins = 1000;
-
+	Int_t nofSortBins = 10000;
 
 	for (Int_t i = 0; i < 12; i++){
 		sprintf(histName,"fhElossSortEl%d",i);
@@ -84,29 +80,11 @@ void CbmTrdElectronsQa::InitHistos()
 		sprintf(histName,"fhElossSortPi%d",i);
 		fhElossSortPi[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
 
-		sprintf(histName,"fhElossDiffEl%d",i);
-		sprintf(histTitle, "Eloss diff. between %d-%d hits;Energy loss difference, GeV;Entries", i, i-1);
-		fhElossDiffEl[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
-		sprintf(histName,"fhElossDiffPi%d",i);
-		fhElossDiffPi[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
-
 		sprintf(histName,"fhCumProbSortEl%d",i);
 		sprintf(histTitle, "Cumulative prob. in %d hit;Energy loss, GeV;cumulative probability", i);
 		fhCumProbSortEl[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
 		sprintf(histName,"fhCumProbSortPi%d",i);
 		fhCumProbSortPi[i] = new TH1D(histName, histTitle, nofSortBins, 0, histMax[i]);
-
-		sprintf(histName,"fhPiProbSortEl%d",i);
-		sprintf(histTitle, "Pi prob. in %d hit;Probability;Entries", i);
-		fhPiProbSortEl[i] = new TH1D(histName, histTitle, 100, -0.1, 1.1);
-		sprintf(histName,"fhPiProbSortPi%d",i);
-		fhPiProbSortPi[i] = new TH1D(histName, histTitle, 100, -0.1, 1.1);
-
-		sprintf(histName,"fhElProbSortEl%d",i);
-		sprintf(histTitle, "El prob. in %d hit;Probability;Entries", i);
-		fhElProbSortEl[i] = new TH1D(histName, histTitle, 100, -0.1, 1.1);
-		sprintf(histName,"fhElProbSortPi%d",i);
-		fhElProbSortPi[i] = new TH1D(histName, histTitle, 100, -0.1, 1.1);
 	}
 
 	fEnergyCutForClusters = 5e-6; //GeV
@@ -238,21 +216,6 @@ Double_t CbmTrdElectronsQa::GetElossRMS(CbmTrdTrack* trdtrack)
 		Double_t eLoss = trdhit->GetELoss();
 
 		rms += (mean - eLoss) * (mean - eLoss) / nHits;
-	} //iHit
-
-	return sqrt(rms);
-}
-
-Double_t CbmTrdElectronsQa::GetRMSMediana(CbmTrdTrack* trdtrack, Double_t mediana)
-{
-	Double_t nHits = 12.;
-	Double_t rms = 0.;
-	for (Int_t iHit = 0; iHit < 12; iHit++) {
-		Int_t hitIndex = trdtrack->GetHitIndex(iHit);
-		CbmTrdHit* trdhit = (CbmTrdHit*) fTrdHits->At(hitIndex);
-		Double_t eLoss = trdhit->GetELoss();
-
-		rms += (mediana - eLoss) * (mediana - eLoss) / nHits;
 	} //iHit
 
 	return sqrt(rms);
@@ -449,43 +412,31 @@ void CbmTrdElectronsQa::ElIdAnalysis()
 
 	    Double_t rms = GetElossRMS(trdtrack);
 	    Double_t mediana = (vec[5] + vec[6])/2.;
-	    Double_t rmsMed = GetRMSMediana(trdtrack, mediana);
 
 		if (partPdg == 11) {
 			fhElElossRMS->Fill(rms);
 			fhElElossMediana->Fill(mediana);
-			fhElElossRMSMed->Fill(rmsMed);
-			FillProbabilityHistos(vec, true);
 		}
 	    if (partPdg == 211) {
 			fhPiElossRMS->Fill(rms);
 			fhPiElossMediana->Fill(mediana);
-			fhPiElossRMSMed->Fill(rmsMed);
-			FillProbabilityHistos(vec, false);
 		}
 	    for (int i = 0; i < 12; i++){
 			if (partPdg == 11) {
 				fhElossSortEl[i]->Fill(vec[i]);
-				if (i != 11){
-					fhElossDiffEl[i]->Fill(vec[i+1] - vec[i]);
-				}else {
-					fhElossDiffEl[i]->Fill(vec[i] - vec[0]);
-				}
-
 			}//electrons
 
 			if (partPdg == 211) {
 				fhElossSortPi[i]->Fill(vec[i]);
-				if (i != 11){
-					fhElossDiffPi[i]->Fill(vec[i+1] - vec[i]);
-				}else {
-					fhElossDiffPi[i]->Fill(vec[i] - vec[0]);
-				}
-
 			}//pions
 	    }
 	}//iTrdTrack
+}
 
+
+
+void CbmTrdElectronsQa::Finish()
+{
 //fill cumulative probability histograms
 	for (Int_t iL=0; iL < 12; iL++){
 		Double_t cumProbPi = 0.;
@@ -501,38 +452,6 @@ void CbmTrdElectronsQa::ElIdAnalysis()
 		}
 	}
 
-
-
-}
-
-void CbmTrdElectronsQa::FillProbabilityHistos(const std::vector<Double_t>& vec, Bool_t isEl)
-{
-	for (Int_t j = 0; j < vec.size(); j++) {
-		Int_t binNum = fhCumProbSortEl[j]->FindBin(vec[j]);
-		if (binNum > fhCumProbSortEl[j]->GetNbinsX())
-			binNum = fhCumProbSortEl[j]->GetNbinsX();
-		if (isEl) {
-			fhElProbSortEl[j]->Fill(fhCumProbSortEl[j]->GetBinContent(binNum));
-		}else {
-			fhElProbSortPi[j]->Fill(fhCumProbSortEl[j]->GetBinContent(binNum));
-		}
-	}
-
-	for (Int_t j = 0; j < vec.size(); j++) {
-		Int_t binNum = fhCumProbSortPi[j]->FindBin(vec[j]);
-		if (binNum > fhCumProbSortPi[j]->GetNbinsX()){
-			binNum = fhCumProbSortPi[j]->GetNbinsX();
-		}
-		if (isEl) {
-			fhPiProbSortEl[j]->Fill(fhCumProbSortPi[j]->GetBinContent(binNum));
-		}else {
-			fhPiProbSortPi[j]->Fill(fhCumProbSortPi[j]->GetBinContent(binNum));
-		}
-	}
-}
-
-void CbmTrdElectronsQa::Finish()
-{
 	fhPiELossSum->Write();
 	fhPiELoss->Write();
 	fhElElossSum->Write();
@@ -546,8 +465,6 @@ void CbmTrdElectronsQa::Finish()
     fhPiElossRMS->Write();
     fhElElossMediana->Write();
     fhPiElossMediana->Write();
-    fhElElossRMSMed->Write();
-    fhPiElossRMSMed->Write();
 
 	fhNofTrdHitsEl->Write();
 	fhNofTrdHitsPi->Write();
@@ -560,14 +477,8 @@ void CbmTrdElectronsQa::Finish()
 	for (Int_t i = 0; i < 12; i++){
 		fhElossSortEl[i]->Write();
 		fhElossSortPi[i]->Write();
-		fhElossDiffEl[i]->Write();
-		fhElossDiffPi[i]->Write();
 		fhCumProbSortEl[i]->Write();
 		fhCumProbSortPi[i]->Write();
-		fhPiProbSortEl[i]->Write();
-		fhPiProbSortPi[i]->Write();
-		fhElProbSortEl[i]->Write();
-		fhElProbSortPi[i]->Write();
 	}
 }
 

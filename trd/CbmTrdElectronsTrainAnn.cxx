@@ -4,7 +4,9 @@
 #include "TFile.h"
 #include "TCut.h"
 #include "TSystem.h"
+#include "TRandom.h"
 #include "TCanvas.h"
+#include "TMVA/PDF.h"
 
 #include <iostream>
 #include <vector>
@@ -18,6 +20,13 @@ CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn()
 
 CbmTrdElectronsTrainAnn::~CbmTrdElectronsTrainAnn()
 {
+//	delete fhAnnOutputPi;
+//	delete fhAnnOutputEl;
+//	delete fhCumProbPi;
+//	delete fhCumProbEl;
+//	delete fhElNofClusters;
+//	delete fhPiNofClusters;
+//	delete fhElElossMediana;
 
 }
 
@@ -47,6 +56,36 @@ void CbmTrdElectronsTrainAnn::Init()
     fhPiNofClusters = new TH1D("fhPiNofClusters","Number of clusters;number of clusters; entries",13, 0., 13.);
     fhElElossMediana= new TH1D("fhElElossMediana","Eloss mediana;mediana, GeV; entries",100, 0, 1);
     fhPiElossMediana = new TH1D("fhPiElossMediana","Eloss mediana;mediana, GeV; entries",100, 0., 1);
+
+	char histName[200];
+	char histTitle[200];
+	for (Int_t i = 0; i < 12; i++){
+		sprintf(histName,"fhPiProbSortEl%d",i);
+		sprintf(histTitle, "Pi prob. in %d hit;Probability;Entries", i);
+		fhPiProbSortEl[i] = new TH1D(histName, histTitle, 100, -1.1, 1.1);
+		sprintf(histName,"fhPiProbSortPi%d",i);
+		fhPiProbSortPi[i] = new TH1D(histName, histTitle, 100, -1.1, 1.1);
+
+		sprintf(histName,"fhElProbSortEl%d",i);
+		sprintf(histTitle, "El prob. in %d hit;Probability;Entries", i);
+		fhElProbSortEl[i] = new TH1D(histName, histTitle, 100, -1.1, 1.1);
+		sprintf(histName,"fhElProbSortPi%d",i);
+		fhElProbSortPi[i] = new TH1D(histName, histTitle, 100, -1.1, 1.1);
+
+		sprintf(histName,"fhMulProbSortEl%d",i);
+		sprintf(histTitle, "Mul prob. in %d hit;Probability;Entries", i);
+		fhMulProbSortEl[i] = new TH1D(histName, histTitle, 100, -1.1, 1.1);
+		sprintf(histName,"fhMulProbSortPi%d",i);
+		fhMulProbSortPi[i] = new TH1D(histName, histTitle, 100, -1.1, 1.1);
+
+		sprintf(histName,"fhInputEl%d",i);
+		sprintf(histTitle, "Input in %d hit;Input;Entries", i);
+		fhInputEl[i] = new TH1D(histName, histTitle, 100, -1.1, 1.1);
+		sprintf(histName,"fhInputPi%d",i);
+		fhInputPi[i] = new TH1D(histName, histTitle, 100, -1.1, 1.1);
+	}
+	fRandom = new TRandom();
+	foutResults.open("trd_elid_results.txt",std::ios_base::app);
 }
 
 void CbmTrdElectronsTrainAnn::InitCumHistos()
@@ -55,6 +94,7 @@ void CbmTrdElectronsTrainAnn::InitCumHistos()
 		if (!fhCumProbSortPi[i]) delete fhCumProbSortPi[i];
 		if (!fhCumProbSortEl[i]) delete fhCumProbSortEl[i];
 	}
+	cout << "-I- file for cum histogramms: " << fFileNameCumHistos <<endl;
 
 	TFile* f = new TFile(fFileNameCumHistos, "READ");
 	if (!f->IsOpen()){
@@ -64,14 +104,35 @@ void CbmTrdElectronsTrainAnn::InitCumHistos()
 	}
 
 	char hName[50];
+//	TMVA::PDF * pdfEl = new TMVA::PDF("pdfSortEl", true);
 	for (int i = 0; i < fNofLayers; i++) {
 		sprintf(hName, "fhCumProbSortPi%d", i);
 		fhCumProbSortPi[i] = (TH1D*) f->Get(hName)->Clone();
 		sprintf(hName, "fhCumProbSortEl%d", i);
 		fhCumProbSortEl[i] = (TH1D*) f->Get(hName)->Clone();
+		sprintf(hName, "fhElossSortPi%d", i);
+		fhPdfSortPi[i] = (TH1D*) f->Get(hName)->Clone();
+		//fhPdfSortPi[i]->Rebin(5);
+		fhPdfSortPi[i]->Scale(1./FindArea(fhPdfSortPi[i]));
+		//fhPdfSortPi[i]->Scale(1./fhPdfSortPi[i]->GetMaximum());
+		sprintf(hName, "fhElossSortEl%d", i);
+		fhPdfSortEl[i] = (TH1D*) f->Get(hName)->Clone();
+		//fhPdfSortEl[i]->Rebin(5);
+		fhPdfSortEl[i]->Scale(1./FindArea(fhPdfSortEl[i]));
+		//fhPdfSortEl[i]->Scale(1./fhPdfSortEl[i]->GetMaximum());
 	}
 	//f->Close();
 	//delete f;
+}
+
+Double_t CbmTrdElectronsTrainAnn::FindArea(TH1* h)
+{
+	Double_t w = h->GetBinWidth(1);
+	Double_t a = 0.;
+	for (Int_t i = 1; i <= h->GetNbinsX(); i++){
+		a += w * h->GetBinContent(i);
+	}
+	return a;
 }
 
 void CbmTrdElectronsTrainAnn::Run()
@@ -86,9 +147,9 @@ void CbmTrdElectronsTrainAnn::Run()
 		DoTest();
 	}else if (fIdMethod == kMEDIANA){
 		DoTest();
+	}else if (fIdMethod == kLIKELIHOOD){
+		DoTest();
 	}
-	DrawHistos();
-
 }
 
 void CbmTrdElectronsTrainAnn::Transform()
@@ -100,6 +161,8 @@ void CbmTrdElectronsTrainAnn::Transform()
 			Transform2();
 		} else if (fTransformType == 3) {
 			Transform3();
+		} else if (fTransformType == 4) {
+			Transform4();
 		}
 	}
 }
@@ -109,26 +172,36 @@ void CbmTrdElectronsTrainAnn::Transform1()
 	Double_t ANNCoef1 = 1.06;
 	Double_t ANNCoef2 = 0.57;
 	for (Int_t i = 0; i<fElossVec.size(); i++) {
-		fElossVec[i]=fElossVec[i]*1e6;
-		fElossVec[i]=(fElossVec[i]-ANNCoef1)/ANNCoef2 -0.225;
+		fInVector[i]=fElossVec[i]*1e6;
+		fInVector[i]=(fInVector[i]-ANNCoef1)/ANNCoef2 -0.225;
 	}
-	sort(fElossVec.begin(), fElossVec.end());
-	for (Int_t i = 0; i<fElossVec.size(); i++)
-		fInVector[i]=TMath::LandauI(fElossVec[i]);
+	sort(fInVector.begin(), fInVector.end());
+	for (Int_t i = 0; i<fInVector.size(); i++)
+		fInVector[i]=TMath::LandauI(fInVector[i]);
 }
 
 void CbmTrdElectronsTrainAnn::Transform2()
 {
 	sort(fElossVec.begin(), fElossVec.end());
 	Int_t size = fElossVec.size();
-	//size = 6;
 	for (Int_t j = 0; j < size; j++) {
 		Int_t binNum = fhCumProbSortPi[j]->FindBin(fElossVec[j]);
 		if (binNum > fhCumProbSortPi[j]->GetNbinsX()){
 			binNum = fhCumProbSortPi[j]->GetNbinsX();
 		}
-		fInVector[j] = fhCumProbSortPi[j]->GetBinContent(binNum);
+		Double_t prob = fhCumProbSortPi[j]->GetBinContent(binNum);
+		fInVector[j] = prob;
+
+//		Int_t binNumPi = fhCumProbSortPi[j]->FindBin(fElossVec[j]);
+//		if (binNumPi > fhCumProbSortPi[j]->GetNbinsX()){
+//			binNumPi = fhCumProbSortPi[j]->GetNbinsX();
+//		}
+//	    Double_t probPi = fhCumProbSortPi[j]->GetBinContent(binNumPi);
+//		probPi = 0.3*TMath::ErfInverse(2*probPi-1.);
+//		if (probPi == 0.) probPi = 1.;
+//		fInVector[j] = probPi;
 	}
+
 
 	//fInVector[fNofInputNeurons-2] = (fElossVec[5] + fElossVec[6])/2.;//GetNofClusters();
 	//fInVector[fNofInputNeurons-1] = GetNofClusters();
@@ -136,25 +209,89 @@ void CbmTrdElectronsTrainAnn::Transform2()
 
 void CbmTrdElectronsTrainAnn::Transform3()
 {
+
+//	for (int i = 0; i < 12; i ++){
+//		fElossVec[i] += fRandom->Gaus(0., 3e-6);
+//	}
 	sort(fElossVec.begin(), fElossVec.end());
 
-//	for (Int_t j = 0; j < fElossVec.size(); j++) {
+	Int_t size = fElossVec.size();
+	for (Int_t j = 0; j < size; j++) {
+//		Int_t binNum = fhCumProbSortEl[j]->FindBin(fElossVec[j]);
+//		if (binNum > fhCumProbSortEl[j]->GetNbinsX())
+//			binNum = fhCumProbSortEl[j]->GetNbinsX();
+//
+//		Double_t prob = fhCumProbSortEl[j]->GetBinContent(binNum);
+//		fInVector[j] = prob;
+
+//		Int_t binNumEl = fhCumProbSortEl[j]->FindBin(fElossVec[j]);
+//		if (binNumEl > fhCumProbSortEl[j]->GetNbinsX())
+//			binNumEl = fhCumProbSortEl[j]->GetNbinsX();
+//		Double_t probEl = fhCumProbSortEl[j]->GetBinContent(binNumEl);
+//		probEl = 0.3*TMath::ErfInverse(2*probEl-1.);
+//		if (probEl == 0.) probEl = -1.;
+//		fInVector[j] = probEl;
+//
+		Int_t binNumEl = fhPdfSortEl[j]->FindBin(fElossVec[j]);
+		if (binNumEl > fhPdfSortEl[j]->GetNbinsX())
+			binNumEl = fhPdfSortEl[j]->GetNbinsX();
+		Double_t probEl = fhPdfSortEl[j]->GetBinContent(binNumEl);
+
+		Int_t binNumPi = fhPdfSortPi[j]->FindBin(fElossVec[j]);
+		if (binNumPi > fhPdfSortPi[j]->GetNbinsX())
+			binNumPi = fhPdfSortPi[j]->GetNbinsX();
+		Double_t probPi = fhPdfSortPi[j]->GetBinContent(binNumPi);
+
+		if (TMath::IsNaN(probPi/(probEl+probPi))){
+			fInVector[j] =0.;
+			//fInVector[j+12] =0.;
+		}else{
+			fInVector[j] = probPi/(probEl+probPi);
+			//fInVector[j+12] = probEl/(probEl+probPi);
+		}
+		//fInVector[j+12] = probEl/(probEl+probPi);
+	}
+
+	//fInVector[fNofInputNeurons-2] = (fElossVec[5] + fElossVec[6])/2.;//GetNofClusters();
+	//fInVector[fNofInputNeurons-1] = GetNofClusters();
+}
+
+void CbmTrdElectronsTrainAnn::Transform4()
+{
+	sort(fElossVec.begin(), fElossVec.end());
+	Int_t size = fElossVec.size();
+	for (Int_t j = 0; j < size; j++) {
 //		Int_t binNum = fhCumProbSortPi[j]->FindBin(fElossVec[j]);
 //		if (binNum > fhCumProbSortPi[j]->GetNbinsX()){
 //			binNum = fhCumProbSortPi[j]->GetNbinsX();
 //		}
 //		fInVector[j] = fhCumProbSortPi[j]->GetBinContent(binNum);
-//	}
-	Int_t size = fElossVec.size();
-	for (Int_t j = 0; j < size; j++) {
-		Int_t binNum = fhCumProbSortEl[j]->FindBin(fElossVec[j]);
-		if (binNum > fhCumProbSortEl[j]->GetNbinsX())
-			binNum = fhCumProbSortEl[j]->GetNbinsX();
-		fInVector[j] = fhCumProbSortEl[j]->GetBinContent(binNum);
+
+		Int_t binNumPi = fhCumProbSortPi[j]->FindBin(fElossVec[j]);
+		if (binNumPi > fhCumProbSortPi[j]->GetNbinsX()){
+			binNumPi = fhCumProbSortPi[j]->GetNbinsX();
+		}
+	    Double_t probPi = fhCumProbSortPi[j]->GetBinContent(binNumPi);
+		probPi = 0.3*TMath::ErfInverse(2*probPi-1.);
+		if (probPi == 0.) probPi = 1.;
+		fInVector[j] = probPi;
 	}
 
-	//fInVector[fNofInputNeurons-2] = (fElossVec[5] + fElossVec[6])/2.;//GetNofClusters();
-	//fInVector[fNofInputNeurons-1] = GetNofClusters();
+	for (Int_t j = 0; j < size; j++) {
+//		Int_t binNum = fhCumProbSortEl[j]->FindBin(fElossVec[j]);
+//		if (binNum > fhCumProbSortEl[j]->GetNbinsX())
+//			binNum = fhCumProbSortEl[j]->GetNbinsX();
+//		fInVector[j+12] = fhCumProbSortEl[j]->GetBinContent(binNum);
+
+		Int_t binNumEl = fhCumProbSortEl[j]->FindBin(fElossVec[j]);
+		if (binNumEl > fhCumProbSortEl[j]->GetNbinsX())
+			binNumEl = fhCumProbSortEl[j]->GetNbinsX();
+		Double_t probEl = fhCumProbSortEl[j]->GetBinContent(binNumEl);
+		probEl = 0.3*TMath::ErfInverse(2*probEl-1.);
+		if (probEl == 0.) probEl = -1.;
+		fInVector[j+12] = probEl;
+
+	}
 }
 
 Int_t CbmTrdElectronsTrainAnn::GetNofClusters()
@@ -168,13 +305,38 @@ Int_t CbmTrdElectronsTrainAnn::GetNofClusters()
 	return nofClusters;
 }
 
+Double_t CbmTrdElectronsTrainAnn::Likelihood()
+{
+	Double_t lPi = 1.;
+	Double_t lEl = 1.;
+	//cout << "likelihood: "<<endl; ;
+    sort(fElossVec.begin(), fElossVec.end());
+    for (Int_t j = 0; j < fElossVec.size(); j++) {
+		Int_t binNumEl = fhPdfSortEl[j]->FindBin(fElossVec[j]);
+		if (binNumEl > fhPdfSortEl[j]->GetNbinsX())
+			binNumEl = fhPdfSortEl[j]->GetNbinsX();
+		Double_t probEl = fhPdfSortEl[j]->GetBinContent(binNumEl);
+		lEl = lEl*probEl;
+		//cout << binNumEl << " " << probEl << " " << lEl<< endl;
+
+		Int_t binNumPi = fhPdfSortPi[j]->FindBin(fElossVec[j]);
+		if (binNumPi > fhPdfSortPi[j]->GetNbinsX())
+			binNumPi = fhPdfSortPi[j]->GetNbinsX();
+		Double_t probPi = fhPdfSortPi[j]->GetBinContent(binNumPi);
+		lPi = lPi*probPi;
+	}
+	//cout << lEl << " " <<lPi << " " << lPi/(lEl + lPi)	<<endl;
+	return lEl/(lEl + lPi);
+
+}
+
 Double_t CbmTrdElectronsTrainAnn::Eval(Bool_t isEl)
 {
 
 	if (fIdMethod == kBDT){
 		return fReader->EvaluateMVA("BDT");
 	}else if (fIdMethod == kANN){
-		Double_t par[12];
+		Double_t par[fNofInputNeurons];
 		for (UInt_t i = 0; i <fInVector.size(); i++) par[i] = fInVector[i];
 		return fNN->Evaluate(0, par);
 	}else if (fIdMethod == kCLUSTERS){
@@ -186,6 +348,9 @@ Double_t CbmTrdElectronsTrainAnn::Eval(Bool_t isEl)
 		Double_t eval = (fElossVec[5] + fElossVec[6])/2.;
 		if (eval > 4.56e-6) return 1.;
 		return -1.;
+
+	}else if (fIdMethod == kLIKELIHOOD){
+		return Likelihood();
 
 	}
 }
@@ -252,7 +417,7 @@ void CbmTrdElectronsTrainAnn::DoTrain()
 	cout << "-I- create ANN: "<< mlpString << endl;
 	cout << "-I- number of training epochs = " << fNofAnnEpochs << endl;
 	fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
-	fNN->Train(fNofAnnEpochs, "+text,update=10");
+	fNN->Train(fNofAnnEpochs, "+text,update=50");
 	fNN->DumpWeights((const char*)fAnnWeightsFile);
 }
 
@@ -354,6 +519,8 @@ void CbmTrdElectronsTrainAnn::DoPreTest()
 		cout << "-I- IdMethod = kCLUSTERS " << endl;
 	}else if (fIdMethod == kMEDIANA){
 		cout << "-I- IdMethod = kMEDIANA " << endl;
+	}else if (fIdMethod == kLIKELIHOOD){
+		cout << "-I- IdMethod = kLIKELIHOOD " << endl;
 	}
 
 	fElossVec.clear();
@@ -387,6 +554,7 @@ void CbmTrdElectronsTrainAnn::DoPreTest()
 			fElossVec[i] = inVectorTemp[i];
 
 		Transform();
+		FillProbabilityHistos(true);
 		Double_t nnEval = Eval(true);
 		if (nnEval > fMaxEval)nnEval = fMaxEval - 0.01;
 		if (nnEval < fMinEval)nnEval = fMinEval + 0.01;
@@ -403,6 +571,7 @@ void CbmTrdElectronsTrainAnn::DoPreTest()
 		finPiTest >> mom;
 
 		Transform();
+		FillProbabilityHistos(false);
 		Double_t nnEval = Eval(false);
 		if (nnEval > fMaxEval)nnEval = fMaxEval - 0.01;
 		if (nnEval < fMinEval)nnEval = fMinEval + 0.01;
@@ -426,6 +595,9 @@ void CbmTrdElectronsTrainAnn::DoTest()
 		cout << "-E- NO TESTING WILL BE PERFORMED!!!" << endl;
 		return;
 	}
+
+	fElossVec.clear();
+	fElossVec.resize(fNofLayers);
 
 	DoPreTest();
 	fAnnCut = FindOptimalCut();
@@ -511,6 +683,16 @@ void CbmTrdElectronsTrainAnn::DoTest()
 	}
 	cout << "electron efficiency loss in % = " << nofElLikePi << "/"
 			<< nofElTest << " = " << (Double_t) nofElLikePi/nofElTest *100. << endl;
+
+	foutResults << "------------------------"<< endl;
+	foutResults << fIdMethod << " ";
+	foutResults << fTransformType << endl;
+	foutResults << fFileNameTestEl <<endl;
+	foutResults << fFileNameTestPi<<endl;
+	foutResults << fFileNameCumHistos<<endl;
+	foutResults << (Double_t) nofPiTest / nofPiLikeEl<<endl;
+	foutResults << (Double_t) nofElLikePi/nofElTest *100. <<endl;
+	foutResults << "------------------------"<< endl;
 
 }
 
@@ -624,10 +806,48 @@ TMVA::Reader* CbmTrdElectronsTrainAnn::CreateTmvaReader()
 	char txt1[100];
 	for (Int_t i = 0; i < fNofInputNeurons; i++){
 		sprintf(txt1, "x%d",i);
-		//cout << txt1 << endl;
 		reader->AddVariable(txt1, &fInVector[i]);
 	}
 	return reader;
+}
+
+void CbmTrdElectronsTrainAnn::FillProbabilityHistos(Bool_t isEl)
+{
+	Double_t probEl, probPi;
+	sort(fElossVec.begin(), fElossVec.end());
+	for (Int_t j = 0; j < fElossVec.size(); j++) {
+		Int_t binNumEl = fhCumProbSortEl[j]->FindBin(fElossVec[j]);
+		if (binNumEl > fhCumProbSortEl[j]->GetNbinsX())
+			binNumEl = fhCumProbSortEl[j]->GetNbinsX();
+		probEl = fhCumProbSortEl[j]->GetBinContent(binNumEl);
+		probEl = 0.3*TMath::ErfInverse(2*probEl-1.);
+		if (probEl == 0.) probEl = -1.;
+
+		Int_t binNumPi = fhCumProbSortPi[j]->FindBin(fElossVec[j]);
+		if (binNumPi > fhCumProbSortPi[j]->GetNbinsX()){
+			binNumPi = fhCumProbSortPi[j]->GetNbinsX();
+		}
+	    probPi = fhCumProbSortPi[j]->GetBinContent(binNumPi);
+		probPi = 0.3*TMath::ErfInverse(2*probPi-1.);
+		if (probPi == 0.) probPi = -1.;
+		if (isEl) {
+			fhMulProbSortEl[j]->Fill((probPi)*(probEl));
+			fhPiProbSortEl[j]->Fill(probPi);
+			fhElProbSortEl[j]->Fill(probEl);
+		}else {
+			fhMulProbSortPi[j]->Fill((probPi)*(probEl));
+			fhPiProbSortPi[j]->Fill(probPi);
+			fhElProbSortPi[j]->Fill(probEl);
+		}
+	}
+
+	for (Int_t j = 0; j < fElossVec.size(); j++) {
+		if (isEl) {
+			fhInputEl[j]->Fill(fInVector[j]);
+		}else {
+			fhInputPi[j]->Fill(fInVector[j]);
+		}
+	}
 }
 
 void CbmTrdElectronsTrainAnn::DrawHistos()
@@ -676,7 +896,131 @@ void CbmTrdElectronsTrainAnn::DrawHistos()
 	fhElElossMediana->Draw();
 	fhPiElossMediana->Draw("same");
 
+	TCanvas* c6 = new TCanvas("c6", "c6", 10, 10, 800, 800);
+	c6->Divide(4, 3);
+	for (int i = 0; i < 12; i++) {
+		c6->cd(i + 1);
+		fhElProbSortPi[i]->SetLineWidth(3);
+		fhElProbSortPi[i]->SetStats(false);
+		fhElProbSortPi[i]->SetMinimum(1);
+		fhElProbSortPi[i]->SetMaximum(1.1*
+				TMath::Max(fhElProbSortPi[i]->GetMaximum(), fhElProbSortEl[i]->GetMaximum()));
+		fhElProbSortPi[i]->Draw();
 
+		fhElProbSortEl[i]->SetLineWidth(3);
+		fhElProbSortEl[i]->SetLineStyle(2);
+		fhElProbSortEl[i]->SetStats(false);
+		fhElProbSortEl[i]->SetMinimum(1);
+		fhElProbSortEl[i]->Draw("same");
+
+//		TLegend* leg1 = new TLegend(0.5, 0.15, 0.99, 0.4);
+//		leg1->AddEntry(fhElossDiffEl[i], "electrons");
+//		leg1->AddEntry(fhElossDiffPi[i], "pions");
+//		leg1->DrawClone();
+
+		gPad->SetLogy(true);
+		gPad->SetGridy(true);
+		gPad->SetGridx(true);
+	}
+
+	TCanvas* c7 = new TCanvas("c7", "c7", 10, 10, 800, 800);
+	c7->Divide(4, 3);
+	for (int i = 0; i < 12; i++) {
+		c7->cd(i + 1);
+		fhPiProbSortPi[i]->SetLineWidth(3);
+		fhPiProbSortPi[i]->SetStats(false);
+		fhPiProbSortPi[i]->SetMinimum(1);
+		fhPiProbSortPi[i]->SetMaximum(1.1*
+				TMath::Max(fhPiProbSortPi[i]->GetMaximum(), fhPiProbSortEl[i]->GetMaximum()));
+		fhPiProbSortPi[i]->Draw();
+
+		fhPiProbSortEl[i]->SetLineWidth(3);
+		fhPiProbSortEl[i]->SetLineStyle(2);
+		fhPiProbSortEl[i]->SetStats(false);
+		fhPiProbSortEl[i]->SetMinimum(1);
+		fhPiProbSortEl[i]->Draw("same");
+
+//		TLegend* leg1 = new TLegend(0.5, 0.15, 0.99, 0.4);
+//		leg1->AddEntry(fhElossDiffEl[i], "electrons");
+//		leg1->AddEntry(fhElossDiffPi[i], "pions");
+//		leg1->DrawClone();
+
+		gPad->SetLogy(true);
+		gPad->SetGridy(true);
+		gPad->SetGridx(true);
+	}
+
+	TCanvas* c8 = new TCanvas("c8", "c8", 10, 10, 800, 800);
+	c8->Divide(4, 3);
+	for (int i = 0; i < 12; i++) {
+		c8->cd(i + 1);
+		fhMulProbSortPi[i]->SetLineWidth(3);
+		fhMulProbSortPi[i]->SetStats(false);
+		fhMulProbSortPi[i]->SetMinimum(1);
+		fhMulProbSortPi[i]->SetMaximum(1.1*
+				TMath::Max(fhMulProbSortPi[i]->GetMaximum(), fhMulProbSortEl[i]->GetMaximum()));
+		fhMulProbSortPi[i]->Draw();
+
+		fhMulProbSortEl[i]->SetLineWidth(3);
+		fhMulProbSortEl[i]->SetLineStyle(2);
+		fhMulProbSortEl[i]->SetStats(false);
+		fhMulProbSortEl[i]->SetMinimum(1);
+		fhMulProbSortEl[i]->Draw("same");
+
+//		TLegend* leg1 = new TLegend(0.5, 0.15, 0.99, 0.4);
+//		leg1->AddEntry(fhElossDiffEl[i], "electrons");
+//		leg1->AddEntry(fhElossDiffPi[i], "pions");
+//		leg1->DrawClone();
+
+		gPad->SetLogy(true);
+		gPad->SetGridy(true);
+		gPad->SetGridx(true);
+	}
+
+	TCanvas* c9 = new TCanvas("c9", "c9", 10, 10, 800, 800);
+	c9->Divide(4, 3);
+	for (int i = 0; i < 12; i++) {
+		c9->cd(i + 1);
+		fhInputPi[i]->SetLineWidth(3);
+		fhInputPi[i]->SetStats(false);
+		fhInputPi[i]->SetMinimum(1);
+		fhInputPi[i]->SetMaximum(1.1*
+				TMath::Max(fhInputPi[i]->GetMaximum(), fhInputEl[i]->GetMaximum()));
+		fhInputPi[i]->Draw();
+
+		fhInputEl[i]->SetLineWidth(3);
+		fhInputEl[i]->SetLineStyle(2);
+		fhInputEl[i]->SetStats(false);
+		fhInputEl[i]->SetMinimum(1);
+		fhInputEl[i]->Draw("same");
+
+		gPad->SetLogy(true);
+		gPad->SetGridy(true);
+		gPad->SetGridx(true);
+	}
+
+
+	TCanvas* c10 = new TCanvas("c10", "c10", 10, 10, 800, 800);
+	c10->Divide(4, 3);
+	for (int i = 0; i < 12; i++) {
+		c10->cd(i + 1);
+		fhPdfSortPi[i]->SetLineWidth(3);
+		fhPdfSortPi[i]->SetStats(false);
+		fhPdfSortPi[i]->SetMinimum(0.001);
+		fhPdfSortPi[i]->SetMaximum(1.1*
+				TMath::Max(fhPdfSortPi[i]->GetMaximum(), fhPdfSortPi[i]->GetMaximum()));
+		fhPdfSortPi[i]->Draw();
+
+		fhPdfSortPi[i]->SetLineWidth(3);
+		fhPdfSortPi[i]->SetLineStyle(2);
+		fhPdfSortPi[i]->SetStats(false);
+		fhPdfSortPi[i]->SetMinimum(0.001);
+		fhPdfSortPi[i]->Draw("same");
+
+		gPad->SetLogy(true);
+		gPad->SetGridy(true);
+		gPad->SetGridx(true);
+	}
 }
 
 Bool_t CbmTrdElectronsTrainAnn::FileExists(TString fileName)

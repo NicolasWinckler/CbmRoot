@@ -12,6 +12,7 @@
 #include "TString.h"
 #include "TTree.h"
 #include "TGraph.h"
+#include "TRandom.h"
 #include "TMultiLayerPerceptron.h"
 #include "TMVA/Factory.h"
 #include "TMVA/Reader.h"
@@ -21,7 +22,7 @@
 
 using std::vector;
 
-enum IdMethod {kANN = 0, kBDT = 1, kCLUSTERS = 2, kMEDIANA = 3};
+enum IdMethod {kANN = 0, kBDT = 1, kCLUSTERS = 2, kMEDIANA = 3, kLIKELIHOOD=4};
 
 
 class CbmTrdElectronsTrainAnn
@@ -50,10 +51,13 @@ public:
 	void Transform1();
 	void Transform2();
 	void Transform3();
+	void Transform4();
 	Double_t FindOptimalCut();
 	void CreateCumProbHistos();
 	void CreateROCDiagramm();
 	Int_t GetNofClusters();
+	Double_t Likelihood();
+	Double_t FindArea(TH1* h);
 	Double_t Eval(Bool_t isEl);
 	void SetAnnCut(Double_t annCut){fAnnCut = annCut;}
 	void SetIsDoTrain(Bool_t doTrain){fIsDoTrain = doTrain;}
@@ -71,6 +75,7 @@ public:
 	void SetNofAnnEpochs(Int_t nofAnnEpochs){fNofAnnEpochs=nofAnnEpochs;}
 	void SetMaxNofTrainPi(Int_t nofPi){fMaxNofTrainPi = nofPi;}
 	void SetMaxNofTrainEl(Int_t nofEl){fMaxNofTrainEl = nofEl;}
+	void FillProbabilityHistos(Bool_t isEl);
 
 	Bool_t FileExists(TString fileName);
 private:
@@ -85,6 +90,8 @@ private:
 
 	TH1D* fhCumProbSortPi[12];
 	TH1D* fhCumProbSortEl[12];
+	TH1D* fhPdfSortPi[12];
+	TH1D* fhPdfSortEl[12];
 
 	vector<Float_t> fElossVec;
 	vector<Float_t> fInVector;
@@ -103,6 +110,9 @@ private:
 	Int_t fMaxNofTrainPi;
 	Int_t fMaxNofTrainEl;
 
+	TRandom* fRandom;
+    std::ofstream  foutResults;
+
 // Histogramms for testing
 	TH1D* fhAnnOutputPi;
 	TH1D* fhAnnOutputEl;
@@ -114,7 +124,17 @@ private:
     TH1D* fhElElossMediana;
     TH1D* fhPiElossMediana;
 
+	TH1D* fhPiProbSortEl[12];
+	TH1D* fhPiProbSortPi[12];
+	TH1D* fhElProbSortEl[12];
+	TH1D* fhElProbSortPi[12];
+	TH1D* fhMulProbSortEl[12];
+	TH1D* fhMulProbSortPi[12];
+	TH1D* fhInputEl[12];
+	TH1D* fhInputPi[12];
     TGraph* fROCGraph;
+
+
 	ClassDef(CbmTrdElectronsTrainAnn,1);
 
 };

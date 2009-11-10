@@ -45,7 +45,6 @@ private:
 			  Double_t  eLossTR[], Double_t  eLoss[]);
 	Int_t GetNofClusters(CbmTrdTrack* trdtrack);
 	Double_t GetElossRMS(CbmTrdTrack* trdtrack);
-	Double_t GetRMSMediana(CbmTrdTrack* trdtrack, Double_t mediana);
 	Double_t fEnergyCutForClusters;
 
 	TClonesArray* fMCTracks;
@@ -67,14 +66,12 @@ private:
     TH1D* fhElELoss;
     TH1D* fhElElossSum;
     TH1D* fhElNofZeroTR;
-    TH1D* fhElNofClusters;
+    TH1D* fhElNofClusters; // photon cluster counting method
     TH1D* fhPiNofClusters;
     TH1D* fhElElossRMS;
     TH1D* fhPiElossRMS;
-    TH1D* fhElElossMediana;
+    TH1D* fhElElossMediana; // mediana
     TH1D* fhPiElossMediana;
-    TH1D* fhElElossRMSMed;
-    TH1D* fhPiElossRMSMed;
 
 // Histograms for testing current Pid routines in TRD
 	TH1D* fhNofTrdHitsEl;
@@ -84,14 +81,8 @@ private:
 
 	TH1D* fhElossSortPi[12];
 	TH1D* fhElossSortEl[12];
-	TH1D* fhElossDiffPi[12];
-	TH1D* fhElossDiffEl[12];
 	TH1D* fhCumProbSortEl[12];
 	TH1D* fhCumProbSortPi[12];
-	TH1D* fhPiProbSortEl[12];
-	TH1D* fhPiProbSortPi[12];
-	TH1D* fhElProbSortEl[12];
-	TH1D* fhElProbSortPi[12];
 
 	Int_t fEventNum;
 

@@ -31,6 +31,8 @@ class TGCanvas;
 class TRootEmbeddedCanvas;
 class TGComboBox;
 class CbmMuchModuleGem;
+class TGTextButton;
+class TGHorizontalFrame;
 
 class CbmVisMuchModuleFrame : public TObject{
 RQ_OBJECT("CbmVisMuchModuleFrame")
@@ -44,6 +46,7 @@ public:
    void DrawHits();
    void DoScale(Int_t scale);
    void UpdateModule();
+   void PrintCanvas();
 
    Int_t GetStationNr() {return fStationNr;}
    Int_t GetModuleNr()  {return fModuleNr;}
@@ -58,6 +61,9 @@ public:
    TRootEmbeddedCanvas *fECanvas;
    TCanvas             *fCanvas;
    TGComboBox          *fSectorCombo;
+   TGTextButton        *fPrintButton;
+   TGHorizontalFrame   *fButtonFrame;
+
    CbmMuchModuleGem    *fModule;
 
    CbmVisMuch          *fDisplay;

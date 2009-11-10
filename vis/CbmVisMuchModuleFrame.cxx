@@ -18,6 +18,9 @@
 #include "TGSlider.h"
 #include "TGCanvas.h"
 #include "TGComboBox.h"
+#include "TGButton.h"
+#include "TArc.h"
+
 
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
@@ -31,7 +34,6 @@
 #include "CbmVisPixelHit.h"
 #include "CbmVisMuchCluster.h"
 #include "CbmMuchGeoScheme.h"
-#include "TArc.h"
 using std::map;
 // -------------------------------------------------------------------------
 CbmVisMuchModuleFrame::CbmVisMuchModuleFrame(CbmMuchModuleGem* module, CbmVisMuch* display){
@@ -54,12 +56,26 @@ CbmVisMuchModuleFrame::CbmVisMuchModuleFrame(CbmMuchModuleGem* module, CbmVisMuc
   fMain = new TGMainFrame(gClient->GetRoot(),800,800,kVerticalFrame);
   fMain->Connect("CloseWindow()", "CbmVisMuchModuleFrame", this, "CloseWindow()");
 
-  fScale = new TGComboBox(fMain,1);
+  //Button Frame
+  fButtonFrame = new TGHorizontalFrame(fMain,500,100);
+
+
+  fScale = new TGComboBox(fButtonFrame,1);
   for (Int_t i=1;i<=4;i++) fScale->AddEntry(Form("x %i",Int_t(TMath::Power(2.,i-1))),i);
   fScale->Resize(90,20);
   fScale->Connect("Selected(Int_t)","CbmVisMuchModuleFrame", this,"DoScale(Int_t)");
   fScale->Select(1,kFALSE);
   fScaleValue = 1;
+
+//  fMain->AddFrame(fScale    ,new TGLayoutHints(kLHintsTop|kLHintsLeft,3,3,3,3));
+  fButtonFrame->AddFrame(fScale,new TGLayoutHints(kLHintsTop|kLHintsLeft,3,3,3,3));
+
+  fPrintButton = new TGTextButton(fButtonFrame," &Print ");
+  fButtonFrame->AddFrame(fScale,new TGLayoutHints(kLHintsTop|kLHintsLeft,3,3,3,3));
+  fButtonFrame->AddFrame(fPrintButton,new TGLayoutHints(kLHintsTop|kLHintsLeft,3,3,3,3));
+
+  fPrintButton->Connect("Clicked()","CbmVisMuchModuleFrame",this,"PrintCanvas()");
+
 
   Int_t parts[] = {15,70,15};
   fStatusBar = new TGStatusBar(fMain,50,10,kHorizontalFrame);
@@ -90,12 +106,14 @@ CbmVisMuchModuleFrame::CbmVisMuchModuleFrame(CbmMuchModuleGem* module, CbmVisMuc
   fCanvas->Connect("ProcessedEvent(Int_t,Int_t,Int_t,TObject*)",
    "CbmVisMuchModuleFrame", this,"HandleEmbeddedCanvas(Int_t,Int_t,Int_t,TObject*)");
 
-  fMain->AddFrame(fScale    ,new TGLayoutHints(kLHintsTop|kLHintsLeft,3,3,3,3));
+  fMain->AddFrame(fButtonFrame , new TGLayoutHints(kLHintsTop|kLHintsCenterX,2,2,2,2));
   fMain->AddFrame(fGCanvas  ,new TGLayoutHints(kLHintsExpandX|kLHintsExpandY,3,3,3,3));
   fMain->AddFrame(fStatusBar,new TGLayoutHints(kLHintsBottom|kLHintsLeft |kLHintsExpandX,0,0,2,0));
 
   fMain->MapSubwindows();
   fMain->Resize();
+
+
 
   TString wname = Form("Station %i: Sector %i at (%.2f,%.2f) cm, size: (%.1f,%.1f)cm",
      fStationNr,fModuleNr,x0,y0,lx,ly);
@@ -303,6 +321,11 @@ void CbmVisMuchModuleFrame::UpdateModule(){
 //  fStatusBar->SetText(Form("Occupancy:%4.1f",100*fGSector->GetOccupancy()),0);
 }
 // -------------------------------------------------------------------------
+
+
+void CbmVisMuchModuleFrame::PrintCanvas(){
+  fCanvas->Print("module_view.eps");
+}
 
 ClassImp(CbmVisMuchModuleFrame)
 

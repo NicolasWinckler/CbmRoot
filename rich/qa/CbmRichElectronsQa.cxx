@@ -10,6 +10,7 @@
 #include "FairMCPoint.h"
 #include "CbmMCTrack.h"
 #include "CbmTofHit.h"
+#include "CbmTofPoint.h"
 
 #include "TString.h"
 #include "TSystem.h"
@@ -68,12 +69,16 @@ CbmRichElectronsQa::CbmRichElectronsQa(const char *name, const char *title, Int_
 	fNofPiasElRich = 0;
 	fNofTrueIdRichTrd = 0;;
 	fNofPiasElRichTrd = 0;
+	fNofTrueIdRichTrdTof = 0;
+	fNofPiasElRichTrdTof = 0;
 
 	fhTrueIdRich = new TH1D("fhTrueIdRich", "True identified e+ and e- by RICH;momentum, GeV/c;Entries", 30,0,15);
 	fhAccPi = new TH1D("fhAccPi", "Accepted pions;momentum, GeV/c;Entries", 30,0,15);
 	fhPiasElRich = new TH1D("fhPiasElRich", "Pi identified as el by RICH;momentum, GeV/c;Entries", 30,0,15);
-    fhTrueIdRichTrd = new TH1D("fhTrueIdRichTrd", "True identified as el by RICH and TRD;momentum, GeV/c;Entries", 30,0,15);;
-	fhPiasElRichTrd = new TH1D("fhPiasElRichTrd", "Pi identified as el by RICH and TRD;momentum, GeV/c;Entries", 30,0,15);;
+    fhTrueIdRichTrd = new TH1D("fhTrueIdRichTrd", "True identified as el by RICH and TRD;momentum, GeV/c;Entries", 30,0,15);
+	fhPiasElRichTrd = new TH1D("fhPiasElRichTrd", "Pi identified as el by RICH and TRD;momentum, GeV/c;Entries", 30,0,15);
+	fhTrueIdRichTrdTof = new TH1D("fhTrueIdRichTrdTof", "True identified as el by RICH-TRD-TOF;momentum, GeV/c;Entries", 30,0,15);
+	fhPiasElRichTrdTof = new TH1D("fhPiasElRichTrdTof", "Pi identified as el by RICH-TRD-TOF;momentum, GeV/c;Entries", 30,0,15);
 
 /// DIFFERENCE BETWEEN ELECTRONS AND PIONS
 	fhAaxisEl= new TH1D("fhAaxisEl", "fhAaxisEl;A axis, cm;Entries", 30,3,8);
@@ -102,57 +107,83 @@ CbmRichElectronsQa::CbmRichElectronsQa(const char *name, const char *title, Int_
 	fhTrdAnnPi= new TH1D("fhTrdAnnPi", "fhTrdAnnPi;ANN output;Entries", 50,-1.2,1.2);
 
 	fOutElandPi.open("ann_el_pi.txt");
-	SetParameters("large");
+	SetDefaultParameters();
 }
 
 
 CbmRichElectronsQa::~CbmRichElectronsQa()
 {
 
-
 }
 
-
-void CbmRichElectronsQa::SetParameters(TString richGeo)
+void CbmRichElectronsQa::SetDefaultParameters()
 {
 	fMinNofHitsInRichRing = 5;
 	fMinNofTrdHits = 8;
-	fTrdAnnCut = 0.96;
-	fRichAnnCut = -0.25;
-	fUseRichAnn = true;
+	fTrdAnnCut = -1.;
+	fRichAnnCut = -1.;
+	fUseRichAnn = false;
+	fMeanA = -1.;
+	fMeanB = -1.;
+	fRmsA = -1.;
+	fRmsB = -1.;
+	fRmsCoeff = -1.;
+	fDistCut = -1.;
+}
 
+Bool_t CbmRichElectronsQa::SetParameters()
+{
+	if (fTrdAnnCut == -1.){
+		cout << "-E- You must set TrdAnnCut, current value is " << fTrdAnnCut<<endl;
+		return false;
+	}
+	if (fUseRichAnn && fRichAnnCut == -1.){
+		cout << "-E- You must set RichAnnCut, because you are using RICH ANN, current value is " << fRichAnnCut<<endl;
+		return false;
+	}
+	if (fMeanA == -1.){
+		cout << "-E- You must set MeanA, current value is " << fMeanA<<endl;
+		return false;
+	}
+	if (fMeanB == -1.){
+		cout << "-E- You must set MeanB, current value is " << fMeanB<<endl;
+		return false;
+	}
+	if (fRmsA == -1.){
+		cout << "-E- You must set RmsA, current value is " << fRmsA<<endl;
+		return false;
+	}
+	if (fRmsB == -1.){
+		cout << "-E- You must set RmsB, current value is " << fRmsB<<endl;
+		return false;
+	}
+	if (fRmsCoeff == -1.){
+		cout << "-E- You must set RmsCoeff, current value is " << fRmsCoeff<<endl;
+		return false;
+	}
+	if (fDistCut == -1.){
+		cout << "-E- You must set fDistCut, current value is " << fDistCut<<endl;
+		return false;
+	}
 
-    cout << "-I- CbmRichElectronsQa for " << richGeo << " RICH geometry"<<endl;
-    if (richGeo != "compact" && richGeo != "large"){
-    	richGeo = "compact";
-        cout << "-E- CbmRichElectronsQa::SetParameters UNKNOWN geometry,  " <<
-        "Set default parameters for "<< richGeo << " RICH geometry"<<endl;
-    }
+	if (fUseRichAnn){
+		if (fRichGeoType != "compact" && fRichGeoType != "large"){
+			fRichGeoType = "compact";
+			cout << "-E- CbmRichElectronsQa::SetParameters UNKNOWN geometry,  " <<
+			"Set default parameters for "<< fRichGeoType << " RICH geometry"<<endl;
+			return false;
+		}
+		TString richANNFile = gSystem->Getenv("VMCWORKDIR");
+		if (fRichGeoType == "compact"){
+			richANNFile += "/parameters/rich/el_id_ann_weights_rich_compact.txt";
+		}else if (fRichGeoType == "large"){
+			richANNFile += "/parameters/rich/el_id_ann_weights_rich.txt";
+		}
 
-    TString richANNFile = gSystem->Getenv("VMCWORKDIR");
-    if (richGeo == "compact"){
-        richANNFile += "/parameters/rich/el_id_ann_weights_rich_compact.txt";
-        fMeanA = 5.02;
-        fMeanB = 4.68;
-        fRmsA = 0.22;
-        fRmsB = 0.167;
-        fRmsCoeff = 3.5;
-        fDistCut = 1.;
-    }
-
-    if (richGeo == "large"){
-        richANNFile += "/parameters/rich/el_id_ann_weights_rich.txt";
-        fMeanA = 6.10;
-        fMeanB = 5.67;
-        fRmsA = 0.19;
-        fRmsB = 0.17;
-        fRmsCoeff = 4.;
-        fDistCut = 1.;
-    }
-
-    fElIdAnn = new CbmRichElectronIdAnn(0, richANNFile);
-    fElIdAnn->Init();
-
+		fElIdAnn = new CbmRichElectronIdAnn(0, richANNFile);
+		fElIdAnn->Init();
+	}
+	return true;
 }
 
 
@@ -253,6 +284,10 @@ InitStatus CbmRichElectronsQa::Init()
 		return kERROR;
 	}
 
+	Bool_t isSetOk = SetParameters();
+
+	if (!isSetOk) return kFATAL;
+
 	return kSUCCESS;
 }
 
@@ -268,6 +303,17 @@ void CbmRichElectronsQa::Exec(Option_t* option)
     Double_t eventNum = (Double_t) fEventNum;
 
     cout << endl <<"----CbmRichElectronsQa---- event # " << fEventNum << endl;
+    cout <<"You set the following cuts:"<< endl;
+	cout << "RichAnnCut="<<fRichAnnCut << ";  ";
+	cout << "UseRichAnn=" <<fUseRichAnn <<";  ";
+	cout << "TrdAnnCut=" <<fTrdAnnCut <<";  ";
+	cout << "MeanA=" <<fMeanA <<";  ";
+	cout << "MeanB=" <<fMeanB <<";  ";
+	cout << "RmsA=" <<fRmsA <<";  ";
+	cout << "RmsB=" <<fRmsB <<";  ";
+	cout << "RmsCoeff=" <<fRmsCoeff <<";  ";
+	cout << "DistCut=" <<fDistCut <<endl;
+
     cout << "----RICH----" << endl;
 	cout << "fNofMCRings = " << fNofMCRings <<
 		", per event " << fNofMCRings/eventNum << endl;
@@ -328,6 +374,13 @@ void CbmRichElectronsQa::Exec(Option_t* option)
 		", per event " << fNofPiasElRichTrd/eventNum <<
 		", pion supression = " << (Double_t) fNofAccPi / fNofPiasElRichTrd <<endl;
 
+	cout << "fNofTrueIdRichTrdTof = " << fNofTrueIdRichTrdTof <<
+		", per event " << fNofTrueIdRichTrdTof/eventNum <<
+		", Eff (acc. rings) = " << (Double_t)  fNofTrueIdRichTrdTof/fNofAccRings  <<endl;
+
+	cout << "fNofPiasElRichTrdTof = " << fNofPiasElRichTrdTof <<
+		", per event " << fNofPiasElRichTrdTof/eventNum <<
+		", pion supression = " << (Double_t) fNofAccPi / fNofPiasElRichTrdTof <<endl;
 
 	fEventNum++;
    //fNofFakeRings;
@@ -600,7 +653,6 @@ void CbmRichElectronsQa::GlobalTracksMatchEff()
         if (pdg != 11 || motherId != -1) continue;//only primary electrons
 
 		if (richRing->GetRecFlag() == 3 && mcIdSts == mcIdRich && mcIdRich != -1){
-			cout << "rich = " <<  iTrack << " " << gTrack->GetTrdTrackIndex() << " ";
 			fNofTrueMatchStsRichGlobal++;
         	fhTrueMatchStsRichGlobal->Fill(momentum);
 		}
@@ -714,6 +766,30 @@ void CbmRichElectronsQa::GlobalTracksElIdEff()
         	fhPiasElRichTrd->Fill(momentum);
 		}
 
+///TOF
+		Int_t tofIndex = gTrack->GetTofHitIndex();
+		if (tofIndex == -1)	continue;
+		CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(tofIndex);
+		if (!tofHit)continue;
+		Int_t iPoint = tofHit->GetRefId();
+		CbmTofPoint* tofPoint = (CbmTofPoint*) fTofPoints->At(iPoint);
+		Int_t mcIdTof = tofPoint->GetTrackID();
+
+		if (pdg == 11 && motherId == -1 && richRing->GetRecFlag() == 3
+				&& mcIdSts == mcIdRich && mcIdRich != -1 &&
+				IsRichElectron(richRing, momentum) && IsTrdElectron(trdTrack)
+				&& IsTofElectron(gTrack, momentum)) {
+
+			fNofTrueIdRichTrdTof++;
+			fhTrueIdRichTrdTof->Fill(momentum);
+		}
+
+		/// pions supression
+		if (pdg == 211 && mcIdRich != -1 && IsRichElectron(richRing, momentum)
+				&& IsTrdElectron(trdTrack) && IsTofElectron(gTrack, momentum)) {
+			fNofPiasElRichTrdTof++;
+			fhPiasElRichTrdTof->Fill(momentum);
+		}
 	}// global tracks
 }
 
@@ -724,12 +800,27 @@ Bool_t CbmRichElectronsQa::IsRichElectron(CbmRichRing* ring, Double_t momentum)
     	Double_t axisA = ring->GetAaxis();
     	Double_t axisB = ring->GetBaxis();
     	Double_t dist = ring->GetDistance();
-    	cout << "0000" << endl;
 		if ( fabs(axisA-fMeanA) < fRmsCoeff*fRmsA &&
 		   fabs(axisB-fMeanB) < fRmsCoeff*fRmsB && dist < fDistCut) return true;
 		return false;
     }
-
+///
+//    if (fUseRichAnn == false){
+//        if(momentum > 5.5) return false;
+//
+//		if (momentum < 0.5  && dist < 2.) return true;
+//		if (momentum >= 0.5 && momentum < 2. ){
+//	    	if (dist < (7./3.-2./3.* momentum)) return true;
+//		}
+//		if (momentum >= 2. && dist < 1.) return true;
+//
+//        if(ring->GetSelectionNN() < -0.5) return false;
+//
+//		if (axisA < (fMeanA - fRmsCoeff*fRmsA) ||
+//		    axisB < (fMeanB - fRmsCoeff*fRmsB)) return false;
+//
+//		return false;
+//    }
 
     if (fElIdAnn->DoSelect(ring, momentum) > fRichAnnCut) return true;
     return false;
@@ -743,11 +834,29 @@ Bool_t CbmRichElectronsQa::IsTrdElectron(CbmTrdTrack* trdTrk)
     return false;
 }
 
-Bool_t CbmRichElectronsQa::IsTofElectron()
+Bool_t CbmRichElectronsQa::IsTofElectron(CbmGlobalTrack* gTrack, Double_t momentum)
 {
+	// Get the tracklength
+	Double_t trackLength = gTrack->GetLength() / 100.;
 
+	// Calculate time of flight from TOF hit
+	Int_t tofIndex = gTrack->GetTofHitIndex();
+	CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(tofIndex);
+	if (NULL == tofHit)
+		return false;
+	Double_t time = 0.2998 * tofHit->GetTime(); // time in ns -> transfrom to ct in m
 
-    return false;
+	// Calculate mass squared
+	Double_t mass2 = TMath::Power(momentum, 2.) * (TMath::Power(time
+			/ trackLength, 2) - 1);
+	if (momentum >= 1.) {
+		if (mass2 < (0.01 + (momentum - 1.) * 0.09))
+			return true;
+	} else {
+		if (mass2 < 0.)
+			return true;//fTofM2
+	}
+	return false;
 }
 
 void CbmRichElectronsQa::DiffElandPi()
@@ -877,6 +986,8 @@ void CbmRichElectronsQa::FinishTask()
 	fhPiasElRich->Write();
 	fhTrueIdRichTrd->Write();
 	fhPiasElRichTrd->Write();
+	fhTrueIdRichTrdTof->Write();
+	fhPiasElRichTrdTof->Write();
 
 	fhAaxisEl->Write();
 	fhAaxisPi->Write();

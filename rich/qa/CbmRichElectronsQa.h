@@ -5,7 +5,7 @@
 #include "CbmRichRing.h"
 #include "CbmTrdTrack.h"
 #include "CbmRichElectronIdAnn.h"
-
+#include "CbmGlobalTrack.h"
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TClonesArray.h"
@@ -26,7 +26,18 @@ public:
 	virtual InitStatus Init();
 	virtual void Exec(Option_t* option);
 	virtual void FinishTask();
-	void SetParameters(TString richGeo);
+	void SetDefaultParameters();
+	Bool_t SetParameters();
+	void SetGeoType(TString richGeo){fRichGeoType = richGeo;}
+    void SetTrdAnnCut(Double_t annCut){fTrdAnnCut = annCut;}
+    void SetRichAnnCut(Double_t richAnnCut){fRichAnnCut = richAnnCut;}
+    void SetMeanA(Double_t meanA){fMeanA = meanA;}
+    void SetMeanB(Double_t meanB){fMeanB = meanB;}
+    void SetRmsA(Double_t rmsA){fRmsA = rmsA;}
+    void SetRmsB(Double_t rmsB){fRmsB = rmsB;}
+    void SetRmsCoeff(Double_t rmsCoeff){fRmsCoeff = rmsCoeff;}
+    void SetDistCut(Double_t dist){fDistCut = dist;}
+    void SetUseRichAnn(Bool_t useRichAnn){fUseRichAnn = useRichAnn;}
 
 private:
 	Int_t fEventNum;
@@ -47,6 +58,7 @@ private:
 
     Int_t fMinNofHitsInRichRing;
     Int_t fMinNofTrdHits;
+    TString fRichGeoType;
     Double_t fTrdAnnCut;
     Double_t fRichAnnCut;
     Double_t fMeanA;
@@ -60,7 +72,7 @@ private:
     Bool_t DoesRingHaveProjection(Int_t trackId);
     Bool_t IsRichElectron(CbmRichRing* ring, Double_t momentum);
     Bool_t IsTrdElectron(CbmTrdTrack* trdTrk);
-    Bool_t IsTofElectron();
+    Bool_t IsTofElectron(CbmGlobalTrack* gTrack, Double_t momentum);
     void AccTracks();
     void FoundRichRings();
     void RingTrackMatch();
@@ -116,6 +128,11 @@ private:
 	TH1D* fhTrueIdRichTrd;
 	Int_t fNofPiasElRichTrd;
 	TH1D* fhPiasElRichTrd;
+
+	Int_t fNofTrueIdRichTrdTof;
+	TH1D* fhTrueIdRichTrdTof;
+	Int_t fNofPiasElRichTrdTof;
+	TH1D* fhPiasElRichTrdTof;
 
 // difference between electrons and pions
 	TH1D* fhAaxisEl;

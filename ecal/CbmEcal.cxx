@@ -174,6 +174,7 @@ CbmEcal::CbmEcal(const char* name, Bool_t active, const char* fileGeo)
   Int_t i;
   printf("ECAL geometry is read from file %s\n",fileGeo);
   fInf=CbmEcalInf::GetInstance(fileGeo);
+  fInf->DumpContainer();
   if (fInf==NULL)
   {
     cerr << "Error. CbmEcal: Can't read geometry from " << fileGeo;
@@ -850,29 +851,38 @@ void CbmEcal::ConstructGeometry()
   par[0] = fCellSize/2;
   par[1] = fCellSize/2;
   par[2] = psThickness/2;
-  
-  volume = gGeoManager->Volume("ECALPScell", "BOX", kMedLead, par, 3);
-  fVolArr[1]=volume->GetNumber();
-  AddSensitiveVolume(volume);
-  
-  zPos = fEcalSize[2]/2 - par[2];
-  gGeoManager->Node("ECALPScell", 1, "ECAL1row", 0.,0.,-zPos,0,kTRUE,buf,0);
-  gGeoManager->Node("ECALPScell", 2, "ECAL2row", 0.,0.,-zPos,0,kTRUE,buf,0);
 
-  // Preshower Scintillator tile is a sensitive volume
-  par[2] = fThicknessPSscin/2;
-  shape = new TGeoBBox("ECALPSscin", par[0], par[1], par[2]);
+  if (psThickness>0)
+  {
+    volume = gGeoManager->Volume("ECALPScell", "BOX", kMedLead, par, 3);
+    fVolArr[1]=volume->GetNumber();
+    AddSensitiveVolume(volume);
   
-  volume = new TGeoVolume("ECALPSscin",shape,gGeoManager->GetMedium(kMedScin));
+    zPos = fEcalSize[2]/2 - par[2];
+    gGeoManager->Node("ECALPScell", 1, "ECAL1row", 0.,0.,-zPos,0,kTRUE,buf,0);
+    gGeoManager->Node("ECALPScell", 2, "ECAL2row", 0.,0.,-zPos,0,kTRUE,buf,0);
 
-  fVolArr[2]=volume->GetNumber();
+    // Preshower Scintillator tile is a sensitive volume
+    par[2] = fThicknessPSscin/2;
+    shape = new TGeoBBox("ECALPSscin", par[0], par[1], par[2]);
+  
+    volume = new TGeoVolume("ECALPSscin",shape,gGeoManager->GetMedium(kMedScin));
+
+    fVolArr[2]=volume->GetNumber();
     
-  //  gGeoManager->AddVolume(volume);
+    //  gGeoManager->AddVolume(volume);
   
-  zPos = psThickness/2 - par[2];
-  gGeoManager->Node("ECALPSscin", 1, "ECALPScell", 0.,0.,zPos,0,kTRUE,buf,0);
+    zPos = psThickness/2 - par[2];
+    gGeoManager->Node("ECALPSscin", 1, "ECALPScell", 0.,0.,zPos,0,kTRUE,buf,0);
 
-  AddSensitiveVolume(volume);
+    AddSensitiveVolume(volume);
+  }
+  else
+  {
+    fVolArr[2]=-1111;
+    fVolArr[1]=-1111;
+    Info("ConstructGeometry"," Constructing calorimeter without PS.");
+  }
 
   // --------------- ECAL cell
   par[0] = fCellSize/2;

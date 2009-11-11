@@ -27,7 +27,7 @@ void draw_diff_el_pi(TH1D* h1, TH1D* h2)
 }
 
 void draw_electrons_qa(){
- 	TFile *file = new TFile("/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0001.reco.qa.root");
+ 	TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.qa.root");
 
    gROOT->SetStyle("Plain");
     gStyle->SetPalette(1,0);
@@ -218,6 +218,13 @@ void draw_electrons_qa(){
     elidEffRichTrd->SetMarkerColor(kGreen+2);
     elidEffRichTrd->Draw("same");
 
+    TH1D* elidEffRichTrdTof = divide_hist(fhTrueIdRichTrdTof, fhAccRings);
+    elidEffRichTrdTof->SetLineColor(kOrange-3);
+    elidEffRichTrdTof->SetMarkerStyle(27);
+    elidEffRichTrdTof->SetMarkerSize(1.2);
+    elidEffRichTrdTof->SetMarkerColor(kOrange-3);
+    elidEffRichTrdTof->Draw("same");
+
     TLegend* elidLeg1 = new TLegend(0.5,0.1, 0.99, 0.4);
     char effTxt[100];
     sprintf(effTxt,"ring finding (%.2f\%)", (Double_t)fhTrueFoundRings->GetEntries()/fhAccRings->GetEntries()*100);
@@ -226,6 +233,8 @@ void draw_electrons_qa(){
     elidLeg1->AddEntry(stsRichEff, effTxt);
     sprintf(effTxt,"RICH+TRD el id (%.2f\%)", (Double_t)fhTrueIdRichTrd->GetEntries()/fhAccRings->GetEntries()*100);
     elidLeg1->AddEntry(stsRichTrdEff,effTxt);
+    sprintf(effTxt,"RICH+TRD+TOF el id (%.2f\%)", (Double_t)fhTrueIdRichTrdTof->GetEntries()/fhAccRings->GetEntries()*100);
+    elidLeg1->AddEntry(stsRichTrdTofEff, effTxt);
     elidLeg1->Draw();
     gPad->SetGridy(true);
     gPad->SetGridx(true);
@@ -249,15 +258,25 @@ void draw_electrons_qa(){
     piSuprRichTrd->SetMarkerColor(kGreen+2);
     piSuprRichTrd->Draw("same");
 
-    for (int i = 1; i < 30; i++)
-    	if ( fabs(piSuprRichTrd->GetBinContent(i)) < 0.00000001) piSuprRichTrd->SetBinContent(i, 0.0000001);
+    TH1D* piSuprRichTrdTof = divide_hist(fhAccPi, fhPiasElRichTrdTof);
+    piSuprRichTrdTof->SetLineColor(kOrange-3);
+    piSuprRichTrdTof->SetMarkerStyle(27);
+    piSuprRichTrdTof->SetMarkerSize(1.2);
+    piSuprRichTrdTof->SetMarkerColor(kOrange-3);
+    piSuprRichTrdTof->Draw("same");
 
+    for (int i = 1; i < 30; i++){
+    	if ( fabs(piSuprRichTrd->GetBinContent(i)) < 0.00000001) piSuprRichTrd->SetBinContent(i, 0.0000001);
+    	if ( fabs(piSuprRichTrdTof->GetBinContent(i)) < 0.00000001) piSuprRichTrdTof->SetBinContent(i, 0.0000001);
+    }
     TLegend* elidLeg2 = new TLegend(0.5,0.1, 0.99, 0.4);
     char effTxt[100];
     sprintf(effTxt,"RICH (%.1e)", (Double_t)fhAccPi->GetEntries()/fhPiasElRich->GetEntries());
     elidLeg2->AddEntry(piSuprRich, effTxt);
     sprintf(effTxt,"RICH+TRD (%.1e)", (Double_t)fhAccPi->GetEntries()/fhPiasElRichTrd->GetEntries());
     elidLeg2->AddEntry(piSuprRichTrd, effTxt);
+    sprintf(effTxt,"RICH+TRD+TOF (%.1e)", (Double_t)fhAccPi->GetEntries()/fhPiasElRichTrdTof->GetEntries());
+    elidLeg2->AddEntry(piSuprRichTrdTof, effTxt);
     elidLeg2->Draw();
     gPad->SetLogy(true);
     gPad->SetGridy(true);

@@ -8,7 +8,7 @@
 
 #include "CbmRichRingFinder.h"
 #include "CbmRichRingFinderHoughImpl.h"
-
+#include "CbmRichRingFinderHoughSimd.h"
 #include <vector>
 #include <map>
 #include <functional>
@@ -23,6 +23,7 @@ protected:
 	TString fGeometryType;
 	Int_t fRingCount;
 	CbmRichRingFinderHoughImpl *fHTImpl;
+	//CbmRichRingFinderHoughSimd *fHTImpl;
 
 	Double_t fExecTime;//evaluate execution time
 
@@ -44,7 +45,7 @@ public:
 			Float_t rmsCoeffEl, Float_t maxCutEl,
 			Float_t rmsCoeffCOP, Float_t maxCutCOP);
 
-    void AddRingsToOutputArray(TClonesArray *rRingArray,std::vector<CbmRichRing>& rings);
+    void AddRingsToOutputArray(TClonesArray *rRingArray,std::vector<CbmRichRing*>& rings);
 
 	virtual void Init();
 

@@ -38,11 +38,13 @@ CbmRichRingFinderHough::CbmRichRingFinderHough  ( Int_t verbose, TString geometr
     fGeometryType = geometry;
     fIsFindOptPar = false;
     fRingCount = 0;
+    fNEvent = 0;
 }
 
 void CbmRichRingFinderHough::Init()
 {
 	fHTImpl = new CbmRichRingFinderHoughImpl(fGeometryType);
+	//fHTImpl = new CbmRichRingFinderHoughSimd(fGeometryType);
 	fHTImpl->Init();
 }
 
@@ -67,8 +69,7 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 	timer.Start();
 
 	fNEvent++;
-	if (fVerbose)
-		cout << "-------------------------    Event no. " << fNEvent<< "   -------------------------" << endl;
+	if (fVerbose) cout << "-I- CbmRichRingFinderHough  Event no. " << fNEvent<< endl;
 
 	std::vector<CbmRichHoughHit> UpH;
 	std::vector<CbmRichHoughHit> DownH;
@@ -100,9 +101,6 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 		}
 	}
 
-	std::vector<CbmRichRing> foundRings1;
-	std::vector<CbmRichRing> foundRings2;
-
 	fHTImpl->SetData(UpH);
 	fHTImpl->DoFind();
 	AddRingsToOutputArray(rRingArray, fHTImpl->GetFoundRings());
@@ -116,7 +114,7 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 
 	if (fVerbose)cout << "CbmRichRingFinderHough: Number of output rings: "<< rRingArray->GetEntriesFast() << endl;
 
-	cout << "Exec time : " << fExecTime << endl;
+	cout << "Exec time : " << fExecTime << ", per event " << fExecTime/fNEvent << endl;
 
 	if (fIsFindOptPar == true ){
 		ofstream fout;
@@ -149,11 +147,11 @@ void CbmRichRingFinderHough::SetParameters( Int_t nofParts,
 }
 
 void CbmRichRingFinderHough::AddRingsToOutputArray(TClonesArray *rRingArray,
-		std::vector<CbmRichRing>& rings)
+		std::vector<CbmRichRing*>& rings)
 {
 	for (UInt_t iRing = 0; iRing < rings.size(); iRing++) {
-		if (rings[iRing].GetRecFlag() == -1)	continue;
-		new ((*rRingArray)[fRingCount]) CbmRichRing(rings[iRing]);
+		if (rings[iRing]->GetRecFlag() == -1)	continue;
+		new ((*rRingArray)[fRingCount]) CbmRichRing(*rings[iRing]);
 		fRingCount++;
 	}
 }

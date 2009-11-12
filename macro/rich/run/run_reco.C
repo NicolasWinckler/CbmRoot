@@ -1,25 +1,7 @@
-// --------------------------------------------------------------------------
-//
-// Macro for reconstruction of simulated events with standard settings
-//
-// HitProducers in MVD, RICH, TRD, TOF, ECAL
-// Digitizer and HitFinder in STS
-// FAST MC for ECAL
-// STS track finding and fitting (L1 / KF)
-// TRD track finding and fitting (L1 / KF)
-// RICH ring finding (ideal) and fitting
-// Global track finding (ideal), rich assignment
-// Primary vertex finding (ideal)
-// Matching of reconstructed and MC tracks in STS, RICH and TRD
-//
-// V. Friese   24/02/2006
-// Version     24/04/2007 (V. Friese)
-//
-// --------------------------------------------------------------------------
 
 #include "../../../cbmbase/CbmDetectorList.h";
 
-void run_reco(Int_t nEvents = 800)
+void run_reco(Int_t nEvents = 700)
 {
 
   // ========================================================================
@@ -29,16 +11,16 @@ void run_reco(Int_t nEvents = 800)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0000.mc.root";
+  TString inFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
 
   // Parameter file
-  TString parFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0000.params.root";
+  TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
 
   // STS digitisation file
   TString stsDigiFile = "sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0000.reco.root";
+  TString outFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
 
 
   // In general, the following parts need not be touched
@@ -62,26 +44,8 @@ void run_reco(Int_t nEvents = 800)
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  //gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libEcal");
-  gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
-  gSystem->Load("libL1");
-  gSystem->Load("libMuch");
-  gSystem->Load("libLittrack");
-  gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
+  gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
+  cbmlibs();
   // ------------------------------------------------------------------------
 
 
@@ -215,9 +179,9 @@ void run_reco(Int_t nEvents = 800)
     // ----------------------------------------------------
 
 
-    CbmLitRecQa* litRecQa   =  new CbmLitRecQa(8, 0.7, kTRD, 1);
-    litRecQa->SetNormType(2); // '2' to number of STS tracks
-    run->AddTask(litRecQa);
+//    CbmLitRecQa* litRecQa   =  new CbmLitRecQa(8, 0.7, kTRD, 1);
+//    litRecQa->SetNormType(2); // '2' to number of STS tracks
+//    run->AddTask(litRecQa);
 
   // -------------------------------------------------------------------------
 

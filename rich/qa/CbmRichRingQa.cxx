@@ -1,27 +1,8 @@
-/******************************************************************************
-*  $Id: CbmRichRingQa.cxx,v 1.3 2006/06/19 11:19:52 turany Exp $
-*
-*  Class  : CbmRichRingQa
-*  Description : Quality checks or ring finders:
-*                efficiency calculation etc.
-*
-*  Author : Simeon Lebedev
-*
-*******************************************************************************
-*  $Log: CbmRichRingQa.cxx,v $
-*  Revision 1.3  2006/06/19 11:19:52  turany
-*  map<Int_t, Int_t>iterator it do not need to be set to zero, it will be reseted by calling it.begin(), putting it=0 gives a compiler error with the new compilers
-*
-*  Revision 1.2  2006/04/17 22:11:04  sgorboun
-*  changes in L1 ENN Ring Finder
-*
-*  Revision 1.1  2006/04/10 08:21:03  hoehne
-*  routine for checking the ring finders (quality, efficiency)
-*  initial version
-*
-*
-*
-*******************************************************************************/
+/*
+Class  : CbmRichRingQa
+Description : Quality checks or ring finders: efficiency calculation etc.
+Author : Semen Lebedev (S.Lebedev@gsi.de)
+*/
 
 #include "CbmRichRingQa.h"
 
@@ -167,7 +148,6 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
   fh_MCMomvsNofHits = new TH2D("fh_MCMomvsNofHits","MC momentum vs. NofHits;momentum,  GeV/c;nof hits",30, 0, 10, 45,0,45);
   fh_MCMomvsBoverA = new TH2D("fh_MCMomvsBoverA","MC momentum vs B/A;momentum,  GeV/c;B/A",30, 0, 10, 50,0.5,1);
   fh_MCXYE = new TH2D("fh_MCXYE","MC (x,y) electrons rings;X, cm;Y, cm",40,-200,200,50,-250,250);
-
 
   //foutFakeAndTrue.open("ann_fake_and_true.txt",std::ios_base::app);
 
@@ -328,7 +308,7 @@ void CbmRichRingQa::Exec(Option_t* option)
         cout << "-E- CbmRichRingQa::Exec "
             << "Empty MCtrack " << iMCTrack
             << endl;
-        continue;
+			continue;
         }
         iMother = track->GetMotherId();
         if (iMother == -1) {
@@ -358,7 +338,7 @@ void CbmRichRingQa::Exec(Option_t* option)
         Int_t motherId = track->GetMotherId();
 
         fNofAllRings++;
-//!!!!!!!!        //TMath::Abs(gcode) == 11
+
         if ((TMath::Abs(gcode) == 11) && motherId == -1) {///primary electron rings
             fNofElRings++;
             if (isProj) fNofElRingsProj++;
@@ -400,18 +380,7 @@ void CbmRichRingQa::Exec(Option_t* option)
                 fh_MCElRingsProjHitCutRadPos->Fill(itMapWithHits->second.GetRadialPosition());
                 Double_t bOverA = itMapWithHits->second.GetBaxis()/itMapWithHits->second.GetAaxis();
                 fh_MCElRingsProjHitCutBoverA->Fill(bOverA);
-
                 fh_MCElMomVsBoverA->Fill(momentum, bOverA);
-
-                if (bOverA < 0.1){
-                	cout << "Nof hits = " << itMapWithHits->second.GetNofHits() << " ";
-                	cout << "B = " << itMapWithHits->second.GetBaxis() << " A = "<<
-                	itMapWithHits->second.GetAaxis() << " ";
-                	cout << "boa = " << bOverA << "  radPos = "<<
-                		itMapWithHits->second.GetRadialPosition()<< endl;
-                }
-                //cout << "MC "<<itMapWithHits->second.GetRadialPosition() << endl;
-
                 fh_MCMomvsRadpos->Fill(momentum, itMapWithHits->second.GetRadialPosition());
                 fh_MCMomvsNofHits->Fill(momentum, itMapWithHits->second.GetNofHits());
                 fh_MCMomvsBoverA->Fill(momentum, itMapWithHits->second.GetBaxis()/itMapWithHits->second.GetAaxis());
@@ -420,6 +389,7 @@ void CbmRichRingQa::Exec(Option_t* option)
         }
     }
     delete fitCOP;
+    delete fitEllipse;
 
     EfficiencyCalc();
     DiffFakeTrue();
@@ -578,9 +548,6 @@ void CbmRichRingQa::EfficiencyCalc()
 
         ring->SetRecFlag(-1);
 
-        ///reject the fake rings
-     //   if (ring->GetSelectionNN() < -0.5) continue;
-
         ///fake rings
         if (lPercTrue < 0.5){
             ring->SetRecFlag(1);
@@ -631,7 +598,6 @@ void CbmRichRingQa::EfficiencyCalc()
             Double_t bOverA = fRingMapWithHits[trackID].GetBaxis()/fRingMapWithHits[trackID].GetAaxis();
             fh_TrueFoundElRingsProjHitCutBoverA->Fill(bOverA);
             fh_TrueElMomVsBoverA->Fill(momentum, bOverA);
-            //cout << "True Found"<<fRingMapWithHits[trackID].GetRadialPosition() << endl;
         }
 
         ///pions
@@ -639,8 +605,6 @@ void CbmRichRingQa::EfficiencyCalc()
             fNofTrueFoundPiRingsProjHitCut++;
             fh_TrueFoundRingsXYPi->Fill(ring->GetCenterX(),ring->GetCenterY());
         }
-
-
     }///loop over all found rings
 
 }
@@ -846,7 +810,7 @@ void CbmRichRingQa::FinishTask()
     fh_TrueElMomVsBoverA->Write();
     fh_MCElMomVsBoverA->Write();
 
-    /// Difference Fake and True rings histogramms BEGIN
+    /// Difference Fake and True rings histograms BEGIN
     fh_FakeNofHits->Write();
     fh_TrueElNofHits->Write();
 
@@ -885,7 +849,7 @@ void CbmRichRingQa::FinishTask()
 
     fh_TrueElRadiusVsMom->Write();
     fh_FakeRadiusVsMom->Write();
-    /// Difference Fake and True rings histogramms END
+    /// Difference Fake and True rings histograms END
 
     fh_WrongMatchElDistance->Write();
     fh_TrueMatchElDistance->Write();
@@ -919,8 +883,6 @@ void CbmRichRingQa::FinishTask()
 		(Double_t)fNofTrueFoundElRingsProjHitCut/(Double_t)fNofElRingsProjHitCut << endl;
 
 }
-
-// -------------------------------------------------------------------------
 
 ClassImp(CbmRichRingQa)
 

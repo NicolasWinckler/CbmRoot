@@ -1,21 +1,8 @@
-/******************************************************************************
-*  $Id: CbmRichRingQa.h,v 1.1 2006/04/10 08:21:04 hoehne Exp $
-*
-*  Class  : CbmRichRingQa
-*  Description : Quality checks or ring finders:
-*                efficiency calculation etc.
-*
-*  Author : Simeon Lebedev
-*
-*******************************************************************************
-*  $Log: CbmRichRingQa.h,v $
-*  Revision 1.1  2006/04/10 08:21:04  hoehne
-*  routine for checking the ring finders (quality, efficiency)
-*  initial version
-*
-*
-*
-*******************************************************************************/
+/*
+Class  : CbmRichRingQa
+Description : Quality checks or ring finders: efficiency calculation etc.
+Author : Semen Lebedev (S.Lebedev@gsi.de)
+*/
 
 #ifndef CBMRICHRINGQA_H
 #define CBMRICHRINGQA_H

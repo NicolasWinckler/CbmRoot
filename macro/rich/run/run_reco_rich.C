@@ -1,73 +1,33 @@
-void run_reco_rich(Int_t nEvents = 500)
+void run_reco_rich(Int_t nEvents = 700)
 {
 
-  // ========================================================================
-  //          Adjust this part according to your requirements
-
-  // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile1 = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.mc.root";
-  TString inFile2 = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.reco.root";
+  TString inFile1 = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
+  TString inFile2 = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
   // Parameter file
-  TString parFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.params.root";
+  TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
 
   // STS digitisation file
   TString stsDigiFile = "sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.recorich.root";
+  TString outFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.recorich.root";
 
-  // In general, the following parts need not be touched
-  // ========================================================================
-
-
-
-  // ----    Debug option   -------------------------------------------------
   gDebug = 0;
-  // ------------------------------------------------------------------------
-
-
-
-  // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
   timer.Start();
-  // ------------------------------------------------------------------------
 
-
-
-  // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libEcal");
-  gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
-  gSystem->Load("libL1");
-  gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
-  // ------------------------------------------------------------------------
+  gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
+  cbmlibs();
 
-
-
-  // -----   Reconstruction run   -------------------------------------------
   FairRunAna *run= new FairRunAna();
   run->SetInputFile(inFile1);
   run->AddFriend(inFile2);
   run->SetOutputFile(outFile);
-  // ------------------------------------------------------------------------
 
 /*
 
@@ -83,14 +43,14 @@ void run_reco_rich(Int_t nEvents = 500)
   // =========================================================================
 */
   // ---------------------RICH Hit Producer ----------------------------------
-  Double_t richPmtRad  = 0.4;     // PMT radius [cm]
-  Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
-  Int_t    richDetType = 4;       // Detector type Hamamatsu H8500-03
-  Int_t    richNoise   = 220;     // Number of noise points per event
-  CbmRichHitProducer* richHitProd
-    = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
-			     richNoise, iVerbose);
-  run->AddTask(richHitProd);
+//  Double_t richPmtRad  = 0.4;     // PMT radius [cm]
+//  Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
+//  Int_t    richDetType = 5;       // Detector type Hamamatsu H8500-03
+//  Int_t    richNoise   = 220;     // Number of noise points per event
+//  CbmRichHitProducer* richHitProd
+//    = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
+//			     richNoise, iVerbose);
+//  run->AddTask(richHitProd);
   //--------------------------------------------------------------------------
 /*
 

@@ -666,6 +666,11 @@ void CbmRichRingQa::DiffFakeTrue()
     if (recFlag == 3) fh_TrueElRadiusVsMom->Fill(stsMomentum, axisB);
     if (recFlag == 1) fh_FakeRadiusVsMom->Fill(stsMomentum, axisB);
 
+    if (TMath::IsNaN(nHits)||TMath::IsNaN(distance)||
+    	TMath::IsNaN(angle)||TMath::IsNaN(hitsOnRing)||
+    	TMath::IsNaN(radPos)||TMath::IsNaN(axisA)||
+    	TMath::IsNaN(axisB)||TMath::IsNaN(phi)||
+    	TMath::IsNaN(radAngle)||TMath::IsNaN(chi2)) continue;
 
     if (recFlag == 1) foutFakeAndTrue << nHits << " "
                             << distance << " "

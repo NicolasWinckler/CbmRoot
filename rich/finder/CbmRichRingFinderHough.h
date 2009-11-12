@@ -8,7 +8,7 @@
 
 #include "CbmRichRingFinder.h"
 #include "CbmRichRingFinderHoughImpl.h"
-#include "CbmRichRingFinderHoughSimd.h"
+//#include "CbmRichRingFinderHoughSimd.h"
 #include <vector>
 #include <map>
 #include <functional>

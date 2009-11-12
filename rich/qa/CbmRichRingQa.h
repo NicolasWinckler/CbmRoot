@@ -70,7 +70,6 @@ class CbmRichRingQa : public FairTask{
     Int_t fNofElRingsProjHitCut;//number of El MC rings with proj and # hits more than HitCut
     Int_t fNofPiRingsProjHitCut;//number of Pi MC rings with proj and # hits more than HitCut
 
-
     Int_t fNofTrueFoundElRingsProjHitCut;
     Int_t fNofTrueFoundPiRingsProjHitCut;
     Int_t fNofCloneRings;
@@ -93,7 +92,7 @@ class CbmRichRingQa : public FairTask{
     TH2D* fh_FakeFoundRingsXYAll;
 
 
-    /// Difference Fake and True rings histogramms BEGIN
+/// Difference Fake and True rings histograms BEGIN
     TH1D*  fh_FakeNofHits;
     TH1D*  fh_TrueElNofHits;
 
@@ -132,22 +131,13 @@ class CbmRichRingQa : public FairTask{
 
     TH2D* fh_TrueElRadiusVsMom;
     TH2D* fh_FakeRadiusVsMom;
-    /// Difference Fake and True rings histogramms END
+/// Difference Fake and True rings histograms END
 
     /// Ring Track matching BEGIN
     TH1D* fh_WrongMatchElDistance;
     TH1D* fh_TrueMatchElDistance;
     TH1D*  fh_TrueMatchElMom;
     /// Ring Track matching END
-
-
-    TH2D* fh_StartVertexXZ;
-    TH2D* fh_StartVertexYZ;
-
-    TH2D* fh_MCMomvsRadpos;
-    TH2D* fh_MCMomvsNofHits;
-    TH2D* fh_MCMomvsBoverA;
-    TH2D* fh_MCXYE;
 
     std::ofstream  foutFakeAndTrue;
 

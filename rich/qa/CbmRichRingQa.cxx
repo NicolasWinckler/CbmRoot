@@ -125,28 +125,18 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
     fh_TrueMatchElDistance = new TH1D("fh_TrueMatchElDistance","Distance between track and ring center",50,0,5);
     fh_TrueMatchElMom = new TH1D("fh_TrueMatchElMom","fh_TrueMatchElMom",40,0,10);
 
-    fh_StartVertexXZ = new TH2D("fh_StartVertexXZ","StartVertex XZ", 200, -2. ,200.,300, -150. , 150.);
-    fh_StartVertexYZ = new TH2D("fh_StartVertexYZ","StartVertex YZ", 200, -2.,200.,300, -150. ,150.);
-
-  //hits distribution (x,y)
-  fh_HitsXY = new TH2D("fh_HitsXY","Hits distribution (x,y)",100,-200,200,125,-250,250);
-  fh_HitsRadPos = new TH1D("fh_HitsRadPos","Hits distribution rad position",200, 0, 200);
-  // (x,y) of true primary electron rings
-  fh_TrueFoundRingsXYE = new TH2D("fh_TrueFoundRingsXYE","(x,y) true electrons rings. >=10 Hits. Proj",40,-200,200,50,-250,250);
-  // (x,y) of true primary pions rings
-  fh_TrueFoundRingsXYPi = new TH2D("fh_TrueFoundRingsXYPi","(x,y) true pions rings. >=10 Hits. Proj",100,-200,200,125,-250,250);
-  //number of hits per event
-  fh_NhitsPerEvent = new TH1D("fh_NhitsPerEvent","Number of hits per event",100,1000,3000);
-  //number of projections per event
-  fh_NprojPerEvent = new TH1D("fh_NprojPerEvent","Number of projections per event",50,200,450);
-
-
-  fh_MCMomvsRadpos = new TH2D("fh_MCMomvsRadpos","MC, momentum vs. Radpos;momentum,  GeV/c;radial position, cm",30, 0, 10, 50,0,200);
-  fh_MCMomvsNofHits = new TH2D("fh_MCMomvsNofHits","MC momentum vs. NofHits;momentum,  GeV/c;nof hits",30, 0, 10, 45,0,45);
-  fh_MCMomvsBoverA = new TH2D("fh_MCMomvsBoverA","MC momentum vs B/A;momentum,  GeV/c;B/A",30, 0, 10, 50,0.5,1);
-  fh_MCXYE = new TH2D("fh_MCXYE","MC (x,y) electrons rings;X, cm;Y, cm",40,-200,200,50,-250,250);
-
-  //foutFakeAndTrue.open("ann_fake_and_true.txt",std::ios_base::app);
+    //hits distribution (x,y)
+    fh_HitsXY = new TH2D("fh_HitsXY","Hits distribution (x,y)",100,-200,200,125,-250,250);
+    fh_HitsRadPos = new TH1D("fh_HitsRadPos","Hits distribution rad position",200, 0, 200);
+    // (x,y) of true primary electron rings
+    fh_TrueFoundRingsXYE = new TH2D("fh_TrueFoundRingsXYE","(x,y) true electrons rings. >=10 Hits. Proj",40,-200,200,50,-250,250);
+    // (x,y) of true primary pions rings
+    fh_TrueFoundRingsXYPi = new TH2D("fh_TrueFoundRingsXYPi","(x,y) true pions rings. >=10 Hits. Proj",100,-200,200,125,-250,250);
+    //number of hits per event
+    fh_NhitsPerEvent = new TH1D("fh_NhitsPerEvent","Number of hits per event",100,1000,3000);
+    //number of projections per event
+    fh_NprojPerEvent = new TH1D("fh_NprojPerEvent","Number of projections per event",50,200,450);
+    //foutFakeAndTrue.open("ann_fake_and_true.txt",std::ios_base::app);
 
    foutFakeAndTrue.open("ann_fake_and_true.txt");
 }
@@ -377,10 +367,6 @@ void CbmRichRingQa::Exec(Option_t* option)
                 fh_MCElRingsProjHitCutRadPos->Fill(itMapWithHits->second.GetRadialPosition());
                 Double_t bOverA = itMapWithHits->second.GetBaxis()/itMapWithHits->second.GetAaxis();
                 fh_MCElRingsProjHitCutBoverA->Fill(bOverA);
-                fh_MCMomvsRadpos->Fill(momentum, itMapWithHits->second.GetRadialPosition());
-                fh_MCMomvsNofHits->Fill(momentum, itMapWithHits->second.GetNofHits());
-                fh_MCMomvsBoverA->Fill(momentum, itMapWithHits->second.GetBaxis()/itMapWithHits->second.GetAaxis());
-                fh_MCXYE->Fill(itMapWithHits->second.GetCenterX(),itMapWithHits->second.GetCenterY());
             }
         }
     }
@@ -846,15 +832,6 @@ void CbmRichRingQa::FinishTask()
     fh_WrongMatchElDistance->Write();
     fh_TrueMatchElDistance->Write();
     fh_TrueMatchElMom->Write();
-
-    fh_StartVertexXZ->Write();
-    fh_StartVertexYZ->Write();
-
-    fh_MCMomvsRadpos->Write();
-    fh_MCMomvsNofHits->Write();
-    fh_MCMomvsBoverA->Write();
-    fh_MCXYE->Write();
-
 
     fh_HitsXY->Write();
     fh_HitsRadPos->Write();

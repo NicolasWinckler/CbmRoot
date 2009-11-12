@@ -632,9 +632,9 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 		//RemoveHitsAroundRing(indmin, indmax, &ring2);
 		RemoveHitsAroundEllipse(indmin, indmax, ring2);
 
-		//fFoundRings.push_back(ring2);
+		fFoundRings.push_back(ring2);
 	}
-	fFoundRings.push_back(ring2);
+	//fFoundRings.push_back(ring2);
 }
 
 void CbmRichRingFinderHoughImpl::RingSelection()

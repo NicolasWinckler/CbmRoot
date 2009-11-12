@@ -299,7 +299,7 @@ void CbmRichRingQa::Exec(Option_t* option)
         }
         iMother = track->GetMotherId();
         if (iMother == -1) {
-            cout << "-E- MotherID of Cherenkov photon = -1" << endl;
+           // cout << "-E- MotherID of Cherenkov photon = -1" << endl;
             continue;
         }
         fRingMap[iMother]++;

@@ -32,8 +32,7 @@ void draw_diff_true_fake(TH1D* h1, TH1D* h2, char* xTitle)
 }
 
 void draw_qa(){
-	TFile *file = new TFile("/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0003.reco.root");
-	//TFile *file = new TFile("/d/cbm02/slebedev/rich/MAY08/electronId/urqmd.0000.recorich.root");
+	TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.recorich.root");
 
 	TDirectory *current = gDirectory;
 	current->cd("RichRingQaHist");
@@ -135,7 +134,6 @@ void draw_qa(){
     gPad->SetGridx(true);
     gPad->SetGridy(true);
 
-
     TCanvas *c7 = new TCanvas("CbmRichQa7","c7",1200,1000);
 	TH1D* thNofHits = divide_hist(fh_TrueFoundElRingsProjHitCutNofHits, fh_MCElRingsProjHitCutNofHits,
 			"Efficiency, electrons vs NofHits;Nof Hits; efficiency, %", 20, 0, 40);
@@ -145,11 +143,6 @@ void draw_qa(){
 	TH1D* thBoverA = divide_hist(fh_TrueFoundElRingsProjHitCutBoverA, fh_MCElRingsProjHitCutBoverA,
 			"Efficiency, electrons vs B/A;B/A; efficiency, %", 20, 0, 1);
 	thBoverA->Draw();
-
-    TCanvas *c9 = new TCanvas("CbmRichQa9","c9",1200,1000);
-	TH2D* thMomVsBoverA = new TH2D("thMomVsBoverA","Efficiency, electrons vs Mom and B/A;momentum, Gev/c; B/A, %",20, 0, 10, 40,0,1);
-	thMomVsBoverA->Divide(fh_TrueElMomVsBoverA, fh_MCElMomVsBoverA);
-	thMomVsBoverA->Draw("COLZ");
 
     cout << "El. eff = " << (Double_t)fh_TrueFoundElRingsProjHitCutMom->GetEntries()/
                             (Double_t)fh_MCElRingsProjHitCutMom->GetEntries() << endl;

@@ -76,9 +76,6 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
     fh_TrueFoundElRingsProjHitCutBoverA = new TH1D("fh_TrueFoundElRingsProjHitCutBoverA","fh_TrueFoundElRingsProjHitCutBoverA",20,0,1);
     fh_MCElRingsProjHitCutBoverA = new TH1D("fh_MCElRingsProjHitCutBoverA","fh_MCElRingsProjHitCutBoverA",20,0,1);
 
-    fh_TrueElMomVsBoverA = new TH2D("fh_TrueElMomVsBoverA","fh_TrueElMomVsBoverA",20, 0,10, 40,0,1);
-    fh_MCElMomVsBoverA = new TH2D("fh_MCElMomVsBoverA","fh_MCElMomVsBoverA",20, 0,10, 40,0,1);
-
     // (x,y) of fake rings
     fh_FakeFoundRingsXYAll = new TH2D("fh_FakeFoundRingsXYAll","(x,y) fake rings",100,-200,200,125,-250,250);
 
@@ -380,7 +377,6 @@ void CbmRichRingQa::Exec(Option_t* option)
                 fh_MCElRingsProjHitCutRadPos->Fill(itMapWithHits->second.GetRadialPosition());
                 Double_t bOverA = itMapWithHits->second.GetBaxis()/itMapWithHits->second.GetAaxis();
                 fh_MCElRingsProjHitCutBoverA->Fill(bOverA);
-                fh_MCElMomVsBoverA->Fill(momentum, bOverA);
                 fh_MCMomvsRadpos->Fill(momentum, itMapWithHits->second.GetRadialPosition());
                 fh_MCMomvsNofHits->Fill(momentum, itMapWithHits->second.GetNofHits());
                 fh_MCMomvsBoverA->Fill(momentum, itMapWithHits->second.GetBaxis()/itMapWithHits->second.GetAaxis());
@@ -597,7 +593,6 @@ void CbmRichRingQa::EfficiencyCalc()
 
             Double_t bOverA = fRingMapWithHits[trackID].GetBaxis()/fRingMapWithHits[trackID].GetAaxis();
             fh_TrueFoundElRingsProjHitCutBoverA->Fill(bOverA);
-            fh_TrueElMomVsBoverA->Fill(momentum, bOverA);
         }
 
         ///pions
@@ -806,9 +801,6 @@ void CbmRichRingQa::FinishTask()
 
     fh_TrueFoundElRingsProjHitCutBoverA->Write();
     fh_MCElRingsProjHitCutBoverA->Write();
-
-    fh_TrueElMomVsBoverA->Write();
-    fh_MCElMomVsBoverA->Write();
 
     /// Difference Fake and True rings histograms BEGIN
     fh_FakeNofHits->Write();

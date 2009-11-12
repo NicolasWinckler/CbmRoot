@@ -90,9 +90,6 @@ class CbmRichRingQa : public FairTask{
     TH1D* fh_TrueFoundElRingsProjHitCutBoverA;
     TH1D* fh_MCElRingsProjHitCutBoverA;
 
-    TH2D* fh_TrueElMomVsBoverA;
-    TH2D* fh_MCElMomVsBoverA;
-
     TH2D* fh_FakeFoundRingsXYAll;
 
 

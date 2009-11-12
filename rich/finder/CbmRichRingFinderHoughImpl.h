@@ -47,8 +47,8 @@ class CbmRichRingComparatorMore:
 	          bool>
 {
 public:
-	bool operator()(const CbmRichRing& ring1, const CbmRichRing& ring2) const {
-		return ring1.GetSelectionNN() > ring2.GetSelectionNN();
+	bool operator()(const CbmRichRing* ring1, const CbmRichRing* ring2) const {
+		return ring1->GetSelectionNN() > ring2->GetSelectionNN();
 	}
 };
 
@@ -103,7 +103,7 @@ protected:
 	vector< vector< unsigned short> > fRingHitsR;
     vector< vector<unsigned short> > fHitInd;
 
-	vector<CbmRichRing> fFoundRings;///collect found rings
+	vector<CbmRichRing*> fFoundRings;///collect found rings
 
 	CbmRichRingFitterCOP* fFitCOP;
 	CbmRichRingFitterEllipseTau* fFitEllipseTau;
@@ -146,15 +146,13 @@ public:
 				Float_t *yc,
 				Float_t *r);
 
-	void HoughTransformReconstruction();
-	void DefineLocalAreaAndHits(Float_t x0, Float_t y0, Int_t *indmin, Int_t *indmax);
+	virtual void HoughTransformReconstruction();
+	virtual void DefineLocalAreaAndHits(Float_t x0, Float_t y0, Int_t *indmin, Int_t *indmax);
 	virtual void HoughTransform(unsigned short int indmin,
 			unsigned short int indmax);
 	virtual void HoughTransformGroup(unsigned short int indmin,
 			unsigned short int indmax, Int_t iPart);
 	void FindPeak(Int_t indmin, Int_t indmax);
-	void FindMaxBinsXYR(Int_t *maxBinXY, Int_t *maxBinR);
-	void FindPrelimXYR(Float_t *xc, Float_t *yc, Float_t *r);
 	void FuzzyKE(TClonesArray* rHitArray);
     void RingSelection();
     void RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring);
@@ -168,7 +166,7 @@ public:
 		fData = data;
 	}
 
-	vector<CbmRichRing>& GetFoundRings(){
+	vector<CbmRichRing*>& GetFoundRings(){
 		return fFoundRings;
 	}
 

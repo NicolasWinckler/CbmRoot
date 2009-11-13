@@ -108,6 +108,11 @@ private:
      */
 	void ReadDataBranches();
 
+	/**
+	  * Fills hit related histograms
+	  */
+	void ProcessHits();
+
     /**
      * Loops over the reconstructed global tracks. Checks if the track is correct
      * than fills the multimaps <MC track index, reconstructed track index>.
@@ -229,6 +234,7 @@ private:
 	TClonesArray* fStsMatches; // CbmStsTrackMatch array
 	TClonesArray* fMuchMatches; // CbmTrackMatch array
 	TClonesArray* fTrdMatches; // CbmTrackMatch array
+	TClonesArray* fTrdHits; // CbmTrdHit array
 	TClonesArray* fTofPoints; // CbmTofPoint array
 	TClonesArray* fTofHits; // CbmTofHit array
 
@@ -253,6 +259,8 @@ private:
 	TH1F *fhStsGhostNh;
 	// TRD(MUCH): ghost tracks (number of hits dependence)
 	TH1F *fhRecGhostNh;
+
+	TH1F *fhNofHitsInStation; // mean number of hits in station
 
 	TList* fHistoList; // List of histograms
 

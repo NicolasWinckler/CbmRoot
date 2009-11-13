@@ -24,16 +24,12 @@ void CbmLitTrdTrackFinderWeight::Init()
 	DefaultInit();
 
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	TrackPropagatorPtr propagator = factory->CreateTrackPropagator("lit");
-	SetPropagatorToDet(propagator);
-	SetPropagator(propagator);
+	SetPropagator(factory->CreateTrackPropagator("lit"));
 	SetSeedSelection(factory->CreateTrackSelection("momentum"));
 	SetFinalSelection(factory->CreateTrackSelection("empty"));
 	SetFitter(factory->CreateTrackFitter("kalman_robust"));
 	SetFilter(factory->CreateTrackUpdate("kalman"));
-
 	SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-
 	SetVerbose(1);
 	SetNofIter(1);
 	SetMaxNofMissingHits(0);

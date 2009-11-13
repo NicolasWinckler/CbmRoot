@@ -85,12 +85,12 @@
 #pragma link C++ class CbmLitReconstructionQa+;
 #pragma link C++ class CbmLitFindGlobalTracksIdeal+;
 #pragma link C++ class CbmLitPropagationAnalysis+;
-#pragma link C++ class CbmLitRobustFitterAnalysis+;
+#pragma link C++ class CbmLitRobustFitterAnalysis+;MultipleScattering
 #pragma link C++ class CbmLitCheckSimpleGeo+;
 #pragma link C++ class CbmLitCheckField+;
 #pragma link C++ class CbmLitCheckEnergyLoss+;
 #pragma link C++ class CbmLitCheckMultipleScattering+;
-
+#pragma link C++ class CbmLitCheckBrem+;
 
 // robust
 //#pragma link C++ class CbmLitWeightedHitCalculatorImp+;
@@ -111,6 +111,13 @@
 
 // utils
 //#pragma link C++ class CbmLitConverter+;
+
+
+#pragma link C++ class CbmLitDetContFact;
+#pragma link C++ class CbmLitDetGeo;
+#pragma link C++ class CbmLitDetGeoPar;
+#pragma link C++ class CbmLitDet+;
+#pragma link C++ class CbmLitDetPoint+;
 
 
 #endif

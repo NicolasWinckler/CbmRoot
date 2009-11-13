@@ -449,7 +449,8 @@ void CbmLitCheckField::DrawHistosPoly(
 				if (opt == "rel") hist1 = fhBRelErrH1D[v][i][j];
 				else hist1 = fhBErrH1D[v][i][j];
 				if (max < hist1->GetMaximum()) max = hist1->GetMaximum();
-				hist1->GetXaxis()->SetTitle("B [kGauss]");
+				if (opt == "rel") hist1->GetXaxis()->SetTitle("Relative error [%]");
+				else hist1->GetXaxis()->SetTitle("B [kGauss]");
 				hist1->SetLineColor(1+j);
 				hist1->SetLineWidth(3);
 				hist1->SetLineStyle(1+j);

@@ -29,8 +29,8 @@ InitStatus CbmLitCheckMultipleScattering::Init()
     fMCTrackArray  = (TClonesArray*) ioman->ActivateBranch("MCTrack");
     if (!fMCTrackArray) Fatal("Init", "No MCTrack array!");
 
-    fMCPointArray  = (TClonesArray*) ioman->ActivateBranch("MuchPoint");
-    if (!fMCPointArray) Fatal("Init", "No MuchPoint array!");
+    fMCPointArray  = (TClonesArray*) ioman->ActivateBranch("LitDetPoint");
+    if (!fMCPointArray) Fatal("Init", "No LitPoint array!");
 
     Int_t nBins = 1000;
     Double_t minTheta = -0.2;
@@ -48,8 +48,6 @@ void CbmLitCheckMultipleScattering::SetParContainers()
 void CbmLitCheckMultipleScattering::Exec(
 		Option_t* opt)
 {
-//	Double_t mass = 0.105;
-//	Double_t Q;
 	Int_t nofTracks = fMCTrackArray->GetEntriesFast();
 	for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) {
         CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTrackArray->At(iTrack);
@@ -68,11 +66,10 @@ void CbmLitCheckMultipleScattering::Exec(
         }
         if (point == NULL) continue;
 
-        TVector3 momIn, momOut;
-        point->Momentum(momIn);
-        point->MomentumOut(momOut);
+        TVector3 mom;
+        point->Momentum(mom);
 
-    	Double_t mc_theta = momOut.Theta() * std::cos(momOut.Phi());
+    	Double_t mc_theta = mom.Theta() * std::cos(mom.Phi());
         fh_theta_mc->Fill(mc_theta);
 	} //loop over MC tracks
 
@@ -81,7 +78,7 @@ void CbmLitCheckMultipleScattering::Exec(
 
 void CbmLitCheckMultipleScattering::Finish()
 {
-    fh_theta_mc->Write();
+    fh_theta_mc->Draw();
 }
 
 ClassImp(CbmLitCheckMultipleScattering)

@@ -546,7 +546,7 @@ void CbmLitPropagationAnalysis::McPointToLitFitNode(
     par.SetX(point->GetX());
     par.SetY(point->GetY());
     par.SetZ(point->GetZ());
-    //TODO: temporarily done to check for straw tubes
+    //TODO: temporarily done to check the straw tubes
 //    CbmMuchPoint* p = (CbmMuchPoint*) point;
 //    par.SetX((p->GetXIn()+p->GetXOut())/2.);
 //    par.SetY((p->GetYIn()+p->GetYOut())/2.);
@@ -574,7 +574,9 @@ std::vector<Double_t> CbmLitPropagationAnalysis::CalcResidualsAndPulls(
     if (par->GetCovariance(9) > 0.) r[7] = (r[2]) / (std::sqrt(par->GetCovariance(9)));
     if (par->GetCovariance(12) > 0.) r[8] = (r[3]) / (std::sqrt(par->GetCovariance(12)));
     if (par->GetCovariance(14) > 0.) r[9] = (r[4]) / (std::sqrt(par->GetCovariance(14)));
+//    r[10] = 100 * ((1./par->GetQp() - 1./mcPar->GetQp()) / (1./mcPar->GetQp()));
     r[10] = 100 * ((1./par->GetQp() - 1./mcPar->GetQp()) / (std::abs(1./mcPar->GetQp())));
+//    std::cout << "calc=" << 1./par->GetQp() << " mc=" << 1./mcPar->GetQp() << std::endl;
     return r;
 }
 

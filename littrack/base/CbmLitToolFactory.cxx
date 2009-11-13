@@ -245,7 +245,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 	if(name == "e_branch") {
 		CbmLitTrackFinderBranch* trdFinderBranch = new CbmLitTrackFinderBranch();
 		trdFinderBranch->SetPropagator(CreateTrackPropagator("lit"));
-		trdFinderBranch->SetSeedSelection(CreateTrackSelection("momentum"));
+		trdFinderBranch->SetSeedSelection(CreateTrackSelection("empty"));
 		trdFinderBranch->SetStationGroupSelection(CreateTrackSelection("trd_station"));
 		trdFinderBranch->SetFinalSelection(CreateTrackSelection("trd_final"));
 		trdFinderBranch->SetFilter(CreateTrackUpdate("kalman"));
@@ -328,7 +328,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderBranch->SetFinalSelection(CreateTrackSelection("much_final"));
 		muchFinderBranch->SetFilter(CreateTrackUpdate("kalman"));
 		muchFinderBranch->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-		muchFinderBranch->SetVerbose(3);
+		muchFinderBranch->SetVerbose(1);
 		muchFinderBranch->SetNofIter(1);
 		muchFinderBranch->IsUseFastSearch(true);
 		muchFinderBranch->SetPDG(13);

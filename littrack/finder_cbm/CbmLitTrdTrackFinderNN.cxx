@@ -24,23 +24,20 @@ void CbmLitTrdTrackFinderNN::Init()
 	DefaultInit();
 
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	TrackPropagatorPtr propagator = factory->CreateTrackPropagator("lit");
-	SetPropagatorToDet(propagator);
-	SetPropagator(propagator);
-	SetSeedSelection(factory->CreateTrackSelection("momentum"));
+	SetPropagator(factory->CreateTrackPropagator("lit"));
+	SetSeedSelection(factory->CreateTrackSelection("empty"));//"momentum"));
 	SetFinalSelection(factory->CreateTrackSelection("trd_final"));
 	SetFilter(factory->CreateTrackUpdate("kalman"));
-
 	SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-
 	SetVerbose(1);
 	SetNofIter(1);
 	IsUseFastSearch(true);
-	SetMaxNofMissingHits(4);
-	SetSigmaCoef(10.);
-	SetChiSqPixelHitCut(20.);
+	SetMaxNofMissingHits(3);
+	SetSigmaCoef(5.);
+	SetChiSqPixelHitCut(25.);
 	SetChiSqStripHitCut(4.);
 	SetPDG(11);
+	IsProcessSubstationsTogether(true);
 }
 
 Int_t CbmLitTrdTrackFinderNN::DoFind(

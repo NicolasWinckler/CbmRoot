@@ -77,6 +77,7 @@ InitStatus CbmLitReconstructionQa::Init()
 void CbmLitReconstructionQa::Exec(
 		Option_t* opt)
 {
+	ProcessHits();
 	ProcessGlobalTracks();
 	ProcessMcTracks();
 	PrintEventStatistics();
@@ -131,6 +132,8 @@ void CbmLitReconstructionQa::ReadDataBranches()
     if (fIsTrd) {
     	fTrdMatches = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
     	if (NULL == fTrdMatches) Fatal("Init","No TRDTrackMatch array!");
+    	fTrdHits = (TClonesArray*) ioman->GetObject("TRDHit");
+    	if (NULL == fTrdHits) Fatal("Init","No TRDHit array!");
     }
 
     if (fIsTof) {
@@ -139,6 +142,16 @@ void CbmLitReconstructionQa::ReadDataBranches()
     	fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
     	if (NULL == fTofHits) Fatal("Init", "No TofHit array!");
     }
+}
+
+void CbmLitReconstructionQa::ProcessHits()
+{
+	if (fIsTrd) {
+		for (Int_t i = 0; i < fTrdHits->GetEntriesFast(); i++) {
+			CbmBaseHit* hit = (CbmBaseHit*) fTrdHits->At(i);
+			fhNofHitsInStation->Fill(hit->GetPlaneId());
+		}
+	}
 }
 
 void CbmLitReconstructionQa::ProcessGlobalTracks()
@@ -423,6 +436,9 @@ void CbmLitReconstructionQa::CreateHistos()
 	fHistoList->Add(fhStsGhostNh);
 	fhRecGhostNh = new TH1F("hRecGhostNh", "TRD(MUCH): ghost tracks", nBinsNofPoints, minNofPoints, maxNofPoints);
 	fHistoList->Add(fhRecGhostNh);
+
+	fhNofHitsInStation = new TH1F("hNofHitsInStation", "TRD(MUCH): number of hits", 20, 0, 20);
+	fHistoList->Add(fhNofHitsInStation);
 }
 
 void CbmLitReconstructionQa::DivideHistos(
@@ -447,6 +463,7 @@ void CbmLitReconstructionQa::CalculateEfficiencyHistos()
 		DivideHistos(fhRecNp[i][REC], fhRecNp[i][ACC], fhRecNp[i][EFF]);
 		DivideHistos(fhTofMom[i][REC], fhTofMom[i][ACC], fhTofMom[i][EFF]);
 	}
+	fhNofHitsInStation->Scale(1./fEventNo);
 }
 
 void CbmLitReconstructionQa::WriteToFile()

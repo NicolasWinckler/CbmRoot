@@ -242,22 +242,12 @@ void CbmLitTrackFinderBranch::ProcessSubstation(
 {
 	CbmLitTrackParam uPar;
 	for (HitPtrIterator iHit = bounds.first; iHit != bounds.second; iHit++) {
-		// This is temporarily solution to correctly calculate chi-square for straw tube stations.
-		// For the pixel hits the chi-square is calculated after the track is updated
-		// with KF. For straw tube the chi-square is calculated before the track parameters are updated
-		// with KF.
 		CbmLitHit* hit = *iHit;
-//		if (hit->GetType() == kLITPIXELHIT) {
-			fFilter->Update(par, &uPar, hit);
-//		} else {
-//			uPar = *par;
-//		}
+		fFilter->Update(par, &uPar, hit);
 		if (IsHitInValidationGate(&uPar, hit)) {
 			myf chi = ChiSq(&uPar, hit);
 			CbmLitHitChiSq h;
-//			if (hit->GetType() == kLITSTRIPHIT) {
-//				fFilter->Update(&uPar, hit);
-//			}
+
 			h.SetHit(hit);
 			h.SetParam(&uPar);
 			h.SetChiSq(chi);

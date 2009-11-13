@@ -80,6 +80,7 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 	if (nofSteps == 0) stepSize = dz; else  stepSize = lit::MAXIMUM_PROPAGATION_STEP_SIZE;
 	myf z = zIn;
 
+//	std::cout << "Propagation: zIn=" << zIn << " zOut=" << zOut << " stepSize=" << stepSize << " nofSteps=" << nofSteps << std::endl;
 	//Loop over steps + additional step to propagate to virtual plane at zOut
 	for (int iStep = 0; iStep < nofSteps + 1; iStep++) {
 		if (!IsParCorrect(par)) {
@@ -96,8 +97,9 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 //			std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: navigation failed" << std::endl;
 			return kLITERROR;
 		}
+//		std::cout << iStep << " z0=" << par->GetZ() << " z1=" << z << " nofInt=" << inter.size() << std::endl;
 
-//		std::cout << "nof intersections=" << inter.size()  << " zIn=" << par->GetZ() << " zOut=" << z << std::endl;
+//		std::cout << "  nof intersections=" << inter.size()  << " zIn=" << par->GetZ() << " zOut=" << z << std::endl;
 		//Loop over the materials
 		for(unsigned int  iMat = 0; iMat < inter.size() ; iMat++) {
 			CbmLitMaterialInfo mat = inter[iMat];
@@ -123,14 +125,19 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 
 			// add material effects
 			fMaterial->Update(par, &mat, pdg, downstream);
+
+//			std::cout << "    " << iStep << " " << iMat << " " << mat.ToString();
+//			std::cout << "    " << iStep << " " << iMat << " " << par->ToString();
 		}
 	}
-	std::vector<myf>* Fnew = NULL;
-	if (F != NULL) Fnew = new std::vector<myf>(25, 0.);
-	fExtrapolator->Extrapolate(par, zOut, Fnew);
-	if (F != NULL) UpdateF(*F, *Fnew);
-	delete Fnew;
+//	std::vector<myf>* Fnew = NULL;
+//	if (F != NULL) Fnew = new std::vector<myf>(25, 0.);
+//	fExtrapolator->Extrapolate(par, zOut, Fnew);
+//	if (F != NULL) UpdateF(*F, *Fnew);
+//	delete Fnew;
 //	par->SetZ(zOut);
+
+//	std::cout << "OUT " << par->ToString();
 
 	if (!IsParCorrect(par)) return kLITERROR;
 	else return kLITSUCCESS;

@@ -46,23 +46,35 @@ LitStatus CbmLitTGeoNavigator::FindIntersections(
 	CbmLitMaterialInfo stepInfo;
 	bool last = false;
 
-	while (!last) {
+	do {
 		fGeo->PushPoint();
 		stepInfo = MakeStep();
+//		std::cout << "FIRST STEP: " << stepInfo.ToString();
 		if(fGeo->IsOutside()) {
 			fGeo->PopDummy();
 			return kLITERROR;
 		}
+		if (stepInfo.GetZpos() <= zOut + 1e-3 && stepInfo.GetZpos() >= zOut - 1e-3) {
+//			std::cout << "3 Current before:" << " " << fGeo->GetCurrentPoint()[0] << " " <<  fGeo->GetCurrentPoint()[1] << " " << fGeo->GetCurrentPoint()[2] << std::endl;
+			last = true;
+			fGeo->PopDummy();
+//			std::cout << "3 Current after:" << " " << fGeo->GetCurrentPoint()[0] << " " <<  fGeo->GetCurrentPoint()[1] << " " << fGeo->GetCurrentPoint()[2] << std::endl;
+		} else
 		if (stepInfo.GetZpos() > zOut) {
+//			std::cout << "1 Current before:" << " " << fGeo->GetCurrentPoint()[0] << " " <<  fGeo->GetCurrentPoint()[1] << " " << fGeo->GetCurrentPoint()[2] << std::endl;
 			fGeo->PopPoint();
+//			std::cout << "1 Current after:" << " " << fGeo->GetCurrentPoint()[0] << " " <<  fGeo->GetCurrentPoint()[1] << " " << fGeo->GetCurrentPoint()[2] << std::endl;
 			myf l = CalcLength(zOut);
 			stepInfo = MakeStep(l);
 			last = true;
-		} else {
+		} else
+		if (stepInfo.GetZpos() < zOut){
+//			std::cout << "2 Current before:" << " " << fGeo->GetCurrentPoint()[0] << " " <<  fGeo->GetCurrentPoint()[1] << " " << fGeo->GetCurrentPoint()[2] << std::endl;
 			fGeo->PopDummy();
+//			std::cout << "2 Current after:" << " " << fGeo->GetCurrentPoint()[0] << " " <<  fGeo->GetCurrentPoint()[1] << " " << fGeo->GetCurrentPoint()[2] << std::endl;
 		}
 		inter.push_back(stepInfo);
-	}
+	} while (!last);
 	return kLITSUCCESS;
 }
 

@@ -569,7 +569,7 @@ bool CbmLitEnvironment::CheckDetectorPresence(
 
 bool CbmLitEnvironment::IsElectronSetup() const
 {
-	return CheckDetectorPresence("rich");
+	return CheckDetectorPresence("rich");// || CheckDetectorPresence("trd");
 }
 
 bool CbmLitEnvironment::IsTrd() const

@@ -82,6 +82,11 @@ fitter/CbmLitKalmanFilter.cxx
 fitter/CbmLitTrackFitterRobust.cxx
 fitter/CbmLitKalmanSmoother.cxx
 fitter/CbmLitTrackFitterIter.cxx
+geo/CbmLitDet.cxx
+geo/CbmLitDetContFact.cxx
+geo/CbmLitDetGeo.cxx
+geo/CbmLitDetGeoPar.cxx
+geo/CbmLitDetPoint.cxx
 #parallel/LitTrackFinderNNParallel.cxx
 propagation/CbmLitTGeoTrackPropagator.cxx 
 propagation/CbmLitRK4TrackExtrapolator.cxx
@@ -101,6 +106,7 @@ qa/CbmLitCheckSimpleGeo.cxx
 qa/CbmLitCheckField.cxx
 qa/CbmLitParallelTrackFitterTest.cxx
 qa/CbmLitCheckEnergyLoss.cxx
+qa/CbmLitCheckBrem.cxx
 weight/CbmLitWeightedHitCalculatorImp.cxx
 weight/CbmLitWeightCalculatorSimple.cxx
 weight/CbmLitWeightCalculatorGauss.cxx
@@ -133,6 +139,11 @@ finder_cbm/CbmLitTrdTrackFinderStandalone.h
 #finder_cbm/CbmLitMuchTrackFinderWeight.h
 finder_cbm/CbmLitStsBasedTrackFinder.h
 finder_cbm/CbmLitFindGlobalTracks.h
+geo/CbmLitDet.h
+geo/CbmLitDetContFact.h
+geo/CbmLitDetGeo.h
+geo/CbmLitDetGeoPar.h
+geo/CbmLitDetPoint.h
 qa/CbmLitReconstructionQa.h
 qa/CbmLitFindGlobalTracksIdeal.h
 qa/CbmLitPropagationAnalysis.h
@@ -141,6 +152,7 @@ qa/CbmLitCheckSimpleGeo.h
 qa/CbmLitCheckField.h
 qa/CbmLitCheckEnergyLoss.h
 qa/CbmLitCheckMultipleScattering.h
+qa/CbmLitCheckBrem.h
 )
 
 

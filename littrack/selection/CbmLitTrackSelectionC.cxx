@@ -104,7 +104,8 @@ void CbmLitTrackSelectionC::CheckSharedHits(
 		TrackPtrIterator itEnd)
 {
 	std::set<int> hitsId;
-	const int STRIPSTART = 1000000;
+	const int STRIPSTART = 1e6;
+	const int TRDSTART = 1e7;
 
 	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
 		CbmLitTrack* track = *iTrack;
@@ -117,7 +118,9 @@ void CbmLitTrackSelectionC::CheckSharedHits(
 	    for(int iHit = 0; iHit < nofHits; iHit++) {
 	    	int hitId = track->GetHit(iHit)->GetRefId();
 	    	LitHitType type = track->GetHit(iHit)->GetType();
+	    	LitDetectorId detId = track->GetHit(iHit)->GetDetectorId();
 	    	if (type == kLITSTRIPHIT) hitId += STRIPSTART;
+	    	if (detId == kLITTRD) hitId += TRDSTART;
 	    	if(hitsId.find(hitId) != hitsId.end()) {
 	            nofSharedHits++;
 	            if (nofSharedHits > fNofSharedHits) {

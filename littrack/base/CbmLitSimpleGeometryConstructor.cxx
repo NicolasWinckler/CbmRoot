@@ -336,7 +336,7 @@ void CbmLitSimpleGeometryConstructor::ConstructTof()
 
 		CbmLitMaterialInfo litMaterial;
 		litMaterial.SetLength(2. * sh->GetDZ());
-		litMaterial.SetZpos(Z);
+		litMaterial.SetZpos(Z + sh->GetDZ());
 		GeoMediumToMaterialInfo(medium, litMaterial);
 		fMyGeoNodes.push_back(litMaterial);
 	}

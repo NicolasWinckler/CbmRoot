@@ -59,13 +59,40 @@ void CbmLitMaterialEffectsImp::AddEnergyLoss(
 		CbmLitTrackParam* par,
 		const CbmLitMaterialInfo* mat) const
 {
-   myf Eloss = EnergyLoss(par, mat);
-   par->SetQp(CalcQpAfterEloss(par->GetQp(), Eloss));
+	if (fIsElectron) {
+//		myf X0 = (716.4 * mat->GetA()) / (mat->GetZ() * (mat->GetZ() + 1) * std::log(287./std::sqrt(mat->GetZ())));
+//		std::cout << "X0=" << m.fX0 * m.fRho << " X0calc=" << X0 << std::endl;
+//		Double_t brem_calc = p / X0;
 
-   myf cov = par->GetCovariance(14);
-   if (fIsElectron) cov += CalcSigmaSqQpElectron(par, mat);
-   else cov += CalcSigmaSqQp(par, mat);
-   par->SetCovariance(14, cov);
+//		myf radLength = (mat->GetLength() * mat->GetRho()) / X0;
+		myf radLength = mat->GetLength() / (mat->GetRL());
+		myf t;
+
+//		std::cout << "X0=" << mat->GetRL()*mat->GetRho() << " calcX0=" << X0 << " ratio=" <<  mat->GetRL()*mat->GetRho() / X0 << std::endl;
+
+		if (!fDownstream){
+			t = radLength;
+		} else{
+			t = -radLength;
+		}
+
+		myf qp = par->GetQp();
+//		std::cout << "qp0=" << qp;
+		qp *= std::exp(-t);
+		par->SetQp(qp);
+//		std::cout << " qp1=" << qp << " corr=" << std::exp(-t) << " t=" << t << std::endl;
+
+		myf cov = par->GetCovariance(14);
+		cov += CalcSigmaSqQpElectron(par, mat);
+		par->SetCovariance(14, cov);
+	} else {
+		myf Eloss = EnergyLoss(par, mat);
+		par->SetQp(CalcQpAfterEloss(par->GetQp(), Eloss));
+
+		myf cov = par->GetCovariance(14);
+		cov += CalcSigmaSqQp(par, mat);
+		par->SetCovariance(14, cov);
+	}
 }
 
 void CbmLitMaterialEffectsImp::AddThickScatter(
@@ -153,23 +180,7 @@ myf CbmLitMaterialEffectsImp::EnergyLoss(
         const CbmLitMaterialInfo* mat) const
 {
 	myf length = mat->GetRho() * mat->GetLength();
-//	return dEdx(par, mat) * length;
-	if (!fIsElectron) return dEdx(par, mat) * length;
-//	else {
-//		myf M = fMass; //GeV
-//		myf p = std::abs(1. / par->GetQp());  // GeV
-//		myf rho = mat->GetRho();
-//		myf X0 = mat->GetRL();
-////		myf me = 0.000511; // GeV
-//		myf E = std::sqrt(M * M + p * p);
-////		myf ratio = me/M;
-//
-////		std::cout << "p=" << p << " E=" << E << " eloss=" << std::abs(E * (std::exp(-length/X0)))<< std::endl;
-//
-//		return std::abs(E - E * std::exp(-mat->GetLength()/X0));
-//	}
-//	else return BetheBlochSimple(mat) * length;
-	else return BetheBlochElectron(par, mat) * length;
+	return dEdx(par, mat) * length;
 	//return MPVEnergyLoss(par, mat);
 }
 
@@ -177,9 +188,7 @@ myf CbmLitMaterialEffectsImp::dEdx(
 		const CbmLitTrackParam* par,
         const CbmLitMaterialInfo* mat) const
 {
-	myf dedx;
-	if (fIsElectron) dedx = BetheBlochElectron(par, mat);
-	else dedx = BetheBloch(par, mat);
+	myf dedx = BetheBloch(par, mat);
 	dedx += BetheHeitler(par, mat);
 	if (fIsMuon) dedx += PairProduction(par, mat);
 	return dedx;
@@ -255,6 +264,7 @@ myf CbmLitMaterialEffectsImp::CalcQpAfterEloss(
 	myf pnew = (Enew > fMass) ? std::sqrt(Enew * Enew - massSq) : 0.;
 	if (pnew != 0) return q/pnew;
 	else return 1e5;
+
 	//if (!fDownstream) eloss *= -1.0;
 	//if (p > 0.) p -= eloss;
 	//else p += eloss;

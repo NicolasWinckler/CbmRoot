@@ -26,32 +26,21 @@ void CbmLitTrdTrackFinderBranch::Init()
 	DefaultInit();
 
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
-	SetSeedSelection(factory->CreateTrackSelection("momentum"));
+	SetPropagator(factory->CreateTrackPropagator("lit"));
+	SetSeedSelection(factory->CreateTrackSelection("empty"));
 	SetStationGroupSelection(factory->CreateTrackSelection("trd_station"));
 	SetFinalSelection(factory->CreateTrackSelection("trd_final"));
-	TrackPropagatorPtr propagator = factory->CreateTrackPropagator("lit");
-	SetPropagatorToDet(propagator);
-	SetPropagator(propagator);
 	SetFilter(factory->CreateTrackUpdate("kalman"));
-
 	SetLayout(CbmLitEnvironment::Instance()->GetLayout());
-
 	SetVerbose(1);
 	SetNofIter(1);
 	IsUseFastSearch(true);
 	SetPDG(11);
-}
-
-void CbmLitTrdTrackFinderBranch::SetIterationParameters(
-		Int_t iter)
-{
-	if (iter == 0) {
-		SetMaxNofMissingHits(4);
-		IsAlwaysCreateMissingHit(false);
-		SetSigmaCoef(10.);
-		SetChiSqPixelHitCut(25.);//15.84;
-		SetChiSqStripHitCut(4.);
-	}
+	SetMaxNofMissingHits(3);
+	IsAlwaysCreateMissingHit(false);
+	SetSigmaCoef(5.);
+	SetChiSqPixelHitCut(25.);
+	SetChiSqStripHitCut(4.);
 }
 
 Int_t CbmLitTrdTrackFinderBranch::DoFind(

@@ -41,13 +41,13 @@ public:
    *@param px,py,pz,E  4 components of LorentzVector
    **/
   CbmEcalRecParticle(Double_t px, Double_t py, 
-		     Double_t pz, Double_t E,
+		     Double_t pz, Double_t e,
 		     Double_t x=-1111, Double_t y=-1111, Double_t z=-1111,
 		     Int_t id=0, Double_t chi2=-1111, CbmEcalClusterV1* cl=NULL,
 		     CbmEcalCell* cell=NULL, Int_t type=0);
 
   CbmEcalRecParticle(Int_t clnum, Int_t cellnum, Double_t px, Double_t py, 
-		     Double_t pz, Double_t E,
+		     Double_t pz, Double_t e,
 		     Double_t x=-1111, Double_t y=-1111, Double_t z=-1111,
 		     Int_t id=0, Double_t chi2=-1111, Int_t type=0);
   /** Copy constructor **/

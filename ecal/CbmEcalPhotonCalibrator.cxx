@@ -1,25 +1,4 @@
 /* $Id: CbmEcalPhotonCalibrator.cxx,v 1.6 2006/07/30 13:10:35 prokudin Exp $ */
-/*
- * $Log: CbmEcalPhotonCalibrator.cxx,v $
- * Revision 1.6  2006/07/30 13:10:35  prokudin
- * Bug hunting
- *
- * Revision 1.5  2006/07/25 20:23:31  prokudin
- * Thresholds and noise added
- *
- * Revision 1.4  2006/07/23 16:13:05  prokudin
- * Bug hunting
- *
- * Revision 1.3  2006/07/23 14:27:41  prokudin
- * Some optimization.
- *
- * Revision 1.2  2006/07/22 14:12:48  prokudin
- * Some bug hunting
- *
- * Revision 1.1  2006/07/19 09:34:45  prokudin
- * First version
- *
- */
 
 #include "CbmEcalPhotonCalibrator.h"
 
@@ -77,8 +56,8 @@ void CbmEcalPhotonCalibrator::InitForGenerator()
   Char_t maxtype=0;
   InitStructure();
 
-  CbmEcalInf* fInf=fStr->GetEcalInf();
-  if (fInf==NULL) 
+  CbmEcalInf* inf=fStr->GetEcalInf();
+  if (inf==NULL) 
     return;
 
   vector<CbmEcalModule*> modules;
@@ -99,22 +78,22 @@ void CbmEcalPhotonCalibrator::InitForGenerator()
       cells=module->GetCells();
       for(UInt_t j=0;j<cells.size();j++)
       {
-	angle=GetAngle(cells[j]->GetX1(), cells[j]->GetY1(), fInf->GetZPos());
+	angle=GetAngle(cells[j]->GetX1(), cells[j]->GetY1(), inf->GetZPos());
 	if (angle<fLowTheta[moduleType])
 	  fLowTheta[moduleType]=angle;
 	if (angle>fHighTheta[moduleType])
 	  fHighTheta[moduleType]=angle;
-	angle=GetAngle(cells[j]->GetX1(), cells[j]->GetY2(), fInf->GetZPos());
+	angle=GetAngle(cells[j]->GetX1(), cells[j]->GetY2(), inf->GetZPos());
 	if (angle<fLowTheta[moduleType])
 	  fLowTheta[moduleType]=angle;
 	if (angle>fHighTheta[moduleType])
 	  fHighTheta[moduleType]=angle;
-	angle=GetAngle(cells[j]->GetX2(), cells[j]->GetY1(), fInf->GetZPos());
+	angle=GetAngle(cells[j]->GetX2(), cells[j]->GetY1(), inf->GetZPos());
 	if (angle<fLowTheta[moduleType])
 	  fLowTheta[moduleType]=angle;
 	if (angle>fHighTheta[moduleType])
 	  fHighTheta[moduleType]=angle;
-	angle=GetAngle(cells[j]->GetX2(), cells[j]->GetY2(), fInf->GetZPos());
+	angle=GetAngle(cells[j]->GetX2(), cells[j]->GetY2(), inf->GetZPos());
 	if (angle<fLowTheta[moduleType])
 	  fLowTheta[moduleType]=angle;
 	if (angle>fHighTheta[moduleType])
@@ -202,8 +181,8 @@ void CbmEcalPhotonCalibrator::Exec(Option_t* option)
   Float_t EcalE=0;
   Float_t EcalPSE=0;
   Float_t EcalFullE=0;
-  CbmEcalInf* fInf=CbmEcalInf::GetInstance(NULL);
-  Float_t dz=fInf->GetPSLead()+fInf->GetPSScin()+fInf->GetPSGap();
+  CbmEcalInf* inf=CbmEcalInf::GetInstance(NULL);
+  Float_t dz=inf->GetPSLead()+inf->GetPSScin()+inf->GetPSGap();
   Float_t x;
   Float_t y;
   Float_t z;

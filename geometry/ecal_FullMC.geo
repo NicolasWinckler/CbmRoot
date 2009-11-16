@@ -38,6 +38,7 @@ EcalZSize=120.0	#Z size of ECAL container	[cm]
 ECut=100e-6	#Geant cuts CUTGAM CUTELE BCUTE BCUTM DCUTE [GeV]
 HCut=300e-6	#Geant cuts CUTNEU CUTHAD CUTMUO DCUTM PPCUTM [GeV]
 FastMC=0	#0 for full MC (with showers in ECAL), 1 for fast MC (only hits at sensitive plane before ECAL)
+absorber=Lead   #Material of the absorber
 structure
 #Zero for no module here. ECALs with rectangular hole only can be constructed.
 #Number means number of divisions of ECAL module in both directions: vertical and horizontal.

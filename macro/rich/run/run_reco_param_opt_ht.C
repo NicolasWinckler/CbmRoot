@@ -9,16 +9,15 @@ void run_reco_param_opt_ht(Float_t p1, Float_t p2)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile1 = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0000.mc.root";
-  TString inFile2 = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0000.reco.root";
+  TString inFile1 = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
+  TString inFile2 = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
   // Parameter file
-  TString parFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0000.params.root";
-
+  TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
   // STS digitisation file
   TString stsDigiFile = "sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0000.recorich.root";
+  TString outFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.recorich.root";
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -36,32 +35,12 @@ void run_reco_param_opt_ht(Float_t p1, Float_t p2)
   timer.Start();
   // ------------------------------------------------------------------------
 
-
-
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libEcal");
-  gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
-  gSystem->Load("libL1");
-  gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
+  gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
+  cbmlibs();
   // ------------------------------------------------------------------------
-
-
 
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *run= new FairRunAna();
@@ -79,7 +58,7 @@ void run_reco_param_opt_ht(Float_t p1, Float_t p2)
 		  2, //Nof parts
 		  11.5, 2.5, //Max-min dist
 		  3.3, 5.7, //Max-min radius
-		  5, 2, 5, 2, //HTCut
+		  p1, 2, p2, 2, //HTCut
 		  25, 25, 32, //NofBins
 		  -0.5, 0.35, 0.4,
 		  2, 0.8, 3., 1.2);

@@ -1,6 +1,6 @@
 void run_reco_param_opt_ht(Float_t p1, Float_t p2)
 {
-	Int_t nEvents = 500;
+	Int_t nEvents = 700;
 
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -75,8 +75,14 @@ void run_reco_param_opt_ht(Float_t p1, Float_t p2)
   //CbmL1RichENNRingFinder* richFinder = new CbmL1RichENNRingFinder();
   CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose, richGeoType);
   richFinder->SetFindOptPar(true);
-  richFinder->SetParameters(2, 11.5, 2.5, 3.3, 5.7, p1, p2, 9, 2, 12, 12, 16, -0.15, 0.375, 0.4,
-			2, 0.8, 3., 1.2);
+  richFinder->SetParameters(
+		  2, //Nof parts
+		  11.5, 2.5, //Max-min dist
+		  3.3, 5.7, //Max-min radius
+		  5, 2, 5, 2, //HTCut
+		  25, 25, 32, //NofBins
+		  -0.5, 0.35, 0.4,
+		  2, 0.8, 3., 1.2);
 
   CbmRichFindRings* richFindRings = new CbmRichFindRings();
   richFindRings->UseFinder(richFinder);
@@ -87,8 +93,6 @@ void run_reco_param_opt_ht(Float_t p1, Float_t p2)
 
   CbmRichRingQa* richQa   =  new CbmRichRingQa("Qa","qa", 0);
   run->AddTask(richQa);
-
-
 
   // -----  Parameter database   --------------------------------------------
   TString stsDigi = gSystem->Getenv("VMCWORKDIR");

@@ -63,6 +63,18 @@ void CbmRichRingFinderHoughImpl::Init()
 
     fFitEllipseTau = new CbmRichRingFitterEllipseTau(0, 0, fGeometryType);
     fFitEllipseTau->Init();
+
+    TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
+    if (fGeometryType == "large"){
+        richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights.txt";
+    }
+    if (fGeometryType == "compact"){
+	    richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights_Compact.txt";
+       // richSelectNNFile = "/u/slebedev/JUL09/trunk/macro/rich/NeuralNet_RingSelection_Weights1.txt";
+    }
+    fANNSelect = new CbmRichRingSelectNeuralNet(0, richSelectNNFile);
+    fANNSelect->Init();
+
 }
 
 CbmRichRingFinderHoughImpl::CbmRichRingFinderHoughImpl()
@@ -110,6 +122,8 @@ void CbmRichRingFinderHoughImpl::SetParameters( Int_t nofParts,
 
     fMaxDistance = maxDistance;
     fMinDistance = minDistance;
+    fMinDistanceSq = fMinDistance*fMinDistance;
+    fMaxDistanceSq = fMaxDistance*fMaxDistance;
 
     fMinRadius = minRadius;
     fMaxRadius = maxRadius;
@@ -146,14 +160,11 @@ void CbmRichRingFinderHoughImpl::SetParameters( Int_t nofParts,
 ///Set Parameters for specify geometry
 void CbmRichRingFinderHoughImpl::SetParameters(TString geometry)
 {
-    cout << "-I- CbmRichRingFinderHough::SetParameters for " << geometry << " RICH geometry"<<endl;
     if (geometry != "compact" && geometry != "large"){
         geometry = "compact";
         cout << "-E- CbmRichRingFinderHough::SetParameters UNKNOWN geometry,  " <<
         "Set default parameters for "<< geometry << " RICH geometry"<<endl;
     }
-
-    TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
 
     if (geometry == "large"){
         fNofParts = 1;
@@ -185,8 +196,6 @@ void CbmRichRingFinderHoughImpl::SetParameters(TString geometry)
     	fMaxCutEl = 0.3;
     	fRmsCoeffCOP = 3.;
     	fMaxCutCOP = 1.2;
-
-        richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights.txt";
     }
 
     if (geometry == "compact"){
@@ -220,7 +229,7 @@ void CbmRichRingFinderHoughImpl::SetParameters(TString geometry)
         fNofBinsY = 25;
         fNofBinsR = 32;
 
-		fAnnCut = -0.15;
+		fAnnCut = -0.5;
 		fUsedHitsCut = 0.35;
 		fUsedHitsAllCut = 0.4;
 
@@ -228,18 +237,11 @@ void CbmRichRingFinderHoughImpl::SetParameters(TString geometry)
     	fMaxCutEl = 0.8;
     	fRmsCoeffCOP = 3.;
     	fMaxCutCOP = 1.2;
-
-	    richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights_Compact.txt";
     }
-
-
     fDx = 2.*fMaxDistance / (Float_t)fNofBinsX;
     fDy = 2.*fMaxDistance / (Float_t)fNofBinsY;
     fDr = fMaxRadius / (Float_t)fNofBinsR;
     fNofBinsXY = fNofBinsX * fNofBinsY;
-
-    fANNSelect = new CbmRichRingSelectNeuralNet(0, richSelectNNFile);
-    fANNSelect->Init();
 }
 
 void CbmRichRingFinderHoughImpl::HoughTransformReconstruction()
@@ -533,15 +535,16 @@ void CbmRichRingFinderHoughImpl::RemoveHitsAroundEllipse(Int_t indmin, Int_t ind
 
 void CbmRichRingFinderHoughImpl::RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring)
 {
-	Double_t drHitCut = sqrt(ring->GetChi2()/ring->GetNofHits());
-	if (drHitCut > 0.3)	drHitCut = 0.3;
+	Double_t rms = TMath::Sqrt(ring->GetChi2()/ring->GetNofHits());
+	Double_t dCut = fRmsCoeffEl * rms;
+	if (dCut > fMaxCutEl) dCut = fMaxCutEl;
 
 	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
 		Double_t rx = fData[j + indmin].fX - ring->GetCenterX();
 		Double_t ry = fData[j + indmin].fY - ring->GetCenterY();
 
 		Double_t dr = fabs(sqrt(rx * rx + ry * ry) - ring->GetRadius());
-		if (dr < drHitCut) {
+		if (dr < dCut) {
 			fData[j+indmin].fIsUsed = true;
 		}
 	}
@@ -613,6 +616,8 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 	xc = ring1->GetCenterX();
 	yc = ring1->GetCenterY();
 	r = ring1->GetRadius();
+	delete ring1;
+
 	CbmRichRing* ring2 = new CbmRichRing();
 	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
 		Float_t rx = fData[j + indmin].fX - xc;
@@ -624,14 +629,21 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 			ring2->AddHit(fData[j + indmin].fId);
 		}
 	}
-	fFitEllipseTau->DoFit(ring2);
-
+	//fFitEllipseTau->DoFit(ring2);
+	fFitCOP->DoFit(ring2);
 	fANNSelect->DoSelect(ring2);
-	//remove found hits only for good quality rings
-	if (ring2->GetSelectionNN() > fAnnCut) {
-		//RemoveHitsAroundRing(indmin, indmax, &ring2);
-		RemoveHitsAroundEllipse(indmin, indmax, ring2);
+	Double_t select = ring2->GetSelectionNN();
 
+	//remove found hits only for good quality rings
+	if (select > fAnnCut) {
+
+		RemoveHitsAroundRing(indmin, indmax, ring2);
+		//RemoveHitsAroundEllipse(indmin, indmax, ring2);
+
+		//fFoundRings.push_back(ring2);
+	}
+
+	if (select > -0.7) {
 		fFoundRings.push_back(ring2);
 	}
 	//fFoundRings.push_back(ring2);

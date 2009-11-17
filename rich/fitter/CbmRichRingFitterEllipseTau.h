@@ -27,9 +27,12 @@
 
 using namespace std;
 
+#define MAX_NOF_HITS 150
+
 class CbmRichRingFitterEllipseTau : public CbmRichRingFitterEllipseBase
 {
 public:
+
 
 /***** Methods *****/
 
@@ -50,14 +53,20 @@ public:
 	void TransEllipse(CbmRichRing *pRing);
 	void InitMatrices();
 	void Taubin();
-
+	void Inv5x5();
+	void AMultB(const Double_t * const ap, Int_t na, Int_t ncolsa,
+	            const Double_t * const bp, Int_t nb, Int_t ncolsb, Double_t *cp);
+	void Jacobi(Double_t a[5][5], Double_t d[5], Double_t v[5][5]);
+	void Eigsrt(Double_t d[5],  Double_t v[5][5]);
 private:
 
-	TMatrixD fM;
-	TMatrixD fP;
-	TMatrixD fQ;
+	Double_t fM[36];
+	Double_t fP[25];
+	Double_t fQ[25];
+	Double_t fZ[MAX_NOF_HITS*6];
+	Double_t fZT[MAX_NOF_HITS*6];
 
-	vector<Double_t> fAlgPar;
+	Double_t fAlgPar[6];
 	vector<Double_t> fX;
 	vector<Double_t> fY;
 

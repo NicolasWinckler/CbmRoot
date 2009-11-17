@@ -52,7 +52,9 @@ void CbmRichRingSelectImpl::Init()
 		cout << "-W- CbmRichRingSelectImpl::Init(): No RichHit array!"
 		<< endl;
 	}
-
+	kMAX_NOF_HITS = 100;
+	fAlpha.resize(kMAX_NOF_HITS);
+	fPhi.resize(kMAX_NOF_HITS);
 }
 
 Int_t CbmRichRingSelectImpl::GetNofHitsOnRing(CbmRichRing* ring){
@@ -103,48 +105,47 @@ Int_t CbmRichRingSelectImpl::GetNofHitsOnRingCircle(CbmRichRing* ring)
 	return count;
 }
 
-Double_t CbmRichRingSelectImpl::GetAngle(CbmRichRing* ring){
-    Double_t Pi = TMath::Pi();
-    CbmRichHit * hit;
-    Int_t nHits = ring->GetNofHits();
-    Double_t xRing = ring->GetCenterX();
-    Double_t yRing = ring->GetCenterY();
-    Double_t xHit, yHit;
+Double_t CbmRichRingSelectImpl::GetAngle(CbmRichRing* ring)
+{
+    register Int_t nHits = ring->GetNofHits();
+	if (nHits > kMAX_NOF_HITS) return 0.2;
+	if (nHits < 4) return 999.;
 
-    vector<Double_t> alpha;
-    vector<Double_t> phi;
-    alpha.reserve(nHits + 3);
-    phi.reserve(nHits + 3);
-    if (nHits < 4) return 999.;
+	register Double_t Pi = TMath::Pi();
+	register Double_t TwoPi = 2.*TMath::Pi();
+    CbmRichHit * hit;
+    register Double_t xRing = ring->GetCenterX();
+    register Double_t yRing = ring->GetCenterY();
+    register Double_t xHit, yHit;
+
     for(Int_t iHit = 0; iHit < nHits; iHit++){
 		hit = (CbmRichHit*)fHitsArray->At(ring->GetHit(iHit));
 		xHit = hit->GetX();
 		yHit = hit->GetY();
 
 		if (!hit) continue;
-		if (yHit-yRing == 0) return 999.;
-		if (xHit-xRing == 0) return 999.;
+		if (yHit-yRing == 0 || xHit-xRing == 0) return 999.;
 
 		if( xHit > xRing && yHit > yRing ){
-			alpha.push_back(atan(fabs((yHit-yRing)/(xHit-xRing))));
+			fAlpha[iHit] = atan(fabs((yHit-yRing)/(xHit-xRing)));
 		}else if( xHit < xRing && yHit > yRing ){
-			alpha.push_back(Pi - atan(fabs((yHit-yRing)/(xHit-xRing))));
+			fAlpha[iHit] = Pi - atan(fabs((yHit-yRing)/(xHit-xRing)));
 		}else if( xHit < xRing && yHit < yRing ){
-			alpha.push_back(Pi + atan(fabs((yHit-yRing)/(xHit-xRing))));
+			fAlpha[iHit] = Pi + atan(fabs((yHit-yRing)/(xHit-xRing)));
 		} else if( xHit > xRing && yHit < yRing ){
-			alpha.push_back(2*Pi - atan(fabs((yHit-yRing)/(xHit-xRing))));
+			fAlpha[iHit] = TwoPi - atan(fabs((yHit-yRing)/(xHit-xRing)));
 		}
     }
 
-    sort(alpha.begin(),alpha.end());
+    sort(fAlpha.begin(),fAlpha.begin()+nHits);
 
-    for(Int_t i = 0; i < nHits-1; i++) phi.push_back(alpha[i+1] - alpha[i]);
-    phi.push_back(2*Pi - alpha[nHits-1] + alpha[0]);
-    sort(phi.begin(),phi.end());
+    for(Int_t i = 0; i < nHits-1; i++) fPhi[i] = fAlpha[i+1] - fAlpha[i];
+    fPhi[nHits-1] = 2*Pi - fAlpha[nHits-1] + fAlpha[0];
+    sort(fPhi.begin(),fPhi.begin()+nHits);
 
-    Double_t bigestAngle = phi[nHits-1]+phi[nHits-2]+phi[nHits-3];
+    Double_t angle = fPhi[nHits-1]+fPhi[nHits-2]+fPhi[nHits-3];
 
-    return bigestAngle;
+    return angle;
 }
 
 

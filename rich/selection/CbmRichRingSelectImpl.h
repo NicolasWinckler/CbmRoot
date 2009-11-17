@@ -23,30 +23,30 @@
 
 #include "TObject.h"
 #include "TClonesArray.h"
-
+#include <vector>
 class CbmRichRing;
 
 class CbmRichRingSelectImpl
 {
+public:
+	Int_t kMAX_NOF_HITS;
+	 /** Default constructor **/
+	 CbmRichRingSelectImpl() { };
 
- public:
+	 /** Destructor **/
+	 ~CbmRichRingSelectImpl() { };
 
-  /** Default constructor **/
-  CbmRichRingSelectImpl() { };
+	 void Init();
 
-  /** Destructor **/
-  ~CbmRichRingSelectImpl() { };
-
-  void Init();
-
-  Int_t GetNofHitsOnRing(CbmRichRing* ring);
-  Int_t GetNofHitsOnRingCircle(CbmRichRing* ring);
-  Double_t GetAngle(CbmRichRing* ring);
+	 Int_t GetNofHitsOnRing(CbmRichRing* ring);
+	 Int_t GetNofHitsOnRingCircle(CbmRichRing* ring);
+	 Double_t GetAngle(CbmRichRing* ring);
 protected:
-
+    std::vector<Double_t> fAlpha;
+    std::vector<Double_t> fPhi;
 	TClonesArray* fHitsArray;
 
-  ClassDef(CbmRichRingSelectImpl,1);
+	ClassDef(CbmRichRingSelectImpl,1);
 
 };
 

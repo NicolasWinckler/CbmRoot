@@ -367,7 +367,7 @@ void CbmRichRingQa::Exec(Option_t* option)
     }
 
     EfficiencyCalc();
-    DiffFakeTrue();
+    DiffFakeTrueCircle();
     RingTrackMatchEff();
 
    cout <<  "fNofAllRings="<< fNofAllRings <<
@@ -724,7 +724,8 @@ void CbmRichRingQa::DiffFakeTrueCircle()
 				|| TMath::IsNaN(angle) || TMath::IsNaN(hitsOnRing)
 				|| TMath::IsNaN(radPos) || TMath::IsNaN(radius)
 				|| TMath::IsNaN(chi2))	continue;
-
+		if (nHits == 0) continue;
+		if (chi2 > 10000000000.) continue;
 		if (recFlag == 1)
 			foutFakeAndTrue << nHits << " " << angle << " "
 					<< hitsOnRing << " " << radPos << " " << radius << " "

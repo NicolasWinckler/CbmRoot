@@ -22,8 +22,6 @@ public:
             TClonesArray* trackArray);
 
 private:
-    virtual void SetIterationParameters(
-    		Int_t iter);
 
     ClassDef(CbmLitTrdTrackFinderBranch, 1);
 };

@@ -13,7 +13,7 @@
 *  Revision 1.1  2006/09/13 14:53:31  hoehne
 *  initial version
 *
-*  
+*
 *
 *******************************************************************************/
 
@@ -35,7 +35,7 @@ class CbmRichRingSelectImpl : public  CbmRichRingSelect
 
   /** Default constructor **/
   CbmRichRingSelectImpl() { };
-  
+
   /** Destructor **/
   virtual ~CbmRichRingSelectImpl() { };
 
@@ -44,9 +44,10 @@ class CbmRichRingSelectImpl : public  CbmRichRingSelect
   virtual void DoSelect(CbmRichRing* ring) = 0;
 
    void SetVerbose(Int_t verbose) { fVerbose = verbose; };
-   
+
   Int_t GetNofHitsOnRing(CbmRichRing* ring);
-  Double_t GetAngle(CbmRichRing* ring);   
+  Int_t GetNofHitsOnRingCircle(CbmRichRing* ring);
+  Double_t GetAngle(CbmRichRing* ring);
  protected:
 
   Int_t fVerbose;      // Verbosity level

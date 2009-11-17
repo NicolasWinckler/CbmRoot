@@ -87,6 +87,22 @@ Int_t CbmRichRingSelectImpl::GetNofHitsOnRing(CbmRichRing* ring){
 	return count;
 }
 
+Int_t CbmRichRingSelectImpl::GetNofHitsOnRingCircle(CbmRichRing* ring)
+{
+    Int_t count = 0;
+	Int_t nHits = ring->GetNofHits();
+	CbmRichHit* hitRing;
+	for (Int_t iH = 0; iH < nHits; iH++) {
+		hitRing = (CbmRichHit*) fHitsArray->At(ring->GetHit(iH));
+		if (!hitRing)continue;
+		Double_t rx = hitRing->GetX() - ring->GetCenterX();
+		Double_t ry = hitRing->GetY() - ring->GetCenterY();
+		Double_t r = sqrt(rx * rx + ry * ry) - ring->GetRadius();
+		if (r < 0.35)	count++;
+	}
+	return count;
+}
+
 Double_t CbmRichRingSelectImpl::GetAngle(CbmRichRing* ring){
     Double_t Pi = TMath::Pi();
     CbmRichHit * hit;

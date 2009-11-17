@@ -674,6 +674,7 @@ void CbmMuchSegmentManual::DrawSegmentation(){
         CbmMuchModule* mod = layerSide->GetModule(iModule);
         mod->SetFillStyle(0);
         mod->Draw();
+        if(mod->GetDetectorType() != 1) continue;
         CbmMuchModuleGem* module = (CbmMuchModuleGem*)mod;
         for (Int_t iSector=0;iSector<module->GetNSectors();++iSector){
           CbmMuchSector* sector = module->GetSector(iSector);

@@ -10,10 +10,10 @@
  *
  * The detector ID consists of:
  *   system ID      (0-15, MUCH=4), bits 0-3
- *   station number (0-7),          bits 4-6
- *   layer number   (0-7),          bits 7-9
- *   layer side     (0-1),          bits 10 [0 - Front, 1 - Back]
- *   module number  (0-511),        bits 11-19
+ *   station number (0-31),         bits 4-8
+ *   layer number   (0-7),          bits 9-11
+ *   layer side     (0-1),          bits 12 [0 - Front, 1 - Back]
+ *   module number  (0-511),        bits 13-21
  *
  */
 
@@ -41,16 +41,16 @@ using std::map;
 
 // Length of the index of the corresponding volume
 #define WL_SYSTEM 15
-#define WL_STATION 7
+#define WL_STATION 31
 #define WL_LAYER 7
 #define WL_LAYERSIDE 1
 #define WL_MODULE 511
 // Number of a start bit for each volume
 #define SB_SYSTEM 0
 #define SB_STATION 4
-#define SB_LAYER 7
-#define SB_LAYERSIDE 10
-#define SB_MODULE 11
+#define SB_LAYER 9
+#define SB_LAYERSIDE 12
+#define SB_MODULE 13
 
 class CbmMuchGeoScheme: public TObject {
 

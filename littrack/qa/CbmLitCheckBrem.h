@@ -3,6 +3,7 @@
 
 #include "TObject.h"
 #include <string>
+#include <vector>>
 class TGraph;
 
 class CbmLitSimpleMaterial {

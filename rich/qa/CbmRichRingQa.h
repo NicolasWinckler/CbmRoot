@@ -10,7 +10,9 @@ Author : Semen Lebedev (S.Lebedev@gsi.de)
 #include "CbmRichRing.h"
 
 #include "FairTask.h"
-
+#include "CbmRichRingFitterCOP.h"
+#include "CbmRichRingFitterEllipseTau.h"
+#include "CbmRichRingSelectImpl.h"
 #include "TH1D.h"
 #include "TH2D.h"
 
@@ -58,9 +60,14 @@ class CbmRichRingQa : public FairTask{
 
     void EfficiencyCalc();
     void DiffFakeTrue();
+    void DiffFakeTrueCircle();
     Bool_t DoesRingHaveProjection(Int_t trackId);
     Double_t GetStsMomentum(CbmRichRing * ring);
     void RingTrackMatchEff();
+
+    CbmRichRingFitterCOP* fFitCOP;
+    CbmRichRingFitterEllipseTau* fFitEllipse;
+    CbmRichRingSelectImpl* fSelectImpl;
 
     Int_t fNofAllRings;      //number of all MC rings
     Int_t fNofElRings;  //number of all electron MC rings

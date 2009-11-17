@@ -10,8 +10,6 @@ Author : Semen Lebedev (S.Lebedev@gsi.de)
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
 #include "CbmRichRingMatch.h"
-#include "CbmRichRingFitterCOP.h"
-#include "CbmRichRingFitterEllipseTau.h"
 
 #include "FairRootManager.h"
 #include "CbmMCTrack.h"
@@ -154,74 +152,77 @@ CbmRichRingQa::~CbmRichRingQa()
 
 InitStatus CbmRichRingQa::Init()
 {
-    cout << "InitStatus CbmRichRingQa::Init()"<<endl;
- // Get and check CbmRootManager
-  FairRootManager* ioman = FairRootManager::Instance();
-  if (! ioman) {
-    cout << "-E- CbmRichRingQa::Init: "
-     << "RootManager not instantised!" << endl;
-    return kERROR;
-  }
+    cout << "InitStatus CbmRichRingQa::Init()" << endl;
+	// Get and check CbmRootManager
+	FairRootManager* ioman = FairRootManager::Instance();
+	if (!ioman) {
+		cout << "-E- CbmRichRingQa::Init: " << "RootManager not instantised!"<< endl;
+		return kERROR;
+	}
 
-  // Get hit Array
-  fHits = (TClonesArray*) ioman->GetObject("RichHit");
-  if ( ! fHits) {
-    cout << "-W- CbmRichRingQa::Init: No RichHit array!"
-     << endl;
-  }
+	// Get hit Array
+	fHits = (TClonesArray*) ioman->GetObject("RichHit");
+	if (!fHits) {
+		cout << "-W- CbmRichRingQa::Init: No RichHit array!" << endl;
+	}
 
-  // Get RichRing Array
-  fRings = (TClonesArray*) ioman->GetObject("RichRing");
-  if ( ! fRings ) {
-    cout << "-E- CbmRichRingQa::Init: No RichRing array!" << endl;
-    return kERROR;
-  }
+	// Get RichRing Array
+	fRings = (TClonesArray*) ioman->GetObject("RichRing");
+	if (!fRings) {
+		cout << "-E- CbmRichRingQa::Init: No RichRing array!" << endl;
+		return kERROR;
+	}
 
-  // Get MC Point array
-  fPoints = (TClonesArray*) ioman->GetObject("RichPoint");
-  if ( ! fPoints ) {
-    cout << "-E- CbmRichRingQa::Init: No RichPoint array!" << endl;
-    return kERROR;
-  }
+	// Get MC Point array
+	fPoints = (TClonesArray*) ioman->GetObject("RichPoint");
+	if (!fPoints) {
+		cout << "-E- CbmRichRingQa::Init: No RichPoint array!" << endl;
+		return kERROR;
+	}
 
-  // Get MC Point array
-  fTracks = (TClonesArray*) ioman->GetObject("MCTrack");
-  if ( ! fTracks ) {
-    cout << "-E- CbmRichRingQa::Init: No MCTrack array!" << endl;
-    return kERROR;
-  }
+	// Get MC Point array
+	fTracks = (TClonesArray*) ioman->GetObject("MCTrack");
+	if (!fTracks) {
+		cout << "-E- CbmRichRingQa::Init: No MCTrack array!" << endl;
+		return kERROR;
+	}
 
-  // Get RichRingMatch array
-  fMatches = (TClonesArray*) ioman->GetObject("RichRingMatch");
-  if ( ! fMatches ) {
-    cout << "-E- CbmRichRingQa::Init: No RichRingMatch array!" << endl;
-    return kERROR;
-  }
+	// Get RichRingMatch array
+	fMatches = (TClonesArray*) ioman->GetObject("RichRingMatch");
+	if (!fMatches) {
+		cout << "-E- CbmRichRingQa::Init: No RichRingMatch array!" << endl;
+		return kERROR;
+	}
 
-  // Get RichProjection array
-  fProj = (TClonesArray*) ioman->GetObject("RichProjection");
-  if ( ! fProj ) {
-    cout << "-E- CbmRichRingQa::Init: No RichProjection array!" << endl;
-    return kERROR;
-  }
+	// Get RichProjection array
+	fProj = (TClonesArray*) ioman->GetObject("RichProjection");
+	if (!fProj) {
+		cout << "-E- CbmRichRingQa::Init: No RichProjection array!" << endl;
+		return kERROR;
+	}
 
+	// get TrackMatch array
+	fTrackMatch = (TClonesArray*) ioman->GetObject("STSTrackMatch");
+	if (!fTrackMatch) {
+		cout << "-E- CbmRichRingQa::Init: No track match array!" << endl;
+		return kERROR;
+	}
 
-  // get TrackMatch array
-  fTrackMatch = (TClonesArray*) ioman->GetObject("STSTrackMatch");
-  if ( ! fTrackMatch) {
-    cout << "-E- CbmRichRingQa::Init: No track match array!"<< endl;
-    return kERROR;
-  }
+	// Get global track array
+	gTrackArray = (TClonesArray*) ioman->GetObject("GlobalTrack");
+	if (!gTrackArray) {
+		cout << "-W- CbmRichRingQa::Init: No global track array!" << endl;
+		return kERROR;
+	}
 
-  // Get global track array
-    gTrackArray = (TClonesArray*) ioman->GetObject("GlobalTrack");
-    if ( ! gTrackArray) {
-        cout << "-W- CbmRichRingQa::Init: No global track array!"
-        << endl;
-    return kERROR;
-     }
+    fFitCOP = new CbmRichRingFitterCOP(0,0);
+    fFitCOP->Init();
+    fFitEllipse = new CbmRichRingFitterEllipseTau(0,0,"compact");
+    fFitEllipse->Init();
+    fSelectImpl = new CbmRichRingSelectImpl();
+    fSelectImpl->Init();
 
-  return kSUCCESS;
+    return kSUCCESS;
 
 }
 
@@ -343,12 +344,6 @@ void CbmRichRingQa::Exec(Option_t* option)
         }
     }  ///Loop for all MC rings
 
-
-    CbmRichRingFitterCOP* fitCOP = new CbmRichRingFitterCOP(0,0);
-    fitCOP->Init();
-    CbmRichRingFitterEllipseTau* fitEllipse = new CbmRichRingFitterEllipseTau(0,0,"compact");
-    fitEllipse->Init();
-
     for (itMapWithHits=fRingMapWithHits.begin(); itMapWithHits!=fRingMapWithHits.end(); itMapWithHits++) {
         track = (CbmMCTrack*) fTracks->At(itMapWithHits->first);
         Double_t momentum = track->GetP();
@@ -362,16 +357,14 @@ void CbmRichRingQa::Exec(Option_t* option)
         Int_t motherId = track->GetMotherId();
         if ((TMath::Abs(gcode) == 11)&& motherId == -1) {///primary electron rings
             if (isProj && itMapWithHits->second.GetNofHits() >= fNofHitsInRingCut){
-                fitCOP->DoFit(&(itMapWithHits->second));
-                fitEllipse->DoFit(&(itMapWithHits->second));
+                fFitCOP->DoFit(&(itMapWithHits->second));
+                fFitEllipse->DoFit(&(itMapWithHits->second));
                 fh_MCElRingsProjHitCutRadPos->Fill(itMapWithHits->second.GetRadialPosition());
                 Double_t bOverA = itMapWithHits->second.GetBaxis()/itMapWithHits->second.GetAaxis();
                 fh_MCElRingsProjHitCutBoverA->Fill(bOverA);
             }
         }
     }
-    delete fitCOP;
-    delete fitEllipse;
 
     EfficiencyCalc();
     DiffFakeTrue();
@@ -700,6 +693,51 @@ void CbmRichRingQa::DiffFakeTrue()
 
 }
 
+void CbmRichRingQa::DiffFakeTrueCircle()
+{
+    CbmRichRingMatch *match;
+	CbmRichRing* ring;
+	Int_t nMatches = fMatches->GetEntriesFast();
+
+	for (Int_t iMatches = 0; iMatches < nMatches; iMatches++) {
+		match = (CbmRichRingMatch*) fMatches->At(iMatches);
+		if (!match) {
+			cout << "-E- CbmRichRingQa::DiffFakeTrueCOP() no match" << iMatches	<< endl;
+			continue;
+		}
+		ring = (CbmRichRing*) fRings->At(iMatches);
+		if (!ring) {
+			cout << "-E- CbmRichRingQa::DiffFakeTrueCOP() no ring" << iMatches	<< endl;
+			continue;
+		}
+		fFitCOP->DoFit(ring);
+
+		Int_t recFlag = ring->GetRecFlag();
+		Double_t angle = fSelectImpl->GetAngle(ring);
+		Int_t hitsOnRing = fSelectImpl->GetNofHitsOnRingCircle(ring);
+		Double_t chi2 = ring->GetChi2() / ring->GetNDF();
+		Int_t nHits = ring->GetNofHits();
+		Double_t radPos = ring->GetRadialPosition();
+		Double_t radius = ring->GetRadius();
+
+		if (TMath::IsNaN(nHits)
+				|| TMath::IsNaN(angle) || TMath::IsNaN(hitsOnRing)
+				|| TMath::IsNaN(radPos) || TMath::IsNaN(radius)
+				|| TMath::IsNaN(chi2))	continue;
+
+		if (recFlag == 1)
+			foutFakeAndTrue << nHits << " " << angle << " "
+					<< hitsOnRing << " " << radPos << " " << radius << " "
+					<< chi2 << " " << -1 << endl;
+
+		if (recFlag == 3)
+			foutFakeAndTrue << nHits << " " << angle << " "
+			<< hitsOnRing << " " << radPos << " " << radius << " "
+			<< chi2 << " " << 1 << endl;
+
+	}///loop over matches
+}
+
 void CbmRichRingQa::RingTrackMatchEff()
 {
     CbmRichRingMatch *match;
@@ -856,6 +894,9 @@ void CbmRichRingQa::FinishTask()
 		(Double_t)fNofFakeRings/fEventNumber << " " <<
 		(Double_t)fNofTrueFoundElRingsProjHitCut/(Double_t)fNofElRingsProjHitCut << endl;
 
+    delete fFitCOP;
+    delete fFitEllipse;
+    delete fSelectImpl;
 }
 
 ClassImp(CbmRichRingQa)

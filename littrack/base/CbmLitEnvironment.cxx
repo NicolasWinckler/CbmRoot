@@ -549,7 +549,7 @@ bool CbmLitEnvironment::IsTrdSegmented() const
 	TObjArray *detList = baseParSet->GetDetList();
 	FairDetector* much = (FairDetector*) detList->FindObject("TRD");
 	TString name = much->GetGeometryFileName();
-	if(name.Contains("monolithic")) {
+	if(name.Contains("monolithic") && !name.Contains("monolithic_new")) {
 		return false;
 	} else {
 		return true;

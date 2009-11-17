@@ -21,14 +21,12 @@
 #ifndef CBM_RICH_RING_SELECT_IMPL
 #define CBM_RICH_RING_SELECT_IMPL 1
 
-#include "CbmRichRingSelect.h"
-
 #include "TObject.h"
 #include "TClonesArray.h"
 
 class CbmRichRing;
 
-class CbmRichRingSelectImpl : public  CbmRichRingSelect
+class CbmRichRingSelectImpl
 {
 
  public:
@@ -37,20 +35,15 @@ class CbmRichRingSelectImpl : public  CbmRichRingSelect
   CbmRichRingSelectImpl() { };
 
   /** Destructor **/
-  virtual ~CbmRichRingSelectImpl() { };
+  ~CbmRichRingSelectImpl() { };
 
-  virtual void Init();
-
-  virtual void DoSelect(CbmRichRing* ring) = 0;
-
-   void SetVerbose(Int_t verbose) { fVerbose = verbose; };
+  void Init();
 
   Int_t GetNofHitsOnRing(CbmRichRing* ring);
   Int_t GetNofHitsOnRingCircle(CbmRichRing* ring);
   Double_t GetAngle(CbmRichRing* ring);
- protected:
+protected:
 
-  Int_t fVerbose;      // Verbosity level
 	TClonesArray* fHitsArray;
 
   ClassDef(CbmRichRingSelectImpl,1);

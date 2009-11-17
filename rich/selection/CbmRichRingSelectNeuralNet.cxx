@@ -56,7 +56,8 @@ CbmRichRingSelectNeuralNet::~CbmRichRingSelectNeuralNet()
 // -----   Initialization   ----------------------------------------------------
 void CbmRichRingSelectNeuralNet::Init ()
 {
-    CbmRichRingSelectImpl::Init();
+    fSelectImpl = new CbmRichRingSelectImpl();
+    fSelectImpl->Init();
 
     TTree *simu = new TTree ("MonteCarlo","MontecarloData");
     Float_t x1,x3,x4,x5,x6,x7,x8, x9, x10, x11;
@@ -95,8 +96,8 @@ void CbmRichRingSelectNeuralNet::DoSelect(CbmRichRing* ring)
         return;
     }
 
-    ring->SetAngle(GetAngle(ring));
-    ring->SetNofHitsOnRing(GetNofHitsOnRing(ring));
+    ring->SetAngle(fSelectImpl->GetAngle(ring));
+    ring->SetNofHitsOnRing(fSelectImpl->GetNofHitsOnRing(ring));
 
     Double_t nnPar[10];
     nnPar[0] =  ring->GetNofHits();

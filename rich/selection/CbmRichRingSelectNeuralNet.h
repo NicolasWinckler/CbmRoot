@@ -17,7 +17,7 @@
 *  Revision 1.1  2006/09/13 14:53:31  hoehne
 *  initial version
 *
-*  
+*
 *
 *******************************************************************************/
 
@@ -30,12 +30,13 @@
 /*#include "FairTask.h"
 #include "FairRootManager.h"*/
 #include "CbmRichRingSelectImpl.h"
+#include "CbmRichRingSelect.h"
 #include "TMultiLayerPerceptron.h"
 #include "TTree.h"
 
 class TMultiLayerPerceptron;
 
-class CbmRichRingSelectNeuralNet : public CbmRichRingSelectImpl {
+class CbmRichRingSelectNeuralNet : public CbmRichRingSelect {
 
 	  /** Verbosity level **/
   	Int_t fVerbose;
@@ -45,13 +46,14 @@ public:
   	CbmRichRingSelectNeuralNet();// Default constructor
   	CbmRichRingSelectNeuralNet ( Int_t verbose, const char* NNFile);// Standard constructor
 	~CbmRichRingSelectNeuralNet();
-	
+
 	virtual void Init();
 	void DoSelect(CbmRichRing* ring);
-				
-	TMultiLayerPerceptron* fNN;    
-	      
+
+	TMultiLayerPerceptron* fNN;
+	CbmRichRingSelectImpl* fSelectImpl;
+
 	ClassDef(CbmRichRingSelectNeuralNet,1);
 };
 
-#endif 
+#endif

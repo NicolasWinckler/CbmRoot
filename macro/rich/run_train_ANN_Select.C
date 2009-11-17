@@ -1,10 +1,10 @@
 /*  Description: This macro train the ANN for fake
      rejection algorithm.
 
-    Author : Simeon Lebedev
+    Author : Semen Lebedev
     E-mail : S.Lebedev@gsi.de
 */
-{
+void run_train_ANN_Select(){
     Int_t i;
     std::ifstream  finFakeAndTrue("ann_fake_and_true.txt");
 
@@ -16,27 +16,27 @@
 
 
     simu->Branch("x1", &x1,"x1/F");
-    //simu->Branch("x2", &x2,"x2/F");
+    simu->Branch("x2", &x2,"x2/F");
     simu->Branch("x3", &x3,"x3/F");
     simu->Branch("x4", &x4,"x4/F");
     simu->Branch("x5", &x5,"x5/F");
     simu->Branch("x6", &x6,"x6/F");
-    simu->Branch("x7", &x7,"x7/F");
-    simu->Branch("x8", &x8,"x8/F");
-    simu->Branch("x9", &x9,"x9/F");
-    simu->Branch("x10", &x10,"x10/F");
+    //simu->Branch("x7", &x7,"x7/F");
+    //simu->Branch("x8", &x8,"x8/F");
+    //simu->Branch("x9", &x9,"x9/F");
+    //simu->Branch("x10", &x10,"x10/F");
     simu->Branch("x11", &x11,"x11/F");
 
-    Int_t maxNofFake = 1500;
-    Int_t maxNofTrue = 1500;
+    Int_t maxNofFake = 3000;
+    Int_t maxNofTrue = 3000;
     Int_t inputCountTrue = 0;
     Int_t inputCountFake = 0;
 
     while ( !finFakeAndTrue.eof() ){
-        finFakeAndTrue >> x1  >> x2 >> x3 >> x4 >> x5 >> x6 >> x7 >> x8 >> x9 >> x10 >>x11;
-
-        //cout << " "<< x1 << " "<<  x2 << " " << x3 << " "<< x4 << " "<< x5 << " " <<
-        //x6 << " " << x7 << " " << x8 << " "<< x9  << " " << x10 << " " << x11 << endl;
+        //finFakeAndTrue >> x1  >> x2 >> x3 >> x4 >> x5 >> x6 >> x7 >> x8 >> x9 >> x10 >>x11;
+        finFakeAndTrue >> x1  >> x2 >> x3 >> x4 >> x5 >> x6 >> x11;
+        cout << " "<< x1 << " "<<  x2 << " " << x3 << " "<< x4 << " "<< x5 << " " <<
+        x6 <<" "<< x11 << endl;
 
         if ( x11 == -1 && inputCountFake < maxNofFake){
             inputCountFake++;
@@ -51,10 +51,10 @@
         }
     }
 
-    TMultiLayerPerceptron network("x1,x3,x4,x5,x6,x7,x8,x9,x10:20:x11",simu,"Entry$+1");
+    TMultiLayerPerceptron network("x1,x2,x3,x4,x5,x6:10:x11",simu,"Entry$+1");
    // network.LoadWeights("NeuralNet_RingSelection_Weights_Ellipse.txt");
     network.Train(500,"text,update=1");
-    network.DumpWeights("NeuralNet_RingSelection_Weights.txt");
+    network.DumpWeights("NeuralNet_RingSelection_Weights1.txt");
 
     Double_t minEval = -1.3;
     Double_t maxEval = 1.3;
@@ -77,7 +77,7 @@
     Int_t NofFakeTest = 0;
 
     while ( !finTest.eof() ){
-        finTest >> x1  >> x2 >> x3 >> x4 >> x5 >> x6 >> x7 >> x8 >> x9 >> x10 >> x11;
+        finTest >> x1  >> x2 >> x3 >> x4 >> x5 >> x6 >> x11;
 
        // cout << " "<< x1 << " "<<  x2 << " " << x3 << " "<< x4 << " "<< x5 << " " <<
        // x6 << " " << x7 << " " << x8 << " "<< x9  << " " << x10 << " " << x11 << endl;
@@ -86,15 +86,15 @@
         if (x11 == 1 )NofTrueTest++;
 
         params[0] =  x1;
-      //  params[1] =  x2;
-        params[1] =  x3;
-        params[2] =  x4;
-        params[3] =  x5;
-        params[4] =  x6;
-        params[5] =  x7;
-        params[6] =  x8;
-        params[7] =  x9;
-        params[8] =  x10;
+        params[1] =  x2;
+        params[2] =  x3;
+        params[3] =  x4;
+        params[4] =  x5;
+        params[5] =  x6;
+       // params[5] =  x7;
+       // params[6] =  x8;
+       // params[7] =  x9;
+       // params[6] =  x10;
 
         Double_t netEval = network.Evaluate(0,params);
     	if (netEval > maxEval) netEval = maxEval - 0.01;

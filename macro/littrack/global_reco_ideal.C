@@ -1,6 +1,6 @@
 void global_reco_ideal(Int_t nEvents = 1000)
 {
-	TString dir  = "/home/d/andrey/straw_2mu/";
+	TString dir  = "/home/d/andrey/std_10e_norich/";
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
@@ -92,11 +92,11 @@ void global_reco_ideal(Int_t nEvents = 1000)
 		Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
 		Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
-//		Double_t trdSigmaX[] = {200, 200, 200};             // Resolution in x [mum]
+//		Double_t trdSigmaX[] = {100, 100, 100};             // Resolution in x [mum]
 //		// Resolutions in y - station and angle dependent [mum]
-//		Double_t trdSigmaY1[] = {200, 200, 200, 200, 200, 200, 200};
-//		Double_t trdSigmaY2[] = {200, 200, 200, 200, 200, 200, 200};
-//		Double_t trdSigmaY3[] = {200, 200, 200, 200, 200, 200, 200};
+//		Double_t trdSigmaY1[] = {100, 100, 100, 100, 100, 100, 100};
+//		Double_t trdSigmaY2[] = {100, 100, 100, 100, 100, 100, 100};
+//		Double_t trdSigmaY3[] = {100, 100, 100, 100, 100, 100, 100};
 
 		CbmTrdHitProducerSmearing* trdHitProd = new
 				 CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);

@@ -1,11 +1,11 @@
-void eloss_sim(Int_t nEvents = 200000)
+void eloss_sim(Int_t nEvents = 20000)
 {
-	TString dir = "/home/d/andrey/ms_sim/1X01GeViron/";
-	TString outFile = dir + "eloss.sim.root";
-	// TString parFile = dir + "eloss.params.root";
+	TString dir = "/home/d/andrey/eloss/";
+	TString outFile = dir + "eloss.mc.root";
+	 TString parFile = dir + "eloss.params.root";
 
-	TString caveGeom   = "cave.geo";
-	TString muchGeom   = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/littrack/qa/simple_geo.geo");
+	TString caveGeom   = "cave_vacuum.geo";
+	TString litGeom   = "simple_geo.geo";
 
 	TStopwatch timer;
 	timer.Start();
@@ -31,20 +31,20 @@ void eloss_sim(Int_t nEvents = 200000)
 	cout << "    --- " << caveGeom << endl;
 	}
 
-	if ( muchGeom != "" ) {
-	FairDetector* much = new CbmMuch("MUCH", kTRUE);
-	much->SetGeometryFileName(muchGeom);
-	fRun->AddModule(much);
-	cout << "    --- " << muchGeom << endl;
+	if ( litGeom != "" ) {
+	FairDetector* lit = new CbmLitDet("LITDET", kTRUE);
+	lit->SetGeometryFileName(litGeom);
+	fRun->AddModule(lit);
+	cout << "    --- " << litGeom << endl;
 	}
 
-	CbmFieldMap* magField = NULL;
-	fRun->SetField(magField);
+//	CbmFieldMap* magField = NULL;
+//	fRun->SetField(magField);
 
 	CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
 
-	Double_t minMom = 1.; //minimum momentum
-	Double_t maxMom = 1.; //maximum momentum
+	Double_t minMom = 10.; //minimum momentum
+	Double_t maxMom = 10.; //maximum momentum
 
 	FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, 1);
 	boxGen1->SetPRange(minMom, maxMom);
@@ -57,6 +57,15 @@ void eloss_sim(Int_t nEvents = 200000)
 	fRun->SetGenerator(primGen);
 
 	fRun->Init();
+
+	Bool_t kParameterMerged = kTRUE;
+	FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
+	//  FairParAsciiFileIo* parOut = new FairParAsciiFileIo();
+	parOut->open(parFile.Data());
+	rtdb->setOutput(parOut);
+	rtdb->saveOutput();
+	rtdb->print();
+
 	fRun->Run(nEvents);
 
 	// -----   Finish   -------------------------------------------------------

@@ -7,7 +7,11 @@ void draw_dedx() {
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
 	cbmrootlibs();
 
-	CbmLitCheckEnergyLoss checker;
+//	CbmLitCheckEnergyLoss checker;
+//	checker.SetMaterial("iron");
+//	checker.Check();
+
+	CbmLitCheckBrem checker;
 	checker.SetMaterial("iron");
 	checker.Check();
 }

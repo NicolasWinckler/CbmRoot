@@ -1,8 +1,7 @@
-void eloss_ana(Int_t nEvents = 200000)
+void eloss_ana(Int_t nEvents = 20000)
 {
-  TString engine = "geant4/";
-  TString dir = "/d/cbm02/andrey/events/eloss/" + engine + "10gev10X0iron/";
-  TString inFile = dir + "eloss.sim.root";
+  TString dir = "/home/d/andrey/eloss/";
+  TString inFile = dir + "eloss.mc.root";
   TString outFile = dir + "eloss.ana.root";
 
    TStopwatch timer;
@@ -19,8 +18,8 @@ void eloss_ana(Int_t nEvents = 200000)
    run->SetOutputFile(outFile);
 
 
-   CbmLitElossAna* elossAna = new CbmLitElossAna();
-   run->AddTask(elossAna);
+   CbmLitCheckMultipleScattering* msCheck = new CbmLitCheckMultipleScattering();
+   run->AddTask(msCheck);
 
    run->LoadGeometry();
    run->Init();

@@ -1,4 +1,4 @@
-void trd_sim(Int_t nEvents = 10)
+void trd_sim(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -9,7 +9,7 @@ void trd_sim(Int_t nEvents = 10)
 		//if necessary specify input pluto file to embed signal particles
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
 		//directory for output simulation files
-		dir  = "/home/d/andrey/mono_1e-/";
+		dir  = "/home/d/andrey/std_10e_norich/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
@@ -21,7 +21,7 @@ void trd_sim(Int_t nEvents = 10)
 		//If "yes" PLUTO particles will be embedded
 		pluto = "no";
 		//TRD geometry file name
-		trdGeom = "trd_monolithic.geo";
+		trdGeom = "trd_standard.geo";
 	} else {
 		inFile  = TString(gSystem->Getenv("INFILE"));
 		plutoFile  = TString(gSystem->Getenv("PLUTOFILE"));
@@ -40,7 +40,7 @@ void trd_sim(Int_t nEvents = 10)
 	TString magnetGeom = "magnet_standard.geo";
 	TString mvdGeom    = "";//"mvd_standard.geo";
 	TString stsGeom    = "sts_standard.geo";
-	TString richGeom   = "rich_standard.geo";
+	TString richGeom   = "";//"rich_standard.geo";
 	TString tofGeom    = "tof_standard.geo";
 	TString ecalGeom   = "";//"ecal_FastMC.geo";
 
@@ -158,16 +158,18 @@ void trd_sim(Int_t nEvents = 10)
 	}
 
 	if (electrons == "yes") {
-//		FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, 1);
+		FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, 5);
 //		boxGen1->SetPtRange(0.,3.);
-//		boxGen1->SetPhiRange(0.,360.);
-//		boxGen1->SetThetaRange(2.5,25.);
-//		boxGen1->SetCosTheta();
-//		boxGen1->Init();
-//		primGen->AddGenerator(boxGen1);
+		boxGen1->SetPRange(10, 10);
+		boxGen1->SetPhiRange(0.,360.);
+		boxGen1->SetThetaRange(2.5,25.);
+		boxGen1->SetCosTheta();
+		boxGen1->Init();
+		primGen->AddGenerator(boxGen1);
 
-		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-11, 1);
-		boxGen2->SetPtRange(0.,3.);
+		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-11, 5);
+//		boxGen2->SetPtRange(0.,3.);
+		boxGen2->SetPRange(10, 10);
 		boxGen2->SetPhiRange(0.,360.);
 		boxGen2->SetThetaRange(2.5,25.);
 		boxGen2->SetCosTheta();

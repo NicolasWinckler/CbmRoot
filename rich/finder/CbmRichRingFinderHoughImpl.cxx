@@ -266,7 +266,7 @@ void CbmRichRingFinderHoughImpl::DefineLocalAreaAndHits(Float_t x0, Float_t y0,
     std::vector<CbmRichHoughHit>::iterator itmin, itmax;
 
 	//find all hits which are in the corridor
-	mpnt.fX = x0 - 0.6*fMaxDistance;
+	mpnt.fX = x0 - 0.4*fMaxDistance;
 	itmin = std::lower_bound(fData.begin(), fData.end(), mpnt, CbmRichHoughHitCmpUp());
 
 	mpnt.fX = x0 + fMaxDistance;
@@ -704,6 +704,11 @@ void CbmRichRingFinderHoughImpl::RingSelection()
 			usedHits.push_back(usedHitsT);
 		}
 	}
+
+	usedHits.clear();
+	usedHitsAll.clear();
+	goodRingIndex.clear();
+
 }
 
 void CbmRichRingFinderHoughImpl::ReAssingSharedHits(Int_t ringInd1, Int_t ringInd2)

@@ -98,15 +98,15 @@ protected:
 	vector<CbmRichHoughHit> fData;  ///Rich hits
 
 	vector<unsigned short> fHist;
-	vector< vector<unsigned short> > fRingHits;
+	//vector< vector<unsigned short> > fRingHits;
 	vector<unsigned short> fHistR;
-	vector< vector< unsigned short> > fRingHitsR;
+	//vector< vector< unsigned short> > fRingHitsR;
     vector< vector<unsigned short> > fHitInd;
 
 	vector<CbmRichRing*> fFoundRings;///collect found rings
 
 	CbmRichRingFitterCOP* fFitCOP;
-	CbmRichRingFitterEllipseTau* fFitEllipseTau;
+	//CbmRichRingFitterEllipseTau* fFitEllipseTau;
 	CbmRichRingSelectNeuralNet* fANNSelect;
 
 	TString fGeometryType;
@@ -155,6 +155,8 @@ public:
 	void FindPeak(Int_t indmin, Int_t indmax);
 	void FuzzyKE(TClonesArray* rHitArray);
     void RingSelection();
+    void ReAssingSharedHits(Int_t ringInd1, Int_t ringInd2);
+    Int_t GetHitIndex(Int_t hitInd);
     void RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring);
     void RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring);
 

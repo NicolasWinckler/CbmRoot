@@ -56,7 +56,6 @@ class CbmRichRingFinderHoughImpl{
 
 protected:
 	static const unsigned short int kMAX_NOF_HITS = 65500;
-	unsigned short int kMAX_NOF_HITS_IN_AREA;
 
 	Float_t fMaxDistance;
 	Float_t fMinDistance;
@@ -98,15 +97,12 @@ protected:
 	vector<CbmRichHoughHit> fData;  ///Rich hits
 
 	vector<unsigned short> fHist;
-	//vector< vector<unsigned short> > fRingHits;
 	vector<unsigned short> fHistR;
-	//vector< vector< unsigned short> > fRingHitsR;
     vector< vector<unsigned short> > fHitInd;
 
 	vector<CbmRichRing*> fFoundRings;///collect found rings
 
 	CbmRichRingFitterCOP* fFitCOP;
-	//CbmRichRingFitterEllipseTau* fFitEllipseTau;
 	CbmRichRingSelectNeuralNet* fANNSelect;
 
 	TString fGeometryType;

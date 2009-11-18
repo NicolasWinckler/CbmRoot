@@ -15,6 +15,7 @@
 #include "TString.h"
 #include "TStopwatch.h"
 #include "TSystem.h"
+#include "TMath.h"
 
 #include <iostream>
 #include <cmath>
@@ -44,25 +45,11 @@ void CbmRichRingFinderHoughImpl::Init()
     SetParameters(fGeometryType);
 
     fHist.resize(fNofBinsXY);
-
-//    fRingHits.resize(fNofBinsXY);
-//    for (Int_t j = 0; j < fNofBinsXY; j++)
-//		fRingHits[j].resize(kMAX_NOF_HITS_IN_AREA);
-
     fHistR.resize(fNofBinsR);
-
-//    fRingHitsR.resize(fNofBinsR);
-//	for (Int_t k = 0; k < fNofBinsR; k++){
-//		fRingHitsR[k].resize(kMAX_NOF_HITS_IN_AREA);
-//	}
-
 	fHitInd.resize(fNofParts);
 
     fFitCOP = new CbmRichRingFitterCOP(0, 0);
     fFitCOP->Init();
-
-    //fFitEllipseTau = new CbmRichRingFitterEllipseTau(0, 0, fGeometryType);
-    //fFitEllipseTau->Init();
 
     TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
     if (fGeometryType == "large"){
@@ -86,7 +73,6 @@ CbmRichRingFinderHoughImpl::CbmRichRingFinderHoughImpl()
 CbmRichRingFinderHoughImpl::~CbmRichRingFinderHoughImpl()
 {
 	delete fFitCOP;
-	//delete fFitEllipseTau;
 	delete fANNSelect;
 }
 
@@ -146,7 +132,6 @@ void CbmRichRingFinderHoughImpl::SetParameters( Int_t nofParts,
 	fRmsCoeffCOP = rmsCoeffCOP;
 	fMaxCutCOP = maxCutCOP;
 
-    kMAX_NOF_HITS_IN_AREA = 300;
     fMinNofHitsInArea = 6;
 
     fDx = 2*fMaxDistance / (Float_t)fNofBinsX;
@@ -166,7 +151,6 @@ void CbmRichRingFinderHoughImpl::SetParameters(TString geometry)
 
     if (geometry == "large"){
         fNofParts = 1;
-        kMAX_NOF_HITS_IN_AREA = 300;
         fMinNofHitsInArea = 6;
 
         fMaxDistance = 14;
@@ -212,14 +196,12 @@ void CbmRichRingFinderHoughImpl::SetParameters(TString geometry)
 			fHitCut = 5;
 			fHTCutR = 20;
 			fHitCutR = 3;
-			kMAX_NOF_HITS_IN_AREA = 300;
 			fMinNofHitsInArea = 6;
         }else if (fNofParts == 2){
 			fHTCut = 5;
 			fHitCut = 2;
 			fHTCutR = 5;
 			fHitCutR = 2;
-			kMAX_NOF_HITS_IN_AREA = 300;
 			fMinNofHitsInArea = 4;
         }
 
@@ -296,45 +278,13 @@ void CbmRichRingFinderHoughImpl::DefineLocalAreaAndHits(Float_t x0, Float_t y0,
     	fHitInd[i % fNofParts].push_back(i);
     }
 
-    Int_t nofHits = 0;
-    Int_t nofHitsNorm = fHitInd[0].size() + 1;
-    Int_t iPmulNofHits;
-
 	for (Int_t j = 0; j < fNofBinsXY; j++){
 		fHist[j] = 0;
 	}
 
-//	for (Int_t iP = 0; iP < fNofParts; iP++){
-//		nofHits = fHitInd[iP].size();
-//		if (nofHits > kMAX_NOF_HITS_IN_AREA) nofHits = kMAX_NOF_HITS_IN_AREA - 1;
-//		iPmulNofHits = iP * nofHitsNorm;
-//		for (Int_t j = 0; j < fNofBinsXY; j++){
-//		    for (Int_t iH = 0; iH < (nofHits & ~ 3); iH+=4) {
-//			fRingHits[j][iPmulNofHits + iH] = 0;
-//			fRingHits[j][iPmulNofHits + iH+1] = 0;
-//			fRingHits[j][iPmulNofHits + iH+2] = 0;
-//                        fRingHits[j][iPmulNofHits + iH+3] = 0;
-//		    }
-//		    for (Int_t iH = (nofHits & ~ 3); iH < nofHits; iH++) {
-//                       fRingHits[j][iPmulNofHits + iH] = 0;
-//		    }
-//		}
-//	}
-
 	for (Int_t k = 0; k < fNofBinsR; k++) {
 		fHistR[k] = 0;
 	}
-
-//	for (Int_t iP = 0; iP < fNofParts; iP++){
-//		nofHits = fHitInd[iP].size();
-//		if (nofHits > kMAX_NOF_HITS_IN_AREA) nofHits = kMAX_NOF_HITS_IN_AREA - 1;
-//		iPmulNofHits = iP * nofHitsNorm;
-//		for (Int_t k = 0; k < fNofBinsR; k++) {
-//			for (Int_t iH = 0; iH < nofHits; iH++)
-//				fRingHitsR[k][iPmulNofHits + iH] = 0;
-//		}
-//	}
-
 }
 
 void CbmRichRingFinderHoughImpl::HoughTransform(unsigned short int indmin, unsigned short int indmax)
@@ -355,7 +305,7 @@ void CbmRichRingFinderHoughImpl::HoughTransformGroup(unsigned short int indmin,
     register Int_t indXY;
 
     register unsigned short int iH1, iH2, iH3;
-    register unsigned short int iH1_1, iH2_1, iH3_1;
+    //register unsigned short int iH1_1, iH2_1, iH3_1;
     register Int_t nofHitsNorm = fHitInd[0].size() + 1;
     register Int_t iPmulNofHits;
 
@@ -364,20 +314,21 @@ void CbmRichRingFinderHoughImpl::HoughTransformGroup(unsigned short int indmin,
     register Float_t histXY;
 
     Int_t nofHits = fHitInd[iPart].size();
+    vector<unsigned short> hitIndPart;
+    hitIndPart.assign(fHitInd[iPart].begin(), fHitInd[iPart].end());
+
     if (nofHits <= fMinNofHitsInArea) return;
     iPmulNofHits = iPart * nofHitsNorm;
 
     register Float_t iH1X, iH1Y, iH2X, iH2Y, iH3X, iH3Y;
 
 	for (unsigned short int iHit1 = 0; iHit1 < nofHits; iHit1++) {
-		iH1 = fHitInd[iPart][iHit1];
-		iH1_1 = iPmulNofHits + iHit1;
+		iH1 = hitIndPart[iHit1];
 		iH1X = fData[iH1].fX;
 		iH1Y = fData[iH1].fY;
 
 		for (unsigned short int iHit2 = iHit1 + 1; iHit2 < nofHits; iHit2++) {
-			iH2 = fHitInd[iPart][iHit2];
-			iH2_1 = iPmulNofHits + iHit2;
+			iH2 = hitIndPart[iHit2];
 			iH2X = fData[iH2].fX;
 			iH2Y = fData[iH2].fY;
 
@@ -387,10 +338,8 @@ void CbmRichRingFinderHoughImpl::HoughTransformGroup(unsigned short int indmin,
 			if (r12 < fMinDistanceSq || r12 > fMaxDistanceSq)	continue;
 
 			t10 = fData[iH1].fX2plusY2 - fData[iH2].fX2plusY2;
-			iH3_1= iPmulNofHits+iHit2;
 			for (unsigned short int iHit3 = iHit2 + 1; iHit3 < nofHits; iHit3++) {
-				iH3 = fHitInd[iPart][iHit3];
-				iH3_1++;//iH3_1 = iPmulNofHits + iHit3;
+				iH3 = hitIndPart[iHit3];
 				iH3X = fData[iH3].fX;
 				iH3Y = fData[iH3].fY;
 
@@ -429,14 +378,7 @@ void CbmRichRingFinderHoughImpl::HoughTransformGroup(unsigned short int indmin,
 				indXY = intX * fNofBinsX + intY;
 
 				fHist[indXY]++;
-//				fRingHits[indXY][iH1_1]++;
-//				fRingHits[indXY][iH2_1]++;
-//				fRingHits[indXY][iH3_1]++;
 				fHistR[intR]++;
-
-//				fRingHitsR[intR][iH1_1]++;
-//				fRingHitsR[intR][iH2_1]++;
-//				fRingHitsR[intR][iH3_1]++;
 			}//iHit1
 		}//iHit2
 	}//iHit3

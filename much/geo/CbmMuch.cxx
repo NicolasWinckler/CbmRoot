@@ -278,7 +278,7 @@ void CbmMuch::ConstructGeometry() {
   // Create absorbers
   TObjArray* absorbers = fGeoScheme->GetAbsorbers();
   for (Int_t i=0;i<absorbers->GetEntriesFast();i++){
-    TString absName = Form("muchabsorber%i",i+1);
+    TString absName = Form("muchabsorber%02i",i+1);
     switch (fGeoScheme->GetAbsorberMat(i)) {
       case 'C': mat = carbon;  break;
       case 'I': mat = iron;    break;
@@ -320,12 +320,12 @@ void CbmMuch::ConstructGeometry() {
     // Check if
     Int_t nLayers = station->GetNLayers();
     if (nLayers<=0) {
-      Warning("CbmMuch","Station layers are not defined for station %i",st);
+      Warning("CbmMuch","Station layers are not defined for station %02i",st);
       continue;
     }
 
     // Create station volume
-    TString stName = Form("muchstation%i",st+1);
+    TString stName = Form("muchstation%02i",st+1);
     Double_t stRmin = station->GetTubeRmin();
     Double_t stRmax = station->GetTubeRmax();
     Double_t stDz   = station->GetTubeDz();
@@ -339,10 +339,10 @@ void CbmMuch::ConstructGeometry() {
     Double_t supDy  = layerFirst->GetSupportDy();
     Double_t supDz  = layerFirst->GetSupportDz();
 
-    TString supBoxName   = Form("muchst%ibox",st+1);
-    TString supHoleName  = Form("muchst%ihole",st+1);
-    TString trName       = Form("muchst%itr",st+1);
-    TString supShapeName = Form("muchst%ish",st+1);
+    TString supBoxName   = Form("muchst%02ibox",st+1);
+    TString supHoleName  = Form("muchst%02ihole",st+1);
+    TString trName       = Form("muchst%02itr",st+1);
+    TString supShapeName = Form("muchst%02ish",st+1);
     TGeoTube* shHole = new TGeoTube(supHoleName,0.,station->GetTubeRmin(),supDz+0.001);
     TGeoBBox* shBox  = new TGeoBBox(supBoxName,supDx/2.,supDy,supDz);
     TGeoTranslation* trHole = new TGeoTranslation(trName,-supDx/2.,0.,0.);
@@ -355,14 +355,14 @@ void CbmMuch::ConstructGeometry() {
       CbmMuchLayer* layer = station->GetLayer(l);
       Double_t layerZ  = layer->GetZtoStationCenter();
       Double_t layerDz = layer->GetDz();
-      TString layerName   = Form("muchstation%ilayer%i",st+1,l+1);
+      TString layerName   = Form("muchstation%02ilayer%i",st+1,l+1);
       TGeoTube*   shLayer = new TGeoTube(stRmin,stRmax,layerDz);
       TGeoVolume* voLayer = new TGeoVolume(layerName,shLayer,air);
       gGeoManager->Node(layerName,0,stName,0.,0.,layerZ,0,kTRUE,buf,0);
 
       // Create support
-      TString  supName1  = Form("muchstation%ilayer%isupport1",st+1,l+1);
-      TString  supName2  = Form("muchstation%ilayer%isupport2",st+1,l+1);
+      TString  supName1  = Form("muchstation%02ilayer%isupport1",st+1,l+1);
+      TString  supName2  = Form("muchstation%02ilayer%isupport2",st+1,l+1);
       TGeoVolume* voSup1 = new TGeoVolume(supName1,shSup,supportMat);
       TGeoVolume* voSup2 = new TGeoVolume(supName2,shSup,supportMat);
       gGeoManager->Node(supName1,0,layerName,+supDx/2.,0.,0.,    0,kTRUE,buf,0);
@@ -381,9 +381,9 @@ void CbmMuch::ConstructGeometry() {
           Double_t cutRadius = module->GetCutRadius();
 
           if (!station->IsModuleDesign()){ // simple design
-            TGeoBBox* shActiveBox = new TGeoBBox(Form("shActiveBoxSt%il%i",st+1,l+1),size[0]/2.,size[1]/2.,size[2]/2.);
-            TGeoShape* shActive = new TGeoCompositeShape(Form("shActiveHoleSt%il%i%cm%02i",st+1,l,cside,m+1),Form("shActiveBoxSt%il%i-muchst%ihole",st+1,l+1,st+1));
-            TString activeName = Form("muchstation%ilayer%i%cactive%03i",st+1,l+1,cside,m+1);
+            TGeoBBox* shActiveBox = new TGeoBBox(Form("shActiveBoxSt%02il%i",st+1,l+1),size[0]/2.,size[1]/2.,size[2]/2.);
+            TGeoShape* shActive = new TGeoCompositeShape(Form("shActiveHoleSt%02il%i%cm%02i",st+1,l,cside,m+1),Form("shActiveBoxSt%il%i-muchst%ihole",st+1,l+1,st+1));
+            TString activeName = Form("muchstation%02ilayer%i%cactive%03i",st+1,l+1,cside,m+1);
             TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);
             gGeoManager->Node(activeName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);
             AddSensitiveVolume(voActive);
@@ -391,19 +391,19 @@ void CbmMuch::ConstructGeometry() {
           }
 
           if (module->GetDetectorType()==2) {
-            Fatal("CbmMuch","Station %i - detailed module design not implemented for straws",st);
+            Fatal("CbmMuch","Station %02i - detailed module design not implemented for straws",st);
           }
 
-          TString activeName = Form("muchstation%ilayer%i%cactive%03i",st+1,l+1,cside,m+1);
-          TString spacerName = Form("muchstation%ilayer%i%cspacer%03i",st+1,l+1,cside,m+1);
+          TString activeName = Form("muchstation%02ilayer%i%cactive%03i",st+1,l+1,cside,m+1);
+          TString spacerName = Form("muchstation%02ilayer%i%cspacer%03i",st+1,l+1,cside,m+1);
           TGeoShape* shActive = shActiveFull;
           TGeoShape* shSpacer = shSpacerFull;
 
           if (cutRadius>0) { // Create composite shape with a hole
             TGeoTranslation* tr = new TGeoTranslation(Form("tr%il%i%cm%02i",st+1,l+1,cside,m+1),-pos[0],-pos[1],0.);
             tr->RegisterYourself();
-            shActive = new TGeoCompositeShape(Form("shActiveHoleSt%il%im%02i",st+1,l+1,m+1),Form("shActive-muchst%ihole:tr%il%i%cm%02i",st+1,st+1,l+1,cside,m+1));
-            shSpacer = new TGeoCompositeShape(Form("shSpacerHoleSt%il%im%02i",st+1,l+1,m+1),Form("shSpacer-muchst%ihole:tr%il%i%cm%02i",st+1,st+1,l+1,cside,m+1));
+            shActive = new TGeoCompositeShape(Form("shActiveHoleSt%02il%im%02i",st+1,l+1,m+1),Form("shActive-muchst%02ihole:tr%il%i%cm%02i",st+1,st+1,l+1,cside,m+1));
+            shSpacer = new TGeoCompositeShape(Form("shSpacerHoleSt%02il%im%02i",st+1,l+1,m+1),Form("shSpacer-muchst%02ihole:tr%il%i%cm%02i",st+1,st+1,l+1,cside,m+1));
           }
 
           TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);
@@ -452,10 +452,11 @@ void CbmMuch::ConstructGeometry() {
 
 Int_t CbmMuch::GetDetId(FairVolume* vol) {
   TString name = vol->GetName();
-  Int_t  iStation     = TString(name[11]).Atoi()-1;
-  Int_t  iLayer       = TString(name[17]).Atoi()-1;
-  Int_t  iSide        = (name[18]=='b') ? 1 : 0;
-  Char_t cModuleNr[4] = {name[25],name[26],name[27],' '};
+  Char_t cStationNr[3]= {name[11],name[12],' '};
+  Int_t  iStation     = atoi(cStationNr)-1;
+  Int_t  iLayer       = TString(name[18]).Atoi()-1;
+  Int_t  iSide        = (name[19]=='b') ? 1 : 0;
+  Char_t cModuleNr[4] = {name[26],name[27],name[28],' '};
   Int_t  iModule      = atoi(cModuleNr)-1;
   if(iSide!=1 && iSide !=0) printf("side = %i", iSide);
   Int_t detectorId = CbmMuchGeoScheme::GetDetectorId(iStation, iLayer, iSide, iModule);

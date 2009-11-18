@@ -61,8 +61,8 @@ void CbmRichRingFinderHoughImpl::Init()
     fFitCOP = new CbmRichRingFitterCOP(0, 0);
     fFitCOP->Init();
 
-    fFitEllipseTau = new CbmRichRingFitterEllipseTau(0, 0, fGeometryType);
-    fFitEllipseTau->Init();
+    //fFitEllipseTau = new CbmRichRingFitterEllipseTau(0, 0, fGeometryType);
+    //fFitEllipseTau->Init();
 
     TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
     if (fGeometryType == "large"){
@@ -86,7 +86,7 @@ CbmRichRingFinderHoughImpl::CbmRichRingFinderHoughImpl()
 CbmRichRingFinderHoughImpl::~CbmRichRingFinderHoughImpl()
 {
 	delete fFitCOP;
-	delete fFitEllipseTau;
+	//delete fFitEllipseTau;
 	delete fANNSelect;
 }
 
@@ -229,12 +229,12 @@ void CbmRichRingFinderHoughImpl::SetParameters(TString geometry)
         fNofBinsY = 25;
         fNofBinsR = 32;
 
-		fAnnCut = -0.5;
+		fAnnCut = -0.6;
 		fUsedHitsCut = 0.35;
 		fUsedHitsAllCut = 0.4;
 
-    	fRmsCoeffEl = 2.;
-    	fMaxCutEl = 0.8;
+    	fRmsCoeffEl = 2.5;
+    	fMaxCutEl = 1.2;
     	fRmsCoeffCOP = 3.;
     	fMaxCutCOP = 1.2;
     }
@@ -555,7 +555,7 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 {
 //Find MAX bin XY and compare it with CUT
     Int_t maxBinXY = -1, maxXY = -1;
-    UInt_t size = fHist.size();
+    register UInt_t size = fHist.size();
     for (UInt_t k = 0; k < size; k++){
         if (fHist[k] > maxBinXY){
             maxBinXY = fHist[k];

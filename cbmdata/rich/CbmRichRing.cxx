@@ -59,6 +59,7 @@ CbmRichRing::CbmRichRing()
     fRecFlag(0)
 {
     fSelectionNN  = -1.;
+    fHitCollection.reserve(40);
 }
 // -------------------------------------------------------------------------
 
@@ -76,12 +77,16 @@ CbmRichRing::CbmRichRing ( Double_t x,
     fRecFlag(0)
 {
     fSelectionNN  = -1.;
+    fHitCollection.reserve(40);
 }
 // -------------------------------------------------------------------------
 
 
 // -----   Destructor   ----------------------------------------------------
-CbmRichRing::~CbmRichRing() {}
+CbmRichRing::~CbmRichRing()
+{
+	fHitCollection.clear();
+}
 // -------------------------------------------------------------------------
 
 void CbmRichRing::SetXYABPhi(Double_t x, Double_t y,

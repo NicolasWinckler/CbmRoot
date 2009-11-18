@@ -493,9 +493,20 @@ void CbmRichRingFinderHoughImpl::RemoveHitsAroundRing(Int_t indmin, Int_t indmax
 
 void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 {
+//Find MAX bin R and compare it with CUT
+    Int_t maxBinR = -1, maxR = -1;
+    register UInt_t size = fHistR.size();
+    for (UInt_t k = 0; k < size; k++){
+        if (fHistR[k] > maxBinR){
+            maxBinR = fHistR[k];
+            maxR = k;
+        }
+    }
+	if (maxBinR < fHTCutR) return;
+
 //Find MAX bin XY and compare it with CUT
     Int_t maxBinXY = -1, maxXY = -1;
-    register UInt_t size = fHist.size();
+    size = fHist.size();
     for (UInt_t k = 0; k < size; k++){
         if (fHist[k] > maxBinXY){
             maxBinXY = fHist[k];
@@ -504,37 +515,7 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
     }
     if (maxBinXY < fHTCut) return;
 
-//Find MAX bin R and compare it with CUT
-    Int_t maxBinR = -1, maxR = -1;
-    size = fHistR.size();
-    for (UInt_t k = 0; k < size; k++){
-        if (fHistR[k] > maxBinR){
-            maxBinR = fHistR[k];
-            maxR = k;
-        }
-    }
-	if (maxBinR < fHTCutR) return;
 	CbmRichRing* ring1 = new CbmRichRing();
-//	Double_t hitCut = maxBinXY/10.;
-//	if (hitCut <= fHitCut)	hitCut = fHitCut;
-//	Int_t nofHitsNorm = fHitInd[0].size() + 1;
-//    Int_t iPmulNofHits;
-//    Int_t ind;
-//    for (Int_t iP = 0; iP < fNofParts; iP++){
-//    	Int_t nofHits = fHitInd[iP].size();
-//    	iPmulNofHits = iP * nofHitsNorm;
-//    	for (Int_t iH = 0; iH < nofHits; iH++){
-//    		ind = iPmulNofHits + iH;
-//    		Int_t hitCutR = fRingHitsR[maxR][ind];
-//    		//if (maxR >=1 && maxR <= fHistR.size())
-//    		//	hitCutR += fRingHitsR[maxR+1][ind] + fRingHitsR[maxR-1][ind];
-//
-//    		if (fRingHits[maxXY][ind] >= hitCut && hitCutR >= fHitCutR) {
-//    			ring1.AddHit(fData[ fHitInd[iP][iH] ].fId);
-//    		}
-//    	}
-//    }
-
 
 //Find Preliminary Xc, Yc, R
     Float_t xc, yc, r;

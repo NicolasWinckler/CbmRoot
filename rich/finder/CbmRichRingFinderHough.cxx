@@ -39,12 +39,13 @@ CbmRichRingFinderHough::CbmRichRingFinderHough  ( Int_t verbose, TString geometr
     fIsFindOptPar = false;
     fRingCount = 0;
     fNEvent = 0;
+
+	fHTImpl = new CbmRichRingFinderHoughImpl(fGeometryType);
+	//fHTImpl = new CbmRichRingFinderHoughSimd(fGeometryType);
 }
 
 void CbmRichRingFinderHough::Init()
 {
-	fHTImpl = new CbmRichRingFinderHoughImpl(fGeometryType);
-	//fHTImpl = new CbmRichRingFinderHoughSimd(fGeometryType);
 	fHTImpl->Init();
 }
 
@@ -57,13 +58,14 @@ CbmRichRingFinderHough::CbmRichRingFinderHough()
 // -----   Destructor   ----------------------------------------------------
 CbmRichRingFinderHough::~CbmRichRingFinderHough()
 {
-
+	delete fHTImpl;
 }
 
 Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
                                          TClonesArray* rProjArray,
                                          TClonesArray* rRingArray)
 {
+
 
 	TStopwatch timer;
 	timer.Start();
@@ -84,6 +86,8 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 		cout << "-E- CbmRichRingFinderHough::DoFind:No hits in this event."	<< endl;
 		return -1;
 	}
+	UpH.reserve(nhits/2);
+	DownH.reserve(nhits/2);
 
 	for(Int_t iHit = 0; iHit < nhits; iHit++) {
 		CbmRichHit * hit = (CbmRichHit*) rHitArray->At(iHit);
@@ -104,22 +108,22 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 	fHTImpl->SetData(UpH);
 	fHTImpl->DoFind();
 	AddRingsToOutputArray(rRingArray, fHTImpl->GetFoundRings());
-
+	UpH.clear();
 	fHTImpl->SetData(DownH);
 	fHTImpl->DoFind();
 	AddRingsToOutputArray(rRingArray, fHTImpl->GetFoundRings());
-
+	DownH.clear();
 	timer.Stop();
 	fExecTime += timer.CpuTime();
 
 	if (fVerbose)cout << "CbmRichRingFinderHough: Number of output rings: "<< rRingArray->GetEntriesFast() << endl;
 
-	cout << "Exec time : " << fExecTime << ", per event " << fExecTime/fNEvent << endl;
+	cout << "Exec time : " << fExecTime << ", per event " << 1000.*fExecTime/fNEvent << " ms" << endl;
 
 	if (fIsFindOptPar == true ){
 		ofstream fout;
 		fout.open("opt_param_ht.txt",std::ios_base::app);
-		fout << fExecTime << " ";
+		fout << fExecTime/fNEvent * 1000. << " ";
 	}
 
 	return 1;
@@ -141,9 +145,21 @@ void CbmRichRingFinderHough::SetParameters( Int_t nofParts,
 		Float_t rmsCoeffEl, Float_t maxCutEl,
 		Float_t rmsCoeffCOP, Float_t maxCutCOP)
 {
+	fHTImpl->SetParameters(nofParts,
+			maxDistance, minDistance,
+			minRadius, maxRadius,
+			HTCut, hitCut,
+			HTCutR, hitCutR,
+			nofBinsX, nofBinsY,
+			nofBinsR, annCut,
+			usedHitsCut, usedHitsAllCut,
+			rmsCoeffEl, maxCutEl,
+			rmsCoeffCOP, maxCutCOP);
+
     ofstream fout;
     fout.open("opt_param_ht.txt",std::ios_base::app);
-    fout << HTCut << " " << hitCut  << endl;
+    fout << annCut << " " <<  rmsCoeffEl << " "<<
+    maxCutEl << " " <<  usedHitsCut<< " " << usedHitsAllCut << endl;
 }
 
 void CbmRichRingFinderHough::AddRingsToOutputArray(TClonesArray *rRingArray,

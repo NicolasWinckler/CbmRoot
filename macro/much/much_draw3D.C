@@ -1,12 +1,8 @@
-
-void much_draw3D(const char* mcfile = ""){
-
-   if (mcfile == "") {
-      mcfile = "data/Jpsi.auau.25gev.centr.mc.root";
-   }
+void much_draw3D(char* mcfile = "data/mc.root"){
 
    gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
    basiclibs();
+
    gSystem->Load("libGeoBase");
    gSystem->Load("libParBase");
    gSystem->Load("libBase");
@@ -19,16 +15,19 @@ void much_draw3D(const char* mcfile = ""){
    gSystem->Load("libMuch");
 
    TFile* f = new TFile(mcfile);
-   TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
-   geoMan->SetVisLevel(0);
-
+   f->Get("FairBaseParSet");
+   gGeoManager->SetVisLevel(0);
+//
    // Check overlaps
-   geoMan->CheckOverlaps(0.0000001);
-   geoMan->PrintOverlaps();
+   gGeoManager->CheckOverlaps(0.0000001);
+   gGeoManager->PrintOverlaps();
 
-   TGeoVolume* master = geoMan->GetMasterVolume();
+   TGeoVolume* master = gGeoManager->GetMasterVolume();
+
+   // Draw all
    //master->Draw("ogl");
 
+   // Draw much
    TGeoVolume* much = master->FindNode("much_0")->GetVolume();
    much->Draw("ogl");
 }

@@ -5,6 +5,9 @@
     E-mail : S.Lebedev@gsi.de
 */
 void run_train_ANN_Select(){
+	gROOT->LoadMacro("$VMCWORKDIR/macro/rich/setstyle.C");
+	setphdStyle();
+
     Int_t i;
     std::ifstream  finFakeAndTrue("ann_fake_and_true.txt");
 
@@ -12,7 +15,7 @@ void run_train_ANN_Select(){
         gSystem->Load("libMLP");
 
     TTree *simu = new TTree ("MonteCarlo","MontecarloData");
-    Float_t x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11;
+    Float_t x1,x2,x3,x4,x5,x6,x11;
 
 
     simu->Branch("x1", &x1,"x1/F");
@@ -21,10 +24,6 @@ void run_train_ANN_Select(){
     simu->Branch("x4", &x4,"x4/F");
     simu->Branch("x5", &x5,"x5/F");
     simu->Branch("x6", &x6,"x6/F");
-    //simu->Branch("x7", &x7,"x7/F");
-    //simu->Branch("x8", &x8,"x8/F");
-    //simu->Branch("x9", &x9,"x9/F");
-    //simu->Branch("x10", &x10,"x10/F");
     simu->Branch("x11", &x11,"x11/F");
 
     Int_t maxNofFake = 3000;
@@ -33,7 +32,6 @@ void run_train_ANN_Select(){
     Int_t inputCountFake = 0;
 
     while ( !finFakeAndTrue.eof() ){
-        //finFakeAndTrue >> x1  >> x2 >> x3 >> x4 >> x5 >> x6 >> x7 >> x8 >> x9 >> x10 >>x11;
         finFakeAndTrue >> x1  >> x2 >> x3 >> x4 >> x5 >> x6 >> x11;
         cout << " "<< x1 << " "<<  x2 << " " << x3 << " "<< x4 << " "<< x5 << " " <<
         x6 <<" "<< x11 << endl;
@@ -52,10 +50,10 @@ void run_train_ANN_Select(){
     }
 
     TMultiLayerPerceptron network("x1,x2,x3,x4,x5,x6:10:x11",simu,"Entry$+1");
-   // network.LoadWeights("NeuralNet_RingSelection_Weights_Ellipse.txt");
-    network.Train(500,"text,update=1");
-    network.DumpWeights("NeuralNet_RingSelection_Weights1.txt");
-
+    network.LoadWeights("/u/slebedev/JUL09/trunk/parameters/rich/NeuralNet_RingSelection_Weights_Compact.txt");
+   // network.Train(500,"text,update=1");
+  //  network.DumpWeights("NeuralNet_RingSelection_Weights1.txt");
+    network.Export();
     Double_t minEval = -1.3;
     Double_t maxEval = 1.3;
 
@@ -79,9 +77,6 @@ void run_train_ANN_Select(){
     while ( !finTest.eof() ){
         finTest >> x1  >> x2 >> x3 >> x4 >> x5 >> x6 >> x11;
 
-       // cout << " "<< x1 << " "<<  x2 << " " << x3 << " "<< x4 << " "<< x5 << " " <<
-       // x6 << " " << x7 << " " << x8 << " "<< x9  << " " << x10 << " " << x11 << endl;
-
         if (x11 == -1)NofFakeTest++;
         if (x11 == 1 )NofTrueTest++;
 
@@ -91,10 +86,6 @@ void run_train_ANN_Select(){
         params[3] =  x4;
         params[4] =  x5;
         params[5] =  x6;
-       // params[5] =  x7;
-       // params[6] =  x8;
-       // params[7] =  x9;
-       // params[6] =  x10;
 
         Double_t netEval = network.Evaluate(0,params);
     	if (netEval > maxEval) netEval = maxEval - 0.01;
@@ -125,15 +116,13 @@ void run_train_ANN_Select(){
     }
 
     TCanvas* c1 = new TCanvas();
-    c1->Divide(1,2);
-    c1->cd(1);
     hANNOutputTrue->SetLineWidth(3);
     hANNOutputFake->SetLineStyle(2);
     hANNOutputFake->SetLineWidth(3);
     hANNOutputTrue->Draw();
     hANNOutputFake->Draw("Same");
     gPad->SetLogy();
-    c1->cd(2);
+    TCanvas* c2 = new TCanvas();
     hCumProbFake->SetLineWidth(3);
     hCumProbFake->SetLineStyle(2);
     hCumProbFake->Draw();

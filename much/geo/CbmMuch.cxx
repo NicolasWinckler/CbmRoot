@@ -382,7 +382,7 @@ void CbmMuch::ConstructGeometry() {
 
           if (!station->IsModuleDesign()){ // simple design
             TGeoBBox* shActiveBox = new TGeoBBox(Form("shActiveBoxSt%02il%i",st+1,l+1),size[0]/2.,size[1]/2.,size[2]/2.);
-            TGeoShape* shActive = new TGeoCompositeShape(Form("shActiveHoleSt%02il%i%cm%02i",st+1,l,cside,m+1),Form("shActiveBoxSt%il%i-muchst%ihole",st+1,l+1,st+1));
+            TGeoShape* shActive = new TGeoCompositeShape(Form("shActiveHoleSt%02il%i%cm%02i",st+1,l,cside,m+1),Form("shActiveBoxSt%02il%i-muchst%02ihole",st+1,l+1,st+1));
             TString activeName = Form("muchstation%02ilayer%i%cactive%03i",st+1,l+1,cside,m+1);
             TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);
             gGeoManager->Node(activeName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);
@@ -400,10 +400,10 @@ void CbmMuch::ConstructGeometry() {
           TGeoShape* shSpacer = shSpacerFull;
 
           if (cutRadius>0) { // Create composite shape with a hole
-            TGeoTranslation* tr = new TGeoTranslation(Form("tr%il%i%cm%02i",st+1,l+1,cside,m+1),-pos[0],-pos[1],0.);
+            TGeoTranslation* tr = new TGeoTranslation(Form("tr%02il%i%cm%02i",st+1,l+1,cside,m+1),-pos[0],-pos[1],0.);
             tr->RegisterYourself();
-            shActive = new TGeoCompositeShape(Form("shActiveHoleSt%02il%im%02i",st+1,l+1,m+1),Form("shActive-muchst%02ihole:tr%il%i%cm%02i",st+1,st+1,l+1,cside,m+1));
-            shSpacer = new TGeoCompositeShape(Form("shSpacerHoleSt%02il%im%02i",st+1,l+1,m+1),Form("shSpacer-muchst%02ihole:tr%il%i%cm%02i",st+1,st+1,l+1,cside,m+1));
+            shActive = new TGeoCompositeShape(Form("shActiveHoleSt%02il%im%02i",st+1,l+1,m+1),Form("shActive-muchst%02ihole:tr%02il%i%cm%02i",st+1,st+1,l+1,cside,m+1));
+            shSpacer = new TGeoCompositeShape(Form("shSpacerHoleSt%02il%im%02i",st+1,l+1,m+1),Form("shSpacer-muchst%02ihole:tr%02il%i%cm%02i",st+1,st+1,l+1,cside,m+1));
           }
 
           TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);

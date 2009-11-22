@@ -135,7 +135,9 @@ using std::cout;
 using std::endl;
 using std::cerr;
 
-
+//Defines for debuging
+//#define _DECAL
+//#define _DECALCELL
 #define kN kNumberOfECALSensitiveVolumes
 
 // -----   Default constructor   -------------------------------------------
@@ -511,7 +513,7 @@ Bool_t CbmEcal::FindVolumeID(Int_t volnum)
 #endif
 #ifdef _DECALCELL
   printf("%s in ECAL block %d, block copy %d, column %d, row %d\n",
-	 gMC->CurrentVolName(),iEcalBlock,iEcalBlockCopy,nColumns,nRows);
+	 gMC->CurrentVolName(),iEcalBlock,iEcalBlockCopy,iColumn,iRow);
 #endif   
   return kTRUE;
 }
@@ -818,8 +820,8 @@ void CbmEcal::ConstructGeometry()
   volume = gGeoManager->Division("ECAL1column","ECAL1"      ,1,-1,-par[0],fCellSize,0,"S");
   volume = gGeoManager->Division("ECAL1row"   ,"ECAL1column",2,-1,-par[1],fCellSize,0,"S");
   
-  fNColumns1 = (Int_t)(par[0]/fCellSize)*2;
-  fNRows1    = (Int_t)(par[1]/fCellSize)*2;
+  fNColumns1 = (Int_t)((par[0]/fCellSize)*2);
+  fNRows1    = (Int_t)((par[1]/fCellSize)*2);
 
   // --------------- Left and right parts of ECAL
   par[0] = (fEcalSize[0]-fEcalHole[0])/4;
@@ -835,15 +837,18 @@ void CbmEcal::ConstructGeometry()
   volume = gGeoManager->Division("ECAL2column","ECAL2"      ,1,-1,-par[0],fCellSize,0,"S");
   volume = gGeoManager->Division("ECAL2row"   ,"ECAL2column",2,-1,-par[1],fCellSize,0,"S");
   
-  fNColumns2 = (Int_t)(par[0]/fCellSize)*2;
-  fNRows2    = (Int_t)(par[1]/fCellSize)*2;
+  fNColumns2 = (Int_t)((par[0]/fCellSize)*2);
+  fNRows2    = (Int_t)((par[1]/fCellSize)*2);
 
   Int_t colmax=TMath::Max(fNColumns1,fNColumns2);
   Int_t rowmax=TMath::Max(fNRows1,fNRows2);
   Int_t fVolumeIDmax = (2*(4-1)+2-1)*colmax*rowmax +
     colmax*rowmax + rowmax;
-
-  cout<<"fVolumeIDmax="<<fVolumeIDmax<<".fVolIDmax="<<fVolIdMax<<endl;
+#ifdef _DECAL
+  cout << "fNColumns1=" << fNColumns1 << ", fNColumns2=" << fNColumns2 << endl;
+  cout << "fNRows1=" << fNRows1 << ", fNRows2=" << fNRows2 << endl;
+  cout << "fVolumeIDmax=" <<fVolumeIDmax << ".fVolIDmax=" << fVolIdMax <<endl;
+#endif  
   fVolIdMax=fVolumeIDmax;
   // --------------- Preshower cell (lead + scintillator)
   Float_t psThickness = fThicknessPSlead + fThicknessPSscin;
@@ -1010,10 +1015,10 @@ Int_t CbmEcal::GetVolIdMax()
     }
     return GetVolIdMaxInf();
   }
-  static Int_t NColumns1 = (Int_t)(xcalosize/2/cellsize)*2;
-  static Int_t NRows1    = (Int_t)((ycalosize-yholesize)/4/cellsize)*2;
-  static Int_t NColumns2 = (Int_t)((xcalosize-xholesize)/4/cellsize)*2;
-  static Int_t NRows2    = (Int_t)(yholesize/2/cellsize)*2;
+  static Int_t NColumns1 = (Int_t)((xcalosize/2/cellsize)*2);
+  static Int_t NRows1    = (Int_t)(((ycalosize-yholesize)/4/cellsize)*2);
+  static Int_t NColumns2 = (Int_t)(((xcalosize-xholesize)/4/cellsize)*2);
+  static Int_t NRows2    = (Int_t)((yholesize/2/cellsize)*2);
   static Int_t colmax=TMath::Max(NColumns1,NColumns2);
   static Int_t rowmax=TMath::Max(NRows1,NRows2);
   static Int_t VolIdMax=colmax*rowmax+rowmax+(2*(4-1)+2-1)*colmax*rowmax;
@@ -1039,10 +1044,10 @@ Bool_t CbmEcal::GetCellCoordInf(Int_t fVolID, Float_t &x, Float_t &y, Int_t& ten
   static Float_t ycalosize=inf->GetEcalSize(1);
   static Float_t xholesize=inf->GetEcalHole(0);
   static Float_t yholesize=inf->GetEcalHole(1);
-  static Int_t NColumns1 = (Int_t)(xcalosize/2/cellsize)*2;
-  static Int_t NRows1    = (Int_t)((ycalosize-yholesize)/4/cellsize)*2;
-  static Int_t NColumns2 = (Int_t)((xcalosize-xholesize)/4/cellsize)*2;
-  static Int_t NRows2    = (Int_t)(yholesize/2/cellsize)*2;
+  static Int_t NColumns1 = (Int_t)((xcalosize/2/cellsize)*2);
+  static Int_t NRows1    = (Int_t)(((ycalosize-yholesize)/4/cellsize)*2);
+  static Int_t NColumns2 = (Int_t)(((xcalosize-xholesize)/4/cellsize)*2);
+  static Int_t NRows2    = (Int_t)((yholesize/2/cellsize)*2);
   static Int_t colmax=TMath::Max(NColumns1,NColumns2);
   static Int_t rowmax=TMath::Max(NRows1,NRows2);
   static Int_t VolIdMax=colmax*rowmax+rowmax+(2*(4-1)+2-1)*colmax*rowmax;
@@ -1112,10 +1117,10 @@ Bool_t CbmEcal::GetCellCoord(Int_t fVolID, Float_t &x, Float_t &y, Int_t& tenerg
     return GetCellCoordInf(fVolID, x, y, tenergy);
   }
   
-  static Int_t NColumns1 = (Int_t)(xcalosize/2/cellsize)*2;
-  static Int_t NRows1    = (Int_t)((ycalosize-yholesize)/4/cellsize)*2;
-  static Int_t NColumns2 = (Int_t)((xcalosize-xholesize)/4/cellsize)*2;
-  static Int_t NRows2    = (Int_t)(yholesize/2/cellsize)*2;
+  static Int_t NColumns1 = (Int_t)((xcalosize/2/cellsize)*2);
+  static Int_t NRows1    = (Int_t)(((ycalosize-yholesize)/4/cellsize)*2);
+  static Int_t NColumns2 = (Int_t)(((xcalosize-xholesize)/4/cellsize)*2);
+  static Int_t NRows2    = (Int_t)((yholesize/2/cellsize)*2);
   static Int_t colmax=TMath::Max(NColumns1,NColumns2);
   static Int_t rowmax=TMath::Max(NRows1,NRows2);
   static Int_t VolIdMax=colmax*rowmax+rowmax+(2*(4-1)+2-1)*colmax*rowmax;

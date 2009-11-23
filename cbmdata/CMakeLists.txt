@@ -21,6 +21,7 @@ set(CBMDATA_SRCS
 CbmBaseHit.cxx
 CbmDigi.cxx
 CbmHit.cxx
+CbmMCEvent.cxx
 CbmMCTrack.cxx
 CbmPixelHit.cxx
 CbmStack.cxx

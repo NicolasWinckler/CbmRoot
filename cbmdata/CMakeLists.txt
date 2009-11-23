@@ -21,7 +21,6 @@ set(CBMDATA_SRCS
 CbmBaseHit.cxx
 CbmDigi.cxx
 CbmHit.cxx
-CbmMCEvent.cxx
 CbmMCTrack.cxx
 CbmPixelHit.cxx
 CbmStack.cxx
@@ -37,12 +36,12 @@ mvd/CbmMvdHitMatch.cxx
 mvd/CbmMvdPoint.cxx
 
 sts/CbmStsCluster.cxx 
+sts/CbmStsDetectorId.cxx
 sts/CbmStsDigi.cxx 
 sts/CbmStsDigiMatch.cxx 
 sts/CbmStsHit.cxx 
 sts/CbmStsPoint.cxx 
 sts/CbmStsTrack.cxx 
-#sts/CbmStsTrackMatch.cxx
 
 rich/CbmRichRing.cxx	
 rich/CbmRichHit.cxx 

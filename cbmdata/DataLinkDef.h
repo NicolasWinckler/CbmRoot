@@ -7,7 +7,6 @@
 #pragma link C++ class CbmDigi+;
 #pragma link C++ class CbmBaseHit+;
 #pragma link C++ class CbmHit+;
-#pragma link C++ class CbmMCEvent+;
 #pragma link C++ class CbmMCTrack+;
 #pragma link C++ class CbmPixelHit+;
 #pragma link C++ class CbmStack+;
@@ -23,12 +22,12 @@
 #pragma link C++ class CbmMvdPoint+;
 
 #pragma link C++ class CbmStsCluster+;
+#pragma link C++ class CbmStsDetectorId+;
 #pragma link C++ class CbmStsDigi+;
 #pragma link C++ class CbmStsDigiMatch+;
 #pragma link C++ class CbmStsHit+;
 #pragma link C++ class CbmStsPoint+;
 #pragma link C++ class CbmStsTrack+;
-//#pragma link C++ class CbmStsTrackMatch+;
 
 #pragma link C++ class CbmRichPoint+;
 #pragma link C++ class CbmRichHit+;

@@ -6,12 +6,12 @@
  ** Data class for digital STS information
  ** Data level: RAW
  **
- ** The information is encoded into 6 bytes (1 Int_t, 1 Short_t).
- ** Address:                       22 bits
+ ** The information is encoded into 8 bytes (1 Long64_t).
+ ** Address:                       25 bits
  **   - Station Nr.        4 bits
  **   - Sector Nr.        10 bits
  **   - Side (front/back)  1 bit
- **   - Channel Nr.        7 bits
+ **   - Channel Nr.       10 bits
  ** Charge (ADC):                  12 bits
  ** Time (ns):                     14 bits
  **

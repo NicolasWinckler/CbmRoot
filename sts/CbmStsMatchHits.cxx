@@ -1,11 +1,10 @@
 //* $Id: */
 
 // -------------------------------------------------------------------------
-// -----                    CbmStsMatchHits source file                -----
-// -----                  Created 27/11/06  by V. Friese               -----
+// -----                    CbmStsMatchHits source file            -----
+// -----                  Created 01/07/2008  by R. Karabowicz         -----
 // -------------------------------------------------------------------------
-#include <iostream>
-#include <iomanip>
+
 
 // --- Includes from ROOT
 #include "TClonesArray.h"
@@ -17,6 +16,7 @@
 
 // --- Includes from STS
 #include "CbmGeoStsPar.h"
+#include "CbmGeoPassivePar.h"
 #include "CbmStsDigiPar.h"
 #include "CbmStsDigiScheme.h"
 #include "CbmStsDigiMatch.h"
@@ -25,8 +25,14 @@
 #include "CbmStsPoint.h"
 #include "CbmStsSector.h"
 #include "CbmStsStation.h"
+#include "FairGeoVector.h"
+#include "FairGeoNode.h"
 
 #include "TMath.h"
+
+#include <iostream>
+#include <iomanip>
+#include <map>
 
 using std::cout;
 using std::endl;
@@ -35,16 +41,18 @@ using std::left;
 using std::right;
 using std::fixed;
 using std::setprecision;
-
+using std::map;
 
 // -----   Default constructor   -------------------------------------------
 CbmStsMatchHits::CbmStsMatchHits() : FairTask("STSMatchHits", 1) {
+  fPassGeo     = NULL;
   fGeoPar      = NULL;
   fDigiPar     = NULL;
   fPoints      = NULL;
   fDigis       = NULL;
   fDigiMatches = NULL;
   fHits        = NULL;
+  fRealistic   = kFALSE;
   fDigiScheme  = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -54,12 +62,14 @@ CbmStsMatchHits::CbmStsMatchHits() : FairTask("STSMatchHits", 1) {
 // -----   Standard constructor   ------------------------------------------
 CbmStsMatchHits::CbmStsMatchHits(Int_t iVerbose)
   : FairTask("STSMatchHits", iVerbose) {
+  fPassGeo     = NULL;
   fGeoPar      = NULL;
   fDigiPar     = NULL;
   fPoints      = NULL;
   fDigis       = NULL;
   fDigiMatches = NULL;
   fHits        = NULL;
+  fRealistic   = kFALSE;
   fDigiScheme  = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -69,12 +79,14 @@ CbmStsMatchHits::CbmStsMatchHits(Int_t iVerbose)
 // -----   Constructor with name   -----------------------------------------
 CbmStsMatchHits::CbmStsMatchHits(const char* name, Int_t iVerbose)
   : FairTask(name, iVerbose) {
+  fPassGeo     = NULL;
   fGeoPar      = NULL;
   fDigiPar     = NULL;
   fPoints      = NULL;
   fDigis       = NULL;
   fDigiMatches = NULL;
   fHits        = NULL;
+  fRealistic   = kFALSE;
   fDigiScheme  = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -83,6 +95,7 @@ CbmStsMatchHits::CbmStsMatchHits(const char* name, Int_t iVerbose)
 
 // -----   Destructor   ----------------------------------------------------
 CbmStsMatchHits::~CbmStsMatchHits() {
+  if ( fPassGeo )    delete fPassGeo;
   if ( fGeoPar )     delete fGeoPar;
   if ( fDigiPar )    delete fDigiPar;
   if ( fDigiScheme ) delete fDigiScheme;
@@ -93,6 +106,11 @@ CbmStsMatchHits::~CbmStsMatchHits() {
 
 // -----   Public method Exec   --------------------------------------------
 void CbmStsMatchHits::Exec(Option_t* opt) {
+
+  if ( fRealistic ) {
+    ExecReal(opt);
+    return;
+  }
 
   // Timer
   fTimer.Start();
@@ -132,7 +150,7 @@ void CbmStsMatchHits::Exec(Option_t* opt) {
     Double_t dY = hit->GetDy();
 
     // Get front side DigiMatch corresponding to hit
-    Int_t  iMatchF  = hit->GetDigi(0);
+    Int_t  iMatchF  = (Int_t)hit->GetDigi(0);
     if ( iMatchF >= 0 ) 
       dMatchF = (CbmStsDigiMatch*) fDigiMatches->At(iMatchF);
     if ( ! dMatchF ) {
@@ -146,7 +164,7 @@ void CbmStsMatchHits::Exec(Option_t* opt) {
 
     // Get back side DigiMatch of hit (for strip sensors only)
     if ( iType != 1 ) {
-      Int_t  iMatchB  = hit->GetDigi(1);    
+      Int_t  iMatchB  = (Int_t)hit->GetDigi(1);    
       if ( iMatchB >= 0 ) 
 	dMatchB = (CbmStsDigiMatch*) fDigiMatches->At(iMatchB);
       if ( ! dMatchB ) {
@@ -183,6 +201,7 @@ void CbmStsMatchHits::Exec(Option_t* opt) {
 	Double_t xP = point->GetX(station->GetZ());
 	Double_t yP = point->GetY(station->GetZ());
 	Double_t dist = TMath::Sqrt( (xP-xH)*(xP-xH) + (yP-yH)*(yP-yH) );
+	//	cout << "candidate dist = " << dist << endl;
 	fCandMap[dist] = iPointF;
       }     // front digi loop
     }       // pixel sensor
@@ -193,10 +212,12 @@ void CbmStsMatchHits::Exec(Option_t* opt) {
       for ( Int_t iMatchF=0; iMatchF<3; iMatchF++) {
 	Int_t iPointF = dMatchF->GetRefIndex(iMatchF);
 	if ( iPointF < 0 ) continue; 
+	//	cout << " got pointf index = " << iPointF << endl;
 	nPointsF++;
 	for ( Int_t iMatchB=0; iMatchB<3; iMatchB++) {
 	  Int_t iPointB = dMatchB->GetRefIndex(iMatchB);
 	  if ( iPointB < 0 ) continue; 
+	  //	  cout << " got pointb index = " << iPointB << endl;
 	  if ( iMatchF == 0 ) nPointsB++;
 	  if ( iPointB != iPointF ) continue; // chance combination
 	  // Calculate distance to hit
@@ -257,8 +278,8 @@ void CbmStsMatchHits::Exec(Option_t* opt) {
       Fatal("Exec", "No closest point");
     }
     CbmStsPoint* point = (CbmStsPoint*) fPoints->At(iPoint);
-    if (fVerbose>1) cout << ", matched to " << iPoint << ", distance " 
-			 << distMin << " cm";
+    if (fVerbose>1)    cout << ", matched to " << iPoint << ", distance " 
+			    << distMin << " cm";
  	    
     // Check whether closest point is more than 5 sigma away from hit.
     // This should not happen in case of pixel or strip OSU sensors,
@@ -304,14 +325,96 @@ void CbmStsMatchHits::Exec(Option_t* opt) {
 
   // Event statistics
   fTimer.Stop();
-  if ( fVerbose ) {
-    if ( warn ) cout << "- ";
-    else        cout << "+ ";
-    cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8) 
-	 << fixed << right << fTimer.RealTime()
-	 << " s, hits " << nHits << ", matched " << nMatched << ", distant " 
-	 << nDistant << ", background " << setw(6) << nBackgrd << endl;
+  if ( warn ) cout << "- ";
+  else        cout << "+ ";
+  cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8) 
+       << fixed << right << fTimer.RealTime()
+       << " s, hits " << nHits << ", matched " << nMatched << ", distant " 
+       << nDistant << ", background " << setw(6) << nBackgrd << endl;
+
+  // Run statistics
+  if ( warn) fNEventsFailed++;
+  else {
+    fNEvents++;
+    fTime     += fTimer.RealTime();
+    fNHits    += Double_t(nHits);
+    fNMatched += Double_t(nMatched);
+    fNDistant += Double_t(nDistant);
+    fNBackgrd += Double_t(nBackgrd);
   }
+
+}
+
+// -------------------------------------------------------------------------
+
+// -----   Public method ExecReal   --------------------------------------------
+void CbmStsMatchHits::ExecReal(Option_t* opt) {
+
+  // Timer
+  fTimer.Start();
+  Bool_t warn = kFALSE;
+
+  // Counters
+  Int_t nHits    = fHits->GetEntriesFast();
+  Int_t nNoDigi  = 0;
+  Int_t nBackgrd = 0;
+  Int_t nDistant = 0;
+  Int_t nMatched = 0;
+
+  Int_t nofStsHits = fHits->GetEntriesFast();
+  Int_t nofStsPoints = fPoints->GetEntriesFast();
+  cout << "there are " << nofStsPoints << " points and " << nofStsHits << " hits." << endl;
+  Int_t   hitStationLimits[2][100];
+
+  for ( Int_t ist = 0 ; ist < fNStations ; ist++ ) {
+    hitStationLimits[0][ist] = -1;
+    hitStationLimits[1][ist] = -1;
+  }
+
+  // check for limits of hit indices on different stations...
+  for ( Int_t ihit = 0 ; ihit < nofStsHits ; ihit++ ) {
+    CbmStsHit *stsHit     = (CbmStsHit*)fHits->At(ihit);
+    stsHit->SetRefIndex(-1);
+    if ( hitStationLimits[0][stsHit->GetStationNr()-1] == -1 )
+      hitStationLimits[0][stsHit->GetStationNr()-1] = ihit;
+    CbmStsHit *stsHitBack = (CbmStsHit*)fHits->At(nofStsHits-ihit-1);
+    if ( hitStationLimits[1][stsHitBack->GetStationNr()-1] == -1 ) {
+      hitStationLimits[1][stsHitBack->GetStationNr()-1] = nofStsHits-ihit;
+    }
+  }
+//   for ( Int_t istat = 0 ; istat < fNStations ; istat++ ) 
+//     cout << "station " << istat << " hits from " << hitStationLimits[0][istat] << " to " << hitStationLimits[1][istat] << endl;
+
+  for ( Int_t ipnt = 0 ; ipnt < nofStsPoints ; ipnt++ ) {
+    CbmStsPoint *stsPoint = (CbmStsPoint*)fPoints->At(ipnt);
+
+    Int_t startHit = hitStationLimits[0][fStationNrFromMcId[stsPoint->GetDetectorID()]];
+    Int_t finalHit = hitStationLimits[1][fStationNrFromMcId[stsPoint->GetDetectorID()]];
+    
+    if ( startHit == -1 && finalHit == -1 ) continue;
+    
+    for ( Int_t ihit = startHit ; ihit < finalHit ; ihit++ ) {
+      CbmStsHit *stsHit= (CbmStsHit*)fHits->At(ihit);
+      if ( ( TMath::Abs(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ())) < .01 ) &&
+ 	   ( TMath::Abs(stsHit->GetY()-stsPoint->GetY(stsHit->GetZ())) < .04 ) ) {
+// 	cout << "matching " 
+// 	     << "X: " << stsHit->GetX() << " - " << stsPoint->GetX(stsHit->GetZ())
+// 	     << "Y: " << stsHit->GetY() << " - " << stsPoint->GetY(stsHit->GetZ()) << endl;
+	stsHit->SetRefIndex(ipnt);
+	//	cout << "setting ref index = " << stsHit->GetRefIndex() << " (max sts pnt = " << nofStsPoints << ")" << endl;
+	nMatched++;
+      }
+    }
+  }
+
+  // Event statistics
+  fTimer.Stop();
+  if ( warn ) cout << "- ";
+  else        cout << "+ ";
+  cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8) 
+       << fixed << right << fTimer.RealTime()
+       << " s, hits " << nHits << ", matched " << nMatched << ", distant " 
+       << nDistant << ", background " << setw(6) << nBackgrd << endl;
 
   // Run statistics
   if ( warn) fNEventsFailed++;
@@ -339,6 +442,7 @@ void CbmStsMatchHits::SetParContainers() {
   if ( ! db ) Fatal("SetParContainers", "No runtime database");
 
   // Get STS geometry and digitisation parameter container
+  fPassGeo = (CbmGeoPassivePar*) db->getContainer("CbmGeoPassivePar");
   fGeoPar  = (CbmGeoStsPar*)  db->getContainer("CbmGeoStsPar");
   fDigiPar = (CbmStsDigiPar*) db->getContainer("CbmStsDigiPar");
 
@@ -379,6 +483,13 @@ InitStatus CbmStsMatchHits::Init() {
     return kERROR;
   }
 
+  InitStatus geoStatus = GetGeometry();
+  if ( geoStatus != kSUCCESS ) {
+    cout << "-E- " << GetName() << "::Init: Error in reading geometry!"
+	 << endl;
+    return geoStatus;
+  }
+
   // Build digitisation scheme
   if ( fDigiScheme->Init(fGeoPar, fDigiPar) ) {
     if      (fVerbose == 1 || fVerbose == 2) fDigiScheme->Print(kFALSE);
@@ -407,7 +518,107 @@ InitStatus CbmStsMatchHits::ReInit() {
   // Build new digitisation scheme
   if ( fDigiScheme->Init(fGeoPar, fDigiPar) ) return kSUCCESS;
 
+  InitStatus geoStatus = GetGeometry();
+  if ( geoStatus != kSUCCESS ) {
+    cout << "-E- " << GetName() << "::Init: Error in reading geometry!"
+	 << endl;
+    return geoStatus;
+  }
+
   return kERROR;
+
+}
+// -------------------------------------------------------------------------
+
+// -----   Private method GetGeometry   ------------------------------------
+InitStatus CbmStsMatchHits::GetGeometry() {
+
+  // Get target geometry
+  if ( ! fPassGeo ) {
+    cout << "-W- " << GetName() << "::GetGeometry: No passive geometry!"
+	 <<endl;
+    fTargetPos.SetXYZ(0., 0., 0.);
+    return kERROR;
+  }
+  TObjArray* passNodes = fPassGeo->GetGeoPassiveNodes();
+  if ( ! passNodes ) {
+    cout << "-W- " << GetName() << "::GetGeometry: No passive node array" 
+	 << endl;
+    fTargetPos.SetXYZ(0., 0., 0.);
+    return kERROR;
+  }
+  /*  FairGeoNode* target = (FairGeoNode*) passNodes->FindObject("targ");
+  if ( ! target ) {
+    cout << "-E- " << GetName() << "::GetGeometry: No target node" 
+	 << endl;
+    fTargetPos.SetXYZ(0., 0., 0.);
+    return kERROR;
+  }
+  FairGeoVector targetPos = target->getLabTransform()->getTranslation();
+  FairGeoVector centerPos = target->getCenterPosition().getTranslation();
+  Double_t targetX = targetPos.X() + centerPos.X();
+  Double_t targetY = targetPos.Y() + centerPos.Y();
+  Double_t targetZ = targetPos.Z() + centerPos.Z();
+  fTargetPos.SetXYZ(targetX, targetY, targetZ);*/
+  
+  // Get STS geometry
+  if ( ! fGeoPar ) {
+    cout << "-W- " << GetName() << "::GetGeometry: No passive geometry!"
+	 <<endl;
+    fNStations = 0;
+    return kERROR;
+  }
+  TObjArray* stsNodes = fGeoPar->GetGeoSensitiveNodes();
+  if ( ! stsNodes ) {
+    cout << "-E- " << GetName() << "::GetGeometry: No STS node array" 
+	 << endl;
+    fNStations = 0;
+    return kERROR;
+  }
+  Int_t tempNofStations = stsNodes->GetEntries();
+
+  cout << "There are " << tempNofStations << " nodes" << (tempNofStations > 10 ? "!!!" : "" ) << endl;
+
+  TString geoNodeName;
+  fNStations = 0;
+  TString stationNames[100];
+  for ( Int_t ist = 0 ; ist < tempNofStations ; ist++ ) {
+    FairGeoNode* stsNode = (FairGeoNode*)stsNodes->At(ist);
+    if ( ! stsNode ) {
+      cout << "-W- CbmStsDigiScheme::Init: station#" << ist
+	   << " not found among sensitive nodes " << endl;
+      continue;
+    }
+    geoNodeName = stsNode->getName();
+    //    TArrayD* params = stsNode->getParameters();
+
+    Bool_t stationKnown = kFALSE;
+    // check if the node belongs to some station, save the MCId and outer radius
+    for ( Int_t ikst = 0 ; ikst < fNStations ; ikst++ )
+      if ( geoNodeName.Contains(stationNames[ikst]) ) {
+	fStationNrFromMcId[stsNode->getMCid()] = ikst;
+	stationKnown = kTRUE;
+      }
+
+    if ( stationKnown ) continue;
+
+    // if not known, register it and save MCId
+    fStationNrFromMcId[stsNode->getMCid()] = fNStations;
+
+    // it will work only if the node name is organized as:
+    // for station name is "stsstationXX", where XX is the station number (f.e. XX=07 for station number 7)
+    // for sector  name is "stsstationXXanythingHereToDistinguishDifferentSectors"
+    geoNodeName.Remove(12,geoNodeName.Length()-12);
+    stationNames[fNStations] = geoNodeName.Data();
+    fNStations++;
+
+    cout << "station #" << fNStations << " has MCID = " << stsNode->getMCid() << " and name " << stsNode->GetName() << endl;
+    
+    //    fStationsMCId[fNStations] = stsNode->getMCid(); // not used
+  }
+  cout << "There are " << fNStations << " stations" << endl;
+
+  return kSUCCESS;
 
 }
 // -------------------------------------------------------------------------

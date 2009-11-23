@@ -1,34 +1,39 @@
 //* $Id: */
 
 // -------------------------------------------------------------------------
-// -----                    CbmStsDigitize source file                 -----
-// -----                  Created 30/08/06  by V. Friese               -----
+// -----                    CbmStsDigitize source file             -----
+// -----                  Created 08/07/2008  by R. Karabowicz         -----
 // -------------------------------------------------------------------------
 
-// Includes from STS
-#include "CbmStsDigitize.h"
 
-#include "CbmGeoStsPar.h"
-#include "CbmStsDigi.h"
-#include "CbmStsDigiMatch.h"
-#include "CbmStsDigiPar.h"
-#include "CbmStsDigiScheme.h"
-#include "CbmStsPoint.h"
-#include "CbmStsSensor.h"
-#include "CbmStsSector.h"
-#include "CbmStsStation.h"
+
+
+// Includes from ROOT
+#include "TClonesArray.h"
+#include "TObjArray.h"
+#include "TMath.h"
+#include "TF1.h"
+#include "TRandom3.h"
+
+#include "TGeoManager.h"
+#include "TGeoNode.h"
 
 // Includes from base
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
-// Includes from ROOT
-#include "TClonesArray.h"
-#include "TObjArray.h"
-#include "TMath.h"
-#include "TGeoManager.h"
-#include "TGeoNode.h"
+// Includes from STS
+#include "CbmGeoStsPar.h"
+#include "CbmStsDigi.h"
+#include "CbmStsDigiMatch.h"
+#include "CbmStsDigiPar.h"
+#include "CbmStsDigiScheme.h"
+#include "CbmStsDigitize.h"
+#include "CbmStsPoint.h"
+#include "CbmStsSensor.h"
+#include "CbmStsSector.h"
+#include "CbmStsStation.h"
 
 #include <iostream>
 #include <iomanip>
@@ -37,14 +42,16 @@
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::flush;
 using std::pair;
 using std::setw;
 using std::left;
 using std::right;
 using std::fixed;
 using std::setprecision;
+using std::set;
 using std::map;
-
+using std::ios_base;
 
 
 // -----   Default constructor   ------------------------------------------
@@ -54,12 +61,25 @@ CbmStsDigitize::CbmStsDigitize() : FairTask("STS Digitizer", 1) {
   fPoints      = NULL;
   fDigis       = NULL;
   fDigiMatches = NULL;
+  fRealistic   = kFALSE;
   fDigiScheme  = new CbmStsDigiScheme();
   Reset();
+
+  fStep = 0.001;
+
+  fFThreshold  = 0.001;
+  fBThreshold  = 0.001;
+  fFNoiseWidth = 0.0;
+  fBNoiseWidth = 0.0;
+
+  fFNofBits    = 20;
+  fBNofBits    = 20;
+  fFMinStep    = 0.01;
+  fBMinStep    = 0.01;
+
+  fNEvents = 0.;
 }
 // -------------------------------------------------------------------------
-
-
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsDigitize::CbmStsDigitize(Int_t iVerbose) 
@@ -69,12 +89,25 @@ CbmStsDigitize::CbmStsDigitize(Int_t iVerbose)
   fPoints      = NULL;
   fDigis       = NULL;
   fDigiMatches = NULL;
+  fRealistic   = kFALSE;
   fDigiScheme  = new CbmStsDigiScheme();
   Reset();
+
+  fStep = 0.001;
+
+  fFThreshold  = 0.001;
+  fBThreshold  = 0.001;
+  fFNoiseWidth = 0.0;
+  fBNoiseWidth = 0.0;
+
+  fFNofBits    = 20;
+  fBNofBits    = 20;
+  fFMinStep    = 0.01;
+  fBMinStep    = 0.01;
+
+  fNEvents = 0.;
 }
 // -------------------------------------------------------------------------
-
-
 
 // -----   Constructor with name   -----------------------------------------
 CbmStsDigitize::CbmStsDigitize(const char* name, Int_t iVerbose) 
@@ -84,12 +117,25 @@ CbmStsDigitize::CbmStsDigitize(const char* name, Int_t iVerbose)
   fPoints      = NULL;
   fDigis       = NULL;
   fDigiMatches = NULL;
+  fRealistic   = kFALSE;
   fDigiScheme  = new CbmStsDigiScheme();
   Reset();
+
+  fStep = 0.001;
+
+  fFThreshold  = 0.001;
+  fBThreshold  = 0.001;
+  fFNoiseWidth = 0.0;
+  fBNoiseWidth = 0.0;
+
+  fFNofBits    = 20;
+  fBNofBits    = 20;
+  fFMinStep    = 0.01;
+  fBMinStep    = 0.01;
+
+  fNEvents = 0.;
 }
 // -------------------------------------------------------------------------
-
-
 
 // -----   Destructor   ----------------------------------------------------
 CbmStsDigitize::~CbmStsDigitize() { 
@@ -111,15 +157,23 @@ CbmStsDigitize::~CbmStsDigitize() {
 // -----   Public method Exec   --------------------------------------------
 void CbmStsDigitize::Exec(Option_t* opt) {
 
+//   cout << "threshold = " << fFThreshold << endl;
+
   // Reset all eventwise counters
   fTimer.Start();
   Reset();
+  TF1* digiGausDist = new TF1("digiGausDist","gaus",-5.,5.);
 
   // Verbose screen output
   if ( fVerbose > 2 ) {
-    cout << endl << "-I- " << fName << ": executing event" << endl;
+    cout << endl << "-I- " << fName << ": executing event" << endl; 
     cout << "----------------------------------------------" << endl;
   }
+
+  Double_t nPoints  = 0.;
+  Double_t nOutside = 0.;
+  Double_t nDigisF  = 0.;
+  Double_t nDigisB  = 0.;
 
   // Loop over all StsPoints
   if ( ! fPoints ) {
@@ -129,138 +183,283 @@ void CbmStsDigitize::Exec(Option_t* opt) {
     return;
   }
 
+  map<CbmStsSensor*, set<Int_t> >::iterator mapIt;
+  for (mapIt=fPointMap.begin(); mapIt!=fPointMap.end(); mapIt++)
+    ((*mapIt).second).clear();
+  
   for (Int_t iPoint=0; iPoint<fPoints->GetEntriesFast(); iPoint++) {
     CbmStsPoint* point = (CbmStsPoint*) fPoints->At(iPoint);
-    fNPoints++;
 
-    Double_t xIn = point->GetXIn(); 
-    Double_t yIn = point->GetYIn(); 
-    Double_t zIn = point->GetZIn(); 
-
-    gGeoManager->FindNode(xIn,yIn,zIn);
+    Double_t xin = point->GetXIn();
+    Double_t yin = point->GetYIn();
+    Double_t zin = point->GetZIn();
+    gGeoManager->FindNode(xin,yin,zin);
     TGeoNode* curNode = gGeoManager->GetCurrentNode();
-
+    
     CbmStsSensor* sensor = fDigiScheme->GetSensorByName(curNode->GetName());
-    
-    if ( !sensor ) 
-      Fatal("Exec",Form("No sensor in DigiScheme with name: \"%s\"",curNode->GetName()));
 
-    Int_t stationNr = sensor->GetStationNr();
-    Int_t  sectorNr = sensor->GetSectorNr();
-
-    // Take point coordinates in the midplane of the sensor
-    if ( ! point->IsUsable() ) continue;
-    Double_t xpt = point->GetX(sensor->GetZ0());
-    Double_t ypt = point->GetY(sensor->GetZ0());
-
-    Int_t iChan    = -1;
-    Int_t channelF = -1;
-    Int_t channelB = -1;
-
-    iChan = sensor->GetChannel(xpt, ypt, 0);
-
-    // point outside active sensor area
-    if ( iChan < 0 ) {
-      if ( fVerbose ) {
-	Float_t tempX = sensor->GetX0();
-	Float_t tempY = sensor->GetY0();
-	Float_t rot = sensor->GetRotation();
-	Float_t tempLX = sensor->GetLx()/2.*TMath::Cos(rot)+sensor->GetLy()/2.*TMath::Sin(rot);
-	Float_t tempLY = sensor->GetLy()/2.*TMath::Cos(rot)+sensor->GetLx()/2.*TMath::Sin(rot);
-	
-	cout.precision(8);
-	cout << fName << ". Warning: Point " << xpt << ", " << ypt << ", " << sensor->GetZ0() << " not inside sector." << endl;
-      }
+    if ( fPointMap.find(sensor) == fPointMap.end() ) {
+      cerr << "-E- " << fName << "::Exec:: sensor " << curNode->GetName()
+	   << " not found in digi scheme!" << endl;
       continue;
     }
-
-    channelF = iChan;
-
-    Int_t sectorDetId  = 2 << 24 | stationNr << 16 | sectorNr << 4;
-   
-    // Treat front side
-    pair<Int_t, Int_t> a(sectorDetId, channelF);
-    if ( fChannelMap.find(a) == fChannelMap.end() ) {
-      // Channel not yet active. Create new Digi and Match.
-      new ((*fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
-					  0, channelF);
-      new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(iPoint);
-      fChannelMap[a] = fNDigis;
-      fNDigis++;
-    }
-    else {
-      // Channel already active. Update DigiMatch.
-      Int_t iDigi = fChannelMap[a];
-      CbmStsDigiMatch* match 
-	= dynamic_cast<CbmStsDigiMatch*>(fDigiMatches->At(iDigi));
-      if ( match ) {
-	match->AddPoint(iPoint);
-	fNMulti++;
-      }
-    }
-    
-    // Treat back side (strip sensors only)
-    if ( sensor->GetType() < 2 || sensor->GetType() > 3 ) continue;
-
-    iChan = sensor->GetChannel(xpt, ypt, 1);
-    if ( iChan <0 ) {
-      cerr << "-W- " << fName << "::Exec: No back side channel "
-	   << " for StsPoint " << iPoint << ", station "
-	   << stationNr << ", sector " << sectorNr 
-	   << ", front side channel " << channelF << endl;
-      continue;
-    }
-    sectorDetId = sectorDetId | (1<<0);  // for back side channel
-    channelB = iChan;
-    pair<Int_t, Int_t> b(sectorDetId, channelB);
-    if ( fChannelMap.find(b) == fChannelMap.end() ) {
-      // Channel not yet active. Create new Digi and Match.
-      new ((*fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
-					  1, channelB);
-      new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(iPoint);
-      fChannelMap[b] = fNDigis;
-      fNDigis++;
-    }
-    else {
-      // Channel already active. Update DigiMatch.
-      Int_t iDigi = fChannelMap[b];
-      CbmStsDigiMatch* match 
-	= dynamic_cast<CbmStsDigiMatch*>(fDigiMatches->At(iDigi));
-      if ( match ) {
-	  match->AddPoint(iPoint);
-	  fNMulti++;
-      }
-    }
-
-    // Verbose screen output
-    if ( fVerbose > 2 ) {
-      cout.precision(6);
-      cout << "StsPoint " << iPoint << ", station " << stationNr
-	   << ", (" << xpt << ", " << ypt << ") cm, sector " 
-	   << sectorNr << ", front " << channelF << ", back "
-	   << channelB << endl;
-    }
-
-
-    // Not found in any sector?
-    if ( sectorNr == -1 ) fNOutside++;      
-
-  }  // StsPoint loop
-
-  // Screen output
-  fTimer.Stop();
-  if ( fVerbose ) {
-    cout << "+ ";
-    cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
-	 << fixed << right << fTimer.RealTime()
-	 << " s, points " << fNPoints << ", failed " << fNFailed 
-	 << ", outside " << fNOutside << ", multihits " << fNMulti 
-	 << ", digis " << fNDigis << endl;
+    fPointMap[sensor].insert(iPoint);     
   }
+  
+  for (Int_t iStation=fDigiScheme->GetNStations(); iStation > 0 ; ) {
+    CbmStsStation* station = fDigiScheme->GetStation(--iStation);
+    for (Int_t iSector=station->GetNSectors(); iSector > 0 ; ) {
+      CbmStsSector* sector = station->GetSector(--iSector);
+
+      map<Int_t, set<Int_t> >::iterator mapCh;
+
+      for (mapCh=fFChannelPointsMap.begin(); mapCh!=fFChannelPointsMap.end(); mapCh++)
+	((*mapCh).second).clear();
+      for (mapCh=fBChannelPointsMap.begin(); mapCh!=fBChannelPointsMap.end(); mapCh++)
+	((*mapCh).second).clear();
+
+      // simulating detector+cables+electronics noise 
+      // should be more sophisticated...
+      // the question is: sectorwise or sensorwise???
+      Int_t nChannels = sector->GetNChannelsFront();
+      for (Int_t iChannel=nChannels ; iChannel > 0 ; ) {
+// 	fStripSignalF[--iChannel] = fGen->Landau(.1,.02);
+// 	fStripSignalB[  iChannel] = fGen->Landau(.1,.02);
+// 	fStripSignalF[--iChannel] = 0.;
+// 	fStripSignalB[  iChannel] = 0.;
+	fStripSignalF[--iChannel] = TMath::Abs(fGen->Gaus(0.,fFNoiseWidth));
+	fStripSignalB[  iChannel] = TMath::Abs(fGen->Gaus(0.,fBNoiseWidth));
+      }
+      
+      for (Int_t iSensor=sector->GetNSensors(); iSensor > 0 ; ) {
+	CbmStsSensor* sensor = sector->GetSensor(--iSensor);
+	
+	ProduceHitResponse(sensor);
+      }
+
+      Int_t   stationNr = sector->GetStationNr();
+      Int_t    sectorNr = sector->GetSectorNr();
+      Int_t sectorDetId = sector->GetDetectorId();
+      
+      for ( Int_t ifstr = 0 ; ifstr < nChannels ; ifstr++ ) {
+	if ( fStripSignalF[ifstr] < fFThreshold ) continue;
+        
+	Double_t generator;
+	generator = fGen->Rndm()*100.;	
+// 	cout << "digi#" << fNDigis << " -> making fdigi at " << stationNr << "," << sectorNr 
+// 	     << " at channel " << ifstr << " with signal " << fStripSignalF[ifstr] << endl;        
+// 	if (generator< fStripDeadTime*occupancy [iStation][iSector][ifstr/125])
+// 	{
+// 	cout << "OCCUPANCYF [" << iStation+1 << "][" << iSector+1 << "][" << ifstr/125 << "] "<< occupancy [iStation][iSector][ifstr/125] << "%" << " generator = "<<generator<< endl;
+// 	}
+// 	if (generator< fStripDeadTime*occupancy [iStation][iSector][ifstr/125]) ifstr = ifstr+2;
+// 	if (generator< fStripDeadTime*occupancy [iStation][iSector][ifstr/125]) continue;
+	
+	Int_t digiFSignal = 1+(Int_t)((fStripSignalF[ifstr]-fFThreshold)/fFMinStep);
+	if ( digiFSignal >= fFNofSteps ) digiFSignal = fFNofSteps-1;
+	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
+						  0, ifstr, 
+						  digiFSignal, 0);
+	//						  fStripSignalF[ifstr], 0);
+	set<Int_t>::iterator it1;
+	set<Int_t> chPnt = fFChannelPointsMap[ifstr];
+	Int_t pnt;
+	CbmStsDigiMatch* match;
+	if ( chPnt.size() == 0 ) {
+// 	  cout << "digi#" << fNDigis << " -> making fdigi at " << stationNr << "," << sectorNr 
+// 	       << " at channel " << ifstr << " with signal " << fStripSignalF[ifstr] << endl;
+	  new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(-666);
+	}
+	else {
+	  for (it1=chPnt.begin(); it1!=chPnt.end(); it1++) {
+	    pnt = (*it1);
+	    if ( it1==chPnt.begin() ) 
+	      match = new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(pnt);
+	    else {
+	      match->AddPoint(pnt);
+	      fNMulti++;
+	    }
+	  }
+	}
+	fNDigis++;
+      }
+      
+      for ( Int_t ibstr = 0 ; ibstr < nChannels ; ibstr++ ) {
+	if ( fStripSignalB[ibstr] < fBThreshold ) continue;
+
+	Double_t generator;
+	generator = fGen->Rndm()*100.;
+	/*if (generator< fStripDeadTime*occupancy [iStation][iSector][ibstr/125])
+	{
+	cout << "OCCUPANCYB [" << iStation+1 << "][" << iSector+1 << "][" << ibstr/125 << "] "<< occupancy [iStation][iSector][ibstr/125] << "%  generator = "<<generator<< endl;
+	}*/
+	//if (generator< fStripDeadTime*occupancy [iStation][iSector][ibstr/125]) ibstr = ibstr+2;
+// 	if (generator< fStripDeadTime*occupancy [iStation][iSector][ibstr/125]) continue;
+
+	Int_t digiBSignal = 1+(Int_t)((fStripSignalB[ibstr]-fBThreshold)/fBMinStep);
+	if ( digiBSignal >= fBNofSteps ) digiBSignal = fBNofSteps-1;
+	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
+						  1, ibstr, 
+						  digiBSignal, 0);
+	//						  fStripSignalB[ibstr], 0);
+	set<Int_t>::iterator it1;
+	set<Int_t> chPnt = fBChannelPointsMap[ibstr];
+	Int_t pnt;
+	CbmStsDigiMatch* match;
+	if ( chPnt.size() == 0 ) {
+// 	  cout << "digi#" << fNDigis << " -> making fdigi at " << stationNr << "," << sectorNr 
+// 	       << " at channel " << ifstr << " with signal " << fStripSignalF[ifstr] << endl;
+	  new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(-666);
+	}
+	else {
+	  for (it1=chPnt.begin(); it1!=chPnt.end(); it1++) {
+	    pnt = (*it1);
+	    if ( it1==chPnt.begin() ) 
+	    match = new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(pnt);
+	    else {
+	      match->AddPoint(pnt);
+	      fNMulti++;
+	    }
+	  }
+	}
+	fNDigis++;
+      }
+    }
+  }
+  
+  fTimer.Stop();
+  cout << "+ " << flush;
+  cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
+       << fixed << right << fTimer.RealTime() 
+       << " s, digis " << nDigisF << " / " << nDigisB << endl;
+  
+  fNEvents     += 1.;
+  fNPoints     += Double_t(nPoints);
+  fNOutside    += Double_t(nOutside);
+  fNDigisFront += Double_t(nDigisF);
+  fNDigisBack  += Double_t(nDigisB);
+  fTime        += fTimer.RealTime();
+
 }
 // -------------------------------------------------------------------------
 
+// -----   Private method ProduceHitResponse   --------------------------------
+void CbmStsDigitize::ProduceHitResponse(CbmStsSensor* sensor) {
+  set <Int_t> pSet;
+  if ( fPointMap.find(sensor) == fPointMap.end() ) {
+    cerr << "-E- " << fName << "::Exec:: sensor" 
+	 << " not found in digi scheme!" << endl;
+    return;
+  }
+  pSet = fPointMap[sensor];
 
+  Int_t       iPoint = -1;
+  CbmStsPoint* point = NULL;
+
+  set<Int_t>::iterator it1;
+
+  for (it1=pSet.begin(); it1!=pSet.end(); it1++) {
+    iPoint = (*it1);
+    point  = (CbmStsPoint*) fPoints->At(iPoint);
+
+    Double_t xin = point->GetXIn();
+    Double_t yin = point->GetYIn();
+    Double_t zin = point->GetZIn();
+    
+    Double_t xvec = point->GetXOut()-xin;
+    Double_t yvec = point->GetYOut()-yin;
+    Double_t zvec = point->GetZOut()-zin;
+
+    Int_t nofSteps = (Int_t)(TMath::Sqrt(xvec*xvec+yvec*yvec+zvec*zvec)/fStep+1);
+    
+    Double_t stepEL = fEnergyLossToSignal*point->GetEnergyLoss()/(nofSteps+1);
+    
+    xvec = xvec/((Double_t)nofSteps);  
+    yvec = yvec/((Double_t)nofSteps);  
+    zvec = zvec/((Double_t)nofSteps);  
+
+    for ( Int_t istep = 0 ; istep <= nofSteps ; istep++ ) {
+      //      Float_t iFChan = sensor->GetChannelPlus(xin, yin, 0);
+      Int_t   iIChan = sensor->GetFrontChannel(xin,yin,zin);
+	//(Int_t)iFChan;
+      
+      if ( iIChan != -1 ) {
+	fStripSignalF[iIChan] += stepEL;
+	fFChannelPointsMap[iIChan].insert(iPoint);
+      }
+
+      //      iFChan = sensor->GetChannelPlus(xin, yin, 1);
+      //      iIChan = (Int_t)iFChan;
+      iIChan = sensor->GetBackChannel (xin,yin,zin);
+      
+      if ( iIChan != -1 ) {
+	fStripSignalB[iIChan] += stepEL;
+	fBChannelPointsMap[iIChan].insert(iPoint);
+      }
+    
+      xin+=xvec;
+      yin+=yvec;
+      zin+=zvec;
+    }
+    
+  }
+
+}
+// -------------------------------------------------------------------------
+
+// -----   Private method FindFiredStrips   --------------------------------
+void CbmStsDigitize::FindFiredStrips(CbmStsPoint* pnt,Int_t& nofStr,Int_t*& strips,Double_t*& signals, Int_t side) {
+
+  nofStr = 0;
+
+  Double_t xin = pnt->GetXIn();
+  Double_t yin = pnt->GetYIn();
+  Double_t zin = pnt->GetZIn();
+
+  gGeoManager->FindNode(xin,yin,zin);
+  TGeoNode* curNode = gGeoManager->GetCurrentNode();
+  
+  CbmStsSensor* sensor = fDigiScheme->GetSensorByName(curNode->GetName());
+
+  Double_t xvec = pnt->GetXOut()-xin;
+  Double_t yvec = pnt->GetYOut()-yin;
+  Double_t zvec = pnt->GetZOut()-zin;
+
+  Int_t nofSteps = (Int_t)(TMath::Sqrt(xvec*xvec+yvec*yvec+zvec*zvec)/fStep+1);
+
+  Double_t stepEL = fEnergyLossToSignal*pnt->GetEnergyLoss()/(nofSteps+1);
+
+  xvec = xvec/((Double_t)nofSteps);  
+  yvec = yvec/((Double_t)nofSteps);  
+  zvec = zvec/((Double_t)nofSteps);  
+
+  for ( Int_t istep = 0 ; istep <= nofSteps ; istep++ ) {
+    Float_t iFChan = sensor->GetChannelPlus(xin, yin, side);
+    Int_t   iIChan = (Int_t)iFChan;
+
+    xin+=xvec;
+    yin+=yvec;
+    zin+=zvec;
+
+    if ( iIChan == -1 ) continue;
+
+    for ( Int_t ifstr = 0 ; ifstr < nofStr ; ifstr++ ) {
+      if ( strips[ifstr] == iIChan ) {
+	signals[ifstr] += stepEL;
+	iIChan = -1;
+	break;
+      }
+    }
+    if ( iIChan == -1 ) continue;
+
+    strips [nofStr] = iIChan;
+    signals[nofStr] = stepEL;
+
+    nofStr++;
+
+  }
+}
+// -------------------------------------------------------------------------
  
 // -----   Private method SetParContainers   -------------------------------
 void CbmStsDigitize::SetParContainers() {
@@ -299,8 +498,23 @@ InitStatus CbmStsDigitize::Init() {
   fDigiMatches = new TClonesArray("CbmStsDigiMatch",1000);
   ioman->Register("STSDigiMatch", "Digi Match in STS", fDigiMatches, kTRUE);
 
+  fGen = new TRandom3();
+  time_t curtime;
+  time(&curtime);
+  fGen->SetSeed(curtime);
+
+  fStripSignalF = new Double_t[2000];
+  fStripSignalB = new Double_t[2000];
+
+  fEnergyLossToSignal    = 200000.;
+
+  fFNofSteps = (Int_t)TMath::Power(2,(Double_t)fFNofBits);
+  fBNofSteps = (Int_t)TMath::Power(2,(Double_t)fBNofBits);
+
   // Build digitisation scheme
   if ( fDigiScheme->Init(fGeoPar, fDigiPar) ) {
+    MakeSets();
+
     if      (fVerbose == 1 || fVerbose == 2) fDigiScheme->Print(kFALSE);
     else if (fVerbose >  2) fDigiScheme->Print(kTRUE);
     cout << "-I- " << fName << "::Init: "
@@ -310,7 +524,7 @@ InitStatus CbmStsDigitize::Init() {
 	 << fDigiScheme->GetNChannels() << endl;
     return kSUCCESS;
   }
-  
+
   return kERROR;
 
 }
@@ -325,7 +539,10 @@ InitStatus CbmStsDigitize::ReInit() {
   fDigiScheme->Clear();
 
   // Build new digitisation scheme
-  if ( fDigiScheme->Init(fGeoPar, fDigiPar) ) return kSUCCESS;
+  if ( fDigiScheme->Init(fGeoPar, fDigiPar) ) {
+    MakeSets();
+    return kSUCCESS;
+  }
 
   return kERROR;
 
@@ -333,17 +550,147 @@ InitStatus CbmStsDigitize::ReInit() {
 // -------------------------------------------------------------------------
 
 
+// -----   Private method MakeSets   ---------------------------------------
+void CbmStsDigitize::MakeSets() {
+
+  fPointMap.clear();
+  Int_t nStations = fDigiScheme->GetNStations();
+  for (Int_t iStation=0; iStation<nStations; iStation++) {
+    CbmStsStation* station = fDigiScheme->GetStation(iStation);
+    Int_t nSectors = station->GetNSectors();
+    for (Int_t iSector=0; iSector<nSectors; iSector++) {
+      CbmStsSector* sector = station->GetSector(iSector);
+      Int_t nSensors = sector->GetNSensors();
+      for (Int_t iSensor=0; iSensor<nSensors; iSensor++) {
+	CbmStsSensor* sensor = sector->GetSensor(iSensor);
+	set<Int_t> a;
+	fPointMap[sensor] = a;
+      }
+    }
+  }
+  fFChannelPointsMap.clear();
+  fBChannelPointsMap.clear();
+  for ( Int_t ichan = 2000 ; ichan > 0 ; ) {
+    set<Int_t> a;
+    fFChannelPointsMap[--ichan] = a;
+    set<Int_t> b;
+    fBChannelPointsMap[  ichan] = b;
+  }
+}
+// -------------------------------------------------------------------------
+// void CbmStsDigitize::MakeSets() {
+// 
+// 
+//   fPointMap.clear();
+//   Int_t nStations = fDigiScheme->GetNStations();
+//       
+//   TH1F* fhFNofDigisPChip[10][1000][20];
+//   TH1F* fhBNofDigisPChip[10][1000][20];
+//   TString qaFileName;
+//   qaFileName = "sts.occupancy.root";
+//   cout << "Occupancy read from file: \"" << qaFileName.Data() << "\"" << endl;
+//   TFile* occuF = TFile::Open(qaFileName.Data());  
+//   if ( !occuF )
+//     { cout << "sorry, no file" << endl; return; }
+//   TString directoryName = "STSFindHitsQA";
+//   
+//   Double_t fSectorWidth = 0.;
+//   
+//   for (Int_t iStation=0; iStation<nStations; iStation++) {
+//     CbmStsStation* station = fDigiScheme->GetStation(iStation);
+//     Int_t nSectors = station->GetNSectors();
+//     
+//     for (Int_t iSector=0; iSector<nSectors; iSector++) {
+//       CbmStsSector* sector = station->GetSector(iSector);
+//       Int_t nSensors = sector->GetNSensors();
+//       Int_t nChannels = sector->GetNChannelsFront();
+//       
+//       for (Int_t iSensor=0; iSensor<nSensors; iSensor++) {
+// 	CbmStsSensor* sensor = sector->GetSensor(iSensor);
+// 	set<Int_t> a;
+// 	fPointMap[sensor] = a;
+// 	fSectorWidth = 10.*sensor->GetLx();
+//       
+//       
+//         Int_t nofChips = (Int_t)(TMath::Ceil(fSectorWidth/7.5));  // fwidth in mm, 7.5mm = 125(channels)*60mum(pitch)
+//         Int_t lastChip = (Int_t)(TMath::Ceil(10.*fSectorWidth));
+//         lastChip = lastChip%75;
+//         lastChip = (Int_t)(lastChip/.6);
+//          //     cout << nofChips << " chips on " << iStation+1 << " " << iSector+1 << endl;
+//         TString addInfo = "";
+// 	if ( nofChips != 8 ) {
+// 	addInfo = Form(", only %d strips",lastChip);
+// 	//	cout << fSectorWidth << " -> " << addInfo.Data() << endl;
+//         }
+//    
+//       
+//         for ( Int_t iChip = 0 ; iChip < nofChips ; iChip++ ) {
+//           fhFNofDigisPChip[iStation][iSector][iChip]=(TH1F*)occuF->Get(Form("%s/Station%d/hNofFiredDigisFSt%dSect%dChip%d",directoryName.Data(),iStation+1,iStation+1,iSector+1,iChip+1));
+//           fhBNofDigisPChip[iStation][iSector][iChip]=(TH1F*)occuF->Get(Form("%s/Station%d/hNofFiredDigisBSt%dSect%dChip%d",directoryName.Data(),iStation+1,iStation+1,iSector+1,iChip+1));
+//           occupancy [iStation][iSector][iChip] = 100.*fhFNofDigisPChip[iStation][iSector][iChip]->GetMean()/125.;
+//           occupancy [iStation][iSector][iChip] = 100.*fhBNofDigisPChip[iStation][iSector][iChip]->GetMean()/125.;
+//           //cout << "OCCUPANCY [" << iStation+1 << "][" << iSector+1 << "][" << iChip << "] "<< occupancy [iStation][iSector][iChip] << "%" << endl;
+//         }
+//         
+// 
+//       }
+//     }
+//   }
+//   fFChannelPointsMap.clear();
+//   fBChannelPointsMap.clear();
+//   for ( Int_t ichan = 2000 ; ichan > 0 ; ) {
+//     set<Int_t> a;
+//     fFChannelPointsMap[--ichan] = a;
+//     set<Int_t> b;
+//     fBChannelPointsMap[  ichan] = b;
+//   }
+//  
+// }
+// -------------------------------------------------------------------------
 
 // -----   Private method Reset   ------------------------------------------
 void CbmStsDigitize::Reset() {
-  fNPoints = fNFailed = fNOutside = fNMulti = fNDigis = 0;
-  fChannelMap.clear();
+  //  fNPoints = fNOutside = fNDigisFront = fNDigisBack = fTime = 0.;
+  fNDigis = fNMulti = 0;
+  fFChannelPointsMap.clear();
+  fBChannelPointsMap.clear();
   if ( fDigis ) fDigis->Clear();
   if ( fDigiMatches ) fDigiMatches->Clear();
 }
 // -------------------------------------------------------------------------
 
 
+// -----   Virtual method Finish   -----------------------------------------
+void CbmStsDigitize::Finish() {
+  cout << endl;
+  cout << "============================================================"
+       << endl;
+  cout << "===== " << fName << ": Run summary " << endl;
+  cout << "===== " << endl;
+  cout << "===== Events processed          : " << setw(8) << fNEvents << endl;
+  cout.setf(ios_base::fixed, ios_base::floatfield);
+  cout << "===== Real time per event       : " 
+       << setw(8) << setprecision(4) 
+       << fTime / fNEvents << " s" << endl;
+  cout << "===== StsPoints per event       : " 
+       << setw(8) << setprecision(2) 
+       << fNPoints / fNEvents << endl;
+  cout << "===== Outside hits per event    : " 
+       << setw(8) << setprecision(2) 
+       << fNOutside / fNEvents << " = " 
+       << setw(6) << setprecision(2) 
+       << fNOutside / fNPoints * 100. << " %" << endl;
+  cout << "===== Front digis per point     : " 
+       << setw(8) << setprecision(2) 
+       << fNDigisFront / (fNPoints-fNOutside) << endl;
+  cout << "===== Back digis per point      : " 
+       << setw(8) << setprecision(2) 
+       << fNDigisBack / (fNPoints-fNOutside) << endl;
+  cout << "============================================================"
+       << endl;
+	
+}					       
+// -------------------------------------------------------------------------
 
 
 

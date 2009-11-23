@@ -1,8 +1,8 @@
 //* $Id: */
 
 // -------------------------------------------------------------------------
-// -----                     CbmStsFindHits header file                -----
-// -----                  Created 11/09/06  by V. Friese               -----
+// -----                     CbmStsFindHits header file            -----
+// -----                  Created 26/06/2008  by R. Karabowicz         -----
 // -------------------------------------------------------------------------
 
 
@@ -63,6 +63,8 @@ class CbmStsFindHits : public FairTask
   /** Execution **/
   virtual void Exec(Option_t* opt);
 
+  /** Virtual method Finish **/
+  virtual void Finish();
 
 
  private:
@@ -70,11 +72,13 @@ class CbmStsFindHits : public FairTask
   CbmGeoStsPar*     fGeoPar;      /** Geometry parameters **/
   CbmStsDigiPar*    fDigiPar;     /** Digitisation parameters **/
   CbmStsDigiScheme* fDigiScheme;  /** Digitisation scheme **/
-  TClonesArray*     fDigis;       /** Input array of CbmStsDigi **/
+  TClonesArray*     fClusters;    /** Input array of CbmStsCluster **/
   TClonesArray*     fHits;        /** Output array of CbmStsHit **/
-  std::map<CbmStsSector*, std::set<Int_t> > fDigiMapF;  /** sector digis (front) **/
-  std::map<CbmStsSector*, std::set<Int_t> > fDigiMapB;  /** sector digis (back)  **/
+  std::map<CbmStsSector*, std::set<Int_t> > fClusterMapF;  /** sector clusters (front) **/
+  std::map<CbmStsSector*, std::set<Int_t> > fClusterMapB;  /** sector clusters (back)  **/
   TStopwatch fTimer;
+
+  Int_t fNHits;
 
   /** Get parameter containers **/
   virtual void SetParContainers();
@@ -93,9 +97,7 @@ class CbmStsFindHits : public FairTask
 
 
   /** Sort digis sectorwise  **/
-  void SortDigis();
-  
-//  virtual void Finish() { };
+  void SortClusters();
 
 
   /** Find hits in one sector **/
@@ -104,17 +106,7 @@ class CbmStsFindHits : public FairTask
 
 
   ClassDef(CbmStsFindHits,1);
-  
-  Int_t    fNStations;
-  Int_t    fNEvents;        /** Number of events with success **/
-  /** Total real time used for good events **/
-   Double_t  fTime1;     
-   Double_t  fTime2;     
-   Double_t  fTime3;
-   Double_t  fTime4;
-   Double_t  fTime5;
-   Double_t  fTime6;
-   Double_t  fTime7;
+
 };
 
 #endif

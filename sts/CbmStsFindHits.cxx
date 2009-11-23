@@ -1,14 +1,14 @@
 //* $Id: */
 
 // -------------------------------------------------------------------------
-// -----                    CbmStsFindHits source file                 -----
-// -----                  Created 11/09/06  by V. Friese               -----
+// -----                    CbmStsFindHits source file             -----
+// -----                  Created 26/06/2008 by R. Karabowicz          -----
 // -------------------------------------------------------------------------
 
 #include "CbmStsFindHits.h"
 
 #include "CbmGeoStsPar.h"
-#include "CbmStsDigi.h"
+#include "CbmStsCluster.h"
 #include "CbmStsDigiPar.h"
 #include "CbmStsDigiScheme.h"
 #include "CbmStsHit.h"
@@ -40,8 +40,9 @@ using std::map;
 CbmStsFindHits::CbmStsFindHits() : FairTask("STS Hit Finder", 1) {
   fGeoPar  = NULL;
   fDigiPar = NULL;
-  fDigis   = NULL;
+  fClusters   = NULL;
   fHits    = NULL;
+  fNHits = 0;
   fDigiScheme = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -50,11 +51,12 @@ CbmStsFindHits::CbmStsFindHits() : FairTask("STS Hit Finder", 1) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsFindHits::CbmStsFindHits(Int_t iVerbose) 
-  : FairTask("STSFindHits", iVerbose) {
+  : FairTask("STSRealFindHits", iVerbose) {
   fGeoPar  = NULL;
   fDigiPar = NULL;
-  fDigis   = NULL;
+  fClusters   = NULL;
   fHits    = NULL;
+  fNHits = 0;
   fDigiScheme = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -66,8 +68,9 @@ CbmStsFindHits::CbmStsFindHits(const char* name, Int_t iVerbose)
   : FairTask(name, iVerbose) {
   fGeoPar  = NULL;
   fDigiPar = NULL;
-  fDigis   = NULL;
+  fClusters   = NULL;
   fHits    = NULL;
+  fNHits = 0;
   fDigiScheme = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -87,8 +90,8 @@ CbmStsFindHits::~CbmStsFindHits() {
 
 // -----   Public method Exec   --------------------------------------------
 void CbmStsFindHits::Exec(Option_t* opt) {
-  fTimer.Start();
 
+  fTimer.Start();
   Bool_t warn = kFALSE;
 
   // Check for digi scheme
@@ -101,25 +104,25 @@ void CbmStsFindHits::Exec(Option_t* opt) {
   fHits->Clear();
 
   // Sort STS digis with respect to sectors
-  SortDigis();
+  SortClusters();
 
   // Find hits in sectors
-  Int_t nDigisF = 0;
-  Int_t nDigisB = 0;
+  Int_t nClustersF = 0;
+  Int_t nClustersB = 0;
   Int_t nHits   = 0;
   Int_t nStations = fDigiScheme->GetNStations();
   CbmStsStation* station = NULL;
   for (Int_t iStation=0; iStation<nStations; iStation++) {
     station = fDigiScheme->GetStation(iStation);
 
-    Int_t nDigisFInStation = 0;
-    Int_t nDigisBInStation = 0;
+    Int_t nClustersFInStation = 0;
+    Int_t nClustersBInStation = 0;
     Int_t nHitsInStation   = 0;
     Int_t nSectors = station->GetNSectors();
     for (Int_t iSector=0; iSector<nSectors; iSector++) {
       CbmStsSector* sector = station->GetSector(iSector);
       set <Int_t> fSet, bSet;
-      if ( fDigiMapF.find(sector) == fDigiMapF.end() ) {
+      if ( fClusterMapF.find(sector) == fClusterMapF.end() ) {
 	cout << "-E- " << fName << "::Exec: sector " 
 	     << sector->GetSectorNr() << " of station " 
 	     << station->GetStationNr() << "not found in front map!" 
@@ -127,9 +130,9 @@ void CbmStsFindHits::Exec(Option_t* opt) {
 	warn = kTRUE;
 	continue;
       }
-      fSet = fDigiMapF[sector];
+      fSet = fClusterMapF[sector];
       if ( sector->GetType() == 2 || sector->GetType() == 3 ) {
-	if ( fDigiMapB.find(sector) == fDigiMapB.end() ) {
+	if ( fClusterMapB.find(sector) == fClusterMapB.end() ) {
 	  cout << "-E- " << fName << "::Exec: sector " 
 	       << sector->GetSectorNr() << " of station " 
 	       << station->GetStationNr() << "not found in back map!" 
@@ -138,51 +141,51 @@ void CbmStsFindHits::Exec(Option_t* opt) {
 	  continue;
 	}
       }
-      bSet = fDigiMapB[sector];
-      Int_t nDigisFInSector = fSet.size();
-      Int_t nDigisBInSector = bSet.size();
+      bSet = fClusterMapB[sector];
+      Int_t nClustersFInSector = fSet.size();
+      Int_t nClustersBInSector = bSet.size();
       Int_t nHitsInSector   = FindHits(station, sector, fSet, bSet);
       if ( fVerbose > 2 ) 
 	cout << "Sector " << sector->GetSectorNr() 
-	     << ", Digis front " << nDigisFInSector 
-	     << ", Digis Back " << nDigisBInSector
+	     << ", Clusters front " << nClustersFInSector 
+	     << ", Clusters Back " << nClustersBInSector
 	     << ", Hits " << nHitsInSector << endl;
       nHitsInStation   += nHitsInSector;
-      nDigisFInStation += nDigisFInSector;
-      nDigisBInStation += nDigisBInSector;      
+      nClustersFInStation += nClustersFInSector;
+      nClustersBInStation += nClustersBInSector;      
     }      // Sector loop
 
     if ( fVerbose > 1 ) cout << "Total for station " 
-			     << station->GetStationNr() << ": Digis front "
-			     << nDigisFInStation << ", digis back "
-			     << nDigisBInStation << ", hits "
+			     << station->GetStationNr() << ": Clusters front "
+			     << nClustersFInStation << ", clusters back "
+			     << nClustersBInStation << ", hits "
 			     << nHitsInStation << endl;
-    nDigisB += nDigisBInStation;
-    nDigisF += nDigisFInStation;
+    nClustersB += nClustersBInStation;
+    nClustersF += nClustersFInStation;
     nHits   += nHitsInStation;
     
   }       // Station loop
 
   fTimer.Stop();  
-  if ( fVerbose > 1 ) {
+  if ( fVerbose  ) {
     cout << endl;
     cout << "-I- " << fName << ":Event summary" << endl;
-    cout << "    Active channels front side: " << nDigisF << endl;
-    cout << "    Active channels back side : " << nDigisB << endl;
+    cout << "    Clusters front side       : " << nClustersF << endl;
+    cout << "    Clusters back side        : " << nClustersB << endl;
     cout << "    Hits created              : " << nHits   << endl;
     cout << "    Real time                 : " << fTimer.RealTime() 
 	 << endl;
   }
-  if ( fVerbose == 1 ) {
+  else {
     if ( warn ) cout << "- ";
     else        cout << "+ ";
     cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8) 
 	 << fixed << right << fTimer.RealTime() 
-	 << " s, digis " << nDigisF << " / " << nDigisB << ", hits: " 
+	 << " s, clusters " << nClustersF << " / " << nClustersB << ", hits: " 
 	 << nHits << endl;
   }
 
-  
+  fNHits += nHits;
 }
 // -------------------------------------------------------------------------
 
@@ -213,11 +216,11 @@ void CbmStsFindHits::SetParContainers() {
 
 // -----   Private method Init   -------------------------------------------
 InitStatus CbmStsFindHits::Init() {
-  
+
   // Get input array
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
-  fDigis = (TClonesArray*) ioman->GetObject("STSDigi");
+  fClusters = (TClonesArray*) ioman->GetObject("STSCluster");
 
   // Register output array
   fHits = new TClonesArray("CbmStsHit", 1000);
@@ -227,7 +230,7 @@ InitStatus CbmStsFindHits::Init() {
   Bool_t success = fDigiScheme->Init(fGeoPar, fDigiPar);
   if ( ! success ) return kERROR;
 
-  // Create sectorwise digi sets
+  // Create sectorwise cluster sets
   MakeSets();
 
   // Control output
@@ -239,7 +242,7 @@ InitStatus CbmStsFindHits::Init() {
        << ", Sectors: " << fDigiScheme->GetNSectors() << ", Channels: " 
        << fDigiScheme->GetNChannels() << endl;
   
-  return kSUCCESS; 
+  return kSUCCESS;
 }
 // -------------------------------------------------------------------------
 
@@ -278,8 +281,8 @@ InitStatus CbmStsFindHits::ReInit() {
 // -----   Private method MakeSets   ---------------------------------------
 void CbmStsFindHits::MakeSets() {
 
-  fDigiMapF.clear();
-  fDigiMapB.clear();
+  fClusterMapF.clear();
+  fClusterMapB.clear();
   Int_t nStations = fDigiScheme->GetNStations();
   for (Int_t iStation=0; iStation<nStations; iStation++) {
     CbmStsStation* station = fDigiScheme->GetStation(iStation);
@@ -287,69 +290,69 @@ void CbmStsFindHits::MakeSets() {
     for (Int_t iSector=0; iSector<nSectors; iSector++) {
       CbmStsSector* sector = station->GetSector(iSector);
       set<Int_t> a;
-      fDigiMapF[sector] = a;
+      fClusterMapF[sector] = a;
       if ( sector->GetType() == 2 || sector->GetType() ==3 ) {
 	set<Int_t> b;
-	fDigiMapB[sector] = b;
+	fClusterMapB[sector] = b;
       }
     }
   }
-  
+
 }
 // -------------------------------------------------------------------------
 
 
 
 
-// -----   Private method SortDigis   --------------------------------------
-void CbmStsFindHits::SortDigis() {
- 
+// -----   Private method SortClusters   --------------------------------------
+void CbmStsFindHits::SortClusters() {
+
   // Check input array
-  if ( ! fDigis ) {
-    cout << "-E- " << fName << "::SortDigis: No input array!" << endl;
+  if ( ! fClusters ) {
+    cout << "-E- " << fName << "::SortClusters: No input array!" << endl;
     return;
   }
 
-  // Clear sector digi sets
+  // Clear sector cluster sets
   map<CbmStsSector*, set<Int_t> >::iterator mapIt;
-  for (mapIt=fDigiMapF.begin(); mapIt!=fDigiMapF.end(); mapIt++)
+  for (mapIt=fClusterMapF.begin(); mapIt!=fClusterMapF.end(); mapIt++)
     ((*mapIt).second).clear();
-  for (mapIt=fDigiMapB.begin(); mapIt!=fDigiMapB.end(); mapIt++)
+  for (mapIt=fClusterMapB.begin(); mapIt!=fClusterMapB.end(); mapIt++)
     ((*mapIt).second).clear();
 
-  // Fill digis into sets
-  CbmStsDigi* digi = NULL;
+  // Fill clusters into sets
+  CbmStsCluster* cluster = NULL;
   CbmStsSector* sector = NULL;
   Int_t stationNr = -1;
   Int_t sectorNr  = -1;
   Int_t iSide     = -1;
-  Int_t nDigis = fDigis->GetEntriesFast();
-  for (Int_t iDigi=0; iDigi<nDigis; iDigi++) {
-    digi = (CbmStsDigi*) fDigis->At(iDigi);
-    stationNr = digi->GetStationNr();
-    sectorNr  = digi->GetSectorNr();
-    iSide     = digi->GetSide();
+  Int_t nClusters = fClusters->GetEntriesFast();
+  for (Int_t iClus=0; iClus<nClusters ; iClus++) {
+    cluster = (CbmStsCluster*) fClusters->At(iClus);
+    stationNr = cluster->GetStationNr();
+    sectorNr  = cluster->GetSectorNr();
+    iSide     = cluster->GetSide();
     sector = fDigiScheme->GetSector(stationNr, sectorNr);
     if (iSide == 0 ) {
-      if ( fDigiMapF.find(sector) == fDigiMapF.end() ) {
-	cerr << "-E- " << fName << "::SortDigits:: sector " << sectorNr
+      if ( fClusterMapF.find(sector) == fClusterMapF.end() ) {
+	cerr << "-E- " << fName << "::SortClusters:: sector " << sectorNr
 	     << " of station " << stationNr 
 	     << " not found in digi scheme (F)!" << endl;
 	continue;
       }
-      fDigiMapF[sector].insert(iDigi);      
+      fClusterMapF[sector].insert(iClus);      
     }
     else if (iSide == 1 ) {
-      if ( fDigiMapB.find(sector) == fDigiMapB.end() ) {
-	cerr << "-E- " << fName << "::SortDigits:: sector " << sectorNr
+      if ( fClusterMapB.find(sector) == fClusterMapB.end() ) {
+	cerr << "-E- " << fName << "::SortClusters:: sector " << sectorNr
 	     << " of station " << stationNr 
 	     << " not found in digi scheme (B)!" << endl;
 	continue;
       }
-      fDigiMapB[sector].insert(iDigi);      
+      fClusterMapB[sector].insert(iClus);      
     }
   }
-  
+
 }
 // -------------------------------------------------------------------------
 
@@ -358,12 +361,12 @@ void CbmStsFindHits::SortDigis() {
 
 // -----   Private method FindHits   ---------------------------------------
 Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
-			       CbmStsSector* sector, 
-			       set<Int_t>& fSet, set<Int_t>& bSet) {
+				   CbmStsSector* sector, 
+				   set<Int_t>& fSet, set<Int_t>& bSet) {
 
   // Counter
   Int_t nNew = 0;
-
+  
   // Get sector parameters
   Int_t    detId  = sector->GetDetectorId();
   Int_t    iType  = sector->GetType();
@@ -371,171 +374,11 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
   Double_t rot    = sector->GetRotation();
   Double_t dx     = sector->GetDx();
   Double_t dy     = sector->GetDy();
-  Double_t stereoF = sector->GetStereoF();
   Double_t stereoB = sector->GetStereoB();
 
   //  Double_t z      = station->GetZ();
   Int_t stationNr = station->GetStationNr();
   Int_t sectorNr  = sector->GetSectorNr();
-
-  // Some auxiliary values
-  Double_t sinrot = TMath::Sin(rot);
-  Double_t cosrot = TMath::Cos(rot);
-  Double_t tanstrB = TMath::Tan(stereoB);
-  Double_t tanstrF = TMath::Tan(stereoF);
-  
-  // Calculate error matrix in sector system
-  Double_t vX, vY, vXY;
-  if ( iType == 1 ) {
-    vX  = dx / TMath::Sqrt(12.);
-    vY  = dy / TMath::Sqrt(12.);
-    vXY = 0.;
-  }
-  else if ( iType == 2 || iType == 3 ) {
-    vX  = dx / TMath::Sqrt(12.);
-    vY  = dx / TMath::Sqrt(6.) / TMath::Abs(tanstrB);
-    vXY = -1. * dx * dx / 12. / tanstrB;
-  }
-  else {
-    cerr << "-E- " << fName << "::FindHits: Illegal sector type "
-	 << iType << endl;
-    return 0;
-  }
-    
-  // Transform variances into global c.s.
-  Double_t wX  = vX * vX  * cosrot * cosrot 
-               - 2. * vXY * cosrot * sinrot
-               + vY * vY  * sinrot * sinrot;
-  Double_t wY  = vX * vX  * sinrot * sinrot
-               + 2. * vXY * cosrot * sinrot
-	       + vY * vY  * cosrot * cosrot; 
-  Double_t wXY = (vX*vX - vY*vY) * cosrot * sinrot
-               + vXY * ( cosrot*cosrot - sinrot*sinrot );
-  Double_t sigmaX = TMath::Sqrt(wX);
-  Double_t sigmaY = TMath::Sqrt(wY);
-
-  // Now perform the loop over active channels
-  set<Int_t>::iterator it1;
-  set<Int_t>::iterator it2;
-
-  // ----- Type 1 : Pixel sector   ---------------------------------------
-  if ( iType == 1 ) {
-    Fatal("FindHits","Sorry, not implemented yet");
-  }     // Pixel sensor
-  // ---------------------------------------------------------------------
-
-  // -----  Type 2: Strip sector OSU   -----------------------------------
-  else if ( iType == 2 ) {
-    Fatal("FindHits","Sorry, not implemented yet");
-  }         // Strip OSU
-  // ---------------------------------------------------------------------
-      
-  // -----  Type 3: Strip sector GSI   -----------------------------------
-  else if (iType == 3 ) {
-    Int_t iDigiF = -1;
-    Int_t iDigiB = -1;
-    Int_t iChanF = -1;
-    Int_t iChanB = -1;
-    Int_t nHits = fHits->GetEntriesFast();
-    Double_t xHit;
-    Double_t yHit;
-    Double_t zHit;
-    TVector3 pos, dpos;
-    CbmStsDigi* digiF = NULL;
-    CbmStsDigi* digiB = NULL;
-    for (it1=fSet.begin(); it1!=fSet.end(); it1++) {
-      iDigiF = (*it1);
-      digiF  = (CbmStsDigi*) fDigis->At(iDigiF);
-      if ( ! digiF ) {
-	cout << "-W- " << GetName() << "::FindHits: Invalid digi index " 
-	     << iDigiF << " in front set of sector " 
-	     << sector->GetSectorNr() << ", station " 
-	     << station->GetStationNr() << endl;
-	continue;
-      }
-      iChanF = digiF->GetChannelNr();
-      for (it2=bSet.begin(); it2!=bSet.end(); it2++ ) {
-	iDigiB = (*it2);
-	digiB = (CbmStsDigi*) fDigis->At(iDigiB);
-	if ( ! digiB ) {
-	  cout << "-W- " << GetName() << "::FindHits: Invalid digi index " 
-	       << iDigiB << " in back set of sector " 
-	       << sector->GetSectorNr() << ", station " 
-	       << station->GetStationNr() << endl;
-	  continue;
-	}
-	iChanB = digiB->GetChannelNr();
-
-	Int_t sensorDetId = sector->Intersect(iChanF,iChanB,xHit,yHit,zHit);
-
-	if ( sensorDetId == -1 ) continue;
-	
-	pos.SetXYZ(xHit, yHit, zHit);
-	dpos.SetXYZ(sigmaX, sigmaY, 0.);
-
-	Int_t statLayer = -1;
-	for ( Int_t istatL = station->GetNofZ() ; istatL > 0 ; istatL-- ) 
-	  if ( TMath::Abs(zHit-station->GetZ(istatL-1)) < 0.00001 ) {
-	    statLayer = istatL-1;
-	    break;
-	  }
-       
-	if ( statLayer == -1 ) 
-	  cout << "unknown layer for hit at z = " << zHit << endl;
-
-	new ((*fHits)[nHits++]) CbmStsHit(sensorDetId, pos, dpos, wXY, 
-					  iDigiF, iDigiB, iChanF, iChanB, statLayer);
-
-	nNew++;
-	if ( fVerbose > 3 ) cout << "New StsHit at (" << xHit << ", " << yHit
-				 << ", " << zHit << "), station " 
-				 << stationNr << ", sector " << sectorNr 
-				 << ", channel " << iChanF << " / " 
-				 << iChanB 
-				 << endl;
-	
-      }      // back side strip loop
-    }        // front side strip loop
-    
-  }          // strip GSI
-  // ---------------------------------------------------------------------
- 
-  
-  return nNew; 
-}
-// -------------------------------------------------------------------------
-
-/*
-// -----   Private method FindHits   ---------------------------------------
-Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
-			       CbmStsSector* sector, 
-			       set<Int_t>& fSet, set<Int_t>& bSet) {
-
-  // Counter
-  Int_t nNew = 0;
-
-  // Get sector parameters
-  Int_t    detId  = sector->GetDetectorId();
-  Int_t    iType  = sector->GetType();
-  Double_t xc     = sector->GetX0();
-  Double_t yc     = sector->GetY0();
-  Double_t rot    = sector->GetRotation();
-  Double_t lx     = sector->GetLx();
-  Double_t ly     = sector->GetLy();
-  Double_t dx     = sector->GetDx();
-  Double_t dy     = sector->GetDy();
-  Double_t stereoB = sector->GetStereoB();
-  Double_t z      = sector->GetZ0();
-  //  Double_t z      = station->GetZ();
-  Int_t stationNr = station->GetStationNr();
-  Int_t sectorNr  = sector->GetSectorNr();
-
-  Int_t statLayer = 0;
-  for ( Int_t isz = 1 ; isz < 11 ; isz++ )
-    if ( TMath::Abs(station->GetZ(isz)-z) < 0.001 ) {
-      statLayer = isz;
-      break;
-    }
 
   // Some auxiliary values
   Double_t sinrot = TMath::Sin(rot);
@@ -578,217 +421,106 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
 
   // ----- Type 1 : Pixel sector   ---------------------------------------
   if ( iType == 1 ) {
-    Int_t nColumns = Int_t(TMath::Ceil ( lx / dx ));
-    Int_t iDigi = -1;
-    Int_t iChan = -1;
-    Int_t iCol  = -1;
-    Int_t iRow  = -1;
-    Int_t nHits = fHits->GetEntriesFast();
-    Double_t xint, yint;
-    Double_t x, y;
-    TVector3 pos, dpos;
-    CbmStsDigi* digi = NULL;
-    for (it1=fSet.begin(); it1!=fSet.end(); it1++) {
-      iDigi = (*it1);
-      digi  = (CbmStsDigi*) fDigis->At(iDigi);
-      if ( ! digi ) {
-	cout << "-W- " << GetName() << "::FindHits: Invalid digi index " 
-	     << iDigi << " in front set of sector " 
-	     << sector->GetSectorNr() << ", station " 
-	     << station->GetStationNr() << endl;
-	continue;
-      }
-      iChan = digi->GetChannelNr();
-      iRow  = Int_t( iChan / nColumns );
-      iCol  = iChan - iRow * nColumns;
-      xint = ( Double_t(iCol) + 0.5 ) * dx;
-      yint = ( Double_t(iRow) + 0.5 ) * dy;
-      
-      // Translation to centre of sector
-      xint = xint - lx/2.;
-      yint = yint - ly/2.;
-
-      // Rotation around sector centre
-      x = xint * cosrot - yint * sinrot;
-      y = xint * sinrot + yint * cosrot;
-
-      // Translation into global c.s.
-      x = x + xc;
-      y = y + yc;
-
-      // Make new hit
-      pos.SetXYZ(x, y, z);
-      dpos.SetXYZ(sigmaX, sigmaY, 0.);
-      new ((*fHits)[nHits++]) CbmStsHit(detId, pos, dpos, wXY, iDigi, -1);
-      nNew++;
-      if ( fVerbose > 3 ) cout << "New StsHit at (" << x << ", " << y 
-			       << ", " << z << "), station " << stationNr
-			       << ", sector " << sectorNr << ", channel "
-			       << iChan << endl;
-    }    // Loop over digi set
-
+    Fatal("FindHits","Sorry, not implemented yet");
   }     // Pixel sensor
   // ---------------------------------------------------------------------
 
-      
-      
   // -----  Type 2: Strip sector OSU   -----------------------------------
   else if ( iType == 2 ) {
-    Int_t iDigiF = -1;
-    Int_t iDigiB = -1;
-    Int_t iChanF = -1;
-    Int_t iChanB = -1;
-    Int_t nHits  = fHits->GetEntriesFast();
-    Double_t x0  = 0.;
-    Double_t xint, yint;
-    Double_t xtemp, ytemp;
-    Double_t x, y;
-    TVector3 pos, dpos;
-    CbmStsDigi* digiF = NULL;
-    CbmStsDigi* digiB = NULL;
-    for (it1=fSet.begin(); it1!=fSet.end(); it1++) {
-      iDigiF = (*it1);
-      digiF  = (CbmStsDigi*) fDigis->At(iDigiF);
-      if ( ! digiF ) {
-	cout << "-W- " << GetName() << "::FindHits: Invalid digi index " 
-	     << iDigiF << " in front set of sector " 
-	     << sector->GetSectorNr() << ", station " 
-	     << station->GetStationNr() << endl;
-	continue;
-      }
-      iChanF = digiF->GetChannelNr();
-      xint = ( Double_t(iChanF) + 0.5 ) * dx;            
-      for (it2=bSet.begin(); it2!=bSet.end(); it2++ ) {
-	iDigiB = (*it2);
-	digiB = (CbmStsDigi*) fDigis->At(iDigiB);
-	if ( ! digiB ) {
-	  cout << "-W- " << GetName() << "::FindHits: Invalid digi index " 
-	       << iDigiB << " in back set of sector " 
-	       << sector->GetSectorNr() << ", station " 
-	       << station->GetStationNr() << endl;
-	  continue;
-	}
-	iChanB = digiB->GetChannelNr();;
-	x0 = ( Double_t(iChanB) + 0.5 ) * dx;
-	yint = (x0 - xint) / tanstr;
-	if ( ! ( yint>0. && yint<ly) ) continue;
-
-	// Translation to centre of sector
-	xtemp = xint - lx/2.;
-	ytemp = yint - ly/2.;
-
-	// Rotation around sector centre
-	x = xtemp * cosrot - ytemp * sinrot;
-	y = xtemp * sinrot + ytemp * cosrot;
-
-	// Translation into global c.s.
-	x = x + xc;
-	y = y + yc;
-
-	// Make new hit
-	pos.SetXYZ(x, y, z);
-	dpos.SetXYZ(sigmaX, sigmaY, 0.);
-	new ((*fHits)[nHits++]) CbmStsHit(detId, pos, dpos, wXY, 
-					  iDigiF, iDigiB);
-	nNew++;
-	if ( fVerbose > 3 ) cout << "New StsHit at (" << x << ", " << y 
-				 << ", " << z << "), station " << stationNr
-				 << ", sector " << sectorNr << ", channel "
-				 << iChanF << " / " << iChanB << endl;
-      }     // Back side set loop
-    }       // Front side set sloop
-
+    Fatal("FindHits","Sorry, not implemented yet");
   }         // Strip OSU
   // ---------------------------------------------------------------------
-
-      
       
   // -----  Type 3: Strip sector GSI   -----------------------------------
   else if (iType == 3 ) {
-    Int_t iDigiF = -1;
-    Int_t iDigiB = -1;
-    Int_t iChanF = -1;
-    Int_t iChanB = -1;
+    Int_t iClusF = -1;
+    Int_t iClusB = -1;
+    Double_t chanF = -1;
+    Double_t chanB = -1;
     Int_t nHits = fHits->GetEntriesFast();
-    Int_t nStripMax = ( stereoB<0. ? 0 :  Int_t(ly*tanstr/lx)+1 ); // max. number of strips
-    Int_t nStripBeg = ( stereoB>0. ? 0 : -Int_t(ly*tanstr/lx)-1 );
-    Double_t x0 = 0.;
-    Double_t xint, yint;
-    Double_t xtemp, ytemp;
-    Double_t x,y;
+    Double_t xHit;
+    Double_t yHit;
+    Double_t zHit;
     TVector3 pos, dpos;
-    CbmStsDigi* digiF = NULL;
-    CbmStsDigi* digiB = NULL;
+    CbmStsCluster* clusterF = NULL;
+    CbmStsCluster* clusterB = NULL;
     for (it1=fSet.begin(); it1!=fSet.end(); it1++) {
-      iDigiF = (*it1);
-      digiF  = (CbmStsDigi*) fDigis->At(iDigiF);
-      if ( ! digiF ) {
-	cout << "-W- " << GetName() << "::FindHits: Invalid digi index " 
-	     << iDigiF << " in front set of sector " 
+      iClusF = (*it1);
+      clusterF  = (CbmStsCluster*) fClusters->At(iClusF);
+      if ( ! clusterF ) {
+	cout << "-W- " << GetName() << "::FindHits: Invalid cluster index " 
+	     << iClusF << " in front set of sector " 
 	     << sector->GetSectorNr() << ", station " 
 	     << station->GetStationNr() << endl;
 	continue;
       }
-      iChanF = digiF->GetChannelNr();
-      xint = ( Double_t(iChanF) + 0.5 ) * dx;             
+      chanF = clusterF->GetMean();
       for (it2=bSet.begin(); it2!=bSet.end(); it2++ ) {
-	iDigiB = (*it2);
-	digiB = (CbmStsDigi*) fDigis->At(iDigiB);
-	if ( ! digiB ) {
-	  cout << "-W- " << GetName() << "::FindHits: Invalid digi index " 
-	       << iDigiB << " in back set of sector " 
+	iClusB = (*it2);
+	clusterB = (CbmStsCluster*) fClusters->At(iClusB);
+	if ( ! clusterB ) {
+	  cout << "-W- " << GetName() << "::FindHits: Invalid cluster index " 
+	       << iClusB << " in back set of sector " 
 	       << sector->GetSectorNr() << ", station " 
 	       << station->GetStationNr() << endl;
 	  continue;
 	}
-	iChanB = digiB->GetChannelNr();;
-	x0 = ( Double_t(iChanB) + 0.5 ) * dx;
-	for (Int_t iStrip=nStripBeg; iStrip<=nStripMax; iStrip++) {
-	  yint = ( x0 - xint + Double_t(iStrip) * lx ) / tanstr;
+	chanB = clusterB->GetMean();
+	
+	Int_t sensorDetId = sector->IntersectClusters(chanF,chanB,xHit,yHit,zHit);
 
-	  if ( ! ( yint>0. && yint<ly ) ) continue;
+	if ( sensorDetId == -1 ) continue;
 
-	  Int_t discreteNetYPos = (Int_t)(0.5+yint*tanstr/dx);
+	pos.SetXYZ(xHit, yHit, zHit);
+	dpos.SetXYZ(sigmaX*clusterF->GetMeanError(), sigmaY*clusterB->GetMeanError(), 0.);
+	
+	Int_t statLayer = -1;
+	for ( Int_t istatL = station->GetNofZ() ; istatL > 0 ; istatL-- ) 
+	  if ( TMath::Abs(zHit-station->GetZ(istatL-1)) < 0.00001 ) {
+	    statLayer = istatL-1;
+	    break;
+	  }
+	
+	if ( statLayer == -1 ) 
+	  cout << "unknown layer for hit at z = " << zHit << endl;
 
-	  // Translation to centre of sector
-	  xtemp = xint - lx/2.;
-	  ytemp = yint - ly/2.;
-	  
-	  // Rotation around sector centre
-	  x = xtemp * cosrot - ytemp * sinrot;
-	  y = xtemp * sinrot + ytemp * cosrot;
+	new ((*fHits)[nHits++]) CbmStsHit(sensorDetId, pos, dpos, wXY, 
+					  iClusF, iClusB, (Int_t)chanF, (Int_t)chanB, statLayer);
 
-	  // Translation into global c.s.
-	  x = x + xc;
-	  y = y + yc;
-
-	  // Make new hit
-	  pos.SetXYZ(x, y, z);
-	  dpos.SetXYZ(sigmaX, sigmaY, 0.);
-	  new ((*fHits)[nHits++]) CbmStsHit(detId, pos, dpos, wXY, 
-					    iDigiF, iDigiB, iChanF, discreteNetYPos, statLayer);
-	  nNew++;
-	  if ( fVerbose > 3 ) cout << "New StsHit at (" << x << ", " << y 
-				   << ", " << z << "), station " 
-				   << stationNr << ", sector " << sectorNr 
-				   << ", channel " << iChanF << " / " 
-				   << iChanB  << ", segment " << iStrip 
-				   << endl;
-
-	}    // strip segment loop
+	nNew++;
+	if ( fVerbose > 3 ) cout << "New StsHit at (" << xHit << ", " << yHit
+				 << ", " << zHit << "), station " 
+				 << stationNr << ", sector " << sectorNr 
+				 << ", channel " << chanF << " / " 
+				 << chanB 
+				 << endl;
+	
       }      // back side strip loop
     }        // front side strip loop
-
+    
   }          // strip GSI
   // ---------------------------------------------------------------------
-
- 
+  
+  
   return nNew;
 }
 // -------------------------------------------------------------------------
 
-*/
-    
+// -----   Virtual method Finish   -----------------------------------------
+void CbmStsFindHits::Finish() {
+  cout << endl;
+  cout << "============================================================"
+       << endl;
+  cout << "===== " << fName << ": Run summary " << endl;
+  cout << "===== " << endl;
+  cout << "===== Number of hits                 : " 
+       << setw(8) << setprecision(2) 
+       << fNHits << endl;
+  cout << "============================================================"
+       << endl;
+	
+}					       
+// -------------------------------------------------------------------------
 
 ClassImp(CbmStsFindHits)
 

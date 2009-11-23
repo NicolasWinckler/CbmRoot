@@ -1,8 +1,8 @@
 //* $Id: */
 
 // -------------------------------------------------------------------------
-// -----                    CbmStsMatchHits header file                -----
-// -----                  Created 27/11/06  by V. Friese               -----
+// -----                    CbmStsMatchHits header file            -----
+// -----                  Created 01/07/2008  by R. Karabowicz         -----
 // -------------------------------------------------------------------------
 
 
@@ -19,13 +19,18 @@
 #ifndef CBMSTSMATCHHIT_H
 #define CBMSTSMATCHHIT_H 1
 
+#include <set>
+//#include <map>
+#include "TStopwatch.h"
 #include "FairTask.h"
 
-#include "TStopwatch.h"
+using std::set;
+using std::map;
+using std::pair;
 
-#include <map>
 
 class TClonesArray;
+class CbmGeoPassivePar;
 class CbmGeoStsPar;
 class CbmStsDigiPar;
 class CbmStsDigiScheme;
@@ -57,7 +62,9 @@ class CbmStsMatchHits : public FairTask
 
   /** Execution **/
   virtual void Exec(Option_t* opt);
+  virtual void ExecReal(Option_t* opt);
 
+  virtual void SetRealisticResponse(Bool_t real=kTRUE) {fRealistic = real;}
 
 
  private:
@@ -69,10 +76,11 @@ class CbmStsMatchHits : public FairTask
   /** Intialisation **/
   virtual InitStatus Init();
 
+  // -----   Private method GetGeometry   ------------------------------------
+  InitStatus GetGeometry();
 
   /** Reinitialisation **/
   virtual InitStatus ReInit();
-
 
   /** Run summary **/
   virtual void Finish();
@@ -95,9 +103,17 @@ class CbmStsMatchHits : public FairTask
   Double_t fNDistant;       /** Total number of displaced hits **/
   Double_t fNBackgrd;       /** Total number of background hits **/
 
+  /** Geometry parameters **/
+  CbmGeoPassivePar* fPassGeo;             // Passive geometry parameters
+  TVector3 fTargetPos;                    // Target centre position
+  Int_t fNStations;                       // Number of STS stations
+  Int_t fStationNrFromMcId[1000];         // station number from mc id
+
+  Bool_t fRealistic;
+
   /** Map from candidate point to distance to hit **/
-  std::map<Double_t, Int_t> fCandMap;            //!
-  std::map<Double_t, Int_t>::iterator fIter;     //!
+  map<Double_t, Int_t> fCandMap;            //!
+  map<Double_t, Int_t>::iterator fIter;     //!
 
 
 

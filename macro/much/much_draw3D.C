@@ -1,4 +1,4 @@
-void much_draw3D(char* mcfile = "data/mc.root"){
+void much_draw3D(char* mcfile = "data/Jpsi.auau.25gev.centr.mc.root"){
 
    gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
    basiclibs();

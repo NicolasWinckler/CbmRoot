@@ -1,27 +1,21 @@
-//* $Id: */
-
-// -------------------------------------------------------------------------
-// -----                      CbmStsDigi header file                   -----
-// -----                  Created 28/08/06  by V. Friese               -----
-// -------------------------------------------------------------------------
-
-
 /** CbmStsDigi.h
  **@author V.Friese <v.friese@gsi.de>
- **@since 28.08.06
- **@version 1.0
+ **@since 28.08.2006
+ **@version 2.0
  **
  ** Data class for digital STS information
  ** Data level: RAW
  **
- ** The detector ID consists of:
- **   system ID (0-31, kSTS=2), bits 0-4, see base class
- **   station number (0-255), bits 5-12 
- **   sector number (0-32767), bits 13-27
- **   side (0=front side, 1=back side, bit 28, always 0 for pixel sectors).
- ** 
- ** The index of the (first) MCPoint having activated this channel
- ** is accessible via GetMcPointIndex(). 
+ ** The information is encoded into 6 bytes (1 Int_t, 1 Short_t).
+ ** Address:                       22 bits
+ **   - Station Nr.        4 bits
+ **   - Sector Nr.        10 bits
+ **   - Side (front/back)  1 bit
+ **   - Channel Nr.        7 bits
+ ** Charge (ADC):                  12 bits
+ ** Time (ns):                     14 bits
+ **
+ ** The time is relative to the event time. 
  **/
 
 
@@ -30,61 +24,99 @@
 
 
 #include "CbmDetectorList.h"
-#include "CbmDigi.h"
+#include "CbmStsDetectorId.h"
+
 
 #include "TObject.h"
 
-class CbmStsDigi : public CbmDigi
+
+
+class CbmStsDigi : public TObject, public CbmStsDetectorId
 {
 
  public:
 
-  /** Default constructor **/
+  /**   Default constructor   **/
   CbmStsDigi();
 
 
-  /** Constructor from station number, sector number, 
-   ** front/back side and channel number
-   **@param iStation  station number (0-255)
-   **@param iSector   sector number  (0-32767)
-   **@param iSide     0=front side; 1=back side
-   **@param iChannel  channel number
+  /**  Constructor from station number, sector number, 
+   **  front/back side and channel number
+   **@param station  station number (1 -   15)
+   **@param sector   sector number  (1 - 1023)
+   **@param side     0=front side; 1=back side
+   **@param channel  channel number (1 -  1023)
+   **@param adc      Charge ADC channel (0 - 4095)
+   **@param time     Time within event [ns]
    **/
-  CbmStsDigi(Int_t iStation, Int_t iSector, Int_t iSide, Int_t iChannel);
+  CbmStsDigi(Int_t station, Int_t sector, Int_t side, 
+	     Int_t channel, Int_t adc, Int_t time);
 
-  CbmStsDigi(Int_t iStation, Int_t iSector, Int_t iSide, Double_t iChannel, Double_t iADC, Double_t iTDC);
 
-  /** Destructor **/
+  /**   Destructor   **/
   virtual ~CbmStsDigi();
 
-  void SetADC(Double_t iADC) { fDigiADC = iADC; }
-  void SetTDC(Double_t iTDC) { fDigiTDC = iTDC; }
-  void SetCor(Double_t iCor) { fDigiCor = iCor; }
 
-  void AddADC(Double_t iADC) { fDigiADC+= iADC; }
+  /**   Add charge   **/
+  void AddAdc(Int_t adc);
 
-  /** Accessors **/
-  Int_t    GetDetectorId() const { return fDetectorId; }
 
-  Int_t    GetStationNr()  const { 
-    return ( fDetectorId & (255<<16) ) >> 16; }
-  Int_t    GetSectorNr()   const {  // sector number within station
-    return ( fDetectorId & (4095<<4) ) >> 4; }
-  Int_t    GetSide()        const {
-    return ( fDetectorId & (1<<0) ) >> 0; }  // 0=front, 1=back
+  /**   Station number   **/
+  Int_t GetStationNr() const { return StationNr(GetDetectorId()); }
 
-  Double_t GetADC()          const { return fDigiADC; }
-  Double_t GetTDC()          const { return fDigiTDC; }
-  Double_t GetCor()          const { return fDigiCor; }
+  /**   Sector number   **/
+  Int_t GetSectorNr() const { return SectorNr(GetDetectorId()); }
+
+
+  /**   Side ( 0 = front, 1 = back )   **/
+  Int_t GetSide() const { return Side(GetDetectorId()); }
+
+
+  /**   Channel number   **/
+  Int_t GetChannelNr() const { return ChannelNr(GetDetectorId()); }
+
+
+  /**   Charge   **/
+  Int_t GetAdc() const { return ( (fData >> fgkCharShift) & fgkCharMask ); }
+
+
+  /**   Time   **/
+  Int_t GetTime() const { return ( (fData >> fgkTimeShift) & fgkTimeMask ); }
+
+
+  /**   Unique detector ID   **/
+  Int_t GetDetectorId() const { 
+    return ( kSTS | ( (fData & fgkAddrMask) << 4) );
+  }
+
+
 
  private:
 
-  Double_t fDigiADC;
-  Double_t fDigiTDC;
-  Double_t fDigiCor;
 
-  ClassDef(CbmStsDigi,1);
+  /**   Data members  **/
+  Long64_t fData;
+
+
+  /**   Modifiers   **/
+  void SetAdc(Int_t charge);
+
+
+  /**   Static members for bit operations   **/
+  static const Int_t fgkAddrBits;
+  static const Int_t fgkCharBits;
+  static const Int_t fgkTimeBits;
+  static const Int_t fgkCharShift;
+  static const Int_t fgkTimeShift;
+  static const Long64_t fgkAddrMask;
+  static const Long64_t fgkCharMask;
+  static const Long64_t fgkTimeMask;
+
+
+
+  ClassDef(CbmStsDigi,2);
 
 };
+
 
 #endif

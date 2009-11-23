@@ -10,7 +10,7 @@ void much_sim(Int_t nEvents = 100)
 		//if necessary specify input pluto file to embed signal particles
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
 		//directory for output simulation files
-		dir  = "/home/d/andrey/straw_10mu_urqmd/";
+		dir  = "/home/d/andrey/std18_10mu_urqmd/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
@@ -22,7 +22,7 @@ void much_sim(Int_t nEvents = 100)
 		//If "yes" PLUTO particles will be embedded
 		pluto = "no";
 		//MUCH geometry file name
-		muchGeom = "much_standard_straw.geo";
+		muchGeom = "much_standard_18.geo";
 		//TRD geometry file name
 		trdGeom = "";//"trd_muon_setup_new.geo";
 	} else {

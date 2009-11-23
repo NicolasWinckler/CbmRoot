@@ -2,14 +2,14 @@ void trd_sim(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString inFile, plutoFile, dir, mcFile, parFile, electrons, urqmd, trdGeom;
+	TString inFile, plutoFile, dir, mcFile, parFile, electrons, urqmd, trdGeom, pluto;
 	if (script != "yes") {
 		//input UrQMD file
 		inFile  = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
 		//if necessary specify input pluto file to embed signal particles
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
 		//directory for output simulation files
-		dir  = "/home/d/andrey/std_10e_norich/";
+		dir  = "/home/d/andrey/std_10e_cut10gev/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
@@ -33,14 +33,13 @@ void trd_sim(Int_t nEvents = 1000)
 		trdGeom = TString(gSystem->Getenv("TRDGEOM"));
 	}
 
-
 	TString caveGeom   = "cave.geo";
 	TString targetGeom = "target_au_250mu.geo";
 	TString pipeGeom   = "pipe_standard.geo";
 	TString magnetGeom = "magnet_standard.geo";
 	TString mvdGeom    = "";//"mvd_standard.geo";
 	TString stsGeom    = "sts_standard.geo";
-	TString richGeom   = "";//"rich_standard.geo";
+	TString richGeom   = "rich_standard.geo";
 	TString tofGeom    = "tof_standard.geo";
 	TString ecalGeom   = "";//"ecal_FastMC.geo";
 
@@ -159,8 +158,8 @@ void trd_sim(Int_t nEvents = 1000)
 
 	if (electrons == "yes") {
 		FairBoxGenerator* boxGen1 = new FairBoxGenerator(11, 5);
-//		boxGen1->SetPtRange(0.,3.);
-		boxGen1->SetPRange(10, 10);
+		boxGen1->SetPtRange(0.,3.);
+//		boxGen1->SetPRange(30, 30);
 		boxGen1->SetPhiRange(0.,360.);
 		boxGen1->SetThetaRange(2.5,25.);
 		boxGen1->SetCosTheta();
@@ -168,8 +167,8 @@ void trd_sim(Int_t nEvents = 1000)
 		primGen->AddGenerator(boxGen1);
 
 		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-11, 5);
-//		boxGen2->SetPtRange(0.,3.);
-		boxGen2->SetPRange(10, 10);
+		boxGen2->SetPtRange(0.,3.);
+//		boxGen2->SetPRange(30, 30);
 		boxGen2->SetPhiRange(0.,360.);
 		boxGen2->SetThetaRange(2.5,25.);
 		boxGen2->SetCosTheta();

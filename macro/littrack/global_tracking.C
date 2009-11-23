@@ -6,14 +6,14 @@
  * Macro runs Littrack global track reconstruction.
  **/
 
-void global_tracking(Int_t nEvents = 100)
+void global_tracking(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, globalHitsFile, globalTracksFile;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/home/d/andrey/std_10mu_urqmd/";
+		dir  = "/home/d/andrey/std_10e/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file

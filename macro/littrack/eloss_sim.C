@@ -43,10 +43,10 @@ void eloss_sim(Int_t nEvents = 20000)
 
 	CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
 
-	Double_t minMom = 10.; //minimum momentum
-	Double_t maxMom = 10.; //maximum momentum
+	Double_t minMom = 5.; //minimum momentum
+	Double_t maxMom = 5.; //maximum momentum
 
-	FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, 1);
+	FairBoxGenerator* boxGen1 = new FairBoxGenerator(-11, 1);
 	boxGen1->SetPRange(minMom, maxMom);
 	boxGen1->SetPhiRange(0.,360.);
 	boxGen1->SetThetaRange(0.,0.);

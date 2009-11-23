@@ -37,13 +37,13 @@ void check_field(Int_t nEvents = 1)
 	// ------------------------------------------------------------------------
 
 	CbmLitCheckField* checkField = new CbmLitCheckField();
-	checkField->SetXangle(35.);
+	checkField->SetXangle(25.);
 	checkField->SetYangle(25.);
 	checkField->SetNofBinsX(30);
 	checkField->SetNofBinsY(30);
-	checkField->SetUseEllipseAcc(true);
-	checkField->SetPolynomDegree(3);
-	checkField->SetOutputDir("field/muon/ellipse_x35_y25/");
+	checkField->SetUseEllipseAcc(false);
+	checkField->SetPolynomDegree(1);
+	checkField->SetOutputDir("field/");
 	run->AddTask(checkField);
 
 	// -----  Parameter database   --------------------------------------------

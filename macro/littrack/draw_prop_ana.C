@@ -19,7 +19,7 @@
 const int nofPar = 12;
 
 /** Number of detector planes. */
-const int nofLayers = 13;
+const int nofLayers = 12;
 
 // Drawing options. If true than specified histograms are drawn.
 bool drawPropagation = false;
@@ -42,12 +42,12 @@ TCanvas* canvas[3][nofLayers];
 
 
 // Input directory
-TString dir = "/home/d/andrey/std_10e_norich/";
+TString dir = "/home/d/andrey/std_10e/";
 // Input file with propagation analysis
 TFile *file = new TFile(dir + "propagation.ana.0000.root");
 
 //Output directory for images and fit results.
-TString outDir = "./meeting/trd/";
+TString outDir = "./eloss/std/";
 
 void draw_prop_ana()
 {
@@ -75,9 +75,9 @@ void draw_prop_ana()
 		Print(fout, 2);
 	}
 
-//	DrawForPhd(0);
-//	DrawForPhd(1);
-//	DrawForPhd(2);
+	DrawForPhd(0);
+	DrawForPhd(1);
+	DrawForPhd(2);
 
 	fout.close();
 }
@@ -119,7 +119,7 @@ void DrawHistos(
 		oss << names[i] << var[v] << layer;
 		TH1F* hist1 = (TH1F*) file->Get(oss.str().c_str());
 		if (i != 11) hist1->Fit("gaus");
-		hist1->SetMaximum(hist1->GetMaximum() * 1.20);
+		hist1->SetMaximum(hist1->GetMaximum() * 1.50);
 		hist1->GetXaxis()->SetLabelSize(0.075);
 		hist1->GetXaxis()->SetNdivisions(505, kTRUE);
 		hist1->GetYaxis()->SetLabelSize(0.075);

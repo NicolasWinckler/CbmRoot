@@ -100,17 +100,14 @@ class CbmRichRingQa : public FairTask{
 
 
 /// Difference Fake and True rings histograms BEGIN
-    TH1D*  fh_FakeNofHits;
-    TH1D*  fh_TrueElNofHits;
+    TH1D* fh_FakeNofHits;
+    TH1D* fh_TrueElNofHits;
 
-    TH1D*   fh_FakeDistance;
-    TH1D*   fh_TrueElDistance;
+    TH1D* fh_FakeAngle;
+    TH1D* fh_TrueElAngle;
 
-    TH1D*   fh_FakeAngle;
-    TH1D*   fh_TrueElAngle;
-
-    TH1D*   fh_FakeNofHitsOnRing;
-    TH1D*   fh_TrueElNofHitsOnRing;
+    TH1D* fh_FakeNofHitsOnRing;
+    TH1D* fh_TrueElNofHitsOnRing;
 
     TH1D* fh_FakeChi2;
     TH1D* fh_TrueElChi2;
@@ -120,24 +117,6 @@ class CbmRichRingQa : public FairTask{
 
     TH1D* fh_FakeRadius;
     TH1D* fh_TrueElRadius;
-
-    TH1D* fh_FakeA;
-    TH1D* fh_TrueElA;
-
-    TH1D* fh_FakeB;
-    TH1D* fh_TrueElB;
-
-    TH1D* fh_FakePhi;
-    TH1D* fh_TrueElPhi;
-
-    TH1D* fh_FakeStsMom;
-    TH1D* fh_TrueElStsMom;
-
-    TH2D* fh_TrueElPhiVsRadAngle;
-    TH2D* fh_FakePhiVsRadAngle;
-
-    TH2D* fh_TrueElRadiusVsMom;
-    TH2D* fh_FakeRadiusVsMom;
 /// Difference Fake and True rings histograms END
 
     /// Ring Track matching BEGIN

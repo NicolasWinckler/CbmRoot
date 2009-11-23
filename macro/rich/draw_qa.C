@@ -46,55 +46,24 @@ void draw_qa(){
 	//gStyle->SetOptFit(1);
 
     TCanvas *c1 = new TCanvas("CbmRichQa1","c1",1200,1000);
-    c1->Divide(4,4);
+    c1->Divide(2,3);
     c1->cd(1);
     draw_diff_true_fake(fh_TrueElNofHits, fh_FakeNofHits, "Number of Hits");
 
     c1->cd(2);
-    draw_diff_true_fake(fh_TrueElDistance, fh_FakeDistance, "ring-track distance, [cm]");
-
-    c1->cd(3);
     draw_diff_true_fake(fh_TrueElAngle, fh_FakeAngle, "Angle, [rad]");
 
-    c1->cd(4);
+    c1->cd(3);
     draw_diff_true_fake(fh_TrueElNofHitsOnRing, fh_FakeNofHitsOnRing,"# hits on ring");
 
-    c1->cd(5);
-    draw_diff_true_fake(fh_TrueElRadPos, fh_FakeRadPos, "Radial posotion, [cm]");
+    c1->cd(4);
+    draw_diff_true_fake(fh_TrueElRadPos, fh_FakeRadPos, "Radial position, [cm]");
 
-    c1->cd(6);
+    c1->cd(5);
     draw_diff_true_fake(fh_TrueElChi2, fh_FakeChi2, "chi2");
 
-    c1->cd(7);
+    c1->cd(6);
     draw_diff_true_fake(fh_TrueElRadius, fh_FakeRadius, "radius, [cm]");
-
-    c1->cd(8);
-    draw_diff_true_fake(fh_TrueElA, fh_FakeA, "A axis, [cm]");
-
-    c1->cd(9);
-    draw_diff_true_fake(fh_TrueElB, fh_FakeB, "B axis, [cm]");
-
-    c1->cd(10);
-    draw_diff_true_fake(fh_TrueElPhi, fh_FakePhi, "Entries");
-
-    c1->cd(11);
-    draw_diff_true_fake(fh_TrueElStsMom, fh_FakeStsMom, "mom, [Gev/c]");
-
-    c1->cd(12);
-    fh_TrueElPhiVsRadAngle->GetXaxis()->SetTitle("phi, [rad]");
-    fh_TrueElPhiVsRadAngle->GetYaxis()->SetTitle("rad angle, [rad]");
-    fh_TrueElPhiVsRadAngle->Draw("COLZ");
-
-    c1->cd(13);
-    fh_FakePhiVsRadAngle->GetXaxis()->SetTitle("phi, [rad]");
-    fh_FakePhiVsRadAngle->GetYaxis()->SetTitle("rad angle, [rad]");
-    fh_FakePhiVsRadAngle->Draw("COLZ");
-
-    c1->cd(14);
-    fh_TrueElRadiusVsMom->Draw("COLZ");
-
-    c1->cd(15);
-    fh_FakeRadiusVsMom->Draw("COLZ");
 
     char effTxt[200];
 	TCanvas *c3 = new TCanvas("CbmRichQa3","c3",1200,1000);

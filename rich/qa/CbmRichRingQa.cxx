@@ -81,9 +81,6 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
     fh_FakeNofHits = new TH1D("fh_FakeNofHits","Number of hits in ring",50,0,50);
     fh_TrueElNofHits= new TH1D("fh_TrueElNofHits","Number of hits in ring",50,0,50);
 
-    fh_FakeDistance = new TH1D("fh_FakeDistance","Distance between track and ring center",50,0,5);
-    fh_TrueElDistance = new TH1D("fh_TrueElDistance","Distance between track and ring center",50,0,5);
-
     fh_FakeAngle = new TH1D("fh_FakeAngle","Biggest angle in ring",50,0,6.5);
     fh_TrueElAngle = new TH1D("fh_TrueElAngle","Biggest angle in ring",50,0,6.5);
 
@@ -98,25 +95,6 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
 
     fh_FakeRadius = new TH1D("fh_FakeRadius","Radius",90,0,9);;
     fh_TrueElRadius = new TH1D("fh_TrueElRadius","Radius",90,0,9);;
-
-    fh_FakeA = new TH1D("fh_FakeA","A",90,0, 9.);
-    fh_TrueElA = new TH1D("fh_TrueElA","A",90,0, 9.);
-
-    fh_FakeB = new TH1D("fh_FakeB","B", 90, 0., 9.);
-    fh_TrueElB = new TH1D("fh_TrueElB","B", 90, 0. ,9.);
-
-    fh_FakePhi = new TH1D("fh_FakePhi","Phi",50, -2.,2.);
-    fh_TrueElPhi = new TH1D("fh_TrueElPhi","Phi",50, -2. ,2.);
-
-    fh_FakeStsMom = new TH1D("fh_FakeStsMom","Sts Mom",50, 0., 15.);
-    fh_TrueElStsMom = new TH1D("fh_TrueElStsMom","Sts Mom",50, 0. , 15.);
-
-    fh_TrueElPhiVsRadAngle = new TH2D("fh_TrueElPhiVsRadAngle","Phi vs RadAngle", 50, -2. ,2.,50, 0. , 6.3);
-    fh_FakePhiVsRadAngle = new TH2D("fh_FakePhiVsRadAngle","Phi vs RadAngle", 50, -2. ,2.,50, 0. , 6.3);
-
-    fh_TrueElRadiusVsMom = new TH2D("fh_TrueElRadiusVsMom","Radius Vs Momentum", 50,0.,15.,50, 0. ,9.);
-    fh_FakeRadiusVsMom = new TH2D("fh_FakeRadiusVsMom","Radius Vs Momentum", 50, 0.,15.,50, 0.,9.);
-
 /// Difference Fake and True rings histogramms END
 
     fh_WrongMatchElDistance = new TH1D("fh_WrongMatchElDistance","Distance between track and ring center",50,0,5);
@@ -585,111 +563,6 @@ void CbmRichRingQa::EfficiencyCalc()
 
 void CbmRichRingQa::DiffFakeTrue()
 {
-  CbmRichRingMatch *match;
-  CbmRichRing* ring;
-  Int_t nMatches = fMatches->GetEntriesFast();
-
-  for (Int_t iMatches = 0; iMatches < nMatches; iMatches++){
-    match   = (CbmRichRingMatch*)fMatches->At(iMatches);
-    if (!match){
-       cout << "-E- CbmRichRingQa::DiffFakeTrue() no match"<<
-       iMatches<<endl;
-       continue;
-    }
-    ring = (CbmRichRing*)fRings->At(iMatches);
-    if (!ring){
-       cout << "-E- CbmRichRingQa::DiffFakeTrue() no ring"<<
-       iMatches<<endl;
-       continue;
-    }
-
-    Int_t recFlag = ring->GetRecFlag();
-    Double_t angle = ring->GetAngle();
-    Int_t hitsOnRing = ring->GetNofHitsOnRing();
-    Double_t chi2 = ring->GetChi2() / ring->GetNDF();
-    Double_t distance = ring->GetDistance();
-    Int_t nHits = ring->GetNofHits();
-    Double_t radPos = ring->GetRadialPosition();
-    Double_t axisA = ring->GetAaxis();
-    Double_t axisB = ring->GetBaxis();
-    Double_t phi = ring->GetPhi();
-    Double_t radAngle = ring->GetRadialAngle();
-    Double_t stsMomentum = GetStsMomentum(ring);
-
-    if (ring->GetAaxis() >= 10. || ring->GetAaxis() <= 0.){
-        continue;
-    }
-
-    if (recFlag == 1) fh_FakeNofHits->Fill(nHits);
-    if (recFlag == 3) fh_TrueElNofHits->Fill(nHits);
-
-    if (recFlag == 1) fh_FakeDistance->Fill(distance);
-    if (recFlag == 3) fh_TrueElDistance->Fill(distance);
-
-    if (recFlag == 1) fh_FakeAngle->Fill(angle);
-    if (recFlag == 3)  fh_TrueElAngle->Fill(angle);
-
-    if (recFlag == 1) fh_FakeNofHitsOnRing->Fill(hitsOnRing);
-    if (recFlag == 3) fh_TrueElNofHitsOnRing->Fill(hitsOnRing);
-
-    if (recFlag == 1) fh_FakeRadPos->Fill(radPos);
-    if (recFlag == 3) fh_TrueElRadPos->Fill(radPos);
-
-    if (recFlag == 1) fh_FakeChi2->Fill(chi2);
-    if (recFlag == 3) fh_TrueElChi2->Fill(chi2);
-
-    if (recFlag == 1) fh_FakeRadius->Fill(0.5*(axisB+axisA));
-    if (recFlag == 3) fh_TrueElRadius->Fill(0.5*(axisB+axisA));
-
-    if (recFlag == 1) fh_FakeA->Fill(axisA);
-    if (recFlag == 3) fh_TrueElA->Fill(axisA);
-
-    if (recFlag == 1) fh_FakeB->Fill(axisB);
-    if (recFlag == 3) fh_TrueElB->Fill(axisB);
-
-    if (recFlag == 1) fh_FakePhi->Fill(phi);
-    if (recFlag == 3) fh_TrueElPhi->Fill(phi);
-
-    if (recFlag == 1) fh_FakeStsMom->Fill(GetStsMomentum(ring));
-    if (recFlag == 3) fh_TrueElStsMom->Fill(GetStsMomentum(ring));
-
-    if (recFlag == 3) fh_TrueElPhiVsRadAngle->Fill(phi, radAngle);
-    if (recFlag == 1) fh_FakePhiVsRadAngle->Fill(phi, radAngle);
-
-    if (recFlag == 3) fh_TrueElRadiusVsMom->Fill(stsMomentum, axisB);
-    if (recFlag == 1) fh_FakeRadiusVsMom->Fill(stsMomentum, axisB);
-
-    if (TMath::IsNaN(nHits)||TMath::IsNaN(distance)||
-    	TMath::IsNaN(angle)||TMath::IsNaN(hitsOnRing)||
-    	TMath::IsNaN(radPos)||TMath::IsNaN(axisA)||
-    	TMath::IsNaN(axisB)||TMath::IsNaN(phi)||
-    	TMath::IsNaN(radAngle)||TMath::IsNaN(chi2)) continue;
-
-    if (recFlag == 1) foutFakeAndTrue << nHits << " "
-                            << distance << " "
-                            << angle << " "
-                            << hitsOnRing << " "
-                            << radPos << " "
-                            << axisA << " "
-                            << axisB << " "
-                            << phi << " "
-                            << radAngle << " "
-                            << chi2 << " "
-                            << -1 << endl;
-
-    if (recFlag == 3) foutFakeAndTrue << nHits << " "
-                            << distance << " "
-                            << angle << " "
-                            << hitsOnRing << " "
-                            << radPos << " "
-                            << axisA << " "
-                            << axisB << " "
-                            << phi << " "
-                            << radAngle << " "
-                            << chi2 << " "
-                            << 1 << endl;
-
-  }///loop over matches
 
 }
 
@@ -720,11 +593,29 @@ void CbmRichRingQa::DiffFakeTrueCircle()
 		Double_t radPos = ring->GetRadialPosition();
 		Double_t radius = ring->GetRadius();
 
+	    if (recFlag == 1) fh_FakeNofHits->Fill(nHits);
+	    if (recFlag == 3) fh_TrueElNofHits->Fill(nHits);
+
+	    if (recFlag == 1) fh_FakeAngle->Fill(angle);
+	    if (recFlag == 3)  fh_TrueElAngle->Fill(angle);
+
+	    if (recFlag == 1) fh_FakeNofHitsOnRing->Fill(hitsOnRing);
+	    if (recFlag == 3) fh_TrueElNofHitsOnRing->Fill(hitsOnRing);
+
+	    if (recFlag == 1) fh_FakeRadPos->Fill(radPos);
+	    if (recFlag == 3) fh_TrueElRadPos->Fill(radPos);
+
+	    if (recFlag == 1) fh_FakeChi2->Fill(chi2);
+	    if (recFlag == 3) fh_TrueElChi2->Fill(chi2);
+
+	    if (recFlag == 1) fh_FakeRadius->Fill(radius);
+	    if (recFlag == 3) fh_TrueElRadius->Fill(radius);
+
 		if (TMath::IsNaN(nHits)
 				|| TMath::IsNaN(angle) || TMath::IsNaN(hitsOnRing)
 				|| TMath::IsNaN(radPos) || TMath::IsNaN(radius)
 				|| TMath::IsNaN(chi2))	continue;
-		if (nHits == 0) continue;
+		if (nHits < 3) continue;
 		if (chi2 > 10000000000.) continue;
 		if (recFlag == 1)
 			foutFakeAndTrue << nHits << " " << angle << " "
@@ -832,12 +723,9 @@ void CbmRichRingQa::FinishTask()
     fh_TrueFoundElRingsProjHitCutBoverA->Write();
     fh_MCElRingsProjHitCutBoverA->Write();
 
-    /// Difference Fake and True rings histograms BEGIN
+/// Difference Fake and True rings histograms BEGIN
     fh_FakeNofHits->Write();
     fh_TrueElNofHits->Write();
-
-    fh_FakeDistance->Write();
-    fh_TrueElDistance->Write();
 
     fh_FakeAngle->Write();
     fh_TrueElAngle->Write();
@@ -853,25 +741,7 @@ void CbmRichRingQa::FinishTask()
 
     fh_FakeRadius->Write();
     fh_TrueElRadius->Write();
-
-    fh_FakeA->Write();
-    fh_TrueElA->Write();
-
-    fh_FakeB->Write();
-    fh_TrueElB->Write();
-
-    fh_FakePhi->Write();
-    fh_TrueElPhi->Write();
-
-    fh_TrueElStsMom->Write();
-    fh_FakeStsMom->Write();
-
-    fh_TrueElPhiVsRadAngle->Write();
-    fh_FakePhiVsRadAngle->Write();
-
-    fh_TrueElRadiusVsMom->Write();
-    fh_FakeRadiusVsMom->Write();
-    /// Difference Fake and True rings histograms END
+/// Difference Fake and True rings histograms END
 
     fh_WrongMatchElDistance->Write();
     fh_TrueMatchElDistance->Write();

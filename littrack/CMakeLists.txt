@@ -19,6 +19,7 @@ ${CBMROOT_SOURCE_DIR}/littrack/qa
 ${CBMROOT_SOURCE_DIR}/littrack/weight
 ${CBMROOT_SOURCE_DIR}/littrack/selection
 ${CBMROOT_SOURCE_DIR}/littrack/utils
+${CBMROOT_SOURCE_DIR}/littrack/geo
 ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base

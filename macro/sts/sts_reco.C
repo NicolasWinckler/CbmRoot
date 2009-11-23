@@ -15,48 +15,57 @@
 //
 // --------------------------------------------------------------------------
 
-
-void sts_reco(Int_t nEvents = 1)
-{
+#include <math.h>
+void sts_reco_real(Int_t nEvents = 1) {
 
   // ========================================================================
   //          Adjust this part according to your requirements
   
   // Input file (MC events)
-  TString inFile = "sts.mc.root";
+  TString inFile = "data/occupancy.sim.root";
   
   // Parameter file
-  TString parFile = "params.root";
+  TString parFile = "data/occupancy.param.root";
   
-  // STS digitisation file for stereo angle 0 & 15 deg
-  //TString digiFile = "sts_standard.digi.par";
-  
-  // STS digitisation file for stereo angle -7.5 & +7.5 deg
-  TString digiFile = "sts_standard_7vs7.digi.par";
-  
-  //STS digitisation file for the same z position of all sensors
-  //TString digiFile = "sts_same_z.digi.par";
-  
+  // STS digitisation file
+  TString digiFile = "sts_standard.digi.par";
   
   // Output file
-  TString outFile = "sts.reco.root";
+  TString outFile = "data/occupancy.root";
 
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;
   // ========================================================================
 
   
-    
+  Double_t threshold  =  4;
+  Double_t noiseWidth =  0.1;
+  Int_t    nofBits    = 20;
+  Double_t minStep    =  0.01,;
+  Double_t StripDeadTime = 10.;
+  
+  StripDeadTime = StripDeadTime/100.;
+
   // ---   Screen output   --------------------------------------------------  
-  cout << "*****************************************" << endl;
-  cout << "***   STS RECONSTRUCTION SCRIPT   *******" << endl;
-  cout << "*****************************************" << endl;
+  cout << "***************************************************" << endl;
+  cout << "***   STS REALISTIC RECONSTRUCTION SCRIPT   *******" << endl;
+  cout << "***************************************************" << endl;
   cout << "*** Input file        : " << inFile << endl;
   cout << "*** Parameter file    : " << parFile << endl;
   cout << "*** Digitisation file : " << digiFile << endl;
   cout << "*** Output file       : " << outFile << endl;
   cout << "*** Number of events  : " << nEvents << endl;
-  cout << "*****************************************" << endl;
+  cout << "***************************************************" << endl;
+  cout << endl;
+  cout << "=============================================" << endl;
+  cout << "===     Realistic response settings  ========" << endl;
+  cout << "=============================================" << endl;
+  cout << "===    threshold  = " << threshold  << endl;
+  cout << "===    noiseWidth = " << noiseWidth << endl;
+  cout << "===    nofBits    = " << nofBits    << endl;
+  cout << "===    minStep    = " << minStep    << endl;
+  cout << "===    StripDeadTime    = " << StripDeadTime*100. << "[ns] " << endl;
+  cout << "=============================================" << endl;
   cout << endl << endl;
  // ------------------------------------------------------------------------
 
@@ -105,46 +114,60 @@ void sts_reco(Int_t nEvents = 1)
   run->SetInputFile(inFile);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
-  
+
   // -----   MVD Hitproducer   ----------------------------------------------
-  CbmMvdHitProducer* hitProd = new CbmMvdHitProducer("MVDHitProducer", 0, 
-   						     iVerbose);
+  CbmMvdHitProducer* hitProd = new CbmMvdHitProducer("MVDHitProducer", 0, iVerbose);
   run->AddTask(hitProd);
   // ------------------------------------------------------------------------
-  
+
   // -----   STS digitiser   ------------------------------------------------
-  FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
+  //  CbmTask* 
+  CbmStsDigitize* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
+  stsDigitize->SetRealisticResponse();
+  stsDigitize->SetFrontThreshold (threshold);
+  stsDigitize->SetBackThreshold  (threshold);
+  stsDigitize->SetFrontNoiseWidth(noiseWidth);
+  stsDigitize->SetBackNoiseWidth (noiseWidth);
+
+  stsDigitize->SetFrontNofBits   (nofBits);
+  stsDigitize->SetBackNofBits    (nofBits);
+  stsDigitize->SetFrontMinStep   (minStep);
+  stsDigitize->SetBackMinStep    (minStep);
+
+  stsDigitize->SetStripDeadTime  (StripDeadTime);
+
   run->AddTask(stsDigitize);
   // ------------------------------------------------------------------------
  
-  
+  CbmStsClusterFinder* findClusters = new CbmStsClusterFinder("STSFindClusters", iVerbose);
+  run->AddTask(findClusters);
+
   
   // ---  STS hit finding   -------------------------------------------------
-  FairTask* findHits = new CbmStsFindHits("STSFindHits", iVerbose);
+  //  CbmTask* 
+  CbmStsFindHits* findHits = new CbmStsFindHits("STSFindHits", iVerbose);
   run->AddTask(findHits);
-  // ------------------------------------------------------------------------
-   
+
   
-    
   // ---  STS hit matching   ------------------------------------------------
-  FairTask* matchHits = new CbmStsMatchHits("STSMatchHits", 
- 					   iVerbose);
+  //  CbmTask*
+  CbmStsMatchHits* matchHits = new CbmStsMatchHits("STSMatchHits",iVerbose);
+  matchHits->SetRealisticResponse();
   run->AddTask(matchHits);
   // ------------------------------------------------------------------------
-   
-
-   
+  
+  
   // -----   STS track finding   --------------------------------------------
   FairTask* kalman= new CbmKF();
   run->AddTask(kalman);
   FairTask* l1 = new CbmL1();
   run->AddTask(l1);
   CbmStsTrackFinder* trackFinder    = new CbmL1StsTrackFinder();
-  FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder);
+  FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder, kTRUE);
   run->AddTask(findTracks);
   // ------------------------------------------------------------------------
 
- 
+  
          
   // -----   STS track matching   -------------------------------------------
   FairTask* matchTracks = new CbmStsMatchTracks("Match tracks", iVerbose);
@@ -162,22 +185,22 @@ void sts_reco(Int_t nEvents = 1)
   // ------------------------------------------------------------------------
   
   
+   // -----   STS reconstruction QA   ----------------------------------------
+   FairTask* stsFHQa = new CbmStsFindHitsQa("STSFindHitsQA",iVerbose);
+   run->AddTask(stsFHQa);
+   // ------------------------------------------------------------------------
+/*  // -----   STS reconstruction QA   ----------------------------------------
+   FairTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 0);
+   run->AddTask(stsRecoQa);*/
+ // ------------------------------------------------------------------------
+
   
-  // -----   STS reconstruction QA   ----------------------------------------
-  FairTask* stsFHQa = new CbmStsFindHitsQa("STSFindHitsQA",iVerbose);
-  run->AddTask(stsFHQa);
-  // ------------------------------------------------------------------------
-  // -----   STS reconstruction QA   ----------------------------------------
-  FairTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 1);
-  run->AddTask(stsRecoQa);
-  // ------------------------------------------------------------------------
-  
-   
 
   // -----  Parameter database   --------------------------------------------
   TString stsDigiFile = gSystem->Getenv("VMCWORKDIR");
   stsDigiFile += "/parameters/sts/";
   stsDigiFile += digiFile;
+  cout << "digi file = " << stsDigiFile << endl;
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
   FairParRootFileIo*  parIo1 = new FairParRootFileIo();
   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
@@ -202,6 +225,8 @@ void sts_reco(Int_t nEvents = 1)
   // -----   Finish   -------------------------------------------------------
   timer.Stop();
   Double_t rtime = timer.RealTime();
+
+
   Double_t ctime = timer.CpuTime();
   cout << endl << endl;
   cout << "Macro finished succesfully." << endl;
@@ -213,3 +238,30 @@ void sts_reco(Int_t nEvents = 1)
 
 
 }
+
+/*
+RefPrim   efficiency   : 0.9518 | 28331
+RefSec    efficiency   : 0.7498 | 3098
+Refset    efficiency   : 0.9272 | 31429
+Allset    efficiency   : 0.8858 | 40750
+ExtraPrim efficiency   : 0.8847 | 7438
+ExtraSec  efficiency   : 0.5091 | 1883
+Extra     efficiency   : 0.7699 | 9321
+Clone     probability  : 0.0000 | 0
+Ghost     probability  : 0.0349 | 1422
+MC tracks/event found  : 565
+
++ STSFindTracks  :   0.0052 s, tracks found 595
++ Match tracks   :   0.0021 s, matches 595, hit quota 95.4026 %
++ STS Track Fitter:   0.6635 s, tracks fitted 595
+there are 4845 points and 20116 hits.
+----------   StsReconstructionQa : Event summary   ------------
+MCTracks   : 1984, reconstructable: 706, reconstructed: 573
+Vertex     : reconstructable: 578, reconstructed: 529, efficiency 91.5225%
+Reference  : reconstructable: 425, reconstructed: 399, efficiency 93.8824%
+Non-vertex : reconstructable: 128, reconstructed: 44, efficiency 34.3750%
+STSTracks 595, ghosts 22, clones 0
+-----------------------------------------------------------
+
+Got out
+*/

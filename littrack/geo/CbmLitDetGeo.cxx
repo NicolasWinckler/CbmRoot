@@ -6,7 +6,7 @@ ClassImp(CbmLitDetGeo)
 // -----   Default constructor   -------------------------------------------
 CbmLitDetGeo::CbmLitDetGeo() {
   // Constructor
-  fName="tutdet";
+  fName="litdet";
   maxSectors=0;
   maxModules=10;
 }
@@ -19,12 +19,12 @@ const char* CbmLitDetGeo::getModuleName(Int_t m) {
       ASCII file should start with TutorialDet otherwise they will 
       not be constructed
   */
-  sprintf(modName,"tutdet%i",m+1); 
+  sprintf(modName,"litdet%i",m+1);
   return modName;
 }
 
 const char* CbmLitDetGeo::getEleName(Int_t m) {
   /** Returns the element name of Det number m */
-  sprintf(eleName,"tutdet%i",m+1);
+  sprintf(eleName,"litdet%i",m+1);
   return eleName;
 }

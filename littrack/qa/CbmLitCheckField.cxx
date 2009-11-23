@@ -36,7 +36,7 @@ CbmLitCheckField::CbmLitCheckField():
 	fNofBinsY(30),
 	fUseEllipseAcc(true),
 	fOutputDir("field/"),
-	fPolynomDegree(3),
+	fPolynomDegree(1),
 	fNofPolynoms(4)
 {
 
@@ -133,9 +133,9 @@ void CbmLitCheckField::Exec(
 	DrawHistosPoly("rel");
 	DrawHistosPoly("abs");
 
-//	if (IsDrawBx()) DrawHistosPhd(BX);
-//	if (IsDrawBy()) DrawHistosPhd(BY);
-//	if (IsDrawBz()) DrawHistosPhd(BZ);
+	if (IsDrawBx()) DrawHistosPhd(BX);
+	if (IsDrawBy()) DrawHistosPhd(BY);
+	if (IsDrawBz()) DrawHistosPhd(BZ);
 }
 
 void CbmLitCheckField::Finish()
@@ -481,6 +481,8 @@ void CbmLitCheckField::DrawHistosPhd(
 		Int_t v)
 {
 	gStyle->SetOptTitle(0);
+	gStyle->SetPalette(0);
+	gStyle->SetOptStat(0);
 	std::string names[] = {"phd_Bx", "phd_By", "phd_Bz"};
 	TCanvas* canvas[fNofSlices];
 	for (Int_t s = 0; s < fNofSlices; s++) {
@@ -491,8 +493,9 @@ void CbmLitCheckField::DrawHistosPhd(
 	}
 
 	for (int i = 0; i < fNofSlices; i++) {
-		canvas[i]->cd(4);
+		canvas[i]->cd(1);
 		TGraph2D* graph2 = fhBAprGraph[v][i][fPolynomDegree];
+//		graph2->Scale(0.01);
 		graph2->GetXaxis()->SetTitle("X [cm]");
 		graph2->GetYaxis()->SetTitle("Y [cm]");
 		graph2->GetZaxis()->SetTitle("B [kGauss]");
@@ -504,6 +507,7 @@ void CbmLitCheckField::DrawHistosPhd(
 
 		canvas[i]->cd(2);
 		TH2D* hist3 = fhBErrH2D[v][i][fPolynomDegree];
+//		hist3->Scale(0.01);
 		hist3->GetXaxis()->SetTitle("X [cm]");
 		hist3->GetYaxis()->SetTitle("Y [cm]");
 		hist3->GetZaxis()->SetTitle("B [kGauss]");

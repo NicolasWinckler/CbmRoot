@@ -71,10 +71,18 @@ Bool_t  CbmLitDet::ProcessHits(FairVolume* vol)
        gMC->IsTrackDisappeared()   ) {
     fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
     fVolumeID = vol->getMCid();
-    if (fELoss == 0. ) return kFALSE;
-    AddHit(fTrackID, fVolumeID, TVector3(fPos.X(),  fPos.Y(),  fPos.Z()),
-	   TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, fLength,
-	   fELoss);
+    gMC->TrackPosition(fPosOut);
+    gMC->TrackMomentum(fMomOut);
+//    if (fELoss == 0. ) return kFALSE;
+//    AddHit(fTrackID, fVolumeID, TVector3(fPos.X(),  fPos.Y(),  fPos.Z()),
+//	   TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, fLength,
+//	   fELoss);
+    AddHit(fTrackID, 1,
+      TVector3(fPos.X(),   fPos.Y(),   fPos.Z()),
+      TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
+      TVector3(fMom.Px(),  fMom.Py(),  fMom.Pz()),
+      TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
+      fTime, fLength, fELoss);
     
     // Increment number of lit det points in TParticle
     CbmStack* stack = (CbmStack*) gMC->GetStack();
@@ -155,14 +163,20 @@ void CbmLitDet::ConstructGeometry() {
   ProcessNodes ( volList );
 }
 
-CbmLitDetPoint* CbmLitDet::AddHit(Int_t trackID, Int_t detID,
-					    TVector3 pos, TVector3 mom, 
-					    Double_t time, Double_t length,
-					    Double_t eLoss) {
+//CbmLitDetPoint* CbmLitDet::AddHit(Int_t trackID, Int_t detID,
+//					    TVector3 pos, TVector3 mom,
+//					    Double_t time, Double_t length,
+//					    Double_t eLoss) {
+CbmLitDetPoint* CbmLitDet::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+				  TVector3 posOut, TVector3 momIn,
+				  TVector3 momOut, Double_t time,
+				  Double_t length, Double_t eLoss) {
   TClonesArray& clref = *fCbmLitDetPointCollection;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) CbmLitDetPoint(trackID, detID, pos, mom,
-					      time, length, eLoss);
+  return new(clref[size]) CbmLitDetPoint(trackID, detID, posIn, posOut,
+				       momIn, momOut, time, length, eLoss);
+//  return new(clref[size]) CbmLitDetPoint(trackID, detID, pos, mom,
+//					      time, length, eLoss);
 }
 
 ClassImp(CbmLitDet)

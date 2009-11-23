@@ -51,10 +51,14 @@ class CbmLitDet: public FairDetector {
     /**      This method is an example of how to add your own point 
      *       of type CbmLitDetPoint to the clones array
     */
-   CbmLitDetPoint* AddHit(Int_t trackID, Int_t detID,
-			       TVector3 pos, TVector3 mom, 
-			       Double_t time, Double_t length,
-			       Double_t eLoss);
+//   CbmLitDetPoint* AddHit(Int_t trackID, Int_t detID,
+//			       TVector3 pos, TVector3 mom,
+//			       Double_t time, Double_t length,
+//			       Double_t eLoss);
+   CbmLitDetPoint* AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+   			      TVector3 posOut, TVector3 momIn,
+   			      TVector3 momOut, Double_t time,
+   			      Double_t length, Double_t eLoss);
  
     /**	The following methods can be implemented if you need to make 
      *	any optional action in your detector during the transport.  
@@ -71,8 +75,7 @@ class CbmLitDet: public FairDetector {
     virtual void   PreTrack(){;}                                      
     virtual void   BeginEvent(){;}
 
-
- private: 
+private:
 
     /** Track information to be stored until the track leaves the
 	active volume. 
@@ -81,6 +84,8 @@ class CbmLitDet: public FairDetector {
     Int_t          fVolumeID;          //!  volume id
     TLorentzVector fPos;               //!  position at entrance
     TLorentzVector fMom;               //!  momentum at entrance
+    TLorentzVector fPosOut;            //!  position at exit
+    TLorentzVector fMomOut;            //!  momentum at exit
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss

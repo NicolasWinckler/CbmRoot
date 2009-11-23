@@ -36,6 +36,8 @@ private:
     TClonesArray* fMCPointArray;
 
     TH1F* fh_theta_mc;
+    TH1F* fh_eloss_mc;
+    TH1F* fh_eloss_rec;
 
     Int_t fNEvents;
 

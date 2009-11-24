@@ -1,6 +1,3 @@
-//  2009/11/23   Belogurov:  Thickness of the vacuum chamber window is changed to 0.5 mm.
-//Points 4, 5, 6 are changheg in PCON.
-// before it was 0.1 mm due to sin of the cone angle between z= 240 and z= 270
 //  $Id: pipe_standard.geo,v 1.1 2006/06/09 14:04:21 hoehne Exp $
 //
 //  pipe_standard.geo (Claudia Hoehne)
@@ -51,39 +48,32 @@
 //  - point n 
 //  
 //----------------------------------------------------------
-
-
 pipe1
 cave
 PCON 
 carbon
-8
+6
 0. 360.
- -50.   25.  25.5 
-  25.   25.  25.5 
-  35.  130. 130.5
- 239.5 130. 130.5
- 240.  128. 130.5
- 269.5  10.  12.5
- 270.   10.  10.5 
-1600.   32.  32.5
+ -50.  25.  25.5 
+  25.  25.  25.5 
+  35. 130. 130.5
+ 240. 130. 130.5
+ 270.  10.  10.5
+1600.  32.  32.5
 
 0. 0. 0. 
 1.  0.  0.  0.  1.  0.  0.  0.  1
 //
-
 pipevac1
 cave
 PCON
 vacuum
-8
+6
 0. 360.  
  -50.  0.  25.   
   25.  0.  25.  
   35.  0. 130.
- 239.5 0. 130.
- 240.  0. 128.
- 269.5 0.  10.
+ 240.  0. 130.   
  270.  0.  10.
 1600.  0.  32.
 

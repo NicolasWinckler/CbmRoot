@@ -167,11 +167,11 @@ void CbmMuchStrawHitFinderQa::Exec(Option_t * option)
     Double_t x = digi->GetTime();
     Double_t tubeNo = x / diam[station3];
     if (TMath::Abs(x) > fRadIn[station3]) {
-      fhOccup[station3]->Fill(x);
-      fhOccTub[station3]->Fill(tubeNo);
+      fhOccup[station3]->Fill(x,1);
+      fhOccTub[station3]->Fill(tubeNo,1);
     } else {
-      fhOccup[station3]->Fill(x,0.5); // around beam hole
-      fhOccTub[station3]->Fill(tubeNo,0.5);
+      fhOccup[station3]->Fill(x,1); // around beam hole
+      fhOccTub[station3]->Fill(tubeNo,1);
     }
   }
 
@@ -179,7 +179,6 @@ void CbmMuchStrawHitFinderQa::Exec(Option_t * option)
   Double_t xz[2] = {0};
   for (Int_t i = 0; i < nHits; ++i){
     CbmMuchStrawHit* hit = (CbmMuchStrawHit*) fHits->UncheckedAt(i);
-    //if (hit->GetTime(2) > -66666) continue; // not a straw hit
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->UncheckedAt(hit->GetRefId());
     Int_t detId =  digi->GetDetectorId();
     Int_t station3 = fGeoScheme->GetStationIndex(detId);
@@ -199,7 +198,6 @@ void CbmMuchStrawHitFinderQa::Exec(Option_t * option)
     for (Int_t j = 0; j < nHits; ++j){
       if (j == i) continue;
       CbmMuchStrawHit* hit1 = (CbmMuchStrawHit*) fHits->UncheckedAt(j);
-      //if (hit1->GetTime(2) > -66666) continue; // not a straw hit
       CbmMuchDigi* digi1 = (CbmMuchDigi*) fDigis->UncheckedAt(hit1->GetRefId());
       Int_t detId1 =  digi1->GetDetectorId();
       Int_t stat3 = fGeoScheme->GetStationIndex(detId1);
@@ -300,7 +298,6 @@ void CbmMuchStrawHitFinderQa::CheckMirrors()
     //CbmMuchHit* hit = (CbmMuchHit*) fHits->UncheckedAt(i);
     CbmMuchStrawHit* hit = tmp[i];
     if (!hit) continue;
-    //if (hit->GetTime(2) > -66666) continue; // not a straw hit
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->UncheckedAt(hit->GetRefId());
     Int_t detId =  digi->GetDetectorId();
     Int_t station3 = fGeoScheme->GetStationIndex(detId);
@@ -322,7 +319,6 @@ void CbmMuchStrawHitFinderQa::CheckMirrors()
       //hit = (CbmMuchHit*) fHits->UncheckedAt(i1);
       hit = tmp[i1];
       if (!hit) continue;
-      //if (hit->GetTime(2) > -66666) continue; // not a straw hit
       digi = (CbmMuchDigi*) fDigis->UncheckedAt(hit->GetRefId());
       Int_t detId1 =  digi->GetDetectorId();
       Int_t stat3 = fGeoScheme->GetStationIndex(detId1);
@@ -357,7 +353,6 @@ void CbmMuchStrawHitFinderQa::CheckMirrors()
       CbmMuchStrawHit* hit1 = tmp[i1];
       if (!hit1) continue;
       if (hit1 == hits[0] || hit1 == hits[1]) continue;
-      //if (hit->GetTime(2) > -66666) continue; // not a straw hit
       CbmMuchDigi* digi1 = (CbmMuchDigi*) fDigis->UncheckedAt(hit1->GetRefId());
       Int_t detId1 =  digi1->GetDetectorId();
       Int_t stat3 = fGeoScheme->GetStationIndex(detId1);
@@ -378,7 +373,7 @@ void CbmMuchStrawHitFinderQa::CheckMirrors()
       Double_t angPos = TMath::ATan2 (hit1->GetU(), hit1->GetZ()); // angular position
       for (Int_t j = 0; j < 2; ++j) {
 	Double_t ang = TMath::ATan2 (hit1->GetU()-hits[j]->GetU(), hit1->GetZ()-hits[j]->GetZ());
-	cout << ang << " " << hits[j]->GetFlag() << " " << hit1->GetFlag() << " " << hits[j]->GetTube() << " " << hit1->GetTube() << " " << hits[j]->GetU() << " " << hit1->GetU() << " " << TMath::ATan2(hits[j]->GetU(),hits[j]->GetZ()) << " " << TMath::ATan2(hit1->GetU(),hit1->GetZ()) << endl;
+	//cout << ang << " " << hits[j]->GetFlag() << " " << hit1->GetFlag() << " " << hits[j]->GetTube() << " " << hit1->GetTube() << " " << hits[j]->GetU() << " " << hit1->GetU() << " " << TMath::ATan2(hits[j]->GetU(),hits[j]->GetZ()) << " " << TMath::ATan2(hit1->GetU(),hit1->GetZ()) << endl;
 	if (TMath::Abs(ang-angPos) < TMath::Abs(angMin)) {
 	  angMin1 = angMin; 
 	  iMin1 = iMin;

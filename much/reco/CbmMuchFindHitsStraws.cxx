@@ -145,23 +145,28 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
     Int_t detId =  digi->GetDetectorId();
     Int_t station3 = fGeoScheme->GetStationIndex(detId);
     Int_t layer = fGeoScheme->GetLayerIndex(detId);
+    Int_t side = fGeoScheme->GetLayerSideIndex(detId);
     Int_t rot = layer % 3;
     Double_t plocX = xyz[0] * TMath::Cos(phi[rot]) + xyz[1] * TMath::Sin(phi[rot]);
     Double_t plocY = -xyz[0] * TMath::Sin(phi[rot]) + xyz[1] * TMath::Cos(phi[rot]);
 //    std::cout << "phi=" << phi[rot] << " x=" << xyz[0] << " y=" << xyz[1] << " z=" << xyz[2] << " plocX=" << plocX << " plocY=" << plocY << std::endl;
     Double_t xloc = plocX;
     //cout << " Local: " << ploc.getX() << " " << ploc.getY() << " " << ploc.getZ() << endl;
-    if (layer % 2 != 0) xloc += diam[station3] / 2. * TMath::Sign(1.,xloc); // half-tube shift
+    if (side) xloc += diam[station3] / 2.; // half-tube shift
     Int_t itube = (Int_t) (xloc / diam[station3]), iSegment;
     if (xloc < 0) itube--;
-//    cout << itube << " " << station3 << endl;
     Double_t xwire = (itube + 0.5) * diam[station3]; // wire position
+    //cout << itube << " " << layer << " " << side << " " << xloc << " " << xwire << endl;
     Double_t times[3] = {0};
 
+    /* No segmentation outside beam hole region
     if (TMath::Abs(plocX) < radIn[station3]) {
       if (plocY > 0) iSegment = 1;
       else iSegment = -1;
     } else iSegment = 0;
+    */
+    if (plocY > 0) iSegment = 1;
+    else iSegment = -1;
 
     // Global coordinates in rotated coordinate system
     Double_t errU = gRandom->Gaus(0,sigmaX);
@@ -183,7 +188,7 @@ void CbmMuchFindHitsStraws::Exec(Option_t* opt)
     //hit->SetZ(fGeoScheme->GetLayerSideByDetId(detId)->GetZ());
     iarray[0] = station3;
     iarray[1] = itube;
-    array[0] = xwire;
+    array[0] = xwire - diam[station3] / 2. * side; // Xwire in global system
     array[1] = xloc - xwire; // drift distance
     array[2] = array[1] + errU; // drift distance with error
     hit->SetDouble(3, array);
@@ -220,6 +225,7 @@ void CbmMuchFindHitsStraws::Effic(Double_t *diam)
     // Apply inefficiency
     Double_t drift = hit->GetDouble()[1];
     Int_t station = hit->GetInt()[0];
+    //cout << drift << " " << diam[station]/2 << endl;
     if (TMath::Abs(drift) < diam[station]/2-0.01) continue; // outside tube wall
     fHits->RemoveAt(ihit);
   }
@@ -238,8 +244,8 @@ void CbmMuchFindHitsStraws::Merge()
     CbmMuchStrawHit *hit = (CbmMuchStrawHit*) fHits->UncheckedAt(ihit);
     if (hit == 0x0) continue;
     Double_t drift = TMath::Abs (hit->GetDouble()[1]);
-    //CbmMuchDigiMatch *digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit->GetDigi());
-    CbmMuchDigiMatch *digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(ihit);
+    CbmMuchDigiMatch *digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit->GetRefId());
+    //CbmMuchDigiMatch *digiM = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(ihit);
 
     for (Int_t jhit = ihit+1; jhit < nHits; ++jhit) {
       CbmMuchStrawHit *hit1 = (CbmMuchStrawHit*) fHits->UncheckedAt(jhit);
@@ -250,8 +256,9 @@ void CbmMuchFindHitsStraws::Merge()
       if (hit1->GetSegment() != hit->GetSegment()) continue; // upper and lower tubes
 
       Double_t drift1 = TMath::Abs (hit1->GetDouble()[1]);
-      //CbmMuchDigiMatch *digiM1 = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit1->GetDigi());
-      CbmMuchDigiMatch *digiM1 = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(jhit);
+      CbmMuchDigiMatch *digiM1 = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(hit1->GetRefId());
+      //CbmMuchDigiMatch *digiM1 = (CbmMuchDigiMatch*) fDigiMatches->UncheckedAt(jhit);
+      //cout << jhit << " " << hit1->GetRefId() << endl;
       if (drift < drift1) {
 	fHits->RemoveAt(jhit);
 	hit->SetFlag(hit->GetFlag()+(1<<1)); // increase overlap multiplicity
@@ -285,7 +292,7 @@ void CbmMuchFindHitsStraws::Mirror()
     CbmMuchStrawHit *hitM = new ((*fHits)[nHits++]) CbmMuchStrawHit(*hit);
     hitM->SetU(hit->GetU()-2*drift);
     hitM->SetFlag(hitM->GetFlag()+1); // flag mirror hit
-    cout << " Mirror: " << hit->GetU() << " " << xwire << " " << hitM->GetU() << endl;
+    //cout << " Mirror: " << hit->GetU() << " " << xwire << " " << hitM->GetU() << endl;
   }
 }
 // -------------------------------------------------------------------------

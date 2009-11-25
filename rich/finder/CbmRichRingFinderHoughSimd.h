@@ -7,7 +7,6 @@
 
 #include "CbmRichRingFinderHoughImpl.h"
 
-
 class CbmRichRingFinderHoughSimd : public CbmRichRingFinderHoughImpl {
 
 public:
@@ -20,7 +19,7 @@ public:
 	virtual void HoughTransformReconstruction();
 	virtual void HoughTransformGroup(unsigned short int indmin, unsigned short int indmax, Int_t iPart);
 
-	ClassDef(CbmRichRingFinderHoughSimd,1)
+	//ClassDef(CbmRichRingFinderHoughSimd,1)
 
 };
 #endif // CBM_RICH_RING_FINDER_HOUGH_SIMD_H

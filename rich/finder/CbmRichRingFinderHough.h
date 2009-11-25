@@ -8,7 +8,7 @@
 
 #include "CbmRichRingFinder.h"
 #include "CbmRichRingFinderHoughImpl.h"
-//#include "CbmRichRingFinderHoughSimd.h"
+#include "CbmRichRingFinderHoughSimd.h"
 #include <vector>
 #include <map>
 #include <functional>
@@ -22,8 +22,8 @@ protected:
 	Int_t fVerbose; /// Verbosity level
 	TString fGeometryType;
 	Int_t fRingCount;
-	CbmRichRingFinderHoughImpl *fHTImpl;
-	//CbmRichRingFinderHoughSimd *fHTImpl;
+	//CbmRichRingFinderHoughImpl *fHTImpl;
+	CbmRichRingFinderHoughSimd *fHTImpl;
 
 	Double_t fExecTime;//evaluate execution time
 

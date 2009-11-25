@@ -135,10 +135,11 @@ class CbmStsDigitize : public FairTask
   map<Int_t, set<Int_t> > fBChannelPointsMap;
  
   map<CbmStsSensor*, set<Int_t> > fPointMap;  /** sensor points **/
-  Float_t occupancy   [10][1000][20];
+  Float_t occupancy [10][1000][20] ;
 
   /** Make sensorwise set for points **/
   void MakeSets();
+  void MakeSets1();
 
   /** Get parameter containers **/
   virtual void SetParContainers();

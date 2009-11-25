@@ -611,10 +611,10 @@ void CbmStsClusterFinder::AnalyzeCluster(Int_t iCluster) {
   cluster->SetMean(sumWX/sumW);
   cluster->SetMeanError(sumW/maxDigiSig);
   if ( sumW < maxDigiSig ) {
-    cout << " MAX DIGI = " << maxDigiSig << ", while SUMW = " << sumW << endl;
+//     cout << " MAX DIGI = " << maxDigiSig << ", while SUMW = " << sumW << endl;
     for ( Int_t itemp = 0 ; itemp < cluster->GetNDigis() ; itemp++ ) {
       digi = (CbmStsDigi*)fDigis->At(cluster->GetDigi(itemp));
-      cout << "digi ADC = " << digi->GetAdc() << " at channel# " << digi->GetChannelNr() << endl;
+//       cout << "digi ADC = " << digi->GetAdc() << " at channel# " << digi->GetChannelNr() << endl;
     }
   }
   //   cout << sumWE/sumW << " mean at " << endl;

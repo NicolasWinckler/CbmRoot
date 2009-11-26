@@ -48,8 +48,6 @@ void run_reco(Int_t nEvents = 700)
   cbmlibs();
   // ------------------------------------------------------------------------
 
-
-
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *run= new FairRunAna();
   run->SetInputFile(inFile);
@@ -267,9 +265,10 @@ void run_reco(Int_t nEvents = 700)
   Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
   Int_t    richDetType = 4;       // Detector type Hamamatsu H8500-03
   Int_t    richNoise   = 220;     // Number of noise points per event
+  Double_t collectionEff = 1.0;
   CbmRichHitProducer* richHitProd
     = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
-			     richNoise, iVerbose);
+			     richNoise, iVerbose, collectionEff);
   run->AddTask(richHitProd);
   //--------------------------------------------------------------------------
 

@@ -51,13 +51,13 @@ void much_sim(TString inputSignal = "",
   // -----   Other geometries   ---------------------------------------------
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
-  TString magnetGeom = "magnet_standard.geo";
+  TString magnetGeom = "magnet_muon_standard.geo";
   TString stsGeom    = "sts_standard.geo";
   TString trdGeom    = "";
   TString tofGeom    = "";
 
   // -----   Magnetic field   -----------------------------------------------
-  TString  fieldMap   = "FieldMuonMagnet";   // name of field map
+  TString  fieldMap   = "field_muon_standard";   // name of field map
   Double_t fieldZ     = 50.;                 // field centre z position
   Double_t fieldScale =  1.;                 // field scaling factor
 

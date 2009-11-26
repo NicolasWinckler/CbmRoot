@@ -24,7 +24,7 @@ void run_sim(Int_t nEvents = 2)
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
   TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "magnet_standard.geo";
+  TString magnetGeom = "magnet_electron_standard.geo";
   TString mvdGeom    = "mvd_standard.geo";
   TString stsGeom    = "sts_standard.geo";
   TString richGeom   = "rich_standard.geo";
@@ -33,7 +33,7 @@ void run_sim(Int_t nEvents = 2)
   TString ecalGeom   = "ecal_FastMC.geo";
   
   // -----   Magnetic field   -----------------------------------------------
-  TString fieldMap    = "FieldMuonMagnet";   // name of field map
+  TString fieldMap    = "field_electron_standard";   // name of field map
   Double_t fieldZ     = 50.;             // field centre z position
   Double_t fieldScale =  1.;             // field scaling factor
   

@@ -55,7 +55,7 @@
   
   FairModule *Magnet= new CbmMagnet("MAGNET");
   // 1- Active shielding Geometry
-  Magnet->SetGeometryFileName("magnet_standard.geo");
+  Magnet->SetGeometryFileName("magnet_electron_standard.geo");
   // 2- Iron Magnet
   // Magnet->SetGeometryFileName("magnet_iron.geo");
   fRun->AddModule(Magnet);

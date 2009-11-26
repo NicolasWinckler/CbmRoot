@@ -43,8 +43,8 @@
   TString pipeGeom    = "pipe_standard.geo";
 
   // Magnet geometry and field map
-  TString magnetGeom  = "magnet_standard.geo";
-  TString fieldMap    = "FieldMuonMagnet";
+  TString magnetGeom  = "magnet_electron_standard.geo";
+  TString fieldMap    = "field_electron_standard";
   Double_t fieldZ     = 50.;     // z position of field centre
   Double_t fieldScale = 1.;      // field scaling factor
 

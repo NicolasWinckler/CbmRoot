@@ -166,8 +166,8 @@ void CbmStsIdealMatchHits::Exec(Option_t* opt) {
 
     if ( iType == 1 ) {
       // Case pixel: Candidates are all points of the digi.
-      for (Int_t iMatchF=0; iMatchF<3; iMatchF++) {
-	Int_t iPointF = dMatchF->GetRefIndex(iMatchF);
+      for (Int_t jMatchF=0; jMatchF<3; jMatchF++) {
+	Int_t iPointF = dMatchF->GetRefIndex(jMatchF);
 	if ( iPointF < 0 ) continue;
 	nPointsF++;
 	// Calculate distance to hit
@@ -190,14 +190,14 @@ void CbmStsIdealMatchHits::Exec(Option_t* opt) {
     else if ( iType == 2 || iType == 3 ) {
       // Case strip: Candidates are points corresponding to front
       // and back side digis
-      for ( Int_t iMatchF=0; iMatchF<3; iMatchF++) {
-	Int_t iPointF = dMatchF->GetRefIndex(iMatchF);
+      for ( Int_t jMatchF=0; jMatchF<3; jMatchF++) {
+	Int_t iPointF = dMatchF->GetRefIndex(jMatchF);
 	if ( iPointF < 0 ) continue; 
 	nPointsF++;
-	for ( Int_t iMatchB=0; iMatchB<3; iMatchB++) {
-	  Int_t iPointB = dMatchB->GetRefIndex(iMatchB);
+	for ( Int_t jMatchB=0; jMatchB<3; jMatchB++) {
+	  Int_t iPointB = dMatchB->GetRefIndex(jMatchB);
 	  if ( iPointB < 0 ) continue; 
-	  if ( iMatchF == 0 ) nPointsB++;
+	  if ( jMatchF == 0 ) nPointsB++;
 	  if ( iPointB != iPointF ) continue; // chance combination
 	  // Calculate distance to hit
 	  CbmStsPoint* point = (CbmStsPoint*) fPoints->At(iPointF);

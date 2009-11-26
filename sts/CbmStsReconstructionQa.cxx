@@ -443,10 +443,10 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
       Int_t nTrue  = match->GetNofTrueHits();
       Int_t nWrong = match->GetNofWrongHits();
       Int_t nFake  = match->GetNofFakeHits();
-      Int_t nHits  = stsTrack->GetNStsHits();
-      if ( nTrue + nWrong + nFake != nHits ) {
+      Int_t nAllHits  = stsTrack->GetNStsHits();
+      if ( nTrue + nWrong + nFake != nAllHits ) {
 	cout << "True " << nTrue << " wrong " << nWrong << " Fake "
-	     << nFake << " Hits " << nHits << endl;
+	     << nFake << " Hits " << nAllHits << endl;
 	Fatal("Exec", "Wrong number of hits");
       }
 
@@ -454,7 +454,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
       if ( fVerbose > 4 )
 	cout << "-I- " << GetName() << ": "
 	     << "MCTrack " << iMC << ", hits "
-	     << nHits << ", StsTrack " << iRec << ", hits " << nHits
+	     << nHits << ", StsTrack " << iRec << ", hits " << nAllHits
 	     << ", true hits " << nTrue << endl;
 
       // Fill histograms for reconstructed tracks
@@ -462,11 +462,11 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
 	fhMomResAll->Fill(mom,100.*(mom-1./TMath::Abs(stsTrack->GetParamFirst()->GetQp()))/mom);
       nRecAll++;
       fhMomRecAll->Fill(mom);
-      fhNpRecAll->Fill(Double_t(nHits));
+      fhNpRecAll->Fill(Double_t(nAllHits));
       if ( isPrim ) {
 	nRecPrim++;
 	fhMomRecPrim->Fill(mom);
-	fhNpRecPrim->Fill(Double_t(nHits));
+	fhNpRecPrim->Fill(Double_t(nAllHits));
 
 	if ( toSave >= 0 ) {
 	  if ( pdgC > 0 )
@@ -482,7 +482,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
       else {
 	nRecSec++;
 	fhMomRecSec->Fill(mom);
-	fhNpRecSec->Fill(Double_t(nHits));
+	fhNpRecSec->Fill(Double_t(nAllHits));
 	fhZRecSec->Fill(vertex.Z());
 	if ( stsTrack->GetParamFirst()->GetQp() )
 	  fhMomResSec->Fill(mom,100.*(mom-1./TMath::Abs(stsTrack->GetParamFirst()->GetQp()))/mom);

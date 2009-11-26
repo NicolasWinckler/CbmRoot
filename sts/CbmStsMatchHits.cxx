@@ -184,8 +184,8 @@ void CbmStsMatchHits::Exec(Option_t* opt) {
 
     if ( iType == 1 ) {
       // Case pixel: Candidates are all points of the digi.
-      for (Int_t iMatchF=0; iMatchF<3; iMatchF++) {
-	Int_t iPointF = dMatchF->GetRefIndex(iMatchF);
+      for (Int_t jMatchF=0; jMatchF<3; jMatchF++) {
+	Int_t iPointF = dMatchF->GetRefIndex(jMatchF);
 	if ( iPointF < 0 ) continue;
 	nPointsF++;
 	// Calculate distance to hit
@@ -209,8 +209,8 @@ void CbmStsMatchHits::Exec(Option_t* opt) {
     else if ( iType == 2 || iType == 3 ) {
       // Case strip: Candidates are points corresponding to front
       // and back side digis
-      for ( Int_t iMatchF=0; iMatchF<3; iMatchF++) {
-	Int_t iPointF = dMatchF->GetRefIndex(iMatchF);
+      for ( Int_t jMatchF=0; jMatchF<3; jMatchF++) {
+	Int_t iPointF = dMatchF->GetRefIndex(jMatchF);
 	if ( iPointF < 0 ) continue; 
 	//	cout << " got pointf index = " << iPointF << endl;
 	nPointsF++;

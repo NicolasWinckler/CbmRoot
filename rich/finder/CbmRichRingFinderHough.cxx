@@ -40,8 +40,8 @@ CbmRichRingFinderHough::CbmRichRingFinderHough  ( Int_t verbose, TString geometr
     fRingCount = 0;
     fNEvent = 0;
 
-	//fHTImpl = new CbmRichRingFinderHoughImpl(fGeometryType);
-	fHTImpl = new CbmRichRingFinderHoughSimd(fGeometryType);
+	fHTImpl = new CbmRichRingFinderHoughImpl(fGeometryType);
+	//fHTImpl = new CbmRichRingFinderHoughSimd(fGeometryType);
 }
 
 void CbmRichRingFinderHough::Init()

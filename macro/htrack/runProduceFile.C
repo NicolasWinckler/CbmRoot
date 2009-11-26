@@ -107,15 +107,14 @@
   // ------------------------------------------------------------------------
 
   // -----   Create magnetic field   ----------------------------------------
-  if ( fieldMap == "FieldActive" || fieldMap == "FieldIron")
-    CbmFieldMapSym3* magField = new CbmFieldMapSym3(fieldMap);
-  else if ( fieldMap == "FieldAlligator" )
-    CbmFieldMapSym2* magField = new CbmFieldMapSym2(fieldMap);
-  else if ( fieldMap == "FieldMuonMagnet" )
-    CbmFieldMapSym3* magField = new CbmFieldMapSym3(fieldMap);
+  if (fieldMap == "field_electron_standard" ) 
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "field_muon_standard" )
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "FieldMuonMagnet" )
+    CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
   else {
-    CbmField*        magField = NULL;
-    cout << "===> ERROR: Field map " << fieldMap << " unknown! " << endl;
+    cout << "===> ERROR: Unknown field map " << fieldMap << endl;
     exit;
   }
   if (magField != NULL) {

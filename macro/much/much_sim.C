@@ -162,7 +162,16 @@ void much_sim(TString inputSignal = "",
 
   // -----   Create magnetic field   ----------------------------------------
   cout << endl << "=== much_sim.C : Create magnetic field ..." << endl;
-  CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);;
+  if (fieldMap == "field_electron_standard" ) 
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "field_muon_standard" )
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "FieldMuonMagnet" )
+    CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
+  else {
+    cout << "===> ERROR: Unknown field map " << fieldMap << endl;
+    exit;
+  }
   magField->SetPosition(0., 0., fieldZ);
   magField->SetScale(fieldScale);
   fRun->SetField(magField);

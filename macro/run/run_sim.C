@@ -155,17 +155,7 @@ void run_sim(Int_t nEvents = 2)
 
 
   // -----   Create magnetic field   ----------------------------------------
-  CbmFieldMap* magField = NULL;
-  if ( fieldMap == "FieldActive" || fieldMap == "FieldIron")
-    magField = new CbmFieldMapSym3(fieldMap);
-  else if ( fieldMap == "FieldAlligator" )
-    magField = new CbmFieldMapSym2(fieldMap);
-  else if ( fieldMap = "FieldMuonMagnet" )
-    magField = new CbmFieldMapSym3(fieldMap);
-  else {
-    cout << "===> ERROR: Field map " << fieldMap << " unknown! " << endl;
-    exit;
-  }
+  CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
   magField->SetPosition(0., 0., fieldZ);
   magField->SetScale(fieldScale);
   fRun->SetField(magField);

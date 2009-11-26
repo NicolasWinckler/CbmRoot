@@ -18,24 +18,8 @@ void run_radius_correction ()
     // ----  Load libraries   -------------------------------------------------
     gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
     basiclibs();
-    gSystem->Load("libGeoBase");
-    gSystem->Load("libParBase");
-    gSystem->Load("libBase");
-    gSystem->Load("libCbmBase");
-    gSystem->Load("libCbmData");
-    gSystem->Load("libField");
-    gSystem->Load("libGen");
-    gSystem->Load("libPassive");
-    gSystem->Load("libMvd");
-    gSystem->Load("libSts");
-    gSystem->Load("libRich");
-    gSystem->Load("libTrd");
-    gSystem->Load("libTof");
-    gSystem->Load("libEcal");
-    gSystem->Load("libGlobal");
-    gSystem->Load("libKF");
-    gSystem->Load("libL1");
-    // ------------------------------------------------------------------------
+    gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
+    cbmlibs();
 
     char fileMC[200], fileRec[200];
 

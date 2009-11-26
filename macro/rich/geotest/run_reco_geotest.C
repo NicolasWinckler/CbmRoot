@@ -1,5 +1,5 @@
 
-void run_reco_geotest(Int_t nEvents = 100)
+void run_reco_geotest(Int_t nEvents = 200)
 {
 
   // ========================================================================
@@ -9,77 +9,38 @@ void run_reco_geotest(Int_t nEvents = 100)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "/home/semeon/d/rich/mc.00.root";
+  TString inFile = "/d/cbm06/user/slebedev/geotest/mc.00.root";
 
   // Parameter file
-  TString parFile = "/home/semeon/d/rich/params.00.root";
+  TString parFile = "/d/cbm06/user/slebedev/geotest/params.00.root";
 
   // STS digitisation file
   TString stsDigiFile = "sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/home/semeon/d/rich/reco.00.root";
+  TString outFile = "/d/cbm06/user/slebedev/geotest/reco.00.root";
 
-
-  // In general, the following parts need not be touched
-  // ========================================================================
-
-
-
-  // ----    Debug option   -------------------------------------------------
   gDebug = 0;
-  // ------------------------------------------------------------------------
 
-
-
-  // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
   timer.Start();
-  // ------------------------------------------------------------------------
-
-
 
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libSts");
-  gSystem->Load("libRich");
-  gSystem->Load("libMuch");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libEcal");
-  gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
-  gSystem->Load("libL1");
-  gSystem->Load("libLittrack");
-  gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
-  // ------------------------------------------------------------------------
-
-
+  gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
+  cbmlibs();
 
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *run= new FairRunAna();
   run->SetInputFile(inFile);
   run->SetOutputFile(outFile);
-  // ------------------------------------------------------------------------
 
-
-  // =========================================================================
-  // ===                        RICH reconstruction                        ===
-  // =========================================================================
 
   // ---------------------RICH Hit Producer ----------------------------------
   Double_t richPmtRad  = 0.4;     // PMT radius [cm]
   Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
-  Int_t    richDetType = 4;       // Detector type Hamamatsu H8500-03
+  Int_t    richDetType = 5;       // Detector type Hamamatsu H8500-03
   Int_t    richNoise   = 220;     // Number of noise points per event
   CbmRichHitProducer* richHitProd
     = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
@@ -105,8 +66,6 @@ void run_reco_geotest(Int_t nEvents = 100)
   run->AddTask(fitRings);
   //--------------------------------------------------------------------------
 
-
-
   // ------------------- RICH Ring matching  ---------------------------------
   CbmRichMatchRings* matchRings = new CbmRichMatchRings(iVerbose);
   run->AddTask(matchRings);
@@ -114,8 +73,6 @@ void run_reco_geotest(Int_t nEvents = 100)
 
    CbmRichGeoTest* geoTest = new CbmRichGeoTest();
   run->AddTask(geoTest);
-  // ===                 End of RICH local reconstruction                  ===
-  // =========================================================================
 
 
   // -----  Parameter database   --------------------------------------------
@@ -133,16 +90,12 @@ void run_reco_geotest(Int_t nEvents = 100)
   rtdb->saveOutput();
   // ------------------------------------------------------------------------
 
-
-
   // -----   Intialise and run   --------------------------------------------
   run->LoadGeometry();
   run->Init();
   cout << "Starting run" << endl;
   run->Run(0,nEvents);
   // ------------------------------------------------------------------------
-
-
 
   // -----   Finish   -------------------------------------------------------
   timer.Stop();

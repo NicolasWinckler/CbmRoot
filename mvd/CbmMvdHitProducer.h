@@ -79,7 +79,7 @@ class CbmMvdHitProducer : public FairTask
   
 
 
- private:
+ public:
 
   // ----------   Private data members  ------------------------------------
 

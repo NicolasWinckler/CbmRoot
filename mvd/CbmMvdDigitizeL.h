@@ -1,16 +1,12 @@
-// -------------------------------------------------------------------------
-// -----                    CbmMvdDigitizeL header file              -----
-// -----                   Created 08/11/06  by V. Friese              -----
-// -------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
+// -----                    CbmMvdDigitizeL header file                     -----
+// -----                    Created by C.Dritsa (2009)                      -----
+// -----                    Maintained by M.Deveaux (m.deveaux(att)gsi.de   -----
+// ------------------------------------------------------------------------------
 
 
 /** CbmMvdDigitizeL header file
- **
- ** Task class for producing MvdHits from MvdPoints.
- ** Mode = 0 : MAPS readout
- ** Mode = 1 : Ideal (copy of MCPoint properties)
- **
- ** Former CbmStsMapsDigitiser (M.Deveaux, 02/02/05)
+ ** Read "ReadmeMvdDigitizer.pdf" for instructions
  **
  **/
 
@@ -36,6 +32,9 @@
 #include <map>
 #include <utility>
 #include "CbmMvdPixelCharge.h"
+#include "TH1F.h"
+#include "TH2F.h"
+#include "TCanvas.h"
 
 
 
@@ -81,11 +80,11 @@ class CbmMvdDigitizeL : public FairTask
 
   void ProduceIonisationPoints(CbmMvdPoint* point, CbmMvdStation* station);
   void ProduceSignalPoints();
-  void ProducePixelCharge();
+  void ProducePixelCharge(CbmMvdPoint* point, CbmMvdStation* station);
   void TransformXYtoPixelIndex(Double_t x, Double_t y,Int_t & ix, Int_t & iy);
   void TransformPixelIndexToXY(Int_t ix, Int_t iy, Double_t & x, Double_t & y );
   void PositionWithinCell(Double_t x, Double_t y,  Int_t & ix, Int_t & iy, Double_t & xCell, Double_t & yCell);
-  void AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t charge);
+  void AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t charge, CbmMvdPoint* point);
   Int_t BuildEvent();
   Double_t GetDetectorGeometry(CbmMvdPoint* point);
 
@@ -107,6 +106,8 @@ class CbmMvdDigitizeL : public FairTask
   void SetDeltaName(TString fileName)    { fDeltaFileName   = fileName;    }
   void SetBgBufferSize(Int_t nBuffer)    { fBgBufferSize    = nBuffer;     }
   void SetDeltaBufferSize(Int_t nBuffer) { fDeltaBufferSize = nBuffer;     }
+
+  void ShowDebugHistograms() {fShowDebugHistos = kTRUE;}
 
 
 
@@ -134,7 +135,16 @@ public:
     Double_t fCurrentParticleMomentum;
     Int_t    fCurrentParticlePdg;
 
-    TH1F*    fRandomGeneratorTestHisto;
+    TH1F* fRandomGeneratorTestHisto;
+    TH2F* fPosXY;
+    TH1F* fpZ;
+    TH1F* fPosXinIOut;
+    TH1F* fAngle;
+    TH1F* fSegResolutionHistoX;
+    TH1F* fSegResolutionHistoY;
+    TH1F* fSegResolutionHistoZ;
+
+
     Double_t fLorentzY0;
     Double_t fLorentzXc; 
     Double_t fLorentzW;
@@ -151,6 +161,9 @@ public:
     Double_t fPar1;
     Double_t fPar2;
 
+    Bool_t fShowDebugHistos;
+    TH1F* fResolutionHistoX;
+    TH1F* fResolutionHistoY;
 
     Int_t fNumberOfSegments;
     Int_t fCurrentLayer;

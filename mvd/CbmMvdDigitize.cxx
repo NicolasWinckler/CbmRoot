@@ -133,6 +133,7 @@ CbmMvdDigitize::CbmMvdDigitize()
 {
     fMode          = 0;
     fBranchName    = "MVDPoint";
+    fDigis         = new TClonesArray("CbmMvdDigi");
     fPixelCharge   = new TClonesArray("CbmMvdPixelCharge");
     fPileupManager = NULL;
     fDeltaManager  = NULL;
@@ -285,6 +286,7 @@ Int_t CbmMvdDigitize::BuildEvent() {
       // Add points from this event to the input arrays
       for (Int_t iPoint=0; iPoint<points->GetEntriesFast(); iPoint++) {
 	point = (CbmMvdPoint*) points->At(iPoint);
+	point->SetTrackID(-2);
 	iStation = point->GetStationNr();
 	if ( fStationMap.find(iStation) == fStationMap.end() ) 
 	  Fatal("BuildEvent", "Station not found");
@@ -318,6 +320,7 @@ Int_t CbmMvdDigitize::BuildEvent() {
       // Add points from this event to the input arrays
       for (Int_t iPoint=0; iPoint<pointsD->GetEntriesFast(); iPoint++) {
 	point = (CbmMvdPoint*) pointsD->At(iPoint);
+	point->SetTrackID(-3);
 	iStation = point->GetStationNr();
 	if ( fStationMap.find(iStation) == fStationMap.end() ) 
 	  Fatal("BuildEvent", "Station not found");
@@ -366,6 +369,9 @@ void CbmMvdDigitize::Exec(Option_t* opt) {
 	 stationIt++) {
 	CbmMvdStation* station = (*stationIt).second;
 
+	cout << "-I- Digitizer: Station Nr" << station->GetStationNr() << endl;
+	cout << "-I- Digitizer: Station Points" <<   station->GetNPoints() << endl;
+
 	fPixelCharge->Clear("C");
 
 	// Clear charge map
@@ -374,7 +380,8 @@ void CbmMvdDigitize::Exec(Option_t* opt) {
 	// Loop over MvdPoints in station
 	for (Int_t iPoint=0; iPoint<station->GetNPoints(); iPoint++) {
 	    CbmMvdPoint* point = station->GetPoint(iPoint);
-
+	    
+	    
 	    // Reject for the time being light nuclei.
 	    // They have to be added in the data base...
 	    if ( point->GetPdgCode() > 100000) continue;
@@ -382,14 +389,14 @@ void CbmMvdDigitize::Exec(Option_t* opt) {
 	    // Produce charge in pixels
 	    ProduceIonisationPoints(point, station);
 	    ProduceSignalPoints();
-	    ProducePixelCharge();
+	    ProducePixelCharge(point);
 
 	    CbmMvdPixelCharge* pixelCharge;
 
 	    for(Int_t f=0; f<fPixelCharge->GetEntriesFast(); f++)
 	    {
 		pixelCharge = (CbmMvdPixelCharge*) fPixelCharge->At(f);
-		pixelCharge->DigestCharge( ( (float)( point->GetX()+point->GetXOut() )/2 ) , ( (float)( point->GetY()+point->GetYOut() )/2 )  );
+		pixelCharge->DigestCharge( ( (float)( point->GetX()+point->GetXOut() )/2 ) , ( (float)( point->GetY()+point->GetYOut() )/2 ), point->GetTrackID() );
 	    };
 
 	} //loop on MCpoints
@@ -407,7 +414,8 @@ void CbmMvdDigitize::Exec(Option_t* opt) {
 			       fPixelSizeX, fPixelSizeY,
 			       pixel->GetPointX(), pixel->GetPointY(),
 			       pixel->GetContributors(),
-			       pixel->GetMaxChargeContribution());
+			       pixel->GetMaxChargeContribution(),
+			       pixel->GetTrackId());
 	    }
 	}
 	//------------------------------------------------------------------------------
@@ -456,7 +464,7 @@ void CbmMvdDigitize::ProduceIonisationPoints(CbmMvdPoint* point,
                                                                //
   Double_t lxDet  = TMath::Abs(entryX-exitX);                  //
   Double_t lyDet  = TMath::Abs(entryY-exitY);                  //
-  Double_t lzDet  = TMath::Abs(entryZ-exitZ);                  //
+   						               //
   //-----------------------------------------------------------//
 
 
@@ -482,9 +490,7 @@ void CbmMvdDigitize::ProduceIonisationPoints(CbmMvdPoint* point,
     Double_t entryZepi = -fEpiTh/2;
     Double_t exitZepi  =  fEpiTh/2;
 
-    //Double_t lxzDet = sqrt(lxDet*lxDet + lzDet*lzDet);
-    //Double_t lyzDet = sqrt(lyDet*lyDet + lzDet*lzDet);
-
+    
     TVector3  a( entryX, entryY, entryZ ); // entry in the detector
     TVector3  b( exitX,  exitY,  exitZ  ); // exit from the detector
     TVector3  c;
@@ -637,7 +643,7 @@ void CbmMvdDigitize::ProduceSignalPoints() {
 }
 // -------------------------------------------------------------------------
 
-void CbmMvdDigitize::ProducePixelCharge() {
+void CbmMvdDigitize::ProducePixelCharge(CbmMvdPoint* point) {
     /** Simulation of fired pixels. Each fired pixel is considered
      * as SimTrackerHit
      */
@@ -687,7 +693,7 @@ void CbmMvdDigitize::ProducePixelCharge() {
 
   			CbmMvdDigi * digi = 0;
 
-			if(totCharge>0){AddChargeToPixel(ix,iy,totCharge);};
+			if(totCharge>0){AddChargeToPixel(ix,iy,totCharge,point);};
 
 	    }//for y
 	}// for x
@@ -708,7 +714,7 @@ void CbmMvdDigitize::TransformXYtoPixelIndex(Double_t x, Double_t y,Int_t & ix, 
 
 // ---------------------------------------------------------------------------
 
-void CbmMvdDigitize:: AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t charge){
+void CbmMvdDigitize:: AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t charge, CbmMvdPoint* point){
     // Adds the charge of a hit to the pixels. Checks if the pixel was hit before.
 
     CbmMvdPixelCharge* pixel;
@@ -720,14 +726,14 @@ void CbmMvdDigitize:: AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t cha
 
     // Pixel not yet in map -> Add new pixel
     if ( fChargeMapIt == fChargeMap.end() ) {
-	CbmMvdPixelCharge* pixel= new ((*fPixelCharge)[fPixelCharge->GetEntriesFast()])
-	    CbmMvdPixelCharge(charge, channelX, channelY);
+        pixel= new ((*fPixelCharge)[fPixelCharge->GetEntriesFast()])
+	    CbmMvdPixelCharge(charge, channelX, channelY, point->GetTrackID());
 	fChargeMap[a] = pixel;
     }
 
     // Pixel already in map -> Add charge
     else {
-	CbmMvdPixelCharge* pixel = fChargeMapIt->second;
+	pixel = fChargeMapIt->second;
 	if ( ! pixel ) Fatal("AddChargeToPixel", "Zero pointer in charge map!");
 	pixel->AddCharge(charge);
     }
@@ -807,7 +813,7 @@ Int_t CbmMvdDigitize::GetMvdGeometry() {
       }
 
       // Create new CbmMvdStation and add it to the map
-      fStationMap[iStation] = new CbmMvdStation(volName.Data(), iStation, volId, 
+      fStationMap[iStation] = new CbmMvdStation(volName.Data(), iStation, volId,
 				       	        z, d, rmin, rmax);
       fStationMap[iStation]->Print();
       
@@ -906,7 +912,7 @@ InitStatus CbmMvdDigitize::Init() {
       return kERROR;
   }
   if (fNDeltaElect > 20000) {
-      cout << "-E- " << GetName() << "::Init:  Delta Pileup of " << fNPileup
+      cout << "-E- " << GetName() << "::Init:  Delta Pileup of " << fNDeltaElect
 	  << " too large; maximum buffer size is 100000 events." << endl;
       return kERROR;
   }
@@ -985,6 +991,7 @@ void CbmMvdDigitize::Finish() {
 	<< fCutOnDeltaRays  << " MeV " <<  endl;
     cout << "ChargeThreshold            : " << setw(8) << setprecision(2)
 	<< fChargeThreshold  <<  endl;
+    cout << "YOU USED THE GAUSS DIGITIZER!!! " <<  endl;
     cout << "---------------------------------------------" << endl;
 
 	

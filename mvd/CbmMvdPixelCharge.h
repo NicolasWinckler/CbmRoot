@@ -23,13 +23,13 @@ public:
 
     /** Constructor with all variables **/
 
-    CbmMvdPixelCharge(Int_t charge, Int_t channelNrX, Int_t channelNrY);
+    CbmMvdPixelCharge(Int_t charge, Int_t channelNrX, Int_t channelNrY, Int_t trackId);
     virtual ~CbmMvdPixelCharge();
 
     Bool_t TestXY(Int_t channelNrX,Int_t channelNrY);
 
 
-    void DigestCharge(Float_t pointX, Float_t pointY);
+    void DigestCharge(Float_t pointX, Float_t pointY, Int_t trackId);
     void AddCharge(Int_t charge){ fTrackCharge = fTrackCharge+charge; };
 
 
@@ -40,6 +40,7 @@ public:
     Float_t  GetPointY()   { return fDominatingPointY; };
     Int_t    GetMaxChargeContribution(){return fMaxChargeContribution;};
     Short_t  GetContributors(){return fContributors;};
+    Int_t    GetTrackId()    {return fTrackId;}
 
     void SetCharge(Int_t charge){fCharge = charge;};
     void SetMaxChargeContribution(Int_t maxContribution){ fMaxChargeContribution = maxContribution; }
@@ -62,6 +63,7 @@ private:
     Int_t fChannelNrX;
     Int_t fChannelNrY;
     Int_t fTrackCharge;
+    Int_t fTrackId;
 
 
     ClassDef(CbmMvdPixelCharge,1);

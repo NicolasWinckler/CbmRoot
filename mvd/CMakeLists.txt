@@ -13,6 +13,7 @@ ${CBMROOT_SOURCE_DIR}/field
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/mvd
+${CBMROOT_SOURCE_DIR}/passive
 ${CBMROOT_SOURCE_DIR}/mvd 
 )
 
@@ -31,14 +32,14 @@ CbmMvdContFact.cxx
 CbmMvdGeo.cxx 
 CbmMvdGeoPar.cxx 
 CbmMvdHitProducer.cxx 
-CbmMvdDigitize.cxx  
-CbmMvdDigitizeL.cxx  
+CbmMvdDigitize.cxx   
+CbmMvdDigitizeL.cxx   
 CbmMvdPileupManager.cxx  
-CbmMvdFindHits.cxx
-CbmMvdStation.cxx
-MyG4UniversalFluctuationForSi.cxx
-CbmMvdPixelCharge.cxx    
-)
+CbmMvdPixelCharge.cxx  
+CbmMvdFindHits.cxx 
+CbmMvdStation.cxx 
+MyG4UniversalFluctuationForSi.cxx   )
+#CbmMvdMatchTracks.cxx 
 
 # fill list of header files from list of source files
 # by exchanging the file extension

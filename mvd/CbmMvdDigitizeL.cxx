@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-// -----                    CbmMvdDigitise  source file                -----
+// -----                    CbmMvdDigitize  source file                -----
 // -------------------------------------------------------------------------
 
 
@@ -100,7 +100,7 @@ CbmMvdDigitizeL::CbmMvdDigitizeL()
     fSegmentLength = 0.0001;
     fDiffusionCoefficient = 0.0055; // correspondes to the sigma of the gauss with the max drift length
     fElectronsPerKeV = 276; //3.62 eV for e-h creation
-    fWidthOfCluster  = 3.5; // in pixels
+    fWidthOfCluster  = 3.5; // in sigmas
     fPixelSizeX = 0.0030; // in cm
     fPixelSizeY = 0.0030;
     fCutOnDeltaRays  = 0.00169720;  //MeV
@@ -114,6 +114,8 @@ CbmMvdDigitizeL::CbmMvdDigitizeL()
     fPixelScanAccelerator    = 0;
     fLandauRandom=new TRandom3();
 
+    fShowDebugHistos = kFALSE;
+
     fPixelSize = 0.0010;
     fPar0 = 3.42157e+02;
     fPar1 = 7.67981e-01;
@@ -121,7 +123,7 @@ CbmMvdDigitizeL::CbmMvdDigitizeL()
 
     fLandauMPV=1013.;
     fLandauSigma=159.2;
-    fLandauGain=1.6;
+    fLandauGain=1.56;
 
     /*fLorentzY0=-21.74022;
     fLorentzXc=0.; // -0.04133
@@ -208,7 +210,7 @@ CbmMvdDigitizeL::CbmMvdDigitizeL(const char* name, Int_t iMode,
     fSegmentLength = 0.0001;
     fDiffusionCoefficient = 0.0055; // correspondes to the sigma of the gauss with the largest drift length
     fElectronsPerKeV = 276; //3.62 eV deposited for creation of 1 pair electron/hole
-    fWidthOfCluster  = 3.5; // in pixels
+    fWidthOfCluster  = 3.5; // in sigmas
     fPixelSizeX      = 0.0030; // in cm
     fPixelSizeY      = 0.0030;
     fCutOnDeltaRays  = 0.00169720; //MeV
@@ -224,6 +226,8 @@ CbmMvdDigitizeL::CbmMvdDigitizeL(const char* name, Int_t iMode,
     /*fLandauMPV=967.;
     fLandauSigma=208;*/
 
+    fShowDebugHistos = kFALSE;
+
     fPixelSize = 0.0010;
     fPar0 = 3.42157e+02;
     fPar1 = 7.67981e-01;
@@ -232,7 +236,7 @@ CbmMvdDigitizeL::CbmMvdDigitizeL(const char* name, Int_t iMode,
 
     fLandauMPV=1013.;
     fLandauSigma=159.2;
-    fLandauGain=1.6;
+    fLandauGain=1.56;
     
     /*fLorentzY0=-21.74022;
     fLorentzXc=0.; // -0.04133
@@ -314,7 +318,7 @@ void CbmMvdDigitizeL::SetPixelSize(Double_t pixelSize) {
 	fPar2 = 0;
         fLandauMPV   = 9.34187e+02;
         fLandauSigma = 1.87871e+02;
-        fLandauGain  = 1.6;
+
 
 
     }
@@ -324,7 +328,7 @@ void CbmMvdDigitizeL::SetPixelSize(Double_t pixelSize) {
 	fPar2 = 0;
         fLandauMPV   = 758.1;
         fLandauSigma = 145.3;
-        fLandauGain  = 1.6;
+
     }
     else if( pixelSize == 30 ){
 	fPar0 = 4.12073e+02;
@@ -332,7 +336,6 @@ void CbmMvdDigitizeL::SetPixelSize(Double_t pixelSize) {
 	fPar2 = 0;
 	fLandauMPV   = 8.62131e+02;
         fLandauSigma = 1.68846e+02;
-        fLandauGain  = 1.6;
 
     }
     else {
@@ -395,6 +398,7 @@ Int_t CbmMvdDigitizeL::BuildEvent() {
 	if ( fStationMap.find(iStation) == fStationMap.end() )
 	  Fatal("BuildEvent", "Station not found");
 	fStationMap[iStation]->AddPoint(point);
+	point->SetTrackID(-2);
 	nPile++;
       }
 	
@@ -428,6 +432,7 @@ Int_t CbmMvdDigitizeL::BuildEvent() {
 	if ( fStationMap.find(iStation) == fStationMap.end() )
 	  Fatal("BuildEvent", "Station not found");
 	fStationMap[iStation]->AddPoint(point);
+	point->SetTrackID(-3); // Mark the points as delta electron
 	nElec++;
       }
 
@@ -472,8 +477,8 @@ void CbmMvdDigitizeL::Exec(Option_t* opt) {
 	 stationIt++) {
 	CbmMvdStation* station = (*stationIt).second;
 
-	cout << "-I- Digitiser: Station Nr " << station->GetStationNr() << endl;
-	cout << "-I- Digitiser: Station Points " <<   station->GetNPoints() << endl;
+	cout << "-I- Digitizer: Station Nr " << station->GetStationNr() << endl;
+	cout << "-I- Digitizer: Station Points " <<   station->GetNPoints() << endl;
 
 	fPixelCharge->Clear("C");
 
@@ -484,39 +489,23 @@ void CbmMvdDigitizeL::Exec(Option_t* opt) {
 	for (Int_t iPoint=0; iPoint<station->GetNPoints(); iPoint++) {
 	    CbmMvdPoint* point = station->GetPoint(iPoint);
 
+	    if(TMath::Abs(point->GetZOut()-point->GetZ())<0.9* station->GetD()) continue;
+
 	    // Reject for the time being light nuclei.
 	    // They have to be added in the data base...
 	    if ( point->GetPdgCode() > 100000) continue;
 
-	    // do not take into account particles that do not cross the full thickness
-	    Double_t path_length = 0.99*(station->GetD()); 
-
-	    Int_t pdgCode = point->GetPdgCode();
-	    Double_t mass = TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass();
-
-	    if( TMath::Abs(point->GetZ() - point->GetZOut() ) < path_length ) {continue;}
-
-	    //if( point->GetPz()  < 0 ) {continue;}
-	    //if( ( point->GetZ()-station->GetZ()>0.01 ) && ( station->GetZ()-point->GetZOut() ) ) {continue;}
-
-	    //if( ((180./3.14)*TMath::ATan( (1./point->GetPz()) *sqrt( point->GetPx()*point->GetPx() + point->GetPy()*point->GetPy() ) ) > 50 ||
-	    //      (180./3.14)*TMath::ATan( (1./point->GetPz()) *sqrt( point->GetPx()*point->GetPx() + point->GetPy()*point->GetPy() ) ) < -50 )) {continue;}
-
-	    //if( !(point->GetZOut() - point->GetZ()  > path_length)  && (mass ==0 ) ) {continue;}
-	    //if( !(point->GetZOut() - point->GetZ()  > path_length)  ) {continue;}
-	    //if( pdgCode == 11  ) {continue;}
-
+	    // Produce charge in pixels
 	    ProduceIonisationPoints(point, station);
 	    ProduceSignalPoints();
-	    ProducePixelCharge();
-
+	    ProducePixelCharge(point,station);
 
 	    CbmMvdPixelCharge* pixelCharge;
 
 	    for(Int_t f=0; f<fPixelCharge->GetEntriesFast(); f++)
 	    {
 		pixelCharge = (CbmMvdPixelCharge*) fPixelCharge->At(f);
-		pixelCharge->DigestCharge( ( (float)( point->GetX()+point->GetXOut() )/2 ) , ( (float)( point->GetY()+point->GetYOut() )/2 )  );
+		pixelCharge->DigestCharge( ( (float)( point->GetX()+point->GetXOut() )/2 ) , ( (float)( point->GetY()+point->GetYOut() )/2 ), point->GetTrackID());
 	    };
 
 	} //loop on MCpoints
@@ -534,7 +523,8 @@ void CbmMvdDigitizeL::Exec(Option_t* opt) {
 			       fPixelSizeX, fPixelSizeY,
 			       pixel->GetPointX(), pixel->GetPointY(),
 			       pixel->GetContributors(),
-			       pixel->GetMaxChargeContribution());
+			       pixel->GetMaxChargeContribution(),
+			       pixel->GetTrackId());
 	    }
 	}
 	//------------------------------------------------------------------------------
@@ -569,33 +559,23 @@ void CbmMvdDigitizeL::ProduceIonisationPoints(CbmMvdPoint* point,
   TVector3 mom;
   point->Momentum(mom);
   Double_t momentum = mom.Mag();
+  
 
-
-  Double_t entryZ = 0;
-  Double_t exitZ  = 0;
-  Double_t entryX = 0;
-  Double_t exitX  = 0;
-  Double_t entryY = 0;
-  Double_t exitY  = 0;
-  Double_t lxDet  = 0;
-  Double_t lyDet  = 0;
-  Double_t lzDet  = 0;
-
+ 
   // entry and exit from the det layer ( detector ref frame ) :
   // -------------OK-------------------------------------------//
-  //entryZ = -layerTh/2;                                //
-  //exitZ  =  layerTh/2;                                //
-  entryZ = point->GetZ()-station->GetZ();
-  exitZ  = point->GetZOut()-station->GetZ();
-
-  entryX = point->GetX()    + layerRadius;            //
-  exitX  = point->GetXOut() + layerRadius;            //
-  entryY = point->GetY()    + layerRadius;            //
-  exitY  = point->GetYOut() + layerRadius;            //
-
-  lxDet  = TMath::Abs(entryX-exitX);                  //
-  lyDet  = TMath::Abs(entryY-exitY);                  //
-  lzDet  = TMath::Abs(entryZ-exitZ);                  //
+  Double_t entryZ = -layerTh/2;                                //
+  Double_t exitZ  =  layerTh/2;                                //
+  //Double_t entryZ = point->GetZ()-station->GetZ();             //
+  //Double_t exitZ  = point->GetZOut()-station->GetZ();          //
+  Double_t entryX = point->GetX()    + layerRadius;            //
+  Double_t exitX  = point->GetXOut() + layerRadius;            //
+  Double_t entryY = point->GetY()    + layerRadius;            //
+  Double_t exitY  = point->GetYOut() + layerRadius;            //
+                                                               //
+  Double_t lxDet  = TMath::Abs(entryX-exitX);                  //
+  Double_t lyDet  = TMath::Abs(entryY-exitY);                  //
+  Double_t lzDet  = TMath::Abs(entryZ-exitZ);                  //
   //-----------------------------------------------------------//
 
 
@@ -657,9 +637,17 @@ void CbmMvdDigitizeL::ProduceIonisationPoints(CbmMvdPoint* point,
     Double_t exitYepi = exitEpiCoord.Y();
              exitZepi = exitEpiCoord.Z();
 
+    /*
     Double_t lx        = TMath::Abs(entryXepi-exitXepi); //length of segment x-direction
     Double_t ly        = TMath::Abs(entryYepi-exitYepi);
     Double_t lz        = TMath::Abs(entryZepi-exitZepi);
+    */
+
+    Double_t lx        = -(entryXepi-exitXepi); //length of segment x-direction
+    Double_t ly        = -(entryYepi-exitYepi);
+    Double_t lz        = -(entryZepi-exitZepi);
+   
+
     //-----------------------------------------------------------
 
 
@@ -674,9 +662,9 @@ void CbmMvdDigitizeL::ProduceIonisationPoints(CbmMvdPoint* point,
     }
 
 
-    //Smear the charge on each track segment
+    //Smear the energy on each track segment
     Double_t charge = fLandauGain*fLandauRandom->Landau(1,fLandauSigma/fLandauMPV);
-    if (charge>12000){ charge = 12000; } //limit Random generator behaviour
+    if (charge>12000){charge=12000;} //limit Random generator behaviour
     
     //fRandomGeneratorTestHisto->Fill(charge);
     //Double_t dEmean = point->GetEnergyLoss()*fEpiTh/layerTh; // dEmean: energy loss corresponds to the epi thickness
@@ -711,11 +699,19 @@ void CbmMvdDigitizeL::ProduceIonisationPoints(CbmMvdPoint* point,
 
     Double_t x=0,y=0,z=0;
 
-    for (int i=0; i<fNumberOfSegments; ++i) {
+    Double_t xDebug=0,yDebug=0,zDebug=0;
 
+    for (int i=0; i<fNumberOfSegments; ++i) {
+       
 	z = -fEpiTh/2 + ((double)(i)+0.5)*fSegmentDepth; //middle position of the segment; zdirection
 	x = entryXepi + ((double)(i)+0.5)*( lx/( (Double_t)fNumberOfSegments) ); //middle position of the segment; xdirection
         y = entryYepi + ((double)(i)+0.5)*( ly/( (Double_t)fNumberOfSegments) ); //middle position of the segment; ydirection
+
+	if (fShowDebugHistos){
+	    xDebug=xDebug + x;
+	    yDebug=yDebug + y;
+	    zDebug=zDebug + z;
+	};
 
 
 	SignalPoint* spoint=&fSignalPoints[i];
@@ -736,13 +732,15 @@ void CbmMvdDigitizeL::ProduceIonisationPoints(CbmMvdPoint* point,
 	spoint->z = z;
 
         // --- debug 05/08/08 start -------
+
+
+
 	x=x-layerRadius;
         y=y-layerRadius;
-
 	if (sqrt(x*x + y*y )< 0.5) {
-	    cout <<"-I- " << GetName() << " point->GetX()= " <<  point->GetX() <<  " , point->GetXOut()= " << point->GetXOut()  << " , pdg code " << pdgCode << endl;
-	    cout <<"-I- " << GetName() << " point->GetY()= " <<  point->GetY() <<  " , point->GetYOut()= " << point->GetYOut() << endl;
-	    cout <<"-I- " << GetName() << " point->GetZ()= " <<setprecision(8)<<  point->GetZ() <<  " , point->GetZOut()= " <<setprecision(8)<< point->GetZOut() << endl;
+	    cout <<"-I- " << GetName() << "point->GetX()= " <<  point->GetX() <<  " , point->GetXOut()= " << point->GetXOut()  << " , pdg code " << pdgCode << endl;
+	    cout <<"-I- " << GetName() << "point->GetY()= " <<  point->GetY() <<  " , point->GetYOut()= " << point->GetYOut() << endl;
+	    cout <<"-I- " << GetName() << "point->GetZ()= " <<setprecision(8)<<  point->GetZ() <<  " , point->GetZOut()= " <<setprecision(8)<< point->GetZOut() << endl;
 	}
 
 	// --- debug 05/08/08 end -------
@@ -750,7 +748,12 @@ void CbmMvdDigitizeL::ProduceIonisationPoints(CbmMvdPoint* point,
 
     }
 
-
+    if (fShowDebugHistos && layerRadius <6 ){
+       
+       	fSegResolutionHistoX->Fill(xDebug/fNumberOfSegments - (point->GetX()+point->GetXOut())/2 - layerRadius);
+	fSegResolutionHistoY->Fill(yDebug/fNumberOfSegments- (point->GetY()+point->GetYOut())/2 - layerRadius);
+	fSegResolutionHistoZ->Fill(zDebug/fNumberOfSegments - (point->GetZ()+point->GetZOut())/2 - 5);
+    }
 
 
 }
@@ -788,12 +791,19 @@ void CbmMvdDigitizeL::ProduceSignalPoints() {
 }
 // -------------------------------------------------------------------------
 
-void CbmMvdDigitizeL::ProducePixelCharge() {
+void CbmMvdDigitizeL::ProducePixelCharge(CbmMvdPoint* point, CbmMvdStation* station) {
     /** Simulation of fired pixels. Each fired pixel is considered
      * as SimTrackerHit
      */
-
+    Double_t stationRadius=station->GetRmax();
     fCurrentTotalCharge = 0.0;
+
+    // MDx - Variables needed in order to compute a "Monte Carlo Center of Gravity" of the cluster
+
+    Float_t xCharge=0,yCharge=0,totClusterCharge=0;
+
+
+
 
     for (int i=0; i<fNumberOfSegments; ++i) {
 	SignalPoint* spoint = &fSignalPoints[i];
@@ -810,6 +820,27 @@ void CbmMvdDigitizeL::ProducePixelCharge() {
 	Double_t yUp = spoint->y + fWidthOfCluster*spoint->sigmaY;
 
 
+/*y = y0 + (2*A/PI)*(w/(4*(x-xc)^2 + w^2))
+Parameter	Value	Error
+----------------------------------------
+y0	-21.74022	4.21298
+xc	-0.04133	0.01879
+w	1.28456	0.0381
+A	1008.79877	34.96494
+----------------------------------------
+
+fLorentzY0=-21.74022;
+fLorentzXc=0.; // -0.04133
+fLorentzW=1.28456;
+fLorentzA=1008.79877;
+fLorentzNorm=0.00013010281679422413;
+
+Double_t lorentz= fLorentzY0 + (2*fLorentzA/3.141)*(   fLorentzW/( 4*(x*x + y*y) + (fLorentzW*fLorentzW) )   )
+
+Double_t lorentz=0.00013010281679422413*(-21.74022 + 1098.997803374761/
+      (0.0023952935226936958 + 4*(x*x + y*y)))
+
+*/
 
 	fCurrentTotalCharge += spoint->charge;
 	Int_t ixLo, ixUp, iyLo, iyUp;
@@ -834,11 +865,42 @@ void CbmMvdDigitizeL::ProducePixelCharge() {
 				     );
 
 		//cout << totCharge << " " << xCurrent << " " << xCentre << " " << yCurrent << " " << yCentre << endl;
-		if(totCharge>0){AddChargeToPixel(ix,iy,totCharge);};
+		if(totCharge>0){AddChargeToPixel(ix,iy,totCharge, point);};
+
+		if(fShowDebugHistos){
+		    xCharge=xCharge + xCurrent * totCharge;
+		    yCharge=yCharge + yCurrent * totCharge;
+		    totClusterCharge=totClusterCharge + totCharge;
+		}
+
+
 
 	    }//for y
 	}// for x
     }// for number of segments
+
+    if(fShowDebugHistos && (stationRadius <10) ){
+            fResolutionHistoX->Fill(xCharge/totClusterCharge - (point->GetX()+point->GetXOut())/2 - stationRadius);
+	    fResolutionHistoY->Fill(yCharge/totClusterCharge - (point->GetY()+point->GetYOut())/2 - stationRadius);
+
+//	    if (TMath::Abs(xCharge/totClusterCharge - (point->GetX()+point->GetXOut())/2 - stationRadius)>0.004){
+		TVector3 momentum, position;
+
+
+		point->Position(position);
+
+		point->Momentum(momentum);
+
+
+		fPosXY->Fill(position.X(),position.Y());
+		fpZ->Fill(momentum.Z());
+		fPosXinIOut->Fill(point->GetZ()-point->GetZOut());
+		fAngle -> Fill (TMath::ATan ( momentum.Pt()/momentum.Pz())*180/TMath::Pi());
+                //fMomentumLoss->Fill(point->pZOut()-point->pZ());
+//	    }
+
+    };
+
 
 }//end of function
 
@@ -855,7 +917,7 @@ void CbmMvdDigitizeL::TransformXYtoPixelIndex(Double_t x, Double_t y,Int_t & ix,
 
 // ---------------------------------------------------------------------------
 
-void CbmMvdDigitizeL:: AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t charge){
+void CbmMvdDigitizeL:: AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t charge, CbmMvdPoint* point){
     // Adds the charge of a hit to the pixels. Checks if the pixel was hit before.
 
     CbmMvdPixelCharge* pixel;
@@ -867,14 +929,14 @@ void CbmMvdDigitizeL:: AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t ch
 
     // Pixel not yet in map -> Add new pixel
     if ( fChargeMapIt == fChargeMap.end() ) {
-	CbmMvdPixelCharge* pixel= new ((*fPixelCharge)[fPixelCharge->GetEntriesFast()])
-	    CbmMvdPixelCharge(charge, channelX, channelY);
+	pixel= new ((*fPixelCharge)[fPixelCharge->GetEntriesFast()])
+	    CbmMvdPixelCharge(charge, channelX, channelY, point->GetTrackID());
 	fChargeMap[a] = pixel;
     }
 
     // Pixel already in map -> Add charge
     else {
-	CbmMvdPixelCharge* pixel = fChargeMapIt->second;
+        pixel = fChargeMapIt->second;
 	if ( ! pixel ) Fatal("AddChargeToPixel", "Zero pointer in charge map!");
 	pixel->AddCharge(charge);
     }
@@ -1019,6 +1081,22 @@ InitStatus CbmMvdDigitizeL::Init() {
     Double_t v = fLandauRandom->Landau(fLandauMPV,fLandauSigma);
     fRandomGeneratorTestHisto->Fill(v);
 
+    // Init DebugHistos in case they are needed
+
+    if (fShowDebugHistos) {
+	fResolutionHistoX=new TH1F ("DigiResolutionX","DigiResolutionX", 1000, -.005,.005);
+	fResolutionHistoY=new TH1F ("DigiResolutionY","DigiResolutionY", 1000, -.005,.005);
+	fPosXY= new TH2F("DigiPointXY","DigiPointXY", 100,-6,6,100,-6,6);
+	fpZ= new TH1F ("DigiPointPZ","DigiPointPZ", 1000, -0.5,0.5);
+	fPosXinIOut = new TH1F("DigiZInOut","Digi Z InOut", 1000, -0.04,0.04);
+	fAngle = new TH1F ("DigiAngle","DigiAngle", 1000,0,90);
+	fSegResolutionHistoX= new TH1F("SegmentResolutionX","SegmentResolutionX",1000, -.005,.005);
+	fSegResolutionHistoY= new TH1F("SegmentResolutionY","SegmentResolutionY",1000, -.005,.005);
+        fSegResolutionHistoZ= new TH1F("SegmentResolutionZ","SegmentResolutionZ",1000, -.005,.005);
+    }
+
+
+
 
     cout << endl;
     cout << "---------------------------------------------" << endl;
@@ -1128,15 +1206,52 @@ void CbmMvdDigitizeL::Finish() {
     cout << "Diffusion Coefficient      : " << setw(8) << setprecision(2)
 	<< fDiffusionCoefficient * 10000. << " mum" << endl;
     cout << "Width of Cluster           : " << setw(8) << setprecision(2)
-	<< fWidthOfCluster << " ,  in pixels " << endl;
+	<< fWidthOfCluster << " * sigma " << endl;
     cout << "ElectronsPerKeV 3.62 eV/eh : " << setw(8) << setprecision(2)
 	<< fElectronsPerKeV  <<  endl;
     cout << "CutOnDeltaRays             : " << setw(8) << setprecision(8)
 	<< fCutOnDeltaRays  << " MeV " <<  endl;
     cout << "ChargeThreshold            : " << setw(8) << setprecision(2)
 	<< fChargeThreshold  <<  endl;
-        cout << "YOU USED THE LORENTZ DIGITIZER!!! " <<  endl;
+    cout << "YOU USED THE LORENTZ DIGITIZER!!! " <<  endl;
     cout << "---------------------------------------------" << endl;
+
+    if (fShowDebugHistos){
+	TCanvas* c=new TCanvas("DigiCanvas","DigiCanvas", 150,10,800,600);
+	c->Divide(3,3);
+	c->cd(1);
+        fResolutionHistoX->Draw();
+        fResolutionHistoX->Write();
+        c->cd(2);
+	fResolutionHistoY->Draw();
+	fResolutionHistoY->Write();
+	c->cd(3);
+	fPosXY->Draw();
+	fPosXY->Write();
+        c->cd(4);
+	fpZ->Draw();
+	fpZ->Write();
+        c->cd(5);
+	fPosXinIOut->Draw();
+	fPosXinIOut->Write();
+        c->cd(6);
+	fAngle->Draw();
+	fAngle->Write();
+	c->cd(7);
+	fSegResolutionHistoX->Draw();
+	fSegResolutionHistoX->Write();
+        c->cd(8);
+	fSegResolutionHistoY->Draw();
+	fSegResolutionHistoY->Write();
+        c->cd(9);
+	fSegResolutionHistoZ->Draw();
+	fSegResolutionHistoZ->Write();
+
+
+
+
+    };
+
 	
 }					       
 // -------------------------------------------------------------------------

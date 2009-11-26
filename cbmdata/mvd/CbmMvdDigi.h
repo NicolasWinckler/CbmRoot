@@ -29,7 +29,7 @@ public:
 
     CbmMvdDigi(Int_t iStation, Int_t iChannelNrX, Int_t iChannelNrY, Int_t charge, Float_t pixelSizeX, 
     Float_t pixelSizeY, Float_t dominatorX, Float_t dominatorY, Short_t contributors, 
-    Int_t maxChargeContribution);
+    Int_t maxChargeContribution, Int_t trackID);
     /**
      charge     : of each fired pixel in electrons
      PixelSize  : in cm
@@ -49,6 +49,8 @@ public:
     Float_t  GetDominatorX(){return fDominatingPointX;}
     Float_t  GetDominatorY(){return fDominatingPointY;}
     Int_t    GetStationNr() { return StationNr(fDetectorId); }
+    Int_t    GetTrackID(){return fTrackID;}
+   
  
 
     /** Modifiers **/
@@ -65,6 +67,7 @@ private:
     Int_t fCharge;
     Int_t fChannelNrX;
     Int_t fChannelNrY;
+    Int_t fTrackID;
     Float_t fPixelSizeX;
     Float_t fPixelSizeY;
 
@@ -74,6 +77,7 @@ private:
     Float_t fDominatingPointX;
     Float_t fDominatingPointY;
     Short_t fContributors;
+   
 
 
 

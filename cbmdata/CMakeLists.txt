@@ -29,8 +29,8 @@ CbmStripHit.cxx
 CbmTrack.cxx
 CbmTrackMatch.cxx
 
-mvd/CbmMvdDetectorId.cxx
 mvd/CbmMvdCluster.cxx 
+mvd/CbmMvdDetectorId.cxx
 mvd/CbmMvdDigi.cxx  
 mvd/CbmMvdHit.cxx 
 mvd/CbmMvdHitMatch.cxx 

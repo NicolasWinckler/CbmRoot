@@ -1,22 +1,20 @@
-// -------------------------------------------------------------------------
-// -----                    CbmMvdDigitize header file              -----
-// -----                   Created 08/11/06  by V. Friese              -----
-// -------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// -----                    CbmMvdDigitize header file                    -----
+// -----                   Created by C. Dritsa (2009)                    -----
+// -----                   Maintained by M.Deveaux (m.deveaux(att)gsi.de) -----
+// ----------------------------------------------------------------------------
 
 
 /** CbmMvdDigitize header file
+ ** Read "ReadmeMvdDigitizer.pdf" for instructions
  **
- ** Task class for producing MvdHits from MvdPoints.
- ** Mode = 0 : MAPS readout
- ** Mode = 1 : Ideal (copy of MCPoint properties)
- **
- ** Former CbmStsMapsDigitize (M.Deveaux, 02/02/05)
- **
+ ** Obsolete version with limited physics model.
+ ** The use of CbmMvdDigitizeL is recommended
  **/
 
 
-#ifndef CBMMVDDIGITIZE_H
-#define CBMMVDDIGITIZE_H 1
+#ifndef CBMMVDDIGITIZER_H
+#define CBMMVDDIGITIZER_H 1
 
 #include "FairTask.h"
 #include "CbmMvdPoint.h"
@@ -79,11 +77,11 @@ class CbmMvdDigitize : public FairTask
 
   void ProduceIonisationPoints(CbmMvdPoint* point, CbmMvdStation* station);
   void ProduceSignalPoints();
-  void ProducePixelCharge();
+  void ProducePixelCharge(CbmMvdPoint* point);
   void TransformXYtoPixelIndex(Double_t x, Double_t y,Int_t & ix, Int_t & iy);
   void TransformPixelIndexToXY(Int_t ix, Int_t iy, Double_t & x, Double_t & y );
   void PositionWithinCell(Double_t x, Double_t y,  Int_t & ix, Int_t & iy, Double_t & xCell, Double_t & yCell);
-  void AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t charge);
+  void AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t charge, CbmMvdPoint* point);
   Int_t BuildEvent();
   Double_t GetDetectorGeometry(CbmMvdPoint* point);
 

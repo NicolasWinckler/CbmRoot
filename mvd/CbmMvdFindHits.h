@@ -24,6 +24,7 @@
 #include "TMath.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TH1F.h"
 #include <vector>
 #include <list>
 #include <map>
@@ -91,6 +92,7 @@ public:
     void SetHitPosErrX( Double_t errorX ) { errorX = fHitPosErrX; }
     void SetHitPosErrY( Double_t errorY ) { errorY = fHitPosErrY; }
     void SetHitPosErrZ( Double_t errorZ ) { errorZ = fHitPosErrZ; }
+    void ShowDebugHistograms(){fShowDebugHistos=kTRUE;}
 
 
     //protected:
@@ -106,7 +108,19 @@ public:
     TClonesArray* fHits;
     TClonesArray* fClusters;
     TClonesArray* fMatches;
+
+    TObjArray* fPixelChargeHistos;
+    TObjArray* fTotalChargeInNpixelsArray;
     
+    // Debug Histograms
+    TH1F* fResolutionHistoX;
+    TH1F* fResolutionHistoY;
+    TH1F* fResolutionHistoCleanX;
+    TH1F* fResolutionHistoCleanY;
+    TH1F* fResolutionHistoMergedX;
+    TH1F* fResolutionHistoMergedY;
+    TH2F* fBadHitHisto;
+
     map<pair<Int_t, Int_t>, Int_t> fDigiMap;
     map<pair<Int_t, Int_t>, Int_t>::iterator fDigiMapIt;
     
@@ -115,6 +129,7 @@ public:
     TH2F* h3;
     TH1F* h1;
     TH1F* h2;
+    TH1F* Qseed;
 
     TCanvas* c1;
 
@@ -126,6 +141,7 @@ private:
     Double_t fSigmaNoise;
     Double_t fSeedThreshold;
     Double_t fNeighThreshold;
+    Bool_t fShowDebugHistos;
 
     Double_t fLayerRadius;
     Double_t fLayerRadiusInner;

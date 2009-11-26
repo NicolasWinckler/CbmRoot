@@ -355,7 +355,8 @@ void CbmMvdHitProducer::ExecIdeal() {
 
     // Create new hit and hitMatch
     Int_t nHits = fHits->GetEntriesFast();
-    new ((*fHits)[nHits]) CbmMvdHit(detId, pos, dpos, 0);
+    //new ((*fHits)[nHits]) CbmMvdHit(detId, pos, dpos, 0);
+    new ((*fHits)[nHits]) CbmMvdHit(statNr, pos, dpos, 0); // cdritsa; 28apr09
     new ((*fMatches)[nHits]) CbmMvdHitMatch(0, 0, trackId, iPoint, 0);
     nReal++;
 

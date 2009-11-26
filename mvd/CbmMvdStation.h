@@ -7,7 +7,7 @@
 /** CbmMvdStation.h
  *@author V.Friese <v.friese@gsi.de>
  **
- ** Auxiliary class for the CbmMvdDigitiser.
+ ** Auxiliary class for the CbmMvdDigitise class.
  ** It holds the parameters of one MVD station and an array of its MvdPoints.
  **/
 

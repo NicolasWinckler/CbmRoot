@@ -32,7 +32,7 @@ CbmMvdDigi::CbmMvdDigi(){
 
 // -----   Constructor with parameters   -----------------------------------
 CbmMvdDigi::CbmMvdDigi(Int_t iStation, Int_t iChannelNrX, Int_t iChannelNrY, Int_t charge, 
-                       Float_t pixelSizeX, Float_t pixelSizeY, Float_t dominatorX, Float_t dominatorY, Short_t contributors, Int_t maxChargeContribution )
+                       Float_t pixelSizeX, Float_t pixelSizeY, Float_t dominatorX, Float_t dominatorY, Short_t contributors, Int_t maxChargeContribution, Int_t trackID)
 :CbmDigi(kMVD, 0)
 {
     // Check range for station
@@ -48,6 +48,8 @@ CbmMvdDigi::CbmMvdDigi(Int_t iStation, Int_t iChannelNrX, Int_t iChannelNrY, Int
     fChannelNrY=iChannelNrY;
     fPixelSizeX=pixelSizeX;
     fPixelSizeY=pixelSizeY;
+    fTrackID=trackID;
+   
 
     fDigiFlag=-1;
     fDominatingPointX=dominatorX;
@@ -72,8 +74,11 @@ Int_t CbmMvdDigi::GetAdcCharge(Int_t adcDynamic, Int_t adcOffset, Int_t adcBits)
 
      */
 
+     Int_t adcCharge;
 
-    Int_t adcCharge;
+    if(fCharge<adcOffset){return 0;};
+
+   
     Double_t stepSize;
     Int_t adcMax = adcOffset + adcDynamic;
 
@@ -81,9 +86,9 @@ Int_t CbmMvdDigi::GetAdcCharge(Int_t adcDynamic, Int_t adcOffset, Int_t adcBits)
     adcCharge = int( (fCharge-adcOffset)/stepSize );
 
 
-    if ( adcCharge>int( TMath::Power(2,adcBits) ) )
+    if ( adcCharge>int( TMath::Power(2,adcBits)-1 ) )
     {
-	adcCharge = (int)TMath::Power(2,adcBits);
+	adcCharge = (int)TMath::Power(2,adcBits)-1;
 
     }
 

@@ -9,16 +9,16 @@ void run_reco_geotest(Int_t nEvents = 200)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "/d/cbm06/user/slebedev/geotest/mc.00.root";
+  TString inFile = "/d/cbm02/slebedev/rich/JUL09/correction/mc.00.root";
 
   // Parameter file
-  TString parFile = "/d/cbm06/user/slebedev/geotest/params.00.root";
+  TString parFile = "/d/cbm02/slebedev/rich/JUL09/correction/params.00.root";
 
   // STS digitisation file
   TString stsDigiFile = "sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/d/cbm06/user/slebedev/geotest/reco.00.root";
+  TString outFile = "/d/cbm02/slebedev/rich/JUL09/correction/reco.00.root";
 
   gDebug = 0;
 
@@ -42,9 +42,10 @@ void run_reco_geotest(Int_t nEvents = 200)
   Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
   Int_t    richDetType = 5;       // Detector type Hamamatsu H8500-03
   Int_t    richNoise   = 220;     // Number of noise points per event
+  Double_t collectionEff = 1.0;
   CbmRichHitProducer* richHitProd
     = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
-			     richNoise, iVerbose);
+			     richNoise, iVerbose, collectionEff);
   run->AddTask(richHitProd);
   //--------------------------------------------------------------------------
 

@@ -76,8 +76,9 @@ public:
    *@param noise        number of noise hits
    *@param verbose      verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
    *@param colleff      collection efficiency for photoelectrons in PMT optics
+   *@param s_mirror     additional scattering in mirror: results in smeared point in PMT plane
    */
-  CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_t det_type, Int_t noise, Int_t verbose, Double_t colleff);
+  CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_t det_type, Int_t noise, Int_t verbose, Double_t colleff, Double_t s_mirror);
 
   /** Constructor with name and title. Puts default parameter values. */
   CbmRichHitProducer(const char *name, const char *title);
@@ -157,6 +158,7 @@ private:
   Int_t  fDetType;            //** detector type */
   Int_t  fNoise;              //** number of noise hits */
   Double_t  fColl;            //** collection efficiency for photoelectrons in PMT optics */
+  Double_t  fSMirror;         //** additinal smearing of MC Points due to light scattering in mirror */
   
   Double_t theta;   //** theta = angle by which photodetector was tilted (around x-axis)*/ 
   Double_t phi;   //** phi = angle by which photodetector was tilted (around y-axis)*/ 

@@ -121,7 +121,7 @@ CbmRichHitProducer::CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_
 
 // -----   Standard constructor with verbosity level  -------------------------------------------
 CbmRichHitProducer::CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_t det_type,
-                                       Int_t noise, Int_t verbose, Double_t colleff)
+                                       Int_t noise, Int_t verbose, Double_t colleff, Double_t s_mirror)
   :FairTask("RichHitProducer")
 {
   fPhotomulRadius = pmt_rad;
@@ -130,6 +130,7 @@ CbmRichHitProducer::CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_
   fNoise = noise;
   fVerbose = verbose;
   fColl = colleff;
+  fSMirror = s_mirror;
 
   c = 2.998E8;                // speed of light
   h = 6.626E-34;              // Plancks constant
@@ -165,6 +166,7 @@ CbmRichHitProducer::~CbmRichHitProducer()
   fNoise            = 220;
   fVerbose = 1;
   fColl = 0.7;
+  fSMirror = 0.6; 
 }
 // -------------------------------------------------------------------------
 
@@ -497,19 +499,19 @@ void CbmRichHitProducer::Exec(Option_t* option)
 
      if (fDetType == 1) {
        if (fVerbose)
-      if (TMath::Sqrt((detPoint.X()-xHit)*(detPoint.X()-xHit)+(detPoint.Y()-yHit)*(detPoint.Y()-yHit)) > (fPhotomulRadius+fPhotomulDist))
+      if (TMath::Sqrt((detPoint.X()-xHit)*(detPoint.X()-xHit)+(detPoint.Y()-yHit)*(detPoint.Y()-yHit)) > (fPhotomulRadius+fPhotomulDist)*1.5)
           cout << "-E- RichHitProducer: wrongly assigned Hits (distance point-hit too large)!" << endl;
 	  }
      if (fDetType == 2 || fDetType == 3 || fDetType == 4) {
       if (fVerbose)
-      if (TMath::Abs(detPoint.X()-xHit) > fPhotomulRadius || TMath::Abs(detPoint.Y()-yHit) > fPhotomulRadius)
+      if (TMath::Abs(detPoint.X()-xHit) > fPhotomulRadius || TMath::Abs(detPoint.Y()-yHit) > fPhotomulRadius*1.5)
           cout << "-E- RichHitProducer: wrongly assigned Hits (distance point-hit too large)! " <<
 	  detPoint.X() << " " << xHit << " " << detPoint.Y() << " " << yHit << endl;
 	  }
      if (fDetType == 5) {      // fDetType 5: additional smearing with RMS=3mm due to WLS film
       if (fVerbose)
-      if (TMath::Abs(detPoint.X()-xHit) > fPhotomulRadius+1.5 || TMath::Abs(detPoint.Y()-yHit) > fPhotomulRadius+1.5)
-          cout << "-E- RichHitProducer: wrongly assigned Hits ? (point-hit distance larger than 5sigma of smearing)! " <<
+      if (TMath::Abs(detPoint.X()-xHit) > fPhotomulRadius+1.5 || TMath::Abs(detPoint.Y()-yHit) > fPhotomulRadius*1.5)
+          cout << "-E- RichHitProducer: wrongly assigned Hits ? (distance point-hit too large)! " <<
 	  detPoint.X() << " " << xHit << " " << detPoint.Y() << " " << yHit << endl;
 	  }
 
@@ -916,6 +918,10 @@ void CbmRichHitProducer::FindRichHitPositionSinglePMT(Double_t xPoint, Double_t 
   Double_t alpha = TMath::Pi()/6.;
   Double_t distance;
 
+  // smear points due to light scattering in mirror
+   xPoint = xPoint + gRandom->Gaus(0,fSMirror);
+   yPoint = yPoint + gRandom->Gaus(0,fSMirror);
+
   uPoint = 2.*fDetWidthX - (fPhotomulRadius+fPhotomulDist) + xPoint;
   if (yPoint > 0)
     vPoint = (- fDetY + fDetWidthY - (fPhotomulRadius+fPhotomulDist) + yPoint)/ TMath::Cos(alpha);
@@ -976,6 +982,10 @@ void CbmRichHitProducer::FindRichHitPositionMAPMT(Double_t sigma, Double_t xPoin
 
   Double_t uPoint, vPoint;
   Double_t uPMT, vPMT, uPMTs, vPMTs;
+
+  // smear points due to light scattering in mirror
+   xPoint = xPoint + gRandom->Gaus(0,fSMirror);
+   yPoint = yPoint + gRandom->Gaus(0,fSMirror);
 
 // smear Point if photon is converted via WLS film:
   if (sigma > 0.) {
@@ -1048,6 +1058,10 @@ void CbmRichHitProducer::FindRichHitPositionCsI(Double_t xPoint, Double_t yPoint
 
   Double_t uPoint, vPoint;
   Double_t uPMT, vPMT, uPMTs, vPMTs;
+
+  // smear points due to light scattering in mirror
+   xPoint = xPoint + gRandom->Gaus(0,fSMirror);
+   yPoint = yPoint + gRandom->Gaus(0,fSMirror);
 
   uPoint = 2.*fDetWidthX + xPoint;
   if (yPoint > 0)

@@ -1,4 +1,4 @@
-void much_sim(Int_t nEvents = 100)
+void much_sim(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -10,7 +10,7 @@ void much_sim(Int_t nEvents = 100)
 		//if necessary specify input pluto file to embed signal particles
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
 		//directory for output simulation files
-		dir  = "/home/d/andrey/std18_10mu_urqmd/";
+		dir  = "/home/d/andrey/muchtrd_10mu/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
@@ -18,13 +18,13 @@ void much_sim(Int_t nEvents = 100)
 		//If "yes" than 10 primary muons will be generated
 		muons = "yes";
 		//If "yes" than UrQMD will be used as background
-		urqmd = "yes";
+		urqmd = "no";
 		//If "yes" PLUTO particles will be embedded
 		pluto = "no";
 		//MUCH geometry file name
-		muchGeom = "much_standard_18.geo";
+		muchGeom = "much_standard_trd.geo";
 		//TRD geometry file name
-		trdGeom = "";//"trd_muon_setup_new.geo";
+		trdGeom = "trd_muon_setup_new.geo";
 	} else {
 		inFile  = TString(gSystem->Getenv("INFILE"));
 		plutoFile  = TString(gSystem->Getenv("PLUTOFILE"));
@@ -46,10 +46,8 @@ void much_sim(Int_t nEvents = 100)
 	TString tofGeom    = "tof_standard.geo";
 
 	// -----   Magnetic field   -----------------------------------------------
-	TString fieldMap = "FieldMuonMagnet";   // name of field map
-	TString magnetGeom = "magnet_standard.geo";
-//	TString fieldMap = "FieldSCmuon_16x13";   // name of field map
-//	TString magnetGeom = "magnet_scmuon_16x13.geo";
+	TString fieldMap = "field_muon_standard";   // name of field map
+	TString magnetGeom = "magnet_muon_standard.geo";
 	Double_t fieldZ = 50.;                 // field center z position
 	Double_t fieldScale =  1.;                 // field scaling factor
 
@@ -133,20 +131,22 @@ void much_sim(Int_t nEvents = 100)
 		cout << "    --- " << tofGeom << endl;
 	}
 
+	  // -----   Create magnetic field   ----------------------------------------
 	CbmFieldMap* magField = NULL;
-	if ( fieldMap == "FieldActive" || fieldMap == "FieldIron")
-		magField = new CbmFieldMapSym3(fieldMap);
-	else if ( fieldMap == "FieldSCmuon_16x13" || fieldMap == "FieldAlligator" )
+	if (fieldMap == "field_electron_standard" )
 		magField = new CbmFieldMapSym2(fieldMap);
-	else if ( fieldMap = "FieldMuonMagnet" )
+	else if (fieldMap == "field_muon_standard" )
+		magField = new CbmFieldMapSym2(fieldMap);
+	else if (fieldMap == "FieldMuonMagnet" )
 		magField = new CbmFieldMapSym3(fieldMap);
 	else {
-		cout << "===> ERROR: Field map " << fieldMap << " unknown! " << endl;
-		exit;
+		cout << "===> ERROR: Unknown field map " << fieldMap << endl;
+	exit;
 	}
 	magField->SetPosition(0., 0., fieldZ);
 	magField->SetScale(fieldScale);
 	fRun->SetField(magField);
+	// ------------------------------------------------------------------------
 
 	// ------------------------------------------------------------------------
 	CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
@@ -189,7 +189,6 @@ void much_sim(Int_t nEvents = 100)
 	}
 
 	fRun->SetGenerator(primGen);
-
 	fRun->Init();
 
 	// -----   Runtime database   ---------------------------------------------

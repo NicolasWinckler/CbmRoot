@@ -19,6 +19,7 @@ void eloss_ana(Int_t nEvents = 20000)
 
 
    CbmLitCheckMultipleScattering* msCheck = new CbmLitCheckMultipleScattering();
+   msCheck->SetOutputDir("/home/d/andrey/eloss/");
    run->AddTask(msCheck);
 
    run->LoadGeometry();

@@ -2,7 +2,7 @@ void eloss_sim(Int_t nEvents = 20000)
 {
 	TString dir = "/home/d/andrey/eloss/";
 	TString outFile = dir + "eloss.mc.root";
-	 TString parFile = dir + "eloss.params.root";
+	TString parFile = dir + "eloss.params.root";
 
 	TString caveGeom   = "cave_vacuum.geo";
 	TString litGeom   = "simple_geo.geo";
@@ -43,8 +43,8 @@ void eloss_sim(Int_t nEvents = 20000)
 
 	CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
 
-	Double_t minMom = 5.; //minimum momentum
-	Double_t maxMom = 5.; //maximum momentum
+	Double_t minMom = 10.; //minimum momentum
+	Double_t maxMom = 10.; //maximum momentum
 
 	FairBoxGenerator* boxGen1 = new FairBoxGenerator(-11, 1);
 	boxGen1->SetPRange(minMom, maxMom);

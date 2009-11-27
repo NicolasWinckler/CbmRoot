@@ -5,6 +5,8 @@
  * Macro draws histograms produced by CbmLitPropagationAnalysis class.
  **/
 
+#include "../../littrack/utils/CbmLitDrawHist.h"
+
 #include <string>
 #include <sstream>
 #include <ostream>
@@ -19,12 +21,15 @@
 const int nofPar = 12;
 
 /** Number of detector planes. */
-const int nofLayers = 12;
+const int nofLayers = 19;
 
 // Drawing options. If true than specified histograms are drawn.
-bool drawPropagation = false;
+bool drawPropagation = true;
 bool drawFilter = true;
-bool drawSmoother = false;
+bool drawSmoother = true;
+
+// If true, than canvases will be closed after drawing
+bool isClose = true;
 
 /* Arrays to store RMS and sigma values of the histogram fits.
  * First index: 0-propagation, 1-filter, 2-smoother.
@@ -42,12 +47,12 @@ TCanvas* canvas[3][nofLayers];
 
 
 // Input directory
-TString dir = "/home/d/andrey/std_10e/";
+TString dir = "/home/d/andrey/muchtrd_10mu/";
 // Input file with propagation analysis
 TFile *file = new TFile(dir + "propagation.ana.0000.root");
 
 //Output directory for images and fit results.
-TString outDir = "./eloss/std/";
+TString outDir = "./prop/muchtrd/";
 
 void draw_prop_ana()
 {
@@ -82,8 +87,6 @@ void draw_prop_ana()
 	fout.close();
 }
 
-
-
 void CreateCanvas()
 {
 	string var[] = {"c_propagation_", "c_filter_", "c_smoother_"};
@@ -103,7 +106,10 @@ void CreateCanvas()
 void DrawHistos(
 		int v)
 {
-	for (int i = 0; i < nofLayers; i++) DrawHistos(i, v);
+	for (int i = 0; i < nofLayers; i++) {
+		DrawHistos(i, v);
+		if (isClose) canvas[v][i]->Close();
+	}
 }
 
 void DrawHistos(
@@ -208,7 +214,7 @@ void DrawForPhd(
 
 	const Int_t NH = 3;
 	TH1F* hist[NC][NH];
-	Int_t stnum[NC] = {0, 6, 12};
+	Int_t stnum[NC] = {0, 9, 18};
 	std::string hname[] = {"h_resx", "h_pullx", "h_resp"};
 	std::string xtitles[] = {"residual X [cm]", "pull X", "relative momentum error [%]"};
 	for (Int_t i = 0; i < NC; i++) {
@@ -226,33 +232,16 @@ void DrawForPhd(
 	for (int i = 0; i < NC; i++) {
 		for (int j = 0; j < NH; j++) {
 			canvas[i]->cd(j+1);
+			DrawHist1D(hist[i][j], xtitles[j], "counter",
+					kBlack, 1, 1, 1, kDot, false, true, "");
+
 			hist[i][j]->Fit("gaus");
-			hist[i][j]->SetMaximum(hist[i][j]->GetMaximum() * 2.5);
-			hist[i][j]->GetXaxis()->SetLabelSize(0.055);
-			hist[i][j]->GetXaxis()->SetNdivisions(505, kTRUE);
-			hist[i][j]->GetYaxis()->SetLabelSize(0.055);
-			hist[i][j]->GetXaxis()->SetTitleOffset(1.0);
-			hist[i][j]->GetXaxis()->SetTitleSize(0.055);
-			hist[i][j]->GetXaxis()->SetTitle(xtitles[j].c_str());
-
-			gPad->SetBottomMargin(0.15);
-			hist[i][j]->Draw();
 			TF1 *fit1 = hist[i][j]->GetFunction("gaus");
-			sigma[i][j] = fit1->GetParameter(2);
-			rms[i][j] = hist[i][j]->GetRMS();
-
-			DrawText(j, sigma[i][j], rms[i][j]);
-			gPad->SetLogy();
-
-	//		stringstream oss1;
-	//		oss1 << outDir << "layer" << var[v] << layer << "_" << names[i] << ".eps";
-	//		hist1->SaveAs(TString(oss1.str().c_str()));
-	//
-	//		stringstream oss2;
-	//		oss2 << outDir << "layer" << var[v] << layer << "_" << names[i] << ".svg";
-	//		hist1->SaveAs(TString(oss2.str().c_str()));
-
+			Double_t m_sigma = fit1->GetParameter(2);
+			Double_t m_rms = hist[i][j]->GetRMS();
+			DrawText(j, m_sigma, m_rms);
 		}
+
 		stringstream oss1;
 		oss1 << outDir << "phd_layer" << var[v] << i << ".eps";
 		canvas[i]->SaveAs(TString(oss1.str().c_str()));
@@ -260,5 +249,9 @@ void DrawForPhd(
 		stringstream oss2;
 		oss2 << outDir << "phd_layer" << var[v] << i << ".svg";
 		canvas[i]->SaveAs(TString(oss2.str().c_str()));
+
+		stringstream oss3;
+		oss3 << outDir << "phd_layer" << var[v] << i << ".gif";
+		canvas[i]->SaveAs(TString(oss3.str().c_str()));
 	}
 }

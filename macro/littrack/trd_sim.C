@@ -36,7 +36,6 @@ void trd_sim(Int_t nEvents = 1000)
 	TString caveGeom   = "cave.geo";
 	TString targetGeom = "target_au_250mu.geo";
 	TString pipeGeom   = "pipe_standard.geo";
-	TString magnetGeom = "magnet_standard.geo";
 	TString mvdGeom    = "";//"mvd_standard.geo";
 	TString stsGeom    = "sts_standard.geo";
 	TString richGeom   = "rich_standard.geo";
@@ -44,7 +43,8 @@ void trd_sim(Int_t nEvents = 1000)
 	TString ecalGeom   = "";//"ecal_FastMC.geo";
 
 	// -----   Magnetic field   -----------------------------------------------
-	TString fieldMap    = "FieldMuonMagnet";   // name of field map
+	TString fieldMap = "field_electron_standard";   // name of field map
+	TString magnetGeom = "magnet_electron_standard.geo";
 	Double_t fieldZ     = 50.;             // field centre z position
 	Double_t fieldScale =  1.;             // field scaling factor
 
@@ -128,15 +128,15 @@ void trd_sim(Int_t nEvents = 1000)
 
 	// -----   Create magnetic field   ----------------------------------------
 	CbmFieldMap* magField = NULL;
-	if ( fieldMap == "FieldActive" || fieldMap == "FieldIron")
-		magField = new CbmFieldMapSym3(fieldMap);
-	else if ( fieldMap == "FieldAlligator" )
+	if (fieldMap == "field_electron_standard" )
 		magField = new CbmFieldMapSym2(fieldMap);
-	else if ( fieldMap = "FieldMuonMagnet" )
+	else if (fieldMap == "field_muon_standard" )
+		magField = new CbmFieldMapSym2(fieldMap);
+	else if (fieldMap == "FieldMuonMagnet" )
 		magField = new CbmFieldMapSym3(fieldMap);
 	else {
-		cout << "===> ERROR: Field map " << fieldMap << " unknown! " << endl;
-		exit(1);
+		cout << "===> ERROR: Unknown field map " << fieldMap << endl;
+	exit;
 	}
 	magField->SetPosition(0., 0., fieldZ);
 	magField->SetScale(fieldScale);

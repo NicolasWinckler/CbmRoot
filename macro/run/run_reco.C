@@ -106,7 +106,7 @@ void run_reco(Int_t nEvents = 2)
 
   // -----   MVD Hit Finder   ------------------------------------------------
   CbmMvdFindHits* mvdHitFinder = new CbmMvdFindHits("MVD Hit Finder",
-						    1, iVerbose);
+						    0, iVerbose);
   run->AddTask(mvdHitFinder);
   // -------------------------------------------------------------------------
 

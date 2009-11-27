@@ -20,7 +20,6 @@ public:
     virtual Int_t DoFind(
     		TClonesArray* hitArray,
             TClonesArray* trackArray);
-
 private:
 
     ClassDef(CbmLitTrdTrackFinderBranch, 1);

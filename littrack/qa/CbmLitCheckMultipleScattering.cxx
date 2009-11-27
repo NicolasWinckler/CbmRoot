@@ -1,5 +1,7 @@
 #include "CbmLitCheckMultipleScattering.h"
 
+#include "CbmLitDrawHist.h"
+
 #include "FairRootManager.h"
 #include "CbmMCTrack.h"
 #include "FairMCPoint.h"
@@ -8,13 +10,19 @@
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TPad.h"
+#include "TCanvas.h"
+#include "TStyle.h"
+#include "TF1.h"
+#include "TLatex.h"
 
 #include <iostream>
 #include <cmath>
+#include <sstream>
 
-CbmLitCheckMultipleScattering::CbmLitCheckMultipleScattering()
+CbmLitCheckMultipleScattering::CbmLitCheckMultipleScattering():
+	fOutputDir("eloss/"),
+	fNEvents(0)
 {
-	fNEvents = 0;
 }
 
 CbmLitCheckMultipleScattering::~CbmLitCheckMultipleScattering()
@@ -33,15 +41,17 @@ InitStatus CbmLitCheckMultipleScattering::Init()
     fMCPointArray  = (TClonesArray*) ioman->ActivateBranch("LitDetPoint");
     if (!fMCPointArray) Fatal("Init", "No LitPoint array!");
 
-    Int_t nBins = 1000;
-    Double_t minTheta = -0.2;
-    Double_t maxTheta =  0.2;
-    Double_t minEloss = -0.001;
-    Double_t maxEloss = 0.1;
+    Int_t nBins = 500;
+    Double_t minTheta = -0.001;
+    Double_t maxTheta =  0.001;
+    Double_t minEloss = 0.0;
+    Double_t maxEloss = 10.;
 
     fh_theta_mc = new TH1F("fh_theta_mc", "theta_mc", nBins, minTheta, maxTheta);
     fh_eloss_mc = new TH1F("fh_eloss_mc", "eloss_mc", nBins, minEloss, maxEloss);
-    fh_eloss_rec = new TH1F("fh_eloss_rec", "eloss_rec", nBins, minEloss, maxEloss);;
+    fh_eloss_rec = new TH1F("fh_eloss_rec", "eloss_rec", nBins, minEloss, maxEloss);
+    fh_dep_energy = new TH1F("fh_dep_energy", "dep_energy", nBins, minEloss, maxEloss);
+
     return kSUCCESS;
 }
 
@@ -75,19 +85,42 @@ void CbmLitCheckMultipleScattering::Exec(
         point->Momentum(mom);
         point->MomentumOut(momOut);
 
+        // Material properties
+        Double_t length = 0.1; //cm
+//        Double_t X0 = 1.76; // cm - iron
+        Double_t X0 = 9.34961; // cm -silicon
+
+        // Particle properties
+        Double_t mass = 0.139; // GeV
+		Double_t p = mom.Mag();
+		Double_t E = std::sqrt(mass * mass + p * p);
+		Double_t beta = p / E;
+		Double_t bcp = beta * p;
+
     	Double_t mc_theta = momOut.Theta() * std::cos(momOut.Phi());
+    	std::cout << "mc_theta=" << mc_theta << std::endl;
         fh_theta_mc->Fill(mc_theta);
+
+        myf theta = 0.0136 * (1./bcp) * 1. * std::sqrt(length/X0) *
+        					(1. + 0.038 * std::log(length/X0));
+        std::cout << "calc_theta=" << theta << std::endl;
+
+
 
         Double_t mc_eloss = mom.Mag() - momOut.Mag();
         std::cout << "mc_eloss=" << mc_eloss << std::endl;
         fh_eloss_mc->Fill(mc_eloss);
 
-        Double_t length = 0.1;
-        Double_t p = mom.Mag();
-        Double_t m = 0.000511;
-        Double_t initialE = std::sqrt(p*p+m*m);
-        Double_t X0 = 9.34961;
-        Double_t dEdX = initialE / X0;
+        Double_t dep_energy = point->GetEnergyLoss();
+        std::cout << "dep_energy=" << dep_energy << std::endl;
+        fh_dep_energy->Fill(dep_energy);
+
+//        Double_t length = 0.1;
+//        Double_t p = mom.Mag();
+//        Double_t m = 0.000511;
+//        Double_t initialE = std::sqrt(p*p+m*m);
+//        Double_t X0 = 9.34961;
+        Double_t dEdX = E / X0;
         Double_t rec_eloss = dEdX * length;
 
         std::cout << "rec_eloss=" << rec_eloss << std::endl;
@@ -99,10 +132,51 @@ void CbmLitCheckMultipleScattering::Exec(
 
 void CbmLitCheckMultipleScattering::Finish()
 {
-    fh_theta_mc->Draw();
-    gPad->SetLogy();
-    fh_eloss_mc->Draw();
-    fh_eloss_rec->Draw("same");
+//	gStyle->SetOptStat("");
+//	gStyle->SetOptFit(0);
+//	gStyle->SetOptTitle(0);
+
+	gStyle->SetCanvasColor(kWhite);
+	gStyle->SetFrameFillColor(kWhite);
+	gStyle->SetPadColor(kWhite);
+	gStyle->SetStatColor(kWhite);
+	gStyle->SetTitleFillColor(kWhite);
+	gStyle->SetPalette(1);
+
+	TCanvas* canvas1 = new TCanvas("canvas1", "canvas1", 700, 500);
+	canvas1->cd(1);
+	DrawHist1D(fh_theta_mc, "projected scattering angle [rad]", "counter",
+			kBlue, 2, 1, 1, kDot, false, true, "");
+	fh_theta_mc->Fit("gaus");
+	TF1 *fit1 = fh_theta_mc->GetFunction("gaus");
+	Double_t sigma = fit1->GetParameter(2);
+	std::stringstream oss1;
+	oss1.precision(3);
+	oss1 << "#sigma _{fit}=" << sigma;
+	TLatex text;
+//	text.SetTextAlign(21);
+	text.SetTextSize(0.065); //0.1
+	text.DrawLatex(0.0003, 1000, oss1.str().c_str());
+	text.DrawLatex(0.0003, 400, "#sigma _{calc}=0.000116");
+//	text.DrawTextNDC(0.8, 0.7, oss2.str().c_str());
+
+	std::string name(canvas1->GetName());
+	canvas1->SaveAs(std::string(fOutputDir + name + ".gif").c_str());
+	canvas1->SaveAs(std::string(fOutputDir + name + ".eps").c_str());
+	canvas1->SaveAs(std::string(fOutputDir + name + ".svg").c_str());
+
+	TCanvas* canvas2 = new TCanvas("canvas2", "canvas2", 700, 500);
+	canvas2->cd(1);
+	DrawHist1D(fh_eloss_mc, "energy loss [GeV/c]", "counter",
+				kBlack, 1, 1, 1, kDot, true, true, "");
+	DrawHist1D(fh_eloss_rec, "energy loss [GeV/c]", "counter",
+				kBlue, 1, 1, 2, kDot, true, true, "same");
+	DrawHist1D(fh_dep_energy, "energy loss [GeV/c]", "counter",
+					kRed, 1, 1, 2, kDot, true, true, "same");
+	std::string name2(canvas2->GetName());
+	canvas2->SaveAs(std::string(fOutputDir + name2 + ".gif").c_str());
+	canvas2->SaveAs(std::string(fOutputDir + name2 + ".eps").c_str());
+	canvas2->SaveAs(std::string(fOutputDir + name2 + ".svg").c_str());
 }
 
 ClassImp(CbmLitCheckMultipleScattering)

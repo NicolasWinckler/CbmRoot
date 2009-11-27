@@ -70,20 +70,20 @@ void CbmLitCheckEnergyLoss::Check()
 
 void CbmLitCheckEnergyLoss::DrawGraphs()
 {
-	TCanvas *c1 = new TCanvas("energy_loss","c1",800, 800);
+	TCanvas *c1 = new TCanvas("energy_loss","c1",1100, 700);
 //    c1->SetGrid();
 
 	for (int i = 0; i < 4; i++) {
 		fTable[i]->SetLineStyle(3);
 		fTable[i]->SetLineColor(2);
 		fTable[i]->SetMarkerColor(2);
-		fTable[i]->SetLineWidth(3);
+		fTable[i]->SetLineWidth(2);
 		fTable[i]->SetMarkerSize(2);
 
 		fCalc[i]->SetLineStyle(1);
-		fCalc[i]->SetLineColor(4);
-		fCalc[i]->SetMarkerColor(4);
-		fCalc[i]->SetLineWidth(3);
+		fCalc[i]->SetLineColor(1);
+		fCalc[i]->SetMarkerColor(1);
+		fCalc[i]->SetLineWidth(2);
 		fCalc[i]->SetMarkerSize(2);
 	}
 	fTable[0]->SetMarkerStyle(20);
@@ -108,32 +108,37 @@ void CbmLitCheckEnergyLoss::DrawGraphs()
 
 	mg->Draw("ALP");
 
-	mg->GetXaxis()->SetTitle("Muon momentum [MeV/c]");
-	mg->GetYaxis()->SetTitle("Mean energy loss in iron [Mev*cm^2/g]");
+	mg->GetXaxis()->SetTitle("momentum [MeV/c]");
+	mg->GetYaxis()->SetTitle("energy loss [Mev*cm^2/g]");
 	mg->GetXaxis()->SetLimits(45, 100102);
 
+	Double_t textSize = 0.06;
+	mg->GetXaxis()->SetLabelSize(textSize);
+	mg->GetXaxis()->SetNdivisions(505, kTRUE);
+	mg->GetYaxis()->SetLabelSize(textSize);
+	mg->GetXaxis()->SetTitleSize(textSize);
+	mg->GetYaxis()->SetTitleSize(textSize);
+	mg->GetXaxis()->SetTitleOffset(1.0);
+	mg->GetYaxis()->SetTitleOffset(1.0);
+	gPad->SetLeftMargin(0.15);
+	gPad->SetBottomMargin(0.15);
 
-//    mg->GetXaxis()->SetLabelSize(0.045);
-//	mg->GetXaxis()->SetNdivisions(505, kTRUE);
-//	mg->GetYaxis()->SetLabelSize(0.055);
-//	mg->GetYaxis()->SetNdivisions(505, kTRUE);
-
-	TLegend* l1 = new TLegend(0.20, 0.97, 0.9, 0.7);
-	l1->SetFillColor(kWhite);
-	l1->SetHeader("Energy losses for muons in iron vs. momentum");
-	l1->AddEntry(fTable[0],"total (table)","lp");
-	l1->AddEntry(fCalc[0],"total (calculation)","lp");
-	l1->AddEntry(fTable[1],"ionization (table)","lp");
-	l1->AddEntry(fCalc[1],"ionization (calculation)","lp");
-	l1->AddEntry(fTable[2],"bremsstrahlung (table)","lp");
-	l1->AddEntry(fCalc[2],"bremsstrahlung (calculation)","lp");
-	l1->AddEntry(fTable[3],"pair production (table)","lp");
-	l1->AddEntry(fCalc[3],"pair production (calculation)","lp");
-	l1->Draw();
+//	TLegend* l1 = new TLegend(0.20, 0.97, 0.9, 0.7);
+//	l1->SetFillColor(kWhite);
+//	l1->SetHeader("Energy losses for muons in iron vs. momentum");
+//	l1->AddEntry(fTable[0],"total (table)","lp");
+//	l1->AddEntry(fCalc[0],"total (calculation)","lp");
+//	l1->AddEntry(fTable[1],"ionization (table)","lp");
+//	l1->AddEntry(fCalc[1],"ionization (calculation)","lp");
+//	l1->AddEntry(fTable[2],"bremsstrahlung (table)","lp");
+//	l1->AddEntry(fCalc[2],"bremsstrahlung (calculation)","lp");
+//	l1->AddEntry(fTable[3],"pair production (table)","lp");
+//	l1->AddEntry(fCalc[3],"pair production (calculation)","lp");
+//	l1->Draw();
 
 	c1->SaveAs("energy_loss.eps");
 	c1->SaveAs("energy_loss.svg");
-
+	c1->SaveAs("energy_loss.gif");
 }
 
 void CbmLitCheckEnergyLoss::CalcEloss()

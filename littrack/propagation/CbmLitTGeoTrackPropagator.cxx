@@ -104,12 +104,19 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 		for(unsigned int  iMat = 0; iMat < inter.size() ; iMat++) {
 			CbmLitMaterialInfo mat = inter[iMat];
 
+//			if (mat.GetRL() > 2000) {
+				//std::cout << "ZERO material length: " << mat.ToString();
+//				continue;
+//			}
+
 
 			// check if track parameters are correct
 			if (!IsParCorrect(par)) {
 //				std::cout << "-E- CbmLitTGeoTrackPropagator::Propagate: incorrect track parameters" << std::endl;
 				return kLITERROR;
 			}
+
+//			std::cout << mat.ToString();
 
 			std::vector<myf>* Fnew = NULL;
 		    if (F != NULL) Fnew = new std::vector<myf>(25, 0.);
@@ -130,12 +137,12 @@ LitStatus CbmLitTGeoTrackPropagator::Propagate(
 //			std::cout << "    " << iStep << " " << iMat << " " << par->ToString();
 		}
 	}
-//	std::vector<myf>* Fnew = NULL;
-//	if (F != NULL) Fnew = new std::vector<myf>(25, 0.);
-//	fExtrapolator->Extrapolate(par, zOut, Fnew);
-//	if (F != NULL) UpdateF(*F, *Fnew);
-//	delete Fnew;
-//	par->SetZ(zOut);
+	std::vector<myf>* Fnew = NULL;
+	if (F != NULL) Fnew = new std::vector<myf>(25, 0.);
+	fExtrapolator->Extrapolate(par, zOut, Fnew);
+	if (F != NULL) UpdateF(*F, *Fnew);
+	delete Fnew;
+	par->SetZ(zOut);
 
 //	std::cout << "OUT " << par->ToString();
 

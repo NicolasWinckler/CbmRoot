@@ -27,6 +27,7 @@ public:
 
     virtual void SetParContainers();
 
+	void SetOutputDir(const std::string& dir) {fOutputDir = dir;}
 private:
 	Double_t CalcTheta(
 	          const CbmLitTrackParam* par,
@@ -38,8 +39,11 @@ private:
     TH1F* fh_theta_mc;
     TH1F* fh_eloss_mc;
     TH1F* fh_eloss_rec;
+    TH1F* fh_dep_energy;
 
     Int_t fNEvents;
+
+    std::string fOutputDir;
 
     ClassDef(CbmLitCheckMultipleScattering, 1)
 };

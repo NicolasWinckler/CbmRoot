@@ -204,8 +204,6 @@ void CbmLitPropagationAnalysis::CreateHistograms()
 		fSmootherHistos[i].resize(fNofParams);
 	}
 
-	std::stringstream histName;
-	std::stringstream histTitle;
 	std::string names[] = { "h_resx", "h_resy", "h_restx", "h_resty", "h_resqp",
 			           "h_pullx", "h_pully", "h_pulltx", "h_pullty", "h_pullqp",
 			           "h_resp", "h_chisq" };

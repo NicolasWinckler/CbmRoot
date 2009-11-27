@@ -108,6 +108,11 @@ CbmLitMaterialInfo CbmLitTGeoNavigator::MakeStep(
 	matInfo.SetLength(fGeo->GetStep());
 	matInfo.SetZpos(fGeo->GetCurrentPoint()[2]);
 
+//	if (fGeo->GetCurrentPoint()[2] > 100. && fGeo->GetCurrentPoint()[2] < 970.) {
+//		std::cout << "step=" << fGeo->GetStep()  << ";" << step << " z=" << fGeo->GetCurrentPoint()[2]
+//			<< " rl=" <<  fGeo->GetStep() / matInfo.GetRL() << " " << matInfo.ToString();
+//	}
+
 	return matInfo;
 }
 

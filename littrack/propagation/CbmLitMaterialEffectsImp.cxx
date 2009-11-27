@@ -60,27 +60,15 @@ void CbmLitMaterialEffectsImp::AddEnergyLoss(
 		const CbmLitMaterialInfo* mat) const
 {
 	if (fIsElectron) {
-//		myf X0 = (716.4 * mat->GetA()) / (mat->GetZ() * (mat->GetZ() + 1) * std::log(287./std::sqrt(mat->GetZ())));
-//		std::cout << "X0=" << m.fX0 * m.fRho << " X0calc=" << X0 << std::endl;
-//		Double_t brem_calc = p / X0;
-
-//		myf radLength = (mat->GetLength() * mat->GetRho()) / X0;
-		myf radLength = mat->GetLength() / (mat->GetRL());
+		myf radLength = mat->GetLength() / mat->GetRL();
 		myf t;
 
-//		std::cout << "X0=" << mat->GetRL()*mat->GetRho() << " calcX0=" << X0 << " ratio=" <<  mat->GetRL()*mat->GetRho() / X0 << std::endl;
-
-		if (!fDownstream){
-			t = radLength;
-		} else{
-			t = -radLength;
-		}
+		if (!fDownstream) t = radLength;
+		else t = -radLength;
 
 		myf qp = par->GetQp();
-//		std::cout << "qp0=" << qp;
 		qp *= std::exp(-t);
 		par->SetQp(qp);
-//		std::cout << " qp1=" << qp << " corr=" << std::exp(-t) << " t=" << t << std::endl;
 
 		myf cov = par->GetCovariance(14);
 		cov += CalcSigmaSqQpElectron(par, mat);

@@ -1,43 +1,3 @@
-/* $Id: CbmRichHitProducer.cxx,v 1.12 2006/07/17 11:10:06 hoehne Exp $ */
-
-/* History of cvs commits:
- *
- * $Log: CbmRichHitProducer.cxx,v $
- * Revision 1.12  2006/07/17 11:10:06  hoehne
- * improved H8500 MAPMT added (DetType=4) : q.e. enhanced for lower wavelength due to UV windows
- *
- * Revision 1.11  2006/07/07 13:48:53  hoehne
- * -> 3 different types of photodetectors may be chosen differing in geometry (pixelsize) and quantum efficiency
- *    specify 1 = single PMTS a la Protvino
- *            2 = MAPMT, Hamamatsu H8500
- *            3 = CsI, panels similar to ALICE
- *    for DetType when running the HitProducer
- *
- * Revision 1.9  2006/02/09 16:27:16  hoehne
- * noise added, trackID removed (go via RefIndex)
- *
- * Revision 1.8  2006/01/19 11:54:01  hoehne
- * default values of verbosity level added
- *
- * Revision 1.7  2006/01/18 16:28:03  hoehne
- * verbosity levels added
- *
- * Revision 1.6  2006/01/11 12:37:36  hoehne
- * hardcoded parameters removed, 3 types of photodetector efficiencies implemented, parameter setting via macro CbmRichHitsProd.C
- *
- * Revision 1.5  2005/12/19 19:04:31  friese
- * New FairTask design
- *
- * Revision 1.4  2005/12/08 15:11:22  turany
- * change GetRegistered, ActivateBranch and CheckActivatedBranch
- * to GetObject, also add a flag to the arguments of Register which control saving
- * to file(kTRUE) or only in memory(kFALSE)
- *
- * Revision 1.3  2005/07/06 15:00:48  kharlov
- * Object dump commented out
- *
- */
-
 // -------------------------------------------------------------------------
 // -----                   CbmRichHitProducer source file              -----
 // -----               Created 21/05/04  by B. Polichtchouk            -----
@@ -78,50 +38,10 @@ SetDefaultParameters();
 }
 // -------------------------------------------------------------------------
 
-// -----   Standard constructor   -------------------------------------------
-CbmRichHitProducer::CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_t det_type,
-                                       Int_t noise)
-  :FairTask("RichHitProducer")
-{
-  fPhotomulRadius = pmt_rad;
-  fPhotomulDist = pmt_dist;
-  fDetType = det_type;
-  fNoise = noise;
-  fVerbose = 1;               // default value
-
-  c = 2.998E8;                // speed of light
-  h = 6.626E-34;              // Plancks constant
-  e = 1.6022E-19;             // Eulers constant
-
-  nevents = 0;
-  fNHits  = 0;
-}
-// -------------------------------------------------------------------------
-
 // -----   Standard constructor with verbosity level  -------------------------------------------
-CbmRichHitProducer::CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_t det_type,
-                                       Int_t noise, Int_t verbose)
-  :FairTask("RichHitProducer")
-{
-  fPhotomulRadius = pmt_rad;
-  fPhotomulDist = pmt_dist;
-  fDetType = det_type;
-  fNoise = noise;
-  fVerbose = verbose;
-
-  c = 2.998E8;                // speed of light
-  h = 6.626E-34;              // Plancks constant
-  e = 1.6022E-19;             // Eulers constant
-
-  nevents = 0;
-  fNHits  = 0;
-  fNDoubleHits = 0;
-}
-// -------------------------------------------------------------------------
-
-// -----   Standard constructor with verbosity level  -------------------------------------------
-CbmRichHitProducer::CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist, Int_t det_type,
-                                       Int_t noise, Int_t verbose, Double_t colleff, Double_t s_mirror)
+CbmRichHitProducer::CbmRichHitProducer(Double_t pmt_rad, Double_t pmt_dist,
+		Int_t det_type, Int_t noise, Int_t verbose,
+		Double_t colleff, Double_t s_mirror)
   :FairTask("RichHitProducer")
 {
   fPhotomulRadius = pmt_rad;
@@ -166,7 +86,7 @@ CbmRichHitProducer::~CbmRichHitProducer()
   fNoise            = 220;
   fVerbose = 1;
   fColl = 0.7;
-  fSMirror = 0.6; 
+  fSMirror = 0.6;
 }
 // -------------------------------------------------------------------------
 
@@ -360,17 +280,14 @@ void CbmRichHitProducer::Exec(Option_t* option)
     if (fDetType == 0){
      fPhotomulRadius = 0.;
      fPhotomulDist = 0.;
-     fColl = 1.;
     }
     if (fDetType == 2 || fDetType == 4 || fDetType == 5) {
       fPhotomulRadius = 0.6125;
       fPhotomulDist = 0.2;
-      fColl = 0.7;
      }
     if (fDetType == 3) {
       fPhotomulRadius = 0.8;
       fPhotomulDist = 0.5;
-      fColl = 1.;
      }
 
   if (fVerbose > 0){
@@ -472,7 +389,7 @@ void CbmRichHitProducer::Exec(Option_t* option)
     //hit position as a center of PMT
     Double_t xHit, yHit;
     Int_t pmtID;
-    Double_t sigma0 = 0.; 
+    Double_t sigma0 = 0.;
     Double_t sigma = 0.19;  // sigma (cm) for additional smearing of HitPosition due to WLS film or scattering on mirror
 
     //FindRichHitPosition
@@ -873,7 +790,7 @@ else if (det_type == 5){
     fEfficiency[23] = 0.0033;
 
    }
-    else if (det_type == 0){ 
+    else if (det_type == 0){
 
   /** ideal detector */
 

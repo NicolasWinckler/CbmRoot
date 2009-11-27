@@ -96,15 +96,21 @@ void run_reco(Int_t nEvents = 2)
   // ===                     MVD local reconstruction                      ===
   // =========================================================================
 
-  
-  // -----   MVD Hitproducer   -----------------------------------------------
-  CbmMvdHitProducer* mvdHitProd = new CbmMvdHitProducer("MVDHitProducer", 0, 
-  			  			       iVerbose);
-  run->AddTask(mvdHitProd);
+
+  // -----   MVD Digitiser   -------------------------------------------------
+  CbmMvdDigitizeL* mvdDigi = new CbmMvdDigitizeL("MVD Digitiser", 
+						 0, iVerbose);
+  run->AddTask(mvdDigi);
   // -------------------------------------------------------------------------
  
-  
 
+  // -----   MVD Hit Finder   ------------------------------------------------
+  CbmMvdFindHits* mvdHitFinder = new CbmMvdFindHits("MVD Hit Finder",
+						    1, iVerbose);
+  run->AddTask(mvdHitFinder);
+  // -------------------------------------------------------------------------
+
+ 
 
   // ===                 End of MVD local reconstruction                   ===
   // =========================================================================
@@ -119,19 +125,26 @@ void run_reco(Int_t nEvents = 2)
   // =========================================================================
 
   // -----   STS digitizer   -------------------------------------------------
-  FairTask* stsDigitize = new CbmStsDigitize(iVerbose);
+  FairTask* stsDigitize = new CbmStsDigitize("STS Digitiser", iVerbose);
   run->AddTask(stsDigitize);
   // -------------------------------------------------------------------------
 
 
-  // -----  STS hit finding   ------------------------------------------------
+  // -----   STS Cluster Finder   --------------------------------------------
+  FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",
+						       iVerbose);
+  run->AddTask(stsClusterFinder);
+  // -------------------------------------------------------------------------
+
+
+  // -----   STS hit finder   ------------------------------------------------
   FairTask* stsFindHits = new CbmStsFindHits(iVerbose);
   run->AddTask(stsFindHits);
   // -------------------------------------------------------------------------
 
 
   // -----  STS hit matching   -----------------------------------------------
-  CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits(iVerbose);
+  FairTask* stsMatchHits = new CbmStsMatchHits(iVerbose);
   run->AddTask(stsMatchHits);
   // -------------------------------------------------------------------------
 

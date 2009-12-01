@@ -47,7 +47,7 @@ void run_reco_rich(Int_t nEvents = 700)
 //  Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
 //  Int_t    richDetType = 4;       // Detector type Hamamatsu H8500-03
 //  Int_t    richNoise   = 220;     // Number of noise points per event
-//  Double_t collectionEff = 0.7;
+//  Double_t collectionEff = 1.;
 //  Double_t richSMirror = 0.06;     // Sigma for additional point smearing due to light scattering in mirror
 //  CbmRichHitProducer* richHitProd
 //    = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,

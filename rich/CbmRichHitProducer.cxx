@@ -86,7 +86,7 @@ CbmRichHitProducer::~CbmRichHitProducer()
   fNoise            = 220;
   fVerbose = 1;
   fColl = 0.7;
-  fSMirror = 0.6;
+  fSMirror = 0.06;
 }
 // -------------------------------------------------------------------------
 
@@ -390,7 +390,7 @@ void CbmRichHitProducer::Exec(Option_t* option)
     Double_t xHit, yHit;
     Int_t pmtID;
     Double_t sigma0 = 0.;
-    Double_t sigma = 0.19;  // sigma (cm) for additional smearing of HitPosition due to WLS film or scattering on mirror
+    Double_t sigma = 0.19;  // sigma (cm) for additional smearing of HitPosition due to WLS film 
 
     //FindRichHitPosition
     if (fDetType == 0) {

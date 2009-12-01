@@ -27,14 +27,9 @@ c) run cmake to create the Makefiles
 
     > cmake "Path_to_CbmRoot_top_directory"
 
-d) execute the config script to export all necessary environment variables
-   
-    > . ./config.sh
-
-e) create and install the framework
+e) create and install the framework in the build directory
 
     > make
-    > make install
 
 ===========================================================
 
@@ -63,11 +58,6 @@ c) run cmake with an option to create the Makefiles
 
     > cmake "Path_to_CbmRoot_top_directory" -DCBMROOT_MINIMAL=1
 
-d) execute the config script to export all necessary environment variables
-   
-    > . ./config.sh
-
-e) create and install the framework
+e) create and install the framework in the build directory
 
     > make
-    > make install

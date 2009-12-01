@@ -43,14 +43,16 @@ void run_reco_rich(Int_t nEvents = 700)
   // =========================================================================
 */
   // ---------------------RICH Hit Producer ----------------------------------
-//  Double_t richPmtRad  = 0.4;     // PMT radius [cm]
-//  Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
-//  Int_t    richDetType = 5;       // Detector type Hamamatsu H8500-03
-//  Int_t    richNoise   = 220;     // Number of noise points per event
-//  CbmRichHitProducer* richHitProd
-//    = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
-//			     richNoise, iVerbose);
-//  run->AddTask(richHitProd);
+  Double_t richPmtRad  = 0.4;     // PMT radius [cm]
+  Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
+  Int_t    richDetType = 5;       // Detector type Hamamatsu H8500-03
+  Int_t    richNoise   = 220;     // Number of noise points per event
+  Double_t collectionEff = 0.7;
+  Double_t richSMirror = 0.6;     // Sigma for additional point smearing due to light scattering in mirror
+  CbmRichHitProducer* richHitProd
+    = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
+			     richNoise, iVerbose, collectionEff, richSMirror);
+  run->AddTask(richHitProd);
   //--------------------------------------------------------------------------
 /*
 
@@ -74,14 +76,22 @@ void run_reco_rich(Int_t nEvents = 700)
 
 */
   //--------------------- RICH Ring Finding ----------------------------------
- // CbmL1RichENNRingFinder* richFinder = new CbmL1RichENNRingFinder(iVerbose);
+  //CbmL1RichENNRingFinder* richFinder = new CbmL1RichENNRingFinder(iVerbose);
   TString richGeoType = "compact";
   CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose, richGeoType);
+//  richFinder->SetFindOptPar(true);
+//  richFinder->SetParameters(
+//		  2, //Nof parts
+//		  11.5, 2.5, //Max-min dist
+//		  3.3, 5.7, //Max-min radius
+//		  5, 2, 5, 2, //HTCut
+//		  25, 25, 32, //NofBins
+//		  -0.5, 0.35, 0.4,
+//		  2, 0.8, 3., 1.2);
   CbmRichFindRings* richFindRings = new CbmRichFindRings();
   richFindRings->UseFinder(richFinder);
   run->AddTask(richFindRings);
   //--------------------------------------------------------------------------
-
 
   //-------------------- RICH Ring Fitting -----------------------------------
   CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, 1, richGeoType);

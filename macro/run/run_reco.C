@@ -332,7 +332,7 @@ void run_reco(Int_t nEvents = 2)
   Int_t    richDetType = 4;       // Detector type Hamamatsu H8500-03 (no WLS)
   Int_t    richNoise   = 220;     // Number of noise points per event
   Double_t richCollEff = 1.0;     // Collection Efficiency of PMT electron optics
-  Double_t richSMirror = 0.6;     // Sigma for additional point smearing due to light scattering in mirror
+  Double_t richSMirror = 0.06;     // Sigma for additional point smearing due to light scattering in mirror
   
   CbmRichHitProducer* richHitProd 
     = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType, 

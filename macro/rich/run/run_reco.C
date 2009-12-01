@@ -266,9 +266,10 @@ void run_reco(Int_t nEvents = 700)
   Int_t    richDetType = 4;       // Detector type Hamamatsu H8500-03
   Int_t    richNoise   = 220;     // Number of noise points per event
   Double_t collectionEff = 1.0;
+  Double_t richSMirror = 0.06;     // Sigma for additional point smearing due to light scattering in mirror
   CbmRichHitProducer* richHitProd
     = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
-			     richNoise, iVerbose, collectionEff);
+			     richNoise, iVerbose, collectionEff,richSMirror);
   run->AddTask(richHitProd);
   //--------------------------------------------------------------------------
 

@@ -43,7 +43,7 @@ using std::pair;
 CbmMuchDigitizeSimpleGem::CbmMuchDigitizeSimpleGem() :
   FairTask("MuchDigitizeAdvancedGem", 1) {
   fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = NULL;
+  fDigiFile = "";
   fPoints = NULL;
   fDigis = NULL;
   fDigiMatches = NULL;
@@ -56,7 +56,7 @@ CbmMuchDigitizeSimpleGem::CbmMuchDigitizeSimpleGem() :
 CbmMuchDigitizeSimpleGem::CbmMuchDigitizeSimpleGem(Int_t iVerbose) :
   FairTask("MuchDigitizeAdvancedGem", iVerbose) {
   fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = NULL;
+  fDigiFile = "";
   fPoints = NULL;
   fDigis = NULL;
   fDigiMatches = NULL;
@@ -70,7 +70,7 @@ CbmMuchDigitizeSimpleGem::CbmMuchDigitizeSimpleGem(const char* name, const char*
     Int_t iVerbose) :
       FairTask(name, iVerbose) {
   fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = new TFile(digiFileName);
+  fDigiFile = digiFileName;
   fPoints = NULL;
   fDigis = NULL;
   fDigiMatches = NULL;
@@ -81,8 +81,10 @@ CbmMuchDigitizeSimpleGem::CbmMuchDigitizeSimpleGem(const char* name, const char*
 
 // -----   Destructor   ----------------------------------------------------
 CbmMuchDigitizeSimpleGem::~CbmMuchDigitizeSimpleGem() {
+/*
   if (fDigiFile)
     delete fDigiFile;
+*/
   if (fDigis) {
     fDigis->Delete();
     delete fDigis;
@@ -264,7 +266,12 @@ InitStatus CbmMuchDigitizeSimpleGem::Init() {
     Fatal("Init", "No FairRootManager");
 
   // Initialize GeoScheme
-  TObjArray* stations = (TObjArray*) fDigiFile->Get("stations");
+  TFile* oldfile=gFile;
+  TFile* file=new TFile(fDigiFile);
+  TObjArray* stations = (TObjArray*) file->Get("stations");
+  file->Close();
+  file->Delete();
+  gFile=oldfile;
   fGeoScheme->Init(stations);
 
   // Get input array of MuchPoints

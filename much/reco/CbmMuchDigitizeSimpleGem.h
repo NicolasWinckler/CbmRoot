@@ -66,7 +66,7 @@ public:
 private:
 
   CbmMuchGeoScheme*  fGeoScheme;     // Object responsible for geometry description
-  TFile*             fDigiFile;      // Digitization file
+  TString            fDigiFile;      // Digitization file
 
   TClonesArray*      fPoints;        // Input array of CbmMuchPoint
   TClonesArray*      fDigis;         // Output array of CbmMuchDigi

@@ -3,7 +3,7 @@
  Author : Simeon Lebedev
  E-mail : S.Lebedev@gsi.de
  */
-void trd_elid_reco(Int_t nEvents = 1000)
+void trd_elid_reco(Int_t nEvents = 700)
 {
 
   // ========================================================================
@@ -13,17 +13,17 @@ void trd_elid_reco(Int_t nEvents = 1000)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "/d/cbm02/slebedev/trd/JUN09/st/piel.0009.mc.root";
-  TString inFile2 = "/d/cbm02/slebedev/trd/JUN09/mb/piel.0009.mc_1.root";
+  TString inFile = "/d/cbm02/slebedev/trd/JUL09/mb/piel.0000.mc.root";
+  //TString inFile2 = "/d/cbm02/slebedev/trd/JUN09/mb/piel.0009.mc_1.root";
 
   // Parameter file
-  TString parFile = "/d/cbm02/slebedev/trd/JUN09/st/piel.0009.params.root";
+  TString parFile = "/d/cbm02/slebedev/trd/JUL09/mb/piel.0000.params.root";
 
   // STS digitisation file
   TString stsDigiFile = "sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/d/cbm02/slebedev/trd/JUN09/st/piel.0009.reco.root";
+  TString outFile = "/d/cbm02/slebedev/trd/JUL09/mb/piel.0000.reco.root";
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -46,31 +46,14 @@ void trd_elid_reco(Int_t nEvents = 1000)
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libEcal");
-  gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
-  gSystem->Load("libL1");
-  // ------------------------------------------------------------------------
-
+  gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
+  cbmlibs();
 
 
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *run= new FairRunAna();
   run->SetInputFile(inFile);
-  run->AddFile(inFile2);
+ // run->AddFile(inFile2);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
 
@@ -80,10 +63,10 @@ void trd_elid_reco(Int_t nEvents = 1000)
   // ===                     TRD local reconstruction                      ===
   // =========================================================================
 
-  // Update of the values for the radiator F.U. 17.08.07
-  Int_t trdNFoils    = 130;      // number of polyetylene foils
-  Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
-  Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
+  // Update of the values for the radiator 03.12.2009
+  Int_t trdNFoils    = 70;      // number of polyetylene foils
+  Float_t trdDFoils = 0.0014;    // thickness of 1 foil [cm]
+  Float_t trdDGap   = 0.04;      // thickness of gap between foils [cm]
   Bool_t simpleTR = kTRUE;       // use fast and simple version for TR
                                  // production
 

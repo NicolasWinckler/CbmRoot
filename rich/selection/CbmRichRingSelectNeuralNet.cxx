@@ -68,15 +68,13 @@ void CbmRichRingSelectNeuralNet::Init ()
     simu->Branch("x4", &x4,"x4/F");
     simu->Branch("x5", &x5,"x5/F");
     simu->Branch("x6", &x6,"x6/F");
-    //simu->Branch("x7", &x7,"x7/F");
-    //simu->Branch("x8", &x8,"x8/F");
-    //simu->Branch("x9", &x9,"x9/F");
-    //simu->Branch("x10", &x10,"x10/F");
     simu->Branch("x11", &x11,"x11/F");
 
-    fNN = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6:10:x11",simu);
+    fNN = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6:5:x11",simu);
     cout << "-I- CbmRichRingSelectNeuralNet: get NeuralNet weight parameters from: " << fNeuralNetWeights << endl;
     fNN->LoadWeights(fNeuralNetWeights);
+
+    //fNNfunction = new NNfunction();
 }
 
 // -----   Exec   ----------------------------------------------------
@@ -102,12 +100,9 @@ void CbmRichRingSelectNeuralNet::DoSelect(CbmRichRing* ring)
     nnPar[3] =  ring->GetRadialPosition();
     nnPar[4] =  ring->GetRadius();
     nnPar[5] =  ring->GetChi2() / ring->GetNDF();
-    //nnPar[5] =  ring->GetBaxis();
-    //nnPar[6] =  ring->GetPhi();
-    //nnPar[7] =  ring->GetRadialAngle();
-    //nnPar[6] =  ;
 
     Double_t nnEval = fNN->Evaluate(0,nnPar);
+    //Double_t nnEval = fNNfunction->Value(0,nnPar);
     if (fVerbose > 1) cout <<"nnEval = "<<nnEval<<endl;
 
     if (TMath::IsNaN(nnEval) == 1) {

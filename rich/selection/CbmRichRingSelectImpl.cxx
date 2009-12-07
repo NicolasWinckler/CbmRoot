@@ -124,7 +124,7 @@ Double_t CbmRichRingSelectImpl::GetAngle(CbmRichRing* ring)
 		yHit = hit->GetY();
 
 		if (!hit) continue;
-		if (yHit-yRing == 0 || xHit-xRing == 0) return 999.;
+		if (yHit-yRing == 0 || xHit-xRing == 0) continue;
 
 		if( xHit > xRing && yHit > yRing ){
 			fAlpha[iHit] = atan(fabs((yHit-yRing)/(xHit-xRing)));
@@ -140,7 +140,7 @@ Double_t CbmRichRingSelectImpl::GetAngle(CbmRichRing* ring)
     sort(fAlpha.begin(),fAlpha.begin()+nHits);
 
     for(Int_t i = 0; i < nHits-1; i++) fPhi[i] = fAlpha[i+1] - fAlpha[i];
-    fPhi[nHits-1] = 2*Pi - fAlpha[nHits-1] + fAlpha[0];
+    fPhi[nHits-1] = TwoPi - fAlpha[nHits-1] + fAlpha[0];
     sort(fPhi.begin(),fPhi.begin()+nHits);
 
     Double_t angle = fPhi[nHits-1]+fPhi[nHits-2]+fPhi[nHits-3];

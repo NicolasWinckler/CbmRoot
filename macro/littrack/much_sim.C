@@ -6,11 +6,11 @@ void much_sim(Int_t nEvents = 1000)
 	//if SCRIPT environment variable is set to "yes", i.e. macro is run via script
 	if (script != "yes") {
 		//input UrQMD file
-		inFile  = "/home/d/events/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
+		inFile  = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
 		//if necessary specify input pluto file to embed signal particles
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
 		//directory for output simulation files
-		dir  = "/home/d/andrey/muchtrd_10mu/";
+		dir  = "/d/cbm02/andrey/std13_10mu_urqmd/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
@@ -18,13 +18,13 @@ void much_sim(Int_t nEvents = 1000)
 		//If "yes" than 10 primary muons will be generated
 		muons = "yes";
 		//If "yes" than UrQMD will be used as background
-		urqmd = "no";
+		urqmd = "yes";
 		//If "yes" PLUTO particles will be embedded
 		pluto = "no";
 		//MUCH geometry file name
-		muchGeom = "much_standard_trd.geo";
+		muchGeom = "much_standard_2layers.geo";
 		//TRD geometry file name
-		trdGeom = "trd_muon_setup_new.geo";
+		trdGeom = "";//"trd_muon_setup_new.geo";
 	} else {
 		inFile  = TString(gSystem->Getenv("INFILE"));
 		plutoFile  = TString(gSystem->Getenv("PLUTOFILE"));

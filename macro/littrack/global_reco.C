@@ -10,7 +10,7 @@
  * global tracking independently.
  **/
 
-void global_reco(Int_t nEvents = 10)
+void global_reco(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
@@ -18,13 +18,13 @@ void global_reco(Int_t nEvents = 10)
 	TString dir, mcFile, parFile, globalRecoFile, muchDigiFile;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/home/d/andrey/test/trunk/global_mu/";
+		dir  = "/d/cbm02/andrey/std13_10mu_urqmd/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameters file
 		parFile = dir + "param.0000.root";
 		// Output file with reconstructed tracks and hits
-		globalRecoFile = dir + "global.reco.0000.root";
+		globalRecoFile = dir + "global.reco.newsts.0000.root";
 		// Digi scheme file for MUCH.
 		// MUST be consistent with MUCH geometry used in MC transport.
 		muchDigiFile = parDir + "/much/much_standard.digi.root";
@@ -41,6 +41,8 @@ void global_reco(Int_t nEvents = 10)
 	TStopwatch timer;
 	timer.Start();
 
+        gSystem->Load("/u/andrey/soft/tbb/libtbb");
+
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
@@ -51,11 +53,14 @@ void global_reco(Int_t nEvents = 10)
 	run->SetInputFile(mcFile);
 	run->SetOutputFile(globalRecoFile);
 
-	TString stsDigiFile = parDir+ "/sts/sts_Standard_s3055AAFK5.SecD.digi.par";
+	TString stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
 
 	// ----- STS reconstruction   ---------------------------------------------
 	FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
 	run->AddTask(stsDigitize);
+
+        FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
+        run->AddTask(stsClusterFinder);
 
 	FairTask* stsFindHits = new CbmStsFindHits("STSFindHits", iVerbose);
 	run->AddTask(stsFindHits);
@@ -80,7 +85,7 @@ void global_reco(Int_t nEvents = 10)
 	run->AddTask(fitTracks);
 	// ------------------------------------------------------------------------
 
-	if (IsMuch(mcFile)) {
+	if (IsMuch(parFile)) {
 	// ----- MUCH hits----------   --------------------------------------------
 		CbmMuchDigitizeSimpleGem* muchDigitize = new CbmMuchDigitizeSimpleGem("MuchDigitize", muchDigiFile.Data(), iVerbose);
 		run->AddTask(muchDigitize);
@@ -94,7 +99,7 @@ void global_reco(Int_t nEvents = 10)
 	// ------------------------------------------------------------------------
 	}
 
-	if (IsTrd(mcFile)){
+	if (IsTrd(parFile)){
 	// ----- TRD hits ---------------------------------------------------------
 		// Update of the values for the radiator F.U. 17.08.07
 		Int_t trdNFoils    = 130;      // number of polyetylene foils
@@ -120,7 +125,7 @@ void global_reco(Int_t nEvents = 10)
 	// ------------------------------------------------------------------------
 	}
 
-	if (IsTof(mcFile)) {
+	if (IsTof(parFile)) {
 	// ------ TOF hits --------------------------------------------------------
 		CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
 		run->AddTask(tofHitProd);
@@ -133,7 +138,7 @@ void global_reco(Int_t nEvents = 10)
 	// "branch" - branching tracking
 	// "nn" - nearest neighbor tracking
 	// "weight" - weighting tracking
-	finder->SetTrackingType("branch");
+	finder->SetTrackingType("nn");
 
 	// Hit-to-track merger method to be used
 	// "nearest_hit" - assigns nearest hit to the track

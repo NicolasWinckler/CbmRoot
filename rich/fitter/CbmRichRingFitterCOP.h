@@ -5,7 +5,7 @@
 *  Description: This is the header of a particular fitting class.
 *               Here the ring is fitted with theh COP algorithm from A. Ayriyan/ G. Ososkov
 *
-*  Algorithm:                     Alexander Ayriyan 10.08.2005, Gennadi Ososkov
+*  Algorithm:  Alexander Ayriyan 10.08.2005, Gennadi Ososkov
 *  Adoption to new Fitter Class : Claudia Hoehne
 *  E-mail : C.Hoehne@gsi.de
 *
@@ -40,12 +40,6 @@ class CbmRichRingFitterCOP : public CbmRichRingFitterImpl
 
    /** Ring Fitting algorithm **/
    void DoFit(CbmRichRing* ring);
-
-   private:
-
-   /** Verbosity level **/
-   Int_t fVerbose;
-  Double_t fCorrection;
 
   ClassDef(CbmRichRingFitterCOP,1);
 };

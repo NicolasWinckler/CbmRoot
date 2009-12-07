@@ -89,9 +89,13 @@ void CbmRichRingSelectNeuralNet::DoSelect(CbmRichRing* ring)
         ring->SetSelectionNN(-1.);
         return;
     }
+    ring->SetNofHitsOnRing(fSelectImpl->GetNofHitsOnRingCircle(ring));
+    if (ring->GetNofHitsOnRing() < 5){
+    	ring->SetSelectionNN(-1.);
+    	return;
+    }
 
     ring->SetAngle(fSelectImpl->GetAngle(ring));
-    ring->SetNofHitsOnRing(fSelectImpl->GetNofHitsOnRingCircle(ring));
 
     Double_t nnPar[10];
     nnPar[0] =  ring->GetNofHits();

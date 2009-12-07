@@ -52,7 +52,7 @@ CbmStsMatchHits::CbmStsMatchHits() : FairTask("STSMatchHits", 1) {
   fDigis       = NULL;
   fDigiMatches = NULL;
   fHits        = NULL;
-  fRealistic   = kFALSE;
+  fRealistic   = kTRUE;
   fDigiScheme  = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -69,7 +69,7 @@ CbmStsMatchHits::CbmStsMatchHits(Int_t iVerbose)
   fDigis       = NULL;
   fDigiMatches = NULL;
   fHits        = NULL;
-  fRealistic   = kFALSE;
+  fRealistic   = kTRUE;
   fDigiScheme  = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -86,7 +86,7 @@ CbmStsMatchHits::CbmStsMatchHits(const char* name, Int_t iVerbose)
   fDigis       = NULL;
   fDigiMatches = NULL;
   fHits        = NULL;
-  fRealistic   = kFALSE;
+  fRealistic   = kTRUE;
   fDigiScheme  = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------

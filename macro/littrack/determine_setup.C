@@ -15,8 +15,9 @@ Bool_t CheckDetectorPresence(
 		const char* name)
 {
 
-	TFile* f = new TFile(parFile);
-    f->Get("FairBaseParSet");
+       TFile *currentfile = gFile;
+       TFile* f = new TFile(parFile);
+       f->Get("FairBaseParSet");
        
 //	TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
 
@@ -29,10 +30,12 @@ Bool_t CheckDetectorPresence(
 		if (TString(node->GetName()).Contains(name)) {
 			f->Close();
 			delete f;
+                        gFile=currentfile;
 			return true;
 		}
 	}
 	f->Close();
+        gFile=currentfile;
 	delete f;
 	return false;
 }

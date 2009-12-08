@@ -17,7 +17,7 @@ void much_reco(Int_t nEvents = 2)
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
 	cbmrootlibs();
-//	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
+	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
 
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
@@ -28,6 +28,9 @@ void much_reco(Int_t nEvents = 2)
 	// ----- STS reconstruction   ---------------------------------------------
 	FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
 	run->AddTask(stsDigitize);
+
+        FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
+        run->AddTask(stsClusterFinder);
 
 	FairTask* stsFindHits = new CbmStsFindHits("STSFindHits", iVerbose);
 	run->AddTask(stsFindHits);
@@ -52,11 +55,11 @@ void much_reco(Int_t nEvents = 2)
 	run->AddTask(fitTracks);
 	// ------------------------------------------------------------------------
 
-//	if (IsMuch(mcFile)) {
+	if (IsMuch(mcFile)) {
 	// ----- MUCH hits----------   --------------------------------------------
 		CbmMuchDigitizeSimpleGem* muchDigitize = new CbmMuchDigitizeSimpleGem("MuchDigitize", muchDigiFile.Data(), iVerbose);
 		run->AddTask(muchDigitize);
-/*
+
 		CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws("MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
 		run->AddTask(strawDigitize);
 
@@ -137,7 +140,7 @@ void much_reco(Int_t nEvents = 2)
 	reconstructionQa->SetVerbose(1);
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------
-*/
+
 
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();

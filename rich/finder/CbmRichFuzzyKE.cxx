@@ -134,9 +134,8 @@ Double_t CbmRichFuzzyKE::d1(Int_t i, Int_t j)
 	Double_t yf1 = fEllipses[i].fV12;
 	Double_t x = fHits[j].fX;
 	Double_t y = fHits[j].fY;
-    Double_t d1 = sqrt((x - xf1)*(x - xf1) + (y - yf1)*(y - yf1)); 
-  //  cout << "d1 = " << d1 << endl;
-    return d1;
+	Double_t result = sqrt((x - xf1)*(x - xf1) + (y - yf1)*(y - yf1)); 
+	return result;
 }
 
 Double_t CbmRichFuzzyKE::d2(Int_t i, Int_t j)
@@ -145,18 +144,16 @@ Double_t CbmRichFuzzyKE::d2(Int_t i, Int_t j)
 	Double_t yf2 = fEllipses[i].fV22;
 	Double_t x = fHits[j].fX;
 	Double_t y = fHits[j].fY;
-    Double_t d2 = sqrt((x - xf2)*(x - xf2) + (y - yf2)*(y - yf2)); 
-  //  cout << "d2 = " << d2 << endl;
-    return d2;
+	Double_t result = sqrt((x - xf2)*(x - xf2) + (y - yf2)*(y - yf2)); 
+	return result;
 }
 
 // i-ellipse , j-hit
 Double_t CbmRichFuzzyKE::D(Int_t i, Int_t j)
 {
-	Double_t r = fEllipses[i].fR;
-
-    Double_t ri = d1(i,j) + d2(i,j) - r;
-    return ri;
+	Double_t radius = fEllipses[i].fR;
+	Double_t ri = d1(i,j) + d2(i,j) - radius;
+	return ri;
 }
 
 void CbmRichFuzzyKE::Minimize(){

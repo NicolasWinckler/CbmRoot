@@ -127,8 +127,9 @@ void CbmRichTrackExtrapolationIdeal::Init() {
 
 
 // -----   Public method DoExtrapolate   ------------------------------------------
-Int_t CbmRichTrackExtrapolationIdeal::DoExtrapolate(TClonesArray *gTrackArray, Double_t fZ,
-                                                    TClonesArray *fTrackParamArray)
+Int_t CbmRichTrackExtrapolationIdeal::DoExtrapolate(TClonesArray *gTrackArray, 
+						    Double_t z,
+                                                    TClonesArray *trackParamArray)
    {
 
   // Check pointers
@@ -139,7 +140,7 @@ Int_t CbmRichTrackExtrapolationIdeal::DoExtrapolate(TClonesArray *gTrackArray, D
     return -1;
   }
 
-  if ( !fTrackParamArray ) {
+  if ( !trackParamArray ) {
     cout << "-E- CbmRichTrackExtrapolationIdeal::DoExtrapolate: "
 	 << "TrackParam Array missing! " << endl;
     return -1;
@@ -169,7 +170,7 @@ Int_t CbmRichTrackExtrapolationIdeal::DoExtrapolate(TClonesArray *gTrackArray, D
    Int_t nTracks = gTrackArray->GetEntriesFast();
    for (Int_t iTrack=0; iTrack < nTracks; iTrack++){
      CbmGlobalTrack* gTrack = (CbmGlobalTrack*)gTrackArray->At(iTrack);
-     new((*fTrackParamArray)[iTrack]) FairTrackParam(0.,0.,0.,0.,0.,0.,covMat);
+     new((*trackParamArray)[iTrack]) FairTrackParam(0.,0.,0.,0.,0.,0.,covMat);
      Int_t idSTS = gTrack->GetStsTrackIndex();
      if (idSTS < 0 ) continue;     // global tracks having no STS part get STSIndex -1
      if (fVerbose > 1) cout << "-I- Ideal-Trackextrapolation, iTrack(STS) " << idSTS
@@ -193,7 +194,7 @@ Int_t CbmRichTrackExtrapolationIdeal::DoExtrapolate(TClonesArray *gTrackArray, D
            ty = mom.Py()/mom.Pz();
            qp = charge/mom.Mag();
 	   FairTrackParam richtrack(pos.X(),pos.Y(),pos.Z(),tx,ty,qp,covMat);
-           * (FairTrackParam*)(fTrackParamArray->At(iTrack)) = richtrack;
+           * (FairTrackParam*)(trackParamArray->At(iTrack)) = richtrack;
 
            if (fVerbose > 1) {
 	      cout << "-I- Ideal Track Extrapolation - extrapolate track " << iTrack << endl;

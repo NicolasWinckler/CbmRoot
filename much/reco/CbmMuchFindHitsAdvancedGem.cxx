@@ -49,7 +49,7 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem() :
   fDigis = NULL;
   fDigiMatches = NULL;
   fHits = NULL;
-  fDigiFile = NULL;
+  fDigiFile = "";
   fClusters = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   fThresholdRatio = 0.1;
@@ -66,7 +66,7 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(Int_t iVerbose) :
   FairTask("MuchFindHitsAdvancedGem", iVerbose) {
   fDigis = NULL;
   fDigiMatches = NULL;
-  fDigiFile = NULL;
+  fDigiFile = "";
   fClusters = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   fThresholdRatio = 0.1;
@@ -83,7 +83,7 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(const char* name, const c
     Int_t iVerbose) : FairTask(name, iVerbose) {
   fDigis = NULL;
   fDigiMatches = NULL;
-  fDigiFile    = new TFile(digiFileName);
+  fDigiFile    = digiFileName;
   fClusters = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   fThresholdRatio = 0.1;
@@ -458,7 +458,12 @@ InitStatus CbmMuchFindHitsAdvancedGem::Init() {
   fDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
 
   // Initialize GeoScheme
-  TObjArray* stations = (TObjArray*) fDigiFile->Get("stations");
+  TFile* oldfile=gFile;
+  TFile* file=new TFile(fDigiFile);
+  TObjArray* stations = (TObjArray*) file->Get("stations");
+  file->Close();
+  file->Delete();
+  gFile=oldfile;
   fGeoScheme->Init(stations);
 
   // Register output arrays

@@ -33,7 +33,7 @@ CbmMuchStrawHitFinderQa::CbmMuchStrawHitFinderQa(const char *name, const char* d
  : FairTask(name,verbose){
   fVerbose = verbose;
   fGeoScheme  = CbmMuchGeoScheme::Instance();
-  fDigiFile   = new TFile(digiFileName);
+  fDigiFile   = digiFileName;
   fEvent = fMirror = 0;
   for (Int_t i = 0; i < 6; ++i) fhOccup[i] = 0x0;
 }
@@ -54,7 +54,12 @@ InitStatus CbmMuchStrawHitFinderQa::Init()
   //fClusters    = (TClonesArray*) fManager->GetObject("MuchCluster");
 
   // Initialize GeoScheme
-  TObjArray* stations = (TObjArray*) fDigiFile->Get("stations");
+  TFile* oldfile=gFile;
+  TFile* file=new TFile(fDigiFile);
+  TObjArray* stations = (TObjArray*) file->Get("stations");
+  file->Close();
+  file->Delete();
+  gFile=oldfile;
   fGeoScheme->Init(stations);
   Int_t nSt = fGeoScheme->GetNStations();
 

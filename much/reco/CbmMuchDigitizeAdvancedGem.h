@@ -19,6 +19,7 @@
 #include "TRandom3.h"
 #include "TRandom.h"
 #include "TClonesArray.h"
+#include "TString.h"
 
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
@@ -29,7 +30,6 @@
 
 class CbmMuchSector;
 class CbmMuchPoint;
-class TFile;
 
 enum DetectorType {kGEM, kMICROMEGAS};
 
@@ -114,7 +114,7 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
   private:
 
     CbmMuchGeoScheme*  fGeoScheme;     // Main object responsible for geometry
-    TFile*             fDigiFile;      // Digitization file
+    TString            fDigiFile;      // Digitization file
     TClonesArray*      fPoints;        // Input array of CbmMuchPoint
     TClonesArray*      fMCTracks;      // Input array of MCTrack
     TClonesArray*      fDigis;         // Output array of CbmMuchDigi

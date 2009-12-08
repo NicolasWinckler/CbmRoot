@@ -24,7 +24,7 @@
 
 #include "TStopwatch.h"
 #include "TClonesArray.h"
-#include "TFile.h"
+#include "TString.h"
 #include "CbmMuchGeoScheme.h"
 #include "FairTask.h"
 
@@ -96,7 +96,7 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
  private:
 
   CbmMuchGeoScheme*                fGeoScheme;         // Geometry scheme
-  TFile*                           fDigiFile;          // Digitization file
+  TString                          fDigiFile;          // Digitization file
   TClonesArray*                    fHits;              // Output array of CbmMuchHit
   TClonesArray*                    fDigis;             // Input array of CbmMuchDigi
   TClonesArray*                    fDigiMatches;       // Input array of CbmMuchDigiMatch

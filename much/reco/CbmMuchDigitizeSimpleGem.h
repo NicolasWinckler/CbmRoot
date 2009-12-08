@@ -23,7 +23,7 @@
 #include "TRandom3.h"
 #include "TRandom.h"
 #include "TClonesArray.h"
-#include "TFile.h"
+#include "TString.h"
 
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
@@ -35,7 +35,6 @@
 
 class CbmMuchSector;
 class CbmMuchPoint;
-class TFile;
 
 class CbmMuchDigitizeSimpleGem : public FairTask
 {

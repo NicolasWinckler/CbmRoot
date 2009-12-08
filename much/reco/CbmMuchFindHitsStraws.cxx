@@ -26,7 +26,7 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws()
   : FairTask("MuchFindHits", 1),
     fEffic(0),fMerge(0),fMirror(0)
 {
-  fDigiFile    = NULL;
+  fDigiFile    = "";
   fDigis   = fDigiMatches = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   //SetPhis(0., 90., 45.);
@@ -39,7 +39,7 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(Int_t iVerbose)
   : FairTask("MuchFindHits", iVerbose), 
     fEffic(0),fMerge(0),fMirror(0)
 {
-  fDigiFile    = NULL;
+  fDigiFile    = "";
   fDigis   = fDigiMatches = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   //SetPhis(0., 90., 45.);
@@ -52,7 +52,7 @@ CbmMuchFindHitsStraws::CbmMuchFindHitsStraws(const char* name, const char* digiF
   : FairTask(name, iVerbose),
     fEffic(0),fMerge(0),fMirror(0)
 {
-  fDigiFile    = new TFile(digiFileName);
+  fDigiFile    = digiFileName;
   fDigis   = fDigiMatches = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   //SetPhis(0., 90., 45.);
@@ -84,7 +84,12 @@ InitStatus CbmMuchFindHitsStraws::Init() {
   fDigiMatches = (TClonesArray*) ioman->GetObject("MuchStrawDigiMatch");
 
   // Initialize GeoScheme
-  TObjArray* stations = (TObjArray*) fDigiFile->Get("stations");
+  TFile* oldfile=gFile;
+  TFile* file=new TFile(fDigiFile);
+  TObjArray* stations = (TObjArray*) file->Get("stations");
+  file->Close();
+  file->Delete();
+  gFile=oldfile;
   fGeoScheme->Init(stations);
 
   // Register hit array

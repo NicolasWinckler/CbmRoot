@@ -9,16 +9,12 @@
 
 #include "TStopwatch.h"
 #include "TClonesArray.h"
-#include "TFile.h"
+#include "TString.h"
 
 #include "CbmMuchPoint.h"
 #include "CbmMuchDigi.h"
 #include "CbmMuchDigiMatch.h"
 #include "CbmMuchGeoScheme.h"
-
-
-
-class TFile;
 
 class CbmMuchDigitizeStraws : public FairTask
 {
@@ -49,7 +45,7 @@ class CbmMuchDigitizeStraws : public FairTask
  private:
 
   CbmMuchGeoScheme*  fGeoScheme;     // TODO add comments
-  TFile*             fDigiFile;      // Digitization file
+  TString            fDigiFile;      // Digitization file
 
   TClonesArray*      fPoints;        // Input array of CbmMuchPoint
   TClonesArray*      fDigis;         // Output array of CbmMuchDigi

@@ -8,6 +8,7 @@
 
 #include "FairTask.h"
 #include "TClonesArray.h"
+#include "TString.h"
 #include "TH2.h"
 
 class CbmMuchGeoScheme;
@@ -33,7 +34,7 @@ private:
   TClonesArray *fDigiMatches;
   TClonesArray *fHits;
 
-  TFile*             fDigiFile;      // Digitization parameter file
+  TString            fDigiFile;      // Digitization parameter file
   CbmMuchGeoScheme*  fGeoScheme;     // Geometry scheme
 
   Int_t fMirror; // flag if mirror hits present (left-right ambig.)

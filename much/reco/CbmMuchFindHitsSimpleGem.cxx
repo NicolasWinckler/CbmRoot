@@ -34,7 +34,7 @@ using std::vector;
 
 // -----   Default constructor   ------------------------------------------
 CbmMuchFindHitsSimpleGem::CbmMuchFindHitsSimpleGem() : FairTask("MuchFindHitsSimpleGem", 1) {
-  fDigiFile    = NULL;
+  fDigiFile    = "";
   fDigis   = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
 }
@@ -43,7 +43,7 @@ CbmMuchFindHitsSimpleGem::CbmMuchFindHitsSimpleGem() : FairTask("MuchFindHitsSim
 // -----   Standard constructor   ------------------------------------------
 CbmMuchFindHitsSimpleGem::CbmMuchFindHitsSimpleGem(Int_t iVerbose)
   : FairTask("MuchFindHitsSimpleGem", iVerbose) {
-  fDigiFile    = NULL;
+  fDigiFile    = "";
   fDigis   = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
 }
@@ -52,7 +52,7 @@ CbmMuchFindHitsSimpleGem::CbmMuchFindHitsSimpleGem(Int_t iVerbose)
 // -----   Constructor with name   -----------------------------------------
 CbmMuchFindHitsSimpleGem::CbmMuchFindHitsSimpleGem(const char* name, const char* digiFileName, Int_t iVerbose)
   : FairTask(name, iVerbose) {
-  fDigiFile    = new TFile(digiFileName);
+  fDigiFile    = digiFileName;
   fDigis   = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
 }
@@ -168,7 +168,12 @@ InitStatus CbmMuchFindHitsSimpleGem::Init() {
   fDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
 
   // Initialize GeoScheme
-  TObjArray* stations = (TObjArray*) fDigiFile->Get("stations");
+  TFile* oldfile=gFile;
+  TFile* file=new TFile(fDigiFile);
+  TObjArray* stations = (TObjArray*) file->Get("stations");
+  file->Close();
+  file->Delete();
+  gFile=oldfile;
   fGeoScheme->Init(stations);
 
   // Register output array

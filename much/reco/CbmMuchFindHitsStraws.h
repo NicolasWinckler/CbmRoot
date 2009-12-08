@@ -9,7 +9,7 @@
 
 #include "FairTask.h"
 
-#include "TFile.h"
+#include "TString.h"
 #include "TClonesArray.h"
 #include "TStopwatch.h"
 
@@ -58,7 +58,7 @@ class CbmMuchFindHitsStraws : public FairTask
   void Mirror(); // add mirror hits (left/right ambiguity)
 
   CbmMuchGeoScheme*                fGeoScheme;         // Geometry scheme
-  TFile*                           fDigiFile;          // Digitization file
+  TString                          fDigiFile;          // Digitization file
   TClonesArray*                    fDigis;             // Input array of CbmMuchDigi
   TClonesArray*                    fDigiMatches;       // Input/output array of CbmMuchDigiMatch
   TClonesArray*                    fHits;              // Output array of CbmMuchHit

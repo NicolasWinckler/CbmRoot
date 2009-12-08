@@ -17,8 +17,8 @@
 #include "FairTask.h"
 
 #include "TStopwatch.h"
+#include "TString.h"
 
-class TFile;
 
 class CbmMuchFindHitsSimpleGem : public FairTask
 {
@@ -41,7 +41,7 @@ class CbmMuchFindHitsSimpleGem : public FairTask
 
  private:
   CbmMuchGeoScheme*                fGeoScheme;         // Geometry scheme
-  TFile*                           fDigiFile;          // Digitization file
+  TString                          fDigiFile;          // Digitization file
   TClonesArray*                    fHits;              // Output array of CbmMuchHit
   TClonesArray*                    fClusters;          // Output array of CbmMuchCluster
   TClonesArray*                    fDigis;             // Input array of CbmMuchDigi

@@ -27,7 +27,7 @@ using std::setprecision;
 CbmMuchDigitizeStraws::CbmMuchDigitizeStraws() :
   FairTask("MuchDigitize", 1) {
   fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = NULL;
+  fDigiFile = "";
   fPoints = NULL;
   fDigis = NULL;
   fDigiMatches = NULL;
@@ -40,7 +40,7 @@ CbmMuchDigitizeStraws::CbmMuchDigitizeStraws() :
 CbmMuchDigitizeStraws::CbmMuchDigitizeStraws(Int_t iVerbose) :
   FairTask("MuchDigitize", iVerbose) {
   fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = NULL;
+  fDigiFile = "";
   fPoints = NULL;
   fDigis = NULL;
   fDigiMatches = NULL;
@@ -53,7 +53,7 @@ CbmMuchDigitizeStraws::CbmMuchDigitizeStraws(Int_t iVerbose) :
 CbmMuchDigitizeStraws::CbmMuchDigitizeStraws(const char* name, const char* digiFileName,
     Int_t iVerbose) : FairTask(name, iVerbose) {
   fGeoScheme = CbmMuchGeoScheme::Instance();
-  fDigiFile = new TFile(digiFileName);
+  fDigiFile = digiFileName;
   fPoints = NULL;
   fDigis = NULL;
   fDigiMatches = NULL;
@@ -64,8 +64,10 @@ CbmMuchDigitizeStraws::CbmMuchDigitizeStraws(const char* name, const char* digiF
 
 // -----   Destructor   ----------------------------------------------------
 CbmMuchDigitizeStraws::~CbmMuchDigitizeStraws() {
+  /*
   if (fDigiFile)
     delete fDigiFile;
+  */
   if (fDigis) {
     fDigis->Delete();
     delete fDigis;
@@ -155,7 +157,12 @@ InitStatus CbmMuchDigitizeStraws::Init() {
   if (!ioman) Fatal("Init", "No FairRootManager");
 
   // Initialize GeoScheme
-  TObjArray* stations = (TObjArray*) fDigiFile->Get("stations");
+  TFile* oldfile=gFile;
+  TFile* file=new TFile(fDigiFile);
+  TObjArray* stations = (TObjArray*) file->Get("stations");
+  file->Close();
+  file->Delete();
+  gFile=oldfile;
   fGeoScheme->Init(stations);
 
   // Get input array of MuchPoints

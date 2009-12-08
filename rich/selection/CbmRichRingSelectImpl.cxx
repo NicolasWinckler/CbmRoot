@@ -126,14 +126,18 @@ Double_t CbmRichRingSelectImpl::GetAngle(CbmRichRing* ring)
 		if (!hit) continue;
 		if (yHit-yRing == 0 || xHit-xRing == 0) continue;
 
-		if( xHit > xRing && yHit > yRing ){
-			fAlpha[iHit] = atan(fabs((yHit-yRing)/(xHit-xRing)));
-		}else if( xHit < xRing && yHit > yRing ){
-			fAlpha[iHit] = Pi - atan(fabs((yHit-yRing)/(xHit-xRing)));
-		}else if( xHit < xRing && yHit < yRing ){
-			fAlpha[iHit] = Pi + atan(fabs((yHit-yRing)/(xHit-xRing)));
-		} else if( xHit > xRing && yHit < yRing ){
-			fAlpha[iHit] = TwoPi - atan(fabs((yHit-yRing)/(xHit-xRing)));
+		if( xHit > xRing){
+			if (yHit > yRing){
+				fAlpha[iHit] = atan(fabs((yHit-yRing)/(xHit-xRing)));
+			} else{
+				fAlpha[iHit] = TwoPi - atan(fabs((yHit-yRing)/(xHit-xRing)));
+			}
+		}else {
+			if (yHit > yRing){
+				fAlpha[iHit] = Pi - atan(fabs((yHit-yRing)/(xHit-xRing)));
+			}else {
+				fAlpha[iHit] = Pi + atan(fabs((yHit-yRing)/(xHit-xRing)));
+			}
 		}
     }
 

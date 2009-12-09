@@ -39,6 +39,9 @@ void trd_elid_trainANN_txt(Int_t paramNum = 1, Int_t fileNum = 0)
 	gSystem->Load("libPassive");
 	gSystem->Load("libTMVA");
 	gSystem->Load("libTrd");
+//
+//	paramNum = 1;
+//	fileNum = 2;
 
 	TString fileNumSt;
 	if (fileNum == 0)fileNumSt = "0000";
@@ -59,12 +62,13 @@ void trd_elid_trainANN_txt(Int_t paramNum = 1, Int_t fileNum = 0)
 
 	cout << "-I- Current file number is " << fileNumSt << endl;
 	TString geoType = "st";
-	TString inputDir = "/d/cbm02/slebedev/trd/JUL09/reco/"+paramSt+"/st/";
+	TString inputDir = "/d/cbm06/user/slebedev/trd/JUL09/reco/"+paramSt+"/st/";
 	fileNameEl = inputDir + geoType + "_" + "electrons_mom_" + fileNumSt	+ ".txt";
 	fileNamePi = inputDir + geoType + "_" + "pions_mom_" + fileNumSt + ".txt";
 	fileNameTestEl = inputDir + geoType + "_" + "electrons_mom_" + fileNumSt	+ ".txt";
 	fileNameTestPi = inputDir + geoType + "_" + "pions_mom_" + fileNumSt	+ ".txt";
-	fileNameCumHistos ="/d/cbm02/slebedev/trd/JUL09/reco/"+paramSt+"/st/piel."+fileNumSt+".reco.root";
+	fileNameCumHistos ="/d/cbm06/user/slebedev/trd/JUL09/reco/"+paramSt+"/st/piel."+fileNumSt+".reco.root";
+	weightFileDir="weights/"+paramSt+"_"+fileNumSt;
 
 	CbmTrdElectronsTrainAnn* trainer = new CbmTrdElectronsTrainAnn();
 	trainer->SetFileNameEl(fileNameEl);
@@ -72,16 +76,17 @@ void trd_elid_trainANN_txt(Int_t paramNum = 1, Int_t fileNum = 0)
 	trainer->SetFileNameTestEl(fileNameTestEl);
 	trainer->SetFileNameTestPi(fileNameTestPi);
 	trainer->SetFileNameCumHistos(fileNameCumHistos);
+	trainer->SetWeightFileDir(weightFileDir);
 	trainer->SetNofHiddenNeurons(12);
 	trainer->SetNofAnnEpochs(250);
-	trainer->SetMaxNofTrainPi(6000);
-	trainer->SetMaxNofTrainEl(6000);
+	trainer->SetMaxNofTrainPi(3000);
+	trainer->SetMaxNofTrainEl(3000);
 
 	//Cut will be calculated automatically, taken into account 90% of electron efficiency
 	trainer->SetIsDoTrain(true);
 	trainer->SetTransformType(3);
 	//kANN = 0, kBDT = 1, kCLUSTERS = 2, kMEDIANA = 3, kLIKELIHOOD = 4
-	trainer->SetIdMethod(0);
+	trainer->SetIdMethod(1);
 	trainer->Run();
 	//trainer->DrawHistos();
 

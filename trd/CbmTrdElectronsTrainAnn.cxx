@@ -7,7 +7,7 @@
 #include "TRandom.h"
 #include "TCanvas.h"
 #include "TMVA/PDF.h"
-
+#include "TMVA/Config.h"
 #include <iostream>
 #include <vector>
 using std::cout;
@@ -476,6 +476,7 @@ void CbmTrdElectronsTrainAnn::DoTrainTmva()
 	finEl.close();
 
 	TMVA::Factory* factory = CreateFactory(simu);
+	(TMVA::gConfig().GetIONames()).fWeightFileDir = fWeightFileDir;
 
 	TCut mycuts = "";
 	TCut mycutb = "";
@@ -529,7 +530,7 @@ void CbmTrdElectronsTrainAnn::DoPreTest()
 	if (fIdMethod == kBDT){
 		fReader = CreateTmvaReader();
 		//reader->BookMVA("TMlpANN", "weights/TMVAnalysis_TMlpANN.weights.txt");
-		fReader->BookMVA("BDT", "weights/TMVAnalysis_BDT.weights.xml");
+		fReader->BookMVA("BDT", fWeightFileDir+"/TMVAnalysis_BDT.weights.xml");
 	} else if (fIdMethod == kANN){
 		if (fNN != NULL) delete fNN;
 		TTree* simu = CreateTree();
@@ -611,7 +612,7 @@ void CbmTrdElectronsTrainAnn::DoTest()
 	if (fIdMethod == kBDT){
 		fReader = CreateTmvaReader();
 		//reader->BookMVA("TMlpANN", "weights/TMVAnalysis_TMlpANN.weights.txt");
-		fReader->BookMVA("BDT", "weights/TMVAnalysis_BDT.weights.xml");
+		fReader->BookMVA("BDT", fWeightFileDir+"/TMVAnalysis_BDT.weights.xml");
 	} else if (fIdMethod == kANN){
 		if (fNN != NULL) delete fNN;
 		TTree* simu = CreateTree();

@@ -71,6 +71,7 @@ public:
 		fFileNameCumHistos = fileNameCumHistos;
 		InitCumHistos();
 	}
+	void SetWeightFileDir(TString weightFileDir){fWeightFileDir = weightFileDir;}
 	void SetNofHiddenNeurons(Int_t nofHiddenNeurons){fNofHiddenNeurons=nofHiddenNeurons;}
 	void SetNofAnnEpochs(Int_t nofAnnEpochs){fNofAnnEpochs=nofAnnEpochs;}
 	void SetMaxNofTrainPi(Int_t nofPi){fMaxNofTrainPi = nofPi;}
@@ -84,6 +85,7 @@ private:
 	TString fFileNameTestEl;
 	TString fFileNameTestPi;
 	TString fFileNameCumHistos;
+	TString fWeightFileDir;
 
 	Bool_t fIsDoTrain;
 	Int_t fTransformType;

@@ -417,7 +417,7 @@ void CbmTrdElectronsTrainAnn::DoTrain()
 	cout << "-I- create ANN: "<< mlpString << endl;
 	cout << "-I- number of training epochs = " << fNofAnnEpochs << endl;
 	fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
-	fNN->Train(fNofAnnEpochs, "+text,update=50");
+	fNN->Train(fNofAnnEpochs, "+text,update=10");
 	fNN->DumpWeights((const char*)fAnnWeightsFile);
 }
 
@@ -480,9 +480,9 @@ void CbmTrdElectronsTrainAnn::DoTrainTmva()
 	TCut mycuts = "";
 	TCut mycutb = "";
 	factory->PrepareTrainingAndTestTree(mycuts, mycutb,
-			"NSigTrain=0:NBkgTrain=0:SplitMode=Random:NormMode=NumEvents:!V");
+			"SplitMode=Random:NormMode=NumEvents:!V");
 
-	//factory->BookMethod(TMVA::Types::kTMlpANN, "TMlpANN","!H:!V:NCycles=50:HiddenLayers=N+1");
+//	factory->BookMethod(TMVA::Types::kTMlpANN, "TMlpANN","!H:!V:NCycles=50:HiddenLayers=N+1");
 
 	factory->BookMethod(TMVA::Types::kBDT,"BDT",
 			"!H:!V:NTrees=400:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:PruneMethod=CostComplexity:PruneStrength=4.5");
@@ -529,7 +529,7 @@ void CbmTrdElectronsTrainAnn::DoPreTest()
 	if (fIdMethod == kBDT){
 		fReader = CreateTmvaReader();
 		//reader->BookMVA("TMlpANN", "weights/TMVAnalysis_TMlpANN.weights.txt");
-		fReader->BookMVA("BDT", "weights/TMVAnalysis_BDT.weights.txt");
+		fReader->BookMVA("BDT", "weights/TMVAnalysis_BDT.weights.xml");
 	} else if (fIdMethod == kANN){
 		if (fNN != NULL) delete fNN;
 		TTree* simu = CreateTree();
@@ -611,7 +611,7 @@ void CbmTrdElectronsTrainAnn::DoTest()
 	if (fIdMethod == kBDT){
 		fReader = CreateTmvaReader();
 		//reader->BookMVA("TMlpANN", "weights/TMVAnalysis_TMlpANN.weights.txt");
-		fReader->BookMVA("BDT", "weights/TMVAnalysis_BDT.weights.txt");
+		fReader->BookMVA("BDT", "weights/TMVAnalysis_BDT.weights.xml");
 	} else if (fIdMethod == kANN){
 		if (fNN != NULL) delete fNN;
 		TTree* simu = CreateTree();

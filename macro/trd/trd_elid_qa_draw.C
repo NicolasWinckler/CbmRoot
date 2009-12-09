@@ -69,7 +69,7 @@ void trd_elid_qa_draw()
 	gStyle->SetPalette(1,0);
     gStyle->SetHistLineWidth(3);
 
-	TFile* file = new TFile("/d/cbm02/slebedev/trd/JUL09/reco/param1/st/piel.0009.reco.root");
+	TFile* file = new TFile("/d/cbm06/user/slebedev/trd/JUL09/reco/param1/st/piel.0009.reco.root");
 
     fhPiELossSum->SetLineWidth(3);
     fhElELossSum->SetLineWidth(3);
@@ -254,7 +254,6 @@ void trd_elid_qa_draw()
 	fhElNofClusters->SetLineStyle(2);
 	fhElElossRMS->SetLineStyle(2);
 	fhElElossMediana->SetLineStyle(2);
-	fhElElossRMSMed->SetLineStyle(2);
 	c5->cd(1);
 	fhElNofClusters->SetMaximum(1.2*TMath::Max(fhElNofClusters->GetMaximum(),
 			fhPiNofClusters->GetMaximum()));

@@ -95,6 +95,11 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
      */
     void SetMeanNoise(UInt_t meanNoise) { fMeanNoise = meanNoise; }
 
+    /**
+     * Sets the probability (normalized to unity) to find a dead pad.
+     */
+    void SetDeadPadsFrac(Double_t deadPadsFrac) { fDeadPadsFrac = deadPadsFrac; }
+
     /** Sets the time resolution. **/
     void SetDTime(Double_t dTime) { fDTime = dTime; }
 
@@ -132,6 +137,7 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     Int_t              fEvent;         // Event counter
     TRandom3*          fRnd;           // Random generator
     TRandom*           fLandauRnd;     // Random Landau distr. generator
+    Double_t           fDeadPadsFrac;  // Probability to find a dead pad
     TStopwatch         fTimer;         // Timer
 
     /** Map of active channels to index of MuchDigi. **/

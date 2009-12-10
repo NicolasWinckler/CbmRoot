@@ -59,6 +59,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
   fMeanGasGain = 1e4;
   fRnd = new TRandom3();
   fLandauRnd = new TRandom();
+  fDeadPadsFrac = 0;
 
   Reset();
 }
@@ -81,6 +82,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(Int_t iVerbose) :
   fMeanGasGain = 1e4;
   fRnd = new TRandom3();
   fLandauRnd = new TRandom();
+  fDeadPadsFrac = 0;
 
   Reset();
 }
@@ -104,6 +106,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const c
   fMeanGasGain = 1e4;
   fRnd = new TRandom3();
   fLandauRnd = new TRandom();
+  fDeadPadsFrac = 0;
 
   Reset();
 }
@@ -453,8 +456,9 @@ void CbmMuchDigitizeAdvancedGem::FirePads() {
     pair<Int_t, Long64_t> uniqueId = (*it).first;
     CbmMuchDigi* digi = (*it).second;
     CbmMuchDigiMatch* match = fChargedMatches[uniqueId];
-    //assert(match->GetTotalCharge() == digi->GetCharge());
-    if (match->GetTotalCharge() > fQThreshold) {
+    Double_t rnd = fRnd->Rndm();
+    if (match->GetTotalCharge() > fQThreshold &&
+        rnd > fDeadPadsFrac) {
       Int_t iDigi = -1;
       if (fChannelMap.find(uniqueId) == fChannelMap.end()) {
         iDigi = fDigis->GetEntriesFast();

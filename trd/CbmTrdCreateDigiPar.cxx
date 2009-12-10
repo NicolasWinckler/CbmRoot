@@ -1,5 +1,6 @@
 #include "CbmTrdCreateDigiPar.h"
 
+#include "CbmTrdPads.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdDigiPar.h"
 
@@ -156,7 +157,7 @@ void CbmTrdCreateDigiPar::GetModuleInformation()
 void CbmTrdCreateDigiPar::CalculateModuleId() {
 
   Int_t sector = 0;
-  Int_t detInfo_array[6]={kTRD, fStation,fLayer,fModuleType,fModuleCopy,0};      
+  Int_t detInfo_array[6]={kTRD, fStation, fLayer, fModuleType, fModuleCopy, 0};      
   fModuleID = fTrdDetId.SetDetectorInfo(detInfo_array);
 
 }
@@ -210,12 +211,124 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
               //Layer 2 and 4 have resolution in y-direction (Orientation=0)
               Int_t Orientation=fLayer%2;
 
-              if( 1 == Orientation) {
-                fpadsizex = 0.5;
-                fpadsizey = 2;
-              } else {
-                fpadsizex = 2.;
-                fpadsizey = 0.5;
+//--------------------------------------------------------------------------------
+//    Int_t fStation;
+//    Int_t fLayer;
+//    Int_t fModuleType;
+//    Int_t fModuleCopy;
+
+//--------------------------------------------------------------------------------
+// station 1
+// 2 + 6 + 4 + 8 + 6 + 30
+// 2   8  12  20  26   56
+
+              if (fStation==1)
+                if (fModuleType==1)
+                  if (fModuleCopy <= 2)
+                    {
+                      fpadsizex = fst1_pad_type[0][0];
+                      fpadsizey = fst1_pad_type[0][1];
+                    }
+                  else
+                    {
+                      fpadsizex = fst1_pad_type[1][0];
+                      fpadsizey = fst1_pad_type[1][1];
+                    }
+                if (fModuleType==2)
+                  if (fModuleCopy <= 4)
+                    {
+                      fpadsizex = fst1_pad_type[2][0];
+                      fpadsizey = fst1_pad_type[2][1];
+                    }
+                  else
+                    {
+                      fpadsizex = fst1_pad_type[3][0];
+                      fpadsizey = fst1_pad_type[3][1];
+                    }
+                if (fModuleType==3)
+                  if (fModuleCopy <= 6)
+                    {
+                      fpadsizex = fst1_pad_type[4][0];
+                      fpadsizey = fst1_pad_type[4][1];
+                    }
+                  else
+                    {
+                      fpadsizex = fst1_pad_type[5][0];
+                      fpadsizey = fst1_pad_type[5][1];
+                    }
+
+//--------------------------------------------------------------------------------
+// station 2
+// 2 + 6 + 4 + 8 + 6 + 74
+// 2   8  12  20  26  100
+
+              if (fStation==2)
+                if (fModuleType==1)
+                  if (fModuleCopy <= 2)
+                    {
+                      fpadsizex = fst2_pad_type[0][0];
+                      fpadsizey = fst2_pad_type[0][1];
+                    }
+                  else
+                    {
+                      fpadsizex = fst2_pad_type[1][0];
+                      fpadsizey = fst2_pad_type[1][1];
+                    }
+                if (fModuleType==2)
+                  if (fModuleCopy <= 4)
+                    {
+                      fpadsizex = fst2_pad_type[2][0];
+                      fpadsizey = fst2_pad_type[2][1];
+                    }
+                  else
+                    {
+                      fpadsizex = fst2_pad_type[3][0];
+                      fpadsizey = fst2_pad_type[3][1];
+                    }
+                if (fModuleType==3)
+                  if (fModuleCopy <= 6)
+                    {
+                      fpadsizex = fst2_pad_type[4][0];
+                      fpadsizey = fst2_pad_type[4][1];
+                    }
+                  else
+                    {
+                      fpadsizex = fst2_pad_type[5][0];
+                      fpadsizey = fst2_pad_type[5][1];
+                    }
+
+//--------------------------------------------------------------------------------
+// station 3
+// 8 + 136
+// 2   144
+
+              if (fStation==3)
+                if (fModuleType==3)
+                  if (fModuleCopy <= 8)
+                    {
+                      fpadsizex = fst3_pad_type[0][0];
+                      fpadsizey = fst3_pad_type[0][1];
+                    }
+                  else
+                    {
+                      fpadsizex = fst3_pad_type[1][0];
+                      fpadsizey = fst3_pad_type[1][1];
+                    }
+
+//--------------------------------------------------------------------------------
+
+              //if( 1 == Orientation) {
+              //  fpadsizex = 0.5;
+              //  fpadsizey = 2;
+              //} else {
+              //  fpadsizex = 2.;
+              //  fpadsizey = 0.5;
+              //}
+
+              if( 0 == Orientation) {  // flip pads for even layers
+                Float_t copybuf = fpadsizex;
+                fpadsizex = fpadsizey;
+                fpadsizey = copybuf;
               }
               nmodules++;
 
@@ -248,6 +361,20 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
   fDigiPar->SetModuleIdArray(*ModuleId);
   fDigiPar->SetModuleRotArray(*ModuleRot);
   fDigiPar->SetModuleMap(fModuleMap);
+
+}
+
+void CbmTrdCreateDigiPar::FinishTask(){
+
+  cout<<" * CbmTrdCreateDigiPar * :: FinishTask() "<<endl;
+
+  FairRunAna* ana = FairRunAna::Instance();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
+
+  fDigiPar = (CbmTrdDigiPar*)
+      (rtdb->getContainer("CbmTrdDigiPar"));
+
+  fDigiPar->print();
 
 }
 

@@ -50,7 +50,7 @@ class CbmTrdCreateDigiPar : public FairTask {
     virtual void FinishEvent(){;}
  
    /** Finish task (called after all event) **/
-    virtual void FinishTask(){;}
+    virtual void FinishTask();
 
 
 private:
@@ -65,22 +65,22 @@ private:
     Int_t fModuleType;
     Int_t fModuleCopy;
 
-    Float_t fpadsizex; //pixel widh in x;
+    Float_t fpadsizex; //pixel width in x;
     Float_t fpadsizey; //pixel width in y;
-    Float_t fsizex; //module widh in x;
-    Float_t fsizey; //module width in y;
-    Int_t    fCol; //Calculated pixel column were the hit is in
-    Int_t    fRow; //Calculated pixel row were the hit is in
+    Float_t fsizex;    //module width in x;
+    Float_t fsizey;    //module width in y;
+    Int_t   fCol;      //Calculated pixel column were the hit is in
+    Int_t   fRow;      //Calculated pixel row were the hit is in
     Bool_t  fIsRotated;
 
-    Int_t fModuleID;//Unique number for detector module
+    Int_t   fModuleID; //Unique number for detector module
 
-    Float_t fPosX;//Hit position in chamber coordinates
-    Float_t fPosY;//Hit position in chamber coordinates
+    Float_t fPosX;     //Hit position in chamber coordinates
+    Float_t fPosY;     //Hit position in chamber coordinates
 
     /** Map of Unique Trd Module Id to corresponding TrdModule **/
     std::map<Int_t, CbmTrdModule*> fModuleMap;                  //!   
-    std::map<Int_t, CbmTrdModule*>::iterator fModuleMapIt;                  //!   
+    std::map<Int_t, CbmTrdModule*>::iterator fModuleMapIt;      //!   
     CbmTrdDigiPar *fDigiPar;
 
     CbmTrdDetectorId fTrdDetId;

@@ -292,6 +292,10 @@ void CbmTrdHitProducerDigi::CalculateHitPosition() {
   local_point[0] = ((fCol+0.5) * fpadsizex) - fsizex + (fpadsizex/2);
   local_point[1] = ((fRow+0.5) * fpadsizey) - fsizey + (fpadsizey/2);
 
+  fPosX=local_point[0]+fModuleInfo->GetX();
+  fPosY=local_point[1]+fModuleInfo->GetY();
+  fPosZ=fModuleInfo->GetZ();
+
   /*
   cout<<"###################################"<<endl;
   cout<<"Col: "<< fCol <<endl;
@@ -303,9 +307,6 @@ void CbmTrdHitProducerDigi::CalculateHitPosition() {
   cout<<"localx: "<<  local_point[0] <<endl;
   cout<<"localy: "<<  local_point[1] <<endl;
 
-  fPosX=local_point[0]+fModuleInfo->GetX();
-  fPosY=local_point[1]+fModuleInfo->GetY();
-  fPosZ=fModuleInfo->GetZ();
   cout<<"fPosX: "<<  fPosX <<endl;
   cout<<"fPosY: "<<  fPosY <<endl;
   cout<<"###################################"<<endl;

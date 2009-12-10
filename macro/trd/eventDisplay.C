@@ -19,6 +19,7 @@ eventDisplay()
   gSystem->Load("libEcal");
   gSystem->Load("libEve");
   gSystem->Load("libEventDisplay");
+  gSystem->Load("libCbmDisplay");
 
                                      
   // -----   Reconstruction run   -------------------------------------------
@@ -40,8 +41,6 @@ eventDisplay()
   rtdb->setSecondInput(parIo2);
   // ------------------------------------------------------------------------
 
-  //  fRun->LoadGeometry();
-
   FairEventManager *fMan= new FairEventManager();
   FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
   FairMCPointDraw *TrdPoints =   new FairMCPointDraw ("TRDPoint",kBlue,  kFullSquare);
@@ -51,7 +50,7 @@ eventDisplay()
   fMan->AddTask(Track);
   
   fMan->AddTask(TrdPoints);
-//  fMan->AddTask(TrdHits);
+  fMan->AddTask(TrdHits);
   fMan->AddTask(TrdDigis);
     
   fMan->Init();                     

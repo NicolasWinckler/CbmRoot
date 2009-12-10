@@ -1,15 +1,24 @@
+/** LitHit.h
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
+ *
+ * Hit data classes for fast parallel version of the Littrack tracking.
+ **/
+
 #ifndef LITHIT_H_
 #define LITHIT_H_
 
 #include "LitTypes.h"
 
+template<class T>
 class LitStripHit
 {
 public:
-	fvec phiCos;
-	fvec phiSin;
-	fvec U;
-	fvec Du;
+	T phiCos;
+	T phiSin;
+	T U;
+	T Du;
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitStripHit &hit){
 		strm << "LitStripHit: " << "phiCos=" << hit.phiCos << " phiSin=" << hit.phiSin
@@ -18,25 +27,16 @@ public:
 			<< std::endl;
 		return strm;
 	}
-
-	friend std::ostream & operator<<(std::ostream &strm, const LitStripHit *hit){
-		strm << "LitStripHit: " << "phiCos=" << hit->phiCos << " phiSin=" << hit->phiSin
-			<< " U=" << hit->U << " Du=" << hit->Du
-//			<< " planeId=" << (int)hit->planeId
-			<< std::endl;
-		return strm;
-	}
-
 } _fvecalignment;
 
 
-
+template<class T>
 class LitPixelHit
 {
 public:
-	fvec X, Y;
-	fvec Dx, Dy;
-	fvec Dxy;
+	T X, Y;
+	T Dx, Dy;
+	T Dxy;
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitPixelHit &hit){
 		strm << "LitPixelHit: " << "X=" << hit.X << " Y=" << hit.Y
@@ -45,15 +45,6 @@ public:
 			<< std::endl;
 		return strm;
 	}
-
-	friend std::ostream & operator<<(std::ostream &strm, const LitPixelHit *hit){
-		strm << "LitPixelHit: " << "X=" << hit->X << " Y=" << hit->Y
-			<< " Dx=" << hit->Dx << " Dy=" << hit->Dy << " Dxy" << hit->Dxy
-//			<< " planeId=" << (int)hit->planeId
-			<< std::endl;
-		return strm;
-	}
-
 } _fvecalignment;
 
 
@@ -75,14 +66,7 @@ public:
 			<< " refId=" << hit.refId << " Z=" << hit.Z << std::endl;
 		return strm;
 	}
-
-	friend std::ostream & operator<<(std::ostream &strm, const LitScalStripHit *hit){
-		strm << "LitScalStripHit: " << "phiCos=" << hit->phiCos << " phiSin=" << hit->phiSin
-			<< " U=" << hit->U << " Du=" << hit->Du << " planeId=" << (int)hit->planeId
-			<< " refId=" << hit->refId << " Z=" << hit->Z << std::endl;
-		return strm;
-	}
-} _fvecalignment;
+};// _fvecalignment;
 
 
 
@@ -102,14 +86,7 @@ public:
 			<< " planeId=" << (int)hit.planeId << " refId=" << hit.refId << " Z=" << hit.Z << std::endl;
 		return strm;
 	}
-
-	friend std::ostream & operator<<(std::ostream &strm, const LitScalPixelHit *hit){
-		strm << "LitScalPixelHit: " << "X=" << hit->X << " Y=" << hit->Y
-			<< " Dx=" << hit->Dx << " Dy=" << hit->Dy << " Dxy=" << hit->Dxy
-			<< " planeId=" << (int)hit->planeId << " refId=" << hit->refId << " Z=" << hit->Z << std::endl;
-		return strm;
-	}
-} _fvecalignment;
+};// _fvecalignment;
 
 
 #endif /* LITHIT_H_ */

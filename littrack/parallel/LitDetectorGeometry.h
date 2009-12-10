@@ -3,7 +3,7 @@
  * @since 2009
  * @version 1.0
  *
- * Classe for geometry description for the Littrack parallel
+ * Classes for geometry description for the Littrack parallel
  * version of the tracking.
  **/
 
@@ -19,12 +19,13 @@ const unsigned char MAX_NOF_STATION_GROUPS = 6;
 const unsigned char MAX_NOF_STATIONS = 4;
 const unsigned char MAX_NOF_SUBSTATIONS = 2;
 
+template<class T>
 class LitSubstation
 {
 public:
-	fvec Z;
-	LitMaterialInfo material;
-	LitFieldSlice fieldSlice;
+	T Z;
+	LitMaterialInfo<T> material;
+	LitFieldSlice<T> fieldSlice;
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitSubstation &substation ){
 		strm << "LitSubstation: " << "Z=" << substation.Z << ", material=" << substation.material;
@@ -33,14 +34,18 @@ public:
 	}
 } _fvecalignment;
 
+typedef LitSubstation<fvec> LitSubstationVec;
+typedef LitSubstation<fscal> LitSubstationScal;
 
 
+
+template<class T>
 class LitStation
 {
 public:
 	LitStation():nofSubstations(0){}
 
-	void AddSubstation(const LitSubstation& substation) {
+	void AddSubstation(const LitSubstation<T>& substation) {
 		substations[nofSubstations++] = substation;
 	}
 
@@ -51,7 +56,7 @@ public:
 	// Type of hits on the station
 	LitHitType type;
 	// array with substations in the station
-	LitSubstation substations[MAX_NOF_SUBSTATIONS];
+	LitSubstation<T> substations[MAX_NOF_SUBSTATIONS];
 	// number of substations
 	unsigned char nofSubstations;
 
@@ -65,15 +70,19 @@ public:
 
 } _fvecalignment;
 
+typedef LitStation<fvec> LitStationVec;
+typedef LitStation<fscal> LitStationScal;
 
 
+
+template<class T>
 class LitAbsorber
 {
 public:
-	fvec Z;
-	LitMaterialInfo material;
-	LitFieldSlice fieldSliceFront;
-	LitFieldSlice fieldSliceBack;
+	T Z;
+	LitMaterialInfo<T> material;
+	LitFieldSlice<T> fieldSliceFront;
+	LitFieldSlice<T> fieldSliceBack;
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitAbsorber &absorber){
 		strm << "LitAbsorber: Z" << absorber.Z << ", material=" << absorber.material;
@@ -83,8 +92,12 @@ public:
 	}
 } _fvecalignment;
 
+typedef LitAbsorber<fvec> LitAbsorberVec;
+typedef LitAbsorber<fscal> LitAbsorberScal;
 
 
+
+template<class T>
 class LitStationGroup
 {
 public:
@@ -92,7 +105,7 @@ public:
 
 	virtual ~LitStationGroup() {}
 
-	void AddStation(const LitStation& station) {
+	void AddStation(const LitStation<T>& station) {
 		stations[nofStations++] = station;
 	}
 
@@ -101,11 +114,11 @@ public:
 	}
 
 	// array with stations in the station group
-	LitStation stations[MAX_NOF_STATIONS];
+	LitStation<T> stations[MAX_NOF_STATIONS];
 	// number of stations in the station group
 	unsigned char nofStations;
 	// absorber
-	LitAbsorber absorber;
+	LitAbsorber<T> absorber;
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitStationGroup &stationGroup){
 		strm << "LitStationGroup: " << "nofStations=" << stationGroup.GetNofStations() << std::endl;
@@ -117,14 +130,18 @@ public:
 	}
 } _fvecalignment;
 
+typedef LitStationGroup<fvec> LitStationGroupVec;
+typedef LitStationGroup<fscal> LitStationGroupScal;
 
 
+
+template<class T>
 class LitDetectorLayout
 {
 public:
 	LitDetectorLayout():nofStationGroups(0){};
 
-	void AddStationGroup(const LitStationGroup& stationGroup) {
+	void AddStationGroup(const LitStationGroup<T>& stationGroup) {
 		stationGroups[nofStationGroups++] = stationGroup;
 	}
 
@@ -140,20 +157,20 @@ public:
 		return stationGroups[stationGroup].stations[station].GetNofSubstations();
 	}
 
-	const LitStationGroup& GetStationGroup(unsigned char stationGroup) {
+	const LitStationGroup<T>& GetStationGroup(unsigned char stationGroup) {
 		return stationGroups[stationGroup];
 	}
 
-	const LitStation& GetStation(unsigned char stationGroup, unsigned char station) {
+	const LitStation<T>& GetStation(unsigned char stationGroup, unsigned char station) {
 		return stationGroups[stationGroup].stations[station];
 	}
 
-	const LitSubstation& GetSubstation(unsigned char stationGroup, unsigned char station, unsigned char substation){
+	const LitSubstation<T>& GetSubstation(unsigned char stationGroup, unsigned char station, unsigned char substation){
 		return stationGroups[stationGroup].stations[station].substations[substation];
 	}
 
 	// array with station groups
-    LitStationGroup stationGroups[MAX_NOF_STATION_GROUPS];
+    LitStationGroup<T> stationGroups[MAX_NOF_STATION_GROUPS];
     //number of station groups
     unsigned char nofStationGroups;
 
@@ -164,7 +181,9 @@ public:
 		}
 		return strm;
 	}
-
 } _fvecalignment;
+
+typedef LitDetectorLayout<fvec> LitDetectorLayoutVec;
+typedef LitDetectorLayout<fscal> LitDetectorLayoutScal;
 
 #endif

@@ -1,9 +1,10 @@
-/*
- * LitTrack.h
+/** LitTrack.h
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
  *
- *  Created on: Sep 24, 2009
- *      Author: andrey
- */
+ * Track data class for fast parallel version of the Littrack tracking.
+ **/
 
 #ifndef LITTRACK_H_
 #define LITTRACK_H_
@@ -29,8 +30,8 @@ public:
 		hits[nofHits++] = hit;
 	}
 
-	LitScalTrackParam paramFirst;
-	LitScalTrackParam paramLast;
+	LitTrackParam<fscal> paramFirst;
+	LitTrackParam<fscal> paramLast;
 	fscal chiSq;
 	unsigned short NDF;
 	LitScalPixelHit* hits[MAX_NOF_HITS_IN_TRACK];

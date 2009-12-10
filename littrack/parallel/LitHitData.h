@@ -4,6 +4,7 @@
  * @version 1.0
  **
  ** Class for accessing the hits in the track reconstruction.
+ ** It is used in the parallel version of the Littrack tracking.
  **/
 
 #ifndef LITHITDATA_H_
@@ -18,6 +19,7 @@
 // Maximum number of hits for station/substation
 const unsigned int MAX_NOF_HITS = 2000;
 
+template<class T>
 class LitHitData
 {
 public:
@@ -40,24 +42,8 @@ public:
 	 *@param layout Detector layout
 	 */
 	void SetDetectorLayout(
-			const LitDetectorLayout& layout){
+			const LitDetectorLayout<T>& layout){
 		fLayout = layout;
-//		unsigned char nofGroups = layout.GetNofStationGroups();
-//		fHits.resize(nofGroups);
-//		fMaxErr.resize(nofGroups);
-//		for(unsigned char i = 0; i < nofGroups; i++) {
-//			unsigned char nofStations = layout.stationGroups[i].GetNofStations();
-//			fHits[i].resize(nofStations);
-//			fMaxErr[i].resize(nofStations);
-//			for(unsigned char j = 0; j < nofStations; j++) {
-//				unsigned char nofSubstations = layout.stationGroups[i].stations[j].GetNofSubstations();
-//				fHits[i][j].resize(nofSubstations);
-//				fMaxErr[i][j].resize(nofSubstations);
-//				for(unsigned char k = 0; k < nofSubstations; k++) {
-//					fHits[i][j][k].reserve(1500);
-//				}
-//			}
-//		}
 	}
 
 	/* Adds the hit using station group, station and substation indices
@@ -192,7 +178,7 @@ public:
 	// Arrays with maximum hit position errors for each substation
 	fscal fMaxErr[MAX_NOF_STATION_GROUPS][MAX_NOF_STATIONS][MAX_NOF_SUBSTATIONS];
 
-	LitDetectorLayout fLayout;
+	LitDetectorLayout<T> fLayout;
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitHitData &hitData){
 		strm << "HitData:" << std::endl;
@@ -209,6 +195,6 @@ public:
 		return strm;
 	}
 
-};// _fvecalignment;
+} _fvecalignment;
 
 #endif /* LITHITDATA_H_ */

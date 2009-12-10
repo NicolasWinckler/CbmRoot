@@ -1,43 +1,57 @@
+/** LitFiltration.h
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
+ *
+ * Functions of the Kalman filter update step
+ * for parallel version of the tracking.
+ **/
+
 #ifndef LITFILTRATION_H_
 #define LITFILTRATION_H_
 
-#include "LitTypes.h"
+//#include "LitTypes.h"
 #include "LitHit.h"
 
-#define cnst static const fvec
-
+/* Function performs calculations of the Kalman filter update step,
+ * taking into account hit information, and updates
+ * track parameters and its covariance matrix.
+ * @param par Reference to INPUT/OUTPUT track parameters.
+ * @param mat Reference to pixel hit
+ */
+template<class T>
 inline void LitFiltration (
-		LitTrackParam &par,
-        const LitPixelHit &hit)
+		LitTrackParam<T>& par,
+        const LitPixelHit<T> &hit)
 {
-	cnst ONE = 1., TWO = 2.;
+	static const T ONE = 1., TWO = 2.;
 
-	fvec dxx = hit.Dx * hit.Dx;
-	fvec dxy = hit.Dxy;
-	fvec dyy = hit.Dy * hit.Dy;
+	T dxx = hit.Dx * hit.Dx;
+	T dxy = hit.Dxy;
+	T dyy = hit.Dy * hit.Dy;
 
 	// calculate residuals
-	fvec dx = hit.X - par.X;
-	fvec dy = hit.Y - par.Y;
+	T dx = hit.X - par.X;
+	T dy = hit.Y - par.Y;
 
 	// Calculate and inverse residual covariance matrix
-	fvec t = ONE / (dxx * dyy + dxx * par.C5 + dyy * par.C0 + par.C0 * par.C5 -
+	T t = ONE / (dxx * dyy + dxx * par.C5 + dyy * par.C0 + par.C0 * par.C5 -
 					dxy * dxy - TWO * dxy * par.C1 - par.C1 * par.C1);
-	fvec R00 = (dyy + par.C5) * t;
-	fvec R01 = -(dxy + par.C1) * t;
-	fvec R11 = (dxx + par.C0) * t;
+	T R00 = (dyy + par.C5) * t;
+	T R01 = -(dxy + par.C1) * t;
+	T R11 = (dxx + par.C0) * t;
 
 	 // Calculate Kalman gain matrix
-	fvec K00 = par.C0 * R00 + par.C1 * R01;
-	fvec K01 = par.C0 * R01 + par.C1 * R11;
-	fvec K10 = par.C1 * R00 + par.C5 * R01;
-	fvec K11 = par.C1 * R01 + par.C5 * R11;
-	fvec K20 = par.C2 * R00 + par.C6 * R01;
-	fvec K21 = par.C2 * R01 + par.C6 * R11;
-	fvec K30 = par.C3 * R00 + par.C7 * R01;
-	fvec K31 = par.C3 * R01 + par.C7 * R11;
-	fvec K40 = par.C4 * R00 + par.C8 * R01;
-	fvec K41 = par.C4 * R01 + par.C8 * R11;
+	T K00 = par.C0 * R00 + par.C1 * R01;
+	T K01 = par.C0 * R01 + par.C1 * R11;
+	T K10 = par.C1 * R00 + par.C5 * R01;
+	T K11 = par.C1 * R01 + par.C5 * R11;
+	T K20 = par.C2 * R00 + par.C6 * R01;
+	T K21 = par.C2 * R01 + par.C6 * R11;
+	T K30 = par.C3 * R00 + par.C7 * R01;
+	T K31 = par.C3 * R01 + par.C7 * R11;
+	T K40 = par.C4 * R00 + par.C8 * R01;
+	T K41 = par.C4 * R01 + par.C8 * R11;
 
 	// Calculate filtered state vector
 	par.X  += K00 * dx + K01 * dy;
@@ -47,7 +61,7 @@ inline void LitFiltration (
 	par.Qp += K40 * dx + K41 * dy;
 
 	// Calculate filtered covariance matrix
-   fvec cIn[15] = {par.C0,  par.C1,  par.C2,  par.C3,  par.C4,
+    T cIn[15] = {par.C0,  par.C1,  par.C2,  par.C3,  par.C4,
 		           par.C5,  par.C6,  par.C7,  par.C8,  par.C9,
 		           par.C10, par.C11, par.C12, par.C13, par.C14};
 
@@ -72,35 +86,42 @@ inline void LitFiltration (
 	par.C14 += -K40 * cIn[4] - K41 * cIn[8];
 }
 
+/* Function performs calculations of the Kalman filter update step,
+ * taking into account hit information, and updates
+ * track parameters and its covariance matrix.
+ * @param par Reference to INPUT/OUTPUT track parameters.
+ * @param mat Reference to strip hit
+ */
+template<class T>
 inline void LitFiltration(
-		LitTrackParam &par,
-		const LitStripHit &hit)
+		LitTrackParam<T>& par,
+		const LitStripHit<T>& hit)
 {
-	cnst ONE = 1., TWO = 2.;
+	static const T ONE = 1., TWO = 2.;
 
-	fvec duu = hit.Du * hit.Du;
-	fvec phiCosSq = hit.phiCos * hit.phiCos;
-	fvec phiSinSq = hit.phiSin * hit.phiSin;
-	fvec phi2SinCos = TWO * hit.phiCos * hit.phiSin;
+	T duu = hit.Du * hit.Du;
+	T phiCosSq = hit.phiCos * hit.phiCos;
+	T phiSinSq = hit.phiSin * hit.phiSin;
+	T phi2SinCos = TWO * hit.phiCos * hit.phiSin;
 
 	// residual
-	fvec r = hit.U - par.C0 * hit.phiCos - par.C1 * hit.phiSin;
-	fvec norm = duu + par.C0 * phiCosSq + phi2SinCos * par.C1 + par.C5 * phiSinSq;
+	T r = hit.U - par.C0 * hit.phiCos - par.C1 * hit.phiSin;
+	T norm = duu + par.C0 * phiCosSq + phi2SinCos * par.C1 + par.C5 * phiSinSq;
 	//	 myf norm = duu + cIn[0] * phiCos + cIn[5] * phiSin;
-	fvec R = rcp(norm);
+	T R = rcp(norm);
 
 	 // Calculate Kalman gain matrix
-	fvec K0 = par.C0 * hit.phiCos + par.C1 * hit.phiSin;
-	fvec K1 = par.C1 * hit.phiCos + par.C5 * hit.phiSin;
-	fvec K2 = par.C2 * hit.phiCos + par.C6 * hit.phiSin;
-	fvec K3 = par.C3 * hit.phiCos + par.C7 * hit.phiSin;
-	fvec K4 = par.C4 * hit.phiCos + par.C8 * hit.phiSin;
+	T K0 = par.C0 * hit.phiCos + par.C1 * hit.phiSin;
+	T K1 = par.C1 * hit.phiCos + par.C5 * hit.phiSin;
+	T K2 = par.C2 * hit.phiCos + par.C6 * hit.phiSin;
+	T K3 = par.C3 * hit.phiCos + par.C7 * hit.phiSin;
+	T K4 = par.C4 * hit.phiCos + par.C8 * hit.phiSin;
 
-	fvec KR0 = K0 * R;
-	fvec KR1 = K1 * R;
-	fvec KR2 = K2 * R;
-	fvec KR3 = K3 * R;
-	fvec KR4 = K4 * R;
+	T KR0 = K0 * R;
+	T KR1 = K1 * R;
+	T KR2 = K2 * R;
+	T KR3 = K3 * R;
+	T KR4 = K4 * R;
 
 	// Calculate filtered state vector
 	par.X += KR0 * r;
@@ -131,5 +152,4 @@ inline void LitFiltration(
 	par.C14 -= KR4 * K4;
 }
 
-#undef cnst
 #endif /* LITFILTRATION_H_ */

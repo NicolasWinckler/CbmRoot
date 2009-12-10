@@ -7,39 +7,41 @@
 #ifndef LITFIELD_H_
 #define LITFIELD_H_
 
+template<class T>
 class LitFieldValue
 {
 public:
 	// components of the magnetic field
-	fvec Bx, By, Bz;
+	T Bx, By, Bz;
 } _fvecalignment;
 
 
 
+template<class T>
 class LitFieldSlice
 {
 public:
 	LitFieldSlice() {
-		for(unsigned int i=0; i<10; i++) cx[i] = cy[i] = cz[i] = 0;
+		for(unsigned int i=0; i<10; i++) cx[i] = cy[i] = cz[i] = 0.;
     }
 
 	void GetFieldValue(
-			const fvec &x,
-			const fvec &y,
-			LitFieldValue &B) const {
-		fvec x2 = x*x;
-		fvec y2 = y*y;
-		fvec yx2 = y*x2;
-		fvec xy2 = x*y2;
-		fvec x3 = x2*x;
-		fvec y3 = y2*y;
+			const T &x,
+			const T &y,
+			LitFieldValue<T> &B) const {
+		T x2 = x*x;
+		T y2 = y*y;
+		T yx2 = y*x2;
+		T xy2 = x*y2;
+		T x3 = x2*x;
+		T y3 = y2*y;
 		B.Bx = cx[0] + cx[1]*x + cx[2]*y + cx[3]*x*y + cx[4]*x2 + cx[5]*y2 + cx[6]*xy2 + cx[7]*yx2 + cx[8]*x3 + cx[9]*y3;
 		B.By = cy[0] + cy[1]*x + cy[2]*y + cy[3]*x*y + cy[4]*x2 + cy[5]*y2 + cy[6]*xy2 + cy[7]*yx2 + cy[8]*x3 + cy[9]*y3;
 		B.Bz = cz[0] + cz[1]*x + cz[2]*y + cz[3]*x*y + cz[4]*x2 + cz[5]*y2 + cz[6]*xy2 + cz[7]*yx2 + cz[8]*x3 + cz[9]*y3;
     }
 
-	fvec cx[10], cy[10], cz[10]; // polinom coefficients
-	fvec Z; // Z position of the slice
+	T cx[10], cy[10], cz[10]; // polinom coefficients
+	T Z; // Z position of the slice
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitFieldSlice &slice){
 		strm << "LitFieldSlice: Z=" << slice.Z << ", cx=";
@@ -58,26 +60,27 @@ public:
 
 
 
+template<class T>
 class LitFieldRegion
 {
 public:
   void Set(
-		  const LitFieldValue &B0,
-		  const fvec B0z,
-		  const LitFieldValue &B1,
-		  const fvec B1z,
-		  const LitFieldValue &B2,
-		  const fvec B2z ) {
+		  const LitFieldValue<T> &B0,
+		  const T B0z,
+		  const LitFieldValue<T> &B1,
+		  const T B1z,
+		  const LitFieldValue<T> &B2,
+		  const T B2z ) {
       z0 = B0z[0];
-      fvec dz1 = B1z - B0z, dz2 = B2z - B0z;
-      fvec det = rcp(fvec(dz1 * dz2 * (dz2 - dz1)));
-      fvec w21 = -dz2 * det;
-      fvec w22 = dz1 * det;
-      fvec w11 = -dz2 * w21;
-      fvec w12 = -dz1 * w22;
+      T dz1 = B1z - B0z, dz2 = B2z - B0z;
+      T det = rcp(T(dz1 * dz2 * (dz2 - dz1)));
+      T w21 = -dz2 * det;
+      T w22 = dz1 * det;
+      T w11 = -dz2 * w21;
+      T w12 = -dz1 * w22;
 
-      fvec dB1 = B1.Bx - B0.Bx;
-      fvec dB2 = B2.Bx - B0.Bx;
+      T dB1 = B1.Bx - B0.Bx;
+      T dB2 = B2.Bx - B0.Bx;
       cx0 = B0.Bx;
       cx1 = dB1 * w11 + dB2 * w12;
       cx2 = dB1 * w21 + dB2 * w22;
@@ -96,12 +99,12 @@ public:
     }
 
 	void Set(
-			const LitFieldValue& B0,
-			const fvec B0z,
-			const LitFieldValue& B1,
-			const fvec B1z) {
+			const LitFieldValue<T>& B0,
+			const T B0z,
+			const LitFieldValue<T>& B1,
+			const T B1z) {
 		z0 = B0z[0];
-		fvec dzi = rcp(fvec(B1z - B0z));
+		T dzi = rcp(T(B1z - B0z));
 		cx0 = B0.Bx;
 		cy0 = B0.By;
 		cz0 = B0.Bz;
@@ -112,11 +115,11 @@ public:
 	}
 
 	void Shift(
-			fvec z) {
-		fvec dz = z-z0;
-		fvec cx2dz = cx2*dz;
-		fvec cy2dz = cy2*dz;
-		fvec cz2dz = cz2*dz;
+			T z) {
+		T dz = z-z0;
+		T cx2dz = cx2*dz;
+		T cy2dz = cy2*dz;
+		T cz2dz = cz2*dz;
 		z0 = z[0];
 		cx0+= ( cx1 + cx2dz )*dz;
 		cy0+= ( cy1 + cy2dz )*dz;
@@ -127,19 +130,19 @@ public:
 	}
 
 	void GetFieldValue(
-			const fvec &z,
-			LitFieldValue &B) const {
-		fvec dz = z - z0;
-		fvec dzdz = dz * dz;
+			const T &z,
+			LitFieldValue<T> &B) const {
+		T dz = z - z0;
+		T dzdz = dz * dz;
 		B.Bx = cx0 + cx1 * dz + cx2 * dzdz;
 		B.By = cy0 + cy1 * dz + cy2 * dzdz;
 		B.Bz = cz0 + cz1 * dz + cz2 * dzdz;
 	}
 
-	fvec cx0, cx1, cx2 ; // Bx(z) = cx0 + cx1*(z-z0) + cx2*(z-z0)^2
-	fvec cy0, cy1, cy2 ; // By(z) = cy0 + cy1*(z-z0) + cy2*(z-z0)^2
-	fvec cz0, cz1, cz2 ; // Bz(z) = cz0 + cz1*(z-z0) + cz2*(z-z0)^2
-	fvec z0;
+	T cx0, cx1, cx2 ; // Bx(z) = cx0 + cx1*(z-z0) + cx2*(z-z0)^2
+	T cy0, cy1, cy2 ; // By(z) = cy0 + cy1*(z-z0) + cy2*(z-z0)^2
+	T cz0, cz1, cz2 ; // Bz(z) = cz0 + cz1*(z-z0) + cz2*(z-z0)^2
+	T z0;
 } _fvecalignment;
 
 

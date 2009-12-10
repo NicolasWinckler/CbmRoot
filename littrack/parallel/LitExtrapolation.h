@@ -11,27 +11,26 @@
 #include "LitTrackParam.h"
 #include "LitField.h"
 
-#define cnst static const fvec
-
 /* Line track extrapolation for parallel version of the tracking.
  *@param par Input/Output track parameters.
  *@param zOut Z position to extrapolate to.
  */
+template<class T>
 inline void LitLineExtrapolation(
-		LitTrackParam& par,
-		fvec zOut)
+		LitTrackParam<T>& par,
+		T zOut)
 {
-    fvec dz = zOut - par.Z;
+    T dz = zOut - par.Z;
 
     // transport state vector F*X*F.T()
     par.X += dz * par.Tx;
     par.Y += dz * par.Ty;
 
     // transport covariance matrix F*C*F.T()
-    fvec t3 = par.C2 + dz * par.C9;
-    fvec t7 = dz * par.C10;
-    fvec t8 = par.C3 + t7;
-    fvec t19 = par.C7 + dz * par.C12;
+    T t3 = par.C2 + dz * par.C9;
+    T t7 = dz * par.C10;
+    T t8 = par.C3 + t7;
+    T t19 = par.C7 + dz * par.C12;
     par.C0 += dz * par.C2 + t3 * dz;
     par.C1 += dz * par.C6 + t8 * dz;
     par.C2 = t3;
@@ -48,36 +47,38 @@ inline void LitLineExtrapolation(
 /* Runge-Kutta track extrapolation for parallel version of the tracking.
  *@param par Input/Output track parameters.
  *@param zOut Z position to extrapolate to.
+ *@param field Reference to the field region.
  */
+template<class T>
 inline void LitRK4Extrapolation(
-		LitTrackParam& par,
-		fvec zOut,
-		const LitFieldRegion& field)
+		LitTrackParam<T>& par,
+		T zOut,
+		const LitFieldRegion<T>& field)
 {
-   cnst fC = 0.000299792458;
-   cnst ZERO = 0., ONE = 1., TWO = 2., C1_3 = 1./3., C1_6 = 1./6.;
+   static const T fC = 0.000299792458;
+   static const T ZERO = 0., ONE = 1., TWO = 2., C1_3 = 1./3., C1_6 = 1./6.;
 
-   fvec coef[4] = {0.0, 0.5, 0.5, 1.0};
+   T coef[4] = {0.0, 0.5, 0.5, 1.0};
 
-   fvec Ax[4], Ay[4];
-   fvec dAx_dtx[4], dAy_dtx[4], dAx_dty[4], dAy_dty[4];
-   fvec kx[4];
-   fvec ky[4];
-   fvec ktx[4];
-   fvec kty[4];
+   T Ax[4], Ay[4];
+   T dAx_dtx[4], dAy_dtx[4], dAx_dty[4], dAy_dty[4];
+   T kx[4];
+   T ky[4];
+   T ktx[4];
+   T kty[4];
 
-   fvec zIn = par.Z;
-   fvec h = zOut - zIn;
-   fvec hC   = h * fC;
-   fvec hCqp = h * fC * par.Qp;
-   fvec x0[4];
+   T zIn = par.Z;
+   T h = zOut - zIn;
+   T hC   = h * fC;
+   T hCqp = h * fC * par.Qp;
+   T x0[4];
 
-   fvec x[4] = {par.X, par.Y, par.Tx, par.Ty};
+   T x[4] = {par.X, par.Y, par.Tx, par.Ty};
 
-   fvec F[25]; // derivatives, transport matrix
+   T F[25]; // derivatives, transport matrix
 
    // Get field values
-   LitFieldValue B[4];
+   LitFieldValue<T> B[4];
    field.GetFieldValue(zIn + coef[0] * h, B[0]);
    field.GetFieldValue(zIn + coef[1] * h, B[1]);
    B[2] = B[1];
@@ -85,18 +86,18 @@ inline void LitRK4Extrapolation(
 
    // Calculation for zero step
    {
-   fvec Bx = B[0].Bx;
-   fvec By = B[0].By;
-   fvec Bz = B[0].Bz;
+   T Bx = B[0].Bx;
+   T By = B[0].By;
+   T Bz = B[0].Bz;
 
-   fvec tx = x[2];
-   fvec ty = x[3];
-   fvec txtx = tx * tx;
-   fvec tyty = ty * ty;
-   fvec txty = tx * ty;
-   fvec txtxtyty1 = ONE + txtx + tyty;
-   fvec t1 = sqrt(txtxtyty1);
-   fvec t2 = rcp(txtxtyty1); //1.0 / txtxtyty1;
+   T tx = x[2];
+   T ty = x[3];
+   T txtx = tx * tx;
+   T tyty = ty * ty;
+   T txty = tx * ty;
+   T txtxtyty1 = ONE + txtx + tyty;
+   T t1 = sqrt(txtxtyty1);
+   T t2 = rcp(txtxtyty1); //1.0 / txtxtyty1;
 
    Ax[0] = ( txty * Bx + ty * Bz - ( ONE + txtx ) * By ) * t1;
    Ay[0] = (-txty * By - tx * Bz + ( ONE + tyty ) * Bx ) * t1;
@@ -120,18 +121,18 @@ inline void LitRK4Extrapolation(
    	  x[2] = par.Tx + coef[iStep] * ktx[iStep - 1];
    	  x[3] = par.Ty + coef[iStep] * kty[iStep - 1];
 
-      fvec Bx = B[iStep].Bx;
-      fvec By = B[iStep].By;
-      fvec Bz = B[iStep].Bz;
+      T Bx = B[iStep].Bx;
+      T By = B[iStep].By;
+      T Bz = B[iStep].Bz;
 
-      fvec tx = x[2];
-      fvec ty = x[3];
-      fvec txtx = tx * tx;
-      fvec tyty = ty * ty;
-      fvec txty = tx * ty;
-      fvec txtxtyty1 = ONE + txtx + tyty;
-      fvec t1 = sqrt(txtxtyty1);
-      fvec t2 = rcp(txtxtyty1); //1.0 / txtxtyty1;
+      T tx = x[2];
+      T ty = x[3];
+      T txtx = tx * tx;
+      T tyty = ty * ty;
+      T txty = tx * ty;
+      T txtxtyty1 = ONE + txtx + tyty;
+      T t1 = sqrt(txtxtyty1);
+      T t2 = rcp(txtxtyty1); //1.0 / txtxtyty1;
 
       Ax[iStep] = ( txty * Bx + ty * Bz - ( ONE + txtx ) * By ) * t1;
       Ay[iStep] = (-txty * By - tx * Bz + ( ONE + tyty ) * Bx ) * t1;
@@ -198,10 +199,10 @@ inline void LitRK4Extrapolation(
       kty[iStep] = (dAy_dtx[iStep] * x[2] + dAy_dty[iStep] * x[3]) * hCqp;
    } // 2
 
-   F[2]  = x0[0] + kx[0] * C1_6 + kx[1] * C1_3 + kx[2] * C1_3 + kx[3] * C1_6;//CalcOut(x0[0], k[0]);
-   F[7]  = x0[1] + ky[0] * C1_6 + ky[1] * C1_3 + ky[2] * C1_3 + ky[3] * C1_6;//CalcOut(x0[1], k[1]);
+   F[2]  = x0[0] + kx[0] * C1_6 + kx[1] * C1_3 + kx[2] * C1_3 + kx[3] * C1_6;
+   F[7]  = x0[1] + ky[0] * C1_6 + ky[1] * C1_3 + ky[2] * C1_3 + ky[3] * C1_6;
    F[12] = ONE;
-   F[17] = x0[3] + kty[0] * C1_6 + kty[1] * C1_3 + kty[2] * C1_3 + kty[3] * C1_6;//CalcOut(x0[3], k[3]);
+   F[17] = x0[3] + kty[0] * C1_6 + kty[1] * C1_3 + kty[2] * C1_3 + kty[3] * C1_6;
    F[22] = ZERO;
    // end of derivatives dx/dtx
 
@@ -260,10 +261,10 @@ inline void LitRK4Extrapolation(
 		kty[iStep] = Ay[iStep] * hC + hCqp * (dAy_dtx[iStep] * x[2] + dAy_dty[iStep] * x[3]);
    }  // 4
 
-   F[4]  = x0[0] + kx[0] * C1_6 + kx[1] * C1_3 + kx[2] * C1_3 + kx[3] * C1_6; //CalcOut(x0[0], k[0]);
-   F[9]  = x0[1] + ky[0] * C1_6 + ky[1] * C1_3 + ky[2] * C1_3 + ky[3] * C1_6; //CalcOut(x0[1], k[1]);
-   F[14] = x0[2] + ktx[0] * C1_6 + ktx[1] * C1_3 + ktx[2] * C1_3 + ktx[3] * C1_6; //CalcOut(x0[2], k[2]);
-   F[19] = x0[3] + kty[0] * C1_6 + kty[1] * C1_3 + kty[2] * C1_3 + kty[3] * C1_6; //CalcOut(x0[3], k[3]);
+   F[4]  = x0[0] + kx[0] * C1_6 + kx[1] * C1_3 + kx[2] * C1_3 + kx[3] * C1_6;
+   F[9]  = x0[1] + ky[0] * C1_6 + ky[1] * C1_3 + ky[2] * C1_3 + ky[3] * C1_6;
+   F[14] = x0[2] + ktx[0] * C1_6 + ktx[1] * C1_3 + ktx[2] * C1_3 + ktx[3] * C1_6;
+   F[19] = x0[3] + kty[0] * C1_6 + kty[1] * C1_3 + kty[2] * C1_3 + kty[3] * C1_6;
    F[24] = 1.;
    // end of derivatives dx/dqp
 
@@ -272,23 +273,23 @@ inline void LitRK4Extrapolation(
 
    // Transport C matrix
    {
-   fvec cIn[15] = {par.C0,  par.C1,  par.C2,  par.C3,  par.C4,
+   T cIn[15] = {par.C0,  par.C1,  par.C2,  par.C3,  par.C4,
 		           par.C5,  par.C6,  par.C7,  par.C8,  par.C9,
 		           par.C10, par.C11, par.C12, par.C13, par.C14};
 	// F*C*Ft
-	fvec A = cIn[2] + F[2] * cIn[9] + F[3] * cIn[10] + F[4] * cIn[11];
-	fvec B = cIn[3] + F[2] * cIn[10] + F[3] * cIn[12] + F[4] * cIn[13];
-	fvec C = cIn[4] + F[2] * cIn[11] + F[3] * cIn[13] + F[4] * cIn[14];
+	T A = cIn[2] + F[2] * cIn[9] + F[3] * cIn[10] + F[4] * cIn[11];
+	T B = cIn[3] + F[2] * cIn[10] + F[3] * cIn[12] + F[4] * cIn[13];
+	T C = cIn[4] + F[2] * cIn[11] + F[3] * cIn[13] + F[4] * cIn[14];
 
-	fvec D = cIn[6] + F[7] * cIn[9] + F[8] * cIn[10] + F[9] * cIn[11];
-	fvec E = cIn[7] + F[7] * cIn[10] + F[8] * cIn[12] + F[9] * cIn[13];
-	fvec G = cIn[8] + F[7] * cIn[11] + F[8] * cIn[13] + F[9] * cIn[14];
+	T D = cIn[6] + F[7] * cIn[9] + F[8] * cIn[10] + F[9] * cIn[11];
+	T E = cIn[7] + F[7] * cIn[10] + F[8] * cIn[12] + F[9] * cIn[13];
+	T G = cIn[8] + F[7] * cIn[11] + F[8] * cIn[13] + F[9] * cIn[14];
 
-	fvec H = cIn[9] + F[13] * cIn[10] + F[14] * cIn[11];
-	fvec I = cIn[10] + F[13] * cIn[12] + F[14] * cIn[13];
-	fvec J = cIn[11] + F[13] * cIn[13] + F[14] * cIn[14];
+	T H = cIn[9] + F[13] * cIn[10] + F[14] * cIn[11];
+	T I = cIn[10] + F[13] * cIn[12] + F[14] * cIn[13];
+	T J = cIn[11] + F[13] * cIn[13] + F[14] * cIn[14];
 
-	fvec K = cIn[13] + F[17] * cIn[11] + F[19] * cIn[14];
+	T K = cIn[13] + F[17] * cIn[11] + F[19] * cIn[14];
 
 	par.C0 = cIn[0] + F[2] * cIn[2] + F[3] * cIn[3] + F[4] * cIn[4] + A * F[2] + B * F[3] + C * F[4];
 	par.C1 = cIn[1] + F[2] * cIn[6] + F[3] * cIn[7] + F[4] * cIn[8] + A * F[7] + B * F[8] + C * F[9];
@@ -315,5 +316,4 @@ inline void LitRK4Extrapolation(
 	par.Z = zOut;
 }
 
-#undef cnst
 #endif

@@ -40,7 +40,7 @@ public:
 			LitTrack* tracks[],
 			unsigned int &nofTracks);
 
-	void SetDetectorLayout(LitDetectorLayout& layout) {
+	void SetDetectorLayout(LitDetectorLayout<fvec>& layout) {
 		fLayout = layout;
 		fHitData.SetDetectorLayout(layout);
 	}
@@ -60,7 +60,7 @@ public:
 			unsigned int nofTrackSeeds);
 
 	inline void MinMaxIndex(
-			const LitScalTrackParam* par,
+			const LitTrackParam<fscal>* par,
 			LitScalPixelHit** hits,
 			unsigned int nofHits,
 			fscal maxErr,
@@ -78,7 +78,17 @@ public:
 	 */
 	inline void PropagateThroughAbsorber(
 			LitTrack* tracks[],
-			LitAbsorber& absorber);
+			LitAbsorber<fvec>& absorber);
+
+	/*
+	 * TODO Add comments
+	 */
+	void CollectHits(
+			LitTrackParam<fscal>* par,
+			LitTrack* track,
+			unsigned char stationGroup,
+			unsigned char station,
+			unsigned char nofSubstations);
 
 	/* TODO: Add comment
 	 *
@@ -96,15 +106,15 @@ public:
 	bool AddNearestHit(
 			LitTrack* track,
 			LitScalPixelHit* hits[],
-			LitScalTrackParam* pars[],
+			LitTrackParam<fscal>* pars[],
 			unsigned int nofHits);
 
 private:
 	LitTrack* fTracks[MAX_NOF_TRACKS]; // local copy of tracks
 	unsigned int fNofTracks;
 
-	LitDetectorLayout fLayout; // detector geometry
-	LitHitData fHitData; // arranged hits
+	LitDetectorLayout<fvec> fLayout; // detector geometry
+	LitHitData<fvec> fHitData; // arranged hits
 
 	unsigned char fMaxNofMissingHits;
 	fscal fSigmaCoef;

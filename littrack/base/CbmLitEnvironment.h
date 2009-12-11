@@ -32,7 +32,8 @@ public:
 
 	CbmLitDetectorLayout GetMuchLayout() {return fMuchLayout;}
 
-	void GetMuchLayout(LitDetectorLayout& layout);
+	void GetMuchLayoutVec(LitDetectorLayoutVec& layout);
+
 	int MaterialId(
 			int stationGroup,
 			int station,

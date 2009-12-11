@@ -363,8 +363,8 @@ CbmLitStation CbmLitEnvironment::GetTofStation()
 	return fTofStation;
 }
 
-void CbmLitEnvironment::GetMuchLayout(
-		LitDetectorLayout& layout)
+void CbmLitEnvironment::GetMuchLayoutVec(
+		LitDetectorLayoutVec& layout)
 {
 	std::cout << "Getting layout for parallel version of tracking..." << std::endl;
 	CbmLitFieldFitter fieldFitter(3);
@@ -378,7 +378,7 @@ void CbmLitEnvironment::GetMuchLayout(
 	std::cout << muchLayout.ToString();
 	for (int isg = 0; isg < muchLayout.GetNofStationGroups(); isg++) {
 		CbmLitStationGroup stationGroup = muchLayout.GetStationGroup(isg);
-		LitStationGroup sg;
+		LitStationGroupVec sg;
 
 		// Add absorber
 		// Fit the field at Z front and Z back of the absorber
@@ -400,26 +400,31 @@ void CbmLitEnvironment::GetMuchLayout(
 			sg.absorber.fieldSliceBack.cz[i] = aparBz[1][i];
 		}
 
-		sg.absorber.material.A = amat.GetA();
-		sg.absorber.material.Z = amat.GetZ();
-		sg.absorber.material.I = (amat.GetZ() > 16)? 10 * amat.GetZ() * 1e-9 :
+		LitMaterialInfoVec& mat1 = sg.absorber.material;
+		mat1.A = amat.GetA();
+		mat1.Z = amat.GetZ();
+		mat1.I = (amat.GetZ() > 16)? 10 * amat.GetZ() * 1e-9 :
 			16 * std::pow(amat.GetZ(), 0.9) * 1e-9;
-		sg.absorber.material.Rho = amat.GetRho();
-		sg.absorber.material.Thickness = amat.GetLength();
-		sg.absorber.material.X0 = amat.GetRL();
-		sg.absorber.material.Zpos = amat.GetZpos();
+		mat1.Rho = amat.GetRho();
+		mat1.Thickness = amat.GetLength();
+		mat1.X0 = amat.GetRL();
+		mat1.Zpos = amat.GetZpos();
 
 		sg.absorber.Z = amat.GetZpos();
+
+		mat1.RadThick = mat1.Thickness / mat1.X0; // Length/X0
+		mat1.SqrtRadThick = sqrt(mat1.RadThick); // std::sqrt(Length/X0)
+		mat1.LogRadThick = log(mat1.RadThick); // std::log(Length/X0)
 		//end add absorber
 
 
 		for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
 			CbmLitStation station = stationGroup.GetStation(ist);
-			LitStation st;
+			LitStationVec st;
 			st.type = station.GetType();
 			for(int iss = 0; iss < station.GetNofSubstations(); iss++) {
 				CbmLitSubstation substation = station.GetSubstation(iss);
-				LitSubstation ss;
+				LitSubstationVec ss;
 				ss.Z = substation.GetZ();
 
 				// Fit the field at Z position of the substation
@@ -442,6 +447,10 @@ void CbmLitEnvironment::GetMuchLayout(
 				ss.material.Thickness = mat.GetLength();
 				ss.material.X0 = mat.GetRL();
 				ss.material.Zpos = mat.GetZpos();
+
+				ss.material.RadThick = ss.material.Thickness / ss.material.X0; // Length/X0
+				ss.material.SqrtRadThick = sqrt(ss.material.RadThick); // std::sqrt(Length/X0)
+				ss.material.LogRadThick = log(ss.material.RadThick); // std::log(Length/X0)
 
 				st.AddSubstation(ss);
 			} // loop over substations

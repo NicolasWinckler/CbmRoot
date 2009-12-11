@@ -12,10 +12,12 @@
 #include "CbmLitPixelHit.h"
 #include "parallel/LitDetectorGeometry.h"
 #include "parallel/LitHit.h"
+#include "parallel/LitTypes.h"
+#include "parallel/LitTrackParam.h"
 
 class CbmLitTrack;
 class CbmLitTrackParam;
-class LitTrackParam;
+//class LitTrackParam;
 
 class CbmLitParallelTrackFitterTest : public CbmLitTrackFitter {
 public:
@@ -33,31 +35,31 @@ private:
 
 	void SerialParamToParallel(
 			const CbmLitTrackParam& par,
-			LitTrackParam& lpar);
+			LitTrackParam<fvec>& lpar);
 
 
 	void ParallelParamToSerial(
-			const LitTrackParam& lpar,
+			const LitTrackParam<fvec>& lpar,
 			CbmLitTrackParam& par);
 
 	int PlaneId(
 			int stationGroup,
 			int station,
 			int substation,
-			LitDetectorLayout& layout) const;
+			LitDetectorLayout<fvec>& layout) const;
 
 	bool CheckHit(
 			int stationGroup,
 			int station,
 			int substation,
-			LitDetectorLayout& layout,
+			LitDetectorLayout<fvec>& layout,
 			CbmLitTrack* track);
 
 	void SerialHitToParallel(
 			const CbmLitPixelHit& hit,
-			LitPixelHit& lhit);
+			LitPixelHit<fvec>& lhit);
 
-	LitDetectorLayout fLayout;
+	LitDetectorLayout<fvec> fLayout;
 };
 
 #endif /* CBMLITPARALLELTRACKFITTERTEST_H_ */

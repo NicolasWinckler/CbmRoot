@@ -22,8 +22,8 @@ CbmLitTrackFinderNNParallel::CbmLitTrackFinderNNParallel():
 	fTime(0.)
 {
 	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-	LitDetectorLayout layout;
-	env->GetMuchLayout(layout);
+	LitDetectorLayoutVec layout;
+	env->GetMuchLayoutVec(layout);
 	fTrackFinder.SetDetectorLayout(layout);
 }
 

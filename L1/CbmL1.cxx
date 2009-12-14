@@ -179,6 +179,7 @@ InitStatus CbmL1::Init()
   NStsStations = StsDigi.GetNStations();
   NStation = NMvdStations + NStsStations;
   geo[ind++] = NStation;
+  geo[ind++] = NMvdStations;
 
   // field
   const int M=3; // polinom order
@@ -289,7 +290,7 @@ InitStatus CbmL1::Init()
       geo[ind++] = N;
       for( int k=0; k<3; k++ ){	  
 	for( int j=0; j<N; j++) geo[ind++] = C[k][j];
-      }    
+      }
     }
 
   geo[ind++] = fTrackingLevel;

@@ -239,6 +239,12 @@ void CbmLitFindGlobalTracks::RunTrackReconstruction()
 		fTrackingWatch.Stop();
 	}
 	if (fIsTof){
+		if (!(fIsMuch || fIsTrd)) {
+			for(TrackPtrIterator it = fLitStsTracks.begin(); it != fLitStsTracks.end(); it++) {
+				CbmLitTrack* track = new CbmLitTrack(*(*it));
+				fLitOutputTracks.push_back(track);
+			}
+		}
 		fMergerWatch.Start(kFALSE);
 		fMerger->DoMerge(fLitTofHits, fLitOutputTracks);
 		fMergerWatch.Stop();

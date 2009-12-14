@@ -264,7 +264,7 @@ void CbmLitConverter::LitTrackVectorToGlobalTrackArray(
 		CbmLitTrack* litTrack = litTracks[iTrack];
 
 		if (litTrack->GetQuality() == kLITBAD) continue;
-		if (litTrack->GetNofHits() < 2) continue;
+		if (litTrack->GetNofHits() < 1) continue;
 		if (litTrack->GetNofHits() != litTrack->GetFitNodes().size()) {
 			std::cout << "-E- CbmLitConverter::LitTrackVectorToGlobalTrackArray: unequal number of hits and fit nodes" << std::endl;
 			std::cout << litTrack->ToString();

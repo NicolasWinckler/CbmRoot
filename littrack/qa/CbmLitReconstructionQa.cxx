@@ -234,10 +234,17 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 			fMcHalfGlobalMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
 		}
 		// select the longest tracks STS+TRD(MUCH)+TOF
-		if ( (isStsOk && stsMCId != -1) &&
-				((isTrdOk && stsMCId == trdMCId) || (isMuchOk && stsMCId == muchMCId)) &&
-				(isTofOk && stsMCId == tofMCId) ) {
-			fMcGlobalMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
+		if (fIsTrd || fIsMuch) {
+			if ( (isStsOk && stsMCId != -1) &&
+					((isTrdOk && stsMCId == trdMCId) || (isMuchOk && stsMCId == muchMCId)) &&
+					(isTofOk && stsMCId == tofMCId) ) {
+				fMcGlobalMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
+			}
+		} else { // for STS+TOF setup
+			if ( (isStsOk && stsMCId != -1) &&
+					(isTofOk && stsMCId == tofMCId) ) {
+				fMcGlobalMap.insert(std::pair<Int_t, Int_t>(stsMCId, iTrack));
+			}
 		}
 	}
 }
@@ -307,9 +314,16 @@ void CbmLitReconstructionQa::ProcessMcTracks()
 			FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, fhRecNp, np);
 		}
 
-		if (isHalfGlobalReconstructed && isStsOk && isRecOk && isTofOk) {
-			// momentum dependence histograms
-			FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcGlobalMap, fhTofMom, mcTrack->GetP());
+		if (fIsTrd || fIsMuch) {
+			if (isHalfGlobalReconstructed && isStsOk && isRecOk && isTofOk) {
+				// momentum dependence histograms
+				FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcGlobalMap, fhTofMom, mcTrack->GetP());
+			}
+		} else { // for STS+TOF setup
+			if (isStsOk && isTofOk) {
+				// momentum dependence histograms
+				FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcGlobalMap, fhTofMom, mcTrack->GetP());
+			}
 		}
 	} // Loop over MCTracks
 }

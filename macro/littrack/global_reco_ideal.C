@@ -1,6 +1,6 @@
-void global_reco_ideal(Int_t nEvents = 1000)
+void global_reco_ideal(Int_t nEvents = 10000)
 {
-	TString dir  = "/home/d/andrey/muchtrd_10mu/";
+	TString dir  = "/d/cbm02/andrey/std13_10mu_new/";
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
@@ -9,7 +9,7 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/home/soft/tbb22_004oss/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -25,16 +25,19 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	TString stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
 //	TString muchDigiFile = parDir + "/much/much_standard.digi.root";
 //	TString muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
-	TString muchDigiFile = parDir + "/much/much_standard_trd.digi.root";
+	TString muchDigiFile = parDir + "/much/much_standard_2layers.digi.root";
 
 	// ----- STS reconstruction   ---------------------------------------------
-	FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
+	FairTask* stsDigitize = new CbmStsIdealDigitize("STSDigitize", iVerbose);
 	run->AddTask(stsDigitize);
 
-	FairTask* stsFindHits = new CbmStsFindHits("STSFindHits", iVerbose);
+//        FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
+//        run->AddTask(stsClusterFinder);
+
+	FairTask* stsFindHits = new CbmStsIdealFindHits("STSFindHits", iVerbose);
 	run->AddTask(stsFindHits);
 
-	FairTask* stsMatchHits = new CbmStsMatchHits("STSMatchHits", iVerbose);
+	FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);
 	run->AddTask(stsMatchHits);
 
 	FairTask* kalman= new CbmKF();

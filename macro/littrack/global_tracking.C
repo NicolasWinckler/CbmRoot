@@ -6,14 +6,14 @@
  * Macro runs Littrack global track reconstruction.
  **/
 
-void global_tracking(Int_t nEvents = 1000)
+void global_tracking(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, mcFile, parFile, globalHitsFile, globalTracksFile;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/home/d/andrey/std_10e/";
+		dir  = "/d/cbm02/andrey/std13_10mu_urqmd/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file
@@ -33,7 +33,7 @@ void global_tracking(Int_t nEvents = 1000)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/home/soft/tbb22_004oss/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -58,7 +58,7 @@ void global_tracking(Int_t nEvents = 1000)
 	// "branch" - branching tracking
 	// "nn" - nearest neighbor tracking
 	// "weight" - weighting tracking
-	finder->SetTrackingType("nn");
+	finder->SetTrackingType("nn_parallel");
 
 	// Hit-to-track merger method to be used
 	// "nearest_hit" - assigns nearest hit to the track

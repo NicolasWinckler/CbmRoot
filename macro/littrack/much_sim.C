@@ -1,16 +1,29 @@
-void much_sim(Int_t nEvents = 1000)
+void much_sim(Int_t nEvents = 10000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString muchGeom, trdGeom, inFile, dir, mcFile, parFile, plutoFile, muons, urqmd, pluto;
+	// number of embedded muons or Jpsi
+	Int_t NMUONS = 10;
+
+	TString muchGeom, trdGeom, inFile, dir, mcFile, parFile, plutoFile[NMUONS], muons, urqmd, pluto;
 	//if SCRIPT environment variable is set to "yes", i.e. macro is run via script
 	if (script != "yes") {
 		//input UrQMD file
 		inFile  = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
 		//if necessary specify input pluto file to embed signal particles
-		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
+		TString plutoDir = "/u/andrey/cbm/much/pluto/25gev/";
+		plutoFile[0] = plutoDir + "Jpsi.0010.root";
+		plutoFile[1] = plutoDir + "Jpsi.0011.root";
+		plutoFile[2] = plutoDir + "Jpsi.0012.root";
+		plutoFile[3] = plutoDir + "Jpsi.0013.root";
+		plutoFile[4] = plutoDir + "Jpsi.0014.root";
+		plutoFile[5] = plutoDir + "Jpsi.0015.root";
+		plutoFile[6] = plutoDir + "Jpsi.0016.root";
+		plutoFile[7] = plutoDir + "Jpsi.0017.root";
+		plutoFile[8] = plutoDir + "Jpsi.0018.root";
+		plutoFile[9] = plutoDir + "Jpsi.0019.root";
 		//directory for output simulation files
-		dir  = "/d/cbm02/andrey/std13_10mu_urqmd/";
+		dir  = "/d/cbm02/andrey/std13_10mu_new/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
@@ -18,7 +31,7 @@ void much_sim(Int_t nEvents = 1000)
 		//If "yes" than 10 primary muons will be generated
 		muons = "yes";
 		//If "yes" than UrQMD will be used as background
-		urqmd = "yes";
+		urqmd = "no";
 		//If "yes" PLUTO particles will be embedded
 		pluto = "no";
 		//MUCH geometry file name
@@ -54,7 +67,7 @@ void much_sim(Int_t nEvents = 1000)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/home/soft/tbb22_004oss/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -152,8 +165,10 @@ void much_sim(Int_t nEvents = 1000)
 	CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
 
 	if (pluto == "yes") {
-		FairPlutoGenerator *plutoGen= new FairPlutoGenerator(plutoFile);
-		primGen->AddGenerator(plutoGen);
+		for (Int_t i = 0; i < NMUONS; i++) {
+			FairPlutoGenerator *plutoGen= new FairPlutoGenerator(plutoFile[i]);
+			primGen->AddGenerator(plutoGen);
+		}
 	}
 
 	if (urqmd == "yes") {
@@ -171,7 +186,7 @@ void much_sim(Int_t nEvents = 1000)
 			maxMom = 10.;
 		}
 
-		FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, 5);
+		FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, NMUONS/2);
 		boxGen1->SetPRange(minMom, maxMom);
 		boxGen1->SetPhiRange(0.,360.);
 		boxGen1->SetThetaRange(2.5, 25.);
@@ -179,7 +194,7 @@ void much_sim(Int_t nEvents = 1000)
 		boxGen1->Init();
 		primGen->AddGenerator(boxGen1);
 
-		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-13, 5);
+		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-13, NMUONS/2);
 		boxGen2->SetPRange(minMom, maxMom);
 		boxGen2->SetPhiRange(0.,360.);
 		boxGen2->SetThetaRange(2.5, 25.);

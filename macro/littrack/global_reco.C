@@ -10,7 +10,7 @@
  * global tracking independently.
  **/
 
-void global_reco(Int_t nEvents = 1000)
+void global_reco(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
@@ -66,6 +66,7 @@ void global_reco(Int_t nEvents = 1000)
 	run->AddTask(stsFindHits);
 
 	FairTask* stsMatchHits = new CbmStsMatchHits("STSMatchHits", iVerbose);
+//        stsmatchHits->SetRealisticResponse();
 	run->AddTask(stsMatchHits);
 
 	FairTask* kalman= new CbmKF();
@@ -161,7 +162,7 @@ void global_reco(Int_t nEvents = 1000)
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
 	reconstructionQa->SetMinNofPointsTrd(10);
-	reconstructionQa->SetMinNofPointsMuch(12);
+	reconstructionQa->SetMinNofPointsMuch(11);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(3);

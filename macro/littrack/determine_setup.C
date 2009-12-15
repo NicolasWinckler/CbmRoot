@@ -22,20 +22,20 @@ Bool_t CheckDetectorPresence(
 //	TGeoManager *geoMan = (TGeoManager*) f->Get("FAIRGeom");
 
 	TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
-	std::cout << "Number of nodes:" << nodes->GetEntriesFast() << std::endl;
+//	std::cout << "Number of nodes:" << nodes->GetEntriesFast() << std::endl;
 	for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
-		std::cout << "  node " << iNode;
+//		std::cout << "  node " << iNode;
 		TGeoNode* node = (TGeoNode*) nodes->At(iNode);
-		std::cout << " " << node->GetName() << std::endl;
+//		std::cout << " " << node->GetName() << std::endl;
 		if (TString(node->GetName()).Contains(name)) {
 			f->Close();
 			delete f;
-                        gFile=currentfile;
+            gFile=currentfile;
 			return true;
 		}
 	}
 	f->Close();
-        gFile=currentfile;
+    gFile=currentfile;
 	delete f;
 	return false;
 }

@@ -8,7 +8,7 @@
  * tracking. See example in macro/littrack/global_tracking.C.
  **/
 
-void global_hits(Int_t nEvents = 1000)
+void global_hits(Int_t nEvents = 10000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
@@ -16,7 +16,7 @@ void global_hits(Int_t nEvents = 1000)
 	TString dir, mcFile, parFile, globalHitsFile, muchDigiFile;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/home/d/andrey/muchtrd_10mu/";
+		dir  = "/d/cbm02/andrey/std13_10mu_new/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file
@@ -26,7 +26,7 @@ void global_hits(Int_t nEvents = 1000)
 		// Digi scheme file for MUCH.
 		// MUST be consistent with MUCH geometry used in MC transport.
 //		muchDigiFile = parDir + "/much/much_standard_monolithic.digi.root";
-		muchDigiFile = parDir + "/much/much_standard_trd.digi.root";
+		muchDigiFile = parDir + "/much/much_standard_2layers.digi.root";
 //		muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
@@ -39,7 +39,7 @@ void global_hits(Int_t nEvents = 1000)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/home/soft/tbb22_004oss/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -56,13 +56,16 @@ void global_hits(Int_t nEvents = 1000)
 //	TString stsDigiFile = parDir+ "/sts/sts_9st_sameZ.digi.par";
 
 	// ----- STS reconstruction   ---------------------------------------------
-	FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
+	FairTask* stsDigitize = new CbmStsIdealDigitize("STSDigitize", iVerbose);
 	run->AddTask(stsDigitize);
 
-	FairTask* stsFindHits = new CbmStsFindHits("STSFindHits", iVerbose);
+//        FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
+//        run->AddTask(stsClusterFinder);
+
+	FairTask* stsFindHits = new CbmStsIdealFindHits("STSFindHits", iVerbose);
 	run->AddTask(stsFindHits);
 
-	FairTask* stsMatchHits = new CbmStsMatchHits("STSMatchHits", iVerbose);
+	FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);
 	run->AddTask(stsMatchHits);
 
 	FairTask* kalman= new CbmKF();

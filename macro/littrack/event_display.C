@@ -24,6 +24,7 @@ void event_display()
 	FairMCPointDraw *RichPoint = new FairMCPointDraw ("RichPoint",kOrange,  kFullSquare);
 	FairMCPointDraw *TofPoint = new FairMCPointDraw ("TOFPoint",kBlue,  kFullSquare);
 	FairMCPointDraw *TrdPoint = new FairMCPointDraw ("TRDPoint",kTeal,  kFullSquare);
+	FairMCPointDraw *MuchPoint = new FairMCPointDraw ("MuchPoint",kRed,  kFullSquare);
 	FairMCPointDraw *ECalPoint = new FairMCPointDraw ("ECALPoint",kYellow,  kFullSquare);
 	FairMCPointDraw *RefPlanePoint = new FairMCPointDraw ("RefPlanePoint",kPink,  kFullSquare);
 	FairMCPointDraw *STSPoint = new FairMCPointDraw ("STSPoint",kCyan,  kFullSquare);
@@ -33,6 +34,7 @@ void event_display()
 	fMan->AddTask(ECalPoint);
 	fMan->AddTask(TofPoint);
 	fMan->AddTask(TrdPoint);
+	fMan->AddTask(MuchPoint);
 	fMan->AddTask(RefPlanePoint);
 	fMan->AddTask(STSPoint);
 

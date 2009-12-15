@@ -1,15 +1,15 @@
-void trd_sim(Int_t nEvents = 1000)
+void trd_sim(Int_t nEvents = 10)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString inFile, plutoFile, dir, mcFile, parFile, electrons, urqmd, trdGeom, pluto;
 	if (script != "yes") {
 		//input UrQMD file
-		inFile  = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
+		inFile  = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14";
 		//if necessary specify input pluto file to embed signal particles
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
 		//directory for output simulation files
-		dir  = "/home/d/andrey/std_10e_cut10gev/";
+		dir  = "/d/cbm02/andrey/notrd/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
@@ -17,11 +17,11 @@ void trd_sim(Int_t nEvents = 1000)
 		//If "yes" than 10 primary muons will be generated
 		electrons = "yes";
 		//If "yes" than UrQMD will be used as background
-		urqmd = "no";
+		urqmd = "yes";
 		//If "yes" PLUTO particles will be embedded
 		pluto = "no";
 		//TRD geometry file name
-		trdGeom = "trd_standard.geo";
+		trdGeom = "";//"trd_standard.geo";
 	} else {
 		inFile  = TString(gSystem->Getenv("INFILE"));
 		plutoFile  = TString(gSystem->Getenv("PLUTOFILE"));
@@ -51,7 +51,7 @@ void trd_sim(Int_t nEvents = 1000)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/home/soft/tbb22_004oss/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");

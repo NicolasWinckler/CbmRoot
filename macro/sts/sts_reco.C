@@ -16,7 +16,7 @@
 // --------------------------------------------------------------------------
 
 #include <math.h>
-void sts_reco_real(Int_t nEvents = 1) {
+void sts_reco(Int_t nEvents = 1) {
 
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -44,7 +44,6 @@ void sts_reco_real(Int_t nEvents = 1) {
   Double_t minStep    =  0.01,;
   Double_t StripDeadTime = 10.;
   
-  StripDeadTime = StripDeadTime/100.;
 
   // ---   Screen output   --------------------------------------------------  
   cout << "***************************************************" << endl;
@@ -115,10 +114,14 @@ void sts_reco_real(Int_t nEvents = 1) {
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
 
-  // -----   MVD Hitproducer   ----------------------------------------------
+  // -----   OLD MVD Hitproducer   ----------------------------------------------
   CbmMvdHitProducer* hitProd = new CbmMvdHitProducer("MVDHitProducer", 0, iVerbose);
   run->AddTask(hitProd);
   // ------------------------------------------------------------------------
+ 
+  // -----   NEW MVD   --------------------------------------------------------
+
+
 
   // -----   STS digitiser   ------------------------------------------------
   //  CbmTask* 

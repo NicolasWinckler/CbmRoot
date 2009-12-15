@@ -89,8 +89,8 @@ class CbmL1 : public FairTask
   
   ~CbmL1();
   
-  CbmL1(const char *name, Int_t iVerbose = 1 );
-  CbmL1();
+  CbmL1(const char *name, Int_t iVerbose = 1, int fAlDataMode_ = 0, TString fStAPDataDir_ = "./");
+  CbmL1(int fAlDataMode_ = 0, TString fStAPDataDir_ = "./");  
   void Finish();
 
   void SetTrackingLevel( Int_t iLevel ){ fTrackingLevel = iLevel; }
@@ -126,6 +126,16 @@ class CbmL1 : public FairTask
 
 
  private:
+   
+   int fStAPDataMode; // way to work with file for StandAlonePackage. 0 (off) , 1 (write), 2 (read data and work only with it), 3 (debug - write and read)
+   TString fStAPDataDir;
+   
+   void WriteStAPGeoData(void *geo, int size); // create geo_algo.dat
+   void WriteStAPAlgoData(); // create data_algo.dat
+   void WriteStAPPerfData(); // create data_perfo.dat
+   void ReadStAPGeoData(void *geo, int &size);
+   void ReadStAPAlgoData();
+   void ReadStAPPerfData(); 
 
   static CbmL1 *fInstance;
  

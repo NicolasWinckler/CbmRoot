@@ -559,6 +559,17 @@ void CbmL1::ReadEvent()
   
   if ( fVerbose && PrimVtx.MC_ID == 999 ) cout<<"No primary vertex !!!"<<endl;
 
+  {
+    if(fStAPDataMode%2 == 1){ // 1,3
+      WriteStAPAlgoData();
+      WriteStAPPerfData();
+    };
+    if(fStAPDataMode >= 2){  // 2,3
+      ReadStAPAlgoData();
+      ReadStAPPerfData(); 
+    };
+  }
+  
 }
 
 

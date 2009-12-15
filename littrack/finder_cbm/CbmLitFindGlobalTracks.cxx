@@ -29,6 +29,7 @@
 #include "TClonesArray.h"
 
 #include <iostream>
+#include <cmath>
 
 CbmLitFindGlobalTracks::CbmLitFindGlobalTracks():
 	fEventNo(0),

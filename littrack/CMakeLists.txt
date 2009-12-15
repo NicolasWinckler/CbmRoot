@@ -37,7 +37,8 @@ ${CBMROOT_SOURCE_DIR}/much
 ${CBMROOT_SOURCE_DIR}/much/geo
 ${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/sts
-/u/andrey/soft/tbb/tbb22_009oss/include )
+#/u/andrey/soft/tbb/tbb22_009oss/include 
+)
 
 include_directories( ${INCLUDE_DIRECTORIES})
 
@@ -106,10 +107,10 @@ qa/CbmLitPropagationAnalysis.cxx
 qa/CbmLitRobustFitterAnalysis.cxx
 qa/CbmLitCheckSimpleGeo.cxx 
 qa/CbmLitCheckField.cxx
-qa/CbmLitParallelTrackFitterTest.cxx 
+#qa/CbmLitParallelTrackFitterTest.cxx 
 qa/CbmLitCheckEnergyLoss.cxx
 qa/CbmLitCheckBrem.cxx 
-qa/CbmLitTrackFitSpeedTest.cxx
+#qa/CbmLitTrackFitSpeedTest.cxx
 weight/CbmLitWeightedHitCalculatorImp.cxx
 weight/CbmLitWeightCalculatorSimple.cxx
 weight/CbmLitWeightCalculatorGauss.cxx

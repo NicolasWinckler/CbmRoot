@@ -26,14 +26,14 @@ void sts_sim(Int_t nEvents = 1)
   TString caveGeom = "cave.geo";
   
   // Target geometry
-  TString targetGeom = "target.geo";
+  TString targetGeom = "target_au_250mu.geo";
 
   // Beam pipe geometry
   TString pipeGeom = "pipe_standard.geo";
 
   // Magnet geometry and field map
-  TString magnetGeom  = "magnet_active.geo";
-  TString fieldMap    = "FieldActive";
+  TString magnetGeom  = "magnet_electron_standard.geo";
+  TString fieldMap    = "field_electron_standard";
   Double_t fieldZ     = 50.;     // z position of field centre
   Double_t fieldScale = 1.;      // field scaling factor
 
@@ -126,12 +126,14 @@ void sts_sim(Int_t nEvents = 1)
   
   
   // -----   Create magnetic field   ----------------------------------------
-  if ( fieldMap == "FieldActive" || fieldMap == "FieldIron")
-    magField = new CbmFieldMapSym3(fieldMap);
-  else if ( fieldMap == "FieldAlligator" )
-    magField = new CbmFieldMapSym2(fieldMap);
+  if (fieldMap == "field_electron_standard" ) 
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "field_muon_standard" )
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "FieldMuonMagnet" )
+    CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
   else {
-    cout << "===> ERROR: Field map " << fieldMap << " unknown! " << endl;
+    cout << "===> ERROR: Unknown field map " << fieldMap << endl;
     exit;
   }
   magField->SetPosition(0., 0., fieldZ);

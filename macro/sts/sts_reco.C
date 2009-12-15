@@ -22,16 +22,16 @@ void sts_reco_real(Int_t nEvents = 1) {
   //          Adjust this part according to your requirements
   
   // Input file (MC events)
-  TString inFile = "data/occupancy.sim.root";
+  TString inFile = "sts.mc.root";
   
   // Parameter file
-  TString parFile = "data/occupancy.param.root";
+  TString parFile = "params.root";
   
   // STS digitisation file
   TString digiFile = "sts_standard.digi.par";
   
   // Output file
-  TString outFile = "data/occupancy.root";
+  TString outFile = "sts.reco.root";
 
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;

@@ -24,6 +24,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "CbmStsHit.h"
 
 #include "TClonesArray.h"
 
@@ -73,6 +74,8 @@ void CbmLitFindGlobalTracks::Exec(
 
 	ConvertOutputData();
 
+	CalculateLength();
+
 	ClearArrays();
 
 	std::cout << "Event: " << fEventNo++ << std::endl;
@@ -116,7 +119,8 @@ void CbmLitFindGlobalTracks::ReadAndCreateDataBranches()
 	//STS data
 	fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
 	if (NULL == fStsTracks) Fatal("Init","No STSTrack array!");
-	std::cout << "-I- STSTrack branch found in tree" << std::endl;
+	fStsHits = (TClonesArray*) ioman->GetObject("STSHit");
+	if (NULL == fStsHits) Fatal("Init","No STSHit array!");
 
 	//MUCH data
 	if (fIsMuch) {
@@ -216,6 +220,89 @@ void CbmLitFindGlobalTracks::ConvertInputData()
 void CbmLitFindGlobalTracks::ConvertOutputData()
 {
 	CbmLitConverter::LitTrackVectorToGlobalTrackArray(fLitOutputTracks, fGlobalTracks, fStsTracks, fTrdTracks, fMuchTracks);
+}
+
+void CbmLitFindGlobalTracks::CalculateLength()
+{
+	/* Calculate the length of the global track
+	 * starting with (0, 0, 0) and adding all
+	 * distances between hits
+	 */
+
+	for(Int_t igt = 0; igt < fGlobalTracks->GetEntriesFast(); igt++) {
+
+		// First collect hits from the global track
+		CbmGlobalTrack* globalTrack = (CbmGlobalTrack*) fGlobalTracks->At(igt);
+		if (globalTrack == NULL) continue;
+
+		std::vector<Double_t> X, Y, Z;
+		X.push_back(0.);
+		Y.push_back(0.);
+		Z.push_back(0.);
+
+		// get track segments indices
+		Int_t stsId = globalTrack->GetStsTrackIndex();
+		Int_t trdId = globalTrack->GetTrdTrackIndex();
+		Int_t muchId = globalTrack->GetMuchTrackIndex();
+		Int_t tofId = globalTrack->GetTofHitIndex();
+
+		if (stsId > -1) {
+			CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(stsId);
+			Int_t nofStsHits = stsTrack->GetNStsHits();
+			for(Int_t ih = 0; ih < nofStsHits; ih++) {
+				CbmStsHit* hit = (CbmStsHit*) fStsHits->At(stsTrack->GetStsHitIndex(ih));
+				X.push_back(hit->GetX());
+				Y.push_back(hit->GetY());
+				Z.push_back(hit->GetZ());
+			}
+		}
+
+		if (muchId > -1) {
+			CbmTrack* muchTrack = (CbmTrack*) fMuchTracks->At(muchId);
+			Int_t nofMuchHits = muchTrack->GetNofHits();
+			for(Int_t ih = 0; ih < nofMuchHits; ih++) {
+				HitType hitType = muchTrack->GetHitType(ih);
+				if (hitType == kMUCHPIXELHIT) {
+					CbmPixelHit* hit = (CbmPixelHit*) fMuchPixelHits->At(muchTrack->GetHitIndex(ih));
+					X.push_back(hit->GetX());
+					Y.push_back(hit->GetY());
+					Z.push_back(hit->GetZ());
+				} else if (hitType == kMUCHSTRAWHIT){
+
+				}
+			}
+		}
+
+		if (trdId > -1) {
+			CbmTrack* trdTrack = (CbmTrack*) fTrdTracks->At(stsId);
+			Int_t nofTrdHits = trdTrack->GetNofHits();
+			for(Int_t ih = 0; ih < nofTrdHits; ih++) {
+				CbmPixelHit* hit = (CbmPixelHit*) fTrdHits->At(trdTrack->GetHitIndex(ih));
+				X.push_back(hit->GetX());
+				Y.push_back(hit->GetY());
+				Z.push_back(hit->GetZ());
+			}
+		}
+
+		if (tofId > -1) {
+			CbmPixelHit* hit = (CbmPixelHit*) fTofHits->At(tofId);
+			X.push_back(hit->GetX());
+			Y.push_back(hit->GetY());
+			Z.push_back(hit->GetZ());
+		}
+
+		// Calculate distances between hits
+		Double_t length = 0.;
+		for (Int_t i = 0; i < X.size() - 1; i++) {
+			Double_t dX = X[i] - X[i+1];
+			Double_t dY = Y[i] - Y[i+1];
+			Double_t dZ = Z[i] - Z[i+1];
+			length += std::sqrt(dX*dX + dY*dY + dZ*dZ);
+		}
+		globalTrack->SetLength(length);
+//		std::cout << "stsId=" << stsId << " muchId=" << muchId << " trdId="
+//		   << trdId << " tofId=" << tofId << " length=" << length << std::endl;
+	}
 }
 
 void CbmLitFindGlobalTracks::ClearArrays()

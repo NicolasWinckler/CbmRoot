@@ -108,6 +108,11 @@ private:
      */
 	void ConvertOutputData();
 
+	/*
+	 * Calculate length of the global track
+	 */
+	void CalculateLength();
+
     /**
      * Clear arrays and frees the memory.
      */
@@ -130,6 +135,7 @@ private:
 
 	// Pointers to data arrays
 	TClonesArray* fStsTracks; // CbmStsTrack array
+	TClonesArray* fStsHits; // CbmStsHit
 	TClonesArray* fMuchPixelHits; // CbmMuchPixelHit array
 	TClonesArray* fMuchStrawHits; // CbmMuchStrawHit array
 	TClonesArray* fMuchTracks; // output CbmMuchTrack array

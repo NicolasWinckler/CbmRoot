@@ -14,6 +14,9 @@
 #include "parallel/LitHit.h"
 #include "parallel/LitTrack.h"
 
+inline fscal rcp(const fscal &a){return 1./a;}
+inline fscal sgn(const fscal &a){return a<0 ?-1 :(a>0 ?1 :0);}
+
 template<class T>
 inline T ChiSq(
 		const LitTrackParam<T>& par,
@@ -53,7 +56,7 @@ inline T ChiSq(
 }
 
 inline unsigned short NDF(
-		const LitTrack& track)
+		const LitScalTrack& track)
 {
    // TODO check NDF
 

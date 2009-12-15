@@ -32,4 +32,7 @@ public:
 	}
 } _fvecalignment;
 
+typedef LitTrackParam<fvec> LitTrackParamVec;
+typedef LitTrackParam<fscal> LitTrackParamScal;
+
 #endif

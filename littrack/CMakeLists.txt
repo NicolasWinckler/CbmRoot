@@ -1,4 +1,4 @@
-# Create a library called "libBase" which includes the source files given in
+# Create a library called "libLittrack" which includes the source files given in
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
@@ -37,8 +37,7 @@ ${CBMROOT_SOURCE_DIR}/much
 ${CBMROOT_SOURCE_DIR}/much/geo
 ${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/sts
-#/home/soft/tbb22_004oss/include
-)
+/u/andrey/soft/tbb/tbb22_009oss/include )
 
 include_directories( ${INCLUDE_DIRECTORIES})
 
@@ -69,6 +68,7 @@ finder/CbmLitTrackFinderNN.cxx
 finder/CbmLitNearestHitToTrackMerger.cxx
 finder/CbmLitGating.cxx
 #finder/CbmLitTrackFinderNNParallel.cxx
+#finder/CbmLitTrackFinderNNCuda.cxx
 finder_cbm/CbmLitTrdTrackFinderBranch.cxx
 finder_cbm/CbmLitTrdTrackFinderNN.cxx
 finder_cbm/CbmLitTrdTrackFinderWeight.cxx
@@ -77,17 +77,18 @@ finder_cbm/CbmLitTrdTrackFinderStandalone.cxx
 #finder_cbm/CbmLitMuchTrackFinderNN.cxx
 #finder_cbm/CbmLitMuchTrackFinderWeight.cxx
 finder_cbm/CbmLitStsBasedTrackFinder.cxx
-finder_cbm/CbmLitFindGlobalTracks.cxx
-fitter/CbmLitTrackFitterImp.cxx
+finder_cbm/CbmLitFindGlobalTracks.cxx 
+#finder_cbm/CbmLitCudaTest.cxx
+fitter/CbmLitTrackFitterImp.cxx 
 fitter/CbmLitKalmanFilter.cxx
-fitter/CbmLitTrackFitterRobust.cxx
+fitter/CbmLitTrackFitterRobust.cxx 
 fitter/CbmLitKalmanSmoother.cxx
-fitter/CbmLitTrackFitterIter.cxx
+fitter/CbmLitTrackFitterIter.cxx 
 geo/CbmLitDet.cxx
-geo/CbmLitDetContFact.cxx
-geo/CbmLitDetGeo.cxx
+geo/CbmLitDetContFact.cxx 
+geo/CbmLitDetGeo.cxx 
 geo/CbmLitDetGeoPar.cxx
-geo/CbmLitDetPoint.cxx
+geo/CbmLitDetPoint.cxx 
 #parallel/LitTrackFinderNNParallel.cxx
 propagation/CbmLitTGeoTrackPropagator.cxx 
 propagation/CbmLitRK4TrackExtrapolator.cxx
@@ -97,36 +98,32 @@ propagation/CbmLitTGeoNavigator.cxx
 propagation/CbmLitMaterialEffectsImp.cxx
 propagation/CbmLitCleverTrackExtrapolator.cxx
 propagation/CbmLitMyGeoNavigator.cxx
-propagation/CbmLitMyTrackPropagator.cxx
+propagation/CbmLitMyTrackPropagator.cxx 
 qa/CbmLitReconstructionQa.cxx
-qa/CbmLitFindGlobalTracksIdeal.cxx
+qa/CbmLitFindGlobalTracksIdeal.cxx 
 qa/CbmLitCheckMultipleScattering.cxx
-qa/CbmLitPropagationAnalysis.cxx
+qa/CbmLitPropagationAnalysis.cxx 
 qa/CbmLitRobustFitterAnalysis.cxx
-qa/CbmLitCheckSimpleGeo.cxx
+qa/CbmLitCheckSimpleGeo.cxx 
 qa/CbmLitCheckField.cxx
-qa/CbmLitParallelTrackFitterTest.cxx
+qa/CbmLitParallelTrackFitterTest.cxx 
 qa/CbmLitCheckEnergyLoss.cxx
-qa/CbmLitCheckBrem.cxx
+qa/CbmLitCheckBrem.cxx 
+qa/CbmLitTrackFitSpeedTest.cxx
 weight/CbmLitWeightedHitCalculatorImp.cxx
 weight/CbmLitWeightCalculatorSimple.cxx
 weight/CbmLitWeightCalculatorGauss.cxx
 #weight/CbmLitWeightCalculatorOptimal.cxx
 weight/CbmLitWeightCalculatorTukey.cxx
 selection/CbmLitTrackSelectionEmpty.cxx
-selection/CbmLitTrackSelectionA.cxx
-selection/CbmLitTrackSelectionB.cxx
-selection/CbmLitTrackSelectionC.cxx
-selection/CbmLitTrackSelectionD.cxx
+selection/CbmLitTrackSelectionA.cxx selection/CbmLitTrackSelectionB.cxx
+selection/CbmLitTrackSelectionC.cxx selection/CbmLitTrackSelectionD.cxx
 selection/CbmLitTrackSelectionMomentum.cxx
 selection/CbmLitTrackSelectionTrd.cxx
 selection/CbmLitTrackSelectionMuch.cxx
 selection/CbmLitTrackSelectionMuchRobust.cxx
-selection/CbmLitTrackSelectionChiSq.cxx
-utils/CbmLitConverter.cxx
-utils/CbmLitMath.cxx
-utils/CbmLitMatrixMath.cxx
-)
+selection/CbmLitTrackSelectionChiSq.cxx utils/CbmLitConverter.cxx
+utils/CbmLitMath.cxx utils/CbmLitMatrixMath.cxx )
 
 set(LITTRACK_HEADERS
 cbm/CbmPropagatorGeane.h
@@ -140,21 +137,22 @@ finder_cbm/CbmLitTrdTrackFinderStandalone.h
 #finder_cbm/CbmLitMuchTrackFinderWeight.h
 finder_cbm/CbmLitStsBasedTrackFinder.h
 finder_cbm/CbmLitFindGlobalTracks.h
-geo/CbmLitDet.h
+#finder_cbm/CbmLitCudaTest.h 
+geo/CbmLitDet.h 
 geo/CbmLitDetContFact.h
-geo/CbmLitDetGeo.h
-geo/CbmLitDetGeoPar.h
+geo/CbmLitDetGeo.h 
+geo/CbmLitDetGeoPar.h 
 geo/CbmLitDetPoint.h
-qa/CbmLitReconstructionQa.h
+qa/CbmLitReconstructionQa.h 
 qa/CbmLitFindGlobalTracksIdeal.h
-qa/CbmLitPropagationAnalysis.h
+qa/CbmLitPropagationAnalysis.h 
 qa/CbmLitRobustFitterAnalysis.h
-qa/CbmLitCheckSimpleGeo.h
+qa/CbmLitCheckSimpleGeo.h 
 qa/CbmLitCheckField.h
-qa/CbmLitCheckEnergyLoss.h
+qa/CbmLitCheckEnergyLoss.h 
 qa/CbmLitCheckMultipleScattering.h
-qa/CbmLitCheckBrem.h
-)
+qa/CbmLitCheckBrem.h 
+qa/CbmLitTrackFitSpeedTest.h)
 
 
 SET(LITTRACK_SRCS ${LITTRACK_SRCS_RULECHECKER})

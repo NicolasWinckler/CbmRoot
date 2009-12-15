@@ -35,9 +35,9 @@ public:
 	virtual void DoFind(
 			LitScalPixelHit* hits[],
 			unsigned int nofHits,
-			LitTrack* trackSeeds[],
+			LitScalTrack* trackSeeds[],
 			unsigned int nofTrackSeeds,
-			LitTrack* tracks[],
+			LitScalTrack* tracks[],
 			unsigned int &nofTracks);
 
 	void SetDetectorLayout(LitDetectorLayout<fvec>& layout) {
@@ -56,11 +56,11 @@ public:
 	 * @param itEnd iterator to the last track seed.
 	 */
 	void InitTrackSeeds(
-			LitTrack* trackSeeds[],
+			LitScalTrack* trackSeeds[],
 			unsigned int nofTrackSeeds);
 
 	inline void MinMaxIndex(
-			const LitTrackParam<fscal>* par,
+			const LitTrackParamScal* par,
 			LitScalPixelHit** hits,
 			unsigned int nofHits,
 			fscal maxErr,
@@ -77,15 +77,15 @@ public:
 	 *
 	 */
 	inline void PropagateThroughAbsorber(
-			LitTrack* tracks[],
+			LitScalTrack* tracks[],
 			LitAbsorber<fvec>& absorber);
 
 	/*
 	 * TODO Add comments
 	 */
 	void CollectHits(
-			LitTrackParam<fscal>* par,
-			LitTrack* track,
+			LitTrackParamScal* par,
+			LitScalTrack* track,
 			unsigned char stationGroup,
 			unsigned char station,
 			unsigned char nofSubstations);
@@ -94,7 +94,7 @@ public:
 	 *
 	 */
 	inline void ProcessStation(
-			LitTrack* tracks[],
+			LitScalTrack* tracks[],
 			unsigned char stationGroup,
 			unsigned char station);
 
@@ -104,13 +104,13 @@ public:
 	 * @return True if the hit was attached to track.
 	 */
 	bool AddNearestHit(
-			LitTrack* track,
+			LitScalTrack* track,
 			LitScalPixelHit* hits[],
-			LitTrackParam<fscal>* pars[],
+			LitTrackParamScal* pars[],
 			unsigned int nofHits);
 
 private:
-	LitTrack* fTracks[MAX_NOF_TRACKS]; // local copy of tracks
+	LitScalTrack* fTracks[MAX_NOF_TRACKS]; // local copy of tracks
 	unsigned int fNofTracks;
 
 	LitDetectorLayout<fvec> fLayout; // detector geometry

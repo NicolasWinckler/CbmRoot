@@ -13,7 +13,7 @@
 
 #include "CbmLitMemoryManagment.h"
 
-//#define LIT_USE_TBB // TBB will be used for multithreading
+#define LIT_USE_TBB // TBB will be used for multithreading
 
 #ifdef LIT_USE_TBB
 #include "tbb/task_scheduler_init.h"
@@ -43,7 +43,7 @@ public:
 #ifdef LIT_USE_TBB
 class PropagateThroughAbsorberClass
 {
-	LitTrack** fTracks;
+	LitScalTrack** fTracks;
 	LitTrackFinderNNParallel* fFinder;
 	LitAbsorber<fvec>& fAbsorber;
 	unsigned int* fTracksId;
@@ -52,14 +52,14 @@ public:
 		for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
 			unsigned int start = fvecLen * iTrack;
 			// Collect track group
-			LitTrack* tracks[fvecLen];
+			LitScalTrack* tracks[fvecLen];
 			for(unsigned int i = 0; i < fvecLen; i++) tracks[i] = fTracks[fTracksId[start + i]];
 			fFinder->PropagateThroughAbsorber(tracks, fAbsorber);
 		}
 	}
 	PropagateThroughAbsorberClass(
 			LitTrackFinderNNParallel* finder,
-			LitTrack* tracks[],
+			LitScalTrack* tracks[],
 			unsigned int* tracksId,
 			LitAbsorber<fvec>& absorber) :
 		fFinder(finder),
@@ -72,7 +72,7 @@ public:
 
 class ProcessStationClass
 {
-	LitTrack** fTracks;
+	LitScalTrack** fTracks;
 	LitTrackFinderNNParallel* fFinder;
 	unsigned int* fTracksId;
 	unsigned char fStationGroup;
@@ -82,14 +82,14 @@ public:
 		for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
 			unsigned int start = fvecLen * iTrack;
 			// Collect track group
-			LitTrack* tracks[fvecLen];
+			LitScalTrack* tracks[fvecLen];
 			for(unsigned int i = 0; i < fvecLen; i++) tracks[i] = fTracks[fTracksId[start + i]];
 			fFinder->ProcessStation(tracks, fStationGroup, fStation);
 		}
 	}
 	ProcessStationClass(
 			LitTrackFinderNNParallel* finder,
-			LitTrack** tracks,
+			LitScalTrack** tracks,
 			unsigned int* tracksId,
 			unsigned char stationGroup,
 			unsigned char station) :
@@ -133,7 +133,7 @@ class CollectHitsClass
 {
     LitTrackFinderNNParallel* fFinder;
     LitTrackParam<fvec>* flpar;
-    LitTrack** fTracks;
+    LitScalTrack** fTracks;
     unsigned char fStationGroup;
     unsigned char fStation;
     unsigned int fNofSubstations;
@@ -142,7 +142,7 @@ public:
 	void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
 		// Loop over the substations
 	    for (unsigned int i = r.begin(); i != r.end(); ++i) {
-	    	LitTrackParam<fscal> spar[fNofSubstations];
+	    	LitTrackParamScal spar[fNofSubstations];
             for (unsigned char iSubstation = 0; iSubstation < fNofSubstations; iSubstation++) {
                UnpackTrackParam(i, flpar[iSubstation], spar[iSubstation]);
             }
@@ -154,7 +154,7 @@ public:
 	CollectHitsClass(
 			 LitTrackFinderNNParallel* finder,
 		     LitTrackParam<fvec>* lpar,
-			 LitTrack** tracks,
+			 LitScalTrack** tracks,
 			 unsigned char stationGroup,
 			 unsigned char station,
              unsigned char nofSubstations):
@@ -186,9 +186,9 @@ LitTrackFinderNNParallel::~LitTrackFinderNNParallel()
 void LitTrackFinderNNParallel::DoFind(
 		LitScalPixelHit* hits[],
 		unsigned int nofHits,
-		LitTrack* trackSeeds[],
+		LitScalTrack* trackSeeds[],
 		unsigned int nofTrackSeeds,
-		LitTrack* tracks[],
+		LitScalTrack* tracks[],
 		unsigned int &nofTracks)
 {
 	ArrangeHits(hits, nofHits);
@@ -198,11 +198,11 @@ void LitTrackFinderNNParallel::DoFind(
 	//Copy tracks to output
 	nofTracks = 0;
 	for (unsigned int i = 0; i < fNofTracks; i++) {
-		LitTrack* track = fTracks[i];
+		LitScalTrack* track = fTracks[i];
 //		std::cout << track;
 		if (track->nofHits < 11) continue;
 //		std::cout << *track;
-		tracks[nofTracks++] = new LitTrack(*track);
+		tracks[nofTracks++] = new LitScalTrack(*track);
 	}
 
 //	for (unsigned int i = 0; i < nofTracks; i++)
@@ -255,7 +255,7 @@ void LitTrackFinderNNParallel::ArrangeHits(
 }
 
 void LitTrackFinderNNParallel::MinMaxIndex(
-		const LitTrackParam<fscal>* par,
+		const LitTrackParamScal* par,
 		LitScalPixelHit** hits,
 		unsigned int nofHits,
 		fscal maxErr,
@@ -294,7 +294,7 @@ void LitTrackFinderNNParallel::MinMaxIndex(
 }
 
 void LitTrackFinderNNParallel::InitTrackSeeds(
-		LitTrack* trackSeeds[],
+		LitScalTrack* trackSeeds[],
 		unsigned int nofTrackSeeds)
 {
 //	tbb::parallel_for(tbb::blocked_range<unsigned int>(0, seeds.size()),
@@ -304,14 +304,14 @@ void LitTrackFinderNNParallel::InitTrackSeeds(
 	fscal QpCut = 1./1.5;
 	//TODO : add threads here
 	for (unsigned int i = 0; i < nofTrackSeeds; i++) {
-		LitTrack* track = trackSeeds[i];
+		LitScalTrack* track = trackSeeds[i];
 		if (fabs(track->paramLast.Qp) > QpCut) continue;
 //		if (fUsedSeedsSet.find((*track)->GetPreviousTrackId()) != fUsedSeedsSet.end()) continue;
 //		track->SetPDG(fPDG);
 		track->previouseTrackId = i;
 //		std::cout << track->previouseTrackId << "   ";
 
-		LitTrack* newTrack = new LitTrack(*track);
+		LitScalTrack* newTrack = new LitScalTrack(*track);
 //		newTrack->paramFirst = newTrack->paramLast;
 		newTrack->paramLast = newTrack->paramFirst;
 		fTracks[fNofTracks++] = newTrack;
@@ -351,15 +351,15 @@ void LitTrackFinderNNParallel::FollowTracks()
 		for (unsigned int iTrack = 0; iTrack < nofTracksVec; iTrack++) {
 			unsigned int start = fvecLen * iTrack;
 			// Collect track group
-			LitTrack* tracks[fvecLen];
+			LitScalTrack* tracks[fvecLen];
 			for(unsigned int i = 0; i < fvecLen; i++) tracks[i] = fTracks[tracksId1[start + i]];
 			PropagateThroughAbsorber(tracks, stg.absorber);
 		} // loop over tracks
 #endif
 		// Propagate remaining dTracks through the absorber
 		if (dTracks > 0){
-			LitTrack* tracks[fvecLen];
-			LitTrack dummyTracks[fvecLen - dTracks];
+			LitScalTrack* tracks[fvecLen];
+			LitScalTrack dummyTracks[fvecLen - dTracks];
 			unsigned int start = fvecLen * nofTracksVec;
 			for(unsigned int i = 0; i < dTracks; i++) tracks[i] = fTracks[tracksId1[start + i]];
 			// Check if the number of remaining tracks is less than fvecLen.
@@ -387,15 +387,15 @@ void LitTrackFinderNNParallel::FollowTracks()
 			for (unsigned int iTrack = 0; iTrack < nofTracksVec; iTrack++) { // loop over tracks
 				unsigned int start = fvecLen * iTrack;
 				// Collect track group
-				LitTrack* tracks[fvecLen];
+				LitScalTrack* tracks[fvecLen];
 				for(unsigned int i = 0; i < fvecLen; i++) tracks[i] = fTracks[tracksId1[start + i]];
 				ProcessStation(tracks, iStationGroup, iStation);
 			} // loop over tracks
 #endif
 			// Propagate remaining dTracks
 			if (dTracks > 0){
-				LitTrack* tracks[fvecLen];
-				LitTrack dummyTracks[fvecLen - dTracks];
+				LitScalTrack* tracks[fvecLen];
+				LitScalTrack dummyTracks[fvecLen - dTracks];
 				unsigned int start = fvecLen * nofTracksVec;
 				for(unsigned int i = 0; i < dTracks; i++) tracks[i] = fTracks[tracksId1[start + i]];
 				// Check if the number of remaining tracks is less than fvecLen.
@@ -420,11 +420,11 @@ void LitTrackFinderNNParallel::FollowTracks()
 }
 
 void LitTrackFinderNNParallel::PropagateThroughAbsorber(
-		LitTrack* tracks[],
+		LitScalTrack* tracks[],
 		LitAbsorber<fvec>& absorber)
 {
 	// Pack track parameters
-	LitTrackParam<fscal> par[fvecLen];
+	LitTrackParamScal par[fvecLen];
 	for(unsigned int i = 0; i < fvecLen; i++) par[i] = tracks[i]->paramLast;
 	LitTrackParam<fvec> lpar;
 	PackTrackParam(par, lpar);
@@ -435,7 +435,7 @@ void LitTrackFinderNNParallel::PropagateThroughAbsorber(
 //	LitAbsorber absorber = stg.absorber;
 	absorber.fieldSliceFront.GetFieldValue(lpar.X, lpar.Y, v1);
 	absorber.fieldSliceBack.GetFieldValue(lpar.X, lpar.Y, v2);
-	field.Set(v1, absorber.fieldSliceBack.Z, v2, absorber.fieldSliceFront.Z);
+	field.Set(v1, absorber.fieldSliceFront.Z, v2, absorber.fieldSliceBack.Z);
 	LitRK4Extrapolation(lpar, absorber.Z, field);
 	LitAddMaterial(lpar, absorber.material);
 
@@ -445,7 +445,7 @@ void LitTrackFinderNNParallel::PropagateThroughAbsorber(
 }
 
 void LitTrackFinderNNParallel::ProcessStation(
-		LitTrack* tracks[],
+		LitScalTrack* tracks[],
 		unsigned char stationGroup,
 		unsigned char station)
 {
@@ -454,7 +454,7 @@ void LitTrackFinderNNParallel::ProcessStation(
 	unsigned char nofSubstations = sta.GetNofSubstations();
 
 	// Pack track parameters
-	LitTrackParam<fscal> par[nofSubstations][fvecLen];
+	LitTrackParamScal par[nofSubstations][fvecLen];
 	for(unsigned int i = 0; i < fvecLen; i++) par[0][i] = tracks[i]->paramLast;
 	LitTrackParam<fvec> lpar[nofSubstations];
 	PackTrackParam(par[0], lpar[0]);
@@ -492,7 +492,7 @@ void LitTrackFinderNNParallel::ProcessStation(
     for (unsigned char iSubstation = 0; iSubstation < nofSubstations; iSubstation++)
 		UnpackTrackParam(lpar[iSubstation], par[iSubstation]);
     for(unsigned int i = 0; i < fvecLen; i++) {
-		LitTrackParam<fscal> spar[nofSubstations];
+		LitTrackParamScal spar[nofSubstations];
 		for (unsigned char iSubstation = 0; iSubstation < nofSubstations; iSubstation++)
 			spar[iSubstation] = par[iSubstation][i];
 
@@ -503,8 +503,8 @@ void LitTrackFinderNNParallel::ProcessStation(
 
 
 void LitTrackFinderNNParallel::CollectHits(
-		LitTrackParam<fscal>* par,
-		LitTrack* track,
+		LitTrackParamScal* par,
+		LitScalTrack* track,
 		unsigned char stationGroup,
 		unsigned char station,
 		unsigned char nofSubstations)
@@ -527,7 +527,7 @@ void LitTrackFinderNNParallel::CollectHits(
 
 	bool hitAdded = false;
 	LitScalPixelHit* ahits[nofHits];
-	LitTrackParam<fscal>* apars[nofHits];
+	LitTrackParamScal* apars[nofHits];
 	unsigned int cnt = 0;
 	for(unsigned char iss = 0; iss < nofSubstations; iss++) {
 		LitScalPixelHit** hitvec = fHitData.GetHits(stationGroup, station, iss);
@@ -544,14 +544,14 @@ void LitTrackFinderNNParallel::CollectHits(
 }
 
 bool LitTrackFinderNNParallel::AddNearestHit(
-		LitTrack* track,
+		LitScalTrack* track,
 		LitScalPixelHit* hits[],
-		LitTrackParam<fscal>* pars[],
+		LitTrackParamScal* pars[],
 		unsigned int nofHits)
 {
 	bool hitAdded = false;
 	LitScalPixelHit* hita = NULL;
-	LitTrackParam<fscal> param;
+	LitTrackParamScal param;
 	fscal chiSq = 1e10;
 
 	unsigned int nofHitsVec = nofHits / fvecLen; // number of hits grouped in vectors
@@ -565,7 +565,7 @@ bool LitTrackFinderNNParallel::AddNearestHit(
 		LitPixelHit<fvec> lhit;
 		PackPixelHit(hit, lhit);
 		// Pack track parameters
-		LitTrackParam<fscal> par[fvecLen];
+		LitTrackParamScal par[fvecLen];
 		for(unsigned int i = 0; i < fvecLen; i++) par[i] = *pars[start + i];
 		LitTrackParam<fvec> lpar;
 		PackTrackParam(par, lpar);
@@ -589,7 +589,7 @@ bool LitTrackFinderNNParallel::AddNearestHit(
 		unsigned int start = fvecLen * nofHitsVec;
 		LitScalPixelHit hit[fvecLen];
 		LitPixelHit<fvec> lhit;
-		LitTrackParam<fscal> par[fvecLen];
+		LitTrackParamScal par[fvecLen];
 		LitTrackParam<fvec> lpar;
 		for(unsigned int i = 0; i < dHits; i++) {
 			hit[i] = *hits[start + i];

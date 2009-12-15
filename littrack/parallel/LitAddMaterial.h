@@ -12,6 +12,7 @@
 
 #include "LitTrackParam.h"
 #include "LitMaterialInfo.h"
+#include "LitMath.h"
 
 /* Function calculates material effects and adds them to the
  * track parameters and its covariance matrix.

@@ -366,6 +366,19 @@ CbmLitStation CbmLitEnvironment::GetTofStation()
 void CbmLitEnvironment::GetMuchLayoutVec(
 		LitDetectorLayoutVec& layout)
 {
+	GetMuchLayout(layout);
+}
+
+void CbmLitEnvironment::GetMuchLayoutScal(
+		LitDetectorLayoutScal& layout)
+{
+	GetMuchLayout(layout);
+}
+
+template<class T>
+void CbmLitEnvironment::GetMuchLayout(
+		LitDetectorLayout<T>& layout)
+{
 	std::cout << "Getting layout for parallel version of tracking..." << std::endl;
 	CbmLitFieldFitter fieldFitter(3);
 	std::cout << "Field fitter initialized" << std::endl;
@@ -378,7 +391,7 @@ void CbmLitEnvironment::GetMuchLayoutVec(
 	std::cout << muchLayout.ToString();
 	for (int isg = 0; isg < muchLayout.GetNofStationGroups(); isg++) {
 		CbmLitStationGroup stationGroup = muchLayout.GetStationGroup(isg);
-		LitStationGroupVec sg;
+		LitStationGroup<T> sg;
 
 		// Add absorber
 		// Fit the field at Z front and Z back of the absorber
@@ -400,7 +413,7 @@ void CbmLitEnvironment::GetMuchLayoutVec(
 			sg.absorber.fieldSliceBack.cz[i] = aparBz[1][i];
 		}
 
-		LitMaterialInfoVec& mat1 = sg.absorber.material;
+		LitMaterialInfo<T>& mat1 = sg.absorber.material;
 		mat1.A = amat.GetA();
 		mat1.Z = amat.GetZ();
 		mat1.I = (amat.GetZ() > 16)? 10 * amat.GetZ() * 1e-9 :
@@ -420,11 +433,11 @@ void CbmLitEnvironment::GetMuchLayoutVec(
 
 		for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
 			CbmLitStation station = stationGroup.GetStation(ist);
-			LitStationVec st;
+			LitStation<T> st;
 			st.type = station.GetType();
 			for(int iss = 0; iss < station.GetNofSubstations(); iss++) {
 				CbmLitSubstation substation = station.GetSubstation(iss);
-				LitSubstationVec ss;
+				LitSubstation<T> ss;
 				ss.Z = substation.GetZ();
 
 				// Fit the field at Z position of the substation

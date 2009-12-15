@@ -47,6 +47,8 @@
 #pragma link C++ class CbmLitStsBasedTrackFinder+;
 //#pragma link C++ class CbmLitTofMerger+;
 #pragma link C++ class CbmLitFindGlobalTracks+;
+//#pragma link C++ class CbmLitCudaTest+;
+
 
 // fitter
 //#pragma link C++ class CbmLitTrackFitterImp+;
@@ -91,6 +93,7 @@
 #pragma link C++ class CbmLitCheckEnergyLoss+;
 #pragma link C++ class CbmLitCheckMultipleScattering+;
 #pragma link C++ class CbmLitCheckBrem+;
+#pragma link C++ class CbmLitTrackFitSpeedTest+;
 
 // robust
 //#pragma link C++ class CbmLitWeightedHitCalculatorImp+;

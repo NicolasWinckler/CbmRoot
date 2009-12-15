@@ -7,6 +7,8 @@
 #ifndef LITFIELD_H_
 #define LITFIELD_H_
 
+#include "parallel/LitMath.h"
+
 template<class T>
 class LitFieldValue
 {
@@ -103,7 +105,7 @@ public:
 			const T B0z,
 			const LitFieldValue<T>& B1,
 			const T B1z) {
-		z0 = B0z[0];
+		z0 = B0z;
 		T dzi = rcp(T(B1z - B0z));
 		cx0 = B0.Bx;
 		cy0 = B0.By;

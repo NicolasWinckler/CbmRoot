@@ -96,7 +96,7 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
 //		for (size_t i = 0; i < fMyTrdGeoNodes.size(); ++i)
 //			std::cout << i << " " << fMyTrdGeoNodes[i].ToString();
 
-
+	gGeoManager = fGeo;
 	std::cout << "-I- Simple geometry construction finished" << std::endl;
 }
 

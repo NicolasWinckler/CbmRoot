@@ -6,6 +6,7 @@
  * Functions to convert Littrack serial data classes
  * to data classes used in the Littrack parallel version.
  **/
+
 #ifndef LITCONVERTER_H_
 #define LITCONVERTER_H_
 
@@ -21,7 +22,7 @@
  * @param hit Pointer to CbmlitPixelHit.
  * @param lhit Pointer to LitScalPixelHit.
  */
-void CbmLitPixelHitToLitScalPixelHit(
+inline void CbmLitPixelHitToLitScalPixelHit(
 		const CbmLitPixelHit* hit,
 		LitScalPixelHit* lhit)
 {
@@ -35,13 +36,13 @@ void CbmLitPixelHitToLitScalPixelHit(
 		lhit->Z = hit->GetZ();
 }
 
-/* Converts CbmLitTrackparam to LitScalTrackParam.
+/* Converts CbmLitTrackParam to LitTrackParamScal.
  * @param par Pointer to CbmLitTrackParam.
- * @param lpar Pointer to LitScalTrackParam.
+ * @param lpar Pointer to LitTrackParamScal.
  */
-void CbmLitTrackParamToLitScalTrackParam(
+inline void CbmLitTrackParamToLitTrackParamScal(
 		const CbmLitTrackParam* par,
-		LitTrackParam<fscal>* lpar)
+		LitTrackParamScal* lpar)
 {
 	lpar->X = par->GetX();
 	lpar->Y = par->GetY();
@@ -66,12 +67,12 @@ void CbmLitTrackParamToLitScalTrackParam(
 	lpar->C14 = par->GetCovariance(14);
 }
 
-/* Converts LitScalTrackParam to CbmLitTrackParam.
- * @param lpar Pointer to LitScalTrackParam.
+/* Converts LitTrackParamScal to CbmLitTrackParam.
+ * @param lpar Pointer to LitTrackParamScal.
  * @param par Pointer to CbmLitTrackParam.
  */
-void LitScalTrackParamToCbmLitTrackParam(
-		const LitTrackParam<fscal>* lpar,
+inline void LitTrackParamScalToCbmLitTrackParam(
+		const LitTrackParamScal* lpar,
 		CbmLitTrackParam* par)
 {
 	par->SetX(lpar->X);
@@ -101,14 +102,14 @@ void LitScalTrackParamToCbmLitTrackParam(
  * @param ltrack Pointer to LitTrack.
  * @param track Pointer to CbmLitTrack.
  */
-inline void LitTrackToCbmLitTrack(
-		LitTrack* ltrack,
+inline void LitScalTrackToCbmLitTrack(
+		LitScalTrack* ltrack,
 		CbmLitTrack* track)
 {
 	// Convert track parameters
 	CbmLitTrackParam parFirst, parLast;
-	LitScalTrackParamToCbmLitTrackParam(&(ltrack->paramFirst), &parFirst);
-	LitScalTrackParamToCbmLitTrackParam(&(ltrack->paramLast), &parLast);
+	LitTrackParamScalToCbmLitTrackParam(&(ltrack->paramFirst), &parFirst);
+	LitTrackParamScalToCbmLitTrackParam(&(ltrack->paramLast), &parLast);
 	track->SetParamLast(&parLast);
 	track->SetParamFirst(&parFirst);
 
@@ -141,31 +142,31 @@ inline void LitTrackToCbmLitTrack(
  * @param track Pointer to CbmLitTrack.
  * @param ltrack Pointer to LitTrack.
  */
-inline void CbmLitTrackToLitTrack(
-		LitTrack* ltrack,
-		CbmLitTrack* track)
+inline void CbmLitTrackToLitTrackScal(
+		CbmLitTrack* track,
+		LitTrackScal* ltrack)
 {
 	// Convert track parameters
-	CbmLitTrackParamToLitScalTrackParam(track->GetParamFirst(), &(ltrack->paramFirst));
-	CbmLitTrackParamToLitScalTrackParam(track->GetParamLast(), &(ltrack->paramLast));
+//	CbmLitTrackParamToLitTrackParamScal(track->GetParamFirst(), &(ltrack->paramFirst));
+	CbmLitTrackParamToLitTrackParamScal(track->GetParamLast(), &(ltrack->paramLast));
 
 	// Copy other track parameters
-	ltrack->chiSq = track->GetChi2();
-	ltrack->NDF = track->GetNDF();
-	ltrack->previouseTrackId = track->GetPreviousTrackId();
+//	ltrack->chiSq = track->GetChi2();
+//	ltrack->NDF = track->GetNDF();
+//	ltrack->previouseTrackId = track->GetPreviousTrackId();
 
 	// Convert hits
 	for (int i = 0; i < track->GetNofHits(); i++){
-		LitScalPixelHit* newHit = new LitScalPixelHit;
+		LitPixelHit<fscal>* newHit = new LitPixelHit<fscal>;
 		CbmLitPixelHit* hit = (CbmLitPixelHit*) track->GetHit(i);
 		newHit->X = hit->GetX();
 		newHit->Y = hit->GetY();
 		newHit->Dx = hit->GetDx();
 		newHit->Dy = hit->GetDy();
 		newHit->Dxy = hit->GetDxy();
-		newHit->planeId = hit->GetPlaneId();
-		newHit->refId = hit->GetRefId();
-		newHit->Z = hit->GetZ();
+//		newHit->planeId = hit->GetPlaneId();
+//		newHit->refId = hit->GetRefId();
+//		newHit->Z = hit->GetZ();
 		ltrack->AddHit(newHit);
 	}
 }

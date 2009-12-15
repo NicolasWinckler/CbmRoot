@@ -49,8 +49,8 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
 	const unsigned int NHITS = hits.size();
 	LitScalPixelHit* lhits[NHITS];
 	const unsigned int NTRACKS = trackSeeds.size();
-	LitTrack* lseeds[NTRACKS];
-	LitTrack* ltracks[NTRACKS];
+	LitScalTrack* lseeds[NTRACKS];
+	LitScalTrack* ltracks[NTRACKS];
 
 	ConvertHits(hits, lhits);
 	ConvertSeeds(trackSeeds, lseeds);
@@ -103,15 +103,15 @@ void CbmLitTrackFinderNNParallel::ConvertHits(
 
 void CbmLitTrackFinderNNParallel::ConvertSeeds(
 		TrackPtrVector& seeds,
-		LitTrack* lseeds[])
+		LitScalTrack* lseeds[])
 {
 	for (unsigned int i = 0; i < seeds.size(); i++){
 		CbmLitTrack* track = (CbmLitTrack*) seeds[i];
 		const CbmLitTrackParam* par = track->GetParamLast();
-		LitTrack* ltrack = new LitTrack;
+		LitScalTrack* ltrack = new LitScalTrack;
 
-		CbmLitTrackParamToLitScalTrackParam(par, &ltrack->paramFirst);
-		CbmLitTrackParamToLitScalTrackParam(par, &ltrack->paramLast);
+		CbmLitTrackParamToLitTrackParamScal(par, &ltrack->paramFirst);
+		CbmLitTrackParamToLitTrackParamScal(par, &ltrack->paramLast);
 
 //		ltrack->previouseTrackId = std::distance(seeds.begin(), it);
 
@@ -120,14 +120,14 @@ void CbmLitTrackFinderNNParallel::ConvertSeeds(
 }
 
 void CbmLitTrackFinderNNParallel::ConvertTracks(
-		LitTrack* ltracks[],
+		LitScalTrack* ltracks[],
 		unsigned int nofTracks,
 		TrackPtrVector& tracks)
 {
 	for (unsigned int i = 0; i < nofTracks; i++){
-		LitTrack* ltrack = ltracks[i];
+		LitScalTrack* ltrack = ltracks[i];
 		CbmLitTrack* track = new CbmLitTrack;
-		LitTrackToCbmLitTrack(ltrack, track);
+		LitScalTrackToCbmLitTrack(ltrack, track);
 		tracks.push_back(track);
 	}
 }

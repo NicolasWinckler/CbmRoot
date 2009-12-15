@@ -7,6 +7,4 @@
   #include "../L1/L1Algo/vectors/PSEUDO_F32vec1.h"
 #endif
 
-//#include "vectors/PSEUDO_F64vec1.h"
-
 #endif /* LITTYPES_H_ */

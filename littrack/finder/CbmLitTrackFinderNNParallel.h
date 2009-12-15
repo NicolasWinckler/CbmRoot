@@ -40,10 +40,10 @@ private:
 
 	void ConvertSeeds(
 			TrackPtrVector& seeds,
-			LitTrack* lseeds[]);
+			LitScalTrack* lseeds[]);
 
 	void ConvertTracks(
-			LitTrack* ltracks[],
+			LitScalTrack* ltracks[],
 			unsigned int nofTracks,
 			TrackPtrVector& tracks);
 

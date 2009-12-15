@@ -74,8 +74,8 @@ CbmStsDigitize::CbmStsDigitize() : FairTask("STS Digitizer", 1) {
 
   fFNofBits    = 10;
   fBNofBits    = 10;
-  fFMinStep    = 0.01;
-  fBMinStep    = 0.01;
+  fFMinStep    = 0.1;
+  fBMinStep    = 0.1;
   fStripDeadTime = 10;
   fNEvents = 0.;
 }
@@ -102,8 +102,8 @@ CbmStsDigitize::CbmStsDigitize(Int_t iVerbose)
 
   fFNofBits    = 10;
   fBNofBits    = 10;
-  fFMinStep    = 0.01;
-  fBMinStep    = 0.01;
+  fFMinStep    = 0.1;
+  fBMinStep    = 0.1;
   fStripDeadTime = 10;
   fNEvents = 0.;
 }
@@ -130,8 +130,8 @@ CbmStsDigitize::CbmStsDigitize(const char* name, Int_t iVerbose)
 
   fFNofBits    = 10;
   fBNofBits    = 10;
-  fFMinStep    = 0.01;
-  fBMinStep    = 0.01;
+  fFMinStep    = 0.1;
+  fBMinStep    = 0.1;
   fStripDeadTime = 10;
   fNEvents = 0.;
 }

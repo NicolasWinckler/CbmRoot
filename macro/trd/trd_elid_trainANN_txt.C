@@ -22,7 +22,7 @@ void coeffCalc(double mom, double* coeff1, double* coeff2) {
 	}
 }
 
-void trd_elid_trainANN_txt(Int_t paramNum = 1, Int_t fileNum = 0)
+void trd_elid_trainANN_txt(Int_t paramNum = 1, Int_t fileNum = 0, Double_t sigmaError)
 {
 	///load libraries for neural net
 	if (!gROOT->GetClass("TMultiLayerPerceptron"))
@@ -39,9 +39,14 @@ void trd_elid_trainANN_txt(Int_t paramNum = 1, Int_t fileNum = 0)
 	gSystem->Load("libPassive");
 	gSystem->Load("libTMVA");
 	gSystem->Load("libTrd");
-//
-//	paramNum = 1;
-//	fileNum = 2;
+
+
+//	paramNum = 3;
+//	fileNum = 1;
+//	Double_t sigmaError = 0.0;
+	Int_t maxNofTrain = 200500;
+	Int_t transType = 3;
+
 
 	TString fileNumSt;
 	if (fileNum == 0)fileNumSt = "0000";
@@ -78,13 +83,15 @@ void trd_elid_trainANN_txt(Int_t paramNum = 1, Int_t fileNum = 0)
 	trainer->SetFileNameCumHistos(fileNameCumHistos);
 	trainer->SetWeightFileDir(weightFileDir);
 	trainer->SetNofHiddenNeurons(12);
-	trainer->SetNofAnnEpochs(250);
-	trainer->SetMaxNofTrainPi(3000);
-	trainer->SetMaxNofTrainEl(3000);
+	trainer->SetNofAnnEpochs(500);
+	trainer->SetMaxNofTrainPi(maxNofTrain);
+	trainer->SetMaxNofTrainEl(maxNofTrain);
+	trainer->SetFileNum(fileNum);
+	trainer->SetSigmaError(sigmaError);
 
 	//Cut will be calculated automatically, taken into account 90% of electron efficiency
 	trainer->SetIsDoTrain(true);
-	trainer->SetTransformType(3);
+	trainer->SetTransformType(transType);
 	//kANN = 0, kBDT = 1, kCLUSTERS = 2, kMEDIANA = 3, kLIKELIHOOD = 4
 	trainer->SetIdMethod(1);
 	trainer->Run();

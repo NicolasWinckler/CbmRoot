@@ -1,8 +1,5 @@
-for number in 5 6 7 8 9
+for number in 9 8 7 6 5 4 3 2 1 0
 do
-root -l<<EOF
-.x trd_elid_sim_many.C($number, 1)
-.q
-EOF
+xterm -hold -e "./run_script1.sh $number"&
 done
  

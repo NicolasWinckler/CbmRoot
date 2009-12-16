@@ -59,10 +59,12 @@ public:
 	Double_t Likelihood();
 	Double_t FindArea(TH1* h);
 	Double_t Eval(Bool_t isEl);
+	void ReadFile();
 	void SetAnnCut(Double_t annCut){fAnnCut = annCut;}
 	void SetIsDoTrain(Bool_t doTrain){fIsDoTrain = doTrain;}
 	void SetTransformType(Int_t type){fTransformType = type;}
 	void SetIdMethod(IdMethod idMethod){fIdMethod = idMethod;}
+	void SetFileNum(Int_t fileNum){fFileNum = fileNum;}
 	void SetFileNameEl(TString fileNameEl){fFileNameEl = fileNameEl;}
 	void SetFileNamePi(TString fileNamePi){fFileNamePi = fileNamePi;}
 	void SetFileNameTestEl(TString fileNameTestEl){fFileNameTestEl = fileNameTestEl;}
@@ -76,6 +78,7 @@ public:
 	void SetNofAnnEpochs(Int_t nofAnnEpochs){fNofAnnEpochs=nofAnnEpochs;}
 	void SetMaxNofTrainPi(Int_t nofPi){fMaxNofTrainPi = nofPi;}
 	void SetMaxNofTrainEl(Int_t nofEl){fMaxNofTrainEl = nofEl;}
+	void SetSigmaError(Double_t sigma){fSigmaError = sigma;}
 	void FillProbabilityHistos(Bool_t isEl);
 
 	Bool_t FileExists(TString fileName);
@@ -86,6 +89,7 @@ private:
 	TString fFileNameTestPi;
 	TString fFileNameCumHistos;
 	TString fWeightFileDir;
+	Double_t fSigmaError;
 
 	Bool_t fIsDoTrain;
 	Int_t fTransformType;
@@ -97,6 +101,9 @@ private:
 
 	vector<Float_t> fElossVec;
 	vector<Float_t> fInVector;
+	vector<vector<Double_t> > fElossPi;
+	vector<vector<Double_t> > fElossEl;
+	Int_t fFileNum;
 	Float_t fXOut;
 	Double_t fAnnCut;
 	Int_t fNofInputNeurons;

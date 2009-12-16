@@ -44,6 +44,11 @@ void CbmTrdElectronsTrainAnn::Init()
 	fNofLayers = 12;
 	InitCumHistos();
 
+	fElossPi.clear();
+	fElossEl.clear();
+	fElossPi.reserve(1000000);
+	fElossEl.reserve(1000000);
+
 //Histogramms for testing
 	Int_t nofBins = 2000;
 	fMaxEval = 1.3;
@@ -112,12 +117,12 @@ void CbmTrdElectronsTrainAnn::InitCumHistos()
 		fhCumProbSortEl[i] = (TH1D*) f->Get(hName)->Clone();
 		sprintf(hName, "fhElossSortPi%d", i);
 		fhPdfSortPi[i] = (TH1D*) f->Get(hName)->Clone();
-		//fhPdfSortPi[i]->Rebin(5);
+		fhPdfSortPi[i]->Rebin(20);
 		fhPdfSortPi[i]->Scale(1./FindArea(fhPdfSortPi[i]));
 		//fhPdfSortPi[i]->Scale(1./fhPdfSortPi[i]->GetMaximum());
 		sprintf(hName, "fhElossSortEl%d", i);
 		fhPdfSortEl[i] = (TH1D*) f->Get(hName)->Clone();
-		//fhPdfSortEl[i]->Rebin(5);
+		fhPdfSortEl[i]->Rebin(20);
 		fhPdfSortEl[i]->Scale(1./FindArea(fhPdfSortEl[i]));
 		//fhPdfSortEl[i]->Scale(1./fhPdfSortEl[i]->GetMaximum());
 	}
@@ -128,15 +133,19 @@ void CbmTrdElectronsTrainAnn::InitCumHistos()
 Double_t CbmTrdElectronsTrainAnn::FindArea(TH1* h)
 {
 	Double_t w = h->GetBinWidth(1);
+	cout << "-I- bin width = " << w << endl;
+	cout << "-I- nBins = " << h->GetNbinsX() << endl;
 	Double_t a = 0.;
 	for (Int_t i = 1; i <= h->GetNbinsX(); i++){
 		a += w * h->GetBinContent(i);
 	}
+	cout << "-I- area = " << a << endl;
 	return a;
 }
 
 void CbmTrdElectronsTrainAnn::Run()
 {
+	ReadFile();
 	if (fIdMethod == kBDT){
 		if (fIsDoTrain) DoTrainTmva();
 		DoTest();
@@ -169,11 +178,13 @@ void CbmTrdElectronsTrainAnn::Transform()
 
 void CbmTrdElectronsTrainAnn::Transform1()
 {
-	Double_t ANNCoef1 = 1.06;
-	Double_t ANNCoef2 = 0.57;
+//	Double_t ANNCoef1 = 1.06;
+//	Double_t ANNCoef2 = 0.57;
+	Double_t ANNCoef1[] = {1.04,1.105,1.154,1.277,1.333,1.394,1.47,1.50,1.54,1.58};
+	Double_t ANNCoef2[] = {0.548,0.567,0.585,0.63,0.645,0.664,0.69,0.705,0.716,0.723};
 	for (Int_t i = 0; i<fElossVec.size(); i++) {
 		fInVector[i]=fElossVec[i]*1e6;
-		fInVector[i]=(fInVector[i]-ANNCoef1)/ANNCoef2 -0.225;
+		fInVector[i]=(fInVector[i]-ANNCoef1[fFileNum])/ANNCoef2[fFileNum] -0.225;
 	}
 	sort(fInVector.begin(), fInVector.end());
 	for (Int_t i = 0; i<fInVector.size(); i++)
@@ -210,9 +221,6 @@ void CbmTrdElectronsTrainAnn::Transform2()
 void CbmTrdElectronsTrainAnn::Transform3()
 {
 
-//	for (int i = 0; i < 12; i ++){
-//		fElossVec[i] += fRandom->Gaus(0., 3e-6);
-//	}
 	sort(fElossVec.begin(), fElossVec.end());
 
 	Int_t size = fElossVec.size();
@@ -355,8 +363,9 @@ Double_t CbmTrdElectronsTrainAnn::Eval(Bool_t isEl)
 	}
 }
 
-void CbmTrdElectronsTrainAnn::DoTrain()
+void CbmTrdElectronsTrainAnn::ReadFile()
 {
+	cout << "-I- ReadFile" << endl;
 	if (!FileExists(fFileNameEl) ){
 		cout << "-E- FILE NOT FOUND fFileNameEl: "<< fFileNameEl << endl;
 		cout << "-E- NO TRAINING WILL BE PERFORMED!!!" << endl;
@@ -370,24 +379,54 @@ void CbmTrdElectronsTrainAnn::DoTrain()
 
 	std::ifstream finEl((const char*) fFileNameEl);
 	std::ifstream finPi((const char*) fFileNamePi);
-
-	Int_t nofPi = 0, nofEl = 0;
 	Double_t dEdX, tr, mom;
-	std::vector<Double_t> inVectorTemp;
-	inVectorTemp.resize(12);
+	Int_t count = 0;
+	while (!finPi.eof()) {
+		count++;
+		if (count%50000 == 0) cout << "-I- read Pion file line number: "<< count << endl;
+		vector<Double_t> eloss;
+		eloss.resize(12);
+		for (Int_t iStation = 0; iStation < 12; iStation++) {
+			finPi >> dEdX >> tr >> eloss[iStation];
+		}
+		finPi >> mom;
+		fElossPi.push_back(eloss);
+	}
+	finPi.close();
+	count = 0;
+	while (!finEl.eof()) {
+		count++;
+		if (count%50000 == 0) cout << "-I- read Electron file line number: "<< count << endl;
+		vector<Double_t> eloss;
+		eloss.resize(12);
+		for (Int_t iStation = 0; iStation < 12; iStation++) {
+			finEl >> dEdX >> tr >> eloss[iStation];
+		}
+		finEl >> mom;
+		fElossEl.push_back(eloss);
+	}
+	finEl.close();
+//
+//	for (Int_t iP = 0; iP < 30; iP++) {
+//		for (int i = 0; i < 12; i++){
+//			cout << fElossPi[iP][i] << " ";
+//		}
+//		cout <<endl;
+//	}
+
+}
+
+void CbmTrdElectronsTrainAnn::DoTrain()
+{
+	Int_t nofPi = 0, nofEl = 0;
 	fElossVec.clear();
 	fElossVec.resize(fNofLayers);
 
 	TTree* simu = CreateTree();
 
-	while (!finPi.eof()) {
-		for (Int_t iStation = 0; iStation < 12; iStation++) {
-			finPi >> dEdX >> tr >> inVectorTemp[iStation];
-		}
+	for (Int_t iP = 0; iP < fElossPi.size() - 2; iP++) {
 		for (int i = 0; i < fNofLayers; i++)
-			fElossVec[i] = inVectorTemp[i];
-
-		finPi >> mom;
+			fElossVec[i] = fElossPi[iP][i];
 		fXOut = -1.;
 		Transform();
 
@@ -395,15 +434,9 @@ void CbmTrdElectronsTrainAnn::DoTrain()
 		nofPi++;
 		if (nofPi >= fMaxNofTrainPi) break;
 	}
-	finPi.close();
-	while (!finEl.eof()) {
-		for (Int_t iStation = 0; iStation < 12; iStation++) {
-			finEl >> dEdX >> tr >> inVectorTemp[iStation];
-		}
+	for (Int_t iE = 0; iE < fElossEl.size() - 2; iE++){
 		for (int i = 0; i < fNofLayers; i++)
-			fElossVec[i] = inVectorTemp[i];
-		finEl >> mom;
-
+			fElossVec[i] = fElossEl[iE][i];
 		fXOut = 1.;
 		Transform();
 
@@ -411,69 +444,46 @@ void CbmTrdElectronsTrainAnn::DoTrain()
 		nofEl++;
 		if (nofEl >= fMaxNofTrainEl) break;
 	}
-	finEl.close();
 	if (!fNN) delete fNN;
 	TString mlpString = CreateAnnString();
 	cout << "-I- create ANN: "<< mlpString << endl;
 	cout << "-I- number of training epochs = " << fNofAnnEpochs << endl;
 	fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
 	fNN->Train(fNofAnnEpochs, "+text,update=10");
-	fNN->DumpWeights((const char*)fAnnWeightsFile);
+	fNN->DumpWeights((const char*)(fWeightFileDir+"/"+fAnnWeightsFile));
 }
 
 void CbmTrdElectronsTrainAnn::DoTrainTmva()
 {
-	if (!FileExists(fFileNameEl) ){
-		cout << "-E- FILE NOT FOUND fFileNameEl: "<< fFileNameEl << endl;
-		cout << "-E- NO TRAINING WILL BE PERFORMED!!!" << endl;
-		return;
-	}
-	if (!FileExists(fFileNamePi)){
-		cout << "-E- FILE NOT FOUND fFileNamePi: "<< fFileNamePi << endl;
-		cout << "-E- NO TRAINING WILL BE PERFORMED!!!" << endl;
-		return;
-	}
-
 	TTree* simu = CreateTree();
 
-	std::ifstream finEl((const char*) fFileNameEl);
-	std::ifstream finPi((const char*) fFileNamePi);
-
 	Int_t nofPi = 0, nofEl = 0;
-	Double_t dEdX, tr, mom;
-	std::vector<Double_t> inVectorTemp;
-	inVectorTemp.resize(12);
 	fElossVec.clear();
 	fElossVec.resize(fNofLayers);
 
-	while (!finPi.eof()) {
-		for (Int_t iStation = 0; iStation < 12; iStation++) {
-			finPi >> dEdX >> tr >> inVectorTemp[iStation];
+	for (Int_t iP = 0; iP < fElossPi.size(); iP++) {
+		for (Int_t i = 0; i < fNofLayers; i++){
+			fElossVec[i] = fElossPi[iP][i];
+			//cout << fElossPi[iP][i]<< " ";
 		}
-		for (int i = 0; i < fNofLayers; i++)
-			fElossVec[i] = inVectorTemp[i];
-		finPi >> mom;
+		//cout<< endl;
 		fXOut = -1.;
 		Transform();
+
 		simu->Fill();
 		nofPi++;
-		if (nofPi >= fMaxNofTrainPi) break;
+		if (nofPi >= fMaxNofTrainPi)break;
 	}
-	finPi.close();
-	while (!finEl.eof()) {
-		for (Int_t iStation = 0; iStation < 12; iStation++) {
-			finEl >> dEdX >> tr >> inVectorTemp[iStation];
-		}
-		for (int i = 0; i < fNofLayers; i++)
-			fElossVec[i] = inVectorTemp[i];
-		finEl >> mom;
+	for (Int_t iE = 0; iE < fElossEl.size(); iE++) {
+		for (Int_t i = 0; i < fNofLayers; i++)
+			fElossVec[i] = fElossEl[iE][i];
 		fXOut = 1.;
 		Transform();
+
 		simu->Fill();
 		nofEl++;
-		if (nofEl >= fMaxNofTrainEl) break;
+		if (nofEl >= fMaxNofTrainEl)break;
 	}
-	finEl.close();
 
 	TMVA::Factory* factory = CreateFactory(simu);
 	(TMVA::gConfig().GetIONames()).fWeightFileDir = fWeightFileDir;
@@ -484,7 +494,11 @@ void CbmTrdElectronsTrainAnn::DoTrainTmva()
 			"SplitMode=Random:NormMode=NumEvents:!V");
 
 //	factory->BookMethod(TMVA::Types::kTMlpANN, "TMlpANN","!H:!V:NCycles=50:HiddenLayers=N+1");
+	char txt1[150];
+	sprintf(txt1, "nTrain_Signal=%d:nTrain_Background=%d:nTest_Signal=0:nTest_Background=0",
+			fMaxNofTrainEl-500, fMaxNofTrainPi-500);
 
+	factory->PrepareTrainingAndTestTree("",txt1);
 	factory->BookMethod(TMVA::Types::kBDT,"BDT",
 			"!H:!V:NTrees=400:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:PruneMethod=CostComplexity:PruneStrength=4.5");
 
@@ -500,16 +514,6 @@ void CbmTrdElectronsTrainAnn::DoTrainTmva()
 
 void CbmTrdElectronsTrainAnn::DoPreTest()
 {
-	if (!FileExists(fFileNameTestEl) ){
-		cout << "-E- FILE NOT FOUND fFileNameTestEl: "<< fFileNameTestEl << endl;
-		cout << "-E- NO TESTING WILL BE PERFORMED!!!" << endl;
-		return;
-	}
-	if (!FileExists(fFileNameTestPi)){
-		cout << "-E- FILE NOT FOUND fFileNameTestPi: "<< fFileNameTestPi << endl;
-		cout << "-E- NO TESTING WILL BE PERFORMED!!!" << endl;
-		return;
-	}
 
 	cout << "-I- Start pretesting " << endl;
 	if (fIdMethod == kBDT){
@@ -536,23 +540,18 @@ void CbmTrdElectronsTrainAnn::DoPreTest()
 		TTree* simu = CreateTree();
 		TString mlpString = CreateAnnString();
 		fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
-		fNN->LoadWeights((const char*)fAnnWeightsFile);
+		fNN->LoadWeights((const char*)(fWeightFileDir+"/"+fAnnWeightsFile));
 	}
 
-	Double_t dEdX, tr, mom;
-	std::vector<Double_t> inVectorTemp;
-	inVectorTemp.resize(12);
-	//input data for testing
-	std::ifstream finPiTest((const char*) fFileNameTestPi);
-	std::ifstream finElTest((const char*) fFileNameTestEl);
-
-	while (!finElTest.eof()) {
-		for (Int_t iStation = 0; iStation < 12; iStation++) {
-			finElTest >> dEdX >> tr >> inVectorTemp[iStation];
+	Int_t count = 0;
+	for (Int_t iE = 0; iE < fElossEl.size(); iE++) {
+		count++;
+		if (count < fMaxNofTrainEl) continue;//exclude training samples
+		if (count%50000 == 0) cout << "-I- read Electron number: "<< count << endl;
+		for (int i = 0; i < fNofLayers; i++){
+			if (fSigmaError !=0.)fElossEl[iE][i]+=fRandom->Gaus(0., fSigmaError);
+			fElossVec[i] = fElossEl[iE][i];
 		}
-		finElTest >> mom;
-		for (int i = 0; i < fNofLayers; i++)
-			fElossVec[i] = inVectorTemp[i];
 
 		Transform();
 		FillProbabilityHistos(true);
@@ -561,15 +560,17 @@ void CbmTrdElectronsTrainAnn::DoPreTest()
 		if (nnEval < fMinEval)nnEval = fMinEval + 0.01;
 		fhAnnOutputEl->Fill(nnEval);
 	}
-	finElTest.close();
 
-	while (!finPiTest.eof()) {
-		for (Int_t iStation = 0; iStation < 12; iStation++) {
-			finPiTest >> dEdX >> tr >> inVectorTemp[iStation];
+	count = 0;
+	for (Int_t iP = 0; iP < fElossPi.size(); iP++) {
+		count++;
+		if (count < fMaxNofTrainPi) continue; //exclude training samples
+		if (count%50000 == 0) cout << "-I- read Pion number: "<< count << endl;
+		for (int i = 0; i < fNofLayers; i++){
+			if (fSigmaError !=0.)fElossPi[iP][i]+=fRandom->Gaus(0., fSigmaError);
+			fElossVec[i] = fElossPi[iP][i];
 		}
-		for (int i = 0; i < fNofLayers; i++)
-			fElossVec[i] = inVectorTemp[i];
-		finPiTest >> mom;
+
 
 		Transform();
 		FillProbabilityHistos(false);
@@ -578,7 +579,6 @@ void CbmTrdElectronsTrainAnn::DoPreTest()
 		if (nnEval < fMinEval)nnEval = fMinEval + 0.01;
 		fhAnnOutputPi->Fill(nnEval);
 	}
-	finPiTest.close();
 	CreateCumProbHistos();
 	CreateROCDiagramm();
 }
@@ -586,17 +586,6 @@ void CbmTrdElectronsTrainAnn::DoPreTest()
 
 void CbmTrdElectronsTrainAnn::DoTest()
 {
-	if (!FileExists(fFileNameTestEl) ){
-		cout << "-E- FILE NOT FOUND fFileNameTestEl: "<< fFileNameTestEl << endl;
-		cout << "-E- NO TESTING WILL BE PERFORMED!!!" << endl;
-		return;
-	}
-	if (!FileExists(fFileNameTestPi)){
-		cout << "-E- FILE NOT FOUND fFileNameTestPi: "<< fFileNameTestPi << endl;
-		cout << "-E- NO TESTING WILL BE PERFORMED!!!" << endl;
-		return;
-	}
-
 	fElossVec.clear();
 	fElossVec.resize(fNofLayers);
 
@@ -618,29 +607,23 @@ void CbmTrdElectronsTrainAnn::DoTest()
 		TTree* simu = CreateTree();
 		TString mlpString = CreateAnnString();
 		fNN = new TMultiLayerPerceptron(mlpString,simu,"(Entry$+1)");
-		fNN->LoadWeights((const char*)fAnnWeightsFile);
+		fNN->LoadWeights((const char*)(fWeightFileDir+"/"+fAnnWeightsFile));
 	}
-
-	Double_t dEdX, tr, mom;
-	std::vector<Double_t> inVectorTemp;
-	inVectorTemp.resize(12);
-	//input data for testing
-	std::ifstream finPiTest((const char*) fFileNameTestPi);
-	std::ifstream finElTest((const char*) fFileNameTestEl);
 
 	Int_t nofPiLikeEl = 0;
 	Int_t nofElLikePi = 0;
 	Int_t nofElTest = 0;
 	Int_t nofPiTest = 0;
 
-	cout << "-I- read data from file " << endl;
-	while (!finElTest.eof()) {
-		for (Int_t iStation = 0; iStation < 12; iStation++) {
-			finElTest >> dEdX >> tr >> inVectorTemp[iStation];
-		}
-		finElTest >> mom;
+	Int_t count = 0;
+	cout << "fMaxNofTrainEl = "  << fMaxNofTrainEl << endl;
+	for (Int_t iE = 0; iE < fElossEl.size(); iE++) {
+		count++;
+		if (count < fMaxNofTrainEl) continue;//exclude training samples
+		if (count%50000 == 0) cout << "-I- read Electron number: "<< count<< endl;
+
 		for (int i = 0; i < fNofLayers; i++)
-			fElossVec[i] = inVectorTemp[i];
+			fElossVec[i] = fElossEl[iE][i];
 
 		Transform();
 		Double_t nnEval = Eval(true);
@@ -650,16 +633,14 @@ void CbmTrdElectronsTrainAnn::DoTest()
 		nofElTest++;
 		if (nnEval < fAnnCut)nofElLikePi++;
 	}
-	finElTest.close();
+	count = 0;
+	for (Int_t iP = 0; iP < fElossPi.size(); iP++){
+		count++;
+		if (count < fMaxNofTrainPi) continue;//exclude training samples
+		if (count%50000 == 0) cout << "-I- read Pion number: "<< count <<endl;
 
-	while (!finPiTest.eof()) {
-		for (Int_t iStation = 0; iStation < 12; iStation++) {
-			finPiTest >> dEdX >> tr >> inVectorTemp[iStation];
-		}
 		for (int i = 0; i < fNofLayers; i++)
-			fElossVec[i] = inVectorTemp[i];
-		finPiTest >> mom;
-
+			fElossVec[i] = fElossPi[iP][i];
 		Transform();
 		Double_t nnEval = Eval(false);
 		if (nnEval > fMaxEval)nnEval = fMaxEval - 0.01;
@@ -668,7 +649,6 @@ void CbmTrdElectronsTrainAnn::DoTest()
 		nofPiTest++;
 		if (nnEval > fAnnCut)nofPiLikeEl++;
 	}
-	finPiTest.close();
 
 	cout << "Testing results:" << endl;
 	cout << "cut = " << fAnnCut << endl;
@@ -688,6 +668,8 @@ void CbmTrdElectronsTrainAnn::DoTest()
 	foutResults << "------------------------"<< endl;
 	foutResults << fIdMethod << " ";
 	foutResults << fTransformType << endl;
+	foutResults << fMaxNofTrainPi << " " << fMaxNofTrainEl << endl;
+	foutResults << fSigmaError <<endl;
 	foutResults << fFileNameTestEl <<endl;
 	foutResults << fFileNameTestPi<<endl;
 	foutResults << fFileNameCumHistos<<endl;

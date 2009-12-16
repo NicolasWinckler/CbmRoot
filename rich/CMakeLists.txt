@@ -75,7 +75,7 @@ qa/CbmRichElectronsQa.cxx
 selection/CbmRichRingSelectImpl.cxx
 selection/CbmRichRingSelectNeuralNet.cxx
 selection/CbmRichSelectRings.cxx
-selection/NNfunction.cxx
+#selection/NNfunction.cxx
 #LhcbRingFinder.cxx
 #CbmRichTestSimd.cxx
 )

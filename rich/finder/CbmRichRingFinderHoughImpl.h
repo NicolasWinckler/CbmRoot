@@ -10,7 +10,6 @@
 #include "CbmRichRingFinder.h"
 #include "CbmRichRingFitterCOP.h"
 #include "CbmRichRingFitterEllipseTau.h"
-#include "CbmRichRingFitterEllipse.h"
 #include "CbmRichRingSelectNeuralNet.h"
 #include "TClonesArray.h"
 #include "TString.h"
@@ -104,6 +103,7 @@ protected:
 
 	CbmRichRingFitterCOP* fFitCOP;
 	CbmRichRingSelectNeuralNet* fANNSelect;
+	CbmRichRingFitterEllipseTau* fFitEllipse;
 
 	TString fGeometryType;
 
@@ -152,10 +152,12 @@ public:
 	void FuzzyKE(TClonesArray* rHitArray);
     void RingSelection();
     void ReAssingSharedHits(Int_t ringInd1, Int_t ringInd2);
+    void ReAssingSharedHitsEllipse(Int_t ringInd1, Int_t ringInd2);
     Int_t GetHitIndex(Int_t hitInd);
+    Bool_t AreRingsCloseEnough(CbmRichRing* ring1, CbmRichRing* ring2);
     void RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring);
     void RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring);
-
+    void InitHist();
 	void Init();
 	void DoFind();
 
@@ -168,7 +170,7 @@ public:
 		return fFoundRings;
 	}
 
-	ClassDef(CbmRichRingFinderHoughImpl,1)
+	//ClassDef(CbmRichRingFinderHoughImpl,1)
 
 };
 #endif // CBM_RICH_RING_FINDER_HOUGH_IMPL_H

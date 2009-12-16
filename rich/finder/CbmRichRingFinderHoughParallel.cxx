@@ -6,13 +6,10 @@
 #include "tbb/task_scheduler_init.h"
 #include "tbb/task.h"
 #include "tbb/tick_count.h"
+#include "tbb/parallel_invoke.h"
 
 #include "CbmRichRingFinderHoughParallel.h"
 #include "CbmRichRingFinderHoughImpl.h"
-
-#include "CbmRichHit.h"
-#include "CbmRichRing.h"
-#include "FairTrackParam.h"
 
 #include "TString.h"
 #include "TStopwatch.h"
@@ -24,27 +21,21 @@
 #include <algorithm>
 #include <iostream>
 
-
 using std::cout;
 using std::endl;
 using std::vector;
 
-class FinderTask: public tbb::task {
-
-public:
+class FinderTask{
 	CbmRichRingFinderHoughParallelImpl* fHTImpl;
-
+public:
 	FinderTask(CbmRichRingFinderHoughParallelImpl* HTImpl) {
 		fHTImpl = HTImpl;
 	}
 
-	tbb::task* execute() {
+	void operator()() const {
 		fHTImpl->DoFind();
-		return NULL;
 	}
 };
-
-
 
 // -----   Standard constructor   ------------------------------------------
 CbmRichRingFinderHoughParallel::CbmRichRingFinderHoughParallel  ( Int_t verbose, TString geometry )
@@ -67,6 +58,7 @@ void CbmRichRingFinderHoughParallel::Init()
 	fHTImpl1->Init();
 	fHTImpl2 = new CbmRichRingFinderHoughParallelImpl(fGeometryType);
 	fHTImpl2->Init();
+	tbb::task_scheduler_init init;
 }
 
 CbmRichRingFinderHoughParallel::CbmRichRingFinderHoughParallel()
@@ -123,16 +115,12 @@ Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
 		}
 	}
 
-
 	fHTImpl1->SetData(UpH);
 	fHTImpl2->SetData(DownH);
-	tbb::task_scheduler_init init;
-	tbb::task_list tl;
-	FinderTask& a = *new( tbb::task::allocate_root() ) FinderTask(fHTImpl1);
-	FinderTask& b = *new( tbb::task::allocate_root() ) FinderTask(fHTImpl2);
-	tl.push_back(a);
-	tl.push_back(b);
-	tbb::task::spawn_root_and_wait(tl);
+
+	FinderTask a(fHTImpl1);
+	FinderTask b(fHTImpl2);
+	tbb::parallel_invoke(a, b);
 
 	AddRingsToOutputArray(rRingArray, fHTImpl2->GetFoundRings());
 	AddRingsToOutputArray(rRingArray, fHTImpl1->GetFoundRings());
@@ -148,25 +136,19 @@ Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
 		cout << "CbmRichRingFinderHough: Number of output rings: "
 				<< rRingArray->GetEntriesFast() << endl;
 
-	cout << "Exec time : " << fExecTime<< endl;
+	cout << "Exec time : " << fExecTime << ", per event " << 1000.*fExecTime/fNEvent << " ms" << endl;
 
 	return 1;
 }
 
-void CbmRichRingFinderHoughParallel::Finish()
-{
-
-}
-
 void CbmRichRingFinderHoughParallel::AddRingsToOutputArray(TClonesArray *rRingArray,
-		vector<CbmRichRing>& rings)
+		vector<CbmRichRing*>& rings)
 {
 	for (UInt_t iRing = 0; iRing < rings.size(); iRing++) {
-		if (rings[iRing].GetRecFlag() == -1)	continue;
-		new ((*rRingArray)[fRingCount]) CbmRichRing(rings[iRing]);
+		if (rings[iRing]->GetRecFlag() == -1)	continue;
+		new ((*rRingArray)[fRingCount]) CbmRichRing(*rings[iRing]);
 		fRingCount++;
 	}
 }
 
-
-ClassImp(CbmRichRingFinderHoughParallel)
+ClassImp(CbmRichRingFinderHoughParallel);

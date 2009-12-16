@@ -40,6 +40,12 @@ CbmRichRingFinderHoughImpl::CbmRichRingFinderHoughImpl  (TString geometry)
     fGeometryType = geometry;
 }
 
+CbmRichRingFinderHoughImpl::CbmRichRingFinderHoughImpl()
+{
+
+
+}
+
 void CbmRichRingFinderHoughImpl::Init()
 {
     SetParameters(fGeometryType);
@@ -50,6 +56,8 @@ void CbmRichRingFinderHoughImpl::Init()
 
     fFitCOP = new CbmRichRingFitterCOP(0, 0);
     fFitCOP->Init();
+//    fFitEllipse = new CbmRichRingFitterEllipseTau(0, 1, "compact");
+//   fFitEllipse->Init();
 
     TString richSelectNNFile = gSystem->Getenv("VMCWORKDIR");
     if (fGeometryType == "large"){
@@ -57,18 +65,13 @@ void CbmRichRingFinderHoughImpl::Init()
     }
     if (fGeometryType == "compact"){
 	    richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights_Compact.txt";
-       // richSelectNNFile = "/u/slebedev/JUL09/trunk/macro/rich/NeuralNet_RingSelection_Weights1.txt";
+        //richSelectNNFile = "/u/slebedev/JUL09/trunk/macro/rich/NeuralNet_RingSelection_Weights1.txt";
     }
     fANNSelect = new CbmRichRingSelectNeuralNet(0, richSelectNNFile);
     fANNSelect->Init();
 
 }
 
-CbmRichRingFinderHoughImpl::CbmRichRingFinderHoughImpl()
-{
-
-
-}
 // -----   Destructor   ----------------------------------------------------
 CbmRichRingFinderHoughImpl::~CbmRichRingFinderHoughImpl()
 {
@@ -91,6 +94,7 @@ void CbmRichRingFinderHoughImpl::DoFind()
 	std::sort(fData.begin(), fData.end(), CbmRichHoughHitCmpUp());
 	HoughTransformReconstruction();
 	RingSelection();
+	fData.clear();
 }
 
 void CbmRichRingFinderHoughImpl::SetParameters( Int_t nofParts,
@@ -134,8 +138,8 @@ void CbmRichRingFinderHoughImpl::SetParameters( Int_t nofParts,
 
     fMinNofHitsInArea = 6;
 
-    fDx = 2*fMaxDistance / (Float_t)fNofBinsX;
-    fDy = 2*fMaxDistance / (Float_t)fNofBinsY;
+    fDx = 2.*fMaxDistance / (Float_t)fNofBinsX;
+    fDy = 2.*fMaxDistance / (Float_t)fNofBinsY;
     fDr = fMaxRadius / (Float_t)fNofBinsR;
     fNofBinsXY = fNofBinsX * fNofBinsY;
 }
@@ -184,7 +188,7 @@ void CbmRichRingFinderHoughImpl::SetParameters(TString geometry)
         fNofParts = 2;
 
         fMaxDistance = 11.5;
-        fMinDistance = 2.5;
+        fMinDistance = 3.;
         fMinDistanceSq = fMinDistance*fMinDistance;
         fMaxDistanceSq = fMaxDistance*fMaxDistance;
 
@@ -205,7 +209,7 @@ void CbmRichRingFinderHoughImpl::SetParameters(TString geometry)
 			fMinNofHitsInArea = 4;
         }
 
-        fNofBinsX = 25;
+        fNofBinsX = 17;
         fNofBinsY = 25;
         fNofBinsR = 32;
 
@@ -218,7 +222,7 @@ void CbmRichRingFinderHoughImpl::SetParameters(TString geometry)
     	fRmsCoeffCOP = 3.;
     	fMaxCutCOP = 1.2;
     }
-    fDx = 2.*fMaxDistance / (Float_t)fNofBinsX;
+    fDx = 1.36*fMaxDistance / (Float_t)fNofBinsX;
     fDy = 2.*fMaxDistance / (Float_t)fNofBinsY;
     fDr = fMaxRadius / (Float_t)fNofBinsR;
     fNofBinsXY = fNofBinsX * fNofBinsY;
@@ -231,7 +235,7 @@ void CbmRichRingFinderHoughImpl::HoughTransformReconstruction()
     {
         if (fData[iHit].fIsUsed == true) continue;
 
-        fCurMinX = fData[iHit].fX  - fMaxDistance;
+        fCurMinX = fData[iHit].fX  - 0.36f*fMaxDistance;
 		fCurMinY = fData[iHit].fY - fMaxDistance;
 
 		DefineLocalAreaAndHits(fData[iHit].fX, fData[iHit].fY , &indmin, &indmax);
@@ -248,7 +252,7 @@ void CbmRichRingFinderHoughImpl::DefineLocalAreaAndHits(Float_t x0, Float_t y0,
     std::vector<CbmRichHoughHit>::iterator itmin, itmax;
 
 	//find all hits which are in the corridor
-	mpnt.fX = x0 - 0.4*fMaxDistance;
+	mpnt.fX = x0 - 0.36f*fMaxDistance;
 	itmin = std::lower_bound(fData.begin(), fData.end(), mpnt, CbmRichHoughHitCmpUp());
 
 	mpnt.fX = x0 + fMaxDistance;
@@ -267,24 +271,52 @@ void CbmRichRingFinderHoughImpl::DefineLocalAreaAndHits(Float_t x0, Float_t y0,
 	}
 
 	register Float_t rx, ry;
-    for (Int_t i = *indmin; i <= *indmax; i++) {
-    	if (fData[i].fIsUsed == true) continue;
-    	ry = y0 - fData[i].fY;
-    	if (fabs(ry) > 0.8*fMaxDistance) continue;
-    	rx = x0 - fData[i].fX;
-    	Float_t d = rx	* rx +ry * ry;
-    	if (d > fMaxDistanceSq) continue;
+	register Int_t indmin1=*indmin;
+	register Int_t indmax1=*indmax;
+	register Float_t maxDistance08 = 0.8f*fMaxDistance;
 
-    	fHitInd[i % fNofParts].push_back(i);
-    }
+	if (fNofParts == 2){
+		for (Int_t i = indmin1; i <= indmax1; i+=2) {
+			if (fData[i].fIsUsed == true) continue;
+			ry = y0 - fData[i].fY;
+			if (fabs(ry) > maxDistance08) continue;
+			rx = x0 - fData[i].fX;
+			Float_t d = rx	* rx +ry * ry;
+			if (d > fMaxDistanceSq) continue;
+			fHitInd[0].push_back(i);
+		}
+		for (Int_t i = indmin1+1; i <= indmax1; i+=2) {
+			if (fData[i].fIsUsed == true) continue;
+			ry = y0 - fData[i].fY;
+			if (fabs(ry) > maxDistance08) continue;
+			rx = x0 - fData[i].fX;
+			Float_t d = rx	* rx +ry * ry;
+			if (d > fMaxDistanceSq) continue;
+			fHitInd[1].push_back(i);
+		}
+	}else { //fNofParts!=2
+		for (Int_t i = indmin1; i <= indmax1; i++) {
+			if (fData[i].fIsUsed == true) continue;
+			ry = y0 - fData[i].fY;
+			if (fabs(ry) > maxDistance08) continue;
+			rx = x0 - fData[i].fX;
+			Float_t d = rx	* rx +ry * ry;
+			if (d > fMaxDistanceSq) continue;
 
-	for (Int_t j = 0; j < fNofBinsXY; j++){
-		fHist[j] = 0;
+			fHitInd[i % fNofParts].push_back(i);
+		}
 	}
 
-	for (Int_t k = 0; k < fNofBinsR; k++) {
-		fHistR[k] = 0;
-	}
+//	for (Int_t j = 0; j < fNofBinsXY; j++){
+//		fHist[j] = 0;
+//		cout << "fHist["<<j<<"]=0;" <<endl;
+//	}
+
+	InitHist();
+
+//	for (Int_t k = 0; k < fNofBinsR; k++) {
+//		fHistR[k] = 0;
+//	}
 }
 
 void CbmRichRingFinderHoughImpl::HoughTransform(unsigned short int indmin, unsigned short int indmax)
@@ -297,29 +329,20 @@ void CbmRichRingFinderHoughImpl::HoughTransform(unsigned short int indmin, unsig
 void CbmRichRingFinderHoughImpl::HoughTransformGroup(unsigned short int indmin,
 		unsigned short int indmax, Int_t iPart)
 {
+    Int_t nofHits = fHitInd[iPart].size();
+	if (nofHits <= fMinNofHitsInArea) return;
 	register Float_t r12, r13, r23;
     register Float_t rx0, rx1, rx2, ry0, ry1,ry2; //rx[3], ry[3];//, x[3], y[3];
     register Float_t xc, yc, r;
     register Float_t xcs, ycs; // xcs = xc - fCurMinX
     register Int_t intX, intY, intR;
     register Int_t indXY;
-
     register unsigned short int iH1, iH2, iH3;
-    //register unsigned short int iH1_1, iH2_1, iH3_1;
-    register Int_t nofHitsNorm = fHitInd[0].size() + 1;
-    register Int_t iPmulNofHits;
-
     register Float_t t5, t10, t19, det, t6, t7;
     register Float_t dx = 1.0f/fDx, dy = 1.0f/fDy, dr = 1.0f/fDr;
     register Float_t histXY;
-
-    Int_t nofHits = fHitInd[iPart].size();
     vector<unsigned short> hitIndPart;
     hitIndPart.assign(fHitInd[iPart].begin(), fHitInd[iPart].end());
-
-    if (nofHits <= fMinNofHitsInArea) return;
-    iPmulNofHits = iPart * nofHitsNorm;
-
     register Float_t iH1X, iH1Y, iH2X, iH2Y, iH3X, iH3Y;
 
 	for (unsigned short int iHit1 = 0; iHit1 < nofHits; iHit1++) {
@@ -371,8 +394,9 @@ void CbmRichRingFinderHoughImpl::HoughTransformGroup(unsigned short int indmin,
 				 //radius calculation
 				t6 = iH1X - xc;
 				t7 = iH1Y - yc;
+				//if (t6 > fMaxRadius || t7 > fMaxRadius) continue;
 				r = sqrt(t6 * t6 + t7 * t7);
-
+				//if (r < fMinRadius) continue;
 				intR = int(r *dr);
 				if (intR < 0 || intR >= fNofBinsR) continue;
 				indXY = intX * fNofBinsX + intY;
@@ -382,6 +406,7 @@ void CbmRichRingFinderHoughImpl::HoughTransformGroup(unsigned short int indmin,
 			}//iHit1
 		}//iHit2
 	}//iHit3
+	hitIndPart.clear();
 }
 
 
@@ -461,15 +486,15 @@ void CbmRichRingFinderHoughImpl::RemoveHitsAroundEllipse(Int_t indmin, Int_t ind
 	Double_t dCut = fRmsCoeffEl * rms;
 	if (dCut > fMaxCutEl) dCut = fMaxCutEl;
 
-	for(Int_t j = 0; j < indmax - indmin + 1; j++){
-		Double_t x = fData[j + indmin].fX;
-		Double_t y = fData[j + indmin].fY;
+	for(Int_t j = indmin; j < indmax + 1; j++){
+		Double_t x = fData[j].fX;
+		Double_t y = fData[j].fY;
 
         Double_t d1 = TMath::Abs(A*x*x + B*x*y + C*y*y + D*x + E*y + F);
         Double_t d2 = sqrt( pow(2*A*x + B*y + D, 2) + pow(B*x + 2*C*y + E, 2) );
 
         Double_t d = d1/d2;
-        if (d < dCut) fData[j+indmin].fIsUsed = true;
+        if (d < dCut) fData[j].fIsUsed = true;
 	}
 }
 
@@ -479,13 +504,13 @@ void CbmRichRingFinderHoughImpl::RemoveHitsAroundRing(Int_t indmin, Int_t indmax
 	Double_t dCut = fRmsCoeffEl * rms;
 	if (dCut > fMaxCutEl) dCut = fMaxCutEl;
 
-	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
-		Double_t rx = fData[j + indmin].fX - ring->GetCenterX();
-		Double_t ry = fData[j + indmin].fY - ring->GetCenterY();
+	for (Int_t j = indmin; j < indmax + 1; j++) {
+		Double_t rx = fData[j].fX - ring->GetCenterX();
+		Double_t ry = fData[j].fY - ring->GetCenterY();
 
 		Double_t dr = fabs(sqrt(rx * rx + ry * ry) - ring->GetRadius());
 		if (dr < dCut) {
-			fData[j+indmin].fIsUsed = true;
+			fData[j].fIsUsed = true;
 		}
 	}
 }
@@ -518,20 +543,22 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 	CbmRichRing* ring1 = new CbmRichRing();
 
 //Find Preliminary Xc, Yc, R
-    Float_t xc, yc, r;
-	xc = (maxXY/fNofBinsX + 0.5)* fDx + fCurMinX;
-	yc = (maxXY%fNofBinsX + 0.5)* fDy + fCurMinY;
-	r = (maxR + 0.5)* fDr;
-	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
-		Float_t rx = fData[j + indmin].fX - xc;
-		Float_t ry = fData[j + indmin].fY - yc;
+    register Float_t xc, yc, r;
+    register Float_t rx, ry, dr;
+	xc = (maxXY/fNofBinsX + 0.5f)* fDx + fCurMinX;
+	yc = (maxXY%fNofBinsX + 0.5f)* fDy + fCurMinY;
+	r = (maxR + 0.5f)* fDr;
+	for (Int_t j = indmin; j < indmax + 1; j++) {
+		rx = fData[j].fX - xc;
+		ry = fData[j].fY - yc;
 
-		Float_t dr = fabs(sqrt(rx * rx + ry * ry) - r);
-		if (dr < 0.6) ring1->AddHit(fData[j + indmin].fId);
+		dr = fabs(sqrt(rx * rx + ry * ry) - r);
+		if (dr > 0.6f) continue;
+		ring1->AddHit(fData[j].fId);
 	}
 
 	fFitCOP->DoFit(ring1);
-	Double_t drCOPCut = fRmsCoeffCOP*sqrt(ring1->GetChi2()/ring1->GetNofHits());
+	Float_t drCOPCut = fRmsCoeffCOP*sqrt(ring1->GetChi2()/ring1->GetNofHits());
 	if (drCOPCut > fMaxCutCOP)	drCOPCut = fMaxCutCOP;
 
 	xc = ring1->GetCenterX();
@@ -540,17 +567,16 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 	delete ring1;
 
 	CbmRichRing* ring2 = new CbmRichRing();
-	for (Int_t j = 0; j < indmax - indmin + 1; j++) {
-		Float_t rx = fData[j + indmin].fX - xc;
-		Float_t ry = fData[j + indmin].fY - yc;
+	for (Int_t j = indmin; j < indmax + 1; j++) {
+		rx = fData[j].fX - xc;
+		ry = fData[j].fY - yc;
 
-		Float_t dr = fabs(sqrt(rx * rx + ry * ry) - r);
-		if (dr < drCOPCut) {
-			//fData[j+indmin].fIsUsed = true;
-			ring2->AddHit(fData[j + indmin].fId);
-		}
+		dr = fabs(sqrt(rx * rx + ry * ry) - r);
+		if (dr > drCOPCut) continue;
+		//fData[j+indmin].fIsUsed = true;
+		ring2->AddHit(fData[j].fId);
 	}
-	//fFitEllipseTau->DoFit(ring2);
+
 	fFitCOP->DoFit(ring2);
 	fANNSelect->DoSelect(ring2);
 	Double_t select = ring2->GetSelectionNN();
@@ -572,20 +598,23 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 
 void CbmRichRingFinderHoughImpl::RingSelection()
 {
+	Int_t nofRings = fFoundRings.size();
 	std::sort(fFoundRings.begin(), fFoundRings.end(), CbmRichRingComparatorMore());
 	std::vector<std::set<Int_t> > usedHits;
-	usedHits.reserve(300);
+	usedHits.reserve(nofRings);
 	std::set<Int_t> usedHitsAll;
 	std::vector<Int_t> goodRingIndex;
-
-	Int_t nofRings = fFoundRings.size();
+	goodRingIndex.reserve(nofRings);
+	CbmRichRing* ring2;
 	for (Int_t iRing = 0; iRing < nofRings; iRing++){
-		fFoundRings[iRing]->SetRecFlag(-1);
 		CbmRichRing* ring = fFoundRings[iRing];
+		ring->SetRecFlag(-1);
 		Int_t nofHits = ring->GetNofHits();
 		Bool_t isGoodRing = true;
 
 		for (Int_t iRSet = 0; iRSet < usedHits.size(); iRSet++){
+			ring2 = fFoundRings[goodRingIndex[iRSet]];
+			if (AreRingsCloseEnough(ring2, ring)) continue;
 			Int_t nofUsedHits = 0;
 			for(Int_t iHit = 0; iHit < nofHits; iHit++){
 				std::set<Int_t>::iterator it = usedHits[iRSet].find(ring->GetHit(iHit));
@@ -593,7 +622,7 @@ void CbmRichRingFinderHoughImpl::RingSelection()
 					nofUsedHits++;
 				}
 			}
-			if ((Double_t)nofUsedHits/(Double_t)nofHits > fUsedHitsCut){
+			if ((Float_t)nofUsedHits/(Float_t)nofHits > fUsedHitsCut){
 				isGoodRing = false;
 				break;
 			}
@@ -608,15 +637,19 @@ void CbmRichRingFinderHoughImpl::RingSelection()
 				nofUsedHitsAll++;
 			}
 		}
-		if ((Double_t)nofUsedHitsAll/(Double_t)nofHits > fUsedHitsAllCut){
+		if ((Float_t)nofUsedHitsAll/(Float_t)nofHits > fUsedHitsAllCut){
 			isGoodRingAll = false;
 		}
 
 		if (isGoodRing && isGoodRingAll){
+			//fFitEllipse->DoFit(fFoundRings[iRing]);
 			fFoundRings[iRing]->SetRecFlag(1);
 			goodRingIndex.push_back(iRing);
 
 			for (Int_t iRSet = 0; iRSet < usedHits.size(); iRSet++){
+			//	ring2 = fFoundRings[goodRingIndex[iRSet]];
+			//	if (AreRingsCloseEnough(ring2, ring)) continue;
+
 				ReAssingSharedHits(goodRingIndex[iRSet]	,iRing);
 			}
 			std::set<Int_t> usedHitsT;
@@ -626,7 +659,7 @@ void CbmRichRingFinderHoughImpl::RingSelection()
 			}
 			usedHits.push_back(usedHitsT);
 		}
-	}
+	}// iRing
 
 	usedHits.clear();
 	usedHitsAll.clear();
@@ -645,17 +678,63 @@ void CbmRichRingFinderHoughImpl::ReAssingSharedHits(Int_t ringInd1, Int_t ringIn
 		Int_t hitInd1 = ring1->GetHit(iHit1);
 		for(Int_t iHit2 = 0; iHit2 < nofHits2; iHit2++){
 			Int_t hitInd2 = ring2->GetHit(iHit2);
+			if(hitInd1 != hitInd2) continue;
+			Int_t hitIndData =  GetHitIndex(hitInd1);
+			Float_t hitX = fData[hitIndData].fX;
+			Float_t hitY = fData[hitIndData].fY;
+			Float_t rx1 = hitX - ring1->GetCenterX();
+			Float_t ry1 = hitY - ring1->GetCenterY();
+			Float_t dr1 = fabs(sqrt(rx1 * rx1 + ry1 * ry1) - ring1->GetRadius());
+
+			Float_t rx2 = hitX - ring2->GetCenterX();
+			Float_t ry2 = hitY - ring2->GetCenterY();
+			Float_t dr2 = fabs(sqrt(rx2 * rx2 + ry2 * ry2) - ring2->GetRadius());
+
+			if (dr1 > dr2){
+				ring1->RemoveHit(hitInd1);
+			} else {
+				ring2->RemoveHit(hitInd2);
+			}
+
+		}//iHit2
+	}//iHit1
+}
+
+void CbmRichRingFinderHoughImpl::ReAssingSharedHitsEllipse(Int_t ringInd1, Int_t ringInd2)
+{
+	CbmRichRing* ring1 = fFoundRings[ringInd1];
+	CbmRichRing* ring2 = fFoundRings[ringInd2];
+	Int_t nofHits1 = ring1->GetNofHits();
+	Int_t nofHits2 = ring2->GetNofHits();
+
+	for(Int_t iHit1 = 0; iHit1 < nofHits1; iHit1++){
+		Int_t hitInd1 = ring1->GetHit(iHit1);
+		for(Int_t iHit2 = 0; iHit2 < nofHits2; iHit2++){
+			Int_t hitInd2 = ring2->GetHit(iHit2);
 			if(hitInd1 == hitInd2){
 				Int_t hitIndData =  GetHitIndex(hitInd1);
-				Float_t hitX = fData[hitIndData].fX;
-				Float_t hitY = fData[hitIndData].fY;
-				Float_t rx1 = hitX - ring1->GetCenterX();
-				Float_t ry1 = hitY - ring1->GetCenterY();
-				Float_t dr1 = fabs(sqrt(rx1 * rx1 + ry1 * ry1) - ring1->GetRadius());
+				Float_t x = fData[hitIndData].fX;
+				Float_t y = fData[hitIndData].fY;
 
-				Float_t rx2 = hitX - ring2->GetCenterX();
-				Float_t ry2 = hitY - ring2->GetCenterY();
-				Float_t dr2 = fabs(sqrt(rx2 * rx2 + ry2 * ry2) - ring2->GetRadius());
+				Double_t A = ring1->GetAPar();
+				Double_t B = ring1->GetBPar();
+				Double_t C = ring1->GetCPar();
+				Double_t D = ring1->GetDPar();
+				Double_t E = ring1->GetEPar();
+				Double_t F = ring1->GetFPar();
+		        Double_t d1 = TMath::Abs(A*x*x + B*x*y + C*y*y + D*x + E*y + F);
+			    Double_t d2 = sqrt( pow(2*A*x + B*y + D, 2) + pow(B*x + 2*C*y + E, 2) );
+			    Double_t dr1 = d1/d2;
+
+				A = ring2->GetAPar();
+				B = ring2->GetBPar();
+				C = ring2->GetCPar();
+				D = ring2->GetDPar();
+				E = ring2->GetEPar();
+				F = ring2->GetFPar();
+		        d1 = TMath::Abs(A*x*x + B*x*y + C*y*y + D*x + E*y + F);
+			    d2 = sqrt( pow(2*A*x + B*y + D, 2) + pow(B*x + 2*C*y + E, 2) );
+			    Double_t dr2 = d1/d2;
 
 				if (dr1 > dr2){
 					ring1->RemoveHit(hitInd1);
@@ -675,6 +754,481 @@ Int_t CbmRichRingFinderHoughImpl::GetHitIndex(Int_t hitInd)
 	}
 
 }
+
+Bool_t CbmRichRingFinderHoughImpl::AreRingsCloseEnough(CbmRichRing* ring1, CbmRichRing* ring2)
+{
+	Double_t rx = ring1->GetCenterX() - ring2->GetCenterX();
+	Double_t ry = ring1->GetCenterY() - ring2->GetCenterY();
+
+	//Double_t r = sqrt(rx*rx + ry*ry);
+	if (rx > 1.3 * fMaxDistance || ry > 1.3 * fMaxDistance) return false;
+	return true;
+
+}
+
+void CbmRichRingFinderHoughImpl::InitHist()
+{
+	fHist[0]=0;
+	fHist[1]=0;
+	fHist[2]=0;
+	fHist[3]=0;
+	fHist[4]=0;
+	fHist[5]=0;
+	fHist[6]=0;
+	fHist[7]=0;
+	fHist[8]=0;
+	fHist[9]=0;
+	fHist[10]=0;
+	fHist[11]=0;
+	fHist[12]=0;
+	fHist[13]=0;
+	fHist[14]=0;
+	fHist[15]=0;
+	fHist[16]=0;
+	fHist[17]=0;
+	fHist[18]=0;
+	fHist[19]=0;
+	fHist[20]=0;
+	fHist[21]=0;
+	fHist[22]=0;
+	fHist[23]=0;
+	fHist[24]=0;
+	fHist[25]=0;
+	fHist[26]=0;
+	fHist[27]=0;
+	fHist[28]=0;
+	fHist[29]=0;
+	fHist[30]=0;
+	fHist[31]=0;
+	fHist[32]=0;
+	fHist[33]=0;
+	fHist[34]=0;
+	fHist[35]=0;
+	fHist[36]=0;
+	fHist[37]=0;
+	fHist[38]=0;
+	fHist[39]=0;
+	fHist[40]=0;
+	fHist[41]=0;
+	fHist[42]=0;
+	fHist[43]=0;
+	fHist[44]=0;
+	fHist[45]=0;
+	fHist[46]=0;
+	fHist[47]=0;
+	fHist[48]=0;
+	fHist[49]=0;
+	fHist[50]=0;
+	fHist[51]=0;
+	fHist[52]=0;
+	fHist[53]=0;
+	fHist[54]=0;
+	fHist[55]=0;
+	fHist[56]=0;
+	fHist[57]=0;
+	fHist[58]=0;
+	fHist[59]=0;
+	fHist[60]=0;
+	fHist[61]=0;
+	fHist[62]=0;
+	fHist[63]=0;
+	fHist[64]=0;
+	fHist[65]=0;
+	fHist[66]=0;
+	fHist[67]=0;
+	fHist[68]=0;
+	fHist[69]=0;
+	fHist[70]=0;
+	fHist[71]=0;
+	fHist[72]=0;
+	fHist[73]=0;
+	fHist[74]=0;
+	fHist[75]=0;
+	fHist[76]=0;
+	fHist[77]=0;
+	fHist[78]=0;
+	fHist[79]=0;
+	fHist[80]=0;
+	fHist[81]=0;
+	fHist[82]=0;
+	fHist[83]=0;
+	fHist[84]=0;
+	fHist[85]=0;
+	fHist[86]=0;
+	fHist[87]=0;
+	fHist[88]=0;
+	fHist[89]=0;
+	fHist[90]=0;
+	fHist[91]=0;
+	fHist[92]=0;
+	fHist[93]=0;
+	fHist[94]=0;
+	fHist[95]=0;
+	fHist[96]=0;
+	fHist[97]=0;
+	fHist[98]=0;
+	fHist[99]=0;
+	fHist[100]=0;
+	fHist[101]=0;
+	fHist[102]=0;
+	fHist[103]=0;
+	fHist[104]=0;
+	fHist[105]=0;
+	fHist[106]=0;
+	fHist[107]=0;
+	fHist[108]=0;
+	fHist[109]=0;
+	fHist[110]=0;
+	fHist[111]=0;
+	fHist[112]=0;
+	fHist[113]=0;
+	fHist[114]=0;
+	fHist[115]=0;
+	fHist[116]=0;
+	fHist[117]=0;
+	fHist[118]=0;
+	fHist[119]=0;
+	fHist[120]=0;
+	fHist[121]=0;
+	fHist[122]=0;
+	fHist[123]=0;
+	fHist[124]=0;
+	fHist[125]=0;
+	fHist[126]=0;
+	fHist[127]=0;
+	fHist[128]=0;
+	fHist[129]=0;
+	fHist[130]=0;
+	fHist[131]=0;
+	fHist[132]=0;
+	fHist[133]=0;
+	fHist[134]=0;
+	fHist[135]=0;
+	fHist[136]=0;
+	fHist[137]=0;
+	fHist[138]=0;
+	fHist[139]=0;
+	fHist[140]=0;
+	fHist[141]=0;
+	fHist[142]=0;
+	fHist[143]=0;
+	fHist[144]=0;
+	fHist[145]=0;
+	fHist[146]=0;
+	fHist[147]=0;
+	fHist[148]=0;
+	fHist[149]=0;
+	fHist[150]=0;
+	fHist[151]=0;
+	fHist[152]=0;
+	fHist[153]=0;
+	fHist[154]=0;
+	fHist[155]=0;
+	fHist[156]=0;
+	fHist[157]=0;
+	fHist[158]=0;
+	fHist[159]=0;
+	fHist[160]=0;
+	fHist[161]=0;
+	fHist[162]=0;
+	fHist[163]=0;
+	fHist[164]=0;
+	fHist[165]=0;
+	fHist[166]=0;
+	fHist[167]=0;
+	fHist[168]=0;
+	fHist[169]=0;
+	fHist[170]=0;
+	fHist[171]=0;
+	fHist[172]=0;
+	fHist[173]=0;
+	fHist[174]=0;
+	fHist[175]=0;
+	fHist[176]=0;
+	fHist[177]=0;
+	fHist[178]=0;
+	fHist[179]=0;
+	fHist[180]=0;
+	fHist[181]=0;
+	fHist[182]=0;
+	fHist[183]=0;
+	fHist[184]=0;
+	fHist[185]=0;
+	fHist[186]=0;
+	fHist[187]=0;
+	fHist[188]=0;
+	fHist[189]=0;
+	fHist[190]=0;
+	fHist[191]=0;
+	fHist[192]=0;
+	fHist[193]=0;
+	fHist[194]=0;
+	fHist[195]=0;
+	fHist[196]=0;
+	fHist[197]=0;
+	fHist[198]=0;
+	fHist[199]=0;
+	fHist[200]=0;
+	fHist[201]=0;
+	fHist[202]=0;
+	fHist[203]=0;
+	fHist[204]=0;
+	fHist[205]=0;
+	fHist[206]=0;
+	fHist[207]=0;
+	fHist[208]=0;
+	fHist[209]=0;
+	fHist[210]=0;
+	fHist[211]=0;
+	fHist[212]=0;
+	fHist[213]=0;
+	fHist[214]=0;
+	fHist[215]=0;
+	fHist[216]=0;
+	fHist[217]=0;
+	fHist[218]=0;
+	fHist[219]=0;
+	fHist[220]=0;
+	fHist[221]=0;
+	fHist[222]=0;
+	fHist[223]=0;
+	fHist[224]=0;
+	fHist[225]=0;
+	fHist[226]=0;
+	fHist[227]=0;
+	fHist[228]=0;
+	fHist[229]=0;
+	fHist[230]=0;
+	fHist[231]=0;
+	fHist[232]=0;
+	fHist[233]=0;
+	fHist[234]=0;
+	fHist[235]=0;
+	fHist[236]=0;
+	fHist[237]=0;
+	fHist[238]=0;
+	fHist[239]=0;
+	fHist[240]=0;
+	fHist[241]=0;
+	fHist[242]=0;
+	fHist[243]=0;
+	fHist[244]=0;
+	fHist[245]=0;
+	fHist[246]=0;
+	fHist[247]=0;
+	fHist[248]=0;
+	fHist[249]=0;
+	fHist[250]=0;
+	fHist[251]=0;
+	fHist[252]=0;
+	fHist[253]=0;
+	fHist[254]=0;
+	fHist[255]=0;
+	fHist[256]=0;
+	fHist[257]=0;
+	fHist[258]=0;
+	fHist[259]=0;
+	fHist[260]=0;
+	fHist[261]=0;
+	fHist[262]=0;
+	fHist[263]=0;
+	fHist[264]=0;
+	fHist[265]=0;
+	fHist[266]=0;
+	fHist[267]=0;
+	fHist[268]=0;
+	fHist[269]=0;
+	fHist[270]=0;
+	fHist[271]=0;
+	fHist[272]=0;
+	fHist[273]=0;
+	fHist[274]=0;
+	fHist[275]=0;
+	fHist[276]=0;
+	fHist[277]=0;
+	fHist[278]=0;
+	fHist[279]=0;
+	fHist[280]=0;
+	fHist[281]=0;
+	fHist[282]=0;
+	fHist[283]=0;
+	fHist[284]=0;
+	fHist[285]=0;
+	fHist[286]=0;
+	fHist[287]=0;
+	fHist[288]=0;
+	fHist[289]=0;
+	fHist[290]=0;
+	fHist[291]=0;
+	fHist[292]=0;
+	fHist[293]=0;
+	fHist[294]=0;
+	fHist[295]=0;
+	fHist[296]=0;
+	fHist[297]=0;
+	fHist[298]=0;
+	fHist[299]=0;
+	fHist[300]=0;
+	fHist[301]=0;
+	fHist[302]=0;
+	fHist[303]=0;
+	fHist[304]=0;
+	fHist[305]=0;
+	fHist[306]=0;
+	fHist[307]=0;
+	fHist[308]=0;
+	fHist[309]=0;
+	fHist[310]=0;
+	fHist[311]=0;
+	fHist[312]=0;
+	fHist[313]=0;
+	fHist[314]=0;
+	fHist[315]=0;
+	fHist[316]=0;
+	fHist[317]=0;
+	fHist[318]=0;
+	fHist[319]=0;
+	fHist[320]=0;
+	fHist[321]=0;
+	fHist[322]=0;
+	fHist[323]=0;
+	fHist[324]=0;
+	fHist[325]=0;
+	fHist[326]=0;
+	fHist[327]=0;
+	fHist[328]=0;
+	fHist[329]=0;
+	fHist[330]=0;
+	fHist[331]=0;
+	fHist[332]=0;
+	fHist[333]=0;
+	fHist[334]=0;
+	fHist[335]=0;
+	fHist[336]=0;
+	fHist[337]=0;
+	fHist[338]=0;
+	fHist[339]=0;
+	fHist[340]=0;
+	fHist[341]=0;
+	fHist[342]=0;
+	fHist[343]=0;
+	fHist[344]=0;
+	fHist[345]=0;
+	fHist[346]=0;
+	fHist[347]=0;
+	fHist[348]=0;
+	fHist[349]=0;
+	fHist[350]=0;
+	fHist[351]=0;
+	fHist[352]=0;
+	fHist[353]=0;
+	fHist[354]=0;
+	fHist[355]=0;
+	fHist[356]=0;
+	fHist[357]=0;
+	fHist[358]=0;
+	fHist[359]=0;
+	fHist[360]=0;
+	fHist[361]=0;
+	fHist[362]=0;
+	fHist[363]=0;
+	fHist[364]=0;
+	fHist[365]=0;
+	fHist[366]=0;
+	fHist[367]=0;
+	fHist[368]=0;
+	fHist[369]=0;
+	fHist[370]=0;
+	fHist[371]=0;
+	fHist[372]=0;
+	fHist[373]=0;
+	fHist[374]=0;
+	fHist[375]=0;
+	fHist[376]=0;
+	fHist[377]=0;
+	fHist[378]=0;
+	fHist[379]=0;
+	fHist[380]=0;
+	fHist[381]=0;
+	fHist[382]=0;
+	fHist[383]=0;
+	fHist[384]=0;
+	fHist[385]=0;
+	fHist[386]=0;
+	fHist[387]=0;
+	fHist[388]=0;
+	fHist[389]=0;
+	fHist[390]=0;
+	fHist[391]=0;
+	fHist[392]=0;
+	fHist[393]=0;
+	fHist[394]=0;
+	fHist[395]=0;
+	fHist[396]=0;
+	fHist[397]=0;
+	fHist[398]=0;
+	fHist[399]=0;
+	fHist[400]=0;
+	fHist[401]=0;
+	fHist[402]=0;
+	fHist[403]=0;
+	fHist[404]=0;
+	fHist[405]=0;
+	fHist[406]=0;
+	fHist[407]=0;
+	fHist[408]=0;
+	fHist[409]=0;
+	fHist[410]=0;
+	fHist[411]=0;
+	fHist[412]=0;
+	fHist[413]=0;
+	fHist[414]=0;
+	fHist[415]=0;
+	fHist[416]=0;
+	fHist[417]=0;
+	fHist[418]=0;
+	fHist[419]=0;
+	fHist[420]=0;
+	fHist[421]=0;
+	fHist[422]=0;
+	fHist[423]=0;
+	fHist[424]=0;
+
+	fHistR[0]=0;
+	fHistR[1]=0;
+	fHistR[2]=0;
+	fHistR[3]=0;
+	fHistR[4]=0;
+	fHistR[5]=0;
+	fHistR[6]=0;
+	fHistR[7]=0;
+	fHistR[8]=0;
+	fHistR[9]=0;
+	fHistR[10]=0;
+	fHistR[11]=0;
+	fHistR[12]=0;
+	fHistR[13]=0;
+	fHistR[14]=0;
+	fHistR[15]=0;
+	fHistR[16]=0;
+	fHistR[17]=0;
+	fHistR[18]=0;
+	fHistR[19]=0;
+	fHistR[20]=0;
+	fHistR[21]=0;
+	fHistR[22]=0;
+	fHistR[23]=0;
+	fHistR[24]=0;
+	fHistR[25]=0;
+	fHistR[26]=0;
+	fHistR[27]=0;
+	fHistR[28]=0;
+	fHistR[29]=0;
+	fHistR[30]=0;
+	fHistR[31]=0;
+
+}
+
 void CbmRichRingFinderHoughImpl::FuzzyKE(TClonesArray* rHitArray)
 {
 /*	Int_t nofRings = fFoundRings.size();
@@ -770,4 +1324,4 @@ void CbmRichRingFinderHoughImpl::FuzzyKE(TClonesArray* rHitArray)
 	//fFoundRings.assign(foundRingsFuzzy.begin(), foundRingsFuzzy.end());*/
 }
 
-ClassImp(CbmRichRingFinderHoughImpl)
+//ClassImp(CbmRichRingFinderHoughImpl)

@@ -5,6 +5,8 @@
 
 #include "CbmRichRingFinderHough.h"
 //#include "CbmRichFuzzyKE.h"
+#include "CbmRichRingFinderHoughImpl.h"
+#include "CbmRichRingFinderHoughSimd.h"
 
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"

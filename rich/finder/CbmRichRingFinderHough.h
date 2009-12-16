@@ -7,12 +7,16 @@
 #define CBM_RICH_RING_FINDER_HOUGH_H
 
 #include "CbmRichRingFinder.h"
-#include "CbmRichRingFinderHoughImpl.h"
-//#include "CbmRichRingFinderHoughSimd.h"
+
+#include "TString.h"
+
 #include <vector>
 #include <map>
 #include <functional>
 
+class CbmRichRingFinderHoughImpl;
+class CbmRichRingFinderHoughSimd;
+class CbmRichRing;
 
 class CbmRichRingFinderHough : public CbmRichRingFinder {
 

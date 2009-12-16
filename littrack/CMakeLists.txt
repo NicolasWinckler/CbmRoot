@@ -37,7 +37,7 @@ ${CBMROOT_SOURCE_DIR}/much
 ${CBMROOT_SOURCE_DIR}/much/geo
 ${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/sts
-#/u/andrey/soft/tbb/tbb22_009oss/include 
+/u/andrey/soft/tbb/tbb22_009oss/include 
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -68,7 +68,7 @@ finder/CbmLitTrackFinderBranch.cxx
 finder/CbmLitTrackFinderNN.cxx
 finder/CbmLitNearestHitToTrackMerger.cxx
 finder/CbmLitGating.cxx
-#finder/CbmLitTrackFinderNNParallel.cxx
+finder/CbmLitTrackFinderNNParallel.cxx
 #finder/CbmLitTrackFinderNNCuda.cxx
 finder_cbm/CbmLitTrdTrackFinderBranch.cxx
 finder_cbm/CbmLitTrdTrackFinderNN.cxx
@@ -90,7 +90,7 @@ geo/CbmLitDetContFact.cxx
 geo/CbmLitDetGeo.cxx 
 geo/CbmLitDetGeoPar.cxx
 geo/CbmLitDetPoint.cxx 
-#parallel/LitTrackFinderNNParallel.cxx
+parallel/LitTrackFinderNNParallel.cxx
 propagation/CbmLitTGeoTrackPropagator.cxx 
 propagation/CbmLitRK4TrackExtrapolator.cxx
 propagation/CbmLitLineTrackExtrapolator.cxx
@@ -107,10 +107,10 @@ qa/CbmLitPropagationAnalysis.cxx
 qa/CbmLitRobustFitterAnalysis.cxx
 qa/CbmLitCheckSimpleGeo.cxx 
 qa/CbmLitCheckField.cxx
-#qa/CbmLitParallelTrackFitterTest.cxx 
+qa/CbmLitParallelTrackFitterTest.cxx 
 qa/CbmLitCheckEnergyLoss.cxx
 qa/CbmLitCheckBrem.cxx 
-#qa/CbmLitTrackFitSpeedTest.cxx
+qa/CbmLitTrackFitSpeedTest.cxx
 weight/CbmLitWeightedHitCalculatorImp.cxx
 weight/CbmLitWeightCalculatorSimple.cxx
 weight/CbmLitWeightCalculatorGauss.cxx

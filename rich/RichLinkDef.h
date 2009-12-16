@@ -32,9 +32,9 @@
 #pragma link C++ class CbmRichRingFinderIdeal+;
 #pragma link C++ class CbmRichFindRings+;
 //#pragma link C++ class CbmRichRingFinderHoughParallel;
-#pragma link C++ class CbmRichFuzzyKE+;
+//#pragma link C++ class CbmRichFuzzyKE+;
 //#pragma link C++ class CbmRichRingFinderHoughSimd;
-#pragma link C++ class CbmRichRingFinderHoughImpl;
+//#pragma link C++ class CbmRichRingFinderHoughImpl;
 //#pragma link C++ class CbmRichRingFinderHoughParallelImpl;
 
 //qa

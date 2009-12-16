@@ -20,7 +20,7 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
-/u/slebedev/Baykal/tbb21_017oss/include
+#/u/slebedev/Baykal/tbb21_017oss/include
 
 ${CBMROOT_SOURCE_DIR}/rich 
 )
@@ -41,15 +41,14 @@ CbmGeoRichPar.cxx
 CbmRichContFact.cxx
 CbmRichMatchRings.cxx
 CbmRichElectronIdAnn.cxx
-finder/CbmRichRingFinderHough.cxx
 finder/CbmRichRingFinderTrack.cxx
 finder/CbmRichRingFinderIdeal.cxx 
 finder/CbmRichFindRings.cxx
-finder/CbmRichFuzzyKE.cxx
+#finder/CbmRichFuzzyKE.cxx
 #finder/CbmRichRingFinderHoughSimd.cxx
-finder/CbmRichRingFinderHoughImpl.cxx
+finder/CbmRichRingFinderHough.cxx
 #finder/CbmRichRingFinderHoughParallel.cxx
-#finder/CbmRichRingFinderHoughImpl.cxx
+finder/CbmRichRingFinderHoughImpl.cxx
 #finder/CbmRichRingFinderHoughParallelImpl.cxx
 fitter/CbmRichRingFitterCircle.cxx 
 fitter/CbmRichFitRings.cxx
@@ -76,7 +75,54 @@ qa/CbmRichElectronsQa.cxx
 selection/CbmRichRingSelectImpl.cxx
 selection/CbmRichRingSelectNeuralNet.cxx
 selection/CbmRichSelectRings.cxx
+selection/NNfunction.cxx
 #LhcbRingFinder.cxx
+#CbmRichTestSimd.cxx
+)
+
+set(RICH_HEADERS
+CbmGeoRich.h
+CbmRich.h
+CbmRichHitProducer.h  
+CbmGeoRichPar.h
+CbmRichContFact.h
+CbmRichMatchRings.h
+CbmRichElectronIdAnn.h
+finder/CbmRichRingFinderTrack.h
+finder/CbmRichRingFinderIdeal.h
+finder/CbmRichFindRings.h
+#finder/CbmRichFuzzyKE.h
+#finder/CbmRichRingFinderHoughSimd.h
+#finder/CbmRichRingFinderHoughParallel.h
+#finder/CbmRichRingFinderHoughImpl.h
+finder/CbmRichRingFinderHough.h
+#finder/CbmRichRingFinderHoughParallelImpl.h
+fitter/CbmRichRingFitterCircle.h
+fitter/CbmRichFitRings.h
+fitter/CbmRichRingFitterCOP.h
+fitter/CbmRichRingFitterRobustCOP.h
+fitter/CbmRichRingFitterTAU.h
+fitter/CbmRichRingFitterImpl.h
+fitter/CbmRichRingFitterEllipse.h
+fitter/CbmRichRingFitterEllipseTau.h
+fitter/CbmRichRingFitterEllipseBase.h
+tracks/CbmRichProjectionProducer.h
+tracks/CbmRichTrackExtrapolationIdeal.h
+tracks/CbmRichTrackExtrapolationMirrorIdeal.h
+tracks/CbmRichExtrapolateTracks.h
+tracks/CbmRichRingTrackAssignClosestD.h
+tracks/CbmRichRingTrackAssignIdeal.h
+tracks/CbmRichAssignTrack.h
+qa/CbmRichTestSim.h
+qa/CbmRichTestHits.h
+qa/CbmRichRingQa.h
+qa/CbmRichGeoTest.h
+qa/CbmRichRingFitterQa.h
+qa/CbmRichElectronsQa.h
+selection/CbmRichRingSelectImpl.h
+selection/CbmRichRingSelectNeuralNet.h
+selection/CbmRichSelectRings.h
+#LhcbRingFinder.h
 )
 
 if(RULE_CHECKER_FOUND)
@@ -85,34 +131,34 @@ endif(RULE_CHECKER_FOUND)
 
 # fill list of header files from list of source files
 # by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h RICH_HEADERS "${RICH_SRCS}")
+#CHANGE_FILE_EXTENSION(*.cxx *.h RICH_HEADERS "${RICH_SRCS}")
 
 # BEGIN SSE
 # Check if SSE instructions are available on the machine where 
 # the project is compiled.
 
-#IF(CMAKE_SYSTEM_NAME MATCHES Linux)
-#  EXEC_PROGRAM(cat ARGS "/proc/cpuinfo" OUTPUT_VARIABLE CPUINFO)
-#  STRING(REGEX REPLACE "^.*(sse).*$" "\\1" SSE_THERE ${CPUINFO})
-#  STRING(COMPARE EQUAL "sse" "${SSE_THERE}" SSE_TRUE)
-#ELSE(CMAKE_SYSTEM_NAME MATCHES Linux)
-#  IF(CMAKE_SYSTEM_NAME MATCHES Darwin)
-#    EXEC_PROGRAM("/usr/sbin/sysctl -n machdep.cpu.features" OUTPUT_VARIABLE CPUINFO)
-#    STRING(REGEX REPLACE "^.*(SSE).*$" "\\1" SSE_THERE ${CPUINFO})
-#    STRING(COMPARE EQUAL "SSE" "${SSE_THERE}" SSE_TRUE)
-#  ENDIF(CMAKE_SYSTEM_NAME MATCHES Darwin)
-#ENDIF(CMAKE_SYSTEM_NAME MATCHES Linux)
-#
-#IF (SSE_TRUE)
-#  MESSAGE(STATUS "SSE extensions available")
-#  ADD_DEFINITIONS(-DHAVE_SSE)
-#  SET_SOURCE_FILES_PROPERTIES(${RICH_SRCS} PROPERTIES COMPILE_FLAGS "-msse -O3")
-#ELSE (SSE_TRUE)
-#  MESSAGE (STATUS "*********************************************************************************")
-#  MESSAGE(STATUS "NO SSE extensions available")
-#  MESSAGE (STATUS "*********************************************************************************")
-#  SET_SOURCE_FILES_PROPERTIES(${RICH_SRCS} PROPERTIES COMPILE_FLAGS "-O3")
-#ENDIF (SSE_TRUE)
+IF(CMAKE_SYSTEM_NAME MATCHES Linux)
+  EXEC_PROGRAM(cat ARGS "/proc/cpuinfo" OUTPUT_VARIABLE CPUINFO)
+  STRING(REGEX REPLACE "^.*(sse).*$" "\\1" SSE_THERE ${CPUINFO})
+  STRING(COMPARE EQUAL "sse" "${SSE_THERE}" SSE_TRUE)
+ELSE(CMAKE_SYSTEM_NAME MATCHES Linux)
+  IF(CMAKE_SYSTEM_NAME MATCHES Darwin)
+    EXEC_PROGRAM("/usr/sbin/sysctl -n machdep.cpu.features" OUTPUT_VARIABLE CPUINFO)
+    STRING(REGEX REPLACE "^.*(SSE).*$" "\\1" SSE_THERE ${CPUINFO})
+    STRING(COMPARE EQUAL "SSE" "${SSE_THERE}" SSE_TRUE)
+  ENDIF(CMAKE_SYSTEM_NAME MATCHES Darwin)
+ENDIF(CMAKE_SYSTEM_NAME MATCHES Linux)
+
+IF (SSE_TRUE)
+ MESSAGE(STATUS "SSE extensions available")
+  ADD_DEFINITIONS(-DHAVE_SSE)
+  SET_SOURCE_FILES_PROPERTIES(${RICH_SRCS} PROPERTIES COMPILE_FLAGS "-msse -O3")
+ELSE (SSE_TRUE)
+  MESSAGE (STATUS "*********************************************************************************")
+  MESSAGE(STATUS "NO SSE extensions available")
+  MESSAGE (STATUS "*********************************************************************************")
+  SET_SOURCE_FILES_PROPERTIES(${RICH_SRCS} PROPERTIES COMPILE_FLAGS "-O3")
+ENDIF (SSE_TRUE)
 
 # END SSE
 

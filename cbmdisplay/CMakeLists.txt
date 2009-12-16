@@ -9,6 +9,7 @@ ${CBMROOT_SOURCE_DIR}/base
 ${CBMROOT_SOURCE_DIR}/eventdisplay
 
 ${CBMROOT_SOURCE_DIR}/cbmdisplay 
+${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 
 ${CBMROOT_SOURCE_DIR}/trd
@@ -24,6 +25,7 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(CBMDISPLAY_SRCS
 CbmTrdDigiDraw.cxx
+CbmPixelHitSetDraw.cxx
 )
 
 if(RULE_CHECKER_FOUND)

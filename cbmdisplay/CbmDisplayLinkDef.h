@@ -7,5 +7,6 @@
 #pragma link off all functions;
 
 #pragma link C++ class CbmTrdDigiDraw;
+#pragma link C++ class CbmPixelHitSetDraw;
 
 #endif

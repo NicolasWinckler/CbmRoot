@@ -23,8 +23,10 @@
 #include "TObjArray.h"
 
 #include <iostream>
+#include <iomanip>
 using std::cout;
 using std::endl;
+using std::setprecision;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrdDigiDraw::CbmTrdDigiDraw() 
@@ -91,6 +93,9 @@ void CbmTrdDigiDraw::Exec(Option_t* option)
    CbmTrdDigi *p=0;
 
    Int_t npoints=fPointList->GetEntriesFast();
+   Reset();
+
+   /*
    Int_t digiCounter = 0;
 
    for (Int_t i=0; i<npoints; ++i) {   
@@ -104,6 +109,7 @@ void CbmTrdDigiDraw::Exec(Option_t* option)
      }
 
    }
+   */
 
    TEveBoxSet *q = new TEveBoxSet(GetName(),"");
    q->Reset(TEveBoxSet::kBT_AABox, kTRUE, npoints);
@@ -157,12 +163,34 @@ void CbmTrdDigiDraw::Exec(Option_t* option)
        }
 
        Float_t local_point[2];
-       local_point[0] = ((Col+0.5) * padsizex) - sizex;
-       local_point[1] = ((Row+0.5) * padsizey) - sizey;
+       local_point[0] = ((Col-0.5) * padsizex) - sizex;
+       local_point[1] = ((Row-0.5) * padsizey) - sizey;
 
        Float_t X=local_point[0]+fModuleInfo->GetX();
        Float_t Y=local_point[1]+fModuleInfo->GetY();
        Float_t Z=fModuleInfo->GetZ();
+
+       // The given point is used as the edge of the box but it is
+       // the middle point of the pad. So we have to do a transformation
+     
+       X=X-(padsizex/2);
+       Y=Y-(padsizey/2);
+
+       if(fVerbose>1){
+         cout<<"*** CbmTrdHitProducerDigi::CalculateHitPosition ***"<<endl;
+         cout<<"Col: "<< Col <<endl;
+         cout<<"Row: "<< Row <<endl;
+         cout<<setprecision(5)<<"fPadX: "<< padsizex <<endl;
+         cout<<setprecision(5)<<"fPadY: "<< padsizey <<endl;
+         cout<<setprecision(5)<<"fsizex: "<< sizex <<endl;
+         cout<<setprecision(5)<<"fsizey: "<< sizey <<endl;
+         cout<<setprecision(5)<<"localx: "<<  local_point[0] <<endl;
+         cout<<setprecision(5)<<"localy: "<<  local_point[1] <<endl;
+
+         cout<<setprecision(5)<<"fPosX: "<<  X <<endl;
+         cout<<setprecision(5)<<"fPosY: "<<  Y <<endl;
+         cout<<setprecision(5)<<"fPosZ: "<<  Z <<endl;
+     }
 
        Int_t fStation = (Int_t) (detID/100000);
        Int_t fLayer =  (Int_t) ((detID -(fStation*100000))/10000);

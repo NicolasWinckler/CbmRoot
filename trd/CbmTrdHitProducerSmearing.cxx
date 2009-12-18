@@ -100,7 +100,7 @@ InitStatus CbmTrdHitProducerSmearing::Init()
 
     FairRootManager *ioman = FairRootManager::Instance();
  
-    fTrdPoints=(TClonesArray *)  ioman->ActivateBranch("TRDPoint");
+    fTrdPoints=(TClonesArray *)  ioman->ActivateBranch("TrdPoint");
     if ( ! fTrdPoints ) {
       cout << "-W CbmTrdHitProducerSmearing::Init: No TrdPoints array!" << endl;
       cout << "                            Task will be inactive" << endl;
@@ -110,7 +110,7 @@ InitStatus CbmTrdHitProducerSmearing::Init()
     fListStack = (TClonesArray*)ioman->ActivateBranch("MCTrack");
 
     fHitCollection = new TClonesArray("CbmTrdHit", 100);
-    ioman->Register("TRDHit","TRD",fHitCollection,kTRUE);
+    ioman->Register("TrdHit","TRD",fHitCollection,kTRUE);
 
     // Extract information about the number of TRD stations and
     // the number of layers per TRD station from the geomanager.

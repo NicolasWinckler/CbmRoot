@@ -217,11 +217,11 @@ InitStatus CbmStsIdealFindHits::Init() {
   // Get input array
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
-  fDigis = (TClonesArray*) ioman->GetObject("STSDigi");
+  fDigis = (TClonesArray*) ioman->GetObject("StsDigi");
 
   // Register output array
   fHits = new TClonesArray("CbmStsHit", 1000);
-  ioman->Register("STSHit", "Hit in STS", fHits, kTRUE);
+  ioman->Register("StsHit", "Hit in STS", fHits, kTRUE);
 
   // Build digitisation scheme
   Bool_t success = fDigiScheme->Init(fGeoPar, fDigiPar);

@@ -357,25 +357,25 @@ InitStatus CbmStsIdealMatchHits::Init() {
   // Get input arrays
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
-  fPoints = (TClonesArray*) ioman->GetObject("STSPoint");
+  fPoints = (TClonesArray*) ioman->GetObject("StsPoint");
   if ( ! fPoints ) {
     cout << "-E- " << GetName() << "::Init: No STSPoint array!" << endl;
     return kERROR;
   }
-  fDigis  = (TClonesArray*) ioman->GetObject("STSDigi");
+  fDigis  = (TClonesArray*) ioman->GetObject("StsDigi");
   if ( ! fDigis ) {
-    cout << "-E- " << GetName() << "::Init: No STSDigi array!" << endl;
+    cout << "-E- " << GetName() << "::Init: No StsDigi array!" << endl;
     return kERROR;
   }
-  fDigiMatches = (TClonesArray*) ioman->GetObject("STSDigiMatch");
+  fDigiMatches = (TClonesArray*) ioman->GetObject("StsDigiMatch");
   if ( ! fDigiMatches ) {
-    cout << "-E- " << GetName() << "::Init: No STSDigiMatch array!" 
+    cout << "-E- " << GetName() << "::Init: No StsDigiMatch array!" 
 	 << endl;
     return kERROR;
   }
-  fHits = (TClonesArray*) ioman->GetObject("STSHit");
+  fHits = (TClonesArray*) ioman->GetObject("StsHit");
   if ( ! fHits ) {
-    cout << "-E- " << GetName() << "::Init: No STSHit array!" << endl;
+    cout << "-E- " << GetName() << "::Init: No StsHit array!" << endl;
     return kERROR;
   }
 

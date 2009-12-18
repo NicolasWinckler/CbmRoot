@@ -41,8 +41,8 @@ InitStatus CbmAnaHypRecCascade::Init(){
 
   FairRootManager* fManager =FairRootManager::Instance();
   fMCTracks  = (TClonesArray*) fManager->GetObject("MCTrack");
-  fRCTracks  = (TClonesArray*) fManager->GetObject("STSTrack");
-  fRCMatch   = (TClonesArray*) fManager->GetObject("STSTrackMatch");
+  fRCTracks  = (TClonesArray*) fManager->GetObject("StsTrack");
+  fRCMatch   = (TClonesArray*) fManager->GetObject("StsTrackMatch");
   fPV        = (CbmVertex*)    fManager->GetObject("PrimaryVertex");
   fListRCLambda  = (TClonesArray*) fManager->ActivateBranch("V0Candidates");
   fManager->Register("CascadeCandidates","Sts",fListCascades,kTRUE);

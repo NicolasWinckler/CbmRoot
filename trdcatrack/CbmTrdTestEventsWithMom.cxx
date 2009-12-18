@@ -172,7 +172,7 @@ InitStatus CbmTrdTestEventsWithMom::Init() {
 
 
   // Get TRD hit Array
-  fHits  = (TClonesArray*) ioman->GetObject("TRDHit");
+  fHits  = (TClonesArray*) ioman->GetObject("TrdHit");
   if ( ! fHits) {
     cout << "-W- CbmTrdTestEventsWithMom::Init: No TRDHit array!"
 	 << endl;
@@ -183,9 +183,9 @@ InitStatus CbmTrdTestEventsWithMom::Init() {
     <<"-I- CbmTrdTestEventsWithMom::Init: TrdHit OK...\n";
 
   // Get TrdTrack Array
-  fTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
+  fTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
   if ( ! fTracks ) {
-    cout << "-E- CbmTrdTestEventsWithMom::Init: No TRDTrack array!" << endl;
+    cout << "-E- CbmTrdTestEventsWithMom::Init: No TrdTrack array!" << endl;
     return kERROR;
   }
 
@@ -193,7 +193,7 @@ InitStatus CbmTrdTestEventsWithMom::Init() {
     <<"-I- CbmTrdTestEventsWithMom::Init: TrdTrack OK...\n";
 
   // Get TRDPoint array
-  fPoints = (TClonesArray*) ioman->GetObject("TRDPoint");
+  fPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
   if ( ! fPoints ) {
     cout << "-E- CbmTrdTestEventsWithMom::Init: No TRDPoint array!" << endl;
     return kERROR;
@@ -259,7 +259,7 @@ InitStatus CbmTrdTestEventsWithMom::Init() {
 
   // Create and register TrdTrackMatch array
   //   fMatches = new TClonesArray("CbmTrackMatch",100);
-  //   ioman->Register("TRDTrackMatch", "TRD", fMatches, kTRUE);
+  //   ioman->Register("TrdTrackMatch", "TRD", fMatches, kTRUE);
 
   cout << "-I- CbmTrdTestEventsWithMom::Init: Creating Histogramms...";
   CreateHistogramms();

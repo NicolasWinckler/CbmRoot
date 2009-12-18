@@ -129,10 +129,10 @@ InitStatus CbmEcalAnalysis::Init()
   fListStack        = (TClonesArray*)manager->ActivateBranch("MCTrack");
 
   //ECAL MC points inside ECAL
-  fListECALptsEdep  = (TClonesArray*)manager->ActivateBranch("ECALPointLite");
+  fListECALptsEdep  = (TClonesArray*)manager->ActivateBranch("EcalPointLite");
 
   //ECAL MC points on entrance to ECAL
-  fListECALptsWall  = (TClonesArray*)manager->ActivateBranch("ECALPoint");
+  fListECALptsWall  = (TClonesArray*)manager->ActivateBranch("EcalPoint");
 
   //ECAL hits
   fListECALhits     = (TClonesArray*)manager->ActivateBranch("EcalHitFastMC");

@@ -139,7 +139,7 @@ void CbmMvd::EndOfEvent() {
 
 // -----   Virtual public method Register   --------------------------------
 void CbmMvd::Register() {
-  FairRootManager::Instance()->Register("MVDPoint", GetName(), 
+  FairRootManager::Instance()->Register("MvdPoint", GetName(), 
 				       fCollection, kTRUE);
 }
 // -------------------------------------------------------------------------

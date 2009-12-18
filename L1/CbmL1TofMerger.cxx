@@ -67,7 +67,7 @@ void CbmL1TofMerger::Init()
 	    << "ROOT manager is not instantiated!" << endl;
         return;
     }
-    fArrayTrdTrack = (TClonesArray*) rootMgr->GetObject("TRDTrack");
+    fArrayTrdTrack = (TClonesArray*) rootMgr->GetObject("TrdTrack");
     if(NULL == fArrayTrdTrack) {
 	cout << "-W- CbmL1TofMerger::Init: "
             << "no TRD track array" << endl;

@@ -45,14 +45,14 @@
 
 #define ASCIIVERSION       "v05a"				/**< Defines the version of the detector geometry files */
 #define STSVACUUMFODLER    "pipevac1_1"			/**< Defines the name of the folder to read the STS stations which are in the vacuum */
-#define STSPOINTBRANCH     "STSPoint"			/**< Defines the name of the branch consisting of the points for all STS stations */
-#define STSMAPSHITBRANCH   "STSMapsHit"			/**< Defines the name of the branch consisting of the hits for all STS maps stations */
-#define STSHYBRIDHITBRANCH "STSHybridHit"		/**< Defines the name of the branch consisting of the hits for all STS hybrid stations */
-#define STSSTRIPHITBRANCH  "STSStripHit"		/**< Defines the name of the branch consisting of the hits for all STS strip stations */
-#define STSHITBRANCH       "STSHit"				/**< Defines the name of the branch consisting of the hits for all STS stations */
+#define STSPOINTBRANCH     "StsPoint"			/**< Defines the name of the branch consisting of the points for all STS stations */
+#define STSMAPSHITBRANCH   "StsMapsHit"			/**< Defines the name of the branch consisting of the hits for all STS maps stations */
+#define STSHYBRIDHITBRANCH "StsHybridHit"		/**< Defines the name of the branch consisting of the hits for all STS hybrid stations */
+#define STSSTRIPHITBRANCH  "StsStripHit"		/**< Defines the name of the branch consisting of the hits for all STS strip stations */
+#define STSHITBRANCH       "StsHit"				/**< Defines the name of the branch consisting of the hits for all STS stations */
 #define MCTRACKBRANCH      "MCTrack"			/**< Defines the name of the branch consisting of the tracks for all STS stations */
-#define MVDPOINTBRANCH     "MVDPoint"			/**< Defines the name of the branch consisting of the points for all MVD stations */
-#define MVDHITBRANCH       "MVDHit"				/**< Defines the name of the branch consisting of the hits for all MVD stations */
+#define MVDPOINTBRANCH     "MvdPoint"			/**< Defines the name of the branch consisting of the points for all MVD stations */
+#define MVDHITBRANCH       "MvdHit"				/**< Defines the name of the branch consisting of the hits for all MVD stations */
 
 
 #if (ARCHITECTURE == STANDALONE)

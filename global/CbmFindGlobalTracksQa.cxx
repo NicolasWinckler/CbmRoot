@@ -94,7 +94,7 @@ InitStatus CbmFindGlobalTracksQa::Init()
             << " no MC track array!" << endl;
     }
     if(fRequireTof) {
-	fArrayTofPoint = (TClonesArray*) rootMgr->GetObject("TOFPoint");
+	fArrayTofPoint = (TClonesArray*) rootMgr->GetObject("TofPoint");
 	if(NULL == fArrayTofPoint) {
 	    cout << "-W- CbmFindGlobalTracksQa::Init :"
 		<< " no TOF point array!" << endl;
@@ -116,12 +116,12 @@ InitStatus CbmFindGlobalTracksQa::Init()
 	cout << "-W- CbmFindGlobalTracksQa::Init :"
             << " no global track array" << endl;
     }
-    fArrayStsTrackMatch = (TClonesArray*) rootMgr->GetObject("STSTrackMatch");
+    fArrayStsTrackMatch = (TClonesArray*) rootMgr->GetObject("StsTrackMatch");
     if(NULL == fArrayStsTrackMatch) {
 	cout << "-W- CbmFindGlobalTracksQa::Init :"
 	    << " no STS track match array" << endl;
     }
-    fArrayTrdTrackMatch = (TClonesArray*) rootMgr->GetObject("TRDTrackMatch");
+    fArrayTrdTrackMatch = (TClonesArray*) rootMgr->GetObject("TrdTrackMatch");
     if(NULL == fArrayTrdTrackMatch) {
 	cout << "-W- CbmFindGlobalTracksQa::Init :"
 	    << " no TRD track match array" << endl;

@@ -596,10 +596,10 @@ InitStatus CbmEcalIdentification::Init()
       Fatal("Init", "Can't find array of MC tracks in system.");
       return kFATAL;
     }
-    fMCPoints=(TClonesArray*)fManager->GetObject("ECALPoint");
+    fMCPoints=(TClonesArray*)fManager->GetObject("EcalPoint");
     if (!fMCPoints)
     {
-      Fatal("Init","Can't find array of ECALPoint in the system");
+      Fatal("Init","Can't find array of EcalPoint in the system");
       return kFATAL;
     }
   }
@@ -607,20 +607,20 @@ InitStatus CbmEcalIdentification::Init()
   {
     fCircRad=p->GetDouble("circrad");
 /*
-    fStsTracks=(TClonesArray*)fManager->GetObject("STSTrack");
+    fStsTracks=(TClonesArray*)fManager->GetObject("StsTrack");
     if (!fStsTracks)
     {
       Fatal("Init()","Can't find STS tracking information");
       return kFATAL;
     }
 */
-    fStsTracksMatch=(TClonesArray*)fManager->GetObject("STSTrackMatch");
+    fStsTracksMatch=(TClonesArray*)fManager->GetObject("StsTrackMatch");
     if (!fStsTracksMatch)
     {
       Fatal("Init()","Can't find STS track matching information");
       return kFATAL;
     }
-    fTrdTracks=(TClonesArray*)fManager->GetObject("TRDTrack");
+    fTrdTracks=(TClonesArray*)fManager->GetObject("TrdTrack");
     if (!fTrdTracks)
     {
       Fatal("Init()","Can't find TRD track information in run");

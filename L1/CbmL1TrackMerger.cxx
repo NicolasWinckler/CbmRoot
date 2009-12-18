@@ -80,12 +80,12 @@ void CbmL1TrackMerger::Init()
 	    << "FairRootManager is not instantiated!" << endl;
         return;
     }
-    fArrayStsTrackM = (TClonesArray*) rootMgr->GetObject("STSTrackMatch");
+    fArrayStsTrackM = (TClonesArray*) rootMgr->GetObject("StsTrackMatch");
     if(NULL == fArrayStsTrackM) {
 	cout << "-W- CbmL1TrackMerger::Init : "
             << "no STS track match array" << endl;
     }
-    fArrayTrdTrackM = (TClonesArray*) rootMgr->GetObject("TRDTrackMatch");
+    fArrayTrdTrackM = (TClonesArray*) rootMgr->GetObject("TrdTrackMatch");
     if(NULL == fArrayTrdTrackM) {
 	cout << "-W- CbmL1TrackMerger::Init : "
             << "no TRD track match array" << endl;

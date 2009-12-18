@@ -70,10 +70,10 @@ InitStatus CbmSttMatchTracks::Init() {
     return kFATAL;
   }
 
-  // Get STT hit Array
-  fHits  = (TClonesArray*) ioman->GetObject("STTHit");
+  // Get Stt hit Array
+  fHits  = (TClonesArray*) ioman->GetObject("SttHit");
   if ( ! fHits) {
-    cout << "-W- CbmSttMatchTracks::Init: No STTHit array!"
+    cout << "-W- CbmSttMatchTracks::Init: No SttHit array!"
 	 << endl;
     return kERROR;
   }
@@ -85,10 +85,10 @@ InitStatus CbmSttMatchTracks::Init() {
     return kERROR;
   }
 
-  // Get STTPoint array
-  fPoints = (TClonesArray*) ioman->GetObject("STTPoint");
+  // Get SttPoint array
+  fPoints = (TClonesArray*) ioman->GetObject("SttPoint");
   if ( ! fPoints ) {
-    cout << "-E- CbmSttMatchTracks::Init: No STTPoint array!" << endl;
+    cout << "-E- CbmSttMatchTracks::Init: No SttPoint array!" << endl;
     return kERROR;
   }
 

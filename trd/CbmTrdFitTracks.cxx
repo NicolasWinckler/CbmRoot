@@ -80,7 +80,7 @@ InitStatus CbmTrdFitTracks::Init() {
   }
 
   // Get TrdTrack array
-  fTrackArray  = (TClonesArray*) ioman->GetObject("TRDTrack"); //=>SG
+  fTrackArray  = (TClonesArray*) ioman->GetObject("TrdTrack"); //=>SG
   if ( ! fTrackArray) {
     cout << "-E- CbmTrdFitTracks::Init: No TrdTrack array!"
 	 << endl;

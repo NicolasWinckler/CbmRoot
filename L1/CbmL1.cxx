@@ -147,8 +147,8 @@ InitStatus CbmL1::Init()
 
   histodir = gROOT->mkdir("L1");
 
-  listStsPts = (TClonesArray *)  fManger->GetObject("STSPoint");
-  listStsHits = (TClonesArray *)  fManger->GetObject("STSHit");
+  listStsPts = (TClonesArray *)  fManger->GetObject("StsPoint");
+  listStsHits = (TClonesArray *)  fManger->GetObject("StsHit");
   listMCTracks = (TClonesArray*) fManger->GetObject("MCTrack");  
 
   if( !fUseMVD ){
@@ -156,9 +156,9 @@ InitStatus CbmL1::Init()
     listMvdHits = 0;
     listMvdHitMatches = 0;
   } else {
-    listMvdPts = (TClonesArray *)  fManger->GetObject("MVDPoint");
-    listMvdHits = (TClonesArray *)  fManger->GetObject("MVDHit");
-    listMvdHitMatches = (TClonesArray *)  fManger->GetObject("MVDHitMatch");
+    listMvdPts = (TClonesArray *)  fManger->GetObject("MvdPoint");
+    listMvdHits = (TClonesArray *)  fManger->GetObject("MvdHit");
+    listMvdHitMatches = (TClonesArray *)  fManger->GetObject("MvdHitMatch");
   }
 
   NMvdStations = 0;

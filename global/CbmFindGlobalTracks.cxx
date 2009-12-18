@@ -110,14 +110,14 @@ InitStatus CbmFindGlobalTracks::Init() {
   }
 
   // Get StsTrack array
-  fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
+  fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
   if ( ! fStsTracks) {
     cout << "-W- CbmStsFindTracks::Init: No StsTrack array!"
 	 << endl;
   }
 
   // Get TrdTrack array
-  fTrdTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
+  fTrdTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
   if ( ! fTrdTracks) {
     cout << "-W- CbmStsFindTracks::Init: No TrdTrack array!"
 	 << endl;
@@ -189,7 +189,7 @@ void CbmFindGlobalTracks::Exec(Option_t* opt) {
     cout << "-I-              Global Track Finding               -I-"
 	 << endl;
     cout << "Reconstructed STSTracks : " << nSts << endl;
-    cout << "Reconstructed TRDTracks : " << nTrd << endl;
+    cout << "Reconstructed TrdTracks : " << nTrd << endl;
     cout << "STS and TRD merged      : " << nMergedTracks << endl;
     cout << "Reconstructed RICHrings : " << nRich << endl;
     cout << "RICH rings attached     : " << nMergedRings << endl

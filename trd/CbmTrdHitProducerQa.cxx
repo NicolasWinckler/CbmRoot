@@ -69,7 +69,7 @@ InitStatus CbmTrdHitProducerQa::Init()
     }
 
     // Get pointer to TRD point array
-    fTrdPointCollection = (TClonesArray*) rootMgr->GetObject("TRDPoint");
+    fTrdPointCollection = (TClonesArray*) rootMgr->GetObject("TrdPoint");
     if(NULL == fTrdPointCollection) {
 	cout << "-W- CbmTrdHitProducerQa::Init : "
 	    << "no TRD point array !" << endl;
@@ -77,7 +77,7 @@ InitStatus CbmTrdHitProducerQa::Init()
     }
 
     // Get pointer to TRD hit array
-    fTrdHitCollection = (TClonesArray*) rootMgr->GetObject("TRDHit");
+    fTrdHitCollection = (TClonesArray*) rootMgr->GetObject("TrdHit");
     if(NULL == fTrdHitCollection) {
 	cout << "-W- CbmTrdHitProducerQa::Init : "
 	    << "no TRD hit array !" << endl;

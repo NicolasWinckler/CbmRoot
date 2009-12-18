@@ -69,7 +69,7 @@ InitStatus CbmTrdTracksPidQa::Init()
 
 
     // Get pointer to TRD point array
-    fMCPointArray = (TClonesArray*) rootMgr->GetObject("TRDPoint");
+    fMCPointArray = (TClonesArray*) rootMgr->GetObject("TrdPoint");
     if(NULL == fMCPointArray) {
 	cout << "-W- CbmTrdTracksPidQa::Init : "
 	    << "no MC point array !" << endl;
@@ -77,7 +77,7 @@ InitStatus CbmTrdTracksPidQa::Init()
     }
 
     // Get pointer to TRD hit array
-    fTrdHitCollection = (TClonesArray*) rootMgr->GetObject("TRDHit");
+    fTrdHitCollection = (TClonesArray*) rootMgr->GetObject("TrdHit");
     if(NULL == fTrdHitCollection) {
 	cout << "-W- CbmTrdTracksPidQa::Init : "
 	    << "no TRD hit array !" << endl;
@@ -85,7 +85,7 @@ InitStatus CbmTrdTracksPidQa::Init()
     }
 
     // Get pointer to TRD track array
-    fTrdTrackCollection = (TClonesArray*) rootMgr->GetObject("TRDTrack");
+    fTrdTrackCollection = (TClonesArray*) rootMgr->GetObject("TrdTrack");
     if(NULL == fTrdTrackCollection) {
 	cout << "-W- CbmTrdTracksPidQa::Init : "
 	    << "no TRD hit array !" << endl;

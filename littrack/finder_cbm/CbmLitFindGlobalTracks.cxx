@@ -118,10 +118,10 @@ void CbmLitFindGlobalTracks::ReadAndCreateDataBranches()
 	if (NULL == ioman) Fatal("Init","CbmRootManager is not instantiated");
 
 	//STS data
-	fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
+	fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
 	if (NULL == fStsTracks) Fatal("Init","No STSTrack array!");
-	fStsHits = (TClonesArray*) ioman->GetObject("STSHit");
-	if (NULL == fStsHits) Fatal("Init","No STSHit array!");
+	fStsHits = (TClonesArray*) ioman->GetObject("StsHit");
+	if (NULL == fStsHits) Fatal("Init","No StsHit array!");
 
 	//MUCH data
 	if (fIsMuch) {
@@ -134,7 +134,7 @@ void CbmLitFindGlobalTracks::ReadAndCreateDataBranches()
 
 	//TRD data
 	if (fIsTrd) {
-		fTrdHits = (TClonesArray*) ioman->GetObject("TRDHit");
+		fTrdHits = (TClonesArray*) ioman->GetObject("TrdHit");
 		if (NULL == fTrdHits) Fatal("Init", "No TRDHit array!");
 		std::cout << "-I- TRDHit branch found in tree" << std::endl;
 	}
@@ -157,7 +157,7 @@ void CbmLitFindGlobalTracks::ReadAndCreateDataBranches()
 
 	if (fIsTrd) {
 		fTrdTracks = new TClonesArray("CbmTrdTrack", 100);
-		ioman->Register("TRDTrack", "Trd", fTrdTracks, kTRUE);
+		ioman->Register("TrdTrack", "Trd", fTrdTracks, kTRUE);
 	}
 }
 

@@ -41,7 +41,7 @@ InitStatus CbmStsHitProducerIdeal::Init() {
   }
 
   // Get input array
-  fPointArray = (TClonesArray*) ioman->GetObject("STSPoint");
+  fPointArray = (TClonesArray*) ioman->GetObject("StsPoint");
   if ( ! fPointArray ) {
     cout << "-W- CbmStsHitProducerIdeal::Init: "
 	 << "No STSPoint array!" << endl;
@@ -50,7 +50,7 @@ InitStatus CbmStsHitProducerIdeal::Init() {
 
   // Create and register output array
   fHitArray = new TClonesArray("CbmStsHit");
-  ioman->Register("STSHit", "STS", fHitArray, kTRUE);
+  ioman->Register("StsHit", "STS", fHitArray, kTRUE);
 
   cout << "-I- CbmStsHitProducerIdeal: Intialisation successfull" << endl;
   return kSUCCESS;

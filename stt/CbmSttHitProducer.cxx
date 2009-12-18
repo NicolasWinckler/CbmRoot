@@ -105,7 +105,7 @@ InitStatus CbmSttHitProducer::Init()
     cout<<" * HitProducer * :: Init() "<<endl;
 
     FairRootManager *ioman = FairRootManager::Instance();
-    fSttPoints=(TClonesArray *) ioman->ActivateBranch("STTPoint");
+    fSttPoints=(TClonesArray *) ioman->ActivateBranch("SttPoint");
     if ( ! fSttPoints ) {
       cout << "-W CbmSttHitProducer::Init: No SttPoints array!" << endl;
       cout << "                          Task will be inactive" << endl;
@@ -114,7 +114,7 @@ InitStatus CbmSttHitProducer::Init()
 
     fListStack = (TClonesArray*)ioman->ActivateBranch("MCTrack");
     fHitCollection = new TClonesArray("CbmSttHit", 100);
-    ioman->Register("STTHit","STT",fHitCollection,kTRUE);
+    ioman->Register("SttHit","STT",fHitCollection,kTRUE);
     ioman->Register("MCEventHeader.","",
 		    (TClonesArray*)ioman->ActivateBranch("MCEventHeader."),kTRUE);
 
@@ -261,8 +261,8 @@ void CbmSttHitProducer::Exec(Option_t * option)
 
   Int_t station;        // stt station
   Int_t layer;          // stt layer in given stt station
-  Int_t plane;          // unique position of the STT plane in the whole setup
-  Int_t rot;  // used in the smearing part - rotation of the STT planes
+  Int_t plane;          // unique position of the Stt plane in the whole setup
+  Int_t rot;  // used in the smearing part - rotation of the Stt planes
 
   for (Int_t j = 0; j < nentries; ++j) {
 

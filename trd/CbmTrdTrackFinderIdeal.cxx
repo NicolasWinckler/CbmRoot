@@ -68,7 +68,7 @@ void CbmTrdTrackFinderIdeal::Init()
   }
 
   // Get MCPoint array
-  fMCPointArray  = (TClonesArray*) ioman->ActivateBranch("TRDPoint");
+  fMCPointArray  = (TClonesArray*) ioman->ActivateBranch("TrdPoint");
   if ( ! fMCPointArray) {
     cout << "-E- CbmTrdTrackFinderIdeal::Init: No MCPoint array!"
 	 << endl;

@@ -240,7 +240,7 @@ InitStatus CbmRichElectronsQa::Init()
 	}
 
 	// get TrackMatch array
-	fStsTrackMatches = (TClonesArray*) ioman->GetObject("STSTrackMatch");
+	fStsTrackMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
 	if ( !fStsTrackMatches) {
 		cout << "-E- CbmRichElectronsQa::Init: No track match array!"<< endl;
 		return kERROR;
@@ -254,25 +254,25 @@ InitStatus CbmRichElectronsQa::Init()
 	}
 
 
-	fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
+	fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
 	if ( !fStsTracks) {
 		cout << "-E- CbmRichElectronsQa::Init: No  STSTrack array!"<< endl;
 		return kERROR;
 	}
 
 
-	fTrdTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
+	fTrdTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
 	if ( !fTrdTracks) {
-		cout << "-W- CbmRichElectronsQa::Init: No TRDTrack array!" << endl;
+		cout << "-W- CbmRichElectronsQa::Init: No TrdTrack array!" << endl;
 		return kERROR;
 	}
-	fTrdTrackMatches = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
+	fTrdTrackMatches = (TClonesArray*) ioman->GetObject("TrdTrackMatch");
 	if ( !fTrdTrackMatches) {
-		cout << "-W- CbmRichElectronsQa::Init: No TRDTrackMatch array!" << endl;
+		cout << "-W- CbmRichElectronsQa::Init: No TrdTrackMatch array!" << endl;
 		return kERROR;
 	}
 
-	fTofPoints = (TClonesArray*) ioman->GetObject("TOFPoint");
+	fTofPoints = (TClonesArray*) ioman->GetObject("TofPoint");
 	if ( !fTofPoints) {
 		cout << "-W- CbmRichElectronsQa::Init: No TOFPoint array!" << endl;
 		return kERROR;

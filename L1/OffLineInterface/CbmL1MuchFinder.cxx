@@ -56,9 +56,9 @@ InitStatus CbmL1MuchFinder::ReInit()
 {
   fMuchPoints=(TClonesArray *) FairRootManager::Instance()->GetObject("MuchPoint");
   fMuchHits =(TClonesArray *) FairRootManager::Instance()->GetObject("MuchHit");
-  fStsTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("STSTrack");
+  fStsTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("StsTrack");
   fMCTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("MCTrack");
-  fSTSTrackMatch = (TClonesArray*) FairRootManager::Instance()->GetObject("STSTrackMatch");
+  fSTSTrackMatch = (TClonesArray*) FairRootManager::Instance()->GetObject("StsTrackMatch");
   fPrimVtx =  (CbmVertex *) FairRootManager::Instance() ->GetObject("PrimaryVertex");
   fStsFitter.Init();
 

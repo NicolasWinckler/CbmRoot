@@ -71,7 +71,7 @@ InitStatus CbmTrdFitTracksQa::Init()
 
     // Get pointer to array of TRD MC points
     fArrayTrdPoint =
-        (TClonesArray*) rootMgr->GetObject("TRDPoint");
+        (TClonesArray*) rootMgr->GetObject("TrdPoint");
     if(NULL == fArrayTrdPoint) {
         cout << "-W- CbmTrdFitTracksQa::Init : "
             << "no TRDPoint array!" << endl;
@@ -79,7 +79,7 @@ InitStatus CbmTrdFitTracksQa::Init()
 
     // Get pointer to array of TRD hits
     fArrayTrdHit =
-        (TClonesArray*) rootMgr->GetObject("TRDHit");
+        (TClonesArray*) rootMgr->GetObject("TrdHit");
     if(NULL == fArrayTrdHit) {
         cout << "-W- CbmTrdFitTracksQa::Init : "
             << "no TRDHit array!" << endl;
@@ -87,7 +87,7 @@ InitStatus CbmTrdFitTracksQa::Init()
 
     // Get pointer to array of TRD tracks
     fArrayTrdTrack =
-        (TClonesArray*) rootMgr->GetObject("TRDTrack");
+        (TClonesArray*) rootMgr->GetObject("TrdTrack");
     if(NULL == fArrayTrdTrack) {
         cout << "-W- CbmTrdFitTracksQa::Init : "
             << "no TRD tracks!" << endl;
@@ -124,7 +124,7 @@ void CbmTrdFitTracksQa::Exec(Option_t* option)
         pTrack = (CbmTrdTrack*) fArrayTrdTrack->At(iTrack);
         if(NULL == pTrack) {
             cout << "-E- CbmTrdFitTracksQa::Exec : "
-                << "empty TRDTrack slot : " << iTrack << ", "
+                << "empty TrdTrack slot : " << iTrack << ", "
                 << pTrack << " !" << endl;
             return;
         }

@@ -57,7 +57,7 @@ InitStatus CbmEcalStructureFiller::Init()
   }
   //ECAL MC points
   if (fUseMCPoints) 
-    fListECALpts = (TClonesArray*)fManager->ActivateBranch("ECALPointLite");
+    fListECALpts = (TClonesArray*)fManager->ActivateBranch("EcalPointLite");
 
   //ECAL Summable hits
   if (fUseSummableHits) 

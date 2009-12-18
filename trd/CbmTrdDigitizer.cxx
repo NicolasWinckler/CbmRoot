@@ -109,7 +109,7 @@ InitStatus CbmTrdDigitizer::Init()
     if ( ! ioman ) Fatal("Init", "No FairRootManager");
     
     fTrdPoints=(TClonesArray *)  
-      ioman->ActivateBranch("TRDPoint");
+      ioman->ActivateBranch("TrdPoint");
  
     if ( ! fTrdPoints ) {
       cout << "-W CbmTrdDigitizer::Init: No TrdPoints array!" << endl;

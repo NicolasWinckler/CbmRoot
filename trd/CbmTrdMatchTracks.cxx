@@ -74,20 +74,20 @@ InitStatus CbmTrdMatchTracks::Init()
 	if (ioman == NULL) Fatal("CbmTrdMatchTracks::Init", "RootManager not instantised!");
 
 	// Get TRD hit Array
-	fHits  = (TClonesArray*) ioman->GetObject("TRDHit");
-	if (fHits == NULL) Fatal("CbmTrdMatchTracks::Init", "No TRDHit array!");
+	fHits  = (TClonesArray*) ioman->GetObject("TrdHit");
+	if (fHits == NULL) Fatal("CbmTrdMatchTracks::Init", "No TrdHit array!");
 
 	// Get TrdTrack Array
-	fTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
-	if (fTracks == NULL) Fatal("CbmTrdMatchTracks::Init", "No TRDTrack array!");
+	fTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
+	if (fTracks == NULL) Fatal("CbmTrdMatchTracks::Init", "No TrdTrack array!");
 
 	// Get TRDPoint array
-	fPoints = (TClonesArray*) ioman->GetObject("TRDPoint");
-	if (fPoints == NULL) Fatal("CbmTrdMatchTracks::Init", "No TRDPoint array!");
+	fPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
+	if (fPoints == NULL) Fatal("CbmTrdMatchTracks::Init", "No TrdPoint array!");
 
 	// Create and register TrdTrackMatch array
 	fMatches = new TClonesArray("CbmTrackMatch",100);
-	ioman->Register("TRDTrackMatch", "TRD", fMatches, kTRUE);
+	ioman->Register("TrdTrackMatch", "TRD", fMatches, kTRUE);
 
 	return kSUCCESS;
 }
@@ -169,7 +169,7 @@ void CbmTrdMatchTracks::Exec(Option_t* opt)
 		}
 	}
 	nWrong = nAll - nTrue;
-	if (fVerbose>1) cout << "-I- CbmTrdMatchTracks: TRDTrack " << iTrack
+	if (fVerbose>1) cout << "-I- CbmTrdMatchTracks: TrdTrack " << iTrack
 			 << ", MCTrack " << iMCTrack << ", true "
 			 << nTrue << ", wrong " << nWrong << ", fake "
 			 << nFake << ", #MCTracks " << nMCTracks << endl;
@@ -197,11 +197,11 @@ void CbmTrdMatchTracks::Exec(Option_t* opt)
 		cout << "-------------------------------------------------------"
 		 << endl;
 		cout << "-I-              TRD Track Matching                 -I-"<< endl;
-		cout << "Reconstructed TRDTracks : " << nTracks << endl;;
+		cout << "Reconstructed TrdTracks : " << nTracks << endl;;
 		cout << "True  hit assignments   : " << qTrue  << " %" << endl;
 		cout << "Wrong hit assignments   : " << qWrong << " %" << endl;
 		cout << "Fake  hit assignments   : " << qFake  << " %" << endl;
-		cout << "MCTracks per TRDTrack   : " << qMC << endl;
+		cout << "MCTracks per TrdTrack   : " << qMC << endl;
 		cout << "--------------------------------------------------------" << endl;
 	}
 	else cout << "-I- CbmTrdMatchTracks: rec. " << nTracks << ", quota "

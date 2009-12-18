@@ -109,7 +109,7 @@ InitStatus CbmTrdHitProducerDigi::Init()
     fMCStack = (TClonesArray*)ioman->ActivateBranch("MCTrack");
 
     fHitCollection = new TClonesArray("CbmTrdHit", 100);
-    ioman->Register("TRDHit","TRD",fHitCollection,kTRUE);
+    ioman->Register("TrdHit","TRD",fHitCollection,kTRUE);
 
     // Extract information about the number of TRD stations and
     // the number of layers per TRD station from the geomanager.

@@ -106,7 +106,7 @@ void CbmRichTrackExtrapolationMirrorIdeal::Init() {
   }
 
   // Get STS track array
-    fSTSArray = (TClonesArray*) ioman->GetObject("STSTrack");
+    fSTSArray = (TClonesArray*) ioman->GetObject("StsTrack");
     if ( ! fSTSArray) {
         cout << "-W- CbmRichTrackExtrapolationMirrorIdeal::Init: No sts track array!"
 	    << endl;
@@ -114,7 +114,7 @@ void CbmRichTrackExtrapolationMirrorIdeal::Init() {
 
 
      // get TrackMatch array
-   fTrackMatchArray = (TClonesArray*) ioman->GetObject("STSTrackMatch");
+   fTrackMatchArray = (TClonesArray*) ioman->GetObject("StsTrackMatch");
    if ( ! fTrackMatchArray) {
         cout << "-W- CbmRichTrackExtrapolationMirrorIdeal::Init: No track match array!"
 	    << endl;

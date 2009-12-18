@@ -121,7 +121,7 @@ void CbmZdc::EndOfEvent() {
 
 // -----   Public method Register   ----------------------------------------
 void CbmZdc::Register() {
-  FairRootManager::Instance()->Register("ZDCPoint", "Zdc", 
+  FairRootManager::Instance()->Register("ZdcPoint", "Zdc", 
   				       fZdcCollection, kTRUE);
 }
 // -------------------------------------------------------------------------

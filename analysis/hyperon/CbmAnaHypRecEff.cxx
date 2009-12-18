@@ -41,8 +41,8 @@ CbmAnaHypRecEff::~CbmAnaHypRecEff() {}
 InitStatus CbmAnaHypRecEff::Init() {
   FairRootManager* ioman = FairRootManager::Instance();
   fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
-  fRCTracks = (TClonesArray*) ioman->GetObject("STSTrack");
-  fRCMatch  = (TClonesArray*) ioman->GetObject("STSTrackMatch");
+  fRCTracks = (TClonesArray*) ioman->GetObject("StsTrack");
+  fRCMatch  = (TClonesArray*) ioman->GetObject("StsTrackMatch");
   fEvent=0;
 
   hEventCounter = new TH1D("hEventCounter","",-1,1,1);

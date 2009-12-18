@@ -32,7 +32,7 @@ void CbmLitStsBasedTrackFinder::DefaultInit()
 	   //TObject::Fatal("CbmLitStsBasedTrackFinder::DefaultInit","ROOT manager is not instantiated");
 	}
 
-	fTrackSeedsArray = (TClonesArray*) rootMgr->GetObject("STSTrack");
+	fTrackSeedsArray = (TClonesArray*) rootMgr->GetObject("StsTrack");
 	if(NULL == fTrackSeedsArray){
 		std::cout << "CbmLitStsBasedTrackFinder::DefaultInit" << "no STS track array" << std::endl;
 		exit(0);

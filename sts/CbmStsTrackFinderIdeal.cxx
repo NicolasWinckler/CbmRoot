@@ -77,7 +77,7 @@ void CbmStsTrackFinderIdeal::Init() {
   }
 
   // Get MCPoint array
-  fMCPointArray  = (TClonesArray*) ioman->ActivateBranch("STSPoint");
+  fMCPointArray  = (TClonesArray*) ioman->ActivateBranch("StsPoint");
   if ( ! fMCPointArray) {
     cout << "-E- " << fName << "::Init: No MCPoint array!"
 	 << endl;
@@ -130,19 +130,19 @@ Int_t CbmStsTrackFinderIdeal::DoFind() {
   CbmMCTrack*  pMCtr = NULL;
   CbmStsTrack* pTrck = NULL;
 
-  // Number of STS hits
+  // Number of Sts hits
   Int_t nHits   = fStsHits->GetEntriesFast();;
 
   // Declare some variables outside the loops
   Int_t ptIndex      = 0;     // MCPoint index
   Int_t mcTrackIndex = 0;     // MCTrack index
-  Int_t trackIndex   = 0;     // STSTrack index
+  Int_t trackIndex   = 0;     // StsTrack index
 
 
   // Create STL map from MCtrack index to number of valid StsHits
   map<Int_t, Int_t> hitMap;
 
-  // Loop over STS hits
+  // Loop over Sts hits
   for (Int_t iHit = 0; iHit<nHits; iHit++) {
     pHit = (CbmStsHit*) fStsHits->At(iHit);
     if ( ! pHit ) continue;
@@ -157,7 +157,7 @@ Int_t CbmStsTrackFinderIdeal::DoFind() {
   // Create STL map from MCTrack index to StsTrack index
   map<Int_t, Int_t> trackMap;
 
-  // Create STSTracks for reconstructable MCTracks
+  // Create StsTracks for reconstructable MCTracks
   Int_t nMCacc  = 0;         // accepted MCTracks
   Int_t nTracks = 0;         // reconstructable MCTracks
   Int_t nMCTracks = fMCTrackArray->GetEntriesFast();
@@ -168,16 +168,16 @@ Int_t CbmStsTrackFinderIdeal::DoFind() {
     nMCacc++;
     if ( hitMap[iMCTrack] < 3 ) continue;
     new((*fTracks)[nTracks]) CbmStsTrack();
-    if (fVerbose>1) cout << "-I- " << fName << ": STSTrack " 
+    if (fVerbose>1) cout << "-I- " << fName << ": StsTrack " 
 			 << nTracks << " created from MCTrack " 
 			 << iMCTrack << " (" << pMCtr->GetNPoints(kSTS) 
-			 << " STSPoints)" << endl;
+			 << " StsPoints)" << endl;
     trackMap[iMCTrack] = nTracks++;
   }
 
   if (fVerbose>2) cout << "-I- " << GetName() << ": " << endl;
 
-  // Loop over STS hits. Get corresponding MCPoint and MCTrack index
+  // Loop over Sts hits. Get corresponding MCPoint and MCTrack index
   for (Int_t iHit = 0; iHit<nHits; iHit++) {
     pHit = (CbmStsHit*) fStsHits->At(iHit);
     if ( ! pHit ) {
@@ -218,9 +218,9 @@ Int_t CbmStsTrackFinderIdeal::DoFind() {
       continue;
     }
     pTrck->AddStsHit(iHit, pHit);
-    if (fVerbose>2) cout << "STS Hit " << iHit << " from STSPoint "
+    if (fVerbose>2) cout << "Sts Hit " << iHit << " from StsPoint "
 			 << ptIndex << " (MCTrack "
-			 << mcTrackIndex << ") added to STSTrack " 
+			 << mcTrackIndex << ") added to StsTrack " 
 			 << trackIndex << endl;
   }
 
@@ -230,7 +230,7 @@ Int_t CbmStsTrackFinderIdeal::DoFind() {
     cout << "-------------------------------------------------------" 
 	 << endl;
     cout << "-I-    " << fName << endl; 
-    cout << "STS hits: " << nHits << endl;
+    cout << "Sts hits: " << nHits << endl;
     cout << "MCTracks: total " << nMCTracks << ", accepted " << nMCacc
 	 << ", reconstructable: " << nTracks << endl;
     if (nNoStsHit)   cout << "StsHits not found   : " 

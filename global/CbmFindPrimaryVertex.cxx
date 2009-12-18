@@ -72,7 +72,7 @@ InitStatus CbmFindPrimaryVertex::Init() {
   }
 
   // Get CbmStsTrack array
-  fTracks = (TClonesArray*) ioman->GetObject("STSTrack");
+  fTracks = (TClonesArray*) ioman->GetObject("StsTrack");
   if ( ! fTracks) {
     cout << "-W- CbmFindPrimaryVertex::Init: No STSTrack array!"
 	 << endl;

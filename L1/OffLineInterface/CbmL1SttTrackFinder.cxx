@@ -61,20 +61,20 @@ InitStatus CbmL1SttTrackFinder::Init()
 
 InitStatus CbmL1SttTrackFinder::ReInit()
 {
-  fSttPoints=(TClonesArray *) FairRootManager::Instance()->GetObject("STTPoint");
-  fSttHits =(TClonesArray *) FairRootManager::Instance()->GetObject("STTHit");
+  fSttPoints=(TClonesArray *) FairRootManager::Instance()->GetObject("SttPoint");
+  fSttHits =(TClonesArray *) FairRootManager::Instance()->GetObject("SttHit");
   fMuchTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("MuchTrack");
-  fStsTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("STSTrack");
+  fStsTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("StsTrack");
   fMCTracks =(TClonesArray *) FairRootManager::Instance()->GetObject("MCTrack");
-  fSTSTrackMatch = (TClonesArray*) FairRootManager::Instance()->GetObject("STSTrackMatch");
+  fSTSTrackMatch = (TClonesArray*) FairRootManager::Instance()->GetObject("StsTrackMatch");
   fPrimVtx =  (CbmVertex *) FairRootManager::Instance() ->GetObject("PrimaryVertex");
   fStsFitter.Init();
 
   FairRootManager::Instance()->Register("SttTrack", "Stt", fTrackCollection, kTRUE);
 
   cout << " **************************************************" << endl;
-  if (fMuchTracks) cout << " *** Using MUCH tracks for STT tracking *** " << endl;
-  else  cout << " *** Using STS tracks for STT tracking *** " << endl;
+  if (fMuchTracks) cout << " *** Using Much tracks for Stt tracking *** " << endl;
+  else  cout << " *** Using Sts tracks for Stt tracking *** " << endl;
   cout << " **************************************************" << endl;
 
   return kSUCCESS;

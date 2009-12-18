@@ -500,21 +500,21 @@ InitStatus CbmStsFindHitsQa::Init() {
     return kFATAL;
   }
   // Get StsPoint array
-  fStsPoints = (TClonesArray*) ioman->GetObject("STSPoint");
+  fStsPoints = (TClonesArray*) ioman->GetObject("StsPoint");
   if ( ! fStsPoints ) {
     cout << "-E- " << GetName() << "::Init: No StsPoint array!" << endl;
     return kFATAL;
   }
    
   // Get StsHit array
-  fStsHits = (TClonesArray*) ioman->GetObject("STSHit");
+  fStsHits = (TClonesArray*) ioman->GetObject("StsHit");
   if ( ! fStsHits ) {
     cout << "-E- " << GetName() << "::Init: No StsHit array!" << endl;
     return kFATAL;
   }
 
   // Get StsDigis array
-  fStsDigis = (TClonesArray*) ioman->GetObject("STSDigi");
+  fStsDigis = (TClonesArray*) ioman->GetObject("StsDigi");
   if ( ! fStsDigis ) {
     cout << "-E- " << GetName() << "::Init: No StsDigi array!" 
 	 << endl;
@@ -522,7 +522,7 @@ InitStatus CbmStsFindHitsQa::Init() {
   }
 
   // Get StsClusters array
-  fStsClusters = (TClonesArray*) ioman->GetObject("STSCluster");
+  fStsClusters = (TClonesArray*) ioman->GetObject("StsCluster");
   if ( ! fStsClusters ) {
     cout << "-w- " << GetName() << "::Init: No StsCluster array!" 
 	 << endl;

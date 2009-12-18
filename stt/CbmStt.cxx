@@ -138,7 +138,7 @@ Bool_t  CbmStt::ProcessHits(FairVolume* vol)
     point->SetChamberNo(chamber);
     point->SetLayerNo(layer);
 
-    // Increment number of STT points in TParticle
+    // Increment number of Stt points in TParticle
     CbmStack* stack = (CbmStack*) gMC->GetStack();
     stack->AddPoint(kTRD);
 
@@ -167,7 +167,7 @@ void CbmStt::Register() {
 /** This will create a branch in the output tree called  CbmSttDetPoint, setting the last parameter to kFALSE means:
 this collection will not be written to the file, it will exist only during the simulation. */
 
-  FairRootManager::Instance()->Register("STTPoint", "Stt", fSttCollection, kTRUE);
+  FairRootManager::Instance()->Register("SttPoint", "Stt", fSttCollection, kTRUE);
 
 }
 

@@ -146,10 +146,10 @@ void CbmLitPropagationAnalysis::ReadDataBranches()
     if (NULL == fGlobalTracks) Fatal("CbmLitPropagationAnalysis::Init","No GlobalTrack array!");
 
    	if (fIsSts) {
-   		fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
+   		fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
    		if (NULL == fStsTracks) Fatal("CbmLitPropagationAnalysis::Init", "No STSTrack array!");
-//   		fStsTrackMatches = (TClonesArray*) ioman->GetObject("STSTrackMatch");
-//   		if (NULL == fStsTrackMatches) Fatal("CbmLitPropagationAnalysis::Init", "No STSTrackMatch array!");
+//   		fStsTrackMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
+//   		if (NULL == fStsTrackMatches) Fatal("CbmLitPropagationAnalysis::Init", "No StsTrackMatch array!");
    	}
 
    	if (fIsMuch) {
@@ -170,18 +170,18 @@ void CbmLitPropagationAnalysis::ReadDataBranches()
    	}
 
    	if (fIsTrd) {
-		fTrdTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
-		if (NULL == fTrdTracks) Fatal("CbmLitPropagationAnalysis::Init", "No TRDTrack array!");
-		fTrdHits  = (TClonesArray*) ioman->GetObject("TRDHit");
+		fTrdTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
+		if (NULL == fTrdTracks) Fatal("CbmLitPropagationAnalysis::Init", "No TrdTrack array!");
+		fTrdHits  = (TClonesArray*) ioman->GetObject("TrdHit");
 		if (NULL == fTrdHits) Fatal("CbmLitPropagationAnalysis::Init", "No TRDHit array!");
-		fTrdTrackMatches = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
-		if (!fTrdTrackMatches) Fatal("CbmLitPropagationAnalysis::Init", "No TRDTrackMatch array!");
-		fTrdPoints  = (TClonesArray*) ioman->GetObject("TRDPoint");
+		fTrdTrackMatches = (TClonesArray*) ioman->GetObject("TrdTrackMatch");
+		if (!fTrdTrackMatches) Fatal("CbmLitPropagationAnalysis::Init", "No TrdTrackMatch array!");
+		fTrdPoints  = (TClonesArray*) ioman->GetObject("TrdPoint");
 		if (NULL == fTrdPoints) Fatal("CbmLitPropagationAnalysis::Init", "No TRDPoint array!");
    	}
 
    	if (fIsTof) {
-		fTofPoints = (TClonesArray*) ioman->GetObject("TOFPoint");
+		fTofPoints = (TClonesArray*) ioman->GetObject("TofPoint");
 		if (NULL == fTofPoints) Fatal("CbmLitPropagationAnalysis::Init", "No TofPoint array!");
 		fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
 		if (NULL == fTofHits) Fatal("CbmLitPropagationAnalysis::Init", "No TofHit array!");

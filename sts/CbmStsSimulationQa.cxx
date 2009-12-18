@@ -100,7 +100,7 @@ void CbmStsSimulationQa::SetParContainers() {
   fStsGeo = (CbmGeoStsPar*) runDb->getContainer("CbmGeoStsPar");
   if ( ! fStsGeo ) {
     cout << "-E- " << GetName() << "::SetParContainers: "
-	 << "No STS geometry parameters!" << endl;
+	 << "No Sts geometry parameters!" << endl;
     return;
   }
 
@@ -131,14 +131,14 @@ InitStatus CbmStsSimulationQa::Init() {
     return kERROR;
   }
 
-  // Get STSPoints array
-  fSTSPoints = (TClonesArray*) ioman->GetObject("STSPoint");
+  // Get StsPoints array
+  fSTSPoints = (TClonesArray*) ioman->GetObject("StsPoint");
   if ( ! fSTSPoints ) {
-    cout << "-E- " << GetName() << "::Init: No STSPoint array!" << endl;
+    cout << "-E- " << GetName() << "::Init: No StsPoint array!" << endl;
     return kERROR;
   }
 
-  // Get the geometry of target and STS
+  // Get the geometry of target and Sts
   InitStatus geoStatus = GetGeometry();
   if ( geoStatus != kSUCCESS ) {
     cout << "-E- " << GetName() << "::Init: Error in reading geometry!"
@@ -168,7 +168,7 @@ InitStatus CbmStsSimulationQa::Init() {
     }
 
     fOnlinePad[0]->cd();
-    TLegend* brp = new TLegend(0.1,0.1,0.9,0.9,"Online STS simulation");
+    TLegend* brp = new TLegend(0.1,0.1,0.9,0.9,"Online Sts simulation");
     brp->SetTextAlign(22);
     brp->SetTextSize(0.6);
     brp->SetTextColor(1);
@@ -181,7 +181,7 @@ InitStatus CbmStsSimulationQa::Init() {
   fhNofStsStations->SetBinContent(1,fNStations);
 
   // Output
-  cout << "   Number of STS stations : " << fNStations << endl;
+  cout << "   Number of Sts stations : " << fNStations << endl;
   if (fActive) cout << "   *****   Task is ACTIVE   *****" << endl;
   cout << "==========================================================="
        << endl << endl;
@@ -200,7 +200,7 @@ InitStatus CbmStsSimulationQa::ReInit() {
        << endl;;
   cout << GetName() << ": Reinitialising..." << endl;
 
-  // Get the geometry of target and STS
+  // Get the geometry of target and Sts
   InitStatus geoStatus = GetGeometry();
   if ( geoStatus != kSUCCESS ) {
     cout << "-E- " << GetName() << "::ReInit: Error in reading geometry!"
@@ -209,7 +209,7 @@ InitStatus CbmStsSimulationQa::ReInit() {
   }
 
   // Output
-  cout << "   Number of STS stations : " << fNStations << endl;
+  cout << "   Number of Sts stations : " << fNStations << endl;
   if (fActive) cout << "   *****   Task is ACTIVE   *****" << endl;
   cout << "==========================================================="
        << endl << endl;
@@ -377,7 +377,7 @@ void CbmStsSimulationQa::Finish()
 InitStatus CbmStsSimulationQa::GetGeometry() {
 
   cout << "GET GEOMETRY" << endl;
-  // Get STS geometry
+  // Get Sts geometry
   if ( ! fStsGeo ) {
     cout << "-W- " << GetName() << "::GetGeometry: No passive geometry!"
 	 <<endl;
@@ -386,7 +386,7 @@ InitStatus CbmStsSimulationQa::GetGeometry() {
   }
   TObjArray* stsNodes = fStsGeo->GetGeoSensitiveNodes();
   if ( ! stsNodes ) {
-    cout << "-E- " << GetName() << "::GetGeometry: No STS node array"
+    cout << "-E- " << GetName() << "::GetGeometry: No Sts node array"
 	 << endl;
     fNStations = 0;
     return kERROR;

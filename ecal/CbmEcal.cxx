@@ -701,9 +701,9 @@ void CbmEcal::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 // -----   Public method Register   ----------------------------------------
 void CbmEcal::Register()
 {
-  FairRootManager::Instance()->Register("ECALPoint","Ecal",fEcalCollection,kTRUE);
+  FairRootManager::Instance()->Register("EcalPoint","Ecal",fEcalCollection,kTRUE);
   if (fInf->GetFastMC()==0)
-    FairRootManager::Instance()->Register("ECALPointLite","EcalLite",fLiteCollection,kTRUE);
+    FairRootManager::Instance()->Register("EcalPointLite","EcalLite",fLiteCollection,kTRUE);
 }
 // -------------------------------------------------------------------------
 

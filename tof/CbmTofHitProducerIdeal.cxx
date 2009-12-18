@@ -42,16 +42,16 @@ InitStatus CbmTofHitProducerIdeal::Init() {
   }
 
   // Get input array
-  fPointArray = (TClonesArray*) ioman->GetObject("TOFPoint");
+  fPointArray = (TClonesArray*) ioman->GetObject("TofPoint");
   if ( ! fPointArray ) {
     cout << "-W- CbmTofHitProducerIdeal::Init: "
-	 << "No TOFPoint array!" << endl;
+	 << "No TofPoint array!" << endl;
     return kERROR;
   }
 
   // Create and register output array
   fHitArray = new TClonesArray("CbmTofHit");
-  ioman->Register("TOFHit", "TOF", fHitArray, kTRUE);
+  ioman->Register("TofHit", "TOF", fHitArray, kTRUE);
 
   cout << "-I- CbmTofHitProducerIdeal: Intialisation successfull" << endl;
   return kSUCCESS;

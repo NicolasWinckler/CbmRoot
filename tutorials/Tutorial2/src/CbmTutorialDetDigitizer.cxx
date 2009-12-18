@@ -105,7 +105,7 @@ InitStatus CbmTutorialDetDigitizer::Init()
 
     //fListStack = (TClonesArray*)ioman->ActivateBranch("MCTrack");
     //fDigiCollection = new TClonesArray("CbmTrdDigi", 100);
-    //ioman->Register("TRDDigi","TRD Digis",fDigiCollection,kTRUE);
+    //ioman->Register("TrdDigi","TRD Digis",fDigiCollection,kTRUE);
 
     return kSUCCESS;
 

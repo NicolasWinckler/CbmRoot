@@ -184,7 +184,7 @@ InitStatus CbmTrdSetTracksPidLike::Init() {
   }
 
   // Get StsTrack array
-  fstsTrackArray  = (TClonesArray*) ioman->GetObject("STSTrack");
+  fstsTrackArray  = (TClonesArray*) ioman->GetObject("StsTrack");
   if ( ! fstsTrackArray) {
     cout << "-E-  CbmTrdSetTracksPidLike::Init:! No StsTrack array!"
          << endl;
@@ -193,7 +193,7 @@ InitStatus CbmTrdSetTracksPidLike::Init() {
 
 
   // Get TrdTrack array
-  fTrackArray  = (TClonesArray*) ioman->GetObject("TRDTrack"); //=>SG
+  fTrackArray  = (TClonesArray*) ioman->GetObject("TrdTrack"); //=>SG
   if ( ! fTrackArray) {
     cout << "-E- CbmTrdSetTracksPidWkn::Init: No TrdTrack array!"
 	 << endl;
@@ -201,7 +201,7 @@ InitStatus CbmTrdSetTracksPidLike::Init() {
   }
 
   // Get TrdTrack array
-  fTrdHitArray  = (TClonesArray*) ioman->GetObject("TRDHit"); //=>SG
+  fTrdHitArray  = (TClonesArray*) ioman->GetObject("TrdHit"); //=>SG
   if ( ! fTrdHitArray) {
     cout << "-E- CbmTrdSetTracksPidWkn::Init: No TrdHit array!"
 	 << endl;

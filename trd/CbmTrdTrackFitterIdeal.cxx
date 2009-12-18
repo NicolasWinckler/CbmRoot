@@ -54,13 +54,13 @@ void CbmTrdTrackFitterIdeal::Init()
         return;
     }
 
-    fArrayTrdPoint = (TClonesArray*) rootMgr->GetObject("TRDPoint");
+    fArrayTrdPoint = (TClonesArray*) rootMgr->GetObject("TrdPoint");
     if(NULL == fArrayTrdPoint) {
 	cout << "-W- CbmTrdTrackFitterIdeal::Init : "
             << "no TRD point array!" << endl;
     }
 
-    fArrayTrdHit = (TClonesArray*) rootMgr->GetObject("TRDHit");
+    fArrayTrdHit = (TClonesArray*) rootMgr->GetObject("TrdHit");
     if(NULL == fArrayTrdHit) {
 	cout << "-W- CbmTrdTrackFitterIdeal::Init : "
             << "no TRD hit array!" << endl;

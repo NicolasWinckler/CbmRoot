@@ -132,7 +132,7 @@ CbmMvdDigitize::CbmMvdDigitize()
     : FairTask("MVDDigitize")
 {
     fMode          = 0;
-    fBranchName    = "MVDPoint";
+    fBranchName    = "MvdPoint";
     fDigis         = new TClonesArray("CbmMvdDigi");
     fPixelCharge   = new TClonesArray("CbmMvdPixelCharge");
     fPileupManager = NULL;
@@ -181,7 +181,7 @@ CbmMvdDigitize::CbmMvdDigitize(const char* name, Int_t iMode,
 : FairTask(name, iVerbose)
 {
     fMode          = iMode;
-    fBranchName    = "MVDPoint";
+    fBranchName    = "MvdPoint";
     fDigis         = new TClonesArray("CbmMvdDigi");
     fPixelCharge   = new TClonesArray("CbmMvdPixelCharge");
     fPileupManager = NULL;
@@ -893,7 +893,7 @@ InitStatus CbmMvdDigitize::Init() {
   
   // **********  Register output array
   fDigis = new TClonesArray("CbmMvdDigi", 10000);
-  ioman->Register("MVDDigi", "MVDRawData", fDigis, kTRUE);
+  ioman->Register("MvdDigi", "MVDRawData", fDigis, kTRUE);
   
   
   // **********  Get MVD geometry

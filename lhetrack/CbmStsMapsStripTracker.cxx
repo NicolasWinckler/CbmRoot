@@ -78,12 +78,12 @@ InitStatus CbmStsMapsStripTracker::Init() {
   FairRootManager *fManager =FairRootManager::Instance();	
 
   fListMCtracks = (TClonesArray *)fManager->GetObject("MCTrack");
-  fListSTSpts   = (TClonesArray *)fManager->GetObject("STSPoint");
+  fListSTSpts   = (TClonesArray *)fManager->GetObject("StsPoint");
 
-  fListStripHits  = (TClonesArray *)fManager->GetObject("STSStripHit");
-  fListHybridHits  = (TClonesArray *)fManager->GetObject("STSHybridHit");
-  fListMAPSpts = (TClonesArray *)fManager->GetObject("STSMapsHit");
-  fListHitInfo = (TClonesArray *)fManager->GetObject("STSMapsHitInfo");
+  fListStripHits  = (TClonesArray *)fManager->GetObject("StsStripHit");
+  fListHybridHits  = (TClonesArray *)fManager->GetObject("StsHybridHit");
+  fListMAPSpts = (TClonesArray *)fManager->GetObject("StsMapsHit");
+  fListHitInfo = (TClonesArray *)fManager->GetObject("StsMapsHitInfo");
 
 
 

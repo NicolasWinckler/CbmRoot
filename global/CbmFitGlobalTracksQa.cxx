@@ -74,34 +74,34 @@ InitStatus CbmFitGlobalTracksQa::Init()
         return kFATAL;
     }
     // Get MC points
-    fArrayStsPoint = (TClonesArray*) rootMgr->GetObject("STSPoint");
+    fArrayStsPoint = (TClonesArray*) rootMgr->GetObject("StsPoint");
     if(NULL == fArrayStsPoint) {
 	cout << "-E- CbmFitGlobalTracksQa::Init : "
             << "no STS point array!" << endl;
     }
-    fArrayTrdPoint = (TClonesArray*) rootMgr->GetObject("TRDPoint");
+    fArrayTrdPoint = (TClonesArray*) rootMgr->GetObject("TrdPoint");
     if(NULL == fArrayTrdPoint) {
 	cout << "-E- CbmFitGlobalTracksQa::Init : "
             << "no TRD point array!" << endl;
     }
     // Get hit arrays
-    fArrayStsHit = (TClonesArray*) rootMgr->GetObject("STSHit");
+    fArrayStsHit = (TClonesArray*) rootMgr->GetObject("StsHit");
     if(NULL == fArrayStsHit) {
 	cout << "-W- CbmFitGlobalTracksQa::Init :"
             << " no STS hit array" << endl;
     }
-    fArrayTrdHit = (TClonesArray*) rootMgr->GetObject("TRDHit");
+    fArrayTrdHit = (TClonesArray*) rootMgr->GetObject("TrdHit");
     if(NULL == fArrayTrdHit) {
 	cout << "-W- CbmFitGlobalTracksQa::Init :"
             << " no TRD hit array" << endl;
     }
     // Get track arrays
-    fArrayStsTrack = (TClonesArray*) rootMgr->GetObject("STSTrack");
+    fArrayStsTrack = (TClonesArray*) rootMgr->GetObject("StsTrack");
     if(NULL == fArrayStsTrack) {
 	cout << "-W- CbmFitGlobalTracksQa::Init : "
             << "no STS track array!" << endl;
     }
-    fArrayTrdTrack = (TClonesArray*) rootMgr->GetObject("TRDTrack");
+    fArrayTrdTrack = (TClonesArray*) rootMgr->GetObject("TrdTrack");
     if(NULL == fArrayTrdTrack) {
 	cout << "-W- CbmFitGlobalTracksQa::Init : "
             << "no TRD track array!" << endl;

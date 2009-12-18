@@ -100,9 +100,9 @@ void CbmRichRingTrackAssignClosestD::Init()
 		return;
 	}
 
-	fTrdTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
+	fTrdTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
 	if ( !fTrdTracks) {
-		cout << "-W- CbmRichElectronsQa::Init: No TRDTrack array!" << endl;
+		cout << "-W- CbmRichElectronsQa::Init: No TrdTrack array!" << endl;
 		return;
 	}
 

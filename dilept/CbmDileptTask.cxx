@@ -429,7 +429,7 @@ InitStatus CbmDiLeptTask::Init()
   }
 
   // Get StsPoint
-  fArrayStsPoint = (TClonesArray*) fRootManager->GetObject("STSPoint");
+  fArrayStsPoint = (TClonesArray*) fRootManager->GetObject("StsPoint");
   if (! fArrayStsPoint) {
     cout << "-E- CbmMCTrack::Init: No StsPoint array!" << endl;
     return kERROR;

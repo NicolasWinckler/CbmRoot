@@ -108,7 +108,7 @@ InitStatus CbmTrdMatchTracksMK::Init() {
   }
 
   // Get TRD hit Array
-  fHits  = (TClonesArray*) ioman->GetObject("TRDHit");
+  fHits  = (TClonesArray*) ioman->GetObject("TrdHit");
   if ( ! fHits) {
     cout << "-W- CbmTrdMatchTracksMK::Init: No TRDHit array!"
 	 << endl;
@@ -116,9 +116,9 @@ InitStatus CbmTrdMatchTracksMK::Init() {
   }
 
   // Get TrdTrack Array
-  fTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
+  fTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
   if ( ! fTracks ) {
-    cout << "-E- CbmTrdMatchTracksMK::Init: No TRDTrack array!" << endl;
+    cout << "-E- CbmTrdMatchTracksMK::Init: No TrdTrack array!" << endl;
     return kERROR;
   }
 
@@ -131,7 +131,7 @@ InitStatus CbmTrdMatchTracksMK::Init() {
 
 
   // Get TRDPoint array
-  fPoints = (TClonesArray*) ioman->GetObject("TRDPoint");
+  fPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
   if ( ! fPoints ) {
     cout << "-E- CbmTrdMatchTracksMK::Init: No TRDPoint array!" << endl;
     return kERROR;
@@ -139,7 +139,7 @@ InitStatus CbmTrdMatchTracksMK::Init() {
 
   // Create and register TrdTrackMatch array
   fMatches = new TClonesArray("CbmTrackMatch",100);
-  ioman->Register("TRDTrackMatch", "TRD", fMatches, kTRUE);
+  ioman->Register("TrdTrackMatch", "TRD", fMatches, kTRUE);
 
   MC_Tot_PrimaryRefFast = 0;
 
@@ -1050,7 +1050,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 	   << endl;
       cout << "-I-                TRD Event #" << NO_TOTAL_EVENTS << " Summary              -I-"
 	   << endl;
-       cout << "        Reconstructed TRDTracks   : " << std::setw(mW+1) << nTracks << endl;
+       cout << "        Reconstructed TrdTracks   : " << std::setw(mW+1) << nTracks << endl;
 
       cout// << fixed
 	<< "    Eff. of primary reference all : " << std::setw(mW) << qPrimaryRefAll << "" << std::setw(mW) << RECO_PrimaryRefAll << endl
@@ -1217,7 +1217,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
     //        << endl
     //        << "               Summary of event " << NO_TOTAL_EVENTS
     //        << endl;
-    //   cout << "        Reconstructed TRDTracks   : " << qTotEvents << " /event" << endl;
+    //   cout << "        Reconstructed TrdTracks   : " << qTotEvents << " /event" << endl;
     //   cout << "  Number of correct reco tracks   : " << qTotCommonMatches << " /event" << endl;
     //   cout << "  Number of MC reference tracks   : " << qTotMCTrackPrim << " /event" << endl;
     //   cout << "  Efficiency for ref. primaries   : " << qTotEff <<"% " << noTotCommonMatches << endl;
@@ -1234,7 +1234,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 
     cout << fixed << "Accumulated " << NO_TOTAL_EVENTS << " events: " << endl;
 
-    cout << "        Reconstructed TRDTracks : " << std::setw(mW) << Int_t(qTotEvents) << " " << endl
+    cout << "        Reconstructed TrdTracks : " << std::setw(mW) << Int_t(qTotEvents) << " " << endl
 	 << "  Eff. of primary reference all : " << std::setw(mW) <<  qTotPrimaryRefAll << "% " << std::setw(mW) << RECO_Tot_PrimaryRefAll << endl
 	 << " Eff. of primary reference fast : " << std::setw(mW) <<  qTotPrimaryRefFast <<"% " << std::setw(mW) << RECO_Tot_PrimaryRefFast << " " << endl
 	 << " Eff. of primary reference slow : " << std::setw(mW) <<  qTotPrimaryRefSlow << "% " << std::setw(mW) << RECO_Tot_PrimaryRefSlow << endl
@@ -1268,7 +1268,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 	 << "######################################################"
 	 <<endl;
 
-    //     cout << "        Reconstructed TRDTracks : " << qTotEvents << " /event" << endl
+    //     cout << "        Reconstructed TrdTracks : " << qTotEvents << " /event" << endl
     // 	 << " Eff. of primary reference fast : " << qTotPrimaryRefFast <<"% " << double(RECO_Tot_PrimaryRefFast)/double(NO_TOTAL_EVENTS) << " /event" << endl
     // 	 << " Eff. of primary reference slow : " << qTotPrimaryRefSlow << "% " << double(RECO_Tot_PrimaryRefSlow)/double(NO_TOTAL_EVENTS) << " /event" << endl
     // 	 << "  Eff. of primary reference all : " << qTotPrimaryRefAll << "% " << double(RECO_Tot_PrimaryRefAll)/double(NO_TOTAL_EVENTS) << " /event" << endl

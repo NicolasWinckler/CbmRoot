@@ -468,15 +468,15 @@ InitStatus CbmStsRealDigitize::Init() {
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
-  fPoints = (TClonesArray*) ioman->GetObject("STSPoint");
+  fPoints = (TClonesArray*) ioman->GetObject("StsPoint");
 
   // Register output array StsDigi
   fDigis = new TClonesArray("CbmStsDigi",1000);
-  ioman->Register("STSDigi", "Digital response in STS", fDigis, kTRUE);
+  ioman->Register("StsDigi", "Digital response in STS", fDigis, kTRUE);
 
   // Register output array StsDigiMatches
   fDigiMatches = new TClonesArray("CbmStsDigiMatch",1000);
-  ioman->Register("STSDigiMatch", "Digi Match in STS", fDigiMatches, kTRUE);
+  ioman->Register("StsDigiMatch", "Digi Match in STS", fDigiMatches, kTRUE);
 
   fGen = new TRandom3();
   time_t curtime;

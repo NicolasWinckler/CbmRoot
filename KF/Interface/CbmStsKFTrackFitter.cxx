@@ -36,13 +36,13 @@ void CbmStsKFTrackFitter::Init(){
 	 << "ROOT manager is not instantiated!" << endl;
     return;
   }
-  fStsHitsArray      = (TClonesArray*) rootMgr->GetObject("STSHit");
+  fStsHitsArray      = (TClonesArray*) rootMgr->GetObject("StsHit");
   if ( !fStsHitsArray ) {
     cout << "-W- CbmStsKFTrackFitter::Init: "
 	 << "no STS hits array" << endl;
     //return;
   }
-  fMvdHitsArray   = (TClonesArray*) rootMgr->GetObject("MVDHit");
+  fMvdHitsArray   = (TClonesArray*) rootMgr->GetObject("MvdHit");
   if( !fMvdHitsArray ) {
     cout << "-W- CbmStsKFTrackFitter::Init: "
   	 << "no MVD hits array" << endl;

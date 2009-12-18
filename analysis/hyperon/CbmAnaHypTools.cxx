@@ -17,12 +17,12 @@
 void CbmAnaHypTools::Init(){
   FairRootManager* ioman = FairRootManager::Instance();
   fListMCTracks  = (TClonesArray*) ioman->GetObject("MCTrack");
-  fListRCTracks  = (TClonesArray*) ioman->GetObject("STSTrack");
-  fStsPointArray = (TClonesArray*) ioman->GetObject("STSPoint");
-  fmArray        = (TClonesArray*) ioman->GetObject("MVDHit");
-  fsArray        = (TClonesArray*) ioman->GetObject("STSHit");
+  fListRCTracks  = (TClonesArray*) ioman->GetObject("StsTrack");
+  fStsPointArray = (TClonesArray*) ioman->GetObject("StsPoint");
+  fmArray        = (TClonesArray*) ioman->GetObject("MvdHit");
+  fsArray        = (TClonesArray*) ioman->GetObject("StsHit");
   fPV            = (CbmVertex*)    ioman->GetObject("PrimaryVertex");
-  fTrackMatch    = (TClonesArray*) ioman->GetObject("STSTrackMatch");
+  fTrackMatch    = (TClonesArray*) ioman->GetObject("StsTrackMatch");
 
   TVector3 pv;
   fPV->Position(pv);

@@ -76,14 +76,14 @@ InitStatus CbmTrdHitProducerIdeal::Init()
     }
 
     // Activate data branches
-    fArrayTrdPoint = (TClonesArray*) rootMgr->GetObject("TRDPoint");
+    fArrayTrdPoint = (TClonesArray*) rootMgr->GetObject("TrdPoint");
     if(NULL == fArrayTrdPoint) {
 	cout << "-W- CbmTrdHitProducerIdeal::Init: "
-            << "no TRD point array!" << endl;
+            << "no TrdPoint array!" << endl;
     }
 
     // Register
-    rootMgr->Register("TRDHit", "TRD", fArrayTrdHit, kTRUE);
+    rootMgr->Register("TrdHit", "TRD", fArrayTrdHit, kTRUE);
     cout << "-I- CbmTrdHitProducerIdeal::Init: "
 	<<"initialisation completed." << endl;
 

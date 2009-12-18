@@ -95,17 +95,17 @@ InitStatus CbmDileptonAssignMCid::Init(){
         return kFATAL;
     }
 
-    // Get STSTrack Array
-    fArrayStsTrack = (TClonesArray*) fRootManager->GetObject("STSTrack");
+    // Get StsTrack Array
+    fArrayStsTrack = (TClonesArray*) fRootManager->GetObject("StsTrack");
     if (! fArrayStsTrack) {
-        cout << "-E- CbmDileptonAssignMCid::Init: No STSTrack array!" << endl;
+        cout << "-E- CbmDileptonAssignMCid::Init: No StsTrack array!" << endl;
         return kFATAL;
     }
 
-    // Get STSTrackMatch Array
-    fArrayStsTrackMatch = (TClonesArray*) fRootManager->GetObject("STSTrackMatch");
+    // Get StsTrackMatch Array
+    fArrayStsTrackMatch = (TClonesArray*) fRootManager->GetObject("StsTrackMatch");
     if (! fArrayStsTrackMatch) {
-        cout << "-E- CbmDileptonAssignMCid::Init: No STSTrackMatch array!" << endl;
+        cout << "-E- CbmDileptonAssignMCid::Init: No StsTrackMatch array!" << endl;
         return kFATAL;
     }
 
@@ -124,7 +124,7 @@ InitStatus CbmDileptonAssignMCid::Init(){
     }
 
     // Get TrdTrack Array
-    fArrayTrdTrack = (TClonesArray*) fRootManager->GetObject("TRDTrack");
+    fArrayTrdTrack = (TClonesArray*) fRootManager->GetObject("TrdTrack");
     if (! fArrayTrdTrack) {
         cout << "-E- CbmDileptonAssignMCid::Init: No TrdTrack array!" << endl;
         return kFATAL;
@@ -138,7 +138,7 @@ InitStatus CbmDileptonAssignMCid::Init(){
     }
 
     // Get TofPoint Array
-    fArrayTofPoint = (TClonesArray*) fRootManager->GetObject("TOFPoint");
+    fArrayTofPoint = (TClonesArray*) fRootManager->GetObject("TofPoint");
     if (! fArrayTofPoint) {
         cout << "-E- CbmDileptonAssignMCid::Init: No TofPoint array!" << endl;
         return kFATAL;

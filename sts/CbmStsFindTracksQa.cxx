@@ -137,28 +137,28 @@ InitStatus CbmStsFindTracksQa::Init() {
   }
 
   // Get StsPoint array
-  fStsPoints = (TClonesArray*) ioman->GetObject("STSPoint");
+  fStsPoints = (TClonesArray*) ioman->GetObject("StsPoint");
   if ( ! fStsPoints ) {
     cout << "-E- " << GetName() << "::Init: No StsPoint array!" << endl;
     return kFATAL;
   }
 
   // Get StsHit array
-  fStsHits = (TClonesArray*) ioman->GetObject("STSHit");
+  fStsHits = (TClonesArray*) ioman->GetObject("StsHit");
   if ( ! fStsHits ) {
     cout << "-E- " << GetName() << "::Init: No StsHit array!" << endl;
     return kFATAL;
   }
 
   // Get StsTrack array
-  fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
+  fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
   if ( ! fStsTracks ) {
     cout << "-E- " << GetName() << "::Init: No StsTrack array!" << endl;
     return kERROR;
   }
 
   // Get StsTrackMatch array
-  fMatches = (TClonesArray*) ioman->GetObject("STSTrackMatch");
+  fMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
   if ( ! fMatches ) {
     cout << "-E- " << GetName() << "::Init: No StsTrackMatch array!"
 	 << endl;

@@ -85,21 +85,21 @@ InitStatus CbmJpsiTrigger::Init()
     }
 
     // Get STSTrack Array
-    fStsTrack = (TClonesArray*) fRootManager->GetObject("STSTrack");
+    fStsTrack = (TClonesArray*) fRootManager->GetObject("StsTrack");
     if (! fStsTrack) {
 	cout << "-E- CbmDileptonAssignPid::Init: No STSTrack array!" << endl;
 	return kFATAL;
     }
 
     // Get TrdTrack array
-    fTrdTrack = (TClonesArray*) fRootManager->GetObject("TRDTrack");
+    fTrdTrack = (TClonesArray*) fRootManager->GetObject("TrdTrack");
     if (! fTrdTrack) {
         cout << "-E- CbmDileptonAssignPid::Init: No TrdTrack array!" << endl;
         return kFATAL;
     }
  
   // Get TRD tracks Array
-  fTrdTrack = (TClonesArray*) fRootManager->GetObject("TRDTrack");
+  fTrdTrack = (TClonesArray*) fRootManager->GetObject("TrdTrack");
   
   // fJpsiEl = new TClonesArray("CbmJpsiTriggerElectron",1000); 
   //    fRootManager->Register("CbmJpsiTriggerElectron","Jpsi electrons canditates",fJpsiEl ,kTRUE);

@@ -56,7 +56,7 @@ void CbmEcalTrackExtrapolationKF::Init()
     Fatal("CbmEcalTrackExtrapolationKF::Init()", "Can't instantise Rootmanager");
 
   //Get STS track array
-  fSTSArray=(TClonesArray*)ioman->GetObject("STSTrack");
+  fSTSArray=(TClonesArray*)ioman->GetObject("StsTrack");
   if (!fSTSArray)
     cout << "-W- CbmEcalTrackExtrapolationKF::Init: No sts track array!" << endl;
 }

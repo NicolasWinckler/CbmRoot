@@ -222,10 +222,10 @@ InitStatus CbmStsClusterFinder::Init() {
   // Get input array
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
-  fDigis = (TClonesArray*) ioman->GetObject("STSDigi");
+  fDigis = (TClonesArray*) ioman->GetObject("StsDigi");
 
   fClusters = new TClonesArray("CbmStsCluster", 1000);
-  ioman->Register("STSCluster", "Cluster in STS", fClusters, kTRUE);
+  ioman->Register("StsCluster", "Cluster in STS", fClusters, kTRUE);
 
   // Build digitisation scheme
   Bool_t success = fDigiScheme->Init(fGeoPar, fDigiPar);

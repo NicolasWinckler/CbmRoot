@@ -58,13 +58,13 @@ void CbmStsTrackFitterIdeal::Init()
             << "no MC track array!" << endl;
     }
 
-    fArrayStsPoint = (TClonesArray*) rootMgr->GetObject("STSPoint");
+    fArrayStsPoint = (TClonesArray*) rootMgr->GetObject("StsPoint");
     if(NULL == fArrayStsPoint) {
 	cout << "-W- CbmStsTrackFitterIdeal::Init : "
             << "no STS point array!" << endl;
     }
 
-    fArrayStsHit = (TClonesArray*) rootMgr->GetObject("STSHit");
+    fArrayStsHit = (TClonesArray*) rootMgr->GetObject("StsHit");
     if(NULL == fArrayStsHit) {
 	cout << "-W- CbmStsTrackFitterIdeal::Init : "
             << "no STS hit array!" << endl;

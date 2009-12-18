@@ -75,7 +75,7 @@ void CbmTrdTrackFitterKF::Init()
     }
 
     // Activate data branches
-    fArrayTrdHit = (TClonesArray*) rootMgr->GetObject("TRDHit");
+    fArrayTrdHit = (TClonesArray*) rootMgr->GetObject("TrdHit");
     if(NULL == fArrayTrdHit) {
         cout << "-E- CbmTrdTrackFitterKF::Init : "
             << " no TRD hit array!" << endl;

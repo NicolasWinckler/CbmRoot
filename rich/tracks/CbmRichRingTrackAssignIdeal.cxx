@@ -115,7 +115,7 @@ void CbmRichRingTrackAssignIdeal::Init() {
      }
 
    // get TrackMatch array
-  fTrackMatchArray = (TClonesArray*) ioman->GetObject("STSTrackMatch");
+  fTrackMatchArray = (TClonesArray*) ioman->GetObject("StsTrackMatch");
   if ( ! fTrackMatchArray) {
         cout << "-W- CbmRichRingTrackAssignIdeal::Init: No track match array!"
 	    << endl;

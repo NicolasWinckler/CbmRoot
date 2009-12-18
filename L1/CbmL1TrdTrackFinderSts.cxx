@@ -766,19 +766,19 @@ void CbmL1TrdTrackFinderSts::DataBranches()
         return;
     }
     // Get pointer to the TRD points
-    fArrayTrdPoint = (TClonesArray*) rootMgr->GetObject("TRDPoint");
+    fArrayTrdPoint = (TClonesArray*) rootMgr->GetObject("TrdPoint");
     if(NULL == fArrayTrdPoint) {
         cout << "-W- CbmL1TrdTrackFinderSts::DataBranches : "
             << "no TRD point array" << endl;
     }
     // Get pointer to the STS track array
-    fArrayStsTrack = (TClonesArray*) rootMgr->GetObject("STSTrack");
+    fArrayStsTrack = (TClonesArray*) rootMgr->GetObject("StsTrack");
     if(NULL == fArrayStsTrack) {
         cout << "-W- CbmL1TrdTrackFinderSts::DataBranches : "
             << "no STS track array" << endl;
     }
     // Get pointer to the STS track match array
-    fArrayStsTrackM = (TClonesArray*) rootMgr->GetObject("STSTrackMatch");
+    fArrayStsTrackM = (TClonesArray*) rootMgr->GetObject("StsTrackMatch");
     if(NULL == fArrayStsTrackM) {
         cout << "-W- CbmL1TrdTrackFinderSts::DataBranches : "
             << "no STS track match array" << endl;

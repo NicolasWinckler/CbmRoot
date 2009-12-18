@@ -185,14 +185,14 @@ InitStatus CbmTrdSetTracksPidANN::Init() {
 	}
 
 	// Get TrdTrack array
-	fTrackArray = (TClonesArray*) ioman->GetObject("TRDTrack");
+	fTrackArray = (TClonesArray*) ioman->GetObject("TrdTrack");
 	if ( !fTrackArray) {
 		cout << "-E- CbmTrdSetTracksPidANN::Init: No TrdTrack array!" << endl;
 		return kERROR;
 	}
 
 	// Get TrdTrack array
-	fTrdHitArray = (TClonesArray*) ioman->GetObject("TRDHit");
+	fTrdHitArray = (TClonesArray*) ioman->GetObject("TrdHit");
 	if ( !fTrdHitArray) {
 		cout << "-E- CbmTrdSetTracksPidANN::Init: No TrdHit array!" << endl;
 		return kERROR;

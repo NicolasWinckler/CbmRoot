@@ -55,12 +55,12 @@ void CbmGlobalTrackFitterIdeal::Init()
         return;
     }
     // Get track arrays
-    fArrayStsTrack = (TClonesArray*) rootMgr->GetObject("STSTrack");
+    fArrayStsTrack = (TClonesArray*) rootMgr->GetObject("StsTrack");
     if(NULL == fArrayStsTrack) {
 	cout << "-W- CbmGlobalTrackFitterIdeal::Init : "
             << "no STS track array!" << endl;
     }
-    fArrayTrdTrack = (TClonesArray*) rootMgr->GetObject("TRDTrack");
+    fArrayTrdTrack = (TClonesArray*) rootMgr->GetObject("TrdTrack");
     if(NULL == fArrayTrdTrack) {
 	cout << "-W- CbmGlobalTrackFitterIdeal::Init : "
             << "no TRD track array!" << endl;

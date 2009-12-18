@@ -119,7 +119,7 @@ InitStatus CbmStsFitTracks::Init() {
   }
 
   // Get StsTrack array
-  fTracks  = (TClonesArray*) ioman->GetObject("STSTrack"); //=>SG
+  fTracks  = (TClonesArray*) ioman->GetObject("StsTrack"); //=>SG
   if ( ! fTracks) {
     cout << "-E- CbmStsFitTracks::Init: No StsTrack array!"
 	 << endl;

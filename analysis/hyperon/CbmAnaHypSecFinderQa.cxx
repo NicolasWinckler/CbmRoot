@@ -41,7 +41,7 @@ InitStatus CbmAnaHypSecFinderQa::Init() {
   CbmAnaHypSecFinder::Init();
 
   FairRootManager* ioman = FairRootManager::Instance();
-  fTrackMatch = (TClonesArray*) ioman->GetObject("STSTrackMatch");
+  fTrackMatch = (TClonesArray*) ioman->GetObject("StsTrackMatch");
 
 
   fTools = new CbmAnaHypTools();

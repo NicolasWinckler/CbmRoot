@@ -206,7 +206,7 @@ void CbmSts::EndOfEvent() {
 
 // -----   Public method Register   -------------------------------------------
 void CbmSts::Register() {
-  FairRootManager::Instance()->Register("STSPoint", GetName(), fStsCollection, kTRUE);
+  FairRootManager::Instance()->Register("StsPoint", GetName(), fStsCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
 

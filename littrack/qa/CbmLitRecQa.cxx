@@ -71,23 +71,23 @@ InitStatus CbmLitRecQa::Init()
     	if (NULL == fRecMatches) Fatal("Init","No MuchTrackMatch array!");
     } else
     if (fDetId == kTRD) {
-    	fMCPoints = (TClonesArray*) ioman->GetObject("TRDPoint");
-    	if (NULL == fMCPoints ) Fatal("Init","No TRDPoint array!");
-    	fRecHits = (TClonesArray*) ioman->GetObject("TRDHit");
-    	if (NULL == fRecHits) Fatal("Init", "No TRDHit array!");
-    	fRecTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
-    	if (NULL == fRecTracks) Fatal("Init","No TRDTrack array!");
-    	fRecMatches = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
-    	if (NULL == fRecMatches) Fatal("Init","No TRDTrackMatch array!");
+    	fMCPoints = (TClonesArray*) ioman->GetObject("TrdPoint");
+    	if (NULL == fMCPoints ) Fatal("Init","No TrdPoint array!");
+    	fRecHits = (TClonesArray*) ioman->GetObject("TrdHit");
+    	if (NULL == fRecHits) Fatal("Init", "No TrdHit array!");
+    	fRecTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
+    	if (NULL == fRecTracks) Fatal("Init","No TrdTrack array!");
+    	fRecMatches = (TClonesArray*) ioman->GetObject("TrdTrackMatch");
+    	if (NULL == fRecMatches) Fatal("Init","No TrdTrackMatch array!");
     } else {
     	Fatal("Init","This detector type is not supported");
     }
 
     if (fNormType == 2) {
-    	fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
-    	if (NULL == fStsTracks) Fatal("Init","No STStrack array!");
-    	fStsMatches = (TClonesArray*) ioman->GetObject("STSTrackMatch");
-    	if (NULL == fStsMatches) Fatal("Init",": No STSTrackMatch array!");
+    	fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
+    	if (NULL == fStsTracks) Fatal("Init","No Ststrack array!");
+    	fStsMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
+    	if (NULL == fStsMatches) Fatal("Init",": No StsTrackMatch array!");
     }
 
     CreateHistos();

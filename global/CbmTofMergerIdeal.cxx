@@ -61,21 +61,21 @@ void CbmTofMergerIdeal::Init()
         return;
     }
     // Activate TOF point array
-    fArrayTofPoint = (TClonesArray*) rootMgr->GetObject("TOFPoint");
+    fArrayTofPoint = (TClonesArray*) rootMgr->GetObject("TofPoint");
     if(NULL == fArrayTofPoint) {
 	cout << "-W- CbmTofMergerIdeal::Init : "
 	    << "no TOF point array"
 	    << endl;
     }
     // Activate STS track match array
-    fArrayStsTrackMatch = (TClonesArray*) rootMgr->GetObject("STSTrackMatch");
+    fArrayStsTrackMatch = (TClonesArray*) rootMgr->GetObject("StsTrackMatch");
     if(NULL == fArrayStsTrackMatch) {
 	cout << "-W- CbmTofMergerIdeal::Init : "
 	    << "no STS track match array"
 	    << endl;
     }
     // Activate TRD track match array
-    fArrayTrdTrackMatch = (TClonesArray*) rootMgr->GetObject("TRDTrackMatch");
+    fArrayTrdTrackMatch = (TClonesArray*) rootMgr->GetObject("TrdTrackMatch");
     if(NULL == fArrayTrdTrackMatch) {
 	cout << "-W- CbmTofMergerIdeal::Init : "
 	    << "no TRD track match array"

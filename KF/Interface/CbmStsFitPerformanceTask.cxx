@@ -297,13 +297,13 @@ InitStatus CbmStsFitPerformanceTask::ReInit(){
 
   FairRootManager* fManger =FairRootManager::Instance();
   fMCTrackArray     = (TClonesArray*) fManger->GetObject("MCTrack");
-  fStsPointArray    = (TClonesArray*) fManger->GetObject("STSPoint");
+  fStsPointArray    = (TClonesArray*) fManger->GetObject("StsPoint");
   fMvdPointArray    = (TClonesArray*) fManger->GetObject("MvdPoint");
-  fRecStsTrackArray = (TClonesArray*) fManger->GetObject("STSTrack");
-  fStsHitArray = (TClonesArray*) fManger->GetObject("STSHit");
-  fMvdHitArray = (TClonesArray*) fManger->GetObject("MVDHit");
+  fRecStsTrackArray = (TClonesArray*) fManger->GetObject("StsTrack");
+  fStsHitArray = (TClonesArray*) fManger->GetObject("StsHit");
+  fMvdHitArray = (TClonesArray*) fManger->GetObject("MvdHit");
   fPrimaryVertex = (CbmVertex*) fManger->GetObject("PrimaryVertex");
-  fSTSTrackMatch = (TClonesArray*) fManger->GetObject("STSTrackMatch");
+  fSTSTrackMatch = (TClonesArray*) fManger->GetObject("StsTrackMatch");
   fFitter.Init();
 
   return kSUCCESS;

@@ -31,9 +31,9 @@ void CbmLitTofMerger::Init()
     if(rootMgr == NULL)
     	TObject::Fatal("CbmLitTofMerger::Init()", "ROOT manager is not instantiated");
 
-    fTrdTracks = (TClonesArray*) rootMgr->GetObject("TRDTrack");
+    fTrdTracks = (TClonesArray*) rootMgr->GetObject("TrdTrack");
     if(fTrdTracks == NULL) TObject::Fatal("CbmLitTofMerger::Init()", "no TRD track array");
-    fTrdHits = (TClonesArray*) rootMgr->GetObject("TRDHit");
+    fTrdHits = (TClonesArray*) rootMgr->GetObject("TrdHit");
     if(fTrdHits == NULL) TObject::Fatal("CbmLitTofMerger::Init()", "no TRD hit array");
 
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();

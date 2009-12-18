@@ -121,8 +121,8 @@ void CbmLitReconstructionQa::ReadDataBranches()
     fGlobalTracks = (TClonesArray*) ioman->GetObject("GlobalTrack");
     if (NULL == fGlobalTracks) Fatal("Init","No GlobalTrack array!");
 
-    fStsMatches = (TClonesArray*) ioman->GetObject("STSTrackMatch");
-    if (NULL == fStsMatches) Fatal("Init",": No STSTrackMatch array!");
+    fStsMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
+    if (NULL == fStsMatches) Fatal("Init",": No StsTrackMatch array!");
 
     if (fIsMuch) {
     	fMuchMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
@@ -130,14 +130,14 @@ void CbmLitReconstructionQa::ReadDataBranches()
     }
 
     if (fIsTrd) {
-    	fTrdMatches = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
-    	if (NULL == fTrdMatches) Fatal("Init","No TRDTrackMatch array!");
-    	fTrdHits = (TClonesArray*) ioman->GetObject("TRDHit");
-    	if (NULL == fTrdHits) Fatal("Init","No TRDHit array!");
+    	fTrdMatches = (TClonesArray*) ioman->GetObject("TrdTrackMatch");
+    	if (NULL == fTrdMatches) Fatal("Init","No TrdTrackMatch array!");
+    	fTrdHits = (TClonesArray*) ioman->GetObject("TrdHit");
+    	if (NULL == fTrdHits) Fatal("Init","No TrdHit array!");
     }
 
     if (fIsTof) {
-    	fTofPoints = (TClonesArray*) ioman->GetObject("TOFPoint");
+    	fTofPoints = (TClonesArray*) ioman->GetObject("TofPoint");
     	if (NULL == fTofPoints) Fatal("Init", "No TofPoint array!");
     	fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
     	if (NULL == fTofHits) Fatal("Init", "No TofHit array!");

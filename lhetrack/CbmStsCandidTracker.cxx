@@ -47,7 +47,7 @@ InitStatus CbmStsCandidTracker::Init()
 
   FairRootManager *fManager =FairRootManager::Instance();	
 
-  fListSTSpts = (TClonesArray *)fManager->GetObject("STSPoint");
+  fListSTSpts = (TClonesArray *)fManager->GetObject("StsPoint");
   fListMCtracks = (TClonesArray *)fManager->GetObject("MCTrack");
 
   fDx = 0.002; //!  20 mkm

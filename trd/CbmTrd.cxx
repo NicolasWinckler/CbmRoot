@@ -367,7 +367,7 @@ void CbmTrd::EndOfEvent() {
 
 // -----   Public method Register   ----------------------------------------
 void CbmTrd::Register() {
-  FairRootManager::Instance()->Register("TRDPoint", "Trd", fTrdCollection, kTRUE);
+  FairRootManager::Instance()->Register("TrdPoint", "Trd", fTrdCollection, kTRUE);
 }
 // -------------------------------------------------------------------------
 

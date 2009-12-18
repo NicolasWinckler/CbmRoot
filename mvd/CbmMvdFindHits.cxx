@@ -70,7 +70,7 @@ CbmMvdFindHits::CbmMvdFindHits()
     fHits       = new TClonesArray("CbmMvdHit");
     fClusters   = new TClonesArray("CbmMvdCluster");
     fMatches    = new TClonesArray("CbmMvdHitMatch"); //testing purposes
-    fBranchName = "MVDDigi";
+    fBranchName = "MvdDigi";
 
     fAddNoise = kFALSE;
 
@@ -107,7 +107,7 @@ CbmMvdFindHits::CbmMvdFindHits(const char* name, Int_t iMode,
     fHits       = new TClonesArray("CbmMvdHit");
     fClusters   = new TClonesArray("CbmMvdCluster");
     fMatches    = new TClonesArray("CbmMvdHitMatch"); //testing purposes
-    fBranchName = "MVDDigi";
+    fBranchName = "MvdDigi";
 
     fAddNoise = kFALSE;
 
@@ -992,9 +992,9 @@ void CbmMvdFindHits::Register() {
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman) Fatal("Register",
 		      "No FairRootManager");
-  ioman->Register("MVDHit", "MVD", fHits, kTRUE);
-  ioman->Register("MVDCluster", "MVD", fClusters, kTRUE);
-  ioman->Register("MVDHitMatch", "MVD Hit Match", fMatches, kTRUE);
+  ioman->Register("MvdHit", "MVD", fHits, kTRUE);
+  ioman->Register("MvdCluster", "MVD", fClusters, kTRUE);
+  ioman->Register("MvdHitMatch", "MVD Hit Match", fMatches, kTRUE);
 
 
 }

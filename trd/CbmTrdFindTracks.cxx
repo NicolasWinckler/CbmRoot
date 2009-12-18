@@ -76,7 +76,7 @@ InitStatus CbmTrdFindTracks::Init()
 
   // Get TRD hit Array
   fTrdHitArray
-    = (TClonesArray*) ioman->GetObject("TRDHit");
+    = (TClonesArray*) ioman->GetObject("TrdHit");
   if ( ! fTrdHitArray) {
     cout << "-W- CbmTrdFindTracks::Init: No TrdHit array!"
 	 << endl;
@@ -85,7 +85,7 @@ InitStatus CbmTrdFindTracks::Init()
 
   // Create and register TrdTrack array
   fTrackArray = new TClonesArray("CbmTrdTrack",100);
-  ioman->Register("TRDTrack", "TRD", fTrackArray, kTRUE);
+  ioman->Register("TrdTrack", "TRD", fTrackArray, kTRUE);
 
 
   // Call the Init method of the track finder

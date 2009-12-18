@@ -74,7 +74,7 @@ InitStatus CbmEcalMatching::Init()
     Fatal("Init", "Can't find array of MC tracks");
     return kFATAL;
   }
-  fPoints=(TClonesArray*)io->ActivateBranch("ECALPoint");
+  fPoints=(TClonesArray*)io->ActivateBranch("EcalPoint");
   if (!fPoints)
   {
     Fatal("Init", "Can't find array of Ecal Points");

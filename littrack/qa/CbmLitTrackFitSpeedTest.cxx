@@ -324,7 +324,7 @@ void CbmLitTrackFitSpeedTest::ReadDataBranches()
     if (NULL == fGlobalTracks) Fatal("CbmLitTrackFitSpeedTest::Init","No GlobalTrack array!");
 
    	if (fIsSts) {
-   		fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
+   		fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
    		if (NULL == fStsTracks) Fatal("CbmLitTrackFitSpeedTest::Init", "No STSTrack array!");
    	}
 
@@ -337,9 +337,9 @@ void CbmLitTrackFitSpeedTest::ReadDataBranches()
    	}
 
    	if (fIsTrd) {
-		fTrdTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
-		if (NULL == fTrdTracks) Fatal("CbmLitTrackFitSpeedTest::Init", "No TRDTrack array!");
-		fTrdHits  = (TClonesArray*) ioman->GetObject("TRDHit");
+		fTrdTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
+		if (NULL == fTrdTracks) Fatal("CbmLitTrackFitSpeedTest::Init", "No TrdTrack array!");
+		fTrdHits  = (TClonesArray*) ioman->GetObject("TrdHit");
 		if (NULL == fTrdHits) Fatal("CbmLitTrackFitSpeedTest::Init", "No TRDHit array!");
    	}
 

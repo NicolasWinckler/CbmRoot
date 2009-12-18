@@ -145,7 +145,7 @@ void CbmMvdMatchTracks::Exec(Option_t* opt) {
       iMCTrack = hit->GetTrackID();
       if ( fVerbose > 2 ) cout << "Track " << iTrack << ", MAPS hit "
 			       << track->GetMvdHitIndex(iHit) 
-			       << ", STSPoint " << iPoint << ", MCTrack "
+			       << ", StsPoint " << iPoint << ", MCTrack "
 			       << iMCTrack << endl;
       fMatchMap[iMCTrack]++;
     }
@@ -165,7 +165,7 @@ void CbmMvdMatchTracks::Exec(Option_t* opt) {
       }
     }
     nWrong = nAll - nTrue;
-    if (fVerbose>1) cout << "-I- CbmMvdMatchTracks: STSTrack " << iTrack 
+    if (fVerbose>1) cout << "-I- CbmMvdMatchTracks: StsTrack " << iTrack 
 			 << ", MCTrack " << iMCTrack << ", true " 
 			 << nTrue << ", wrong " << nWrong << ", fake " 
 			 << nFake << ", #MCTracks " << nMCTracks << endl;
@@ -195,13 +195,13 @@ void CbmMvdMatchTracks::Exec(Option_t* opt) {
     cout << endl;
     cout << "-------------------------------------------------------" 
 	 << endl;
-    cout << "-I-              STS Track Matching                 -I-"
+    cout << "-I-              Sts Track Matching                 -I-"
 	 << endl;
-    cout << "Reconstructed STSTracks : " << nTracks << endl;;
+    cout << "Reconstructed StsTracks : " << nTracks << endl;;
     cout << "True  hit assignments   : " << qTrue  << " %" << endl;
     cout << "Wrong hit assignments   : " << qWrong << " %" << endl;
     cout << "Fake  hit assignments   : " << qFake  << " %" << endl;
-    cout << "MCTracks per STSTrack   : " << qMC << endl;
+    cout << "MCTracks per StsTrack   : " << qMC << endl;
     cout << "--------------------------------------------------------" 
 	 << endl;
   }
@@ -239,24 +239,24 @@ InitStatus CbmMvdMatchTracks::Init() {
     return kFATAL;
   }
 
-  // Get STS hit Array
-  fHits = (TClonesArray*) ioman->GetObject("MVDHit");
+  // Get StsHit Array
+  fHits = (TClonesArray*) ioman->GetObject("MvdHit");
   if ( ! fHits) {
     cout << "-W- CbmMvdMatchTracks::Init: No MvdHit array!"
 	 << endl;
   }
 
   // Get MvdTrack Array
-  fTracks = (TClonesArray*) ioman->GetObject("STSTrack");
+  fTracks = (TClonesArray*) ioman->GetObject("StsTrack");
   if ( ! fTracks ) {
     cout << "-E- CbmMvdMatchTracks::Init: No MvdTrack array!" << endl;
     return kERROR;
   }
 
-  fStsMatches=(TClonesArray*) ioman->GetObject("STSTrackMatch");
+  fStsMatches=(TClonesArray*) ioman->GetObject("StsTrackMatch");
 
-  // Get STSPoint array
-  fPoints = (TClonesArray*) ioman->GetObject("MVDPoint");
+  // Get StsPoint array
+  fPoints = (TClonesArray*) ioman->GetObject("MvdPoint");
   if ( ! fPoints ) {
     cout << "-E- CbmMvdMatchTracks::Init: No MvdPoint array!" << endl;
     return kERROR;

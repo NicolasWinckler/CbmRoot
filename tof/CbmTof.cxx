@@ -127,7 +127,7 @@ void CbmTof::EndOfEvent() {
 
 // -----   Public method Register   ----------------------------------------
 void CbmTof::Register() {
-  FairRootManager::Instance()->Register("TOFPoint", "Tof", fTofCollection, kTRUE);
+  FairRootManager::Instance()->Register("TofPoint", "Tof", fTofCollection, kTRUE);
 }
 // -------------------------------------------------------------------------
 

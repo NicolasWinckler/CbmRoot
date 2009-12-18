@@ -143,13 +143,13 @@ InitStatus CbmStsFindTracks::Init() {
   // Get input hit arrays
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
-  fStsHits = (TClonesArray*) ioman->GetObject("STSHit");
+  fStsHits = (TClonesArray*) ioman->GetObject("StsHit");
   if ( ! fStsHits ) {
-    cout << "-E- "<< GetName() << "::Init: No STSHit array!" << endl;
+    cout << "-E- "<< GetName() << "::Init: No StsHit array!" << endl;
     return kERROR;
   }
   if ( fUseMvd ) {
-    fMvdHits = (TClonesArray*) ioman->GetObject("MVDHit");
+    fMvdHits = (TClonesArray*) ioman->GetObject("MvdHit");
     if ( ! fMvdHits ) {
       cout << "-W- " << GetName() << "::Init: No MVD hits available!" 
 	   << endl;
@@ -159,7 +159,7 @@ InitStatus CbmStsFindTracks::Init() {
 
   // Create and register output array STSTrack
   fTracks = new TClonesArray("CbmStsTrack",100);
-  ioman->Register("STSTrack", "STS", fTracks, kTRUE);
+  ioman->Register("StsTrack", "STS", fTracks, kTRUE);
 
   // Build digitisation scheme
   if ( fDigiScheme->Init(fGeoPar, fDigiPar) ) {

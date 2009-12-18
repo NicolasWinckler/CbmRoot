@@ -90,7 +90,7 @@ void CbmRichTrackExtrapolationKF::Init() {
   }
 
      // Get STS track array
-    fSTSArray = (TClonesArray*) ioman->GetObject("STSTrack");
+    fSTSArray = (TClonesArray*) ioman->GetObject("StsTrack");
     if ( ! fSTSArray) {
         cout << "-W- CbmRichTrackExtrapolationKF::Init: No sts track array!"
 	    << endl;

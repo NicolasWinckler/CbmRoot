@@ -391,16 +391,16 @@ InitStatus CbmEcalAnalysisDS::Init()
 {
   FairRootManager* fManager=FairRootManager::Instance();
 
-  fLitePoints=(TClonesArray*)fManager->ActivateBranch("ECALPointLite");
+  fLitePoints=(TClonesArray*)fManager->ActivateBranch("EcalPointLite");
   if (fLitePoints==NULL)
   {
-    cerr << "There are no ECALPointLite branch in the file!!!" << endl;
+    cerr << "There are no EcalPointLite branch in the file!!!" << endl;
     return kFATAL; 
   }
-  fEcalPoints=(TClonesArray*)fManager->ActivateBranch("ECALPoint");
+  fEcalPoints=(TClonesArray*)fManager->ActivateBranch("EcalPoint");
   if (fEcalPoints==NULL)
   {
-    cerr << "There are no ECALPoint branch in the file!!!" << endl;
+    cerr << "There are no EcalPoint branch in the file!!!" << endl;
     return kFATAL; 
   }
   fMCTracks=(TClonesArray*)fManager->ActivateBranch("MCTrack");

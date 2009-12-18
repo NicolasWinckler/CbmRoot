@@ -106,7 +106,7 @@ void CbmL1CATrdTrackFinderSA::Init()
   }
 
   // Get MCPoint array
-  fMCPointArray  = (TClonesArray*) ioman->ActivateBranch("TRDPoint");
+  fMCPointArray  = (TClonesArray*) ioman->ActivateBranch("TrdPoint");
   if ( ! fMCPointArray) {
     cout << "-E- CbmL1CATrdTrackFinderSA::Init: No MCPoint array!"
 	 << endl;
@@ -1081,7 +1081,7 @@ void CbmL1CATrdTrackFinderSA::DataBranches() {
     return;
   }
 
-  fArrayTrdHit  = (TClonesArray*) rootMgr->GetObject("TRDHit");
+  fArrayTrdHit  = (TClonesArray*) rootMgr->GetObject("TrdHit");
   if ( ! fArrayTrdHit) {
     cout << "-E- CbmL1CATrdTrackFinderSA::Init: No TrdHit array!"
 	 << endl;

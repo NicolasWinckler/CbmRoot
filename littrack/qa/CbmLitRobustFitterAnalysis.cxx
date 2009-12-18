@@ -446,10 +446,10 @@ void CbmLitRobustFitterAnalysis::ReadDataBranches()
 
 //	fMCTracks  = (TClonesArray*) ioman->GetObject("MCTrack");
 //	if (!fMCTracks) Fatal("Init", "No MCTrack array!");
-	fStsTracks = (TClonesArray*) ioman->GetObject("STSTrack");
-	if (!fStsTracks) Fatal("Init", "No STSTrack array!");
-//	fStsTrackMatches = (TClonesArray*) ioman->GetObject("STSTrackMatch");
-//	if (!fStsTrackMatches) Fatal("Init", "No STSTrackMatch array!");
+	fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
+	if (!fStsTracks) Fatal("Init", "No StsTrack array!");
+//	fStsTrackMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
+//	if (!fStsTrackMatches) Fatal("Init", "No StsTrackMatch array!");
 
 	if (fDetId == kMUCH) {
 	   fPoints  = (TClonesArray*) ioman->GetObject("MuchPoint");
@@ -464,14 +464,14 @@ void CbmLitRobustFitterAnalysis::ReadDataBranches()
 	   if (!fTrackMatches) Fatal("Init", "No MuchTrackMatch array!");
 	} else
 	if (fDetId == kTRD) {
-	   fPoints  = (TClonesArray*) ioman->GetObject("TRDPoint");
+	   fPoints  = (TClonesArray*) ioman->GetObject("TrdPoint");
 	   if (!fPoints) Fatal("Init", "No TRDPoint array!");
-	   fHits = (TClonesArray*) ioman->GetObject("TRDHit");
+	   fHits = (TClonesArray*) ioman->GetObject("TrdHit");
 	   if (!fHits) Fatal("Init", "No TRDHit array!");
-	   fTracks = (TClonesArray*) ioman->GetObject("TRDTrack");
-	   if (!fTracks) Fatal("Init", "No TRDTrack array!");
-	   fTrackMatches = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
-	   if (!fTrackMatches) Fatal("Init", "No TRDTrackMatch array!");
+	   fTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
+	   if (!fTracks) Fatal("Init", "No TrdTrack array!");
+	   fTrackMatches = (TClonesArray*) ioman->GetObject("TrdTrackMatch");
+	   if (!fTrackMatches) Fatal("Init", "No TrdTrackMatch array!");
 	} else {
 	   Fatal("Init", "CbmLitRobustFitterAnalysis works only with MUCH and TRD!");
 	}

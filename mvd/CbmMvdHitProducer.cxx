@@ -49,7 +49,7 @@ using std::vector;
 CbmMvdHitProducer::CbmMvdHitProducer() 
   : FairTask("MVDHitProducer") {
   fMode          = 0;
-  fBranchName    = "MVDPoint";
+  fBranchName    = "MvdPoint";
   fHits          = new TClonesArray("CbmMvdHit");
   fMatches       = new TClonesArray("CbmMvdHitMatch");
   fPileupManager = NULL;
@@ -72,7 +72,7 @@ CbmMvdHitProducer::CbmMvdHitProducer(const char* name, Int_t iMode,
 				     Int_t iVerbose) 
   : FairTask(name, iVerbose) {
   fMode          = iMode;
-  fBranchName    = "MVDPoint";
+  fBranchName    = "MvdPoint";
   fHits          = new TClonesArray("CbmMvdHit");
   fMatches       = new TClonesArray("CbmMvdHitMatch");
   fPileupManager = NULL;
@@ -456,8 +456,8 @@ void CbmMvdHitProducer::Register() {
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman) Fatal("Register",
 		      "No FairRootManager");
-  ioman->Register("MVDHit", "Mmv Hit", fHits, kTRUE);
-  ioman->Register("MVDHitMatch", "MVD Hit Match", fMatches, kTRUE);
+  ioman->Register("MvdHit", "Mmv Hit", fHits, kTRUE);
+  ioman->Register("MvdHitMatch", "MVD Hit Match", fMatches, kTRUE);
 }
 // -------------------------------------------------------------------------  
 

@@ -70,12 +70,12 @@ void CbmGlobalTrackFitterKF::Init()
         return;
     }
     // Get hit arrays
-    fArrayStsHit = (TClonesArray*) rootMgr->GetObject("STSHit");
+    fArrayStsHit = (TClonesArray*) rootMgr->GetObject("StsHit");
     if(NULL == fArrayStsHit) {
 	cout << "-W- CbmGlobalTrackFitterKF::Init :"
             << " no Sts hit array" << endl;
     }
-    fArrayTrdHit = (TClonesArray*) rootMgr->GetObject("TRDHit");
+    fArrayTrdHit = (TClonesArray*) rootMgr->GetObject("TrdHit");
     if(NULL == fArrayTrdHit) {
 	cout << "-W- CbmGlobalTrackFitterKF::Init :"
             << " no TRD hit array" << endl;
@@ -86,12 +86,12 @@ void CbmGlobalTrackFitterKF::Init()
             << " no TOF hit array" << endl;
     }
     // Get track arrays
-    fArrayStsTrack = (TClonesArray*) rootMgr->GetObject("STSTrack");
+    fArrayStsTrack = (TClonesArray*) rootMgr->GetObject("StsTrack");
     if(NULL == fArrayStsTrack) {
 	cout << "-W- CbmGlobalTrackFitterKF::Init : "
             << "no STS track array!" << endl;
     }
-    fArrayTrdTrack = (TClonesArray*) rootMgr->GetObject("TRDTrack");
+    fArrayTrdTrack = (TClonesArray*) rootMgr->GetObject("TrdTrack");
     if(NULL == fArrayTrdTrack) {
 	cout << "-W- CbmGlobalTrackFitterKF::Init : "
             << "no TRD track array!" << endl;

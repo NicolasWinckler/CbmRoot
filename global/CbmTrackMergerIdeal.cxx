@@ -45,14 +45,14 @@ void CbmTrackMergerIdeal::Init() {
   }
 
   // Get StsTrackMatch array
-  fStsMatch = (TClonesArray*) ioman->GetObject("STSTrackMatch");
+  fStsMatch = (TClonesArray*) ioman->GetObject("StsTrackMatch");
   if ( ! fStsMatch ) {
     cout << "-W- CbmTrackMergerIdeal::Init: "
 	 << "No StsTrackMatch array!" << endl;
   }
 
   // Get TrdTrackMatch array
-  fTrdMatch = (TClonesArray*) ioman->GetObject("TRDTrackMatch");
+  fTrdMatch = (TClonesArray*) ioman->GetObject("TrdTrackMatch");
   if ( ! fTrdMatch ) {
     cout << "-W- CbmTrackMergerIdeal::Init: "
 	 << "No TrdTrackMatch array!" << endl;

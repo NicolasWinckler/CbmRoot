@@ -70,7 +70,7 @@ InitStatus CbmTrdSetTracksPidWkn::Init() {
   }
 
   // Get TrdTrack array
-  fTrackArray  = (TClonesArray*) ioman->GetObject("TRDTrack");
+  fTrackArray  = (TClonesArray*) ioman->GetObject("TrdTrack");
   if ( ! fTrackArray) {
     cout << "-E- CbmTrdSetTracksPidWkn::Init: No TrdTrack array!"
 	 << endl;
@@ -78,7 +78,7 @@ InitStatus CbmTrdSetTracksPidWkn::Init() {
   }
 
   // Get TrdHit array
-  fTrdHitArray  = (TClonesArray*) ioman->GetObject("TRDHit");
+  fTrdHitArray  = (TClonesArray*) ioman->GetObject("TrdHit");
   if ( ! fTrdHitArray) {
     cout << "-E- CbmTrdSetTracksPidWkn::Init: No TrdHit array!"
 	 << endl;
@@ -154,7 +154,7 @@ void CbmTrdSetTracksPidWkn::Exec(Option_t* opt) {
       Ye_tmp_new[j] = Ye_tmp [i+j-1];
     }
 
-    // calculate the Wkn and add the information to the TRDTrack
+    // calculate the Wkn and add the information to the TrdTrack
     result_wkn  = CbmWknStat (Ye_tmp_new, k, n);
     pTrack->SetPidWkn(result_wkn);
 

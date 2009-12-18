@@ -42,16 +42,16 @@ CbmAnaHypSecFinder::~CbmAnaHypSecFinder() {}
 InitStatus CbmAnaHypSecFinder::Init() {
   FairRootManager* ioman = FairRootManager::Instance();
   mcTrackArray = (TClonesArray*) ioman->GetObject("MCTrack");
-  rcTrackArray = (TClonesArray*) ioman->GetObject("STSTrack");
-  sHitArray    = (TClonesArray*) ioman->GetObject("STSHit");
-  mcPointArray = (TClonesArray*) ioman->GetObject("STSPoint");
+  rcTrackArray = (TClonesArray*) ioman->GetObject("StsTrack");
+  sHitArray    = (TClonesArray*) ioman->GetObject("StsHit");
+  mcPointArray = (TClonesArray*) ioman->GetObject("StsPoint");
 
   if (fStandAlone) {
     newTrackArray = new TClonesArray("CbmStsTrack",100);
-    ioman->Register("STSTrackSec", "STS", newTrackArray, kTRUE);
+    ioman->Register("StsTrackSec", "STS", newTrackArray, kTRUE);
   }
   else {
-    newTrackArray = (TClonesArray*) ioman->GetObject("STSTrack");
+    newTrackArray = (TClonesArray*) ioman->GetObject("StsTrack");
   }
 
   CbmKF& KF = *CbmKF::Instance();

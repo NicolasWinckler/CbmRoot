@@ -93,13 +93,13 @@ InitStatus CbmAnaMuch::Init(){
   // Get and check FairRootManager
   FairRootManager* fManager = FairRootManager::Instance();
   fMCTracks         = (TClonesArray*) fManager->GetObject("MCTrack");
-  fStsPoints        = (TClonesArray*) fManager->GetObject("STSPoint");
+  fStsPoints        = (TClonesArray*) fManager->GetObject("StsPoint");
   fMuchPoints       = (TClonesArray*) fManager->GetObject("MuchPoint");
   fMuchHits         = (TClonesArray*) fManager->GetObject("MuchPixelHit");
-  fStsTracks        = (TClonesArray*) fManager->GetObject("STSTrack");
+  fStsTracks        = (TClonesArray*) fManager->GetObject("StsTrack");
   fMuchTracks       = (TClonesArray*) fManager->GetObject("MuchTrack");
   fMuchTrackMatches = (TClonesArray*) fManager->GetObject("MuchTrackMatch");
-  fStsTrackMatches  = (TClonesArray*) fManager->GetObject("STSTrackMatch");
+  fStsTrackMatches  = (TClonesArray*) fManager->GetObject("StsTrackMatch");
   fEvent=0;
 //  printf(" %i",fStsPoints);
 //  printf(" %i",fMuchPoints);

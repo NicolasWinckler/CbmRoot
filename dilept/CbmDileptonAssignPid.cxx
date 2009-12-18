@@ -162,7 +162,7 @@ InitStatus CbmDileptonAssignPid::Init(){
     }
 
     // Get STSTrack Array
-    fArrayStsTrack = (TClonesArray*) fRootManager->GetObject("STSTrack");
+    fArrayStsTrack = (TClonesArray*) fRootManager->GetObject("StsTrack");
     if (! fArrayStsTrack) {
 	cout << "-E- CbmDileptonAssignPid::Init: No STSTrack array!" << endl;
 	return kFATAL;
@@ -176,7 +176,7 @@ InitStatus CbmDileptonAssignPid::Init(){
     }
 
     // Get TrdTrack array
-    fArrayTrdTrack = (TClonesArray*) fRootManager->GetObject("TRDTrack");
+    fArrayTrdTrack = (TClonesArray*) fRootManager->GetObject("TrdTrack");
     if (! fArrayTrdTrack) {
         cout << "-E- CbmDileptonAssignPid::Init: No TrdTrack array!" << endl;
         return kFATAL;

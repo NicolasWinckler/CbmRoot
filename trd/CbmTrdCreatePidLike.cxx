@@ -58,7 +58,7 @@ InitStatus CbmTrdCreatePidLike::Init() {
     }
 
     // Get pointer to TRD point array
-    fTrdPointCollection = (TClonesArray*) rootMgr->GetObject("TRDPoint");
+    fTrdPointCollection = (TClonesArray*) rootMgr->GetObject("TrdPoint");
     if(NULL == fTrdPointCollection) {
         cout << "-W- CbmTrdCreatePidLike::Init : "
         << "no TRD point array !" << endl;
@@ -66,7 +66,7 @@ InitStatus CbmTrdCreatePidLike::Init() {
     }
 
     // Get pointer to TRD hit array
-    fTrdHitCollection = (TClonesArray*) rootMgr->GetObject("TRDHit");
+    fTrdHitCollection = (TClonesArray*) rootMgr->GetObject("TrdHit");
     if(NULL == fTrdHitCollection) {
         cout << "-W- CbmTrdCreatePidLike::Init : "
         << "no TRD hit array !" << endl;

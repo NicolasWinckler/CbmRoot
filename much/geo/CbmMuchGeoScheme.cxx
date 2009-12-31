@@ -78,6 +78,20 @@ void CbmMuchGeoScheme::Init(TObjArray* stations) {
 }
 // -------------------------------------------------------------------------
 
+
+// -------------------------------------------------------------------------
+void CbmMuchGeoScheme::Init(TString digiFileName) {
+  TFile* oldfile=gFile;
+  TFile* file=new TFile(digiFileName);
+  TObjArray* stations = (TObjArray*) file->Get("stations");
+  file->Close();
+  file->Delete();
+  gFile=oldfile;
+  Init(stations);
+}
+// -------------------------------------------------------------------------
+
+
 // -------------------------------------------------------------------------
 void CbmMuchGeoScheme::InitModules() {
   if (!fModulesInitialized) {

@@ -18,6 +18,8 @@
 #pragma link C++ class CbmAnaMuch+;
 #pragma link C++ class CbmAnaMuchJpsiPolarization+;
 #pragma link C++ class CbmPolarizedGenerator+;
+#pragma link C++ class CbmAnaMuonCandidate+;
+#pragma link C++ class CbmAnaDimuonAnalysis+;
 
 
 #endif

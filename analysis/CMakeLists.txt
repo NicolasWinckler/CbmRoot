@@ -49,6 +49,8 @@ hyperon/CbmAnaHypMix.cxx
 much/CbmAnaMuch.cxx
 much/CbmAnaMuchJpsiPolarization.cxx
 much/CbmPolarizedGenerator.cxx
+much/CbmAnaMuonCandidate.cxx
+much/CbmAnaDimuonAnalysis.cxx
 )
 
 

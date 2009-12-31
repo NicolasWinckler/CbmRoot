@@ -91,27 +91,30 @@ void CbmMuchMatchTracks::Exec(
 
 		Int_t nofTrue = 0;
 		Int_t bestMcTrackId = -1;
+		Int_t nPoints = 0;
 		for (std::map<Int_t, Int_t>::iterator it = matchMap.begin(); it != matchMap.end(); it++) {
 			if (it->first != -1 && it->second > nofTrue) {
 				bestMcTrackId = it->first;
 				nofTrue = it->second;
 			}
+			nPoints+=it->second;
 		}
+		
 		Int_t nofFake = 0;//matchMap[-1];
-		Int_t nofWrong = nofHits - nofTrue - nofFake;
+		Int_t nofWrong = nPoints - nofTrue - nofFake;
 		Int_t nofMcTracks = matchMap.size() - 1;
 
 		new ((*fMatches)[iTrack]) CbmTrackMatch(
 				bestMcTrackId, nofTrue, nofWrong, nofFake, nofMcTracks);
 
-		fNofHits += nofHits;
+		fNofHits += nPoints;
 		fNofTrueHits += nofTrue;
 		fNofWrongHits += nofWrong;
 		fNofFakeHits += nofFake;
 
 		if (fVerbose > 1)
 		std::cout << "iTrack=" << iTrack << " mcTrack=" << bestMcTrackId
-			<< " nofHits=" << nofHits << " nofTrue=" << nofTrue
+			<< " nPoints=" << nPoints << " nofTrue=" << nofTrue
 			<< " nofWrong=" << nofWrong << " nofFake=" << nofFake
 			<< " nofMcTracks=" << nofMcTracks << std::endl;
 	} // Loop over tracks

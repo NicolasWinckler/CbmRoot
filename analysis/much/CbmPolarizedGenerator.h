@@ -57,7 +57,7 @@ public:
   inline void SetMultiplicity   (Int_t mult) {fMult    = mult; };
   
   // Set temperature for transverse momentum distribution in GeV
-  inline void SetDistributionPt (Double_t T=0.154319) {fT=T;};
+  inline void SetDistributionPt (Double_t T=0.154319, Double_t mass=-1.) {fT=T; fPtDistMass=mass;};
   
   // Set rapidity distribution parameters (y0 - mid rapidity, sigma - Gaussian width)
   inline void SetDistributionY  (Double_t y0=1.98604, Double_t sigma=0.617173) {fY0=y0;fSigma=sigma;};
@@ -99,6 +99,7 @@ private:
   Int_t    fPDGType;      ///< Particle type (PDG encoding)
   Int_t    fMult;         ///< Multiplicity
   Double_t fT;            ///< Temperature in the Pt distribution
+  Double_t fPtDistMass;   ///< Mass in Pt distribution
   Double_t fY0;           ///< Mean rapidity
   Double_t fSigma;        ///< Simga in the rapidity distribution
   Double_t fPtMin;        ///< Max value of Pt

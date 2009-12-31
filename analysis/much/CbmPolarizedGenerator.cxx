@@ -55,9 +55,10 @@ void CbmPolarizedGenerator::Init(){
   TParticlePDG *particle = pdgBase->GetParticle(fPDGType);
   if (! particle) Fatal("CbmPolarizedGenerator","PDG code %d not defined.",fPDGType);
   fPDGMass = particle->Mass();
+  if (fPtDistMass<0) fPtDistMass=fPDGMass;
   //gRandom->SetSeed(0);
   fDistPt = new TF1("distPt","x*exp(-sqrt(x*x+[1]*[1])/[0])",fPtMin,fPtMax);
-  fDistPt->SetParameters(fT,fPDGMass);
+  fDistPt->SetParameters(fT,fPtDistMass);
   fPol = new TF1("dsigdcostheta","1.+[0]*x*x",-1.,1.);
   fPol->SetParameter(0,fAlpha);
   Info("Init","pdg=%i y0=%4.2f sigma_y=%4.2f T_pt=%6.4f",fPDGType,fY0,fSigma,fT);

@@ -223,24 +223,6 @@ Double_t CbmMuchModuleGem::GetInitY(CbmMuchSector* sector){
 }
 // -------------------------------------------------------------------------
 
-// -----   Private method IsIncompleteSector  ------------------------------
-Bool_t CbmMuchModuleGem::IsIncompleteSector(CbmMuchSector* sector, Int_t nChannels){
-  Bool_t result = false;
-  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
-  Double_t secLx = sector->GetSize()[0];
-  Double_t secLy = sector->GetSize()[1];
-  Double_t minL = TMath::Min(secLx, secLy);
-  Double_t maxL = TMath::Max(secLx, secLy);
-  Int_t nFrac = Int_t((maxL+1e-5)/minL);
-  Int_t nPower = Int_t(TMath::Log2(nFrac) + 1e-2);
-  Double_t maxL1 = minL*TMath::Power(2,nPower);
-
-  if(TMath::Abs(maxL-maxL1 ) > 1e-5 || sector->GetNChannels() < nChannels)
-    result = true;
-  return result;
-}
-// -------------------------------------------------------------------------
-
 // -----   Public method InitGrid  -----------------------------------------
 Bool_t CbmMuchModuleGem::InitGrid(Bool_t useModuleDesign) {
   if (GetNSectors() == 0) return kFALSE;

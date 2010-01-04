@@ -116,7 +116,7 @@ CbmMuchSector* CbmMuchModuleGem::GetSector(Int_t iGridColumn, Int_t iGridRow) {
   if(iGridRow < 0 || iGridRow > fGridRows - 1) return NULL;
   Int_t iSector = fGridIndices[iGridRow][iGridColumn];
   if (iSector != -1) {
-    CbmMuchSector* sector = GetSector(iSector);
+    CbmMuchSector* sector = GetSector((Long64_t)iSector);
     return sector;
   }
   else
@@ -129,7 +129,7 @@ CbmMuchSector* CbmMuchModuleGem::GetSector(Double_t x, Double_t y){
   Int_t nX = fPosition[0] < 0 ? -1 : 1;
   Int_t nY = fPosition[1] < 0 ? -1 : 1;
 
-  // Get module corner nearest to the layer side center
+  // Get module corner nearest to the layer side center for module design
   Double_t xCorner = fUseModuleDesign ? fPosition[0] - nX*fSize[0]/2. : -fGridDx*fGridCols/2.;
   Double_t yCorner = fUseModuleDesign ? fPosition[1] - nY*fSize[1]/2. : -fGridDy*fGridRows/2.;
 
@@ -139,6 +139,12 @@ CbmMuchSector* CbmMuchModuleGem::GetSector(Double_t x, Double_t y){
 
   Int_t iCol = xM < 0 ? -1 : Int_t(xM/fGridDx);
   Int_t iRow = yM < 0 ? -1 : Int_t(yM/fGridDy);
+//  if(CbmMuchGeoScheme::GetStationIndex(fDetectorId) == 1 &&
+//      CbmMuchGeoScheme::GetLayerIndex(fDetectorId) == 1){
+//    printf("iCol = %i, iRow = %i\n", iCol, iRow);
+//    printf("fGridDx = %f, fGridDy = %f\n", fGridDx, fGridDy);
+//    printf("fGridCols = %i, fGridRows = %i\n", fGridCols, fGridRows);
+//  }
   return GetSector(iCol, iRow);
 }
 // -------------------------------------------------------------------------
@@ -217,6 +223,24 @@ Double_t CbmMuchModuleGem::GetInitY(CbmMuchSector* sector){
 }
 // -------------------------------------------------------------------------
 
+// -----   Private method IsIncompleteSector  ------------------------------
+Bool_t CbmMuchModuleGem::IsIncompleteSector(CbmMuchSector* sector, Int_t nChannels){
+  Bool_t result = false;
+  Int_t iStation = CbmMuchGeoScheme::GetStationIndex(sector->GetDetectorId());
+  Double_t secLx = sector->GetSize()[0];
+  Double_t secLy = sector->GetSize()[1];
+  Double_t minL = TMath::Min(secLx, secLy);
+  Double_t maxL = TMath::Max(secLx, secLy);
+  Int_t nFrac = Int_t((maxL+1e-5)/minL);
+  Int_t nPower = Int_t(TMath::Log2(nFrac) + 1e-2);
+  Double_t maxL1 = minL*TMath::Power(2,nPower);
+
+  if(TMath::Abs(maxL-maxL1 ) > 1e-5 || sector->GetNChannels() < nChannels)
+    result = true;
+  return result;
+}
+// -------------------------------------------------------------------------
+
 // -----   Public method InitGrid  -----------------------------------------
 Bool_t CbmMuchModuleGem::InitGrid(Bool_t useModuleDesign) {
   if (GetNSectors() == 0) return kFALSE;
@@ -240,10 +264,10 @@ Bool_t CbmMuchModuleGem::InitGrid(Bool_t useModuleDesign) {
   fGridCols = Int_t ((fSize[0] + 1e-5) / fGridDx) + nCell;
   fGridRows = Int_t ((fSize[1] + 1e-5) / fGridDy) + nCell;
 
-  if(!fUseModuleDesign){
-    if(fGridCols%2!=0) fGridCols++;
-    if(fGridRows%2!=0) fGridRows++;
-  }
+//  if(!fUseModuleDesign){
+//    if(fGridCols%2!=0) fGridCols++;
+//    if(fGridRows%2!=0) fGridRows++;
+//  }
 
   // Fill cells with sector numbers
   fGridIndices.resize(fGridRows);

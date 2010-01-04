@@ -3,24 +3,45 @@
 
 #include "CbmKFTrack.h"
 #include "TLorentzVector.h"
-#define NPLANES 20
+#define NPLANES 31
 
 class CbmAnaMuonCandidate : public TObject{
   public:
-    CbmAnaMuonCandidate() {};
+    CbmAnaMuonCandidate();
     CbmAnaMuonCandidate(Int_t iTrack, TLorentzVector pMC);
     virtual ~CbmAnaMuonCandidate(){};
     Int_t* GetMuchPoints() { return muchPoints; };
     Int_t* GetMuchHits()   { return muchHits;   };
     void SetMuchPoint(Int_t planeId, Int_t index) { muchPoints[planeId]=index; }
     void SetMuchHit  (Int_t planeId, Int_t index) { muchHits[planeId]=index;   }
+    void SetMomentumMC(TLorentzVector mom) {fpMC = TLorentzVector(mom); }
+    void SetMomentumRC(TLorentzVector mom) {fpRC = TLorentzVector(mom); }
+    void SetMomentumRC(Double_t* T);
+    void SetMCTrackId(Int_t trackId) {fMCTrackId    = trackId; }
+    void SetNStsHits(Int_t nStsHits) {fNStsHits     = nStsHits; }
+    void SetChiToVertex(Double_t chi) {fChiToVertex = chi; }
+    void SetNTriggerHits(Int_t n) { fNTriggerHits = n; }
+    void SetSign(Double_t sign) {fSign = sign; }
+    TLorentzVector* GetMomentumMC() {return &fpMC; }
+    TLorentzVector* GetMomentumRC() {return &fpRC; }
+    Bool_t IsReconstructed(Int_t nStsHitsCut=8, Double_t chiToVertexCut=3.);
+    void SetReconstructed(Bool_t isRec) {fIsReconstructed = isRec; }
+    Double_t GetSign() {return fSign;}
   private:
     CbmKFTrack track;
     Int_t fMCTrackId;
     TLorentzVector fpMC;
+    TLorentzVector fpRC;
     Int_t muchPoints[NPLANES];
     Int_t muchHits[NPLANES];
-  ClassDef(CbmAnaMuonCandidate,0);
+    Int_t stsPoints[NPLANES];
+    Int_t stsHits[NPLANES];
+    Bool_t fIsReconstructed;
+    Int_t fNStsHits;
+    Double_t fChiToVertex;
+    Int_t fNTriggerHits;
+    Double_t fSign;
+  ClassDef(CbmAnaMuonCandidate,1);
 };
 
 #endif

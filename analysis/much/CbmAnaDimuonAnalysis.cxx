@@ -1,6 +1,6 @@
 /** CbmAnaDimuonAnalysis.cxx
  *@author E.Kryshen <e.kryshen@gsi.de>
- *@since 2009-09-11
+ *@since 2010-01-02
  **/
 
 #include "CbmAnaDimuonAnalysis.h"
@@ -15,7 +15,9 @@
 #include "CbmGlobalTrack.h"
 #include "CbmMuchGeoScheme.h"
 #include "CbmMuchPixelHit.h"
-
+#include "CbmAnaDimuonCandidate.h"
+#include "CbmKFTrack.h"
+#include "CbmStsKFTrackFitter.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
@@ -36,23 +38,23 @@ CbmAnaDimuonAnalysis::CbmAnaDimuonAnalysis(){
   fMuchPointsAccQuota=10;
   fMuchTrueHitQuota=0.7;
   fHistoFileName="histo.root";
-  fMuPlusCandidates  = new TClonesArray("CbmAnaMuonCandidate",1);
-  fMuMinusCandidates = new TClonesArray("CbmAnaMuonCandidate",1);
+  fMuCandidates  = new TClonesArray("CbmAnaMuonCandidate",1);
 }
 // -------------------------------------------------------------------------
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmAnaDimuonAnalysis::CbmAnaDimuonAnalysis(const char* name,TString digiFileName,TString histoFileName)
+CbmAnaDimuonAnalysis::CbmAnaDimuonAnalysis(const char* name,
+    TString digiFileName,Int_t nSignalPairs)
 :FairTask(name){
   fEvent=0;
   fStsPointsAccQuota=4;
   fStsTrueHitQuota=0.7;
   fMuchPointsAccQuota=10;
   fMuchTrueHitQuota=0.7;
-  fHistoFileName=histoFileName;
-  fMuPlusCandidates  = new TClonesArray("CbmAnaMuonCandidate",1);
-  fMuMinusCandidates = new TClonesArray("CbmAnaMuonCandidate",1);
+  fMuCandidates  = new TClonesArray("CbmAnaMuonCandidate",1);
+  fDimuonCandidates  = new TClonesArray("CbmAnaDimuonCandidate",nSignalPairs);
+  fSignalPairs  = nSignalPairs;
   fDigiFileName = digiFileName;
 }
 
@@ -85,13 +87,13 @@ InitStatus CbmAnaDimuonAnalysis::Init()
   // Get and check FairRootManager
   FairRootManager* fManager = FairRootManager::Instance();
   fMCTracks         = (TClonesArray*) fManager->GetObject("MCTrack");
-  fStsPoints        = (TClonesArray*) fManager->GetObject("StsPoint");
+  fStsPoints        = (TClonesArray*) fManager->GetObject("STSPoint");
   fMuchPoints       = (TClonesArray*) fManager->GetObject("MuchPoint");
   fMuchHits         = (TClonesArray*) fManager->GetObject("MuchPixelHit");
-  fStsTracks        = (TClonesArray*) fManager->GetObject("StsTrack");
+  fStsTracks        = (TClonesArray*) fManager->GetObject("STSTrack");
   fMuchTracks       = (TClonesArray*) fManager->GetObject("MuchTrack");
   fMuchTrackMatches = (TClonesArray*) fManager->GetObject("MuchTrackMatch");
-  fStsTrackMatches  = (TClonesArray*) fManager->GetObject("StsTrackMatch");
+  fStsTrackMatches  = (TClonesArray*) fManager->GetObject("STSTrackMatch");
   fGlobalTracks     = (TClonesArray*) fManager->GetObject("GlobalTrack");
   fEvent=0;
   
@@ -106,11 +108,18 @@ InitStatus CbmAnaDimuonAnalysis::Init()
     Fatal("Init","One of TCloneArrays not available");
   }  
   
-  fManager->Register("MuPlusCandidates" ,"Much",fMuPlusCandidates,kTRUE);
-  fManager->Register("MuMinusCandidates","Much",fMuMinusCandidates,kTRUE);
+  fManager->Register("DimuonCandidates" ,"Much",fDimuonCandidates,kTRUE);
+  fManager->Register("MuCandidates" ,"Much",fMuCandidates,kTRUE);
   
   fGeoScheme = CbmMuchGeoScheme::Instance();
   fGeoScheme->Init(fDigiFileName);
+  fLastStationIndex = fGeoScheme->GetNStations()-1;
+  fNLayers = 0;
+  for (Int_t i=0;i<=fLastStationIndex;i++){
+    fNLayers+=fGeoScheme->GetLayerSides(i).size()/2;
+  }
+  fFitter = new CbmStsKFTrackFitter();
+  fFitter->Init();
 
   return kSUCCESS;
 }
@@ -119,8 +128,6 @@ InitStatus CbmAnaDimuonAnalysis::Init()
 
 // -----   Public method Exec   --------------------------------------------
 void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
-  Int_t nSignalPairs   = 15;
-  
   Int_t nMCTracks      = fMCTracks->GetEntriesFast();
   Int_t nStsTracks     = fStsTracks->GetEntriesFast();
   Int_t nMuchTracks    = fMuchTracks->GetEntriesFast();
@@ -128,7 +135,7 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
   Int_t nMuchPoints    = fMuchPoints->GetEntriesFast();
   Int_t nMuchHits      = fMuchHits->GetEntriesFast();
   Int_t nGlobalTracks  = fGlobalTracks->GetEntriesFast();
-  if (fVerbose>0) printf(" Event: %4i",fEvent++);
+  if (fVerbose>-1) printf(" Event: %4i",fEvent++);
   if (fVerbose>0) printf(" MCtracks: %4i",nMCTracks);
   if (fVerbose>0) printf(" GlobalTracks: %4i",nGlobalTracks);
   if (fVerbose>0) printf(" StsTracks: %4i",nStsTracks);
@@ -137,15 +144,30 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
   if (fVerbose>0) printf(" StsPoints: %4i",nStsPoints);
   if (fVerbose>0) printf(" MuchPoints: %4i",nMuchPoints);
   if (fVerbose>0) printf(" MuchHits: %4i",nMuchHits);
-  if (fVerbose>0) printf("\n");
+  if (fVerbose>-1) printf("\n");
 
-  Int_t iMuPlusCandidates = 0;
-  Int_t iMuMinusCandidates = 0;
+  fMuCandidates->Clear();
+  fDimuonCandidates->Clear();
+  
+  for (Int_t iDimuon=0;iDimuon<fSignalPairs;iDimuon++){
+    new((*fDimuonCandidates)[iDimuon]) CbmAnaDimuonCandidate();
+  }
+  
+  TLorentzVector pMC;
+
+  for (Int_t iMCTrack=0;iMCTrack<2*fSignalPairs;iMCTrack++){
+    CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(iMCTrack);
+    CbmAnaMuonCandidate* mu = GetMu(iMCTrack);
+    mcTrack->Get4Momentum(pMC);
+    mu->SetMomentumMC(pMC);
+    mu->SetMCTrackId(iMCTrack);
+  }
+  
+  Int_t iMuCandidates = 0;
   
   Int_t muPlusAccepted = -1;
   Int_t muMinusAccepted = -1;
   
-  TLorentzVector pMC;
   TVector3 pRCmuPlus;
   TVector3 pRCmuMinus;
   
@@ -155,69 +177,89 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
     Int_t nAccStsPoints  = mcTrack->GetNPoints(kSTS);
     Int_t nAccMuchPoints = mcTrack->GetNPoints(kMUCH);
     Int_t pdgCode = mcTrack->GetPdgCode();
+    if (pdgCode==223) printf("%i\n",iTrack);
     mcTrack->Get4Momentum(pMC);
     // TODO add variables
-    if (pdgCode== 13) new((*fMuPlusCandidates)[iMuPlusCandidates++]) CbmAnaMuonCandidate(iTrack,pMC);
-    if (pdgCode==-13) new((*fMuMinusCandidates)[iMuMinusCandidates++]) CbmAnaMuonCandidate(iTrack,pMC);
   }
 
   for (Int_t iPoint=0;iPoint<nMuchPoints;iPoint++){
     CbmMuchPoint* point = (CbmMuchPoint*) fMuchPoints->At(iPoint);
     Int_t trackId = point->GetTrackID();
-    if (trackId>=2*nSignalPairs) continue;
-    Int_t iJpsi = trackId/2;
-    Int_t iSign = trackId%2; // 0 - muPlus, 1 - muMinus
-    CbmAnaMuonCandidate* mu = (CbmAnaMuonCandidate*) (!iSign ? (*fMuPlusCandidates)[iJpsi] : (*fMuMinusCandidates)[iJpsi]); 
+    if (trackId>=2*fSignalPairs) continue;
+    CbmAnaMuonCandidate* mu = GetMu(trackId);
     Int_t planeId = fGeoScheme->GetLayerSideNr(point->GetDetectorId());
     mu->SetMuchPoint(planeId,iPoint);
   }
+
   
   for (Int_t iTrack=0;iTrack<nGlobalTracks;iTrack++){
     CbmGlobalTrack* globalTrack = (CbmGlobalTrack*) fGlobalTracks->At(iTrack);
     Int_t iMuchTrack = globalTrack->GetMuchTrackIndex();
     Int_t iStsTrack  = globalTrack->GetStsTrackIndex();
-    printf("iSts=%4i iMuch=%4i\n", iStsTrack, iMuchTrack);
+    //printf("iSts=%4i iMuch=%4i\n", iStsTrack, iMuchTrack);
     // Check much track
     if (iMuchTrack<0) continue;
     CbmMuchTrack*  muchTrack = (CbmMuchTrack*)  fMuchTracks->At(iMuchTrack);
     CbmTrackMatch* muchTrackMatch = (CbmTrackMatch*) fMuchTrackMatches->At(iMuchTrack);
     Int_t mcMuchTrackId = CbmAnaMuch::GetTrackId(muchTrackMatch,fMuchTrueHitQuota);
-    Int_t iJpsi = mcMuchTrackId/2;
-    Int_t iSign = mcMuchTrackId%2; // 0 - muPlus, 1 - muMinus
-    CbmAnaMuonCandidate* mu = (CbmAnaMuonCandidate*) (!iSign ? (*fMuPlusCandidates)[iJpsi] : (*fMuMinusCandidates)[iJpsi]); 
+    //printf("\n");
+    Int_t nTriggerHits=0;
     for (Int_t i=0;i<muchTrack->GetNofHits();i++){
       Int_t hitIndex = muchTrack->GetHitIndex(i);
       CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fMuchHits->At(hitIndex);
-      Int_t planeId = hit->GetPlaneId();
-      mu->SetMuchHit(planeId,hitIndex);
+      //printf(" %i",hitIndex);
+//      Int_t planeId = hit->GetPlaneId();
+//      mu->SetMuchHit(planeId,hitIndex);
+      Int_t stationIndex = fGeoScheme->GetStationIndex(hit->GetDetectorId());
+      if (stationIndex==fLastStationIndex) nTriggerHits++;
     }
     
-//    Bool_t trigger = Trigger(muchTrack);
-//    printf("%i\n", trigger);
-//    if (!trigger) continue;
+    CbmAnaMuonCandidate* mu;
+    if (mcMuchTrackId<0 || mcMuchTrackId>=2*fSignalPairs) {
+      if (nTriggerHits<3) continue;
+      if (muchTrack->GetNofHits()<fNLayers-3) continue;
+      new((*fMuCandidates)[iMuCandidates++]) CbmAnaMuonCandidate();
+      mu = (CbmAnaMuonCandidate*) (*fMuCandidates)[iMuCandidates-1];
+    } else {
+      mu = GetMu(mcMuchTrackId); 
+    }
+    mu->SetNTriggerHits(nTriggerHits);
+    if (iStsTrack<0) continue;
+    CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(iStsTrack);
+    Int_t nStsHits = stsTrack->GetNStsHits();
+    mu->SetNStsHits(nStsHits);
+    Double_t chi = fFitter->GetChiToVertex(stsTrack);
+    mu->SetChiToVertex(chi);
+//    printf("n=%i chi=%f\n",nStsHits,chi);
+    CbmKFTrack kfTrack = CbmKFTrack(*stsTrack);
+    
+    kfTrack.Extrapolate(0); // TODO change to primary vertex z
+    Double_t* T=kfTrack.GetTrack();
+    mu->SetMomentumRC(T);
+    mu->SetReconstructed(kTRUE);
+    mu->SetSign(T[4]>0 ? 1. : -1.);
+
 //    // Check sts track
 //    if (iStsTrack<0) continue;
 //    CbmStsTrack*   stsTrack      = (CbmStsTrack*) fStsTracks->At(iStsTrack);
 //    CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*) fStsTrackMatches->At(iStsTrack);
 //    Int_t mcStsTrackId = CbmAnaMuch::GetTrackId(stsTrackMatch,fStsTrueHitQuota);
   }
-  // reconstructed dimuon
-//  if (mapRecSts[0]>=0 && mapRecSts[1]>=0 && mapRecMuch[0]>=0 && mapRecMuch[1]>=0){
-//    new((*fMuPlusCandidates)[iMuPlusCandidates++]) CbmAnaMuonCandidate();
 
-//  }
-
-  for (Int_t iMuon=0;iMuon<fMuPlusCandidates->GetEntriesFast();iMuon++){
-    CbmAnaMuonCandidate* mu = (CbmAnaMuonCandidate*) fMuMinusCandidates->At(iMuon);
-    printf("muon %4i planes: ",iMuon);
-    Int_t* points = mu->GetMuchPoints();
-    Int_t* hits   = mu->GetMuchHits();
-    for (Int_t iPlane=0;iPlane<NPLANES;iPlane++){
-      if (points[iPlane]>=0) printf(" %2i",iPlane); else printf("   ");
-      if (hits[iPlane]>=0)  printf("!",iPlane); else printf(" ");
-    }
-    printf("\n");
-  }
+  for (Int_t iDimuon=0;iDimuon<fDimuonCandidates->GetEntriesFast();iDimuon++){
+    CbmAnaDimuonCandidate* dimuon = (CbmAnaDimuonCandidate*) fDimuonCandidates->At(iDimuon);
+    for (Int_t sign=0;sign<2;sign++){
+      CbmAnaMuonCandidate* mu = dimuon->GetMu(sign);
+//      printf("mu(%2i,%i) planes: ",iDimuon,sign);
+      Int_t* points = mu->GetMuchPoints();
+      Int_t* hits   = mu->GetMuchHits();
+//      for (Int_t iPlane=0;iPlane<NPLANES;iPlane++){
+//        if (points[iPlane]>=0) printf("%2i",iPlane); else printf("  ");
+//        if (hits[iPlane]>=0)  printf("!",iPlane); else printf(" ");
+//      }
+//      printf("\n");
+    }//sign
+  }//dimuon
 
 }
 // -------------------------------------------------------------------------
@@ -225,30 +267,19 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
 
 // -----   Public method Finish   ------------------------------------------
 void CbmAnaDimuonAnalysis::Finish(){
-  TFile* f = new TFile(fHistoFileName,"recreate");
-  f->Close();
 }
 // -------------------------------------------------------------------------
 
 
 // -------------------------------------------------------------------------
-Bool_t CbmAnaDimuonAnalysis::Trigger(CbmMuchTrack* track){
-  Int_t nHits = track->GetNofHits();
-  Int_t triggerPlaneId[3]={16,17,18};
-  Bool_t triggeredPlanes[3]={0,0,0};
-  for (Int_t i=0;i<nHits;i++){
-    CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fMuchHits->At(track->GetHitIndex(i));
-    Int_t planeId = hit->GetPlaneId();
-    printf("%i ",planeId);
-    for (Int_t t=0;t<3;t++) if (planeId==triggerPlaneId[t]) triggeredPlanes[t]=1;
-//    printf("%i\n",planeId);
-  }
-//  printf("\n");
-  Bool_t trigger = 1;
-  for (Int_t t=0;t<3;t++) trigger*=triggeredPlanes[t];
-//  printf("trigger=%i\n",trigger);
-  return trigger;
+CbmAnaMuonCandidate* CbmAnaDimuonAnalysis::GetMu(Int_t trackId){
+  if (trackId<0) Fatal("GetMu","MCtrackId for signal muon < 0");
+  if (trackId>=2*fSignalPairs) Fatal("GetMu","MCtrackId for signal muon > 2*dimuons");
+  Int_t iDimuon = trackId/2;
+  Int_t sign = trackId%2; // 0 - muPlus, 1 - muMinus
+  return ((CbmAnaDimuonCandidate*) fDimuonCandidates->At(iDimuon))->GetMu(sign); 
 }
 // -------------------------------------------------------------------------
+
 
 ClassImp(CbmAnaDimuonAnalysis);

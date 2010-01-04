@@ -1,8 +1,7 @@
 /** CbmAnaDimuonAnalysis.h
  *@author E.Kryshen <e.kryshen@gsi.de>
- *@since 2009-09-11
+ *@since 2010-01-02
  **
- ** Jpsi polarization studies
  **/
 
 #ifndef CBMANADIMUONANALYSIS_H_
@@ -13,6 +12,7 @@
 #include <map>
 
 class CbmAnaDimuonAnalysis;
+class CbmAnaMuonCandidate;
 class TClonesArray;
 class CbmTrackMatch;
 class TH1D;
@@ -21,6 +21,7 @@ class TH3D;
 class TLorentzVector;
 class CbmMuchTrack;
 class CbmMuchGeoScheme;
+class CbmStsKFTrackFitter;
 using std::map;
 
 class CbmAnaDimuonAnalysis : public FairTask{
@@ -32,7 +33,7 @@ public:
   *@param name   Name of class
   *@param title  Task title
   **/
-  CbmAnaDimuonAnalysis(const char* name, TString digiFileName, TString histoFileName);
+  CbmAnaDimuonAnalysis(const char* name, TString digiFileName, Int_t nSignalPairs);
 
   /** Destructor **/
   virtual ~CbmAnaDimuonAnalysis();
@@ -55,7 +56,8 @@ public:
   void SetStsTrueHitQuota(Double_t quota)   { fStsTrueHitQuota = quota; }
   void SetMuchTrueHitQuota(Double_t quota)  { fMuchTrueHitQuota = quota; }
 
-  Bool_t Trigger(CbmMuchTrack* track);
+private:
+  CbmAnaMuonCandidate* GetMu(Int_t trackId);
 private:
   Int_t         fEvent;             //!
   TClonesArray* fMCTracks;          //!
@@ -66,17 +68,19 @@ private:
   TClonesArray* fMuchTracks;        //!
   TClonesArray* fMuchTrackMatches;  //!
   TClonesArray* fStsTrackMatches;   //!
-  TClonesArray* fMuPlusCandidates;  //!
-  TClonesArray* fMuMinusCandidates; //!
+  TClonesArray* fMuCandidates;      //!
+  TClonesArray* fDimuonCandidates;  //!
   TClonesArray* fGlobalTracks;      //!
-
+  CbmStsKFTrackFitter* fFitter;
+  
   Int_t    fStsPointsAccQuota;
   Double_t fStsTrueHitQuota;
   Int_t    fMuchPointsAccQuota;
   Double_t fMuchTrueHitQuota;
   TString  fHistoFileName;
   TString  fDigiFileName;
-  
+  Int_t fLastStationIndex;
+  Int_t fNLayers;
   
   map<Int_t,Int_t> mapRecSts;       //!
   map<Int_t,Int_t> mapRecMuch;      //!
@@ -89,9 +93,10 @@ private:
   map<Int_t,Int_t> mapRecMuMinus;   //!
 
   CbmMuchGeoScheme* fGeoScheme;     //!
+  Int_t fSignalPairs;               //!
   
   
-  ClassDef(CbmAnaDimuonAnalysis,1);
+  ClassDef(CbmAnaDimuonAnalysis,2);
 };
 
 #endif

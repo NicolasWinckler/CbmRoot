@@ -56,8 +56,12 @@ public:
   void SetStsTrueHitQuota(Double_t quota)   { fStsTrueHitQuota = quota; }
   void SetMuchTrueHitQuota(Double_t quota)  { fMuchTrueHitQuota = quota; }
 
+  Int_t GetMCTrackId(Int_t iMuchTrack);
+  
 private:
   CbmAnaMuonCandidate* GetMu(Int_t trackId);
+  void DigiToTrackMatch(const TClonesArray* digiMatches,Int_t digiIndex,std::map<Int_t, Int_t> &matchMap);
+
 private:
   Int_t         fEvent;             //!
   TClonesArray* fMCTracks;          //!
@@ -72,6 +76,9 @@ private:
   TClonesArray* fMuCandidates;      //!
   TClonesArray* fDimuonCandidates;  //!
   TClonesArray* fGlobalTracks;      //!
+  TClonesArray* fPixelDigiMatches;
+  TClonesArray* fStrawDigiMatches;
+  TClonesArray* fClusters;
   CbmStsKFTrackFitter* fFitter;
   
   Int_t    fStsPointsAccQuota;

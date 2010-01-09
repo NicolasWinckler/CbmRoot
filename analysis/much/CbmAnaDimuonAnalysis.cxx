@@ -23,6 +23,8 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "CbmMuchCluster.h"
+#include "CbmMuchDigiMatch.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -98,6 +100,10 @@ InitStatus CbmAnaDimuonAnalysis::Init()
   fMuchTrackMatches = (TClonesArray*) fManager->GetObject("MuchTrackMatch");
   fStsTrackMatches  = (TClonesArray*) fManager->GetObject("STSTrackMatch");
   fGlobalTracks     = (TClonesArray*) fManager->GetObject("GlobalTrack");
+  fPixelDigiMatches = (TClonesArray*) fManager->GetObject("MuchDigiMatch");
+  fStrawDigiMatches = (TClonesArray*) fManager->GetObject("MuchStrawDigiMatch");
+  fClusters         = (TClonesArray*) fManager->GetObject("MuchCluster");
+
   fEvent=0;
   
   if (!(fMCTracks&&fStsPoints&&fMuchPoints&&fMuchPixelHits&&fStsTracks&&fMuchTracks&&fMuchTrackMatches&&fStsTrackMatches)){
@@ -200,9 +206,6 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
     // Check much track
     if (iMuchTrack<0) continue;
     CbmMuchTrack*  muchTrack = (CbmMuchTrack*)  fMuchTracks->At(iMuchTrack);
-    CbmTrackMatch* muchTrackMatch = (CbmTrackMatch*) fMuchTrackMatches->At(iMuchTrack);
-//    Int_t mcMuchTrackId = CbmAnaMuch::GetTrackId(muchTrackMatch,fMuchTrueHitQuota);
-    Int_t mcMuchTrackId = muchTrackMatch->GetMCTrackId();
     //printf("\n");
     Int_t nTriggerHits=0;
     Int_t nHits=0;
@@ -210,9 +213,9 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
       Int_t hitIndex = muchTrack->GetHitIndex(i);
       Int_t hitType = muchTrack->GetHitType(i);
       CbmBaseHit* hit;
-      if      (hitType==6) hit = (CbmBaseHit*) fMuchPixelHits->At(hitIndex);
-      else if (hitType==7) hit = (CbmBaseHit*) fMuchStrawHits->At(hitIndex);
-      else Fatal("Exec","%i - wrong hit type, must be 6 for pixel and 7 for straw",hitType);
+      if      (hitType==kMUCHPIXELHIT) hit = (CbmBaseHit*) fMuchPixelHits->At(hitIndex);
+      else if (hitType==kMUCHSTRAWHIT) hit = (CbmBaseHit*) fMuchStrawHits->At(hitIndex);
+      else Fatal("Exec","%i - wrong hit type, must be %i for pixel and %i for straw",hitType,kMUCHPIXELHIT,kMUCHSTRAWHIT);
       Int_t stationIndex = fGeoScheme->GetStationIndex(hit->GetDetectorId());
       if (stationIndex==fLastStationIndex) nTriggerHits++;
       nHits++;
@@ -227,6 +230,10 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
     // Take only tracks with at least 3 trigger hits
     if (nTriggerHits<3) continue;
     
+    CbmTrackMatch* muchTrackMatch = (CbmTrackMatch*) fMuchTrackMatches->At(iMuchTrack);
+//    Int_t mcMuchTrackId = CbmAnaMuch::GetTrackId(muchTrackMatch,fMuchTrueHitQuota);
+    Int_t mcMuchTrackId = GetMCTrackId(iMuchTrack);
+    
     CbmAnaMuonCandidate* mu;
     if (mcMuchTrackId<0 || mcMuchTrackId>=2*fSignalPairs) {
       new((*fMuCandidates)[iMuCandidates++]) CbmAnaMuonCandidate();
@@ -235,8 +242,11 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
       mu = GetMu(mcMuchTrackId); 
     }
     mu->SetNTriggerHits(nTriggerHits);
-//    printf("%4i  ",muchTrackMatch->GetMCTrackId());
-//    printf("chi2/ndf=%6.2f\n",muchTrack->GetChiSq()/muchTrack->GetNDF());
+    mu->SetNMuchHits(muchTrack->GetNofHits());
+    printf("%4i  ",muchTrack->GetNofHits());
+    printf("%4i  ",mcMuchTrackId);
+//    printf("%4i  ",muchTrackMatch->GetNofTrueHits());
+    printf("chi2/ndf=%6.2f\n",muchTrack->GetChiSq()/muchTrack->GetNDF());
     
     if (iStsTrack<0) continue;
     CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(iStsTrack);
@@ -274,6 +284,64 @@ CbmAnaMuonCandidate* CbmAnaDimuonAnalysis::GetMu(Int_t trackId){
   return ((CbmAnaDimuonCandidate*) fDimuonCandidates->At(iDimuon))->GetMu(sign); 
 }
 // -------------------------------------------------------------------------
+
+
+Int_t CbmAnaDimuonAnalysis::GetMCTrackId(Int_t iMuchTrack){
+  CbmMuchTrack*  muchTrack = (CbmMuchTrack*)  fMuchTracks->At(iMuchTrack);
+  std::map<Int_t, Int_t> matchMap;
+  for (Int_t i=0;i<muchTrack->GetNofHits();i++){
+    Int_t hitIndex = muchTrack->GetHitIndex(i);
+    Int_t hitType = muchTrack->GetHitType(i);
+    CbmBaseHit* hit;
+    if      (hitType==kMUCHPIXELHIT) hit = (CbmBaseHit*) fMuchPixelHits->At(hitIndex);
+    else if (hitType==kMUCHSTRAWHIT) hit = (CbmBaseHit*) fMuchStrawHits->At(hitIndex);
+    else Fatal("Exec","%i - wrong hit type, must be 6 for pixel and 7 for straw",hitType);
+    Int_t stationIndex = fGeoScheme->GetStationIndex(hit->GetDetectorId());
+    if (stationIndex<fLastStationIndex-1) continue;
+    if (hitType==kMUCHPIXELHIT) {
+      CbmMuchPixelHit* phit = (CbmMuchPixelHit*) hit;
+      Int_t clusterId = phit->GetRefId();
+      CbmMuchCluster* cluster = (CbmMuchCluster*) fClusters->At(clusterId);
+      for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
+              Int_t digiIndex = cluster->GetDigiIndex(iDigi);
+              DigiToTrackMatch(fPixelDigiMatches, digiIndex, matchMap);
+      }
+    } else{
+      CbmMuchStrawHit* phit = (CbmMuchStrawHit*) hit;
+      Int_t digiIndex = phit->GetRefId();
+      DigiToTrackMatch(fStrawDigiMatches, digiIndex, matchMap);
+    }
+  }
+  Int_t bestMcTrackId = -1;
+  Int_t nofTrue = 0;
+      for (std::map<Int_t, Int_t>::iterator it = matchMap.begin(); it != matchMap.end(); it++) {
+              if (it->first != -1 && it->second > nofTrue) {
+                      bestMcTrackId = it->first;
+                      nofTrue = it->second;
+              }
+      }
+  printf("%i\n",nofTrue);
+  return bestMcTrackId;
+}
+
+void CbmAnaDimuonAnalysis::DigiToTrackMatch(
+                const TClonesArray* digiMatches,
+                Int_t digiIndex,
+                std::map<Int_t, Int_t> &matchMap)
+{
+        CbmMuchDigiMatch* digiMatch = (CbmMuchDigiMatch*) digiMatches->At(digiIndex);
+        if (digiMatch == NULL) return;
+        for (Int_t iPoint = 0; iPoint < digiMatch->GetNPoints(); iPoint++) {
+                Int_t pointIndex = digiMatch->GetRefIndex(iPoint);
+                if (pointIndex < 0) { // Fake or background hit
+                        matchMap[-1]++;
+                        continue;
+                }
+                FairMCPoint* point = (FairMCPoint*) fMuchPoints->At(pointIndex);
+                if (point == NULL) continue;
+                matchMap[point->GetTrackID()]++;
+        }
+}
 
 
 ClassImp(CbmAnaDimuonAnalysis);

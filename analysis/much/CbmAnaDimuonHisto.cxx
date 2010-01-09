@@ -20,7 +20,7 @@
 #include "FairRuntimeDb.h"
 #include "FairRunAna.h"
 
-#define NEVENTS 960
+#define NEVENTS 920
 
 // -----   Default constructor   -------------------------------------------
 CbmAnaDimuonHisto::CbmAnaDimuonHisto(){

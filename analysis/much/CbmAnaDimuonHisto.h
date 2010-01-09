@@ -50,6 +50,11 @@ public:
     fMmax=max;
     fMbins=nBins;
   }
+  
+  inline void SetMcuts(Double_t mMinCut, Double_t mMaxCut) {
+    fMminCut = mMinCut;
+    fMmaxCut = mMaxCut;
+  }
 private:
   Int_t         fEvent;             //!
   TClonesArray* fMuCandidates;      //!
@@ -64,6 +69,8 @@ private:
   Double_t fMmin;
   Double_t fMmax;
   Int_t fMbins;
+  Double_t fMminCut;
+  Double_t fMmaxCut;
 
   ClassDef(CbmAnaDimuonHisto,1);
 };

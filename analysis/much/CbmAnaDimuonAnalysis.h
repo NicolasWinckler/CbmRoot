@@ -64,7 +64,8 @@ private:
   TClonesArray* fStsTracks;         //!
   TClonesArray* fStsPoints;         //!
   TClonesArray* fMuchPoints;        //!
-  TClonesArray* fMuchHits;          //!
+  TClonesArray* fMuchPixelHits;     //!
+  TClonesArray* fMuchStrawHits;     //!
   TClonesArray* fMuchTracks;        //!
   TClonesArray* fMuchTrackMatches;  //!
   TClonesArray* fStsTrackMatches;   //!

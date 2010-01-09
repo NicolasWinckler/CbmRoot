@@ -20,6 +20,8 @@
 #include "FairRuntimeDb.h"
 #include "FairRunAna.h"
 
+#define NEVENTS 960
+
 // -----   Default constructor   -------------------------------------------
 CbmAnaDimuonHisto::CbmAnaDimuonHisto(){
   
@@ -33,6 +35,8 @@ CbmAnaDimuonHisto::CbmAnaDimuonHisto(const char* name,TString histoFileName)
   fMmin = 0.7;
   fMmax = 0.9;
   fMbins = 100;
+  fMminCut = 0.78259-2*0.0083;
+  fMmaxCut = 0.78259+2*0.0083;
   fHistoFileName=histoFileName;
 }
 
@@ -94,6 +98,7 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
   if (fVerbose>0) printf(" Muons: %2i",nMuons);
   if (fVerbose>-1) printf("\n");
 
+ 
   for (Int_t iDimuon=0;iDimuon<nDimuons;iDimuon++){
     CbmAnaDimuonCandidate* dimuon = (CbmAnaDimuonCandidate*) fDimuonCandidates->At(iDimuon);
     for (Int_t sign=0;sign<2;sign++){
@@ -123,8 +128,8 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
     TLorentzVector pP = TLorentzVector(*(muP->GetMomentumRC()));
 //    printf("%f\n",pP.P());
     for (Int_t ev=fEvent+1; ev<fEvent+1+fNoMixedEv;ev++){
-      if (ev<1000) fTree->GetEntry(ev);
-      else         fTree->GetEntry(ev-1000);
+      if (ev<NEVENTS) fTree->GetEntry(ev);
+      else            fTree->GetEntry(ev-NEVENTS);
 //      printf("%f\n",pP.P());
       for (Int_t iMuN=0;iMuN<fMuCandidates->GetEntriesFast();iMuN++){
         CbmAnaMuonCandidate* muN = (CbmAnaMuonCandidate*) fMuCandidates->At(iMuN);
@@ -151,6 +156,11 @@ void CbmAnaDimuonHisto::Finish(){
   fBgdM->Write();
   f->Close();
   
+  Int_t mMinCutBin = fDimuonMrc->GetXaxis()->FindFixBin(fMminCut);
+  Int_t mMaxCutBin = fDimuonMrc->GetXaxis()->FindFixBin(fMmaxCut);
+
+  fDimuonMrc->GetXaxis()->FindFixBin(fMmaxCut);
+  
   TCanvas* c1 = new TCanvas("cM","Invariant mass",800,800);
   c1->Divide(2,2);
   c1->cd(1);
@@ -159,13 +169,18 @@ void CbmAnaDimuonHisto::Finish(){
   c1->cd(2);
   fDimuonMrc->Fit("gaus");
   fDimuonMrc->Draw("e");
-  printf("%f\n",fDimuonMrc->Integral(30,50));
   
   c1->cd(3);
   fBgdM->SetMinimum(0);
 //  fBgdM->Add(fDimuonMrc);
   fBgdM->Draw("e");
-  printf("%f\n",fBgdM->Integral(30,50));
+
+  Double_t S = fDimuonMrc->Integral(mMinCutBin,mMaxCutBin);
+  Double_t B = fBgdM->Integral(mMinCutBin,mMaxCutBin);
+  Double_t Stotal = fEvent*10;
+  printf(" Ef=%6.4f",S/Stotal);
+  printf(" S/B=%6.4f",S/B);
+  printf("\n");
 }
 // -------------------------------------------------------------------------
 

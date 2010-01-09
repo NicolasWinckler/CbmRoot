@@ -11,8 +11,10 @@
 #include "CbmMuchPoint.h"
 #include "CbmTrackMatch.h"
 #include "CbmMuchPixelHit.h"
+#include "CbmMuchStrawHit.h"
 #include "CbmAnaMuonCandidate.h"
 #include "CbmGlobalTrack.h"
+#include "CbmBaseHit.h"
 #include "CbmMuchGeoScheme.h"
 #include "CbmMuchPixelHit.h"
 #include "CbmAnaDimuonCandidate.h"
@@ -89,7 +91,8 @@ InitStatus CbmAnaDimuonAnalysis::Init()
   fMCTracks         = (TClonesArray*) fManager->GetObject("MCTrack");
   fStsPoints        = (TClonesArray*) fManager->GetObject("STSPoint");
   fMuchPoints       = (TClonesArray*) fManager->GetObject("MuchPoint");
-  fMuchHits         = (TClonesArray*) fManager->GetObject("MuchPixelHit");
+  fMuchPixelHits    = (TClonesArray*) fManager->GetObject("MuchPixelHit");
+  fMuchStrawHits    = (TClonesArray*) fManager->GetObject("MuchStrawHit");
   fStsTracks        = (TClonesArray*) fManager->GetObject("STSTrack");
   fMuchTracks       = (TClonesArray*) fManager->GetObject("MuchTrack");
   fMuchTrackMatches = (TClonesArray*) fManager->GetObject("MuchTrackMatch");
@@ -97,13 +100,15 @@ InitStatus CbmAnaDimuonAnalysis::Init()
   fGlobalTracks     = (TClonesArray*) fManager->GetObject("GlobalTrack");
   fEvent=0;
   
-  if (!(fMCTracks&&fStsPoints&&fMuchPoints&&fMuchHits&&fStsTracks&&fMuchTracks&&fMuchTrackMatches&&fStsTrackMatches)){
+  if (!(fMCTracks&&fStsPoints&&fMuchPoints&&fMuchPixelHits&&fStsTracks&&fMuchTracks&&fMuchTrackMatches&&fStsTrackMatches)){
     printf(" %i",fStsPoints);
     printf(" %i",fMuchPoints);
     printf(" %i",fStsTracks);
-    printf(" %i",fMuchHits);
+    printf(" %i",fMuchPixelHits);
     printf(" %i",fMuchTracks);
     printf(" %i",fMuchTrackMatches);
+    printf(" %i",fMuchPixelHits);
+    printf(" %i",fMuchStrawHits);
     printf("\n");
     Fatal("Init","One of TCloneArrays not available");
   }  
@@ -133,7 +138,8 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
   Int_t nMuchTracks    = fMuchTracks->GetEntriesFast();
   Int_t nStsPoints     = fStsPoints->GetEntriesFast();
   Int_t nMuchPoints    = fMuchPoints->GetEntriesFast();
-  Int_t nMuchHits      = fMuchHits->GetEntriesFast();
+  Int_t nMuchPixelHits = fMuchPixelHits ? fMuchPixelHits->GetEntriesFast() : 0;
+  Int_t nMuchStrawHits = fMuchStrawHits ? fMuchStrawHits->GetEntriesFast() : 0;
   Int_t nGlobalTracks  = fGlobalTracks->GetEntriesFast();
   if (fVerbose>-1) printf(" Event: %4i",fEvent++);
   if (fVerbose>0) printf(" MCtracks: %4i",nMCTracks);
@@ -143,45 +149,39 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
   if (fVerbose>0) printf(" MCtracks: %4i",nMCTracks);
   if (fVerbose>0) printf(" StsPoints: %4i",nStsPoints);
   if (fVerbose>0) printf(" MuchPoints: %4i",nMuchPoints);
-  if (fVerbose>0) printf(" MuchHits: %4i",nMuchHits);
+  if (fVerbose>0) printf(" MuchPixelHits: %4i",nMuchPixelHits);
+  if (fVerbose>0) printf(" MuchStrawHits: %4i",nMuchStrawHits);
   if (fVerbose>-1) printf("\n");
 
   fMuCandidates->Clear();
   fDimuonCandidates->Clear();
+  Int_t iMuCandidates = 0;
   
+  
+  // Create array of signal dimuons
   for (Int_t iDimuon=0;iDimuon<fSignalPairs;iDimuon++){
     new((*fDimuonCandidates)[iDimuon]) CbmAnaDimuonCandidate();
   }
   
-  TLorentzVector pMC;
-
+  // Set MC momentum and MC track reference
   for (Int_t iMCTrack=0;iMCTrack<2*fSignalPairs;iMCTrack++){
     CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(iMCTrack);
-    CbmAnaMuonCandidate* mu = GetMu(iMCTrack);
-    mcTrack->Get4Momentum(pMC);
-    mu->SetMomentumMC(pMC);
-    mu->SetMCTrackId(iMCTrack);
-  }
-  
-  Int_t iMuCandidates = 0;
-  
-  Int_t muPlusAccepted = -1;
-  Int_t muMinusAccepted = -1;
-  
-  TVector3 pRCmuPlus;
-  TVector3 pRCmuMinus;
-  
-  for (Int_t iTrack=0;iTrack<nMCTracks;iTrack++){
-    CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(iTrack);
-    if (mcTrack->GetMotherId()>=0) continue;
+    // check mother Id for safety
+    if (mcTrack->GetMotherId()>=0) { Error("Exec","motherId for signal track >=0"); continue; }
+    // get info
     Int_t nAccStsPoints  = mcTrack->GetNPoints(kSTS);
     Int_t nAccMuchPoints = mcTrack->GetNPoints(kMUCH);
     Int_t pdgCode = mcTrack->GetPdgCode();
-    if (pdgCode==223) printf("%i\n",iTrack);
+    TLorentzVector pMC;
     mcTrack->Get4Momentum(pMC);
-    // TODO add variables
+    // set muon momentum and MC track reference
+    CbmAnaMuonCandidate* mu = GetMu(iMCTrack);
+    mu->SetMomentumMC(pMC);
+    mu->SetMCTrackId(iMCTrack);
+    // TODO add other info
   }
-
+  
+  // Set arrays of MC points in much (planeId vs point reference)
   for (Int_t iPoint=0;iPoint<nMuchPoints;iPoint++){
     CbmMuchPoint* point = (CbmMuchPoint*) fMuchPoints->At(iPoint);
     Int_t trackId = point->GetTrackID();
@@ -201,32 +201,47 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
     if (iMuchTrack<0) continue;
     CbmMuchTrack*  muchTrack = (CbmMuchTrack*)  fMuchTracks->At(iMuchTrack);
     CbmTrackMatch* muchTrackMatch = (CbmTrackMatch*) fMuchTrackMatches->At(iMuchTrack);
-    Int_t mcMuchTrackId = CbmAnaMuch::GetTrackId(muchTrackMatch,fMuchTrueHitQuota);
+//    Int_t mcMuchTrackId = CbmAnaMuch::GetTrackId(muchTrackMatch,fMuchTrueHitQuota);
+    Int_t mcMuchTrackId = muchTrackMatch->GetMCTrackId();
     //printf("\n");
     Int_t nTriggerHits=0;
+    Int_t nHits=0;
     for (Int_t i=0;i<muchTrack->GetNofHits();i++){
       Int_t hitIndex = muchTrack->GetHitIndex(i);
-      CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fMuchHits->At(hitIndex);
-      //printf(" %i",hitIndex);
-//      Int_t planeId = hit->GetPlaneId();
-//      mu->SetMuchHit(planeId,hitIndex);
+      Int_t hitType = muchTrack->GetHitType(i);
+      CbmBaseHit* hit;
+      if      (hitType==6) hit = (CbmBaseHit*) fMuchPixelHits->At(hitIndex);
+      else if (hitType==7) hit = (CbmBaseHit*) fMuchStrawHits->At(hitIndex);
+      else Fatal("Exec","%i - wrong hit type, must be 6 for pixel and 7 for straw",hitType);
       Int_t stationIndex = fGeoScheme->GetStationIndex(hit->GetDetectorId());
       if (stationIndex==fLastStationIndex) nTriggerHits++;
+      nHits++;
     }
+    
+    if (nTriggerHits>=3) {
+//      printf(":%i %i ",nHits,nTriggerHits);
+//      printf("%i ",muchTrackMatch->GetNofTrueHits());
+//      printf("%i\n",muchTrackMatch->GetMCTrackId());
+    }
+
+    // Take only tracks with at least 3 trigger hits
+    if (nTriggerHits<3) continue;
     
     CbmAnaMuonCandidate* mu;
     if (mcMuchTrackId<0 || mcMuchTrackId>=2*fSignalPairs) {
-      if (nTriggerHits<3) continue;
-      if (muchTrack->GetNofHits()<fNLayers-3) continue;
       new((*fMuCandidates)[iMuCandidates++]) CbmAnaMuonCandidate();
       mu = (CbmAnaMuonCandidate*) (*fMuCandidates)[iMuCandidates-1];
     } else {
       mu = GetMu(mcMuchTrackId); 
     }
     mu->SetNTriggerHits(nTriggerHits);
+//    printf("%4i  ",muchTrackMatch->GetMCTrackId());
+//    printf("chi2/ndf=%6.2f\n",muchTrack->GetChiSq()/muchTrack->GetNDF());
+    
     if (iStsTrack<0) continue;
     CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(iStsTrack);
     Int_t nStsHits = stsTrack->GetNStsHits();
+//    printf("nStsHits=%i\n",nStsHits);
     mu->SetNStsHits(nStsHits);
     Double_t chi = fFitter->GetChiToVertex(stsTrack);
     mu->SetChiToVertex(chi);
@@ -238,28 +253,7 @@ void CbmAnaDimuonAnalysis::Exec(Option_t* opt){
     mu->SetMomentumRC(T);
     mu->SetReconstructed(kTRUE);
     mu->SetSign(T[4]>0 ? 1. : -1.);
-
-//    // Check sts track
-//    if (iStsTrack<0) continue;
-//    CbmStsTrack*   stsTrack      = (CbmStsTrack*) fStsTracks->At(iStsTrack);
-//    CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*) fStsTrackMatches->At(iStsTrack);
-//    Int_t mcStsTrackId = CbmAnaMuch::GetTrackId(stsTrackMatch,fStsTrueHitQuota);
   }
-
-  for (Int_t iDimuon=0;iDimuon<fDimuonCandidates->GetEntriesFast();iDimuon++){
-    CbmAnaDimuonCandidate* dimuon = (CbmAnaDimuonCandidate*) fDimuonCandidates->At(iDimuon);
-    for (Int_t sign=0;sign<2;sign++){
-      CbmAnaMuonCandidate* mu = dimuon->GetMu(sign);
-//      printf("mu(%2i,%i) planes: ",iDimuon,sign);
-      Int_t* points = mu->GetMuchPoints();
-      Int_t* hits   = mu->GetMuchHits();
-//      for (Int_t iPlane=0;iPlane<NPLANES;iPlane++){
-//        if (points[iPlane]>=0) printf("%2i",iPlane); else printf("  ");
-//        if (hits[iPlane]>=0)  printf("!",iPlane); else printf(" ");
-//      }
-//      printf("\n");
-    }//sign
-  }//dimuon
 
 }
 // -------------------------------------------------------------------------

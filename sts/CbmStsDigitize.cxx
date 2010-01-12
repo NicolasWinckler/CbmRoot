@@ -67,15 +67,15 @@ CbmStsDigitize::CbmStsDigitize() : FairTask("STS Digitizer", 1) {
 
   fStep = 0.001;
 
-  fFThreshold  = 5.0;
-  fBThreshold  = 5.0;
-  fFNoiseWidth = 1.5;
-  fBNoiseWidth = 1.5;
+  fFThreshold  = 8.0;
+  fBThreshold  = 8.0;
+  fFNoiseWidth = 0.1;
+  fBNoiseWidth = 0.1;
 
-  fFNofBits    = 10;
-  fBNofBits    = 10;
-  fFMinStep    = 0.1;
-  fBMinStep    = 0.1;
+  fFNofBits    = 20;
+  fBNofBits    = 20;
+  fFMinStep    = 0.01;
+  fBMinStep    = 0.01;
   fStripDeadTime = 10;
   fNEvents = 0.;
 }
@@ -95,15 +95,15 @@ CbmStsDigitize::CbmStsDigitize(Int_t iVerbose)
 
   fStep = 0.001;
 
-  fFThreshold  = 5.0;
-  fBThreshold  = 5.0;
-  fFNoiseWidth = 1.5;
-  fBNoiseWidth = 1.5;
+  fFThreshold  = 8.0;
+  fBThreshold  = 8.0;
+  fFNoiseWidth = 0.1;
+  fBNoiseWidth = 0.1;
 
-  fFNofBits    = 10;
-  fBNofBits    = 10;
-  fFMinStep    = 0.1;
-  fBMinStep    = 0.1;
+  fFNofBits    = 20;
+  fBNofBits    = 20;
+  fFMinStep    = 0.01;
+  fBMinStep    = 0.01;
   fStripDeadTime = 10;
   fNEvents = 0.;
 }
@@ -123,15 +123,15 @@ CbmStsDigitize::CbmStsDigitize(const char* name, Int_t iVerbose)
 
   fStep = 0.001;
 
-  fFThreshold  = 5.0;
-  fBThreshold  = 5.0;
-  fFNoiseWidth = 1.5;
-  fBNoiseWidth = 1.5;
+  fFThreshold  = 8.0;
+  fBThreshold  = 8.0;
+  fFNoiseWidth = 0.1;
+  fBNoiseWidth = 0.1;
 
-  fFNofBits    = 10;
-  fBNofBits    = 10;
-  fFMinStep    = 0.1;
-  fBMinStep    = 0.1;
+  fFNofBits    = 20;
+  fBNofBits    = 20;
+  fFMinStep    = 0.01;
+  fBMinStep    = 0.01;
   fStripDeadTime = 10;
   fNEvents = 0.;
 }

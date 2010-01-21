@@ -105,7 +105,7 @@ public:
 
 
 /* 5th degree polynom
- * 22 coefficients.
+ * 21 coefficients.
  */
 class CbmLitPolynom5 : public CbmLitPolynom
 {
@@ -128,7 +128,7 @@ public:
 			   c[10]*x2*y2 + c[11]*x*y3 + c[12]*y*x3 + c[13]*x4 + c[14]*y4 + c[15]*x2*y3 + c[16]*y2*x3 +
 			   c[17]*x*y4 + c[18]*y*x4 + c[19]*x5 + c[20]*y5;
 	}
-	unsigned int GetNofCoefficients() const {return 22;}
+	unsigned int GetNofCoefficients() const {return 21;}
 };
 
 

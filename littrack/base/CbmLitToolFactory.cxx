@@ -27,7 +27,6 @@
 #include "CbmLitTrackFinderNNParallel.h"
 #include "CbmLitField.h"
 #include "CbmLitMapField.h"
-#include "CbmLitMyField.h"
 #include "CbmLitParallelTrackFitterTest.h"
 
 

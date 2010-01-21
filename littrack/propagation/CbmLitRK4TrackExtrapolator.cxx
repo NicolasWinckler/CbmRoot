@@ -94,12 +94,8 @@ void CbmLitRK4TrackExtrapolator::RK4Order(
          }
       }
 
-      CbmLitFieldValue B;
-      fField->GetFieldValue(x[0], x[1], zIn + coef[iStep] * h, B);
-
-      myf Bx = B.GetBx();
-      myf By = B.GetBy();
-      myf Bz = B.GetBz();
+      myf Bx, By, Bz;
+      fField->GetFieldValue(x[0], x[1], zIn + coef[iStep] * h, Bx, By, Bz);
 
       myf tx = x[2];
       myf ty = x[3];

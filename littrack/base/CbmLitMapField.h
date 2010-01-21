@@ -21,13 +21,15 @@ public:
 	virtual ~CbmLitMapField(){};
 
 	/* Inherited from CbmLitField */
-	void GetFieldValue(myf x, myf y, myf z, CbmLitFieldValue& value) const {
+	void GetFieldValue(
+					myf x, myf y, myf z,
+					myf &Bx, myf &By, myf &Bz) const {
 		double pos[3] = {x, y, z};
 		double B[3];
 		fField->GetFieldValue(pos, B);
-		value.SetBx(B[0]);
-		value.SetBy(B[1]);
-		value.SetBz(B[2]);
+		Bx = B[0];
+		By = B[1];
+		Bz = B[2];
 	}
 
 	/* Inherited from CbmLitField */

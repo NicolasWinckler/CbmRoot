@@ -10,8 +10,6 @@
 #ifndef CBMLITFIELDFITTER_H_
 #define CBMLITFIELDFITTER_H_
 
-#include "CbmLitMyField.h"
-#include "CbmLitFieldSlice.h"
 #include <vector>
 
 class FairField;

@@ -8,8 +8,6 @@
 #ifndef CBMLITFIELD_H_
 #define CBMLITFIELD_H_
 
-#include "CbmLitFieldValue.h"
-
 class CbmLitField {
 public:
 	/* Constructor */
@@ -22,14 +20,20 @@ public:
 	 * @param x X coordinate [cm].
 	 * @param y Y coordinate [cm].
 	 * @param z Z coordinate [cm].
-	 * @param value Output field value.
+	 * @param Bx Output Bx field value [kGauss].
+	 * @param By Output By field value [kGauss]
+	 * @param Bz Output Bz field value [kGauss]
 	 */
-	virtual void GetFieldValue(myf x, myf y, myf z, CbmLitFieldValue& value) const = 0;
+	virtual void GetFieldValue(
+			myf x, myf y, myf z,
+			myf &Bx, myf &By, myf &Bz) const = 0;
 
 	/* Returns std::string representation of this class
 	 * @return String representation of the class
 	 */
-	virtual std::string ToString() const { return "CbmLitField::ToString";}
+	virtual std::string ToString() const {
+		return "CbmLitField::ToString";
+	}
 };
 
 #endif /* CBMLITFIELD_H_ */

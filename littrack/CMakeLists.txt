@@ -56,7 +56,6 @@ base/CbmLitToolFactory.cxx
 base/CbmLitHitData.cxx
 base/CbmLitFieldFitter.cxx
 base/CbmLitSimpleGeometryConstructor.cxx
-base/CbmLitMyField.cxx
 cbm/CbmPropagatorGeane.cxx
 cbm/CbmPropagatorLit.cxx
 data/CbmLitTrackParam.cxx

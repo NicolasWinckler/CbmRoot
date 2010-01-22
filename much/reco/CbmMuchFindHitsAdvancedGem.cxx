@@ -14,6 +14,7 @@
  *  3 - Simple + Ward
  *  4 - Divisive clustering
  *  5 - Simple + divisive clustering
+ *  6 - Simple (threshold is set for each station separately)
  *
  */
 
@@ -166,7 +167,8 @@ void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
           break;
         }
         //------------ Simple ----------------------
-        case 1:{
+        case 1:
+        case 6:{
           ExecClusteringSimple(cluster, clusters);
           CreateHits(clusters, iCluster);
           break;
@@ -211,6 +213,9 @@ void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
           clusters.clear();
           break;
         }
+//        //----------Simple (threshold for each station)---------
+//        case 6:
+//          break;
 
         default:{
           Fatal("CbmMuchFindHitsAdvancedGem::Exec:", "The algorithm index does not exist.");
@@ -264,6 +269,24 @@ void CbmMuchFindHitsAdvancedGem::SetClusterDistanceLimits(Int_t iStation, Int_t 
   }
   else{
     fDistanceLimits[iStation][clusterSize] = distances;
+  }
+}
+// -------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------
+void CbmMuchFindHitsAdvancedGem::SetNStations(Int_t nStations){
+  fNStations = nStations;
+  fThresholdRatios.resize(fNStations);
+
+}
+// -------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------
+void CbmMuchFindHitsAdvancedGem::SetThresholdRatios(Double_t* thresholdRatios){
+  for(Int_t iStation = 0; iStation < fNStations; ++iStation){
+    if(iStation >= fNStations) Fatal("CbmMuchFindHitsAdvancedGem::SetThresholdRatios",
+        "Station index is out of range.");
+    fThresholdRatios.at(iStation) = thresholdRatios[iStation];
   }
 }
 // -------------------------------------------------------------------------
@@ -453,7 +476,7 @@ InitStatus CbmMuchFindHitsAdvancedGem::Init() {
   // Get input arrays
   FairRootManager* ioman = FairRootManager::Instance();
   if (!ioman)
-    Fatal("Init", "No FairRootManager");
+    Fatal("CbmMuchFindHitsAdvancedGem::Init", "No FairRootManager");
   fDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
   fDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
 
@@ -592,7 +615,23 @@ CbmMuchPad* CbmMuchFindHitsAdvancedGem::GetPadByDigi(Int_t digiIndex, Int_t &cha
 // -----   Private method ExecClusteringSimple  ----------------------------
 void CbmMuchFindHitsAdvancedGem::ExecClusteringSimple(CbmMuchCluster* cluster, vector<CbmMuchCluster*> &clusters) {
   fSelectedDigis.clear();
-  Int_t qThreshold = Int_t (fThresholdRatio*cluster->GetMaxCharge());
+
+  Int_t iDig = cluster->GetDigiIndex(0);
+  CbmMuchDigi* digi = (CbmMuchDigi*)fDigis->At(iDig);
+  Int_t iStation = fGeoScheme->GetStationIndex(digi->GetDetectorId());
+  Double_t thresholdRatio = 0.;
+  switch (fAlgorithm){
+    case 1:
+      thresholdRatio = fThresholdRatio;
+      break;
+    case 6:
+      if(iStation >= fNStations) Fatal("CbmMuchFindHitsAdvancedGem::ExecClusterSimple",
+          "Station index is out of range.");
+      thresholdRatio = fThresholdRatios.at(iStation);
+      break;
+  }
+
+  Int_t qThreshold = Int_t (thresholdRatio*cluster->GetMaxCharge());
   Int_t dummy = 0;
   for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++) {
     Int_t digiIndex = cluster->GetDigiIndex(iDigi);

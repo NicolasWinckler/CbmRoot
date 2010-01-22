@@ -14,6 +14,7 @@
  *  3 - Simple + Ward
  *  4 - Divisive clustering
  *  5 - Simple + divisive clustering
+ *  6 - Simple (threshold is set for each station separately)
  *
  */
 
@@ -65,9 +66,16 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
   /** Destructor. */
   virtual ~CbmMuchFindHitsAdvancedGem();
 
-  /** Sets ration to multiply on maximal pad-charge in a cluster to obtain
+  /** Sets number of stations for the current setup. */
+  void SetNStations(Int_t nStations);
+
+  /** Sets ratio to multiply on maximal pad-charge in a cluster to obtain
    * charge threshold (appropriate only for simple clustering). */
   void SetThresholdRatio(Double_t thresholdRatio) {fThresholdRatio = thresholdRatio;}
+
+  /** Sets ratios to multiply on maximal pad-charge in a cluster to obtain
+   * charge threshold for each station (appropriate only for algorithm 6). */
+  void SetThresholdRatios(Double_t* thresholdRatios);
 
   /**
    * Sets the clustering algorithm to use.
@@ -77,6 +85,7 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
    * 3 - Simple + Ward's clustering
    * 4 - Divisive clustering
    * 5 - Simple + divisive clustering
+   * 6 - Simple (threshold is set for each station separately)
    */
   void SetAlgorithm(Int_t iAlgorithm) {fAlgorithm = iAlgorithm;}
 
@@ -97,6 +106,7 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
 
   CbmMuchGeoScheme*                fGeoScheme;         // Geometry scheme
   TString                          fDigiFile;          // Digitization file
+  Int_t                            fNStations;         // Number of stations
   TClonesArray*                    fHits;              // Output array of CbmMuchHit
   TClonesArray*                    fDigis;             // Input array of CbmMuchDigi
   TClonesArray*                    fDigiMatches;       // Input array of CbmMuchDigiMatch
@@ -104,6 +114,7 @@ class CbmMuchFindHitsAdvancedGem : public FairTask
   map<pair<Int_t, Long64_t>, Int_t>   fChannelDigiMap;    // Correspondence between unique channel id and digi index
   set<Int_t>                       fSelectedDigis;     // Digis already included in clusters
   Double_t                         fThresholdRatio;    // Multiplied by maximal pad-charge gives the charge ratio (for simple clustering only)
+  vector<Double_t>                 fThresholdRatios;   // Charge thresholds for each station
   Int_t                            fAlgorithm;         // Defines which algorithm to use
   TStopwatch                       fTimer;             // Timer
   Double_t                         fDistanceLimit;     // Limit for the ESS increment

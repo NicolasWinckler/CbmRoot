@@ -275,7 +275,7 @@ void CbmLitFindGlobalTracks::CalculateLength()
 		}
 
 		if (trdId > -1) {
-			CbmTrack* trdTrack = (CbmTrack*) fTrdTracks->At(stsId);
+			CbmTrack* trdTrack = (CbmTrack*) fTrdTracks->At(trdId);
 			Int_t nofTrdHits = trdTrack->GetNofHits();
 			for(Int_t ih = 0; ih < nofTrdHits; ih++) {
 				CbmPixelHit* hit = (CbmPixelHit*) fTrdHits->At(trdTrack->GetHitIndex(ih));

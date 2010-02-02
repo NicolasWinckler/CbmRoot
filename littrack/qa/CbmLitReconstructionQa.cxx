@@ -750,6 +750,7 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 	c1->SaveAs(std::string(std::string(c1->GetTitle()) + ".gif").c_str());
 }
 
+
 Double_t CbmLitReconstructionQa::CalcEfficiency(
 		TH1* histRec,
 		TH1* histAcc)

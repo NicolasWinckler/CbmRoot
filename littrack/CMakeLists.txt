@@ -127,7 +127,8 @@ selection/CbmLitTrackSelectionMuchRobust.cxx
 selection/CbmLitTrackSelectionChiSq.cxx 
 utils/CbmLitConverter.cxx
 utils/CbmLitMath.cxx 
-utils/CbmLitMatrixMath.cxx )
+utils/CbmLitMatrixMath.cxx 
+utils/CbmLitDrawHist.cxx)
 
 set(LITTRACK_HEADERS
 cbm/CbmPropagatorGeane.h

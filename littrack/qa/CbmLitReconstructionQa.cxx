@@ -6,6 +6,8 @@
 
 #include "CbmLitReconstructionQa.h"
 #include "CbmLitEnvironment.h"
+#include "CbmLitDrawHist.h"
+#include "CbmLitUtils.h"
 
 #include "CbmGlobalTrack.h"
 #include "CbmTrackMatch.h"
@@ -18,11 +20,16 @@
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TList.h"
+#include "TCanvas.h"
+#include "TLegend.h"
+#include "TPad.h"
 
 #include <iostream>
 #include <map>
 #include <cmath>
 #include <iomanip>
+#include <string>
+#include <sstream>
 
 // histogram types
 const Int_t ACC=0; // accepted tracks histogram
@@ -97,6 +104,7 @@ void CbmLitReconstructionQa::Finish()
 	CalculateEfficiencyHistos();
 	WriteToFile();
 	PrintFinalStatistics();
+	Draw();
 }
 
 void CbmLitReconstructionQa::DetermineSetup()
@@ -131,6 +139,9 @@ void CbmLitReconstructionQa::ReadDataBranches()
     if (NULL == fStsMatches) Fatal("Init",": No StsTrackMatch array!");
 
     if (fIsMuch) {
+		fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
+		fMuchStrawHits = (TClonesArray*) ioman->GetObject("MuchStrawHit");
+		if (NULL == fMuchPixelHits && NULL == fMuchStrawHits) Fatal("CbmLitReconstructionQa::Init", "No MuchPixelHit AND MuchStrawHit arrays!");
     	fMuchMatches = (TClonesArray*) ioman->GetObject("MuchTrackMatch");
     	if (NULL == fMuchMatches) Fatal("Init","No MuchTrackMatch array!");
     }
@@ -155,7 +166,23 @@ void CbmLitReconstructionQa::ProcessHits()
 	if (fIsTrd) {
 		for (Int_t i = 0; i < fTrdHits->GetEntriesFast(); i++) {
 			CbmBaseHit* hit = (CbmBaseHit*) fTrdHits->At(i);
-			fhNofHitsInStation->Fill(hit->GetPlaneId());
+			fhTrdNofHitsInStation->Fill(hit->GetPlaneId());
+		}
+	}
+	if (fIsMuch) {
+		for (Int_t i = 0; i < fMuchPixelHits->GetEntriesFast(); i++) {
+			CbmBaseHit* hit = (CbmBaseHit*) fMuchPixelHits->At(i);
+			fhMuchNofHitsInStation->Fill(hit->GetPlaneId());
+		}
+		for (Int_t i = 0; i < fMuchStrawHits->GetEntriesFast(); i++) {
+			CbmBaseHit* hit = (CbmBaseHit*) fMuchStrawHits->At(i);
+			fhMuchNofHitsInStation->Fill(hit->GetPlaneId());
+		}
+	}
+	if (fIsTof) {
+		for (Int_t i = 0; i < fTofHits->GetEntriesFast(); i++) {
+			CbmBaseHit* hit = (CbmBaseHit*) fTofHits->At(i);
+			fhTofNofHitsInStation->Fill(hit->GetPlaneId());
 		}
 	}
 }
@@ -482,8 +509,15 @@ void CbmLitReconstructionQa::CreateHistos()
 	fhRecGhostNh = new TH1F("hRecGhostNh", "TRD(MUCH): ghost tracks", nBinsNofPoints, minNofPoints, maxNofPoints);
 	fHistoList->Add(fhRecGhostNh);
 
-	fhNofHitsInStation = new TH1F("hNofHitsInStation", "TRD(MUCH): number of hits", 20, 0, 20);
-	fHistoList->Add(fhNofHitsInStation);
+	const UInt_t maxNofStations = 30;
+	fhTrdNofHitsInStation = new TH1F("hTrdNofHitsInStation", "TRD: number of hits", maxNofStations, 0, maxNofStations);
+	fHistoList->Add(fhTrdNofHitsInStation);
+	fhMuchNofHitsInStation = new TH1F("hMuchNofHitsInStation", "MUCH: number of hits", maxNofStations, 0, maxNofStations);
+	fHistoList->Add(fhMuchNofHitsInStation);
+	fhTofNofHitsInStation = new TH1F("hTofNofHitsInStation", "TOF: number of hits", maxNofStations, 0, maxNofStations);
+	fHistoList->Add(fhTofNofHitsInStation);
+
+
 
 	const UInt_t nofHitsHistos = 5;
 	std::string hittype[] = { "All", "True", "Fake", "TrueOverAll", "FakeOverAll" };
@@ -533,7 +567,9 @@ void CbmLitReconstructionQa::CalculateEfficiencyHistos()
 		DivideHistos(fhRecNp[i][REC], fhRecNp[i][ACC], fhRecNp[i][EFF]);
 		DivideHistos(fhTofMom[i][REC], fhTofMom[i][ACC], fhTofMom[i][EFF]);
 	}
-	fhNofHitsInStation->Scale(1./fEventNo);
+	fhTrdNofHitsInStation->Scale(1./fEventNo);
+	fhMuchNofHitsInStation->Scale(1./fEventNo);
+	fhTofNofHitsInStation->Scale(1./fEventNo);
 }
 
 void CbmLitReconstructionQa::WriteToFile()
@@ -644,6 +680,127 @@ std::string CbmLitReconstructionQa::EventEfficiencyStatisticsToString(
 	}
 
 	return ss.str();
+}
+
+void CbmLitReconstructionQa::Draw()
+{
+	SetStyles();
+	DrawEfficiencyHistos();
+	DrawHitsHistos();
+}
+
+void CbmLitReconstructionQa::DrawEfficiencyHistos()
+{
+	TCanvas *c1 = new TCanvas("rec_qa_global_tracking_efficiency","rec_qa_global_tracking_efficiency", 1200, 1000);
+	c1->Divide(2,2);
+	c1->SetGrid();
+
+	std::string sname("STS");
+	std::string rname;
+	if (fIsMuch && !fIsTrd) rname = "MUCH";
+	else if (fIsTrd && !fIsMuch) rname = "TRD";
+	else if (fIsTrd && fIsMuch) rname = "MUCH+TRD";
+	std::string hgname(sname + "+" + rname);
+	std::string gname = hgname += "+TOF";
+
+	std::string signal;
+	if (fIsMuch) signal = "muons"; else signal = "electrons";
+
+	std::string hname1(sname), hname2(hgname), hname3(gname);
+	hname1 += "(" + ToString<Double_t>(CalcEfficiency(fhStsMom[ALL][REC], fhStsMom[ALL][ACC])) + ")";
+	hname2 += "(" + ToString<Double_t>(CalcEfficiency(fhHalfGlobalMom[ALL][REC], fhHalfGlobalMom[ALL][ACC])) + ")";
+	hname3 += "(" + ToString<Double_t>(CalcEfficiency(fhGlobalMom[ALL][REC], fhGlobalMom[ALL][ACC])) + ")";
+	c1->cd(1);
+	DrawHist1D(fhStsMom[ALL][EFF], fhHalfGlobalMom[ALL][EFF], fhGlobalMom[ALL][EFF],
+			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3,
+			false, false, true, 0.3,0.3,0.85,0.6);
+
+	Int_t cat;
+	if (fIsMuch) cat = MU; else cat = EL;
+	hname1 = sname;
+	hname2 = hgname;
+	hname3 = gname;
+	hname1 += "(" + ToString<Double_t>(CalcEfficiency(fhStsMom[cat][REC], fhStsMom[cat][ACC])) + ")";
+	hname2 += "(" + ToString<Double_t>(CalcEfficiency(fhHalfGlobalMom[cat][REC], fhHalfGlobalMom[cat][ACC])) + ")";
+	hname3 += "(" + ToString<Double_t>(CalcEfficiency(fhGlobalMom[cat][REC], fhGlobalMom[cat][ACC])) + ")";
+	c1->cd(2);
+	DrawHist1D(fhStsMom[cat][EFF], fhHalfGlobalMom[cat][EFF], fhGlobalMom[cat][EFF],
+			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3,
+			false, false, true, 0.3,0.3,0.85,0.6);
+
+	hname1 = rname + ": all";
+	hname2 = rname + ": " + signal;
+	c1->cd(3);
+	hname1 += "(" + ToString<Double_t>(CalcEfficiency(fhRecMom[ALL][REC], fhRecMom[ALL][ACC]))+ ")";
+	hname2 += "(" + ToString<Double_t>(CalcEfficiency(fhRecMom[cat][REC], fhRecMom[cat][ACC])) + ")";
+	DrawHist1D(fhRecMom[ALL][EFF], fhRecMom[cat][EFF], NULL,
+			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, "",
+			false, false, true, 0.3,0.3,0.85,0.6);
+
+	hname1 = "TOF: all";
+	hname2 = "TOF: " + signal;
+	hname1 += "(" + ToString<Double_t>(CalcEfficiency(fhTofMom[ALL][REC], fhTofMom[ALL][ACC])) + ")";
+	hname2 += "(" + ToString<Double_t>(CalcEfficiency(fhTofMom[cat][REC], fhTofMom[cat][ACC])) + ")";
+	c1->cd(4);
+	DrawHist1D(fhTofMom[ALL][EFF], fhTofMom[cat][EFF], NULL,
+			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, "",
+			false, false, true, 0.3,0.3,0.85,0.6);
+
+	c1->SaveAs(std::string(std::string(c1->GetTitle()) + ".eps").c_str());
+	c1->SaveAs(std::string(std::string(c1->GetTitle()) + ".gif").c_str());
+}
+
+Double_t CbmLitReconstructionQa::CalcEfficiency(
+		TH1* histRec,
+		TH1* histAcc)
+{
+	if (histAcc->GetEntries() == 0) return 0.;
+	else return Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries());
+}
+
+void CbmLitReconstructionQa::DrawHitsHistos()
+{
+	if (fIsSts){
+		TCanvas* cStsHits = new TCanvas("rec_qa_sts_hits","rec_qa_sts_hits", 1200, 600);
+		DrawHitsHistos(cStsHits, fhStsTrackHits);
+	}
+
+	if (fIsTrd){
+	   TCanvas* cTrdHits = new TCanvas("rec_qa_trd_hits","rec_qa_trd_hits", 1200, 600);
+	   DrawHitsHistos(cTrdHits, fhTrdTrackHits);
+   }
+
+   if (fIsMuch) {
+	   TCanvas* cMuchHits = new TCanvas("rec_qa_much_hits","rec_qa_much_hits", 1200, 600);
+	   DrawHitsHistos(cMuchHits, fhMuchTrackHits);
+   }
+}
+
+void CbmLitReconstructionQa::DrawHitsHistos(
+		TCanvas* c,
+		std::vector<TH1F*>& histos)
+{
+	c->Divide(2,1);
+	c->SetGrid();
+
+	c->cd(1);
+	DrawHist1D(histos[0], histos[1], histos[2],
+				"Number of hits", "Number of hits", "Counter",
+				"all: " + ToString<Double_t>(histos[0]->GetEntries()),
+				"true: " + ToString<Double_t>(histos[1]->GetEntries()),
+				"fake: " + ToString<Double_t>(histos[2]->GetEntries()),
+				true, true, true, 0.3, 0.3, 0.85, 0.6);
+
+	c->cd(2);
+	DrawHist1D(histos[3], histos[4], NULL,
+				"Ratio", "Ratio", "Counter",
+				"true/all: " + ToString<Double_t>(fhStsTrackHits[3]->GetEntries()),
+				"fake/all: " + ToString<Double_t>(fhStsTrackHits[4]->GetEntries()),
+				"",
+				true, true, true, 0.25,0.99,0.55,0.75);
+
+	c->SaveAs(std::string(std::string(c->GetTitle()) + ".eps").c_str());
+	c->SaveAs(std::string(std::string(c->GetTitle()) + ".gif").c_str());
 }
 
 ClassImp(CbmLitReconstructionQa);

@@ -6,7 +6,6 @@ class CbmLitHit;
 class CbmLitStripHit;
 class CbmLitPixelHit;
 class CbmLitTrack;
-//class CbmLitTrackParam;
 
 myf ChiSq(
 		const CbmLitTrackParam* par,

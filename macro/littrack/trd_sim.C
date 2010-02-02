@@ -1,4 +1,4 @@
-void trd_sim(Int_t nEvents = 10)
+void trd_sim(Int_t nEvents = 500)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -9,19 +9,19 @@ void trd_sim(Int_t nEvents = 10)
 		//if necessary specify input pluto file to embed signal particles
 		plutoFile = "/u/andrey/cbm/much/pluto/omega/25gev/omega.0000.root";
 		//directory for output simulation files
-		dir  = "/d/cbm02/andrey/notrd/";
+		dir  = "/d/cbm02/andrey/stdtrd_urqmd/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
 		parFile = dir + "param.0000.root";
 		//If "yes" than 10 primary muons will be generated
-		electrons = "yes";
+		electrons = "no";
 		//If "yes" than UrQMD will be used as background
 		urqmd = "yes";
 		//If "yes" PLUTO particles will be embedded
 		pluto = "no";
 		//TRD geometry file name
-		trdGeom = "";//"trd_standard.geo";
+		trdGeom = "trd_monolithic_new.geo";
 	} else {
 		inFile  = TString(gSystem->Getenv("INFILE"));
 		plutoFile  = TString(gSystem->Getenv("PLUTOFILE"));

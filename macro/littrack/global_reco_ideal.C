@@ -1,9 +1,9 @@
-void global_reco_ideal(Int_t nEvents = 10000)
+void global_reco_ideal(Int_t nEvents = 1000)
 {
-	TString dir  = "/d/cbm02/andrey/std13_10mu_new/";
+	TString dir  = "/d/cbm02/andrey/stdtrd_10pi/";
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
-	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
+	TString globalTracksFile = dir + "global.tracks.ideal.trd500.0000.root";
 
 	Int_t iVerbose = 1;
 	TStopwatch timer;
@@ -90,17 +90,17 @@ void global_reco_ideal(Int_t nEvents = 10000)
 
 		CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,	 trdDFoils, trdDGap);
 
-		Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
-		// Resolutions in y - station and angle dependent [mum]
-		Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
-		Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
-		Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
-
-//		Double_t trdSigmaX[] = {100, 100, 100};             // Resolution in x [mum]
+//		Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
 //		// Resolutions in y - station and angle dependent [mum]
-//		Double_t trdSigmaY1[] = {100, 100, 100, 100, 100, 100, 100};
-//		Double_t trdSigmaY2[] = {100, 100, 100, 100, 100, 100, 100};
-//		Double_t trdSigmaY3[] = {100, 100, 100, 100, 100, 100, 100};
+//		Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
+//		Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
+//		Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
+
+		Double_t trdSigmaX[] = {500, 500, 500};             // Resolution in x [mum]
+		// Resolutions in y - station and angle dependent [mum]
+		Double_t trdSigmaY1[] = {500, 500, 500, 500, 500, 500, 500};
+		Double_t trdSigmaY2[] = {500, 500, 500, 500, 500, 500, 500};
+		Double_t trdSigmaY3[] = {500, 500, 500, 500, 500, 500, 500};
 
 		CbmTrdHitProducerSmearing* trdHitProd = new
 				 CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);

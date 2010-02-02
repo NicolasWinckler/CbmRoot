@@ -1,10 +1,12 @@
 void event_display()
 {
-	TString dir  = "/home/d/andrey/std_1e+/";
+	TString dir  = "/d/cbm02/andrey/test/";
 	// MC transport file
 	TString mcFile = dir + "mc.0000.root";
 	// Parameter file
 	TString parFile = dir + "param.0000.root";
+
+	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -22,12 +24,12 @@ void event_display()
 	FairEventManager *fMan= new FairEventManager();
 	FairMCTracks *Track = new FairMCTracks ("Monte-Carlo Tracks");
 	FairMCPointDraw *RichPoint = new FairMCPointDraw ("RichPoint",kOrange,  kFullSquare);
-	FairMCPointDraw *TofPoint = new FairMCPointDraw ("TOFPoint",kBlue,  kFullSquare);
-	FairMCPointDraw *TrdPoint = new FairMCPointDraw ("TRDPoint",kTeal,  kFullSquare);
+	FairMCPointDraw *TofPoint = new FairMCPointDraw ("TofPoint",kBlue,  kFullSquare);
+	FairMCPointDraw *TrdPoint = new FairMCPointDraw ("TrdPoint",kTeal,  kFullSquare);
 	FairMCPointDraw *MuchPoint = new FairMCPointDraw ("MuchPoint",kRed,  kFullSquare);
-	FairMCPointDraw *ECalPoint = new FairMCPointDraw ("ECALPoint",kYellow,  kFullSquare);
+	FairMCPointDraw *ECalPoint = new FairMCPointDraw ("EcalPoint",kYellow,  kFullSquare);
 	FairMCPointDraw *RefPlanePoint = new FairMCPointDraw ("RefPlanePoint",kPink,  kFullSquare);
-	FairMCPointDraw *STSPoint = new FairMCPointDraw ("STSPoint",kCyan,  kFullSquare);
+	FairMCPointDraw *STSPoint = new FairMCPointDraw ("StsPoint",kCyan,  kFullSquare);
 
 	fMan->AddTask(Track);
 	fMan->AddTask(RichPoint);

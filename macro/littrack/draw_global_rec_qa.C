@@ -4,13 +4,15 @@
  * @version 3.0
  * Macro draws histograms produced by CbmLitReconstructionQa class.
  **/
+#include "../../littrack/utils/CbmLitDrawHist.h"
+
 #include <string>
 #include <sstream>
 #include <ostream>
 #include <iomanip>
 
 //Input directory.
-const TString dir = "/home/d/andrey/std_10mu_urqmd/";
+const TString dir = "/d/cbm02/andrey/stdtrd_10pi/";
 //Input reconstruction file.
 const TFile *file = new TFile(dir + "global.tracks.0000.root");
 
@@ -44,6 +46,10 @@ TH1F* histGlobalMom[NCATS][NTYPES]; // STS+TRD(MUCH)+TOF tracking efficiency in 
 TH1F* histRecMom[NCATS][NTYPES]; // TRD(MUCH) tracking efficiency in dependence on momentum
 TH1F* histTofMom[NCATS][NTYPES]; // TOF hit to track matching efficiency in dependence on momentum
 
+TH1F* histStsTrackHits[5];
+TH1F* histTrdTrackHits[5];
+TH1F* histMuchTrackHits[5];
+
 void draw_global_rec_qa()
 {
 	gSystem->Load("/home/soft/tbb22_004oss/libtbb");
@@ -53,7 +59,6 @@ void draw_global_rec_qa()
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");
 	cbmrootlibs();
 
-	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/draw_hist.C");
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/style.C");
 	style();
@@ -65,6 +70,7 @@ void draw_global_rec_qa()
 	read_histos();
 
 	draw_eff();
+	draw_hits();
 }
 
 void read_histos()
@@ -80,11 +86,18 @@ void read_histos()
 			histTofMom[i][j] = (TH1F*) file->Get(std::string("hTofMom" + type[j] + cat[i]).c_str());
 		}
 	}
+
+	std::string hittype[] = { "All", "True", "Fake", "TrueOverAll", "FakeOverAll" };
+	for (Int_t i = 0; i < 5; i++) {
+		histStsTrackHits[i] = (TH1F*) file->Get(std::string("hStsTrackHits" + hittype[i]).c_str());
+		histTrdTrackHits[i] = (TH1F*) file->Get(std::string("hTrdTrackHits" + hittype[i]).c_str());
+		histMuchTrackHits[i] = (TH1F*) file->Get(std::string("hMuchTrackHits" + hittype[i]).c_str());
+	}
 }
 
 void draw_eff()
 {
-	TCanvas *c1 = new TCanvas("Global tracking efficiency","Global tracking efficiency", 1200, 1000);
+	TCanvas *c1 = new TCanvas("global_tracking_efficiency","global_tracking_efficiency", 1200, 1000);
 	c1->Divide(2,2);
 	c1->SetGrid();
 
@@ -127,6 +140,14 @@ void draw_eff()
 	hname2 += "(" + eff(histTofMom[cat][REC], histTofMom[cat][ACC]) + ")";
 	c1->cd(4);
 	draw_eff(histTofMom[ALL][EFF], histTofMom[cat][EFF], NULL, hname1, hname2, "");
+
+	stringstream oss1;
+	oss1 << c1->GetTitle() << ".eps";
+	c1->SaveAs(TString(oss1.str().c_str()));
+
+	stringstream oss3;
+	oss3 << c1->GetTitle() << ".gif";
+	c1->SaveAs(TString(oss3.str().c_str()));
 }
 
 void draw_eff(
@@ -140,16 +161,15 @@ void draw_eff(
 	if (hist1 != NULL) {
 		hist1->SetMaximum(1);
 		hist1->SetMinimum(0);
-		draw_hist_1D(hist1, "Momentum [GeV/c]", "Efficiency",
+		hist1->GetXaxis()->SetRange(0, 28);
+		DrawHist1D(hist1, "Momentum [GeV/c]", "Efficiency",
 			  kBlue, lineWidth, 1, markerSize, kCircle, false, false, "");
-		hist1->GetXaxis()->SetLabelSize(labelSize);
-		hist1->GetYaxis()->SetLabelSize(labelSize);
 	}
 
-	if (hist2 != NULL) draw_hist_1D(hist2, "Momentum [GeV/c]", "Efficiency",
+	if (hist2 != NULL) DrawHist1D(hist2, "Momentum [GeV/c]", "Efficiency",
 		  kRed, lineWidth, 1, markerSize, kStar, false, false, "SAME");
 
-	if (hist3 != NULL) draw_hist_1D(hist3, "Momentum [GeV/c]", "Efficiency",
+	if (hist3 != NULL) DrawHist1D(hist3, "Momentum [GeV/c]", "Efficiency",
 		  kGreen + 3, lineWidth, 1, markerSize, kFullSquare, false, false, "SAME");
 
 	TLegend* l1 = new TLegend(0.3,0.3,0.85,0.6);
@@ -166,9 +186,83 @@ std::string eff(
 		TH1* histAcc)
 {
 	Double_t eff;
-	if (histAcc->GetEntries() == 0) eff = 0.; else	eff = histRec->GetEntries() / histAcc->GetEntries();
+	if (histAcc->GetEntries() == 0) eff = 0.;
+	else eff = Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries());
 	std::stringstream ss;
 	ss.precision(3);
 	ss << eff;
 	return ss.str();
 }
+
+std::string num_to_string(Double_t num)
+{
+	std::stringstream ss;
+	ss.precision(5);
+	ss << num;
+	return ss.str();
+}
+
+void draw_hits()
+{
+	TCanvas *c_sts_hits = new TCanvas("c_sts_hits","c_sts_hits", 1200, 600);
+	c_sts_hits->Divide(2,1);
+	c_sts_hits->SetGrid();
+	draw_hits(c_sts_hits, histStsTrackHits);
+
+	if (IsTrd(parFile)){
+	   TCanvas *c_trd_hits = new TCanvas("c_trd_hits","c_trd_hits", 1200, 600);
+	   c_trd_hits->Divide(2,1);
+	   c_trd_hits->SetGrid();
+       draw_hits(c_trd_hits, histTrdTrackHits);
+   }
+
+   if (IsMuch(parFile)) {
+	   TCanvas *c_much_hits = new TCanvas("c_much_hits","c_much_hits", 1200, 600);
+	   c_much_hits->Divide(2,1);
+	   c_much_hits->SetGrid();
+       draw_hits(c_much_hits, histMuchTrackHits);
+   }
+}
+
+void draw_hits(
+		TCanvas* c,
+		TH1F** hists)
+{
+   c->cd(1);
+   DrawHist1D(hists[0], "Number of hits", "Counter",
+   			  kBlue, lineWidth, 1, markerSize, kCircle, false, true, "");
+   DrawHist1D(hists[1], "Number of hits", "Counter",
+		      kRed, lineWidth, 1, markerSize, kStar, false, true, "SAME");
+   DrawHist1D(hists[2], "Number of hits", "Counter",
+		      kGreen + 3, lineWidth, 1, markerSize, kFullSquare, false, true, "SAME");
+
+   TLegend* l1 = new TLegend(0.25,0.99,0.55,0.75);
+   l1->SetFillColor(kWhite);
+   l1->SetHeader(std::string("Nof hits " + num_to_string(hists[0]->GetEntries())).c_str());
+   l1->AddEntry(hists[0], std::string("all: " + num_to_string(hists[0]->GetMean())).c_str(), "lp");
+   l1->AddEntry(hists[1], std::string("true: " + num_to_string(hists[1]->GetMean())).c_str(), "lp");
+   l1->AddEntry(hists[2], std::string("fake: " + num_to_string(hists[2]->GetMean())).c_str(), "lp");
+   l1->Draw();
+
+
+   c->cd(2);
+   DrawHist1D(hists[3], "Ratio", "Counter",
+   			  kBlue, lineWidth, 1, markerSize, kCircle, false, true, "");
+   DrawHist1D(hists[4], "Ratio", "Counter",
+		      kRed, lineWidth, 1, markerSize, kStar, false, true, "SAME");
+   TLegend* l2 = new TLegend(0.25,0.99,0.55,0.75);
+   l2->SetFillColor(kWhite);
+   l2->SetHeader(std::string("Ratio " + num_to_string(hists[0]->GetEntries())).c_str());
+   l2->AddEntry(hists[3], std::string("true/all: " + num_to_string(hists[3]->GetMean())).c_str(), "lp");
+   l2->AddEntry(hists[4], std::string("fake/all: " + num_to_string(hists[4]->GetMean())).c_str(), "lp");
+   l2->Draw();
+
+	stringstream oss1;
+	oss1 << c->GetTitle() << ".eps";
+	c->SaveAs(TString(oss1.str().c_str()));
+
+	stringstream oss3;
+	oss3 << c->GetTitle() << ".gif";
+	c->SaveAs(TString(oss3.str().c_str()));
+}
+

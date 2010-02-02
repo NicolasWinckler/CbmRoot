@@ -1,6 +1,6 @@
 void simple_geo(Int_t nEvents = 1)
 {
-	TString dir = "/home/d/andrey/std_1e+/";
+	TString dir = "/d/cbm02/andrey/trd/";
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString outFile = dir + "simple.geo.0000.root";
@@ -8,6 +8,7 @@ void simple_geo(Int_t nEvents = 1)
 	TStopwatch timer;
 	timer.Start();
 
+        gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");

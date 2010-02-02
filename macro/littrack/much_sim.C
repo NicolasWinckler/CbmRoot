@@ -1,9 +1,9 @@
-void much_sim(Int_t nEvents = 10000)
+void much_sim(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	// number of embedded muons or Jpsi
-	Int_t NMUONS = 10;
+	Int_t NMUONS = 1;
 
 	TString muchGeom, trdGeom, inFile, dir, mcFile, parFile, plutoFile[NMUONS], muons, urqmd, pluto;
 	//if SCRIPT environment variable is set to "yes", i.e. macro is run via script
@@ -13,27 +13,27 @@ void much_sim(Int_t nEvents = 10000)
 		//if necessary specify input pluto file to embed signal particles
 		TString plutoDir = "/u/andrey/cbm/much/pluto/25gev/";
 		plutoFile[0] = plutoDir + "Jpsi.0010.root";
-		plutoFile[1] = plutoDir + "Jpsi.0011.root";
-		plutoFile[2] = plutoDir + "Jpsi.0012.root";
-		plutoFile[3] = plutoDir + "Jpsi.0013.root";
-		plutoFile[4] = plutoDir + "Jpsi.0014.root";
-		plutoFile[5] = plutoDir + "Jpsi.0015.root";
-		plutoFile[6] = plutoDir + "Jpsi.0016.root";
-		plutoFile[7] = plutoDir + "Jpsi.0017.root";
-		plutoFile[8] = plutoDir + "Jpsi.0018.root";
-		plutoFile[9] = plutoDir + "Jpsi.0019.root";
+//		plutoFile[1] = plutoDir + "Jpsi.0011.root";
+//		plutoFile[2] = plutoDir + "Jpsi.0012.root";
+//		plutoFile[3] = plutoDir + "Jpsi.0013.root";
+//		plutoFile[4] = plutoDir + "Jpsi.0014.root";
+//		plutoFile[5] = plutoDir + "Jpsi.0015.root";
+//		plutoFile[6] = plutoDir + "Jpsi.0016.root";
+//		plutoFile[7] = plutoDir + "Jpsi.0017.root";
+//		plutoFile[8] = plutoDir + "Jpsi.0018.root";
+//		plutoFile[9] = plutoDir + "Jpsi.0019.root";
 		//directory for output simulation files
-		dir  = "/d/cbm02/andrey/std13_10mu_new/";
+		dir  = "/d/cbm02/andrey/test/";
 		//MC file name
 		mcFile = dir + "mc.0000.root";
 		//Parameter file name
 		parFile = dir + "param.0000.root";
 		//If "yes" than 10 primary muons will be generated
-		muons = "yes";
+		muons = "no";
 		//If "yes" than UrQMD will be used as background
 		urqmd = "no";
 		//If "yes" PLUTO particles will be embedded
-		pluto = "no";
+		pluto = "yes";
 		//MUCH geometry file name
 		muchGeom = "much_standard_2layers.geo";
 		//TRD geometry file name
@@ -80,6 +80,7 @@ void much_sim(Int_t nEvents = 10000)
 	FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
 
 	fRun->SetMaterials("media.geo");       // Materials
+	//fRun->SetStoreTraj(kTRUE);
 
 	if ( caveGeom != "" ) {
 		FairModule* cave = new CbmCave("CAVE");

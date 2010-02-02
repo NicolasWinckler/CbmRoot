@@ -8,15 +8,17 @@
  * tracking. See example in macro/littrack/global_tracking.C.
  **/
 
-void global_hits(Int_t nEvents = 10000)
+void global_hits(Int_t nEvents = 500)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
+	gRandom->SetSeed(10);
+
 	TString dir, mcFile, parFile, globalHitsFile, muchDigiFile;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/d/cbm02/andrey/std13_10mu_new/";
+		dir  = "/d/cbm02/andrey/monotrd_urqmd/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file
@@ -72,8 +74,8 @@ void global_hits(Int_t nEvents = 10000)
 	run->AddTask(kalman);
 	FairTask* l1 = new CbmL1();
 	run->AddTask(l1);
-	CbmStsTrackFinder* trackFinder    = new CbmL1StsTrackFinder();
-//	CbmStsTrackFinder* trackFinder    = new CbmStsTrackFinderIdeal();
+//	CbmStsTrackFinder* trackFinder    = new CbmL1StsTrackFinder();
+	CbmStsTrackFinder* trackFinder    = new CbmStsTrackFinderIdeal();
 	FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder);
 	run->AddTask(findTracks);
 
@@ -83,6 +85,12 @@ void global_hits(Int_t nEvents = 10000)
 	CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
 	FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter", trackFitter, iVerbose);
 	run->AddTask(fitTracks);
+
+	FairTask* stsFHQa = new CbmStsFindHitsQa("STSFindHitsQA",iVerbose);
+	run->AddTask(stsFHQa);
+
+    FairTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 1);
+	run->AddTask(stsRecoQa);
 	// ------------------------------------------------------------------------
 
 	if (IsMuch(parFile)) {
@@ -116,11 +124,11 @@ void global_hits(Int_t nEvents = 10000)
 		Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
 		Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
-//		Double_t trdSigmaX[] = {100, 100, 100};             // Resolution in x [mum]
+//		Double_t trdSigmaX[] = {500, 500, 500};             // Resolution in x [mum]
 //		// Resolutions in y - station and angle dependent [mum]
-//		Double_t trdSigmaY1[] = {100, 100, 100, 100, 100, 100, 100 };
-//		Double_t trdSigmaY2[] = {100, 100, 100, 100, 100, 100, 100 };
-//		Double_t trdSigmaY3[] = {100, 100, 100, 100, 100, 100, 100 };
+//		Double_t trdSigmaY1[] = {500, 500, 500, 500, 500, 500, 500 };
+//		Double_t trdSigmaY2[] = {500, 500, 500, 500, 500, 500, 500 };
+//		Double_t trdSigmaY3[] = {500, 500, 500, 500, 500, 500, 500 };
 
 		CbmTrdHitProducerSmearing* trdHitProd = new
 				 CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);

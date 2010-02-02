@@ -1,15 +1,15 @@
 void prop_ana(Int_t nEvents = 1000)
 {
-	TString dir = "/home/d/andrey/muchtrd_10mu/";
+	TString dir = "/d/cbm02/andrey/stdtrd_10pi/";
 	TString mcFile = dir + "mc.0000.root";
-	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
+	TString globalTracksFile = dir + "global.tracks.ideal.trd500.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString outFile = dir + "propagation.ana.0000.root";
 
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/home/soft/tbb22_004oss/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -28,10 +28,11 @@ void prop_ana(Int_t nEvents = 1000)
 
 	// -------------------------------------------------------------------------
 	CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis();
-	propAna->SetNofPlanes(20);
-	propAna->SetNofTrdHits(4);
-	propAna->SetNofMuchHits(15);
+	propAna->SetNofPlanes(13);
+	propAna->SetNofTrdHits(12);
+	propAna->SetNofMuchHits(0);
 	propAna->SetNofTofHits(1);
+	propAna->SetPDGCode(211);
 	propAna->SetTestFastPropagation(false);
 	run->AddTask(propAna);
 	// -------------------------------------------------------------------------

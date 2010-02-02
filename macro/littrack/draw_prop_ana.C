@@ -21,15 +21,15 @@
 const int nofPar = 12;
 
 /** Number of detector planes. */
-const int nofLayers = 19;
+const int nofLayers = 13;
 
 // Drawing options. If true than specified histograms are drawn.
 bool drawPropagation = true;
 bool drawFilter = true;
-bool drawSmoother = true;
+bool drawSmoother = false;
 
 // If true, than canvases will be closed after drawing
-bool isClose = true;
+bool isClose = false;
 
 /* Arrays to store RMS and sigma values of the histogram fits.
  * First index: 0-propagation, 1-filter, 2-smoother.
@@ -47,12 +47,12 @@ TCanvas* canvas[3][nofLayers];
 
 
 // Input directory
-TString dir = "/home/d/andrey/muchtrd_10mu/";
+TString dir = "/d/cbm02/andrey/stdtrd_10pi/";
 // Input file with propagation analysis
 TFile *file = new TFile(dir + "propagation.ana.0000.root");
 
 //Output directory for images and fit results.
-TString outDir = "./prop/muchtrd/";
+TString outDir = "./prop/trd500/";
 
 void draw_prop_ana()
 {

@@ -1,6 +1,6 @@
 void fit_speed(Int_t nEvents = 10000)
 {
-	TString dir = "/d/cbm02/andrey/std13_10mu_new/";
+	TString dir = "/d/cbm02/andrey/std13_10mu/";
 	TString mcFile = dir + "mc.0000.root";
 	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
 	TString parFile = dir + "param.0000.root";

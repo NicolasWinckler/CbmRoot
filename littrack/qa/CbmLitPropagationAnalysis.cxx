@@ -60,6 +60,7 @@ CbmLitPropagationAnalysis::CbmLitPropagationAnalysis()
 	fNofTrdHits = 0;
 	fNofMuchHits = 13;
 	fNofTofHits = 1;
+	fPDGCode = -1;
 
 	fIsTestFastPropagation = true;
 }
@@ -262,7 +263,9 @@ void CbmLitPropagationAnalysis::CreateTrackArrays()
 		if (!CheckAcceptance(globalTrack)) continue;
 
 		GlobalTrackToLitTrack(globalTrack, litTrack);
-		if (fIsElectronSetup) litTrack->SetPDG(11); else litTrack->SetPDG(13);
+		if (fPDGCode < 0) {
+			if (fIsElectronSetup) litTrack->SetPDG(11); else litTrack->SetPDG(13);
+		} else litTrack->SetPDG(fPDGCode);
 
 		GlobalTrackToMCLitTrack(globalTrack, mcLitTrack);
 
@@ -535,6 +538,8 @@ void CbmLitPropagationAnalysis::McPointToLitFitNode(
     if (pdg == -13) q = 1.;
     if (pdg == 11) q = -1.;
     if (pdg == -11) q = 1.;
+    if (pdg == 211) q = 1.;
+    if (pdg == -211) q = -1.;
 
     TVector3 mom;
     point->Momentum(mom);

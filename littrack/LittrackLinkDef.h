@@ -57,6 +57,13 @@
 //#pragma link C++ class CbmLitTrackFitterIter+;
 //#pragma link C++ class CbmLitKalmanSmoother+;
 
+//geo
+#pragma link C++ class CbmLitDetContFact;
+#pragma link C++ class CbmLitDetGeo;
+#pragma link C++ class CbmLitDetGeoPar;
+#pragma link C++ class CbmLitDet+;
+#pragma link C++ class CbmLitDetPoint+;
+
 // interface
 //#pragma link C++ class CbmLitMaterialEffects+;
 //#pragma link C++ class CbmLitGeoNavigator+;
@@ -114,13 +121,6 @@
 
 // utils
 //#pragma link C++ class CbmLitConverter+;
-
-
-#pragma link C++ class CbmLitDetContFact;
-#pragma link C++ class CbmLitDetGeo;
-#pragma link C++ class CbmLitDetGeoPar;
-#pragma link C++ class CbmLitDet+;
-#pragma link C++ class CbmLitDetPoint+;
 
 
 #endif

@@ -43,6 +43,7 @@ public:
 	void SetNofMuchHits(Int_t nofMuchHits) {fNofMuchHits = nofMuchHits;}
 	void SetNofTofHits(Int_t nofTofHits) {fNofTofHits = nofTofHits;}
 	void SetTestFastPropagation(Bool_t isTestFastPropagation){fIsTestFastPropagation = isTestFastPropagation;}
+	void SetPDGCode(Int_t pdgCode) {fPDGCode = pdgCode;}
 
 private:
 	void DetermineSetup();
@@ -103,6 +104,8 @@ private:
 	TrackPtrVector fLitTracks; // array with reconstructed global tracks converted to LitTracks
 	TrackPtrVector fLitMcTracks; // array with MC track converted to LitTracks
 	Int_t fNofPlanes; // number of planes in the detector
+
+	Int_t fPDGCode; // PDG code for the track fit
 
 	// Track acceptance parameters
 	Int_t fNofTrdHits; // number of TRD hits

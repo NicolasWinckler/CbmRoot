@@ -11,6 +11,7 @@
 #define CBMLITRECONSTRUCTIONQA_H_
 
 #include "FairTask.h"
+#include "CbmDetectorList.h"
 
 #include <map>
 #include <string>
@@ -124,7 +125,8 @@ private:
      * @param trackMatch  Track match
      */
 	Bool_t CheckTrackQuality(
-			CbmTrackMatch* trackMatch);
+			CbmTrackMatch* trackMatch,
+			DetectorId detId);
 
 	/**
      * Loops over the MC tracks. Checks the track acceptance for different cases.
@@ -261,6 +263,12 @@ private:
 	TH1F *fhRecGhostNh;
 
 	TH1F *fhNofHitsInStation; // mean number of hits in station
+
+	// histograms of number of hits in track
+	// all, true, fake, true/all, fake/all
+	std::vector<TH1F*> fhStsTrackHits;
+	std::vector<TH1F*> fhTrdTrackHits;
+	std::vector<TH1F*> fhMuchTrackHits;
 
 	TList* fHistoList; // List of histograms
 

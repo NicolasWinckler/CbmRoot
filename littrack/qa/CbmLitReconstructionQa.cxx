@@ -35,6 +35,12 @@ const Int_t PRIM=2; // primary tracks
 const Int_t SEC=3; // secondary tracks
 const Int_t MU=4; // primary muon tracks
 const Int_t EL=5; // primary electron tracks
+// for hits in the track distribution
+const Int_t ALLHITS = 0;
+const Int_t TRUEHITS = 1;
+const Int_t FAKEHITS = 2;
+const Int_t TRUEALL = 3;
+const Int_t FAKEALL = 4;
 
 CbmLitReconstructionQa::CbmLitReconstructionQa():
   FairTask("LitReconstructionQA", 1)
@@ -180,7 +186,7 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 		CbmTrackMatch* stsTrackMatch;
 		if (isStsOk) {
 			stsTrackMatch = (CbmTrackMatch*) fStsMatches->At(stsId);
-			isStsOk = CheckTrackQuality(stsTrackMatch);
+			isStsOk = CheckTrackQuality(stsTrackMatch, kSTS);
 			if (!isStsOk) { // ghost track
 				Int_t nofHits = stsTrackMatch->GetNofTrueHits() + stsTrackMatch->GetNofWrongHits() + stsTrackMatch->GetNofFakeHits();
 				fhStsGhostNh->Fill(nofHits);
@@ -191,7 +197,7 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 			trdTrackMatch = (CbmTrackMatch*) fTrdMatches->At(trdId);
 			Int_t nofHits = trdTrackMatch->GetNofTrueHits() + trdTrackMatch->GetNofWrongHits() + trdTrackMatch->GetNofFakeHits();
 			if (nofHits >= fMinNofHitsTrd) {
-				isTrdOk = CheckTrackQuality(trdTrackMatch);
+				isTrdOk = CheckTrackQuality(trdTrackMatch, kTRD);
 				if (!isTrdOk) { // ghost track
 					fhRecGhostNh->Fill(nofHits);
 				}
@@ -204,7 +210,7 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 			muchTrackMatch = (CbmTrackMatch*) fMuchMatches->At(muchId);
 			Int_t nofHits = muchTrackMatch->GetNofTrueHits() + muchTrackMatch->GetNofWrongHits() + muchTrackMatch->GetNofFakeHits();
 			if (nofHits >= fMinNofHitsMuch) {
-				isMuchOk = CheckTrackQuality(muchTrackMatch);
+				isMuchOk = CheckTrackQuality(muchTrackMatch, kMUCH);
 				if (!isMuchOk) { // ghost track
 					fhRecGhostNh->Fill(nofHits);
 				}
@@ -250,7 +256,8 @@ void CbmLitReconstructionQa::ProcessGlobalTracks()
 }
 
 Bool_t CbmLitReconstructionQa::CheckTrackQuality(
-		CbmTrackMatch* trackMatch)
+		CbmTrackMatch* trackMatch,
+		DetectorId detId)
 {
 	Int_t mcId = trackMatch->GetMCTrackId();
 	if(mcId < 0) return false;
@@ -260,6 +267,30 @@ Bool_t CbmLitReconstructionQa::CheckTrackQuality(
 	Int_t nofFake = trackMatch->GetNofFakeHits();
 	Int_t nofHits = nofTrue + nofWrong + nofFake;
 	Double_t quali = Double_t(nofTrue) / Double_t(nofHits);
+	Double_t fakequali = Double_t(nofFake + nofWrong) / Double_t(nofHits);
+
+	if(detId == kSTS) {
+		fhStsTrackHits[ALLHITS]->Fill(nofHits);
+		fhStsTrackHits[TRUEHITS]->Fill(nofTrue);
+		fhStsTrackHits[FAKEHITS]->Fill(nofFake + nofWrong);
+		fhStsTrackHits[TRUEALL]->Fill(quali);
+		fhStsTrackHits[FAKEALL]->Fill(fakequali);
+	}
+	if(detId == kTRD) {
+		fhTrdTrackHits[ALLHITS]->Fill(nofHits);
+		fhTrdTrackHits[TRUEHITS]->Fill(nofTrue);
+		fhTrdTrackHits[FAKEHITS]->Fill(nofFake + nofWrong);
+		fhTrdTrackHits[TRUEALL]->Fill(quali);
+		fhTrdTrackHits[FAKEALL]->Fill(fakequali);
+	}
+	if(detId == kMUCH) {
+		fhMuchTrackHits[ALLHITS]->Fill(nofHits);
+		fhMuchTrackHits[TRUEHITS]->Fill(nofTrue);
+		fhMuchTrackHits[FAKEHITS]->Fill(nofFake + nofWrong);
+		fhMuchTrackHits[TRUEALL]->Fill(quali);
+		fhMuchTrackHits[FAKEALL]->Fill(fakequali);
+	}
+
 	if (quali < fQuota) return false;
 	return true;
 }
@@ -453,6 +484,31 @@ void CbmLitReconstructionQa::CreateHistos()
 
 	fhNofHitsInStation = new TH1F("hNofHitsInStation", "TRD(MUCH): number of hits", 20, 0, 20);
 	fHistoList->Add(fhNofHitsInStation);
+
+	const UInt_t nofHitsHistos = 5;
+	std::string hittype[] = { "All", "True", "Fake", "TrueOverAll", "FakeOverAll" };
+	Double_t hitmin[] = {0, 0, 0, -0.1, -0.1};
+	Double_t hitmax[] = {20, 20, 20, 1.1, 1.1};
+	Int_t hitbins[] = {20, 20, 20, 100, 12};
+	fhStsTrackHits.resize(nofHitsHistos);
+	fhTrdTrackHits.resize(nofHitsHistos);
+	fhMuchTrackHits.resize(nofHitsHistos);
+	for(UInt_t i = 0; i < nofHitsHistos; i++){
+		std::string histName = "hStsTrackHits" + hittype[i];
+		std::string histTitle = "STS hits in track: " + hittype[i];
+		fhStsTrackHits[i] = new TH1F(histName.c_str(), histTitle.c_str(), hitbins[i], hitmin[i], hitmax[i]);
+		fHistoList->Add(fhStsTrackHits[i]);
+
+		histName = "hTrdTrackHits" + hittype[i];
+		histTitle = "TRD hits in track: " + hittype[i];
+		fhTrdTrackHits[i] = new TH1F(histName.c_str(), histTitle.c_str(), hitbins[i], hitmin[i], hitmax[i]);
+		fHistoList->Add(fhTrdTrackHits[i]);
+
+		histName = "hMuchTrackHits" + hittype[i];
+		histTitle = "MUCH hits in track: " + hittype[i];
+		fhMuchTrackHits[i] = new TH1F(histName.c_str(), histTitle.c_str(), hitbins[i], hitmin[i], hitmax[i]);
+		fHistoList->Add(fhMuchTrackHits[i]);
+	}
 }
 
 void CbmLitReconstructionQa::DivideHistos(

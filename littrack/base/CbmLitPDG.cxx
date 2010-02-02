@@ -34,3 +34,10 @@ bool CbmLitPDG::IsMuon(
 	if (std::abs(pdg) == 13) return true;
 	else return false;
 }
+
+bool CbmLitPDG::IsPion(
+		int pdg)
+{
+	if (std::abs(pdg) == 211) return true;
+	else return false;
+}

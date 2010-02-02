@@ -17,6 +17,9 @@ public:
 
 	static bool IsMuon(
 			int pdg);
+
+	static bool IsPion(
+				int pdg);
 };
 
 #endif /*CBMLITPDG_H_*/

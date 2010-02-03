@@ -1,4 +1,4 @@
-/** draw_global_rec_qa.C
+/** global_reco_qa.C
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2007
  * @version 3.0

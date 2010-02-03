@@ -6,7 +6,7 @@
  * Macro runs Littrack global track reconstruction.
  **/
 
-void global_tracking(Int_t nEvents = 1000)
+void global_tracking(Int_t nEvents = 100)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 

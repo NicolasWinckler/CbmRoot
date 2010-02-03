@@ -687,6 +687,7 @@ void CbmLitReconstructionQa::Draw()
 	SetStyles();
 	DrawEfficiencyHistos();
 	DrawHitsHistos();
+	DrawHitsStationHistos();
 }
 
 void CbmLitReconstructionQa::DrawEfficiencyHistos()
@@ -711,6 +712,8 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 	hname2 += "(" + ToString<Double_t>(CalcEfficiency(fhHalfGlobalMom[ALL][REC], fhHalfGlobalMom[ALL][ACC])) + ")";
 	hname3 += "(" + ToString<Double_t>(CalcEfficiency(fhGlobalMom[ALL][REC], fhGlobalMom[ALL][ACC])) + ")";
 	c1->cd(1);
+	fhStsMom[ALL][EFF]->SetMinimum(0.);
+	fhStsMom[ALL][EFF]->SetMaximum(1.);
 	DrawHist1D(fhStsMom[ALL][EFF], fhHalfGlobalMom[ALL][EFF], fhGlobalMom[ALL][EFF],
 			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3,
 			false, false, true, 0.3,0.3,0.85,0.6);
@@ -724,6 +727,8 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 	hname2 += "(" + ToString<Double_t>(CalcEfficiency(fhHalfGlobalMom[cat][REC], fhHalfGlobalMom[cat][ACC])) + ")";
 	hname3 += "(" + ToString<Double_t>(CalcEfficiency(fhGlobalMom[cat][REC], fhGlobalMom[cat][ACC])) + ")";
 	c1->cd(2);
+	fhStsMom[cat][EFF]->SetMinimum(0.);
+	fhStsMom[cat][EFF]->SetMaximum(1.);
 	DrawHist1D(fhStsMom[cat][EFF], fhHalfGlobalMom[cat][EFF], fhGlobalMom[cat][EFF],
 			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3,
 			false, false, true, 0.3,0.3,0.85,0.6);
@@ -733,6 +738,8 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 	c1->cd(3);
 	hname1 += "(" + ToString<Double_t>(CalcEfficiency(fhRecMom[ALL][REC], fhRecMom[ALL][ACC]))+ ")";
 	hname2 += "(" + ToString<Double_t>(CalcEfficiency(fhRecMom[cat][REC], fhRecMom[cat][ACC])) + ")";
+	fhRecMom[ALL][EFF]->SetMinimum(0.);
+	fhRecMom[ALL][EFF]->SetMaximum(1.);
 	DrawHist1D(fhRecMom[ALL][EFF], fhRecMom[cat][EFF], NULL,
 			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, "",
 			false, false, true, 0.3,0.3,0.85,0.6);
@@ -742,14 +749,14 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 	hname1 += "(" + ToString<Double_t>(CalcEfficiency(fhTofMom[ALL][REC], fhTofMom[ALL][ACC])) + ")";
 	hname2 += "(" + ToString<Double_t>(CalcEfficiency(fhTofMom[cat][REC], fhTofMom[cat][ACC])) + ")";
 	c1->cd(4);
+	fhTofMom[ALL][EFF]->SetMinimum(0.);
+	fhTofMom[ALL][EFF]->SetMaximum(1.);
 	DrawHist1D(fhTofMom[ALL][EFF], fhTofMom[cat][EFF], NULL,
 			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, "",
 			false, false, true, 0.3,0.3,0.85,0.6);
 
-	c1->SaveAs(std::string(std::string(c1->GetTitle()) + ".eps").c_str());
-	c1->SaveAs(std::string(std::string(c1->GetTitle()) + ".gif").c_str());
+	SaveCanvasAsImage(c1);
 }
-
 
 Double_t CbmLitReconstructionQa::CalcEfficiency(
 		TH1* histRec,
@@ -787,21 +794,47 @@ void CbmLitReconstructionQa::DrawHitsHistos(
 	c->cd(1);
 	DrawHist1D(histos[0], histos[1], histos[2],
 				"Number of hits", "Number of hits", "Counter",
-				"all: " + ToString<Double_t>(histos[0]->GetEntries()),
-				"true: " + ToString<Double_t>(histos[1]->GetEntries()),
-				"fake: " + ToString<Double_t>(histos[2]->GetEntries()),
-				true, true, true, 0.3, 0.3, 0.85, 0.6);
+				"all: " + ToString<Double_t>(histos[0]->GetMean()),
+				"true: " + ToString<Double_t>(histos[1]->GetMean()),
+				"fake: " + ToString<Double_t>(histos[2]->GetMean()),
+				false, true, true, 0.25,0.99,0.55,0.75);
 
 	c->cd(2);
 	DrawHist1D(histos[3], histos[4], NULL,
 				"Ratio", "Ratio", "Counter",
-				"true/all: " + ToString<Double_t>(fhStsTrackHits[3]->GetEntries()),
-				"fake/all: " + ToString<Double_t>(fhStsTrackHits[4]->GetEntries()),
+				"true/all: " + ToString<Double_t>(histos[3]->GetMean()),
+				"fake/all: " + ToString<Double_t>(histos[4]->GetMean()),
 				"",
-				true, true, true, 0.25,0.99,0.55,0.75);
+				false, true, true, 0.25,0.99,0.55,0.75);
 
-	c->SaveAs(std::string(std::string(c->GetTitle()) + ".eps").c_str());
-	c->SaveAs(std::string(std::string(c->GetTitle()) + ".gif").c_str());
+	SaveCanvasAsImage(c);
+}
+
+void CbmLitReconstructionQa::DrawHitsStationHistos()
+{
+	if (fIsTrd){
+	   TCanvas* cTrdHits = new TCanvas("rec_qa_trd_hits_station","rec_qa_trd_hits_station", 1200, 600);
+	   DrawHist1D(fhTrdNofHitsInStation, "Station number", "Number of hits",
+	   			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+	   			LIT_MARKER_STYLE1, false, false, "");
+	   SaveCanvasAsImage(cTrdHits);
+   }
+
+   if (fIsMuch){
+	   TCanvas* cMuchHits = new TCanvas("rec_qa_much_hits_station","rec_qa_much_hits_station", 1200, 600);
+	   DrawHist1D(fhMuchNofHitsInStation, "Station number", "Number of hits",
+	   			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+	   			LIT_MARKER_STYLE1, false, false, "");
+	   SaveCanvasAsImage(cMuchHits);
+   }
+
+   if (fIsTof){
+	   TCanvas* cTofHits = new TCanvas("rec_qa_tof_hits_station","rec_qa_tof_hits_station", 1200, 600);
+	   DrawHist1D(fhTofNofHitsInStation, "Station number", "Number of hits",
+	   			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+	   			LIT_MARKER_STYLE1, false, false, "");
+	   SaveCanvasAsImage(cTofHits);
+   }
 }
 
 ClassImp(CbmLitReconstructionQa);

@@ -230,6 +230,11 @@ private:
 			TCanvas* c,
 			std::vector<TH1F*>& histos);
 
+	/**
+	 * Draws histograms of number of hits in station
+	 */
+	void DrawHitsStationHistos();
+
 	Int_t fMinNofPointsSts; // Minimal number of MCPoints in STS
 	Int_t fMinNofPointsTrd; // Minimal number of MCPoints in TRD
 	Int_t fMinNofPointsMuch; // Minimal number of MCPoints in MUCH
@@ -295,7 +300,6 @@ private:
 	// TRD(MUCH): ghost tracks (number of hits dependence)
 	TH1F *fhRecGhostNh;
 
-	TH1F *fhStsNofHitsInStation; // mean number of hits in station in STS
 	TH1F *fhTrdNofHitsInStation; // mean number of hits in station in TRD
 	TH1F *fhMuchNofHitsInStation; // mean number of hits in station in MUCH
 	TH1F *fhTofNofHitsInStation; // mean number of hits in station in TOF

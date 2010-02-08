@@ -12,8 +12,11 @@
  *  Finds tracks using the Cellular Automaton algorithm
  *
  */
-
+#include "CbmKF.h"
 #include "CbmL1.h"
+#include "CbmStsHit.h"
+#include "CbmStsStation.h"
+#include "CbmStsDigiScheme.h"
 #include "L1Algo/L1Algo.h"
 #include "L1Algo/L1TrackPar.h"
 #include "L1Algo/L1Branch.h"
@@ -176,7 +179,7 @@ void L1Algo::CATrackFinder()
     }
     else{//use outer radius of the 1st station as a constraint
       L1Station &st = vStations[0];
-      SigmaTargetX = SigmaTargetY = 3;//st.Rmax[0];   // optimal value recived by test
+      SigmaTargetX = SigmaTargetY = 10;//st.Rmax[0];
       targZ = 0.;//-1.; 
       st.fieldSlice.GetFieldValue( 0, 0, targB );
     }
@@ -200,6 +203,8 @@ void L1Algo::CATrackFinder()
     }
 
     //cout << "NStations " << NStations << endl;
+    int NMvdStations = CbmKF::Instance()->vMvdMaterial.size();
+    //cout << "NMvdStations= " << NMvdStations << endl;
     //for (int istal = NStations-2; istal >= 0; istal--){//  //start downstream chambers
     for (int istal = NStations-2; istal >= FIRSTCASTATION; istal--){//  //start downstream chambers
       TripStartIndex[istal] = TripStopIndex[istal] = vTriplets.size();
@@ -252,13 +257,21 @@ void L1Algo::CATrackFinder()
       L1StsHit *vStsHits_l = &(vStsHits[0]) + StsHitsStartIndex[istal];
       L1StsHit *vStsHits_m = &(vStsHits[0]) + StsHitsStartIndex[istam];
       L1StsHit *vStsHits_r = 0;
+     //******************************************************************
 
+       CbmL1HitStore *vHitStore_l=&(CbmL1::Instance()->vHitStore[0])+StsHitsStartIndex[istal];
+       CbmL1HitStore *vHitStore_m=&(CbmL1::Instance()->vHitStore[0])+StsHitsStartIndex[istam];       
+       CbmL1HitStore *vHitStore_r= 0;
+   //************************************************************************
       int NHits_l = StsHitsStopIndex[istal] - StsHitsStartIndex[istal] + 1;
       int NHits_m = StsHitsStopIndex[istam] - StsHitsStartIndex[istam] + 1;
       int NHits_r = 0;
       if( istar < NStations ){
-        vStsHits_r = &(vStsHits[0]) + StsHitsStartIndex[istar];
-        NHits_r = StsHitsStopIndex[istar] - StsHitsStartIndex[istar] + 1;
+	vStsHits_r = &(vStsHits[0]) + StsHitsStartIndex[istar];
+  //**********************************************************************
+       vHitStore_r=&(CbmL1::Instance()->vHitStore[0]) + StsHitsStartIndex[istar];
+  //************************************************************************
+	NHits_r = StsHitsStopIndex[istar] - StsHitsStartIndex[istar] + 1;
       }
 
       //hit on the middle plane to start
@@ -283,12 +296,15 @@ void L1Algo::CATrackFinder()
 	  //vFake_l[ilh]=1;
           	  
 	  L1StsHit &hitl = vStsHits_l[ilh];
+          CbmL1HitStore &hitl_story=vHitStore_l[ilh];
+          CbmStsHit *mh;
+          if (istal < NMvdStations) Z[n1_V][n1_4] = stal.z[0]; 
+          else {    
+          mh = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitl_story.ExtIndex));
+          Z[n1_V][n1_4] = mh->GetZ();
+               }
+	  if( GetFUsed( vSFlag[hitl.f] | vSFlagB[hitl.b] ) ) continue; // if used
 
-    if( GetFUsed( vSFlag[hitl.f] | vSFlagB[hitl.b] ) ) continue; // if used
-    
-//     Z[n1_V][n1_4] = hitl.z;
-    Z[n1_V][n1_4] = vStsZPos[hitl.iz];
-//     cout << vStsZPos[hitl.iz] << "  " << hitl.z << endl;
 	  hitsl_1[n1] = ilh;
 	  u_front[n1_V][n1_4] = vStsStrips[hitl.f];
 	  u_back [n1_V][n1_4] = vStsStripsB[hitl.b];
@@ -426,10 +442,16 @@ void L1Algo::CATrackFinder()
        for (; start_mhit < NHits_m; start_mhit++){
 	    if( vFake_m[start_mhit] ) continue;
 	    L1StsHit &hitm = vStsHits_m[start_mhit];
-
-//       fscal zl_m = hitm.z;
-      fscal zl_m = vStsZPos[hitm.iz];
-//       cout << vStsZPos[hitm.iz] << "  " << hitm.z << endl;
+//*********************************************************
+            fvec zl_m;
+            CbmStsHit *mh_m;
+            CbmL1HitStore &hitm_story= vHitStore_m[start_mhit];
+            if (istam < NMvdStations) zl_m=stam.z[0];
+            else {
+            mh_m = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitm_story.ExtIndex));
+            zl_m=mh_m->GetZ();
+            }
+//**************************************************************
 	    fscal &xx = vStsStrips[hitm.f];
 	    fscal &v = vStsStripsB[hitm.b];
 	    //cout<<"x,v="<<xx<<" "<<v<<endl;
@@ -439,7 +461,7 @@ void L1Algo::CATrackFinder()
 	    //cout<<"y= "<<y<< "x= " << x << endl;
 
 //*************************************************************
-               fscal temp1=T_1[i1_V].ty[i1_4]*(zl_m-stam.z[0]);
+               fscal temp1=T_1[i1_V].ty[i1_4]*(zl_m[0]-stam.z[0]);
 //            if ( y >= y_minus[i1]) break;
             if ( y >= y_minus[i1]+temp1) break;	    
 //********************************************************
@@ -452,16 +474,22 @@ void L1Algo::CATrackFinder()
 	    //if( imh>=10000 ) cout<<"imh="<<imh<<endl;
 	    if( vFake_m[imh] ) continue;
 	    L1StsHit &hitm = vStsHits_m[imh];
-
-//       fscal zl_m = hitm.z;
-      fscal zl_m = vStsZPos[hitm.iz];
-//       cout << vStsZPos[hitm.iz] << "  " << hitm.z << endl;
+//*****************************************************************
+            fvec zl_m;
+            CbmStsHit *mh_m;
+            CbmL1HitStore &hitm_story= vHitStore_m[imh];
+            if (istam < NMvdStations) zl_m=stam.z[0];
+            else {  
+            mh_m = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitm_story.ExtIndex));
+            zl_m=mh_m->GetZ();
+            }
+//***********************************************************************************************
 	    fscal &xx = vStsStrips[hitm.f];
 	    fscal &v = vStsStripsB[hitm.b];
-      fscal tempX=T_1[i1_V].tx[i1_4]*(zl_m-stam.z[0]);
-      fscal tempY=T_1[i1_V].ty[i1_4]*(zl_m-stam.z[0]);
+            fscal tempX=T_1[i1_V].tx[i1_4]*(zl_m[0]-stam.z[0]);
+            fscal tempY=T_1[i1_V].ty[i1_4]*(zl_m[0]-stam.z[0]);
 	    fscal y  = (stam.yInfo.cos_phi*xx + stam.yInfo.sin_phi*v)[0];
-      fscal x  = (stam.xInfo.sin_phi*xx + stam.xInfo.cos_phi*v)[0];
+            fscal x  = (stam.xInfo.sin_phi*xx + stam.xInfo.cos_phi*v)[0];
 
 //	    if ( y > y_plus[i1] ) break;
 //	    if ( (x < x_minus[i1] ) || (x > x_plus[i1]) ) continue;
@@ -491,9 +519,9 @@ break;
 	    for( fvec *i=&T2.x, *j=&T1.x; i<=&T2.NDF; i++,j++ ) (*i)[n2_4]=(*j)[i1_4];
 	    for( fvec *i=&f2.cx0, *j=&f1.cx0; i<=&f2.z0; i++,j++ ) (*i)[n2_4]=(*j)[i1_4];
 
-      T2.x[n2_4]+=T2.tx[n2_4]*(zl_m-stam.z[0]);
-      T2.y[n2_4]+=T2.ty[n2_4]*(zl_m-stam.z[0]);
-      T2.z[n2_4]=zl_m;
+            T2.x[n2_4]+=T2.tx[n2_4]*(zl_m[0]-stam.z[0]);
+            T2.y[n2_4]+=T2.ty[n2_4]*(zl_m[0]-stam.z[0]);
+            T2.z[n2_4]=zl_m[0];
 
 	    hitsl_2[n2] = hitsl_1[i1];
 	    hitsm_2[n2] = imh;
@@ -574,24 +602,32 @@ break;
 	    //if( irh>=10000 ) cout<<"irh="<<irh<<endl;
 	    L1StsHit &hitr = vStsHits_r[irh];
        
-      if ( (irh+StsHitsStartIndex[istar]) > StsHitsStopIndex[istar]) { 
-        continue;
-      }
+          if ( (irh+StsHitsStartIndex[istar]) > StsHitsStopIndex[istar]) { 
+          continue;
+           }
 
-//       fscal zl_r = hitr.z;  
-      fscal zl_r = vStsZPos[hitr.iz];  
-//       cout << vStsZPos[hitr.iz] << "  " << hitr.z << endl;
+//********************************************************
+            fvec zl_r;  
+            CbmStsHit *mh_r;    
+            CbmL1HitStore &hitr_story= vHitStore_r[irh];
+            if (istar < NMvdStations) zl_r=star.z[0];
+            else {
+            mh_r = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(hitr_story.ExtIndex));
+            zl_r=mh_r->GetZ();
+            }
+
+//*********************************************************
 	    //double yr = hitr.y;
 	    fscal &xxr = vStsStrips[hitr.f];
 	    fscal &vr = vStsStripsB[hitr.b];
 	    fscal yr  = (star.yInfo.cos_phi*xxr + star.yInfo.sin_phi*vr)[0];
-      fscal     xr  = (star.xInfo.sin_phi*xxr + star.xInfo.cos_phi*vr)[0];
+            fscal     xr  = (star.xInfo.sin_phi*xxr + star.xInfo.cos_phi*vr)[0];
 
-      fscal tempX1=T_2[i2_V].tx[i2_4]*(zl_r-star.z[0]);
-      fscal tempY1=T_2[i2_V].ty[i2_4]*(zl_r-star.z[0]);
-      if (yr < y_minus[i2]+tempY1) continue;
-      if (yr > y_plus [i2]+tempY1 ) break;
-      if ((xr < x_minus[i2]+tempX1) || (xr > x_plus[i2]+tempX1)) continue;
+            fscal tempX1=T_2[i2_V].tx[i2_4]*(zl_r[0]-star.z[0]);
+            fscal tempY1=T_2[i2_V].ty[i2_4]*(zl_r[0]-star.z[0]);
+           if (yr < y_minus[i2]+tempY1) continue;
+           if (yr > y_plus [i2]+tempY1 ) break;
+           if ((xr < x_minus[i2]+tempX1) || (xr > x_plus[i2]+tempX1)) continue;
 
 
 
@@ -618,9 +654,9 @@ break;
 	    }
 
 
-      T3.x[n3_4]+=T3.tx[n3_4]*(zl_r-star.z[0]);
-      T3.y[n3_4]+=T3.ty[n3_4]*(zl_r-star.z[0]);
-      T3.z[n3_4]=zl_r;
+            T3.x[n3_4]+=T3.tx[n3_4]*(zl_r[0]-star.z[0]);
+            T3.y[n3_4]+=T3.ty[n3_4]*(zl_r[0]-star.z[0]);
+            T3.z[n3_4]=zl_r[0];
 
 	    n3++;
 	    n3_V = n3/fvecLen;

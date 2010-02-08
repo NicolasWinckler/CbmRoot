@@ -56,7 +56,7 @@ class F32vec1
   //friend F32vec1 fabs(const F32vec1 &a){ return fabs(a); }
 
   /* Sign */
-  friend F32vec1 sgn(const F32vec1 &a){ return a<0 ?-1 :(a>0 ?1 :0); }
+  //friend F32vec1 sgn(const F32vec1 &a){ return a<0 ?-1 :(a>0 ?1 :0); }
 
   /* Logical */
   /*
@@ -79,12 +79,12 @@ class F32vec1
   friend void operator*=( F32vec1 &a, const F32vec1 &b ){ a = a * b ; } 
   friend void operator/=( F32vec1 &a, const F32vec1 &b ){ a = a / b ; } 
 
-  friend std::ostream & operator<<(std::ostream &strm, const F32vec1 &a ){
+  friend ostream & operator<<(ostream &strm, const F32vec1 &a ){
     strm<<a[0];
     return strm;
   }
 
-  friend std::istream & operator>>(std::istream &strm, F32vec1 &a ){
+  friend istream & operator>>(istream &strm, F32vec1 &a ){
     float tmp;
     strm>>tmp;
     a = tmp;
@@ -94,7 +94,6 @@ class F32vec1
 };//__attribute__ ((aligned(16)));;
 
 typedef F32vec1 fvec;
-typedef float  fscal;
 const int fvecLen = 1;
 #define fvec_true  _f32vec1_true
 #define fvec_false _f32vec1_false

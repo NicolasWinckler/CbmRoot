@@ -33,14 +33,13 @@ class L1Algo{
   void Init( fscal geo[] );
    //local copy of measurements arranged vs station/planes
 
-  int NStations, NMvdStations, fTrackingLevel, fGhostSuppression;
+  int NStations, fTrackingLevel, fGhostSuppression, bla3;
   double TRACK_CHI2_CUT;
   double CATime;
   double fMomentumCutOff;
   double bla;
 
   std::vector< fscal > vStsStrips, vStsStripsB;
-  std::vector< fscal > vStsZPos; // all possible z-positions of hits in inc order.
   std::vector< L1StsHit   > vStsHits;
   std::vector< unsigned char > vSFlag;  // = iStation*4 + used*2 + used_by_duplets;
   std::vector< unsigned char > vSFlagB;
@@ -81,7 +80,6 @@ inline void L1Algo::Init( fscal geo[] )
   }
   //vStations.clear();
   NStations = (int) geo[ind++];
-  NMvdStations = (int) geo[ind++];
   std::cout<<"L1Algo Input "<<NStations<<" Stations:"<<std::endl;
   for( int i=0; i<NStations; i++ ){
     L1Station &st = vStations[i];

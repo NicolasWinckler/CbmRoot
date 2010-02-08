@@ -19,8 +19,6 @@
 #include "CbmKF.h"
 #include "CbmMvdHitMatch.h"
 
-#include "CbmStsStation.h" // only for get z position of stantions
-
 #include <iostream>
 #include <vector>
 
@@ -265,8 +263,7 @@ void CbmL1::ReadEvent()
 	tmpStripsB[th.indStripB].effIndex = -2;
       }
     }
-  } // space point unefficiency
-  else { // strip unefficiency
+  } else { // strip unefficiency
 
     for( int i=0; i<NStrips; i++ ){
       if( gRandom->Uniform(1)>fDetectorEfficiency ) tmpStrips[i].effIndex = -2;
@@ -276,7 +273,7 @@ void CbmL1::ReadEvent()
       TmpStrip &ts = tmpStripsB[i];
       if( ts.isStrip && gRandom->Uniform(1)>fDetectorEfficiency ) ts.effIndex = -2;
     }
-  }// strip unefficiency
+  }
 
   Int_t NEffStrips = 0, NEffStripsB = 0;
 
@@ -304,8 +301,6 @@ void CbmL1::ReadEvent()
   vector<CbmL1HitStore> vUnEffHitStore;
 
   int nEffHits = 0;
-  vector<float> vStsZPos_temp; // temp array for unsorted z positions of detectors segments
-  vStsZPos_temp.clear();
   for( int i=0; i<nHits; i++ ){
     TmpHit &th = tmpHits[i];
  
@@ -329,32 +324,6 @@ void CbmL1::ReadEvent()
     L1StsHit h;
     h.f = tsF.effIndex;
     h.b = tsB.effIndex;
-      // find and save z positions
-    float z_tmp;
-    int ist = th.iStation;
-    if (ist < NMvdStations){
-      CbmKFTube &t = CbmKF::Instance()->vMvdMaterial[ist];
-      z_tmp = t.z;
-    }
-    else {
-      CbmStsHit *mh_m = (CbmStsHit*) (CbmL1::Instance()->listStsHits->At(s.ExtIndex));
-      z_tmp = mh_m->GetZ();
-    }
-//     h.z = z_tmp;
-    
-    int k;
-    for (k = 0; k < vStsZPos_temp.size(); k++){
-      if (vStsZPos_temp[k] == z_tmp){
-        h.iz = k;
-        break;
-      }
-    }
-    if (k == vStsZPos_temp.size()){
-      h.iz = vStsZPos_temp.size();
-      vStsZPos_temp.push_back(z_tmp);
-    }
-    
-      // save hit
     algo->vStsHits.push_back(h);
     
     int sta = th.iStation;
@@ -365,69 +334,7 @@ void CbmL1::ReadEvent()
     vHitStore.push_back(s);
     vHitMCRef.push_back(th.iMC);
   }
-  
-//   if(0){ // check index z-pos befor sort
-//     for (int k = 0; k < algo->vStsHits.size(); k++){
-//       cout << algo->vStsHits[k].z << "  " << vStsZPos_temp[algo->vStsHits[k].iz] << endl;
-//     }
-//     int kk; std::cin >> kk;
-//   }
-  
-    // sort z-pos
-  vector<float> vStsZPos_temp2;
-  vStsZPos_temp2.clear();
-  vStsZPos_temp2.push_back(vStsZPos_temp[0]);
-  vector<int> newToOldIndex;
-  newToOldIndex.clear();
-  newToOldIndex.push_back(0);
-  for (int k = 1; k < vStsZPos_temp.size(); k++){
-    vector<float>::iterator itpos = vStsZPos_temp2.begin()+1;
-    vector<int>::iterator iti = newToOldIndex.begin()+1;
-    for (; itpos < vStsZPos_temp2.end(); itpos++, iti++){
-      if (vStsZPos_temp[k] < *itpos){
-        vStsZPos_temp2.insert(itpos,vStsZPos_temp[k]);
-        newToOldIndex.insert(iti,k);
-        break;
-      }
-    }
-    if (itpos == vStsZPos_temp2.end()){
-      vStsZPos_temp2.push_back(vStsZPos_temp[k]);
-      newToOldIndex.push_back(k);
-    }
-  } // k
-    // save z-pos
-  for (int k = 0; k < vStsZPos_temp2.size(); k++)
-    algo->vStsZPos.push_back(vStsZPos_temp2[k]);
-    // correct index of z-pos in hits array
-  int size_nto_tmp = newToOldIndex.size();
-  vector<int> oldToNewIndex;  
-  oldToNewIndex.clear();
-  oldToNewIndex.resize(size_nto_tmp);
-  for (int k = 0; k < size_nto_tmp; k++)
-    oldToNewIndex[newToOldIndex[k]] = k;
-  
-  int size_hs_tmp = vHitStore.size();
-  for (int k = 0; k < size_hs_tmp; k++)
-    algo->vStsHits[k].iz = oldToNewIndex[algo->vStsHits[k].iz];
-  
-//   if(0){ // check index z-pos
-//     for (int k = 0; k < algo->vStsHits.size(); k++){
-//       cout << algo->vStsHits[k].z << "  " << vStsZPos_temp2[algo->vStsHits[k].iz] << endl;
-//     }
-//   }
-  if(0){ // check z-pos
-    cout  << endl << endl << endl << "!!!!!!!!!!!!!!!!!!!!!Z-POS OLD!!!!!!!!!!!!!!!!" << endl << endl << endl;
-    for (int k = 0; k < vStsZPos_temp.size(); k++)
-      cout << vStsZPos_temp[k] << " " << k << " " << oldToNewIndex[k] << "     ";
-    cout << endl;
 
-    cout  << "Z-POS  NEW " << endl << endl << endl;
-    for (int k = 0; k < vStsZPos_temp2.size(); k++)
-      cout << vStsZPos_temp2[k] << " " << newToOldIndex[k] << " " << k << "     ";
-    cout << endl;
-  }
-  
-  
   //cout<<" sorting MC points.."<<endl;
   vector<TmpHitSort> vTmp;
 
@@ -559,17 +466,6 @@ void CbmL1::ReadEvent()
   
   if ( fVerbose && PrimVtx.MC_ID == 999 ) cout<<"No primary vertex !!!"<<endl;
 
-  {
-    if(fStAPDataMode%2 == 1){ // 1,3
-      WriteStAPAlgoData();
-      WriteStAPPerfData();
-    };
-    if(fStAPDataMode >= 2){  // 2,3
-      ReadStAPAlgoData();
-      ReadStAPPerfData(); 
-    };
-  }
-  
 }
 
 

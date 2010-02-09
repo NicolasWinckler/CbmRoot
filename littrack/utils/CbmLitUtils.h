@@ -18,10 +18,8 @@ std::string ToString(
 }
 
 void SaveCanvasAsImage(
-		TCanvas* c)
-{
-	c->SaveAs(std::string(std::string(c->GetTitle()) + ".eps").c_str());
-	c->SaveAs(std::string(std::string(c->GetTitle()) + ".gif").c_str());
-}
+		TCanvas* c,
+		const std::string& dir);
+
 
 #endif /* CBMLITUTILS_H_ */

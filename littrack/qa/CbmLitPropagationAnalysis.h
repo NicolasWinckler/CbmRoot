@@ -16,6 +16,7 @@
 #include "TStopwatch.h"
 
 #include <vector>
+#include <iostream>
 
 class CbmLitTrackParam;
 class CbmLitTrack;
@@ -25,6 +26,7 @@ class CbmMCTrack;
 class CbmGlobalTrack;
 class TClonesArray;
 class TH1F;
+class TCanvas;
 
 class CbmLitPropagationAnalysis : public FairTask
 {
@@ -44,6 +46,19 @@ public:
 	void SetNofTofHits(Int_t nofTofHits) {fNofTofHits = nofTofHits;}
 	void SetTestFastPropagation(Bool_t isTestFastPropagation){fIsTestFastPropagation = isTestFastPropagation;}
 	void SetPDGCode(Int_t pdgCode) {fPDGCode = pdgCode;}
+
+	/**
+     * Sets the output directory for images.
+     * @param dir Directory name.
+     */
+	void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
+
+	void IsDrawPropagation(Bool_t drawPropagation) {fIsDrawPropagation = drawPropagation;}
+	void IsDrawFilter(Bool_t drawFilter) {fIsDrawFilter = drawFilter;}
+	void IsDrawSmoother(Bool_t drawSmoother) {fIsDrawSmoother = drawSmoother;}
+	void IsCloseCanvas(Bool_t closeCanvas) {fIsCloseCanvas = closeCanvas;}
+
+	void SetPlaneNoPhd(Int_t planeNo) {fPlaneNoPhd = planeNo;}
 
 private:
 	void DetermineSetup();
@@ -94,6 +109,27 @@ private:
 	void TestFastPropagation(
 			CbmLitTrack* track,
 			CbmLitTrack* mcTrack);
+
+	void Draw();
+
+	void DrawHistos(
+			TCanvas* c[],
+			Int_t v);
+
+	void DrawText(
+			Int_t index,
+			Double_t sigma,
+			Double_t rms);
+
+	void PrintResults(
+			std::ostream& out,
+			int v);
+
+	void DrawForPhd();
+
+	void DrawForPhd(
+			TCanvas* canvas,
+			Int_t v);
 
 	Bool_t fIsElectronSetup; // If "electron" setup detected than true
 	Bool_t fIsSts; // If STS detected than true
@@ -163,6 +199,25 @@ private:
 	Int_t fVerbose; // Verbose level
 
 	Bool_t fIsTestFastPropagation;
+
+	//Drawing options
+	//If true than specified histograms are drawn.
+	Bool_t fIsDrawPropagation;
+	Bool_t fIsDrawFilter;
+	Bool_t fIsDrawSmoother;
+
+	Bool_t fIsCloseCanvas; // If true than canvas will be closed after drawing
+	std::string fOutputDir; // Output directory for image files
+
+	Int_t fPlaneNoPhd; // Number of the plane fo Phd drawing
+
+	// Vectors to store sigma and RMS value for different parameters.
+	// [v][plane number][parameter]
+	// v: 0-propagation, 1-filter, 2-smoother.
+	// plane number: absolute plane number
+	// parameter: see description above
+	std::vector<std::vector<std::vector<Double_t> > > fSigma;
+	std::vector<std::vector<std::vector<Double_t> > > fRms;
 
 	ClassDef(CbmLitPropagationAnalysis, 1);
 };

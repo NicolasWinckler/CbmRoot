@@ -1,8 +1,8 @@
 void prop_ana(Int_t nEvents = 1000)
 {
-	TString dir = "/d/cbm02/andrey/stdtrd_10pi/";
+	TString dir = "/home/d/andrey/std_10mu/";
 	TString mcFile = dir + "mc.0000.root";
-	TString globalTracksFile = dir + "global.tracks.ideal.trd500.0000.root";
+	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString outFile = dir + "propagation.ana.0000.root";
 
@@ -28,12 +28,18 @@ void prop_ana(Int_t nEvents = 1000)
 
 	// -------------------------------------------------------------------------
 	CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis();
-	propAna->SetNofPlanes(13);
-	propAna->SetNofTrdHits(12);
-	propAna->SetNofMuchHits(0);
+	propAna->SetNofPlanes(14);
+	propAna->SetNofTrdHits(0);
+	propAna->SetNofMuchHits(13);
 	propAna->SetNofTofHits(1);
-	propAna->SetPDGCode(211);
+	propAna->SetPDGCode(13);
 	propAna->SetTestFastPropagation(false);
+	propAna->SetOutputDir("./test/");
+	propAna->IsDrawPropagation(true);
+	propAna->IsDrawFilter(true);
+	propAna->IsDrawSmoother(false);
+	propAna->IsCloseCanvas(true);
+	propAna->SetPlaneNoPhd(12);
 	run->AddTask(propAna);
 	// -------------------------------------------------------------------------
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");

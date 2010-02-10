@@ -41,7 +41,7 @@ void global_hits(Int_t nEvents = 500)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -74,8 +74,8 @@ void global_hits(Int_t nEvents = 500)
 	run->AddTask(kalman);
 	FairTask* l1 = new CbmL1();
 	run->AddTask(l1);
-//	CbmStsTrackFinder* trackFinder    = new CbmL1StsTrackFinder();
-	CbmStsTrackFinder* trackFinder    = new CbmStsTrackFinderIdeal();
+	CbmStsTrackFinder* trackFinder    = new CbmL1StsTrackFinder();
+//	CbmStsTrackFinder* trackFinder    = new CbmStsTrackFinderIdeal();
 	FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder);
 	run->AddTask(findTracks);
 

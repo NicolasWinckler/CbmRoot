@@ -19,6 +19,7 @@ CbmLitDetectorLayout::~CbmLitDetectorLayout()
 std::string CbmLitDetectorLayout::ToString() const
 {
 	std::stringstream ss;
+	ss.precision(7);
     ss << "Detector Layout:" << std::endl
        << "-number of station groups: " << GetNofStationGroups() << std::endl
        << "-number of detector planes: " << GetNofPlanes() << std::endl

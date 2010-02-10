@@ -59,9 +59,13 @@ std::string CbmLitTrackParam::ToString() const
 {
 	std::stringstream ss;
 	ss << "TrackParam: pos=(" << fX << "," << fY << "," << fZ
-    	      << ") tx=" << fTx << " ty=" << fTy << " qp=" << fQp << std::endl;
+    	      << ") tx=" << fTx << " ty=" << fTy << " qp=" << fQp;// << std::endl;
 //	ss << "cov: ";
 //	for (Int_t i = 0; i < 15; i++) ss << fCovMatrix[i] << " ";
 //	ss << std::endl;
+	ss.precision(3);
+	ss << " cov: x=" << fCovMatrix[0] <<  " y=" << fCovMatrix[5]
+	   <<  " tx=" << fCovMatrix[9] <<  " ty=" << fCovMatrix[12]
+	   <<  " q/p=" << fCovMatrix[14] << std::endl;
 	return ss.str();
 }

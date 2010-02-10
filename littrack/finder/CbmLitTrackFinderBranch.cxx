@@ -85,6 +85,7 @@ void CbmLitTrackFinderBranch::InitTrackSeeds(
 		if (fUsedSeedsSet.find(track->GetPreviousTrackId()) != fUsedSeedsSet.end()) continue;
 		CbmLitTrack* newTrack = new CbmLitTrack(*track);
 		newTrack->SetPDG(fPDG);
+		newTrack->SetChi2(0.);
 		fTracks.push_back(newTrack);
 	}
 }

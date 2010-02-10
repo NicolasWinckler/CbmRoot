@@ -240,10 +240,13 @@ void CbmLitEnvironment::TrdLayout()
 					TGeoNode* layer = (TGeoNode*) layers->At(iLayer);
 					const Double_t* layerPos = layer->GetMatrix()->GetTranslation();
 
+					Double_t Zmodule = 0.;
 					TObjArray* layerParts;
 					if (IsTrdSegmented()) {
 						TGeoNode* module = (TGeoNode*) layer->GetNodes()->At(0);
 						layerParts = module->GetNodes();
+						const Double_t* modPos = module->GetMatrix()->GetTranslation();
+						Zmodule = modPos[2];
 					} else {
 						layerParts = layer->GetNodes();
 					}
@@ -256,7 +259,7 @@ void CbmLitEnvironment::TrdLayout()
 							TGeoPgon* shape = (TGeoPgon*) layerPart->GetVolume()->GetShape();
 							CbmLitStation sta;
 							CbmLitSubstation substation;
-							substation.SetZ(stationPos[2] + layerPos[2] + pos[2] - shape->GetDZ());
+							substation.SetZ(stationPos[2] + layerPos[2] + pos[2] - shape->GetDZ() + Zmodule + 0.001);
 							sta.SetType(kLITPIXELHIT);
 							sta.AddSubstation(substation);
 							stationSet.insert(sta);

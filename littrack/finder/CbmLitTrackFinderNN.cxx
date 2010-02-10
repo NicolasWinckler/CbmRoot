@@ -83,6 +83,7 @@ void CbmLitTrackFinderNN::InitTrackSeeds(
 		if ((*track)->GetQuality() == kLITBAD) continue;
 		if (fUsedSeedsSet.find((*track)->GetPreviousTrackId()) != fUsedSeedsSet.end()) continue;
 		(*track)->SetPDG(fPDG);
+		(*track)->SetChi2(0.);
 		fTracks.push_back(new CbmLitTrack(*(*track)));
 	}
 }
@@ -157,9 +158,15 @@ bool CbmLitTrackFinderNN::AddNearestHit(
 	HitPtrIterator hit(hits[0].second);
 	myf chiSq = 1e10;
 	for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
+//		std::cout<< "pred: " << par[iSubstation].ToString();
 		for (HitPtrIterator iHit = hits[iSubstation].first; iHit != hits[iSubstation].second; iHit++) {
 			//First update track parameters with KF, than check whether the hit is in the validation gate.
 			fFilter->Update(&par[iSubstation], &uPar, *iHit);
+//			std::cout<< "upd: " << uPar.ToString();
+//			std::cout << (*iHit)->ToString();
+//			std::cout << (*iHit)->GetPlaneId() << " pred p=" << 1./par[iSubstation].GetQp() << std::endl;
+//			std::cout << (*iHit)->GetPlaneId() << " upd p=" << 1./uPar.GetQp() << std::endl;
+//			std::cout << (*iHit)->GetPlaneId() << " " << ChiSq(&uPar, *iHit) << std::endl;
 			if (IsHitInValidationGate(&uPar, *iHit)) {
 				myf chi = ChiSq(&uPar, *iHit);
 				// Check if current hit is closer by statistical distance than the previous ones

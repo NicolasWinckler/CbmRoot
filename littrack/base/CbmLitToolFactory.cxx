@@ -176,7 +176,7 @@ TrackSelectionPtr CbmLitToolFactory::CreateTrackSelection(
 	} else
 	if(name == "momentum_seed") {
 		CbmLitTrackSelectionMomentum* momSelection = new CbmLitTrackSelectionMomentum();
-		momSelection->SetMinMomentum(1.5);
+		momSelection->SetMinMomentum(1.0);
 		momSelection->Initialize();
 		TrackSelectionPtr selection(momSelection);
 		return selection;
@@ -224,7 +224,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 	if(name == "e_nn") {
 		CbmLitTrackFinderNN* trdFinderNN = new CbmLitTrackFinderNN();
 		trdFinderNN->SetPropagator(CreateTrackPropagator("lit"));
-		trdFinderNN->SetSeedSelection(CreateTrackSelection("empty"));//momentum"));
+		trdFinderNN->SetSeedSelection(CreateTrackSelection("momentum"));
 		trdFinderNN->SetFinalSelection(CreateTrackSelection("trd_final"));
 		trdFinderNN->SetFilter(CreateTrackUpdate("kalman"));
 		trdFinderNN->SetLayout(CbmLitEnvironment::Instance()->GetLayout());

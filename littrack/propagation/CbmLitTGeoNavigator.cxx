@@ -46,32 +46,23 @@ LitStatus CbmLitTGeoNavigator::FindIntersections(
 	CbmLitMaterialInfo stepInfo;
 	bool last = false;
 
+	std::cout.precision(7);
+
 	do {
 		fGeo->PushPoint();
 		stepInfo = MakeStep();
-//		std::cout << "FIRST STEP: " << stepInfo.ToString();
 		if(fGeo->IsOutside()) {
 			fGeo->PopDummy();
 			return kLITERROR;
 		}
-		if (stepInfo.GetZpos() <= zOut + 1e-3 && stepInfo.GetZpos() >= zOut - 1e-3) {
-//			std::cout << "3 Current before:" << " " << fGeo->GetCurrentPoint()[0] << " " <<  fGeo->GetCurrentPoint()[1] << " " << fGeo->GetCurrentPoint()[2] << std::endl;
-			last = true;
-			fGeo->PopDummy();
-//			std::cout << "3 Current after:" << " " << fGeo->GetCurrentPoint()[0] << " " <<  fGeo->GetCurrentPoint()[1] << " " << fGeo->GetCurrentPoint()[2] << std::endl;
-		} else
-		if (stepInfo.GetZpos() > zOut) {
-//			std::cout << "1 Current before:" << " " << fGeo->GetCurrentPoint()[0] << " " <<  fGeo->GetCurrentPoint()[1] << " " << fGeo->GetCurrentPoint()[2] << std::endl;
+		if ((stepInfo.GetZpos() >= zOut)){
 			fGeo->PopPoint();
-//			std::cout << "1 Current after:" << " " << fGeo->GetCurrentPoint()[0] << " " <<  fGeo->GetCurrentPoint()[1] << " " << fGeo->GetCurrentPoint()[2] << std::endl;
 			myf l = CalcLength(zOut);
-			stepInfo = MakeStep(l);
+			stepInfo.SetLength(l);
+			stepInfo.SetZpos(zOut);
 			last = true;
-		} else
-		if (stepInfo.GetZpos() < zOut){
-//			std::cout << "2 Current before:" << " " << fGeo->GetCurrentPoint()[0] << " " <<  fGeo->GetCurrentPoint()[1] << " " << fGeo->GetCurrentPoint()[2] << std::endl;
+		} else {
 			fGeo->PopDummy();
-//			std::cout << "2 Current after:" << " " << fGeo->GetCurrentPoint()[0] << " " <<  fGeo->GetCurrentPoint()[1] << " " << fGeo->GetCurrentPoint()[2] << std::endl;
 		}
 		inter.push_back(stepInfo);
 	} while (!last);
@@ -83,8 +74,7 @@ void CbmLitTGeoNavigator::InitTrack(
 {
 	myf nx, ny, nz;
 	par->GetDirCos(nx, ny, nz);
-	fGeo->InitTrack(par->GetX(), par->GetY(), par->GetZ(),
-			               nx, ny, nz);
+	fGeo->InitTrack(par->GetX(), par->GetY(), par->GetZ(), nx, ny, nz);
 }
 
 CbmLitMaterialInfo CbmLitTGeoNavigator::MakeStep(
@@ -107,11 +97,6 @@ CbmLitMaterialInfo CbmLitTGeoNavigator::MakeStep(
 
 	matInfo.SetLength(fGeo->GetStep());
 	matInfo.SetZpos(fGeo->GetCurrentPoint()[2]);
-
-//	if (fGeo->GetCurrentPoint()[2] > 100. && fGeo->GetCurrentPoint()[2] < 970.) {
-//		std::cout << "step=" << fGeo->GetStep()  << ";" << step << " z=" << fGeo->GetCurrentPoint()[2]
-//			<< " rl=" <<  fGeo->GetStep() / matInfo.GetRL() << " " << matInfo.ToString();
-//	}
 
 	return matInfo;
 }

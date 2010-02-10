@@ -72,7 +72,7 @@ LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 			LitStatus result1;
 			if (F != NULL) result1 = fLineExtrapolator->Extrapolate(par, zOut, &F2);
 			else result1 = fLineExtrapolator->Extrapolate(par, zOut, NULL);
-			if (F != NULL && result1 == kLITSUCCESS) Mult25(F1, F2, *F);
+			if (F != NULL && result1 == kLITSUCCESS) Mult25(F2, F1, *F);
 			return result1;
 	    };
 	} else
@@ -87,7 +87,7 @@ LitStatus CbmLitCleverTrackExtrapolator::Extrapolate(
 			LitStatus result1;
 			if (F != NULL) result1 = fRK4Extrapolator->Extrapolate(par, zOut, &F2);
 			else result1 = fRK4Extrapolator->Extrapolate(par, zOut, NULL);
-			if (F != NULL && result1 == kLITSUCCESS) Mult25(F1, F2, *F);
+			if (F != NULL && result1 == kLITSUCCESS) Mult25(F2, F1, *F);
 			return result1;
 		}
 	}

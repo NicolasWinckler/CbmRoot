@@ -7,6 +7,7 @@
 #include "CbmLitTrack.h"
 
 #include <iostream>
+#include <cmath>
 
 myf ChiSq(
 		const CbmLitTrackParam* par,
@@ -95,6 +96,9 @@ myf ChiSq(
 
 	myf chi2 = (-dx * dx * (dyy - C5) - dy * dy * (dxx - C0) + 2 * dx * dy * (dxy - C1)) / norm;
 
+//    chi2 = dx * dx / (dxx - C0) + dy * dy / (dyy - C5);
+//    std::cout << hit->GetPlaneId() << " chi2=" << chi2  << " first=" << dx * dx / (dxx - C0)<< " dx=" << dx << " dxx=" << dxx << " C0=" << C0
+//	          << " second=" << dy * dy / (dyy - C5) << " dy=" << dy << " dyy=" << dyy << " C5=" << C5 << std::endl;
 	return chi2;
 }
 

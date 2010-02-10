@@ -30,6 +30,7 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
+#include <fstream>
 
 // histogram types
 const Int_t ACC=0; // accepted tracks histogram
@@ -70,6 +71,8 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
 	fNofTrdTracks = 0;
 	fNofMuchTracks = 0;
 	fNofTofHits = 0;
+
+	fOutputDir = "";
 }
 
 CbmLitReconstructionQa::~CbmLitReconstructionQa()
@@ -103,7 +106,7 @@ void CbmLitReconstructionQa::Finish()
 {
 	CalculateEfficiencyHistos();
 	WriteToFile();
-	PrintFinalStatistics();
+	PrintFinalStatistics(std::cout);
 	Draw();
 }
 
@@ -523,7 +526,7 @@ void CbmLitReconstructionQa::CreateHistos()
 	std::string hittype[] = { "All", "True", "Fake", "TrueOverAll", "FakeOverAll" };
 	Double_t hitmin[] = {0, 0, 0, -0.1, -0.1};
 	Double_t hitmax[] = {20, 20, 20, 1.1, 1.1};
-	Int_t hitbins[] = {20, 20, 20, 100, 12};
+	Int_t hitbins[] = {20, 20, 20, 12, 12};
 	fhStsTrackHits.resize(nofHitsHistos);
 	fhTrdTrackHits.resize(nofHitsHistos);
 	fhMuchTrackHits.resize(nofHitsHistos);
@@ -603,30 +606,31 @@ void CbmLitReconstructionQa::PrintEventStatistics()
 	std::cout << "Efficiency TOF matching:      " << EventEfficiencyStatisticsToString(fhTofMom, "event");
 }
 
-void CbmLitReconstructionQa::PrintFinalStatistics()
+void CbmLitReconstructionQa::PrintFinalStatistics(
+		std::ostream& out)
 {
-	std::cout << "-I- CbmLitReconstructionQa final statistics:" << std::endl;
-	std::cout << "Number of rec tracks (per event/total): " << std::endl;
-	std::cout << "  global=(" << (Double_t)fNofGlobalTracks/(Double_t)fEventNo << "/" << fNofGlobalTracks << ")" << std::endl;
-	if (fIsSts) std::cout << "  STS=(" << (Double_t)fNofStsTracks/(Double_t)fEventNo << "/" << fNofStsTracks << ")" << std::endl;
-	if (fIsTrd) std::cout << "  TRD=(" << (Double_t)fNofTrdTracks/(Double_t)fEventNo << "/" << fNofTrdTracks << ")" << std::endl;
-	if (fIsMuch) std::cout << "  MUCH=(" << (Double_t)fNofMuchTracks/(Double_t)fEventNo << "/" << fNofMuchTracks << ")" << std::endl;
-	if (fIsTof) std::cout << "  TOF=(" << (Double_t)fNofTofHits/(Double_t)fEventNo << "/" << fNofTofHits << ")" << std::endl;
+	out << "-I- CbmLitReconstructionQa final statistics:" << std::endl;
+	out << "Number of rec tracks (per event/total): " << std::endl;
+	out << "  global=(" << (Double_t)fNofGlobalTracks/(Double_t)fEventNo << "/" << fNofGlobalTracks << ")" << std::endl;
+	if (fIsSts) out << "  STS=(" << (Double_t)fNofStsTracks/(Double_t)fEventNo << "/" << fNofStsTracks << ")" << std::endl;
+	if (fIsTrd) out << "  TRD=(" << (Double_t)fNofTrdTracks/(Double_t)fEventNo << "/" << fNofTrdTracks << ")" << std::endl;
+	if (fIsMuch) out << "  MUCH=(" << (Double_t)fNofMuchTracks/(Double_t)fEventNo << "/" << fNofMuchTracks << ")" << std::endl;
+	if (fIsTof) out << "  TOF=(" << (Double_t)fNofTofHits/(Double_t)fEventNo << "/" << fNofTofHits << ")" << std::endl;
 
-	std::cout << "Efficiency STS:" << std::endl << EventEfficiencyStatisticsToString(fhStsMom, "final");
-	std::cout << "Efficiency STS+TRD(MUCH):" << std::endl << EventEfficiencyStatisticsToString(fhHalfGlobalMom, "final");
-	std::cout << "Efficiency STS+TRD(MUCH)+TOF: " << std::endl << EventEfficiencyStatisticsToString(fhGlobalMom, "final");
-	std::cout << "Efficiency TRD(MUCH):" << std::endl << EventEfficiencyStatisticsToString(fhRecMom, "final");
-	std::cout << "Efficiency TOF matching:" << std::endl << EventEfficiencyStatisticsToString(fhTofMom, "final");
+	out << "Efficiency STS:" << std::endl << EventEfficiencyStatisticsToString(fhStsMom, "final");
+	out << "Efficiency STS+TRD(MUCH):" << std::endl << EventEfficiencyStatisticsToString(fhHalfGlobalMom, "final");
+	out << "Efficiency STS+TRD(MUCH)+TOF: " << std::endl << EventEfficiencyStatisticsToString(fhGlobalMom, "final");
+	out << "Efficiency TRD(MUCH):" << std::endl << EventEfficiencyStatisticsToString(fhRecMom, "final");
+	out << "Efficiency TOF matching:" << std::endl << EventEfficiencyStatisticsToString(fhTofMom, "final");
 
 	Double_t stsGhosts, recGhosts;
 	stsGhosts = fhStsGhostNh->GetEntries();
 	recGhosts = fhRecGhostNh->GetEntries();
 	if (fIsSts)
-		std::cout << "Ghosts STS (per event/total): " << stsGhosts/fEventNo << "/" << stsGhosts << std::endl;
+		out << "Ghosts STS (per event/total): " << stsGhosts/fEventNo << "/" << stsGhosts << std::endl;
 	if (fIsMuch || fIsTrd)
-		std::cout << "Ghosts TRD(MUCH) (per event/total): " << recGhosts/fEventNo << "/" << recGhosts << std::endl;
-	std::cout << "-------------------------------------------------------------" << std::endl;
+		out << "Ghosts TRD(MUCH) (per event/total): " << recGhosts/fEventNo << "/" << recGhosts << std::endl;
+	out << "-------------------------------------------------------------" << std::endl;
 }
 
 std::string CbmLitReconstructionQa::EventEfficiencyStatisticsToString(
@@ -688,6 +692,8 @@ void CbmLitReconstructionQa::Draw()
 	DrawEfficiencyHistos();
 	DrawHitsHistos();
 	DrawHitsStationHistos();
+	std::ofstream fout(std::string(fOutputDir + "rec_qa.txt").c_str());
+	PrintFinalStatistics(fout);
 }
 
 void CbmLitReconstructionQa::DrawEfficiencyHistos()
@@ -702,7 +708,7 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 	else if (fIsTrd && !fIsMuch) rname = "TRD";
 	else if (fIsTrd && fIsMuch) rname = "MUCH+TRD";
 	std::string hgname(sname + "+" + rname);
-	std::string gname = hgname += "+TOF";
+	std::string gname = hgname + "+TOF";
 
 	std::string signal;
 	if (fIsMuch) signal = "muons"; else signal = "electrons";
@@ -755,7 +761,7 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, "",
 			false, false, true, 0.3,0.3,0.85,0.6);
 
-	SaveCanvasAsImage(c1);
+	SaveCanvasAsImage(c1, fOutputDir);
 }
 
 Double_t CbmLitReconstructionQa::CalcEfficiency(
@@ -807,7 +813,7 @@ void CbmLitReconstructionQa::DrawHitsHistos(
 				"",
 				false, true, true, 0.25,0.99,0.55,0.75);
 
-	SaveCanvasAsImage(c);
+	SaveCanvasAsImage(c, fOutputDir);
 }
 
 void CbmLitReconstructionQa::DrawHitsStationHistos()
@@ -817,7 +823,7 @@ void CbmLitReconstructionQa::DrawHitsStationHistos()
 	   DrawHist1D(fhTrdNofHitsInStation, "Station number", "Number of hits",
 	   			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 	   			LIT_MARKER_STYLE1, false, false, "");
-	   SaveCanvasAsImage(cTrdHits);
+	   SaveCanvasAsImage(cTrdHits, fOutputDir);
    }
 
    if (fIsMuch){
@@ -825,7 +831,7 @@ void CbmLitReconstructionQa::DrawHitsStationHistos()
 	   DrawHist1D(fhMuchNofHitsInStation, "Station number", "Number of hits",
 	   			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 	   			LIT_MARKER_STYLE1, false, false, "");
-	   SaveCanvasAsImage(cMuchHits);
+	   SaveCanvasAsImage(cMuchHits, fOutputDir);
    }
 
    if (fIsTof){
@@ -833,7 +839,7 @@ void CbmLitReconstructionQa::DrawHitsStationHistos()
 	   DrawHist1D(fhTofNofHitsInStation, "Station number", "Number of hits",
 	   			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 	   			LIT_MARKER_STYLE1, false, false, "");
-	   SaveCanvasAsImage(cTofHits);
+	   SaveCanvasAsImage(cTofHits, fOutputDir);
    }
 }
 

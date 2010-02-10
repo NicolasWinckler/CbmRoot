@@ -94,6 +94,12 @@ public:
      */
 	void SetVerbose(Int_t verbose) { fVerbose = verbose;}
 
+    /**
+     * Sets the output directory for images.
+     * @param dir Directory name.
+     */
+	void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
+
 private:
     /**
      * Derived from FairTask. Executed after all events are processed.
@@ -188,8 +194,10 @@ private:
 
     /**
      * Prints final statistics.
+     * @param out Output stream
      */
-	void PrintFinalStatistics();
+	void PrintFinalStatistics(
+			std::ostream& out);
 
     /**
      * Calculates integrated efficiencies and forms string with statistic information.
@@ -320,6 +328,8 @@ private:
 	Int_t fNofTofHits; // TOF hits
 
 	Int_t fEventNo; // Event counter
+
+	std::string fOutputDir; // Output directory for images
 
 	ClassDef(CbmLitReconstructionQa, 1);
 };

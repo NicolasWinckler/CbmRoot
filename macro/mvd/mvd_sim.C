@@ -34,8 +34,8 @@
   TString pipeGeom = "pipe_standard.geo";
 
   // Magnet geometry and field map
-  TString magnetGeom  = "magnet_standard.geo";
-  TString fieldMap    = "FieldMuonMagnet";
+  TString magnetGeom  = "magnet_muon_standard.geo";
+  TString fieldMap    = "field_muon_standard";
   Double_t fieldZ     = 50.;     // z position of field centre
   Double_t fieldScale = 1.;      // field scaling factor
 
@@ -69,9 +69,12 @@
   gSystem->Load("libBase");
   gSystem->Load("libCbmBase");
   gSystem->Load("libCbmData");
+//  gSystem->Load("libCbmGenerators");
   gSystem->Load("libField");
+
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
+
   gSystem->Load("libMvd");
   // ------------------------------------------------------------------------
 
@@ -114,10 +117,10 @@
 
 
 
-  // -----   Create magnetic field   ----------------------------------------
-  if ( fieldMap == "FieldActive" || fieldMap == "FieldIron")
+  // -----   Create magnetic field   ---------------------------------------
+  if ( fieldMap == "field_electron_standard" )
     magField = new CbmFieldMapSym3(fieldMap);
-  else if ( fieldMap == "FieldAlligator" )
+  else if ( fieldMap == "field_muon_standard" )
     magField = new CbmFieldMapSym2(fieldMap);
   else if ( fieldMap = "FieldMuonMagnet" )
     magField = new CbmFieldMapSym3(fieldMap);
@@ -133,7 +136,7 @@
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
-  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
   primGen->AddGenerator(urqmdGen);
   fRun->SetGenerator(primGen);       

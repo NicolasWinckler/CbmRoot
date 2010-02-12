@@ -4,10 +4,13 @@
 export SCRIPT=yes
 
 #Build directory of CBMROOT
-export MYBUILDDIR=/home/andrey/cbm/trunk/build/
+export MYBUILDDIR=/u/andrey/cbm/trunk_new/buildnew/
 
 #Output directory for simulation files
-export DIR=/home/d/andrey/test
+export DIR=/d/cbm02/andrey/muchstd18_10mu
+
+#Output directory for image files
+export IMAGEDIR=./test/much1_10mu
 
 # CBM setup that will be used for simulation: "muon" or "electron"
 export DETECTORSETUP=muon
@@ -47,6 +50,8 @@ if [ $DETECTORSETUP = "muon" ]; then
     export MVDGEOM=
     export STSGEOM=sts_standard.geo
     export MUCHGEOM=much_standard_2layers.geo
+    #MUCH digitization file
+    export MUCHDIGI=$VMCWORKDIR/parameters/much/much_standard_2layers.digi.root
     export RICHGEOM=
     export TRDGEOM=
 #trd_muon_setup_new.geo   
@@ -70,11 +75,8 @@ else
     export MAGNETGEOM=magnet_electron_standard.geo
 fi
 
-#MUCH digitization file
-export MUCHDIGI=$VMCWORKDIR/parameters/much/much_standard_2layers.digi.root
-
 #number of events for each thread
-export NEVENTS=100
+export NEVENTS=1000
 
 for Y in 0; do
  for X in 0; do

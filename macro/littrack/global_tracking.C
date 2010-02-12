@@ -10,10 +10,12 @@ void global_tracking(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString dir, mcFile, parFile, globalHitsFile, globalTracksFile;
+	TString dir, imageDir, mcFile, parFile, globalHitsFile, globalTracksFile;
 	if (script != "yes") {
 		// Output directory
 		dir  = "/home/d/andrey/stdtrd_1pi/";
+		//Output directory for images
+		imageDir = "./test/much1_10mu/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file
@@ -27,13 +29,14 @@ void global_tracking(Int_t nEvents = 1000)
 		parFile = TString(gSystem->Getenv("PARFILE"));
 		globalHitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
 		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
+		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
 	}
 
 	Int_t iVerbose = 1;
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -80,13 +83,13 @@ void global_tracking(Int_t nEvents = 1000)
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
 	reconstructionQa->SetMinNofPointsTrd(9);
-	reconstructionQa->SetMinNofPointsMuch(11);
+	reconstructionQa->SetMinNofPointsMuch(12);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(9);
 	reconstructionQa->SetMinNofHitsMuch(11);
 	reconstructionQa->SetVerbose(1);
-	reconstructionQa->SetOutputDir("./test/");
+	reconstructionQa->SetOutputDir(std::string(imageDir));
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------
 

@@ -33,33 +33,24 @@ public:
 
 private:
 
-	void SerialParamToParallel(
-			const CbmLitTrackParam& par,
-			LitTrackParam<fvec>& lpar);
-
-
-	void ParallelParamToSerial(
-			const LitTrackParam<fvec>& lpar,
-			CbmLitTrackParam& par);
-
 	int PlaneId(
 			int stationGroup,
 			int station,
 			int substation,
-			LitDetectorLayout<fvec>& layout) const;
+			LitDetectorLayout<fscal>& layout) const;
 
 	bool CheckHit(
 			int stationGroup,
 			int station,
 			int substation,
-			LitDetectorLayout<fvec>& layout,
+			LitDetectorLayout<fscal>& layout,
 			CbmLitTrack* track);
 
 	void SerialHitToParallel(
 			const CbmLitPixelHit& hit,
-			LitPixelHit<fvec>& lhit);
+			LitPixelHit<fscal>& lhit);
 
-	LitDetectorLayout<fvec> fLayout;
+	LitDetectorLayout<fscal> fLayout;
 };
 
 #endif /* CBMLITPARALLELTRACKFITTERTEST_H_ */

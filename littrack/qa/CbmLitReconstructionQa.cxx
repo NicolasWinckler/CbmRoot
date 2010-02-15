@@ -755,6 +755,8 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 	hname2 += "(" + ToString<Double_t>(CalcEfficiency(fhHalfGlobalMom[cat][REC], fhHalfGlobalMom[cat][ACC])) + ")";
 	hname3 += "(" + ToString<Double_t>(CalcEfficiency(fhGlobalMom[cat][REC], fhGlobalMom[cat][ACC])) + ")";
 	c2->cd();
+	fhStsMom[cat][EFF]->SetMinimum(0.);
+	fhStsMom[cat][EFF]->SetMaximum(1.);
 	DrawHist1D(fhStsMom[cat][EFF], fhHalfGlobalMom[cat][EFF], fhGlobalMom[cat][EFF],
 				"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3,
 				false, false, true, 0.3,0.3,0.85,0.6);

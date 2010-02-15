@@ -7,6 +7,8 @@
 #ifndef LITFIELD_H_
 #define LITFIELD_H_
 
+//#define LIT_USE_THIRD_DEGREE 1;
+
 #include "parallel/LitMath.h"
 
 template<class T>
@@ -22,15 +24,24 @@ public:
 template<class T>
 class LitFieldSlice
 {
+private:
+	// number of polynom coefficients
+#ifdef LIT_USE_THIRD_DEGREE
+	static const unsigned int N = 10; // for the 3rd degree polynom
+#else
+	static const unsigned int N = 21; // for the 5th degree polynom
+#endif
+
 public:
 	LitFieldSlice() {
-		for(unsigned int i=0; i<10; i++) cx[i] = cy[i] = cz[i] = 0.;
+		for(unsigned int i=0; i<N; i++) cx[i] = cy[i] = cz[i] = 0.;
     }
 
 	void GetFieldValue(
 			const T &x,
 			const T &y,
 			LitFieldValue<T> &B) const {
+#ifdef LIT_USE_THIRD_DEGREE
 		T x2 = x*x;
 		T y2 = y*y;
 		T yx2 = y*x2;
@@ -40,20 +51,41 @@ public:
 		B.Bx = cx[0] + cx[1]*x + cx[2]*y + cx[3]*x*y + cx[4]*x2 + cx[5]*y2 + cx[6]*xy2 + cx[7]*yx2 + cx[8]*x3 + cx[9]*y3;
 		B.By = cy[0] + cy[1]*x + cy[2]*y + cy[3]*x*y + cy[4]*x2 + cy[5]*y2 + cy[6]*xy2 + cy[7]*yx2 + cy[8]*x3 + cy[9]*y3;
 		B.Bz = cz[0] + cz[1]*x + cz[2]*y + cz[3]*x*y + cz[4]*x2 + cz[5]*y2 + cz[6]*xy2 + cz[7]*yx2 + cz[8]*x3 + cz[9]*y3;
-    }
+#else
+		T x2 = x*x;
+		T y2 = y*y;
+		T yx2 = y*x2;
+		T xy2 = x*y2;
+		T x3 = x2*x;
+		T y3 = y2*y;
+		T x4 = x2*x2;
+		T y4 = y2*y2;
+		T x5 = x4*x;
+		T y5 = y4*y;
+		B.Bx = cx[0] + cx[1]*x + cx[2]*y + cx[3]*x*y + cx[4]*x2 + cx[5]*y2 + cx[6]*xy2 + cx[7]*yx2 + cx[8]*x3 + cx[9]*y3 +
+			   cx[10]*x2*y2 + cx[11]*x*y3 + cx[12]*y*x3 + cx[13]*x4 + cx[14]*y4 + cx[15]*x2*y3 + cx[16]*y2*x3 +
+			   cx[17]*x*y4 + cx[18]*y*x4 + cx[19]*x5 + cx[20]*y5;
+		B.By = cy[0] + cy[1]*x + cy[2]*y + cy[3]*x*y + cy[4]*x2 + cy[5]*y2 + cy[6]*xy2 + cy[7]*yx2 + cy[8]*x3 + cy[9]*y3 +
+			   cy[10]*x2*y2 + cy[11]*x*y3 + cy[12]*y*x3 + cy[13]*x4 + cy[14]*y4 + cy[15]*x2*y3 + cy[16]*y2*x3 +
+			   cy[17]*x*y4 + cy[18]*y*x4 + cy[19]*x5 + cy[20]*y5;
+		B.Bz = cz[0] + cz[1]*x + cz[2]*y + cz[3]*x*y + cz[4]*x2 + cz[5]*y2 + cz[6]*xy2 + cz[7]*yx2 + cz[8]*x3 + cz[9]*y3 +
+			   cz[10]*x2*y2 + cz[11]*x*y3 + cz[12]*y*x3 + cz[13]*x4 + cz[14]*y4 + cz[15]*x2*y3 + cz[16]*y2*x3 +
+			   cz[17]*x*y4 + cz[18]*y*x4 + cz[19]*x5 + cz[20]*y5;
+#endif
+	}
 
-	T cx[10], cy[10], cz[10]; // polinom coefficients
+	T cx[N], cy[N], cz[N]; // polinom coefficients
 	T Z; // Z position of the slice
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitFieldSlice &slice){
 		strm << "LitFieldSlice: Z=" << slice.Z << ", cx=";
-		for(unsigned int i = 0; i < 10; i++) strm << slice.cx[i] << " ";
+		for(unsigned int i = 0; i < N; i++) strm << slice.cx[i] << " ";
 		strm << std::endl;
 		strm << "LitFieldSlice: cy=";
-		for(unsigned int i = 0; i < 10; i++) strm << slice.cy[i] << " ";
+		for(unsigned int i = 0; i < N; i++) strm << slice.cy[i] << " ";
 		strm << std::endl;
 		strm << "LitFieldSlice: cz=";
-		for(unsigned int i = 0; i < 10; i++) strm << slice.cz[i] << " ";
+		for(unsigned int i = 0; i < N; i++) strm << slice.cz[i] << " ";
 		strm << std::endl;
 		return strm;
 	}

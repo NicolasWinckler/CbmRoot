@@ -383,7 +383,13 @@ void CbmLitEnvironment::GetMuchLayout(
 		LitDetectorLayout<T>& layout)
 {
 	std::cout << "Getting layout for parallel version of tracking..." << std::endl;
-	CbmLitFieldFitter fieldFitter(3);
+#ifdef LIT_USE_THIRD_DEGREE
+	CbmLitFieldFitter fieldFitter(3); // set polynom degree
+	static const unsigned int N = 10; // set number of coefficients
+#else
+	CbmLitFieldFitter fieldFitter(5); // set polynom degree
+	static const unsigned int N = 21; // set number of coefficients
+#endif
 	std::cout << "Field fitter initialized" << std::endl;
 	CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
 	std::cout << "Simple geometry constructor initialized" << std::endl;
@@ -407,7 +413,7 @@ void CbmLitEnvironment::GetMuchLayout(
 		fieldFitter.FitSlice(aZ[1], aparBx[1], aparBy[1], aparBz[1]);
 		sg.absorber.fieldSliceFront.Z = aZ[0];
 		sg.absorber.fieldSliceBack.Z = aZ[1];
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < N; i++) {
 			sg.absorber.fieldSliceFront.cx[i] = aparBx[0][i];
 			sg.absorber.fieldSliceFront.cy[i] = aparBy[0][i];
 			sg.absorber.fieldSliceFront.cz[i] = aparBz[0][i];
@@ -447,7 +453,7 @@ void CbmLitEnvironment::GetMuchLayout(
 				std::vector<double> parBx, parBy, parBz;
 				ss.fieldSlice.Z = substation.GetZ();
 				fieldFitter.FitSlice(substation.GetZ(), parBx, parBy, parBz);
-				for (int i = 0; i < 10; i++) {
+				for (int i = 0; i < N; i++) {
 					ss.fieldSlice.cx[i] = parBx[i];
 					ss.fieldSlice.cy[i] = parBy[i];
 					ss.fieldSlice.cz[i] = parBz[i];

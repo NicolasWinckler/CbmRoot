@@ -1,10 +1,8 @@
-/*
- * CbmLitParallelTrackFitterTest.h
- *
- *  Created on: Sep 24, 2009
- *      Author: andrey
- */
-
+/** CbmLitParallelTrackFitterTest.h
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
+ **/
 #ifndef CBMLITPARALLELTRACKFITTERTEST_H_
 #define CBMLITPARALLELTRACKFITTERTEST_H_
 
@@ -12,12 +10,9 @@
 #include "CbmLitPixelHit.h"
 #include "parallel/LitDetectorGeometry.h"
 #include "parallel/LitHit.h"
-#include "parallel/LitTypes.h"
-#include "parallel/LitTrackParam.h"
 
 class CbmLitTrack;
 class CbmLitTrackParam;
-//class LitTrackParam;
 
 class CbmLitParallelTrackFitterTest : public CbmLitTrackFitter {
 public:
@@ -33,16 +28,16 @@ public:
 
 private:
 
-	int PlaneId(
-			int stationGroup,
-			int station,
-			int substation,
+	unsigned char PlaneId(
+			unsigned char stationGroup,
+			unsigned char station,
+			unsigned char substation,
 			LitDetectorLayout<fscal>& layout) const;
 
 	bool CheckHit(
-			int stationGroup,
-			int station,
-			int substation,
+			unsigned char stationGroup,
+			unsigned char station,
+			unsigned char substation,
 			LitDetectorLayout<fscal>& layout,
 			CbmLitTrack* track);
 

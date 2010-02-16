@@ -1,10 +1,8 @@
-/*
- * CbmLitParallelTrackFitterTest.cxx
- *
- *  Created on: Sep 24, 2009
- *      Author: andrey
- */
-
+/** CbmLitParallelTrackFitterTest.cxx
+ * @author Andrey Lebedev <andrey.lebedev@gsi.de>
+ * @since 2009
+ * @version 1.0
+ **/
 #include "CbmLitParallelTrackFitterTest.h"
 #include "CbmLitEnvironment.h"
 #include "CbmLitTrack.h"
@@ -62,7 +60,7 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
 
     int ihit = 0;
 
-	for (int isg = 0; isg < fLayout.GetNofStationGroups(); isg++) {
+	for (unsigned char isg = 0; isg < fLayout.GetNofStationGroups(); isg++) {
 		LitStationGroup<fscal> stationGroup = fLayout.stationGroups[isg];
 	    //Propagation through the absorber
 	    LitFieldRegion<fscal> field;
@@ -73,6 +71,20 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
 	    field.Set(v1, absorber.fieldSliceFront.Z, v2, absorber.fieldSliceBack.Z);
 	    LitRK4Extrapolation(lpar, absorber.Z, field);
 	    LitAddMaterial(lpar, absorber.material);
+	    //propagate through the absorber using steps
+	    // first extrapolate input track parameters to the absorber
+//	    LitRK4Extrapolation(lpar, absorber.Z - absorber.material.Thickness, field);
+//	    int nofSteps = 8;
+//	    fscal step = (absorber.Z - lpar.Z) / nofSteps;
+//	    fscal z = lpar.Z;
+//	    LitMaterialInfo<fscal> mat = absorber.material;
+//	    mat.Thickness = step;
+//	    for (int iStep = 0; iStep < nofSteps; iStep++) {
+//	    	z += step;
+//	    	LitRK4Extrapolation(lpar, z, field);
+//	    	LitAddMaterial(lpar, mat);
+//	    }
+	    //end propagate through the absorber using steps
 
 	    //Approximate the field between the absorbers
 	    LitSubstation<fscal> ss1 = stationGroup.stations[0].substations[0];
@@ -80,11 +92,12 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
 	    ss1.fieldSlice.GetFieldValue(lpar.X, lpar.Y, v1);
 	    ss2.fieldSlice.GetFieldValue(lpar.X, lpar.Y, v2);
 	    field.Set(v1, ss1.fieldSlice.Z, v2, ss2.fieldSlice.Z);
-	    for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
+	    for (unsigned char ist = 0; ist < stationGroup.GetNofStations(); ist++) {
 	    	 LitStation<fscal> station = stationGroup.stations[ist];
-	    	 for (int iss = 0; iss < station.GetNofSubstations(); iss++) {
+	    	 for (unsigned char iss = 0; iss < station.GetNofSubstations(); iss++) {
 	    		LitSubstation<fscal> substation = station.substations[iss];
 				// Propagation through station
+
 				LitRK4Extrapolation(lpar, substation.Z, field);
 				LitAddMaterial(lpar, substation.material);
 
@@ -119,21 +132,21 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
 	return kLITSUCCESS;
 }
 
-int CbmLitParallelTrackFitterTest::PlaneId(
-		int stationGroup,
-		int station,
-		int substation,
+unsigned char CbmLitParallelTrackFitterTest::PlaneId(
+		unsigned char stationGroup,
+		unsigned char station,
+		unsigned char substation,
 		LitDetectorLayout<fscal>& layout) const
 {
 	int counter = 0;
-	for(int i = 0; i < stationGroup; i++) {
-		for(int j = 0; j < layout.stationGroups[i].GetNofStations(); j++) {
+	for(unsigned char i = 0; i < stationGroup; i++) {
+		for(unsigned char j = 0; j < layout.stationGroups[i].GetNofStations(); j++) {
 			counter += layout.stationGroups[i].stations[j].GetNofSubstations();
 		}
 //		counter++; // count for absorber
 	}
 //	counter++;//again count for absorber
-	for(int j = 0; j < station; j++) {
+	for(unsigned char j = 0; j < station; j++) {
 		counter += layout.stationGroups[stationGroup].stations[j].GetNofSubstations();
 	}
 	counter += substation;
@@ -144,14 +157,14 @@ int CbmLitParallelTrackFitterTest::PlaneId(
 }
 
 bool CbmLitParallelTrackFitterTest::CheckHit(
-		int stationGroup,
-		int station,
-		int substation,
+		unsigned char stationGroup,
+		unsigned char station,
+		unsigned char substation,
 		LitDetectorLayout<fscal>& layout,
 		CbmLitTrack* track)
 {
-	int planeId = PlaneId(stationGroup, station, substation, layout);
-	for (int i = 0; i < track->GetNofHits(); i++) {
+	unsigned char planeId = PlaneId(stationGroup, station, substation, layout);
+	for (unsigned int i = 0; i < track->GetNofHits(); i++) {
 		const CbmLitHit* hit = track->GetHit(i);
 		if (hit->GetPlaneId() == planeId) return true;
 	}

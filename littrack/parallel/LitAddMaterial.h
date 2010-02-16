@@ -30,7 +30,7 @@ inline void LitAddMaterial(
 	static const T me = 0.000511; // Electron mass [GeV/c]
 	static const T ratio = me / mass;
 
-	T p = ONE / par.Qp; // Momentum [GeV/c]
+	T p = sgn(par.Qp) / par.Qp; // Momentum [GeV/c]
 	T E = sqrt(massSq + p * p);
 	T beta = p / E;
 	T betaSq = beta * beta;
@@ -41,8 +41,8 @@ inline void LitAddMaterial(
 	T norm = sqrt(ONE + par.Tx * par.Tx + par.Ty * par.Ty);
 	T thickness = norm * mat.Thickness;
 	T radThick = thickness / mat.X0;
-	T sqrtRadThick = sqrt(radThick);//mat.SqrtRadThick;//sqrt(radThick);
-	T logRadThick = log(radThick);//mat.LogRadThick;//log(radThick);
+	T sqrtRadThick = sqrt(radThick);//mat.SqrtRadThick;
+	T logRadThick = log(radThick);//mat.LogRadThick;
 
 	/*
 	 * Energy loss corrections
@@ -55,52 +55,56 @@ inline void LitAddMaterial(
 	// density correction
 	T dc = ZERO;
 //	if (p > 0.5) { // for particles above 1 Gev
-//		static const T c7 = 28.816;
-//		static const T c8 = 1e-9;
-//		T hwp = c7 * sqrt(mat.Rho * mat.Z / mat.A) * c8; // GeV
-//		dc = log(hwp/mat.I) + log(beta*gamma) - C1_2;
+		static const T c7 = 28.816;
+		static const T c8 = 1e-9;
+		T hwp = c7 * sqrt(mat.Rho * mat.Z / mat.A) * c8; // GeV
+		dc = log(hwp/mat.I) + log(beta*gamma) - C1_2;
 //	}
 
 	T bbLoss = K * (mat.Z / mat.A) * rcp(betaSq) *
 			(C1_2 * log(TWO * me * betaSq * gammaSq * Tmax / (mat.I * mat.I)) - betaSq - dc);
 
 	// Bethe-Heitler
-	T bhLoss = (E * ratio * ratio)/(mat.X0 * mat.Rho);
+//	T bhLoss = (E * ratio * ratio)/(mat.X0 * mat.Rho);
+	T bhLoss = ZERO;
 
 	// Pair production approximation
-	static const T c3 = 7e-5;
-	T ppLoss = c3 * E / (mat.X0 * mat.Rho);
+//	static const T c3 = 7e-5;
+//	T ppLoss = c3 * E / (mat.X0 * mat.Rho);
+	T ppLoss = ZERO;
 
 	// Integrated value of the energy loss
 	T energyLoss = (bbLoss + bhLoss + ppLoss) * mat.Rho * thickness;
 
 	// Correct Q/p value due to energy loss
-//	T q = sgn(par.Qp);//(ZERO < par.Qp) ? ONE: -ONE;
 	T Enew = E - energyLoss;
-//	T pnew = (mass < Enew) ? sqrt(Enew * Enew - massSq) : ZERO;
-//	par.Qp = (pnew != ZERO) ? q / pnew : INF;
 	T pnew = sqrt(Enew * Enew - massSq);
 	par.Qp = sgn(par.Qp) * rcp(pnew);
 
 	// Calculate Q/p correction in the covariance matrix
+	T betanew = pnew / Enew;
+	T betaSqnew = betanew * betanew;
+	T gammanew = Enew / mass;
+	T gammaSqnew = gammanew * gammanew;
+
 	// Calculate xi factor (KeV).
 	static const T c4 = 153.5;
-	T XI = (c4 * mat.Z * thickness * mat.Rho)/(mat.A * betaSq);
+	T XI = (c4 * mat.Z * thickness * mat.Rho)/(mat.A * betaSqnew);
 
 	// Maximum energy transfer to atomic electron (KeV).
-	T eta = beta * gamma;
-	T etaSq = eta * eta;
-	T F1 = TWO * me * etaSq;
-	T F2 = ONE + TWO * ratio * gamma + ratio * ratio;
+	T etanew = betanew * gammanew;
+	T etaSqnew = etanew * etanew;
+	T F1 = TWO * me * etaSqnew;
+	T F2 = ONE + TWO * ratio * gammanew + ratio * ratio;
 	static const T c5 = 1e6;
 	T emax = c5 * F1/F2;
 
 	static const T c6 = 1e-12;
-	T dedxSq = XI * emax * (ONE - C1_2 * betaSq) * c6;
+	T dedxSq = XI * emax * (ONE - C1_2 * betaSqnew) * c6;
 
-	T p2 = p * p;
+	T p2 = pnew * pnew;
 	T p6 = p2 * p2 * p2;
-	T qpCorr = (E * E * dedxSq) / p6;
+	T qpCorr = (Enew * Enew * dedxSq) / p6;
 	par.C14 += qpCorr; //abs(qpCorr);
 	// end calculate Q/p correction in the covariance matrix
 
@@ -113,8 +117,7 @@ inline void LitAddMaterial(
 	 */
 	T tx = par.Tx;
 	T ty = par.Ty;
-	T bcp = beta * p;
-
+	T bcp = betanew * pnew;
 	static const T c1 = 0.0136, c2 = 0.038;
 	T theta = c1 * rcp(bcp) * sqrtRadThick * (ONE + c2 * logRadThick);
 	T thetaSq = theta * theta;

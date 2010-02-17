@@ -8,7 +8,7 @@ void run_reco(Int_t nEvents = 10)
   //          Adjust this part according to your requirements
 
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
-  Int_t iVerbose = 0;
+  Int_t iVerbose =2;
 
   // Input file (MC events)
   TString inFile = "/d/cbm02/slebedev/rich/JUL09/test/auau.25gev.centr.0000.mc.root";
@@ -59,19 +59,24 @@ void run_reco(Int_t nEvents = 10)
   // =========================================================================
 
   // -----   STS digitizer   -------------------------------------------------
-  FairTask* stsDigitize = new CbmStsDigitize(iVerbose);
+  FairTask* stsDigitize = new CbmStsIdealDigitize(iVerbose);
   run->AddTask(stsDigitize);
   // -------------------------------------------------------------------------
 
+  // -----   STS Cluster Finder   --------------------------------------------
+//  FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",
+//                               iVerbose);
+//  run->AddTask(stsClusterFinder);
+  // -------------------------------------------------------------------------
 
   // -----  STS hit finding   ------------------------------------------------
-  FairTask* stsFindHits = new CbmStsFindHits(iVerbose);
+  FairTask* stsFindHits = new CbmStsIdealFindHits(iVerbose);
   run->AddTask(stsFindHits);
   // -------------------------------------------------------------------------
 
 
   // -----  STS hit matching   -----------------------------------------------
-  CbmStsMatchHits* stsMatchHits = new CbmStsMatchHits(iVerbose);
+  CbmStsIdealMatchHits* stsMatchHits = new CbmStsIdealMatchHits(iVerbose);
   run->AddTask(stsMatchHits);
   // -------------------------------------------------------------------------
 

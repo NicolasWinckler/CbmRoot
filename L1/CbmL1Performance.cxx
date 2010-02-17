@@ -33,45 +33,47 @@ using std::vector;
 using std::pair;
 using std::map;
 
-
-static int L1_NMTRA_D0              = 0;
-static int L1_NMTRA_TOTAL           = 0;
-static int L1_NMTRA_FAST            = 0;
-static int L1_NMTRA_FAST_PRIM       = 0;
-static int L1_NMTRA_FAST_SEC        = 0;
-static int L1_NMTRA_SLOW            = 0;
-static int L1_NMTRA_SLOW_PRIM       = 0;
-static int L1_NMTRA_SLOW_SEC        = 0;
-
-static int L1_NMTRA_D0_RECO         = 0;
-static int L1_NMTRA_TOTAL_RECO      = 0;
-static int L1_NMTRA_FAST_RECO       = 0;
-static int L1_NMTRA_FAST_PRIM_RECO  = 0;
-static int L1_NMTRA_FAST_SEC_RECO   = 0;
-static int L1_NMTRA_SLOW_RECO       = 0;
-static int L1_NMTRA_SLOW_PRIM_RECO  = 0;
-static int L1_NMTRA_SLOW_SEC_RECO   = 0;
-static int L1_NTRACKS               = 0;
-static int L1_NCLONES               = 0;
-static int L1_NGHOSTS               = 0;
-
-static int L1_NMTRA_D0_KILLED         = 0;
-static int L1_NMTRA_TOTAL_KILLED      = 0;
-static int L1_NMTRA_FAST_KILLED       = 0;
-static int L1_NMTRA_FAST_PRIM_KILLED  = 0;
-static int L1_NMTRA_FAST_SEC_KILLED   = 0;
-static int L1_NMTRA_SLOW_KILLED       = 0;
-static int L1_NMTRA_SLOW_PRIM_KILLED  = 0;
-static int L1_NMTRA_SLOW_SEC_KILLED   = 0;
-
-static int L1_NHITS[20], L1_NFAKES[20];
-
-static int L1_NEVENTS               = 0;
-static double L1_CATIME             = 0.0;
-
-
 void CbmL1::Performance()
 {
+
+  static int L1_NMTRA_D0              = 0;
+  static int L1_NMTRA_TOTAL           = 0;
+  static int L1_NMTRA_FAST            = 0;
+  static int L1_NMTRA_LONG_FAST_PRIM       = 0;
+  static int L1_NMTRA_FAST_PRIM       = 0;
+  static int L1_NMTRA_FAST_SEC        = 0;
+  static int L1_NMTRA_SLOW            = 0;
+  static int L1_NMTRA_SLOW_PRIM       = 0;
+  static int L1_NMTRA_SLOW_SEC        = 0;
+
+  static int L1_NMTRA_D0_RECO         = 0;
+  static int L1_NMTRA_TOTAL_RECO      = 0;
+  static int L1_NMTRA_FAST_RECO       = 0;
+  static int L1_NMTRA_LONG_FAST_PRIM_RECO  = 0;
+  static int L1_NMTRA_FAST_PRIM_RECO  = 0;
+  static int L1_NMTRA_FAST_SEC_RECO   = 0;
+  static int L1_NMTRA_SLOW_RECO       = 0;
+  static int L1_NMTRA_SLOW_PRIM_RECO  = 0;
+  static int L1_NMTRA_SLOW_SEC_RECO   = 0;
+  static int L1_NTRACKS               = 0;
+  static int L1_NCLONES               = 0;
+  static int L1_NGHOSTS               = 0;
+
+  static int L1_NMTRA_D0_KILLED         = 0;
+  static int L1_NMTRA_TOTAL_KILLED      = 0;
+  static int L1_NMTRA_FAST_KILLED       = 0;
+  static int L1_NMTRA_LONG_FAST_PRIM_KILLED  = 0;
+  static int L1_NMTRA_FAST_PRIM_KILLED  = 0;
+  static int L1_NMTRA_FAST_SEC_KILLED   = 0;
+  static int L1_NMTRA_SLOW_KILLED       = 0;
+  static int L1_NMTRA_SLOW_PRIM_KILLED  = 0;
+  static int L1_NMTRA_SLOW_SEC_KILLED   = 0;
+
+  static int L1_NHITS[20], L1_NFAKES[20];
+
+  static int L1_NEVENTS               = 0;
+  static double L1_CATIME             = 0.0;
+  
   typedef  map<CbmL1MCTrack*, CbmL1Track*>  Mtrartramap;
   typedef  map<CbmL1MCTrack*, CbmL1Track*>::iterator MtrartramapIt;
   Mtrartramap   mtrartramap, mtrartradistortmap;
@@ -136,46 +138,46 @@ void CbmL1::Performance()
       histodir->mkdir("Fit");
       gDirectory->cd("Fit");
       {
-	struct {    
-	  const char *name;
-	  const char *title;
-	  Int_t n;
-	  Double_t l,r;
-	} Table[10]= 
-	  { 
-	    {"x",  "Residual X [#mum]",                   100, -100., 100.},
-	    {"y",  "Residual Y [#mum]",                   100, -100., 100.},
-	    {"tx", "Residual Tx [mrad]",                  100,   -2.,   2.},
-	    {"ty", "Residual Ty [mrad]",                  100,   -2.,   2.},
-	    {"P",  "Resolution P/Q [100%]",               100,   -.1,  .1 },
-	    {"px", "Pull X [residual/estimated_error]",   100,  -10.,  10.},
-	    {"py", "Pull Y [residual/estimated_error]",   100,  -10.,  10.},
-	    {"ptx","Pull Tx [residual/estimated_error]",  100,  -10.,  10.},
-	    {"pty","Pull Ty [residual/estimated_error]",  100,  -10.,  10.},
-	    {"pQP","Pull Q/P [residual/estimated_error]", 100,  -10.,  10.}
-	  };
-	
-	for( int i=0; i<10; i++ ){
-	  char n[225], t[255];
-	  sprintf(n,"fst_%s",Table[i].name);
-	  sprintf(t,"First point %s",Table[i].title);
-	  h_fit[i] = new TH1F(n,t, Table[i].n, Table[i].l, Table[i].r);
-	  sprintf(n,"lst_%s",Table[i].name);
-	  sprintf(t,"Last point %s",Table[i].title);
-	  h_fitL[i] = new TH1F(n,t, Table[i].n, Table[i].l, Table[i].r);
-	}
-	h_fit_chi2 = new TH1F("h_fit_chi2", "Chi2/NDF", 50, -0.5, 10.0);
+      struct {
+        const char *name;
+        const char *title;
+        Int_t n;
+        Double_t l,r;
+      } Table[10]=
+        {
+          {"x",  "Residual X [#mum]",                   100, -100., 100.},
+          {"y",  "Residual Y [#mum]",                   100, -100., 100.},
+          {"tx", "Residual Tx [mrad]",                  100,   -2.,   2.},
+          {"ty", "Residual Ty [mrad]",                  100,   -2.,   2.},
+          {"P",  "Resolution P/Q [100%]",               100,   -.1,  .1 },
+          {"px", "Pull X [residual/estimated_error]",   100,  -10.,  10.},
+          {"py", "Pull Y [residual/estimated_error]",   100,  -10.,  10.},
+          {"ptx","Pull Tx [residual/estimated_error]",  100,  -10.,  10.},
+          {"pty","Pull Ty [residual/estimated_error]",  100,  -10.,  10.},
+          {"pQP","Pull Q/P [residual/estimated_error]", 100,  -10.,  10.}
+        };
+      
+      for( int i=0; i<10; i++ ){
+        char n[225], t[255];
+        sprintf(n,"fst_%s",Table[i].name);
+        sprintf(t,"First point %s",Table[i].title);
+        h_fit[i] = new TH1F(n,t, Table[i].n, Table[i].l, Table[i].r);
+        sprintf(n,"lst_%s",Table[i].name);
+        sprintf(t,"Last point %s",Table[i].title);
+        h_fitL[i] = new TH1F(n,t, Table[i].n, Table[i].l, Table[i].r);
+      }
+      h_fit_chi2 = new TH1F("h_fit_chi2", "Chi2/NDF", 50, -0.5, 10.0);
       }
       gDirectory->cd("..");
 
       p_eff_all_vs_mom = new TProfile("p_eff_all_vs_mom", "AllSet Efficiency vs Momentum",
-				     100, 0.0, 5.0, 0.0, 100.0);
+                     100, 0.0, 5.0, 0.0, 100.0);
       p_eff_prim_vs_mom = new TProfile("p_eff_prim_vs_mom", "All Primary Set Efficiency vs Momentum",
-				     100, 0.0, 5.0, 0.0, 100.0);
+                     100, 0.0, 5.0, 0.0, 100.0);
       p_eff_sec_vs_mom = new TProfile("p_eff_sec_vs_mom", "All Secondary Set Efficiency vs Momentum",
-				     100, 0.0, 5.0, 0.0, 100.0);
+                     100, 0.0, 5.0, 0.0, 100.0);
       p_eff_d0_vs_mom = new TProfile("p_eff_d0_vs_mom", "D0 Secondary Tracks Efficiency vs Momentum",
-				     150, 0.0, 15.0, 0.0, 100.0);
+                     150, 0.0, 15.0, 0.0, 100.0);
 
       h_reg_mom_prim   = new TH1F("h_reg_mom_prim", "Momentum of registered primary tracks", 500, 0.0, 5.0);
       h_reg_mom_sec   = new TH1F("h_reg_mom_sec", "Momentum of registered secondary tracks", 500, 0.0, 5.0);
@@ -212,17 +214,17 @@ void CbmL1::Performance()
       h_reco_clean = new TH1F("h_reco_clean", "Percentage of correct hits", 100, -0.5, 100.5);
       h_reco_time = new TH1F("h_reco_time", "CA Track Finder Time (s/ev)", 20, 0.0, 20.0);
       h_reco_timeNtr = new TProfile("h_reco_timeNtr", 
-				    "CA Track Finder Time (s/ev) vs N Tracks", 
-				    200, 0.0, 1000.0);
+                    "CA Track Finder Time (s/ev) vs N Tracks",
+                    200, 0.0, 1000.0);
       h_reco_timeNhit = new TProfile("h_reco_timeNhit", 
-				    "CA Track Finder Time (s/ev) vs N Hits", 
-				    200, 0.0, 30000.0);
+                    "CA Track Finder Time (s/ev) vs N Hits",
+                    200, 0.0, 30000.0);
       h_reco_fakeNtr = new TProfile("h_reco_fakeNtr", 
-				    "N Fake hits vs N Tracks", 
-				    200, 0.0, 1000.0);
+                    "N Fake hits vs N Tracks",
+                    200, 0.0, 1000.0);
       h_reco_fakeNhit = new TProfile("h_reco_fakeNhit", 
-				    "N Fake hits vs N Hits", 
-				    200, 0.0, 30000.0);
+                    "N Fake hits vs N Hits",
+                    200, 0.0, 30000.0);
 
       h_reco_d0_mom = new TH1F("h_reco_d0_mom", "Momentum of reco D0 track", 150, 0.0, 15.0);
       /*
@@ -307,8 +309,8 @@ void CbmL1::Performance()
       curdir->cd();      
       
       for (int i = 0; i < algo->NStations; i++){
-	L1_NHITS[i]  = 0;
-	L1_NFAKES[i] = 0;
+      L1_NHITS[i]  = 0;
+      L1_NFAKES[i] = 0;
       }
 
     }// first_call 
@@ -374,17 +376,17 @@ void CbmL1::Performance()
     hitmap.clear();
     
     for (vector<int>::iterator ih = (rtraIt->StsHits).begin();
-	 ih != (rtraIt->StsHits).end(); ++ih){
+       ih != (rtraIt->StsHits).end(); ++ih){
       //L1StsHit &h = algo->vStsHits[*ih];
       vHitUsed[*ih]=1;
       int ID = -1;
       int iMC = vHitMCRef[*ih];
       if (iMC >= 0)
-	ID = vMCPoints[iMC].ID;
+      ID = vMCPoints[iMC].ID;
       if(hitmap.find(ID) == hitmap.end())
-	hitmap.insert(pair<int, int>(ID, 1));
+      hitmap.insert(pair<int, int>(ID, 1));
       else{
-	hitmap[ID] += 1;
+      hitmap[ID] += 1;
       }
       hitsum++;
     }
@@ -396,8 +398,8 @@ void CbmL1::Performance()
       CbmL1HitStore &mh = vHitStore[prtra->StsHits[0]];
       h_reco_station->Fill(mh.iStation);
       if (prtra->NDF > 0){
-	h_reco_chi2->Fill(prtra->chi2/prtra->NDF);
-	h_reco_prob->Fill(TMath::Erf(sqrt(fabs(prtra->chi2/prtra->NDF))));
+      h_reco_chi2->Fill(prtra->chi2/prtra->NDF);
+      h_reco_prob->Fill(TMath::Erf(sqrt(fabs(prtra->chi2/prtra->NDF))));
       }
     }
     
@@ -410,41 +412,41 @@ void CbmL1::Performance()
       if (posIt->first < 0) continue; //not a MC track - based on fake hits
 
       if (100.0*double(posIt->second) > max_percent*double(hitsum)) 
-	max_percent = 100.0*double(posIt->second)/double(hitsum);
+      max_percent = 100.0*double(posIt->second)/double(hitsum);
       
       if ( double(posIt->second) > 0.7*double(hitsum) ){ //MTRA reconstructed
-	
-	if (pmctrackmap.find(posIt->first) == pmctrackmap.end()) continue;
-	CbmL1MCTrack* pmtra = pmctrackmap[posIt->first]; //pointer to MC track
-	CbmL1Track* prtra = &(*rtraIt);
-	
-	mtrartramap.insert(pair<CbmL1MCTrack*, CbmL1Track*>(pmtra, prtra));
-	rtramtramap.insert(pair<CbmL1Track*, CbmL1MCTrack*>(prtra, pmtra));
-	
-	momentum = pmtra->p;
-	  
-	if(pmtramap.find(pmtra) == pmtramap.end())
-	  pmtramap.insert(pair<CbmL1MCTrack*, int>(pmtra, 1));
-	else{
-	  pmtramap[pmtra]++;
-	}
-	
-	ghost = 0;
+      
+      if (pmctrackmap.find(posIt->first) == pmctrackmap.end()) continue;
+      CbmL1MCTrack* pmtra = pmctrackmap[posIt->first]; //pointer to MC track
+      CbmL1Track* prtra = &(*rtraIt);
+      
+      mtrartramap.insert(pair<CbmL1MCTrack*, CbmL1Track*>(pmtra, prtra));
+      rtramtramap.insert(pair<CbmL1Track*, CbmL1MCTrack*>(prtra, pmtra));
+      
+      momentum = pmtra->p;
+      
+      if(pmtramap.find(pmtra) == pmtramap.end())
+        pmtramap.insert(pair<CbmL1MCTrack*, int>(pmtra, 1));
+      else{
+        pmtramap[pmtra]++;
+      }
+      
+      ghost = 0;
 
       }
       else{ // MTRA destorted
-	if (pmctrackmap.find(posIt->first) == pmctrackmap.end()) continue;
-	CbmL1MCTrack* pmtra = pmctrackmap[posIt->first]; //pointer to MC track
-	CbmL1Track* prtra = &(*rtraIt);
-	
-	mtrartradistortmap.insert(pair<CbmL1MCTrack*, CbmL1Track*>(pmtra, prtra));
-	rtramtradistortmap.insert(pair<CbmL1Track*, CbmL1MCTrack*>(prtra, pmtra));
-	
-	if(rtradistortmap.find(prtra) == rtradistortmap.end())
-	  rtradistortmap.insert(pair<CbmL1Track*, int>(prtra, 1));
-	else{
-	  rtradistortmap[prtra]++;
-	}
+      if (pmctrackmap.find(posIt->first) == pmctrackmap.end()) continue;
+      CbmL1MCTrack* pmtra = pmctrackmap[posIt->first]; //pointer to MC track
+      CbmL1Track* prtra = &(*rtraIt);
+      
+      mtrartradistortmap.insert(pair<CbmL1MCTrack*, CbmL1Track*>(pmtra, prtra));
+      rtramtradistortmap.insert(pair<CbmL1Track*, CbmL1MCTrack*>(prtra, pmtra));
+      
+      if(rtradistortmap.find(prtra) == rtradistortmap.end())
+        rtradistortmap.insert(pair<CbmL1Track*, int>(prtra, 1));
+      else{
+        rtradistortmap[prtra]++;
+      }
       }
     }
 
@@ -456,31 +458,31 @@ void CbmL1::Performance()
       CbmL1Track* prtra = &(*rtraIt);
       //cout << "Ghost T[4] " << prtra->T[4] << endl;
       if( fabs(prtra->T[4])>1.e-10) 
-	h_ghost_mom->Fill(fabs(1.0/prtra->T[4]));
+      h_ghost_mom->Fill(fabs(1.0/prtra->T[4]));
       h_ghost_nhits->Fill((prtra->StsHits).size());
       CbmL1HitStore &h1 = vHitStore[prtra->StsHits[0]];
       CbmL1HitStore &h2 = vHitStore[prtra->StsHits[1]];
       h_ghost_fstation->Fill(h1.iStation);
       if (prtra->NDF > 0){
-	h_ghost_chi2->Fill(prtra->chi2/prtra->NDF);
-	h_ghost_prob->Fill(TMath::Erf(sqrt(fabs(prtra->chi2/prtra->NDF))));
+      h_ghost_chi2->Fill(prtra->chi2/prtra->NDF);
+      h_ghost_prob->Fill(TMath::Erf(sqrt(fabs(prtra->chi2/prtra->NDF))));
       }
       h_ghost_r->Fill(sqrt(fabs(h1.x*h1.x+h1.y*h1.y)));
       double z1 = algo->vStations[h1.iStation].z[0];
       double z2 = algo->vStations[h2.iStation].z[0];
       if( fabs(z2-z1)>1.e-4 ){
-	h_ghost_tx->Fill((h2.x-h1.x)/(z2-z1));
-	h_ghost_ty->Fill((h2.y-h1.y)/(z2-z1));
+      h_ghost_tx->Fill((h2.x-h1.x)/(z2-z1));
+      h_ghost_ty->Fill((h2.y-h1.y)/(z2-z1));
       }
 
       if( fabs(prtra->T[4])>1.e-10) 
-	h2_ghost_nhits_vs_mom->Fill(fabs(1.0/prtra->T[4]), (prtra->StsHits).size());
+      h2_ghost_nhits_vs_mom->Fill(fabs(1.0/prtra->T[4]), (prtra->StsHits).size());
       CbmL1HitStore &hf = vHitStore[prtra->StsHits[0]];
       CbmL1HitStore &hl = vHitStore[prtra->StsHits[(prtra->StsHits).size()-1]];
       if( fabs(prtra->T[4])>1.e-10) 
-	h2_ghost_fstation_vs_mom->Fill(fabs(1.0/prtra->T[4]), hf.iStation+1);
+      h2_ghost_fstation_vs_mom->Fill(fabs(1.0/prtra->T[4]), hf.iStation+1);
       if (hl.iStation >= hf.iStation)
-	h2_ghost_lstation_vs_fstation->Fill(hf.iStation+1, hl.iStation+1);
+      h2_ghost_lstation_vs_fstation->Fill(hf.iStation+1, hl.iStation+1);
 
     }
     
@@ -489,7 +491,7 @@ void CbmL1::Performance()
   // clone 
   /*
   for (vector<CbmL1Track>::iterator rtraIt = vRTracks.begin(); rtraIt != vRTracks.end(); ++rtraIt){
-         	
+               
     CbmL1Track* prtra = &(*rtraIt);
     
     if( rtramtramap.find(prtra) == rtramtramap.end() ) continue;
@@ -499,7 +501,7 @@ void CbmL1::Performance()
     if( pmtramap[pmtra]<=1 ) continue;
     CbmL1HitStore &fh = vHitStore[prtra->StsHits[0]];
     CbmL1HitStore &lh = vHitStore[prtra->StsHits[prtra->StsHits.size()-1]];
-    cout<<"clone "<<pmtra->ID<<" "<<fh.iStation<<" "<<lh.iStation<<endl;	
+    cout<<"clone "<<pmtra->ID<<" "<<fh.iStation<<" "<<lh.iStation<<endl;      
   }
   */
 
@@ -507,6 +509,7 @@ void CbmL1::Performance()
   int nmtra_d0         = 0;
   int nmtra_total      = 0;
   int nmtra_fast       = 0;
+  int nmtra_long_fast_prim  = 0;
   int nmtra_fast_prim  = 0;
   int nmtra_fast_sec   = 0;
   int nmtra_slow       = 0;
@@ -516,6 +519,7 @@ void CbmL1::Performance()
   int nmtra_d0_reco    = 0;
   int nmtra_total_reco = 0;
   int nmtra_fast_reco  = 0;
+  int nmtra_long_fast_prim_reco  = 0;
   int nmtra_fast_prim_reco  = 0;
   int nmtra_fast_sec_reco   = 0;
   int nmtra_slow_reco  = 0;
@@ -526,6 +530,7 @@ void CbmL1::Performance()
   int nmtra_d0_killed    = 0;
   int nmtra_total_killed = 0;
   int nmtra_fast_killed  = 0;
+  int nmtra_long_fast_prim_killed  = 0;
   int nmtra_fast_prim_killed  = 0;
   int nmtra_fast_sec_killed   = 0;
   int nmtra_slow_killed  = 0;
@@ -542,7 +547,7 @@ void CbmL1::Performance()
   }
 
   for ( map<int, CbmL1MCTrack*>::iterator mtraIt = pmctrackmap.begin();
-	mtraIt != pmctrackmap.end(); mtraIt++ ) {
+      mtraIt != pmctrackmap.end(); mtraIt++ ) {
       
     // No Sts hits? 
     int nmchits = (mtraIt->second)->StsHits.size();
@@ -558,7 +563,7 @@ void CbmL1::Performance()
    int sta_count = 0;
     int ista = -1;
     for( vector<int>::iterator ih = (mtraIt->second)->StsHits.begin();
-	 ih!= (mtraIt->second)->StsHits.end(); ++ih){
+       ih!= (mtraIt->second)->StsHits.end(); ++ih){
       CbmL1HitStore &mh = vHitStore[*ih];
       if (mh.iStation <= ista ) continue;
       sta_count++;
@@ -573,15 +578,15 @@ void CbmL1::Performance()
       h2_reg_nhits_vs_mom_prim->Fill(momentum, sta_count);
       h2_reg_fstation_vs_mom_prim->Fill(momentum, fh.iStation+1);
       if (lh.iStation >= fh.iStation)
-	h2_reg_lstation_vs_fstation_prim->Fill(fh.iStation+1, lh.iStation+1);
+      h2_reg_lstation_vs_fstation_prim->Fill(fh.iStation+1, lh.iStation+1);
     }else{
       h_reg_mom_sec->Fill(momentum);
       h_reg_nhits_sec->Fill(sta_count);
       if (momentum > 0.01){
-	h2_reg_nhits_vs_mom_sec->Fill(momentum, sta_count);
-	h2_reg_fstation_vs_mom_sec->Fill(momentum, fh.iStation+1);
-	if (lh.iStation >= fh.iStation)
-	  h2_reg_lstation_vs_fstation_sec->Fill(fh.iStation+1, lh.iStation+1);
+      h2_reg_nhits_vs_mom_sec->Fill(momentum, sta_count);
+      h2_reg_fstation_vs_mom_sec->Fill(momentum, fh.iStation+1);
+      if (lh.iStation >= fh.iStation)
+        h2_reg_lstation_vs_fstation_sec->Fill(fh.iStation+1, lh.iStation+1);
       }
     }
       
@@ -600,15 +605,15 @@ void CbmL1::Performance()
       h2_acc_nhits_vs_mom_prim->Fill(momentum, sta_count);
       h2_acc_fstation_vs_mom_prim->Fill(momentum, fh.iStation+1);
       if (lh.iStation >= fh.iStation)
-	h2_acc_lstation_vs_fstation_prim->Fill(fh.iStation+1, lh.iStation+1);
+      h2_acc_lstation_vs_fstation_prim->Fill(fh.iStation+1, lh.iStation+1);
     }else{
       h_acc_mom_sec->Fill(momentum);
       h_acc_nhits_sec->Fill(sta_count);
       if (momentum > 0.01){
-	h2_acc_nhits_vs_mom_sec->Fill(momentum, sta_count);
-	h2_acc_fstation_vs_mom_sec->Fill(momentum, fh.iStation+1);
-	if (lh.iStation >= fh.iStation)
-	  h2_acc_lstation_vs_fstation_sec->Fill(fh.iStation+1, lh.iStation+1);
+      h2_acc_nhits_vs_mom_sec->Fill(momentum, sta_count);
+      h2_acc_fstation_vs_mom_sec->Fill(momentum, fh.iStation+1);
+      if (lh.iStation >= fh.iStation)
+        h2_acc_lstation_vs_fstation_sec->Fill(fh.iStation+1, lh.iStation+1);
       }
     }
       
@@ -636,58 +641,60 @@ void CbmL1::Performance()
       h_tx->Fill((mtraIt->second)->px/(mtraIt->second)->pz);
       h_ty->Fill((mtraIt->second)->py/(mtraIt->second)->pz);
     }
-      
 
     bool reco = (pmtramap.find(mtraIt->second) != pmtramap.end());
-       
+    bool long_reco = reco && ( mtraIt->second->Points.size() >= NStation );
+    
+    
+        
     if (reco){
       p_eff_all_vs_mom->Fill(momentum, 100.0);
       if ((mtraIt->second)->mother_ID < 0){ // primary
-	p_eff_prim_vs_mom->Fill(momentum, 100.0);
+      p_eff_prim_vs_mom->Fill(momentum, 100.0);
       }else{
-	p_eff_sec_vs_mom->Fill(momentum, 100.0);
+      p_eff_sec_vs_mom->Fill(momentum, 100.0);
       }
       if ((mtraIt->second)->mother_ID < 0){ // primary
-	h_reco_mom_prim->Fill(momentum);
-	h_reco_nhits_prim->Fill(sta_count);
-	h2_reco_nhits_vs_mom_prim->Fill(momentum, sta_count);
-	h2_reco_fstation_vs_mom_prim->Fill(momentum, fh.iStation+1);
-	if (lh.iStation >= fh.iStation)
-	  h2_reco_lstation_vs_fstation_prim->Fill(fh.iStation+1, lh.iStation+1);
+      h_reco_mom_prim->Fill(momentum);
+      h_reco_nhits_prim->Fill(sta_count);
+      h2_reco_nhits_vs_mom_prim->Fill(momentum, sta_count);
+      h2_reco_fstation_vs_mom_prim->Fill(momentum, fh.iStation+1);
+      if (lh.iStation >= fh.iStation)
+        h2_reco_lstation_vs_fstation_prim->Fill(fh.iStation+1, lh.iStation+1);
       }else{
-	h_reco_mom_sec->Fill(momentum);
-	h_reco_nhits_sec->Fill(sta_count);
-	if (momentum > 0.01){
-	  h2_reco_nhits_vs_mom_sec->Fill(momentum, sta_count);
-	  h2_reco_fstation_vs_mom_sec->Fill(momentum, fh.iStation+1);
-	  if (lh.iStation >= fh.iStation)
-	    h2_reco_lstation_vs_fstation_sec->Fill(fh.iStation+1, lh.iStation+1);
-	}
+      h_reco_mom_sec->Fill(momentum);
+      h_reco_nhits_sec->Fill(sta_count);
+      if (momentum > 0.01){
+        h2_reco_nhits_vs_mom_sec->Fill(momentum, sta_count);
+        h2_reco_fstation_vs_mom_sec->Fill(momentum, fh.iStation+1);
+        if (lh.iStation >= fh.iStation)
+          h2_reco_lstation_vs_fstation_sec->Fill(fh.iStation+1, lh.iStation+1);
+      }
       }
     }else{
       h_notfound_mom->Fill(momentum);
       p_eff_all_vs_mom->Fill(momentum, 0.0);
       if ((mtraIt->second)->mother_ID < 0){ // primary
-	p_eff_prim_vs_mom->Fill(momentum, 0.0);
+      p_eff_prim_vs_mom->Fill(momentum, 0.0);
       }else{
-	p_eff_sec_vs_mom->Fill(momentum, 0.0);
+      p_eff_sec_vs_mom->Fill(momentum, 0.0);
       }
       if ((mtraIt->second)->mother_ID < 0){ // primary
-	h_rest_mom_prim->Fill(momentum);
-	h_rest_nhits_prim->Fill(sta_count);
-	h2_rest_nhits_vs_mom_prim->Fill(momentum, sta_count);
-	h2_rest_fstation_vs_mom_prim->Fill(momentum, fh.iStation+1);
-	if (lh.iStation >= fh.iStation)
-	  h2_rest_lstation_vs_fstation_prim->Fill(fh.iStation+1, lh.iStation+1);
+      h_rest_mom_prim->Fill(momentum);
+      h_rest_nhits_prim->Fill(sta_count);
+      h2_rest_nhits_vs_mom_prim->Fill(momentum, sta_count);
+      h2_rest_fstation_vs_mom_prim->Fill(momentum, fh.iStation+1);
+      if (lh.iStation >= fh.iStation)
+        h2_rest_lstation_vs_fstation_prim->Fill(fh.iStation+1, lh.iStation+1);
       }else{
-	h_rest_mom_sec->Fill(momentum);
-	h_rest_nhits_sec->Fill(sta_count);
-	if (momentum > 0.01){
-	  h2_rest_nhits_vs_mom_sec->Fill(momentum, sta_count);
-	  h2_rest_fstation_vs_mom_sec->Fill(momentum, fh.iStation+1);
-	  if (lh.iStation >= fh.iStation)
-	    h2_rest_lstation_vs_fstation_sec->Fill(fh.iStation+1, lh.iStation+1);
-	}
+      h_rest_mom_sec->Fill(momentum);
+      h_rest_nhits_sec->Fill(sta_count);
+      if (momentum > 0.01){
+        h2_rest_nhits_vs_mom_sec->Fill(momentum, sta_count);
+        h2_rest_fstation_vs_mom_sec->Fill(momentum, fh.iStation+1);
+        if (lh.iStation >= fh.iStation)
+          h2_rest_lstation_vs_fstation_sec->Fill(fh.iStation+1, lh.iStation+1);
+      }
       }
     }
 
@@ -697,6 +704,7 @@ void CbmL1::Performance()
     }
  
     bool killed = 0;
+    bool long_killed = 0;
     if(!reco){
       h_notfound_nhits->Fill(nmchits);
       h_notfound_station->Fill(ph.iStation);
@@ -707,19 +715,19 @@ void CbmL1::Performance()
       double z21 = algo->vStations[ph21.iStation].z[0];
       double z22 = algo->vStations[ph22.iStation].z[0];
       if( fabs(z22-z21)>1.e-4 ){
-	h_notfound_tx->Fill((ph22.x-ph21.x)/(z22-z21));
-	h_notfound_ty->Fill((ph22.y-ph21.y)/(z22-z21));
+      h_notfound_tx->Fill((ph22.x-ph21.x)/(z22-z21));
+      h_notfound_ty->Fill((ph22.y-ph21.y)/(z22-z21));
       }
 
       int nusedhits = 0;
       for( vector<int>::iterator ih = (mtraIt->second)->StsHits.begin();
-	   ih != (mtraIt->second)->StsHits.end(); ih++ ){
-	if( vHitUsed[*ih] ) nusedhits++;
+         ih != (mtraIt->second)->StsHits.end(); ih++ ){
+      if( vHitUsed[*ih] ) nusedhits++;
       }
 
-      if( nusedhits >0 ) killed = 1;      
-
+      if( nusedhits >0 ) killed = 1;
     }
+    long_killed = killed && (mtraIt->second->Points.size() >= NStation );
     
     if (((mtraIt->second)->mother_ID < 0)&&((mtraIt->second)->z > 0)){ // D0
       nmtra_d0++;
@@ -741,16 +749,19 @@ void CbmL1::Performance()
       nmtra_fast++;
       if (reco) nmtra_fast_reco++;
       if (killed) nmtra_fast_killed++;
-	
+      
       if ((mtraIt->second)->mother_ID < 0){ // primary
-	nmtra_fast_prim++;
-	if (reco) nmtra_fast_prim_reco++;
-	if (killed) nmtra_fast_prim_killed++;
+        if ( mtraIt->second->Points.size() >= NStation ) nmtra_long_fast_prim++;
+        nmtra_fast_prim++;
+        if (long_reco) nmtra_long_fast_prim_reco++;
+        if (reco) nmtra_fast_prim_reco++;
+        if (long_killed) nmtra_long_fast_prim_killed++;
+        if (killed) nmtra_fast_prim_killed++;
      }
       else{
-	nmtra_fast_sec++;
-	if (reco) nmtra_fast_sec_reco++;
-	if (killed) nmtra_fast_sec_killed++;
+      nmtra_fast_sec++;
+      if (reco) nmtra_fast_sec_reco++;
+      if (killed) nmtra_fast_sec_killed++;
       }
     }
     else{   // extra set of tracks
@@ -759,14 +770,14 @@ void CbmL1::Performance()
       if (killed) nmtra_slow_killed++;
        
       if ((mtraIt->second)->mother_ID < 0){ // primary
-	nmtra_slow_prim++;
-	if (reco) nmtra_slow_prim_reco++;
-	if (killed) nmtra_slow_prim_killed++;
+      nmtra_slow_prim++;
+      if (reco) nmtra_slow_prim_reco++;
+      if (killed) nmtra_slow_prim_killed++;
       }
       else{
-	nmtra_slow_sec++;
-	if (reco) nmtra_slow_sec_reco++;
-	if (killed) nmtra_slow_sec_killed++;
+      nmtra_slow_sec++;
+      if (reco) nmtra_slow_sec_reco++;
+      if (killed) nmtra_slow_sec_killed++;
       }
       
     }
@@ -802,6 +813,7 @@ void CbmL1::Performance()
   L1_NMTRA_D0              += nmtra_d0;
   L1_NMTRA_TOTAL           += nmtra_total;
   L1_NMTRA_FAST            += nmtra_fast;
+  L1_NMTRA_LONG_FAST_PRIM  += nmtra_long_fast_prim;
   L1_NMTRA_FAST_PRIM       += nmtra_fast_prim;
   L1_NMTRA_FAST_SEC        += nmtra_fast_sec;
   L1_NMTRA_SLOW            += nmtra_slow;
@@ -811,6 +823,7 @@ void CbmL1::Performance()
   L1_NMTRA_D0_RECO         += nmtra_d0_reco;
   L1_NMTRA_TOTAL_RECO      += nmtra_total_reco;
   L1_NMTRA_FAST_RECO       += nmtra_fast_reco;
+  L1_NMTRA_LONG_FAST_PRIM_RECO  += nmtra_long_fast_prim_reco;
   L1_NMTRA_FAST_PRIM_RECO  += nmtra_fast_prim_reco;
   L1_NMTRA_FAST_SEC_RECO   += nmtra_fast_sec_reco;
   L1_NMTRA_SLOW_RECO       += nmtra_slow_reco;
@@ -823,6 +836,7 @@ void CbmL1::Performance()
   L1_NMTRA_D0_KILLED         += nmtra_d0_killed;
   L1_NMTRA_TOTAL_KILLED      += nmtra_total_killed;
   L1_NMTRA_FAST_KILLED       += nmtra_fast_killed;
+  L1_NMTRA_LONG_FAST_PRIM_KILLED  += nmtra_long_fast_prim_killed;
   L1_NMTRA_FAST_PRIM_KILLED  += nmtra_fast_prim_killed;
   L1_NMTRA_FAST_SEC_KILLED   += nmtra_fast_sec_killed;
   L1_NMTRA_SLOW_KILLED       += nmtra_slow_killed;
@@ -831,10 +845,11 @@ void CbmL1::Performance()
   
   L1_NEVENTS++;
   
-  double p_total=0.0,p_fast=0.0,p_fast_prim=0.0,p_fast_sec=0.0,p_slow=0.0,p_slow_prim=0.0,p_slow_sec=0.0;
+  double p_total=0.0,p_fast=0.0,p_long_fast_prim=0.0,p_fast_prim=0.0,p_fast_sec=0.0,p_slow=0.0,p_slow_prim=0.0,p_slow_sec=0.0;
   double p_clone=0.0,p_ghost=0.0;
   if (nmtra_total    !=0) p_total = double(nmtra_total_reco)/double(nmtra_total);
   if (nmtra_fast     !=0) p_fast  = double(nmtra_fast_reco)/double(nmtra_fast);
+  if (nmtra_long_fast_prim!=0) p_long_fast_prim  = double(nmtra_long_fast_prim_reco)/double(nmtra_long_fast_prim);
   if (nmtra_fast_prim!=0) p_fast_prim  = double(nmtra_fast_prim_reco)/double(nmtra_fast_prim);
   if (nmtra_fast_sec !=0) p_fast_sec  = double(nmtra_fast_sec_reco)/double(nmtra_fast_sec);
   if (nmtra_slow     !=0) p_slow  = double(nmtra_slow_reco)/double(nmtra_slow);
@@ -843,8 +858,8 @@ void CbmL1::Performance()
   if (ntracks        !=0) p_clone = double(nclones)/double(ntracks);
   if (ntracks        !=0) p_ghost = double(nghosts)/double(ntracks);
   
-  double P_D0=0.0,P_TOTAL=0.0,P_FAST=0.0,P_FAST_PRIM=0.0,P_FAST_SEC=0.0,P_SLOW=0.0,P_SLOW_PRIM=0.0,P_SLOW_SEC=0.0;
-  double K_D0=0.0,K_TOTAL=0.0,K_FAST=0.0,K_FAST_PRIM=0.0,K_FAST_SEC=0.0,K_SLOW=0.0,K_SLOW_PRIM=0.0,K_SLOW_SEC=0.0;
+  double P_D0=0.0,P_TOTAL=0.0,P_FAST=0.0,P_LONG_FAST_PRIM=0.0,P_FAST_PRIM=0.0,P_FAST_SEC=0.0,P_SLOW=0.0,P_SLOW_PRIM=0.0,P_SLOW_SEC=0.0;
+  double K_D0=0.0,K_TOTAL=0.0,K_FAST=0.0,K_LONG_FAST_PRIM=0.0,K_FAST_PRIM=0.0,K_FAST_SEC=0.0,K_SLOW=0.0,K_SLOW_PRIM=0.0,K_SLOW_SEC=0.0;
   double P_CLONE=0.0,P_GHOST=0.0;
   if (L1_NMTRA_D0!=0){
     P_D0 = double(L1_NMTRA_D0_RECO)/double(L1_NMTRA_D0);
@@ -857,6 +872,10 @@ void CbmL1::Performance()
   if (L1_NMTRA_FAST!=0){
     P_FAST  = double(L1_NMTRA_FAST_RECO)/double(L1_NMTRA_FAST);
     K_FAST  = double(L1_NMTRA_FAST_KILLED)/double(L1_NMTRA_FAST);
+  }
+  if (L1_NMTRA_FAST_PRIM!=0){
+    P_LONG_FAST_PRIM  = double(L1_NMTRA_LONG_FAST_PRIM_RECO)/double(L1_NMTRA_LONG_FAST_PRIM);
+    K_LONG_FAST_PRIM  = double(L1_NMTRA_LONG_FAST_PRIM_KILLED)/double(L1_NMTRA_LONG_FAST_PRIM);
   }
   if (L1_NMTRA_FAST_PRIM!=0){
     P_FAST_PRIM  = double(L1_NMTRA_FAST_PRIM_RECO)/double(L1_NMTRA_FAST_PRIM);
@@ -890,41 +909,42 @@ void CbmL1::Performance()
     cout.setf(ios::fixed);
     cout.setf(ios::showpoint);
     cout.precision(3);
-#ifdef XXX
-  cout                                                   << endl;
-  cout << "L1 PER EVENT STAT      : "                    << endl;
-  cout << "MC Refset              : " << nmtra_fast      << endl;
-  cout << "MC Extras              : " << nmtra_slow      << endl;
-  cout << "ALL SIMULATED          : " << nmtra_total     << endl;
-  cout                                                   << endl;
-  cout << "RC Refset              : " << nmtra_fast_reco << endl;
-  cout << "RC Extras              : " << nmtra_slow_reco << endl;
-  cout << "ghosts                 : " << nghosts         << endl;
-  cout << "clones                 : " << nclones         << endl;
-  cout << "ALL RECONSTRUCTED      : " << ntracks         << endl;
-  cout                                                   << endl;
-  cout << "Refset efficiency      : " << p_fast          << endl;
-  cout << "Allset efficiency      : " << p_total         << endl;
-  cout << "Extra  efficiency      : " << p_slow          << endl;
-  cout << "clone  probability     : " << p_clone         << endl;
-  cout << "ghost  probability     : " << p_ghost         << endl;
+    if( fVerbose > 1 ){
+      cout                                                   << endl;
+      cout << "L1 PER EVENT STAT      : "                    << endl;
+      cout << "MC Refset              : " << nmtra_fast      << endl;
+      cout << "MC Extras              : " << nmtra_slow      << endl;
+      cout << "ALL SIMULATED          : " << nmtra_total     << endl;
+      cout                                                   << endl;
+      cout << "RC Refset              : " << nmtra_fast_reco << endl;
+      cout << "RC Extras              : " << nmtra_slow_reco << endl;
+      cout << "ghosts                 : " << nghosts         << endl;
+      cout << "clones                 : " << nclones         << endl;
+      cout << "ALL RECONSTRUCTED      : " << ntracks         << endl;
+      cout                                                   << endl;
+      cout << "Refset efficiency      : " << p_fast          << endl;
+      cout << "Allset efficiency      : " << p_total         << endl;
+      cout << "Extra  efficiency      : " << p_slow          << endl;
+      cout << "clone  probability     : " << p_clone         << endl;
+      cout << "ghost  probability     : " << p_ghost         << endl;
 
-  cout                                                   << endl;
+      cout                                                   << endl;
 
 
-  cout << "Number of true and fake hits in stations: " << endl;
-  for (int i = 0; i < algo->NStations; i++){
-    cout << sta_nhits[i]-sta_nfakes[i] << "+" << sta_nfakes[i] << "   ";
-  }
-  cout << endl;
+      cout << "Number of true and fake hits in stations: " << endl;
+      for (int i = 0; i < algo->NStations; i++){
+        cout << sta_nhits[i]-sta_nfakes[i] << "+" << sta_nfakes[i] << "   ";
+      }
+      cout << endl;
 
-#endif//XXX
+    } // fVerbose > 1
   cout                                                   << endl;
   cout << "L1 ACCUMULATED STAT    : " << L1_NEVENTS << " EVENTS "               << endl << endl;
   
   if (L1_NMTRA_D0!=0)
     cout << "D0        efficiency   : " << P_D0        <<" | "<<L1_NMTRA_D0_RECO   << endl;
   
+  cout << "LongRPrim efficiency   : " << P_LONG_FAST_PRIM <<" / "<< K_LONG_FAST_PRIM <<" | "<<L1_NMTRA_LONG_FAST_PRIM_RECO   << endl;
   cout << "RefPrim   efficiency   : " << P_FAST_PRIM <<" / "<< K_FAST_PRIM <<" | "<<L1_NMTRA_FAST_PRIM_RECO   << endl;
   cout << "RefSec    efficiency   : " << P_FAST_SEC  <<" / "<< K_FAST_SEC  <<" | "<<L1_NMTRA_FAST_SEC_RECO    << endl;
   cout << "Refset    efficiency   : " << P_FAST      <<" / "<< K_FAST      <<" | "<<L1_NMTRA_FAST_RECO        << endl;
@@ -958,44 +978,45 @@ void CbmL1::Performance()
   //#endif//XXX
   }
   // fit quality
-  if(0){
+  if(1){
 
     for (vector<CbmL1Track>::iterator it = vRTracks.begin(); it != vRTracks.end(); ++it){
 
       if (rtramtramap.find(&(*it)) == rtramtramap.end()) continue;
       {
-	int iMC = vHitMCRef[it->StsHits.front()];
-	if (iMC < 0) continue;
-	CbmL1MCPoint &mc = vMCPoints[iMC];
-	h_fit[0]->Fill( (mc.x-it->T[0]) *1.e4);
-	h_fit[1]->Fill( (mc.y-it->T[1]) *1.e4);
-	h_fit[2]->Fill((mc.px/mc.pz-it->T[2])*1.e3);
-	h_fit[3]->Fill((mc.py/mc.pz-it->T[3])*1.e3);
-	h_fit[4]->Fill(it->T[4]/mc.q*mc.p-1);
-	if( finite(it->C[0]) && it->C[0]>0 )h_fit[5]->Fill( (mc.x-it->T[0])/sqrt(it->C[0]));
-	if( finite(it->C[2]) && it->C[2]>0 )h_fit[6]->Fill( (mc.y-it->T[1])/sqrt(it->C[2]));
-	if( finite(it->C[5]) && it->C[5]>0 )h_fit[7]->Fill( (mc.px/mc.pz-it->T[2])/sqrt(it->C[5]));
-	if( finite(it->C[9]) && it->C[9]>0 )h_fit[8]->Fill( (mc.py/mc.pz-it->T[3])/sqrt(it->C[9]));
-	if( finite(it->C[14]) && it->C[14]>0 )h_fit[9]->Fill( (mc.q/mc.p-it->T[4])/sqrt(it->C[14]));
+        int iMC = vHitMCRef[it->StsHits.front()];
+        if (iMC < 0) continue;
+        CbmL1MCPoint &mc = vMCPoints[iMC];
+        h_fit[0]->Fill( (mc.x-it->T[0]) *1.e4);
+        h_fit[1]->Fill( (mc.y-it->T[1]) *1.e4);
+        h_fit[2]->Fill((mc.px/mc.pz-it->T[2])*1.e3);
+        h_fit[3]->Fill((mc.py/mc.pz-it->T[3])*1.e3);
+        h_fit[4]->Fill(it->T[4]/mc.q*mc.p-1);
+        if( finite(it->C[0]) && it->C[0]>0 )h_fit[5]->Fill( (mc.x-it->T[0])/sqrt(it->C[0]));
+        if( finite(it->C[2]) && it->C[2]>0 )h_fit[6]->Fill( (mc.y-it->T[1])/sqrt(it->C[2]));
+        if( finite(it->C[5]) && it->C[5]>0 )h_fit[7]->Fill( (mc.px/mc.pz-it->T[2])/sqrt(it->C[5]));
+        if( finite(it->C[9]) && it->C[9]>0 )h_fit[8]->Fill( (mc.py/mc.pz-it->T[3])/sqrt(it->C[9]));
+        if( finite(it->C[14]) && it->C[14]>0 )h_fit[9]->Fill( (mc.q/mc.p-it->T[4])/sqrt(it->C[14]));
       }
       {
-	int iMC = vHitMCRef[it->StsHits.back()];
-	if (iMC < 0) continue;
-	CbmL1MCPoint &mc = vMCPoints[iMC];
-	h_fitL[0]->Fill( (mc.x-it->TLast[0]) *1.e4);
-	h_fitL[1]->Fill( (mc.y-it->TLast[1]) *1.e4);
-	h_fitL[2]->Fill((mc.px/mc.pz-it->TLast[2])*1.e3);
-	h_fitL[3]->Fill((mc.py/mc.pz-it->TLast[3])*1.e3);
-	h_fitL[4]->Fill(it->T[4]/mc.q*mc.p-1);
-	if( finite(it->CLast[0]) && it->CLast[0]>0 ) h_fitL[5]->Fill( (mc.x-it->TLast[0])/sqrt(it->CLast[0]));
-	if( finite(it->CLast[2]) && it->CLast[2]>0 ) h_fitL[6]->Fill( (mc.y-it->TLast[1])/sqrt(it->CLast[2]));
-	if( finite(it->CLast[5]) && it->CLast[5]>0 ) h_fitL[7]->Fill( (mc.px/mc.pz-it->TLast[2])/sqrt(it->CLast[5]));
-	if( finite(it->CLast[9]) && it->CLast[9]>0 ) h_fitL[8]->Fill( (mc.py/mc.pz-it->TLast[3])/sqrt(it->CLast[9]));
-	if( finite(it->CLast[14]) && it->CLast[14]>0 ) h_fitL[9]->Fill( (mc.q/mc.p-it->TLast[4])/sqrt(it->CLast[14]));   
+        int iMC = vHitMCRef[it->StsHits.back()];
+        if (iMC < 0) continue;
+        CbmL1MCPoint &mc = vMCPoints[iMC];
+        h_fitL[0]->Fill( (mc.x-it->TLast[0]) *1.e4);
+        h_fitL[1]->Fill( (mc.y-it->TLast[1]) *1.e4);
+        h_fitL[2]->Fill((mc.px/mc.pz-it->TLast[2])*1.e3);
+        h_fitL[3]->Fill((mc.py/mc.pz-it->TLast[3])*1.e3);
+        h_fitL[4]->Fill(it->T[4]/mc.q*mc.p-1);
+        if( finite(it->CLast[0]) && it->CLast[0]>0 ) h_fitL[5]->Fill( (mc.x-it->TLast[0])/sqrt(it->CLast[0]));
+        if( finite(it->CLast[2]) && it->CLast[2]>0 ) h_fitL[6]->Fill( (mc.y-it->TLast[1])/sqrt(it->CLast[2]));
+        if( finite(it->CLast[5]) && it->CLast[5]>0 ) h_fitL[7]->Fill( (mc.px/mc.pz-it->TLast[2])/sqrt(it->CLast[5]));
+        if( finite(it->CLast[9]) && it->CLast[9]>0 ) h_fitL[8]->Fill( (mc.py/mc.pz-it->TLast[3])/sqrt(it->CLast[9]));
+        if( finite(it->CLast[14]) && it->CLast[14]>0 ) h_fitL[9]->Fill( (mc.q/mc.p-it->TLast[4])/sqrt(it->CLast[14]));
       }
       h_fit_chi2->Fill(it->chi2/it->NDF);
     }
   }
+
 
   bool write = false;
 
@@ -1024,3 +1045,4 @@ void CbmL1::Performance()
   }
 
 }
+

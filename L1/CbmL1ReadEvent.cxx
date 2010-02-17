@@ -121,16 +121,22 @@ void CbmL1::ReadEvent()
 	}
 	th.iMC=-1;
 	int iMC = -1;
-	if( listMvdHitMatches ){
-	  CbmMvdHitMatch *match = (CbmMvdHitMatch*) listMvdHitMatches->At(j);
-	  if( match){
-	    iMC = match->GetPointId();
-	  }
-	}
+  int iMCTr = -1;
+  if( listMvdHitMatches ){
+    CbmMvdHitMatch *match = (CbmMvdHitMatch*) listMvdHitMatches->At(j);
+    if( match){
+      iMC = match->GetPointId();
+      iMCTr = match->GetTrackId();
+    }
+  }
 	if( listStsPts && iMC>=0 ){
 	  CbmL1MCPoint MC;
 	  if( ! ReadMCPoint( &MC, iMC, 1 ) ){
 	    MC.iStation = th.iStation;
+      
+      MC.ID = iMCTr; // because atch->GetPointId() == 0 !!! and ReadMCPoint don't work
+      MC.z = th.iStation; // for sort in right order
+      
 	    vMCPoints.push_back( MC );
 	    th.iMC = vMCPoints.size()-1;	    
 	  }

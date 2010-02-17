@@ -7,7 +7,7 @@
 //
 // --------------------------------------------------------------------------
 
-void run_sim(Int_t nEvents = 800)
+void run_sim(Int_t nEvents = 10)
 {
 
   // ========================================================================
@@ -20,14 +20,14 @@ void run_sim(Int_t nEvents = 800)
 //  TString inFile  = inDir + "/urqmd.auau.25gev.centr.0006.ftn14";
     TString inFile = "/d/cbm02/slebedev/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
   TString outDir  = "data";
-  TString outFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0000.mc.root";;
-  TString parFile = "/d/cbm02/slebedev/rich/MAR09/auau.25gev.centr.0000.params.root";;
+  TString outFile = "/d/cbm02/slebedev/rich/JUL09/test/auau.25gev.centr.0000.mc.root";;
+  TString parFile = "/d/cbm02/slebedev/rich/JUL09/test/auau.25gev.centr.0000.params.root";;
 
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
   TString pipeGeom   = "pipe_standard.geo";
-  TString magnetGeom = "magnet_standard.geo";
+  TString magnetGeom = "magnet_electron_standard.geo";
   TString mvdGeom    = "mvd_standard.geo";
   mvdGeom = "";
   TString stsGeom    = "sts_standard.geo";
@@ -37,7 +37,7 @@ void run_sim(Int_t nEvents = 800)
  // TString ecalGeom   = "ecal_FastMC.geo";
 
   // -----   Magnetic field   -----------------------------------------------
-  TString fieldMap    = "FieldMuonMagnet";   // name of field map
+  TString fieldMap    = "field_electron_standard";   // name of field map
   Double_t fieldZ     = 50.;             // field centre z position
   Double_t fieldScale =  1.;             // field scaling factor
 
@@ -157,15 +157,14 @@ void run_sim(Int_t nEvents = 800)
 
 
   // -----   Create magnetic field   ----------------------------------------
-  CbmFieldMap* magField = NULL;
-  if ( fieldMap == "FieldActive" || fieldMap == "FieldIron")
-    magField = new CbmFieldMapSym3(fieldMap);
-  else if ( fieldMap == "FieldAlligator" )
-    magField = new CbmFieldMapSym2(fieldMap);
-  else if ( fieldMap = "FieldMuonMagnet" )
-    magField = new CbmFieldMapSym3(fieldMap);
+  if (fieldMap == "field_electron_standard" ) 
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "field_muon_standard" )
+    CbmFieldMap* magField = new CbmFieldMapSym2(fieldMap);
+  else if (fieldMap == "FieldMuonMagnet" )
+    CbmFieldMap* magField = new CbmFieldMapSym3(fieldMap);
   else {
-    cout << "===> ERROR: Field map " << fieldMap << " unknown! " << endl;
+    cout << "===> ERROR: Unknown field map " << fieldMap << endl;
     exit;
   }
   magField->SetPosition(0., 0., fieldZ);

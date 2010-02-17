@@ -1,7 +1,7 @@
 
 #include "../../../cbmbase/CbmDetectorList.h";
 
-void run_reco(Int_t nEvents = 700)
+void run_reco(Int_t nEvents = 10)
 {
 
   // ========================================================================
@@ -11,16 +11,16 @@ void run_reco(Int_t nEvents = 700)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
+  TString inFile = "/d/cbm02/slebedev/rich/JUL09/test/auau.25gev.centr.0000.mc.root";
 
   // Parameter file
-  TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
+  TString parFile = "/d/cbm02/slebedev/rich/JUL09/test/auau.25gev.centr.0000.params.root";
 
   // STS digitisation file
   TString stsDigiFile = "sts_standard.digi.par";
 
   // Output file
-  TString outFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
+  TString outFile = "/d/cbm02/slebedev/rich/JUL09/test/auau.25gev.centr.0000.reco.root";
 
 
   // In general, the following parts need not be touched

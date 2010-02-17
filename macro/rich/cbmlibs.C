@@ -1,6 +1,6 @@
 void cbmlibs()
 {
-	  gSystem->Load("/u/slebedev/Baykal/tbb21_017oss/libtbb");
+	  //gSystem->Load("/u/slebedev/Baykal/tbb21_017oss/libtbb");
 	  gSystem->Load("libGeoBase");
 	  gSystem->Load("libParBase");
 	  gSystem->Load("libBase");
@@ -18,6 +18,7 @@ void cbmlibs()
 	  gSystem->Load("libGlobal");
 	  gSystem->Load("libKF");
 	  gSystem->Load("libL1");
+      gSystem->Load("libLittrack");
 	  gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
 
 }

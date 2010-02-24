@@ -72,42 +72,42 @@ CbmRichRingFitterCOP::~CbmRichRingFitterCOP()
 void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 {
     Int_t fNhits = pRing->GetNofHits();
-	Double_t fRadius = 0.;
-	Double_t fCenterX = 0.;
-	Double_t fCenterY = 0.;
+	Double_t radius = 0.;
+	Double_t centerX = 0.;
+	Double_t centerY = 0.;
 
 	if (fNhits < 3) {
+		pRing->SetRadius(0.);
+		pRing->SetCenterX(0.);
+		pRing->SetCenterY(0.);
 		return;
 	}
 
-	Int_t i, iter, iterMax = 20;
-
+	Int_t iterMax = 20;
 	Double_t Xi, Yi, Zi;
 	Double_t M0, Mx, My, Mz, Mxy, Mxx, Myy, Mxz, Myz, Mzz, Mxz2, Myz2, Cov_xy;
-	//    Double_t temp;
 	Double_t A0, A1, A2, A22, epsilon = 0.000000000001;
 	Double_t Dy, xnew, xold, ynew, yold = 100000000000.;
-	Double_t GAM, DET;
-	Double_t Xcenter = -1., Ycenter = -1., Radius = -1.;
 
 	M0 = fNhits;
 	Mx = My = 0.;
+	CbmRichHit* hit;
 
-	for (i = 0; i < fNhits; i++) {
-		CbmRichHit* hit = (CbmRichHit*) fHitsArray->At(pRing->GetHit(i));
+	//calculate center of gravity
+	for (Int_t i = 0; i < fNhits; i++) {
+		hit = (CbmRichHit*) fHitsArray->At(pRing->GetHit(i));
 		Mx += hit->GetX();
 		My += hit->GetY();
 	}
-
 	Mx /= M0;
 	My /= M0;
 
 	//computing moments (note: all moments are normed, i.e. divided by N)
 	Mxx = Myy = Mxy = Mxz = Myz = Mzz = 0.;
 
-	for (i = 0; i < fNhits; i++) {
-		CbmRichHit* hit = (CbmRichHit*) fHitsArray->At(pRing->GetHit(i));
-		Xi = hit->GetX() - Mx;
+	for (Int_t i = 0; i < fNhits; i++) {
+		hit = (CbmRichHit*) fHitsArray->At(pRing->GetHit(i));
+		Xi = hit->GetX() - Mx; //transform to center of gravity coordinate system
 		Yi = hit->GetY() - My;
 		Zi = Xi * Xi + Yi * Yi;
 
@@ -137,11 +137,11 @@ void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 			* Mz * Cov_xy;
 
 	A22 = A2 + A2;
-	iter = 0;
 	xnew = 0.;
 
 	//Newton's method starting at x=0
-	for (iter = 0; iter < iterMax; iter++) {
+	Int_t iter;
+	for (iter = 0; iter < 4; iter++) {
 		ynew = A0 + xnew * (A1 + xnew * (A2 + 4. * xnew * xnew));
 
 		if (fabs(ynew) > fabs(yold)) {
@@ -154,46 +154,43 @@ void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 		xold = xnew;
 		xnew = xold - ynew / Dy;
 		//cout << " xnew = " << xnew ;
-		if (xnew == 0 || fabs((xnew - xold) / xnew) < epsilon)
-			break;
+		//if (xnew == 0 || fabs((xnew - xold) / xnew) < epsilon){
+		//	cout << "iter = " << iter << " N = " << fNhits << endl;
+		//	break;
+		//}
 	}
 
 	if (iter == iterMax - 1) {
 		//  printf("Newton2 does not converge in %d iterations\n",iterMax);
 		xnew = 0.;
 	}
-	if (xnew < 0.) {
-		iter = 30;
-		//      printf("Negative root:  x=%f\n",xnew);
-	}
 
-	//    computing the circle parameters
-	GAM = -Mz - xnew - xnew;
-	DET = xnew * xnew - xnew * Mz + Cov_xy;
-	if (DET != 0) {
-		Xcenter = (Mxz * (Myy - xnew) - Myz * Mxy) / DET / 2.;
-		Ycenter = (Myz * (Mxx - xnew) - Mxz * Mxy) / DET / 2.;
-		Radius = TMath::Sqrt(Xcenter * Xcenter + Ycenter * Ycenter - GAM);
-		fCenterX = Xcenter + Mx;
-		fCenterY = Ycenter + My;
-		fRadius = Radius;
+	//computing the circle parameters
+	Double_t GAM = -Mz - xnew - xnew;
+	Double_t DET = xnew * xnew - xnew * Mz + Cov_xy;
+	if (DET != 0.) {
+		centerX = (Mxz * (Myy - xnew) - Myz * Mxy) / DET / 2.;
+		centerY = (Myz * (Mxx - xnew) - Mxz * Mxy) / DET / 2.;
+		radius = TMath::Sqrt(centerX * centerX + centerY * centerY - GAM);
+		centerX += Mx;
+		centerY += My;
 	} else {
-		fCenterX = 0.;
-		fCenterY = 0.;
-		fRadius = 0.;
+		centerX = 0.;
+		centerY = 0.;
+		radius = 0.;
 	}
 
-	pRing->SetRadius(fRadius);
-	pRing->SetCenterX(fCenterX);
-	pRing->SetCenterY(fCenterY);
+	pRing->SetRadius(radius);
+	pRing->SetCenterX(centerX);
+	pRing->SetCenterY(centerY);
 
 	CalcChi2(pRing);
 
-	if (TMath::IsNaN(fRadius) == 1)
+	if (TMath::IsNaN(radius) == 1)
 		pRing->SetRadius(0.);
-	if (TMath::IsNaN(fCenterX) == 1)
+	if (TMath::IsNaN(centerX) == 1)
 		pRing->SetCenterX(0.);
-	if (TMath::IsNaN(fCenterY) == 1)
+	if (TMath::IsNaN(centerY) == 1)
 		pRing->SetCenterY(0.);
 
 }

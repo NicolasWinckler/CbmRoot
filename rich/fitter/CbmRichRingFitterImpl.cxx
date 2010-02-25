@@ -64,12 +64,12 @@ void CbmRichRingFitterImpl::CalcChi2(CbmRichRing* pRing)
       return;
     }
 
-    Double_t Xd2, Yd2;
-    Double_t chi2 = 0.;
+    Float_t Xd2, Yd2;
+    Float_t chi2 = 0.;
 
-    Double_t Radius  = pRing->GetRadius();
-    Double_t Xcenter = pRing->GetCenterX();
-    Double_t Ycenter = pRing->GetCenterY();
+    Float_t Radius  = pRing->GetRadius();
+    Float_t Xcenter = pRing->GetCenterX();
+    Float_t Ycenter = pRing->GetCenterY();
 
     for (Int_t i = 0; i < fNhits; i++) {
 
@@ -82,7 +82,7 @@ void CbmRichRingFitterImpl::CalcChi2(CbmRichRing* pRing)
 		Xd2 *= Xd2;
 		Yd2 *= Yd2;
 
-		Double_t d = TMath::Sqrt( Xd2 + Yd2 ) - Radius;
+		Float_t d = TMath::Sqrt( Xd2 + Yd2 ) - Radius;
         chi2 += d*d;
     }
 

@@ -65,8 +65,8 @@ protected:
 	TClonesArray* fHitsArray;
 
 	static const Int_t MAX_NOF_HITS_IN_RING = 200;
-	std::vector<Double_t> fHitX;
-	std::vector<Double_t> fHitY;
+	std::vector<Float_t> fHitX;
+	std::vector<Float_t> fHitY;
 
 	ClassDef(CbmRichRingFitterImpl,1);
 

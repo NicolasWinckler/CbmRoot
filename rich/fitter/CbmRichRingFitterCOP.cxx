@@ -72,9 +72,9 @@ CbmRichRingFitterCOP::~CbmRichRingFitterCOP()
 void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 {
     Int_t fNhits = pRing->GetNofHits();
-	Double_t radius = 0.;
-	Double_t centerX = 0.;
-	Double_t centerY = 0.;
+	Float_t radius = 0.;
+	Float_t centerX = 0.;
+	Float_t centerY = 0.;
 
 	if (fNhits < 3) {
 		pRing->SetRadius(0.);
@@ -92,11 +92,12 @@ void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 		return;
 	}
 
-	Int_t iterMax = 20;
-	Double_t Xi, Yi, Zi;
-	Double_t M0, Mx, My, Mz, Mxy, Mxx, Myy, Mxz, Myz, Mzz, Mxz2, Myz2, Cov_xy;
-	Double_t A0, A1, A2, A22, epsilon = 0.000000000001;
-	Double_t Dy, xnew, xold, ynew, yold = 100000000000.;
+	Int_t iterMax = 4;
+	Float_t Xi, Yi, Zi;
+	Float_t M0, Mx, My, Mz, Mxy, Mxx, Myy, Mxz, Myz, Mzz, Mxz2, Myz2, Cov_xy;
+	Float_t A0, A1, A2, A22;
+	Float_t epsilon = 0.00001;
+	Float_t Dy, xnew, xold, ynew, yold = 10000000.;
 
 	M0 = fNhits;
 	Mx = My = 0.;
@@ -152,7 +153,7 @@ void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 
 	//Newton's method starting at x=0
 	Int_t iter;
-	for (iter = 0; iter < 4; iter++) {
+	for (iter = 0; iter < iterMax; iter++) {
 		ynew = A0 + xnew * (A1 + xnew * (A2 + 4. * xnew * xnew));
 
 		if (fabs(ynew) > fabs(yold)) {
@@ -165,20 +166,20 @@ void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 		xold = xnew;
 		xnew = xold - ynew / Dy;
 		//cout << " xnew = " << xnew ;
-		//if (xnew == 0 || fabs((xnew - xold) / xnew) < epsilon){
-		//	cout << "iter = " << iter << " N = " << fNhits << endl;
-		//	break;
-		//}
+		if (xnew == 0 || fabs((xnew - xold) / xnew) < epsilon){
+			//cout << "iter = " << iter << " N = " << fNhits << endl;
+			break;
+		}
 	}
 
-	if (iter == iterMax - 1) {
+	//if (iter == iterMax - 1) {
 		//  printf("Newton2 does not converge in %d iterations\n",iterMax);
-		xnew = 0.;
-	}
+	//	xnew = 0.;
+	//}
 
 	//computing the circle parameters
-	Double_t GAM = -Mz - xnew - xnew;
-	Double_t DET = xnew * xnew - xnew * Mz + Cov_xy;
+	Float_t GAM = -Mz - xnew - xnew;
+	Float_t DET = xnew * xnew - xnew * Mz + Cov_xy;
 	if (DET != 0.) {
 		centerX = (Mxz * (Myy - xnew) - Myz * Mxy) / DET / 2.;
 		centerY = (Myz * (Mxx - xnew) - Mxz * Mxy) / DET / 2.;

@@ -58,7 +58,7 @@ void much_sim(TString inputSignal = "",
 
   // -----   Magnetic field   -----------------------------------------------
   TString  fieldMap   = "field_muon_standard";   // name of field map
-  Double_t fieldZ     = 50.;                 // field centre z position
+  Double_t fieldZ     = 50.;                 // field center z position
   Double_t fieldScale =  1.;                 // field scaling factor
 
   // In general, the following parts need not be touched

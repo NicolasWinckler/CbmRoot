@@ -38,7 +38,6 @@ void much_seg_auto(const char* mcFile = "",
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
-//  gSystem->Load("libMvd");
   gSystem->Load("libSts");
   gSystem->Load("libRich");
   gSystem->Load("libTrd");

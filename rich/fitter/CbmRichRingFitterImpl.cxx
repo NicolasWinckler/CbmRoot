@@ -50,9 +50,10 @@ void CbmRichRingFitterImpl::Init()
 		cout << "-W- CbmRichRingFitterImpl::Init(): No RichHit array!"
 		<< endl;
 	}
-
-
+	fHitX.resize(MAX_NOF_HITS_IN_RING);
+	fHitY.resize(MAX_NOF_HITS_IN_RING);
 }
+
 // -----   Protected method CalcChi2   ----------------------------------------
 void CbmRichRingFitterImpl::CalcChi2(CbmRichRing* pRing)
 {
@@ -65,19 +66,19 @@ void CbmRichRingFitterImpl::CalcChi2(CbmRichRing* pRing)
 
     Double_t Xd2, Yd2;
     Double_t chi2 = 0.;
-    Double_t Xcenter, Ycenter, Radius;
 
-    Radius  = pRing->GetRadius();
-    Xcenter = pRing->GetCenterX();
-    Ycenter = pRing->GetCenterY();
+    Double_t Radius  = pRing->GetRadius();
+    Double_t Xcenter = pRing->GetCenterX();
+    Double_t Ycenter = pRing->GetCenterY();
 
-    for (int i = 0; i < fNhits; i++) {
+    for (Int_t i = 0; i < fNhits; i++) {
 
-        CbmRichHit *hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
+        //CbmRichHit *hit = (CbmRichHit*)fHitsArray->At(pRing->GetHit(i));
+		//Xd2 = Xcenter - hit->GetX();
+		//Yd2 = Ycenter - hit->GetY();
 
-		Xd2 = Xcenter - hit->GetX();
-		Yd2 = Ycenter - hit->GetY();
-
+    	Xd2 = Xcenter - fHitX[i];
+		Yd2 = Ycenter - fHitY[i];
 		Xd2 *= Xd2;
 		Yd2 *= Yd2;
 
@@ -86,7 +87,6 @@ void CbmRichRingFitterImpl::CalcChi2(CbmRichRing* pRing)
     }
 
     pRing->SetChi2(chi2);
-
 }
 
 ClassImp(CbmRichRingFitterImpl)

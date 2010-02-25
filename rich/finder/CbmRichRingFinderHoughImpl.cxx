@@ -557,6 +557,8 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 		ring1->AddHit(fData[j].fId);
 	}
 
+	if (ring1->GetNofHits() < 7) return;
+
 	fFitCOP->DoFit(ring1);
 	Float_t drCOPCut = fRmsCoeffCOP*sqrt(ring1->GetChi2()/ring1->GetNofHits());
 	if (drCOPCut > fMaxCutCOP)	drCOPCut = fMaxCutCOP;
@@ -576,6 +578,8 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 		//fData[j+indmin].fIsUsed = true;
 		ring2->AddHit(fData[j].fId);
 	}
+
+	if (ring2->GetNofHits() < 7) return;
 
 	fFitCOP->DoFit(ring2);
 	fANNSelect->DoSelect(ring2);

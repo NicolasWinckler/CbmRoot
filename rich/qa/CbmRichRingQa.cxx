@@ -42,7 +42,7 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
     // verbosity level
     fVerbose = verbose;
 
-    fNofHitsInRingCut = 5; /// minumum number of hits in ring
+    fNofHitsInRingCut = 7; /// minumum number of hits in ring
 
     // count events
     fEventNumber = 0;

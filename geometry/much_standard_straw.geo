@@ -26,22 +26,22 @@ Number of absorbers         :       6
 Number of stations          :       6
 
 # Absorber specification
-Absorber Zin position [cm]  :       0      55      110    165     230     300
+Absorber Zin position [cm]  :       0      50      100    150     210     275
 Absorber thickness [cm]     :      20      20      20      30      35     100
 Absorber material           :       I       I       I       I       I       I
 
 # Station specification
-Station Zceneter [cm]       :    37.5    92.5   147.5   212.5   282.5   417.5
+Station Zceneter [cm]       :      35      85     135     195     260     390
 Number of layers            :       3       3       3       3       3       3
 Detector type               :       1       1       1       2       2       2
-Distance between layers [cm]:      10      10      10       7       7       7
-Support thickness [cm]      :     1.5     1.5     1.5     0.0     0.0     0.0
+Distance between layers [cm]:      10      10      10      10      10      10
+Support thickness [cm]      :     1.5     1.5     1.5     1.5     1.5     1.5
 Use module design (0/1)     :       1       1       1       0       0       0
 
 # GEM module specification (type 1)
 Active volume lx [cm]       :    25.6
 Active volume ly [cm]       :    25.6
-Active volume lz [cm]       :     0.3
+Active volume lz [cm]       :     0.9
 Spacer lx [cm]              :     0.5
 Spacer ly [cm]              :       5
 Overlap along y axis [cm]   :       2

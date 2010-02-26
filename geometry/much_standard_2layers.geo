@@ -41,7 +41,7 @@ Use module design (0/1)     :       1       1       1       1       1       1
 # GEM module specification (type 1)
 Active volume lx [cm]       :    25.6
 Active volume ly [cm]       :    25.6
-Active volume lz [cm]       :     0.3
+Active volume lz [cm]       :     0.9
 Spacer lx [cm]              :     0.5
 Spacer ly [cm]              :       5
 Overlap along y axis [cm]   :       2

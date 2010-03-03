@@ -228,13 +228,16 @@ InitStatus CbmStsReconstructionQa::Init() {
     fOnlinePad[0] = new TPad("titlePad",   "Title pad"                     ,0.01,0.91,0.99,0.99);
     fOnlinePad[1] = new TPad("efficiencyPad","Efficiency pad"              ,0.01,0.61,0.39,0.89);
     fOnlinePad[2] = new TPad("resolutionPad","Momentum resolution pad"     ,0.01,0.31,0.39,0.59);
-    fOnlinePad[3] = new TPad("ghostsPad"    ,"Ghosts nof hits pad"         ,0.01,0.01,0.39,0.29);
-//     fOnlinePad[3] = new TPad("hitVspoint3Pad","Hit vs point on st.3 pad"   ,0.41,0.66,0.69,0.89);
-//     fOnlinePad[4] = new TPad("hitVspoint6Pad","Hit vs point on st.6 pad"   ,0.71,0.66,0.99,0.89);
-//     fOnlinePad[5] = new TPad("hitVspntXY3Pad","Hit vs point XY on st.3 pad",0.41,0.41,0.69,0.64);
-//     fOnlinePad[6] = new TPad("hitVspntXY6Pad","Hit vs point XY on st.6 pad",0.71,0.41,0.99,0.64);
-    fOnlinePad[4] = new TPad("printoutPad","Print information pad"         ,0.39,0.00,1.00,0.41);
-    for ( Int_t ipad = 0 ; ipad < 5 ; ipad++ ) {
+    fOnlinePad[3] = new TPad("hitVspoint3Pad","Hit vs point on st.3 pad"   ,0.41,0.66,0.69,0.89);
+    fOnlinePad[4] = new TPad("hitVspoint6Pad","Hit vs point on st.6 pad"   ,0.71,0.66,0.99,0.89);
+    fOnlinePad[5] = new TPad("hitVspntXY3Pad","Hit vs point XY on st.3 pad",0.41,0.41,0.69,0.64);
+    fOnlinePad[6] = new TPad("hitVspntXY6Pad","Hit vs point XY on st.6 pad",0.71,0.41,0.99,0.64);
+    fOnlinePad[7] = new TPad("printoutPad","Print information pad"         ,0.41,0.16,0.69,0.41);
+    fOnlinePad[8] = new TPad("printoutPad","Print information pad"         ,0.71,0.16,0.99,0.41);
+    fOnlinePad[9] = new TPad("printoutPad","Print information pad"         ,0.01,0.01,0.39,0.29);
+    fOnlinePad[7]->SetLogy();
+    fOnlinePad[8]->SetLogy();
+    for ( Int_t ipad = 0 ; ipad < 10 ; ipad++ ) {
       fOnlinePad[ipad]->SetFillColor(0);
       fOnlinePad[ipad]->SetBorderMode(0);
       fOnlinePad[ipad]->Draw();
@@ -360,13 +363,13 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
       toSave = (Int_t)((momentum.Z()-.1)*10.);
       //  if ( TMath::Abs(momentum.Z()-1.)<0.5 )
 
-    if ( isPrim ) 
-      if ( toSave >= 0 ) {
-	if ( pdgC > 0 ) 
-	  fhDirEmiPrimP[toSave]->Fill(momentum.X(),momentum.Y());
-	else
-	  fhDirEmiPrimM[toSave]->Fill(momentum.X(),momentum.Y());
-      }
+//     if ( isPrim ) 
+//       if ( toSave >= 0 ) {
+// 	if ( pdgC > 0 ) 
+// 	  fhDirEmiPrimP[toSave]->Fill(momentum.X(),momentum.Y());
+// 	else
+// 	  fhDirEmiPrimM[toSave]->Fill(momentum.X(),momentum.Y());
+//       }
 
     // Check reconstructability; continue only for reconstructable tracks
     nAll++;
@@ -395,12 +398,12 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
     if ( isPrim) {
       fhMomAccPrim->Fill(mom);
       fhNpAccPrim->Fill(Double_t(nHits));
-      if ( toSave >= 0 ) {
-	if ( pdgC > 0 ) 
-	  fhDirAccPrimP[toSave]->Fill(momentum.X(),momentum.Y());
-	else
-	  fhDirAccPrimM[toSave]->Fill(momentum.X(),momentum.Y());
-      }
+//       if ( toSave >= 0 ) {
+// 	if ( pdgC > 0 ) 
+// 	  fhDirAccPrimP[toSave]->Fill(momentum.X(),momentum.Y());
+// 	else
+// 	  fhDirAccPrimM[toSave]->Fill(momentum.X(),momentum.Y());
+//       }
     }
     else {
       fhMomAccSec->Fill(mom);
@@ -468,12 +471,12 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
 	fhMomRecPrim->Fill(mom);
 	fhNpRecPrim->Fill(Double_t(nAllHits));
 
-	if ( toSave >= 0 ) {
-	  if ( pdgC > 0 ) 
-	    fhDirRecPrimP[toSave]->Fill(momentum.X(),momentum.Y());
-	  else
-	    fhDirRecPrimM[toSave]->Fill(momentum.X(),momentum.Y());
-	}
+// 	if ( toSave >= 0 ) {
+// 	  if ( pdgC > 0 ) 
+// 	    fhDirRecPrimP[toSave]->Fill(momentum.X(),momentum.Y());
+// 	  else
+// 	    fhDirRecPrimM[toSave]->Fill(momentum.X(),momentum.Y());
+// 	}
 
 	if ( isRef ) nRecRef++;
 	if ( stsTrack->GetParamFirst()->GetQp() )
@@ -658,6 +661,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
     oneLine->SetLineStyle(2);
     oneLine->Draw();
     fOnlinePad[1]->Update();
+    
     fOnlinePad[2]->cd();
     if ( fhMomResPrim->Integral() ) 
       fOnlinePad[2]->SetLogz();
@@ -681,76 +685,55 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
     fhLowBand->Draw("Psame");
     fhHigBand->Draw("Psame");
     fOnlinePad[2]->Update();
+
     fOnlinePad[3]->cd();
-    fhNhGhosts->Draw();
+    fhNpAccAll->Draw();
     fOnlinePad[3]->Update();
+    
+    fOnlinePad[4]->cd();
+    fhNpRecAll->Draw();
+    fOnlinePad[4]->Update();
 
-    TH1F* projX[100];
-    TH1F* projY[100];
-    TF1*   fitX[100];
-    TF1*   fitY[100];
-    Double_t resolution[2][100];
+    fOnlinePad[5]->cd();
+    fhStsTrackFPos[2]->Draw();
+    fOnlinePad[5]->Update();
 
-    /*    for ( Int_t ist = 0 ; ist < fNStations ; ist++ ) {
-      projX[ist] = (TH1F*)fhHitPointCorrelation[ist]->ProjectionX(Form("projX%i",ist+1));
-      projY[ist] = (TH1F*)fhHitPointCorrelation[ist]->ProjectionY(Form("projY%i",ist+1));
-      fitX[ist] = new TF1(Form("fitX%i",ist+1),"gaus",-0.02,0.02);
-      fitY[ist] = new TF1(Form("fitY%i",ist+1),"gaus",-0.02,0.02);
-      projX[ist]->SetAxisRange(-0.02,0.02,"X");
-      projY[ist]->SetAxisRange(-0.02,0.02,"X");
-      projX[ist]->Fit(fitX[ist],"QN","",-0.02,0.02);
-      projY[ist]->Fit(fitY[ist],"QN","",-0.02,0.02);
-      resolution[0][ist] = 10000.*fitX[ist]->GetParameter(2);
-      resolution[1][ist] = 10000.*fitY[ist]->GetParameter(2);
-      }*/
-
-//     fOnlinePad[3]->cd();
-    //    fhHitPointCorrelation[fShowStation1]->Draw("col");
-//     fOnlinePad[3]->Update();
-//     fOnlinePad[4]->cd();
-    //    fhHitPointCorrelation[fShowStation2]->Draw("col");
-//     fOnlinePad[4]->Update();
-
-//     fOnlinePad[5]->cd();
-    /*projX[fShowStation1]->SetLineWidth(2);
-    projY[fShowStation1]->SetLineWidth(2);
-    projX[fShowStation1]->SetLineColor(2);
-    projY[fShowStation1]->SetLineColor(3);
-    projY[fShowStation1]->SetXTitle("#Delta x, y [cm]");
-    projX[fShowStation1]->Draw();
-    projY[fShowStation1]->Draw("same");
-    //    fitY[fShowStation1]->Draw("same");
-    //    fitX[fShowStation1]->Draw("same");
-    TLegend* legend1 = new TLegend(0.55,0.6,1.0,0.94);
-    legend1->SetBorderSize(0);
-    legend1->SetFillColor(0);
-    legend1->AddEntry(projX[fShowStation1],
-		      Form("X,#sigma=%3.2f#mum",resolution[0][fShowStation1]),"l");
-    legend1->AddEntry(projY[fShowStation1],
-		      Form("Y,#sigma=%3.2f#mum",resolution[1][fShowStation1]),"l");
-		      legend1->Draw();*/
-//     fOnlinePad[5]->Update();
-
-//     fOnlinePad[6]->cd();
-    /*    projX[fShowStation2]->SetLineWidth(2);
-    projY[fShowStation2]->SetLineWidth(2);
-    projX[fShowStation2]->SetLineColor(2);
-    projY[fShowStation2]->SetLineColor(3);
-    projX[fShowStation2]->SetXTitle("#Delta x, y [cm]");
-    projX[fShowStation2]->Draw();
-    projY[fShowStation2]->Draw("same");
-    //    fitY[fShowStation2]->Draw("same");
-    //    fitX[fShowStation2]->Draw("same");
-    TLegend* legend2 = new TLegend(0.55,0.6,1.0,0.94);
-    legend2->SetBorderSize(0);
-    legend2->SetFillColor(0);
-    legend2->AddEntry(projX[fShowStation2],
-		      Form("X,#sigma=%3.2f#mum",resolution[0][fShowStation2]),"l");
-    legend2->AddEntry(projY[fShowStation2],
-		      Form("Y,#sigma=%3.2f#mum",resolution[1][fShowStation2]),"l");
-		      legend2->Draw();*/
-//     fOnlinePad[6]->Update();
-
+    fOnlinePad[6]->cd();
+    fhStsTrackLPos[2]->Draw();
+    fOnlinePad[6]->Update();
+    
+    fOnlinePad[7]->cd();
+    fhMomAccPrim->SetLineWidth(2);
+    fhMomAccPrim->SetLineColor(3);
+    fhMomAccPrim->Draw();
+    fhMomRecPrim->SetLineColor(2);
+  
+    fhMomRecPrim->Draw("same");
+    TLegend* momLeg = new TLegend(0.55,0.45,0.72,0.8);
+    momLeg->SetBorderSize(0);
+    momLeg->SetFillColor(0);
+    momLeg->SetTextSize(0.07);
+    momLeg->AddEntry(fhMomAccPrim, "acc prim" ,"pl");
+    momLeg->AddEntry(fhMomRecPrim, "rec prim" ,"pl");
+    momLeg->Draw();
+    fOnlinePad[7]->Update();
+    
+    fOnlinePad[8]->cd();
+    fhMomAccSec->SetLineWidth(2);
+    fhMomAccSec->SetLineColor(3);
+    fhMomAccSec->Draw();
+    fhMomRecSec->SetLineColor(2);
+   
+    fhMomRecSec->Draw("same");
+    TLegend* momsLeg = new TLegend(0.55,0.45,0.72,0.8);
+    momsLeg->SetBorderSize(0);
+    momsLeg->SetFillColor(0);
+    momsLeg->SetTextSize(0.07);
+    momsLeg->AddEntry(fhMomAccSec, "acc sec" ,"pl");
+    momsLeg->AddEntry(fhMomRecSec, "rec sec" ,"pl");
+    momsLeg->Draw();
+    fOnlinePad[8]->Update();
+    
     TF1* allEffFit = new TF1 ("allEffFit","pol0",1.,10.);
     fhMomEffAll->Fit(allEffFit,"QN","",1,10);
     Double_t allEff = allEffFit->GetParameter(0);
@@ -779,7 +762,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
     momentumResHistAll->Fit(momentumResFuncAll,"QN","",-10.,10.);
     Double_t momentumResolutionAll = momentumResFuncAll->GetParameter(2);
 
-    fOnlinePad[4]->cd();
+    fOnlinePad[9]->cd();
     TPaveText* printoutPave = new TPaveText(0.0,0.0,1.0,1.0);
     printoutPave->SetTextAlign(23);
     printoutPave->SetTextSize(0.05);
@@ -793,7 +776,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
 			       Double_t (fNGhosts) /Double_t (fNEvents),
 			       Double_t (fNClones) /Double_t (fNEvents)));
 //     printoutPave->AddText("Single Hit Resolutions:");
-    for ( Int_t ist = 0 ; ist < fNStations ; ist++ )
+//     for ( Int_t ist = 0 ; ist < fNStations ; ist++ )
 //       if ( resolution[0][ist] > 0.01 )
 // 	printoutPave->AddText(Form("st#%i,#sigma_{x}=%3.2f#mum,#sigma_{y}=%3.2f#mum",
 // 				   ist+1,resolution[0][ist],resolution[1][ist]));
@@ -803,9 +786,9 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
     printoutPave->AddText(Form("reference = %2.2f%%",100.*effRef));
     printoutPave->AddText(Form("non-vertex = %2.2f%%(%2.2f%%)",100.*effSec,100.*secEff));
     printoutPave->AddText(Form("Momentum resolution = %3.2f%%(%3.2f%%)",momentumResolutionAll,momentumResolutionPrim));
-    fOnlinePad[4]->Clear();
+    fOnlinePad[9]->Clear();
     printoutPave->Draw();
-    fOnlinePad[4]->Update();
+    fOnlinePad[9]->Update();
   }
 }
 // -------------------------------------------------------------------------
@@ -824,12 +807,12 @@ void CbmStsReconstructionQa::Finish() {
   DivideHistos(fhNpRecSec,   fhNpAccSec,   fhNpEffSec);
   DivideHistos(fhZRecSec,    fhZAccSec,    fhZEffSec);
 
-  for ( Int_t itemp = 0 ; itemp < 25 ; itemp++ ) {
-    fhDirAcMPrimM[itemp]->Divide(fhDirAccPrimM[itemp],fhDirEmiPrimM[itemp]);
-    fhDirEffPrimM[itemp]->Divide(fhDirRecPrimM[itemp],fhDirAccPrimM[itemp]);
-    fhDirAcMPrimP[itemp]->Divide(fhDirAccPrimP[itemp],fhDirEmiPrimP[itemp]);
-    fhDirEffPrimP[itemp]->Divide(fhDirRecPrimP[itemp],fhDirAccPrimP[itemp]);
-  }
+//   for ( Int_t itemp = 0 ; itemp < 25 ; itemp++ ) {
+//     fhDirAcMPrimM[itemp]->Divide(fhDirAccPrimM[itemp],fhDirEmiPrimM[itemp]);
+//     fhDirEffPrimM[itemp]->Divide(fhDirRecPrimM[itemp],fhDirAccPrimM[itemp]);
+//     fhDirAcMPrimP[itemp]->Divide(fhDirAccPrimP[itemp],fhDirEmiPrimP[itemp]);
+//     fhDirEffPrimP[itemp]->Divide(fhDirRecPrimP[itemp],fhDirAccPrimP[itemp]);
+//   }
 
   for ( Int_t itemp = 0 ; itemp < 10 ; itemp++ ) {
     if ( fPartPdgTable[itemp] == -7777 ) break;
@@ -1061,38 +1044,38 @@ void CbmStsReconstructionQa::CreateHistos() {
   fHistoList->Add(fhMomClones);
   fHistoList->Add(fhMomGhosts);
 
-  for ( Int_t itemp = 0 ; itemp < 25 ; itemp++ ) {
-    fhDirEmiPrimM[itemp] = new TH2F(Form("hDirEmiPrimM%d",itemp), "emitted vertex tracks",
-				   100,-1.,1.,100,-1.,1.);
-    fhDirAccPrimM[itemp] = new TH2F(Form("hDirAccPrimM%d",itemp), "reconstructable vertex tracks",
-				   100,-1.,1.,100,-1.,1.);
-    fhDirAcMPrimM[itemp] = new TH2F(Form("hDirAcMPrimM%d",itemp), "acceptance vertex tracks",
-				   100,-1.,1.,100,-1.,1.);
-    fhDirRecPrimM[itemp] = new TH2F(Form("hDirRecPrimM%d",itemp), "reconstructed vertex tracks",
-				   100,-1.,1.,100,-1.,1.);
-    fhDirEffPrimM[itemp] = new TH2F(Form("hDirEffPrimM%d",itemp), "efficiency vertex tracks",
-				   100,-1.,1.,100,-1.,1.);
-    fHistoList->Add(fhDirEmiPrimM[itemp]);
-    fHistoList->Add(fhDirAccPrimM[itemp]);
-    fHistoList->Add(fhDirAcMPrimM[itemp]);
-    fHistoList->Add(fhDirRecPrimM[itemp]);
-    fHistoList->Add(fhDirEffPrimM[itemp]);
-    fhDirEmiPrimP[itemp] = new TH2F(Form("hDirEmiPrimP%d",itemp), "emitted vertex tracks",
-				   100,-1.,1.,100,-1.,1.);
-    fhDirAccPrimP[itemp] = new TH2F(Form("hDirAccPrimP%d",itemp), "reconstructable vertex tracks",
-				   100,-1.,1.,100,-1.,1.);
-    fhDirAcMPrimP[itemp] = new TH2F(Form("hDirAcMPrimP%d",itemp), "acceptance vertex tracks",
-				   100,-1.,1.,100,-1.,1.);
-    fhDirRecPrimP[itemp] = new TH2F(Form("hDirRecPrimP%d",itemp), "reconstructed vertex tracks",
-				   100,-1.,1.,100,-1.,1.);
-    fhDirEffPrimP[itemp] = new TH2F(Form("hDirEffPrimP%d",itemp), "efficiency vertex tracks",
-				   100,-1.,1.,100,-1.,1.);
-    fHistoList->Add(fhDirEmiPrimP[itemp]);
-    fHistoList->Add(fhDirAccPrimP[itemp]);
-    fHistoList->Add(fhDirAcMPrimP[itemp]);
-    fHistoList->Add(fhDirRecPrimP[itemp]);
-    fHistoList->Add(fhDirEffPrimP[itemp]);
-  }
+//   for ( Int_t itemp = 0 ; itemp < 25 ; itemp++ ) {
+//     fhDirEmiPrimM[itemp] = new TH2F(Form("hDirEmiPrimM%d",itemp), "emitted vertex tracks",
+// 				   100,-1.,1.,100,-1.,1.);
+//     fhDirAccPrimM[itemp] = new TH2F(Form("hDirAccPrimM%d",itemp), "reconstructable vertex tracks",
+// 				   100,-1.,1.,100,-1.,1.);
+//     fhDirAcMPrimM[itemp] = new TH2F(Form("hDirAcMPrimM%d",itemp), "acceptance vertex tracks",
+// 				   100,-1.,1.,100,-1.,1.);
+//     fhDirRecPrimM[itemp] = new TH2F(Form("hDirRecPrimM%d",itemp), "reconstructed vertex tracks",
+// 				   100,-1.,1.,100,-1.,1.);
+//     fhDirEffPrimM[itemp] = new TH2F(Form("hDirEffPrimM%d",itemp), "efficiency vertex tracks",
+// 				   100,-1.,1.,100,-1.,1.);
+//     fHistoList->Add(fhDirEmiPrimM[itemp]);
+//     fHistoList->Add(fhDirAccPrimM[itemp]);
+//     fHistoList->Add(fhDirAcMPrimM[itemp]);
+//     fHistoList->Add(fhDirRecPrimM[itemp]);
+//     fHistoList->Add(fhDirEffPrimM[itemp]);
+//     fhDirEmiPrimP[itemp] = new TH2F(Form("hDirEmiPrimP%d",itemp), "emitted vertex tracks",
+// 				   100,-1.,1.,100,-1.,1.);
+//     fhDirAccPrimP[itemp] = new TH2F(Form("hDirAccPrimP%d",itemp), "reconstructable vertex tracks",
+// 				   100,-1.,1.,100,-1.,1.);
+//     fhDirAcMPrimP[itemp] = new TH2F(Form("hDirAcMPrimP%d",itemp), "acceptance vertex tracks",
+// 				   100,-1.,1.,100,-1.,1.);
+//     fhDirRecPrimP[itemp] = new TH2F(Form("hDirRecPrimP%d",itemp), "reconstructed vertex tracks",
+// 				   100,-1.,1.,100,-1.,1.);
+//     fhDirEffPrimP[itemp] = new TH2F(Form("hDirEffPrimP%d",itemp), "efficiency vertex tracks",
+// 				   100,-1.,1.,100,-1.,1.);
+//     fHistoList->Add(fhDirEmiPrimP[itemp]);
+//     fHistoList->Add(fhDirAccPrimP[itemp]);
+//     fHistoList->Add(fhDirAcMPrimP[itemp]);
+//     fHistoList->Add(fhDirRecPrimP[itemp]);
+//     fHistoList->Add(fhDirEffPrimP[itemp]);
+//   }
 
   
   for ( Int_t itemp = 0 ; itemp < 10 ; itemp++ ) {
@@ -1210,45 +1193,45 @@ void CbmStsReconstructionQa::CreateHistos() {
   Char_t lett[5] = {'X','Y','Z','x','y'};
 
   for ( Int_t itemp = 0 ; itemp < 15 ; itemp++ ) {
-    if ( itemp < 6 || itemp == 7) {
-      fhStsTrackFCovEl[itemp] = new TH1F(Form("hStsTrackFCovEl%d",itemp),
-					 Form("StsTrack ParamFirst cov. el. %d",itemp),
-					 200,-1.e-3,1.e-3);
-      fhStsTrackLCovEl[itemp] = new TH1F(Form("hStsTrackLCovEl%d",itemp),
-					 Form("StsTrack ParamLast cov. el. %d",itemp),
-					 200,-1.e-3,1.e-3);
-    }
-    else {
-      if ( itemp == 6 ) {
-	fhStsTrackFCovEl[itemp] = new TH1F(Form("hStsTrackFCovEl%d",itemp),
-					   Form("StsTrack ParamFirst cov. el. %d",itemp),
-					   200,-1.e-3,1.e-3);
-	fhStsTrackLCovEl[itemp] = new TH1F(Form("hStsTrackLCovEl%d",itemp),
-					   Form("StsTrack ParamLast cov. el. %d",itemp),
-					   200,-1.e-3,1.e-3);
-      }
-      else {
-	if ( itemp == 8 ) {
-	  fhStsTrackFCovEl[itemp] = new TH1F(Form("hStsTrackFCovEl%d",itemp),
-					     Form("StsTrack ParamFirst cov. el. %d",itemp),
-					     200,-1.e-2,1.e-2);
-	  fhStsTrackLCovEl[itemp] = new TH1F(Form("hStsTrackLCovEl%d",itemp),
-					     Form("StsTrack ParamLast cov. el. %d",itemp),
-					     200,-1.e-2,1.e-2);
-	}
-	else {
-	  fhStsTrackFCovEl[itemp] = new TH1F(Form("hStsTrackFCovEl%d",itemp),
-					     Form("StsTrack ParamFirst cov. el. %d",itemp),
-					     200,-1.e-2,1.e-2);
-	  fhStsTrackLCovEl[itemp] = new TH1F(Form("hStsTrackLCovEl%d",itemp),
-					     Form("StsTrack ParamLast cov. el. %d",itemp),
-					     200,-1.e-2,1.e-2);
-	}
-      }
-    }
+//     if ( itemp < 6 || itemp == 7) {
+//       fhStsTrackFCovEl[itemp] = new TH1F(Form("hStsTrackFCovEl%d",itemp),
+// 					 Form("StsTrack ParamFirst cov. el. %d",itemp),
+// 					 200,-1.e-3,1.e-3);
+//       fhStsTrackLCovEl[itemp] = new TH1F(Form("hStsTrackLCovEl%d",itemp),
+// 					 Form("StsTrack ParamLast cov. el. %d",itemp),
+// 					 200,-1.e-3,1.e-3);
+//     }
+//     else {
+//       if ( itemp == 6 ) {
+// 	fhStsTrackFCovEl[itemp] = new TH1F(Form("hStsTrackFCovEl%d",itemp),
+// 					   Form("StsTrack ParamFirst cov. el. %d",itemp),
+// 					   200,-1.e-3,1.e-3);
+// 	fhStsTrackLCovEl[itemp] = new TH1F(Form("hStsTrackLCovEl%d",itemp),
+// 					   Form("StsTrack ParamLast cov. el. %d",itemp),
+// 					   200,-1.e-3,1.e-3);
+//       }
+//       else {
+// 	if ( itemp == 8 ) {
+// 	  fhStsTrackFCovEl[itemp] = new TH1F(Form("hStsTrackFCovEl%d",itemp),
+// 					     Form("StsTrack ParamFirst cov. el. %d",itemp),
+// 					     200,-1.e-2,1.e-2);
+// 	  fhStsTrackLCovEl[itemp] = new TH1F(Form("hStsTrackLCovEl%d",itemp),
+// 					     Form("StsTrack ParamLast cov. el. %d",itemp),
+// 					     200,-1.e-2,1.e-2);
+// 	}
+// 	else {
+// 	  fhStsTrackFCovEl[itemp] = new TH1F(Form("hStsTrackFCovEl%d",itemp),
+// 					     Form("StsTrack ParamFirst cov. el. %d",itemp),
+// 					     200,-1.e-2,1.e-2);
+// 	  fhStsTrackLCovEl[itemp] = new TH1F(Form("hStsTrackLCovEl%d",itemp),
+// 					     Form("StsTrack ParamLast cov. el. %d",itemp),
+// 					     200,-1.e-2,1.e-2);
+// 	}
+//       }
+//     }
 
-    fHistoList->Add(fhStsTrackFCovEl[itemp]);
-    fHistoList->Add(fhStsTrackLCovEl[itemp]);
+//     fHistoList->Add(fhStsTrackFCovEl[itemp]);
+//     fHistoList->Add(fhStsTrackLCovEl[itemp]);
 
     if ( itemp >= 3 ) continue;
     Int_t    nof = 100 ;
@@ -1413,8 +1396,8 @@ void CbmStsReconstructionQa::FillMatchMap(Int_t& nRec, Int_t& nGhosts,
     Int_t elToFill = 0;
     for ( Int_t ixx = 0 ; ixx < 5 ; ixx++ ) {
       for ( Int_t iyy = ixx ; iyy < 5 ; iyy++ ) {
-	fhStsTrackFCovEl[elToFill]->Fill(trParF->GetCovariance(ixx,iyy));
-	fhStsTrackLCovEl[elToFill]->Fill(trParL->GetCovariance(ixx,iyy));
+// 	fhStsTrackFCovEl[elToFill]->Fill(trParF->GetCovariance(ixx,iyy));
+// 	fhStsTrackLCovEl[elToFill]->Fill(trParL->GetCovariance(ixx,iyy));
 	elToFill++;
       }
     }

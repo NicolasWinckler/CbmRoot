@@ -6,7 +6,7 @@
 #include "CbmStsSimulationQa.h"
 
 #include "CbmStsPoint.h"
-#include "CbmStsTrack.h"
+// #include "CbmStsTrack.h"
 //#include "CbmStsTrackMatch.h"
 #include "CbmGeoStsPar.h"
 
@@ -150,18 +150,17 @@ InitStatus CbmStsSimulationQa::Init() {
   CreateHistos();
   Reset();
   if ( fOnlineAnalysis ) {
-    fOnlineCanvas = new TCanvas("StsSimOnline","Sts simulation online",10,10,600,900);
-    fOnlinePad[0] = new TPad("titlePad",   "Title pad"                ,0.00,0.90,1.00,1.00);
-    fOnlinePad[1] = new TPad("momentumPad","Momentum pad"             ,0.00,0.45,0.50,0.90);
-    fOnlinePad[2] = new TPad("yptPad",     "y-pt pad"                 ,0.00,0.00,0.50,0.45);
-    fOnlinePad[3] = new TPad("pointPad",   "Points per track pad"     ,0.50,0.60,1.00,0.90);
-    fOnlinePad[4] = new TPad("stationPad1","Points on 1st station pad",0.50,0.40,0.75,0.60);
-    fOnlinePad[5] = new TPad("stationPad2","Points on 3rd station pad",0.75,0.40,1.00,0.60);
-    fOnlinePad[6] = new TPad("stationPad3","Points on 5th station pad",0.50,0.20,0.75,0.40);
-    fOnlinePad[7] = new TPad("stationPad4","Points on 7th station pad",0.75,0.20,1.00,0.40);
-    fOnlinePad[8] = new TPad("printoutPad","Print information pad    ",0.50,0.00,1.00,0.20);
+    fOnlineCanvas = new TCanvas("StsSimOnline","Sts simulation online",10,10,600,600);
+    fOnlinePad[0] = new TPad("titlePad",      "Title pad"             ,0.00,0.90,1.00,1.00);
+    fOnlinePad[1] = new TPad("momentumPad",   "Momentum pad"          ,0.00,0.35,0.50,0.90);
+    fOnlinePad[2] = new TPad("printoutPad","Print information pad    ",0.10,0.10,0.35,0.35);
+    fOnlinePad[3] = new TPad("pointPad",      "Points per track pad"  ,0.50,0.50,1.00,0.90);
+    fOnlinePad[4] = new TPad("stationPad1","Points on 1st station pad",0.50,0.25,0.75,0.50);
+    fOnlinePad[5] = new TPad("stationPad2","Points on 3rd station pad",0.75,0.25,1.00,0.50);
+    fOnlinePad[6] = new TPad("stationPad3","Points on 5th station pad",0.50,0.00,0.75,0.25);
+    fOnlinePad[7] = new TPad("stationPad4","Points on 7th station pad",0.75,0.00,1.00,0.25);
     fOnlinePad[1]->SetLogy();
-    for ( Int_t ipad = 0 ; ipad < 9 ; ipad++ ) {
+    for ( Int_t ipad = 0 ; ipad < 8 ; ipad++ ) {
       fOnlinePad[ipad]->SetFillColor(0);
       fOnlinePad[ipad]->SetBorderMode(0);
       fOnlinePad[ipad]->Draw();
@@ -227,7 +226,7 @@ void CbmStsSimulationQa::Exec(Option_t* opt) {
 
   Int_t nofMCTracks = fMCTracks->GetEntriesFast();
   Int_t nofSTSPoints = fSTSPoints->GetEntriesFast();
-
+  
   for ( Int_t itr = 0 ; itr < nofMCTracks ; itr++ ) {
     CbmMCTrack *mctrack= (CbmMCTrack*)fMCTracks->At(itr);
     Int_t pdgCode = mctrack->GetPdgCode();
@@ -239,7 +238,7 @@ void CbmStsSimulationQa::Exec(Option_t* opt) {
 	 ( pdgCode == 50010051) ||
 	 ( pdgCode == 10020040) )
       continue;
-
+    
     TVector3 mom;
     mctrack->GetMomentum(mom);
     Float_t pT  = mom.Pt();
@@ -296,12 +295,22 @@ void CbmStsSimulationQa::Exec(Option_t* opt) {
     fhMomRec->Draw();
     fOnlinePad[1]->Update();
     fOnlinePad[2]->cd();
-    fhYPtMapRec->Draw("colz");
+    TPaveText* printoutPave = new TPaveText(0.1,0.1,0.9,0.9);
+    printoutPave->SetTextAlign(22);
+    printoutPave->SetTextSize(0.1);
+    printoutPave->SetTextColor(1);
+    printoutPave->SetBorderSize(0);
+    printoutPave->SetFillColor(0);
+    printoutPave->AddText(Form("%i events",fNEvents+1));
+    printoutPave->AddText(Form("tracks/event = %3.2f",tracksPerEvent));
+    printoutPave->AddText(Form("points/event = %3.2f",pointsPerEvent));
+    fOnlinePad[2]->Clear();
+    printoutPave->Draw();
     fOnlinePad[2]->Update();
     fOnlinePad[3]->cd();
     fhStsPointsRec->Draw();
     fOnlinePad[3]->Update();
-
+ 
     if ( fNStations ) {
       fOnlinePad[4]->cd();
       fhStationPoints[0]->Draw("colz");
@@ -323,25 +332,17 @@ void CbmStsSimulationQa::Exec(Option_t* opt) {
       }
     }
 
-    fOnlinePad[8]->cd();
-    TPaveText* printoutPave = new TPaveText(0.1,0.1,0.9,0.9);
-    printoutPave->SetTextAlign(22);
-    printoutPave->SetTextSize(0.1);
-    printoutPave->SetTextColor(1);
-    printoutPave->SetBorderSize(0);
-    printoutPave->SetFillColor(0);
-    printoutPave->AddText(Form("%i events",fNEvents+1));
-    printoutPave->AddText(Form("tracks/event = %3.2f",tracksPerEvent));
-    printoutPave->AddText(Form("points/event = %3.2f",pointsPerEvent));
-    fOnlinePad[8]->Clear();
-    printoutPave->Draw();
-    fOnlinePad[8]->Update();
+    
   }
 
   //  cout << "\rEvent #" << fNEvents+1 << flush;
-  cout << "\rEvent #" << fNEvents+1 << " --> "
-       << setprecision(6) << tracksPerEvent << " tracks/event >--< "
-       << setprecision(7) << pointsPerEvent << " points/event >--" << flush;
+  cout << endl << endl;
+  cout << "======================================================="<< endl;
+  cout << "===== StsSimulationQa: " << endl;
+  cout << "===== \rEvent #" << fNEvents+1 << endl;
+  cout << "===== " << setprecision(6) << tracksPerEvent << " tracks/event" << endl;
+  cout << "===== " << setprecision(7) << pointsPerEvent << " points/event" << endl;
+  cout << "======================================================="<< endl;
 
   fNEvents++;
 
@@ -355,13 +356,12 @@ void CbmStsSimulationQa::Exec(Option_t* opt) {
 void CbmStsSimulationQa::Finish()
 {
   // Run summary to screen
-  cout << endl << endl;
-  cout << "======================================================="
-       << endl;
-  cout << "            StsSimulationQa: Run summary" << endl << endl;
-  cout << "======================================================="
-       << endl;
-  cout << endl << endl;
+//   cout << endl << endl;
+//   cout << "======================================================="<< endl;
+//   cout << "            StsSimulationQa: Run summary" << endl << endl;
+//   cout << "======================================================="
+//        << endl;
+//   cout << endl << endl;
 
   gDirectory->mkdir("STSSimulationQA");
   gDirectory->cd("STSSimulationQA");
@@ -393,7 +393,7 @@ InitStatus CbmStsSimulationQa::GetGeometry() {
   }
   Int_t tempNofStations = stsNodes->GetEntries();
 
-  cout << "There are " << tempNofStations << " nodes" << (tempNofStations > 10 ? "!!!" : "" ) << endl;
+//   cout << "There are " << tempNofStations << " nodes" << (tempNofStations > 10 ? "!!!" : "" ) << endl;
 
   TString geoNodeName;
   fNStations = 0;
@@ -421,7 +421,7 @@ InitStatus CbmStsSimulationQa::GetGeometry() {
 					  (translat.Y() + centerV.Y() + params->At(1))*
 					  (translat.Y() + centerV.Y() + params->At(1)));
 	if ( radialSize > fStationRadius[ikst] ) {
-	  cout << "Found bigger radius for station " << ikst << " -> " << radialSize << endl;
+// 	  cout << "Found bigger radius for station " << ikst << " -> " << radialSize << endl;
 	  fStationRadius[ikst] = radialSize;
 	}
 	fStationNrFromMcId[stsNode->getMCid()] = ikst;
@@ -453,11 +453,11 @@ InitStatus CbmStsSimulationQa::GetGeometry() {
     stationNames[fNStations] = geoNodeName.Data();
     fNStations++;
 
-    cout << "station #" << fNStations << " has MCID = " << stsNode->getMCid() << " and name " << stsNode->GetName() << endl;
+//     cout << "station #" << fNStations << " has MCID = " << stsNode->getMCid() << " and name " << stsNode->GetName() << endl;
 
     //    fStationsMCId[fNStations] = stsNode->getMCid(); // not used
   }
-  cout << "There are " << fNStations << " stations" << endl;
+//   cout << "There are " << fNStations << " stations" << endl;
 
   return kSUCCESS;
 
@@ -485,7 +485,7 @@ void CbmStsSimulationQa::CreateHistos() {
   fhPdgCodeRec        = new TH1F("hPdgCodeRec","PDG code - rec in STS",1000,-500,500);
   fhStsPointsRec      = new TH1F("hStsPointsRec","STSPoints per track - rec in STS",2*fNStations,0.5,2*fNStations+0.5);
   fhStsPointsRec->SetXTitle("nof points");  fhStsPointsRec->SetYTitle("yield [a.u.]");
-  fhMomStsPoints      = new TH2F("hMomStsPoints","momentum vs STSPoints per track",10,0,9,100,0,50);
+  fhMomStsPoints      = new TH2F("hMomStsPoints","momentum vs STSPoints per track",1000,0,9,100,0,50);
   fhStsPointsPosition = new TH3F("hStsPointsPosition","STS hits",100,0,100,100,-50,50,100,-50,50);
   fHistoList->Add(fhMomAll);
   fHistoList->Add(fhYPtMapAll);

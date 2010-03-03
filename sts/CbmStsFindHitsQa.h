@@ -62,6 +62,8 @@ class CbmStsFindHitsQa : public FairTask
   /** Constructor with task name **/
   CbmStsFindHitsQa(const char* name, Int_t iVerbose);
 
+  
+  CbmStsFindHitsQa(Bool_t visualizeBool, Int_t iVerbose = 1);
 
   /** Destructor **/
   virtual ~CbmStsFindHitsQa();
@@ -101,21 +103,17 @@ class CbmStsFindHitsQa : public FairTask
   TH2F* fhHitPointCorrelationB[100];
   TH2F* fhHitPointPuls [100];
 
-  TH3F* fhPrimaryVertex;
-
-  TH1F* fhNofFiredDigis[20][300][2];     // per station, sector, side
-  TH1F* fhNofDigisPChip[20][300][2][8];  // per station, sector, side, chip
-  TH1F* fhNofHits      [20][300][3];     // per station, sector, sensor
-
-  TH1F* fhClusterLength[20][300][2];     // per station, sector, side
-
-  TH2F* fhEnergyLoss[20];
+  TH3F* fhEnergyLoss[20];
+  TH3F* fhIncAngle[20];
 
   TH2F* fhPoints    [20];
   TH2F* fhRecoPoints[20];
 
   TH1F* fhHitFindingEfficiency;
-
+  TH2F* fhEffIncAng;
+  TH2F* fhEffPdgSec;
+  TH2F* fhEffPdgPrim;
+  
   /** List of histograms **/
   TList* fHistoList;
   TList* fHistoListPS[20];
@@ -131,13 +129,21 @@ class CbmStsFindHitsQa : public FairTask
    Double_t  fTime6;
    Double_t  fTime7;
    
-  Int_t fNofFiredDigis[20][300][2];     // per station, sector, side
-  Int_t fNofDigisPChip[20][300][2][8];  // per station, sector, side, chip
+ 
   Int_t fNofHits      [20][300][3];     // per station, sector, sensor
 
   Int_t fNofPoints    [20][300][3];
   Int_t fNofRecoPoints[20][300][3];
-
+  Int_t fNofPointsIncAng     [1000];
+  Int_t fNofRecoPointsIncAng [1000];
+  Int_t fNofRecoPdgSec       [20000];
+  Int_t fNofPointsPdgSec     [20000];
+  Int_t fNofRecoPdgPrim      [20000];
+  Int_t fNofPointsPdgPrim    [20000];
+  Int_t fNofPointsPrim;
+  Int_t fNofPointsSec;
+  Int_t fNofRecoPrim;
+  Int_t fNofRecoSec;
   /** Get parameter containers **/
   virtual void SetParContainers();
 
@@ -148,7 +154,10 @@ class CbmStsFindHitsQa : public FairTask
 
   /** Reinitialisation **/
   virtual InitStatus ReInit();
-
+  
+  Bool_t fOnlineAnalysis;
+  TCanvas* recoCanvas;
+  TPad*    recoPad[20];
 
   ClassDef(CbmStsFindHitsQa,1);
 

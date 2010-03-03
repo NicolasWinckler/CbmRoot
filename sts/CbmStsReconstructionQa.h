@@ -158,8 +158,8 @@ class CbmStsReconstructionQa : public FairTask
   TH1F* fhNhClones,   *fhNhGhosts;              // # hits of clones and ghosts   
   
   // acc., eff. vs. track direction, vertex
-  TH2F* fhDirEmiPrimM[25], *fhDirAccPrimM[25], *fhDirAcMPrimM[25], *fhDirRecPrimM[25], *fhDirEffPrimM[25];
-  TH2F* fhDirEmiPrimP[25], *fhDirAccPrimP[25], *fhDirAcMPrimP[25], *fhDirRecPrimP[25], *fhDirEffPrimP[25];
+//   TH2F* fhDirEmiPrimM[25], *fhDirAccPrimM[25], *fhDirAcMPrimM[25], *fhDirRecPrimM[25], *fhDirEffPrimM[25];
+//   TH2F* fhDirEmiPrimP[25], *fhDirAccPrimP[25], *fhDirAcMPrimP[25], *fhDirRecPrimP[25], *fhDirEffPrimP[25];
   
   Int_t fPartPdgTable[10];
   TH1F *fhMomAccPart[10], *fhMomRecPart[10], *fhMomEffPart[10];
@@ -189,8 +189,8 @@ class CbmStsReconstructionQa : public FairTask
   TH1F* fhStsTrackLPos[3];
   TH1F* fhStsTrackFDir[2];
   TH1F* fhStsTrackLDir[2];
-  TH1F* fhStsTrackFCovEl[15];
-  TH1F* fhStsTrackLCovEl[15];
+//   TH1F* fhStsTrackFCovEl[15];
+//   TH1F* fhStsTrackLCovEl[15];
   TH1F* fhStsTrackFMom;
   TH1F* fhStsTrackLMom;
   TH1F* fhStsTrackChiSq;

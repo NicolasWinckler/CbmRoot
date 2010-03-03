@@ -19,6 +19,9 @@
 #include "parallel/LitVecPack.h"
 //#include "CbmLitTrackFitterTester.h"
 
+//#include "cuda/LitCudaConverter.h"
+//#include "cuda/LitCudaDetectorGeometry.h"
+
 #include "CbmGlobalTrack.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
@@ -39,6 +42,10 @@
 #include <iostream>
 #include <algorithm>
 
+//extern "C" void LitCudaFitTracks(
+//		LitCudaTrack* h_tracks[],
+//		const LitCudaDetectorLayout* h_layout,
+//		int nofTracks);
 
 class FastScalarFitClass
 {

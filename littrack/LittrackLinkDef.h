@@ -4,6 +4,8 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ class CudaTest+;
+
 // base
 //#pragma link C++ class CbmLitTool+;
 //#pragma link C++ class CbmLitPDG+;
@@ -100,7 +102,7 @@
 #pragma link C++ class CbmLitCheckEnergyLoss+;
 #pragma link C++ class CbmLitCheckMultipleScattering+;
 #pragma link C++ class CbmLitCheckBrem+;
-//#pragma link C++ class CbmLitTrackFitSpeedTest+;
+#pragma link C++ class CbmLitTrackFitSpeedTest+;
 
 // robust
 //#pragma link C++ class CbmLitWeightedHitCalculatorImp+;

@@ -758,7 +758,7 @@ void CbmLitPropagationAnalysis::DrawForPhd(
 		if (v == 2) hist = fSmootherHistos[fPlaneNoPhd][param[j]];
 		DrawHist1D(hist, xtitles[param[j]], "Counter",
 				LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
-				LIT_MARKER_STYLE1, false, true, "");
+				LIT_MARKER_STYLE1, false, false, "");
 
 		hist->Fit("gaus");
 		TF1 *fit = hist->GetFunction("gaus");

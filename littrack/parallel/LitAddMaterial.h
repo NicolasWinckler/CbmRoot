@@ -85,7 +85,7 @@ inline void LitAddMaterial(
 	T betanew = pnew / Enew;
 	T betaSqnew = betanew * betanew;
 	T gammanew = Enew / mass;
-	T gammaSqnew = gammanew * gammanew;
+//	T gammaSqnew = gammanew * gammanew;
 
 	// Calculate xi factor (KeV).
 	static const T c4 = 153.5;
@@ -105,7 +105,7 @@ inline void LitAddMaterial(
 	T p2 = pnew * pnew;
 	T p6 = p2 * p2 * p2;
 	T qpCorr = (Enew * Enew * dedxSq) / p6;
-	par.C14 += qpCorr; //abs(qpCorr);
+	par.C14 += qpCorr;
 	// end calculate Q/p correction in the covariance matrix
 
 	/*

@@ -177,8 +177,8 @@ myf CbmLitMaterialEffectsImp::dEdx(
         const CbmLitMaterialInfo* mat) const
 {
 	myf dedx = BetheBloch(par, mat);
-	dedx += BetheHeitler(par, mat);
-	if (fIsMuon) dedx += PairProduction(par, mat);
+//	dedx += BetheHeitler(par, mat);
+//	if (fIsMuon) dedx += PairProduction(par, mat);
 	return dedx;
 }
 

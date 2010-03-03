@@ -72,6 +72,7 @@ public:
 			   cz[10]*x2*y2 + cz[11]*x*y3 + cz[12]*y*x3 + cz[13]*x4 + cz[14]*y4 + cz[15]*x2*y3 + cz[16]*y2*x3 +
 			   cz[17]*x*y4 + cz[18]*y*x4 + cz[19]*x5 + cz[20]*y5;
 #endif
+
 	}
 
 	T cx[N], cy[N], cz[N]; // polinom coefficients

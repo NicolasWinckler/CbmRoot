@@ -1,51 +1,56 @@
 // --------------------------------------------------------------------------
 //
-// Macro for reconstruction in STS from digi data
+// Macro for quality check in STS 
 //
-// Tasks:  CbmStsClusterFinder
-//         CbmStsFindHits
-//         CbmStsFindTracks
-//         CbmStsMatchTracks
-//         CbmStsFitTracks
-//
-// V. Friese   12/09/2006
-// Version     24/04/2007 (V. Friese)
+// Tasks:  CbmStsFindHitsQa
+//         CbmStsReconstructionQa
 //
 // --------------------------------------------------------------------------
 
 #include <math.h>
-void sts_reco(Int_t nEvents = 1) {
+void sts_Qa(Int_t nEvents = 1) {
 
   // ========================================================================
   //          Adjust this part according to your requirements
   
   // Input file (MC events)
-  TString inFile = "sts.digi.root";
+  TString inFile = "sts.mc.root";
   
   // Parameter file
   TString parFile = "params.root";
   
+  // STS digitization parameter file
+  TString digipar = "sts_standard.digi.par";
+
+  // STS reconstruction file
+  TString recoFile = "sts.reco.root";
+
   // STS digitisation file
-  TString digiFile = "sts_standard.digi.par";
+  TString digiFile = "sts.digi.root";
   
   // Output file
-  TString outFile = "sts.reco.root";
+  TString outFile = "sts.Qa.root";
 
-  // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
+  // Verbosity level (0=quiet, 3=debug)
   Int_t iVerbose = 0;
   // ========================================================================
 
+
+//   
+
   // ---   Screen output   --------------------------------------------------  
   cout << "***************************************************" << endl;
-  cout << "***   STS REALISTIC RECONSTRUCTION SCRIPT   *******" << endl;
+  cout << "***   STS QA SCRIPT   *******" << endl;
   cout << "***************************************************" << endl;
-  cout << "*** Input file        : " << inFile << endl;
-  cout << "*** Parameter file    : " << parFile << endl;
-  cout << "*** Digi file         : " << digiFile << endl;
-  cout << "*** Output file       : " << outFile << endl;
-  cout << "*** Number of events  : " << nEvents << endl;
+  cout << "*** Input file          : " << inFile << endl;
+  cout << "*** Parameter file      : " << parFile << endl;
+  cout << "*** Digitisation file   : " << digiFile << endl;
+  cout << "*** Reconstruction file : " << recoFile << endl;
+  cout << "*** Output file         : " << outFile << endl;
+  cout << "*** Number of events    : " << nEvents << endl;
   cout << "***************************************************" << endl;
-  cout << endl << endl;
+  cout << endl;
+ 
  // ------------------------------------------------------------------------
 
 
@@ -91,42 +96,30 @@ void sts_reco(Int_t nEvents = 1) {
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna* run= new FairRunAna();
   run->SetInputFile(inFile);
+  run->AddFriend(recoFile);
+  run->AddFriend(digiFile);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
-
-
-  // ---  STS Cluster Finder  ---------------------------------------------------------------------
- 
-  CbmStsClusterFinder* findClusters = new CbmStsClusterFinder("STSFindClusters", iVerbose);
-  run->AddTask(findClusters);
-
-  // ---  STS hit finding   -------------------------------------------------
-
-  CbmStsFindHits* findHits = new CbmStsFindHits("STSFindHits", iVerbose);
-  run->AddTask(findHits);
-
-  // -----   STS track finding   --------------------------------------------
-/*FairTask* kalman= new CbmKF();
-  run->AddTask(kalman);
-  FairTask* l1 = new CbmL1();
-  run->AddTask(l1);
-  CbmStsTrackFinder* trackFinder    = new CbmL1StsTrackFinder();
-  FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder, kFALSE);
-  run->AddTask(findTracks);
+// -----   STS simulation QA   ----------------------------------------
+  FairTask* stsSimQa = new CbmStsSimulationQa(kTRUE,iVerbose);
+  run->AddTask(stsSimQa);
+  // ------------------------------------------------------------------------
+  
+  // -----   STS hit finding QA   ----------------------------------------
+  FairTask* stsFHQa = new CbmStsFindHitsQa(kTRUE,iVerbose);
+  run->AddTask(stsFHQa);
+  // ------------------------------------------------------------------------
+  // -----   STS reconstruction QA   ----------------------------------------
+//   FairTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 3);
+//   run->AddTask(stsRecoQa);
   // ------------------------------------------------------------------------
 
-  // -----   STS track fitting   --------------------------------------------
-  CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
-  FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter",
-					   trackFitter,
-					   iVerbose);
-  run->AddTask(fitTracks);*/
-  // ------------------------------------------------------------------------
+  
 
   // -----  Parameter database   --------------------------------------------
   TString stsDigiFile = gSystem->Getenv("VMCWORKDIR");
   stsDigiFile += "/parameters/sts/";
-  stsDigiFile += digiFile;
+  stsDigiFile += digipar;
   cout << "digi file = " << stsDigiFile << endl;
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
   FairParRootFileIo*  parIo1 = new FairParRootFileIo();
@@ -158,7 +151,6 @@ void sts_reco(Int_t nEvents = 1) {
   cout << endl << endl;
   cout << "Macro finished succesfully." << endl;
   cout << "Output file is "         << outFile << endl;
-  cout << "Parameter file is "      << parFile << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
   cout << endl;
   // ------------------------------------------------------------------------

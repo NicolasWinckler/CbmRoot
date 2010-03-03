@@ -1,45 +1,82 @@
 // --------------------------------------------------------------------------
 //
-// Macro for digitisation of STS
+// Macro for digitization in STS from MC data
 //
-// Task: CbmStsDigitize
+// Tasks:  CbmStsDigitise
 //
-// V. Friese   01/09/2006
+// V. Friese   12/09/2006
+// Version     24/04/2007 (V. Friese)
 //
 // --------------------------------------------------------------------------
 
-
-void sts_digi(Int_t nEvents = 1)
-{
+#include <math.h>
+void sts_digi(Int_t nEvents = 1) {
 
   // ========================================================================
   //          Adjust this part according to your requirements
-
+  
   // Input file (MC events)
   TString inFile = "sts.mc.root";
-
-  // Output file
-  TString outFile = "sts.raw.root";
- 
+  
   // Parameter file
   TString parFile = "params.root";
   
-  // Digitisation file
+  // STS digitisation file
   TString digiFile = "sts_standard.digi.par";
+  
+  // Output file
+  TString outFile = "sts.digi.root";
 
-  // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
-  Int_t iVerbose = 1;
+  // Verbosity level (0=quiet, 3=debug)
+  Int_t iVerbose = 0;
   // ========================================================================
+
+  
+  Double_t threshold  =  4;
+  Double_t noiseWidth =  0.01;
+  Int_t    nofBits    = 20;
+  Double_t minStep    =  0.01,;
+  Double_t StripDeadTime = 0.1;
+//   
+
+  // ---   Screen output   --------------------------------------------------  
+  cout << "***************************************************" << endl;
+  cout << "***   STS DIGITIZATION SCRIPT   *******" << endl;
+  cout << "***************************************************" << endl;
+  cout << "*** Input file        : " << inFile << endl;
+  cout << "*** Parameter file    : " << parFile << endl;
+  cout << "*** Digitisation file : " << digiFile << endl;
+  cout << "*** Output file       : " << outFile << endl;
+  cout << "*** Number of events  : " << nEvents << endl;
+  cout << "***************************************************" << endl;
+  cout << endl;
+  cout << "=============================================" << endl;
+  cout << "===     Realistic response settings  ========" << endl;
+  cout << "=============================================" << endl;
+  cout << "===    threshold  = " << threshold  << endl;
+  cout << "===    noiseWidth = " << noiseWidth << endl;
+  cout << "===    nofBits    = " << nofBits    << endl;
+  cout << "===    minStep    = " << minStep    << endl;
+  cout << "===    StripDeadTime    = " << StripDeadTime*100. << "[ns] " << endl;
+  cout << "=============================================" << endl;
+  cout << endl << endl;
+ // ------------------------------------------------------------------------
+
+
+        
+  // ---  ROOT settings   ---------------------------------------------------
+  gStyle->SetPalette(1);  
+  gDebug = 0;
+  // ------------------------------------------------------------------------
  
 
- 
- 
+  
   // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
   timer.Start();
   // ------------------------------------------------------------------------
 
- 
+    
   
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -58,32 +95,48 @@ void sts_digi(Int_t nEvents = 1)
   gSystem->Load("libTrd");
   gSystem->Load("libTof");
   gSystem->Load("libGlobal");
+  gSystem->Load("libEcal");
   gSystem->Load("libKF");
   gSystem->Load("libL1");
   // ------------------------------------------------------------------------
 
-
+  
 
   // -----   Reconstruction run   -------------------------------------------
-  FairRunAna *run= new FairRunAna();
+  FairRunAna* run= new FairRunAna();
   run->SetInputFile(inFile);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
 
-
-  
-  // ---  STS digitizer   ----------------------------------------------------
-  FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
-  run->AddTask(stsDigitize);
+  // -----   OLD MVD Hitproducer   ----------------------------------------------
+//   CbmMvdHitProducer* hitProd = new CbmMvdHitProducer("MVDHitProducer", 0, iVerbose);
+//   run->AddTask(hitProd);
   // ------------------------------------------------------------------------
 
+  // -----   STS digitiser   ------------------------------------------------
+  //  CbmTask* 
+  CbmStsDigitize* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
+  stsDigitize->SetRealisticResponse();
+  stsDigitize->SetFrontThreshold (threshold);
+  stsDigitize->SetBackThreshold  (threshold);
+  stsDigitize->SetFrontNoiseWidth(noiseWidth);
+  stsDigitize->SetBackNoiseWidth (noiseWidth);
 
-  
+  stsDigitize->SetFrontNofBits   (nofBits);
+  stsDigitize->SetBackNofBits    (nofBits);
+  stsDigitize->SetFrontMinStep   (minStep);
+  stsDigitize->SetBackMinStep    (minStep);
+
+  stsDigitize->SetStripDeadTime  (StripDeadTime);
+
+  run->AddTask(stsDigitize);
+  // ------------------------------------------------------------------------
  
   // -----  Parameter database   --------------------------------------------
   TString stsDigiFile = gSystem->Getenv("VMCWORKDIR");
   stsDigiFile += "/parameters/sts/";
   stsDigiFile += digiFile;
+  cout << "digi file = " << stsDigiFile << endl;
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
   FairParRootFileIo*  parIo1 = new FairParRootFileIo();
   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
@@ -95,12 +148,10 @@ void sts_digi(Int_t nEvents = 1)
   rtdb->saveOutput();
   // ------------------------------------------------------------------------
 
-
-     
-  // -----   Intialise and run   --------------------------------------------
+  // -----   Initialise and run   -------------------------------------------
   run->LoadGeometry();
   run->Init();
-  run->Run(0,nEvents);
+  run->Run(0, nEvents);
   // ------------------------------------------------------------------------
 
 
@@ -108,14 +159,18 @@ void sts_digi(Int_t nEvents = 1)
   // -----   Finish   -------------------------------------------------------
   timer.Stop();
   Double_t rtime = timer.RealTime();
+
+
   Double_t ctime = timer.CpuTime();
   cout << endl << endl;
   cout << "Macro finished succesfully." << endl;
-  cout << "Output file is "    << outFile << endl;
-  cout << "Parameter file is " << parFile << endl;
+  cout << "Output file is "         << outFile << endl;
+  cout << "Parameter file is "      << parFile << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
   cout << endl;
   // ------------------------------------------------------------------------
 
 
 }
+
+

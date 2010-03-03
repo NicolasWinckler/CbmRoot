@@ -1,12 +1,14 @@
 // --------------------------------------------------------------------------
 //
-// Macro for reconstruction in STS from digi data
+// Macro for reconstruction in STS from MC data
 //
-// Tasks:  CbmStsClusterFinder
+// Tasks:  CbmStsDigitise
 //         CbmStsFindHits
+//         CbmStsMatchHits
 //         CbmStsFindTracks
 //         CbmStsMatchTracks
 //         CbmStsFitTracks
+//         CbmStsReconstructionQa
 //
 // V. Friese   12/09/2006
 // Version     24/04/2007 (V. Friese)
@@ -20,7 +22,7 @@ void sts_reco(Int_t nEvents = 1) {
   //          Adjust this part according to your requirements
   
   // Input file (MC events)
-  TString inFile = "sts.digi.root";
+  TString inFile = "sts.mc.root";
   
   // Parameter file
   TString parFile = "params.root";
@@ -35,16 +37,34 @@ void sts_reco(Int_t nEvents = 1) {
   Int_t iVerbose = 0;
   // ========================================================================
 
+  
+  Double_t threshold  =  4;
+  Double_t noiseWidth =  0.1;
+  Int_t    nofBits    = 20;
+  Double_t minStep    =  0.01,;
+  Double_t StripDeadTime = 10.;
+  
+
   // ---   Screen output   --------------------------------------------------  
   cout << "***************************************************" << endl;
   cout << "***   STS REALISTIC RECONSTRUCTION SCRIPT   *******" << endl;
   cout << "***************************************************" << endl;
   cout << "*** Input file        : " << inFile << endl;
   cout << "*** Parameter file    : " << parFile << endl;
-  cout << "*** Digi file         : " << digiFile << endl;
+  cout << "*** Digitisation file : " << digiFile << endl;
   cout << "*** Output file       : " << outFile << endl;
   cout << "*** Number of events  : " << nEvents << endl;
   cout << "***************************************************" << endl;
+  cout << endl;
+  cout << "=============================================" << endl;
+  cout << "===     Realistic response settings  ========" << endl;
+  cout << "=============================================" << endl;
+  cout << "===    threshold  = " << threshold  << endl;
+  cout << "===    noiseWidth = " << noiseWidth << endl;
+  cout << "===    nofBits    = " << nofBits    << endl;
+  cout << "===    minStep    = " << minStep    << endl;
+  cout << "===    StripDeadTime    = " << StripDeadTime*100. << "[ns] " << endl;
+  cout << "=============================================" << endl;
   cout << endl << endl;
  // ------------------------------------------------------------------------
 
@@ -94,34 +114,95 @@ void sts_reco(Int_t nEvents = 1) {
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
 
+  // -----   OLD MVD Hitproducer   ----------------------------------------------
+  CbmMvdHitProducer* hitProd = new CbmMvdHitProducer("MVDHitProducer", 0, iVerbose);
+  run->AddTask(hitProd);
+  // ------------------------------------------------------------------------
+ 
+  // -----   NEW MVD   --------------------------------------------------------
 
-  // ---  STS Cluster Finder  ---------------------------------------------------------------------
+
+
+  // -----   STS digitiser   ------------------------------------------------
+  //  CbmTask* 
+  CbmStsDigitize* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
+  stsDigitize->SetRealisticResponse();
+  stsDigitize->SetFrontThreshold (threshold);
+  stsDigitize->SetBackThreshold  (threshold);
+  stsDigitize->SetFrontNoiseWidth(noiseWidth);
+  stsDigitize->SetBackNoiseWidth (noiseWidth);
+
+  stsDigitize->SetFrontNofBits   (nofBits);
+  stsDigitize->SetBackNofBits    (nofBits);
+  stsDigitize->SetFrontMinStep   (minStep);
+  stsDigitize->SetBackMinStep    (minStep);
+
+  stsDigitize->SetStripDeadTime  (StripDeadTime);
+
+  run->AddTask(stsDigitize);
+  // ------------------------------------------------------------------------
  
   CbmStsClusterFinder* findClusters = new CbmStsClusterFinder("STSFindClusters", iVerbose);
   run->AddTask(findClusters);
 
+  
   // ---  STS hit finding   -------------------------------------------------
-
+  //  CbmTask* 
   CbmStsFindHits* findHits = new CbmStsFindHits("STSFindHits", iVerbose);
   run->AddTask(findHits);
 
+  
+  // ---  STS hit matching   ------------------------------------------------
+  //  CbmTask*
+  CbmStsMatchHits* matchHits = new CbmStsMatchHits("STSMatchHits",iVerbose);
+  matchHits->SetRealisticResponse();
+  run->AddTask(matchHits);
+  // ------------------------------------------------------------------------
+  
+  
   // -----   STS track finding   --------------------------------------------
-/*FairTask* kalman= new CbmKF();
+  FairTask* kalman= new CbmKF();
   run->AddTask(kalman);
   FairTask* l1 = new CbmL1();
   run->AddTask(l1);
   CbmStsTrackFinder* trackFinder    = new CbmL1StsTrackFinder();
-  FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder, kFALSE);
+  FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder, kTRUE);
   run->AddTask(findTracks);
   // ------------------------------------------------------------------------
 
+  
+         
+  // -----   STS track matching   -------------------------------------------
+  FairTask* matchTracks = new CbmStsMatchTracks("Match tracks", iVerbose);
+  run->AddTask(matchTracks);
+  // ------------------------------------------------------------------------
+  
+
+  
   // -----   STS track fitting   --------------------------------------------
   CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
   FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter",
 					   trackFitter,
 					   iVerbose);
-  run->AddTask(fitTracks);*/
+  run->AddTask(fitTracks);
   // ------------------------------------------------------------------------
+  
+  
+   // -----   STS reconstruction QA   ----------------------------------------
+FairTask* stsSimQa = new CbmStsSimulationQa(kTRUE,iVerbose);
+  run->AddTask(stsSimQa);
+  // ------------------------------------------------------------------------
+  
+  // -----   STS hit finding QA   ----------------------------------------
+  FairTask* stsFHQa = new CbmStsFindHitsQa(kTRUE,iVerbose);
+  run->AddTask(stsFHQa);
+   // ------------------------------------------------------------------------
+  // -----   STS reconstruction QA   ----------------------------------------
+   FairTask* stsRecoQa = new CbmStsReconstructionQa(kTRUE, 4, 0.7, 0);
+   run->AddTask(stsRecoQa);
+ // ------------------------------------------------------------------------
+
+  
 
   // -----  Parameter database   --------------------------------------------
   TString stsDigiFile = gSystem->Getenv("VMCWORKDIR");

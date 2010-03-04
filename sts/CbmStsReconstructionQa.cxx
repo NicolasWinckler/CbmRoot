@@ -224,17 +224,17 @@ InitStatus CbmStsReconstructionQa::Init() {
   Reset();
 
   if ( fOnlineAnalysis ) {
-    fOnlineCanvas = new TCanvas("StsRecoOnline","Sts reconstruction online",10,10,600,900);
-    fOnlinePad[0] = new TPad("titlePad",   "Title pad"                     ,0.01,0.91,0.99,0.99);
-    fOnlinePad[1] = new TPad("efficiencyPad","Efficiency pad"              ,0.01,0.61,0.39,0.89);
-    fOnlinePad[2] = new TPad("resolutionPad","Momentum resolution pad"     ,0.01,0.31,0.39,0.59);
-    fOnlinePad[3] = new TPad("hitVspoint3Pad","Hit vs point on st.3 pad"   ,0.41,0.66,0.69,0.89);
-    fOnlinePad[4] = new TPad("hitVspoint6Pad","Hit vs point on st.6 pad"   ,0.71,0.66,0.99,0.89);
-    fOnlinePad[5] = new TPad("hitVspntXY3Pad","Hit vs point XY on st.3 pad",0.41,0.41,0.69,0.64);
-    fOnlinePad[6] = new TPad("hitVspntXY6Pad","Hit vs point XY on st.6 pad",0.71,0.41,0.99,0.64);
-    fOnlinePad[7] = new TPad("printoutPad","Print information pad"         ,0.41,0.16,0.69,0.41);
-    fOnlinePad[8] = new TPad("printoutPad","Print information pad"         ,0.71,0.16,0.99,0.41);
-    fOnlinePad[9] = new TPad("printoutPad","Print information pad"         ,0.01,0.01,0.39,0.29);
+    fOnlineCanvas = new TCanvas("StsRecoOnline","Sts reconstruction online"    ,10,10,600,900);
+    fOnlinePad[0] = new TPad("titlePad",   "Title pad"                         ,0.01,0.91,0.99,0.99);
+    fOnlinePad[1] = new TPad("efficiencyPad","Efficiency pad"                  ,0.01,0.61,0.39,0.89);
+    fOnlinePad[2] = new TPad("resolutionPad","Momentum resolution pad"         ,0.01,0.31,0.39,0.59);
+    fOnlinePad[3] = new TPad("hNpAccAll","Nof points reconstructuble tracks"   ,0.41,0.66,0.69,0.89);
+    fOnlinePad[4] = new TPad("hNpRecAll","Nof points reconstructed track"      ,0.71,0.66,0.99,0.89);
+    fOnlinePad[5] = new TPad("hStsTrackFPosZ","Param First pos Z"              ,0.41,0.41,0.69,0.64);
+    fOnlinePad[6] = new TPad("hStsTrackLPosZ","Param Last pos Z"               ,0.71,0.41,0.99,0.64);
+    fOnlinePad[7] = new TPad("hMomPrim","Momentum of primary tracks"           ,0.41,0.16,0.69,0.41);
+    fOnlinePad[8] = new TPad("hMomSec","Momentum of secondary tracks"          ,0.71,0.16,0.99,0.41);
+    fOnlinePad[9] = new TPad("printoutPad","Print information pad"             ,0.01,0.01,0.39,0.29);
     fOnlinePad[7]->SetLogy();
     fOnlinePad[8]->SetLogy();
     for ( Int_t ipad = 0 ; ipad < 10 ; ipad++ ) {

@@ -427,7 +427,7 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
     printoutPave->SetTextColor(1);
     printoutPave->SetBorderSize(0);
     printoutPave->SetFillColor(0);
-    printoutPave->AddText(Form("%i events",fNEvents));
+    printoutPave->AddText(Form("%i events",fNEvents+1));
     printoutPave->AddText(Form("Hits/Points %3.2f ",
 			     Double_t (nofStsHits)/Double_t (nofStsPoints)));
 
@@ -692,19 +692,19 @@ InitStatus CbmStsFindHitsQa::Init() {
     TCanvas* recoCanvas = new TCanvas("StsRecoCanvas","Sts reconstruction",10,10,600,900);
 //     TPad* recoPad[10];
 
-    recoPad[0] = new TPad("titlePad",   "Title pad"                     ,0.00,0.90,1.00,1.00);
-    recoPad[1] = new TPad("efficiencyPad","Efficiency pad"              ,0.00,0.60,0.40,0.90);
-    recoPad[3] = new TPad("hitVspoint3Pad","Hit vs point on st.3 pad"   ,0.40,0.65,0.70,0.90);
-    recoPad[4] = new TPad("hitVspoint6Pad","Hit vs point on st.6 pad"   ,0.70,0.65,1.00,0.90);
-    recoPad[5] = new TPad("hitVspntXY3Pad","Hit vs point XY on st.3 pad",0.40,0.40,0.70,0.65);
-    recoPad[6] = new TPad("hitVspntXY6Pad","Hit vs point XY on st.6 pad",0.70,0.40,1.00,0.65);
-    recoPad[2] = new TPad("Points vs hits st1","Points vs hits st1"         ,0.00,0.20,0.33,0.40);
-    recoPad[7] = new TPad("Points vs hits st2","Points vs hits st2"         ,0.33,0.20,0.66,0.40);
-    recoPad[8] = new TPad("Points vs hits st4","Points vs hits st4"         ,0.66,0.20,1.00,0.40);
-    recoPad[9] = new TPad("Points vs hits st5","Points vs hits st5"         ,0.00,0.00,0.33,0.20);
-    recoPad[10] = new TPad("Points vs hits st6","Points vs hits st6"        ,0.33,0.00,0.66,0.20);
-    recoPad[11] = new TPad("Points vs hits st8","Points vs hits st8"        ,0.66,0.00,1.00,0.20);
-    recoPad[12] = new TPad("printoutPad","Print information pad"            ,0.00,0.40,0.40,0.60);
+    recoPad[0] = new TPad("titlePad",   "Title pad"                       ,0.00,0.90,1.00,1.00);
+    recoPad[1] = new TPad("efficiencyPad","Efficiency pad"                ,0.00,0.60,0.40,0.90);
+    recoPad[3] = new TPad("hitVspoint1Pad","Hit vs point on st.1 pad"     ,0.40,0.65,0.70,0.90);
+    recoPad[4] = new TPad("hitPullst1","Hit vs sigma on st.1 pad"         ,0.70,0.65,1.00,0.90);
+    recoPad[5] = new TPad("hitVspntXY1Pad","Hit vs point XY on st.1 pad"  ,0.40,0.40,0.70,0.65);
+    recoPad[6] = new TPad("hitVssigmaXY6Pad","Hit vs sigma XY on st.1 pad",0.70,0.40,1.00,0.65);
+    recoPad[2] = new TPad("Reco Points st1","Reco Points st1"         	  ,0.00,0.20,0.33,0.40);
+    recoPad[7] = new TPad("Reco Points st2","Reco Points st2"             ,0.33,0.20,0.66,0.40);
+    recoPad[8] = new TPad("Reco Points st3","Reco Points st3"             ,0.66,0.20,1.00,0.40);
+    recoPad[9] = new TPad("Reco Points st5","Reco Points st5"             ,0.00,0.00,0.33,0.20);
+    recoPad[10] = new TPad("Reco Points st6","Reco Points st6"            ,0.33,0.00,0.66,0.20);
+    recoPad[11] = new TPad("Reco Points st8","Reco Points st8"            ,0.66,0.00,1.00,0.20);
+    recoPad[12] = new TPad("printoutPad","Print information pad"          ,0.00,0.40,0.40,0.60);
 //     recoPad[12]->SetLogz();
     for ( Int_t ipad = 0 ; ipad < 13 ; ipad++ ) {
 	recoPad[ipad]->SetFillColor(0);

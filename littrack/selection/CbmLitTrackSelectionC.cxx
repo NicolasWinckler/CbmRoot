@@ -104,8 +104,8 @@ void CbmLitTrackSelectionC::CheckSharedHits(
 		TrackPtrIterator itEnd)
 {
 	std::set<int> hitsId;
-	const int STRIPSTART = 1e5;
-	const int TRDSTART = 1e6;
+	const int STRIPSTART = 100000;
+	const int TRDSTART = 1000000;
 
 	for (TrackPtrIterator iTrack = itBegin; iTrack != itEnd; iTrack++) {
 		CbmLitTrack* track = *iTrack;

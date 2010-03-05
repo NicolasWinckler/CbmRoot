@@ -109,6 +109,7 @@ qa/CbmLitCheckField.cxx
 qa/CbmLitCheckEnergyLoss.cxx
 qa/CbmLitCheckBrem.cxx 
 #qa/CbmLitTrackFitSpeedTest.cxx
+qa/CbmTrdHitsQa.cxx
 weight/CbmLitWeightedHitCalculatorImp.cxx
 weight/CbmLitWeightCalculatorSimple.cxx
 weight/CbmLitWeightCalculatorGauss.cxx
@@ -158,6 +159,7 @@ qa/CbmLitCheckEnergyLoss.h
 qa/CbmLitCheckMultipleScattering.h
 qa/CbmLitCheckBrem.h 
 #qa/CbmLitTrackFitSpeedTest.h
+qa/CbmTrdHitsQa.h
 #cuda/CudaTest.h
 )
 

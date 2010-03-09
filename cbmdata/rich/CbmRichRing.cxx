@@ -53,7 +53,6 @@ CbmRichRing::CbmRichRing()
   : TObject(),
     fCenterX(), fCenterY(), fRadius(),
     fTrackID ( -1 ),
-    fMCMotherID ( -1 ),
     fDistance ( 99 ),
     fChi2 ( 0 ),
     fRecFlag(0)
@@ -65,13 +64,12 @@ CbmRichRing::CbmRichRing()
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmRichRing::CbmRichRing ( Double_t x,
-			   Double_t y,
-			   Double_t r )
+CbmRichRing::CbmRichRing ( Float_t x,
+			   Float_t y,
+			   Float_t r )
   : TObject(),
     fCenterX ( x ), fCenterY ( y ), fRadius ( r ),
     fTrackID ( -1 ),
-    fMCMotherID ( -1 ),
     fDistance ( 99 ),
     fChi2 ( 0 ),
     fRecFlag(0)
@@ -100,10 +98,10 @@ void CbmRichRing::SetXYABPhi(Double_t x, Double_t y,
     fPhi = phi;
 }
 
-Bool_t CbmRichRing::RemoveHit(Int_t hitId)
+Bool_t CbmRichRing::RemoveHit(UShort_t hitId)
 {
 	//Int_t nofHits = fHitCollection.size();
-	std::vector<Int_t>::iterator it;
+	std::vector<UShort_t>::iterator it;
 	for (it = fHitCollection.begin(); it!=fHitCollection.end(); it++){
 		if (hitId == *it){
 			fHitCollection.erase(it);
@@ -167,21 +165,13 @@ void CbmRichRing::Print(){
 			", NofHitsOnRing = " << GetNofHitsOnRing() << std::endl;
 }
 
-Double_t CbmRichRing::GetRadialPosition() const{
-   Double_t radPos;
-   if (fCenterY > 0){
-       radPos = sqrt((fCenterX - 0)*
-		     (fCenterX - 0) +
-		     (fCenterY - 110)*
-		     (fCenterY - 110));
-   } else {
-       radPos = sqrt((fCenterX - 0)*
-		     (fCenterX - 0) +
-		     (fCenterY + 110)*
-		     (fCenterY + 110));
-   }
-
-   return radPos;
+Float_t CbmRichRing::GetRadialPosition() const
+{
+	if (fCenterY > 0.f) {
+		return sqrt(fCenterX*fCenterX + (fCenterY-110.f)*(fCenterY-110.f));
+	} else {
+		return sqrt(fCenterX*fCenterX + (fCenterY+110.f)*(fCenterY+110.f));
+	}
 }
 
 Double_t CbmRichRing::GetRadialAngle() const{
@@ -205,6 +195,25 @@ Double_t CbmRichRing::GetRadialAngle() const{
     }
 
     return 999.;
+}
+
+CbmRichRingLight* CbmRichRing::toLightRing()
+{
+	CbmRichRingLight* rl = new CbmRichRingLight();
+
+	for (int i = 0; i < this->GetNofHits(); i ++){
+		rl->AddHit(this->GetHit(i));
+	}
+	rl->SetCenterX(this->GetCenterX());
+	rl->SetCenterY(this->GetCenterY());
+	rl->SetRadius(this->GetRadius());
+	rl->SetAngle(this->GetAngle());
+	rl->SetChi2(this->GetChi2());
+	rl->SetNofHitsOnRing(this->GetNofHitsOnRing());
+	rl->SetSelectionNN(this->GetSelectionNN());
+	rl->SetRecFlag(this->GetRecFlag());
+
+	return rl;
 }
 
 ClassImp(CbmRichRing)

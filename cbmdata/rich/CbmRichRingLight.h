@@ -2,14 +2,14 @@
  * CbmRichRingLight.h
  *
  *  Created on: 09.03.2010
- *      Author: Semen Lebedev
+ *  Author: Semen Lebedev
  */
 
 #ifndef CBMRICHRINGLIGHT_H_
 #define CBMRICHRINGLIGHT_H_
 
 #include <vector>
-#include <math.h>
+#include <cmath>
 
 class CbmRichRingLight
 {
@@ -22,9 +22,9 @@ public:
 		fHitCollection.clear();
 	}
 
-	void AddHit(UShort_t pHit)  {fHitCollection.push_back(pHit);}
-	void RemoveHit(UShort_t hitId){
-		std::vector<UShort_t>::iterator it;
+	void AddHit(unsigned short pHit)  {fHitCollection.push_back(pHit);}
+	void RemoveHit(unsigned short hitId){
+		std::vector<unsigned short>::iterator it;
 		for (it = fHitCollection.begin(); it!=fHitCollection.end(); it++){
 			if (hitId == *it){
 				fHitCollection.erase(it);
@@ -33,26 +33,26 @@ public:
 		}
 	}
 
-	Int_t GetNofHits() const {return fHitCollection.size(); }
-	UShort_t GetHit(Int_t i) {return fHitCollection[i];}
+	int GetNofHits() const {return fHitCollection.size(); }
+	unsigned short GetHit(int i) {return fHitCollection[i];}
 
-	void SetCenterX(Float_t x) {fCenterX = x;}
-    void SetCenterY(Float_t y) {fCenterY = y;}
-	void SetRadius(Float_t r) {fRadius = r;}
-	void SetChi2(Float_t chi2) {fChi2 = chi2;}
-	void SetAngle( Float_t angle) {fAngle = angle;}
-	void SetNofHitsOnRing(UShort_t onring) {fNofHitsOnRing = onring;}
+	void SetCenterX(float x) {fCenterX = x;}
+    void SetCenterY(float y) {fCenterY = y;}
+	void SetRadius(float r) {fRadius = r;}
+	void SetChi2(float chi2) {fChi2 = chi2;}
+	void SetAngle( float angle) {fAngle = angle;}
+	void SetNofHitsOnRing(unsigned short onring) {fNofHitsOnRing = onring;}
 	/** number between -1 and 1: -1 = fake ring, 1 = good ring (selection by neural net)*/
-	void SetSelectionNN (Float_t selectionNN ) {fSelectionNN = selectionNN;}
-	void SetRecFlag(Short_t recFlag){fRecFlag = recFlag;}
+	void SetSelectionNN (float selectionNN ) {fSelectionNN = selectionNN;}
+	void SetRecFlag(short recFlag){fRecFlag = recFlag;}
 
-	Float_t GetCenterX() const {return fCenterX;}
-	Float_t GetCenterY() const {return fCenterY;}
-	Float_t GetRadius() const {return fRadius;}
-	Float_t GetSelectionNN() const {return fSelectionNN;}
-	Float_t GetChi2() const {return fChi2;}
-	Float_t GetNDF() const {return (Float_t)(GetNofHits()-5);}
-	Float_t GetRadialPosition() const{
+	float GetCenterX() const {return fCenterX;}
+	float GetCenterY() const {return fCenterY;}
+	float GetRadius() const {return fRadius;}
+	float GetSelectionNN() const {return fSelectionNN;}
+	float GetChi2() const {return fChi2;}
+	float GetNDF() const {return (float)(GetNofHits()-5);}
+	float GetRadialPosition() const{
 		if (fCenterY > 0.f){
 		       return sqrt(fCenterX*fCenterX +(fCenterY - 110.f)*(fCenterY - 110.f));
 		   } else {
@@ -60,22 +60,22 @@ public:
 		};
 	}
 
-	Float_t GetAngle() const {return fAngle;}
-	UShort_t GetNofHitsOnRing() const {return fNofHitsOnRing;}
-	Short_t GetRecFlag(){return fRecFlag;}
+	float GetAngle() const {return fAngle;}
+	unsigned short GetNofHitsOnRing() const {return fNofHitsOnRing;}
+	short GetRecFlag(){return fRecFlag;}
 
 private:
-   std::vector<UShort_t> fHitCollection; /** STL container to hold the hit indexes */
+   std::vector<unsigned short> fHitCollection; /** STL container to hold the hit indexes */
 
 protected:
-    Float_t fCenterX;
-	Float_t fCenterY;
-	Float_t fRadius;
-	Float_t fChi2;
-	Float_t fAngle;
-	UShort_t fNofHitsOnRing;
-	Short_t fRecFlag;
-	Float_t fSelectionNN;
+    float fCenterX;
+	float fCenterY;
+	float fRadius;
+	float fChi2;
+	float fAngle;
+	unsigned short fNofHitsOnRing;
+	short fRecFlag;
+	float fSelectionNN;
 };
 
 #endif /* CBMRICHRINGLIGHT_H_ */

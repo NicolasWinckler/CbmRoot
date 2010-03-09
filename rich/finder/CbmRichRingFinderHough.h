@@ -7,7 +7,7 @@
 #define CBM_RICH_RING_FINDER_HOUGH_H
 
 #include "CbmRichRingFinder.h"
-
+#include "CbmRichRingLight.h"
 #include "TString.h"
 
 #include <vector>
@@ -49,7 +49,7 @@ public:
 			Float_t rmsCoeffEl, Float_t maxCutEl,
 			Float_t rmsCoeffCOP, Float_t maxCutCOP);
 
-    void AddRingsToOutputArray(TClonesArray *rRingArray,std::vector<CbmRichRing*>& rings);
+    void AddRingsToOutputArray(TClonesArray *rRingArray,std::vector<CbmRichRingLight*>& rings);
 
 	virtual void Init();
 

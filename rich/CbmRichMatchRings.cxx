@@ -309,8 +309,6 @@ void CbmRichMatchRings::Exec(Option_t* opt) {
 					      nWrong, nFake,
 					      nMCHits, nMCTracks);
 
-    // Set the MCMotherID for the ring
-    ring->SetMCMotherID(iMCTrack);
 
     // Some statistics
     nHitSum     += nHits;

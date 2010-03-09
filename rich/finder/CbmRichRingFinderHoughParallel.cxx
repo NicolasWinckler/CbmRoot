@@ -26,9 +26,9 @@ using std::endl;
 using std::vector;
 
 class FinderTask{
-	CbmRichRingFinderHoughParallelImpl* fHTImpl;
+	CbmRichRingFinderHoughImpl* fHTImpl;
 public:
-	FinderTask(CbmRichRingFinderHoughParallelImpl* HTImpl) {
+	FinderTask(CbmRichRingFinderHoughImpl* HTImpl) {
 		fHTImpl = HTImpl;
 	}
 
@@ -54,9 +54,9 @@ void CbmRichRingFinderHoughParallel::Init()
     fNEvent = 0;
     fRingCount = 0;
 
-	fHTImpl1 = new CbmRichRingFinderHoughParallelImpl(fGeometryType);
+	fHTImpl1 = new CbmRichRingFinderHoughImpl(fGeometryType);
 	fHTImpl1->Init();
-	fHTImpl2 = new CbmRichRingFinderHoughParallelImpl(fGeometryType);
+	fHTImpl2 = new CbmRichRingFinderHoughImpl(fGeometryType);
 	fHTImpl2->Init();
 	tbb::task_scheduler_init init;
 }
@@ -142,11 +142,15 @@ Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
 }
 
 void CbmRichRingFinderHoughParallel::AddRingsToOutputArray(TClonesArray *rRingArray,
-		vector<CbmRichRing*>& rings)
+		std::vector<CbmRichRingLight*>& rings)
 {
 	for (UInt_t iRing = 0; iRing < rings.size(); iRing++) {
 		if (rings[iRing]->GetRecFlag() == -1)	continue;
-		new ((*rRingArray)[fRingCount]) CbmRichRing(*rings[iRing]);
+		CbmRichRing* r = new CbmRichRing();
+		for (Int_t i = 0; i < rings[iRing]->GetNofHits(); i++){
+			r->AddHit(rings[iRing]->GetHit(i));
+		}
+		new ((*rRingArray)[fRingCount]) CbmRichRing(*r);
 		fRingCount++;
 	}
 }

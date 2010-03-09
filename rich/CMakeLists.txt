@@ -21,6 +21,7 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
 #/u/slebedev/Baykal/tbb21_017oss/include
+/u/andrey/soft/tbb/tbb22_009oss/include
 
 ${CBMROOT_SOURCE_DIR}/rich 
 )
@@ -47,9 +48,9 @@ finder/CbmRichFindRings.cxx
 #finder/CbmRichFuzzyKE.cxx
 #finder/CbmRichRingFinderHoughSimd.cxx
 finder/CbmRichRingFinderHough.cxx
-#finder/CbmRichRingFinderHoughParallel.cxx
+finder/CbmRichRingFinderHoughParallel.cxx
 finder/CbmRichRingFinderHoughImpl.cxx
-#finder/CbmRichRingFinderHoughParallelImpl.cxx
+finder/CbmRichRingFinderHoughParallelImpl.cxx
 fitter/CbmRichRingFitterCircle.cxx 
 fitter/CbmRichFitRings.cxx
 fitter/CbmRichRingFitterCOP.cxx 
@@ -74,8 +75,7 @@ qa/CbmRichRingFitterQa.cxx
 qa/CbmRichElectronsQa.cxx
 selection/CbmRichRingSelectImpl.cxx
 selection/CbmRichRingSelectNeuralNet.cxx
-selection/CbmRichSelectRings.cxx
-#selection/NNfunction.cxx
+selection/NNfunction.cxx
 #LhcbRingFinder.cxx
 #CbmRichTestSimd.cxx
 )
@@ -93,13 +93,13 @@ finder/CbmRichRingFinderIdeal.h
 finder/CbmRichFindRings.h
 #finder/CbmRichFuzzyKE.h
 #finder/CbmRichRingFinderHoughSimd.h
-#finder/CbmRichRingFinderHoughParallel.h
+finder/CbmRichRingFinderHoughParallel.h
 #finder/CbmRichRingFinderHoughImpl.h
 finder/CbmRichRingFinderHough.h
 #finder/CbmRichRingFinderHoughParallelImpl.h
 fitter/CbmRichRingFitterCircle.h
 fitter/CbmRichFitRings.h
-fitter/CbmRichRingFitterCOP.h
+#fitter/CbmRichRingFitterCOP.h
 fitter/CbmRichRingFitterRobustCOP.h
 fitter/CbmRichRingFitterTAU.h
 fitter/CbmRichRingFitterImpl.h
@@ -119,9 +119,8 @@ qa/CbmRichRingQa.h
 qa/CbmRichGeoTest.h
 qa/CbmRichRingFitterQa.h
 qa/CbmRichElectronsQa.h
-selection/CbmRichRingSelectImpl.h
-selection/CbmRichRingSelectNeuralNet.h
-selection/CbmRichSelectRings.h
+#selection/CbmRichRingSelectImpl.h
+#selection/CbmRichRingSelectNeuralNet.h
 #LhcbRingFinder.h
 )
 

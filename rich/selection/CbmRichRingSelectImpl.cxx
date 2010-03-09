@@ -1,32 +1,15 @@
-/******************************************************************************
-*  $Id: CbmRichRingSelectImpl.cxx,v 1.1 2006/09/13 14:53:31 hoehne Exp $
-*
-*  Class  : CbmRichRingSelectImpl
-*  Description : Abstract base class for concrete RICH ring selection algorithm:
-*                to be run after ring-track assign for fake-ring rejection
-*
-*  Author : Simeon Lebedev
-*  E-mail : salebedev@jinr.ru
-*
-*******************************************************************************
-*  $Log: CbmRichRingSelectImpl.cxx,v $
-*  Revision 1.1  2006/09/13 14:53:31  hoehne
-*  initial version
-*
-*
-*
-*******************************************************************************/
 #include "CbmRichRingSelectImpl.h"
-
-#include "CbmRichRing.h"
-
+#include "CbmRichHit.h"
 #include "FairRootManager.h"
-
-#include "TMath.h"
 
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <algorithm>
+
+#include "TClonesArray.h"
+#include "CbmRichRingLight.h"
+#include "CbmRichRing.h"
 
 using std::vector;
 using std::cout;
@@ -57,69 +40,66 @@ void CbmRichRingSelectImpl::Init()
 	fPhi.resize(kMAX_NOF_HITS);
 }
 
-Int_t CbmRichRingSelectImpl::GetNofHitsOnRing(CbmRichRing* ring){
-    Int_t count = 0;
-	Int_t nHits = ring->GetNofHits();
+int CbmRichRingSelectImpl::GetNofHitsOnRing(CbmRichRing* ring){
+    int count = 0;
+	int nHits = ring->GetNofHits();
 	CbmRichHit* hit;
-	Double_t A = ring->GetAPar();
-	Double_t B = ring->GetBPar();
-	Double_t C = ring->GetCPar();
-	Double_t D = ring->GetDPar();
-	Double_t E = ring->GetEPar();
-	Double_t F = ring->GetFPar();
-	Double_t t1, t2;
-	for(Int_t iH = 0; iH < nHits; iH++){
+	double A = ring->GetAPar();
+	double B = ring->GetBPar();
+	double C = ring->GetCPar();
+	double D = ring->GetDPar();
+	double E = ring->GetEPar();
+	double F = ring->GetFPar();
+	double t1, t2;
+	for(int iH = 0; iH < nHits; iH++){
 		hit = (CbmRichHit*)fHitsArray->At(ring->GetHit(iH));
 		if (!hit) continue;
 
-		Double_t x =hit->GetX();
-		Double_t y = hit->GetY();
+		double x =hit->GetX();
+		double y = hit->GetY();
 
-        Double_t d1 = TMath::Abs(A*x*x + B*x*y + C*y*y + D*x + E*y + F);
+        double d1 = fabs(A*x*x + B*x*y + C*y*y + D*x + E*y + F);
         t1 = 2*A*x + B*y + D;
         t2 = B*x + 2*C*y + E;
-        Double_t d2 = sqrt( t1 * t1 + t2*t2);
+        double d2 = sqrt( t1 * t1 + t2*t2);
 
-        Double_t d = d1/d2;
+        double d = d1/d2;
 
         if (d < 0.3) count++;
 	}
-
-
 	return count;
 }
 
-Int_t CbmRichRingSelectImpl::GetNofHitsOnRingCircle(CbmRichRing* ring)
+int CbmRichRingSelectImpl::GetNofHitsOnRingCircle(CbmRichRingLight* ring)
 {
-    Int_t count = 0;
-	Int_t nHits = ring->GetNofHits();
+    int count = 0;
+	int nHits = ring->GetNofHits();
 	CbmRichHit* hitRing;
-	for (Int_t iH = 0; iH < nHits; iH++) {
+	for (int iH = 0; iH < nHits; iH++) {
 		hitRing = (CbmRichHit*) fHitsArray->At(ring->GetHit(iH));
 		if (!hitRing)continue;
-		Double_t rx = hitRing->GetX() - ring->GetCenterX();
-		Double_t ry = hitRing->GetY() - ring->GetCenterY();
-		Double_t r = sqrt(rx * rx + ry * ry) - ring->GetRadius();
-		if (r < 0.35)	count++;
+		float rx = hitRing->GetX() - ring->GetCenterX();
+		float ry = hitRing->GetY() - ring->GetCenterY();
+		float r = sqrt(rx * rx + ry * ry) - ring->GetRadius();
+		if (r < 0.35f)	count++;
 	}
 	return count;
 }
 
-Double_t CbmRichRingSelectImpl::GetAngle(CbmRichRing* ring)
+float CbmRichRingSelectImpl::GetAngle(CbmRichRingLight* ring)
 {
-    register Int_t nHits = ring->GetNofHits();
-	if (nHits > kMAX_NOF_HITS) return 0.2;
-	if (nHits < 4) return 999.;
+    register int nHits = ring->GetNofHits();
+	if (nHits > kMAX_NOF_HITS) return 0.2f;
+	if (nHits < 4) return 999.f;
 
-	register Double_t Pi = TMath::Pi();
-	register Double_t TwoPi = 2.*TMath::Pi();
-    CbmRichHit * hit;
-    register Double_t xRing = ring->GetCenterX();
-    register Double_t yRing = ring->GetCenterY();
-    register Double_t xHit, yHit;
+	register float Pi = 3.14159265;
+	register float TwoPi = 2.*3.14159265;
+    register float xRing = ring->GetCenterX();
+    register float yRing = ring->GetCenterY();
+    register float xHit, yHit;
 
-    for(Int_t iHit = 0; iHit < nHits; iHit++){
-		hit = (CbmRichHit*)fHitsArray->At(ring->GetHit(iHit));
+    for(int iHit = 0; iHit < nHits; iHit++){
+		CbmRichHit *hit = (CbmRichHit*)fHitsArray->At(ring->GetHit(iHit));
 		xHit = hit->GetX();
 		yHit = hit->GetY();
 
@@ -143,16 +123,21 @@ Double_t CbmRichRingSelectImpl::GetAngle(CbmRichRing* ring)
 
     sort(fAlpha.begin(),fAlpha.begin()+nHits);
 
-    for(Int_t i = 0; i < nHits-1; i++) fPhi[i] = fAlpha[i+1] - fAlpha[i];
+    for(int i = 0; i < nHits-1; i++) fPhi[i] = fAlpha[i+1] - fAlpha[i];
     fPhi[nHits-1] = TwoPi - fAlpha[nHits-1] + fAlpha[0];
     sort(fPhi.begin(),fPhi.begin()+nHits);
 
-    Double_t angle = fPhi[nHits-1]+fPhi[nHits-2]+fPhi[nHits-3];
+    float angle = fPhi[nHits-1]+fPhi[nHits-2]+fPhi[nHits-3];
 
     return angle;
 }
 
+int CbmRichRingSelectImpl::GetNofHitsOnRingCircle(CbmRichRing* ring)
+{
+	return GetNofHitsOnRingCircle(ring->toLightRing());
+}
 
-
-//------------------------------------------------------------------
-ClassImp(CbmRichRingSelectImpl)
+float CbmRichRingSelectImpl::GetAngle(CbmRichRing* ring)
+{
+	return GetAngle(ring->toLightRing());
+}

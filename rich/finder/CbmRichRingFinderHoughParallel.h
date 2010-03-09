@@ -6,17 +6,18 @@
 #ifndef CBM_RICH_RING_FINDER_HOUGH_PARALLEL_H
 #define CBM_RICH_RING_FINDER_HOUGH_PARALLEL_H
 
-#include "CbmRichRingFinderHoughParallelImpl.h"
+//#include "CbmRichRingFinderHoughParallelImpl.h"
 #include "CbmRichRingFinderHoughImpl.h"
 #include "CbmRichRingFinder.h"
 #include "TClonesArray.h"
 #include "TString.h"
+#include "CbmRichRingLight.h"
+#include "CbmRichRing.h"
+#include "CbmRichHit.h"
 
 #include <vector>
 #include <map>
 #include <functional>
-
-class CbmRichRing;
 
 class CbmRichRingFinderHoughParallel: public CbmRichRingFinder{
 
@@ -29,10 +30,10 @@ protected:
 
 	Double_t fExecTime;//evaluate execution time
 
-	//CbmRichRingFinderHoughImpl* fHTImpl1;
-	//CbmRichRingFinderHoughImpl* fHTImpl2;
-	CbmRichRingFinderHoughParallelImpl* fHTImpl1;
-	CbmRichRingFinderHoughParallelImpl* fHTImpl2;
+	CbmRichRingFinderHoughImpl* fHTImpl1;
+	CbmRichRingFinderHoughImpl* fHTImpl2;
+	//CbmRichRingFinderHoughParallelImpl* fHTImpl1;
+	//CbmRichRingFinderHoughParallelImpl* fHTImpl2;
 public:
   	CbmRichRingFinderHoughParallel ();
 
@@ -41,7 +42,8 @@ public:
 
 	virtual ~CbmRichRingFinderHoughParallel();
 	void SetParameters(TString geometry);
-    void AddRingsToOutputArray(TClonesArray *rRingArray, vector<CbmRichRing*>& rings);
+    void AddRingsToOutputArray(TClonesArray *rRingArray,
+    		std::vector<CbmRichRingLight*>& rings);
 
 	virtual void Init();
 

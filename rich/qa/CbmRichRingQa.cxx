@@ -180,7 +180,7 @@ InitStatus CbmRichRingQa::Init()
 	}
 
 	// get TrackMatch array
-	fTrackMatch = (TClonesArray*) ioman->GetObject("StsTrackMatch");
+	fTrackMatch = (TClonesArray*) ioman->GetObject("STSTrackMatch");
 	if (!fTrackMatch) {
 		cout << "-E- CbmRichRingQa::Init: No track match array!" << endl;
 		return kERROR;
@@ -193,7 +193,7 @@ InitStatus CbmRichRingQa::Init()
 		return kERROR;
 	}
 
-    fFitCOP = new CbmRichRingFitterCOP(0,0);
+    fFitCOP = new CbmRichRingFitterCOP();
     fFitCOP->Init();
     fFitEllipse = new CbmRichRingFitterEllipseTau(0,0,"compact");
     fFitEllipse->Init();

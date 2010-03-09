@@ -12,6 +12,7 @@
 
 #include "CbmRichRingFitterImpl.h"
 #include "TH2D.h"
+#include "CbmRichHit.h"
 
 class CbmRichRing;
 

@@ -23,10 +23,9 @@
 
 #include "CbmRichRingFitter.h"
 #include "TClonesArray.h"
+#include "CbmRichRingLight.h"
+#include "CbmRichRing.h"
 #include <vector>
-
-class CbmRichRing;
-
 
 class CbmRichRingFitterImpl : public CbmRichRingFitter
 {
@@ -60,7 +59,8 @@ protected:
 	 Rich Ring fitting algorithms.
 	 Task: Calculate chi2 for reconstructed ring.
 	 **/
-	virtual void CalcChi2(CbmRichRing* pRing);
+	virtual void CalcChi2(CbmRichRing* pRing){;}
+	virtual void CalcChi2(CbmRichRingLight* pRing);
 
 	TClonesArray* fHitsArray;
 

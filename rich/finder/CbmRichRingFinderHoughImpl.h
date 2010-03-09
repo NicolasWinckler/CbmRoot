@@ -23,7 +23,7 @@ public:
 	Float_t fX;
 	Float_t fY;
 	Float_t fX2plusY2;
-	unsigned short int fId;
+    UShort_t fId;
 	Bool_t fIsUsed;
 };
 
@@ -46,7 +46,7 @@ class CbmRichRingComparatorMore:
 	          bool>
 {
 public:
-	bool operator()(const CbmRichRing* ring1, const CbmRichRing* ring2) const {
+	bool operator()(const CbmRichRingLight* ring1, const CbmRichRingLight* ring2) const {
 		return ring1->GetSelectionNN() > ring2->GetSelectionNN();
 	}
 };
@@ -54,7 +54,7 @@ public:
 class CbmRichRingFinderHoughImpl{
 
 protected:
-	static const unsigned short int kMAX_NOF_HITS = 65500;
+	static const UShort_t kMAX_NOF_HITS = 65500;
 
 	Float_t fMaxDistance;
 	Float_t fMinDistance;
@@ -67,19 +67,19 @@ protected:
 	Float_t fDx;
 	Float_t fDy;
 	Float_t fDr;
-	unsigned short int  fNofBinsX;
-	unsigned short int  fNofBinsY;
-	unsigned short int  fNofBinsXY;
-	unsigned short int  fHTCut;
-	unsigned short int  fHitCut;
+	UShort_t  fNofBinsX;
+	UShort_t  fNofBinsY;
+	UShort_t  fNofBinsXY;
+	UShort_t  fHTCut;
+	UShort_t  fHitCut;
 
-	unsigned short int  fNofBinsR;
-	unsigned short int  fHTCutR;
-	unsigned short int  fHitCutR;
+	UShort_t  fNofBinsR;
+	UShort_t  fHTCutR;
+	UShort_t  fHitCutR;
 
-	unsigned short int fMinNofHitsInArea;
+	UShort_t fMinNofHitsInArea;
 
-	unsigned short int fNofParts;
+	UShort_t fNofParts;
 
 	Float_t fRmsCoeffEl;
 	Float_t fMaxCutEl;
@@ -95,11 +95,11 @@ protected:
 
 	vector<CbmRichHoughHit> fData;  ///Rich hits
 
-	vector<unsigned short> fHist;
-	vector<unsigned short> fHistR;
-    vector< vector<unsigned short> > fHitInd;
+	vector<UShort_t> fHist;
+	vector<UShort_t> fHistR;
+    vector< vector<UShort_t> > fHitInd;
 
-	vector<CbmRichRing*> fFoundRings;///collect found rings
+	vector<CbmRichRingLight*> fFoundRings;///collect found rings
 
 	CbmRichRingFitterCOP* fFitCOP;
 	CbmRichRingSelectNeuralNet* fANNSelect;
@@ -153,10 +153,10 @@ public:
     void RingSelection();
     void ReAssingSharedHits(Int_t ringInd1, Int_t ringInd2);
     void ReAssingSharedHitsEllipse(Int_t ringInd1, Int_t ringInd2);
-    Int_t GetHitIndex(Int_t hitInd);
-    Bool_t AreRingsCloseEnough(CbmRichRing* ring1, CbmRichRing* ring2);
+    Int_t GetHitIndex(UShort_t hitInd);
+    Bool_t AreRingsCloseEnough(CbmRichRingLight* ring1, CbmRichRingLight* ring2);
     void RemoveHitsAroundEllipse(Int_t indmin, Int_t indmax, CbmRichRing * ring);
-    void RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring);
+    void RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRingLight* ring);
     void InitHist();
 	void Init();
 	void DoFind();
@@ -166,7 +166,7 @@ public:
 		fData = data;
 	}
 
-	vector<CbmRichRing*>& GetFoundRings(){
+	vector<CbmRichRingLight*>& GetFoundRings(){
 		return fFoundRings;
 	}
 

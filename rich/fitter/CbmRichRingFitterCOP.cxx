@@ -1,43 +1,9 @@
-/******************************************************************************
-*  $Id: CbmRichRingFitterCOP.cxx,v 1.5 2006/09/13 14:59:21 hoehne Exp $
-*
-*  Class  : CbmRichRingFitterCOP
-*  Description: This is the implementation of a particular fittng class.
-*               Here the ring is fitted with theh COP algorithm from A. Ayriyan/ G. Ososkov
-*
-*  Algorithm:                     Alexander Ayriyan 10.08.2005, Gennadi Ososkov
-*  Adoption to new Fitter Class : Claudia Hoehne
-*  E-mail : C.Hoehne@gsi.de
-*
-*******************************************************************************
-*  $Log: CbmRichRingFitterCOP.cxx,v $
-*  Revision 1.5  2006/09/13 14:59:21  hoehne
-*  setting of reconstructed flaf removed
-*
-*  Revision 1.4  2006/08/03 13:23:58  hoehne
-*  new ring radius correction parameters (for rich_standard.geo, JUN06)
-*  (Petr Stolpovsky)
-*
-*  Revision 1.3  2006/07/17 14:06:25  hoehne
-*  ring radius correction added, see P. Stolpovsky, CBM simulation meeting 14.7.2006
-*
-*  Revision 1.2  2006/01/25 13:31:40  hoehne
-*  change int -> Int_t and double -> Double_t
-*
-*  Revision 1.1  2006/01/19 11:50:31  hoehne
-*  initial version: implementation of COP fit to ring
-*
-*
-*******************************************************************************/
 #include "CbmRichRingFitterCOP.h"
-
+#include "FairRootManager.h"
+#include "CbmRichRingLight.h"
 #include "CbmRichRing.h"
 #include "CbmRichHit.h"
-
-#include "FairRootManager.h"
-
-#include "TMath.h"
-
+#include "TClonesArray.h"
 #include <iostream>
 #include <cmath>
 
@@ -45,31 +11,37 @@ using std::cout;
 using std::endl;
 using std::fabs;
 
-ClassImp(CbmRichRingFitterCOP)
-
 // -----   Default constructor   -------------------------------------------
 CbmRichRingFitterCOP::CbmRichRingFitterCOP()
 {
 
 }
-// -------------------------------------------------------------------------
 
-// -----   Standard constructor   -------------------------------------------
-CbmRichRingFitterCOP::CbmRichRingFitterCOP(Int_t verbose,Double_t correction)
-{
-//  fVerbose = verbose;
-//  fCorrection   = correction;
-}
-// -------------------------------------------------------------------------
-
-// -----   Destructor   ----------------------------------------------------
 CbmRichRingFitterCOP::~CbmRichRingFitterCOP()
 {
+	fHitX.clear();
+	fHitY.clear();
 }
-// -------------------------------------------------------------------------
 
-// -----   Public method DoFit   ------------------------------------------
+
 void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
+{
+	fNofHits = pRing->GetNofHits();
+	for (int i = 0; i < fNofHits; i++) {
+		CbmRichHit* hit = (CbmRichHit*) fHitsArray->At(pRing->GetHit(i));
+		fHitX[i] = hit->GetX();
+		fHitY[i] = hit->GetY();
+	}
+
+	CbmRichRingLight* ring= new CbmRichRingLight();
+	FitRing(ring);
+	pRing->SetRadius(ring->GetRadius());
+	pRing->SetCenterX(ring->GetCenterX());
+	pRing->SetCenterY(ring->GetCenterY());
+	delete ring;
+}
+
+void CbmRichRingFitterCOP::DoFit(CbmRichRingLight *pRing)
 {
 	fNofHits = pRing->GetNofHits();
 	if (fNofHits < 3) {
@@ -88,7 +60,7 @@ void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 		return;
 	}
 
-	for (Int_t i = 0; i < fNofHits; i++) {
+	for (int i = 0; i < fNofHits; i++) {
 		CbmRichHit* hit = (CbmRichHit*) fHitsArray->At(pRing->GetHit(i));
 		fHitX[i] = hit->GetX();
 		fHitY[i] = hit->GetY();
@@ -97,24 +69,24 @@ void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 	FitRing(pRing);
 }
 
-void CbmRichRingFitterCOP::FitRing(CbmRichRing* ring)
+void CbmRichRingFitterCOP::FitRing(CbmRichRingLight* ring)
 {
-	Float_t radius = 0.;
-	Float_t centerX = 0.;
-	Float_t centerY = 0.;
+	float radius = 0.;
+	float centerX = 0.;
+	float centerY = 0.;
 
-	Int_t iterMax = 4;
-	Float_t Xi, Yi, Zi;
-	Float_t M0, Mx, My, Mz, Mxy, Mxx, Myy, Mxz, Myz, Mzz, Mxz2, Myz2, Cov_xy;
-	Float_t A0, A1, A2, A22;
-	Float_t epsilon = 0.00001;
-	Float_t Dy, xnew, xold, ynew, yold = 10000000.;
+	int iterMax = 4;
+	float Xi, Yi, Zi;
+	float M0, Mx, My, Mz, Mxy, Mxx, Myy, Mxz, Myz, Mzz, Mxz2, Myz2, Cov_xy;
+	float A0, A1, A2, A22;
+	float epsilon = 0.00001;
+	float Dy, xnew, xold, ynew, yold = 10000000.;
 
 	M0 = fNofHits;
 	Mx = My = 0.;
 
 	//calculate center of gravity
-	for (Int_t i = 0; i < fNofHits; i++) {
+	for (int i = 0; i < fNofHits; i++) {
 		Mx += fHitX[i];
 		My += fHitY[i];
 	}
@@ -124,7 +96,7 @@ void CbmRichRingFitterCOP::FitRing(CbmRichRing* ring)
 	//computing moments (note: all moments are normed, i.e. divided by N)
 	Mxx = Myy = Mxy = Mxz = Myz = Mzz = 0.;
 
-	for (Int_t i = 0; i < fNofHits; i++) {
+	for (int i = 0; i < fNofHits; i++) {
 		Xi = fHitX[i] - Mx; //transform to center of gravity coordinate system
 		Yi = fHitY[i] - My;
 		Zi = Xi * Xi + Yi * Yi;
@@ -158,7 +130,7 @@ void CbmRichRingFitterCOP::FitRing(CbmRichRing* ring)
 	xnew = 0.;
 
 	//Newton's method starting at x=0
-	Int_t iter;
+	int iter;
 	for (iter = 0; iter < iterMax; iter++) {
 		ynew = A0 + xnew * (A1 + xnew * (A2 + 4. * xnew * xnew));
 
@@ -184,12 +156,12 @@ void CbmRichRingFitterCOP::FitRing(CbmRichRing* ring)
 	//}
 
 	//computing the circle parameters
-	Float_t GAM = -Mz - xnew - xnew;
-	Float_t DET = xnew * xnew - xnew * Mz + Cov_xy;
+	float GAM = -Mz - xnew - xnew;
+	float DET = xnew * xnew - xnew * Mz + Cov_xy;
 	if (DET != 0.) {
 		centerX = (Mxz * (Myy - xnew) - Myz * Mxy) / DET / 2.;
 		centerY = (Myz * (Mxx - xnew) - Mxz * Mxy) / DET / 2.;
-		radius = TMath::Sqrt(centerX * centerX + centerY * centerY - GAM);
+		radius = sqrt(centerX * centerX + centerY * centerY - GAM);
 		centerX += Mx;
 		centerY += My;
 	} else {
@@ -203,9 +175,56 @@ void CbmRichRingFitterCOP::FitRing(CbmRichRing* ring)
 	ring->SetCenterY(centerY);
 
 	CalcChi2(ring);
-
-	if (TMath::IsNaN(radius)) ring->SetRadius(0.);
-	if (TMath::IsNaN(centerX)) ring->SetCenterX(0.);
-	if (TMath::IsNaN(centerY))	ring->SetCenterY(0.);
-
 }
+
+void CbmRichRingFitterCOP::Init()
+{
+	cout << "CbmRichRingFitterImpl::Init()"<<endl;
+	// Get and check FairRootManager
+	FairRootManager* ioman = FairRootManager::Instance();
+	if (! ioman) {
+		cout << "-E- CbmRichRingFitterImpl::Init()"
+		<< "RootManager not instantised!" << endl;
+		return;
+	}
+
+	// Get hit Array
+	fHitsArray = (TClonesArray*) ioman->GetObject("RichHit");
+	if ( ! fHitsArray) {
+		cout << "-W- CbmRichRingFitterImpl::Init(): No RichHit array!"
+		<< endl;
+	}
+	fHitX.resize(MAX_NOF_HITS_IN_RING);
+	fHitY.resize(MAX_NOF_HITS_IN_RING);
+}
+
+// -----   Protected method CalcChi2   ----------------------------------------
+void CbmRichRingFitterCOP::CalcChi2(CbmRichRingLight* pRing)
+{
+    int fNhits=pRing->GetNofHits();
+
+    if (fNhits < 4) {
+      pRing->SetChi2(-1.);
+      return;
+    }
+
+    float Xd2, Yd2;
+    float chi2 = 0.;
+
+    float Radius  = pRing->GetRadius();
+    float Xcenter = pRing->GetCenterX();
+    float Ycenter = pRing->GetCenterY();
+
+    for (int i = 0; i < fNhits; i++) {
+    	Xd2 = Xcenter - fHitX[i];
+		Yd2 = Ycenter - fHitY[i];
+		Xd2 *= Xd2;
+		Yd2 *= Yd2;
+
+		float d = sqrt( Xd2 + Yd2 ) - Radius;
+        chi2 += d*d;
+    }
+
+    pRing->SetChi2(chi2);
+}
+

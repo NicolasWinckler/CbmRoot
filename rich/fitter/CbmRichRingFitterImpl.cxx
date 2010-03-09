@@ -55,7 +55,7 @@ void CbmRichRingFitterImpl::Init()
 }
 
 // -----   Protected method CalcChi2   ----------------------------------------
-void CbmRichRingFitterImpl::CalcChi2(CbmRichRing* pRing)
+void CbmRichRingFitterImpl::CalcChi2(CbmRichRingLight* pRing)
 {
     Int_t fNhits=pRing->GetNofHits();
 

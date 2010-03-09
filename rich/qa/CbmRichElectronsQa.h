@@ -9,7 +9,7 @@
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TClonesArray.h"
-
+#include "CbmRichHit.h"
 
 #include <map>
 #include <fstream>

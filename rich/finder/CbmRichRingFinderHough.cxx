@@ -70,7 +70,6 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 
 
 	TStopwatch timer;
-	timer.Start();
 
 	fNEvent++;
 	if (fVerbose) cout << "-I- CbmRichRingFinderHough  Event no. " << fNEvent<< endl;
@@ -107,15 +106,18 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 		}
 	}
 
+	timer.Start();
 	fHTImpl->SetData(UpH);
 	fHTImpl->DoFind();
+	timer.Stop();
 	AddRingsToOutputArray(rRingArray, fHTImpl->GetFoundRings());
 	UpH.clear();
+	timer.Start(false);
 	fHTImpl->SetData(DownH);
 	fHTImpl->DoFind();
+	timer.Stop();
 	AddRingsToOutputArray(rRingArray, fHTImpl->GetFoundRings());
 	DownH.clear();
-	timer.Stop();
 	fExecTime += timer.CpuTime();
 
 	if (fVerbose)cout << "CbmRichRingFinderHough: Number of output rings: "<< rRingArray->GetEntriesFast() << endl;
@@ -165,11 +167,15 @@ void CbmRichRingFinderHough::SetParameters( Int_t nofParts,
 }
 
 void CbmRichRingFinderHough::AddRingsToOutputArray(TClonesArray *rRingArray,
-		std::vector<CbmRichRing*>& rings)
+		std::vector<CbmRichRingLight*>& rings)
 {
 	for (UInt_t iRing = 0; iRing < rings.size(); iRing++) {
 		if (rings[iRing]->GetRecFlag() == -1)	continue;
-		new ((*rRingArray)[fRingCount]) CbmRichRing(*rings[iRing]);
+		CbmRichRing* r = new CbmRichRing();
+		for (Int_t i = 0; i < rings[iRing]->GetNofHits(); i++){
+			r->AddHit(rings[iRing]->GetHit(i));
+		}
+		new ((*rRingArray)[fRingCount]) CbmRichRing(*r);
 		fRingCount++;
 	}
 }

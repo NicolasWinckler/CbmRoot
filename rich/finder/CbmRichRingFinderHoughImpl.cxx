@@ -6,6 +6,7 @@
 
 #include "CbmRichRingFinderHoughImpl.h"
 //#include "CbmRichFuzzyKE.h"
+#include "CbmRichRingLight.h"
 
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
@@ -54,7 +55,7 @@ void CbmRichRingFinderHoughImpl::Init()
     fHistR.resize(fNofBinsR);
 	fHitInd.resize(fNofParts);
 
-    fFitCOP = new CbmRichRingFitterCOP(0, 0);
+    fFitCOP = new CbmRichRingFitterCOP();
     fFitCOP->Init();
 //    fFitEllipse = new CbmRichRingFitterEllipseTau(0, 1, "compact");
 //   fFitEllipse->Init();
@@ -67,7 +68,7 @@ void CbmRichRingFinderHoughImpl::Init()
 	    richSelectNNFile += "/parameters/rich/NeuralNet_RingSelection_Weights_Compact.txt";
         //richSelectNNFile = "/u/slebedev/JUL09/trunk/macro/rich/NeuralNet_RingSelection_Weights1.txt";
     }
-    fANNSelect = new CbmRichRingSelectNeuralNet(0, richSelectNNFile);
+    fANNSelect = new CbmRichRingSelectNeuralNet(richSelectNNFile);
     fANNSelect->Init();
 
 }
@@ -81,7 +82,6 @@ CbmRichRingFinderHoughImpl::~CbmRichRingFinderHoughImpl()
 
 void CbmRichRingFinderHoughImpl::DoFind()
 {
-
 	if (fData.size() > kMAX_NOF_HITS) {
 		cout<< "-E- CbmRichRingFinderHoughImpl::DoFind: Number of hits is more than "<< kMAX_NOF_HITS << endl;
 		return ;
@@ -498,17 +498,18 @@ void CbmRichRingFinderHoughImpl::RemoveHitsAroundEllipse(Int_t indmin, Int_t ind
 	}
 }
 
-void CbmRichRingFinderHoughImpl::RemoveHitsAroundRing(Int_t indmin, Int_t indmax, CbmRichRing * ring)
+void CbmRichRingFinderHoughImpl::RemoveHitsAroundRing(Int_t indmin, Int_t indmax,
+		CbmRichRingLight* ring)
 {
-	Double_t rms = TMath::Sqrt(ring->GetChi2()/ring->GetNofHits());
-	Double_t dCut = fRmsCoeffEl * rms;
+	Float_t rms = TMath::Sqrt(ring->GetChi2()/ring->GetNofHits());
+	Float_t dCut = fRmsCoeffEl * rms;
 	if (dCut > fMaxCutEl) dCut = fMaxCutEl;
 
 	for (Int_t j = indmin; j < indmax + 1; j++) {
-		Double_t rx = fData[j].fX - ring->GetCenterX();
-		Double_t ry = fData[j].fY - ring->GetCenterY();
+		Float_t rx = fData[j].fX - ring->GetCenterX();
+		Float_t ry = fData[j].fY - ring->GetCenterY();
 
-		Double_t dr = fabs(sqrt(rx * rx + ry * ry) - ring->GetRadius());
+		Float_t dr = fabs(sqrt(rx * rx + ry * ry) - ring->GetRadius());
 		if (dr < dCut) {
 			fData[j].fIsUsed = true;
 		}
@@ -540,7 +541,7 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
     }
     if (maxBinXY < fHTCut) return;
 
-	CbmRichRing* ring1 = new CbmRichRing();
+	CbmRichRingLight* ring1 = new CbmRichRingLight();
 
 //Find Preliminary Xc, Yc, R
     register Float_t xc, yc, r;
@@ -566,9 +567,10 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 	xc = ring1->GetCenterX();
 	yc = ring1->GetCenterY();
 	r = ring1->GetRadius();
+
 	delete ring1;
 
-	CbmRichRing* ring2 = new CbmRichRing();
+	CbmRichRingLight* ring2 = new CbmRichRingLight();
 	for (Int_t j = indmin; j < indmax + 1; j++) {
 		rx = fData[j].fX - xc;
 		ry = fData[j].fY - yc;
@@ -582,9 +584,9 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 	if (ring2->GetNofHits() < 7) return;
 
 	fFitCOP->DoFit(ring2);
+
 	fANNSelect->DoSelect(ring2);
 	Double_t select = ring2->GetSelectionNN();
-
 	//remove found hits only for good quality rings
 	if (select > fAnnCut) {
 
@@ -604,14 +606,14 @@ void CbmRichRingFinderHoughImpl::RingSelection()
 {
 	Int_t nofRings = fFoundRings.size();
 	std::sort(fFoundRings.begin(), fFoundRings.end(), CbmRichRingComparatorMore());
-	std::vector<std::set<Int_t> > usedHits;
+	std::vector<std::set<UShort_t> > usedHits;
 	usedHits.reserve(nofRings);
-	std::set<Int_t> usedHitsAll;
+	std::set<UShort_t> usedHitsAll;
 	std::vector<Int_t> goodRingIndex;
 	goodRingIndex.reserve(nofRings);
-	CbmRichRing* ring2;
+	CbmRichRingLight* ring2;
 	for (Int_t iRing = 0; iRing < nofRings; iRing++){
-		CbmRichRing* ring = fFoundRings[iRing];
+		CbmRichRingLight* ring = fFoundRings[iRing];
 		ring->SetRecFlag(-1);
 		Int_t nofHits = ring->GetNofHits();
 		Bool_t isGoodRing = true;
@@ -621,7 +623,7 @@ void CbmRichRingFinderHoughImpl::RingSelection()
 			if (AreRingsCloseEnough(ring2, ring)) continue;
 			Int_t nofUsedHits = 0;
 			for(Int_t iHit = 0; iHit < nofHits; iHit++){
-				std::set<Int_t>::iterator it = usedHits[iRSet].find(ring->GetHit(iHit));
+				std::set<UShort_t>::iterator it = usedHits[iRSet].find(ring->GetHit(iHit));
 				if(it != usedHits[iRSet].end()){
 					nofUsedHits++;
 				}
@@ -636,7 +638,7 @@ void CbmRichRingFinderHoughImpl::RingSelection()
 		Bool_t isGoodRingAll = true;
 		Int_t nofUsedHitsAll = 0;
 		for(Int_t iHit = 0; iHit < nofHits; iHit++){
-			std::set<Int_t>::iterator it = usedHitsAll.find(ring->GetHit(iHit));
+			std::set<UShort_t>::iterator it = usedHitsAll.find(ring->GetHit(iHit));
 			if(it != usedHitsAll.end()){
 				nofUsedHitsAll++;
 			}
@@ -656,12 +658,13 @@ void CbmRichRingFinderHoughImpl::RingSelection()
 
 				ReAssingSharedHits(goodRingIndex[iRSet]	,iRing);
 			}
-			std::set<Int_t> usedHitsT;
+			std::set<UShort_t> usedHitsT;
 			for(Int_t iHit = 0; iHit < nofHits; iHit++){
 				usedHitsT.insert(ring->GetHit(iHit));
 				usedHitsAll.insert(ring->GetHit(iHit));
 			}
 			usedHits.push_back(usedHitsT);
+		//	usedHitsT.clear();
 		}
 	}// iRing
 
@@ -673,8 +676,8 @@ void CbmRichRingFinderHoughImpl::RingSelection()
 
 void CbmRichRingFinderHoughImpl::ReAssingSharedHits(Int_t ringInd1, Int_t ringInd2)
 {
-	CbmRichRing* ring1 = fFoundRings[ringInd1];
-	CbmRichRing* ring2 = fFoundRings[ringInd2];
+	CbmRichRingLight* ring1 = fFoundRings[ringInd1];
+	CbmRichRingLight* ring2 = fFoundRings[ringInd2];
 	Int_t nofHits1 = ring1->GetNofHits();
 	Int_t nofHits2 = ring2->GetNofHits();
 
@@ -706,60 +709,61 @@ void CbmRichRingFinderHoughImpl::ReAssingSharedHits(Int_t ringInd1, Int_t ringIn
 
 void CbmRichRingFinderHoughImpl::ReAssingSharedHitsEllipse(Int_t ringInd1, Int_t ringInd2)
 {
-	CbmRichRing* ring1 = fFoundRings[ringInd1];
-	CbmRichRing* ring2 = fFoundRings[ringInd2];
-	Int_t nofHits1 = ring1->GetNofHits();
-	Int_t nofHits2 = ring2->GetNofHits();
-
-	for(Int_t iHit1 = 0; iHit1 < nofHits1; iHit1++){
-		Int_t hitInd1 = ring1->GetHit(iHit1);
-		for(Int_t iHit2 = 0; iHit2 < nofHits2; iHit2++){
-			Int_t hitInd2 = ring2->GetHit(iHit2);
-			if(hitInd1 == hitInd2){
-				Int_t hitIndData =  GetHitIndex(hitInd1);
-				Float_t x = fData[hitIndData].fX;
-				Float_t y = fData[hitIndData].fY;
-
-				Double_t A = ring1->GetAPar();
-				Double_t B = ring1->GetBPar();
-				Double_t C = ring1->GetCPar();
-				Double_t D = ring1->GetDPar();
-				Double_t E = ring1->GetEPar();
-				Double_t F = ring1->GetFPar();
-		        Double_t d1 = TMath::Abs(A*x*x + B*x*y + C*y*y + D*x + E*y + F);
-			    Double_t d2 = sqrt( pow(2*A*x + B*y + D, 2) + pow(B*x + 2*C*y + E, 2) );
-			    Double_t dr1 = d1/d2;
-
-				A = ring2->GetAPar();
-				B = ring2->GetBPar();
-				C = ring2->GetCPar();
-				D = ring2->GetDPar();
-				E = ring2->GetEPar();
-				F = ring2->GetFPar();
-		        d1 = TMath::Abs(A*x*x + B*x*y + C*y*y + D*x + E*y + F);
-			    d2 = sqrt( pow(2*A*x + B*y + D, 2) + pow(B*x + 2*C*y + E, 2) );
-			    Double_t dr2 = d1/d2;
-
-				if (dr1 > dr2){
-					ring1->RemoveHit(hitInd1);
-				} else {
-					ring2->RemoveHit(hitInd2);
-				}
-			}
-		}
-	}
+//	CbmRichRing* ring1 = fFoundRings[ringInd1];
+//	CbmRichRing* ring2 = fFoundRings[ringInd2];
+//	Int_t nofHits1 = ring1->GetNofHits();
+//	Int_t nofHits2 = ring2->GetNofHits();
+//
+//	for(Int_t iHit1 = 0; iHit1 < nofHits1; iHit1++){
+//		UShort_t hitInd1 = ring1->GetHit(iHit1);
+//		for(Int_t iHit2 = 0; iHit2 < nofHits2; iHit2++){
+//			UShort_t hitInd2 = ring2->GetHit(iHit2);
+//			if(hitInd1 == hitInd2){
+//				Int_t hitIndData =  GetHitIndex(hitInd1);
+//				Float_t x = fData[hitIndData].fX;
+//				Float_t y = fData[hitIndData].fY;
+//
+//				Double_t A = ring1->GetAPar();
+//				Double_t B = ring1->GetBPar();
+//				Double_t C = ring1->GetCPar();
+//				Double_t D = ring1->GetDPar();
+//				Double_t E = ring1->GetEPar();
+//				Double_t F = ring1->GetFPar();
+//		        Double_t d1 = TMath::Abs(A*x*x + B*x*y + C*y*y + D*x + E*y + F);
+//			    Double_t d2 = sqrt( pow(2*A*x + B*y + D, 2) + pow(B*x + 2*C*y + E, 2) );
+//			    Double_t dr1 = d1/d2;
+//
+//				A = ring2->GetAPar();
+//				B = ring2->GetBPar();
+//				C = ring2->GetCPar();
+//				D = ring2->GetDPar();
+//				E = ring2->GetEPar();
+//				F = ring2->GetFPar();
+//		        d1 = TMath::Abs(A*x*x + B*x*y + C*y*y + D*x + E*y + F);
+//			    d2 = sqrt( pow(2*A*x + B*y + D, 2) + pow(B*x + 2*C*y + E, 2) );
+//			    Double_t dr2 = d1/d2;
+//
+//				if (dr1 > dr2){
+//					ring1->RemoveHit(hitInd1);
+//				} else {
+//					ring2->RemoveHit(hitInd2);
+//				}
+//			}
+//		}
+//	}
 }
 
-Int_t CbmRichRingFinderHoughImpl::GetHitIndex(Int_t hitInd)
+Int_t CbmRichRingFinderHoughImpl::GetHitIndex(UShort_t hitInd)
 {
 	UInt_t size = fData.size();
-	for (Int_t i = 0; i < size; i++){
+	for (UInt_t i = 0; i < size; i++){
 		if (fData[i].fId == hitInd) return i;
 	}
 
 }
 
-Bool_t CbmRichRingFinderHoughImpl::AreRingsCloseEnough(CbmRichRing* ring1, CbmRichRing* ring2)
+Bool_t CbmRichRingFinderHoughImpl::AreRingsCloseEnough(CbmRichRingLight* ring1,
+		CbmRichRingLight* ring2)
 {
 	Double_t rx = ring1->GetCenterX() - ring2->GetCenterX();
 	Double_t ry = ring1->GetCenterY() - ring2->GetCenterY();

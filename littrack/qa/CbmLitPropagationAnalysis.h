@@ -116,10 +116,10 @@ private:
 			TCanvas* c[],
 			Int_t v);
 
-	void DrawText(
-			Int_t index,
-			Double_t sigma,
-			Double_t rms);
+//	void DrawText(
+//			Int_t index,
+//			Double_t sigma,
+//			Double_t rms);
 
 	void PrintResults(
 			std::ostream& out,

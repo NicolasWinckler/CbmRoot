@@ -3,12 +3,16 @@
  * @since 2008
  **/
 #include "CbmLitDrawHist.h"
+#include "CbmLitUtils.h"
 
 #include "TH1.h"
 #include "TH2.h"
 #include "TPad.h"
 #include "TLegend.h"
+#include "TLatex.h"
 #include "TStyle.h"
+
+#include <string>
 
 /* Set default styles for histograms. */
 void SetStyles()
@@ -121,4 +125,19 @@ void DrawHist1D(
 	if (hist2 != NULL) l1->AddEntry(hist2,hist2label.c_str(),"lp");
 	if (hist3 != NULL) l1->AddEntry(hist3,hist3label.c_str(),"lp");
 	if (drawLegend) l1->Draw();
+}
+
+
+void  DrawHistSigmaRMS(
+		Int_t index,
+		Double_t sigma,
+		Double_t rms)
+{
+	std::string txt1 = ToString<Double_t>(sigma) + " / " + ToString<Double_t>(rms);
+	TLatex text;
+	text.SetTextAlign(21);
+	text.SetTextSize(0.08); //0.1
+	if (index != 11) text.DrawTextNDC(0.5, 0.83, txt1.c_str());
+	std::string txt2 = ToString<char>(index+97) + ")";
+	text.DrawTextNDC(0.8, 0.7, txt2.c_str());
 }

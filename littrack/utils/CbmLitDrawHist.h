@@ -114,4 +114,16 @@ void DrawHist1D(
 		Double_t x2,
 		Double_t y2);
 
+
+
+/* Draws gma/RMS value on the histogram
+ * @param index Index of letter for the histogram
+ * @param sigma Sigma value
+ * @param rms RMS value
+ */
+void DrawHistSigmaRMS(
+		Int_t index,
+		Double_t sigma,
+		Double_t rms);
+
 #endif

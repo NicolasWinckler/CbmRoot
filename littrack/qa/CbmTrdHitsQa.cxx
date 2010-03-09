@@ -15,6 +15,7 @@
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TF1.h"
 
 #include <iostream>
 
@@ -250,11 +251,24 @@ void CbmTrdHitsQa::Draw()
 			   		LIT_MARKER_STYLE1, false, true, "");
 		SaveCanvasAsImage(chPullX, fOutputDir);
 
+		TH1F* hist = fhPullX[i];
+		hist->Fit("gaus");
+		TF1 *fit = hist->GetFunction("gaus");
+		Double_t sigma = fit->GetParameter(2);
+		Double_t rms = hist->GetRMS();
+		DrawHistSigmaRMS(i, sigma, rms);
+
 		chPullY->cd(i + 1);
 		DrawHist1D(fhPullY[i], "Pull Y", "Counter",
 					LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 					LIT_MARKER_STYLE1, false, true, "");
 		SaveCanvasAsImage(chPullY, fOutputDir);
+		hist = fhPullY[i];
+		hist->Fit("gaus");
+		fit = hist->GetFunction("gaus");
+		sigma = fit->GetParameter(2);
+		rms = hist->GetRMS();
+		DrawHistSigmaRMS(i, sigma, rms);
 	}
 }
 

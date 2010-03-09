@@ -41,6 +41,9 @@ class CbmRichRingFitterCOP : public CbmRichRingFitterImpl
    /** Ring Fitting algorithm **/
    void DoFit(CbmRichRing* ring);
 
+private:
+   void FitRing(CbmRichRing* ring);
+
   ClassDef(CbmRichRingFitterCOP,1);
 };
 

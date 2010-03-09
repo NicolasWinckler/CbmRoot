@@ -71,26 +71,37 @@ CbmRichRingFitterCOP::~CbmRichRingFitterCOP()
 // -----   Public method DoFit   ------------------------------------------
 void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 {
-    Int_t fNhits = pRing->GetNofHits();
+	fNofHits = pRing->GetNofHits();
+	if (fNofHits < 3) {
+		pRing->SetRadius(0.);
+		pRing->SetCenterX(0.);
+		pRing->SetCenterY(0.);
+		return;
+	}
+
+	if (fNofHits >= MAX_NOF_HITS_IN_RING) {
+		cout << "-E- CbmRichRingFitterCOP::DoFit() - Too many hits in the ring:"
+		<<fNofHits <<endl;
+		pRing->SetRadius(0.);
+		pRing->SetCenterX(0.);
+		pRing->SetCenterY(0.);
+		return;
+	}
+
+	for (Int_t i = 0; i < fNofHits; i++) {
+		CbmRichHit* hit = (CbmRichHit*) fHitsArray->At(pRing->GetHit(i));
+		fHitX[i] = hit->GetX();
+		fHitY[i] = hit->GetY();
+	}
+
+	FitRing(pRing);
+}
+
+void CbmRichRingFitterCOP::FitRing(CbmRichRing* ring)
+{
 	Float_t radius = 0.;
 	Float_t centerX = 0.;
 	Float_t centerY = 0.;
-
-	if (fNhits < 3) {
-		pRing->SetRadius(0.);
-		pRing->SetCenterX(0.);
-		pRing->SetCenterY(0.);
-		return;
-	}
-
-	if (fNhits >= MAX_NOF_HITS_IN_RING) {
-		cout << "-E- CbmRichRingFitterCOP::DoFit() - Too many hits in the ring:"
-		<<fNhits <<endl;
-		pRing->SetRadius(0.);
-		pRing->SetCenterX(0.);
-		pRing->SetCenterY(0.);
-		return;
-	}
 
 	Int_t iterMax = 4;
 	Float_t Xi, Yi, Zi;
@@ -99,15 +110,11 @@ void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 	Float_t epsilon = 0.00001;
 	Float_t Dy, xnew, xold, ynew, yold = 10000000.;
 
-	M0 = fNhits;
+	M0 = fNofHits;
 	Mx = My = 0.;
-	CbmRichHit* hit;
 
 	//calculate center of gravity
-	for (Int_t i = 0; i < fNhits; i++) {
-		hit = (CbmRichHit*) fHitsArray->At(pRing->GetHit(i));
-		fHitX[i] = hit->GetX();
-		fHitY[i] = hit->GetY();
+	for (Int_t i = 0; i < fNofHits; i++) {
 		Mx += fHitX[i];
 		My += fHitY[i];
 	}
@@ -117,8 +124,7 @@ void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 	//computing moments (note: all moments are normed, i.e. divided by N)
 	Mxx = Myy = Mxy = Mxz = Myz = Mzz = 0.;
 
-	for (Int_t i = 0; i < fNhits; i++) {
-		//hit = (CbmRichHit*) fHitsArray->At(pRing->GetHit(i));
+	for (Int_t i = 0; i < fNofHits; i++) {
 		Xi = fHitX[i] - Mx; //transform to center of gravity coordinate system
 		Yi = fHitY[i] - My;
 		Zi = Xi * Xi + Yi * Yi;
@@ -192,17 +198,14 @@ void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
 		radius = 0.;
 	}
 
-	pRing->SetRadius(radius);
-	pRing->SetCenterX(centerX);
-	pRing->SetCenterY(centerY);
+	ring->SetRadius(radius);
+	ring->SetCenterX(centerX);
+	ring->SetCenterY(centerY);
 
-	CalcChi2(pRing);
+	CalcChi2(ring);
 
-	if (TMath::IsNaN(radius) == 1)
-		pRing->SetRadius(0.);
-	if (TMath::IsNaN(centerX) == 1)
-		pRing->SetCenterX(0.);
-	if (TMath::IsNaN(centerY) == 1)
-		pRing->SetCenterY(0.);
+	if (TMath::IsNaN(radius)) ring->SetRadius(0.);
+	if (TMath::IsNaN(centerX)) ring->SetCenterX(0.);
+	if (TMath::IsNaN(centerY))	ring->SetCenterY(0.);
 
 }

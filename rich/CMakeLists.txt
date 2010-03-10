@@ -48,9 +48,9 @@ finder/CbmRichFindRings.cxx
 #finder/CbmRichFuzzyKE.cxx
 #finder/CbmRichRingFinderHoughSimd.cxx
 finder/CbmRichRingFinderHough.cxx
-finder/CbmRichRingFinderHoughParallel.cxx
+#finder/CbmRichRingFinderHoughParallel.cxx
 finder/CbmRichRingFinderHoughImpl.cxx
-finder/CbmRichRingFinderHoughParallelImpl.cxx
+#finder/CbmRichRingFinderHoughParallelImpl.cxx
 fitter/CbmRichRingFitterCircle.cxx 
 fitter/CbmRichFitRings.cxx
 fitter/CbmRichRingFitterCOP.cxx 
@@ -75,7 +75,7 @@ qa/CbmRichRingFitterQa.cxx
 qa/CbmRichElectronsQa.cxx
 selection/CbmRichRingSelectImpl.cxx
 selection/CbmRichRingSelectNeuralNet.cxx
-selection/NNfunction.cxx
+#selection/NNfunction.cxx
 #LhcbRingFinder.cxx
 #CbmRichTestSimd.cxx
 )
@@ -93,7 +93,7 @@ finder/CbmRichRingFinderIdeal.h
 finder/CbmRichFindRings.h
 #finder/CbmRichFuzzyKE.h
 #finder/CbmRichRingFinderHoughSimd.h
-finder/CbmRichRingFinderHoughParallel.h
+#finder/CbmRichRingFinderHoughParallel.h
 #finder/CbmRichRingFinderHoughImpl.h
 finder/CbmRichRingFinderHough.h
 #finder/CbmRichRingFinderHoughParallelImpl.h

@@ -1,9 +1,15 @@
 #include "CbmRichRingSelectNeuralNet.h"
 #include "CbmRichRingLight.h"
-#include "TMultiLayerPerceptron.h"
-#include "TTree.h"
 #include "CbmRichRingSelectImpl.h"
+
+#ifdef ANN_FILE
+#include "TTree.h"
+#include "TMultiLayerPerceptron.h"
+#endif
+
+#ifdef NN_FUNCTION
 #include "NNfunction.h"
+#endif
 
 #include <iostream>
 
@@ -26,22 +32,26 @@ void CbmRichRingSelectNeuralNet::Init ()
     fSelectImpl = new CbmRichRingSelectImpl();
     fSelectImpl->Init();
 
-//    TTree *simu = new TTree ("MonteCarlo","MontecarloData");
-//    Float_t x1,x2,x3,x4,x5,x6,x7,x8, x9, x10, x11;
-//
-//    simu->Branch("x1", &x1,"x1/F");
-//    simu->Branch("x2", &x2,"x2/F");
-//    simu->Branch("x3", &x3,"x3/F");
-//    simu->Branch("x4", &x4,"x4/F");
-//    simu->Branch("x5", &x5,"x5/F");
-//    simu->Branch("x6", &x6,"x6/F");
-//    simu->Branch("x11", &x11,"x11/F");
-//
-//    fNN = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6:5:x11",simu);
-//    cout << "-I- CbmRichRingSelectNeuralNet: get NeuralNet weight parameters from: " << fNeuralNetWeights << endl;
-//    fNN->LoadWeights(fNeuralNetWeights);
+#ifdef ANN_FILE
+    TTree *simu = new TTree ("MonteCarlo","MontecarloData");
+    Float_t x1,x2,x3,x4,x5,x6,x7,x8, x9, x10, x11;
 
+    simu->Branch("x1", &x1,"x1/F");
+    simu->Branch("x2", &x2,"x2/F");
+    simu->Branch("x3", &x3,"x3/F");
+    simu->Branch("x4", &x4,"x4/F");
+    simu->Branch("x5", &x5,"x5/F");
+    simu->Branch("x6", &x6,"x6/F");
+    simu->Branch("x11", &x11,"x11/F");
+
+    fNN = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6:5:x11",simu);
+    cout << "-I- CbmRichRingSelectNeuralNet: get NeuralNet weight parameters from: " << fNeuralNetWeights << endl;
+    fNN->LoadWeights(fNeuralNetWeights);
+#endif
+
+#ifdef NN_FUNCTION
     fNNfunction = new NNfunction();
+#endif
 }
 
 // -----   Exec   ----------------------------------------------------
@@ -73,9 +83,13 @@ void CbmRichRingSelectNeuralNet::DoSelect(CbmRichRingLight* ring)
     nnPar[3] =  ring->GetRadialPosition();
     nnPar[4] =  ring->GetRadius();
     nnPar[5] =  ring->GetChi2() / ring->GetNDF();
+#ifdef ANN_FILE
+    float nnEval = fNN->Evaluate(0,nnPar);
+#endif
 
-    //Double_t nnEval = fNN->Evaluate(0,nnPar);
+#ifdef NN_FUNCTION
     float nnEval = fNNfunction->Value(0,nnPar);
+#endif
 
     ring->SetSelectionNN(nnEval);
 }

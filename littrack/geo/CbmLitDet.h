@@ -1,29 +1,30 @@
-#ifndef ICALDET_H
-#define ICALDET_H
+#ifndef CBMLITDET_H
+#define CBMLITDET_H
 
 #include "FairDetector.h"
 
 #include "TVector3.h"
 #include "TLorentzVector.h"
 
-class IcalPoint;
+class CbmLitDetPoint;
 class FairVolume;
 class TClonesArray;
 
-class IcalDet: public FairDetector {
-public:
+class CbmLitDet: public FairDetector {
+
+ public:
 
     /**      Name :  Detector Name
      *       Active: kTRUE for active detectors (ProcessHits() will be called)
      *               kFALSE for inactive detectors     
     */
-    IcalDet(const char * Name, Bool_t Active);
+    CbmLitDet(const char * Name, Bool_t Active);
 
     /**      default constructor    */
-    IcalDet();
+    CbmLitDet();
 
     /**       destructor     */
-    virtual ~IcalDet();
+    virtual ~CbmLitDet();
 
     /**      Initialization of the detector is done here    */
     virtual void   Initialize();
@@ -45,10 +46,16 @@ public:
     /**      Create the detector geometry        */
     void ConstructGeometry();
 
+ 
+
     /**      This method is an example of how to add your own point 
-     *       of type IcalDetPoint to the clones array
+     *       of type CbmLitDetPoint to the clones array
     */
-   IcalPoint* AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+//   CbmLitDetPoint* AddHit(Int_t trackID, Int_t detID,
+//			       TVector3 pos, TVector3 mom,
+//			       Double_t time, Double_t length,
+//			       Double_t eLoss);
+   CbmLitDetPoint* AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
    			      TVector3 posOut, TVector3 momIn,
    			      TVector3 momOut, Double_t time,
    			      Double_t length, Double_t eLoss);
@@ -85,9 +92,9 @@ private:
 
     /** container for data points */
     
-    TClonesArray  *fIcalDetPointCollection;
+    TClonesArray  *fCbmLitDetPointCollection;
 
-    ClassDef(IcalDet,1);
+    ClassDef(CbmLitDet,1)
 };
 
-#endif //ICALDET_H
+#endif //CbmLitDet_H

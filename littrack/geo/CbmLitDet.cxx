@@ -1,8 +1,8 @@
-#include "IcalDet.h"
+#include "CbmLitDet.h"
 
-#include "IcalPoint.h"
-#include "IcalDetGeo.h"
-#include "IcalDetGeoPar.h"
+#include "CbmLitDetPoint.h"
+#include "CbmLitDetGeo.h"
+#include "CbmLitDetGeoPar.h"
 
 #include "FairVolume.h"
 #include "FairGeoVolume.h"
@@ -19,33 +19,37 @@
 #include "TVirtualMC.h"
 
 #include <iostream>
+using std::cout;
+using std::endl;
 
-IcalDet::IcalDet() :
-   FairDetector("IcalDet", kTRUE, kTutDet) {
+CbmLitDet::CbmLitDet() :
+   FairDetector("LitDet", kTRUE, kTutDet) {
    /** create your collection for data points */
-   fIcalDetPointCollection = new TClonesArray("IcalPoint");
+   fCbmLitDetPointCollection = new TClonesArray("CbmLitDetPoint");
+
 }
 
-IcalDet::IcalDet(const char* name, Bool_t active)
+CbmLitDet::CbmLitDet(const char* name, Bool_t active)
    : FairDetector(name, active, kTutDet) {
-   fIcalDetPointCollection = new TClonesArray("IcalPoint");
+   fCbmLitDetPointCollection = new TClonesArray("CbmLitDetPoint");
+
 }
 
-IcalDet::~IcalDet() {
-   if (fIcalDetPointCollection) {
-      fIcalDetPointCollection->Delete();
-      delete fIcalDetPointCollection;
+CbmLitDet::~CbmLitDet() {
+   if (fCbmLitDetPointCollection) {
+      fCbmLitDetPointCollection->Delete();
+      delete fCbmLitDetPointCollection;
    }
 }
 
-void IcalDet::Initialize()
+void CbmLitDet::Initialize()
 {
    FairDetector::Initialize();
    FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-   IcalDetGeoPar* par=(IcalDetGeoPar*)(rtdb->getContainer("IcalDetGeoPar"));
+   CbmLitDetGeoPar* par=(CbmLitDetGeoPar*)(rtdb->getContainer("CbmLitDetGeoPar"));
 }
 
-Bool_t  IcalDet::ProcessHits(FairVolume* vol)
+Bool_t  CbmLitDet::ProcessHits(FairVolume* vol)
 {
    /** This method is called from the MC stepping */
 
@@ -61,7 +65,7 @@ Bool_t  IcalDet::ProcessHits(FairVolume* vol)
    // Sum energy loss for all steps in the active volume
    fELoss += gMC->Edep();
 
-   // Create IcalDetPoint at exit of active volume
+   // Create CbmLitDetPoint at exit of active volume
    if ( gMC->IsTrackExiting()    ||
          gMC->IsTrackStop()       ||
          gMC->IsTrackDisappeared()   ) {
@@ -70,6 +74,9 @@ Bool_t  IcalDet::ProcessHits(FairVolume* vol)
       gMC->TrackPosition(fPosOut);
       gMC->TrackMomentum(fMomOut);
 //    if (fELoss == 0. ) return kFALSE;
+//    AddHit(fTrackID, fVolumeID, TVector3(fPos.X(),  fPos.Y(),  fPos.Z()),
+//	   TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, fLength,
+//	   fELoss);
       AddHit(fTrackID, 1,
              TVector3(fPos.X(),   fPos.Y(),   fPos.Z()),
              TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
@@ -77,7 +84,7 @@ Bool_t  IcalDet::ProcessHits(FairVolume* vol)
              TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
              fTime, fLength, fELoss);
 
-      // Increment number of Ical points in TParticle
+      // Increment number of lit det points in TParticle
       CbmStack* stack = (CbmStack*) gMC->GetStack();
       stack->AddPoint(kTutDet);
    }
@@ -85,43 +92,45 @@ Bool_t  IcalDet::ProcessHits(FairVolume* vol)
    return kTRUE;
 }
 
-void IcalDet::EndOfEvent()
-{
-   fIcalDetPointCollection->Clear();
+void CbmLitDet::EndOfEvent() {
+
+   fCbmLitDetPointCollection->Clear();
+
 }
 
-void IcalDet::Register()
-{
+
+
+void CbmLitDet::Register() {
+
    /** This will create a branch in the output tree called
-       IcalDetPoint, setting the last parameter to kFALSE means:
+       CbmLitDetPoint, setting the last parameter to kFALSE means:
        this collection will not be written to the file, it will exist
        only during the simulation.
    */
 
-   FairRootManager::Instance()->Register("IcalPoint", "Ical",
-                                         fIcalDetPointCollection, kTRUE);
+   FairRootManager::Instance()->Register("LitDetPoint", "LitDet",
+                                         fCbmLitDetPointCollection, kTRUE);
+
 }
 
-TClonesArray* IcalDet::GetCollection(Int_t iColl) const
-{
-   if (iColl == 0) return fIcalDetPointCollection;
+
+TClonesArray* CbmLitDet::GetCollection(Int_t iColl) const {
+   if (iColl == 0) return fCbmLitDetPointCollection;
    else return NULL;
 }
 
-void IcalDet::Reset()
-{
-   fIcalDetPointCollection->Clear();
+void CbmLitDet::Reset() {
+   fCbmLitDetPointCollection->Clear();
 }
 
-void IcalDet::ConstructGeometry()
-{
+void CbmLitDet::ConstructGeometry() {
    /** If you are using the standard ASCII input for the geometry
        just copy this and use it for your detector, otherwise you can
        implement here you own way of constructing the geometry. */
 
    FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
    FairGeoInterface* geoFace = geoLoad->getGeoInterface();
-   IcalDetGeo*  Geo  = new IcalDetGeo();
+   CbmLitDetGeo*  Geo  = new CbmLitDetGeo();
    Geo->setGeomFile(GetGeometryFileName());
    geoFace->addGeoModule(Geo);
 
@@ -132,7 +141,7 @@ void IcalDet::ConstructGeometry()
    // store geo parameter
    FairRun *fRun = FairRun::Instance();
    FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-   IcalDetGeoPar* par=(IcalDetGeoPar*)(rtdb->getContainer("IcalDetGeoPar"));
+   CbmLitDetGeoPar* par=(CbmLitDetGeoPar*)(rtdb->getContainer("CbmLitDetGeoPar"));
    TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
    TObjArray *fPassNodes = par->GetGeoPassiveNodes();
 
@@ -154,15 +163,20 @@ void IcalDet::ConstructGeometry()
    ProcessNodes ( volList );
 }
 
-IcalPoint* IcalDet::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+//CbmLitDetPoint* CbmLitDet::AddHit(Int_t trackID, Int_t detID,
+//					    TVector3 pos, TVector3 mom,
+//					    Double_t time, Double_t length,
+//					    Double_t eLoss) {
+CbmLitDetPoint* CbmLitDet::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
                                   TVector3 posOut, TVector3 momIn,
                                   TVector3 momOut, Double_t time,
-                                  Double_t length, Double_t eLoss)
-{
-   TClonesArray& clref = *fIcalDetPointCollection;
+                                  Double_t length, Double_t eLoss) {
+   TClonesArray& clref = *fCbmLitDetPointCollection;
    Int_t size = clref.GetEntriesFast();
-   return new(clref[size]) IcalPoint(trackID, detID, posIn, posOut,
+   return new(clref[size]) CbmLitDetPoint(trackID, detID, posIn, posOut,
                                           momIn, momOut, time, length, eLoss);
+//  return new(clref[size]) CbmLitDetPoint(trackID, detID, pos, mom,
+//					      time, length, eLoss);
 }
 
-ClassImp(IcalDet);
+ClassImp(CbmLitDet)

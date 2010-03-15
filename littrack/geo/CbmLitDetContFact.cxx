@@ -1,38 +1,38 @@
-#include "IcalDetContFact.h"
+#include "CbmLitDetContFact.h"
 
-#include "IcalDetGeoPar.h"
+#include "CbmLitDetGeoPar.h"
 
 #include "FairRuntimeDb.h"
 
 #include <iostream>
 
-ClassImp(IcalDetContFact)
+ClassImp(CbmLitDetContFact)
 
-static IcalDetContFact gIcalDetContFact;
+static CbmLitDetContFact gCbmLitDetContFact;
 
-IcalDetContFact::IcalDetContFact() {
+CbmLitDetContFact::CbmLitDetContFact() {
   /** Constructor (called when the library is loaded) */
-  fName="IcalDetContFact";
-  fTitle="Factory for parameter containers in libIcal";
+  fName="CbmLitDetContFact";
+  fTitle="Factory for parameter containers in libLittrack";
   setAllContainers();
   FairRuntimeDb::instance()->addContFactory(this);
 }
 
-void IcalDetContFact::setAllContainers() {
+void CbmLitDetContFact::setAllContainers() {
   /** Creates the Container objects with all accepted 
       contexts and adds them to
       the list of containers for the Tutorial1 library.
   */
 
-  FairContainer* p= new FairContainer("IcalDetGeoPar",
-				    "IcalDet Geometry Parameters",
+  FairContainer* p= new FairContainer("CbmLitDetGeoPar",
+				    "CbmLitDet Geometry Parameters",
 				    "TestDefaultContext");
   p->addContext("TestNonDefaultContext");
   
   containers->Add(p);
 }
 
-FairParSet* IcalDetContFact::createContainer(FairContainer* c) {
+FairParSet* CbmLitDetContFact::createContainer(FairContainer* c) {
   /** Calls the constructor of the corresponding parameter container.
       For an actual context, which is not an empty string and not 
       the default context
@@ -40,8 +40,8 @@ FairParSet* IcalDetContFact::createContainer(FairContainer* c) {
   */
   const char* name=c->GetName();
   FairParSet* p=NULL;
-  if (strcmp(name,"IcalDetGeoPar")==0) {
-    p=new IcalDetGeoPar(c->getConcatName().Data(),
+  if (strcmp(name,"CbmLitDetGeoPar")==0) {
+    p=new CbmLitDetGeoPar(c->getConcatName().Data(),
 			       c->GetTitle(),c->getContext());
   }
   return p;

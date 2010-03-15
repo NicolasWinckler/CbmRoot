@@ -50,6 +50,8 @@ public:
 	bool IsMuch() const;
 	bool IsTof() const;
 
+	bool IsTrdSimple() const;
+
 protected:
 	CbmLitEnvironment();
 
@@ -58,6 +60,7 @@ protected:
 	void NewMuchLayout();
 	void OldMuchLayout();
 	void TrdLayout();
+	void TrdLayoutSimple();
 
 private:
 	void DetermineLayout(

@@ -30,6 +30,10 @@ public:
 	        const CbmLitMaterialInfo* mat,
 	        int pdg,
 	        bool downstream);
+
+//	LitStatus Update2(
+//			CbmLitTrackParam* par,
+//	        const CbmLitMaterialInfo* mat);
 public:
 
 	void AddThinScatter(
@@ -94,7 +98,6 @@ public:
 	myf CalcI(
 			myf Z) const;
 private:
-//	myf fEnergyLoss;
 	bool fDownstream;
 	myf fMass;
 	bool fIsElectron;

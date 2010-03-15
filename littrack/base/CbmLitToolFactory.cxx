@@ -233,7 +233,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderNN->IsUseFastSearch(true);
 		trdFinderNN->SetMaxNofMissingHits(3);
 		trdFinderNN->SetSigmaCoef(5.);
-		trdFinderNN->SetChiSqPixelHitCut(15.);
+		trdFinderNN->SetChiSqPixelHitCut(25.);
 		trdFinderNN->SetChiSqStripHitCut(4.);
 		trdFinderNN->SetPDG(211);
 		trdFinderNN->IsProcessSubstationsTogether(true);
@@ -256,7 +256,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderBranch->SetMaxNofMissingHits(3);
 		trdFinderBranch->IsAlwaysCreateMissingHit(false);
 		trdFinderBranch->SetSigmaCoef(5.);
-		trdFinderBranch->SetChiSqPixelHitCut(15.);
+		trdFinderBranch->SetChiSqPixelHitCut(25.);
 		trdFinderBranch->SetChiSqStripHitCut(4.);
 		TrackFinderPtr finder(trdFinderBranch);
 		return finder;

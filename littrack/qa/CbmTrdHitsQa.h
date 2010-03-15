@@ -11,6 +11,8 @@
 
 #include "FairTask.h"
 
+#include <vector>
+
 class TClonesArray;
 class TH1F;
 class TH2F;

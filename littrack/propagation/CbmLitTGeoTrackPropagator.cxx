@@ -159,5 +159,10 @@ bool CbmLitTGeoTrackPropagator::IsParCorrect(
 		std::abs(par->GetQp()) > maxQp) {
 		return false;
 	}
+
+	if (std::isnan(par->GetX()) || std::isnan(par->GetY()) ||
+			std::isnan(par->GetTx()) || std::isnan(par->GetTy()) ||
+					std::isnan(par->GetQp())) return false;
+
 	return true;
 }

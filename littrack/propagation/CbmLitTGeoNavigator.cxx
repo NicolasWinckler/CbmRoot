@@ -51,11 +51,20 @@ LitStatus CbmLitTGeoNavigator::FindIntersections(
 	do {
 		fGeo->PushPoint();
 		stepInfo = MakeStep();
+		// Check if outside of the geometry
 		if(fGeo->IsOutside()) {
 			fGeo->PopDummy();
 			return kLITERROR;
 		}
-		if ((stepInfo.GetZpos() >= zOut)){
+		// Check for NaN values
+		if (std::isnan(fGeo->GetCurrentPoint()[0]) ||
+				std::isnan(fGeo->GetCurrentPoint()[1]) ||
+				std::isnan(fGeo->GetCurrentPoint()[2]) ){
+			fGeo->PopDummy();
+			return kLITERROR;
+		}
+		// Check if we currently at the output position
+		if ((stepInfo.GetZpos() >= zOut)) { //|| fGeo->IsNullStep()){
 			fGeo->PopPoint();
 			myf l = CalcLength(zOut);
 			stepInfo.SetLength(l);

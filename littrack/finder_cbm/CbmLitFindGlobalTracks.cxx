@@ -58,7 +58,6 @@ InitStatus CbmLitFindGlobalTracks::Init()
 	ReadAndCreateDataBranches();
 
 	InitTrackReconstruction();
-
 	return kSUCCESS;
 }
 
@@ -100,6 +99,7 @@ void CbmLitFindGlobalTracks::DetermineSetup()
 {
     CbmLitEnvironment* env = CbmLitEnvironment::Instance();
     fIsElectronSetup = env->IsElectronSetup();
+    if (env->IsTrdSimple()) fIsElectronSetup = true;
     fIsTrd = env->IsTrd();
     fIsMuch = env->IsMuch();
     fIsTof = env->IsTof();

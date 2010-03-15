@@ -33,6 +33,7 @@
 #include "TGeoArb8.h"
 #include "TGeoSphere.h"
 #include "TGeoBBox.h"
+#include "TGeoCone.h"
 #include "TGeoMatrix.h"
 
 #include <set>
@@ -84,6 +85,11 @@ CbmLitDetectorLayout CbmLitEnvironment::GetLayout()
 	static Bool_t layoutCreated = false;
 
 	if (!layoutCreated) {
+		if (IsTrdSimple()) {
+			std::cout << "TRD SIMPLE LAYOUT" << std::endl;
+			TrdLayoutSimple();
+			fLayout = fTrdLayout;
+		} else
 		if (IsMuch() && !IsTrd()) {
 			MuchLayout();
 			fLayout = fMuchLayout;
@@ -266,6 +272,38 @@ void CbmLitEnvironment::TrdLayout()
 						}
 					}
 				}
+			}
+		}
+
+		std::vector<CbmLitStation> stationVec(stationSet.begin(), stationSet.end());
+		DetermineLayout(stationVec, fTrdLayout);
+//		std::cout << fTrdLayout.ToString();
+		layoutCreated = true;
+	}
+}
+
+void CbmLitEnvironment::TrdLayoutSimple()
+{
+	static Bool_t layoutCreated = false;
+
+	if (!layoutCreated) {
+		std::set<CbmLitStation, CompareStationZLess> stationSet;
+		TObjArray* nodes = gGeoManager->GetTopNode()->GetNodes();
+		for (Int_t iNode = 0; iNode < nodes->GetEntriesFast(); iNode++) {
+
+			TGeoNode* node = (TGeoNode*) nodes->At(iNode);
+			if (TString(node->GetName()).Contains("trd")) {
+				TGeoNode* station = node;
+				const Double_t* stationPos = station->GetMatrix()->GetTranslation();
+
+//				const Double_t* pos = layerPart->GetMatrix()->GetTranslation();
+				TGeoCone* shape = (TGeoCone*) station->GetVolume()->GetShape();
+				CbmLitStation sta;
+				CbmLitSubstation substation;
+				substation.SetZ(stationPos[2] - shape->GetDz());
+				sta.SetType(kLITPIXELHIT);
+				sta.AddSubstation(substation);
+				stationSet.insert(sta);
 			}
 		}
 
@@ -578,12 +616,27 @@ bool CbmLitEnvironment::IsTrdSegmented() const
 	FairRuntimeDb* rtdb = ana->GetRuntimeDb();
 	FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
 	TObjArray *detList = baseParSet->GetDetList();
-	FairDetector* much = (FairDetector*) detList->FindObject("TRD");
-	TString name = much->GetGeometryFileName();
+	FairDetector* trd = (FairDetector*) detList->FindObject("TRD");
+	TString name = trd->GetGeometryFileName();
 	if(name.Contains("monolithic") && !name.Contains("monolithic_new")) {
 		return false;
 	} else {
 		return true;
+	}
+}
+
+bool CbmLitEnvironment::IsTrdSimple() const
+{
+	FairRunAna* ana = FairRunAna::Instance();
+	FairRuntimeDb* rtdb = ana->GetRuntimeDb();
+	FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
+	TObjArray *detList = baseParSet->GetDetList();
+	FairDetector* trd = (FairDetector*) detList->FindObject("TRD");
+	TString name = trd->GetGeometryFileName();
+	if(name.Contains("simple")) {
+		return true;
+	} else {
+		return false;
 	}
 }
 

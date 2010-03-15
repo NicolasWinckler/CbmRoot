@@ -158,8 +158,8 @@ void CbmTrdHitsQa::ProcessHits()
 		fhResX[plane]->Fill(resX);
 		fhResY[plane]->Fill(resY);
 
-		fhPullX[plane]->Fill(resX / hit->GetDx());
-		fhPullY[plane]->Fill(resY / hit->GetDy());
+		if (hit->GetDx() != 0.) fhPullX[plane]->Fill(resX / hit->GetDx());
+		if (hit->GetDy() != 0.) fhPullY[plane]->Fill(resY / hit->GetDy());
 	}
 }
 
@@ -254,8 +254,11 @@ void CbmTrdHitsQa::Draw()
 		TH1F* hist = fhPullX[i];
 		hist->Fit("gaus");
 		TF1 *fit = hist->GetFunction("gaus");
-		Double_t sigma = fit->GetParameter(2);
-		Double_t rms = hist->GetRMS();
+		Double_t sigma = 0., rms = 0.;
+		if (fit){
+			sigma = fit->GetParameter(2);
+		    rms = hist->GetRMS();
+		}
 		DrawHistSigmaRMS(i, sigma, rms);
 
 		chPullY->cd(i + 1);
@@ -266,8 +269,10 @@ void CbmTrdHitsQa::Draw()
 		hist = fhPullY[i];
 		hist->Fit("gaus");
 		fit = hist->GetFunction("gaus");
-		sigma = fit->GetParameter(2);
-		rms = hist->GetRMS();
+		if (fit){
+			sigma = fit->GetParameter(2);
+			rms = hist->GetRMS();
+		}
 		DrawHistSigmaRMS(i, sigma, rms);
 	}
 }

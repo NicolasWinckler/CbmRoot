@@ -137,7 +137,8 @@ void  DrawHistSigmaRMS(
 	TLatex text;
 	text.SetTextAlign(21);
 	text.SetTextSize(0.08); //0.1
-	if (index != 11) text.DrawTextNDC(0.5, 0.83, txt1.c_str());
+//	if (index != 11)
+	text.DrawTextNDC(0.5, 0.83, txt1.c_str());
 	std::string txt2 = ToString<char>(index+97) + ")";
 	text.DrawTextNDC(0.8, 0.7, txt2.c_str());
 }

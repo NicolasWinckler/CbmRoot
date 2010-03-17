@@ -5,16 +5,16 @@
  * Macro draws histograms produced by CbmLitReconstructionQa class.
  **/
 
-void global_reco_qa()
+void global_reco_qa(Int_t nEvents = 1000)
 {
 	// Output directory
-	TString dir  = "/d/cbm02/andrey/stdtrd_10pi/";
+	TString dir  = "/d/cbm02/andrey/muchcomp10_10mu_urqmd/";
 	// MC transport file
 	TString mcFile = dir + "mc.0000.root";
 	// Parameter file
 	TString parFile = dir + "param.0000.root";
 	// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
-	TString globalHitsFile = dir + "global.hits.trd500.0000.root";
+	TString globalHitsFile = dir + "global.hits.0000.root";
 	// File with global tracks
 	TString globalTracksFile = dir + "global.tracks.0000.root";
 	// Output file with histograms
@@ -35,7 +35,7 @@ void global_reco_qa()
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
 	run->AddFriend(globalHitsFile);
-	run->AddFriend(globalHitsFile);
+	run->AddFriend(globalTracksFile);
 	run->SetOutputFile(recoQaFile);
 	// ------------------------------------------------------------------------
 
@@ -43,12 +43,13 @@ void global_reco_qa()
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
 	reconstructionQa->SetMinNofPointsTrd(10);
-	reconstructionQa->SetMinNofPointsMuch(11);
+	reconstructionQa->SetMinNofPointsMuch(9);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
-	reconstructionQa->SetMinNofHitsTrd(9);
-	reconstructionQa->SetMinNofHitsMuch(11);
+	reconstructionQa->SetMinNofHitsTrd(0);
+	reconstructionQa->SetMinNofHitsMuch(8);
 	reconstructionQa->SetVerbose(1);
+	reconstructionQa->SetOutputDir("./test/muchcomp10_10mu_urqmd/");
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------
 

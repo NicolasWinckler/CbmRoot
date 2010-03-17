@@ -741,9 +741,15 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 	c1->cd();
 	fhStsMom[ALL][EFF]->SetMinimum(0.);
 	fhStsMom[ALL][EFF]->SetMaximum(1.);
-	DrawHist1D(fhStsMom[ALL][EFF], fhHalfGlobalMom[ALL][EFF], fhGlobalMom[ALL][EFF],
+	if (fIsTof) {
+	   DrawHist1D(fhStsMom[ALL][EFF], fhHalfGlobalMom[ALL][EFF], fhGlobalMom[ALL][EFF],
 			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3,
 			false, false, true, 0.3,0.3,0.85,0.6);
+	} else {
+	    DrawHist1D(fhStsMom[ALL][EFF], fhHalfGlobalMom[ALL][EFF], NULL,
+			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3,
+			false, false, true, 0.3,0.3,0.85,0.6);
+	}
 	SaveCanvasAsImage(c1, fOutputDir);
 
 	Int_t cat;
@@ -757,9 +763,15 @@ void CbmLitReconstructionQa::DrawEfficiencyHistos()
 	c2->cd();
 	fhStsMom[cat][EFF]->SetMinimum(0.);
 	fhStsMom[cat][EFF]->SetMaximum(1.);
-	DrawHist1D(fhStsMom[cat][EFF], fhHalfGlobalMom[cat][EFF], fhGlobalMom[cat][EFF],
+	if (fIsTof) {
+	   DrawHist1D(fhStsMom[cat][EFF], fhHalfGlobalMom[cat][EFF], fhGlobalMom[cat][EFF],
 				"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3,
 				false, false, true, 0.3,0.3,0.85,0.6);
+	} else {
+	   DrawHist1D(fhStsMom[cat][EFF], fhHalfGlobalMom[cat][EFF], NULL,
+				"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3,
+				false, false, true, 0.3,0.3,0.85,0.6);
+	}
 	SaveCanvasAsImage(c2, fOutputDir);
 
 

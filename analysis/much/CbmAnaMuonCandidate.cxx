@@ -38,7 +38,8 @@ void CbmAnaMuonCandidate::SetMomentumRC(Double_t* T){
 
 }
 
-Bool_t CbmAnaMuonCandidate::IsReconstructed(Int_t nStsHitsCut, Double_t chiToVertexCut){
+Bool_t CbmAnaMuonCandidate::IsReconstructed(Int_t nMuchHitsCut, Int_t nStsHitsCut, Double_t chiToVertexCut){
+  if (fNMuchHits<nMuchHitsCut) return kFALSE;
   if (fNStsHits<nStsHitsCut) return kFALSE;
   if (fChiToVertex>chiToVertexCut) return kFALSE;
   return kTRUE;

@@ -19,12 +19,13 @@ class CbmAnaMuonCandidate : public TObject{
     void SetMomentumRC(Double_t* T);
     void SetMCTrackId(Int_t trackId) {fMCTrackId    = trackId; }
     void SetNStsHits(Int_t nStsHits) {fNStsHits     = nStsHits; }
+    void SetNMuchHits(Int_t nMuchHits) {fNMuchHits     = nMuchHits; }
     void SetChiToVertex(Double_t chi) {fChiToVertex = chi; }
     void SetNTriggerHits(Int_t n) { fNTriggerHits = n; }
     void SetSign(Double_t sign) {fSign = sign; }
     TLorentzVector* GetMomentumMC() {return &fpMC; }
     TLorentzVector* GetMomentumRC() {return &fpRC; }
-    Bool_t IsReconstructed(Int_t nStsHitsCut=8, Double_t chiToVertexCut=3.);
+    Bool_t IsReconstructed(Int_t nMuchHitsCut=13, Int_t nStsHitsCut=8, Double_t chiToVertexCut=3.);
     void SetReconstructed(Bool_t isRec) {fIsReconstructed = isRec; }
     Double_t GetSign() {return fSign;}
   private:
@@ -38,6 +39,7 @@ class CbmAnaMuonCandidate : public TObject{
     Int_t stsHits[NPLANES];
     Bool_t fIsReconstructed;
     Int_t fNStsHits;
+    Int_t fNMuchHits;
     Double_t fChiToVertex;
     Int_t fNTriggerHits;
     Double_t fSign;

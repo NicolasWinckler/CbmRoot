@@ -19,6 +19,8 @@ void global_reco_qa(Int_t nEvents = 1000)
 	TString globalTracksFile = dir + "global.tracks.0000.root";
 	// Output file with histograms
 	TString recoQaFile = dir + "reco.qa.0000.root";
+	// Output directory for images
+	TString imageDir = "./test/";
 
 	TStopwatch timer;
 	timer.Start();
@@ -42,14 +44,16 @@ void global_reco_qa(Int_t nEvents = 1000)
 	// -----   Track finding QA check   ------------------------------------
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
-	reconstructionQa->SetMinNofPointsTrd(10);
-	reconstructionQa->SetMinNofPointsMuch(9);
+	reconstructionQa->SetMinNofPointsTrd(9);
+	reconstructionQa->SetMinNofPointsMuch(12);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(0);
 	reconstructionQa->SetMinNofHitsMuch(8);
 	reconstructionQa->SetVerbose(1);
-	reconstructionQa->SetOutputDir("./test/muchcomp10_10mu_urqmd/");
+	reconstructionQa->SetMomentumRange(0., 25);
+	reconstructionQa->SetNofBinsMom(50);
+	reconstructionQa->SetOutputDir(std::string(imageDir));
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------
 

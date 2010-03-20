@@ -100,6 +100,21 @@ public:
      */
 	void SetOutputDir(const std::string& dir) { fOutputDir = dir;}
 
+	/**
+	 * Sets momentum range for efficiency calculation
+	 */
+	void SetMomentumRange(Double_t minMom, Double_t maxMom) {
+		fMinMom = minMom;
+		fMaxMom = maxMom;
+	}
+
+	/**
+	 * Set number of bins for efficiency v. momentum histograms
+	 */
+	void SetNofBinsMom(Int_t nofBins) {
+		fNofBinsMom = nofBins;
+	}
+
 private:
     /**
      * Derived from FairTask. Executed after all events are processed.
@@ -267,6 +282,9 @@ private:
 	Bool_t fIsTof; // If TOF detected than true
 
 	Double_t fRefMomentum; // Momentum cut for reference tracks
+	Double_t fMinMom; // Minimum momentum for tracks for efficiency calculation
+	Double_t fMaxMom; // Maximum momentum for tracks for efficiency calculation
+	Int_t fNofBinsMom; // Number of bins for efficiency vs. momentum histogram
 
 	// Maps for reconstructed tracks
 	// <MC track index, reconstructed track index>

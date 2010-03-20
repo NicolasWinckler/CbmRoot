@@ -63,6 +63,8 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
 	fMinNofHitsTrd = 8;
 	fMinNofHitsMuch = 10;
 	fRefMomentum = 2.;
+	fMinMom = 0.;
+	fMaxMom = 25.;
 	fNofTypes = 3;
 	fNofCategories = 6;
 
@@ -463,9 +465,9 @@ void CbmLitReconstructionQa::CreateHistos()
 	}
 
 	// Momentum distributions
-	Double_t minMom   =  0.;
-	Double_t maxMom   = 25.;
-	Int_t    nBinsMom = 25; //50
+	Double_t minMom   =  fMinMom;
+	Double_t maxMom   = fMaxMom;
+	Int_t    nBinsMom = fNofBinsMom;
 	// Number of points distributions
 	Double_t minNofPoints   =  0.;
 	Double_t maxNofPoints   = 25.;

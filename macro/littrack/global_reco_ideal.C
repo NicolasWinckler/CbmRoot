@@ -1,15 +1,16 @@
 void global_reco_ideal(Int_t nEvents = 1000)
 {
-	TString dir  = "/d/cbm02/andrey/stdtrd_10pi/";
+	TString dir  = "/home/d/andrey/trdsimple_10pi/";
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
-	TString globalTracksFile = dir + "global.tracks.ideal.trd500.0000.root";
+	TString globalTracksFile = dir + "global.tracks.ideal.trd100_200.0000.root";
+	TString imageDir = "./test/";
 
 	Int_t iVerbose = 1;
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
+	gSystem->Load("/d/soft/tbb/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -96,14 +97,16 @@ void global_reco_ideal(Int_t nEvents = 1000)
 //		Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
 //		Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
-		Double_t trdSigmaX[] = {500, 500, 500};             // Resolution in x [mum]
+		Double_t trdSigmaX[] = {200, 200, 200};             // Resolution in x [mum]
 		// Resolutions in y - station and angle dependent [mum]
-		Double_t trdSigmaY1[] = {500, 500, 500, 500, 500, 500, 500};
-		Double_t trdSigmaY2[] = {500, 500, 500, 500, 500, 500, 500};
-		Double_t trdSigmaY3[] = {500, 500, 500, 500, 500, 500, 500};
+		Double_t trdSigmaY1[] = {100, 100, 100, 100, 100, 100, 100};
+		Double_t trdSigmaY2[] = {100, 100, 100, 100, 100, 100, 100};
+		Double_t trdSigmaY3[] = {100, 100, 100, 100, 100, 100, 100};
 
+//		CbmTrdHitProducerSmearing* trdHitProd = new
+//				 CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
 		CbmTrdHitProducerSmearing* trdHitProd = new
-				 CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
+				 CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", NULL);
 
 		trdHitProd->SetSigmaX(trdSigmaX);
 		trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
@@ -134,11 +137,16 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	// ------- Track finding QA check   ---------------------------------------
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
-	reconstructionQa->SetMinNofPointsTrd(8);
+	reconstructionQa->SetMinNofPointsTrd(9);
 	reconstructionQa->SetMinNofPointsMuch(12);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
+	reconstructionQa->SetMinNofHitsTrd(9);
+	reconstructionQa->SetMinNofHitsMuch(11);
 	reconstructionQa->SetVerbose(1);
+	reconstructionQa->SetMomentumRange(0., 25);
+	reconstructionQa->SetNofBinsMom(50);
+	reconstructionQa->SetOutputDir(std::string(imageDir));
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------
 

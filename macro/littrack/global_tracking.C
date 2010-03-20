@@ -13,9 +13,9 @@ void global_tracking(Int_t nEvents = 1000)
 	TString dir, imageDir, mcFile, parFile, globalHitsFile, globalTracksFile;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/home/d/andrey/stdtrd_1pi/";
+		dir  = "/home/d/andrey/trdsimple_10pi/";
 		//Output directory for images
-		imageDir = "./test/much1_10mu/";
+		imageDir = "./test/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file
@@ -36,7 +36,7 @@ void global_tracking(Int_t nEvents = 1000)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+	gSystem->Load("/home/soft/tbb/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -89,6 +89,8 @@ void global_tracking(Int_t nEvents = 1000)
 	reconstructionQa->SetMinNofHitsTrd(9);
 	reconstructionQa->SetMinNofHitsMuch(11);
 	reconstructionQa->SetVerbose(1);
+	reconstructionQa->SetMomentumRange(0., 10);
+	reconstructionQa->SetNofBinsMom(20);
 	reconstructionQa->SetOutputDir(std::string(imageDir));
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------

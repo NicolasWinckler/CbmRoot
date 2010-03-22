@@ -28,6 +28,7 @@
 #include "TFile.h"
 #include "TH1.h"
 #include "TF1.h"
+#include "TSystem.h"
 
 #include <cassert>
 #include <stdio.h>
@@ -171,7 +172,8 @@ void CbmMuchSegmentAuto::FinishTask(){
     fExp1.push_back(exp1);
 
     h->Draw();
-    c1->Print();
+    c1->Print(Form("%s/hd_station%i.eps",gSystem->DirName(fDigiFileName), i+1));
+    c1->Print(Form("%s/hd_station%i.png",gSystem->DirName(fDigiFileName), i+1));
   }
 
   for (Int_t i=0;i<fNStations;i++) {
@@ -559,8 +561,8 @@ void CbmMuchSegmentAuto::DrawSegmentation(){
     TArc* arc = new TArc(0.,0.,station->GetRmin());
     arc->Draw();
 
-    c1->Print(Form("station%i.eps",iStation+1));
-    c1->Print(Form("station%i.png",iStation+1));
+    c1->Print(Form("%s/station%i.eps",gSystem->DirName(fDigiFileName), iStation+1));
+    c1->Print(Form("%s/station%i.png",gSystem->DirName(fDigiFileName), iStation+1));
   }//stations
   fclose(outfile);
 }

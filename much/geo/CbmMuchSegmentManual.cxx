@@ -22,6 +22,7 @@
 #include "TCanvas.h"
 #include "TArc.h"
 #include "TColor.h"
+#include "TSystem.h"
 
 #include <stdio.h>
 #include <cassert>
@@ -711,8 +712,9 @@ void CbmMuchSegmentManual::DrawSegmentation(){
       arc->SetFillStyle(0);
       arc->Draw();
     }
-    c1->Print(Form("station%i.eps",iStation+1));
-    c1->Print(Form("station%i.png",iStation+1));
+
+    c1->Print(Form("%s/station%i.eps",gSystem->DirName(fDigiFileName), iStation+1));
+    c1->Print(Form("%s/station%i.png",gSystem->DirName(fDigiFileName), iStation+1));
   }//stations
   fclose(outfile);
 }

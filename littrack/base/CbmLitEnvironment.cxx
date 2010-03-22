@@ -2,7 +2,6 @@
  *@author A.Lebedev <alebedev@jinr.ru>
  *@since 2007
  **/
-#define NEWMUCH 1
 
 #include "CbmLitEnvironment.h"
 #include "CbmLitMemoryManagment.h"
@@ -15,15 +14,12 @@
 #include "FairDetector.h"
 #include "FairRuntimeDb.h"
 #include "FairBaseParSet.h"
-
-#ifdef NEWMUCH
 #include "CbmMuchGeoScheme.h"
 #include "CbmGeoMuchPar.h"
 #include "CbmMuchStation.h"
 #include "CbmMuchLayer.h"
 #include "CbmMuchLayerSide.h"
 #include "CbmMuchModule.h"
-#endif
 
 #include "TGeoNode.h"
 #include "TGeoMaterial.h"
@@ -80,19 +76,22 @@ FairField* CbmLitEnvironment::GetField()
    return fField;
 }
 
-CbmLitDetectorLayout CbmLitEnvironment::GetLayout()
+const CbmLitDetectorLayout& CbmLitEnvironment::GetLayout()
 {
 	static Bool_t layoutCreated = false;
 
 	if (!layoutCreated) {
-		if (IsTrdSimple()) {
-			std::cout << "TRD SIMPLE LAYOUT" << std::endl;
-			TrdLayoutSimple();
-			fLayout = fTrdLayout;
+		if (IsTrd()) {
+			if (IsTrdSimple()) {
+				TrdLayoutSimple();
+				fLayout = fTrdLayout;
+			}
 		} else
 		if (IsMuch() && !IsTrd()) {
+			std::cout << "BEGIN MUCH ALONE" << std::endl;
 			MuchLayout();
 			fLayout = fMuchLayout;
+			std::cout << "END MUCH ALONE" << std::endl;
 		} else
 		if (IsTrd() && !IsMuch()){
 			TrdLayout();
@@ -110,77 +109,6 @@ CbmLitDetectorLayout CbmLitEnvironment::GetLayout()
 
 void CbmLitEnvironment::MuchLayout()
 {
-	if ((TGeoNode*) gGeoManager->GetTopNode()->GetNodes()->FindObject("much1_0") != NULL){
-		OldMuchLayout();
-	} else {
-		NewMuchLayout();
-	}
-}
-
-void CbmLitEnvironment::OldMuchLayout()
-{
-	static Bool_t layoutCreated = false;
-
-	if (!layoutCreated) {
-
-		std::set<CbmLitStation, CompareStationZLess> stationSet;
-
-		TGeoNode* much = (TGeoNode*) gGeoManager->GetTopNode()->GetNodes()->FindObject("much1_0");
-
-		const Double_t* muchPos  = much->GetMatrix()->GetTranslation();
-		TObjArray* muchNodes = much->GetNodes();
-		for (Int_t iMuchNode = 0; iMuchNode < muchNodes->GetEntriesFast(); iMuchNode++) {
-			TGeoNode* muchNode = (TGeoNode*) muchNodes->At(iMuchNode);
-
-			if (IsStraw()) {// for straws
-				Int_t nd = muchNode->CountDaughters(kTRUE);
-				//cout << iMuchNode << " " << muchNode->GetName() << " " << nd << endl;
-				TGeoNode *daught = muchNode;
-				Double_t dz = daught->GetMatrix()->GetTranslation()[2];
-				Double_t dz1 = 0.;
-				for (Int_t i = 0; i < nd; ++i) {
-					if (nd > 1) {
-					    daught = muchNode->GetDaughter(i);
-					    dz1 = daught->GetMatrix()->GetTranslation()[2];
-					}
-					//cout << i << " " << daught->GetName() << " " << dz << " " << dz1 << endl;
-					if (TString(daught->GetName()).Contains("station")) {
-					    TGeoPcon* shape = (TGeoPcon*) daught->GetVolume()->GetShape();
-					    CbmLitStation station;
-					    CbmLitSubstation substation;
-					    substation.SetZ(muchPos[2] + shape->GetZ(0) + shape->GetDZ()
-									   + dz + dz1);
-					    // TODO temporary solution
-					    if (substation.GetZ() > 220.)station.SetType(kLITSTRIPHIT);
-					    else station.SetType(kLITPIXELHIT);
-					    station.AddSubstation(substation);
-					    stationSet.insert(station);
-					}
-				}// end for straws
-			} else {
-				if (TString(muchNode->GetName()).Contains("station")) {
-					TGeoPcon* shape = (TGeoPcon*) muchNode->GetVolume()->GetShape();
-					CbmLitStation station;
-					CbmLitSubstation substation;
-					substation.SetZ(muchPos[2] + shape->GetZ(0) + shape->GetDZ());
-					station.SetType(kLITPIXELHIT);
-					station.AddSubstation(substation);
-					stationSet.insert(station);
-				}
-			}
-		}
-
-		std::vector<CbmLitStation> stationVec(stationSet.begin(), stationSet.end());
-		DetermineLayout(stationVec, fMuchLayout);
-//		std::cout << fMuchLayout.ToString();
-		layoutCreated = true;
-	}
-}
-
-
-void CbmLitEnvironment::NewMuchLayout()
-{
-#ifdef NEWMUCH
 	static Bool_t layoutCreated = false;
 
 	if (!layoutCreated) {
@@ -210,7 +138,6 @@ void CbmLitEnvironment::NewMuchLayout()
 				Int_t type = layer->GetSideF()->GetModule(0)->GetDetectorType();
 
 				litStation.AddSubstation(litSubstationFront);
-				//if (station->IsModuleDesign()) litStation.AddSubstation(litSubstationBack);
 				if (station->IsModuleDesign() || type == 2) litStation.AddSubstation(litSubstationBack);
 
 				if (type == 2) litStation.SetType(kLITSTRIPHIT);
@@ -223,7 +150,6 @@ void CbmLitEnvironment::NewMuchLayout()
 //		std::cout << fMuchLayout.ToString();
 		layoutCreated = true;
 	}
-#endif
 }
 
 void CbmLitEnvironment::TrdLayout()
@@ -333,7 +259,7 @@ void CbmLitEnvironment::CombineMuchAndTrd()
 	}
 }
 
-CbmLitDetectorLayout CbmLitEnvironment::GetTofLayout()
+const CbmLitDetectorLayout& CbmLitEnvironment::GetTofLayout()
 {
 	static Bool_t layoutCreated = false;
 
@@ -371,7 +297,7 @@ CbmLitDetectorLayout CbmLitEnvironment::GetTofLayout()
 	return fTofLayout;
 }
 
-CbmLitStation CbmLitEnvironment::GetTofStation()
+const CbmLitStation& CbmLitEnvironment::GetTofStation()
 {
 	static Bool_t layoutCreated = false;
 	if (!layoutCreated) {
@@ -420,7 +346,7 @@ template<class T>
 void CbmLitEnvironment::GetMuchLayout(
 		LitDetectorLayout<T>& layout)
 {
-	std::cout << "Getting layout for parallel version of tracking..." << std::endl;
+	std::cout << "Getting MUCH layout for parallel version of tracking..." << std::endl;
 #ifdef LIT_USE_THIRD_DEGREE
 	CbmLitFieldFitter fieldFitter(3); // set polynom degree
 	static const unsigned int N = 10; // set number of coefficients
@@ -434,10 +360,10 @@ void CbmLitEnvironment::GetMuchLayout(
 	std::vector<CbmLitMaterialInfo> muchMaterial = geoConstructor->GetMyMuchGeoNodes();
 
 	MuchLayout();
-	CbmLitDetectorLayout muchLayout = GetMuchLayout();
+	const CbmLitDetectorLayout& muchLayout = GetMuchLayout();
 	std::cout << muchLayout.ToString();
 	for (int isg = 0; isg < muchLayout.GetNofStationGroups(); isg++) {
-		CbmLitStationGroup stationGroup = muchLayout.GetStationGroup(isg);
+		const CbmLitStationGroup& stationGroup = muchLayout.GetStationGroup(isg);
 		LitStationGroup<T> sg;
 
 		// Add absorber
@@ -520,11 +446,78 @@ void CbmLitEnvironment::GetMuchLayout(
 	} // loop over station groups
 }
 
+
+//template<class T>
+//void CbmLitEnvironment::TrdLayoutParallel(
+//		LitDetectorLayout<T>& layout)
+//{
+//	std::cout << "Getting TRD layout for parallel version of tracking..." << std::endl;
+//#ifdef LIT_USE_THIRD_DEGREE
+//	CbmLitFieldFitter fieldFitter(3); // set polynom degree
+//	static const unsigned int N = 10; // set number of coefficients
+//#else
+//	CbmLitFieldFitter fieldFitter(5); // set polynom degree
+//	static const unsigned int N = 21; // set number of coefficients
+//#endif
+//	std::cout << "Field fitter initialized" << std::endl;
+//	CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
+//	std::cout << "Simple geometry constructor initialized" << std::endl;
+//	std::vector<CbmLitMaterialInfo> trdMaterial = geoConstructor->GetMyTrdGeoNodes();
+//
+//	TrdLayout();
+//	const CbmLitDetectorLayout& trdLayout = GetTrdLayout();
+//	std::cout << trdLayout.ToString();
+//	for (int isg = 0; isg < trdLayout.GetNofStationGroups(); isg++) {
+//		const CbmLitStationGroup& stationGroup = trdLayout.GetStationGroup(isg);
+//		LitStationGroup<T> sg;
+//
+//		for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
+//			const CbmLitStation& station = stationGroup.GetStation(ist);
+//			LitStation<T> st;
+//			st.type = station.GetType();
+//			for(int iss = 0; iss < station.GetNofSubstations(); iss++) {
+//				const CbmLitSubstation& substation = station.GetSubstation(iss);
+//				LitSubstation<T> ss;
+//				ss.Z = substation.GetZ();
+//
+//				// Fit the field at Z position of the substation
+//				std::vector<double> parBx, parBy, parBz;
+//				ss.fieldSlice.Z = substation.GetZ();
+//				fieldFitter.FitSlice(substation.GetZ(), parBx, parBy, parBz);
+//				for (int i = 0; i < N; i++) {
+//					ss.fieldSlice.cx[i] = parBx[i];
+//					ss.fieldSlice.cy[i] = parBy[i];
+//					ss.fieldSlice.cz[i] = parBz[i];
+//				}
+//
+//				int matId = MaterialId(isg, ist, iss, muchLayout);
+//				CbmLitMaterialInfo mat = muchMaterial[matId];
+//				ss.material.A = mat.GetA();
+//				ss.material.Z = mat.GetZ();
+//				ss.material.I = (mat.GetZ() > 16)? 10 * mat.GetZ() * 1e-9 :
+//					16 * std::pow(mat.GetZ(), 0.9) * 1e-9;
+//				ss.material.Rho = mat.GetRho();
+//				ss.material.Thickness = mat.GetLength();
+//				ss.material.X0 = mat.GetRL();
+//				ss.material.Zpos = mat.GetZpos();
+//
+//				ss.material.RadThick = ss.material.Thickness / ss.material.X0; // Length/X0
+//				ss.material.SqrtRadThick = sqrt(ss.material.RadThick); // std::sqrt(Length/X0)
+//				ss.material.LogRadThick = log(ss.material.RadThick); // std::log(Length/X0)
+//
+//				st.AddSubstation(ss);
+//			} // loop over substations
+//			sg.AddStation(st);
+//		} // loop over stations
+//		layout.AddStationGroup(sg);
+//	} // loop over station groups
+//}
+
 int CbmLitEnvironment::MaterialId(
 		int stationGroup,
 		int station,
 		int substation,
-		CbmLitDetectorLayout& layout) const
+		const CbmLitDetectorLayout& layout) const
 {
 	int counter = 0;
 	for(int i = 0; i < stationGroup; i++) {
@@ -632,6 +625,7 @@ bool CbmLitEnvironment::IsTrdSimple() const
 	FairBaseParSet* baseParSet = (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
 	TObjArray *detList = baseParSet->GetDetList();
 	FairDetector* trd = (FairDetector*) detList->FindObject("TRD");
+	if (!trd) return false;
 	TString name = trd->GetGeometryFileName();
 	if(name.Contains("simple")) {
 		return true;

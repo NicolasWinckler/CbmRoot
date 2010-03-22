@@ -3,8 +3,8 @@
  *@since 2007
  **
  ** The class is an interface to the CBM detector classes and field.
- ** The detector geometries in the form of CbmLitDetectorLayout class
- ** can be got via this class.
+ ** The detector geometry which is represented in the form of
+ ** CbmLitDetectorLayout class constructed in this class.
  **/
 
 #ifndef CBMLITENVIRONMENT_H_
@@ -28,9 +28,13 @@ public:
 	static CbmLitEnvironment* Instance();
 
 	FairField* GetField();
-	CbmLitDetectorLayout GetLayout();
+	const CbmLitDetectorLayout& GetLayout();
+//	void GetLayoutParallelVec(LitDetectorLayoutVec& layout);
+//	void GetLayoutParallelScal(LitDetectorLayoutScal& layout);
+//	template<class T> void GetLayoutParallel(LitDetectorLayout<T>& layout);
 
-	CbmLitDetectorLayout GetMuchLayout() {return fMuchLayout;}
+	const CbmLitDetectorLayout& GetMuchLayout() {return fMuchLayout;}
+	const CbmLitDetectorLayout& GetTrdLayout() {return fTrdLayout;}
 
 	void GetMuchLayoutVec(LitDetectorLayoutVec& layout);
 	void GetMuchLayoutScal(LitDetectorLayoutScal& layout);
@@ -40,10 +44,10 @@ public:
 			int stationGroup,
 			int station,
 			int substation,
-			CbmLitDetectorLayout& layout) const;
+			const CbmLitDetectorLayout& layout) const;
 
-	CbmLitDetectorLayout GetTofLayout();
-	CbmLitStation GetTofStation();
+	const CbmLitDetectorLayout& GetTofLayout();
+	const CbmLitStation& GetTofStation();
 
 	bool IsElectronSetup() const;
 	bool IsTrd() const;
@@ -57,8 +61,6 @@ protected:
 
 	void CombineMuchAndTrd();
 	void MuchLayout();
-	void NewMuchLayout();
-	void OldMuchLayout();
 	void TrdLayout();
 	void TrdLayoutSimple();
 

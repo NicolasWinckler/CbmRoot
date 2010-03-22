@@ -58,6 +58,8 @@ public:
 	void IsDrawSmoother(Bool_t drawSmoother) {fIsDrawSmoother = drawSmoother;}
 	void IsCloseCanvas(Bool_t closeCanvas) {fIsCloseCanvas = closeCanvas;}
 
+	void IsFixedBounds(Bool_t isFixedBounds) {fIsFixedBounds = isFixedBounds;};
+
 	void SetPlaneNoPhd(Int_t planeNo) {fPlaneNoPhd = planeNo;}
 
 private:
@@ -208,6 +210,8 @@ private:
 
 	Bool_t fIsCloseCanvas; // If true than canvas will be closed after drawing
 	std::string fOutputDir; // Output directory for image files
+
+	Bool_t fIsFixedBounds;
 
 	Int_t fPlaneNoPhd; // Number of the plane fo Phd drawing
 

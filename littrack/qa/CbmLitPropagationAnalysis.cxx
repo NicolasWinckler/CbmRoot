@@ -77,6 +77,8 @@ CbmLitPropagationAnalysis::CbmLitPropagationAnalysis()
 	fIsDrawSmoother = false;
 	fIsCloseCanvas = true;
 
+	fIsFixedBounds = false;
+
 	fPlaneNoPhd = 13;
 
 	fOutputDir = "";
@@ -231,8 +233,21 @@ void CbmLitPropagationAnalysis::CreateHistograms()
 			            "pull Y at ", "pull Tx at ", "pull Ty at ", "pull Q/p at ",
 			            "relative momentum resolution at ", "chi-square at" };
 	Int_t bins[] = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
-	Double_t boundL[] = {-10., -10., -.15, -.15, -.1, -5., -5., -5., -5., -7., -30., -1.};
-	Double_t boundR[] = { 10.,  10.,  .15,  .15,  .1,  5.,  5.,  5.,  5.,  7.,  30.,  20.};
+	Double_t boundL[fNofParams];
+	Double_t boundR[fNofParams];
+	if (fIsFixedBounds) {
+		boundL[0] = -10.; boundL[1] = -10.; boundL[2] = -.15; boundL[3] = -.15; boundL[4] = -.1;
+		boundL[5] =-5.;   boundL[6] = -5.;  boundL[7] = -5.;  boundL[8] = -5.;  boundL[9] =-7.;
+		boundL[10] =-30.; boundL[11] =-1.;
+		boundR[0] =  10.; boundR[1] = 10.; boundR[2] = .15; boundR[3] = .15; boundR[4] = .1;
+		boundR[5] = 5.;   boundR[6] = 5.;  boundR[7] = 5.;  boundR[8] = 5.;  boundR[9] = 7.;
+		boundR[10] = 30.; boundR[11] = 20.;
+	} else {
+		for (Int_t i = 0; i < fNofParams; i++) {
+			boundL[i] = 0.;
+			boundR[i] = 0.;
+		}
+	}
 	std::string var[] = {"p", "f", "s"};
 	std::string var2[] = {"[propagation]", "[filter]", "[smoother]"};
 

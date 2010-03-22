@@ -177,7 +177,7 @@ void CbmAnaDimuonHisto::Finish(){
 
   Double_t S = fDimuonMrc->Integral(mMinCutBin,mMaxCutBin);
   Double_t B = fBgdM->Integral(mMinCutBin,mMaxCutBin);
-  Double_t Stotal = fEvent*10;
+  Double_t Stotal = fDimuonMmc->Integral();
   printf(" Ef=%6.4f",S/Stotal);
   printf(" S/B=%6.4f",S/B);
   printf("\n");

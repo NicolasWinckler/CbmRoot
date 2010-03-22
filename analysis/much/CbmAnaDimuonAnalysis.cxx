@@ -91,14 +91,14 @@ InitStatus CbmAnaDimuonAnalysis::Init()
   // Get and check FairRootManager
   FairRootManager* fManager = FairRootManager::Instance();
   fMCTracks         = (TClonesArray*) fManager->GetObject("MCTrack");
-  fStsPoints        = (TClonesArray*) fManager->GetObject("STSPoint");
+  fStsPoints        = (TClonesArray*) fManager->GetObject("StsPoint");
   fMuchPoints       = (TClonesArray*) fManager->GetObject("MuchPoint");
   fMuchPixelHits    = (TClonesArray*) fManager->GetObject("MuchPixelHit");
   fMuchStrawHits    = (TClonesArray*) fManager->GetObject("MuchStrawHit");
-  fStsTracks        = (TClonesArray*) fManager->GetObject("STSTrack");
+  fStsTracks        = (TClonesArray*) fManager->GetObject("StsTrack");
   fMuchTracks       = (TClonesArray*) fManager->GetObject("MuchTrack");
   fMuchTrackMatches = (TClonesArray*) fManager->GetObject("MuchTrackMatch");
-  fStsTrackMatches  = (TClonesArray*) fManager->GetObject("STSTrackMatch");
+  fStsTrackMatches  = (TClonesArray*) fManager->GetObject("StsTrackMatch");
   fGlobalTracks     = (TClonesArray*) fManager->GetObject("GlobalTrack");
   fPixelDigiMatches = (TClonesArray*) fManager->GetObject("MuchDigiMatch");
   fStrawDigiMatches = (TClonesArray*) fManager->GetObject("MuchStrawDigiMatch");

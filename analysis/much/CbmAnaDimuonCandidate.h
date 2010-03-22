@@ -13,9 +13,9 @@ class CbmAnaDimuonCandidate : public TObject{
     CbmAnaMuonCandidate* GetMu(Bool_t sign) { return sign ? &fMuPlus: &fMuMinus; }
     TLorentzVector GetMomentumMC();
     TLorentzVector GetMomentumRC();
-    inline Bool_t IsReconstructed(Int_t nStsHitsCut=8, Double_t chiToVertexCut=3.){ 
-      return fMuPlus.IsReconstructed(nStsHitsCut,chiToVertexCut)*
-             fMuMinus.IsReconstructed(nStsHitsCut,chiToVertexCut); 
+    inline Bool_t IsReconstructed(Int_t nMuchHitsCut=13, Int_t nStsHitsCut=8, Double_t chiToVertexCut=3.){ 
+      return fMuPlus.IsReconstructed(nMuchHitsCut,nStsHitsCut,chiToVertexCut)*
+             fMuMinus.IsReconstructed(nMuchHitsCut,nStsHitsCut,chiToVertexCut); 
     }
     virtual ~CbmAnaDimuonCandidate(){};
   private:

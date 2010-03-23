@@ -20,7 +20,7 @@ using std::endl;
 // -----   Default constructor   -------------------------------------------
 CbmMuchDigi::CbmMuchDigi() {
   fDetectorId   =  0;
-  fChannelId = 0LL;
+  fChannelId = 0;
   fTime = -1;
   fDTime = 8e-2;
 }

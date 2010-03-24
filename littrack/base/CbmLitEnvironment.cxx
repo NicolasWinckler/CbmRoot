@@ -81,11 +81,11 @@ const CbmLitDetectorLayout& CbmLitEnvironment::GetLayout()
 	static Bool_t layoutCreated = false;
 
 	if (!layoutCreated) {
-		if (IsTrd()) {
+//		if (IsTrd()) {
 			if (IsTrdSimple()) {
 				TrdLayoutSimple();
 				fLayout = fTrdLayout;
-			}
+//			}
 		} else
 		if (IsMuch() && !IsTrd()) {
 			std::cout << "BEGIN MUCH ALONE" << std::endl;

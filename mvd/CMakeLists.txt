@@ -41,6 +41,11 @@ CbmMvdStation.cxx
 MyG4UniversalFluctuationForSi.cxx   )
 #CbmMvdMatchTracks.cxx 
 
+if(RULE_CHECKER_FOUND)
+  CHECK_RULES("${MVD_SRCS}" "${INCLUDE_DIRECTORIES}" MVD_RULES)
+endif(RULE_CHECKER_FOUND)
+
+
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h MVD_HEADERS "${MVD_SRCS}")

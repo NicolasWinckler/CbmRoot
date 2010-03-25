@@ -36,10 +36,10 @@ ${ROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 
-set(L1_SRCS
-L1Algo/L1CATrackFinder.cxx 
-CbmL1Performance.cxx 
-CbmL1ReadEvent.cxx 
+set(L1RULECHECKER_SRCS
+#L1Algo/L1CATrackFinder.cxx 
+#CbmL1Performance.cxx 
+#CbmL1ReadEvent.cxx 
 CbmL1CATrdTrackFinderSA.cxx 
 CbmL1TrdTracklet.cxx 
 CbmL1TrdTracklet4.cxx 
@@ -58,6 +58,17 @@ OffLineInterface/CbmL1RichRingQa.cxx
 #OffLineInterface/CbmL1SttTrackFinder.cxx 
 #OffLineInterface/CbmL1SttTrack.cxx 
 )
+set(L1_SRCS
+${L1RULECHECKER_SRCS}
+L1Algo/L1CATrackFinder.cxx 
+CbmL1Performance.cxx 
+CbmL1ReadEvent.cxx 
+)
+
+if(RULE_CHECKER_FOUND)
+  CHECK_RULES("${L1RULECHECKER_SRCS}" "${INCLUDE_DIRECTORIES}" L1_RULES)
+endif(RULE_CHECKER_FOUND)
+
 
 set(L1_HEADERS
 CbmL1CATrdTrackFinderSA.h

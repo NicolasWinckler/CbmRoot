@@ -65,6 +65,12 @@ Interface/CbmTrdTrackFitterKF.cxx
 Interface/CbmGlobalTrackFitterKF.cxx
 CbmKFParticle.cxx
 )
+
+if(RULE_CHECKER_FOUND)
+  CHECK_RULES("${KF_SRCS}" "${INCLUDE_DIRECTORIES}" KF_RULES)
+endif(RULE_CHECKER_FOUND)
+
+
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h KF_HEADERS "${KF_SRCS}")

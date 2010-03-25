@@ -42,6 +42,10 @@ CbmTrdTestEventsWithMom.cxx
 CbmTrdTrackFitterKF_CA.cxx
 )
 
+if(RULE_CHECKER_FOUND)
+  CHECK_RULES("${TRDCATRACK_SRCS}" "${INCLUDE_DIRECTORIES}" TRDCATRACK_RULES)
+endif(RULE_CHECKER_FOUND)
+
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h TRDCATRACK_HEADERS "${TRDCATRACK_SRCS}")

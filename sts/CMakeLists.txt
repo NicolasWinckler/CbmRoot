@@ -57,6 +57,11 @@ CbmStsFindHitsQa.cxx
 CbmStsReconstructionQa.cxx
 )
 
+if(RULE_CHECKER_FOUND)
+  CHECK_RULES("${STS_SRCS}" "${INCLUDE_DIRECTORIES}" STS_RULES)
+endif(RULE_CHECKER_FOUND)
+
+
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h STS_HEADERS "${STS_SRCS}")

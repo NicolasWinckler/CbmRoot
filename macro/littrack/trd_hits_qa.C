@@ -4,16 +4,16 @@
  * @version 1.0
  **/
 
-void trd_hits_qa(Int_t nEvents = 10000)
+void trd_hits_qa(Int_t nEvents = 100)
 {
 	// Output directory
-	TString dir  = "/d/cbm02/andrey/monotrd_1pi/";
+	TString dir  = "/home/d/andrey/trdsimple_10pi/";
 	// MC transport file
 	TString mcFile = dir + "mc.0000.root";
 	// Parameter file
 	TString parFile = dir + "param.0000.root";
 	// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis.
-	TString globalHitsFile = dir + "global.hits.0000.root";
+	TString globalHitsFile = dir + "global.hits.trd3000.0000.root";
 	// Output file with TRD hits qa histograms
 	TString trdHitsQaFile = dir + "trd.hits.qa.0000.root";
 
@@ -21,7 +21,7 @@ void trd_hits_qa(Int_t nEvents = 10000)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+	gSystem->Load("/home/soft/tbb/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -36,7 +36,7 @@ void trd_hits_qa(Int_t nEvents = 10000)
 
 	//------------------------------------------------
 	CbmTrdHitsQa* trdHitsQa = new CbmTrdHitsQa();
-	trdHitsQa->SetOutputDir("./");
+	trdHitsQa->SetOutputDir("./test/");
 	run->AddTask(trdHitsQa);
 	//------------------------------------------------
 

@@ -21,7 +21,7 @@ void global_tracking(Int_t nEvents = 1000)
 		// Parameter file
 		parFile = dir + "param.0000.root";
 		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
-		globalHitsFile = dir + "global.hits.0000.root";
+		globalHitsFile = dir + "global.hits.trd10.0000.root";
 		// Output file with global tracks
 		globalTracksFile = dir + "global.tracks.0000.root";
 	} else {

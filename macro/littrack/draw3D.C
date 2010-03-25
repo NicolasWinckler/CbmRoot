@@ -8,12 +8,12 @@
 void draw3D()
 {
 	//Input directory
-	TString dir = "/d/cbm02/andrey/notrd/";
+	TString dir = "/home/d/andrey/trdstd_urqmd/";
 	//Input MC file with TGeo
 //	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
+	gSystem->Load("/home/soft/soft/tbb/libtbb");
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");

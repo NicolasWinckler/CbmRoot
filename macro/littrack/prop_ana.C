@@ -1,15 +1,28 @@
 void prop_ana(Int_t nEvents = 1000)
 {
-	TString dir = "/home/d/andrey/std_10mu/";
-	TString mcFile = dir + "mc.0000.root";
-	TString globalTracksFile = dir + "global.tracks.ideal.0000.root";
-	TString parFile = dir + "param.0000.root";
-	TString outFile = dir + "propagation.ana.0000.root";
+	TString script = TString(gSystem->Getenv("SCRIPT"));
+
+	Double_t trdHitErr = 100; // if == 0 than standard errors are used
+	TString dir, imageDir, mcFile, parFile, globalTracksFile, propAnaFile;
+	if (script != "yes") {
+		dir = "/home/d/andrey/trdsimple_10pi/";
+		mcFile = dir + "mc.0000.root";
+		globalTracksFile = dir + "global.tracks.ideal.trd100.0000.root";
+		parFile = dir + "param.0000.root";
+		propAnaFile = dir + "propagation.ana.0000.root";
+		imageDir = "./test/";
+	} else {
+		mcFile = TString(gSystem->Getenv("MCFILE"));
+		parFile = TString(gSystem->Getenv("PARFILE"));
+		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSIDEALFILE"));
+		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
+		propAnaFile = TString(gSystem->Getenv("PROPANAFILE"));
+	}
 
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
+	gSystem->Load("/home/soft/tbb/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -19,7 +32,7 @@ void prop_ana(Int_t nEvents = 1000)
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
 	run->AddFriend(globalTracksFile);
-	run->SetOutputFile(outFile);
+	run->SetOutputFile(propAnaFile);
 
 //	FairGeane* Geane = new FairGeane(inFile.Data());
 //	FairGeane* Geane = new FairGeane(parFile.Data());
@@ -28,17 +41,18 @@ void prop_ana(Int_t nEvents = 1000)
 
 	// -------------------------------------------------------------------------
 	CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis();
-	propAna->SetNofPlanes(14);
-	propAna->SetNofTrdHits(0);
-	propAna->SetNofMuchHits(13);
-	propAna->SetNofTofHits(1);
-	propAna->SetPDGCode(13);
+	propAna->SetNofPlanes(12);
+	propAna->SetNofTrdHits(12);
+	propAna->SetNofMuchHits(0);
+	propAna->SetNofTofHits(0);
+	propAna->SetPDGCode(211);
 	propAna->SetTestFastPropagation(false);
-	propAna->SetOutputDir("./test/");
+	propAna->SetOutputDir(std::string(imageDir));
 	propAna->IsDrawPropagation(true);
 	propAna->IsDrawFilter(true);
 	propAna->IsDrawSmoother(false);
 	propAna->IsCloseCanvas(true);
+	propAna->IsFixedBounds(false);
 	propAna->SetPlaneNoPhd(12);
 	run->AddTask(propAna);
 	// -------------------------------------------------------------------------
@@ -67,7 +81,7 @@ void prop_ana(Int_t nEvents = 1000)
 	timer.Stop();
 	cout << endl << endl;
 	cout << "Macro finished succesfully." << endl;
-	cout << "Output file is "    << outFile << endl;
+	cout << "Output file is "    << propAnaFile << endl;
 	cout << "Parameter file is " << parFile << endl;
 	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << endl;
 	cout << endl;

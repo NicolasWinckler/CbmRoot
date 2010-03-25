@@ -1,12 +1,12 @@
 void event_display()
 {
-	TString dir  = "/d/cbm02/andrey/test/";
+	TString dir  = "/home/d/andrey/trdsimple_1_10pi/";
 	// MC transport file
 	TString mcFile = dir + "mc.0000.root";
 	// Parameter file
 	TString parFile = dir + "param.0000.root";
 
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
+	gSystem->Load("/home/soft/tbb/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();

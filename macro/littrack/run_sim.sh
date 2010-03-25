@@ -4,13 +4,13 @@
 export SCRIPT=yes
 
 #Build directory of CBMROOT
-export MYBUILDDIR=/u/andrey/cbm/trunk_new/buildnew/
+export MYBUILDDIR=/home/andrey/cbm/trunk/build_jul09-gcc4.3.4_debug/
 
 #Output directory for simulation files
-export DIR=/d/cbm02/andrey/muchstd18_10mu
+export DIR=/home/d/andrey/trdstd_urqmd/
 
 #Output directory for image files
-export IMAGEDIR=./test/much1_10mu
+export IMAGEDIR=./test/
 
 # CBM setup that will be used for simulation: "muon" or "electron"
 export DETECTORSETUP=muon
@@ -76,7 +76,7 @@ else
 fi
 
 #number of events for each thread
-export NEVENTS=1000
+export NEVENTS=500
 
 for Y in 0; do
  for X in 0; do

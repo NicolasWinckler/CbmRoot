@@ -7,13 +7,13 @@
  * of the CBM.
  **/
 
-void global_sim(Int_t nEvents = 1000)
+void global_sim(Int_t nEvents = 500)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	// Specify "electron" or "muon" setup of CBM
-	TString setup = "muon";
-//	TString setup = "electron";
+//	TString setup = "muon";
+	TString setup = "electron";
 
 	// Event parameters
 	Int_t NMUONSPLUS = 5; // number of embedded muons
@@ -23,20 +23,20 @@ void global_sim(Int_t nEvents = 1000)
 	Int_t NPIONSPLUS = 5; // number of embedded pions
 	Int_t NPIONSMINUS = 5; // number of embedded pions
 	Int_t NPLUTO = 10; // number of embedded particles from pluto
-	TString urqmd = "no"; // If "yes" than UrQMD will be used as background
-	TString muons = "yes"; // If "yes" than primary muons will be generated
+	TString urqmd = "yes"; // If "yes" than UrQMD will be used as background
+	TString muons = "no"; // If "yes" than primary muons will be generated
 	TString electrons = "no"; // If "yes" than primary electrons will be generated
 	TString pions = "no"; // If "yes" than primary pions will be generated
 	TString pluto = "no"; // If "yes" PLUTO particles will be embedded
 
 	// Files
-	TString inFile  = "/d/cbm03/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir  = "/d/cbm02/andrey/test/"; //directory for output simulation files
+	TString inFile  = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
+	TString dir  = "/home/d/andrey/trdstd_urqmd/"; //directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
 	// Pluto files
-	TString plutoDir = "/d/cbm02/andrey/pluto/"; // if necessary specify input pluto file to embed signal particles
+	TString plutoDir = "/home/d/andrey/pluto/"; // if necessary specify input pluto file to embed signal particles
 	std::vector<TString> plutoFile;
 	if (script != "yes") {
 		plutoFile.resize(NPLUTO);
@@ -61,7 +61,7 @@ void global_sim(Int_t nEvents = 1000)
 		stsGeom    = "sts_standard.geo";
 		muchGeom   = "much_standard_2layers.geo";
 		trdGeom    = "";//"trd_muon_setup_new.geo";
-		tofGeom    = "tof_standard.geo";
+		tofGeom    = "";//"tof_standard.geo";
 		fieldMap   = "field_muon_standard";
 		magnetGeom = "magnet_muon_standard.geo";
 	} else if (setup == "electron") {
@@ -71,8 +71,8 @@ void global_sim(Int_t nEvents = 1000)
 		mvdGeom    = "";//"mvd_standard.geo";
 		stsGeom    = "sts_standard.geo";
 		richGeom   = "rich_standard.geo";
-		trdGeom    = "trd_standard.geo";
-		tofGeom    = "tof_standard.geo";
+		trdGeom    = "trd_standard.geo";//"trd_simple.geo";
+		tofGeom    = "";//"tof_standard.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
 		fieldMap   = "field_electron_standard";
 		magnetGeom = "magnet_electron_standard.geo";
@@ -96,6 +96,14 @@ void global_sim(Int_t nEvents = 1000)
 		electrons = TString(gSystem->Getenv("ELECTRONS"));
 		pions = TString(gSystem->Getenv("PIONS"));
 		pluto = TString(gSystem->Getenv("PLUTO"));
+
+		std::cout << "NMUONSPLUS=" << NMUONSPLUS << " NMUONSMINUS=" << NMUONSMINUS
+		          << " NELECTRONS=" << NELECTRONS << " NPOSITRONS=" << NPOSITRONS
+		          << " NPIONSPLUS=" << NPIONSPLUS << " NPIONSMINUS=" << NPIONSMINUS
+		          << " NPLUTO=" << NPLUTO
+		          << " urqmd=" << urqmd << " muons=" << muons
+		          << " electrons=" << electrons << " pions=" << pions
+		          << " pluto=" << pluto << std::endl;
 
 		plutoFile.resize(NPLUTO);
 		for (Int_t i = 0; i < NPLUTO; i++) {
@@ -125,7 +133,7 @@ void global_sim(Int_t nEvents = 1000)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -248,8 +256,10 @@ void global_sim(Int_t nEvents = 1000)
 
 	if (pluto == "yes") {
 		for (Int_t i = 0; i < NPLUTO; i++) {
+			std::cout << "B PLUTO:" << plutoFile[i] << std::endl;
 			FairPlutoGenerator *plutoGen= new FairPlutoGenerator(plutoFile[i]);
 			primGen->AddGenerator(plutoGen);
+			std::cout << "A PLUTO:" << plutoFile[i] << std::endl;
 		}
 	}
 
@@ -259,7 +269,7 @@ void global_sim(Int_t nEvents = 1000)
 			minMom = 2.5;
 			maxMom = 25.;
 		} else if (muchGeom.Contains("compact")) {
-			minMom = 1.0;
+			minMom = 1.5;
 			maxMom = 10.;
 		}
 

@@ -30,6 +30,7 @@ void global_reco(Int_t nEvents = 100)
 		muchDigiFile = parDir + "/much/much_standard.digi.root";
 //		muchDigiFile = parDir + "/much/much_standard_trd.digi.root";
 //		muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
+		TString imageDir = "./test/";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -41,7 +42,7 @@ void global_reco(Int_t nEvents = 100)
 	TStopwatch timer;
 	timer.Start();
 
-        gSystem->Load("/u/andrey/soft/tbb/libtbb");
+    gSystem->Load("/u/andrey/soft/tbb/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();

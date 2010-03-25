@@ -83,6 +83,7 @@ void CbmLitSimpleGeometryConstructor::ConstructGeometry()
 
 	std::sort(fMyGeoNodes.begin(), fMyGeoNodes.end(), CompareMaterialInfoZLess());
 	std::sort(fMyMuchGeoNodes.begin(), fMyMuchGeoNodes.end(), CompareMaterialInfoZLess());
+	std::sort(fMyTrdGeoNodes.begin(), fMyTrdGeoNodes.end(), CompareMaterialInfoZLess());
 
 	std::cout << "My Simple Geometry:" << std::endl;
 	for (size_t i = 0; i < fMyGeoNodes.size(); ++i)

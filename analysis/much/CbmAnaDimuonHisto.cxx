@@ -38,6 +38,9 @@ CbmAnaDimuonHisto::CbmAnaDimuonHisto(const char* name,TString histoFileName)
   fMminCut = 0.78259-2*0.0083;
   fMmaxCut = 0.78259+2*0.0083;
   fHistoFileName=histoFileName;
+  fMuchHitsCut=13;
+  fStsHitsCut=8;
+  fChiToVertexCut=3.;
 }
 
 // -------------------------------------------------------------------------
@@ -114,17 +117,16 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
     }//sign
 //    printf("%f\n",dimuon->GetMomentumMC().M());
     fDimuonMmc->Fill(dimuon->GetMomentumMC().M());
-    if (!dimuon->IsReconstructed()) continue;
+    if (!dimuon->IsReconstructed(fMuchHitsCut,fStsHitsCut,fChiToVertexCut)) continue;
     fDimuonMrc->Fill(dimuon->GetMomentumRC().M());
   }//dimuon
-
 
   Int_t fNoMixedEv=30;
   
   for (Int_t iMuP=0;iMuP<nMuons;iMuP++){
     CbmAnaMuonCandidate* muP = (CbmAnaMuonCandidate*) fMuCandidates->At(iMuP);
     if (muP->GetSign()<0) continue;
-    if (!muP->IsReconstructed()) continue;
+    if (!muP->IsReconstructed(fMuchHitsCut,fStsHitsCut,fChiToVertexCut)) continue;
     TLorentzVector pP = TLorentzVector(*(muP->GetMomentumRC()));
 //    printf("%f\n",pP.P());
     for (Int_t ev=fEvent+1; ev<fEvent+1+fNoMixedEv;ev++){
@@ -134,7 +136,7 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
       for (Int_t iMuN=0;iMuN<fMuCandidates->GetEntriesFast();iMuN++){
         CbmAnaMuonCandidate* muN = (CbmAnaMuonCandidate*) fMuCandidates->At(iMuN);
         if (muN->GetSign()>0) continue;
-        if (!muN->IsReconstructed()) continue;
+        if (!muN->IsReconstructed(fMuchHitsCut,fStsHitsCut,fChiToVertexCut)) continue;
         TLorentzVector* pN = muN->GetMomentumRC();
         //printf("%f\n",pN->P());
         fBgdM->Fill(((*pN)+pP).M());

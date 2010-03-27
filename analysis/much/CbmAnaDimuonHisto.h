@@ -51,6 +51,10 @@ public:
     fMbins=nBins;
   }
   
+  inline void SetMuchHitsCut(Int_t nHits) {fMuchHitsCut=nHits; }
+  inline void SetStsHitsCut(Int_t nHits) {fStsHitsCut=nHits; }
+  inline void SetChiToVertexCut(Double_t chi) {fChiToVertexCut=chi; }
+
   inline void SetMcuts(Double_t mMinCut, Double_t mMaxCut) {
     fMminCut = mMinCut;
     fMmaxCut = mMaxCut;
@@ -71,6 +75,10 @@ private:
   Int_t fMbins;
   Double_t fMminCut;
   Double_t fMmaxCut;
+
+  Int_t fMuchHitsCut;
+  Int_t fStsHitsCut;
+  Double_t fChiToVertexCut;
 
   ClassDef(CbmAnaDimuonHisto,1);
 };

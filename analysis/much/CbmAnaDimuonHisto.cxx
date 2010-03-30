@@ -155,17 +155,21 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
 // -----   Public method Finish   ------------------------------------------
 void CbmAnaDimuonHisto::Finish(){
   TFile* f = new TFile(fHistoFileName,"recreate");
-  fDimuonMmc->Write();
-  fDimuonMrc->Write();
-  fBgdM->Write();
-  f->Close();
-  
-  Int_t mMinCutBin = fDimuonMrc->GetXaxis()->FindFixBin(fMminCut);
-  Int_t mMaxCutBin = fDimuonMrc->GetXaxis()->FindFixBin(fMmaxCut);
+  fDimuonMmc->Sumw2();
+  fDimuonMrc->Sumw2();
+  fBgdM->Sumw2();
   
   fDimuonMmc->Scale(1./fSignalPairs*fMultiplicity*fBranching/fEvent);
   fDimuonMrc->Scale(1./fSignalPairs*fMultiplicity*fBranching/fEvent);
   fBgdM->Scale(1./fNoMixedEv/fEvent);
+
+  fDimuonMmc->Write();
+  fDimuonMrc->Write();
+  fBgdM->Write();
+  f->Close();
+
+  Int_t mMinCutBin = fDimuonMrc->GetXaxis()->FindFixBin(fMminCut);
+  Int_t mMaxCutBin = fDimuonMrc->GetXaxis()->FindFixBin(fMmaxCut);
   
   TCanvas* c1 = new TCanvas("cM","Invariant mass",800,800);
   c1->Divide(2,2);

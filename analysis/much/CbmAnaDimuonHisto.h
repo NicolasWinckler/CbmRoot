@@ -59,8 +59,11 @@ public:
     fMminCut = mMinCut;
     fMmaxCut = mMaxCut;
   }
-  inline void SetMultiplicity(Double_t mult) {fMultiplicity = mult; }
-  inline void SetBranching(Double_t b) {fBranching = b; }
+  inline void SetMultiplicity(Double_t mult) { fMultiplicity = mult; }
+  inline void SetBranching(Double_t b) { fBranching = b; }
+  inline void SetSignalPairs(Int_t n) {fSignalPairs = n; }
+  inline void SetNoMixedEv(Int_t n) {fNoMixedEv = n; }
+  
 private:
   Int_t         fEvent;             //!
   TClonesArray* fMuCandidates;      //!
@@ -83,7 +86,9 @@ private:
   Double_t fChiToVertexCut;
   Double_t fMultiplicity;
   Double_t fBranching;
-  
+  Int_t fSignalPairs;
+  Int_t fNoMixedEv;
+
   ClassDef(CbmAnaDimuonHisto,1);
 };
 

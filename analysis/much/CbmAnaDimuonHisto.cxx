@@ -23,7 +23,7 @@
 #define NEVENTS 1000
 
 // -----   Default constructor   -------------------------------------------
-CbmAnaDimuonHisto::CbmA292naDimuonHisto(){
+CbmAnaDimuonHisto::CbmAnaDimuonHisto(){
   
 }
 // -------------------------------------------------------------------------
@@ -43,6 +43,8 @@ CbmAnaDimuonHisto::CbmAnaDimuonHisto(const char* name,TString histoFileName)
   fChiToVertexCut=3.;
   fMultiplicity=38;
   fBranching=9.e-5;
+  fSignalPairs=15;
+  fNoMixedEv=NEVENTS;
 }
 
 // -------------------------------------------------------------------------
@@ -123,8 +125,6 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
     fDimuonMrc->Fill(dimuon->GetMomentumRC().M());
   }//dimuon
 
-  Int_t fNoMixedEv=NEVENTS;
-  
   for (Int_t iMuP=0;iMuP<nMuons;iMuP++){
     CbmAnaMuonCandidate* muP = (CbmAnaMuonCandidate*) fMuCandidates->At(iMuP);
     if (muP->GetSign()<0) continue;

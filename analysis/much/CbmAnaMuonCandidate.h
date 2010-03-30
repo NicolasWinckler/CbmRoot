@@ -28,6 +28,12 @@ class CbmAnaMuonCandidate : public TObject{
     Bool_t IsReconstructed(Int_t nMuchHitsCut=13, Int_t nStsHitsCut=8, Double_t chiToVertexCut=3.);
     void SetReconstructed(Bool_t isRec) {fIsReconstructed = isRec; }
     Double_t GetSign() {return fSign;}
+    void SetNMuchPoints(Int_t nPoints) {fNMuchPoints = nPoints; }
+    void SetNStsPoints(Int_t nPoints) {fNStsPoints = nPoints; }
+    Int_t GetNMuchPoints() { return fNMuchPoints; }
+    Int_t GetNStsPoints() { return fNStsPoints; }
+    Int_t GetNMuchHits() { return fNMuchHits; }
+    Int_t GetNStsHits() { return fNStsHits; }
   private:
     CbmKFTrack track;
     Int_t fMCTrackId;
@@ -43,7 +49,9 @@ class CbmAnaMuonCandidate : public TObject{
     Double_t fChiToVertex;
     Int_t fNTriggerHits;
     Double_t fSign;
-  ClassDef(CbmAnaMuonCandidate,1);
+    Int_t fNMuchPoints;
+    Int_t fNStsPoints;
+  ClassDef(CbmAnaMuonCandidate,2);
 };
 
 #endif

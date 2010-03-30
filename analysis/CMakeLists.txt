@@ -53,6 +53,7 @@ much/CbmAnaMuonCandidate.cxx
 much/CbmAnaDimuonCandidate.cxx
 much/CbmAnaDimuonAnalysis.cxx
 much/CbmAnaDimuonHisto.cxx
+much/CbmAnaAngularAcceptance.cxx
 )
 
 

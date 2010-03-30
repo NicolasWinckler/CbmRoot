@@ -59,6 +59,8 @@ public:
     fMminCut = mMinCut;
     fMmaxCut = mMaxCut;
   }
+  inline void SetMultiplicity(Double_t mult) {fMultiplicity = mult; }
+  inline void SetBranching(Double b) {fBranching = b; }
 private:
   Int_t         fEvent;             //!
   TClonesArray* fMuCandidates;      //!
@@ -79,7 +81,9 @@ private:
   Int_t fMuchHitsCut;
   Int_t fStsHitsCut;
   Double_t fChiToVertexCut;
-
+  Double_t fMultiplicity;
+  Double_t fBranching;
+  
   ClassDef(CbmAnaDimuonHisto,1);
 };
 

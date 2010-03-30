@@ -23,7 +23,7 @@
 #define NEVENTS 1000
 
 // -----   Default constructor   -------------------------------------------
-CbmAnaDimuonHisto::CbmAnaDimuonHisto(){
+CbmAnaDimuonHisto::CbmA292naDimuonHisto(){
   
 }
 // -------------------------------------------------------------------------
@@ -41,6 +41,8 @@ CbmAnaDimuonHisto::CbmAnaDimuonHisto(const char* name,TString histoFileName)
   fMuchHitsCut=13;
   fStsHitsCut=8;
   fChiToVertexCut=3.;
+  fMultiplicity=38;
+  fBranching=9.e-5;
 }
 
 // -------------------------------------------------------------------------
@@ -121,7 +123,7 @@ void CbmAnaDimuonHisto::Exec(Option_t* opt){
     fDimuonMrc->Fill(dimuon->GetMomentumRC().M());
   }//dimuon
 
-  Int_t fNoMixedEv=30;
+  Int_t fNoMixedEv=NEVENTS;
   
   for (Int_t iMuP=0;iMuP<nMuons;iMuP++){
     CbmAnaMuonCandidate* muP = (CbmAnaMuonCandidate*) fMuCandidates->At(iMuP);
@@ -160,8 +162,10 @@ void CbmAnaDimuonHisto::Finish(){
   
   Int_t mMinCutBin = fDimuonMrc->GetXaxis()->FindFixBin(fMminCut);
   Int_t mMaxCutBin = fDimuonMrc->GetXaxis()->FindFixBin(fMmaxCut);
-
-  fDimuonMrc->GetXaxis()->FindFixBin(fMmaxCut);
+  
+  fDimuonMmc->Scale(1./fSignalPairs*fMultiplicity*fBranching/fEvent);
+  fDimuonMrc->Scale(1./fSignalPairs*fMultiplicity*fBranching/fEvent);
+  fBgdM->Scale(1./fNoMixedEv/fEvent);
   
   TCanvas* c1 = new TCanvas("cM","Invariant mass",800,800);
   c1->Divide(2,2);

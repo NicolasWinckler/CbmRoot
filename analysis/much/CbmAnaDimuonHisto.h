@@ -60,7 +60,7 @@ public:
     fMmaxCut = mMaxCut;
   }
   inline void SetMultiplicity(Double_t mult) {fMultiplicity = mult; }
-  inline void SetBranching(Double b) {fBranching = b; }
+  inline void SetBranching(Double_t b) {fBranching = b; }
 private:
   Int_t         fEvent;             //!
   TClonesArray* fMuCandidates;      //!

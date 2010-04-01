@@ -50,6 +50,7 @@ public:
 	const CbmLitStation& GetTofStation();
 
 	bool IsElectronSetup() const;
+	bool IsSts() const;
 	bool IsTrd() const;
 	bool IsMuch() const;
 	bool IsTof() const;

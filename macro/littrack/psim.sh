@@ -157,7 +157,7 @@ if [ $1 -eq 4 ] ; then
 else
 
 if [ $1 -eq 5 ] ; then
-   run much5 much_standard_straw_trd_2layers.geo $VMCWORKDIR/parameters/much/digi_straw_trd_2layers.root trd_muon_setup_new.geo shield_standard_trd.geo
+   run much5 much_standard_straw_trd_2layers.geo $VMCWORKDIR/parameters/much/much_standard_straw_trd_2layers.digi.root trd_muon_setup_new.geo shield_standard_trd.geo
 fi
 fi
 fi   

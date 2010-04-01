@@ -13,7 +13,10 @@ void draw3D()
 //	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 
-	gSystem->Load("/home/soft/soft/tbb/libtbb");
+	gSystem->Load("/home/soft/tbb/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
+
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/cbmrootlibs.C");

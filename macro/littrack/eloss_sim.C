@@ -10,7 +10,9 @@ void eloss_sim(Int_t nEvents = 20000)
 	TStopwatch timer;
 	timer.Start();
 
-	gSystem->Load("/home/soft/tbb22_004oss/libtbb");
+	gSystem->Load("/home/soft/tbb/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();

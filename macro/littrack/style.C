@@ -4,6 +4,7 @@ void style()
 {
 	gStyle->SetCanvasColor(kWhite);
 	gStyle->SetFrameFillColor(kWhite);
+	gStyle->SetFrameBorderStyle(0);
 	gStyle->SetPadColor(kWhite);
 	gStyle->SetStatColor(kWhite);
 	gStyle->SetTitleFillColor(kWhite);

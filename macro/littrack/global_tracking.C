@@ -10,7 +10,7 @@ void global_tracking(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	TString dir, imageDir, mcFile, parFile, globalHitsFile, globalTracksFile;
+	TString dir, imageDir, mcFile, parFile, globalHitsFile, globalTracksFile, trackingType;
 	if (script != "yes") {
 		// Output directory
 		dir  = "/home/d/andrey/trdsimple_10pi/";
@@ -24,12 +24,15 @@ void global_tracking(Int_t nEvents = 1000)
 		globalHitsFile = dir + "global.hits.trd10.0000.root";
 		// Output file with global tracks
 		globalTracksFile = dir + "global.tracks.0000.root";
+		// Tracking type
+		trackingType = "nn";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
 		globalHitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
 		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
 		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
+		trackingType = TString(gSystem->Getenv("TRACKINGTYPE"));
 	}
 
 	Int_t iVerbose = 1;
@@ -37,6 +40,8 @@ void global_tracking(Int_t nEvents = 1000)
 	timer.Start();
 
 	gSystem->Load("/home/soft/tbb/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -61,7 +66,8 @@ void global_tracking(Int_t nEvents = 1000)
 	// "branch" - branching tracking
 	// "nn" - nearest neighbor tracking
 	// "weight" - weighting tracking
-	finder->SetTrackingType("nn");
+//	finder->SetTrackingType("nn");
+	finder->SetTrackingType(std::string(trackingType));
 
 	// Hit-to-track merger method to be used
 	// "nearest_hit" - assigns nearest hit to the track
@@ -89,8 +95,8 @@ void global_tracking(Int_t nEvents = 1000)
 	reconstructionQa->SetMinNofHitsTrd(9);
 	reconstructionQa->SetMinNofHitsMuch(11);
 	reconstructionQa->SetVerbose(1);
-	reconstructionQa->SetMomentumRange(0., 10);
-	reconstructionQa->SetNofBinsMom(20);
+	reconstructionQa->SetMomentumRange(0., 25);
+	reconstructionQa->SetNofBinsMom(25);
 	reconstructionQa->SetOutputDir(std::string(imageDir));
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------

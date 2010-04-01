@@ -8,7 +8,7 @@
 void global_reco_qa(Int_t nEvents = 1000)
 {
 	// Output directory
-	TString dir  = "/d/cbm02/andrey/muchcomp10_10mu_urqmd/";
+	TString dir  = "/d/cbm06/user/andrey/much1_10mu_urqmd/";
 	// MC transport file
 	TString mcFile = dir + "mc.0000.root";
 	// Parameter file
@@ -16,15 +16,17 @@ void global_reco_qa(Int_t nEvents = 1000)
 	// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
 	TString globalHitsFile = dir + "global.hits.0000.root";
 	// File with global tracks
-	TString globalTracksFile = dir + "global.tracks.0000.root";
+	TString globalTracksFile = dir + "global.tracks.branch.0000.root";
 	// Output file with histograms
-	TString recoQaFile = dir + "reco.qa.0000.root";
+	TString recoQaFile = dir + "reco.qa.branch.0000.root";
 	// Output directory for images
-	TString imageDir = "./test/";
+	TString imageDir = "./test/much1/branch/";
 
 	TStopwatch timer;
 	timer.Start();
 
+	gSystem->Load("/home/soft/tbb/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
 	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -45,14 +47,14 @@ void global_reco_qa(Int_t nEvents = 1000)
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
 	reconstructionQa->SetMinNofPointsTrd(9);
-	reconstructionQa->SetMinNofPointsMuch(12);
+	reconstructionQa->SetMinNofPointsMuch(11);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(0);
-	reconstructionQa->SetMinNofHitsMuch(8);
+	reconstructionQa->SetMinNofHitsMuch(11);
 	reconstructionQa->SetVerbose(1);
 	reconstructionQa->SetMomentumRange(0., 25);
-	reconstructionQa->SetNofBinsMom(50);
+	reconstructionQa->SetNofBinsMom(25);
 	reconstructionQa->SetOutputDir(std::string(imageDir));
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------

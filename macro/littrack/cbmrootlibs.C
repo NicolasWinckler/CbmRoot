@@ -27,7 +27,7 @@ void cbmrootlibs()
    gSystem->Load("libGlobal");
    gSystem->Load("libKF");
    gSystem->Load("libL1");
-   gSystem->Load("libcudalittrack");
+//   gSystem->Load("libcudalittrack");
    gSystem->Load("libLittrack");
    gSystem->Load("libMinuit2"); // Needed for field fitter
 

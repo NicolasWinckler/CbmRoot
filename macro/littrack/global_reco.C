@@ -42,7 +42,9 @@ void global_reco(Int_t nEvents = 100)
 	TStopwatch timer;
 	timer.Start();
 
-    gSystem->Load("/u/andrey/soft/tbb/libtbb");
+	gSystem->Load("/home/soft/tbb/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();

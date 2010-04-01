@@ -23,6 +23,8 @@ void prop_ana(Int_t nEvents = 1000)
 	timer.Start();
 
 	gSystem->Load("/home/soft/tbb/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -52,7 +54,7 @@ void prop_ana(Int_t nEvents = 1000)
 	propAna->IsDrawFilter(true);
 	propAna->IsDrawSmoother(false);
 	propAna->IsCloseCanvas(true);
-	propAna->IsFixedBounds(false);
+	propAna->IsFixedBounds(true);
 	propAna->SetPlaneNoPhd(12);
 	run->AddTask(propAna);
 	// -------------------------------------------------------------------------

@@ -32,7 +32,7 @@ Absorber material           :       I       I       I       I       I       I
 
 # Station specification
 Station Zceneter [cm]       :      35      85     135     195     260
-Number of layers            :       2       2       2       2       2
+Number of layers            :       2       2       2       3       3
 Detector type               :       1       1       1       2       2
 Distance between layers [cm]:      10      10      10      10      10
 Support thickness [cm]      :     1.5     1.5     1.5     1.5     1.5

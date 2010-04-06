@@ -11,6 +11,7 @@
 #include "TLegend.h"
 #include "TLatex.h"
 #include "TStyle.h"
+#include "TGraph.h"
 
 #include <string>
 
@@ -23,6 +24,7 @@ void SetStyles()
 
 	gStyle->SetCanvasColor(kWhite);
 	gStyle->SetFrameFillColor(kWhite);
+	gStyle->SetFrameBorderMode(0);
 	gStyle->SetPadColor(kWhite);
 	gStyle->SetStatColor(kWhite);
 	gStyle->SetTitleFillColor(kWhite);
@@ -141,4 +143,41 @@ void  DrawHistSigmaRMS(
 	text.DrawTextNDC(0.5, 0.83, txt1.c_str());
 	std::string txt2 = ToString<char>(index+97) + ")";
 	text.DrawTextNDC(0.8, 0.7, txt2.c_str());
+}
+
+
+void DrawGraph(
+		TGraph* graph,
+		const std::string& titleX,
+		const std::string& titleY,
+		Int_t color,
+		Int_t lineWidth,
+		Int_t lineStyle,
+		Int_t markerSize,
+		Int_t markerStyle,
+		Bool_t logx,
+		Bool_t logy,
+		const std::string& drawOpt)
+{
+	Double_t textSize = 0.06;
+	graph->GetXaxis()->SetTitle(titleX.c_str());
+	graph->GetYaxis()->SetTitle(titleY.c_str());
+	graph->SetLineColor(color);
+	graph->SetLineWidth(lineWidth);
+	graph->SetLineStyle(lineStyle);
+	graph->SetMarkerColor(color);
+	graph->SetMarkerSize(markerSize);
+	graph->SetMarkerStyle(markerStyle);
+	if (logx) gPad->SetLogx();
+	if (logy) gPad->SetLogy();
+	graph->GetXaxis()->SetLabelSize(textSize);
+	graph->GetXaxis()->SetNdivisions(505, kTRUE);
+	graph->GetYaxis()->SetLabelSize(textSize);
+	graph->GetXaxis()->SetTitleSize(textSize);
+	graph->GetYaxis()->SetTitleSize(textSize);
+	graph->GetXaxis()->SetTitleOffset(1.0);
+	graph->GetYaxis()->SetTitleOffset(1.3);
+	gPad->SetLeftMargin(0.17);
+	gPad->SetBottomMargin(0.15);
+	graph->Draw(drawOpt.c_str());
 }

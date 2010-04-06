@@ -11,6 +11,7 @@
 #include "TH2.h"
 #include "TPad.h"
 #include "TLegend.h"
+#include "TGraph.h"
 
 // Set of standard settings for drawing
 const Int_t LIT_COLOR1 = kRed;
@@ -45,18 +46,18 @@ void DrawHist1D(
 		TH1* hist,
 		const std::string& titleX,
 		const std::string& titleY,
-		Int_t color = kBlack,
-		Int_t lineWidth = 1,
-		Int_t lineStyle = 1,
-		Int_t markerSize = 1,
-		Int_t markerStyle = kDot,
-		Bool_t logx = false,
-		Bool_t logy = false,
-		const std::string& drawOpt = "");
+		Int_t color,
+		Int_t lineWidth,
+		Int_t lineStyle,
+		Int_t markerSize,
+		Int_t markerStyle,
+		Bool_t logx,
+		Bool_t logy,
+		const std::string& drawOpt);
 
 
 
-/* Draws 1D histogram.
+/* Draws 2D histogram.
  * @param hist Pointer to the histogram.
  * @param titleX X axis title.
  * @param titleY Y axis title.
@@ -71,10 +72,10 @@ void DrawHist2D(
 		const std::string& titleX,
 		const std::string& titleY,
 		const std::string& titleZ,
-		Bool_t logx = false,
-		Bool_t logy = false,
-		Bool_t logz = false,
-		const std::string& drawOpt = "");
+		Bool_t logx,
+		Bool_t logy,
+		Bool_t logz,
+		const std::string& drawOpt);
 
 
 
@@ -125,5 +126,31 @@ void DrawHistSigmaRMS(
 		Int_t index,
 		Double_t sigma,
 		Double_t rms);
+
+/* Draws graph.
+ * @param graph Pointer to the TGraph.
+ * @param titleX X axis title.
+ * @param titleY Y axis title.
+ * @param color Color.
+ * @param lineWidth Line width.
+ * @param lineStyle Line style (see ROOT documentation for details).
+ * @param markerSize Marker size.
+ * @param markerStyle Marker style (see ROOt documentation for details).
+ * @param logx If true than X axis is plotted in logarithmic scale.
+ * @param logy If true than Y axis is plotted in logarithmic scale.
+ * @param drawOpt Other drawing options (see ROOT documentation for details).
+ */
+void DrawGraph(
+		TGraph* graph,
+		const std::string& titleX,
+		const std::string& titleY,
+		Int_t color,
+		Int_t lineWidth,
+		Int_t lineStyle,
+		Int_t markerSize,
+		Int_t markerStyle,
+		Bool_t logx,
+		Bool_t logy,
+		const std::string& drawOpt);
 
 #endif

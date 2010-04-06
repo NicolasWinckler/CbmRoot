@@ -52,6 +52,7 @@ void CbmLitCheckEnergyLoss::Check()
 {
 	gStyle->SetCanvasColor(kWhite);
 	gStyle->SetFrameFillColor(kWhite);
+	gStyle->SetFrameBorderMode(0);
 	gStyle->SetPadColor(kWhite);
 	gStyle->SetStatColor(kWhite);
 	gStyle->SetTitleFillColor(kWhite);

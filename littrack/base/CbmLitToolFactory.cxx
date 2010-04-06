@@ -292,7 +292,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderNN->IsUseFastSearch(true);
 		muchFinderNN->SetMaxNofMissingHits(2);
 		muchFinderNN->SetSigmaCoef(3.5);
-		muchFinderNN->SetChiSqPixelHitCut(13.86);
+		muchFinderNN->SetChiSqPixelHitCut(15.);//13.86);
 		muchFinderNN->SetChiSqStripHitCut(9.);
 		muchFinderNN->SetPDG(13);
 		muchFinderNN->IsProcessSubstationsTogether(true);
@@ -321,7 +321,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderBranch->SetMaxNofMissingHits(2);
 		muchFinderBranch->IsAlwaysCreateMissingHit(false);
 		muchFinderBranch->SetSigmaCoef(3.5);
-		muchFinderBranch->SetChiSqPixelHitCut(13.86);
+		muchFinderBranch->SetChiSqPixelHitCut(15);//13.86);
 		muchFinderBranch->SetChiSqStripHitCut(9.);
 		TrackFinderPtr finder(muchFinderBranch);
 		return finder;
@@ -339,8 +339,8 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderWeight->SetMaxNofMissingHits(2);
 		muchFinderWeight->IsUseFastSearch(true);
 		muchFinderWeight->SetSigmaCoef(3.5);
-		muchFinderWeight->SetChiSqPixelHitCut(13.86);
-		muchFinderWeight->SetChiSqStripHitCut(4.);
+		muchFinderWeight->SetChiSqPixelHitCut(15.);//13.86);
+		muchFinderWeight->SetChiSqStripHitCut(9.);
 		muchFinderWeight->SetPDG(13);
 		TrackFinderPtr finder(muchFinderWeight);
 		return finder;

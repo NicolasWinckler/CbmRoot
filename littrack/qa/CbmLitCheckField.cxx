@@ -1,8 +1,9 @@
 #include "CbmLitCheckField.h"
-
 #include "CbmLitEnvironment.h"
 #include "CbmLitFloat.h"
 #include "CbmLitFieldFitter.h"
+#include "CbmLitUtils.h"
+
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "FairField.h"
@@ -136,6 +137,8 @@ void CbmLitCheckField::Exec(
 	if (IsDrawBx()) DrawHistosPhd(BX);
 	if (IsDrawBy()) DrawHistosPhd(BY);
 	if (IsDrawBz()) DrawHistosPhd(BZ);
+
+	DrawFieldOnly();
 }
 
 void CbmLitCheckField::Finish()
@@ -519,6 +522,60 @@ void CbmLitCheckField::DrawHistosPhd(
 		canvas[i]->SaveAs(std::string(fOutputDir + name + ".gif").c_str());
 		canvas[i]->SaveAs(std::string(fOutputDir + name + ".eps").c_str());
 		canvas[i]->SaveAs(std::string(fOutputDir + name + ".svg").c_str());
+	}
+}
+
+void CbmLitCheckField::DrawFieldOnly()
+{
+	gStyle->SetOptTitle(0);
+	gStyle->SetPalette(1);
+	gStyle->SetOptStat(0);
+	TCanvas* canvas[fNofSlices];
+	for (Int_t s = 0; s < fNofSlices; s++) {
+		std::string ss = "field_at_z_" +ToString<Double_t>(fZpos[s]);
+		canvas[s] = new TCanvas(ss.c_str(), ss.c_str(), 1200,400);
+		canvas[s]->Divide(3, 1);
+	}
+
+	for (int i = 0; i < fNofSlices; i++) {
+		canvas[i]->cd(1);
+		TGraph2D* graphBx = fhBGraph[BX][i];
+//		graph2->Scale(0.01);
+		graphBx->GetXaxis()->SetTitle("X [cm]");
+		graphBx->GetYaxis()->SetTitle("Y [cm]");
+		graphBx->GetZaxis()->SetTitle("B [kGauss]");
+		graphBx->GetXaxis()->SetTitleOffset(1.7);
+		graphBx->GetYaxis()->SetTitleOffset(2);
+		graphBx->GetZaxis()->SetTitleOffset(1.8);
+		gPad->SetLeftMargin(0.2);
+		graphBx->Draw("TRI1");
+
+		canvas[i]->cd(2);
+		TGraph2D* graphBy = fhBGraph[BY][i];
+//		graph2->Scale(0.01);
+		graphBy->GetXaxis()->SetTitle("X [cm]");
+		graphBy->GetYaxis()->SetTitle("Y [cm]");
+		graphBy->GetZaxis()->SetTitle("B [kGauss]");
+		graphBy->GetXaxis()->SetTitleOffset(1.7);
+		graphBy->GetYaxis()->SetTitleOffset(2);
+		graphBy->GetZaxis()->SetTitleOffset(1.8);
+		gPad->SetLeftMargin(0.2);
+		graphBy->Draw("TRI1");
+
+		canvas[i]->cd(3);
+		TGraph2D* graphBz = fhBGraph[BZ][i];
+//		graph2->Scale(0.01);
+		graphBz->GetXaxis()->SetTitle("X [cm]");
+		graphBz->GetYaxis()->SetTitle("Y [cm]");
+		graphBz->GetZaxis()->SetTitle("B [kGauss]");
+		graphBz->GetXaxis()->SetTitleOffset(1.7);
+		graphBz->GetYaxis()->SetTitleOffset(2);
+		graphBz->GetZaxis()->SetTitleOffset(1.8);
+		gPad->SetLeftMargin(0.2);
+		graphBz->Draw("TRI1");
+
+
+		SaveCanvasAsImage(canvas[i], fOutputDir);
 	}
 }
 

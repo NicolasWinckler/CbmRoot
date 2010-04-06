@@ -50,6 +50,7 @@ private:
 	void DrawHistos(Int_t v);
 	void DrawHistosPhd(Int_t v);
 	void DrawHistosPoly(const std::string& opt);
+	void DrawFieldOnly();
 
 	FairField* fField;
 

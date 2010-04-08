@@ -578,8 +578,10 @@ void CbmMuchGeoScheme::CreateStations() {
 CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
   Double_t stGlobalZ0 = fStationZ0[st] + fMuchZ1;
   TVector3 size = TVector3(fActiveLx, fActiveLy, fActiveLz);
+//  Double_t stDz = ((fNlayers[st] - 1) * fLayersDz[st] + fSupportLz[st]
+//                                                                   + fActiveLz) / 2. + 1;
   Double_t stDz = ((fNlayers[st] - 1) * fLayersDz[st] + fSupportLz[st]
-                                                                   + fActiveLz) / 2. + 1;
+                                                                   + 2*fActiveLz) / 2.;
   Double_t stGlobalZ2 = stGlobalZ0 + stDz;
   Double_t rmin = stGlobalZ2 * fAcceptanceTanMin;
   Double_t rmax = stGlobalZ2 * fAcceptanceTanMax + 20;
@@ -593,7 +595,7 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
   for (Int_t l = 0; l < fNlayers[st]; l++) {
     Double_t layerZ0 = (l + 1 / 2. - fNlayers[st] / 2.) * fLayersDz[st];
     Double_t layerGlobalZ0 = layerZ0 + stGlobalZ0;
-    Double_t sideDz = fSupportLz[st] + fActiveLz / 2. + 0.01;
+    Double_t sideDz = fSupportLz[st]/2. + fActiveLz / 2. + 0.01;
     Double_t layerDz = fSupportLz[st]/2. + fActiveLz+1;
     CbmMuchLayer* layer = new CbmMuchLayer(st, l, layerGlobalZ0,layerZ0,layerDz);
     layer->GetSideB()->SetZ(layerGlobalZ0 + sideDz);
@@ -662,7 +664,8 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
 // -------------------------------------------------------------------------
 CbmMuchStation* CbmMuchGeoScheme::CreateStationStraw(Int_t st){
   Double_t stGlobalZ0 = fStationZ0[st] + fMuchZ1;
-  Double_t stDz = ((fNlayers[st] - 1) * fLayersDz[st] + fStrawLz) / 2. + 1;
+//  Double_t stDz = ((fNlayers[st] - 1) * fLayersDz[st] + fStrawLz) / 2. + 1;
+  Double_t stDz = ((fNlayers[st] - 1) * fLayersDz[st] + fSupportLz[st] + 2*fStrawLz) / 2.;
   Double_t stGlobalZ2 = stGlobalZ0 + stDz;
   Double_t rmin = stGlobalZ2 * fAcceptanceTanMin;
   Double_t rmax = stGlobalZ2 * fAcceptanceTanMax + 20;
@@ -677,8 +680,10 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationStraw(Int_t st){
   for (Int_t l = 0; l < fNlayers[st]; l++) {
     Double_t layerZ0 = (l + 1 / 2. - fNlayers[st] / 2.) * fLayersDz[st];
     Double_t layerGlobalZ0 = layerZ0 + stGlobalZ0;
-    Double_t sideDz = fStrawLz / 2. + 0.001; // +0.001 to prevent overlaps
-    Double_t layerDz = fStrawLz+1; // +1 for safety
+//    Double_t sideDz = fStrawLz / 2. + 0.001; // +0.001 to prevent overlaps
+//    Double_t layerDz = fStrawLz+1; // +1 for safety
+    Double_t sideDz = fSupportLz[st]/2. + fStrawLz / 2. + 0.01;
+    Double_t layerDz = fSupportLz[st]/2. + fStrawLz;
 
     CbmMuchLayer* layer = new CbmMuchLayer(st, l, layerGlobalZ0,layerZ0,layerDz);
     layer->GetSideF()->SetZ(layerGlobalZ0 - sideDz);

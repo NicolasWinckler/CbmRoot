@@ -89,6 +89,7 @@ CbmMuch::~CbmMuch() {
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t CbmMuch::ProcessHits(FairVolume* vol) {
+
   if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
     fTime   = gMC->TrackTime() * 1.0e09;
@@ -234,7 +235,7 @@ CbmMuchPoint* CbmMuch::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
 // ----------------------------------------------------------------------------
 
 
-
+#include "FairVolumeList.h"
 // ----------------------------------------------------------------------------
 void CbmMuch::ConstructGeometry() {
   FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
@@ -411,6 +412,7 @@ void CbmMuch::ConstructGeometry() {
           gGeoManager->Node(activeName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);
           gGeoManager->Node(spacerName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);
           AddSensitiveVolume(voActive);
+
         } // modules
       } // sides
     } // layers
@@ -438,6 +440,7 @@ void CbmMuch::ConstructGeometry() {
           TGeoNode* layerNode = (TGeoNode*)layerNodes->At(m);
           TString layerNodeName = layerNode->GetName();
           if (layerNodeName.Contains("active"))  fSensNodes->Add(layerNode);
+
           if (layerNodeName.Contains("support")) fPassNodes->Add(layerNode);
         }
       }

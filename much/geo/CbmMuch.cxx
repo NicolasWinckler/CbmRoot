@@ -366,8 +366,10 @@ void CbmMuch::ConstructGeometry() {
       TString  supName2  = Form("muchstation%02ilayer%isupport2",st+1,l+1);
       TGeoVolume* voSup1 = new TGeoVolume(supName1,shSup,supportMat);
       TGeoVolume* voSup2 = new TGeoVolume(supName2,shSup,supportMat);
-      gGeoManager->Node(supName1,0,layerName,+supDx/2.,0.,0.,    0,kTRUE,buf,0);
-      gGeoManager->Node(supName2,0,layerName,-supDx/2.,0.,0.,krotZ,kTRUE,buf,0);
+      if(TMath::Abs(supDz) > 1e-5) { // Do not create support if it does not exist
+        gGeoManager->Node(supName1,0,layerName,+supDx/2.,0.,0.,    0,kTRUE,buf,0);
+        gGeoManager->Node(supName2,0,layerName,-supDx/2.,0.,0.,krotZ,kTRUE,buf,0);
+      }
 
       // Create layer sides
       for (Int_t s=0;s<2;s++){

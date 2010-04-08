@@ -29,18 +29,16 @@ class CbmMuchLayer : public TObject
    *@param detId     Detector ID
    *@param z         z position of layer center [cm]
    *@param zRel      z position of layer center relative to station center [cm]
-   *@param dz        half-thickness of the layer [cm]
    **/
-  CbmMuchLayer(Int_t detId, Double_t z, Double_t zRel, Double_t dz);
+  CbmMuchLayer(Int_t detId, Double_t z, Double_t zRel);
 
   /** Standard constructor
    *@param iStation  Station index
    *@param iLayer    Layer index
    *@param z         z position of layer center [cm]
    *@param zRel      z position of layer center relative to station center [cm]
-   *@param dz        half-thickness of the layer [cm]
    **/
-  CbmMuchLayer(Int_t iStation, Int_t iLayer, Double_t z, Double_t zRel, Double_t dz);
+  CbmMuchLayer(Int_t iStation, Int_t iLayer, Double_t z, Double_t zRel);
 
   /** Destructor **/
   virtual ~CbmMuchLayer();

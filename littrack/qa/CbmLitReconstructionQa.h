@@ -222,6 +222,15 @@ private:
 	std::string EventEfficiencyStatisticsToString(
 			const std::vector<std::vector<TH1F*> >& hist,
 			const std::string& opt);
+
+
+	/** Calculates integrated efficiencies for different polar angles
+         * and returns a string with statistics.
+	 * @param hist Vector with histograms
+         **/
+        std::string PolarAngleEfficiency(
+                        const std::vector<std::vector<TH1F*> >& hist);
+
 	/**
 	 * Draws histograms.
 	 */
@@ -285,6 +294,10 @@ private:
 	Double_t fMinMom; // Minimum momentum for tracks for efficiency calculation
 	Double_t fMaxMom; // Maximum momentum for tracks for efficiency calculation
 	Int_t fNofBinsMom; // Number of bins for efficiency vs. momentum histogram
+	Double_t fMinAngle; // Minimum polar angle [grad]
+	Double_t fMaxAngle; // Maximum polar angle [grad]
+        Int_t fNofBinsAngle; // Number of bins for efficiency vs. polar angle histogram
+
 
 	// Maps for reconstructed tracks
 	// <MC track index, reconstructed track index>
@@ -315,10 +328,12 @@ private:
 	// histogram type (acc, rec, eff)
 	std::vector<std::vector<TH1F*> > fhStsMom; // STS: momentum dependence
 	std::vector<std::vector<TH1F*> > fhStsNp; // STS: number of points dependence
+	std::vector<std::vector<TH1F*> > fhStsAngle; // STS: polar angle dependence
 	std::vector<std::vector<TH1F*> > fhHalfGlobalMom; // STS+TRD(MUCH): momentum dependence
 	std::vector<std::vector<TH1F*> > fhGlobalMom; // STS+TRD(MUCH)+TOF: momentum dependence
 	std::vector<std::vector<TH1F*> > fhRecMom; // TRD(MUCH): momentum dependence
 	std::vector<std::vector<TH1F*> > fhRecNp; // TRD(MUCH): number of points dependence
+	std::vector<std::vector<TH1F*> > fhRecAngle; // TRD(MUCH): polar angle dependence
 	std::vector<std::vector<TH1F*> > fhTofMom; // TOF: momentum dependence
 	// histograms for ghost tracks
 	// STS: ghost tracks (number of hits dependence)

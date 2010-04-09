@@ -65,6 +65,9 @@ CbmLitReconstructionQa::CbmLitReconstructionQa():
 	fRefMomentum = 2.;
 	fMinMom = 0.;
 	fMaxMom = 25.;
+	fMinAngle = 0.;
+	fMaxAngle = 30.;
+        fNofBinsAngle = 3;
 	fNofTypes = 3;
 	fNofCategories = 6;
 
@@ -364,6 +367,11 @@ void CbmLitReconstructionQa::ProcessMcTracks()
 		Bool_t isHalfGlobalReconstructed = fMcHalfGlobalMap.find(iMCTrack) != fMcHalfGlobalMap.end();
 		Bool_t isRecOk = (fIsMuch && fIsTrd) ? (isTrdOk && isMuchOk) : (isTrdOk || isMuchOk); // MUCH+TRD
 
+		// calculate polar angle
+		TVector3 mom;
+		mcTrack->GetMomentum(mom);
+		Double_t angle = std::abs(mom.Theta() * 180 / TMath::Pi());
+
 		// Check accepted tracks cutting on minimal number of MC points
 		// acceptance: STS tracks only
 		if (isStsOk){
@@ -371,6 +379,8 @@ void CbmLitReconstructionQa::ProcessMcTracks()
 			FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsMom, mcTrack->GetP());
 			// number of points dependence histograms
 			FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsNp, nofPointsSts);
+			// number of points dependence histograms
+			FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcStsMap, fhStsAngle, angle);
 		}
 		// acceptance: STS+TRD(MUCH)
 		if (isStsOk && isRecOk){
@@ -390,6 +400,8 @@ void CbmLitReconstructionQa::ProcessMcTracks()
 			// number of points dependence histograms
 			Int_t np = fIsElectronSetup ? nofPointsTrd : nofPointsMuch;
 			FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, fhRecNp, np);
+			// polar angle dependence histograms
+			FillGlobalReconstructionHistos(mcTrack, iMCTrack, fMcHalfGlobalMap, fhRecAngle, angle);
 		}
 
 		if (fIsTrd || fIsMuch) {
@@ -449,18 +461,22 @@ void CbmLitReconstructionQa::CreateHistos()
 	// resize histogram vectors
 	fhStsMom.resize(fNofCategories);
 	fhStsNp.resize(fNofCategories);
+	fhStsAngle.resize(fNofCategories);
 	fhHalfGlobalMom.resize(fNofCategories);
 	fhGlobalMom.resize(fNofCategories);
 	fhRecMom.resize(fNofCategories);
 	fhRecNp.resize(fNofCategories);
+	fhRecAngle.resize(fNofCategories);
 	fhTofMom.resize(fNofCategories);
 	for (Int_t i = 0; i < fNofCategories; i++) {
 		fhStsMom[i].resize(fNofTypes);
 		fhStsNp[i].resize(fNofTypes);
+		fhStsAngle[i].resize(fNofTypes);
 		fhHalfGlobalMom[i].resize(fNofTypes);
 		fhGlobalMom[i].resize(fNofTypes);
 		fhRecMom[i].resize(fNofTypes);
 		fhRecNp[i].resize(fNofTypes);
+		fhRecAngle[i].resize(fNofTypes);
 		fhTofMom[i].resize(fNofTypes);
 	}
 
@@ -472,6 +488,10 @@ void CbmLitReconstructionQa::CreateHistos()
 	Double_t minNofPoints   =  0.;
 	Double_t maxNofPoints   = 25.;
 	Int_t    nBinsNofPoints = 25;
+	// Polar angle distributions
+	Double_t minAngle   =  fMinAngle; //grad
+	Double_t maxAngle   = fMaxAngle; //grad
+	Int_t    nBinsAngle = fNofBinsAngle; // grad
 
 	std::string cat[] = { "All", "Ref", "Prim", "Sec", "Muon", "Electron"};
 	std::string type[] = { "Acc", "Rec", "Eff" };
@@ -490,6 +510,12 @@ void CbmLitReconstructionQa::CreateHistos()
 			histTitle = "STS: " + type[j] + cat[i] + " " + " tracks";
 			fhStsNp[i][j] = new TH1F(histName.c_str(), histTitle.c_str(), nBinsNofPoints, minNofPoints, maxNofPoints);
 			fHistoList->Add(fhStsNp[i][j]);
+
+			// STS polar angle dependence histograms
+			histName = "hStsAngle" + type[j] + cat[i];
+			histTitle = "STS: " + type[j] + cat[i] + " " + " tracks";
+			fhStsAngle[i][j] = new TH1F(histName.c_str(), histTitle.c_str(), nBinsAngle, minAngle, maxAngle);
+			fHistoList->Add(fhStsAngle[i][j]);
 
 			// STS+TRD(MUCH) momentum dependence histograms
 			histName = "hHalfGlobalMom" + type[j] + cat[i];
@@ -514,6 +540,12 @@ void CbmLitReconstructionQa::CreateHistos()
 			histTitle = "TRD(MUCH): " + type[j] + cat[i] + " " + " tracks";
 			fhRecNp[i][j] = new TH1F(histName.c_str(), histTitle.c_str(), nBinsNofPoints, minNofPoints, maxNofPoints);
 			fHistoList->Add(fhRecNp[i][j]);
+
+			// TRD(MUCH) polar angle dependence histograms
+			histName = "hRecAngle" + type[j] + cat[i];
+			histTitle = "TRD(MUCH): " + type[j] + cat[i] + " " + " tracks";
+			fhRecAngle[i][j] = new TH1F(histName.c_str(), histTitle.c_str(), nBinsAngle, minAngle, maxAngle);
+			fHistoList->Add(fhRecAngle[i][j]);
 
 			// TOF momentum dependence histograms
 			histName = "hTofMom" + type[j] + cat[i];
@@ -579,10 +611,12 @@ void CbmLitReconstructionQa::CalculateEfficiencyHistos()
 	for (Int_t i = 0; i < fNofCategories; i++) {
 		DivideHistos(fhStsMom[i][REC], fhStsMom[i][ACC], fhStsMom[i][EFF]);
 		DivideHistos(fhStsNp[i][REC], fhStsNp[i][ACC], fhStsNp[i][EFF]);
+		DivideHistos(fhStsAngle[i][REC], fhStsAngle[i][ACC], fhStsAngle[i][EFF]);
 		DivideHistos(fhHalfGlobalMom[i][REC], fhHalfGlobalMom[i][ACC], fhHalfGlobalMom[i][EFF]);
 		DivideHistos(fhGlobalMom[i][REC], fhGlobalMom[i][ACC], fhGlobalMom[i][EFF]);
 		DivideHistos(fhRecMom[i][REC], fhRecMom[i][ACC], fhRecMom[i][EFF]);
 		DivideHistos(fhRecNp[i][REC], fhRecNp[i][ACC], fhRecNp[i][EFF]);
+		DivideHistos(fhRecAngle[i][REC], fhRecAngle[i][ACC], fhRecAngle[i][EFF]);
 		DivideHistos(fhTofMom[i][REC], fhTofMom[i][ACC], fhTofMom[i][EFF]);
 	}
 	fhTrdNofHitsInStation->Scale(1./fEventNo);
@@ -645,6 +679,11 @@ void CbmLitReconstructionQa::PrintFinalStatistics(
 		out << "Ghosts STS (per event/total): " << stsGhosts/fEventNo << "/" << stsGhosts << std::endl;
 	if (fIsMuch || fIsTrd)
 		out << "Ghosts TRD(MUCH) (per event/total): " << recGhosts/fEventNo << "/" << recGhosts << std::endl;
+	out << "Polar angle efficiency:" << std::endl;
+	out << "STS:" << std::endl;
+	out << PolarAngleEfficiency(fhStsAngle);
+	out << "TRD(MUCH):" << std::endl;
+        out << PolarAngleEfficiency(fhRecAngle);
 	out << "-------------------------------------------------------------" << std::endl;
 }
 
@@ -699,6 +738,35 @@ std::string CbmLitReconstructionQa::EventEfficiencyStatisticsToString(
 	}
 
 	return ss.str();
+}
+
+std::string CbmLitReconstructionQa::PolarAngleEfficiency(
+	const std::vector<std::vector<TH1F*> >& hist)
+{
+    Double_t step = (fMaxAngle - fMinAngle) / fNofBinsAngle;
+    Double_t allEff[fNofBinsAngle], refEff[fNofBinsAngle];
+    Double_t allRec[fNofBinsAngle], refRec[fNofBinsAngle];
+    Double_t allAcc[fNofBinsAngle], refAcc[fNofBinsAngle];
+    for(Int_t i = 0; i < fNofBinsAngle; i++) {
+        allRec[i] = hist[ALL][REC]->GetBinContent(i+1);
+	allAcc[i] = hist[ALL][ACC]->GetBinContent(i+1);
+	if (allAcc[i] != 0.) allEff[i] = allRec[i] / allAcc[i];
+	refRec[i] = hist[REF][REC]->GetBinContent(i+1);
+	refAcc[i] = hist[REF][ACC]->GetBinContent(i+1);
+	if (refAcc[i] != 0.) refEff[i] = refRec[i] / refAcc[i];
+    }
+
+    std::stringstream ss;
+    for (Int_t i = 0; i < fNofBinsAngle; i++) {
+	Double_t angle0 = i*step;
+        Double_t angle1 = angle0 + step;
+	ss << "(" << angle0 << "-" << angle1 << ") "
+	    << "all=" << allEff[i] << "(" << allRec[i] << "/" << allAcc[i] << "), per event ("
+		      << allRec[i]/fEventNo << "/" << allAcc[i]/fEventNo << ")"
+	    << "  ref=" << refEff[i] << "(" << refRec[i] << "/" << refAcc[i] << "), per event ("
+	              << refRec[i]/fEventNo << "/" << refAcc[i]/fEventNo << ")" << std::endl;
+    }
+    return ss.str();
 }
 
 void CbmLitReconstructionQa::Draw()

@@ -5,29 +5,41 @@
  * Macro draws histograms produced by CbmLitReconstructionQa class.
  **/
 
-void global_reco_qa(Int_t nEvents = 1000)
+void global_reco_qa(Int_t nEvents = 10)
 {
-	// Output directory
-	TString dir  = "/d/cbm06/user/andrey/much1_10mu_urqmd/";
-	// MC transport file
-	TString mcFile = dir + "mc.0000.root";
-	// Parameter file
-	TString parFile = dir + "param.0000.root";
-	// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
-	TString globalHitsFile = dir + "global.hits.0000.root";
-	// File with global tracks
-	TString globalTracksFile = dir + "global.tracks.branch.0000.root";
-	// Output file with histograms
-	TString recoQaFile = dir + "reco.qa.branch.0000.root";
-	// Output directory for images
-	TString imageDir = "./test/much1/branch/";
+	TString script = TString(gSystem->Getenv("SCRIPT"));
+
+    	TString dir, imageDir, mcFile, parFile, globalHitsFile, globalTracksFile, trackingType;
+	if (script != "yes") {
+		// Output directory
+		dir  = "/home/d/andrey/trdsimple_10pi/";
+		//Output directory for images
+		imageDir = "./test/";
+		// MC transport file
+		mcFile = dir + "mc.0000.root";
+		// Parameter file
+		parFile = dir + "param.0000.root";
+		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
+		globalHitsFile = dir + "global.hits.trd10.0000.root";
+		// File with global tracks
+		globalTracksFile = dir + "global.tracks.0000.root";
+		// Output file with histograms
+                recoQaFile = dir + "reco.qa.trd100.0000.root";
+	} else {
+		mcFile = TString(gSystem->Getenv("MCFILE"));
+		parFile = TString(gSystem->Getenv("PARFILE"));
+		globalHitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
+		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
+		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
+                recoQaFile = TString(gSystem->Getenv("RECOQAFILE"));
+	}
 
 	TStopwatch timer;
 	timer.Start();
 
 	gSystem->Load("/home/soft/tbb/libtbb");
 	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
+//	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
@@ -47,14 +59,14 @@ void global_reco_qa(Int_t nEvents = 1000)
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
 	reconstructionQa->SetMinNofPointsTrd(9);
-	reconstructionQa->SetMinNofPointsMuch(11);
-	reconstructionQa->SetMinNofPointsTof(1);
+	reconstructionQa->SetMinNofPointsMuch(0);
+	reconstructionQa->SetMinNofPointsTof(0);
 	reconstructionQa->SetQuota(0.7);
-	reconstructionQa->SetMinNofHitsTrd(0);
-	reconstructionQa->SetMinNofHitsMuch(11);
+	reconstructionQa->SetMinNofHitsTrd(9);
+	reconstructionQa->SetMinNofHitsMuch(0);
 	reconstructionQa->SetVerbose(1);
-	reconstructionQa->SetMomentumRange(0., 25);
-	reconstructionQa->SetNofBinsMom(25);
+	reconstructionQa->SetMomentumRange(0., 15);
+	reconstructionQa->SetNofBinsMom(15);
 	reconstructionQa->SetOutputDir(std::string(imageDir));
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------

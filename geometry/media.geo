@@ -685,6 +685,8 @@ G10                4  12.01 1.008 16. 28.09 6.  1.  8.  14. 1.7 0.259 0.288 0.24
                    0  0  20.  .001
                    0
 
+// This is an effective  mixture for the radiator with an
+// effective density wich is only 0.1 of the PP density  
 polypropylene	   -2	12.01 1.008 6. 1. 0.074 3  6
                    0  0  20.  .001
                    0

@@ -3,6 +3,7 @@
 #include "CbmLitFloat.h"
 #include "CbmLitFieldFitter.h"
 #include "CbmLitUtils.h"
+#include "CbmLitDrawHist.h"
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
@@ -36,7 +37,7 @@ CbmLitCheckField::CbmLitCheckField():
 	fNofBinsX(30),
 	fNofBinsY(30),
 	fUseEllipseAcc(true),
-	fOutputDir("field/"),
+	fOutputDir("./field/"),
 	fPolynomDegree(1),
 	fNofPolynoms(4)
 {
@@ -50,13 +51,16 @@ CbmLitCheckField::~CbmLitCheckField()
 InitStatus CbmLitCheckField::Init()
 {
 	// Some style settings for drawing
-	gStyle->SetCanvasColor(kWhite);
-	gStyle->SetFrameFillColor(kWhite);
-	gStyle->SetPadColor(kWhite);
-	gStyle->SetStatColor(kWhite);
-	gStyle->SetTitleFillColor(kWhite);
-	gStyle->SetPalette(1);
-	gStyle->SetOptStat(0);
+//	gStyle->SetCanvasColor(kWhite);
+//	gStyle->SetFrameFillColor(kWhite);
+//	gStyle->SetPadColor(kWhite);
+//	gStyle->SetStatColor(kWhite);
+//	gStyle->SetTitleFillColor(kWhite);
+//	gStyle->SetPalette(1);
+//	gStyle->SetOptStat(0);
+
+	// Set draw styles
+	SetStyles();
 
 	fDegrees.push_back(3);
 	fDegrees.push_back(5);
@@ -353,84 +357,62 @@ void CbmLitCheckField::FillErrHistos()
 void CbmLitCheckField::DrawHistos(
 		Int_t v)
 {
-	std::string names[] = {"Bx", "By", "Bz"};
+	std::string names[] = {"field_Bx_", "field_By_", "field_Bz_"};
 	TCanvas* canvas[fNofSlices];
 	for (Int_t s = 0; s < fNofSlices; s++) {
 		std::stringstream ss;
-		ss << names[v] << " at z=" << fZpos[s];
+		ss << names[v] << "z_" << fZpos[s];
 		canvas[s] = new TCanvas(ss.str().c_str(), ss.str().c_str(), 1200,800);
 		canvas[s]->Divide(3, 2);
 	}
 
+	std::string title = "B_{x}";
+	if (v == 1) title = "B_{y}";
+	if (v == 2) title = "B_{z}";
 	for (int i = 0; i < fNofSlices; i++) {
 		canvas[i]->cd(1);
 		TGraph2D* graph1 = fhBGraph[v][i];
-		graph1->GetXaxis()->SetTitle("X [cm]");
-		graph1->GetYaxis()->SetTitle("Y [cm]");
-		graph1->GetZaxis()->SetTitle("B [kGauss]");
-		graph1->GetXaxis()->SetTitleOffset(1.7);
-		graph1->GetYaxis()->SetTitleOffset(2);
-		graph1->GetZaxis()->SetTitleOffset(1.8);
-		gPad->SetLeftMargin(0.2);
-		graph1->Draw("TRI1");
+		DrawGraph2D(graph1, "X [cm]", "Y [cm]", std::string(title + " [kGauss]"),
+										false, false, false, "TRI1");
 
 		canvas[i]->cd(2);
 		TH1D* hist2 = fhBErrH1D[v][i][fPolynomDegree];
-		hist2->GetXaxis()->SetTitle("B [kGauss]");
-		gPad->SetLogy();
-		hist2->Draw();
+		DrawHist1D(hist2, std::string(title + " [kGauss]"), "Counter",
+			   		LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+			   		LIT_MARKER_STYLE1, false, true, "");
 
 		canvas[i]->cd(3);
 		TH2D* hist3 = fhBErrH2D[v][i][fPolynomDegree];
-		hist3->GetXaxis()->SetTitle("X [cm]");
-		hist3->GetYaxis()->SetTitle("Y [cm]");
-		hist3->GetZaxis()->SetTitle("B [kGauss]");
-		hist3->GetZaxis()->SetTitleOffset(1.7);
-		gPad->SetRightMargin(0.2);
-		hist3->Draw("colz");
+		DrawHist2D(hist3, "X [cm]", "Y [cm]", std::string(title + " [kGauss]"),
+				false, false, false, "colz");
 
 		canvas[i]->cd(4);
 		TGraph2D* graph2 = fhBAprGraph[v][i][fPolynomDegree];
-		graph2->GetXaxis()->SetTitle("X [cm]");
-		graph2->GetYaxis()->SetTitle("Y [cm]");
-		graph2->GetZaxis()->SetTitle("B [kGauss]");
-		graph2->GetXaxis()->SetTitleOffset(1.7);
-		graph2->GetYaxis()->SetTitleOffset(2);
-		graph2->GetZaxis()->SetTitleOffset(1.8);
-		gPad->SetLeftMargin(0.2);
-		graph2->Draw("TRI1");
+		DrawGraph2D(graph2, "X [cm]", "Y [cm]", std::string(title + " [kGauss]"),
+								false, false, false, "TRI1");
 
 		canvas[i]->cd(5);
 		TH1D* hist4 = fhBRelErrH1D[v][i][fPolynomDegree];
-		hist4->GetXaxis()->SetTitle("Relative error [%]");
-		gPad->SetLogy();
-		hist4->Draw();
+		DrawHist1D(hist4, std::string(title + " relative error [%]"), "Counter",
+				LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+				LIT_MARKER_STYLE1, false, true, "");
 
 		canvas[i]->cd(6);
 		TH2D* hist5 = fhBRelErrH2D[v][i][fPolynomDegree];
-		hist5->GetXaxis()->SetTitle("X [cm]");
-		hist5->GetYaxis()->SetTitle("Y [cm]");
-		hist5->GetZaxis()->SetTitle("B [kGauss]");
-		hist5->GetZaxis()->SetTitleOffset(1.7);
-		gPad->SetRightMargin(0.2);
-		hist5->Draw("colz");
+		DrawHist2D(hist5, "X [cm]", "Y [cm]", std::string(title + " relative error [%]"),
+						false, false, false, "colz");
 
-
-		std::string name(canvas[i]->GetName());
-		canvas[i]->SaveAs(std::string(fOutputDir + name + ".gif").c_str());
-		canvas[i]->SaveAs(std::string(fOutputDir + name + ".eps").c_str());
-		canvas[i]->SaveAs(std::string(fOutputDir + name + ".svg").c_str());
+		SaveCanvasAsImage(canvas[i], fOutputDir);
 	}
 }
 
 void CbmLitCheckField::DrawHistosPoly(
 		const std::string& opt)
 {
-	std::string names[] = {"Bx", "By", "Bz"};
 	TCanvas* canvas[fNofSlices];
 	for (Int_t s = 0; s < fNofSlices; s++) {
 		std::stringstream ss;
-		ss << opt + " degree at z=" << fZpos[s];
+		ss << "field_" + opt + "_degree_z_" << fZpos[s];
 		canvas[s] = new TCanvas(ss.str().c_str(), ss.str().c_str(), 1500,500);
 		canvas[s]->Divide(4, 1);
 	}
@@ -439,8 +421,8 @@ void CbmLitCheckField::DrawHistosPoly(
 		TLegend* l1 = new TLegend(0.1,0.1,0.9,0.9);
 		l1->SetFillColor(kWhite);
 		l1->SetTextSize(0.1);
-		l1->SetLineWidth(7);
-		l1->SetHeader("");
+		l1->SetLineWidth(1);
+		l1->SetHeader("Polynom degree");
 		for (int v = 0; v < 3; v++) {
 			TH1D* firsthist;
 			if (opt == "rel") firsthist = fhBRelErrH1D[v][i][0];
@@ -452,13 +434,21 @@ void CbmLitCheckField::DrawHistosPoly(
 				if (opt == "rel") hist1 = fhBRelErrH1D[v][i][j];
 				else hist1 = fhBErrH1D[v][i][j];
 				if (max < hist1->GetMaximum()) max = hist1->GetMaximum();
-				if (opt == "rel") hist1->GetXaxis()->SetTitle("Relative error [%]");
-				else hist1->GetXaxis()->SetTitle("B [kGauss]");
-				hist1->SetLineColor(1+j);
-				hist1->SetLineWidth(3);
-				hist1->SetLineStyle(1+j);
-				gPad->SetLogy();
-				if (j == 0) hist1->Draw(); else hist1->Draw("SAME");
+				std::string title;
+				if (opt == "rel") {
+					if (v == 0) title = "B_{x} relative error [%]";
+					if (v == 1) title = "B_{y} relative error [%]";
+					if (v == 2) title = "B_{z} relative error [%]";
+				} else {
+					if (v == 0) title = "B_{x} [kGauss]";
+					if (v == 1) title = "B_{y} [kGauss]";
+					if (v == 2) title = "B_{z} [kGauss]";
+				}
+				std::string draw_opt;
+				if (j == 0) draw_opt = ""; else draw_opt = "SAME";
+				DrawHist1D(hist1, title, "Counter",
+						1+j, LIT_LINE_WIDTH, 1+j, LIT_MARKER_SIZE,
+						kDot, false, true, draw_opt.c_str());
 
 				if (v == 0) {
 					std::stringstream ss;
@@ -472,10 +462,7 @@ void CbmLitCheckField::DrawHistosPoly(
 		canvas[i]->cd(1);
 		l1->Draw();
 
-		std::string name(canvas[i]->GetName());
-		canvas[i]->SaveAs(std::string(fOutputDir + name + ".gif").c_str());
-		canvas[i]->SaveAs(std::string(fOutputDir + name + ".eps").c_str());
-		canvas[i]->SaveAs(std::string(fOutputDir + name + ".svg").c_str());
+		SaveCanvasAsImage(canvas[i], fOutputDir);
 	}
 }
 
@@ -483,53 +470,35 @@ void CbmLitCheckField::DrawHistosPoly(
 void CbmLitCheckField::DrawHistosPhd(
 		Int_t v)
 {
-	gStyle->SetOptTitle(0);
-	gStyle->SetPalette(0);
-	gStyle->SetOptStat(0);
-	std::string names[] = {"phd_Bx", "phd_By", "phd_Bz"};
+	std::string names[] = {"field_phd_Bx_", "field_phd_By_", "field_phd_Bz_"};
 	TCanvas* canvas[fNofSlices];
 	for (Int_t s = 0; s < fNofSlices; s++) {
 		std::stringstream ss;
-		ss << names[v] << " at z=" << fZpos[s];
+		ss << names[v] << "z_" << fZpos[s];
 		canvas[s] = new TCanvas(ss.str().c_str(), ss.str().c_str(), 800,400);
 		canvas[s]->Divide(2, 1);
 	}
 
+	std::string title = "B_{x} [kGauss]";
+	if (v == 1) title = "B_{y} [kGauss]";
+	if (v == 2) title = "B_{z} [kGauss]";
 	for (int i = 0; i < fNofSlices; i++) {
 		canvas[i]->cd(1);
 		TGraph2D* graph2 = fhBAprGraph[v][i][fPolynomDegree];
-//		graph2->Scale(0.01);
-		graph2->GetXaxis()->SetTitle("X [cm]");
-		graph2->GetYaxis()->SetTitle("Y [cm]");
-		graph2->GetZaxis()->SetTitle("B [kGauss]");
-		graph2->GetXaxis()->SetTitleOffset(1.7);
-		graph2->GetYaxis()->SetTitleOffset(2);
-		graph2->GetZaxis()->SetTitleOffset(1.8);
-		gPad->SetLeftMargin(0.2);
-		graph2->Draw("TRI1");
+		DrawGraph2D(graph2, "X [cm]", "Y [cm]", title,
+								false, false, false, "TRI1");
 
 		canvas[i]->cd(2);
 		TH2D* hist3 = fhBErrH2D[v][i][fPolynomDegree];
-//		hist3->Scale(0.01);
-		hist3->GetXaxis()->SetTitle("X [cm]");
-		hist3->GetYaxis()->SetTitle("Y [cm]");
-		hist3->GetZaxis()->SetTitle("B [kGauss]");
-		hist3->GetZaxis()->SetTitleOffset(1.7);
-		gPad->SetRightMargin(0.2);
-		hist3->Draw("colz");
+		DrawHist2D(hist3, "X [cm]", "Y [cm]", title,
+						false, false, false, "colz");
 
-		std::string name(canvas[i]->GetName());
-		canvas[i]->SaveAs(std::string(fOutputDir + name + ".gif").c_str());
-		canvas[i]->SaveAs(std::string(fOutputDir + name + ".eps").c_str());
-		canvas[i]->SaveAs(std::string(fOutputDir + name + ".svg").c_str());
+		SaveCanvasAsImage(canvas[i], fOutputDir);
 	}
 }
 
 void CbmLitCheckField::DrawFieldOnly()
 {
-	gStyle->SetOptTitle(0);
-	gStyle->SetPalette(1);
-	gStyle->SetOptStat(0);
 	TCanvas* canvas[fNofSlices];
 	for (Int_t s = 0; s < fNofSlices; s++) {
 		std::string ss = "field_at_z_" +ToString<Double_t>(fZpos[s]);
@@ -540,40 +509,18 @@ void CbmLitCheckField::DrawFieldOnly()
 	for (int i = 0; i < fNofSlices; i++) {
 		canvas[i]->cd(1);
 		TGraph2D* graphBx = fhBGraph[BX][i];
-//		graph2->Scale(0.01);
-		graphBx->GetXaxis()->SetTitle("X [cm]");
-		graphBx->GetYaxis()->SetTitle("Y [cm]");
-		graphBx->GetZaxis()->SetTitle("B [kGauss]");
-		graphBx->GetXaxis()->SetTitleOffset(1.7);
-		graphBx->GetYaxis()->SetTitleOffset(2);
-		graphBx->GetZaxis()->SetTitleOffset(1.8);
-		gPad->SetLeftMargin(0.2);
-		graphBx->Draw("TRI1");
+		DrawGraph2D(graphBx, "X [cm]", "Y [cm]", "B_{x} [kGauss]",
+					false, false, false, "TRI1");
 
 		canvas[i]->cd(2);
 		TGraph2D* graphBy = fhBGraph[BY][i];
-//		graph2->Scale(0.01);
-		graphBy->GetXaxis()->SetTitle("X [cm]");
-		graphBy->GetYaxis()->SetTitle("Y [cm]");
-		graphBy->GetZaxis()->SetTitle("B [kGauss]");
-		graphBy->GetXaxis()->SetTitleOffset(1.7);
-		graphBy->GetYaxis()->SetTitleOffset(2);
-		graphBy->GetZaxis()->SetTitleOffset(1.8);
-		gPad->SetLeftMargin(0.2);
-		graphBy->Draw("TRI1");
+		DrawGraph2D(graphBy, "X [cm]", "Y [cm]", "B_{y} [kGauss]",
+					false, false, false, "TRI1");
 
 		canvas[i]->cd(3);
 		TGraph2D* graphBz = fhBGraph[BZ][i];
-//		graph2->Scale(0.01);
-		graphBz->GetXaxis()->SetTitle("X [cm]");
-		graphBz->GetYaxis()->SetTitle("Y [cm]");
-		graphBz->GetZaxis()->SetTitle("B [kGauss]");
-		graphBz->GetXaxis()->SetTitleOffset(1.7);
-		graphBz->GetYaxis()->SetTitleOffset(2);
-		graphBz->GetZaxis()->SetTitleOffset(1.8);
-		gPad->SetLeftMargin(0.2);
-		graphBz->Draw("TRI1");
-
+		DrawGraph2D(graphBz, "X [cm]", "Y [cm]", "B_{z} [kGauss]",
+					false, false, false, "TRI1");
 
 		SaveCanvasAsImage(canvas[i], fOutputDir);
 	}

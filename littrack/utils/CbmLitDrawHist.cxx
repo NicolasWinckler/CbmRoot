@@ -12,6 +12,7 @@
 #include "TLatex.h"
 #include "TStyle.h"
 #include "TGraph.h"
+#include "TGraph2D.h"
 
 #include <string>
 
@@ -46,7 +47,7 @@ void DrawHist1D(
 		Bool_t logy,
 		const std::string& drawOpt)
 {
-	Double_t textSize = 0.06;
+	Double_t textSize = LIT_TEXT_SIZE;
 	hist->GetXaxis()->SetTitle(titleX.c_str());
 	hist->GetYaxis()->SetTitle(titleY.c_str());
 	hist->SetLineColor(color);
@@ -80,12 +81,29 @@ void DrawHist2D(
 		Bool_t logz,
 		const std::string& drawOpt)
 {
+	Double_t textSize = LIT_TEXT_SIZE;
 	hist->GetXaxis()->SetTitle(titleX.c_str());
 	hist->GetYaxis()->SetTitle(titleY.c_str());
-	hist->GetYaxis()->SetTitle(titleZ.c_str());
+	hist->GetZaxis()->SetTitle(titleZ.c_str());
 	if (logx) gPad->SetLogx();
 	if (logy) gPad->SetLogy();
 	if (logz) gPad->SetLogz();
+	hist->GetXaxis()->SetLabelSize(textSize);
+	hist->GetXaxis()->SetNdivisions(505, kTRUE);
+	hist->GetYaxis()->SetLabelSize(textSize);
+	hist->GetYaxis()->SetNdivisions(505, kTRUE);
+	hist->GetZaxis()->SetLabelSize(textSize);
+//	hist->GetZaxis()->SetNdivisions(505, kTRUE);
+	hist->GetXaxis()->SetTitleSize(textSize);
+	hist->GetYaxis()->SetTitleSize(textSize);
+	hist->GetZaxis()->SetTitleSize(textSize);
+	hist->GetXaxis()->SetTitleOffset(1.0);
+	hist->GetYaxis()->SetTitleOffset(1.3);
+	hist->GetZaxis()->SetTitleOffset(1.5);
+	gPad->SetLeftMargin(0.17);
+	gPad->SetRightMargin(0.30);
+	gPad->SetBottomMargin(0.15);
+
 	hist->Draw(drawOpt.c_str());
 }
 
@@ -159,7 +177,7 @@ void DrawGraph(
 		Bool_t logy,
 		const std::string& drawOpt)
 {
-	Double_t textSize = 0.06;
+	Double_t textSize = LIT_TEXT_SIZE;
 	graph->GetXaxis()->SetTitle(titleX.c_str());
 	graph->GetYaxis()->SetTitle(titleY.c_str());
 	graph->SetLineColor(color);
@@ -181,3 +199,41 @@ void DrawGraph(
 	gPad->SetBottomMargin(0.15);
 	graph->Draw(drawOpt.c_str());
 }
+
+/* Draws 2D graph.*/
+void DrawGraph2D(
+		TGraph2D* graph,
+		const std::string& titleX,
+		const std::string& titleY,
+		const std::string& titleZ,
+		Bool_t logx,
+		Bool_t logy,
+		Bool_t logz,
+		const std::string& drawOpt)
+{
+	Double_t textSize = LIT_TEXT_SIZE;
+	graph->GetXaxis()->SetTitle(titleX.c_str());
+	graph->GetYaxis()->SetTitle(titleY.c_str());
+	graph->GetZaxis()->SetTitle(titleZ.c_str());
+	if (logx) gPad->SetLogx();
+	if (logy) gPad->SetLogy();
+	if (logz) gPad->SetLogz();
+	graph->GetXaxis()->SetLabelSize(textSize);
+	graph->GetXaxis()->SetNdivisions(505, kTRUE);
+	graph->GetYaxis()->SetLabelSize(textSize);
+	graph->GetYaxis()->SetNdivisions(505, kTRUE);
+	graph->GetZaxis()->SetLabelSize(textSize);
+	graph->GetZaxis()->SetNdivisions(505, kTRUE);
+	graph->GetXaxis()->SetTitleSize(textSize);
+	graph->GetYaxis()->SetTitleSize(textSize);
+	graph->GetZaxis()->SetTitleSize(textSize);
+	graph->GetXaxis()->SetTitleOffset(1.7);
+	graph->GetYaxis()->SetTitleOffset(2.0);
+	graph->GetZaxis()->SetTitleOffset(1.7);
+	gPad->SetLeftMargin(0.22);
+//	gPad->SetRightMargin(0.17);
+//	gPad->SetBottomMargin(0.15);
+
+	graph->Draw(drawOpt.c_str());
+}
+

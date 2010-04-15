@@ -199,7 +199,7 @@ void LitTrackFinderNNParallel::DoFind(
 	nofTracks = 0;
 	for (unsigned int i = 0; i < fNofTracks; i++) {
 		LitScalTrack* track = fTracks[i];
-//		std::cout << track;
+//		std::cout << *track;
 		if (track->nofHits < 11) continue;
 //		std::cout << *track;
 		tracks[nofTracks++] = new LitScalTrack(*track);

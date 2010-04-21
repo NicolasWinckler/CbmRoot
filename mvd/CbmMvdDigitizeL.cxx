@@ -39,7 +39,7 @@
 //#include "TGeoShape.h"
 #include "TGeoTube.h"
 #include "TObjArray.h"
-#include "TRandom3.h"
+#include "TRandom.h"
 #include "TString.h"
 #include "TVector3.h"
 #include "TMath.h"
@@ -81,7 +81,6 @@ CbmMvdDigitizeL::CbmMvdDigitizeL()
     fPixelCharge   = new TClonesArray("CbmMvdPixelCharge");
     fPileupManager = NULL;
     fDeltaManager  = NULL;
-    fRandGen.SetSeed(2736);
     fEvent       = 0;
     fTime        = 0.;
     fSigmaX      = 0.0005;
@@ -112,7 +111,6 @@ CbmMvdDigitizeL::CbmMvdDigitizeL()
     fCurrentParticleMass     = 0;
     fCurrentParticleMomentum = 0;
     fPixelScanAccelerator    = 0;
-    fLandauRandom=new TRandom3();
 
     fShowDebugHistos = kFALSE;
 
@@ -191,7 +189,6 @@ CbmMvdDigitizeL::CbmMvdDigitizeL(const char* name, Int_t iMode,
     fPixelCharge   = new TClonesArray("CbmMvdPixelCharge");
     fPileupManager = NULL;
     fDeltaManager  = NULL;
-    fRandGen.SetSeed(2736);
     fEvent       = 0;
     fTime        = 0.;
     fSigmaX      = 0.0005;
@@ -222,7 +219,6 @@ CbmMvdDigitizeL::CbmMvdDigitizeL(const char* name, Int_t iMode,
     fCurrentParticleMass = 0;
     fCurrentParticleMomentum = 0;
     fPixelScanAccelerator    = 0;
-    fLandauRandom=new TRandom3();
     /*fLandauMPV=967.;
     fLandauSigma=208;*/
 
@@ -663,7 +659,7 @@ void CbmMvdDigitizeL::ProduceIonisationPoints(CbmMvdPoint* point,
 
 
     //Smear the energy on each track segment
-    Double_t charge = fLandauGain*fLandauRandom->Landau(1,fLandauSigma/fLandauMPV);
+    Double_t charge = fLandauGain*gRandom->Landau(1,fLandauSigma/fLandauMPV);
     if (charge>12000){charge=12000;} //limit Random generator behaviour
     
     //fRandomGeneratorTestHisto->Fill(charge);
@@ -1078,7 +1074,7 @@ void CbmMvdDigitizeL::SetParContainers() {
 InitStatus CbmMvdDigitizeL::Init() {
 
     fRandomGeneratorTestHisto = new TH1F("TestHisto","TestHisto",400,0,12000);
-    Double_t v = fLandauRandom->Landau(fLandauMPV,fLandauSigma);
+    Double_t v = gRandom->Landau(fLandauMPV,fLandauSigma);
     fRandomGeneratorTestHisto->Fill(v);
 
     // Init DebugHistos in case they are needed

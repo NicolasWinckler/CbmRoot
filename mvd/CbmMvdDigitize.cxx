@@ -95,7 +95,7 @@
 //#include "TGeoShape.h"
 #include "TGeoTube.h"
 #include "TObjArray.h"
-#include "TRandom3.h"
+#include "TRandom.h"
 #include "TString.h"
 #include "TVector3.h"
 #include "TMath.h"
@@ -137,7 +137,6 @@ CbmMvdDigitize::CbmMvdDigitize()
     fPixelCharge   = new TClonesArray("CbmMvdPixelCharge");
     fPileupManager = NULL;
     fDeltaManager  = NULL;
-    fRandGen.SetSeed(2736);
     fEvent       = 0;
     fTime        = 0.;
     fSigmaX      = 0.0005;
@@ -186,7 +185,6 @@ CbmMvdDigitize::CbmMvdDigitize(const char* name, Int_t iMode,
     fPixelCharge   = new TClonesArray("CbmMvdPixelCharge");
     fPileupManager = NULL;
     fDeltaManager  = NULL;
-    fRandGen.SetSeed(2736);
     fEvent       = 0;
     fTime        = 0.;
     fSigmaX      = 0.0005;

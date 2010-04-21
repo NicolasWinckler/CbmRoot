@@ -16,8 +16,6 @@
 #include "TStopwatch.h"
 #include "TPolyLine.h"
 #include "TMath.h"
-#include "TRandom3.h"
-#include "TRandom.h"
 #include "TClonesArray.h"
 #include "TString.h"
 
@@ -135,8 +133,6 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     Double_t           fMeanGasGain;   // Mean gas gain value (1e4 by default)
     Double_t           fDTime;         // Time resolution [ns]
     Int_t              fEvent;         // Event counter
-    TRandom3*          fRnd;           // Random generator
-    TRandom*           fLandauRnd;     // Random Landau distr. generator
     Double_t           fDeadPadsFrac;  // Probability to find a dead pad
     TStopwatch         fTimer;         // Timer
 

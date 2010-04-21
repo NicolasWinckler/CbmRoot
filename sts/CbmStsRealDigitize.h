@@ -23,7 +23,6 @@
 #include <set>
 #include "TStopwatch.h"
 #include "FairTask.h"
-#include "TRandom3.h"
 
 using std::set;
 using std::map;
@@ -107,8 +106,6 @@ class CbmStsRealDigitize : public FairTask
   Double_t          fStep;
 
   TStopwatch        fTimer;
-
-  TRandom3*         fGen;
 
   Bool_t    fRealistic;
   Double_t  fEnergyLossToSignal;

@@ -223,12 +223,12 @@ void CbmStsRealDigitize::Exec(Option_t* opt) {
       // the question is: sectorwise or sensorwise???
       Int_t nChannels = sector->GetNChannelsFront();
       for (Int_t iChannel=nChannels ; iChannel > 0 ; ) {
-// 	fStripSignalF[--iChannel] = fGen->Landau(.1,.02);
-// 	fStripSignalB[  iChannel] = fGen->Landau(.1,.02);
+// 	fStripSignalF[--iChannel] = gRandom->Landau(.1,.02);
+// 	fStripSignalB[  iChannel] = gRandom->Landau(.1,.02);
 // 	fStripSignalF[--iChannel] = 0.;
 // 	fStripSignalB[  iChannel] = 0.;
-	fStripSignalF[--iChannel] = TMath::Abs(fGen->Gaus(0.,fFNoiseWidth));
-	fStripSignalB[  iChannel] = TMath::Abs(fGen->Gaus(0.,fBNoiseWidth));
+	fStripSignalF[--iChannel] = TMath::Abs(gRandom->Gaus(0.,fFNoiseWidth));
+	fStripSignalB[  iChannel] = TMath::Abs(gRandom->Gaus(0.,fBNoiseWidth));
       }
       
       for (Int_t iSensor=sector->GetNSensors(); iSensor > 0 ; ) {
@@ -477,11 +477,6 @@ InitStatus CbmStsRealDigitize::Init() {
   // Register output array StsDigiMatches
   fDigiMatches = new TClonesArray("CbmStsDigiMatch",1000);
   ioman->Register("StsDigiMatch", "Digi Match in STS", fDigiMatches, kTRUE);
-
-  fGen = new TRandom3();
-  time_t curtime;
-  time(&curtime);
-  fGen->SetSeed(curtime);
 
   fStripSignalF = new Double_t[2000];
   fStripSignalB = new Double_t[2000];

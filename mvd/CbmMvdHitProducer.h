@@ -20,7 +20,6 @@
 
 #include "FairTask.h"
 
-#include "TRandom3.h"
 #include "TStopwatch.h"
 #include "TString.h"
 
@@ -28,7 +27,6 @@
 #include <map>
 
 class TClonesArray;
-class TRandom3;
 class CbmMvdGeoPar;
 class CbmMvdPileupManager;
 
@@ -111,7 +109,6 @@ class CbmMvdHitProducer : public FairTask
 
 
   /** Random generator and Stopwatch **/
-  TRandom3   fRandGen; 
   TStopwatch fTimer;
   
 

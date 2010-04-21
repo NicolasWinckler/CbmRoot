@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------
+#// ------------------------------------------------------------------------------
 // -----                    CbmMvdDigitizeL header file                     -----
 // -----                    Created by C.Dritsa (2009)                      -----
 // -----                    Maintained by M.Deveaux (m.deveaux(att)gsi.de   -----
@@ -19,7 +19,6 @@
 #include "CbmMvdDigi.h"
 #include "MyG4UniversalFluctuationForSi.h"
 
-#include "TRandom3.h"
 #include "TStopwatch.h"
 #include "TString.h"
 #include "TMath.h"
@@ -39,7 +38,6 @@
 
 
 class TClonesArray;
-class TRandom3;
 class CbmMvdGeoPar;
 class CbmMvdPileupManager;
 class CbmMvdStation;
@@ -154,7 +152,6 @@ public:
     Double_t fLandauMPV;
     Double_t fLandauSigma;
     Double_t fLandauGain;
-    TRandom3* fLandauRandom;
 
     Double_t fPixelSize;
     Double_t fPar0;
@@ -211,7 +208,6 @@ private:
 
 
   /** Random generator and Stopwatch **/
-  TRandom3   fRandGen; 
   TStopwatch fTimer;
   
 

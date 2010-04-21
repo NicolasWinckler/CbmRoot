@@ -25,6 +25,7 @@
 #include "TObjArray.h"
 #include "TDatabasePDG.h"
 #include "TFile.h"
+#include "TRandom.h"
 
 #include <iostream>
 #include <iomanip>
@@ -57,8 +58,6 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
   fMeanNoise = 0; //1500;
   SetDetectorType(kMICROMEGAS);
   fMeanGasGain = 1e4;
-  fRnd = new TRandom3();
-  fLandauRnd = new TRandom();
   fDeadPadsFrac = 0;
 
   Reset();
@@ -80,8 +79,6 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(Int_t iVerbose) :
   fMeanNoise = 0;//1500;
   SetDetectorType(kMICROMEGAS);
   fMeanGasGain = 1e4;
-  fRnd = new TRandom3();
-  fLandauRnd = new TRandom();
   fDeadPadsFrac = 0;
 
   Reset();
@@ -104,8 +101,6 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const c
   fMeanNoise = 0;//1500;
   SetDetectorType(kMICROMEGAS);
   fMeanGasGain = 1e4;
-  fRnd = new TRandom3();
-  fLandauRnd = new TRandom();
   fDeadPadsFrac = 0;
 
   Reset();
@@ -188,9 +183,9 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
   Double_t Tkin = TMath::Sqrt(mom2 + mass2) - mass; // kinetic energy of the particle
   Double_t sigma = CbmMuchDigitizeAdvancedGem::Sigma_n_e(Tkin, mass);      // sigma for Landau distribution
   Double_t mpv = CbmMuchDigitizeAdvancedGem::MPV_n_e(Tkin, mass);          // most probable value for Landau distr.
-  UInt_t nElectrons = (UInt_t) fLandauRnd->Landau(mpv, sigma);  // number of prim. electrons per 0.3 cm gap
+  UInt_t nElectrons = (UInt_t) gRandom->Landau(mpv, sigma);  // number of prim. electrons per 0.3 cm gap
   while (nElectrons > 50000)
-    nElectrons = (UInt_t) (fLandauRnd->Landau(mpv, sigma));     // restrict Landau tail to increase performance
+    nElectrons = (UInt_t) (gRandom->Landau(mpv, sigma));     // restrict Landau tail to increase performance
   // Number of electrons for current track length
   if (mass < 100.)
     nElectrons = (UInt_t) (nElectrons * lTrack / 0.47);
@@ -209,7 +204,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
   UInt_t nTrackCharge = 0;                  // total charge left by a track
   for (Int_t iElectron = 0; iElectron < nElectrons; iElectron++) {
     // Coordinates of primary electrons along the track
-    Double_t aL = fRnd->Rndm() * hypotenuse;
+    Double_t aL = gRandom->Rndm() * hypotenuse;
     Double_t xe = xIn + aL * cosphi_tr;
     Double_t ye = yIn + aL * sinphi_tr;
 
@@ -456,7 +451,7 @@ void CbmMuchDigitizeAdvancedGem::FirePads() {
     pair<Int_t, Long64_t> uniqueId = (*it).first;
     CbmMuchDigi* digi = (*it).second;
     CbmMuchDigiMatch* match = fChargedMatches[uniqueId];
-    Double_t rnd = fRnd->Rndm();
+    Double_t rnd = gRandom->Rndm();
     if (match->GetTotalCharge() > fQThreshold &&
         rnd > fDeadPadsFrac) {
       Int_t iDigi = -1;
@@ -492,7 +487,7 @@ void CbmMuchDigitizeAdvancedGem::AddNoise() {
 
 // -----   Private method AddNoise   ---------------------------------------
 void CbmMuchDigitizeAdvancedGem::AddNoise(CbmMuchPad* pad) {
-  Double_t rndGaus = TMath::Abs(fMeanNoise * fRnd->Gaus());
+  Double_t rndGaus = TMath::Abs(fMeanNoise * gRandom->Gaus());
   UInt_t iCharge = (UInt_t) rndGaus;
   Int_t detectorId = pad->GetDetectorId();
   Long64_t channelId  = pad->GetChannelId();
@@ -567,7 +562,7 @@ Bool_t CbmMuchDigitizeAdvancedGem::PolygonsIntersect(CbmMuchSector* sector,
 
 Int_t CbmMuchDigitizeAdvancedGem::GasGain() {
   //  const Double_t q_mean  = 1.e4;  // mean gas gain, arbitrary value
-  Double_t gasGain = -fMeanGasGain * TMath::Log(1 - fRnd->Rndm());
+  Double_t gasGain = -fMeanGasGain * TMath::Log(1 - gRandom->Rndm());
   if (gasGain < 0.)
     gasGain = 1e6;
   return (Int_t) gasGain;

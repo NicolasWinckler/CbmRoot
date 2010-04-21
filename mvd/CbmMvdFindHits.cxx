@@ -31,7 +31,7 @@
 
 #include "TClonesArray.h"
 
-#include "TRandom3.h"
+#include "TRandom.h"
 #include "TString.h"
 #include "TVector3.h"
 #include "TMath.h"

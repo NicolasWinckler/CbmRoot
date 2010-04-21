@@ -8,6 +8,7 @@
 #include "CbmStsSensorDigiPar.h"
 
 #include "TMath.h"
+#include "TRandom.h"
 
 #include <iostream>
 #include <list>
@@ -34,11 +35,6 @@ CbmStsSensor::CbmStsSensor() {
 
   fFrontLorentzShift = 0.132;
   fBackLorentzShift  = 0.026;
-
-  fGen = new TRandom3();
-  time_t curtime;
-  time(&curtime);
-  fGen->SetSeed(curtime);
 }
 // -------------------------------------------------------------------------
 
@@ -153,11 +149,6 @@ CbmStsSensor::CbmStsSensor(TString tempName, Int_t detId, Int_t iType, Double_t 
 
   fFrontLorentzShift = 0.132;
   fBackLorentzShift  = 0.026;
-
-  fGen = new TRandom3();
-  time_t curtime;
-  time(&curtime);
-  fGen->SetSeed(curtime);
 }
 // -------------------------------------------------------------------------
 
@@ -267,10 +258,6 @@ CbmStsSensor::CbmStsSensor(Int_t detId, Int_t iType, Double_t x0,
   fFrontLorentzShift = 0.132;
   fBackLorentzShift  = 0.026;
 
-  fGen = new TRandom3();
-  time_t curtime;
-  time(&curtime);
-  fGen->SetSeed(curtime);
 }
 // -------------------------------------------------------------------------
 
@@ -513,8 +500,8 @@ Int_t CbmStsSensor::GetFrontChannel(Double_t x, Double_t y, Double_t z) {
   if ( ! IntCoord(x, y, xint, yint) ) return -1;
   Int_t    iChan = 0;
 
-  xint += fGen->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
-  yint += fGen->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
+  xint += gRandom->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
+  yint += gRandom->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
   
   Double_t xf = xint + fFrontStripShift + yint * TMath::Tan(fStereoF);
   xf = xf - TMath::Floor(xf/fLx) * fLx;
@@ -545,8 +532,8 @@ Int_t CbmStsSensor::GetBackChannel (Double_t x, Double_t y, Double_t z) {
   if ( ! IntCoord(x, y, xint, yint) ) return -1;
   Int_t    iChan = 0;
 
-  xint += fGen->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
-  yint += fGen->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
+  xint += gRandom->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
+  yint += gRandom->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
 
   // Project point along backside strip to y = 0 
   Double_t xp = xint + fBackStripShift + yint * TMath::Tan(fStereoB);

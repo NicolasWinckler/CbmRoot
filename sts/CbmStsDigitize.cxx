@@ -223,12 +223,12 @@ void CbmStsDigitize::Exec(Option_t* opt) {
       // the question is: sectorwise or sensorwise???
       Int_t nChannels = sector->GetNChannelsFront();
       for (Int_t iChannel=nChannels ; iChannel > 0 ; ) {
-// 	fStripSignalF[--iChannel] = fGen->Landau(.1,.02);
-// 	fStripSignalB[  iChannel] = fGen->Landau(.1,.02);
+// 	fStripSignalF[--iChannel] = gRandom->Landau(.1,.02);
+// 	fStripSignalB[  iChannel] = gRandom->Landau(.1,.02);
 // 	fStripSignalF[--iChannel] = 0.;
 // 	fStripSignalB[  iChannel] = 0.;
-	fStripSignalF[--iChannel] = TMath::Abs(fGen->Gaus(0.,fFNoiseWidth));
-	fStripSignalB[  iChannel] = TMath::Abs(fGen->Gaus(0.,fBNoiseWidth));
+	fStripSignalF[--iChannel] = TMath::Abs(gRandom->Gaus(0.,fFNoiseWidth));
+	fStripSignalB[  iChannel] = TMath::Abs(gRandom->Gaus(0.,fBNoiseWidth));
       }
       
       for (Int_t iSensor=sector->GetNSensors(); iSensor > 0 ; ) {
@@ -245,7 +245,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	if ( fStripSignalF[ifstr] < fFThreshold ) continue;
         
 	Double_t generator;
-	generator = fGen->Rndm()*100.;	
+	generator = gRandom->Rndm()*100.;	
 // 	cout << "digi#" << fNDigis << " -> making fdigi at " << stationNr << "," << sectorNr 
 // 	     << " at channel " << ifstr << " with signal " << fStripSignalF[ifstr] << endl;        
 // 	if (generator< (fStripDeadTime/100.)*occupancy [iStation][iSector][ifstr/125])
@@ -288,7 +288,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	if ( fStripSignalB[ibstr] < fBThreshold ) continue;
 
 	Double_t generator;
-	generator = fGen->Rndm()*100.;
+	generator = gRandom->Rndm()*100.;
 // 	if (generator< (fStripDeadTime/100.)*occupancy [iStation][iSector][ibstr/125])
 // 	{
 // 	cout << "OCCUPANCYB [" << iStation+1 << "][" << iSector+1 << "][" << ibstr/125 << "] "<< fStripDeadTime*occupancy [iStation][iSector][ibstr/125] << "%  generator = "<<generator<< endl;
@@ -497,11 +497,6 @@ InitStatus CbmStsDigitize::Init() {
   // Register output array StsDigiMatches
   fDigiMatches = new TClonesArray("CbmStsDigiMatch",1000);
   ioman->Register("StsDigiMatch", "Digi Match in STS", fDigiMatches, kTRUE);
-
-  fGen = new TRandom3();
-  time_t curtime;
-  time(&curtime);
-  fGen->SetSeed(curtime);
 
   fStripSignalF = new Double_t[2000];
   fStripSignalB = new Double_t[2000];

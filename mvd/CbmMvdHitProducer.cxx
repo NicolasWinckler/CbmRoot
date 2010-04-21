@@ -22,7 +22,7 @@
 #include "TArrayD.h"
 #include "TClonesArray.h"
 #include "TObjArray.h"
-#include "TRandom3.h"
+#include "TRandom.h"
 #include "TString.h"
 #include "TVector3.h"
 
@@ -53,7 +53,6 @@ CbmMvdHitProducer::CbmMvdHitProducer()
   fHits          = new TClonesArray("CbmMvdHit");
   fMatches       = new TClonesArray("CbmMvdHitMatch");
   fPileupManager = NULL;
-  fRandGen.SetSeed(2736);
   fNEvents = 0;
   fNPoints = fNReal = fNBg = fNFake = fNLost = fNMerged = fTime = 0.;
   fSigmaX     = 0.0005;
@@ -76,7 +75,6 @@ CbmMvdHitProducer::CbmMvdHitProducer(const char* name, Int_t iMode,
   fHits          = new TClonesArray("CbmMvdHit");
   fMatches       = new TClonesArray("CbmMvdHitMatch");
   fPileupManager = NULL;
-  fRandGen.SetSeed(2736);
   fNEvents = 0;
   fNPoints = fNReal = fNBg = fNFake = fNLost = fNMerged = fTime = 0.;
   fSigmaX     = 0.0005;
@@ -261,7 +259,7 @@ void CbmMvdHitProducer::ExecMaps() {
 				  "No Pileup Manager!");
     TClonesArray* bgArray = NULL;
     Int_t nEvents     = fPileupManager->GetNEvents();
-    Int_t firstEvent  = fRandGen.Integer(nEvents-fNPileup+2);
+    Int_t firstEvent  = gRandom->Integer(nEvents-fNPileup+2);
     for (Int_t iBg=0; iBg<fNPileup-1; iBg++) {
       Int_t iEvent = firstEvent + iBg;
       bgArray = fPileupManager->GetEvent(iEvent);
@@ -550,7 +548,7 @@ void CbmMvdHitProducer::ProduceHits(TClonesArray* pointArray,
     point = (CbmMvdPoint*) pointArray->At(iPoint);
 
     // Loss due to detector inefficiency
-    if ( fRandGen.Rndm(1) > fEfficiency ) {
+    if ( gRandom->Rndm(1) > fEfficiency ) {
       mLost++;
       continue;
     }
@@ -565,8 +563,8 @@ void CbmMvdHitProducer::ProduceHits(TClonesArray* pointArray,
     Double_t zpt = 0.5 * ( point->GetZ() + point->GetZOut() );
 
     // Hit position (Gaussian smearing)
-    Double_t xHit = fRandGen.Gaus(xpt, fSigmaX);
-    Double_t yHit = fRandGen.Gaus(ypt, fSigmaY);
+    Double_t xHit = gRandom->Gaus(xpt, fSigmaX);
+    Double_t yHit = gRandom->Gaus(ypt, fSigmaY);
     pos.SetXYZ(xHit, yHit, zpt);
     dpos.SetXYZ(fSigmaX, fSigmaY, 0.);
 
@@ -603,7 +601,7 @@ Int_t CbmMvdHitProducer::ProduceFakes() {
   for (Int_t iFake=0; iFake<nFakes; iFake++) {
 
     // Select a random hit from the array
-    Int_t index = fRandGen.Integer(nHits);
+    Int_t index = gRandom->Integer(nHits);
     CbmMvdHit* trueHit = (CbmMvdHit*) fHits->At(index);
     Int_t statNr = trueHit->GetStationNr();
     trueHit->PositionError(dPos);
@@ -618,8 +616,8 @@ Int_t CbmMvdHitProducer::ProduceFakes() {
     Double_t rMax = fRadiusMap[statNr].second;
     
     // Generate position of fake hit (flat in radius and azimuth)
-    Double_t r   = fRandGen.Uniform(rMin, rMax);
-    Double_t phi = fRandGen.Uniform(0., twoPi);
+    Double_t r   = gRandom->Uniform(rMin, rMax);
+    Double_t phi = gRandom->Uniform(0., twoPi);
     pos.SetXYZ(r*TMath::Cos(phi), r*TMath::Sin(phi), trueHit->GetZ());
 
     // Create new fake hit and hit match

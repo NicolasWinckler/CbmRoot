@@ -30,7 +30,6 @@
 #define CBMSTSSENSOR_H 1
 
 #include "TNamed.h"
-#include "TRandom3.h"
 
 #include <map>
 #include <list>
@@ -187,8 +186,6 @@ class CbmStsSensor : public TNamed
   Double_t fStereoB;      // StereoB angle [rad] for strip sensor.
   
   Double_t fD;            // thickness of the sensor [cm]
-
-  TRandom3* fGen;
 
   /** Number of channels in front and back plane **/
   Int_t fNChannelsFront;

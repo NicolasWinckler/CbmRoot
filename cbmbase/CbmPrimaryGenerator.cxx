@@ -96,7 +96,7 @@ Bool_t CbmPrimaryGenerator::GenerateEvent(FairGenericStack* pStack) {
   if(fTimeProb!=0){
      fEventTime = fEventTime + fTimeProb->GetRandom();
   }else{
-     fEventTime = fEventTime + fRandGen->Uniform( fEventTimeMin,  fEventTimeMax);
+     fEventTime = fEventTime + gRandom->Uniform( fEventTimeMin,  fEventTimeMax);
   }
   
   fEvent->SetTime(fEventTime);

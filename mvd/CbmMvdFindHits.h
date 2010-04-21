@@ -17,8 +17,6 @@
 #include "TRefArray.h"
 #include "TCanvas.h"
 
-
-#include "TRandom3.h"
 #include "TStopwatch.h"
 #include "TString.h"
 #include "TMath.h"
@@ -31,7 +29,6 @@
 #include <utility>
 
 class TClonesArray;
-class TRandom3;
 class CbmMvdGeoPar;
 class CbmMvdPileupManager;
 class CbmMvdStation;

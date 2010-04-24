@@ -119,12 +119,23 @@ protected:
 			int stationGroup,
 			int station);
 
-	/* Adds the nearest hit to the track.
+	/* Adds the nearest hit to the track when fIsProcessSubstationsTogether == true.
 	 * @param track Pointer to the track.
 	 * @param hits Reference to hit vector from which the nearest hit will be attached.
 	 * @return True if the hit was attached to track.
 	 */
-	bool AddNearestHit(
+	bool AddNearestHit1(
+			CbmLitTrack* track,
+			HitPtrIteratorPair hits[],
+			const CbmLitTrackParam par[],
+			int nofSubstations);
+
+	/* Adds the nearest hit to the track when fIsProcessSubstationsTogether == false.
+	 * @param track Pointer to the track.
+	 * @param hits Reference to hit vector from which the nearest hit will be attached.
+	 * @return True if the hit was attached to track.
+	 */
+	bool AddNearestHit2(
 			CbmLitTrack* track,
 			HitPtrIteratorPair hits[],
 			const CbmLitTrackParam par[],

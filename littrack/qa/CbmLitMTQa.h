@@ -1,38 +1,57 @@
 #ifndef CBMLITMTQA_H_
 #define CBMLITMTQA_H_
 
-#include "FairTask.h"
-#include "CbmRichRingFinderHough.h"
-#include "CbmRichRingFinderHoughParallel.h"
+#include "CbmLitTask.h"
+
 #include <vector>
-#include "../../L1/OffLineInterface/CbmL1RichENNRingFinder.h"
 
-class CbmLitMTQa : public FairTask {
+class LitScalTrack;
+class LitScalPixelHit;
 
-    TClonesArray* fRichRings;        // Array of CbmRichRings
-    TClonesArray* fRichHits;         // Array of CbmRichHits
-
-    Int_t fEventNumber;
-    Double_t fExecTime;
-    static const int kMAX_NOF_THREADS = 80;
-    int fNofTasks;
-    int fNofEvents;
-
-    CbmRichRingFinderHough* fHT[kMAX_NOF_THREADS];
-    //CbmL1RichENNRingFinder* fHT[kMAX_NOF_THREADS];
-    std::vector<std::vector<CbmRichHoughHit> > fData;
+class CbmLitMTQa : public CbmLitTask
+{
 public:
-
+	/* Constructor */
     CbmLitMTQa();
+
+    /* Destructor */
     virtual ~CbmLitMTQa();
+
+	/* Inherited from FairTask */
     virtual InitStatus Init();
+
+	/* Inherited from FairTask */
     virtual void Exec(Option_t* option);
-    void DoTestWithTask();
 
-    void SetNofTasks(int n){fNofTasks = n;}
-    void SetNofEvents(int n){fNofEvents = n;}
+	/* Inherited from FairTask */
+	virtual void Finish();
 
-    ClassDef(CbmLitMTQa,1)
+	/* Inherited from FairTask */
+	virtual void SetParContainers();
+
+private:
+	TClonesArray* fStsTracks; // CbmStsTrack array
+	TClonesArray* fMuchPixelHits; // CbmMuchPixelHits array
+
+	void DoTestWithTasks(Int_t nofTasks);
+
+	// Event buffers
+	// [first index] - event number
+	// [second index] - hit/track number
+	std::vector<std::vector<LitScalPixelHit*> > fHits;
+	std::vector<std::vector<LitScalTrack*> > fTrackSeeds;
+
+//    Int_t fEventNumber;
+//    Double_t fExecTime;
+//    static const int kMAX_NOF_THREADS = 80;
+//    int fNofTasks;
+//    int fNofEvents;
+//
+//    CbmRichRingFinderHough* fHT[kMAX_NOF_THREADS];
+//    //CbmL1RichENNRingFinder* fHT[kMAX_NOF_THREADS];
+//    std::vector<std::vector<CbmRichHoughHit> > fData;
+
+    ClassDef(CbmLitMTQa, 1);
 };
 
 #endif /* CBMLITMTQA_H_ */

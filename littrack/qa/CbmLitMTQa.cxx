@@ -1,8 +1,19 @@
 #include "CbmLitMTQa.h"
-#include "CbmRichHit.h"
-#include "FairRootManager.h"
-#include "tbb/tick_count.h"
+#include "CbmLitConverter.h"
+#include "CbmLitEnvironment.h"
+#include "parallel/LitTrackFinderNNParallel.h"
+#include "parallel/LitConverter.h"
 
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "CbmMuchPixelHit.h"
+#include "CbmStsTrack.h"
+
+#include "TClonesArray.h"
+#include "TStopwatch.h"
+
+#include "tbb/tick_count.h"
 #include "tbb/task_scheduler_init.h"
 #include "tbb/task.h"
 #include "tbb/parallel_invoke.h"
@@ -14,15 +25,12 @@
 #include <iostream>
 #include <fstream>
 
-using namespace std;
-using namespace tbb;
-
 int threads_counter = -1;
-map<int, long> threadToCpuMap; // let get cpuId by threadId
-map<int, int> threadNumberToCpuMap; // let get cpuId by threadNumber (see threads_counter)
-spin_mutex mutex;
+std::map<int, long> threadToCpuMap; // let get cpuId by threadId
+std::map<int, int> threadNumberToCpuMap; // let get cpuId by threadNumber (see threads_counter)
+tbb::spin_mutex mutex;
 
-class TMyObserver: public task_scheduler_observer {
+class TMyObserver: public tbb::task_scheduler_observer {
 public:
 	void FInit(); // set cpu - thread correspondence
 protected:
@@ -33,11 +41,10 @@ protected:
 // set cpu - thread correspondence
 void TMyObserver::FInit() {
 	for (int i = 0; i < 8; i++) {
-		//threadNumberToCpuMap[2 * i + 0] = i;
-		//threadNumberToCpuMap[2 * i + 1] = i + 8;
-		threadNumberToCpuMap[i] = i;
-		threadNumberToCpuMap[8 + i] = i + 8;
-
+		threadNumberToCpuMap[2 * i + 0] = i;
+		threadNumberToCpuMap[2 * i + 1] = i + 8;
+		//threadNumberToCpuMap[i] = i;
+		//threadNumberToCpuMap[8 + i] = i + 8;
 	};
 	observe(true);
 }
@@ -45,15 +52,14 @@ void TMyObserver::FInit() {
 /// redefine function, which will be run at begining of execution of each thread
 #define handle_error_en(en, msg) do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)
 void TMyObserver::on_scheduler_entry(bool Is_worker) {
-	//cout << "-I-Scheduler entry" <<endl;
 	pthread_t I = pthread_self();
-	spin_mutex::scoped_lock lock;
+	tbb::spin_mutex::scoped_lock lock;
 	lock.acquire(mutex);
 	++threads_counter;
 	int cpuId = threadNumberToCpuMap[threads_counter % 16];
 
-	//cout << "ThrId=" << I << " thread have been created " << threads_counter << "-th.";
-	//cout << " And was run on cpu " << cpuId << endl;
+      //  std::cout << "ThrId=" << I << " thread have been created " << threads_counter << "-th.";
+      //  std::cout << " And was run on cpu " << cpuId << std::endl;
 
 	lock.release();
 	threadToCpuMap[I] = cpuId;
@@ -66,7 +72,7 @@ void TMyObserver::on_scheduler_entry(bool Is_worker) {
 	// cout << "before" << endl; //FIXME: segmentation fault somethere.
 	s = pthread_setaffinity_np(thread, sizeof(cpu_set_t), &cpuset);
 	if (s != 0) {
-		cout << " pthread_setaffinity_np " << endl;
+		std::cout << " pthread_setaffinity_np " << std::endl;
 //		handle_error_en(s, "pthread_setaffinity_np");
 	}
 };
@@ -75,29 +81,38 @@ void TMyObserver::on_scheduler_entry(bool Is_worker) {
 void TMyObserver::on_scheduler_exit(bool Is_worker) //FIXME: don't run
 {
 	pthread_t I = pthread_self();
-	cout << "Thread with number " << I << " was ended " << --threads_counter;
+	std::cout << "Thread with number " << I << " was ended " << --threads_counter;
 };
 
 
-class FinderTaskQa : public task {
-	//CbmL1RichENNRingFinder* fHT;
-	CbmRichRingFinderHough* fHT;
-    std::vector<std::vector<CbmRichHoughHit> > fData;
-	// std::vector<CbmRichHoughHit> fData;
+class FinderTaskQa : public tbb::task {
+	LitTrackFinderNNParallel* fFinder;
+	std::vector<std::vector<LitScalPixelHit*> >& fHits;
+	std::vector<std::vector<LitScalTrack*> >& fTrackSeeds;
 public:
-	FinderTaskQa(CbmRichRingFinderHough* HTImpl,
-			  const std::vector<std::vector<CbmRichHoughHit> > &data) {
-		fHT = HTImpl;
-		fData = data;
-		//fData.assign(data[0].begin(), data[0].end());
+	FinderTaskQa(
+			LitTrackFinderNNParallel* finder,
+			std::vector<std::vector<LitScalPixelHit*> >& hits,
+			std::vector<std::vector<LitScalTrack*> >& trackSeeds):
+		fFinder(finder),
+		fHits(hits),
+		fTrackSeeds(trackSeeds){
 	}
+
 	task* execute(){
-		//for (int j = 0; j < 10; j ++){
-			for (int i = 0; i < fData.size(); i ++){
-				//cout<< "rec event "<< i << endl;
-				fHT->DoFind(fData[i]);
-			}
-		//}//
+	    unsigned int nofEvents = fHits.size();
+//	    for (unsigned int iTimes = 0; iTimes < 5000; iTimes++) {
+	    for (unsigned int iEvent = 0; iEvent < nofEvents; iEvent++) {
+	    	unsigned int nofHits = fHits[iEvent].size();
+	    	LitScalPixelHit** lhits = &fHits[iEvent][0];
+	    	unsigned int nofTrackSeeds = fTrackSeeds[iEvent].size();
+	    	LitScalTrack** lseeds = &fTrackSeeds[iEvent][0];
+	    	LitScalTrack* ltracks[nofTrackSeeds];
+
+	    	unsigned int ntracks = 0;
+	    	fFinder->DoFind(lhits, nofHits, lseeds, nofTrackSeeds, ltracks, ntracks);
+	    }
+//	    }
 		return NULL;
 	}
 };
@@ -105,114 +120,223 @@ public:
 
 CbmLitMTQa::CbmLitMTQa()
 {
-	for (int i = 0; i < kMAX_NOF_THREADS;i++){
-		fHT[i] = new CbmRichRingFinderHough(0, "compact");
-		//fHT[i] = new CbmL1RichENNRingFinder(0);
-	}
-
-	fEventNumber = 0;
-	fExecTime = 0.;
+//	for (int i = 0; i < kMAX_NOF_THREADS;i++){
+//		fHT[i] = new CbmRichRingFinderHough(0, "compact");
+//		//fHT[i] = new CbmL1RichENNRingFinder(0);
+//	}
+//
+//	fEventNumber = 0;
+//	fExecTime = 0.;
 }
 
 CbmLitMTQa::~CbmLitMTQa()
 {
-	delete fHT;
+//	delete fHT;
 }
 
 InitStatus CbmLitMTQa::Init()
 {
-    cout << "InitStatus CbmLitMTQa::Init()" << endl;
-	// Get and check CbmRootManager
 	FairRootManager* ioman = FairRootManager::Instance();
-	if (!ioman) {
-		cout << "-E- CbmLitMTQa::Init: " << "RootManager not instantised!"<< endl;
-		return kERROR;
-	}
 
-	// Get hit Array
-	fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
-	if (!fRichHits) {
-		cout << "-W- CbmLitMTQa::Init: No RichHit array!" << endl;
-	}
+	fStsTracks = (TClonesArray*) ioman->GetObject("StsTrack");
+	if (NULL == fStsTracks) Fatal("CbmLitMTQa::Init", "No StsTrack array!");
 
-	// Get RichRing Array
-	fRichRings = (TClonesArray*) ioman->GetObject("RichRing");
-	if (!fRichRings) {
-		cout << "-E- CbmLitMTQa::Init: No RichRing array!" << endl;
-		return kERROR;
-	}
-	for (int i = 0; i<kMAX_NOF_THREADS;i++){
-		fHT[i]->Init();
-	}
+	fMuchPixelHits = (TClonesArray*) ioman->GetObject("MuchPixelHit");
+	if (NULL == fMuchPixelHits) Fatal("CbmLitMTQa::Init", "No MuchPixelHit array!");
 
-
-//	tbb::task_scheduler_init init();
-//	TMyObserver obs;
-//	obs.FInit();    // set cpu-threads correspondence
+       // tbb::task_scheduler_init init();
+       // TMyObserver obs;
+       // obs.FInit();    // set cpu-threads correspondence
 
     return kSUCCESS;
 }
 
 void CbmLitMTQa::Exec(Option_t* option)
 {
-	fEventNumber++;
-	cout << "-I- Read event " << fEventNumber<<endl;
-	std::vector<CbmRichHoughHit> data;
-
-	const Int_t nhits = fRichHits->GetEntriesFast();
-	if (!nhits) {
-		cout << "-E- CbmRichRingFinderHough::DoFind:No hits in this event."	<< endl;
-		return;
+	const Int_t nofHits = fMuchPixelHits->GetEntriesFast();
+	std::vector<LitScalPixelHit*> hits;
+	for(Int_t iHit = 0; iHit < nofHits; iHit++) {
+		CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fMuchPixelHits->At(iHit);
+		LitScalPixelHit* lhit = new LitScalPixelHit();
+		CbmPixelHitToLitScalPixelHit(hit, lhit);
+		hits.push_back(lhit);
 	}
-	data.reserve(nhits);
+	fHits.push_back(hits);
 
-	for(Int_t iHit = 0; iHit < nhits; iHit++) {
-		CbmRichHit * hit = (CbmRichHit*) fRichHits->At(iHit);
-		if (hit) {
-			CbmRichHoughHit tempPoint;
-			tempPoint.fHit.fX = hit->GetX();
-			tempPoint.fHit.fY = hit->GetY();
-			tempPoint.fX2plusY2 = hit->GetX() * hit->GetX() + hit->GetY() * hit->GetY();
-			tempPoint.fId = iHit;
-			tempPoint.fIsUsed = false;
-			data.push_back(tempPoint);
-		}
+	const Int_t nofTrackSeeds = fStsTracks->GetEntriesFast();
+	std::vector<LitScalTrack*> trackSeeds;
+	for(Int_t iTrack = 0; iTrack < nofTrackSeeds; iTrack++) {
+		CbmStsTrack* track = (CbmStsTrack*) fStsTracks->At(iTrack);
+		LitScalTrack* ltrack = new LitScalTrack();
+
+		FairTrackParam* par = track->GetParamLast();
+
+		LitTrackParam<fscal> lpar;
+
+		lpar.X = par->GetX();
+		lpar.Y = par->GetY();
+		lpar.Z = par->GetZ();
+		lpar.Tx = par->GetTx();
+		lpar.Ty = par->GetTy();
+		lpar.Qp = par->GetQp();
+		double cov[15];
+		par->CovMatrix(cov);
+		lpar.C0 = cov[0];
+		lpar.C1 = cov[1];
+		lpar.C2 = cov[2];
+		lpar.C3 = cov[3];
+		lpar.C4 = cov[4];
+		lpar.C5 = cov[5];
+		lpar.C6 = cov[6];
+		lpar.C7 = cov[7];
+		lpar.C8 = cov[8];
+		lpar.C9 = cov[9];
+		lpar.C10 = cov[10];
+		lpar.C11 = cov[11];
+		lpar.C12 = cov[12];
+		lpar.C13 = cov[13];
+		lpar.C14 = cov[14];
+
+		ltrack->chiSq = 0;
+		ltrack->NDF = 0;
+		ltrack->nofHits = 0;
+		ltrack->nofMissingHits = 0;
+		ltrack->paramFirst = lpar;
+		ltrack->paramLast = lpar;
+
+		trackSeeds.push_back(ltrack);
 	}
+	fTrackSeeds.push_back(trackSeeds);
 
-	fData.push_back(data);
+//
+//	if (fEventNumber == fNofEvents){
+//		cout << "-I- NofTasks = " << fNofTasks << endl;
+//		TMyObserver obs;
+//		obs.FInit();    // set cpu-threads correspondence
+//		obs.observe(true);
+//		tbb::task_scheduler_init init(fNofTasks);
+//		DoTestWithTask();
+//	}
 
-	if (fEventNumber == fNofEvents){
-		cout << "-I- NofTasks = " << fNofTasks << endl;
-		TMyObserver obs;
-		obs.FInit();    // set cpu-threads correspondence
-		obs.observe(true);
-		tbb::task_scheduler_init init(fNofTasks);
-		DoTestWithTask();
-	}
+	std::cout << "Event: " << fEventNo++ << std::endl;
 
 }
 
-void CbmLitMTQa::DoTestWithTask()
+void CbmLitMTQa::Finish()
 {
-	tbb::tick_count t0 = tbb::tick_count::now();
-	task* root_task = new (task::allocate_root()) empty_task;
-	root_task->set_ref_count(fNofTasks+1);
-	task_list list;
+    DoTestWithTasks(1);
+    DoTestWithTasks(2);
+    DoTestWithTasks(3);
+    DoTestWithTasks(4);
+    DoTestWithTasks(5);
+    DoTestWithTasks(6);
+    DoTestWithTasks(7);
+    DoTestWithTasks(8);
+    DoTestWithTasks(9);
+    DoTestWithTasks(10);
+    DoTestWithTasks(11);
+    DoTestWithTasks(12);
+    DoTestWithTasks(13);
+    DoTestWithTasks(14);
+    DoTestWithTasks(15);
+    DoTestWithTasks(16);
 
-	for (int iT = 0; iT < fNofTasks; iT++){
-		list.push_back(*new(root_task->allocate_child()) FinderTaskQa (fHT[iT], fData));
-	}
 
-	root_task->spawn_and_wait_for_all(list);
-	tbb::tick_count t1 = tbb::tick_count::now();
-
-	root_task->destroy(*root_task);
-	fExecTime += (t1-t0).seconds();
-	cout <<  1000.*fExecTime << " ms for " << fData.size()<< " events" << endl;
-	cout <<  1000.*fExecTime/ (fData.size())<< " ms per event "<< endl;
-	cout <<  fNofTasks*fData.size()/fExecTime << " events per sec"<< endl;
-
-	std::ofstream fout;
-	fout.open("parallel.txt",std::ios_base::app);
-	fout << (int)(fNofTasks*fData.size()/fExecTime) << ",";
 }
+
+void CbmLitMTQa::SetParContainers()
+{
+    FairRunAna* ana = FairRunAna::Instance();
+    FairRuntimeDb* rtdb = ana->GetRuntimeDb();
+
+    rtdb->getContainer("FairBaseParSet");
+    rtdb->getContainer("CbmGeoMuchPar");
+}
+
+void CbmLitMTQa::DoTestWithTasks(
+       Int_t nofTasks)
+{
+//    std::cout << "Number of tasks: " << nofTasks << std::endl;
+
+    tbb::task_scheduler_init init();
+    TMyObserver obs;
+    obs.FInit();    // set cpu-threads correspondence
+
+
+    // Create and initialize seperate track finder
+    // for each thread
+//    std::cout << "Creating tyracking..." << std::endl;
+    LitTrackFinderNNParallel* finder[nofTasks];
+//    std::cout << "Creating tracking finished..." << std::endl;
+    LitDetectorLayout<fvec> layout;
+//    std::cout << "Getting layout..." << std::endl;
+    CbmLitEnvironment* env = CbmLitEnvironment::Instance();
+    env->GetMuchLayoutVec(layout);
+//    std::cout << "Getting layout finished..." << std::endl;
+    for(Int_t i = 0; i < nofTasks; i++) {
+//	std::cout << "i=" << i << std::endl;
+        finder[i] = new LitTrackFinderNNParallel;
+	finder[i]->SetDetectorLayout(layout);
+    }
+
+//    std::cout << "Track finders created" << std::endl;
+//    Int_t nofEvents = fHits.size();
+//    std::cout << "Number of events: " << nofEvents << std::endl;
+//    TStopwatch timer;
+//	timer.Start();
+//	int trackcnt = 0;
+//    for (unsigned int iEvent = 0; iEvent < nofEvents; iEvent++) {
+//    	unsigned int nofHits = fHits[iEvent].size();
+//    	LitScalPixelHit** lhits = &fHits[iEvent][0];
+//    	unsigned int nofTrackSeeds = fTrackSeeds[iEvent].size();
+//    	LitScalTrack** lseeds = &fTrackSeeds[iEvent][0];
+//    	LitScalTrack* ltracks[nofTrackSeeds];
+//
+//    	unsigned int ntracks = 0;
+//    	finder.DoFind(lhits, nofHits, lseeds, nofTrackSeeds, ltracks, ntracks);
+//    	trackcnt += ntracks;
+//   }
+//   timer.Stop();
+//    std::cout << "trackcnt=" << trackcnt << std::endl;
+//	std::cout << "Time (total / per event): " << timer.RealTime() << " / "
+//		<< timer.RealTime() / nofEvents << std::endl;
+    //
+
+
+    TStopwatch timer;
+    timer.Start();
+//    tbb::tick_count t0 = tbb::tick_count::now();
+    tbb::task* root_task = new (tbb::task::allocate_root()) tbb::empty_task;
+    root_task->set_ref_count(nofTasks+1);
+    tbb::task_list list;
+
+    for (int iT = 0; iT < nofTasks; iT++){
+       list.push_back(*new(root_task->allocate_child()) FinderTaskQa (finder[iT], fHits, fTrackSeeds));
+    }
+
+    root_task->spawn_and_wait_for_all(list);
+//  tbb::tick_count t1 = tbb::tick_count::now();
+    timer.Stop();
+
+    root_task->destroy(*root_task);
+    //Double_t execTime = (t1-t0).seconds();
+    Double_t execTime = timer.RealTime();
+
+    static std::ofstream out("mtqa.txt");
+    out << "Number of tasks: " << nofTasks << ", number of events:" << fHits.size() << std::endl;
+    out << "Total time: " << 1000. * execTime << " ms" << std::endl;
+    out << "Time per event: " << 1000. * execTime/ (fHits.size()*nofTasks)<< " ms"<< std::endl;
+    out << "Events per sec: " << nofTasks * fHits.size() / execTime << std::endl;
+
+
+    for (int i = 0; i < nofTasks; i++){
+        delete finder[i];
+    }
+
+//	std::ofstream fout;
+//	fout.open("parallel.txt",std::ios_base::app);
+//	fout << (int)(fNofTasks*fData.size()/fExecTime) << ",";
+}
+
+ClassImp(CbmLitMTQa);
+

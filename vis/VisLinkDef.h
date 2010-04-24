@@ -12,5 +12,8 @@
 #pragma link C++ class CbmVisMuchCluster+;
 #pragma link C++ class CbmVisMuchStationFrame+;
 #pragma link C++ class CbmVisMuchModuleFrame+;
+#pragma link C++ class CbmVisMvdStationFrame+;
+#pragma link C++ class CbmVisMvd+;
+
 
 #endif

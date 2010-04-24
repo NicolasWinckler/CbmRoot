@@ -5,6 +5,7 @@ ${CBMROOT_SOURCE_DIR}/geobase
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base
 #${CBMROOT_SOURCE_DIR}/sts
+${CBMROOT_SOURCE_DIR}/mvd
 ${CBMROOT_SOURCE_DIR}/much
 ${CBMROOT_SOURCE_DIR}/much/geo
 ${CBMROOT_SOURCE_DIR}/much/reco
@@ -14,6 +15,7 @@ ${CBMROOT_SOURCE_DIR}/field
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmdata 
 ${CBMROOT_SOURCE_DIR}/cbmdata/much 
+${CBMROOT_SOURCE_DIR}/cbmdata/mvd 
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts 
 )
 
@@ -34,6 +36,8 @@ CbmVisPixelHit.cxx
 CbmVisMuchStationFrame.cxx  
 CbmVisMuchCluster.cxx 
 CbmVisMuchModuleFrame.cxx 
+CbmVisMvd.cxx
+CbmVisMvdStationFrame.cxx
 )
 
 # fill list of header files from list of source files

@@ -88,10 +88,8 @@ const CbmLitDetectorLayout& CbmLitEnvironment::GetLayout()
 //			}
 		} else
 		if (IsMuch() && !IsTrd()) {
-			std::cout << "BEGIN MUCH ALONE" << std::endl;
 			MuchLayout();
 			fLayout = fMuchLayout;
-			std::cout << "END MUCH ALONE" << std::endl;
 		} else
 		if (IsTrd() && !IsMuch()){
 			TrdLayout();

@@ -141,6 +141,7 @@ bool CbmLitTrackFinderNN::ProcessStation(
 		hits[iSubstation] = bounds;
 	}
 
+//	if (AddNearestHit1(track, hits, par, nofSubstations)) hitAdded = true;
 	if (fIsProcessSubstationsTogether) hitAdded = AddNearestHit1(track, hits, par, nofSubstations);
 	else hitAdded = AddNearestHit2(track, hits, par, nofSubstations);
 

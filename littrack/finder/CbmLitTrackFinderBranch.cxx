@@ -1,7 +1,6 @@
 /** CbmLitTrackFinderBranch.cxx
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2007
- * @version 1.0
  **/
 
 #include "CbmLitTrackFinderBranch.h"
@@ -21,11 +20,10 @@
 #include <iostream>
 #include <algorithm>
 
-//TODO: propagate track to the first detector station internally
-// here in the CbmLitTrackFinderBase class.
-
 CbmLitTrackFinderBranch::CbmLitTrackFinderBranch():
-	fMaxNofHitsInValidationGate(3)
+	fMaxNofHitsInValidationGate(3),
+	fIsProcessSubstationsTogether(true),
+	fMaxNofBranches(27)
 {
 }
 
@@ -129,6 +127,7 @@ void CbmLitTrackFinderBranch::ProcessStationGroup(
 {
    int nofStations = fLayout.GetNofStations(stationGroup);
    std::vector<TrackPtrVector> tracks(nofStations);
+   fNofBranches = 0;
 
    if (ProcessStation(track, stationGroup, 0, tracks[0])){ //0
 	   for (TrackPtrIterator trk0 = tracks[0].begin(); trk0 != tracks[0].end(); trk0++) { //1
@@ -171,7 +170,11 @@ bool CbmLitTrackFinderBranch::ProcessStation(
 	for_each(tracksOut.begin(), tracksOut.end(), DeleteObject());
 	tracksOut.clear();
 
-	bool isBranchCreated = ProcessStation1(track, stationGroup, station, tracksOut);
+	bool isBranchCreated;
+	if (fIsProcessSubstationsTogether)
+		isBranchCreated = ProcessStation1(track, stationGroup, station, tracksOut);
+	else
+		isBranchCreated = ProcessStation2(track, stationGroup, station, tracksOut);
 
 	bool isMissingHitOk = false;
 	if (fIsAlwaysCreateMissingHit || !isBranchCreated) {
@@ -194,6 +197,7 @@ bool CbmLitTrackFinderBranch::ProcessStation1(
 			int station,
 			TrackPtrVector& tracksOut)
 {
+	// if fIsProcessSubstationsTogether == true
 	bool result = false;
 	CbmLitTrackParam par(*track->GetParamLast());
 	HitPtrIteratorPair bounds;
@@ -213,24 +217,64 @@ bool CbmLitTrackFinderBranch::ProcessStation1(
 	// sort hits in the validation gate by the chi-square
 	if (nofHits > fMaxNofHitsInValidationGate){
 		std::sort(hits.begin(), hits.end(), CompareHitChiSqLess());
-	} else {
-
 	}
 
 	//Select the best hits to be attached
-
 	//Create track branches
 	int N = (nofHits > fMaxNofHitsInValidationGate) ? fMaxNofHitsInValidationGate : nofHits;
 	for (int iHit = 0; iHit < N; iHit++) {
 		CbmLitTrack* newTrack = new CbmLitTrack(*track);
 		newTrack->AddHit(hits[iHit].GetHit());
 		newTrack->SetChi2(newTrack->GetChi2() + hits[iHit].GetChiSq());
-//		newTrack->SortHits();
 		newTrack->SetPDG(fPDG);
-//		newTrack->SetLastPlaneId(stationGroup);
 		newTrack->SetParamLast(hits[iHit].GetParam());
 		tracksOut.push_back(newTrack);
 		result = true;
+	}
+
+	return result;
+}
+
+bool CbmLitTrackFinderBranch::ProcessStation2(
+			const CbmLitTrack *track,
+			int stationGroup,
+			int station,
+			TrackPtrVector& tracksOut)
+{
+	// if fIsProcessSubstationsTogether == true
+	bool result = false;
+	CbmLitTrackParam par(*track->GetParamLast());
+	int nofSubstations = fLayout.GetNofSubstations(stationGroup, station);
+	for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
+		HitPtrIteratorPair bounds;
+		std::vector<CbmLitHitChiSq> hits;
+
+		myf z = fLayout.GetSubstation(stationGroup, station, iSubstation).GetZ();
+		if (fPropagator->Propagate(&par, z, fPDG) == kLITERROR) return false;
+		bounds = MinMaxIndex(&par, fHitData.GetHits(stationGroup, station, iSubstation),
+				fLayout.GetStation(stationGroup, station), fHitData.GetMaxErr(stationGroup, station, iSubstation));
+		ProcessSubstation(&par, bounds, hits);
+
+		if (hits.empty()) continue; //return false;
+		int nofHits = hits.size();
+		// if too many hits in the validation gate,
+		// sort hits in the validation gate by the chi-square
+		if (nofHits > fMaxNofHitsInValidationGate){
+			std::sort(hits.begin(), hits.end(), CompareHitChiSqLess());
+		}
+
+		//Select the best hits to be attached
+		//Create track branches
+		int N = (nofHits > fMaxNofHitsInValidationGate) ? fMaxNofHitsInValidationGate : nofHits;
+		for (int iHit = 0; iHit < N; iHit++) {
+			CbmLitTrack* newTrack = new CbmLitTrack(*track);
+			newTrack->AddHit(hits[iHit].GetHit());
+			newTrack->SetChi2(newTrack->GetChi2() + hits[iHit].GetChiSq());
+			newTrack->SetPDG(fPDG);
+			newTrack->SetParamLast(hits[iHit].GetParam());
+			tracksOut.push_back(newTrack);
+			result = true;
+		}
 	}
 
 	return result;
@@ -262,6 +306,8 @@ bool CbmLitTrackFinderBranch::AddTrackCandidate(
 		int stationGroup)
 {
 	for (TrackPtrIterator it = tracks.begin(); it != tracks.end(); it++) {
+		fNofBranches++;
+		if (fNofBranches > fMaxNofBranches) return false;
 		CbmLitTrack* newTrack = new CbmLitTrack(**it);
 		newTrack->SetLastPlaneId(stationGroup);
 		newTrack->SetNDF(NDF(newTrack));

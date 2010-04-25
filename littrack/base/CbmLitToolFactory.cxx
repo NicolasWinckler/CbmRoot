@@ -253,6 +253,7 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderBranch->SetNofIter(1);
 		trdFinderBranch->IsUseFastSearch(true);
 		trdFinderBranch->SetPDG(211);
+		trdFinderBranch->IsProcessSubstationsTogether(true);
 		trdFinderBranch->SetMaxNofMissingHits(3);
 		trdFinderBranch->IsAlwaysCreateMissingHit(false);
 		trdFinderBranch->SetSigmaCoef(5.);
@@ -318,10 +319,11 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		muchFinderBranch->SetNofIter(1);
 		muchFinderBranch->IsUseFastSearch(true);
 		muchFinderBranch->SetPDG(13);
+		muchFinderBranch->IsProcessSubstationsTogether(true);
 		muchFinderBranch->SetMaxNofMissingHits(2);
 		muchFinderBranch->IsAlwaysCreateMissingHit(false);
 		muchFinderBranch->SetSigmaCoef(3.5);
-		muchFinderBranch->SetChiSqPixelHitCut(15);//13.86);
+		muchFinderBranch->SetChiSqPixelHitCut(15.);//13.86);
 		muchFinderBranch->SetChiSqStripHitCut(9.);
 		TrackFinderPtr finder(muchFinderBranch);
 		return finder;

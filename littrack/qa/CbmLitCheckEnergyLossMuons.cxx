@@ -1,19 +1,13 @@
-#include "CbmLitCheckEnergyLoss.h"
+#include "CbmLitCheckEnergyLossMuons.h"
 #include "CbmLitMaterialInfo.h"
 #include "CbmLitMaterialEffectsImp.h"
 #include "CbmLitTrackParam.h"
-
-#include "TGraph.h"
-#include "TMultiGraph.h"
-#include "TPad.h"
-#include "TCanvas.h"
-#include "TAxis.h"
-#include "TLegend.h"
-#include "TStyle.h"
+#include "CbmLitUtils.h"
+#include "CbmLitDrawHist.h"
 
 #include <cstdlib>
 
-CbmLitCheckEnergyLoss::CbmLitCheckEnergyLoss():
+CbmLitCheckEnergyLossMuons::CbmLitCheckEnergyLossMuons():
 	fMat("iron")
 {
 	fMom[0] = 47.04;
@@ -29,34 +23,28 @@ CbmLitCheckEnergyLoss::CbmLitCheckEnergyLoss():
 	fMom[10] = 391.7;
 	fMom[11] = 494.5;
 	fMom[12] = 899.5;
-	fMom[13] = 1101;
-	fMom[14] = 1502;
-	fMom[15] = 2103;
-	fMom[16] = 3104;
-	fMom[17] = 4104;
-	fMom[18] = 8105;
-	fMom[19] = 10110;
-	fMom[20] = 14110;
-	fMom[21] = 20110;
-	fMom[22] = 30110;
-	fMom[23] = 40110;
-	fMom[24] = 80110;
-	fMom[25] = 100100;
+	fMom[13] = 1101.;
+	fMom[14] = 1502.;
+	fMom[15] = 2103.;
+	fMom[16] = 3104.;
+	fMom[17] = 4104.;
+	fMom[18] = 8105.;
+	fMom[19] = 10110.;
+	fMom[20] = 14110.;
+	fMom[21] = 20110.;
+	fMom[22] = 30110.;
+	fMom[23] = 40110.;
+	fMom[24] = 80110.;
+	fMom[25] = 100100.;
 }
 
-CbmLitCheckEnergyLoss::~CbmLitCheckEnergyLoss()
+CbmLitCheckEnergyLossMuons::~CbmLitCheckEnergyLossMuons()
 {
 }
 
-void CbmLitCheckEnergyLoss::Check()
+void CbmLitCheckEnergyLossMuons::Check()
 {
-	gStyle->SetCanvasColor(kWhite);
-	gStyle->SetFrameFillColor(kWhite);
-	gStyle->SetFrameBorderMode(0);
-	gStyle->SetPadColor(kWhite);
-	gStyle->SetStatColor(kWhite);
-	gStyle->SetTitleFillColor(kWhite);
-	gStyle->SetPalette(1);
+	SetStyles();
 
 	CreateGraphs();
 
@@ -69,60 +57,46 @@ void CbmLitCheckEnergyLoss::Check()
 	DrawGraphs();
 }
 
-void CbmLitCheckEnergyLoss::DrawGraphs()
+void CbmLitCheckEnergyLossMuons::DrawGraphs()
 {
-	TCanvas *c1 = new TCanvas("energy_loss","c1",1100, 700);
-//    c1->SetGrid();
+	TCanvas *c1 = new TCanvas("mean_energy_loss_muons","mean_energy_loss_muons",700, 500);
 
-	for (int i = 0; i < 4; i++) {
-		fTable[i]->SetLineStyle(3);
-		fTable[i]->SetLineColor(2);
-		fTable[i]->SetMarkerColor(2);
-		fTable[i]->SetLineWidth(2);
-		fTable[i]->SetMarkerSize(2);
+	fTable[0]->GetXaxis()->SetLimits(45, 100102);
+	fTable[0]->SetMinimum(0.1);
+	fTable[0]->SetMaximum(10.);
 
-		fCalc[i]->SetLineStyle(1);
-		fCalc[i]->SetLineColor(1);
-		fCalc[i]->SetMarkerColor(1);
-		fCalc[i]->SetLineWidth(2);
-		fCalc[i]->SetMarkerSize(2);
-	}
-	fTable[0]->SetMarkerStyle(20);
-	fTable[1]->SetMarkerStyle(26);
-	fTable[2]->SetMarkerStyle(27);
-	fTable[3]->SetMarkerStyle(25);
+	DrawGraph(fTable[0], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
+			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+			kOpenCircle, true, true, "ALP");
 
-	fCalc[0]->SetMarkerStyle(20);
-	fCalc[1]->SetMarkerStyle(26);
-	fCalc[2]->SetMarkerStyle(27);
-	fCalc[3]->SetMarkerStyle(25);
+	DrawGraph(fTable[1], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
+			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+			kOpenSquare, true, true, "LP");
 
-	TMultiGraph* mg = new TMultiGraph();
-	for (int i = 0; i < 4; i++) {
-		mg->Add(fTable[i]);
-		mg->Add(fCalc[i]);
-	}
-	mg->SetMinimum(0.1);
-	mg->SetMaximum(10.);
-    gPad->SetLogx();
-	gPad->SetLogy();
+	DrawGraph(fTable[2], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
+			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+			kOpenTriangleUp, true, true, "LP");
 
-	mg->Draw("ALP");
+	DrawGraph(fTable[3], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
+			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+			kOpenDiamond, true, true, "LP");
 
-	mg->GetXaxis()->SetTitle("momentum [MeV/c]");
-	mg->GetYaxis()->SetTitle("energy loss [Mev*cm^2/g]");
-	mg->GetXaxis()->SetLimits(45, 100102);
 
-	Double_t textSize = 0.06;
-	mg->GetXaxis()->SetLabelSize(textSize);
-	mg->GetXaxis()->SetNdivisions(505, kTRUE);
-	mg->GetYaxis()->SetLabelSize(textSize);
-	mg->GetXaxis()->SetTitleSize(textSize);
-	mg->GetYaxis()->SetTitleSize(textSize);
-	mg->GetXaxis()->SetTitleOffset(1.0);
-	mg->GetYaxis()->SetTitleOffset(1.0);
-	gPad->SetLeftMargin(0.15);
-	gPad->SetBottomMargin(0.15);
+	DrawGraph(fCalc[0], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
+			LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
+			kOpenCircle, true, true, "LP");
+
+	DrawGraph(fCalc[1], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
+			LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
+			kOpenSquare, true, true, "LP");
+
+	DrawGraph(fCalc[2], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
+			LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
+			kOpenTriangleUp, true, true, "LP");
+
+	DrawGraph(fCalc[3], "momentum [MeV/c]", "energy loss [Mev*cm^2/g]",
+			LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
+			kOpenDiamond, true, true, "LP");
 
 //	TLegend* l1 = new TLegend(0.20, 0.97, 0.9, 0.7);
 //	l1->SetFillColor(kWhite);
@@ -137,12 +111,10 @@ void CbmLitCheckEnergyLoss::DrawGraphs()
 //	l1->AddEntry(fCalc[3],"pair production (calculation)","lp");
 //	l1->Draw();
 
-	c1->SaveAs("energy_loss.eps");
-	c1->SaveAs("energy_loss.svg");
-	c1->SaveAs("energy_loss.gif");
+	SaveCanvasAsImage(c1, fOutputDir);
 }
 
-void CbmLitCheckEnergyLoss::CalcEloss()
+void CbmLitCheckEnergyLossMuons::CalcEloss()
 {
 	CbmLitMaterialInfo material;
 	if (fMat == "tungsten") {
@@ -175,7 +147,7 @@ void CbmLitCheckEnergyLoss::CalcEloss()
 	}
 }
 
-void CbmLitCheckEnergyLoss::CreateGraphs()
+void CbmLitCheckEnergyLossMuons::CreateGraphs()
 {
 	for (int i = 0; i < 4; i++) {
 	    fTable[i] = new TGraph();
@@ -183,7 +155,7 @@ void CbmLitCheckEnergyLoss::CreateGraphs()
 	}
 }
 
-void CbmLitCheckEnergyLoss::FillTableIron()
+void CbmLitCheckEnergyLossMuons::FillTableIron()
 {
 	Double_t table_iron[26][4] = {
 		//ion    //brems   //pair   //total
@@ -226,7 +198,7 @@ void CbmLitCheckEnergyLoss::FillTableIron()
 	}
 }
 
-void CbmLitCheckEnergyLoss::FillTableTungsten()
+void CbmLitCheckEnergyLossMuons::FillTableTungsten()
 {
 	Double_t table_tungsten[26][4] = {
 		//ion    //brems   //pair   //total
@@ -269,7 +241,7 @@ void CbmLitCheckEnergyLoss::FillTableTungsten()
 	}
 }
 
-void CbmLitCheckEnergyLoss::FillTableCarbon()
+void CbmLitCheckEnergyLossMuons::FillTableCarbon()
 {
 	Double_t table_carbon[26][4] = {
 		//ion    //brems   //pair   //total
@@ -313,4 +285,4 @@ void CbmLitCheckEnergyLoss::FillTableCarbon()
 
 }
 
-ClassImp(CbmLitCheckEnergyLoss)
+ClassImp(CbmLitCheckEnergyLossMuons);

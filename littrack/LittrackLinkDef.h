@@ -16,6 +16,7 @@
 //#pragma link C++ class CbmLitEnvironment+;
 //#pragma link C++ class CbmLitToolFactory+;
 //#pragma link C++ class CbmLitHitData+;
+#pragma link C++ class CbmLitTask+;
 
 // cbm
 //#pragma link C++ class CbmPropagatorGeane+;
@@ -99,7 +100,7 @@
 #pragma link C++ class CbmLitRobustFitterAnalysis+;
 #pragma link C++ class CbmLitCheckSimpleGeo+;
 #pragma link C++ class CbmLitCheckField+;
-#pragma link C++ class CbmLitCheckEnergyLoss+;
+#pragma link C++ class CbmLitCheckEnergyLossMuons+;
 #pragma link C++ class CbmLitCheckMultipleScattering+;
 #pragma link C++ class CbmLitCheckBrem+;
 //#pragma link C++ class CbmLitTrackFitSpeedTest+;

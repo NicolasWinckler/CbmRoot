@@ -1,14 +1,15 @@
-#ifndef CBMLITCHECKENERGYLOSS_H_
-#define CBMLITCHECKENERGYLOSS_H_
+#ifndef CBMLITCHECKENERGYLOSSMUONS_H_
+#define CBMLITCHECKENERGYLOSSMUONS_H_
 
-#include "TObject.h"
+#include "CbmLitTask.h"
 #include <string>
 class TGraph;
 
-class CbmLitCheckEnergyLoss : public TObject {
+class CbmLitCheckEnergyLossMuons : public CbmLitTask
+{
 public:
-	CbmLitCheckEnergyLoss();
-	virtual ~CbmLitCheckEnergyLoss();
+	CbmLitCheckEnergyLossMuons();
+	virtual ~CbmLitCheckEnergyLossMuons();
 
 	virtual void Check();
 
@@ -29,7 +30,7 @@ private:
 	TGraph* fCalc[4];
 	std::string fMat;
 
-	ClassDef(CbmLitCheckEnergyLoss, 1);
+	ClassDef(CbmLitCheckEnergyLossMuons, 1);
 };
 
-#endif /* CBMLITCHECKENERGYLOSS_H_ */
+#endif /* CBMLITCHECKENERGYLOSSMUONS_H_ */

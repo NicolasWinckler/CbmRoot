@@ -56,6 +56,7 @@ base/CbmLitToolFactory.cxx
 base/CbmLitHitData.cxx
 base/CbmLitFieldFitter.cxx
 base/CbmLitSimpleGeometryConstructor.cxx
+base/CbmLitTask.cxx
 cbm/CbmPropagatorGeane.cxx
 cbm/CbmPropagatorLit.cxx
 data/CbmLitTrackParam.cxx
@@ -106,7 +107,7 @@ qa/CbmLitRobustFitterAnalysis.cxx
 qa/CbmLitCheckSimpleGeo.cxx 
 qa/CbmLitCheckField.cxx
 #qa/CbmLitParallelTrackFitterTest.cxx 
-qa/CbmLitCheckEnergyLoss.cxx
+qa/CbmLitCheckEnergyLossMuons.cxx
 qa/CbmLitCheckBrem.cxx 
 #qa/CbmLitTrackFitSpeedTest.cxx
 qa/CbmTrdHitsQa.cxx
@@ -132,6 +133,7 @@ utils/CbmLitDrawHist.cxx
 utils/CbmLitUtils.cxx)
 
 set(LITTRACK_HEADERS
+base/CbmLitTask.h
 cbm/CbmPropagatorGeane.h
 cbm/CbmPropagatorLit.h
 finder_cbm/CbmLitTrdTrackFinderBranch.h
@@ -155,7 +157,7 @@ qa/CbmLitPropagationAnalysis.h
 qa/CbmLitRobustFitterAnalysis.h
 qa/CbmLitCheckSimpleGeo.h 
 qa/CbmLitCheckField.h
-qa/CbmLitCheckEnergyLoss.h 
+qa/CbmLitCheckEnergyLossMuons.h 
 qa/CbmLitCheckMultipleScattering.h
 qa/CbmLitCheckBrem.h 
 #qa/CbmLitTrackFitSpeedTest.h

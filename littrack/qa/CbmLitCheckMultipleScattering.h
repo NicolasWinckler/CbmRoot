@@ -33,6 +33,8 @@ private:
 	          const CbmLitTrackParam* par,
 	          const CbmLitMaterialInfo* mat) const;
 
+	void Draw();
+
     TClonesArray* fMCTrackArray;
     TClonesArray* fMCPointArray;
 

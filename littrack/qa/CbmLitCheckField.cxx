@@ -50,15 +50,6 @@ CbmLitCheckField::~CbmLitCheckField()
 
 InitStatus CbmLitCheckField::Init()
 {
-	// Some style settings for drawing
-//	gStyle->SetCanvasColor(kWhite);
-//	gStyle->SetFrameFillColor(kWhite);
-//	gStyle->SetPadColor(kWhite);
-//	gStyle->SetStatColor(kWhite);
-//	gStyle->SetTitleFillColor(kWhite);
-//	gStyle->SetPalette(1);
-//	gStyle->SetOptStat(0);
-
 	// Set draw styles
 	SetStyles();
 
@@ -413,8 +404,8 @@ void CbmLitCheckField::DrawHistosPoly(
 	for (Int_t s = 0; s < fNofSlices; s++) {
 		std::stringstream ss;
 		ss << "field_" + opt + "_degree_z_" << fZpos[s];
-		canvas[s] = new TCanvas(ss.str().c_str(), ss.str().c_str(), 1500,500);
-		canvas[s]->Divide(4, 1);
+		canvas[s] = new TCanvas(ss.str().c_str(), ss.str().c_str(), 1000,800);
+		canvas[s]->Divide(2, 2);
 	}
 
 	for (int i = 0; i < fNofSlices; i++) {

@@ -25,13 +25,16 @@
 
 #include "CbmDetectorList.h"
 #include "CbmStsDetectorId.h"
-
+#include "FairMultiLinkedData.h"
 
 #include "TObject.h"
+#include "TString.h"
 
+#include <iostream>
+#include <vector>
+#include <set>
 
-
-class CbmStsDigi : public TObject, public CbmStsDetectorId
+class CbmStsDigi : public FairMultiLinkedData,  public CbmStsDetectorId
 {
 
  public:
@@ -49,7 +52,9 @@ class CbmStsDigi : public TObject, public CbmStsDetectorId
    **@param adc      Charge ADC channel (0 - 4095)
    **@param time     Time within event [ns]
    **/
-  CbmStsDigi(Int_t station, Int_t sector, Int_t side, 
+  CbmStsDigi(std::vector<Int_t> index, Int_t station, Int_t sector, Int_t side, 
+	     Int_t channel, Int_t adc, Int_t time);
+  CbmStsDigi(Int_t index, Int_t station, Int_t sector, Int_t side, 
 	     Int_t channel, Int_t adc, Int_t time);
 
 
@@ -59,7 +64,12 @@ class CbmStsDigi : public TObject, public CbmStsDetectorId
 
   /**   Add charge   **/
   void AddAdc(Int_t adc);
-
+  void AddIndex(int index){
+			AddLink(FairLink(kStsPoint, index));
+		}
+  void AddIndex(std::vector<Int_t> index){
+			SetLinks(FairMultiLinkedData(kStsPoint, index));
+		}
 
   /**   Station number   **/
   Int_t GetStationNr() const { return StationNr(GetDetectorId()); }

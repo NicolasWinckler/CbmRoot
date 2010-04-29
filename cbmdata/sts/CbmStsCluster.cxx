@@ -26,7 +26,7 @@ CbmStsCluster::CbmStsCluster() {
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-CbmStsCluster::CbmStsCluster(Int_t iStation, Int_t iSector, Int_t iSide)
+CbmStsCluster::CbmStsCluster(Int_t index, Int_t iStation, Int_t iSector, Int_t iSide)
 {
   
   // Check range for station, sector and side
@@ -42,7 +42,7 @@ CbmStsCluster::CbmStsCluster(Int_t iStation, Int_t iSector, Int_t iSide)
     cout << "-E- CbmStsCluster: Illegal side number " << iSide <<  endl;
     Fatal("", "Illegal side number");
   }
-
+  AddIndex(index);
   // System id is set by the base class constructor on bits 0-4
   fDetectorId  =         2 << 24 ;  // station nr. on bits  5-12
   fDetectorId |= (iStation << 16);  // station nr. on bits  5-12

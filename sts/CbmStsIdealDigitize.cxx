@@ -182,7 +182,7 @@ void CbmStsIdealDigitize::Exec(Option_t* opt) {
     pair<Int_t, Int_t> a(sectorDetId, channelF);
     if ( fChannelMap.find(a) == fChannelMap.end() ) {
       // Channel not yet active. Create new Digi and Match.
-      new ((*fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
+      new ((*fDigis)[fNDigis]) CbmStsDigi(iPoint, stationNr, sectorNr,
 					  0, channelF, 0, 0);
       new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(iPoint);
       fChannelMap[a] = fNDigis;
@@ -215,7 +215,7 @@ void CbmStsIdealDigitize::Exec(Option_t* opt) {
     pair<Int_t, Int_t> b(sectorDetId, channelB);
     if ( fChannelMap.find(b) == fChannelMap.end() ) {
       // Channel not yet active. Create new Digi and Match.
-      new ((*fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
+      new ((*fDigis)[fNDigis]) CbmStsDigi(iPoint, stationNr, sectorNr,
 					  1, channelB, 0, 0);
       new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(iPoint);
       fChannelMap[b] = fNDigis;

@@ -408,7 +408,7 @@ Int_t CbmStsRealClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int
     digiSig = digi->GetADC();
     
     if ( lastDigiPos == -1 ) {
-      cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(stationNr,sectorNr,iSide);
+      cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(iDigi,stationNr,sectorNr,iSide);
        //   cout << "first cluster ADC        "  << digiSig << endl;
       clusterBeginPos = digiPos;
     }
@@ -424,7 +424,7 @@ Int_t CbmStsRealClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int
       if ( digiSig > lastDigiSig && lastDigiSig < clusterMaxSig ) {
 	cluster->SetMean(clusterMaxNr);
       //      cluster->SetMeanError(clusterMaxSig);
-	cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(stationNr,sectorNr,iSide);
+	cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(iDigi,stationNr,sectorNr,iSide);
 
 	cluster->AddDigi(lastDigiNr);
 	//	cout << "         +end cluster " << lastDigiPos << endl;
@@ -451,7 +451,7 @@ Int_t CbmStsRealClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int
     else if ( lastDigiPos>=0 ) {
       cluster->SetMean(clusterMaxNr);
       //      cluster->SetMeanError(clusterMaxSig);
-      cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(stationNr,sectorNr,iSide);
+      cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(iDigi,stationNr,sectorNr,iSide);
       //    cout << "          end cluster " << lastDigiPos << endl;
   
       //    cout << "new cluster           " << digiPos << endl;
@@ -486,7 +486,7 @@ Int_t CbmStsRealClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int
       cluster->SetMean(clusterMaxNr);
       //      cluster->SetMeanError(clusterMaxSig);
 
-      cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(stationNr,sectorNr,iSide);
+      cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(iDigi,stationNr,sectorNr,iSide);
       cluster->AddDigi(iDigi);
 
       clusterWidth = lastDigiPos - clusterBeginPos + 1;

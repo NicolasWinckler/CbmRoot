@@ -21,11 +21,15 @@
 #ifndef CBMSTSSHIT_H
 #define CBMSTSSHIT_H 1
 
-
-
 #include "CbmHit.h"
 
-#include "TVector3.h"
+#include "FairMultiLinkedData.h"
+#include "CbmDetectorList.h"
+#include "TObject.h"
+#include "TString.h"
+
+#include <iostream>
+#include <vector>
 
 
 class CbmStsHit : public CbmHit
@@ -60,6 +64,8 @@ class CbmStsHit : public CbmHit
 
 
   /** Accessors **/
+
+  
   Int_t    GetSystemId()           const { 
     return ( fDetectorID & (15<<24) ) >> 24; }
   virtual  Int_t    GetStationNr()  const { 
@@ -77,14 +83,15 @@ class CbmStsHit : public CbmHit
 
   Int_t SetStatLayer(Int_t it)              { fStatLayer = it; }
   Int_t GetStatLayer()                const { return fStatLayer; }
-
+  void AddIndex(int index){
+			AddLink(FairLink(kStsCluster, index));
+		}
 
   /** Screen output **/
   virtual void Print(Option_t* opt) const;
 
 
  private:
-
   Int_t fDigiF;          // Channel number front side
   Int_t fDigiB;          // Channel number back side
 

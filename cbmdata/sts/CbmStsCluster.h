@@ -28,12 +28,16 @@
 #ifndef CBMSTSCLUSTER_H
 #define CBMSTSCLUSTER_H 1
 
-
+#include "FairMultiLinkedData.h"
 #include "CbmDetectorList.h"
 
 #include "TObject.h"
+#include "TString.h"
 
-class CbmStsCluster : public TObject
+#include <iostream>
+#include <vector>
+
+class CbmStsCluster : public FairMultiLinkedData
 {
 
  public:
@@ -49,13 +53,15 @@ class CbmStsCluster : public TObject
    **@param iSide     0=front side; 1=back side
    **@param iChannel  channel number
    **/
-  CbmStsCluster(Int_t iStation, Int_t iSector, Int_t iSide);
+  CbmStsCluster(Int_t index, Int_t iStation, Int_t iSector, Int_t iSide);
 
   /** Destructor **/
   virtual ~CbmStsCluster();
 
   void AddDigi(Int_t idigi)  { fDigis[fNofDigis++] = idigi; }
-
+  void AddIndex(int index){
+			AddLink(FairLink(kStsDigi, index));
+		}
   void SetMean     (Double_t chan) { fChannel = chan; }
   void SetMeanError(Double_t err)  { fError   = err;  }
 

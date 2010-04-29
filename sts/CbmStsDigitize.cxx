@@ -38,7 +38,7 @@
 #include <iostream>
 #include <iomanip>
 #include <map>
-
+#include <vector>
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -52,7 +52,7 @@ using std::setprecision;
 using std::set;
 using std::map;
 using std::ios_base;
-
+using std::vector;
 
 // -----   Default constructor   ------------------------------------------
 CbmStsDigitize::CbmStsDigitize() : FairTask("STS Digitizer", 1) {
@@ -223,12 +223,12 @@ void CbmStsDigitize::Exec(Option_t* opt) {
       // the question is: sectorwise or sensorwise???
       Int_t nChannels = sector->GetNChannelsFront();
       for (Int_t iChannel=nChannels ; iChannel > 0 ; ) {
-// 	fStripSignalF[--iChannel] = gRandom->Landau(.1,.02);
-// 	fStripSignalB[  iChannel] = gRandom->Landau(.1,.02);
+// 	fStripSignalF[--iChannel] = fGen->Landau(.1,.02);
+// 	fStripSignalB[  iChannel] = fGen->Landau(.1,.02);
 // 	fStripSignalF[--iChannel] = 0.;
 // 	fStripSignalB[  iChannel] = 0.;
-	fStripSignalF[--iChannel] = TMath::Abs(gRandom->Gaus(0.,fFNoiseWidth));
-	fStripSignalB[  iChannel] = TMath::Abs(gRandom->Gaus(0.,fBNoiseWidth));
+	fStripSignalF[--iChannel] = TMath::Abs(fGen->Gaus(0.,fFNoiseWidth));
+	fStripSignalB[  iChannel] = TMath::Abs(fGen->Gaus(0.,fBNoiseWidth));
       }
       
       for (Int_t iSensor=sector->GetNSensors(); iSensor > 0 ; ) {
@@ -245,7 +245,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	if ( fStripSignalF[ifstr] < fFThreshold ) continue;
         
 	Double_t generator;
-	generator = gRandom->Rndm()*100.;	
+	generator = fGen->Rndm()*100.;	
 // 	cout << "digi#" << fNDigis << " -> making fdigi at " << stationNr << "," << sectorNr 
 // 	     << " at channel " << ifstr << " with signal " << fStripSignalF[ifstr] << endl;        
 // 	if (generator< (fStripDeadTime/100.)*occupancy [iStation][iSector][ifstr/125])
@@ -257,14 +257,17 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	
 	Int_t digiFSignal = 1+(Int_t)((fStripSignalF[ifstr]-fFThreshold)/fFMinStep);
 	if ( digiFSignal >= fFNofSteps ) digiFSignal = fFNofSteps-1;
-	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
-						  0, ifstr, 
-						  digiFSignal, 0);
+
+// 	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
+// 						  0, ifstr, 
+// 						  digiFSignal, 0);
 	//						  fStripSignalF[ifstr], 0);
 	set<Int_t>::iterator it1;
 	set<Int_t> chPnt = fFChannelPointsMap[ifstr];
 	Int_t pnt;
 	CbmStsDigiMatch* match;
+        CbmStsPoint* point = NULL;
+        CbmStsDigi* digi;
 	if ( chPnt.size() == 0 ) {
 // 	  cout << "digi#" << fNDigis << " -> making fdigi at " << stationNr << "," << sectorNr 
 // 	       << " at channel " << ifstr << " with signal " << fStripSignalF[ifstr] << endl;
@@ -273,11 +276,17 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	else {
 	  for (it1=chPnt.begin(); it1!=chPnt.end(); it1++) {
 	    pnt = (*it1);
-	    if ( it1==chPnt.begin() ) 
+	    point  = (CbmStsPoint*) fPoints->At(pnt);
+	    if ( it1==chPnt.begin() ) {
 	      match = new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(pnt);
+	      digi  = new ((      *fDigis)[fNDigis]) CbmStsDigi(pnt, stationNr, sectorNr,
+						  0, ifstr, 
+						  digiFSignal, 0);
+	    }
 	    else {
 	      match->AddPoint(pnt);
 	      fNMulti++;
+	      digi->AddIndex(pnt);
 	    }
 	  }
 	}
@@ -288,7 +297,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	if ( fStripSignalB[ibstr] < fBThreshold ) continue;
 
 	Double_t generator;
-	generator = gRandom->Rndm()*100.;
+	generator = fGen->Rndm()*100.;
 // 	if (generator< (fStripDeadTime/100.)*occupancy [iStation][iSector][ibstr/125])
 // 	{
 // 	cout << "OCCUPANCYB [" << iStation+1 << "][" << iSector+1 << "][" << ibstr/125 << "] "<< fStripDeadTime*occupancy [iStation][iSector][ibstr/125] << "%  generator = "<<generator<< endl;
@@ -298,14 +307,16 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 
 	Int_t digiBSignal = 1+(Int_t)((fStripSignalB[ibstr]-fBThreshold)/fBMinStep);
 	if ( digiBSignal >= fBNofSteps ) digiBSignal = fBNofSteps-1;
-	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
-						  1, ibstr, 
-						  digiBSignal, 0);
+// 	new ((      *fDigis)[fNDigis]) CbmStsDigi(stationNr, sectorNr,
+// 						  1, ibstr, 
+// 						  digiBSignal, 0);
 	//						  fStripSignalB[ibstr], 0);
 	set<Int_t>::iterator it1;
 	set<Int_t> chPnt = fBChannelPointsMap[ibstr];
 	Int_t pnt;
+        CbmStsPoint* point = NULL;
 	CbmStsDigiMatch* match;
+        CbmStsDigi* digi;
 	if ( chPnt.size() == 0 ) {
 // 	  cout << "digi#" << fNDigis << " -> making fdigi at " << stationNr << "," << sectorNr 
 // 	       << " at channel " << ifstr << " with signal " << fStripSignalF[ifstr] << endl;
@@ -314,11 +325,17 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	else {
 	  for (it1=chPnt.begin(); it1!=chPnt.end(); it1++) {
 	    pnt = (*it1);
-	    if ( it1==chPnt.begin() ) 
-	    match = new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(pnt);
+            point  = (CbmStsPoint*) fPoints->At(pnt);
+	    if ( it1==chPnt.begin() ) {
+	      match = new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(pnt);
+	      digi  = new ((      *fDigis)[fNDigis]) CbmStsDigi(pnt, stationNr, sectorNr,
+						  1, ibstr, 
+						  digiBSignal, 0);
+	    }
 	    else {
 	      match->AddPoint(pnt);
 	      fNMulti++;
+	      digi->AddIndex(pnt);
 	    }
 	  }
 	}
@@ -497,6 +514,11 @@ InitStatus CbmStsDigitize::Init() {
   // Register output array StsDigiMatches
   fDigiMatches = new TClonesArray("CbmStsDigiMatch",1000);
   ioman->Register("StsDigiMatch", "Digi Match in STS", fDigiMatches, kTRUE);
+
+  fGen = new TRandom3();
+  time_t curtime;
+  time(&curtime);
+  fGen->SetSeed(curtime);
 
   fStripSignalF = new Double_t[2000];
   fStripSignalB = new Double_t[2000];

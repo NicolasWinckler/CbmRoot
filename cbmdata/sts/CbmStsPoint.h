@@ -83,7 +83,10 @@ class CbmStsPoint : public FairMCPoint
   /** Modifiers **/
   void SetPositionOut(TVector3 pos);
   void SetMomentumOut(TVector3 mom);
-
+  virtual void SetTrackID(Int_t id){
+	  //SetLink(kMCTrack, id);
+	  FairMCPoint::SetTrackID(id);
+  };
 
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;

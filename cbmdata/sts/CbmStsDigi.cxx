@@ -44,16 +44,23 @@ CbmStsDigi::CbmStsDigi() : fData(0) {
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmStsDigi::CbmStsDigi(Int_t station, Int_t sector, Int_t side, 
+CbmStsDigi::CbmStsDigi(std::vector<Int_t> index, Int_t station, Int_t sector, Int_t side, 
 		       Int_t channel, Int_t adc, Int_t time) {
-
+  AddIndex(index);
   fData = ( (DetectorId(station, sector, side, channel) >> 4) & fgkAddrMask )
     | ( (adc  & fgkCharMask) << fgkCharShift )
     | ( (time & fgkTimeMask) << fgkTimeShift ) ;
  
 }
 // -------------------------------------------------------------------------
-
+CbmStsDigi::CbmStsDigi(Int_t index, Int_t station, Int_t sector, Int_t side, 
+		       Int_t channel, Int_t adc, Int_t time) {
+  AddIndex(index);
+  fData = ( (DetectorId(station, sector, side, channel) >> 4) & fgkAddrMask )
+    | ( (adc  & fgkCharMask) << fgkCharShift )
+    | ( (time & fgkTimeMask) << fgkTimeShift ) ;
+ 
+}
 
 
 

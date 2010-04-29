@@ -11,4 +11,10 @@
  
 enum DetectorId {kREF, kMVD, kSTS, kRICH, kMUCH, kTRD, kTOF, kECAL, kZDC, kSTT,kTutDet};
 
+
+enum fDetectorType {  
+   kUnknown, kMCTrack,
+   kStsPoint, kStsDigi, kStsCluster, kStsHit};
+
+
 #endif

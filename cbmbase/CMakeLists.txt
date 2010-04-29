@@ -5,15 +5,10 @@
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
 ${CBMROOT_SOURCE_DIR}/geobase 
-${CMAKE_SOURCE_DIR}/parbase
 ${CBMROOT_SOURCE_DIR}/base 
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmdata
-${CMAKE_SOURCE_DIR}/cbmdata/sts
-${CMAKE_SOURCE_DIR}/field 
-${CMAKE_SOURCE_DIR}/trackbase
-${CMAKE_SOURCE_DIR}/geane
-${CMAKE_SOURCE_DIR}/genfit
+
 //${CBMROOT_SOURCE_DIR}/cbmdata/rich
 )
 
@@ -50,17 +45,6 @@ CbmPrimaryVertexFinder.cxx
 CbmRichMerger.cxx
 CbmTofMerger.cxx
 CbmTrackMerger.cxx
-CbmMCMatch.cxx
-CbmMCMatchCreatorTask.cxx
-CbmMCMatchLoaderTask.cxx
-CbmMCMatchSelectorTask.cxx
-CbmMCObject.cxx
-CbmMCStage.cxx
-CbmMCResult.cxx
-#CbmMCTestMomentumCompare.cxx
-CbmMCTestHitCompare.cxx
-CbmMCEntry.cxx
-CbmMCList.cxx
 )
 
 if(RULE_CHECKER_FOUND)

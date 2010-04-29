@@ -31,5 +31,16 @@
 #pragma link C++ class CbmTofMerger+;
 #pragma link C++ class CbmTrackMerger+;
 
+#pragma link C++ class CbmMCMatch+;
+#pragma link C++ class CbmMCMatchCreatorTask+;
+#pragma link C++ class CbmMCMatchLoaderTask+;
+#pragma link C++ class CbmMCMatchSelectorTask+;
+#pragma link C++ class CbmMCObject+;
+#pragma link C++ class CbmMCStage+;
+#pragma link C++ class CbmMCResult+;
+
+#pragma link C++ class CbmMCTestHitCompare+;
+#pragma link C++ class CbmMCEntry+;
+#pragma link C++ class CbmMCList+;
 #endif
 

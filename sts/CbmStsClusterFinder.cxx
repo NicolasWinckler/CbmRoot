@@ -353,6 +353,7 @@ void CbmStsClusterFinder::SortDigis() {
     stationNr = digi->GetStationNr();
     sectorNr  = digi->GetSectorNr();
     iSide     = digi->GetSide();
+cout<<" St = "<<stationNr<<" Sec = "<<sectorNr<<endl;
     sector = fDigiScheme->GetSector(stationNr, sectorNr);
     if (iSide == 0 ) {
       if ( fDigiMapF.find(sector) == fDigiMapF.end() ) {

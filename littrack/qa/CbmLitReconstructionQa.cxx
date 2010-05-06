@@ -781,16 +781,16 @@ void CbmLitReconstructionQa::Draw()
 
 void CbmLitReconstructionQa::DrawEfficiencyHistos()
 {
-	TCanvas *c1 = new TCanvas("rec_qa_global_tracking_efficiency_all","rec_qa_global_tracking_efficiency_all", 1200, 1000);
+	TCanvas *c1 = new TCanvas("rec_qa_global_tracking_efficiency_all","rec_qa_global_tracking_efficiency_all", 600, 500);
 	c1->SetGrid();
 
-	TCanvas *c2 = new TCanvas("rec_qa_global_tracking_efficiency_signal","rec_qa_global_tracking_efficiency_signal", 1200, 1000);
+	TCanvas *c2 = new TCanvas("rec_qa_global_tracking_efficiency_signal","rec_qa_global_tracking_efficiency_signal", 600, 500);
 	c2->SetGrid();
 
-	TCanvas *c3 = new TCanvas("rec_qa_global_tracking_efficiency_rec","rec_qa_global_tracking_efficiency_rec", 1200, 1000);
+	TCanvas *c3 = new TCanvas("rec_qa_global_tracking_efficiency_rec","rec_qa_global_tracking_efficiency_rec", 600, 500);
 	c3->SetGrid();
 
-	TCanvas *c4 = new TCanvas("rec_qa_global_tracking_efficiency_tof","rec_qa_global_tracking_efficiency_tof", 1200, 1000);
+	TCanvas *c4 = new TCanvas("rec_qa_global_tracking_efficiency_tof","rec_qa_global_tracking_efficiency_tof", 600, 500);
 	c4->SetGrid();
 
 	std::string sname("STS");

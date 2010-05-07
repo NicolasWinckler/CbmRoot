@@ -156,6 +156,41 @@ void DrawGraph(
 		const std::string& drawOpt);
 
 
+/* Draws up to TGraphs. If graph == NULL than graph will not be drawn.
+ * @param graph1 Pointer to the first TGraph.
+ * @param graph2 Pointer to the second TGraph.
+ * @param graph3 Pointer to the third TGraph.
+ * @param legendLabel Legend label text.
+ * @param xAxisLabel X axis label text.
+ * @param yAxisLabel Y axis label text.
+ * @param hist1label Label text for the first TGraph.
+ * @param hist2label Label text for the second TGraph.
+ * @param hist3label Label text for the third TGraph.
+ * @param logx If true than X axis is plotted in logarithmic scale.
+ * @param logy If true than Y axis is plotted in logarithmic scale.
+ * @param drawLegend If true than legend will be drawn.
+ * @param x1 coordinates of the Legend in the current pad
+ * @param y1 coordinates of the Legend in the current pad
+ * @param x2 coordinates of the Legend in the current pad
+ * @param y2 coordinates of the Legend in the current pad
+ */
+void DrawGraph(
+		TGraph* graph1,
+		TGraph* graph2,
+		TGraph* graph3,
+		const std::string& legendLabel,
+		const std::string& xAxisLabel,
+		const std::string& yAxisLabel,
+		const std::string& hist1label,
+		const std::string& hist2label,
+		const std::string& hist3label,
+		Bool_t logx,
+		Bool_t logy,
+		Bool_t drawLegend,
+		Double_t x1,
+		Double_t y1,
+		Double_t x2,
+		Double_t y2);
 
 /* Draws 2D graph.
  * @param graph Pointer to the TGraph2D.

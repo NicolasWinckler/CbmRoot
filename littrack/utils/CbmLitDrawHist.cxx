@@ -202,6 +202,47 @@ void DrawGraph(
 	graph->Draw(drawOpt.c_str());
 }
 
+
+/* Draws up to 3 graphs. If graph == NULL than graph will not be drawn. */
+void DrawGraph(
+		TGraph* graph1,
+		TGraph* graph2,
+		TGraph* graph3,
+		const std::string& legendLabel,
+		const std::string& xAxisLabel,
+		const std::string& yAxisLabel,
+		const std::string& hist1label,
+		const std::string& hist2label,
+		const std::string& hist3label,
+		Bool_t logx,
+		Bool_t logy,
+		Bool_t drawLegend,
+		Double_t x1,
+		Double_t y1,
+		Double_t x2,
+		Double_t y2)
+{
+	if (graph1 != NULL) DrawGraph(graph1, xAxisLabel, yAxisLabel,
+			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+			LIT_MARKER_STYLE1, logx, logy, "ACP");
+
+	if (graph2 != NULL) DrawGraph(graph2, xAxisLabel, yAxisLabel,
+			LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
+						LIT_MARKER_STYLE2, logx, logy, "CP");
+
+	if (graph3 != NULL) DrawGraph(graph3, xAxisLabel, yAxisLabel,
+			LIT_COLOR3, LIT_LINE_WIDTH, LIT_LINE_STYLE3, LIT_MARKER_SIZE,
+						LIT_MARKER_STYLE3, logx, logy, "CP");
+
+	TLegend* l1 = new TLegend(x1, y1, x2, y2);
+	l1->SetFillColor(kWhite);
+	l1->SetHeader(legendLabel.c_str());
+	if (graph1 != NULL) l1->AddEntry(graph1,hist1label.c_str(),"lp");
+	if (graph2 != NULL) l1->AddEntry(graph2,hist2label.c_str(),"lp");
+	if (graph3 != NULL) l1->AddEntry(graph3,hist3label.c_str(),"lp");
+	if (drawLegend) l1->Draw();
+}
+
 /* Draws 2D graph.*/
 void DrawGraph2D(
 		TGraph2D* graph,

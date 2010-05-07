@@ -178,23 +178,25 @@ void DrawGraph(
 		const std::string& drawOpt)
 {
 	Double_t textSize = LIT_TEXT_SIZE;
-	graph->GetXaxis()->SetTitle(titleX.c_str());
-	graph->GetYaxis()->SetTitle(titleY.c_str());
 	graph->SetLineColor(color);
 	graph->SetLineWidth(lineWidth);
 	graph->SetLineStyle(lineStyle);
 	graph->SetMarkerColor(color);
 	graph->SetMarkerSize(markerSize);
 	graph->SetMarkerStyle(markerStyle);
-	if (logx) gPad->SetLogx();
-	if (logy) gPad->SetLogy();
-	graph->GetXaxis()->SetLabelSize(textSize);
-	graph->GetXaxis()->SetNdivisions(505, kTRUE);
-	graph->GetYaxis()->SetLabelSize(textSize);
-	graph->GetXaxis()->SetTitleSize(textSize);
-	graph->GetYaxis()->SetTitleSize(textSize);
-	graph->GetXaxis()->SetTitleOffset(1.0);
-	graph->GetYaxis()->SetTitleOffset(1.3);
+    if (drawOpt.find("A") != std::string::npos) {
+		if (logx) gPad->SetLogx();
+		if (logy) gPad->SetLogy();
+		graph->GetXaxis()->SetTitle(titleX.c_str());
+		graph->GetYaxis()->SetTitle(titleY.c_str());
+		graph->GetXaxis()->SetLabelSize(textSize);
+		graph->GetXaxis()->SetNdivisions(505, kTRUE);
+		graph->GetYaxis()->SetLabelSize(textSize);
+		graph->GetXaxis()->SetTitleSize(textSize);
+		graph->GetYaxis()->SetTitleSize(textSize);
+		graph->GetXaxis()->SetTitleOffset(1.0);
+		graph->GetYaxis()->SetTitleOffset(1.3);
+	}
 	gPad->SetLeftMargin(0.17);
 	gPad->SetBottomMargin(0.15);
 	graph->Draw(drawOpt.c_str());

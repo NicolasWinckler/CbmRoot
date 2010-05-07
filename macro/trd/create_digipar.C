@@ -1,19 +1,15 @@
 // --------------------------------------------------------------------------
 //
-// Macro for reconstruction of simulated events with standard settings
+// Macro to create digi parameters for the TRD
+// This macro needs a geometry file with the TRD
+// geometry only.
 //
-// HitProducers in MVD, RICH, TRD, TOF, ECAL
-// Digitizer and HitFinder in STS
-// FAST MC for ECAL
-// STS track finding and fitting (L1 / KF)
-// TRD track finding and fitting (L1 / KF)
-// RICH ring finding (ideal) and fitting
-// Global track finding (ideal), rich assignment
-// Primary vertex finding (ideal)
-// Matching of reconstructed and MC tracks in STS, RICH and TRD
+// The way how the pad layout looks like has to be
+// implemented in a task called in this macro.
+// CbmTrdCreateDigiPar is the implementation used
+// here.
 //
-// V. Friese   24/02/2006
-// Version     24/04/2007 (V. Friese)
+// F.Uhlig 07.05.2010
 //
 // --------------------------------------------------------------------------
 
@@ -30,17 +26,14 @@ void create_digipar(Int_t nEvents = 0)
   // Input file (MC events)
   TString inFile = "data/test.mc.root";
 
-  // Parameter file
-  //  TString parFile = "data/params.root";
+  // Geometry File
+  TString geoFile="geofile_trd.root";
 
-  // STS digitisation file
-//  TString stsDigiFile = "sts_standard.digi.par";
-//  TString stsDigiFile = "sts_Standard_s3055AAFK5.SecD.digi.par";
   // Output file
   TString outFile = "data/test.eds.root";
 
-  // Geometry File
-  TString geoFile="geofile.root";
+  // Digi Parameter Output File
+  TString digiFile = "trd.digi.par";
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -71,19 +64,8 @@ void create_digipar(Int_t nEvents = 0)
   gSystem->Load("libField");
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
-  gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libRich");
   gSystem->Load("libTrd");
-  gSystem->Load("libTof");
-  gSystem->Load("libEcal");
-  gSystem->Load("libGlobal");
-  gSystem->Load("libKF");
-  gSystem->Load("libL1");
-  gSystem->Load("libMinuit2"); // Nedded for rich ellipse fitter
   // ------------------------------------------------------------------------
-
-
 
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *run= new FairRunAna();
@@ -94,49 +76,23 @@ void create_digipar(Int_t nEvents = 0)
 
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
 
-  /*
-  FairParRootFileIo* parIo1 = new FairParRootFileIo();
-  parIo1->open(parFile.Data(),"UPDATE");
-  rtdb->setFirstInput(parIo1);
-  */
-
   FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
-  parIo2->open("./trd.digi.par","out");
+  parIo2->open(digiFile,"out");
   rtdb->setOutput(parIo2);
-
-  /*
-  CbmFieldPar* fieldPar = (CbmFieldPar*) rtdb->getContainer("CbmFieldPar");
-  fieldPar->SetParameters(magField);
-  fieldPar->setChanged();
-  */
-
 
   CbmTrdCreateDigiPar* trdDigitizer = new CbmTrdCreateDigiPar("TRD Digitizer",
                                                         "TRD task");
   run->AddTask(trdDigitizer);
+
   // -------------------------------------------------------------------------
-
-
-
-  // -----  Parameter database   --------------------------------------------
-  //  TString stsDigi = gSystem->Getenv("VMCWORKDIR");
-  //  stsDigi += "/parameters/sts/";
-  //  stsDigi += stsDigiFile;
- 
 
   rtdb->saveOutput();
  
-  // ------------------------------------------------------------------------
-
-
-     
   // -----   Intialise and run   --------------------------------------------
-  run->LoadGeometry();
+  //  run->LoadGeometry();
   run->Init();
    
   rtdb->print();
-  //  rtdb->getContainer("CbmTrdDigiPar")->print();
-
   
 
   CbmTrdDigiPar* DigiPar = (CbmTrdDigiPar*)
@@ -146,14 +102,6 @@ void create_digipar(Int_t nEvents = 0)
   DigiPar->setInputVersion(run->GetRunId(),1);
   rtdb->print();
   rtdb->saveOutput();
-  //  parIo2->write(DigiPar);
-  //parIo2->close();
-			   
-
-  cout << "Starting run" << endl;
-  //  run->Run(0,nEvents);
-  // ------------------------------------------------------------------------
-
 
 
   // -----   Finish   -------------------------------------------------------
@@ -163,7 +111,6 @@ void create_digipar(Int_t nEvents = 0)
   cout << endl << endl;
   cout << "Macro finished succesfully." << endl;
   cout << "Output file is "    << outFile << endl;
-  cout << "Parameter file is " << parFile << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
   cout << endl;
   // ------------------------------------------------------------------------

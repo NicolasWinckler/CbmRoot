@@ -39,7 +39,7 @@ public:
     CbmTrdHitProducerDigi();
 
     /** Standard constructor **/
-    CbmTrdHitProducerDigi(const char *name, const char *title="CBM Task");
+    CbmTrdHitProducerDigi(const char *name, const char *title="CBM Task", Int_t iVerbose=1);
 
     /** Destructor **/
     virtual ~CbmTrdHitProducerDigi();
@@ -62,6 +62,8 @@ public:
     void Register();
 
 private:
+
+    void CalculateHitPosition();
 
     Int_t   fStation;
     Int_t   fLayer;
@@ -91,8 +93,6 @@ private:
     CbmTrdDetectorId fTrdId; //!
 
     std::vector<Int_t> fLayersBeforeStation; //! 
-
-    void CalculateHitPosition();
  
     ClassDef(CbmTrdHitProducerDigi,1) 
 

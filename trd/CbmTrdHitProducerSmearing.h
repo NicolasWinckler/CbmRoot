@@ -49,8 +49,11 @@ class CbmTrdHitProducerSmearing : public FairTask {
     CbmTrdHitProducerSmearing();
 
     /** Standard constructor **/
-    CbmTrdHitProducerSmearing(const char *name, const char *title="CBM Task", 
+    CbmTrdHitProducerSmearing(const char *name, const char *title, 
                               CbmTrdRadiator *radiator=NULL);
+
+    /** Constructor **/
+    CbmTrdHitProducerSmearing(const char *name);
 
     /** Destructor **/
     virtual ~CbmTrdHitProducerSmearing();

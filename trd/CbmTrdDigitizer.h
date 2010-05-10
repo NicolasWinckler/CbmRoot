@@ -35,7 +35,7 @@ class CbmTrdDigitizer : public FairTask {
 
     /** Standard constructor **/
     CbmTrdDigitizer(const char *name, const char *title="CBM Task",
-                    CbmTrdRadiator *radiator=NULL);
+                    CbmTrdRadiator *radiator=NULL, Int_t iVerbose=1);
 
     /** Destructor **/
     virtual ~CbmTrdDigitizer();
@@ -65,16 +65,16 @@ class CbmTrdDigitizer : public FairTask {
 private:
 
     void GetModuleInformationFromDigiPar(Int_t, Double_t*);
-    void GetModuleInformation();
-
+    //    void GetModuleInformation();
+   
     void AddDigi();
 
     void CalculatePixel();
 
-    Int_t   fStation;
-    Int_t   fLayer;
-    Int_t   fModuleType;
-    Int_t   fModuleCopy;
+    //    Int_t   fStation;
+    //    Int_t   fLayer;
+    //    Int_t   fModuleType;
+    //    Int_t   fModuleCopy;
     Int_t   fCol; //Calculated pixel column were the hit is in
     Int_t   fRow; //Calculated pixel row were the hit is in
     Int_t   fModuleID;//Unique number for detector module

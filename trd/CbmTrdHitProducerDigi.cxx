@@ -22,12 +22,14 @@
 #include "TGeoVolume.h"
 
 #include <iostream>
+#include <iomanip>
 using std::cout;
 using std::endl;
+using std::setprecision;
 
 // ---- Default constructor -------------------------------------------
 CbmTrdHitProducerDigi::CbmTrdHitProducerDigi()
-    :FairTask("TrdHitProducer")
+    :FairTask("TrdHitProducer",1)
 	//:fRef(0)
 {
 
@@ -35,8 +37,8 @@ CbmTrdHitProducerDigi::CbmTrdHitProducerDigi()
 // --------------------------------------------------------------------
 
 // ---- Constructor ----------------------------------------------------
-CbmTrdHitProducerDigi::CbmTrdHitProducerDigi(const char *name, const char *title)
-	:FairTask(name)
+CbmTrdHitProducerDigi::CbmTrdHitProducerDigi(const char *name, const char *title, Int_t iVerbose)
+	:FairTask(name, iVerbose)
 {
 
 }
@@ -45,8 +47,8 @@ CbmTrdHitProducerDigi::CbmTrdHitProducerDigi(const char *name, const char *title
 // ---- Destructor ----------------------------------------------------
 CbmTrdHitProducerDigi::~CbmTrdHitProducerDigi()
 {
-    FairRootManager *ioman =FairRootManager::Instance();
-    ioman->Write();
+  //    FairRootManager *ioman =FairRootManager::Instance();
+  //    ioman->Write();
     fHitCollection->Clear("C");
     delete fHitCollection;
 
@@ -259,7 +261,7 @@ void CbmTrdHitProducerDigi::CalculateHitPosition() {
   fModuleType = bla[3];
   fModuleCopy = bla[4];
  
- /*
+  /*
   cout <<"##########################################"<<endl;
   cout <<"ID     : "<<fVolumeID<<endl;
   cout <<"System : "<<kTRD<<" , "<<bla[0]<<endl;
@@ -289,29 +291,30 @@ void CbmTrdHitProducerDigi::CalculateHitPosition() {
 
 
   Float_t local_point[2];
-  local_point[0] = ((fCol+0.5) * fpadsizex) - fsizex + (fpadsizex/2);
-  local_point[1] = ((fRow+0.5) * fpadsizey) - fsizey + (fpadsizey/2);
+
+  local_point[0] = ( ((fCol-0.5) * fpadsizex) - fsizex);
+  local_point[1] = ( ((fRow-0.5) * fpadsizey) - fsizey);
 
   fPosX=local_point[0]+fModuleInfo->GetX();
   fPosY=local_point[1]+fModuleInfo->GetY();
   fPosZ=fModuleInfo->GetZ();
 
-  /*
-  cout<<"###################################"<<endl;
-  cout<<"Col: "<< fCol <<endl;
-  cout<<"Row: "<< fRow <<endl;
-  cout<<"fPadX: "<< fpadsizex <<endl;
-  cout<<"fPadY: "<< fpadsizey <<endl;
-  cout<<"fsizex: "<< fsizex <<endl;
-  cout<<"fsizey: "<< fsizey <<endl;
-  cout<<"localx: "<<  local_point[0] <<endl;
-  cout<<"localy: "<<  local_point[1] <<endl;
-
-  cout<<"fPosX: "<<  fPosX <<endl;
-  cout<<"fPosY: "<<  fPosY <<endl;
-  cout<<"###################################"<<endl;
-  */
-
+  if ( fVerbose > 2 ){ 
+    cout<<"*** CbmTrdHitProducerDigi::CalculateHitPosition ***"<<endl;
+    cout<<"Col: "<< fCol <<endl;
+    cout<<"Row: "<< fRow <<endl;
+    cout<<setprecision(5)<<"fPadX: "<< fpadsizex <<endl;
+    cout<<setprecision(5)<<"fPadY: "<< fpadsizey <<endl;
+    cout<<setprecision(5)<<"fsizex: "<< fsizex <<endl;
+    cout<<setprecision(5)<<"fsizey: "<< fsizey <<endl;
+    cout<<setprecision(5)<<"localx: "<<  local_point[0] <<endl;
+    cout<<setprecision(5)<<"localy: "<<  local_point[1] <<endl;
+  
+    cout<<setprecision(5)<<"fPosX: "<<  fPosX <<endl;
+    cout<<setprecision(5)<<"fPosY: "<<  fPosY <<endl;
+    cout<<setprecision(5)<<"fPosZ: "<<  fPosZ <<endl;
+  }
+  
 }
 
 

@@ -39,8 +39,28 @@ CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing()
     fEfficency = 1.;
 
 
-    fRadiator = new CbmTrdRadiator(kTRUE , 130 ,
-                                   0.0013, 0.02);
+    // Create the radiator with default parameters
+    fRadiator = new CbmTrdRadiator();
+
+}
+// --------------------------------------------------------------------
+
+// ---- Constructor -------------------------------------------
+CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing(const char *name)
+    :FairTask(name)
+	//:fRef(0)
+{
+    fHitCollection = new TClonesArray("CbmTrdHit");
+
+    fDx=0.0;
+    fDy=0.0;
+
+    fNHits=0;
+
+    fEfficency = 1.;
+
+    // Create the radiator with default parameters
+    fRadiator = new CbmTrdRadiator();
 
 }
 // --------------------------------------------------------------------
@@ -96,7 +116,7 @@ InitStatus CbmTrdHitProducerSmearing::ReInit(){
 InitStatus CbmTrdHitProducerSmearing::Init()
 {
 
-    cout<<" * HitProducer * :: Init() "<<endl;
+    cout<<" * CbmTrdHitProducerSmearing::Init() "<<endl;
 
     FairRootManager *ioman = FairRootManager::Instance();
  

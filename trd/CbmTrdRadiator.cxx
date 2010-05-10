@@ -39,6 +39,12 @@ CbmTrdRadiator::CbmTrdRadiator(){
   fGapThickCorr = 1.0;
   fGasThickCorr = 1.0;
 
+  // Set initial parameters defining the radiator
+  fNFoils = 130;
+  fGapThick   = 0.02;
+  fFoilThick  = 0.0013;
+  fSimpleTR   = kTRUE;
+
   CreateHistograms();
 
 }

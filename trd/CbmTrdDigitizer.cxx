@@ -30,24 +30,25 @@
 #endif
 
 #include <iostream>
+#include <iomanip>
 using std::cout;
 using std::endl;
 using std::pair;
+using std::setprecision;
 
 // ---- Default constructor -------------------------------------------
 CbmTrdDigitizer::CbmTrdDigitizer()
-    :FairTask("TrdDigitizer")
-	//:fRef(0)
+    :FairTask("TrdDigitizer",1)
 {
-  //  fDigiCollection = new TClonesArray("CbmTrdDigi");
-  fEfficiency = 1;
+ fRadiator = new CbmTrdRadiator();
+ fEfficiency = 1;
 }
 // --------------------------------------------------------------------
 
 // ---- Constructor ----------------------------------------------------
 CbmTrdDigitizer::CbmTrdDigitizer(const char *name, const char *title,
-                 CbmTrdRadiator *radiator)
-	:FairTask(name)
+                 CbmTrdRadiator *radiator, Int_t iVerbose)
+	:FairTask(name, iVerbose)
 {
   fRadiator = radiator;
   fEfficiency = 1;
@@ -118,6 +119,7 @@ InitStatus CbmTrdDigitizer::Init()
     }
 
     fMCStack = (TClonesArray*)ioman->ActivateBranch("MCTrack");
+
     fDigiCollection = new TClonesArray("CbmTrdDigi", 100);
     ioman->Register("TrdDigi","TRD Digis",fDigiCollection,kTRUE);
 
@@ -186,6 +188,13 @@ void CbmTrdDigitizer::Exec(Option_t * option)
     Double_t z_mean = (pt->GetZIn()+pt->GetZOut())/2.;
     gGeoManager->FindNode(x_mean, y_mean, z_mean);
 
+    if ( fVerbose > 2 ) {
+      cout<<"*** CbmTrdDigitizer::Exec ***"<<endl;
+      cout<<setprecision(5)<<"xmean: "<<x_mean<<endl;
+      cout<<setprecision(5)<<"ymean: "<<y_mean<<endl;
+      cout<<setprecision(5)<<"zmean: "<<z_mean<<endl;
+    }
+
     // Get the local point in local MC coordinates from
     // the geomanager. This coordinate system is rotated
     // if the chamber is rotated. This is corrected in 
@@ -208,10 +217,6 @@ void CbmTrdDigitizer::Exec(Option_t * option)
   Int_t iDigi=0; 
 
   for ( fDigiMapIt=fDigiMap.begin() ; fDigiMapIt != fDigiMap.end(); fDigiMapIt++ ){
-    if (fDigiMapIt->second->GetDetId() == 111003) {
-      cout<<"Add ModID 111003 to TClonesArray"<<endl;
-    }
-
     new ((*fDigiCollection)[iDigi]) CbmTrdDigi(fDigiMapIt->second->GetDetId(), fDigiMapIt->second->GetCol(), fDigiMapIt->second->GetRow(), fDigiMapIt->second->GetCharge());
 ;
    CbmTrdDigiMatch *p = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
@@ -241,6 +246,7 @@ void CbmTrdDigitizer::FinishEvent()
 }
 // --------------------------------------------------------------------
 
+/*
 void CbmTrdDigitizer::GetModuleInformation()
 {
 
@@ -288,7 +294,7 @@ void CbmTrdDigitizer::GetModuleInformation()
   }
 
 }
-
+*/
 
 void CbmTrdDigitizer::GetModuleInformationFromDigiPar(Int_t VolumeID, Double_t *local_point)
 {
@@ -300,11 +306,13 @@ void CbmTrdDigitizer::GetModuleInformationFromDigiPar(Int_t VolumeID, Double_t *
     cout<<" -E- This is wrong!!!!!!!!!!!!!!!!!!!!!"<<endl;
   }
 
+  /*
   Int_t* detInfo = fTrdId.GetDetectorInfo(VolumeID); 
   fStation = detInfo[1];
   fLayer = detInfo[2];
   fModuleType =  detInfo[3];
   fModuleCopy = detInfo[4];
+  */
 
   fpadsizex = fModuleInfo->GetPadSizex();
   fpadsizey = fModuleInfo->GetPadSizey();
@@ -312,7 +320,7 @@ void CbmTrdDigitizer::GetModuleInformationFromDigiPar(Int_t VolumeID, Double_t *
   fsizey    = fModuleInfo->GetSizey();
 
   // Calculate the position in the chamber with the origin of
-  // the local coordinate system in the lower left corner
+  // the local coordinate system in the lower left (right???) corner
   // of the chamber. x goes to the left looking in beam direction
   // y goes upward
 
@@ -330,21 +338,25 @@ void CbmTrdDigitizer::GetModuleInformationFromDigiPar(Int_t VolumeID, Double_t *
 
   fPosX=local_point[0]+fsizex;
   fPosY=local_point[1]+fsizey;
-
-  /*
-  cout<<"sizex: "<< fsizex <<endl;
-  cout<<"sizey: "<< fsizey <<endl;
-
-  cout<<"X: "<< local_point[0] <<endl;
-  cout<<"Y: "<< local_point[1] <<endl;
-  cout<<"fPosX: "<< fPosX <<endl;
-  cout<<"fPosY: "<< fPosY <<endl;
-  cout<<"DetID: "<< detID <<endl;
-
-  cout<<"CPosX: "<< fModuleInfo->GetX() <<endl;
-  cout<<"CPosY: "<< fModuleInfo->GetY() <<endl;
-  cout<<"CPosZ: "<< fModuleInfo->GetZ() <<endl;
-  */
+ 
+  if ( fVerbose > 2 ) {
+    cout<<setprecision(5)<<"*** CbmTrdDigitizer::GetModuleInformationFromDigiPar ***"<<endl;
+    cout<<setprecision(5)<<"sizex: "<< fsizex <<endl;
+    cout<<setprecision(5)<<"sizey: "<< fsizey <<endl;
+    cout<<setprecision(5)<<"padsizex: "<< fpadsizex <<endl;
+    cout<<setprecision(5)<<"padsizey: "<< fpadsizey <<endl;
+  
+    cout<<setprecision(5)<<"X: "<< local_point[0] <<endl;
+    cout<<setprecision(5)<<"Y: "<< local_point[1] <<endl;
+    cout<<setprecision(5)<<"fPosX: "<< fPosX <<endl;
+    cout<<setprecision(5)<<"fPosY: "<< fPosY <<endl;
+    cout<<"DetID: "<< detID <<endl;
+  
+    cout<<setprecision(5)<<"CPosX: "<< fModuleInfo->GetX() <<endl;
+    cout<<setprecision(5)<<"CPosY: "<< fModuleInfo->GetY() <<endl;
+    cout<<setprecision(5)<<"CPosZ: "<< fModuleInfo->GetZ() <<endl;
+  }
+  
 }
 
 // --------------------------------------------------------------------
@@ -366,18 +378,12 @@ void CbmTrdDigitizer::AddDigi() {
 
     // Pixel not yet in map -> Add new pixel
     if ( fDigiMapIt == fDigiMap.end() ) {
-      if (fModuleID == 111003) {
-        cout<<"Create ModID 111003 in Map"<<endl;
-      }
       CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, fCol, fRow, fELoss, fMCindex);
       fDigiMap[b] = digi;
     }
 
     // Pixel already in map -> Add charge
     else {
-      if (fModuleID == 111003) {
-        cout<<"Modify ModID 111003 in Map"<<endl;
-      }
         CbmTrdDigi* digi = (CbmTrdDigi*)fDigiMapIt->second;
         if ( ! digi ) Fatal("AddChargeToPixel", "Zero pointer in digi map!");
         digi->AddCharge(fELoss);
@@ -390,17 +396,18 @@ void CbmTrdDigitizer::AddDigi() {
 
 void CbmTrdDigitizer::CalculatePixel() {
 
-  fCol = (Int_t)(fPosX/fpadsizex);
-  fRow = (Int_t)(fPosY/fpadsizey);
+  fCol = 1+(Int_t)(fPosX/fpadsizex);
+  fRow = 1+(Int_t)(fPosY/fpadsizey);
 
-  /*
-  cout<<"fPosX: "<< fPosX <<endl;
-  cout<<"fPosY: "<< fPosY <<endl;
-  cout<<"fPadX: "<< fpadsizex <<endl;
-  cout<<"fPadY: "<< fpadsizey <<endl;
-  cout<<"Col: "<< fCol <<endl;
-  cout<<"Row: "<< fRow <<endl;
-  */
+  if ( fVerbose > 2 ){
+    cout<<"*** CbmTrdDigitizer::CalculatePixel ***"<<endl;
+    cout<<setprecision(5)<<"fPosX: "<< fPosX <<endl;
+    cout<<setprecision(5)<<"fPosY: "<< fPosY <<endl;
+    cout<<setprecision(5)<<"fPadX: "<< fpadsizex <<endl;
+    cout<<setprecision(5)<<"fPadY: "<< fpadsizey <<endl;
+    cout<<"Col: "<< fCol <<endl;
+    cout<<"Row: "<< fRow <<endl;
+  } 
 
 }
 

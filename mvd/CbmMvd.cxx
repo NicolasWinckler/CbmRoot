@@ -43,6 +43,7 @@ CbmMvd::CbmMvd() : FairDetector("MVD", kTRUE, kMVD) {
   fGeoPar     = new TList();
   fGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  fRegisterAll = kFALSE;
 }
 // -------------------------------------------------------------------------
 
@@ -58,6 +59,7 @@ CbmMvd::CbmMvd(const char* name, Bool_t active)
   fGeoPar     = new TList();
   fGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  fRegisterAll = kFALSE;
 }
 // -------------------------------------------------------------------------
 
@@ -100,7 +102,7 @@ Bool_t CbmMvd::ProcessHits(FairVolume* vol) {
     fVolumeID = vol->getMCid();
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
-    if (fELoss == 0. ) return kFALSE;
+    if ( (fELoss == 0.) && ( ! fRegisterAll) ) return kFALSE;
     AddHit(fTrackID, fPdg, fStationMap[fVolumeID],
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),

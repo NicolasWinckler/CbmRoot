@@ -80,7 +80,7 @@ void mvd_reco(Int_t  nEvents = 3,
   if ( useDigitisation ) {
   
     // -----   MVD Digitiser   ----------------------------------------------
-    FairTask* mvdDigitise = new CbmMvdDigitiser("MVD Digitiser", 0, iVerbose);
+    FairTask* mvdDigitise = new CbmMvdDigitizeL("MVD Digitiser", 0, iVerbose);
     run->AddTask(mvdDigitise);
     // ----------------------------------------------------------------------
 

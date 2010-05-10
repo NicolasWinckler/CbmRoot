@@ -37,4 +37,5 @@
 //#pragma link C++ class  CbmTrdDetectorId+;
 #pragma link C++ class CbmTrdElectronsQa+;
 #pragma link C++ class CbmTrdElectronsTrainAnn+;
+#pragma link C++ class CbmTrdFindHits+;
 #endif

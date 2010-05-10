@@ -25,7 +25,7 @@
 
 
 #include "TObject.h"
-
+#include "TArrayI.h"
 
 class CbmTrdDigiMatch : public TObject
 {
@@ -50,8 +50,8 @@ class CbmTrdDigiMatch : public TObject
 
  private:
 
-  Int_t fNrRefIndex;
-  Int_t fRefIndex[10];
+  //  Int_t fNrRefIndex;
+  TArrayI fRefIndex;
 
   ClassDef(CbmTrdDigiMatch,1);
 

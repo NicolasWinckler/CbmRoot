@@ -14,9 +14,11 @@ using std::endl;
 
 
 // -----   Default onstructor   --------------------------------------------
-CbmTrdDigiMatch::CbmTrdDigiMatch() { 
-  fNrRefIndex =0;
-  for (Int_t i=0; i<10; i++) fRefIndex[i] = -1;
+CbmTrdDigiMatch::CbmTrdDigiMatch() 
+:TObject(),
+ fRefIndex(0) 
+{ 
+
 };
 
 // -------------------------------------------------------------------------
@@ -24,10 +26,13 @@ CbmTrdDigiMatch::CbmTrdDigiMatch() {
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmTrdDigiMatch::CbmTrdDigiMatch(Int_t iPoint) { 
-
-    fRefIndex[fNrRefIndex++] = iPoint;
-    for (Int_t i=fNrRefIndex; i<10; i++) fRefIndex[i] = -1;
+CbmTrdDigiMatch::CbmTrdDigiMatch(Int_t iPoint) 
+:TObject(),
+ fRefIndex(0) 
+{ 
+  Int_t n = fRefIndex.GetSize();
+  fRefIndex.Set(n+1);
+  fRefIndex.AddAt(iPoint, n);
 };
 // -------------------------------------------------------------------------
 
@@ -40,28 +45,26 @@ CbmTrdDigiMatch::~CbmTrdDigiMatch() { };
 
 
 // -----   Public method AddPoint   ----------------------------------------
-Int_t CbmTrdDigiMatch::AddPoint(Int_t iPoint) {
-
-  if(fNrRefIndex<9) {
-    fRefIndex[fNrRefIndex++] = iPoint;
-    return fNrRefIndex;
-  } else {
-    return 11;
-  }
-
+Int_t CbmTrdDigiMatch::AddPoint(Int_t iPoint) 
+{
+  Int_t n = fRefIndex.GetSize();
+  fRefIndex.Set(n+1);
+  fRefIndex.AddAt(iPoint, n);
+  return n+1;
 }
 // -------------------------------------------------------------------------
 
   
 
 // -----   Public method GetRefIndex   -------------------------------------
-Int_t CbmTrdDigiMatch::GetRefIndex(Int_t i) const {
-  if ( i<0 || i>=10 ) {
+Int_t CbmTrdDigiMatch::GetRefIndex(Int_t i) const 
+{
+  if ( i<0 || i> fRefIndex.GetSize() ) {
     cout << "-W- CbmTrdDigiMatch::GetRefIndex: Illegal index number "
 	 << i << endl;
     return -1;
   }
-  return fRefIndex[i];
+  return fRefIndex.At(i);
 }
 // -------------------------------------------------------------------------
 

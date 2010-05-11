@@ -20,7 +20,7 @@
 class CbmMCStage: public CbmMCObject {
 public:
 	CbmMCStage();
-	CbmMCStage(fDetectorType id, std::string fileName, std::string branchName, Double_t weight = 1.0);
+	CbmMCStage(DataType id, std::string fileName, std::string branchName, Double_t weight = 1.0);
 	CbmMCStage(const CbmMCStage& mcStage):
 		CbmMCObject((CbmMCObject)mcStage),
 		fBranchName(mcStage.GetBranchName()),

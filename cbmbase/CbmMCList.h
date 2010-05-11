@@ -18,12 +18,12 @@
 class CbmMCList : public TObject {
 public:
 	CbmMCList();
-	CbmMCList(fDetectorType type, Int_t entry)
+	CbmMCList(DataType type, Int_t entry)
 	{
 		fType = type;
 		fEntry = entry;
 	}
-	CbmMCList(fDetectorType type, Int_t entry, std::vector<Int_t> list)
+	CbmMCList(DataType type, Int_t entry, std::vector<Int_t> list)
 	{
 		fType = type;
 		fEntry = entry;
@@ -32,11 +32,11 @@ public:
 
 	virtual ~CbmMCList();
 
-	void SetType(fDetectorType type){ fType = type;}
+	void SetType(DataType type){ fType = type;}
 	void SetEntry(Int_t entry){ fEntry = entry;}
 	void AddElement(Int_t element){fList.push_back(element);}
 
-	fDetectorType GetType() const {return fType;}
+	DataType GetType() const {return fType;}
 	Int_t GetEntry() const {return fEntry;}
 	Int_t GetNElements() const {return fList.size();}
 	Int_t GetElement(Int_t index)const {return fList.at(index);}
@@ -50,7 +50,7 @@ public:
 private:
 	std::vector<Int_t> fList;
 	Int_t fEntry;
-	fDetectorType fType;
+	DataType fType;
 
 	ClassDef(CbmMCList, 1);
 };

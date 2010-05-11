@@ -24,23 +24,23 @@ CbmMCMatch::~CbmMCMatch() {
 	fList.clear();
 }
 
-void CbmMCMatch::AddElement(fDetectorType sourceType, int index, fDetectorType targetType, int link)
+void CbmMCMatch::AddElement(DataType sourceType, int index, DataType targetType, int link)
 {
 	FairLink myPair(targetType, link);
 	AddElement(sourceType, index, myPair);
 }
 
-void CbmMCMatch::AddElement(fDetectorType type, int index, FairLink link){
+void CbmMCMatch::AddElement(DataType type, int index, FairLink link){
 	fList[type]->AddLink(link, index);
 }
 
 
 
-void CbmMCMatch::SetElements(fDetectorType sourceType, int index, FairLinkedData* links){
+void CbmMCMatch::SetElements(DataType sourceType, int index, FairLinkedData* links){
 	fList[sourceType]->SetEntry(links, index);
 }
 
-void CbmMCMatch::InitStage(fDetectorType type, std::string fileName, std::string branchName)
+void CbmMCMatch::InitStage(DataType type, std::string fileName, std::string branchName)
 {
 	if (fList[type] == 0){
 		CbmMCStage* newStage = new CbmMCStage(type, fileName, branchName);
@@ -51,7 +51,7 @@ void CbmMCMatch::InitStage(fDetectorType type, std::string fileName, std::string
 	}
 }
 
-void CbmMCMatch::RemoveStage(fDetectorType type){
+void CbmMCMatch::RemoveStage(DataType type){
 	fList.erase(type);
 }
 
@@ -63,7 +63,7 @@ void CbmMCMatch::SetCommonWeightStages(Float_t weight)
 	}
 }
 
-CbmMCResult CbmMCMatch::GetMCInfo(fDetectorType start, fDetectorType stop){
+CbmMCResult CbmMCMatch::GetMCInfo(DataType start, DataType stop){
 
 	CbmMCResult result(start, stop);
 	if(!IsTypeInList(start))
@@ -74,12 +74,12 @@ CbmMCResult CbmMCMatch::GetMCInfo(fDetectorType start, fDetectorType stop){
 		return GetMCInfoBackward(start, stop);
 }
 
-CbmMCEntry CbmMCMatch::GetMCInfoSingle(FairLink aLink, fDetectorType stop)
+CbmMCEntry CbmMCMatch::GetMCInfoSingle(FairLink aLink, DataType stop)
 {
 	CbmMCEntry result;
-	if(!IsTypeInList((fDetectorType)aLink.GetType()))
+	if(!IsTypeInList((DataType)aLink.GetType()))
 		return result;
-	if(!(fList[(fDetectorType)aLink.GetType()]->GetNEntries() > aLink.GetIndex()))
+	if(!(fList[(DataType)aLink.GetType()]->GetNEntries() > aLink.GetIndex()))
 		return result;
 
 	if (aLink.GetType() < stop)
@@ -88,7 +88,7 @@ CbmMCEntry CbmMCMatch::GetMCInfoSingle(FairLink aLink, fDetectorType stop)
 		return GetMCInfoBackwardSingle(aLink, stop);
 }
 
-CbmMCResult CbmMCMatch::GetMCInfoForward(fDetectorType start, fDetectorType stop)
+CbmMCResult CbmMCMatch::GetMCInfoForward(DataType start, DataType stop)
 {
 	CbmMCResult result(start, stop);
 	CbmMCStage startVec = *(fList[start]);
@@ -113,7 +113,7 @@ CbmMCResult CbmMCMatch::GetMCInfoForward(fDetectorType start, fDetectorType stop
 
 }
 
-CbmMCEntry CbmMCMatch::GetMCInfoForwardSingle(FairLink link, fDetectorType stop)
+CbmMCEntry CbmMCMatch::GetMCInfoForwardSingle(FairLink link, DataType stop)
 {
 	CbmMCEntry result;
 	ClearFinalStage();
@@ -126,7 +126,7 @@ CbmMCEntry CbmMCMatch::GetMCInfoForwardSingle(FairLink link, fDetectorType stop)
 
 }
 
-CbmMCResult CbmMCMatch::GetMCInfoBackward(fDetectorType start, fDetectorType stop)
+CbmMCResult CbmMCMatch::GetMCInfoBackward(DataType start, DataType stop)
 {
 	CbmMCResult result(start, stop);
 	CbmMCStage startVec = *(fList[start]);
@@ -145,10 +145,10 @@ CbmMCResult CbmMCMatch::GetMCInfoBackward(fDetectorType start, fDetectorType sto
 	return result;
 }
 
-CbmMCEntry CbmMCMatch::GetMCInfoBackwardSingle(FairLink aLink, fDetectorType stop, Double_t weight)
+CbmMCEntry CbmMCMatch::GetMCInfoBackwardSingle(FairLink aLink, DataType stop, Double_t weight)
 {
 	CbmMCEntry result;
-	FairMultiLinkedData multiLink = fList[(fDetectorType)aLink.GetType()]->GetEntry(aLink.GetIndex());
+	FairMultiLinkedData multiLink = fList[(DataType)aLink.GetType()]->GetEntry(aLink.GetIndex());
 
 	ClearFinalStage();
 	multiLink.MultiplyAllWeights(weight);
@@ -160,7 +160,7 @@ CbmMCEntry CbmMCMatch::GetMCInfoBackwardSingle(FairLink aLink, fDetectorType sto
 }
 
 
-void CbmMCMatch::FindStagesPointingToLinks(FairMultiLinkedData links, fDetectorType stop)
+void CbmMCMatch::FindStagesPointingToLinks(FairMultiLinkedData links, DataType stop)
 {
 	FairMultiLinkedData tempLinks;
 	for (int i = 0; i < links.GetNLinks(); i++){
@@ -187,7 +187,7 @@ void CbmMCMatch::FindStagesPointingToLinks(FairMultiLinkedData links, fDetectorT
 FairMultiLinkedData CbmMCMatch::FindStagesPointingToLink(FairLink link)
 {
 	FairMultiLinkedData result;
-	TListIteratorConst iter = fList.find((fDetectorType)link.GetType());
+	TListIteratorConst iter = fList.find((DataType)link.GetType());
 	for(;iter!= fList.end(); iter++){
 		if (iter->second->PosInList(link).GetNLinks() > 0){
 			result.AddLinks(iter->second->PosInList(link), true);
@@ -197,7 +197,7 @@ FairMultiLinkedData CbmMCMatch::FindStagesPointingToLink(FairLink link)
 }
 
 
-FairMultiLinkedData CbmMCMatch::FindLinksToStage(fDetectorType stage)
+FairMultiLinkedData CbmMCMatch::FindLinksToStage(DataType stage)
 {
 	FairMultiLinkedData result;
 	for (int i = 0; i < GetNMCStages(); i++){
@@ -207,7 +207,7 @@ FairMultiLinkedData CbmMCMatch::FindLinksToStage(fDetectorType stage)
 }
 
 
-void CbmMCMatch::CreateArtificialStage(fDetectorType stage, std::string fileName, std::string branchName)
+void CbmMCMatch::CreateArtificialStage(DataType stage, std::string fileName, std::string branchName)
 {
 	FairMultiLinkedData stageLinks = FindLinksToStage(stage);
 	if (stageLinks.GetNLinks() > 0){
@@ -222,7 +222,7 @@ void CbmMCMatch::CreateArtificialStage(fDetectorType stage, std::string fileName
 
 
 
-void CbmMCMatch::GetNextStage(FairMultiLinkedData& startStage, fDetectorType stopStage){
+void CbmMCMatch::GetNextStage(FairMultiLinkedData& startStage, DataType stopStage){
 
 	CbmMCEntry tempStage;
 
@@ -245,7 +245,7 @@ void CbmMCMatch::GetNextStage(FairMultiLinkedData& startStage, fDetectorType sto
 				AddToFinalStage(startStage.GetLink(i),1);
 			}
 			else{
-				double tempStageWeight = GetMCStageType(static_cast<fDetectorType>(tempStage.GetSource()))->GetWeight();
+				double tempStageWeight = GetMCStageType(static_cast<DataType>(tempStage.GetSource()))->GetWeight();
 				double startLinkWeight = startStage.GetLink(i).GetWeight()/startStage.GetNLinks();
 				//std::cout << " StageWeight: " << tempStageWeight << " startLinkWeight: " << startLinkWeight;
 				tempStage.MultiplyAllWeights(tempStageWeight);
@@ -266,7 +266,7 @@ void CbmMCMatch::GetNextStage(FairMultiLinkedData& startStage, fDetectorType sto
 	}
 }
 
-CbmMCEntry CbmMCMatch::GetEntry(fDetectorType type, int index){
+CbmMCEntry CbmMCMatch::GetEntry(DataType type, int index){
 
 	CbmMCEntry empty;
 	if (index < 0) return empty;
@@ -278,7 +278,7 @@ CbmMCEntry CbmMCMatch::GetEntry(fDetectorType type, int index){
 }
 
 CbmMCEntry CbmMCMatch::GetEntry(FairLink link){
-	return GetEntry(static_cast<fDetectorType>(link.GetType()), link.GetIndex());
+	return GetEntry(static_cast<DataType>(link.GetType()), link.GetIndex());
 }
 
 void CbmMCMatch::AddToFinalStage(FairLink hitPair, Float_t mult){
@@ -299,7 +299,7 @@ void CbmMCMatch::ClearMCList()
 	//fList.clear();
 }
 
-bool CbmMCMatch::IsTypeInList(fDetectorType type){
+bool CbmMCMatch::IsTypeInList(DataType type){
 	for(TListIterator iter = fList.begin(); iter != fList.end(); iter++){
 		if (iter->first == type)
 			return true;
@@ -311,10 +311,10 @@ void CbmMCMatch::LoadInMCLists(TClonesArray* myLinkArray){
 	for (int i = 0; i < myLinkArray->GetEntriesFast(); i++){
 		CbmMCEntry* myLink = (CbmMCEntry*)myLinkArray->At(i);
 		//std::cout << "myLink.size(): " << myLink->GetNLinks() << ":";
-		if (IsTypeInList((fDetectorType)myLink->GetSource())){
-			//fList[(fDetectorType)myLink->GetSource()]->ClearEntries();
-			fList[(fDetectorType)myLink->GetSource()]->SetEntry(*myLink);
-			fList[(fDetectorType)myLink->GetSource()]->SetLoaded(kTRUE);
+		if (IsTypeInList((DataType)myLink->GetSource())){
+			//fList[(DataType)myLink->GetSource()]->ClearEntries();
+			fList[(DataType)myLink->GetSource()]->SetEntry(*myLink);
+			fList[(DataType)myLink->GetSource()]->SetLoaded(kTRUE);
 		}
 	}
 }

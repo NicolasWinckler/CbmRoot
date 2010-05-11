@@ -27,7 +27,7 @@ CbmMCMatchSelectorTask::CbmMCMatchSelectorTask()
 }
 // -------------------------------------------------------------------------
 
-CbmMCMatchSelectorTask::CbmMCMatchSelectorTask(fDetectorType start, fDetectorType stop)
+CbmMCMatchSelectorTask::CbmMCMatchSelectorTask(DataType start, DataType stop)
 	: FairTask("Creates CbmMCMatch"), fStart(start), fStop(stop)
 {
 }

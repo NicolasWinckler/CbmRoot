@@ -27,6 +27,8 @@ ${CMAKE_SOURCE_DIR}/base
 link_directories( ${LINK_DIRECTORIES})
 
 set(CBMBASE_SRCS
+CbmDetectorList.cxx
+
 CbmDigiManager.cxx
 CbmPrimaryGenerator.cxx
 CbmPropagator.cxx
@@ -73,8 +75,6 @@ endif(RULE_CHECKER_FOUND)
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h CBMBASE_HEADERS "${CBMBASE_SRCS}")
-
-SET(CBMBASE_HEADERS ${CBMBASE_HEADERS} CbmDetectorList.h)
 
 set(CBMBASE_LINKDEF  CbmBaseLinkDef.h)
 set(CBMBASE_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/CbmBaseDict.cxx) 

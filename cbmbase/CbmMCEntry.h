@@ -19,7 +19,7 @@
 class CbmMCEntry : public FairMultiLinkedData {
 public:
 	CbmMCEntry();
-	//CbmMCEntry(fDetectorType type, int pos);
+	//CbmMCEntry(DataType type, int pos);
 	CbmMCEntry(std::vector<FairLink> links, Int_t source = -1, Int_t pos = -1)
 		:FairMultiLinkedData(links), fSource(source), fPos(pos){}
 	CbmMCEntry(FairMultiLinkedData links, Int_t source = -1, Int_t pos = -1)

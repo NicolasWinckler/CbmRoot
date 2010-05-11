@@ -19,8 +19,8 @@
 #include <vector>
 #include <string>
 
-typedef std::map<fDetectorType, CbmMCStage*>::iterator TListIterator;
-typedef std::map<fDetectorType, CbmMCStage*>::const_iterator TListIteratorConst;
+typedef std::map<DataType, CbmMCStage*>::iterator TListIterator;
+typedef std::map<DataType, CbmMCStage*>::const_iterator TListIteratorConst;
 
 class CbmMCMatch: public TNamed {
 public:
@@ -29,21 +29,21 @@ public:
 		:TNamed(name, title), fUltimateStage(kMCTrack){};
 	virtual ~CbmMCMatch();
 
-	void AddElement(fDetectorType type, int index, FairLink link);
-	void AddElement(fDetectorType sourceType, int index, fDetectorType targetType, int link);
-	void SetElements(fDetectorType sourceType, int index, FairLinkedData* links);
-	void InitStage(fDetectorType type, std::string fileName, std::string branchName);
-	void RemoveStage(fDetectorType type);
+	void AddElement(DataType type, int index, FairLink link);
+	void AddElement(DataType sourceType, int index, DataType targetType, int link);
+	void SetElements(DataType sourceType, int index, FairLinkedData* links);
+	void InitStage(DataType type, std::string fileName, std::string branchName);
+	void RemoveStage(DataType type);
 	void LoadInMCLists(TClonesArray* myLinkArray);
 	void ClearMCList();
 
 	void SetCommonWeightStages(Float_t weight);
 
-	CbmMCEntry GetEntry(fDetectorType type, int index);
+	CbmMCEntry GetEntry(DataType type, int index);
 	CbmMCEntry GetEntry(FairLink link);
 
-	CbmMCResult GetMCInfo(fDetectorType start, fDetectorType stop);
-	CbmMCEntry  GetMCInfoSingle(FairLink aLink, fDetectorType stop);
+	CbmMCResult GetMCInfo(DataType start, DataType stop);
+	CbmMCEntry  GetMCInfoSingle(FairLink aLink, DataType stop);
 
 	int GetNMCStages() const {return fList.size();}
 
@@ -54,15 +54,15 @@ public:
 		return (iter->second);
 	}
 
-	CbmMCStage* GetMCStageType(fDetectorType type){
+	CbmMCStage* GetMCStageType(DataType type){
 		return fList[type];
 	}
 
-	void CreateArtificialStage(fDetectorType stage, std::string fileName = "", std::string branchName = "");
+	void CreateArtificialStage(DataType stage, std::string fileName = "", std::string branchName = "");
 
-	FairMultiLinkedData FindLinksToStage(fDetectorType stage);
+	FairMultiLinkedData FindLinksToStage(DataType stage);
 
-	bool IsTypeInList(fDetectorType type);
+	bool IsTypeInList(DataType type);
 
 	void Print(std::ostream& out = std::cout){out << *this;}
 
@@ -77,19 +77,19 @@ public:
 	}
 
 private:
-	fDetectorType fUltimateStage; ///< last stage in link chain. Here all recursive operations must stop.
-	std::map<fDetectorType, CbmMCStage*> fList;
+	DataType fUltimateStage; ///< last stage in link chain. Here all recursive operations must stop.
+	std::map<DataType, CbmMCStage*> fList;
 	FairMultiLinkedData fFinalStageML;
 
-	void FindStagesPointingToLinks(FairMultiLinkedData links, fDetectorType stop);
+	void FindStagesPointingToLinks(FairMultiLinkedData links, DataType stop);
 	FairMultiLinkedData FindStagesPointingToLink(FairLink link);
 
-	CbmMCResult GetMCInfoForward(fDetectorType start, fDetectorType stop);
-	CbmMCResult GetMCInfoBackward(fDetectorType start, fDetectorType stop);
-	CbmMCEntry GetMCInfoForwardSingle(FairLink link, fDetectorType stop);
-	CbmMCEntry GetMCInfoBackwardSingle(FairLink link, fDetectorType stop, Double_t weight = 1.);
+	CbmMCResult GetMCInfoForward(DataType start, DataType stop);
+	CbmMCResult GetMCInfoBackward(DataType start, DataType stop);
+	CbmMCEntry GetMCInfoForwardSingle(FairLink link, DataType stop);
+	CbmMCEntry GetMCInfoBackwardSingle(FairLink link, DataType stop, Double_t weight = 1.);
 
-	void GetNextStage(FairMultiLinkedData& startEntry, fDetectorType stopStage);
+	void GetNextStage(FairMultiLinkedData& startEntry, DataType stopStage);
 	void AddToFinalStage(FairLink link, Float_t mult);
 	void ClearFinalStage();
 	ClassDef(CbmMCMatch, 1);

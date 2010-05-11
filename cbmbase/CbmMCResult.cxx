@@ -15,7 +15,7 @@ CbmMCResult::CbmMCResult() {
 CbmMCResult::~CbmMCResult() {
 }
 
-CbmMCResult::CbmMCResult(fDetectorType start, fDetectorType stop)
+CbmMCResult::CbmMCResult(DataType start, DataType stop)
 : fStartType(start), fStopType(stop)
 {}
 

@@ -16,7 +16,6 @@
 
 //fitter
 #pragma link C++ class CbmRichRingFitterCircle+;
-//#pragma link C++ class CbmRichRingFitterCOP+;
 #pragma link C++ class CbmRichRingFitterRobustCOP+;
 #pragma link C++ class CbmRichRingFitterTAU+;
 #pragma link C++ class CbmRichFitRings+;
@@ -32,10 +31,6 @@
 #pragma link C++ class CbmRichRingFinderIdeal+;
 #pragma link C++ class CbmRichFindRings+;
 //#pragma link C++ class CbmRichRingFinderHoughParallel;
-//#pragma link C++ class CbmRichFuzzyKE+;
-//#pragma link C++ class CbmRichRingFinderHoughSimd;
-//#pragma link C++ class CbmRichRingFinderHoughImpl;
-//#pragma link C++ class CbmRichRingFinderHoughParallelImpl;
 
 //qa
 #pragma link C++ class  CbmRichTestSim+;
@@ -43,10 +38,8 @@
 #pragma link C++ class  CbmRichRingQa+;
 #pragma link C++ class CbmRichGeoTest+;
 #pragma link C++ class CbmRichElectronsQa+;
-
+//#pragma link C++ class CbmRichParallelQa+;
 //selection
-//#pragma link C++ class CbmRichRingSelectImpl+;
-//#pragma link C++ class CbmRichRingSelectNeuralNet+;
 
 //tracks
 #pragma link C++ class  CbmRichProjectionProducer+;

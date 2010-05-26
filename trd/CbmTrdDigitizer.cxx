@@ -214,6 +214,12 @@ void CbmTrdDigitizer::Exec(Option_t * option)
 
   }
 
+  cout <<"--II-- CbmTrdDigitizer: Used " << fTrdPoints->GetEntriesFast()<<
+    " points."<<endl;
+
+  cout <<"--II-- CbmTrdDigitizer: Create " << fDigiMap.size() <<
+    " digis."<<endl;
+
   Int_t iDigi=0; 
 
   for ( fDigiMapIt=fDigiMap.begin() ; fDigiMapIt != fDigiMap.end(); fDigiMapIt++ ){

@@ -405,6 +405,8 @@ void CbmTrdDigitizer::CalculatePixel() {
   fCol = 1+(Int_t)(fPosX/fpadsizex);
   fRow = 1+(Int_t)(fPosY/fpadsizey);
 
+  cout<<fModuleID<<","<<fCol<<","<<fRow<<endl;
+
   if ( fVerbose > 2 ){
     cout<<"*** CbmTrdDigitizer::CalculatePixel ***"<<endl;
     cout<<setprecision(5)<<"fPosX: "<< fPosX <<endl;

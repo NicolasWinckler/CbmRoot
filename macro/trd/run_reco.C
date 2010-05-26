@@ -222,13 +222,13 @@ void run_reco(Int_t nEvents = 2)
   run->AddTask(trdDigitizer);
 
 
-/*
   CbmTrdHitProducerDigi* trdHitProd =
                    new CbmTrdHitProducerDigi("TRD Hit Producer","TRD task");
 
   run->AddTask(trdHitProd);
 
   
+/*
   CbmTrdHitProducerQa* trdHitProdQa =
                    new CbmTrdHitProducerQa("TRD Hit Producer Qa","TRD task");
 

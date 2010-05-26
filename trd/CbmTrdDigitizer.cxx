@@ -214,11 +214,13 @@ void CbmTrdDigitizer::Exec(Option_t * option)
 
   }
 
+  /*
   cout <<"--II-- CbmTrdDigitizer: Used " << fTrdPoints->GetEntriesFast()<<
     " points."<<endl;
 
   cout <<"--II-- CbmTrdDigitizer: Create " << fDigiMap.size() <<
     " digis."<<endl;
+  */
 
   Int_t iDigi=0; 
 
@@ -405,9 +407,11 @@ void CbmTrdDigitizer::CalculatePixel() {
   fCol = 1+(Int_t)(fPosX/fpadsizex);
   fRow = 1+(Int_t)(fPosY/fpadsizey);
 
+  /*
   cout<<"#######################################"<<endl;
   cout<<fModuleID<<","<<fCol<<","<<fRow<<endl;
   cout<<fModuleID<<","<<setprecision(5)<<fPosX<<","<<fPosY<<endl;
+  */
 
   if ( fVerbose > 2 ){
     cout<<"*** CbmTrdDigitizer::CalculatePixel ***"<<endl;

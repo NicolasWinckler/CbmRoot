@@ -243,7 +243,7 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
                   if (fModuleCopy <= 4)
                   {
                     fpadsizex = fst1_pad_type[2][0];
-                      fpadsizey = fst1_pad_type[2][1];
+                    fpadsizey = fst1_pad_type[2][1];
                   }
                   else
                   {

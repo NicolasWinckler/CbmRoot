@@ -349,6 +349,11 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
               }
               nmodules++;   // module counter
 
+	      if (fStation==1 && fModuleType==2 && fModuleCopy<=4){
+                    cout<<"Bin Hier2: "<<fStation<<","<<fLayer<<","<<fModuleType<<","<<fModuleCopy<<","<<fModuleID<<endl;
+                    cout<<fpadsizex<<","<<fpadsizey<<endl;
+	      }
+
               //if( 1 == Orientation) {
               //  fpadsizex = 0.5;
               //  fpadsizey = 2;

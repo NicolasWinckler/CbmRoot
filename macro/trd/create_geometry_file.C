@@ -6,6 +6,7 @@
 //
 // F. Uhlig 07.05.2010
 //
+// D. Emschermann - 26.05.2010 - fix TRD geo input file
 // --------------------------------------------------------------------------
 
 void create_geometry_file()
@@ -23,8 +24,9 @@ void create_geometry_file()
   
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
-  TString trdGeom    = "trd_dec09_sq_exploded_num_06.geo";
-  
+  TString trdGeom    = "trd_squared_modules_dec09.geo";
+  //  TString trdGeom    = "trd_squared_modules_jun10.geo";
+
   // In general, the following parts need not be touched
   // ========================================================================
 

@@ -55,7 +55,7 @@ CbmStsDigi::CbmStsDigi(std::vector<Int_t> index, Int_t station, Int_t sector, In
 // -------------------------------------------------------------------------
 CbmStsDigi::CbmStsDigi(Int_t index, Int_t station, Int_t sector, Int_t side, 
 		       Int_t channel, Int_t adc, Int_t time) {
-  AddIndex(index);
+  AddIndex(index,adc);
   fData = ( (DetectorId(station, sector, side, channel) >> 4) & fgkAddrMask )
     | ( (adc  & fgkCharMask) << fgkCharShift )
     | ( (time & fgkTimeMask) << fgkTimeShift ) ;

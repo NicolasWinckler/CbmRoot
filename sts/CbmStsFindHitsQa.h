@@ -101,7 +101,7 @@ class CbmStsFindHitsQa : public FairTask
   TH2F* fhHitPointCorrelation [100];
   TH2F* fhHitPointCorrelationU[100];
   TH2F* fhHitPointCorrelationB[100];
-  TH2F* fhHitPointPuls [100];
+//   TH2F* fhHitPointPuls [100];
 
   TH3F* fhEnergyLoss[20];
   TH3F* fhIncAngle[20];
@@ -111,8 +111,11 @@ class CbmStsFindHitsQa : public FairTask
 
   TH1F* fhHitFindingEfficiency;
   TH2F* fhEffIncAng;
+  TH2F* fhEffMom;
   TH2F* fhEffPdgSec;
   TH2F* fhEffPdgPrim;
+  TH2F* fhHitPointPull;
+  TH2F* fhHitPointCorr;
   
   /** List of histograms **/
   TList* fHistoList;
@@ -136,6 +139,8 @@ class CbmStsFindHitsQa : public FairTask
   Int_t fNofRecoPoints[20][300][3];
   Int_t fNofPointsIncAng     [1000];
   Int_t fNofRecoPointsIncAng [1000];
+  Int_t fNofPointsMom        [1000];
+  Int_t fNofRecoPointsMom    [1000];
   Int_t fNofRecoPdgSec       [20000];
   Int_t fNofPointsPdgSec     [20000];
   Int_t fNofRecoPdgPrim      [20000];

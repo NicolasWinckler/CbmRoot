@@ -409,7 +409,7 @@ Int_t CbmStsClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int_t i
     digiSig = digi->GetAdc();
 
     if ( lastDigiPos == -1 ) {
-      cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(iDigi, stationNr,sectorNr,iSide);
+      cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(iDigi, digiSig, stationNr,sectorNr,iSide);
        //   cout << "first cluster ADC        "  << digiSig << endl;
       clusterBeginPos = digiPos;
     }
@@ -425,7 +425,7 @@ Int_t CbmStsClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int_t i
       if ( digiSig > lastDigiSig && lastDigiSig < clusterMaxSig ) {
 	cluster->SetMean(clusterMaxNr);
       //      cluster->SetMeanError(clusterMaxSig);
-	cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(iDigi, stationNr,sectorNr,iSide);
+	cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(iDigi, digiSig, stationNr,sectorNr,iSide);
 	cluster->AddDigi(lastDigiNr);
 	//	cout << "         +end cluster " << lastDigiPos << endl;
 
@@ -451,7 +451,7 @@ Int_t CbmStsClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int_t i
     else if ( lastDigiPos>=0 ) {
       cluster->SetMean(clusterMaxNr);
       //      cluster->SetMeanError(clusterMaxSig);
-      cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(iDigi, stationNr,sectorNr,iSide);
+      cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(iDigi, digiSig, stationNr,sectorNr,iSide);
       //    cout << "          end cluster " << lastDigiPos << endl;
       //    cout << "new cluster           " << digiPos << endl;
       clusterWidth = lastDigiPos - clusterBeginPos + 1;
@@ -480,13 +480,13 @@ Int_t CbmStsClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int_t i
     clusterWidth = lastDigiPos - clusterBeginPos + 1;
     if ( clusterWidth < 90 ) {
       cluster->AddDigi(iDigi);
-      cluster->AddIndex(iDigi);}
+      cluster->AddIndex(iDigi,digiSig);}
     else {
       //      return 1;
       cluster->SetMean(clusterMaxNr);
       //      cluster->SetMeanError(clusterMaxSig);
 
-      cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(iDigi,stationNr,sectorNr,iSide);
+      cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(iDigi, digiSig, stationNr,sectorNr,iSide);
       cluster->AddDigi(iDigi);
       clusterWidth = lastDigiPos - clusterBeginPos + 1;
       if ( clusterWidth > fLongestCluster ) 
@@ -579,38 +579,50 @@ void CbmStsClusterFinder::AnalyzeClusters() {
 void CbmStsClusterFinder::AnalyzeCluster(Int_t iCluster) {
 
   CbmStsCluster* cluster  = (CbmStsCluster*) fClusters->At(iCluster);
+//   CbmStsSector* sector = NULL;
   Int_t maxDigiNr = (Int_t)cluster->GetMean();
   Double_t plateau = cluster->GetMeanError();
   Double_t maxDigiSig = 0.;
   CbmStsDigi* digi = NULL;
   digi = (CbmStsDigi*)fDigis->At(maxDigiNr);
   Int_t maxDigiPos = digi->GetChannelNr();
-  maxDigiSig = digi->GetAdc() - plateau;
-  if ( plateau ) {
-    if ( TMath::Abs(plateau-maxDigiSig)<0.0001 ) plateau = 0.;
-    //    cout << "PLATEAU, but maxdigisig = " << maxDigiSig << " at " << maxDigiNr << " -> plateau = " << plateau << endl;
-  }
+  maxDigiSig = digi->GetAdc();
+//   if ( plateau ) {
+//     if ( TMath::Abs(plateau-maxDigiSig)<0.0001 ) plateau = 0.;
+//     //    cout << "PLATEAU, but maxdigisig = " << maxDigiSig << " at " << maxDigiNr << " -> plateau = " << plateau << endl;
+//   }
 
   //  cout << "Cluster " << iCluster+1 << " has " << cluster->GetNDigis() << " digis, max at " << maxDigiNr << endl;
   Double_t chanNr  = 0;
   Double_t chanADC = 0.;
   Double_t sumW    = 0;
   Double_t sumWX   = 0;
+  Double_t sumCh   = 0;
+  Double_t error   = 0;
   for ( Int_t itemp = 0 ; itemp < cluster->GetNDigis() ; itemp++ ) {
     digi = (CbmStsDigi*)fDigis->At(cluster->GetDigi(itemp));
     chanNr  = (Double_t)digi->GetChannelNr();
     chanADC = digi->GetAdc();
-    chanADC = ( chanADC < plateau ? 0 : chanADC-plateau );
+//     chanADC = ( chanADC < plateau ? 0 : chanADC-plateau );
     sumW  +=        chanADC;
     sumWX += chanNr*chanADC;
+    sumCh += chanNr;
     //    cout << chanADC << " + " << flush;
     //    cout << "channel " << digi->GetChannelNr() << " with signal = " << digi->GetADC() << " (" << sumWX << "/" << sumW << ") - plateau = " << plateau << endl;
   }
+
+  for ( Int_t itemp = 0 ; itemp < cluster->GetNDigis() ; itemp++ ) {
+    digi = (CbmStsDigi*)fDigis->At(cluster->GetDigi(itemp));
+    chanNr  = (Double_t)digi->GetChannelNr();
+    chanADC = digi->GetAdc();
+    error += ( chanADC*chanADC )*(sumCh-chanNr)*(sumCh-chanNr);
+  }
+
   //  cout << " mean at = " << sumWX/sumW << endl;
   cluster->SetMean(sumWX/sumW);
-  cluster->SetMeanError(sumW/maxDigiSig);
+  cluster->SetMeanError(  (1./(sumCh*sumCh)) * TMath::Sqrt(error)   );
   if ( sumW < maxDigiSig ) {
-//     cout << " MAX DIGI = " << maxDigiSig << ", while SUMW = " << sumW << endl;
+    cout << " MAX DIGI = " << maxDigiSig << ", while SUMW = " << sumW << endl;
     for ( Int_t itemp = 0 ; itemp < cluster->GetNDigis() ; itemp++ ) {
       digi = (CbmStsDigi*)fDigis->At(cluster->GetDigi(itemp));
 //       cout << "digi ADC = " << digi->GetAdc() << " at channel# " << digi->GetChannelNr() << endl;

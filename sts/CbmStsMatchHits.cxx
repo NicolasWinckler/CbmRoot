@@ -35,6 +35,7 @@
 #include <map>
 
 using std::cout;
+using std::flush;
 using std::endl;
 using std::setw;
 using std::left;
@@ -392,18 +393,47 @@ void CbmStsMatchHits::ExecReal(Option_t* opt) {
     Int_t finalHit = hitStationLimits[1][fStationNrFromMcId[stsPoint->GetDetectorID()]];
     
     if ( startHit == -1 && finalHit == -1 ) continue;
-    
+
+   
+    Int_t NofMatched = 0;
+    Double_t GoodHit[100];
+    Int_t GoodHitIndex[nofStsHits];
     for ( Int_t ihit = startHit ; ihit < finalHit ; ihit++ ) {
       CbmStsHit *stsHit= (CbmStsHit*)fHits->At(ihit);
+      Double_t xH = stsHit->GetX();
+      Double_t yH = stsHit->GetY();
+      Double_t xP = stsPoint->GetX(stsHit->GetZ());
+      Double_t yP = stsPoint->GetY(stsHit->GetZ());
       if ( ( TMath::Abs(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ())) < .01 ) &&
  	   ( TMath::Abs(stsHit->GetY()-stsPoint->GetY(stsHit->GetZ())) < .04 ) ) {
 // 	cout << "matching " 
 // 	     << "X: " << stsHit->GetX() << " - " << stsPoint->GetX(stsHit->GetZ())
 // 	     << "Y: " << stsHit->GetY() << " - " << stsPoint->GetY(stsHit->GetZ()) << endl;
-	stsHit->SetRefIndex(ipnt);
+	//	cout << "candidate dist = " << dist << endl;
+        Double_t dist = TMath::Sqrt( (xP-xH)*(xP-xH) + (yP-yH)*(yP-yH) );
+	
 	//	cout << "setting ref index = " << stsHit->GetRefIndex() << " (max sts pnt = " << nofStsPoints << ")" << endl;
 	nMatched++;
+        NofMatched++;
+        GoodHitIndex[NofMatched]=ihit;
+        GoodHit[NofMatched]=dist;
+//         cout <<" NofMatched = "<<NofMatched<<" dist = "<<dist<<flush;
       }
+
+    }
+
+    Int_t k=NofMatched;
+    if (NofMatched>1){
+      for (Int_t i=NofMatched-1; i>0; i--) {
+
+          if (GoodHit[i]<GoodHit[k]) {
+            k=i;
+          }
+      }
+    }
+    if (NofMatched>0) {
+      CbmStsHit *stsHit= (CbmStsHit*)fHits->At(GoodHitIndex[k]);
+      stsHit->SetRefIndex(ipnt);
     }
   }
 

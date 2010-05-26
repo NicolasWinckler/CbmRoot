@@ -223,12 +223,12 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
     
     for ( Int_t ihit = startHit ; ihit < finalHit ; ihit++ ) {
       CbmStsHit *stsHit= (CbmStsHit*)fStsHits->At(ihit);
-      if ( ( TMath::Abs(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ())) < .1 ) &&
- 	   ( TMath::Abs(stsHit->GetY()-stsPoint->GetY(stsHit->GetZ())) < .1 ) ) {
+      if ( ( TMath::Abs(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ())) < .01 ) &&
+ 	   ( TMath::Abs(stsHit->GetY()-stsPoint->GetY(stsHit->GetZ())) < .04 ) ) {
  	fhHitPointCorrelation[stationNr-1]->Fill(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ()),
 						 stsHit->GetY()-stsPoint->GetY(stsHit->GetZ()));
 	
-	fhHitPointPuls[stationNr-1]       ->Fill((stsHit->GetX()-stsPoint->GetX(stsHit->GetZ()))/sensor->GetSigmaX(),(stsHit->GetY()-stsPoint->GetY(stsHit->GetZ()))/sensor->GetSigmaY());
+	fhHitPointPull -> Fill( (stsHit->GetX()-stsPoint->GetX(stsHit->GetZ()))/stsHit->GetDx() , (stsHit->GetY()-stsPoint->GetY(stsHit->GetZ()))/stsHit->GetDy());
 	
 	if ( stsPoint->GetY(stsHit->GetZ()) > 0. )
 	  fhHitPointCorrelationU[stationNr-1]->Fill(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ()),
@@ -239,9 +239,8 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
       }
       
       if ( ( TMath::Abs(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ())) < .01 ) &&
-	   ( TMath::Abs(stsHit->GetY()-stsPoint->GetY(stsHit->GetZ())) < .02 ) ) {
+	   ( TMath::Abs(stsHit->GetY()-stsPoint->GetY(stsHit->GetZ())) < .04 ) ) {
 	foundPnt = kTRUE;
-        
       }
 
     }
@@ -324,31 +323,31 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
       resolution[1][ist] = 10000.*fitY[ist]->GetParameter(2);
     }
     
-    TH1F* projXPull[10];
-    TH1F* projYPull[10];
-    TF1*   fitXPull[10];
-    TF1*   fitYPull[10];
-    Double_t resolutionPull[2][10];
+    TH1F* projXPull;
+    TH1F* projYPull;
+    TF1*   fitXPull;
+    TF1*   fitYPull;
+    Double_t resolutionPull[2];
 
-    for ( Int_t ist = 0 ; ist < 8 ; ist++ ) {
-      projXPull[ist] = (TH1F*)fhHitPointPuls[ist]->ProjectionX(Form("projXPull%i",ist+1));
-      projYPull[ist] = (TH1F*)fhHitPointPuls[ist]->ProjectionY(Form("projYPull%i",ist+1));
-      fitXPull[ist] = new TF1(Form("fitXPull%i",ist+1),"gaus",-2,2);
-      fitYPull[ist] = new TF1(Form("fitYPull%i",ist+1),"gaus",-2,2);
-      projXPull[ist]->SetAxisRange(-2,2,"X");
-      projYPull[ist]->SetAxisRange(-2,2,"X");
-      projXPull[ist]->Fit(fitXPull[ist],"QN","",-2,2);
-      projYPull[ist]->Fit(fitYPull[ist],"QN","",-2,2);
-      resolutionPull[0][ist] = fitXPull[ist]->GetParameter(2);
-      resolutionPull[1][ist] = fitYPull[ist]->GetParameter(2);
-    }
+
+      projXPull = (TH1F*)fhHitPointPull->ProjectionX("projXPull");
+      projYPull = (TH1F*)fhHitPointPull->ProjectionY("projYPull");
+      fitXPull = new TF1("fitXPull","gaus",-2,2);
+      fitYPull = new TF1("fitYPull","gaus",-2,2);
+      projXPull->SetAxisRange(-2,2,"X");
+      projYPull->SetAxisRange(-2,2,"X");
+      projXPull->Fit(fitXPull,"QN","",-2,2);
+      projYPull->Fit(fitYPull,"QN","",-2,2);
+      resolutionPull[0] = fitXPull->GetParameter(2);
+      resolutionPull[1] = fitYPull->GetParameter(2);
+
     
     recoPad[3]->cd();
     fhHitPointCorrelation[0]->Draw("col");
     recoPad[3]->Update();
     
     recoPad[4]->cd();
-    fhHitPointPuls[0]->Draw("col");
+    fhHitPointPull->Draw("col");
     recoPad[4]->Update();
     
     recoPad[5]->cd();
@@ -372,22 +371,20 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
     recoPad[5]->Update();
     
     recoPad[6]->cd();
-    projXPull[0]->SetLineWidth(2);
-    projYPull[0]->SetLineWidth(2);
-    projXPull[0]->SetLineColor(2);
-    projYPull[0]->SetLineColor(3);
-    projXPull[0]->SetXTitle("Pull x, y ");
-    projXPull[0]->Draw();
-    projYPull[0]->Draw("same");
+    projXPull->SetLineWidth(2);
+    projYPull->SetLineWidth(2);
+    projXPull->SetLineColor(2);
+    projYPull->SetLineColor(3);
+    projXPull->SetXTitle("Pull x, y ");
+    projXPull->Draw();
+    projYPull->Draw("same");
     //  fitY[fShowStation2]->Draw("same");
     //  fitX[fShowStation2]->Draw("same");
     TLegend* legend2a = new TLegend(0.55,0.6,1.0,0.94);
     legend2a->SetBorderSize(0);
     legend2a->SetFillColor(0);
-    legend2a->AddEntry(projXPull[0],
-		    Form("X,#sigma=%3.2f#mum",resolutionPull[0][0]),"l");
-    legend2a->AddEntry(projYPull[0],
-		    Form("Y,#sigma=%3.2f#mum",resolutionPull[1][0]),"l");
+    legend2a->AddEntry(projXPull,Form("X,#sigma=%3.2f#mum",resolutionPull[0]),"l");
+    legend2a->AddEntry(projYPull,Form("Y,#sigma=%3.2f#mum",resolutionPull[1]),"l");
     legend2a->Draw();
     recoPad[6]->Update();
     recoPad[2]->cd();
@@ -428,8 +425,7 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
     printoutPave->SetBorderSize(0);
     printoutPave->SetFillColor(0);
     printoutPave->AddText(Form("%i events",fNEvents+1));
-    printoutPave->AddText(Form("Hits/Points %3.2f ",
-			     Double_t (nofStsHits)/Double_t (nofStsPoints)));
+    printoutPave->AddText(Form("Hits/Points %3.2f ",Double_t (nofStsHits)/Double_t (nofStsPoints)));
 
     printoutPave->AddText(Form("%3.0f points prim, %3.0f reco prim",
 			     Double_t (fNofPointsPrim)/Double_t (fNEvents+1),
@@ -493,19 +489,19 @@ void CbmStsFindHitsQa::CreateHistos() {
   CbmStsSector*  sector  = NULL;
   CbmStsSensor*  sensor  = NULL;
 
-  fhHitFindingEfficiency = new TH1F("hHitFindingEfficiency","Hit finding efficiency",
-				    1000000,
-				    (Float_t)(2<<24)-0.5,
-				    (Float_t)(2<<24)-0.5+1000000.);
+  fhHitFindingEfficiency = new TH1F("hHitFindingEfficiency","Hit finding efficiency",1000000,
+				    (Float_t)(2<<24)-0.5,(Float_t)(2<<24)-0.5+1000000.);
 
   fhEffIncAng  = new TH2F("hEffIncAng","hEffIncAng",100,0,100,100,0,1);
-  fhEffPdgSec  = new TH2F("hEffPdgSec", "hEffPdgSec", 3500,-1000,2500,100,0,1);
-  fhEffPdgPrim = new TH2F("hEffPdgPrim","hEffPdgPrim",3500,-1000,2500,100,0,1);
+  fhEffPdgSec  = new TH2F("hEffPdgSec", "hEffPdgSec", 350,-1000,2500,10,0,1);
+  fhEffPdgPrim = new TH2F("hEffPdgPrim","hEffPdgPrim",350,-1000,2500,10,0,1);
+  fhHitPointPull = new TH2F("hHitPointPull","Hit vs sigma at station %i",500,-3., 3.,500,-3.,3.);
+
   fHistoList->Add(fhEffPdgSec);
   fHistoList->Add(fhEffPdgPrim);
   fHistoList->Add(fhHitFindingEfficiency);
   fHistoList->Add(fhEffIncAng);
-  
+  fHistoList->Add(fhHitPointPull);
   for ( Int_t ist = 0 ; ist < fNStations ; ist++ ) {
     fhHitPointCorrelation[ist] = new TH2F(Form("hHitPointCorrelation%i",ist+1),
 					  Form("Hit vs point correlation at station %i",ist+1),
@@ -513,15 +509,11 @@ void CbmStsFindHitsQa::CreateHistos() {
     fhHitPointCorrelation[ist]->SetXTitle("#Delta x [cm]");  
     fhHitPointCorrelation[ist]->SetYTitle("#Delta y [cm]");
     
-    fhHitPointPuls[ist] = new TH2F(Form("hHitPointPuls%i",ist+1),
-					  Form("Hit vs sigma at station %i",ist+1),
-					  500,-3., 3.,500,-3.,3.);
-    fhHitPointPuls[ist]->SetXTitle("#Pull x [cm]");  
-    fhHitPointPuls[ist]->SetYTitle("#Pull y [cm]");
+
     
     
     fHistoListPS[ist]->Add(fhHitPointCorrelation[ist]);
-    fHistoListPS[ist]->Add(fhHitPointPuls[ist]);
+    
 
     fhHitPointCorrelationU[ist] = new TH2F(Form("hHitPointCorrelationU%i",ist+1),
 					   Form("Hit vs point correlation at station %i",ist+1),
@@ -532,14 +524,12 @@ void CbmStsFindHitsQa::CreateHistos() {
     fHistoListPS[ist]->Add(fhHitPointCorrelationU[ist]);
     fHistoListPS[ist]->Add(fhHitPointCorrelationB[ist]);
 
-    fhPoints    [ist] = new TH2F(Form("hPoints%i",ist+1),
-				 Form("Points on station %i",ist+1),
-				 1000,-100.,100.,
-				 1000,-100.,100.);
-    fhRecoPoints[ist] = new TH2F(Form("hRecoPoints%i",ist+1),
-				 Form("Reconstructed points on station %i",ist+1),
-				 1000,-100.,100.,
-				 1000,-100.,100.);
+    fhPoints    [ist] = new TH2F(Form("hPoints%i",ist+1),Form("Points on station %i",ist+1),
+				 100,-100.,100.,
+				 100,-100.,100.);
+    fhRecoPoints[ist] = new TH2F(Form("hRecoPoints%i",ist+1),Form("Reconstructed points on station %i",ist+1),
+				 100,-100.,100.,
+				 100,-100.,100.);
     fHistoListPS[ist]->Add(fhPoints    [ist]);
     fHistoListPS[ist]->Add(fhRecoPoints[ist]);
 
@@ -561,7 +551,7 @@ void CbmStsFindHitsQa::CreateHistos() {
 
     fhEnergyLoss[istat] = new TH3F(Form("hEnergyLossSt%d",istat+1),
 				   Form("Energy loss on station %d",istat+1),
-				   200,-100.,100.,200,-100.,100.,1000,0,0.01);
+				   20,-100.,100.,20,-100.,100.,100,0,0.01);
     fhIncAngle [istat] = new TH3F(Form("hIncAngleSt%d",istat+1),
 				   Form("Incident Angle on station %d;X;Y;Angle",istat+1),
 				   100,-50,50,100,-40,40,20,0,100.);

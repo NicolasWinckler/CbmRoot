@@ -64,8 +64,8 @@ class CbmStsDigi : public FairMultiLinkedData,  public CbmStsDetectorId
 
   /**   Add charge   **/
   void AddAdc(Int_t adc);
-  void AddIndex(int index){
-			AddLink(FairLink(kStsPoint, index));
+  void AddIndex(int index, int adc){
+			AddLink(FairLink(kStsPoint, index, adc));
 		}
   void AddIndex(std::vector<Int_t> index){
 			SetLinks(FairMultiLinkedData(kStsPoint, index));

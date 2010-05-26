@@ -277,6 +277,27 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	  for (it1=chPnt.begin(); it1!=chPnt.end(); it1++) {
 	    pnt = (*it1);
 	    point  = (CbmStsPoint*) fPoints->At(pnt);
+
+ 	    Double_t xin = point->GetXIn();
+  	    Double_t yin = point->GetYIn();
+ 	    Double_t zin = point->GetZIn();
+    
+ 	    Double_t xvec = point->GetXOut()-xin;
+       	    Double_t yvec = point->GetYOut()-yin;
+ 	    Double_t zvec = point->GetZOut()-zin;
+            Int_t MynofSteps = (Int_t)(TMath::Sqrt(xvec*xvec+yvec*yvec+zvec*zvec)/fStep+1);
+    
+            Double_t MystepEL = fEnergyLossToSignal*point->GetEnergyLoss()/(MynofSteps+1);
+            xvec = xvec/((Double_t)MynofSteps);  
+            yvec = yvec/((Double_t)MynofSteps);  
+            zvec = zvec/((Double_t)MynofSteps);  
+
+            for ( Int_t istep = 0 ; istep <= MynofSteps ; istep++ ) {
+    	      xin+=xvec;
+              yin+=yvec;
+       	      zin+=zvec;
+   	    }
+
 	    if ( it1==chPnt.begin() ) {
 	      match = new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(pnt);
 	      digi  = new ((      *fDigis)[fNDigis]) CbmStsDigi(pnt, stationNr, sectorNr,
@@ -286,7 +307,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	    else {
 	      match->AddPoint(pnt);
 	      fNMulti++;
-	      digi->AddIndex(pnt);
+	      digi->AddIndex(pnt,MystepEL);
 	    }
 	  }
 	}
@@ -326,6 +347,28 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	  for (it1=chPnt.begin(); it1!=chPnt.end(); it1++) {
 	    pnt = (*it1);
             point  = (CbmStsPoint*) fPoints->At(pnt);
+
+ 	    Double_t xin = point->GetXIn();
+  	    Double_t yin = point->GetYIn();
+ 	    Double_t zin = point->GetZIn();
+    
+ 	    Double_t xvec = point->GetXOut()-xin;
+       	    Double_t yvec = point->GetYOut()-yin;
+ 	    Double_t zvec = point->GetZOut()-zin;
+            Int_t MynofSteps = (Int_t)(TMath::Sqrt(xvec*xvec+yvec*yvec+zvec*zvec)/fStep+1);
+    
+            Double_t MystepEL = fEnergyLossToSignal*point->GetEnergyLoss()/(MynofSteps+1);
+            xvec = xvec/((Double_t)MynofSteps);  
+            yvec = yvec/((Double_t)MynofSteps);  
+            zvec = zvec/((Double_t)MynofSteps);  
+
+            for ( Int_t istep = 0 ; istep <= MynofSteps ; istep++ ) {
+    	      xin+=xvec;
+              yin+=yvec;
+       	      zin+=zvec;
+   	    }
+
+
 	    if ( it1==chPnt.begin() ) {
 	      match = new ((*fDigiMatches)[fNDigis]) CbmStsDigiMatch(pnt);
 	      digi  = new ((      *fDigis)[fNDigis]) CbmStsDigi(pnt, stationNr, sectorNr,
@@ -335,7 +378,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
 	    else {
 	      match->AddPoint(pnt);
 	      fNMulti++;
-	      digi->AddIndex(pnt);
+	      digi->AddIndex(pnt,MystepEL);
 	    }
 	  }
 	}

@@ -375,6 +375,7 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
   Double_t dx     = sector->GetDx();
   Double_t dy     = sector->GetDy();
   Double_t stereoB = sector->GetStereoB();
+  Double_t stereoF = sector->GetStereoF();
 
   //  Double_t z      = station->GetZ();
   Int_t stationNr = station->GetStationNr();
@@ -393,9 +394,21 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
     vXY = 0.;
   }
   else if ( iType == 2 || iType == 3 ) {
-    vX  = dx / TMath::Sqrt(12.);
-    vY  = dx / TMath::Sqrt(6.) / TMath::Abs(tanstr);
-    vXY = -1. * dx * dx / 12. / tanstr;
+//     vX  = dx / TMath::Sqrt(12.);
+//     vY  = dx / TMath::Sqrt(6.) / TMath::Abs(tanstr);
+//     vXY = -1. * dx * dx / 12. / tanstr;
+
+    if (stereoF==0.) {
+      vX  = dx / TMath::Sqrt(12.);
+      vY  = (vX/TMath::Sqrt(2.))*(1./TMath::Sin(stereoB/2.));
+      vXY = (-1. * dx * dx)/tanstr;
+    }
+    else {
+      vX  = ((dx / TMath::Sqrt(24.))*(1./TMath::Cos(stereoB)));
+      vY  = ((dx / TMath::Sqrt(24.))*(1./TMath::Sin(stereoB)));
+      vXY = 0.;
+    }
+
   }
   else {
     cerr << "-E- " << fName << "::FindHits: Illegal sector type "
@@ -472,7 +485,9 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
 	if ( sensorDetId == -1 ) continue;
 
 	pos.SetXYZ(xHit, yHit, zHit);
-	dpos.SetXYZ(sigmaX*clusterF->GetMeanError(), sigmaY*clusterB->GetMeanError(), 0.);
+	dpos.SetXYZ(0.5*TMath::Sqrt((vX*clusterF->GetMeanError())*(vX*clusterF->GetMeanError())+(vX*clusterB->GetMeanError())*(vX*clusterB->GetMeanError())), (0.5/tanstr)*TMath::Sqrt((vX*clusterF->GetMeanError())*(vX*clusterF->GetMeanError())+(vX*clusterB->GetMeanError())*(vX*clusterB->GetMeanError())), 0.);
+
+// dpos.SetXYZ(0.5*TMath::Sqrt((sector->GetDx()*clusterF->GetMeanError())*(sector->GetDx()*clusterF->GetMeanError())+(sector->GetDx()*clusterB->GetMeanError())*(sector->GetDx()*clusterB->GetMeanError())), (0.5/tanstr)*TMath::Sqrt((sector->GetDx()*clusterF->GetMeanError())*(sector->GetDx()*clusterF->GetMeanError())+(sector->GetDx()*clusterB->GetMeanError())*(sector->GetDx()*clusterB->GetMeanError())), 0.);
 	
 	Int_t statLayer = -1;
 	for ( Int_t istatL = station->GetNofZ() ; istatL > 0 ; istatL-- ) 

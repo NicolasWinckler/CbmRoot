@@ -53,13 +53,13 @@ class CbmStsCluster : public FairMultiLinkedData
    **@param iSide     0=front side; 1=back side
    **@param iChannel  channel number
    **/
-  CbmStsCluster(Int_t index, Int_t iStation, Int_t iSector, Int_t iSide);
+  CbmStsCluster(Int_t index, Double_t digiSig, Int_t iStation, Int_t iSector, Int_t iSide);
 
   /** Destructor **/
   virtual ~CbmStsCluster();
 
   void AddDigi(Int_t idigi)  { fDigis[fNofDigis++] = idigi; }
-  void AddIndex(int index){
+  void AddIndex(int index, double digiSig){
 			AddLink(FairLink(kStsDigi, index));
 		}
   void SetMean     (Double_t chan) { fChannel = chan; }

@@ -219,103 +219,135 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
 
 //--------------------------------------------------------------------------------
 // station 1
-// 2 + 6 + 4 + 8 + 6 + 30
-// 2   8  12  20  26   56
+//
+// jun10: 4 + 4 + 4 + 8 + 6 + 30   -- number of module types 	       
+// jun10: 4   8  12  20  26   56   -- sum of modules for this station
 
               if (fStation==1)
+              {
                 if (fModuleType==1)
-                  if (fModuleCopy <= 2)
-                    {
-                      fpadsizex = fst1_pad_type[0][0];
-                      fpadsizey = fst1_pad_type[0][1];
-                    }
-                  else
-                    {
-                      fpadsizex = fst1_pad_type[1][0];
-                      fpadsizey = fst1_pad_type[1][1];
-                    }
-                if (fModuleType==2)
+                {
                   if (fModuleCopy <= 4)
-                    {
-                      fpadsizex = fst1_pad_type[2][0];
+                  {
+                    fpadsizex = fst1_pad_type[0][0];
+                    fpadsizey = fst1_pad_type[0][1];
+                  }
+                  else
+                  {
+                    fpadsizex = fst1_pad_type[1][0];
+                    fpadsizey = fst1_pad_type[1][1];
+                  }
+                }
+                if (fModuleType==2)
+                { 
+                  if (fModuleCopy <= 4)
+                  {
+                    fpadsizex = fst1_pad_type[2][0];
                       fpadsizey = fst1_pad_type[2][1];
-                    }
+                  }
                   else
-                    {
-                      fpadsizex = fst1_pad_type[3][0];
-                      fpadsizey = fst1_pad_type[3][1];
-                    }
+                  {
+                    fpadsizex = fst1_pad_type[3][0];
+                    fpadsizey = fst1_pad_type[3][1];
+                  }
+                }
                 if (fModuleType==3)
+                {
                   if (fModuleCopy <= 6)
-                    {
-                      fpadsizex = fst1_pad_type[4][0];
-                      fpadsizey = fst1_pad_type[4][1];
-                    }
+                  {
+                    fpadsizex = fst1_pad_type[4][0];
+                    fpadsizey = fst1_pad_type[4][1];
+                  }
                   else
-                    {
-                      fpadsizex = fst1_pad_type[5][0];
-                      fpadsizey = fst1_pad_type[5][1];
-                    }
+                  {
+                    fpadsizex = fst1_pad_type[5][0];
+                    fpadsizey = fst1_pad_type[5][1];
+                  }
+                }
+              }
 
 //--------------------------------------------------------------------------------
 // station 2
-// 2 + 6 + 4 + 8 + 6 + 74
-// 2   8  12  20  26  100
+//
+// jun10: 4 + 4 + 4 + 8 + 6 + 30   -- number of module types 	       
+// jun10: 4   8  12  20  26   56   -- sum of modules for this station
 
               if (fStation==2)
+              {
                 if (fModuleType==1)
-                  if (fModuleCopy <= 2)
-                    {
-                      fpadsizex = fst2_pad_type[0][0];
-                      fpadsizey = fst2_pad_type[0][1];
-                    }
-                  else
-                    {
-                      fpadsizex = fst2_pad_type[1][0];
-                      fpadsizey = fst2_pad_type[1][1];
-                    }
-                if (fModuleType==2)
+                {
                   if (fModuleCopy <= 4)
-                    {
-                      fpadsizex = fst2_pad_type[2][0];
-                      fpadsizey = fst2_pad_type[2][1];
-                    }
+                  {
+                    fpadsizex = fst2_pad_type[0][0];
+                    fpadsizey = fst2_pad_type[0][1];
+                  }
                   else
-                    {
-                      fpadsizex = fst2_pad_type[3][0];
-                      fpadsizey = fst2_pad_type[3][1];
-                    }
+                  {
+                    fpadsizex = fst2_pad_type[1][0];
+                    fpadsizey = fst2_pad_type[1][1];
+                  }
+                }
+                if (fModuleType==2)
+                {
+                  if (fModuleCopy <= 4)
+                  {
+                    fpadsizex = fst2_pad_type[2][0];
+                    fpadsizey = fst2_pad_type[2][1];
+                  }
+                  else
+                  {
+                    fpadsizex = fst2_pad_type[3][0];
+                    fpadsizey = fst2_pad_type[3][1];
+                  }
+                }
                 if (fModuleType==3)
+                {
                   if (fModuleCopy <= 6)
-                    {
-                      fpadsizex = fst2_pad_type[4][0];
-                      fpadsizey = fst2_pad_type[4][1];
-                    }
+                  {
+                    fpadsizex = fst2_pad_type[4][0];
+                    fpadsizey = fst2_pad_type[4][1];
+                  }
                   else
-                    {
-                      fpadsizex = fst2_pad_type[5][0];
-                      fpadsizey = fst2_pad_type[5][1];
-                    }
+                  {
+                    fpadsizex = fst2_pad_type[5][0];
+                    fpadsizey = fst2_pad_type[5][1];
+                  }
+                }
+              }
 
 //--------------------------------------------------------------------------------
 // station 3
-// 8 + 136
-// 2   144
+//
+// jun10: 8 + 136   -- number of module types 
+// jun10: 2   144   -- sum of modules for this station
 
               if (fStation==3)
+	      {
                 if (fModuleType==3)
+                {
                   if (fModuleCopy <= 8)
-                    {
-                      fpadsizex = fst3_pad_type[0][0];
-                      fpadsizey = fst3_pad_type[0][1];
-                    }
+                  {
+                    fpadsizex = fst3_pad_type[0][0];
+                    fpadsizey = fst3_pad_type[0][1];
+                  }
                   else
-                    {
-                      fpadsizex = fst3_pad_type[1][0];
-                      fpadsizey = fst3_pad_type[1][1];
-                    }
+                  {
+                    fpadsizex = fst3_pad_type[1][0];
+                    fpadsizey = fst3_pad_type[1][1];
+                  }
+                }
+              }
 
 //--------------------------------------------------------------------------------
+// flip pads for even layers (2,4,6,...)
+
+              if( 0 == Orientation)   
+              {
+                Float_t copybuf = fpadsizex;
+                fpadsizex = fpadsizey;
+                fpadsizey = copybuf;
+              }
+              nmodules++;   // module counter
 
               //if( 1 == Orientation) {
               //  fpadsizex = 0.5;
@@ -325,18 +357,15 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
               //  fpadsizey = 0.5;
               //}
 
-              if( 0 == Orientation) {  // flip pads for even layers
-                Float_t copybuf = fpadsizex;
-                fpadsizex = fpadsizey;
-                fpadsizey = copybuf;
-              }
-              nmodules++;
+// print assignment of pads to modules 
+              if (fLayer<=1)   // for the first layer of each station only
+		printf("%04d - Station Layer Type Copy x y: %d %d %d %3d %6.3f %6.3f\n", \
+		       nmodules, fStation, fLayer, fModuleType, fModuleCopy, fpadsizex, fpadsizey);
 
               // Create new CbmTrdModule and add it to the map
 	      fModuleMap[fModuleID] = new CbmTrdModule(fModuleID, x, y, z, sizex, sizey, fpadsizex, fpadsizey, fIsRotated);
 	    }
 	  }
-
 	}
       }
     }

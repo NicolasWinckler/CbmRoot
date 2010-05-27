@@ -11,7 +11,7 @@
 #ifndef CBMTRDPADS_H
 #define CBMTRDPADS_H
 
-// v0.3
+// v0.4
   Float_t fst1_pad_type[6][2] = // array of pad sizes in station 1
     { {  .5, 46./23},     // 5 x  20    mm,  92 * 23 = 2116 pads mod1
       {  .5, 46./15},     // 5 x  30.67 mm,  92 * 15 = 1380 pads mod1

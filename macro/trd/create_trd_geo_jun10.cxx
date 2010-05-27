@@ -669,7 +669,7 @@ int main(void)
   float y320 = Detector_size_y[2] *  2;
 	  	    
   float x321 = Detector_size_x[2] * -4;
-  float y321 = Detector_size_y[2] * -1;
+  float y321 = Detector_size_y[2] *  1;
 	  	    
   float x322 = -x307;
   float y322 = -y307;

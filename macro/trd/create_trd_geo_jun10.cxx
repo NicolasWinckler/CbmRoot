@@ -2,6 +2,9 @@
 //   Generator for CbmTrd Geometry
 //
 //
+// Update 20100527 - David Emschermann 
+// - replace carbon frames by G10
+//
 // Update 20100526 - David Emschermann 
 // - change the order of chambers to match the pad definition for jun10
 //
@@ -248,10 +251,10 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
   
       if ( frame_width > 0.) {
         fprintf(geofile,"//*********************************\n");
-        fprintf(geofile,"trd%dmod%dcarbon1#1\n",Station_number, module_number);
+        fprintf(geofile,"trd%dmod%dframe1#1\n",Station_number, module_number);
         fprintf(geofile,"trd%dmod%d#%d\n",Station_number, module_number,copy_number);
         fprintf(geofile,"BOX\n");
-        fprintf(geofile,"carbon\n");
+        fprintf(geofile,"G10\n");
         fprintf(geofile,"%f %f %f\n", Detector_size_x[j] /2 ,-frame_width/2 , -frame_thickness);
         fprintf(geofile,"%f %f %f\n", Detector_size_x[j] /2 , frame_width/2 , -frame_thickness);
         fprintf(geofile,"%f %f %f\n",-Detector_size_x[j] /2 , frame_width/2 , -frame_thickness);
@@ -273,7 +276,7 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
         fprintf(geofile,"//*********************************\n");
   
         fprintf(geofile,"//*********************************\n");
-        fprintf(geofile,"trd%dmod%dcarbon1#2\n",Station_number, module_number);
+        fprintf(geofile,"trd%dmod%dframe1#2\n",Station_number, module_number);
         fprintf(geofile,"trd%dmod%d#%d\n",Station_number, module_number,copy_number);
         fprintf(geofile,"%f %f %f\n", 0., -(Active_area_y[j] + frame_width / 2 ), frame_position);
         if (Position_Station1[i][3] == 0) {
@@ -288,10 +291,10 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
   
   
         fprintf(geofile,"//*********************************\n");
-        fprintf(geofile,"trd%dmod%dcarbon2#1\n",Station_number, module_number);
+        fprintf(geofile,"trd%dmod%dframe2#1\n",Station_number, module_number);
         fprintf(geofile,"trd%dmod%d#%d\n",Station_number, module_number,copy_number);
         fprintf(geofile,"BOX\n");
-        fprintf(geofile,"carbon\n");
+        fprintf(geofile,"G10\n");
         fprintf(geofile,"%f %f %f\n",  frame_width/2, -Active_area_y[j], -frame_thickness);
         fprintf(geofile,"%f %f %f\n",  frame_width/2,  Active_area_y[j], -frame_thickness);
         fprintf(geofile,"%f %f %f\n", -frame_width/2,  Active_area_y[j], -frame_thickness);
@@ -312,7 +315,7 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
         fprintf(geofile,"//*********************************\n");
   
         fprintf(geofile,"//*********************************\n");
-        fprintf(geofile,"trd%dmod%dcarbon2#2\n",Station_number, module_number);
+        fprintf(geofile,"trd%dmod%dframe2#2\n",Station_number, module_number);
         fprintf(geofile,"trd%dmod%d#%d\n",Station_number, module_number,copy_number);
         fprintf(geofile,"%f %f %f\n", -(Active_area_x[j] + frame_width / 2 ), 0., frame_position);
         if (Position_Station1[i][3] == 0) {

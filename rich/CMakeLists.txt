@@ -22,16 +22,28 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
 #/u/slebedev/Baykal/tbb21_017oss/include
 #/u/andrey/soft/tbb/tbb22_009oss/include
-
-${CBMROOT_SOURCE_DIR}/rich 
 )
+
+If(TBB_FOUND)
+  Set(INCLUDE_DIRECTORIES 
+      ${INCLUDE_DIRECTORIES}
+      ${TBB_INCLUDE_DIRS}
+     )
+EndIf(TBB_FOUND)
 
 include_directories( ${INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 )
- 
+
+If(TBB_FOUND)
+  Set(LINK_DIRECTORIES
+      ${LINK_DIRECTORIES} 
+      ${TBB_LIBRARY_DIRS}
+     )
+EndIf(TBB_FOUND)
+
 link_directories( ${LINK_DIRECTORIES})
 
 set(RICH_SRCS
@@ -47,9 +59,7 @@ finder/CbmRichRingFinderIdeal.cxx
 finder/CbmRichFindRings.cxx
 #finder/CbmRichRingFinderHoughSimd.cxx
 finder/CbmRichRingFinderHough.cxx
-#finder/CbmRichRingFinderHoughParallel.cxx
 finder/CbmRichRingFinderHoughImpl.cxx
-#finder/CbmRichRingFinderHoughParallelImpl.cxx
 fitter/CbmRichRingFitterCircle.cxx  
 fitter/CbmRichFitRings.cxx
 fitter/CbmRichRingFitterCOP.cxx  
@@ -78,6 +88,14 @@ selection/CbmRichRingSelectNeuralNet.cxx
 #selection/NNfunction.cxx 
 #LhcbRingFinder.cxx  
 )
+
+If(TBB_FOUND)
+  Set(RICH_SRCS 
+      ${RICH_SRCS}
+      finder/CbmRichRingFinderHoughParallel.cxx
+      finder/CbmRichRingFinderHoughParallelImpl.cxx
+     )
+EndIf(TBB_FOUND)
 
 set(RICH_HEADERS
 CbmGeoRich.h
@@ -115,6 +133,13 @@ qa/CbmRichElectronsQa.h
 #qa/CbmRichParallelQa.h  
 #LhcbRingFinder.h  
 )
+
+If(TBB_FOUND)
+  Set(RICH_HEADERS 
+      ${RICH_HEADERS}
+      finder/CbmRichRingFinderHoughParallel.h
+     )
+EndIf(TBB_FOUND)
 
 if(RULE_CHECKER_FOUND)
   CHECK_RULES("${RICH_SRCS}" "${INCLUDE_DIRECTORIES}" RICH_RULES)
@@ -154,7 +179,12 @@ ENDIF (SSE_TRUE)
 # END SSE
 
 
-set(RICH_LINKDEF  RichLinkDef.h)
+If(TBB_FOUND)
+  set(RICH_LINKDEF  RichLinkDef_tbb.h)
+Else(TBB_FOUND)
+  set(RICH_LINKDEF  RichLinkDef.h)
+EndIf(TBB_FOUND)
+
 set(RICH_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/CbmRichDict.cxx) 
 
 ROOT_GENERATE_DICTIONARY("${RICH_HEADERS}" "${RICH_LINKDEF}" "${RICH_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
@@ -166,6 +196,13 @@ set(RICH_SRCS ${RICH_SRCS} ${RICH_DICTIONARY})
 add_library(Rich SHARED ${RICH_SRCS})
 target_link_libraries(Rich ${ROOT_LIBRARIES})
 set_target_properties(Rich PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
+
+If(TBB_FOUND)
+  target_link_libraries(Rich
+                        ${TBB_LIBRARIES}
+                       )
+
+EndIf(TBB_FOUND)
 
 ################ install ###################
 install(TARGETS Rich DESTINATION ${CMAKE_BINARY_DIR}/lib)

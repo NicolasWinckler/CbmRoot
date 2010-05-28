@@ -70,6 +70,7 @@ else(CBMROOT_MINIMAL)
   find_package(GEANT4VMC)
   find_package(CLHEP)
   find_package(RuleChecker)
+  find_package(TBB)
 endif(CBMROOT_MINIMAL)
 
 

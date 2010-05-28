@@ -176,70 +176,44 @@ void CbmTrdDigitizer::Exec(Option_t * option)
     }
     fELoss = ELoss;
 
-    // Calculate point in the middle of the detector. This is
-    // for safety reasons, because the point at exit is slightly
-    // outside of the active volume. If one does not use a point
-    // in the detector one will get a wrong volume from the
-    // geomanager. Navigate to the correct volume to get all
-    // necessary information about this volume
+    fTime = pt->GetTime();
 
-    Double_t x_mean = (pt->GetXIn()+pt->GetXOut())/2.;
-    Double_t y_mean = (pt->GetYIn()+pt->GetYOut())/2.;
-    Double_t z_mean = (pt->GetZIn()+pt->GetZOut())/2.;
-    gGeoManager->FindNode(x_mean, y_mean, z_mean);
+    Int_t Sector;
 
-    if ( fVerbose > 2 ) {
-      cout<<"*** CbmTrdDigitizer::Exec ***"<<endl;
-      cout<<setprecision(5)<<"xmean: "<<x_mean<<endl;
-      cout<<setprecision(5)<<"ymean: "<<y_mean<<endl;
-      cout<<setprecision(5)<<"zmean: "<<z_mean<<endl;
-    }
+    // Get pointer to the correct TRD module 
+    // Extract the information which digi
+    // Row/Col/Sector has fired for the TrdPoint
+    // Encode the Sector info into the detector ID and
+    // finally add the digi to the map
+    fModuleInfo = fDigiPar->GetModule(pt->GetDetectorID());
+    fModuleInfo->GetPadInfo(pt, fCol, fRow, Sector);
+    fModuleID = fTrdId.SetSector(pt->GetDetectorID(), Sector);
 
-    // Get the local point in local MC coordinates from
-    // the geomanager. This coordinate system is rotated
-    // if the chamber is rotated. This is corrected in 
-    // GetModuleInformationFromDigiPar(..) to have a
-    // the same local coordinate system in all the chambers
-    const Double_t *global_point = gGeoManager->GetCurrentPoint();
-    Double_t local_point[3];  // global_point[3];
-    gGeoManager->MasterToLocal(global_point, local_point);
-
-    fModuleID = pt->GetDetectorID();
-
-    GetModuleInformationFromDigiPar(fModuleID, local_point);
-
-    CalculatePixel();
-	
     AddDigi();
 
   }
 
-  /*
-  cout <<"--II-- CbmTrdDigitizer: Used " << fTrdPoints->GetEntriesFast()<<
-    " points."<<endl;
-
-  cout <<"--II-- CbmTrdDigitizer: Create " << fDigiMap.size() <<
-    " digis."<<endl;
-  */
-
+  // Fill data from internaly used stl map into output TClonesArray
+  // Fill also the DigiMatch output which holds for each digi the MC indexes
+  // which give a contribution to the digi
   Int_t iDigi=0; 
-
-  for ( fDigiMapIt=fDigiMap.begin() ; fDigiMapIt != fDigiMap.end(); fDigiMapIt++ ){
+  for ( fDigiMapIt=fDigiMap.begin() ; fDigiMapIt != fDigiMap.end(); 
+        fDigiMapIt++ ) {
     new ((*fDigiCollection)[iDigi]) 
         CbmTrdDigi(fDigiMapIt->second->GetDetId(), 
         fDigiMapIt->second->GetCol(), fDigiMapIt->second->GetRow(), 
         fDigiMapIt->second->GetCharge(),fDigiMapIt->second->GetTime());
 
-   CbmTrdDigiMatch *p = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
-   //   cout<<"DetID: "<<fDigiMapIt->second->GetDetId()<<endl;
-   std::vector<int> arr=fDigiMapIt->second->GetMCIndex();
-   std::vector<int>::iterator it;
+    CbmTrdDigiMatch *p = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
 
-   for (it=arr.begin() ; it <arr.end(); it++  ) {
-     Int_t bla = p->AddPoint((Int_t)*it);
-   }
+    std::vector<int> arr=fDigiMapIt->second->GetMCIndex();
+    std::vector<int>::iterator it;
 
-   iDigi++;
+    for (it=arr.begin() ; it <arr.end(); it++  ) {
+      Int_t bla = p->AddPoint((Int_t)*it);
+    }
+
+    iDigi++;
 
   }
 
@@ -257,118 +231,6 @@ void CbmTrdDigitizer::FinishEvent()
 }
 // --------------------------------------------------------------------
 
-/*
-void CbmTrdDigitizer::GetModuleInformation()
-{
-
-  // Extract the information about station, layer, module type
-  // and cpoy number of the module from the full path to the
-  // node.
-  // The full path is tokenized at the "/" which diide the different
-  // levels of the geometry.
-  // Knowing the nameing scheme of the volumes one gets the required
-  // information with simple string manipulation.
-  // This is probably not the fastes way, but the speed has to be checked.
-  // The methode works only for versions of Root > 5.20.0, before the
-  // class TStringTocken is not implemented
-
-
-  TString path = gGeoManager->GetPath();
-  cout<<"Path: "<<path<<endl;
-#if ROOT_VERSION_CODE >= ROOT_VERSION(5,20,0)
-  TStringToken* bla = new TStringToken(path,"/");
-#else
-  CbmTrdStringToken* bla = new CbmTrdStringToken(path,"/");
-#endif
-
-  while (bla->NextToken()) {
-    if (bla->Contains("layer")) {
-      TString bla3 = (TString) *bla;
-      Ssiz_t pos = bla3.Last('_');
-      Ssiz_t substringLength=bla3.Length()-pos-1;
-      TString bla2 = bla3((bla3.Last('_')+1),substringLength);
-      TString bla1 = bla3(3,1);
-      fStation=bla1.Atoi();
-      fLayer=bla2.Atoi();
-    }
-    if (bla->Contains("mod")){
-      TString bla3 = (TString) *bla;
-      Ssiz_t pos = bla3.Last('_');
-      Ssiz_t substringLength=bla3.Length()-pos-1;
-      TString bla2 = bla3(pos+1,substringLength);
-      substringLength=pos-7;
-      TString bla1 = bla3(7,substringLength);     
-      fModuleType = bla1.Atoi();
-      fModuleCopy = bla2.Atoi();
-      break;
-    } 
-  }
-
-}
-*/
-
-void CbmTrdDigitizer::GetModuleInformationFromDigiPar(Int_t VolumeID, Double_t *local_point)
-{
-
-  fModuleInfo = fDigiPar->GetModule(VolumeID);
-  Int_t detID = fModuleInfo->GetDetectorId();
-
-  if (detID != VolumeID ){
-    cout<<" -E- This is wrong!!!!!!!!!!!!!!!!!!!!!"<<endl;
-  }
-
-  /*
-  Int_t* detInfo = fTrdId.GetDetectorInfo(VolumeID); 
-  fStation = detInfo[1];
-  fLayer = detInfo[2];
-  fModuleType =  detInfo[3];
-  fModuleCopy = detInfo[4];
-  */
-
-  fpadsizex = fModuleInfo->GetPadSizex();
-  fpadsizey = fModuleInfo->GetPadSizey();
-  fsizex    = fModuleInfo->GetSizex();
-  fsizey    = fModuleInfo->GetSizey();
-
-  // Calculate the position in the chamber with the origin of
-  // the local coordinate system in the lower left (right???) corner
-  // of the chamber. x goes to the left looking in beam direction
-  // y goes upward
-
-  if (fModuleInfo->IsRotated()){
-    Double_t tempx = local_point[0];
-    Double_t tempy = local_point[1];
-    local_point[1] = -tempx;
-    local_point[0] =  tempy;
-
-    tempx = fsizex;
-    tempy = fsizey;
-    fsizey = tempx;
-    fsizex = tempy;
-  }
-
-  fPosX=local_point[0]+fsizex;
-  fPosY=local_point[1]+fsizey;
- 
-  if ( fVerbose > 2 ) {
-    cout<<setprecision(5)<<"*** CbmTrdDigitizer::GetModuleInformationFromDigiPar ***"<<endl;
-    cout<<setprecision(5)<<"sizex: "<< fsizex <<endl;
-    cout<<setprecision(5)<<"sizey: "<< fsizey <<endl;
-    cout<<setprecision(5)<<"padsizex: "<< fpadsizex <<endl;
-    cout<<setprecision(5)<<"padsizey: "<< fpadsizey <<endl;
-  
-    cout<<setprecision(5)<<"X: "<< local_point[0] <<endl;
-    cout<<setprecision(5)<<"Y: "<< local_point[1] <<endl;
-    cout<<setprecision(5)<<"fPosX: "<< fPosX <<endl;
-    cout<<setprecision(5)<<"fPosY: "<< fPosY <<endl;
-    cout<<"DetID: "<< detID <<endl;
-  
-    cout<<setprecision(5)<<"CPosX: "<< fModuleInfo->GetX() <<endl;
-    cout<<setprecision(5)<<"CPosY: "<< fModuleInfo->GetY() <<endl;
-    cout<<setprecision(5)<<"CPosZ: "<< fModuleInfo->GetZ() <<endl;
-  }
-  
-}
 
 // --------------------------------------------------------------------
 
@@ -405,30 +267,6 @@ void CbmTrdDigitizer::AddDigi() {
 
 }
 
-// --------------------------------------------------------------------
-
-void CbmTrdDigitizer::CalculatePixel() {
-
-  fCol = 1+(Int_t)(fPosX/fpadsizex);
-  fRow = 1+(Int_t)(fPosY/fpadsizey);
-
-  /*
-  cout<<"#######################################"<<endl;
-  cout<<fModuleID<<","<<fCol<<","<<fRow<<endl;
-  cout<<fModuleID<<","<<setprecision(5)<<fPosX<<","<<fPosY<<endl;
-  */
-
-  if ( fVerbose > 2 ){
-    cout<<"*** CbmTrdDigitizer::CalculatePixel ***"<<endl;
-    cout<<setprecision(5)<<"fPosX: "<< fPosX <<endl;
-    cout<<setprecision(5)<<"fPosY: "<< fPosY <<endl;
-    cout<<setprecision(5)<<"fPadX: "<< fpadsizex <<endl;
-    cout<<setprecision(5)<<"fPadY: "<< fpadsizey <<endl;
-    cout<<"Col: "<< fCol <<endl;
-    cout<<"Row: "<< fRow <<endl;
-  } 
-
-}
 
 // ---- Register ------------------------------------------------------
 void CbmTrdDigitizer::Register(){

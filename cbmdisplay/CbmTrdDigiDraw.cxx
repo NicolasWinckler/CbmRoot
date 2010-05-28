@@ -150,8 +150,8 @@ void CbmTrdDigiDraw::Exec(Option_t* option)
 	 cout<<" -E- This is wrong!!!!!!!!!!!!!!!!!!!!!"<<endl;
        }
     
-       Float_t padsizex = fModuleInfo->GetPadSizex();
-       Float_t padsizey = fModuleInfo->GetPadSizey();
+       Float_t padsizex = fModuleInfo->GetPadSizex(0);//TODO: change for sector layout
+       Float_t padsizey = fModuleInfo->GetPadSizey(0);//TODO: change for sector layout
        Float_t sizex    = fModuleInfo->GetSizex();
        Float_t sizey    = fModuleInfo->GetSizey();
 

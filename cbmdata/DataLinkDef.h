@@ -48,7 +48,7 @@
 #pragma link C++ class CbmTrdTrack+;
 #pragma link C++ class CbmTrdDigi+;
 #pragma link C++ class CbmTrdDigiMatch+;
-#pragma link C++ class CbmTrdDetectorId+;
+//#pragma link C++ class CbmTrdDetectorId+;
 
 #pragma link C++ class CbmTofHit+;
 #pragma link C++ class CbmTofPoint+;

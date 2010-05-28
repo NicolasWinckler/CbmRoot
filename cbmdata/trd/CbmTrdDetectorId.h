@@ -25,15 +25,7 @@
 #ifndef CBMTRDDETECTORID_H
 #define CBMTRDDETECTORID_H 1
 
-
-#include <iostream>
-#include "TObject.h"
-#include "CbmDetectorList.h"
- 
-using std::cerr;
-using std::endl;
-
-
+#include"Rtypes.h"
 
 class CbmTrdDetectorId
 {
@@ -50,9 +42,7 @@ class CbmTrdDetectorId
   
   
   /** Get System identifier from detector ID **/
-  Int_t GetSystemId(Int_t detectorId) const {
-    return (detectorId & 31);
-  }
+  Int_t GetSystemId(const Int_t detectorId);
 
    
   /** Get complete system info from detector ID
@@ -61,6 +51,15 @@ class CbmTrdDetectorId
    **/
   Int_t* GetDetectorInfo(const Int_t detectorId);
 
+  /** Get sector number from detector ID **/
+  Int_t GetSector(const Int_t detectorId);
+
+  /** Get module number from detector ID. 
+   ** This is masking the the sector number
+   ** if this is set.
+   **/
+  Int_t GetModuleId(const Int_t detectorId);
+
 
   /** Calculate the unique detector ID
    ** This will return a pointer to an integer
@@ -68,14 +67,24 @@ class CbmTrdDetectorId
    **/
   Int_t SetDetectorInfo(const Int_t* detectorInfo);
 
+  /** Add the sector info to the detoctor ID.
+   ** This is needed for the digitization and
+   ** hit producing step.
+   **/
+  Int_t SetSector(const Int_t moduleInfo, const Int_t Sector);
+
+  //  char* itoa(int value, char* result, int base);
+
  private:
  
   static const Int_t array_length = 6;
   static const Int_t shiftarray[];
   static const Int_t bitarray[];
   Int_t result_array[array_length];
+  Int_t maskarray[array_length];
+  Int_t modulemask;
 
-  ClassDef(CbmTrdDetectorId,1);
+  //  ClassDef(CbmTrdDetectorId,1);
   
 };
 

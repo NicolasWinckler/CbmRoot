@@ -27,21 +27,12 @@ class CbmTrdDigiPar : public FairParGenericSet
 
   /** Standard constructor **/
   CbmTrdDigiPar(const char* name    = "CbmTrdDigiPar",
-			const char* title   = "TRD digi parameters",
-			const char* context = "Default");
+		const char* title   = "TRD digi parameters",
+		const char* context = "Default");
 
 
   /** Destructor **/
   virtual ~CbmTrdDigiPar();
-
-
-  /** Initialisation from input device**/
-  //virtual Bool_t init(FairParIo* input);
-
-
-  /** Output to file **/
-  //  virtual Int_t write(FairParIo* output);
-
   
   /** Reset all parameters **/
   virtual void clear();
@@ -50,13 +41,16 @@ class CbmTrdDigiPar : public FairParGenericSet
   Bool_t getParams(FairParamList*);
 
   void SetNrOfModules(Int_t i) { fNrOfModules = i; }
+  void SetMaxSectors(Int_t i) { fMaxSectors = i; }
   void SetModuleIdArray(TArrayI array) { fModuleIdArray = array; }
   void SetModuleRotArray(TArrayI array) { fModuleRotArray = array; }
   void SetModuleMap(std::map<Int_t, CbmTrdModule*> map) 
                     { fModuleMap = map;}
 
   Int_t GetNrOfModules() { return fNrOfModules;}
+  Int_t GetMaxSectors() { return fMaxSectors;}
   Int_t GetModuleId(Int_t i) {return fModuleIdArray[i];}
+
   CbmTrdModule* GetModule(Int_t i) {return fModuleMap[i];}
 
  private:
@@ -68,9 +62,9 @@ class CbmTrdDigiPar : public FairParGenericSet
   TArrayI fModuleIdArray; // Array to hold the unique IDs for all modules
   TArrayI fModuleRotArray; // Array to hold info about rotation
   Int_t fNrOfModules; // Total number of modules
+  Int_t fMaxSectors; // Maximum number of sectors
 
-
-  ClassDef(CbmTrdDigiPar,1);
+  ClassDef(CbmTrdDigiPar,2);
 
 
 };

@@ -54,39 +54,18 @@ class CbmTrdDigitizer : public FairTask {
    /** Finish task (called after all event) **/
     virtual void FinishTask(){;}
 
-    /*
-    void AddHit(TVector3 &posHit, TVector3 &posHitErr,
-		Int_t TrackID, Int_t PlaneID, Int_t ref, Double_t ELoss,
-		Double_t ELossTR, Double_t ELossdEdX);
-    */
-
     void Register();
 
 private:
-
-    void GetModuleInformationFromDigiPar(Int_t, Double_t*);
-    //    void GetModuleInformation();
    
     void AddDigi();
 
-    void CalculatePixel();
-
-    //    Int_t   fStation;
-    //    Int_t   fLayer;
-    //    Int_t   fModuleType;
-    //    Int_t   fModuleCopy;
     Int_t   fCol; //Calculated pixel column were the hit is in
     Int_t   fRow; //Calculated pixel row were the hit is in
     Int_t   fModuleID;//Unique number for detector module
     Int_t   fMCindex;// index to MCPoint
-    Float_t fpadsizex; //pixel widh in x;
-    Float_t fpadsizey; //pixel width in y;
-    Float_t fsizex; //module widh in x;
-    Float_t fsizey; //module width in y;
     Float_t fELoss;//energy loss from MCPoint 
     Float_t fTime;//time from MCPoint
-    Float_t fPosX;//Hit position in chamber coordinates
-    Float_t fPosY;//Hit position in chamber coordinates
     Float_t fEfficiency; // Digi production efficiency (0-100%)
     //    Double_t fthreshold; //pixel threshold in electrons
     //    Double_t fnoise; //pixel noise in electrons

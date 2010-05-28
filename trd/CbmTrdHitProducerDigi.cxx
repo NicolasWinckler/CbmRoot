@@ -163,59 +163,76 @@ InitStatus CbmTrdHitProducerDigi::Init()
 void CbmTrdHitProducerDigi::Exec(Option_t * option)
 {
 
-    fHitCollection->Clear();
-    CbmTrdDigi *digi=NULL;
-    CbmTrdDigiMatch *digimatch=NULL;
+  fHitCollection->Clear();
+  CbmTrdDigi *digi=NULL;
+  CbmTrdDigiMatch *digimatch=NULL;
+  
+  Int_t Col, Row, DetId, moduleId, Plane;
+  Int_t Station, Layer, ModuleType, ModuleCopy, Sector;
+  Double_t xHit, yHit, zHit;
+  Double_t xHitErr, yHitErr, zHitErr;
+  Double_t ELoss;
+  TVector3 posHit;
+  TVector3 posHitErr;
+    
+  Int_t nentries = fTrdDigi->GetEntries();
+  cout<<" ** "<<nentries<<" Trd hits to be created in this event** "<<endl;
+  
+  for (int j=0; j < nentries; j++ ) {
+    
+    digi =  (CbmTrdDigi*) fTrdDigi->At(j);
+    
+    Col = digi->GetCol();
+    Row = digi->GetRow();
+    ELoss = digi-> GetCharge();
+    DetId = digi->GetDetId();
 
-    Double_t xHit, yHit, zHit;
-    Double_t xHitErr, yHitErr, zHitErr;
+    // The digi contains the information of the detector Id + the
+    // sector number. The digitization parameters are stored per
+    // module with arrays holding the information about the sectors.
+    // So we have to extract the information about the module Id and
+    // the sector from the detector Id.
+    Int_t* bla = fTrdId.GetDetectorInfo(DetId);
+    Station = bla[1];
+    Layer = bla[2];
+    ModuleType = bla[3];
+    ModuleCopy = bla[4];
+    Sector = bla[5];
+    moduleId= fTrdId.GetModuleId(DetId);
 
-    Int_t nentries = fTrdDigi->GetEntries();
-    cout<<" ** "<<nentries<<" Trd hits to be created in this event** "<<endl;
+    /*
+    cout <<"##########################################"<<endl;
+    cout <<"ID        : "<<DetId<<endl;
+    cout <<"Module ID : "<<moduleId<<endl;
+    cout <<"Sector    : "<<Sector<<endl;
+    */
 
-    for (int j=0; j < nentries; j++ ) {
+    Plane=fLayersBeforeStation[Station-1]+Layer;
 
-      digi =  (CbmTrdDigi*) fTrdDigi->At(j);
-
-      //      digi->Print();
-
-      fCol = digi->GetCol();
-      fRow = digi->GetRow();
-      Double_t ELoss = digi-> GetCharge();
-      fDetId = digi->GetDetId();
-
-      /*
-      cout <<"Col: "<<fCol<<endl;
-      cout <<"Row: "<<fRow<<endl;
-      cout <<"ELoss: "<<ELoss<<endl;
-      cout <<"ID: "<<fDetId<<endl;
-      */
-
-      CalculateHitPosition();
-
-	
-      //      AddHit();
-
-        Int_t Plane=fLayersBeforeStation[fStation-1]+fLayer;
-
-      
-        Double_t xHitErr = fpadsizex / TMath::Sqrt(12.);
-        Double_t yHitErr = fpadsizey / TMath::Sqrt(12.);
-	TVector3 posHit(fPosX, fPosY, fPosZ);
-	TVector3 posHitErr(xHitErr,yHitErr, 0.);
-
-	AddHit(posHit, posHitErr, 0, Plane, j , ELoss, 0., 0.);
-      
-
-    }
-
+    fModuleInfo = fDigiPar->GetModule(moduleId);
+    fModuleInfo->GetPosition(Col, Row, moduleId, Sector, posHit, posHitErr);
+     
+    /*
+      cout <<"##########################################"<<endl;
+      cout <<"ID     : "<<detID<<endl;
+      cout <<"System : "<<kTRD<<" , "<<bla[0]<<endl;
+      cout <<"Station: "<<station<<" , "<<bla[1]<<endl;
+      cout <<"Layer  : "<<layer<<" , "<<bla[2]<<endl;
+      cout <<"Type   : "<<modtype<<" , "<<bla[3]<<endl;
+      cout <<"Copy   : "<<modnumber<<" , "<<bla[4]<<endl;
+    */
+        
+    AddHit(posHit, posHitErr, DetId, Plane, j , ELoss, 0., 0.);
+    
+  }
+  
 }
 // --------------------------------------------------------------------
 
 // ---- Add Hit to HitCollection --------------------------------------
 
 void CbmTrdHitProducerDigi::AddHit(TVector3 &posHit, TVector3 &posHitErr,
-			       Int_t index, Int_t Plane, Int_t ref,
+			       Int_t detId, Int_t Plane, Int_t ref,
 			       Double_t ELoss, Double_t ELossTR,
 			       Double_t ELossdEdX){
 
@@ -226,7 +243,7 @@ void CbmTrdHitProducerDigi::AddHit(TVector3 &posHit, TVector3 &posHitErr,
 //    new((*fHitCollection)[size]) CbmTrdHit(fDetId, posHit, posHitErr, ref,
 //					   Plane, 0., 0., ELoss);
 
-    new((*fHitCollection)[size]) CbmTrdHit(fDetId, posHit, posHitErr, 0., 
+    new((*fHitCollection)[size]) CbmTrdHit(detId, posHit, posHitErr, 0., 
                             ref, Plane, 0., 0., ELoss);
 }
 
@@ -244,78 +261,5 @@ void CbmTrdHitProducerDigi::Register(){
   FairRootManager::Instance()->Register("TrdHit","Trd", fHitCollection, kTRUE);
 
 }
-
-// ---- CalculateHitPosition ------------------------------------------
-void CbmTrdHitProducerDigi::CalculateHitPosition() {
-
-  fModuleInfo = fDigiPar->GetModule(fDetId);
-  Int_t detID = fModuleInfo->GetDetectorId();
-
-  if (detID != fDetId ){
-    cout<<" -E- This is wrong!!!!!!!!!!!!!!!!!!!!!"<<endl;
-  }
-
-  Int_t* bla = fTrdId.GetDetectorInfo(fDetId);
-  fStation = bla[1];
-  fLayer = bla[2];
-  fModuleType = bla[3];
-  fModuleCopy = bla[4];
- 
-  /*
-  cout <<"##########################################"<<endl;
-  cout <<"ID     : "<<fVolumeID<<endl;
-  cout <<"System : "<<kTRD<<" , "<<bla[0]<<endl;
-  cout <<"Station: "<<fstation<<" , "<<bla[1]<<endl;
-  cout <<"Layer  : "<<flayer<<" , "<<bla[2]<<endl;
-  cout <<"Type   : "<<fmodtype<<" , "<<bla[3]<<endl;
-  cout <<"Copy   : "<<fmodnumber<<" , "<<bla[4]<<endl;
-
-
-  fStation = (Int_t) (detID/100000);
-  fLayer =  (Int_t) ((detID -(fStation*100000))/10000);
-  fModuleType =  (Int_t) ((detID -(fStation*100000)-(fLayer*10000))/1000);
-  fModuleCopy = (Int_t) (detID - (fStation*100000) - (fLayer*10000) - (fModuleType*1000)); 
-  */
-    
-  fpadsizex = fModuleInfo->GetPadSizex();
-  fpadsizey = fModuleInfo->GetPadSizey();
-  fsizex    = fModuleInfo->GetSizex();
-  fsizey    = fModuleInfo->GetSizey();
-
-  if (fModuleInfo->IsRotated()){
-    Double_t tempx = fsizex;
-    Double_t tempy = fsizey;
-    fsizey = tempx;
-    fsizex = tempy;
-  }
-
-
-  Float_t local_point[2];
-
-  local_point[0] = ( ((fCol-0.5) * fpadsizex) - fsizex);
-  local_point[1] = ( ((fRow-0.5) * fpadsizey) - fsizey);
-
-  fPosX=local_point[0]+fModuleInfo->GetX();
-  fPosY=local_point[1]+fModuleInfo->GetY();
-  fPosZ=fModuleInfo->GetZ();
-
-  if ( fVerbose > 2 ){ 
-    cout<<"*** CbmTrdHitProducerDigi::CalculateHitPosition ***"<<endl;
-    cout<<"Col: "<< fCol <<endl;
-    cout<<"Row: "<< fRow <<endl;
-    cout<<setprecision(5)<<"fPadX: "<< fpadsizex <<endl;
-    cout<<setprecision(5)<<"fPadY: "<< fpadsizey <<endl;
-    cout<<setprecision(5)<<"fsizex: "<< fsizex <<endl;
-    cout<<setprecision(5)<<"fsizey: "<< fsizey <<endl;
-    cout<<setprecision(5)<<"localx: "<<  local_point[0] <<endl;
-    cout<<setprecision(5)<<"localy: "<<  local_point[1] <<endl;
-  
-    cout<<setprecision(5)<<"fPosX: "<<  fPosX <<endl;
-    cout<<setprecision(5)<<"fPosY: "<<  fPosY <<endl;
-    cout<<setprecision(5)<<"fPosZ: "<<  fPosZ <<endl;
-  }
-  
-}
-
 
 ClassImp(CbmTrdHitProducerDigi)

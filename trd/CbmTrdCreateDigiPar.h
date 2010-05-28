@@ -12,6 +12,8 @@
 
 #include "FairTask.h"
 
+#include "TArrayD.h"
+
 #include <map>
 #include <list>
 //#include <utility>
@@ -59,21 +61,27 @@ private:
     void CalculateModuleId();
 
     void FillModuleMap();
+    void FillPadInfo();
 
     Int_t fStation;
     Int_t fLayer;
     Int_t fModuleType;
     Int_t fModuleCopy;
+    Int_t fSector;
 
-    Float_t fpadsizex; //pixel width in x;
-    Float_t fpadsizey; //pixel width in y;
+    TArrayD fpadsizex; //pixel width in x;
+    TArrayD fpadsizey; //pixel width in y;
     Float_t fsizex;    //module width in x;
     Float_t fsizey;    //module width in y;
+    TArrayD fSectorSizex;    //sector width in x;
+    TArrayD fSectorSizey;    //sector width in y;
     Int_t   fCol;      //Calculated pixel column were the hit is in
     Int_t   fRow;      //Calculated pixel row were the hit is in
     Bool_t  fIsRotated;
 
     Int_t   fModuleID; //Unique number for detector module
+
+    Int_t   fMaxSectors; //Max. number of sectors for all modules 
 
     Float_t fPosX;     //Hit position in chamber coordinates
     Float_t fPosY;     //Hit position in chamber coordinates
@@ -81,11 +89,12 @@ private:
     /** Map of Unique Trd Module Id to corresponding TrdModule **/
     std::map<Int_t, CbmTrdModule*> fModuleMap;                  //!   
     std::map<Int_t, CbmTrdModule*>::iterator fModuleMapIt;      //!   
+
     CbmTrdDigiPar *fDigiPar;
 
     CbmTrdDetectorId fTrdDetId;
 
-    ClassDef(CbmTrdCreateDigiPar,1)
+    ClassDef(CbmTrdCreateDigiPar,2)
 
     };
 #endif //CBMTRDCREATEDIGIPAR_H

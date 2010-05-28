@@ -84,6 +84,7 @@ private:
     Float_t fsizex; //module widh in x;
     Float_t fsizey; //module width in y;
     Float_t fELoss;//energy loss from MCPoint 
+    Float_t fTime;//time from MCPoint
     Float_t fPosX;//Hit position in chamber coordinates
     Float_t fPosY;//Hit position in chamber coordinates
     Float_t fEfficiency; // Digi production efficiency (0-100%)
@@ -107,7 +108,7 @@ private:
     /**  iterator over map to store digis for pair of x,y position in module **/
     std::map<std::pair< Int_t, std::pair< Int_t, Int_t > >, CbmTrdDigi* >::iterator fDigiMapIt; //! iterator over array above
 
-    ClassDef(CbmTrdDigitizer,1)
+    ClassDef(CbmTrdDigitizer,2)
 
     };
 #endif //CBMTUTORIALDETDIGITIZER_H

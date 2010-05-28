@@ -225,8 +225,11 @@ void CbmTrdDigitizer::Exec(Option_t * option)
   Int_t iDigi=0; 
 
   for ( fDigiMapIt=fDigiMap.begin() ; fDigiMapIt != fDigiMap.end(); fDigiMapIt++ ){
-    new ((*fDigiCollection)[iDigi]) CbmTrdDigi(fDigiMapIt->second->GetDetId(), fDigiMapIt->second->GetCol(), fDigiMapIt->second->GetRow(), fDigiMapIt->second->GetCharge());
-;
+    new ((*fDigiCollection)[iDigi]) 
+        CbmTrdDigi(fDigiMapIt->second->GetDetId(), 
+        fDigiMapIt->second->GetCol(), fDigiMapIt->second->GetRow(), 
+        fDigiMapIt->second->GetCharge(),fDigiMapIt->second->GetTime());
+
    CbmTrdDigiMatch *p = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
    //   cout<<"DetID: "<<fDigiMapIt->second->GetDetId()<<endl;
    std::vector<int> arr=fDigiMapIt->second->GetMCIndex();
@@ -386,7 +389,8 @@ void CbmTrdDigitizer::AddDigi() {
 
     // Pixel not yet in map -> Add new pixel
     if ( fDigiMapIt == fDigiMap.end() ) {
-      CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, fCol, fRow, fELoss, fMCindex);
+      CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, fCol, fRow, fELoss, 
+                                        fTime, fMCindex);
       fDigiMap[b] = digi;
     }
 
@@ -396,6 +400,7 @@ void CbmTrdDigitizer::AddDigi() {
         if ( ! digi ) Fatal("AddChargeToPixel", "Zero pointer in digi map!");
         digi->AddCharge(fELoss);
         digi->AddMCIndex(fMCindex);
+        if( fTime > (digi->GetTime()) ) digi->SetTime(fTime);
     }
 
 }

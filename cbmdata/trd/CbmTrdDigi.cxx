@@ -4,28 +4,34 @@
 using std::cout;
 using std::endl;
 
-CbmTrdDigi::CbmTrdDigi() {
-  fCol = -1;
-  fRow = -1;
-  fCharge = -1.0;
-  fDetId = -1;
+CbmTrdDigi::CbmTrdDigi() 
+  :fDetId(-1),
+   fCol(-1),
+   fRow(-1),
+   fCharge(-1.0),
+   fTime(-1.0),
+   fMCIndex(0)
+{
 }
 
 CbmTrdDigi::CbmTrdDigi(Int_t detId, Int_t col, Int_t row, Double_t charge, 
-                       Int_t index){
-  fDetId = detId;
-  fCol = col;
-  fRow = row;
-  fCharge = charge;
+                       Double_t time, Int_t index)
+  :fDetId(detId),
+   fCol(col),
+   fRow(row),
+   fCharge(charge),
+   fTime(time)
+{
   if (index >= 0)
           fMCIndex.push_back(index);
 };
 
 void CbmTrdDigi::Print() {
-  cout<<"Col : "<<fCol <<endl;
-  cout<<"Row : "<<fRow <<endl;
-  cout<<"ELoss : "<<fCharge <<endl;
   cout<<"fDetID : "<<fDetId <<endl;
+  cout<<"Col    : "<<fCol <<endl;
+  cout<<"Row    : "<<fRow <<endl;
+  cout<<"ELoss  : "<<fCharge <<endl;
+  cout<<"Time   : "<<fTime <<endl;
 }
 
 ClassImp(CbmTrdDigi)

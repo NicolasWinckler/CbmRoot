@@ -379,8 +379,8 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
   
   //-----------------------------------------------------------------------
   // station 1
-  // 2 + 6 + 4 + 8 + 6 + 30
-  // 2   8  12  20  26   56
+  // jun10: 4 + 4 + 4 + 8 + 6 + 30   -- number of module types
+  // jun10: 4   8  12  20  26   56   -- sum of modules for this station
   
   // Reset the Array in case we have different sector sizes for
   // different detector modules
@@ -430,8 +430,8 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
 
   //-------------------------------------------------------------------------
   // station 2
-  // 2 + 6 + 4 + 8 + 6 + 74
-  // 2   8  12  20  26  100
+  // jun10: 4 + 4 + 4 + 8 + 6 + 74   -- number of module types
+  // jun10: 4   8  12  20  26  100   -- sum of modules for this station
    
   if (fStation==2) {
 
@@ -468,8 +468,8 @@ void CbmTrdCreateDigiPar::FillPadInfo(){
   }
   //------------------------------------------------------------------------
   // station 3
-  // 8 + 136
-  // 2   144
+  // jun10: 8 + 136   -- number of module types
+  // jun10: 2   144   -- sum of modules for this station
   
   if (fStation==3) {
     if (fModuleType==3) {

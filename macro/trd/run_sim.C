@@ -17,8 +17,8 @@ void run_sim(Int_t nEvents = 2)
   TString inDir   = gSystem->Getenv("VMCWORKDIR");
   TString inFile  = inDir + "/input/urqmd.ftn14";
   TString outDir  = "data";
-  TString outFile = outDir + "/test.dev.mc.root";
-  TString parFile = outDir + "/params.dev.root";
+  TString outFile = outDir + "/test.mc.root";
+  TString parFile = outDir + "/params.root";
   
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";

@@ -28,10 +28,10 @@ void run_reco(Int_t nEvents = 2)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "data/test.dev.mc.root";
+  TString inFile = "data/test.mc.root";
 
   // Parameter file
-  TString parFile = "data/params.dev.root";
+  TString parFile = "data/params.root";
 
 
  //  Digitisation files
@@ -51,7 +51,7 @@ void run_reco(Int_t nEvents = 2)
 
 
   // Output file
-  TString outFile = "data/test.dev.eds.root";
+  TString outFile = "data/test.eds.root";
 
 
   // In general, the following parts need not be touched

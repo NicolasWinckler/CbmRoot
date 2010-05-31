@@ -400,12 +400,12 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
 
     if (stereoF==0.) {
       vX  = dx / TMath::Sqrt(12.);
-      vY  = (vX/TMath::Sqrt(2.))*(1./TMath::Sin(stereoB/2.));
-      vXY = (-1. * dx * dx)/tanstr;
+      vY  = dx / TMath::Sqrt(6.) / TMath::Abs(tanstr);
+      vXY = -1. * dx * dx / 12. / tanstr;
     }
     else {
-      vX  = ((dx / TMath::Sqrt(24.))*(1./TMath::Cos(stereoB)));
-      vY  = ((dx / TMath::Sqrt(24.))*(1./TMath::Sin(stereoB)));
+      vX  = dx / TMath::Sqrt(24.);
+      vY  = dx / TMath::Sqrt(24.) / TMath::Abs(tanstr);
       vXY = 0.;
     }
 

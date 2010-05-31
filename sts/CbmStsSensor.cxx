@@ -207,12 +207,12 @@ CbmStsSensor::CbmStsSensor(Int_t detId, Int_t iType, Double_t x0,
     Double_t absStF = TMath::Abs(fStereoF);
     if (fStereoF==0. ) {
       fSigmaX  = fDx / TMath::Sqrt(12);
-      fSigmaY  = fSigmaX*(1./tanStB)+fSigmaX*(1./TMath::Sin(fStereoB));
-      fSigmaXY = (-1. * fDx * fDx)/tanStB;
+      fSigmaY  = fDx / (TMath::Sqrt(6)*tanStB);
+      fSigmaXY = (-1. * fDx * fDx)/(12.*tanStB);
     }
     else {
-      fSigmaX  = ((fDx / TMath::Sqrt(24))*(1./TMath::Cos(fStereoB)));
-      fSigmaY  = ((fDx / TMath::Sqrt(24))*(1./TMath::Sin(fStereoB)));
+      fSigmaX  = fDx / TMath::Sqrt(24);
+      fSigmaY  = fDx / (TMath::Sqrt(24)*tanStB);
       fSigmaXY = 0.;
     }
     

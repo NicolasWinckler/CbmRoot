@@ -177,6 +177,7 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
     Int_t motherPdg = 0;
     TVector3 trackVertex;
     TVector3 motherVertex;
+    TVector3 momentum;
 
     Double_t xin = stsPoint->GetXIn();
     Double_t yin = stsPoint->GetYIn();
@@ -192,6 +193,8 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
     CbmMCTrack *mcTrack = (CbmMCTrack*) fMCTracks->At(trackId);
     trackPdg = mcTrack -> GetPdgCode();
     motherId = mcTrack -> GetMotherId();
+    mcTrack->GetMomentum(momentum);
+    Double_t mom = momentum.Mag();
 
     if (motherId>=0 ) {
       CbmMCTrack *motherTrack = (CbmMCTrack*) fMCTracks->At(motherId);
@@ -227,7 +230,8 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
  	   ( TMath::Abs(stsHit->GetY()-stsPoint->GetY(stsHit->GetZ())) < .04 ) ) {
  	fhHitPointCorrelation[stationNr-1]->Fill(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ()),
 						 stsHit->GetY()-stsPoint->GetY(stsHit->GetZ()));
-	
+	fhHitPointCorr->Fill(stsHit->GetX()-stsPoint->GetX(stsHit->GetZ()),
+						 stsHit->GetY()-stsPoint->GetY(stsHit->GetZ()));
 	fhHitPointPull -> Fill( (stsHit->GetX()-stsPoint->GetX(stsHit->GetZ()))/stsHit->GetDx() , (stsHit->GetY()-stsPoint->GetY(stsHit->GetZ()))/stsHit->GetDy());
 	
 	if ( stsPoint->GetY(stsHit->GetZ()) > 0. )
@@ -242,11 +246,13 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
 	   ( TMath::Abs(stsHit->GetY()-stsPoint->GetY(stsHit->GetZ())) < .04 ) ) {
 	foundPnt = kTRUE;
       }
-
+//       cout <<"St "<<stationNr<<" Sens "<<sensor->GetSensorNr()<< " chan "<<sensor->GetFrontChannel(stsHit->GetX(),stsHit->GetY(),stsHit->GetZ())<<" X "<<stsHit->GetX();
     }
     Int_t incAngle = TMath::ATan((stsPoint->GetXOut()-stsPoint->GetXIn())/(stsPoint->GetZOut()-stsPoint->GetZIn()))*180./3.14;
     fNofPoints    [stationNr-1][sensor->GetSectorNr()-1][sensor->GetSensorNr()-1] += 1;
     fNofPointsIncAng[TMath::Abs((Int_t)(incAngle))] +=1;
+    if (TMath::Abs((Int_t)(mom))<1) fNofPointsMom [TMath::Abs((Int_t)(mom))] +=1;
+    if (TMath::Abs((Int_t)(mom))<1) fNofPointsMomSum+=1;
     //  cout << stationNr-1 << " " << sensor->GetSectorNr()-1 << " " << sensor->GetSensorNr()-1 << "/" << flush;
     fhPoints      [stationNr-1]->Fill(stsPoint->GetX(stsPoint->GetZ()),
 				      stsPoint->GetY(stsPoint->GetZ()));
@@ -261,6 +267,8 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
     if ( foundPnt ) {
       fNofRecoPoints[stationNr-1][sensor->GetSectorNr()-1][sensor->GetSensorNr()-1] += 1;
       fNofRecoPointsIncAng[TMath::Abs((Int_t)(incAngle))] +=1;
+      if (TMath::Abs((Int_t)(mom))<1) fNofRecoPointsMom [TMath::Abs((Int_t)(mom))] +=1;
+      if (TMath::Abs((Int_t)(mom))<1) fNofRecoPointsMomSum+=1;
       fhRecoPoints  [stationNr-1]->Fill(stsPoint->GetX(stsPoint->GetZ()),
 					stsPoint->GetY(stsPoint->GetZ()));
       if (trackPdg<10000&&motherId>=0) {
@@ -274,12 +282,13 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
     }
     
   }
-  
   for (Int_t ang=0; ang<400; ang++) {
     Double_t factor = (Float_t)(fNofRecoPointsIncAng[ang])/(Float_t)(fNofPointsIncAng[ang]);
     fhEffIncAng->Fill(ang,((Float_t)(fNofRecoPointsIncAng[ang]))/((Float_t)(fNofPointsIncAng[ang])));
   }
-  
+    for (Int_t momentum=0; momentum<50; momentum++) {
+    fhEffMom->Fill(momentum,((Float_t)(fNofRecoPointsMom[momentum]))/((Float_t)(fNofPointsMom[momentum])));
+  }
   
   if ( fOnlineAnalysis ) {
     recoPad[0]->cd();
@@ -491,7 +500,10 @@ void CbmStsFindHitsQa::CreateHistos() {
 
   fhHitFindingEfficiency = new TH1F("hHitFindingEfficiency","Hit finding efficiency",1000000,
 				    (Float_t)(2<<24)-0.5,(Float_t)(2<<24)-0.5+1000000.);
-
+  fhHitPointCorr = new TH2F(Form("hHitPointCorrelation"),
+					  Form("Hit vs point correlation "),
+					  500,-.1, .1,500,-.1,.1);
+  fhEffMom     = new TH2F("hEffMom","hEffMom",500,0,25,100,0,1);
   fhEffIncAng  = new TH2F("hEffIncAng","hEffIncAng",100,0,100,100,0,1);
   fhEffPdgSec  = new TH2F("hEffPdgSec", "hEffPdgSec", 350,-1000,2500,10,0,1);
   fhEffPdgPrim = new TH2F("hEffPdgPrim","hEffPdgPrim",350,-1000,2500,10,0,1);
@@ -502,6 +514,8 @@ void CbmStsFindHitsQa::CreateHistos() {
   fHistoList->Add(fhHitFindingEfficiency);
   fHistoList->Add(fhEffIncAng);
   fHistoList->Add(fhHitPointPull);
+  fHistoList->Add(fhEffMom);
+  fHistoList->Add(fhHitPointCorr);
   for ( Int_t ist = 0 ; ist < fNStations ; ist++ ) {
     fhHitPointCorrelation[ist] = new TH2F(Form("hHitPointCorrelation%i",ist+1),
 					  Form("Hit vs point correlation at station %i",ist+1),

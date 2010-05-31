@@ -323,8 +323,7 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
   TVector3 momentum;
 
   // Fill hit and track maps
-  FillHitMap();
-  FillMatchMap(nRec, nGhosts, nClones);
+  
 
   for ( Int_t istat = 0 ; istat < fNStations ; istat++ ) {
     for ( Int_t isect = 0 ; isect < fNSectors[istat] ; isect++ ) {
@@ -339,6 +338,9 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
 
   // Loop over MCTracks
   Int_t nMC = fMCTracks->GetEntriesFast();
+  
+  FillHitMap();
+  FillMatchMap(nRec, nGhosts, nClones);
   for (Int_t iMC=0; iMC<nMC; iMC++) {
     CbmMCTrack* mcTrack = (CbmMCTrack*) fMCTracks->At(iMC);
     if ( ! mcTrack ) {
@@ -375,8 +377,18 @@ void CbmStsReconstructionQa::Exec(Option_t* opt) {
     nAll++;
     if ( fHitMap.find(iMC) == fHitMap.end() ) continue; // No hits
     Int_t nHits = fHitMap[iMC];
-
-    if ( nHits < fMinHits ) continue;                   // Too few hits
+    Int_t nHitsSt = 0;
+    Int_t minHits = fMinHits;
+    for (Int_t i=0; i<9; i++) {
+      nHitsSt = 0;
+      nHitsSt = HitSt[iMC][i];
+      if (nHitsSt>1) {
+        minHits += nHitsSt;
+      }
+    }
+    if (minHits>4) minHits=minHits-1;
+//     if (nHits>3&&nHits<minHits) cout << minHits <<"  "<<nHits<< endl;
+    if ( nHits < (minHits) ) continue;                   // Too few hits
     nAcc++;
 
     // Check origin of MCTrack
@@ -1340,6 +1352,12 @@ void CbmStsReconstructionQa::Reset() {
 // -----   Private method FillHitMap   -------------------------------------
 void CbmStsReconstructionQa::FillHitMap() {
   fHitMap.clear();
+  Int_t nMC = fMCTracks->GetEntriesFast();
+  for (Int_t i=0; i<nMC; i++) {
+    for (Int_t j=0; j<10; j++){
+      HitSt[i][j]=0;
+    }
+  }
   Int_t nHits = fStsHits->GetEntriesFast();
   for (Int_t iHit=0; iHit<nHits; iHit++) {
     CbmStsHit* hit = (CbmStsHit*) fStsHits->At(iHit);
@@ -1347,6 +1365,7 @@ void CbmStsReconstructionQa::FillHitMap() {
     if ( iMc < 0 ) continue;
     CbmStsPoint* stsPoint = (CbmStsPoint*) fStsPoints->At(iMc);
     Int_t iTrack = stsPoint->GetTrackID();
+    HitSt [iTrack][hit->GetStationNr()]++;
     fHitMap[iTrack]++;
   }
 }

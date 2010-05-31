@@ -21,7 +21,7 @@
 #include "TVector3.h"
 
 #include <map>
-
+#include <set>
 class TCanvas;
 class TPad;
 class TClonesArray;
@@ -32,7 +32,7 @@ class TH3F;
 class TList;
 class CbmGeoPassivePar;
 class CbmGeoStsPar;
-
+class CbmMCTrack;
 
 
 class CbmStsReconstructionQa : public FairTask
@@ -115,11 +115,11 @@ class CbmStsReconstructionQa : public FairTask
 
   /** Map from MCTrack index to number of attached StsHits **/
   std::map<Int_t, Int_t> fHitMap;
-
+  std::map<CbmMCTrack*, std::set<Int_t> > fHitTrackMap;
 
   /** Map from MCTrack index to matched StsTrack index **/
   std::map<Int_t, Int_t> fMatchMap;
-
+  
 
   /** Map from MCTrack index to percentage of matched hits **/
   std::map<Int_t, Double_t> fQualiMap;
@@ -141,7 +141,7 @@ class CbmStsReconstructionQa : public FairTask
   Int_t fStationNrFromMcId[10000];         // station number from mc id
   Int_t fNSectors[20];                    // number of sectors per station
   Double_t fWidthSectors[20][500];        // width of the sectors to calculate nof channels
-
+  Int_t HitSt [100000][10];
   /** Task parameters **/
   Int_t fMinHits;   // Minimal number of StsHits for considered MCTrack
   Double_t fQuota;  // True/all hits for track to be considered reconstructed

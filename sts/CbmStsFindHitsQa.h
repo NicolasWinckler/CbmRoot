@@ -98,6 +98,7 @@ class CbmStsFindHitsQa : public FairTask
 
   TStopwatch fTimer;
 
+
   TH2F* fhHitPointCorrelation [100];
   TH2F* fhHitPointCorrelationU[100];
   TH2F* fhHitPointCorrelationB[100];
@@ -145,10 +146,13 @@ class CbmStsFindHitsQa : public FairTask
   Int_t fNofPointsPdgSec     [20000];
   Int_t fNofRecoPdgPrim      [20000];
   Int_t fNofPointsPdgPrim    [20000];
+ 
   Int_t fNofPointsPrim;
   Int_t fNofPointsSec;
   Int_t fNofRecoPrim;
   Int_t fNofRecoSec;
+  Int_t fNofPointsMomSum;
+  Int_t fNofRecoPointsMomSum;
   /** Get parameter containers **/
   virtual void SetParContainers();
 

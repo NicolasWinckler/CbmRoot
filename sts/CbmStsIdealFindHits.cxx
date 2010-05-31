@@ -392,9 +392,16 @@ Int_t CbmStsIdealFindHits::FindHits(CbmStsStation* station,
     vXY = 0.;
   }
   else if ( iType == 2 || iType == 3 ) {
-    vX  = dx / TMath::Sqrt(12.);
-    vY  = dx / TMath::Sqrt(6.) / TMath::Abs(tanstrB);
-    vXY = -1. * dx * dx / 12. / tanstrB;
+    if (stereoF==0.) {
+      vX  = dx / TMath::Sqrt(12.);
+      vY  = dx / TMath::Sqrt(6.) / TMath::Abs(tanstrB);
+      vXY = -1. * dx * dx / 12. / tanstrB;
+    }
+    else {
+      vX  = dx / TMath::Sqrt(24.);
+      vY  = dx / TMath::Sqrt(24.) / TMath::Abs(tanstrB);
+      vXY = 0.;
+    }
   }
   else {
     cerr << "-E- " << fName << "::FindHits: Illegal sector type "

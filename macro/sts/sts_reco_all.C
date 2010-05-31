@@ -16,7 +16,7 @@
 // --------------------------------------------------------------------------
 
 #include <math.h>
-void sts_reco(Int_t nEvents = 1) {
+void sts_reco_all(Int_t nEvents = 1) {
 
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -41,7 +41,7 @@ void sts_reco(Int_t nEvents = 1) {
   Double_t threshold  =  4;
   Double_t noiseWidth =  0.1;
   Int_t    nofBits    = 20;
-  Double_t minStep    =  0.01,;
+  Double_t minStep    =  0.01;
   Double_t StripDeadTime = 10.;
   
 
@@ -114,17 +114,7 @@ void sts_reco(Int_t nEvents = 1) {
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
 
-  // -----   OLD MVD Hitproducer   ----------------------------------------------
-  CbmMvdHitProducer* hitProd = new CbmMvdHitProducer("MVDHitProducer", 0, iVerbose);
-  run->AddTask(hitProd);
-  // ------------------------------------------------------------------------
- 
-  // -----   NEW MVD   --------------------------------------------------------
-
-
-
   // -----   STS digitiser   ------------------------------------------------
-  //  CbmTask* 
   CbmStsDigitize* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
   stsDigitize->SetRealisticResponse();
   stsDigitize->SetFrontThreshold (threshold);
@@ -140,20 +130,18 @@ void sts_reco(Int_t nEvents = 1) {
   stsDigitize->SetStripDeadTime  (StripDeadTime);
 
   run->AddTask(stsDigitize);
-  // ------------------------------------------------------------------------
- 
+
+  // -----   STS cluster finding   ------------------------------------------------
   CbmStsClusterFinder* findClusters = new CbmStsClusterFinder("STSFindClusters", iVerbose);
   run->AddTask(findClusters);
 
   
   // ---  STS hit finding   -------------------------------------------------
-  //  CbmTask* 
   CbmStsFindHits* findHits = new CbmStsFindHits("STSFindHits", iVerbose);
   run->AddTask(findHits);
 
   
   // ---  STS hit matching   ------------------------------------------------
-  //  CbmTask*
   CbmStsMatchHits* matchHits = new CbmStsMatchHits("STSMatchHits",iVerbose);
   matchHits->SetRealisticResponse();
   run->AddTask(matchHits);
@@ -189,18 +177,19 @@ void sts_reco(Int_t nEvents = 1) {
   
   
    // -----   STS reconstruction QA   ----------------------------------------
-FairTask* stsSimQa = new CbmStsSimulationQa(kTRUE,iVerbose);
+  FairTask* stsSimQa = new CbmStsSimulationQa(kTRUE,iVerbose);
   run->AddTask(stsSimQa);
   // ------------------------------------------------------------------------
   
   // -----   STS hit finding QA   ----------------------------------------
   FairTask* stsFHQa = new CbmStsFindHitsQa(kTRUE,iVerbose);
   run->AddTask(stsFHQa);
-   // ------------------------------------------------------------------------
+  // ------------------------------------------------------------------------
+
   // -----   STS reconstruction QA   ----------------------------------------
-   FairTask* stsRecoQa = new CbmStsReconstructionQa(kTRUE, 4, 0.7, 0);
-   run->AddTask(stsRecoQa);
- // ------------------------------------------------------------------------
+  FairTask* stsRecoQa = new CbmStsReconstructionQa(kTRUE, 4, 0.7, 0);
+  run->AddTask(stsRecoQa);
+  // ------------------------------------------------------------------------
 
   
 

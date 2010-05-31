@@ -28,7 +28,7 @@ void run_sim_only_first_trd_layer(Int_t nEvents = 2)
   TString mvdGeom    = "mvd_standard.geo";
   TString stsGeom    = "sts_standard.geo";
   TString richGeom   = "rich_standard.geo";
-  TString trdGeom    = "trd_dec09_sq_exploded_num_06_only_first_layer.geo";
+  TString trdGeom    = "trd_squared_modules_jun10_layer01.geo";
   TString tofGeom    = "";
   TString ecalGeom   = "";
   

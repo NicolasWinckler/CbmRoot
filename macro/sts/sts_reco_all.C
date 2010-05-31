@@ -176,7 +176,7 @@ void sts_reco_all(Int_t nEvents = 1) {
   // ------------------------------------------------------------------------
   
   
-   // -----   STS reconstruction QA   ----------------------------------------
+  // -----   STS simulation QA   ----------------------------------------
   FairTask* stsSimQa = new CbmStsSimulationQa(kTRUE,iVerbose);
   run->AddTask(stsSimQa);
   // ------------------------------------------------------------------------

@@ -16,30 +16,23 @@
 // --------------------------------------------------------------------------
 
 
-void sts_reco(Int_t nEvents = 1)
+void sts_reco_ideal(Int_t nEvents = 1)
 {
 
   // ========================================================================
   //          Adjust this part according to your requirements
   
   // Input file (MC events)
-  TString inFile = "data/sts.mc.root";
+  TString inFile = "sts.mc.root";
   
   // Parameter file
-  TString parFile = "data/params.root";
+  TString parFile = "params.root";
   
   // STS digitisation file for stereo angle 0 & 15 deg
-  //TString digiFile = "sts_standard.digi.par";
-  
-  // STS digitisation file for stereo angle -7.5 & +7.5 deg
-  TString digiFile = "sts_standard_7vs7.digi.par";
-  
-  //STS digitisation file for the same z position of all sensors
-  //TString digiFile = "sts_same_z.digi.par";
-  
+  TString digiFile = "sts_standard.digi.par";
   
   // Output file
-  TString outFile = "sts.reco.root";
+  TString outFile = "sts.reco.ideal.root";
 
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;
@@ -105,12 +98,7 @@ void sts_reco(Int_t nEvents = 1)
   run->SetInputFile(inFile);
   run->SetOutputFile(outFile);
   // ------------------------------------------------------------------------
-  
-  // -----   MVD Hitproducer   ----------------------------------------------
-  CbmMvdHitProducer* hitProd = new CbmMvdHitProducer("MVDHitProducer", 0, 
-   						     iVerbose);
-  run->AddTask(hitProd);
-  // ------------------------------------------------------------------------
+
   
   // -----   STS digitiser   ------------------------------------------------
   FairTask* stsIdealDigitize = new CbmStsIdealDigitize("STSIdealDigitize", iVerbose);
@@ -127,8 +115,7 @@ void sts_reco(Int_t nEvents = 1)
   
     
   // ---  STS hit matching   ------------------------------------------------
-  FairTask* IdealmatchHits = new CbmStsIdealMatchHits("STSIdealMatchHits", 
- 					   iVerbose);
+  FairTask* IdealmatchHits = new CbmStsIdealMatchHits("STSIdealMatchHits", iVerbose);
   run->AddTask(IdealmatchHits);
   // ------------------------------------------------------------------------
    
@@ -161,18 +148,22 @@ void sts_reco(Int_t nEvents = 1)
   run->AddTask(fitTracks);
   // ------------------------------------------------------------------------
   
+  // -----   STS simulation QA   ----------------------------------------
+  FairTask* stsSimQa = new CbmStsSimulationQa(kTRUE,iVerbose);
+  run->AddTask(stsSimQa);
+  // ------------------------------------------------------------------------
   
-  
-  // -----   STS reconstruction QA   ----------------------------------------
-  FairTask* stsFHQa = new CbmStsFindHitsQa("STSFindHitsQA",iVerbose);
+  // -----   STS hit finding QA   ----------------------------------------
+  FairTask* stsFHQa = new CbmStsFindHitsQa(kTRUE,iVerbose);
   run->AddTask(stsFHQa);
   // ------------------------------------------------------------------------
+
   // -----   STS reconstruction QA   ----------------------------------------
-//   FairTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 1);
-//   run->AddTask(stsRecoQa);
+  FairTask* stsRecoQa = new CbmStsReconstructionQa(kTRUE, 4, 0.7, 0);
+  run->AddTask(stsRecoQa);
   // ------------------------------------------------------------------------
-  
-   
+
+
 
   // -----  Parameter database   --------------------------------------------
   TString stsDigiFile = gSystem->Getenv("VMCWORKDIR");

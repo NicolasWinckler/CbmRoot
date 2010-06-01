@@ -115,54 +115,64 @@ CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z,
   // In the moment it is assumed that there are sectors which have either
   // in x- or y-direction the size of the chamber.
 
-  Double_t beginx, beginy, endx, endy;
-  Double_t summed_sectsize;
-  if ( sectorSizeX.GetAt(0) == 2*sizex ) { //substructure only in y-direction
-    beginx = 0;
-    endx = 2*sizex;
-    summed_sectsize=0;
-    for( Int_t i=0; i<fNoSectors; i++){
-      if ( 0==i ){
-	beginy = 0.;
-        endy = sectorSizeY.GetAt(i);
-        summed_sectsize+=sectorSizeY.GetAt(i);
+  if(nSectors>1) {
+
+    Double_t beginx, beginy, endx, endy;
+    Double_t summed_sectsize;
+    if ( sectorSizeX.GetAt(0) == 2*sizex ) { //substructure only in y-direction
+      beginx = 0;
+      endx = 2*sizex;
+      summed_sectsize=0;
+      for( Int_t i=0; i<fNoSectors; i++){
+	if ( 0==i ){
+	  beginy = 0.;
+	  endy = sectorSizeY.GetAt(i);
+	  summed_sectsize+=sectorSizeY.GetAt(i);
+	}
+	else {
+	  beginy = summed_sectsize;
+	  endy = summed_sectsize+=sectorSizeY.GetAt(i);
+	}
+	fSectorBeginX.AddAt(beginx,i);
+	fSectorBeginY.AddAt(beginy,i); 
+	fSectorEndX.AddAt(endx,i);
+	fSectorEndY.AddAt(endy,i); 
+	fSectorX.AddAt(beginx+(sectorSizeX.GetAt(i)/2),i);
+	fSectorY.AddAt(beginy+(sectorSizeY.GetAt(i)/2),i);
+	fSectorZ.AddAt(fZ,i);
       }
-      else {
-	beginy = summed_sectsize;
-        endy = summed_sectsize+=sectorSizeY.GetAt(i);
+    } else {
+      beginy = 0;
+      endy = 2*sizey;
+      summed_sectsize=0;
+      for( Int_t i=0; i<fNoSectors; i++){
+	if ( 0==i ){
+	  beginx = 0.;
+	  endx = sectorSizeX.GetAt(i);
+	  summed_sectsize+=sectorSizeX.GetAt(i);
+	}
+	else {
+	  beginx = summed_sectsize;
+	  endx = summed_sectsize+=sectorSizeX.GetAt(i);
+	}
+	fSectorBeginX.AddAt(beginx,i);
+	fSectorBeginY.AddAt(beginy,i); 
+	fSectorEndX.AddAt(endx,i);
+	fSectorEndY.AddAt(endy,i); 
+	fSectorX.AddAt(beginx+(sectorSizeX.GetAt(i)/2),i);
+	fSectorY.AddAt(beginy+(sectorSizeY.GetAt(i)/2),i);
+	fSectorZ.AddAt(fZ,i);
       }
-      fSectorBeginX.AddAt(beginx,i);
-      fSectorBeginY.AddAt(beginy,i); 
-      fSectorEndX.AddAt(endx,i);
-      fSectorEndY.AddAt(endy,i); 
-      fSectorX.AddAt(beginx+(sectorSizeX.GetAt(i)/2),i);
-      fSectorY.AddAt(beginy+(sectorSizeY.GetAt(i)/2),i);
-      fSectorZ.AddAt(fZ,i);
     }
   } else {
-    beginy = 0;
-    endy = 2*sizey;
-    summed_sectsize=0;
-    for( Int_t i=0; i<fNoSectors; i++){
-      if ( 0==i ){
-	beginx = 0.;
-        endx = sectorSizeX.GetAt(i);
-        summed_sectsize+=sectorSizeX.GetAt(i);
-      }
-      else {
-	beginx = summed_sectsize;
-        endx = summed_sectsize+=sectorSizeX.GetAt(i);
-      }
-      fSectorBeginX.AddAt(beginx,i);
-      fSectorBeginY.AddAt(beginy,i); 
-      fSectorEndX.AddAt(endx,i);
-      fSectorEndY.AddAt(endy,i); 
-      fSectorX.AddAt(beginx+(sectorSizeX.GetAt(i)/2),i);
-      fSectorY.AddAt(beginy+(sectorSizeY.GetAt(i)/2),i);
-      fSectorZ.AddAt(fZ,i);
-    }
+    fSectorBeginX.AddAt(0.,0);
+    fSectorBeginY.AddAt(0.,0); 
+    fSectorEndX.AddAt(sectorSizeX.GetAt(0),0);
+    fSectorEndY.AddAt(sectorSizeY.GetAt(0),0); 
+    fSectorX.AddAt(x,0);
+    fSectorY.AddAt(y,0);
+    fSectorZ.AddAt(z,0);
   }
-
 }
 // -------------------------------------------------------------------------
 CbmTrdModule::~CbmTrdModule() 
@@ -195,14 +205,16 @@ Int_t CbmTrdModule::GetSector(Double_t *local_point)
   Double_t posy=local_point[1]+sizey;
 
   for(Int_t i=0; i<fNoSectors; i++){
-    if (posx > fSectorBeginX.GetAt(i) &&
-        posx < fSectorEndX.GetAt(i) &&
-        posy > fSectorBeginY.GetAt(i) &&
-        posy < fSectorEndY.GetAt(i) ) {
+    if (posx >= fSectorBeginX.GetAt(i) &&
+        posx <  fSectorEndX.GetAt(i)   &&
+        posy >= fSectorBeginY.GetAt(i) &&
+        posy <  fSectorEndY.GetAt(i) ) 
+    {
       return i;
     } 
   }
 
+  Error("CbmTrdModule::GetSector","Could not find local point in any of the sectors");
   return -1; //This should be never reached
 
 }
@@ -212,6 +224,7 @@ Int_t CbmTrdModule::GetSector(Double_t *local_point)
 void CbmTrdModule::GetPadInfo(CbmTrdPoint *trdPoint, Int_t &Col, 
                               Int_t &Row, Int_t &Sector)
 {
+
     // Calculate point in the middle of the detector. This is
     // for safety reasons, because the point at exit is slightly
     // outside of the active volume. If one does not use a point
@@ -234,18 +247,41 @@ void CbmTrdModule::GetPadInfo(CbmTrdPoint *trdPoint, Int_t &Col,
     gGeoManager->MasterToLocal(global_point, local_point);
 
     Int_t ModuleID = trdPoint->GetDetectorID();
-    Sector = 1;
 
-    GetModuleInformation(ModuleID, local_point, Col, Row);
+    GetModuleInformation(ModuleID, local_point, Col, Row, Sector);
 
 }
 
 // --------------------------------------------------------------------
 
-
-void CbmTrdModule::GetModuleInformation(Int_t VolumeID, Double_t *local_point, Int_t &Col, Int_t &Row)
+void CbmTrdModule::TransformToLocalCorner(Double_t *local_point, Double_t &posX,
+                                          Double_t &posY)
 {
+  // Transformation from local coordinate system with origin in
+  // the middle of the module into a system with origin in the
+  // lower right corner of the module. Since for both coordinate
+  // systems the orientation is the same this is only a shift by
+  // the half size of the module in x- and y-direction
+  posX=local_point[0]+fSizex;
+  posY=local_point[1]+fSizey;
+}
 
+void CbmTrdModule::TransformToLocalSector(Double_t *local_point, 
+                                          const Double_t &sector,
+                                          Double_t &posX, Double_t &posY)
+{
+  // Transformation of the module coordinate system with origin
+  // in the middle of the chamber into a system with 
+  // the origin in the lower right corner of the sector the point
+  // is in. First transform in a system with origin in the lower
+  // right corner.
+  TransformToLocalCorner(local_point, posX, posY);
+  posX-=fSectorBeginX.GetAt(sector);
+  posY-=fSectorBeginY.GetAt(sector);
+}
+
+void CbmTrdModule::GetModuleInformation(Int_t VolumeID, Double_t *local_point, Int_t &Col, Int_t &Row, Int_t &sector)
+{
 
   // safety check. Up to now allways correct, so could be removed.
   if (fDetectorId != VolumeID ){
@@ -253,132 +289,63 @@ void CbmTrdModule::GetModuleInformation(Int_t VolumeID, Double_t *local_point, I
   }
 
   // calculate in which sector the point is
-  Int_t sector = GetSector(local_point);
+  sector = GetSector(local_point);
 
+  Double_t posX, posY;
   Double_t fpadsizex = GetPadSizex(sector);
   Double_t fpadsizey = GetPadSizey(sector);
-  Double_t fsizex    = GetSizex();
-  Double_t fsizey    = GetSizey();
 
-  // Calculate the position in the chamber with the origin of
-  // the local coordinate system in the lower left corner
-  // of the chamber. x goes to the left looking in beam direction
-  // y goes upward
+  TransformToLocalSector(local_point, sector, posX, posY);
 
-  if (fIsRotated){
-    Double_t tempx = local_point[0];
-    Double_t tempy = local_point[1];
-    local_point[1] = -tempx;
-    local_point[0] =  tempy;
-
-    tempx = fsizex;
-    tempy = fsizey;
-    fsizey = tempx;
-    fsizex = tempy;
-  }
-
-  Double_t fPosX=local_point[0]+fsizex;
-  Double_t fPosY=local_point[1]+fsizey;
- 
-  /*
-  if ( fVerbose > 2 ) {
-    cout<<setprecision(5)<<"*** CbmTrdDigitizer::GetModuleInformationFromDigiPar ***"<<endl;
-    cout<<setprecision(5)<<"sizex: "<< fsizex <<endl;
-    cout<<setprecision(5)<<"sizey: "<< fsizey <<endl;
-    cout<<setprecision(5)<<"padsizex: "<< fpadsizex <<endl;
-    cout<<setprecision(5)<<"padsizey: "<< fpadsizey <<endl;
-  
-    cout<<setprecision(5)<<"X: "<< local_point[0] <<endl;
-    cout<<setprecision(5)<<"Y: "<< local_point[1] <<endl;
-    cout<<setprecision(5)<<"fPosX: "<< fPosX <<endl;
-    cout<<setprecision(5)<<"fPosY: "<< fPosY <<endl;
-    cout<<"DetID: "<< detID <<endl;
-  
-    cout<<setprecision(5)<<"CPosX: "<< fModuleInfo->GetX() <<endl;
-    cout<<setprecision(5)<<"CPosY: "<< fModuleInfo->GetY() <<endl;
-    cout<<setprecision(5)<<"CPosZ: "<< fModuleInfo->GetZ() <<endl;
-  }
-  */  
-
-  Col = 1+(Int_t)(fPosX/fpadsizex);
-  Row = 1+(Int_t)(fPosY/fpadsizey);
-
-  /*
-  if ( fVerbose > 2 ){
-    cout<<"*** CbmTrdDigitizer::CalculatePixel ***"<<endl;
-    cout<<setprecision(5)<<"fPosX: "<< fPosX <<endl;
-    cout<<setprecision(5)<<"fPosY: "<< fPosY <<endl;
-    cout<<setprecision(5)<<"fPadX: "<< fpadsizex <<endl;
-    cout<<setprecision(5)<<"fPadY: "<< fpadsizey <<endl;
-    cout<<"Col: "<< fCol <<endl;
-    cout<<"Row: "<< fRow <<endl;
-  } 
-  */
-
-  /*
-  cout<<"#######################################"<<endl;
-  cout<<VolumeID<<","<<Col<<","<<Row<<endl;
-  cout<<VolumeID<<","<<setprecision(5)<<fPosX<<","<<fPosY<<endl;
-  */
+  Col = 1+(Int_t)(posX/fPadSizex.At(sector));
+  Row = 1+(Int_t)(posY/fPadSizey.At(sector));
 
 }
 
 
 // ---- CalculateHitPosition ------------------------------------------
 void CbmTrdModule::GetPosition(const Int_t Col, const Int_t Row, 
-				const Int_t VolumeId, const Int_t Sector,
+				const Int_t VolumeId, const Int_t sector,
                                 TVector3 &posHit, TVector3 &posHitErr) {
 
-
+  // calculate position in global coordinates from digi 
+  // information(Sector, Col, Row).  
+  // Returns two TVector3. One with the position and one 
+  // with the error of the position which is taken as padsize/sqrt(12)
 
   if (fDetectorId != VolumeId ){
     cout<<" -E- This is wrong!!!!!!!!!!!!!!!!!!!!!"<<endl;
   }
     
-  Double_t fpadsizex = GetPadSizex(Sector-1);
-  Double_t fpadsizey = GetPadSizey(Sector-1);
-  Double_t fsizex    = GetSizex();
-  Double_t fsizey    = GetSizey();
+  Double_t local_point[2];
+  Double_t padsizex = fPadSizex.At(sector);
+  Double_t padsizey = fPadSizey.At(sector);
 
-  if (fIsRotated){
-    Double_t tempx = fsizex;
-    Double_t tempy = fsizey;
-    fsizey = tempx;
-    fsizex = tempy;
-  }
+  // calculate position in sector coordinate system with the
+  // origin in the lower right corner
+  local_point[0] = (((Float_t)Col-0.5) * padsizex);
+  local_point[1] = (((Float_t)Row-0.5) * padsizey); 
 
+  // calculate position in module coordinate system
+  // with origin in the lower right corner of the module
+  local_point[0]+=fSectorBeginX.GetAt(sector);
+  local_point[1]+=fSectorBeginY.GetAt(sector);
 
-  Float_t local_point[2];
+  // calculte position in the module coordinate system 
+  // with origin in the middle of the module
+  local_point[0]-=fSizex;
+  local_point[1]-=fSizey;
 
-  local_point[0] = ( ((Col-0.5) * fpadsizex) - fsizex);
-  local_point[1] = ( ((Row-0.5) * fpadsizey) - fsizey);
+  // calculate the position in the global coordinate system
+  // with the origin in target
+  Float_t posX=local_point[0]+fX;
+  Float_t posY=local_point[1]+fY;
+  Float_t posZ=fZ;
+  Float_t xHitErr = padsizex / TMath::Sqrt(12.);
+  Float_t yHitErr = padsizey / TMath::Sqrt(12.);
 
-  Float_t PosX=local_point[0]+GetX();
-  Float_t PosY=local_point[1]+GetY();
-  Float_t PosZ=GetZ();
-  Float_t xHitErr = fpadsizex / TMath::Sqrt(12.);
-  Float_t yHitErr = fpadsizey / TMath::Sqrt(12.);
-
-  posHit.SetXYZ(PosX, PosY, PosZ);
+  posHit.SetXYZ(posX, posY, posZ);
   posHitErr.SetXYZ(xHitErr,yHitErr, 0.);
-
-  
-
-//  if ( fVerbose > 2 ){ 
-//    cout<<"*** CbmTrdHitProducerDigi::CalculateHitPosition ***"<<endl;
-//    cout<<"Col: "<< fCol <<endl;
-//    cout<<"Row: "<< fRow <<endl;
-//    cout<<setprecision(5)<<"fPadX: "<< fpadsizex <<endl;
-//    cout<<setprecision(5)<<"fPadY: "<< fpadsizey <<endl;
-//    cout<<setprecision(5)<<"fsizex: "<< fsizex <<endl;
-//    cout<<setprecision(5)<<"fsizey: "<< fsizey <<endl;
-//    cout<<setprecision(5)<<"localx: "<<  local_point[0] <<endl;
-//    cout<<setprecision(5)<<"localy: "<<  local_point[1] <<endl;
-//  
-//    cout<<setprecision(5)<<"fPosX: "<<  fPosX <<endl;
-//    cout<<setprecision(5)<<"fPosY: "<<  fPosY <<endl;
-//    cout<<setprecision(5)<<"fPosZ: "<<  fPosZ <<endl;
-//  }
   
 }
 

@@ -62,8 +62,6 @@ class CbmTrdModule : public TNamed
   Double_t GetSectorSizex(Int_t i)   const { return fSectorSizex.At(i); }
   Double_t GetSectorSizey(Int_t i)   const { return fSectorSizey.At(i); }
 
-  Int_t    GetSector(Double_t *local_point);
-
   Bool_t IsRotated()     const { return fIsRotated; }
 
 
@@ -105,8 +103,16 @@ class CbmTrdModule : public TNamed
   /** --------------- private functions ----------------------**/
 
   void GetModuleInformation(Int_t VolumeID, Double_t *local_point, 
-                            Int_t &Col, Int_t &Row);
+                            Int_t &Col, Int_t &Row, Int_t &Sector);
 
+  void TransformToLocalSector(Double_t *local_point, 
+			      const Double_t &sector,
+			      Double_t &posX, Double_t &posY);
+
+  void TransformToLocalCorner(Double_t *local_point, Double_t &posX,
+			      Double_t &posY);
+
+  Int_t    GetSector(Double_t *local_point);
 
   ClassDef(CbmTrdModule,2);
 

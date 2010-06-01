@@ -3,6 +3,8 @@
 // -----               Created 03/12/2009 by D. Emschermann            -----
 // -------------------------------------------------------------------------
 //
+// v0.9 - 20100601 DE - improve pad size ballance in trd1mod1-2 to 30/35 from 30/40
+// v0.8 - 20100601 DE - implement 5 sectors per module for code testing
 // v0.7 - 20100531 DE - implement 3 sectors of n*0.5 mm long pads per module
 // v0.6 - 20100530 DE - implement 2 sectors with identical pads per module
 // v0.5 - 20100525 DE - reduce the pad length in trd1mod1-2 of station 1 
@@ -16,17 +18,17 @@
 #ifndef CBMTRDPADS_H
 #define CBMTRDPADS_H
 
-// v0.7
+// v0.9
   Int_t fst1_sect_count = 3;
   Float_t fst1_pad_type[6][3][4] =   // array of pad sizes in station 1
     { { { 46., 20., .5,  2.0 }, 
         { 46.,  6., .5,  2.0 }, 
         { 46., 20., .5,  2.0 } },     
         // 10 x  20 mm + 3 x  20 mm + 10 x  20 mm,  92 * 23 = 2116 pads mod1
-      { { 46., 21., .5,  3.0 }, 
-        { 46.,  4., .5,  4.0 }, 
-        { 46., 21., .5,  3.0 } },     
-        //  7 x  30 mm + 1 x  40 mm +  7 x  30 mm,  92 * 15 = 1380 pads mod1
+      { { 46., 3.5, .5,  3.5 }, 
+        { 46., 39., .5,  3.0 }, 
+        { 46., 3.5, .5,  3.5 } },     
+        //  1 x  35 mm +13 x  30 mm +  1 x  35 mm,  92 * 15 = 1380 pads mod1
       { { 71., 32., .5,  4.0 }, 
         { 71.,  7., .5,  3.5 }, 
         { 71., 32., .5,  4.0 } },     

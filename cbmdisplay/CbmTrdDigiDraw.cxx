@@ -90,7 +90,7 @@ void CbmTrdDigiDraw::Exec(Option_t* option)
 {
    if (IsActive()){
 
-   CbmTrdDigi *p=0;
+   CbmTrdDigi *digi=0;
 
    Int_t npoints=fPointList->GetEntriesFast();
    Reset();
@@ -124,83 +124,78 @@ void CbmTrdDigiDraw::Exec(Option_t* option)
    //   q->SetDefDepth();
 
    Int_t refCounter=0;
+   Int_t Col, Row, ELoss, DetId;
+   Int_t *bla;
+   Int_t Station, Layer, ModuleType, ModuleCopy;
+   Int_t Sector, moduleId;
+   TVector3 posHit, padSize;
+   Double_t padsizex, padsizy;
+   Double_t X, Y;
+
    for (Int_t i=0; i<npoints; ++i) {   
      
-     p=(CbmTrdDigi *)fPointList->At(i);
+     digi =  (CbmTrdDigi*) fPointList->At(i);
      
-     if(p!=0) {
+
+     if(digi!=0) {
        
-       Int_t      Col = p->GetCol();
-       Int_t      Row = p->GetRow();
-       Double_t ELoss = p->GetCharge();
-       Int_t   fDetId = p->GetDetId();
+    
+       Col = digi->GetCol();
+       Row = digi->GetRow();
+       ELoss = digi-> GetCharge();
+       DetId = digi->GetDetId();
+
+       // The digi contains the information of the detector Id + the
+       // sector number. The digitization parameters are stored per
+       // module with arrays holding the information about the sectors.
+       // So we have to extract the information about the module Id and
+       // the sector from the detector Id.
+       bla = fTrdId.GetDetectorInfo(DetId);
+       Station = bla[1];
+       Layer = bla[2];
+       ModuleType = bla[3];
+       ModuleCopy = bla[4];
+       Sector = bla[5];
+       moduleId= fTrdId.GetModuleId(DetId);
 
        /*
-       p->Print();
-       cout<<"Col : "<<Col <<endl;
-       cout<<"Row : "<<Row <<endl;
-       cout<<"ELoss : "<<ELoss <<endl;
-       cout<<"fDetID : "<<fDetId <<endl;
+	 cout <<"##########################################"<<endl;
+	 cout <<"ID        : "<<DetId<<endl;
+	 cout <<"Module ID : "<<moduleId<<endl;
+	 cout <<"Sector    : "<<Sector<<endl;
        */
 
-       fModuleInfo = fDigiPar->GetModule(fDetId);
-       Int_t detID = fModuleInfo->GetDetectorId();
 
-       if (detID != fDetId ){
-	 cout<<" -E- This is wrong!!!!!!!!!!!!!!!!!!!!!"<<endl;
-       }
-    
-       Float_t padsizex = fModuleInfo->GetPadSizex(0);//TODO: change for sector layout
-       Float_t padsizey = fModuleInfo->GetPadSizey(0);//TODO: change for sector layout
-       Float_t sizex    = fModuleInfo->GetSizex();
-       Float_t sizey    = fModuleInfo->GetSizey();
+       fModuleInfo = fDigiPar->GetModule(moduleId);
+       fModuleInfo->GetPosition(Col, Row, moduleId, Sector, posHit, padSize);
 
-       if (fModuleInfo->IsRotated()){
-	 Double_t tempx = sizex;
-	 Double_t tempy = sizey;
-	 sizey = tempx;
-	 sizex = tempy;
-       }
 
-       Float_t local_point[2];
-       local_point[0] = ((Col-0.5) * padsizex) - sizex;
-       local_point[1] = ((Row-0.5) * padsizey) - sizey;
-
-       Float_t X=local_point[0]+fModuleInfo->GetX();
-       Float_t Y=local_point[1]+fModuleInfo->GetY();
-       Float_t Z=fModuleInfo->GetZ();
 
        // The given point is used as the edge of the box but it is
        // the middle point of the pad. So we have to do a transformation
      
-       X=X-(padsizex/2);
-       Y=Y-(padsizey/2);
+      
+       X=posHit.X()-(padSize.X()/2);
+       Y=posHit.Y()-(padSize.Y()/2);
+
 
        if(fVerbose>1){
          cout<<"*** CbmTrdHitProducerDigi::CalculateHitPosition ***"<<endl;
          cout<<"Col: "<< Col <<endl;
          cout<<"Row: "<< Row <<endl;
-         cout<<setprecision(5)<<"fPadX: "<< padsizex <<endl;
-         cout<<setprecision(5)<<"fPadY: "<< padsizey <<endl;
-         cout<<setprecision(5)<<"fsizex: "<< sizex <<endl;
-         cout<<setprecision(5)<<"fsizey: "<< sizey <<endl;
-         cout<<setprecision(5)<<"localx: "<<  local_point[0] <<endl;
-         cout<<setprecision(5)<<"localy: "<<  local_point[1] <<endl;
-
-         cout<<setprecision(5)<<"fPosX: "<<  X <<endl;
-         cout<<setprecision(5)<<"fPosY: "<<  Y <<endl;
-         cout<<setprecision(5)<<"fPosZ: "<<  Z <<endl;
+         cout<<setprecision(5)<<"fPadX: "<< padSize.X() <<endl;
+         cout<<setprecision(5)<<"fPadY: "<< padSize.Y() <<endl;
+         cout<<setprecision(5)<<"fPosX: "<< posHit.X() <<endl;
+         cout<<setprecision(5)<<"fPosY: "<< posHit.Y() <<endl;
+         cout<<setprecision(5)<<"fPosZ: "<< posHit.Z() <<endl;
      }
 
-       Int_t fStation = (Int_t) (detID/100000);
-       Int_t fLayer =  (Int_t) ((detID -(fStation*100000))/10000);
-
-
-       //   if ( fStation == 1 && fLayer == 1) {
+       if ( fActiveLayers[Station-1][Layer-1]) {
        	 //cout <<"S,L: "<<fStation<<","<<fLayer<<endl;
-	 q->AddBox(X, Y, Z, padsizex, padsizey, 0.);
-	 //refCounter++;
-	 //}
+	 q->AddBox(X,Y,posHit.Z(), 
+                   padSize.X(), padSize.Y(), 0.);
+	 refCounter++;
+       }
      }
      
    }
@@ -229,6 +224,31 @@ void CbmTrdDigiDraw::Reset()
 	   fq->Reset();
        gEve->RemoveElement(fq, fEventManager );
 	 }
+}
+
+void  CbmTrdDigiDraw::SetLayerStation1(Bool_t Layer1, Bool_t Layer2,
+                                       Bool_t Layer3, Bool_t Layer4)
+{
+  fActiveLayers[0][0]=Layer1;
+  fActiveLayers[0][1]=Layer2;
+  fActiveLayers[0][2]=Layer3;
+  fActiveLayers[0][3]=Layer4;
+}
+void  CbmTrdDigiDraw::SetLayerStation2(Bool_t Layer1, Bool_t Layer2,
+                                       Bool_t Layer3, Bool_t Layer4)
+{
+  fActiveLayers[1][0]=Layer1;
+  fActiveLayers[1][1]=Layer2;
+  fActiveLayers[1][2]=Layer3;
+  fActiveLayers[1][3]=Layer4;
+}
+void  CbmTrdDigiDraw::SetLayerStation3(Bool_t Layer1, Bool_t Layer2,
+                                       Bool_t Layer3, Bool_t Layer4)
+{
+  fActiveLayers[2][0]=Layer1;
+  fActiveLayers[2][1]=Layer2;
+  fActiveLayers[2][2]=Layer3;
+  fActiveLayers[2][3]=Layer4;
 }
 
 

@@ -19,6 +19,7 @@
 
 #include "CbmTrdDigiPar.h"
 #include "CbmTrdModule.h"
+#include "CbmTrdDetectorId.h"
 
 class FairEventManager;
 class TClonesArray;
@@ -46,6 +47,14 @@ class CbmTrdDigiDraw : public FairTask {
    /** Executed task **/ 
   virtual void Exec(Option_t* option);
   void Reset();
+
+  void SetLayerStation1(Bool_t Layer1, Bool_t Layer2,
+                        Bool_t Layer3, Bool_t Layer4);
+  void SetLayerStation2(Bool_t Layer1, Bool_t Layer2,
+                        Bool_t Layer3, Bool_t Layer4);
+  void SetLayerStation3(Bool_t Layer1, Bool_t Layer2,
+                        Bool_t Layer3, Bool_t Layer4);
+
 protected:
 
   Int_t   fVerbose;       //  Verbosity level
@@ -58,8 +67,11 @@ protected:
   CbmTrdModule *fModuleInfo;
   FairEventManager *fEventManager;   //!
   TEveBoxSet* fq;    //!
+  CbmTrdDetectorId fTrdId; //!
   Color_t fColor; //!
   Style_t fStyle; //!
+
+  Bool_t fActiveLayers[3][4];
 
   ClassDef(CbmTrdDigiDraw,1);
     

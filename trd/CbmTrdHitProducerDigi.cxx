@@ -173,7 +173,7 @@ void CbmTrdHitProducerDigi::Exec(Option_t * option)
   Double_t xHitErr, yHitErr, zHitErr;
   Double_t ELoss;
   TVector3 posHit;
-  TVector3 posHitErr;
+  TVector3 padSize;
     
   Int_t nentries = fTrdDigi->GetEntries();
   cout<<" ** "<<nentries<<" Trd hits to be created in this event** "<<endl;
@@ -210,7 +210,7 @@ void CbmTrdHitProducerDigi::Exec(Option_t * option)
     Plane=fLayersBeforeStation[Station-1]+Layer;
 
     fModuleInfo = fDigiPar->GetModule(moduleId);
-    fModuleInfo->GetPosition(Col, Row, moduleId, Sector, posHit, posHitErr);
+    fModuleInfo->GetPosition(Col, Row, moduleId, Sector, posHit, padSize);
      
     /*
       cout <<"##########################################"<<endl;
@@ -221,8 +221,11 @@ void CbmTrdHitProducerDigi::Exec(Option_t * option)
       cout <<"Type   : "<<modtype<<" , "<<bla[3]<<endl;
       cout <<"Copy   : "<<modnumber<<" , "<<bla[4]<<endl;
     */
+   
+    // Calculate the hit error from the pad sizes
+    padSize*=(1/TMath::Sqrt(12.));
         
-    AddHit(posHit, posHitErr, DetId, Plane, j , ELoss, 0., 0.);
+    AddHit(posHit, padSize, DetId, Plane, j , ELoss, 0., 0.);
     
   }
   

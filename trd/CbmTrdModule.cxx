@@ -306,12 +306,12 @@ void CbmTrdModule::GetModuleInformation(Int_t VolumeID, Double_t *local_point, I
 // ---- CalculateHitPosition ------------------------------------------
 void CbmTrdModule::GetPosition(const Int_t Col, const Int_t Row, 
 				const Int_t VolumeId, const Int_t sector,
-                                TVector3 &posHit, TVector3 &posHitErr) {
+                                TVector3 &posHit, TVector3 &padSize) {
 
   // calculate position in global coordinates from digi 
   // information(Sector, Col, Row).  
   // Returns two TVector3. One with the position and one 
-  // with the error of the position which is taken as padsize/sqrt(12)
+  // with the padsize of the fired pad
 
   if (fDetectorId != VolumeId ){
     cout<<" -E- This is wrong!!!!!!!!!!!!!!!!!!!!!"<<endl;
@@ -341,11 +341,9 @@ void CbmTrdModule::GetPosition(const Int_t Col, const Int_t Row,
   Float_t posX=local_point[0]+fX;
   Float_t posY=local_point[1]+fY;
   Float_t posZ=fZ;
-  Float_t xHitErr = padsizex / TMath::Sqrt(12.);
-  Float_t yHitErr = padsizey / TMath::Sqrt(12.);
 
   posHit.SetXYZ(posX, posY, posZ);
-  posHitErr.SetXYZ(xHitErr,yHitErr, 0.);
+  padSize.SetXYZ(padsizex,padsizey, 0.);
   
 }
 

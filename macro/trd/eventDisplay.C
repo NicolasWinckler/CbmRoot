@@ -53,7 +53,7 @@ eventDisplay()
   fMan->AddTask(TrdHits);
   fMan->AddTask(TrdDigis);
     
-  fMan->Init();                     
-  
+  fMan->Init();                    
+
 
 }

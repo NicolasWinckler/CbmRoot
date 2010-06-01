@@ -485,8 +485,12 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
 	if ( sensorDetId == -1 ) continue;
 
 	pos.SetXYZ(xHit, yHit, zHit);
-	dpos.SetXYZ(0.5*TMath::Sqrt((vX*clusterF->GetMeanError())*(vX*clusterF->GetMeanError())+(vX*clusterB->GetMeanError())*(vX*clusterB->GetMeanError())), (0.5/tanstr)*TMath::Sqrt((vX*clusterF->GetMeanError())*(vX*clusterF->GetMeanError())+(vX*clusterB->GetMeanError())*(vX*clusterB->GetMeanError())), 0.);
-
+	if (stereoF==0.) {
+	  dpos.SetXYZ(vX*clusterF->GetMeanError(), (1./(tanstr))*TMath::Sqrt((vX*clusterF->GetMeanError())*(vX*clusterF->GetMeanError())+(vX*clusterB->GetMeanError())*(vX*clusterB->GetMeanError())), 0.);
+	}
+	else {
+	  dpos.SetXYZ(0.5*TMath::Sqrt((vX*clusterF->GetMeanError())*(vX*clusterF->GetMeanError())+(vX*clusterB->GetMeanError())*(vX*clusterB->GetMeanError())), (0.5/tanstr)*TMath::Sqrt((vX*clusterF->GetMeanError())*(vX*clusterF->GetMeanError())+(vX*clusterB->GetMeanError())*(vX*clusterB->GetMeanError())), 0.);
+	}
 // dpos.SetXYZ(0.5*TMath::Sqrt((sector->GetDx()*clusterF->GetMeanError())*(sector->GetDx()*clusterF->GetMeanError())+(sector->GetDx()*clusterB->GetMeanError())*(sector->GetDx()*clusterB->GetMeanError())), (0.5/tanstr)*TMath::Sqrt((sector->GetDx()*clusterF->GetMeanError())*(sector->GetDx()*clusterF->GetMeanError())+(sector->GetDx()*clusterB->GetMeanError())*(sector->GetDx()*clusterB->GetMeanError())), 0.);
 	
 	Int_t statLayer = -1;

@@ -96,14 +96,14 @@ CbmStsSensor::CbmStsSensor(TString tempName, Int_t detId, Int_t iType, Double_t 
     Double_t tanStB = TMath::Tan(fStereoB);
     Double_t tanStF = TMath::Tan(fStereoF);
     Double_t absStF = TMath::Abs(fStereoF);
-    if (fStereoF==0.) {
-      fSigmaX  = fDx / TMath::Sqrt(12.);
-      fSigmaY  = (fSigmaX/TMath::Sqrt(2.))*(1./TMath::Sin(fStereoB/2.));
-      fSigmaXY = (-1. * fDx * fDx)/tanStB;
+    if (fStereoF==0. ) {
+      fSigmaX  = fDx / TMath::Sqrt(12);
+      fSigmaY  = fDx / (TMath::Sqrt(6)*tanStB);
+      fSigmaXY = (-1. * fDx * fDx)/(12.*tanStB);
     }
     else {
-      fSigmaX  = ((fDx / TMath::Sqrt(24.))*(1./TMath::Cos(fStereoB)));
-      fSigmaY  = ((fDx / TMath::Sqrt(24.))*(1./TMath::Sin(fStereoB)));
+      fSigmaX  = fDx / TMath::Sqrt(24);
+      fSigmaY  = fDx / (TMath::Sqrt(24)*tanStB);
       fSigmaXY = 0.;
     }
     

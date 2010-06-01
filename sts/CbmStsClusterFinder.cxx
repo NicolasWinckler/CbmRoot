@@ -615,12 +615,12 @@ void CbmStsClusterFinder::AnalyzeCluster(Int_t iCluster) {
     digi = (CbmStsDigi*)fDigis->At(cluster->GetDigi(itemp));
     chanNr  = (Double_t)digi->GetChannelNr();
     chanADC = digi->GetAdc();
-    error += ( chanADC*chanADC )*(sumCh-chanNr)*(sumCh-chanNr);
+    error += ( chanADC*chanADC );
   }
 
   //  cout << " mean at = " << sumWX/sumW << endl;
   cluster->SetMean(sumWX/sumW);
-  cluster->SetMeanError(  (1./(sumCh*sumCh)) * TMath::Sqrt(error)   );
+  cluster->SetMeanError(  (1./(sumW)) * TMath::Sqrt(error)   );
   if ( sumW < maxDigiSig ) {
     cout << " MAX DIGI = " << maxDigiSig << ", while SUMW = " << sumW << endl;
     for ( Int_t itemp = 0 ; itemp < cluster->GetNDigis() ; itemp++ ) {

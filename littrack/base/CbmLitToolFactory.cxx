@@ -233,9 +233,9 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderNN->IsUseFastSearch(true);
 		trdFinderNN->SetMaxNofMissingHits(3);
 		trdFinderNN->SetSigmaCoef(5.);
-		trdFinderNN->SetChiSqPixelHitCut(25.);
+		trdFinderNN->SetChiSqPixelHitCut(50.);
 		trdFinderNN->SetChiSqStripHitCut(4.);
-		trdFinderNN->SetPDG(211);
+		trdFinderNN->SetPDG(11);
 		trdFinderNN->IsProcessSubstationsTogether(true);
 		trdFinderNN->Initialize();
 		TrackFinderPtr finder(trdFinderNN);
@@ -252,12 +252,12 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderBranch->SetVerbose(1);
 		trdFinderBranch->SetNofIter(1);
 		trdFinderBranch->IsUseFastSearch(true);
-		trdFinderBranch->SetPDG(211);
+		trdFinderBranch->SetPDG(11);
 		trdFinderBranch->IsProcessSubstationsTogether(true);
 		trdFinderBranch->SetMaxNofMissingHits(3);
 		trdFinderBranch->IsAlwaysCreateMissingHit(false);
 		trdFinderBranch->SetSigmaCoef(5.);
-		trdFinderBranch->SetChiSqPixelHitCut(25.);
+		trdFinderBranch->SetChiSqPixelHitCut(50.);
 		trdFinderBranch->SetChiSqStripHitCut(4.);
 		TrackFinderPtr finder(trdFinderBranch);
 		return finder;
@@ -272,12 +272,12 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		trdFinderWeight->SetLayout(CbmLitEnvironment::Instance()->GetLayout());
 		trdFinderWeight->SetVerbose(1);
 		trdFinderWeight->SetNofIter(1);
-		trdFinderWeight->SetMaxNofMissingHits(0);
+		trdFinderWeight->SetMaxNofMissingHits(3);
 		trdFinderWeight->IsUseFastSearch(true);
-		trdFinderWeight->SetSigmaCoef(10.);
-		trdFinderWeight->SetChiSqPixelHitCut(20.);
+		trdFinderWeight->SetSigmaCoef(5.);
+		trdFinderWeight->SetChiSqPixelHitCut(50.);
 		trdFinderWeight->SetChiSqStripHitCut(4.);
-		trdFinderWeight->SetPDG(211);
+		trdFinderWeight->SetPDG(11);
 		TrackFinderPtr finder(trdFinderWeight);
 		return finder;
 	} else
@@ -357,6 +357,10 @@ HitToTrackMergerPtr CbmLitToolFactory::CreateHitToTrackMerger(
 		nhMerger->SetPropagator(CreateTrackPropagator("lit"));
 		nhMerger->SetFilter(CreateTrackUpdate("kalman"));
 		nhMerger->SetPDG(11);
+                nhMerger->IsUseFastSearch(true);
+		nhMerger->SetSigmaCoef(5.);
+		nhMerger->SetChiSqPixelHitCut(50.);//13.86);
+		nhMerger->SetChiSqStripHitCut(4.);
 		nhMerger->SetStation(CbmLitEnvironment::Instance()->GetTofStation());
 		nhMerger->Initialize();
 		HitToTrackMergerPtr merger(nhMerger);

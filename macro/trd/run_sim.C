@@ -28,7 +28,8 @@ void run_sim(Int_t nEvents = 2)
   TString mvdGeom    = "mvd_standard.geo";
   TString stsGeom    = "sts_standard.geo";
   TString richGeom   = "rich_standard.geo";
-  TString trdGeom    = "trd_squared_modules_jun10.geo";
+//  TString trdGeom    = "trd_squared_modules_jun10.geo";
+  TString trdGeom    = "../macro/trd/trd_squared_modules_jun10_layer01.geo";
   TString tofGeom    = "tof_standard.geo";
   TString ecalGeom   = "ecal_FastMC.geo";
   
@@ -180,10 +181,23 @@ void run_sim(Int_t nEvents = 2)
   fRun->SetGenerator(primGen);       
   // ------------------------------------------------------------------------
 
+// -Trajectories Visualization (TGeoManager Only )
+   fRun->SetStoreTraj(kTRUE);
+
  
   // -----   Run initialisation   -------------------------------------------
   fRun->Init();
   // ------------------------------------------------------------------------
+
+// Set cuts for storing the trajectpries
+   FairTrajFilter* trajFilter = FairTrajFilter::Instance();
+     trajFilter->SetStepSizeCut(0.01); // 1 cm
+     trajFilter->SetVertexCut(-2000., -2000., 4., 2000., 2000., 100.);
+     trajFilter->SetMomentumCutP(10e-3); // p_lab > 10 MeV
+     trajFilter->SetEnergyCut(0., 1.02); // 0 < Etot < 1.04 GeV
+     trajFilter->SetStorePrimaries(kTRUE);
+     trajFilter->SetStoreSecondaries(kTRUE);
+   
   
   
   // -----   Runtime database   ---------------------------------------------

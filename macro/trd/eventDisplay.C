@@ -43,9 +43,13 @@ eventDisplay()
 
   FairEventManager *fMan= new FairEventManager();
   FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
-  FairMCPointDraw *TrdPoints =   new FairMCPointDraw ("TRDPoint",kBlue,  kFullSquare);
-  FairMCPointDraw *TrdHits =   new FairMCPointDraw ("TRDHit",kRed,  kFullSquare);
+  FairMCPointDraw *TrdPoints =   new FairMCPointDraw ("TrdPoint",kBlue,  kFullSquare);
+  CbmPixelHitSetDraw *TrdHits =   new CbmPixelHitSetDraw ("TrdHit",kRed,  kFullSquare);
   CbmTrdDigiDraw *TrdDigis =   new CbmTrdDigiDraw("TrdDigi",kGreen, kFullSquare);
+
+  TrdDigis->SetLayerStation1(kTRUE,kFALSE,kFALSE,kFALSE);
+  TrdDigis->SetLayerStation2(kFALSE,kFALSE,kFALSE,kFALSE);
+  TrdDigis->SetLayerStation3(kFALSE,kFALSE,kFALSE,kFALSE);
                                                                
   fMan->AddTask(Track);
   
@@ -55,5 +59,5 @@ eventDisplay()
     
   fMan->Init();                    
 
-
+  gGeoManager->SetVisLevel(3);
 }

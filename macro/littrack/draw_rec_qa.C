@@ -1,22 +1,23 @@
-#include "../../littrack/utils/CbmLitDrawHist.h"
+//#include "../../littrack/utils/CbmLitDrawHist.h"
 #include "../../littrack/utils/CbmLitDrawHist.cxx"
 #include "../../littrack/utils/CbmLitUtils.cxx"
 
-const TString dir  = "/home/d/andrey/phd/much1_10mu_urqmd/";
+const TString dir  = "/d/cbm02/andrey/trdstd_10e_urqmd/";
 const TFile *file1 = new TFile(dir + "global.tracks.branch.0000.root");
 const TFile *file2 = new TFile(dir + "global.tracks.nn.0000.root");
-const TFile *file3 = new TFile(dir + "global.tracks.weight.0000.root");
+//const TFile *file3 = new TFile(dir + "global.tracks.weight.0000.root");
 
 void draw_rec_qa()
 {
 	SetStyles();
 
-	DrawEffMethods();
+	//	DrawEffMethods();
+        DrawEffMethodsTrd();
 }
 
 void DrawEffMethods()
 {
-	TCanvas *canvas = new TCanvas("rec_qa_eff_methods_signal","rec_qa_eff_methods_signal",1200,1000);
+	TCanvas *canvas = new TCanvas("rec_qa_eff_methods_signal","rec_qa_eff_methods_signal",600,500);
 	canvas->SetGrid();
 	TH1* eff1 = (TH1*)file1->Get("hRecMomEffMuon");
 	TH1* eff2 = (TH1*)file2->Get("hRecMomEffMuon");
@@ -38,11 +39,48 @@ void DrawEffMethods()
 	canvas->cd();
 	eff1->SetMinimum(0.);
 	eff1->SetMaximum(1.);
-	DrawHist1D(eff1, eff2, eff3,
-			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3,
+	DrawHist1D(eff1, eff2, eff3,NULL,
+			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3,"",
 			false, false, true, 0.3,0.3,0.85,0.6);
 	SaveCanvasAsImage(canvas, "./test/");
 }
+
+void DrawEffMethodsTrd()
+{
+	TCanvas *canvas = new TCanvas("rec_qa_eff_methods","rec_qa_eff_methods",600,500);
+	canvas->SetGrid();
+	TH1* eff1_1 = (TH1*)file1->Get("hRecMomEffAll");
+	TH1* eff2_1 = (TH1*)file2->Get("hRecMomEffAll");
+        TH1* eff1_2 = (TH1*)file1->Get("hRecMomEffElectron");
+	TH1* eff2_2 = (TH1*)file2->Get("hRecMomEffElectron");
+	
+	TH1* acc1_1 = (TH1*)file1->Get("hRecMomAccAll");
+	TH1* acc2_1 = (TH1*)file2->Get("hRecMomAccAll");
+        TH1* acc1_2 = (TH1*)file1->Get("hRecMomAccElectron");
+	TH1* acc2_2 = (TH1*)file2->Get("hRecMomAccElectron");
+
+      	TH1* rec1_1 = (TH1*)file1->Get("hRecMomRecAll");
+	TH1* rec2_1 = (TH1*)file2->Get("hRecMomRecAll");
+        TH1* rec1_2 = (TH1*)file1->Get("hRecMomRecElectron");
+	TH1* rec2_2 = (TH1*)file2->Get("hRecMomRecElectron");
+
+
+	std::string hname1, hname2, hname3, hname4;
+	hname1 = "all branch  (" + CalcEfficiency(rec1_1, acc1_1) + ")";
+	hname2 = "all nn (" + CalcEfficiency(rec2_1, acc2_1) + ")";
+	hname3 = "electron branch (" + CalcEfficiency(rec1_2, acc1_2) + ")";
+        hname4 = "electron nn (" + CalcEfficiency(rec2_2, acc2_2) + ")";
+
+
+	canvas->cd();
+	eff1_1->SetMinimum(0.);
+	eff1_1->SetMaximum(1.);
+	DrawHist1D(eff1_1, eff2_1, eff1_2, eff2_2,
+			"Efficiency", "Momentum [GeV/c]", "Efficiency", hname1, hname2, hname3, hname4,
+			false, false, true, 0.2,0.2,0.85,0.6);
+	SaveCanvasAsImage(canvas, "./test/");
+}
+
 
 std::string CalcEfficiency(
 		TH1* histRec,

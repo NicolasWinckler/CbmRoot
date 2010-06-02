@@ -4,16 +4,19 @@
 export SCRIPT=yes
 
 #Build directory of CBMROOT
-export MYBUILDDIR=/home/andrey/cbm/trunk/build_jul09-gcc4.3.4_debug/
+export MYBUILDDIR=/u/andrey/cbm/trunk_w/build_new/
 
 #Output directory for simulation files
-export DIR=/home/d/andrey/trdstd_urqmd/
+export DIR=/d/cbm02/andrey/trdstd_10e_urqmd/
 
 #Output directory for image files
-export IMAGEDIR=./test/
+export IMAGEDIR=./test/trdstd_10e_urqmd/
 
 # CBM setup that will be used for simulation: "muon" or "electron"
-export DETECTORSETUP=muon
+export DETECTORSETUP=electron
+
+
+export TRACKINGTYPE=branch
 
 #Simulation parameters
 # number of embedded muons
@@ -31,11 +34,11 @@ export NPIONSMINUS=5
 # number of embedded particles from pluto. MAX = 10.
 export NPLUTO=10
 # If "yes" than UrQMD will be used as background
-export URQMD=no
+export URQMD=yes
 # If "yes" than primary muons will be generated
-export MUONS=yes
+export MUONS=no
 # If "yes" than primary electrons will be generated
-export ELECTRONS=no
+export ELECTRONS=yes
 # If "yes" than primary pions will be generated
 export PIONS=no
 # If "yes" PLUTO particles will be embedded

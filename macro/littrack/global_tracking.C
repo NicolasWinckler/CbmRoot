@@ -6,26 +6,26 @@
  * Macro runs Littrack global track reconstruction.
  **/
 
-void global_tracking(Int_t nEvents = 1000)
+void global_tracking(Int_t nEvents = 500)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, imageDir, mcFile, parFile, globalHitsFile, globalTracksFile, trackingType;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/home/d/andrey/trdsimple_10pi/";
+		dir  = "/d/cbm02/andrey/trdstd_10e_urqmd/";
 		//Output directory for images
-		imageDir = "./test/";
+		imageDir = "./test/trdstd_10e_urqmd/weight/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file
 		parFile = dir + "param.0000.root";
 		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
-		globalHitsFile = dir + "global.hits.trd10.0000.root";
+		globalHitsFile = dir + "global.hits.0000.root";
 		// Output file with global tracks
-		globalTracksFile = dir + "global.tracks.0000.root";
+		globalTracksFile = dir + "global.tracks.weight.0000.root";
 		// Tracking type
-		trackingType = "nn";
+		trackingType = "weight";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -88,15 +88,15 @@ void global_tracking(Int_t nEvents = 1000)
 	// -----   Track finding QA check   ------------------------------------
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
-	reconstructionQa->SetMinNofPointsTrd(9);
-	reconstructionQa->SetMinNofPointsMuch(12);
+	reconstructionQa->SetMinNofPointsTrd(11);
+	reconstructionQa->SetMinNofPointsMuch(0);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(9);
-	reconstructionQa->SetMinNofHitsMuch(11);
+	reconstructionQa->SetMinNofHitsMuch(0);
 	reconstructionQa->SetVerbose(1);
-	reconstructionQa->SetMomentumRange(0., 25);
-	reconstructionQa->SetNofBinsMom(25);
+	reconstructionQa->SetMomentumRange(0., 15);
+	reconstructionQa->SetNofBinsMom(15);
 	reconstructionQa->SetOutputDir(std::string(imageDir));
 	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------

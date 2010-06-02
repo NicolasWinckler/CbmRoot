@@ -21,6 +21,7 @@
 
 #include "TClonesArray.h"
 #include "TObjArray.h"
+#include "TVector3.h"
 
 #include <iostream>
 #include <iomanip>
@@ -124,7 +125,8 @@ void CbmTrdDigiDraw::Exec(Option_t* option)
    //   q->SetDefDepth();
 
    Int_t refCounter=0;
-   Int_t Col, Row, ELoss, DetId;
+   Int_t Col, Row, DetId;
+   Double_t ELoss;
    Int_t *bla;
    Int_t Station, Layer, ModuleType, ModuleCopy;
    Int_t Sector, moduleId;

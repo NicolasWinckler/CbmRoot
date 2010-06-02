@@ -267,7 +267,7 @@ void CbmTrdModule::TransformToLocalCorner(Double_t *local_point, Double_t &posX,
 }
 
 void CbmTrdModule::TransformToLocalSector(Double_t *local_point, 
-                                          const Double_t &sector,
+                                          const Int_t &sector,
                                           Double_t &posX, Double_t &posY)
 {
   // Transformation of the module coordinate system with origin

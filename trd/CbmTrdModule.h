@@ -106,7 +106,7 @@ class CbmTrdModule : public TNamed
                             Int_t &Col, Int_t &Row, Int_t &Sector);
 
   void TransformToLocalSector(Double_t *local_point, 
-			      const Double_t &sector,
+			      const Int_t &sector,
 			      Double_t &posX, Double_t &posY);
 
   void TransformToLocalCorner(Double_t *local_point, Double_t &posX,

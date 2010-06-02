@@ -107,17 +107,19 @@ void DrawHist2D(
 	hist->Draw(drawOpt.c_str());
 }
 
-/* Draws up to 3 1D histograms. If hist == NULL than histogram will not be drawn. */
+/* Draws up to 4 1D histograms. If hist == NULL than histogram will not be drawn. */
 void DrawHist1D(
 		TH1* hist1,
 		TH1* hist2,
 		TH1* hist3,
+                TH1* hist4,
 		const std::string& legendLabel,
 		const std::string& xAxisLabel,
 		const std::string& yAxisLabel,
 		const std::string& hist1label,
 		const std::string& hist2label,
 		const std::string& hist3label,
+		const std::string& hist4label,
 		Bool_t logx,
 		Bool_t logy,
 		Bool_t drawLegend,
@@ -136,7 +138,12 @@ void DrawHist1D(
 
 	if (hist3 != NULL) DrawHist1D(hist3, xAxisLabel, yAxisLabel,
 			LIT_COLOR3, LIT_LINE_WIDTH, LIT_LINE_STYLE3, LIT_MARKER_SIZE,
-						LIT_MARKER_STYLE3, logx, logy, "SAME");
+				      LIT_MARKER_STYLE3, logx, logy, "SAME");
+
+        if (hist4 != NULL) DrawHist1D(hist4, xAxisLabel, yAxisLabel,
+			LIT_COLOR4, LIT_LINE_WIDTH, LIT_LINE_STYLE4, LIT_MARKER_SIZE,
+				      LIT_MARKER_STYLE4, logx, logy, "SAME");
+
 
 	TLegend* l1 = new TLegend(x1, y1, x2, y2);
 	l1->SetFillColor(kWhite);
@@ -144,6 +151,7 @@ void DrawHist1D(
 	if (hist1 != NULL) l1->AddEntry(hist1,hist1label.c_str(),"lp");
 	if (hist2 != NULL) l1->AddEntry(hist2,hist2label.c_str(),"lp");
 	if (hist3 != NULL) l1->AddEntry(hist3,hist3label.c_str(),"lp");
+        if (hist4 != NULL) l1->AddEntry(hist4,hist4label.c_str(),"lp");
 	if (drawLegend) l1->Draw();
 }
 

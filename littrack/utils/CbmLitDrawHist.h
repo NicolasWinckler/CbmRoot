@@ -18,14 +18,17 @@
 const Int_t LIT_COLOR1 = kRed;
 const Int_t LIT_COLOR2 = kBlue;
 const Int_t LIT_COLOR3 = kGreen+3;
+const Int_t LIT_COLOR4 = kYellow+2;
 const Int_t LIT_LINE_WIDTH = 2;
 const Int_t LIT_LINE_STYLE1 = 1;
 const Int_t LIT_LINE_STYLE2 = 2;
 const Int_t LIT_LINE_STYLE3 = 3;
+const Int_t LIT_LINE_STYLE4 = 4;
 const Int_t LIT_MARKER_SIZE = 1;
 const Int_t LIT_MARKER_STYLE1 = kOpenCircle;
 const Int_t LIT_MARKER_STYLE2 = kOpenSquare;
 const Int_t LIT_MARKER_STYLE3 = kOpenTriangleUp;
+const Int_t LIT_MARKER_STYLE4 = kOpenDiamond;
 const Double_t LIT_TEXT_SIZE = 0.06;
 
 /* Set default styles for histograms. */
@@ -85,12 +88,14 @@ void DrawHist2D(
  * @param hist1 Pointer to the first histogram.
  * @param hist2 Pointer to the second histogram.
  * @param hist3 Pointer to the third histogram.
+ * @param hist4 Pointer to the fourth histogram.
  * @param legendLabel Legend label text.
  * @param xAxisLabel X axis label text.
  * @param yAxisLabel Y axis label text.
  * @param hist1label Label text for the first histogram.
  * @param hist2label Label text for the second histogram.
  * @param hist3label Label text for the third histogram.
+ * @param hist4label Label text for the fourth histogram
  * @param logx If true than X axis is plotted in logarithmic scale.
  * @param logy If true than Y axis is plotted in logarithmic scale.
  * @param drawLegend If true than legend will be drawn.
@@ -103,12 +108,14 @@ void DrawHist1D(
 		TH1* hist1,
 		TH1* hist2,
 		TH1* hist3,
+                TH1* hist4,
 		const std::string& legendLabel,
 		const std::string& xAxisLabel,
 		const std::string& yAxisLabel,
 		const std::string& hist1label,
 		const std::string& hist2label,
 		const std::string& hist3label,
+		const std::string& hist4label,
 		Bool_t logx,
 		Bool_t logy,
 		Bool_t drawLegend,

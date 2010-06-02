@@ -163,9 +163,9 @@ void CbmLitCheckMultipleScattering::Draw()
 	canvas2->cd(1);
 	std::string eloss_mc = "MC(" + ToString<Double_t>(fh_eloss_mc->GetMean()) + ")";
 	std::string eloss_rec = "Reco(" + ToString<Double_t>(fh_eloss_rec->GetMean()) + ")";
-	DrawHist1D(fh_eloss_mc, fh_eloss_rec, NULL,
+	DrawHist1D(fh_eloss_mc, fh_eloss_rec, NULL, NULL,
 			"Energy loss", "energy loss [GeV/c]", "counter",
-			eloss_mc, eloss_rec, "", true, true, true, 0.6, 0.6, 0.9, 0.9);
+			eloss_mc, eloss_rec, "","", true, true, true, 0.6, 0.6, 0.9, 0.9);
 
 	SaveCanvasAsImage(canvas2, fOutputDir);
 }

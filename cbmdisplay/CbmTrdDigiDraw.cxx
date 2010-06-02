@@ -51,7 +51,12 @@ CbmTrdDigiDraw::CbmTrdDigiDraw(const char* name, Color_t color ,Style_t mstyle,I
     fColor(color),
     fStyle(mstyle)
 {
- 
+  for(Int_t i=0; i<3; i++){
+    for(Int_t j=0; j<4; j++){
+      fActiveLayers[i][j]=kTRUE;
+    } 
+
+  } 
 }
 // ----  Initialisation  ----------------------------------------------
 void CbmTrdDigiDraw::SetParContainers()

@@ -961,7 +961,7 @@ int main(void)
     printf("\n%3d\n\n",a);
   }
 
-  // central 126 modules (3x3 hole)
+  // central 124 modules (3x3 hole)
   for ( int i = 0; i < 11; i++) 
   {
     int y = -(i-5);

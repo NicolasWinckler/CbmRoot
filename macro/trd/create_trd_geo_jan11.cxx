@@ -2,6 +2,13 @@
 //   Generator for CbmTrd Geometry
 //
 //
+// Update 20100603 - David Emschermann 
+// - jan11: core of station 1 and 2 changed to to 5x5-1 modules with 60x60 cm size
+// - jan11: 6 left and 6 right modules of station 2 reduced to 5 left and 5 right
+// - jan11: 60 +  98 + 126 = 284 (*4) = 1136
+// - dec10: 56 + 100 + 126 = 282 (*4) = 1128
+// - jun09: 56 + 100 + 144 = 300 (*4) = 1300
+//
 // Update 20100602 - David Emschermann 
 // - cut the 3 top, 3 bottom, 6 left and 6 right modules in all layers of station 3 for dec10
 //
@@ -56,13 +63,7 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
   float  Active_area_x[3];
   float  Active_area_y[3];
   
-//  Active_area_x[0] = Detector_size_x[0] - frame_width;
-//  Active_area_y[0] = Detector_size_x[0] / 2 - frame_width;
-//  Active_area_x[1] = Detector_size_x[1] - frame_width;
-//  Active_area_y[1] = Detector_size_x[1] / 2 - frame_width;
-//  Active_area_x[2] = Detector_size_x[2] - frame_width;
-//  Active_area_y[2] = Detector_size_x[2] / 2 - frame_width;
-  // squared 
+  // squared detectors
   Active_area_x[0] = Detector_size_x[0] /2 - frame_width;
   Active_area_y[0] = Detector_size_y[0] /2 - frame_width;
   Active_area_x[1] = Detector_size_x[1] /2 - frame_width;
@@ -407,7 +408,7 @@ int main(void)
  //-----------Files------------------------------------------------
   string path = "./";
   //  string geoname  = path + "trd_segmented.geo" ;
-  string geoname  = path + "trd_squared_modules_dec10.geo" ;
+  string geoname  = path + "trd_squared_modules_jan11.geo" ;
   string infoname = path + "trd_segmented.info";
   string parametername  = path + "trd_segmented.txt";
 
@@ -496,33 +497,46 @@ int main(void)
  
   }
 
-  // Calculate the sizes of all three detector modules. All sizes depend on the radius
-  // of the inner acceptance of the first station.
-  // At least this is correct is the stations are at 5000, 7250 and 9500 mm. If this is
-  // still okay when the stations are shifted has to be checked.
+//  // Calculate the sizes of all three detector modules. All sizes depend on the radius
+//  // of the inner acceptance of the first station.
+//  // At least this is correct is the stations are at 5000, 7250 and 9500 mm. If this is
+//  // still okay when the stations are shifted has to be checked.
+//
+//  Detector_size_x[0] = roundf(Inner_radius[0]);  // DE = 250 for z=5000
+//  if ((int)Detector_size_x[0]%2) Detector_size_x[0]++;
+//
+//  // Calculate size of the complete detector with frames in x-direction which is the double
+//  // size of the inner acceptance for geometrical reasons. The y-direction is twice as much
+//  // as the length in x-direction
+//
+//  Detector_size_x[0] *= 2;                       // DE =  500
+//  // squared, x=y
+//  Detector_size_y[0] = Detector_size_x[0];   // DE = 1000
+//  //  Detector_size_y[0] = Detector_size_x[0] * 2;   // DE = 1000
+//
+//
+//  // Calculate the sizes of the lager detector modules according to the size of the smallest
+//  // modules. The calculations follow the geometrical layout of the stations.
+//
+//  Detector_size_x[1] = Detector_size_x[0] * 3 / 2 ;  // DE =  750 
+//  Detector_size_y[1] = Detector_size_y[0] * 3 / 2 ;  // DE = 1500
+//
+//  Detector_size_x[2] = Detector_size_x[0] * 2 ;  // DE = 1000
+//  Detector_size_y[2] = Detector_size_y[0] * 2 ;  // DE = 2000
 
-  Detector_size_x[0] = roundf(Inner_radius[0]);  // DE = 250 for z=5000
-  if ((int)Detector_size_x[0]%2) Detector_size_x[0]++;
 
-  // Calculate size of the complete detector with frames in x-direction which is the double
-  // size of the inner acceptance for geometrical reasons. The y-direction is twice as much
-  // as the length in x-direction
+  // squared detectors
+  Detector_size_x[0] =  600;
+  Detector_size_y[0] =  600;
 
-  Detector_size_x[0] *= 2;                       // DE =  500
-  // squared, x=y
-  Detector_size_y[0] = Detector_size_x[0];   // DE = 1000
-  //  Detector_size_y[0] = Detector_size_x[0] * 2;   // DE = 1000
+  Detector_size_x[1] =  600;
+  Detector_size_y[1] =  600;
 
+  Detector_size_x[2] = 1000;
+  Detector_size_y[2] = 1000;
 
-  // Calculate the sizes of the lager detector modules according to the size of the smallest
-  // modules. The calculations follow the geometrical layout of the stations.
-
-  Detector_size_x[1] = Detector_size_x[0] * 3 / 2 ;  // DE =  750 
-  Detector_size_y[1] = Detector_size_y[0] * 3 / 2 ;  // DE = 1500
-
-  Detector_size_x[2] = Detector_size_x[0] * 2 ;  // DE = 1000
-  Detector_size_y[2] = Detector_size_y[0] * 2 ;  // DE = 2000
-
+  //------------------------------------------------------------------
+  //------------------------------------------------------------------
 
   for(int i = 0; i < Station_number; i++)
   {
@@ -569,44 +583,56 @@ int main(void)
   //------------------------------------------------------------------
   //trd1mod2-1
 
-  float x201 = Detector_size_x[1] *  1.5;
-  float y201 = Detector_size_y[1] *  0.5;
-	    	    
-  float x202 = Detector_size_x[1] * -1.5;
-  float y202 = Detector_size_y[1] *  0.5;
-	    	     	    
-  float x203 = -x201;
-  float y203 = -y201;
-	    	     	    
-  float x204 = -x202;
-  float y204 = -y202;
-	    	     	    
+  float x201 = Detector_size_x[0] *  2;
+  float y201 = Detector_size_y[0] *  1;
+
+  float x202 = Detector_size_x[0] *  2;
+  float y202 = Detector_size_y[0] *  0;
+
+  float x203 = Detector_size_x[0] *  2;
+  float y203 = Detector_size_y[0] * -1;
+
+  float x204 = -x201;
+  float y204 = -y201;
+		    	    
+  float x205 = -x202;
+  float y205 = -y202;
+		    	    
+  float x206 = -x203;
+  float y206 = -y203;
+
   //------------------------------------------------------------------
   //trd1mod2-2
 
-  float x205 = Detector_size_x[1] *  1.5;
-  float y205 = Detector_size_y[1] *  1.5;
+  float x207 = Detector_size_x[1] * -2;
+  float y207 = Detector_size_y[1] *  2;
 	    	     	    
-  float x206 = Detector_size_x[1] *  0.5;
-  float y206 = Detector_size_y[1] *  1.5;
+  float x208 = Detector_size_x[1] * -1;
+  float y208 = Detector_size_y[1] *  2;
 	    	     	    
-  float x207 = Detector_size_x[1] * -0.5;
-  float y207 = Detector_size_y[1] *  1.5;
+  float x209 = Detector_size_x[1] *  0;
+  float y209 = Detector_size_y[1] *  2;
 	    	     	    
-  float x208 = Detector_size_x[1] * -1.5;
-  float y208 = Detector_size_y[1] *  1.5;
+  float x210 = Detector_size_x[1] *  1;
+  float y210 = Detector_size_y[1] *  2;
+	      	     	    
+  float x211 = Detector_size_x[1] *  2;
+  float y211 = Detector_size_y[1] *  2;
 	    	     	    
-  float x209 = -x205;
-  float y209 = -y205;
+  float x212 = -x207;
+  float y212 = -y207;
+	  	     	    
+  float x213 = -x208;
+  float y213 = -y208;
 	    	     	    
-  float x210 = -x206;
-  float y210 = -y206;
+  float x214 = -x209;
+  float y214 = -y209;
 	    	     	    
-  float x211 = -x207;
-  float y211 = -y207;
+  float x215 = -x210;
+  float y215 = -y210;
 	    	     	    
-  float x212 = -x208;
-  float y212 = -y208;
+  float x216 = -x211;
+  float y216 = -y211;
 
   //------------------------------------------------------------------
   //trd1mod3-1
@@ -724,38 +750,17 @@ int main(void)
 
   //------------------------------------------------------------------
 	   
-//  float x1 = Detector_size_x[0];
-//  float y1 = 2 * Detector_size_x[0] + Detector_size_x[1] + Detector_size_x[2]; 
-//  float x2 = Detector_size_x[0] / 2;
-//  float y2 = Detector_size_x[0];
-//  float x3 = Detector_size_x[1];
-//  float y3 = Detector_size_x[1] * 3 / 2;
-//  float x4 = Detector_size_x[2] / 2;
-//  float y4 = Detector_size_x[2] * 2;
-//  float x5 = Detector_size_x[2] * 3 / 2;
-//  float y5 = Detector_size_x[2] * 2;
-//
-//  float x6a = Detector_size_x[2] * 7 /2;
-//  float y6a = Detector_size_x[2] * 2;
-//
-//  float x7a = Detector_size_x[2] * 7 /2;
-//  float y7a = Detector_size_x[2];
-//
-//  float x8a = Detector_size_x[2] * 7 /2;
-//  float y8a = 0;
-//
-//  cout << x1 <<" , " << y1 <<" , " << x2 <<" , " << y2 <<" , "  << x3 <<" , " << y3 << endl;
-//  cout  << x4 <<" , " << y4 <<" , " << x5 <<" , " << y5 << endl;
-//  cout  << x6a <<" , " << y6a <<" , " << x7a <<" , " << y7a <<" , " << x8a <<" , " << y8a <<endl;
-
   //int Chamber_number_Station1 = 28;
-  int Chamber_number_Station1 =  28 + 4 + 6 + 18;
+  //  int Chamber_number_Station1 =  28 + 4 + 6 + 18;
+  //  int Chamber_number_Station1 =  8 + 12 + 36;   // = 56 - jun10
+  int Chamber_number_Station1 =  8 + 16 + 36;   // = 60 - jan11
   float Position_Station1[][4] = { {x101,y101,1,0},{x102,y102,1,0},{x103,y103,1,0},{x104,y104,1,0},
 				   {x105,y105,1,0},{x106,y106,1,0},{x107,y107,1,0},{x108,y108,1,0},
 
 				   {x201,y201,2,0},{x202,y202,2,0},{x203,y203,2,0},{x204,y204,2,0},
 				   {x205,y205,2,0},{x206,y206,2,0},{x207,y207,2,0},{x208,y208,2,0},
 				   {x209,y209,2,0},{x210,y210,2,0},{x211,y211,2,0},{x212,y212,2,0},
+				   {x213,y213,2,0},{x214,y214,2,0},{x215,y215,2,0},{x216,y216,2,0},
 
 				   {x301,y301,3,0},{x302,y302,3,0},{x303,y303,3,0},{x304,y304,3,0},
 				   {x305,y305,3,0},{x306,y306,3,0},{x307,y307,3,0},{x308,y308,3,0},
@@ -768,24 +773,10 @@ int main(void)
 				   {x329,y329,3,0},{x330,y330,3,0},
 				   {x331,y331,3,0},{x332,y332,3,0},{x333,y333,3,0},{x334,y334,3,0},
 				   {x335,y335,3,0},{x336,y336,3,0}
-};
+  };
 
   //------------------------------------------------------------------
-
-  // This array stores all information about the geometrical layout of the first TRD
-  // station. First row is x-position, second row is y-position, third row is the
-  // chamber type and the last row gives information about the orientation of the
-  // chamber
-
-//  // ### Station 1
-//  int Chamber_number_Station1 = 28;
-//
-//  float Position_Station1[][4] = { {-x2,y2,1,0},{x2,-y2,1,0},{y2,x2,1,1}, {-y2,-x2,1,1},
-//                                   {-x3,y3,2,0},{x3,y3,2,0}, {-x3,-y3,2,0},{x3,-y3,2,0},{-y3,0,2,1},{y3,0,2,1},
-//                                   {-x4,y4,3,0},{x5,y4,3,0}, {-x5,-y5,3,0},{x4,-y5,3,0},{-y5,x5,3,1},{-y4,-x4,3,1},
-//                                   {y4,x4,3,1}, {y5,-x5,3,1},{x6a,y6a,3,0},{x7a,y7a,3,0},{x8a,y8a,3,0},{x7a,-y7a,3,0},
-//                                   {x6a,-y6a,3,0},{-x6a,y6a,3,0},{-x7a,y7a,3,0},{-x8a,y8a,3,0},{-x7a,-y7a,3,0},{-x6a,-y6a,3,0}};
-
+  //------------------------------------------------------------------
 
   float x337 = Detector_size_x[2] * -1;
   float y337 = Detector_size_y[2] *  3;
@@ -835,60 +826,39 @@ int main(void)
   float x352 = Detector_size_x[2] *  2;
   float y352 = Detector_size_y[2] * -3;
 
+  // ony 5 modules jan11 (was 6)
+
   float x353 = Detector_size_x[2] *  6;
-  float y353 = Detector_size_y[2] *  2.5;
+  float y353 = Detector_size_y[2] *  2;
 
   float x354 = Detector_size_x[2] *  6;
-  float y354 = Detector_size_y[2] *  1.5;
+  float y354 = Detector_size_y[2] *  1;
 
   float x355 = Detector_size_x[2] *  6;
-  float y355 = Detector_size_y[2] *  0.5;
+  float y355 = Detector_size_y[2] *  0;
 
   float x356 = Detector_size_x[2] *  6;
-  float y356 = Detector_size_y[2] * -0.5;
+  float y356 = Detector_size_y[2] * -1;
 
   float x357 = Detector_size_x[2] *  6;
-  float y357 = Detector_size_y[2] * -1.5;
+  float y357 = Detector_size_y[2] * -2;
 
-  float x358 = Detector_size_x[2] *  6;
-  float y358 = Detector_size_y[2] * -2.5;
-
-  //------------------------------------------------------------------
-
-
-  // ### Station 2
-//  //  float Offset_size=250;
-//  float Offset_size=Detector_size_x[0]/2;
-//
-//  float x6 = Offset_size + Detector_size_x[0] +  Detector_size_x[1] + 1.5 * Detector_size_x[2];
-//  float y6 = Offset_size + Detector_size_x[0] / 2;
-//  float x7 = Offset_size + Detector_size_x[0] +  Detector_size_x[1] + 1.5 * Detector_size_x[2];
-//  float y7 = Offset_size + Detector_size_x[0] / 2 + Detector_size_x[2];
-//  float x8 = Offset_size + Detector_size_x[0] +  Detector_size_x[1] + 1.5 * Detector_size_x[2];
-//  float y8 = Offset_size + Detector_size_x[0] / 2 + 2 * Detector_size_x[2];
-//  float x9 = Detector_size_x[1];
-//  float y9 = Offset_size + Detector_size_x[0] +  1.5 * Detector_size_x[1] + 2 * Detector_size_x[2];
-//  float x10a =  Offset_size + Detector_size_x[0] + Detector_size_x[1] + 3 * Detector_size_x[2];
-//  float y10a = 0.;
-//  float y10b = Detector_size_x[2];
-//  float y10c = 2 * Detector_size_x[2];
-//  float y10d = 3 * Detector_size_x[2];
-//  float x11a = Offset_size + Detector_size_x[0] + Detector_size_x[1] + 4.5 * Detector_size_x[2];
-//  float y11a = 0;
-//  float y11b = 2 * Detector_size_x[2];
-  
+  //  float x358 = Detector_size_x[2] *  6;
+  //  float y358 = Detector_size_y[2] * -2.5;
 
   //------------------------------------------------------------------
-
 
   //  int Chamber_number_Station2 = 50;
-  int Chamber_number_Station2 =  100;
+  //  int Chamber_number_Station2 =  100;
+  //  int Chamber_number_Station2 =  Chamber_number_Station1 + 22 * 2;   // = 100 - jun10
+  int Chamber_number_Station2 =  Chamber_number_Station1 + 21 * 2;   // = 98 - jun11
   float Position_Station2[][4] = { {x101,y101,1,0},{x102,y102,1,0},{x103,y103,1,0},{x104,y104,1,0},
 				   {x105,y105,1,0},{x106,y106,1,0},{x107,y107,1,0},{x108,y108,1,0},
 
 				   {x201,y201,2,0},{x202,y202,2,0},{x203,y203,2,0},{x204,y204,2,0},
 				   {x205,y205,2,0},{x206,y206,2,0},{x207,y207,2,0},{x208,y208,2,0},
 				   {x209,y209,2,0},{x210,y210,2,0},{x211,y211,2,0},{x212,y212,2,0},
+				   {x213,y213,2,0},{x214,y214,2,0},{x215,y215,2,0},{x216,y216,2,0},
 
 				   {x301,y301,3,0},{x302,y302,3,0},{x303,y303,3,0},{x304,y304,3,0},
 				   {x305,y305,3,0},{x306,y306,3,0},{x307,y307,3,0},{x308,y308,3,0},
@@ -910,7 +880,7 @@ int main(void)
 				   {x345,y345,3,0},{x346,y346,3,0},{x347,y347,3,0},{x348,y348,3,0},
 				   {x349,y349,3,0},{x350,y350,3,0},
 				   {x351,y351,3,0},{x352,y352,3,0},{x353,y353,3,0},{x354,y354,3,0},
-				   {x355,y355,3,0},{x356,y356,3,0},{x357,y357,3,0},{x358,y358,3,0},
+				   {x355,y355,3,0},{x356,y356,3,0},{x357,y357,3,0},//{x358,y358,3,0},
   //------------------------------------------------------------------
                                                                        {-x337,-y337,3,0},{-x338,-y338,3,0},
 				   {-x339,-y339,3,0},{-x340,-y340,3,0},
@@ -918,30 +888,16 @@ int main(void)
 				   {-x345,-y345,3,0},{-x346,-y346,3,0},{-x347,-y347,3,0},{-x348,-y348,3,0},
 				   {-x349,-y349,3,0},{-x350,-y350,3,0},
 				   {-x351,-y351,3,0},{-x352,-y352,3,0},{-x353,-y353,3,0},{-x354,-y354,3,0},
-				   {-x355,-y355,3,0},{-x356,-y356,3,0},{-x357,-y357,3,0},{-x358,-y358,3,0}
-};
+				   {-x355,-y355,3,0},{-x356,-y356,3,0},{-x357,-y357,3,0}//,{-x358,-y358,3,0}
+  };
 
   //------------------------------------------------------------------
-
-
-
-//  int Chamber_number_Station2 = 50;
-//
-//  float Position_Station2[][4] = { {-x2,y2,1,0},{x2,-y2,1,0},{y2,x2,1,1},{-y2,-x2,1,1},{-x3,y3,2,0},{x3,y3,2,0},{-x3,-y3,2,0},{x3,-y3,2,0},
-//      	      			     {-y3,0,2,1},{y3,0,2,1},{-x4,y4,3,0},{x5,y4,3,0},{-x5,-y5,3,0},{x4,-y5,3,0},{-y5,x5,3,1},{-y4,-x4,3,1},
-//				     {y4,x4,3,1},{y5,-x5,3,1},{-y8,-x8,3,0},{-y6,-x6,3,0},{y7,-x7,3,0},{-y7,x7,3,0},{y6,x6,3,0},{y8,x8,3,0},
-//				     {-x8,y8,3,1},{-x6,y6,3,1},{-x7,-y7,3,1},{x7,y7,3,1},{x6,-y6,3,1},{x8,-y8,3,1},
-//{-x10a,y10d,3,0},{-x10a,y10c,3,0},{-x10a,y10b,3,0},{-x10a,y10a,3,0},{-x10a,-y10b,3,0},{-x10a,-y10c,3,0},{-x10a,-y10d,3,0},{-x11a,y11b,3,1},{-x11a,y11a,3,1},{-x11a,-y11b,3,1},{x10a,y10d,3,0},{x10a,y10c,3,0},{x10a,y10b,3,0},{x10a,y10a,3,0},{x10a,-y10b,3,0},{x10a,-y10c,3,0},{x10a,-y10d,3,0},{x11a,y11b,3,1},{x11a,y11a,3,1},{x11a,-y11b,3,1} };
-//
-
   //------------------------------------------------------------------
 
   // ### Station 3
   //  int Chamber_number_Station3 = 72;
-  // Jun10
-  //  int Chamber_number_Station3 = 144;
-  // Dec10
-  int Chamber_number_Station3 = 126;
+  //  int Chamber_number_Station3 = 144;   // jun10
+  int Chamber_number_Station3 = 126;   // dec10, jan11
   float Position_Station3[144][4];
 
 //  // jun10
@@ -1014,46 +970,6 @@ int main(void)
 //  }
 
   //------------------------------------------------------------------
-
-//  float x10 = 1.5 * Detector_size_x[2]; //1500 
-//  float y10 = 2 *  Detector_size_x[2];  //2000
-//  float x11 = 1.5 * Detector_size_x[2]; //1500
-//  float y11 = Detector_size_x[2];       //1000
-//  float x12 = 1.5 * Detector_size_x[2]; //1500
-//  float y12 = 0;                        //0
-//  float x13 = 2.5 * Detector_size_x[2]; //2500
-//  float y13 = 4 * Detector_size_x[2];   //4000
-//  float x14 = 2.5 * Detector_size_x[2]; //2500
-//  float y14 = 3 * Detector_size_x[2];   //3000
-//  float x15 = 1.5 * Detector_size_x[2]; //1500
-//  float y15 = 3 * Detector_size_x[2];   //3000
-//  float x16 = 0.5 * Detector_size_x[2]; //500
-//  float y16 = 3 * Detector_size_x[2];   //3000
-//  float x17 = 4.5 * Detector_size_x[2]; //4500
-//  float y17 = Detector_size_x[2];       //1000
-//  float x18 = 4.5 * Detector_size_x[2]; //4500
-//  float y18a = 4. * Detector_size_x[2];
-//  float y18b = 3. * Detector_size_x[2];
-//  float y18c = 2. * Detector_size_x[2]; 
-//  float y18d = 1. * Detector_size_x[2];
-//  float y18e = 0.;
-//  float x19 = 0;                        //0
-//  float y19 = 1.5 * Detector_size_x[2]; //1500
-//  float x20 = 6.5 * Detector_size_x[2];
-//  float x21 = 8. * Detector_size_x[2];
-//  
-//
-//  int Chamber_number_Station3 = 72;
-//
-//   
-//  float Position_Station3[][4] = { {-x10,y10,3,0},{-x11,y11,3,0},{-x12,y12,3,0},{-x11,-y11,3,0},{-x10,-y10,3,0},{x10,y10,3,0},
-//                                   {x11,y11,3,0},{x12,y12,3,0},{x11,-y11,3,0},{x10,-y10,3,0},{-x13,y13,3,0},{x13,y13,3,0},
-//                                   {-x13,-y13,3,0},{x13,-y13,3,0},{-x14,-y14,3,0},{-x16,-y15,3,0},{x15,-y15,3,0},{-x15,y15,3,0},
-//                                   {x16,y16,3,0},{x14,y14,3,0},{y17,x17,3,1},{y18e,x17,3,1},{-y17,x17,3,1},{y17,-x17,3,1},
-//                                   {y18e,-x17,3,1},{-y17,-x17,3,1},{y15,x15,3,1},{y16,-x16,3,1},{y14,-x14,3,1},{-y14,x14,3,1},
-//                                   {-y16,x16,3,1},{-y15,-x15,3,1},
-//				   {x19,-y19,3,1},{x19,y19,3,1},{-x18,y18a,3,0},{-x18,y18b,3,0},{-x18,y18c,3,0},{-x18,y18d,3,0},{-x18,y18e,3,0},{-x18,-y18d,3,0},{-x18,-y18c,3,0},{-x18,-y18b,3,0},{-x18,-y18a,3,0},{x18,y18a,3,0},{x18,y18b,3,0},{x18,y18c,3,0},{x18,y18d,3,0},{x18,y18e,3,0},{x18,-y18d,3,0},{x18,-y18c,3,0},{x18,-y18b,3,0},{x18,-y18a,3,0},{-x20,y18b,3,0},{-x20,y18c,3,0},{-x20,y18d,3,0},{-x20,y18e,3,0},{-x20,-y18d,3,0},{-x20,-y18c,3,0},{-x20,-y18b,3,0},{x20,y18b,3,0},{x20,y18c,3,0},{x20,y18d,3,0},{x20,y18e,3,0},{x20,-y18d,3,0},{x20,-y18c,3,0},{x20,-y18b,3,0},{x21,y18c,3,1},{x21,y18e,3,1},{x21,-y18c,3,1},{-x21,y18c,3,1},{-x21,y18e,3,1},{-x21,-y18c,3,1} };
-//   
 
   for ( int counter = 0; counter < Station_number; counter++) {
 
@@ -1133,7 +1049,6 @@ int main(void)
   
     }
   }
-
 
   fclose(geofile);
   fclose(infofile);

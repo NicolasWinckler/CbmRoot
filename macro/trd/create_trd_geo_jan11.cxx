@@ -7,7 +7,7 @@
 // - jan11: 6 left and 6 right modules of station 2 reduced to 5 left and 5 right
 // - jan11: 60 +  98 + 126 = 284 (*4) = 1136
 // - dec10: 56 + 100 + 126 = 282 (*4) = 1128
-// - jun09: 56 + 100 + 144 = 300 (*4) = 1300
+// - jun10: 56 + 100 + 144 = 300 (*4) = 1300
 //
 // Update 20100602 - David Emschermann 
 // - cut the 3 top, 3 bottom, 6 left and 6 right modules in all layers of station 3 for dec10

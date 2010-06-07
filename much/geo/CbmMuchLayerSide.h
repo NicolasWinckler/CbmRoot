@@ -27,7 +27,7 @@ class CbmMuchLayerSide : public TObject
 
   /** Standard constructor
   *@param detId     Detector ID
-  *@param z         z position of station centre [cm]
+  *@param z         z position of layer side center [cm]
   **/
   CbmMuchLayerSide(Int_t detId, Double_t z);
 
@@ -35,7 +35,7 @@ class CbmMuchLayerSide : public TObject
    *@param iStation  Station index within the MUCH system.
    *@param iLayer    Layer index within the station.
    *@param iSide     Defines side (0 - Front, 1 - Back) within the layer.
-   *@param z         z position of station centre [cm].
+   *@param z         z position of layer side center [cm].
    **/
   CbmMuchLayerSide(Int_t iStation, Int_t iLayer, Bool_t iSide, Double_t z);
 
@@ -43,11 +43,11 @@ class CbmMuchLayerSide : public TObject
   virtual ~CbmMuchLayerSide();
 
   /** Accessors **/
-  Int_t   GetDetectorId() const { return fDetectorId; }
-  Int_t      GetNModules()   const { return fModules.GetEntriesFast(); }
-  TObjArray* GetModules()          { return &fModules; }
-  Double_t   GetZ()                { return fZ;}
-  void SetZ(Double_t z) { fZ = z; }
+  Int_t      GetDetectorId()  const { return fDetectorId; }
+  Int_t      GetNModules()    const { return fModules.GetEntriesFast(); }
+  TObjArray* GetModules()            { return &fModules; }
+  Double_t   GetZ()                   { return fZ;}
+  void      SetZ(Double_t z)         { fZ = z; }
 
   CbmMuchModule* GetModule(Int_t iModule) const { return (CbmMuchModule*)fModules.At(iModule); }
 
@@ -60,7 +60,7 @@ class CbmMuchLayerSide : public TObject
 
  protected:
   Int_t   fDetectorId;                      // Unique detector ID
-  Double32_t fZ;                            // z position of station centre (midplane) [cm]
+  Double32_t fZ;                            // z position of layer side center (midplane) [cm] in global cs
   TObjArray  fModules;                      // Array of CbmMuchModuleGem objects
 
   ClassDef(CbmMuchLayerSide,1);

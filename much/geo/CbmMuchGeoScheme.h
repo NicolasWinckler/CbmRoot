@@ -230,10 +230,10 @@ class CbmMuchGeoScheme: public TObject {
     // Straw module parameters
     Double_t fStrawLz;
 
-    TArrayD fAbsorberZ1; // Absorber Zin position [cm]
+    TArrayD fAbsorberZ1; // Absorber Zin position [cm] in the cave reference frame
     TArrayD fAbsorberLz; // Absorber thickness [cm]
     TArrayC fAbsorberMat; // Absorber material
-    TArrayD fStationZ0; // Station Zceneter [cm]
+    TArrayD fStationZ0; // Station Zceneter [cm] in  the cave reference frame
     TArrayI fNlayers; // Number of layers
     TArrayI fDetType; // Detector type
     TArrayD fLayersDz; // Distance between layers [cm]

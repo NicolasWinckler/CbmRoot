@@ -278,9 +278,8 @@ void CbmMuch::ConstructGeometry() {
 
   // Create absorbers
   TObjArray* absorbers = fGeoScheme->GetAbsorbers();
-  for (Int_t i=0;i<absorbers->GetEntriesFast();i++){
-    TString absName = Form("muchabsorber%02i",i+1);
-    switch (fGeoScheme->GetAbsorberMat(i)) {
+  for (Int_t iAbsorber=0;iAbsorber<absorbers->GetEntriesFast();iAbsorber++){
+    switch (fGeoScheme->GetAbsorberMat(iAbsorber)) {
       case 'C': mat = carbon;  break;
       case 'I': mat = iron;    break;
       case 'L': mat = lead;    break;
@@ -289,10 +288,11 @@ void CbmMuch::ConstructGeometry() {
         mat = iron;
         Warning("CreateGeometry","Absorber material not defined");
     }
-    Double_t z0 = fGeoScheme->GetAbsorberZ0(i)-muchZ0;
-    TGeoCone* shAbs = (TGeoCone*) absorbers->At(i);
-    TGeoVolume* voAbs = new TGeoVolume(absName,shAbs,mat);
-    gGeoManager->Node(absName,0,"much",0.,0.,z0,0,kTRUE,buf,0);
+    Double_t z0 = fGeoScheme->GetAbsorberZ0(iAbsorber)-muchZ0;
+    TGeoCone* shAbs = (TGeoCone*) absorbers->At(iAbsorber);
+    TString absorberName = Form("muchabsorber%02i",iAbsorber+1);
+    TGeoVolume* voAbs = new TGeoVolume(absorberName,shAbs,mat);
+    gGeoManager->Node(absorberName,0,"much",0.,0.,z0,0,kTRUE,buf,0);
   }
 
   // Create rotation matrices
@@ -315,78 +315,81 @@ void CbmMuch::ConstructGeometry() {
   TGeoCompositeShape* shSpacerFull = new TGeoCompositeShape("shSpacer","shModule-shActive");
 
   // Create stations
-  for (Int_t st=0;st<fGeoScheme->GetNStations();st++){
-    CbmMuchStation* station = fGeoScheme->GetStation(st);
+  for (Int_t iStation=0;iStation<fGeoScheme->GetNStations();iStation++){
+    CbmMuchStation* station = fGeoScheme->GetStation(iStation);
 
     // Check if
     Int_t nLayers = station->GetNLayers();
     if (nLayers<=0) {
-      Warning("CbmMuch","Station layers are not defined for station %02i",st);
+      Warning("CbmMuch","Station layers are not defined for station %02i",iStation);
       continue;
     }
 
     // Create station volume
-    TString stName = Form("muchstation%02i",st+1);
     Double_t stRmin = station->GetTubeRmin();
     Double_t stRmax = station->GetTubeRmax();
     Double_t stDz   = station->GetTubeDz();
-    TGeoTube*   shSt = new TGeoTube(stRmin,stRmax,stDz);
-    TGeoVolume* voSt = new TGeoVolume(stName,shSt,air);
-    gGeoManager->Node(stName,0,"much",0.,0.,station->GetZ()-muchZ0,0,kTRUE,buf,0);
+    TGeoTube* shStation = new TGeoTube(stRmin,stRmax,stDz);
+    TString stationName = Form("muchstation%02i",iStation+1);
+    TGeoVolume* voSt = new TGeoVolume(stationName,shStation,air);
+    gGeoManager->Node(stationName,0,"much",0.,0.,station->GetZ()-muchZ0,0,kTRUE,buf,0);
 
     // Create support shape
     CbmMuchLayer* layerFirst = station->GetLayer(0);
-    Double_t supDx  = layerFirst->GetSupportDx();
-    Double_t supDy  = layerFirst->GetSupportDy();
-    Double_t supDz  = layerFirst->GetSupportDz();
-
-    TString supBoxName   = Form("muchst%02ibox",st+1);
-    TString supHoleName  = Form("muchst%02ihole",st+1);
-    TString trName       = Form("muchst%02itr",st+1);
-    TString supShapeName = Form("muchst%02ish",st+1);
-    TGeoTube* shHole = new TGeoTube(supHoleName,0.,station->GetTubeRmin(),supDz+0.001);
-    TGeoBBox* shBox  = new TGeoBBox(supBoxName,supDx/2.,supDy,supDz);
-    TGeoTranslation* trHole = new TGeoTranslation(trName,-supDx/2.,0.,0.);
-    trHole->RegisterYourself();
-    TString formula = supBoxName+"-"+supHoleName+":"+trName;
-    TGeoCompositeShape* shSup = new TGeoCompositeShape(supShapeName,formula);
+    Double_t supportDx  = layerFirst->GetSupportDx();
+    Double_t supportDy  = layerFirst->GetSupportDy();
+    Double_t supportDz  = layerFirst->GetSupportDz();
+    TString supportBoxName   = Form("shStation%02iSupportBox",iStation+1);
+    TString supportHoleName  = Form("shStation%02iSupportHole",iStation+1);
+    TString translationName  = Form("trSt%02i",iStation+1);
+    TString supportShapeName = Form("shSt%02iSupport",iStation+1);
+    TGeoTube* shSupportHole = new TGeoTube(supportHoleName,0.,stRmin,supportDz+0.001);
+    TGeoBBox* shSupportBox  = new TGeoBBox(supportBoxName,supportDx/2.,supportDy,supportDz);
+    TGeoTranslation* translation = new TGeoTranslation(translationName,-supportDx/2.,0.,0.);
+    translation->RegisterYourself();
+    TString expression = supportBoxName+"-"+supportHoleName+":"+translationName;
+    TGeoCompositeShape* shSupport = new TGeoCompositeShape(supportShapeName,expression);
 
     // Create layers
-    for (Int_t l=0;l<station->GetNLayers();l++){
-      CbmMuchLayer* layer = station->GetLayer(l);
+    for (Int_t iLayer=0;iLayer<station->GetNLayers();iLayer++){
+      CbmMuchLayer* layer = station->GetLayer(iLayer);
       Double_t layerZ  = layer->GetZtoStationCenter();
       Double_t layerDz = layer->GetDz();
-      TString layerName   = Form("muchstation%02ilayer%i",st+1,l+1);
       TGeoTube*   shLayer = new TGeoTube(stRmin,stRmax,layerDz);
+      TString layerName   = Form("muchstation%02ilayer%i",iStation+1,iLayer+1);
       TGeoVolume* voLayer = new TGeoVolume(layerName,shLayer,air);
-      gGeoManager->Node(layerName,0,stName,0.,0.,layerZ,0,kTRUE,buf,0);
+      gGeoManager->Node(layerName,0,stationName,0.,0.,layerZ,0,kTRUE,buf,0);
 
       // Create support
-      TString  supName1  = Form("muchstation%02ilayer%isupport1",st+1,l+1);
-      TString  supName2  = Form("muchstation%02ilayer%isupport2",st+1,l+1);
-      TGeoVolume* voSup1 = new TGeoVolume(supName1,shSup,supportMat);
-      TGeoVolume* voSup2 = new TGeoVolume(supName2,shSup,supportMat);
-      if(TMath::Abs(supDz) > 1e-5) { // Do not create support if it does not exist
-        gGeoManager->Node(supName1,0,layerName,+supDx/2.,0.,0.,    0,kTRUE,buf,0);
-        gGeoManager->Node(supName2,0,layerName,-supDx/2.,0.,0.,krotZ,kTRUE,buf,0);
+      TString  supportName1  = Form("muchstation%02ilayer%isupport1",iStation+1,iLayer+1);
+      TString  supportName2  = Form("muchstation%02ilayer%isupport2",iStation+1,iLayer+1);
+      TGeoVolume* voSupport1 = new TGeoVolume(supportName1,shSupport,supportMat);
+      TGeoVolume* voSupport2 = new TGeoVolume(supportName2,shSupport,supportMat);
+      if(TMath::Abs(supportDz) > 1e-5) { // Do not create support if it does not exist
+        gGeoManager->Node(supportName1,0,layerName,+supportDx/2.,0.,0.,    0,kTRUE,buf,0);
+        gGeoManager->Node(supportName2,0,layerName,-supportDx/2.,0.,0.,krotZ,kTRUE,buf,0);
       }
 
       // Create layer sides
-      for (Int_t s=0;s<2;s++){
-        CbmMuchLayerSide* side = layer->GetSide(s);
-        Char_t cside = (s==1) ? 'b' : 'f';
+      for (Int_t iSide=0;iSide<2;iSide++){
+        CbmMuchLayerSide* side = layer->GetSide(iSide);
+        Char_t cside = (iSide==1) ? 'b' : 'f';
 
         // Create modules
-        for (Int_t m=0;m<side->GetNModules();m++){
-          CbmMuchModule* module = side->GetModule(m);
+        for (Int_t iModule=0;iModule<side->GetNModules();iModule++){
+          CbmMuchModule* module = side->GetModule(iModule);
           TVector3 pos = module->GetPosition();
           TVector3 size = module->GetSize();
-          Double_t cutRadius = module->GetCutRadius();
+          TString moduleHoleName = Form("shStation%02iModuleHole", iStation);
+          TGeoTube* shModuleHole = new TGeoTube(moduleHoleName, 0., stRmin, size[2] / 2. + 0.001);
 
           if (!station->IsModuleDesign()){ // simple design
-            TGeoBBox* shActiveBox = new TGeoBBox(Form("shActiveBoxSt%02il%i",st+1,l+1),size[0]/2.,size[1]/2.,size[2]/2.);
-            TGeoShape* shActive = new TGeoCompositeShape(Form("shActiveHoleSt%02il%i%cm%02i",st+1,l,cside,m+1),Form("shActiveBoxSt%02il%i-muchst%02ihole",st+1,l+1,st+1));
-            TString activeName = Form("muchstation%02ilayer%i%cactive%03i",st+1,l+1,cside,m+1);
+            TString moduleBoxName = Form("shStation%02iModuleBox", iStation);
+            TString moduleActiveName = Form("shStation%02iModuleActive", iStation);
+            expression = moduleBoxName+"-"+moduleHoleName;
+            TGeoBBox* shActiveBox = new TGeoBBox(moduleBoxName, size[0] / 2., size[1] / 2., size[2] / 2.);
+            TGeoShape* shActive = new TGeoCompositeShape(moduleActiveName, expression);
+            TString activeName = Form("muchstation%02ilayer%i%cactive%03i",iStation+1,iLayer+1,cside,iModule+1);
             TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);
             gGeoManager->Node(activeName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);
             AddSensitiveVolume(voActive);
@@ -394,21 +397,26 @@ void CbmMuch::ConstructGeometry() {
           }
 
           if (module->GetDetectorType()==2) {
-            Fatal("CbmMuch","Station %02i - detailed module design not implemented for straws",st);
+            Fatal("CbmMuch","Station %02i - detailed module design not implemented for straws",iStation);
           }
 
-          TString activeName = Form("muchstation%02ilayer%i%cactive%03i",st+1,l+1,cside,m+1);
-          TString spacerName = Form("muchstation%02ilayer%i%cspacer%03i",st+1,l+1,cside,m+1);
           TGeoShape* shActive = shActiveFull;
           TGeoShape* shSpacer = shSpacerFull;
-
+          Double_t cutRadius = module->GetCutRadius();
           if (cutRadius>0) { // Create composite shape with a hole
-            TGeoTranslation* tr = new TGeoTranslation(Form("tr%02il%i%cm%02i",st+1,l+1,cside,m+1),-pos[0],-pos[1],0.);
-            tr->RegisterYourself();
-            shActive = new TGeoCompositeShape(Form("shActiveHoleSt%02il%im%02i",st+1,l+1,m+1),Form("shActive-muchst%02ihole:tr%02il%i%cm%02i",st+1,st+1,l+1,cside,m+1));
-            shSpacer = new TGeoCompositeShape(Form("shSpacerHoleSt%02il%im%02i",st+1,l+1,m+1),Form("shSpacer-muchst%02ihole:tr%02il%i%cm%02i",st+1,st+1,l+1,cside,m+1));
+            translationName = Form("tr%02il%i%cm%03i",iStation+1,iLayer+1,cside,iModule+1);
+            translation = new TGeoTranslation(translationName,-pos[0],-pos[1],0.);
+            translation->RegisterYourself();
+            expression = "shActive-"+moduleHoleName+":"+translationName;
+            TString moduleActiveName = Form("shStation%02iLayer%i%cModule%03iActive", iStation, iLayer, cside, iModule);
+            shActive = new TGeoCompositeShape(moduleActiveName,expression);
+            expression = "shSpacer-"+moduleHoleName+":"+translationName;
+            TString moduleSpacerName = Form("shStation%02iLayer%i%cModule%03iSpacer", iStation, iLayer, cside, iModule);
+            shSpacer = new TGeoCompositeShape(moduleSpacerName,expression);
           }
 
+          TString activeName = Form("muchstation%02ilayer%i%cactive%03i",iStation+1,iLayer+1,cside,iModule+1);
+          TString spacerName = Form("muchstation%02ilayer%i%cspacer%03i",iStation+1,iLayer+1,cside,iModule+1);
           TGeoVolume* voActive = new TGeoVolume(activeName,shActive,argon);
           TGeoVolume* voSpacer = new TGeoVolume(spacerName,shSpacer,noryl);
           gGeoManager->Node(activeName,0,layerName,pos[0],pos[1],pos[2]-layer->GetZ(),0,kTRUE,buf,0);

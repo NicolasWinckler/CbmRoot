@@ -24,7 +24,7 @@ class CbmMuchStation : public TObject{
 
   /** Standard constructor
   *@param iStation  Station index
-  *@param z         z position of station centre [cm]
+  *@param z         z position of station center in global cs [cm]
   **/
   CbmMuchStation(Int_t iStation, Double_t z);
 
@@ -65,7 +65,7 @@ class CbmMuchStation : public TObject{
 
  protected:
   Int_t      fDetectorId;       // Unique detector ID
-  Double32_t fZ;                // z position of station centre (midplane) [cm]
+  Double32_t fZ;                // z position of station center (midplane) [cm] in global cs
   TObjArray  fLayers;           // Array of CbmMuchLayers
   Double_t   fRmin;             // Minimum radius of the station acceptance [cm]
   Double_t   fRmax;             // Maximum radius of the station acceptance [cm]

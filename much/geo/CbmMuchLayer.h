@@ -65,7 +65,7 @@ class CbmMuchLayer : public TObject
 
  protected:
   Int_t   fDetectorId;  // Unique detector ID
-  Double32_t fZ;           // z position of station centre (midplane) [cm]
+  Double32_t fZ;           // z position of station center (midplane) [cm]
   CbmMuchLayerSide fSideF; // Front side of the layer
   CbmMuchLayerSide fSideB; // Back side of the layer
   Double_t   fSupportDx;   // Support half-width

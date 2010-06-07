@@ -577,14 +577,11 @@ void CbmMuchGeoScheme::CreateStations() {
 // -------------------------------------------------------------------------
 CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
   Double_t stGlobalZ0 = fStationZ0[st] + fMuchZ1;
-  TVector3 size = TVector3(fActiveLx, fActiveLy, fActiveLz);
-//  Double_t stDz = ((fNlayers[st] - 1) * fLayersDz[st] + fSupportLz[st]
-//                                                                   + fActiveLz) / 2. + 1;
-  Double_t stDz = ((fNlayers[st] - 1) * fLayersDz[st] + fSupportLz[st]
-                                                                   + 2*fActiveLz) / 2.;
+  Double_t stDz = ((fNlayers[st] - 1) * fLayersDz[st] + fSupportLz[st] + 2
+      * fActiveLz) / 2.;
   Double_t stGlobalZ2 = stGlobalZ0 + stDz;
   Double_t rmin = stGlobalZ2 * fAcceptanceTanMin;
-  Double_t rmax = stGlobalZ2 * fAcceptanceTanMax + 20;
+  Double_t rmax = stGlobalZ2 * fAcceptanceTanMax;
 
   CbmMuchStation* station = new CbmMuchStation(st, stGlobalZ0);
   station->SetRmin(rmin);
@@ -593,63 +590,53 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationGem(Int_t st){
 
   // Create layers
   for (Int_t l = 0; l < fNlayers[st]; l++) {
-    Double_t layerZ0 = (l + 1 / 2. - fNlayers[st] / 2.) * fLayersDz[st];
+    Double_t layerZ0 = (l - (fNlayers[st] - 1) / 2.) * fLayersDz[st];
     Double_t layerGlobalZ0 = layerZ0 + stGlobalZ0;
-    Double_t sideDz = fSupportLz[st]/2. + fActiveLz / 2. + 0.01;
-    CbmMuchLayer* layer = new CbmMuchLayer(st, l, layerGlobalZ0,layerZ0);
+    Double_t sideDz = fSupportLz[st] / 2. + fActiveLz / 2. + 0.001; // distance between side's and layer's centers
+    CbmMuchLayer* layer = new CbmMuchLayer(st, l, layerGlobalZ0, layerZ0);
     layer->GetSideB()->SetZ(layerGlobalZ0 + sideDz);
     layer->GetSideF()->SetZ(layerGlobalZ0 - sideDz);
 
+    Double_t moduleZ = sideDz; // Z position of the module center in the layer cs
     if (fModuleDesign[st]) {
       // Create modules
-      Int_t mF = 0, mB = 0;
-      Double_t mDx = fSpacerLx + fActiveLx / 2.;
-      Double_t mDy = fSpacerLy + fActiveLy / 2.;
-      Int_t nx = Int_t(TMath::Ceil(rmax / 2. / mDx));
-      Int_t ny = Int_t(TMath::Ceil(rmax / (fActiveLy - fOverlapY)));
-      for (Int_t ix = 1; ix <= nx; ix++) {
-        Double_t mX = mDx * (2 * ix - 1);
-        Double_t mZ = sideDz;
-        for (Int_t iy = -ny; iy < ny; iy += 1) {
-          mZ *= -1;
-          Bool_t isBack = (mZ > 0);
+      Double_t moduleDx = fSpacerLx + fActiveLx / 2.; // half-width of the module including spacers
+      Double_t moduleDy = fSpacerLy + fActiveLy / 2.; // half-length of the module including spacers
+      Int_t nx = Int_t(TMath::Ceil(rmax / 2. / moduleDx)); // half-number of modules along the X direction
+      Int_t ny = Int_t(TMath::Ceil(rmax / (fActiveLy - fOverlapY))); // half-number of modules along the Y direction
+      for (Int_t ix = 1; ix <= nx; ++ix) {
+        Double_t moduleX = moduleDx * (2 * ix - 1);
+        for (Int_t iy = -ny; iy < ny; ++iy) {
+          moduleZ *= -1;
+          Bool_t isBack = (moduleZ > 0);
           CbmMuchLayerSide* side = layer->GetSide(isBack);
-          Int_t &m = isBack ? mB : mF;
-          Double_t mY = (fActiveLy - fOverlapY) * (iy+1./2.);
+          Double_t moduleY = (fActiveLy - fOverlapY) * (iy + 1. / 2.);
 
-          Int_t intersect = Intersect(mX, mY, mDx, mDy, rmin);
+          Int_t intersect = Intersect(moduleX, moduleY, moduleDx, moduleDy, rmin);
           if (intersect == 2)
             continue;
           Double_t rHole = (intersect == 1) ? rmin : -1;
           // Skip module if not in the acceptance
-          if (pow(mX - fActiveLx / 2., 2) + pow(mY - fActiveLy / 2., 2)
-              > rmax * rmax && pow(mX - fActiveLx / 2., 2) + pow(mY
-                  + fActiveLy / 2., 2) > rmax * rmax)
+          if (!Intersect(moduleX, moduleY, fActiveLx / 2., fActiveLy / 2., rmax))
             continue;
-          // Create module with positive x
-          TVector3 pos = TVector3(mX, mY, mZ + layerGlobalZ0);
-          side->AddModule(
-              new CbmMuchModuleGem(st, l, isBack, m, pos, size, rHole));
-          m++;
-          // Create module with negative x
-          pos = TVector3(-mX, mY, mZ + layerGlobalZ0);
-          side->AddModule(
-              new CbmMuchModuleGem(st, l, isBack, m, pos, size, rHole));
-          m++;
-          //printf("mx=%6.2f my=%6.2f\n",mX,mY);
+          // Create modules with positive and negative x
+          for(Int_t i=0; i<2; ++i){
+            TVector3 size = TVector3(fActiveLx, fActiveLy, fActiveLz);
+            TVector3 pos = TVector3(TMath::Power(-1, i)*moduleX, moduleY, moduleZ + layerGlobalZ0);
+            side->AddModule(new CbmMuchModuleGem(st, l, isBack, side->GetNModules(), pos, size,
+                rHole));
+          }
         } // mY
       } // mX
-      //printf("\n");
       // Set support shape
       layer->SetSupportDx(nx * (fActiveLx + 2. * fSpacerLx));
-      layer->SetSupportDy((2*ny + 1) * (fActiveLy - fOverlapY) / 2. + fOverlapY
-          / 2. + fSpacerLy);
+      layer->SetSupportDy((2 * ny + 1) * (fActiveLy - fOverlapY) / 2.
+          + fOverlapY / 2. + fSpacerLy);
       layer->SetSupportDz(fSupportLz[st] / 2.);
     } else {
-      TVector3 pos = TVector3(0, 0, -sideDz + layerGlobalZ0);
-      size = TVector3(2 * rmax, 2 * rmax, fActiveLz);
-      CbmMuchLayerSide* side = layer->GetSideF();
-      side->AddModule(new CbmMuchModuleGem(st, l, 0, 0, pos, size, rmin));
+      TVector3 size = TVector3(2 * rmax, 2 * rmax, fActiveLz);
+      TVector3 pos = TVector3(0, 0, layerGlobalZ0 - moduleZ);
+      layer->GetSideF()->AddModule(new CbmMuchModuleGem(st, l, 0, 0, pos, size, rmin));
       layer->SetSupportDx(rmax);
       layer->SetSupportDy(rmax);
       layer->SetSupportDz(fSupportLz[st] / 2.);
@@ -666,20 +653,18 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationStraw(Int_t st){
   Double_t stDz = ((fNlayers[st] - 1) * fLayersDz[st] + 2*fStrawLz) / 2.;
   Double_t stGlobalZ2 = stGlobalZ0 + stDz;
   Double_t rmin = stGlobalZ2 * fAcceptanceTanMin;
-  Double_t rmax = stGlobalZ2 * fAcceptanceTanMax + 20;
+  Double_t rmax = stGlobalZ2 * fAcceptanceTanMax;
 
   CbmMuchStation* station = new CbmMuchStation(st, stGlobalZ0);
   station->SetRmin(rmin);
   station->SetRmax(rmax);
   station->SetModuleDesign(fModuleDesign[st]);
 
-
   // Create layers
   for (Int_t l = 0; l < fNlayers[st]; l++) {
-    Double_t layerZ0 = (l + 1 / 2. - fNlayers[st] / 2.) * fLayersDz[st];
+    Double_t layerZ0 = (l - (fNlayers[st] - 1) / 2.) * fLayersDz[st];
     Double_t layerGlobalZ0 = layerZ0 + stGlobalZ0;
-    Double_t sideDz = fStrawLz / 2. + 0.01;
-
+    Double_t sideDz = fStrawLz / 2. + 0.001;
     CbmMuchLayer* layer = new CbmMuchLayer(st, l, layerGlobalZ0,layerZ0);
     layer->GetSideF()->SetZ(layerGlobalZ0 - sideDz);
     layer->GetSideB()->SetZ(layerGlobalZ0 + sideDz);
@@ -689,8 +674,8 @@ CbmMuchStation* CbmMuchGeoScheme::CreateStationStraw(Int_t st){
     }
 
     // Create two modules (one per each layer side)
-    TVector3 posF = TVector3(0, 0, -sideDz + layerGlobalZ0);
-    TVector3 posB = TVector3(0, 0, +sideDz + layerGlobalZ0);
+    TVector3 posF = TVector3(0, 0, layerGlobalZ0 - sideDz);
+    TVector3 posB = TVector3(0, 0, layerGlobalZ0 + sideDz);
     TVector3 size = TVector3(2 * rmax, 2 * rmax, fStrawLz);
     layer->GetSideF()->AddModule(new CbmMuchModuleStraws(st, l, 0, 0, posF, size, rmin));
     layer->GetSideB()->AddModule(new CbmMuchModuleStraws(st, l, 1, 0, posB, size, rmin));

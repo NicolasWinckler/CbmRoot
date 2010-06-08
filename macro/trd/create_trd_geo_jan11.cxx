@@ -1008,7 +1008,9 @@ int main(void)
         fprintf(geofile,"45 360 4\n");
         fprintf(geofile,"-%f %f %f \n",Layer_thickness/2,(Inner_radius[counter]-0.5),(Outer_radius[counter]+500));
         fprintf(geofile,"%f %f %f \n",Layer_thickness/2,(Inner_radius[counter]-0.5),(Outer_radius[counter]+500));
-        fprintf(geofile,"0. 0. %4.1f\n",(-Station_thickness/2)+30+(60*i));
+      // allow variable size in calculation of layer position
+      //        fprintf(geofile,"0. 0. %4.1f\n",(-Station_thickness/2)+30+(60*i));
+        fprintf(geofile,"0. 0. %4.1f\n",(-Station_thickness/2)+Layer_thickness/2+(Layer_thickness*i));
         fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
         fprintf(geofile,"//*********************************\n");
   
@@ -1042,7 +1044,9 @@ int main(void)
         fprintf(geofile,"//*********************************\n");
         fprintf(geofile,"trd%dlayer#%d\n",counter+1, i+1);
         fprintf(geofile,"trd%d\n",counter+1);
-        fprintf(geofile,"0. 0. %4.1f\n",(-Station_thickness/2)+30+(60*i));
+      // allow variable size in calculation of layer position
+      //        fprintf(geofile,"0. 0. %4.1f\n",(-Station_thickness/2)+30+(60*i));
+        fprintf(geofile,"0. 0. %4.1f\n",(-Station_thickness/2)+Layer_thickness/2+(Layer_thickness*i));
         fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
         fprintf(geofile,"//*********************************\n");
       }

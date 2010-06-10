@@ -5,8 +5,8 @@
 
 
 
-#ifndef CBMTUTORIALDETDIGITIZER_H
-#define CBMTUTORIALDETDIGITIZER_H
+#ifndef CBMTRDDIGITIZER_H
+#define CBMTRDDIGITIZER_H
 
 #include "CbmTrdDetectorId.h"
 
@@ -90,4 +90,4 @@ private:
     ClassDef(CbmTrdDigitizer,2)
 
     };
-#endif //CBMTUTORIALDETDIGITIZER_H
+#endif //CBMTRDDIGITIZER_H

@@ -63,11 +63,11 @@ private:
     void FillModuleMap();
     void FillPadInfo();
 
-    Int_t fStation;
-    Int_t fLayer;
-    Int_t fModuleType;
-    Int_t fModuleCopy;
-    Int_t fSector;
+    Int_t fStation;    //station number
+    Int_t fLayer;      //layer number
+    Int_t fModuleType; //module type [1,2,3]
+    Int_t fModuleCopy; //module copy number
+    Int_t fSector;     //sector number
 
     TArrayD fpadsizex; //pixel width in x;
     TArrayD fpadsizey; //pixel width in y;
@@ -77,7 +77,7 @@ private:
     TArrayD fSectorSizey;    //sector width in y;
     Int_t   fCol;      //Calculated pixel column were the hit is in
     Int_t   fRow;      //Calculated pixel row were the hit is in
-    Bool_t  fIsRotated;
+    Bool_t  fIsRotated;//obsolete - used for rectangual modules
 
     Int_t   fModuleID; //Unique number for detector module
 
@@ -90,9 +90,9 @@ private:
     std::map<Int_t, CbmTrdModule*> fModuleMap;                  //!   
     std::map<Int_t, CbmTrdModule*>::iterator fModuleMapIt;      //!   
 
-    CbmTrdDigiPar *fDigiPar;
+    CbmTrdDigiPar *fDigiPar;    // pointer to digi parameters
 
-    CbmTrdDetectorId fTrdDetId;
+    CbmTrdDetectorId fTrdDetId; // detector ID
 
     ClassDef(CbmTrdCreateDigiPar,2)
 

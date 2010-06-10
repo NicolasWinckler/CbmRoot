@@ -2,6 +2,9 @@
 //   Generator for CbmTrd Geometry
 //
 //
+// Update 20100610 - David Emschermann 
+// - 12 mm gas thickness as standard (was 6 mm)
+//
 // Update 20100527 - David Emschermann 
 // - replace carbon frames by G10
 //
@@ -68,18 +71,47 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
   Active_area_y[2] = Detector_size_y[2] /2 - frame_width;
  
 
-  float radiator_thickness = 14.5;
-  float radiator_position = -15.5;
-  float gas_thickness = 3.;
-  float gas_position = 2.;
-  float padplane_thickness = 0.015;
-  float padplane_position = 5.015;
-  float mylar_thickness = 0.75;
-  float mylar_position = 5.78;
-  float electronics_thickness = 0.035;
-  float electronics_position = 6.565;
-  float frame_thickness = 18.300;
-  float frame_position = -11.7;
+  // 75. is half of the layer thickness in Jun10
+  float radiator_thickness    =  29. /2.;
+  float radiator_position     =  14.5 - Layer_thickness /2.;
+  float gas_thickness         =  12. /2.;
+  float gas_position          =  35. - Layer_thickness /2.;
+  float padplane_thickness    =   0.03 /2.;
+  float padplane_position     =  41.015 - Layer_thickness /2.;
+  float mylar_thickness       =   1.5 /2.;
+  float mylar_position        =  41.78 - Layer_thickness /2.;
+  float electronics_thickness =   0.07 /2.;
+  float electronics_position  =  42.565 - Layer_thickness /2.;
+  float frame_thickness       =  42.6 /2.;
+  float frame_position        =  21.3 - Layer_thickness /2.;
+
+//  // classical approach
+//  float radiator_thickness    =  14.5;
+//  float radiator_position     = -15.5 - 45.;
+//  float gas_thickness         =   6.;
+//  float gas_position          =   5. - 45.;
+//  float padplane_thickness    =   0.015;
+//  float padplane_position     =  11.015 - 45.;
+//  float mylar_thickness       =   0.75;
+//  float mylar_position        =  11.78 - 45.;
+//  float electronics_thickness =   0.035;
+//  float electronics_position  =  12.565 - 45;
+//  float frame_thickness       =  21.3;
+//  float frame_position        = -53.7;   // -75 + 21.3 = -53.7
+
+//  // prior to Jun10 - 6 mm
+//  float radiator_thickness = 14.5;
+//  float radiator_position = -15.5;
+//  float gas_thickness = 3.;
+//  float gas_position = 2.;
+//  float padplane_thickness = 0.015;
+//  float padplane_position = 5.015;
+//  float mylar_thickness = 0.75;
+//  float mylar_position = 5.78;
+//  float electronics_thickness = 0.035;
+//  float electronics_position = 6.565;
+//  float frame_thickness = 18.300;
+//  float frame_position = -11.7;   // -30 + 18.3 = -11,7
 
 
 

@@ -60,7 +60,8 @@ OffLineInterface/CbmL1RichRingQa.cxx
 )
 set(L1_SRCS
 ${L1RULECHECKER_SRCS}
-L1Algo/L1CATrackFinder.cxx 
+L1Algo/L1CATrackFinder.cxx
+L1Algo/L1TrackFitter.cxx
 CbmL1Performance.cxx 
 CbmL1ReadEvent.cxx 
 )

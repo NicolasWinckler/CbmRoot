@@ -21,7 +21,14 @@ class L1Algo{
   
 
   void CATrackFinder();
+  
   void KFTrackFitter();
+  void GuessVec( L1TrackPar &t, fvec *xV, fvec *yV, fvec *zV, fvec *wV, int NHits );
+  void FilterFirst( L1TrackPar &track,fvec &x, fvec &y, fvec &w, L1Station &st );
+  void FilterLast( L1TrackPar &track,fvec &x, fvec &y, fvec &w, L1Station &st );
+  void Filter( L1TrackPar &T, L1UMeasurementInfo &info, fvec &u , fvec &w);
+      
+      
 
   void FitTrack( L1TrackPar &T, short unsigned int* vHits, int NHits, bool downstream );
 

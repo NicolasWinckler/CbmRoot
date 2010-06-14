@@ -306,7 +306,9 @@ void CbmL1::Exec(Option_t * option)
   static int nevent=1;
   if( fVerbose>1 ) cout << endl << "CbmL1::Exec event " << nevent++ << " ..." << endl << endl;
 
-  ReadEvent();  
+  ReadEvent();
+  InputPerformance();
+  
 
   if( fVerbose>1 ) cout<<"L1 Track finder..."<<endl;
   algo->CATrackFinder();

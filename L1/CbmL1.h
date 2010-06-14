@@ -128,7 +128,10 @@ class CbmL1 : public FairTask
  private:
 
   static CbmL1 *fInstance;
- 
+
+  void InputPerformance();
+  void WriteHistos();
+  
   ClassDef(CbmL1,1);
 
 };

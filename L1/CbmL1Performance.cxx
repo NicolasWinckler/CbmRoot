@@ -33,6 +33,9 @@ using std::vector;
 using std::pair;
 using std::map;
 
+
+
+
 void CbmL1::Performance()
 {
 
@@ -171,13 +174,13 @@ void CbmL1::Performance()
       gDirectory->cd("..");
 
       p_eff_all_vs_mom = new TProfile("p_eff_all_vs_mom", "AllSet Efficiency vs Momentum",
-                     100, 0.0, 5.0, 0.0, 100.0);
+      		           100, 0.0, 5.0, 0.0, 100.0);
       p_eff_prim_vs_mom = new TProfile("p_eff_prim_vs_mom", "All Primary Set Efficiency vs Momentum",
-                     100, 0.0, 5.0, 0.0, 100.0);
+      		           100, 0.0, 5.0, 0.0, 100.0);
       p_eff_sec_vs_mom = new TProfile("p_eff_sec_vs_mom", "All Secondary Set Efficiency vs Momentum",
-                     100, 0.0, 5.0, 0.0, 100.0);
+      		           100, 0.0, 5.0, 0.0, 100.0);
       p_eff_d0_vs_mom = new TProfile("p_eff_d0_vs_mom", "D0 Secondary Tracks Efficiency vs Momentum",
-                     150, 0.0, 15.0, 0.0, 100.0);
+      		           150, 0.0, 15.0, 0.0, 100.0);
 
       h_reg_mom_prim   = new TH1F("h_reg_mom_prim", "Momentum of registered primary tracks", 500, 0.0, 5.0);
       h_reg_mom_sec   = new TH1F("h_reg_mom_sec", "Momentum of registered secondary tracks", 500, 0.0, 5.0);
@@ -214,17 +217,17 @@ void CbmL1::Performance()
       h_reco_clean = new TH1F("h_reco_clean", "Percentage of correct hits", 100, -0.5, 100.5);
       h_reco_time = new TH1F("h_reco_time", "CA Track Finder Time (s/ev)", 20, 0.0, 20.0);
       h_reco_timeNtr = new TProfile("h_reco_timeNtr", 
-                    "CA Track Finder Time (s/ev) vs N Tracks",
-                    200, 0.0, 1000.0);
+      		          "CA Track Finder Time (s/ev) vs N Tracks",
+      		          200, 0.0, 1000.0);
       h_reco_timeNhit = new TProfile("h_reco_timeNhit", 
-                    "CA Track Finder Time (s/ev) vs N Hits",
-                    200, 0.0, 30000.0);
+      		          "CA Track Finder Time (s/ev) vs N Hits",
+      		          200, 0.0, 30000.0);
       h_reco_fakeNtr = new TProfile("h_reco_fakeNtr", 
-                    "N Fake hits vs N Tracks",
-                    200, 0.0, 1000.0);
+      		          "N Fake hits vs N Tracks",
+      		          200, 0.0, 1000.0);
       h_reco_fakeNhit = new TProfile("h_reco_fakeNhit", 
-                    "N Fake hits vs N Hits",
-                    200, 0.0, 30000.0);
+      		          "N Fake hits vs N Hits",
+      		          200, 0.0, 30000.0);
 
       h_reco_d0_mom = new TH1F("h_reco_d0_mom", "Momentum of reco D0 track", 150, 0.0, 15.0);
       /*
@@ -997,6 +1000,9 @@ void CbmL1::Performance()
         if( finite(it->C[5]) && it->C[5]>0 )h_fit[7]->Fill( (mc.px/mc.pz-it->T[2])/sqrt(it->C[5]));
         if( finite(it->C[9]) && it->C[9]>0 )h_fit[8]->Fill( (mc.py/mc.pz-it->T[3])/sqrt(it->C[9]));
         if( finite(it->C[14]) && it->C[14]>0 )h_fit[9]->Fill( (mc.q/mc.p-it->T[4])/sqrt(it->C[14]));
+
+//         cout << it->T[2] << " " << sqrt(it->C[5]) << " - ";
+//         cout << it->T[3] << " " << sqrt(it->C[9]) << endl;
       }
       {
         int iMC = vHitMCRef[it->StsHits.back()];
@@ -1017,7 +1023,6 @@ void CbmL1::Performance()
     }
   }
 
-
   bool write = false;
 
   if (L1_NEVENTS < 10){//write at every event
@@ -1034,15 +1039,110 @@ void CbmL1::Performance()
       write = true;
   }
   //write = 0;
-  if (write){
+}
+
+
+void CbmL1::InputPerformance()
+{
+  static TH1I *nStripFHits, *nStripBHits, *nStripFMC, *nStripBMC;
+
+  static TH1F *resX, *resY/*, *pullZ*/;
+  static TH1F *pullX, *pullY/*, *pullZ*/;
+  
+  static bool first_call = 1;
+  if ( first_call ){
+    first_call = 0;
+    
     TDirectory *curr = gDirectory;
-    // Open output file and write histograms
-    TFile* outfile = new TFile("L1_histo.root","RECREATE");
-    outfile->cd();
-    writedir2current(histodir);
-    outfile->Close();
+    histodir->cd();
+    histodir->mkdir("Input");
+    histodir->cd("Input");
+    gDirectory->cd("Input");
+    
+    nStripFHits = new TH1I("NHits On Forward Strip", "NHits On Forward Strip", 10, 0, 10);
+    nStripBHits = new TH1I("NHits On Back Strip", "NHits On Back Strip", 10, 0, 10);
+    nStripFMC = new TH1I("N MC Points On Forward Strip", "N MC Points On Forward Strip", 10, 0, 10);
+    nStripBMC = new TH1I("N MC Points On Back Strip", "N MC Points On Back Strip", 10, 0, 10);
+
+    pullX = new TH1F("Pull x", "Pull x", 50, -10, 10);
+    pullY = new TH1F("Pull y", "Pull y", 50, -10, 10);
+
+    resX = new TH1F("Residual x, um", "Residual x", 50, -200, 200);
+    resY = new TH1F("Residual y, um", "Residual y", 50, -200, 200);
+    TH1* histo;
+    histo = resX;
+    histo->GetXaxis()->SetTitle("Residual x, um");
+    histo = resY;
+    histo->GetXaxis()->SetTitle("Residual y, um");
+    
     curr->cd();
+  } // first_call
+  
+  std::map<unsigned int, unsigned int> stripFToNHitMap,stripBToNHitMap;
+  std::map<unsigned int, unsigned int> stripFToNMCMap,stripBToNMCMap;
+
+  map<unsigned int, unsigned int>::iterator it;
+  Int_t nMC = -1;
+  if( listStsPts ){
+    nMC = listStsPts->GetEntries();
+  }
+  if( listStsHits ){
+    Int_t nEnt = listStsHits->GetEntries();
+//     Int_t nMC = listStsPts->GetEntries();
+    for (int j=0; j < nEnt; j++ ){
+      CbmStsHit *sh = (CbmStsHit*) listStsHits->At(j);
+      int iStripF = sh->GetDigi(0);
+      int iStripB = sh->GetDigi(1);
+      if ( iStripF >= 0 ) stripFToNHitMap[iStripF]++;
+      if ( iStripB >= 0 ) stripBToNHitMap[iStripB]++;
+      int iMC = sh->GetRefIndex();
+      if( iMC>=0 && iMC<nMC){
+        if ( iStripF >= 0 ) stripFToNMCMap[iStripF]++;
+        if ( iStripB >= 0 ) stripBToNMCMap[iStripB]++;
+      }
+
+      TVector3 hitPos, mcPos, hitErr;
+      sh->Position(hitPos);
+      sh->PositionError(hitErr);
+      CbmStsPoint *pt = 0;
+      if( iMC>=0 && iMC<nMC) pt = (CbmStsPoint*) listStsPts->At(iMC);
+      if ( !pt ){
+        cout << " No MC points! " << "iMC=" << iMC << endl;
+        continue;
+      }
+      pt->Position(mcPos);
+
+      if (hitErr.X() != 0) pullX->Fill( (hitPos.X() - mcPos.X()) /hitErr.X() );
+      if (hitErr.Y() != 0) pullY->Fill( (hitPos.Y() - mcPos.Y()) /hitErr.Y() );
+
+      resX->Fill((hitPos.X() - mcPos.X())*10*1000);
+      resY->Fill((hitPos.Y() - mcPos.Y())*10*1000);
+      
+    }
+  }
+  for (it = stripFToNHitMap.begin(); it != stripFToNHitMap.end(); it++){
+    nStripFHits->Fill(it->second);
+  }
+  for (it = stripBToNHitMap.begin(); it != stripBToNHitMap.end(); it++){
+    nStripBHits->Fill(it->second);
+  }
+  for (it = stripFToNMCMap.begin(); it != stripFToNMCMap.end(); it++){
+    nStripFMC->Fill(it->second);
+  }
+  for (it = stripBToNMCMap.begin(); it != stripBToNMCMap.end(); it++){
+    nStripBMC->Fill(it->second);
   }
 
 }
 
+
+void CbmL1::WriteHistos()
+{
+  TDirectory *curr = gDirectory;
+    // Open output file and write histograms
+  TFile* outfile = new TFile("L1_histo.root","RECREATE");
+  outfile->cd();
+  writedir2current(histodir);
+  outfile->Close();
+  curr->cd();
+}

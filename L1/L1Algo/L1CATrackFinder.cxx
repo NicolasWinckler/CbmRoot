@@ -12,6 +12,13 @@
  *  Finds tracks using the Cellular Automaton algorithm
  *
  */
+
+// #define DRAW
+
+
+
+
+ 
 #include "CbmKF.h"
 #include "CbmL1.h"
 #include "CbmStsHit.h"
@@ -38,11 +45,16 @@ using std::pair;
 using std::vector;
 using std::map;
 
+#ifdef DRAW
+  #include "L1CADraw.h" // for run draw
+#endif
+
 void L1Algo::CATrackFinder()
 {
 
 #ifdef DRAW
-  InitL1Draw();
+  static L1AlgoDraw draw;
+  draw.InitL1Draw(this);
 #endif
 
 #ifdef DEBUG_CA
@@ -107,7 +119,12 @@ void L1Algo::CATrackFinder()
     stat_max_n_branches = 0;
   
 #ifdef DRAW
-  Draw1();
+//   draw.DrawInfo();
+    draw.ClearVeiw();
+    draw.DrawInputHits();
+    draw.DrawMCTracks();
+//     draw.SaveCanvas("MC_");
+    draw.DrawAsk();
 #endif
 
 //  for (int isec = 0; isec <= 0; isec++){ // D0 !!!
@@ -1485,7 +1502,12 @@ break;
 #endif
 
 #ifdef DRAW
-  DrawAsk();
+  draw.ClearVeiw();
+  draw.DrawInputHits();
+//   draw.DrawInfo();
+  draw.DrawRecoTracks();
+//   draw.SaveCanvas("Reco_");
+  draw.DrawAsk();
 #endif 
   
 }

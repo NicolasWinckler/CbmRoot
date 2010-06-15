@@ -21,6 +21,10 @@
 #include "CbmKF.h"
 #include "CbmKFMath.h"
 
+#include "CbmStsSensor.h" // for field FieldCheck.
+#include "CbmStsSector.h" // for field FieldCheck.
+#include "CbmStsStation.h" // for field FieldCheck.
+
 #include <iostream>
 #include <vector>
 #include <list>
@@ -1041,6 +1045,145 @@ void CbmL1::Performance()
   //write = 0;
 }
 
+
+
+void CbmL1::FieldApproxCheck()
+{
+  TFile* fout = new TFile("FieldApprox.root","Recreate");
+  
+  FairField *MF = CbmKF::Instance()->GetMagneticField();
+
+
+  for ( int ist = 0; ist<NStation; ist++ )
+  {
+    double z = 0;
+    double Xmax=-100, Ymax=-100;
+    if( ist<NMvdStations ){
+      CbmKFTube &t = CbmKF::Instance()->vMvdMaterial[ist];
+      z = t.z;
+      Xmax = Ymax = t.R;
+    }else{
+      CbmStsStation *st = StsDigi.GetStation(ist - NMvdStations);
+      z = st->GetZ();
+
+      CbmStsSectorDigiPar *sectorPar;
+      CbmStsSensorDigiPar *sensorPar;
+
+      double x,y;
+      for(int isec = 0; isec < st->GetNSectors(); isec++)
+      {
+        CbmStsSector *sect = (CbmStsSector*) st->GetSector(isec);
+        for(int isen = 0; isen < sect->GetNSensors(); isen++)
+        {
+          x = sect->GetSensor(isen)->GetX0() + sect->GetSensor(isen)->GetLx()/2.;
+          y = sect->GetSensor(isen)->GetY0() + sect->GetSensor(isen)->GetLy()/2.;
+          if(x>Xmax) Xmax = x;
+          if(y>Ymax) Ymax = y;
+        }
+      }
+      cout << "Station  "<<  ist << ",  Xmax  " << Xmax<<",  Ymax" << Ymax<<endl;
+  
+    } // if mvd
+
+
+    float step = 1.;
+
+    int NbinsX = (int) (2*Xmax/step);
+    int NbinsY = (int) (2*Ymax/step);
+    float ddx = 2*Xmax/NbinsX;
+    float ddy = 2*Ymax/NbinsY;
+
+    TH2F *stB  = new TH2F(Form("station %i, dB", ist+1) ,Form("station %i, dB, z = %0.f cm", ist+1,z) , (int) (NbinsX+1),-(Xmax+ddx/2.),(Xmax+ddx/2.), (int) (NbinsY+1),-(Ymax+ddy/2.),(Ymax+ddy/2.));
+    TH2F *stBx = new TH2F(Form("station %i, dBx", ist+1),Form("station %i, dBx, z = %0.f cm", ist+1,z), (int) (NbinsX+1),-(Xmax+ddx/2.),(Xmax+ddx/2.), (int) (NbinsY+1),-(Ymax+ddy/2.),(Ymax+ddy/2.));
+    TH2F *stBy = new TH2F(Form("station %i, dBy", ist+1),Form("station %i, dBy, z = %0.f cm", ist+1,z), (int) (NbinsX+1),-(Xmax+ddx/2.),(Xmax+ddx/2.), (int) (NbinsY+1),-(Ymax+ddy/2.),(Ymax+ddy/2.));
+    TH2F *stBz = new TH2F(Form("station %i, dBz", ist+1),Form("station %i, dBz, z = %0.f cm", ist+1,z), (int) (NbinsX+1),-(Xmax+ddx/2.),(Xmax+ddx/2.), (int) (NbinsY+1),-(Ymax+ddy/2.),(Ymax+ddy/2.));
+
+    Double_t r[3],B[3];
+    L1FieldSlice FSl;
+    L1FieldValue B_L1;
+    Double_t bbb, bbb_L1;
+
+    const int M=5; // polinom order
+    const int N=(M+1)*(M+2)/2;
+    L1Station &st = algo->vStations[ist];
+    for(int i=0; i<N; i++)
+    {
+      FSl.cx[i] = st.fieldSlice.cx[i][0];
+      FSl.cy[i] = st.fieldSlice.cy[i][0];
+      FSl.cz[i] = st.fieldSlice.cz[i][0];
+    }
+
+    Int_t i=1,j=1;
+
+    double x,y;
+    for(int ii = 1; ii <=NbinsX+1; ii++)
+    {
+      j=1;
+      x = -Xmax+(ii-1)*ddx;
+      for(int jj = 1; jj <=NbinsY+1; jj++)
+      {
+        y = -Ymax+(jj-1)*ddy;
+        double rrr = sqrt(fabs(x*x/Xmax/Xmax+y/Ymax*y/Ymax));
+        if(rrr>1. )
+        {
+          j++;
+          continue;
+        }
+        r[2] = z; r[0] = x; r[1] = y;
+        MF->GetFieldValue( r, B );
+        bbb = sqrt(B[0]*B[0]+B[1]*B[1]+B[2]*B[2]);
+
+        bool IsOnStation = 0;
+
+        FSl.GetFieldValue(x,y,B_L1);
+        bbb_L1 = sqrt(B_L1.x[0]*B_L1.x[0] + B_L1.y[0]*B_L1.y[0] + B_L1.z[0]*B_L1.z[0]);
+
+        stB  -> SetBinContent(ii,jj,(bbb - bbb_L1));
+        stBx -> SetBinContent(ii,jj,(B[0] - B_L1.x[0]));
+        stBy -> SetBinContent(ii,jj,(B[1] - B_L1.y[0]));
+        stBz -> SetBinContent(ii,jj,(B[2] - B_L1.z[0]));
+        j++;
+      }
+      i++;
+    }
+
+    stB   ->GetXaxis()->SetTitle("X, cm");
+    stB   ->GetYaxis()->SetTitle("Y, cm");
+    stB   ->GetXaxis()->SetTitleOffset(1);
+    stB   ->GetYaxis()->SetTitleOffset(1);
+    stB   ->GetZaxis()->SetTitle("B_map - B_L1, kGauss");
+    stB   ->GetZaxis()->SetTitleOffset(1.3);
+
+    stBx  ->GetXaxis()->SetTitle("X, cm");
+    stBx  ->GetYaxis()->SetTitle("Y, cm");
+    stBx  ->GetXaxis()->SetTitleOffset(1);
+    stBx  ->GetYaxis()->SetTitleOffset(1);
+    stBx  ->GetZaxis()->SetTitle("Bx_map - Bx_L1, kGauss");
+    stBx  ->GetZaxis()->SetTitleOffset(1.3);
+
+    stBy  ->GetXaxis()->SetTitle("X, cm");
+    stBy  ->GetYaxis()->SetTitle("Y, cm");
+    stBy  ->GetXaxis()->SetTitleOffset(1);
+    stBy  ->GetYaxis()->SetTitleOffset(1);
+    stBy  ->GetZaxis()->SetTitle("By_map - By_L1, kGauss");
+    stBy  ->GetZaxis()->SetTitleOffset(1.3);
+
+    stBz  ->GetXaxis()->SetTitle("X, cm");
+    stBz  ->GetYaxis()->SetTitle("Y, cm");
+    stBz  ->GetXaxis()->SetTitleOffset(1);
+    stBz  ->GetYaxis()->SetTitleOffset(1);
+    stBz  ->GetZaxis()->SetTitle("Bz_map - Bz_L1, kGauss");
+    stBz  ->GetZaxis()->SetTitleOffset(1.3);
+
+    stB  -> Write();
+    stBx -> Write();
+    stBy -> Write();
+    stBz -> Write();
+    
+  } // for ista
+
+  fout->Close();
+}
 
 void CbmL1::InputPerformance()
 {

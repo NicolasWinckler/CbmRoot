@@ -1,3 +1,17 @@
+/*
+ *====================================================================
+ *
+ *  SIMD Kalman filter(KF) track fitter
+ *  
+ *  Authors: M.Zyzak, I.Kulakov
+ *  Primary authors: I.Kisel, S.Gorbunov
+ *
+ *  e-mail : I.Kisel@gsi.de, M.Zyzak@gsi.de
+ *
+ *====================================================================
+ */
+
+
 #include "L1Algo/L1Algo.h"
 #include "L1Algo/L1TrackPar.h"
 #include "L1Algo/L1Extrapolation.h"

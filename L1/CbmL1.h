@@ -32,6 +32,7 @@
 #include "CbmMvdHit.h"
 #include "CbmStsDigiScheme.h"
 
+
 #include "TClonesArray.h"
 #include "TRefArray.h"
 #include "TParticle.h"
@@ -131,6 +132,7 @@ class CbmL1 : public FairTask
 
   static CbmL1 *fInstance;
 
+  void FieldApproxCheck();
   void InputPerformance();
   void WriteHistos();
   

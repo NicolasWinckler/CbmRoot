@@ -334,14 +334,14 @@ void CbmL1::Exec(Option_t * option)
 
   ReadEvent();
   InputPerformance();
-  
+//   FieldApproxCheck();
 
   if( fVerbose>1 ) cout<<"L1 Track finder..."<<endl;
 //   algo->CATrackFinder();
-  IdealTrackFinder();
+//   IdealTrackFinder();
   if( fVerbose>1 ) cout<<"L1 Track finder ok"<<endl;
-  algo->KFTrackFitter();
-  cout<<"L1 Track fitter  ok"<<endl;
+//   algo->KFTrackFitter();
+//   cout<<"L1 Track fitter  ok"<<endl;
   vRTracks.clear();
   int start_hit = 0;
   for(vector<L1Track>::iterator it = algo->vTracks.begin(); it!=algo->vTracks.end(); it++){

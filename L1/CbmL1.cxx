@@ -24,6 +24,7 @@
 #include "CbmGeoStsPar.h"
 #include "CbmStsStation.h"
 #include "CbmStsSector.h"
+#include "CbmStsSensor.h" // for field approx.
 #include "CbmStsDigiScheme.h"
 #include "CbmStsFindTracks.h"
 #include "CbmKF.h"
@@ -188,7 +189,7 @@ InitStatus CbmL1::Init()
     {
       double C[3][N];
       double z = 0;
-      double R = 0;
+      double Xmax, Ymax;
       if( ist<NMvdStations ){
 	CbmKFTube &t = CbmKF::Instance()->vMvdMaterial[ist];
 	geo[ind++] = t.z;
@@ -202,7 +203,7 @@ InitStatus CbmL1::Init()
 	geo[ind++] = b_phi;
 	geo[ind++] = b_sigma;      
 	z = t.z;
-	R = t.R;
+  Xmax = Ymax = t.R;
       }else{
 	CbmStsStation *st = StsDigi.GetStation(ist - NMvdStations);
 	
@@ -239,10 +240,35 @@ InitStatus CbmL1::Init()
 	//<<", f_phi="<<f_phi<<", b_phi="<<b_phi
 	//<<", f_sigma="<<f_sigma <<", b_sigma="<<b_sigma<<endl;
 	z = st->GetZ();
-	R = st->GetRmax();
+  
+  Xmax=-100; Ymax=-100;
+
+  CbmStsSectorDigiPar *sectorPar;
+  CbmStsSensorDigiPar *sensorPar;
+
+  double x,y;
+  for(int isec = 0; isec<st->GetNSectors(); isec++)
+  {
+    CbmStsSector *sect = (CbmStsSector*) st->GetSector(isec);
+    for(int isen = 0; isen < sect->GetNSensors(); isen++)
+    {
+      x = sect->GetSensor(isen)->GetX0() + sect->GetSensor(isen)->GetLx()/2.;
+      y = sect->GetSensor(isen)->GetY0() + sect->GetSensor(isen)->GetLy()/2.;
+      if(x>Xmax) Xmax = x;
+      if(y>Ymax) Ymax = y;
+    }
+  }
+  cout << "Station  "<<  ist << ",  Xmax  " << Xmax<<",  Ymax" << Ymax<<endl;
+
+
+  
       }
-      double d = 1.;
-      if( d > R/N/2 ) d = R/N/4.;
+
+      double dx = 1.;
+      double dy = 1.;
+      if( dx > Xmax/N/2 ) dx = Xmax/N/4.;
+      if( dy > Ymax/N/2 ) dy = Ymax/N/4.;
+      
       for( int i=0; i<3; i++)
 	for( int k=0; k<N; k++) C[i][k] = 0;
       TMatrixD A(N,N);
@@ -251,11 +277,11 @@ InitStatus CbmL1::Init()
 	for( int j=0; j<N; j++) A(i,j)==0.;
 	b0(i)=b1(i)=b2(i) = 0.;
       }
-      for( double x=-R; x<=R; x+=d )
-	for( double y=-R; y<=R; y+=d )
-	  {
-	    double r = sqrt(fabs(x*x+y*y));
-	    if( r>R ) continue;
+      for( double x=-Xmax; x<=Xmax; x+=dx )
+        for( double y=-Ymax; y<=Ymax; y+=dy )
+      {
+        double r = sqrt(fabs(x*x/Xmax/Xmax+y/Ymax*y/Ymax));
+        if( r>1. ) continue;
 	    Double_t w = 1./(r*r+1);
 	    Double_t p[3] = { x, y, z};
 	    Double_t B[3] = {0.,0.,0.};
@@ -311,11 +337,11 @@ void CbmL1::Exec(Option_t * option)
   
 
   if( fVerbose>1 ) cout<<"L1 Track finder..."<<endl;
-  algo->CATrackFinder();
-//   IdealTrackFinder();
+//   algo->CATrackFinder();
+  IdealTrackFinder();
   if( fVerbose>1 ) cout<<"L1 Track finder ok"<<endl;
-//   algo->KFTrackFitter();
-//   cout<<"L1 Track fitter  ok"<<endl;
+  algo->KFTrackFitter();
+  cout<<"L1 Track fitter  ok"<<endl;
   vRTracks.clear();
   int start_hit = 0;
   for(vector<L1Track>::iterator it = algo->vTracks.begin(); it!=algo->vTracks.end(); it++){

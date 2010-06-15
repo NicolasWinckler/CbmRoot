@@ -123,10 +123,6 @@ CbmRichRingQa::~CbmRichRingQa()
 
 
 }
-// -------------------------------------------------------------------------
-
-
-// -----   Initialization   -----------------------------------------------
 
 InitStatus CbmRichRingQa::Init()
 {
@@ -176,21 +172,21 @@ InitStatus CbmRichRingQa::Init()
 	fProj = (TClonesArray*) ioman->GetObject("RichProjection");
 	if (!fProj) {
 		cout << "-E- CbmRichRingQa::Init: No RichProjection array!" << endl;
-		return kERROR;
+		//return kERROR;
 	}
 
 	// get TrackMatch array
 	fTrackMatch = (TClonesArray*) ioman->GetObject("STSTrackMatch");
 	if (!fTrackMatch) {
 		cout << "-E- CbmRichRingQa::Init: No track match array!" << endl;
-		return kERROR;
+		//return kERROR;
 	}
 
 	// Get global track array
 	gTrackArray = (TClonesArray*) ioman->GetObject("GlobalTrack");
 	if (!gTrackArray) {
 		cout << "-W- CbmRichRingQa::Init: No global track array!" << endl;
-		return kERROR;
+		//return kERROR;
 	}
 
     fFitCOP = new CbmRichRingFitterCOP();
@@ -233,7 +229,7 @@ void CbmRichRingQa::Exec(Option_t* option)
 
     Int_t nRichHits = fHits->GetEntriesFast();
     fh_NhitsPerEvent->Fill(nRichHits);
-    fh_NprojPerEvent->Fill(fProj->GetEntriesFast());
+    //fh_NprojPerEvent->Fill(fProj->GetEntriesFast());
 
     /// Loop over Rich hits
     for (Int_t iHit=0; iHit < nRichHits; iHit++) {
@@ -376,10 +372,12 @@ void CbmRichRingQa::Exec(Option_t* option)
            "  per Event = " << (Double_t)fNofTrueFoundPiRingsProjHitCut/fEventNumber<< endl <<
 
            "fNofCloneRings = " << fNofCloneRings <<
-           "  per Event = " << (Double_t)fNofCloneRings/fEventNumber<< endl <<
+           "  per Event = " << (Double_t)fNofCloneRings/fEventNumber<<
+           ", "<< 100.*(Double_t)fNofCloneRings/fNofAllRings << "%" << endl <<
 
            "fNofFakeRings = " << fNofFakeRings <<
-           "  per Event = " << (Double_t)fNofFakeRings/fEventNumber<< endl;
+           "  per Event = " << (Double_t)fNofFakeRings/fEventNumber<<
+           ", "<< 100.*(Double_t)fNofFakeRings/fNofAllRings << "%" << endl;
 
      Double_t elEff = 0.;
      if (fNofElRingsProjHitCut != 0.)
@@ -407,7 +405,8 @@ void CbmRichRingQa::Exec(Option_t* option)
 }
 
 Bool_t CbmRichRingQa::DoesRingHaveProjection(Int_t trackId){
-    //search for projection with such TrackID
+	return true;
+	//search for projection with such TrackID
     Bool_t isProj = false;
     Int_t nProj = fProj->GetEntriesFast();
 
@@ -700,12 +699,12 @@ void CbmRichRingQa::RingTrackMatchEff()
 void CbmRichRingQa::FinishTask()
 {
 
-    fRings->Clear();
-    fPoints->Clear();
-    fTracks->Clear();
-    fHits->Clear();
-    fMatches->Clear();
-    gTrackArray->Clear();
+   // fRings->Clear();
+    //fPoints->Clear();
+   // fTracks->Clear();
+   // fHits->Clear();
+   // fMatches->Clear();
+   // gTrackArray->Clear();
 
     TDirectory *current = gDirectory;
     TDirectory *rich = current->mkdir("RichRingQaHist");

@@ -1059,16 +1059,16 @@ void CbmL1::InputPerformance()
     histodir->cd("Input");
     gDirectory->cd("Input");
     
-    nStripFHits = new TH1I("NHits On Forward Strip", "NHits On Forward Strip", 10, 0, 10);
-    nStripBHits = new TH1I("NHits On Back Strip", "NHits On Back Strip", 10, 0, 10);
-    nStripFMC = new TH1I("N MC Points On Forward Strip", "N MC Points On Forward Strip", 10, 0, 10);
-    nStripBMC = new TH1I("N MC Points On Back Strip", "N MC Points On Back Strip", 10, 0, 10);
+    nStripFHits = new TH1I("nHits_f", "NHits On Front Strip", 10, 0, 10);
+    nStripBHits = new TH1I("nHits_b", "NHits On Back Strip", 10, 0, 10);
+    nStripFMC = new TH1I("nMC_f", "N MC Points On Front Strip", 10, 0, 10);
+    nStripBMC = new TH1I("nMC_b", "N MC Points On Back Strip", 10, 0, 10);
 
-    pullX = new TH1F("Pull x", "Pull x", 50, -10, 10);
-    pullY = new TH1F("Pull y", "Pull y", 50, -10, 10);
+    pullX = new TH1F("Px", "Pull x", 50, -10, 10);
+    pullY = new TH1F("Py", "Pull y", 50, -10, 10);
 
-    resX = new TH1F("Residual x, um", "Residual x", 50, -200, 200);
-    resY = new TH1F("Residual y, um", "Residual y", 50, -200, 200);
+    resX = new TH1F("x", "Residual x", 50, -200, 200);
+    resY = new TH1F("y", "Residual y", 50, -200, 200);
     TH1* histo;
     histo = resX;
     histo->GetXaxis()->SetTitle("Residual x, um");
@@ -1112,8 +1112,11 @@ void CbmL1::InputPerformance()
       }
       pt->Position(mcPos);
 
-      if (hitErr.X() != 0) pullX->Fill( (hitPos.X() - mcPos.X()) /hitErr.X() );
-      if (hitErr.Y() != 0) pullY->Fill( (hitPos.Y() - mcPos.Y()) /hitErr.Y() );
+      if (hitErr.X() != 0) pullX->Fill( (hitPos.X() - mcPos.X()) / hitErr.X() ); // standard errors
+      if (hitErr.Y() != 0) pullY->Fill( (hitPos.Y() - mcPos.Y()) / hitErr.Y() );
+
+//       if (hitErr.X() != 0) pullX->Fill( (hitPos.X() - mcPos.X()) / sqrt(algo->vStations[0].XYInfo.C00[0]) );  // errors used in TF
+//       if (hitErr.Y() != 0) pullY->Fill( (hitPos.Y() - mcPos.Y()) / sqrt(algo->vStations[0].XYInfo.C11[0]) );
 
       resX->Fill((hitPos.X() - mcPos.X())*10*1000);
       resY->Fill((hitPos.Y() - mcPos.Y())*10*1000);

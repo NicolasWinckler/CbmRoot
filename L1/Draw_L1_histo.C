@@ -119,6 +119,9 @@ void Draw_L1_histo() {
 
 
     // ------------ make histos -----------
+
+
+      // ------------ tracks -----------
   
   TString dirFitName = "/L1/Fit";
   dirFitName = fileName + ":" + dirFitName;
@@ -150,6 +153,29 @@ void Draw_L1_histo() {
   for (int i = 0; i < nHisto; i++){
     histo[i] = (TH1F*) dirFit->Get(histoData[i].name);
     makeUpHisto(histo[i],histoData[i].title);
+  }
+
+      // ------------ hits, strips -----------
+  
+  TString dirInputName = "/L1/Input";
+  dirInputName = fileName + ":" + dirInputName;
+  TDirectory *dirInput = fileIn->Get(dirInputName);
+  
+  const int nHisto2 = 4;
+  
+  const THistoData histoData2[nHisto] =
+  {
+    {"Px",  "Pull x" }
+    {"Py",  "Pull y" }
+    {"x",  "Residual (x^{hit}-x^{mc}) [#mum]" }
+    {"y",  "Residual (y^{hit}-y^{mc}) [#mum]" }
+  };
+  
+  TH1F *histo2[nHisto2];
+
+  for (int i = 0; i < nHisto2; i++){
+    histo2[i] = (TH1F*) dirInput->Get(histoData2[i].name);
+    makeUpHisto(histo2[i],histoData2[i].title);
   }
   
     // ------------ make profiles -----------
@@ -204,6 +230,13 @@ void Draw_L1_histo() {
     if (divide) c2->cd(iPart++);
     histo[i]->Draw();
     TString name = TString(histoData[i].name)+".pdf";
+    if (!divide) c2->SaveAs(name);
+  }
+
+  for (int i = 0; i < nHisto2; i++){
+    if (divide) c2->cd(iPart++);
+    histo2[i]->Draw();
+    TString name = TString(histoData2[i].name)+".pdf";
     if (!divide) c2->SaveAs(name);
   }
   

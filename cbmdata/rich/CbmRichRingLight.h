@@ -11,30 +11,45 @@
 #include <vector>
 #include <cmath>
 
+class CbmRichHitLight
+{
+public:
+	float fX;
+	float fY;
+};
+
 class CbmRichRingLight
 {
 public:
     CbmRichRingLight(){
-    	fHitCollection.reserve(40);
+    	fHitCollection.reserve(30);
+    	fHitIdCollection.reserve(30);
     }
 
 	~CbmRichRingLight(){
 		fHitCollection.clear();
 	}
 
-	void AddHit(unsigned short pHit)  {fHitCollection.push_back(pHit);}
-	void RemoveHit(unsigned short hitId){
+	void AddHit(CbmRichHitLight pHit, unsigned short id) {
+		fHitCollection.push_back(pHit);
+		fHitIdCollection.push_back(id);
+
+	}
+	bool RemoveHit(int hitId){
+		//Int_t nofHits = fHitCollection.size();
 		std::vector<unsigned short>::iterator it;
-		for (it = fHitCollection.begin(); it!=fHitCollection.end(); it++){
+		for (it = fHitIdCollection.begin(); it!=fHitIdCollection.end(); it++){
 			if (hitId == *it){
-				fHitCollection.erase(it);
-				return;
+				fHitIdCollection.erase(it);
+				return true;
 			}
 		}
+		return false;
 	}
 
-	int GetNofHits() const {return fHitCollection.size(); }
-	unsigned short GetHit(int i) {return fHitCollection[i];}
+	int GetNofHits() const {return fHitIdCollection.size(); }
+	CbmRichHitLight GetHit(int i) {return fHitCollection[i];}
+	unsigned short GetHitId(int i) {return fHitIdCollection[i];}
 
 	void SetCenterX(float x) {fCenterX = x;}
     void SetCenterY(float y) {fCenterY = y;}
@@ -65,8 +80,8 @@ public:
 	short GetRecFlag(){return fRecFlag;}
 
 private:
-   std::vector<unsigned short> fHitCollection; /** STL container to hold the hit indexes */
-
+   std::vector<CbmRichHitLight> fHitCollection;
+   std::vector<unsigned short> fHitIdCollection; /** STL container to hold the hit indexes */
 protected:
     float fCenterX;
 	float fCenterY;

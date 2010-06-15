@@ -105,7 +105,7 @@ public:
 	Int_t GetNofHitsOnRing() const {return fNofHitsOnRing;}
 	Double_t GetRadialAngle() const;
 	Int_t GetRecFlag() const {return fRecFlag;}
-	CbmRichRingLight* toLightRing();
+	//CbmRichRingLight* toLightRing();
 private:
 
   std::vector<UShort_t> fHitCollection; /** STL container to hold the hits */

@@ -196,25 +196,25 @@ Double_t CbmRichRing::GetRadialAngle() const{
 
     return 999.;
 }
-
-CbmRichRingLight* CbmRichRing::toLightRing()
-{
-	CbmRichRingLight* rl = new CbmRichRingLight();
-
-	for (int i = 0; i < this->GetNofHits(); i ++){
-		rl->AddHit(this->GetHit(i));
-	}
-	rl->SetCenterX(this->GetCenterX());
-	rl->SetCenterY(this->GetCenterY());
-	rl->SetRadius(this->GetRadius());
-	rl->SetAngle(this->GetAngle());
-	rl->SetChi2(this->GetChi2());
-	rl->SetNofHitsOnRing(this->GetNofHitsOnRing());
-	rl->SetSelectionNN(this->GetSelectionNN());
-	rl->SetRecFlag(this->GetRecFlag());
-
-	return rl;
-}
+//
+//CbmRichRingLight* CbmRichRing::toLightRing()
+//{
+//	CbmRichRingLight* rl = new CbmRichRingLight();
+//
+//	for (int i = 0; i < this->GetNofHits(); i ++){
+//		rl->AddHit(this->GetHit(i));
+//	}
+//	rl->SetCenterX(this->GetCenterX());
+//	rl->SetCenterY(this->GetCenterY());
+//	rl->SetRadius(this->GetRadius());
+//	rl->SetAngle(this->GetAngle());
+//	rl->SetChi2(this->GetChi2());
+//	rl->SetNofHitsOnRing(this->GetNofHitsOnRing());
+//	rl->SetSelectionNN(this->GetSelectionNN());
+//	rl->SetRecFlag(this->GetRecFlag());
+//
+//	return rl;
+//}
 
 ClassImp(CbmRichRing)
 

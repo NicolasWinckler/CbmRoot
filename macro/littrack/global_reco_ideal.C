@@ -5,11 +5,11 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	Double_t trdHitErr = 100; // if == 0 than standard errors are used
 	TString dir, imageDir, mcFile, parFile, globalTracksFile;
 	if (script != "yes") {
-		dir  = "/home/d/andrey/trdsimple_1_10pi/";
+		dir  = "/d/cbm02/andrey/test_muons/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
-		globalTracksFile = dir + "global.tracks.ideal.trd100.0000.root";
-		imageDir = "./test/";
+		globalTracksFile = dir + "global.tracks.ideal.0000.root";
+		imageDir = "./test_muons/";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -104,17 +104,17 @@ void global_reco_ideal(Int_t nEvents = 1000)
 
 		CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,	 trdDFoils, trdDGap);
 
-//		Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
-//		// Resolutions in y - station and angle dependent [mum]
-//		Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
-//		Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
-//		Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
-
-		Double_t trdSigmaX[] = {trdHitErr, trdHitErr, trdHitErr};             // Resolution in x [mum]
+		Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
 		// Resolutions in y - station and angle dependent [mum]
-		Double_t trdSigmaY1[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr};
-		Double_t trdSigmaY2[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr};
-		Double_t trdSigmaY3[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr};
+		Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
+		Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
+		Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
+
+//		Double_t trdSigmaX[] = {trdHitErr, trdHitErr, trdHitErr};             // Resolution in x [mum]
+//		// Resolutions in y - station and angle dependent [mum]
+//		Double_t trdSigmaY1[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr};
+//		Double_t trdSigmaY2[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr};
+//		Double_t trdSigmaY3[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr};
 
 		CbmTrdHitProducerSmearing* trdHitProd = new
 				 CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
@@ -148,19 +148,19 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	// ------------------------------------------------------------------------
 
 	// ------- Track finding QA check   ---------------------------------------
-//	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
-//	reconstructionQa->SetMinNofPointsSts(4);
-//	reconstructionQa->SetMinNofPointsTrd(9);
-//	reconstructionQa->SetMinNofPointsMuch(12);
-//	reconstructionQa->SetMinNofPointsTof(1);
-//	reconstructionQa->SetQuota(0.7);
-//	reconstructionQa->SetMinNofHitsTrd(9);
-//	reconstructionQa->SetMinNofHitsMuch(11);
-//	reconstructionQa->SetVerbose(1);
-//	reconstructionQa->SetMomentumRange(0., 25);
-//	reconstructionQa->SetNofBinsMom(50);
-//	reconstructionQa->SetOutputDir(std::string(imageDir));
-//	run->AddTask(reconstructionQa);
+	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
+	reconstructionQa->SetMinNofPointsSts(4);
+	reconstructionQa->SetMinNofPointsTrd(9);
+	reconstructionQa->SetMinNofPointsMuch(11);
+	reconstructionQa->SetMinNofPointsTof(1);
+	reconstructionQa->SetQuota(0.7);
+	reconstructionQa->SetMinNofHitsTrd(9);
+	reconstructionQa->SetMinNofHitsMuch(10);
+	reconstructionQa->SetVerbose(1);
+	reconstructionQa->SetMomentumRange(0., 25);
+	reconstructionQa->SetNofBinsMom(25);
+	reconstructionQa->SetOutputDir(std::string(imageDir));
+	run->AddTask(reconstructionQa);
 	// ------------------------------------------------------------------------
 
 	// -----  Parameter database   --------------------------------------------

@@ -6,16 +6,16 @@
  * Macro runs Littrack global track reconstruction.
  **/
 
-void global_tracking(Int_t nEvents = 500)
+void global_tracking(Int_t nEvents = 10)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
 	TString dir, imageDir, mcFile, parFile, globalHitsFile, globalTracksFile, trackingType;
 	if (script != "yes") {
 		// Output directory
-		dir  = "/d/cbm02/andrey/trdstd_10e_urqmd/";
+		dir  = "/d/cbm02/andrey/test_muons/";
 		//Output directory for images
-		imageDir = "./test/trdstd_10e_urqmd/weight/";
+		imageDir = "./test_muons/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameter file
@@ -23,9 +23,9 @@ void global_tracking(Int_t nEvents = 500)
 		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
 		globalHitsFile = dir + "global.hits.0000.root";
 		// Output file with global tracks
-		globalTracksFile = dir + "global.tracks.weight.0000.root";
+		globalTracksFile = dir + "global.tracks.0000.root";
 		// Tracking type
-		trackingType = "weight";
+		trackingType = "nn";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -40,7 +40,7 @@ void global_tracking(Int_t nEvents = 500)
 	timer.Start();
 
 	gSystem->Load("/home/soft/tbb/libtbb");
-	gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
+    gSystem->Load("/u/andrey/soft/tbb/Lenny64/libtbb");
 	gSystem->Load("/u/andrey/soft/tbb/Etch32/libtbb");
 
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -88,12 +88,12 @@ void global_tracking(Int_t nEvents = 500)
 	// -----   Track finding QA check   ------------------------------------
 	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
 	reconstructionQa->SetMinNofPointsSts(4);
-	reconstructionQa->SetMinNofPointsTrd(11);
-	reconstructionQa->SetMinNofPointsMuch(0);
+	reconstructionQa->SetMinNofPointsTrd(10);
+	reconstructionQa->SetMinNofPointsMuch(11);
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(9);
-	reconstructionQa->SetMinNofHitsMuch(0);
+	reconstructionQa->SetMinNofHitsMuch(11);
 	reconstructionQa->SetVerbose(1);
 	reconstructionQa->SetMomentumRange(0., 15);
 	reconstructionQa->SetNofBinsMom(15);

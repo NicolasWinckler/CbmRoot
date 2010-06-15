@@ -4,13 +4,13 @@
 export SCRIPT=yes
 
 #Build directory of CBMROOT
-export MYBUILDDIR=/u/andrey/cbm/trunk_w/build_new/
+export MYBUILDDIR=/u/andrey/cbm/trunk/build_new/
 
 #Output directory for simulation files
-export DIR=/d/cbm02/andrey/trdstd_10e_urqmd/
+export DIR=/d/cbm02/andrey/test_electrons
 
 #Output directory for image files
-export IMAGEDIR=./test/trdstd_10e_urqmd/
+export IMAGEDIR=./test_electrons/
 
 # CBM setup that will be used for simulation: "muon" or "electron"
 export DETECTORSETUP=electron
@@ -68,7 +68,8 @@ else
     export PIPEGEOM=pipe_much.geo
     export SHIELDGEOM=shield_standard.geo
     export MVDGEOM= #mvd_standard.geo
-    export STSGEOM=sts_standard.geo
+#    export STSGEOM=sts_standard.geo
+    export STSGEOM=sts_same_z.geo
     export MUCHGEOM=
     export RICHGEOM=rich_standard.geo
     export TRDGEOM=trd_standard.geo

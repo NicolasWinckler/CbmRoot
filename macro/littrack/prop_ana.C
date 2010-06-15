@@ -5,12 +5,12 @@ void prop_ana(Int_t nEvents = 1000)
 	Double_t trdHitErr = 100; // if == 0 than standard errors are used
 	TString dir, imageDir, mcFile, parFile, globalTracksFile, propAnaFile;
 	if (script != "yes") {
-		dir = "/home/d/andrey/trdsimple_10pi/";
+		dir = "/d/cbm02/andrey/test_muons/";
 		mcFile = dir + "mc.0000.root";
-		globalTracksFile = dir + "global.tracks.ideal.trd100.0000.root";
+		globalTracksFile = dir + "global.tracks.ideal.0000.root";
 		parFile = dir + "param.0000.root";
 		propAnaFile = dir + "propagation.ana.0000.root";
-		imageDir = "./test/";
+		imageDir = "./test_muons/";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -43,11 +43,11 @@ void prop_ana(Int_t nEvents = 1000)
 
 	// -------------------------------------------------------------------------
 	CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis();
-	propAna->SetNofPlanes(12);
-	propAna->SetNofTrdHits(12);
-	propAna->SetNofMuchHits(0);
-	propAna->SetNofTofHits(0);
-	propAna->SetPDGCode(211);
+	propAna->SetNofPlanes(14);
+	propAna->SetNofTrdHits(0);
+	propAna->SetNofMuchHits(13);
+	propAna->SetNofTofHits(1);
+	propAna->SetPDGCode(13);
 	propAna->SetTestFastPropagation(false);
 	propAna->SetOutputDir(std::string(imageDir));
 	propAna->IsDrawPropagation(true);

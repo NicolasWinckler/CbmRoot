@@ -57,8 +57,8 @@ void global_hits(Int_t nEvents = 10000)
 	run->SetInputFile(mcFile);
 	run->SetOutputFile(globalHitsFile);
 
-	TString stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
-//	TString stsDigiFile = parDir+ "/sts/sts_same_z.digi.par";
+//	TString stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
+	TString stsDigiFile = parDir+ "/sts/sts_same_z.digi.par";
 //	TString stsDigiFile = parDir+ "/sts/sts_9st_sameZ.digi.par";
 
 	// ----- STS reconstruction   ---------------------------------------------

@@ -28,8 +28,6 @@ public:
 	 void Init();
 
 	 int GetNofHitsOnRing(CbmRichRing* ring);
-	 int GetNofHitsOnRingCircle(CbmRichRingLight* ring);
-	 float GetAngle(CbmRichRingLight* ring);
 	 int GetNofHitsOnRingCircle(CbmRichRing* ring);
 	 float GetAngle(CbmRichRing* ring);
 protected:

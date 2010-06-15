@@ -1,6 +1,6 @@
 #include "CbmRichRingSelectNeuralNet.h"
 #include "CbmRichRingLight.h"
-#include "CbmRichRingSelectImpl.h"
+#include "CbmRichRingSelectImplLight.h"
 
 #ifdef ANN_FILE
 #include "TTree.h"
@@ -29,8 +29,8 @@ CbmRichRingSelectNeuralNet::~CbmRichRingSelectNeuralNet()
 // -----   Initialization   ----------------------------------------------------
 void CbmRichRingSelectNeuralNet::Init ()
 {
-    fSelectImpl = new CbmRichRingSelectImpl();
-    fSelectImpl->Init();
+    fSelectImpl = new CbmRichRingSelectImplLight();
+    //fSelectImpl->Init();
 
 #ifdef ANN_FILE
     TTree *simu = new TTree ("MonteCarlo","MontecarloData");

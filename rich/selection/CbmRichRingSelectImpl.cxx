@@ -70,7 +70,7 @@ int CbmRichRingSelectImpl::GetNofHitsOnRing(CbmRichRing* ring){
 	return count;
 }
 
-int CbmRichRingSelectImpl::GetNofHitsOnRingCircle(CbmRichRingLight* ring)
+int CbmRichRingSelectImpl::GetNofHitsOnRingCircle(CbmRichRing* ring)
 {
     int count = 0;
 	int nHits = ring->GetNofHits();
@@ -86,7 +86,7 @@ int CbmRichRingSelectImpl::GetNofHitsOnRingCircle(CbmRichRingLight* ring)
 	return count;
 }
 
-float CbmRichRingSelectImpl::GetAngle(CbmRichRingLight* ring)
+float CbmRichRingSelectImpl::GetAngle(CbmRichRing* ring)
 {
     register int nHits = ring->GetNofHits();
 	if (nHits > kMAX_NOF_HITS) return 0.2f;
@@ -130,14 +130,4 @@ float CbmRichRingSelectImpl::GetAngle(CbmRichRingLight* ring)
     float angle = fPhi[nHits-1]+fPhi[nHits-2]+fPhi[nHits-3];
 
     return angle;
-}
-
-int CbmRichRingSelectImpl::GetNofHitsOnRingCircle(CbmRichRing* ring)
-{
-	return GetNofHitsOnRingCircle(ring->toLightRing());
-}
-
-float CbmRichRingSelectImpl::GetAngle(CbmRichRing* ring)
-{
-	return GetAngle(ring->toLightRing());
 }

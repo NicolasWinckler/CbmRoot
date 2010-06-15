@@ -13,11 +13,11 @@
 #ifndef CBM_RICH_RING_SELECT_NEURALNET_H
 #define CBM_RICH_RING_SELECT_NEURALNET_H
 
-//#define NN_FUNCTION
-#define ANN_FILE
+#define NN_FUNCTION
+//#define ANN_FILE
 
 class CbmRichRingLight;
-class CbmRichRingSelectImpl;
+class CbmRichRingSelectImplLight;
 class NNfunction;
 class TMultiLayerPerceptron;
 
@@ -35,7 +35,7 @@ public:
 
 	TMultiLayerPerceptron* fNN;
 	NNfunction* fNNfunction;
-	CbmRichRingSelectImpl* fSelectImpl;
+	CbmRichRingSelectImplLight* fSelectImpl;
 };
 
 #endif

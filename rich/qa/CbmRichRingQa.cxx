@@ -38,7 +38,6 @@ CbmRichRingQa::CbmRichRingQa() :FairTask("RichRingQa")
 CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
   :FairTask(name)
 {
-
     // verbosity level
     fVerbose = verbose;
 
@@ -48,53 +47,48 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
     fEventNumber = 0;
 
     fNofAllRings = 0;
-    fNofElRings = 0;
-    fNofPiRings = 0;
-    fNofElRingsProj = 0;
-    fNofPiRingsProj = 0;
-    fNofElRingsProjHitCut = 0;
-    fNofPiRingsProjHitCut = 0;
+    fNofMcElRings = 0;
+    fNofMcPiRings = 0;
+    fNofAccElRings = 0;
+    fNofAccPiRings = 0;
 
-    fNofTrueFoundElRingsProjHitCut = 0;
-    fNofTrueFoundPiRingsProjHitCut = 0;
+    fNofRecElRings = 0;
+    fNofRecPiRings = 0;
     fNofCloneRings = 0;
     fNofFakeRings = 0;
 
     fNofTrueElBadFit = 0;
 
-    fh_TrueFoundElRingsProjHitCutMom = new TH1D("fh_TrueFoundElRingsProjHitCutMom","fh_TrueFoundElRingsProjHitCutMom",40,0,10);
-    fh_MCElRingsProjHitCutMom = new TH1D("fh_MCElRingsProjHitCutMom","fh_MCElRingsProjHitCutMom",40,0,10);
+    fh_RecElRingsMom = new TH1D("fh_RecElRingsMom","fh_RecElRingsMom",40,0,10);
+    fh_AccElRingsMom = new TH1D("fh_AccElRingsMom","fh_AccElRingsMom",40,0,10);
 
-    fh_TrueFoundElRingsProjHitCutRadPos = new TH1D("fh_TrueFoundElRingsProjHitCutRadPos","fh_TrueFoundElRingsProjHitCutRadPos",40,0,150);
-    fh_MCElRingsProjHitCutRadPos = new TH1D("fh_MCElRingsProjHitCutRadPos","fh_MCElRingsProjHitCutRadPos",40,0,150);
+    fh_RecElRingsRadPos = new TH1D("fh_RecElRingsRadPos","fh_RecElRingsRadPos",40,0,150);
+    fh_AccElRingsRadPos = new TH1D("fh_AccElRingsRadPos","fh_AccElRingsRadPos",40,0,150);
 
-    fh_TrueFoundElRingsProjHitCutNofHits = new TH1D("fh_TrueFoundElRingsProjHitCutNofHits","fh_TrueFoundElRingsProjHitCutNofHits",20,0,40);
-    fh_MCElRingsProjHitCutNofHits = new TH1D("fh_MCElRingsProjHitCutNofHits","fh_MCElRingsProjHitCutNofHits",20,0,40);
+    fh_RecElRingsNofHits = new TH1D("fh_RecElRingsNofHits","fh_RecElRingsNofHits",20,0,40);
+    fh_AccElRingsNofHits = new TH1D("fh_AccElRingsNofHits","fh_AccElRingsNofHits",20,0,40);
 
-    fh_TrueFoundElRingsProjHitCutBoverA = new TH1D("fh_TrueFoundElRingsProjHitCutBoverA","fh_TrueFoundElRingsProjHitCutBoverA",20,0,1);
-    fh_MCElRingsProjHitCutBoverA = new TH1D("fh_MCElRingsProjHitCutBoverA","fh_MCElRingsProjHitCutBoverA",20,0,1);
-
-    // (x,y) of fake rings
-    fh_FakeFoundRingsXYAll = new TH2D("fh_FakeFoundRingsXYAll","(x,y) fake rings",100,-200,200,125,-250,250);
+    fh_RecElRingsBoverA = new TH1D("fh_RecElRingsBoverA","fh_RecElRingsBoverA",20,0,1);
+    fh_AccElRingsBoverA = new TH1D("fh_AccElRingsBoverA","fh_AccElRingsBoverA",20,0,1);
 
 /// Difference Fake and True rings histogramms BEGIN
-    fh_FakeNofHits = new TH1D("fh_FakeNofHits","Number of hits in ring",50,0,50);
-    fh_TrueElNofHits= new TH1D("fh_TrueElNofHits","Number of hits in ring",50,0,50);
+    fh_FakeNofHits = new TH1D("fh_FakeNofHits","Number of hits in ring;Nof hits in ring;Yield",50,0,50);
+    fh_TrueElNofHits= new TH1D("fh_TrueElNofHits","Number of hits in ring;Nof hits in ring;Yield",50,0,50);
 
-    fh_FakeAngle = new TH1D("fh_FakeAngle","Biggest angle in ring",50,0,6.5);
-    fh_TrueElAngle = new TH1D("fh_TrueElAngle","Biggest angle in ring",50,0,6.5);
+    fh_FakeAngle = new TH1D("fh_FakeAngle","Biggest angle in ring;Angle, rad;Yield",50,0,6.5);
+    fh_TrueElAngle = new TH1D("fh_TrueElAngle","Biggest angle in ring;Angle, rad;Yield",50,0,6.5);
 
-    fh_FakeNofHitsOnRing= new TH1D("fh_FakeNofHitsOnRing","# of hits on ring",50,0,50);
-    fh_TrueElNofHitsOnRing= new TH1D("fh_TrueElNofHitsOnRing","# of hits on ring",50,0,50);
+    fh_FakeNofHitsOnRing= new TH1D("fh_FakeNofHitsOnRing","Number of hits on ring;Nof hits on ring;Yield",50,0,50);
+    fh_TrueElNofHitsOnRing= new TH1D("fh_TrueElNofHitsOnRing","Number of hits on ring;Nof hits on ring;Yield",50,0,50);
 
-    fh_FakeChi2 = new TH1D("fh_FakeChi2","Chi2",50,0.,1.);
-    fh_TrueElChi2 = new TH1D("fh_TrueElChi2","Chi2",50,0.,1.);
+    fh_FakeChi2 = new TH1D("fh_FakeChi2","Chi2;Chi2;Yield",50,0.,1.);
+    fh_TrueElChi2 = new TH1D("fh_TrueElChi2","Chi2;Chi2;Yield",50,0.,1.);
 
-    fh_FakeRadPos = new TH1D("fh_FakeRadPos","Radial Position",200,0,200);;
-    fh_TrueElRadPos = new TH1D("fh_TrueElRadPos","Radial Position",200,0,200);;
+    fh_FakeRadPos = new TH1D("fh_FakeRadPos","Radial position;Radial position, cm;Yield",200,0,200);;
+    fh_TrueElRadPos = new TH1D("fh_TrueElRadPos","Radial position;Radial position, cm;Yield",200,0,200);;
 
-    fh_FakeRadius = new TH1D("fh_FakeRadius","Radius",90,0,9);;
-    fh_TrueElRadius = new TH1D("fh_TrueElRadius","Radius",90,0,9);;
+    fh_FakeRadius = new TH1D("fh_FakeRadius","Radius;Radius, cm;Yield",90,0,9);;
+    fh_TrueElRadius = new TH1D("fh_TrueElRadius","Radius;Radius, cm;Yield",90,0,9);;
 /// Difference Fake and True rings histogramms END
 
     fh_WrongMatchElDistance = new TH1D("fh_WrongMatchElDistance","Distance between track and ring center",50,0,5);
@@ -102,12 +96,7 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
     fh_TrueMatchElMom = new TH1D("fh_TrueMatchElMom","fh_TrueMatchElMom",40,0,10);
 
     //hits distribution (x,y)
-    fh_HitsXY = new TH2D("fh_HitsXY","Hits distribution (x,y)",100,-200,200,125,-250,250);
-    fh_HitsRadPos = new TH1D("fh_HitsRadPos","Hits distribution rad position",200, 0, 200);
-    // (x,y) of true primary electron rings
-    fh_TrueFoundRingsXYE = new TH2D("fh_TrueFoundRingsXYE","(x,y) true electrons rings. >=10 Hits. Proj",40,-200,200,50,-250,250);
-    // (x,y) of true primary pions rings
-    fh_TrueFoundRingsXYPi = new TH2D("fh_TrueFoundRingsXYPi","(x,y) true pions rings. >=10 Hits. Proj",100,-200,200,125,-250,250);
+    fh_HitsXY = new TH2D("fh_HitsXY","Hits distribution (x,y), hits/cm^2/event;X, cm;Y, cm",400,-200,200,500,-250,250);
     //number of hits per event
     fh_NhitsPerEvent = new TH1D("fh_NhitsPerEvent","Number of hits per event",100,1000,3000);
     //number of projections per event
@@ -210,7 +199,6 @@ void CbmRichRingQa::Exec(Option_t* option)
 	fEventNumber++;
     cout<<"CbmRichRingQa Event No. "<< fEventNumber << endl;
 
-    // Create some pointers and variables
     CbmRichHit* hit    = NULL;
     FairMCPoint* point  = NULL;
     CbmMCTrack* track  = NULL;
@@ -239,15 +227,6 @@ void CbmRichRingQa::Exec(Option_t* option)
             << "No Hit " << iHit << endl;
         continue;
         }
-        Double_t radPos;
-        if (hit->GetY() > 0){
-            radPos = sqrt((hit->GetX() - 0)*(hit->GetX() - 0) +
-                          (hit->GetY() - 110)*(hit->GetY() - 110));
-        } else {
-            radPos = sqrt((hit->GetX() - 0)*(hit->GetX() - 0) +
-                          (hit->GetY() + 110)* (hit->GetY() + 110));
-        }
-        fh_HitsRadPos->Fill(radPos);
 
         fh_HitsXY->Fill(hit->GetX(), hit->GetY());
         iPoint = hit->GetRefId();
@@ -302,19 +281,17 @@ void CbmRichRingQa::Exec(Option_t* option)
         fNofAllRings++;
 
         if ((TMath::Abs(gcode) == 11) && motherId == -1) {///primary electron rings
-            fNofElRings++;
-            if (isProj) fNofElRingsProj++;
+            fNofMcElRings++;
             if (isProj && it->second >= fNofHitsInRingCut){
-                fNofElRingsProjHitCut++;
-                fh_MCElRingsProjHitCutMom->Fill(momentum);
-                fh_MCElRingsProjHitCutNofHits->Fill(it->second);
+                fNofAccElRings++;
+                fh_AccElRingsMom->Fill(momentum);
+                fh_AccElRingsNofHits->Fill(it->second);
             }
         }
 
         if ((TMath::Abs(gcode) == 211)) {///pion rings
-            fNofPiRings++;
-            if (isProj) fNofPiRingsProj++;
-            if (isProj && it->second >= fNofHitsInRingCut) fNofPiRingsProjHitCut++;
+            fNofMcPiRings++;
+            if (isProj && it->second >= fNofHitsInRingCut) fNofAccPiRings++;
         }
     }  ///Loop for all MC rings
 
@@ -333,9 +310,9 @@ void CbmRichRingQa::Exec(Option_t* option)
             if (isProj && itMapWithHits->second.GetNofHits() >= fNofHitsInRingCut){
                 fFitCOP->DoFit(&(itMapWithHits->second));
                 fFitEllipse->DoFit(&(itMapWithHits->second));
-                fh_MCElRingsProjHitCutRadPos->Fill(itMapWithHits->second.GetRadialPosition());
+                fh_AccElRingsRadPos->Fill(itMapWithHits->second.GetRadialPosition());
                 Double_t bOverA = itMapWithHits->second.GetBaxis()/itMapWithHits->second.GetAaxis();
-                fh_MCElRingsProjHitCutBoverA->Fill(bOverA);
+                fh_AccElRingsBoverA->Fill(bOverA);
             }
         }
     }
@@ -347,29 +324,23 @@ void CbmRichRingQa::Exec(Option_t* option)
    cout <<  "fNofAllRings="<< fNofAllRings <<
            "  per Event = " << (Double_t)fNofAllRings/fEventNumber<< endl <<
 
-           "fNofElRings="<< fNofElRings<<
-           "  per Event = " << (Double_t)fNofElRings/fEventNumber<< endl <<
+           "fNofMcElRings="<< fNofMcElRings<<
+           "  per Event = " << (Double_t)fNofMcElRings/fEventNumber<< endl <<
 
-           "fNofPiRings="<< fNofPiRings <<
-           "  per Event = " << (Double_t)fNofPiRings/fEventNumber<< endl <<
+           "fNofMcPiRings="<< fNofMcPiRings <<
+           "  per Event = " << (Double_t)fNofMcPiRings/fEventNumber<< endl <<
 
-           "fNofElRingsProj="<<fNofElRingsProj <<
-           "  per Event = " << (Double_t)fNofElRingsProj/fEventNumber<< endl <<
+           "fNofAccElRings="<<fNofAccElRings <<
+           "  per Event = " << (Double_t)fNofAccElRings/fEventNumber<< endl <<
 
-           "fNofPiRingsProj="<<fNofPiRingsProj <<
-           "  per Event = " << (Double_t)fNofPiRingsProj/fEventNumber<< endl <<
+           "fNofAccPiRings="<<fNofAccPiRings <<
+           "  per Event = " << (Double_t)fNofAccPiRings/fEventNumber<< endl <<
 
-           "fNofElRingsProjHitCut="<<fNofElRingsProjHitCut <<
-           "  per Event = " << (Double_t)fNofElRingsProjHitCut/fEventNumber<< endl <<
+           "fNofRecElRings = " << fNofRecElRings <<
+           "  per Event = " << (Double_t)fNofRecElRings/fEventNumber<< endl <<
 
-           "fNofPiRingsProjHitCut="<<fNofPiRingsProjHitCut <<
-           "  per Event = " << (Double_t)fNofPiRingsProjHitCut/fEventNumber<< endl <<
-
-           "fNofTrueFoundElRingsProjHitCut = " << fNofTrueFoundElRingsProjHitCut <<
-           "  per Event = " << (Double_t)fNofTrueFoundElRingsProjHitCut/fEventNumber<< endl <<
-
-           "fNofTrueFoundPiRingsProjHitCut = " << fNofTrueFoundPiRingsProjHitCut <<
-           "  per Event = " << (Double_t)fNofTrueFoundPiRingsProjHitCut/fEventNumber<< endl <<
+           "fNofRecPiRings = " << fNofRecPiRings <<
+           "  per Event = " << (Double_t)fNofRecPiRings/fEventNumber<< endl <<
 
            "fNofCloneRings = " << fNofCloneRings <<
            "  per Event = " << (Double_t)fNofCloneRings/fEventNumber<<
@@ -380,13 +351,13 @@ void CbmRichRingQa::Exec(Option_t* option)
            ", "<< 100.*(Double_t)fNofFakeRings/fNofAllRings << "%" << endl;
 
      Double_t elEff = 0.;
-     if (fNofElRingsProjHitCut != 0.)
-        elEff = (Double_t)fNofTrueFoundElRingsProjHitCut/(Double_t)fNofElRingsProjHitCut;
+     if (fNofAccElRings != 0.)
+        elEff = (Double_t)fNofRecElRings/(Double_t)fNofAccElRings;
      cout << "El efficiency = "<< elEff << endl;
 
      Double_t piEff = 0.;
-     if (fNofPiRingsProjHitCut != 0.)
-        piEff = (Double_t)fNofTrueFoundPiRingsProjHitCut/(Double_t)fNofPiRingsProjHitCut;
+     if (fNofAccPiRings != 0.)
+        piEff = (Double_t)fNofRecPiRings/(Double_t)fNofAccPiRings;
      cout << "Pi efficiency = "<<piEff << endl;
 
      cout << "NofTrueMatchEl = "<<fh_TrueMatchElDistance->GetEntries() <<
@@ -534,27 +505,23 @@ void CbmRichRingQa::EfficiencyCalc()
 
         ///fake ring
         if (recFlag == 1){
-            fh_FakeFoundRingsXYAll->Fill(ring->GetCenterX(), ring->GetCenterY());
             fNofFakeRings++;
         }
 
         ///primary electrons
         if (recFlag == 3){
-            fNofTrueFoundElRingsProjHitCut++;
+            fNofRecElRings++;
             if (ring->GetAaxis() > 10 || ring->GetAaxis() < 0) fNofTrueElBadFit++;
-            fh_TrueFoundElRingsProjHitCutMom->Fill(momentum);
-            fh_TrueFoundElRingsProjHitCutNofHits->Fill(lMCHits);
-            fh_TrueFoundRingsXYE->Fill(ring->GetCenterX(),ring->GetCenterY());
-            fh_TrueFoundElRingsProjHitCutRadPos->Fill(fRingMapWithHits[trackID].GetRadialPosition());
-
+            fh_RecElRingsMom->Fill(momentum);
+            fh_RecElRingsNofHits->Fill(lMCHits);
+            fh_RecElRingsRadPos->Fill(fRingMapWithHits[trackID].GetRadialPosition());
             Double_t bOverA = fRingMapWithHits[trackID].GetBaxis()/fRingMapWithHits[trackID].GetAaxis();
-            fh_TrueFoundElRingsProjHitCutBoverA->Fill(bOverA);
+            fh_RecElRingsBoverA->Fill(bOverA);
         }
 
         ///pions
         if (recFlag == 4){
-            fNofTrueFoundPiRingsProjHitCut++;
-            fh_TrueFoundRingsXYPi->Fill(ring->GetCenterX(),ring->GetCenterY());
+            fNofRecPiRings++;
         }
     }///loop over all found rings
 
@@ -710,34 +677,46 @@ void CbmRichRingQa::FinishTask()
     TDirectory *rich = current->mkdir("RichRingQaHist");
     rich->cd();
 
-    fh_TrueFoundElRingsProjHitCutMom->Write();
-    fh_MCElRingsProjHitCutMom->Write();
+    fh_RecElRingsMom->Write();
+    fh_AccElRingsMom->Write();
 
-    fh_TrueFoundElRingsProjHitCutRadPos->Write();
-    fh_MCElRingsProjHitCutRadPos->Write();
+    fh_RecElRingsRadPos->Write();
+    fh_AccElRingsRadPos->Write();
 
-    fh_TrueFoundElRingsProjHitCutNofHits->Write();
-    fh_MCElRingsProjHitCutNofHits->Write();
+    fh_RecElRingsNofHits->Write();
+    fh_AccElRingsNofHits->Write();
 
-    fh_TrueFoundElRingsProjHitCutBoverA->Write();
-    fh_MCElRingsProjHitCutBoverA->Write();
+    fh_RecElRingsBoverA->Write();
+    fh_AccElRingsBoverA->Write();
 
 /// Difference Fake and True rings histograms BEGIN
+    fh_FakeNofHits->Scale(1./fh_FakeNofHits->Integral());
+    fh_TrueElNofHits->Scale(1./fh_TrueElNofHits->Integral());
     fh_FakeNofHits->Write();
     fh_TrueElNofHits->Write();
 
+    fh_FakeAngle->Scale(1./fh_FakeAngle->Integral());
+    fh_TrueElAngle->Scale(1./fh_TrueElAngle->Integral());
     fh_FakeAngle->Write();
     fh_TrueElAngle->Write();
 
+    fh_FakeNofHitsOnRing->Scale(1./fh_FakeNofHitsOnRing->Integral());
+    fh_TrueElNofHitsOnRing->Scale(1./fh_TrueElNofHitsOnRing->Integral());
     fh_FakeNofHitsOnRing->Write();
     fh_TrueElNofHitsOnRing->Write();
 
+    fh_FakeRadPos->Scale(1./fh_FakeRadPos->Integral());
+    fh_TrueElRadPos->Scale(1./fh_TrueElRadPos->Integral());
     fh_FakeRadPos->Write();
     fh_TrueElRadPos->Write();
 
+    fh_FakeChi2->Scale(1./fh_FakeChi2->Integral());
+    fh_TrueElChi2->Scale(1./fh_TrueElChi2->Integral());
     fh_FakeChi2->Write();
     fh_TrueElChi2->Write();
 
+    fh_FakeRadius->Scale(1./fh_FakeRadius->Integral());
+    fh_TrueElRadius->Scale(1./fh_TrueElRadius->Integral());
     fh_FakeRadius->Write();
     fh_TrueElRadius->Write();
 /// Difference Fake and True rings histograms END
@@ -746,11 +725,8 @@ void CbmRichRingQa::FinishTask()
     fh_TrueMatchElDistance->Write();
     fh_TrueMatchElMom->Write();
 
+    fh_HitsXY->Scale(1./fEventNumber); // hits/cm^2/event
     fh_HitsXY->Write();
-    fh_HitsRadPos->Write();
-    fh_TrueFoundRingsXYE->Write();
-    fh_TrueFoundRingsXYPi->Write();
-    fh_FakeFoundRingsXYAll->Write();
 
     fh_NhitsPerEvent->Write();
     fh_NprojPerEvent->Write();
@@ -762,7 +738,7 @@ void CbmRichRingQa::FinishTask()
     fout.open("opt_param_ht.txt",std::ios_base::app);
     fout << (Double_t)fNofCloneRings/fEventNumber<< " " <<
 		(Double_t)fNofFakeRings/fEventNumber << " " <<
-		(Double_t)fNofTrueFoundElRingsProjHitCut/(Double_t)fNofElRingsProjHitCut << endl;
+		(Double_t)fNofRecElRings/(Double_t)fNofAccElRings << endl;
 
     delete fFitCOP;
     delete fFitEllipse;
@@ -770,4 +746,3 @@ void CbmRichRingQa::FinishTask()
 }
 
 ClassImp(CbmRichRingQa)
-

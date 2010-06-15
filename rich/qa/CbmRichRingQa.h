@@ -69,34 +69,30 @@ class CbmRichRingQa : public FairTask{
     CbmRichRingFitterEllipseTau* fFitEllipse;
     CbmRichRingSelectImpl* fSelectImpl;
 
-    Int_t fNofAllRings;      //number of all MC rings
-    Int_t fNofElRings;  //number of all electron MC rings
-    Int_t fNofPiRings;  //number of all pion MC rings
-    Int_t fNofElRingsProj; //number of El MC rings with proj
-    Int_t fNofPiRingsProj; //number of Pi MC rings with proj
-    Int_t fNofElRingsProjHitCut;//number of El MC rings with proj and # hits more than HitCut
-    Int_t fNofPiRingsProjHitCut;//number of Pi MC rings with proj and # hits more than HitCut
+    Int_t fNofAllRings;  //number of all MC rings
+    Int_t fNofMcElRings; //number of all electron MC rings
+    Int_t fNofMcPiRings; //number of all pion MC rings
+    Int_t fNofAccElRings;//number of El MC rings with proj and # hits more than HitCut
+    Int_t fNofAccPiRings;//number of Pi MC rings with proj and # hits more than HitCut
 
-    Int_t fNofTrueFoundElRingsProjHitCut;
-    Int_t fNofTrueFoundPiRingsProjHitCut;
+    Int_t fNofRecElRings;
+    Int_t fNofRecPiRings;
     Int_t fNofCloneRings;
     Int_t fNofFakeRings;
 
     Int_t fNofTrueElBadFit;
 
-    TH1D* fh_TrueFoundElRingsProjHitCutMom;///Histogram of found rings vs momentum. Electron. Proj
-    TH1D* fh_MCElRingsProjHitCutMom;///Histogram of MC rings vs momentum. Electron. Proj
+    TH1D* fh_RecElRingsMom;///Histogram of found rings vs momentum. Electron. Proj
+    TH1D* fh_AccElRingsMom;///Histogram of MC rings vs momentum. Electron. Proj
 
-    TH1D* fh_TrueFoundElRingsProjHitCutRadPos;///Histogram of found rings vs RadialPosition. Electron. Proj
-    TH1D* fh_MCElRingsProjHitCutRadPos;///Histogram of MC rings vs RadialPosition. Electron. Proj
+    TH1D* fh_RecElRingsRadPos;///Histogram of found rings vs RadialPosition. Electron. Proj
+    TH1D* fh_AccElRingsRadPos;///Histogram of MC rings vs RadialPosition. Electron. Proj
 
-    TH1D* fh_TrueFoundElRingsProjHitCutNofHits;///Histogram of found rings vs nof Hits. Electron. Proj
-    TH1D* fh_MCElRingsProjHitCutNofHits;///Histogram of MC rings vs Nof hits. Electron. Proj
+    TH1D* fh_RecElRingsNofHits;///Histogram of found rings vs nof Hits. Electron. Proj
+    TH1D* fh_AccElRingsNofHits;///Histogram of MC rings vs Nof hits. Electron. Proj
 
-    TH1D* fh_TrueFoundElRingsProjHitCutBoverA;
-    TH1D* fh_MCElRingsProjHitCutBoverA;
-
-    TH2D* fh_FakeFoundRingsXYAll;
+    TH1D* fh_RecElRingsBoverA;
+    TH1D* fh_AccElRingsBoverA;
 
 
 /// Difference Fake and True rings histograms BEGIN
@@ -119,18 +115,15 @@ class CbmRichRingQa : public FairTask{
     TH1D* fh_TrueElRadius;
 /// Difference Fake and True rings histograms END
 
-    /// Ring Track matching BEGIN
+/// Ring Track matching BEGIN
     TH1D* fh_WrongMatchElDistance;
     TH1D* fh_TrueMatchElDistance;
     TH1D*  fh_TrueMatchElMom;
-    /// Ring Track matching END
+/// Ring Track matching END
 
     std::ofstream  foutFakeAndTrue;
 
     TH2D*  fh_HitsXY;//hits distribution (x,y)
-    TH1D*  fh_HitsRadPos;
-    TH2D*  fh_TrueFoundRingsXYE;// (x,y) of true electron rings
-    TH2D*  fh_TrueFoundRingsXYPi; // (x,y) of true pions rings
 
     TH1D*  fh_NhitsPerEvent;//Nof hits per event
     TH1D*  fh_NprojPerEvent;//Nof projections/ event

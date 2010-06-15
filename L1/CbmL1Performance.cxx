@@ -1049,11 +1049,11 @@ void CbmL1::Performance()
 
 void CbmL1::FieldApproxCheck()
 {
-  TFile* fout = new TFile("FieldApprox.root","Recreate");
-  
+  TDirectory *curr = gDirectory;
+  TFile* fout = new TFile("FieldApprox.root","RECREATE");
+  fout->cd();
+
   FairField *MF = CbmKF::Instance()->GetMagneticField();
-
-
   for ( int ist = 0; ist<NStation; ist++ )
   {
     double z = 0;
@@ -1183,6 +1183,7 @@ void CbmL1::FieldApproxCheck()
   } // for ista
 
   fout->Close();
+  curr->cd();
 }
 
 void CbmL1::InputPerformance()

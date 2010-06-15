@@ -337,7 +337,7 @@ void CbmL1::Exec(Option_t * option)
 //   FieldApproxCheck();
 
   if( fVerbose>1 ) cout<<"L1 Track finder..."<<endl;
-//   algo->CATrackFinder();
+  algo->CATrackFinder();
 //   IdealTrackFinder();
   if( fVerbose>1 ) cout<<"L1 Track finder ok"<<endl;
 //   algo->KFTrackFitter();

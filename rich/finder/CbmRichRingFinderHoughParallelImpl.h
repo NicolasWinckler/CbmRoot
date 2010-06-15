@@ -14,7 +14,9 @@ protected:
 
 
 public:
-  	CbmRichRingFinderHoughParallelImpl ();
+  	CbmRichRingFinderHoughParallelImpl (){
+  		;
+  	}
 
   	/** Standard constructor **/
   	CbmRichRingFinderHoughParallelImpl (TString geometry);
@@ -23,8 +25,6 @@ public:
 
 	virtual void HoughTransform(unsigned short int indmin, unsigned short int indmax);
 
-
-	//ClassDef(CbmRichRingFinderHoughParallelImpl,1)
 //	vector<unsigned short> fHist1;
 //	vector<unsigned short> fHistR1;
 //	vector<unsigned short> fHist2;

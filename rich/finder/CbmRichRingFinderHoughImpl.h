@@ -6,10 +6,10 @@
 #ifndef CBM_RICH_RING_FINDER_HOUGH_IMPL_H
 #define CBM_RICH_RING_FINDER_HOUGH_IMPL_H
 
+#include "CbmRichRingLight.h"
 #include "CbmRichRing.h"
-#include "CbmRichRingFinder.h"
-#include "CbmRichRingFitterCOP.h"
-#include "CbmRichRingFitterEllipseTau.h"
+#include "CbmRichRingFitterCOPLight.h"
+//#include "CbmRichRingFitterEllipseTau.h"
 #include "CbmRichRingSelectNeuralNet.h"
 #include "TClonesArray.h"
 #include "TString.h"
@@ -20,8 +20,7 @@
 
 class CbmRichHoughHit {
 public:
-	Float_t fX;
-	Float_t fY;
+	CbmRichHitLight fHit;
 	Float_t fX2plusY2;
     UShort_t fId;
 	Bool_t fIsUsed;
@@ -29,20 +28,20 @@ public:
 
 class CbmRichHoughHitCmpUp:
        public std::binary_function<
-	          const CbmRichHoughHit*,
-	          const CbmRichHoughHit*,
+	          const CbmRichHoughHit,
+	          const CbmRichHoughHit,
 	          bool>
 {
 public:
 	bool operator()(const CbmRichHoughHit &m1, const CbmRichHoughHit &m2) const {
-		return m1.fX < m2.fX;
+		return m1.fHit.fX < m2.fHit.fX;
 	}
 };
 
 class CbmRichRingComparatorMore:
        public std::binary_function<
-	          const CbmRichRing*,
-	          const CbmRichRing*,
+	          const CbmRichRingLight*,
+	          const CbmRichRingLight*,
 	          bool>
 {
 public:
@@ -54,7 +53,8 @@ public:
 class CbmRichRingFinderHoughImpl{
 
 protected:
-	static const UShort_t kMAX_NOF_HITS = 65500;
+	UShort_t kMAX_NOF_HITS;
+	UShort_t fNofParts;
 
 	Float_t fMaxDistance;
 	Float_t fMinDistance;
@@ -79,8 +79,6 @@ protected:
 
 	UShort_t fMinNofHitsInArea;
 
-	UShort_t fNofParts;
-
 	Float_t fRmsCoeffEl;
 	Float_t fMaxCutEl;
 	Float_t fRmsCoeffCOP;
@@ -93,17 +91,19 @@ protected:
 	Float_t fCurMinX;
 	Float_t fCurMinY;
 
-	vector<CbmRichHoughHit> fData;  ///Rich hits
+	std::vector<CbmRichHoughHit> fData;  ///Rich hits
+	std::vector<CbmRichHoughHit> fDataPart1;  ///Rich hits
+	std::vector<CbmRichHoughHit> fDataPart2;  ///Rich hits
 
-	vector<UShort_t> fHist;
-	vector<UShort_t> fHistR;
-    vector< vector<UShort_t> > fHitInd;
+	std::vector<UShort_t> fHist;
+	std::vector<UShort_t> fHistR;
+	std::vector< std::vector<UShort_t> > fHitInd;
 
-	vector<CbmRichRingLight*> fFoundRings;///collect found rings
+	std::vector<CbmRichRingLight*> fFoundRings;///collect found rings
 
-	CbmRichRingFitterCOP* fFitCOP;
+	CbmRichRingFitterCOPLight* fFitCOP;
 	CbmRichRingSelectNeuralNet* fANNSelect;
-	CbmRichRingFitterEllipseTau* fFitEllipse;
+	//CbmRichRingFitterEllipseTau* fFitEllipse;
 
 	TString fGeometryType;
 
@@ -161,16 +161,13 @@ public:
 	void Init();
 	void DoFind();
 
-	void SetData(const vector<CbmRichHoughHit>& data){
+	void SetData(const std::vector<CbmRichHoughHit>& data){
 		fData.clear();
 		fData = data;
 	}
 
-	vector<CbmRichRingLight*>& GetFoundRings(){
+	std::vector<CbmRichRingLight*>& GetFoundRings(){
 		return fFoundRings;
 	}
-
-	//ClassDef(CbmRichRingFinderHoughImpl,1)
-
 };
 #endif // CBM_RICH_RING_FINDER_HOUGH_IMPL_H

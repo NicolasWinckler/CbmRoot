@@ -4,9 +4,9 @@
 // Implementation: Semen Lebedev (s.lebedev@gsi.de)
 
 #include "CbmRichRingFinderHough.h"
-//#include "CbmRichFuzzyKE.h"
 #include "CbmRichRingFinderHoughImpl.h"
 #include "CbmRichRingFinderHoughSimd.h"
+//#include "../../littrack/utils/CbmLitMemoryManagment.h"
 
 #include "CbmRichHit.h"
 #include "CbmRichRing.h"
@@ -20,7 +20,7 @@
 #include <cmath>
 #include <set>
 #include <algorithm>
-#include <iostream>
+#include <fstream>
 
 
 using std::cout;
@@ -42,8 +42,15 @@ CbmRichRingFinderHough::CbmRichRingFinderHough  ( Int_t verbose, TString geometr
     fRingCount = 0;
     fNEvent = 0;
 
-	fHTImpl = new CbmRichRingFinderHoughImpl(fGeometryType);
-	//fHTImpl = new CbmRichRingFinderHoughSimd(fGeometryType);
+#ifdef HOUGH_SERIAL
+	fHTImpl = new CbmRichRingFinderHoughImpl(fGeometryType);;
+#endif
+
+#ifdef HOUGH_SIMD
+	fHTImpl  = new CbmRichRingFinderHoughSimd(fGeometryType);;
+#endif
+
+
 }
 
 void CbmRichRingFinderHough::Init()
@@ -62,6 +69,39 @@ CbmRichRingFinderHough::~CbmRichRingFinderHough()
 {
 	delete fHTImpl;
 }
+
+Int_t CbmRichRingFinderHough::DoFind(const vector<CbmRichHoughHit>& data)
+{
+	fNEvent++;
+	if (fVerbose) cout << "-I- CbmRichRingFinderHough  Event no. " << fNEvent<< endl;
+
+	std::vector<CbmRichHoughHit> UpH;
+	std::vector<CbmRichHoughHit> DownH;
+    fRingCount = 0;
+
+	UpH.reserve(data.size()/2);
+	DownH.reserve(data.size()/2);
+
+	for(Int_t iHit = 0; iHit < data.size(); iHit++) {
+		CbmRichHoughHit hit = data[iHit];
+		if (hit.fHit.fY >= 0)
+			UpH.push_back(hit);
+		else
+			DownH.push_back(hit);
+	}
+
+	fHTImpl->SetData(UpH);
+	fHTImpl->DoFind();
+	//if (rRingArray!=NULL) AddRingsToOutputArray(rRingArray, fHTImpl->GetFoundRings());
+	UpH.clear();
+
+	fHTImpl->SetData(DownH);
+	fHTImpl->DoFind();
+	//if (rRingArray!=NULL) AddRingsToOutputArray(rRingArray, fHTImpl->GetFoundRings());
+	DownH.clear();
+}
+
+
 
 Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
                                          TClonesArray* rProjArray,
@@ -90,12 +130,18 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 	UpH.reserve(nhits/2);
 	DownH.reserve(nhits/2);
 
+//	std::ofstream outEvents;
+//	outEvents.open("events.txt",std::ios_base::app);
+//	outEvents << fNEvent << " " << nhits << endl;
+
 	for(Int_t iHit = 0; iHit < nhits; iHit++) {
 		CbmRichHit * hit = (CbmRichHit*) rHitArray->At(iHit);
 		if (hit) {
 			CbmRichHoughHit tempPoint;
-			tempPoint.fX = hit->GetX();
-			tempPoint.fY = hit->GetY();
+			tempPoint.fHit.fX = hit->GetX();
+			tempPoint.fHit.fY = hit->GetY();
+			//outEvents << hit->GetX() << " " << hit->GetY() << endl;
+
 			tempPoint.fX2plusY2 = hit->GetX() * hit->GetX() + hit->GetY() * hit->GetY();
 			tempPoint.fId = iHit;
 			tempPoint.fIsUsed = false;
@@ -110,22 +156,25 @@ Int_t CbmRichRingFinderHough::DoFind(TClonesArray* rHitArray,
 	fHTImpl->SetData(UpH);
 	fHTImpl->DoFind();
 	timer.Stop();
-	AddRingsToOutputArray(rRingArray, fHTImpl->GetFoundRings());
+	if (rRingArray!=NULL) AddRingsToOutputArray(rRingArray, fHTImpl->GetFoundRings());
+	//for_each(UpH.begin(), UpH.end(), DeleteObject());
 	UpH.clear();
+
 	timer.Start(false);
 	fHTImpl->SetData(DownH);
 	fHTImpl->DoFind();
 	timer.Stop();
-	AddRingsToOutputArray(rRingArray, fHTImpl->GetFoundRings());
+	if (rRingArray!=NULL) AddRingsToOutputArray(rRingArray, fHTImpl->GetFoundRings());
+	//for_each(DownH.begin(), DownH.end(), DeleteObject());
 	DownH.clear();
 	fExecTime += timer.CpuTime();
 
-	if (fVerbose)cout << "CbmRichRingFinderHough: Number of output rings: "<< rRingArray->GetEntriesFast() << endl;
+	cout << "CbmRichRingFinderHough: Number of output rings: "<< rRingArray->GetEntriesFast() << endl;
 
 	cout << "Exec time : " << fExecTime << ", per event " << 1000.*fExecTime/fNEvent << " ms" << endl;
 
 	if (fIsFindOptPar == true ){
-		ofstream fout;
+		std::ofstream fout;
 		fout.open("opt_param_ht.txt",std::ios_base::app);
 		fout << fExecTime/fNEvent * 1000. << " ";
 	}
@@ -173,7 +222,7 @@ void CbmRichRingFinderHough::AddRingsToOutputArray(TClonesArray *rRingArray,
 		if (rings[iRing]->GetRecFlag() == -1)	continue;
 		CbmRichRing* r = new CbmRichRing();
 		for (Int_t i = 0; i < rings[iRing]->GetNofHits(); i++){
-			r->AddHit(rings[iRing]->GetHit(i));
+			r->AddHit(rings[iRing]->GetHitId(i));
 		}
 		new ((*rRingArray)[fRingCount]) CbmRichRing(*r);
 		fRingCount++;

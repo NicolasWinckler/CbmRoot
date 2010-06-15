@@ -25,17 +25,31 @@ using std::cout;
 using std::endl;
 using std::vector;
 
+#ifdef HOUGH_IMPL
 class FinderTask{
 	CbmRichRingFinderHoughImpl* fHTImpl;
 public:
 	FinderTask(CbmRichRingFinderHoughImpl* HTImpl) {
 		fHTImpl = HTImpl;
 	}
-
 	void operator()() const {
 		fHTImpl->DoFind();
 	}
 };
+#endif
+
+#ifdef HOUGH_IMPL_PARALLEL
+class FinderTask{
+	CbmRichRingFinderHoughParallelImpl* fHTImpl;
+public:
+	FinderTask(CbmRichRingFinderHoughParallelImpl* HTImpl) {
+		fHTImpl = HTImpl;
+	}
+	void operator()() const {
+		fHTImpl->DoFind();
+	}
+};
+#endif
 
 // -----   Standard constructor   ------------------------------------------
 CbmRichRingFinderHoughParallel::CbmRichRingFinderHoughParallel  ( Int_t verbose, TString geometry )
@@ -53,11 +67,17 @@ void CbmRichRingFinderHoughParallel::Init()
 {
     fNEvent = 0;
     fRingCount = 0;
-
+#ifdef HOUGH_IMPL_PARALLEL
+	fHTImpl1 = new CbmRichRingFinderHoughParallelImpl(fGeometryType);
+	fHTImpl2 = new CbmRichRingFinderHoughParallelImpl(fGeometryType);
+#endif
+#ifdef HOUGH_IMPL
 	fHTImpl1 = new CbmRichRingFinderHoughImpl(fGeometryType);
-	fHTImpl1->Init();
 	fHTImpl2 = new CbmRichRingFinderHoughImpl(fGeometryType);
+#endif
+
 	fHTImpl2->Init();
+	fHTImpl1->Init();
 	tbb::task_scheduler_init init;
 }
 
@@ -71,6 +91,41 @@ CbmRichRingFinderHoughParallel::~CbmRichRingFinderHoughParallel()
 {
 
 }
+
+
+Int_t CbmRichRingFinderHoughParallel::DoFind(const vector<CbmRichHoughHit>& data)
+{
+	fNEvent++;
+	if (fVerbose) cout << "-I- CbmRichRingFinderHough  Event no. " << fNEvent<< endl;
+
+	std::vector<CbmRichHoughHit> UpH;
+	std::vector<CbmRichHoughHit> DownH;
+    fRingCount = 0;
+
+	UpH.reserve(data.size()/2);
+	DownH.reserve(data.size()/2);
+
+	for(Int_t iHit = 0; iHit < data.size(); iHit++) {
+		CbmRichHoughHit hit = data[iHit];
+		if (hit.fHit.fY >= 0)
+			UpH.push_back(hit);
+		else
+			DownH.push_back(hit);
+	}
+	fHTImpl1->SetData(UpH);
+	fHTImpl2->SetData(DownH);
+
+	fHTImpl1->DoFind();
+	fHTImpl2->DoFind();
+
+	FinderTask a(fHTImpl1);
+	FinderTask b(fHTImpl2);
+	tbb::parallel_invoke(a, b);
+
+	UpH.clear();
+	DownH.clear();
+}
+
 
 Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
                                             TClonesArray* rProjArray,
@@ -103,8 +158,8 @@ Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
 		CbmRichHit * hit = (CbmRichHit*) rHitArray->At(iHit);
 		if (hit) {
 			CbmRichHoughHit tempPoint;
-			tempPoint.fX = hit->GetX();
-			tempPoint.fY = hit->GetY();
+			tempPoint.fHit.fX = hit->GetX();
+			tempPoint.fHit.fY = hit->GetY();
 			tempPoint.fX2plusY2 = hit->GetX() * hit->GetX() + hit->GetY() * hit->GetY();
 			tempPoint.fId = iHit;
 			tempPoint.fIsUsed = false;
@@ -118,6 +173,9 @@ Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
 	fHTImpl1->SetData(UpH);
 	fHTImpl2->SetData(DownH);
 
+	//fHTImpl1->DoFind();
+	//fHTImpl2->DoFind();
+
 	FinderTask a(fHTImpl1);
 	FinderTask b(fHTImpl2);
 	tbb::parallel_invoke(a, b);
@@ -129,7 +187,12 @@ Int_t CbmRichRingFinderHoughParallel::DoFind(TClonesArray* rHitArray,
 	//fExecTime += timer.CpuTime();
 
 	tbb::tick_count t1 = tbb::tick_count::now();
+
 	fExecTime += (t1-t0).seconds();
+	//for_each(UpH.begin(), UpH.end(), DeleteObject());
+	UpH.clear();
+	//for_each(DownH.begin(), DownH.end(), DeleteObject());
+	DownH.clear();
 
 	//FuzzyKE(rHitArray);
 	if (fVerbose)
@@ -148,7 +211,7 @@ void CbmRichRingFinderHoughParallel::AddRingsToOutputArray(TClonesArray *rRingAr
 		if (rings[iRing]->GetRecFlag() == -1)	continue;
 		CbmRichRing* r = new CbmRichRing();
 		for (Int_t i = 0; i < rings[iRing]->GetNofHits(); i++){
-			r->AddHit(rings[iRing]->GetHit(i));
+			r->AddHit(rings[iRing]->GetHitId(i));
 		}
 		new ((*rRingArray)[fRingCount]) CbmRichRing(*r);
 		fRingCount++;

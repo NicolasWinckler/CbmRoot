@@ -9,6 +9,8 @@
 #include "CbmRichRingFinder.h"
 #include "CbmRichRingLight.h"
 #include "TString.h"
+#include "CbmRichRingFinderHoughImpl.h"
+
 
 #include <vector>
 #include <map>
@@ -18,6 +20,10 @@ class CbmRichRingFinderHoughImpl;
 class CbmRichRingFinderHoughSimd;
 class CbmRichRing;
 
+#define HOUGH_SERIAL
+//#define HOUGH_SIMD
+
+
 class CbmRichRingFinderHough : public CbmRichRingFinder {
 
 protected:
@@ -26,8 +32,14 @@ protected:
 	Int_t fVerbose; /// Verbosity level
 	TString fGeometryType;
 	Int_t fRingCount;
+#ifdef HOUGH_SERIAL
 	CbmRichRingFinderHoughImpl *fHTImpl;
-	//CbmRichRingFinderHoughSimd *fHTImpl;
+#endif
+
+#ifdef HOUGH_SIMD
+	CbmRichRingFinderHoughSimd *fHTImpl;
+#endif
+
 
 	Double_t fExecTime;//evaluate execution time
 
@@ -58,6 +70,8 @@ public:
 	virtual Int_t DoFind(TClonesArray* rHitArray,
 	 		      		 TClonesArray* rProjArray,
 		       	      	 TClonesArray* rRingArray);
+
+	Int_t DoFind(const std::vector<CbmRichHoughHit>& data);
 
 	void SetFindOptPar(Bool_t findOptPar){fIsFindOptPar = findOptPar;}
 

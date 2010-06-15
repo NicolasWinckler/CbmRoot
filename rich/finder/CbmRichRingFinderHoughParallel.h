@@ -6,7 +6,7 @@
 #ifndef CBM_RICH_RING_FINDER_HOUGH_PARALLEL_H
 #define CBM_RICH_RING_FINDER_HOUGH_PARALLEL_H
 
-//#include "CbmRichRingFinderHoughParallelImpl.h"
+#include "CbmRichRingFinderHoughParallelImpl.h"
 #include "CbmRichRingFinderHoughImpl.h"
 #include "CbmRichRingFinder.h"
 #include "TClonesArray.h"
@@ -30,10 +30,19 @@ protected:
 
 	Double_t fExecTime;//evaluate execution time
 
+#define HOUGH_IMPL_PARALLEL
+//#define HOUGH_IMPL
+
+#ifdef HOUGH_IMPL
 	CbmRichRingFinderHoughImpl* fHTImpl1;
 	CbmRichRingFinderHoughImpl* fHTImpl2;
-	//CbmRichRingFinderHoughParallelImpl* fHTImpl1;
-	//CbmRichRingFinderHoughParallelImpl* fHTImpl2;
+#endif
+
+#ifdef HOUGH_IMPL_PARALLEL
+	CbmRichRingFinderHoughParallelImpl* fHTImpl1;
+	CbmRichRingFinderHoughParallelImpl* fHTImpl2;
+#endif
+
 public:
   	CbmRichRingFinderHoughParallel ();
 
@@ -50,6 +59,7 @@ public:
 	virtual Int_t DoFind(TClonesArray* rHitArray,
 	 		      		 TClonesArray* rProjArray,
 		       	      	 TClonesArray* rRingArray);
+	int DoFind(const std::vector<CbmRichHoughHit>& data);
 
 ClassDef(CbmRichRingFinderHoughParallel,1);
 };

@@ -2,9 +2,10 @@
 // Implementation: Semen Lebedev (s.lebedev@gsi.de)
 
 //#include "tbb/blocked_range.h"
+//#include "tbb/parallel_for.h"
 #include "tbb/parallel_invoke.h"
 #include "CbmRichRingFinderHoughParallelImpl.h"
-
+#include <iostream>
 //class ApplyHough {
 //	Int_t fIndmin;
 //	Int_t fIndmax;
@@ -42,28 +43,32 @@ public:
 		fIndmin = indmin;
 		fGroup = group;
 	}
-
 };
 
-CbmRichRingFinderHoughParallelImpl::CbmRichRingFinderHoughParallelImpl  (TString geometry)
+CbmRichRingFinderHoughParallelImpl::CbmRichRingFinderHoughParallelImpl(
+		TString geometry)
 {
-    cout << "-I- CbmRichRingFinderHoughImpl constructor for " << geometry << " RICH geometry"<<endl;
+    std::cout << "-I- CbmRichRingFinderHoughImpl constructor for " << geometry << " RICH geometry"<<std::endl;
     if (geometry != "compact" && geometry != "large"){
         geometry = "compact";
-        cout << "-E- CbmRichRingFinderHoughImpl::SetParameters UNKNOWN geometry,  " <<
-        "Set default parameters for "<< geometry << " RICH geometry"<<endl;
+        std::cout << "-E- CbmRichRingFinderHoughImpl::SetParameters UNKNOWN geometry,  " <<
+        "Set default parameters for "<< geometry << " RICH geometry"<<std::endl;
     }
     fGeometryType = geometry;
 }
 
-void CbmRichRingFinderHoughParallelImpl::HoughTransform(unsigned short int indmin,
+void CbmRichRingFinderHoughParallelImpl::HoughTransform(
+		unsigned short int indmin,
 		unsigned short int indmax)
 {
 	//tbb::parallel_for(tbb::blocked_range<size_t>(0, fNofParts,1), ApplyHough(this, indmin, indmax));
-	ApplyHough a(this,indmin, indmax, 0);
-	ApplyHough b(this, indmin, indmax, 1);
 
-	tbb::parallel_invoke(a, b);
+        //if (fHitInd[0].size() <= fMinNofHitsInArea)
+        //ApplyHough a(this,indmin, indmax, 0);
+        //if (fHitInd[1].size() <= fMinNofHitsInArea)
+        //ApplyHough b(this,indmin, indmax, 1);
+		//tbb::parallel_invoke(a,b);
+
+		HoughTransformGroup(indmin, indmax, 0);
+		HoughTransformGroup(indmin, indmax, 1);
 }
-
-//ClassImp(CbmRichRingFinderHoughImpl)

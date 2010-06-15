@@ -38,7 +38,7 @@ void draw_electrons_qa(){
 	//gStyle->SetOptStat(0);
 	//gStyle->SetOptFit(1);
 
-	TCanvas *c1 = new TCanvas();
+	TCanvas *c1 = new TCanvas("c1","c1",500,500);
 	TH1D* accEff1 = divide_hist(fhAccRings, fhMCRings);
 	accEff1->SetTitle("Efficiencies for primary electrons normilized to MC rings");
 	accEff1->SetLineColor(kViolet+2);
@@ -74,7 +74,7 @@ void draw_electrons_qa(){
     leg2->Draw();
 
 
-    TCanvas *c2 = new TCanvas();
+    TCanvas *c2 = new TCanvas("c2","c2",500,500);
     TH1D* ringFindEff = divide_hist(fhTrueFoundRings, fhAccRings);
     ringFindEff->SetTitle("Efficiencies for primary electrons normilized to acc. rings");
     ringFindEff->SetLineColor(kViolet+2);
@@ -116,7 +116,7 @@ void draw_electrons_qa(){
     leg1->AddEntry(stsRichTrdTofEff,effTxt);
     leg1->Draw();
 
-    TCanvas *c3 = new TCanvas();
+    TCanvas *c3 = new TCanvas("c3","c3",800,800);
     c3->Divide(2,2);
     c3->cd(1);
     TH1D* eff1 = divide_hist(fhTrueFoundRings, fhAccRings);
@@ -163,7 +163,7 @@ void draw_electrons_qa(){
     gPad->SetGridy(true);
 
 ////
-    TCanvas* c4 = new TCanvas();
+    TCanvas* c4 = new TCanvas("c4","c4",900,900);
     c4->Divide(3,3);
     c4->cd(1);
 	draw_diff_el_pi(fhAaxisEl, fhAaxisPi);
@@ -182,8 +182,8 @@ void draw_electrons_qa(){
     c4->cd(8);
 	draw_diff_el_pi(fhRadPosEl,fhRadPosPi);
 
-    TCanvas* c5 = new TCanvas();
-    c5->Divide(3,2);
+    TCanvas* c5 = new TCanvas("c5","c5",600,900);
+    c5->Divide(2,3);
     c5->cd(1);
 	fhAaxisVsMomEl->Draw("COLZ");
     c5->cd(2);
@@ -197,10 +197,10 @@ void draw_electrons_qa(){
     c5->cd(6);
 	fhPhiVsRadAngPi->Draw("COLZ");
 
-    TCanvas* c6 = new TCanvas();
+    TCanvas* c6 = new TCanvas("c6","c6",500,500);
 	draw_diff_el_pi(fhTrdAnnEl,fhTrdAnnPi);
 
-	TCanvas* c7 = new TCanvas();
+	TCanvas* c7 = new TCanvas("c7","c7",800,400);
 	c7->Divide(2,1);
 	c7->cd(1);
     ringFindEff->Draw();

@@ -80,7 +80,6 @@ private:
     void GlobalTracksElIdEff();
     void DiffElandPi();
 
-
     std::ofstream  fOutElandPi;
     CbmRichElectronIdAnn * fElIdAnn;
 
@@ -93,7 +92,6 @@ private:
 
     Int_t fNofFakeRings;
     Int_t fNofCloneRings;
-
 
 	TH1D* fhMCRings;
 	TH1D* fhAccRings;

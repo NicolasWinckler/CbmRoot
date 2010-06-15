@@ -145,26 +145,29 @@ void CbmL1::Performance()
       histodir->mkdir("Fit");
       gDirectory->cd("Fit");
       {
+      const int Nh_fit = 12;
       struct {
         const char *name;
         const char *title;
         Int_t n;
         Double_t l,r;
-      } Table[10]=
+      } Table[Nh_fit]=
         {
           {"x",  "Residual X [#mum]",                   100, -100., 100.},
           {"y",  "Residual Y [#mum]",                   100, -100., 100.},
           {"tx", "Residual Tx [mrad]",                  100,   -2.,   2.},
           {"ty", "Residual Ty [mrad]",                  100,   -2.,   2.},
-          {"P",  "Resolution P/Q [100%]",               100,   -.1,  .1 },
+          {"P",  "Resolution P/Q [100%]",               100,   -1,  1 },
           {"px", "Pull X [residual/estimated_error]",   100,  -10.,  10.},
           {"py", "Pull Y [residual/estimated_error]",   100,  -10.,  10.},
           {"ptx","Pull Tx [residual/estimated_error]",  100,  -10.,  10.},
           {"pty","Pull Ty [residual/estimated_error]",  100,  -10.,  10.},
-          {"pQP","Pull Q/P [residual/estimated_error]", 100,  -10.,  10.}
+          {"pQP","Pull Q/P [residual/estimated_error]", 100,  -10.,  10.},
+          {"QPreco","Reco Q/P ", 100,  -10.,  10.},
+          {"QPmc","MC Q/P ", 100,  -10.,  10.}
         };
       
-      for( int i=0; i<10; i++ ){
+      for( int i=0; i<Nh_fit; i++ ){
         char n[225], t[255];
         sprintf(n,"fst_%s",Table[i].name);
         sprintf(t,"First point %s",Table[i].title);
@@ -1004,7 +1007,10 @@ void CbmL1::Performance()
         if( finite(it->C[5]) && it->C[5]>0 )h_fit[7]->Fill( (mc.px/mc.pz-it->T[2])/sqrt(it->C[5]));
         if( finite(it->C[9]) && it->C[9]>0 )h_fit[8]->Fill( (mc.py/mc.pz-it->T[3])/sqrt(it->C[9]));
         if( finite(it->C[14]) && it->C[14]>0 )h_fit[9]->Fill( (mc.q/mc.p-it->T[4])/sqrt(it->C[14]));
+        h_fit[10]->Fill(it->T[4]);
+        h_fit[11]->Fill(mc.q/mc.p);
 
+//         cout << it->T[4] << " " << mc.q << " " << mc.p << endl;
 //         cout << it->T[2] << " " << sqrt(it->C[5]) << " - ";
 //         cout << it->T[3] << " " << sqrt(it->C[9]) << endl;
       }
@@ -1022,6 +1028,8 @@ void CbmL1::Performance()
         if( finite(it->CLast[5]) && it->CLast[5]>0 ) h_fitL[7]->Fill( (mc.px/mc.pz-it->TLast[2])/sqrt(it->CLast[5]));
         if( finite(it->CLast[9]) && it->CLast[9]>0 ) h_fitL[8]->Fill( (mc.py/mc.pz-it->TLast[3])/sqrt(it->CLast[9]));
         if( finite(it->CLast[14]) && it->CLast[14]>0 ) h_fitL[9]->Fill( (mc.q/mc.p-it->TLast[4])/sqrt(it->CLast[14]));
+        h_fitL[10]->Fill(it->TLast[4]);
+        h_fitL[11]->Fill(mc.q/mc.p);
       }
       h_fit_chi2->Fill(it->chi2/it->NDF);
     }

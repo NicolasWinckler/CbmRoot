@@ -21,8 +21,10 @@ class L1Algo{
   
 
   void CATrackFinder();
-  
-  void KFTrackFitter();
+
+    
+  void KFTrackFitter_simple(); // Fit reconstracted track like it fitted during the reconstruction.
+  void KFTrackFitter(); // SIMD version from benchmark
   void GuessVec( L1TrackPar &t, fvec *xV, fvec *yV, fvec *zV, fvec *wV, int NHits );
   void FilterFirst( L1TrackPar &track,fvec &x, fvec &y, fvec &w, L1Station &st );
   void FilterLast( L1TrackPar &track,fvec &x, fvec &y, fvec &w, L1Station &st );

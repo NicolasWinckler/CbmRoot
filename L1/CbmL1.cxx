@@ -227,6 +227,8 @@ InitStatus CbmL1::Init()
           f_sigma = sector->GetDx() / TMath::Sqrt(12);
           b_sigma  = f_sigma;
             }
+            f_sigma /= cos(f_phi);
+            b_sigma /= cos(b_phi);
 
 	//if( sector->GetType()==2 ){ //!! DEBUG !!
 	//b_phi = sector->GetRotation() + 3.14159265358/2.;
@@ -341,7 +343,8 @@ void CbmL1::Exec(Option_t * option)
 //   IdealTrackFinder();
   if( fVerbose>1 ) cout<<"L1 Track finder ok"<<endl;
 //   algo->KFTrackFitter();
-//   cout<<"L1 Track fitter  ok"<<endl;
+//   algo->KFTrackFitter_simple();
+//   if( fVerbose>1 ) cout<<"L1 Track fitter  ok"<<endl;
   vRTracks.clear();
   int start_hit = 0;
   for(vector<L1Track>::iterator it = algo->vTracks.begin(); it!=algo->vTracks.end(); it++){

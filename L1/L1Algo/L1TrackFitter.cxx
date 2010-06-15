@@ -11,11 +11,13 @@
  *====================================================================
  */
 
+// TODO: works only for same-z
 
 #include "L1Algo/L1Algo.h"
 #include "L1Algo/L1TrackPar.h"
 #include "L1Algo/L1Extrapolation.h"
 #include "L1Algo/L1AddMaterial.h"
+#include "L1Algo/L1Filtration.h" // for KFTrackFitter_simple
 
 #include "TStopwatch.h"
 
@@ -30,6 +32,298 @@ const fvec c_light = 0.000299792458, c_light_i = 1./c_light;
 const fvec ZERO = 0.;
 const fvec ONE = 1.;
 const fvec vINF = 0.1;
+
+  /// Fit reconstracted track like it fitted during the reconstruction.
+void L1Algo::KFTrackFitter_simple()
+{
+//  cout << " Start KF Track Fitter " << endl;
+  int start_hit = 0; // for interation in vRecoHits[]
+
+  for(unsigned itrack = 0; itrack < vTracks.size(); itrack++)
+  {
+    L1Track &t =  vTracks[itrack]; // current track
+    cout << t.Momentum << endl;
+    // get hits of current track
+    std::vector<unsigned short int> hits; // array of indeses of hits of current track
+    hits.clear();
+    int nHits = t.NHits;
+    for( int i = 0; i < nHits; i++ ){
+      hits.push_back( vRecoHits[start_hit++]);
+    }
+    
+    L1TrackPar T; // fitting parametr coresponding to current track
+    
+    // fit backward
+    fvec qp0 = 0;
+    //fvec qp0 = 2./t.Momentum;
+    for(int iter=0; iter<3; iter++ )
+    {
+      //cout<<" Back 1"<<endl;
+      L1StsHit &hit0 = vStsHits[hits[nHits-1]];
+      L1StsHit &hit1 = vStsHits[hits[nHits-2]];
+      L1StsHit &hit2 = vStsHits[hits[nHits-3]];
+
+      int ista0 = vSFlag[hit0.f]/4;
+      int ista1 = vSFlag[hit1.f]/4;
+      int ista2 = vSFlag[hit2.f]/4;
+
+      //cout<<"back: ista012="<<ista0<<" "<<ista1<<" "<<ista2<<endl;
+      L1Station &sta0 = vStations[ista0];
+      L1Station &sta1 = vStations[ista1];
+      L1Station &sta2 = vStations[ista2];
+
+      fvec x0  = vStsStrips[hit0.f] ;
+      fvec v0  = vStsStripsB[hit0.b];
+      fvec y0  = sta0.yInfo.cos_phi*x0 + sta0.yInfo.sin_phi*v0;
+      fvec z0 = sta0.z;
+//       fvec z0 = hit0.z;
+
+      fvec x1  = vStsStrips[hit1.f];
+      fvec v1  = vStsStripsB[hit1.b];
+      fvec y1  = sta1.yInfo.cos_phi*x1 + sta1.yInfo.sin_phi*v1;
+      fvec z1 = sta1.z;
+//       fvec z1 = hit1.z;
+
+      fvec x2  = vStsStrips[hit2.f];
+      fvec v2  = vStsStripsB[hit2.b];
+      fvec y2  = sta2.yInfo.cos_phi*x2 + sta2.yInfo.sin_phi*v2;
+      fvec z2 = sta2.z;
+//       fvec z2 = hit2.z;
+  
+      fvec dzi = 1./(z1-z0);
+      
+      const fvec vINF = .1;
+      T.x  = x0;
+      T.y  = y0;
+      if( iter==0 ){
+        T.tx = (x1-x0)*dzi;
+        T.ty = (y1-y0)*dzi;
+      }
+
+      T.qp = qp0;
+      T.z  = z0;
+      T.chi2 = 0.;
+      T.NDF = 0.;
+      T.C00 = sta0.XYInfo.C00;
+      T.C10 = sta0.XYInfo.C10;
+      T.C11 = sta0.XYInfo.C11;
+
+      T.C20 = T.C21 = 0;
+      T.C30 = T.C31 = T.C32 = 0;
+      T.C40 = T.C41 = T.C42 = T.C43 = 0;
+      T.C22 = T.C33 = vINF;
+      T.C44 = 1.;
+
+      static L1FieldValue fB0, fB1, fB2 _fvecalignment;
+      static L1FieldRegion fld _fvecalignment;
+      fvec fz0 = sta1.z;
+      fvec fz1 = sta2.z;
+      fvec fz2 = sta0.z;
+//       fvec fz0 = hit1.z;
+//       fvec fz1 = hit2.z;
+//       fvec fz2 = hit0.z;
+
+
+      sta1.fieldSlice.GetFieldValue( x1, y1, fB0 );
+      sta2.fieldSlice.GetFieldValue( x2, y2, fB1 );
+      sta0.fieldSlice.GetFieldValue( x0, y0, fB2 );
+
+      fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
+      
+      int ista = ista2;
+      //cout<<"\nfit, iter=:"<<iter<<endl;
+      for( int i = nHits-2; i >= 0; i--){
+  //  if( fabs(T.qp[0])>2. ) break;  // iklm. Don't know it need for
+        L1StsHit &hit = vStsHits[hits[i]];
+        ista = vSFlag[hit.f]/4;
+  
+        L1Station &sta = vStations[ista];
+
+        L1Extrapolate( T, sta.z, qp0, fld );
+//         L1Extrapolate( T, hit.z, qp0, fld );
+        L1AddMaterial( T, sta.materialInfo, qp0 );
+//         if (ista==NMvdStations-1) L1AddPipeMaterial( T, qp0);
+
+//         fvec xx = vStsStrips[hit.f];
+//         fvec v = vStsStripsB[hit.b];
+//         fvec y  = sta.yInfo.cos_phi*xx + sta.yInfo.sin_phi*v;
+//         fvec x  = sta.xInfo.sin_phi*xx + sta.xInfo.cos_phi*v;
+//         L1Filter( T, sta.frontInfo, xx );
+//         L1Filter( T, sta.backInfo,  v );
+
+        fvec x = vStsStrips[hit.f];
+        fvec v = vStsStripsB[hit.b];
+        fvec y  = sta.yInfo.cos_phi*x + sta.yInfo.sin_phi*v;
+        L1Filter( T, sta.frontInfo, x );
+        L1Filter( T, sta.backInfo,  v );
+        fB0 = fB1;
+        fB1 = fB2;
+        fz0 = fz1;
+        fz1 = fz2;
+        sta.fieldSlice.GetFieldValue( x, y, fB2 );
+//         cout << fB0.x[0] << " " << fB0.y[0] << " " << fB0.z[0]  << endl;
+        
+        fz2 = sta.z;
+//         fz2 = hit.z;
+        fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
+      } // i
+  
+      // write received parametres in track
+      t.TFirst[0] = T.x[0];
+      t.TFirst[1] = T.y[0];
+      t.TFirst[2] = T.tx[0];
+      t.TFirst[3] = T.ty[0];
+      t.TFirst[4] = T.qp[0];
+      t.TFirst[5] = T.z[0];
+      
+      t.CFirst[0] = T.C00[0];
+      t.CFirst[1] = T.C10[0];
+      t.CFirst[2] = T.C11[0];
+      t.CFirst[3] = T.C20[0];
+      t.CFirst[4] = T.C21[0];
+      t.CFirst[5] = T.C22[0];
+      t.CFirst[6] = T.C30[0];
+      t.CFirst[7] = T.C31[0];
+      t.CFirst[8] = T.C32[0];
+      t.CFirst[9] = T.C33[0];
+      t.CFirst[10] = T.C40[0];
+      t.CFirst[11] = T.C41[0];
+      t.CFirst[12] = T.C42[0];
+      t.CFirst[13] = T.C43[0];
+      t.CFirst[14] = T.C44[0];
+    
+      t.chi2 = T.chi2[0];
+      t.NDF = (int)T.NDF[0];
+      qp0 = T.qp[0];
+    
+      
+      // fit forward
+      {
+  //T.qp = first_trip->GetQpOrig(MaxInvMom);
+    
+        L1StsHit &hit0 = vStsHits[hits[0]];
+        L1StsHit &hit1 = vStsHits[hits[1]];
+        L1StsHit &hit2 = vStsHits[hits[2]];
+  
+        int ista0 = GetFStation( vSFlag[hit0.f] );
+        int ista1 = GetFStation( vSFlag[hit1.f] );
+        int ista2 = GetFStation( vSFlag[hit2.f] );
+  
+        L1Station &sta0 = vStations[ista0];
+        L1Station &sta1 = vStations[ista1];
+        L1Station &sta2 = vStations[ista2];
+  
+        fvec x0  = vStsStrips[hit0.f];
+        fvec v0  = vStsStripsB[hit0.b];
+        fvec y0  = sta0.yInfo.cos_phi*x0 + sta0.yInfo.sin_phi*v0;
+        fvec z0 = sta0.z;
+//         fvec z0 = hit0.z;
+  
+        fvec x1  = vStsStrips[hit1.f];
+        fvec v1  = vStsStripsB[hit1.b];
+        fvec y1  = sta1.yInfo.cos_phi*x1 + sta1.yInfo.sin_phi*v1;
+        fvec z1 = sta1.z;
+//         fvec z1 = hit1.z;
+  
+        fvec x2  = vStsStrips[hit2.f];
+        fvec v2  = vStsStripsB[hit2.b];
+        fvec y2  = sta2.yInfo.cos_phi*x2 + sta2.yInfo.sin_phi*v2;
+        fvec z2 = sta2.z;
+//         fvec z2 = hit2.z;
+  
+        fvec dzi = 1./(z1-z0);
+  
+  //fvec qp0 = first_trip->GetQpOrig(MaxInvMom);
+    
+        const fvec vINF = .1;
+        T.chi2 = 0.;
+        T.NDF = 0.;
+        T.x  = x0;
+        T.y  = y0;
+  //T.tx = (x1-x0)*dzi;
+  //T.ty = (y1-y0)*dzi;
+        T.qp = qp0;
+        T.z  = z0;
+        T.C00 = sta0.XYInfo.C00;
+        T.C10 = sta0.XYInfo.C10;
+        T.C11 = sta0.XYInfo.C11;
+        T.C20 = T.C21 = 0;
+        T.C30 = T.C31 = T.C32 = 0;
+        T.C40 = T.C41 = T.C42 = T.C43 = 0;
+        T.C22 = T.C33 = vINF;
+        T.C44 = 1.;
+  
+        static L1FieldValue fB0, fB1, fB2 _fvecalignment;
+        static L1FieldRegion fld _fvecalignment;
+        fvec fz0 = sta1.z;
+        fvec fz1 = sta2.z;
+        fvec fz2 = sta0.z;
+//         fvec fz0 = hit1.z;
+//         fvec fz1 = hit2.z;
+//         fvec fz2 = hit0.z;
+        
+        sta1.fieldSlice.GetFieldValue( x1, y1, fB0 );
+        sta2.fieldSlice.GetFieldValue( x2, y2, fB1 );
+        sta0.fieldSlice.GetFieldValue( x0, y0, fB2 );
+
+        fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
+        int ista = ista2;
+  
+        for( int i=1; i<nHits; i++){
+          L1StsHit &hit = vStsHits[hits[i]];
+          ista = vSFlag[hit.f]/4;
+          L1Station &sta = vStations[ista];
+          fvec x = vStsStrips[hit.f];
+          fvec v = vStsStripsB[hit.b];
+          fvec y  = sta.yInfo.cos_phi*x + sta.yInfo.sin_phi*v;
+          L1Extrapolate( T, sta.z, qp0, fld );
+//           L1Extrapolate( T, hit.z, qp0, fld );
+          L1AddMaterial( T, sta.materialInfo, qp0 );
+//           if (ista==NMvdStations) L1AddPipeMaterial( T, qp0);
+          L1Filter( T, sta.frontInfo, x );
+          L1Filter( T, sta.backInfo,  v );
+          fB0 = fB1;
+          fB1 = fB2;
+          fz0 = fz1;
+          fz1 = fz2;
+          sta.fieldSlice.GetFieldValue( x, y, fB2 );
+          fz2 = sta.z;
+//           fz2 = hit.z;
+          fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
+        }
+      
+  // write received parametres in track
+        t.TLast[0] = T.x[0];
+        t.TLast[1] = T.y[0];
+        t.TLast[2] = T.tx[0];
+        t.TLast[3] = T.ty[0];
+        t.TLast[4] = T.qp[0];
+        t.TLast[5] = T.z[0];
+  
+        t.CLast[0] = T.C00[0];
+        t.CLast[1] = T.C10[0];
+        t.CLast[2] = T.C11[0];
+        t.CLast[3] = T.C20[0];
+        t.CLast[4] = T.C21[0];
+        t.CLast[5] = T.C22[0];
+        t.CLast[6] = T.C30[0];
+        t.CLast[7] = T.C31[0];
+        t.CLast[8] = T.C32[0];
+        t.CLast[9] = T.C33[0];
+        t.CLast[10] = T.C40[0];
+        t.CLast[11] = T.C41[0];
+        t.CLast[12] = T.C42[0];
+        t.CLast[13] = T.C43[0];
+        t.CLast[14] = T.C44[0];
+  
+        t.chi2 += T.chi2[0];
+        t.NDF += (int)T.NDF[0];
+      }
+      qp0 = T.qp[0];
+    }
+  } // for(int itrack
+}
+
 
 void L1Algo::KFTrackFitter()
 {

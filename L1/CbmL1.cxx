@@ -312,9 +312,10 @@ void CbmL1::Exec(Option_t * option)
 
   if( fVerbose>1 ) cout<<"L1 Track finder..."<<endl;
   algo->CATrackFinder();
+//   IdealTrackFinder();
   if( fVerbose>1 ) cout<<"L1 Track finder ok"<<endl;
-  algo->KFTrackFitter();
-  cout<<"L1 Track fitter  ok"<<endl;
+//   algo->KFTrackFitter();
+//   cout<<"L1 Track fitter  ok"<<endl;
   vRTracks.clear();
   int start_hit = 0;
   for(vector<L1Track>::iterator it = algo->vTracks.begin(); it!=algo->vTracks.end(); it++){
@@ -377,3 +378,29 @@ void CbmL1::writedir2current( TObject *obj ){
     cur->cd();
   }
 }
+
+// -----   Ideal Tracking   -----------------------------
+
+void CbmL1::IdealTrackFinder()
+{
+  algo->vTracks.clear();
+  algo->vRecoHits.clear();
+
+  for( vector<CbmL1MCTrack>::iterator i = vMCTracks.begin(); i != vMCTracks.end(); ++i){
+    CbmL1MCTrack &MC = *i;
+
+    if (MC.ID >= 0){
+      L1Track algoTr;
+      
+      algoTr.NHits = MC.StsHits.size();
+      for (int iH = 0; iH < algoTr.NHits; iH++){
+        algo->vRecoHits.push_back(MC.StsHits[iH]);
+      }
+      
+      algoTr.Momentum = MC.p;
+          
+      algo->vTracks.push_back(algoTr);
+    };
+  }
+  
+};

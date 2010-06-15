@@ -120,6 +120,8 @@ class CbmL1 : public FairTask
 
   void Performance();
 
+  void IdealTrackFinder(); // just copy MCTrack into RecoTracks.
+
   bool ReadMCPoint( CbmL1MCPoint *MC, int iPoint, bool MVD );
 
   static void writedir2current( TObject *obj );

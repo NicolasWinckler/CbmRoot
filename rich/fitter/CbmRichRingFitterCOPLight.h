@@ -1,60 +1,59 @@
-#include "CbmRichRingFitterCOP.h"
-#include "FairRootManager.h"
+#ifndef CBM_RICH_RING_FITTER_COP_LIGHT
+#define CBM_RICH_RING_FITTER_COP_LIGHT 1
+
+#include <vector>
 #include "CbmRichRingLight.h"
-#include "CbmRichRing.h"
-#include "CbmRichHit.h"
-#include "TClonesArray.h"
-#include <iostream>
 #include <cmath>
 
-using std::cout;
-using std::endl;
-using std::fabs;
-
-// -----   Default constructor   -------------------------------------------
-CbmRichRingFitterCOP::CbmRichRingFitterCOP()
+class CbmRichRingFitterCOPLight
 {
+public:
 
-}
+   CbmRichRingFitterCOPLight(){
+		fHitX.resize(MAX_NOF_HITS_IN_RING);
+		fHitY.resize(MAX_NOF_HITS_IN_RING);
+   }
+   virtual ~CbmRichRingFitterCOPLight(){
+	   fHitX.clear();
+	   fHitY.clear();
+   }
+   void DoFit(CbmRichRingLight *ring);
 
-CbmRichRingFitterCOP::~CbmRichRingFitterCOP()
+private:
+   void CalcChi2(CbmRichRingLight* ring);
+
+	static const int MAX_NOF_HITS_IN_RING = 200;
+	std::vector<float> fHitX;
+	std::vector<float> fHitY;
+	int fNofHits;
+}; //class
+
+#endif
+
+inline void CbmRichRingFitterCOPLight::DoFit(CbmRichRingLight *ring)
 {
-	fHitX.clear();
-	fHitY.clear();
-}
-
-
-
-void CbmRichRingFitterCOP::DoFit(CbmRichRing *pRing)
-{
-	fNofHits = pRing->GetNofHits();
+	fNofHits = ring->GetNofHits();
 	if (fNofHits < 3) {
-		pRing->SetRadius(0.);
-		pRing->SetCenterX(0.);
-		pRing->SetCenterY(0.);
+		ring->SetRadius(0.);
+		ring->SetCenterX(0.);
+		ring->SetCenterY(0.);
 		return;
 	}
 
 	if (fNofHits >= MAX_NOF_HITS_IN_RING) {
-		cout << "-E- CbmRichRingFitterCOP::DoFit() - Too many hits in the ring:"
-		<<fNofHits <<endl;
-		pRing->SetRadius(0.);
-		pRing->SetCenterX(0.);
-		pRing->SetCenterY(0.);
+		//cout << "-E- CbmRichRingFitterCOP::DoFit() - Too many hits in the ring:"
+		//<<fNofHits <<endl;
+		ring->SetRadius(0.);
+		ring->SetCenterX(0.);
+		ring->SetCenterY(0.);
 		return;
 	}
 
 	for (int i = 0; i < fNofHits; i++) {
-		CbmRichHit* hit = (CbmRichHit*) fHitsArray->At(pRing->GetHit(i));
-		fHitX[i] = hit->GetX();
-		fHitY[i] = hit->GetY();
+		fHitX[i] = ring->GetHit(i).fX;
+		fHitY[i] = ring->GetHit(i).fY;
 	}
 
-	FitRing(pRing);
-}
-
-void CbmRichRingFitterCOP::FitRing(CbmRichRing* ring)
-{
 	float radius = 0.;
 	float centerX = 0.;
 	float centerY = 0.;
@@ -161,29 +160,7 @@ void CbmRichRingFitterCOP::FitRing(CbmRichRing* ring)
 	CalcChi2(ring);
 }
 
-void CbmRichRingFitterCOP::Init()
-{
-	cout << "CbmRichRingFitterImpl::Init()"<<endl;
-	// Get and check FairRootManager
-	FairRootManager* ioman = FairRootManager::Instance();
-	if (! ioman) {
-		cout << "-E- CbmRichRingFitterImpl::Init()"
-		<< "RootManager not instantised!" << endl;
-		return;
-	}
-
-	// Get hit Array
-	fHitsArray = (TClonesArray*) ioman->GetObject("RichHit");
-	if ( ! fHitsArray) {
-		cout << "-W- CbmRichRingFitterImpl::Init(): No RichHit array!"
-		<< endl;
-	}
-	fHitX.resize(MAX_NOF_HITS_IN_RING);
-	fHitY.resize(MAX_NOF_HITS_IN_RING);
-}
-
-// -----   Protected method CalcChi2   ----------------------------------------
-void CbmRichRingFitterCOP::CalcChi2(CbmRichRing* pRing)
+inline void CbmRichRingFitterCOPLight::CalcChi2(CbmRichRingLight* pRing)
 {
     int fNhits=pRing->GetNofHits();
 
@@ -211,4 +188,5 @@ void CbmRichRingFitterCOP::CalcChi2(CbmRichRing* pRing)
 
     pRing->SetChi2(chi2);
 }
+
 

@@ -12,7 +12,6 @@
 #include <vector>
 
 class TClonesArray;
-class CbmRichRingLight;
 class CbmRichRing;
 
 class CbmRichRingFitterCOP
@@ -23,12 +22,11 @@ public:
    ~CbmRichRingFitterCOP();
    void Init();
 
-   void DoFit(CbmRichRingLight *ring);
    void DoFit(CbmRichRing *ring);
 
 private:
-   void FitRing(CbmRichRingLight* ring);
-   void CalcChi2(CbmRichRingLight* ring);
+   void FitRing(CbmRichRing* ring);
+   void CalcChi2(CbmRichRing* ring);
 
 	TClonesArray* fHitsArray;
 

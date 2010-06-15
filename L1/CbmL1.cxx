@@ -181,7 +181,7 @@ InitStatus CbmL1::Init()
   geo[ind++] = NStation;
 
   // field
-  const int M=3; // polinom order
+  const int M=5; // polinom order
   const int N=(M+1)*(M+2)/2;
 
   for ( Int_t ist = 0; ist<NStation; ist++ )
@@ -313,8 +313,8 @@ void CbmL1::Exec(Option_t * option)
   if( fVerbose>1 ) cout<<"L1 Track finder..."<<endl;
   algo->CATrackFinder();
   if( fVerbose>1 ) cout<<"L1 Track finder ok"<<endl;
-  //algo->KFTrackFitter();
-  //cout<<"L1 Track fitter  ok"<<endl;
+  algo->KFTrackFitter();
+  cout<<"L1 Track fitter  ok"<<endl;
   vRTracks.clear();
   int start_hit = 0;
   for(vector<L1Track>::iterator it = algo->vTracks.begin(); it!=algo->vTracks.end(); it++){

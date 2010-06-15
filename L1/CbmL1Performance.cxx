@@ -1107,7 +1107,7 @@ void CbmL1::InputPerformance()
       CbmStsPoint *pt = 0;
       if( iMC>=0 && iMC<nMC) pt = (CbmStsPoint*) listStsPts->At(iMC);
       if ( !pt ){
-        cout << " No MC points! " << "iMC=" << iMC << endl;
+//         cout << " No MC points! " << "iMC=" << iMC << endl;
         continue;
       }
       pt->Position(mcPos);

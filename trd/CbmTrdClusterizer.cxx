@@ -165,8 +165,8 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   const Bool_t Histo = false;
   //const Bool_t TEST = true;
   const Bool_t TEST = false;
-  //const Bool_t Sector = true;
-  const Bool_t Sector = false;
+  const Bool_t Sector = true;
+  //const Bool_t Sector = false;
   /*
     if (Histo){
     printf("Finale Histograms are Created and Saved to Pics/*.png\n");
@@ -633,7 +633,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       cout<<"Add ModID 111003 to TClonesArray"<<endl;
     }
 
-    new ((*fDigiCollection)[iDigi]) CbmTrdDigi(fDigiMapIt->second->GetDetId(), fDigiMapIt->second->GetCol(), fDigiMapIt->second->GetRow(), fDigiMapIt->second->GetCharge());
+    new ((*fDigiCollection)[iDigi]) CbmTrdDigi(fDigiMapIt->second->GetDetId(), fDigiMapIt->second->GetCol(), fDigiMapIt->second->GetRow(), fDigiMapIt->second->GetCharge(),fDigiMapIt->second->GetTime());
     ;
     CbmTrdDigiMatch *p = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
     std::vector<int> arr=fDigiMapIt->second->GetMCIndex();
@@ -689,10 +689,10 @@ double CbmTrdClusterizer::GetPadHeight(Int_t iRow)
   Double_t fpadsizex; //pixel widh in x;
   Double_t fpadsizey; //pixel width in y;
   Double_t temp;
-  fpadsizex    = (fModuleInfo->GetPadSizex()) * 10.; // [mm]
-  fpadsizey    = (fModuleInfo->GetPadSizey()) * 10.;
-  //fsectorsizex = (fModuleInfo->GetSectorSizex(Sector)) * 10; // [mm]
-  //fsectorsizey = (fModuleInfo->GetSectorSizey(Sector)) * 10;
+  fpadsizex    = (fModuleInfo->GetPadSizex(Sector)) * 10.; // [mm]
+  fpadsizey    = (fModuleInfo->GetPadSizey(Sector)) * 10.;
+  Double_t fsectorsizex = (fModuleInfo->GetSectorSizex(Sector)) * 10; // [mm]
+  Double_t fsectorsizey = (fModuleInfo->GetSectorSizey(Sector)) * 10;
   if (fLayer%2 == 0) //un-rotate
     {
       temp      = fpadsizex;
@@ -783,11 +783,11 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
 	{
 	  for (Int_t iSector = 0; iSector < fNoSectors; iSector++)
 	    {
-	      //fSector      = (fModuleInfo->GetSector(local_point)  );
-	      //fsectorsizex = (fModuleInfo->GetSectorSizex(iSector)) * 10; // [mm]
-	      //fsectorsizey = (fModuleInfo->GetSectorSizey(iSector)) * 10;
-	      //fpadsizex    = (fModuleInfo->GetPadSizex(iSector))    * 10.; // [mm]
-	      //fpadsizey    = (fModuleInfo->GetPadSizey(iSector))    * 10.;
+	      //fSector      = (fModuleInfo->GetSector(local_inLL)  );
+	      fsectorsizex = (fModuleInfo->GetSectorSizex(iSector)) * 10; // [mm]
+	      fsectorsizey = (fModuleInfo->GetSectorSizey(iSector)) * 10;
+	      fpadsizex    = (fModuleInfo->GetPadSizex(iSector))    * 10.; // [mm]
+	      fpadsizey    = (fModuleInfo->GetPadSizey(iSector))    * 10.;
 	      if (fLayer%2 == 0) //un-rotate
 		{
 		  temp = fsectorsizex;
@@ -805,8 +805,8 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
 	      sectorsize[iSector] =  fsectorsizey;
 	      sectorrows[iSector] =  int(fsectorsizey / fpadsizey);
 	    }
-	  //fpadsizex    = (fModuleInfo->GetPadSizex(fSector))    * 10.; // [mm]
-	  //fpadsizey    = (fModuleInfo->GetPadSizey(fSector))    * 10.;
+	  fpadsizex    = (fModuleInfo->GetPadSizex(fSector))    * 10.; // [mm]
+	  fpadsizey    = (fModuleInfo->GetPadSizey(fSector))    * 10.;
 	  if (fLayer%2 == 0) //un-rotate
 	    {
 	      temp      = fpadsizex;
@@ -818,6 +818,7 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
 	      fsizey = temp;
 	    }
 	}
+      /*
       else
 	{
 	  fpadsizex    = (fModuleInfo->GetPadSizex()) * 10.; // [mm]
@@ -837,7 +838,7 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
 	      fsizey = temp;
 	    }
 	}
-          	
+      */   	
 
       /*
 	padsize    = {fpadsizex, fpadsizey, 0.};

@@ -36,7 +36,7 @@
 #include "CbmTrdStringToken.h"
 #endif
 
-#include "sqlite/sqlite3.h" // used for the lookup table option
+//#include "sqlite/sqlite3.h" // used for the lookup table option
 
 #include <iostream>
 using std::cout;

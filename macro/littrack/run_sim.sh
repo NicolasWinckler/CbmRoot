@@ -92,6 +92,8 @@ for Y in 0; do
   export GLOBALRECOFILE=$DIR/global.reco.$XXXX.root
   export GLOBALHITSFILE=$DIR/global.hits.$XXXX.root
   export GLOBALTRACKSFILE=$DIR/global.tracks.$XXXX.root
+  export RICHFILE=$DIR/rich.reco.$XXXX.root
+  export ELIDFILE=$DIR/elid.qa.$XXXX.root
   
   COUNT=0
   while [ $COUNT -lt $NPLUTO ]; do

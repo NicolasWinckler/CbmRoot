@@ -9,6 +9,10 @@ root -b -q "./global_hits.C($NEVENTS)"
 
 root -b -q "./global_tracking.C($NEVENTS)"
 
+root -b -q "../rich/run/run_reco_rich.C($NEVENTS)"
+
+root -b -q "../rich/electronId/run_electrons_qa.C($NEVENTS)"
+
 #root -b -q "./global_reco.C($NEVENTS)"
 
 

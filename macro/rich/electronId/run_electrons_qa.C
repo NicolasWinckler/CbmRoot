@@ -1,15 +1,29 @@
 void run_electrons_qa(Int_t nEvents = 100)
 {
 
-	Int_t iVerbose = 0;
+    Int_t iVerbose = 0;
 
-	TString inFile1 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
-	TString inFile2 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
-	TString parFile ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
+    TString script = TString(gSystem->Getenv("SCRIPT"));
+    TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString stsDigiFile = "sts_standard.digi.par";
+    gRandom->SetSeed(10);
 
-	TString outFile ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.qa.root";
+    TString inFile1 = "", inFile2 = "", inFile3 = "", inFile4 = "", parFile = "", outFile ="";
+
+    if (script != "yes") {
+        TString inFile1 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
+        TString inFile2 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
+        TString parFile ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
+        TString outFile ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.qa.root";
+    } else {
+    	inFile1 = TString(gSystem->Getenv("MCFILE"));
+    	inFile2 = TString(gSystem->Getenv("GLOBALHITSFILE"));
+    	inFile3 = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
+    	inFile4 = TString(gSystem->Getenv("RICHFILE"));
+    	parFile = TString(gSystem->Getenv("PARFILE"));
+    	outFile = TString(gSystem->Getenv("ELIDFILE"));
+    }
+    //TString stsDigiFile = "sts_standard.digi.par";
 
 	gDebug = 0;
 
@@ -22,14 +36,23 @@ void run_electrons_qa(Int_t nEvents = 100)
 	cbmlibs();
 
 	FairRunAna *run = new FairRunAna();
-	run->SetInputFile(inFile1);
-	run->AddFriend(inFile2);
+	if (inFile1 != "") run->SetInputFile(inFile1);
+	if (inFile2 != "") run->AddFriend(inFile2);
+	if (inFile3 != "") run->AddFriend(inFile3);
+	if (inFile4 != "") run->AddFriend(inFile4);
+
 	run->SetOutputFile(outFile);
+
+	// ----------- TRD track Pid Ann ----------------------
+	CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new
+	    CbmTrdSetTracksPidANN("Ann","Ann");
+	run->AddTask(trdSetTracksPidAnnTask);
+	// ----------------------------------------------------
 
 	CbmRichElectronsQa* richQa = new CbmRichElectronsQa("Qa", "qa", 0);
 	richQa->SetGeoType("compact"); //or large
 	richQa->SetRichAnnCut(-0.5);
-	richQa->SetUseRichAnn(false);
+	richQa->SetUseRichAnn(true);
 	richQa->SetTrdAnnCut(0.8);
 	richQa->SetMeanA(5.02);
 	richQa->SetMeanB(4.68);
@@ -41,16 +64,16 @@ void run_electrons_qa(Int_t nEvents = 100)
 	run->AddTask(richQa);
 
 	// -----  Parameter database   --------------------------------------------
-	TString stsDigi = gSystem->Getenv("VMCWORKDIR");
-	stsDigi += "/parameters/sts/";
-	stsDigi += stsDigiFile;
+       // TString stsDigi = gSystem->Getenv("VMCWORKDIR");
+       // stsDigi += "/parameters/sts/";
+       // stsDigi += stsDigiFile;
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();
 	FairParRootFileIo* parIo1 = new FairParRootFileIo();
-	FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
+	//FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
 	parIo1->open(parFile.Data());
-	parIo2->open(stsDigi.Data(), "in");
+	//parIo2->open(stsDigi.Data(), "in");
 	rtdb->setFirstInput(parIo1);
-	rtdb->setSecondInput(parIo2);
+	//rtdb->setSecondInput(parIo2);
 	rtdb->setOutput(parIo1);
 	rtdb->saveOutput();
 	// ------------------------------------------------------------------------

@@ -165,7 +165,7 @@ InitStatus CbmRichRingQa::Init()
 	}
 
 	// get TrackMatch array
-	fTrackMatch = (TClonesArray*) ioman->GetObject("STSTrackMatch");
+	fTrackMatch = (TClonesArray*) ioman->GetObject("StsTrackMatch");
 	if (!fTrackMatch) {
 		cout << "-E- CbmRichRingQa::Init: No track match array!" << endl;
 		//return kERROR;

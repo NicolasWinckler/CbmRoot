@@ -623,9 +623,7 @@ void CbmRichElectronsQa::GlobalTracksMatchEff()
 	Int_t nGlTracks = fGlobalTracks->GetEntriesFast();
 
 	for (Int_t iTrack=0; iTrack<nGlTracks; iTrack++) {
-
 		CbmGlobalTrack* gTrack = (CbmGlobalTrack*)fGlobalTracks->At(iTrack);
-
 ///STS and RICH
 		Int_t stsIndex = gTrack->GetStsTrackIndex();
 		if (stsIndex == -1)continue;
@@ -735,7 +733,7 @@ void CbmRichElectronsQa::GlobalTracksElIdEff()
         	fhTrueIdRich->Fill(momentum);
 		}
 
-		/// pions supression
+		/// pions suppression
 		if ( pdg == 211 &&  mcIdRich != -1 && IsRichElectron(richRing, momentum)){
         	fNofPiasElRich++;
         	fhPiasElRich->Fill(momentum);
@@ -779,12 +777,11 @@ void CbmRichElectronsQa::GlobalTracksElIdEff()
 				&& mcIdSts == mcIdRich && mcIdRich != -1 &&
 				IsRichElectron(richRing, momentum) && IsTrdElectron(trdTrack)
 				&& IsTofElectron(gTrack, momentum)) {
-
 			fNofTrueIdRichTrdTof++;
 			fhTrueIdRichTrdTof->Fill(momentum);
 		}
 
-		/// pions supression
+		/// pions suppression
 		if (pdg == 211 && mcIdRich != -1 && IsRichElectron(richRing, momentum)
 				&& IsTrdElectron(trdTrack) && IsTofElectron(gTrack, momentum)) {
 			fNofPiasElRichTrdTof++;

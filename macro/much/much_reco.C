@@ -256,4 +256,8 @@ void much_reco(
 	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << endl;
 	cout << endl;
 	// ------------------------------------------------------------------------
+
+        cout << " Test passed" << endl;
+        cout << " All ok " << endl;
+
 }

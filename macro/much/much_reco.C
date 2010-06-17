@@ -10,7 +10,7 @@
  * global tracking independently.
  **/
 
-void global_reco(
+void much_reco(
 		Int_t nEvents = 100, // number of events
 		TString opt = "all") // if opt == "all" STS + hit producers + global tracking are executed
                              // if opt == "hits" STS + hit producers are executed

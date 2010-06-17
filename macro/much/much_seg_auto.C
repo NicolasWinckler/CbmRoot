@@ -20,6 +20,8 @@ void much_seg_auto(const char* mcFile = "",
   if (digiFile == "") {
     digiFile = "data/much_digi.root";
   }
+  TString parFile="data/params.root";
+
 
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;
@@ -58,11 +60,11 @@ void much_seg_auto(const char* mcFile = "",
   // -----  Parameter database   --------------------------------------------
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo*  parIo1 = new FairParRootFileIo();
-  parIo1->open(gFile);
+  parIo1->open(parFile);
   rtdb->setFirstInput(parIo1);
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
-  fRun->LoadGeometry();
+//  fRun->LoadGeometry();
   // ------------------------------------------------------------------------
 
 

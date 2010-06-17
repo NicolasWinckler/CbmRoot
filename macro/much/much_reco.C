@@ -23,11 +23,11 @@ void much_reco(
 	//Double_t trdHitErr = 100; // if == 0 than standard errors are used
 	if (script != "yes") {
 		// Output directory
-		dir  = "/d/cbm02/andrey/std13_10mu_urqmd/";
+		dir  = "data/";
 		// MC transport file
-		mcFile = dir + "mc.0000.root";
+		mcFile = dir + "Jpsi.auau.25gev.centr.mc.root";
 		// Parameters file
-		parFile = dir + "param.0000.root";
+		parFile = dir + "params.root";
 		// Output file with reconstructed tracks and hits
 		globalRecoFile = dir + "global.reco.0000.root";
 		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
@@ -41,7 +41,7 @@ void much_reco(
 		// MUST be consistent with MUCH geometry used in MC transport.
 		muchDigiFile = parDir + "/much/much_standard.digi.root";
 		// Directory for output images
-		TString imageDir = "./test/";
+		TString imageDir = "./data/";
 		// Tracking type
 		trackingType = "branch";
 	} else {
@@ -233,7 +233,7 @@ void much_reco(
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();
 	FairParRootFileIo* parIo1 = new FairParRootFileIo();
 	FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
-	parIo1->open(parFile.Data());
+	parIo1->open(parFile);
 	parIo2->open(stsDigiFile.Data(),"in");
 	rtdb->setFirstInput(parIo1);
 	rtdb->setSecondInput(parIo2);

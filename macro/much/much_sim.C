@@ -26,6 +26,7 @@ void much_sim(TString inputSignal = "",
   if (outFile == "") {
     outFile = "data/Jpsi.auau.25gev.centr.mc.root";
   }
+  TString parFile = "data/params.root";
 
   // -----   Confirm input parameters    ------------------------------------
   cout << endl;
@@ -212,7 +213,7 @@ void much_sim(TString inputSignal = "",
   fieldPar->setInputVersion(fRun->GetRunId(),1);
   Bool_t kParameterMerged = kTRUE;
   FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
-  parOut->open(gFile);
+  parOut->open(parFile);
   rtdb->setOutput(parOut);
   rtdb->saveOutput();
   rtdb->print();

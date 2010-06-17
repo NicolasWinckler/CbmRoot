@@ -30,21 +30,32 @@ void draw_electrons_qa()
 	//gStyle->SetHistLineWidth(3);
 	//gROOT->ForceStyle();
 
-	TCanvas *c1 = new TCanvas("c1","c1",500,500);
+// get all histos from file
 	TH1D* fhAccRings = (TH1D*)file->Get("fhAccRings");
 	TH1D* fhMCRings = (TH1D*)file->Get("fhMCRings");
+	TH1D* fhAccRichTrdGlobal = (TH1D*)file->Get("fhAccRichTrdGlobal");
+    TH1D* fhAccRichTrdGlobal = (TH1D*)file->Get("fhAccRichTrdTofGlobal");
+	TH1D* fhTrueFoundRings = (TH1D*)file->Get("fhTrueFoundRings");
+	TH1D* fhTrueMatchStsRichGlobal = (TH1D*)file->Get("fhTrueMatchStsRichGlobal");
+	TH1D* fhTrueMatchStsRichTrdGlobal = (TH1D*)file->Get("fhTrueMatchStsRichTrdGlobal");
+	TH1D* fhTrueMatchStsRichTrdTofGlobal = (TH1D*)file->Get("fhTrueMatchStsRichTrdTofGlobal");
+	TH1D* fhTrueIdRich = (TH1D*)file->Get("fhTrueIdRich");
+	TH1D* fhTrueIdRichTrd = (TH1D*)file->Get("fhTrueIdRichTrd");
+	TH1D* fhTrueIdRichTrdTof = (TH1D*)file->Get("fhTrueIdRichTrdTof");
+	TH1D* fhAccPi = (TH1D*)file->Get("fhAccPi");
+	TH1D* fhPiasElRich = (TH1D*)file->Get("fhPiasElRich");
+	TH1D* fhPiasElRichTrd = (TH1D*)file->Get("fhPiasElRichTrd");
+	TH1D* fhPiasElRichTrdTof = (TH1D*)file->Get("fhPiasElRichTrdTof");
+
+
+	TCanvas *c1 = new TCanvas("c1","c1",500,500);
 	TH1D* accEff1 = Divide1DHists(fhAccRings, fhMCRings, "elid_acc_rich_eff",
 		"Efficiencies for primary electrons normalized to MC rings",
 		"momentum, GeV/c", "efficiency");
 	accEff1->SetMinimum(0.);
 
-	TH1D* fhAccRichTrdGlobal = (TH1D*)file->Get("fhAccRichTrdGlobal");
-    TH1D* accEff2 = Divide1DHists(fhAccRichTrdGlobal, fhMCRings, "elid_acc_rich_trd_eff",
-    	"",	"", "");
-
-    TH1D* fhAccRichTrdGlobal = (TH1D*)file->Get("fhAccRichTrdTofGlobal");
-    TH1D* accEff3 = Divide1DHists(fhAccRichTrdTofGlobal, fhMCRings, "elid_acc_rich_trd_tof_eff",
-        "", "", "");
+    TH1D* accEff2 = Divide1DHists(fhAccRichTrdGlobal, fhMCRings, "elid_acc_rich_trd_eff","","", "");
+    TH1D* accEff3 = Divide1DHists(fhAccRichTrdTofGlobal, fhMCRings, "elid_acc_rich_trd_tof_eff", "", "", "");
 
 	std::string hname1, hname2, hname3, hname4;
 	hname1 = "accepted RICH rings (" + CalcEfficiency(fhAccRings, fhMCRings)+")";
@@ -57,23 +68,15 @@ void draw_electrons_qa()
     gPad->SetGridy(true);
 
     TCanvas *c2 = new TCanvas("c2","c2",500,500);
-	TH1D* fhTrueFoundRings = (TH1D*)file->Get("fhTrueFoundRings");
+
 	TH1D* ringFindEff = Divide1DHists(fhTrueFoundRings, fhAccRings, "elid_ring_find_eff",
 		"Ring finding efficiencies for primary electrons (norm. acc. rings)",
 		"momentum, GeV/c", "efficiency");
 	ringFindEff->SetMinimum(0.);
 
-	TH1D* fhTrueMatchStsRichGlobal = (TH1D*)file->Get("fhTrueMatchStsRichGlobal");
-	TH1D* stsRichEff = Divide1DHists(fhTrueMatchStsRichGlobal, fhAccRings,
-			"elid_sts_rich_eff","",	"", "");
-
-	TH1D* fhTrueMatchStsRichTrdGlobal = (TH1D*)file->Get("fhTrueMatchStsRichTrdGlobal");
-	TH1D* stsRichTrdEff = Divide1DHists(fhTrueMatchStsRichTrdGlobal, fhAccRings,
-			"elid_sts_rich_trd_eff","",	"", "");
-
-	TH1D* fhTrueMatchStsRichTrdTofGlobal = (TH1D*)file->Get("fhTrueMatchStsRichTrdTofGlobal");
-	TH1D* stsRichTrdTofEff = Divide1DHists(fhTrueMatchStsRichTrdTofGlobal, fhAccRings,
-			"elid_sts_rich_trd_eff","",	"", "");
+	TH1D* stsRichEff = Divide1DHists(fhTrueMatchStsRichGlobal, fhAccRings,"elid_sts_rich_eff","",	"", "");
+	TH1D* stsRichTrdEff = Divide1DHists(fhTrueMatchStsRichTrdGlobal, fhAccRings,"elid_sts_rich_trd_eff","",	"", "");
+	TH1D* stsRichTrdTofEff = Divide1DHists(fhTrueMatchStsRichTrdTofGlobal, fhAccRings,"elid_sts_rich_trd_eff","",	"", "");
 
 	hname1 = "ring finding (" +CalcEfficiency(fhTrueFoundRings,fhAccRings)+")";
 	hname2 = "STS+RICH match (" +CalcEfficiency(fhTrueMatchStsRichGlobal,fhAccRings)+")";
@@ -134,13 +137,8 @@ void draw_electrons_qa()
 	c7->cd(1);
 	ringFindEff->SetMinimum(0.);
 
-	TH1D* fhTrueIdRich = (TH1D*)file->Get("fhTrueIdRich");
 	TH1D* elidEffRich = Divide1DHists(fhTrueIdRich, fhAccRings,	"elid_rich_eff","",	"", "");
-
-	TH1D* fhTrueIdRichTrd = (TH1D*)file->Get("fhTrueIdRichTrd");
 	TH1D* elidEffRichTrd = Divide1DHists(fhTrueIdRichTrd, fhAccRings, "elid_rich_trd_eff","","", "");
-
-	TH1D* fhTrueIdRichTrdTof = (TH1D*)file->Get("fhTrueIdRichTrdTof");
 	TH1D* elidEffRichTrdTof = Divide1DHists(fhTrueIdRichTrdTof, fhAccRings,	"elid_rich_trd_eff","",	"", "");
 
 	hname1 = "ring finding (" +CalcEfficiency(fhTrueFoundRings,fhAccRings)+")";
@@ -155,16 +153,10 @@ void draw_electrons_qa()
     gPad->SetGridy(true);
 
 	c7->cd(2);
-	TH1D* fhAccPi = (TH1D*)file->Get("fhAccPi");
-	TH1D* fhPiasElRich = (TH1D*)file->Get("fhPiasElRich");
 	TH1D* piSuprRich = Divide1DHists(fhAccPi, fhPiasElRich,	"elid_pisup_rich","","", "");
     piSuprRich->SetMinimum(5);
     piSuprRich->SetMaximum(1e5);
-
-	TH1D* fhPiasElRichTrd = (TH1D*)file->Get("fhPiasElRichTrd");
 	TH1D* piSuprRichTrd = Divide1DHists(fhAccPi, fhPiasElRichTrd, "elid_pisup_rich_trd","","", "");
-
-	TH1D* fhPiasElRichTrdTof = (TH1D*)file->Get("fhPiasElRichTrdTof");
 	TH1D* piSuprRichTrdTof = Divide1DHists(fhAccPi, fhPiasElRichTrdTof,	"elid_pisup_rich_trd_tof","","", "");
 
 	hname1 = "RICH (" +CalcEfficiency(fhAccPi,fhPiasElRich)+")";
@@ -181,8 +173,6 @@ void draw_electrons_qa()
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
-
-
 
 ////Draw difference electron-pion
     TCanvas* c6 = new TCanvas("c6","c6",500,500);

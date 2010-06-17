@@ -8,6 +8,7 @@
 #define CBMLITDRAWHIST_H_
 
 #include "TH1.h"
+#include "TH1D.h"
 #include "TH2.h"
 #include "TPad.h"
 #include "TLegend.h"
@@ -218,5 +219,27 @@ void DrawGraph2D(
 		Bool_t logy,
 		Bool_t logz,
 		const std::string& drawOpt);
+
+/* Divide two histograms.
+ * @param h1 Pointer to the first histogram.
+ * @param h2 Pointer to the second histogram.
+ * @param name name of a new histogram.
+ * @param title histogram title.
+ * @param axisX X axis title.
+ * @param axisY Y axis title.
+ */
+TH1D* Divide1DHists(
+		TH1D* h1,
+		TH1D* h2,
+		const std::string& name,
+		const std::string& title,
+		const std::string& axisX,
+		const std::string& axisY);
+
+
+std::string CalcEfficiency(
+		TH1* histRec,
+		TH1* histAcc);
+
 
 #endif

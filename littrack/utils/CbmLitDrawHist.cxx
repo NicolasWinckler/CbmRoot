@@ -7,13 +7,14 @@
 
 #include "TH1.h"
 #include "TH2.h"
+#include "TH1D.h"
 #include "TPad.h"
 #include "TLegend.h"
 #include "TLatex.h"
 #include "TStyle.h"
 #include "TGraph.h"
 #include "TGraph2D.h"
-
+#include "TMath.h"
 #include <string>
 
 /* Set default styles for histograms. */
@@ -112,7 +113,7 @@ void DrawHist1D(
 		TH1* hist1,
 		TH1* hist2,
 		TH1* hist3,
-                TH1* hist4,
+        TH1* hist4,
 		const std::string& legendLabel,
 		const std::string& xAxisLabel,
 		const std::string& yAxisLabel,
@@ -128,26 +129,40 @@ void DrawHist1D(
 		Double_t x2,
 		Double_t y2)
 {
-	if (hist1 != NULL) DrawHist1D(hist1, xAxisLabel, yAxisLabel,
+	Double_t max;
+	if (hist1 != NULL){
+		DrawHist1D(hist1, xAxisLabel, yAxisLabel,
 			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 			LIT_MARKER_STYLE1, logx, logy, "");
+		max = hist1->GetMaximum();
+	}
 
-	if (hist2 != NULL) DrawHist1D(hist2, xAxisLabel, yAxisLabel,
+	if (hist2 != NULL){
+		DrawHist1D(hist2, xAxisLabel, yAxisLabel,
 			LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
-						LIT_MARKER_STYLE2, logx, logy, "SAME");
+			LIT_MARKER_STYLE2, logx, logy, "SAME");
+		if (max < hist2->GetMaximum()) max = hist2->GetMaximum();
+	}
 
-	if (hist3 != NULL) DrawHist1D(hist3, xAxisLabel, yAxisLabel,
+	if (hist3 != NULL){
+		DrawHist1D(hist3, xAxisLabel, yAxisLabel,
 			LIT_COLOR3, LIT_LINE_WIDTH, LIT_LINE_STYLE3, LIT_MARKER_SIZE,
-				      LIT_MARKER_STYLE3, logx, logy, "SAME");
+			LIT_MARKER_STYLE3, logx, logy, "SAME");
+		if (max < hist3->GetMaximum()) max = hist3->GetMaximum();
+	}
 
-        if (hist4 != NULL) DrawHist1D(hist4, xAxisLabel, yAxisLabel,
+    if (hist4 != NULL) {
+    	DrawHist1D(hist4, xAxisLabel, yAxisLabel,
 			LIT_COLOR4, LIT_LINE_WIDTH, LIT_LINE_STYLE4, LIT_MARKER_SIZE,
-				      LIT_MARKER_STYLE4, logx, logy, "SAME");
+			LIT_MARKER_STYLE4, logx, logy, "SAME");
+		if (max < hist4->GetMaximum()) max = hist4->GetMaximum();
+	}
 
+    if (hist1 != NULL) hist1->SetMaximum(max * 1.05);
 
 	TLegend* l1 = new TLegend(x1, y1, x2, y2);
 	l1->SetFillColor(kWhite);
-	l1->SetHeader(legendLabel.c_str());
+	if (legendLabel != "") l1->SetHeader(legendLabel.c_str());
 	if (hist1 != NULL) l1->AddEntry(hist1,hist1label.c_str(),"lp");
 	if (hist2 != NULL) l1->AddEntry(hist2,hist2label.c_str(),"lp");
 	if (hist3 != NULL) l1->AddEntry(hist3,hist3label.c_str(),"lp");
@@ -288,3 +303,32 @@ void DrawGraph2D(
 	graph->Draw(drawOpt.c_str());
 }
 
+TH1D* Divide1DHists(
+		TH1D* h1,
+		TH1D* h2,
+		const std::string& name,
+		const std::string& title,
+		const std::string& axisX,
+		const std::string& axisY)
+{
+	h1->Sumw2();
+	h2->Sumw2();
+	TH1D* h3 = new TH1D(name.c_str(), std::string(title +";"+axisX+";"+ axisY).c_str(),
+			h1->GetNbinsX(), h1->GetXaxis()->GetXmin(),h1->GetXaxis()->GetXmax());
+	h3->Divide(h1, h2, 1., 1., "B");
+	return h3;
+}
+
+std::string CalcEfficiency(
+		TH1* histRec,
+		TH1* histAcc)
+{
+	if (histAcc->GetEntries() == 0) return "0.0";
+	else {
+		Double_t eff = Double_t(histRec->GetEntries()) / Double_t(histAcc->GetEntries());
+		std::stringstream ss;
+		ss.precision(3);
+		ss << eff;
+		return ss.str();
+	}
+}

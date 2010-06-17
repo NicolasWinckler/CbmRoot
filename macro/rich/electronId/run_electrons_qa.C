@@ -43,6 +43,16 @@ void run_electrons_qa(Int_t nEvents = 100)
 
 	run->SetOutputFile(outFile);
 
+	//--------------------- RICH ring-track assignment ------------------------
+	Double_t richDistance = 10.; // Max. dist. ring center to track [cm]
+	Int_t richNPoints = 5; // Minimum number of hits on ring
+	CbmRichRingTrackAssign* richAssign = new CbmRichRingTrackAssignClosestD(
+			richDistance, richNPoints, iVerbose);
+	CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
+	assignTrack->UseAssign(richAssign);
+	run->AddTask(assignTrack);
+	// ------------------------------------------------------------------------
+
 	// ----------- TRD track Pid Ann ----------------------
 	CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new
 	    CbmTrdSetTracksPidANN("Ann","Ann");

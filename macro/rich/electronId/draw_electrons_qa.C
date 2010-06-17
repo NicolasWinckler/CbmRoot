@@ -27,8 +27,8 @@ void draw_diff_el_pi(TH1D* h1, TH1D* h2)
 }
 
 void draw_electrons_qa(){
- 	TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.qa.root");
-
+       // TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.qa.root");
+	TFile *file = new TFile( "/d/cbm02/andrey/test_electrons/elid.qa.0000.root");
    gROOT->SetStyle("Plain");
     gStyle->SetPalette(1,0);
    // gStyle->SetOptStat(0000);

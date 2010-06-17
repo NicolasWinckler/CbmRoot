@@ -10,12 +10,17 @@
  * global tracking independently.
  **/
 
-void global_reco(Int_t nEvents = 100)
+void global_reco(
+		Int_t nEvents = 100, // number of events
+		TString opt = "all") // if opt == "all" STS + hit producers + global tracking are executed
+                                 // if opt == "hits" STS + hit producers are executed
+                                 // if opt == "tracking" global tracking is executed
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-	TString dir, mcFile, parFile, globalRecoFile, muchDigiFile;
+	TString dir, imageDir, mcFile, parFile, globalRecoFile, stsDigiFile, muchDigiFile, trackingType;
+	//Double_t trdHitErr = 100; // if == 0 than standard errors are used
 	if (script != "yes") {
 		// Output directory
 		dir  = "/d/cbm02/andrey/std13_10mu_urqmd/";
@@ -24,18 +29,32 @@ void global_reco(Int_t nEvents = 100)
 		// Parameters file
 		parFile = dir + "param.0000.root";
 		// Output file with reconstructed tracks and hits
-		globalRecoFile = dir + "global.reco.newsts.0000.root";
+		globalRecoFile = dir + "global.reco.0000.root";
+		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
+		globalHitsFile = dir + "global.hits.0000.root";
+		// Output file with global tracks
+		globalTracksFile = dir + "global.tracks.0000.root";
+		// Digi scheme file for STS.
+		// MUST be consistent with STS geometry used in MC transport.
+		stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
 		// Digi scheme file for MUCH.
 		// MUST be consistent with MUCH geometry used in MC transport.
 		muchDigiFile = parDir + "/much/much_standard.digi.root";
-//		muchDigiFile = parDir + "/much/much_standard_trd.digi.root";
-//		muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
+		// Directory for output images
 		TString imageDir = "./test/";
+		// Tracking type
+		trackingType = "nn";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
 		globalRecoFile = TString(gSystem->Getenv("GLOBALRECOFILE"));
+		globalHitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
+		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
+		stsDigiFile = TString(gSystem->Getenv("STSDIGI"));
 		muchDigiFile = TString(gSystem->Getenv("MUCHDIGI"));
+		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
+		trackingType = TString(gSystem->Getenv("TRACKINGTYPE"));
+		//trdHitErr = TString(gSystem->Getenv("TRDHITERR"))->Atof();
 	}
 
 	Int_t iVerbose = 1;
@@ -53,126 +72,162 @@ void global_reco(Int_t nEvents = 100)
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
 
 	FairRunAna *run= new FairRunAna();
-	run->SetInputFile(mcFile);
-	run->SetOutputFile(globalRecoFile);
-
-	TString stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
-
-	// ----- STS reconstruction   ---------------------------------------------
-	FairTask* stsDigitize = new CbmStsDigitize("STSDigitize", iVerbose);
-	run->AddTask(stsDigitize);
-
-        FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
-        run->AddTask(stsClusterFinder);
-
-	FairTask* stsFindHits = new CbmStsFindHits("STSFindHits", iVerbose);
-	run->AddTask(stsFindHits);
-
-	FairTask* stsMatchHits = new CbmStsMatchHits("STSMatchHits", iVerbose);
-//        stsmatchHits->SetRealisticResponse();
-	run->AddTask(stsMatchHits);
-
-	FairTask* kalman= new CbmKF();
-	run->AddTask(kalman);
-	FairTask* l1 = new CbmL1();
-	run->AddTask(l1);
-	CbmStsTrackFinder* trackFinder    = new CbmL1StsTrackFinder();
-//	CbmStsTrackFinder* trackFinder    = new CbmStsTrackFinderIdeal();
-	FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder);
-	run->AddTask(findTracks);
-
-	FairTask* stsMatchTracks = new CbmStsMatchTracks("STSMatchTracks", iVerbose);
-	run->AddTask(stsMatchTracks);
-
-	CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
-	FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter", trackFitter, iVerbose);
-	run->AddTask(fitTracks);
-	// ------------------------------------------------------------------------
-
-	if (IsMuch(parFile)) {
-	// ----- MUCH hits----------   --------------------------------------------
-		CbmMuchDigitizeSimpleGem* muchDigitize = new CbmMuchDigitizeSimpleGem("MuchDigitize", muchDigiFile.Data(), iVerbose);
-		run->AddTask(muchDigitize);
-		CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws("MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
-		run->AddTask(strawDigitize);
-
-		CbmMuchFindHitsSimpleGem* muchFindHits = new CbmMuchFindHitsSimpleGem("MuchFindHits", muchDigiFile.Data(), iVerbose);
-		run->AddTask(muchFindHits);
-		CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws("MuchFindHitsStraws", muchDigiFile.Data(), iVerbose);
-		run->AddTask(strawFindHits);
-	// ------------------------------------------------------------------------
+	if (opt == "all") {
+		run->SetInputFile(mcFile);
+		run->SetOutputFile(globalRecoFile);
+	} else if (opt == "hits") {
+		run->SetInputFile(mcFile);
+		run->SetOutputFile(globalHitsFile);
+	} else if (opt == "tracking") {
+		run->SetInputFile(mcFile);
+		run->AddFriend(globalHitsFile);
+		run->SetOutputFile(globalTracksFile);
+	} else {
+		std::cout << "-E- Incorrect opt parameter" << std::endl;
+		exit();
 	}
 
-	if (IsTrd(parFile)){
-	// ----- TRD hits ---------------------------------------------------------
-		// Update of the values for the radiator F.U. 17.08.07
-		Int_t trdNFoils    = 130;      // number of polyetylene foils
-		Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
-		Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
-		Bool_t simpleTR = kTRUE;       // use fast and simple version for TR
-									   // production
+	if (opt == "all" || opt == "hits") {
+		// ----- STS reconstruction   ---------------------------------------------
+		FairTask* stsDigitize = new CbmStsIdealDigitize("STSDigitize", iVerbose);
+		run->AddTask(stsDigitize);
 
-		CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,	 trdDFoils, trdDGap);
+	//  FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
+	//  run->AddTask(stsClusterFinder);
 
-		Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
-		// Resolutions in y - station and angle dependent [mum]
-		Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
-		Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
-		Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
+		FairTask* stsFindHits = new CbmStsIdealFindHits("STSFindHits", iVerbose);
+		run->AddTask(stsFindHits);
 
-		CbmTrdHitProducerSmearing* trdHitProd = new
-				 CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
+		FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);
+		run->AddTask(stsMatchHits);
 
-		trdHitProd->SetSigmaX(trdSigmaX);
-		trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
-		run->AddTask(trdHitProd);
-	// ------------------------------------------------------------------------
+		FairTask* kalman= new CbmKF();
+		run->AddTask(kalman);
+		FairTask* l1 = new CbmL1();
+		run->AddTask(l1);
+		CbmStsTrackFinder* trackFinder    = new CbmL1StsTrackFinder();
+	//	CbmStsTrackFinder* trackFinder    = new CbmStsTrackFinderIdeal();
+		FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder);
+		run->AddTask(findTracks);
+
+		FairTask* stsMatchTracks = new CbmStsMatchTracks("STSMatchTracks", iVerbose);
+		run->AddTask(stsMatchTracks);
+
+		CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
+		FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter", trackFitter, iVerbose);
+		run->AddTask(fitTracks);
+
+		//	FairTask* stsFHQa = new CbmStsFindHitsQa("STSFindHitsQA",iVerbose);
+		//	run->AddTask(stsFHQa);
+
+		//  FairTask* stsRecoQa = new CbmStsReconstructionQa(kFALSE, 4, 0.7, 1);
+		//	run->AddTask(stsRecoQa);
+		// ------------------------------------------------------------------------
+
+		if (IsMuch(parFile)) {
+		// ----- MUCH hits----------   --------------------------------------------
+			CbmMuchDigitizeSimpleGem* muchDigitize = new CbmMuchDigitizeSimpleGem("MuchDigitize", muchDigiFile.Data(), iVerbose);
+			run->AddTask(muchDigitize);
+			CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws("MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
+			run->AddTask(strawDigitize);
+
+			CbmMuchFindHitsSimpleGem* muchFindHits = new CbmMuchFindHitsSimpleGem("MuchFindHits", muchDigiFile.Data(), iVerbose);
+			run->AddTask(muchFindHits);
+			CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws("MuchFindHitsStraws", muchDigiFile.Data(), iVerbose);
+			run->AddTask(strawFindHits);
+		// ------------------------------------------------------------------------
+		}
+
+		if (IsTrd(parFile)){
+		// ----- TRD hits ---------------------------------------------------------
+			// Update of the values for the radiator F.U. 17.08.07
+			Int_t trdNFoils    = 130;      // number of polyetylene foils
+			Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
+			Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
+			Bool_t simpleTR = kTRUE;       // use fast and simple version for TR
+										   // production
+
+			CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,	 trdDFoils, trdDGap);
+
+			Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
+			// Resolutions in y - station and angle dependent [mum]
+			Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
+			Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
+			Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
+
+	//		Double_t trdSigmaX[] = {trdHitErr, trdHitErr, trdHitErr};             // Resolution in x [mum]
+	//		// Resolutions in y - station and angle dependent [mum]
+	//		Double_t trdSigmaY1[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
+	//		Double_t trdSigmaY2[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
+	//		Double_t trdSigmaY3[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
+
+			CbmTrdHitProducerSmearing* trdHitProd = new
+					 CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
+	//		CbmTrdHitProducerSmearing* trdHitProd = new
+	//						 CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", NULL);
+
+			trdHitProd->SetSigmaX(trdSigmaX);
+			trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
+			run->AddTask(trdHitProd);
+		// ------------------------------------------------------------------------
+		}
+
+		if (IsTof(parFile)) {
+		// ------ TOF hits --------------------------------------------------------
+			CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
+			run->AddTask(tofHitProd);
+		// ------------------------------------------------------------------------
+		}
 	}
 
-	if (IsTof(parFile)) {
-	// ------ TOF hits --------------------------------------------------------
-		CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
-		run->AddTask(tofHitProd);
-	// ------------------------------------------------------------------------
+	if (opt == "all" || opt == "tracking") {
+		// ------ Global track reconstruction -------------------------------------
+		//	FairGeane* Geane = new FairGeane(parFile.Data());
+		//	FairGeane *Geane = new FairGeane();
+		//	run->AddTask(Geane);
+
+		CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
+		// Tracking method to be used
+		// "branch" - branching tracking
+		// "nn" - nearest neighbor tracking
+		// "weight" - weighting tracking
+		finder->SetTrackingType(std::string(trackingType));
+
+		// Hit-to-track merger method to be used
+		// "nearest_hit" - assigns nearest hit to the track
+		finder->SetMergerType("nearest_hit");
+
+		run->AddTask(finder);
+
+		if (IsTrd(parFile)) {
+			CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
+			run->AddTask(trdMatchTracks);
+
+//			CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new CbmTrdSetTracksPidANN("Ann","Ann");
+//			run->AddTask(trdSetTracksPidAnnTask);
+		}
+
+		if (IsMuch(parFile)) {
+			CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
+			run->AddTask(muchMatchTracks);
+		}
+
+		// -----   Track finding QA check   ------------------------------------
+		CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
+		reconstructionQa->SetMinNofPointsSts(4);
+		reconstructionQa->SetMinNofPointsTrd(10);
+		reconstructionQa->SetMinNofPointsMuch(11);
+		reconstructionQa->SetMinNofPointsTof(1);
+		reconstructionQa->SetQuota(0.7);
+		reconstructionQa->SetMinNofHitsTrd(9);
+		reconstructionQa->SetMinNofHitsMuch(11);
+		reconstructionQa->SetVerbose(1);
+		reconstructionQa->SetMomentumRange(0., 15);
+		reconstructionQa->SetNofBinsMom(15);
+		reconstructionQa->SetOutputDir(std::string(imageDir));
+		run->AddTask(reconstructionQa);
+		// ------------------------------------------------------------------------
 	}
-
-	// ------ Global track reconstruction -------------------------------------
-	CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
-	// Tracking method to be used
-	// "branch" - branching tracking
-	// "nn" - nearest neighbor tracking
-	// "weight" - weighting tracking
-	finder->SetTrackingType("nn");
-
-	// Hit-to-track merger method to be used
-	// "nearest_hit" - assigns nearest hit to the track
-	finder->SetMergerType("nearest_hit");
-
-	run->AddTask(finder);
-	// ------------------------------------------------------------------------
-
-	if (IsTrd(mcFile)) {
-		CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
-		run->AddTask(trdMatchTracks);
-	}
-
-	if (IsMuch(mcFile)) {
-		CbmMuchMatchTracks* muchMatchTracks = new CbmMuchMatchTracks();
-		run->AddTask(muchMatchTracks);
-	}
-
-	// -----   Track finding QA check   ------------------------------------
-	CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
-	reconstructionQa->SetMinNofPointsSts(4);
-	reconstructionQa->SetMinNofPointsTrd(10);
-	reconstructionQa->SetMinNofPointsMuch(11);
-	reconstructionQa->SetMinNofPointsTof(1);
-	reconstructionQa->SetQuota(0.7);
-	reconstructionQa->SetMinNofHitsTrd(3);
-	reconstructionQa->SetMinNofHitsMuch(11);
-	reconstructionQa->SetVerbose(1);
-	run->AddTask(reconstructionQa);
-	// ------------------------------------------------------------------------
 
 	// -----  Parameter database   --------------------------------------------
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();

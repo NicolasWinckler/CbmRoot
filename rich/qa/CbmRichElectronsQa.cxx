@@ -987,6 +987,7 @@ void CbmRichElectronsQa::SaveToImage()
 // -----   Finish Task   ---------------------------------------------------
 void CbmRichElectronsQa::FinishTask()
 {
+	SaveToImage();
 	fhMCRings->Write();
 	fhAccRings->Write();
 	fhTrueFoundRings->Write();

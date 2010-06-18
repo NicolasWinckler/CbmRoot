@@ -62,6 +62,8 @@ class CbmTrdModule : public TNamed
   Double_t GetSectorSizex(Int_t i)   const { return fSectorSizex.At(i); }
   Double_t GetSectorSizey(Int_t i)   const { return fSectorSizey.At(i); }
 
+  Int_t GetNoSectors()    const { return fNoSectors; }
+
   Bool_t IsRotated()     const { return fIsRotated; }
 
 

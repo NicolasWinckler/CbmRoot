@@ -227,7 +227,8 @@ void CbmL1::ReadEvent()
     for( int is = 0; is<NStrips; is++ ){
       TmpStrip &s = tmpStrips[is];
       if( s.iStation!=th.iStation ||  s.iSector!=th.iSector ) continue;
-      if( s.iStrip!=th.iStripF ) continue; 
+      if( s.iStrip!=th.iStripF ) continue;
+      if( fabs(s.u - th.u_front)>1.e-4 ) continue;
       th.indStripF = is;
     }
     for( int is = 0; is<NStripsB; is++ ){

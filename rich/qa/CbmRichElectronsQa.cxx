@@ -12,8 +12,12 @@
 #include "CbmTofHit.h"
 #include "CbmTofPoint.h"
 
+#include "../../littrack/utils/CbmLitUtils.cxx"
+#include "../utils/CbmRichDrawElectronsQa.cxx"
+
 #include "TString.h"
 #include "TSystem.h"
+#include "TCanvas.h"
 
 #include <iostream>
 #include <vector>
@@ -959,6 +963,24 @@ void CbmRichElectronsQa::DiffElandPi()
 		}
 
 	}// global tracks
+
+}
+
+void CbmRichElectronsQa::SaveToImage()
+{
+	if (fImageOutDir !="") return;
+	TCanvas* c = DrawAcc(fhMCRings, fhAccRings, fhAccRichTrdGlobal, fhAccRichTrdTofGlobal);
+	SaveCanvasAsImage(c, fImageOutDir);
+	c = DrawMatchingEff(fhAccRings, fhTrueFoundRings, fhTrueMatchStsRichGlobal,
+			fhTrueMatchStsRichTrdGlobal,fhTrueMatchStsRichTrdTofGlobal);
+	SaveCanvasAsImage(c, fImageOutDir);
+	c = DrawMatchingEff2(fhAccRings, fhTrueFoundRings, fhTrueMatchStsRichGlobal,
+			fhTrueMatchStsRichTrdGlobal, fhTrueMatchStsRichTrdTofGlobal);
+	SaveCanvasAsImage(c, fImageOutDir);
+	c = DrawElidEff(fhAccRings, fhTrueFoundRings, fhTrueIdRich,
+			fhTrueIdRichTrd, fhTrueIdRichTrdTof,
+			fhAccPi, fhPiasElRich, fhPiasElRichTrd, fhPiasElRichTrdTof);
+	SaveCanvasAsImage(c, fImageOutDir);
 
 }
 

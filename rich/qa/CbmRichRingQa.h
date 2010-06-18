@@ -35,6 +35,7 @@ class CbmRichRingQa : public FairTask{
     std::map<Int_t, CbmRichRing > fRingMapWithHits;
     Int_t fEventNumber;
     Int_t fNofHitsInRingCut;
+    Bool_t fIsSaveToPdf;
 
     public:
 
@@ -64,6 +65,8 @@ class CbmRichRingQa : public FairTask{
     Bool_t DoesRingHaveProjection(Int_t trackId);
     Double_t GetStsMomentum(CbmRichRing * ring);
     void RingTrackMatchEff();
+    void SaveToPdf();
+    void SetIsSaveToPdf(Bool_t s){fIsSaveToPdf = s;}
 
     CbmRichRingFitterCOP* fFitCOP;
     CbmRichRingFitterEllipseTau* fFitEllipse;

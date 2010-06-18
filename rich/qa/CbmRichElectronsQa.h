@@ -13,8 +13,10 @@
 
 #include <map>
 #include <fstream>
+#include <string>
 
 using std::map;
+using std::string;
 
 class CbmRichElectronsQa : public FairTask{
 
@@ -38,6 +40,8 @@ public:
     void SetRmsCoeff(Double_t rmsCoeff){fRmsCoeff = rmsCoeff;}
     void SetDistCut(Double_t dist){fDistCut = dist;}
     void SetUseRichAnn(Bool_t useRichAnn){fUseRichAnn = useRichAnn;}
+    // set to "", if you don't want to save images
+    void SetImageOutDir(string s){fImageOutDir = s;}
 
 private:
 	Int_t fEventNum;
@@ -68,6 +72,7 @@ private:
     Double_t fRmsCoeff;
     Double_t fDistCut;
     Bool_t fUseRichAnn;
+    string fImageOutDir;
 
     Bool_t DoesRingHaveProjection(Int_t trackId);
     Bool_t IsRichElectron(CbmRichRing* ring, Double_t momentum);
@@ -79,6 +84,7 @@ private:
     void GlobalTracksMatchEff();
     void GlobalTracksElIdEff();
     void DiffElandPi();
+    void SaveToImage();
 
     std::ofstream  fOutElandPi;
     CbmRichElectronIdAnn * fElIdAnn;

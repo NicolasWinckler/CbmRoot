@@ -18,6 +18,8 @@ Author : Semen Lebedev (S.Lebedev@gsi.de)
 #include "CbmMCTrack.h"
 #include "CbmTrackMatch.h"
 
+#include "TCanvas.h"
+
 #include <map>
 #include <vector>
 #include <iostream>
@@ -40,7 +42,7 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
 {
     // verbosity level
     fVerbose = verbose;
-
+    fIsSaveToPdf = false;
     fNofHitsInRingCut = 7; /// minumum number of hits in ring
 
     // count events
@@ -662,7 +664,16 @@ void CbmRichRingQa::RingTrackMatchEff()
     }///loop over matches
 }
 
-// -----   Finish Task   ---------------------------------------------------
+void CbmRichRingQa::SaveToPdf()
+{
+	if (!fIsSaveToPdf) return;
+
+   // TCanvas *canvas = new TCanvas("canvas","canvas",600,900);
+   // c1->Divide(2,3);
+
+
+}
+
 void CbmRichRingQa::FinishTask()
 {
 

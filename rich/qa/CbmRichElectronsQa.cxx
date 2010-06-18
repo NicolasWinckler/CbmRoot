@@ -968,7 +968,7 @@ void CbmRichElectronsQa::DiffElandPi()
 
 void CbmRichElectronsQa::SaveToImage()
 {
-	if (fImageOutDir !="") return;
+//	if (fImageOutDir !="") return;
 	TCanvas* c = DrawAcc(fhMCRings, fhAccRings, fhAccRichTrdGlobal, fhAccRichTrdTofGlobal);
 	SaveCanvasAsImage(c, fImageOutDir);
 	c = DrawMatchingEff(fhAccRings, fhTrueFoundRings, fhTrueMatchStsRichGlobal,

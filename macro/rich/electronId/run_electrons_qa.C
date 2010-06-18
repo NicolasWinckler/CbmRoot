@@ -9,7 +9,7 @@ void run_electrons_qa(Int_t nEvents = 100)
     gRandom->SetSeed(10);
 
     TString inFile1 = "", inFile2 = "", inFile3 = "", inFile4 = "", parFile = "", outFile ="";
-
+    string outImageDir = "";
     if (script != "yes") {
         TString inFile1 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
         TString inFile2 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
@@ -22,6 +22,7 @@ void run_electrons_qa(Int_t nEvents = 100)
     	inFile4 = TString(gSystem->Getenv("RICHFILE"));
     	parFile = TString(gSystem->Getenv("PARFILE"));
     	outFile = TString(gSystem->Getenv("ELIDFILE"));
+    	outImageDir = string(gSystem->Getenv("IMAGEDIR"));
     }
     //TString stsDigiFile = "sts_standard.digi.par";
 
@@ -61,6 +62,7 @@ void run_electrons_qa(Int_t nEvents = 100)
 
 	CbmRichElectronsQa* richQa = new CbmRichElectronsQa("Qa", "qa", 0);
 	richQa->SetGeoType("compact"); //or large
+	richQa->SetImageOutDir(outImageDir);
 	richQa->SetRichAnnCut(-0.5);
 	richQa->SetUseRichAnn(true);
 	richQa->SetTrdAnnCut(0.8);

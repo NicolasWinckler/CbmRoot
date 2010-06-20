@@ -6,8 +6,8 @@
  */
 
 #include "../../littrack/utils/CbmLitDrawHist.cxx"
-
-void DrawAcc(TH1D* mc, TH1D* acc, TH1D* richTrd, TH1D* richTrdTof){
+#include <string>
+TCanvas* DrawAcc(TH1D* mc, TH1D* acc, TH1D* richTrd, TH1D* richTrdTof){
 	TCanvas *c1 = new TCanvas("c1","c1",500,500);
 	TH1D* accEff1 = Divide1DHists(acc, mc, "elid_acc_rich_eff",
 		"Efficiencies for primary electrons normalized to MC rings",
@@ -17,7 +17,7 @@ void DrawAcc(TH1D* mc, TH1D* acc, TH1D* richTrd, TH1D* richTrdTof){
     TH1D* accEff2 = Divide1DHists(richTrd, mc, "elid_acc_rich_trd_eff","","", "");
     TH1D* accEff3 = Divide1DHists(richTrdTof, mc, "elid_acc_rich_trd_tof_eff", "", "", "");
 
-	std::string hname1, hname2, hname3, hname4;
+	std::string hname1, hname2, hname3;
 	hname1 = "accepted RICH rings (" + CalcEfficiency(acc, mc)+")";
 	hname2 = "accepted RICH rings+TRD ("+ CalcEfficiency(richTrd, mc)+")";
 	hname3 = "accepted RICH rings+TRD+TOF ("+ CalcEfficiency(richTrdTof, mc)+")";
@@ -26,9 +26,10 @@ void DrawAcc(TH1D* mc, TH1D* acc, TH1D* richTrd, TH1D* richTrdTof){
 
     gPad->SetGridx(true);
     gPad->SetGridy(true);
+    return c1;
 }
 
-void DrawMatchingEff(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrueMatchStsRichGlobal,
+TCanvas* DrawMatchingEff(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrueMatchStsRichGlobal,
 		TH1D* fhTrueMatchStsRichTrdGlobal, TH1D* fhTrueMatchStsRichTrdTofGlobal)
 {
 	TCanvas *c2 = new TCanvas("c2","c2",500,500);
@@ -41,6 +42,7 @@ void DrawMatchingEff(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrueMatch
 	TH1D* stsRichTrdEff = Divide1DHists(fhTrueMatchStsRichTrdGlobal, fhAccRings,"elid_sts_rich_trd_eff","",	"", "");
 	TH1D* stsRichTrdTofEff = Divide1DHists(fhTrueMatchStsRichTrdTofGlobal, fhAccRings,"elid_sts_rich_trd_eff","",	"", "");
 
+	std::string hname1, hname2, hname3, hname4;
 	hname1 = "ring finding (" +CalcEfficiency(fhTrueFoundRings,fhAccRings)+")";
 	hname2 = "STS+RICH match (" +CalcEfficiency(fhTrueMatchStsRichGlobal,fhAccRings)+")";
 	hname3 = "STS+RICH+TRD match ("+CalcEfficiency(fhTrueMatchStsRichTrdGlobal,fhAccRings)+")";
@@ -51,11 +53,13 @@ void DrawMatchingEff(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrueMatch
 
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
+    return c2;
 }
 
-void DrawMatchingEff2(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrueMatchStsRichGlobal,
+TCanvas* DrawMatchingEff2(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrueMatchStsRichGlobal,
 		TH1D* fhTrueMatchStsRichTrdGlobal,TH1D* fhTrueMatchStsRichTrdTofGlobal)
 {
+	std::string hname1;
     TCanvas *c3 = new TCanvas("c3","c3",800,800);
     c3->Divide(2,2);
     c3->cd(1);
@@ -97,13 +101,14 @@ void DrawMatchingEff2(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrueMatc
 	eff3->SetMinimum(0.);
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
+    return c3;
 }
 
-void DrawElidEff(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrueIdRich,
+TCanvas* DrawElidEff(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrueIdRich,
 		TH1D* fhTrueIdRichTrd, TH1D* fhTrueIdRichTrdTof,
 		TH1D* fhAccPi, TH1D* fhPiasElRich, TH1D* fhPiasElRichTrd, TH1D* fhPiasElRichTrdTof)
 {
-
+	std::string hname1, hname2, hname3, hname4;
 	TCanvas* c7 = new TCanvas("c7","c7",800,400);
 	c7->Divide(2,1);
 	c7->cd(1);
@@ -148,4 +153,5 @@ void DrawElidEff(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrueIdRich,
 	gPad->SetGridx(true);
 	gPad->SetGridy(true);
 	gPad->SetLogy(true);
+    return c7;
 }

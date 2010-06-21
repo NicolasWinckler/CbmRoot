@@ -857,19 +857,39 @@ void CbmTrdClusterizer::CalculatePixel(Bool_t Sector)
 
 }
   // ---------------CalculatePixelCoordinate-----------------------------------------------------
-void CbmTrdClusterizer:: CalcPixelCoordinate() 
+void CbmTrdClusterizer::CalcPixelCoordinate() 
 {
   // fPadPosLL is >0 for x and y and not rotated
   // origin of the local coordinate system 'LL' in 
   // the 'L'ower 'L'eft corner of the chamber.
   fPadPosxLL = (local_meanLL[0] - padsize[0] * fCol_mean); //[mm]
-  fPadPosyLL = (local_meanLL[1] - padsize[1] * fRow_mean); //[mm]
+  fPadPosyLL = (GetFloatPositionY(local_meanLL[1]) - int(GetFloatPositionY(local_meanLL[1]))) * padsize[1];//(local_meanLL[1] - padsize[1] * fRow_mean); //[mm]
 
   // fPadPosC is not rotated
   // origin of the local coordinate system 'C' is 
   // the 'C'enter of the pad
   fPadPosxC = fPadPosxLL - 0.5 * padsize[0]; //[mm]
   fPadPosyC = fPadPosyLL - 0.5 * padsize[1]; //[mm]
+}
+  // --------------------------------------------------------------------
+  // --------------------------------------------------------------------
+float CbmTrdClusterizer::GetFloatPositionY(Double_t tempPosY)
+{
+  Float_t floatRow = 0;
+  for (Int_t iSector = 0; iSector < fNoSectors; iSector++)
+    {
+      if (tempPosY > sectorsize[iSector])
+	{
+	  tempPosY -= sectorsize[iSector];
+	  floatRow += sectorrows[iSector];
+	}
+      else
+	{
+	  floatRow += tempPosY / float(GetPadHeight(iSector));
+	  break;
+	}
+    }
+  return floatRow;
 }
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
@@ -924,7 +944,7 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
   if (recoTRD1 && recoTRD2 && deltarecoTRD1 && deltarecoTRD2 && deltarecoPad && Xreco && PR && PRF && PRF2)
     {
       //printf("SplitPathSlices...\n");
-      Int_t DrawTH = 15;//200;//15;
+      Int_t DrawTH = 200;//15;
       Float_t ClusterDistance = 5; //[mm]
       Double_t deltaR = sqrt(pow((local_inLL[0] - local_outLL[0]),2) + pow((local_inLL[1] - local_outLL[1]),2)/* + pow((fz_in - fz_out),2)*/);
       Int_t nPathSlice = int(deltaR / ClusterDistance) + 1;                       
@@ -959,8 +979,8 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
 	      Out = new TH2F("out","out [mm]", (nCol) * 100, 0, (nCol), nRow * 100, 0, (nRow));
 	      Out->SetMarkerStyle(24);
 	      Out->SetMarkerColor(1);
-	      In ->Fill(local_inLL[0] /padsize[0], local_inLL[1] /padsize[1]); 
-	      Out->Fill(local_outLL[0]/padsize[0], local_outLL[1]/padsize[1]);
+	      In ->Fill(local_inLL[0] /padsize[0], GetFloatPositionY(local_inLL[1]));//local_inLL[1] /padsize[1]); 
+	      Out->Fill(local_outLL[0]/padsize[0], GetFloatPositionY(local_outLL[1]));//local_outLL[1]/padsize[1]);
 	      Clusterposition = new TH2F("ClusterPosition","Cluster Positions [mm]", (nCol) * 100, 0, (nCol),(nRow) * 100, 0, (nRow));
 	      Clusterposition->SetMarkerStyle(2);
 	      Clusterposition->SetMarkerColor(16);
@@ -1011,7 +1031,7 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
 	    {
 	      if (TEST)
 		{
-		  Clusterposition->Fill(ClusterMLL[0]/padsize[0],ClusterMLL[1]/GetPadHeight(iSector)/*padsize[1]*/);
+		  Clusterposition->Fill(ClusterMLL[0]/padsize[0], GetFloatPositionY(ClusterMLL[1]));///GetPadHeight(iSector)/*padsize[1]*/);
 		  //printf("PadSlice (%d/%d)\n",Col_slice,Row_slice);
 		}
 	    }
@@ -1060,8 +1080,10 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
 	    {
 	      
 	      //printf("Draw\n");
+	   
 	      TCanvas *c = new TCanvas("c","c",900,675);	
 	      c->Divide(1,1);
+	       
 	      c->cd(1);
 	      DeltaSlice2->Draw("colz");
 	      In->Draw("same");

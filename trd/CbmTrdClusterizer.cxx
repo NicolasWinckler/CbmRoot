@@ -454,39 +454,48 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       if (TEST)
 	{
 	  //printf("... Delete\n");
-	  //delete DeltaSlice2;
+	  if (DeltaSlice2)
+	    {
+	      delete DeltaSlice2;
+	    }
 	  if (Reco)
 	    {
 	      delete Reco;
 	    }
 	  /*
-	  else
+	    else
 	    {
-	      printf("Reco can't be deleted\n");
+	    printf("Reco can't be deleted\n");
 	    }
+	  */
 	  if ( In )
 	    {
 	      delete In;
 	    }
-	  else
+	  /*
+	    else
 	    {
-	      printf("In can't be deleted\n");
+	    printf("In can't be deleted\n");
 	    }
+	  */
 	  if ( Out)
 	    {
 	      delete Out;
 	    }
-	  else
+	  /*
+	    else
 	    {
-	      printf("Out can't be deleted\n");
+	    printf("Out can't be deleted\n");
 	    }
+	  */
 	  if (Clusterposition)
 	    {
 	      delete Clusterposition;
 	    }
-	  else
+	  /*
+	    else
 	    {
-	      printf("Clusterposition can't be deleted\n");
+	    printf("Clusterposition can't be deleted\n");
 	    }
 	  */
 	  //printf("Delete....\n");
@@ -692,18 +701,6 @@ void CbmTrdClusterizer::TransformLL2C(Double_t* LLCoordinate, Double_t* CCoordin
 
 double CbmTrdClusterizer::GetPadHeight(Int_t Sector)
 {
-  //Int_t temp_row = iRow;
-  // Int_t Sector = 0;
-  /*
-  for (Int_t iSector = 0; iSector < fSector; iSector++)
-    {
-      if (temp_row > sectorrows[iSector])
-	{
-	  temp_row -= sectorrows[iSector];
-	  Sector++;
-	}
-    }
-  */
   Double_t fpadsizex; //pixel widh in x;
   Double_t fpadsizey; //pixel width in y;
   Double_t temp;
@@ -860,15 +857,6 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
       padsize[2]    = 0.;
       modulesize[2] = 0.;
 
-      for (Int_t i = 0; i < 3; i++)
-	{
-	  //printf("%d p = %.2f   m = %.2f\n",i,padsize[i],modulesize[i]);
-	}
-      //printf("\n");
-      /*
-	fPosXLL = local_meanLL[0];
-	fPosYLL = local_meanLL[1];
-      */
     }
   else
     {
@@ -906,19 +894,6 @@ void CbmTrdClusterizer::CalculatePixel(Bool_t Sector)
 	  fCol_out  = (Int_t)(( local_outLL[0]) / padsize[0]);
 	  fRow_out  = (Int_t)(( local_outLL[1] - sectorsize[fSector - 1] - sectorsize[fSector - 2]) / padsize[1]) + sectorrows[fSector - 1] + sectorrows[fSector - 2];
 	}
-      /*
-  else
-    {
-      fCol_mean = (Int_t)((local_meanLL[0]) / padsize[0]);
-      fRow_mean = (Int_t)((local_meanLL[1]) / padsize[1]);
-
-      fCol_in   = (Int_t)((  local_inLL[0]) / padsize[0]);
-      fRow_in   = (Int_t)((  local_inLL[1]) / padsize[1]);
-
-      fCol_out  = (Int_t)(( local_outLL[0]) / padsize[0]);
-      fRow_out  = (Int_t)(( local_outLL[1]) / padsize[1]);
-    }
-      */
 }
   // ---------------CalculatePixelCoordinate-----------------------------------------------------
 void CbmTrdClusterizer:: CalcPixelCoordinate() 
@@ -940,10 +915,10 @@ void CbmTrdClusterizer:: CalcPixelCoordinate()
 void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2)
 {
  
-    if (recoTRD1 && recoTRD2 && deltarecoTRD1 && deltarecoTRD2 && deltarecoPad && Xreco && PR && PRF && PRF2)
+  if (recoTRD1 && recoTRD2 && deltarecoTRD1 && deltarecoTRD2 && deltarecoPad && Xreco && PR && PRF && PRF2)
     {
       //printf("SplitPathSlices...\n");
-      Int_t DrawTH = 15;
+      Int_t DrawTH = 15;//200;//15;
       Float_t ClusterDistance = 5; //[mm]
       Double_t deltaR = sqrt(pow((local_inLL[0] - local_outLL[0]),2) + pow((local_inLL[1] - local_outLL[1]),2)/* + pow((fz_in - fz_out),2)*/);
       Int_t nPathSlice = int(deltaR / ClusterDistance) + 1;                       
@@ -968,7 +943,7 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
 	      printf("Event %d    CN %d\n",j,nPathSlice);
 	      DeltaSlice2 = new TH2F("Delta","Inpact (white) Exit (black) Cluster (gray) ClusterCharge (color) [pad units]",(nCol),0,(nCol),(nRow),0,(nRow));
 	      DeltaSlice2->SetContour(99);
-	      //Reco = new TH2F("Reco","Reco [mm]", (nCol) * 100, 0, (nCol), (nRow) * 100, 0, (nRow));
+	      // Reco = new TH2F("Reco","Reco [mm]", (nCol) * 100, 0, (nCol), (nRow) * 100, 0, (nRow));
 	      Reco->SetMarkerStyle(20);
 	      Reco->SetMarkerColor(7);
 
@@ -1003,26 +978,25 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
 	    }
 	  // Cluster position has to be known also in module cs to calc if cluster has traversed a pad boundery
 	  ClusterMLL[0]    = local_inLL[0] + (0.5 * delta[0]) + (delta[0] * iPathSlice); 
-	  ClusterMLL[1]    = local_inLL[1] + (0.5 * delta[1]) + (delta[1] * iPathSlice);  
-     
-	  //printf(" (%1.f / %1.f)   (%1.f / %1.f) \n",local_inLL[0], local_inLL[1], local_outLL[0], local_outLL[1]);
+	  ClusterMLL[1]    = local_inLL[1] + (0.5 * delta[1]) + (delta[1] * iPathSlice); 
+
+	  Col_slice = 0;
+	  Row_slice = 0;
+
 	  Col_slice = (Int_t)((ClusterMLL[0]) / padsize[0]);
 	 
 	  Double_t tempClusterMLLy = ClusterMLL[1];
-	  for (Int_t iSector = 0; iSector < fNoSectors; iSector++)
+	  Int_t iSector = 0;
+	  for (iSector = 0; iSector < fNoSectors; iSector++)
 	    {
-	      //printf("SS %.1f\n",sectorsize[iSector]);
-	      //printf("->   RS %d %.1f %.1f\n",Row_slice,tempClusterMLLy,ClusterMLL[1] );
 	      if (tempClusterMLLy > sectorsize[iSector])
 		{
 		  tempClusterMLLy -= sectorsize[iSector];
 		  Row_slice += sectorrows[iSector];
-		  //printf("+   RS %d %.1f %.1f\n",Row_slice,tempClusterMLLy,ClusterMLL[1] );
 		}
 	      else
 		{
-		  Row_slice += int(tempClusterMLLy / GetPadHeight(iSector));
-		  //printf("=   RS %d %.1f %.1f  %.1f   CPx = %.1f\n",Row_slice,tempClusterMLLy,ClusterMLL[1],GetPadHeight(iSector),ClusterPosC[0] );
+		  Row_slice += int(tempClusterMLLy / float(GetPadHeight(iSector)));
 		  break;
 		}
 	    }
@@ -1031,19 +1005,16 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
 	  Double_t tempClusterPosCy = ClusterMLL[1];
 	  Int_t tempSecRows = Row_slice;
 
-	  for (Int_t iSector = 0; iSector < fNoSectors; iSector++)
+	  for (iSector = 0; iSector < fNoSectors; iSector++)
 	    {
-	      //printf("-> %d RS %d %.1f %.1f  %.1f\n",iSector,tempSecRows,tempClusterPosCy,ClusterMLL[1],GetPadHeight(iSector) );
 	      if (tempClusterPosCy > sectorsize[iSector])
 		{
 		  tempClusterPosCy -= sectorsize[iSector];
 		  tempSecRows -= sectorrows[iSector];
-		  //printf("+  %d RS %d %.1f %.1f  %.1f\n",iSector,tempSecRows,tempClusterPosCy,ClusterMLL[1],GetPadHeight(iSector) );
 		}
 	      else
 		{
 		  ClusterPosC[1] = tempClusterPosCy - tempSecRows * GetPadHeight(iSector) - 0.5 * GetPadHeight(iSector);
-		  //printf("=  %d RS %d %.1f %.1f  %.1f   CPy = %.1f\n",iSector,tempSecRows,tempClusterPosCy,ClusterMLL[1],GetPadHeight(iSector),ClusterPosC[1] );
 		  break;
 		}
 	    }
@@ -1052,139 +1023,23 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
 	    {
 	      if (TEST)
 		{
-		  /*
-		    printf("in      %6.3E  %6.3E\n",local_in[0]  + 0.5 * fsizex,local_in[1]  + 0.5 * fsizey);
-		    printf("cluster %6.3E  %6.3E\n",ClusterXMLL,ClusterYMLL);
-		    printf("out     %6.3E  %6.3E\n",local_out[0] + 0.5 * fsizex,local_out[1] + 0.5 * fsizey);
-		    printf("Delta   %6.3E  %6.3E\n\n",deltaX,deltaY);
-		  */
-		  printf("%d\n",Col_slice);
-		  Clusterposition->Fill(ClusterMLL[0]/padsize[0],ClusterMLL[1]/padsize[1]);
+		  Clusterposition->Fill(ClusterMLL[0]/padsize[0],ClusterMLL[1]/GetPadHeight(iSector)/*padsize[1]*/);
+		  //printf("PadSlice (%d/%d)\n",Col_slice,Row_slice);
 		}
 	    }
 	  //---------------------------------------------------------------------------------------------
-	
-	  for (Int_t iRow = 0; iRow <= fPadNrY / 2; iRow++)
-	    {
-	      if (iRow == 0)
-		{
-		  H[(fPadNrY / 2)] = padH[Row_slice];
-		}
-	      else
-		{
-		  if (Row_slice + iRow < nRow)
-		    {
-		      H[(fPadNrY / 2) + iRow] = padH[Row_slice + iRow];
-		    }
-		  else
-		    {
-		      H[(fPadNrY / 2) + iRow] = H[iRow - 1];
-		    }
-		  if (Row_slice - iRow > 0)
-		    {
-		      H[(fPadNrY / 2) - iRow] = padH[Row_slice - iRow];
-		    }
-		  else
-		    {
-		      H[(fPadNrY / 2) - iRow] = H[iRow + 1];
-		    }
-		}
-	    }
-	  for (Int_t iCol = 0; iCol <= fPadNrX / 2; iCol++)
-	    {	   
-	      if (iCol == 0)
-		{
-		  W[(fPadNrX / 2)] = padW[Col_slice];
-		}
-	      else
-		{
-		  if (Col_slice + iCol < nCol)
-		    {   
-		      W[(fPadNrX / 2) + iCol] = padW[Col_slice + iCol];
-		    }
-		  else
-		    {
-		      W[(fPadNrX / 2) + iCol] = W[iCol - 1];
-		    }
-		  if (Col_slice - iCol > 0)
-		    {
-		      W[(fPadNrX / 2) - iCol] = padW[Col_slice - iCol];
-		    }
-		  else
-		    {
-		      W[(fPadNrX / 2) - iCol] = W[iCol + 1];
-		    }
-		}
-	    }
-	  for (Int_t iRow = 0; iRow < fPadNrY; iRow++)
-	    {
-	      for (Int_t iCol = 0; iCol < fPadNrX; iCol++)
-		{
-		  //printf("(%.1f / %.1f) ",W[iCol],H[iRow]);
-		}
-	      //printf("\n");
-	    }
+	  GetPadSizeMatrix( H, W, padH, padW, Row_slice, Col_slice, nRow, nCol);
+
 	  //---------------------------------------------------------------------------------------------
 
 	  CalcMathieson(TEST, ClusterPosC[0], ClusterPosC[1], SliceELoss, W ,H);
 
 	  // Charge conservation
-	  
-	  for (Int_t iRow = 0; iRow <= fPadNrY / 2; iRow++)
-	    {
-	      for (Int_t iCol = 0; iCol <= fPadNrX / 2; iCol++)
-		{	      
-		  if (Row_slice - (fPadNrY / 2) + iRow < 0)
-		    {
-		      fPadCharge[iRow + 1][iCol] += fPadCharge[iRow][iCol];
-		      fPadCharge[iRow    ][iCol]  = 0.0;
+	  ChargeConservation(Row_slice, Col_slice,  nCol, nRow);
 
-		      fPadCharge[iRow + 1][(fPadNrX-1) - iCol] += fPadCharge[iRow][(fPadNrX-1) - iCol];
-		      fPadCharge[iRow    ][(fPadNrX-1) - iCol]  = 0.0;
-		    }
-	      
-		  if (Row_slice + (fPadNrY / 2)  - iRow > nRow)
-		    {
-		      fPadCharge[(fPadNrY-1) - iRow - 1][iCol] += fPadCharge[(fPadNrY-1) - iRow][iCol];
-		      fPadCharge[(fPadNrY-1) - iRow    ][iCol]  = 0.0;
-
-		      fPadCharge[(fPadNrY-1) - iRow - 1][(fPadNrX-1) - iCol] += fPadCharge[(fPadNrY) - iRow][(fPadNrX-1) - iCol];
-		      fPadCharge[(fPadNrY-1) - iRow    ][(fPadNrX-1) - iCol]  = 0.0;
-		    }
-	      
-		  if (Col_slice - (fPadNrX / 2) + iCol < 0)
-		    { 
-		      fPadCharge[iRow][iCol + 1] += fPadCharge[iRow][iCol];
-		      fPadCharge[iRow][iCol    ]  = 0.0;
-		    }
-	      
-		  if (Col_slice + (fPadNrX / 2) - iCol > nCol)
-		    {
-		      fPadCharge[iRow][(fPadNrX-1) - iCol - 1] += fPadCharge[iRow][(fPadNrX-1) - iCol];
-		      fPadCharge[iRow][(fPadNrX-1) - iCol    ]  = 0.0;
-		    }	      	     
-		}
-	    }
-	  
-	  //printf("\n");
 	  // Cluster mapping in module coordinate system
-	  for (Int_t iRow = 0; iRow < nRow; iRow++)
-	    {
-	      for (Int_t iCol = 0; iCol < nCol; iCol++)
-		{	
-		  if (iCol >= Col_slice - (fPadNrX / 2) && iCol <= Col_slice + (fPadNrX / 2))
-		    { 		  
-		      if (iRow >= Row_slice - (fPadNrY / 2) && iRow <= Row_slice + (fPadNrY / 2))
-			{
-			  //printf(" Charge %.2E ", fPadCharge[iRow - (Row_slice - (fPadNrY / 2))][iCol - (Col_slice - (fPadNrX / 2))]/*fPadCharge[iRow][iCol]*/);
-			  PadChargeModule[iRow * nCol + iCol] += fPadCharge[iRow - (Row_slice - (fPadNrY / 2))][iCol - (Col_slice - (fPadNrX / 2))];
-		      
-			}
-		      
-		    }
-		}
-	      //printf("\n");
-	    } 
+	  ClusterMapping( nCol, nRow, Col_slice, Row_slice, PadChargeModule);
+
 	}
 
       for (Int_t iRow = 0; iRow < nRow; iRow++)
@@ -1206,23 +1061,20 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
 	    }
 	}
       // Attention
-  
-      //if (nPathSlice < 5/*DrawTH*/)
-      //  {
-      if (TEST)
+      /*
+	if (TEST)
 	{
-	  CalcPRF(TEST, Histo, nRow, nCol, PadChargeModule, Reco, recoTRD1, recoTRD2, deltarecoTRD1, deltarecoTRD2, deltarecoPad, Xreco, PR, PRF, PRF2);
-	}
+      */
+      CalcPRF(TEST, Histo, nRow, nCol, PadChargeModule, Reco, recoTRD1, recoTRD2, deltarecoTRD1, deltarecoTRD2, deltarecoPad, Xreco, PR, PRF, PRF2);
       /*
 	}
       */
-      //else{printf("big CW = %d\n",nPathSlice);}
-  
-      //printf("Draw PRF\n");
+
       if (nPathSlice > DrawTH)
 	{
 	  if (TEST)
 	    {
+	      
 	      //printf("Draw\n");
 	      TCanvas *c = new TCanvas("c","c",900,675);	
 	      c->Divide(1,1);
@@ -1237,145 +1089,263 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
 	      TImage *Padimage = TImage::Create();
 	      Padimage->FromPad(c);
 	      Padimage->WriteImage(Picfile);
-	      delete Padimage;
-	      delete c;
-	      delete DeltaSlice2;
-	      delete Reco;
-	      delete In;
-	      delete Out;
-	      delete Clusterposition;
+	      
+	      if (Padimage)
+		{
+		  delete Padimage;
+		}
+	      if (c)
+		{
+		  delete c;
+		}
+	      if (DeltaSlice2)
+		{
+		  delete DeltaSlice2;
+		}
+	      if (Reco)
+		{
+		  //delete Reco;
+		}
+	      if (In)
+		{
+		  delete In;
+		}
+	      if (Out)
+		{
+		  delete Out;
+		}
+	      if (Clusterposition)
+		{
+		  delete Clusterposition;
+		}
 	    }
 	}
-      //printf("...SplitPathSlice\n");
     }
   else
     {
       printf(":( SplitPathSlice Histos NULL\n");
     }
 }
-    // --------------------------------------------------------------------
-    // ---- GetIntegrationArea -------------------------------------------------
-void CbmTrdClusterizer::GetIntegrationArea(Bool_t Histo, TH1F* PadX, TH1F* PadY)
+  // --------------------------------------------------------------------
+  // --------------------------------------------------------------------
+void CbmTrdClusterizer::GetPadSizeMatrix(Double_t* H, Double_t* W, Double_t* padH, Double_t* padW, Int_t Row_slice, Int_t Col_slice, Int_t nRow, Int_t nCol)
 {
-  Int_t Padx = fabs(fCol_in - fCol_out) + 1;
-  Int_t Pady = fabs(fRow_in - fRow_out) + 1;
-
-  if (Histo)
-    {
-      PadX->Fill(Padx);
-      PadY->Fill(Pady);
-    }
-
-
-}
-    // --------------------------------------------------------------------
-    // ---- CalcMathieson -------------------------------------------------
-void CbmTrdClusterizer::CalcMathieson(Bool_t TEST, Double_t x_mean, Double_t y_mean, Double_t SliceELoss,Double_t* W, Double_t* H)
-{
-  //printf("CalcMathieson...\n");
-  Int_t accuracy = 1;    // '1/accuracy' integration step width [mm]
-  Float_t h = 3;         //anode-cathode gap [mm]
-  Float_t s = 3;         //anode wire spacing [mm]
-  Float_t r_a = 12.5E-3/2.; //anode wire radius [mm]
-  Float_t q_a = 1700;    //anode neto charge [??] ???
   
-  //needed to calc PRF
-  /*
-    Float_t W = padsize[0];   // pad width [mm]
-    Float_t H = padsize[1];   //pad height [mm]
-  */
-  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
+  for (Int_t iRow = 0; iRow <= fPadNrY / 2; iRow++)
     {
-      for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++)
+      if (iRow == 0)
 	{
-	  fPadCharge[iPadRow][iPadCol] = 0.0;
+	  H[(fPadNrY / 2)] = padH[Row_slice];
+	}
+      else
+	{
+	  if (Row_slice + iRow < nRow)
+	    {
+	      H[(fPadNrY / 2) + iRow] = padH[Row_slice + iRow];
+	    }
+	  else
+	    {
+	      H[(fPadNrY / 2) + iRow] = H[iRow - 1];
+	    }
+	  if (Row_slice - iRow > 0)
+	    {
+	      H[(fPadNrY / 2) - iRow] = padH[Row_slice - iRow];
+	    }
+	  else
+	    {
+	      H[(fPadNrY / 2) - iRow] = H[iRow + 1];
+	    }
 	}
     }
-  Float_t par = 1.0; // normalization factor
-  Float_t r = 0.0;   // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
-  Float_t rho = 0.0; //charge at position x
-  Float_t K_3 = 0.525; //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
-  //Float_t K_3 = -0.24 * (h / s) + 0.7 + (-0.75 * log(r_a / s) - 3.64);// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
-  Float_t K_2 = 3.14159265 / 2.* ( 1. - sqrt(K_3)/2.);
-  Float_t K_1 = (K_2 * sqrt(K_3)) / (4. * atan(sqrt(K_3)));
-  TH2F* Test = NULL;
-  TH2F* TestPos = NULL;
-  TH2F* Test2 = NULL;
-  /*
-  x_mean *= -1;
-  y_mean *= -1;
-  */
-  //printf("(%.1f / %.1f)\n",x_mean,y_mean);
-  //SliceELoss = 1;
-  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
-    { 
-      for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++)		
-	{ 
-	  for (Int_t yi = 0; yi < H[iPadRow] * accuracy; yi++)
+  for (Int_t iCol = 0; iCol <= fPadNrX / 2; iCol++)
+    {	   
+      if (iCol == 0)
+	{
+	  W[(fPadNrX / 2)] = padW[Col_slice];
+	}
+      else
+	{
+	  if (Col_slice + iCol < nCol)
+	    {   
+	      W[(fPadNrX / 2) + iCol] = padW[Col_slice + iCol];
+	    }
+	  else
 	    {
-	      for (Int_t xi = 0; xi < W[iPadCol] * accuracy; xi++)
+	      W[(fPadNrX / 2) + iCol] = W[iCol - 1];
+	    }
+	  if (Col_slice - iCol > 0)
+	    {
+	      W[(fPadNrX / 2) - iCol] = padW[Col_slice - iCol];
+	    }
+	  else
+	    {
+	      W[(fPadNrX / 2) - iCol] = W[iCol + 1];
+	    }
+	}
+    }
+  
+}
+  // --------------------------------------------------------------------
+  // --------------------------------------------------------------------
+void CbmTrdClusterizer::ChargeConservation(Int_t Row_slice, Int_t Col_slice, Int_t nCol, Int_t nRow)
+{
+  
+  for (Int_t iRow = 0; iRow <= fPadNrY / 2; iRow++)
+    {
+      for (Int_t iCol = 0; iCol <= fPadNrX / 2; iCol++)
+	{	      
+	  if (Row_slice - (fPadNrY / 2) + iRow < 0)
+	    {
+	      fPadCharge[iRow + 1][iCol] += fPadCharge[iRow][iCol];
+	      fPadCharge[iRow    ][iCol]  = 0.0;
+
+	      fPadCharge[iRow + 1][(fPadNrX-1) - iCol] += fPadCharge[iRow][(fPadNrX-1) - iCol];
+	      fPadCharge[iRow    ][(fPadNrX-1) - iCol]  = 0.0;
+	    }
+	      
+	  if (Row_slice + (fPadNrY / 2)  - iRow > nRow)
+	    {
+	      fPadCharge[(fPadNrY-1) - iRow - 1][iCol] += fPadCharge[(fPadNrY-1) - iRow][iCol];
+	      fPadCharge[(fPadNrY-1) - iRow    ][iCol]  = 0.0;
+
+	      fPadCharge[(fPadNrY-1) - iRow - 1][(fPadNrX-1) - iCol] += fPadCharge[(fPadNrY) - iRow][(fPadNrX-1) - iCol];
+	      fPadCharge[(fPadNrY-1) - iRow    ][(fPadNrX-1) - iCol]  = 0.0;
+	    }
+	      
+	  if (Col_slice - (fPadNrX / 2) + iCol < 0)
+	    { 
+	      fPadCharge[iRow][iCol + 1] += fPadCharge[iRow][iCol];
+	      fPadCharge[iRow][iCol    ]  = 0.0;
+	    }
+	      
+	  if (Col_slice + (fPadNrX / 2) - iCol > nCol)
+	    {
+	      fPadCharge[iRow][(fPadNrX-1) - iCol - 1] += fPadCharge[iRow][(fPadNrX-1) - iCol];
+	      fPadCharge[iRow][(fPadNrX-1) - iCol    ]  = 0.0;
+	    }	      	     
+	}
+    }
+  
+}
+  // --------------------------------------------------------------------
+  // --------------------------------------------------------------------
+void CbmTrdClusterizer::ClusterMapping(Int_t nCol, Int_t nRow, Int_t Col_slice, Int_t Row_slice, Double_t* PadChargeModule)
+{
+  
+  for (Int_t iRow = 0; iRow < nRow; iRow++)
+    {
+      for (Int_t iCol = 0; iCol < nCol; iCol++)
+	{	
+	  if (iCol >= Col_slice - (fPadNrX / 2) && iCol <= Col_slice + (fPadNrX / 2))
+	    { 		  
+	      if (iRow >= Row_slice - (fPadNrY / 2) && iRow <= Row_slice + (fPadNrY / 2))
 		{
-		  //Mathieson coordinate system ist centered in the center of the hit pad 
-		  r = sqrt(
-			   pow(((iPadCol - int(fPadNrX/2)) * W[iPadCol] + (xi + 0.5) / float(accuracy) - 0.5 * W[iPadCol]) - x_mean,2) + 
-			   pow(((iPadRow - int(fPadNrY/2)) * H[iPadRow] + (yi + 0.5) / float(accuracy) - 0.5 * H[iPadRow]) - y_mean,2)
-			   /*
-			     pow(((iPadCol - int(fPadNrX/2)) * W[iPadCol] + (xi + 0.5) / float(accuracy) - 0.5 * W[iPadCol]) - (x_mean),2) + 
-			     pow(((iPadRow - int(fPadNrY/2)) * H[iPadRow] + (yi + 0.5) / float(accuracy) - 0.5 * H[iPadRow]) - (y_mean),2)
-			   */
-			   );
-		  //rho = r;
-		  //rho = (iPadRow * fPadNrX + iPadCol) / (H[iPadRow] * accuracy * W[iPadCol] * accuracy);
-		  
-		  rho = (q_a * K_1 * (1. - tanh(K_2 * r / h) * tanh(K_2 * r / h)) /
-			 (1. + K_3 * tanh(K_2 * r / h) * tanh(K_2 * r / h))) / float((accuracy * accuracy));         
-		  
-		  if (rho > 0.00)
-		    {
-		      fPadCharge[iPadRow][iPadCol] += rho * SliceELoss;
-		    }
+		  PadChargeModule[iRow * nCol + iCol] += fPadCharge[iRow - (Row_slice - (fPadNrY / 2))][iCol - (Col_slice - (fPadNrX / 2))];
 		}
 	    }
-	  //printf(" Charge %.2E ",fPadCharge[iPadRow][iPadCol]);
 	}
-      //printf("\n");
-    }
-  //printf("...CalcMathieson\n");
+    } 
+  
 }
- // --------------------------------------------------------------------
-int CbmTrdClusterizer::GetPadMax(Int_t iRow, Int_t nCol, Double_t* PadChargeModule)
-{
-  //printf("GetPadMax...\n");
-  Int_t PadMax = -1;
-  Int_t PadPlateau = 1;
-  Double_t TempCharge = 0;
-  for (Int_t iCol = 1; iCol < nCol; iCol++)
-    {
-      if (PadChargeModule[iRow * nCol + iCol] > 0)
-	{
-	  if (PadChargeModule[iRow * nCol + iCol] > TempCharge )
-	    {
-	      TempCharge = PadChargeModule[iRow * nCol + iCol];
-	      PadMax = iCol;
-	    }
-	  /*
-	  if (PadChargeModule[iRow * nCol + iCol] > TempCharge && TempCharge > 0)
-	    {
-	      PadPlateau++;
-	    }
-	  */
-	  //printf("    PM %d\n",PadMax);
-	}
-    }
-  //printf("...(Row %d) GetPadMax\n",iRow);
-  return PadMax;
-}
+  // --------------------------------------------------------------------
+  // ---- GetIntegrationArea -------------------------------------------------
+  void CbmTrdClusterizer::GetIntegrationArea(Bool_t Histo, TH1F* PadX, TH1F* PadY)
+  {
+    Int_t Padx = fabs(fCol_in - fCol_out) + 1;
+    Int_t Pady = fabs(fRow_in - fRow_out) + 1;
+
+    if (Histo)
+      {
+	PadX->Fill(Padx);
+	PadY->Fill(Pady);
+      }
+
+
+  }
+  // --------------------------------------------------------------------
+  // ---- CalcMathieson -------------------------------------------------
+  void CbmTrdClusterizer::CalcMathieson(Bool_t TEST, Double_t x_mean, Double_t y_mean, Double_t SliceELoss,Double_t* W, Double_t* H)
+  {
+    //printf("CalcMathieson...\n");
+    Int_t accuracy = 1;    // '1/accuracy' integration step width [mm]
+    Float_t h = 3;         //anode-cathode gap [mm]
+    Float_t s = 3;         //anode wire spacing [mm]
+    Float_t r_a = 12.5E-3/2.; //anode wire radius [mm]
+    Float_t q_a = 1700;    //anode neto charge [??] ???
+
+    for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
+      {
+	for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++)
+	  {
+	    fPadCharge[iPadRow][iPadCol] = 0.0;
+	  }
+      }
+    Float_t par = 1.0; // normalization factor
+    Float_t r = 0.0;   // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
+    Float_t rho = 0.0; //charge at position x
+    Float_t K_3 = 0.525; //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
+    //Float_t K_3 = -0.24 * (h / s) + 0.7 + (-0.75 * log(r_a / s) - 3.64);// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
+    Float_t K_2 = 3.14159265 / 2.* ( 1. - sqrt(K_3)/2.);
+    Float_t K_1 = (K_2 * sqrt(K_3)) / (4. * atan(sqrt(K_3)));
+    TH2F* Test = NULL;
+    TH2F* TestPos = NULL;
+    TH2F* Test2 = NULL;
+  
+    for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
+      { 
+	for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++)		
+	  { 
+	    for (Int_t yi = 0; yi < H[iPadRow] * accuracy; yi++)
+	      {
+		for (Int_t xi = 0; xi < W[iPadCol] * accuracy; xi++)
+		  {
+		    //Mathieson coordinate system ist centered in the center of the hit pad 
+		    r = sqrt(
+			     pow(((iPadCol - int(fPadNrX/2)) * W[iPadCol] + (xi + 0.5) / float(accuracy) - 0.5 * W[iPadCol]) - x_mean,2) + 
+			     pow(((iPadRow - int(fPadNrY/2)) * H[iPadRow] + (yi + 0.5) / float(accuracy) - 0.5 * H[iPadRow]) - y_mean,2)
+			 
+			     );
+		    //rho = r;
+		    //rho = (iPadRow * fPadNrX + iPadCol) / (H[iPadRow] * accuracy * W[iPadCol] * accuracy);
+		    //rho = (1.) / (H[iPadRow] * accuracy * W[iPadCol] * accuracy);
+		    
+		    rho = (q_a * K_1 * (1. - tanh(K_2 * r / h) * tanh(K_2 * r / h)) /
+			   (1. + K_3 * tanh(K_2 * r / h) * tanh(K_2 * r / h))) / float((accuracy * accuracy));         
+		    
+		    if (rho > 0.00)
+		      {
+			fPadCharge[iPadRow][iPadCol] += rho * SliceELoss;
+		      }
+		  }
+	      }
+	  }
+      }
+  }
+  // --------------------------------------------------------------------
+  int CbmTrdClusterizer::GetPadMax(Int_t iRow, Int_t nCol, Double_t* PadChargeModule)
+  {
+    Int_t PadMax = -1;
+    Int_t PadPlateau = 1;
+    Double_t TempCharge = 0;
+    for (Int_t iCol = 1; iCol < nCol; iCol++)
+      {
+	if (PadChargeModule[iRow * nCol + iCol] > 0)
+	  {
+	    if (PadChargeModule[iRow * nCol + iCol] > TempCharge )
+	      {
+		TempCharge = PadChargeModule[iRow * nCol + iCol];
+		PadMax = iCol;
+	      }
+	  }
+      }
+    return PadMax;
+  }
   // --------------------------------------------------------------------
 
   // ---- CalcCenterOfGravity -------------------------------------------
-void CbmTrdClusterizer::CalcCenterOfGravity()
-{
-}
+  void CbmTrdClusterizer::CalcCenterOfGravity()
+  {
+  }
   // --------------------------------------------------------------------
  
   // ---- CalcPRF------------ -------------------------------------------
@@ -1383,12 +1353,11 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
 {
   if ( recoTRD1 && recoTRD2 && deltarecoTRD1 && deltarecoTRD2 && deltarecoPad/* */ && Xreco && PR && PRF && PRF2)
     {
-      //printf("CalcPRF...\n");
       if (TEST)
 	{
 	  if(Reco==NULL)
 	    {
-	      printf("bad Reco!\n");
+	      printf("bad Reco! CalcPRF1\n");
 	    }
 	  else
 	    {
@@ -1397,26 +1366,10 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
 		  Int_t PadMax = GetPadMax(iRow, nCol, PadChargeModule);
 		  if (PadMax > -1)
 		    {
-		      //printf("Hit Reco ...\n");
 		      fPRFHitPositionC = 0.0;
 		      Int_t max    = PadMax;
 		      Int_t left   = PadMax - 1;
 		      Int_t right  = PadMax + 1;
-		      /* Minimum Charge Cut
-			 if (PadChargeModule[iRow * nCol + max] > 0.005)
-			 {
-		      */
-		      /*
-			Int_t center = iRow;
-			if (fPadCharge[center][left] > 0 && fPadCharge[center][max] > 0 && fPadCharge[center][right] > 0)
-			{
-			fPRFHitPositionC = 0.5 * padsize[0] * log( fPadCharge[center][right] / fPadCharge[center][left] ) /
-			( log( fPadCharge[center][max] * fPadCharge[center][max]
-			/ ( fPadCharge[center][left] * fPadCharge[center][right] )));
-   
-			fPRFHitPositionLL = fPRFHitPositionC + 0.5 * padsize[0];
-			}
-		      */
 		      if (PadChargeModule[iRow * nCol + left] > 0 && PadChargeModule[iRow * nCol + max] > 0 && PadChargeModule[iRow * nCol + right] > 0)
 			{
 			  fPRFHitPositionC = 0.5 * padsize[0] * log( PadChargeModule[iRow * nCol + right] / PadChargeModule[iRow * nCol + left] ) /
@@ -1425,19 +1378,16 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
    
 			  fPRFHitPositionLL = fPRFHitPositionC + 0.5 * padsize[0];
 			}
-		      //printf("... Hit Reco\n");
 		      if (TEST)// is this right?????
 			{
-			  if(Reco==NULL)printf("bad Reco!\n");
-			  else{
-			    Reco->Fill(fPRFHitPositionLL/padsize[0]+PadMax,iRow+0.5);
-			  }
-			  //printf("                    ... l%.2E m%.2E r%.2E\n",fPadCharge[center][left],fPadCharge[center][max],fPadCharge[center][right]);
-			  //printf("CalcPRF... l%d m%d r%d     %6.2f\n",left,max,right,fPRFHitPositionC);
+			  if(Reco==NULL)printf("bad Reco! CalcPRF2\n");
+			  else
+			    {
+			      Reco->Fill(fPRFHitPositionLL/padsize[0]+PadMax,iRow+0.5);
+			    }
 			}
 		      if (Histo)
 			{
-			  //printf("->Histo PRF\n");
 			  recoTRD1->Fill(fPRFHitPositionC, fPadPosyC);
 			  recoTRD2->Fill(fPRFHitPositionC/padsize[0], fPadPosyC/padsize[1]);
 			  deltarecoTRD1->Fill(sqrt(pow(global_inC[0],2) + pow(global_inC[1],2)),fabs(fPRFHitPositionC-fPadPosxC));
@@ -1445,7 +1395,6 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
 			  deltarecoPad->Fill(fPadPosxC/padsize[0],(fPRFHitPositionC-fPadPosxC)/padsize[0]);	 
 			  Xreco->Fill(fPRFHitPositionC/padsize[0]);
 			  PR->Fill(fPadPosxC-fPRFHitPositionC);
-			  //printf(">-Histo PRF\n");
 			  if(PRF != NULL)
 			    {
 			      PRF->Fill(fPRFHitPositionC, PadChargeModule[iRow * nCol + max]/
@@ -1468,13 +1417,9 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
 			    }
 			}
 		    }
-		  /*
-		    }
-		  */
 		}	  
 	    }
-	}
-      //printf("...CalcPRF\n");
+	};
     }
   else
     {
@@ -1485,54 +1430,54 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
   // -------------------------------------------------------------------
   // ------AddDigi--------------------------------------------------------------
 
-//void CbmTrdClusterizer::AddDigi() 
-void CbmTrdClusterizer::AddDigi(Int_t iCol, Int_t iRow, Float_t iCharge) 
-{
+  //void CbmTrdClusterizer::AddDigi() 
+  void CbmTrdClusterizer::AddDigi(Int_t iCol, Int_t iRow, Float_t iCharge) 
+  {
 
-  // Add digi for pixel(x,y) in module to map for intermediate storage
-  // In case the pixel for this pixel/module combination does not exists
-  // it is added to the map.
-  // In case it exists already the information about another hit in this
-  // pixel is added. Also the additional energy loss is added to the pixel.
+    // Add digi for pixel(x,y) in module to map for intermediate storage
+    // In case the pixel for this pixel/module combination does not exists
+    // it is added to the map.
+    // In case it exists already the information about another hit in this
+    // pixel is added. Also the additional energy loss is added to the pixel.
 
   
-  // Look for pixel in charge map
-  //pair<Int_t, Int_t> a(fCol_mean, fRow_mean);
-  pair<Int_t, Int_t> a(iCol, iRow);
-  pair<Int_t, pair<Int_t,Int_t> > b(fModuleID, a);
-  fDigiMapIt = fDigiMap.find(b);
+    // Look for pixel in charge map
+    //pair<Int_t, Int_t> a(fCol_mean, fRow_mean);
+    pair<Int_t, Int_t> a(iCol, iRow);
+    pair<Int_t, pair<Int_t,Int_t> > b(fModuleID, a);
+    fDigiMapIt = fDigiMap.find(b);
 
-  //    cout<<"DetID: "<<fModuleID<<endl;
+    //    cout<<"DetID: "<<fModuleID<<endl;
 
-  // Pixel not yet in map -> Add new pixel
-  if ( fDigiMapIt == fDigiMap.end() ) {
-    if (fModuleID == 111003) {
-      cout<<"Create ModID 111003 in Map"<<endl;
+    // Pixel not yet in map -> Add new pixel
+    if ( fDigiMapIt == fDigiMap.end() ) {
+      if (fModuleID == 111003) {
+	cout<<"Create ModID 111003 in Map"<<endl;
+      }
+      //  CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, fCol_mean, fRow_mean, fELoss, fMCindex);
+      CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, iCol, iRow, iCharge, fMCindex);
+      fDigiMap[b] = digi;
     }
-    //  CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, fCol_mean, fRow_mean, fELoss, fMCindex);
-    CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, iCol, iRow, iCharge, fMCindex);
-    fDigiMap[b] = digi;
-  }
 
-  // Pixel already in map -> Add charge
-  else {
-    if (fModuleID == 111003) {
-      cout<<"Modify ModID 111003 in Map"<<endl;
+    // Pixel already in map -> Add charge
+    else {
+      if (fModuleID == 111003) {
+	cout<<"Modify ModID 111003 in Map"<<endl;
+      }
+      CbmTrdDigi* digi = (CbmTrdDigi*)fDigiMapIt->second;
+      if ( ! digi ) Fatal("AddChargeToPixel", "Zero pointer in digi map!");
+      digi->AddCharge(iCharge);
+      digi->AddMCIndex(fMCindex);
     }
-    CbmTrdDigi* digi = (CbmTrdDigi*)fDigiMapIt->second;
-    if ( ! digi ) Fatal("AddChargeToPixel", "Zero pointer in digi map!");
-    digi->AddCharge(iCharge);
-    digi->AddMCIndex(fMCindex);
-  }
   
-}
+  }
 
   // ---- Register ------------------------------------------------------
-void CbmTrdClusterizer::Register()
-{
-  FairRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigiCollection, kTRUE);
-  FairRootManager::Instance()->Register("TrdDigiMatch","Trd Digi Match", fDigiMatchCollection, kTRUE);
-}
+  void CbmTrdClusterizer::Register()
+  {
+    FairRootManager::Instance()->Register("TrdDigi","Trd Digi", fDigiCollection, kTRUE);
+    FairRootManager::Instance()->Register("TrdDigiMatch","Trd Digi Match", fDigiMatchCollection, kTRUE);
+  }
   // --------------------------------------------------------------------
 
-ClassImp(CbmTrdClusterizer)
+  ClassImp(CbmTrdClusterizer)

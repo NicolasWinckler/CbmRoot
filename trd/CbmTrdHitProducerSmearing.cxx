@@ -237,7 +237,15 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
 	ELossdEdX = pt->GetEnergyLoss();
 	ELoss = ELossdEdX;
 
-	pt->Position(pos);
+        // Get the momentum and the position to calculate the TR 
+        // production, the hit position and the hit error.	
+        // The corresponding hit should be stored at the position of
+        // the padplane which is the roughly the the exit of the gas
+        // volume. So take the position from the exit point. The 
+        // momentum to calculate the TR production should be taken from 
+        // the entrance point.
+        // FU, 21.06.10
+	pt->PositionOut(pos); 
 	pt->Momentum(mom);
 
 	// TR

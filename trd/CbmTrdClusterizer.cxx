@@ -1173,7 +1173,9 @@ void CbmTrdClusterizer::GetPadSizeMatrix(Double_t* H, Double_t* W, Double_t* pad
   // --------------------------------------------------------------------
 void CbmTrdClusterizer::ChargeConservation(Int_t Row_slice, Int_t Col_slice, Int_t nCol, Int_t nRow)
 {
-  
+  /*
+    the integration area of CalcMathieson() is not necessary coverd by the module size. Therefore the charge induced outside of the module borders is added to the charge on the first pads inside of the module ranges.
+   */
   for (Int_t iRow = 0; iRow <= fPadNrY / 2; iRow++)
     {
       for (Int_t iCol = 0; iCol <= fPadNrX / 2; iCol++)
@@ -1215,6 +1217,9 @@ void CbmTrdClusterizer::ChargeConservation(Int_t Row_slice, Int_t Col_slice, Int
   // --------------------------------------------------------------------
 void CbmTrdClusterizer::ClusterMapping(Int_t nCol, Int_t nRow, Int_t Col_slice, Int_t Row_slice, Double_t* PadChargeModule)
 {
+  /*
+    Associates the integration are used within CalcMathieson() to the pad area of the module
+   */
   
   for (Int_t iRow = 0; iRow < nRow; iRow++)
     {
@@ -1235,6 +1240,9 @@ void CbmTrdClusterizer::ClusterMapping(Int_t nCol, Int_t nRow, Int_t Col_slice, 
   // ---- GetIntegrationArea -------------------------------------------------
   void CbmTrdClusterizer::GetIntegrationArea(Bool_t Histo, TH1F* PadX, TH1F* PadY)
   {
+    /*
+      First iteration of the area on which the charge of one track is induced
+     */
     Int_t Padx = fabs(fCol_in - fCol_out) + 1;
     Int_t Pady = fabs(fRow_in - fRow_out) + 1;
 
@@ -1250,6 +1258,9 @@ void CbmTrdClusterizer::ClusterMapping(Int_t nCol, Int_t nRow, Int_t Col_slice, 
   // ---- CalcMathieson -------------------------------------------------
   void CbmTrdClusterizer::CalcMathieson(Bool_t TEST, Double_t x_mean, Double_t y_mean, Double_t SliceELoss,Double_t* W, Double_t* H)
   {
+    /*
+      Calculates the induced charge on tha area defind by 'fPadNrX' aand 'fPadNrY'  by using the mathieson formula for each cluster
+     */
     //printf("CalcMathieson...\n");
     Int_t accuracy = 1;    // '1/accuracy' integration step width [mm]
     Float_t h = 3;         //anode-cathode gap [mm]
@@ -1308,6 +1319,9 @@ void CbmTrdClusterizer::ClusterMapping(Int_t nCol, Int_t nRow, Int_t Col_slice, 
   // --------------------------------------------------------------------
   int CbmTrdClusterizer::GetPadMax(Int_t iRow, Int_t nCol, Double_t* PadChargeModule)
   {
+    /*
+      Find Pad with maximum induced charge per row
+     */
     Int_t PadMax = -1;
     Int_t PadPlateau = 1;
     Double_t TempCharge = 0;
@@ -1335,6 +1349,9 @@ void CbmTrdClusterizer::ClusterMapping(Int_t nCol, Int_t nRow, Int_t Col_slice, 
   // ---- CalcPRF------------ -------------------------------------------
 void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCol, Double_t* PadChargeModule, TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2)
 {
+  /*
+    Uses the non weighted Pad Responce Function to reconstructed the cluster position for each row
+   */
   if ( recoTRD1 && recoTRD2 && deltarecoTRD1 && deltarecoTRD2 && deltarecoPad && Xreco && PR && PRF && PRF2)
     {
       if (TEST)
@@ -1354,50 +1371,57 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
 		      Int_t max    = PadMax;
 		      Int_t left   = PadMax - 1;
 		      Int_t right  = PadMax + 1;
-		      if (PadChargeModule[iRow * nCol + left] > 0 && PadChargeModule[iRow * nCol + max] > 0 && PadChargeModule[iRow * nCol + right] > 0)
+		      if (PadChargeModule[iRow * nCol + left]  > 0 && 
+			  PadChargeModule[iRow * nCol + max]   > 0 && 
+			  PadChargeModule[iRow * nCol + right] > 0)
 			{
-			  fPRFHitPositionC = 0.5 * padsize[0] * log( PadChargeModule[iRow * nCol + right] / PadChargeModule[iRow * nCol + left] ) /
-			    ( log( PadChargeModule[iRow * nCol + max] * PadChargeModule[iRow * nCol + max]
-				   / ( PadChargeModule[iRow * nCol + left] * PadChargeModule[iRow * nCol + right] )));
+			  if (PadChargeModule[iRow * nCol + left ] != PadChargeModule[iRow * nCol + max]   && 
+			      PadChargeModule[iRow * nCol + max]   != PadChargeModule[iRow * nCol + right] && 
+			      PadChargeModule[iRow * nCol + right] != PadChargeModule[iRow * nCol + left] )
+			    {
+			      fPRFHitPositionC = 0.5 * padsize[0] * log( PadChargeModule[iRow * nCol + right] / PadChargeModule[iRow * nCol + left] ) /
+				( log( PadChargeModule[iRow * nCol + max] * PadChargeModule[iRow * nCol + max]
+				       / ( PadChargeModule[iRow * nCol + left] * PadChargeModule[iRow * nCol + right] )));
    
-			  fPRFHitPositionLL = fPRFHitPositionC + 0.5 * padsize[0];
-			}
-		      if (TEST)// is this right?????
-			{
-			  if(Reco==NULL)printf("bad Reco! CalcPRF2\n");
-			  else
-			    {
-			      Reco->Fill(fPRFHitPositionLL/padsize[0]+PadMax,iRow+0.5);
+			      fPRFHitPositionLL = fPRFHitPositionC + 0.5 * padsize[0];
 			    }
-			}
-		      if (Histo)
-			{
-			  recoTRD1->Fill(fPRFHitPositionC, fPadPosyC);
-			  recoTRD2->Fill(fPRFHitPositionC/padsize[0], fPadPosyC/padsize[1]);
-			  deltarecoTRD1->Fill(sqrt(pow(global_inC[0],2) + pow(global_inC[1],2)),fabs(fPRFHitPositionC-fPadPosxC));
-			  deltarecoTRD2->Fill(sqrt(pow(global_inC[0],2) + pow(global_inC[1],2)),fabs(fPRFHitPositionC-fPadPosxC));
-			  deltarecoPad->Fill(fPadPosxC/padsize[0],(fPRFHitPositionC-fPadPosxC)/padsize[0]);	 
-			  Xreco->Fill(fPRFHitPositionC/padsize[0]);
-			  PR->Fill(fPadPosxC-fPRFHitPositionC);
-			  if(PRF != NULL)
+			  if (TEST)// is this right?????
 			    {
-			      PRF->Fill(fPRFHitPositionC, PadChargeModule[iRow * nCol + max]/
-					(PadChargeModule[iRow * nCol + left] + PadChargeModule[iRow * nCol + max] + PadChargeModule[iRow * nCol + right]));
-			      PRF->Fill( + 1 * padsize[0] - fPRFHitPositionC, PadChargeModule[iRow * nCol + right]/
-					 (PadChargeModule[iRow * nCol + left] + PadChargeModule[iRow * nCol + max] + PadChargeModule[iRow * nCol + right]));
-			      PRF->Fill( - 1 * padsize[0] - fPRFHitPositionC, PadChargeModule[iRow * nCol + left]/
-					 (PadChargeModule[iRow * nCol + left] + PadChargeModule[iRow * nCol + max] + PadChargeModule[iRow * nCol + right]));
+			      if(Reco==NULL)printf("bad Reco! CalcPRF2\n");
+			      else
+				{
+				  Reco->Fill(fPRFHitPositionLL/padsize[0]+PadMax,iRow+0.5);
+				}
+			    }
+			  if (Histo)
+			    {
+			      recoTRD1->Fill(fPRFHitPositionC, fPadPosyC);
+			      recoTRD2->Fill(fPRFHitPositionC/padsize[0], fPadPosyC/padsize[1]);
+			      deltarecoTRD1->Fill(sqrt(pow(global_inC[0],2) + pow(global_inC[1],2)),fabs(fPRFHitPositionC-fPadPosxC));
+			      deltarecoTRD2->Fill(sqrt(pow(global_inC[0],2) + pow(global_inC[1],2)),fabs(fPRFHitPositionC-fPadPosxC));
+			      deltarecoPad->Fill(fPadPosxC/padsize[0],(fPRFHitPositionC-fPadPosxC)/padsize[0]);	 
+			      Xreco->Fill(fPRFHitPositionC/padsize[0]);
+			      PR->Fill(fPadPosxC-fPRFHitPositionC);
+			      if(PRF != NULL)
+				{
+				  PRF->Fill(fPRFHitPositionC, PadChargeModule[iRow * nCol + max]/
+					    (PadChargeModule[iRow * nCol + left] + PadChargeModule[iRow * nCol + max] + PadChargeModule[iRow * nCol + right]));
+				  PRF->Fill( + 1 * padsize[0] - fPRFHitPositionC, PadChargeModule[iRow * nCol + right]/
+					     (PadChargeModule[iRow * nCol + left] + PadChargeModule[iRow * nCol + max] + PadChargeModule[iRow * nCol + right]));
+				  PRF->Fill( - 1 * padsize[0] - fPRFHitPositionC, PadChargeModule[iRow * nCol + left]/
+					     (PadChargeModule[iRow * nCol + left] + PadChargeModule[iRow * nCol + max] + PadChargeModule[iRow * nCol + right]));
 
-			      PRF2->Fill(fPRFHitPositionC, PadChargeModule[iRow * nCol + max]/
-					 (PadChargeModule[iRow * nCol + left] + PadChargeModule[iRow * nCol + max] + PadChargeModule[iRow * nCol + right]));
-			      PRF2->Fill( + 1 * padsize[0] - fPRFHitPositionC, PadChargeModule[iRow * nCol + right]/
-					  (PadChargeModule[iRow * nCol + left] + PadChargeModule[iRow * nCol + max] + PadChargeModule[iRow * nCol + right]));
-			      PRF2->Fill( - 1 * padsize[0] - fPRFHitPositionC, PadChargeModule[iRow * nCol + left]/
-					  (PadChargeModule[iRow * nCol + left] + PadChargeModule[iRow * nCol + max] + PadChargeModule[iRow * nCol + right]));
-			    }
-			  else 
-			    {
-			      printf("bad PRF\n");
+				  PRF2->Fill(fPRFHitPositionC, PadChargeModule[iRow * nCol + max]/
+					     (PadChargeModule[iRow * nCol + left] + PadChargeModule[iRow * nCol + max] + PadChargeModule[iRow * nCol + right]));
+				  PRF2->Fill( + 1 * padsize[0] - fPRFHitPositionC, PadChargeModule[iRow * nCol + right]/
+					      (PadChargeModule[iRow * nCol + left] + PadChargeModule[iRow * nCol + max] + PadChargeModule[iRow * nCol + right]));
+				  PRF2->Fill( - 1 * padsize[0] - fPRFHitPositionC, PadChargeModule[iRow * nCol + left]/
+					      (PadChargeModule[iRow * nCol + left] + PadChargeModule[iRow * nCol + max] + PadChargeModule[iRow * nCol + right]));
+				}
+			      else 
+				{
+				  printf("bad PRF\n");
+				}
 			    }
 			}
 		    }
@@ -1435,23 +1459,28 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
 
     // Pixel not yet in map -> Add new pixel
     if ( fDigiMapIt == fDigiMap.end() ) {
+      /*
       if (fModuleID == 111003) {
 	cout<<"Create ModID 111003 in Map"<<endl;
       }
+      */
       //  CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, fCol_mean, fRow_mean, fELoss, fMCindex);
-      CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, iCol, iRow, iCharge, fMCindex);
+      CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, iCol, iRow, iCharge,/* fTime,*/ fMCindex);
       fDigiMap[b] = digi;
     }
 
     // Pixel already in map -> Add charge
     else {
+      /*
       if (fModuleID == 111003) {
 	cout<<"Modify ModID 111003 in Map"<<endl;
       }
+      */
       CbmTrdDigi* digi = (CbmTrdDigi*)fDigiMapIt->second;
       if ( ! digi ) Fatal("AddChargeToPixel", "Zero pointer in digi map!");
       digi->AddCharge(iCharge);
       digi->AddMCIndex(fMCindex);
+      //if( fTime > (digi->GetTime()) ) digi->SetTime(fTime);
     }
   
   }

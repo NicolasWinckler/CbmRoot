@@ -167,14 +167,14 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   //const Bool_t TEST = false;
   const Bool_t Sector = true;
   //const Bool_t Sector = false;
-  /*
-    if (Histo){
+  
+  if (Histo){
     printf("Finale Histograms are Created and Saved to Pics/*.png\n");
-    }
-    if (TEST){
+  }
+  if (TEST){
     printf("Long path tracks are Exported to Pics/*.png\n");
-    }
-  */
+  }
+  
   TH1F* TRDalpha = NULL;
   TH1F* TRDbeta = NULL;
   TH1F* XMC = NULL;
@@ -462,43 +462,19 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	    {
 	      delete Reco;
 	    }
-	  /*
-	    else
-	    {
-	    printf("Reco can't be deleted\n");
-	    }
-	  */
 	  if ( In )
 	    {
 	      delete In;
 	    }
-	  /*
-	    else
-	    {
-	    printf("In can't be deleted\n");
-	    }
-	  */
 	  if ( Out)
 	    {
 	      delete Out;
 	    }
-	  /*
-	    else
-	    {
-	    printf("Out can't be deleted\n");
-	    }
-	  */
 	  if (Clusterposition)
 	    {
 	      delete Clusterposition;
 	    }
-	  /*
-	    else
-	    {
-	    printf("Clusterposition can't be deleted\n");
-	    }
-	  */
-	  //printf("Delete....\n");
+
 	}
       if (Histo)
 	{
@@ -553,7 +529,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	    }	
 	  zdTRD->Fill(fLayer+(fStation-1)*4, fabs(Rin-Rout));
 	  padTRD1->Fill(fPadPosxC, fPadPosyC);
-	  padTRD2->Fill(fPadPosxC/padsize[0], fPadPosyC/padsize[1]);
+	  padTRD2->Fill(fPadPosxC/padsize[0], fPadPosyC/padsize[1]);//GetPadHeight(GetSector(local_meanLL[1]))
 	  DeltaSlice->Fill((global_inC[0] - global_outC[0])/padsize[0], (global_inC[1] - global_outC[1])/padsize[1]); 
 	  XMC->Fill(fPadPosxC/padsize[0]);
 	}
@@ -870,30 +846,15 @@ void CbmTrdClusterizer::CalculatePixel(Bool_t Sector)
   // origin of the local coordinate system in 
   // the lower left corner of the chamber, 
   // x to the right (small side of the pads), y up
+  fCol_mean = GetCol(local_meanLL[0]);
+  fRow_mean = GetRow(local_meanLL[1]);
 
+  fCol_in   = GetCol(  local_inLL[0]);
+  fRow_in   = GetRow(  local_inLL[1]);
 
-      if (fSector > 0 )
-	{
-	  fCol_mean = (Int_t)((local_meanLL[0]) / padsize[0]);
-	  fRow_mean = (Int_t)((local_meanLL[1] - sectorsize[fSector - 1]) / padsize[1]) + sectorrows[fSector - 1];
+  fCol_out  = GetCol( local_outLL[0]);
+  fRow_out  = GetRow( local_outLL[1]);
 
-	  fCol_in   = (Int_t)((  local_inLL[0]) / padsize[0]);
-	  fRow_in   = (Int_t)((  local_inLL[1] - sectorsize[fSector - 1]) / padsize[1]) + sectorrows[fSector - 1];
-
-	  fCol_out  = (Int_t)(( local_outLL[0]) / padsize[0]);
-	  fRow_out  = (Int_t)(( local_outLL[1] - sectorsize[fSector - 1]) / padsize[1]) + sectorrows[fSector - 1];
-	}
-      if (fSector > 1)
-	{
-	  fCol_mean = (Int_t)((local_meanLL[0]) / padsize[0]);
-	  fRow_mean = (Int_t)((local_meanLL[1] - sectorsize[fSector - 1] - sectorsize[fSector - 2]) / padsize[1]) + sectorrows[fSector - 1] + sectorrows[fSector - 2];
-
-	  fCol_in   = (Int_t)((  local_inLL[0]) / padsize[0]);
-	  fRow_in   = (Int_t)((  local_inLL[1] - sectorsize[fSector - 1] - sectorsize[fSector - 2]) / padsize[1]) + sectorrows[fSector - 1] + sectorrows[fSector - 2];
-
-	  fCol_out  = (Int_t)(( local_outLL[0]) / padsize[0]);
-	  fRow_out  = (Int_t)(( local_outLL[1] - sectorsize[fSector - 1] - sectorsize[fSector - 2]) / padsize[1]) + sectorrows[fSector - 1] + sectorrows[fSector - 2];
-	}
 }
   // ---------------CalculatePixelCoordinate-----------------------------------------------------
 void CbmTrdClusterizer:: CalcPixelCoordinate() 
@@ -909,6 +870,51 @@ void CbmTrdClusterizer:: CalcPixelCoordinate()
   // the 'C'enter of the pad
   fPadPosxC = fPadPosxLL - 0.5 * padsize[0]; //[mm]
   fPadPosyC = fPadPosyLL - 0.5 * padsize[1]; //[mm]
+}
+  // --------------------------------------------------------------------
+  // --------------------------------------------------------------------
+int CbmTrdClusterizer::GetCol(Double_t tempPosX)/*tempPosX has to be in LL module coordinate-systems in [mm]*/
+{
+  Int_t iCol   = (Int_t)((tempPosX) / padsize[0]);
+  return iCol;
+}
+  // --------------------------------------------------------------------
+  // --------------------------------------------------------------------
+int CbmTrdClusterizer::GetRow(Double_t tempPosY)/*tempPosY has to be in LL module coordinate-systems in [mm]*/
+{
+  Int_t iRow = 0;
+  for (Int_t iSector = 0; iSector < fNoSectors; iSector++)
+    {
+      if (tempPosY > sectorsize[iSector])
+	{
+	  tempPosY -= sectorsize[iSector];
+	  iRow += sectorrows[iSector];
+	}
+      else
+	{
+	  iRow += int(tempPosY / float(GetPadHeight(iSector)));
+	  break;
+	}
+    }
+  return iRow;
+}
+  // --------------------------------------------------------------------
+  // --------------------------------------------------------------------
+int CbmTrdClusterizer::GetSector(Double_t tempPosY)/*tempPosY has to be in LL module coordinate-systems in [mm]*/
+{
+   for (Int_t iSector = 0; iSector < fNoSectors; iSector++)
+    {
+      if (tempPosY > sectorsize[iSector])
+	{
+	  tempPosY -= sectorsize[iSector];
+	}
+      else
+	{
+	  return iSector;
+	  break;//?? nötig ??
+	}
+    }
+  
 }
   // --------------------------------------------------------------------
   // ---- SplitPathSlices -------------------------------------------------
@@ -953,7 +959,7 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
 	      Out = new TH2F("out","out [mm]", (nCol) * 100, 0, (nCol), nRow * 100, 0, (nRow));
 	      Out->SetMarkerStyle(24);
 	      Out->SetMarkerColor(1);
-	      In ->Fill(local_inLL[0] /padsize[0], local_inLL[1] /padsize[1]);
+	      In ->Fill(local_inLL[0] /padsize[0], local_inLL[1] /padsize[1]); 
 	      Out->Fill(local_outLL[0]/padsize[0], local_outLL[1]/padsize[1]);
 	      Clusterposition = new TH2F("ClusterPosition","Cluster Positions [mm]", (nCol) * 100, 0, (nCol),(nRow) * 100, 0, (nRow));
 	      Clusterposition->SetMarkerStyle(2);
@@ -980,32 +986,14 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
 	  ClusterMLL[0]    = local_inLL[0] + (0.5 * delta[0]) + (delta[0] * iPathSlice); 
 	  ClusterMLL[1]    = local_inLL[1] + (0.5 * delta[1]) + (delta[1] * iPathSlice); 
 
-	  Col_slice = 0;
-	  Row_slice = 0;
+	  Col_slice = GetCol(ClusterMLL[0]);
+	  Row_slice = GetRow(ClusterMLL[1]);
 
-	  Col_slice = (Int_t)((ClusterMLL[0]) / padsize[0]);
-	 
-	  Double_t tempClusterMLLy = ClusterMLL[1];
-	  Int_t iSector = 0;
-	  for (iSector = 0; iSector < fNoSectors; iSector++)
-	    {
-	      if (tempClusterMLLy > sectorsize[iSector])
-		{
-		  tempClusterMLLy -= sectorsize[iSector];
-		  Row_slice += sectorrows[iSector];
-		}
-	      else
-		{
-		  Row_slice += int(tempClusterMLLy / float(GetPadHeight(iSector)));
-		  break;
-		}
-	    }
-    
 	  ClusterPosC[0] = (ClusterMLL[0] - padsize[0] * Col_slice) - 0.5 * padsize[0]; //[mm]
 	  Double_t tempClusterPosCy = ClusterMLL[1];
 	  Int_t tempSecRows = Row_slice;
-
-	  for (iSector = 0; iSector < fNoSectors; iSector++)
+	  Int_t iSector;
+	  for ( iSector = 0; iSector < fNoSectors; iSector++)
 	    {
 	      if (tempClusterPosCy > sectorsize[iSector])
 		{
@@ -1027,17 +1015,13 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
 		  //printf("PadSlice (%d/%d)\n",Col_slice,Row_slice);
 		}
 	    }
-	  //---------------------------------------------------------------------------------------------
-	  GetPadSizeMatrix( H, W, padH, padW, Row_slice, Col_slice, nRow, nCol);
 
-	  //---------------------------------------------------------------------------------------------
+	  GetPadSizeMatrix( H, W, padH, padW, Row_slice, Col_slice, nRow, nCol);
 
 	  CalcMathieson(TEST, ClusterPosC[0], ClusterPosC[1], SliceELoss, W ,H);
 
-	  // Charge conservation
 	  ChargeConservation(Row_slice, Col_slice,  nCol, nRow);
 
-	  // Cluster mapping in module coordinate system
 	  ClusterMapping( nCol, nRow, Col_slice, Row_slice, PadChargeModule);
 
 	}
@@ -1280,9 +1264,9 @@ void CbmTrdClusterizer::ClusterMapping(Int_t nCol, Int_t nRow, Int_t Col_slice, 
 	    fPadCharge[iPadRow][iPadCol] = 0.0;
 	  }
       }
-    Float_t par = 1.0; // normalization factor
-    Float_t r = 0.0;   // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
-    Float_t rho = 0.0; //charge at position x
+    Float_t par = 1.0;   // normalization factor
+    Float_t r = 0.0;     // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
+    Float_t rho = 0.0;   //charge at position x
     Float_t K_3 = 0.525; //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
     //Float_t K_3 = -0.24 * (h / s) + 0.7 + (-0.75 * log(r_a / s) - 3.64);// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
     Float_t K_2 = 3.14159265 / 2.* ( 1. - sqrt(K_3)/2.);
@@ -1351,7 +1335,7 @@ void CbmTrdClusterizer::ClusterMapping(Int_t nCol, Int_t nRow, Int_t Col_slice, 
   // ---- CalcPRF------------ -------------------------------------------
 void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCol, Double_t* PadChargeModule, TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2)
 {
-  if ( recoTRD1 && recoTRD2 && deltarecoTRD1 && deltarecoTRD2 && deltarecoPad/* */ && Xreco && PR && PRF && PRF2)
+  if ( recoTRD1 && recoTRD2 && deltarecoTRD1 && deltarecoTRD2 && deltarecoPad && Xreco && PR && PRF && PRF2)
     {
       if (TEST)
 	{
@@ -1419,7 +1403,7 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
 		    }
 		}	  
 	    }
-	};
+	}
     }
   else
     {

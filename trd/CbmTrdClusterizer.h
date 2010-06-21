@@ -95,6 +95,8 @@ class CbmTrdClusterizer : public FairTask {
 
   void CalcPixelCoordinate();
 
+  float GetFloatPositionY(Double_t tempPosY);
+
   void SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,  TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2);
 
   void GetIntegrationArea(Bool_t Histo, TH1F* PadX ,TH1F* PadY);

@@ -58,7 +58,7 @@ class CbmTrdDigitizer : public FairTask {
 
 private:
    
-    void AddDigi();
+    void AddDigi(const Int_t pointID);
 
     Int_t   fCol; //Calculated pixel column were the hit is in
     Int_t   fRow; //Calculated pixel row were the hit is in

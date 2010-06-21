@@ -189,7 +189,7 @@ void CbmTrdDigitizer::Exec(Option_t * option)
     fModuleInfo->GetPadInfo(pt, fCol, fRow, Sector);
     fModuleID = fTrdId.SetSector(pt->GetDetectorID(), Sector);
 
-    AddDigi();
+    AddDigi(j);
 
   }
 
@@ -234,7 +234,7 @@ void CbmTrdDigitizer::FinishEvent()
 
 // --------------------------------------------------------------------
 
-void CbmTrdDigitizer::AddDigi() {
+void CbmTrdDigitizer::AddDigi(const Int_t pointID) {
   // Add digi for pixel(x,y) in module to map for intermediate storage
   // In case the pixel for this pixel/module combination does not exists
   // it is added to the map.
@@ -252,7 +252,7 @@ void CbmTrdDigitizer::AddDigi() {
     // Pixel not yet in map -> Add new pixel
     if ( fDigiMapIt == fDigiMap.end() ) {
       CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, fCol, fRow, fELoss, 
-                                        fTime, fMCindex);
+                                        fTime, pointID);
       fDigiMap[b] = digi;
     }
 
@@ -261,7 +261,7 @@ void CbmTrdDigitizer::AddDigi() {
         CbmTrdDigi* digi = (CbmTrdDigi*)fDigiMapIt->second;
         if ( ! digi ) Fatal("AddChargeToPixel", "Zero pointer in digi map!");
         digi->AddCharge(fELoss);
-        digi->AddMCIndex(fMCindex);
+        digi->AddMCIndex(pointID);
         if( fTime > (digi->GetTime()) ) digi->SetTime(fTime);
     }
 

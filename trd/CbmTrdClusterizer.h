@@ -1,4 +1,4 @@
-
+#
 #ifndef CBMTUTORIALDETCluster_H
 #define CBMTUTORIALDETCluster_H
 
@@ -57,7 +57,7 @@ class CbmTrdClusterizer : public FairTask {
 
   /** Standard constructor **/
   CbmTrdClusterizer(const char *name, const char *title="CBM Task",
-		CbmTrdRadiator *radiator=NULL);
+		    CbmTrdRadiator *radiator=NULL);
 
   /** Destructor **/
   virtual ~CbmTrdClusterizer();
@@ -99,6 +99,10 @@ class CbmTrdClusterizer : public FairTask {
 
   void GetIntegrationArea(Bool_t Histo, TH1F* PadX ,TH1F* PadY);
 
+  void ChargeConservation(Int_t Row_slice, Int_t Col_slice, Int_t nCol, Int_t nRow);
+
+  void ClusterMapping(Int_t nCol, Int_t nRow, Int_t Col_slice, Int_t Row_slice, Double_t* PadChargeModule);
+
   void CalcMathieson(Bool_t TEST, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
 
   void CalcCenterOfGravity();
@@ -109,7 +113,15 @@ class CbmTrdClusterizer : public FairTask {
  
   void TransformC2LL(Double_t* CCoordinate, Double_t* LLCoordinate, Double_t* StrucDim);
 
-  double GetPadHeight(Int_t iRow);
+  double GetPadHeight(Int_t iSector);
+
+  int GetRow(Double_t tempPosY);
+
+  int GetCol(Double_t tempPosX);
+
+  int GetSector(Double_t tempPosY);
+
+  void GetPadSizeMatrix(Double_t* H, Double_t* W, Double_t* padH, Double_t* padW, Int_t Row_slice, Int_t Col_slice, Int_t nRow, Int_t nCol);
 
   int GetPadMax(Int_t iRow, Int_t nCol, Double_t* PadChargeModule);
 
@@ -130,7 +142,6 @@ class CbmTrdClusterizer : public FairTask {
   Double_t local_meanC[3];
   Double_t global_meanLL[3];//[cm]
   Double_t global_meanC[3];
-
   Double_t local_inLL[3];
   Double_t local_inC[3];
   Double_t global_inLL[3];//[cm]
@@ -144,16 +155,18 @@ class CbmTrdClusterizer : public FairTask {
 
   Float_t fx_in, fx_out, fy_in, fy_out, fz_in, fz_out, fx_mean, fy_mean, fz_mean;
   Int_t fSector;
+  //Int_t tempNosectors =  (fModuleInfo->GetNoSectors);
   static const Int_t fPadNrX = 7; // has to be odd
   static const Int_t fPadNrY = 5; // has to be odd
- static const Int_t fNoSectors = 3;
+  static const Int_t fNoSectors = 3;
+  //Int_t fNoSectors;
   /*
-  static const Bool_t Histo = true;
-  //static const Bool_t Histo = false;
-  static const Bool_t TEST = true;
-  //static const Bool_t TEST = false;
-  //static const Bool_t Sector = true;
-  static const Bool_t Sector = false;
+    static const Bool_t Histo = true;
+    //static const Bool_t Histo = false;
+    static const Bool_t TEST = true;
+    //static const Bool_t TEST = false;
+    //static const Bool_t Sector = true;
+    static const Bool_t Sector = false;
   */
   
   Double_t padsize[3];

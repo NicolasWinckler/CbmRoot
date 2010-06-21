@@ -48,6 +48,9 @@ class CbmTrdDigiMatch : public TObject
   /** Accessor to TrdPoint indizes **/
   Int_t GetRefIndex(Int_t i = 0) const;
 
+  /** Return number of references **/
+  Int_t GetNofRefs() const {return fRefIndex.GetSize();}
+
  private:
 
   //  Int_t fNrRefIndex;

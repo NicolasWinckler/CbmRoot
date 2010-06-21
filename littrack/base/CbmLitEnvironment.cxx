@@ -189,7 +189,7 @@ void CbmLitEnvironment::TrdLayout()
 							TGeoPgon* shape = (TGeoPgon*) layerPart->GetVolume()->GetShape();
 							CbmLitStation sta;
 							CbmLitSubstation substation;
-							substation.SetZ(stationPos[2] + layerPos[2] + pos[2] - shape->GetDZ() + Zmodule + 0.001);
+							substation.SetZ(stationPos[2] + layerPos[2] + pos[2] + shape->GetDZ() + Zmodule);
 							sta.SetType(kLITPIXELHIT);
 							sta.AddSubstation(substation);
 							stationSet.insert(sta);

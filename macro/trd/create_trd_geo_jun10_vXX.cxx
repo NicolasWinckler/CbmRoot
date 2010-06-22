@@ -2,6 +2,9 @@
 //   Generator for CbmTrd Geometry
 //
 //
+// Update 20100526 - David Emschermann 
+// - change the order of 1x1m^2 modules to allow for tilting
+//
 // Update 20100617 - David Emschermann 
 // - move TRD in z to 4500 / 6750 / 9000 mm
 // - change calculation of thicknesses
@@ -13,13 +16,13 @@
 // - replace carbon frames by G10
 //
 // Update 20100526 - David Emschermann 
-// - change the order of chambers to match the pad definition for jun10
+// - change the order of modules to match the pad definition for jun10
 //
 // Update 20091127 - David Emschermann 
 // - all chambers have squared geometry
 //
 // Update 20081120 - F. Uhlig
-// Changes made that geometry is now independent of Trd-positions.
+// - Changes made that geometry is now independent of Trd-positions.
 //
 
 #include <cstring>
@@ -484,7 +487,8 @@ int main(void)
   //  string geoname  = path + "trd_squared_modules_jun10_150mm_pitch.geo" ;
   //
   //  string geoname  = path + "trd_squared_modules_jun10_v01.geo" ; // 12 mm gas
-  string geoname  = path + "trd_squared_modules_jun10_v02.geo" ; //  6 mm gas 
+  //  string geoname  = path + "trd_squared_modules_jun10_v02.geo" ; //  6 mm gas
+  string geoname  = path + "trd_squared_modules_jun10_v03.geo" ; //  test
   string infoname = path + "trd_segmented.info";
   string parametername  = path + "trd_segmented.txt";
 
@@ -727,51 +731,51 @@ int main(void)
 	  	    
   //------------------------------------------------------------------
   //trd1mod3-1
+// | no 1 
+  float x307 = Detector_size_x[2] *  2;
+  float y307 = Detector_size_y[2] *  2;
 
-  float x307 = Detector_size_x[2] *  3;
-  float y307 = Detector_size_y[2] *  0;
-	  	    
-  float x308 = Detector_size_x[2] *  3;
-  float y308 = Detector_size_y[2] *  1;
-	  	    
-  float x309 = Detector_size_x[2] *  3;
+  float x308 = Detector_size_x[2] *  2;
+  float y308 = Detector_size_y[2] * -2;
+// top 		       
+  float x309 = Detector_size_x[2] *  1;
   float y309 = Detector_size_y[2] *  2;
-	  	    
-  float x310 = Detector_size_x[2] *  2;
+
+  float x310 = Detector_size_x[2] *  0;
   float y310 = Detector_size_y[2] *  2;
-	  	    
-  float x311 = Detector_size_x[2] *  1;
+
+  float x311 = Detector_size_x[2] * -1;
   float y311 = Detector_size_y[2] *  2;
-	  	    
-  float x312 = Detector_size_x[2] *  0;
+// | no 2
+  float x312 = Detector_size_x[2] *  3;
   float y312 = Detector_size_y[2] *  2;
-	  	    
-  float x313 = Detector_size_x[2] * -1;
-  float y313 = Detector_size_y[2] *  2;
-	  	    
-  float x314 = Detector_size_x[2] * -2;
-  float y314 = Detector_size_y[2] *  2;
-	  	    
-  float x315 = Detector_size_x[2] * -3;
-  float y315 = Detector_size_y[2] *  2;
-	  	    
-  float x316 = Detector_size_x[2] * -3;
-  float y316 = Detector_size_y[2] *  1;
-	  	    
+	  	    		       	       
+  float x313 = Detector_size_x[2] *  3;
+  float y313 = Detector_size_y[2] *  1;
+	  	    		       	       
+  float x314 = Detector_size_x[2] *  3;
+  float y314 = Detector_size_y[2] *  0;
+	  	    		       	       
+  float x315 = Detector_size_x[2] *  3;
+  float y315 = Detector_size_y[2] * -1;
+	  	    		       	       
+  float x316 = Detector_size_x[2] *  3;
+  float y316 = Detector_size_y[2] * -2;
+// | no 3
   float x317 = Detector_size_x[2] *  4;
-  float y317 = Detector_size_y[2] *  0;
-	  	    
+  float y317 = Detector_size_y[2] *  2;
+	  	    		       	       
   float x318 = Detector_size_x[2] *  4;
   float y318 = Detector_size_y[2] *  1;
-	  	    
+	  	    		       	       
   float x319 = Detector_size_x[2] *  4;
-  float y319 = Detector_size_y[2] *  2;
-	  	    
-  float x320 = Detector_size_x[2] * -4;
-  float y320 = Detector_size_y[2] *  2;
-	  	    
-  float x321 = Detector_size_x[2] * -4;
-  float y321 = Detector_size_y[2] *  1;
+  float y319 = Detector_size_y[2] *  0;
+	  	    		       	       
+  float x320 = Detector_size_x[2] *  4;
+  float y320 = Detector_size_y[2] * -1;
+	  	    		       	       
+  float x321 = Detector_size_x[2] *  4;
+  float y321 = Detector_size_y[2] * -2;
 	  	    
   float x322 = -x307;
   float y322 = -y307;
@@ -882,71 +886,71 @@ int main(void)
 //                                   {y4,x4,3,1}, {y5,-x5,3,1},{x6a,y6a,3,0},{x7a,y7a,3,0},{x8a,y8a,3,0},{x7a,-y7a,3,0},
 //                                   {x6a,-y6a,3,0},{-x6a,y6a,3,0},{-x7a,y7a,3,0},{-x8a,y8a,3,0},{-x7a,-y7a,3,0},{-x6a,-y6a,3,0}};
 
-
-  float x337 = Detector_size_x[2] * -1;
+// top 		       
+  float x337 = Detector_size_x[2] *  4;
   float y337 = Detector_size_y[2] *  3;
-
-  float x338 = Detector_size_x[2] *  0;
-  float y338 = Detector_size_y[2] *  3;
-
-  float x339 = Detector_size_x[2] *  1;
+				       
+  float x338 = Detector_size_x[2] *  4;
+  float y338 = Detector_size_y[2] * -3;
+				       
+  float x339 = Detector_size_x[2] *  3;
   float y339 = Detector_size_y[2] *  3;
-
-  float x340 = Detector_size_x[2] *  2;
-  float y340 = Detector_size_y[2] *  3;
-
-  float x341 = Detector_size_x[2] *  3;
+				       
+  float x340 = Detector_size_x[2] *  3;
+  float y340 = Detector_size_y[2] * -3;
+				       
+  float x341 = Detector_size_x[2] *  2;
   float y341 = Detector_size_y[2] *  3;
-
-  float x342 = Detector_size_x[2] *  4;
-  float y342 = Detector_size_y[2] *  3;
-
-  float x343 = Detector_size_x[2] *  5;
+				       
+  float x342 = Detector_size_x[2] *  2;
+  float y342 = Detector_size_y[2] * -3;
+				       
+  float x343 = Detector_size_x[2] *  1;
   float y343 = Detector_size_y[2] *  3;
-
-  float x344 = Detector_size_x[2] *  5;
-  float y344 = Detector_size_y[2] *  2;
-
-  float x345 = Detector_size_x[2] *  5;
-  float y345 = Detector_size_y[2] *  1;
-
+				       
+  float x344 = Detector_size_x[2] *  1;
+  float y344 = Detector_size_y[2] * -3;
+				       
+  float x345 = Detector_size_x[2] *  0;
+  float y345 = Detector_size_y[2] *  3;
+// | no 4
   float x346 = Detector_size_x[2] *  5;
-  float y346 = Detector_size_y[2] *  0;
-
+  float y346 = Detector_size_y[2] *  3;
+				       
   float x347 = Detector_size_x[2] *  5;
-  float y347 = Detector_size_y[2] * -1;
-
+  float y347 = Detector_size_y[2] *  2;
+				       
   float x348 = Detector_size_x[2] *  5;
-  float y348 = Detector_size_y[2] * -2;
-
+  float y348 = Detector_size_y[2] *  1;
+				       
   float x349 = Detector_size_x[2] *  5;
-  float y349 = Detector_size_y[2] * -3;
-
-  float x350 = Detector_size_x[2] *  4;
-  float y350 = Detector_size_y[2] * -3;
-
-  float x351 = Detector_size_x[2] *  3;
-  float y351 = Detector_size_y[2] * -3;
-
-  float x352 = Detector_size_x[2] *  2;
+  float y349 = Detector_size_y[2] *  0;
+				       
+  float x350 = Detector_size_x[2] *  5;
+  float y350 = Detector_size_y[2] * -1;
+				       
+  float x351 = Detector_size_x[2] *  5;
+  float y351 = Detector_size_y[2] * -2;
+				       
+  float x352 = Detector_size_x[2] *  5;
   float y352 = Detector_size_y[2] * -3;
-
-  float x353 = Detector_size_x[2] *  6;
+// | no 5
+  float x353 = Detector_size_x[2] *  6;	 
   float y353 = Detector_size_y[2] *  2.5;
-
-  float x354 = Detector_size_x[2] *  6;
+					 
+  float x354 = Detector_size_x[2] *  6;	 
   float y354 = Detector_size_y[2] *  1.5;
-
-  float x355 = Detector_size_x[2] *  6;
+					 
+  float x355 = Detector_size_x[2] *  6;	 
   float y355 = Detector_size_y[2] *  0.5;
-
-  float x356 = Detector_size_x[2] *  6;
+					 
+  float x356 = Detector_size_x[2] *  6;	 
   float y356 = Detector_size_y[2] * -0.5;
-
-  float x357 = Detector_size_x[2] *  6;
+					 
+  float x357 = Detector_size_x[2] *  6;	 
   float y357 = Detector_size_y[2] * -1.5;
-
-  float x358 = Detector_size_x[2] *  6;
+					 
+  float x358 = Detector_size_x[2] *  6;	 
   float y358 = Detector_size_y[2] * -2.5;
 
   //------------------------------------------------------------------

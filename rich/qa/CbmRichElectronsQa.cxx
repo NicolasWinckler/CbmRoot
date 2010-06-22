@@ -637,7 +637,7 @@ void CbmRichElectronsQa::GlobalTracksMatchEff()
 		CbmStsTrack* stsTrack = (CbmStsTrack*)fStsTracks->At(stsIndex);
 		if (!stsTrack) continue;
 		CbmRichRing* richRing = (CbmRichRing*)fRichRings->At(richIndex);
-		if (!stsTrack) continue;
+		if (!richRing) continue;
 
 		CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*)fStsTrackMatches->At(stsIndex);
 		if (!stsTrackMatch) continue;
@@ -714,12 +714,12 @@ void CbmRichElectronsQa::GlobalTracksElIdEff()
 		CbmStsTrack* stsTrack = (CbmStsTrack*)fStsTracks->At(stsIndex);
 		if (!stsTrack) continue;
 		CbmRichRing* richRing = (CbmRichRing*)fRichRings->At(richIndex);
-		if (!stsTrack) continue;
+		if (!richRing) continue;
 
 		CbmTrackMatch* stsTrackMatch = (CbmTrackMatch*)fStsTrackMatches->At(stsIndex);
 		if (!stsTrackMatch) continue;
 		CbmRichRingMatch* richRingMatch = (CbmRichRingMatch*)fRichRingMatches->At(richIndex);
-		if (!stsTrackMatch) continue;
+		if (!richRingMatch) continue;
 
 		Int_t mcIdSts = stsTrackMatch->GetMCTrackId();
 		Int_t mcIdRich = richRingMatch->GetMCTrackID();

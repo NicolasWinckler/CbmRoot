@@ -39,7 +39,7 @@ export NPIONSMINUS=5
 # number of embedded particles from pluto. MAX = 10.
 export NPLUTO=10
 # If "yes" than UrQMD will be used as background
-export URQMD=yes
+export URQMD=no
 # If "yes" than primary muons will be generated
 export MUONS=yes
 # If "yes" than primary electrons will be generated
@@ -51,10 +51,10 @@ export PLUTO=no
 
 
 if [ "$1" = "muon" ] ; then
-    $DIR=/d/cbm02/andrey/test_muons
-    $IMAGEDIR=./test_muons/
-    $DETECTORSETUP=muon
-    $URQMD=yes
+    export DIR=/d/cbm02/andrey/test_muons
+    export IMAGEDIR=./test_muons/
+    export DETECTORSETUP=muon
+    export URQMD=yes
     export MUONS=yes
     export ELECTRONS=no
     export PIONS=no
@@ -88,7 +88,8 @@ if [ $DETECTORSETUP = "muon" ]; then
     export MUCHDIGI=$VMCWORKDIR/parameters/much/much_standard_2layers.digi.root
     export RICHGEOM=
     export TRDGEOM=
-#trd_muon_setup_new.geo   
+#trd_muon_setup_new.geo
+    export TRDDIGI=
     export TOFGEOM=tof_standard.geo
     export ECALGEOM=
     export FIELDMAP=field_muon_standard
@@ -99,12 +100,13 @@ else
     export PIPEGEOM=pipe_much.geo
     export SHIELDGEOM=shield_standard.geo
     export MVDGEOM= #mvd_standard.geo
-    export STSGEOM=sts_standard.geo
-    export STSDIGI=$VMCWORKDIR/parameters/sts/sts_standard.digi.par
+    export STSGEOM=sts_same_z.geo
+    export STSDIGI=$VMCWORKDIR/parameters/sts/sts_same_z.digi.par
     export MUCHGEOM=
     export MUCHDIGI=
     export RICHGEOM=rich_standard.geo
     export TRDGEOM=trd_standard.geo
+    export TRDDIGI=$VMCWORKDIR/parameters/trd/trd_standard.digi.par
     export TOFGEOM=tof_standard.geo
     export ECALGEOM=
     export FIELDMAP=field_electron_standard
@@ -112,7 +114,7 @@ else
 fi
 
 #number of events for each thread
-export NEVENTS=1
+export NEVENTS=800
 
 for Y in 0; do
  for X in 0; do
@@ -138,33 +140,14 @@ for Y in 0; do
   root -b -q "./global_reco.C($NEVENTS, \"all\")"
   #root -b -q "./global_reco.C($NEVENTS, \"hits\")"
   #root -b -q "./global_reco.C($NEVENTS, \"tracking\")"
-  #root -b -q "../rich/run/run_reco_rich.C($NEVENTS)"
-  #root -b -q "../rich/electronId/run_electrons_qa.C($NEVENTS)"
+  root -b -q "../rich/run/run_reco_rich.C($NEVENTS)"
+  root -b -q "../rich/electronId/run_electrons_qa.C($NEVENTS)"
   
 #  . ./sim.sh
 # bsub -q betch64 -J mc.$XXXX.run -o log/$XXXX.log -N -u andrey.lebedev@gsi.de sh much.sh
  done
 done
 export SCRIPT=no
-
-
-
-
-
-
-
-
-#!/bin/sh
-#cd $MYBUILDDIR
-#. ./config.sh
-#cd -
-#root -b -q "./global_sim.C($NEVENTS)"
-#root -b -q "./global_reco.C($NEVENTS, \"all\")"
-#root -b -q "./global_reco.C($NEVENTS, \"hits\")"
-#root -b -q "./global_reco.C($NEVENTS, \"tracking\")"
-#root -b -q "../rich/run/run_reco_rich.C($NEVENTS)"
-#root -b -q "../rich/electronId/run_electrons_qa.C($NEVENTS)"
-
 
 
 

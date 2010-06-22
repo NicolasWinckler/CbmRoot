@@ -97,7 +97,7 @@ class CbmTrdClusterizer : public FairTask {
 
   float GetFloatPositionY(Double_t tempPosY);
 
-  void SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,  TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2);
+  void SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,  TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration);
 
   void GetIntegrationArea(Bool_t Histo, TH1F* PadX ,TH1F* PadY);
 
@@ -158,8 +158,9 @@ class CbmTrdClusterizer : public FairTask {
   Float_t fx_in, fx_out, fy_in, fy_out, fz_in, fz_out, fx_mean, fy_mean, fz_mean;
   Int_t fSector;
   //Int_t tempNosectors =  (fModuleInfo->GetNoSectors);
-  static const Int_t fPadNrX = 7; // has to be odd
-  static const Int_t fPadNrY = 5; // has to be odd
+  static const Int_t accuracy = 1;// '1/accuracy' integration step width [mm]
+  static const Int_t fPadNrX = 9;//7; // has to be odd
+  static const Int_t fPadNrY = 7;//5; // has to be odd
   static const Int_t fNoSectors = 3;
   //Int_t fNoSectors;
   /*

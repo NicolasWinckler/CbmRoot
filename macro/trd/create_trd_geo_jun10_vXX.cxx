@@ -712,13 +712,13 @@ int main(void)
   //trd1mod3-1
 
   float x301 = Detector_size_x[2] *  2;
-  float y301 = Detector_size_y[2] *  0;
+  float y301 = Detector_size_y[2] *  1;
 	  	    
   float x302 = Detector_size_x[2] *  2;
-  float y302 = Detector_size_y[2] *  1;
+  float y302 = Detector_size_y[2] *  0;
 	  	    
-  float x303 = Detector_size_x[2] * -2;
-  float y303 = Detector_size_y[2] *  1;
+  float x303 = Detector_size_x[2] *  2;
+  float y303 = Detector_size_y[2] * -1;
 	  	    
   float x304 = -x301;
   float y304 = -y301;

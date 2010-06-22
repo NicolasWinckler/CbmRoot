@@ -126,6 +126,14 @@ add_subdirectory (trdcatrack)
 #add_subdirectory (tutorials/Tutorial2/src)
 add_subdirectory (cbmgenerators)
 
+set(BUILD_ROCLIB FALSE CACHE BOOL "Build DABC and RocLib which are needed
+    to read testbeam data.")
+If(BUILD_ROCLIB)
+  configure_file(${PROJECT_SOURCE_DIR}/cmake/scripts/CMakeLists.txt_roc
+                 ${PROJECT_SOURCE_DIR}/roc/CMakeLists.txt COPYONLY)
+  add_subdirectory (roc)
+EndIf(BUILD_ROCLIB)
+
 
 Option(BUILD_DOXYGEN "Build Doxygen" OFF)
 if(BUILD_DOXYGEN)

@@ -8,7 +8,7 @@
 #include "../../littrack/utils/CbmLitDrawHist.cxx"
 #include <string>
 TCanvas* DrawAcc(TH1D* mc, TH1D* acc, TH1D* richTrd, TH1D* richTrdTof){
-	TCanvas *c1 = new TCanvas("c1","c1",500,500);
+	TCanvas *c1 = new TCanvas("elid_acc_eff","elid_acc_eff",500,500);
 	TH1D* accEff1 = Divide1DHists(acc, mc, "elid_acc_rich_eff",
 		"Efficiencies for primary electrons normalized to MC rings",
 		"momentum, GeV/c", "efficiency");
@@ -32,15 +32,15 @@ TCanvas* DrawAcc(TH1D* mc, TH1D* acc, TH1D* richTrd, TH1D* richTrdTof){
 TCanvas* DrawMatchingEff(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrueMatchStsRichGlobal,
 		TH1D* fhTrueMatchStsRichTrdGlobal, TH1D* fhTrueMatchStsRichTrdTofGlobal)
 {
-	TCanvas *c2 = new TCanvas("c2","c2",500,500);
+	TCanvas *c2 = new TCanvas("elid_match_eff","elid_match_eff",500,500);
 	TH1D* ringFindEff = Divide1DHists(fhTrueFoundRings, fhAccRings, "elid_ring_find_eff",
 		"Ring finding efficiencies for primary electrons (norm. acc. rings)",
 		"momentum, GeV/c", "efficiency");
 	ringFindEff->SetMinimum(0.);
 
-	TH1D* stsRichEff = Divide1DHists(fhTrueMatchStsRichGlobal, fhAccRings,"elid_sts_rich_eff","",	"", "");
-	TH1D* stsRichTrdEff = Divide1DHists(fhTrueMatchStsRichTrdGlobal, fhAccRings,"elid_sts_rich_trd_eff","",	"", "");
-	TH1D* stsRichTrdTofEff = Divide1DHists(fhTrueMatchStsRichTrdTofGlobal, fhAccRings,"elid_sts_rich_trd_eff","",	"", "");
+	TH1D* stsRichEff = Divide1DHists(fhTrueMatchStsRichGlobal, fhAccRings,"elid_match_sts_rich_eff","",	"", "");
+	TH1D* stsRichTrdEff = Divide1DHists(fhTrueMatchStsRichTrdGlobal, fhAccRings,"elid_match_sts_rich_trd_eff","",	"", "");
+	TH1D* stsRichTrdTofEff = Divide1DHists(fhTrueMatchStsRichTrdTofGlobal, fhAccRings,"elid_match_sts_rich_trd_eff","",	"", "");
 
 	std::string hname1, hname2, hname3, hname4;
 	hname1 = "ring finding (" +CalcEfficiency(fhTrueFoundRings,fhAccRings)+")";
@@ -60,7 +60,7 @@ TCanvas* DrawMatchingEff2(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrue
 		TH1D* fhTrueMatchStsRichTrdGlobal,TH1D* fhTrueMatchStsRichTrdTofGlobal)
 {
 	std::string hname1;
-    TCanvas *c3 = new TCanvas("c3","c3",800,800);
+    TCanvas *c3 = new TCanvas("elid_match_eff2","elid_match_eff2",800,800);
     c3->Divide(2,2);
     c3->cd(1);
 	TH1D* eff1 = Divide1DHists(fhTrueFoundRings, fhAccRings, "elid_ring_find_eff2",
@@ -73,7 +73,7 @@ TCanvas* DrawMatchingEff2(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrue
     gPad->SetGridy(true);
 
     c3->cd(2);
-    TH1D* eff2 = Divide1DHists(fhTrueMatchStsRichGlobal, fhTrueFoundRings, "elid_sts_rich_eff2",
+    TH1D* eff2 = Divide1DHists(fhTrueMatchStsRichGlobal, fhTrueFoundRings, "elid_match_sts_rich_eff2",
     		"STS+RICH matching efficiency for primary electrons","momentum, GeV/c", "efficiency");
     hname1 = "Mean eff. = ("+CalcEfficiency(fhTrueMatchStsRichGlobal,fhTrueFoundRings)+")";
     DrawHist1D(eff2, NULL, NULL, NULL, "", "momentum, GeV/c", "efficiency",
@@ -83,7 +83,7 @@ TCanvas* DrawMatchingEff2(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrue
     gPad->SetGridy(true);
 
     c3->cd(3);
-	TH1D* eff3 = Divide1DHists(fhTrueMatchStsRichTrdGlobal, fhTrueMatchStsRichGlobal, "elid_sts_rich__trd_eff2",
+	TH1D* eff3 = Divide1DHists(fhTrueMatchStsRichTrdGlobal, fhTrueMatchStsRichGlobal, "elid_match_sts_rich__trd_eff2",
 			"STS+RICH+TRD matching efficiency for primary electrons","momentum, GeV/c", "efficiency");
 	hname1 = "Mean eff. = ("+CalcEfficiency(fhTrueMatchStsRichTrdGlobal,fhTrueMatchStsRichGlobal)+")";
 	DrawHist1D(eff3, NULL, NULL, NULL, "", "momentum, GeV/c", "efficiency",
@@ -93,7 +93,7 @@ TCanvas* DrawMatchingEff2(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrue
 	gPad->SetGridy(true);
 
     c3->cd(4);
-	TH1D* eff4 = Divide1DHists(fhTrueMatchStsRichTrdTofGlobal, fhTrueMatchStsRichTrdGlobal, "elid_sts_rich__trd_eff2",
+	TH1D* eff4 = Divide1DHists(fhTrueMatchStsRichTrdTofGlobal, fhTrueMatchStsRichTrdGlobal, "elid_match_sts_rich__trd_eff2",
 			"STS+RICH+TRD+TOF matching efficiency for primary electrons","momentum, GeV/c", "efficiency");
 	hname1 = "Mean eff. = ("+CalcEfficiency(fhTrueMatchStsRichTrdTofGlobal,fhTrueMatchStsRichTrdGlobal)+")";
 	DrawHist1D(eff4, NULL, NULL, NULL, "", "momentum, GeV/c", "efficiency",
@@ -109,17 +109,17 @@ TCanvas* DrawElidEff(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrueIdRic
 		TH1D* fhAccPi, TH1D* fhPiasElRich, TH1D* fhPiasElRichTrd, TH1D* fhPiasElRichTrdTof)
 {
 	std::string hname1, hname2, hname3, hname4;
-	TCanvas* c7 = new TCanvas("c7","c7",800,400);
+	TCanvas* c7 = new TCanvas("elid_el_eff_pi_supp","elid_el_eff_pi_supp",800,400);
 	c7->Divide(2,1);
 	c7->cd(1);
-	TH1D* ringFindEff = Divide1DHists(fhTrueFoundRings, fhAccRings, "elid_ring_find_eff",
+	TH1D* ringFindEff = Divide1DHists(fhTrueFoundRings, fhAccRings, "elid_ring_find_eff3",
 		"Efficiencies for primary electrons (norm. acc. rings)",
 		"momentum, GeV/c", "efficiency");
 	ringFindEff->SetMinimum(0.);
 
-	TH1D* elidEffRich = Divide1DHists(fhTrueIdRich, fhAccRings,	"elid_rich_eff","",	"", "");
-	TH1D* elidEffRichTrd = Divide1DHists(fhTrueIdRichTrd, fhAccRings, "elid_rich_trd_eff","","", "");
-	TH1D* elidEffRichTrdTof = Divide1DHists(fhTrueIdRichTrdTof, fhAccRings,	"elid_rich_trd_eff","",	"", "");
+	TH1D* elidEffRich = Divide1DHists(fhTrueIdRich, fhAccRings,	"elid_el_eff_rich","",	"", "");
+	TH1D* elidEffRichTrd = Divide1DHists(fhTrueIdRichTrd, fhAccRings, "elid_el_eff_rich_trd","","", "");
+	TH1D* elidEffRichTrdTof = Divide1DHists(fhTrueIdRichTrdTof, fhAccRings,	"elid_el_eff_rich_trd","",	"", "");
 
 	hname1 = "ring finding (" +CalcEfficiency(fhTrueFoundRings,fhAccRings)+")";
 	hname2 = "RICH el id (" +CalcEfficiency(fhTrueIdRich,fhAccRings)+")";
@@ -133,11 +133,11 @@ TCanvas* DrawElidEff(TH1D* fhAccRings, TH1D* fhTrueFoundRings, TH1D* fhTrueIdRic
 	gPad->SetGridy(true);
 
 	c7->cd(2);
-	TH1D* piSuprRich = Divide1DHists(fhAccPi, fhPiasElRich,	"elid_pisup_rich","","", "");
+	TH1D* piSuprRich = Divide1DHists(fhAccPi, fhPiasElRich,	"elid_pi_supp_rich","","", "");
 	piSuprRich->SetMinimum(5);
 	piSuprRich->SetMaximum(1e5);
-	TH1D* piSuprRichTrd = Divide1DHists(fhAccPi, fhPiasElRichTrd, "elid_pisup_rich_trd","","", "");
-	TH1D* piSuprRichTrdTof = Divide1DHists(fhAccPi, fhPiasElRichTrdTof,	"elid_pisup_rich_trd_tof","","", "");
+	TH1D* piSuprRichTrd = Divide1DHists(fhAccPi, fhPiasElRichTrd, "elid_pi_supp_rich_trd","","", "");
+	TH1D* piSuprRichTrdTof = Divide1DHists(fhAccPi, fhPiasElRichTrdTof,	"elid_pi_supp_rich_trd_tof","","", "");
 
 	hname1 = "RICH (" +CalcEfficiency(fhAccPi,fhPiasElRich)+")";
 	hname2 = "RICH+TRD (" +CalcEfficiency(fhAccPi,fhPiasElRichTrd)+")";

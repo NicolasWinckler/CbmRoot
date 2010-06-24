@@ -38,4 +38,6 @@
 #pragma link C++ class CbmTrdElectronsQa+;
 #pragma link C++ class CbmTrdElectronsTrainAnn+;
 #pragma link C++ class CbmTrdFindHits+;
+#pragma link C++ class CbmTrdClusterFinder+;
+#pragma link C++ class CbmTrdSimpleHitProducerCluster+;
 #endif

@@ -63,6 +63,7 @@ trd/CbmTrdPoint.cxx
 trd/CbmTrdDigi.cxx  
 trd/CbmTrdDigiMatch.cxx  
 trd/CbmTrdDetectorId.cxx
+trd/CbmTrdCluster.cxx
 
 tof/CbmTofHit.cxx 
 tof/CbmTofPoint.cxx

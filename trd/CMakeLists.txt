@@ -60,6 +60,8 @@ CbmTrdHitProducerDigi.cxx
 CbmTrdElectronsQa.cxx
 CbmTrdElectronsTrainAnn.cxx
 CbmTrdFindHits.cxx
+CbmTrdClusterFinder.cxx
+CbmTrdSimpleHitProducerCluster.cxx
 )
 
 if(RULE_CHECKER_FOUND)

@@ -25,7 +25,9 @@ void create_geometry_file()
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
   //  TString trdGeom    = "trd_squared_modules_dec09.geo";
-  TString trdGeom    = "trd_squared_modules_jun10.geo";
+  //  TString trdGeom    = "trd_squared_modules_jun10.geo";
+  //  TString trdGeom    = "../macro/trd/trd_squared_modules_jun10_v01.geo";
+  TString trdGeom    = "../macro/trd/trd_squared_modules_jun10_v02.geo";
 
   // In general, the following parts need not be touched
   // ========================================================================

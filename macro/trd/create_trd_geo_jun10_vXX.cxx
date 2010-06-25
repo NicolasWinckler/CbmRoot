@@ -2,7 +2,10 @@
 //   Generator for CbmTrd Geometry
 //
 //
-// Update 20100526 - David Emschermann 
+// Update 20100625 - David Emschermann 
+// - hardcode the detector module sizes: 500 mm, 750 mm, 1000 mm
+//
+// Update 20100622 - David Emschermann 
 // - change the order of 1x1m^2 modules to allow for tilting
 //
 // Update 20100617 - David Emschermann 
@@ -81,7 +84,7 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
   // 12 mm gas (Jun10) - intelligent
   float radiator_thickness    =  29.000 /2.;
   float radiator_position     =  radiator_thickness - Layer_thickness /2.;
-//float gas_thickness         =  12.000 /2.;
+  //  float gas_thickness         =  12.000 /2.;
   float gas_thickness         =   6.000 /2.;
   float gas_position          =  radiator_position + radiator_thickness + gas_thickness;
   float padplane_thickness    =   0.030 /2.;
@@ -596,32 +599,43 @@ int main(void)
  
   }
 
-  // Calculate the sizes of all three detector modules. All sizes depend on the radius
-  // of the inner acceptance of the first station.
-  // At least this is correct is the stations are at 5000, 7250 and 9500 mm. If this is
-  // still okay when the stations are shifted has to be checked.
+//  // Calculate the sizes of all three detector modules. All sizes depend on the radius
+//  // of the inner acceptance of the first station.
+//  // At least this is correct is the stations are at 5000, 7250 and 9500 mm. If this is
+//  // still okay when the stations are shifted has to be checked.
+//
+//  Detector_size_x[0] = roundf(Inner_radius[0]);  // DE = 250 for z=5000
+//  if ((int)Detector_size_x[0]%2) Detector_size_x[0]++;
+//
+//  // Calculate size of the complete detector with frames in x-direction which is the double
+//  // size of the inner acceptance for geometrical reasons. The y-direction is twice as much
+//  // as the length in x-direction
+//
+//  Detector_size_x[0] *= 2;                       // DE =  500
+//  // squared, x=y
+//  Detector_size_y[0] = Detector_size_x[0];   // DE = 1000
+//  //  Detector_size_y[0] = Detector_size_x[0] * 2;   // DE = 1000
+//
+//
+//  // Calculate the sizes of the lager detector modules according to the size of the smallest
+//  // modules. The calculations follow the geometrical layout of the stations.
+//
+//  Detector_size_x[1] = Detector_size_x[0] * 3 / 2 ;  // DE =  750 
+//  Detector_size_y[1] = Detector_size_y[0] * 3 / 2 ;  // DE = 1500
+//
+//  Detector_size_x[2] = Detector_size_x[0] * 2 ;  // DE = 1000
+//  Detector_size_y[2] = Detector_size_y[0] * 2 ;  // DE = 2000
 
-  Detector_size_x[0] = roundf(Inner_radius[0]);  // DE = 250 for z=5000
-  if ((int)Detector_size_x[0]%2) Detector_size_x[0]++;
 
-  // Calculate size of the complete detector with frames in x-direction which is the double
-  // size of the inner acceptance for geometrical reasons. The y-direction is twice as much
-  // as the length in x-direction
+  // fixed detector sizes, independent of z Position
+  Detector_size_x[0] =  500;                 // x =  500 mm
+  Detector_size_y[0] = Detector_size_x[0];   // y =  500 mm
 
-  Detector_size_x[0] *= 2;                       // DE =  500
-  // squared, x=y
-  Detector_size_y[0] = Detector_size_x[0];   // DE = 1000
-  //  Detector_size_y[0] = Detector_size_x[0] * 2;   // DE = 1000
+  Detector_size_x[1] =  750;                 // x =  750 mm 
+  Detector_size_y[1] = Detector_size_x[1];   // y =  750 mm 
 
-
-  // Calculate the sizes of the lager detector modules according to the size of the smallest
-  // modules. The calculations follow the geometrical layout of the stations.
-
-  Detector_size_x[1] = Detector_size_x[0] * 3 / 2 ;  // DE =  750 
-  Detector_size_y[1] = Detector_size_y[0] * 3 / 2 ;  // DE = 1500
-
-  Detector_size_x[2] = Detector_size_x[0] * 2 ;  // DE = 1000
-  Detector_size_y[2] = Detector_size_y[0] * 2 ;  // DE = 2000
+  Detector_size_x[2] = 1000;                 // x = 1000 mm
+  Detector_size_y[2] = Detector_size_x[2];   // y = 1000 mm
 
 
   for(int i = 0; i < Station_number; i++)

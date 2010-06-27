@@ -1,0 +1,212 @@
+#ifndef CBMTUTORIALDETHitRate_H
+#define CBMTUTORIALDETHitRate_H
+
+#include "CbmTrdDetectorId.h"
+#include "CbmTrdDigiPar.h"
+#include "FairTask.h"
+
+#include "CbmTrdDigiPar.h"
+#include "CbmTrdPoint.h"
+#include "CbmTrdDigi.h"
+#include "CbmTrdDigiMatch.h"
+#include "CbmTrdModule.h"
+#include "CbmTrdRadiator.h"
+#include "CbmTrdHit.h"
+#include "CbmTrdDetectorId.h"
+
+#include "CbmMCTrack.h"
+
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairBaseParSet.h"
+#include "FairTask.h"
+
+#include "TRandom.h"
+#include "TMath.h"
+#include "TVector3.h"
+#include "TClonesArray.h"
+#include "TGeoManager.h"
+#include "TGeoVolume.h"
+#include "TGeoMaterial.h"
+#include "TGeoNode.h"
+#include "TGeoMatrix.h"
+#include "TGeoBBox.h"
+#include "TPRegexp.h"
+#include "TH2F.h"
+#include "TCanvas.h"
+#include "TLine.h"
+//#include "TVector3.h"
+
+#include <map>
+#include <list>
+#include <vector>
+using std::vector;
+
+//#include <utility>
+
+
+class TClonesArray;
+class CbmTrdDigiPar;
+class CbmTrdDigi;
+class CbmTrdModule;
+class CbmTrdRadiator;
+
+class CbmTrdHitRateTest : public FairTask {
+
+ public:
+
+  /** Default constructor **/
+  CbmTrdHitRateTest();
+
+  /** Standard constructor **/
+  CbmTrdHitRateTest(const char *name, const char *title="CBM Task",
+		    CbmTrdRadiator *radiator=NULL);
+
+  /** Destructor **/
+  virtual ~CbmTrdHitRateTest();
+
+  /** Initialisation **/
+  virtual InitStatus ReInit();
+  virtual InitStatus Init();
+  virtual void SetParContainers();
+
+  /** Executed task **/
+  virtual void Exec(Option_t * option);
+
+  /** Finish (called after each event) **/
+  virtual void FinishEvent();
+ 
+  /** Finish task (called after all event) **/
+  virtual void FinishTask(){;}
+
+  /*
+    void AddHit(TVector3 &posHit, TVector3 &posHitErr,
+    Int_t TrackID, Int_t PlaneID, Int_t ref, Double_t ELoss,
+    Double_t ELossTR, Double_t ELossdEdX);
+  */
+
+  void Register();
+
+ private:
+
+  void GetModuleInformationFromDigiPar(Bool_t Sector, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, Int_t prevLayer, Int_t prevStation, 
+				       vector<int>& L1S1, vector<int>& L2S1, vector<int>& L3S1, vector<int>& L4S1, 
+				       vector<int>& L1S2, vector<int>& L2S2, vector<int>& L3S2, vector<int>& L4S2, 
+				       vector<int>& L1S3, vector<int>& L2S3, vector<int>& L3S3, vector<int>& L4S3,
+				       TLine* a, TLine* b, TLine* c, TLine* d);
+
+  void GetModuleInformationSL( Int_t VolumeID);
+
+  void FillVector( Int_t VolumeID,
+		   vector<int>& L1S1, vector<int>& L2S1, vector<int>& L3S1, vector<int>& L4S1, 
+		   vector<int>& L1S2, vector<int>& L2S2, vector<int>& L3S2, vector<int>& L4S2, 
+		   vector<int>& L1S3, vector<int>& L2S3, vector<int>& L3S3, vector<int>& L4S3);
+
+  void GetModuleInformation();
+
+  void Histo(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Padsize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, Int_t prevLayer, Int_t prevStation, 
+	     vector<int>& L1S1, vector<int>& L2S1, vector<int>& L3S1, vector<int>& L4S1, 
+	     vector<int>& L1S2, vector<int>& L2S2, vector<int>& L3S2, vector<int>& L4S2, 
+	     vector<int>& L1S3, vector<int>& L2S3, vector<int>& L3S3, vector<int>& L4S3,
+	     TLine* a, TLine* b, TLine* c, TLine* d);
+  /*
+    vector<int>* L1S1, vector<int>* L2S1, vector<int>* L3S1, vector<int>* L4S1, 
+    vector<int>* L1S2, vector<int>* L2S2, vector<int>* L3S2, vector<int>* L4S2, 
+    vector<int>* L1S3, vector<int>* L2S3, vector<int>* L3S3, vector<int>* L4S3);
+  */
+  float CalcHitRate(Float_t StartX, Float_t StopX, Float_t StartY, Float_t StopY);
+
+  void DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Padsize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, TLine* a, TLine* b, TLine* c, TLine* d);
+
+  void AddDigi(Int_t iCol, Int_t iRow, Float_t iCharge);
+
+ 
+  Int_t Digicounter;
+
+  Int_t   fStation;
+  Int_t   fLayer;
+  Int_t   fModuleType;
+  Int_t   fModuleCopy;
+  Int_t   fCol_mean,fCol_in,fCol_out; //Calculated pixel column were the hit is in
+  Int_t   fRow_mean,fRow_in,fRow_out; //Calculated pixel row were the hit is in
+  Int_t   fModuleID;//Unique number for detector module
+  Int_t   fMCindex;// index to MCPoint
+  // --------------->[cm]<---------------
+  Double_t local_meanLL[3];
+  Double_t local_meanC[3];
+  Double_t global_meanLL[3];//[cm]
+  Double_t global_meanC[3];
+  Double_t local_inLL[3];
+  Double_t local_inC[3];
+  Double_t global_inLL[3];//[cm]
+  Double_t global_inC[3];
+
+  Double_t local_outLL[3];
+  Double_t local_outC[3];
+  Double_t global_outLL[3];//[cm]
+  Double_t global_outC[3];
+  // --------------->[mm]<---------------
+
+  Float_t fx_in, fx_out, fy_in, fy_out, fz_in, fz_out, fx_mean, fy_mean, fz_mean;
+  Int_t fSector;
+  //Int_t tempNosectors =  (fModuleInfo->GetNoSectors);
+  static const Int_t accuracy = 1;// '1/accuracy' integration step width [mm]
+  static const Int_t fPadNrX = 7;//7; // has to be odd
+  static const Int_t fPadNrY = 5;//5; // has to be odd
+  static const Int_t fNoSectors = 3;
+  //Int_t fNoSectors;
+  /*
+    static const Bool_t Histo = true;
+    //static const Bool_t Histo = false;
+    static const Bool_t TEST = true;
+    //static const Bool_t TEST = false;
+    //static const Bool_t Sector = true;
+    static const Bool_t Sector = false;
+  */
+  
+  Double_t padsize[3];
+  Double_t modulesize[3];
+  Double_t sectorsize[fNoSectors]; // 3 sectors per module
+  Int_t sectorrows[fNoSectors];
+
+  Float_t fELoss;//energy loss from MCPoint 
+  Float_t fELossdEdX;
+  Float_t fELossTR;
+  Float_t fPosXLL, fPosYLL;//Hit position in chamber coordinates origin 'L'ower 'L'eft corner
+ 
+  Float_t fPadPosxLL, fPadPosyLL;//Hit position in pad coordinates (not rotated) origin 'L'ower 'L'eft corner
+  Float_t fPadPosxC, fPadPosyC;//Hit position in pad coordinates (not rotated) origin pad 'C'enter
+  Float_t fDeltax, fDeltay;
+
+
+
+  Float_t fPadCharge[fPadNrY][fPadNrX]; //Charge on 3 adjacent pads calculated by using the Mathieson formula
+
+  Float_t fPRFHitPositionLL, fPRFHitPositionC;
+
+  Float_t fEfficiency; // Digi production efficiency (0-100%)
+  //    Double_t fthreshold; //pixel threshold in electrons
+  //    Double_t fnoise; //pixel noise in electrons
+
+  TClonesArray *fTrdPoints; //! Trd MC points
+  TClonesArray *fDigiCollection; //! TRD digis
+  TClonesArray *fDigiMatchCollection; //! Corresponding MCPoints to TRD digis
+  TClonesArray *fMCStacks;  //! MC Track information
+
+  CbmTrdDigiPar  *fDigiPar;
+  CbmTrdModule   *fModuleInfo;
+  CbmTrdRadiator *fRadiators; 
+
+  CbmTrdDetectorId fTrdId; //!
+    
+  /**  map to store digis for pair of x,y position in module **/
+  // map<pair<ModuleID,pair<x,y>>, CbmTrdDigi*>
+  std::map<std::pair< Int_t, std::pair< Int_t, Int_t > >, CbmTrdDigi* > fDigiMap; 
+  /**  iterator over map to store digis for pair of x,y position in module **/
+  std::map<std::pair< Int_t, std::pair< Int_t, Int_t > >, CbmTrdDigi* >::iterator fDigiMapIt; //! iterator over array above
+
+  ClassDef(CbmTrdHitRateTest,1)
+
+    };
+#endif //CBMTUTORIALDETCluster_H

@@ -49,7 +49,7 @@ CbmTrdClusterizer::CbmTrdClusterizer()
     :FairTask("TrdCluster")
 	//:fRef(0)
 {
-  //  fDigiCollection = new TClonesArray("CbmTrdDigi");
+   fDigiCollection = new TClonesArray("CbmTrdDigi");
   fEfficiency = 1;
 }
 // --------------------------------------------------------------------
@@ -1252,65 +1252,70 @@ void CbmTrdClusterizer::ClusterMapping(Int_t nCol, Int_t nRow, Int_t Col_slice, 
   // --------------------------------------------------------------------
   // ---- CalcMathieson -------------------------------------------------
 void CbmTrdClusterizer::CalcMathieson( Bool_t TEST, Double_t x_mean, Double_t y_mean, Double_t SliceELoss,Double_t* W, Double_t* H)
-  {
-    /*
-      Calculates the induced charge on tha area defind by 'fPadNrX' aand 'fPadNrY'  by using the mathieson formula for each cluster
-     */
-    //printf("CalcMathieson...\n");
-    //Int_t accuracy = 1;    // '1/accuracy' integration step width [mm]
-    Float_t h = 3;         //anode-cathode gap [mm]
-    Float_t s = 3;         //anode wire spacing [mm]
-    Float_t r_a = 12.5E-3/2.; //anode wire radius [mm]
-    Float_t q_a = 1700;    //anode neto charge [??] ???
+{
+  /*
+    Calculates the induced charge on tha area defind by 'fPadNrX' aand 'fPadNrY'  by using the mathieson formula for each cluster
+  */
+  //printf("CalcMathieson...\n");
+  //Int_t accuracy = 1;    // '1/accuracy' integration step width [mm]
+  Float_t h = 3;         //anode-cathode gap [mm]
+  Float_t s = 3;         //anode wire spacing [mm]
+  Float_t r_a = 12.5E-3/2.; //anode wire radius [mm]
+  Float_t q_a = 1700;    //anode neto charge [??] ???
 
-    for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
-      {
-	for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++)
-	  {
-	    fPadCharge[iPadRow][iPadCol] = 0.0;
-	  }
-      }
-    Float_t par = 1.0;   // normalization factor
-    Float_t r = 0.0;     // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
-    Double_t rho = 0.0;   //charge at position x
-    Float_t K_3 = 0.525; //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
-    //Float_t K_3 = -0.24 * (h / s) + 0.7 + (-0.75 * log(r_a / s) - 3.64);// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
-    Float_t K_2 = 3.14159265 / 2.* ( 1. - sqrt(K_3)/2.);
-    Float_t K_1 = (K_2 * sqrt(K_3)) / (4. * atan(sqrt(K_3)));
-    TH2F* Test = NULL;
-    TH2F* TestPos = NULL;
-    TH2F* Test2 = NULL;
+  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
+    {
+      for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++)
+	{
+	  fPadCharge[iPadRow][iPadCol] = 0.0;
+	}
+    }
+  Float_t par = 1.0;   // normalization factor
+  Float_t r = 0.0;     // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
+  Float_t value = 0.0;
+  Double_t rho = 0.0;   //charge at position x
+  Float_t K_3 = 0.525; //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
+  //Float_t K_3 = -0.24 * (h / s) + 0.7 + (-0.75 * log(r_a / s) - 3.64);// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
+  Float_t K_2 = 3.14159265 / 2.* ( 1. - sqrt(K_3)/2.);
+  Float_t K_1 = (K_2 * sqrt(K_3)) / (4. * atan(sqrt(K_3)));
+  TH2F* Test = NULL;
+  TH2F* TestPos = NULL;
+  TH2F* Test2 = NULL;
   
-    for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
-      { 
-	for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++)		
-	  { 
-	    for (Int_t yi = 0; yi < H[iPadRow] * accuracy; yi++)
-	      {
-		for (Int_t xi = 0; xi < W[iPadCol] * accuracy; xi++)
-		  {
-		    //Mathieson coordinate system ist centered in the center of the hit pad 
-		    r = sqrt(
-			     pow(((iPadCol - int(fPadNrX/2)) * W[iPadCol] + (xi + 0.5) / float(accuracy) - 0.5 * W[iPadCol]) - x_mean,2) + 
-			     pow(((iPadRow - int(fPadNrY/2)) * H[iPadRow] + (yi + 0.5) / float(accuracy) - 0.5 * H[iPadRow]) - y_mean,2)
+  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
+    { 
+      for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++)		
+	{ 
+	  for (Int_t yi = 0; yi < H[iPadRow] * accuracy; yi++)
+	    {
+	      for (Int_t xi = 0; xi < W[iPadCol] * accuracy; xi++)
+		{
+		  //Mathieson coordinate system ist centered in the center of the hit pad 
+		  r = sqrt(
+			   pow(((iPadCol - int(fPadNrX/2)) * W[iPadCol] + (xi + 0.5) / float(accuracy) - 0.5 * W[iPadCol]) - x_mean,2) + 
+			   pow(((iPadRow - int(fPadNrY/2)) * H[iPadRow] + (yi + 0.5) / float(accuracy) - 0.5 * H[iPadRow]) - y_mean,2)
 			 
-			     );
-		    //rho = r;
-		    //rho = (iPadRow * fPadNrX + iPadCol) / (H[iPadRow] * accuracy * W[iPadCol] * accuracy);
-		    //rho = (1.) / (H[iPadRow] * accuracy * W[iPadCol] * accuracy);
+			   );
+		  value = K_2 * r / h;
+		  //rho = r;
+		  //rho = (iPadRow * fPadNrX + iPadCol) / (H[iPadRow] * accuracy * W[iPadCol] * accuracy);
+		  //rho = (1.) / (H[iPadRow] * accuracy * W[iPadCol] * accuracy);
+		  /*
+		  rho = (q_a * K_1 * (1. - tanh(K_2 * r / h) * tanh(K_2 * r / h)) /
+			 (1. + K_3 * tanh(K_2 * r / h) * tanh(K_2 * r / h))) / float((accuracy * accuracy));  
+		  */ 
+		  rho = (q_a * K_1 * (1. - tanh(value) * tanh(value)) /
+			 (1. + K_3 * tanh(value) * tanh(value))) / float((accuracy * accuracy));         
 		    
-		    rho = (q_a * K_1 * (1. - tanh(K_2 * r / h) * tanh(K_2 * r / h)) /
-			   (1. + K_3 * tanh(K_2 * r / h) * tanh(K_2 * r / h))) / float((accuracy * accuracy));         
-		    
-		    if (rho > 0.00)
-		      {
-			fPadCharge[iPadRow][iPadCol] += rho * SliceELoss;
-		      }
-		  }
-	      }
-	  }
-      }
-  }
+		  if (rho > 0.00)
+		    {
+		      fPadCharge[iPadRow][iPadCol] += rho * SliceELoss;
+		    }
+		}
+	    }
+	}
+    }
+}
   // --------------------------------------------------------------------
   int CbmTrdClusterizer::GetPadMax(Int_t iRow, Int_t nCol, Double_t* PadChargeModule)
   {

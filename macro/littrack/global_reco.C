@@ -10,20 +10,24 @@
  * global tracking independently.
  **/
 
-void global_reco(
-		Int_t nEvents = 100, // number of events
-		TString opt = "all") // if opt == "all" STS + hit producers + global tracking are executed
-                                 // if opt == "hits" STS + hit producers are executed
-                                 // if opt == "tracking" global tracking is executed
+void global_reco(Int_t nEvents = 1000, // number of events
+		TString opt = "tracking") // if opt == "all" STS + hit producers + global tracking are executed
+// if opt == "hits" STS + hit producers are executed
+// if opt == "tracking" global tracking is executed
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
-	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
+	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString(
+			"/parameters");
 
-	TString dir, imageDir, mcFile, parFile, globalRecoFile, stsDigiFile, muchDigiFile, trackingType;
+	TString dir, imageDir, mcFile, parFile, globalRecoFile, muchDigiFile,
+			trackingType;
+	TList *parFileList = new TList();
+	TObjString stsDigiFile, trdDigiFile;
 	//Double_t trdHitErr = 100; // if == 0 than standard errors are used
 	if (script != "yes") {
 		// Output directory
-		dir  = "/d/cbm02/andrey/std13_10mu_urqmd/";
+//		dir = "/d/cbm02/andrey/std13_10mu_urqmd/";
+		dir = "/d/cbm02/andrey/phd/much1_10mu_urqmd/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameters file
@@ -33,28 +37,34 @@ void global_reco(
 		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
 		globalHitsFile = dir + "global.hits.0000.root";
 		// Output file with global tracks
-		globalTracksFile = dir + "global.tracks.0000.root";
-		// Digi scheme file for STS.
-		// MUST be consistent with STS geometry used in MC transport.
-		stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
+		globalTracksFile = dir + "global.tracks.weight.0000.root";
 		// Digi scheme file for MUCH.
 		// MUST be consistent with MUCH geometry used in MC transport.
-		muchDigiFile = parDir + "/much/much_standard.digi.root";
+		muchDigiFile = parDir + "/much/much_standard_2layers.digi.root";
+		// Digi scheme for STS
+		TObjString stsDigiFile = parDir + "/sts/sts_standard.digi.par";
+		parFileList->Add(&stsDigiFile);
+		// Digi scheme for TRD
+		TObjString trdDigiFile = parDir + "/trd/trd_standard.digi.par";
+		parFileList->Add(&trdDigiFile);
 		// Directory for output images
 		TString imageDir = "./test/";
 		// Tracking type
-		trackingType = "nn";
+		trackingType = "weight";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
 		globalRecoFile = TString(gSystem->Getenv("GLOBALRECOFILE"));
 		globalHitsFile = TString(gSystem->Getenv("GLOBALHITSFILE"));
 		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
-		stsDigiFile = TString(gSystem->Getenv("STSDIGI"));
 		muchDigiFile = TString(gSystem->Getenv("MUCHDIGI"));
 		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
 		trackingType = TString(gSystem->Getenv("TRACKINGTYPE"));
 		//trdHitErr = TString(gSystem->Getenv("TRDHITERR"))->Atof();
+		TObjString stsDigiFile = TString(gSystem->Getenv("STSDIGI"));
+		parFileList->Add(&stsDigiFile);
+		TObjString trdDigiFile = TString(gSystem->Getenv("TRDDIGI"));
+		parFileList->Add(&trdDigiFile);
 	}
 
 	Int_t iVerbose = 1;
@@ -71,7 +81,7 @@ void global_reco(
 	cbmrootlibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
 
-	FairRunAna *run= new FairRunAna();
+	FairRunAna *run = new FairRunAna();
 	if (opt == "all") {
 		run->SetInputFile(mcFile);
 		run->SetOutputFile(globalRecoFile);
@@ -89,32 +99,37 @@ void global_reco(
 
 	if (opt == "all" || opt == "hits") {
 		// ----- STS reconstruction   ---------------------------------------------
-		FairTask* stsDigitize = new CbmStsIdealDigitize("STSDigitize", iVerbose);
+		FairTask* stsDigitize =
+				new CbmStsIdealDigitize("STSDigitize", iVerbose);
 		run->AddTask(stsDigitize);
 
-	//  FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
-	//  run->AddTask(stsClusterFinder);
+		//  FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder", iVerbose);
+		//  run->AddTask(stsClusterFinder);
 
-		FairTask* stsFindHits = new CbmStsIdealFindHits("STSFindHits", iVerbose);
+		FairTask* stsFindHits =
+				new CbmStsIdealFindHits("STSFindHits", iVerbose);
 		run->AddTask(stsFindHits);
 
-		FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits", iVerbose);
+		FairTask* stsMatchHits = new CbmStsIdealMatchHits("STSMatchHits",
+				iVerbose);
 		run->AddTask(stsMatchHits);
 
-		FairTask* kalman= new CbmKF();
+		FairTask* kalman = new CbmKF();
 		run->AddTask(kalman);
 		FairTask* l1 = new CbmL1();
 		run->AddTask(l1);
-		CbmStsTrackFinder* trackFinder    = new CbmL1StsTrackFinder();
-	//	CbmStsTrackFinder* trackFinder    = new CbmStsTrackFinderIdeal();
+		CbmStsTrackFinder* trackFinder = new CbmL1StsTrackFinder();
+		//	CbmStsTrackFinder* trackFinder    = new CbmStsTrackFinderIdeal();
 		FairTask* findTracks = new CbmStsFindTracks(iVerbose, trackFinder);
 		run->AddTask(findTracks);
 
-		FairTask* stsMatchTracks = new CbmStsMatchTracks("STSMatchTracks", iVerbose);
+		FairTask* stsMatchTracks = new CbmStsMatchTracks("STSMatchTracks",
+				iVerbose);
 		run->AddTask(stsMatchTracks);
 
 		CbmStsTrackFitter* trackFitter = new CbmStsKFTrackFitter();
-		FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter", trackFitter, iVerbose);
+		FairTask* fitTracks = new CbmStsFitTracks("STS Track Fitter",
+				trackFitter, iVerbose);
 		run->AddTask(fitTracks);
 
 		//	FairTask* stsFHQa = new CbmStsFindHitsQa("STSFindHitsQA",iVerbose);
@@ -125,58 +140,73 @@ void global_reco(
 		// ------------------------------------------------------------------------
 
 		if (IsMuch(parFile)) {
-		// ----- MUCH hits----------   --------------------------------------------
-			CbmMuchDigitizeSimpleGem* muchDigitize = new CbmMuchDigitizeSimpleGem("MuchDigitize", muchDigiFile.Data(), iVerbose);
+			// ----- MUCH hits----------   --------------------------------------------
+			CbmMuchDigitizeSimpleGem* muchDigitize =
+					new CbmMuchDigitizeSimpleGem("MuchDigitize",
+							muchDigiFile.Data(), iVerbose);
 			run->AddTask(muchDigitize);
-			CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws("MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
+			CbmMuchDigitizeStraws* strawDigitize = new CbmMuchDigitizeStraws(
+					"MuchDigitizeStraws", muchDigiFile.Data(), iVerbose);
 			run->AddTask(strawDigitize);
 
-			CbmMuchFindHitsSimpleGem* muchFindHits = new CbmMuchFindHitsSimpleGem("MuchFindHits", muchDigiFile.Data(), iVerbose);
+			CbmMuchFindHitsSimpleGem* muchFindHits =
+					new CbmMuchFindHitsSimpleGem("MuchFindHits",
+							muchDigiFile.Data(), iVerbose);
 			run->AddTask(muchFindHits);
-			CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws("MuchFindHitsStraws", muchDigiFile.Data(), iVerbose);
+			CbmMuchFindHitsStraws* strawFindHits = new CbmMuchFindHitsStraws(
+					"MuchFindHitsStraws", muchDigiFile.Data(), iVerbose);
 			run->AddTask(strawFindHits);
-		// ------------------------------------------------------------------------
+			// ------------------------------------------------------------------------
 		}
 
-		if (IsTrd(parFile)){
-		// ----- TRD hits ---------------------------------------------------------
+		if (IsTrd(parFile)) {
+			// ----- TRD hits ---------------------------------------------------------
 			// Update of the values for the radiator F.U. 17.08.07
-			Int_t trdNFoils    = 130;      // number of polyetylene foils
-			Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
-			Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
-			Bool_t simpleTR = kTRUE;       // use fast and simple version for TR
-										   // production
+			Int_t trdNFoils = 130; // number of polyetylene foils
+			Float_t trdDFoils = 0.0013; // thickness of 1 foil [cm]
+			Float_t trdDGap = 0.02; // thickness of gap between foils [cm]
+			Bool_t simpleTR = kTRUE; // use fast and simple version for TR
+			// production
 
-			CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,	 trdDFoils, trdDGap);
+			CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR, trdNFoils, trdDFoils, trdDGap);
 
-			Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
+			Double_t trdSigmaX[] = { 300, 400, 500 }; // Resolution in x [mum]
 			// Resolutions in y - station and angle dependent [mum]
-			Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
-			Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
-			Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
+			Double_t trdSigmaY1[] = { 2700, 3700, 15000, 27600, 33000, 33000, 33000 };
+			Double_t trdSigmaY2[] = { 6300, 8300, 33000, 33000, 33000, 33000, 33000 };
+			Double_t trdSigmaY3[] = { 10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
-	//		Double_t trdSigmaX[] = {trdHitErr, trdHitErr, trdHitErr};             // Resolution in x [mum]
-	//		// Resolutions in y - station and angle dependent [mum]
-	//		Double_t trdSigmaY1[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
-	//		Double_t trdSigmaY2[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
-	//		Double_t trdSigmaY3[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
+			// Double_t trdSigmaX[] = {trdHitErr, trdHitErr, trdHitErr};             // Resolution in x [mum]
+			// // Resolutions in y - station and angle dependent [mum]
+			// Double_t trdSigmaY1[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
+			// Double_t trdSigmaY2[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
+			// Double_t trdSigmaY3[] = {trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr, trdHitErr };
 
-			CbmTrdHitProducerSmearing* trdHitProd = new
-					 CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
-	//		CbmTrdHitProducerSmearing* trdHitProd = new
-	//						 CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", NULL);
+			CbmTrdHitProducerSmearing* trdHitProd =
+					new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
+			// CbmTrdHitProducerSmearing* trdHitProd =
+			// new CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", NULL);
 
 			trdHitProd->SetSigmaX(trdSigmaX);
 			trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
 			run->AddTask(trdHitProd);
-		// ------------------------------------------------------------------------
+
+//			CbmTrdDigitizer* trdDigitizer = new CbmTrdDigitizer(
+//					"TRD Digitizer", "TRD task", radiator);
+//			run->AddTask(trdDigitizer);
+//
+//			CbmTrdHitProducerDigi* trdHitProd = new CbmTrdHitProducerDigi(
+//					"TRD Hit Producer", "TRD task");
+//			run->AddTask(trdHitProd);
+			// ------------------------------------------------------------------------
 		}
 
 		if (IsTof(parFile)) {
-		// ------ TOF hits --------------------------------------------------------
-			CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer", 1);
+			// ------ TOF hits --------------------------------------------------------
+			CbmTofHitProducer* tofHitProd = new CbmTofHitProducer(
+					"TOF HitProducer", 1);
 			run->AddTask(tofHitProd);
-		// ------------------------------------------------------------------------
+			// ------------------------------------------------------------------------
 		}
 	}
 
@@ -203,8 +233,8 @@ void global_reco(
 			CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(1);
 			run->AddTask(trdMatchTracks);
 
-//			CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new CbmTrdSetTracksPidANN("Ann","Ann");
-//			run->AddTask(trdSetTracksPidAnnTask);
+			//			CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new CbmTrdSetTracksPidANN("Ann","Ann");
+			//			run->AddTask(trdSetTracksPidAnnTask);
 		}
 
 		if (IsMuch(parFile)) {
@@ -220,10 +250,10 @@ void global_reco(
 		reconstructionQa->SetMinNofPointsTof(1);
 		reconstructionQa->SetQuota(0.7);
 		reconstructionQa->SetMinNofHitsTrd(9);
-		reconstructionQa->SetMinNofHitsMuch(11);
+		reconstructionQa->SetMinNofHitsMuch(10);
 		reconstructionQa->SetVerbose(1);
-		reconstructionQa->SetMomentumRange(0., 15);
-		reconstructionQa->SetNofBinsMom(15);
+		reconstructionQa->SetMomentumRange(0., 25);
+		reconstructionQa->SetNofBinsMom(25);
 		reconstructionQa->SetOutputDir(std::string(imageDir));
 		run->AddTask(reconstructionQa);
 		// ------------------------------------------------------------------------
@@ -234,7 +264,7 @@ void global_reco(
 	FairParRootFileIo* parIo1 = new FairParRootFileIo();
 	FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
 	parIo1->open(parFile.Data());
-	parIo2->open(stsDigiFile.Data(),"in");
+	parIo2->open(parFileList, "in");
 	rtdb->setFirstInput(parIo1);
 	rtdb->setSecondInput(parIo2);
 	rtdb->setOutput(parIo1);
@@ -244,16 +274,17 @@ void global_reco(
 	// -----   Initialize and run   --------------------------------------------
 	run->LoadGeometry();
 	run->Init();
-	run->Run(0,nEvents);
+	run->Run(0, nEvents);
 	// ------------------------------------------------------------------------
 
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
 	cout << endl << endl;
 	cout << "Macro finished successfully." << endl;
-	cout << "Output file is "    << globalRecoFile << endl;
+	cout << "Output file is " << globalRecoFile << endl;
 	cout << "Parameter file is " << parFile << endl;
-	cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << " s" << endl;
+	cout << "Real time " << timer.RealTime() << " s, CPU time "
+			<< timer.CpuTime() << " s" << endl;
 	cout << endl;
 	// ------------------------------------------------------------------------
 }

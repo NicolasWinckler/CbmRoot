@@ -69,3 +69,13 @@ Bool_t IsTof(
 {
 	return CheckDetectorPresence(parFile, "tof");
 }
+
+/* Determines RICH detector presence in the TGeo.
+ * @param parFile Name of the parameter file with TGeo.
+ * @return True if RICH presents in the TGeo.
+ */
+Bool_t IsRich(
+		const TString& parFile)
+{
+	return CheckDetectorPresence(parFile, "rich");
+}

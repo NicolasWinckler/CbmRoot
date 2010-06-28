@@ -547,7 +547,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       TRDbeta->Draw();
       c1->cd(4);
       DeltaSlice->Draw("colz");
-      c1->cd(5);
+      c1->cd(5)->SetLogy();
       TestIntegration->Draw();
       c1->cd(6);
       padTRD2->Draw("colz");
@@ -1272,7 +1272,7 @@ void CbmTrdClusterizer::CalcMathieson( Bool_t TEST, Double_t x_mean, Double_t y_
       }
     Float_t par = 1.0;   // normalization factor
     Float_t r = 0.0;     // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
-    Float_t rho = 0.0;   //charge at position x
+    Double_t rho = 0.0;   //charge at position x
     Float_t K_3 = 0.525; //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
     //Float_t K_3 = -0.24 * (h / s) + 0.7 + (-0.75 * log(r_a / s) - 3.64);// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
     Float_t K_2 = 3.14159265 / 2.* ( 1. - sqrt(K_3)/2.);

@@ -732,7 +732,7 @@ void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssiz
   Float_t SecXStop  = 0.0;
   for (Int_t iSec = 0; iSec < nSec-1; iSec++)//would be enought to iterate up to nSec-1
     {
-      if (Ssize[0+iSec*nSec] < 2 * Msize[0] && Ssize[0+i*NoSectors] > 0)
+      if (Ssize[0+iSec*nSec] < 2 * Msize[0] && Ssize[0+iSec*nSec] > 0)
 	{
 	  SecXStart += Ssize[0+iSec*nSec];
 	  SecXStop   = SecXStart;
@@ -742,7 +742,7 @@ void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssiz
 	  SecXStart = 0.0;
 	  SecXStop  = Ssize[0+iSec*nSec];
 	}
-      if (Ssize[1+iSec*nSec] < 2 * Msize[1] && Ssize[1+i*NoSectors] > 0)
+      if (Ssize[1+iSec*nSec] < 2 * Msize[1] && Ssize[1+iSec*nSec] > 0)
 	{
 	  SecYStart += Ssize[1+iSec*nSec];
 	  SecYStop = SecYStart;

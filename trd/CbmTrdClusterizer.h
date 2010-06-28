@@ -1,4 +1,3 @@
-#
 #ifndef CBMTUTORIALDETCluster_H
 #define CBMTUTORIALDETCluster_H
 
@@ -159,8 +158,8 @@ class CbmTrdClusterizer : public FairTask {
   Int_t fSector;
   //Int_t tempNosectors =  (fModuleInfo->GetNoSectors);
   static const Int_t accuracy = 1;// '1/accuracy' integration step width [mm]
-  static const Int_t fPadNrX = 9;//7; // has to be odd
-  static const Int_t fPadNrY = 7;//5; // has to be odd
+  static const Int_t fPadNrX = 7;//7; // has to be odd
+  static const Int_t fPadNrY = 5;//5; // has to be odd
   static const Int_t fNoSectors = 3;
   //Int_t fNoSectors;
   /*

@@ -1,4 +1,4 @@
-﻿#include "CbmTrdHitRateTest.h"
+#include "CbmTrdHitRateTest.h"
 
 #include "CbmTrdDigiPar.h"
 #include "CbmTrdPoint.h"

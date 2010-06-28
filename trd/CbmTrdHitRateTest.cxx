@@ -500,7 +500,7 @@ void CbmTrdHitRateTest::FinishEvent()
     }
 
   }
-void CbmTrdHitRateTest::GetModuleInformationSL( Int_t VolumeID)
+void CbmTrdHitRateTest::GetModuleInformationSL(Int_t VolumeID)
 {
       Int_t* detInfo = fTrdId.GetDetectorInfo(VolumeID); 
       fStation    = detInfo[1];
@@ -565,7 +565,7 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(Bool_t Fast, Int_t Volum
       Int_t tempX = 0;
       for (Int_t i = 0; i < fNoSectors; i++)
 	{
-	  if (Ssize[0+i*NoSectors] < 2 * Msize[0] /*> 0*/)
+	  if (Ssize[0+i*NoSectors] < 2 * Msize[0] && Ssize[0+i*NoSectors] > 0)
 	    {
 	      tempX += int(Ssize[0+i*NoSectors]/Psize[0+i*NoSectors]); 
 	    }
@@ -573,7 +573,7 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(Bool_t Fast, Int_t Volum
 	    {
 	      tempX  = int(Ssize[0+i*NoSectors]/Psize[0+i*NoSectors]); 
 	    }
-	  if (Ssize[1+i*NoSectors] < 2 * Msize[1] /*> 0*/)
+	  if (Ssize[1+i*NoSectors] < 2 * Msize[1] && Ssize[1+i*NoSectors] > 0)
 	    {
 	      tempY += int(Ssize[1+i*NoSectors]/Psize[1+i*NoSectors]); 
 	    }
@@ -732,7 +732,7 @@ void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssiz
   Float_t SecXStop  = 0.0;
   for (Int_t iSec = 0; iSec < nSec-1; iSec++)//would be enought to iterate up to nSec-1
     {
-      if (Ssize[0+iSec*nSec] < 2 * Msize[0])
+      if (Ssize[0+iSec*nSec] < 2 * Msize[0] && Ssize[0+i*NoSectors] > 0)
 	{
 	  SecXStart += Ssize[0+iSec*nSec];
 	  SecXStop   = SecXStart;
@@ -742,7 +742,7 @@ void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssiz
 	  SecXStart = 0.0;
 	  SecXStop  = Ssize[0+iSec*nSec];
 	}
-      if (Ssize[1+iSec*nSec] < 2 * Msize[1])
+      if (Ssize[1+iSec*nSec] < 2 * Msize[1] && Ssize[1+i*NoSectors] > 0)
 	{
 	  SecYStart += Ssize[1+iSec*nSec];
 	  SecYStop = SecYStart;

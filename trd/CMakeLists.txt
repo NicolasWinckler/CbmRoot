@@ -35,7 +35,10 @@ CbmGeoTrdPar.cxx
 CbmTrdContFact.cxx   
 CbmTrd.cxx 		 
 CbmTrdHitProducerIdeal.cxx    
-CbmTrdHitProducerSmearing.cxx	 
+CbmTrdHitProducerSmearing.cxx
+CbmTrdClusterizer.cxx 
+CbmTrdHitRateTest.cxx
+# CbmTrdCluster.cxx 
 CbmTrdHitProducerQa.cxx  
 CbmTrdRadiator.cxx  
 CbmTrdFindTracks.cxx  
@@ -59,7 +62,6 @@ CbmTrdHitProducerDigi.cxx
 #CbmTrdDetectorId.cxx
 CbmTrdElectronsQa.cxx
 CbmTrdElectronsTrainAnn.cxx
-CbmTrdFindHits.cxx
 CbmTrdClusterFinder.cxx
 CbmTrdSimpleHitProducerCluster.cxx
 )

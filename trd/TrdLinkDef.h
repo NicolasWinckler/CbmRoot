@@ -19,6 +19,9 @@
 #pragma link C++ class  CbmTrdTrackFitterIdeal+;
 #pragma link C++ class  CbmGeoTrd+;
 #pragma link C++ class  CbmGeoTrdPar;
+#pragma link C++ class  CbmTrdClusterizer;
+#pragma link C++ class  CbmTrdHitRateTest;
+//#pragma link C++ class  CbmTrdCluster;
 #pragma link C++ class  CbmTrdContFact;
 #pragma link C++ class  CbmTrdRadiator;
 #pragma link C++ class  CbmTrdMatchTracks+;
@@ -37,7 +40,6 @@
 //#pragma link C++ class  CbmTrdDetectorId+;
 #pragma link C++ class CbmTrdElectronsQa+;
 #pragma link C++ class CbmTrdElectronsTrainAnn+;
-#pragma link C++ class CbmTrdFindHits+;
 #pragma link C++ class CbmTrdClusterFinder+;
 #pragma link C++ class CbmTrdSimpleHitProducerCluster+;
 #endif

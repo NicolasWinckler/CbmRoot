@@ -121,7 +121,7 @@ InitStatus CbmTrdHitRateTest::ReInit(){
 InitStatus CbmTrdHitRateTest::Init()
 {
 
-    cout<<" * CbmTrdCluster * :: Init() "<<endl;
+    cout<<" * CbmTrdHitRate * :: Init() "<<endl;
 
     FairRootManager *ioman = FairRootManager::Instance();
     if ( ! ioman ) Fatal("Init", "No FairRootManager");
@@ -157,17 +157,19 @@ InitStatus CbmTrdHitRateTest::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdHitRateTest::Exec(Option_t * option)
 {
-  TH2F *Layer = NULL;//new TH2F("Dummy","Dummy",1,-1,1,1,-1,1);
+
+  Bool_t Fast = true;
+  //Bool_t Fast = false;
+  Double_t ZRangeL = 1;
+  Double_t ZRangeU = 1e06;
+
+
+  TH2F *Layer = NULL;
   fStation = 0;
   fLayer = 0;
-  Int_t prevLayer = 0;
-  Int_t prevStation = 0;
+
   TCanvas *c1 = NULL;
-  /*
-    TCanvas *c1 = new TCanvas("c1","c1",1000,900);	
-    c1->Divide(1,1);
-    c1->cd(1);
-  */
+ 
   Char_t Canfile1[100];
   
   vector<int> L1S1;
@@ -182,8 +184,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   vector<int> L2S3;
   vector<int> L3S3;
   vector<int> L4S3;
-  
-  //TVector3 mom;
+
   Int_t ModuleID[10];
   Int_t Sector = 0;
   Char_t trddigiparpath[50] = "trd.digi.par";
@@ -195,17 +196,14 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
     } 
   Int_t counter = 0;
   do {
-    /*
-      counter++;
-      cout << counter << endl;
-    */
+  
     for (Int_t i = 0; i < 10; i++)
       {
 	ModuleID[i] = -1000;
       }
-    //cout << "reading" << endl;
+
     digifile >> skipws >> ModuleID[0] >> ModuleID[1] >> ModuleID[2] >> ModuleID[3] >> ModuleID[4] >> ModuleID[5] >> ModuleID[6] >> ModuleID[7] >> ModuleID[8] >> ModuleID[9];
-    //cout << "done" << endl;
+
     if (ModuleID[0] == 0)
       {
 	break;
@@ -214,12 +212,11 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
       {
 	if (ModuleID[i] > -1000)
 	  {
-	    //cout << ModuleID[i] << " ";
+
 	    GetModuleInformationSL(ModuleID[i]);
 	    
 	    FillVector(ModuleID[i], L1S1, L2S1, L3S1, L4S1, L1S2, L2S2, L3S2, L4S2, L1S3, L2S3, L3S3, L4S3);
-	    prevLayer = fLayer;
-	    prevStation = fStation;
+
 	  }
       }
     //cout << endl;
@@ -231,15 +228,9 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   
   } while (digifile.good());
 
-  //sprintf(Canfile1,"Pics/Station%dLayer%d.png",fStation,fLayer);
   Char_t name[50];
   Char_t title[50];
   TImage *Outimage1;
-
-  TLine* a = NULL;
-  TLine* b = NULL;
-  TLine* c = NULL;
-  TLine* d = NULL;
 
   fStation = 1;
   fLayer = 1;
@@ -261,13 +252,14 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Layer->GetYaxis()->SetTitleOffset(2);
   Layer->GetZaxis()->SetTitleSize(0.02);
   Layer->GetZaxis()->SetTitleOffset(-2);
-  Layer->GetZaxis()->SetRangeUser(1,1.e06);//1.e06,5.e07);
+  Layer->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);//1,1.e06);//1.e06,5.e07);
   c1 = new TCanvas("c1","c1",1000,900);	
   c1->Divide(1,1);
   c1->cd(1)->SetLogz(1);
+  Layer->Draw();
   for (Int_t i = 0; i < L1S1.size(); i++)
     {
-      GetModuleInformationFromDigiPar(Sector, L1S1[i], Layer ,c1, Canfile1, prevLayer, prevStation, L1S1, L2S1, L3S1, L4S1, L1S2, L2S2, L3S2, L4S2, L1S3, L2S3, L3S3, L4S3, a, b, c, d);
+      GetModuleInformationFromDigiPar(Fast, L1S1[i], Layer ,c1, Canfile1);
     }
   Outimage1 = TImage::Create();
   Outimage1->FromPad(c1);
@@ -295,20 +287,21 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Layer->GetYaxis()->SetTitleOffset(2);
   Layer->GetZaxis()->SetTitleSize(0.02);
   Layer->GetZaxis()->SetTitleOffset(-2);
-  Layer->GetZaxis()->SetRangeUser(1,1.e06);//1.e06,5.e07);
+  Layer->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);//1,1.e06);//1.e06,5.e07);
   c1 = new TCanvas("c1","c1",1000,900);	
   c1->Divide(1,1);
   c1->cd(1)->SetLogz(1);
+  Layer->Draw();
   for (Int_t i = 0; i < L2S1.size(); i++)
     {
-      GetModuleInformationFromDigiPar(Sector, L2S1[i], Layer ,c1, Canfile1, prevLayer, prevStation, L1S1, L2S1, L3S1, L4S1, L1S2, L2S2, L3S2, L4S2, L1S3, L2S3, L3S3, L4S3, a, b, c, d);
+      GetModuleInformationFromDigiPar(Fast, L2S1[i], Layer ,c1, Canfile1);
     }
   Outimage1 = TImage::Create();
   Outimage1->FromPad(c1);
   Outimage1->WriteImage(Canfile1);
   delete Layer;
   delete c1;
-
+  
   fStation = 2;
   fLayer = 1;
   sprintf(name,"S%d_L%d",fStation,fLayer);
@@ -329,13 +322,14 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Layer->GetYaxis()->SetTitleOffset(2);
   Layer->GetZaxis()->SetTitleSize(0.02);
   Layer->GetZaxis()->SetTitleOffset(-2);
-  Layer->GetZaxis()->SetRangeUser(1,1.e06);//1.e06,5.e07);
+  Layer->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);//1,1.e06);//1.e06,5.e07);
   c1 = new TCanvas("c1","c1",1000,900);	
   c1->Divide(1,1);
   c1->cd(1)->SetLogz(1);
+  Layer->Draw();
   for (Int_t i = 0; i < L1S2.size(); i++)
     {
-      GetModuleInformationFromDigiPar(Sector, L1S2[i], Layer ,c1, Canfile1, prevLayer, prevStation, L1S1, L2S1, L3S1, L4S1, L1S2, L2S2, L3S2, L4S2, L1S3, L2S3, L3S3, L4S3, a, b, c, d);
+      GetModuleInformationFromDigiPar(Fast, L1S2[i], Layer ,c1, Canfile1);
     }
   Outimage1 = TImage::Create();
   Outimage1->FromPad(c1);
@@ -363,13 +357,14 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Layer->GetYaxis()->SetTitleOffset(2);
   Layer->GetZaxis()->SetTitleSize(0.02);
   Layer->GetZaxis()->SetTitleOffset(-2);
-  Layer->GetZaxis()->SetRangeUser(1,1.e06);//1.e06,5.e07);
+  Layer->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);//1,1.e06);//1.e06,5.e07);
   c1 = new TCanvas("c1","c1",1000,900);	
   c1->Divide(1,1);
   c1->cd(1)->SetLogz(1);
+  Layer->Draw();
   for (Int_t i = 0; i < L2S2.size(); i++)
     {
-      GetModuleInformationFromDigiPar(Sector, L2S2[i], Layer ,c1, Canfile1, prevLayer, prevStation, L1S1, L2S1, L3S1, L4S1, L1S2, L2S2, L3S2, L4S2, L1S3, L2S3, L3S3, L4S3, a, b, c, d);
+      GetModuleInformationFromDigiPar(Fast, L2S2[i], Layer ,c1, Canfile1);
     }
   Outimage1 = TImage::Create();
   Outimage1->FromPad(c1);
@@ -397,13 +392,14 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Layer->GetYaxis()->SetTitleOffset(2);
   Layer->GetZaxis()->SetTitleSize(0.02);
   Layer->GetZaxis()->SetTitleOffset(-2);
-  Layer->GetZaxis()->SetRangeUser(1,1.e06);//1.e06,5.e07);
+  Layer->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);//1,1.e06);//1.e06,5.e07);
   c1 = new TCanvas("c1","c1",1000,900);	
   c1->Divide(1,1);
   c1->cd(1)->SetLogz(1);
+  Layer->Draw();
   for (Int_t i = 0; i < L1S3.size(); i++)
     {
-      GetModuleInformationFromDigiPar(Sector, L1S3[i], Layer ,c1, Canfile1, prevLayer, prevStation, L1S1, L2S1, L3S1, L4S1, L1S2, L2S2, L3S2, L4S2, L1S3, L2S3, L3S3, L4S3, a, b, c, d);
+      GetModuleInformationFromDigiPar(Fast, L1S3[i], Layer ,c1, Canfile1);
     }
   Outimage1 = TImage::Create();
   Outimage1->FromPad(c1);
@@ -431,13 +427,14 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Layer->GetYaxis()->SetTitleOffset(2);
   Layer->GetZaxis()->SetTitleSize(0.02);
   Layer->GetZaxis()->SetTitleOffset(-2);
-  Layer->GetZaxis()->SetRangeUser(1,1.e06);//1.e06,5.e07);
+  Layer->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);//1,1.e06);//1.e06,5.e07);
   c1 = new TCanvas("c1","c1",1000,900);	
   c1->Divide(1,1);
   c1->cd(1)->SetLogz(1);
+  Layer->Draw();
   for (Int_t i = 0; i < L2S3.size(); i++)
     {
-      GetModuleInformationFromDigiPar(Sector, L2S3[i], Layer ,c1, Canfile1, prevLayer, prevStation, L1S1, L2S1, L3S1, L4S1, L1S2, L2S2, L3S2, L4S2, L1S3, L2S3, L3S3, L4S3, a, b, c, d);
+      GetModuleInformationFromDigiPar(Fast, L2S3[i], Layer ,c1, Canfile1);
     }
   Outimage1 = TImage::Create();
   Outimage1->FromPad(c1);
@@ -514,11 +511,7 @@ void CbmTrdHitRateTest::GetModuleInformationSL( Int_t VolumeID)
 }
   // --------------------------------------------------------------------
   // ----GetModuleInformationFromDigiPar ------------------------------------------
-void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, Int_t prevLayer, Int_t prevStation, 
-							vector<int>& L1S1, vector<int>& L2S1, vector<int>& L3S1, vector<int>& L4S1, 
-							vector<int>& L1S2, vector<int>& L2S2, vector<int>& L3S2, vector<int>& L4S2, 
-							vector<int>& L1S3, vector<int>& L2S3, vector<int>& L3S3, vector<int>& L4S3,
-							TLine* a, TLine* b, TLine* c, TLine* d)
+void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(Bool_t Fast, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1)
 {
   // fPos is >0 for x and y and not rotated
   // origin of the local coordinate system in 
@@ -544,11 +537,6 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
       Msize[1] = fModuleInfo->GetSizey() * 10;
       Msize[3] = 0; 
 
-      for (Int_t i = 0; i < 3 ; i++)
-	{
-	  //cout <<  " dim " << i << " Mpos " << Mpos[i] << "   Msize  " << Msize[i] << endl;
-	}
-      //cout << endl;
       const Int_t NoSectors = fModuleInfo->GetNoSectors();
       Int_t nSec = NoSectors;
       Double_t Ssize[3*NoSectors];
@@ -563,12 +551,6 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
 	  Psize[0+i*NoSectors] = fModuleInfo->GetPadSizex(i) * 10;
 	  Psize[1+i*NoSectors] = fModuleInfo->GetPadSizey(i) * 10;
 	  Psize[2+i*NoSectors] = 0;
-
-	  for (Int_t j = 0; j < 3 ; j++)
-	    {
-	      //cout << "S" << i << " dim " << j << " Ssize " << Ssize[j+i*NoSectors] << "   Psize  " << Psize[j+i*NoSectors] << endl;
-	    }
-	  //cout << endl;
 	}
 
       Int_t* detInfo = fTrdId.GetDetectorInfo(VolumeID); 
@@ -576,19 +558,35 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
       fLayer      = detInfo[2];     
       fModuleType = detInfo[3];
       fModuleCopy = detInfo[4];
-      //printf(" (S%d L%d)  ",fStation,fLayer);
    
-      /* const*/ 
-      nCol = (Int_t)(2*Msize[0] / (int(Psize[0] * 100) / 100.0));   
-      Int_t temp = 0;
+      
+      //nCol = (Int_t)(2*Msize[0] / (int(Psize[0] * 100) / 100.0));   
+      Int_t tempY = 0;
+      Int_t tempX = 0;
       for (Int_t i = 0; i < fNoSectors; i++)
 	{
-	  temp += int(Ssize[1+i*NoSectors]/Psize[1+i*NoSectors]); //sectorrows[i];
+	  if (Ssize[0+i*NoSectors] < 2 * Msize[0] /*> 0*/)
+	    {
+	      tempX += int(Ssize[0+i*NoSectors]/Psize[0+i*NoSectors]); 
+	    }
+	  else
+	    {
+	      tempX  = int(Ssize[0+i*NoSectors]/Psize[0+i*NoSectors]); 
+	    }
+	  if (Ssize[1+i*NoSectors] < 2 * Msize[1] /*> 0*/)
+	    {
+	      tempY += int(Ssize[1+i*NoSectors]/Psize[1+i*NoSectors]); 
+	    }
+	  else
+	    {
+	      tempY  = int(Ssize[1+i*NoSectors]/Psize[1+i*NoSectors]); 
+	    }
 	}
-      /*const*/
-      nRow = temp;
-      //cout << "nRow " << nRow << "    nCol " << nCol << endl;
-      Histo( Mpos, Msize, Ssize, Psize, nRow, nCol, nSec, Layer, c1, Canfile1, prevLayer, prevStation, L1S1, L2S1, L3S1, L4S1, L1S2, L2S2, L3S2, L4S2, L1S3, L2S3, L3S3, L4S3, a, b, c, d);
+      
+      nRow = tempY;
+      nCol = tempX;
+      //cout << nRow << " " << nCol << endl;
+      Histo(Fast, Mpos, Msize, Ssize, Psize, nRow, nCol, nSec, Layer, c1, Canfile1);
 
     }
   else
@@ -662,8 +660,111 @@ void CbmTrdHitRateTest::FillVector(Int_t VolumeID,
 	}
     }
 }
-void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, TLine* a, TLine* b, TLine* c, TLine* d)
+void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1/*, TLine* a, TLine* b, TLine* c, TLine* d*/)
 {
+
+ //----------------------Pad--------------------------------------
+  const Int_t nR = nRow;
+  const Int_t nC = nCol;
+  Int_t iSecX = 0;
+  Int_t iSecY = 0;
+  Float_t StartX = Mpos[0]-Msize[0];
+  Float_t StartY = Mpos[1]-Msize[1];
+  Int_t SecRow = int(Ssize[1+iSecY*nSec]/Psize[1+iSecY*nSec]);
+  Int_t SecCol = int(Ssize[0+iSecX*nSec]/Psize[0+iSecX*nSec]);
+  for (Int_t iR = 0; iR < nR; iR++)
+    {
+      StartX = Mpos[0]-Msize[0];
+      for (Int_t iC = 0; iC < nC; iC++)
+	{
+	  TLine* Pa = new TLine(StartX,
+				StartY,
+				StartX+Psize[0+iSecX*nSec],
+				StartY);
+	  TLine* Pb = new TLine(StartX,
+				StartY+Psize[1+iSecY*nSec],
+				StartX+Psize[0+iSecX*nSec],
+				StartY+Psize[1+iSecY*nSec]);
+	  TLine* Pc = new TLine(StartX,
+				StartY,
+				StartX,
+				StartY+Psize[1+iSecY*nSec]);
+	  TLine* Pd = new TLine(StartX+Psize[0+iSecX*nSec],
+				StartY,
+				StartX+Psize[0+iSecX*nSec],
+				StartY+Psize[1+iSecY*nSec]);
+	  c1->cd(1);
+	  Pa->SetLineColor(17);
+	  //Pa->SetLineStyle(3);
+	  Pa->Draw("same");
+	  Pb->SetLineColor(17);
+	  //Pb->SetLineStyle(3);
+	  Pb->Draw("same");
+	  Pc->SetLineColor(17);
+	  //Pc->SetLineStyle(3);
+	  Pc->Draw("same");
+	  Pd->SetLineColor(17);
+	  //Pd->SetLineStyle(3);
+	  Pd->Draw("same");
+	  //printf("Sx Sy (%d,%d)     nC nR (%d,%d) iC iR (%d,%d) SC SR (%d,%d)              Px Py (%.1f,%.1f) StartX StartY (%.1f,%.1f)\n",iSecX,iSecY,nC,nR,iC,iR,SecCol,SecRow,Psize[0+iSecX*nSec],Psize[1+iSecY*nSec],StartX,StartY);
+
+	  if (iC == SecCol-1)
+	    {
+	      iSecX++;
+	      SecCol += int(Ssize[0+iSecX*nSec]/Psize[0+iSecX*nSec]);
+	    }
+	  StartX += Psize[0+iSecX*nSec];
+	}
+      iSecX = 0;
+      if (iR == SecRow-1)
+	{          
+	  iSecY++;
+	  SecRow += int(Ssize[1+iSecY*nSec]/Psize[1+iSecY*nSec]);
+	}
+      StartY += Psize[1+iSecY*nSec];
+    }
+
+
+  //----------------------Sector--------------------------------------
+  Float_t SecYStart = 0.0;
+  Float_t SecXStart = 0.0;
+  Float_t SecYStop  = 0.0;
+  Float_t SecXStop  = 0.0;
+  for (Int_t iSec = 0; iSec < nSec-1; iSec++)//would be enought to iterate up to nSec-1
+    {
+      if (Ssize[0+iSec*nSec] < 2 * Msize[0])
+	{
+	  SecXStart += Ssize[0+iSec*nSec];
+	  SecXStop   = SecXStart;
+	}
+      else
+	{
+	  SecXStart = 0.0;
+	  SecXStop  = Ssize[0+iSec*nSec];
+	}
+      if (Ssize[1+iSec*nSec] < 2 * Msize[1])
+	{
+	  SecYStart += Ssize[1+iSec*nSec];
+	  SecYStop = SecYStart;
+	}
+      else
+	{
+	  SecYStart = 0.0;
+	  SecYStop  = Ssize[1+iSec*nSec];
+	}
+
+
+      TLine* S1 = new TLine(Mpos[0]-Msize[0]+SecXStart,
+			    Mpos[1]-Msize[1]+SecYStart,
+			    Mpos[0]-Msize[0]+SecXStop,
+			    Mpos[1]-Msize[1]+SecYStop);
+      S1->SetLineColor(15);
+      S1->SetLineStyle(2);
+ 
+      c1->cd(1);
+      S1->Draw("same");
+    }
+  
   
   //----------------------Module--------------------------------------
   TLine* Ma = new TLine(Mpos[0]-Msize[0],
@@ -689,135 +790,87 @@ void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssiz
   Mc->Draw("same");
   Md->Draw("same");
   //c1->Update();
-
-  //----------------------Sector--------------------------------------
-  Float_t SecY = 0.0;
-  for (Int_t iSec = 0; iSec < nSec-1; iSec++)//would be enought to iterate up to nSec-1
-    {
-      SecY += Ssize[1+iSec*nSec];
-
-      TLine* S1 = new TLine(Mpos[0]-0.5*Ssize[0+iSec*nSec],
-			    Mpos[1]-Msize[1]+SecY,
-			    Mpos[0]+0.5*Ssize[0+iSec*nSec],
-			    Mpos[1]-Msize[1]+SecY);
-      S1->SetLineColor(15);
-      S1->SetLineStyle(2);
-      /*
-	TLine* S2 = new TLine(Mpos[0]-Msize[0],Mpos[1]-Msize[1]+Ssize[1]+Ssize[1+3],Mpos[0]+Msize[0],Mpos[1]-Msize[1]+Ssize[1]+Ssize[1+3]);
-	S2->SetLineColor(15);
-	S2->SetLineStyle(2);
-      */
-      c1->cd(1);
-      S1->Draw("same");
-      //S2->Draw("same");
-    }
+ 
   
-
-  //----------------------Pad--------------------------------------
-  const Int_t nR = nRow;
-  const Int_t nC = nCol;
-  Int_t iSec = 0;
-  Float_t StartX = Mpos[0]-Msize[0];
-  Float_t StartY = Mpos[1]-Msize[1];
-  Int_t SecRow = int(Ssize[1+iSec*nSec]/Psize[1+iSec*nSec]);
-  for (Int_t iR = 0; iR < nR; iR++)
-    {
-      //cout <<  "iSec " << iSec << " iRow " << iR << " SecBorderRow " << SecRow << " nRow " << nR << endl;
-      StartX = Mpos[0]-Msize[0];
-      for (Int_t iC = 0; iC < nC; iC++)
-	{
-	  //cout << "Pad " << iC << "," << iR << " x " << StartX << " y " << StartY << endl;
-
-	  TLine* Pa = new TLine(StartX,
-				StartY,
-				StartX+Psize[0+iSec*nSec],
-				StartY);
-	  TLine* Pb = new TLine(StartX,
-				StartY+Psize[1+iSec*nSec],
-				StartX+Psize[0+iSec*nSec],
-				StartY+Psize[1+iSec*nSec]);
-	  TLine* Pc = new TLine(StartX,
-				StartY,
-				StartX,
-				StartY+Psize[1+iSec*nSec]);
-	  TLine* Pd = new TLine(StartX+Psize[0+iSec*nSec],
-				StartY,
-				StartX+Psize[0+iSec*nSec],
-				StartY+Psize[1+iSec*nSec]);
-	  c1->cd(1);
-	  Pa->SetLineColor(17);
-	  //Pa->SetLineStyle(3);
-	  Pa->Draw("same");
-	  Pb->SetLineColor(17);
-	  //Pb->SetLineStyle(3);
-	  Pb->Draw("same");
-	  Pc->SetLineColor(17);
-	  //Pc->SetLineStyle(3);
-	  Pc->Draw("same");
-	  Pd->SetLineColor(17);
-	  //Pd->SetLineStyle(3);
-	  Pd->Draw("same");
-
-	  StartX += Psize[0+iSec*nSec];
-	}
-      if (iR == SecRow-1)
-	{          
-	  iSec++;
-	  SecRow += int(Ssize[1+iSec*nSec]/Psize[1+iSec*nSec]);
-	  //cout << iSec << " " << iR << " " << SecRow << " " << nR << endl;
-	}
-      StartY += Psize[1+iSec*nSec];
-    }
-
 }
-void CbmTrdHitRateTest::Histo(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, Int_t prevLayer, Int_t prevStation,
-			      vector<int>& L1S1, vector<int>& L2S1, vector<int>& L3S1, vector<int>& L4S1, 
-			      vector<int>& L1S2, vector<int>& L2S2, vector<int>& L3S2, vector<int>& L4S2, 
-			      vector<int>& L1S3, vector<int>& L2S3, vector<int>& L3S3, vector<int>& L4S3,
-			      TLine* a, TLine* b, TLine* c, TLine* d)
+void CbmTrdHitRateTest::Histo(Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1)
 {
   const Int_t nR = nRow;
   const Int_t nC = nCol;
   Float_t HiteRate = 0;
-  Int_t iSec = 0;
+  Int_t iSecX = 0;
+  Int_t iSecY = 0;
   Float_t StartX = Mpos[0]-Msize[0];
   Float_t StartY = Mpos[1]-Msize[1];
-  Float_t StopX = StartX + Psize[0+iSec*nSec];
-  Float_t StopY = StartY + Psize[1+iSec*nSec];
-  Int_t SecRow = int(Ssize[1+iSec*nSec]/Psize[1+iSec*nSec]);
+  Float_t StopX = StartX + Psize[0+iSecX*nSec];
+  Float_t StopY = StartY + Psize[1+iSecY*nSec];
+  Int_t SecRow = int(Ssize[1+iSecY*nSec]/Psize[1+iSecY*nSec]);
+  Int_t SecCol = int(Ssize[0+iSecX*nSec]/Psize[0+iSecX*nSec]);
+
   for (Int_t iR = 0; iR < nR; iR++)
     {
       StartX = Mpos[0]-Msize[0];
-      StopX  = StartX + Psize[0+iSec*nSec];
+      StopX  = StartX + Psize[0+iSecX*nSec];
 
-	for (Int_t iC = 0; iC < nC; iC++)
-	  {
-	    HiteRate = CalcHitRate(StartX, StopX, StartY, StopY);
+      for (Int_t iC = 0; iC < nC; iC++)
+	{
+	  if (Fast)
+	    {
+	      if (Mpos[0] > -1 && Mpos[1] > -1)
+		{
+		  HiteRate = CalcHitRate(StartX, StopX, StartY, StopY);
+		}
+	    }
+	  else
+	    {
+	      HiteRate = CalcHitRate(StartX, StopX, StartY, StopY);
+	    }
+	  for (Int_t stepY = int(StartY); stepY < int(StopY); stepY++)
+	    {
+	      for (Int_t stepX = int(StartX); stepX < int(StopX); stepX++)
+		{
+		  if (Fast)
+		    {
+		      if (Mpos[0] > -1 && Mpos[1] > -1)
+			{
+			  Layer->Fill(     stepX,      stepY, HiteRate);
+			  Layer->Fill(-1 * stepX,      stepY, HiteRate);
+			  Layer->Fill(     stepX, -1 * stepY, HiteRate);
+			  Layer->Fill(-1 * stepX, -1 * stepY, HiteRate);
+			}
+		    }
+		  else
+		    {
+		      Layer->Fill(stepX, stepY, HiteRate);
+		    }
+		}
+	    }
+	  //printf("Sx Sy (%d,%d)     nC nR (%d,%d) iC iR (%d,%d) SC SR (%d,%d)             Px Py (%.1f,%.1f) StartX StartY (%.1f,%.1f)\n",iSecX,iSecY,nC,nR,iC,iR,SecCol,SecRow,Psize[0+iSecX*nSec],Psize[1+iSecY*nSec],StartX,StartY);
 
-	    for (Int_t stepY = int(StartY); stepY < int(StopY); stepY++)
-	      {
-		for (Int_t stepX = int(StartX); stepX < int(StopX); stepX++)
-		  {
-		    Layer->Fill(stepX/* + 9000*/, stepY/* + 9000*/, HiteRate);
-		  }
-	      }
-	    StartX += Psize[0+iSec*nSec];
-	    StopX  += Psize[0+iSec*nSec];
-	  }
+	  if (iC == SecCol-1)
+	    {
+	      iSecX++;
+	      SecCol += int(Ssize[0+iSecX*nSec]/Psize[0+iSecX*nSec]);
+	    }
+	  StartX += Psize[0+iSecX*nSec];
+	  StopX  += Psize[0+iSecX*nSec];
+	}
+      iSecX = 0;
+   
       if (iR == SecRow-1)
 	{          
-	  iSec++;
-	  SecRow += int(Ssize[1+iSec*nSec]/Psize[1+iSec*nSec]);
+	  iSecY++;
+	  SecRow += int(Ssize[1+iSecY*nSec]/Psize[1+iSecY*nSec]);
 	}
-      StartY += Psize[1+iSec*nSec];
-      StopY  += Psize[1+iSec*nSec];
+      StartY += Psize[1+iSecY*nSec];
+      StopY  += Psize[1+iSecY*nSec];
     }
   
   c1->cd(1);
   Layer->Draw("colz");
   
-  //DrawLines( Mpos, Msize,Ssize, Psize, nRow, nCol, nSec, Layer, c1, a, b, c, d);
-  //c1->Update();
+  //DrawLines( Mpos, Msize,Ssize, Psize, nRow, nCol, nSec, Layer, c1);
+ 
 
 
 }

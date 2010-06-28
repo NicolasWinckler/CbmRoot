@@ -9,6 +9,7 @@
 #include "CbmTrdHit.h"
 #include "CbmTrdTrack.h"
 #include "CbmTrdDigiMatch.h"
+#include "CbmTrdCluster.h"
 
 #include "FairMCPoint.h"
 #include "FairRootManager.h"
@@ -20,29 +21,29 @@
 
 // -----   Default constructor   -------------------------------------------
 CbmTrdMatchTracks::CbmTrdMatchTracks() :
-	FairTask("TRD track match"), fTracks(NULL), fPoints(NULL), fHits(NULL),
+	FairTask("TRD track match"), fTracks(NULL), fPoints(NULL), fHits(NULL), fClusters(NULL),
 			fDigiMatches(NULL), fMatches(NULL), fVerbose(1), fNofHits(0),
 			fNofTrueHits(0), fNofWrongHits(0), fNofFakeHits(0), fNEvents(0),
-			fUseDigis(kTRUE) {
+			fUseDigis(kTRUE), fUseClusters(kTRUE) {
 }
 // -------------------------------------------------------------------------
 
 // -----   Constructor with verbosity level   ------------------------------
 CbmTrdMatchTracks::CbmTrdMatchTracks(Int_t verbose) :
-	FairTask("TRD track match"), fTracks(NULL), fPoints(NULL), fHits(NULL),
+	FairTask("TRD track match"), fTracks(NULL), fPoints(NULL), fHits(NULL), fClusters(NULL),
 			fDigiMatches(NULL), fMatches(NULL), fVerbose(verbose), fNofHits(0),
 			fNofTrueHits(0), fNofWrongHits(0), fNofFakeHits(0), fNEvents(0),
-			fUseDigis(kTRUE) {
+			fUseDigis(kTRUE), fUseClusters(kTRUE) {
 }
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name, title and verbosity  ---------------------
 CbmTrdMatchTracks::CbmTrdMatchTracks(const char* name, const char* title,
 		Int_t verbose) :
-	FairTask(name), fTracks(NULL), fPoints(NULL), fHits(NULL), fDigiMatches(
+	FairTask(name), fTracks(NULL), fPoints(NULL), fHits(NULL), fClusters(NULL), fDigiMatches(
 			NULL), fMatches(NULL), fVerbose(verbose), fNofHits(0),
 			fNofTrueHits(0), fNofWrongHits(0), fNofFakeHits(0), fNEvents(0),
-			fUseDigis(kTRUE) {
+			fUseDigis(kTRUE), fUseClusters(kTRUE) {
 }
 // -------------------------------------------------------------------------
 
@@ -62,6 +63,12 @@ InitStatus CbmTrdMatchTracks::Init() {
 	fHits = (TClonesArray*) ioman->GetObject("TrdHit");
 	if (fHits == NULL)
 		Fatal("CbmTrdMatchTracks::Init", "No TrdHit array!");
+
+	// Get TrdCluster array
+	fClusters = (TClonesArray*) ioman->GetObject("TrdCluster");
+	if (fClusters == NULL)
+		Fatal("CbmTrdMatchTracks::Init", "No TrdCluster array!");
+
 
 	// Get TrdTrack array
 	fTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
@@ -93,9 +100,12 @@ InitStatus CbmTrdMatchTracks::Init() {
 void CbmTrdMatchTracks::Exec(Option_t* opt) {
 	if (!fUseDigis)
 		ExecSmearing(opt);
-	else
+	else {
+	    if (!fUseClusters)
 		ExecDigi(opt);
-
+	    else
+		ExecCluster(opt);
+	}
 	std::cout << "Event: " << fNEvents++ << std::endl;
 }
 
@@ -234,6 +244,7 @@ void CbmTrdMatchTracks::ExecSmearing(Option_t* opt) {
 void CbmTrdMatchTracks::ExecDigi(Option_t* opt) {
 	fMatches->Clear();
 
+        std::cout << "TRACK MATCHING USES DIGIS" << std::endl;
 	Int_t nofTracks = fTracks->GetEntriesFast();
 	for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) { // Loop over tracks
 		std::map<Int_t, Int_t> matchMap;
@@ -298,6 +309,79 @@ void CbmTrdMatchTracks::ExecDigi(Option_t* opt) {
 	} // Loop over tracks
 }
 // -------------------------------------------------------------------------
+
+// -----   Private method ExecCluster   --------------------------------------------
+void CbmTrdMatchTracks::ExecCluster(Option_t* opt) {
+	fMatches->Clear();
+
+	std::cout << "TRACK MATCHING USES CLUSTERS" << std::endl;
+
+	Int_t nofTracks = fTracks->GetEntriesFast();
+	for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) { // Loop over tracks
+		std::map<Int_t, Int_t> matchMap;
+
+		CbmTrdTrack* pTrack = (CbmTrdTrack*) fTracks->At(iTrack);
+		if (pTrack == NULL) continue;
+
+		Int_t nofHits = pTrack->GetNofHits();
+		for (Int_t iHit = 0; iHit < nofHits; iHit++) { // Loop over hits
+			Int_t index = pTrack->GetHitIndex(iHit);
+			CbmTrdHit* hit = (CbmTrdHit*) fHits->At(index);
+			if (hit == NULL) continue;
+
+			Int_t clusterId = hit->GetRefId();
+                        CbmTrdCluster* cluster = (CbmTrdCluster*) fClusters->At(clusterId);
+			if (cluster == NULL) continue;
+			for (Int_t iDigi = 0; iDigi < cluster->GetNDigis(); iDigi++){
+                            Int_t digiId = cluster->GetDigiIndex(iDigi);
+			    CbmTrdDigiMatch* digiMatch = (CbmTrdDigiMatch*) fDigiMatches->At(digiId);
+			    if (digiMatch == NULL) continue;
+			    for (Int_t iPoint = 0; iPoint < digiMatch->GetNofRefs(); iPoint++) {
+				Int_t pointIndex = digiMatch->GetRefIndex(iPoint);
+				if (pointIndex < 0) { // Fake or background hit
+					matchMap[-1]++;
+					continue;
+				}
+				FairMCPoint* point = (FairMCPoint*) fPoints->At(pointIndex);
+				if (point == NULL) continue;
+				matchMap[point->GetTrackID()]++;
+			    }
+			} // loop over cluster
+		} // Loop over hits
+
+		Int_t nofTrue = 0;
+		Int_t bestMcTrackId = -1;
+		Int_t nPoints = 0;
+		for (std::map<Int_t, Int_t>::iterator it = matchMap.begin(); it
+				!= matchMap.end(); it++) {
+			if (it->first != -1 && it->second > nofTrue) {
+				bestMcTrackId = it->first;
+				nofTrue = it->second;
+			}
+			nPoints += it->second;
+		}
+
+		Int_t nofFake = 0;//matchMap[-1];
+		Int_t nofWrong = nPoints - nofTrue - nofFake;
+		Int_t nofMcTracks = matchMap.size() - 1;
+
+		new ((*fMatches)[iTrack]) CbmTrackMatch(bestMcTrackId, nofTrue,
+				nofWrong, nofFake, nofMcTracks);
+
+		fNofHits += nPoints;
+		fNofTrueHits += nofTrue;
+		fNofWrongHits += nofWrong;
+		fNofFakeHits += nofFake;
+
+		if (fVerbose > 1)
+			std::cout << "iTrack=" << iTrack << " mcTrack=" << bestMcTrackId
+					<< " nPoints=" << nPoints << " nofTrue=" << nofTrue
+					<< " nofWrong=" << nofWrong << " nofFake=" << nofFake
+					<< " nofMcTracks=" << nofMcTracks << std::endl;
+	} // Loop over tracks
+}
+// -------------------------------------------------------------------------
+
 
 // -----   Public method Finish   ------------------------------------------
 void CbmTrdMatchTracks::Finish() {

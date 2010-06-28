@@ -58,9 +58,13 @@ private:
 	/** Execution in case of digi hit producer **/
 	virtual void ExecDigi(Option_t* opt);
 
+	/** Execution in  case of clustering **/
+        virtual void ExecCluster(Option_t* opt);
+
 	TClonesArray* fTracks; // Array of CbmTrdTracks
 	TClonesArray* fPoints; // Array of FairMCPoints
 	TClonesArray* fHits; // Array of CbmTrdHits
+        TClonesArray* fClusters; // Array of CbmTrdCluster
 	TClonesArray* fDigiMatches; // Array of CbmTrdDigiMatch;
 	TClonesArray* fMatches; // Array of CbmTrackMatch
 
@@ -77,6 +81,9 @@ private:
 
 	/** If true than matching will be done using digis **/
 	Bool_t fUseDigis;
+
+	/** If true than matching will be done using clusters **/
+        Bool_t fUseClusters;
 
 ClassDef(CbmTrdMatchTracks,1);
 };

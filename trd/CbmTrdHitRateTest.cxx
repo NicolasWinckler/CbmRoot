@@ -164,11 +164,11 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Double_t ZRangeU = 1e06;
 
 
-  TH2F *Layer = NULL;
+  TH2F* Layer = NULL;
   fStation = 0;
   fLayer = 0;
 
-  TCanvas *c1 = NULL;
+  TCanvas* c1 = NULL;
  
   Char_t Canfile1[100];
   
@@ -377,7 +377,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   sprintf(name,"S%d_L%d",fStation,fLayer);
   sprintf(title,"Station %d, Layer %d",fStation,fLayer);
   sprintf(Canfile1,"Pics/Station%dLayer%d.png",fStation,fLayer);
-  Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
+ Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
   Layer->SetContour(99);
   Layer->SetXTitle("x-Coordinate [mm]");
   Layer->SetYTitle("y-Coordinate [mm]");

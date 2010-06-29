@@ -54,10 +54,10 @@ public:
   Int_t GetDigiIndex(Int_t iDigi) const {return fDigiIndices.At(iDigi);}
 
   /** Total charge in the cluster. */
-  Int_t GetCharge() const {return fCharge;}
+  Float_t GetCharge() const {return fCharge;}
 
   /** Maximum charge on a single pad. */
-  Int_t GetMaxCharge() const {return fQMax;}
+  Float_t GetMaxCharge() const {return fQMax;}
 
 
 private:

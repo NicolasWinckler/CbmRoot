@@ -1,3 +1,4 @@
+
 #ifndef CBMTUTORIALDETHitRate_H
 #define CBMTUTORIALDETHitRate_H
 
@@ -90,7 +91,7 @@ class CbmTrdHitRateTest : public FairTask {
 
  private:
 
-  void GetModuleInformationFromDigiPar(Bool_t Fast, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1);
+  void GetModuleInformationFromDigiPar(Bool_t Fast, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2);
 
   void GetModuleInformationSL( Int_t VolumeID);
 
@@ -101,7 +102,7 @@ class CbmTrdHitRateTest : public FairTask {
 
   void GetModuleInformation();
 
-  void Histo(Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Padsize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1);
+  void Histo(Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Padsize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2);
   /*
     vector<int>* L1S1, vector<int>* L2S1, vector<int>* L3S1, vector<int>* L4S1, 
     vector<int>* L1S2, vector<int>* L2S2, vector<int>* L3S2, vector<int>* L4S2, 

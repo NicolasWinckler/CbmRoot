@@ -246,7 +246,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
   sprintf(name,"HP_S%d_L%d",fStation,fLayer);
   sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
-  HitPad = new TH1F(name,title,1e04,1e00,1e06);
+  HitPad = new TH1F(name,title,1e04,1e00,1e06);//
   Layer->SetContour(99);
   Layer->SetXTitle("x-Coordinate [mm]");
   Layer->SetYTitle("y-Coordinate [mm]");
@@ -286,6 +286,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   
   delete Layer;
   delete c1;
+  delete Outimage1;
  
   HitPad->Draw("same");
   //border->Draw("same");
@@ -296,7 +297,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   
   delete HitPad;
   delete c2;  
-  
+  delete Outimage2;
   //**************************************************************************************
   fStation = 1;
   fLayer = 2;
@@ -308,7 +309,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
   sprintf(name,"HP_S%d_L%d",fStation,fLayer);
   sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
-  HitPad = new TH1F(name,title,1e08,0,1e07);
+  HitPad = new TH1F(name,title,1e04,1e00,1e06);//1e08,0,1e07);
   Layer->SetContour(99);
   Layer->SetXTitle("x-Coordinate [mm]");
   Layer->SetYTitle("y-Coordinate [mm]");
@@ -328,7 +329,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   c1->Divide(1,1);
   c1->cd(1)->SetLogz(1);
   Layer->Draw();
-  c2 = new TCanvas("c2","c2",1000/2,900/2);	
+  c2 = new TCanvas("c2","c2",1000,900/2);	
   c2->Divide(1,1);
   c2->cd(1)->SetLogx(1);
   c2->cd(1)->SetLogy(1);
@@ -344,6 +345,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Outimage1->WriteImage(Canfile1);
   delete Layer;
   delete c1;
+  delete Outimage1;
   c2->cd(1);
   HitPad->Draw("same");
   //border->Draw("same");
@@ -352,6 +354,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Outimage2->WriteImage(Canfile2);
   delete HitPad;
   delete c2;
+  delete Outimage2;
   //**************************************************************************************
   fStation = 2;
   fLayer = 1;
@@ -363,7 +366,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
   sprintf(name,"HP_S%d_L%d",fStation,fLayer);
   sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
-  HitPad = new TH1F(name,title,1e08,0,1e07);
+  HitPad = new TH1F(name,title,1e04,1e00,1e06);//1e08,0,1e07);
   Layer->SetContour(99);
   Layer->SetXTitle("x-Coordinate [mm]");
   Layer->SetYTitle("y-Coordinate [mm]");
@@ -383,7 +386,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   c1->Divide(1,1);
   c1->cd(1)->SetLogz(1);
   Layer->Draw();
-  c2 = new TCanvas("c2","c2",1000/2,900/2);	
+  c2 = new TCanvas("c2","c2",1000,900/2);	
   c2->Divide(1,1);
   c2->cd(1)->SetLogx(1);
   c2->cd(1)->SetLogy(1);
@@ -399,6 +402,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Outimage1->WriteImage(Canfile1);
   delete Layer;
   delete c1;
+  delete Outimage1;
   c2->cd(1);
   HitPad->Draw("same");
   //border->Draw("same");
@@ -407,6 +411,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Outimage2->WriteImage(Canfile2);
   delete HitPad;
   delete c2;
+  delete Outimage2;
   //**************************************************************************************
   fStation = 2;
   fLayer = 2;
@@ -418,7 +423,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
   sprintf(name,"HP_S%d_L%d",fStation,fLayer);
   sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
-  HitPad = new TH1F(name,title,1e08,0,1e07);
+  HitPad = new TH1F(name,title,1e04,1e00,1e06);//1e08,0,1e07);
   Layer->SetContour(99);
   Layer->SetXTitle("x-Coordinate [mm]");
   Layer->SetYTitle("y-Coordinate [mm]");
@@ -438,7 +443,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   c1->Divide(1,1);
   c1->cd(1)->SetLogz(1);
   Layer->Draw();
-  c2 = new TCanvas("c2","c2",1000/2,900/2);	
+  c2 = new TCanvas("c2","c2",1000,900/2);	
   c2->Divide(1,1);
   c2->cd(1)->SetLogx(1);
   c2->cd(1)->SetLogy(1);
@@ -454,6 +459,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Outimage1->WriteImage(Canfile1);
   delete Layer;
   delete c1;
+  delete Outimage1;
   c2->cd(1);
   HitPad->Draw("same");
   //border->Draw("same");
@@ -462,6 +468,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Outimage2->WriteImage(Canfile2);
   delete HitPad;
   delete c2;
+  delete Outimage2;
   //**************************************************************************************
   fStation = 3;
   fLayer = 1;
@@ -473,7 +480,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
   sprintf(name,"HP_S%d_L%d",fStation,fLayer);
   sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
-  HitPad = new TH1F(name,title,1e08,0,1e07);
+  HitPad = new TH1F(name,title,1e04,1e00,1e06);//1e08,0,1e07);
   Layer->SetContour(99);
   Layer->SetXTitle("x-Coordinate [mm]");
   Layer->SetYTitle("y-Coordinate [mm]");
@@ -493,7 +500,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   c1->Divide(1,1);
   c1->cd(1)->SetLogz(1);
   Layer->Draw();
-  c2 = new TCanvas("c2","c2",1000/2,900/2);	
+  c2 = new TCanvas("c2","c2",1000,900/2);	
   c2->Divide(1,1);
   c2->cd(1)->SetLogx(1);
   c2->cd(1)->SetLogy(1);
@@ -509,6 +516,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Outimage1->WriteImage(Canfile1);
   delete Layer;
   delete c1;
+  delete Outimage1;
   c2->cd(1);
   HitPad->Draw("same");
   //border->Draw("same");
@@ -517,6 +525,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Outimage2->WriteImage(Canfile2);
   delete HitPad;
   delete c2;
+  delete Outimage2;
   //**************************************************************************************
   fStation = 3;
   fLayer = 2;
@@ -528,7 +537,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
   sprintf(name,"HP_S%d_L%d",fStation,fLayer);
   sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
-  HitPad = new TH1F(name,title,1e08,0,1e07);
+  HitPad = new TH1F(name,title,1e04,1e00,1e06);//1e08,0,1e07);
   Layer->SetContour(99);
   Layer->SetXTitle("x-Coordinate [mm]");
   Layer->SetYTitle("y-Coordinate [mm]");
@@ -548,7 +557,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   c1->Divide(1,1);
   c1->cd(1)->SetLogz(1);
   Layer->Draw();
-  c2 = new TCanvas("c2","c2",1000/2,900/2);	
+  c2 = new TCanvas("c2","c2",1000,900/2);	
   c2->Divide(1,1);
   c2->cd(1)->SetLogx(1);
   c2->cd(1)->SetLogy(1);
@@ -564,6 +573,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Outimage1->WriteImage(Canfile1);
   delete Layer;
   delete c1;
+  delete Outimage1;
   c2->cd(1);
   HitPad->Draw("same");
   border->Draw("same");
@@ -572,6 +582,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Outimage2->WriteImage(Canfile2);
   delete HitPad;
   delete c2;
+  delete Outimage2;
   //**************************************************************************************
   
 }

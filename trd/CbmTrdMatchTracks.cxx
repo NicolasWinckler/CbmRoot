@@ -66,8 +66,13 @@ InitStatus CbmTrdMatchTracks::Init() {
 
 	// Get TrdCluster array
 	fClusters = (TClonesArray*) ioman->GetObject("TrdCluster");
-	if (fClusters == NULL)
-		Fatal("CbmTrdMatchTracks::Init", "No TrdCluster array!");
+	//	if (fClusters == NULL)
+	//		Fatal("CbmTrdMatchTracks::Init", "No TrdCluster array!");
+	if (fClusters == NULL) {
+		fUseClusters = kFALSE;
+	} else {
+		fUseClusters = kTRUE;
+	}
 
 
 	// Get TrdTrack array

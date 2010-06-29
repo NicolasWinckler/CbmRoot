@@ -39,11 +39,12 @@
 //#include "sqlite/sqlite3.h" // used for the lookup table option
 
 #include <iostream>
+#include <cmath>
 using std::cout;
 using std::cin;
 using std::endl;
 using std::pair;
-
+using std::fabs;
 // ---- Default constructor -------------------------------------------
 CbmTrdClusterizer::CbmTrdClusterizer()
     :FairTask("TrdCluster")

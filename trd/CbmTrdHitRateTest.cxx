@@ -449,7 +449,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   c2->cd(1)->SetLogy(1);
   
   HitPad->Draw();
-  //border->Draw("same");
+  border->Draw("same");
   for (Int_t i = 0; i < L2S2.size(); i++)
     {
       GetModuleInformationFromDigiPar(Fast, L2S2[i], Layer ,c1, Canfile1, HitPad, c2);
@@ -576,7 +576,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   delete Outimage1;
   c2->cd(1);
   HitPad->Draw("same");
-  border->Draw("same");
+  //border->Draw("same");
   Outimage2 = TImage::Create();
   Outimage2->FromPad(c2);
   Outimage2->WriteImage(Canfile2);

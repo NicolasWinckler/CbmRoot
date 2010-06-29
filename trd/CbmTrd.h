@@ -114,18 +114,18 @@ class CbmTrd : public FairDetector
 
   /** Track information to be stored until the track leaves the
       active volume. **/
-  Int_t          fTrackID;           //!  track index
-  Int_t          fVolumeID;          //!  volume id
-  TLorentzVector fPosIn;             //!  position at entrance
-  TLorentzVector fMomIn;             //!  momentum at entrance
-  TLorentzVector fPosOut;            //!  position at exit
-  TLorentzVector fMomOut;            //!  momentum at exit
-  Double32_t     fTime;              //!  time
-  Double32_t     fLength;            //!  length
-  Double32_t     fELoss;             //!  energy loss
-  Int_t 	 fVolid1,fVolid2, fVolid3, fVolid4, fVolid5, fVolid6;
-  Int_t 	 fCopyNo;
-  Int_t          fPosIndex;          //!
+  Int_t          fTrackID;           //! track index
+  Int_t          fVolumeID;          //! volume id
+  TLorentzVector fPosIn;             //! position at entrance
+  TLorentzVector fMomIn;             //! momentum at entrance
+  TLorentzVector fPosOut;            //! position at exit
+  TLorentzVector fMomOut;            //! momentum at exit
+  Double32_t     fTime;              //! time
+  Double32_t     fLength;            //! length
+  Double32_t     fELoss;             //! energy loss
+  Int_t 	 fVolid1,fVolid2, fVolid3, fVolid4, fVolid5, fVolid6;  //! volume id
+  Int_t 	 fCopyNo;            //! copy number
+  Int_t          fPosIndex;          //! position index
   TClonesArray*  fTrdCollection;     //! Hit collection
 
   Int_t          fSimple;            //! Switch between different geometry versions
@@ -148,7 +148,7 @@ class CbmTrd : public FairDetector
   Int_t Trd3_Module2_ID;	     //! MC ID of middle module of third TRD 
   Int_t Trd3_Module3_ID;	     //! MC ID of big module of third TRD    
 
-  CbmTrdDetectorId fTrdId;
+  CbmTrdDetectorId fTrdId;           //! TRD detector ID
   /** Private method AddHit
    **
    ** Adds a CbmTrdPoint to the HitCollection

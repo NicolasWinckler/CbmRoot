@@ -1,6 +1,5 @@
-
-#ifndef CBMTUTORIALDETHitRate_H
-#define CBMTUTORIALDETHitRate_H
+#ifndef CBMTRDHITRATETEST_H
+#define CBMTRDHITRATETEST_H
 
 #include "CbmTrdDetectorId.h"
 #include "CbmTrdDigiPar.h"
@@ -202,4 +201,5 @@ class CbmTrdHitRateTest : public FairTask {
   ClassDef(CbmTrdHitRateTest,1)
 
     };
-#endif //CBMTUTORIALDETCluster_H
+
+#endif // CBMTRDHITRATETEST_H

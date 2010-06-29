@@ -1,5 +1,5 @@
-#ifndef CBMTUTORIALDETCluster_H
-#define CBMTUTORIALDETCluster_H
+#ifndef CBMTRDCLUSTERIZER_H
+#define CBMTRDCLUSTERIZER_H
 
 #include "CbmTrdDetectorId.h"
 #include "CbmTrdDigiPar.h"
@@ -215,4 +215,4 @@ class CbmTrdClusterizer : public FairTask {
   ClassDef(CbmTrdClusterizer,1)
 
     };
-#endif //CBMTUTORIALDETCluster_H
+#endif // CBMTRDCLUSTERIZER_H

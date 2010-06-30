@@ -90,7 +90,7 @@ class CbmTrdHitRateTest : public FairTask {
 
  private:
 
-  void GetModuleInformationFromDigiPar(Bool_t Fast, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2);
+  void GetModuleInformationFromDigiPar(Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2);
 
   void GetModuleInformationSL( Int_t VolumeID);
 

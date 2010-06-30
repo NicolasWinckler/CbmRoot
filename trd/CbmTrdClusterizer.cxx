@@ -1,5 +1,5 @@
 #include "CbmTrdClusterizer.h"
-
+/*
 #include "CbmTrdDigiPar.h"
 #include "CbmTrdPoint.h"
 #include "CbmTrdDigi.h"
@@ -13,7 +13,7 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "FairBaseParSet.h"
-
+*/
 #include "TRandom.h"
 #include "TMath.h"
 #include "TVector3.h"
@@ -273,12 +273,12 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       deltarecoTRD1 = new TProfile("deltarecoTRD","r_in(MC) vs. fabs(x_mean(MC) - x_mean(reco)) [mm] pad 'C'-CS", 50, 0,10000);
       deltarecoPad = new TProfile("deltarecoPad","x_mean(MC) vs. (x_mean(MC) - x_mean(reco)) [pad units] pad 'C'-CS", 100, -1,1);
       PRF2 = new TProfile("PRF2","PRF2",150,-1.5 * 5,1.5 * 5);
-      Float_t K_3 = 0.525;
+      Float_t K3 = 0.525;
       Float_t pW = 5;
       Float_t h = 3;
       Float_t par = 1;
       Char_t Mathieson[500];
-      sprintf(Mathieson," -1. / (2. * atan(sqrt(%f))) * (atan(sqrt(%f) *tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f + 2.* x * %f) / (8.* %f) )) +  atan(sqrt(%f) *  tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f - 2.* x * %f) / (8.* %f) )) )",K_3,K_3,K_3,pW,par,h,K_3,K_3,pW,par,h);
+      sprintf(Mathieson," -1. / (2. * atan(sqrt(%f))) * (atan(sqrt(%f) *tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f + 2.* x * %f) / (8.* %f) )) +  atan(sqrt(%f) *  tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f - 2.* x * %f) / (8.* %f) )) )",K3,K3,K3,pW,par,h,K3,K3,pW,par,h);
       mathieson = new TF1("mathieson", Mathieson, -1.5 * pW, 1.5 * pW);
       mathieson->SetLineColor(2);
     }
@@ -1261,8 +1261,8 @@ void CbmTrdClusterizer::CalcMathieson( Bool_t TEST, Double_t x_mean, Double_t y_
   //Int_t accuracy = 1;    // '1/accuracy' integration step width [mm]
   Float_t h = 3;         //anode-cathode gap [mm]
   Float_t s = 3;         //anode wire spacing [mm]
-  Float_t r_a = 12.5E-3/2.; //anode wire radius [mm]
-  Float_t q_a = 1700;    //anode neto charge [??] ???
+  Float_t ra = 12.5E-3/2.; //anode wire radius [mm]
+  Float_t qa = 1700;    //anode neto charge [??] ???
 
   for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
     {
@@ -1275,10 +1275,10 @@ void CbmTrdClusterizer::CalcMathieson( Bool_t TEST, Double_t x_mean, Double_t y_
   Float_t r = 0.0;     // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
   Float_t value = 0.0;
   Double_t rho = 0.0;   //charge at position x
-  Float_t K_3 = 0.525; //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
-  //Float_t K_3 = -0.24 * (h / s) + 0.7 + (-0.75 * log(r_a / s) - 3.64);// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
-  Float_t K_2 = 3.14159265 / 2.* ( 1. - sqrt(K_3)/2.);
-  Float_t K_1 = (K_2 * sqrt(K_3)) / (4. * atan(sqrt(K_3)));
+  Float_t K3 = 0.525; //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
+  //Float_t K3 = -0.24 * (h / s) + 0.7 + (-0.75 * log(ra / s) - 3.64);// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
+  Float_t K2 = 3.14159265 / 2.* ( 1. - sqrt(K3)/2.);
+  Float_t K1 = (K2 * sqrt(K3)) / (4. * atan(sqrt(K3)));
   TH2F* Test = NULL;
   TH2F* TestPos = NULL;
   TH2F* Test2 = NULL;
@@ -1297,16 +1297,16 @@ void CbmTrdClusterizer::CalcMathieson( Bool_t TEST, Double_t x_mean, Double_t y_
 			   pow(((iPadRow - int(fPadNrY/2)) * H[iPadRow] + (yi + 0.5) / float(accuracy) - 0.5 * H[iPadRow]) - y_mean,2)
 			 
 			   );
-		  value = K_2 * r / h;
+		  value = pow(tanh(K2 * r / h),2);
 		  //rho = r;
 		  //rho = (iPadRow * fPadNrX + iPadCol) / (H[iPadRow] * accuracy * W[iPadCol] * accuracy);
 		  //rho = (1.) / (H[iPadRow] * accuracy * W[iPadCol] * accuracy);
 		  /*
-		  rho = (q_a * K_1 * (1. - tanh(K_2 * r / h) * tanh(K_2 * r / h)) /
-			 (1. + K_3 * tanh(K_2 * r / h) * tanh(K_2 * r / h))) / float((accuracy * accuracy));  
+		    rho = (qa * K1 * (1. - tanh(K2 * r / h) * tanh(K2 * r / h)) /
+		    (1. + K3 * tanh(K2 * r / h) * tanh(K2 * r / h))) / float((accuracy * accuracy));  
 		  */ 
-		  rho = (q_a * K_1 * (1. - tanh(value) * tanh(value)) /
-			 (1. + K_3 * tanh(value) * tanh(value))) / float((accuracy * accuracy));         
+		  rho = (qa * K1 * (1. - value) /
+			 (1. + K3 * value)) / float((accuracy * accuracy));         
 		    
 		  if (rho > 0.00)
 		    {

@@ -2,6 +2,9 @@
 //   Generator for CbmTrd Geometry
 //
 //
+// Update 20100631 - David Emschermann 
+// - adapt trd1/2/3 keeping volume to tilted setup
+//
 // Update 20100630 - David Emschermann 
 // - introduce layer_pitch in addition to layer_thickness
 //
@@ -50,24 +53,86 @@ FILE *parameterfile;
 using namespace std;
 
 
-int  TrdModules1(int, int, float, float, int, float, float*, float*);
+int Tiltandshift(int, int, float, float, int);
+int TrdModules1(int, int, float, float, int, float, float*, float*);
 
 
 //--------------------------------------------------------------------
-int TrdModules1(int Station_number, int Layer_number, float frame_width, float Layer_thickness, int Chamber_number, float Position_Station1[][4], float* Detector_size_x, float* Detector_size_y) {
+int Tiltandshift(int Station_number, int Layer_number, float Layer_thickness, float Position_Station1[][4], int i) {
 
+  float rho[3] = { 1.5/4.5, 2.5/6.75, 3.5/9.0 } ;   // hardcoded tilting angle
+  // corresponds to angles of 18.43, 20.32 and 21.25 deg for stations 1, 2, 3
+  // incident angle at kink position is orthogonal for tracks from the vertex 
+
+  float rot[3][3]={ { 1500., 0., -Layer_thickness/2. }, 
+                    { 2500., 0., -Layer_thickness/2. }, 
+		    { 3500., 0., -Layer_thickness/2. } };
+  // hardcoded tilt position for stations 1, 2, 3 - left right side - 3 vector
+
+  float ve1[3];   // buffer vector
+  float ve2[3];   // buffer vector
+
+// rotation around y-axis
+//    /   cos phi   0   sin phi \
+//    |   0         1   0       |
+//    \ - sin phi   0   cos phi /
+
+  float pos[3] = { Position_Station1[i][0], Position_Station1[i][1], 0. }; // x, y, z position vector
+
+  // determin sign of x-coordinate
+  int sign = 1;
+  if  ( pos[0] < 0 ) sign = -1;
+
+  if (abs(pos[0]) > rot[Station_number-1][0])  // if module located in tilt area
+  {
+    float phi = rho[Station_number-1] * sign;  // +x side : tilt +angle // -x side : tilt -angle
+
+    //    printf("op1 %f %f %f\n", pos[0], pos[1], pos[2]);
+
+    // vector from rotation point to detector center
+    ve1[0] = pos[0] - sign * rot[Station_number-1][0];
+    ve1[1] = pos[1] -        rot[Station_number-1][1];
+    ve1[2] = pos[2] -        rot[Station_number-1][2];
+
+    // rotation around angle
+    ve2[0] =  cos(phi) * ve1[0] +           sin(phi) * ve1[2];
+    ve2[1] =                      ve1[1]                     ;
+    ve2[2] = -sin(phi) * ve1[0] +           cos(phi) * ve1[2];
+
+    // add rotated vector to rotation point
+    pos[0] = sign * rot[Station_number-1][0] + ve2[0];
+    pos[1] =        rot[Station_number-1][1] + ve2[1];
+    pos[2] =        rot[Station_number-1][2] + ve2[2];
+
+//    printf("op2 %f %f %f\n", ve1[0], ve1[1], ve1[2]);
+//    printf("op3 %f %f %f\n", ve2[0], ve2[1], ve2[2]);
+//    printf("op4 %f %f %f\n", pos[0], pos[1], pos[2]);
+
+    fprintf(geofile,"%f %f %f\n", pos[0], pos[1], pos[2]);
+    fprintf(geofile,"%f %f %f %f %f %f %f %f %f\n", 
+   	     cos(phi), 0.,  sin(phi), 0., 1., 0., -sin(phi), 0.,  cos(phi) );
+
+  }
+  else if (Position_Station1[i][3] == 0) {
+    //horizontal position
+    fprintf(geofile,"%f %f %f\n", Position_Station1[i][0], Position_Station1[i][1], 0.);
+    fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
+  } 
+  else {
+    // vertical position
+    fprintf(geofile,"%f %f %f\n", Position_Station1[i][0], Position_Station1[i][1], 0.);
+    fprintf(geofile,"0.  1.  0.  -1.  0.  0.  0.  0.  1.\n");
+  }
+
+}
+
+//--------------------------------------------------------------------
+int TrdModules1(int Station_number, int Layer_number, float frame_width, float Layer_thickness, int Chamber_number, float Position_Station1[][4], float* Detector_size_x, float* Detector_size_y) {
 
   // create box of air with size of 'Detector_size_x[0] x Detector_size_y[0]' and fill
   // this box with the
   // radiator, mylar foil, gas, pad plane which have a size of 'Active_area_x[0] x Active_area_y[0]'  
   // the frames which have a width of 'frame_width' and are at the outer edges of the box
-
-// tilt
-    float phi = 1.5/4.5;   // for station 1
-//  float phi = 0;
-//  float phi = 3.1415927/4;     // 45 deg
-  //      printf("angle phi: %f\n", atan(phi)/3.141*180);
-
 
   bool first_time_Module1 = true;
   bool first_time_Module2 = true;
@@ -216,72 +281,8 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
       fprintf(geofile,"%f %f %f\n",-Detector_size_x[j] /2 ,-Detector_size_y[j] /2 ,  Layer_thickness/2);
       //      fprintf(geofile,"%f %f %f\n", Position_Station1[i][0], Position_Station1[i][1], 0.);
 
-// tilt
-//    /   cos phi   0   sin phi \
-//    |   0         1   0       |
-//    \ - sin phi   0   cos phi /
+      Tiltandshift(Station_number, Layer_number, Layer_thickness, Position_Station1, i);
 
-      float pos[3]={ Position_Station1[i][0], Position_Station1[i][1], 0. }; // x, y, z
-      float ve1[3];
-      float ve2[3];
-
-      if (Position_Station1[i][0] >  1500)  // +x side : tilt +angle
-      {
-      float rot[3]={ 1500., 0., -Layer_thickness/2. };
-
-        // vector from rotation point to detector center
-        ve1[0] = pos[0] - rot[0];
-        ve1[1] = pos[1] - rot[1];
-        ve1[2] = pos[2] - rot[2];
-
-        // rotation around angle
-        ve2[0] =  cos(phi) * ve1[0] +           sin(phi) * ve1[2];
-        ve2[1] =                      ve1[1]                     ;
-        ve2[2] = -sin(phi) * ve1[0] +           cos(phi) * ve1[2];
-
-        // add rotated vector to rotation point
-        pos[0] = rot[0] + ve2[0];
-	pos[1] = rot[1] + ve2[1];
-        pos[2] = rot[2] + ve2[2];
-
-        fprintf(geofile,"%f %f %f\n", pos[0], pos[1], pos[2]);
-        fprintf(geofile,"%f %f %f %f %f %f %f %f %f\n", 
-		cos(phi), 0., sin(phi), 0., 1., 0., -sin(phi), 0., cos(phi) );
-
-      }
-      else if (Position_Station1[i][0] < -1500)  // -x side : tilt -angle
-      {
-      float rot[3]={-1500., 0., -Layer_thickness/2. };
-
-        // vector from rotation point to detector center
-        ve1[0] = pos[0] - rot[0];
-        ve1[1] = pos[1] - rot[1];
-        ve1[2] = pos[2] - rot[2];
-
-        // rotation around angle
-        ve2[0] =  cos(phi) * ve1[0] +          -sin(phi) * ve1[2];
-        ve2[1] =                      ve1[1]                     ;
-        ve2[2] =  sin(phi) * ve1[0] +           cos(phi) * ve1[2];
-
-        // add rotated vector to rotation point
-        pos[0] = rot[0] + ve2[0];
-	pos[1] = rot[1] + ve2[1];
-        pos[2] = rot[2] + ve2[2];
-
-        fprintf(geofile,"%f %f %f\n", pos[0], pos[1], pos[2]);
-        fprintf(geofile,"%f %f %f %f %f %f %f %f %f\n", 
-		cos(phi), 0., -sin(phi), 0., 1., 0., sin(phi), 0., cos(phi) );
-      }
-      else if (Position_Station1[i][3] == 0) {
-        //horizontal position
-        fprintf(geofile,"%f %f %f\n", Position_Station1[i][0], Position_Station1[i][1], 0.);
-        fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
-      } 
-      else {
-        // vertical position
-        fprintf(geofile,"%f %f %f\n", Position_Station1[i][0], Position_Station1[i][1], 0.);
-        fprintf(geofile,"0.  1.  0.  -1.  0.  0.  0.  0.  1.\n");
-      }
       fprintf(geofile,"//*********************************\n");
   
   
@@ -522,73 +523,8 @@ int TrdModules1(int Station_number, int Layer_number, float frame_width, float L
       fprintf(geofile,"trd%dmod%d#%d\n",Station_number, module_number,copy_number);
       fprintf(geofile,"trd%dlayer#%d\n",Station_number, Layer_number+1);
 
+      Tiltandshift(Station_number, Layer_number, Layer_thickness, Position_Station1, i);
 
-// tilt
-//    /   cos phi   0   sin phi \
-//    |   0         1   0       |
-//    \ - sin phi   0   cos phi /
-
-      float pos[3]={ Position_Station1[i][0], Position_Station1[i][1], 0. }; // x, y, z
-      float ve1[3];
-      float ve2[3];
-
-      if (Position_Station1[i][0] >  1500)  // +x side : tilt +angle
-      {
-      float rot[3]={ 1500., 0., -Layer_thickness/2. };
-
-        // vector from rotation point to detector center
-        ve1[0] = pos[0] - rot[0];
-        ve1[1] = pos[1] - rot[1];
-        ve1[2] = pos[2] - rot[2];
-
-        // rotation around angle
-        ve2[0] =  cos(phi) * ve1[0] +           sin(phi) * ve1[2];
-        ve2[1] =                      ve1[1]                     ;
-        ve2[2] = -sin(phi) * ve1[0] +           cos(phi) * ve1[2];
-
-        // add rotated vector to rotation point
-        pos[0] = rot[0] + ve2[0];
-	pos[1] = rot[1] + ve2[1];
-        pos[2] = rot[2] + ve2[2];
-
-        fprintf(geofile,"%f %f %f\n", pos[0], pos[1], pos[2]);
-        fprintf(geofile,"%f %f %f %f %f %f %f %f %f\n", 
-		cos(phi), 0., sin(phi), 0., 1., 0., -sin(phi), 0., cos(phi) );
-
-      }
-      else if (Position_Station1[i][0] < -1500)  // -x side : tilt -angle
-      {
-      float rot[3]={-1500., 0., -Layer_thickness/2. };
-
-        // vector from rotation point to detector center
-        ve1[0] = pos[0] - rot[0];
-        ve1[1] = pos[1] - rot[1];
-        ve1[2] = pos[2] - rot[2];
-
-        // rotation around angle
-        ve2[0] =  cos(phi) * ve1[0] +          -sin(phi) * ve1[2];
-        ve2[1] =                      ve1[1]                     ;
-        ve2[2] =  sin(phi) * ve1[0] +           cos(phi) * ve1[2];
-
-        // add rotated vector to rotation point
-        pos[0] = rot[0] + ve2[0];
-	pos[1] = rot[1] + ve2[1];
-        pos[2] = rot[2] + ve2[2];
-
-        fprintf(geofile,"%f %f %f\n", pos[0], pos[1], pos[2]);
-        fprintf(geofile,"%f %f %f %f %f %f %f %f %f\n", 
-		cos(phi), 0., -sin(phi), 0., 1., 0., sin(phi), 0., cos(phi) );
-      }
-      else if (Position_Station1[i][3] == 0) {
-        //horizontal position
-        fprintf(geofile,"%f %f %f\n", Position_Station1[i][0], Position_Station1[i][1], 0.);
-        fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
-      } 
-      else {
-        // vertical position
-        fprintf(geofile,"%f %f %f\n", Position_Station1[i][0], Position_Station1[i][1], 0.);
-        fprintf(geofile,"0.  1.  0.  -1.  0.  0.  0.  0.  1.\n");
-      }
       fprintf(geofile,"//*********************************\n");
   
       if ( module_number == 1 ) {
@@ -624,7 +560,8 @@ int main(void)
   //
   //  string geoname  = path + "trd_squared_modules_jun10_v01.geo" ; // 12 mm gas
   //  string geoname  = path + "trd_squared_modules_jun10_v02.geo" ; //  6 mm gas
-  string geoname  = path + "trd_squared_modules_jun10_v03.geo" ; //  test
+  string geoname  = path + "trd_squared_modules_jun10_v03.geo" ; // tilted,  6 mm gas
+  //  string geoname  = path + "trd_squared_modules_jun10_v04.geo" ; //  test
   string infoname = path + "trd_segmented.info";
   string parametername  = path + "trd_segmented.txt";
 
@@ -667,7 +604,7 @@ int main(void)
   Station_number       = 3;
   Layer_number         = 4;
   //  Layer_thickness      = 60;
-  Layer_thickness      = 140;   // DE adapt layer thickness to TRD prototypes (Jun10)
+  Layer_thickness      = 135;   // adapt layer thickness to TRD prototypes (Jun10)
   Layer_pitch          = 150;   // Distance between 2 adjacent layers of a TRD station
   //  Station_thickness    = Layer_number * Layer_thickness;
   Station_thickness    = Layer_number * Layer_pitch;
@@ -688,8 +625,9 @@ int main(void)
   fprintf(geofile,"//*********************************************************\n");
   fprintf(geofile,"// stations located at 4500 / 6750 / 9000 mm in z\n");
   fprintf(geofile,"// with frontside of radiators of the 1st layer  \n");
-  fprintf(geofile,"// v01 - 12 mm gas thickness		           \n");
+  fprintf(geofile,"// v01 - 12 mm gas thickness		            \n");
   fprintf(geofile,"// v02 -  6 mm gas thickness (standard)          \n");
+  fprintf(geofile,"// v03 - tilted,  6 mm gas thickness             \n");
   fprintf(geofile,"//*********************************************************\n");
   fprintf(geofile,"//*********************************************************\n");
   fprintf(geofile,"// This is the geometry file of the following configuration\n");
@@ -1213,10 +1151,29 @@ int main(void)
     fprintf(geofile,"cave\n");
     fprintf(geofile,"PGON\n");
     fprintf(geofile,"air\n");
-    fprintf(geofile,"2\n");
+//    fprintf(geofile,"2\n");
+//    fprintf(geofile,"45 360 4\n");
+////  fprintf(geofile,"-%f %f %f \n",Station_thickness/2,(Inner_radius[counter]-1),(Outer_radius[counter]+1010));
+////  fprintf(geofile,"%f %f %f \n", Station_thickness/2,(Inner_radius[counter]-1),(Outer_radius[counter]+1010));
+//    // same keeping volume size in x and y for stations and their layers
+//    fprintf(geofile,"-%f %f %f \n",Station_thickness/2, Inner_radius[counter], Outer_radius[counter]);
+//    fprintf(geofile,"%f %f %f \n", Station_thickness/2, Inner_radius[counter], Outer_radius[counter]);
+
+    fprintf(geofile,"4\n");
     fprintf(geofile,"45 360 4\n");
-//  fprintf(geofile,"-%f %f %f \n",Station_thickness/2,(Inner_radius[counter]-1),(Outer_radius[counter]+1010));
-//  fprintf(geofile,"%f %f %f \n", Station_thickness/2,(Inner_radius[counter]-1),(Outer_radius[counter]+1010));
+    // hardcoded
+    if (counter+1 == 1) {
+    fprintf(geofile,"%f %f %f \n",-1300., 4300., 4600.);   // station 1
+    fprintf(geofile,"%f %f %f \n", -300., 1500., 4600.);   // station 1
+    }
+    if (counter+1 == 2) {
+    fprintf(geofile,"%f %f %f \n",-1800., 6200., 6600.);   // station 2
+    fprintf(geofile,"%f %f %f \n", -300., 2500., 6600.);   // station 2
+    }
+    if (counter+1 == 3) {
+    fprintf(geofile,"%f %f %f \n",-2300., 8100., 8600.);   // station 3
+    fprintf(geofile,"%f %f %f \n", -300., 3500., 8600.);   // station 3
+    }
     // same keeping volume size in x and y for stations and their layers
     fprintf(geofile,"-%f %f %f \n",Station_thickness/2, Inner_radius[counter], Outer_radius[counter]);
     fprintf(geofile,"%f %f %f \n", Station_thickness/2, Inner_radius[counter], Outer_radius[counter]);

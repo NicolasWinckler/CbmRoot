@@ -497,7 +497,8 @@ int main(void)
   //
   //  string geoname  = path + "trd_squared_modules_jun10_v01.geo" ; // 12 mm gas
   //  string geoname  = path + "trd_squared_modules_jun10_v02.geo" ; //  6 mm gas
-  string geoname  = path + "trd_squared_modules_jun10_v03.geo" ; //  test
+  string geoname  = path + "trd_squared_modules_jun10_v03.geo" ; // tilted,  6 mm gas
+  //  string geoname  = path + "trd_squared_modules_jun10_v04.geo" ; //  test
   string infoname = path + "trd_segmented.info";
   string parametername  = path + "trd_segmented.txt";
 
@@ -561,8 +562,9 @@ int main(void)
   fprintf(geofile,"//*********************************************************\n");
   fprintf(geofile,"// stations located at 4500 / 6750 / 9000 mm in z\n");
   fprintf(geofile,"// with frontside of radiators of the 1st layer  \n");
-  fprintf(geofile,"// v01 - 12 mm gas thickness		           \n");
+  fprintf(geofile,"// v01 - 12 mm gas thickness                     \n");
   fprintf(geofile,"// v02 -  6 mm gas thickness (standard)          \n");
+  fprintf(geofile,"// v03 - tilted,  6 mm gas thickness             \n");
   fprintf(geofile,"//*********************************************************\n");
   fprintf(geofile,"//*********************************************************\n");
   fprintf(geofile,"// This is the geometry file of the following configuration\n");

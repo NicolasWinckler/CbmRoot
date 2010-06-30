@@ -3,6 +3,9 @@
 //
 //
 // Update 20100630 - David Emschermann 
+// - introduce layer_pitch in addition to layer_thickness
+//
+// Update 20100630 - David Emschermann 
 // - experimental branch for tilted TRD geometries
 //
 // Update 20100629 - David Emschermann 
@@ -634,6 +637,7 @@ int main(void)
   float Distance[3];         // Distance between target an the front of the TRD stations
   float Station_thickness;   // Thickness of one TRD station
   float Layer_thickness;     // Thickness of one layer of a TRD station
+  float Layer_pitch;         // Distance between 2 adjacent layers of a TRD station
   int   Layer_number;        // Number of detector layers per station
   int   Station_number;      // Number of TRD stations in the setup
   float Detector_size_x[3];  // length in mm of a detector module in x-direction       
@@ -663,8 +667,10 @@ int main(void)
   Station_number       = 3;
   Layer_number         = 4;
   //  Layer_thickness      = 60;
-  Layer_thickness      = 150;   // DE adapt layer pitch to TRD prototypes (Jun10)
-  Station_thickness    = Layer_number * Layer_thickness;
+  Layer_thickness      = 140;   // DE adapt layer thickness to TRD prototypes (Jun10)
+  Layer_pitch          = 150;   // Distance between 2 adjacent layers of a TRD station
+  //  Station_thickness    = Layer_number * Layer_thickness;
+  Station_thickness    = Layer_number * Layer_pitch;
   float Inner_acceptance[3]  = {50, 50, 50};
   float Outer_acceptance[3]  = {500, 500, 500};
   // DE with frames
@@ -1192,7 +1198,8 @@ int main(void)
 
     printf("Distance, Inner_radius, Outer_radius, Station_thickness: %f, %f, %f, %f \n",
             Distance[counter], Inner_radius[counter], Outer_radius[counter], Station_thickness);
-    printf("Layer_number, Layer_thickness, frame_width: %d, %f, %f \n",Layer_number, Layer_thickness, Frame_width);
+    printf("Layer_number, Layer_thickness, layer_pitch, frame_width: %d, %f, %f, %f \n",
+	   Layer_number, Layer_thickness, Layer_pitch, Frame_width);
     printf("Detector_size_x %d: %f\n",counter,Detector_size_x[counter]);
   
     // The distance is measured to the start of the station. In GEANT the
@@ -1232,7 +1239,7 @@ int main(void)
     fprintf(geofile,"-%f %f %f \n",Layer_thickness/2, Inner_radius[counter], Outer_radius[counter]);
     fprintf(geofile,"%f %f %f \n", Layer_thickness/2, Inner_radius[counter], Outer_radius[counter]);
 	// allow variable size in calculation of layer position
-        fprintf(geofile,"0. 0. %4.1f\n",(-Station_thickness/2)+Layer_thickness/2+(Layer_thickness*i));
+        fprintf(geofile,"0. 0. %4.1f\n",(-Station_thickness/2)+Layer_thickness/2+(Layer_pitch*i));
         fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
         fprintf(geofile,"//*********************************\n");
   
@@ -1267,7 +1274,7 @@ int main(void)
         fprintf(geofile,"trd%dlayer#%d\n",counter+1, i+1);
         fprintf(geofile,"trd%d\n",counter+1);
 	// allow variable size in calculation of layer position
-        fprintf(geofile,"0. 0. %4.1f\n",(-Station_thickness/2)+Layer_thickness/2+(Layer_thickness*i));
+        fprintf(geofile,"0. 0. %4.1f\n",(-Station_thickness/2)+Layer_thickness/2+(Layer_pitch*i));
         fprintf(geofile,"1.  0.  0.  0.  1.  0.  0.  0.  1.\n");
         fprintf(geofile,"//*********************************\n");
       }

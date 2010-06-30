@@ -64,12 +64,15 @@ class CbmTrdSetTracksPidLike : public FairTask
 
 
   /** Accessors **/
-  Int_t GetNofTracks()              { return fNofTracks; };
+  Int_t GetNofTracks() const { return fNofTracks; };
 
   /** Setters **/
   //  void SetInputFile(Char_t* infile) {InputFile = infile;};
 
 private:
+
+  CbmTrdSetTracksPidLike& operator=(const CbmTrdSetTracksPidLike&);
+  CbmTrdSetTracksPidLike(const CbmTrdSetTracksPidLike&);
 
   TClonesArray* fTrackArray;       /** Input array of TRD tracks */
   TClonesArray* fTrdHitArray;      /** Input array of TRD Hits */
@@ -79,7 +82,7 @@ private:
   TObjArray* fHistdEdx;          // Prob. of dEdx for 5 particle species
                                  // and several momenta
 
-//  TString InputFile;             // name of the input file with the histos
+  //  TString InputFile;             // name of the input file with the histos
 
   Int_t fNofTracks;              // Number of tracks successfully fitted
 

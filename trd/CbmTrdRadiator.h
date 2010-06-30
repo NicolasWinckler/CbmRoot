@@ -92,7 +92,7 @@ class CbmTrdRadiator
    void          SetNFoils(Int_t n)      { fNFoils    = n; }
    void          SetFoilThick(Float_t t) { fFoilThick = t; }
    void          SetGapThick(Float_t t)  { fGapThick  = t; }
-   void          SetSigma(Int_t fSigmaT);
+   void          SetSigma(Int_t SigmaT);
  
 private:
 

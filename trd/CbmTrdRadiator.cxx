@@ -620,13 +620,13 @@ Float_t CbmTrdRadiator::GammaF(){
 //----------------------------------------------------------------------------
 
 //----- SetSigma---------------------------------------------------------
-void CbmTrdRadiator::SetSigma(Int_t fSigmaT){
+void CbmTrdRadiator::SetSigma(Int_t SigmaT){
   //
   // Sets the absorbtion crosssection for the energies of the TR spectrum
   //
 
 
-  if (fSigmaT == 1){
+  if (SigmaT == 1){
     if (fSigma) delete [] fSigma;
     fSigma       = new Float_t [fSpNBins];
      for (Int_t iBin = 0; iBin < fSpNBins; iBin++) {
@@ -635,7 +635,7 @@ void CbmTrdRadiator::SetSigma(Int_t fSigmaT){
      }
   }
 
-  if (fSigmaT == 2){
+  if (SigmaT == 2){
     if (fSigmaMy) delete [] fSigmaMy;
     fSigmaMy       = new Float_t [fSpNBins];
     for (Int_t iBin = 0; iBin < fSpNBins; iBin++) {
@@ -644,7 +644,7 @@ void CbmTrdRadiator::SetSigma(Int_t fSigmaT){
     }
   }
 
-  if (fSigmaT == 3){
+  if (SigmaT == 3){
     if (fSigmaDet) delete [] fSigmaDet;
     fSigmaDet       = new Float_t [fSpNBins];
     for (Int_t iBin = 0; iBin < fSpNBins; iBin++){

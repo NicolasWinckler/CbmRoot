@@ -79,7 +79,7 @@ private:
   TObjArray* fHistdEdx;          // Prob. of dEdx for 5 particle species
                                  // and several momenta
 
-  TString InputFile;             // name of the input file with the histos
+//  TString InputFile;             // name of the input file with the histos
 
   Int_t fNofTracks;              // Number of tracks successfully fitted
 

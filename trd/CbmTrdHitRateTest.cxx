@@ -158,8 +158,9 @@ InitStatus CbmTrdHitRateTest::Init()
 void CbmTrdHitRateTest::Exec(Option_t * option)
 {
   printf("Introduction:\n");
-  Bool_t Fast = true;
-  //Bool_t Fast = false;
+  //Bool_t Fast = true;
+  Bool_t Lines;
+  Bool_t Fast = false;
   Double_t ZRangeL = 1;
   Double_t ZRangeU = 1e06;
 
@@ -273,17 +274,23 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   
   HitPad->Draw();
   border->Draw("same");
+  Lines = false;
   for (Int_t i = 0; i < L1S1.size(); i++)
     {
-      GetModuleInformationFromDigiPar(Fast, L1S1[i], Layer ,c1, Canfile1, HitPad, c2);
+      GetModuleInformationFromDigiPar(Fast, Lines, L1S1[i], Layer ,c1, Canfile1, HitPad, c2);
     }
-
   c1->cd(1)->SetLogz(1);
   Layer->Draw("colz");
+  Lines = true;
+  for (Int_t i = 0; i < L1S1.size(); i++)
+    {
+      GetModuleInformationFromDigiPar(Fast, Lines, L1S1[i], Layer ,c1, Canfile1, HitPad, c2);
+    }
+
   Outimage1 = TImage::Create();
   Outimage1->FromPad(c1);
   Outimage1->WriteImage(Canfile1);
-  
+  //c1->cd(1)->Print("Pics/Station%dLayer%d.pdf");
   delete Layer;
   delete c1;
   delete Outimage1;
@@ -336,9 +343,15 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   
   HitPad->Draw();
   border->Draw("same");
+  Lines = false;
   for (Int_t i = 0; i < L2S1.size(); i++)
     {
-      GetModuleInformationFromDigiPar(Fast, L2S1[i], Layer ,c1, Canfile1, HitPad, c2);
+      GetModuleInformationFromDigiPar(Fast, Lines, L2S1[i], Layer ,c1, Canfile1, HitPad, c2);
+    }
+  Lines = true;
+  for (Int_t i = 0; i < L2S1.size(); i++)
+    {
+      GetModuleInformationFromDigiPar(Fast, Lines, L2S1[i], Layer ,c1, Canfile1, HitPad, c2);
     }
   Outimage1 = TImage::Create();
   Outimage1->FromPad(c1);
@@ -393,9 +406,15 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   
   HitPad->Draw();
   border->Draw("same");
+  Lines = false;
   for (Int_t i = 0; i < L1S2.size(); i++)
     {
-      GetModuleInformationFromDigiPar(Fast, L1S2[i], Layer ,c1, Canfile1, HitPad, c2);
+      GetModuleInformationFromDigiPar(Fast, Lines, L1S2[i], Layer ,c1, Canfile1, HitPad, c2);
+    }
+  Lines = true;
+  for (Int_t i = 0; i < L1S2.size(); i++)
+    {
+      GetModuleInformationFromDigiPar(Fast, Lines, L1S2[i], Layer ,c1, Canfile1, HitPad, c2);
     }
   Outimage1 = TImage::Create();
   Outimage1->FromPad(c1);
@@ -450,9 +469,15 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   
   HitPad->Draw();
   border->Draw("same");
+  Lines = false;
   for (Int_t i = 0; i < L2S2.size(); i++)
     {
-      GetModuleInformationFromDigiPar(Fast, L2S2[i], Layer ,c1, Canfile1, HitPad, c2);
+      GetModuleInformationFromDigiPar(Fast, Lines, L2S2[i], Layer ,c1, Canfile1, HitPad, c2);
+    }
+  Lines = true;
+  for (Int_t i = 0; i < L2S2.size(); i++)
+    {
+      GetModuleInformationFromDigiPar(Fast, Lines, L2S2[i], Layer ,c1, Canfile1, HitPad, c2);
     }
   Outimage1 = TImage::Create();
   Outimage1->FromPad(c1);
@@ -507,9 +532,15 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   
   HitPad->Draw();
   border->Draw("same");
+  Lines = false;
   for (Int_t i = 0; i < L1S3.size(); i++)
     {
-      GetModuleInformationFromDigiPar(Fast, L1S3[i], Layer ,c1, Canfile1, HitPad, c2);
+      GetModuleInformationFromDigiPar(Fast, Lines, L1S3[i], Layer ,c1, Canfile1, HitPad, c2);
+    }
+  Lines = true;
+  for (Int_t i = 0; i < L1S3.size(); i++)
+    {
+      GetModuleInformationFromDigiPar(Fast, Lines, L1S3[i], Layer ,c1, Canfile1, HitPad, c2);
     }
   Outimage1 = TImage::Create();
   Outimage1->FromPad(c1);
@@ -564,9 +595,15 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   
   HitPad->Draw();
   border->Draw("same");
+  Lines = false;
   for (Int_t i = 0; i < L2S3.size(); i++)
     {
-      GetModuleInformationFromDigiPar(Fast, L2S3[i], Layer ,c1, Canfile1, HitPad, c2);
+      GetModuleInformationFromDigiPar(Fast, Lines, L2S3[i], Layer ,c1, Canfile1, HitPad, c2);
+    }
+  Lines = true;
+  for (Int_t i = 0; i < L2S3.size(); i++)
+    {
+      GetModuleInformationFromDigiPar(Fast, Lines, L2S3[i], Layer ,c1, Canfile1, HitPad, c2);
     }
   Outimage1 = TImage::Create();
   Outimage1->FromPad(c1);
@@ -654,7 +691,7 @@ void CbmTrdHitRateTest::GetModuleInformationSL(Int_t VolumeID)
 }
   // --------------------------------------------------------------------
   // ----GetModuleInformationFromDigiPar ------------------------------------------
-void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(Bool_t Fast, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2)
+void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2)
 {
   // fPos is >0 for x and y and not rotated
   // origin of the local coordinate system in 
@@ -729,8 +766,14 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(Bool_t Fast, Int_t Volum
       nRow = tempY;
       nCol = tempX;
       //cout << nRow << " " << nCol << endl;
-      Histo(Fast, Mpos, Msize, Ssize, Psize, nRow, nCol, nSec, Layer, c1, Canfile1, HitPad, c2);
-
+      if(Lines)
+	{
+	  DrawLines( Mpos, Msize,Ssize, Psize, nRow, nCol, nSec, Layer, c1);
+	}
+      else
+	{
+	  Histo(Fast, Mpos, Msize, Ssize, Psize, nRow, nCol, nSec, Layer, c1, Canfile1, HitPad, c2);
+	}
     }
   else
     {
@@ -805,7 +848,7 @@ void CbmTrdHitRateTest::FillVector(Int_t VolumeID,
 }
 void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1/*, TLine* a, TLine* b, TLine* c, TLine* d*/)
 {
-
+  /*
  //----------------------Pad--------------------------------------
   const Int_t nR = nRow;
   const Int_t nC = nCol;
@@ -867,7 +910,7 @@ void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssiz
       StartY += Psize[1+iSecY*nSec];
     }
 
-
+  */
   //----------------------Sector--------------------------------------
   Float_t SecYStart = 0.0;
   Float_t SecXStart = 0.0;

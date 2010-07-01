@@ -2,50 +2,21 @@
 #define CBMTRDCLUSTERIZER_H
 
 #include "CbmTrdDetectorId.h"
-#include "CbmTrdDigiPar.h"
+
 #include "FairTask.h"
-
-#include "CbmTrdDigiPar.h"
-#include "CbmTrdPoint.h"
-#include "CbmTrdDigi.h"
-#include "CbmTrdDigiMatch.h"
-#include "CbmTrdModule.h"
-#include "CbmTrdRadiator.h"
-#include "CbmTrdHit.h"
-#include "CbmTrdDetectorId.h"
-
-#include "CbmMCTrack.h"
-
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
-#include "FairBaseParSet.h"
-#include "FairTask.h"
-
-#include "TRandom.h"
-#include "TMath.h"
-#include "TVector3.h"
-#include "TClonesArray.h"
-#include "TGeoManager.h"
-#include "TGeoVolume.h"
-#include "TGeoMaterial.h"
-#include "TGeoNode.h"
-#include "TGeoMatrix.h"
-#include "TGeoBBox.h"
-#include "TPRegexp.h"
-#include "TH2F.h"
-//#include "TVector3.h"
 
 #include <map>
 #include <list>
-//#include <utility>
 
-
-class TClonesArray;
 class CbmTrdDigiPar;
 class CbmTrdDigi;
 class CbmTrdModule;
 class CbmTrdRadiator;
+
+class TClonesArray;
+class TH1F;
+class TH2F;
+class TProfile;
 
 class CbmTrdClusterizer : public FairTask {
 

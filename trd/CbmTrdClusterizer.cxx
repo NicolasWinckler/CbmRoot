@@ -1,5 +1,5 @@
 #include "CbmTrdClusterizer.h"
-/*
+
 #include "CbmTrdDigiPar.h"
 #include "CbmTrdPoint.h"
 #include "CbmTrdDigi.h"
@@ -12,8 +12,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
-#include "FairBaseParSet.h"
-*/
+
 #include "TRandom.h"
 #include "TMath.h"
 #include "TVector3.h"
@@ -23,14 +22,9 @@
 #include "TProfile.h"
 #include "TCanvas.h"
 #include "TImage.h"
-#include "TLine.h"
 #include "TClonesArray.h"
 #include "TGeoManager.h"
-#include "TGeoVolume.h"
-#include "TGeoMaterial.h"
-#include "TGeoNode.h"
-#include "TGeoMatrix.h"
-#include "TGeoBBox.h"
+
 #include "TPRegexp.h"
 #if ROOT_VERSION_CODE < ROOT_VERSION(5,20,0)
 #include "CbmTrdStringToken.h"
@@ -45,6 +39,7 @@ using std::cin;
 using std::endl;
 using std::pair;
 using std::fabs;
+
 // ---- Default constructor -------------------------------------------
 CbmTrdClusterizer::CbmTrdClusterizer()
     :FairTask("TrdCluster")

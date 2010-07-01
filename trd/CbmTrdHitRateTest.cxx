@@ -305,6 +305,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   delete HitPad;
   delete c2;  
   delete Outimage2;
+  
   //**************************************************************************************
   fStation = 1;
   fLayer = 2;
@@ -621,7 +622,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   delete c2;
   delete Outimage2;
   //**************************************************************************************
-  
+ 
 }
   // --------------------------------------------------------------------
 
@@ -710,8 +711,8 @@ void CbmTrdHitRateTest::GetModuleInformationFromDigiPar(Bool_t Fast, Bool_t Line
       Double_t Mpos[3];
       Mpos[0] = fModuleInfo->GetX() * 10;
       Mpos[1] = fModuleInfo->GetY() * 10;
-      Mpos[2] = fModuleInfo->GetZ() * 10;
-  
+      Mpos[2] = fModuleInfo->GetZ() * 10; // == z(station) ??
+      
       Double_t Msize[3];
       Msize[0] = fModuleInfo->GetSizex() * 10;
       Msize[1] = fModuleInfo->GetSizey() * 10;
@@ -981,6 +982,7 @@ void CbmTrdHitRateTest::DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssiz
 }
 void CbmTrdHitRateTest::Histo(Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Psize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2)
 {
+  //cout << Mpos[2] << endl;
   const Int_t nR = nRow;
   const Int_t nC = nCol;
   Float_t HiteRate = 0;
@@ -1004,7 +1006,7 @@ void CbmTrdHitRateTest::Histo(Bool_t Fast, Double_t* Mpos, Double_t* Msize,Doubl
 	    {
 	      if (Mpos[0] > -1 && Mpos[1] > -1)
 		{
-		  HiteRate = CalcHitRate(StartX, StopX, StartY, StopY);
+		  HiteRate = CalcHitRate(StartX, StopX, StartY, StopY, Mpos);
 		  HitPad->Fill(HiteRate);
 		  HitPad->Fill(HiteRate);
 		  HitPad->Fill(HiteRate);
@@ -1013,7 +1015,7 @@ void CbmTrdHitRateTest::Histo(Bool_t Fast, Double_t* Mpos, Double_t* Msize,Doubl
 	    }
 	  else
 	    {
-	      HiteRate = CalcHitRate(StartX, StopX, StartY, StopY);
+	      HiteRate = CalcHitRate(StartX, StopX, StartY, StopY, Mpos);
 	      HitPad->Fill(HiteRate);
 	    }
 	  
@@ -1070,10 +1072,11 @@ void CbmTrdHitRateTest::Histo(Bool_t Fast, Double_t* Mpos, Double_t* Msize,Doubl
 
 }
 
-float CbmTrdHitRateTest::CalcHitRate(Float_t StartX, Float_t StopX, Float_t StartY, Float_t StopY)
+float CbmTrdHitRateTest::CalcHitRate(Float_t StartX, Float_t StopX, Float_t StartY, Float_t StopY, Double_t* Mpos)
 {
   Float_t HitRate = 0;//1. / sqrt( pow( StartX,2) + pow( StartY,2));
   Float_t r = 0;
+  Float_t alpha = 0;
   Int_t counter = 0;
   Float_t a[3] = { 7.66582e+00,  6.97712e+00,  6.53780e+00};
   Float_t b[3] = {-2.72375e-03, -1.85168e-03, -1.42673e-03};
@@ -1084,7 +1087,13 @@ float CbmTrdHitRateTest::CalcHitRate(Float_t StartX, Float_t StopX, Float_t Star
 	{
 	  counter++;
 	  r = sqrt( pow((stepX + 0.5), 2) + pow((stepY + 0.5) ,2));
-	  HitRate += exp(a[fStation-1] + b[fStation-1] * r);
+	  alpha = atan(r/Mpos[2])*1000.;
+	  //HitRate += exp(a[fStation-1] + b[fStation-1] * r);
+	  HitRate += 
+	    exp(4.54156e00 + -8.47377e-03 * alpha) + 
+	    exp(2.40005e01 + -1.19541e-02 * alpha) /
+	    (Mpos[2] * Mpos[2])
+	    ;
 	}
     }
 

@@ -107,7 +107,7 @@ class CbmTrdHitRateTest : public FairTask {
     vector<int>* L1S2, vector<int>* L2S2, vector<int>* L3S2, vector<int>* L4S2, 
     vector<int>* L1S3, vector<int>* L2S3, vector<int>* L3S3, vector<int>* L4S3);
   */
-  float CalcHitRate(Float_t StartX, Float_t StopX, Float_t StartY, Float_t StopY);
+  float CalcHitRate(Float_t StartX, Float_t StopX, Float_t StartY, Float_t StopY, Double_t* Mpos);
 
   void DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Padsize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1);
 

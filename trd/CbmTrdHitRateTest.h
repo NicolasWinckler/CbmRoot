@@ -90,8 +90,7 @@ class CbmTrdHitRateTest : public FairTask {
 
  private:
 
-  //void HistoInit(TCanvas& c1, TCanvas& c2, TH2F& Layer,TH1F& HitPad, Char_t& Canfile1, Char_t& Canfile2, Char_t& name, Char_t& title, Double_t ZRangeL, Double_t ZRangeU);
-  void HistoInit(TCanvas*& c1, TCanvas*& c2, TH2F*& Layer,TH1F*& HitPad, Char_t* Canfile1, Char_t* Canfile2/*, Char_t* name, Char_t* title*/, Double_t ZRangeL, Double_t ZRangeU);
+  void HistoInit(TCanvas*& c1, TCanvas*& c2, TH2F*& Layer,TH1F*& HitPad, Char_t* Canfile1, Char_t* Canfile2, Double_t ZRangeL, Double_t ZRangeU);
 
   void GetModuleInformationFromDigiPar(Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2);
 
@@ -105,11 +104,7 @@ class CbmTrdHitRateTest : public FairTask {
   void GetModuleInformation();
 
   void Histo(Bool_t Fast, Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Padsize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2);
-  /*
-    vector<int>* L1S1, vector<int>* L2S1, vector<int>* L3S1, vector<int>* L4S1, 
-    vector<int>* L1S2, vector<int>* L2S2, vector<int>* L3S2, vector<int>* L4S2, 
-    vector<int>* L1S3, vector<int>* L2S3, vector<int>* L3S3, vector<int>* L4S3);
-  */
+ 
   float CalcHitRate(Float_t StartX, Float_t StopX, Float_t StartY, Float_t StopY, Double_t* Mpos);
 
   void DrawLines(Double_t* Mpos, Double_t* Msize,Double_t* Ssize, Double_t* Padsize, Int_t nRow, Int_t nCol, Int_t nSec, TH2F* Layer, TCanvas* c1);

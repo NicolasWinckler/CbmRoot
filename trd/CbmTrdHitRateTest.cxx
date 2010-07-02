@@ -305,7 +305,7 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
 	}      
     }
 }
-void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*& HitPad, Char_t* Canfile1, Char_t* Canfile2/* Char_t* name, Char_t* title*/, Double_t ZRangeL, Double_t ZRangeU)
+void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*& HitPad, Char_t* Canfile1, Char_t* Canfile2, Double_t ZRangeL, Double_t ZRangeU)
 {
   Char_t name[50];
   Char_t title[50];

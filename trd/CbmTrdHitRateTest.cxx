@@ -187,12 +187,23 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
 
   Int_t ModuleID[10];
   Int_t Sector = 0;
-  Char_t trddigiparpath[50] = "trd.digi.par";
+  Char_t trddigiparpath[100] = "trd.digi.par";
+  printf("Which ...digi.par?\n");
+  cin >> trddigiparpath;
+  cout << trddigiparpath << endl;
   std::ifstream digifile;
   digifile.open(trddigiparpath);
   if(!digifile.good()) 
     {
       printf("ERROR      trd.digi.par was not found at ../%s\n",trddigiparpath);
+      while (!digifile.good())
+	{
+	  printf("Next try. Which ...digi.par?\n");
+	  cin >> trddigiparpath;
+	  cout << trddigiparpath << endl;
+	  //std::ifstream digifile;
+	  digifile.open(trddigiparpath);
+	}
     } 
   Int_t counter = 0;
   do {

@@ -90,6 +90,9 @@ class CbmTrdHitRateTest : public FairTask {
 
  private:
 
+  //void HistoInit(TCanvas& c1, TCanvas& c2, TH2F& Layer,TH1F& HitPad, Char_t& Canfile1, Char_t& Canfile2, Char_t& name, Char_t& title, Double_t ZRangeL, Double_t ZRangeU);
+  void HistoInit(TCanvas*& c1, TCanvas*& c2, TH2F*& Layer,TH1F*& HitPad, Char_t* Canfile1, Char_t* Canfile2/*, Char_t* name, Char_t* title*/, Double_t ZRangeL, Double_t ZRangeU);
+
   void GetModuleInformationFromDigiPar(Bool_t Fast, Bool_t Lines, Int_t VolumeID, TH2F* Layer, TCanvas* c1, Char_t* Canfile1, TH1F* HitPad, TCanvas* c2);
 
   void GetModuleInformationSL( Int_t VolumeID);

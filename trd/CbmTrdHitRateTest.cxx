@@ -345,7 +345,7 @@ void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*&
 
   sprintf(name,"HP_S%d_L%d",fStation,fLayer);
   sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
-  HitPad = new TH1F(name,title,1e04,1e00,1e06);
+  HitPad = new TH1F(name,title,10000,1e00,1e06);
   HitPad->SetXTitle("Hits/Pad [Hz]");
   HitPad->SetYTitle("count");
   HitPad->GetYaxis()->SetRangeUser(1,1e04);

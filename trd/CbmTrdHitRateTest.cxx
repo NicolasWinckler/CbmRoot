@@ -161,18 +161,16 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   //Bool_t Fast = true;
   Bool_t Lines;
   Bool_t Fast = false;
-  Double_t ZRangeL = 1;
-  Double_t ZRangeU = 1e06;
-
-  TH1F* HitPad = NULL;
-  TH2F* Layer = NULL;
+  Double_t ZRangeL = 1e00;
+  Double_t ZRangeU = 1e05;
+ 
   fStation = 0;
   fLayer = 0;
 
+  TH1F* HitPad = NULL;
+  TH2F* Layer = NULL;
   TCanvas* c1 = NULL;
   TCanvas* c2 = NULL;
-  Char_t Canfile1[100];
-  Char_t Canfile2[100];
 
   vector<int> L1S1;
   vector<int> L2S1;
@@ -230,400 +228,131 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   
   } while (digifile.good());
 
-  Char_t name[50];
-  Char_t title[50];
+  vector< vector<int> > LiSi;
+  LiSi.push_back(L1S1);
+  LiSi.push_back(L2S1);
+  LiSi.push_back(L3S1);
+  LiSi.push_back(L4S1);
+  LiSi.push_back(L1S2);
+  LiSi.push_back(L2S2);
+  LiSi.push_back(L3S2);
+  LiSi.push_back(L4S2);
+  LiSi.push_back(L1S3);
+  LiSi.push_back(L2S3);
+  LiSi.push_back(L3S3);
+  LiSi.push_back(L4S3);
+
+  Char_t Canfile1[100];
+  Char_t Canfile2[100];
+
   TImage *Outimage1;
   TImage *Outimage2;
   TLine* border = new TLine(1e05,0,1e05,1e04);
   border->SetLineColor(2);
+  /*
+    Layer  = new TH2F("dummy1","dummy1",1,-0.5,0.5,1,-0.5,0.5);
+    HitPad = new TH1F("dummy2","dummy2",1,-0.5,0.5);
+    c1 = new TCanvas("dummy3","dummy3",10,10);
+    c2 = new TCanvas("dummy4","dummy4",10,10);
+  */
   //**************************************************************************************
   fStation = 1;
   fLayer = 1;
-  sprintf(name,"S%d_L%d",fStation,fLayer);
-  sprintf(title,"Station %d, Layer %d",fStation,fLayer);
-  cout << title << endl;
-  sprintf(Canfile1,"Pics/Station%dLayer%d.png",fStation,fLayer);
-  sprintf(Canfile2,"Pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
-  Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
-  sprintf(name,"HP_S%d_L%d",fStation,fLayer);
-  sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
-  HitPad = new TH1F(name,title,1e04,1e00,1e06);//
-  Layer->SetContour(99);
-  Layer->SetXTitle("x-Coordinate [mm]");
-  Layer->SetYTitle("y-Coordinate [mm]");
-  Layer->SetZTitle("Hits/Pad");//"Data Flow [Bit/s]
-  Layer->SetStats(kFALSE);
-  Layer->GetXaxis()->SetLabelSize(0.02);
-  Layer->GetYaxis()->SetLabelSize(0.02);
-  Layer->GetZaxis()->SetLabelSize(0.02);
-  Layer->GetXaxis()->SetTitleSize(0.02);
-  Layer->GetXaxis()->SetTitleOffset(1.5);
-  Layer->GetYaxis()->SetTitleSize(0.02);
-  Layer->GetYaxis()->SetTitleOffset(2);
-  Layer->GetZaxis()->SetTitleSize(0.02);
-  Layer->GetZaxis()->SetTitleOffset(-2);
-  Layer->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);//1,1.e06);//1.e06,5.e07);
-  c1 = new TCanvas("c1","c1",1000,900);	
-  c1->Divide(1,1);
-  c1->cd(1)->SetLogz(1);
-  Layer->Draw();
-  c2 = new TCanvas("c2","c2",1000,900/2);	
-  c2->Divide(1,1);
-  c2->cd(1)->SetLogx(1);
-  c2->cd(1)->SetLogy(1);
-  
-  HitPad->Draw();
-  border->Draw("same");
-  Lines = false;
-  for (Int_t i = 0; i < L1S1.size(); i++)
+  for (vector< vector<int> >::size_type j = 0; j < LiSi.size(); j++)
     {
-      GetModuleInformationFromDigiPar(Fast, Lines, L1S1[i], Layer ,c1, Canfile1, HitPad, c2);
-    }
-  c1->cd(1)->SetLogz(1);
-  Layer->Draw("colz");
-  Lines = true;
-  for (Int_t i = 0; i < L1S1.size(); i++)
-    {
-      GetModuleInformationFromDigiPar(Fast, Lines, L1S1[i], Layer ,c1, Canfile1, HitPad, c2);
-    }
+      HistoInit(c1, c2,  Layer, HitPad, Canfile1, Canfile2, ZRangeL, ZRangeU);
 
-  Outimage1 = TImage::Create();
-  Outimage1->FromPad(c1);
-  Outimage1->WriteImage(Canfile1);
-  //c1->cd(1)->Print("Pics/Station%dLayer%d.pdf");
-  delete Layer;
-  delete c1;
-  delete Outimage1;
+      border->Draw("same");
+      Lines = false;
+      for (vector<int>::size_type i = 0; i < LiSi[j].size(); i++)
+	{
+	  GetModuleInformationFromDigiPar(Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2);
+	}
+      c1->cd(1)->SetLogz(1);
+      Layer->Draw("colz");
+      Lines = true;
+      for (vector<int>::size_type i = 0; i < LiSi[j].size(); i++)
+	{
+	  GetModuleInformationFromDigiPar(Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2);
+	}
+
+      Outimage1 = TImage::Create();
+      Outimage1->FromPad(c1);
+      Outimage1->WriteImage(Canfile1);
+      //c1->cd(1)->Print("Pics/Station%dLayer%d.pdf");
+      delete Layer;
+      delete c1;
+      delete Outimage1;
  
-  HitPad->Draw("same");
-  //border->Draw("same");
+      HitPad->Draw("same");
   
-  Outimage2 = TImage::Create();
-  Outimage2->FromPad(c2);
-  Outimage2->WriteImage(Canfile2);
+      Outimage2 = TImage::Create();
+      Outimage2->FromPad(c2);
+      Outimage2->WriteImage(Canfile2);
   
-  delete HitPad;
-  delete c2;  
-  delete Outimage2;
-  
-  //**************************************************************************************
-  fStation = 1;
-  fLayer = 2;
-  sprintf(name,"S%d_L%d",fStation,fLayer);
-  sprintf(title,"Station %d, Layer %d",fStation,fLayer);
-  cout << title << endl;
-  sprintf(Canfile1,"Pics/Station%dLayer%d.png",fStation,fLayer);
-  sprintf(Canfile2,"Pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
-  Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
-  sprintf(name,"HP_S%d_L%d",fStation,fLayer);
-  sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
-  HitPad = new TH1F(name,title,1e04,1e00,1e06);//1e08,0,1e07);
-  Layer->SetContour(99);
-  Layer->SetXTitle("x-Coordinate [mm]");
-  Layer->SetYTitle("y-Coordinate [mm]");
-  Layer->SetZTitle("Hits/Pad");//"Bit/Pad");//"Data Flow [Hits/Pad]
-  Layer->SetStats(kFALSE);
-  Layer->GetXaxis()->SetLabelSize(0.02);
-  Layer->GetYaxis()->SetLabelSize(0.02);
-  Layer->GetZaxis()->SetLabelSize(0.02);
-  Layer->GetXaxis()->SetTitleSize(0.02);
-  Layer->GetXaxis()->SetTitleOffset(1.5);
-  Layer->GetYaxis()->SetTitleSize(0.02);
-  Layer->GetYaxis()->SetTitleOffset(2);
-  Layer->GetZaxis()->SetTitleSize(0.02);
-  Layer->GetZaxis()->SetTitleOffset(-2);
-  Layer->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);//1,1.e06);//1.e06,5.e07);
-  c1 = new TCanvas("c1","c1",1000,900);	
-  c1->Divide(1,1);
-  c1->cd(1)->SetLogz(1);
-  Layer->Draw();
-  c2 = new TCanvas("c2","c2",1000,900/2);	
-  c2->Divide(1,1);
-  c2->cd(1)->SetLogx(1);
-  c2->cd(1)->SetLogy(1);
-  
-  HitPad->Draw();
-  border->Draw("same");
-  Lines = false;
-  for (Int_t i = 0; i < L2S1.size(); i++)
-    {
-      GetModuleInformationFromDigiPar(Fast, Lines, L2S1[i], Layer ,c1, Canfile1, HitPad, c2);
+      delete HitPad;
+      delete c2;  
+      delete Outimage2;
+
+      if (fLayer == 4)
+	{
+	  fStation++;
+	  fLayer = 1;
+	}
+      else
+	{
+	  fLayer++;
+	}      
     }
-  Lines = true;
-  for (Int_t i = 0; i < L2S1.size(); i++)
-    {
-      GetModuleInformationFromDigiPar(Fast, Lines, L2S1[i], Layer ,c1, Canfile1, HitPad, c2);
-    }
-  Outimage1 = TImage::Create();
-  Outimage1->FromPad(c1);
-  Outimage1->WriteImage(Canfile1);
-  delete Layer;
-  delete c1;
-  delete Outimage1;
-  c2->cd(1);
-  HitPad->Draw("same");
-  //border->Draw("same");
-  Outimage2 = TImage::Create();
-  Outimage2->FromPad(c2);
-  Outimage2->WriteImage(Canfile2);
-  delete HitPad;
-  delete c2;
-  delete Outimage2;
-  //**************************************************************************************
-  fStation = 2;
-  fLayer = 1;
-  sprintf(name,"S%d_L%d",fStation,fLayer);
-  sprintf(title,"Station %d, Layer %d",fStation,fLayer);
-  cout << title << endl;
-  sprintf(Canfile1,"Pics/Station%dLayer%d.png",fStation,fLayer);
-  sprintf(Canfile2,"Pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
-  Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
-  sprintf(name,"HP_S%d_L%d",fStation,fLayer);
-  sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
-  HitPad = new TH1F(name,title,1e04,1e00,1e06);//1e08,0,1e07);
-  Layer->SetContour(99);
-  Layer->SetXTitle("x-Coordinate [mm]");
-  Layer->SetYTitle("y-Coordinate [mm]");
-  Layer->SetZTitle("Hits/Pad");//"Bit/Pad");//"Data Flow [Hits/Pad]
-  Layer->SetStats(kFALSE);
-  Layer->GetXaxis()->SetLabelSize(0.02);
-  Layer->GetYaxis()->SetLabelSize(0.02);
-  Layer->GetZaxis()->SetLabelSize(0.02);
-  Layer->GetXaxis()->SetTitleSize(0.02);
-  Layer->GetXaxis()->SetTitleOffset(1.5);
-  Layer->GetYaxis()->SetTitleSize(0.02);
-  Layer->GetYaxis()->SetTitleOffset(2);
-  Layer->GetZaxis()->SetTitleSize(0.02);
-  Layer->GetZaxis()->SetTitleOffset(-2);
-  Layer->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);//1,1.e06);//1.e06,5.e07);
-  c1 = new TCanvas("c1","c1",1000,900);	
-  c1->Divide(1,1);
-  c1->cd(1)->SetLogz(1);
-  Layer->Draw();
-  c2 = new TCanvas("c2","c2",1000,900/2);	
-  c2->Divide(1,1);
-  c2->cd(1)->SetLogx(1);
-  c2->cd(1)->SetLogy(1);
-  
-  HitPad->Draw();
-  border->Draw("same");
-  Lines = false;
-  for (Int_t i = 0; i < L1S2.size(); i++)
-    {
-      GetModuleInformationFromDigiPar(Fast, Lines, L1S2[i], Layer ,c1, Canfile1, HitPad, c2);
-    }
-  Lines = true;
-  for (Int_t i = 0; i < L1S2.size(); i++)
-    {
-      GetModuleInformationFromDigiPar(Fast, Lines, L1S2[i], Layer ,c1, Canfile1, HitPad, c2);
-    }
-  Outimage1 = TImage::Create();
-  Outimage1->FromPad(c1);
-  Outimage1->WriteImage(Canfile1);
-  delete Layer;
-  delete c1;
-  delete Outimage1;
-  c2->cd(1);
-  HitPad->Draw("same");
-  //border->Draw("same");
-  Outimage2 = TImage::Create();
-  Outimage2->FromPad(c2);
-  Outimage2->WriteImage(Canfile2);
-  delete HitPad;
-  delete c2;
-  delete Outimage2;
-  //**************************************************************************************
-  fStation = 2;
-  fLayer = 2;
-  sprintf(name,"S%d_L%d",fStation,fLayer);
-  sprintf(title,"Station %d, Layer %d",fStation,fLayer);
-  cout << title << endl;
-  sprintf(Canfile1,"Pics/Station%dLayer%d.png",fStation,fLayer);
-  sprintf(Canfile2,"Pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
-  Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
-  sprintf(name,"HP_S%d_L%d",fStation,fLayer);
-  sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
-  HitPad = new TH1F(name,title,1e04,1e00,1e06);//1e08,0,1e07);
-  Layer->SetContour(99);
-  Layer->SetXTitle("x-Coordinate [mm]");
-  Layer->SetYTitle("y-Coordinate [mm]");
-  Layer->SetZTitle("Hits/Pad");//"Bit/Pad");//"Data Flow [Hits/Pad]
-  Layer->SetStats(kFALSE);
-  Layer->GetXaxis()->SetLabelSize(0.02);
-  Layer->GetYaxis()->SetLabelSize(0.02);
-  Layer->GetZaxis()->SetLabelSize(0.02);
-  Layer->GetXaxis()->SetTitleSize(0.02);
-  Layer->GetXaxis()->SetTitleOffset(1.5);
-  Layer->GetYaxis()->SetTitleSize(0.02);
-  Layer->GetYaxis()->SetTitleOffset(2);
-  Layer->GetZaxis()->SetTitleSize(0.02);
-  Layer->GetZaxis()->SetTitleOffset(-2);
-  Layer->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);//1,1.e06);//1.e06,5.e07);
-  c1 = new TCanvas("c1","c1",1000,900);	
-  c1->Divide(1,1);
-  c1->cd(1)->SetLogz(1);
-  Layer->Draw();
-  c2 = new TCanvas("c2","c2",1000,900/2);	
-  c2->Divide(1,1);
-  c2->cd(1)->SetLogx(1);
-  c2->cd(1)->SetLogy(1);
-  
-  HitPad->Draw();
-  border->Draw("same");
-  Lines = false;
-  for (Int_t i = 0; i < L2S2.size(); i++)
-    {
-      GetModuleInformationFromDigiPar(Fast, Lines, L2S2[i], Layer ,c1, Canfile1, HitPad, c2);
-    }
-  Lines = true;
-  for (Int_t i = 0; i < L2S2.size(); i++)
-    {
-      GetModuleInformationFromDigiPar(Fast, Lines, L2S2[i], Layer ,c1, Canfile1, HitPad, c2);
-    }
-  Outimage1 = TImage::Create();
-  Outimage1->FromPad(c1);
-  Outimage1->WriteImage(Canfile1);
-  delete Layer;
-  delete c1;
-  delete Outimage1;
-  c2->cd(1);
-  HitPad->Draw("same");
-  //border->Draw("same");
-  Outimage2 = TImage::Create();
-  Outimage2->FromPad(c2);
-  Outimage2->WriteImage(Canfile2);
-  delete HitPad;
-  delete c2;
-  delete Outimage2;
-  //**************************************************************************************
-  fStation = 3;
-  fLayer = 1;
-  sprintf(name,"S%d_L%d",fStation,fLayer);
-  sprintf(title,"Station %d, Layer %d",fStation,fLayer);
-  cout << title << endl;
-  sprintf(Canfile1,"Pics/Station%dLayer%d.png",fStation,fLayer);
-  sprintf(Canfile2,"Pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
-  Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
-  sprintf(name,"HP_S%d_L%d",fStation,fLayer);
-  sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
-  HitPad = new TH1F(name,title,1e04,1e00,1e06);//1e08,0,1e07);
-  Layer->SetContour(99);
-  Layer->SetXTitle("x-Coordinate [mm]");
-  Layer->SetYTitle("y-Coordinate [mm]");
-  Layer->SetZTitle("Hits/Pad");//"Bit/Pad");//"Data Flow [Hits/Pad]
-  Layer->SetStats(kFALSE);
-  Layer->GetXaxis()->SetLabelSize(0.02);
-  Layer->GetYaxis()->SetLabelSize(0.02);
-  Layer->GetZaxis()->SetLabelSize(0.02);
-  Layer->GetXaxis()->SetTitleSize(0.02);
-  Layer->GetXaxis()->SetTitleOffset(1.5);
-  Layer->GetYaxis()->SetTitleSize(0.02);
-  Layer->GetYaxis()->SetTitleOffset(2);
-  Layer->GetZaxis()->SetTitleSize(0.02);
-  Layer->GetZaxis()->SetTitleOffset(-2);
-  Layer->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);//1,1.e06);//1.e06,5.e07);
-  c1 = new TCanvas("c1","c1",1000,900);	
-  c1->Divide(1,1);
-  c1->cd(1)->SetLogz(1);
-  Layer->Draw();
-  c2 = new TCanvas("c2","c2",1000,900/2);	
-  c2->Divide(1,1);
-  c2->cd(1)->SetLogx(1);
-  c2->cd(1)->SetLogy(1);
-  
-  HitPad->Draw();
-  border->Draw("same");
-  Lines = false;
-  for (Int_t i = 0; i < L1S3.size(); i++)
-    {
-      GetModuleInformationFromDigiPar(Fast, Lines, L1S3[i], Layer ,c1, Canfile1, HitPad, c2);
-    }
-  Lines = true;
-  for (Int_t i = 0; i < L1S3.size(); i++)
-    {
-      GetModuleInformationFromDigiPar(Fast, Lines, L1S3[i], Layer ,c1, Canfile1, HitPad, c2);
-    }
-  Outimage1 = TImage::Create();
-  Outimage1->FromPad(c1);
-  Outimage1->WriteImage(Canfile1);
-  delete Layer;
-  delete c1;
-  delete Outimage1;
-  c2->cd(1);
-  HitPad->Draw("same");
-  //border->Draw("same");
-  Outimage2 = TImage::Create();
-  Outimage2->FromPad(c2);
-  Outimage2->WriteImage(Canfile2);
-  delete HitPad;
-  delete c2;
-  delete Outimage2;
-  //**************************************************************************************
-  fStation = 3;
-  fLayer = 2;
-  sprintf(name,"S%d_L%d",fStation,fLayer);
-  sprintf(title,"Station %d, Layer %d",fStation,fLayer);
-  cout << title << endl;
-  sprintf(Canfile1,"Pics/Station%dLayer%d.png",fStation,fLayer);
-  sprintf(Canfile2,"Pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
-  Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
-  sprintf(name,"HP_S%d_L%d",fStation,fLayer);
-  sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
-  HitPad = new TH1F(name,title,1e04,1e00,1e06);//1e08,0,1e07);
-  Layer->SetContour(99);
-  Layer->SetXTitle("x-Coordinate [mm]");
-  Layer->SetYTitle("y-Coordinate [mm]");
-  Layer->SetZTitle("Hits/Pad");//"Bit/Pad");//"Data Flow [Hits/Pad]
-  Layer->SetStats(kFALSE);
-  Layer->GetXaxis()->SetLabelSize(0.02);
-  Layer->GetYaxis()->SetLabelSize(0.02);
-  Layer->GetZaxis()->SetLabelSize(0.02);
-  Layer->GetXaxis()->SetTitleSize(0.02);
-  Layer->GetXaxis()->SetTitleOffset(1.5);
-  Layer->GetYaxis()->SetTitleSize(0.02);
-  Layer->GetYaxis()->SetTitleOffset(2);
-  Layer->GetZaxis()->SetTitleSize(0.02);
-  Layer->GetZaxis()->SetTitleOffset(-2);
-  Layer->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);//1,1.e06);//1.e06,5.e07);
-  c1 = new TCanvas("c1","c1",1000,900);	
-  c1->Divide(1,1);
-  c1->cd(1)->SetLogz(1);
-  Layer->Draw();
-  c2 = new TCanvas("c2","c2",1000,900/2);	
-  c2->Divide(1,1);
-  c2->cd(1)->SetLogx(1);
-  c2->cd(1)->SetLogy(1);
-  
-  HitPad->Draw();
-  border->Draw("same");
-  Lines = false;
-  for (Int_t i = 0; i < L2S3.size(); i++)
-    {
-      GetModuleInformationFromDigiPar(Fast, Lines, L2S3[i], Layer ,c1, Canfile1, HitPad, c2);
-    }
-  Lines = true;
-  for (Int_t i = 0; i < L2S3.size(); i++)
-    {
-      GetModuleInformationFromDigiPar(Fast, Lines, L2S3[i], Layer ,c1, Canfile1, HitPad, c2);
-    }
-  Outimage1 = TImage::Create();
-  Outimage1->FromPad(c1);
-  Outimage1->WriteImage(Canfile1);
-  delete Layer;
-  delete c1;
-  delete Outimage1;
-  c2->cd(1);
-  HitPad->Draw("same");
-  //border->Draw("same");
-  Outimage2 = TImage::Create();
-  Outimage2->FromPad(c2);
-  Outimage2->WriteImage(Canfile2);
-  delete HitPad;
-  delete c2;
-  delete Outimage2;
-  //**************************************************************************************
- 
 }
+void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*& HitPad, Char_t* Canfile1, Char_t* Canfile2/* Char_t* name, Char_t* title*/, Double_t ZRangeL, Double_t ZRangeU)
+{
+  Char_t name[50];
+  Char_t title[50];
+
+  sprintf(name,"S%d_L%d",fStation,fLayer);
+  sprintf(title,"Station %d, Layer %d",fStation,fLayer);
+  cout << title << endl;
+  sprintf(Canfile1,"Pics/Station%dLayer%d.png",fStation,fLayer);
+  sprintf(Canfile2,"Pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
+  Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
+  Layer->SetContour(99);
+  Layer->SetXTitle("x-Coordinate [mm]");
+  Layer->SetYTitle("y-Coordinate [mm]");
+  Layer->SetZTitle("Hits/Pad [Hz]");
+  Layer->SetStats(kFALSE);
+  Layer->GetXaxis()->SetLabelSize(0.02);
+  Layer->GetYaxis()->SetLabelSize(0.02);
+  Layer->GetZaxis()->SetLabelSize(0.02);
+  Layer->GetXaxis()->SetTitleSize(0.02);
+  Layer->GetXaxis()->SetTitleOffset(1.5);
+  Layer->GetYaxis()->SetTitleSize(0.02);
+  Layer->GetYaxis()->SetTitleOffset(2);
+  Layer->GetZaxis()->SetTitleSize(0.02);
+  Layer->GetZaxis()->SetTitleOffset(-2);
+  Layer->GetZaxis()->SetRangeUser(ZRangeL,ZRangeU);
+
+  sprintf(name,"HP_S%d_L%d",fStation,fLayer);
+  sprintf(title,"HitPad_Station %d, Layer %d",fStation,fLayer);
+  HitPad = new TH1F(name,title,1e04,1e00,1e06);
+  HitPad->SetXTitle("Hits/Pad [Hz]");
+  HitPad->SetYTitle("count");
+  HitPad->GetYaxis()->SetRangeUser(1,1e04);
+
+  c1 = new TCanvas("c1","c1",1000,900);	
+  c1->Divide(1,1);
+  c1->cd(1)->SetLogz(1);
+   Layer->Draw();
+  c2 = new TCanvas("c2","c2",1000,900/2);	
+  c2->Divide(1,1);
+  c2->cd(1)->SetLogx(1);
+  c2->cd(1)->SetLogy(1);
+  c2->cd(1)->SetGridx(1);
+  c2->cd(1)->SetGridy(1);
+  
+  HitPad->Draw();
+}
+
   // --------------------------------------------------------------------
 
   // ---- FinishTask-----------------------------------------------------

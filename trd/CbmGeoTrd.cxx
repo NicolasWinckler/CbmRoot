@@ -19,13 +19,13 @@ CbmGeoTrd::CbmGeoTrd() {
   maxModules=6;
 }
 
-const char* CbmGeoTrd::getModuleName(Int_t m) {
+const char* CbmGeoTrd::getModuleName(Int_t m=0) {
   // Returns the module name of trd number m
   sprintf(modName,"trd%i",m+1);
   return modName;
 }
 
-const char* CbmGeoTrd::getEleName(Int_t m) {
+const char* CbmGeoTrd::getEleName(Int_t m=0) {
   // Returns the element name of trd number m
   sprintf(eleName,"trd%i",m+1);
   return eleName;

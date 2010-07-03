@@ -1,5 +1,5 @@
 
-void run_reco_geotest(Int_t nEvents = 200)
+void run_reco_geotest(Int_t nEvents = 1000)
 {
 
   // ========================================================================
@@ -38,14 +38,16 @@ void run_reco_geotest(Int_t nEvents = 200)
 
 
   // ---------------------RICH Hit Producer ----------------------------------
-  Double_t richPmtRad  = 0.4;     // PMT radius [cm]
-  Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
-  Int_t    richDetType = 5;       // Detector type Hamamatsu H8500-03
-  Int_t    richNoise   = 220;     // Number of noise points per event
-  Double_t collectionEff = 1.0;
-  CbmRichHitProducer* richHitProd
-    = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
-			     richNoise, iVerbose, collectionEff);
+
+   Double_t richPmtRad = 0.4; // PMT radius [cm]
+   Double_t richPmtDist = 0.; // Distance between PMTs [cm]
+   Int_t richDetType = 4; // Detector type Hamamatsu H8500-03
+   Int_t richNoise = 220; // Number of noise points per event
+   Double_t collectionEff = 1.;
+   Double_t richSMirror = 0.00001; // Sigma for additional point smearing due to light scattering in mirror
+   CbmRichHitProducer* richHitProd = new CbmRichHitProducer(richPmtRad,
+		       richPmtDist, richDetType, richNoise, iVerbose, collectionEff,
+			richSMirror);
   run->AddTask(richHitProd);
   //--------------------------------------------------------------------------
 

@@ -1,7 +1,10 @@
-void run_sim_geotest(Int_t nEvents = 1000)
+void run_sim_geotest(Int_t nElectrons = 500, Int_t nEvents = 1000)
 {
+    nEvents = 1;
 
   TString outDir  = "/d/cbm02/slebedev/rich/JUL09/correction/";
+  char txt[200];
+  sprintf(txt,"%.4i",nElectrons);
   TString outFile = outDir + "mc.00.root";
   TString parFile = outDir + "params.00.root";
 
@@ -9,12 +12,15 @@ void run_sim_geotest(Int_t nEvents = 1000)
   TString caveGeom   = "cave.geo";
   TString targetGeom = "target_au_250mu.geo";
   TString pipeGeom   = "pipe_rich_large.geo";
-  TString magnetGeom = "magnet_standard.geo";
+  TString magnetGeom = "magnet_electron_standard.geo";
+  TString mvdGeom    = "mvd_standard.geo";
+  mvdGeom = "";
   TString stsGeom    = "sts_standard.geo";
+  stsGeom = "";
   TString richGeom   = "rich_large.geo";
 
   // -----   Magnetic field   -----------------------------------------------
-  TString fieldMap    = "FieldMuonMagnet";   // name of field map
+  TString fieldMap    = "field_electron_standard";   // name of field map
   Double_t fieldZ     = 50.;             // field centre z position
   Double_t fieldScale =  1.;             // field scaling factor
 
@@ -28,8 +34,6 @@ void run_sim_geotest(Int_t nEvents = 1000)
   gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
   cbmlibs();
 
-
-
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* fRun = new FairRunSim();
   fRun->SetName("TGeant3");              // Transport engine
@@ -40,7 +44,6 @@ void run_sim_geotest(Int_t nEvents = 1000)
   // -----   Create media   -------------------------------------------------
   fRun->SetMaterials("media.geo");       // Materials
   // ------------------------------------------------------------------------
-  //fRun->SetStoreTraj(kTRUE);
 
   // -----   Create detectors and passive volumes   -------------------------
   if ( caveGeom != "" ) {
@@ -61,17 +64,17 @@ void run_sim_geotest(Int_t nEvents = 1000)
     fRun->AddModule(target);
   }
 
-//  if ( magnetGeom != "" ) {
-//    FairModule* magnet = new CbmMagnet("MAGNET");
-//    magnet->SetGeometryFileName(magnetGeom);
-//    fRun->AddModule(magnet);
-//  }
+  if ( magnetGeom != "" ) {
+    FairModule* magnet = new CbmMagnet("MAGNET");
+    magnet->SetGeometryFileName(magnetGeom);
+    fRun->AddModule(magnet);
+  }
 
-//  if ( stsGeom != "" ) {
-//    FairDetector* sts = new CbmSts("STS", kTRUE);
-//    sts->SetGeometryFileName(stsGeom);
-//    fRun->AddModule(sts);
-//  }
+  if ( stsGeom != "" ) {
+    FairDetector* sts = new CbmSts("STS", kTRUE);
+    sts->SetGeometryFileName(stsGeom);
+    fRun->AddModule(sts);
+  }
 
   if ( richGeom != "" ) {
     FairDetector* rich = new CbmRich("RICH", kTRUE);
@@ -81,9 +84,9 @@ void run_sim_geotest(Int_t nEvents = 1000)
 
   // -----   Create magnetic field   ----------------------------------------
   CbmFieldMap* magField = NULL;
-  if ( fieldMap == "FieldActive" || fieldMap == "FieldIron")
-    magField = new CbmFieldMapSym3(fieldMap);
-  else if ( fieldMap == "FieldAlligator" )
+  if ( fieldMap == "field_electron_standard")
+    magField = new CbmFieldMapSym2(fieldMap);
+  else if ( fieldMap == "field_muon_standard" )
     magField = new CbmFieldMapSym2(fieldMap);
   else if ( fieldMap = "FieldMuonMagnet" )
     magField = new CbmFieldMapSym3(fieldMap);
@@ -94,8 +97,6 @@ void run_sim_geotest(Int_t nEvents = 1000)
   magField->SetPosition(0., 0., fieldZ);
   magField->SetScale(fieldScale);
   fRun->SetField(magField);
-  // ------------------------------------------------------------------------
-
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
@@ -105,7 +106,7 @@ void run_sim_geotest(Int_t nEvents = 1000)
   Int_t kfCode1=11;   // electrons
   Int_t kfCode2=-11;   // positrons
 
-  FairBoxGenerator* boxGen1 = new FairBoxGenerator(kfCode1, 50);
+  FairBoxGenerator* boxGen1 = new FairBoxGenerator(kfCode1, nElectrons/2);
   boxGen1->SetPtRange(0.,3.);
   boxGen1->SetPhiRange(0.,360.);
   boxGen1->SetThetaRange(2.5,25.);
@@ -113,7 +114,7 @@ void run_sim_geotest(Int_t nEvents = 1000)
   boxGen1->Init();
   primGen->AddGenerator(boxGen1);
 
-  FairBoxGenerator* boxGen2 = new FairBoxGenerator(kfCode2, 50);
+  FairBoxGenerator* boxGen2 = new FairBoxGenerator(kfCode2, nElectrons/2);
   boxGen2->SetPtRange(0.,3.);
   boxGen2->SetPhiRange(0.,360.);
   boxGen2->SetThetaRange(2.5,25.);

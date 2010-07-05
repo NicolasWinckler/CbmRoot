@@ -3,8 +3,6 @@
 
 #include "FairGeoSet.h"
 
-#include "TString.h"
-
 class  CbmGeoMagnet : public FairGeoSet {
 protected:
   char modName[2];  // name of module

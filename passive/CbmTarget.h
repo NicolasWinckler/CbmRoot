@@ -1,7 +1,6 @@
 #ifndef Target_H
 #define Target_H
 
-#include "FairDetector.h"
 #include "FairModule.h"
 
 class CbmTarget : public FairModule {

@@ -3,8 +3,6 @@
 
 #include "FairParGenericSet.h"
 
-#include "TH1F.h"
-
 class CbmGeoPassivePar : public FairParGenericSet {
 public:
   TObjArray            *fGeoSensNodes; // List of FairGeoNodes for sensitive volumes

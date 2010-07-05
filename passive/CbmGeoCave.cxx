@@ -14,6 +14,7 @@
 #include "FairGeoShapes.h"
 #include "FairGeoBasicShape.h"
 #include "FairGeoMedium.h"
+#include "FairGeoMedia.h"
 
 using std::cout;
 using std::ios;

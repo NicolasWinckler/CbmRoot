@@ -3,23 +3,15 @@
 #include "CbmCave.h"
 
 #include "CbmGeoCave.h"
+#include "CbmGeoPassivePar.h"
 
 #include "FairGeoInterface.h"
-#include "FairGeoRootBuilder.h"
 #include "FairRuntimeDb.h"
-#include "CbmGeoPassivePar.h"
-#include "FairGeoVolume.h"
 #include "FairGeoNode.h"
 #include "FairRun.h"
-#include "FairMCApplication.h"
-#include "FairVolume.h"
-#include "FairVolumeList.h"
 #include "FairGeoLoader.h"
 
-#include "TGeoMCGeometry.h"
-#include "TGeoManager.h"
-#include "TGeoVolume.h"
-#include "TGeoMedium.h"
+#include "TList.h"
 #include "TObjArray.h"
 
 ClassImp(CbmCave)

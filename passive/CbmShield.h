@@ -1,7 +1,6 @@
 #ifndef CBMSHIELD_H
 #define CBMSHIELD_H 1
 
-#include "FairDetector.h"
 #include "FairModule.h"
 
 class CbmShield : public FairModule {

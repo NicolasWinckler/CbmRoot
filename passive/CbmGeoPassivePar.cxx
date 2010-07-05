@@ -7,9 +7,6 @@
 
 #include "TObjArray.h"
 
-#include <iostream>
-#include <iomanip>
-
 ClassImp(CbmGeoPassivePar)
 
 CbmGeoPassivePar::CbmGeoPassivePar(const char* name,const char* title,const char* context)

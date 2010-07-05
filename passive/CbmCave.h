@@ -1,8 +1,6 @@
 #ifndef Cave_H
 #define Cave_H
 
-#include "FairDetector.h"
-#include "FairModule.h"
 #include "FairModule.h"
 
 

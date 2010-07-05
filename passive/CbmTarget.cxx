@@ -6,12 +6,12 @@
 
 #include "FairGeoLoader.h"
 #include "FairGeoInterface.h"
-#include "FairGeoRootBuilder.h"
 #include "FairRuntimeDb.h"
 #include "FairRun.h"
 #include "FairGeoVolume.h"
 #include "FairGeoNode.h"
 
+#include "TList.h"
 #include "TObjArray.h"
 
 CbmTarget::~CbmTarget()

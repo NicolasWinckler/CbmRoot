@@ -2,9 +2,10 @@
 #define CBMGEOCAVE_H
 
 #include "FairGeoSet.h"
-#include "FairGeoMedia.h"
 
 #include "TString.h"
+
+class FairGeoMedia;
 
 class  CbmGeoCave : public FairGeoSet {
 protected:

@@ -51,11 +51,11 @@ link_directories( ${LINK_DIRECTORIES})
 set(LITTRACK_SRCS_RULECHECKER
 base/CbmLitDetectorLayout.cxx
 base/CbmLitPDG.cxx
-base/CbmLitEnvironment.cxx  
-base/CbmLitToolFactory.cxx
+##base/CbmLitEnvironment.cxx  
+##base/CbmLitToolFactory.cxx
 base/CbmLitHitData.cxx
-base/CbmLitFieldFitter.cxx
-base/CbmLitSimpleGeometryConstructor.cxx
+##base/CbmLitFieldFitter.cxx
+##base/CbmLitSimpleGeometryConstructor.cxx
 base/CbmLitTask.cxx
 cbm/CbmPropagatorGeane.cxx
 cbm/CbmPropagatorLit.cxx
@@ -70,15 +70,15 @@ finder/CbmLitNearestHitToTrackMerger.cxx
 finder/CbmLitGating.cxx
 #finder/CbmLitTrackFinderNNParallel.cxx
 #finder/CbmLitTrackFinderNNCuda.cxx
-finder_cbm/CbmLitTrdTrackFinderBranch.cxx
-finder_cbm/CbmLitTrdTrackFinderNN.cxx
-finder_cbm/CbmLitTrdTrackFinderWeight.cxx
-finder_cbm/CbmLitTrdTrackFinderStandalone.cxx
+##finder_cbm/CbmLitTrdTrackFinderBranch.cxx
+##finder_cbm/CbmLitTrdTrackFinderNN.cxx
+##finder_cbm/CbmLitTrdTrackFinderWeight.cxx
+##finder_cbm/CbmLitTrdTrackFinderStandalone.cxx
 #finder_cbm/CbmLitMuchTrackFinderBranch.cxx
 #finder_cbm/CbmLitMuchTrackFinderNN.cxx
 #finder_cbm/CbmLitMuchTrackFinderWeight.cxx
 finder_cbm/CbmLitStsBasedTrackFinder.cxx
-finder_cbm/CbmLitFindGlobalTracks.cxx 
+##finder_cbm/CbmLitFindGlobalTracks.cxx 
 fitter/CbmLitTrackFitterImp.cxx 
 fitter/CbmLitKalmanFilter.cxx
 fitter/CbmLitTrackFitterRobust.cxx 
@@ -95,17 +95,17 @@ propagation/CbmLitRK4TrackExtrapolator.cxx
 propagation/CbmLitLineTrackExtrapolator.cxx
 propagation/CbmLitTrackPropagatorGeane.cxx
 propagation/CbmLitTGeoNavigator.cxx
-propagation/CbmLitMaterialEffectsImp.cxx
+##propagation/CbmLitMaterialEffectsImp.cxx
 propagation/CbmLitCleverTrackExtrapolator.cxx
 propagation/CbmLitMyGeoNavigator.cxx
 propagation/CbmLitMyTrackPropagator.cxx 
-qa/CbmLitReconstructionQa.cxx
-qa/CbmLitFindGlobalTracksIdeal.cxx 
+##qa/CbmLitReconstructionQa.cxx
+##qa/CbmLitFindGlobalTracksIdeal.cxx 
 qa/CbmLitCheckMultipleScattering.cxx
-qa/CbmLitPropagationAnalysis.cxx 
-qa/CbmLitRobustFitterAnalysis.cxx
+##qa/CbmLitPropagationAnalysis.cxx 
+##qa/CbmLitRobustFitterAnalysis.cxx
 qa/CbmLitCheckSimpleGeo.cxx 
-qa/CbmLitCheckField.cxx
+##qa/CbmLitCheckField.cxx
 #qa/CbmLitParallelTrackFitterTest.cxx 
 qa/CbmLitCheckEnergyLossMuons.cxx
 qa/CbmLitCheckBrem.cxx 
@@ -126,7 +126,7 @@ selection/CbmLitTrackSelectionTrd.cxx
 selection/CbmLitTrackSelectionMuch.cxx
 selection/CbmLitTrackSelectionMuchRobust.cxx
 selection/CbmLitTrackSelectionChiSq.cxx 
-utils/CbmLitConverter.cxx
+##utils/CbmLitConverter.cxx
 utils/CbmLitMath.cxx 
 utils/CbmLitMatrixMath.cxx 
 utils/CbmLitDrawHist.cxx
@@ -166,7 +166,25 @@ qa/CbmTrdHitsQa.h
 )
 
 
-SET(LITTRACK_SRCS ${LITTRACK_SRCS_RULECHECKER})
+SET(LITTRACK_SRCS 
+${LITTRACK_SRCS_RULECHECKER}
+base/CbmLitEnvironment.cxx
+base/CbmLitFieldFitter.cxx
+base/CbmLitToolFactory.cxx
+base/CbmLitSimpleGeometryConstructor.cxx
+finder_cbm/CbmLitTrdTrackFinderBranch.cxx
+finder_cbm/CbmLitTrdTrackFinderNN.cxx
+finder_cbm/CbmLitTrdTrackFinderWeight.cxx
+finder_cbm/CbmLitTrdTrackFinderStandalone.cxx
+finder_cbm/CbmLitFindGlobalTracks.cxx 
+propagation/CbmLitMaterialEffectsImp.cxx
+qa/CbmLitReconstructionQa.cxx
+qa/CbmLitFindGlobalTracksIdeal.cxx 
+qa/CbmLitCheckField.cxx
+qa/CbmLitPropagationAnalysis.cxx 
+qa/CbmLitRobustFitterAnalysis.cxx
+utils/CbmLitConverter.cxx
+)
 
 if(RULE_CHECKER_FOUND)
   CHECK_RULES("${LITTRACK_SRCS_RULECHECKER}" "${INCLUDE_DIRECTORIES}" LITTRACK_RULES)

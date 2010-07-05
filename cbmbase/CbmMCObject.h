@@ -11,11 +11,12 @@
 #include "CbmDetectorList.h"
 #include "CbmMCEntry.h"
 
-#include <TObject.h>
-#include <vector>
-#include <string>
+#include "TObject.h"
 
-#include<iostream>
+#include <vector>
+#include <iostream>
+
+class FairLinkedData;
 
 class CbmMCObject: public TObject {
 public:

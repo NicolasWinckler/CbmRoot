@@ -12,8 +12,9 @@ To be registered to FairRunSim.
 #define CBMPRIMARYGENERATOR_H
 
 #include "FairPrimaryGenerator.h"
-#include "CbmMCEvent.h"
 
+class CbmMCEvent;
+class TF1;
 
 class CbmPrimaryGenerator : public FairPrimaryGenerator
 {

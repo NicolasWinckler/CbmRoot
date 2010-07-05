@@ -11,10 +11,6 @@
 #include "CbmDetectorList.h"
 #include "CbmMCObject.h"
 
-#include <TObject.h>
-#include <vector>
-#include <string>
-
 #include<iostream>
 
 class CbmMCResult: public CbmMCObject {

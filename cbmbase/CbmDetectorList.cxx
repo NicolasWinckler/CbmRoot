@@ -3,12 +3,9 @@
  *@Since 29.04.2010
 **/
 
-
-
-#include "FairDetector.h"
-
 #include "CbmDetectorList.h"
 
+#include "TString.h"
 
 // -----   Constructor   ---------------------------------------------------
 CbmDetectorList::CbmDetectorList() {

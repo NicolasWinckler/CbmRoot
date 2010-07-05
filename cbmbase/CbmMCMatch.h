@@ -12,12 +12,16 @@
 #include "CbmDetectorList.h"
 #include "CbmMCStage.h"
 #include "CbmMCResult.h"
+#include "CbmMCEntry.h"
 
-#include <TNamed.h>
+#include "FairLink.h"
+#include "FairMultiLinkedData.h"
+
+#include "TNamed.h"
 
 #include <map>
-#include <vector>
-#include <string>
+
+class FairLinkedData;
 
 typedef std::map<DataType, CbmMCStage*>::iterator TListIterator;
 typedef std::map<DataType, CbmMCStage*>::const_iterator TListIteratorConst;

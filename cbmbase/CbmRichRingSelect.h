@@ -44,8 +44,8 @@ class CbmRichRingSelect : public TObject
 
    void SetVerbose(Int_t verbose) { fVerbose = verbose; };
    
-  Int_t GetNofHitsOnRing(CbmRichRing* ring) { };
-  Double_t GetAngle(CbmRichRing* ring) { };   
+  Int_t GetNofHitsOnRing(CbmRichRing* ring) { return -42; };
+  Double_t GetAngle(CbmRichRing* ring) { return -42.0; };   
  protected:
 
   Int_t fVerbose;      // Verbosity level

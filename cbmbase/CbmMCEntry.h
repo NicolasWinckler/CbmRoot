@@ -8,13 +8,15 @@
 #ifndef CBMMCENTRY_H_
 #define CBMMCENTRY_H_
 
-#include "CbmMCList.h"
-#include "CbmDetectorList.h"
-#include "FairLink.h"
+//#include "CbmMCList.h"
+//#include "CbmDetectorList.h"
+//#include "FairLink.h"
 #include "FairMultiLinkedData.h"
 
-#include <utility>
+//#include <utility>
 #include <iostream>
+
+class FairLink;
 
 class CbmMCEntry : public FairMultiLinkedData {
 public:

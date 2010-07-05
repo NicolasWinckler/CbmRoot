@@ -2,23 +2,17 @@
 // -----                CbmMCMatchSelectorTask source file             -----
 // -----                  Created 18/07/08  by T.Stockmanns        -----
 // -------------------------------------------------------------------------
-// libc includes
-#include <iostream>
+#include "CbmMCMatchSelectorTask.h"
 
-// Root includes
-#include "TROOT.h"
-#include "TClonesArray.h"
+#include "CbmMCMatch.h"
 
 // framework includes
 #include "FairRootManager.h"
-#include "CbmMCMatchSelectorTask.h"
-#include "FairRun.h"
-#include "FairRuntimeDb.h"
-#include "FairHit.h"
-#include "FairLinkedData.h"
 
-#include "CbmMCEntry.h"
-
+// libc includes
+#include <iostream>
+using std::cout;
+using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmMCMatchSelectorTask::CbmMCMatchSelectorTask()
@@ -48,14 +42,14 @@ InitStatus CbmMCMatchSelectorTask::Init()
 
   FairRootManager* ioman = FairRootManager::Instance();
   	if (!ioman) {
-  		std::cout << "-E- CbmMCMatchSelectorTask::Init: "
-  				<< "RootManager not instantiated!" << std::endl;
+  		cout << "-E- CbmMCMatchSelectorTask::Init: "
+  				<< "RootManager not instantiated!" << endl;
   		return kFATAL;
   	}
 
   	fMCMatch = (CbmMCMatch*)ioman->GetObject("MCMatch");
 
-	std::cout << "-I- CbmMCMatchSelectorTask::Init: Initialization successfull" << std::endl;
+	cout << "-I- CbmMCMatchSelectorTask::Init: Initialization successfull" << endl;
 
 
   return kSUCCESS;
@@ -75,14 +69,14 @@ void CbmMCMatchSelectorTask::SetParContainers()
 // -----   Public method Exec   --------------------------------------------
 void CbmMCMatchSelectorTask::Exec(Option_t* opt)
 {
-	std::cout << "Output Selector: " << std::endl;
+	cout << "Output Selector: " << endl;
 	SetWeights();
-	std::cout << fMCMatch->GetMCInfo(fStart, fStop);
+	cout << fMCMatch->GetMCInfo(fStart, fStop);
 }
 
 void CbmMCMatchSelectorTask::SetWeights()
 {
-//	std::cout << "SetWeights: CommonWeight " << fCommonWeight << " NStageWeights " << fStageWeights.size() << std::endl;
+//	cout << "SetWeights: CommonWeight " << fCommonWeight << " NStageWeights " << fStageWeights.size() << endl;
 	fMCMatch->SetCommonWeightStages(fCommonWeight);
 	for (int i = 0; i < fStageWeights.size();i++){
 		fMCMatch->GetMCStageType(fStageWeights[i].first)->SetWeight(fStageWeights[i].second);

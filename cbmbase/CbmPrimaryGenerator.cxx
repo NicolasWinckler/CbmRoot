@@ -1,15 +1,16 @@
-#include "FairRootManager.h"
-#include "FairRunSim.h"
 #include "CbmPrimaryGenerator.h"
 
-#include "TDatabasePDG.h"
-#include "TParticlePDG.h"
+#include "CbmMCEvent.h"
+
+#include "FairRootManager.h"
+#include "FairRunSim.h"
+#include "FairGenerator.h"
+
 #include "TRandom.h"
-#include "TMath.h"
+#include "TObject.h"
 #include "TF1.h"
 
 #include <iostream>
-
 using std::cout;
 using std::endl;
 

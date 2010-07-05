@@ -17,12 +17,10 @@
 
 // framework includes
 #include "FairTask.h"
-#include "CbmMCMatch.h"
 
-
-#include <vector>
 #include <map>
 
+class CbmMCMatch;
 class TClonesArray;
 
 class CbmMCMatchCreatorTask : public FairTask

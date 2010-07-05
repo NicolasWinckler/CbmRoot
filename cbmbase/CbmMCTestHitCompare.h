@@ -17,32 +17,12 @@
 
 // framework includes
 #include "FairTask.h"
-#include "CbmMCMatch.h"
-#include "CbmDetectorList.h"
 
-
-#include <vector>
-#include <map>
-
-
-#include "CbmDetectorList.h"
-#include "TClonesArray.h"
-#include "TMath.h"
-#include "TGeoManager.h"
-#include "TCanvas.h"
-#include "TPad.h"
-#include "TLegend.h"
-#include "TPaveText.h"
-#include "TFile.h"
-#include "TF1.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TH3F.h"
-#include "TList.h"
-#include "TVector3.h"
-
+class CbmMCMatch;
 
 class TClonesArray;
+class TH2F;
+class TList;
 
 class CbmMCTestHitCompare : public FairTask
 {

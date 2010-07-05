@@ -2,40 +2,26 @@
 // -----                CbmMCTestHitCompare source file             -----
 // -----                  Created 18/07/08  by T.Stockmanns        -----
 // -------------------------------------------------------------------------
-// libc includes
-#include <iostream>
+#include "CbmMCTestHitCompare.h"
 
-// Root includes
-#include "TROOT.h"
-#include "TClonesArray.h"
+#include "CbmMCEntry.h"
+#include "CbmMCMatch.h"
+#include "CbmStsPoint.h"
+#include "CbmStsHit.h"
 
 // framework includes
 #include "FairRootManager.h"
-#include "CbmMCTestHitCompare.h"
-#include "FairRun.h"
-#include "FairRuntimeDb.h"
-#include "FairHit.h"
-#include "FairLinkedData.h"
 
-#include "CbmStsPoint.h"
-#include "CbmStsHit.h"
-#include "CbmMCEntry.h"
-
-#include "CbmDetectorList.h"
+// Root includes
 #include "TClonesArray.h"
 #include "TMath.h"
-#include "TGeoManager.h"
-#include "TCanvas.h"
-#include "TPad.h"
-#include "TLegend.h"
-#include "TPaveText.h"
-#include "TFile.h"
-#include "TF1.h"
-#include "TH1F.h"
 #include "TH2F.h"
-#include "TH3F.h"
 #include "TList.h"
-#include "TVector3.h"
+
+// libc includes
+#include <iostream>
+using std::cout;
+using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmMCTestHitCompare::CbmMCTestHitCompare()
@@ -61,8 +47,8 @@ InitStatus CbmMCTestHitCompare::Init()
 
   FairRootManager* ioman = FairRootManager::Instance();
   	if (!ioman) {
-  		std::cout << "-E- CbmMCTestHitCompare::Init: "
-  				<< "RootManager not instantiated!" << std::endl;
+  		cout << "-E- CbmMCTestHitCompare::Init: "
+  				<< "RootManager not instantiated!" << endl;
   		return kFATAL;
   	}
 
@@ -71,7 +57,7 @@ InitStatus CbmMCTestHitCompare::Init()
   	fStripHit = (TClonesArray*)ioman->GetObject("StsHit");
   	fMCPoint = (TClonesArray*)ioman->GetObject("StsPoint");
 
-	std::cout << "-I- CbmMCTestHitCompare::Init: Initialization successfull" << std::endl;
+	cout << "-I- CbmMCTestHitCompare::Init: Initialization successfull" << endl;
   CreateHistos();
   Reset();
 
@@ -95,24 +81,24 @@ void CbmMCTestHitCompare::Exec(Option_t* opt)
 	//fMCMatch->CreateArtificialStage(kMCTrack, "", "");
 
 	CbmMCResult myResult = fMCMatch->GetMCInfo(kStsHit, kStsPoint);
-	std::cout << myResult;
+	cout << myResult;
 	for (int i = 0; i < myResult.GetNEntries(); i++){
 		CbmMCEntry myLinks = myResult.GetMCLink(i);
 		CbmStsHit* myHit = (CbmStsHit*)fStripHit->At(i);
 
-		std::cout << "Hit Match for hit " << i << " at (" << myHit->GetX() << "," << myHit->GetY() << "," << myHit->GetZ() << ")" << std::endl;
+		cout << "Hit Match for hit " << i << " at (" << myHit->GetX() << "," << myHit->GetY() << "," << myHit->GetZ() << ")" << endl;
 		if (myLinks.GetNLinks()<2){
 		  for (int j = 0; j < myLinks.GetNLinks(); j++){
 		    if (myLinks.GetLink(j).GetType() == kStsPoint){
 				
 		      CbmStsPoint* myMCPoint = (CbmStsPoint*)fMCPoint->At(myLinks.GetLink(j).GetIndex());
 		      //myMCTrack->Print(myLinks.GetFairLink(j).GetIndex());
-		      std::cout << "MCPoint " << myLinks.GetLink(j).GetIndex() << " at (" << myMCPoint->GetX(myMCPoint->GetZ()) << "," << 
+		      cout << "MCPoint " << myLinks.GetLink(j).GetIndex() << " at (" << myMCPoint->GetX(myMCPoint->GetZ()) << "," << 
 		      myMCPoint->GetY(myMCPoint->GetZ()) << "," << 
-		      myMCPoint->GetZ() << ")" <<std::endl;
+		      myMCPoint->GetZ() << ")" <<endl;
 		      fhHitPointCorrelation -> Fill ( myHit->GetX()-myMCPoint->GetX(myMCPoint->GetZ()),
 						      myHit->GetY()-myMCPoint->GetY(myMCPoint->GetZ()));
-		      std::cout << "--------------------------------" << std::endl;
+		      cout << "--------------------------------" << endl;
 		    }
 		  }
 		}
@@ -122,9 +108,9 @@ void CbmMCTestHitCompare::Exec(Option_t* opt)
 				
 		      CbmStsPoint* myMCPoint = (CbmStsPoint*)fMCPoint->At(myLinks.GetLink(j).GetIndex());
 		      //myMCTrack->Print(myLinks.GetFairLink(j).GetIndex());
-		      std::cout << "MCPoint " << myLinks.GetLink(j).GetIndex() << " at (" << myMCPoint->GetX(myMCPoint->GetZ()) << "," << 
+		      cout << "MCPoint " << myLinks.GetLink(j).GetIndex() << " at (" << myMCPoint->GetX(myMCPoint->GetZ()) << "," << 
 		      myMCPoint->GetY(myMCPoint->GetZ()) << "," << 
-		      myMCPoint->GetZ() << ")" <<std::endl;
+		      myMCPoint->GetZ() << ")" <<endl;
 		      if ( TMath::Abs (myHit->GetX()-myMCPoint->GetX(myMCPoint->GetZ())) < 1. && TMath::Abs (myHit->GetY()-myMCPoint->GetY(myMCPoint->GetZ())) < 1.) {
 		        fhHitPointSCorrelationSmall -> Fill( myHit->GetX()-myMCPoint->GetX(myMCPoint->GetZ()),
 						        myHit->GetY()-myMCPoint->GetY(myMCPoint->GetZ()));
@@ -133,11 +119,11 @@ void CbmMCTestHitCompare::Exec(Option_t* opt)
 			fhHitPointSCorrelationLarge -> Fill( myHit->GetX()-myMCPoint->GetX(myMCPoint->GetZ()),
 						              myHit->GetY()-myMCPoint->GetY(myMCPoint->GetZ()));
 		      }
-		      std::cout << "--------------------------------" << std::endl;
+		      cout << "--------------------------------" << endl;
 		    }
 		  }
 		}
-		std::cout << std::endl;
+		cout << endl;
 	}
 }
 // -------------------------------------------------------------------------
@@ -174,7 +160,7 @@ void CbmMCTestHitCompare::Reset() {
 
 
   TIter next(fHistoList);
-  while ( TH1* histo = ((TH1*)next()) ) histo->Reset();
+  while ( TH2* histo = ((TH2*)next()) ) histo->Reset();
 //   for ( Int_t ist = 0 ; ist < fNStations ; ist++ ) {
 //     TIter next0(fHistoListPS[ist]);
 //     while ( TH1* histo = ((TH1*)next0()) ) histo->Reset();
@@ -187,7 +173,7 @@ void CbmMCTestHitCompare::Finish()
   gDirectory->mkdir("Histos");
   gDirectory->cd("Histos");
   TIter next(fHistoList);
-  while ( TH1* histo = ((TH1*)next()) ) histo->Write();
+  while ( TH2* histo = ((TH2*)next()) ) histo->Write();
 
 
   gDirectory->cd("..");

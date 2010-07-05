@@ -6,14 +6,17 @@
 #ifndef CBMPROPAGATOR_H_
 #define CBMPROPAGATOR_H_
 
+#include "TObject.h"
+
 #include "CbmStatusCode.h"
 
-#include "TObject.h"
-#include "TMatrixD.h"
+#include "Rtypes.h"
 
 #include <vector>
 
 class FairTrackParam;
+
+class TMatrixD;
 
 class CbmPropagator : public TObject {
 public:

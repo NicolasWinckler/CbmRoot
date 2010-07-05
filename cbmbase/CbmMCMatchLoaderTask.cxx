@@ -2,35 +2,21 @@
 // -----                CbmMCMatchLoaderTask source file             -----
 // -----                  Created 18/07/08  by T.Stockmanns        -----
 // -------------------------------------------------------------------------
-// libc includes
-#include <iostream>
+#include "CbmMCMatchLoaderTask.h"
 
-// Root includes
-#include "TROOT.h"
-#include "TClonesArray.h"
-#include "TVector3.h"
-
+#include "CbmMCMatch.h"
+#include "CbmDetectorList.h"
 
 // framework includes
 #include "FairRootManager.h"
-#include "CbmMCMatchLoaderTask.h"
-#include "FairRun.h"
-#include "FairRuntimeDb.h"
-#include "FairHit.h"
-#include "FairLinkedData.h"
-#include "CbmMCTrack.h"
-// CbmMvd includes
-#include "CbmStsPoint.h"
-#include "CbmStsDigi.h"
-#include "CbmStsCluster.h"
-#include "CbmStsHit.h"
 
+// Root includes
+#include "TClonesArray.h"
 
-#include "CbmDetectorList.h"
-
-#include <vector>
-#include <map>
-
+// libc includes
+#include <iostream>
+using std::cout;
+using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmMCMatchLoaderTask::CbmMCMatchLoaderTask() : FairTask("Creates CbmMCMatch"), fEventNr(0)
@@ -58,8 +44,8 @@ InitStatus CbmMCMatchLoaderTask::Init()
 
   FairRootManager* ioman = FairRootManager::Instance();
   	if (!ioman) {
-  		std::cout << "-E- CbmMCMatchLoaderTask::Init: "
-  				<< "RootManager not instantiated!" << std::endl;
+  		cout << "-E- CbmMCMatchLoaderTask::Init: "
+  				<< "RootManager not instantiated!" << endl;
   		return kFATAL;
   	}
 
@@ -98,7 +84,7 @@ void CbmMCMatchLoaderTask::Exec(Option_t* opt)
 	fMCMatch->CreateArtificialStage(kMCTrack, "", "");
 
 	fMCMatch->Print();
-	std::cout << std::endl;
+	cout << endl;
 }
 
 void CbmMCMatchLoaderTask::Finish()

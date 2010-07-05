@@ -17,13 +17,14 @@
 
 // framework includes
 #include "FairTask.h"
-#include "CbmMCMatch.h"
+//#include "CbmMCMatch.h"
 #include "CbmDetectorList.h"
 
 
 #include <vector>
-#include <map>
+#include <list>
 
+class CbmMCMatch;
 class TClonesArray;
 
 class CbmMCMatchSelectorTask : public FairTask

@@ -2,24 +2,23 @@
 // -----                CbmMCMatchCreatorTask source file             -----
 // -----                  Created 18/07/08  by T.Stockmanns        -----
 // -------------------------------------------------------------------------
-// libc includes
-#include <iostream>
-
-// Root includes
-#include "TROOT.h"
-#include "TClonesArray.h"
-
-// framework includes
-#include "FairRootManager.h"
 #include "CbmMCMatchCreatorTask.h"
-#include "FairRun.h"
-#include "FairRuntimeDb.h"
-#include "FairHit.h"
-#include "FairLinkedData.h"
 
 #include "CbmDetectorList.h"
 #include "CbmMCEntry.h"
+#include "CbmMCMatch.h"
 
+// framework includes
+#include "FairRootManager.h"
+#include "FairLinkedData.h"
+
+// Root includes
+#include "TClonesArray.h"
+
+// libc includes
+#include <iostream>
+using std::cout;
+using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmMCMatchCreatorTask::CbmMCMatchCreatorTask() : FairTask("Creates CbmMCMatch"), fEventNr(0)
@@ -52,8 +51,8 @@ InitStatus CbmMCMatchCreatorTask::Init()
 
   FairRootManager* ioman = FairRootManager::Instance();
   	if (!ioman) {
-  		std::cout << "-E- CbmMCMatchCreatorTask::Init: "
-  				<< "RootManager not instantiated!" << std::endl;
+  		cout << "-E- CbmMCMatchCreatorTask::Init: "
+  				<< "RootManager not instantiated!" << endl;
   		return kFATAL;
   	}
 
@@ -62,7 +61,7 @@ InitStatus CbmMCMatchCreatorTask::Init()
 
 	ioman->Register("MCMatch", "MCMatch", fMCMatch, kFALSE);
 
-	std::cout << "-I- CbmMCMatchCreatorTask::Init: Initialization successfull" << std::endl;
+	cout << "-I- CbmMCMatchCreatorTask::Init: Initialization successfull" << endl;
 
 
   return status;
@@ -74,8 +73,8 @@ InitStatus CbmMCMatchCreatorTask::InitBranches()
 	 // Get RootManager
 	FairRootManager* ioman = FairRootManager::Instance();
 	if (!ioman) {
-		std::cout << "-E- CbmMCMatchCreatorTask::Init: "
-				<< "RootManager not instantiated!" << std::endl;
+		cout << "-E- CbmMCMatchCreatorTask::Init: "
+				<< "RootManager not instantiated!" << endl;
 		return kFATAL;
 	}
 
@@ -83,8 +82,8 @@ InitStatus CbmMCMatchCreatorTask::InitBranches()
 	for (int i = NStages-1; i > -1; i--){
 		TClonesArray* myBranch = (TClonesArray*)ioman->GetObject(fMCMatch->GetMCStage(i)->GetBranchName().c_str());
 		if (!myBranch)	{
-			//std::cout << "NMCStages: " << fMCMatch->GetNMCStages() << std::endl;
-			std::cout << "-W- CbmMCMatchCreatorTask::Init: "<< "No "<<fMCMatch->GetMCStage(i)->GetBranchName() << " array!" << std::endl;
+			//cout << "NMCStages: " << fMCMatch->GetNMCStages() << endl;
+			cout << "-W- CbmMCMatchCreatorTask::Init: "<< "No "<<fMCMatch->GetMCStage(i)->GetBranchName() << " array!" << endl;
 			fMCMatch->GetMCStage(i)->SetFill(kFALSE); //RemoveStage(fMCMatch->GetMCStage(i)->GetStageId());
 
 			continue;
@@ -114,11 +113,11 @@ void CbmMCMatchCreatorTask::Exec(Option_t* opt)
 
 	fMCMatch->LoadInMCLists(fMCLink);
 
-	std::cout << "NMCStages: " << fMCMatch->GetNMCStages() << std::endl;
+	cout << "NMCStages: " << fMCMatch->GetNMCStages() << endl;
 	for (int i = 0; i < fMCMatch->GetNMCStages(); i++){
 		if (fMCMatch->GetMCStage(i)->GetFill() == kTRUE && fMCMatch->GetMCStage(i)->GetLoaded() == kFALSE){
-			std::cout << i << ": ";
-			std::cout << "BranchName: " << fMCMatch->GetMCStage(i)->GetBranchName() << std::endl;
+			cout << i << ": ";
+			cout << "BranchName: " << fMCMatch->GetMCStage(i)->GetBranchName() << endl;
 			TClonesArray* clArray = fBranches[fMCMatch->GetMCStage(i)->GetBranchName()];
 			for (int j = 0; j < clArray->GetEntries(); j++){
 				FairLinkedData* myData = (FairLinkedData*)clArray->At(j);
@@ -136,7 +135,7 @@ void CbmMCMatchCreatorTask::Exec(Option_t* opt)
 		for (int indStage = 0; indStage < myStage.GetNEntries(); indStage++){
 
 			CbmMCEntry myLink(myStage.GetMCLink(indStage));
-			//std::cout << "myLink: " << myStage.GetMCLink(indStage).GetSource() << "/" << myStage.GetMCLink(indStage).GetPos() << std::endl;
+			//cout << "myLink: " << myStage.GetMCLink(indStage).GetSource() << "/" << myStage.GetMCLink(indStage).GetPos() << endl;
 			new((*fMCLink)[i]) CbmMCEntry(myLink.GetLinks(), myLink.GetSource(), myLink.GetPos());
 			i++;
 		}
@@ -144,7 +143,7 @@ void CbmMCMatchCreatorTask::Exec(Option_t* opt)
 
 	if (fVerbose > 0){
 		fMCMatch->Print();
-		std::cout << std::endl;
+		cout << endl;
 	}
 }
 

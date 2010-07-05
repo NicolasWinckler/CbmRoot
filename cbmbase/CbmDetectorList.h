@@ -24,8 +24,6 @@ enum DataType {
 
 
 #include "TObject.h"
-#include "TString.h"
-
 
 class FairDetector;
 

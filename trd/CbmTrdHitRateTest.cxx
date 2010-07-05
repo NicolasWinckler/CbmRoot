@@ -253,8 +253,8 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   LiSi.push_back(L3S3);
   LiSi.push_back(L4S3);
 
-  Char_t Canfile1[100];
-  Char_t Canfile2[100];
+  Char_t Canfile1[200];
+  Char_t Canfile2[200];
 
   TImage *Outimage1;
   TImage *Outimage2;
@@ -271,6 +271,10 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   fLayer = 1;
   for (vector< vector<int> >::size_type j = 0; j < LiSi.size(); j++)
     {
+
+      sprintf(Canfile1,"Pics/%s_S%d_L%d.png",trddigiparpath,fStation,fLayer);
+      sprintf(Canfile2,"Pics/%s_HitPerPad_S%d_L%d.png",trddigiparpath,fStation,fLayer);
+
       HistoInit(c1, c2,  Layer, HitPad, Canfile1, Canfile2, ZRangeL, ZRangeU);
 
       border->Draw("same");
@@ -324,8 +328,8 @@ void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*&
   sprintf(name,"S%d_L%d",fStation,fLayer);
   sprintf(title,"Station %d, Layer %d",fStation,fLayer);
   cout << title << endl;
-  sprintf(Canfile1,"Pics/Station%dLayer%d.png",fStation,fLayer);
-  sprintf(Canfile2,"Pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
+  //sprintf(Canfile1,"Pics/Station%dLayer%d.png",fStation,fLayer);
+  //sprintf(Canfile2,"Pics/HitPerPadStation%dLayer%d.png",fStation,fLayer);
   Layer = new TH2F(name,title,18000,-9000,9000,18000,-9000,9000);
   Layer->SetContour(99);
   Layer->SetXTitle("x-Coordinate [mm]");

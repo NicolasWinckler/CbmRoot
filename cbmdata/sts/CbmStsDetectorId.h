@@ -26,10 +26,6 @@
 
 #include "CbmDetectorList.h"
 
-#include "TObject.h"
-
-
-
 class CbmStsDetectorId
 {
 

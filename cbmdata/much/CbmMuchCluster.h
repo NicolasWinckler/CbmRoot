@@ -13,7 +13,6 @@
 #include "TArrayI.h"
 
 #include <vector>
-
 using std::vector;
 
 class CbmMuchCluster : public TObject{

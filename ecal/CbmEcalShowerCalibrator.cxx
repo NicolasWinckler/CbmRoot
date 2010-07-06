@@ -12,6 +12,12 @@
 
 #include "TClonesArray.h"
 #include "TTree.h"
+#ifndef ROOT_TParticlePDG
+ #include "TParticlePDG.h"
+#endif
+#ifndef ROOT_TDatabasePDG
+ #include "TDatabasePDG.h"
+#endif
 
 #include <iostream>
 

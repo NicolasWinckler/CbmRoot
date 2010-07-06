@@ -4,19 +4,19 @@
 // -------------------------------------------------------------------------
 #include "CbmStack.h"
 
+#include "CbmMCTrack.h"
+
 #include "FairDetector.h"
 #include "FairMCPoint.h"
-#include "CbmMCTrack.h"
 #include "FairRootManager.h"
 
-#include "TError.h"
 #include "TLorentzVector.h"
+#include "TClonesArray.h"
 #include "TParticle.h"
 #include "TRefArray.h"
 
 #include <list>
 #include <iostream>
-
 using std::cout;
 using std::endl;
 using std::pair;

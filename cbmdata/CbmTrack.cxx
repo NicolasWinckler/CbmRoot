@@ -7,6 +7,8 @@
 #include "CbmTrack.h"
 
 #include <iostream>
+using std::cout;
+using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrack::CbmTrack():
@@ -38,9 +40,9 @@ void CbmTrack::AddHit(
 // -----   Public method Print   -------------------------------------------
 void CbmTrack::Print() const
 {
-	std::cout << "CbmTrack: nof hits=" << fHitIndex.size() << ", chiSq=" << fChiSq
+	cout << "CbmTrack: nof hits=" << fHitIndex.size() << ", chiSq=" << fChiSq
 		<< ", NDF=" << fNDF << ", pidHypo=" << fPidHypo
-		<< ", previousTrackId=" << fPreviousTrackId << ", flag=" << fFlag << std::endl;
+		<< ", previousTrackId=" << fPreviousTrackId << ", flag=" << fFlag << endl;
 //	fParamFirst.Print();
 //	fParamLast.Print();
 }

@@ -15,9 +15,10 @@
 
 #include <iostream>
 #include <limits>
-
+#include <cassert>
 using std::cout;
 using std::endl;
+using std::numeric_limits;
 
 // -----   Default  constructor   ------------------------------------------
 CbmMuchDigiMatch::CbmMuchDigiMatch() {
@@ -25,7 +26,6 @@ CbmMuchDigiMatch::CbmMuchDigiMatch() {
   fCharge.Set(0);
 };
 // -------------------------------------------------------------------------
-
 // -----   Standard constructor   ------------------------------------------
 CbmMuchDigiMatch::CbmMuchDigiMatch(CbmMuchDigiMatch* match){
    if(!match){
@@ -41,7 +41,6 @@ CbmMuchDigiMatch::CbmMuchDigiMatch(CbmMuchDigiMatch* match){
    }
 }
 // -------------------------------------------------------------------------
-
 // -----   Destructor   ----------------------------------------------------
 CbmMuchDigiMatch::~CbmMuchDigiMatch() { };
 // -------------------------------------------------------------------------
@@ -61,7 +60,6 @@ Int_t CbmMuchDigiMatch::AddPoint(Int_t iPoint) {
   return n+1;
 }
 // -------------------------------------------------------------------------
-
 // -----   Public method GetRefIndex   -------------------------------------
 Int_t CbmMuchDigiMatch::GetRefIndex(Int_t i) const {
   if ( i<0 || i>GetNPoints()-1 ) {
@@ -72,7 +70,6 @@ Int_t CbmMuchDigiMatch::GetRefIndex(Int_t i) const {
   return fRefIndex.At(i);
 }
 // -------------------------------------------------------------------------
-#include <cassert>
 // -----   Public method AddCharge  ----------------------------------------
 UInt_t CbmMuchDigiMatch::AddCharge(UInt_t iCharge) {
   if ( iCharge < 0 ) {
@@ -105,7 +102,7 @@ UInt_t CbmMuchDigiMatch::GetTotalCharge() const {
   for(Int_t iRef=0; iRef<GetNPoints(); ++iRef){
     UInt_t first = totCharge;
     totCharge += GetCharge(iRef);
-    if(totCharge < first || totCharge < GetCharge(iRef)) totCharge = std::numeric_limits<Int_t>::max();
+    if(totCharge < first || totCharge < GetCharge(iRef)) totCharge = numeric_limits<Int_t>::max();
   }
   return totCharge;
 }

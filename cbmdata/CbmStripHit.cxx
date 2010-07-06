@@ -10,6 +10,8 @@
 #include "TVector3.h"
 
 #include <iostream>
+using std::cout;
+using std::endl;
 
 CbmStripHit::CbmStripHit():
 	CbmBaseHit(-1, 0., 0., -1),
@@ -59,10 +61,10 @@ CbmStripHit::~CbmStripHit()
 
 void CbmStripHit::Print() const
 {
-	std::cout << "CbmStripHit: detectorId=" << GetDetectorId()
+	cout << "CbmStripHit: detectorId=" << GetDetectorId()
 		<< " pos=(" << GetU() << "," << GetPhi() << "," << GetZ()
 		<< ") err=(" << GetDu() << "," << GetDphi() << "," << GetDz()
-		<< ") refId=" << GetRefId() << std::endl;
+		<< ") refId=" << GetRefId() << endl;
 }
 
 ClassImp(CbmStripHit);

@@ -8,14 +8,8 @@
 #ifndef CBMMVDDIGI_H
 #define CBMMVDDIGI_H 1
 
-#include "CbmDetectorList.h"
 #include "CbmDigi.h"
 #include "CbmMvdDetectorId.h"
-
-#include "TObject.h"
-#include "TMath.h"
-#include "TVector3.h"
-
 
 class CbmMvdDigi : public CbmDigi, public CbmMvdDetectorId
 {

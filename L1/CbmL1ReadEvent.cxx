@@ -19,6 +19,13 @@
 #include "CbmKF.h"
 #include "CbmMvdHitMatch.h"
 
+#ifndef ROOT_TParticlePDG
+ #include "TParticlePDG.h"
+#endif
+#ifndef ROOT_TDatabasePDG
+ #include "TDatabasePDG.h"
+#endif
+
 #include <iostream>
 #include <vector>
 

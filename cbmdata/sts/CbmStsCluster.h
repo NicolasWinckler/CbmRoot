@@ -31,12 +31,6 @@
 #include "FairMultiLinkedData.h"
 #include "CbmDetectorList.h"
 
-#include "TObject.h"
-#include "TString.h"
-
-#include <iostream>
-#include <vector>
-
 class CbmStsCluster : public FairMultiLinkedData
 {
 

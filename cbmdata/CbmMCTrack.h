@@ -21,18 +21,12 @@
 
 #include "CbmDetectorList.h"
 
-#include "TLorentzVector.h"
 #include "TObject.h"
-#include "TParticle.h"
+#include "TMath.h"
 #include "TVector3.h"
+#include "TLorentzVector.h"
 
-#ifndef ROOT_TParticlePDG
- #include "TParticlePDG.h"
-#endif
-#ifndef ROOT_TDatabasePDG
- #include "TDatabasePDG.h"
-#endif
-
+class TParticle;
 
 class CbmMCTrack : public TObject
 {

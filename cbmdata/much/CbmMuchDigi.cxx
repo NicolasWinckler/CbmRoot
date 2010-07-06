@@ -12,11 +12,6 @@
 
 #include "CbmMuchDigi.h"
 
-#include "CbmDetectorList.h"
-
-using std::cout;
-using std::endl;
-
 // -----   Default constructor   -------------------------------------------
 CbmMuchDigi::CbmMuchDigi() {
   fDetectorId   =  0;

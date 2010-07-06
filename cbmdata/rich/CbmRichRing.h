@@ -8,7 +8,7 @@
 #ifndef CBM_RICH_RING_H
 #define CBM_RICH_RING_H
 
-#include "CbmRichRingLight.h"
+//#include "CbmRichRingLight.h"
 
 #include "TObject.h"
 

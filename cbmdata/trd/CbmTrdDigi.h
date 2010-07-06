@@ -3,9 +3,7 @@
 
 #include "TObject.h"
 
-#include <iostream>
 #include <vector>
-#include "Rtypes.h"
 
 class CbmTrdDigi : public TObject
 {

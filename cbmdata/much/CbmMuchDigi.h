@@ -14,12 +14,7 @@
 #ifndef CBMMUCHDIGI_H
 #define CBMMUCHDIGI_H 1
 
-
-#include <iostream>
 #include "TObject.h"
-#include "TArrayD.h"
-
-
 
 class CbmMuchDigi : public TObject
 {

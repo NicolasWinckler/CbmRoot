@@ -5,12 +5,6 @@
 
 #include "CbmRichHit.h"
 
-#include <iostream>
-
-using std::cout;
-using std::endl;
-
-
 // -----   Default constructor   -------------------------------------------
 CbmRichHit::CbmRichHit(): CbmPixelHit() {
   fPmtId=0;

@@ -6,10 +6,9 @@
 
 #include "CbmTrdDetectorId.h"
 
-#include <iostream>
-
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 const Int_t CbmTrdDetectorId::shiftarray[] = {0,5,9,12,17,25}; 
 const Int_t CbmTrdDetectorId::bitarray[] = {5,4,3,5,8,7}; 

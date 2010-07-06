@@ -15,7 +15,6 @@
 
 #include "FairMCPoint.h"
 
-#include "TObject.h"
 #include "TVector3.h"
 
 class CbmMuchPoint : public FairMCPoint

@@ -9,9 +9,9 @@
  **/
 #include "CbmPixelHit.h"
 
-#include "TVector3.h"
-
 #include <iostream>
+using std::cout;
+using std::endl;
 
 CbmPixelHit::CbmPixelHit():
 	CbmBaseHit(-1, 0., 0., -1),
@@ -66,10 +66,10 @@ CbmPixelHit::~CbmPixelHit()
 
 void CbmPixelHit::Print() const
 {
-	std::cout << "CbmPixelHit: detectorId=" << GetDetectorId()
-		<< " pos=(" << GetX() << "," << GetY() << "," << GetZ()
-		<< ") err=(" << GetDx() << "," << GetDy() << "," << GetDz()
-		<< ") dxy=" << GetDxy() << " refId=" << GetRefId() << std::endl;
+	cout << "CbmPixelHit: detectorId=" << GetDetectorId()
+	     << " pos=(" << GetX() << "," << GetY() << "," << GetZ()
+	     << ") err=(" << GetDx() << "," << GetDy() << "," << GetDz()
+	     << ") dxy=" << GetDxy() << " refId=" << GetRefId() << endl;
 }
 
 ClassImp(CbmPixelHit);

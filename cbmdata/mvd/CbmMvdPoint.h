@@ -21,7 +21,7 @@
 #include "FairMCPoint.h"
 #include "CbmMvdDetectorId.h"
 
-#include "TObject.h"
+//#include "TObject.h"
 #include "TVector3.h"
 
 class CbmMvdPoint : public FairMCPoint, CbmMvdDetectorId

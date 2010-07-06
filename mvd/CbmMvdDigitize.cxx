@@ -80,13 +80,13 @@
 #include "CbmMvdPileupManager.h"
 #include "CbmMvdPoint.h"
 #include "CbmMvdStation.h"
+#include "CbmMCTrack.h"
 
 // Includes from base
 #include "FairGeoNode.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
-#include "CbmMCTrack.h"
 
 // Includes from ROOT
 #include "TArrayD.h"
@@ -101,6 +101,12 @@
 #include "TMath.h"
 #include "TH1.h"
 #include "TH2.h"
+#ifndef ROOT_TParticlePDG
+ #include "TParticlePDG.h"
+#endif
+#ifndef ROOT_TDatabasePDG
+ #include "TDatabasePDG.h"
+#endif
 
 // Includes from C++
 #include <iostream>

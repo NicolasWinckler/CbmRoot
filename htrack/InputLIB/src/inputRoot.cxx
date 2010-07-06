@@ -60,7 +60,12 @@
 #include "TGeoMatrix.h"
 #include "TGeoShape.h"
 #include "TGeoTube.h"
-#include "TParticlePDG.h"
+#ifndef ROOT_TParticlePDG
+ #include "TParticlePDG.h"
+#endif
+#ifndef ROOT_TDatabasePDG
+ #include "TDatabasePDG.h"
+#endif
 #include <stdlib.h>
 #include <fstream>
 

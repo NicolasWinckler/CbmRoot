@@ -23,14 +23,9 @@
 
 #include "CbmHit.h"
 
-#include "FairMultiLinkedData.h"
 #include "CbmDetectorList.h"
-#include "TObject.h"
-#include "TString.h"
 
-#include <iostream>
-#include <vector>
-
+class TVector3;
 
 class CbmStsHit : public CbmHit
 {
@@ -81,7 +76,7 @@ class CbmStsHit : public CbmHit
   Int_t GetPosSensorX()               const { return fPosSX;}
   Int_t GetPosSensorY()               const { return fPosSY;}
 
-  Int_t SetStatLayer(Int_t it)              { fStatLayer = it; }
+  void SetStatLayer(Int_t it)              { fStatLayer = it; }
   Int_t GetStatLayer()                const { return fStatLayer; }
   void AddIndex(int index){
 			AddLink(FairLink(kStsCluster, index));

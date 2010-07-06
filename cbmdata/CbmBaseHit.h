@@ -26,7 +26,6 @@ enum HitType {
 };
 
 #include "TObject.h"
-#include "TString.h"
 
 class CbmBaseHit : public TObject
 {

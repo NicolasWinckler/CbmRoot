@@ -62,7 +62,7 @@ public:
   virtual void Print(const Option_t* opt ="") const
   {
     printf(" Cluster :");
-    printf("   %d cells", fPosList.size());
+    printf("   %d cells", (Int_t)fPosList.size());
     printf("  Coordinates X,Y = %f,%f ", fX,fY);
     printf("  Moments m2x, m2y = %f, %f \n ",fM2x ,  fM2y); 
   };

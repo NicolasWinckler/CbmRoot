@@ -22,7 +22,6 @@
 
 
 #include <iostream>
-#include "TObject.h"
 #include "CbmDetectorList.h"
  
 using std::cerr;

@@ -27,12 +27,7 @@
 #include "CbmStsDetectorId.h"
 #include "FairMultiLinkedData.h"
 
-#include "TObject.h"
-#include "TString.h"
-
-#include <iostream>
 #include <vector>
-#include <set>
 
 class CbmStsDigi : public FairMultiLinkedData,  public CbmStsDetectorId
 {

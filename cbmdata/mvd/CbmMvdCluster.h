@@ -15,11 +15,9 @@
 #define CBMMVDCLUSTER_H 1
 
 
-//#include "CbmHit.h"
-//#include "TVector3.h"
 #include "CbmMvdHit.h"
 
-#include "TVector3.h"
+class TVector3;
 
 class CbmMvdCluster : public CbmMvdHit
 {

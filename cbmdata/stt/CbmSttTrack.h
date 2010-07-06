@@ -4,9 +4,6 @@
 
 #include "FairTrackParam.h"
 #include "TObject.h"
-#include "TArrayI.h"
-#include "TLorentzVector.h"
-#include <map>
 
 class CbmSttTrack : public TObject
 {

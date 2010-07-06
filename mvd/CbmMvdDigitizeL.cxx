@@ -45,6 +45,12 @@
 #include "TMath.h"
 #include "TH1.h"
 #include "TH2.h"
+#ifndef ROOT_TParticlePDG
+ #include "TParticlePDG.h"
+#endif
+#ifndef ROOT_TDatabasePDG
+ #include "TDatabasePDG.h"
+#endif
 
 // Includes from C++
 #include <iostream>

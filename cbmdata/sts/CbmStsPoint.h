@@ -17,11 +17,9 @@
 #define CBMSTSPOINT_H
 
 
-#include "TObject.h"
-#include "TVector3.h"
-
 #include "FairMCPoint.h"
 
+class TVector3;
 
 class CbmStsPoint : public FairMCPoint 
 {

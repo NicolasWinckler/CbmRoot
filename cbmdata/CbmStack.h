@@ -34,11 +34,10 @@
 #include "CbmDetectorList.h"
 #include "FairGenericStack.h"
 
-#include "TClonesArray.h"
-#include "TVirtualMCStack.h"
-
 #include <map>
 #include <stack>
+
+class TClonesArray;
 
 class CbmStack : public FairGenericStack
 {

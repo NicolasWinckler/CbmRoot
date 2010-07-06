@@ -10,7 +10,6 @@
 #define CBML1MYEVENT
 
 #include "TObject.h"
-#include "TNtuple.h"
 
 class CbmZdcEvent : public TObject {
 

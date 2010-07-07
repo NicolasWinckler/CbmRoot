@@ -165,10 +165,10 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   //const Bool_t Sector = false;
   
   if (Histo){
-    printf("Finale Histograms are Created and Saved to Pics/*.png\n");
+    printf("Finale histograms are created and saved to ../Pics/*.png\n");
   }
   if (TEST){
-    printf("Long path tracks are Exported to Pics/*.png\n");
+    printf("Long path tracks are exported to ../Pics/*.png\n");
   }
   
   TH1F* TRDalpha = NULL;
@@ -282,7 +282,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   Int_t nEntries = fTrdPoints->GetEntriesFast();
   if (TEST)
     {
-      //nEntries = nEntries * 10 / 100;//5;
+      //nEntries = 1;//nEntries * 10 / 100;//5;
     }
   for (int j = 0; j < nEntries ; j++ ) 
     {
@@ -1017,7 +1017,7 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
 
       if (Histo)
 	{
-	  Float_t tempCharge = 0;
+	  Double_t tempCharge = 0;
 	  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
 	    { 
 	      for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++)		
@@ -1247,17 +1247,17 @@ void CbmTrdClusterizer::ClusterMapping(Int_t nCol, Int_t nRow, Int_t Col_slice, 
   }
   // --------------------------------------------------------------------
   // ---- CalcMathieson -------------------------------------------------
-void CbmTrdClusterizer::CalcMathieson( Bool_t TEST, Double_t x_mean, Double_t y_mean, Double_t SliceELoss,Double_t* W, Double_t* H)
+void CbmTrdClusterizer::CalcMathieson( Bool_t TEST, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
 {
   /*
     Calculates the induced charge on tha area defind by 'fPadNrX' aand 'fPadNrY'  by using the mathieson formula for each cluster
   */
   //printf("CalcMathieson...\n");
   //Int_t accuracy = 1;    // '1/accuracy' integration step width [mm]
-  Float_t h = 3;         //anode-cathode gap [mm]
-  Float_t s = 3;         //anode wire spacing [mm]
+  Float_t h = 3;           //anode-cathode gap [mm]
+  Float_t s = 3;           //anode wire spacing [mm]
   Float_t ra = 12.5E-3/2.; //anode wire radius [mm]
-  Float_t qa = 1700;    //anode neto charge [??] ???
+  Float_t qa = 1700;       //anode neto charge [??] ???
 
   for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
     {
@@ -1269,6 +1269,8 @@ void CbmTrdClusterizer::CalcMathieson( Bool_t TEST, Double_t x_mean, Double_t y_
   Float_t par = 1.0;   // normalization factor
   Float_t r = 0.0;     // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
   Float_t value = 0.0;
+  Float_t argument = 0.0;
+  Float_t taylor = 0.0;
   Double_t rho = 0.0;   //charge at position x
   Float_t K3 = 0.525; //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
   //Float_t K3 = -0.24 * (h / s) + 0.7 + (-0.75 * log(ra / s) - 3.64);// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
@@ -1293,6 +1295,11 @@ void CbmTrdClusterizer::CalcMathieson( Bool_t TEST, Double_t x_mean, Double_t y_
 			 
 			   );
 		  value = pow(tanh(K2 * r / h),2);
+		  /*
+		  argument = K2 * r / h;
+		  taylor = argument - pow(argument,3) / 3. + 2 * pow(argument,5) / 15. - 17 * pow(argument,7) / 315. + 62 * pow(argument,9) / 2835;
+		  value = pow(taylor,2);
+		  */
 		  //rho = r;
 		  //rho = (iPadRow * fPadNrX + iPadCol) / (H[iPadRow] * accuracy * W[iPadCol] * accuracy);
 		  //rho = (1.) / (H[iPadRow] * accuracy * W[iPadCol] * accuracy);
@@ -1302,13 +1309,15 @@ void CbmTrdClusterizer::CalcMathieson( Bool_t TEST, Double_t x_mean, Double_t y_
 		  */ 
 		  rho = (qa * K1 * (1. - value) /
 			 (1. + K3 * value)) / float((accuracy * accuracy));         
-		    
+		 
 		  if (rho > 0.00)
 		    {
-		      fPadCharge[iPadRow][iPadCol] += rho * SliceELoss;
+		      //printf("     Pad(%d,%d) Pos(%4.1f,%4.1f) Hit(%4.1f,%4.1f)     %.2E\n",iPadCol - int(fPadNrX/2),iPadRow - int(fPadNrY/2),(xi + 0.5) / float(accuracy) - 0.5 * W[iPadCol],(yi + 0.5) / float(accuracy) - 0.5 * H[iPadRow],x_mean,y_mean,rho);
+		      fPadCharge[iPadRow][iPadCol] += rho;// * SliceELoss;
 		    }
 		}
 	    }
+	  fPadCharge[iPadRow][iPadCol] *= SliceELoss;
 	}
     }
 }

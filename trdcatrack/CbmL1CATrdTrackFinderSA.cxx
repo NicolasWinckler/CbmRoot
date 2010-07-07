@@ -5,13 +5,10 @@
 
 #include "CbmL1CATrdTrackFinderSA.h"
 
-#include "CbmL1.h"
 #include "CbmL1TrdTracklet.h"
 #include "CbmL1TrdTracklet4.h"
 
-#include "CbmKF.h"
 #include "CbmKFTrdHit.h"
-#include "FairMCPoint.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairBaseParSet.h"
@@ -19,7 +16,6 @@
 #include "FairDetector.h"
 #include "CbmTrdPoint.h"
 #include "CbmTrdHit.h"
-#include "CbmStsTrack.h"
 #include "CbmTrdTrack.h"
 #include "CbmMCTrack.h"
 #include "CbmGeoTrdPar.h"
@@ -29,23 +25,19 @@
 #include "CbmKFTrack.h"
 
 #include "TClonesArray.h"
-#include "TH1F.h"
-#include "TH2F.h"
+#include "TH1.h"
+#include "TH2.h"
 #include "TLinearFitter.h"
 
 #include <iostream>
 #include <vector>
-#include <list>
 #include <map>
-#include <cmath>
 using std::cout;
 using std::endl;
 using std::vector;
 using std::pair;
 using std::map;
 using std::set;
-
-//#include "L1CATrdDraw.h"
 
 ClassImp(CbmL1CATrdTrackFinderSA);
 

@@ -18,27 +18,25 @@
 #define CBMTRDTESTEVENTSWITHMOM_H 1
 
 
-#include "map"
 #include "FairTask.h"
-#include "TLorentzVector.h"
 
-#include "CbmTrdPoint.h"
+#include <map>
 
-#include "CbmTrdFitTracks.h"
-#include <CbmTrdTrackFitterKF_CA.h>
-#include <CbmTrdTrackFitter.h>
-#include <CbmGeoTrdPar.h>
-
-using namespace std;
-
-class TClonesArray;
 class CbmTrdTrack;
 class CbmTrdHit;
+class CbmTrdPoint;
 class CbmKF;
 class CbmKFTrack;
+class CbmTrdTrackFitterKF_CA;
+class CbmGeoTrdPar;
+
 class FairTrackParam;
+
+class TClonesArray;
 class TH1F;
 class TH2F;
+class TLorentzVector;
+class TVector3;
 
 class CbmTrdTestEventsWithMom : public FairTask
 {
@@ -49,7 +47,7 @@ class CbmTrdTestEventsWithMom : public FairTask
   CbmTrdTestEventsWithMom();
 
 
-  /** Constructor with verbosity level **/
+  /** constructor with verbosity level **/
   CbmTrdTestEventsWithMom(Int_t verbose);
 
 
@@ -301,8 +299,8 @@ class CbmTrdTestEventsWithMom : public FairTask
     fNoCrossedX;
 
 
-  map<Int_t, Int_t> totParticlesSum;
-  map<Int_t, Int_t> totPassedParticlesSum;
+  std::map<Int_t, Int_t> totParticlesSum;
+  std::map<Int_t, Int_t> totPassedParticlesSum;
 
  private:
 
@@ -314,7 +312,7 @@ class CbmTrdTestEventsWithMom : public FairTask
   TClonesArray* fArrayKFTrdHit; //array of Kalman Filter hits
   
   /** Map from MCTrackID to number of common hits **/
-  map<Int_t, Int_t> fMatchMap;
+  std::map<Int_t, Int_t> fMatchMap;
   
   
   

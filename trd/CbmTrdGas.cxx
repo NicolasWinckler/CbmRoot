@@ -98,10 +98,10 @@ void CbmTrdGas::Init() {
       cout << "-E- stop execution here." << endl;
       Fatal("CbmTrdGas","Unknown gas mixture.");;
     }    
-    Bool_t found_C=kFALSE;
-    Bool_t found_O=kFALSE;   
-    Int_t C=0;
-	Int_t O=0;
+    Bool_t foundCarbon=kFALSE;
+    Bool_t foundOxygen=kFALSE;   
+    Int_t carbon=0;
+	Int_t oxygen=0;
 	Int_t noblegas=0;
 
     Double_t *elem = mixt->GetZmixt();
@@ -110,16 +110,16 @@ void CbmTrdGas::Init() {
 
     for (Int_t i=0 ; i<nmixt; i++){
       if (elem[i] == 6.0) {
-	C=i;
-	found_C=kTRUE;
+	carbon=i;
+	foundCarbon=kTRUE;
       }
       else if (elem[i] == 8.0) {
-	O=i;
-	found_O=kTRUE;
+	oxygen=i;
+	foundOxygen=kTRUE;
       }
       else noblegas=i;
     }
-    if (!(found_C && found_O)) {
+    if (!(foundCarbon && foundOxygen)) {
       cout << "-E- This gas mixture has no CO2 admixture" << endl;
       cout << "-E- If you want to use this mixture you have to change" << endl;
       cout << "-E- CbmTrdRadiator to be consistent" << endl;
@@ -135,15 +135,15 @@ void CbmTrdGas::Init() {
     }
 
 
-    Double_t Axe=amixt[noblegas];
-    Double_t Ac=amixt[C];
-    Double_t Ao=amixt[O];
+    Double_t massXe=amixt[noblegas];
+    Double_t massC=amixt[carbon];
+    Double_t massO=amixt[oxygen];
     Double_t x=weight[noblegas];
-    Double_t percent_noblegas=100*(((Ac*x)+(2*Ao*x))/
-			      (Axe+Ac*x+2*Ao*x-Axe*x));
+    Double_t percentNoblegas=100*(((massC*x)+(2*massO*x))/
+			      (massXe+massC*x+2*massO*x-massXe*x));
 
     
-    fPercentNobleGas = TMath::Nint(percent_noblegas)/100.;
+    fPercentNobleGas = TMath::Nint(percentNoblegas)/100.;
     fPercentCO2 = 1-fPercentNobleGas;
 
     if (elem[noblegas] == 54) cout << " -I- Percent  (Xe) : " <<(fPercentNobleGas*100) <<endl;
@@ -155,7 +155,7 @@ void CbmTrdGas::Init() {
 
 }
 
-TString CbmTrdGas::GetFileName(TString method) {
+TString CbmTrdGas::GetFileName(TString method) const {
 
   if (method.Contains("Like")) {
     return fFileNameLike;

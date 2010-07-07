@@ -11,19 +11,23 @@ class CbmTrdGas : public TObject {
     //    virtual ~CbmTrdGas();
 
     void Init();
-    TString GetFileName(TString method);
+    TString GetFileName(TString method) const;
 
-    inline Int_t    GetDetType()      {return fDetType;}
-    inline Double_t GetGasThick()     {return fGasThick;}
-    inline Double_t GetNobleGas()     {return fPercentNobleGas;}
-    inline Double_t GetCO2()          {return fPercentCO2;}
-    inline Int_t    GetNobleGasType() {return fNobleGasType;}
+    Int_t    GetDetType() const      {return fDetType;}
+    Double_t GetGasThick() const     {return fGasThick;}
+    Double_t GetNobleGas() const     {return fPercentNobleGas;}
+    Double_t GetCO2() const          {return fPercentCO2;}
+    Int_t    GetNobleGasType() const {return fNobleGasType;}
 
     // static access method
     static CbmTrdGas* Instance() {return fgInstance;}
 
 
  private:
+
+    CbmTrdGas& operator=(const CbmTrdGas&);
+    CbmTrdGas(const CbmTrdGas&);
+
     Int_t              fDetType;         /** Detector type (GSI=0, MB=1) */
     Double_t           fGasThick;        /** Thickness of the gas layer */
     Double_t           fPercentNobleGas; /** Percentage of noble gas */

@@ -15,8 +15,8 @@
  **/
 
 
-#ifndef CBMTRDTRACKFINDERIDEAL
-#define CBMTRDTRACKFINDERIDEAL 1
+#ifndef CBMTRDTRACKFINDERIDEAL_H
+#define CBMTRDTRACKFINDERIDEAL_H
 
 
 #include "CbmTrdTrackFinder.h"
@@ -51,12 +51,21 @@ class CbmTrdTrackFinderIdeal : public CbmTrdTrackFinder
    **
    *@value Number of tracks created
    **/
- virtual Int_t DoFind(TClonesArray* hitArray,
+  virtual Int_t DoFind(TClonesArray* hitArray,
 		      TClonesArray* trackArray);
 
+  /** Public accessors **/
+  const Int_t& GetNoTrdStations() const {return fNoTrdStations;};
+  const Int_t& GetNoTrdPerStation() const {return fNoTrdPerStation;};
+  const Int_t& GetVerbose() const {return fVerbose;};
 
+  /** Public modifiers **/
+  void SetVerbose(const Int_t& verbose) {fVerbose = verbose;};
 
  private:
+
+  CbmTrdTrackFinderIdeal& operator=(const CbmTrdTrackFinderIdeal&);
+  CbmTrdTrackFinderIdeal(const CbmTrdTrackFinderIdeal&);
 
   /** Arrays of MC information **/
   TClonesArray* fMCTrackArray;
@@ -76,17 +85,6 @@ class CbmTrdTrackFinderIdeal : public CbmTrdTrackFinder
    **/
   Int_t fVerbose;
   Int_t fEventNum;
-
- public:
-
-  /** Public accessors **/
-  inline const Int_t& GetNoTrdStations() const {return fNoTrdStations;};
-  inline const Int_t& GetNoTrdPerStation() const {return fNoTrdPerStation;};
-  inline const Int_t& GetVerbose() const {return fVerbose;};
-
-  /** Public modifiers **/
-  inline void SetVerbose(const Int_t& verbose) {fVerbose = verbose;};
-
 
   ClassDef(CbmTrdTrackFinderIdeal,1);
 

@@ -7,9 +7,10 @@
 
 #include <map>
 #include <list>
+#include "CbmTrdDigi.h"
 
 class CbmTrdDigiPar;
-class CbmTrdDigi;
+//class CbmTrdDigi;
 class CbmTrdModule;
 class CbmTrdRadiator;
 
@@ -55,6 +56,9 @@ class CbmTrdClusterizer : public FairTask {
   void Register();
 
  private:
+
+  CbmTrdClusterizer& operator=(const CbmTrdClusterizer&);
+  CbmTrdClusterizer(const CbmTrdClusterizer&);
 
   void GetModuleInformationFromDigiPar(Bool_t Sector, Int_t VolumeID);
   void GetModuleInformation();
@@ -171,15 +175,15 @@ class CbmTrdClusterizer : public FairTask {
   TClonesArray *fDigiMatchCollection; //! Corresponding MCPoints to TRD digis
   TClonesArray *fMCStacks;  //! MC Track information
 
-  CbmTrdDigiPar  *fDigiPar;
-  CbmTrdModule   *fModuleInfo;
-  CbmTrdRadiator *fRadiators; 
+  CbmTrdDigiPar  *fDigiPar;    //!
+  CbmTrdModule   *fModuleInfo; //!
+  CbmTrdRadiator *fRadiators;  //!
 
   CbmTrdDetectorId fTrdId; //!
     
   /**  map to store digis for pair of x,y position in module **/
   // map<pair<ModuleID,pair<x,y>>, CbmTrdDigi*>
-  std::map<std::pair< Int_t, std::pair< Int_t, Int_t > >, CbmTrdDigi* > fDigiMap; 
+  std::map<std::pair< Int_t, std::pair< Int_t, Int_t > >, CbmTrdDigi* > fDigiMap; //!
   /**  iterator over map to store digis for pair of x,y position in module **/
   std::map<std::pair< Int_t, std::pair< Int_t, Int_t > >, CbmTrdDigi* >::iterator fDigiMapIt; //! iterator over array above
 

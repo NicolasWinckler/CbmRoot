@@ -29,9 +29,7 @@ void run_sim(Int_t nEvents = 2)
   TString stsGeom    = "sts_standard.geo";
   TString richGeom   = "rich_standard.geo";
 //  TString trdGeom    = "trd_squared_modules_jun10.geo";
-//  TString trdGeom    = "../macro/trd/trd_squared_modules_jun10_layer01.geo";
-//  TString trdGeom    = "../macro/trd/trd_squared_modules_jun10_v01.geo";
-  TString trdGeom    = "../macro/trd/trd_squared_modules_jun10_v02.geo";
+  TString trdGeom    = "../macro/trd/trd_squared_modules.geo";
   TString tofGeom    = "tof_standard.geo";
   TString ecalGeom   = "ecal_FastMC.geo";
   

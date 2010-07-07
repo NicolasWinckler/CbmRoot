@@ -166,9 +166,12 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
   Int_t ModuleID[10];
   Int_t Sector = 0;
   Char_t trddigiparpath[100] = "trd.digi.par";
-  printf("Which ...digi.par?\n");
-  cin >> trddigiparpath;
-  cout << trddigiparpath << endl;
+
+  //// do not ask for the filename   
+  //  printf("Which ...digi.par?\n");
+  //  cin >> trddigiparpath;         
+  //  cout << trddigiparpath << endl;
+
   std::ifstream digifile;
   digifile.open(trddigiparpath);
   if(!digifile.good()) 

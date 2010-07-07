@@ -82,16 +82,14 @@ private:
   TObjArray* fHistdEdx;          // Prob. of dEdx for 5 particle species
                                  // and several momenta
 
-  //  TString InputFile;             // name of the input file with the histos
-
   Int_t fNofTracks;              // Number of tracks successfully fitted
 
-  static const Int_t fNMom=13;   // number of momentum spectra
-  Double_t *fTrackMomentum;      // [fNMom] Track momenta for which spectra
-                                 // are available
-  Int_t fNBins;                  // number of energy bins
-  Double_t fBinSize;             // size of energy bin
-  static const Int_t fNParts=5;  // numer of different particle species
+  static const Int_t fgkNMom=13;   // number of momentum spectra
+  Double_t *fTrackMomentum;        // [fgkNMom] Track momenta for which spectra
+                                   // are available
+  Int_t fNBins;                    // number of energy bins
+  Double_t fBinSize;               // size of energy bin
+  static const Int_t fgkNParts=5;  // numer of different particle species
 
 
   enum EParticleType {
@@ -102,11 +100,11 @@ private:
     kMuon = 4,
   };
 
-  inline  Int_t        GetHistID(Int_t part, Int_t mom) const { 
-                                     return part*fNMom + mom; }
+  /** Get the correct histogramnumber for particle typ and momentum bin **/
+  Int_t  GetHistID(Int_t part, Int_t mom) const {return part*fgkNMom + mom;}
 
-
-  Bool_t ReadData(); // Read the histograms from file
+  /** Read the histograms from file **/
+  Bool_t ReadData(); 
 
   /** Calculate probability for particle with momentum and dEdx **/
    Double_t   GetProbability(Int_t iType, Double_t mom, Double_t dedx) const;

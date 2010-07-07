@@ -13,7 +13,7 @@
 #include "CbmStsTrack.h"
 
 #include "TClonesArray.h"
-#include "TH1F.h"
+#include "TH1.h"
 #include "TString.h"
 #include "TMath.h"
 #include "TROOT.h"
@@ -73,17 +73,17 @@ Bool_t CbmTrdSetTracksPidLike::ReadData()
      fTrdGas = new CbmTrdGas();
      fTrdGas->Init();
   }
-  TString InputFile = fTrdGas->GetFileName("Like");
+  TString inputFile = fTrdGas->GetFileName("Like");
 
   // Open ROOT file with the histograms
-  TFile *histFile = new TFile(InputFile, "READ");
+  TFile *histFile = new TFile(inputFile, "READ");
   if (!histFile || !histFile->IsOpen()) {
     cout << " -E- CbmTrdSetTracksPidWkn::ReadData "<<endl;
-    cout << " -E- Could not open input file." <<InputFile<< endl;
+    cout << " -E- Could not open input file." <<inputFile<< endl;
     return kFALSE;
   } else {
     cout <<" -I- CbmTrdSetTracksPidLike::ReadData " << endl;
-    cout <<" -I- InputFile: " << InputFile << endl;
+    cout <<" -I- inputFile: " << inputFile << endl;
   }
 
   gROOT->cd();
@@ -91,7 +91,7 @@ Bool_t CbmTrdSetTracksPidLike::ReadData()
   // Read the histograms and store them at the right position in
   // the TObjectArray
   Char_t text[200];
-  for (Int_t particle = 0; particle < fNParts; ++particle)
+  for (Int_t particle = 0; particle < fgkNParts; ++particle)
   {
     const Char_t* particleKey = "";
     switch (particle)
@@ -103,7 +103,7 @@ Bool_t CbmTrdSetTracksPidLike::ReadData()
       case CbmTrdSetTracksPidLike::kMuon:     particleKey = "MU"; break;
     }
 
-    for (Int_t imom = 0; imom < fNMom; imom++)
+    for (Int_t imom = 0; imom < fgkNMom; imom++)
     {
       if (imom<9){
         sprintf(text, "h1dEdx%s%01d", particleKey, imom+1);
@@ -138,14 +138,14 @@ InitStatus CbmTrdSetTracksPidLike::Init() {
   // Initalize data members
   //
 
-  fTrackMomentum = new Double_t[fNMom];
-  Double_t trackMomentum[fNMom] = {0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0,
+  fTrackMomentum = new Double_t[fgkNMom];
+  Double_t trackMomentum[fgkNMom] = {0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0,
                                    5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
-  for (Int_t imom = 0; imom < fNMom; imom++) {
+  for (Int_t imom = 0; imom < fgkNMom; imom++) {
     fTrackMomentum[imom] = trackMomentum[imom];
   }
 
-  fHistdEdx = new TObjArray(fNParts * fNMom);
+  fHistdEdx = new TObjArray(fgkNParts * fgkNMom);
   fHistdEdx->SetOwner();                        // ?????
 
   fNBins = 0;
@@ -154,7 +154,7 @@ InitStatus CbmTrdSetTracksPidLike::Init() {
   // Read the data from ROOT file. In case of problems return kFATAL;
 
   /*
-  if(!InputFile) {
+  if(!inputFile) {
     cout << "-E- CbmTrdSetTracksPidLike::Init: "
 	 << "No input file for histos set." << endl;
     return kFATAL;
@@ -219,8 +219,8 @@ InitStatus CbmTrdSetTracksPidLike::Init() {
 void CbmTrdSetTracksPidLike::Exec(Option_t* opt) {
 
   Double_t momentum;
-  Double_t prob[fNParts];
-  Double_t prob_total;
+  Double_t prob[fgkNParts];
+  Double_t probTotal;
 
 
   if ( !fTrackArray ) return;
@@ -276,8 +276,8 @@ void CbmTrdSetTracksPidLike::Exec(Option_t* opt) {
 
 
 
-    prob_total = 0.0;
-    for (Int_t iSpecies = 0; iSpecies < fNParts; iSpecies++) {
+    probTotal = 0.0;
+    for (Int_t iSpecies = 0; iSpecies < fgkNParts; iSpecies++) {
       prob[iSpecies] = 1.0;
     }
 
@@ -302,12 +302,12 @@ void CbmTrdSetTracksPidLike::Exec(Option_t* opt) {
     Double_t dEdx;
 
     for (Int_t iTRD=0; iTRD < pTrack->GetNofHits(); iTRD++){
-      Int_t TRDindex = pTrack->GetHitIndex(iTRD);
-      CbmTrdHit* trdHit = (CbmTrdHit*) fTrdHitArray->At(TRDindex);
+      Int_t index = pTrack->GetHitIndex(iTRD);
+      CbmTrdHit* trdHit = (CbmTrdHit*) fTrdHitArray->At(index);
 
       dEdx = trdHit->GetELoss()*1000000;
 
-      for (Int_t iSpecies = 0; iSpecies < fNParts; iSpecies++) {
+      for (Int_t iSpecies = 0; iSpecies < fgkNParts; iSpecies++) {
 
         prob[iSpecies] *= GetProbability(iSpecies, momentum, dEdx);
 
@@ -315,13 +315,13 @@ void CbmTrdSetTracksPidLike::Exec(Option_t* opt) {
 
     } // loop TRD hits
 
-    for (Int_t iSpecies = 0; iSpecies < fNParts; iSpecies++) {
-      prob_total +=  prob[iSpecies];
+    for (Int_t iSpecies = 0; iSpecies < fgkNParts; iSpecies++) {
+      probTotal +=  prob[iSpecies];
     }
 
-    for (Int_t iSpecies = 0; iSpecies < fNParts; iSpecies++) {
-      if (prob_total >0) {
-        prob[iSpecies] /= prob_total;
+    for (Int_t iSpecies = 0; iSpecies < fgkNParts; iSpecies++) {
+      if (probTotal >0) {
+        prob[iSpecies] /= probTotal;
       }
       else {
         prob[iSpecies] = -1.5;
@@ -348,7 +348,7 @@ Double_t CbmTrdSetTracksPidLike::GetProbability(Int_t k, Double_t mom, Double_t 
   Int_t    iEnBin = ((Int_t) (dedx/fBinSize+1));
   if(iEnBin > fNBins) iEnBin = fNBins;
 
-  if (k < 0 || k > fNParts) {
+  if (k < 0 || k > fgkNParts) {
     return 1;
   }
 
@@ -366,15 +366,15 @@ Double_t CbmTrdSetTracksPidLike::GetProbability(Int_t k, Double_t mom, Double_t 
   }
 
   // Upper Limit
-  if(mom>=fTrackMomentum[fNMom-1]) {
-    hist2 = (TH1F*) fHistdEdx->At(GetHistID(k,fNMom-1));
-    hist1 = (TH1F*) fHistdEdx->At(GetHistID(k,fNMom-2));
-    mom2 = fTrackMomentum[fNMom-1];
-    mom1 = fTrackMomentum[fNMom-2];
+  if(mom>=fTrackMomentum[fgkNMom-1]) {
+    hist2 = (TH1F*) fHistdEdx->At(GetHistID(k,fgkNMom-1));
+    hist1 = (TH1F*) fHistdEdx->At(GetHistID(k,fgkNMom-2));
+    mom2 = fTrackMomentum[fgkNMom-1];
+    mom1 = fTrackMomentum[fgkNMom-2];
   }
 
   // In the range
-  for (Int_t ip=1; ip<fNMom; ip++) {
+  for (Int_t ip=1; ip<fgkNMom; ip++) {
     if ((fTrackMomentum[ip-1]<= mom) && (mom<fTrackMomentum[ip])) {
       hist1 = (TH1F*) fHistdEdx->At(GetHistID(k,ip));
       hist2 = (TH1F*) fHistdEdx->At(GetHistID(k,ip-1));

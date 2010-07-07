@@ -14,7 +14,8 @@
 #define CBMTRDRADIATOR_H
 
 #include "TVector3.h"
-#include "TH1D.h"
+
+class TH1D;
 
 class CbmTrdRadiator 
 {
@@ -96,6 +97,9 @@ class CbmTrdRadiator
  
 private:
 
+   CbmTrdRadiator& operator=(const CbmTrdRadiator&);
+   CbmTrdRadiator(const CbmTrdRadiator&);
+
   /* Input parameters to be set */
  
   Int_t     fDetType;     // 0: GSI  1: Muenster-Bucarest 
@@ -124,7 +128,7 @@ private:
 
 
   Float_t   fnTRprod;     // <nTR> produced
-  Int_t     fSigmaT;      // set the absorption material
+  //  Int_t     fSigmaT;      // set the absorption material
 
   Float_t   fMyDens;
   Float_t   fMyThick;
@@ -140,16 +144,16 @@ private:
   Float_t*  fSigmaMy;     // [fSpNBins] Array of sigma values
   Float_t*  fSigmaDet;    // [fSpNBins] Array of sigma values
 
-  TH1D*     fSpectrum;    // TR photon energy spectrum
-  TH1D*     fMySpectrum;  // TR spectra in Mylar foil
-  TH1D*     fDetSpectrumA;// TR absorbed in Detector
-  TH1D*     fDetSpectrum; // TR passed through Detector
+  TH1D*     fSpectrum;    //! TR photon energy spectrum
+  TH1D*     fMySpectrum;  //! TR spectra in Mylar foil
+  TH1D*     fDetSpectrumA;//! TR absorbed in Detector
+  TH1D*     fDetSpectrum; //! TR passed through Detector
 
   static const Int_t fNMom=14; // number of momentum spectra  
   Double_t *fTrackMomentum;    // [fNMom] Track momenta for which spectra
                                // are available
 
-  TH1D*     fFinal[fNMom];     // Absorption spectra for different momenta
+  TH1D*     fFinal[fNMom];     //! Absorption spectra for different momenta
   Float_t   fnTRabs[fNMom];    // <nTR> absorbed for differnt momenta
   Float_t   fnTRab;            // <nTR> absorbed
 

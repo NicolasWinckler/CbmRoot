@@ -18,6 +18,8 @@
 
 #include <iostream>
 #include <map>
+using std::cout;
+using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrdMatchTracks::CbmTrdMatchTracks() :
@@ -74,7 +76,6 @@ InitStatus CbmTrdMatchTracks::Init() {
 		fUseClusters = kTRUE;
 	}
 
-
 	// Get TrdTrack array
 	fTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
 	if (fTracks == NULL)
@@ -111,7 +112,7 @@ void CbmTrdMatchTracks::Exec(Option_t* opt) {
 	    else
 		ExecCluster(opt);
 	}
-	std::cout << "Event: " << fNEvents++ << std::endl;
+	cout << "Event: " << fNEvents++ << endl;
 }
 
 // -----   Private method ExecSmearing   --------------------------------------------
@@ -146,23 +147,23 @@ void CbmTrdMatchTracks::ExecSmearing(Option_t* opt) {
 	for (Int_t iTrack = 0; iTrack < nTracks; iTrack++) {
 		track = (CbmTrdTrack*) fTracks->At(iTrack);
 		if (!track) {
-			std::cout << "-W- CbmTrdMatchTracks::Exec: Empty TrdTrack at "
-					<< iTrack << std::endl;
+			cout << "-W- CbmTrdMatchTracks::Exec: Empty TrdTrack at "
+					<< iTrack << endl;
 			continue;
 		}
 		nHits = track->GetNofHits();
 		nAll = nTrue = nWrong = nFake = nMCTracks = 0;
 		matchMap.clear();
 		if (fVerbose > 2)
-			std::cout << std::endl << "Track " << iTrack << ", TrdHits "
-					<< nHits << std::endl;
+			cout << endl << "Track " << iTrack << ", TrdHits "
+					<< nHits << endl;
 
 		// Loop over TRD hits of track
 		for (Int_t iHit = 0; iHit < nHits; iHit++) {
 			hit = (CbmTrdHit*) fHits->At(track->GetHitIndex(iHit));
 			if (!hit) {
-				std::cout << "-E- CbmTrdMatchTracks::Exec: " << "No TrdHit "
-						<< iHit << " for track " << iTrack << std::endl;
+				cout << "-E- CbmTrdMatchTracks::Exec: " << "No TrdHit "
+						<< iHit << " for track " << iTrack << endl;
 				continue;
 			}
 			iPoint = hit->GetRefId();
@@ -172,16 +173,16 @@ void CbmTrdMatchTracks::ExecSmearing(Option_t* opt) {
 			}
 			point = (FairMCPoint*) fPoints->At(iPoint);
 			if (!point) {
-				std::cout << "-E- CbmTrdMatchTracks::Exec: "
+				cout << "-E- CbmTrdMatchTracks::Exec: "
 						<< "Empty MCPoint " << iPoint << " from TrdHit "
-						<< iHit << " (track " << iTrack << ")" << std::endl;
+						<< iHit << " (track " << iTrack << ")" << endl;
 				continue;
 			}
 			iMCTrack = point->GetTrackID();
 			if (fVerbose > 2)
-				std::cout << "Track " << iTrack << ", TRD hit "
+				cout << "Track " << iTrack << ", TRD hit "
 						<< track->GetHitIndex(iHit) << ", TRDPoint " << iPoint
-						<< ", MCTrack " << iMCTrack << std::endl;
+						<< ", MCTrack " << iMCTrack << endl;
 			matchMap[iMCTrack]++;
 		}
 
@@ -189,8 +190,8 @@ void CbmTrdMatchTracks::ExecSmearing(Option_t* opt) {
 		iMCTrack = -1;
 		for (it = matchMap.begin(); it != matchMap.end(); it++) {
 			if (fVerbose > 2)
-				std::cout << it->second << " common points wth MCtrack "
-						<< it->first << std::endl;
+				cout << it->second << " common points wth MCtrack "
+						<< it->first << endl;
 			nMCTracks++;
 			nAll += it->second;
 			if (it->second > nTrue) {
@@ -200,10 +201,10 @@ void CbmTrdMatchTracks::ExecSmearing(Option_t* opt) {
 		}
 		nWrong = nAll - nTrue;
 		if (fVerbose > 1)
-			std::cout << "-I- CbmTrdMatchTracks: TrdTrack " << iTrack
+			cout << "-I- CbmTrdMatchTracks: TrdTrack " << iTrack
 					<< ", MCTrack " << iMCTrack << ", true " << nTrue
 					<< ", wrong " << nWrong << ", fake " << nFake
-					<< ", #MCTracks " << nMCTracks << std::endl;
+					<< ", #MCTracks " << nMCTracks << endl;
 
 		// Create TrdTrackMatch
 		new ((*fMatches)[iTrack]) CbmTrackMatch(iMCTrack, nTrue, nWrong, nFake,
@@ -226,22 +227,22 @@ void CbmTrdMatchTracks::ExecSmearing(Option_t* opt) {
 		Double_t qWrong = Double_t(nWrongSum) / Double_t(nHitSum) * 100.;
 		Double_t qFake = Double_t(nFakeSum) / Double_t(nHitSum) * 100.;
 		Double_t qMC = Double_t(nMCTrackSum) / Double_t(nTracks);
-		std::cout << std::endl;
-		std::cout << "-------------------------------------------------------"
-				<< std::endl;
-		std::cout << "-I-              TRD Track Matching                 -I-"
-				<< std::endl;
-		std::cout << "Reconstructed TrdTracks : " << nTracks << std::endl;
-		std::cout << "True  hit assignments   : " << qTrue << " %" << std::endl;
-		std::cout << "Wrong hit assignments   : " << qWrong << " %"
-				<< std::endl;
-		std::cout << "Fake  hit assignments   : " << qFake << " %" << std::endl;
-		std::cout << "MCTracks per TrdTrack   : " << qMC << std::endl;
-		std::cout << "--------------------------------------------------------"
-				<< std::endl;
+		cout << endl;
+		cout << "-------------------------------------------------------"
+				<< endl;
+		cout << "-I-              TRD Track Matching                 -I-"
+				<< endl;
+		cout << "Reconstructed TrdTracks : " << nTracks << endl;
+		cout << "True  hit assignments   : " << qTrue << " %" << endl;
+		cout << "Wrong hit assignments   : " << qWrong << " %"
+				<< endl;
+		cout << "Fake  hit assignments   : " << qFake << " %" << endl;
+		cout << "MCTracks per TrdTrack   : " << qMC << endl;
+		cout << "--------------------------------------------------------"
+				<< endl;
 	} else
-		std::cout << "-I- CbmTrdMatchTracks: rec. " << nTracks << ", quota "
-				<< qTrue << " % " << std::endl;
+		cout << "-I- CbmTrdMatchTracks: rec. " << nTracks << ", quota "
+				<< qTrue << " % " << endl;
 }
 // -------------------------------------------------------------------------
 
@@ -249,7 +250,7 @@ void CbmTrdMatchTracks::ExecSmearing(Option_t* opt) {
 void CbmTrdMatchTracks::ExecDigi(Option_t* opt) {
 	fMatches->Clear();
 
-        std::cout << "TRACK MATCHING USES DIGIS" << std::endl;
+        cout << "TRACK MATCHING USES DIGIS" << endl;
 	Int_t nofTracks = fTracks->GetEntriesFast();
 	for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) { // Loop over tracks
 		std::map<Int_t, Int_t> matchMap;
@@ -307,10 +308,10 @@ void CbmTrdMatchTracks::ExecDigi(Option_t* opt) {
 		fNofFakeHits += nofFake;
 
 		if (fVerbose > 1)
-			std::cout << "iTrack=" << iTrack << " mcTrack=" << bestMcTrackId
+			cout << "iTrack=" << iTrack << " mcTrack=" << bestMcTrackId
 					<< " nPoints=" << nPoints << " nofTrue=" << nofTrue
 					<< " nofWrong=" << nofWrong << " nofFake=" << nofFake
-					<< " nofMcTracks=" << nofMcTracks << std::endl;
+					<< " nofMcTracks=" << nofMcTracks << endl;
 	} // Loop over tracks
 }
 // -------------------------------------------------------------------------
@@ -319,7 +320,7 @@ void CbmTrdMatchTracks::ExecDigi(Option_t* opt) {
 void CbmTrdMatchTracks::ExecCluster(Option_t* opt) {
 	fMatches->Clear();
 
-	std::cout << "TRACK MATCHING USES CLUSTERS" << std::endl;
+	cout << "TRACK MATCHING USES CLUSTERS" << endl;
 
 	Int_t nofTracks = fTracks->GetEntriesFast();
 	for (Int_t iTrack = 0; iTrack < nofTracks; iTrack++) { // Loop over tracks
@@ -379,10 +380,10 @@ void CbmTrdMatchTracks::ExecCluster(Option_t* opt) {
 		fNofFakeHits += nofFake;
 
 		if (fVerbose > 1)
-			std::cout << "iTrack=" << iTrack << " mcTrack=" << bestMcTrackId
+			cout << "iTrack=" << iTrack << " mcTrack=" << bestMcTrackId
 					<< " nPoints=" << nPoints << " nofTrue=" << nofTrue
 					<< " nofWrong=" << nofWrong << " nofFake=" << nofFake
-					<< " nofMcTracks=" << nofMcTracks << std::endl;
+					<< " nofMcTracks=" << nofMcTracks << endl;
 	} // Loop over tracks
 }
 // -------------------------------------------------------------------------
@@ -393,14 +394,14 @@ void CbmTrdMatchTracks::Finish() {
 	Double_t trueHits = 100. * Double_t(fNofTrueHits) / Double_t(fNofHits);
 	Double_t wrongHits = 100. * Double_t(fNofWrongHits) / Double_t(fNofHits);
 	Double_t fakeHits = 100. * Double_t(fNofFakeHits) / Double_t(fNofHits);
-	std::cout << "================================================="
-			<< std::endl;
-	std::cout << "=====   " << GetName() << ": Run summary " << std::endl;
-	std::cout << "True hits: " << trueHits << "%" << std::endl;
-	std::cout << "Wrong hits: " << wrongHits << "%" << std::endl;
-	std::cout << "Fake hits: " << fakeHits << "%" << std::endl;
-	std::cout << "================================================="
-			<< std::endl;
+	cout << "================================================="
+			<< endl;
+	cout << "=====   " << GetName() << ": Run summary " << endl;
+	cout << "True hits: " << trueHits << "%" << endl;
+	cout << "Wrong hits: " << wrongHits << "%" << endl;
+	cout << "Fake hits: " << fakeHits << "%" << endl;
+	cout << "================================================="
+			<< endl;
 }
 // -------------------------------------------------------------------------
 

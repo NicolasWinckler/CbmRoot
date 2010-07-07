@@ -18,8 +18,6 @@
 
 #include "FairTask.h"
 
-#include <map>
-
 class TClonesArray;
 
 class CbmTrdMatchTracks: public FairTask {
@@ -52,6 +50,10 @@ public:
 	virtual void Finish();
 
 private:
+
+        CbmTrdMatchTracks& operator=(const  CbmTrdMatchTracks&);
+        CbmTrdMatchTracks(const  CbmTrdMatchTracks&);        
+                
 	/** Execution in case of smearing hit producer **/
 	virtual void ExecSmearing(Option_t* opt);
 

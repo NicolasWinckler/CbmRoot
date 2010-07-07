@@ -42,12 +42,8 @@ void run_reco_trd_hitrate_test(Int_t nEvents = 1)
   TObjString stsDigiFile = paramDir + "sts_standard.digi.par";
   parFileList->Add(&stsDigiFile);
 
-  TString trdDigiDir = gSystem->Getenv("VMCWORKDIR");
-  trdDigiDir += "/macro/run/";
-
-  TObjString trdDigiFile = trdDigiDir + "trd.digi.par";
+  TObjString trdDigiFile = "./trd.digi.par";
   parFileList->Add(&trdDigiFile);
-
 
   // Output file
   TString outFile = "data/test.eds.root";

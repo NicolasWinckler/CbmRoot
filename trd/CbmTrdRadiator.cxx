@@ -10,6 +10,7 @@
 #include "TRandom.h"
 #include "TFile.h"
 #include "TMath.h"
+#include "TH1.h"
 
 #include <iostream>
 #include <iomanip>
@@ -194,14 +195,17 @@ void CbmTrdRadiator::Init(Bool_t SimpleTR, Int_t Nfoils, Float_t FoilThick, Floa
 
       ProduceSpectra();
      
+        TFile* oldfile=gFile;
         TFile* f1 = new TFile("histos.root", "recreate");
+        f1->cd();
 
         for (Int_t i=0 ; i < fNMom; i++){
           fFinal[i]->Write();
         }
+
         f1->Close();
         f1->Delete();
-     
+        gFile=oldfile;
     }
 
 

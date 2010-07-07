@@ -24,6 +24,9 @@ void run_reco_trd_hitrate_test(Int_t nEvents = 1)
   // ========================================================================
   //          Adjust this part according to your requirements
 
+  gStyle->SetPalette(1);
+  gROOT->SetStyle("Plain");
+
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;
 

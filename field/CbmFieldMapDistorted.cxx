@@ -6,16 +6,20 @@
 #include "CbmFieldMapDistorted.h"
 
 #include "CbmFieldPar.h"
-#include "FairField.h"
 #include "CbmFieldConst.h"
 #include "CbmFieldMapSym1.h"
 #include "CbmFieldMapSym2.h"
 #include "CbmFieldMapSym3.h"
 
-#include "TFile.h"
-#include "TArrayF.h"
-#include "TSystem.h"
+#include "FairField.h"
 
+#include "TFile.h"
+//#include "TArrayF.h"
+#include "TSystem.h"
+#include "TH1.h"
+#include "TFormula.h"
+
+#include <iostream>
 using std::cout;
 using std::cerr;
 using std::endl;

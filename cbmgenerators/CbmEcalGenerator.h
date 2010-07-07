@@ -3,7 +3,7 @@
 
 #include "FairGenerator.h"
 
-#include <iostream>
+//#include <iostream>
 
 
 class FairPrimaryGenerator;

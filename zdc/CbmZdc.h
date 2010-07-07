@@ -17,13 +17,11 @@
 
 #include "FairDetector.h"
 
-#include "TClonesArray.h"
 #include "TLorentzVector.h"
-#include "TVector3.h"
 
 class CbmZdcPoint; 
 class FairVolume;
-
+class TClonesArray;
 
 
 class CbmZdc : public FairDetector 

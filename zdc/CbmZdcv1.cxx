@@ -7,16 +7,8 @@
 #include "CbmZdcv1.h"
 
 #include "CbmZdcPoint.h"
-#include "CbmGeoZdc.h"
-
-#include "FairGeoInterface.h"
-#include "FairGeoLoader.h"
-#include "FairGeoNode.h"
-#include "FairGeoRootBuilder.h"
-#include "FairRootManager.h"
 
 #include "TClonesArray.h"
-#include "TGeoMCGeometry.h"
 #include "TGeoManager.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"

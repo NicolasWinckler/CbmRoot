@@ -5,16 +5,15 @@
 #include "CbmFindGlobalTracksQa.h"
 
 #include "CbmGlobalTrack.h"
-
-#include "FairRootManager.h"
 #include "CbmMCTrack.h"
 #include "CbmTofPoint.h"
 #include "CbmTofHit.h"
 #include "CbmTrackMatch.h"
 
+#include "FairRootManager.h"
+
 #include "TClonesArray.h"
-#include "TH1F.h"
-#include "TMath.h"
+#include "TH1.h"
 #include "TDirectory.h"
 
 #include <iostream>

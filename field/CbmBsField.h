@@ -22,9 +22,10 @@
 #include "CbmFieldMap.h"
 
 #include "TString.h"
-#include "TArrayF.h"
 
 class CbmFieldPar;
+
+class TArrayF;
 
 class CbmBsField :public CbmFieldMap{
 public:

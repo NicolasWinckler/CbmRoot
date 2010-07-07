@@ -3,7 +3,6 @@
 
 #include "TObject.h"
 #include "TLorentzVector.h"
-#include "TMath.h"
 
 class TParticle;
 

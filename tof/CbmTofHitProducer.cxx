@@ -9,16 +9,13 @@
 
 #include "CbmTofPoint.h"
 #include "CbmTofHit.h"
-
-#include "FairMCApplication.h"
-#include "FairDetector.h"
-#include "FairRootManager.h"
 #include "CbmMCTrack.h"
+
+#include "FairRootManager.h"
 
 #include "TRandom.h"
 #include "TString.h"
 #include "TVector3.h"
-#include "TMath.h"
 #include "TSystem.h"
 #include "TClonesArray.h"
 

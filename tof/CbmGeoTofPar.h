@@ -3,7 +3,9 @@
 
 #include "FairParGenericSet.h"
 
-#include "TH1F.h"
+class FairParamList;
+
+class TObjArray;
 
 class CbmGeoTofPar : public FairParGenericSet {
 public:

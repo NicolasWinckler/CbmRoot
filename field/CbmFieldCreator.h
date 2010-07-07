@@ -7,9 +7,11 @@
 #ifndef CBMFIELDCREATOR_H
 #define CBMFIELDCREATOR_H
 
-#include "FairField.h"
 #include "FairFieldFactory.h"
-#include "CbmFieldPar.h"
+
+class CbmFieldPar;
+
+class FairField;
 
 class CbmFieldCreator : public FairFieldFactory 
 {

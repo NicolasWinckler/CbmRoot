@@ -9,12 +9,6 @@
 
 #include "TArrayF.h"
 
-#include <iostream>
-
-using std::cout;
-using std::endl;
-
-
 // -------------   Default constructor  ----------------------------------
 CbmFieldMapSym2::CbmFieldMapSym2() { 
   fType = 2;

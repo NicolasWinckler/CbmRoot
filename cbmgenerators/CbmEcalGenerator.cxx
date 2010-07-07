@@ -7,9 +7,9 @@
 #include "TDatabasePDG.h"
 #include "TMath.h"
 
-#include <iostream>
+//#include <iostream>
 
-using namespace std;
+//using namespace std;
 
 // ------------------------------------------------------------------------
 CbmEcalGenerator::CbmEcalGenerator() :

@@ -10,8 +10,6 @@
 
 #include "CbmGeoZdc.h"
 
-#include "FairGeoNode.h"
-
 ClassImp(CbmGeoZdc)
 
 CbmGeoZdc::CbmGeoZdc() {

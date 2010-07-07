@@ -9,7 +9,9 @@
 #define CBMPIXELHITSETDRAW_H_
 
 #include "FairPointSetDraw.h"
-#include "TVector3.h"
+
+class TVector3;
+class TObject;
 
 class CbmPixelHitSetDraw: public FairPointSetDraw
 {

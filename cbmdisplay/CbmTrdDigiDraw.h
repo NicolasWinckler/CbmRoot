@@ -17,11 +17,14 @@
 
 #include "FairTask.h"
 
-#include "CbmTrdDigiPar.h"
-#include "CbmTrdModule.h"
+//#include "CbmTrdDigiPar.h"
+//#include "CbmTrdModule.h"
 #include "CbmTrdDetectorId.h"
 
+class CbmTrdDigiPar;
+class CbmTrdModule;
 class FairEventManager;
+
 class TClonesArray;
 class TEveBoxSet;
 
@@ -63,8 +66,8 @@ protected:
   /** Action after each event**/
   virtual void Finish() ;
   TClonesArray *fPointList; //!
-  CbmTrdDigiPar *fDigiPar;
-  CbmTrdModule *fModuleInfo;
+  CbmTrdDigiPar *fDigiPar; //!
+  CbmTrdModule *fModuleInfo; //!
   FairEventManager *fEventManager;   //!
   TEveBoxSet* fq;    //!
   CbmTrdDetectorId fTrdId; //!

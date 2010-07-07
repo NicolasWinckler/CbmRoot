@@ -18,12 +18,12 @@
 
 #include "FairDetector.h"
 
-#include "TClonesArray.h"
 #include "TLorentzVector.h"
-#include "TVector3.h"
 
 class CbmTofPoint;
 class FairVolume; 
+class TClonesArray;
+class TVector3;
 
 class CbmTof : public FairDetector
 {

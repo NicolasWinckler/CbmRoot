@@ -4,7 +4,6 @@
 // -------------------------------------------------------------------------
 
 #include "CbmTrdDigiDraw.h"
-//#include "FairHit.h"
 
 #include "FairRootManager.h"
 #include "FairRuntimeDb.h"
@@ -14,13 +13,13 @@
 #include "CbmTrdModule.h"
 #include "CbmTrdDigiPar.h"
 
-#include "TEveQuadSet.h"
+//#include "TEveQuadSet.h"
 #include "TEveManager.h"
 #include "TEveBoxSet.h"
-#include "TEveTreeTools.h"
+//#include "TEveTreeTools.h"
 
 #include "TClonesArray.h"
-#include "TObjArray.h"
+//#include "TObjArray.h"
 #include "TVector3.h"
 
 #include <iostream>

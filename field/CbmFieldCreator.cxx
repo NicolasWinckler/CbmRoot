@@ -1,5 +1,6 @@
 #include "CbmFieldCreator.h"
 
+#include "CbmFieldPar.h"
 #include "CbmFieldConst.h"
 #include "CbmFieldMap.h"
 #include "CbmFieldMapSym2.h"
@@ -10,7 +11,9 @@
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairField.h"
 
+#include <iostream>
 using std::cout;
 using std::cerr;
 using std::endl;

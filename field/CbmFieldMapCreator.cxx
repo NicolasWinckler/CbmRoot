@@ -79,7 +79,7 @@ Bool_t CbmFieldMapCreator::CreateMap(const char* fileName) {
 
   // Define output file name
   TString outFileName = fileName;
-  if (fileName = "") outFileName = fMapName + ".root";
+  if (fileName == "") outFileName = fMapName + ".root";
 
   // Check for proper intialisation
   if ( ! fInit ) {

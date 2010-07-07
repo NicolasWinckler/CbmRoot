@@ -5,17 +5,14 @@
 
 #include "CbmUrqmdGenerator.h"
 
+#include "CbmPrimaryGenerator.h"
+#include "CbmMCEvent.h"
+
 #include "TLorentzVector.h"
 #include "TMath.h"
 #include "TRandom.h"
 
-#include "CbmPrimaryGenerator.h"
-#include "CbmMCEvent.h"
-
 #include <iostream>
-#include <cstring>
-
-
 using std::cout;
 using std::endl;
 

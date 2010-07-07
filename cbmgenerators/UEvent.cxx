@@ -1,13 +1,12 @@
-#include <iostream>
-using namespace std;
+#include "UEvent.h"
 
-#include "TObject.h"
+#include "UParticle.h"
+
 #include "TString.h"
 #include "TClonesArray.h"
 
-#include "UParticle.h"
-#include "UEvent.h"
-
+#include <iostream>
+using namespace std;
 
 //____________________________________________________________________
 //

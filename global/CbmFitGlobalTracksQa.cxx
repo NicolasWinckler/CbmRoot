@@ -15,7 +15,7 @@
 #include "CbmTrdTrack.h"
 
 #include "TClonesArray.h"
-#include "TH1F.h"
+#include "TH1.h"
 #include "TVector3.h"
 #include "TMath.h"
 

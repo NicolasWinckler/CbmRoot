@@ -16,11 +16,9 @@
 #ifndef CBMFIELDPAR_H
 #define CBMFIELDPAR_H 1
 
-
-#include "FairField.h"
 #include "FairParGenericSet.h"
 
-
+class FairField;
 class FairParamList;
 
 const int kMaxFieldMapType = 5;        

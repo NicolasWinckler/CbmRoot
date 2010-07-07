@@ -6,9 +6,12 @@
  */
 
 #include "CbmPixelHitSetDraw.h"
+
 #include "CbmPixelHit.h"
 
 #include <iostream>
+using std::cout;
+using std::endl;
 
 CbmPixelHitSetDraw::CbmPixelHitSetDraw()
 {
@@ -25,7 +28,7 @@ TVector3 CbmPixelHitSetDraw::GetVector(TObject* obj)
 {
 	CbmPixelHit* p = (CbmPixelHit*)obj;
 	if (fVerbose > 1)
-		std::cout << "-I- CbmPixelHitSetDraw::GetVector: " << p->GetX() << " " << p->GetY() << " " << p->GetZ() << std::endl;
+		cout << "-I- CbmPixelHitSetDraw::GetVector: " << p->GetX() << " " << p->GetY() << " " << p->GetZ() << endl;
 	return TVector3(p->GetX(), p->GetY(), p->GetZ());
 }
 

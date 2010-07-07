@@ -13,14 +13,13 @@
 #include "FairGeoVector.h"
 #include "FairGeoRotation.h"
 
-#include "TVector3.h"
-
-class FairBaseParSet;
 class CbmGeoSttPar;
 class CbmSttPoint;
-
 class CbmSttHit;
-//class CbmTrdRadiator;
+
+class FairBaseParSet;
+
+class TVector3;
 class TClonesArray;
 
 class CbmSttHitProducer : public FairTask {

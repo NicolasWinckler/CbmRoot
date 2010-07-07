@@ -6,12 +6,11 @@
 
 #include "TFile.h"
 #include "TSystem.h"
-#include "TVectorF.h"
-
+#include "TArrayF.h"
+ 
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include <cstdlib>
 
 using std::cout;
 using std::cerr;
@@ -149,7 +148,7 @@ void CbmBsField::readBsRootfile (const char *name)    // Read  Field Splined
 	TFile *f=new TFile(name, "READ");		
 	if (f->IsZombie()) {
 	    cout << "-E- CbmBsField::readBsRootfile:  can not read from file: " << endl;
-	    exit(-1);
+	    Fatal("CbmBsField::readBsRootfile:","Can not read from input file");
 	  }
 	const char *bsname=fBsName.Data();
  	CbmBsField *fnew=new CbmBsField(bsname);

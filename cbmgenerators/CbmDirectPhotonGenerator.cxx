@@ -8,9 +8,9 @@
 
 #include "TChain.h"
 
-#include <iostream>
+//#include <iostream>
 
-using namespace std;
+//using namespace std;
 // -----   Default constructor   ------------------------------------------
 CbmDirectPhotonGenerator::CbmDirectPhotonGenerator()
   : fNEvent(-2), fInput(NULL)

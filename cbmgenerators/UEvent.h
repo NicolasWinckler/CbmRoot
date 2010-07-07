@@ -4,10 +4,10 @@
 #include "TObject.h"
 #include "TLorentzVector.h"
 
-class TString;
-class TClonesArray;
 class UParticle;
 
+class TString;
+class TClonesArray;
 
 class UEvent : public TObject {
 

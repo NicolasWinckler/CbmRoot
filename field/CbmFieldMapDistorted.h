@@ -9,11 +9,10 @@
 
 
 #include "CbmFieldMap.h"
-#include "TFormula.h"
-#include "TH1D.h"
-
 
 class CbmFieldPar;
+
+class TFormula;
 
 class CbmFieldMapDistorted : public CbmFieldMap {
 

@@ -10,8 +10,6 @@
 
 #include "CbmGeoTof.h"
 
-#include "FairGeoNode.h"
-
 ClassImp(CbmGeoTof)
 
 CbmGeoTof::CbmGeoTof() {

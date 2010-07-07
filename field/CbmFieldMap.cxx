@@ -3,25 +3,22 @@
 // -----         Created 12/01/04  by M. Al/Turany (CbmField.cxx)      -----
 // -----                Redesign 13/02/06  by V. Friese                -----
 // -------------------------------------------------------------------------
+// Includes from CBMROOT
+#include "CbmFieldMap.h"
 
-
-// Includes from C
-#include <iomanip>
-#include <iostream>
-#include <fstream>
+#include "CbmFieldMapCreator.h"
+#include "CbmFieldMapData.h"
+#include "CbmFieldPar.h"
 
 // Includes from ROOT
 #include "TArrayF.h"
 #include "TFile.h"
 #include "TMath.h"
 
-// Includes from CBMROOT
-#include "CbmFieldMap.h"
-#include "CbmFieldMapCreator.h"
-#include "CbmFieldMapData.h"
-#include "CbmFieldPar.h"
-
-
+// Includes from C
+#include <iomanip>
+#include <iostream>
+#include <fstream>
 
 using std::cout;
 using std::cerr;
@@ -30,7 +27,6 @@ using std::right;
 using std::flush;
 using std::setw;
 using std::showpoint;
-using TMath::Nint;
 
 
 // -------------   Default constructor  ----------------------------------

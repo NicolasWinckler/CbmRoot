@@ -8,19 +8,17 @@
 #include "CbmGeoZdc.h"
 #include "CbmGeoZdcPar.h"
 #include "CbmZdcPoint.h"
-
 #include "CbmDetectorList.h"
+
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
-#include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
 #include "FairRun.h"
 #include "FairRuntimeDb.h"
 #include "FairVolume.h"
 
 #include "TClonesArray.h"
-#include "TGeoMCGeometry.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
 

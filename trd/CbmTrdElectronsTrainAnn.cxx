@@ -10,9 +10,11 @@
 #include "TMVA/Config.h"
 #include <iostream>
 #include <vector>
+#include "TLine.h"
 using std::cout;
 using std::endl;
-
+#include "../littrack/utils/CbmLitDrawHist.cxx"
+#include "../littrack/utils/CbmLitUtils.cxx"
 CbmTrdElectronsTrainAnn::CbmTrdElectronsTrainAnn()
 {
 	Init();
@@ -53,10 +55,10 @@ void CbmTrdElectronsTrainAnn::Init()
 	Int_t nofBins = 2000;
 	fMaxEval = 1.3;
 	fMinEval = -1.3;
-	fhAnnOutputPi = new TH1D("fhAnnOutputPi","Output;Output;Entries",nofBins, fMinEval, fMaxEval);
-	fhAnnOutputEl = new TH1D("fhAnnOutputEl","Optput;Output;Entries",nofBins, fMinEval, fMaxEval);
-	fhCumProbPi = new TH1D("fhCumProbPi","Cumulative probability;ANN output;Cumulative probability",nofBins, fMinEval, fMaxEval);
-	fhCumProbEl = new TH1D("fhCumProbEl","Cumulative probability;ANN output;Cumulative probability",nofBins, fMinEval, fMaxEval);
+	fhAnnOutputPi = new TH1D("fhAnnOutputPi","Output;output;yield",nofBins, fMinEval, fMaxEval);
+	fhAnnOutputEl = new TH1D("fhAnnOutputEl","Optput;output;yield",nofBins, fMinEval, fMaxEval);
+	fhCumProbPi = new TH1D("fhCumProbPi","Cumulative probability;output;cumulative probability",nofBins, fMinEval, fMaxEval);
+	fhCumProbEl = new TH1D("fhCumProbEl","Cumulative probability;output;cumulative probability",nofBins, fMinEval, fMaxEval);
     fhElNofClusters = new TH1D("fhElNofClusters","Number of clusters;number of clusters; entries",13, 0, 13);
     fhPiNofClusters = new TH1D("fhPiNofClusters","Number of clusters;number of clusters; entries",13, 0., 13.);
     fhElElossMediana= new TH1D("fhElElossMediana","Eloss mediana;mediana, GeV; entries",100, 0, 1);
@@ -109,7 +111,6 @@ void CbmTrdElectronsTrainAnn::InitCumHistos()
 	}
 
 	char hName[50];
-//	TMVA::PDF * pdfEl = new TMVA::PDF("pdfSortEl", true);
 	for (int i = 0; i < fNofLayers; i++) {
 		sprintf(hName, "fhCumProbSortPi%d", i);
 		fhCumProbSortPi[i] = (TH1D*) f->Get(hName)->Clone();
@@ -118,29 +119,14 @@ void CbmTrdElectronsTrainAnn::InitCumHistos()
 		sprintf(hName, "fhElossSortPi%d", i);
 		fhPdfSortPi[i] = (TH1D*) f->Get(hName)->Clone();
 		fhPdfSortPi[i]->Rebin(20);
-		fhPdfSortPi[i]->Scale(1./FindArea(fhPdfSortPi[i]));
-		//fhPdfSortPi[i]->Scale(1./fhPdfSortPi[i]->GetMaximum());
+		fhPdfSortPi[i]->Scale(1./fhPdfSortPi[i]->Integral());
 		sprintf(hName, "fhElossSortEl%d", i);
 		fhPdfSortEl[i] = (TH1D*) f->Get(hName)->Clone();
 		fhPdfSortEl[i]->Rebin(20);
-		fhPdfSortEl[i]->Scale(1./FindArea(fhPdfSortEl[i]));
-		//fhPdfSortEl[i]->Scale(1./fhPdfSortEl[i]->GetMaximum());
+		fhPdfSortEl[i]->Scale(1./fhPdfSortEl[i]->Integral());
 	}
 	//f->Close();
 	//delete f;
-}
-
-Double_t CbmTrdElectronsTrainAnn::FindArea(TH1* h)
-{
-	Double_t w = h->GetBinWidth(1);
-	cout << "-I- bin width = " << w << endl;
-	cout << "-I- nBins = " << h->GetNbinsX() << endl;
-	Double_t a = 0.;
-	for (Int_t i = 1; i <= h->GetNbinsX(); i++){
-		a += w * h->GetBinContent(i);
-	}
-	cout << "-I- area = " << a << endl;
-	return a;
 }
 
 void CbmTrdElectronsTrainAnn::Run()
@@ -306,7 +292,7 @@ Int_t CbmTrdElectronsTrainAnn::GetNofClusters()
 {
 	Int_t nofClusters = 0;
 	for (Int_t iHit = 0; iHit < fElossVec.size(); iHit++) {
-		if ( fElossVec[iHit] > 7.e-6){
+		if ( fElossVec[iHit] > 5.e-6){
 			nofClusters++;
 		}
 	} //iHit
@@ -354,7 +340,7 @@ Double_t CbmTrdElectronsTrainAnn::Eval(Bool_t isEl)
 	}else if (fIdMethod == kMEDIANA){
 		sort(fElossVec.begin(), fElossVec.end());
 		Double_t eval = (fElossVec[5] + fElossVec[6])/2.;
-		if (eval > 4.56e-6) return 1.;
+		if (eval > 3.9e-6) return 1.;
 		return -1.;
 
 	}else if (fIdMethod == kLIKELIHOOD){
@@ -548,6 +534,12 @@ void CbmTrdElectronsTrainAnn::DoPreTest()
 		count++;
 		if (count < fMaxNofTrainEl) continue;//exclude training samples
 		if (count%50000 == 0) cout << "-I- read Electron number: "<< count << endl;
+
+		//change electon hit to pion hit
+		//int randPi = rand()%fElossPi.size();
+	        //for (int i1 = 0; i1 < 5; i1++){
+	       //     fElossEl[iE][i1] = fElossPi[randPi][i1];
+	       // }
 		for (int i = 0; i < fNofLayers; i++){
 			if (fSigmaError !=0.)fElossEl[iE][i]+=fRandom->Gaus(0., fSigmaError);
 			fElossVec[i] = fElossEl[iE][i];
@@ -566,11 +558,16 @@ void CbmTrdElectronsTrainAnn::DoPreTest()
 		count++;
 		if (count < fMaxNofTrainPi) continue; //exclude training samples
 		if (count%50000 == 0) cout << "-I- read Pion number: "<< count << endl;
+
+		//change pion hit to electron hit
+	       // int randEl = rand()%fElossEl.size();
+	       // for (int i1 = 0; i1 < 1; i1++){
+	       //     fElossPi[iP][i1] = fElossEl[randEl][i1];
+	       // }
 		for (int i = 0; i < fNofLayers; i++){
 			if (fSigmaError !=0.)fElossPi[iP][i]+=fRandom->Gaus(0., fSigmaError);
 			fElossVec[i] = fElossPi[iP][i];
 		}
-
 
 		Transform();
 		FillProbabilityHistos(false);
@@ -591,6 +588,8 @@ void CbmTrdElectronsTrainAnn::DoTest()
 
 	DoPreTest();
 	fAnnCut = FindOptimalCut();
+
+
 	cout << " optimal cut = " << fAnnCut
 			<< " for 90% electron efficiency" << endl;
 	//fAnnCut = 0.5;
@@ -712,8 +711,8 @@ void CbmTrdElectronsTrainAnn::CreateROCDiagramm()
 	}
 	fROCGraph = new TGraph(nBins, x, y);
 	fROCGraph->SetTitle("ROC diagram");
-	fROCGraph->GetXaxis()->SetTitle("Electron efficiency");
-	fROCGraph->GetYaxis()->SetTitle("Pion suppression");
+	fROCGraph->GetXaxis()->SetTitle("electron efficiency");
+	fROCGraph->GetYaxis()->SetTitle("pion suppression");
 }
 
 Double_t CbmTrdElectronsTrainAnn::FindOptimalCut()
@@ -835,10 +834,9 @@ void CbmTrdElectronsTrainAnn::FillProbabilityHistos(Bool_t isEl)
 
 void CbmTrdElectronsTrainAnn::DrawHistos()
 {
+    SetStyles();
 
-	TCanvas* c1 = new TCanvas();
-	c1->Divide(2, 2);
-	c1->cd(1);
+	TCanvas* c1_1 = new TCanvas("classifier output","classifier output", 500,500);
 	fhAnnOutputEl->SetLineStyle(2);
 	fhAnnOutputEl->SetLineWidth(3);
 	fhAnnOutputPi->SetLineWidth(3);
@@ -846,20 +844,51 @@ void CbmTrdElectronsTrainAnn::DrawHistos()
 	fhAnnOutputPi->Rebin(10);
 	fhAnnOutputEl->Draw();
 	fhAnnOutputPi->Draw("Same");
+	fhAnnOutputEl->Scale(1./fhAnnOutputEl->Integral());
+	fhAnnOutputPi->Scale(1./fhAnnOutputPi->Integral());
+	fhAnnOutputEl->Rebin(2);
+	fhAnnOutputPi->Rebin(2);
+	TLine* l1= new TLine(fAnnCut,0,fAnnCut,1);
+	l1->SetLineWidth(3);
+        l1->SetLineColor(4);
+	l1->Draw();
 	gPad->SetLogy();
+	gPad->SetGridx();
+	gPad->SetGridy();
 
-	c1->cd(2);
+	TCanvas* c1_2 = new TCanvas("cumProb","cumProb", 500,500);
 	fhCumProbPi->SetLineWidth(3);
 	fhCumProbPi->Draw();
 	fhCumProbEl->SetLineStyle(2);
 	fhCumProbEl->SetLineWidth(3);
 	fhCumProbEl->Draw("same");
+        TLine* l2= new TLine(fAnnCut,0,fAnnCut,1);
+	l2->SetLineWidth(3);
+        l2->SetLineColor(4);
+	l2->Draw();
+       // gPad->SetLogy();
 	gPad->SetGridx();
 	gPad->SetGridy();
 
-	c1->cd(3);
+	TCanvas* c1_3 = new TCanvas("ROC","ROC", 500,500);
+
+       // DrawGraph(fROCGraph, "electron efficiency,%", "pion suppression",
+       // 		kBlack, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
+	// 	  LIT_MARKER_STYLE1, false, true, "ACP");
+	gPad->SetLogy();
+	fROCGraph->GetXaxis()->SetTitle("electron efficiency,%");
+	fROCGraph->GetYaxis()->SetTitle("pion suppression");
 	fROCGraph->SetLineWidth(3);
-	fROCGraph->Draw("AL");
+        fROCGraph->Draw("AL");
+	//TLine* l3= new TLine(90,10e10,90,10e10);
+       // l3->SetLineWidth(3);
+       // l3->SetLineColor(4);
+       // l3->Draw();
+
+	gPad->SetGridx();
+	gPad->SetGridy();
+
+	return;
 
 	TCanvas* c2 = new TCanvas();
 	c2->Divide(2, 1);

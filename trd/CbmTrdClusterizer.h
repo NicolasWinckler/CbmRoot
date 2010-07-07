@@ -133,8 +133,8 @@ class CbmTrdClusterizer : public FairTask {
   Int_t fSector;
   //Int_t tempNosectors =  (fModuleInfo->GetNoSectors);
   static const Int_t accuracy = 1;// '1/accuracy' integration step width [mm]
-  static const Int_t fPadNrX = 7;//7; // has to be odd
-  static const Int_t fPadNrY = 5;//5; // has to be odd
+  static const Int_t fPadNrX = 13;//7; // has to be odd
+  static const Int_t fPadNrY = 3;//5; // has to be odd
   static const Int_t fNoSectors = 3;
   //Int_t fNoSectors;
   /*
@@ -162,7 +162,7 @@ class CbmTrdClusterizer : public FairTask {
 
 
 
-  Float_t fPadCharge[fPadNrY][fPadNrX]; //Charge on 3 adjacent pads calculated by using the Mathieson formula
+  Double_t fPadCharge[fPadNrY][fPadNrX]; //Charge on 3 adjacent pads calculated by using the Mathieson formula
 
   Float_t fPRFHitPositionLL, fPRFHitPositionC;
 

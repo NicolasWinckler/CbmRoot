@@ -14,10 +14,12 @@
 #ifndef CBM_DILEPTON_TRACK_SIM_COLLECTION_H
 #define CBM_DILEPTON_TRACK_SIM_COLLECTION_H
 
-#include "TObjArray.h"
-#include "TVector3.h"
+#include "TObject.h"
 
 class CbmDileptonTrackSim;
+
+class TClonesArray;
+class TVector3;
 
 class CbmDileptonTrackSimCollection : public TObject{
   

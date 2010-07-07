@@ -19,25 +19,21 @@
 #include "CbmDileptonTrackSimCollection.h"
 #include "CbmDileptonTrackReal.h"
 
-#include "FairTask.h"
-#include "FairRootManager.h"
 #include "CbmGlobalTrack.h"
 #include "CbmStsTrack.h"
 #include "CbmTrackMatch.h"
 #include "CbmRichRing.h"
 #include "CbmRichRingMatch.h"
-#include "CbmTrdTrack.h"
-#include "CbmTofHit.h"
-#include "CbmTofPoint.h"
 #include "CbmMCTrack.h"
+
 #include "FairTrackParam.h"
-#include "CbmStsKFTrackFitter.h"
+#include "FairTask.h"
+#include "FairRootManager.h"
 
 // ROOT includes
 #include "TClonesArray.h"
 #include "TFile.h"
-#include "TH1F.h"
-#include "TH2F.h"
+#include "TH1.h"
 #include "TMath.h"
 
 #include <iostream>

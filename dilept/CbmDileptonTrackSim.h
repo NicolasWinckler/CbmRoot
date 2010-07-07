@@ -16,7 +16,7 @@
 
 #include "CbmDileptonTrack.h"
 
-#include "TObject.h"
+class TVector3;
 
 class CbmDileptonTrackSim : public CbmDileptonTrack{
 

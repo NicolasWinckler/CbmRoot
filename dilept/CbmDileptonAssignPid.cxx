@@ -14,29 +14,23 @@
 // CBMROOT includes
 #include "CbmDileptonAssignPid.h"
 
-#include "CbmDileptonTrackReal.h"
 #include "CbmDileptonTrackRealCollection.h"
 
-#include "FairTask.h"
-#include "FairRootManager.h"
 #include "CbmVertex.h"
 #include "CbmGlobalTrack.h"
-#include "CbmMCTrack.h"
-#include "CbmStsKFTrackFitter.h"
 #include "CbmStsTrack.h"
 #include "CbmRichRing.h"
 #include "CbmTrdTrack.h"
 #include "CbmTofHit.h"
 
+#include "FairTask.h"
+#include "FairRootManager.h"
 
 //ROOT includes
-#include "TObjArray.h"
-#include "TH2D.h"
-#include "TH1D.h"
+#include "TH2.h"
+#include "TH1.h"
 #include "TFile.h"
-#include "TF1.h"
 #include "TMath.h"
-#include "TLorentzVector.h"
 #include "TClonesArray.h"
 
 #include <iostream>
@@ -55,8 +49,8 @@ CbmDileptonAssignPid::CbmDileptonAssignPid() : FairTask("DileptonAssignPid"){
 
     //set cuts for RICH
 
-    switchRichMom        = kTRUE;
-    switchRichSelection  = kTRUE;
+    fswitchRichMom        = kTRUE;
+    fswitchRichSelection  = kTRUE;
 
     fRichDist      = 1.;
     fRichNN        = -0.5;
@@ -68,11 +62,11 @@ CbmDileptonAssignPid::CbmDileptonAssignPid() : FairTask("DileptonAssignPid"){
     fRichRsigma    = 0.14;
 
     //set cuts for TRD
-    switchMom       = kTRUE;
-    switchAcceptTrd = kFALSE;
-    switchLike      = kTRUE;
-    switchWkn       = kFALSE;
-    switchAnn       = kFALSE;
+    fswitchMom       = kTRUE;
+    fswitchAcceptTrd = kFALSE;
+    fswitchLike      = kTRUE;
+    fswitchWkn       = kFALSE;
+    fswitchAnn       = kFALSE;
 
     fTrdMom         = 1.5;
     fTrdPidLikeLow  = 0.95;
@@ -82,8 +76,8 @@ CbmDileptonAssignPid::CbmDileptonAssignPid() : FairTask("DileptonAssignPid"){
 
     //set cuts for TOF
 
-    switchTof     = kTRUE;
-    switchAcceptTof = kFALSE;
+    fswitchTof     = kTRUE;
+    fswitchAcceptTof = kFALSE;
     fTofMass2     = 0.01;
 
     fNEvents = 0;
@@ -99,8 +93,8 @@ CbmDileptonAssignPid::CbmDileptonAssignPid(Int_t iVerbose, TString fname, const 
 
     //set cuts for RICH
 
-    switchRichMom       = kTRUE;
-    switchRichSelection = kTRUE;
+    fswitchRichMom       = kTRUE;
+    fswitchRichSelection = kTRUE;
 
     fRichDist      = 1.;
     fRichNN        = -0.5;
@@ -112,11 +106,11 @@ CbmDileptonAssignPid::CbmDileptonAssignPid(Int_t iVerbose, TString fname, const 
     fRichRsigma    = 0.14;
 
     //set cuts for TRD
-    switchMom       = kTRUE;
-    switchAcceptTrd = kFALSE;
-    switchLike      = kTRUE;
-    switchWkn       = kFALSE;
-    switchAnn       = kFALSE;
+    fswitchMom       = kTRUE;
+    fswitchAcceptTrd = kFALSE;
+    fswitchLike      = kTRUE;
+    fswitchWkn       = kFALSE;
+    fswitchAnn       = kFALSE;
 
     fTrdMom         = 1.5;
     fTrdPidLikeLow  = 0.95;
@@ -126,8 +120,8 @@ CbmDileptonAssignPid::CbmDileptonAssignPid(Int_t iVerbose, TString fname, const 
 
     //set cuts for TOF
 
-    switchTof       = kTRUE;
-    switchAcceptTof = kFALSE;
+    fswitchTof       = kTRUE;
+    fswitchAcceptTof = kFALSE;
     fTofMass2 = 0.01;
 
     fNEvents = 0;
@@ -272,9 +266,9 @@ void CbmDileptonAssignPid::Exec(Option_t* opt){
 	Double_t trackLength = fGlobalTrack->GetLength()/100.;
 
         // Get info on RICH, TRD and TOF
-	Bool_t richPid = GetRichPid(switchRichMom, switchRichSelection, momentum, richRingIndex);
-        Bool_t trdPid  = GetTrdPid(richPid,switchMom,switchAcceptTrd,switchLike, switchWkn, switchAnn, momentum, trdTrackIndex);
-        Bool_t tofPid  = GetTofPid(richPid,switchTof, switchAcceptTof,momentum, tofHitIndex, trackLength);
+	Bool_t richPid = GetRichPid(fswitchRichMom, fswitchRichSelection, momentum, richRingIndex);
+        Bool_t trdPid  = GetTrdPid(richPid,fswitchMom,fswitchAcceptTrd,fswitchLike, fswitchWkn, fswitchAnn, momentum, trdTrackIndex);
+        Bool_t tofPid  = GetTofPid(richPid,fswitchTof, fswitchAcceptTof,momentum, tofHitIndex, trackLength);
 
        if(fVerbose>1) cout<<"-I- CbmDileptonAssignPid::Exec() : gTrack,rich,trd,tof : "<<iGlobal <<" "<<richPid<<" "<<trdPid<<" "<<tofPid<<endl;
 
@@ -506,8 +500,8 @@ void CbmDileptonAssignPid::SetRichCuts(Bool_t sRichMom, Bool_t sRichSelection, F
     cout<<" -I-  CbmDileptonAssignPid::SetRichCuts() : Setting Rich Cuts "
 	<< " ---- Changing default switch / cut value, beware of consequence -----"<<endl;
 
-    switchRichMom       = sRichMom;
-    switchRichSelection = sRichSelection;
+    fswitchRichMom       = sRichMom;
+    fswitchRichSelection = sRichSelection;
 
     fRichDist      = richCuts[0];
     fRichNN        = richCuts[1];
@@ -524,11 +518,11 @@ void CbmDileptonAssignPid::SetTrdCuts(Bool_t sMom, Bool_t sAccept, Bool_t sLike,
     cout<<" -I-  CbmDileptonAssignPid::SetTrdCuts() : Setting Trd Cuts "
 	<< " ---- Changing default switch / cut value, beware of consequence -----"<<endl;
 
-    switchMom       = sMom;
-    switchAcceptTrd = sAccept;
-    switchLike      = sLike;
-    switchWkn       = sWkn;
-    switchAnn       = sAnn;
+    fswitchMom       = sMom;
+    fswitchAcceptTrd = sAccept;
+    fswitchLike      = sLike;
+    fswitchWkn       = sWkn;
+    fswitchAnn       = sAnn;
 
     fTrdMom         = trdCuts[0];
     fTrdPidLikeLow  = trdCuts[1];
@@ -542,8 +536,8 @@ void CbmDileptonAssignPid::SetTofCuts(Bool_t sTof, Bool_t sAccept, Float_t tofCu
     cout<<" -I-  CbmDileptonAssignPid::SetTofCuts() : Setting Tof Cuts "
 	<< " ---- Changing default switch / cut value, beware of consequence -----"<<endl;
 
-    switchTof       = sTof;
-    switchAcceptTof = sAccept;
+    fswitchTof       = sTof;
+    fswitchAcceptTof = sAccept;
 
     fTofMass2 = tofCut;
 

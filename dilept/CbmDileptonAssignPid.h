@@ -47,8 +47,8 @@ private:
  
     /** switch to select different criteria for rich id **/
 
-    Bool_t switchRichMom; //! default = true (momentum dependent distant cut), =false (momentum independent)
-    Bool_t switchRichSelection; //! default = true (Selection NN), = false (Selection 2D)
+    Bool_t fswitchRichMom; //! default = true (momentum dependent distant cut), =false (momentum independent)
+    Bool_t fswitchRichSelection; //! default = true (Selection NN), = false (Selection 2D)
 
     /** cuts for RICH identification **/
 
@@ -63,11 +63,11 @@ private:
 
     /** switches to select different criteria for TRD id **/
 
-    Bool_t switchMom;  //! default = true,  = false (turns off selction below mom = 1.5 GeV)
-    Bool_t switchAcceptTrd; //! decision when there is no trd track
-    Bool_t switchLike; //! default = false, = true (turns on selection based on Likelyhood method)
-    Bool_t switchWkn;  //! default = false, = true (turns on selection based on Wkn method)
-    Bool_t switchAnn;  //! default = false, = true (turns on selection based on Ann method)
+    Bool_t fswitchMom;  //! default = true,  = false (turns off selction below mom = 1.5 GeV)
+    Bool_t fswitchAcceptTrd; //! decision when there is no trd track
+    Bool_t fswitchLike; //! default = false, = true (turns on selection based on Likelyhood method)
+    Bool_t fswitchWkn;  //! default = false, = true (turns on selection based on Wkn method)
+    Bool_t fswitchAnn;  //! default = false, = true (turns on selection based on Ann method)
 
     /**  cuts for TRD identification **/
 
@@ -79,8 +79,8 @@ private:
 
     /** switch to select TOF pid criteria **/
 
-    Bool_t switchTof;  //! default = true (momentum dependent mass cut), = false (momentum independent)
-    Bool_t switchAcceptTof; //! decision when no Tof hit assocciated to global track
+    Bool_t fswitchTof;  //! default = true (momentum dependent mass cut), = false (momentum independent)
+    Bool_t fswitchAcceptTof; //! decision when no Tof hit assocciated to global track
 
     /** TOF mass2 cut **/
     Float_t fTofMass2;

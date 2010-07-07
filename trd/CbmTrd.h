@@ -131,19 +131,19 @@ class CbmTrd : public FairDetector
   Int_t          fSimple;            //! Switch between different geometry versions
 
   Int_t Trd1_ID;                     //! MC ID of first TRD Station	     
-  Int_t Trd1_Layer_ID;               //! MC ID of first layer of first TRD   
+  //  Int_t Trd1_Layer_ID;               //! MC ID of first layer of first TRD   
   Int_t Trd1_Module1_ID;             //! MC ID of small module of first TRD  
   Int_t Trd1_Module2_ID;             //! MC ID of middle module of first TRD 
   Int_t Trd1_Module3_ID;             //! MC ID of big module of first TRD    
 
   Int_t Trd2_ID;                     //! MC ID of second TRD Station	     
-  Int_t Trd2_Layer_ID;		     //! MC ID of first layer of second TRD   
+  //  Int_t Trd2_Layer_ID;		     //! MC ID of first layer of second TRD   
   Int_t Trd2_Module1_ID;	     //! MC ID of small module of second TRD  
   Int_t Trd2_Module2_ID;	     //! MC ID of middle module of second TRD 
   Int_t Trd2_Module3_ID;	     //! MC ID of big module of second TRD    
 
   Int_t Trd3_ID;                     //! MC ID of third TRD Station	     
-  Int_t Trd3_Layer_ID;		     //! MC ID of first layer of third TRD   
+  //  Int_t Trd3_Layer_ID;		     //! MC ID of first layer of third TRD   
   Int_t Trd3_Module1_ID;	     //! MC ID of small module of third TRD  
   Int_t Trd3_Module2_ID;	     //! MC ID of middle module of third TRD 
   Int_t Trd3_Module3_ID;	     //! MC ID of big module of third TRD    

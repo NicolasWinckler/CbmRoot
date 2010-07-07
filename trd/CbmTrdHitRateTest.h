@@ -1,56 +1,23 @@
 #ifndef CBMTRDHITRATETEST_H
 #define CBMTRDHITRATETEST_H
 
-#include "CbmTrdDetectorId.h"
-#include "CbmTrdDigiPar.h"
 #include "FairTask.h"
 
-#include "CbmTrdDigiPar.h"
-#include "CbmTrdPoint.h"
-#include "CbmTrdDigi.h"
-#include "CbmTrdDigiMatch.h"
-#include "CbmTrdModule.h"
-#include "CbmTrdRadiator.h"
-#include "CbmTrdHit.h"
 #include "CbmTrdDetectorId.h"
-
-#include "CbmMCTrack.h"
-
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
-#include "FairBaseParSet.h"
-#include "FairTask.h"
-
-#include "TRandom.h"
-#include "TMath.h"
-#include "TVector3.h"
-#include "TClonesArray.h"
-#include "TGeoManager.h"
-#include "TGeoVolume.h"
-#include "TGeoMaterial.h"
-#include "TGeoNode.h"
-#include "TGeoMatrix.h"
-#include "TGeoBBox.h"
-#include "TPRegexp.h"
-#include "TH2F.h"
-#include "TCanvas.h"
-#include "TLine.h"
-//#include "TVector3.h"
 
 #include <map>
 #include <list>
 #include <vector>
-using std::vector;
 
-//#include <utility>
-
-
-class TClonesArray;
 class CbmTrdDigiPar;
 class CbmTrdDigi;
 class CbmTrdModule;
 class CbmTrdRadiator;
+
+class TClonesArray;
+class TCanvas;
+class TH1F;
+class TH2F;
 
 class CbmTrdHitRateTest : public FairTask {
 
@@ -97,9 +64,9 @@ class CbmTrdHitRateTest : public FairTask {
   void GetModuleInformationSL( Int_t VolumeID);
 
   void FillVector( Int_t VolumeID,
-		   vector<int>& L1S1, vector<int>& L2S1, vector<int>& L3S1, vector<int>& L4S1, 
-		   vector<int>& L1S2, vector<int>& L2S2, vector<int>& L3S2, vector<int>& L4S2, 
-		   vector<int>& L1S3, vector<int>& L2S3, vector<int>& L3S3, vector<int>& L4S3);
+		   std::vector<int>& L1S1, std::vector<int>& L2S1, std::vector<int>& L3S1, std::vector<int>& L4S1, 
+		   std::vector<int>& L1S2, std::vector<int>& L2S2, std::vector<int>& L3S2, std::vector<int>& L4S2, 
+		   std::vector<int>& L1S3, std::vector<int>& L2S3, std::vector<int>& L3S3, std::vector<int>& L4S3);
 
   void GetModuleInformation();
 

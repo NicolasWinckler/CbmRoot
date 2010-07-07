@@ -1,56 +1,34 @@
 #include "CbmTrdHitRateTest.h"
 
 #include "CbmTrdDigiPar.h"
-#include "CbmTrdPoint.h"
-#include "CbmTrdDigi.h"
-#include "CbmTrdDigiMatch.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdRadiator.h"
-
-#include "CbmMCTrack.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
-#include "FairBaseParSet.h"
 
-#include "TRandom.h"
-#include "TMath.h"
-#include "TVector3.h"
-#include "TF1.h"
-#include "TH2F.h"
-#include "TH1F.h"
-#include "TProfile.h"
+#include "TH2.h"
 #include "TCanvas.h"
 #include "TImage.h"
 #include "TLine.h"
 #include "TClonesArray.h"
 #include "TGeoManager.h"
-#include "TGeoVolume.h"
-#include "TGeoMaterial.h"
-#include "TGeoNode.h"
-#include "TGeoMatrix.h"
-#include "TGeoBBox.h"
 #include "TPRegexp.h"
 #if ROOT_VERSION_CODE < ROOT_VERSION(5,20,0)
 #include "CbmTrdStringToken.h"
 #endif
 
-//#include "sqlite/sqlite3.h" // used for the lookup table option
-
-//#include <RE2>
 #include <vector>
 #include <iostream>
 #include "Riostream.h"
 #include <fstream>
-#include <string>
+#include <cmath>
 using std::cout;
 using std::cin;
 using std::endl;
 using std::pair;
 using std::vector;
-//using std::push_back;
-
 
 // ---- Default constructor -------------------------------------------
 CbmTrdHitRateTest::CbmTrdHitRateTest()

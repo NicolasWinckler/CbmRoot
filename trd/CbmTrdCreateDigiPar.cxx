@@ -1,6 +1,6 @@
 #include "CbmTrdCreateDigiPar.h"
 
-#include "CbmTrdPads3.h"
+#include "CbmTrdPads.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdDigiPar.h"
 #include "CbmDetectorList.h"

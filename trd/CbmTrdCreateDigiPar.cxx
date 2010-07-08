@@ -110,17 +110,16 @@ CbmTrdCreateDigiPar::~CbmTrdCreateDigiPar()
 // --------------------------------------------------------------------
 
 // ----  Initialisation  ----------------------------------------------
-void CbmTrdCreateDigiPar::SetParContainers()
-{
-    cout<<" * CbmTrdCreateDigiPar * :: SetParContainers() "<<endl;
+void CbmTrdCreateDigiPar::SetParContainers(){
 
+  cout<<" * CbmTrdCreateDigiPar * :: SetParContainers() "<<endl;
 
-    // Get Base Container
-    FairRunAna* ana = FairRunAna::Instance();
-    FairRuntimeDb* rtdb=ana->GetRuntimeDb();
+  // Get Base Container
+  FairRunAna* ana = FairRunAna::Instance();
+  FairRuntimeDb* rtdb=ana->GetRuntimeDb();
 
-    fDigiPar = (CbmTrdDigiPar*)
-               (rtdb->getContainer("CbmTrdDigiPar"));
+  fDigiPar = (CbmTrdDigiPar*)
+             (rtdb->getContainer("CbmTrdDigiPar"));
 
 }
 // --------------------------------------------------------------------
@@ -130,44 +129,40 @@ InitStatus CbmTrdCreateDigiPar::ReInit(){
 
   cout<<" * CbmTrdCreateDigiPar * :: ReInit() "<<endl;
 
-
+  // Get Base Container
   FairRunAna* ana = FairRunAna::Instance();
   FairRuntimeDb* rtdb=ana->GetRuntimeDb();
 
   fDigiPar = (CbmTrdDigiPar*)
-      (rtdb->getContainer("CbmTrdDigiPar"));
+             (rtdb->getContainer("CbmTrdDigiPar"));
   
   return kSUCCESS;
 }
 // --------------------------------------------------------------------
 
 // ---- Init ----------------------------------------------------------
-InitStatus CbmTrdCreateDigiPar::Init()
-{
+InitStatus CbmTrdCreateDigiPar::Init(){
 
-    cout<<" * CbmTrdCreateDigiPar * :: Init() "<<endl;
+  cout<<" * CbmTrdCreateDigiPar * :: Init() "<<endl;
 
-    FairRootManager *ioman = FairRootManager::Instance();
-    if ( ! ioman ) Fatal("Init", "No FairRootManager");
-    
-    FillModuleMap();
+  FairRootManager *ioman = FairRootManager::Instance();
+  if ( ! ioman ) Fatal("Init", "No FairRootManager");
+  
+  FillModuleMap();
 
-    return kSUCCESS;
-
+  return kSUCCESS;
 }
 // --------------------------------------------------------------------
 
 
 // ---- Exec ----------------------------------------------------------
-void CbmTrdCreateDigiPar::Exec(Option_t * option)
-{
+void CbmTrdCreateDigiPar::Exec(Option_t * option){
 
 }
 // --------------------------------------------------------------------
 
 
-void CbmTrdCreateDigiPar::GetModuleInformation()
-{
+void CbmTrdCreateDigiPar::GetModuleInformation(){
 
   // Extract the information about station, layer, module type
   // and cpoy number of the module from the full path to the
@@ -220,7 +215,7 @@ void CbmTrdCreateDigiPar::GetModuleInformation()
 
 // --------------------------------------------------------------------
 
-void CbmTrdCreateDigiPar::CalculateModuleId() {
+void CbmTrdCreateDigiPar::CalculateModuleId(){
 
   Int_t detInfo_array[6]={kTRD, fStation, fLayer, fModuleType, 
                           fModuleCopy, 0};      
@@ -377,10 +372,9 @@ void CbmTrdCreateDigiPar::FinishTask(){
   FairRuntimeDb* rtdb=ana->GetRuntimeDb();
 
   fDigiPar = (CbmTrdDigiPar*)
-      (rtdb->getContainer("CbmTrdDigiPar"));
+             (rtdb->getContainer("CbmTrdDigiPar"));
 
   fDigiPar->print();
-
 }
 
 void CbmTrdCreateDigiPar::FillPadInfo(){

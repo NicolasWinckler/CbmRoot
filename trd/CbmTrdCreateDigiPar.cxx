@@ -189,6 +189,7 @@ void CbmTrdCreateDigiPar::GetModuleInformation()
   
   //put here as an example the full path string and the substrings
 
+// no layers in Jul10  
   while (bla->NextToken()) {
     if (bla->Contains("mod")) {
       TString bla3 = (TString) *bla;
@@ -214,30 +215,6 @@ void CbmTrdCreateDigiPar::GetModuleInformation()
       break; // Don't know why this is here
     } 
   }
-
-//  while (bla->NextToken()) {
-//    if (bla->Contains("layer")) {
-//      TString bla3 = (TString) *bla;
-//      Ssiz_t pos = bla3.Last('_');
-//      Ssiz_t substringLength=bla3.Length()-pos-1;
-//      TString bla2 = bla3((bla3.Last('_')+1),substringLength);
-//      TString bla1 = bla3(3,1);
-//      fStation=bla1.Atoi();
-//      fLayer=bla2.Atoi();
-//    }
-//    if (bla->Contains("mod")){
-//      TString bla3 = (TString) *bla;
-//      Ssiz_t pos = bla3.Last('_');
-//      Ssiz_t substringLength=bla3.Length()-pos-1;
-//      TString bla2 = bla3(pos+1,substringLength);
-//      substringLength=pos-7;
-//      TString bla1 = bla3(7,substringLength);     
-//      fModuleType = bla1.Atoi();
-//      fModuleCopy = bla2.Atoi();
-//      break; // Don't know why this is here
-//    } 
-//  }
-
 }
 
 // --------------------------------------------------------------------
@@ -279,6 +256,7 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
       TString StationNode = node->GetName();
       TGeoNode* station = node;
 
+// no layers in Jul10  
 //      TObjArray* layers = station->GetNodes();
 //      for (Int_t iLayer = 0; iLayer < layers->GetEntriesFast(); iLayer++) {
 //        TGeoNode* layer = (TGeoNode*) layers->At(iLayer);
@@ -298,11 +276,12 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
 	      // is needed to navigate with the geomanager to this volume.
               // Extract the geometry information (size, global position)
               // from this volume.
-	      //              TString FullPath = "/" + TopNode + "/" + StationNode + "/" + 
-	      //                                 LayerNode + "/" + ModuleNode + "/" + PartNode;
+
+// no layers in Jul10  
+//              TString FullPath = "/" + TopNode + "/" + StationNode + "/" + 
+//                                 LayerNode + "/" + ModuleNode + "/" + PartNode;
               TString FullPath = "/" + TopNode + "/" + StationNode + "/" + 
                                  ModuleNode + "/" + PartNode;
-	      cout << TopNode << " " << StationNode << " " << ModuleNode << " " << PartNode << endl << " " << FullPath << endl;
               gGeoManager->cd(FullPath.Data());
 
               TGeoVolume *curvol = gGeoManager->GetCurrentVolume();
@@ -315,8 +294,6 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
 	      // and fModuleCopy                   
 	      GetModuleInformation(); 
                                       
-	      cout << fStation << " " << fLayer << " " << fModuleType << " " << fModuleCopy << endl;
-
               // Calculate unique id for each module
               CalculateModuleId(); 
 
@@ -361,7 +338,9 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
 	    }
 	  }
 
-	  //	}
+// no layers in Jul10  
+//	}
+
       }
     }
   }

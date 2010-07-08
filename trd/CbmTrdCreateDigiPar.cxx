@@ -198,6 +198,7 @@ void CbmTrdCreateDigiPar::GetModuleInformation()
       TString bla2 = bla3((bla3.Last('_')+1),substringLength);
       TString bla1 = bla3(3,1);
       fStation=bla1.Atoi();
+// no layers in Jul10  
       //      fLayer=bla2.Atoi();
     }
     if (bla->Contains("mod")){

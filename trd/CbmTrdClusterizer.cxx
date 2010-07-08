@@ -925,7 +925,8 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
   /*
     Nyquist–Shannon sampling theorem: 1/pad width > 2/cluster gap
   */
-  Float_t ClusterDistance = 0.5 * padsize[0] - 0.1; //2 * padsize[0] - 1;//5; //[mm]
+  Float_t ClusterDistance = 0.2
+ * padsize[0] - 0.1; //Ar 94 electron/cm    Xe 307 electrons/cm
   Int_t DrawTH = 15 * padsize[0] / ClusterDistance;
   Double_t deltaR = sqrt(pow((local_inLL[0] - local_outLL[0]),2) + pow((local_inLL[1] - local_outLL[1]),2)/* + pow((fz_in - fz_out),2)*/);
   Int_t nPathSlice = int(deltaR / ClusterDistance) + 1;                       

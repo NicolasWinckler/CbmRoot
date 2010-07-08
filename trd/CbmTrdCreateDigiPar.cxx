@@ -180,7 +180,6 @@ void CbmTrdCreateDigiPar::GetModuleInformation()
   // The methode works only for versions of Root > 5.20.0, before the
   // class TStringTocken is not implemented
 
-
   TString path = gGeoManager->GetPath();
 #if ROOT_VERSION_CODE >= ROOT_VERSION(5,20,0)
   TStringToken* bla = new TStringToken(path,"/");
@@ -191,14 +190,14 @@ void CbmTrdCreateDigiPar::GetModuleInformation()
   //put here as an example the full path string and the substrings
 
   while (bla->NextToken()) {
-    if (bla->Contains("layer")) {
+    if (bla->Contains("mod")) {
       TString bla3 = (TString) *bla;
       Ssiz_t pos = bla3.Last('_');
       Ssiz_t substringLength=bla3.Length()-pos-1;
       TString bla2 = bla3((bla3.Last('_')+1),substringLength);
       TString bla1 = bla3(3,1);
       fStation=bla1.Atoi();
-      fLayer=bla2.Atoi();
+      //      fLayer=bla2.Atoi();
     }
     if (bla->Contains("mod")){
       TString bla3 = (TString) *bla;
@@ -207,11 +206,37 @@ void CbmTrdCreateDigiPar::GetModuleInformation()
       TString bla2 = bla3(pos+1,substringLength);
       substringLength=pos-7;
       TString bla1 = bla3(7,substringLength);     
+
       fModuleType = bla1.Atoi();
       fModuleCopy = bla2.Atoi();
+      fLayer = fModuleCopy / 1000;
+      fModuleCopy = fModuleCopy % 1000;
       break; // Don't know why this is here
     } 
   }
+
+//  while (bla->NextToken()) {
+//    if (bla->Contains("layer")) {
+//      TString bla3 = (TString) *bla;
+//      Ssiz_t pos = bla3.Last('_');
+//      Ssiz_t substringLength=bla3.Length()-pos-1;
+//      TString bla2 = bla3((bla3.Last('_')+1),substringLength);
+//      TString bla1 = bla3(3,1);
+//      fStation=bla1.Atoi();
+//      fLayer=bla2.Atoi();
+//    }
+//    if (bla->Contains("mod")){
+//      TString bla3 = (TString) *bla;
+//      Ssiz_t pos = bla3.Last('_');
+//      Ssiz_t substringLength=bla3.Length()-pos-1;
+//      TString bla2 = bla3(pos+1,substringLength);
+//      substringLength=pos-7;
+//      TString bla1 = bla3(7,substringLength);     
+//      fModuleType = bla1.Atoi();
+//      fModuleCopy = bla2.Atoi();
+//      break; // Don't know why this is here
+//    } 
+//  }
 
 }
 
@@ -253,11 +278,14 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
     if (TString(node->GetName()).Contains("trd")) {
       TString StationNode = node->GetName();
       TGeoNode* station = node;
-      TObjArray* layers = station->GetNodes();
-      for (Int_t iLayer = 0; iLayer < layers->GetEntriesFast(); iLayer++) {
-        TGeoNode* layer = (TGeoNode*) layers->At(iLayer);
-        TString LayerNode = layer->GetName();
-	TObjArray* modules = layer->GetNodes();
+
+//      TObjArray* layers = station->GetNodes();
+//      for (Int_t iLayer = 0; iLayer < layers->GetEntriesFast(); iLayer++) {
+//        TGeoNode* layer = (TGeoNode*) layers->At(iLayer);
+//        TString LayerNode = layer->GetName();
+//	TObjArray* modules = layer->GetNodes();
+
+	TObjArray* modules = station->GetNodes();
 	for (Int_t iLayerPart = 0; iLayerPart < modules->GetEntriesFast(); iLayerPart++) {
           TGeoNode* module = (TGeoNode*) modules->At(iLayerPart);
           TString ModuleNode = module->GetName();
@@ -270,8 +298,11 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
 	      // is needed to navigate with the geomanager to this volume.
               // Extract the geometry information (size, global position)
               // from this volume.
+	      //              TString FullPath = "/" + TopNode + "/" + StationNode + "/" + 
+	      //                                 LayerNode + "/" + ModuleNode + "/" + PartNode;
               TString FullPath = "/" + TopNode + "/" + StationNode + "/" + 
-                                 LayerNode + "/" + ModuleNode + "/" + PartNode;
+                                 ModuleNode + "/" + PartNode;
+	      cout << TopNode << " " << StationNode << " " << ModuleNode << " " << PartNode << endl << " " << FullPath << endl;
               gGeoManager->cd(FullPath.Data());
 
               TGeoVolume *curvol = gGeoManager->GetCurrentVolume();
@@ -284,6 +315,8 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
 	      // and fModuleCopy                   
 	      GetModuleInformation(); 
                                       
+	      cout << fStation << " " << fLayer << " " << fModuleType << " " << fModuleCopy << endl;
+
               // Calculate unique id for each module
               CalculateModuleId(); 
 
@@ -328,7 +361,7 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
 	    }
 	  }
 
-	}
+	  //	}
       }
     }
   }

@@ -117,8 +117,9 @@ void CbmTrd::Initialize()
 
           fMCid= gMC->VolId("trd1");
           if ( fMCid != 0) Trd1_ID = fMCid;
-          fMCid= gMC->VolId("trd1layer");
-          if ( fMCid != 0) Trd1_Layer_ID = fMCid;
+// no layers in Jul10  
+//          fMCid= gMC->VolId("trd1layer");
+//          if ( fMCid != 0) Trd1_Layer_ID = fMCid;
           fMCid= gMC->VolId("trd1mod1");
           if ( fMCid != 0) Trd1_Module1_ID = fMCid;
           fMCid= gMC->VolId("trd1mod2");
@@ -128,8 +129,9 @@ void CbmTrd::Initialize()
 
           fMCid= gMC->VolId("trd2");
           if ( fMCid != 0) Trd2_ID = fMCid;
-          fMCid= gMC->VolId("trd2layer");
-          if ( fMCid != 0) Trd2_Layer_ID = fMCid;
+// no layers in Jul10  
+//          fMCid= gMC->VolId("trd2layer");
+//          if ( fMCid != 0) Trd2_Layer_ID = fMCid;
           fMCid= gMC->VolId("trd2mod1");
           if ( fMCid != 0) Trd2_Module1_ID = fMCid;
           fMCid= gMC->VolId("trd2mod2");
@@ -139,8 +141,9 @@ void CbmTrd::Initialize()
 
           fMCid= gMC->VolId("trd3");
           if ( fMCid != 0) Trd3_ID = fMCid;
-          fMCid= gMC->VolId("trd3layer");
-          if ( fMCid != 0) Trd3_Layer_ID = fMCid;
+// no layers in Jul10  
+//          fMCid= gMC->VolId("trd3layer");
+//          if ( fMCid != 0) Trd3_Layer_ID = fMCid;
 
 	  /*
           fMCid= gMC->VolId("trd3mod1");
@@ -269,25 +272,31 @@ Bool_t  CbmTrd::ProcessHits(FairVolume* vol)
 
          if ( 0 == fSimple) {
          
+// no layers in Jul10  
+//          Int_t id1 = gMC->CurrentVolOffID(1, mod);
+//          gMC->CurrentVolOffID(2, layer);
+//          Int_t id3 = gMC->CurrentVolOffID(3, station);
+
           Int_t id1 = gMC->CurrentVolOffID(1, mod);
-          gMC->CurrentVolOffID(2, layer);
-          Int_t id3 = gMC->CurrentVolOffID(3, station);
+          Int_t id2 = gMC->CurrentVolOffID(2, station);
 	
 
-          if ( id3 == Trd1_ID ) {
+          if ( id2 == Trd1_ID ) {
             fstation=1;
 	  }
-          else if ( id3 == Trd2_ID ) {
+          else if ( id2 == Trd2_ID ) {
             fstation=2;
 	  }
-          else if ( id3 == Trd3_ID ) {
+          else if ( id2 == Trd3_ID ) {
             fstation=3;
 	  }
           else {
             fstation=-1;
 	  }
 
-	  flayer=layer;
+// no layers in Jul10  
+//	  flayer=layer;
+	  flayer=mod/1000;
 
           if ( (id1 == Trd1_Module1_ID) ||
                (id1 == Trd2_Module1_ID)  ) {
@@ -308,8 +317,9 @@ Bool_t  CbmTrd::ProcessHits(FairVolume* vol)
             fmodtype=0;
 	  }
 
-          fmodnumber=mod;
-
+// no layers in Jul10  
+//          fmodnumber=mod;
+	  fmodnumber=mod%1000;
 
           Int_t sector=0;
           Int_t detInfo_array[6]={kTRD, fstation,flayer,fmodtype,fmodnumber,sector};         

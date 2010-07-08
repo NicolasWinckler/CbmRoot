@@ -921,8 +921,12 @@ int CbmTrdClusterizer::GetSector(Double_t tempPosY)/*tempPosY has to be in LL mo
   // ---- SplitPathSlices -------------------------------------------------
 void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration)
 {
-  Int_t DrawTH = 200;//15;
-  Float_t ClusterDistance = 5; //[mm]
+  
+  /*
+    Nyquist–Shannon sampling theorem: 1/pad width > 2/cluster gap
+  */
+  Float_t ClusterDistance = 0.5 * padsize[0] - 0.1; //2 * padsize[0] - 1;//5; //[mm]
+  Int_t DrawTH = 15 * padsize[0] / ClusterDistance;
   Double_t deltaR = sqrt(pow((local_inLL[0] - local_outLL[0]),2) + pow((local_inLL[1] - local_outLL[1]),2)/* + pow((fz_in - fz_out),2)*/);
   Int_t nPathSlice = int(deltaR / ClusterDistance) + 1;                       
 

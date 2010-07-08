@@ -32,8 +32,8 @@ void sts_sim(Int_t nEvents = 1)
   TString pipeGeom = "pipe_standard.geo";
 
   // Magnet geometry and field map
-  TString magnetGeom  = "magnet_electron_standard.geo";
-  TString fieldMap    = "field_electron_standard";
+  TString magnetGeom  = "magnet_muon_standard.geo";
+  TString fieldMap    = "field_muon_standard";
   Double_t fieldZ     = 50.;     // z position of field centre
   Double_t fieldScale = 1.;      // field scaling factor
 

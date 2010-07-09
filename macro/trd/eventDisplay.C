@@ -58,8 +58,8 @@ eventDisplay()
   // eventdisplay one can get hopefully the information if a volume is visible.
 
   TrdDigis->SetLayerStation1(kTRUE,kFALSE,kFALSE,kFALSE);
-  TrdDigis->SetLayerStation2(kFALSE,kFALSE,kFALSE,kFALSE);
-  TrdDigis->SetLayerStation3(kFALSE,kFALSE,kFALSE,kFALSE);
+  TrdDigis->SetLayerStation2(kTRUE,kFALSE,kFALSE,kFALSE);
+  TrdDigis->SetLayerStation3(kTRUE,kFALSE,kFALSE,kFALSE);
                                                                
   fMan->AddTask(Track);
   

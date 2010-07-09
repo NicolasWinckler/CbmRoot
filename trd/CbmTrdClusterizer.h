@@ -63,7 +63,7 @@ class CbmTrdClusterizer : public FairTask {
   void GetModuleInformationFromDigiPar(Bool_t Sector, Int_t VolumeID);
   void GetModuleInformation();
 
-  void AddDigi(Int_t iCol, Int_t iRow, Float_t iCharge);
+  void AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Float_t iCharge);
 
   void CalculatePixel(Bool_t Sector);
 
@@ -71,7 +71,7 @@ class CbmTrdClusterizer : public FairTask {
 
   float GetFloatPositionY(Double_t tempPosY);
 
-  void SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,  TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration);
+  void SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,  TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration);
 
   void GetIntegrationArea(Bool_t Histo, TH1F* PadX ,TH1F* PadY);
 

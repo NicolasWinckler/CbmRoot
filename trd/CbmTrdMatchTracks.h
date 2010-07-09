@@ -78,16 +78,13 @@ private:
 	/** Event counter **/
 	Int_t fNEvents;
 
-	/** Verbosity level **/
-	Int_t fVerbose;
-
 	/** If true than matching will be done using digis **/
 	Bool_t fUseDigis;
 
 	/** If true than matching will be done using clusters **/
         Bool_t fUseClusters;
 
-ClassDef(CbmTrdMatchTracks,1);
+ClassDef(CbmTrdMatchTracks,2);
 };
 
 #endif

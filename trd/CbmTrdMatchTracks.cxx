@@ -23,8 +23,8 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 CbmTrdMatchTracks::CbmTrdMatchTracks() :
-	FairTask("TRD track match"), fTracks(NULL), fPoints(NULL), fHits(NULL), fClusters(NULL),
-			fDigiMatches(NULL), fMatches(NULL), fVerbose(1), fNofHits(0),
+	FairTask("TRD track match",1), fTracks(NULL), fPoints(NULL), fHits(NULL), fClusters(NULL),
+			fDigiMatches(NULL), fMatches(NULL), fNofHits(0),
 			fNofTrueHits(0), fNofWrongHits(0), fNofFakeHits(0), fNEvents(0),
 			fUseDigis(kTRUE), fUseClusters(kTRUE) {
 }
@@ -32,8 +32,8 @@ CbmTrdMatchTracks::CbmTrdMatchTracks() :
 
 // -----   Constructor with verbosity level   ------------------------------
 CbmTrdMatchTracks::CbmTrdMatchTracks(Int_t verbose) :
-	FairTask("TRD track match"), fTracks(NULL), fPoints(NULL), fHits(NULL), fClusters(NULL),
-			fDigiMatches(NULL), fMatches(NULL), fVerbose(verbose), fNofHits(0),
+	FairTask("TRD track match", verbose), fTracks(NULL), fPoints(NULL), fHits(NULL), fClusters(NULL),
+			fDigiMatches(NULL), fMatches(NULL), fNofHits(0),
 			fNofTrueHits(0), fNofWrongHits(0), fNofFakeHits(0), fNEvents(0),
 			fUseDigis(kTRUE), fUseClusters(kTRUE) {
 }
@@ -42,8 +42,8 @@ CbmTrdMatchTracks::CbmTrdMatchTracks(Int_t verbose) :
 // -----   Constructor with name, title and verbosity  ---------------------
 CbmTrdMatchTracks::CbmTrdMatchTracks(const char* name, const char* title,
 		Int_t verbose) :
-	FairTask(name), fTracks(NULL), fPoints(NULL), fHits(NULL), fClusters(NULL), fDigiMatches(
-			NULL), fMatches(NULL), fVerbose(verbose), fNofHits(0),
+	FairTask(name, verbose), fTracks(NULL), fPoints(NULL), fHits(NULL), fClusters(NULL), fDigiMatches(
+			NULL), fMatches(NULL), fNofHits(0),
 			fNofTrueHits(0), fNofWrongHits(0), fNofFakeHits(0), fNEvents(0),
 			fUseDigis(kTRUE), fUseClusters(kTRUE) {
 }

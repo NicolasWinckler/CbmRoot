@@ -18,8 +18,8 @@
  **/
 
 
-#ifndef CBM_TRD_SET_TRACKS_PID_ANN
-#define CBM_TRD_SET_TRACKS_PID_ANN 1
+#ifndef CBM_TRD_SET_TRACKS_PID_ANN_H
+#define CBM_TRD_SET_TRACKS_PID_ANN_H
 
 #include "FairTask.h"
 
@@ -32,9 +32,6 @@ class TClonesArray;
 class CbmTrdSetTracksPidANN : public FairTask
 {
 	  
-   /** Verbosity level **/
-   Int_t fVerbose;
-		
  public:
 
   /** Default constructor **/
@@ -70,13 +67,13 @@ class CbmTrdSetTracksPidANN : public FairTask
 
 
   /** Accessors **/
-  Int_t GetNofTracks()         { return fNofTracks; };
-  Double_t GetANNPar1()        { return ANNPar1; };
-  Double_t GetANNPar2()        { return ANNPar2; };
+  Int_t GetNofTracks() const  { return fNofTracks; };
+  Double_t GetANNPar1() const { return fANNPar1; };
+  Double_t GetANNPar2() const { return fANNPar2; };
 
   /** Setters **/
-  void SetANNPar1(Double_t param) { ANNPar1=param; };
-  void SetANNPar2(Double_t param) { ANNPar2=param; };
+  void SetANNPar1(Double_t param) { fANNPar1=param; };
+  void SetANNPar2(Double_t param) { fANNPar2=param; };
   
   ///deprecated method, will be deleted soon
   // use SetTRDGeometryName
@@ -90,12 +87,15 @@ class CbmTrdSetTracksPidANN : public FairTask
 
  private:
 
+  CbmTrdSetTracksPidANN& operator=(const CbmTrdSetTracksPidANN&);
+  CbmTrdSetTracksPidANN(const CbmTrdSetTracksPidANN&);
+
   TClonesArray* fTrackArray;    // Input array of TRD tracks
   TClonesArray* fTrdHitArray;   // Input array of TRD Hits
 
   Int_t fNofTracks;             // Number of tracks successfully fitted
-  Double_t ANNPar1;             // Parameter1 for Wkn method
-  Double_t ANNPar2;             // Parameter2 for Wkn method
+  Double_t fANNPar1;             // Parameter1 for Wkn method
+  Double_t fANNPar2;             // Parameter2 for Wkn method
   
   std::vector<TMultiLayerPerceptron*> fNN;   // Neural Network  
 
@@ -103,7 +103,7 @@ class CbmTrdSetTracksPidANN : public FairTask
 
   Bool_t ReadData();            // Read the weights needed for ANN
 
-  ClassDef(CbmTrdSetTracksPidANN,1);
+  ClassDef(CbmTrdSetTracksPidANN,2);
 
 };
 

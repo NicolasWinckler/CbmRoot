@@ -12,10 +12,10 @@
 #include "TClonesArray.h"
 #include "TMultiLayerPerceptron.h"
 #include "TTree.h"
-#include "TFile.h"
+//#include "TFile.h"
 #include "TMath.h"
 #include "TSystem.h"
-#include "TROOT.h"
+//#include "TROOT.h"
 #include "TString.h"
 
 #include <iostream>
@@ -23,7 +23,8 @@
 #include <fstream>
 using std::cout;
 using std::endl;
-
+//using TMath::LandauI;
+//using TMath::IsNaN;
 // -----   Default constructor   -------------------------------------------
 CbmTrdSetTracksPidANN::CbmTrdSetTracksPidANN() {
 
@@ -68,7 +69,7 @@ Bool_t CbmTrdSetTracksPidANN::ReadData() {
 
 	// Check if the input filename is valid
 	TString fileName;
-	std::vector<TString> ANNWeightsFiles;
+	std::vector<TString> weightsFilesANN;
 	fileName = gSystem->Getenv("VMCWORKDIR");
 
 	if (fTRDGeometryType != "mb" && fTRDGeometryType != "st"){
@@ -77,30 +78,30 @@ Bool_t CbmTrdSetTracksPidANN::ReadData() {
 			<< "wrong geometry type." << endl;
 	}
 	if (fTRDGeometryType == "st"){
-		ANNWeightsFiles.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_12.txt");
-		ANNWeightsFiles.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_11.txt");
-		ANNWeightsFiles.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_10.txt");
-		ANNWeightsFiles.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_9.txt");
-		ANNWeightsFiles.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_8.txt");
-		ANNWeightsFiles.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_7.txt");
-		ANNWeightsFiles.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_6.txt");
-		ANNPar1 = 1.21;
-		ANNPar2 = 0.67;
+		weightsFilesANN.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_12.txt");
+		weightsFilesANN.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_11.txt");
+		weightsFilesANN.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_10.txt");
+		weightsFilesANN.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_9.txt");
+		weightsFilesANN.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_8.txt");
+		weightsFilesANN.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_7.txt");
+		weightsFilesANN.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_6.txt");
+		fANNPar1 = 1.21;
+		fANNPar2 = 0.67;
 	}else if (fTRDGeometryType == "mb"){
-		ANNWeightsFiles.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_MB_12.txt");
-		ANNWeightsFiles.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_MB_11.txt");
-		ANNWeightsFiles.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_MB_10.txt");
-		ANNWeightsFiles.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_MB_9.txt");
-		ANNWeightsFiles.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_MB_8.txt");
-		ANNWeightsFiles.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_MB_7.txt");
-		ANNWeightsFiles.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_MB_6.txt");
-		ANNPar1 = 3.88;
-		ANNPar2 = 1.28;
+		weightsFilesANN.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_MB_12.txt");
+		weightsFilesANN.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_MB_11.txt");
+		weightsFilesANN.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_MB_10.txt");
+		weightsFilesANN.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_MB_9.txt");
+		weightsFilesANN.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_MB_8.txt");
+		weightsFilesANN.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_MB_7.txt");
+		weightsFilesANN.push_back(fileName + "/parameters/trd/Neural_Net_Weights_El_ID_MB_6.txt");
+		fANNPar1 = 3.88;
+		fANNPar2 = 1.28;
 	}
 
 
-	for (Int_t i = 0; i < ANNWeightsFiles.size(); i++) {
-		const char* file = (const char*)ANNWeightsFiles[i];
+	for (Int_t i = 0; i < weightsFilesANN.size(); i++) {
+		const char* file = (const char*)weightsFilesANN[i];
 		ifstream myfile(file);
 		if (!myfile.is_open()) {
 			cout << "-E- CbmTrdSetTracksPidANN::Init: "
@@ -111,8 +112,8 @@ Bool_t CbmTrdSetTracksPidANN::ReadData() {
 	}
 
 	cout << "-I- CbmTrdSetTracksPidANN::Init : get NeuralNet weight parameters from: ";
-	for (Int_t i = 0; i < ANNWeightsFiles.size(); i++) {
-		cout << ANNWeightsFiles[i] << " ," << std::endl;
+	for (Int_t i = 0; i < weightsFilesANN.size(); i++) {
+		cout << weightsFilesANN[i] << " ," << std::endl;
 	}
 
 	Float_t inVector[12];
@@ -138,31 +139,31 @@ Bool_t CbmTrdSetTracksPidANN::ReadData() {
 	fNN.clear();
 
 	TMultiLayerPerceptron* ann12 = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12:12:x13",simu);
-	ann12->LoadWeights(ANNWeightsFiles[0]);
+	ann12->LoadWeights(weightsFilesANN[0]);
 	fNN.push_back(ann12);
 
 	TMultiLayerPerceptron* ann11 = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11:12:x13",simu);
-	ann11->LoadWeights(ANNWeightsFiles[1]);
+	ann11->LoadWeights(weightsFilesANN[1]);
 	fNN.push_back(ann11);
 
 	TMultiLayerPerceptron* ann10 = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6,x7,x8,x9,x10:12:x13",simu);
-	ann10->LoadWeights(ANNWeightsFiles[2]);
+	ann10->LoadWeights(weightsFilesANN[2]);
 	fNN.push_back(ann10);
 
 	TMultiLayerPerceptron* ann9 = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6,x7,x8,x9:12:x13",simu);
-	ann9->LoadWeights(ANNWeightsFiles[3]);
+	ann9->LoadWeights(weightsFilesANN[3]);
 	fNN.push_back(ann9);
 
 	TMultiLayerPerceptron* ann8 = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6,x7,x8:12:x13",simu);
-	ann8->LoadWeights(ANNWeightsFiles[4]);
+	ann8->LoadWeights(weightsFilesANN[4]);
 	fNN.push_back(ann8);
 
 	TMultiLayerPerceptron* ann7 = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6,x7:12:x13",simu);
-	ann7->LoadWeights(ANNWeightsFiles[5]);
+	ann7->LoadWeights(weightsFilesANN[5]);
 	fNN.push_back(ann7);
 
 	TMultiLayerPerceptron* ann6 = new TMultiLayerPerceptron("x1,x2,x3,x4,x5,x6:12:x13",simu);
-	ann6->LoadWeights(ANNWeightsFiles[6]);
+	ann6->LoadWeights(weightsFilesANN[6]);
 	fNN.push_back(ann6);
 
 
@@ -226,8 +227,8 @@ void CbmTrdSetTracksPidANN::Exec(Option_t* opt) {
 		}
 
 		for (Int_t iTRD=0; iTRD < pTrack->GetNofHits(); iTRD++) {
-			Int_t TRDindex = pTrack->GetHitIndex(iTRD);
-			CbmTrdHit* trdHit = (CbmTrdHit*) fTrdHitArray->At(TRDindex);
+			Int_t index = pTrack->GetHitIndex(iTRD);
+			CbmTrdHit* trdHit = (CbmTrdHit*) fTrdHitArray->At(index);
 			eLossVector.push_back(trdHit->GetELoss());
 		}
 
@@ -235,13 +236,13 @@ void CbmTrdSetTracksPidANN::Exec(Option_t* opt) {
 
 		for (UInt_t j = 0; j<eLossVector.size(); j++) {
 			eLossVector[j]=eLossVector[j]*1.e6;
-			eLossVector[j]=(eLossVector[j]-ANNPar1)/ANNPar2-0.225;
+			eLossVector[j]=(eLossVector[j]-fANNPar1)/fANNPar2-0.225;
 		}
 
 		sort(eLossVector.begin(), eLossVector.end());
 
 		for (UInt_t j = 0; j<eLossVector.size(); j++) {
-			eLossVector[j]=TMath::LandauI(eLossVector[j]);
+		  eLossVector[j]=TMath::LandauI(eLossVector[j]);
 		}
 
 		//------------------transform Data END----------------------------

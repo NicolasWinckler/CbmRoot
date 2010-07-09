@@ -63,8 +63,8 @@ CbmTrdClusterizer::CbmTrdClusterizer(const char *name, const char *title,
 // ---- Destructor ----------------------------------------------------
 CbmTrdClusterizer::~CbmTrdClusterizer()
 {
-  //    FairRootManager *ioman =FairRootManager::Instance();
-  //ioman->Write();
+  FairRootManager *ioman =FairRootManager::Instance();
+  ioman->Write();
   fDigiCollection->Clear("C");
   delete fDigiCollection;
   fDigiMatchCollection->Clear("C");
@@ -109,7 +109,7 @@ InitStatus CbmTrdClusterizer::ReInit(){
 InitStatus CbmTrdClusterizer::Init()
 {
 
-    cout<<" * CbmTrdCluster * :: Init() "<<endl;
+    cout<<" * CbmTrdClusterizer * :: Init() "<<endl;
 
     FairRootManager *ioman = FairRootManager::Instance();
     if ( ! ioman ) Fatal("Init", "No FairRootManager");
@@ -157,10 +157,10 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   
   //const Bool_t Reconst = true;
   //const Bool_t Reconst = false;
-  const Bool_t Histo = true;
-  //const Bool_t Histo = false;
-  const Bool_t TEST = true;
-  //const Bool_t TEST = false;
+  //const Bool_t Histo = true;
+  const Bool_t Histo = false;
+  //const Bool_t TEST = true;
+  const Bool_t TEST = false;
   const Bool_t Sector = true;
   //const Bool_t Sector = false;
   
@@ -447,7 +447,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	  Reco = new TH2F("Reco","Reco [mm]", (nCol) * 100, 0, (nCol), (nRow) * 100, 0, (nRow)); 
 	}
       
-      SplitPathSlices(Sector, Histo, TEST, DeltaSlice2, In, Out, Clusterposition, PadChargeModule, nCol, nRow, j, padW, padH, Reco, recoTRD1, recoTRD2, deltarecoTRD1, deltarecoTRD2, deltarecoPad, Xreco, PR, PRF, PRF2, TestIntegration);
+      SplitPathSlices(j, Sector, Histo, TEST, DeltaSlice2, In, Out, Clusterposition, PadChargeModule, nCol, nRow, j, padW, padH, Reco, recoTRD1, recoTRD2, deltarecoTRD1, deltarecoTRD2, deltarecoPad, Xreco, PR, PRF, PRF2, TestIntegration);
  
       if (TEST)
 	{
@@ -919,14 +919,14 @@ int CbmTrdClusterizer::GetSector(Double_t tempPosY)/*tempPosY has to be in LL mo
 }
   // --------------------------------------------------------------------
   // ---- SplitPathSlices -------------------------------------------------
-void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration)
+void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration)
 {
   
   /*
     Nyquist–Shannon sampling theorem: 1/pad width > 2/cluster gap
   */
   Float_t ClusterDistance = 0.2 * padsize[0] - 0.1; //Ar 94 electron/cm    Xe 307 electrons/cm
-  Int_t DrawTH = 15 * padsize[0] / ClusterDistance;
+  Int_t DrawTH = int(15 * padsize[0] / ClusterDistance);
   Double_t deltaR = sqrt(pow((local_inLL[0] - local_outLL[0]),2) + pow((local_inLL[1] - local_outLL[1]),2)/* + pow((fz_in - fz_out),2)*/);
   Int_t nPathSlice = int(deltaR / ClusterDistance) + 1;                       
 
@@ -1045,8 +1045,9 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t Sector, Bool_t Histo, Bool_t TEST
 	{
 	  if (PadChargeModule[iRow * nCol + iCol] > 0)
 	    {
-	      AddDigi(iCol, iRow, float(PadChargeModule[iRow * nCol + iCol]));
+	      
 	      Digicounter++;
+	      AddDigi(/*j*/Digicounter, iCol, iRow, float(PadChargeModule[iRow * nCol + iCol]));
 	      if (nPathSlice > DrawTH)
 		{
 		  if(TEST)
@@ -1240,8 +1241,8 @@ void CbmTrdClusterizer::ClusterMapping(Int_t nCol, Int_t nRow, Int_t Col_slice, 
     /*
       First iteration of the area on which the charge of one track is induced
      */
-    Int_t Padx = fabs(fCol_in - fCol_out) + 1;
-    Int_t Pady = fabs(fRow_in - fRow_out) + 1;
+    Int_t Padx = int(fabs(fCol_in - fCol_out) + 1);
+    Int_t Pady = int(fabs(fRow_in - fRow_out) + 1);
 
     if (Histo)
       {
@@ -1448,7 +1449,7 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
   // ------AddDigi--------------------------------------------------------------
 
   //void CbmTrdClusterizer::AddDigi() 
-  void CbmTrdClusterizer::AddDigi(Int_t iCol, Int_t iRow, Float_t iCharge) 
+void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Float_t iCharge) 
   {
 
     // Add digi for pixel(x,y) in module to map for intermediate storage
@@ -1474,7 +1475,7 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
       }
       */
       //  CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, fCol_mean, fRow_mean, fELoss, fMCindex);
-      CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, iCol, iRow, iCharge,/* fTime,*/ fMCindex);
+      CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, iCol, iRow, iCharge,/* fTime,*/ pointID);
       fDigiMap[b] = digi;
     }
 
@@ -1488,7 +1489,7 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
       CbmTrdDigi* digi = (CbmTrdDigi*)fDigiMapIt->second;
       if ( ! digi ) Fatal("AddChargeToPixel", "Zero pointer in digi map!");
       digi->AddCharge(iCharge);
-      digi->AddMCIndex(fMCindex);
+      digi->AddMCIndex(pointID);
       //if( fTime > (digi->GetTime()) ) digi->SetTime(fTime);
     }
   

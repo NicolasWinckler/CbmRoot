@@ -273,21 +273,27 @@ void CbmTrdHitRateTest::Exec(Option_t * option)
 	{
 	  GetModuleInformationFromDigiPar(Fast, Lines, LiSi[j][i], Layer ,c1, Canfile1, HitPad, c2, mm2bin);
 	}
-
+      
       Outimage1 = TImage::Create();
       Outimage1->FromPad(c1);
       Outimage1->WriteImage(Canfile1);
-      //c1->cd(1)->Print("Pics/Station%dLayer%d.pdf");
+      /*
+      sprintf(Canfile1,"Pics/%s_S%d_L%d.eps",trddigiparpath,fStation,fLayer);
+      c1->cd(1)->Print(Canfile1);
+      */
       delete Layer;
       delete c1;
       delete Outimage1;
  
       HitPad->Draw("same");
-  
+      
       Outimage2 = TImage::Create();
       Outimage2->FromPad(c2);
       Outimage2->WriteImage(Canfile2);
-  
+      /*
+      sprintf(Canfile2,"Pics/%s_HitPerPad_S%d_L%d.eps",trddigiparpath,fStation,fLayer);
+      c2->cd(1)->Print(Canfile2);
+      */
       delete HitPad;
       delete c2;  
       delete Outimage2;
@@ -340,7 +346,7 @@ void CbmTrdHitRateTest::HistoInit(TCanvas*& c1, TCanvas*& c2,TH2F*& Layer,TH1F*&
   c1 = new TCanvas("c1","c1",1000,900);	
   c1->Divide(1,1);
   c1->cd(1)->SetLogz(1);
-   Layer->Draw();
+  Layer->Draw();
   c2 = new TCanvas("c2","c2",1000,900/2);	
   c2->Divide(1,1);
   c2->cd(1)->SetLogx(1);

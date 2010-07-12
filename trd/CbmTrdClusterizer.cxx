@@ -157,8 +157,8 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   
   //const Bool_t Reconst = true;
   //const Bool_t Reconst = false;
-  //const Bool_t Histo = true;
-  const Bool_t Histo = false;
+  const Bool_t Histo = true;
+  //const Bool_t Histo = false;
   //const Bool_t TEST = true;
   const Bool_t TEST = false;
   const Bool_t Sector = true;
@@ -216,8 +216,8 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   if (Histo)
     {
       printf("Init Histograms\n");
-      TRDalpha = new TH1F("TRDalpha","acos(deltaZ(MC) / deltaX(MC)) [deg]",110,-10,100);
-      TRDbeta = new TH1F("TRDbeta","acos(deltaZ(MC) / deltaY(MC)) [deg]",110,-10,100);
+      TRDalpha = new TH1F("TRDalpha","atan(deltaX(MC) / deltaZ(MC)) [deg]",110,-10,100);
+      TRDbeta = new TH1F("TRDbeta","atan(deltaY(MC) / deltaZ(MC)) [deg]",110,-10,100);
       XMC = new TH1F("XMC","x_mean(MC) [pad unit]",100,-1,1);
       Xreco = new TH1F("Xreco","x_mean(reco) [pad unit]",100,-1,1);
       RMC = new TH1F("RMC","r_in(MC) - r_out(MC) [mm]",200,0,100);
@@ -400,10 +400,16 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 
       Float_t alpha = 0;
       Float_t beta = 0;
+      Float_t gamma = 0;
       if (Histo)
 	{
-	  alpha = TMath::ACos(fabs(local_outC[2] - local_inC[2]) / fabs(local_outC[0] - local_inC[0])) * (180. / TMath::Pi());
-	  beta  = TMath::ACos(fabs(local_outC[2] - local_inC[2]) / fabs(local_outC[1] - local_inC[1])) * (180. / TMath::Pi());
+	  alpha = TMath::ATan(fabs(local_inC[0] - local_outC[0]) / fabs(local_outC[2] - local_inC[2])) * (180. / TMath::Pi());
+	  beta  = TMath::ATan(fabs(local_inC[1] - local_outC[1]) / fabs(local_outC[2] - local_inC[2])) * (180. / TMath::Pi());
+	  gamma = TMath::ATan(
+			      sqrt(pow(local_inC[0],2) + pow(local_inC[1],2)) - 
+			      sqrt(pow(local_outC[0],2) + pow(local_outC[1],2))
+			      / fabs(local_outC[2] - local_inC[2])
+			      ) * (180. / TMath::Pi());
 	}
       CalculatePixel(Sector);
 

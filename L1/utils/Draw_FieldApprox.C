@@ -10,6 +10,7 @@
  *====================================================================
  */
 
+#include <unistd.h> // for dir navigation
 
 void Draw_FieldApprox() {
 
@@ -47,7 +48,8 @@ void Draw_FieldApprox() {
   FILE *fff;
   fff = fopen("maxErr.txt","w");
 
-
+  system("mkdir FieldApprox -p");
+  chdir( "FieldApprox" );
   for (int ist=0; ist<NStations; ist++)
   {
     TString nameCanv;
@@ -136,4 +138,5 @@ void Draw_FieldApprox() {
   Double_t ctime = timer.CpuTime();
   printf("RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
 
+  chdir( ".." );
 }

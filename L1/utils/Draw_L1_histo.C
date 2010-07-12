@@ -1,34 +1,35 @@
+#include <unistd.h> // for dir navigation
+
 const int textFont = 22; // TNewRoman
 const bool divide = 0; // = 0 - each histo in separate file\screen. = 1 - all in one file\screen
 
-void makeUpHisto(TH1* histo, TString title)
+void makeUpHisto(TH1* hist, TString title, float* sigma = 0)
 {
-  if (histo){
+  if (hist && (hist->GetEntries() != 0)){
     TF1  *fit = new TF1("fit","gaus");
     fit->SetLineColor(2);
     fit->SetLineWidth(3);
-    histo->Fit("fit","","",histo->GetXaxis()->GetXmin(),histo->GetXaxis()->GetXmax());
-    
-    histo->GetXaxis()->SetLabelFont(textFont);
-    histo->GetXaxis()->SetTitleFont(textFont);
-    histo->GetYaxis()->SetLabelFont(textFont);
-    histo->GetYaxis()->SetTitleFont(textFont);
-    
-    histo->GetXaxis()->SetTitle(title);
-    histo->GetXaxis()->SetTitleOffset(1);
-    histo->GetYaxis()->SetTitle("Entries");
-    histo->GetYaxis()->SetTitleOffset(1.05); // good then entries per bit <= 9999
-    
+    hist->Fit("fit","","",hist->GetXaxis()->GetXmin(),hist->GetXaxis()->GetXmax());
+    if (sigma) *sigma = fit->GetParameter(2);
 
+    hist->GetXaxis()->SetLabelFont(textFont);
+    hist->GetXaxis()->SetTitleFont(textFont);
+    hist->GetYaxis()->SetLabelFont(textFont);
+    hist->GetYaxis()->SetTitleFont(textFont);
+    
+    hist->GetXaxis()->SetTitle(title);
+    hist->GetXaxis()->SetTitleOffset(1);
+    hist->GetYaxis()->SetTitle("Entries");
+    hist->GetYaxis()->SetTitleOffset(1.05); // good then entries per bit <= 9999
   }
-    else{
-      std::cout << " E: Read histos error! " << std::endl;
-    }
+  else{
+    std::cout << " E: Read hists error! " << std::endl;
+  }
 }
 
 void makeUpProfile(TProfile* prof, TString titleX, TString titleY)
 {
-  if (prof){
+  if (prof && (prof->GetEntries() != 0)){
     prof->SetMarkerColor(kRed);
     prof->SetLineColor(kRed);
     
@@ -60,7 +61,7 @@ void Draw_L1_histo() {
   histoStyle->SetStatColor(0);
   
   histoStyle->SetOptTitle(0); // without main up title
-  histoStyle->SetOptStat(1000000010);
+  histoStyle->SetOptStat(1000001010);
 //   The parameter mode can be = ksiourmen  (default = 000001111)
 //   k = 1;  kurtosis printed
 //   k = 2;  kurtosis and kurtosis error printed
@@ -127,7 +128,7 @@ void Draw_L1_histo() {
   dirFitName = fileName + ":" + dirFitName;
   TDirectory *dirFit = fileIn->Get(dirFitName);
   
-  const int nHisto = 10;
+  const int nHisto = 30;
   
   struct THistoData
   {
@@ -146,24 +147,52 @@ void Draw_L1_histo() {
     {"fst_ty",  "Residual (t_{y}^{reco}-t_{y}^{mc}) [mrad]" }
     {"fst_x",  "Residual (x^{reco}-x^{mc}) [#mum]" }
     {"fst_y",  "Residual (y^{reco}-y^{mc}) [#mum]" }
+    {"svrt_pQP",  "Pull q/p"   }
+    {"svrt_ptx",  "Pull t_{x}" }
+    {"svrt_pty",  "Pull t_{y}" }
+    {"svrt_px",  "Pull x"   }
+    {"svrt_py",  "Pull y" }
+    {"svrt_P",  "Resolution (p^{reco}-p^{mc})/p^{mc}"   }
+    {"svrt_tx",  "Residual (t_{x}^{reco}-t_{x}^{mc}) [mrad]" }
+    {"svrt_ty",  "Residual (t_{y}^{reco}-t_{y}^{mc}) [mrad]" }
+    {"svrt_x",  "Residual (x^{reco}-x^{mc}) [#mum]" }
+    {"svrt_y",  "Residual (y^{reco}-y^{mc}) [#mum]" }
+    {"pvrt_pQP",  "Pull q/p"   }
+    {"pvrt_ptx",  "Pull t_{x}" }
+    {"pvrt_pty",  "Pull t_{y}" }
+    {"pvrt_px",  "Pull x"   }
+    {"pvrt_py",  "Pull y" }
+    {"pvrt_P",  "Resolution (p^{reco}-p^{mc})/p^{mc}"   }
+    {"pvrt_tx",  "Residual (t_{x}^{reco}-t_{x}^{mc}) [mrad]" }
+    {"pvrt_ty",  "Residual (t_{y}^{reco}-t_{y}^{mc}) [mrad]" }
+    {"pvrt_x",  "Residual (x^{reco}-x^{mc}) [#mum]" }
+    {"pvrt_y",  "Residual (y^{reco}-y^{mc}) [#mum]" }
   };
   
   TH1F *histo[nHisto];
 
+  float charat[nHisto][2]; // 0 - sigma, 1 - RMS
   for (int i = 0; i < nHisto; i++){
     histo[i] = (TH1F*) dirFit->Get(histoData[i].name);
-    makeUpHisto(histo[i],histoData[i].title);
+    makeUpHisto(histo[i],histoData[i].title, &(charat[i][0]));
+    charat[i][1] = histo[i]->GetRMS();
   }
 
+  cout.setf(std::ios::scientific,std::ios::floatfield);
+  cout.precision(2);
+  cout << endl << " Name  " << "   \t" << " Sigma   " << "\t" << " RMS " << endl;
+  for (int i = 0; i < nHisto; i++){
+    cout << histoData[i].name << "   \t" << charat[i][0] << "\t" << charat[i][1] << endl;
+  }
       // ------------ hits, strips -----------
   
   TString dirInputName = "/L1/Input";
   dirInputName = fileName + ":" + dirInputName;
   TDirectory *dirInput = fileIn->Get(dirInputName);
   
-  const int nHisto2 = 4;
+  const int nHistoInput = 4;
   
-  const THistoData histoData2[nHisto] =
+  const THistoData histoDataInput[nHisto] =
   {
     {"Px",  "Pull x" }
     {"Py",  "Pull y" }
@@ -171,11 +200,11 @@ void Draw_L1_histo() {
     {"y",  "Residual (y^{hit}-y^{mc}) [#mum]" }
   };
   
-  TH1F *histo2[nHisto2];
+  TH1F *histoInput[nHistoInput];
 
-  for (int i = 0; i < nHisto2; i++){
-    histo2[i] = (TH1F*) dirInput->Get(histoData2[i].name);
-    makeUpHisto(histo2[i],histoData2[i].title);
+  for (int i = 0; i < nHistoInput; i++){
+    histoInput[i] = (TH1F*) dirInput->Get(histoDataInput[i].name);
+    makeUpHisto(histoInput[i],histoDataInput[i].title);
   }
   
     // ------------ make profiles -----------
@@ -216,6 +245,8 @@ void Draw_L1_histo() {
 
 //   c1->SaveAs("histo.png");
 
+  system("mkdir L1_histo -p");
+  chdir( "L1_histo" );
   const int nParts = 2;
   int iPart = 1;
   histoStyle->cd();
@@ -233,10 +264,10 @@ void Draw_L1_histo() {
     if (!divide) c2->SaveAs(name);
   }
 
-  for (int i = 0; i < nHisto2; i++){
+  for (int i = 0; i < nHistoInput; i++){
     if (divide) c2->cd(iPart++);
-    histo2[i]->Draw();
-    TString name = TString(histoData2[i].name)+".pdf";
+    histoInput[i]->Draw();
+    TString name = TString(histoDataInput[i].name)+".pdf";
     if (!divide) c2->SaveAs(name);
   }
   
@@ -249,4 +280,5 @@ void Draw_L1_histo() {
   }
 
   if (divide) c2->SaveAs("L1_histo.pdf");
+  chdir( ".." );
 }

@@ -9,7 +9,7 @@
  *
  *====================================================================
  *
- *  L1 track class
+ *  L1 branch class
  *
  *====================================================================
  */
@@ -26,7 +26,7 @@ struct L1Branch
 {
   unsigned short int Quality;
   float Momentum, chi2;
-  std::vector<unsigned short int > StsHits;
+  std::vector<unsigned /*short*/ int > StsHits;
 
   void Set( unsigned char iStation, unsigned char Length, float Chi2, float Qp ){
     
@@ -52,16 +52,6 @@ struct L1Branch
   static bool comparePMomentum(const L1Branch *a, const L1Branch *b){
     return compareMomentum(*a,*b);
   }
-};
-
-#include "L1TrackPar.h"
-
-struct L1Track
-{
-  unsigned char NHits;
-  float Momentum;
-  double TFirst[6], CFirst[15], TLast[6], CLast[15], chi2;
-  int NDF;
 };
 
 #endif

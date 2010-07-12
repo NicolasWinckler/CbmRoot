@@ -14,12 +14,11 @@
  *====================================================================
  */
 
-#ifndef CbmL1MC_H
-#define CbmL1MC_H
+#ifndef CbmL1MCPoint_H
+#define CbmL1MCPoint_H
 
 #include <vector>
-
-class L1StsHit;
+using std::vector;
 
 struct CbmL1MCPoint
 { 
@@ -37,17 +36,8 @@ struct CbmL1MCPoint
   {
     return ( a->ID < b->ID ) || ( ( a->ID == b->ID ) && (a->z < b->z) );
   }
-};
 
-struct CbmL1MCTrack
-{
-  double mass, q, p, x, y, z, px, py, pz;
-  int ID, mother_ID, pdg;
-  std::vector<CbmL1MCPoint*> Points;
-  std::vector<int> StsHits;
-  int nMCContStations;
-  int nHitContStations;
+  vector<int> hitIds; // indices of CbmL1StsHits in L1->vStsHits array
 };
-
 
 #endif

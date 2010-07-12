@@ -4,6 +4,7 @@
 #include "L1Types.h"
 #include <iostream>
 using std::cout;
+using std::ostream;
 using std::endl;
 
 
@@ -20,6 +21,10 @@ class L1FieldValue{
       y+= w*( B.y - y );
       z+= w*( B.z - z );
     }
+
+    friend ostream& operator<<(ostream& out, L1FieldValue &B){
+      return out << B.x[0] << " | " << B.y[0] << " | " << B.z[0];
+    };
 } _fvecalignment;
 
 
@@ -84,6 +89,16 @@ class L1FieldRegion{
     fvec cz0, cz1, cz2 ; // Bz(z) = cz0 + cz1*(z-z0) + cz2*(z-z0)^2
     fvec z0;
 
+    L1FieldValue Get(const fvec z){
+      fvec dz = (z-z0);
+      fvec dz2 = dz*dz;
+      L1FieldValue B;
+      B.x = cx0 + cx1*dz + cx2*dz2;
+      B.y = cy0 + cy1*dz + cy2*dz2;
+      B.z = cz0 + cz1*dz + cz2*dz2;
+      return B;
+    }
+    
     void Set( const L1FieldValue &B0, const fvec B0z,
               const L1FieldValue &B1, const fvec B1z,
               const L1FieldValue &B2, const fvec B2z )
@@ -143,7 +158,20 @@ class L1FieldRegion{
       cy1+= cy2dz + cy2dz;
       cz1+= cz2dz + cz2dz;
     }
-  
+
+    void SetOneEntry( const int i0, const L1FieldRegion &f1, const int i1 )
+    {
+      cx0[i0] = f1.cx0[i1];
+      cx1[i0] = f1.cx1[i1];
+      cx2[i0] = f1.cx2[i1];
+      cy0[i0] = f1.cy0[i1];
+      cy1[i0] = f1.cy1[i1];
+      cy2[i0] = f1.cy2[i1];
+      cz0[i0] = f1.cz0[i1];
+      cz1[i0] = f1.cz1[i1];
+      cz2[i0] = f1.cz2[i1];
+      z0[i0] = f1.z0[i1];
+    }
 }  _fvecalignment;
 
 

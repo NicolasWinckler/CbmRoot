@@ -60,10 +60,13 @@ OffLineInterface/CbmL1RichRingQa.cxx
 )
 set(L1_SRCS
 ${L1RULECHECKER_SRCS}
+L1Algo/L1Algo.cxx
 L1Algo/L1CATrackFinder.cxx
 L1Algo/L1TrackFitter.cxx
 CbmL1Performance.cxx 
-CbmL1ReadEvent.cxx 
+CbmL1ReadEvent.cxx
+
+CbmL1MCTrack.cxx
 )
 
 if(RULE_CHECKER_FOUND)
@@ -74,7 +77,9 @@ endif(RULE_CHECKER_FOUND)
 set(L1_HEADERS
 CbmL1CATrdTrackFinderSA.h
 CbmL1.h
-CbmL1MC.h
+CbmL1MCTrack.h
+CbmL1MCPoint.h
+CbmL1StsHit.h
 CbmL1TofMerger.h
 CbmL1Track.h
 CbmL1TrackMerger.h
@@ -94,6 +99,7 @@ OffLineInterface/CbmL1StsTrackFinder.h
 #OffLineInterface/CbmL1SttHit.h
 #OffLineInterface/CbmL1SttTrackFinder.h
 #OffLineInterface/CbmL1SttTrack.h
+# L1Algo/L1Algo.h
 )
 
 

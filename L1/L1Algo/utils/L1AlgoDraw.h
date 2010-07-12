@@ -1,5 +1,5 @@
-#ifndef L1CADraw_h
-#define L1CADraw_h 1
+#ifndef L1AlgoDraw_h
+#define L1AlgoDraw_h 1
 
 #define DRAW
 
@@ -19,12 +19,18 @@
 #include "TText.h"
 #include "TLatex.h"
 #include "TPolyLine.h"
+#include "TPolyLine3D.h"
+#include "TView3D.h"
+
+// #include <unistd.h> // for dir navigation
 
 //static TApplication *myapp;
 
 class L1AlgoDraw{
   struct Point{
     double x,y,z;
+    Point(){};
+    Point(double _x, double _y, double _z):x(_x),y(_y),z(_z){};
   };
  public:
   L1AlgoDraw();
@@ -33,10 +39,10 @@ class L1AlgoDraw{
   void DrawMCTracks();
   void DrawRecoTracks();
   
-  void DrawTriplets(vector <L1Triplet> &triplets, unsigned int *realIHit);
-  void DrawDoublets(unsigned short int* Duplets_hits, unsigned short int*  Duplets_start, const int MaxArrSize,
+  void DrawTriplets(vector <L1Triplet> &triplets, const THitI *realIHit);
+  void DrawDoublets(vector<THitI>* Duplets_hits, map<THitI, THitI>* Duplets_start, const int MaxArrSize,
                     int* StsHitsStartIndex, unsigned int *realIHit);
-  void DrawDoubletsOnSta(int iSta, unsigned short int* Duplets_hits, unsigned short int*  Duplets_start, const int MaxArrSize, int* StsRestHitsStartIndex, unsigned int *realIHit);
+  void DrawDoubletsOnSta(int iSta, THitI* Duplets_hits, THitI*  Duplets_start, const int MaxArrSize, int* StsRestHitsStartIndex, unsigned int *realIHit);
   
   void DrawInputHits(); // draw all hits, which TF have gotten
   void DrawRestHits(int *StsRestHitsStartIndex, int *StsRestHitsStopIndex, unsigned int *realIHit); // draw only hits which leave on current iteration.
@@ -68,8 +74,8 @@ class L1AlgoDraw{
   
   double HitSize; // size of hits
 
-  
-  /*static*/ TCanvas *YZ, *YX, *XZ;
+  int fVerbose;
+  /*static*/ TCanvas *YZ, *YX, *XZ, *XYZ;
   bool ask;
 };
 
@@ -104,7 +110,21 @@ L1AlgoDraw::L1AlgoDraw()
   YX->Range(-50.0, -50.0, 50.0, 50.0);
   YX->Draw();
   YX->Update();
-  
+
+//   XYZ = new TCanvas ("XYZ", "XYZ 3D View",  -0, 0, 1000, 1000);
+  XYZ = new TCanvas ("XYZ", "XYZ 3D View",  -500, 500, 500, 500);
+  XYZ->Range(-5.0, -50.0, 115.0, 60.0);
+//   TView3D *view = (TView3D*) XYZ->GetView3D();
+//   view = (TView3D*) TView::CreateView(1);
+//   TView3D *view = new TView3D();
+//   view->SetRange(-50.0, -50.0, -0.0, 50.0, 50.0, 110.0);
+//   view->SetRange(0,0,0,4,4,4);
+//   view->Draw();
+//   XYZ->ResetView3D(view);
+  XYZ->Draw();
+  XYZ->Update();
+
+  fVerbose = CbmL1::Instance()->fVerbose;
   ask = true;
 }
 
@@ -137,20 +157,27 @@ void L1AlgoDraw::DrawMCTracks()
   int NRegMCTracks = 0;
   CbmL1 &L1 = *CbmL1::Instance();
   TPolyLine pline;
-  pline.SetLineColor(kRed);
-
+  if (fVerbose >= 10) {
+    cout << "Only reconstructable tracks are shown." << endl;
+    cout << "Red - primary p > 0.5 - (first iteration)" << endl;
+    cout << "Blue - primary p < 0.5 - (second iteration)" << endl;
+    cout << "Green - secondary p > 0.5 - (third\\first iteration)" << endl;
+    cout << "Gray - secondary p < 0.5 - (third\\second iteration)" << endl;
+  };
+  
   for( vector<CbmL1MCTrack>::iterator it = L1.vMCTracks.begin(); it != L1.vMCTracks.end(); ++it){
     CbmL1MCTrack &T = *it;
     //draw reconstructable tracks only
-    if( T.nMCContStations<4 ) continue;
+    if( ! T.IsReconstructable() ) continue;
     //if (( T.mother_ID< 0 )&&( T.nContStations<3 )) continue;
     //if (( T.mother_ID>=0 )&&( T.nContStations<4 )) continue;
     //if( T.p<.2 ) continue;
     if( T.p<0.1 ) continue;
+    pline.SetLineColor(kRed);
     if( T.p<0.5 ) pline.SetLineColor(kBlue);
     if( T.mother_ID != -1) pline.SetLineColor(8);
     if(( T.mother_ID != -1) && ( T.p<0.5 )) pline.SetLineColor(12);
-    cout << "MC Track: p = " << T.p << "  mother_ID = " << T.mother_ID << "  PDG = " << T.pdg << endl;
+    if (fVerbose >= 1) cout << "MC Track: p = " << T.p << "  mother_ID = " << T.mother_ID << "  PDG = " << T.pdg << endl;
     double par[6];
     par[0] = T.x;
     par[1] = T.y;
@@ -161,6 +188,7 @@ void L1AlgoDraw::DrawMCTracks()
     par[5] = T.z;
 
     int npoints = T.Points.size();
+    if (fVerbose >= 10) cout << " NMCPoints = " << npoints << endl;
     if( npoints<1 ) continue;
 
     vector<double> lx, ly, lz;
@@ -170,8 +198,14 @@ void L1AlgoDraw::DrawMCTracks()
 
     bool ok = true;
 
+    if (fVerbose >= 4){
+      cout << "hits = ";
+      for (int ih = 0; ih < T.StsHits.size(); ih++)
+        cout << T.StsHits[ih] << " ";
+      cout << endl;
+    }
     for( int ip=0; ip<npoints; ip++){
-      CbmL1MCPoint &p = *(T.Points[ip]);
+      CbmL1MCPoint &p = L1.vMCPoints[T.Points[ip]];
       double par1[6];
       //if( fabs(p.pz)<0.05 ) continue;
       par1[0] = p.x;
@@ -180,6 +214,12 @@ void L1AlgoDraw::DrawMCTracks()
       par1[3] = p.py/p.pz;
       par1[4] = p.q/p.p;
       par1[5] = p.z;
+      if (fVerbose >= 5){
+        static float pz = -1;
+        if (fabs(pz - p.z) > 1.0) cout << "-- ";
+        cout << "point.z = " << p.z << endl;
+        pz = p.z;
+      }
      
       double Zfrst = par[5];
       double Zlast = par1[5];
@@ -246,28 +286,56 @@ void L1AlgoDraw::DrawMCTracks()
 
 void L1AlgoDraw::DrawRecoTracks()
 {
-
+//   XYZ->cd();
+//   TView *view = TView::CreateView(1);
+//   view->SetRange(-100,-100,-100, 100, 100, 100);
+  
   int NRecTracks = 0;
 //   CbmL1 &L1 = *CbmL1::Instance();
-  TPolyLine pline;
-  pline.SetLineColor(kBlue);
 
   int curRecoHit = 0;
-  vector< unsigned short int > &recoHits = algo->vRecoHits;
+  vector< THitI > &recoHits = algo->vRecoHits;
   for( vector<L1Track>::iterator it = algo->vTracks.begin(); it != algo->vTracks.end(); ++it){
     L1Track &T = *it;
-
-    vector<double> lx, ly, lz;
-
     int nHits = T.NHits;
+//     if (nHits > 5) continue; // draw clones
+//     YZ->cd(); YZ->Update();
+//     XZ->cd(); XZ->Update();
+//     YX->cd(); YX->Update();
+//     DrawAsk();
+    vector<double> lx, ly, lz;
+    vector<double> lx_turned, ly_turned, lz_turned;
+    
+    TPolyLine pline;
+    pline.SetLineColor(kBlue);
+//     TPolyLine3D pline3D(nHits);
+//     pline3D.SetLineColor(kBlue);
+    if (fVerbose >= 4){
+      cout << "hits = ";
+    }
     for( int iHit=0; iHit<nHits; iHit++){
       unsigned int ih = recoHits[curRecoHit++];
+      if (fVerbose >= 4){
+        cout << ih << " ";
+      }
+      
       Point p = GetHitCoor(ih);
       lx.push_back(p.x);
       ly.push_back(p.y);
       lz.push_back(p.z);
-    }
 
+      TVector3 v3(p.x, p.y, p.z);
+      v3.RotateX(TMath::Pi()/5);
+      v3.RotateY(TMath::Pi()/20);
+      v3.RotateZ(TMath::Pi()/100);
+      lx_turned.push_back(v3.x());
+      ly_turned.push_back(v3.y());
+      lz_turned.push_back(v3.z());
+//       pline3D.SetPoint(iHit, p.x, p.y, p.z);
+    }
+    if (fVerbose >= 4){
+      cout << endl;
+    }
     if (1){
 
       NRecTracks++;
@@ -278,6 +346,9 @@ void L1AlgoDraw::DrawRecoTracks()
       pline.DrawPolyLine(lx.size(), &(lz[0]), &(lx[0]) );
       YX->cd();
       pline.DrawPolyLine(lx.size(), &(lx[0]), &(ly[0]) );
+      XYZ->cd();
+      pline.DrawPolyLine(lx_turned.size(), &(lz_turned[0]), &(lx_turned[0]) );
+//       pline3D.Draw();
     }
   }
 
@@ -286,9 +357,12 @@ void L1AlgoDraw::DrawRecoTracks()
   YZ->cd(); YZ->Update();
   XZ->cd(); XZ->Update();
   YX->cd(); YX->Update();
+  
+  XYZ->cd();
+  XYZ->Update();
 }
 
-void L1AlgoDraw::DrawTriplets(vector <L1Triplet> &triplets, unsigned int *realIHit)
+void L1AlgoDraw::DrawTriplets(vector <L1Triplet> &triplets, const THitI *realIHit)
 {
 //   vector <L1Triplet> triplets = algo->vTriplets;
   for (int iTrip = 0; iTrip < triplets.size(); iTrip++){
@@ -349,25 +423,25 @@ void L1AlgoDraw::DrawTriplet(int il, int im, int ir)
   marker.DrawMarker(lx[nHits-1],ly[nHits-1]);
 }
 
-void L1AlgoDraw::DrawDoublets(unsigned short int* Duplets_hits, unsigned short int*  Duplets_start, const int MaxArrSize, int* StsRestHitsStartIndex, unsigned int *realIHit)
+void L1AlgoDraw::DrawDoublets(vector<THitI>* Duplets_hits, map<THitI, THitI>* Duplets_start, const int MaxArrSize, int* StsRestHitsStartIndex, unsigned int *realIHit)
 {
   for (int iSta = 0; iSta < NStations-1; iSta++){
     const int firstHitOnSta = StsRestHitsStartIndex[iSta];
     const int firstHitOnNextSta = StsRestHitsStartIndex[iSta+1];
-    unsigned short int* staDupletsHits = Duplets_hits + MaxArrSize*iSta;
-    unsigned short int*  staDupletsStart = Duplets_start + MaxArrSize*iSta;
-    
+    THitI* staDupletsHits  = &(Duplets_hits[iSta][0]);
+    map<THitI, THitI>& staDupletsStart = Duplets_start[iSta];
+
     for (int iRestLHit = firstHitOnSta; iRestLHit < firstHitOnNextSta; iRestLHit++){
       const int ilh = iRestLHit - firstHitOnSta;
       const int iirhFirst = staDupletsStart[ilh];
       const int iirhLast = staDupletsStart[ilh+1]-1;
-      
+
       for (int iirh = iirhFirst; iirh <= iirhLast; iirh++){
         const int iRestRHit = staDupletsHits[iirh] + firstHitOnNextSta;
-      
+
         const int iLHit = realIHit[iRestLHit];
         const int iRHit = realIHit[iRestRHit];
-    
+
         DrawDoublet(iLHit, iRHit);
       }
     }
@@ -378,12 +452,12 @@ void L1AlgoDraw::DrawDoublets(unsigned short int* Duplets_hits, unsigned short i
   YX->cd(); YX->Update();
 };
 
-void L1AlgoDraw::DrawDoubletsOnSta(int iSta, unsigned short int* Duplets_hits, unsigned short int*  Duplets_start, const int MaxArrSize, int* StsRestHitsStartIndex, unsigned int *realIHit)
+void L1AlgoDraw::DrawDoubletsOnSta(int iSta, THitI* Duplets_hits, THitI*  Duplets_start, const int MaxArrSize, int* StsRestHitsStartIndex, unsigned int *realIHit)
 {
   const int firstHitOnSta = StsRestHitsStartIndex[iSta];
   const int firstHitOnNextSta = StsRestHitsStartIndex[iSta+1];
-  unsigned short int* staDupletsHits = Duplets_hits + MaxArrSize*iSta;
-  unsigned short int*  staDupletsStart = Duplets_start + MaxArrSize*iSta;
+  THitI* staDupletsHits = Duplets_hits + MaxArrSize*iSta;
+  THitI*  staDupletsStart = Duplets_start + MaxArrSize*iSta;
 
   for (int iRestLHit = firstHitOnSta; iRestLHit < firstHitOnNextSta; iRestLHit++){
     const int ilh = iRestLHit - firstHitOnSta;
@@ -464,6 +538,8 @@ void L1AlgoDraw::DrawInputHits()
   int nhits = vStsHits.size();
   Double_t x_poly[nhits], y_poly[nhits], z_poly[nhits];
   Double_t x_poly_fake[nhits], y_poly_fake[nhits], z_poly_fake[nhits];
+  Double_t x_poly_turned[nhits], z_poly_turned[nhits];
+  Double_t x_poly_fake_turned[nhits], z_poly_fake_turned[nhits];
 
 
   for (int ista = NStations-1; ista>=0; ista--){//  //start downstream chambers
@@ -475,19 +551,30 @@ void L1AlgoDraw::DrawInputHits()
       int iMC = CbmL1::Instance()->vHitMCRef[ih];
       //if( (vSFlag[h.f] | vSFlagB[h.b] )&0x02 ) continue; // if used
 
-      double x = vStsStrips[h.f];
-      double v = vStsStripsB[h.b];
-      double y = (st.yInfo.cos_phi*x + st.yInfo.sin_phi*v)[0];
-      double z = st.z[0];
+      float x,y,z;
+      float x_t,z_t;
+      algo->GetHitCoor(h ,x,y,z, st);
+
+      TVector3 v3(x, y, z);
+      v3.RotateX(TMath::Pi()/5);
+      v3.RotateY(TMath::Pi()/20);
+      v3.RotateZ(TMath::Pi()/100);
+      x_t = v3.x();
+      z_t = v3.z();
+      
       if( iMC>=0 ){
         x_poly[n_poly] = x;
         y_poly[n_poly] = y;
         z_poly[n_poly] = z;
+        x_poly_turned[n_poly] = x_t;
+        z_poly_turned[n_poly] = z_t;
         n_poly++;
       }else{
         x_poly_fake[n_poly_fake] = x;
         y_poly_fake[n_poly_fake] = y;
         z_poly_fake[n_poly_fake] = z;
+        x_poly_fake_turned[n_poly_fake] = x_t;
+        z_poly_fake_turned[n_poly_fake] = z_t;
         n_poly_fake++;
       }
     }
@@ -544,6 +631,20 @@ void L1AlgoDraw::DrawInputHits()
     pmyx_fake->SetMarkerStyle(fakesMStyle);
     pmyx_fake->SetMarkerSize(HitSize);
     pmyx_fake->Draw();
+
+    XYZ->cd();
+
+    TPolyMarker *pmxyz = new TPolyMarker(n_poly, z_poly_turned, x_poly_turned);
+    pmxyz->SetMarkerColor(mcolor[ista]);
+    pmxyz->SetMarkerStyle(hitsMStyle);
+    pmxyz->SetMarkerSize(HitSize);
+    pmxyz->Draw();
+    
+    TPolyMarker *pmxyz_fake = new TPolyMarker(n_poly_fake, z_poly_fake_turned, x_poly_fake_turned);
+    pmxyz_fake->SetMarkerColor(mcolor[ista]);
+    pmxyz_fake->SetMarkerStyle(fakesMStyle);
+    pmxyz_fake->SetMarkerSize(HitSize);
+    pmxyz_fake->Draw();
   }
 
 } // DrawInputHits
@@ -576,10 +677,8 @@ void L1AlgoDraw::DrawRestHits(int *StsRestHitsStartIndex, int *StsRestHitsStopIn
       int iMC = CbmL1::Instance()->vHitMCRef[ih];
       //if( (vSFlag[h.f] | vSFlagB[h.b] )&0x02 ) continue; // if used
 
-      double x = vStsStrips[h.f];
-      double v = vStsStripsB[h.b];
-      double y = (st.yInfo.cos_phi*x + st.yInfo.sin_phi*v)[0];
-      double z = st.z[0];
+      float x,y,z;
+      algo->GetHitCoor(h ,x,y,z, st);
       if( iMC>=0 ){
         x_poly[n_poly] = x;
         y_poly[n_poly] = y;
@@ -684,17 +783,15 @@ L1AlgoDraw::Point L1AlgoDraw::GetHitCoor(int ih)
     }
   }
   L1Station &sta = vStations[ista];
-  float &x = vStsStrips[hit.f];
-  float &v = vStsStripsB[hit.b];
-  Point out;
-  out.x = x;
-  out.y = (sta.yInfo.cos_phi*x + sta.yInfo.sin_phi*v)[0];
-  out.z = sta.z[0];
-  return out;
+  float x,y,z;
+  algo->GetHitCoor(hit ,x,y,z, sta);
+  return Point(x,y,z);
 };
 
 void L1AlgoDraw::SaveCanvas(TString name)
 {
+  system("mkdir L1CADraw -p");
+  chdir( "L1CADraw" );
   TString tmp = name;
   tmp += "YXView.pdf";
   YX->cd(); 
@@ -712,6 +809,15 @@ void L1AlgoDraw::SaveCanvas(TString name)
   YZ->cd();
 //   YZ->SaveAs("YZView.eps");
   YZ->SaveAs(tmp);
+  
+  tmp = name;
+  tmp += "XYZView.pdf";
+  XYZ->cd();
+  XYZ->SaveAs(tmp);
+//   XYZ->SaveAs("XYZView.eps");
+//   XYZ->SaveAs("XYZView.png");
+//   XYZ->SaveAs("XYZView.pdf");
+  chdir( ".." );
 }
 
 #endif

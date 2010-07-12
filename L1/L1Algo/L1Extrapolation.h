@@ -8,6 +8,48 @@
 #define cnst static const fvec 
 
 
+inline void L1Extrapolate( L1TrackPar &T, fvec        z_out  , fvec       qp0    , L1FieldRegion &F );
+inline void L1Extrapolate0( L1TrackPar &T, fvec        z_out     , L1FieldRegion &F );
+inline void L1Extrapolate00( L1TrackPar &T, fvec        z_out     , L1FieldRegion &F );
+inline void L1ExtrapolateLine( L1TrackPar &T, fvec z_out);
+
+inline void L1ExtrapolateShort
+( 
+ L1TrackPar &T, // input track parameters (x,y,tx,ty,Q/p) and cov.matrix
+ fvec        z_out  , // extrapolate to this z position
+ fvec       qp0    , // use Q/p linearisation at this value
+ L1FieldRegion &F
+ ) // TODO: try to optimize time
+{
+//   T.x += T.tx*(z_out-T.z);
+//   T.y += T.ty*(z_out-T.z);
+//   T.z = z_out;
+//   L1TrackPar T_temp = T;
+  
+//   L1Extrapolate(T,z_out,qp0,F);
+  L1Extrapolate0(T,z_out,F);
+//   L1Extrapolate00(T,z_out,F);
+//   L1ExtrapolateLine(T, z_out);
+  
+//   T.C00 = T_temp.C00;
+//   T.C10 = T_temp.C10;
+//   T.C11 = T_temp.C11;
+//   T.C20 = T_temp.C20;
+//   T.C21 = T_temp.C21;
+//   T.C22 = T_temp.C22;
+//   T.C30 = T_temp.C30;
+//   T.C31 = T_temp.C32;
+//   T.C32 = T_temp.C33;
+//   T.C33 = T_temp.C33;
+//   T.C40 = T_temp.C40;
+//   T.C41 = T_temp.C41;
+//   T.C42 = T_temp.C42;
+//   T.C43 = T_temp.C43;
+//   T.C44 = T_temp.C44;
+//   T.chi2 = T_temp.chi2;
+//   T.NDF = T_temp.NDF;
+}
+
 inline void L1Extrapolate
 ( 
  L1TrackPar &T, // input track parameters (x,y,tx,ty,Q/p) and cov.matrix
@@ -388,7 +430,136 @@ inline void L1Extrapolate0
 
 }
 
+inline void L1Extrapolate00
+    (
+    L1TrackPar &T, // input track parameters (x,y,tx,ty,Q/p) and cov.matrix
+ fvec       z_out  , // extrapolate to this z position
+ L1FieldRegion &F
+    )
+{
+  //
+  //  Part of the analytic extrapolation formula with error (c_light*B*dz)^4/4!
+  //
+  
+  cnst c_light = 0.000299792458;
 
+  cnst
+      c1 = 1., c2 = 2., c3 = 3., c4 = 4., c6 = 6., c9 = 9., c15 = 15., c18 = 18., c45 = 45.,
+  c2i = 1./2., c3i = 1./3., c6i = 1./6., c12i = 1./12.;
+
+  fvec dz = (z_out - T.z);
+  fvec dz2 = dz*dz;
+
+  // construct coefficients 
+
+  fvec x   = T.tx;
+  fvec y   = T.ty;
+  fvec xx  = x*x;
+  fvec xy = x*y;
+  fvec yy = y*y;
+  fvec Ay = -xx-c1;
+  fvec Bx = yy+c1;
+  fvec ct    = c_light*sqrt( c1 + xx + yy );
+
+  fvec dzc2i  = dz*c2i;
+  fvec dz2c3i = dz2*c3i;
+  fvec dzc6i  = dz*c6i;
+  fvec dz2c12i= dz2*c12i;
+
+  fvec sx = ( F.cx0 + F.cx1*dzc2i + F.cx2*dz2c3i  );
+  fvec sy = ( F.cy0 + F.cy1*dzc2i + F.cy2*dz2c3i );
+  fvec sz = ( F.cz0 + F.cz1*dzc2i + F.cz2*dz2c3i );
+
+  fvec Sx = ( F.cx0*c2i + F.cx1*dzc6i + F.cx2*dz2c12i );
+  fvec Sy = ( F.cy0*c2i + F.cy1*dzc6i + F.cy2*dz2c12i );
+  fvec Sz = ( F.cz0*c2i + F.cz1*dzc6i + F.cz2*dz2c12i );
+  
+  
+  fvec ctdz  = ct*dz;
+  fvec ctdz2 = ct*dz2;
+    
+  fvec j04 = ctdz2* ( Sx*xy   + Sy*Ay   + Sz*y );
+  fvec j14 = ctdz2* ( Sx*Bx   - Sy*xy   - Sz*x );
+  fvec j24 = ctdz * ( sx*xy   + sy*Ay   + sz*y );
+  fvec j34 = ctdz * ( sx*Bx   - sy*xy   - sz*x );
+    
+  T.x += x*dz;
+  T.y += y*dz;
+  T.z  += dz;
+
+  //          covariance matrix transport 
+
+  fvec cj00 = T.C00 + T.C20*dz + T.C40*j04;
+  fvec cj10 = T.C10 + T.C21*dz + T.C41*j04;
+  fvec cj20 = T.C20 + T.C22*dz + T.C42*j04;
+  fvec cj30 = T.C30 + T.C32*dz + T.C43*j04;
+ 
+  fvec cj01 = T.C10 + T.C30*dz + T.C40*j14;
+  fvec cj11 = T.C11 + T.C31*dz + T.C41*j14;
+  fvec cj21 = T.C21 + T.C32*dz + T.C42*j14;
+  fvec cj31 = T.C31 + T.C33*dz + T.C43*j14;
+ 
+  fvec cj02 = T.C20 +  T.C40*j24;
+  fvec cj12 = T.C21 +  T.C41*j24;
+  fvec cj22 = T.C22 +  T.C42*j24;
+  fvec cj32 = T.C32 +  T.C43*j24;
+ 
+  fvec cj03 = T.C30 + T.C40*j34;
+  fvec cj13 = T.C31 + T.C41*j34;
+  fvec cj23 = T.C32 + T.C42*j34;
+  fvec cj33 = T.C33 + T.C43*j34;
+
+  T.C40+= T.C42*dz + T.C44*j04; // cj40
+  T.C41+= T.C43*dz + T.C44*j14; // cj41
+  T.C42+=            T.C44*j24; // cj42
+  T.C43+=            T.C44*j34; // cj43
+
+  T.C00 = cj00 + dz*cj20 + j04*T.C40;
+  T.C10 = cj01 + dz*cj21 + j04*T.C41;
+  T.C11 = cj11 + dz*cj31 + j14*T.C41;
+
+  T.C20 = cj20  + j24*T.C40 ;
+  T.C30 = cj30  + j34*T.C40 ;
+  T.C21 = cj21  + j24*T.C41 ;
+  T.C31 = cj31  + j34*T.C41 ;
+  T.C22 = cj22  + j24*T.C42 ;
+  T.C32 = cj32  + j34*T.C42 ;
+  T.C33 = cj33  + j34*T.C43 ;
+
+}
+
+
+
+inline void L1ExtrapolateLine( L1TrackPar &T, fvec z_out)
+{
+  fvec dz = (z_out - T.z);
+
+  T.x += T.tx*dz;
+  T.y += T.ty*dz;
+  T.z  += dz;
+  
+          // TODO: check. w\o T.C works better.
+//   T.C00 += 2*dz*T.C20 + dz*dz*T.C22;
+//   T.C20 += dz*T.C22;
+//   T.C11 += 2*dz*T.C31 + dz*dz*T.C33;
+//   T.C31 += dz*T.C33;
+  
+//   const fvec dzC32_in = dz * T.C32;  
+// 
+//   T.C21 += dzC32_in;
+//   T.C10 += dz * (  T.C21 + T.C30 );
+// 
+//   const fvec C20_in = T.C20;
+// 
+//   T.C20 += dz * T.C22;
+//   T.C00 += dz * ( T.C20 + C20_in );
+// 
+//   const fvec C31_in = T.C31;
+// 
+//   T.C31 += dz * T.C33;
+//   T.C11 += dz * ( T.C31 + C31_in );
+//   T.C30 += dzC32_in;
+}
 
 inline void L1ExtrapolateJXY
 ( 

@@ -9,9 +9,9 @@
  * @param nEvents        Number of events to process
  */
 void much_hits_gem(TString inFile = "",
-      TString digiFile = "",
+      TString digiFile = "data/much_digi.root",
       TString outFile = "",
-      Int_t nEvents = 2)
+      Int_t nEvents = 1)
 {
    TString inputdir = gSystem->Getenv("VMCWORKDIR");
    if (inFile == "") {
@@ -84,7 +84,7 @@ void much_hits_gem(TString inFile = "",
    // ---  MuCh hit finder ---------------------------------------------------
 //   CbmMuchFindHitsSimpleGem* findHits = new CbmMuchFindHitsSimpleGem("MuchFindHitsSimpleGem", digiFile, iVerbose);
    CbmMuchFindHitsAdvancedGem* findHits = new CbmMuchFindHitsAdvancedGem("MuchFindHitsAdvancedGem", digiFile, iVerbose);
-   findHits->SetAlgorithm(3);
+   findHits->SetAlgorithm(2);
 
    findHits->SetNStations(6);
    Double_t thresholds[] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1};

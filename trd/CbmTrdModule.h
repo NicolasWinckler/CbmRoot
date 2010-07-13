@@ -56,7 +56,10 @@ class CbmTrdModule : public TNamed
 
   Double_t GetSizex()      const { return fSizex; }
   Double_t GetSizey()      const { return fSizey; }
-
+  
+  Int_t GetnCol(); 
+  Int_t GetnRow();
+  
   Double_t GetPadSizex(Int_t i)   const { return fPadSizex.At(i); }
   Double_t GetPadSizey(Int_t i)   const { return fPadSizey.At(i); }
   Double_t GetSectorSizex(Int_t i)   const { return fSectorSizex.At(i); }

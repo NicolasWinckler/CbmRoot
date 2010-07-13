@@ -39,8 +39,8 @@ void much_sim(TString inputSignal = "",
   cout << endl;
 
   // -----   Specify MUCH related geometry   --------------------------------
-  // much_standard.geo: 6 absorbers, 6 stations (12 detectors)
-  // much_compact.geo: 5 absorbers, 5 stations (10 detectors)
+  // much_standard.geo: 6 absorbers, 6 stations
+  // much_compact.geo: 5 absorbers, 5 stations
   // Use pipe_much.geo for the beam pipe in both cases.
   // In case you want the additional W shielding around the pipe,
   // use shield_standard.geo or shield_compact.geo, respective to the

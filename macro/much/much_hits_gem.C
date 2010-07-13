@@ -24,6 +24,7 @@ void much_hits_gem(TString inFile = "",
       outFile = "data/Jpsi.auau.25gev.centr.muchhits.root";
    }
 
+   TString parFile = "data/params.root";
    // ========================================================================
    //          Adjust this part according to your requirements
 
@@ -62,7 +63,7 @@ void much_hits_gem(TString inFile = "",
    // -----  Parameter database   --------------------------------------------
    FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
    FairParRootFileIo*  parIo1 = new FairParRootFileIo();
-   parIo1->open(gFile);
+   parIo1->open(parFile);
    rtdb->setFirstInput(parIo1);
    rtdb->setOutput(parIo1);
    rtdb->saveOutput();
@@ -83,7 +84,7 @@ void much_hits_gem(TString inFile = "",
    // ---  MuCh hit finder ---------------------------------------------------
 //   CbmMuchFindHitsSimpleGem* findHits = new CbmMuchFindHitsSimpleGem("MuchFindHitsSimpleGem", digiFile, iVerbose);
    CbmMuchFindHitsAdvancedGem* findHits = new CbmMuchFindHitsAdvancedGem("MuchFindHitsAdvancedGem", digiFile, iVerbose);
-   findHits->SetAlgorithm(6);
+   findHits->SetAlgorithm(3);
 
    findHits->SetNStations(6);
    Double_t thresholds[] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1};

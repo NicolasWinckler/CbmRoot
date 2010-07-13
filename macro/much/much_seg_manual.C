@@ -29,6 +29,7 @@ void much_seg_manual(const char* mcFile = "",
 
   // Dummy ROOT file (needed as an output)
   TString outFile  = "data/dummy.root";
+  TString parFile = "data/params.root";
 
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -62,7 +63,7 @@ void much_seg_manual(const char* mcFile = "",
   // -----  Parameter database   --------------------------------------------
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo*  parIo1 = new FairParRootFileIo();
-  parIo1->open(gFile);
+  parIo1->open(parFile);
   rtdb->setFirstInput(parIo1);
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();

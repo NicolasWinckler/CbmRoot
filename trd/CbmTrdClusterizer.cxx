@@ -159,8 +159,8 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   //const Bool_t Reconst = false;
   const Bool_t Histo = true;
   //const Bool_t Histo = false;
-  //const Bool_t TEST = true;
-  const Bool_t TEST = false;
+  const Bool_t TEST = true;
+  //const Bool_t TEST = false;
   const Bool_t Sector = true;
   //const Bool_t Sector = false;
   
@@ -173,6 +173,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   
   TH1F* TRDalpha = NULL;
   TH1F* TRDbeta = NULL;
+  TH1F* TRDgamma = NULL;
   TH1F* XMC = NULL;
   TH1F* Xreco = NULL;
   TH1F* RMC = NULL;
@@ -206,7 +207,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   TH2F* rdTRD2 = NULL;
      
   TProfile* zdTRD = NULL;
-  TProfile* rdTRD = NULL;
+  //TProfile* rdTRD = NULL;
   TProfile* deltarecoTRD1 = NULL;
   TProfile* deltarecoPad = NULL;
   TProfile* PRF2 = NULL;
@@ -218,14 +219,19 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       printf("Init Histograms\n");
       TRDalpha = new TH1F("TRDalpha","atan(deltaX(MC) / deltaZ(MC)) [deg]",110,-10,100);
       TRDbeta = new TH1F("TRDbeta","atan(deltaY(MC) / deltaZ(MC)) [deg]",110,-10,100);
+      TRDgamma = new TH1F("TRDgamma","atan(deltaR(MC) / deltaZ(MC)) [deg]",110,-10,100);
       XMC = new TH1F("XMC","x_mean(MC) [pad unit]",100,-1,1);
       Xreco = new TH1F("Xreco","x_mean(reco) [pad unit]",100,-1,1);
       RMC = new TH1F("RMC","r_in(MC) - r_out(MC) [mm]",200,0,100);
       PR = new TH1F("PR","x_mean(MC) - x_mean(reco) [mm]",400,-20,20);
+      /*
       hDeltaX = new TH1F("DeltaX","fabs(x_in - x_out) [mm]",200,0,100);
       hDeltaY = new TH1F("DeltaY","fabs(y_in - y_out) [mm]",200,0,100);
+      */
+      /*
       PadX = new TH1F("PadX","pads between x_in and x_out [pad unit]",50,0,50);
       PadY = new TH1F("PadY","pads between y_in and y_out [pad unit]",50,0,50);
+      */
       ClusterWidth = new TH1F("ClusterWidth","Cluster Width 'Charge > 0' [pad unit]",100,0,100);
       //Charge = new TH1F("ChargeSpectra","Charge Spectra [a.u.]",100,0,2);
       TestIntegration = new TH1F("IntegrSpectra","Integral Spectra [a.u.]", 100, 1E3, 4 * 1E4);
@@ -234,7 +240,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       ChargeTR = new TH1F("ChargeTRSpectra","Charge TR Spectra [a.u.]",200,0,2);
       ELossSprectra = new TH1F("ELossSprectra","ELossSprectra",1000,0,0.002);
       ELossdEdXSprectra = new TH1F("ELossdEdXSprectra","ELossdEdX Sprectra",1000,0,0.002);
-      ELossTRSprectra = new TH1F("ELossTRSprectra","ELossTR Sprectra",1000,0,0.002);
+      ELossTRSprectra = new TH1F("ELossTRSprectra","ELossTR Sprectra",1000,0,0.0002);
 
       TRD1 = new TH2F("TRD1","TRD1",1000,-10000,10000,1000,-10000,10000);
       TRD1->SetContour(99);
@@ -264,8 +270,8 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       rdTRD2->SetContour(99);
 
       zdTRD = new TProfile("zdTRD","Layer+(Station-1)*4 vs. fabs(r_in(MC) - r_out(MC)) [mm]", 15, 0,15);
-      rdTRD = new TProfile("rdTRD","r_in(MC) vs. fabs(r_in(MC) - r_out(MC)) [mm]", 50, 0,10000);
-      deltarecoTRD1 = new TProfile("deltarecoTRD","r_in(MC) vs. fabs(x_mean(MC) - x_mean(reco)) [mm] pad 'C'-CS", 50, 0,10000);
+      //rdTRD = new TProfile("rdTRD","r_in(MC) vs. fabs(r_in(MC) - r_out(MC)) [mm]", 50, 0,10000);
+      //deltarecoTRD1 = new TProfile("deltarecoTRD","r_in(MC) vs. fabs(x_mean(MC) - x_mean(reco)) [mm] pad 'C'-CS", 50, 0,10000);
       deltarecoPad = new TProfile("deltarecoPad","x_mean(MC) vs. (x_mean(MC) - x_mean(reco)) [pad units] pad 'C'-CS", 100, -1,1);
       PRF2 = new TProfile("PRF2","PRF2",150,-1.5 * 5,1.5 * 5);
       Float_t K3 = 0.525;
@@ -406,8 +412,8 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	  alpha = TMath::ATan(fabs(local_inC[0] - local_outC[0]) / fabs(local_outC[2] - local_inC[2])) * (180. / TMath::Pi());
 	  beta  = TMath::ATan(fabs(local_inC[1] - local_outC[1]) / fabs(local_outC[2] - local_inC[2])) * (180. / TMath::Pi());
 	  gamma = TMath::ATan(
-			      sqrt(pow(local_inC[0],2) + pow(local_inC[1],2)) - 
-			      sqrt(pow(local_outC[0],2) + pow(local_outC[1],2))
+			      fabs(sqrt(pow(local_inC[0],2) + pow(local_inC[1],2)) - 
+			       sqrt(pow(local_outC[0],2) + pow(local_outC[1],2)))
 			      / fabs(local_outC[2] - local_inC[2])
 			      ) * (180. / TMath::Pi());
 	}
@@ -415,15 +421,10 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 
       CalcPixelCoordinate(); 
 
-      GetIntegrationArea(Histo, PadX , PadY);
+      // GetIntegrationArea(Histo, PadX , PadY);
       
-      const Int_t nCol = (Int_t)(modulesize[0] / (int(padsize[0] * 100) / 100.0));   
-      Int_t temp = 0;
-      for (Int_t i = 0; i < fNoSectors; i++)
-	{
-	  temp += sectorrows[i];
-	}
-      const Int_t nRow = temp;
+      const Int_t nCol = fnCol; 
+      const Int_t nRow = fnRow;
   
       Double_t PadChargeModule[nRow * nCol];     
       Double_t padW[nCol];
@@ -502,16 +503,19 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	  ELossSprectra->Fill(fELoss);
 	  Charge->Fill(tempCharge);
 	  //TestIntegration->Fill(tempCharge/fELoss+5);
+	  /*
 	  hDeltaX->Fill(fabs(local_inC[0] - local_outC[0]));
 	  hDeltaY->Fill(fabs(local_inC[1] - local_outC[1]));
+	  */
 	  TRDalpha->Fill(alpha);
 	  TRDbeta->Fill(beta);
+	  TRDgamma->Fill(gamma);
 	  TRD1->Fill(global_meanC[0], global_meanC[1]);
   
 	  TRDin_out->Fill(local_inC[0],local_inC[1]);
 	  TRDin_out->Fill(local_outC[0],local_outC[1]);
 	  
-	  rdTRD->Fill(fabs(Rin), fabs(Rin-Rout));
+	  //rdTRD->Fill(fabs(Rin), fabs(Rin-Rout));
 	  rdTRD2->Fill(Rin, fabs(Rin-Rout));
 
 	  RMC->Fill( fabs(Rin-Rout));
@@ -547,8 +551,8 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       TRDalpha->Draw();                      
       c1->cd(3)->SetLogy();
       TRDbeta->Draw();
-      c1->cd(4);
-      DeltaSlice->Draw("colz");
+      c1->cd(4)->SetLogy();
+      TRDgamma->Draw();
       c1->cd(5)->SetLogy();
       TestIntegration->Draw();
       c1->cd(6);
@@ -556,9 +560,10 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       c1->cd(7);
       recoTRD2->Draw("colz");
       c1->cd(8);
-      rdTRD->Draw();
+      DeltaSlice->Draw("colz");
+      //rdTRD->Draw();
       c1->cd(9);
-      deltarecoTRD1->Draw();
+      //deltarecoTRD1->Draw();
       c1->cd(10);
       XMC->Draw();
       c1->cd(11);
@@ -576,13 +581,13 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       c2->cd(1)->SetLogy();
       PR->Draw();
       c2->cd(2)->SetLogy();
-      PadX->Draw();
+      //PadX->Draw();
       c2->cd(3)->SetLogy();
-      PadY->Draw();
+      //PadY->Draw();
       c2->cd(4)->SetLogy();
-      hDeltaX->Draw();
+      //hDeltaX->Draw();
       c2->cd(5)->SetLogy();
-      hDeltaY->Draw();
+      //hDeltaY->Draw();
       c2->cd(6);
       rdTRD2->Draw("colz");
       c2->cd(7);
@@ -602,7 +607,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	    }
 	}
       c2->cd(9);
-      localTRD1->Draw("colz");
+      //localTRD1->Draw("colz");
       c2->cd(10)->SetLogy();
       ClusterWidth->Draw();   
       c2->cd(11)->SetLogy();
@@ -768,6 +773,8 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
 	  fsectorsizey = (fModuleInfo->GetSectorSizey(iSector)) * 10;
 	  fpadsizex    = (fModuleInfo->GetPadSizex(iSector))    * 10.; // [mm]
 	  fpadsizey    = (fModuleInfo->GetPadSizey(iSector))    * 10.;
+	  fnRow        = (fModuleInfo->GetnRow());
+	  fnCol        = (fModuleInfo->GetnCol());
 	  if (fLayer%2 == 0) //un-rotate
 	    {
 	      temp = fsectorsizex;
@@ -777,6 +784,10 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
 	      temp      = fpadsizex;
 	      fpadsizex = fpadsizey;
 	      fpadsizey = temp;
+
+	      temp  =  fnRow;
+	      fnRow = fnCol;
+	      fnCol = temp;
 	    }
 	  sectorsize[iSector] =  fsectorsizey;
 	  sectorrows[iSector] =  int(fsectorsizey / fpadsizey);
@@ -932,7 +943,7 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
     Nyquist–Shannon sampling theorem: 1/pad width > 2/cluster gap
   */
   Float_t ClusterDistance = 0.2 * padsize[0] - 0.1; //Ar 94 electron/cm    Xe 307 electrons/cm
-  Int_t DrawTH = int(15 * padsize[0] / ClusterDistance);
+  Int_t DrawTH = int(15 * padsize[0] / ClusterDistance) * 100;
   Double_t deltaR = sqrt(pow((local_inLL[0] - local_outLL[0]),2) + pow((local_inLL[1] - local_outLL[1]),2)/* + pow((fz_in - fz_out),2)*/);
   Int_t nPathSlice = int(deltaR / ClusterDistance) + 1;                       
 
@@ -1247,6 +1258,7 @@ void CbmTrdClusterizer::ClusterMapping(Int_t nCol, Int_t nRow, Int_t Col_slice, 
     /*
       First iteration of the area on which the charge of one track is induced
      */
+    /*
     Int_t Padx = int(fabs(fCol_in - fCol_out) + 1);
     Int_t Pady = int(fabs(fRow_in - fRow_out) + 1);
 
@@ -1255,6 +1267,7 @@ void CbmTrdClusterizer::ClusterMapping(Int_t nCol, Int_t nRow, Int_t Col_slice, 
 	PadX->Fill(Padx);
 	PadY->Fill(Pady);
       }
+    */
   }
   // --------------------------------------------------------------------
   // ---- CalcMathieson -------------------------------------------------
@@ -1368,7 +1381,7 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
   /*
     Uses the non weighted Pad Responce Function to reconstructed the cluster position for each row
    */
-  if ( recoTRD1 && recoTRD2 && deltarecoTRD1 && deltarecoTRD2 && deltarecoPad && Xreco && PR && PRF && PRF2)
+  if ( recoTRD1 && recoTRD2 /*&& deltarecoTRD1*/ && deltarecoTRD2 && deltarecoPad && Xreco && PR && PRF && PRF2)
     {
       if (TEST)
 	{
@@ -1413,7 +1426,7 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
 			    {
 			      recoTRD1->Fill(fPRFHitPositionC, fPadPosyC);
 			      recoTRD2->Fill(fPRFHitPositionC/padsize[0], fPadPosyC/padsize[1]);
-			      deltarecoTRD1->Fill(sqrt(pow(global_inC[0],2) + pow(global_inC[1],2)),fabs(fPRFHitPositionC-fPadPosxC));
+			      //deltarecoTRD1->Fill(sqrt(pow(global_inC[0],2) + pow(global_inC[1],2)),fabs(fPRFHitPositionC-fPadPosxC));
 			      deltarecoTRD2->Fill(sqrt(pow(global_inC[0],2) + pow(global_inC[1],2)),fabs(fPRFHitPositionC-fPadPosxC));
 			      deltarecoPad->Fill(fPadPosxC/padsize[0],(fPRFHitPositionC-fPadPosxC)/padsize[0]);	 
 			      Xreco->Fill(fPRFHitPositionC/padsize[0]);

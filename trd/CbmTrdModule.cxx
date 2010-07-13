@@ -219,7 +219,39 @@ Int_t CbmTrdModule::GetSector(Double_t *local_point)
 
 }
 
+Int_t CbmTrdModule::GetnCol()
+{
+  Int_t nCol = 0;
+  if (fSectorSizex.At(0) < fSizex)
+    {
+      for (Int_t i = 0; i < fNoSectors; i++)
+	{
+	  nCol += fSectorSizex.At(i) / fPadSizex.At(i);
+	}
+    }
+  else
+    {
+      nCol = fSectorSizex.At(0) / fPadSizex.At(0);
+    }
+  return nCol;
+}
 
+Int_t CbmTrdModule::GetnRow()
+{
+  Int_t nRow = 0;
+  if (fSectorSizey.At(0) < fSizey)
+    {
+      for (Int_t i = 0; i < fNoSectors; i++)
+	{
+	  nRow += fSectorSizey.At(i) / fPadSizey.At(i);
+	}
+    } 
+  else
+    {
+      nRow = fSectorSizey.At(0) / fPadSizey.At(0);
+    }
+  return nRow;
+}
 
 void CbmTrdModule::GetPadInfo(CbmTrdPoint *trdPoint, Int_t &Col, 
                               Int_t &Row, Int_t &Sector)
@@ -305,8 +337,8 @@ void CbmTrdModule::GetModuleInformation(Int_t VolumeID, Double_t *local_point, I
 
 // ---- CalculateHitPosition ------------------------------------------
 void CbmTrdModule::GetPosition(const Int_t Col, const Int_t Row, 
-				const Int_t VolumeId, const Int_t sector,
-                                TVector3 &posHit, TVector3 &padSize) {
+			       const Int_t VolumeId, const Int_t sector,
+			       TVector3 &posHit, TVector3 &padSize) {
 
   // calculate position in global coordinates from digi 
   // information(Sector, Col, Row).  

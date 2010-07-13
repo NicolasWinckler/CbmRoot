@@ -130,21 +130,12 @@ class CbmTrdClusterizer : public FairTask {
   // --------------->[mm]<---------------
 
   Float_t fx_in, fx_out, fy_in, fy_out, fz_in, fz_out, fx_mean, fy_mean, fz_mean;
-  Int_t fSector;
-  //Int_t tempNosectors =  (fModuleInfo->GetNoSectors);
+  Int_t fSector, fnCol, fnRow;
   static const Int_t accuracy = 1;// '1/accuracy' integration step width [mm]
   static const Int_t fPadNrX = 13;//7; // has to be odd
   static const Int_t fPadNrY = 3;//5; // has to be odd
   static const Int_t fNoSectors = 3;
-  //Int_t fNoSectors;
-  /*
-    static const Bool_t Histo = true;
-    //static const Bool_t Histo = false;
-    static const Bool_t TEST = true;
-    //static const Bool_t TEST = false;
-    //static const Bool_t Sector = true;
-    static const Bool_t Sector = false;
-  */
+ 
   
   Double_t padsize[3];
   Double_t modulesize[3];

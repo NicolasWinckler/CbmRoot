@@ -99,7 +99,7 @@ class CbmL1 : public FairTask
       */
   CbmL1(const char *name, Int_t iVerbose = 1, Int_t _fPerformance = 0, int fSTAPDataMode_ = 0, TString fSTAPDataDir_ = "./");
 
-  ~CbmL1();
+  ~CbmL1( /*if (targetFieldSlice) delete;*/ );
   
   void Finish();
 
@@ -164,7 +164,7 @@ class CbmL1 : public FairTask
 
    CbmStsDigiScheme StsDigi;
    CbmL1Vtx PrimVtx;
-   L1FieldSlice *targetFieldSlice;
+//    L1FieldSlice *targetFieldSlice  _fvecalignment;
 
     /// Input data
    TClonesArray *listMCTracks ;

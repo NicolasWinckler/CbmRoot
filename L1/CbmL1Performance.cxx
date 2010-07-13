@@ -913,7 +913,8 @@ void CbmL1::TrackFitPerformance()
           };
 //           cout << mc.x << " " << mc.y << " " << mc.z << endl;
 
-          targetFieldSlice->GetFieldValue( mc.x, mc.y, targB );
+//           targetFieldSlice->GetFieldValue( mc.x, mc.y, targB );
+          targB = algo->vtxFieldValue;
           fld.Set( targB, 0., B[0], z[0], B[1], z[1] );
 
           L1Extrapolate(trPar, mc.z, trPar.qp, fld);

@@ -214,58 +214,58 @@ InitStatus CbmL1::Init()
   const int N=(M+1)*(M+2)/2;
 
 
-  { // field at the z=0 plane
-    const double Xmax = 10, Ymax = 10;
-    const double z = 0.;
-    double dx = 1.; // step for the field approximation
-    double dy = 1.;
-    if( dx > Xmax/N/2 ) dx = Xmax/N/4.;
-    if( dy > Ymax/N/2 ) dy = Ymax/N/4.;
-
-    TMatrixD A(N,N);
-    TVectorD b0(N), b1(N), b2(N);
-    for( int i=0; i<N; i++){
-      for( int j=0; j<N; j++) A(i,j)==0.;
-      b0(i)=b1(i)=b2(i) = 0.;
-    }
-    for( double x=-Xmax; x<=Xmax; x+=dx )
-      for( double y=-Ymax; y<=Ymax; y+=dy )
-    {
-      double r = sqrt(fabs(x*x/Xmax/Xmax+y/Ymax*y/Ymax));
-      if( r>1. ) continue;
-      Double_t w = 1./(r*r+1);
-      Double_t p[3] = { x, y, z};
-      Double_t B[3] = {0.,0.,0.};
-      CbmKF::Instance()->GetMagneticField()->GetFieldValue(p, B);
-      TVectorD m(N);
-      m(0)=1;
-      for( int i=1; i<=M; i++){
-        int k = (i-1)*(i)/2;
-        int l = i*(i+1)/2;
-        for( int j=0; j<i; j++ ) m(l+j) = x*m(k+j);
-        m(l+i) = y*m(k+i-1);
-      }
-        
-      TVectorD mt = m;
-      for( int i=0; i<N; i++){
-        for( int j=0; j<N;j++) A(i,j)+=w*m(i)*m(j);
-        b0(i)+=w*B[0]*m(i);
-        b1(i)+=w*B[1]*m(i);
-        b2(i)+=w*B[2]*m(i);
-      }
-    }
-    double det;
-    A.Invert(&det);
-    TVectorD c0 = A*b0, c1 = A*b1, c2 = A*b2;
-    
-    targetFieldSlice = new L1FieldSlice;
-    for(int i=0; i<N; i++){
-      targetFieldSlice->cx[i] = c0(i);
-      targetFieldSlice->cy[i] = c1(i);
-      targetFieldSlice->cz[i] = c2(i);
-    }
-
-  } // target field
+//   { // field at the z=0 plane
+//     const double Xmax = 10, Ymax = 10;
+//     const double z = 0.;
+//     double dx = 1.; // step for the field approximation
+//     double dy = 1.;
+//     if( dx > Xmax/N/2 ) dx = Xmax/N/4.;
+//     if( dy > Ymax/N/2 ) dy = Ymax/N/4.;
+// 
+//     TMatrixD A(N,N);
+//     TVectorD b0(N), b1(N), b2(N);
+//     for( int i=0; i<N; i++){
+//       for( int j=0; j<N; j++) A(i,j)==0.;
+//       b0(i)=b1(i)=b2(i) = 0.;
+//     }
+//     for( double x=-Xmax; x<=Xmax; x+=dx )
+//       for( double y=-Ymax; y<=Ymax; y+=dy )
+//     {
+//       double r = sqrt(fabs(x*x/Xmax/Xmax+y/Ymax*y/Ymax));
+//       if( r>1. ) continue;
+//       Double_t w = 1./(r*r+1);
+//       Double_t p[3] = { x, y, z};
+//       Double_t B[3] = {0.,0.,0.};
+//       CbmKF::Instance()->GetMagneticField()->GetFieldValue(p, B);
+//       TVectorD m(N);
+//       m(0)=1;
+//       for( int i=1; i<=M; i++){
+//         int k = (i-1)*(i)/2;
+//         int l = i*(i+1)/2;
+//         for( int j=0; j<i; j++ ) m(l+j) = x*m(k+j);
+//         m(l+i) = y*m(k+i-1);
+//       }
+//         
+//       TVectorD mt = m;
+//       for( int i=0; i<N; i++){
+//         for( int j=0; j<N;j++) A(i,j)+=w*m(i)*m(j);
+//         b0(i)+=w*B[0]*m(i);
+//         b1(i)+=w*B[1]*m(i);
+//         b2(i)+=w*B[2]*m(i);
+//       }
+//     }
+//     double det;
+//     A.Invert(&det);
+//     TVectorD c0 = A*b0, c1 = A*b1, c2 = A*b2;
+//     
+//     targetFieldSlice = new L1FieldSlice;
+//     for(int i=0; i<N; i++){
+//       targetFieldSlice->cx[i] = c0(i);
+//       targetFieldSlice->cy[i] = c1(i);
+//       targetFieldSlice->cz[i] = c2(i);
+//     }
+// 
+//   } // target field
 
   
   

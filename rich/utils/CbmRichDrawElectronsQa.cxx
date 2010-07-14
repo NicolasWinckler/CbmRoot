@@ -7,6 +7,9 @@
 
 #include "../../littrack/utils/CbmLitDrawHist.cxx"
 #include <string>
+#include <cmath>
+using std::fabs;
+
 TCanvas* DrawAcc(TH1D* mc, TH1D* acc, TH1D* richTrd, TH1D* richTrdTof){
 	TCanvas *c1 = new TCanvas("elid_acc_eff","elid_acc_eff",500,500);
 	TH1D* accEff1 = Divide1DHists(acc, mc, "elid_acc_rich_eff",

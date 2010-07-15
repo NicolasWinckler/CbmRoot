@@ -77,7 +77,6 @@ private:
     TArrayD fSectorSizey;    //sector width in y;
     Int_t   fCol;      //Calculated pixel column were the hit is in
     Int_t   fRow;      //Calculated pixel row were the hit is in
-    Bool_t  fIsRotated;//obsolete - used for rectangual modules
 
     Int_t   fModuleID; //Unique number for detector module
 
@@ -94,7 +93,7 @@ private:
 
     CbmTrdDetectorId fTrdDetId; // detector ID
 
-    ClassDef(CbmTrdCreateDigiPar,2)
+    ClassDef(CbmTrdCreateDigiPar,3)
 
     };
 #endif //CBMTRDCREATEDIGIPAR_H

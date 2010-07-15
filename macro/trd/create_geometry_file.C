@@ -9,33 +9,41 @@
 // D. Emschermann - 26.05.2010 - fix TRD geo input file
 // --------------------------------------------------------------------------
 
-void create_geometry_file()
+void create_geometry_file(TString geomFile="trd_squared_modules.geo")
 {
 
   // ========================================================================
   //          Adjust this part according to your requirements
 
+
+  //Extract Filename without extension and path 
+  //TODO: Do this in a better way.
+  TString fileName = geomFile;
+  fileName.ReplaceAll(".geo","");
+  if (fileName.Contains("/")){
+    fileName=fileName("/.*$"); //extract substring with filename
+    fileName.ReplaceAll("/","");
+  }
+  //  cout<<"fileName: "<<fileName<<endl;
+
   // ----- Paths and file names  --------------------------------------------
   TString inDir   = gSystem->Getenv("VMCWORKDIR");
   TString inFile  = inDir + "/input/urqmd.ftn14";
   TString outDir  = "data";
-  TString outFile = outDir + "/test.mc.root";
+  TString outFile = outDir + "/test.mc."+ fileName + ".root";
   TString parFile = outDir + "/params.root";
   
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
-  //  TString trdGeom    = "trd_squared_modules_dec09.geo";
-  //  TString trdGeom    = "trd_squared_modules_jun10.geo";
-  TString trdGeom    = "../macro/trd/trd_squared_modules.geo";
- 
+  TString trdGeom = "../macro/trd/" + geomFile;
+  TString trdGeomOut = "geofile_" + fileName + ".root";
+
   // In general, the following parts need not be touched
   // ========================================================================
 
   // ----    Debug option   -------------------------------------------------
   gDebug = 0;
   // ------------------------------------------------------------------------
-
-
 
   // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
@@ -107,7 +115,7 @@ void create_geometry_file()
   // Create separate file with the geomanager only
   // This version will work only with new versions of
   // the base classes
-  fRun->CreateGeometryFile("geofile_trd.root");
+  fRun->CreateGeometryFile(trdGeomOut);
 
   // -----   Finish   -------------------------------------------------------
   timer.Stop();
@@ -123,5 +131,6 @@ void create_geometry_file()
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
+  exit(0);
 }
 

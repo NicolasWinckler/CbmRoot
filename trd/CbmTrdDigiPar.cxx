@@ -12,11 +12,6 @@
 
 #include "TString.h"
 
-#include <iostream>
-
-using std::cout;
-using std::endl;
-
 // -----   Standard constructor   ------------------------------------------
 CbmTrdDigiPar::CbmTrdDigiPar(const char* name, 
 			     const char* title,
@@ -50,18 +45,25 @@ void CbmTrdDigiPar::clear()
 void CbmTrdDigiPar::putParams(FairParamList* l) 
 {
 
-  //  cout << " I am in CbmTrdDigiPar::putParams " << endl;
   if (!l) return;
 
    l->add("NrOfModules", fNrOfModules);
    l->add("MaxSectors", fMaxSectors);
    l->add("ModuleIdArray", fModuleIdArray);
-   l->add("ModuleRotArray", fModuleRotArray);
 
-   //   TArrayD values(7);
    // Instead of a fixed number of values the number of values to
    // store now depends on the maximum number of sectors per module
-   Int_t nrValues = 5 + ( fMaxSectors * 4 );
+   // The first six parameters are for the complete module. The rest
+   // of the parameters depend on the number of sectors.
+   // The parametrs are:
+   // X. Y, Z             : position of the middle of the gaslayer.
+   // SizeX, SizeY, SizeZ : size of the gaslayer. The values are only the
+   //                       half size which are the values returned by
+   //                       geant.
+   // SectroSizeX(Y)      : size of a sector
+   // PadSizeX(Y)         : size of the pads in this sector
+
+   Int_t nrValues = 6 + ( fMaxSectors * 4 );
    TArrayD values(nrValues);
  
    for (Int_t i=0; i < fNrOfModules; i++){
@@ -70,8 +72,9 @@ void CbmTrdDigiPar::putParams(FairParamList* l)
      values.AddAt(fModuleMap[fModuleIdArray[i]]->GetZ(),2);          
      values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSizex(),3);      
      values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSizey(),4); 
+     values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSizez(),5); 
      for (Int_t j=0; j < fMaxSectors; j++){       
-       Int_t k=5+(j*4);
+       Int_t k=6+(j*4);
        values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSectorSizex(j),k);   
        values.AddAt(fModuleMap[fModuleIdArray[i]]->GetSectorSizey(j),k+1);   
        values.AddAt(fModuleMap[fModuleIdArray[i]]->GetPadSizex(j),k+2);   
@@ -88,22 +91,17 @@ void CbmTrdDigiPar::putParams(FairParamList* l)
 
 Bool_t CbmTrdDigiPar::getParams(FairParamList* l) {
 
-  //    cout << " I am in CbmTrdDigiPar::getParams " << endl;
-  
   if (!l) return kFALSE;
   
   if ( ! l->fill("NrOfModules", &fNrOfModules) ) return kFALSE;
   if ( ! l->fill("MaxSectors", &fMaxSectors) ) return kFALSE;
   
   fModuleIdArray.Set(fNrOfModules);
-  fModuleRotArray.Set(fNrOfModules);
   if ( ! l->fill("ModuleIdArray", &fModuleIdArray) ) return kFALSE;
-  if ( ! l->fill("ModuleRotArray", &fModuleRotArray) ) return kFALSE;
   
-  //TArrayD *values = new TArrayD(7);
   // Instead of a fixed number of values the number of values to
   // store now depends on the maximum number of sectors per module
-  Int_t nrValues = 5 + ( fMaxSectors * 4 );
+  Int_t nrValues = 6 + ( fMaxSectors * 4 );
   TArrayD *values = new TArrayD(nrValues);
   TArrayD sectorSizeX(fMaxSectors);
   TArrayD sectorSizeY(fMaxSectors);
@@ -114,6 +112,7 @@ Bool_t CbmTrdDigiPar::getParams(FairParamList* l) {
   Double_t z;
   Double_t sizex;
   Double_t sizey;
+  Double_t sizez;
 
   TString text;
   for (Int_t i=0; i < fNrOfModules; i++){
@@ -126,8 +125,9 @@ Bool_t CbmTrdDigiPar::getParams(FairParamList* l) {
     z=values->At(2);
     sizex= values->At(3);
     sizey= values->At(4);
+    sizez= values->At(5);
     for (Int_t j=0; j < fMaxSectors; j++){       
-      Int_t k=5+(j*4);
+      Int_t k=6+(j*4);
       sectorSizeX.AddAt(values->At(k),j);
       sectorSizeY.AddAt(values->At(k+1),j);
       padSizeX.AddAt(values->At(k+2),j);
@@ -135,10 +135,9 @@ Bool_t CbmTrdDigiPar::getParams(FairParamList* l) {
     }
 
     fModuleMap[VolumeID] = new CbmTrdModule(VolumeID, x, y, z,
-					    sizex, sizey, fMaxSectors,
+					    sizex, sizey, sizez, fMaxSectors,
 					    sectorSizeX, sectorSizeY,
-					    padSizeX, padSizeY,
-					    (Bool_t)fModuleRotArray[i]);
+					    padSizeX, padSizeY);
   }
 
     return kTRUE;

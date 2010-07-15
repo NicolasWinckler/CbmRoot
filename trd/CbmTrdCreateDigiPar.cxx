@@ -42,7 +42,6 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar()
    fSectorSizey(0),
    fCol(-1),     
    fRow(-1),     
-   fIsRotated(kFALSE),
    fModuleID(-1.),
    fMaxSectors(0),
    fPosX(-1.),    
@@ -80,7 +79,6 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar(const char *name, const char *title)
    fSectorSizey(0),
    fCol(-1),     
    fRow(-1),     
-   fIsRotated(kFALSE),
    fModuleID(-1.),
    fMaxSectors(0),
    fPosX(-1.),    
@@ -299,10 +297,8 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
               TGeoHMatrix *matrix = gGeoManager->GetCurrentMatrix(); 
               Double_t x = global[0];
               Double_t y = global[1];
-              Double_t z = global[2] + sizez; //Padplane is not at local z=0 
-                                              //but at the end of the volume
-              fIsRotated = matrix->IsRotation();
-              
+              Double_t z = global[2]; 
+
               // Get Information about the padstructure for a
               // given trd module defined by the station and
               // layer numbers, the module type and the copy
@@ -328,9 +324,9 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
 
               // Create new CbmTrdModule and add it to the map
 	      fModuleMap[fModuleID] = 
-                new CbmTrdModule(fModuleID, x, y, z, sizex, sizey, 
-                    fMaxSectors, fSectorSizex , fSectorSizey , 
-                    fpadsizex, fpadsizey, fIsRotated);
+                new CbmTrdModule(fModuleID, x, y, z, sizex, sizey, sizez,
+				 fMaxSectors, fSectorSizex, fSectorSizey, 
+				 fpadsizex, fpadsizey);
 	    }
 	  }
 
@@ -349,17 +345,14 @@ void CbmTrdCreateDigiPar::FillModuleMap(){
   fDigiPar->SetMaxSectors(fMaxSectors);
 
   TArrayI *ModuleId  = new TArrayI(Nrmodules);
-  TArrayI *ModuleRot = new TArrayI(Nrmodules);
   
   Int_t iDigi=0; 
   for ( fModuleMapIt=fModuleMap.begin() ; fModuleMapIt != fModuleMap.end(); fModuleMapIt++ ){
     ModuleId->AddAt(fModuleMapIt->second->GetDetectorId(),iDigi);
-    ModuleRot->AddAt(fModuleMapIt->second->IsRotated(),iDigi);
     iDigi++;
   }  
 
   fDigiPar->SetModuleIdArray(*ModuleId);
-  fDigiPar->SetModuleRotArray(*ModuleRot);
   fDigiPar->SetModuleMap(fModuleMap);
 
 }

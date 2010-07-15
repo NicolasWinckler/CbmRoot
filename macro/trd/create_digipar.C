@@ -14,8 +14,19 @@
 // --------------------------------------------------------------------------
 
 
-void create_digipar(Int_t nEvents = 0)
+void create_digipar(TString geomFile="trd_squared_modules.geo", Int_t nEvents = 0)
 {
+
+  //Extract Filename without extension and path 
+  //TODO: Do this in a better way.
+  TString fileName = geomFile;
+  fileName.ReplaceAll(".geo","");
+  if (fileName.Contains("/")){
+    fileName=fileName("/.*$"); //extract substring with filename
+    fileName.ReplaceAll("/","");
+  }
+  //  cout<<"fileName: "<<fileName<<endl;
+
 
   // ========================================================================
   //          Adjust this part according to your requirements
@@ -24,16 +35,16 @@ void create_digipar(Int_t nEvents = 0)
   Int_t iVerbose = 0;
 
   // Input file (MC events)
-  TString inFile = "data/test.mc.root";
+  TString inFile = "data/test.mc." + fileName + ".root";
 
   // Geometry File
-  TString geoFile="geofile_trd.root";
+  TString geoFile = "geofile_" + fileName + ".root";
 
   // Output file
-  TString outFile = "data/test.eds.root";
+  TString outFile = "data/test.eds." + fileName + ".root";
 
   // Digi Parameter Output File
-  TString digiFile = "trd.digi.par";
+  TString digiFile = fileName + ".digi.par";
 
   // In general, the following parts need not be touched
   // ========================================================================

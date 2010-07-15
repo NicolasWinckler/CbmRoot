@@ -1,6 +1,7 @@
 #include "CbmTrdModule.h"
 
 #include "CbmTrdPoint.h"
+#include "CbmTrdDetectorId.h"
 
 #include "TGeoManager.h"
 #include "TMath.h"
@@ -17,7 +18,8 @@ CbmTrdModule::CbmTrdModule()
   fY(-666.),
   fZ(-666.),
   fSizex(-666.),
-  fSizey(-66.),
+  fSizey(-666.),
+  fSizez(-666.),
   fNoSectors(0),  
   fSectorX(0),    
   fSectorY(0),    
@@ -27,17 +29,14 @@ CbmTrdModule::CbmTrdModule()
   fSectorSizex(0),
   fSectorSizey(0),
   fPadSizex(0),   
-  fPadSizey(0),   
-  fIsRotated(kFALSE)
-
+  fPadSizey(0)   
 {
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z, 
-                           Double_t sizex, Double_t sizey, 
-                           Bool_t rotated) 
+                           Double_t sizex, Double_t sizey, Double_t sizez) 
   :
   fDetectorId(detId),
   fX(x),
@@ -45,6 +44,7 @@ CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z,
   fZ(z),
   fSizex(sizex),
   fSizey(sizey),
+  fSizez(sizez),
   fNoSectors(0),  
   fSectorX(0),    
   fSectorY(0),    
@@ -54,17 +54,16 @@ CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z,
   fSectorSizex(0),
   fSectorSizey(0),
   fPadSizex(0),   
-  fPadSizey(0),   
-  fIsRotated(rotated)
+  fPadSizey(0)   
 {
 }
 // -----   Standard constructor   ------------------------------------------
 CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z, 
-                           Double_t sizex, Double_t sizey, Int_t nSectors, 
+                           Double_t sizex, Double_t sizey, Double_t sizez, 
+                           Int_t nSectors, 
                            TArrayD sectorX, TArrayD sectorY, TArrayD sectorZ,
                            TArrayD sectorSizeX, TArrayD sectorSizeY,
-                           TArrayD padSizeX, TArrayD padSizeY,      
-                           Bool_t rotated) 
+                           TArrayD padSizeX, TArrayD padSizeY)      
   :
   fDetectorId(detId),
   fX(x),
@@ -72,6 +71,7 @@ CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z,
   fZ(z),
   fSizex(sizex),
   fSizey(sizey),
+  fSizez(sizez),
   fNoSectors(nSectors),  
   fSectorX(sectorX),    
   fSectorY(sectorY),    
@@ -79,16 +79,15 @@ CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z,
   fSectorSizex(sectorSizeX),
   fSectorSizey(sectorSizeY),
   fPadSizex(padSizeX),   
-  fPadSizey(padSizeY),   
-  fIsRotated(rotated)
+  fPadSizey(padSizeY)   
 {
 }
 // -------------------------------------------------------------------------
 CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z, 
-                           Double_t sizex, Double_t sizey, Int_t nSectors, 
+                           Double_t sizex, Double_t sizey, Double_t sizez,
+			   Int_t nSectors, 
                            TArrayD sectorSizeX, TArrayD sectorSizeY,
-                           TArrayD padSizeX, TArrayD padSizeY,      
-                           Bool_t rotated) 
+                           TArrayD padSizeX, TArrayD padSizeY)      
   :
   fDetectorId(detId),
   fX(x),
@@ -96,6 +95,7 @@ CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z,
   fZ(z),
   fSizex(sizex),
   fSizey(sizey),
+  fSizez(sizez),
   fNoSectors(nSectors),  
   fSectorX(nSectors),    
   fSectorY(nSectors),    
@@ -107,8 +107,7 @@ CbmTrdModule::CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z,
   fSectorSizex(sectorSizeX),
   fSectorSizey(sectorSizeY),
   fPadSizex(padSizeX),   
-  fPadSizey(padSizeY),   
-  fIsRotated(rotated)
+  fPadSizey(padSizeY)   
 {
   // Calculate the coordinates of the begin and the end of each sector
   // as well as  the cordinates of the center of the sector
@@ -188,18 +187,6 @@ Int_t CbmTrdModule::GetSector(Double_t *local_point)
 
   Double_t sizex=fSizex;
   Double_t sizey=fSizey;
-
-  if (fIsRotated){
-    Double_t tempx = local_point[0];
-    Double_t tempy = local_point[1];
-    local_point[1] = -tempx;
-    local_point[0] =  tempy;
-
-    tempx = sizex;
-    tempy = sizey;
-    sizey = tempx;
-    sizex = tempy;
-  }
 
   Double_t posx=local_point[0]+sizex;
   Double_t posy=local_point[1]+sizey;
@@ -349,7 +336,7 @@ void CbmTrdModule::GetPosition(const Int_t Col, const Int_t Row,
     cout<<" -E- This is wrong!!!!!!!!!!!!!!!!!!!!!"<<endl;
   }
     
-  Double_t local_point[2];
+  Double_t local_point[3];
   Double_t padsizex = fPadSizex.At(sector);
   Double_t padsizey = fPadSizey.At(sector);
 
@@ -367,12 +354,25 @@ void CbmTrdModule::GetPosition(const Int_t Col, const Int_t Row,
   // with origin in the middle of the module
   local_point[0]-=fSizex;
   local_point[1]-=fSizey;
+  local_point[2]=fSizez; 
+                     
+  // Navigate to the correct module. (fX,fY,fZ)
+  gGeoManager->FindNode(fX, fY, fZ);
+
+  // Get the local point in local MC coordinates from
+  // the geomanager. This coordinate system is rotated
+  // if the chamber is rotated. This is corrected in 
+  // GetModuleInformation to have a
+  // the same local coordinate system in all the chambers
+  Double_t global_point[3];  // global_point[3];
+  gGeoManager->LocalToMaster(local_point, global_point);
+  
 
   // calculate the position in the global coordinate system
   // with the origin in target
-  Float_t posX=local_point[0]+fX;
-  Float_t posY=local_point[1]+fY;
-  Float_t posZ=fZ;
+  Float_t posX=global_point[0];
+  Float_t posY=global_point[1];
+  Float_t posZ=global_point[2];
 
   posHit.SetXYZ(posX, posY, posZ);
   padSize.SetXYZ(padsizex,padsizey, 0.);

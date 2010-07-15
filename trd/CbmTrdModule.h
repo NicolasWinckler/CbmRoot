@@ -28,21 +28,20 @@ class CbmTrdModule : public TNamed
    **/
 
   CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z, 
-               Double_t sizex, Double_t sizey, 
-               Bool_t rotated);
+               Double_t sizex, Double_t sizey, Double_t sizez); 
 
   CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z, 
-               Double_t sizex, Double_t sizey, Int_t nSectors, 
+               Double_t sizex, Double_t sizey, Double_t sizez,
+	       Int_t nSectors, 
                TArrayD sectorX, TArrayD sectorY, TArrayD sectorZ,
                TArrayD sectorSizeX, TArrayD sectorSizeY,
-               TArrayD padSizeX, TArrayD padSizeY,      
-               Bool_t rotated); 
+               TArrayD padSizeX, TArrayD padSizeY);
 
   CbmTrdModule(Int_t detId, Double_t x, Double_t y, Double_t z, 
-               Double_t sizex, Double_t sizey, Int_t nSectors, 
+               Double_t sizex, Double_t sizey, Double_t sizez,
+	       Int_t nSectors, 
                TArrayD sectorSizeX, TArrayD sectorSizeY,
-               TArrayD padSizeX, TArrayD padSizeY,      
-               Bool_t rotated); 
+               TArrayD padSizeX, TArrayD padSizeY);
 
 
   /** Destructor **/
@@ -56,6 +55,7 @@ class CbmTrdModule : public TNamed
 
   Double_t GetSizex()      const { return fSizex; }
   Double_t GetSizey()      const { return fSizey; }
+  Double_t GetSizez()      const { return fSizez; }
   
   Int_t GetnCol(); 
   Int_t GetnRow();
@@ -66,8 +66,6 @@ class CbmTrdModule : public TNamed
   Double_t GetSectorSizey(Int_t i)   const { return fSectorSizey.At(i); }
 
   Int_t GetNoSectors()    const { return fNoSectors; }
-
-  Bool_t IsRotated()     const { return fIsRotated; }
 
 
   void GetPadInfo(CbmTrdPoint *trdPoint, Int_t &Col, 
@@ -87,6 +85,7 @@ class CbmTrdModule : public TNamed
   Double_t fZ;            // center of module in global c.s. [cm]
   Double_t fSizex;        // module size in x [cm]
   Double_t fSizey;        // module size in y [cm]
+  Double_t fSizez;        // module size in y [cm]
 	      
   Int_t    fNoSectors;    // Number sectors for this Module
   TArrayD  fSectorX;      // center of sectors local c.s. [cm]
@@ -103,8 +102,6 @@ class CbmTrdModule : public TNamed
   TArrayD  fPadSizey;     // size of the readout pad in y [cm]
 
 
-  Bool_t   fIsRotated;    // Flag shows chamber rotation
- 
   /** --------------- private functions ----------------------**/
 
   void GetModuleInformation(Int_t VolumeID, Double_t *local_point, 
@@ -119,7 +116,7 @@ class CbmTrdModule : public TNamed
 
   Int_t    GetSector(Double_t *local_point);
 
-  ClassDef(CbmTrdModule,2);
+  ClassDef(CbmTrdModule,3);
 
 };
 

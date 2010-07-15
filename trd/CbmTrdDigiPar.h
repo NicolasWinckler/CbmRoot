@@ -43,7 +43,6 @@ class CbmTrdDigiPar : public FairParGenericSet
   void SetNrOfModules(Int_t i) { fNrOfModules = i; }
   void SetMaxSectors(Int_t i) { fMaxSectors = i; }
   void SetModuleIdArray(TArrayI array) { fModuleIdArray = array; }
-  void SetModuleRotArray(TArrayI array) { fModuleRotArray = array; }
   void SetModuleMap(std::map<Int_t, CbmTrdModule*> map) 
                     { fModuleMap = map;}
 
@@ -60,12 +59,10 @@ class CbmTrdDigiPar : public FairParGenericSet
   std::map<Int_t, CbmTrdModule*>::iterator fModuleMapIt;      //! 
 
   TArrayI fModuleIdArray; // Array to hold the unique IDs for all modules
-  TArrayI fModuleRotArray; // Array to hold info about rotation
   Int_t fNrOfModules; // Total number of modules
   Int_t fMaxSectors; // Maximum number of sectors
 
-  ClassDef(CbmTrdDigiPar,2);
-
+  ClassDef(CbmTrdDigiPar,3);
 
 };
 

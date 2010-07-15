@@ -9,10 +9,10 @@
 #ifndef LITMATH_H_
 #define LITMATH_H_
 
-#include "parallel/LitTypes.h"
-#include "parallel/LitTrackParam.h"
-#include "parallel/LitHit.h"
-#include "parallel/LitTrack.h"
+#include "LitTypes.h"
+#include "LitTrackParam.h"
+#include "LitHit.h"
+#include "LitTrack.h"
 
 inline fscal rcp(const fscal &a){return 1./a;}
 inline fscal sgn(const fscal &a){return a<0 ?-1 :(a>0 ?1 :0);}

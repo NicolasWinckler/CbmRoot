@@ -157,8 +157,13 @@ void CbmTrdHitProducerIdeal::Exec(Option_t *option)
 	point->Position(pos);
 
 	// Calculate plane number
+      //TODO: This has to be done in a correct way. In the moment
+      //      it is assumed that all stations have 4 layers which
+      //      has not to be true for each geometry.
+
         Int_t* detInfo = fDetId.GetDetectorInfo(point->GetDetectorID()); 
-        iPlane=fLayersBeforeStation[(detInfo[1]-1)]+detInfo[2];
+	//        iPlane=fLayersBeforeStation[(detInfo[1]-1)]+detInfo[2];
+        iPlane=((detInfo[1]-1)*4) + detInfo[2];
 
 	// Create hit
 	new ((*fArrayTrdHit)[nHit]) CbmTrdHit(point->GetDetectorID(),

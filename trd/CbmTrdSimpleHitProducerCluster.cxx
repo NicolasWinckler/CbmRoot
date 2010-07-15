@@ -208,8 +208,11 @@ void CbmTrdSimpleHitProducerCluster::Exec(Option_t * option)
       Sector = bla[5];
       moduleId= fTrdId.GetModuleId(DetId);
 
-
-      Plane=fLayersBeforeStation[Station-1]+Layer;
+      //TODO: This has to be done in a correct way. In the moment
+      //      it is assumed that all stations have 4 layers which
+      //      has not to be true for each geometry.
+      //      Plane=fLayersBeforeStation[Station-1]+Layer;
+      Plane= ((Station-1)*4) + Layer;
 
       fModuleInfo = fDigiPar->GetModule(moduleId);
       fModuleInfo->GetPosition(Col, Row, moduleId, Sector, posHit, padSize);

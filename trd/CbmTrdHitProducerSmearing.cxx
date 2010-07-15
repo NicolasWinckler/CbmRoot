@@ -231,7 +231,12 @@ void CbmTrdHitProducerSmearing::Exec(Option_t * option)
         Int_t* detInfo = fDetId.GetDetectorInfo(trdId); 
 	station = detInfo[1];
 	layer = detInfo[2];
-        plane=fLayersBeforeStation[station-1]+layer;
+
+      //TODO: This has to be done in a correct way. In the moment
+      //      it is assumed that all stations have 4 layers which
+      //      has not to be true for each geometry.
+	//        plane=fLayersBeforeStation[station-1]+layer;
+        plane= ((station-1)*4) + layer;
 
 	ELossTR = 0.0;
 	ELossdEdX = pt->GetEnergyLoss();

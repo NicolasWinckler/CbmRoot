@@ -11,7 +11,7 @@
 #include "LitMath.h"
 #include "LitVecPack.h"
 
-#include "CbmLitMemoryManagment.h"
+//#include "CbmLitMemoryManagment.h"
 
 #define LIT_USE_TBB // TBB will be used for multithreading
 

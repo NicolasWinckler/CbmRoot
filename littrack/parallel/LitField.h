@@ -9,7 +9,7 @@
 
 //#define LIT_USE_THIRD_DEGREE 1;
 
-#include "parallel/LitMath.h"
+#include "LitMath.h"
 
 template<class T>
 class LitFieldValue

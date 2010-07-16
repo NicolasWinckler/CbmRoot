@@ -338,7 +338,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   Int_t nEntries = fTrdPoints->GetEntriesFast();
   if (TEST)
     {
-      nEntries = nEntries * 10 / 100;//5;
+      //nEntries = nEntries * 10 / 100;//5;
     }
   for (int j = 0; j < nEntries ; j++ ) 
     {
@@ -719,6 +719,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	  sprintf(FuncName,"tanTheo_S1L%d",i);
 	  TanTheo = new TF1(FuncName,Func,0,10000);
 	  TanTheo->SetLineColor(i+1);
+	  TanTheo->SetLineWidth(1);
 	  TanTheo->Draw("same");
 	}
       //PadX->Draw();
@@ -731,6 +732,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	  sprintf(FuncName,"tanTheo_S2L%d",i);
 	  TanTheo = new TF1(FuncName,Func,0,10000);
 	  TanTheo->SetLineColor(i+1);
+	  TanTheo->SetLineWidth(1);
 	  TanTheo->Draw("same");
 	}
       //PadY->Draw();
@@ -743,6 +745,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	  sprintf(FuncName,"tanTheo_S3L%d",i);
 	  TanTheo = new TF1(FuncName,Func,0,10000);
 	  TanTheo->SetLineColor(i+1);
+	  TanTheo->SetLineWidth(1);
 	  TanTheo->Draw("same");
 	}
       //hDeltaX->Draw();

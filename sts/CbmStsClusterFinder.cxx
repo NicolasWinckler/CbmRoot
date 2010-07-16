@@ -422,7 +422,7 @@ Int_t CbmStsClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int_t i
       }
 
       // if the signal is larger that last one and the previous one is smaller than maximum
-      if ( digiSig > lastDigiSig && lastDigiSig < clusterMaxSig ) {
+      if ( digiSig > lastDigiSig && lastDigiSig < clusterMaxSig && digiSig !=clusterMaxSig) {
 	cluster->SetMean(clusterMaxNr);
       //      cluster->SetMeanError(clusterMaxSig);
 	cluster = new ((*fClusters)[fNofClusters++]) CbmStsCluster(iDigi, digiSig, stationNr,sectorNr,iSide);

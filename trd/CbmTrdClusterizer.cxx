@@ -170,21 +170,38 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   if (TEST){
     printf("Long path tracks are exported to ../Pics/*.png\n");
   }
-  
   TH1F* TRDalpha = NULL;
   TH1F* TRDbeta = NULL;
   TH1F* TRDgamma = NULL;
+  TH1F* TRD1alpha = NULL;
+  TH1F* TRD1beta = NULL;
+  TH1F* TRD1gamma = NULL;
+  TH1F* TRD2alpha = NULL;
+  TH1F* TRD2beta = NULL;
+  TH1F* TRD2gamma = NULL;
+  TH1F* TRD3alpha = NULL;
+  TH1F* TRD3beta = NULL;
+  TH1F* TRD3gamma = NULL;
   TH1F* XMC = NULL;
   TH1F* Xreco = NULL;
   TH1F* RMC = NULL;
+  TH1F* RMC1 = NULL;
+  TH1F* RMC2 = NULL;
+  TH1F* RMC3 = NULL;
   TH1F* PR = NULL;
   TH1F* hDeltaX = NULL;
   TH1F* hDeltaY = NULL;
   TH1F* PadX = NULL;
   TH1F* PadY = NULL;
   TH1F* ClusterWidth = NULL;
+  TH1F* ClusterWidth1 = NULL;
+  TH1F* ClusterWidth2 = NULL;
+  TH1F* ClusterWidth3 = NULL;
   TH1F* Charge = NULL;
   TH1F* TestIntegration = NULL;
+  TH1F* TestIntegration1 = NULL;
+  TH1F* TestIntegration2 = NULL;
+  TH1F* TestIntegration3 = NULL;
   TH1F* ChargedEdX = NULL;
   TH1F* ChargeTR = NULL;
   TH1F* ELossSprectra = NULL;
@@ -192,6 +209,9 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   TH1F* ELossTRSprectra = NULL;
 
   TH2F* TRD1 = NULL;   
+  TH2F* TRD1gammaRin = NULL; 
+  TH2F* TRD2gammaRin = NULL;  
+  TH2F* TRD3gammaRin = NULL;   
   TH2F* TRDin_out = NULL;  
   TH2F* localTRD1 = NULL;     
   TH2F* globalTRD1 = NULL;
@@ -202,7 +222,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   TH2F* recoTRD2 = NULL;
   TH2F* DeltaSlice = NULL;
   TH2F* PRF = NULL;
-
+  TH2F* zdTRD2 = NULL;
   TH2F* deltarecoTRD2 = NULL;
   TH2F* rdTRD2 = NULL;
      
@@ -220,30 +240,56 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       TRDalpha = new TH1F("TRDalpha","atan(deltaX(MC) / deltaZ(MC)) [deg]",110,-10,100);
       TRDbeta = new TH1F("TRDbeta","atan(deltaY(MC) / deltaZ(MC)) [deg]",110,-10,100);
       TRDgamma = new TH1F("TRDgamma","atan(deltaR(MC) / deltaZ(MC)) [deg]",110,-10,100);
+      TRD1alpha = new TH1F("TRD1alpha","atan(deltaX(MC) / deltaZ(MC)) [deg]",110,-10,100);
+      TRD1beta = new TH1F("TRD1beta","atan(deltaY(MC) / deltaZ(MC)) [deg]",110,-10,100);
+      TRD1gamma = new TH1F("TRD1gamma","atan(deltaR(MC) / deltaZ(MC)) [deg]",110,-10,100);
+      TRD2alpha = new TH1F("TRD2alpha","atan(deltaX(MC) / deltaZ(MC)) [deg]",110,-10,100);
+      TRD2beta = new TH1F("TRD2beta","atan(deltaY(MC) / deltaZ(MC)) [deg]",110,-10,100);
+      TRD2gamma = new TH1F("TRD2gamma","atan(deltaR(MC) / deltaZ(MC)) [deg]",110,-10,100);
+      TRD3alpha = new TH1F("TRD3alpha","atan(deltaX(MC) / deltaZ(MC)) [deg]",110,-10,100);
+      TRD3beta = new TH1F("TRD3beta","atan(deltaY(MC) / deltaZ(MC)) [deg]",110,-10,100);
+      TRD3gamma = new TH1F("TRD3gamma","atan(deltaR(MC) / deltaZ(MC)) [deg]",110,-10,100);
+
       XMC = new TH1F("XMC","x_mean(MC) [pad unit]",100,-1,1);
       Xreco = new TH1F("Xreco","x_mean(reco) [pad unit]",100,-1,1);
       RMC = new TH1F("RMC","r_in(MC) - r_out(MC) [mm]",200,0,100);
+      RMC1 = new TH1F("RMC1","r_in(MC) - r_out(MC) [mm]",200,0,100);
+      RMC2 = new TH1F("RMC2","r_in(MC) - r_out(MC) [mm]",200,0,100);
+      RMC3 = new TH1F("RMC3","r_in(MC) - r_out(MC) [mm]",200,0,100);
       PR = new TH1F("PR","x_mean(MC) - x_mean(reco) [mm]",400,-20,20);
       /*
-      hDeltaX = new TH1F("DeltaX","fabs(x_in - x_out) [mm]",200,0,100);
-      hDeltaY = new TH1F("DeltaY","fabs(y_in - y_out) [mm]",200,0,100);
+	hDeltaX = new TH1F("DeltaX","fabs(x_in - x_out) [mm]",200,0,100);
+	hDeltaY = new TH1F("DeltaY","fabs(y_in - y_out) [mm]",200,0,100);
       */
       /*
-      PadX = new TH1F("PadX","pads between x_in and x_out [pad unit]",50,0,50);
-      PadY = new TH1F("PadY","pads between y_in and y_out [pad unit]",50,0,50);
+	PadX = new TH1F("PadX","pads between x_in and x_out [pad unit]",50,0,50);
+	PadY = new TH1F("PadY","pads between y_in and y_out [pad unit]",50,0,50);
       */
       ClusterWidth = new TH1F("ClusterWidth","Cluster Width 'Charge > 0' [pad unit]",100,0,100);
+      ClusterWidth1 = new TH1F("ClusterWidth1","Cluster Width 'Charge > 0' [pad unit]",100,0,100);
+      ClusterWidth2 = new TH1F("ClusterWidth2","Cluster Width 'Charge > 0' [pad unit]",100,0,100);
+      ClusterWidth3 = new TH1F("ClusterWidth3","Cluster Width 'Charge > 0' [pad unit]",100,0,100);
       //Charge = new TH1F("ChargeSpectra","Charge Spectra [a.u.]",100,0,2);
       TestIntegration = new TH1F("IntegrSpectra","Integral Spectra [a.u.]", 100, 1E3, 4 * 1E4);
+      TestIntegration1 = new TH1F("IntegrSpectra1","Integral Spectra [a.u.]", 100, 1E3, 4 * 1E4);
+      TestIntegration2 = new TH1F("IntegrSpectra2","Integral Spectra [a.u.]", 100, 1E3, 4 * 1E4);
+      TestIntegration3 = new TH1F("IntegrSpectra3","Integral Spectra [a.u.]", 100, 1E3, 4 * 1E4);
       Charge = new TH1F("ChargeSpectra","Charge Spectra [a.u.]",200,0,2);
       ChargedEdX = new TH1F("ChargedEdXSpectra","Charge dEdX Spectra [a.u.]",200,0,2);
       ChargeTR = new TH1F("ChargeTRSpectra","Charge TR Spectra [a.u.]",200,0,2);
-      ELossSprectra = new TH1F("ELossSprectra","ELossSprectra",1000,0,0.002);
-      ELossdEdXSprectra = new TH1F("ELossdEdXSprectra","ELossdEdX Sprectra",1000,0,0.002);
+      ELossSprectra = new TH1F("ELossSprectra","ELossSprectra",1000,0,0.0002);
+      ELossdEdXSprectra = new TH1F("ELossdEdXSprectra","ELossdEdX Sprectra",1000,0,0.0002);
       ELossTRSprectra = new TH1F("ELossTRSprectra","ELossTR Sprectra",1000,0,0.0002);
 
       TRD1 = new TH2F("TRD1","TRD1",1000,-10000,10000,1000,-10000,10000);
       TRD1->SetContour(99);
+
+      TRD1gammaRin = new TH2F("TRD1gammaaRin","TRD1",100,0,10000,90,0,90);
+      TRD1gammaRin->SetContour(99);
+      TRD2gammaRin = new TH2F("TRD2gammaRin","TRD2",100,0,10000,90,0,90);
+      TRD2gammaRin->SetContour(99);
+      TRD3gammaRin = new TH2F("TRD3gammaRin","TRD3",100,0,10000,90,0,90);
+      TRD3gammaRin->SetContour(99);
       TRDin_out = new TH2F("TRDin_out","TRDin_out",1000,-10000,10000,1000,-10000,10000);
       TRDin_out->SetContour(99);
       localTRD1 = new TH2F("TRDlocal","TRDlocal",1000,-1000,1000,1000,-1000,1000);
@@ -268,8 +314,10 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       PRF->SetContour(99);
       rdTRD2 = new TH2F("rdTRD2","r_in(MC) vs. fabs(r_in(MC) - r_out(MC)) [mm]", 50, 0,10000,100,0,10);
       rdTRD2->SetContour(99);
+      zdTRD2 = new TH2F("zdTRD2","Layer+(Station-1)*4 vs. fabs(r_in(MC) - r_out(MC)) [mm]", 12, 0.5,12.5,100,0,10);
+      zdTRD2->SetContour(99);
 
-      zdTRD = new TProfile("zdTRD","Layer+(Station-1)*4 vs. fabs(r_in(MC) - r_out(MC)) [mm]", 15, 0,15);
+      zdTRD = new TProfile("zdTRD","Layer+(Station-1)*4 vs. fabs(r_in(MC) - r_out(MC)) [mm]", 12, 0.5,12.5);
       //rdTRD = new TProfile("rdTRD","r_in(MC) vs. fabs(r_in(MC) - r_out(MC)) [mm]", 50, 0,10000);
       //deltarecoTRD1 = new TProfile("deltarecoTRD","r_in(MC) vs. fabs(x_mean(MC) - x_mean(reco)) [mm] pad 'C'-CS", 50, 0,10000);
       deltarecoPad = new TProfile("deltarecoPad","x_mean(MC) vs. (x_mean(MC) - x_mean(reco)) [pad units] pad 'C'-CS", 100, -1,1);
@@ -283,12 +331,14 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       mathieson = new TF1("mathieson", Mathieson, -1.5 * pW, 1.5 * pW);
       mathieson->SetLineColor(2);
     }
-
-
+  for (Int_t i = 0; i < 12; i++)
+    {
+      fLayerZ[i] = 1;
+    }
   Int_t nEntries = fTrdPoints->GetEntriesFast();
   if (TEST)
     {
-      //nEntries = 1;//nEntries * 10 / 100;//5;
+      nEntries = nEntries * 10 / 100;//5;
     }
   for (int j = 0; j < nEntries ; j++ ) 
     {
@@ -396,6 +446,11 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 
       GetModuleInformationFromDigiPar(Sector, fModuleID);
 
+      if (fLayerZ[(fStation-1)* 4  + (fLayer-1)] < 2)
+	{
+	  fLayerZ[(fStation-1) * 4 + (fLayer-1)] = global_inC[2];
+	}
+      // cout << fStation << " " << fLayer << endl;
       TransformC2LL(local_meanC, local_meanLL, modulesize);
       TransformC2LL(local_inC,   local_inLL,   modulesize);
       TransformC2LL(local_outC,  local_outLL,  modulesize);
@@ -411,11 +466,8 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	{
 	  alpha = TMath::ATan(fabs(local_inC[0] - local_outC[0]) / fabs(local_outC[2] - local_inC[2])) * (180. / TMath::Pi());
 	  beta  = TMath::ATan(fabs(local_inC[1] - local_outC[1]) / fabs(local_outC[2] - local_inC[2])) * (180. / TMath::Pi());
-	  gamma = TMath::ATan(
-			      fabs(sqrt(pow(local_inC[0],2) + pow(local_inC[1],2)) - 
-			       sqrt(pow(local_outC[0],2) + pow(local_outC[1],2)))
-			      / fabs(local_outC[2] - local_inC[2])
-			      ) * (180. / TMath::Pi());
+	  gamma = TMath::ATan(fabs(sqrt(pow(local_inC[0],2) + pow(local_inC[1],2)) - sqrt(pow(local_outC[0],2) + pow(local_outC[1],2)))
+			      / fabs(local_outC[2] - local_inC[2])) * (180. / TMath::Pi());
 	}
       CalculatePixel(Sector);
 
@@ -454,7 +506,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	  Reco = new TH2F("Reco","Reco [mm]", (nCol) * 100, 0, (nCol), (nRow) * 100, 0, (nRow)); 
 	}
       
-      SplitPathSlices(j, Sector, Histo, TEST, DeltaSlice2, In, Out, Clusterposition, PadChargeModule, nCol, nRow, j, padW, padH, Reco, recoTRD1, recoTRD2, deltarecoTRD1, deltarecoTRD2, deltarecoPad, Xreco, PR, PRF, PRF2, TestIntegration);
+      SplitPathSlices(j, Sector, Histo, TEST, DeltaSlice2, In, Out, Clusterposition, PadChargeModule, nCol, nRow, j, padW, padH, Reco, recoTRD1, recoTRD2, deltarecoTRD1, deltarecoTRD2, deltarecoPad, Xreco, PR, PRF, PRF2, TestIntegration, TestIntegration1, TestIntegration2, TestIntegration3);
  
       if (TEST)
 	{
@@ -487,9 +539,10 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	    {
 	      for (Int_t iCol = 0; iCol < nCol; iCol++)
 		{
-		  tempCharge +=  PadChargeModule[iRow * nCol + iCol];
 		  if (PadChargeModule[iRow * nCol + iCol] > 0)
 		    {
+		      tempCharge +=  PadChargeModule[iRow * nCol + iCol];
+		
 		      counter++;
 		    }
 		}
@@ -499,17 +552,57 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	  Double_t Rout = sqrt(pow(global_outC[0],2) + pow(global_outC[1],2));
 
 	  ClusterWidth->Fill(counter);
+	  if (fStation == 1)
+	    {
+	      ClusterWidth1->Fill(counter);
+	    }
+	  if (fStation == 2)
+	    {
+	      ClusterWidth2->Fill(counter);
+	    }
+	  if (fStation == 3)
+	    {
+	      ClusterWidth3->Fill(counter);
+	    }
 
 	  ELossSprectra->Fill(fELoss);
 	  Charge->Fill(tempCharge);
-	  //TestIntegration->Fill(tempCharge/fELoss+5);
+	  //TestIntegration->Fill(tempCharge/fELoss);
 	  /*
-	  hDeltaX->Fill(fabs(local_inC[0] - local_outC[0]));
-	  hDeltaY->Fill(fabs(local_inC[1] - local_outC[1]));
+	    hDeltaX->Fill(fabs(local_inC[0] - local_outC[0]));
+	    hDeltaY->Fill(fabs(local_inC[1] - local_outC[1]));
 	  */
 	  TRDalpha->Fill(alpha);
 	  TRDbeta->Fill(beta);
 	  TRDgamma->Fill(gamma);
+	  if (fStation == 1)
+	    {
+	      TRD1alpha->Fill(alpha);
+	      TRD1beta->Fill(beta);
+	      TRD1gamma->Fill(gamma);
+	      TRD1gammaRin->Fill(Rin,gamma);
+	      RMC1->Fill( fabs(Rin-Rout));
+	      //TestIntegration1->Fill(tempCharge/fELoss);
+	    }
+	  if (fStation == 2)
+	    {
+	      TRD2alpha->Fill(alpha);
+	      TRD2beta->Fill(beta);
+	      TRD2gamma->Fill(gamma);
+	      TRD2gammaRin->Fill(Rin,gamma);
+	      RMC2->Fill( fabs(Rin-Rout));
+	      //TestIntegration2->Fill(tempCharge/fELoss);
+
+	    }
+	  if (fStation == 3)
+	    {
+	      TRD3alpha->Fill(alpha);
+	      TRD3beta->Fill(beta);
+	      TRD3gamma->Fill(gamma);
+	      TRD3gammaRin->Fill(Rin,gamma);
+	      RMC3->Fill( fabs(Rin-Rout));
+	      //TestIntegration3->Fill(tempCharge/fELoss);
+	    }
 	  TRD1->Fill(global_meanC[0], global_meanC[1]);
   
 	  TRDin_out->Fill(local_inC[0],local_inC[1]);
@@ -519,6 +612,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	  rdTRD2->Fill(Rin, fabs(Rin-Rout));
 
 	  RMC->Fill( fabs(Rin-Rout));
+
 	  globalTRD1->Fill(global_point[0],global_point[1]); 
 	  localTRD1->Fill(local_inLL[0],local_inLL[1]);
 
@@ -531,6 +625,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	      localModule->Fill(local_meanLL[0]-fDeltax,local_meanLL[1]-fDeltay);
 	    }	
 	  zdTRD->Fill(fLayer+(fStation-1)*4, fabs(Rin-Rout));
+	  zdTRD2->Fill(fLayer+(fStation-1)*4, fabs(Rin-Rout));
 	  padTRD1->Fill(fPadPosxC, fPadPosyC);
 	  padTRD2->Fill(fPadPosxC/padsize[0], fPadPosyC/padsize[1]);
 	  DeltaSlice->Fill((global_inC[0] - global_outC[0])/padsize[0], (global_inC[1] - global_outC[1])/padsize[1]); 
@@ -543,18 +638,44 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       Char_t Canfile1[100];
       Char_t Canfile2[100];
       sprintf(Canfile1,"Pics/C1.png");
-      TCanvas *c1 = new TCanvas("c1","c1",1200,900);	
+      TCanvas *c1 = new TCanvas("c1","c1",1200,900);
+     
       c1->Divide(4,3);
       c1->cd(1);
-      zdTRD->Draw();			 
+      zdTRD2->Draw("colz");
+      zdTRD->Draw("same");			 
       c1->cd(2)->SetLogy();
-      TRDalpha->Draw();                      
+      TRDalpha->Draw();
+      TRD1alpha->SetLineColor(2);
+      TRD1alpha->Draw("same"); 
+      TRD2alpha->SetLineColor(3);  
+      TRD2alpha->Draw("same"); 
+      TRD3alpha->SetLineColor(4); 
+      TRD3alpha->Draw("same");             
       c1->cd(3)->SetLogy();
       TRDbeta->Draw();
+      TRD1beta->SetLineColor(2);
+      TRD1beta->Draw("same");
+      TRD2beta->SetLineColor(3);
+      TRD2beta->Draw("same");
+      TRD3beta->SetLineColor(4);
+      TRD3beta->Draw("same");
       c1->cd(4)->SetLogy();
       TRDgamma->Draw();
+      TRD1gamma->SetLineColor(2);
+      TRD1gamma->Draw("same");
+      TRD2gamma->SetLineColor(3);
+      TRD2gamma->Draw("same");
+      TRD3gamma->SetLineColor(4);
+      TRD3gamma->Draw("same");
       c1->cd(5)->SetLogy();
       TestIntegration->Draw();
+      TestIntegration1->SetLineColor(2);
+      TestIntegration1->Draw("same");
+      TestIntegration2->SetLineColor(3);
+      TestIntegration2->Draw("same");
+      TestIntegration3->SetLineColor(4);
+      TestIntegration3->Draw("same");
       c1->cd(6);
       padTRD2->Draw("colz");
       c1->cd(7);
@@ -570,6 +691,12 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       Xreco->Draw();
       c1->cd(12)->SetLogy();
       RMC->Draw();
+      RMC1->SetLineColor(2);
+      RMC1->Draw("same");
+      RMC2->SetLineColor(3);
+      RMC2->Draw("same");
+      RMC3->SetLineColor(4);
+      RMC3->Draw("same");
       c1->Update();
       TImage *Outimage1 = TImage::Create();
       Outimage1->FromPad(c1);
@@ -577,14 +704,47 @@ void CbmTrdClusterizer::Exec(Option_t * option)
      
       TCanvas *c2 = new TCanvas("c2","c2",1200,900);
       sprintf(Canfile2,"Pics/C2.png");
+      Char_t Func[100];
+      Char_t FuncName[100];	
+      TF1* TanTheo = NULL;
       c2->Divide(4,3);
       c2->cd(1)->SetLogy();
       PR->Draw();
-      c2->cd(2)->SetLogy();
+      c2->cd(2)->SetLogz();
+      TRD1gammaRin->Draw("colz");
+      for (Int_t i = 0; i < 4; i++)
+	{
+	  sprintf(Func,"TMath::ATan(x/%f) * (180. / TMath::Pi())",fLayerZ[i]);
+	  //cout << Func << endl;
+	  sprintf(FuncName,"tanTheo_S1L%d",i);
+	  TanTheo = new TF1(FuncName,Func,0,10000);
+	  TanTheo->SetLineColor(i+1);
+	  TanTheo->Draw("same");
+	}
       //PadX->Draw();
-      c2->cd(3)->SetLogy();
+      c2->cd(3)->SetLogz();
+      TRD2gammaRin->Draw("colz");
+      for (Int_t i = 0; i < 4; i++)
+	{
+	  sprintf(Func,"TMath::ATan(x/%f) * (180. / TMath::Pi())",fLayerZ[i+4]);
+	  //cout << Func << endl;
+	  sprintf(FuncName,"tanTheo_S2L%d",i);
+	  TanTheo = new TF1(FuncName,Func,0,10000);
+	  TanTheo->SetLineColor(i+1);
+	  TanTheo->Draw("same");
+	}
       //PadY->Draw();
-      c2->cd(4)->SetLogy();
+      c2->cd(4)->SetLogz();
+      TRD3gammaRin->Draw("colz");
+      for (Int_t i = 0; i < 4; i++)
+	{
+	  sprintf(Func,"TMath::ATan(x/%f) * (180. / TMath::Pi())",fLayerZ[i+8]);
+	  //cout << Func << endl;
+	  sprintf(FuncName,"tanTheo_S3L%d",i);
+	  TanTheo = new TF1(FuncName,Func,0,10000);
+	  TanTheo->SetLineColor(i+1);
+	  TanTheo->Draw("same");
+	}
       //hDeltaX->Draw();
       c2->cd(5)->SetLogy();
       //hDeltaY->Draw();
@@ -609,11 +769,17 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       c2->cd(9);
       //localTRD1->Draw("colz");
       c2->cd(10)->SetLogy();
-      ClusterWidth->Draw();   
+      ClusterWidth->Draw();
+      ClusterWidth1->SetLineColor(2);
+      ClusterWidth1->Draw("same");
+      ClusterWidth2->SetLineColor(3);
+      ClusterWidth2->Draw("same");
+      ClusterWidth3->SetLineColor(4);
+      ClusterWidth3->Draw("same");   
       c2->cd(11)->SetLogy();
-      Charge->Draw();
-      c2->cd(12)->SetLogy();
       ELossSprectra->Draw();
+      c2->cd(12)->SetLogy();
+      Charge->Draw();
       c2->Update();
       TImage *Outimage2 = TImage::Create();
       Outimage2->FromPad(c2);
@@ -936,7 +1102,7 @@ int CbmTrdClusterizer::GetSector(Double_t tempPosY)/*tempPosY has to be in LL mo
 }
   // --------------------------------------------------------------------
   // ---- SplitPathSlices -------------------------------------------------
-void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration)
+void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration, TH1F* TestIntegration1, TH1F* TestIntegration2, TH1F* TestIntegration3)
 {
   
   /*
@@ -1047,6 +1213,18 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
 		}
 	    }
 	  TestIntegration->Fill(tempCharge/SliceELoss);
+	  if(fStation == 1)
+	    {
+	      TestIntegration1->Fill(tempCharge/SliceELoss);
+	    }
+	  if(fStation == 2)
+	    {
+	      TestIntegration2->Fill(tempCharge/SliceELoss);
+	    }
+	  if(fStation == 3)
+	    {
+	      TestIntegration3->Fill(tempCharge/SliceELoss);
+	    }
 	  //printf("%.1E\n",tempCharge/SliceELoss);
 	}
 

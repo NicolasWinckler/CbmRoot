@@ -71,7 +71,7 @@ class CbmTrdClusterizer : public FairTask {
 
   float GetFloatPositionY(Double_t tempPosY);
 
-  void SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,  TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration);
+  void SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,  TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration, TH1F* TestIntegration1, TH1F* TestIntegration2, TH1F* TestIntegration3);
 
   void GetIntegrationArea(Bool_t Histo, TH1F* PadX ,TH1F* PadY);
 
@@ -107,6 +107,7 @@ class CbmTrdClusterizer : public FairTask {
 
   Int_t   fStation;
   Int_t   fLayer;
+  Double_t fLayerZ[12];
   Int_t   fModuleType;
   Int_t   fModuleCopy;
   Int_t   fCol_mean,fCol_in,fCol_out; //Calculated pixel column were the hit is in

@@ -10,6 +10,7 @@ SET (CTEST_UPDATE_CHECKOUT  " ${CTEST_UPDATE_COMMAND} update ")
 SET (BUILD_COMMAND "make")
 SET (CTEST_BUILD_COMMAND "${BUILD_COMMAND} -j$ENV{number_of_processors}")
 
+
 if($ENV{ctest_model} MATCHES Nightly)
   # get the information about conflicting or localy modified files
   # from svn, extract the relavant information about the file name
@@ -33,6 +34,11 @@ if($ENV{ctest_model} MATCHES Nightly)
   CTEST_EMPTY_BINARY_DIRECTORY(${CTEST_BINARY_DIRECTORY})
 
 endif($ENV{ctest_model} MATCHES Nightly)
+
+configure_file(${CTEST_SOURCE_DIRECTORY}/CTestCustom.cmake
+               ${CTEST_BINARY_DIRECTORY}/CTestCustom.cmake
+              )
+ctest_read_custom_files("${CTEST_BINARY_DIRECTORY}")
 
 CTEST_START ($ENV{ctest_model})
 CTEST_UPDATE (SOURCE "${CTEST_SOURCE_DIRECTORY}")

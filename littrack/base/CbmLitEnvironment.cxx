@@ -78,6 +78,9 @@ FairField* CbmLitEnvironment::GetField()
 
 const CbmLitDetectorLayout& CbmLitEnvironment::GetLayout()
 {
+	std::cout << "-I- CbmLitEnvironment::GetLayout : "
+	         << "Getting layout... " << std::endl;
+
 	static Bool_t layoutCreated = false;
 
 	if (!layoutCreated) {
@@ -102,6 +105,10 @@ const CbmLitDetectorLayout& CbmLitEnvironment::GetLayout()
 		std::cout << fLayout.ToString();
 		layoutCreated = true;
 	}
+
+	std::cout << "-I- CbmLitEnvironment::GetLayout : "
+	         << "Finish getting layout" << std::endl;
+
 	return fLayout;
 }
 
@@ -164,37 +171,72 @@ void CbmLitEnvironment::TrdLayout()
 
 				TGeoNode* station = node;
 				const Double_t* stationPos = station->GetMatrix()->GetTranslation();
+
 				TObjArray* layers = station->GetNodes();
-				for (Int_t iLayer = 0; iLayer < layers->GetEntriesFast(); iLayer++) {
+				TGeoNode* t = (TGeoNode*) layers->At(0);
 
-					TGeoNode* layer = (TGeoNode*) layers->At(iLayer);
-					const Double_t* layerPos = layer->GetMatrix()->GetTranslation();
+				// OLD TRD GEOMETRY
+				if (TString(t->GetName()).Contains("layer")) {
+					for (Int_t iLayer = 0; iLayer < layers->GetEntriesFast(); iLayer++) {
 
-					Double_t Zmodule = 0.;
-					TObjArray* layerParts;
-					if (IsTrdSegmented()) {
-						TGeoNode* module = (TGeoNode*) layer->GetNodes()->At(0);
-						layerParts = module->GetNodes();
-						const Double_t* modPos = module->GetMatrix()->GetTranslation();
-						Zmodule = modPos[2];
-					} else {
-						layerParts = layer->GetNodes();
-					}
-					for (Int_t iLayerPart = 0; iLayerPart < layerParts->GetEntriesFast(); iLayerPart++) {
+						TGeoNode* layer = (TGeoNode*) layers->At(iLayer);
+						const Double_t* layerPos = layer->GetMatrix()->GetTranslation();
 
-						TGeoNode* layerPart = (TGeoNode*) layerParts->At(iLayerPart);
+						Double_t Zmodule = 0.;
+						TObjArray* layerParts;
+						if (IsTrdSegmented()) {
+							TGeoNode* module = (TGeoNode*) layer->GetNodes()->At(0);
+							layerParts = module->GetNodes();
+							const Double_t* modPos = module->GetMatrix()->GetTranslation();
+							Zmodule = modPos[2];
+						} else {
+							layerParts = layer->GetNodes();
+						}
+						for (Int_t iLayerPart = 0; iLayerPart < layerParts->GetEntriesFast(); iLayerPart++) {
 
-						if (TString(layerPart->GetName()).Contains("gas")) {
-							const Double_t* pos = layerPart->GetMatrix()->GetTranslation();
-							TGeoPgon* shape = (TGeoPgon*) layerPart->GetVolume()->GetShape();
-							CbmLitStation sta;
-							CbmLitSubstation substation;
-							substation.SetZ(stationPos[2] + layerPos[2] + pos[2] + shape->GetDZ() + Zmodule);
-							sta.SetType(kLITPIXELHIT);
-							sta.AddSubstation(substation);
-							stationSet.insert(sta);
+							TGeoNode* layerPart = (TGeoNode*) layerParts->At(iLayerPart);
+
+							if (TString(layerPart->GetName()).Contains("gas")) {
+								const Double_t* pos = layerPart->GetMatrix()->GetTranslation();
+								TGeoPgon* shape = (TGeoPgon*) layerPart->GetVolume()->GetShape();
+								CbmLitStation sta;
+								CbmLitSubstation substation;
+								substation.SetZ(stationPos[2] + layerPos[2] + pos[2] + shape->GetDZ() + Zmodule);
+								sta.SetType(kLITPIXELHIT);
+								sta.AddSubstation(substation);
+								stationSet.insert(sta);
+							}
 						}
 					}
+					// END: OLD TRD GEOMETRY
+				} else {
+
+				// NEW TRD GEOMETRY
+					for (Int_t iModule = 0; iModule < layers->GetEntriesFast(); iModule++) {
+
+						TGeoNode* module = (TGeoNode*) layers->At(iModule);
+						const Double_t* modulePos = module->GetMatrix()->GetTranslation();
+
+						TObjArray* moduleParts = module->GetNodes();
+						for (Int_t iModulePart = 0; iModulePart < moduleParts->GetEntriesFast(); iModulePart++) {
+
+							TGeoNode* modulePart = (TGeoNode*) moduleParts->At(iModulePart);
+
+							if (TString(modulePart->GetName()).Contains("gas")) {
+								const Double_t* pos = modulePart->GetMatrix()->GetTranslation();
+								TGeoPgon* shape = (TGeoPgon*) modulePart->GetVolume()->GetShape();
+								CbmLitStation sta;
+								CbmLitSubstation substation;
+								substation.SetZ(stationPos[2] + modulePos[2] + pos[2] + shape->GetDZ());
+								sta.SetType(kLITPIXELHIT);
+								sta.AddSubstation(substation);
+								stationSet.insert(sta);
+							}
+						}
+					}
+
+				// END: NEW TRD GEOMETRY
+
 				}
 			}
 		}

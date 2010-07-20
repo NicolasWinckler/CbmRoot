@@ -52,6 +52,20 @@ CbmStack::~CbmStack() {
 }
 // -------------------------------------------------------------------------
 
+void CbmStack::PushTrack(Int_t toBeDone, Int_t parentId, Int_t pdgCode,
+			 Double_t px, Double_t py, Double_t pz,
+			 Double_t e, Double_t vx, Double_t vy, Double_t vz, 
+			 Double_t time, Double_t polx, Double_t poly,
+			 Double_t polz, TMCProcess proc, Int_t& ntr, 
+			 Double_t weight, Int_t is) {
+
+	PushTrack( toBeDone, parentId, pdgCode,
+				  px,  py,  pz,
+				  e,  vx,  vy,  vz,
+				  time,  polx,  poly,
+				  polz, proc, ntr,
+				  weight, is, -1);
+}
   
 
 // -----   Virtual public method PushTrack   -------------------------------
@@ -64,6 +78,7 @@ void CbmStack::PushTrack(Int_t toBeDone, Int_t parentId, Int_t pdgCode,
 
   // --> Get TParticle array
   TClonesArray& partArray = *fParticles;
+ 
 
   // --> Create new TParticle and add it to the TParticle array
   Int_t trackId = fNParticles;
@@ -86,6 +101,7 @@ void CbmStack::PushTrack(Int_t toBeDone, Int_t parentId, Int_t pdgCode,
   ntr = trackId;
 
   // --> Push particle on the stack if toBeDone is set
+  
   if (toBeDone == 1) fStack.push(particle);
 
 }
@@ -385,9 +401,10 @@ void CbmStack::SelectTracks() {
     TLorentzVector p;
     thisPart->Momentum(p);
     Double_t energy = p.E();
-    Double_t mass   = thisPart->GetMass();
+    Double_t mass   = p.M();
+//    Double_t mass   = thisPart->GetMass();
     Double_t eKin = energy - mass;
-
+    if(eKin < 0.0) eKin=0.0;
     // --> Calculate number of points
     Int_t nPoints = 0;
     for (Int_t iDet=kMVD; iDet<=kZDC; iDet++) {

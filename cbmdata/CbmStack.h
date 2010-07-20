@@ -74,7 +74,7 @@ class CbmStack : public FairGenericStack
 			 Double_t e, Double_t vx, Double_t vy, 
 			 Double_t vz, Double_t time, Double_t polx, 
 			 Double_t poly, Double_t polz, TMCProcess proc, 
-			 Int_t& ntr, Double_t weight, Int_t is);
+			 Int_t& ntr, Double_t weight, Int_t is,Int_t secondparentID);
 
 
   /** Get next particle for tracking from the stack.

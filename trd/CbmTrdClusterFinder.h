@@ -21,6 +21,7 @@
 #include "FairTask.h"
 #include "CbmTrdDetectorId.h"
 #include <map>
+#include <vector>
 #include <set>
 
 class CbmTrdDigiPar;
@@ -58,6 +59,9 @@ class CbmTrdClusterFinder : public FairTask
 
  private:
 
+  void DrawCluster(Int_t moduleId, Char_t* name, Char_t* title);
+  void DrawDigi(Int_t moduleId, Char_t* name, Char_t* title);
+  Bool_t SearchNeighbourDigis(Int_t Row, Int_t Col, std::set<Int_t>& ClusterDigiID);
   void SortDigis();
   void RealClustering();
   void SimpleClustering();
@@ -71,10 +75,22 @@ class CbmTrdClusterFinder : public FairTask
   CbmTrdModule  *fModuleInfo; //!
   
   CbmTrdDetectorId fTrdId; //!
+
+  std::map<Int_t, std::set<Int_t> >::iterator mapIt;
+  std::set<Int_t>::iterator it;
+  std::set<Int_t>::iterator search; // search iterator
+  std::set<Int_t>::iterator neighbour;
   
   std::map<Int_t, std::set<Int_t> > fDigiMap;//! /** sector digis **/
   std::map<Int_t, std::set<Int_t> > fModuleMap;//! /** sector id per module **/
   
+  std::set<Int_t> fNeighbours;
+  std::map<Int_t, std::set<Int_t> > fModDigiMap;//std::map<Int_t ModuleID, std::vector<Int_t DigiID> >
+  std::map<Int_t, Int_t> fDigiRow;
+  std::map<Int_t, Int_t> fDigiCol;
+  std::vector< std::set<Int_t> > fClusterBuffer;
+  std::map< Int_t, std::vector< std::set<Int_t> > > fModClusterDigiMap;
+
   ClassDef(CbmTrdClusterFinder,1);
   
 };

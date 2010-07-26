@@ -63,7 +63,7 @@ class CbmTrdClusterizer : public FairTask {
   void GetModuleInformationFromDigiPar(Bool_t Sector, Int_t VolumeID);
   void GetModuleInformation();
 
-  void AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Float_t iCharge);
+  void AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Double_t iCharge);
 
   void CalculatePixel(Bool_t Sector);
 
@@ -108,6 +108,7 @@ class CbmTrdClusterizer : public FairTask {
   Int_t   fStation;
   Int_t   fLayer;
   Double_t fLayerZ[12];
+  Double_t fTime;
   Int_t   fModuleType;
   Int_t   fModuleCopy;
   Int_t   fCol_mean,fCol_in,fCol_out; //Calculated pixel column were the hit is in

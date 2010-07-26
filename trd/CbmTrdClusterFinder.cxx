@@ -109,7 +109,7 @@ InitStatus CbmTrdClusterFinder::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterFinder::Exec(Option_t * option)
 {
-
+  //ChargeTH = 0.1;
   fClusters->Clear();
 
   if(fUseSimpleClustering == /*kTRUE*/kFALSE){
@@ -150,6 +150,7 @@ void CbmTrdClusterFinder::RealClustering()
   Char_t name[50];
   Char_t title[50];
   Int_t moduleId;
+  Int_t DigiId;
   SortDigis();
 
   //Loop over all modules with a fired pad in at least on of their
@@ -166,6 +167,7 @@ void CbmTrdClusterFinder::RealClustering()
   for ( mapIt=fModDigiMap.begin(); mapIt!=fModDigiMap.end(); mapIt++) //module map iterator
     {
       it = ((*mapIt).second).begin();                                 // Digi set iterator
+     
       moduleId = (*mapIt).first;
       cout << " ModuleId: " << moduleId << " set size: " << ((*mapIt).second).size() << endl;
       sprintf(name,"M%d",(*mapIt).first);
@@ -175,8 +177,14 @@ void CbmTrdClusterFinder::RealClustering()
       while ( ((*mapIt).second).size() > 0 )
 	{
 	  it = ((*mapIt).second).begin();
+	  DigiId = *it;
 	  //cout << " search Digi:" << *it << "        Col: " << fDigiCol[*it] << "     Row: " << fDigiRow[*it] << endl;
 	  std::set<Int_t> ClusterDigiID;  //Final container to store the digiIDs belonging to the same cluster 
+	  //cout << fDigiCharge[*it] << endl;
+	  /*
+	    if ( fDigiCharge[*it] > ChargeTH )
+	    {
+	  */	  
 	  ClusterDigiID.insert(*it);      //First element of the module map digi set is used as cluster seed
 	  fNeighbours.insert(*it);        //First element is copied to the set of neighbour digis
 	  ((*mapIt).second).erase(*it);   //First element belongs now to a cluster and is deleted from the module map digi set to avoid double proceeding
@@ -193,35 +201,47 @@ void CbmTrdClusterFinder::RealClustering()
 	  fNeighbours.clear();     //If all neighbour digis which was found for the activ cluster are processed the set is cleared to be used for the next cluster
 	  fClusterBuffer.push_back(ClusterDigiID); // Each cluster digiSet is stored to one vector element
 	  ClusterDigiID.clear();  //if one cluster is finished the digiIDSet is cleared to be used for the next cluster
+	  /*
+	    }
+	    else
+	    {
+	    ((*mapIt).second).erase(*it);   //First element is deleted since it is below Charge(T)resh(H)old 
+	    }
+	  */
 	}
       cout << "                   Number of found clusters: " <<  fClusterBuffer.size() << endl;
       fModClusterDigiMap[(*mapIt).first] = fClusterBuffer;
       fClusterBuffer.clear();
-      cout << "                   set size: " << ((*mapIt).second).size() << endl;
-      //DrawCluster(moduleId,name,title);
+      //cout << "                   set size: " << ((*mapIt).second).size() << endl;
+      DrawCluster(moduleId,name,title);
     }  
 }
-// --------------------------------------------------------------------
+  // --------------------------------------------------------------------
 Bool_t CbmTrdClusterFinder::SearchNeighbourDigis(Int_t searchRow, Int_t searchCol, std::set<Int_t>& ClusterDigiID)
 {
   for ( search = ((*mapIt).second).begin(); search != ((*mapIt).second).end(); search++) // The search iterator is put to the first element (after erasing the activ one) to the next (new first) one and the interated until reaching the last digi within the module map digi set
     {
       if (fabs(fDigiRow[*search] - searchRow) < 2 && fabs(fDigiCol[*search] - searchCol) < 2) // test if digi is a neighbour of the activ one
 	{
+	  /*	  
+		  if (fDigiCharge[*search] > ChargeTH)
+		  {	
+	  */  
 	  ClusterDigiID.insert(*search); // new found neighbour of the activ one is inserted in the finale cluster digi set
 	  fNeighbours.insert(*search);   // new found neighbour digi is inserted in the neighbour set to search for neighbour neighbour digis
 	  //cout << "        Digi:" << *search << "        Col: " << fDigiCol[*search] << "     Row: " << fDigiRow[*search] << endl;
+	  //  }
 	  ((*mapIt).second).erase(search); //found neighbour element is erased from module map digi set
 	}    
     }
   return true;    
 }
-// --------------------------------------------------------------------
+  // --------------------------------------------------------------------
 void CbmTrdClusterFinder::DrawCluster(Int_t moduleId, Char_t* name, Char_t* title)
 {
   Char_t Canfile[100];
-  sprintf(Canfile,"Pics/ModuleID%sCluster.png",name);
-  TH2F* Test = new TH2F(title,name,150,0,150,30,0,30);
+  sprintf(Canfile,"Pics/ModuleID%sClusterNo%d.png",name,int(fModClusterDigiMap[moduleId].size()));
+  TH2F* Test = new TH2F(title,name,200,0,200,30,0,30);
   std::set<Int_t>::iterator iPad;
   Int_t Row;
   Int_t Col;
@@ -229,8 +249,8 @@ void CbmTrdClusterFinder::DrawCluster(Int_t moduleId, Char_t* name, Char_t* titl
     {
       for (iPad = fModClusterDigiMap[moduleId][iCluster].begin(); iPad != fModClusterDigiMap[moduleId][iCluster].end(); iPad++)
 	{
-	  Row = fDigiRow[*iPad];
-	  Col = fDigiCol[*iPad];
+	  Row = fDigiRow[*iPad]+1;
+	  Col = fDigiCol[*iPad]+1;
 	  Test->SetBinContent( Col, Row, iCluster+1);
 	}
     }
@@ -244,34 +264,34 @@ void CbmTrdClusterFinder::DrawCluster(Int_t moduleId, Char_t* name, Char_t* titl
   delete Test;
   delete c;
 }
-// --------------------------------------------------------------------
-void CbmTrdClusterFinder::DrawDigi(Int_t moduleId, Char_t* name, Char_t* title)
-{
-  Char_t Canfile[100];
-  sprintf(Canfile,"Pics/ModuleID%sDigi.png",name);
-  TH2F* Test = new TH2F(title,name,150,0,150,30,0,30);
-  std::set<Int_t>::iterator iPad;
-  Int_t Row;
-  Int_t Col;
+  // --------------------------------------------------------------------
+  void CbmTrdClusterFinder::DrawDigi(Int_t moduleId, Char_t* name, Char_t* title)
+  {
+    Char_t Canfile[100];
+    sprintf(Canfile,"Pics/ModuleID%sDigi.png",name);
+    TH2F* Test = new TH2F(title,name,200,0,200,30,0,30);
+    std::set<Int_t>::iterator iPad;
+    Int_t Row;
+    Int_t Col;
 
-  for (iPad = fModDigiMap[moduleId].begin(); iPad != fModDigiMap[moduleId].end(); iPad++)
-    {
-      Row = fDigiRow[*iPad];
-      Col = fDigiCol[*iPad];
-      Test->SetBinContent( Col, Row, 1);
-    }
+    for (iPad = fModDigiMap[moduleId].begin(); iPad != fModDigiMap[moduleId].end(); iPad++)
+      {
+	Row = fDigiRow[*iPad]+1;
+	Col = fDigiCol[*iPad]+1;
+	Test->SetBinContent( Col, Row, 1);
+      }
 
-  TCanvas* c = new TCanvas(title,name,900,900);
-  c->Divide(1,1);
-  c->cd(1);
-  Test->Draw("colz");
-  TImage *Outimage = TImage::Create();
-  Outimage->FromPad(c);
-  Outimage->WriteImage(Canfile);
-  delete Test;
-  delete c;
-}
-// --------------------------------------------------------------------
+    TCanvas* c = new TCanvas(title,name,900,900);
+    c->Divide(1,1);
+    c->cd(1);
+    Test->Draw("colz");
+    TImage *Outimage = TImage::Create();
+    Outimage->FromPad(c);
+    Outimage->WriteImage(Canfile);
+    delete Test;
+    delete c;
+  }
+  // --------------------------------------------------------------------
 void CbmTrdClusterFinder::SortDigis()
 {
   //Put all digis which belong to one sector (unique sector 
@@ -295,51 +315,59 @@ void CbmTrdClusterFinder::SortDigis()
 
   for (int iDigi=0; iDigi < nentries; iDigi++ ) {
     digi =  (CbmTrdDigi*) fDigis->At(iDigi);
-
-    //Get the sectorId 
-    sectorId = digi->GetDetId();
-    moduleId = fTrdId.GetModuleId(sectorId);
-    //cout << moduleId << endl;
-    iRow = digi->GetRow();
-    iCol = digi->GetCol();
-    fDigiCol[iDigi] = iCol;
-    fDigiRow[iDigi] = iRow;
+    if (digi->GetCharge() > ChargeTH) // to improve speed
+      {
+	//Get the sectorId 
+	sectorId = digi->GetDetId();
+	moduleId = fTrdId.GetModuleId(sectorId);
+	//cout << moduleId << endl;
+	iRow = digi->GetRow();
+	iCol = digi->GetCol();
+	fDigiCol[iDigi] = iCol;
+	fDigiRow[iDigi] = iRow;
+	fDigiCharge[iDigi] = digi->GetCharge();
     
-    // TODO: Maybe do this in the initilization
+	// TODO: Maybe do this in the initilization
 
-    // Add all sectors of a module which have at least one
-    // fired pad to the map of modules
-    if ( fModuleMap.find(moduleId) == fModuleMap.end() ) {
-      std::set<Int_t> a;
-      a.insert(sectorId);
-      fModuleMap[moduleId] = a;
+	// Add all sectors of a module which have at least one
+	// fired pad to the map of modules
+	if ( fModuleMap.find(moduleId) == fModuleMap.end() ) {
+	  std::set<Int_t> a;
+	  a.insert(sectorId);
+	  fModuleMap[moduleId] = a;
       
-      std::set<Int_t> DigiSet;
-      DigiSet.insert(iDigi);
-      fModDigiMap[moduleId] = DigiSet;
+	  std::set<Int_t> DigiSet;
+	  DigiSet.insert(iDigi);
+	  fModDigiMap[moduleId] = DigiSet;
  
-    } else {
-      fModuleMap[moduleId].insert(sectorId);      
-      fModDigiMap[moduleId].insert(iDigi);
-    }
+	} else {
+	  fModuleMap[moduleId].insert(sectorId);      
+	  fModDigiMap[moduleId].insert(iDigi);
+	}
   
 
-    // if the sector is not in the map add it, otherwise
-    // add the new digi to the map.
-    if ( fDigiMap.find(sectorId) == fDigiMap.end() ) {
-      std::set<Int_t> a;
-      a.insert(iDigi);
-      fDigiMap[sectorId] = a;
+	// if the sector is not in the map add it, otherwise
+	// add the new digi to the map.
+	if ( fDigiMap.find(sectorId) == fDigiMap.end() ) {
+	  std::set<Int_t> a;
+	  a.insert(iDigi);
+	  fDigiMap[sectorId] = a;
 
-    } else {
-      fDigiMap[sectorId].insert(iDigi);
-    }
+	} else {
+	  fDigiMap[sectorId].insert(iDigi);
+	}
+      }
   }
 }
-// ---- Finish --------------------------------------------------------
-void CbmTrdClusterFinder::Finish()
-{
-}
+  /*
+    TODO: Add protocluster to CbmTrdCluster collection
 
-ClassImp(CbmTrdClusterFinder)
+
+  */
+  // ---- Finish --------------------------------------------------------
+  void CbmTrdClusterFinder::Finish()
+  {
+  }
+
+  ClassImp(CbmTrdClusterFinder)
 

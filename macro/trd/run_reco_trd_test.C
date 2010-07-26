@@ -230,7 +230,10 @@ void run_reco_trd_test(Int_t nEvents = 1)
   
   CbmTrdClusterizer* trdClustering = new CbmTrdClusterizer("TRD Clusterizer", "TRD task",radiator);
   run->AddTask(trdClustering);
-  
+  printf("Init Clusterfinder\n");
+  CbmTrdClusterFinder* trdClusterfinding = new CbmTrdClusterFinder();
+  run->AddTask(trdClusterfinding);
+  printf("Finished Clusterfinder\n");
   // -------------------------------------------------------------------------
 
   /*

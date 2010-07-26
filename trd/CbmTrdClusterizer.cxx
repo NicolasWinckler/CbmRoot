@@ -145,6 +145,7 @@ InitStatus CbmTrdClusterizer::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterizer::Exec(Option_t * option)
 {
+  //printf(" HALLO\n");
   Digicounter = 0;
   //printf("Exec...\n");
   //gStyle->SetPalette(1,0);
@@ -157,10 +158,10 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   
   //const Bool_t Reconst = true;
   //const Bool_t Reconst = false;
-  const Bool_t Histo = true;
-  //const Bool_t Histo = false;
-  const Bool_t TEST = true;
-  //const Bool_t TEST = false;
+  //const Bool_t Histo = true;
+  const Bool_t Histo = false;
+  //const Bool_t TEST = true;
+  const Bool_t TEST = false;
   const Bool_t Sector = true;
   //const Bool_t Sector = false;
   
@@ -236,7 +237,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   
   if (Histo)
     {
-      printf("Init Histograms\n");
+      printf("  Init Histograms\n");
       TRDalpha = new TH1F("TRDalpha","atan(deltaX(MC) / deltaZ(MC)) [deg]",110,-10,100);
       TRDbeta = new TH1F("TRDbeta","atan(deltaY(MC) / deltaZ(MC)) [deg]",110,-10,100);
       TRDgamma = new TH1F("TRDgamma","atan(deltaR(MC) / deltaZ(MC)) [deg]",110,-10,100);
@@ -330,6 +331,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       sprintf(Mathieson," -1. / (2. * atan(sqrt(%f))) * (atan(sqrt(%f) *tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f + 2.* x * %f) / (8.* %f) )) +  atan(sqrt(%f) *  tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f - 2.* x * %f) / (8.* %f) )) )",K3,K3,K3,pW,par,h,K3,K3,pW,par,h);
       mathieson = new TF1("mathieson", Mathieson, -1.5 * pW, 1.5 * pW);
       mathieson->SetLineColor(2);
+printf("  Init Histograms Finished\n");
     }
   for (Int_t i = 0; i < 12; i++)
     {
@@ -1112,10 +1114,13 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
     Nyquist–Shannon sampling theorem: 1/pad width > 2/cluster gap
   */
   Float_t ClusterDistance = 0.2 * padsize[0] - 0.1; //Ar 94 electron/cm    Xe 307 electrons/cm
-  Int_t DrawTH = int(15 * padsize[0] / ClusterDistance) * 100;
+  Int_t DrawTH = int(15 * padsize[0] / ClusterDistance)/* * 100*/;
   Double_t deltaR = sqrt(pow((local_inLL[0] - local_outLL[0]),2) + pow((local_inLL[1] - local_outLL[1]),2)/* + pow((fz_in - fz_out),2)*/);
   Int_t nPathSlice = int(deltaR / ClusterDistance) + 1;                       
-
+  /*
+  printf(" %d  >   %d\n",nPathSlice,DrawTH);
+  cout << nPathSlice << " > " << DrawTH << endl;
+  */
   Double_t W[fPadNrX];
   Double_t H[fPadNrY];
 
@@ -1129,6 +1134,7 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
     {
       SliceELoss += fELossTR;
     }
+ 
   if (nPathSlice > DrawTH)
     {
       if (TEST)
@@ -1245,7 +1251,7 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
 	    {
 	      
 	      Digicounter++;
-	      AddDigi(/*j*/Digicounter, iCol, iRow, float(PadChargeModule[iRow * nCol + iCol]));
+	      AddDigi(/*j*/Digicounter, iCol, iRow, double(PadChargeModule[iRow * nCol + iCol]));
 	      if (nPathSlice > DrawTH)
 		{
 		  if(TEST)
@@ -1649,7 +1655,7 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
   // ------AddDigi--------------------------------------------------------------
 
   //void CbmTrdClusterizer::AddDigi() 
-void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Float_t iCharge) 
+void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Double_t iCharge) 
   {
 
     // Add digi for pixel(x,y) in module to map for intermediate storage
@@ -1675,7 +1681,8 @@ void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Flo
       }
       */
       //  CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, fCol_mean, fRow_mean, fELoss, fMCindex);
-      CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, iCol, iRow, iCharge,/* fTime,*/ pointID);
+      fTime = 0.0;
+      CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, iCol, iRow, iCharge, fTime, pointID);
       fDigiMap[b] = digi;
     }
 

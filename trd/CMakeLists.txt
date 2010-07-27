@@ -63,6 +63,7 @@ CbmTrdHitProducerDigi.cxx
 CbmTrdElectronsQa.cxx
 CbmTrdElectronsTrainAnn.cxx
 CbmTrdClusterFinder.cxx
+CbmTrdClusterFinderFast.cxx
 CbmTrdSimpleHitProducerCluster.cxx
 )
 

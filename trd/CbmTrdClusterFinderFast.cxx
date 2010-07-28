@@ -15,7 +15,7 @@
 #include "TCanvas.h"
 #include "TImage.h"
 
-#include <map>
+//#include <map>
 #include <iostream>
 #include <iomanip>
 #include <cmath>
@@ -116,6 +116,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t * option)
     d->digiId = iDigi;
     d->rowId = digi->GetRow();
     d->colId = digi->GetCol();
+    d->charge = digi->GetCharge();
     //unrotate rotated modules in x- and y-direction (row <-> col)
     Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId); 
     Int_t Station  = detInfo[1];
@@ -135,9 +136,10 @@ void CbmTrdClusterFinderFast::Exec(Option_t * option)
   std::map<Int_t, ClusterList*> fModClusterMap;
   for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin(); it != modules.end(); ++it) {
     fModClusterMap[it->first] = clusterModule(it->second);
-    // DO SOMETHING USEFUL with the results: AddCluster::
-    //DrawCluster(it->first, fModClusterMap[it->first]);
+    
+    //drawCluster(it->first, fModClusterMap[it->first]);
   }
+  addCluster(fModClusterMap);
   // clean up
   for (std::map<Int_t, ClusterList*>::iterator it = fModClusterMap.begin(); 
        it != fModClusterMap.end(); ++it) {
@@ -269,7 +271,7 @@ void CbmTrdClusterFinderFast::walkCluster(std::list<RowCluster*> *rowClusterList
 }
 
 //----------------------------------------------------------------------
-void CbmTrdClusterFinderFast::DrawCluster(Int_t moduleId, ClusterList *clusterList)
+void CbmTrdClusterFinderFast::drawCluster(Int_t moduleId, ClusterList *clusterList)
 {
   Char_t name[50];
   Char_t title[50];
@@ -303,6 +305,45 @@ void CbmTrdClusterFinderFast::DrawCluster(Int_t moduleId, ClusterList *clusterLi
   delete Test;
   delete c;
 }
+
+//--------------------------------------------------------------------
+void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClusterMap)
+{
+  Float_t Charge;
+  Float_t qMax;
+  for (std::map<Int_t, ClusterList*>::iterator iMod = fModClusterMap.begin(); iMod != fModClusterMap.end(); ++iMod) 
+    {
+      for (ClusterList::iterator iCluster = (iMod->second)->begin(); iCluster != (iMod->second)->end(); iCluster++) 
+	{
+	  TArrayI* digiIndices = new TArrayI( Int_t((*iCluster)->size()) );
+	  Int_t i = 0;
+	  Charge = 0;
+	  qMax = 0;
+	  for (MyDigiList::iterator iDigi = (*iCluster)->begin(); iDigi != (*iCluster)->end(); iDigi++) 
+	    {
+	      (*digiIndices)[i] = (*iDigi)->digiId;
+	      Charge += (*iDigi)->charge;
+	      i++;
+	      if (qMax < (*iDigi)->charge)
+		{
+		  qMax = (*iDigi)->charge;
+		}
+	    }
+	  CbmTrdCluster* Cluster = new CbmTrdCluster(*digiIndices, Charge, qMax);
+	  delete digiIndices;
+	}
+      
+    }
+
+}
+
+// ---- Register ------------------------------------------------------
+void CbmTrdClusterFinderFast::Register()
+{
+  FairRootManager::Instance()->Register("TrdCluster","Trd Cluster", fClusters, kTRUE);
+}
+// --------------------------------------------------------------------
+
 
 // ---- Finish --------------------------------------------------------
 void CbmTrdClusterFinderFast::Finish()

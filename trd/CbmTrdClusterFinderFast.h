@@ -9,9 +9,8 @@
 
 #include "FairTask.h"
 #include "CbmTrdDetectorId.h"
-#include <map>
+
 #include <vector>
-#include <set>
 #include <list>
 
 class CbmTrdDigiPar;
@@ -26,25 +25,30 @@ typedef struct MyDigi
   Int_t combiId;
 } MyDigi;
 
-typedef std::list<MyDigi*> MyDigis;
-typedef std::vector<MyDigis*> ClusterList;
+typedef std::list<MyDigi*> MyDigiList;
+typedef std::vector<MyDigiList*> ClusterList;
 
 class RowCluster
 {
  public:
   RowCluster()
     {
-      digis = new MyDigis;
+      hasBeenVisited = false;
+      digis = new MyDigiList;
     }
   ~RowCluster()
     {
-      if (digis)
+      //      std::cout << "DEBUG destuctor " << this << std::endl;
+      if (digis) {
 	delete digis;
+	digis = NULL;
+      }
     }
+  Bool_t hasBeenVisited;
   Int_t minCol;
   Int_t maxCol;
   Int_t row;
-  MyDigis *digis;
+  MyDigiList *digis;
   std::list<RowCluster*> parents;
   std::list<RowCluster*> children;
 };
@@ -78,13 +82,13 @@ class CbmTrdClusterFinderFast : public FairTask
 
 
  private:
-  ClusterList *clusterModule(MyDigis *digis);  
+  ClusterList *clusterModule(MyDigiList *digis);  
   void mergeRowCluster(RowCluster *currentCluster,
 		       std::list<RowCluster*> *openList);
   ClusterList *findCluster(std::list<RowCluster*> *rowClusterList);
   void walkCluster(std::list<RowCluster*> *rowClusterList, 
 		   RowCluster *currentRowCluster,
-		   MyDigis *cluster);
+		   MyDigiList *cluster);
   void DrawCluster(Int_t moduleId, ClusterList *clusterList);
 
   TClonesArray*     fDigis;       /** Input array of CbmTrdDigi **/

@@ -15,6 +15,7 @@
 #include "TCanvas.h"
 #include "TImage.h"
 
+#include <map>
 #include <iostream>
 #include <iomanip>
 #include <cmath>
@@ -104,11 +105,10 @@ InitStatus CbmTrdClusterFinderFast::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterFinderFast::Exec(Option_t * option)
 {
-  //cout << "DEBUG: ClusterFinderFast::EXEC" << endl;
   Int_t nentries = fDigis->GetEntries();
-  std::map<Int_t, MyDigis*> modules;
+  std::map<Int_t, MyDigiList*> modules;
 
-  for (int iDigi=0; iDigi < nentries; iDigi++ ) {
+  for (Int_t iDigi=0; iDigi < nentries; iDigi++ ) {
     CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
     MyDigi *d = new MyDigi;
     Int_t moduleId = digi->GetDetId();
@@ -116,10 +116,10 @@ void CbmTrdClusterFinderFast::Exec(Option_t * option)
     d->digiId = iDigi;
     d->rowId = digi->GetRow();
     d->colId = digi->GetCol();
-    /* FUCK THIS SHIT!!!!  */
+    //unrotate rotated modules in x- and y-direction (row <-> col)
     Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId); 
-    Int_t Station    = detInfo[1];
-    Int_t Layer      = detInfo[2]; 
+    Int_t Station  = detInfo[1];
+    Int_t Layer    = detInfo[2]; 
     if (Layer%2 == 0) {
       d->combiId = d->rowId * (fModuleInfo->GetnRow() + 1) + d->colId;
     }
@@ -127,14 +127,15 @@ void CbmTrdClusterFinderFast::Exec(Option_t * option)
       d->combiId = d->rowId * (fModuleInfo->GetnCol() + 1) + d->colId;
     }
     if (modules.find(moduleId) == modules.end()) {
-      modules[moduleId] = new MyDigis;
+      modules[moduleId] = new MyDigiList;
     } 
     modules[moduleId]->push_back(d);
   }
   
   std::map<Int_t, ClusterList*> fModClusterMap;
-  for (std::map<Int_t, MyDigis*>::iterator it = modules.begin(); it != modules.end(); ++it) {
+  for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin(); it != modules.end(); ++it) {
     fModClusterMap[it->first] = clusterModule(it->second);
+    // DO SOMETHING USEFUL with the results: AddCluster::
     //DrawCluster(it->first, fModClusterMap[it->first]);
   }
   // clean up
@@ -142,7 +143,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t * option)
        it != fModClusterMap.end(); ++it) {
     for (ClusterList::iterator clusterIt = it->second->begin(); 
 	 clusterIt != it->second->end(); ++clusterIt) {
-      for (MyDigis::iterator digisIt = (*clusterIt)->begin(); 
+      for (MyDigiList::iterator digisIt = (*clusterIt)->begin(); 
 	   digisIt != (*clusterIt)->end(); ++digisIt) {
 	delete *digisIt;
       }
@@ -152,33 +153,12 @@ void CbmTrdClusterFinderFast::Exec(Option_t * option)
   }
 }
 
+//----------------------------------------------------------------------
 bool digiSorter(MyDigi *a, MyDigi *b)
-{
-  return (a->combiId < b->combiId);
-}
+{ return (a->combiId < b->combiId); }
 
-void CbmTrdClusterFinderFast::mergeRowCluster(RowCluster *currentCluster,
-					      std::list<RowCluster*> *openList)
-{
-  // finish up the current rowCluster
-  currentCluster->minCol = currentCluster->digis->front()->colId;
-  currentCluster->maxCol = currentCluster->digis->back()->colId;
-  currentCluster->row = currentCluster->digis->back()->rowId;
-  // merge current RowCluster with openList
-  for (std::list<RowCluster*>::iterator openIt = openList->begin(); 
-       openIt != openList->end(); ++openIt) {
-    if (currentCluster->maxCol < (*openIt)->minCol - 1)
-      break;
-    else if (currentCluster->minCol > (*openIt)->maxCol + 1)
-      continue;
-    else {
-      currentCluster->parents.push_back(*openIt);
-      (*openIt)->children.push_back(currentCluster);
-    }
-  }
-}					      
-
-ClusterList *CbmTrdClusterFinderFast::clusterModule(MyDigis *digis)
+//----------------------------------------------------------------------
+ClusterList *CbmTrdClusterFinderFast::clusterModule(MyDigiList *digis)
 {
   std::list<RowCluster*> closedList;
   std::list<RowCluster*> openList;
@@ -186,7 +166,7 @@ ClusterList *CbmTrdClusterFinderFast::clusterModule(MyDigis *digis)
   RowCluster *currentCluster = new RowCluster;
 
   digis->sort(digiSorter);
-  for (MyDigis::iterator it = digis->begin(); it != digis->end(); ++it) {
+  for (MyDigiList::iterator it = digis->begin(); it != digis->end(); ++it) {
     if (currentCluster->digis->empty() || 
 	currentCluster->digis->back()->combiId + 1 == (*it)->combiId) {
       currentCluster->digis->push_back(*it);
@@ -218,45 +198,77 @@ ClusterList *CbmTrdClusterFinderFast::clusterModule(MyDigis *digis)
   return findCluster(&closedList);
 }
 
-void CbmTrdClusterFinderFast::walkCluster(std::list<RowCluster*> *rowClusterList, 
-					  RowCluster *currentRowCluster,
-					  MyDigis *cluster)
+//----------------------------------------------------------------------
+void CbmTrdClusterFinderFast::mergeRowCluster(RowCluster *currentCluster,
+					      std::list<RowCluster*> *openList)
 {
-  cluster->splice(cluster->end(), *(currentRowCluster->digis));
-  rowClusterList->remove(currentRowCluster);
-  std::list<RowCluster*> neighbours;
-  for (std::list<RowCluster*>::iterator it = currentRowCluster->parents.begin();
-       it != currentRowCluster->parents.end();) {
-    neighbours.push_back(*it);
-    (*it)->children.remove(currentRowCluster);
-    it = currentRowCluster->parents.erase(it);
+  // finish up the current rowCluster
+  currentCluster->minCol = currentCluster->digis->front()->colId;
+  currentCluster->maxCol = currentCluster->digis->back()->colId;
+  currentCluster->row = currentCluster->digis->back()->rowId;
+  // merge current RowCluster with openList
+  for (std::list<RowCluster*>::iterator openIt = openList->begin(); 
+       openIt != openList->end(); ++openIt) {
+    if (currentCluster->maxCol < (*openIt)->minCol - 1)
+      break;
+    else if (currentCluster->minCol > (*openIt)->maxCol + 1)
+      continue;
+    else {
+      currentCluster->parents.push_back(*openIt);
+      (*openIt)->children.push_back(currentCluster);
+    }
   }
-  for (std::list<RowCluster*>::iterator it = currentRowCluster->children.begin();
-       it != currentRowCluster->children.end();) {
-    neighbours.push_back(*it);
-    (*it)->parents.remove(currentRowCluster);
-    it = currentRowCluster->children.erase(it);
-  }
-  for (std::list<RowCluster*>::iterator it = neighbours.begin();
-       it != neighbours.end(); ++it) {
-    walkCluster(rowClusterList, *it, cluster);
-  }
-}
+}					      
 
+//----------------------------------------------------------------------
 ClusterList *CbmTrdClusterFinderFast::findCluster(std::list<RowCluster*> *rowClusterList)
 {
   RowCluster *currentRowCluster;
-  std::vector<MyDigis*> *clusterList = new std::vector<MyDigis*>;
+  ClusterList *clusterList = new ClusterList;
   while (!rowClusterList->empty()) {
     currentRowCluster = *rowClusterList->begin();
-    MyDigis *cluster = new MyDigis;
+    MyDigiList *cluster = new MyDigiList;
     walkCluster(rowClusterList, currentRowCluster, cluster);
     clusterList->push_back(cluster);
   }
   return clusterList;
 }
 
+//----------------------------------------------------------------------
+void CbmTrdClusterFinderFast::walkCluster(std::list<RowCluster*> *rowClusterList, 
+					  RowCluster *currentRowCluster,
+					  MyDigiList *cluster)
+{
+  cluster->splice(cluster->end(), *(currentRowCluster->digis));
+  rowClusterList->remove(currentRowCluster);
+  std::list<RowCluster*> neighbours;
+  for (std::list<RowCluster*>::iterator it = currentRowCluster->parents.begin();
+       it != currentRowCluster->parents.end();) {
+    if (!(*it)->hasBeenVisited) {
+      neighbours.push_back(*it);
+      (*it)->hasBeenVisited = true;
+    }
+    (*it)->children.remove(currentRowCluster);
+    it = currentRowCluster->parents.erase(it);
+  }
+  for (std::list<RowCluster*>::iterator it = currentRowCluster->children.begin();
+       it != currentRowCluster->children.end();) {
+    if (!(*it)->hasBeenVisited) {
+      neighbours.push_back(*it);
+      (*it)->hasBeenVisited = true;
+    }
+    (*it)->parents.remove(currentRowCluster);
+    it = currentRowCluster->children.erase(it);
+  }
+  delete currentRowCluster;
+  currentRowCluster = NULL;
+  for (std::list<RowCluster*>::iterator it = neighbours.begin();
+       it != neighbours.end(); ++it) {
+    walkCluster(rowClusterList, *it, cluster);
+  }
+}
 
+//----------------------------------------------------------------------
 void CbmTrdClusterFinderFast::DrawCluster(Int_t moduleId, ClusterList *clusterList)
 {
   Char_t name[50];
@@ -274,7 +286,7 @@ void CbmTrdClusterFinderFast::DrawCluster(Int_t moduleId, ClusterList *clusterLi
   for (ClusterList::iterator iCluster = clusterList->begin(); 
        iCluster != clusterList->end(); iCluster++, counter++)
     {
-      for ( MyDigis::iterator iPad = (*iCluster)->begin(); iPad != (*iCluster)->end(); iPad++)
+      for (MyDigiList::iterator iPad = (*iCluster)->begin(); iPad != (*iCluster)->end(); iPad++)
 	{
 	  Row = (*iPad)->rowId+1;
 	  Col = (*iPad)->colId+1;

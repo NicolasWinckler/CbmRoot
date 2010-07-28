@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <list>
+#include <map>
 
 class CbmTrdDigiPar;
 class CbmTrdModule;
@@ -23,6 +24,7 @@ typedef struct MyDigi
   Int_t rowId;
   Int_t colId;
   Int_t combiId;
+  Float_t charge;
 } MyDigi;
 
 typedef std::list<MyDigi*> MyDigiList;
@@ -38,7 +40,6 @@ class RowCluster
     }
   ~RowCluster()
     {
-      //      std::cout << "DEBUG destuctor " << this << std::endl;
       if (digis) {
 	delete digis;
 	digis = NULL;
@@ -79,7 +80,7 @@ class CbmTrdClusterFinderFast : public FairTask
 
   /** Finish task **/
   virtual void Finish();
-
+  void Register();
 
  private:
   ClusterList *clusterModule(MyDigiList *digis);  
@@ -89,7 +90,9 @@ class CbmTrdClusterFinderFast : public FairTask
   void walkCluster(std::list<RowCluster*> *rowClusterList, 
 		   RowCluster *currentRowCluster,
 		   MyDigiList *cluster);
-  void DrawCluster(Int_t moduleId, ClusterList *clusterList);
+  void drawCluster(Int_t moduleId, ClusterList *clusterList);
+
+  void addCluster(std::map<Int_t, ClusterList*> fModClusterMap);
 
   TClonesArray*     fDigis;       /** Input array of CbmTrdDigi **/
   TClonesArray*     fClusters;    /** Output array of CbmTrdCluster **/

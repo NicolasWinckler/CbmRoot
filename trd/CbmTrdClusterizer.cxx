@@ -331,14 +331,23 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       sprintf(Mathieson," -1. / (2. * atan(sqrt(%f))) * (atan(sqrt(%f) *tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f + 2.* x * %f) / (8.* %f) )) +  atan(sqrt(%f) *  tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f - 2.* x * %f) / (8.* %f) )) )",K3,K3,K3,pW,par,h,K3,K3,pW,par,h);
       mathieson = new TF1("mathieson", Mathieson, -1.5 * pW, 1.5 * pW);
       mathieson->SetLineColor(2);
-printf("  Init Histograms Finished\n");
+      printf("  Init Histograms Finished\n");
     }
   for (Int_t i = 0; i < 12; i++)
     {
       fLayerZ[i] = 1;
     }
+  
+  cout << " FillMathiesonVector" << endl;
+  FillMathiesonVector();
+  /*
+ for (Int_t r = 0; r < endOfMathiesonArray * Accuracy; r++) // values to be checked !!!!!
+    {
+      cout << fMathieson[r] << endl;
+    }
+  */
   Int_t nEntries = fTrdPoints->GetEntriesFast();
-  //nEntries = nEntries * 10 / 100;
+  //nEntries = nEntries * 1 / 100;
   if (TEST)
     {
       //nEntries = nEntries * 10 / 100;//5;
@@ -1210,7 +1219,9 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
 
       GetPadSizeMatrix( H, W, padH, padW, Row_slice, Col_slice, nRow, nCol);
 
-      CalcMathieson(TEST, ClusterPosC[0], ClusterPosC[1], SliceELoss, W ,H);
+      LookupMathiesonVector(ClusterPosC[0], ClusterPosC[1], SliceELoss, W, H);
+
+      //CalcMathieson(  TEST, ClusterPosC[0], ClusterPosC[1], SliceELoss, W ,H);
 
       if (Histo)
 	{
@@ -1319,6 +1330,107 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
     }
 }
   // --------------------------------------------------------------------
+void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
+{
+  //Int_t Accuracy = 1000;
+  Int_t rMax = 0;
+  Int_t rMin = 0;
+  Double_t Q = 0;
+  Float_t r = 0.0;         // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
+  /*
+  for (Int_t i = 0; i < 100; i++ )
+    {
+      cout << i << "  " << fMathieson[i] << endl;
+    }
+  */
+  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
+    {
+      for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++)
+	{
+	  fPadCharge[iPadRow][iPadCol] = 0.0;
+	}
+    }
+  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
+    { 
+      for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++)		
+	{ 
+	  for (Int_t yi = 0; yi < H[iPadRow] * accuracy; yi++)
+	    {
+	      for (Int_t xi = 0; xi < W[iPadCol] * accuracy; xi++)
+		{
+		  //Mathieson coordinate system ist centered in the center of the hit pad 
+		  r = sqrt(
+			   pow(((iPadCol - int(fPadNrX/2)) * W[iPadCol] + (xi + 0.5) / float(accuracy) - 0.5 * W[iPadCol]) - x_mean,2) + 
+			   pow(((iPadRow - int(fPadNrY/2)) * H[iPadRow] + (yi + 0.5) / float(accuracy) - 0.5 * H[iPadRow]) - y_mean,2)			 
+			   );
+		  if (Int_t(r * Accuracy)+2 < endOfMathiesonArray * Accuracy)
+		    {
+		      rMin = Int_t(r * Accuracy);
+		      /*
+		      if (fMathieson[rMin] > 0)
+			cout << rMin << "  " << fMathieson[rMin] << endl;
+		      */
+		      rMax = rMin+1;
+		      //if (fMathieson.find(rMin) && fMathieson.find(rMax))
+		      {
+			Float_t m = ((fMathieson[rMax] - fMathieson[rMin]) / (Float_t(Accuracy)));
+			Float_t b = fMathieson[rMax] - m * (rMax/Float_t(Accuracy));
+			Q = m * r + b;
+			//Q = 0.5 * (fMathieson[rMin] + fMathieson[rMax]);
+			fPadCharge[iPadRow][iPadCol] += Q;
+		      }
+		    }		  
+		  else
+		    {
+		      //fPadCharge[iPadRow][iPadCol] += 0;
+		      /*
+			cout << "DEBUG: Look up table to small!!" << endl;
+		      */
+		    }
+		}
+	    }
+	  fPadCharge[iPadRow][iPadCol] *= SliceELoss;
+	  //cout << "Q: " << fPadCharge[iPadRow][iPadCol] << endl;
+	}
+    }
+}
+  // --------------------------------------------------------------------
+void CbmTrdClusterizer::FillMathiesonVector()
+{
+  
+  //Int_t Accuracy = 1000;
+  Double_t Q = 0;
+  Float_t h = 3;           //anode-cathode gap [mm]
+  Float_t s = 3;           //anode wire spacing [mm]
+  Float_t ra = 12.5E-3/2.; //anode wire radius [mm]
+  Float_t qa = 1700;       //anode neto charge [??] ???
+  Float_t par = 1.0;       // normalization factor
+  //Float_t r = 0.0;         // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
+  Float_t value = 0.0;
+  Float_t argument = 0.0;
+  Float_t taylor = 0.0;
+  Double_t rho = 0.0;     //charge at position x
+  Float_t K3 = 0.525;     //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
+  //Float_t K3 = -0.24 * (h / s) + 0.7 + (-0.75 * log(ra / s) - 3.64);// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
+  Float_t K2 = 3.14159265 / 2.* ( 1. - sqrt(K3)/2.);
+  Float_t K1 = (K2 * sqrt(K3)) / (4. * atan(sqrt(K3)));
+  
+  //cout <<  Int_t( sqrt(pow(fPadNrX * 5,2) + pow(fPadNrY * 200,2))) * Accuracy << endl;
+  //for (Int_t r = endOfMathiesonArray; r >= 0; r--) // values to be checked !!!!!
+  for (Int_t r = 0; r < endOfMathiesonArray * Accuracy; r++) // values to be checked !!!!!
+    {
+      value = pow(tanh(K2 * (r/Float_t(Accuracy)) / h),2);
+      rho = (qa * K1 * (1. - value) /
+	     (1. + K3 * value)) / float((accuracy * accuracy)); 
+      //if (rho > 0)
+      //cout << "rho: " << rho << endl;
+      //fMathieson.push_back(rho);
+      fMathieson[r] = rho;
+      //cout << rho << endl;
+    }
+  cout << " Finished FillMathiesonVector" << endl;
+}
+
   // --------------------------------------------------------------------
 void CbmTrdClusterizer::GetPadSizeMatrix(Double_t* H, Double_t* W, Double_t* padH, Double_t* padW, Int_t Row_slice, Int_t Col_slice, Int_t nRow, Int_t nCol)
 {  

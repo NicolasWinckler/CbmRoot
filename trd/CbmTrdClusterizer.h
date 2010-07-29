@@ -81,6 +81,10 @@ class CbmTrdClusterizer : public FairTask {
 
   void CalcMathieson(Bool_t TEST, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
 
+  void FillMathiesonVector();
+
+  void LookupMathiesonVector(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
+
   void CalcCenterOfGravity();
 
   void CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCol, Double_t* PadChargeModule, TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2);
@@ -134,11 +138,12 @@ class CbmTrdClusterizer : public FairTask {
   Float_t fx_in, fx_out, fy_in, fy_out, fz_in, fz_out, fx_mean, fy_mean, fz_mean;
   Int_t fSector, fnCol, fnRow;
   static const Int_t accuracy = 1;// '1/accuracy' integration step width [mm]
+  static const Int_t Accuracy = 1000; // fMathieson array accuracy in values per mm
   static const Int_t fPadNrX = 13;//7; // has to be odd
   static const Int_t fPadNrY = 3;//5; // has to be odd
   static const Int_t fNoSectors = 3;
- 
-  
+  static const Int_t endOfMathiesonArray = 35; //+- mm
+  Double_t fMathieson[endOfMathiesonArray * 1000];//endOfMathiesonArray * Accuracy
   Double_t padsize[3];
   Double_t modulesize[3];
   Double_t sectorsize[fNoSectors]; // 3 sectors per module

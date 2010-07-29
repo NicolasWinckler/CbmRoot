@@ -105,34 +105,41 @@ InitStatus CbmTrdClusterFinderFast::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterFinderFast::Exec(Option_t * option)
 {
+ cout << "================CbmTrdClusterFinderFast===============" << endl;
   Int_t nentries = fDigis->GetEntries();
+  Int_t digiCounter = 0;
+  cout << " Found " << nentries << " Digis in Collection" << endl;
   std::map<Int_t, MyDigiList*> modules;
 
   for (Int_t iDigi=0; iDigi < nentries; iDigi++ ) {
     CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
-    MyDigi *d = new MyDigi;
-    Int_t moduleId = digi->GetDetId();
-    fModuleInfo = fDigiPar->GetModule(moduleId);
-    d->digiId = iDigi;
-    d->rowId = digi->GetRow();
-    d->colId = digi->GetCol();
-    d->charge = digi->GetCharge();
-    //unrotate rotated modules in x- and y-direction (row <-> col)
-    Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId); 
-    Int_t Station  = detInfo[1];
-    Int_t Layer    = detInfo[2]; 
-    if (Layer%2 == 0) {
-      d->combiId = d->rowId * (fModuleInfo->GetnRow() + 1) + d->colId;
-    }
-    else {
-      d->combiId = d->rowId * (fModuleInfo->GetnCol() + 1) + d->colId;
-    }
-    if (modules.find(moduleId) == modules.end()) {
-      modules[moduleId] = new MyDigiList;
-    } 
-    modules[moduleId]->push_back(d);
+    if (digi->GetCharge() > minimumChargeTH)
+      {
+	digiCounter++;
+	MyDigi *d = new MyDigi;
+	Int_t moduleId = digi->GetDetId();
+	fModuleInfo = fDigiPar->GetModule(moduleId);
+	d->digiId = iDigi;
+	d->rowId = digi->GetRow();
+	d->colId = digi->GetCol();
+	d->charge = digi->GetCharge();
+	//unrotate rotated modules in x- and y-direction (row <-> col)
+	Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId); 
+	Int_t Station  = detInfo[1];
+	Int_t Layer    = detInfo[2]; 
+	if (Layer%2 == 0) {
+	  d->combiId = d->rowId * (fModuleInfo->GetnRow() + 1) + d->colId;
+	}
+	else {
+	  d->combiId = d->rowId * (fModuleInfo->GetnCol() + 1) + d->colId;
+	}
+	if (modules.find(moduleId) == modules.end()) {
+	  modules[moduleId] = new MyDigiList;
+	} 
+	modules[moduleId]->push_back(d);
+      }
   }
-  
+  cout << " Used  " << digiCounter << " Digis after Minimum Charge Cut (" << minimumChargeTH << ")" << endl;
   std::map<Int_t, ClusterList*> fModClusterMap;
   for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin(); it != modules.end(); ++it) {
     fModClusterMap[it->first] = clusterModule(it->second);
@@ -309,12 +316,14 @@ void CbmTrdClusterFinderFast::drawCluster(Int_t moduleId, ClusterList *clusterLi
 //--------------------------------------------------------------------
 void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClusterMap)
 {
+  Int_t ClusterSumm = 0;
   Float_t Charge;
   Float_t qMax;
   for (std::map<Int_t, ClusterList*>::iterator iMod = fModClusterMap.begin(); iMod != fModClusterMap.end(); ++iMod) 
     {
       for (ClusterList::iterator iCluster = (iMod->second)->begin(); iCluster != (iMod->second)->end(); iCluster++) 
 	{
+	  ClusterSumm++;
 	  TArrayI* digiIndices = new TArrayI( Int_t((*iCluster)->size()) );
 	  Int_t i = 0;
 	  Charge = 0;
@@ -334,7 +343,8 @@ void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClust
 	}
       
     }
-
+ 
+  cout << " Found " << ClusterSumm << " Cluster" << endl;
 }
 
 // ---- Register ------------------------------------------------------

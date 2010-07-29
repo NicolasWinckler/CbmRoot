@@ -145,6 +145,7 @@ InitStatus CbmTrdClusterizer::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterizer::Exec(Option_t * option)
 {
+ cout << "================CbmTrdClusterizer=====================" << endl;
   //printf(" HALLO\n");
   Digicounter = 0;
   //printf("Exec...\n");
@@ -166,10 +167,10 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   //const Bool_t Sector = false;
   
   if (Histo){
-    printf("Finale histograms are created and saved to ../Pics/*.png\n");
+    printf(" - Finale histograms are created and saved to ../Pics/*.png\n");
   }
   if (TEST){
-    printf("Long path tracks are exported to ../Pics/*.png\n");
+    printf(" - Long path tracks are exported to ../Pics/*.png\n");
   }
   TH1F* TRDalpha = NULL;
   TH1F* TRDbeta = NULL;
@@ -338,7 +339,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       fLayerZ[i] = 1;
     }
   
-  cout << " FillMathiesonVector" << endl;
+  //cout << " FillMathiesonVector" << endl;
   FillMathiesonVector();
   /*
  for (Int_t r = 0; r < endOfMathiesonArray * Accuracy; r++) // values to be checked !!!!!
@@ -644,7 +645,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	  XMC->Fill(fPadPosxC/padsize[0]);
 	}
     }
-  printf("Added %d TRD Digis to Collection\n%.2f Digis per Hit in Average\n",Digicounter,float(Digicounter/float(nEntries)));
+  printf(" Added %d TRD Digis to Collection (Including Multiple Fired Digis by Differend Particles in the Same Event)\n   %.2f Digis per 2 MCPoints in Average\n",Digicounter,float(Digicounter/float(nEntries)));
   if (Histo)
     {
       Char_t Canfile1[100];
@@ -1428,7 +1429,7 @@ void CbmTrdClusterizer::FillMathiesonVector()
       fMathieson[r] = rho;
       //cout << rho << endl;
     }
-  cout << " Finished FillMathiesonVector" << endl;
+  //cout << " Finished FillMathiesonVector" << endl;
 }
 
   // --------------------------------------------------------------------

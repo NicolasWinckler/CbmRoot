@@ -32,12 +32,14 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <cmath>
 using std::cout;
 using std::endl;
 using std::vector;
 using std::pair;
 using std::map;
 using std::set;
+using std::fabs;
 
 ClassImp(CbmL1CATrdTrackFinderSA);
 

@@ -1669,13 +1669,18 @@ void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Dou
   // Look for pixel in charge map
   //pair<Int_t, Int_t> a(fCol_mean, fRow_mean);
   Int_t temp;
+  pair<Int_t, Int_t> a;
   if (fLayer % 2 == 0)
     {
-      pair<Int_t, Int_t> a(iRow, iCol);
+//      pair<Int_t, Int_t> a(iRow, iCol);
+      a.first=iRow;
+      a.second=iCol;
     }
   else
     {
-      pair<Int_t, Int_t> a(iCol, iRow);
+//      pair<Int_t, Int_t> a(iCol, iRow);
+      a.first=iCol;
+      a.second=iRow;
     }
     
   pair<Int_t, pair<Int_t,Int_t> > b(fModuleID, a);
@@ -1685,11 +1690,6 @@ void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Dou
 
   // Pixel not yet in map -> Add new pixel
   if ( fDigiMapIt == fDigiMap.end() ) {
-    /*
-      if (fModuleID == 111003) {
-      cout<<"Create ModID 111003 in Map"<<endl;
-      }
-    */
     //  CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, fCol_mean, fRow_mean, fELoss, fMCindex);
     fTime = 0.0;
     CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, iCol, iRow, iCharge, fTime, pointID);
@@ -1698,11 +1698,6 @@ void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Dou
 
   // Pixel already in map -> Add charge
   else {
-    /*
-      if (fModuleID == 111003) {
-      cout<<"Modify ModID 111003 in Map"<<endl;
-      }
-    */
     CbmTrdDigi* digi = (CbmTrdDigi*)fDigiMapIt->second;
     if ( ! digi ) Fatal("AddChargeToPixel", "Zero pointer in digi map!");
     digi->AddCharge(iCharge);

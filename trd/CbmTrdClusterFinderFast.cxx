@@ -24,7 +24,7 @@ using std::endl;
 
 // ---- Default constructor -------------------------------------------
 CbmTrdClusterFinderFast::CbmTrdClusterFinderFast()
-  :FairTask("TrdClusterFinder",1),
+  :FairTask("TrdClusterFinderFast",1),
    fDigis(NULL),
    fClusters(NULL),
    fDigiPar(NULL),
@@ -38,13 +38,12 @@ CbmTrdClusterFinderFast::CbmTrdClusterFinderFast()
 // ---- Destructor ----------------------------------------------------
 CbmTrdClusterFinderFast::~CbmTrdClusterFinderFast()
 {
-
-  if(fClusters){
+   if(fClusters){
     fClusters->Clear("C");
     fClusters->Delete();
     delete fClusters;
   }
-  if(fDigis){
+    if(fDigis){
     fDigis->Delete();
     delete fDigis;
   }
@@ -93,9 +92,9 @@ InitStatus CbmTrdClusterFinderFast::Init()
     cout << "                            Task will be inactive" << endl;
     return kERROR;
   }
-  
+ 
   fClusters = new TClonesArray("CbmTrdCluster", 100);
-  ioman->Register("TrdCluster","TRD",fClusters,kTRUE);
+  ioman->Register("TrdCluster","Trd Cluster",fClusters,kTRUE);
   
   return kSUCCESS;
   
@@ -159,6 +158,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t * option)
     //drawCluster(it->first, fModClusterMap[it->first]);
   }
   addCluster(fModClusterMap);
+
   // clean up
   for (std::map<Int_t, ClusterList*>::iterator it = fModClusterMap.begin(); 
        it != fModClusterMap.end(); ++it) {
@@ -328,14 +328,14 @@ void CbmTrdClusterFinderFast::drawCluster(Int_t moduleId, ClusterList *clusterLi
 //--------------------------------------------------------------------
 void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClusterMap)
 {
-  Int_t ClusterSumm = 0;
+  Int_t ClusterSum = 0;
   Float_t Charge;
   Float_t qMax;
   for (std::map<Int_t, ClusterList*>::iterator iMod = fModClusterMap.begin(); iMod != fModClusterMap.end(); ++iMod) 
     {
       for (ClusterList::iterator iCluster = (iMod->second)->begin(); iCluster != (iMod->second)->end(); iCluster++) 
 	{
-	  ClusterSumm++;
+	  ClusterSum++;
 	  TArrayI* digiIndices = new TArrayI( Int_t((*iCluster)->size()) );
 	  Int_t i = 0;
 	  Charge = 0;
@@ -350,13 +350,15 @@ void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClust
 		  qMax = (*iDigi)->charge;
 		}
 	    }
-	  CbmTrdCluster* Cluster = new CbmTrdCluster(*digiIndices, Charge, qMax);
+
+	  new ((*fClusters)[ClusterSum]) CbmTrdCluster(*digiIndices, Charge, qMax);
+	  ;
 	  delete digiIndices;
 	}
-      
+       
     }
  
-  cout << " Found " << ClusterSumm << " Cluster" << endl;
+  cout << " Found " << ClusterSum << " Cluster" << endl;
 }
 
 // ---- Register ------------------------------------------------------

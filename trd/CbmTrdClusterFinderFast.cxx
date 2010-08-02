@@ -336,13 +336,13 @@ void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClust
       for (ClusterList::iterator iCluster = (iMod->second)->begin(); iCluster != (iMod->second)->end(); iCluster++) 
 	{
 	  ClusterSum++;
-	  TArrayI* digiIndices = new TArrayI( Int_t((*iCluster)->size()) );
+	  TArrayI digiIndices( (*iCluster)->size() );
 	  Int_t i = 0;
 	  Charge = 0;
 	  qMax = 0;
 	  for (MyDigiList::iterator iDigi = (*iCluster)->begin(); iDigi != (*iCluster)->end(); iDigi++) 
 	    {
-	      (*digiIndices)[i] = (*iDigi)->digiId;
+              digiIndices.SetAt((*iDigi)->digiId,i);
 	      Charge += (*iDigi)->charge;
 	      i++;
 	      if (qMax < (*iDigi)->charge)
@@ -351,9 +351,10 @@ void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClust
 		}
 	    }
 
-	  new ((*fClusters)[ClusterSum]) CbmTrdCluster(*digiIndices, Charge, qMax);
-	  ;
-	  delete digiIndices;
+          TClonesArray& clref = *fClusters;
+          Int_t size = clref.GetEntriesFast();
+
+	  new ((*fClusters)[size]) CbmTrdCluster(digiIndices, Charge, qMax);
 	}
        
     }

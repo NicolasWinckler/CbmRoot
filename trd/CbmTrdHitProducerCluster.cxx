@@ -113,33 +113,69 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   if (fClusters == NULL)
     cout << " DEBUG: fCluster is NULL" << endl;
 
-  
-  Int_t nEntries = fClusters->GetEntries();
-  cout << " Found " << nEntries << " Cluster in Collection" << endl;
-
-  for (Int_t iCluster = 0; iCluster < nEntries; iCluster++)
-    {
-      CbmTrdCluster *cluster = (CbmTrdCluster*) fClusters->At(iCluster);
-      cout << cluster->GetNDigis() << endl;
-    }
-  Int_t nentries = fDigis->GetEntries();
-  cout << " Found " << nentries << " Digis in Collection" << endl;
 
   Int_t iHit = 0;
-  /*
-    CbmTrdHit(Int_t detectorId,
-    TVector3& pos,
-    TVector3& dpos,
-    Double_t dxy,
-    Int_t refId,
-    Int_t planeId,
-    Double_t eLossTR,
-    Double_t eLossdEdx,
-    Double_t eLoss)
-  */
-  //new ((*fClusterHits)[iHit]) CbmTrdHit();
+  Int_t nDigi;
+  Int_t DigiIndex;
+  Float_t DigiCharge;
+  Int_t DigiRow;
+  Int_t DigiCol;
+  Float_t qMax;
+  Int_t qMaxIndex;
+
+  Int_t nCluster = fClusters->GetEntries();
+  cout << " Found " << nCluster << " Cluster in Collection" << endl;
+
+  for (Int_t iCluster = 0; iCluster < nCluster; iCluster++)
+    {
+      CbmTrdCluster *cluster = (CbmTrdCluster*) fClusters->At(iCluster);
+      //cout << "NoDigis:" << cluster->GetNDigis() << endl;
+      nDigi = cluster->GetNDigis();
+      qMax = 0;
+      for (Int_t iDigi = 0; iDigi < nDigi; iDigi++)
+	{
+	  DigiIndex = cluster->GetDigiIndex(iDigi);
+	  CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(DigiIndex);
+	  DigiCharge = digi->GetCharge();
+	  DigiCol    = digi->GetCol();
+	  DigiRow    = digi->GetRow();
+	  //cout << "   ID:" << DigiIndex << "  Col:" << DigiCol << "  Row:" << DigiRow << "  Charge:" << DigiCharge << endl;
+	  if (DigiCharge > qMax)
+	    {
+	      qMax = DigiCharge;
+	      qMaxIndex = DigiIndex;
+	    }
+	}
+      PrfReco(qMaxIndex, qMax);
+      SimpleReco(qMaxIndex, qMax);
+      AddHit(iHit);
+      new ((*fClusterHits)[iHit]) CbmTrdHit(/*TODO: include valide parameters*/);
+      iHit++;
+      //cout << "      MaxID: " << qMaxIndex << "   MaxCharge: " << qMax << endl;
+    }  
+  cout << " Found " << iHit << " Hits" << endl;
 }
 
+// --------------------------------------------------------------------
+void CbmTrdHitProducerCluster::SortClusterDigi()
+{
+
+}
+// --------------------------------------------------------------------
+void CbmTrdHitProducerCluster::PrfReco(Int_t qMaxIndex, Float_t qMax)
+{
+
+}
+// --------------------------------------------------------------------
+void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax)
+{
+
+}
+// --------------------------------------------------------------------
+void CbmTrdHitProducerCluster::AddHit(Int_t iHit)
+{
+
+}
 // ---- Register ------------------------------------------------------
 void CbmTrdHitProducerCluster::Register()
 {
@@ -152,7 +188,7 @@ void CbmTrdHitProducerCluster::Register()
 // ---- Finish --------------------------------------------------------
 void CbmTrdHitProducerCluster::Finish()
 {
-  cout << " * CbmTrdHitProducerCluster * :: Finish()" << endl;
+  //cout << " * CbmTrdHitProducerCluster * :: Finish()" << endl;
 }
 
 ClassImp(CbmTrdHitProducerCluster)

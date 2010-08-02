@@ -35,6 +35,12 @@ class CbmTrdHitProducerCluster : public FairTask
 
  private:
 
+  void SortClusterDigi();
+  void PrfReco(Int_t qMaxIndex, Float_t qMax);
+  void SimpleReco(Int_t qMaxIndex, Float_t qMax);
+  void AddHit(Int_t iHit);
+
+
   TClonesArray*     fDigis;       /** Input array of CbmTrdDigi **/
   TClonesArray*     fClusters;    /** Input array of CbmTrdCluster **/
   TClonesArray*     fClusterHits;        /** Output array of CbmTrdHit **/

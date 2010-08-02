@@ -25,7 +25,7 @@ void run_reco_trd_test(Int_t nEvents = 1)
   //          Adjust this part according to your requirements
 
   gStyle->SetPalette(1,0);
- gROOT->SetStyle("Plain");
+  gROOT->SetStyle("Plain");
 
   // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 0;
@@ -45,8 +45,8 @@ void run_reco_trd_test(Int_t nEvents = 1)
   TObjString stsDigiFile = paramDir + "sts_standard.digi.par";
   parFileList->Add(&stsDigiFile);
   /*
-  TString trdDigiDir = gSystem->Getenv("VMCWORKDIR");
-  trdDigiDir += "/macro/run/";
+    TString trdDigiDir = gSystem->Getenv("VMCWORKDIR");
+    trdDigiDir += "/macro/run/";
   */
   TObjString trdDigiFile =/* trdDigiDir + */"./trd.digi.par";
   parFileList->Add(&trdDigiFile);
@@ -117,14 +117,14 @@ void run_reco_trd_test(Int_t nEvents = 1)
 
   // -----   MVD Digitiser   -------------------------------------------------
   CbmMvdDigitizeL* mvdDigi = new CbmMvdDigitizeL("MVD Digitiser", 
-						 0, iVerbose);
+  0, iVerbose);
   run->AddTask(mvdDigi);
   // -------------------------------------------------------------------------
  
 
   // -----   MVD Hit Finder   ------------------------------------------------
   CbmMvdFindHits* mvdHitFinder = new CbmMvdFindHits("MVD Hit Finder",
-						    0, iVerbose);
+  0, iVerbose);
   run->AddTask(mvdHitFinder);
   // -------------------------------------------------------------------------
 
@@ -150,7 +150,7 @@ void run_reco_trd_test(Int_t nEvents = 1)
 
   // -----   STS Cluster Finder   --------------------------------------------
   FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",
-						       iVerbose);
+  iVerbose);
   run->AddTask(stsClusterFinder);
   // -------------------------------------------------------------------------
 
@@ -209,7 +209,7 @@ void run_reco_trd_test(Int_t nEvents = 1)
 
   CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,
 						trdDFoils, trdDGap);
-
+  /*
   // -----   TRD hit producer   ----------------------------------------------
   Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
   // Resolutions in y - station and angle dependent [mum]
@@ -218,22 +218,34 @@ void run_reco_trd_test(Int_t nEvents = 1)
   Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
   CbmTrdHitProducerSmearing* trdHitProd = new
-    CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
+  CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
 
   trdHitProd->SetSigmaX(trdSigmaX);
   trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
 
   run->AddTask(trdHitProd);
-
+  */
  
   // -----   TRD clusterizer     ----------------------------------------------
   
   CbmTrdClusterizer* trdClustering = new CbmTrdClusterizer("TRD Clusterizer", "TRD task",radiator);
   run->AddTask(trdClustering);
-  printf("Init Clusterfinder\n");
-  CbmTrdClusterFinder* trdClusterfinding = new CbmTrdClusterFinder();
-  run->AddTask(trdClusterfinding);
-  printf("Finished Clusterfinder\n");
+  printf("Init ClusterfinderFast\n");
+  /*
+    CbmTrdClusterFinder* trdClusterfinding = new CbmTrdClusterFinder();
+    run->AddTask(trdClusterfinding);
+    printf("Finished Clusterfinder\n");
+  */
+  
+  //printf("HIER KOMMT DER CLUSTERFINDERFAST\n");
+  CbmTrdClusterFinderFast* trdClusterfindingfast = new CbmTrdClusterFinderFast();
+  run->AddTask(trdClusterfindingfast);
+  printf("Finished ClusterfinderFast\n");
+  
+  CbmTrdHitProducerCluster* trdClusterHitProducer = new CbmTrdHitProducerCluster();
+  run->AddTask(trdClusterHitProducer);
+   printf("Finished Hit Producer\n");
+  
   // -------------------------------------------------------------------------
 
   /*
@@ -250,8 +262,8 @@ void run_reco_trd_test(Int_t nEvents = 1)
   ((CbmTrdTrackFitterKF*)trdTrackFitter)->SetVerbose(iVerbose);
   ((CbmTrdTrackFitterKF*)trdTrackFitter)->SetPid(211);
   CbmTrdFitTracks* trdFitTracks = new CbmTrdFitTracks("TRD track fitter",
-						      "TRD",
-						      trdTrackFitter);
+  "TRD",
+  trdTrackFitter);
   run->AddTask(trdFitTracks);
   // -------------------------------------------------------------------------
   
@@ -264,13 +276,13 @@ void run_reco_trd_test(Int_t nEvents = 1)
    
   // ----------- TRD track Pid Wkn ----------------------
   CbmTrdSetTracksPidWkn* trdSetTracksPidTask = new
-    CbmTrdSetTracksPidWkn("trdFindTracks","trdFindTracks");
+  CbmTrdSetTracksPidWkn("trdFindTracks","trdFindTracks");
   run->AddTask(trdSetTracksPidTask);
   // ----------------------------------------------------
 
   // ----------- TRD track Pid Ann ----------------------
   CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new
-    CbmTrdSetTracksPidANN("Ann","Ann");
+  CbmTrdSetTracksPidANN("Ann","Ann");
   run->AddTask(trdSetTracksPidAnnTask);
   // ----------------------------------------------------
   
@@ -291,7 +303,7 @@ void run_reco_trd_test(Int_t nEvents = 1)
 
   // ------   TOF hit producer   ---------------------------------------------
   CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer",
-  							iVerbose);
+  iVerbose);
   run->AddTask(tofHitProd);
   // -------------------------------------------------------------------------
  
@@ -312,15 +324,15 @@ void run_reco_trd_test(Int_t nEvents = 1)
   trackMerger->SetMethod(1);
   CbmL1TofMerger* tofMerger = new CbmL1TofMerger();
   CbmFindGlobalTracks* findGlobal = new CbmFindGlobalTracks(trackMerger,
-							    NULL, tofMerger,
-							    iVerbose);
+  NULL, tofMerger,
+  iVerbose);
   run->AddTask(findGlobal);
   
   //--------- TOF tracklength calculation -----------------------------------
   CbmGlobalTrackFitterKF* globalFitter = new CbmGlobalTrackFitterKF();
   CbmFitGlobalTracks* fitGlobal
-    = new
-    CbmFitGlobalTracks("globalfitter",iVerbose,globalFitter);
+  = new
+  CbmFitGlobalTracks("globalfitter",iVerbose,globalFitter);
   
   run->AddTask(fitGlobal);
   //-------------------------------------------------------------------------
@@ -342,7 +354,7 @@ void run_reco_trd_test(Int_t nEvents = 1)
   // Since in the newest version of this method depends on the global
   // track the task has to move after the global tracking
   CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask = new
-    CbmTrdSetTracksPidLike("Likelihood","Likelihood");
+  CbmTrdSetTracksPidLike("Likelihood","Likelihood");
   run->AddTask(trdSetTracksPidLikeTask);
   // ----------------------------------------------------
 
@@ -362,8 +374,8 @@ void run_reco_trd_test(Int_t nEvents = 1)
   Double_t richSMirror = 0.06;     // Sigma for additional point smearing due to light scattering in mirror
   
   CbmRichHitProducer* richHitProd 
-    = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType, 
-			     richNoise, iVerbose, richCollEff, richSMirror);
+  = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType, 
+  richNoise, iVerbose, richCollEff, richSMirror);
   run->AddTask(richHitProd);
   //--------------------------------------------------------------------------
 
@@ -372,7 +384,7 @@ void run_reco_trd_test(Int_t nEvents = 1)
   Int_t    richNSts = 4;     // minimum number of STS hits for extrapolation
   Double_t richZPos = 300.;  // z position for extrapolation [cm]
   CbmRichTrackExtrapolation* richExtra
-    = new CbmRichTrackExtrapolationKF(richNSts, iVerbose);
+  = new CbmRichTrackExtrapolationKF(richNSts, iVerbose);
   CbmRichExtrapolateTracks* richExtrapolate = new CbmRichExtrapolateTracks();
   richExtrapolate->UseExtrapolation(richExtra,richZPos);
   run->AddTask(richExtrapolate);
@@ -382,7 +394,7 @@ void run_reco_trd_test(Int_t nEvents = 1)
   //--------------------- Rich Track Projection to photodetector -------------
   Int_t richZFlag = 1;       // Projetion from IM plane (default)
   CbmRichProjectionProducer* richProj = 
-    new CbmRichProjectionProducer(iVerbose, richZFlag);
+  new CbmRichProjectionProducer(iVerbose, richZFlag);
   run->AddTask(richProj);
   //--------------------------------------------------------------------------
   
@@ -425,7 +437,7 @@ void run_reco_trd_test(Int_t nEvents = 1)
   Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]
   Int_t    richNPoints  = 5;   // Minmum number of hits on ring
   CbmRichRingTrackAssign* richAssign   =
-    new CbmRichRingTrackAssignClosestD(richDistance, richNPoints, iVerbose);
+  new CbmRichRingTrackAssignClosestD(richDistance, richNPoints, iVerbose);
   CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
   assignTrack->UseAssign(richAssign);
   run->AddTask(assignTrack);
@@ -445,7 +457,7 @@ void run_reco_trd_test(Int_t nEvents = 1)
  
   // -----   ECAL hit producer  ----------------------------------------------
   CbmEcalHitProducerFastMC* ecalHitProd 
-    = new CbmEcalHitProducerFastMC("ECAL Hitproducer");
+  = new CbmEcalHitProducerFastMC("ECAL Hitproducer");
   run->AddTask(ecalHitProd);
   // -------------------------------------------------------------------------
   

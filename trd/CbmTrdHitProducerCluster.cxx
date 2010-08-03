@@ -114,21 +114,21 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     cout << " DEBUG: fCluster is NULL" << endl;
 
 
-  Int_t iHit = 0;
-  Int_t nDigi;
-  Int_t DigiIndex;
-  Float_t DigiCharge;
-  Int_t DigiRow;
-  Int_t DigiCol;
-  Float_t qMax;
-  Int_t qMaxIndex;
+  Int_t iHit = 0;    //reconstructed hit counter
+  Int_t nDigi;       //Number of digis within a cluster
+  Int_t DigiIndex;   //Index of the digi
+  Float_t DigiCharge;//Charge of the digi
+  Int_t DigiRow;     //Row of the digi
+  Int_t DigiCol;     //Column of the digi
+  Float_t qMax;      //Maximum digi charge of the activ cluster
+  Int_t qMaxIndex;   //Index of the digi containing the maximum charge of the activ cluster
 
-  Int_t nCluster = fClusters->GetEntries();
+  Int_t nCluster = fClusters->GetEntries(); // Number of clusters found by CbmTrdClusterFinderFast
   cout << " Found " << nCluster << " Cluster in Collection" << endl;
 
   for (Int_t iCluster = 0; iCluster < nCluster; iCluster++)
     {
-      CbmTrdCluster *cluster = (CbmTrdCluster*) fClusters->At(iCluster);
+      CbmTrdCluster *cluster = (CbmTrdCluster*) fClusters->At(iCluster);//pointer to the acvit cluster
       //cout << "NoDigis:" << cluster->GetNDigis() << endl;
       nDigi = cluster->GetNDigis();
       qMax = 0;
@@ -149,7 +149,6 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       PrfReco(qMaxIndex, qMax);
       SimpleReco(qMaxIndex, qMax);
       AddHit(iHit);
-      new ((*fClusterHits)[iHit]) CbmTrdHit(/*TODO: include valide parameters*/);
       iHit++;
       //cout << "      MaxID: " << qMaxIndex << "   MaxCharge: " << qMax << endl;
     }  
@@ -174,7 +173,7 @@ void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax)
 // --------------------------------------------------------------------
 void CbmTrdHitProducerCluster::AddHit(Int_t iHit)
 {
-
+ new ((*fClusterHits)[iHit]) CbmTrdHit(/*TODO: include valide parameters*/);
 }
 // ---- Register ------------------------------------------------------
 void CbmTrdHitProducerCluster::Register()

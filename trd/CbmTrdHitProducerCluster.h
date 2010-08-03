@@ -43,7 +43,7 @@ class CbmTrdHitProducerCluster : public FairTask
 
   TClonesArray*     fDigis;       /** Input array of CbmTrdDigi **/
   TClonesArray*     fClusters;    /** Input array of CbmTrdCluster **/
-  TClonesArray*     fClusterHits;        /** Output array of CbmTrdHit **/
+  TClonesArray*     fClusterHits; /** Output array of CbmTrdHit **/
 
   CbmTrdDigiPar *fDigiPar;   //!
   CbmTrdModule  *fModuleInfo; //!

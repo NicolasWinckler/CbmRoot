@@ -105,17 +105,17 @@ InitStatus CbmTrdClusterFinderFast::Init()
 void CbmTrdClusterFinderFast::Exec(Option_t * option)
 {
   /*
-    Digis are sorted according to the moduleId. A combiId is calculted based 
-    on the rowId and the colId to have a neighbouring criterion for digis within 
-    the same pad row. The digis of each module are sorted according to this combiId.
-    All sorted digis of one pad row are 'clustered' into rowCluster. For a new row
-    the rowClusters are compared to the rowClusters of the last row. If an overlap 
-    is found they are marked to be parents(last row) and childrens(activ row) 
-    (mergeRowCluster()). After this, the finale clusters are created. Therefor 
-    walkCluster() walks along the list of marked parents and markes every visited 
-    rowCluster to avoid multiple usage of one rowCluster. drawCluster() can be used to
-    get a visual output.
-  */
+   * Digis are sorted according to the moduleId. A combiId is calculted based 
+   * on the rowId and the colId to have a neighbouring criterion for digis within 
+   * the same pad row. The digis of each module are sorted according to this combiId.
+   * All sorted digis of one pad row are 'clustered' into rowCluster. For a new row
+   * the rowClusters are compared to the rowClusters of the last row. If an overlap 
+   * is found they are marked to be parents(last row) and childrens(activ row) 
+   * (mergeRowCluster()). After this, the finale clusters are created. Therefor 
+   * walkCluster() walks along the list of marked parents and markes every visited 
+   * rowCluster to avoid multiple usage of one rowCluster. drawCluster() can be used to
+   * get a visual output.
+   */
   cout << "================CbmTrdClusterFinderFast===============" << endl;
   Int_t nentries = fDigis->GetEntries();
   Int_t digiCounter = 0;
@@ -134,12 +134,15 @@ void CbmTrdClusterFinderFast::Exec(Option_t * option)
 	d->rowId = digi->GetRow();
 	d->colId = digi->GetCol();
 	d->charge = digi->GetCharge();
-	//unrotate rotated modules in x- and y-direction (row <-> col)
+	/*
+	 *unrotate rotated modules in x- and y-direction (row <-> col)
+	*/
 	Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId); 
 	Int_t Station  = detInfo[1];
 	Int_t Layer    = detInfo[2]; 
-
-	//'rotated' modules are backrotated to get consistent notation of Row and Col
+	/*
+	 *'rotated' modules are backrotated to get consistent notation of Row and Col
+	*/
 	if (Layer%2 == 0) {
 	  d->combiId = d->rowId * (fModuleInfo->GetnRow() + 1) + d->colId;
 	}
@@ -160,8 +163,9 @@ void CbmTrdClusterFinderFast::Exec(Option_t * option)
     //drawCluster(it->first, fModClusterMap[it->first]);
   }
   addCluster(fModClusterMap);
-
-  // clean up
+  /*
+   * clean up
+   */
   for (std::map<Int_t, ClusterList*>::iterator it = fModClusterMap.begin(); 
        it != fModClusterMap.end(); ++it) {
     for (ClusterList::iterator clusterIt = it->second->begin(); 
@@ -184,11 +188,11 @@ bool digiSorter(MyDigi *a, MyDigi *b)
 ClusterList *CbmTrdClusterFinderFast::clusterModule(MyDigiList *digis)
 {
   /*
-    3 new Lists are initialized: 
-    currentList for the activ row, 
-    openList for the previous row and 
-    closedList for finished rows.
-    Digis in the TCloneArray digis are sorted according to their combiId (rowId * (nCol+1) + colId).
+   *  3 new Lists are initialized: 
+   *  currentList for the activ row, 
+   *  openList for the previous row and 
+   *  closedList for finished rows.
+   *  Digis in the TCloneArray digis are sorted according to their combiId (rowId * (nCol+1) + colId).
   */
   std::list<RowCluster*> closedList;
   std::list<RowCluster*> openList;
@@ -201,50 +205,50 @@ ClusterList *CbmTrdClusterFinderFast::clusterModule(MyDigiList *digis)
     if (currentCluster->digis->empty() || 
 	currentCluster->digis->back()->combiId + 1 == (*it)->combiId) {
       /*
-	Digis within the same row are related to the 'currentCluster' if they are closed-by.
+       * Digis within the same row are related to the 'currentCluster' if they are closed-by.
       */
       currentCluster->digis->push_back(*it);
     }
     else {
       /*
-	the currentCluster is stored to the currentList
-	(and merged to the clusters of the previous row) 
-	if a break between the activ digi and the currentCluster is found.
+       * the currentCluster is stored to the currentList
+       * (and merged to the clusters of the previous row) 
+       * if a break between the activ digi and the currentCluster is found.
       */
       mergeRowCluster(currentCluster, &openList);
       currentList.push_back(currentCluster);
  
       if ((*it)->rowId > currentCluster->row) {
 	/*
-	  did we move into a new row?      
-	  The openList is spliced to the end of the closedList if the next row is reached
+	 * did we move into a new row?      
+	 * The openList is spliced to the end of the closedList if the next row is reached
 	*/
 	closedList.splice(closedList.end(), openList);
 
 	if ((*it)->rowId > currentCluster->row + 1) {
 	  /*
-	    did we skip at least one line?
-	    Then the currentList is directly spliced to the end of the closedList since the 
-	    cluster is definitely finished.
+	   *  did we skip at least one line?
+	   *  Then the currentList is directly spliced to the end of the closedList since the 
+	   *  cluster is definitely finished.
 	  */
 	  closedList.splice(closedList.end(), currentList);
 	}
 	else {
 	  /*
-	    if we didn't skip a line, the currentList ist spliced to the end of the openList.
+	   * if we didn't skip a line, the currentList ist spliced to the end of the openList.
 	  */
 	  openList.splice(openList.begin(), currentList);
 	}
       }
       /*
-	A new currentCluster is initialized if the activ digi is not closed-by the currentCluster.
+       * A new currentCluster is initialized if the activ digi is not closed-by the currentCluster.
       */
       currentCluster = new RowCluster;
       currentCluster->digis->push_back(*it);
     }
   }
   /*
-    handle last row
+   * handle last row
   */
   mergeRowCluster(currentCluster, &openList);
   currentList.push_back(currentCluster);
@@ -259,15 +263,17 @@ void CbmTrdClusterFinderFast::mergeRowCluster(RowCluster *currentCluster,
 					      std::list<RowCluster*> *openList)
 {
   /*
-    finish up the current rowCluster
-    Limitations of the currentCluster are compared to the limitations of the RowClusters of the openList.
-    They are associated to be 'child' (currentList = activ row) and 'parent' (openList = previous row) 
-    by pointer if a overlap of the limitations are found.
+   *  finish up the current rowCluster
+   *  Limitations of the currentCluster are compared to the limitations of the RowClusters of the openList.
+   *  They are associated to be 'child' (currentList = activ row) and 'parent' (openList = previous row) 
+   *  by pointer if a overlap of the limitations are found.
   */
   currentCluster->minCol = currentCluster->digis->front()->colId;
   currentCluster->maxCol = currentCluster->digis->back()->colId;
   currentCluster->row = currentCluster->digis->back()->rowId;
-  // merge current RowCluster with openList
+  /*
+   * merge current RowCluster with openList
+  */
   for (std::list<RowCluster*>::iterator openIt = openList->begin(); 
        openIt != openList->end(); ++openIt) {
     if (currentCluster->maxCol < (*openIt)->minCol - 1)
@@ -285,8 +291,8 @@ void CbmTrdClusterFinderFast::mergeRowCluster(RowCluster *currentCluster,
 ClusterList *CbmTrdClusterFinderFast::findCluster(std::list<RowCluster*> *rowClusterList)
 {
   /*
-    all found RowClusters are merged to clusters and copyed to the finale clusterList
-    since the rowClusterList is empty
+   *  all found RowClusters are merged to clusters and copyed to the finale clusterList
+   *  since the rowClusterList is empty
   */
   RowCluster *currentRowCluster;
   ClusterList *clusterList = new ClusterList;
@@ -305,9 +311,9 @@ void CbmTrdClusterFinderFast::walkCluster(std::list<RowCluster*> *rowClusterList
 					  MyDigiList *cluster)
 {
   /*
-    the rowClusters are sorted in the neighbour list if conected by a cild oder parent pointer.
-    This pointer is removed and the rowCluster is marked as 'hasBeenVisited'. 
-    Therefor it can not be merged to any cluster.
+   * the rowClusters are sorted in the neighbour list if conected by a cild oder parent pointer.
+   * This pointer is removed and the rowCluster is marked as 'hasBeenVisited'. 
+   * Therefor it can not be merged to any cluster.
    */
   cluster->splice(cluster->end(), *(currentRowCluster->digis));
   rowClusterList->remove(currentRowCluster);
@@ -399,7 +405,7 @@ void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClust
 		  qMax = (*iDigi)->charge;
 		}
 	    }
-	  //here is an error creating an segmentation violation in the following classes. 
+
           TClonesArray& clref = *fClusters;
           Int_t size = clref.GetEntriesFast();
 

@@ -137,8 +137,10 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 	  DigiIndex = cluster->GetDigiIndex(iDigi);
 	  CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(DigiIndex);
 	  DigiCharge = digi->GetCharge();
+	  //-----------unrotated--------------------
 	  DigiCol    = digi->GetCol();
 	  DigiRow    = digi->GetRow();
+	  //-----------unrotated--------------------
 	  //cout << "   ID:" << DigiIndex << "  Col:" << DigiCol << "  Row:" << DigiRow << "  Charge:" << DigiCharge << endl;
 	  if (DigiCharge > qMax)
 	    {
@@ -155,6 +157,45 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   cout << " Found " << iHit << " Hits" << endl;
 }
 
+// --------------------------------------------------------------------
+void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex)
+{
+  Float_t x = 0;
+  Float_t y = 0;
+  Float_t z = 0;
+
+  CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxIndex);  
+  //-----------unrotated--------------------
+  Int_t DigiCol = digi->GetCol();
+  Int_t DigiRow = digi->GetRow();
+  //-----------unrotated--------------------
+
+  fModuleInfo = fDigiPar->GetModule(digi->GetDetId());
+  //-----------rotated--------------------
+  Int_t nCol = fModuleInfo->GetnCol();
+  Int_t nRow = fModuleInfo->GetnRow();
+  //-----------rotated--------------------
+  const Int_t NoSectors = fModuleInfo->GetNoSectors();
+
+  Float_t SectorSizeX[NoSectors];
+  Float_t SectorSizeY[NoSectors];
+  Float_t PadSizeX[NoSectors]; 
+  Float_t PadSizeY[NoSectors];
+
+  for (Int_t i = 0; i < NoSectors; i++)
+    {
+      SectorSizeX[i] = fModuleInfo->GetPadSizex(i);
+      SectorSizeY[i] = fModuleInfo->GetPadSizey(i);
+      PadSizeX[i]    = fModuleInfo->GetPadSizex(i);
+      PadSizeY[i]    = fModuleInfo->GetPadSizey(i);
+    }
+
+  Float_t ModuleSizeX     = fModuleInfo-> GetSizex();
+  Float_t ModulesSizeY    = fModuleInfo-> GetSizey();
+  Float_t ModulePositionX = fModuleInfo->GetX();
+  Float_t ModulePositionY = fModuleInfo->GetY();
+  Float_t ModulePositionZ = fModuleInfo->GetZ();
+}
 // --------------------------------------------------------------------
 void CbmTrdHitProducerCluster::SortClusterDigi()
 {

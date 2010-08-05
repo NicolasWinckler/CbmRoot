@@ -34,7 +34,7 @@ class CbmTrdHitProducerCluster : public FairTask
   void Register();
 
  private:
-
+  void GetModuleInfo(Int_t qMaxIndex);
   void SortClusterDigi();
   void PrfReco(Int_t qMaxIndex, Float_t qMax);
   void SimpleReco(Int_t qMaxIndex, Float_t qMax);

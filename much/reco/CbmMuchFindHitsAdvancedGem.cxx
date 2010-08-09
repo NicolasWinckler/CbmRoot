@@ -16,30 +16,35 @@
  */
 
 #include "CbmMuchFindHitsAdvancedGem.h"
-#include "CbmMuchDigiMatch.h"
-#include "CbmMuchModuleGem.h"
-#include "CbmMuchPad.h"
-#include "CbmMuchCluster.h"
-#include "CbmMuchDigi.h"
 #include "CbmMuchPixelHit.h"
-#include "CbmMuchStation.h"
+#include "CbmMuchDigiMatch.h"
+#include "CbmMuchCluster.h"
+#include "CbmMuchPad.h"
+#include "CbmMuchGeoScheme.h"
+#include "CbmMuchDigi.h"
+#include "CbmMuchModule.h"
+#include "CbmMuchModuleGem.h"
+#include "CbmMuchPoint.h"
+
+#include "CbmMCTrack.h"
 #include "FairRootManager.h"
 
 #include "TMath.h"
+#include "TFile.h"
 
+#include <cassert>
+#include <map>
+#include <vector>
 #include <iostream>
 #include <iomanip>
-#include <cassert>
-#include <limits>
 
-using std::cout;
 using std::endl;
-using std::cerr;
 using std::setw;
-using std::fixed;
-using std::left;
-using std::right;
 using std::setprecision;
+using std::left;
+using std::fixed;
+using std::cout;
+using std::right;
 
 // -----   Default constructor   ------------------------------------------
 CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem() :
@@ -51,10 +56,8 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem() :
   fClusters = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   fThresholdRatio = 0.1;
-  fDistanceLimit = 0.5;
   fAlgorithm = 0;
 
-  //  fDebug = 0;
   fEvent = 0;
 }
 // -------------------------------------------------------------------------
@@ -68,10 +71,8 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(Int_t iVerbose) :
   fClusters = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   fThresholdRatio = 0.1;
-  fDistanceLimit = 0.5;
   fAlgorithm = 0;
 
-  //  fDebug = 0;
   fEvent = 0;
 }
 // -------------------------------------------------------------------------
@@ -86,10 +87,8 @@ CbmMuchFindHitsAdvancedGem::CbmMuchFindHitsAdvancedGem(const char* name,
   fClusters = NULL;
   fGeoScheme = CbmMuchGeoScheme::Instance();
   fThresholdRatio = 0.1;
-  fDistanceLimit = 0.5;
   fAlgorithm = 0;
 
-  //  fDebug = 0;
   fEvent = 0;
 }
 // -------------------------------------------------------------------------
@@ -112,11 +111,12 @@ void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
   fTimer.Start();
   fEvent++;
 
+  fSignalMuons.clear();
+  fSignalMuonsAll.clear();
+
   // Clear output array
-  if (fHits)
-    fHits->Clear();
-  if (fClusters)
-    fClusters->Delete();//Clear(); // Delete because of memory escape
+  if (fHits) fHits->Clear();
+  if (fClusters) fClusters->Delete();//Clear(); // Delete because of memory escape
 
   // Find clusters
   FindClusters();
@@ -173,6 +173,7 @@ void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
         CreateHits(clusters, iCluster);
         break;
       }
+        //------------ Peaks  ----------------------
       case 3: {
         ExecClusteringPeaks(cluster, clusters);
         CreateHits(clusters, iCluster);
@@ -191,14 +192,15 @@ void CbmMuchFindHitsAdvancedGem::Exec(Option_t* opt) {
   if (fVerbose) {
     cout << "-I- " << fName << ":Event summary" << endl;
     cout << "    Active channels           : " << fDigis->GetEntriesFast()
-         << endl;
+        << endl;
     cout << "    Hits created              : " << fHits->GetEntriesFast()
-         << endl;
+        << endl;
     cout << "    Real time                 : " << fTimer.RealTime() << "s"
-         << endl;
+        << endl;
     cout << "    Clusters                  : " << fClusters->GetEntriesFast()
-         << endl;
-  } else {
+        << endl;
+  }
+  else {
     cout << setw(15) << left << fName << ": " << setprecision(4) << setw(8)
         << fixed << right << fTimer.RealTime() << " s, digis "
         << fDigis->GetEntriesFast() << ", hits: " << fHits->GetEntriesFast()
@@ -213,8 +215,16 @@ void CbmMuchFindHitsAdvancedGem::FinishTask() {
       "----------------------- Some statistics -----------------------------\n");
   // Loop over stations
   for (Int_t iStation = 0; iStation < fGeoScheme->GetNStations(); ++iStation) {
-    printf("Station %i: losts = %f%, fakes = %f%\n", iStation + 1, fLosts.at(
-        iStation) / fEvent * 100, fFakes.at(iStation) / fEvent * 100);
+    vector<Double_t> efficiencies = fStationEff[iStation];
+    Double_t eff = 0.0;
+    for (vector<Double_t>::iterator it = efficiencies.begin(); it
+        != efficiencies.end(); ++it) {
+      eff += (*it);
+    }
+    eff /= efficiencies.size();
+    printf("Station %i: losts = %f%, fakes = %f%, resolved signal = %f%\n",
+        iStation + 1, fLosts.at(iStation) / fEvent * 100, fFakes.at(iStation)
+            / fEvent * 100, eff * 100);
   }
   printf(
       "---------------------------------------------------------------------\n");
@@ -231,54 +241,28 @@ void CbmMuchFindHitsAdvancedGem::SetNStations(Int_t nStations) {
 // -------------------------------------------------------------------------
 void CbmMuchFindHitsAdvancedGem::SetThresholdRatios(Double_t* thresholdRatios) {
   for (Int_t iStation = 0; iStation < fNStations; ++iStation) {
-    if (iStation >= fNStations)
-      Fatal("CbmMuchFindHitsAdvancedGem::SetThresholdRatios",
-          "Station index is out of range.");
+    if (iStation >= fNStations) Fatal(
+        "CbmMuchFindHitsAdvancedGem::SetThresholdRatios",
+        "Station index is out of range.");
     fThresholdRatios.at(iStation) = thresholdRatios[iStation];
   }
 }
 // -------------------------------------------------------------------------
 
-// -------------------------------------------------------------------------
-void CbmMuchFindHitsAdvancedGem::SetClusterCharges(Int_t iStation,
-    Int_t clusterSize, Int_t *padCharges) {
-  // Fill vector of charges for the given station and cluster size
-  vector<Int_t> charges;
-  for (Int_t iCharge = 0; iCharge < *padCharges; ++iCharge) {
-    Int_t charge = padCharges[iCharge + 1];
-    charges.push_back(charge);
-  }
-
-  // Put the vector into appropriate place in the staionXclusterSize matrix
-  if (fChargeLimits.find(iStation) == fChargeLimits.end()) {
-    map<Int_t, vector<Int_t> > stationCharges;
-    stationCharges[clusterSize] = charges;
-    fChargeLimits[iStation] = stationCharges;
-  } else {
-    fChargeLimits[iStation][clusterSize] = charges;
-  }
-}
-// -------------------------------------------------------------------------
 
 // -----   Public method StatInfo  -----------------------------------------
 void CbmMuchFindHitsAdvancedGem::StatInfo() {
-  Int_t nHitsTotal = 0; // Total number of hits
-  Int_t nPointsTotal = 0; // Total number of processed points
-  Double_t frFakes = 0.; // Fraction of fake hits
-  Double_t frLosts = 0.; // Fraction of lost points
-  // Loop over stations
   for (Int_t iStation = 0; iStation < fGeoScheme->GetNStations(); ++iStation) {
-    Double_t frStationFakes = 0.; // Fraction of fake hits in the station
-    Double_t frStationLosts = 0.; // Fraction of lost points in the station
-    Int_t nStationPointsTotal = 0; // Total number of processed points in the station
-    Int_t nStationHitsTotal = 0; // Total number of hits in the station
+    Int_t nStationPoints = 0; // Number of MC points in a station
+    Int_t nStationHits = 0; // Number of hits in the station
+    Int_t nStationLosts = 0; // Number of lost MC points in the station
+    Int_t nStationFakes = 0; // Number of fake hits in the station
 
-    // Sort hits by cluster indices for each station
+    // Sort hits by cluster indices in the station
     map<Int_t, vector<CbmMuchPixelHit*> > stationHits;
     for (Int_t iHit = 0; iHit < fHits->GetEntriesFast(); ++iHit) {
       CbmMuchPixelHit* hit = (CbmMuchPixelHit*) fHits->At(iHit);
-      if (CbmMuchGeoScheme::GetStationIndex(hit->GetDetectorId()) != iStation)
-        continue;
+      if (CbmMuchGeoScheme::GetStationIndex(hit->GetDetectorId()) != iStation) continue;
       Int_t iCluster = hit->GetRefId();
       if (stationHits.find(iCluster) == stationHits.end()) {
         vector<CbmMuchPixelHit*> clusterHits;
@@ -290,45 +274,37 @@ void CbmMuchFindHitsAdvancedGem::StatInfo() {
     // Loop over clusters
     for (map<Int_t, vector<CbmMuchPixelHit*> >::iterator it =
         stationHits.begin(); it != stationHits.end(); ++it) {
-
-      // Number of hits in the cluster
-      vector<CbmMuchPixelHit*> clusterHits = (*it).second;
-      Int_t nHits = clusterHits.size();
-      nStationHitsTotal += nHits;
-      nHitsTotal += nHits;
-
-      // Loop over cluster digis
       Int_t iCluster = (*it).first;
+      vector<CbmMuchPixelHit*> hits = (*it).second;
       CbmMuchCluster* cluster = (CbmMuchCluster*) fClusters->At(iCluster);
-      set<Int_t> points;
+      set<Int_t> pointIndices;
       for (Int_t i = 0; i < cluster->GetNDigis(); ++i) {
-        Int_t iDigi = cluster->GetDigiIndex(i);
+        Int_t iDigi = cluster->GetDigiIndex(i); // Digi index
         CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(iDigi);
-        for (Int_t j = 0; j < match->GetNPoints(); ++j) {
-          Int_t iPoint = match->GetRefIndex(j);
-          if (points.find(iPoint) == points.end())
-            points.insert(iPoint);
+        for (Int_t k = 0; k < match->GetNPoints(); ++k) {
+          Int_t iPoint = match->GetRefIndex(k); // Point index
+
+          // Debug
+          CbmMuchPoint* point = (CbmMuchPoint*) fPoints->At(iPoint);
+          assert(iStation == fGeoScheme->GetStationIndex(point->GetDetectorId()));
+
+          if (pointIndices.find(iPoint) == pointIndices.end()) pointIndices.insert(
+              iPoint);
         }
       }
 
-      Int_t nPoints = points.size();
-      nStationPointsTotal += nPoints;
-      nPointsTotal += nPoints;
-
-      if (nPoints > nHits) {
-        frStationLosts += nPoints - nHits;
-        frLosts += nPoints - nHits;
-      }
-      if (nHits > nPoints) {
-        frStationFakes += nHits - nPoints;
-        frFakes += nHits - nPoints;
-      }
+      Int_t nPoints = pointIndices.size();
+      Int_t nHits = hits.size();
+      nStationPoints += nPoints;
+      nStationHits += nHits;
+      nStationLosts += nPoints > nHits ? nPoints - nHits : 0;
+      nStationFakes += nPoints < nHits ? nHits - nPoints : 0;
     }
 
-    frStationLosts /= nStationPointsTotal;
-    frStationFakes /= nStationHitsTotal;
-    //    printf("Station %i: losts = %f%, fakes = %f%\n", iStation+1, frStationLosts*100, frStationFakes*100);
-    //    printf("nStationPointsTotal = %i, nStationHitsTotal = %i\n", nStationPointsTotal, nStationHitsTotal);
+    Double_t frStationLosts = (Double_t) nStationLosts / nStationPoints;
+    Double_t frStationFakes = (Double_t) nStationFakes / nStationHits;
+    //    printf("Station %i: losts = %4.2f%, fakes = %4.2f%\n", iStation + 1,
+    //        frStationLosts * 100, frStationFakes * 100);
 
     if (fFakes.size() == iStation) {
       fFakes.push_back(0);
@@ -339,12 +315,29 @@ void CbmMuchFindHitsAdvancedGem::StatInfo() {
       fLosts.push_back(0);
     }
     fLosts.at(iStation) += frStationLosts;
+
+    // Signal muons efficiency in each station
+    if (fSignalMuonsAll[iStation].size() == 0) {
+      printf(
+          "Station %i: Total number of signal = %i, Number of resolved signal = %i\n",
+          iStation + 1, fSignalMuonsAll[iStation].size(),
+          fSignalMuons[iStation].size());
+    }
+    else {
+      Double_t frSignal = (Double_t) fSignalMuons[iStation].size()
+          / fSignalMuonsAll[iStation].size();
+      if (fStationEff.find(iStation) == fStationEff.end()) {
+        vector<Double_t> efficiencies;
+        fStationEff[iStation] = efficiencies;
+      }
+      fStationEff[iStation].push_back(frSignal);
+      printf(
+          "Station %i: Total number of signal = %i, Number of resolved signal = %i, signal efficiency = %f% \n",
+          iStation + 1, fSignalMuonsAll[iStation].size(),
+          fSignalMuons[iStation].size(), frSignal * 100);
+    }
   }
-  frLosts /= nPointsTotal;
-  frFakes /= nHitsTotal;
-  //  printf("Total: losts = %f%, fakes = %f%\n", frLosts*100, frFakes*100);
-  //  printf("nPointsTotal = %i, nHitsTotal = %i\n", nPointsTotal, nHitsTotal);
-  //  printf("---------------------------------------------------------------------\n");
+
 }
 // -------------------------------------------------------------------------
 
@@ -356,8 +349,7 @@ void CbmMuchFindHitsAdvancedGem::CreateHits(vector<CbmMuchCluster*> clusters,
       != clusters.end(); it++) {
     CbmMuchCluster* cl = (*it);
     CreateHits(cl, iCluster);
-    if (cl)
-      delete cl;
+    if (cl) delete cl;
   }
   clusters.clear();
 }
@@ -373,22 +365,71 @@ void CbmMuchFindHitsAdvancedGem::CreateHits(CbmMuchCluster* cluster,
   Double_t dx = std::numeric_limits<Double_t>::max();
   Double_t dy = std::numeric_limits<Double_t>::max();
   Int_t nClusterDigis = cluster->GetNDigis();
-  if (!nClusterDigis)
-    return;
+  if (!nClusterDigis) return;
+
   CbmMuchPad* pad = NULL;
-  for (Int_t iDigi = 0; iDigi < nClusterDigis; iDigi++) {
-    Int_t digiIndex = cluster->GetDigiIndex(iDigi);
+  Double_t time = 0;
+  Double_t dtime = 0;
+
+  set<Int_t> points;
+  Int_t iPoint, iStation;
+  Bool_t isSignalMuon, isIncluded;
+  CbmMuchPoint* point;
+  for (Int_t i = 0; i < nClusterDigis; i++) {
+    Int_t iDigi = cluster->GetDigiIndex(i);
     Int_t charge = 0;
-    pad = GetPadByDigi(digiIndex, charge);
-    if (!pad)
-      continue;
+    pad = GetPadByDigi(iDigi, charge);
+    if (!pad) continue;
     xq += pad->GetX0() * charge;
     yq += pad->GetY0() * charge;
-    if (dx > pad->GetLx())
-      dx = pad->GetLx();
-    if (dy > pad->GetLy())
-      dy = pad->GetLy();
+    if (dx > pad->GetLx()) dx = pad->GetLx();
+    if (dy > pad->GetLy()) dy = pad->GetLy();
+
+    // Calculate time stamp for hit
+    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
+    time += digi->GetTime();
+    dtime += TMath::Power(digi->GetDTime(), 2);
+
+    // Find signal muons
+    CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(iDigi);
+    for (Int_t k = 0; k < match->GetNPoints(); ++k) {
+      iPoint = match->GetRefIndex(k);
+      Bool_t isProcessedPoint = points.find(iPoint) != points.end();
+      if (!isProcessedPoint) points.insert(iPoint);
+      point = (CbmMuchPoint*) fPoints->At(iPoint);
+      iStation = fGeoScheme->GetStationIndex(point->GetDetectorId());
+      if (fSignalMuons.find(iStation) == fSignalMuons.end()) {
+        set<Int_t> muonIndices;
+        fSignalMuons[iStation] = muonIndices;
+      }
+      if (fSignalMuonsAll.find(iStation) == fSignalMuonsAll.end()) {
+        set<Int_t> muonIndices;
+        fSignalMuonsAll[iStation] = muonIndices;
+      }
+
+      // Check if it is a signal muon
+      CbmMCTrack* track = (CbmMCTrack*) fMCTracks->At(point->GetTrackID());
+      isSignalMuon = track->GetMotherId() < 0
+          && TMath::Abs(track->GetPdgCode()) == 13;
+      Bool_t isIncludedAll = fSignalMuonsAll[iStation].find(iPoint)
+          != fSignalMuonsAll[iStation].end();
+      if (isSignalMuon && !isIncludedAll) {
+        fSignalMuonsAll[iStation].insert(iPoint);
+      }
+    }
   }
+
+  Bool_t isOnlyPoint = points.size() == 1;
+  isIncluded = fSignalMuons[iStation].find(iPoint)
+      != fSignalMuons[iStation].end();
+  if (isSignalMuon && !isIncluded && isOnlyPoint) fSignalMuons[iStation].insert(
+      iPoint);
+
+  time /= cluster->GetNDigis();
+  dtime = TMath::Sqrt(dtime / cluster->GetNDigis());
+
+  //printf("time = %f, dtime = %f, size = %i\n", time, dtime, cluster->GetNDigis());
+
   // Transform variances into global c.s.
   Double_t sigmaX = dx / TMath::Sqrt(12.);
   Double_t sigmaY = dy / TMath::Sqrt(12.);
@@ -406,22 +447,8 @@ void CbmMuchFindHitsAdvancedGem::CreateHits(CbmMuchCluster* cluster,
 
   Int_t iHit = fHits->GetEntriesFast();
 
-  // Calculate time stamp for hit
-  Double_t time = 0;
-  Double_t dtime = 0;
-  for (Int_t i = 0; i < cluster->GetNDigis(); ++i) {
-    Int_t iDigi = cluster->GetDigiIndex(i);
-    CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
-    time += digi->GetTime();
-    dtime += TMath::Power(digi->GetDTime(), 2);
-  }
-  time /= cluster->GetNDigis();
-  dtime = TMath::Sqrt(dtime / cluster->GetNDigis());
-
   new ((*fHits)[iHit]) CbmMuchPixelHit(detId, pos, dpos, 0, iCluster, planeId,
       time, dtime);
-
-  //  printf("time = %f, dtime = %f, size = %i\n", time, dtime, cluster->GetNDigis());
 }
 // -------------------------------------------------------------------------
 
@@ -434,10 +461,11 @@ void CbmMuchFindHitsAdvancedGem::SetParContainers() {
 InitStatus CbmMuchFindHitsAdvancedGem::Init() {
   // Get input arrays
   FairRootManager* ioman = FairRootManager::Instance();
-  if (!ioman)
-    Fatal("CbmMuchFindHitsAdvancedGem::Init", "No FairRootManager");
+  if (!ioman) Fatal("CbmMuchFindHitsAdvancedGem::Init", "No FairRootManager");
   fDigis = (TClonesArray*) ioman->GetObject("MuchDigi");
   fDigiMatches = (TClonesArray*) ioman->GetObject("MuchDigiMatch");
+  fPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
+  fMCTracks = (TClonesArray*) ioman->GetObject("MCTrack");
 
   // Initialize GeoScheme
   TFile* oldfile = gFile;
@@ -470,18 +498,15 @@ void CbmMuchFindHitsAdvancedGem::FillChannelDigiMap() {
   Int_t nDigis = fDigis->GetEntriesFast();
   for (Int_t iDigi = 0; iDigi < nDigis; iDigi++) {
     CbmMuchDigi* digi = (CbmMuchDigi*) fDigis->At(iDigi);
-    if (!digi)
-      continue;
+    if (!digi) continue;
 
     // Skip if digi was generated by straw digitizer
     CbmMuchModule* module = fGeoScheme->GetModuleByDetId(digi->GetDetectorId());
-    if (module->GetDetectorType() != 1)
-      continue;
+    if (module->GetDetectorType() != 1) continue;
 
     // Unique channel id within the MUCH
     pair<Int_t, Long64_t> uniqueId(digi->GetDetectorId(), digi->GetChannelId());
-    if (fChannelDigiMap.find(uniqueId) == fChannelDigiMap.end())
-      fChannelDigiMap[uniqueId] = iDigi;
+    fChannelDigiMap[uniqueId] = iDigi;
   }
 }
 // -------------------------------------------------------------------------
@@ -496,8 +521,7 @@ void CbmMuchFindHitsAdvancedGem::FindClusters() {
   Int_t dummyCharge = 0;
   for (Int_t iDigi = 0; iDigi < nDigis; iDigi++) {
     // Selection
-    if (fSelectedDigis.find(iDigi) != fSelectedDigis.end())
-      continue;
+    if (fSelectedDigis.find(iDigi) != fSelectedDigis.end()) continue;
 
     vector<Int_t> digiIndices;
     Int_t qMax = 0;
@@ -510,6 +534,67 @@ void CbmMuchFindHitsAdvancedGem::FindClusters() {
 }
 // -------------------------------------------------------------------------
 
+// -----   Private method CornersNotFired ----------------------------------
+Bool_t CbmMuchFindHitsAdvancedGem::CornersNotFired(CbmMuchPad *pad,
+    CbmMuchPad *neighbourPad, Double_t deltaX, Double_t deltaY) {
+  Int_t nDx = Int_t((TMath::Abs(deltaX) + 1e-5)/deltaX);
+  Int_t nDy = Int_t((TMath::Abs(deltaY) + 1e-5)/deltaY);
+
+  // Debug
+  if(deltaX < 0) assert(nDx == -1);
+  else assert(nDx == 1);
+  if(deltaY < 0) assert(nDy == -1);
+  else assert(nDy == 1);
+
+  Bool_t result1 = kFALSE;
+  Bool_t result2 = kFALSE;
+
+  vector<CbmMuchPad*> neighbours = neighbourPad->GetNeighbours();
+
+  for (vector<CbmMuchPad*>::iterator it = neighbours.begin(); it
+      != neighbours.end(); ++it) {
+    CbmMuchPad* p = *it;
+    // Omit main pad
+    if (p->GetDetectorId() == pad->GetDetectorId() &&
+        p->GetChannelId() == pad->GetChannelId()) continue;
+
+    // Omit fired pads
+    pair<Int_t, Long64_t> uniqueId(p->GetDetectorId(), p->GetChannelId());
+    Bool_t isFired = fChannelDigiMap.find(uniqueId) != fChannelDigiMap.end();
+    if (isFired) continue;
+
+    // Verify two pads near the corner
+    Bool_t isSameHSide = TMath::Abs(neighbourPad->GetX0() - nDx
+        * neighbourPad->GetLx() / 2 - (p->GetX0() - nDx * p->GetLx() / 2.)) < 1e-5;
+    Bool_t isV = nDy * (neighbourPad->GetY0() - p->GetY0()) > 0;
+    Bool_t isSameVSide = TMath::Abs(neighbourPad->GetY0() - nDy
+        * neighbourPad->GetLy() / 2 - (p->GetY0() - nDy * p->GetLy() / 2.)) < 1e-5;
+    Bool_t isH = nDx * (neighbourPad->GetX0() - p->GetX0()) > 0;
+
+    if (!result1) result1 = isSameHSide && isV;
+    if (!result2) result2 = isSameVSide && isH;
+  }
+
+  return result1 && result2;
+}
+
+// -------------------------------------------------------------------------
+
+// -----   Private method IsCornerBorder -----------------------------------
+Bool_t CbmMuchFindHitsAdvancedGem::IsCornerBorder(CbmMuchPad *pad,
+    CbmMuchPad *neighbourPad) {
+  Double_t deltaX = neighbourPad->GetX0() - pad->GetX0();
+  Double_t deltaY = neighbourPad->GetY0() - pad->GetY0();
+  Double_t sumLx = pad->GetLx() / 2 + neighbourPad->GetLx() / 2;
+  Double_t sumLy = pad->GetLy() / 2 + neighbourPad->GetLy() / 2;
+  Bool_t isCornerNeighbour = TMath::Abs(TMath::Abs(deltaX) - sumLx) < 1e-5
+      && TMath::Abs(TMath::Abs(deltaY) - sumLy) < 1e-5;
+  if (!isCornerNeighbour) return kFALSE;
+
+  return CornersNotFired(pad, neighbourPad, deltaX, deltaY);
+}
+// -------------------------------------------------------------------------
+
 // -----   Private method CreateCluster  -----------------------------------
 void CbmMuchFindHitsAdvancedGem::CreateCluster(Int_t iDigi,
     vector<Int_t> &digiIndices, Int_t &sumCharge, Int_t &qMax, Int_t qThreshold) {
@@ -517,33 +602,31 @@ void CbmMuchFindHitsAdvancedGem::CreateCluster(Int_t iDigi,
   fSelectedDigis.insert(iDigi);
   Int_t charge = 0;
   CbmMuchPad* pad = GetPadByDigi(iDigi, charge);
-  if (!pad)
-    return;
-  if (charge > qMax)
-    qMax = charge;
+  if (!pad) return;
+  if (charge > qMax) qMax = charge;
   sumCharge += charge;
   vector<CbmMuchPad*> neighbourPads = pad->GetNeighbours();
 
+  // Processed neighbour pads
   for (vector<CbmMuchPad*>::iterator it = neighbourPads.begin(); it
       != neighbourPads.end(); it++) {
     CbmMuchPad* neighbourPad = *it;
     pair<Int_t, Long64_t> uniqueId(neighbourPad->GetDetectorId(),
         neighbourPad->GetChannelId());
-    if (fChannelDigiMap.find(uniqueId) == fChannelDigiMap.end())
-      continue;
+
+    if (fChannelDigiMap.find(uniqueId) == fChannelDigiMap.end()) continue; // pad not fired
 
     Int_t digiIndex = fChannelDigiMap[uniqueId];
     CbmMuchDigiMatch* neighbourMatch = (CbmMuchDigiMatch*) fDigiMatches->At(
         digiIndex);
-    if (!neighbourMatch)
-      continue;
+    if (!neighbourMatch) continue;
     Int_t digiCharge = neighbourMatch->GetTotalCharge();
-    if (digiCharge <= qThreshold)
-      continue;
+    if (digiCharge <= qThreshold) continue;
 
     // Selection
-    if (fSelectedDigis.find(digiIndex) != fSelectedDigis.end())
-      continue;
+    if (fSelectedDigis.find(digiIndex) != fSelectedDigis.end()) continue; // pad already included
+
+    if (IsCornerBorder(pad, neighbourPad)) continue;
 
     CreateCluster(digiIndex, digiIndices, sumCharge, qMax, qThreshold);
   }
@@ -592,9 +675,9 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringSimple(CbmMuchCluster* cluster,
     thresholdRatio = fThresholdRatio;
     break;
   case 2:
-    if (iStation >= fNStations)
-      Fatal("CbmMuchFindHitsAdvancedGem::ExecClusterSimple",
-          "Station index is out of range.");
+    if (iStation >= fNStations) Fatal(
+        "CbmMuchFindHitsAdvancedGem::ExecClusterSimple",
+        "Station index is out of range.");
     thresholdRatio = fThresholdRatios.at(iStation);
     break;
   }
@@ -605,16 +688,13 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringSimple(CbmMuchCluster* cluster,
     Int_t digiIndex = cluster->GetDigiIndex(iDigi);
     Int_t charge = 0;
     CbmMuchPad* pad = GetPadByDigi(digiIndex, charge);
-    if (!pad)
-      continue;
+    if (!pad) continue;
     CbmMuchDigiMatch* match = (CbmMuchDigiMatch*) fDigiMatches->At(digiIndex);
     charge = match->GetTotalCharge();
-    if (charge <= qThreshold)
-      continue;
+    if (charge <= qThreshold) continue;
 
     // Selection
-    if (fSelectedDigis.find(digiIndex) != fSelectedDigis.end())
-      continue;
+    if (fSelectedDigis.find(digiIndex) != fSelectedDigis.end()) continue;
 
     vector<Int_t> digiIndices;
     Int_t sumCharge = 0;
@@ -628,11 +708,11 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringSimple(CbmMuchCluster* cluster,
 void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
     vector<CbmMuchCluster*> &clusters) {
   fSelectedDigis.clear();
-//  printf("Cluster contents:\n");
+  //  printf("Cluster contents:\n");
   map<Double_t, Int_t> chargesX; // map from x coordinate to pad charge
   map<Double_t, Int_t> chargesY; // map from y coordinate to pad charge
   Int_t nDigis = cluster->GetNDigis();
-  for(Int_t iDigi = 0; iDigi < nDigis; ++iDigi){
+  for (Int_t iDigi = 0; iDigi < nDigis; ++iDigi) {
     Int_t charge = 0;
     Int_t digiIndex = cluster->GetDigiIndex(iDigi);
     CbmMuchPad* pad = GetPadByDigi(digiIndex, charge);
@@ -641,9 +721,10 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
     Double_t xPad = pad->GetX0();
     Double_t x;
     Bool_t exists = false;
-    for(map<Double_t, Int_t>::iterator it = chargesX.begin(); it != chargesX.end(); ++it){
+    for (map<Double_t, Int_t>::iterator it = chargesX.begin(); it
+        != chargesX.end(); ++it) {
       x = (*it).first;
-      if(TMath::Abs(x - xPad) < 1e-5) {
+      if (TMath::Abs(x - xPad) < 1e-5) {
         exists = true;
         break;
       }
@@ -655,9 +736,10 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
     Double_t yPad = pad->GetY0();
     Double_t y;
     exists = false;
-    for(map<Double_t, Int_t>::iterator it = chargesY.begin(); it != chargesY.end(); ++it){
+    for (map<Double_t, Int_t>::iterator it = chargesY.begin(); it
+        != chargesY.end(); ++it) {
       y = (*it).first;
-      if(TMath::Abs(y - yPad) < 1e-5) {
+      if (TMath::Abs(y - yPad) < 1e-5) {
         exists = true;
         break;
       }
@@ -666,30 +748,31 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
     chargesY[y] = exists ? chargesY[y] + charge : charge;
 
     // Debug info
-//    printf("\t%i) (x, y, charge) = (%4.3f, %4.3f, %i)\n", iDigi, xPad, yPad, charge);
+    //    printf("\t%i) (x, y, charge) = (%4.3f, %4.3f, %i)\n", iDigi, xPad, yPad, charge);
   }
 
   // Debug info
-//  printf("\tX-side:\n");
-//  for(map<Double_t, Int_t>::iterator it = chargesX.begin(); it != chargesX.end(); ++it){
-//    printf("\t\t (x, charge) = (%4.3f, %i)\n", (*it).first, (*it).second);
-//  }
-//  printf("\tY-side:\n");
-//  for(map<Double_t, Int_t>::iterator it = chargesY.begin(); it != chargesY.end(); ++it){
-//    printf("\t\t (y, charge) = (%4.3f, %i)\n", (*it).first, (*it).second);
-//  }
+  //  printf("\tX-side:\n");
+  //  for(map<Double_t, Int_t>::iterator it = chargesX.begin(); it != chargesX.end(); ++it){
+  //    printf("\t\t (x, charge) = (%4.3f, %i)\n", (*it).first, (*it).second);
+  //  }
+  //  printf("\tY-side:\n");
+  //  for(map<Double_t, Int_t>::iterator it = chargesY.begin(); it != chargesY.end(); ++it){
+  //    printf("\t\t (y, charge) = (%4.3f, %i)\n", (*it).first, (*it).second);
+  //  }
 
   // Process x-side
   Int_t charge = 0;
   Bool_t increase = true;
   vector<Double_t> xMin, xMax;
   Double_t previous = std::numeric_limits<Double_t>::max();
-  for(map<Double_t, Int_t>::iterator it = chargesX.begin(); it != chargesX.end(); ++it){
+  for (map<Double_t, Int_t>::iterator it = chargesX.begin(); it
+      != chargesX.end(); ++it) {
     Double_t x = (*it).first;
     Int_t q = (*it).second;
-    if(increase != q>charge){
+    if (increase != q > charge) {
       assert(previous <= x);
-      if(!increase) xMin.push_back(previous);
+      if (!increase) xMin.push_back(previous);
       else xMax.push_back(previous);
     }
     increase = q > charge;
@@ -697,28 +780,29 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
 
     previous = x;
   }
-  if(increase) xMax.push_back(previous);
+  if (increase) xMax.push_back(previous);
 
   // Debug info
-//  printf("\tExtremums in X:\n");
-//  for(Int_t iMax = 0; iMax < xMax.size(); ++iMax){
-//    printf("\t\t%i maximum: %4.2f\n", iMax+1, xMax.at(iMax));
-//  }
-//  for(Int_t iMin = 0; iMin < xMin.size(); ++iMin){
-//    printf("\t\t%i minimum: %4.2f\n", iMin+1, xMin.at(iMin));
-//  }
+  //  printf("\tExtremums in X:\n");
+  //  for(Int_t iMax = 0; iMax < xMax.size(); ++iMax){
+  //    printf("\t\t%i maximum: %4.2f\n", iMax+1, xMax.at(iMax));
+  //  }
+  //  for(Int_t iMin = 0; iMin < xMin.size(); ++iMin){
+  //    printf("\t\t%i minimum: %4.2f\n", iMin+1, xMin.at(iMin));
+  //  }
 
   // Process y-side
   charge = 0;
   increase = true;
   vector<Double_t> yMin, yMax;
   previous = std::numeric_limits<Double_t>::max();
-  for(map<Double_t, Int_t>::iterator it = chargesY.begin(); it != chargesY.end(); ++it){
+  for (map<Double_t, Int_t>::iterator it = chargesY.begin(); it
+      != chargesY.end(); ++it) {
     Double_t y = (*it).first;
     Int_t q = (*it).second;
-    if(increase != q>charge){
+    if (increase != q > charge) {
       assert(previous <= y);
-      if(!increase) yMin.push_back(previous);
+      if (!increase) yMin.push_back(previous);
       else yMax.push_back(previous);
     }
     increase = q > charge;
@@ -726,24 +810,25 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
 
     previous = y;
   }
-  if(increase) yMax.push_back(previous);
+  if (increase) yMax.push_back(previous);
 
   // Debug info
-//  assert(xMin.size() == xMax.size()-1);
-//  assert(yMin.size() == yMax.size()-1);
-//  printf("\tExtremums in Y:\n");
-//  for(Int_t iMax = 0; iMax < yMax.size(); ++iMax){
-//    printf("\t\t%i maximum: %4.2f\n", iMax+1, yMax.at(iMax));
-//  }
-//  for(Int_t iMin = 0; iMin < yMin.size(); ++iMin){
-//    printf("\t\t%i minimum: %4.2f\n", iMin+1, yMin.at(iMin));
-//  }
+  assert(xMin.size() == xMax.size()-1);
+  assert(yMin.size() == yMax.size()-1);
+  //  printf("\tExtremums in Y:\n");
+  //  for(Int_t iMax = 0; iMax < yMax.size(); ++iMax){
+  //    printf("\t\t%i maximum: %4.2f\n", iMax+1, yMax.at(iMax));
+  //  }
+  //  for(Int_t iMin = 0; iMin < yMin.size(); ++iMin){
+  //    printf("\t\t%i minimum: %4.2f\n", iMin+1, yMin.at(iMin));
+  //  }
 
 
   // Create clusters
   map<Double_t, Int_t>::iterator itX = chargesX.end();
   map<Double_t, Int_t>::iterator itY = chargesY.end();
-  --itX; --itY;
+  --itX;
+  --itY;
   Int_t nGroups = xMax.size() * yMax.size();
   vector<vector<Int_t> > digiGroups(nGroups); // groups of digis (cluster candidates)
   vector<Int_t> groupCharges(nGroups, 0); // total charges of each digi group
@@ -758,17 +843,16 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
         charge = 0;
         Int_t digiIndex = cluster->GetDigiIndex(iDigi);
         // Selection
-        if (fSelectedDigis.find(digiIndex) != fSelectedDigis.end())
-          continue;
+        if (fSelectedDigis.find(digiIndex) != fSelectedDigis.end()) continue;
         CbmMuchPad* pad = GetPadByDigi(digiIndex, charge);
         Double_t padX = pad->GetX0();
         Double_t padY = pad->GetY0();
 
-        if (padX <= x && padY <= y){
+        if (padX <= x && padY <= y) {
           Int_t iGroup = jMax * xMax.size() + iMax;
           digiGroups.at(iGroup).push_back(digiIndex);
           groupCharges.at(iGroup) += charge;
-//          groupCharges.at(iGroup) ++;
+          //          groupCharges.at(iGroup) ++;
           fSelectedDigis.insert(digiIndex);
         }
       }
@@ -779,15 +863,16 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
     for (Int_t jMax = 0; jMax < yMax.size(); ++jMax) {
       Int_t iGroup = jMax * xMax.size() + iMax;
       // Debug info
-//      printf("\t%i/%i group (contains %i pads, total charge %i):\n", iGroup+1, nGroups, digiGroups.at(iGroup).size(), groupCharges.at(iGroup));
-//      for(Int_t i = 0; i < digiGroups.at(iGroup).size(); ++i){
-//        Int_t digiIndex = digiGroups.at(iGroup).at(i);
-//        CbmMuchPad* pad = GetPadByDigi(digiIndex, charge);
-//        Double_t padX = pad->GetX0();
-//        Double_t padY = pad->GetY0();
-//        printf("\t\t(x, y) = (%4.2f, %4.2f)\n", padX, padY);
-//      }
-      clusters.push_back(new CbmMuchCluster(digiGroups.at(iGroup), groupCharges.at(iGroup)));
+      //      printf("\t%i/%i group (contains %i pads, total charge %i):\n", iGroup+1, nGroups, digiGroups.at(iGroup).size(), groupCharges.at(iGroup));
+      //      for(Int_t i = 0; i < digiGroups.at(iGroup).size(); ++i){
+      //        Int_t digiIndex = digiGroups.at(iGroup).at(i);
+      //        CbmMuchPad* pad = GetPadByDigi(digiIndex, charge);
+      //        Double_t padX = pad->GetX0();
+      //        Double_t padY = pad->GetY0();
+      //        printf("\t\t(x, y) = (%4.2f, %4.2f)\n", padX, padY);
+      //      }
+      clusters.push_back(new CbmMuchCluster(digiGroups.at(iGroup),
+          groupCharges.at(iGroup)));
     }
   }
 }

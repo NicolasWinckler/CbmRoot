@@ -78,11 +78,8 @@ class CbmMuchFindHitsAdvancedGem: public FairTask {
      * Sets the clustering algorithm to use.
      * 0 - Spatial separation (clusters are sets of neighbor fired pads)
      * 1 - Simple
-     * 2 - Ward's fuzzy clustering
-     * 3 - Simple + Ward's clustering
-     * 4 - Divisive clustering
-     * 5 - Simple + divisive clustering
-     * 6 - Simple (threshold is set for each station separately)
+     * 2 - Simple (threshold is set for each station separately)
+     * 3 - Peaks algorithm
      */
     void SetAlgorithm(Int_t iAlgorithm) {
       fAlgorithm = iAlgorithm;
@@ -91,36 +88,36 @@ class CbmMuchFindHitsAdvancedGem: public FairTask {
     /** Execution. */
     virtual void Exec(Option_t* opt);
 
-    void SetClusterCharges(Int_t iStation, Int_t clusterSize, Int_t* padCharges);
-
     //  void SetAnalysisStation(Int_t iStation) {fAnalysisStationIndex = iStation;}
     //  void SetAnalysisClusterSize(Int_t nPads) {fAnalysisClusterSize = nPads;}
     //  void SetAnalysisNPoints(Int_t nPoints) {fAnalysisNPoints = nPoints;}
 
   private:
 
-    CbmMuchGeoScheme* fGeoScheme; // Geometry scheme
-    TString fDigiFile; // Digitization file
-    Int_t fNStations; // Number of stations
-    TClonesArray* fHits; // Output array of CbmMuchHit
-    TClonesArray* fDigis; // Input array of CbmMuchDigi
-    TClonesArray* fDigiMatches; // Input array of CbmMuchDigiMatch
-    TClonesArray* fClusters; // Output array of CbmMuchCluster objects
+    CbmMuchGeoScheme* fGeoScheme;                       // Geometry scheme
+    TString fDigiFile;                                  // Digitization file
+    Int_t fNStations;                                   // Number of stations
+    TClonesArray* fHits;                                // Output array of CbmMuchHit
+    TClonesArray* fDigis;                               // Input array of CbmMuchDigi
+    TClonesArray* fDigiMatches;                         // Input array of CbmMuchDigiMatch
+    TClonesArray* fClusters;                            // Output array of CbmMuchCluster objects
+    TClonesArray* fPoints;                              // Input array of MC points
+    TClonesArray* fMCTracks;                            // Input array of MC tracks
     map<pair<Int_t, Long64_t> , Int_t> fChannelDigiMap; // Correspondence between unique channel id and digi index
-    set<Int_t> fSelectedDigis; // Digis already included in clusters
-    Double_t fThresholdRatio; // Multiplied by maximal pad-charge gives the charge ratio (for simple clustering only)
-    vector<Double_t> fThresholdRatios; // Charge thresholds for each station
-    Int_t fAlgorithm; // Defines which algorithm to use
-    TStopwatch fTimer; // Timer
-    Double_t fDistanceLimit; // Limit for the ESS increment
-    map<Int_t, map<Int_t, vector<Double_t> > > fDistanceLimits; // Map from station index to the list of distance limits for each cluster size
-    map<Int_t, map<Int_t, vector<Int_t> > > fChargeLimits; // Map from station index to the list of charge limits for each cluster size
+    set<Int_t> fSelectedDigis;                          // Digis already included in clusters
+    Double_t fThresholdRatio;                           // Multiplied by maximal pad-charge gives the charge ratio (for simple clustering only)
+    vector<Double_t> fThresholdRatios;                  // Charge thresholds for each station
+    Int_t fAlgorithm;                                   // Defines which algorithm to use
+    TStopwatch fTimer;                                  // Timer
 
     // Analysis variables
     vector<Double_t> fFakes; // Fakes fraction
     vector<Double_t> fLosts; // Losts fraction
-    vector<Double_t> fMuonLosts; //Fraction of lost muons
+    map<Int_t, set<Int_t> > fSignalMuonsAll; // Map from station index to the list of all signal muons per event
+    map<Int_t, set<Int_t> > fSignalMuons; // Map from station index to the list signal muons formed one cluster per event
+    map<Int_t, vector<Double_t> > fStationEff; // Map from station index to the list of station efficiencies
     Int_t fEvent;
+
 
     //  map<Int_t, CbmMuchCluster*> fAnalysisClusters;  // Clusters to analyze
     //  Int_t fAnalysisStationIndex; // Index of the station to analyze
@@ -177,9 +174,10 @@ class CbmMuchFindHitsAdvancedGem: public FairTask {
     CbmMuchPad* GetPadByDigi(Int_t digiIndex, Int_t &charge);
 
     void StatInfo();
+    Bool_t IsCornerBorder(CbmMuchPad *pad, CbmMuchPad *neighbourPad);
+    Bool_t CornersNotFired(CbmMuchPad *pad, CbmMuchPad *neighbourPad, Double_t deltaX, Double_t deltaY);
 
-  ClassDef(CbmMuchFindHitsAdvancedGem,1)
-    ;
+  ClassDef(CbmMuchFindHitsAdvancedGem,1);
 };
 
 #endif

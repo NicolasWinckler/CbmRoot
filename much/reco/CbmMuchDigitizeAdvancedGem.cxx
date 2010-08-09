@@ -56,7 +56,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem() :
   fQMax = 440000;
   SetQThreshold(3);
   fMeanNoise = 0; //1500;
-  SetDetectorType(kMICROMEGAS);
+  SetSpotRadius();
   fMeanGasGain = 1e4;
   fDeadPadsFrac = 0;
 
@@ -77,7 +77,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(Int_t iVerbose) :
   fQMax = 440000;
   SetQThreshold(3);
   fMeanNoise = 0;//1500;
-  SetDetectorType(kMICROMEGAS);
+  SetSpotRadius();
   fMeanGasGain = 1e4;
   fDeadPadsFrac = 0;
 
@@ -99,7 +99,7 @@ CbmMuchDigitizeAdvancedGem::CbmMuchDigitizeAdvancedGem(const char* name, const c
   fQMax = 440000;
   SetQThreshold(3);
   fMeanNoise = 0;//1500;
-  SetDetectorType(kMICROMEGAS);
+  SetSpotRadius();
   fMeanGasGain = 1e4;
   fDeadPadsFrac = 0;
 
@@ -121,7 +121,7 @@ CbmMuchDigitizeAdvancedGem::~CbmMuchDigitizeAdvancedGem() {
     fDigiMatches->Delete();
     delete fDigiMatches;
   }
-  SetDetectorType(kMICROMEGAS);
+  SetSpotRadius();
 
   Reset();
 }
@@ -166,6 +166,8 @@ Bool_t CbmMuchDigitizeAdvancedGem::ExecAdvanced(CbmMuchPoint* point, Int_t iPoin
     return kFALSE;
   }
   Int_t pdgCode = mcTrack->GetPdgCode();
+  // Debug
+  Bool_t isSignalMuon = TMath::Abs(pdgCode) == 13 && mcTrack->GetMotherId() < 0;
 
   // Reject funny particles
   TParticlePDG *particle = TDatabasePDG::Instance()->GetParticle(pdgCode);
@@ -696,16 +698,6 @@ Double_t CbmMuchDigitizeAdvancedGem::e_MPV_n_e(Double_t &logT) {
     arg = arg * logT;
   }
   return val;
-}
-void CbmMuchDigitizeAdvancedGem::SetDetectorType(DetectorType type) {
-  switch (type) {
-    case kGEM:
-      fSpotRadius = 0.15;
-      break;
-    case kMICROMEGAS:
-      fSpotRadius = 0.03;
-      break;
-  }
 }
 // -------------------------------------------------------------------------
 

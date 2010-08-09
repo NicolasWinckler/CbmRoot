@@ -36,81 +36,80 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
 
   public:
 
-    /** Default constructor */
+    /** Default constructor. */
     CbmMuchDigitizeAdvancedGem();
 
-    /** Standard constructor */
+    /** Standard constructor. */
     CbmMuchDigitizeAdvancedGem(Int_t iVerbose);
 
-    /** Constructor with name */
+    /** Constructor with name. */
     CbmMuchDigitizeAdvancedGem(const char* name, const char* digiFileName, Int_t iVerbose);
 
-    /** Destructor */
+    /** Destructor. */
     virtual ~CbmMuchDigitizeAdvancedGem();
 
-    /** Execution */
+    /** Execution. */
     virtual void Exec(Option_t* opt);
 
     /**
      * Sets radius of a spot from secondary electrons.
-     * @param spotRadius    Spot radius [cm] (0.03 cm by default).
+     * @param spotRadius Spot radius [cm] (0.03 cm by default).
      */
-    void SetSpotRadius(Double_t spotRadius) { fSpotRadius = spotRadius; }
-
-    /**
-     * Sets detector type used in MUCH.
-     * @param type          Detector type (Micromegas by default).
-     */
-    void SetDetectorType(DetectorType type);
+    void SetSpotRadius(Double_t spotRadius = 0.03) { fSpotRadius = spotRadius; }
 
     /**
      * Sets mean gas gain value.
-     * @param gasGain      Mean gas gain value [electrons] (10000 by default).
+     * @param gasGain Mean gas gain value [electrons] (10000 by default).
      */
     void SetMeanGasGain(Double_t gasGain)   { fMeanGasGain = gasGain; }
 
     /**
      * Sets maximal charge which a pad able to collect.
-     * @param qMax         Charge value [electrons] (440000 by default).
+     * @param qMax Charge value [electrons] (440000 by default).
      */
     void SetQMaximum(UInt_t qMax) { fQMax = qMax; }
 
     /**
      * Sets charge threshold [ADC channels] for pads.
-     * @param qThreshold    Charge threshold value [ADC channels] (3 by default).
+     * @param qThreshold Charge threshold value [ADC channels] (3 by default).
      */
     void SetQThreshold(UInt_t qThreshold) { fQThreshold = qThreshold*fQMax/fNADCChannels; }
 
     /**
      * Sets number of ADC channels.
-     * @param nADCChannels  number of ADC channels (256 by default).
+     * @param nADCChannels  Number of ADC channels (256 by default).
      */
     void SetNADCChannels(UInt_t nADCChannels) { fNADCChannels = nADCChannels; }
 
     /**
      * Sets mean electronics noise value.
-     * @param meanNoise     mean noise value [electrons] (0 by default).
+     * @param meanNoise Mean noise value [electrons] (0 by default).
      */
     void SetMeanNoise(UInt_t meanNoise) { fMeanNoise = meanNoise; }
 
     /**
      * Sets the probability (normalized to unity) to find a dead pad.
+     * @param deadPadsFrac Probability to find a dead pad (0-1).
      */
     void SetDeadPadsFrac(Double_t deadPadsFrac) { fDeadPadsFrac = deadPadsFrac; }
 
-    /** Sets the time resolution. **/
+    /** Sets the time resolution.
+     * @param dTime Time resolution [ns].
+     */
     void SetDTime(Double_t dTime) { fDTime = dTime; }
 
-    /** Gets time resolution **/
+    /** Gets time resolution [ns]. **/
     Double_t GetDTime() { return fDTime; }
 
-    /** Parameterization of sigma for electrons for Landau distribution
-     *@param logT  Logarithm of electron kinetic energy (energy in [MeV])
+    /** Parameterization of sigma for electrons for Landau distribution.
+     *@param logT Logarithm of electron kinetic energy (energy in [MeV]).
+     *@param mass Mass of the particle [MeV/c^2].
      **/
     static Double_t Sigma_n_e(Double_t Tkin, Double_t mass);
 
-    /** Parameterization of most probable value for electrons for Landau distribution
-     *@param logT  Logarithm of electron kinetic energy (energy in [MeV])
+    /** Parameterization of most probable value for electrons for Landau distribution.
+     *@param logT  Logarithm of electron kinetic energy (energy in [MeV]).
+     *@param mass Mass of the particle [MeV/c^2].
      **/
     static Double_t MPV_n_e(Double_t Tkin, Double_t mass);
 
@@ -145,25 +144,25 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     /** Map of DigiMatches, which matches pads wounded by secondary electrons.  **/
     std::map<std::pair<Int_t, Long64_t>, CbmMuchDigiMatch*> fChargedMatches;
 
-    /** Finish **/
+    /** Finish. **/
     virtual void FinishTask();
 
-    /** Get parameter containers **/
+    /** Get parameter containers. **/
     virtual void SetParContainers();
 
-    /** Initialization **/
+    /** Initialization. **/
     virtual InitStatus Init();
 
-    /** Re-initialization **/
+    /** Re-initialization. **/
     virtual InitStatus ReInit();
 
-    /** Reset eventwise counters **/
+    /** Reset eventwise counters. **/
     void Reset();
 
-    /** Advanced digis production using avalanches **/
+    /** Advanced digis production using avalanches. **/
     Bool_t ExecAdvanced(CbmMuchPoint* point, Int_t iPoint);
 
-    /** Fills output arrays with digis, which have charge above the threshold **/
+    /** Fills output arrays with digis, which have charge above the threshold. **/
     void FirePads();
 
     /** Add electronics noise. **/
@@ -172,38 +171,38 @@ class CbmMuchDigitizeAdvancedGem : public FairTask
     /** Add electronics noise to the given pad. **/
     void AddNoise(CbmMuchPad* pad);
 
-    /** Builds a TPolyLine from given rectangle parameters (no rotation angle)
-     *@param x0     X of the center
-     *@param y0     Y of the center
-     *@param width  Width
-     *@param height Height
+    /** Builds a TPolyLine from given rectangle parameters (no rotation angle).
+     *@param x0     X of the center.
+     *@param y0     Y of the center.
+     *@param width  Width.
+     *@param height Height.
      **/
     TPolyLine GetPolygon(Double_t x0, Double_t y0,
         Double_t width, Double_t height);
 
-    /** Verifies whether projections with given coordinates are intersected
-     *@param x11     coordinate of one end of the first projection
-     *@param x12     coordinate of another end of the first projection
-     *@param x21     coordinate of one end of the second projection
-     *@param x22     coordinate of another end of the second projection
-     *@param length  length of intresection
+    /** Verifies whether projections with given coordinates are intersected.
+     *@param x11     coordinate of one end of the first projection.
+     *@param x12     coordinate of another end of the first projection.
+     *@param x21     coordinate of one end of the second projection.
+     *@param x22     coordinate of another end of the second projection.
+     *@param length  length of intresection.
      **/
     Bool_t ProjectionsIntersect(Double_t x11, Double_t x12, Double_t x21, Double_t x22, Double_t& length);
 
     /** Determines whether the two given polygons intersect and calculates the
      *  area of intersection.
-     *@param polygon1  Fisrt polygon
-     *@param polygon2  Second polygon
-     *@param area      Intersection area
+     *@param polygon1  Fisrt polygon.
+     *@param polygon2  Second polygon.
+     *@param area      Intersection area.
      **/
     Bool_t PolygonsIntersect(CbmMuchSector* sector, TPolyLine polygon1, TPolyLine polygon2,
         Double_t& area);
 
     /**
      * Function returns a random number distributed according
-     * exponential law, which reproduces the gas gain fluctuation
-     *@author Volodia Nikulin
-     *@since 14/04/2007
+     * exponential law, which reproduces the gas gain fluctuation.
+     *@author Volodia Nikulin.
+     *@since 14/04/2007.
      */
     inline Int_t GasGain();
 

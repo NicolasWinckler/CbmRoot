@@ -814,6 +814,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 
     new ((*fDigiCollection)[iDigi]) CbmTrdDigi(fDigiMapIt->second->GetDetId(), fDigiMapIt->second->GetCol(), fDigiMapIt->second->GetRow(), fDigiMapIt->second->GetCharge(),fDigiMapIt->second->GetTime());
     ;
+    
     CbmTrdDigiMatch *p = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
     std::vector<int> arr=fDigiMapIt->second->GetMCIndex();
     std::vector<int>::iterator it;
@@ -821,6 +822,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
     for (it=arr.begin() ; it <arr.end(); it++  ) {
       Int_t bla = p->AddPoint((Int_t)*it);
     }
+    
     iDigi++;
   }
 }
@@ -1785,17 +1787,25 @@ void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Dou
   pair<Int_t, Int_t> a;
   if (fLayer % 2 == 0)
     {
-//      pair<Int_t, Int_t> a(iRow, iCol);
+      //      pair<Int_t, Int_t> a(iRow, iCol);
+      /*
       a.first=iRow;
       a.second=iCol;
+      */
+      temp = iCol;
+      iCol = iRow;
+      iRow = temp;
     }
   else
     {
-//      pair<Int_t, Int_t> a(iCol, iRow);
+      //      pair<Int_t, Int_t> a(iCol, iRow);
+      /*
       a.first=iCol;
       a.second=iRow;
+      */
     }
-    
+  a.first=iCol;
+  a.second=iRow;
   pair<Int_t, pair<Int_t,Int_t> > b(fModuleID, a);
   fDigiMapIt = fDigiMap.find(b);
 

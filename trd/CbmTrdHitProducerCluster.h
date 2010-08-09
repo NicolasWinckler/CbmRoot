@@ -4,6 +4,7 @@
 #include "FairTask.h"
 #include "CbmTrdDetectorId.h"
 
+#include "TVector3.h"
 #include <vector>
 #include <list>
 #include <map>
@@ -38,7 +39,7 @@ class CbmTrdHitProducerCluster : public FairTask
   void SortClusterDigi();
   void PrfReco(Int_t qMaxIndex, Float_t qMax);
   void SimpleReco(Int_t qMaxIndex, Float_t qMax);
-  void AddHit(Int_t iHit);
+  void AddHit(Int_t iHit, Int_t detectorId, TVector3& pos, TVector3& dpos, Double_t dxy, Int_t planeId, Double_t eLossTR, Double_t eLossdEdx, Double_t eLoss);
 
 
   TClonesArray*     fDigis;       /** Input array of CbmTrdDigi **/

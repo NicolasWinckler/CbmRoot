@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<dabc version="1">
+ <Context name="Readout">
+  <Run>
+    <lib value="libDabcMbs.so"/>
+    <lib value="libDabcRoc.so"/>
+    <logfile value="Trigger.log"/>
+  </Run>
+  <Application class="roc::Readout">
+    <DoCalibr value="0"/>
+    <SyncScaleDown value="3"/>
+    <NumRocs value="1"/>
+    <RocIp0 value="cbmtest11"/>
+    <RocFebs0 value="Feb1nxGenC"/>
+    <BufferSize value="65536"/>
+    <NumBuffers value="100"/>
+    <TransportWindow value="30"/>
+    <RawFile value=""/>
+    <MbsServerKind value="Stream"/>
+    <CalibrFile value=""/>
+    <MbsFileSizeLimit value="110"/>
+    <SpillRoc value="0"/>
+    <SpillAux value="0"/>
+    <CalibrationPeriod value="5"/>
+    <CalibrationLength value="0.5"/>
+  </Application>
+  <Module name="RocComb">
+     <Ratemeter name="*" debug="true" interval="5" width="5" prec="2"/>
+  </Module>
+ </Context>
+</dabc>

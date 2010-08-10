@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<dabc version="1">
+  <Variables>
+  <!--Enter the values for specific setup-->
+     <rocnode0 value="lxi009.gsi.de"/>
+     <rocnode1 value="lxi010.gsi.de"/>
+     <rocnode2 value="lxi011.gsi.de"/>
+     <rocnode3 value="lxi012.gsi.de"/>
+     <rocnode4 value="lxi013.gsi.de"/>
+     <rocnode5 value="lxi014.gsi.de"/>
+     <bufsize value="131072"/>
+  </Variables>
+  <!--Configure controller node-->
+  <Context host="master" name="Controller">
+    <Run>
+      <lib value="libDabcBnet.so"/>
+      <lib value="libBnetRocClust.so"/>
+<!--      <runfunc value="RunTestBnet"/> -->
+    </Run>
+    <Application class="bnet::RocCluster">
+<!--       <NetDevice value="dabc::SocketDevice"/> -->
+       <NetDevice value="verbs::Device"/>
+       <CtrlBuffer value="2048"/>
+       <TransportBuffer value="${bufsize}"/>
+       <NumEventsCombine value="1"/>
+       <FileBase value=""/>
+    </Application>
+  </Context>
+  <!--Configure worker node 1-->
+  <Context host="node01" name="Worker1">
+     <Run>
+       <!--debugger value="gdb -x run.txt --args"/-->
+    </Run>
+    <Application class="bnet::RocWorker">
+       <NumReadouts value="2"/>
+       <Input0Cfg value="${rocnode0}"/>
+       <Input1Cfg value="${rocnode1}"/>
+       <RocFebs0 value="Feb1nxGenD,Feb1nxGenD"/>
+       <RocFebs1 value="Feb1nxGenD,Feb1nxGenD"/>
+       <SpillRoc value="0"/>
+       <SpillAux value="0"/>
+       <CalibrationPeriod value="5"/>
+       <CalibrationLength value="0.5"/>
+    </Application>
+  </Context>
+  <!--Configure worker node 2-->
+  <Context host="node02" name="Worker2">
+    <Application class="bnet::RocWorker">
+       <NumReadouts value="2"/>
+       <Input0Cfg value="${rocnode2}"/>
+       <Input1Cfg value="${rocnode3}"/>
+       <RocFebs0 value="Feb1nxGenD,Feb1nxGenD"/>
+       <RocFebs1 value="Feb1nxGenD,Feb1nxGenD"/>
+    </Application>
+  </Context>
+  <!--Configure worker node 3-->
+  <Context host="node03" name="Worker3">
+    <Application class="bnet::RocWorker">
+       <NumReadouts value="2"/>
+       <Input0Cfg value="${rocnode4}"/>
+       <Input1Cfg value="${rocnode5}"/>
+       <RocFebs0 value="Feb1nxGenD,Feb1nxGenD"/>
+       <RocFebs1 value="Feb1nxGenD,Feb1nxGenD"/>
+    </Application>
+  </Context>
+  <Defaults>
+     <Context name="*">
+       <Run>
+          <logfile value="${Context}.log"/>
+          <loglevel value="1"/>
+          <LD_LIBRARY_PATH value="/usr/local/ROC/head_dabc/lib"/>
+          <TransportBuffer value="${bufsize}"/>
+       </Run>
+     </Context>
+     <Context name="Worker*">
+        <Run>
+          <lib value="libRoc.so"/>
+          <lib value="libDabcMbs.so"/>
+          <lib value="libDabcVerbs.so"/>
+          <lib value="libDabcRoc.so"/>
+          <lib value="libDabcBnet.so"/>
+          <lib value="libBnetMbs.so"/>
+          <lib value="libBnetRoc.so"/>
+        </Run>
+        <Application class="bnet::RocWorker">
+           <IsSender value="true"/>
+           <IsReceiver value="true"/>
+           <ReadoutBuffer value="${bufsize}"/>
+           <IsFilter value="false"/>
+           <EventBuffer value="${bufsize}"/>
+           <MbsFileSizeLimit value="500"/>
+           <MbsServerKind value="Stream"/>
+           <SyncScaleDown value="5"/>
+        </Application>
+        <Module name="*">
+          <Port name="*">
+             <BufferSize value="${bufsize}"/>
+          </Port>
+          <Ratemeter name="Event*" lower="0" upper="10000" debug="false"/>
+          <Ratemeter name="Data*" lower="0" upper="30" debug="false"/>
+          <Ratemeter name="Comb*Rate" lower="0" upper="10" debug="true"/>
+        </Module>
+     </Context>
+  </Defaults>
+</dabc>

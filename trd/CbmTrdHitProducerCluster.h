@@ -18,6 +18,10 @@ typedef struct MyHit
   Int_t digiId;
   Int_t rowId;
   Int_t colId;
+  //
+  Int_t nCol;
+  Int_t nRow;
+  //
   Int_t moduleId;
   Float_t xPos;
   Float_t yPos;
@@ -55,7 +59,7 @@ typedef struct ModulePara
 } ModulePara;
 
 typedef std::list<MyHit*> MyHitList;
-typedef std::map<Int_t, MyHitList*> MHitMap;
+
 
 class CbmTrdHitProducerCluster : public FairTask
 {
@@ -78,10 +82,10 @@ class CbmTrdHitProducerCluster : public FairTask
   void Register();
 
  private:
-  void GetModuleInfo(Int_t qMaxIndex, MHitMap* ModuleHitMap);
+  void GetModuleInfo(Int_t qMaxIndex/*, MHitMap* ModuleHitMap*/);
   void SortClusterDigi();
   void PrfReco(Int_t qMaxIndex, Float_t qMax);
-  void SimpleReco(Int_t qMaxIndex, Float_t qMax, ModulePara* mPara, MyHit* hit, MHitMap* ModuleHitMap);
+  void SimpleReco(Int_t qMaxIndex, Float_t qMax, ModulePara* mPara, MyHit* hit/*, MHitMap* ModuleHitMap*/);
   void DrawHits();
   void AddHit(Int_t iHit, Int_t detectorId, TVector3& pos, TVector3& dpos, Double_t dxy, Int_t planeId, Double_t eLossTR, Double_t eLossdEdx, Double_t eLoss);
 
@@ -95,7 +99,7 @@ class CbmTrdHitProducerCluster : public FairTask
   
   CbmTrdDetectorId fTrdId; //!
 
-
+std::map<Int_t, MyHitList*> ModuleHitMap;
 
   ClassDef(CbmTrdHitProducerCluster,1);
 };

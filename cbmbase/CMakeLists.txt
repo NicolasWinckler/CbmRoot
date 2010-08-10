@@ -14,7 +14,7 @@ ${CBMROOT_SOURCE_DIR}/field
 ${CBMROOT_SOURCE_DIR}/trackbase
 ${CMAKE_SOURCE_DIR}/geane
 
-//${CBMROOT_SOURCE_DIR}/cbmdata/rich
+#${CBMROOT_SOURCE_DIR}/cbmdata/rich
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

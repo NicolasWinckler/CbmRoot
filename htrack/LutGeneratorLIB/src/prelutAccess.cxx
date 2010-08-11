@@ -34,9 +34,13 @@
 #include "../include/lutGeneratorError.h"
 #include "../include/lutGeneratorWarningMsg.h"
 #include "../include/prelutAccess.h"
-#include "malloc.h"
 #include <fstream>
 
+#ifdef __APPLE__
+#include <malloc/malloc.h>
+#else
+#include <malloc.h>
+#endif
 
 #define standardUsage "PRELUT"
 

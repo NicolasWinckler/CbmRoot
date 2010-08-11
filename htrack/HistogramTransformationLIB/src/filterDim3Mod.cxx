@@ -41,9 +41,13 @@
 #include "../include/filterBasicComplexMod.h"
 #include "../include/filterBasicSpecial.h"
 #include "../include/filterDim3Mod.h"
-#include <malloc.h>
 #include <stdio.h>
 
+#ifdef __APPLE__
+#include <malloc/malloc.h>
+#else
+#include <malloc.h>
+#endif
 
 /****************************************************************
  * Default constructor											*

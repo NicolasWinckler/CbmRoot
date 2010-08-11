@@ -32,7 +32,12 @@
 
 #include "../include/histogramCellSignatures.h"
 #include <math.h>
+
+#ifdef __APPLE__
+#include <malloc/malloc.h>
+#else
 #include <malloc.h>
+#endif
 
 #define sqr(a)  ((a) * (a)) 
 

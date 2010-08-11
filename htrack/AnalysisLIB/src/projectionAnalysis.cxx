@@ -36,7 +36,12 @@
 #include "../include/projectionAnalysis.h"
 #include "TStyle.h"
 #include "TFile.h"
+
+#ifdef __APPLE__
+#include <malloc/malloc.h>
+#else
 #include <malloc.h>
+#endif
 
 /****************************************************************
  * This method initializes the global style for each display.	*

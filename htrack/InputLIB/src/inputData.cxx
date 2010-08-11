@@ -34,9 +34,13 @@
 #include "../../RootFrameworkLIB/include/hitProducer.h"
 #include "../include/inputError.h"
 #include "../include/inputData.h"
-#include <malloc.h>
 #include <stdlib.h>
 
+#ifdef __APPLE__
+#include <malloc/malloc.h>
+#else
+#include <malloc.h>
+#endif
 
 /****************************************************************
  * Default constructor											*

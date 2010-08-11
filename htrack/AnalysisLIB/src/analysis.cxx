@@ -42,8 +42,14 @@
 #include "../include/analysisWarningMsg.h"
 #include "../include/analysisDef.h"
 #include "../include/analysis.h"
-#include <malloc.h>
 #include <stdio.h>
+
+#ifdef __APPLE__
+#include <malloc/malloc.h>
+#else
+#include <malloc.h>
+#endif
+
 
 
 #define NUMBEROFDIFFERENTMOMENTAS    100			/**< This definition allows to look in Hough transform goodness to the percentage of wrong momentas. */

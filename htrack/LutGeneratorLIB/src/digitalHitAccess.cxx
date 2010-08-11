@@ -33,9 +33,13 @@
 #include "../include/lutGeneratorError.h"
 #include "../include/lutGeneratorWarningMsg.h"
 #include "../include/digitalHitAccess.h"
-#include "malloc.h"
 #include <fstream>
 
+#ifdef __APPLE__
+#include <malloc/malloc.h>
+#else
+#include <malloc.h>
+#endif
 
 #define standardUsage "DIGITALHIT"
 

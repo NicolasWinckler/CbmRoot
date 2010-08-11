@@ -35,9 +35,13 @@
 #include "../include/dataRootObjectError.h"
 #include "../include/dataRootObjectWarningMsg.h"
 #include "../include/histogramData.h"
-#include <malloc.h>
 #include <stdio.h>
 
+#ifdef __APPLE__
+#include <malloc/malloc.h>
+#else
+#include <malloc.h>
+#endif
 
 #ifndef CALLOC_HISTOGRAM_RUNTIME
 

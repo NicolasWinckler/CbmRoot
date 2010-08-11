@@ -41,9 +41,13 @@
 #include "../include/filterBasicComplexMod.h"
 #include "../include/filterBasicSpecial.h"
 #include "../include/filterDim12Dim1.h"
-#include <malloc.h>
 #include <stdio.h>
 
+#ifdef __APPLE__
+#include <malloc/malloc.h>
+#else
+#include <malloc.h>
+#endif
 
 #define max(a, b)  (((a) > (b)) ? (a) : (b)) 
 

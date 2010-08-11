@@ -10,6 +10,7 @@
 #define LITMATERIALINFO_H_
 
 #include "LitTypes.h"
+#include "../utils/CbmLitUtils.h"
 
 template<class T>
 class LitMaterialInfo
@@ -33,6 +34,12 @@ public:
 			<< ", Rho=" << mat.Rho << ", Z=" << mat.Z << ", A=" << mat.A
 			<< ", Zpos=" << mat.Zpos << ", I=" << mat.I << std::endl;
 		return strm;
+	}
+
+	std::string ToStringShort() {
+		std::string str = ToString<T>(Thickness) + " " + ToString<T>(X0) + " " + ToString<T>(Rho) + " "
+				+ ToString<T>(Z) + " " + ToString<T>(A) + " " + ToString<T>(Zpos) + " " + ToString<T>(I) + "\n";
+		return str;
 	}
 } _fvecalignment;
 

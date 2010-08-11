@@ -10,6 +10,7 @@
 //#define LIT_USE_THIRD_DEGREE 1;
 
 #include "LitMath.h"
+#include "../utils/CbmLitUtils.h"
 
 template<class T>
 class LitFieldValue
@@ -89,6 +90,17 @@ public:
 		for(unsigned int i = 0; i < N; i++) strm << slice.cz[i] << " ";
 		strm << std::endl;
 		return strm;
+	}
+
+	std::string ToStringShort() {
+		std::string str = ToString<T>(Z) + "\n";
+		for(unsigned int i = 0; i < N; i++) str += ToString<T>(cx[i]) + " ";
+		str += "\n";
+		for(unsigned int i = 0; i < N; i++) str += ToString<T>(cy[i]) + " ";
+		str += "\n";
+		for(unsigned int i = 0; i < N; i++) str += ToString<T>(cz[i]) + " ";
+		str += "\n";
+		return str;
 	}
 
 } _fvecalignment;

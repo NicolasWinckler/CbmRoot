@@ -14,6 +14,7 @@
 #include "LitMaterialInfo.h"
 #include "LitField.h"
 #include "CbmLitEnums.h"
+#include "../utils/CbmLitUtils.h"
 
 const unsigned char MAX_NOF_STATION_GROUPS = 6;
 const unsigned char MAX_NOF_STATIONS = 4;
@@ -31,6 +32,12 @@ public:
 		strm << "LitSubstation: " << "Z=" << substation.Z << ", material=" << substation.material;
 //		strm << ", fieldSlice=" << substation.fieldSlice;
 		return strm;
+	}
+
+	std::string ToStringShort() {
+		std::string str = ToString<T>(Z) + "\n" + material.ToStringShort();
+		str += fieldSlice.ToStringShort();
+		return str;
 	}
 } _fvecalignment;
 
@@ -61,11 +68,20 @@ public:
 	unsigned char nofSubstations;
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitStation &station){
-		strm << "LitStation: type" << station.type << ", nofSubstations=" << station.GetNofSubstations() << std::endl;
-		for (int i = 0; i < station.GetNofSubstations(); i++) {
-			strm << "    " << i << station.substations[i];
+		strm << "LitStation: type" << station.type << ", nofSubstations=" << (int) station.GetNofSubstations() << std::endl;
+		for (unsigned char i = 0; i < station.GetNofSubstations(); i++) {
+			strm << "    " << (int) i << station.substations[i];
 		}
 		return strm;
+	}
+
+	std::string ToStringShort() {
+		std::string str = type + " " + ToString<int>(GetNofSubstations()) + "\n";
+		for (unsigned char i = 0; i < GetNofSubstations(); i++) {
+			str += "substation\n";
+			str += ToString<int>(i) + "\n" + substations[i].ToStringShort();
+		}
+		return str;
 	}
 
 } _fvecalignment;
@@ -90,6 +106,14 @@ public:
 //			<< " fieladSliceBack=" << absorber.fieldSliceBack;
 		return strm;
 	}
+
+	std::string ToStringShort() {
+		std::string str = ToString<T>(Z) + "\n" + material.ToStringShort();
+		str += fieldSliceFront.ToStringShort();
+		str += fieldSliceBack.ToStringShort();
+		return str;
+	}
+
 } _fvecalignment;
 
 typedef LitAbsorber<fvec> LitAbsorberVec;
@@ -121,13 +145,25 @@ public:
 	LitAbsorber<T> absorber;
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitStationGroup &stationGroup){
-		strm << "LitStationGroup: " << "nofStations=" << stationGroup.GetNofStations() << std::endl;
+		strm << "LitStationGroup: " << "nofStations=" << (int) stationGroup.GetNofStations() << std::endl;
 		for (unsigned char i = 0; i < stationGroup.GetNofStations(); i++) {
-			strm << "  " << i << stationGroup.stations[i];
+			strm << "  " << (int) i << stationGroup.stations[i];
 		}
 		strm << "  " << stationGroup.absorber;
 		return strm;
 	}
+
+	std::string ToStringShort() {
+		std::string str = ToString<int>(GetNofStations()) + "\n";
+		for (unsigned char i = 0; i < GetNofStations(); i++) {
+			str += "station\n";
+			str += ToString<int>(i) + "\n" + stations[i].ToStringShort();
+		}
+		str += "absorber\n";
+		str += absorber.ToStringShort();
+		return str;
+	}
+
 } _fvecalignment;
 
 typedef LitStationGroup<fvec> LitStationGroupVec;
@@ -175,11 +211,20 @@ public:
     unsigned char nofStationGroups;
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitDetectorLayout &layout){
-		strm << "LitDetectorLayout: " << "nofStationGroups=" << layout.GetNofStationGroups() << std::endl;
+		strm << "LitDetectorLayout: " << "nofStationGroups=" << (int)layout.GetNofStationGroups() << std::endl;
 		for (unsigned char i = 0; i < layout.GetNofStationGroups(); i++) {
-			strm << i << layout.stationGroups[i];
+			strm << (int) i << layout.stationGroups[i];
 		}
 		return strm;
+	}
+
+	std::string ToStringShort() {
+		std::string str = ToString<int>(GetNofStationGroups()) + "\n";
+		for (unsigned char i = 0; i < GetNofStationGroups(); i++) {
+			str += "station group\n";
+			str += ToString<int>(i) + "\n" + stationGroups[i].ToStringShort();
+		}
+		return str;
 	}
 } _fvecalignment;
 

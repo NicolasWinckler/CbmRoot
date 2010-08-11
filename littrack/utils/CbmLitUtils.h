@@ -12,7 +12,7 @@ std::string ToString(
 		const T& value)
 {
 	std::stringstream ss;
-	ss.precision(3);
+	ss.precision(5);
 	ss << value;
 	return ss.str();
 }

@@ -36,11 +36,7 @@
 #include "../include/fileioWarningMsg.h"
 #include "../include/fileio.h"
 
-#ifdef __APPLE__
-#include <malloc/malloc.h>
-#else
-#include <malloc.h>
-#endif
+#include <cstdlib>
 
 /****************************************************************
  * allocates memory												*

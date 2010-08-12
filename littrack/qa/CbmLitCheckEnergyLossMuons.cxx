@@ -5,6 +5,8 @@
 #include "CbmLitUtils.h"
 #include "CbmLitDrawHist.h"
 
+#include "TCanvas.h"
+
 #include <cstdlib>
 
 CbmLitCheckEnergyLossMuons::CbmLitCheckEnergyLossMuons():

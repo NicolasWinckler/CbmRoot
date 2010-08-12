@@ -1,7 +1,7 @@
 #ifndef CBMLITUTILS_H_
 #define CBMLITUTILS_H_
 
-#include "TCanvas.h"
+class TCanvas;
 
 #include <string>
 #include <sstream>

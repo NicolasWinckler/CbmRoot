@@ -1,5 +1,6 @@
 #include "CbmLitUtils.h"
 
+#include "TCanvas.h"
 
 void SaveCanvasAsImage(
 		TCanvas* c,

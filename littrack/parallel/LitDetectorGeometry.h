@@ -50,7 +50,7 @@ template<class T>
 class LitStation
 {
 public:
-	LitStation():nofSubstations(0){}
+	LitStation():nofSubstations(0), type(kLITPIXELHIT){}
 
 	void AddSubstation(const LitSubstation<T>& substation) {
 		substations[nofSubstations++] = substation;
@@ -68,7 +68,7 @@ public:
 	unsigned char nofSubstations;
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitStation &station){
-		strm << "LitStation: type" << station.type << ", nofSubstations=" << (int) station.GetNofSubstations() << std::endl;
+		strm << "LitStation: type=" << station.type << ", nofSubstations=" << (int) station.GetNofSubstations() << std::endl;
 		for (unsigned char i = 0; i < station.GetNofSubstations(); i++) {
 			strm << "    " << (int) i << station.substations[i];
 		}

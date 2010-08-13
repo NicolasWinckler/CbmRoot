@@ -70,7 +70,7 @@ public:
 	friend std::ostream & operator<<(std::ostream &strm, const LitStation &station){
 		strm << "LitStation: type=" << station.type << ", nofSubstations=" << (int) station.GetNofSubstations() << std::endl;
 		for (unsigned char i = 0; i < station.GetNofSubstations(); i++) {
-			strm << "    " << (int) i << station.substations[i];
+			strm << "    " << (int) i << " " << station.substations[i];
 		}
 		return strm;
 	}
@@ -147,7 +147,7 @@ public:
 	friend std::ostream & operator<<(std::ostream &strm, const LitStationGroup &stationGroup){
 		strm << "LitStationGroup: " << "nofStations=" << (int) stationGroup.GetNofStations() << std::endl;
 		for (unsigned char i = 0; i < stationGroup.GetNofStations(); i++) {
-			strm << "  " << (int) i << stationGroup.stations[i];
+			strm << "  " << (int) i << " " << stationGroup.stations[i];
 		}
 		strm << "  " << stationGroup.absorber;
 		return strm;

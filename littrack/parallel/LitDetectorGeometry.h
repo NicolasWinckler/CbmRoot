@@ -78,7 +78,7 @@ public:
 	std::string ToStringShort() {
 		std::string str = type + " " + ToString<int>(GetNofSubstations()) + "\n";
 		for (unsigned char i = 0; i < GetNofSubstations(); i++) {
-			str += "substation\n";
+//			str += "substation\n";
 			str += ToString<int>(i) + "\n" + substations[i].ToStringShort();
 		}
 		return str;
@@ -156,10 +156,10 @@ public:
 	std::string ToStringShort() {
 		std::string str = ToString<int>(GetNofStations()) + "\n";
 		for (unsigned char i = 0; i < GetNofStations(); i++) {
-			str += "station\n";
+//			str += "station\n";
 			str += ToString<int>(i) + "\n" + stations[i].ToStringShort();
 		}
-		str += "absorber\n";
+//		str += "absorber\n";
 		str += absorber.ToStringShort();
 		return str;
 	}
@@ -221,7 +221,7 @@ public:
 	std::string ToStringShort() {
 		std::string str = ToString<int>(GetNofStationGroups()) + "\n";
 		for (unsigned char i = 0; i < GetNofStationGroups(); i++) {
-			str += "station group\n";
+//			str += "station group\n";
 			str += ToString<int>(i) + "\n" + stationGroups[i].ToStringShort();
 		}
 		return str;

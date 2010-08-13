@@ -7,6 +7,7 @@
 #include "CbmTrdDigi.h"
 #include "CbmTrdModule.h"
 #include "CbmTrdDigiMatch.h"
+#include "CbmTrdGeoHandler.h"
 
 #include "FairRootManager.h"
 #include "CbmMCTrack.h"
@@ -18,8 +19,6 @@
 #include "TMath.h"
 #include "TVector3.h"
 #include "TClonesArray.h"
-#include "TGeoManager.h"
-#include "TGeoVolume.h"
 
 #include <iostream>
 #include <iomanip>
@@ -29,18 +28,31 @@ using std::setprecision;
 
 // ---- Default constructor -------------------------------------------
 CbmTrdHitProducerDigi::CbmTrdHitProducerDigi()
-    :FairTask("TrdHitProducer",1)
-	//:fRef(0)
+  :FairTask("TrdHitProducer",1),
+   fTrdDigi(NULL),
+   fTrdDigiMatch(NULL),
+   fHitCollection(new TClonesArray("CbmTrdHit", 100)),
+   fMCStack(NULL),
+   fDigiPar(NULL),
+   fModuleInfo(NULL),
+   fTrdId(),
+   fLayersBeforeStation()
 {
-
 }
 // --------------------------------------------------------------------
 
 // ---- Constructor ----------------------------------------------------
 CbmTrdHitProducerDigi::CbmTrdHitProducerDigi(const char *name, const char *title, Int_t iVerbose)
-	:FairTask(name, iVerbose)
+  :FairTask(name, iVerbose),
+   fTrdDigi(NULL),
+   fTrdDigiMatch(NULL),
+   fHitCollection(new TClonesArray("CbmTrdHit", 100)),
+   fMCStack(NULL),
+   fDigiPar(NULL),
+   fModuleInfo(NULL),
+   fTrdId(),
+   fLayersBeforeStation()
 {
-
 }
 // --------------------------------------------------------------------
 
@@ -110,50 +122,26 @@ InitStatus CbmTrdHitProducerDigi::Init()
 
     fMCStack = (TClonesArray*)ioman->ActivateBranch("MCTrack");
 
-    fHitCollection = new TClonesArray("CbmTrdHit", 100);
     ioman->Register("TrdHit","TRD",fHitCollection,kTRUE);
 
-    // Extract information about the number of TRD stations and
-    // the number of layers per TRD station from the geomanager.
-    // Store the information about the number of layers at the entrance
-    // of subsequent stations in a vector. 
-    // This allows to calculate the layer number starting with 1 for the
-    // first layer of the first station at a later stage by only adding 
-    // the layer number in the station to the number of layers in 
-    // previous stations 
-    TGeoVolume *fm=NULL;
-    Int_t stationNr = 1;
-    Int_t totalNrOfLayers = 0;
-    fLayersBeforeStation.push_back(totalNrOfLayers);
-    char volumeName[10];
-    sprintf(volumeName, "trd%d", stationNr);
-    fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject(volumeName);  
-    if (fm){
-      Int_t nrOfLayers = fm->GetNdaughters();
-      totalNrOfLayers += nrOfLayers;
-      fLayersBeforeStation.push_back(totalNrOfLayers);
-      do {
-	stationNr++;
-        sprintf(volumeName, "trd%d", stationNr);
-	fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject(volumeName);  
-        if (fm) {
-          nrOfLayers = fm->GetNdaughters();
-	  totalNrOfLayers += nrOfLayers;
-	  fLayersBeforeStation.push_back(totalNrOfLayers);
-	}
-      } while (fm);
-    } else {
-      cout << "***************************************" <<endl;
-      cout << "                                       " <<endl;
-      cout << " - FATAL ERROR Unknown geometry version" <<endl;
-      cout << "   in CbmTrdHitProducerSmearing        " <<endl;
-      cout << " No TRD stations found in the geometry " <<endl;
-      cout << "                                       " <<endl;
-      cout << "***************************************" <<endl;
-      return kFATAL;
-    }
+  // Extract information about the number of TRD stations and
+  // the number of layers per TRD station from the geomanager.
+  // Store the information about the number of layers at the entrance
+  // of subsequent stations in a vector. 
+  // This allows to calculate the layer number starting with 1 for the
+  // first layer of the first station at a later stage by only adding 
+  // the layer number in the station to the number of layers in 
+  // previous stations 
+  CbmTrdGeoHandler trdGeoInfo;
+  
+  Bool_t result = trdGeoInfo.GetLayerInfo(fLayersBeforeStation);
+  
+  if (!result) return kFATAL;
+  
+  cout<<"********** End of TRD Hitproducer init ********"<<endl;
 
-    return kSUCCESS;
+  return kSUCCESS;
+
 
 }
 // --------------------------------------------------------------------
@@ -200,32 +188,11 @@ void CbmTrdHitProducerDigi::Exec(Option_t * option)
     Sector = bla[5];
     moduleId= fTrdId.GetModuleId(DetId);
 
-    /*
-    cout <<"##########################################"<<endl;
-    cout <<"ID        : "<<DetId<<endl;
-    cout <<"Module ID : "<<moduleId<<endl;
-    cout <<"Sector    : "<<Sector<<endl;
-    */
-
-      //TODO: This has to be done in a correct way. In the moment
-      //      it is assumed that all stations have 4 layers which
-      //      has not to be true for each geometry.
-    //    Plane=fLayersBeforeStation[Station-1]+Layer;
-    Plane= ((Station-1)*4) + Layer;
+    Plane=fLayersBeforeStation[Station-1]+Layer;
 
     fModuleInfo = fDigiPar->GetModule(moduleId);
     fModuleInfo->GetPosition(Col, Row, moduleId, Sector, posHit, padSize);
-     
-    /*
-      cout <<"##########################################"<<endl;
-      cout <<"ID     : "<<detID<<endl;
-      cout <<"System : "<<kTRD<<" , "<<bla[0]<<endl;
-      cout <<"Station: "<<station<<" , "<<bla[1]<<endl;
-      cout <<"Layer  : "<<layer<<" , "<<bla[2]<<endl;
-      cout <<"Type   : "<<modtype<<" , "<<bla[3]<<endl;
-      cout <<"Copy   : "<<modnumber<<" , "<<bla[4]<<endl;
-    */
-   
+        
     // Calculate the hit error from the pad sizes
     padSize*=(1/TMath::Sqrt(12.));
         

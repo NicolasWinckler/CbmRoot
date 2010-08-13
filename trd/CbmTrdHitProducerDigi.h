@@ -62,25 +62,6 @@ public:
     void Register();
 
 private:
-
-    //    void CalculateHitPosition();
-
-//    Int_t   fStation;
-//    Int_t   fLayer;
-//    Int_t   fModuleType;
-//    Int_t   fModuleCopy;
-//    Int_t   fCol; //Calculated pixel column were the hit is in
-//    Int_t   fRow; //Calculated pixel row were the hit is in
-//    Int_t   fDetId; //Unique detector id
-
-//    Float_t fpadsizex; //pixel widh in x;
-//    Float_t fpadsizey; //pixel width in y;
-//    Float_t fsizex; //module widh in x;
-//    Float_t fsizey; //module width in y;
-//    Float_t fPosX;//Hit position in chamber coordinates
-//    Float_t fPosY;//Hit position in chamber coordinates
-//    Float_t fPosZ;//Hit position in chamber coordinates
-
     
     TClonesArray *fTrdDigi;      //! TRD digi
     TClonesArray *fTrdDigiMatch; //! TRD digi match

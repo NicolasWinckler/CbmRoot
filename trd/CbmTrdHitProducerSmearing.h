@@ -94,7 +94,7 @@ private:
 
     TClonesArray *fTrdPoints;     //! TRD MC points
     TClonesArray *fHitCollection; //! TRD hits
-    TClonesArray *fListStack;     //Tracks
+    TClonesArray *fListStack;     //!Tracks
 
     Double_t fDx;               //!
     Double_t fDy;               //!
@@ -108,6 +108,9 @@ private:
     CbmTrdDetectorId fDetId;  //!
 
     std::vector<Int_t> fLayersBeforeStation; //! 
+
+    CbmTrdHitProducerSmearing(const CbmTrdHitProducerSmearing&);
+    CbmTrdHitProducerSmearing operator=(const CbmTrdHitProducerSmearing&);
 
     ClassDef(CbmTrdHitProducerSmearing,2) //CBMTRDHitProducer
 

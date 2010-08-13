@@ -66,6 +66,7 @@ CbmTrdClusterFinder.cxx
 CbmTrdClusterFinderFast.cxx
 CbmTrdHitProducerCluster.cxx
 CbmTrdSimpleHitProducerCluster.cxx
+CbmTrdGeoHandler.cxx
 )
 
 if(RULE_CHECKER_FOUND)

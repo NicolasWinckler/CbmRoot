@@ -25,7 +25,7 @@ public:
 template<class T>
 class LitFieldSlice
 {
-private:
+public:
 	// number of polynom coefficients
 #ifdef LIT_USE_THIRD_DEGREE
 	static const unsigned int N = 10; // for the 3rd degree polynom

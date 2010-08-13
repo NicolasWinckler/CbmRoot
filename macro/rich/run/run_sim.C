@@ -7,7 +7,8 @@
 //
 // --------------------------------------------------------------------------
 
-void run_sim(Int_t nEvents = 10)
+
+void run_sim(Int_t nEvents = 2)
 {
 
   // ========================================================================
@@ -18,10 +19,11 @@ void run_sim(Int_t nEvents = 10)
  // TString inFile  = inDir + "/input/urqmd.ftn14";
  // TString inDir   = "/d/cbm03/urqmd/auau/25gev/centr";
 //  TString inFile  = inDir + "/urqmd.auau.25gev.centr.0006.ftn14";
-    TString inFile = "/d/cbm02/slebedev/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
+    TString inFile = "/d/cbm02/slebedev/urqmd/auau/25gev/mbias/urqmd.auau.25gev.mbias.0007.ftn14";
   TString outDir  = "data";
-  TString outFile = "/d/cbm02/slebedev/rich/JUL09/test/auau.25gev.centr.0000.mc.root";;
-  TString parFile = "/d/cbm02/slebedev/rich/JUL09/test/auau.25gev.centr.0000.params.root";;
+
+  TString outFile = "/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.mc.root";;
+  TString parFile = "/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.params.root";;
 
   // -----  Geometries  -----------------------------------------------------
   TString caveGeom   = "cave.geo";
@@ -44,9 +46,6 @@ void run_sim(Int_t nEvents = 10)
   // In general, the following parts need not be touched
   // ========================================================================
 
-
-
-
   // ----    Debug option   -------------------------------------------------
   gDebug = 0;
   // ------------------------------------------------------------------------
@@ -62,22 +61,9 @@ void run_sim(Int_t nEvents = 10)
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libCbmBase");
-  gSystem->Load("libCbmData");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libPassive");
-  //gSystem->Load("libMvd");
-  gSystem->Load("libSts");
-  gSystem->Load("libRich");
-  gSystem->Load("libTrd");
-  gSystem->Load("libTof");
- // gSystem->Load("libEcal");
-  // -----------------------------------------------------------------------
 
+  gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
+  cbmlibs();
 
 
   // -----   Create simulation run   ----------------------------------------

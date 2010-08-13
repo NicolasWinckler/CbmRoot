@@ -1,45 +1,28 @@
 
 #include "../../../cbmbase/CbmDetectorList.h";
 
-void run_reco(Int_t nEvents = 10)
+void run_reco(Int_t nElectrons = 20, Int_t nEvents = 1000)
 {
 
-  // ========================================================================
-  //          Adjust this part according to your requirements
+    //      TString outDir  = "/d/cbm06/user/slebedev/rich/ringsperevent/";
+    //      char txt[200];
+    //      sprintf(txt,"%.4i",nElectrons);
+    //      TString inFile = outDir + "mc."+txt+".root";
+    //      TString parFile = outDir + "params."+txt+".root";
+    //      TString outFile = outDir + "reco."+txt+".root";
 
-  // Verbosity level (0=quiet, 1=event level, 2=track level, 3=debug)
-  Int_t iVerbose =2;
+    Int_t iVerbose =0;
 
-  // Input file (MC events)
-  TString inFile = "/d/cbm02/slebedev/rich/JUL09/test/auau.25gev.centr.0000.mc.root";
+    TString stsDigiFile = "sts_standard.digi.par";
 
-  // Parameter file
-  TString parFile = "/d/cbm02/slebedev/rich/JUL09/test/auau.25gev.centr.0000.params.root";
+  TString inFile = "/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.mc.root";
+  TString parFile = "/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.params.root";
+  TString outFile = "/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.reco.root";
 
-  // STS digitisation file
-  TString stsDigiFile = "sts_standard.digi.par";
-
-  // Output file
-  TString outFile = "/d/cbm02/slebedev/rich/JUL09/test/auau.25gev.centr.0000.reco.root";
-
-
-  // In general, the following parts need not be touched
-  // ========================================================================
-
-
-
-  // ----    Debug option   -------------------------------------------------
   gDebug = 0;
-  // ------------------------------------------------------------------------
 
-
-
-  // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
   timer.Start();
-  // ------------------------------------------------------------------------
-
-
 
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
@@ -87,7 +70,8 @@ void run_reco(Int_t nEvents = 10)
   CbmL1* l1 = new CbmL1();
   run->AddTask(l1);
   CbmStsTrackFinder* stsTrackFinder    = new CbmL1StsTrackFinder();
-  FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder);  run->AddTask(stsFindTracks);
+  FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder);
+  run->AddTask(stsFindTracks);
   // -------------------------------------------------------------------------
 
 
@@ -105,7 +89,6 @@ void run_reco(Int_t nEvents = 10)
 
   // ===                 End of STS local reconstruction                   ===
   // =========================================================================
-
 
 
 
@@ -143,9 +126,7 @@ void run_reco(Int_t nEvents = 10)
 
 
   // -----   TRD track finding   ---------------------------------------------
- // CbmTrdTrackFinder* trdTrackFinder    = new CbmL1TrdTrackFinderSts();
- // ((CbmL1TrdTrackFinderSts*)trdTrackFinder)->SetVerbose(iVerbose);
-  CbmTrdTrackFinder* trdTrackFinder    = new CbmLitTrdTrackFinderBranch();
+  CbmTrdTrackFinder* trdTrackFinder    = new CbmLitTrdTrackFinderNN();
   CbmTrdFindTracks* trdFindTracks = new CbmTrdFindTracks("TRD Track Finder");
   trdFindTracks->UseFinder(trdTrackFinder);
   run->AddTask(trdFindTracks);
@@ -161,14 +142,14 @@ void run_reco(Int_t nEvents = 10)
 						      trdTrackFitter);
   run->AddTask(trdFitTracks);
   // -------------------------------------------------------------------------
-
+  
 
   // -----   TRD track matching   --------------------------------------------
   CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(iVerbose);
   run->AddTask(trdMatchTracks);
-
-
-
+  
+  
+   
       // ----------- TRD track Pid Wkn ----------------------
     CbmTrdSetTracksPidWkn* trdSetTracksPidTask = new
     CbmTrdSetTracksPidWkn("trdFindTracks","trdFindTracks");
@@ -180,14 +161,9 @@ void run_reco(Int_t nEvents = 10)
     CbmTrdSetTracksPidANN("Ann","Ann");
     run->AddTask(trdSetTracksPidAnnTask);
     // ----------------------------------------------------
-
-
-//    CbmLitRecQa* litRecQa   =  new CbmLitRecQa(8, 0.7, kTRD, 1);
-//    litRecQa->SetNormType(2); // '2' to number of STS tracks
-//    run->AddTask(litRecQa);
-
+  
   // -------------------------------------------------------------------------
-
+ 
   // ===                 End of TRD local reconstruction                   ===
   // =========================================================================
 
@@ -206,7 +182,7 @@ void run_reco(Int_t nEvents = 10)
   							iVerbose);
   run->AddTask(tofHitProd);
   // -------------------------------------------------------------------------
-
+ 
   // ===                   End of TOF local reconstruction                 ===
   // =========================================================================
 
@@ -214,40 +190,40 @@ void run_reco(Int_t nEvents = 10)
 
 
 
-
+   
   // =========================================================================
   // ===                        Global tracking                            ===
-  // =========================================================================
-
+  // =========================================================================     
+ 
   // -----   STS-TRD-TOF track merging   -------------------------------------
   CbmL1TrackMerger* trackMerger          = new CbmL1TrackMerger();
   trackMerger->SetMethod(1);
   CbmL1TofMerger* tofMerger = new CbmL1TofMerger();
   CbmFindGlobalTracks* findGlobal = new CbmFindGlobalTracks(trackMerger,
-							    NULL, NULL,
+							    NULL, tofMerger,
 							    iVerbose);
   run->AddTask(findGlobal);
-
+  
   //--------- TOF tracklength calculation -----------------------------------
    CbmGlobalTrackFitterKF* globalFitter = new CbmGlobalTrackFitterKF();
    CbmFitGlobalTracks* fitGlobal
                  = new
    CbmFitGlobalTracks("globalfitter",iVerbose,globalFitter);
-
+  
    run->AddTask(fitGlobal);
   //-------------------------------------------------------------------------
 
-
+   
   // -----   Primary vertex finding   ---------------------------------------
   CbmPrimaryVertexFinder* pvFinder = new CbmPVFinderKF();
   CbmFindPrimaryVertex* findVertex = new CbmFindPrimaryVertex(pvFinder);
   run->AddTask(findVertex);
   // ------------------------------------------------------------------------
-
+  
   // ===                      End of global tracking                       ===
   // =========================================================================
 
-
+  
 
 
     // ----------- TRD track Pid Like ----------------------
@@ -257,6 +233,9 @@ void run_reco(Int_t nEvents = 10)
     CbmTrdSetTracksPidLike("Likelihood","Likelihood");
     run->AddTask(trdSetTracksPidLikeTask);
     // ----------------------------------------------------
+
+
+
 
 
 
@@ -271,7 +250,7 @@ void run_reco(Int_t nEvents = 10)
   Int_t    richDetType = 4;       // Detector type Hamamatsu H8500-03
   Int_t    richNoise   = 220;     // Number of noise points per event
   Double_t collectionEff = 1.0;
-  Double_t richSMirror = 0.06;     // Sigma for additional point smearing due to light scattering in mirror
+  Double_t richSMirror = 0.1;     // Sigma for additional point smearing due to light scattering in mirror
   CbmRichHitProducer* richHitProd
     = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
 			     richNoise, iVerbose, collectionEff,richSMirror);
@@ -279,26 +258,27 @@ void run_reco(Int_t nEvents = 10)
   //--------------------------------------------------------------------------
 
 
-  //----------------------RICH Track Extrapolation ---------------------------
-  Int_t    richNSts = 4;     // minimum number of STS hits for extrapolation
-  Double_t richZPos = 300.;  // z position for extrapolation [cm]
-  CbmRichTrackExtrapolation* richExtra
-    = new CbmRichTrackExtrapolationKF(richNSts, iVerbose);
-  CbmRichExtrapolateTracks* richExtrapolate = new CbmRichExtrapolateTracks();
-  richExtrapolate->UseExtrapolation(richExtra,richZPos);
-  run->AddTask(richExtrapolate);
-  //--------------------------------------------------------------------------
-
-
-  //--------------------- Rich Track Projection to photodetector -------------
-  Int_t richZFlag = 1;       // Projetion from IM plane (default)
-  CbmRichProjectionProducer* richProj =
-  new CbmRichProjectionProducer(iVerbose, richZFlag);
-  run->AddTask(richProj);
-  //--------------------------------------------------------------------------
+//  //----------------------RICH Track Extrapolation ---------------------------
+//  Int_t    richNSts = 4;     // minimum number of STS hits for extrapolation
+//  Double_t richZPos = 300.;  // z position for extrapolation [cm]
+//  CbmRichTrackExtrapolation* richExtra
+//    = new CbmRichTrackExtrapolationKF(richNSts, iVerbose);
+//  CbmRichExtrapolateTracks* richExtrapolate = new CbmRichExtrapolateTracks();
+//  richExtrapolate->UseExtrapolation(richExtra,richZPos);
+//  run->AddTask(richExtrapolate);
+//  //--------------------------------------------------------------------------
+//
+//
+//  //--------------------- Rich Track Projection to photodetector -------------
+//  Int_t richZFlag = 1;       // Projetion from IM plane (default)
+//  CbmRichProjectionProducer* richProj =
+//  new CbmRichProjectionProducer(iVerbose, richZFlag);
+//  run->AddTask(richProj);
+//  //--------------------------------------------------------------------------
 
 
   //--------------------- RICH Ring Finding ----------------------------------
+  //CbmL1RichENNRingFinder* richFinder = new CbmL1RichENNRingFinder(iVerbose);
   TString richGeoType = "compact";
   CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose, richGeoType);
   CbmRichFindRings* richFindRings = new CbmRichFindRings();
@@ -313,18 +293,18 @@ void run_reco(Int_t nEvents = 10)
   //--------------------------------------------------------------------------
 
   // ------------------- RICH Ring matching  ---------------------------------
-  CbmRichMatchRings* matchRings = new CbmRichMatchRings(2);
+  CbmRichMatchRings* matchRings = new CbmRichMatchRings(0);
   run->AddTask(matchRings);
   // -------------------------------------------------------------------------
 
-  //--------------------- RICH ring-track assignment ------------------------
-  Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]
-  Int_t    richNPoints  = 5;   // Minmum number of hits on ring
-  CbmRichRingTrackAssign* richAssign   =
-    new CbmRichRingTrackAssignClosestD(richDistance, richNPoints, 3);
-  CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
-  assignTrack->UseAssign(richAssign);
-  run->AddTask(assignTrack);
+//  //--------------------- RICH ring-track assignment ------------------------
+//  Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]
+//  Int_t    richNPoints  = 5;   // Minmum number of hits on ring
+//  CbmRichRingTrackAssign* richAssign   =
+//    new CbmRichRingTrackAssignClosestD(richDistance, richNPoints, 3);
+//  CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
+//  assignTrack->UseAssign(richAssign);
+//  run->AddTask(assignTrack);
   // ------------------------------------------------------------------------
 
   CbmRichRingQa* richQa   =  new CbmRichRingQa("Qa","qa", 0);
@@ -336,10 +316,6 @@ void run_reco(Int_t nEvents = 10)
 
   // ===                 End of RICH local reconstruction                  ===
   // =========================================================================
-
-
-
-
 
   // =========================================================================
   // ===                        ECAL reconstruction                        ===

@@ -1,11 +1,7 @@
 void run_reco_rich(Int_t nEvents = 700) {
 	Int_t iVerbose = 0;
 
-	//      TString outDir  = "/d/cbm06/user/slebedev/rich/ringsperevent/";
-	//      TString inFile1 = outDir + "mc.0050.root";
-	//      TString inFile2 = outDir + "reco.0050.root";
-	//      TString parFile = outDir + "params.0050.root";
-	//      TString outFile = outDir + "reco.0050.root";
+
 
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
@@ -14,12 +10,18 @@ void run_reco_rich(Int_t nEvents = 700) {
 
 	TString inFile1 = "", inFile2 = "", inFile3 = "", parFile = "", outFile ="";
 
-	Bool_t isRichTrackingOn = false;
+	Bool_t isRichTrackingOn = true;
 	if (script != "yes") {
-		TString inFile1 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
-		TString inFile2 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
-		TString parFile ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
-		TString outFile ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.recorich.root";
+	        TString inFile1 ="/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.mc.root";
+	        TString inFile2 ="/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.reco.root";
+	        TString parFile ="/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.params.root";
+	        TString outFile ="/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.recorich.root";
+
+	    //    TString outDir  = "/d/cbm06/user/slebedev/rich/ringsperevent/";
+	    //    TString inFile1 = outDir + "mc.0010.root";
+	    //    TString inFile2 = outDir + "reco.0010.root";
+	    //    TString parFile = outDir + "params.0010.root";
+	    //    TString outFile = outDir + "recorich.0010.root";
 	} else {
 		isRichTrackingOn = true;
 		inFile1 = TString(gSystem->Getenv("MCFILE"));
@@ -38,7 +40,7 @@ void run_reco_rich(Int_t nEvents = 700) {
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
-	cbmlibs();
+         cbmlibs();
 
 	FairRunAna *run = new FairRunAna();
 	if (inFile1 != "") run->SetInputFile(inFile1);
@@ -46,6 +48,9 @@ void run_reco_rich(Int_t nEvents = 700) {
 	if (inFile3 != "") run->AddFriend(inFile3);
 	if (inFile1 != "") run->SetOutputFile(outFile);
 
+
+    FairTask* kalman= new CbmKF();
+    run->AddTask(kalman);
 	// =========================================================================
 	// ===                        RICH reconstruction                        ===
 	// =========================================================================

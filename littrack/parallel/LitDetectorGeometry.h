@@ -213,7 +213,7 @@ public:
 	friend std::ostream & operator<<(std::ostream &strm, const LitDetectorLayout &layout){
 		strm << "LitDetectorLayout: " << "nofStationGroups=" << (int)layout.GetNofStationGroups() << std::endl;
 		for (unsigned char i = 0; i < layout.GetNofStationGroups(); i++) {
-			strm << (int) i << layout.stationGroups[i];
+			strm << (int) i << " " << layout.stationGroups[i];
 		}
 		return strm;
 	}

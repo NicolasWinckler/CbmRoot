@@ -101,7 +101,7 @@ public:
 	LitFieldSlice<T> fieldSliceBack;
 
 	friend std::ostream & operator<<(std::ostream &strm, const LitAbsorber &absorber){
-		strm << "LitAbsorber: Z" << absorber.Z << ", material=" << absorber.material;
+		strm << "LitAbsorber: Z=" << absorber.Z << ", material=" << absorber.material;
 //		strm << "fieldSliceFront=" << absorber.fieldSliceFront
 //			<< " fieladSliceBack=" << absorber.fieldSliceBack;
 		return strm;

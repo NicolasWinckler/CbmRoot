@@ -2,6 +2,7 @@
 
 #include "CbmTrdDigiPar.h"
 #include "CbmTrdDigi.h"
+#include "CbmTrdPoint.h"
 #include "CbmTrdCluster.h"
 #include "CbmTrdHit.h"
 #include "CbmTrdModule.h"
@@ -10,10 +11,12 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
+#include "TGeoManager.h"
 #include "TClonesArray.h"
 #include "TArray.h"
 #include "TH2F.h"
 #include "TProfile.h"
+#include "TLine.h"
 #include "TCanvas.h"
 #include "TImage.h"
 
@@ -86,17 +89,22 @@ InitStatus CbmTrdHitProducerCluster::Init()
 {
   cout << " * CbmTrdHitProducerCluster * :: Init()" << endl;
   FairRootManager *ioman = FairRootManager::Instance();
-  
+  fTrdPoints=(TClonesArray *)ioman->ActivateBranch("TrdPoint"); 
+  if ( ! fTrdPoints ) {
+    cout << "-W CbmTrdHitProducerCluster::Init: No TrdPoints array!" << endl;
+    cout << "                             Task will be inactive" << endl;
+    return kERROR;
+  }
   fDigis =(TClonesArray *)  ioman->ActivateBranch("TrdDigi");
   if ( ! fDigis ) {
-    cout << "-W CbmTrdHitProducerDigi::Init: No TrdDigi array!" << endl;
-    cout << "                            Task will be inactive" << endl;
+    cout << "-W CbmTrdHitProducerCluster::Init: No TrdDigi array!" << endl;
+    cout << "                             Task will be inactive" << endl;
     return kERROR;
   }
   fClusters =(TClonesArray *)  ioman->ActivateBranch("TrdCluster");
   if ( ! fClusters ) {
     cout << "-W CbmTrdHitProducerCluster::Init: No TrdCluster array!" << endl;
-    cout << "                               Task will be inactive" << endl;
+    cout << "                             Task will be inactive" << endl;
     return kERROR;
   }    
   fClusterHits = new TClonesArray("CbmTrdHit", 100);
@@ -157,8 +165,12 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       */
      
       //cout << "      MaxID: " << qMaxIndex << "   MaxCharge: " << qMax << endl;
-    }  
-  //DrawHits();
+    } 
+  //_______________Drawing_______________________ 
+
+  DrawHits();
+
+  //_______________Drawing_______________________ 
   std::map<Int_t, MyHitList* >::iterator it;
   for ( it = ModuleHitMap.begin(); it != ModuleHitMap.end(); it++)
     {
@@ -331,8 +343,127 @@ void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax, ModuleP
 // --------------------------------------------------------------------
 void CbmTrdHitProducerCluster::DrawHits()
 {  
+  Bool_t mean = true;
   Int_t moduleId;
+  //_____________MC Points_______________________________
+  std::map<Int_t, MyHitList*> ModuleMCPointMap;
+  Int_t nPoints = fTrdPoints->GetEntriesFast();
+  CbmTrdPoint *pt = NULL;
+  for (Int_t iPoint = 0; iPoint < nPoints ; iPoint++ ) 
+    {
+      pt = (CbmTrdPoint*) fTrdPoints->At(iPoint);
+      moduleId = pt->GetDetectorID();
+      Double_t x_in   = pt->GetXIn();
+      Double_t x_out  = pt->GetXOut();
+      Double_t y_in   = pt->GetYIn();
+      Double_t y_out  = pt->GetYOut();
+      Double_t z_in   = pt->GetZIn();
+      Double_t z_out  = pt->GetZOut();
+      Double_t x_mean = (x_in + x_out)/2.;
+      Double_t y_mean = (y_in + y_out)/2.;
+      Double_t z_mean = (z_in + z_out)/2.;
 
+      const Double_t *global_point = gGeoManager->GetCurrentPoint();
+      Double_t local_point[3];
+      /*
+	global_meanC= {x_mean, y_mean , z_mean};//[cm]      
+	global_inC  = {x_in  , y_in   , z_in  };//[cm]      
+	global_outC = {x_out , y_out  , z_out };//[cm]
+      */
+            
+      Double_t global_inC[3];
+      Double_t global_outC[3];
+      Double_t global_meanC[3];
+      
+      Double_t local_inC[3];
+      Double_t local_outC[3];
+      Double_t local_meanC[3];
+
+      global_inC[0]  = x_in  ;//[cm]      
+      global_outC[0] = x_out ;//[cm]
+      global_meanC[0]= x_mean;//[cm]
+            
+      global_inC[1]  = y_in  ;//[cm]      
+      global_outC[1] = y_out ;//[cm]
+      global_meanC[1]= y_mean;//[cm]
+           
+      global_inC[2]  = z_in  ;//[cm]      
+      global_outC[2] = z_out ;//[cm]
+      global_meanC[2]= z_mean;//[cm] 
+
+      gGeoManager->MasterToLocal(global_point, local_point);
+      gGeoManager->MasterToLocal(global_meanC, local_meanC);
+      gGeoManager->MasterToLocal(global_inC, local_inC);
+      gGeoManager->MasterToLocal(global_outC, local_outC);
+      
+      for ( Int_t idim = 0; idim < 3; idim++)
+	{
+	  local_meanC[idim]  *= 10; //[cm]->[mm]
+	  local_inC[idim]    *= 10; //[cm]->[mm]
+	  local_outC[idim]   *= 10; //[cm]->[mm]
+
+	  global_meanC[idim] *= 10; //[cm]->[mm]
+	  global_inC[idim]   *= 10; //[cm]->[mm]
+	  global_outC[idim]  *= 10; //[cm]->[mm]
+	}
+      
+      //printf("g   (%f,%f)\nl   (%f,%f)\n\n",global_meanC[0],global_meanC[1],local_meanC[0],local_meanC[1]);
+      if (mean)
+	{
+	  MyHit* hitMean = new MyHit;
+	  fModuleInfo         = fDigiPar->GetModule(moduleId);
+	  hitMean -> nCol     = fModuleInfo->GetnCol();
+	  hitMean -> nRow     = fModuleInfo->GetnRow();
+	  hitMean -> xPos     = global_meanC[0];//local_meanC[0];
+	  hitMean -> yPos     = global_meanC[1];//local_meanC[1];
+	  hitMean -> charge   = 0;//digi->GetCharge();
+	  hitMean -> digiId   = iPoint;
+	  hitMean -> moduleId = moduleId;
+
+	  if (ModuleMCPointMap.find(moduleId) == ModuleMCPointMap.end())
+	    {
+	      ModuleMCPointMap[moduleId] = new MyHitList;
+	    }
+	  ModuleMCPointMap[moduleId]->push_back(hitMean);
+	}
+      else
+	{
+	  MyHit* hit = new MyHit;
+	  fModuleInfo     = fDigiPar->GetModule(moduleId);
+	  hit -> nCol     = fModuleInfo->GetnCol();
+	  hit -> nRow     = fModuleInfo->GetnRow();
+	  hit -> xPos     = local_inC[0];
+	  hit -> yPos     = local_inC[1];
+	  hit -> charge   = 0;//digi->GetCharge();
+	  hit -> digiId   = iPoint;
+	  hit -> moduleId = moduleId;
+	  /*
+	    if (ModuleMCPointMap.find(moduleId) == ModuleMCPointMap.end())
+	    {
+	    ModuleMCPointMap[moduleId] = new MyHitList;
+	    }
+	    ModuleMCPointMap[moduleId]->push_back(hitIn);
+	  
+	    MyHit* hitOut = new MyHit;
+	    fModuleInfo     = fDigiPar->GetModule(moduleId);
+	  
+	    hitOut -> nCol     = fModuleInfo->GetnCol();
+	    hitOut -> nRow     = fModuleInfo->GetnRow();
+	  */
+	  hit -> dxPos     = local_outC[0];
+	  hit -> dyPos     = local_outC[1];
+	  /*
+	    hitOut -> charge   = 0;//digi->GetCharge();
+	    hitOut -> digiId   = iPoint;
+	    hitOut -> moduleId = moduleId;
+	  */
+	  if (ModuleMCPointMap.find(moduleId) == ModuleMCPointMap.end())
+	    {
+	      ModuleMCPointMap[moduleId] = new MyHitList;
+	    }
+	  ModuleMCPointMap[moduleId]->push_back(hit);
+	}
+    }
   //_____________Digi_____________________________________
   std::map<Int_t, MyHitList*> ModuleDigiMap;
   Int_t nDigi = fDigis->GetEntries();
@@ -410,6 +541,7 @@ void CbmTrdHitProducerCluster::DrawHits()
   Char_t title[30];
   Char_t name[100];
   Char_t picPath[200];
+  
   printf("   Drawing Digis\n");    
   std::map<Int_t, MyHitList* >::iterator it;
   std::map<Int_t, MyHitList* >::iterator itHit;
@@ -417,6 +549,7 @@ void CbmTrdHitProducerCluster::DrawHits()
   Int_t counter = 0;
   Int_t done = 0;
   Int_t last = 0;
+  
   for ( it = ModuleDigiMap.begin(); it != ModuleDigiMap.end(); it++)
     {
       counter++;
@@ -428,7 +561,7 @@ void CbmTrdHitProducerCluster::DrawHits()
 	}
       sprintf(title,"Module_%d_1_Digi",(*it).first);
       sprintf(name,"%d Digis",Int_t((*it).second->size()));
-      sprintf(picPath,"Pics/%s_%s.png",title,name);
+      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/%s_%s.png",title,name);
       TCanvas* c = new TCanvas(title,name,900,900);
       c->Divide(1,1);
       c->cd(1);
@@ -436,6 +569,19 @@ void CbmTrdHitProducerCluster::DrawHits()
       Int_t mSizeX = fModuleInfo->GetnCol();
       Int_t mSizeY = fModuleInfo->GetnRow();
       TH2F* Digi = new TH2F (title,name,mSizeX,0,mSizeX,mSizeY,0,mSizeY);
+      Digi->SetXTitle("Pad column");
+      Digi->SetYTitle("Pad row");
+      Digi->SetZTitle("Charge [a.u.]");
+      Digi->SetStats(kFALSE);
+      Digi->GetXaxis()->SetLabelSize(0.02);
+      Digi->GetYaxis()->SetLabelSize(0.02);
+      Digi->GetZaxis()->SetLabelSize(0.02);
+      Digi->GetXaxis()->SetTitleSize(0.02);
+      Digi->GetXaxis()->SetTitleOffset(1.5);
+      Digi->GetYaxis()->SetTitleSize(0.02);
+      Digi->GetYaxis()->SetTitleOffset(2);
+      Digi->GetZaxis()->SetTitleSize(0.02);
+      Digi->GetZaxis()->SetTitleOffset(-2);
       Digi->SetContour(99);
       Int_t xPos;
       Int_t yPos;
@@ -452,7 +598,7 @@ void CbmTrdHitProducerCluster::DrawHits()
       TImage *Outimage = TImage::Create();
       Outimage->FromPad(c);
       Outimage->WriteImage(picPath);
-      sprintf(picPath,"Pics/%s_%s.eps",title,name);
+      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/eps/%s_%s.eps",title,name);
       c->cd(1)->Print(picPath);
       delete Digi;
       delete c;
@@ -474,7 +620,7 @@ void CbmTrdHitProducerCluster::DrawHits()
 	}
       sprintf(title,"Module_%d_2_Cluster",(*it).first);
       sprintf(name,"%d Cluster",Int_t((*it).second->size()));
-      sprintf(picPath,"Pics/%s_%s.png",title,name);
+      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/%s_%s.png",title,name);
       TCanvas* c = new TCanvas(title,name,900,900);
       c->Divide(1,1);
       c->cd(1);
@@ -482,6 +628,19 @@ void CbmTrdHitProducerCluster::DrawHits()
       Int_t mSizeX = fModuleInfo->GetnCol();
       Int_t mSizeY = fModuleInfo->GetnRow();
       TH2F* Cluster = new TH2F (title,name,mSizeX,0,mSizeX,mSizeY,0,mSizeY);
+      Cluster->SetXTitle("Pad column");
+      Cluster->SetYTitle("Pad row");
+      Cluster->SetZTitle("Cluster ID ");
+      Cluster->SetStats(kFALSE);
+      Cluster->GetXaxis()->SetLabelSize(0.02);
+      Cluster->GetYaxis()->SetLabelSize(0.02);
+      Cluster->GetZaxis()->SetLabelSize(0.02);
+      Cluster->GetXaxis()->SetTitleSize(0.02);
+      Cluster->GetXaxis()->SetTitleOffset(1.5);
+      Cluster->GetYaxis()->SetTitleSize(0.02);
+      Cluster->GetYaxis()->SetTitleOffset(2);
+      Cluster->GetZaxis()->SetTitleSize(0.02);
+      Cluster->GetZaxis()->SetTitleOffset(-2);
       Cluster->SetContour(99);
       Int_t xPos;
       Int_t yPos;
@@ -499,7 +658,7 @@ void CbmTrdHitProducerCluster::DrawHits()
       TImage *Outimage = TImage::Create();
       Outimage->FromPad(c);
       Outimage->WriteImage(picPath);
-      sprintf(picPath,"Pics/%s_%s.eps",title,name);
+      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/eps/%s_%s.eps",title,name);
       c->cd(1)->Print(picPath);
       delete Cluster;
       delete c;
@@ -521,7 +680,7 @@ void CbmTrdHitProducerCluster::DrawHits()
 	}
       sprintf(title,"Module_%d_3_Hit",(*it).first);
       sprintf(name,"%d Hits",Int_t((*it).second->size()));
-      sprintf(picPath,"Pics/%s_%s.png",title,name);
+      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/%s_%s.png",title,name);
       
       TCanvas* c = new TCanvas(title,name,900,900);
       c->Divide(1,1);
@@ -532,7 +691,20 @@ void CbmTrdHitProducerCluster::DrawHits()
       Float_t mSizeY  = (fModuleInfo->GetSizey()) * 2;
       Float_t mPosX   = fModuleInfo->GetX();
       Float_t mPosY   = fModuleInfo->GetY();
+      
       TProfile* Avatar = new TProfile (title,name,mSizeX*10,0,mSizeX,0,mSizeY);
+      Avatar->SetXTitle("x-Coordinate [cm]");
+      Avatar->SetYTitle("y-Coordinate [cm]");
+      Avatar->SetStats(kFALSE);
+      Avatar->GetXaxis()->SetLabelSize(0.02);
+      Avatar->GetYaxis()->SetLabelSize(0.02);
+      Avatar->GetZaxis()->SetLabelSize(0.02);
+      Avatar->GetXaxis()->SetTitleSize(0.02);
+      Avatar->GetXaxis()->SetTitleOffset(1.5);
+      Avatar->GetYaxis()->SetTitleSize(0.02);
+      Avatar->GetYaxis()->SetTitleOffset(2);
+      Avatar->GetZaxis()->SetTitleSize(0.02);
+      Avatar->GetZaxis()->SetTitleOffset(-2);
       Avatar->GetYaxis()->SetRangeUser(0,mSizeY);
       Avatar->SetMarkerStyle(4);
       Avatar->Draw();
@@ -546,6 +718,18 @@ void CbmTrdHitProducerCluster::DrawHits()
 	  sprintf(title,"%d Hit",i);
 	  sprintf(name,"%d Hits",i);
 	  TProfile* Hit = new TProfile (title,name,mSizeX*10,0,mSizeX,0,mSizeY);
+	  Hit->SetXTitle("x-Coordinate [cm]");
+	  Hit->SetYTitle("y-Coordinate [cm]");
+	  Hit->SetStats(kFALSE);
+	  Hit->GetXaxis()->SetLabelSize(0.02);
+	  Hit->GetYaxis()->SetLabelSize(0.02);
+	  Hit->GetZaxis()->SetLabelSize(0.02);
+	  Hit->GetXaxis()->SetTitleSize(0.02);
+	  Hit->GetXaxis()->SetTitleOffset(1.5);
+	  Hit->GetYaxis()->SetTitleSize(0.02);
+	  Hit->GetYaxis()->SetTitleOffset(2);
+	  Hit->GetZaxis()->SetTitleSize(0.02);
+	  Hit->GetZaxis()->SetTitleOffset(-2);
 	  xPos = ((*listIt) -> xPos)/10. - mPosX + 0.5 * mSizeX;
 	  yPos = ((*listIt) -> yPos)/10. - mPosY + 0.5 * mSizeY;
 	  //printf("  (%f,%f) \n  (%f,%f) \n\n",mSizeX,mSizeY,xPos,yPos);
@@ -561,12 +745,130 @@ void CbmTrdHitProducerCluster::DrawHits()
       Outimage->WriteImage(picPath);
       sprintf(title,"Module_%d_3_Hit",(*it).first);
       sprintf(name,"%d Hits",Int_t((*it).second->size()));
-      sprintf(picPath,"Pics/%s_%s.eps",title,name);
+      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/eps/%s_%s.eps",title,name);
       c->cd(1)->Print(picPath);
       delete Avatar;
       delete c;
     }
-  
+
+  //____________________Points___________________-
+  printf("   Drawing MC-Points\n");
+  nEntries = Int_t(ModuleMCPointMap.size());
+  counter = 0;
+  done = 0;
+  last = 0;
+  for ( it = ModuleMCPointMap.begin(); it != ModuleMCPointMap.end(); it++)
+    {
+      counter++;
+      done = Int_t((counter*10)/Float_t(nEntries));
+      if (done > last)
+	{
+	  cout << done*10 << endl;
+	  last = done;
+	}
+      sprintf(title,"Module_%d_0_Point",(*it).first);
+      if (mean)
+	{
+	  sprintf(name,"%d Points_mean",Int_t((*it).second->size()));
+	}
+      else
+	{
+	  sprintf(name,"%d Points_in_out",Int_t((*it).second->size()));
+	}
+      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/%s_%s.png",title,name);
+      
+      TCanvas* c = new TCanvas(title,name,900,900);
+      c->Divide(1,1);
+      c->cd(1);
+      
+      fModuleInfo     = fDigiPar->GetModule((*it).first);
+      Float_t mSizeX  = (fModuleInfo->GetSizex()) * 2;
+      Float_t mSizeY  = (fModuleInfo->GetSizey()) * 2;
+      Float_t mPosX   = fModuleInfo->GetX();
+      Float_t mPosY   = fModuleInfo->GetY();
+      TProfile* Avatar = new TProfile (title,name,mSizeX*10,0,mSizeX,0,mSizeY);
+      Avatar->SetXTitle("x-Coordinate [cm]");
+      Avatar->SetYTitle("y-Coordinate [cm]");
+      Avatar->SetStats(kFALSE);
+      Avatar->GetXaxis()->SetLabelSize(0.02);
+      Avatar->GetYaxis()->SetLabelSize(0.02);
+      Avatar->GetZaxis()->SetLabelSize(0.02);
+      Avatar->GetXaxis()->SetTitleSize(0.02);
+      Avatar->GetXaxis()->SetTitleOffset(1.5);
+      Avatar->GetYaxis()->SetTitleSize(0.02);
+      Avatar->GetYaxis()->SetTitleOffset(2);
+      Avatar->GetZaxis()->SetTitleSize(0.02);
+      Avatar->GetZaxis()->SetTitleOffset(-2);
+      Avatar->GetYaxis()->SetRangeUser(0,mSizeY);
+      Avatar->SetMarkerStyle(4);
+      Avatar->Draw();
+      Float_t xPos;
+      Float_t yPos;
+      Int_t i = 0;
+      MyHitList::iterator listIt;
+      for ( listIt = (*it).second->begin(); listIt != (*it).second->end(); listIt++)
+	{
+	  i++;
+	  sprintf(title,"%d Point",i);
+	  sprintf(name,"%d Points",i);
+	  TProfile* Hit = new TProfile (title,name,mSizeX*10,0,mSizeX,0,mSizeY);
+	  Hit->SetXTitle("x-Coordinate [cm]");
+	  Hit->SetYTitle("y-Coordinate [cm]");
+	  Hit->SetStats(kFALSE);
+	  Hit->GetXaxis()->SetLabelSize(0.02);
+	  Hit->GetYaxis()->SetLabelSize(0.02);
+	  Hit->GetZaxis()->SetLabelSize(0.02);
+	  Hit->GetXaxis()->SetTitleSize(0.02);
+	  Hit->GetXaxis()->SetTitleOffset(1.5);
+	  Hit->GetYaxis()->SetTitleSize(0.02);
+	  Hit->GetYaxis()->SetTitleOffset(2);
+	  Hit->GetZaxis()->SetTitleSize(0.02);
+	  Hit->GetZaxis()->SetTitleOffset(-2);
+	  xPos = ((*listIt) -> xPos)/10. - mPosX + 0.5 * mSizeX;
+	  yPos = ((*listIt) -> yPos)/10. - mPosY + 0.5 * mSizeY;
+	  //printf("  (%f,%f) \n  (%f,%f) \n  (%f,%f) \n\n",mSizeX,mSizeY,mPosX,mPosY,xPos,yPos);
+	  Hit->Fill(xPos,yPos);	   
+	  Hit->GetYaxis()->SetRangeUser(0,mSizeY);
+	  Hit->SetMarkerStyle(4);
+	  Hit->DrawCopy("P,same");
+	  if (!mean)
+	    {
+	      Float_t xPos2 = ((*listIt) -> dxPos)/10. - mPosX + 0.5 * mSizeX;
+	      Float_t yPos2 = ((*listIt) -> dyPos)/10. - mPosY + 0.5 * mSizeY;
+	      //printf("  (%f,%f) \n  (%f,%f) \n  (%f,%f) \n\n",mSizeX,mSizeY,mPosX,mPosY,xPos,yPos);
+	      Hit->Fill(xPos2,yPos2);	 
+	      Hit->GetYaxis()->SetRangeUser(0,mSizeY);
+	      Hit->SetMarkerStyle(4);
+	      Hit->DrawCopy("P,same");
+	      
+	      TLine* Track = new TLine(xPos, yPos, xPos2, xPos2);
+	      Track -> Draw("same");
+	      delete Track;
+	    }
+	  delete Hit;
+	}
+     
+      TImage *Outimage = TImage::Create();
+      Outimage->FromPad(c);
+      Outimage->WriteImage(picPath);
+      sprintf(title,"Module_%d_0_Point",(*it).first);
+      if (mean)
+	{
+	  sprintf(name,"%d Points_mean",Int_t((*it).second->size()));
+	}
+      else
+	{
+	  sprintf(name,"%d Points_in_out",Int_t((*it).second->size()));
+	}
+      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/eps/%s_%s.eps",title,name);
+      c->cd(1)->Print(picPath);
+      delete Avatar;
+      delete c;
+    }
+
+
+
+
 }
 // --------------------------------------------------------------------
 void CbmTrdHitProducerCluster::AddHit(Int_t iHit, Int_t detectorId, TVector3& pos, TVector3& dpos, Double_t dxy, Int_t planeId, Double_t eLossTR, Double_t eLossdEdx, Double_t eLoss)

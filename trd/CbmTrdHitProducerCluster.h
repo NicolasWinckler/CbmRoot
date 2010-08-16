@@ -89,7 +89,7 @@ class CbmTrdHitProducerCluster : public FairTask
   void DrawHits();
   void AddHit(Int_t iHit, Int_t detectorId, TVector3& pos, TVector3& dpos, Double_t dxy, Int_t planeId, Double_t eLossTR, Double_t eLossdEdx, Double_t eLoss);
 
-
+  TClonesArray*     fTrdPoints;   /** Input array of Trd MC points **/
   TClonesArray*     fDigis;       /** Input array of CbmTrdDigi **/
   TClonesArray*     fClusters;    /** Input array of CbmTrdCluster **/
   TClonesArray*     fClusterHits; /** Output array of CbmTrdHit **/

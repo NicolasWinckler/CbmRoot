@@ -20,7 +20,7 @@
 
 #include "FairTask.h"
 
-#include "TVector3.h"
+//#include "TVector3.h"
 
 #include <vector>
 
@@ -29,9 +29,10 @@ class CbmTrdDigiPar;
 class CbmTrdDigi;
 class CbmTrdDigiMatch;
 class CbmTrdModule;
+class TVector3;
 
-    class CbmTrdHitProducerDigi : public FairTask {
-public:
+class CbmTrdHitProducerDigi : public FairTask {
+ public:
 
     
 
@@ -62,6 +63,9 @@ public:
     void Register();
 
 private:
+
+    CbmTrdHitProducerDigi& operator=(const CbmTrdHitProducerDigi&);
+    CbmTrdHitProducerDigi(const CbmTrdHitProducerDigi&);
     
     TClonesArray *fTrdDigi;      //! TRD digi
     TClonesArray *fTrdDigiMatch; //! TRD digi match

@@ -3,7 +3,7 @@
 #include "CbmTrdRadiator.h"
 #include "CbmTrdPoint.h"
 #include "CbmTrdHit.h"
-#include "CbmTrdDetectorId.h"
+//#include "CbmTrdDetectorId.h"
 #include "CbmTrdGeoHandler.h"
 
 #include "CbmMCTrack.h"
@@ -17,11 +17,11 @@
 #include "TVector3.h"
 
 #include <iostream>
-#include <vector>
+//#include <vector>
 
 using std::cout;
 using std::endl;
-using std::vector;
+//using std::vector;
 
 // ---- Default constructor -------------------------------------------
 CbmTrdHitProducerSmearing::CbmTrdHitProducerSmearing()
@@ -311,7 +311,7 @@ void CbmTrdHitProducerSmearing::AddHit(Int_t trdId, TVector3 &posHit,
                                        TVector3 &posHitErr,
 			               Int_t ref, Int_t Plane, 
 			               Double_t ELoss, Double_t ELossTR,
-			               Double_t ELossdEdX)
+			               Double_t ELossdEdX) 
 {
   new((*fHitCollection)[fNHits]) CbmTrdHit(trdId, posHit, posHitErr, 0., 
                                            ref, Plane, ELossTR, ELossdEdX, 
@@ -352,7 +352,7 @@ void CbmTrdHitProducerSmearing::SetSigmaY(Double_t s1[], Double_t s2[], Double_t
 // --------------------------------------------------------------------
 
 // ---- GetSigmaX -----------------------------------------------------
-Double_t CbmTrdHitProducerSmearing::GetSigmaX (Int_t stack)
+Double_t CbmTrdHitProducerSmearing::GetSigmaX (Int_t stack) const
 {
 	if  (stack == 1)    	return fSigmaX[0];
 	else if (stack == 2)    return fSigmaX[1];
@@ -362,7 +362,7 @@ Double_t CbmTrdHitProducerSmearing::GetSigmaX (Int_t stack)
 // --------------------------------------------------------------------
 
 // ---- GetSigmaY -----------------------------------------------------
-Double_t CbmTrdHitProducerSmearing::GetSigmaY (Double_t teta, Int_t stack )
+Double_t CbmTrdHitProducerSmearing::GetSigmaY (Double_t teta, Int_t stack ) const
 {
     if (teta <= 50)	                 return fSigmaY[stack - 1][0];
     else if(teta > 50 && teta <= 100)    return fSigmaY[stack - 1][1];

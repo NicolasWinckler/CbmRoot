@@ -32,11 +32,12 @@
 
 #include "FairTask.h"
 
-#include "TVector3.h"
+//#include "TVector3.h"
 
 #include <vector>
 
 class TClonesArray;
+class TVector3;
 class CbmTrdHit;
 class CbmTrdRadiator;
 
@@ -85,10 +86,10 @@ class CbmTrdHitProducerSmearing : public FairTask {
     void SmearingX(Double_t dx) {fDx = dx;}
     void SmearingY(Double_t dy) {fDy = dy;}
 
-    Double_t GetSigmaX (Int_t stack);
-    Double_t GetSigmaY (Double_t teta, Int_t stack );
+    Double_t GetSigmaX (Int_t stack) const;
+    Double_t GetSigmaY (Double_t teta, Int_t stack ) const;
 
-    Float_t  GetEfficency () { return fEfficency;}
+    Float_t  GetEfficency() const { return fEfficency;}
 
 private:
 

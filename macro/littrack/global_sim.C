@@ -249,7 +249,7 @@ void global_sim(Int_t nEvents = 500)
 	// ------------------------------------------------------------------------
 
 	// ------------------------------------------------------------------------
-	CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+	FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
 	if (urqmd == "yes") {
 		FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);

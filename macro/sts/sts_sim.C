@@ -144,7 +144,7 @@ void sts_sim(Int_t nEvents = 1)
   
   
   // -----   Create PrimaryGenerator   --------------------------------------
-  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
   primGen->AddGenerator(urqmdGen);
   run->SetGenerator(primGen);

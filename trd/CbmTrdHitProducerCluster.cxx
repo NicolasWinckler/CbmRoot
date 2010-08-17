@@ -704,10 +704,11 @@ void CbmTrdHitProducerCluster::DrawHits()
 	  Float_t mPosX   = fModuleInfo->GetX();
 	  Float_t mPosY   = fModuleInfo->GetY();
       
-	  TProfile* Avatar = new TProfile (title,name,mSizeX*10,0,mSizeX,0,mSizeY);
+	  TProfile* Avatar = new TProfile (title,name,Int_t(mSizeX*10),0,Int_t(mSizeX),0,Int_t(mSizeY));
 	  Avatar->SetXTitle("x-Coordinate [cm]");
 	  Avatar->SetYTitle("y-Coordinate [cm]");
 	  Avatar->SetStats(kFALSE);
+
 	  Avatar->GetXaxis()->SetLabelSize(0.02);
 	  Avatar->GetYaxis()->SetLabelSize(0.02);
 	  Avatar->GetZaxis()->SetLabelSize(0.02);
@@ -729,7 +730,7 @@ void CbmTrdHitProducerCluster::DrawHits()
 	      i++;
 	      sprintf(title,"%d Hit",i);
 	      sprintf(name,"%d Hits",i);
-	      TProfile* Hit = new TProfile (title,name,mSizeX*10,0,mSizeX,0,mSizeY);
+	      TProfile* Hit = new TProfile (title,name,Int_t(mSizeX*10),0,Int_t(mSizeX),0,Int_t(mSizeY));
 	      Hit->SetXTitle("x-Coordinate [cm]");
 	      Hit->SetYTitle("y-Coordinate [cm]");
 	      Hit->SetStats(kFALSE);
@@ -799,7 +800,7 @@ void CbmTrdHitProducerCluster::DrawHits()
 	  Float_t mSizeY  = (fModuleInfo->GetSizey()) * 2;
 	  Float_t mPosX   = fModuleInfo->GetX();
 	  Float_t mPosY   = fModuleInfo->GetY();
-	  TProfile* Avatar = new TProfile (title,name,mSizeX*10,0,mSizeX,0,mSizeY);
+	  TProfile* Avatar = new TProfile (title,name,Int_t(mSizeX*10),0,Int_t(mSizeX),0,Int_t(mSizeY));
 	  Avatar->SetXTitle("x-Coordinate [cm]");
 	  Avatar->SetYTitle("y-Coordinate [cm]");
 	  Avatar->SetStats(kFALSE);
@@ -824,7 +825,7 @@ void CbmTrdHitProducerCluster::DrawHits()
 	      i++;
 	      sprintf(title,"%d Point",i);
 	      sprintf(name,"%d Points",i);
-	      TProfile* Hit = new TProfile (title,name,mSizeX*10,0,mSizeX,0,mSizeY);
+	      TProfile* Hit = new TProfile (title,name,Int_t(mSizeX*10),0,Int_t(mSizeX),0,Int_t(mSizeY));
 	      Hit->SetXTitle("x-Coordinate [cm]");
 	      Hit->SetYTitle("y-Coordinate [cm]");
 	      Hit->SetStats(kFALSE);

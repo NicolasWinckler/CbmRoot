@@ -145,7 +145,7 @@ InitStatus CbmTrdClusterizer::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterizer::Exec(Option_t * option)
 {
- cout << "================CbmTrdClusterizer=====================" << endl;
+  cout << "================CbmTrdClusterizer=====================" << endl;
   //printf(" HALLO\n");
   Digicounter = 0;
   //printf("Exec...\n");
@@ -342,9 +342,9 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   //cout << " FillMathiesonVector" << endl;
   FillMathiesonVector();
   /*
- for (Int_t r = 0; r < endOfMathiesonArray * Accuracy; r++) // values to be checked !!!!!
+    for (Int_t r = 0; r < endOfMathiesonArray * Accuracy; r++) // values to be checked !!!!!
     {
-      cout << fMathieson[r] << endl;
+    cout << fMathieson[r] << endl;
     }
   */
   Int_t nEntries = fTrdPoints->GetEntriesFast();
@@ -458,6 +458,21 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       fModuleID = pt->GetDetectorID();
 
       GetModuleInformationFromDigiPar(Sector, fModuleID);
+
+      if (fLayer % 2 == 0)
+	{
+	  Double_t temp = local_meanC[0];
+	  local_meanC[0] = - local_meanC[1];
+	  local_meanC[1] = temp;
+
+	  temp = local_inC[0];
+	  local_inC[0] = - local_inC[1];
+	  local_inC[1] = temp;
+
+	  temp = local_outC[0];
+	  local_outC[0] = - local_outC[1];
+	  local_outC[1] = temp;
+	}
 
       if (fLayerZ[(fStation-1)* 4  + (fLayer-1)] < 2)
 	{
@@ -973,6 +988,7 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
 	      fnRow = fnCol;
 	      fnCol = temp;
 	    }
+	  //printf(" L%d S%d\n  (%f,%f)\n  (%d,%d)\n\n", fStation,fLayer,fpadsizex,fpadsizey,fnCol,fnRow);
 	  sectorsize[iSector] =  fsectorsizey;
 	  sectorrows[iSector] =  int(fsectorsizey / fpadsizey);
 	}
@@ -988,16 +1004,19 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
 	      fSector = i;
 	    }
 	}
+      /*
       fpadsizex    = (fModuleInfo->GetPadSizex(fSector))    * 10.; // [mm]
       fpadsizey    = (fModuleInfo->GetPadSizey(fSector))    * 10.;
+      */
       fsizex       = (fModuleInfo->GetSizex())              * 10. * 2;
       fsizey       = (fModuleInfo->GetSizey())              * 10. * 2;
       if (fLayer%2 == 0) //un-rotate
 	{
+	  /*
 	  temp      = fpadsizex;
 	  fpadsizex = fpadsizey;
 	  fpadsizey = temp;
-
+	  */
 	  temp   = fsizex;
 	  fsizex = fsizey;
 	  fsizey = temp;
@@ -1266,7 +1285,7 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
 	    {
 	      
 	      Digicounter++;
-	      AddDigi(/*j*/Digicounter, iCol, iRow, double(PadChargeModule[iRow * nCol + iCol]));
+	      AddDigi(/*j*/Digicounter, iCol, iRow, nCol, nRow, double(PadChargeModule[iRow * nCol + iCol]));
 	      if (nPathSlice > DrawTH)
 		{
 		  if(TEST)
@@ -1771,7 +1790,7 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
   // ------AddDigi--------------------------------------------------------------
 
   //void CbmTrdClusterizer::AddDigi() 
-void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Double_t iCharge) 
+void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Int_t nCol, Int_t nRow, Double_t iCharge) 
 {
 
   // Add digi for pixel(x,y) in module to map for intermediate storage
@@ -1793,8 +1812,8 @@ void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Dou
       a.second=iCol;
       */
       temp = iCol;
-      iCol = iRow;
-      iRow = temp;
+      iCol = nRow - (nRow - (iRow + 1) + 1);
+      iRow = nCol - (temp + 1);
     }
   else
     {
@@ -1804,7 +1823,7 @@ void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Dou
       a.second=iRow;
       */
     }
-  a.first=iCol;
+  a.first =iCol;
   a.second=iRow;
   pair<Int_t, pair<Int_t,Int_t> > b(fModuleID, a);
   fDigiMapIt = fDigiMap.find(b);

@@ -63,7 +63,7 @@ class CbmTrdClusterizer : public FairTask {
   void GetModuleInformationFromDigiPar(Bool_t Sector, Int_t VolumeID);
   void GetModuleInformation();
 
-  void AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Double_t iCharge);
+  void AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Int_t nCol, Int_t nRow, Double_t iCharge);
 
   void CalculatePixel(Bool_t Sector);
 

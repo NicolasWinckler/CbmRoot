@@ -348,6 +348,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
     }
   */
   Int_t nEntries = fTrdPoints->GetEntriesFast();
+  cout << " Found " << nEntries << " MC-Points in Collection of TRD" << endl;
   //nEntries = nEntries * 1 / 100;
   if (TEST)
     {

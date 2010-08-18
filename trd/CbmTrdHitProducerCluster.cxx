@@ -346,14 +346,14 @@ void CbmTrdHitProducerCluster::DrawHits()
 {  
   Bool_t mean = false;
   //Bool_t mean = true;
-  //Bool_t drawMCPoints = false;
-  Bool_t drawMCPoints = true;
-  //Bool_t drawDigis = false;
-  Bool_t drawDigis = true;
-  //Bool_t drawClusters = false;
-  Bool_t drawClusters = true;
-  //Bool_t drawHits = false;
-  Bool_t drawHits = true;
+  Bool_t drawMCPoints = false;
+  //Bool_t drawMCPoints = true;
+  Bool_t drawDigis = false;
+  //Bool_t drawDigis = true;
+  Bool_t drawClusters = false;
+  //Bool_t drawClusters = true;
+  Bool_t drawHits = false;
+  //Bool_t drawHits = true;
   Int_t cs = 800;
   Int_t moduleId;
   //_____________MC Points_______________________________

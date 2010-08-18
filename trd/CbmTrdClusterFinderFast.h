@@ -102,7 +102,9 @@ class CbmTrdClusterFinderFast : public FairTask
   
   CbmTrdDetectorId fTrdId; //!
 
-  static const Float_t minimumChargeTH = 5e-03;
+  //static const Float_t minimumChargeTH = 5e-03;
+
+  Int_t ClusterSum;
 
   ClassDef(CbmTrdClusterFinderFast,1);
 };

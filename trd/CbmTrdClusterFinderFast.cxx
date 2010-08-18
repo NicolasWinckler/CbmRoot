@@ -12,6 +12,8 @@
 #include "TClonesArray.h"
 #include "TArray.h"
 #include "TH2F.h"
+#include "TH1F.h"
+#include "TProfile.h"
 #include "TCanvas.h"
 #include "TImage.h"
 
@@ -104,80 +106,147 @@ InitStatus CbmTrdClusterFinderFast::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterFinderFast::Exec(Option_t * option)
 {
-  /*
-   * Digis are sorted according to the moduleId. A combiId is calculted based 
-   * on the rowId and the colId to have a neighbouring criterion for digis within 
-   * the same pad row. The digis of each module are sorted according to this combiId.
-   * All sorted digis of one pad row are 'clustered' into rowCluster. For a new row
-   * the rowClusters are compared to the rowClusters of the last row. If an overlap 
-   * is found they are marked to be parents(last row) and childrens(activ row) 
-   * (mergeRowCluster()). After this, the finale clusters are created. Therefor 
-   * walkCluster() walks along the list of marked parents and markes every visited 
-   * rowCluster to avoid multiple usage of one rowCluster. drawCluster() can be used to
-   * get a visual output.
-   */
-  cout << "================CbmTrdClusterFinderFast===============" << endl;
-  Int_t nentries = fDigis->GetEntries();
-  Int_t digiCounter = 0;
-  cout << " Found " << nentries << " Digis in Collection" << endl;
-  std::map<Int_t, MyDigiList*> modules; //map of <moduleId, List of struct 'MyDigi' pointer>
+  Bool_t optimization = false;
+  Float_t minimumChargeTH = 5e-03;
+  Float_t mChargeTH[48] = { 0.004,    0, 
+			    1e-05, 2e-05, 3e-05, 4e-05, 5e-05, 6e-05, 7e-05, 8e-05, 9e-05,
+			    1e-04, 2e-04, 3e-04, 4e-04, 5e-04, 6e-04, 7e-04, 8e-04, 9e-04,
+			    1e-03, 2e-03, 3e-03, 4e-03, 5e-03, 6e-03, 7e-03, 8e-03, 9e-03,
+			    1e-02, 2e-02, 3e-02, 4e-02, 5e-02, 6e-02, 7e-02, 8e-02, 9e-02,
+			    1e-01, 2e-01, 3e-01, 4e-01, 5e-01, 6e-01, 7e-01, 8e-01, 9e-01,
+			    1e-00  };
+  Int_t nChargeTH = 1;
 
-  for (Int_t iDigi=0; iDigi < nentries; iDigi++ ) {
-    CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
-    if (digi->GetCharge() > minimumChargeTH)
-      {
-	digiCounter++;
-	MyDigi *d = new MyDigi;
-	Int_t moduleId = digi->GetDetId();
-	fModuleInfo = fDigiPar->GetModule(moduleId);
-	d->digiId = iDigi;
-	d->rowId = digi->GetRow();
-	d->colId = digi->GetCol();
-	d->charge = digi->GetCharge();
-	/*
-	 *unrotate rotated modules in x- and y-direction (row <-> col)
-	*/
-	Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId); 
-	Int_t Station  = detInfo[1];
-	Int_t Layer    = detInfo[2]; 
-	/*
-	 *'rotated' modules are backrotated to get consistent notation of Row and Col
-	*/
-	if (Layer%2 == 0) {
-	  d->combiId = d->rowId * (fModuleInfo->GetnRow() + 1) + d->colId;
-	}
-	else {
-	  d->combiId = d->rowId * (fModuleInfo->GetnCol() + 1) + d->colId;
-	}
-	if (modules.find(moduleId) == modules.end()) {
-	  modules[moduleId] = new MyDigiList;
-	} 
-	modules[moduleId]->push_back(d);
-      }
-  }
-  cout << " Used  " << digiCounter << " Digis after Minimum Charge Cut (" << minimumChargeTH << ")" << endl;
-  std::map<Int_t, ClusterList*> fModClusterMap; //map of <moduleId, pointer of Vector of List of struct 'MyDigi' >
-  for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin(); it != modules.end(); ++it) {
-    fModClusterMap[it->first] = clusterModule(it->second);
-    
-    //drawCluster(it->first, fModClusterMap[it->first]);
-  }
-  addCluster(fModClusterMap);
-  /*
-   * clean up
-   */
-  for (std::map<Int_t, ClusterList*>::iterator it = fModClusterMap.begin(); 
-       it != fModClusterMap.end(); ++it) {
-    for (ClusterList::iterator clusterIt = it->second->begin(); 
-	 clusterIt != it->second->end(); ++clusterIt) {
-      for (MyDigiList::iterator digisIt = (*clusterIt)->begin(); 
-	   digisIt != (*clusterIt)->end(); ++digisIt) {
-	delete *digisIt;
-      }
-      delete *clusterIt;
+  TH1F* DigiChargeSpectrum = NULL;
+  TProfile* OptimalTH = NULL;
+
+  if (optimization)
+    {
+      nChargeTH = 48;
+      OptimalTH = new TProfile("OptimalTH","Optimization of the minimumChargeTH",Int_t(1/mChargeTH[2]),0,mChargeTH[nChargeTH-1]);
+      OptimalTH->SetXTitle("minimumChargeTH value");
+      OptimalTH->SetYTitle("Number of found clusters");
+      OptimalTH->SetStats(kFALSE);
+      OptimalTH->GetXaxis()->SetLabelSize(0.02);
+      OptimalTH->GetYaxis()->SetLabelSize(0.02);
+      OptimalTH->GetXaxis()->SetTitleSize(0.02);
+      OptimalTH->GetXaxis()->SetTitleOffset(1.5);
+      OptimalTH->GetYaxis()->SetTitleSize(0.02);
+      OptimalTH->GetYaxis()->SetTitleOffset(2);
+      OptimalTH->SetMarkerStyle(4);
+      DigiChargeSpectrum = new TH1F("DigiChargeSpectrum","DigiChargeSpectrum",100000,0,1);
+      DigiChargeSpectrum->SetXTitle("Digi charge [a.u.]");
+      DigiChargeSpectrum->SetYTitle("Number of Digis");
+      DigiChargeSpectrum->SetStats(kFALSE);
+      DigiChargeSpectrum->GetXaxis()->SetLabelSize(0.02);
+      DigiChargeSpectrum->GetYaxis()->SetLabelSize(0.02);
+      DigiChargeSpectrum->GetXaxis()->SetTitleSize(0.02);
+      DigiChargeSpectrum->GetXaxis()->SetTitleOffset(1.5);
+      DigiChargeSpectrum->GetYaxis()->SetTitleSize(0.02);
+      DigiChargeSpectrum->GetYaxis()->SetTitleOffset(2);
+      //DigiChargeSpectrum->SetMarkerStyle(4);
     }
-    delete it->second;
-  }
+  for (Int_t iChargeTH = 0; iChargeTH < nChargeTH; iChargeTH++)
+    {
+      minimumChargeTH = mChargeTH[iChargeTH];
+
+      /*
+       * Digis are sorted according to the moduleId. A combiId is calculted based 
+       * on the rowId and the colId to have a neighbouring criterion for digis within 
+       * the same pad row. The digis of each module are sorted according to this combiId.
+       * All sorted digis of one pad row are 'clustered' into rowCluster. For a new row
+       * the rowClusters are compared to the rowClusters of the last row. If an overlap 
+       * is found they are marked to be parents(last row) and childrens(activ row) 
+       * (mergeRowCluster()). After this, the finale clusters are created. Therefor 
+       * walkCluster() walks along the list of marked parents and markes every visited 
+       * rowCluster to avoid multiple usage of one rowCluster. drawCluster() can be used to
+       * get a visual output.
+       */
+      cout << "================CbmTrdClusterFinderFast===============" << endl;
+      Int_t nentries = fDigis->GetEntries();
+      Int_t digiCounter = 0;
+      cout << " Found " << nentries << " Digis in Collection" << endl;
+      std::map<Int_t, MyDigiList*> modules; //map of <moduleId, List of struct 'MyDigi' pointer>
+
+      for (Int_t iDigi=0; iDigi < nentries; iDigi++ ) {
+	CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
+	if (digi->GetCharge() > minimumChargeTH)
+	  {
+	    digiCounter++;
+	    MyDigi *d = new MyDigi;
+	    Int_t moduleId = digi->GetDetId();
+	    fModuleInfo = fDigiPar->GetModule(moduleId);
+	    d->digiId = iDigi;
+	    d->rowId = digi->GetRow();
+	    d->colId = digi->GetCol();
+	    d->charge = digi->GetCharge();
+
+	    if (optimization && minimumChargeTH == 0)
+	      {
+		DigiChargeSpectrum->Fill(digi->GetCharge());
+	      }
+	    /*
+	     *unrotate rotated modules in x- and y-direction (row <-> col)
+	     */
+	    Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId); 
+	    Int_t Station  = detInfo[1];
+	    Int_t Layer    = detInfo[2]; 
+	    /*
+	     *'rotated' modules are backrotated to get consistent notation of Row and Col
+	     */
+	    if (Layer%2 == 0) {
+	      d->combiId = d->rowId * (fModuleInfo->GetnRow() + 1) + d->colId;
+	    }
+	    else {
+	      d->combiId = d->rowId * (fModuleInfo->GetnCol() + 1) + d->colId;
+	    }
+	    if (modules.find(moduleId) == modules.end()) {
+	      modules[moduleId] = new MyDigiList;
+	    } 
+	    modules[moduleId]->push_back(d);
+	  }
+      }
+      cout << " Used  " << digiCounter << " Digis after Minimum Charge Cut (" << minimumChargeTH << ")" << endl;
+      std::map<Int_t, ClusterList*> fModClusterMap; //map of <moduleId, pointer of Vector of List of struct 'MyDigi' >
+      for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin(); it != modules.end(); ++it) {
+	fModClusterMap[it->first] = clusterModule(it->second);
+    
+	//drawCluster(it->first, fModClusterMap[it->first]);
+      }
+      addCluster(fModClusterMap);
+      /*
+       * clean up
+       */
+      for (std::map<Int_t, ClusterList*>::iterator it = fModClusterMap.begin(); 
+	   it != fModClusterMap.end(); ++it) {
+	for (ClusterList::iterator clusterIt = it->second->begin(); 
+	     clusterIt != it->second->end(); ++clusterIt) {
+	  for (MyDigiList::iterator digisIt = (*clusterIt)->begin(); 
+	       digisIt != (*clusterIt)->end(); ++digisIt) {
+	    delete *digisIt;
+	  }
+	  delete *clusterIt;
+	}
+	delete it->second;
+      }
+      if (optimization)
+	{
+	  OptimalTH->Fill(mChargeTH[iChargeTH],ClusterSum);
+	}
+    } //for (iChargeTH)
+  if (optimization)
+    {
+      TCanvas* c = new TCanvas ("c","c",1600,800);
+      c->Divide(2,1);
+      c->cd(1)->SetLogx();
+      OptimalTH->DrawCopy();
+      c->cd(2)->SetLogx();
+      c->cd(2)->SetLogy();
+      DigiChargeSpectrum->DrawCopy();
+      delete OptimalTH;
+      delete DigiChargeSpectrum;
+    }
+
 }
 
 //----------------------------------------------------------------------
@@ -383,7 +452,7 @@ void CbmTrdClusterFinderFast::drawCluster(Int_t moduleId, ClusterList *clusterLi
 //--------------------------------------------------------------------
 void CbmTrdClusterFinderFast::addCluster(std::map<Int_t, ClusterList*> fModClusterMap)
 {
-  Int_t ClusterSum = 0;
+  ClusterSum = 0;
   Float_t Charge;
   Float_t qMax;
   for (std::map<Int_t, ClusterList*>::iterator iMod = fModClusterMap.begin(); iMod != fModClusterMap.end(); ++iMod) 

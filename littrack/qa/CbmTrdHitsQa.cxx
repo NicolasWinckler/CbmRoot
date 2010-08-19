@@ -154,8 +154,8 @@ void CbmTrdHitsQa::ProcessHits()
 		fhDy[plane]->Fill(hit->GetDy());
 		fhXY[plane]->Fill(hit->GetX(), hit->GetY());
 
-		Double_t resX = hit->GetX() - point->GetX();
-		Double_t resY = hit->GetY() - point->GetY();
+		Double_t resX = hit->GetX() - point->GetXOut();
+		Double_t resY = hit->GetY() - point->GetYOut();
 		fhResX[plane]->Fill(resX);
 		fhResY[plane]->Fill(resY);
 

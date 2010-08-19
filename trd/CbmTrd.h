@@ -18,14 +18,15 @@
 
 #include "FairDetector.h"
 
-#include "CbmTrdDetectorId.h"
-
 #include "TLorentzVector.h"
 #include "TVector3.h"
 
-class TClonesArray;
 class CbmTrdPoint; 
+class CbmTrdGeoHandler;
+
 class FairVolume;
+
+class TClonesArray;
 
 
 
@@ -123,35 +124,18 @@ class CbmTrd : public FairDetector
   Double32_t     fTime;              //! time
   Double32_t     fLength;            //! length
   Double32_t     fELoss;             //! energy loss
-  Int_t 	 fVolid1,fVolid2, fVolid3, fVolid4, fVolid5, fVolid6;  //! volume id
-  Int_t 	 fCopyNo;            //! copy number
   Int_t          fPosIndex;          //! position index
+  Int_t          fGeoVersion;        //! Used geometry version
+
   TClonesArray*  fTrdCollection;     //! Hit collection
+  CbmTrdGeoHandler *fGeoHandler;      //! Interface to gMC and gGeoManager
 
-  Int_t          fSimple;            //! Switch between different geometry versions
 
-  Int_t Trd1_ID;                     //! MC ID of first TRD Station	     
-// no layers in Jul10  
-//  Int_t Trd1_Layer_ID;             //! MC ID of first layer of first TRD   
-  Int_t Trd1_Module1_ID;             //! MC ID of small module of first TRD  
-  Int_t Trd1_Module2_ID;             //! MC ID of middle module of first TRD 
-  Int_t Trd1_Module3_ID;             //! MC ID of big module of first TRD    
+  std::vector<Int_t> fStationId;     //! MC IDs of TRD stations
+  std::vector< std::vector<Int_t> > fModuleId;//! MC IDs of gas volumes
+                                              //! in all stations
 
-  Int_t Trd2_ID;                     //! MC ID of second TRD Station	     
-// no layers in Jul10  
-//  Int_t Trd2_Layer_ID;	     //! MC ID of first layer of second TRD   
-  Int_t Trd2_Module1_ID;	     //! MC ID of small module of second TRD  
-  Int_t Trd2_Module2_ID;	     //! MC ID of middle module of second TRD 
-  Int_t Trd2_Module3_ID;	     //! MC ID of big module of second TRD    
 
-  Int_t Trd3_ID;                     //! MC ID of third TRD Station	     
-// no layers in Jul10  
-//  Int_t Trd3_Layer_ID;	     //! MC ID of first layer of third TRD   
-  Int_t Trd3_Module1_ID;	     //! MC ID of small module of third TRD  
-  Int_t Trd3_Module2_ID;	     //! MC ID of middle module of third TRD 
-  Int_t Trd3_Module3_ID;	     //! MC ID of big module of third TRD    
-
-  CbmTrdDetectorId fTrdId;           //! TRD detector ID
   /** Private method AddHit
    **
    ** Adds a CbmTrdPoint to the HitCollection
@@ -168,7 +152,10 @@ class CbmTrd : public FairDetector
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts();
 
-  ClassDef(CbmTrd,5)
+  CbmTrd(const CbmTrd&);
+  CbmTrd operator=(const CbmTrd&);
+
+  ClassDef(CbmTrd,6)
 
 };
 

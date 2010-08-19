@@ -3,23 +3,24 @@
 #include "CbmGeoTrdPar.h"
 #include "CbmTrdPoint.h"
 #include "CbmGeoTrd.h"
+#include "CbmTrdGeoHandler.h"
+#include "CbmStack.h"
 
-#include "CbmDetectorList.h"
+//#include "CbmDetectorList.h"
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
 #include "FairRootManager.h"
-#include "CbmStack.h"
 #include "FairRuntimeDb.h"
 #include "FairRun.h"
 #include "FairVolume.h"
 
 #include "TObjArray.h"
 #include "TClonesArray.h"
-#include "TParticle.h"
+//#include "TParticle.h"
 #include "TVirtualMC.h"
 #include "TGeoManager.h"
-#include "TGeoMaterial.h"
+//#include "TGeoMaterial.h"
 #include "TMath.h"
 
 #include <iostream>
@@ -27,24 +28,47 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-CbmTrd::CbmTrd() : FairDetector("TRD", kTRUE, kTRD) {
-  fTrdCollection = new TClonesArray("CbmTrdPoint");
-  fPosIndex = 0;
-
-  fSimple = 0;
-
+CbmTrd::CbmTrd() 
+  : FairDetector("TRD", kTRUE, kTRD),
+    fTrackID(0),
+    fVolumeID(0),
+    fPosIn(),
+    fMomIn(),
+    fPosOut(),
+    fMomOut(),
+    fTime(0),
+    fLength(0),
+    fELoss(0),
+    fPosIndex(0),
+    fGeoVersion(0),
+    fTrdCollection(new TClonesArray("CbmTrdPoint")),
+    fGeoHandler(),
+    fStationId(),
+    fModuleId()
+{
   fVerboseLevel = 1;
 }
 
 
 // -----   Standard constructor   ------------------------------------------
 CbmTrd::CbmTrd(const char* name, Bool_t active)
-  : FairDetector(name, active, kTRD) {
-  fTrdCollection = new TClonesArray("CbmTrdPoint");
-  fPosIndex = 0;
-
-  fSimple = 0;
-
+  : FairDetector(name, active, kTRD),
+    fTrackID(0),
+    fVolumeID(0),
+    fPosIn(),
+    fMomIn(),
+    fPosOut(),
+    fMomOut(),
+    fTime(0),
+    fLength(0),
+    fELoss(0),
+    fPosIndex(0),
+    fGeoVersion(0),
+    fTrdCollection(new TClonesArray("CbmTrdPoint")),
+    fGeoHandler(),
+    fStationId(),
+    fModuleId()
+{
   fVerboseLevel = 1;
 }
 
@@ -58,104 +82,75 @@ CbmTrd::~CbmTrd() {
    fTrdCollection->Delete();
    delete fTrdCollection;
  }
+ if (fGeoHandler) {
+   delete fGeoHandler;
+ }
 }
 // -------------------------------------------------------------------------
 void CbmTrd::Initialize()
 {
-	FairDetector::Initialize();
- 	FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-	CbmGeoTrdPar* par=(CbmGeoTrdPar*)(rtdb->getContainer("CbmGeoTrdPar"));
-	TObjArray *SensNodes = par->GetGeoSensitiveNodes();
+  FairDetector::Initialize();
+  
+  
+  // Extract geometry information from gGeoManager instead of
+  // CbmGeoTrdPar. All such geometry handling is done now in the
+  //separate utility class CbmTrdGeoHandler
 
-        FairGeoNode *fm1= (FairGeoNode *) SensNodes->FindObject("trd1gas#1");
-        FairGeoNode *fm2= (FairGeoNode *) SensNodes->FindObject("trd1mod1gas");
-                                                                
-        if (fm1) {
-          fSimple = 1;
-	  cout<<" -I: CbmTrd: Simple TRD geometry ('PGON')" <<endl;
-	}
-        else if (fm2) {
-	  cout<<" -I: CbmTrd: Segmented TRD geometry "<<endl;
-	}
-        else {
-          cout<<"-E-: CbmTrd: geometry not known" <<endl;
-          Fatal("","");
-	}
- 
-
-        if ( 1 == fSimple ) {
-
-  	  Int_t nModes = SensNodes->GetEntriesFast();
-	  FairGeoNode* node = NULL;
-   	  Int_t mcID =0;
-	  TString name;
-
-	  for(Int_t i=0; i<nModes; i++){
-  	    node = (FairGeoNode*) SensNodes->At(i);
-	    mcID = node->getMCid();
-	    name = node->getName();
-
-	    FairGeoVolume *aVol1 = dynamic_cast<FairGeoVolume*> (SensNodes->FindObject("trd1gas#1") );
-	    FairGeoVolume *aVol2 = dynamic_cast<FairGeoVolume*> (SensNodes->FindObject("trd2gas#1") );
-	    FairGeoVolume *aVol3 = dynamic_cast<FairGeoVolume*> (SensNodes->FindObject("trd3gas#1") );
-	    FairGeoVolume *aVol4 = dynamic_cast<FairGeoVolume*> (SensNodes->FindObject("trd4gas#1") );
-	    FairGeoVolume *aVol5 = dynamic_cast<FairGeoVolume*> (SensNodes->FindObject("trd5gas#1") );
-	    FairGeoVolume *aVol6 = dynamic_cast<FairGeoVolume*> (SensNodes->FindObject("trd6gas#1") );
-
-	    if(aVol1!=0) fVolid1=aVol1->getMCid();  // store volume id of first station in fVolid1 for later comparison
-	    if(aVol2!=0) fVolid2=aVol2->getMCid();
-	    if(aVol3!=0) fVolid3=aVol3->getMCid();
-	    if(aVol4!=0) fVolid4=aVol4->getMCid();
-	    if(aVol5!=0) fVolid5=aVol5->getMCid();
-	    if(aVol6!=0) fVolid6=aVol6->getMCid();
-	  }
-
-	}
-        else {
-
-          Int_t fMCid;
-
-          fMCid= gMC->VolId("trd1");
-          if ( fMCid != 0) Trd1_ID = fMCid;
-// no layers in Jul10  
-//          fMCid= gMC->VolId("trd1layer");
-//          if ( fMCid != 0) Trd1_Layer_ID = fMCid;
-          fMCid= gMC->VolId("trd1mod1");
-          if ( fMCid != 0) Trd1_Module1_ID = fMCid;
-          fMCid= gMC->VolId("trd1mod2");
-          if ( fMCid != 0) Trd1_Module2_ID = fMCid;
-          fMCid= gMC->VolId("trd1mod3");
-          if ( fMCid != 0) Trd1_Module3_ID = fMCid;
-
-          fMCid= gMC->VolId("trd2");
-          if ( fMCid != 0) Trd2_ID = fMCid;
-// no layers in Jul10  
-//          fMCid= gMC->VolId("trd2layer");
-//          if ( fMCid != 0) Trd2_Layer_ID = fMCid;
-          fMCid= gMC->VolId("trd2mod1");
-          if ( fMCid != 0) Trd2_Module1_ID = fMCid;
-          fMCid= gMC->VolId("trd2mod2");
-          if ( fMCid != 0) Trd2_Module2_ID = fMCid;
-          fMCid= gMC->VolId("trd2mod3");
-          if ( fMCid != 0) Trd2_Module3_ID = fMCid;
-
-          fMCid= gMC->VolId("trd3");
-          if ( fMCid != 0) Trd3_ID = fMCid;
-// no layers in Jul10  
-//          fMCid= gMC->VolId("trd3layer");
-//          if ( fMCid != 0) Trd3_Layer_ID = fMCid;
-
-	  /*
-          fMCid= gMC->VolId("trd3mod1");
-          if ( fMCid != 0) Trd3_Module1_ID = fMCid;
-          fMCid= gMC->VolId("trd3mod2");
-          if ( fMCid != 0) Trd3_Module2_ID = fMCid;
-	  */
-
-          fMCid= gMC->VolId("trd3mod3");
-          if ( fMCid != 0) Trd3_Module3_ID = fMCid;
-       
-	}
+  fGeoVersion = fGeoHandler->CheckGeometryVersion();
+  
+  if (-1 == fGeoVersion) {
+    Fatal("Initialize","unknown TRD geometry");
+  }
+  if (fGeoVersion == kOldMonolithic) {
+    cout<<"-EE- CbmTrd: Old implementation of simple TRD geometry ('PGON')" <<endl;
+    cout<<"-EE- This version does not work with newer ROOT versions and is obsolete."<<endl;
+    cout<<"-EE- If you see this version you're using a rather old version of CbmRoot. Please update to a new version."<<endl;
+    cout<<"-EE- Stop execution at this point."<<endl;
+    Fatal("Initialize","See error message above.");
+  }  
+  
+  Int_t stationNr = 1;
+  char volumeName[10];
+  Bool_t result;
+  
+  if (fGeoVersion == kNewMonolithic) {
+    
+    fStationId.clear();
+    do {
+      sprintf(volumeName, "trd%dgas", stationNr);
+      result = fGeoHandler->GetMCId(volumeName, fStationId);
+      stationNr++;
+    }
+    while (result);
+    
+  } else {
+    
+    fStationId.clear();
+    do {
+      sprintf(volumeName, "trd%d", stationNr);
+      result = fGeoHandler->GetMCId(volumeName, fStationId);
+      stationNr++;
+    }
+    while (result); 
+    Int_t maxStationNr = --stationNr; 
+    cout<<"Max Station: "<<maxStationNr<<endl;
+    
+    Int_t layerNr = 1;
+    
+    fModuleId.clear();
+    std::vector<Int_t> temp;
+    Int_t maxModuleTypes = 3;
+    for (Int_t iStation = 1; iStation < maxStationNr; iStation++) {
+      temp.clear();
+      for (Int_t iModule = 1; iModule <= maxModuleTypes; iModule++) {
+	sprintf(volumeName, "trd%dmod%d", iStation, iModule);
+	Int_t fMCid = gMC->VolId(volumeName);
+	temp.push_back(fMCid);      
+      }
+      fModuleId.push_back(temp);
+    }
+  }
+  
 }
 
 //*************************************************************************
@@ -174,7 +169,7 @@ void CbmTrd::SetSpecialPhysicsCuts(){
       TGeoMaterial *trdgas =  gGeoManager->GetMaterial(mat);
       Double_t mass = trdgas->GetA();
       Double_t charge = trdgas->GetZ();
-      
+     
       // Get the material properties for material with id+1
       // (of-by-one problem) from the Virtual Monte Carlo
       Int_t matIdVMC = mat+1;
@@ -254,111 +249,35 @@ Bool_t  CbmTrd::ProcessHits(FairVolume* vol)
     // Create CbmTrdPoint at exit of active volume
     if ( gMC->IsTrackExiting()    ||
 	 gMC->IsTrackStop()       ||
-	 gMC->IsTrackDisappeared()   ) {
-  	 
-	 gMC->TrackPosition(fPosOut);
-	 gMC->TrackMomentum(fMomOut);
+	 gMC->IsTrackDisappeared()   ) 
+    {
+      
+      gMC->TrackPosition(fPosOut);
+      gMC->TrackMomentum(fMomOut);
 
-
-	 if (fELoss == 0. ) return kFALSE;  // no neutrals
-
-         Int_t mod,layer,station;
-         Int_t fmodtype,fmodnumber;
-	 Int_t flayer=-1;
-	 Int_t fstation=-1;
-
-
-	 fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
-
-         if ( 0 == fSimple) {
-         
-// no layers in Jul10  
-//          Int_t id1 = gMC->CurrentVolOffID(1, mod);
-//          gMC->CurrentVolOffID(2, layer);
-//          Int_t id3 = gMC->CurrentVolOffID(3, station);
-
-          Int_t id1 = gMC->CurrentVolOffID(1, mod);
-          Int_t id2 = gMC->CurrentVolOffID(2, station);
-	
-
-          if ( id2 == Trd1_ID ) {
-            fstation=1;
-	  }
-          else if ( id2 == Trd2_ID ) {
-            fstation=2;
-	  }
-          else if ( id2 == Trd3_ID ) {
-            fstation=3;
-	  }
-          else {
-            fstation=-1;
-	  }
-
-// no layers in Jul10  
-//	  flayer=layer;
-	  flayer=mod/1000;
-
-          if ( (id1 == Trd1_Module1_ID) ||
-               (id1 == Trd2_Module1_ID)  ) {
-	    //               (id1 == Trd3_Module1_ID)    ) {
-            fmodtype=1;
-	  }
-          else if ( (id1 == Trd1_Module2_ID) ||
-                    (id1 == Trd2_Module2_ID) ) {
-	    //                    (id1 == Trd3_Module2_ID)    ) {
-            fmodtype=2;
-	  }
-          else if ( (id1 == Trd1_Module3_ID) ||
-                    (id1 == Trd2_Module3_ID) ||
-                    (id1 == Trd3_Module3_ID)    ) {
-            fmodtype=3;
-	  }
-          else {
-            fmodtype=0;
-	  }
-
-// no layers in Jul10  
-//          fmodnumber=mod;
-	  fmodnumber=mod%1000;
-
-          Int_t sector=0;
-          Int_t detInfo_array[6]={kTRD, fstation,flayer,fmodtype,fmodnumber,sector};         
-          fVolumeID = fTrdId.SetDetectorInfo(detInfo_array);
-
-	 } else {            
-          Int_t sector=0;
-
-	  fVolumeID = vol->getMCid();
-	  gMC->CurrentVolID(fCopyNo); //  Returns the current volume ID and copy number
-	  flayer=fCopyNo; // Set the layer of the station which is equal to the copy number
-	  if(fVolumeID==fVolid1 ) fstation=1; // compare Volume id with stored one to get the detector station
-	  if(fVolumeID==fVolid2 ) fstation=2;
-	  if(fVolumeID==fVolid3 ) fstation=3;
-	  if(fVolumeID==fVolid4 ) fstation=4;
-	  if(fVolumeID==fVolid5 ) fstation=5;
-	  if(fVolumeID==fVolid6 ) fstation=6;
-          fmodtype=0;
-          fmodnumber=0;
-
-          Int_t detInfo_array[6]={kTRD, fstation,flayer,fmodtype,fmodnumber,sector};
-
-          fVolumeID = fTrdId.SetDetectorInfo(detInfo_array);
-	 }
-
-	CbmTrdPoint *fPoint= AddHit(fTrackID, fVolumeID, 
-                            TVector3(fPosIn.X(),  fPosIn.Y(),  fPosIn.Z()),
+      
+      if (fELoss == 0. ) return kFALSE;  // no neutrals
+      
+      fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
+    
+      // Get the unique detector ID from helper class
+      fVolumeID = fGeoHandler->GetUniqueDetectorId(fGeoVersion, fStationId,
+						   fModuleId);
+            
+      CbmTrdPoint *fPoint= AddHit(fTrackID, fVolumeID, 
+			    TVector3(fPosIn.X(),  fPosIn.Y(),  fPosIn.Z()),
 	       		    TVector3(fMomIn.Px(), fMomIn.Py(), fMomIn.Pz()),
                             TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 			    TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
                             fTime, fLength, fELoss);
 
-	// Increment number of trd points in TParticle
-	CbmStack* stack = (CbmStack*) gMC->GetStack();
-	stack->AddPoint(kTRD);
-
-	ResetParameters();
+      // Increment number of trd points in TParticle
+      CbmStack* stack = (CbmStack*) gMC->GetStack();
+      stack->AddPoint(kTRD);
+      
+      ResetParameters();
     }
-
+    
     return kTRUE;
 }
 // -------------------------------------------------------------------------
@@ -469,8 +388,6 @@ void CbmTrd::ConstructGeometry() {
   ProcessNodes( volList );
 }
 // -------------------------------------------------------------------------
-
-
 
 // -----   Private method AddHit   -----------------------------------------
 CbmTrdPoint* CbmTrd::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,

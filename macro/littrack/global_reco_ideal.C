@@ -1,20 +1,35 @@
 void global_reco_ideal(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
+	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString(
+			"/parameters");
 
 	Double_t trdHitErr = 100; // if == 0 than standard errors are used
 	TString dir, imageDir, mcFile, parFile, globalTracksFile;
+	TList *parFileList = new TList();
+	TObjString stsDigiFile, trdDigiFile;
 	if (script != "yes") {
-		dir  = "/d/cbm02/andrey/test_muons/";
+		dir  = "/d/cbm02/andrey/test_electrons_fit/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalTracksFile = dir + "global.tracks.ideal.0000.root";
-		imageDir = "./test_muons/";
+		muchDigiFile = parDir + "/much/much_standard_2layers.digi.root";
+		TObjString stsDigiFile = parDir + "/sts/sts_standard.digi.par";
+		parFileList->Add(&stsDigiFile);
+		TObjString trdDigiFile = parDir + "/trd/trd_standard.digi.par";
+		parFileList->Add(&trdDigiFile);
+		imageDir = "./test_electrons_fit/";
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
 		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSIDEALFILE"));
 		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
+		muchDigiFile = TString(gSystem->Getenv("MUCHDIGI"));
+		//trdHitErr = TString(gSystem->Getenv("TRDHITERR"))->Atof();
+		TObjString stsDigiFile = TString(gSystem->Getenv("STSDIGI"));
+		parFileList->Add(&stsDigiFile);
+		TObjString trdDigiFile = TString(gSystem->Getenv("TRDDIGI"));
+		parFileList->Add(&trdDigiFile);
 	}
 
 	Int_t iVerbose = 1;
@@ -34,12 +49,6 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	FairRunAna *run= new FairRunAna();
 	run->SetInputFile(mcFile);
 	run->SetOutputFile(globalTracksFile);
-
-	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
-	TString stsDigiFile = parDir+ "/sts/sts_standard.digi.par";
-//	TString muchDigiFile = parDir + "/much/much_standard.digi.root";
-//	TString muchDigiFile = parDir + "/much/much_standard_straw.digi.root";
-	TString muchDigiFile = parDir + "/much/much_standard_2layers.digi.root";
 
 	// ----- STS reconstruction   ---------------------------------------------
 	FairTask* stsDigitize = new CbmStsIdealDigitize("STSDigitize", iVerbose);
@@ -168,7 +177,7 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	FairParRootFileIo* parIo1 = new FairParRootFileIo();
 	FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
 	parIo1->open(parFile.Data());
-	parIo2->open(stsDigiFile.Data(),"in");
+	parIo2->open(parFileList, "in");
 	rtdb->setFirstInput(parIo1);
 	rtdb->setSecondInput(parIo2);
 	rtdb->setOutput(parIo1);

@@ -5,10 +5,12 @@
 
 
 #include "CbmTrdGeoHandler.h"
+#include "CbmDetectorList.h"
 
 #include "TGeoVolume.h"
 #include "TGeoNode.h"
 #include "TGeoManager.h"
+#include "TVirtualMC.h"
 
 #include <iostream>
 #include <vector>
@@ -19,12 +21,181 @@ CbmTrdGeoHandler::CbmTrdGeoHandler()
 {
 }
 
+Int_t CbmTrdGeoHandler::CheckGeometryVersion() 
+{
+  // Check which geometry version is used. In the moment there are 4
+  // possible geometry versions. The details of the different geometries
+  // are descibed in detail elswhere. TODO:
+  // Old monolithic geometry:
+  //     Big layers of material that cover the complete detector. The 
+  //     dtector is squared with a squared hole in the middle for the
+  //     beam pipe. Each
+  //     detector station has a subvolume for each layer of this station.
+  // New monolithic version:
+  //     Same overall geometry than the old monolithic geometry, but with
+  //     a differnt internal structure. 
+  // Rectangular segmented geometry:
+  //     The detector is build from rectangular TRD modules. 
+  //     Each of these modules has an active area surrounded by a frame. 
+  //     Each detector station has a subvolume for each layer of this station.
+  // Squared segmented geometry
+  //     The detector is build from squared TRD modules. 
+  //     Each of these modules has an active area surrounded by a frame. 
+  //     Each module is directly put in the station mother volume. There are
+  //     now subvolumes for the different layers.
+  //     TODO: Check if ther was never a squared geometry with layer
+  //           subvolumes.
+  // Quasi monolithic geometry:
+  //     The detector is build from rectangular TRD modules. To mimic the
+  //     monolithic detector layout to have a active area for the whole
+  //     detector surface the single modules does not have any frames. The
+  //     complete detector module is the active area.
+
+  TGeoVolume *fm=NULL;
+  //  gGeoManager->GetListOfVolumes()->Print();
+  //  fm = (TGeoVolume*)gGeoManager->GetListOfVolumes()->FindObject("trd1");
+  //  fm->GetNodes()->Print();
+  // Only the old monolithic geometry version has a volume trd11
+  fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd11");
+  if (fm) {
+    cout<<"-II- Found old monolithic TRD geometry."<<endl;
+    return kOldMonolithic;
+  }
+
+  // Only the new monolithic geometry has a volume trd1gas
+  fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd1gas");
+  if (fm) {
+    cout<<"-II- Found new monolithic TRD geometry."<<endl;
+    return kNewMonolithic;
+  }
+
+  // all modular (segmented) geometries have the volume trd1mod1gas
+  fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd1mod1gas");
+  if (fm) {
+    // the rectangular geometries have the volume trd1layer
+    fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd1layer");
+    if (fm) {
+      // Only the normal rectangular geometry has frames     
+      fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd1mod1carbon1");
+      if (fm){
+	cout<<"-II- Found rectangular segmented TRD geometry."<<endl;
+	return kSegmentedRectangular;
+      } else {
+	cout<<"-II- Found quasi monolithic TRD geometry."<<endl;
+	return kQuasiMonolithic;
+      }
+    } else {
+      cout<<"-II- Found squared segmented TRD geometry."<<endl;
+      return kSegmentedSquared;
+    }
+  }
+  return -1;  
+}
+
+Bool_t CbmTrdGeoHandler::GetMCId(const char* volumeName, 
+				 std::vector<Int_t> &Id) 
+{
+
+  // Use information from the Virtual Monte Carlo, which is used
+  // in the simulation. This should make this function independent 
+  // from the actaul MC engine.
+  Int_t fMCid = gMC->VolId(volumeName);
+
+  if ( 0 != fMCid) {
+    Id.push_back(fMCid);
+    return kTRUE;
+  }
+
+  return kFALSE;
+}
+
+Int_t CbmTrdGeoHandler::GetUniqueDetectorId(Int_t geoVersion, 
+					    std::vector<Int_t>& stationId,
+					    std::vector< std::vector<Int_t> >&
+					    moduleId)
+{
+  Int_t temp_station;
+  Int_t temp_layer;
+  Int_t temp_mod;
+
+  Int_t modnumber;
+  Int_t modtype;
+  Int_t layer;	
+  Int_t station;
+
+  if (geoVersion != kNewMonolithic) {
+    
+    Int_t id2; 
+
+    Int_t id1 = gMC->CurrentVolOffID(1, temp_mod);
+        
+    if (kSegmentedSquared == geoVersion) {
+      id2 = gMC->CurrentVolOffID(2, temp_station);
+      layer=temp_mod/1000;
+      modnumber=temp_mod%1000;
+    } else {
+      gMC->CurrentVolOffID(2, layer);
+      id2 = gMC->CurrentVolOffID(3, temp_station);
+      //      layer=ilayer;
+      modnumber=temp_mod;
+    }
+    
+    // Get the station number from the position in the vector
+    // where the current VolumeId equals the stored Id 
+    std::vector<Int_t>::iterator vecIt;
+    vecIt = find(stationId.begin(), stationId.end(), id2);
+    
+    if (vecIt!=stationId.end()) {
+      station = Int_t(vecIt-stationId.begin())+1;          
+    } else {
+      station=-1;
+    }
+    
+    vecIt = find(moduleId[station-1].begin(), moduleId[station-1].end(), id1);
+    
+    if (vecIt!=moduleId[station-1].end()) {
+      modtype = Int_t(vecIt-moduleId[station-1].begin())+1;          
+    } else {
+      modtype=0;
+    }
+            
+  } else {            
+    
+    // Get the VolumeId of the volume we are in
+    Int_t volumeID = gMC->CurrentVolID(temp_mod);
+    
+    // Get the station number from the position in the vector
+    // where the current VolumeId equals the stored Id 
+    std::vector<Int_t>::iterator vecIt;
+    vecIt = find (stationId.begin(), stationId.end(), volumeID);
+    
+    if (vecIt!=stationId.end()) {
+      station = Int_t(vecIt-stationId.begin())+1;          
+    } else {
+      station=-1;
+    }
+    
+    // get the copy number of the volume one level upward in the
+    // geometrical tree. This is the layer number.
+    gMC->CurrentVolOffID(1, layer);
+    
+    // There are no modules in the monolithic geometry
+    modtype=0;
+    modnumber=0;
+  }
+  
+    Int_t sector=0;
+    Int_t detInfo_array[6]={kTRD, station,layer,modtype,modnumber,sector};         
+    return fTrdId.SetDetectorInfo(detInfo_array);
+}
+
+
 Bool_t CbmTrdGeoHandler::GetLayerInfo(std::vector<Int_t> &layersBeforeStation)
 {
 
   // Check if old geometry version with kepping volumes for each layer
   // or new geometry version with modules put directly in the mother
-  // volume for a TRD station
+  // volume for a TRD station 
   TGeoVolume *fm=NULL;
   fm = (TGeoVolume *)gGeoManager->GetListOfVolumes()->FindObject("trd1layer");
   if (fm) {

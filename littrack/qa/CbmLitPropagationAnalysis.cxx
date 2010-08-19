@@ -39,6 +39,7 @@
 #include "FairRuntimeDb.h"
 #include "CbmGeoMuchPar.h"
 #include "CbmMuchPoint.h"
+#include "CbmTrdPoint.h"
 
 #ifdef NEWMUCH
 #include "CbmMuchGeoScheme.h"
@@ -579,9 +580,23 @@ void CbmLitPropagationAnalysis::McPointToLitFitNode(
     Double_t qp = q / mom.Mag();
 
     CbmLitTrackParam par;
-    par.SetX(point->GetX());
-    par.SetY(point->GetY());
-    par.SetZ(point->GetZ());
+
+    CbmMuchPoint* muchPoint = dynamic_cast<CbmMuchPoint*>(point);
+    if (muchPoint != NULL) {
+    	par.SetX(point->GetX());
+    	par.SetY(point->GetY());
+    	par.SetZ(point->GetZ());
+//    	std::cout << "MUCH point" << std::endl;
+    }
+
+    CbmTrdPoint* trdPoint = dynamic_cast<CbmTrdPoint*>(point);
+    if (trdPoint != NULL) {
+    	par.SetX(trdPoint->GetXOut());
+    	par.SetY(trdPoint->GetYOut());
+    	par.SetZ(trdPoint->GetZOut());
+//    	std::cout << "TRD point" << std::endl;
+    }
+
     //TODO: temporarily done to check the straw tubes
 //    CbmMuchPoint* p = (CbmMuchPoint*) point;
 //    par.SetX((p->GetXIn()+p->GetXOut())/2.);
@@ -803,19 +818,5 @@ void CbmLitPropagationAnalysis::PrintResults(
 		out << std::endl;
 	}
 }
-
-//void CbmLitPropagationAnalysis::DrawText(
-//		Int_t index,
-//		Double_t sigma,
-//		Double_t rms)
-//{
-//	std::string txt1 = ToString<Double_t>(sigma) + " / " + ToString<Double_t>(rms);
-//	TLatex text;
-//	text.SetTextAlign(21);
-//	text.SetTextSize(0.08); //0.1
-//	if (index != 11) text.DrawTextNDC(0.5, 0.83, txt1.c_str());
-//	std::string txt2 = ToString<char>(index+97) + ")";
-//	text.DrawTextNDC(0.8, 0.7, txt2.c_str());
-//}
 
 ClassImp(CbmLitPropagationAnalysis);

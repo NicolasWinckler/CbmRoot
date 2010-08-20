@@ -99,7 +99,9 @@ class CbmTrdHitProducerCluster : public FairTask
   
   CbmTrdDetectorId fTrdId; //!
 
-std::map<Int_t, MyHitList*> ModuleHitMap;
+  std::vector<Int_t> fLayersBeforeStation; //! 
+
+  std::map<Int_t, MyHitList*> ModuleHitMap;
 
   ClassDef(CbmTrdHitProducerCluster,1);
 };

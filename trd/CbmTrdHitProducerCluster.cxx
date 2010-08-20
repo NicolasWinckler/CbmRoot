@@ -35,7 +35,9 @@ CbmTrdHitProducerCluster::CbmTrdHitProducerCluster()
    fClusterHits(NULL),
    fDigiPar(NULL),
    fModuleInfo(NULL),
-   fTrdId()
+   fTrdId(),
+   fModuleHitMap(),
+   fLayersBeforeStation()
 {
 
 }
@@ -110,6 +112,20 @@ InitStatus CbmTrdHitProducerCluster::Init()
   fClusterHits = new TClonesArray("CbmTrdHit", 100);
   ioman->Register("TrdHit","TRD Hit",fClusterHits,kTRUE);
   
+  // Extract information about the number of TRD stations and
+  // the number of layers per TRD station from the geomanager.
+  // Store the information about the number of layers at the entrance
+  // of subsequent stations in a vector. 
+  // This allows to calculate the layer number starting with 1 for the
+  // first layer of the first station at a later stage by only adding 
+  // the layer number in the station to the number of layers in 
+  // previous stations 
+  CbmTrdGeoHandler trdGeoInfo;
+  
+  Bool_t result = trdGeoInfo.GetLayerInfo(fLayersBeforeStation);
+  
+  if (!result) return kFATAL;
+
   return kSUCCESS;
   
 }
@@ -331,6 +347,9 @@ void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax, ModuleP
   Double_t eLossTR = 0;
   Double_t eLossdEdx = 0;
   Double_t eLoss = 0;
+
+  planeId=fLayersBeforeStation[(mpara->Station)-1]+(mpara->Layer);
+      
   AddHit( qMaxIndex, mPara->moduleId, pos, dpos, dxy, planeId, eLossTR, eLossdEdx, eLoss);
   
   // TODO: Fill MyHitList and ModuleHItMap

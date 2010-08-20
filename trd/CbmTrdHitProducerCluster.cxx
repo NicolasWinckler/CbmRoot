@@ -6,6 +6,7 @@
 #include "CbmTrdCluster.h"
 #include "CbmTrdHit.h"
 #include "CbmTrdModule.h"
+#include "CbmTrdGeoHandler.h"
 
 #include "FairRootManager.h"
 #include "FairRunAna.h"
@@ -36,7 +37,7 @@ CbmTrdHitProducerCluster::CbmTrdHitProducerCluster()
    fDigiPar(NULL),
    fModuleInfo(NULL),
    fTrdId(),
-   fModuleHitMap(),
+   ModuleHitMap(),
    fLayersBeforeStation()
 {
 
@@ -348,7 +349,7 @@ void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax, ModuleP
   Double_t eLossdEdx = 0;
   Double_t eLoss = 0;
 
-  planeId=fLayersBeforeStation[(mpara->Station)-1]+(mpara->Layer);
+  planeId=fLayersBeforeStation[(mPara->Station)-1]+(mPara->Layer);
       
   AddHit( qMaxIndex, mPara->moduleId, pos, dpos, dxy, planeId, eLossTR, eLossdEdx, eLoss);
   

@@ -16,6 +16,8 @@
 #include "TGraph2D.h"
 #include "TMath.h"
 #include <string>
+#include <limits>
+#include <iostream>
 
 /* Set default styles for histograms. */
 void SetStyles()
@@ -245,17 +247,37 @@ void DrawGraph(
 		Double_t x2,
 		Double_t y2)
 {
-	if (graph1 != NULL) DrawGraph(graph1, xAxisLabel, yAxisLabel,
+	double max = std::numeric_limits<double>::min();
+	double min = std::numeric_limits<double>::max();
+
+	if (graph1 != NULL) {
+		DrawGraph(graph1, xAxisLabel, yAxisLabel,
 			LIT_COLOR1, LIT_LINE_WIDTH, LIT_LINE_STYLE1, LIT_MARKER_SIZE,
 			LIT_MARKER_STYLE1, logx, logy, "ACP");
+		max = graph1->GetYaxis()->GetXmax();
+		min = graph1->GetYaxis()->GetXmin();
+	}
 
-	if (graph2 != NULL) DrawGraph(graph2, xAxisLabel, yAxisLabel,
+	if (graph2 != NULL) {
+		DrawGraph(graph2, xAxisLabel, yAxisLabel,
 			LIT_COLOR2, LIT_LINE_WIDTH, LIT_LINE_STYLE2, LIT_MARKER_SIZE,
 						LIT_MARKER_STYLE2, logx, logy, "CP");
+		max = std::max(max, graph2->GetYaxis()->GetXmax());
+		min = std::min(min, graph2->GetYaxis()->GetXmin());
+	}
 
-	if (graph3 != NULL) DrawGraph(graph3, xAxisLabel, yAxisLabel,
+	if (graph3 != NULL) {
+		DrawGraph(graph3, xAxisLabel, yAxisLabel,
 			LIT_COLOR3, LIT_LINE_WIDTH, LIT_LINE_STYLE3, LIT_MARKER_SIZE,
 						LIT_MARKER_STYLE3, logx, logy, "CP");
+		max = std::max(max, graph3->GetYaxis()->GetXmax());
+		min = std::min(min, graph3->GetYaxis()->GetXmin());
+	}
+
+	if (graph1 != NULL) {
+		graph1->SetMaximum(max);
+		graph1->SetMinimum(min);
+	}
 
 	TLegend* l1 = new TLegend(x1, y1, x2, y2);
 	l1->SetFillColor(kWhite);

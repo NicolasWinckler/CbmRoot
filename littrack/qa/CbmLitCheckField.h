@@ -8,6 +8,7 @@
 class FairField;
 class TH1D;
 class TH2D;
+class TGraph;
 class TGraph2D;
 class TList;
 class TF1;
@@ -47,10 +48,12 @@ private:
 	void CreateHistos();
 	void FillBHistos();
 	void FillErrHistos();
+	void FillHistosAlongZ();
 	void DrawHistos(Int_t v);
 	void DrawHistosPhd(Int_t v);
 	void DrawHistosPoly(const std::string& opt);
 	void DrawFieldOnly();
+	void DrawFieldAlongZ();
 
 	FairField* fField;
 
@@ -75,6 +78,13 @@ private:
 	std::vector<std::vector<std::vector<TH2D*> > >fhBRelErrH2D;
 
 //	std::vector<std::vector<std::vector<TH1D*> > > fhBErrPolyH1D;
+
+	std::vector<std::vector<TGraph*> >fhBAlongZGraph;
+	std::vector<double> fAlongZAngles;
+	double fZMin;
+	double fZMax;
+	double fZStep;
+
 
 	Bool_t fDrawBx;
 	Bool_t fDrawBy;

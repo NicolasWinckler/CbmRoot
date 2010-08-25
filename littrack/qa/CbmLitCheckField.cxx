@@ -11,6 +11,7 @@
 
 #include "TH2D.h"
 #include "TGraph2D.h"
+#include "TGraph.h"
 #include "TF1.h"
 #include "TF2.h"
 #include "TCanvas.h"
@@ -39,7 +40,10 @@ CbmLitCheckField::CbmLitCheckField():
 	fUseEllipseAcc(true),
 	fOutputDir("./field/"),
 	fPolynomDegree(1),
-	fNofPolynoms(4)
+	fNofPolynoms(4),
+	fZMin(-50.),
+	fZMax(400.),
+	fZStep(1.)
 {
 
 }
@@ -59,10 +63,14 @@ InitStatus CbmLitCheckField::Init()
 	fDegrees.push_back(9);
 	fNofPolynoms = fDegrees.size();
 
-	fZpos.push_back(30.);
-	fZpos.push_back(50.);
-	fZpos.push_back(100.);
-	fZpos.push_back(125.);
+//	fZpos.push_back(30.);
+//	fZpos.push_back(50.);
+//	fZpos.push_back(100.);
+//	fZpos.push_back(125.);
+	fZpos.push_back(105.);
+	fZpos.push_back(150.);
+	fZpos.push_back(200.);
+	fZpos.push_back(300.);
 	fNofSlices = fZpos.size();
 
 	fXpos.resize(fNofSlices);
@@ -82,6 +90,11 @@ InitStatus CbmLitCheckField::Init()
 		fCy[i].resize(fNofPolynoms);
 		fCz[i].resize(fNofPolynoms);
 	}
+
+	fAlongZAngles.push_back(0.);
+	fAlongZAngles.push_back(5.);
+	fAlongZAngles.push_back(15.);
+	fAlongZAngles.push_back(25.);
 }
 
 void CbmLitCheckField::SetParContainers()
@@ -121,6 +134,9 @@ void CbmLitCheckField::Exec(
 	std::cout << "B histograms filled" << std::endl;
 	FillErrHistos();
 	std::cout << "Error histograms filled" << std::endl;
+	FillHistosAlongZ();
+	std::cout << "B histograms along Z filled" << std::endl;
+
 
 	if (IsDrawBx()) DrawHistos(BX);
 	if (IsDrawBy()) DrawHistos(BY);
@@ -134,6 +150,8 @@ void CbmLitCheckField::Exec(
 	if (IsDrawBz()) DrawHistosPhd(BZ);
 
 	DrawFieldOnly();
+
+	DrawFieldAlongZ();
 }
 
 void CbmLitCheckField::Finish()
@@ -218,6 +236,16 @@ void CbmLitCheckField::CreateHistos()
 				fhBRelErrH2D[v][i][j] = new TH2D(histName5.str().c_str(), histTitle5.str().c_str(), nofBinsErrX, -fXpos[i], fXpos[i], nofBinsErrY, -fYpos[i], fYpos[i]);
 				fHistoList->Add(fhBRelErrH2D[v][i][j]);
 			}
+		}
+	}
+
+	fhBAlongZGraph.resize(3);
+	for (Int_t i = 0; i < 3; i++) {
+		fhBAlongZGraph[i].resize(fAlongZAngles.size());
+	}
+	for (Int_t v = 0; v < 3; v++) {
+		for (Int_t i = 0; i < fAlongZAngles.size(); i++) {
+			fhBAlongZGraph[v][i] = new TGraph();
 		}
 	}
 }
@@ -341,6 +369,29 @@ void CbmLitCheckField::FillErrHistos()
 					fhBRelErrH2D[BZ][i][p]->Fill(X, Y, relErrBz);
 				}
 			}
+		}
+	}
+}
+
+void CbmLitCheckField::FillHistosAlongZ()
+{
+	for (int i = 0; i < fAlongZAngles.size(); i++) {
+		int nofSteps = (fZMax - fZMin) / fZStep;
+		for (int istep = 0; istep < nofSteps; istep++){
+			double Z = fZMin + istep * fZStep;
+			double tanXangle = std::tan(fAlongZAngles[i]*3.14159265/180); //
+			double tanYangle = std::tan(fAlongZAngles[i]*3.14159265/180); //
+			double X = Z * tanXangle;
+			double Y = Z * tanYangle;
+
+			// get field value
+			double pos[3] = {X, Y, Z};
+			double B[3];
+			fField->GetFieldValue(pos, B);
+
+			fhBAlongZGraph[BX][i]->SetPoint(istep, Z, B[0]);
+			fhBAlongZGraph[BY][i]->SetPoint(istep, Z, B[1]);
+			fhBAlongZGraph[BZ][i]->SetPoint(istep, Z, B[2]);
 		}
 	}
 }
@@ -517,4 +568,27 @@ void CbmLitCheckField::DrawFieldOnly()
 	}
 }
 
+void CbmLitCheckField::DrawFieldAlongZ()
+{
+	TCanvas* canvas[fAlongZAngles.size()];
+	for (Int_t s = 0; s < fAlongZAngles.size(); s++) {
+		std::string ss = "field_along_z_at_" +ToString<Double_t>(fAlongZAngles[s]) + "_angle";
+		canvas[s] = new TCanvas(ss.c_str(), ss.c_str(), 400,400);
+		canvas[s]->Divide(1, 1);
+	}
+
+	for (int i = 0; i < fAlongZAngles.size(); i++) {
+		canvas[i]->cd(1);
+		TGraph* graphBx = fhBAlongZGraph[BX][i];
+		TGraph* graphBy = fhBAlongZGraph[BY][i];
+		TGraph* graphBz = fhBAlongZGraph[BZ][i];
+
+		DrawGraph(graphBx, graphBy, graphBz,
+				"Field along z", "Z [cm]", "B [kGauss]",
+				"B_{x}", "B_{y}", "B_{z}", false, false, true,
+				0.5, 0.5, 0.9, 0.9);
+
+		SaveCanvasAsImage(canvas[i], fOutputDir);
+	}
+}
 ClassImp(CbmLitCheckField);

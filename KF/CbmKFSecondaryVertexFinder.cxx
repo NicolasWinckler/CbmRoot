@@ -349,7 +349,7 @@ void CbmKFSecondaryVertexFinder::
 }
 
 
-void CbmKFSecondaryVertexFinder::GetMass( Double_t *M, Double_t *Error )
+void CbmKFSecondaryVertexFinder::GetMass( Double_t *M, Double_t *Error_ )
 {
   // S = sigma^2 of m2/2
 
@@ -361,7 +361,7 @@ void CbmKFSecondaryVertexFinder::GetMass( Double_t *M, Double_t *Error )
   Double_t m2 = r[6]*r[6] - r[3]*r[3] - r[4]*r[4] - r[5]*r[5];
   
   if( M     ) *M     = (         m2>1.e-20 ) ? sqrt(m2)   :0.  ;
-  if( Error ) *Error = ( S>=0 && m2>1.e-20 ) ? sqrt(S/m2) :1.e4;
+  if( Error_ ) *Error_ = ( S>=0 && m2>1.e-20 ) ? sqrt(S/m2) :1.e4;
 }
 
 

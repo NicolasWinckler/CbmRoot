@@ -671,8 +671,8 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 
 	    const double D0 = 1.8645 ;
 
-	    TVector3 mc;
-	    mcK->GetStartVertex(mc);
+	    TVector3 mc_;
+	    mcK->GetStartVertex(mc_);
 
 	    CbmStsKFSecondaryVertexFinder SVFinder;
 	    SVFinder.AddTrack(tK);
@@ -709,9 +709,9 @@ void CbmStsFitPerformanceTask::Exec(Option_t * option){
 	      //SVFinder.GetFittedTrack(1, &PFitted );
 	      SVFinder.GetMass(&mass, &mass_err);
 	      if( sv.GetNDF()<=0) continue;
-	      Double_t dx = sv.GetX() - mc.X();
-	      Double_t dy = sv.GetY() - mc.Y();
-	      Double_t dz = sv.GetZ() - mc.Z();
+	      Double_t dx = sv.GetX() - mc_.X();
+	      Double_t dy = sv.GetY() - mc_.Y();
+	      Double_t dz = sv.GetZ() - mc_.Z();
 	      Double_t sx = sv.GetCovariance(0,0);
 	      Double_t sy = sv.GetCovariance(1,1);
 	      Double_t sz = sv.GetCovariance(2,2);

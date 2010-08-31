@@ -283,9 +283,9 @@ Int_t CbmKFFieldMath::ExtrapolateRK4
   
   Double_t dqp = qp_in - qp0;
   
-  { for( Int_t i=0; i<4; i++ )
+  { for( Int_t ip=0; ip<4; ip++ )
     {
-      T_out[i]+=J[5*4+i]*dqp;
+      T_out[ip]+=J[5*4+ip]*dqp;
     }
   }
    

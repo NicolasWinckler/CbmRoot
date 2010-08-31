@@ -78,13 +78,13 @@ Int_t CbmKFTrackInterface::Extrapolate( Double_t z_out, Double_t *QP0 ){
       double z0 = (downstream_direction) ?zcross-zthick/2. :zcross+zthick/2.;
       double d = (downstream_direction) ?1 :-1;
       double dz = 1.E-1*(*i)->RadLength;
-      double z = 0;
-      while( z + dz < zthick){
-	err = err || (*i)->Pass( z0+d*(z+dz/2.), dz, *this, downstream_direction, qp0 );
-	z+=dz;
+      double z_ = 0;
+      while( z_ + dz < zthick){
+	err = err || (*i)->Pass( z0+d*(z_+dz/2.), dz, *this, downstream_direction, qp0 );
+	z_+=dz;
       }
-      dz = zthick - z;
-      err = err || (*i)->Pass( z0+d*(z+dz/2.), dz, *this, downstream_direction, qp0 );
+      dz = zthick - z_;
+      err = err || (*i)->Pass( z0+d*(z_+dz/2.), dz, *this, downstream_direction, qp0 );
       //(*i)->Pass( zcross, zthick, *this, downstream_direction, qp0 );    
     }
   err = err || Propagate( z_out, qp0 );   

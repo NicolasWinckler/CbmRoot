@@ -51,19 +51,19 @@ ClassImp(CbmKFWall)
 ClassImp(CbmKFTube)
   ;
 
-CbmKFTube::CbmKFTube(Int_t ID, Double_t x, Double_t y, Double_t z, Double_t dz, Double_t r, Double_t R, Double_t radL){
-  this->x = x;
-  this->y = y;
-  this->z = z;
-  this->dz = dz;
-  this->r = r;
-  this->R = R;
-  rr = r*r;
-  RR = R*R;
-  this->ID = ID;
-  ZReference =z;
-  ZThickness = dz;
-  RadLength =radL ;
+CbmKFTube::CbmKFTube(Int_t ID_, Double_t x_, Double_t y_, Double_t z_, Double_t dz_, Double_t r_, Double_t R_, Double_t radL_){
+  this->x = x_;
+  this->y = y_;
+  this->z = z_;
+  this->dz = dz_;
+  this->r = r_;
+  this->R = R_;
+  rr = r_*r_;
+  RR = R_*R_;
+  this->ID = ID_;
+  ZReference =z_;
+  ZThickness = dz_;
+  RadLength =radL_ ;
   F = 1;
 }
 
@@ -78,17 +78,17 @@ TString CbmKFTube::Info() const{
 ClassImp(CbmKFBox)
   ;
 
-CbmKFBox::CbmKFBox(Int_t ID, Double_t x, Double_t y, Double_t z, Double_t dx, Double_t dy, Double_t dz, Double_t radL){
-  this->x = x;
-  this->y = y;
-  this->z = z;
-  this->dx05 = dx/2;
-  this->dy05 = dy/2;
-  this->dz = dz;
-  this->ID = ID;
-  ZReference =z;
-  ZThickness = dz;
-  RadLength =radL ;
+CbmKFBox::CbmKFBox(Int_t ID_, Double_t x_, Double_t y_, Double_t z_, Double_t dx_, Double_t dy_, Double_t dz_, Double_t radL_){
+  this->x = x_;
+  this->y = y_;
+  this->z = z_;
+  this->dx05 = dx_/2;
+  this->dy05 = dy_/2;
+  this->dz = dz_;
+  this->ID = ID_;
+  ZReference =z_;
+  ZThickness = dz_;
+  RadLength =radL_ ;
   F = 1;
 }
 

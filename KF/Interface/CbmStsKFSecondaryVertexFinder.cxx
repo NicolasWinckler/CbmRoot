@@ -87,8 +87,8 @@ void CbmStsKFSecondaryVertexFinder::GetMotherTrack( CbmStsTrack *MotherTrack ){
   MotherTrack->SetNDF(1);
 }
 
-void CbmStsKFSecondaryVertexFinder::GetMass( Double_t *M, Double_t *Error ){
-  Finder.GetMass( M, Error );
+void CbmStsKFSecondaryVertexFinder::GetMass( Double_t *M, Double_t *Error_ ){
+  Finder.GetMass( M, Error_ );
 }
 
 CbmStsTrack *CbmStsKFSecondaryVertexFinder::GetTrack( Int_t itrack ){

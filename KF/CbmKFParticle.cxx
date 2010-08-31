@@ -918,7 +918,7 @@ void CbmKFParticle::GetKFVertex( CbmKFVertexInterface  &vtx )
   vtx.GetRefNDF()  = NDF;
 }
 
-void CbmKFParticle::GetMomentum( Double_t &P, Double_t &Error )
+void CbmKFParticle::GetMomentum( Double_t &P, Double_t &Error_ )
 {
   Double_t x = r[3];
   Double_t y = r[4];
@@ -928,11 +928,11 @@ void CbmKFParticle::GetMomentum( Double_t &P, Double_t &Error )
   Double_t z2 = z*z;
   Double_t p2 = x2+y2+z2;
   P = sqrt(p2);
-  Error = sqrt( (x2*C[9]+y2*C[14]+z2*C[20] 
+  Error_ = sqrt( (x2*C[9]+y2*C[14]+z2*C[20] 
 		 + 2*(x*y*C[13]+x*z*C[18]+y*z*C[19]) )/p2 );
 }
 
-void CbmKFParticle::GetMass( Double_t &M, Double_t &Error )
+void CbmKFParticle::GetMass( Double_t &M, Double_t &Error_ )
 {
   // S = sigma^2 of m2/2
 
@@ -943,11 +943,11 @@ void CbmKFParticle::GetMass( Double_t &M, Double_t &Error )
 		 ); 
   Double_t m2 = r[6]*r[6] - r[3]*r[3] - r[4]*r[4] - r[5]*r[5];
   M     = (         m2>1.e-20 ) ? sqrt(m2)   :0.  ;
-  Error = ( S>=0 && m2>1.e-20 ) ? sqrt(S/m2) :1.e4;
+  Error_ = ( S>=0 && m2>1.e-20 ) ? sqrt(S/m2) :1.e4;
 }
 
 
-void CbmKFParticle::GetDecayLength( Double_t &L, Double_t &Error )
+void CbmKFParticle::GetDecayLength( Double_t &L, Double_t &Error_ )
 {
   Double_t x = r[3];
   Double_t y = r[4];
@@ -958,16 +958,16 @@ void CbmKFParticle::GetDecayLength( Double_t &L, Double_t &Error )
   Double_t z2 = z*z;
   Double_t p2 = x2+y2+z2;
   L = t*sqrt(p2);
-  Error = sqrt( p2*C[35] + t*t/p2*(x2*C[9]+y2*C[14]+z2*C[20]
+  Error_ = sqrt( p2*C[35] + t*t/p2*(x2*C[9]+y2*C[14]+z2*C[20]
 				   + 2*(x*y*C[13]+x*z*C[18]+y*z*C[19]) )
 		+ 2*t*(x*C[31]+y*C[32]+z*C[33]) 
 		);
 }
 
-void CbmKFParticle::GetLifeTime( Double_t &TauC, Double_t &Error ){
+void CbmKFParticle::GetLifeTime( Double_t &TauC, Double_t &Error_ ){
   Double_t m, dm;
   GetMass( m, dm );
   Double_t cTM = (-r[3]*C[31] - r[4]*C[32] - r[5]*C[33] + r[6]*C[34]);
   TauC = r[7]*m;
-  Error = sqrt( m*m*C[35] + 2*r[7]*cTM + r[7]*r[7]*dm*dm);
+  Error_ = sqrt( m*m*C[35] + 2*r[7]*cTM + r[7]*r[7]*dm*dm);
 }

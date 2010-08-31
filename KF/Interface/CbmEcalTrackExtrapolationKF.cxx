@@ -65,9 +65,9 @@ void CbmEcalTrackExtrapolationKF::Init()
 
 
 // -----   Public method DoExtrapolate   ------------------------------------------
-Int_t CbmEcalTrackExtrapolationKF::DoExtrapolate(TClonesArray *gTrackArray, TClonesArray *fTrackParamArray)
+Int_t CbmEcalTrackExtrapolationKF::DoExtrapolate(TClonesArray *gTrackArray, TClonesArray *fTrackParamArray_)
 {
-  if (!fTrackParamArray)
+  if (!fTrackParamArray_)
   {
     cout << "-E- CbmEcalTrackExtrapolationKF::DoExtrapolate: ";
     cout << "TrackParamArray missing! " << endl;
@@ -97,7 +97,7 @@ Int_t CbmEcalTrackExtrapolationKF::DoExtrapolate(TClonesArray *gTrackArray, TClo
     kfTr.Extrapolate(Str()->GetEcalInf()->GetZPos());
     kfTr.GetTrackParam(trpar);
     Map()[nTr]=i;
-    new ((*fTrackParamArray)[nTr++]) FairTrackParam(trpar);
+    new ((*fTrackParamArray_)[nTr++]) FairTrackParam(trpar);
   }
 
   return nTr;

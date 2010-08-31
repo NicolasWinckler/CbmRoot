@@ -4,13 +4,13 @@
 
 ClassImp(CbmKFUMeasurement)
 
-void CbmKFUMeasurement::Set( Double_t z, Double_t u, Double_t phi, Double_t sigma2 ){
-  this->z       = z;
-  this->u       = u;
-  this->phi     = phi;
-  this->sigma2  = sigma2;
-  phi_s   = sin(phi);
-  phi_c   = cos(phi);
+void CbmKFUMeasurement::Set( Double_t z_, Double_t u_, Double_t phi_, Double_t sigma2_ ){
+  this->z       = z_;
+  this->u       = u_;
+  this->phi     = phi_;
+  this->sigma2  = sigma2_;
+  phi_s   = sin(phi_);
+  phi_c   = cos(phi_);
   phi_ss  = phi_s * phi_s;
   phi_cc  = phi_c * phi_c;
   phi_2sc = 2.* phi_s * phi_c; 

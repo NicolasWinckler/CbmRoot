@@ -104,10 +104,10 @@ void CbmRichTrackExtrapolationKF::Init() {
 
 // -----   Public method DoExtrapolate   ------------------------------------------
 Int_t CbmRichTrackExtrapolationKF::DoExtrapolate(TClonesArray *gTrackArray, Double_t fZ,
-                                                    TClonesArray *fTrackParamArray)
+                                                    TClonesArray *fTrackParamArray_)
    {
 
-  if ( !fTrackParamArray ) {
+  if ( !fTrackParamArray_ ) {
     cout << "-E- CbmRichTrackExtrapolationKF::DoExtrapolate: "
 	 << "TrackParamArray missing! " << endl;
     return -1;
@@ -134,7 +134,7 @@ Int_t CbmRichTrackExtrapolationKF::DoExtrapolate(TClonesArray *gTrackArray, Doub
    Int_t nTracks = gTrackArray->GetEntriesFast();
    for (Int_t iTrack=0; iTrack < nTracks; iTrack++){
      CbmGlobalTrack* gTrack = (CbmGlobalTrack*)gTrackArray->At(iTrack);
-     new((*fTrackParamArray)[iTrack]) FairTrackParam(0.,0.,0.,0.,0.,0.,covMat);
+     new((*fTrackParamArray_)[iTrack]) FairTrackParam(0.,0.,0.,0.,0.,0.,covMat);
      Int_t idSTS = gTrack->GetStsTrackIndex();
    if (fVerbose > 1) cout << "-I- KF-Trackextrapolation, iTrack(STS) " << idSTS
                           << " pointer " << (CbmStsTrack*)fSTSArray->At(idSTS) << endl;
@@ -150,7 +150,7 @@ Int_t CbmRichTrackExtrapolationKF::DoExtrapolate(TClonesArray *gTrackArray, Doub
     if (fVerbose > 1) cout << "-I- KF-Trackextrapolation, iTrack(Global), iTrack(STS), Nsts: " << iTrack << " " << idSTS << " " << Nsts << endl;
 
     if ( Nsts >= fMinNsts) {
-        * (FairTrackParam*)(fTrackParamArray->At(iTrack)) = ExTrack;
+        * (FairTrackParam*)(fTrackParamArray_->At(iTrack)) = ExTrack;
       if (fVerbose > 1) cout << "-I- KF Track Extrapolation - extrapolate track " << iTrack << endl;
       }
 

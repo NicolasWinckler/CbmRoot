@@ -7,8 +7,11 @@
 #include "CbmLitFieldFitter.h"
 #include "CbmLitEnvironment.h"
 #include "FairField.h"
+#include "CbmLitEnvironment.h"
 
 #include "TFitterMinuit.h"
+#include "TMatrixD.h"
+#include "TVectorD.h"
 
 #include <cmath>
 
@@ -295,7 +298,14 @@ public:
     	double* p = const_cast<double*>(&par[0]);
 		double r = 0.;
 		for(unsigned int i = 0; i < fX.size(); i++) {
-			double ri = fZ[i] - fPolynom->Calculate(fX[i], fY[i], p);
+			// calculate weight
+//			double rad = std::sqrt(std::fabs(fX[i]*fX[i] + fY[i]*fY[i]));
+//			if( rad == 0. ) continue;
+//			Double_t w = 1./rad;//(r*r+1);
+//			Double_t T = 0.;
+//			Double_t w = (1 + T) / (1 + T * std::exp(rad));
+			double w = 1.;
+			double ri = w * (fZ[i] - fPolynom->Calculate(fX[i], fY[i], p));
 			r +=   ri * ri;
 		}
 		return r;
@@ -315,9 +325,9 @@ CbmLitFieldFitter::CbmLitFieldFitter(
 		unsigned int polynomDegree):
 	fXangle(25.),
 	fYangle(25.),
-	fNofBinsX(30),
-	fNofBinsY(30),
-	fUseEllipseAcc(false),
+	fNofBinsX(100),
+	fNofBinsY(100),
+	fUseEllipseAcc(true),
 	fPolynomDegree(polynomDegree)
 {
 	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
@@ -375,6 +385,9 @@ void CbmLitFieldFitter::FitSlice(
 
 	double Xmax = Z * tanXangle;
 	double Ymax = Z * tanYangle;
+
+	std::cout << "Fit slice. Xmax=" << Xmax << " Ymax=" << Ymax
+		<< " Z=" << Z << " Xanlge=" << fXangle << " Yangle=" << fYangle << std::endl;
 
 	double HX = 2 * Xmax / fNofBinsX; // step size for X position
 	double HY = 2 * Ymax / fNofBinsY; // step size for Y position
@@ -439,3 +452,90 @@ void CbmLitFieldFitter::FitSlice(
 //	delete theFCN;
 }
 
+
+//void CbmLitFieldFitter::FitSliceMy(
+//		double Z,
+//		std::vector<double>& parBx,
+//		std::vector<double>& parBy,
+//		std::vector<double>& parBz)
+//{
+//	const int M=fPolynomDegree;//5; // polinom order
+//	const int N=(M+1)*(M+2)/2;
+//
+//	double tanXangle = std::tan(fXangle*3.14159265/180); // AL
+//	double tanYangle = std::tan(fYangle*3.14159265/180); // AL
+//
+//	double Xmax = Z * tanXangle; // AL
+//	double Ymax = Z * tanYangle; // AL
+//
+//    double dx = 1.; // step for the field approximation
+//    double dy = 1.;
+//
+//    if( dx > Xmax/N/2 ) dx = Xmax/N/4.;
+//    if( dy > Ymax/N/2 ) dy = Ymax/N/4.;
+//
+////    double C[3][N];
+////    for( int i=0; i<3; i++) {
+////		for( int k=0; k<N; k++) {
+////			C[i][k] = 0.;
+////		}
+////    }
+//
+//    TMatrixD A(N,N);
+////    A.Zero();
+//    TVectorD b0(N), b1(N), b2(N);
+////    b0.Zero();
+////    b1.Zero();
+////    b2.Zero();
+//	for( int i=0; i<N; i++) {
+//		for( int j=0; j<N; j++) {
+//			A(i,j)=0.; // AL was ==
+//		}
+//		b0(i) = b1(i) = b2(i) = 0.;
+//	}
+//    for( double x=-Xmax; x<=Xmax; x+=dx ) {
+//		for( double y=-Ymax; y<=Ymax; y+=dy )  {
+//			double r = sqrt(fabs(x*x/Xmax/Xmax+y/Ymax*y/Ymax));
+//			if( r>1. ) continue;
+//			Double_t w = 1./(r*r+1);
+//			Double_t p[3] = { x, y, Z};
+//			Double_t B[3] = {0., 0., 0.};
+//			CbmLitEnvironment::Instance()->GetField()->GetFieldValue(p, B);
+//			TVectorD m(N);
+//			m(0)=1;
+//			for( int i=1; i<=M; i++){
+//				int k = (i-1)*(i)/2;
+//				int l = i*(i+1)/2;
+//				for( int j=0; j<i; j++ ) m(l+j) = x*m(k+j);
+//				m(l+i) = y*m(k+i-1);
+//			}
+//
+//			TVectorD mt = m;
+//			for( int i=0; i<N; i++){
+//				for( int j=0; j<N;j++) {
+//					A(i,j)+=w*m(i)*m(j);
+//				}
+//				b0(i)+=w*B[0]*m(i);
+//				b1(i)+=w*B[1]*m(i);
+//				b2(i)+=w*B[2]*m(i);
+//			}
+//		}
+//    }
+//    double det;
+//    A.Invert(&det);
+//    TVectorD c0 = A*b0, c1 = A*b1, c2 = A*b2;
+////    for(int i=0; i<N; i++){
+////		C[0][i] = c0(i);
+////		C[1][i] = c1(i);
+////		C[2][i] = c2(i);
+////    }
+//    for(int i=0; i<N; i++){
+//		parBx.push_back(c0(i));
+//		parBy.push_back(c1(i));
+//		parBz.push_back(c2(i));
+//    }
+//    //    geo[ind++] = N;
+//    //    for( int k=0; k<3; k++ ){
+//    //      for( int j=0; j<N; j++) geo[ind++] = C[k][j];
+//    //    }
+//}

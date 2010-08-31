@@ -31,10 +31,22 @@ public:
 	Bool_t IsDrawBx() const {return fDrawBx;}
 	Bool_t IsDrawBy() const {return fDrawBy;}
 	Bool_t IsDrawBz() const {return fDrawBz;}
+	Bool_t IsDrawMod() const {return fDrawMod;}
+	Bool_t IsDrawFieldMap() const {return fDrawFieldMap;}
+	Bool_t IsDrawPhd() const {return fDrawPhd;}
+	Bool_t IsDrawPoly() const {return fDrawPoly;}
+	Bool_t IsDrawSlices() const {return fDrawSlices;}
+	Bool_t IsFixedBounds() const {return fFixedBounds;}
 
 	void IsDrawBx(Bool_t drawBx) {fDrawBx = drawBx;}
 	void IsDrawBy(Bool_t drawBy) {fDrawBy = drawBy;}
 	void IsDrawBz(Bool_t drawBz) {fDrawBz = drawBz;}
+	void IsDrawMod(Bool_t drawMod) {fDrawMod = drawMod;}
+	void IsDrawFieldMap(Bool_t drawFieldMap) {fDrawFieldMap = drawFieldMap;}
+	void IsDrawPhd(Bool_t drawPhd) {fDrawPhd = drawPhd;}
+	void IsDrawPoly(Bool_t drawPoly) {fDrawPoly = drawPoly;}
+	void IsDrawSlices(Bool_t drawSlices) {fDrawSlices = drawSlices;}
+	void IsFixedBounds(Bool_t fixedBounds) {fFixedBounds = fixedBounds;}
 
 	void SetXangle(double xangle) {fXangle = xangle;}
 	void SetYangle(double yangle) {fYangle = yangle;}
@@ -42,17 +54,20 @@ public:
 	void SetNofBinsY(int nofBinsY) {fNofBinsY = nofBinsY;}
 	void SetUseEllipseAcc(bool useEllipseAcc) {fUseEllipseAcc = useEllipseAcc;}
 	void SetOutputDir(const std::string& dir) {fOutputDir = dir;}
-	void SetPolynomDegree(unsigned int degree) {fPolynomDegree = degree;}
+	void SetPolynomDegreeIndex(unsigned int degreeIndex) {fPolynomDegreeIndex = degreeIndex;}
 
 private:
+	void CreateFieldFitter();
 	void CreateHistos();
 	void FillBHistos();
 	void FillErrHistos();
+	void FillErrHistosAlongZ();
 	void FillHistosAlongZ();
-	void DrawHistos(Int_t v);
-	void DrawHistosPhd(Int_t v);
-	void DrawHistosPoly(const std::string& opt);
-	void DrawFieldOnly();
+
+	void DrawSlices(Int_t v);
+	void DrawPhd(Int_t v);
+	void DrawPoly(const std::string& opt);
+	void DrawField();
 	void DrawFieldAlongZ();
 
 	FairField* fField;
@@ -72,6 +87,7 @@ private:
     std::vector<std::vector<TGraph2D*> >fhBGraph;
     std::vector<std::vector<std::vector<TGraph2D*> > >fhBAprGraph;
 
+    // [BX, BY, BZ][slice number][polynom number]
 	std::vector<std::vector<std::vector<TH2D*> > >fhBErrH2D;
 	std::vector<std::vector<std::vector<TH1D*> > >fhBErrH1D;
 	std::vector<std::vector<std::vector<TH1D*> > >fhBRelErrH1D;
@@ -79,20 +95,31 @@ private:
 
 //	std::vector<std::vector<std::vector<TH1D*> > > fhBErrPolyH1D;
 
+	// Histograms along Z
+	// [BX, BY, BZ][polynom number]
+	std::vector<std::vector<TH1D*> > fhBErrAlongZH1D;
+	std::vector<std::vector<TH1D*> > fhBRelErrAlongZH1D;
 	std::vector<std::vector<TGraph*> >fhBAlongZGraph;
 	std::vector<double> fAlongZAngles;
 	double fZMin;
 	double fZMax;
 	double fZStep;
 
-
 	Bool_t fDrawBx;
 	Bool_t fDrawBy;
 	Bool_t fDrawBz;
+	Bool_t fDrawMod;
+	Bool_t fDrawFieldMap;
+	Bool_t fDrawPhd;
+	Bool_t fDrawPoly;
+	Bool_t fDrawSlices;
 
-	const Int_t BX;
-	const Int_t BY;
-	const Int_t BZ;
+	Bool_t fFixedBounds; // fixed bounds for error histograms
+
+	static const Int_t BX = 0;
+	static const Int_t BY = 1;
+	static const Int_t BZ = 2;
+	static const Int_t MOD = 3;
 
 	double fXangle; // acceptance angle for X
 	double fYangle; // acceptance angle for Y
@@ -102,15 +129,15 @@ private:
 
 	bool fUseEllipseAcc; // if true than only values inside a certain ellipse will be fitted
 
-	std::string fOutputDir; // iutput directory for images
+	std::string fOutputDir; // input directory for images
 
-	std::vector<CbmLitFieldFitter*> fFitter; // fiel fitter tool
+	std::vector<CbmLitFieldFitter*> fFitter; // field fitter tool
 
-	unsigned int fPolynomDegree; // degree of the polinom
+	unsigned int fPolynomDegreeIndex; // degree of the polynom
 
 	unsigned int fNofPolynoms; // number of polynoms for tests
 
-	std::vector<unsigned int> fDegrees; // array with polynom degrees to be analysed
+	std::vector<unsigned int> fDegrees; // array with polynom degrees to be analyzed
 
 	ClassDef(CbmLitCheckField, 1);
 };

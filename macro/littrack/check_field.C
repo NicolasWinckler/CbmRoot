@@ -11,7 +11,7 @@ void check_field(Int_t nEvents = 1)
 
 	TString dir, mcFile, parFile, emptyFile;
 	// Output directory
-	dir  = "/home/d/andrey/std_10mu/";
+	dir  = "/d/cbm02/andrey/test_electrons_fit_norich/";
 	// MC transport file
 	mcFile = dir + "mc.0000.root";
 	// Parameter file
@@ -39,12 +39,21 @@ void check_field(Int_t nEvents = 1)
 	// ------------------------------------------------------------------------
 
 	CbmLitCheckField* checkField = new CbmLitCheckField();
-	checkField->SetXangle(25.);
-	checkField->SetYangle(25.);
+	checkField->SetXangle(35.);
+	checkField->SetYangle(35.);
 	checkField->SetNofBinsX(30);
 	checkField->SetNofBinsY(30);
-	checkField->SetUseEllipseAcc(false);
-	checkField->SetPolynomDegree(1);
+	checkField->IsDrawBx(true);
+	checkField->IsDrawBy(true);
+	checkField->IsDrawBz(true);
+	checkField->IsDrawMod(true);
+	checkField->IsDrawFieldMap(false);
+	checkField->IsDrawPhd(false);
+	checkField->IsDrawPoly(true);
+	checkField->IsDrawSlices(true);
+	checkField->IsFixedBounds(false);
+	checkField->SetUseEllipseAcc(true);
+	checkField->SetPolynomDegreeIndex(0);
 	checkField->SetOutputDir("field/");
 	run->AddTask(checkField);
 

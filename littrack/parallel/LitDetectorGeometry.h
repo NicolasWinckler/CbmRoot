@@ -13,7 +13,7 @@
 #include "LitTypes.h"
 #include "LitMaterialInfo.h"
 #include "LitField.h"
-#include "CbmLitEnums.h"
+#include "../base/CbmLitEnums.h"
 #include "../utils/CbmLitUtils.h"
 
 const unsigned char MAX_NOF_STATION_GROUPS = 6;

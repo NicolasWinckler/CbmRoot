@@ -27,19 +27,6 @@
 
 #define cnst static const fvec
 
-
-class ComparePixelHitXLess :
-	public std::binary_function<
-			const LitScalPixelHit*,
-		    const LitScalPixelHit*,
-		    bool>
-{
-public:
-	bool operator()(const LitScalPixelHit* hit1, const LitScalPixelHit* hit2) const {
-		return hit1->X < hit2->X;
-	}
-};
-
 #ifdef LIT_USE_TBB
 class PropagateThroughAbsorberClass
 {

@@ -150,4 +150,116 @@ inline void LitAddMaterial(
 	 */
 }
 
+
+
+/* Function calculates material effects for electrons
+ * and adds them to the
+ * track parameters and its covariance matrix.
+ * @param par Reference to INPUT/OUTPUT track parameters.
+ * @param mat Reference to material
+ */
+template<class T>
+inline void LitAddMaterialElectron(
+		LitTrackParam<T>& par,
+		const LitMaterialInfo<T>& mat) {
+	static const T ZERO = 0.0, ONE = 1., TWO = 2., THREE = 3., INF = 1.e5;
+//	static const T mass = 0.105658369; // muon mass [GeV/c]
+//	static const T massSq = 0.105658369 * 0.105658369; // muon mass squared
+	static const T C1_2 = 0.5, C1_3 = 1./3.;
+//	static const T me = 0.000511; // Electron mass [GeV/c]
+//	static const T ratio = me / mass;
+
+//	T p = sgn(par.Qp) / par.Qp; // Momentum [GeV/c]
+//	T E = sqrt(massSq + p * p);
+//	T beta = p / E;
+//	T betaSq = beta * beta;
+//	T gamma = E / mass;
+//	T gammaSq = gamma * gamma;
+
+	//scale material thickness
+	T norm = sqrt(ONE + par.Tx * par.Tx + par.Ty * par.Ty);
+	T thickness = norm * mat.Thickness;
+	T radThick = thickness / mat.X0;
+	T sqrtRadThick = sqrt(radThick);//mat.SqrtRadThick;
+	T logRadThick = log(radThick);//mat.LogRadThick;
+
+	/*
+	 * Energy loss corrections
+	 */
+//	myf radLength = mat->GetLength() / mat->GetRL();
+//	myf t;
+//
+//	if (!fDownstream) t = radLength;
+//	else t = -radLength;
+//
+//	myf qp = par->GetQp();
+//	qp *= std::exp(-t);
+//	par->SetQp(qp);
+//
+//	myf cov = par->GetCovariance(14);
+//	cov += CalcSigmaSqQpElectron(par, mat);
+//	par->SetCovariance(14, cov);
+
+//	par.Qp *= exp(radThick);
+
+//	par.C14 += par.Qp * par.Qp * (exp(radThick * log(THREE) / log (TWO)) - exp(-TWO * radThick));
+
+
+//	myf x = mat->GetLength(); //cm
+//	myf X0 = mat->GetRL(); //cm
+
+//	par->GetQp() * par->GetQp() *
+//	           (std::exp(-x/X0 * std::log(3.0)/std::log(2.0)) -
+//	        	std::exp(-2.0 * x/X0));
+	/*
+	 * End of energy loss corrections
+	 */
+
+
+	/*
+	 * Multiple scattering corrections
+	 */
+	T pnew = sgn(par.Qp) / par.Qp; // Momentum [GeV/c]
+	T betanew = ONE;
+	//T E = sqrt(massSq + p * p);
+	//	T beta = p / E;
+	//	T betaSq = beta * beta;
+	//	T gamma = E / mass;
+	//	T gammaSq = gamma * gamma;
+	T tx = par.Tx;
+	T ty = par.Ty;
+	T bcp = betanew * pnew;
+	static const T c1 = 0.0136, c2 = 0.038;
+	T theta = c1 * rcp(bcp) * sqrtRadThick * (ONE + c2 * logRadThick);
+	T thetaSq = theta * theta;
+
+	T t = ONE + tx * tx + ty * ty;
+
+	T Q33 = (1 + tx * tx) * t * thetaSq;
+	T Q44 = (1 + ty * ty) * t * thetaSq;
+	T Q34 = tx * ty * t * thetaSq;
+
+	T T23 = thickness * thickness * C1_3;
+	T T2 = thickness * C1_2;
+
+	par.C0 += Q33 * T23;
+	par.C1 += Q34 * T23;
+	par.C2 += Q33 * T2;
+	par.C3 += Q34 * T2;
+
+	par.C5 += Q44 * T23;
+	par.C6 += Q34 * T2;
+	par.C7 += Q44 * T2;
+
+	par.C9 += Q33;
+	par.C10 += Q34;
+
+	par.C12 += Q44;
+
+	/*
+	 * End multiple scattering corrections
+	 */
+}
+
+
 #endif /* LITADDMATERIAL_H_ */

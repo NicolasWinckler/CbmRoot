@@ -28,6 +28,10 @@ public:
 		strm << "LitTrackParam: " << "X=" << par.X << " Y=" << par.Y
 			<< " Z=" << par.Z << " Tx=" << par.Tx << " Ty=" << par.Ty
 			<< " Qp=" << par.Qp << std::endl;
+		strm << " cov matrix[0-14]: " << par.C0 << " " << par.C1 << " " << par.C2 << " "
+			<< par.C3 << " " << par.C4 << " " << par.C5 << " " << par.C6 << " " << par.C7 << " "
+			<< par.C8 << " " << par.C9 << " " << par.C10 << " " << par.C11 << " " << par.C12 << " "
+			<< par.C13 << " " << par.C14 << std::endl;
 		return strm;
 	}
 } _fvecalignment;

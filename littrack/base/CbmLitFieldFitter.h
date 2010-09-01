@@ -58,17 +58,17 @@ public:
 			const std::vector<double>& z,
 			std::vector<double>& par);
 
-//	/* Fits the (X, Y) slice of the magnetic field at Z position.
-//	 * @param Z Z position of the slice.
-//	 * @param parBx Output vector with polynom coefficients for Bx.
-//	 * @param parBy Output vector with polynom coefficients for By.
-//	 * @param parBz Output vector with polynom coefficients for Bz.
-//	 */
-//	void FitSliceMy(
-//			double Z,
-//			std::vector<double>& parBx,
-//			std::vector<double>& parBy,
-//			std::vector<double>& parBz);
+	/* Fits the (X, Y) slice of the magnetic field at Z position.
+	 * @param Z Z position of the slice.
+	 * @param parBx Output vector with polynom coefficients for Bx.
+	 * @param parBy Output vector with polynom coefficients for By.
+	 * @param parBz Output vector with polynom coefficients for Bz.
+	 */
+	void FitSliceMy(
+			double Z,
+			std::vector<double>& parBx,
+			std::vector<double>& parBy,
+			std::vector<double>& parBz);
 
 	void SetXangle(double xangle) {fXangle = xangle;}
 	void SetYangle(double yangle) {fYangle = yangle;}

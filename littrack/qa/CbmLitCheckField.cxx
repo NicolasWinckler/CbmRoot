@@ -62,21 +62,20 @@ InitStatus CbmLitCheckField::Init()
 	SetStyles();
 
 //	fDegrees.push_back(3);
-	fDegrees.push_back(5);
-//	fDegrees.push_back(7);
+//	fDegrees.push_back(5);
+	fDegrees.push_back(7);
 //	fDegrees.push_back(9);
 	fNofPolynoms = fDegrees.size();
 
-//	fZpos.push_back(30.);
-//	fZpos.push_back(50.);
-//	fZpos.push_back(100.);
-//	fZpos.push_back(125.);
+	fZpos.push_back(30.);
+	fZpos.push_back(50.);
+	fZpos.push_back(100.);
 	fZpos.push_back(105.);
 	fZpos.push_back(115.);
 	fZpos.push_back(125.);
-	fZpos.push_back(135.);
+//	fZpos.push_back(135.);
 	fZpos.push_back(145.);
-	fZpos.push_back(155.);
+//	fZpos.push_back(155.);
 	fZpos.push_back(165.);
 	fZpos.push_back(200.);
 	fZpos.push_back(300.);
@@ -178,7 +177,7 @@ void CbmLitCheckField::CreateFieldFitter()
 		fFitter[i]->SetUseEllipseAcc(fUseEllipseAcc);
 		for(Int_t j = 0; j < fNofSlices; j++) {
 //			std::cout << "Fit slice at " << fZpos[j] << std::endl;
-			fFitter[i]->FitSlice(fZpos[j], fCx[j][i], fCy[j][i], fCz[j][i]);
+			fFitter[i]->FitSliceMy(fZpos[j], fCx[j][i], fCy[j][i], fCz[j][i]);
 		}
 	}
 }

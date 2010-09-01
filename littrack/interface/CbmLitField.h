@@ -8,6 +8,8 @@
 #ifndef CBMLITFIELD_H_
 #define CBMLITFIELD_H_
 
+#include "CbmLitTypes.h"
+
 class CbmLitField {
 public:
 	/* Constructor */

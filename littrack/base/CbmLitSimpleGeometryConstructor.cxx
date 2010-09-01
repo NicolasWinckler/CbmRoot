@@ -261,21 +261,24 @@ void CbmLitSimpleGeometryConstructor::ConstructMuch()
 
 void CbmLitSimpleGeometryConstructor::ConstructTrd()
 {
+	// NEW TRD GEOMETRY (w/o layers)
+
 	std::cout << "-I- Construction of the TRD geometry started" << std::endl;
 	std::string trds[] = {"trd1_0", "trd2_0", "trd3_0"};
-	std::string mods[] = {"trd1mod1_1", "trd2mod1_1", "trd3mod3_1"};
+	std::string mods[][4] = {
+			"trd1mod1_1001", "trd1mod1_2001", "trd1mod1_3001", "trd1mod1_4001",
+			"trd2mod2_1001", "trd2mod2_2001", "trd2mod2_3001", "trd2mod2_4001",
+			"trd3mod3_1001", "trd3mod3_2001", "trd3mod3_3001", "trd3mod3_4001"};
 
 	for (int iTrds = 0; iTrds < 3; iTrds++) {
 		TGeoNode* trd = (TGeoNode*) fGeo->GetTopNode()->GetNodes()->FindObject(trds[iTrds].c_str());
-		TObjArray* trdLayers = trd->GetNodes();
-		for (int iTrdLayer = 0; iTrdLayer < trdLayers->GetEntriesFast(); iTrdLayer++) {
-			TGeoNode* trdLayer = (TGeoNode*) trdLayers->At(iTrdLayer);
 
-			TGeoNode* module = (TGeoNode*) trdLayer->GetNodes()->FindObject(mods[iTrds].c_str());
+		for (int iTrdModule = 0; iTrdModule < 4; iTrdModule++) {
+			TGeoNode* module = (TGeoNode*) trd->GetNodes()->FindObject(mods[iTrds][iTrdModule].c_str());
 			TObjArray* parts = module->GetNodes();
 			for (int iPart = 0; iPart < parts->GetEntriesFast(); iPart++) {
 				TGeoNode* part = (TGeoNode*) parts->At(iPart);
-				if (!TString(part->GetName()).Contains("carbon")) {
+				if (!TString(part->GetName()).Contains("frame")) {
 
 					TGeoBBox* sh = (TGeoBBox*) part->GetVolume()->GetShape();
 					TGeoMedium* med = part->GetVolume()->GetMedium();
@@ -284,8 +287,9 @@ void CbmLitSimpleGeometryConstructor::ConstructTrd()
 					TGeoMedium* medium = fMedium[med->GetName()];
 
 					TGeoVolume* volume = new TGeoVolume(part->GetName(), shape, medium);
-					myf z = trd->GetMatrix()->GetTranslation()[2] + trdLayer->GetMatrix()->GetTranslation()[2]
-						   + module->GetMatrix()->GetTranslation()[2] + part->GetMatrix()->GetTranslation()[2];
+					myf z = trd->GetMatrix()->GetTranslation()[2] +
+							module->GetMatrix()->GetTranslation()[2] +
+							part->GetMatrix()->GetTranslation()[2];
 
 					TGeoMatrix* matrix = new TGeoTranslation(0, 0, z);
 					fSimpleGeo->GetTopVolume()->AddNode(volume, 0, matrix);
@@ -294,10 +298,23 @@ void CbmLitSimpleGeometryConstructor::ConstructTrd()
 					litMaterial.SetLength(2. * sh->GetDZ());
 					litMaterial.SetZpos(z);
 					GeoMediumToMaterialInfo(medium, litMaterial);
+//					std::cout << "mm: " << litMaterial.ToString();
+//					std::cout << medium->GetName() << std::endl;
 					fMyGeoNodes.push_back(litMaterial);
 					fMyTrdGeoNodes.push_back(litMaterial);
 				}
 			}
+			// add air
+			CbmLitMaterialInfo litMaterial;
+			float ml = (iTrdModule == 3)? 150. : 10.;
+//			if (iTrdModule == 3) litMaterial.SetLength(200.);
+//			else litMaterial.SetLength(10.);
+			litMaterial.SetLength(ml);
+			CbmLitMaterialInfo lastmat = fMyGeoNodes.back();
+			litMaterial.SetZpos(lastmat.GetZpos() + lastmat.GetLength() + ml);
+			GeoMediumToMaterialInfo(fMedium["air"], litMaterial);
+			fMyGeoNodes.push_back(litMaterial);
+			fMyTrdGeoNodes.push_back(litMaterial);
 		}
 	}
 	std::cout << "-I- Construction of the TRD geometry finished" << std::endl;

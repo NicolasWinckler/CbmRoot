@@ -959,6 +959,8 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
       Double_t fsectorsizex;
       Double_t fsectorsizey;
       Double_t temp = 0.0;
+      Int_t tempInt = 0.0;
+
 
       Int_t* detInfo = fTrdId.GetDetectorInfo(VolumeID); 
       fStation    = detInfo[1];
@@ -985,9 +987,9 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
 	      fpadsizex = fpadsizey;
 	      fpadsizey = temp;
 
-	      temp  =  fnRow;
+	      tempInt  =  fnRow;
 	      fnRow = fnCol;
-	      fnCol = temp;
+	      fnCol = tempInt;
 	    }
 	  //printf(" L%d S%d\n  (%f,%f)\n  (%d,%d)\n\n", fStation,fLayer,fpadsizex,fpadsizey,fnCol,fnRow);
 	  sectorsize[iSector] =  fsectorsizey;

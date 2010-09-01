@@ -213,12 +213,12 @@ Int_t CbmTrdModule::GetnCol()
     {
       for (Int_t i = 0; i < fNoSectors; i++)
 	{
-	  nCol += fSectorSizex.At(i) / fPadSizex.At(i);
+	  nCol += (Int_t)(fSectorSizex.At(i) / fPadSizex.At(i));
 	}
     }
   else
     {
-      nCol = fSectorSizex.At(0) / fPadSizex.At(0);
+      nCol = (Int_t)(fSectorSizex.At(0) / fPadSizex.At(0));
     }
   return nCol;
 }
@@ -230,12 +230,12 @@ Int_t CbmTrdModule::GetnRow()
     {
       for (Int_t i = 0; i < fNoSectors; i++)
 	{
-	  nRow += fSectorSizey.At(i) / fPadSizey.At(i);
+	  nRow += (Int_t)(fSectorSizey.At(i) / fPadSizey.At(i));
 	}
     } 
   else
     {
-      nRow = fSectorSizey.At(0) / fPadSizey.At(0);
+      nRow = (Int_t)(fSectorSizey.At(0) / fPadSizey.At(0));
     }
   return nRow;
 }

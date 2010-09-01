@@ -218,9 +218,9 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex/*, MHitMap* ModuleH
   hit -> digiId = qMaxIndex;
   hit -> moduleId = moduleId;
 
-  mPara -> xPos = 10 * fModuleInfo->GetX();
-  mPara -> yPos = 10 * fModuleInfo->GetY();
-  mPara -> zPos = 10 * fModuleInfo->GetZ();
+  mPara -> xPos = (Int_t)(10 * fModuleInfo->GetX());
+  mPara -> yPos = (Int_t)(10 * fModuleInfo->GetY());
+  mPara -> zPos = (Int_t)(10 * fModuleInfo->GetZ());
   mPara -> nCol = fModuleInfo->GetnCol();
   mPara -> nRow = fModuleInfo->GetnRow();
   mPara -> NoSectors = fModuleInfo->GetNoSectors();

@@ -10,13 +10,16 @@
 
 #include "CbmLitTrackFinder.h"
 
-#include "parallel/LitTrackFinderNNParallel.h"
+class LitTrackFinderNNParallel;
+class LitTrackFinderNNScalarElectron;
+class LitScalPixelHit;
+class LitScalTrack;
 
 class CbmLitTrackFinderNNParallel : public CbmLitTrackFinder
 {
 public:
 	/* Constructor */
-	CbmLitTrackFinderNNParallel();
+	CbmLitTrackFinderNNParallel(const std::string& trackingType);
 
 	/* Destructor */
 	virtual ~CbmLitTrackFinderNNParallel();
@@ -47,11 +50,15 @@ private:
 			unsigned int nofTracks,
 			TrackPtrVector& tracks);
 
-	LitTrackFinderNNParallel fTrackFinder;
+	LitTrackFinderNNParallel* fTFParallelMuon;
+
+	LitTrackFinderNNScalarElectron* fTFScalElectron;
 
 	double fTime;
 
 	int fEventNo;
+
+	std::string fTrackingType;
 };
 
 #endif /* CBMLITTRACKFINDERNNPARALLEL_H_ */

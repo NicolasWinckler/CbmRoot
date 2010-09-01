@@ -102,7 +102,8 @@ InitStatus CbmLitPropagationAnalysis::Init()
 		fFitter = factory->CreateTrackFitter("lit_kalman");
 		fSmoother = factory->CreateTrackFitter("kalman_smoother");
 	} else {
-		fParallelFitter = factory->CreateTrackFitter("kalman_parallel");
+		if (fIsMuch) fParallelFitter = factory->CreateTrackFitter("kalman_parallel_muon");
+		else fParallelFitter = factory->CreateTrackFitter("kalman_parallel_electron");
 	}
 
 	CreateHistograms();
@@ -264,7 +265,6 @@ void CbmLitPropagationAnalysis::CreateHistograms()
 				if (v == 0) fPropagationHistos[i][j] = hist;
 				if (v == 1) fFilterHistos[i][j] = hist;
 				if (v == 2) fSmootherHistos[i][j] = hist;
-//				std::cout << histName.str() << std::endl << histTitle.str() << std::endl;
 			}
 		}
 	}
@@ -543,12 +543,9 @@ void CbmLitPropagationAnalysis::FillHistosFitter(
 		const CbmLitTrack* mcTrack)
 {
 	Int_t nofHits = track->GetNofHits();
-//	std::cout << "Track:" << std::endl;
 	for (Int_t i = 0; i < nofHits; i++){
 		const CbmLitFitNode* node = track->GetFitNode(i);
 		std::vector<Double_t> rFilter = CalcResidualsAndPulls(node->GetUpdatedParam(), mcTrack->GetFitNode(i)->GetPredictedParam());
-//		std::cout << i << " predicted:" << node->GetPredictedParam()->ToString();
-//		std::cout <<i << " updated:" << node->GetUpdatedParam()->ToString();
 		std::vector<Double_t> rSmoother = CalcResidualsAndPulls(node->GetSmoothedParam(), mcTrack->GetFitNode(i)->GetPredictedParam());
 		for (Int_t j = 0; j < 11; j++){
 			fFilterHistos[i][j]->Fill(rFilter[j]);
@@ -586,7 +583,6 @@ void CbmLitPropagationAnalysis::McPointToLitFitNode(
     	par.SetX(point->GetX());
     	par.SetY(point->GetY());
     	par.SetZ(point->GetZ());
-//    	std::cout << "MUCH point" << std::endl;
     }
 
     CbmTrdPoint* trdPoint = dynamic_cast<CbmTrdPoint*>(point);
@@ -594,7 +590,6 @@ void CbmLitPropagationAnalysis::McPointToLitFitNode(
     	par.SetX(trdPoint->GetXOut());
     	par.SetY(trdPoint->GetYOut());
     	par.SetZ(trdPoint->GetZOut());
-//    	std::cout << "TRD point" << std::endl;
     }
 
     //TODO: temporarily done to check the straw tubes
@@ -654,10 +649,12 @@ void CbmLitPropagationAnalysis::TestFastPropagation(
 		CbmLitTrack* track,
 		CbmLitTrack* mcTrack)
 {
-	fParallelFitter->Fit(track);
-	for (Int_t i = 0; i < track->GetNofHits(); i++){
-         FillHistosPropagation(track->GetFitNode(i)->GetPredictedParam(), mcTrack->GetFitNode(i)->GetPredictedParam(), track->GetHit(i), i);
-         FillHistosFilter(track->GetFitNode(i)->GetUpdatedParam(), mcTrack->GetFitNode(i)->GetPredictedParam(), track->GetHit(i), i, track->GetFitNode(i)->GetChiSqFiltered());
+	LitStatus fitStatus = fParallelFitter->Fit(track);
+	if (fitStatus == kLITSUCCESS) {
+		for (Int_t i = 0; i < track->GetNofHits(); i++){
+			 FillHistosPropagation(track->GetFitNode(i)->GetPredictedParam(), mcTrack->GetFitNode(i)->GetPredictedParam(), track->GetHit(i), i);
+			 FillHistosFilter(track->GetFitNode(i)->GetUpdatedParam(), mcTrack->GetFitNode(i)->GetPredictedParam(), track->GetHit(i), i, track->GetFitNode(i)->GetChiSqFiltered());
+		}
 	}
 }
 

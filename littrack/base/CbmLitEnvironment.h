@@ -12,6 +12,7 @@
 
 #include "CbmLitDetectorLayout.h"
 #include "parallel/LitDetectorGeometry.h"
+#include "parallel/electron/LitDetectorGeometryElectron.h"
 
 #include <vector>
 #include <string>
@@ -40,10 +41,19 @@ public:
 	void GetMuchLayoutScal(LitDetectorLayoutScal& layout);
 	template<class T> void GetMuchLayout(LitDetectorLayout<T>& layout);
 
+	void GetTrdLayoutVec(LitDetectorLayoutElectronVec& layout);
+	void GetTrdLayoutScal(LitDetectorLayoutElectronScal& layout);
+	template<class T> void GetTrdLayout(LitDetectorLayoutElectron<T>& layout);
+
 	int MaterialId(
 			int stationGroup,
 			int station,
 			int substation,
+			const CbmLitDetectorLayout& layout) const;
+
+	int TrdMaterialId(
+			int stationGroup,
+			int station,
 			const CbmLitDetectorLayout& layout) const;
 
 	const CbmLitDetectorLayout& GetTofLayout();

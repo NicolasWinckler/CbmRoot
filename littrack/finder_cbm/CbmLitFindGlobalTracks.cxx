@@ -165,7 +165,7 @@ void CbmLitFindGlobalTracks::InitTrackReconstruction()
 {
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
 	if (fIsElectronSetup) {
-		if (fTrackingType == "branch" || fTrackingType == "nn" || fTrackingType == "weight") {
+		if (fTrackingType == "branch" || fTrackingType == "nn" || fTrackingType == "weight" || fTrackingType == "nn_scalar") {
 			std::string st("e_");
 			st += fTrackingType;
 			fFinder = factory->CreateTrackFinder(st);

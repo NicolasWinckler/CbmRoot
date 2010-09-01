@@ -90,6 +90,7 @@ geo/CbmLitDetGeo.cxx
 geo/CbmLitDetGeoPar.cxx
 geo/CbmLitDetPoint.cxx 
 #parallel/LitTrackFinderNNParallel.cxx
+#parallel/electron/LitTrackFinderNNScalarElectron.cxx
 propagation/CbmLitTGeoTrackPropagator.cxx 
 propagation/CbmLitRK4TrackExtrapolator.cxx
 propagation/CbmLitLineTrackExtrapolator.cxx
@@ -107,6 +108,7 @@ qa/CbmLitCheckMultipleScattering.cxx
 qa/CbmLitCheckSimpleGeo.cxx 
 ##qa/CbmLitCheckField.cxx
 #qa/CbmLitParallelTrackFitterTest.cxx 
+#qa/CbmLitParallelTrackFitterTestElectron.cxx 
 qa/CbmLitCheckEnergyLossMuons.cxx
 qa/CbmLitCheckBrem.cxx 
 #qa/CbmLitTrackFitSpeedTest.cxx

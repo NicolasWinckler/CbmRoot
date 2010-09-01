@@ -387,12 +387,24 @@ void CbmLitEnvironment::GetMuchLayout(
 		LitDetectorLayout<T>& layout)
 {
 	std::cout << "Getting MUCH layout for parallel version of tracking..." << std::endl;
-#ifdef LIT_USE_THIRD_DEGREE
+#if LIT_POLYNOM_DEGREE==3
 	CbmLitFieldFitter fieldFitter(3); // set polynom degree
 	static const unsigned int N = 10; // set number of coefficients
 #else
+#if LIT_POLYNOM_DEGREE==5
 	CbmLitFieldFitter fieldFitter(5); // set polynom degree
 	static const unsigned int N = 21; // set number of coefficients
+#else
+#if LIT_POLYNOM_DEGREE==7
+	CbmLitFieldFitter fieldFitter(7); // set polynom degree
+	static const unsigned int N = 36; // set number of coefficients
+#else
+#if LIT_POLYNOM_DEGREE==9
+	CbmLitFieldFitter fieldFitter(9); // set polynom degree
+	static const unsigned int N = 55; // set number of coefficients
+#endif
+#endif
+#endif
 #endif
 	std::cout << "Field fitter initialized" << std::endl;
 	CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
@@ -445,11 +457,11 @@ void CbmLitEnvironment::GetMuchLayout(
 
 
 		for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
-			CbmLitStation station = stationGroup.GetStation(ist);
+			const CbmLitStation& station = stationGroup.GetStation(ist);
 			LitStation<T> st;
 			st.type = station.GetType();
 			for(int iss = 0; iss < station.GetNofSubstations(); iss++) {
-				CbmLitSubstation substation = station.GetSubstation(iss);
+				const CbmLitSubstation& substation = station.GetSubstation(iss);
 				LitSubstation<T> ss;
 				ss.Z = substation.GetZ();
 
@@ -486,72 +498,135 @@ void CbmLitEnvironment::GetMuchLayout(
 	} // loop over station groups
 }
 
+void CbmLitEnvironment::GetTrdLayoutVec(
+		LitDetectorLayoutElectronVec& layout)
+{
+	GetTrdLayout(layout);
+}
 
-//template<class T>
-//void CbmLitEnvironment::TrdLayoutParallel(
-//		LitDetectorLayout<T>& layout)
-//{
-//	std::cout << "Getting TRD layout for parallel version of tracking..." << std::endl;
-//#ifdef LIT_USE_THIRD_DEGREE
-//	CbmLitFieldFitter fieldFitter(3); // set polynom degree
-//	static const unsigned int N = 10; // set number of coefficients
-//#else
-//	CbmLitFieldFitter fieldFitter(5); // set polynom degree
-//	static const unsigned int N = 21; // set number of coefficients
-//#endif
-//	std::cout << "Field fitter initialized" << std::endl;
-//	CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
-//	std::cout << "Simple geometry constructor initialized" << std::endl;
-//	std::vector<CbmLitMaterialInfo> trdMaterial = geoConstructor->GetMyTrdGeoNodes();
-//
-//	TrdLayout();
-//	const CbmLitDetectorLayout& trdLayout = GetTrdLayout();
-//	std::cout << trdLayout.ToString();
-//	for (int isg = 0; isg < trdLayout.GetNofStationGroups(); isg++) {
-//		const CbmLitStationGroup& stationGroup = trdLayout.GetStationGroup(isg);
-//		LitStationGroup<T> sg;
-//
-//		for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
-//			const CbmLitStation& station = stationGroup.GetStation(ist);
-//			LitStation<T> st;
-//			st.type = station.GetType();
-//			for(int iss = 0; iss < station.GetNofSubstations(); iss++) {
-//				const CbmLitSubstation& substation = station.GetSubstation(iss);
-//				LitSubstation<T> ss;
-//				ss.Z = substation.GetZ();
-//
-//				// Fit the field at Z position of the substation
-//				std::vector<double> parBx, parBy, parBz;
-//				ss.fieldSlice.Z = substation.GetZ();
-//				fieldFitter.FitSlice(substation.GetZ(), parBx, parBy, parBz);
-//				for (int i = 0; i < N; i++) {
-//					ss.fieldSlice.cx[i] = parBx[i];
-//					ss.fieldSlice.cy[i] = parBy[i];
-//					ss.fieldSlice.cz[i] = parBz[i];
-//				}
-//
-//				int matId = MaterialId(isg, ist, iss, muchLayout);
-//				CbmLitMaterialInfo mat = muchMaterial[matId];
-//				ss.material.A = mat.GetA();
-//				ss.material.Z = mat.GetZ();
-//				ss.material.I = (mat.GetZ() > 16)? 10 * mat.GetZ() * 1e-9 :
-//					16 * std::pow(mat.GetZ(), 0.9) * 1e-9;
-//				ss.material.Rho = mat.GetRho();
-//				ss.material.Thickness = mat.GetLength();
-//				ss.material.X0 = mat.GetRL();
-//				ss.material.Zpos = mat.GetZpos();
-//
-//				ss.material.RadThick = ss.material.Thickness / ss.material.X0; // Length/X0
-//				ss.material.SqrtRadThick = sqrt(ss.material.RadThick); // std::sqrt(Length/X0)
-//				ss.material.LogRadThick = log(ss.material.RadThick); // std::log(Length/X0)
-//
-//				st.AddSubstation(ss);
-//			} // loop over substations
-//			sg.AddStation(st);
-//		} // loop over stations
-//		layout.AddStationGroup(sg);
-//	} // loop over station groups
-//}
+void CbmLitEnvironment::GetTrdLayoutScal(
+		LitDetectorLayoutElectronScal& layout)
+{
+	GetTrdLayout(layout);
+}
+
+template<class T>
+void CbmLitEnvironment::GetTrdLayout(
+		LitDetectorLayoutElectron<T>& layout)
+{
+	std::cout << "Getting MUCH layout for parallel version of tracking..." << std::endl;
+#if LIT_POLYNOM_DEGREE==3
+	CbmLitFieldFitter fieldFitter(3); // set polynom degree
+	static const unsigned int N = 10; // set number of coefficients
+#else
+#if LIT_POLYNOM_DEGREE==5
+	CbmLitFieldFitter fieldFitter(5); // set polynom degree
+	static const unsigned int N = 21; // set number of coefficients
+#else
+#if LIT_POLYNOM_DEGREE==7
+	CbmLitFieldFitter fieldFitter(7); // set polynom degree
+	static const unsigned int N = 36; // set number of coefficients
+#else
+#if LIT_POLYNOM_DEGREE==9
+	CbmLitFieldFitter fieldFitter(9); // set polynom degree
+	static const unsigned int N = 55; // set number of coefficients
+#endif
+#endif
+#endif
+#endif
+	std::cout << "Field fitter initialized" << std::endl;
+	CbmLitSimpleGeometryConstructor* geoConstructor = CbmLitSimpleGeometryConstructor::Instance();
+	std::cout << "Simple geometry constructor initialized" << std::endl;
+	std::vector<CbmLitMaterialInfo> trdMaterial = geoConstructor->GetMyTrdGeoNodes();
+
+	TrdLayout();
+	const CbmLitDetectorLayout& trdLayout = GetTrdLayout();
+	std::cout << trdLayout.ToString();
+
+	// add virtual planes
+	for (int nvp = 0; nvp < 20; nvp++) {
+		LitVirtualPlaneElectron<T> virtualPlane;
+		float DZ = 10.;
+		float Z = 105. + nvp * DZ;
+		virtualPlane.Z = Z;
+		// Fit the field at Z position of the substation
+		std::vector<double> parBx, parBy, parBz;
+		virtualPlane.fieldSlice.Z = virtualPlane.Z;
+		fieldFitter.FitSlice(Z, parBx, parBy, parBz);
+		for (int i = 0; i < N; i++) {
+			virtualPlane.fieldSlice.cx[i] = parBx[i];
+			virtualPlane.fieldSlice.cy[i] = parBy[i];
+			virtualPlane.fieldSlice.cz[i] = parBz[i];
+		}
+		// Fit the field at Z between two virtual planes
+		virtualPlane.fieldSlice.Z = virtualPlane.Z + DZ/2.;
+		fieldFitter.FitSlice(Z+DZ/2., parBx, parBy, parBz);
+		for (int i = 0; i < N; i++) {
+			virtualPlane.fieldSliceMid.cx[i] = parBx[i];
+			virtualPlane.fieldSliceMid.cy[i] = parBy[i];
+			virtualPlane.fieldSliceMid.cz[i] = parBz[i];
+		}
+
+		CbmLitMaterialInfo mat = trdMaterial[5]; //air material
+		LitMaterialInfo<T> m;
+		m.A = mat.GetA();
+		m.Z = mat.GetZ();
+		m.I = (mat.GetZ() > 16)? 10 * mat.GetZ() * 1e-9 :
+			16 * std::pow(mat.GetZ(), 0.9) * 1e-9;
+		m.Rho = mat.GetRho();
+		m.Thickness = DZ;//mat.GetLength();
+		m.X0 = mat.GetRL();
+		m.Zpos = Z + DZ;//mat.GetZpos();
+
+		m.RadThick = m.Thickness / m.X0; // Length/X0
+		m.SqrtRadThick = sqrt(m.RadThick); // std::sqrt(Length/X0)
+		m.LogRadThick = log(m.RadThick); // std::log(Length/X0)
+
+		virtualPlane.material = m;
+
+		layout.AddVirtualPlane(virtualPlane);
+	}
+	//
+
+	for (int isg = 0; isg < trdLayout.GetNofStationGroups(); isg++) {
+		const CbmLitStationGroup& stationGroup = trdLayout.GetStationGroup(isg);
+		LitStationGroupElectron<T> sg;
+
+		for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
+			const CbmLitStation& station = stationGroup.GetStation(ist);
+
+			for(int iss = 0; iss < station.GetNofSubstations(); iss++) {
+				const CbmLitSubstation& substation = station.GetSubstation(iss);
+				LitStationElectron<T> st;
+				st.Z = substation.GetZ();
+
+				int matId = TrdMaterialId(isg, ist, trdLayout);
+				for (int im = 0; im < 6; im++) {
+					CbmLitMaterialInfo mat = trdMaterial[matId + im];
+					LitMaterialInfo<T> m;
+					m.A = mat.GetA();
+					m.Z = mat.GetZ();
+					m.I = (mat.GetZ() > 16)? 10 * mat.GetZ() * 1e-9 :
+						16 * std::pow(mat.GetZ(), 0.9) * 1e-9;
+					m.Rho = mat.GetRho();
+					m.Thickness = mat.GetLength();
+					m.X0 = mat.GetRL();
+					m.Zpos = mat.GetZpos();
+
+					m.RadThick = m.Thickness / m.X0; // Length/X0
+					m.SqrtRadThick = sqrt(m.RadThick); // std::sqrt(Length/X0)
+					m.LogRadThick = log(m.RadThick); // std::log(Length/X0)
+
+					if (im < 3) st.AddMaterialBefore(m);
+					else st.AddMaterialAfter(m);
+				}
+
+				sg.AddStation(st);
+			} // loop over substations
+		} // loop over stations
+		layout.AddStationGroup(sg);
+	} // loop over station groups
+}
 
 int CbmLitEnvironment::MaterialId(
 		int stationGroup,
@@ -574,6 +649,28 @@ int CbmLitEnvironment::MaterialId(
 
 	std::cout << "MaterialId: " << stationGroup << " " << station << " " << substation
 		<< " " << counter << std::endl;
+	return counter;
+}
+
+int CbmLitEnvironment::TrdMaterialId(
+		int stationGroup,
+		int station,
+		const CbmLitDetectorLayout& layout) const
+{
+	const int nofMaterialsInLayer = 6;
+	int counter = 0;
+	for(int i = 0; i < stationGroup; i++) {
+		for(int j = 0; j < layout.GetNofStations(i); j++) {
+			counter += nofMaterialsInLayer;
+		}
+	}
+
+	for(int j = 0; j < station; j++) {
+		counter += nofMaterialsInLayer;
+	}
+
+	std::cout << "TrdMaterialId: " << stationGroup << " "
+		<< station << " " << counter << std::endl;
 	return counter;
 }
 

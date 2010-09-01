@@ -28,6 +28,7 @@
 #include "CbmLitField.h"
 #include "CbmLitMapField.h"
 #include "CbmLitParallelTrackFitterTest.h"
+#include "CbmLitParallelTrackFitterTestElectron.h"
 
 
 CbmLitToolFactory* CbmLitToolFactory::fInstance = NULL;
@@ -150,8 +151,12 @@ TrackFitterPtr CbmLitToolFactory::CreateTrackFitter(
 		TrackFitterPtr fitter(new CbmLitTrackFitterImp(propagator, update));
 		return fitter;
 	} else
-	if (name == "kalman_parallel") {
+	if (name == "kalman_parallel_muon") {
 		TrackFitterPtr fitter(new CbmLitParallelTrackFitterTest());
+		return fitter;
+	} else
+		if (name == "kalman_parallel_electron") {
+		TrackFitterPtr fitter(new CbmLitParallelTrackFitterTestElectron());
 		return fitter;
 	}
 //	return fitter;
@@ -302,9 +307,15 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		return finder;
 	} else
 	if(name == "mu_nn_parallel") {
-		CbmLitTrackFinderNNParallel* muchFinderNN = new CbmLitTrackFinderNNParallel();
+		CbmLitTrackFinderNNParallel* muchFinderNN = new CbmLitTrackFinderNNParallel("nn_parallel_muon");
 		muchFinderNN->Initialize();
 		TrackFinderPtr finder(muchFinderNN);
+		return finder;
+	} else
+	if(name == "e_nn_scalar") {
+		CbmLitTrackFinderNNParallel* finderNN = new CbmLitTrackFinderNNParallel("nn_scalar_electron");
+		finderNN->Initialize();
+		TrackFinderPtr finder(finderNN);
 		return finder;
 	} else
 	if(name == "mu_branch") {

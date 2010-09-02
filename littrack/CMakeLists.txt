@@ -39,9 +39,9 @@ ${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/sts
 )
 
-set(TBB_FOUND TRUE)
-set(TBB_INCLUDE_DIRS "/u/andrey/soft/tbb/tbb22_009oss/include")
-set(TBB_LIBRARIES "/u/andrey/soft/tbb/Lenny64/libtbb.so")
+#set(TBB_FOUND TRUE)
+#set(TBB_INCLUDE_DIRS "/u/andrey/soft/tbb/tbb22_009oss/include")
+#set(TBB_LIBRARIES "/u/andrey/soft/tbb/Lenny64/libtbb.so")
 
 If(TBB_FOUND)
   Set(INCLUDE_DIRECTORIES 

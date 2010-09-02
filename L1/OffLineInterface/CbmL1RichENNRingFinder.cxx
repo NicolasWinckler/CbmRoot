@@ -361,48 +361,48 @@ void CbmL1RichENNRingFinder::ENNRingFinder( vector<ENNHit> &Hits, vector<ENNRing
   iR Rbeg = Rings.begin() + NInRings;
   iR Rend = Rings.end();
 
-  for( iH i = Hits.begin(); i != Hits.end(); ++i ) i->quality = 0;   
-  for( iR i = Rbeg; i != Rend; ++i ){
-    i->skip = i->on = 0;  
-    i->NOwn = i->NHits;
-    if( ( i->NHits < MinRingHits ) || 
-	( i->NHits <= 6 && i->chi2  > .3 ) ) 
-      i->skip = 1;
+  for( iH ih = Hits.begin(); ih != Hits.end(); ++ih ) ih->quality = 0;   
+  for( iR ir = Rbeg; ir != Rend; ++ir ){
+    ir->skip = ir->on = 0;  
+    ir->NOwn = ir->NHits;
+    if( ( ir->NHits < MinRingHits ) || 
+	( ir->NHits <= 6 && ir->chi2  > .3 ) ) 
+      ir->skip = 1;
   }
 
   do{
     iR best = Rend;
     int    bestOwn  = 0;
     double bestChi2 = 1.E20;    
-    for( iR i = Rbeg; i != Rend; ++i ){
-      if( i->skip ) continue;
-      if( ( i->NOwn < 1.0*MinRingHits ) || 
-	  ( i->NHits < 10 && i->NOwn < 1.00*i->NHits ) || 
-	  ( i->NOwn < .60*i->NHits )
+    for( iR ir = Rbeg; ir != Rend; ++ir ){
+      if( ir->skip ) continue;
+      if( ( ir->NOwn < 1.0*MinRingHits ) || 
+	  ( ir->NHits < 10 && ir->NOwn < 1.00*ir->NHits ) || 
+	  ( ir->NOwn < .60*ir->NHits )
 	  ){
-	i->skip = 1;
+	ir->skip = 1;
 	continue;
       }
-      if( ( i->NOwn >  1.2*bestOwn ) || 
-	  ( i->NOwn >= 1.*bestOwn   &&  i->chi2 < bestChi2 ) ){
-	bestOwn  = i->NOwn;//Hits;
-	bestChi2 = i->chi2;
-	best = i;
+      if( ( ir->NOwn >  1.2*bestOwn ) || 
+	  ( ir->NOwn >= 1.*bestOwn   &&  ir->chi2 < bestChi2 ) ){
+	bestOwn  = ir->NOwn;//Hits;
+	bestChi2 = ir->chi2;
+	best = ir;
       }
     }
     if( best == Rend ) break;    
     best->skip = 1;
     best->on   = 1;
-    for( iP i = best->Hits.begin(); i != best->Hits.end(); ++i ) 
-      (*i)->quality = 1;    
-    for( iR i = Rbeg; i != Rend; ++i ){
-      if( i->skip ) continue;
-      double dist = i->r+best->r+HitSize2;
-      if( fabs(i->x-best->x) > dist || 
-	  fabs(i->y-best->y) > dist ) continue;
-      i->NOwn = 0;
-      for( iP j = i->Hits.begin(); j != i->Hits.end(); ++j ){
-	if( (*j)->quality==0 ) i->NOwn++;
+    for( iP ip = best->Hits.begin(); ip != best->Hits.end(); ++ip ) 
+      (*ip)->quality = 1;    
+    for( iR ir = Rbeg; ir != Rend; ++ir ){
+      if( ir->skip ) continue;
+      double dist = ir->r+best->r+HitSize2;
+      if( fabs(ir->x-best->x) > dist || 
+	  fabs(ir->y-best->y) > dist ) continue;
+      ir->NOwn = 0;
+      for( iP j = ir->Hits.begin(); j != ir->Hits.end(); ++j ){
+	if( (*j)->quality==0 ) ir->NOwn++;
       }
     }
   }while(1);

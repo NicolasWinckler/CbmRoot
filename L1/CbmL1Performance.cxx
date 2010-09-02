@@ -862,7 +862,7 @@ void CbmL1::TrackFitPerformance()
           L1Extrapolate(trPar, mc.z, trPar.qp, fld);
             // add material
           const int fSta = vHitStore[it->StsHits[0]].iStation;
-          const int dir = (mc.z - algo->vStations[fSta].z[0])/abs(mc.z - algo->vStations[fSta].z[0]);
+          const int dir = int((mc.z - algo->vStations[fSta].z[0])/fabs(mc.z - algo->vStations[fSta].z[0]));
   //         if (abs(mc.z - algo->vStations[fSta].z[0]) > 10.) continue; // can't extrapolate on large distance
           for (int iSta = fSta/*+dir*/; (iSta >= 0) && (iSta < NStation) && (dir*(mc.z - algo->vStations[iSta].z[0]) > 0); iSta += dir){
   //           cout << iSta << " " << dir << endl;

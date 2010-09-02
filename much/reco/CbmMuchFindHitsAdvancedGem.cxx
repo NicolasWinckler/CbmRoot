@@ -604,7 +604,9 @@ void CbmMuchFindHitsAdvancedGem::CreateCluster(Int_t iDigi,
   CbmMuchPad* pad = GetPadByDigi(iDigi, charge);
   if (!pad) return;
   if (charge > qMax) qMax = charge;
-  sumCharge += charge;
+  // Overflow proof
+  Bool_t isOverflow = std::numeric_limits<UInt_t>::max() - charge < sumCharge;
+  sumCharge = isOverflow ? std::numeric_limits<UInt_t>::max() : sumCharge + charge;
   vector<CbmMuchPad*> neighbourPads = pad->GetNeighbours();
 
   // Processed neighbour pads
@@ -730,7 +732,12 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
       }
     }
     x = xPad;
-    chargesX[x] = exists ? chargesX[x] + charge : charge;
+    if(!exists){
+      chargesX[x] = 0;
+    }
+    // Overflow proof
+    Bool_t isOverflow = std::numeric_limits<UInt_t>::max() - charge < chargesX[x];
+    chargesX[x] = isOverflow ? std::numeric_limits<UInt_t>::max() : chargesX[x] + charge;
 
     // Collect y-side pads
     Double_t yPad = pad->GetY0();
@@ -745,7 +752,12 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
       }
     }
     y = yPad;
-    chargesY[y] = exists ? chargesY[y] + charge : charge;
+    if(!exists){
+      chargesY[y] = 0;
+    }
+    // Overflow proof
+    isOverflow = std::numeric_limits<UInt_t>::max() - charge < chargesY[y];
+    chargesY[y] = isOverflow ? std::numeric_limits<UInt_t>::max() : chargesY[y] + charge;
 
     // Debug info
     //    printf("\t%i) (x, y, charge) = (%4.3f, %4.3f, %i)\n", iDigi, xPad, yPad, charge);
@@ -851,7 +863,9 @@ void CbmMuchFindHitsAdvancedGem::ExecClusteringPeaks(CbmMuchCluster* cluster,
         if (padX <= x && padY <= y) {
           Int_t iGroup = jMax * xMax.size() + iMax;
           digiGroups.at(iGroup).push_back(digiIndex);
-          groupCharges.at(iGroup) += charge;
+          // Overflow proof
+          Bool_t isOverflow = std::numeric_limits<UInt_t>::max() - charge < groupCharges.at(iGroup);
+          groupCharges.at(iGroup) = isOverflow ? std::numeric_limits<UInt_t>::max() :  groupCharges.at(iGroup) + charge;
           //          groupCharges.at(iGroup) ++;
           fSelectedDigis.insert(digiIndex);
         }

@@ -39,9 +39,9 @@ ${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/sts
 )
 
-#set(TBB_FOUND TRUE)
-#set(TBB_INCLUDE_DIRS "/u/andrey/soft/tbb/tbb22_009oss/include")
-#set(TBB_LIBRARIES "/u/andrey/soft/tbb/Lenny64/libtbb.so")
+set(TBB_FOUND TRUE)
+set(TBB_INCLUDE_DIRS "/u/andrey/soft/tbb/tbb22_009oss/include")
+set(TBB_LIBRARIES "/u/andrey/soft/tbb/Lenny64/libtbb.so")
 
 If(TBB_FOUND)
   Set(INCLUDE_DIRECTORIES 
@@ -85,7 +85,6 @@ finder/CbmLitTrackFinderBranch.cxx
 finder/CbmLitTrackFinderNN.cxx
 finder/CbmLitNearestHitToTrackMerger.cxx
 finder/CbmLitGating.cxx
-#finder/CbmLitTrackFinderNNParallel.cxx
 #finder/CbmLitTrackFinderNNCuda.cxx
 ##finder_cbm/CbmLitTrdTrackFinderBranch.cxx
 ##finder_cbm/CbmLitTrdTrackFinderNN.cxx
@@ -150,6 +149,7 @@ utils/CbmLitUtils.cxx)
 If(TBB_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 
       ${LITTRACK_SRCS_RULECHECKER}
+      finder/CbmLitTrackFinderNNParallel.cxx
       parallel/LitTrackFinderNNParallel.cxx
       parallel/electron/LitTrackFinderNNScalarElectron.cxx
       qa/CbmLitParallelTrackFitterTest.cxx 

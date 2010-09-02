@@ -37,8 +37,18 @@ ${CBMROOT_SOURCE_DIR}/much
 ${CBMROOT_SOURCE_DIR}/much/geo
 ${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/sts
-#/u/andrey/soft/tbb/tbb22_009oss/include 
 )
+
+#set(TBB_FOUND TRUE)
+#set(TBB_INCLUDE_DIRS "/u/andrey/soft/tbb/tbb22_009oss/include")
+#set(TBB_LIBRARIES "/u/andrey/soft/tbb/Lenny64/libtbb.so")
+
+If(TBB_FOUND)
+  Set(INCLUDE_DIRECTORIES 
+      ${INCLUDE_DIRECTORIES}
+      ${TBB_INCLUDE_DIRS}
+     )
+EndIf(TBB_FOUND)
 
 include_directories( ${INCLUDE_DIRECTORIES})
 
@@ -46,6 +56,13 @@ set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 )
  
+If(TBB_FOUND)
+  Set(LINK_DIRECTORIES
+      ${LINK_DIRECTORIES} 
+      ${TBB_LIBRARY_DIRS}
+     )
+EndIf(TBB_FOUND)
+
 link_directories( ${LINK_DIRECTORIES})
 
 set(LITTRACK_SRCS_RULECHECKER
@@ -89,8 +106,6 @@ geo/CbmLitDetContFact.cxx
 geo/CbmLitDetGeo.cxx 
 geo/CbmLitDetGeoPar.cxx
 geo/CbmLitDetPoint.cxx 
-#parallel/LitTrackFinderNNParallel.cxx
-#parallel/electron/LitTrackFinderNNScalarElectron.cxx
 propagation/CbmLitTGeoTrackPropagator.cxx 
 propagation/CbmLitRK4TrackExtrapolator.cxx
 propagation/CbmLitLineTrackExtrapolator.cxx
@@ -107,11 +122,8 @@ qa/CbmLitCheckMultipleScattering.cxx
 ##qa/CbmLitRobustFitterAnalysis.cxx
 qa/CbmLitCheckSimpleGeo.cxx 
 ##qa/CbmLitCheckField.cxx
-#qa/CbmLitParallelTrackFitterTest.cxx 
-#qa/CbmLitParallelTrackFitterTestElectron.cxx 
 qa/CbmLitCheckEnergyLossMuons.cxx
 qa/CbmLitCheckBrem.cxx 
-#qa/CbmLitTrackFitSpeedTest.cxx
 qa/CbmTrdHitsQa.cxx
 qa/CbmLitCreateStandaloneData.cxx
 weight/CbmLitWeightedHitCalculatorImp.cxx
@@ -134,6 +146,17 @@ utils/CbmLitMath.cxx
 utils/CbmLitMatrixMath.cxx 
 utils/CbmLitDrawHist.cxx
 utils/CbmLitUtils.cxx)
+
+If(TBB_FOUND)
+  Set(LITTRACK_SRCS_RULECHECKER 
+      ${LITTRACK_SRCS_RULECHECKER}
+      parallel/LitTrackFinderNNParallel.cxx
+      parallel/electron/LitTrackFinderNNScalarElectron.cxx
+      qa/CbmLitParallelTrackFitterTest.cxx 
+      qa/CbmLitParallelTrackFitterTestElectron.cxx 
+#      qa/CbmLitTrackFitSpeedTest.cxx
+     )
+EndIf(TBB_FOUND)
 
 set(LITTRACK_HEADERS
 base/CbmLitTask.h
@@ -163,12 +186,17 @@ qa/CbmLitCheckField.h
 qa/CbmLitCheckEnergyLossMuons.h 
 qa/CbmLitCheckMultipleScattering.h
 qa/CbmLitCheckBrem.h 
-#qa/CbmLitTrackFitSpeedTest.h
 qa/CbmTrdHitsQa.h
 qa/CbmLitCreateStandaloneData.h
 #cuda/CudaTest.h
 )
 
+If(TBB_FOUND)
+  Set(LITTRACK_HEADERS 
+      ${LITTRACK_HEADERS}
+#      qa/CbmLitTrackFitSpeedTest.h
+     )
+EndIf(TBB_FOUND)
 
 SET(LITTRACK_SRCS 
 ${LITTRACK_SRCS_RULECHECKER}
@@ -239,6 +267,12 @@ SET(LITTRACK_SRCS ${LITTRACK_SRCS} ${LITTRACK_DICTIONARY})
 add_library(Littrack SHARED ${LITTRACK_SRCS})
 target_link_libraries(Littrack ${ROOT_LIBRARIES})
 set_target_properties(Littrack PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
+
+If(TBB_FOUND)
+  target_link_libraries(Littrack
+        ${TBB_LIBRARIES}
+  )
+EndIf(TBB_FOUND)
 
 ################ install ###################
 install(TARGETS Littrack DESTINATION ${CMAKE_BINARY_DIR}/lib)

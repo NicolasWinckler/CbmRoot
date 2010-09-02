@@ -277,7 +277,7 @@ void CbmLitCheckField::CreateHistos()
 
 	std::string namesErrAlongZH1D[] = {"BxErrAlongZH1D", "ByErrAlongZH1D", "BzErrAlongZH1D"};
 	std::string namesRelErrAlongZH1D[] = {"BxRelErrAlongZH1D", "ByRelErrAlongZH1D", "BzRelErrAlongZH1D"};
-	Int_t nofZHistos = (fZMax - fZMin) / fZStep;
+	Int_t nofZHistos = Int_t((fZMax - fZMin) / fZStep);
 	fhBErrAlongZH1D.resize(3);
 	fhBRelErrAlongZH1D.resize(3);
 	for (Int_t v = 0; v < 3; v++) {
@@ -359,11 +359,11 @@ void CbmLitCheckField::FillBHistos()
 					Double_t Bx = fFitter[p]->GetPolynom()->Calculate(X, Y, &fCx[iSlice][p][0]);
 					Double_t By = fFitter[p]->GetPolynom()->Calculate(X, Y, &fCy[iSlice][p][0]);
 					Double_t Bz = fFitter[p]->GetPolynom()->Calculate(X, Y, &fCz[iSlice][p][0]);
-					Double_t Bmod = std::sqrt(Bx*Bx + By*By + Bz*Bz);
+					Double_t mod = std::sqrt(Bx*Bx + By*By + Bz*Bz);
 					fhBAprGraph[BX][iSlice][p]->SetPoint(cnt, X, Y, Bx);
 					fhBAprGraph[BY][iSlice][p]->SetPoint(cnt, X, Y, By);
 					fhBAprGraph[BZ][iSlice][p]->SetPoint(cnt, X, Y, Bz);
-					fhBAprGraph[MOD][iSlice][p]->SetPoint(cnt, X, Y, Bmod);
+					fhBAprGraph[MOD][iSlice][p]->SetPoint(cnt, X, Y, mod);
 				}
 				cnt++;
 			}
@@ -467,7 +467,7 @@ void CbmLitCheckField::FillErrHistosAlongZ()
 void CbmLitCheckField::FillHistosAlongZ()
 {
 	for (int i = 0; i < fAlongZAngles.size(); i++) {
-		int nofSteps = (fZMax - fZMin) / fZStep;
+		int nofSteps = int((fZMax - fZMin) / fZStep);
 		for (int istep = 0; istep < nofSteps; istep++){
 			double Z = fZMin + istep * fZStep;
 			double tanXangle = std::tan(fAlongZAngles[i]*3.14159265/180); //

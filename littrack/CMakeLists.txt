@@ -157,7 +157,7 @@ geo/CbmLitDetPoint.h
 qa/CbmLitReconstructionQa.h 
 qa/CbmLitFindGlobalTracksIdeal.h
 qa/CbmLitPropagationAnalysis.h 
-qa/CbmLitRobustFitterAnalysis.h
+#qa/CbmLitRobustFitterAnalysis.h
 qa/CbmLitCheckSimpleGeo.h 
 qa/CbmLitCheckField.h
 qa/CbmLitCheckEnergyLossMuons.h 
@@ -186,7 +186,7 @@ qa/CbmLitReconstructionQa.cxx
 qa/CbmLitFindGlobalTracksIdeal.cxx 
 qa/CbmLitCheckField.cxx
 qa/CbmLitPropagationAnalysis.cxx 
-qa/CbmLitRobustFitterAnalysis.cxx
+#qa/CbmLitRobustFitterAnalysis.cxx
 utils/CbmLitConverter.cxx
 )
 

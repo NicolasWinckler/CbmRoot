@@ -146,7 +146,7 @@ class CbmMuchFindHitsAdvancedGem: public FairTask {
 
     /**  **/
     void CreateCluster(Int_t iDigi, vector<Int_t> &digiIndices,
-        Int_t &sumCharge, Int_t &qMax, Int_t qThreshold = 0);
+        UInt_t &sumCharge, UInt_t &qMax, UInt_t qThreshold = 0);
 
     void ExecClusteringSimple(CbmMuchCluster* cluster,
         vector<CbmMuchCluster*> &clusters);
@@ -171,7 +171,7 @@ class CbmMuchFindHitsAdvancedGem: public FairTask {
      * @param digiIndex Index of the digi.
      * @param charge    Charge collected by the pad (output parameter).
      */
-    CbmMuchPad* GetPadByDigi(Int_t digiIndex, Int_t &charge);
+    CbmMuchPad* GetPadByDigi(Int_t digiIndex, UInt_t &charge);
 
     void StatInfo();
     Bool_t IsCornerBorder(CbmMuchPad *pad, CbmMuchPad *neighbourPad);

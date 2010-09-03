@@ -23,11 +23,15 @@ void global_reco(Int_t nEvents = 1000, // number of events
 			trackingType;
 	TList *parFileList = new TList();
 	TObjString stsDigiFile, trdDigiFile;
+	Int_t normStsPoints, normTrdPoints, normMuchPoints, normTofPoints;
+	Int_t normTrdHits, normMuchHits, normTofHits;
+	Float_t momMin, momMax;
+	Int_t momBins;
 	//Double_t trdHitErr = 100; // if == 0 than standard errors are used
 	if (script != "yes") {
 		// Output directory
 //		dir = "/d/cbm02/andrey/std13_10mu_urqmd/";
-		dir = "/d/cbm02/andrey/phd/much1_10mu_urqmd/";
+		dir = "/d/cbm02/andrey/test_electrons_fit_muon/";
 		// MC transport file
 		mcFile = dir + "mc.0000.root";
 		// Parameters file
@@ -37,7 +41,7 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis
 		globalHitsFile = dir + "global.hits.0000.root";
 		// Output file with global tracks
-		globalTracksFile = dir + "global.tracks.weight.0000.root";
+		globalTracksFile = dir + "global.tracks.0000.root";
 		// Digi scheme file for MUCH.
 		// MUST be consistent with MUCH geometry used in MC transport.
 		muchDigiFile = parDir + "/much/much_standard_2layers.digi.root";
@@ -50,7 +54,19 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		// Directory for output images
 		TString imageDir = "./test/";
 		// Tracking type
-		trackingType = "weight";
+		trackingType = "nn_scalar";
+		// Normalization for efficiency
+		normStsPoints = 4;
+		normTrdPoints = 10;
+		normMuchPoints = 12;
+		normTofPoints = 1;
+		normTrdHits = 9;
+		normMuchHits = 11;
+		normTofHits = 1;
+		//
+		momMin = 0.;
+		momMax = 25.;
+		momBins = 25.;
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
@@ -65,6 +81,16 @@ void global_reco(Int_t nEvents = 1000, // number of events
 		parFileList->Add(&stsDigiFile);
 		TObjString trdDigiFile = TString(gSystem->Getenv("TRDDIGI"));
 		parFileList->Add(&trdDigiFile);
+		normStsPoints = TString(gSystem->Getenv("NORMSTSPOINTS"))->Atoi();
+		normTrdPoints = TString(gSystem->Getenv("NORMTRDPOINTS"))->Atoi();
+		normMuchPoints = TString(gSystem->Getenv("NORMMUCHPOINTS"))->Atoi();
+		normTofPoints = TString(gSystem->Getenv("NORMTOFPOINTS"))->Atoi();
+		normTrdHits = TString(gSystem->Getenv("NORMTRDHITS"))->Atoi();
+		normMuchHits = TString(gSystem->Getenv("NORMMUCHHITS"))->Atoi();
+		normTofHits = TString(gSystem->Getenv("NORMTOFHITS"))->Atoi();
+		momMin = TString(gSystem->Getenv("MOMMIN"))->Atof();
+		momMax = TString(gSystem->Getenv("MOMMAX"))->Atof();
+		momBins = TString(gSystem->Getenv("MOMBINS"))->Atoi();
 	}
 
 	Int_t iVerbose = 1;
@@ -244,16 +270,16 @@ void global_reco(Int_t nEvents = 1000, // number of events
 
 		// -----   Track finding QA check   ------------------------------------
 		CbmLitReconstructionQa* reconstructionQa = new CbmLitReconstructionQa();
-		reconstructionQa->SetMinNofPointsSts(4);
-		reconstructionQa->SetMinNofPointsTrd(10);
-		reconstructionQa->SetMinNofPointsMuch(11);
-		reconstructionQa->SetMinNofPointsTof(1);
+		reconstructionQa->SetMinNofPointsSts(normStsPoints);
+		reconstructionQa->SetMinNofPointsTrd(normTrdPoints);
+		reconstructionQa->SetMinNofPointsMuch(normMuchPoints);
+		reconstructionQa->SetMinNofPointsTof(normTofPoints);
 		reconstructionQa->SetQuota(0.7);
-		reconstructionQa->SetMinNofHitsTrd(9);
-		reconstructionQa->SetMinNofHitsMuch(10);
-		reconstructionQa->SetVerbose(1);
-		reconstructionQa->SetMomentumRange(0., 25);
-		reconstructionQa->SetNofBinsMom(25);
+		reconstructionQa->SetMinNofHitsTrd(normTrdHits);
+		reconstructionQa->SetMinNofHitsMuch(normMuchHits);
+		reconstructionQa->SetVerbose(normTofHits);
+		reconstructionQa->SetMomentumRange(momMin, momMax);
+		reconstructionQa->SetNofBinsMom(momBins);
 		reconstructionQa->SetOutputDir(std::string(imageDir));
 		run->AddTask(reconstructionQa);
 		// ------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 void simple_geo(Int_t nEvents = 1)
 {
-	TString dir = "/d/cbm02/andrey/trd/";
+	TString dir = "/d/cbm02/andrey/test_electrons_fit_muon/";
 	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";
 	TString outFile = dir + "simple.geo.0000.root";

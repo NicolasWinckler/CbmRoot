@@ -2,21 +2,33 @@ void prop_ana(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
-	Double_t trdHitErr = 100; // if == 0 than standard errors are used
+//	Double_t trdHitErr = 100; // if == 0 than standard errors are used
 	TString dir, imageDir, mcFile, parFile, globalTracksFile, propAnaFile;
+	Int_t nofTrdHits, nofMuchHits, nofTofHits, pdg;
+	Int_t testFastPropagation;
 	if (script != "yes") {
-		dir = "/d/cbm02/andrey/test_muons/";
+		dir = "/d/cbm02/andrey/test_electrons_fit_norich/";
 		mcFile = dir + "mc.0000.root";
 		globalTracksFile = dir + "global.tracks.ideal.0000.root";
 		parFile = dir + "param.0000.root";
 		propAnaFile = dir + "propagation.ana.0000.root";
-		imageDir = "./test_muons/";
+		imageDir = "./test_electrons_fit/";
+		nofTrdHits = 12;
+		nofMuchHits = 0;
+		nofTofHits = 0;
+		pdg = 11;
+		testFastPropagation = 1;
 	} else {
 		mcFile = TString(gSystem->Getenv("MCFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
 		globalTracksFile = TString(gSystem->Getenv("GLOBALTRACKSIDEALFILE"));
 		imageDir = TString(gSystem->Getenv("IMAGEDIR"));
 		propAnaFile = TString(gSystem->Getenv("PROPANAFILE"));
+		nofTrdHits = TString(gSystem->Getenv("NOFTRDHITS")).Atoi();
+		nofMuchHits = TString(gSystem->Getenv("NOFMUCHHITS")).Atoi();
+		nofTofHits = TString(gSystem->Getenv("NOFTOFHITS")).Atoi();
+		pdg = TString(gSystem->Getenv("PDG")).Atoi();
+		testFastPropagation = TString(gSystem->Getenv("TESTFASTPROPAGATION")).Atoi();
 	}
 
 	TStopwatch timer;
@@ -43,19 +55,19 @@ void prop_ana(Int_t nEvents = 1000)
 
 	// -------------------------------------------------------------------------
 	CbmLitPropagationAnalysis* propAna = new CbmLitPropagationAnalysis();
-	propAna->SetNofPlanes(14);
-	propAna->SetNofTrdHits(0);
-	propAna->SetNofMuchHits(13);
-	propAna->SetNofTofHits(1);
-	propAna->SetPDGCode(13);
-	propAna->SetTestFastPropagation(false);
+	propAna->SetNofPlanes(nofTrdHits + nofMuchHits + nofTofHits);
+	propAna->SetNofTrdHits(nofTrdHits);
+	propAna->SetNofMuchHits(nofMuchHits);
+	propAna->SetNofTofHits(nofTofHits);
+	propAna->SetPDGCode(pdg);
+	propAna->SetTestFastPropagation(testFastPropagation);
 	propAna->SetOutputDir(std::string(imageDir));
 	propAna->IsDrawPropagation(true);
 	propAna->IsDrawFilter(true);
 	propAna->IsDrawSmoother(false);
-	propAna->IsCloseCanvas(true);
+	propAna->IsCloseCanvas(false);
 	propAna->IsFixedBounds(true);
-	propAna->SetPlaneNoPhd(12);
+	propAna->SetPlaneNoPhd(nofTrdHits + nofMuchHits - 1);
 	run->AddTask(propAna);
 	// -------------------------------------------------------------------------
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");

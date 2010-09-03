@@ -39,8 +39,8 @@ void check_field(Int_t nEvents = 1)
 	// ------------------------------------------------------------------------
 
 	CbmLitCheckField* checkField = new CbmLitCheckField();
-	checkField->SetXangle(35.);
-	checkField->SetYangle(35.);
+	checkField->SetXangle(27.);
+	checkField->SetYangle(27.);
 	checkField->SetNofBinsX(30);
 	checkField->SetNofBinsY(30);
 	checkField->IsDrawBx(true);
@@ -54,7 +54,7 @@ void check_field(Int_t nEvents = 1)
 	checkField->IsFixedBounds(false);
 	checkField->SetUseEllipseAcc(true);
 	checkField->SetPolynomDegreeIndex(0);
-	checkField->SetOutputDir("field/");
+	checkField->SetOutputDir("field_minuit/");
 	run->AddTask(checkField);
 
 	// -----  Parameter database   --------------------------------------------

@@ -1,15 +1,14 @@
 void global_reco_ideal(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
-	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString(
-			"/parameters");
+	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
 	Double_t trdHitErr = 100; // if == 0 than standard errors are used
 	TString dir, imageDir, mcFile, parFile, globalTracksFile;
 	TList *parFileList = new TList();
 	TObjString stsDigiFile, trdDigiFile;
 	if (script != "yes") {
-		dir  = "/d/cbm02/andrey/test_electrons_fit/";
+		dir  = "/d/cbm02/andrey/test_electrons_fit_norich/";
 		mcFile = dir + "mc.0000.root";
 		parFile = dir + "param.0000.root";
 		globalTracksFile = dir + "global.tracks.ideal.0000.root";
@@ -164,7 +163,7 @@ void global_reco_ideal(Int_t nEvents = 1000)
 	reconstructionQa->SetMinNofPointsTof(1);
 	reconstructionQa->SetQuota(0.7);
 	reconstructionQa->SetMinNofHitsTrd(9);
-	reconstructionQa->SetMinNofHitsMuch(10);
+	reconstructionQa->SetMinNofHitsMuch(11);
 	reconstructionQa->SetVerbose(1);
 	reconstructionQa->SetMomentumRange(0., 25);
 	reconstructionQa->SetNofBinsMom(25);

@@ -4,16 +4,16 @@
  * @version 1.0
  **/
 
-void trd_hits_qa(Int_t nEvents = 100)
+void trd_hits_qa(Int_t nEvents = 1000)
 {
 	// Output directory
-	TString dir  = "/home/d/andrey/trdsimple_10pi/";
+	TString dir  = "/d/cbm02/andrey/test_electrons_fit_muon/";
 	// MC transport file
 	TString mcFile = dir + "mc.0000.root";
 	// Parameter file
 	TString parFile = dir + "param.0000.root";
 	// File with reconstructed STS tracks, STS, MUCH, TRD and TOF hits and digis.
-	TString globalHitsFile = dir + "global.hits.trd3000.0000.root";
+	TString globalHitsFile = dir + "global.tracks.ideal.0000.root";
 	// Output file with TRD hits qa histograms
 	TString trdHitsQaFile = dir + "trd.hits.qa.0000.root";
 

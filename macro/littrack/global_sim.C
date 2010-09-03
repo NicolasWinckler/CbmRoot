@@ -7,7 +7,7 @@
  * of the CBM.
  **/
 
-void global_sim(Int_t nEvents = 500)
+void global_sim(Int_t nEvents = 1000)
 {
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 
@@ -23,15 +23,15 @@ void global_sim(Int_t nEvents = 500)
 	Int_t NPIONSPLUS = 5; // number of embedded pions
 	Int_t NPIONSMINUS = 5; // number of embedded pions
 	Int_t NPLUTO = 10; // number of embedded particles from pluto
-	TString urqmd = "yes"; // If "yes" than UrQMD will be used as background
+	TString urqmd = "no"; // If "yes" than UrQMD will be used as background
 	TString muons = "no"; // If "yes" than primary muons will be generated
 	TString electrons = "no"; // If "yes" than primary electrons will be generated
-	TString pions = "no"; // If "yes" than primary pions will be generated
+	TString pions = "yes"; // If "yes" than primary pions will be generated
 	TString pluto = "no"; // If "yes" PLUTO particles will be embedded
 
 	// Files
 	TString inFile  = "/home/d/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0000.ftn14"; // input UrQMD file
-	TString dir  = "/home/d/andrey/trdstd_urqmd/"; //directory for output simulation files
+	TString dir  = "/d/cbm02/andrey/test_electrons_fit_norich/"; //directory for output simulation files
 	TString mcFile = dir + "mc.0000.root"; //MC file name
 	TString parFile = dir + "param.0000.root"; //Parameter file name
 
@@ -70,7 +70,7 @@ void global_sim(Int_t nEvents = 500)
 		pipeGeom   = "pipe_standard.geo";
 		mvdGeom    = "";//"mvd_standard.geo";
 		stsGeom    = "sts_standard.geo";
-		richGeom   = "rich_standard.geo";
+		richGeom   = "";//"rich_standard.geo";
 		trdGeom    = "trd_standard.geo";//"trd_simple.geo";
 		tofGeom    = "";//"tof_standard.geo";
 		ecalGeom   = "";//"ecal_FastMC.geo";
@@ -232,6 +232,7 @@ void global_sim(Int_t nEvents = 500)
 	// ------------------------------------------------------------------------
 
 	// -----   Create magnetic field   ----------------------------------------
+	std::cout << "FIELD MAP " << fieldMap << std::endl;
 	CbmFieldMap* magField = NULL;
 	if (fieldMap == "field_electron_standard" )
 		magField = new CbmFieldMapSym2(fieldMap);
@@ -315,7 +316,7 @@ void global_sim(Int_t nEvents = 500)
 	if (pions == "yes") {
 		FairBoxGenerator* boxGen1 = new FairBoxGenerator(211, NPIONSPLUS);
 		boxGen1->SetPtRange(0.,3.);
-//		boxGen1->SetPRange(30, 30);
+//		boxGen1->SetPRange(5, 5);
 		boxGen1->SetPhiRange(0.,360.);
 		boxGen1->SetThetaRange(2.5,25.);
 		boxGen1->SetCosTheta();
@@ -324,7 +325,7 @@ void global_sim(Int_t nEvents = 500)
 
 		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-211, NPIONSMINUS);
 		boxGen2->SetPtRange(0.,3.);
-//		boxGen2->SetPRange(30, 30);
+//		boxGen2->SetPRange(5, 5);
 		boxGen2->SetPhiRange(0.,360.);
 		boxGen2->SetThetaRange(2.5,25.);
 		boxGen2->SetCosTheta();

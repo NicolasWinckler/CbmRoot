@@ -8,7 +8,7 @@
 void draw3D()
 {
 	//Input directory
-	TString dir = "/home/d/andrey/trdstd_urqmd/";
+	TString dir = "/d/cbm02/andrey/test_electrons_fit/";
 	//Input MC file with TGeo
 //	TString mcFile = dir + "mc.0000.root";
 	TString parFile = dir + "param.0000.root";

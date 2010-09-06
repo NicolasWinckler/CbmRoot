@@ -227,7 +227,12 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   TH2F* zdTRD2 = NULL;
   TH2F* deltarecoTRD2 = NULL;
   TH2F* rdTRD2 = NULL;
-     
+  TH2F* MathiesonTest = NULL;
+  //MathiesonTest = new TH2F("MathiesonTest","MathiesonTest",700,-35,35,700,-35,35);
+  MathiesonTest = new TH2F("MathiesonTest","MathiesonTest",961,0,96,961,0,96);
+  MathiesonTest->SetContour(99);
+
+
   TProfile* zdTRD = NULL;
   //TProfile* rdTRD = NULL;
   TProfile* deltarecoTRD1 = NULL;
@@ -348,6 +353,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
     }
   */
   Int_t nEntries = fTrdPoints->GetEntriesFast();
+  //nEntries = 1;
   cout << " Found " << nEntries << " MC-Points in Collection of TRD" << endl;
   //nEntries = nEntries * 1 / 100;
   if (TEST)
@@ -535,8 +541,8 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	  Reco = new TH2F("Reco","Reco [mm]", (nCol) * 100, 0, (nCol), (nRow) * 100, 0, (nRow)); 
 	}
       
-      SplitPathSlices(j, Sector, Histo, TEST, DeltaSlice2, In, Out, Clusterposition, PadChargeModule, nCol, nRow, j, padW, padH, Reco, recoTRD1, recoTRD2, deltarecoTRD1, deltarecoTRD2, deltarecoPad, Xreco, PR, PRF, PRF2, TestIntegration, TestIntegration1, TestIntegration2, TestIntegration3);
- 
+      SplitPathSlices(j, Sector, Histo, TEST, DeltaSlice2, In, Out, Clusterposition, PadChargeModule, nCol, nRow, j, padW, padH, Reco, recoTRD1, recoTRD2, deltarecoTRD1, deltarecoTRD2, deltarecoPad, Xreco, PR, PRF, PRF2, TestIntegration, TestIntegration1, TestIntegration2, TestIntegration3, MathiesonTest);
+      
       if (TEST)
 	{
 	  if (DeltaSlice2)
@@ -1142,9 +1148,9 @@ int CbmTrdClusterizer::GetSector(Double_t tempPosY)/*tempPosY has to be in LL mo
 }
   // --------------------------------------------------------------------
   // ---- SplitPathSlices -------------------------------------------------
-void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration, TH1F* TestIntegration1, TH1F* TestIntegration2, TH1F* TestIntegration3)
+void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration, TH1F* TestIntegration1, TH1F* TestIntegration2, TH1F* TestIntegration3, TH2F* MathiesonTest)
 {
-  
+  MathiesonTest->Reset();
   /*
     Nyquist–Shannon sampling theorem: 1/pad width > 2/cluster gap
   */
@@ -1153,8 +1159,8 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
   Double_t deltaR = sqrt(pow((local_inLL[0] - local_outLL[0]),2) + pow((local_inLL[1] - local_outLL[1]),2)/* + pow((fz_in - fz_out),2)*/);
   Int_t nPathSlice = int(deltaR / ClusterDistance) + 1;                       
   /*
-  printf(" %d  >   %d\n",nPathSlice,DrawTH);
-  cout << nPathSlice << " > " << DrawTH << endl;
+    printf(" %d  >   %d\n",nPathSlice,DrawTH);
+    cout << nPathSlice << " > " << DrawTH << endl;
   */
   Double_t W[fPadNrX];
   Double_t H[fPadNrY];
@@ -1220,6 +1226,8 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
       Double_t tempClusterPosCy = ClusterMLL[1];
       Int_t tempSecRows = Row_slice;
       Int_t iSector;
+      tempy = 0;
+      tempy = 0;
       for ( iSector = 0; iSector < fNoSectors; iSector++)
 	{
 	  if (tempClusterPosCy > sectorsize[iSector])
@@ -1230,12 +1238,17 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
 	  else
 	    {
 	      ClusterPosC[1] = tempClusterPosCy - tempSecRows * GetPadHeight(iSector) - 0.5 * GetPadHeight(iSector);
+	      tempy = ClusterMLL[1] - (ClusterPosC[1] + 0.5 * GetPadHeight(iSector));
 	      break;
 	    }
 	}
 
+      tempx = ClusterMLL[0] - (ClusterPosC[0] + 0.5 * padsize[0]);
+      
+      //tempy = ClusterMLL[1] - ClusterPosC[1];
       if (nPathSlice > DrawTH)
 	{
+	  //cout << " (" << tempx << "," << tempy << ") " << "         (" << ClusterPosC[0] << "," << ClusterPosC[1] << ") " << endl;
 	  if (TEST)
 	    {
 	      Clusterposition->Fill(ClusterMLL[0]/padsize[0], GetFloatPositionY(ClusterMLL[1]));
@@ -1244,7 +1257,7 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
 
       GetPadSizeMatrix( H, W, padH, padW, Row_slice, Col_slice, nRow, nCol);
 
-      LookupMathiesonVector(ClusterPosC[0], ClusterPosC[1], SliceELoss, W, H);
+      LookupMathiesonVector(ClusterPosC[0], ClusterPosC[1], SliceELoss, W, H, MathiesonTest);
 
       //CalcMathieson(  TEST, ClusterPosC[0], ClusterPosC[1], SliceELoss, W ,H);
 
@@ -1300,19 +1313,41 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
 	}
     }
 
-  if (Histo || TEST)
+  if (Histo && TEST)
     {
       CalcPRF(TEST, Histo, nRow, nCol, PadChargeModule, Reco, recoTRD1, recoTRD2, deltarecoTRD1, deltarecoTRD2, deltarecoPad, Xreco, PR, PRF, PRF2);
     }
       
   if (nPathSlice > DrawTH)
     {
+ 
+
       if (TEST)
 	{
+
+	  Char_t Canfile[100];
+	  sprintf(Canfile,"Pics/.png");
+	  TCanvas *c1 = new TCanvas("c1","c1",900,675);
+	  c1->Divide(1,1);	       
+	  c1->cd(1);
+	  MathiesonTest->SetContour(99);
+	  MathiesonTest->GetXaxis()->SetTitle("x-coordinate [cm]");
+	  MathiesonTest->GetYaxis()->SetTitle("y-coordinate [cm]");
+	  MathiesonTest->DrawClone("colz");
+	  Char_t Pic[200];
+	  sprintf(Pic,"Pics/Mathieson_S%d__L%d__pw%.1f__ph%.1f__mw%.1f_mh%.1f__in%.2f_%.2f__out%.2f_%.2f__cn%d_EN%05d.png",fStation,fLayer,padsize[0],padsize[1],modulesize[0],modulesize[1],local_inLL[0],local_inLL[1],local_outLL[0],local_outLL[1],nPathSlice,j);
+	  TImage *PImage = TImage::Create();
+	  PImage->FromPad(c1);
+	  PImage->WriteImage(Pic);
+	  delete PImage;
+	  delete c1;
 	  TCanvas *c = new TCanvas("c","c",900,675);	
 	  c->Divide(1,1);	       
 	  c->cd(1);
+	  DeltaSlice2->GetXaxis()->SetTitle("Pad Column");
+	  DeltaSlice2->GetYaxis()->SetTitle("Pad Row");
 	  DeltaSlice2->Draw("colz");
+
 	  In->Draw("same");
 	  Out->Draw("same");
 	  Clusterposition->Draw("same");
@@ -1355,7 +1390,7 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
     }
 }
   // --------------------------------------------------------------------
-void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
+void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H, TH2F* MathiesonTest)
 {
   //Int_t Accuracy = 1000;
   Int_t rMax = 0;
@@ -1403,6 +1438,13 @@ void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, 
 			Q = m * r + b;
 			//Q = 0.5 * (fMathieson[rMin] + fMathieson[rMax]);
 			fPadCharge[iPadRow][iPadCol] += Q;
+			Float_t x = (((iPadCol - int(fPadNrX/2)) * W[iPadCol] + (xi + 0.5) / float(accuracy) - 0.5 * W[iPadCol]) - x_mean + (x_mean + 0.5 *  W[iPadCol]) + tempx)/10.;
+			Float_t y = (((iPadRow - int(fPadNrY/2)) * H[iPadRow] + (yi + 0.5) / float(accuracy) - 0.5 * H[iPadRow]) - y_mean + (y_mean + 0.5 *  H[iPadRow]) + tempy)/10.;
+			/*
+			cout << x << "," << y << endl;
+			cout << "   " << x_mean << "," << y_mean << endl;
+			*/
+			MathiesonTest->Fill(x,y,Q);
 		      }
 		    }		  
 		  else
@@ -1785,7 +1827,7 @@ void CbmTrdClusterizer::CalcPRF(Bool_t TEST, Bool_t Histo, Int_t nRow, Int_t nCo
     }
   else
     {
-      printf(":( CalcPRF Histos NULL\n");
+      //printf(":( CalcPRF Histos NULL\n");
     }
 }
 

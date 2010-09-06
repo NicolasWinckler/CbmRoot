@@ -71,7 +71,7 @@ class CbmTrdClusterizer : public FairTask {
 
   float GetFloatPositionY(Double_t tempPosY);
 
-  void SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,  TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration, TH1F* TestIntegration1, TH1F* TestIntegration2, TH1F* TestIntegration3);
+  void SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,  TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration, TH1F* TestIntegration1, TH1F* TestIntegration2, TH1F* TestIntegration3, TH2F* MathiesonTest);
 
   void GetIntegrationArea(Bool_t Histo, TH1F* PadX ,TH1F* PadY);
 
@@ -83,7 +83,7 @@ class CbmTrdClusterizer : public FairTask {
 
   void FillMathiesonVector();
 
-  void LookupMathiesonVector(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
+  void LookupMathiesonVector(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H, TH2F* MathiesonTest);
 
   void CalcCenterOfGravity();
 
@@ -128,6 +128,9 @@ class CbmTrdClusterizer : public FairTask {
   Double_t local_inC[3];
   Double_t global_inLL[3];//[cm]
   Double_t global_inC[3];
+  Double_t tempx;
+  Double_t tempy;
+
 
   Double_t local_outLL[3];
   Double_t local_outC[3];

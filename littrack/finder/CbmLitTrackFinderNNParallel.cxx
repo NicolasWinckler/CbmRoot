@@ -87,6 +87,11 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
 
 	ConvertTracks(ltracks, nofTracks, tracks);
 
+	std::cout << "NOFTRACKS=" << nofTracks << " tracks.size=" << tracks.size() << std::endl;
+	for (unsigned int i = 0; i < tracks.size(); i++) {
+		std::cout << tracks[i]->ToString();
+	}
+
 	for (unsigned int i = 0; i < NHITS; i++) {
 		delete lhits[i];
 	}
@@ -146,7 +151,10 @@ void CbmLitTrackFinderNNParallel::ConvertTracks(
 	for (unsigned int i = 0; i < nofTracks; i++){
 		LitScalTrack* ltrack = ltracks[i];
 		CbmLitTrack* track = new CbmLitTrack;
-		LitScalTrackToCbmLitTrack(ltrack, track);
+		if (fTrackingType == "nn_parallel_muon")
+			LitScalTrackToCbmLitTrack(ltrack, track, kLITMUCH);
+		else if (fTrackingType == "nn_scalar_electron")
+			LitScalTrackToCbmLitTrack(ltrack, track, kLITTRD);
 		tracks.push_back(track);
 	}
 }

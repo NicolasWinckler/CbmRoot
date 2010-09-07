@@ -124,7 +124,8 @@ inline void LitTrackParamScalToCbmLitTrackParam(
  */
 inline void LitScalTrackToCbmLitTrack(
 		LitScalTrack* ltrack,
-		CbmLitTrack* track)
+		CbmLitTrack* track,
+		LitDetectorId detId)
 {
 	// Convert track parameters
 	CbmLitTrackParam parFirst, parLast;
@@ -150,7 +151,7 @@ inline void LitScalTrackToCbmLitTrack(
 		newHit->SetDxy(ltrack->hits[i]->Dxy);
 		newHit->SetPlaneId(ltrack->hits[i]->planeId);
 		newHit->SetHitType(kLITPIXELHIT);
-		newHit->SetDetectorId(kLITMUCH);
+		newHit->SetDetectorId(detId);
 		newHit->SetRefId(ltrack->hits[i]->refId);
 		newHit->SetZ(ltrack->hits[i]->Z);
 //		std::cout << ltrack->hits[i];

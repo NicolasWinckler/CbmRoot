@@ -30,18 +30,18 @@ inline void LitTrackFitterElectron(
 	unsigned char ihit = 0;
 
     for (unsigned char ivp = 0; ivp < layout.GetNofVirtualPlanes()-1; ivp++) {
-    	LitVirtualPlaneElectron<T>& vp1 = layout.virtualPlanes[ivp];
-    	LitVirtualPlaneElectron<T>& vp2 = layout.virtualPlanes[ivp+1];
+    	const LitVirtualPlaneElectron<T>& vp1 = layout.virtualPlanes[ivp];
+    	const LitVirtualPlaneElectron<T>& vp2 = layout.virtualPlanes[ivp+1];
 
     	LitRK4ExtrapolationElectron(par, vp2.Z, vp1.fieldSlice, vp1.fieldSliceMid, vp2.fieldSlice);
     	LitAddMaterialElectron(par, vp2.material);
     }
 
 	for (unsigned char isg = 0; isg < layout.GetNofStationGroups(); isg++) {
-		LitStationGroupElectron<T>& stationGroup = layout.stationGroups[isg];
+		const LitStationGroupElectron<T>& stationGroup = layout.stationGroups[isg];
 
 	    for (unsigned char ist = 0; ist < stationGroup.GetNofStations(); ist++) {
-	    	LitStationElectron<T>& station = stationGroup.stations[ist];
+	    	const LitStationElectron<T>& station = stationGroup.stations[ist];
 
 	    	LitLineExtrapolation(par, station.Z);
 

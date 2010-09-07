@@ -9,18 +9,19 @@
 #include "../LitMath.h"
 
 #include "CbmLitEnvironment.h"
-#include "CbmLitMapField.h"
+//#include "CbmLitMapField.h"
 
 #include <algorithm>
 #include <iostream>
+#include <limits>
 
 LitTrackFinderNNScalarElectron::LitTrackFinderNNScalarElectron():
 	fMaxNofMissingHits(2),
 	fSigmaCoef(3.5),
 	fMaxCovSq(20.*20.)
 {
-	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-	fField = new CbmLitMapField(env->GetField());
+//	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
+//	fField = new CbmLitMapField(env->GetField());
 }
 
 LitTrackFinderNNScalarElectron::~LitTrackFinderNNScalarElectron()
@@ -49,8 +50,10 @@ void LitTrackFinderNNScalarElectron::DoFind(
 		tracks[nofTracks++] = new LitScalTrack(*track);
 	}
 
-//	for (unsigned int i = 0; i < nofTracks; i++)
-//		std::cout << *tracks[i];
+	for (unsigned int i = 0; i < nofTracks; i++)
+		std::cout << *tracks[i];
+
+	std::cout << "Number of found tracks: " << nofTracks << std::endl;
 
 	for (unsigned int i = 0; i < fNofTracks; i++) {
 		delete fTracks[i];
@@ -84,6 +87,8 @@ void LitTrackFinderNNScalarElectron::ArrangeHits(
 			std::sort(begin, end, ComparePixelHitXLess());
     	}
     }
+
+    std::cout << fHitData;
 }
 
 void LitTrackFinderNNScalarElectron::MinMaxIndex(
@@ -168,8 +173,9 @@ void LitTrackFinderNNScalarElectron::PropagateToFirstStation(
     	LitVirtualPlaneElectron<fscal>& vp1 = fLayout.virtualPlanes[ivp];
     	LitVirtualPlaneElectron<fscal>& vp2 = fLayout.virtualPlanes[ivp+1];
 
-//    	LitRK4ExtrapolationTest(track->paramLast, vp2.Z, fField);
-//    	LitAddMaterial(track->paramLast, vp2.material);
+    	LitRK4ExtrapolationElectron(track->paramLast, vp2.Z, vp1.fieldSlice, vp1.fieldSliceMid, vp2.fieldSlice);
+//    	LitRK4ExtrapolationElectron(track->paramLast, vp2.Z, fField);
+    	LitAddMaterial(track->paramLast, vp2.material);
     }
 }
 
@@ -205,65 +211,77 @@ bool LitTrackFinderNNScalarElectron::ProcessStation(
 {
 	bool hitAdded = false;
 
-	LitTrackParamScal& lpar = track->paramLast;
+	LitTrackParamScal& par = track->paramLast;
 
 	const LitStationElectronScal& st = fLayout.GetStation(stationGroup, station);
 
-	LitLineExtrapolation(lpar, st.Z);
+	LitLineExtrapolation(par, st.Z);
 
 	for (unsigned char im = 0; im < st.GetNofMaterialsBefore(); im++)
-		LitAddMaterial(lpar, st.materialsBefore[im]);
+		LitAddMaterial(par, st.materialsBefore[im]);
 
+	std::pair<unsigned int, unsigned int> hits;
+	LitScalPixelHit** hitvec = fHitData.GetHits(stationGroup, station);
+	unsigned int nh = fHitData.GetNofHits(stationGroup, station);
+	fscal err = fHitData.GetMaxErr(stationGroup, station);
 
+	MinMaxIndex(&par, hitvec, nh, err, hits.first, hits.second);
 
-//	HitPtrIteratorPair bounds = MinMaxIndex(&par[iSubstation], fHitData.GetHits(stationGroup, station, iSubstation),
-//			fLayout.GetStation(stationGroup, station), fHitData.GetMaxErr(stationGroup, station, iSubstation));
-//	hits[iSubstation] = bounds;
-
-//	AddNearestHit(track, hits, par, nofSubstations);
-
-
+	unsigned int nofHits = hits.second - hits.first;
+	hitAdded = AddNearestHit(track, hits, &par, nofHits, stationGroup, station);
 
 	for (unsigned char im = 0; im < st.GetNofMaterialsAfter(); im++)
-		LitAddMaterial(lpar, st.materialsAfter[im]);
+		LitAddMaterial(par, st.materialsAfter[im]);
 
 	return hitAdded;
 }
 
-//bool LitTrackFinderNNScalarElectron::AddNearestHit(
-//		LitTrackScal* track,
-//		HitPtrIteratorPair hits[],
-//		const CbmLitTrackParam par[],
-//		int nofSubstations)
-//{
-//	//fIsProcessSubstationsTogether == false
-//	bool hitAdded = false;
-//
-//	CbmLitTrackParam uPar, param;
-//	HitPtrIterator hit(hits[iSubstation].second);
-//	myf chiSq = std::numeric_limits<fscal>::max();
-//	for (HitPtrIterator iHit = hits[iSubstation].first; iHit != hits[iSubstation].second; iHit++) {
-//		//First update track parameters with KF, than check whether the hit is in the validation gate.
-//		fFilter->Update(&par[iSubstation], &uPar, *iHit);
-//		if (IsHitInValidationGate(&uPar, *iHit)) {
-//			myf chi = ChiSq(&uPar, *iHit);
-//			// Check if current hit is closer by statistical distance than the previous ones
-//			if (chi < chiSq) {
-//				chiSq = chi;
-//				hit = iHit;
-//				param = uPar;
-//			}
-//		}
-//	}
-//	// if hit was attached than change track information
-//	if (hit != hits[iSubstation].second) {
-//		track->AddHit(*hit);
-//		track->SetParamLast(&param);
-//		track->SetChi2(track->GetChi2() + chiSq);
-//		track->SetNDF(NDF(track));
-//		hitAdded = true;
-//	}
-//
-//
-//	return hitAdded;
-//}
+bool LitTrackFinderNNScalarElectron::AddNearestHit(
+		LitScalTrack* track,
+		const std::pair<unsigned int, unsigned int>& hits,
+		LitTrackParamScal* par,
+		unsigned int nofHits,
+		int stationGroup,
+		int station)
+{
+	bool hitAdded = false;
+	LitScalPixelHit* hita = NULL;
+	LitTrackParamScal param;
+	fscal chiSq = std::numeric_limits<fscal>::max();
+
+	LitScalPixelHit** hitvec = fHitData.GetHits(stationGroup, station);
+	std::cout << "sg=" << stationGroup << " st=" << station
+		<< " nofHits=" << nofHits << "" << std::endl;
+	for (unsigned int iHit = hits.first; iHit < hits.second; iHit++) {
+		LitScalPixelHit* hit = hitvec[iHit];
+
+		LitTrackParamScal upar = *par;
+		LitPixelHitScal lhit;
+		lhit.X = hit->X;
+		lhit.Y = hit->Y;
+		lhit.Dx = hit->Dx;
+		lhit.Dy = hit->Dy;
+		lhit.Dxy = hit->Dxy;
+
+		//First update track parameters with KF, than check whether the hit is in the validation gate.
+		LitFiltration(upar, lhit);
+		static const fscal CHISQCUT = 20.;
+		fscal chisq = ChiSq(upar, lhit);
+
+		if (chisq < CHISQCUT && chisq < chiSq) {
+			chiSq = chisq;
+			hita = hit;
+			param = upar;
+		}
+	}
+
+	// if hit was attached than change track information
+	if (hita != NULL) {
+		track->AddHit(hita);
+		track->paramLast = param;
+		track->chiSq += chiSq;
+		track->NDF = NDF(*track);
+		hitAdded = true;
+	}
+	return hitAdded;
+}

@@ -19,7 +19,7 @@
 #include "LitDetectorGeometryElectron.h"
 #include "LitHitDataElectron.h"
 
-class CbmLitField;
+//class CbmLitField;
 
 //#define cnst static const fvec
 
@@ -81,11 +81,13 @@ public:
 			int stationGroup,
 			int station);
 
-//	bool AddNearestHit(
-//			LitTrackScal* track,
-//			HitPtrIteratorPair hits[],
-//			const CbmLitTrackParam par[],
-//			int nofSubstations);
+	bool AddNearestHit(
+			LitScalTrack* track,
+			const std::pair<unsigned int, unsigned int>& hits,
+			LitTrackParamScal* par,
+			unsigned int nofHits,
+			int stationGroup,
+			int station);
 
 private:
 	LitScalTrack* fTracks[MAX_NOF_TRACKS_ELECTRON]; // local copy of tracks
@@ -98,7 +100,7 @@ private:
 	fscal fSigmaCoef;
 	fscal fMaxCovSq;
 
-	CbmLitField* fField;
+//	CbmLitField* fField;
 };
 
 //#undef cnst

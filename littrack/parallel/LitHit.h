@@ -47,7 +47,8 @@ public:
 	}
 } _fvecalignment;
 
-
+typedef LitPixelHit<fscal> LitPixelHitScal;
+typedef LitPixelHit<fvec> LitPixelHitVec;
 
 class LitScalStripHit
 {

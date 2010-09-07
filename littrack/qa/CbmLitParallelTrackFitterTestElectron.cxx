@@ -88,7 +88,7 @@ LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
 //    	LitAddMaterial(lpar, vp2.material);
 
     	LitRK4ExtrapolationElectron(lpar, vp2.Z, vp1.fieldSlice, vp1.fieldSliceMid, vp2.fieldSlice);
-    	LitAddMaterial(lpar, vp2.material);
+    	LitAddMaterialElectron(lpar, vp2.material);
 
 //    	if (vp2.Z < 200.)
 //    		fExtrapolator->Extrapolate(&par, vp2.Z);
@@ -111,7 +111,7 @@ LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
 	    	LitLineExtrapolation(lpar, station.Z);
 
 	    	for (unsigned char im = 0; im < station.GetNofMaterialsBefore(); im++)
-	    		LitAddMaterial(lpar, station.materialsBefore[im]);
+	    		LitAddMaterialElectron(lpar, station.materialsBefore[im]);
 
 			LitTrackParamScalToCbmLitTrackParam(&lpar, &par);
 
@@ -124,7 +124,7 @@ LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
 				LitFiltration(ulpar, lhit);
 				fscal chisq = ChiSq(ulpar, lhit);
 
-//				lpar = ulpar;
+				lpar = ulpar;
 
 				CbmLitTrackParam upar;
 				LitTrackParamScalToCbmLitTrackParam(&ulpar, &upar);
@@ -137,7 +137,7 @@ LitStatus CbmLitParallelTrackFitterTestElectron::Fit(
 			}
 
 			for (unsigned char im = 0; im < station.GetNofMaterialsAfter(); im++)
-				LitAddMaterial(lpar, station.materialsAfter[im]);
+				LitAddMaterialElectron(lpar, station.materialsAfter[im]);
 	    }
 	}
 

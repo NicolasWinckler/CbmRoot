@@ -581,6 +581,7 @@ void CbmLitEnvironment::GetTrdLayout(
 		m.RadThick = m.Thickness / m.X0; // Length/X0
 		m.SqrtRadThick = sqrt(m.RadThick); // std::sqrt(Length/X0)
 		m.LogRadThick = log(m.RadThick); // std::log(Length/X0)
+		m.ElLoss = exp(m.RadThick * log(3.) / log (2.)) - exp(-2. * m.RadThick);
 
 		virtualPlane.material = m;
 
@@ -616,6 +617,7 @@ void CbmLitEnvironment::GetTrdLayout(
 					m.RadThick = m.Thickness / m.X0; // Length/X0
 					m.SqrtRadThick = sqrt(m.RadThick); // std::sqrt(Length/X0)
 					m.LogRadThick = log(m.RadThick); // std::log(Length/X0)
+					m.ElLoss = exp(m.RadThick * log(3.) / log (2.)) - exp(-2. * m.RadThick);
 
 					if (im < 3) st.AddMaterialBefore(m);
 					else st.AddMaterialAfter(m);

@@ -28,7 +28,8 @@ if($ENV{ctest_model} MATCHES Nightly)
   STRING(REGEX REPLACE "\n" ";" _result "${FILELIST}")
 
   FOREACH(_file ${_result})
-    SET (CTEST_NOTES_FILES ${CTEST_NOTES_FILES} "${CTEST_SOURCE_DIRECTORY}/${_file}")
+    STRING(STRIP "${_file}" _file1)
+    SET (CTEST_NOTES_FILES ${CTEST_NOTES_FILES} "${CTEST_SOURCE_DIRECTORY}/${_file1}")
   ENDFOREACH(_file ${_result})
 
   CTEST_EMPTY_BINARY_DIRECTORY(${CTEST_BINARY_DIRECTORY})

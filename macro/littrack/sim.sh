@@ -39,9 +39,9 @@ for Y in 0; do
   set_default_file_names $DIR $XXXX
   
   root -b -q "./global_sim.C($NEVENTS)"
-  root -b -q "./global_reco.C($NEVENTS, \"all\")"
-  #root -b -q "./global_reco.C($NEVENTS, \"hits\")"
-  #root -b -q "./global_reco.C($NEVENTS, \"tracking\")"
+  #root -b -q "./global_reco.C($NEVENTS, \"all\")"
+  root -b -q "./global_reco.C($NEVENTS, \"hits\")"
+  root -b -q "./global_reco.C($NEVENTS, \"tracking\")"
   #root -b -q "../rich/run/run_reco_rich.C($NEVENTS)"
   #root -b -q "../rich/electronId/run_electrons_qa.C($NEVENTS)"
   

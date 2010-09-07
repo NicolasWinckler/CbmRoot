@@ -33,15 +33,15 @@ void draw_diff_true_fake(TH1D* h1, TH1D* h2)
 }
 
 void draw_qa(){
-       // TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.recorich.root");
-        TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/test_electrons/rich.reco.0000.root");
+        TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.recorich.root");
+       // TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/test_electrons/rich.reco.0000.root");
 	TDirectory *current = gDirectory;
         current->cd("RichRingQaHist");
 
    // gROOT->SetStyle("Plain");
    // gStyle->SetPalette(1,0);
 
-     //   gStyle->SetHistLineWidth(3);
+    gStyle->SetHistLineWidth(3);
      //   gROOT->ForceStyle();
 	//gStyle->SetOptStat(0);
 	//gStyle->SetOptFit(1);

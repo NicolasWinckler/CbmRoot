@@ -17,6 +17,7 @@
 #include "parallel/LitTrackFitter.h"
 #include "parallel/LitDetectorGeometry.h"
 #include "parallel/LitVecPack.h"
+#include "parallel/electron/LitTrackFitterElectron.h"
 
 #include "CbmGlobalTrack.h"
 #include "FairRunAna.h"
@@ -24,6 +25,7 @@
 #include "FairRootManager.h"
 #include "CbmStsTrack.h"
 #include "CbmMuchTrack.h"
+#include "CbmTrdTrack.h"
 
 #include "TClonesArray.h"
 #include "TStopwatch.h"
@@ -121,15 +123,25 @@ void CbmLitTrackFitSpeedTest::RunTest()
     unsigned int nofTracksVec = nofTracks / fvecLen;
     std::cout << "nofTracks = " << nofTracks << std::endl;
     std::cout << "nofTracksVec = " << nofTracksVec << std::endl;
-    const int ntimes = 100; // repeate each test ntimes
+    const int ntimes = 100; // repeat each test ntimes
 
     // Initialization
 	// Get the layout for the fast track fit
 	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-    LitDetectorLayoutScal layoutScal;
+
+	// For MUCH track fit
+	LitDetectorLayoutScal layoutScal;
     LitDetectorLayoutVec layoutVec;
-    env->GetMuchLayoutScal(layoutScal);
-    env->GetMuchLayoutVec(layoutVec);
+    // For TRD track fit
+	LitDetectorLayoutElectronScal layoutElectronScal;
+    LitDetectorLayoutElectronVec layoutElectronVec;
+    if (!fIsElectronSetup) {
+    	env->GetMuchLayoutScal(layoutScal);
+    	env->GetMuchLayoutVec(layoutVec);
+    } else {
+    	env->GetTrdLayoutScal(layoutElectronScal);
+    	env->GetTrdLayoutVec(layoutElectronVec);
+    }
 
     // Convert to LitTracksScal
     LitTrackScal* tracksFast = new LitTrackScal[nofTracks];
@@ -143,11 +155,11 @@ void CbmLitTrackFitSpeedTest::RunTest()
 	std::cout << "Runing test standard Kalman track fit..." << std::endl;
 	TStopwatch timer1;
     timer1.Start();
-    for (int c = 0; c < ntimes; c++) {
-		for(unsigned int i = 0; i < nofTracks; i++){
-			fFitterLitKalman->Fit(fLitTracks[i]);
-		}
-    }
+//    for (int c = 0; c < ntimes; c++) {
+//		for(unsigned int i = 0; i < nofTracks; i++){
+//			fFitterLitKalman->Fit(fLitTracks[i]);
+//		}
+//    }
     timer1.Stop();
 	// end test standard fit
 
@@ -155,9 +167,17 @@ void CbmLitTrackFitSpeedTest::RunTest()
 	std::cout << "Runing test fast scalar Kalman track fit..." << std::endl;
 	TStopwatch timer2;
     timer2.Start();
-    for (int c = 0; c < ntimes; c++) {
-		for(unsigned int i = 0; i < nofTracks; i++) {
-			LitTrackFitter(tracksFast[i], layoutScal);
+    if (!fIsElectronSetup) {
+		for (int c = 0; c < ntimes; c++) {
+			for(unsigned int i = 0; i < nofTracks; i++) {
+				LitTrackFitter(tracksFast[i], layoutScal);
+			}
+		}
+    } else {
+    	for (int c = 0; c < ntimes; c++) {
+			for(unsigned int i = 0; i < nofTracks; i++) {
+				LitTrackFitterElectron(tracksFast[i], layoutElectronScal);
+			}
 		}
     }
     timer2.Stop();
@@ -179,9 +199,17 @@ void CbmLitTrackFitSpeedTest::RunTest()
 	}
     TStopwatch timer3;
     timer3.Start();
-    for (int c = 0; c < ntimes; c++) {
-		for(unsigned int i = 0; i < nofTracksVec; i++) {
-			LitTrackFitter(tracksVec[i], layoutVec);
+    if (!fIsElectronSetup) {
+		for (int c = 0; c < ntimes; c++) {
+			for(unsigned int i = 0; i < nofTracksVec; i++) {
+				LitTrackFitter(tracksVec[i], layoutVec);
+			}
+		}
+    } else {
+    	for (int c = 0; c < ntimes; c++) {
+			for(unsigned int i = 0; i < nofTracksVec; i++) {
+				LitTrackFitterElectron(tracksVec[i], layoutElectronVec);
+			}
 		}
     }
     timer3.Stop();
@@ -216,6 +244,18 @@ void CbmLitTrackFitSpeedTest::ReadDataBranches()
 		fMuchStrawHits = (TClonesArray*) ioman->GetObject("MuchStrawHit");
 		if (NULL == fMuchPixelHits && NULL == fMuchStrawHits) Fatal("CbmLitTrackFitSpeedTest::Init", "No MuchPixelHit AND MuchStrawHit arrays!");
    	}
+
+   	if (fIsTrd) {
+		fTrdTracks = (TClonesArray*) ioman->GetObject("TrdTrack");
+		if (NULL == fTrdTracks) Fatal("CbmLitPropagationAnalysis::Init", "No TrdTrack array!");
+		fTrdHits  = (TClonesArray*) ioman->GetObject("TrdHit");
+		if (NULL == fTrdHits) Fatal("CbmLitPropagationAnalysis::Init", "No TRDHit array!");
+   	}
+
+//   	if (fIsTof) {
+//		fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
+//		if (NULL == fTofHits) Fatal("CbmLitPropagationAnalysis::Init", "No TofHit array!");
+//   	}
 }
 
 void CbmLitTrackFitSpeedTest::CreateHistograms()
@@ -234,6 +274,7 @@ void CbmLitTrackFitSpeedTest::CreateTrackArrays()
 
 		GlobalTrackToLitTrack(globalTrack, litTrack);
 		if (fIsElectronSetup) litTrack->SetPDG(11); else litTrack->SetPDG(13);
+
 		if (litTrack->GetNofHits() != fNofPlanes) continue;
 		litTrack->SortHits();
 		fLitTracks.push_back(litTrack);
@@ -246,10 +287,16 @@ Bool_t CbmLitTrackFitSpeedTest::CheckAcceptance(
 	Int_t trdId = globalTrack->GetTrdTrackIndex();
 	Int_t muchId = globalTrack->GetMuchTrackIndex();
 	Int_t tofId = globalTrack->GetTofHitIndex();
+	if (fIsTrd && trdId > -1) {
+		CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTrdTracks->At(trdId);
+		if (trdTrack->GetNofHits() != fNofTrdHits) return false;
+	}
 	if (fIsMuch && muchId > -1) {
 		CbmMuchTrack* muchTrack = (CbmMuchTrack*) fMuchTracks->At(muchId);
 		if (muchTrack->GetNofHits() != fNofMuchHits) return false;
 	}
+
+//	if (tofId > -1) return true;
 	return true;
 }
 
@@ -289,6 +336,24 @@ void CbmLitTrackFitSpeedTest::GlobalTrackToLitTrack(
 			}
 		}
 	}
+	//TRD: attach hits from TRD track
+	if (trdId > -1) {
+		CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTrdTracks->At(trdId);
+		for (int iHit = 0; iHit < trdTrack->GetNofHits(); iHit++) {
+			Int_t index = trdTrack->GetHitIndex(iHit);
+			CbmPixelHit* hit = (CbmPixelHit*) fTrdHits->At(index);
+			CbmLitPixelHit litHit;
+			CbmLitConverter::PixelHitToLitPixelHit(hit, index, &litHit);
+			litTrack->AddHit(&litHit);
+		}
+	}
+//	//TOF: attach TOF hit
+//	if (tofId > -1) {
+//		CbmPixelHit* tofHit = (CbmPixelHit*) fTofHits->At(tofId);
+//		CbmLitPixelHit litHit;
+//		CbmLitConverter::PixelHitToLitPixelHit(tofHit, tofId, &litHit);
+//		litTrack->AddHit(&litHit);
+//	}
 }
 
 ClassImp(CbmLitTrackFitSpeedTest);

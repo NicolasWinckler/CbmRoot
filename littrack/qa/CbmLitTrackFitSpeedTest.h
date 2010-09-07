@@ -27,6 +27,7 @@ public:
 
 	void SetNofPlanes(Int_t nofPlanes) {fNofPlanes = nofPlanes;}
 	void SetNofMuchHits(Int_t nofMuchHits) {fNofMuchHits = nofMuchHits;}
+	void SetNofTrdHits(Int_t nofTrdHits) {fNofTrdHits = nofTrdHits;}
 
 private:
 	void RunTest();
@@ -43,6 +44,7 @@ private:
 
 	// Track acceptance parameters
 	Int_t fNofMuchHits; // number of MUCH hits
+	Int_t fNofTrdHits; // number of TRD hits
 
 	// Pointers to data arrays
 	TClonesArray* fGlobalTracks; // CbmGlobalTrack array
@@ -50,6 +52,9 @@ private:
 	TClonesArray* fMuchTracks; // CbmMuchTracks array
 	TClonesArray* fMuchPixelHits; // CbmMuchPixelHits array
 	TClonesArray* fMuchStrawHits; // CbmMuchStrawHits array
+	TClonesArray* fTrdTracks; // CbmTrdTrack array
+	TClonesArray* fTrdHits; // CbmTrdHit array
+//	TClonesArray* fTofHits; // CbmTofHit array
 
 	TrackPtrVector fLitTracks; // array with reconstructed global tracks converted to LitTracks
 

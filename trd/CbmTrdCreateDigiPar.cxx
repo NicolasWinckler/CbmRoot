@@ -42,12 +42,12 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar()
    fSectorSizey(0),
    fCol(-1),     
    fRow(-1),     
-   fModuleID(-1.),
+   fModuleID(-1),
    fMaxSectors(0),
    fPosX(-1.),    
    fPosY(-1.),    
    fModuleMap(), 
-   fModuleMapIt(0),
+   fModuleMapIt(),
    fDigiPar(NULL),
    fTrdDetId()
 {
@@ -79,12 +79,12 @@ CbmTrdCreateDigiPar::CbmTrdCreateDigiPar(const char *name, const char *title)
    fSectorSizey(0),
    fCol(-1),     
    fRow(-1),     
-   fModuleID(-1.),
+   fModuleID(-1),
    fMaxSectors(0),
    fPosX(-1.),    
    fPosY(-1.),    
    fModuleMap(), 
-   fModuleMapIt(0),
+   fModuleMapIt(),
    fDigiPar(NULL),
    fTrdDetId()
 {

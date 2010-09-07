@@ -222,7 +222,7 @@ void CbmMuchFindHitsAdvancedGem::FinishTask() {
       eff += (*it);
     }
     eff /= efficiencies.size();
-    printf("Station %i: losts = %f%, fakes = %f%, resolved signal = %f%\n",
+    printf("Station %i: losts = %f, fakes = %f, resolved signal = %f\n",
         iStation + 1, fLosts.at(iStation) / fEvent * 100, fFakes.at(iStation)
             / fEvent * 100, eff * 100);
   }
@@ -320,8 +320,8 @@ void CbmMuchFindHitsAdvancedGem::StatInfo() {
     if (fSignalMuonsAll[iStation].size() == 0) {
       printf(
           "Station %i: Total number of signal = %i, Number of resolved signal = %i\n",
-          iStation + 1, fSignalMuonsAll[iStation].size(),
-          fSignalMuons[iStation].size());
+          iStation + 1, (Int_t)fSignalMuonsAll[iStation].size(),
+          (Int_t)fSignalMuons[iStation].size());
     }
     else {
       Double_t frSignal = (Double_t) fSignalMuons[iStation].size()
@@ -332,9 +332,9 @@ void CbmMuchFindHitsAdvancedGem::StatInfo() {
       }
       fStationEff[iStation].push_back(frSignal);
       printf(
-          "Station %i: Total number of signal = %i, Number of resolved signal = %i, signal efficiency = %f% \n",
-          iStation + 1, fSignalMuonsAll[iStation].size(),
-          fSignalMuons[iStation].size(), frSignal * 100);
+          "Station %i: Total number of signal = %i, Number of resolved signal = %i, signal efficiency = %f \n",
+          iStation + 1, (Int_t)fSignalMuonsAll[iStation].size(),
+          (Int_t)fSignalMuons[iStation].size(), frSignal * 100);
     }
   }
 

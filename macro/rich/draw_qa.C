@@ -4,7 +4,8 @@
     Author : Semen Lebedev
     E-mail : S.Lebedev@gsi.de
 */
-
+#include "../../littrack/utils/CbmLitDrawHist.cxx"
+#include "../../littrack/utils/CbmLitUtils.cxx"
 TH1D* divide_hist(TH1D* h1, TH1D* h2, char* histTitle, Int_t nofBins, Double_t min, Double_t max)
 {
     h1->SetBins(nofBins, min, max);
@@ -32,20 +33,21 @@ void draw_diff_true_fake(TH1D* h1, TH1D* h2)
 }
 
 void draw_qa(){
-	TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.recorich.root");
-
+       // TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.recorich.root");
+        TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/test_electrons/rich.reco.0000.root");
 	TDirectory *current = gDirectory;
         current->cd("RichRingQaHist");
 
-    gROOT->SetStyle("Plain");
-    gStyle->SetPalette(1,0);
+   // gROOT->SetStyle("Plain");
+   // gStyle->SetPalette(1,0);
 
-	gStyle->SetHistLineWidth(3);
-	gROOT->ForceStyle();
+     //   gStyle->SetHistLineWidth(3);
+     //   gROOT->ForceStyle();
 	//gStyle->SetOptStat(0);
 	//gStyle->SetOptFit(1);
+	SetStyles();
 
-    TCanvas *c1 = new TCanvas("c1","c1",600,900);
+    TCanvas *c1 = new TCanvas("c1","c1",400,600);
     c1->Divide(2,3);
     c1->cd(1);
     draw_diff_true_fake(fh_TrueElNofHits, fh_FakeNofHits);
@@ -127,7 +129,7 @@ void draw_qa(){
     cout << "Matching efficiency = " << (Double_t)fh_TrueMatchElMom->GetEntries()/
                                 (Double_t)fh_RecElRingsMom->GetEntries() << endl;
 
-    cout << "Nof Fakes = " << fh_FakePhi->GetEntries()<< endl;
+    cout << "Nof Fakes = " << fh_FakeNofHits->GetEntries()<< endl;
 }
 
 

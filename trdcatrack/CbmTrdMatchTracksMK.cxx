@@ -1116,7 +1116,7 @@ void CbmTrdMatchTracksMK::Exec(Option_t* opt) {
 	  reco = RECO_noPrimRefAll[m],
 	  mc = MC_noPrimRefAll[m];
 
-	Double_t mom = Double_t(m);
+	mom = Double_t(m);
 
 	//      cout << "Filling the values: (" << mom << ", " << qEff << ")" << endl;
 	for(int k=0;k<RECO_noPrimRefAll[m];k++) {

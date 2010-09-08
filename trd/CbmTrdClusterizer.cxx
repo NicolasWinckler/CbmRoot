@@ -965,7 +965,7 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar(Bool_t Sector, Int_t Vol
       Double_t fsectorsizex;
       Double_t fsectorsizey;
       Double_t temp = 0.0;
-      Int_t tempInt = 0.0;
+      Int_t tempInt = 0;
 
 
       Int_t* detInfo = fTrdId.GetDetectorInfo(VolumeID); 

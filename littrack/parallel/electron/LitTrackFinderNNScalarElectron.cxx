@@ -7,21 +7,68 @@
 #include "../LitFiltration.h"
 #include "../LitField.h"
 #include "../LitMath.h"
+#include "../LitConverter.h"
 
 #include "CbmLitEnvironment.h"
-//#include "CbmLitMapField.h"
+#include "CbmLitMapField.h"
+#include "CbmLitToolFactory.h"
 
 #include <algorithm>
 #include <iostream>
 #include <limits>
 
-LitTrackFinderNNScalarElectron::LitTrackFinderNNScalarElectron():
-	fMaxNofMissingHits(2),
-	fSigmaCoef(3.5),
-	fMaxCovSq(20.*20.)
+
+#ifdef LIT_USE_TBB
+#undef LIT_USE_TBB
+#endif
+
+//#define LIT_USE_TBB // TBB will be used for multithreading
+
+#ifdef LIT_USE_TBB
+#include "tbb/task_scheduler_init.h"
+#include "tbb/parallel_for.h"
+#include "tbb/blocked_range.h"
+#include "tbb/parallel_sort.h"
+#endif // LIT_USE_TBB
+
+
+#ifdef LIT_USE_TBB
+class FollowTrackClass
 {
-//	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-//	fField = new CbmLitMapField(env->GetField());
+	LitScalTrack** fTracks;
+	LitTrackFinderNNScalarElectron* fFinder;
+public:
+	void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
+		for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
+			LitScalTrack* track = fTracks[iTrack];
+			fFinder->PropagateToFirstStation(track);
+			fFinder->FollowTrack(track);
+		}
+	}
+	FollowTrackClass(
+			LitTrackFinderNNScalarElectron* finder,
+			LitScalTrack* tracks[]) :
+		fFinder(finder),
+		fTracks(tracks) {}
+};
+#endif
+
+LitTrackFinderNNScalarElectron::LitTrackFinderNNScalarElectron():
+	fMaxNofMissingHits(3)
+{
+	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
+	fField = new CbmLitMapField(env->GetField());
+
+	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
+	fExtrapolator = factory->CreateTrackExtrapolator("lit");
+	fPropagator = factory->CreateTrackPropagator("lit");
+
+	SetSigmaCoef(5.);
+	SetMaxCovSq(20*20);
+
+#ifdef LIT_USE_TBB
+	tbb::task_scheduler_init init;
+#endif
 }
 
 LitTrackFinderNNScalarElectron::~LitTrackFinderNNScalarElectron()
@@ -44,16 +91,8 @@ void LitTrackFinderNNScalarElectron::DoFind(
 	nofTracks = 0;
 	for (unsigned int i = 0; i < fNofTracks; i++) {
 		LitScalTrack* track = fTracks[i];
-//		std::cout << *track;
-//		if (track->nofHits < 11) continue;
-//		std::cout << *track;
 		tracks[nofTracks++] = new LitScalTrack(*track);
 	}
-
-	for (unsigned int i = 0; i < nofTracks; i++)
-		std::cout << *tracks[i];
-
-	std::cout << "Number of found tracks: " << nofTracks << std::endl;
 
 	for (unsigned int i = 0; i < fNofTracks; i++) {
 		delete fTracks[i];
@@ -84,50 +123,15 @@ void LitTrackFinderNNScalarElectron::ArrangeHits(
 			LitScalPixelHit** begin = &shits[0];
 			LitScalPixelHit** end = &shits[0] + fHitData.GetNofHits(i, j);
 
-			std::sort(begin, end, ComparePixelHitXLess());
+#ifdef LIT_USE_TBB
+    		tbb::parallel_sort(begin, end, ComparePixelHitXLess());
+#else
+    		std::sort(begin, end, ComparePixelHitXLess());
+#endif
     	}
     }
 
-    std::cout << fHitData;
-}
-
-void LitTrackFinderNNScalarElectron::MinMaxIndex(
-		const LitTrackParamScal* par,
-		LitScalPixelHit** hits,
-		unsigned int nofHits,
-		fscal maxErr,
-		unsigned int &first,
-		unsigned int &last)
-{
-	LitScalPixelHit hit;
-	first = 0;
-	last = 0;
-	if (par->C0 > fMaxCovSq || par->C0 < 0.) return;
-	if (nofHits == 0) return;
-
-	fscal devX = fSigmaCoef * (std::sqrt(par->C0) + maxErr);
-//	fscal devX = fSigmaCoef * std::sqrt(par->C0 + maxErr * maxErr);
-	LitScalPixelHit** begin = &hits[0];
-	LitScalPixelHit** end = &hits[0] + nofHits;
-	hit.X = par->X - devX;
-	first = std::distance(begin, std::lower_bound(begin, end, &hit, ComparePixelHitXLess()));
-//	std::cout << "---first:" << "hit.X=" << hit.X << " hits[first]->X" << hits[first]->X << std::endl;
-
-	if (first >= nofHits) {
-//		std::cout << "----EEEEE----- firstID >= nofHits" << first << " " << nofHits  << std::endl;
-		first = 0;
-		last = 0;
-		return;
-	}
-
-	hit.X = par->X + devX;
-	last = std::distance(begin, std::lower_bound(begin, end, &hit, ComparePixelHitXLess()));
-//	std::cout << "---last:" << "hit.X=" << hit.X << " hits[last]->X" << hits[last]->X << std::endl;
-	if (last >= nofHits) {
-//		std::cout << "----EEEEE----- lastID >= nofHits"  << last << " " << nofHits << std::endl;
-//		first = 0;
-		last = nofHits;
-	}
+//    std::cout << fHitData;
 }
 
 void LitTrackFinderNNScalarElectron::InitTrackSeeds(
@@ -159,11 +163,16 @@ void LitTrackFinderNNScalarElectron::InitTrackSeeds(
 
 void LitTrackFinderNNScalarElectron::FollowTracks()
 {
-	for (unsigned int iTrack = 0; iTrack < fNofTracks; iTrack++) {
-		LitScalTrack* track = fTracks[iTrack];
-		PropagateToFirstStation(track);
-		FollowTrack(track);
-	}
+#ifdef LIT_USE_TBB
+		tbb::parallel_for(tbb::blocked_range<unsigned int>(0, fNofTracks),
+		FollowTrackClass(this, fTracks), tbb::auto_partitioner());
+#else
+		for (unsigned int iTrack = 0; iTrack < fNofTracks; iTrack++) {
+			LitScalTrack* track = fTracks[iTrack];
+			PropagateToFirstStation(track);
+			FollowTrack(track);
+		}
+#endif
 }
 
 void LitTrackFinderNNScalarElectron::PropagateToFirstStation(
@@ -173,8 +182,16 @@ void LitTrackFinderNNScalarElectron::PropagateToFirstStation(
     	LitVirtualPlaneElectron<fscal>& vp1 = fLayout.virtualPlanes[ivp];
     	LitVirtualPlaneElectron<fscal>& vp2 = fLayout.virtualPlanes[ivp+1];
 
+//    	LitTrackParamScal lpar = track->paramLast;
+//    	CbmLitTrackParam par;
+//    	LitTrackParamScalToCbmLitTrackParam(&lpar, &par);
+////    	fPropagator->Propagate(&par, vp2.Z, 11, NULL);
+//    	fExtrapolator->Extrapolate(&par, vp2.Z);
+//        CbmLitTrackParamToLitTrackParamScal(&par, &lpar);
+//        track->paramLast = lpar;
+
     	LitRK4ExtrapolationElectron(track->paramLast, vp2.Z, vp1.fieldSlice, vp1.fieldSliceMid, vp2.fieldSlice);
-//    	LitRK4ExtrapolationElectron(track->paramLast, vp2.Z, fField);
+//    	LitRK4ExtrapolationElectron1(track->paramLast, vp2.Z, fField);
     	LitAddMaterial(track->paramLast, vp2.material);
     }
 }
@@ -215,6 +232,15 @@ bool LitTrackFinderNNScalarElectron::ProcessStation(
 
 	const LitStationElectronScal& st = fLayout.GetStation(stationGroup, station);
 
+//	LitTrackParamScal lpar = track->paramLast;
+//	CbmLitTrackParam par1;
+//	LitTrackParamScalToCbmLitTrackParam(&lpar, &par1);
+////	fPropagator->Propagate(&par1, st.Z, 11, NULL);
+//	fExtrapolator->Extrapolate(&par1, st.Z);
+//    CbmLitTrackParamToLitTrackParamScal(&par1, &lpar);
+//    track->paramLast = lpar;
+//    par=lpar;
+
 	LitLineExtrapolation(par, st.Z);
 
 	for (unsigned char im = 0; im < st.GetNofMaterialsBefore(); im++)
@@ -250,8 +276,6 @@ bool LitTrackFinderNNScalarElectron::AddNearestHit(
 	fscal chiSq = std::numeric_limits<fscal>::max();
 
 	LitScalPixelHit** hitvec = fHitData.GetHits(stationGroup, station);
-	std::cout << "sg=" << stationGroup << " st=" << station
-		<< " nofHits=" << nofHits << "" << std::endl;
 	for (unsigned int iHit = hits.first; iHit < hits.second; iHit++) {
 		LitScalPixelHit* hit = hitvec[iHit];
 
@@ -265,7 +289,7 @@ bool LitTrackFinderNNScalarElectron::AddNearestHit(
 
 		//First update track parameters with KF, than check whether the hit is in the validation gate.
 		LitFiltration(upar, lhit);
-		static const fscal CHISQCUT = 20.;
+		static const fscal CHISQCUT = 50.;
 		fscal chisq = ChiSq(upar, lhit);
 
 		if (chisq < CHISQCUT && chisq < chiSq) {

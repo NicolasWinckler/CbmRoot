@@ -18,14 +18,17 @@
 //#include "LitTrack.h"
 #include "LitDetectorGeometryElectron.h"
 #include "LitHitDataElectron.h"
+#include "../LitTrackFinderNNBase.h"
 
-//class CbmLitField;
+#include "CbmLitPtrTypes.h"
+
+class CbmLitField;
 
 //#define cnst static const fvec
 
 const unsigned int MAX_NOF_TRACKS_ELECTRON = 1500;
 
-class LitTrackFinderNNScalarElectron
+class LitTrackFinderNNScalarElectron : public LitTrackFinderNNBase
 {
 public:
 	/* Constructor */
@@ -55,14 +58,6 @@ public:
 	void InitTrackSeeds(
 			LitScalTrack* trackSeeds[],
 			unsigned int nofTrackSeeds);
-
-	inline void MinMaxIndex(
-			const LitTrackParamScal* par,
-			LitScalPixelHit** hits,
-			unsigned int nofHits,
-			fscal maxErr,
-			unsigned int &first,
-			unsigned int &last);
 
 	void FollowTracks();
 
@@ -97,10 +92,12 @@ private:
 	LitHitDataElectronScal fHitData; // arranged hits
 
 	unsigned char fMaxNofMissingHits;
-	fscal fSigmaCoef;
-	fscal fMaxCovSq;
+//	fscal fSigmaCoef;
+//	fscal fMaxCovSq;
 
-//	CbmLitField* fField;
+	TrackExtrapolatorPtr fExtrapolator;
+	TrackPropagatorPtr fPropagator;
+	CbmLitField* fField;
 };
 
 //#undef cnst

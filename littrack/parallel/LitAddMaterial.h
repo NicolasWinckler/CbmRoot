@@ -164,19 +164,25 @@ inline void LitAddMaterialElectron(
 		const LitMaterialInfo<T>& mat) {
 	static const T ZERO = 0.0, ONE = 1., TWO = 2., THREE = 3., INF = 1.e5;
 	static const T C1_2 = 0.5, C1_3 = 1./3.;
-//	static const T C_LOG = log(THREE) / log (TWO);
 
 	//scale material thickness
-//	T norm = sqrt(ONE + par.Tx * par.Tx + par.Ty * par.Ty);
-	T thickness = mat.Thickness; //norm * mat.Thickness;
-	T radThick = mat.RadThick;//thickness / mat.X0;
-	T sqrtRadThick = mat.SqrtRadThick;// sqrt(radThick);//mat.SqrtRadThick;
+	static const T C_LOG = log(THREE) / log (TWO);
+	T norm = sqrt(ONE + par.Tx * par.Tx + par.Ty * par.Ty);
+	T thickness = norm * mat.Thickness;
+	T radThick = thickness / mat.X0;
+	T sqrtRadThick = sqrt(radThick);
 	T logRadThick = mat.LogRadThick;//log(radThick);//mat.LogRadThick;
+
+	// no thickness scaling
+//	T thickness = mat.Thickness;
+//	T radThick = mat.RadThick;
+//	T sqrtRadThick = mat.SqrtRadThick;
+//	T logRadThick = mat.LogRadThick;
 
 	/*
 	 * Energy loss corrections
 	 */
-//	par.Qp *= exp(radThick);
+	par.Qp *= exp(radThick);
 	par.C14 += par.Qp * par.Qp * mat.ElLoss;//(exp(radThick * C_LOG) - exp(-TWO * radThick));
 	/*
 	 * End of energy loss corrections

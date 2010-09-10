@@ -151,10 +151,11 @@ If(TBB_FOUND)
       ${LITTRACK_SRCS_RULECHECKER}
       finder/CbmLitTrackFinderNNParallel.cxx
       parallel/LitTrackFinderNNParallel.cxx
+      parallel/LitTrackFinderNNBase.cxx
       parallel/electron/LitTrackFinderNNScalarElectron.cxx
       qa/CbmLitParallelTrackFitterTest.cxx 
       qa/CbmLitParallelTrackFitterTestElectron.cxx 
-#      qa/CbmLitTrackFitSpeedTest.cxx
+      qa/CbmLitTrackFitSpeedTest.cxx
      )
 EndIf(TBB_FOUND)
 
@@ -194,7 +195,7 @@ qa/CbmLitCreateStandaloneData.h
 If(TBB_FOUND)
   Set(LITTRACK_HEADERS 
       ${LITTRACK_HEADERS}
-#      qa/CbmLitTrackFitSpeedTest.h
+      qa/CbmLitTrackFitSpeedTest.h
      )
 EndIf(TBB_FOUND)
 

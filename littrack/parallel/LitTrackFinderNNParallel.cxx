@@ -157,10 +157,11 @@ public:
 
 
 LitTrackFinderNNParallel::LitTrackFinderNNParallel():
-	fMaxNofMissingHits(2),
-	fSigmaCoef(3.5),
-	fMaxCovSq(20.*20.)
+	fMaxNofMissingHits(2)
 {
+	SetSigmaCoef(3.5);
+	SetMaxCovSq(20.*20.);
+
 #ifdef LIT_USE_TBB
 	tbb::task_scheduler_init init;
 #endif
@@ -239,45 +240,6 @@ void LitTrackFinderNNParallel::ArrangeHits(
 //    		}
     	}
     }
-}
-
-void LitTrackFinderNNParallel::MinMaxIndex(
-		const LitTrackParamScal* par,
-		LitScalPixelHit** hits,
-		unsigned int nofHits,
-		fscal maxErr,
-		unsigned int &first,
-		unsigned int &last)
-{
-	LitScalPixelHit hit;
-	first = 0;
-	last = 0;
-	if (par->C0 > fMaxCovSq || par->C0 < 0.) return;
-	if (nofHits == 0) return;
-
-	fscal devX = fSigmaCoef * (std::sqrt(par->C0) + maxErr);
-//	fscal devX = fSigmaCoef * std::sqrt(par->C0 + maxErr * maxErr);
-	LitScalPixelHit** begin = &hits[0];
-	LitScalPixelHit** end = &hits[0] + nofHits;
-	hit.X = par->X - devX;
-	first = std::distance(begin, std::lower_bound(begin, end, &hit, ComparePixelHitXLess()));
-//	std::cout << "---first:" << "hit.X=" << hit.X << " hits[first]->X" << hits[first]->X << std::endl;
-
-	if (first >= nofHits) {
-//		std::cout << "----EEEEE----- firstID >= nofHits" << first << " " << nofHits  << std::endl;
-		first = 0;
-		last = 0;
-		return;
-	}
-
-	hit.X = par->X + devX;
-	last = std::distance(begin, std::lower_bound(begin, end, &hit, ComparePixelHitXLess()));
-//	std::cout << "---last:" << "hit.X=" << hit.X << " hits[last]->X" << hits[last]->X << std::endl;
-	if (last >= nofHits) {
-//		std::cout << "----EEEEE----- lastID >= nofHits"  << last << " " << nofHits << std::endl;
-//		first = 0;
-		last = nofHits;
-	}
 }
 
 void LitTrackFinderNNParallel::InitTrackSeeds(

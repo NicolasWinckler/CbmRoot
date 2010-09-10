@@ -17,12 +17,13 @@
 #include "LitTrack.h"
 #include "LitDetectorGeometry.h"
 #include "LitHitData.h"
+#include "LitTrackFinderNNBase.h"
 
 #define cnst static const fvec
 
 const unsigned int MAX_NOF_TRACKS = 1500;
 
-class LitTrackFinderNNParallel
+class LitTrackFinderNNParallel : public LitTrackFinderNNBase
 {
 public:
 	/* Constructor */
@@ -58,14 +59,6 @@ public:
 	void InitTrackSeeds(
 			LitScalTrack* trackSeeds[],
 			unsigned int nofTrackSeeds);
-
-	inline void MinMaxIndex(
-			const LitTrackParamScal* par,
-			LitScalPixelHit** hits,
-			unsigned int nofHits,
-			fscal maxErr,
-			unsigned int &first,
-			unsigned int &last);
 
 	/* Follows tracks through the detector
 	 * @param itBegin Iterator to the first track.
@@ -117,8 +110,6 @@ private:
 	LitHitData<fvec> fHitData; // arranged hits
 
 	unsigned char fMaxNofMissingHits;
-	fscal fSigmaCoef;
-	fscal fMaxCovSq;
 };
 
 //#undef cnst

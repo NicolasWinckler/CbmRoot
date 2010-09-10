@@ -1,4 +1,4 @@
-/** CbmLitTrackFinderNNVecMuon.h
+/** LitTrackFinderNNVecMuon.h
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2009
  * @version 1.0
@@ -18,12 +18,14 @@
 #include "LitDetectorGeometryMuon.h"
 #include "LitHitDataMuon.h"
 #include "../LitTrackFinderNNBase.h"
+#include "../LitTrackFinder.h"
 
 #define cnst static const fvec
 
 const unsigned int MAX_NOF_TRACKS = 1500;
 
-class LitTrackFinderNNVecMuon : public LitTrackFinderNNBase
+class LitTrackFinderNNVecMuon : public LitTrackFinderNNBase,
+                                public LitTrackFinder
 {
 public:
 	/* Constructor */
@@ -32,7 +34,7 @@ public:
 	/* Destructor */
 	virtual ~LitTrackFinderNNVecMuon();
 
-	/* Inherited from CbmLitTrackFinder */
+	/* Inherited from LitTrackFinder */
 	virtual void DoFind(
 			LitScalPixelHit* hits[],
 			unsigned int nofHits,

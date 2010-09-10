@@ -19,6 +19,7 @@
 #include "LitDetectorGeometryElectron.h"
 #include "LitHitDataElectron.h"
 #include "../LitTrackFinderNNBase.h"
+#include "../LitTrackFinder.h"
 
 #include "CbmLitPtrTypes.h"
 
@@ -28,7 +29,8 @@ class CbmLitField;
 
 const unsigned int MAX_NOF_TRACKS_ELECTRON = 1500;
 
-class LitTrackFinderNNScalarElectron : public LitTrackFinderNNBase
+class LitTrackFinderNNScalarElectron : public LitTrackFinderNNBase,
+                                       public LitTrackFinder
 {
 public:
 	/* Constructor */
@@ -37,6 +39,7 @@ public:
 	/* Destructor */
 	virtual ~LitTrackFinderNNScalarElectron();
 
+	/* Inherited from LitTrackFinder */
 	virtual void DoFind(
 			LitScalPixelHit* hits[],
 			unsigned int nofHits,

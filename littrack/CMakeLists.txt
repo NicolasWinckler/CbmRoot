@@ -150,9 +150,9 @@ If(TBB_FOUND)
   Set(LITTRACK_SRCS_RULECHECKER 
       ${LITTRACK_SRCS_RULECHECKER}
       finder/CbmLitTrackFinderNNParallel.cxx
-      parallel/LitTrackFinderNNParallel.cxx
       parallel/LitTrackFinderNNBase.cxx
       parallel/electron/LitTrackFinderNNScalarElectron.cxx
+      parallel/muon/LitTrackFinderNNVecMuon.cxx
       qa/CbmLitParallelTrackFitterTest.cxx 
       qa/CbmLitParallelTrackFitterTestElectron.cxx 
       qa/CbmLitTrackFitSpeedTest.cxx

@@ -10,7 +10,7 @@
 
 #include "CbmLitTrackFinder.h"
 
-class LitTrackFinderNNParallel;
+class LitTrackFinderNNVecMuon;
 class LitTrackFinderNNScalarElectron;
 class LitScalPixelHit;
 class LitScalTrack;
@@ -50,7 +50,7 @@ private:
 			unsigned int nofTracks,
 			TrackPtrVector& tracks);
 
-	LitTrackFinderNNParallel* fTFParallelMuon;
+	LitTrackFinderNNVecMuon* fTFParallelMuon;
 
 	LitTrackFinderNNScalarElectron* fTFScalElectron;
 

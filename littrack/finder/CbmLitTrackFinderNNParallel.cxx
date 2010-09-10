@@ -12,7 +12,7 @@
 #include "parallel/LitDetectorGeometry.h"
 #include "parallel/LitTrack.h"
 #include "parallel/LitConverter.h"
-#include "parallel/LitTrackFinderNNParallel.h"
+#include "parallel/muon/LitTrackFinderNNVecMuon.h"
 #include "parallel/electron/LitTrackFinderNNScalarElectron.h"
 
 #include <iostream>
@@ -30,7 +30,7 @@ CbmLitTrackFinderNNParallel::CbmLitTrackFinderNNParallel(
 	if (fTrackingType == "nn_parallel_muon") {
 		LitDetectorLayoutVec layout;
 		env->GetMuchLayoutVec(layout);
-		fTFParallelMuon = new LitTrackFinderNNParallel();
+		fTFParallelMuon = new LitTrackFinderNNVecMuon();
 		fTFParallelMuon->SetDetectorLayout(layout);
 	} else if (fTrackingType == "nn_scalar_electron") {
 		LitDetectorLayoutElectronScal layout;

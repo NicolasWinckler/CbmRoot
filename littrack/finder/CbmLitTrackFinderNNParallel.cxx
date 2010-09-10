@@ -87,10 +87,10 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
 
 	ConvertTracks(ltracks, nofTracks, tracks);
 
-	std::cout << "NOFTRACKS=" << nofTracks << " tracks.size=" << tracks.size() << std::endl;
-	for (unsigned int i = 0; i < tracks.size(); i++) {
-		std::cout << tracks[i]->ToString();
-	}
+//	std::cout << "NOFTRACKS=" << nofTracks << " tracks.size=" << tracks.size() << std::endl;
+//	for (unsigned int i = 0; i < tracks.size(); i++) {
+//		std::cout << tracks[i]->ToString();
+//	}
 
 	for (unsigned int i = 0; i < NHITS; i++) {
 		delete lhits[i];

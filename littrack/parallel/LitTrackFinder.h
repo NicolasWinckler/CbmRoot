@@ -11,8 +11,8 @@
 
 class LitTrackFinder {
 public:
-	LitTrackFinder();
-	virtual ~LitTrackFinder();
+	LitTrackFinder() {};
+	virtual ~LitTrackFinder() {};
 
 	virtual void DoFind(
 		LitScalPixelHit* hits[],

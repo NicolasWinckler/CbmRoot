@@ -1,4 +1,4 @@
-/** LitHitData.h
+/** LitHitDataMuon.h
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2009
  * @version 1.0
@@ -7,12 +7,12 @@
  ** It is used in the parallel version of the Littrack tracking.
  **/
 
-#ifndef LITHITDATA_H_
-#define LITHITDATA_H_
+#ifndef LITHITDATAMUON_H_
+#define LITHITDATAMUON_H_
 
 //#include "LitTypes.h"
-#include "LitDetectorGeometry.h"
-#include "LitHit.h"
+#include "LitDetectorGeometryMuon.h"
+#include "../LitHit.h"
 
 //#include <vector>
 
@@ -20,11 +20,11 @@
 const unsigned int MAX_NOF_HITS = 2000;
 
 template<class T>
-class LitHitData
+class LitHitDataMuon
 {
 public:
 	/* Constructor */
-	LitHitData() {
+	LitHitDataMuon() {
 		for(int i = 0; i < MAX_NOF_STATION_GROUPS; i++) {
 			for(int j = 0; j < MAX_NOF_STATIONS; j++) {
 				for(int k = 0; k < MAX_NOF_SUBSTATIONS; k++){
@@ -36,13 +36,13 @@ public:
 	};
 
 	/* Destructor */
-	virtual ~LitHitData(){};
+	virtual ~LitHitDataMuon(){};
 
 	/* Sets the detector layout for which the hits are arranged
 	 *@param layout Detector layout
 	 */
 	void SetDetectorLayout(
-			const LitDetectorLayout<T>& layout){
+			const LitDetectorLayoutMuon<T>& layout){
 		fLayout = layout;
 	}
 
@@ -178,10 +178,10 @@ public:
 	// Arrays with maximum hit position errors for each substation
 	fscal fMaxErr[MAX_NOF_STATION_GROUPS][MAX_NOF_STATIONS][MAX_NOF_SUBSTATIONS];
 
-	LitDetectorLayout<T> fLayout;
+	LitDetectorLayoutMuon<T> fLayout;
 
-	friend std::ostream & operator<<(std::ostream &strm, const LitHitData &hitData){
-		strm << "HitData:" << std::endl;
+	friend std::ostream & operator<<(std::ostream &strm, const LitHitDataMuon &hitData){
+		strm << "HitDataMuon:" << std::endl;
 		for(int i = 0; i < hitData.fLayout.GetNofStationGroups(); i++) {
 			strm << " station group " << i << std::endl;
 			for(int j = 0; j < hitData.fLayout.GetNofStations(i); j++) {
@@ -197,4 +197,4 @@ public:
 
 } _fvecalignment;
 
-#endif /* LITHITDATA_H_ */
+#endif /* LITHITDATAMUON_H_ */

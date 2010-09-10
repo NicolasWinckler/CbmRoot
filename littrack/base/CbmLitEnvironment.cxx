@@ -128,7 +128,7 @@ void CbmLitEnvironment::MuchLayout()
 			CbmMuchStation* station = geoScheme->GetStation(iStation);
 
 			Int_t nofLayers = station->GetNLayers();
-			CbmLitStationGroup litStationGroup;
+			CbmLitStationGroup LitStationGroupMuon;
 			for (Int_t iLayer = 0; iLayer < nofLayers; iLayer++) {
 				CbmMuchLayer* layer = station->GetLayer(iLayer);
 				Double_t zFront = layer->GetSideF()->GetZ();
@@ -138,19 +138,19 @@ void CbmLitEnvironment::MuchLayout()
 				litSubstationFront.SetZ(zFront);
 				litSubstationBack.SetZ(zBack);
 
-				CbmLitStation litStation;
+				CbmLitStation LitStationMuon;
 
 				Int_t type = layer->GetSideF()->GetModule(0)->GetDetectorType();
 
-				litStation.AddSubstation(litSubstationFront);
-				if (station->IsModuleDesign() || type == 2) litStation.AddSubstation(litSubstationBack);
+				LitStationMuon.AddSubstation(litSubstationFront);
+				if (station->IsModuleDesign() || type == 2) LitStationMuon.AddSubstation(litSubstationBack);
 
-				if (type == 2) litStation.SetType(kLITSTRIPHIT);
-				else litStation.SetType(kLITPIXELHIT);
+				if (type == 2) LitStationMuon.SetType(kLITSTRIPHIT);
+				else LitStationMuon.SetType(kLITPIXELHIT);
 
-				litStationGroup.AddStation(litStation);
+				LitStationGroupMuon.AddStation(LitStationMuon);
 			}
-			fMuchLayout.AddStationGroup(litStationGroup);
+			fMuchLayout.AddStationGroup(LitStationGroupMuon);
 		}
 //		std::cout << fMuchLayout.ToString();
 		layoutCreated = true;
@@ -384,7 +384,7 @@ void CbmLitEnvironment::GetMuchLayoutScal(
 
 template<class T>
 void CbmLitEnvironment::GetMuchLayout(
-		LitDetectorLayout<T>& layout)
+		LitDetectorLayoutMuon<T>& layout)
 {
 	std::cout << "Getting MUCH layout for parallel version of tracking..." << std::endl;
 #if LIT_POLYNOM_DEGREE==3
@@ -416,7 +416,7 @@ void CbmLitEnvironment::GetMuchLayout(
 	std::cout << muchLayout.ToString();
 	for (int isg = 0; isg < muchLayout.GetNofStationGroups(); isg++) {
 		const CbmLitStationGroup& stationGroup = muchLayout.GetStationGroup(isg);
-		LitStationGroup<T> sg;
+		LitStationGroupMuon<T> sg;
 
 		// Add absorber
 		// Fit the field at Z front and Z back of the absorber
@@ -458,11 +458,11 @@ void CbmLitEnvironment::GetMuchLayout(
 
 		for (int ist = 0; ist < stationGroup.GetNofStations(); ist++) {
 			const CbmLitStation& station = stationGroup.GetStation(ist);
-			LitStation<T> st;
+			LitStationMuon<T> st;
 			st.type = station.GetType();
 			for(int iss = 0; iss < station.GetNofSubstations(); iss++) {
 				const CbmLitSubstation& substation = station.GetSubstation(iss);
-				LitSubstation<T> ss;
+				LitSubstationMuon<T> ss;
 				ss.Z = substation.GetZ();
 
 				// Fit the field at Z position of the substation

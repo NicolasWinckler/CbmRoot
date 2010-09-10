@@ -1,35 +1,35 @@
-/** LitDetectorGeometry.h
+/** LitDetectorGeometryMuon.h
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2009
  * @version 1.0
  *
- * Classes for geometry description for the Littrack parallel
- * version of the tracking.
+ * Classes for geometry description of the 'muon'
+ * setup of CBM.
  **/
 
-#ifndef LITDETECTORGEOMETRY_H_
-#define LITDETECTORGEOMETRY_H_
+#ifndef LITDETECTORGEOMETRYMUON_H_
+#define LITDETECTORGEOMETRYMUON_H_
 
-#include "LitTypes.h"
-#include "LitMaterialInfo.h"
-#include "LitField.h"
-#include "../base/CbmLitEnums.h"
-#include "../utils/CbmLitUtils.h"
+#include "../LitTypes.h"
+#include "../LitMaterialInfo.h"
+#include "../LitField.h"
+#include "../../base/CbmLitEnums.h"
+#include "../../utils/CbmLitUtils.h"
 
 const unsigned char MAX_NOF_STATION_GROUPS = 6;
 const unsigned char MAX_NOF_STATIONS = 4;
 const unsigned char MAX_NOF_SUBSTATIONS = 2;
 
 template<class T>
-class LitSubstation
+class LitSubstationMuon
 {
 public:
 	T Z;
 	LitMaterialInfo<T> material;
 	LitFieldSlice<T> fieldSlice;
 
-	friend std::ostream & operator<<(std::ostream &strm, const LitSubstation &substation ){
-		strm << "LitSubstation: " << "Z=" << substation.Z << ", material=" << substation.material;
+	friend std::ostream & operator<<(std::ostream &strm, const LitSubstationMuon &substation ){
+		strm << "LitSubstationMuon: " << "Z=" << substation.Z << ", material=" << substation.material;
 //		strm << ", fieldSlice=" << substation.fieldSlice;
 		return strm;
 	}
@@ -41,18 +41,18 @@ public:
 	}
 } _fvecalignment;
 
-typedef LitSubstation<fvec> LitSubstationVec;
-typedef LitSubstation<fscal> LitSubstationScal;
+typedef LitSubstationMuon<fvec> LitSubstationVec;
+typedef LitSubstationMuon<fscal> LitSubstationScal;
 
 
 
 template<class T>
-class LitStation
+class LitStationMuon
 {
 public:
-	LitStation():nofSubstations(0), type(kLITPIXELHIT){}
+	LitStationMuon():nofSubstations(0), type(kLITPIXELHIT){}
 
-	void AddSubstation(const LitSubstation<T>& substation) {
+	void AddSubstation(const LitSubstationMuon<T>& substation) {
 		substations[nofSubstations++] = substation;
 	}
 
@@ -63,12 +63,12 @@ public:
 	// Type of hits on the station
 	LitHitType type;
 	// array with substations in the station
-	LitSubstation<T> substations[MAX_NOF_SUBSTATIONS];
+	LitSubstationMuon<T> substations[MAX_NOF_SUBSTATIONS];
 	// number of substations
 	unsigned char nofSubstations;
 
-	friend std::ostream & operator<<(std::ostream &strm, const LitStation &station){
-		strm << "LitStation: type=" << station.type << ", nofSubstations=" << (int) station.GetNofSubstations() << std::endl;
+	friend std::ostream & operator<<(std::ostream &strm, const LitStationMuon &station){
+		strm << "LitStationMuon: type=" << station.type << ", nofSubstations=" << (int) station.GetNofSubstations() << std::endl;
 		for (unsigned char i = 0; i < station.GetNofSubstations(); i++) {
 			strm << "    " << (int) i << " " << station.substations[i];
 		}
@@ -86,8 +86,8 @@ public:
 
 } _fvecalignment;
 
-typedef LitStation<fvec> LitStationVec;
-typedef LitStation<fscal> LitStationScal;
+typedef LitStationMuon<fvec> LitStationVec;
+typedef LitStationMuon<fscal> LitStationScal;
 
 
 
@@ -122,14 +122,14 @@ typedef LitAbsorber<fscal> LitAbsorberScal;
 
 
 template<class T>
-class LitStationGroup
+class LitStationGroupMuon
 {
 public:
-	LitStationGroup():nofStations(0) {}
+	LitStationGroupMuon():nofStations(0) {}
 
-	virtual ~LitStationGroup() {}
+	virtual ~LitStationGroupMuon() {}
 
-	void AddStation(const LitStation<T>& station) {
+	void AddStation(const LitStationMuon<T>& station) {
 		stations[nofStations++] = station;
 	}
 
@@ -138,14 +138,14 @@ public:
 	}
 
 	// array with stations in the station group
-	LitStation<T> stations[MAX_NOF_STATIONS];
+	LitStationMuon<T> stations[MAX_NOF_STATIONS];
 	// number of stations in the station group
 	unsigned char nofStations;
 	// absorber
 	LitAbsorber<T> absorber;
 
-	friend std::ostream & operator<<(std::ostream &strm, const LitStationGroup &stationGroup){
-		strm << "LitStationGroup: " << "nofStations=" << (int) stationGroup.GetNofStations() << std::endl;
+	friend std::ostream & operator<<(std::ostream &strm, const LitStationGroupMuon &stationGroup){
+		strm << "LitStationGroupMuon: " << "nofStations=" << (int) stationGroup.GetNofStations() << std::endl;
 		for (unsigned char i = 0; i < stationGroup.GetNofStations(); i++) {
 			strm << "  " << (int) i << " " << stationGroup.stations[i];
 		}
@@ -166,18 +166,18 @@ public:
 
 } _fvecalignment;
 
-typedef LitStationGroup<fvec> LitStationGroupVec;
-typedef LitStationGroup<fscal> LitStationGroupScal;
+typedef LitStationGroupMuon<fvec> LitStationGroupVec;
+typedef LitStationGroupMuon<fscal> LitStationGroupScal;
 
 
 
 template<class T>
-class LitDetectorLayout
+class LitDetectorLayoutMuon
 {
 public:
-	LitDetectorLayout():nofStationGroups(0){};
+	LitDetectorLayoutMuon():nofStationGroups(0){};
 
-	void AddStationGroup(const LitStationGroup<T>& stationGroup) {
+	void AddStationGroup(const LitStationGroupMuon<T>& stationGroup) {
 		stationGroups[nofStationGroups++] = stationGroup;
 	}
 
@@ -193,25 +193,25 @@ public:
 		return stationGroups[stationGroup].stations[station].GetNofSubstations();
 	}
 
-	const LitStationGroup<T>& GetStationGroup(unsigned char stationGroup) {
+	const LitStationGroupMuon<T>& GetStationGroup(unsigned char stationGroup) {
 		return stationGroups[stationGroup];
 	}
 
-	const LitStation<T>& GetStation(unsigned char stationGroup, unsigned char station) {
+	const LitStationMuon<T>& GetStation(unsigned char stationGroup, unsigned char station) {
 		return stationGroups[stationGroup].stations[station];
 	}
 
-	const LitSubstation<T>& GetSubstation(unsigned char stationGroup, unsigned char station, unsigned char substation){
+	const LitSubstationMuon<T>& GetSubstation(unsigned char stationGroup, unsigned char station, unsigned char substation){
 		return stationGroups[stationGroup].stations[station].substations[substation];
 	}
 
 	// array with station groups
-    LitStationGroup<T> stationGroups[MAX_NOF_STATION_GROUPS];
+    LitStationGroupMuon<T> stationGroups[MAX_NOF_STATION_GROUPS];
     //number of station groups
     unsigned char nofStationGroups;
 
-	friend std::ostream & operator<<(std::ostream &strm, const LitDetectorLayout &layout){
-		strm << "LitDetectorLayout: " << "nofStationGroups=" << (int)layout.GetNofStationGroups() << std::endl;
+	friend std::ostream & operator<<(std::ostream &strm, const LitDetectorLayoutMuon &layout){
+		strm << "LitDetectorLayoutMuon: " << "nofStationGroups=" << (int)layout.GetNofStationGroups() << std::endl;
 		for (unsigned char i = 0; i < layout.GetNofStationGroups(); i++) {
 			strm << (int) i << " " << layout.stationGroups[i];
 		}
@@ -228,7 +228,7 @@ public:
 	}
 } _fvecalignment;
 
-typedef LitDetectorLayout<fvec> LitDetectorLayoutVec;
-typedef LitDetectorLayout<fscal> LitDetectorLayoutScal;
+typedef LitDetectorLayoutMuon<fvec> LitDetectorLayoutVec;
+typedef LitDetectorLayoutMuon<fscal> LitDetectorLayoutScal;
 
 #endif

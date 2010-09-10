@@ -11,7 +11,7 @@
 #define CBMLITENVIRONMENT_H_
 
 #include "CbmLitDetectorLayout.h"
-#include "parallel/LitDetectorGeometry.h"
+#include "parallel/muon/LitDetectorGeometryMuon.h"
 #include "parallel/electron/LitDetectorGeometryElectron.h"
 
 #include <vector>
@@ -32,14 +32,14 @@ public:
 	const CbmLitDetectorLayout& GetLayout();
 //	void GetLayoutParallelVec(LitDetectorLayoutVec& layout);
 //	void GetLayoutParallelScal(LitDetectorLayoutScal& layout);
-//	template<class T> void GetLayoutParallel(LitDetectorLayout<T>& layout);
+//	template<class T> void GetLayoutParallel(LitDetectorLayoutMuon<T>& layout);
 
 	const CbmLitDetectorLayout& GetMuchLayout() {return fMuchLayout;}
 	const CbmLitDetectorLayout& GetTrdLayout() {return fTrdLayout;}
 
 	void GetMuchLayoutVec(LitDetectorLayoutVec& layout);
 	void GetMuchLayoutScal(LitDetectorLayoutScal& layout);
-	template<class T> void GetMuchLayout(LitDetectorLayout<T>& layout);
+	template<class T> void GetMuchLayout(LitDetectorLayoutMuon<T>& layout);
 
 	void GetTrdLayoutVec(LitDetectorLayoutElectronVec& layout);
 	void GetTrdLayoutScal(LitDetectorLayoutElectronScal& layout);

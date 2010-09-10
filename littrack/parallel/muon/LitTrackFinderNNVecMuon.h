@@ -15,8 +15,8 @@
 
 #include "../LitHit.h"
 #include "../LitTrack.h"
-#include "../LitDetectorGeometry.h"
-#include "../LitHitData.h"
+#include "LitDetectorGeometryMuon.h"
+#include "LitHitDataMuon.h"
 #include "../LitTrackFinderNNBase.h"
 
 #define cnst static const fvec
@@ -41,7 +41,7 @@ public:
 			LitScalTrack* tracks[],
 			unsigned int &nofTracks);
 
-	void SetDetectorLayout(LitDetectorLayout<fvec>& layout) {
+	void SetDetectorLayout(LitDetectorLayoutMuon<fvec>& layout) {
 		fLayout = layout;
 		fHitData.SetDetectorLayout(layout);
 	}
@@ -106,8 +106,8 @@ private:
 	LitScalTrack* fTracks[MAX_NOF_TRACKS]; // local copy of tracks
 	unsigned int fNofTracks;
 
-	LitDetectorLayout<fvec> fLayout; // detector geometry
-	LitHitData<fvec> fHitData; // arranged hits
+	LitDetectorLayoutMuon<fvec> fLayout; // detector geometry
+	LitHitDataMuon<fvec> fHitData; // arranged hits
 
 	unsigned char fMaxNofMissingHits;
 };

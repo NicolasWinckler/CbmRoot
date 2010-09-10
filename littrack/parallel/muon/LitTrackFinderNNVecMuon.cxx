@@ -1,12 +1,12 @@
 #include "LitTrackFinderNNVecMuon.h"
 
+#include "LitDetectorGeometryMuon.h"
+#include "LitHitDataMuon.h"
 #include "../LitTypes.h"
 #include "../LitHit.h"
 #include "../LitAddMaterial.h"
 #include "../LitExtrapolation.h"
 #include "../LitFiltration.h"
-#include "../LitDetectorGeometry.h"
-#include "../LitHitData.h"
 #include "../LitField.h"
 #include "../LitMath.h"
 #include "../LitVecPack.h"
@@ -91,13 +91,13 @@ public:
 class PropagateToSubstationClass
 {
 	LitTrackParam<fvec>* flpar;
-	LitStation<fvec>& fStation;
+	LitStationMuon<fvec>& fStation;
 	const LitFieldRegion<fvec>& fField;
 public:
 	void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
 		// Loop over the substations
 		for (unsigned int i = r.begin(); i != r.end(); ++i) {
-			LitSubstation<fvec>& substation = fStation.substations[i];
+			LitSubstationMuon<fvec>& substation = fStation.substations[i];
 			// Propagation through station
 			LitRK4Extrapolation<fvec>(flpar[i], substation.Z, fField);
 			//		LitLineExtrapolation(lpar[iSubstation], substation.Z);
@@ -107,7 +107,7 @@ public:
 	}
 	PropagateToSubstationClass(
 			LitTrackParam<fvec>* lpar,
-			LitStation<fvec>& station,
+			LitStationMuon<fvec>& station,
 			const LitFieldRegion<fvec>& field) :
 		flpar(lpar),
 		fStation(station),
@@ -220,7 +220,7 @@ void LitTrackFinderNNVecMuon::ArrangeHits(
     // TODO : add threads here
     for (int i = 0; i < fLayout.GetNofStationGroups(); i++){
     	for (int j = 0; j < fLayout.GetNofStations(i); j++){
-//    		LitStation& station = fLayout.GetStation(i, j);
+//    		LitStationMuon& station = fLayout.GetStation(i, j);
 //    		if (station.type == kLITPIXELHIT) {
     			for (int k = 0; k < fLayout.GetNofSubstations(i, j); k++){
     				unsigned int nh = fHitData.GetNofHits(i, j, k);
@@ -284,7 +284,7 @@ void LitTrackFinderNNVecMuon::FollowTracks()
 	// Main loop over station groups for track following
 	unsigned char nofStationGroups = fLayout.GetNofStationGroups();
 	for(unsigned char iStationGroup = 0; iStationGroup < nofStationGroups; iStationGroup++) { // loop over station groups
-		LitStationGroup<fvec> stg = fLayout.stationGroups[iStationGroup];
+		LitStationGroupMuon<fvec> stg = fLayout.stationGroups[iStationGroup];
 
 		unsigned int nofTracks = nofTracksId1; // number of tracks
 		unsigned int nofTracksVec = nofTracks / fvecLen; // number of tracks grouped in vectors
@@ -398,8 +398,8 @@ void LitTrackFinderNNVecMuon::ProcessStation(
 		unsigned char stationGroup,
 		unsigned char station)
 {
-	LitStationGroup<fvec>& stg = fLayout.stationGroups[stationGroup];
-	LitStation<fvec>& sta = stg.stations[station];
+	LitStationGroupMuon<fvec>& stg = fLayout.stationGroups[stationGroup];
+	LitStationMuon<fvec>& sta = stg.stations[station];
 	unsigned char nofSubstations = sta.GetNofSubstations();
 
 	// Pack track parameters
@@ -411,8 +411,8 @@ void LitTrackFinderNNVecMuon::ProcessStation(
 	//Approximate the field between the absorbers
 	LitFieldRegion<fvec> field;
 	LitFieldValue<fvec> v1, v2;
-	LitSubstation<fvec>& ss1 = stg.stations[0].substations[0];
-	LitSubstation<fvec>& ss2 = stg.stations[1].substations[0];
+	LitSubstationMuon<fvec>& ss1 = stg.stations[0].substations[0];
+	LitSubstationMuon<fvec>& ss2 = stg.stations[1].substations[0];
 	ss1.fieldSlice.GetFieldValue(lpar[0].X, lpar[0].Y, v1);
 	ss2.fieldSlice.GetFieldValue(lpar[0].X, lpar[0].Y, v2);
 	field.Set(v1, ss1.fieldSlice.Z, v2, ss2.fieldSlice.Z);
@@ -425,7 +425,7 @@ void LitTrackFinderNNVecMuon::ProcessStation(
 #else
 	// Propagate to each of the substations
 	for (unsigned char iSubstation = 0; iSubstation < nofSubstations; iSubstation++) { // loop over substations
-		LitSubstation<fvec>& substation = sta.substations[iSubstation];
+		LitSubstationMuon<fvec>& substation = sta.substations[iSubstation];
 		// Propagation through station
 		LitRK4Extrapolation(lpar[iSubstation], substation.Z, field);
 //		LitLineExtrapolation(lpar[iSubstation], substation.Z);

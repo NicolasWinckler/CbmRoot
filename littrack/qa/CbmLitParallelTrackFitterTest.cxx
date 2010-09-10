@@ -10,7 +10,7 @@
 #include "CbmLitHit.h"
 #include "CbmLitPixelHit.h"
 #include "CbmLitTrackParam.h"
-#include "parallel/LitDetectorGeometry.h"
+#include "parallel/muon/LitDetectorGeometryMuon.h"
 #include "parallel/LitExtrapolation.h"
 #include "parallel/LitFiltration.h"
 #include "parallel/LitAddMaterial.h"
@@ -61,7 +61,7 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
     int ihit = 0;
 
 	for (unsigned char isg = 0; isg < fLayout.GetNofStationGroups(); isg++) {
-		LitStationGroup<fscal> stationGroup = fLayout.stationGroups[isg];
+		LitStationGroupMuon<fscal> stationGroup = fLayout.stationGroups[isg];
 	    //Propagation through the absorber
 	    LitFieldRegion<fscal> field;
 	    LitFieldValue<fscal> v1, v2;
@@ -87,15 +87,15 @@ LitStatus CbmLitParallelTrackFitterTest::Fit(
 	    //end propagate through the absorber using steps
 
 	    //Approximate the field between the absorbers
-	    LitSubstation<fscal> ss1 = stationGroup.stations[0].substations[0];
-	    LitSubstation<fscal> ss2 = stationGroup.stations[1].substations[0];
+	    LitSubstationMuon<fscal> ss1 = stationGroup.stations[0].substations[0];
+	    LitSubstationMuon<fscal> ss2 = stationGroup.stations[1].substations[0];
 	    ss1.fieldSlice.GetFieldValue(lpar.X, lpar.Y, v1);
 	    ss2.fieldSlice.GetFieldValue(lpar.X, lpar.Y, v2);
 	    field.Set(v1, ss1.fieldSlice.Z, v2, ss2.fieldSlice.Z);
 	    for (unsigned char ist = 0; ist < stationGroup.GetNofStations(); ist++) {
-	    	 LitStation<fscal> station = stationGroup.stations[ist];
+	    	 LitStationMuon<fscal> station = stationGroup.stations[ist];
 	    	 for (unsigned char iss = 0; iss < station.GetNofSubstations(); iss++) {
-	    		LitSubstation<fscal> substation = station.substations[iss];
+	    		LitSubstationMuon<fscal> substation = station.substations[iss];
 				// Propagation through station
 
 				LitRK4Extrapolation(lpar, substation.Z, field);
@@ -136,7 +136,7 @@ unsigned char CbmLitParallelTrackFitterTest::PlaneId(
 		unsigned char stationGroup,
 		unsigned char station,
 		unsigned char substation,
-		LitDetectorLayout<fscal>& layout) const
+		LitDetectorLayoutMuon<fscal>& layout) const
 {
 	int counter = 0;
 	for(unsigned char i = 0; i < stationGroup; i++) {
@@ -160,7 +160,7 @@ bool CbmLitParallelTrackFitterTest::CheckHit(
 		unsigned char stationGroup,
 		unsigned char station,
 		unsigned char substation,
-		LitDetectorLayout<fscal>& layout,
+		LitDetectorLayoutMuon<fscal>& layout,
 		CbmLitTrack* track)
 {
 	unsigned char planeId = PlaneId(stationGroup, station, substation, layout);

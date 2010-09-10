@@ -14,8 +14,8 @@
 #include "CbmLitStripHit.h"
 #include "parallel/LitConverter.h"
 #include "parallel/LitTrack.h"
-#include "parallel/LitTrackFitter.h"
-#include "parallel/LitDetectorGeometry.h"
+#include "parallel/muon/LitTrackFitterMuon.h"
+#include "parallel/muon/LitDetectorGeometryMuon.h"
 #include "parallel/LitVecPack.h"
 #include "parallel/electron/LitTrackFitterElectron.h"
 
@@ -44,7 +44,7 @@ class FastScalarFitClass
 public:
 	void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
 		for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
-			LitTrackFitter(fTracks[iTrack], fLayout);
+			LitTrackFitterMuon(fTracks[iTrack], fLayout);
 		}
 	}
 	FastScalarFitClass(
@@ -61,7 +61,7 @@ class SIMDFitClass
 public:
 	void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
 		for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
-			LitTrackFitter(fTracks[iTrack], fLayout);
+			LitTrackFitterMuon(fTracks[iTrack], fLayout);
 		}
 	}
 	SIMDFitClass(
@@ -170,7 +170,7 @@ void CbmLitTrackFitSpeedTest::RunTest()
     if (!fIsElectronSetup) {
 		for (int c = 0; c < ntimes; c++) {
 			for(unsigned int i = 0; i < nofTracks; i++) {
-				LitTrackFitter(tracksFast[i], layoutScal);
+				LitTrackFitterMuon(tracksFast[i], layoutScal);
 			}
 		}
     } else {
@@ -202,7 +202,7 @@ void CbmLitTrackFitSpeedTest::RunTest()
     if (!fIsElectronSetup) {
 		for (int c = 0; c < ntimes; c++) {
 			for(unsigned int i = 0; i < nofTracksVec; i++) {
-				LitTrackFitter(tracksVec[i], layoutVec);
+				LitTrackFitterMuon(tracksVec[i], layoutVec);
 			}
 		}
     } else {

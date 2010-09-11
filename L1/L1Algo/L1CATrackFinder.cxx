@@ -758,9 +758,9 @@ inline void L1Algo::f4(	// input
 
                 vector<THitI> &hitsl_3,  vector<THitI> &hitsm_3,  vector<THitI> &hitsr_3,
 								// output
-								unsigned &nstaltriplets,
+								unsigned int &nstaltriplets,
                 std::vector<L1Triplet> &vTriplets_part,
-								unsigned *TripStartIndexH, unsigned *TripStopIndexH
+								unsigned int *TripStartIndexH, unsigned int *TripStopIndexH
 // #ifdef XXX
 // 								,unsigned int &stat_n_trip
 // #endif
@@ -824,7 +824,7 @@ inline void L1Algo::f4(	// input
 					/// Find neighbours of triplets. Calculate level of triplets.
 inline void L1Algo::f5(	// input
 							 	// output
-							 unsigned *TripStartIndexH, unsigned *TripStopIndexH,
+							 unsigned int *TripStartIndexH, unsigned int *TripStopIndexH,
 							 int *nlevel
 							 )
 {
@@ -835,8 +835,8 @@ inline void L1Algo::f5(	// input
 		int istar = istal + 2;
 
 
-		unsigned offset_m = TripStartIndex[istam];
-		unsigned offset_r = TripStartIndex[istar];
+		unsigned int offset_m = TripStartIndex[istam];
+		unsigned int offset_r = TripStartIndex[istar];
 
 		for (int it = TripStartIndex[istal]; it < TripStopIndex[istal]; it++){
 			L1Triplet *trip = &(vTriplets[it]);
@@ -855,12 +855,12 @@ inline void L1Algo::f5(	// input
 				// neighbours should have 2 common hits
 			unsigned int first_triplet;
 			unsigned int last_triplet;
-      unsigned iN = TripStartIndexH[ihitm];   // first posible neighbour
-			unsigned lastN = TripStopIndexH[ihitm]; // last posible neighbour
+      unsigned int iN = TripStartIndexH[ihitm];   // first posible neighbour
+			unsigned int lastN = TripStopIndexH[ihitm]; // last posible neighbour
 
 				// find first triplet with 2 common hits
 			for (; (iN < lastN); ++iN){
-				unsigned jhitm;
+				unsigned int jhitm;
 				if( vTriplets[iN].GetLevel()==0 )
 					jhitm = vTriplets[iN].GetMHit();
 				else
@@ -875,7 +875,7 @@ inline void L1Algo::f5(	// input
         first_triplet = iN;
 				for (; iN < lastN; ++iN){
 					if (vTriplets[iN].GetLHit() != ihitm) break;
-					unsigned jhitm;
+					unsigned int jhitm;
 					if( vTriplets[iN].GetLevel()==0 )
 							jhitm = vTriplets[iN].GetMHit();
 						else
@@ -928,7 +928,7 @@ inline void L1Algo::DupletsStaPort(	// input
                       THitI* _RealIHit,
 #endif // DOUB_PERFORMANCE
 
-                      vector<int> &n_g1, unsigned *portionStopIndex,
+                      vector<int> &n_g1, unsigned int *portionStopIndex,
                       L1Portion<L1TrackPar> &T_g1,
                       L1Portion<L1FieldRegion> &fld_g1,
                       L1Portion<THitI> &hitsl_g1,
@@ -971,7 +971,7 @@ inline void L1Algo::DupletsStaPort(	// input
 			unsigned int nDuplets_lm = 0;  // number of created doublets on this stantion
 			int start_mhit = 0;   // hit on the middle stantion to start find new doublets
 
-			for(unsigned ip = portionStopIndex[istal+1]; ip < portionStopIndex[istal]; ip++ ){
+			for(unsigned int ip = portionStopIndex[istal+1]; ip < portionStopIndex[istal]; ip++ ){
 
 				fvec u_front[Portion/fvecLen], u_back[Portion/fvecLen];
         fvec zPos[Portion/fvecLen];
@@ -1130,14 +1130,14 @@ inline void L1Algo::TripletsStaPort(	// input
                             L1Portion<L1FieldRegion> &fld_g1,
                             L1Portion<THitI> &hitsl_g1,
 
-	                          vector<int> &n_g2, unsigned *portionStopIndex,
+	                          vector<int> &n_g2, unsigned int *portionStopIndex,
                             L1Portion<THitI> &i1_g2,
                             L1Portion<THitI> &hitsm_g2,
 
 															// output
 														map<unsigned /*short*/ int,THitI> *Duplets_start, vector<THitI>  *Duplets_hits,
 														std::vector<L1Triplet> *vTriplets_part,
-														unsigned *TripStartIndexH, unsigned *TripStopIndexH
+														unsigned int *TripStartIndexH, unsigned int *TripStopIndexH
 														)
 {
 
@@ -1163,9 +1163,9 @@ inline void L1Algo::TripletsStaPort(	// input
         NHits_r = StsHitsStopIndex[istar] - StsHitsStartIndex[istar] + 1;
       }
 
-      unsigned nstaltriplets = 0; // find triplets begin from this stantion
+      unsigned int nstaltriplets = 0; // find triplets begin from this stantion
 
-      for(unsigned ip = portionStopIndex[istal+1]; ip < portionStopIndex[istal]; ip++ ){
+      for(unsigned int ip = portionStopIndex[istal+1]; ip < portionStopIndex[istal]; ip++ ){
 
 
         int n3=0, n3_V;
@@ -1550,7 +1550,7 @@ void L1Algo::CATrackFinder()
 //       Duplets_start[i].reserve(MaxArrSize);
     }
 //     Duplets_hits[NStations-1].push_back(0);
-// 		for (unsigned i = MaxArrSize*(NStations-1); i < MaxArrSize*NStations; i++){
+// 		for (unsigned int i = MaxArrSize*(NStations-1); i < MaxArrSize*NStations; i++){
 // 			Duplets_hits[i]  = 0;
 // 			Duplets_start[i] = 0;
 // 		};
@@ -1597,8 +1597,9 @@ void L1Algo::CATrackFinder()
     TripStartIndexH_v.reserve(svStsHits->size());
     TripStopIndexH_v.reserve(svStsHits->size());
     unsigned int *TripStartIndexH = &(TripStartIndexH_v[0]), *TripStopIndexH = &(TripStopIndexH_v[0]);
-		for(unsigned i = 0; i < svStsHits->size(); i++){
-// 			TripStartIndexH[i] = 0;
+		for(unsigned int i = 0; i < svStsHits->size(); i++){
+ 			TripStartIndexH[i] = 0; // actually don't need this one, will be initialized at f4(..)
+      
 			TripStopIndexH[i] = 0;
 		}
 
@@ -1698,7 +1699,7 @@ void L1Algo::CATrackFinder()
 
 #ifdef XXX
 		int istat_n_triplet_c=0;
-		for(unsigned ip = 0; ip < portionStopIndex[FIRSTCASTATION]; ip++)
+		for(unsigned int ip = 0; ip < portionStopIndex[FIRSTCASTATION]; ip++)
 			istat_n_triplet_c += n_g2[ip];
 #endif
 
@@ -1807,7 +1808,7 @@ void L1Algo::CATrackFinder()
 		for (int istal = NStations-2; istal >= FIRSTCASTATION; istal--){
 			TripStartIndex[istal] = vTriplets.size();
 
-			for (unsigned i = 0; i < vTriplets_part[istal].size(); i++){
+			for (unsigned int i = 0; i < vTriplets_part[istal].size(); i++){
 				vTriplets.push_back(vTriplets_part[istal][i]);
 			}
 

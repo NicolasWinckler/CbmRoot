@@ -99,7 +99,7 @@ class L1Algo{
   bool GetFUsed   ( unsigned char flag ){ return (flag&0x02)!=0; }
 //   bool GetFUsedD  ( unsigned char flag ){ return (flag&0x01)!=0; }
 
-  void SetFStation ( unsigned char &flag, unsigned iStation ){ flag = iStation*4 + (flag%4); }
+  void SetFStation ( unsigned char &flag, unsigned int iStation ){ flag = iStation*4 + (flag%4); }
   void SetFUsed    ( unsigned char &flag ){ flag |= 0x02; }
 //   void SetFUsedD   ( unsigned char &flag ){ flag |= 0x01; }
   void SetFUnUsed  ( unsigned char &flag ){ flag &= 0xFC; }
@@ -189,9 +189,9 @@ class L1Algo{
                 nsL1::vector<L1TrackPar>::TSimd &T_3,
                 vector<THitI> &hitsl_3,  vector<THitI> &hitsm_3,  vector<THitI> &hitsr_3,
 								// output
-								unsigned &nstaltriplets,
+								unsigned int &nstaltriplets,
 								vector<L1Triplet> &vTriplets_part,
-								unsigned *TripStartIndexH, unsigned *TripStopIndexH
+								unsigned int *TripStartIndexH, unsigned int *TripStopIndexH
 // #ifdef XXX								
 // 								,unsigned int &stat_n_trip			
 // #endif
@@ -200,7 +200,7 @@ class L1Algo{
 					/// Find neighbours of triplets. Calculate level of triplets.
 	void f5(	// input
 							 	// output
-							 unsigned *TripStartIndexH, unsigned *TripStopIndexH,
+							 unsigned int *TripStartIndexH, unsigned int *TripStopIndexH,
 							 int *nlevel
 							 );
 
@@ -213,7 +213,7 @@ class L1Algo{
                       THitI* _RealIHit,
 #endif // DOUB_PERFORMANCE
 
-                      vector<int> &n_g1, unsigned *portionStopIndex,
+                      vector<int> &n_g1, unsigned int *portionStopIndex,
                       L1Portion<L1TrackPar> &T_g1,
                       L1Portion<L1FieldRegion> &fld_g1,
                       L1Portion<THitI> &hitsl_g1,
@@ -238,14 +238,14 @@ class L1Algo{
                             L1Portion<L1FieldRegion> &fld_g1,
                             L1Portion<THitI> &hitsl_g1,
 
-                            vector<int> &n_g2, unsigned *portionStopIndex,
+                            vector<int> &n_g2, unsigned int *portionStopIndex,
                             L1Portion<THitI> &i1_g2,
                             L1Portion<THitI> &hitsm_g2,
 															
 															// output
                             map<THitI,THitI> *Duplets_start, vector<THitI>  *Duplets_hits,
 														vector<L1Triplet> *vTriplets_part,
-														unsigned *TripStartIndexH, unsigned *TripStopIndexH
+														unsigned int *TripStartIndexH, unsigned int *TripStopIndexH
 														);
 
   

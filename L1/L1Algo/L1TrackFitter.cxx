@@ -43,7 +43,7 @@ void L1Algo::KFTrackFitter_simple()  // TODO: Add pipe.
 //  cout << " Start KF Track Fitter " << endl;
   int start_hit = 0; // for interation in vRecoHits[]
 
-  for(unsigned itrack = 0; itrack < vTracks.size(); itrack++)
+  for(unsigned int itrack = 0; itrack < vTracks.size(); itrack++)
   {
     L1Track &t =  vTracks[itrack]; // current track
 
@@ -349,9 +349,9 @@ void L1Algo::KFTrackFitter() // TODO: works only for same-z. Add pipe.
     ZSta[iHit] = sta[iHit].z;
   }
 
-  unsigned N_vTracks = vTracks.size();
+  unsigned int N_vTracks = vTracks.size();
 
-  for(unsigned itrack = 0; itrack < N_vTracks; itrack+=fvecLen)
+  for(unsigned int itrack = 0; itrack < N_vTracks; itrack+=fvecLen)
   {
     if(N_vTracks - itrack < fvecLen)
       nTracks_SIMD = N_vTracks - itrack;

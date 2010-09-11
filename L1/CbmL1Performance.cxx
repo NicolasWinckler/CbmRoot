@@ -725,7 +725,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
   } // for mcTracks
 
   int NFakes = 0;
-  for( unsigned ih=0; ih<algo->vStsHits.size(); ih++){
+  for( unsigned int ih=0; ih<algo->vStsHits.size(); ih++){
     int iMC = vHitMCRef[ih];
     if (iMC < 0) NFakes++;
   }

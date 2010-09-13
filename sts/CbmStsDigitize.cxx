@@ -287,7 +287,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
  	    Double_t zvec = point->GetZOut()-zin;
             Int_t MynofSteps = (Int_t)(TMath::Sqrt(xvec*xvec+yvec*yvec+zvec*zvec)/fStep+1);
     
-            Double_t MystepEL = fEnergyLossToSignal*point->GetEnergyLoss()/(MynofSteps+1);
+            Int_t MystepEL = (Int_t) (fEnergyLossToSignal*point->GetEnergyLoss()/(MynofSteps+1));
             xvec = xvec/((Double_t)MynofSteps);  
             yvec = yvec/((Double_t)MynofSteps);  
             zvec = zvec/((Double_t)MynofSteps);  
@@ -357,7 +357,7 @@ void CbmStsDigitize::Exec(Option_t* opt) {
  	    Double_t zvec = point->GetZOut()-zin;
             Int_t MynofSteps = (Int_t)(TMath::Sqrt(xvec*xvec+yvec*yvec+zvec*zvec)/fStep+1);
     
-            Double_t MystepEL = fEnergyLossToSignal*point->GetEnergyLoss()/(MynofSteps+1);
+            Int_t MystepEL = (Int_t) (fEnergyLossToSignal*point->GetEnergyLoss()/(MynofSteps+1));
             xvec = xvec/((Double_t)MynofSteps);  
             yvec = yvec/((Double_t)MynofSteps);  
             zvec = zvec/((Double_t)MynofSteps);  

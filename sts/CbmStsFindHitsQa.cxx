@@ -248,7 +248,7 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
       }
 //       cout <<"St "<<stationNr<<" Sens "<<sensor->GetSensorNr()<< " chan "<<sensor->GetFrontChannel(stsHit->GetX(),stsHit->GetY(),stsHit->GetZ())<<" X "<<stsHit->GetX();
     }
-    Int_t incAngle = TMath::ATan((stsPoint->GetXOut()-stsPoint->GetXIn())/(stsPoint->GetZOut()-stsPoint->GetZIn()))*180./3.14;
+    Int_t incAngle = (Int_t) ( TMath::ATan((stsPoint->GetXOut()-stsPoint->GetXIn())/(stsPoint->GetZOut()-stsPoint->GetZIn()))*180./3.14);
     fNofPoints    [stationNr-1][sensor->GetSectorNr()-1][sensor->GetSensorNr()-1] += 1;
     fNofPointsIncAng[TMath::Abs((Int_t)(incAngle))] +=1;
     if (TMath::Abs((Int_t)(mom))<1) fNofPointsMom [TMath::Abs((Int_t)(mom))] +=1;
@@ -693,7 +693,7 @@ InitStatus CbmStsFindHitsQa::Init() {
   CreateHistos();
   Reset();
   if ( fOnlineAnalysis ) {
-    TCanvas* recoCanvas = new TCanvas("StsRecoCanvas","Sts reconstruction",10,10,600,900);
+    recoCanvas = new TCanvas("StsRecoCanvas","Sts reconstruction",10,10,600,900);
 //     TPad* recoPad[10];
 
     recoPad[0] = new TPad("titlePad",   "Title pad"                       ,0.00,0.90,1.00,1.00);

@@ -371,13 +371,13 @@ const CbmLitStation& CbmLitEnvironment::GetTofStation()
 }
 
 void CbmLitEnvironment::GetMuchLayoutVec(
-		LitDetectorLayoutVec& layout)
+		LitDetectorLayoutMuonVec& layout)
 {
 	GetMuchLayout(layout);
 }
 
 void CbmLitEnvironment::GetMuchLayoutScal(
-		LitDetectorLayoutScal& layout)
+		LitDetectorLayoutMuonScal& layout)
 {
 	GetMuchLayout(layout);
 }

@@ -40,7 +40,7 @@
 class FastScalarFitClass
 {
 	LitTrackScal* fTracks;
-	LitDetectorLayoutScal& fLayout;
+	LitDetectorLayoutMuonScal& fLayout;
 public:
 	void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
 		for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
@@ -49,7 +49,7 @@ public:
 	}
 	FastScalarFitClass(
 			LitTrackScal* tracks,
-			LitDetectorLayoutScal& layout) :
+			LitDetectorLayoutMuonScal& layout) :
 		fTracks(tracks),
 		fLayout(layout){}
 };
@@ -57,7 +57,7 @@ public:
 class SIMDFitClass
 {
 	LitTrackVec* fTracks;
-	LitDetectorLayoutVec& fLayout;
+	LitDetectorLayoutMuonVec& fLayout;
 public:
 	void operator() ( const tbb::blocked_range<unsigned int>& r ) const {
 		for (unsigned int iTrack = r.begin(); iTrack != r.end(); ++iTrack) {
@@ -66,7 +66,7 @@ public:
 	}
 	SIMDFitClass(
 			LitTrackVec* tracks,
-			LitDetectorLayoutVec& layout) :
+			LitDetectorLayoutMuonVec& layout) :
 		fTracks(tracks),
 		fLayout(layout){}
 };
@@ -130,8 +130,8 @@ void CbmLitTrackFitSpeedTest::RunTest()
 	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
 
 	// For MUCH track fit
-	LitDetectorLayoutScal layoutScal;
-    LitDetectorLayoutVec layoutVec;
+	LitDetectorLayoutMuonScal layoutScal;
+    LitDetectorLayoutMuonVec layoutVec;
     // For TRD track fit
 	LitDetectorLayoutElectronScal layoutElectronScal;
     LitDetectorLayoutElectronVec layoutElectronVec;

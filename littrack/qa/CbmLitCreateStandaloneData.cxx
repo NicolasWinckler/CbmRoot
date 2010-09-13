@@ -29,7 +29,7 @@ InitStatus CbmLitCreateStandaloneData::Init()
 
 	// Save MUCH layout to text file
 	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
-	LitDetectorLayoutScal layout;
+	LitDetectorLayoutMuonScal layout;
 	env->GetMuchLayoutScal(layout);
 
 	std::ofstream outfile("sa_geometry.txt");

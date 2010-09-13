@@ -41,8 +41,8 @@ public:
 	}
 } _fvecalignment;
 
-typedef LitSubstationMuon<fvec> LitSubstationVec;
-typedef LitSubstationMuon<fscal> LitSubstationScal;
+typedef LitSubstationMuon<fvec> LitSubstationMuonVec;
+typedef LitSubstationMuon<fscal> LitSubstationMuonScal;
 
 
 
@@ -86,8 +86,8 @@ public:
 
 } _fvecalignment;
 
-typedef LitStationMuon<fvec> LitStationVec;
-typedef LitStationMuon<fscal> LitStationScal;
+typedef LitStationMuon<fvec> LitStationMuonVec;
+typedef LitStationMuon<fscal> LitStationMuonScal;
 
 
 
@@ -166,8 +166,8 @@ public:
 
 } _fvecalignment;
 
-typedef LitStationGroupMuon<fvec> LitStationGroupVec;
-typedef LitStationGroupMuon<fscal> LitStationGroupScal;
+typedef LitStationGroupMuon<fvec> LitStationGroupMuonVec;
+typedef LitStationGroupMuon<fscal> LitStationGroupMuonScal;
 
 
 
@@ -228,7 +228,7 @@ public:
 	}
 } _fvecalignment;
 
-typedef LitDetectorLayoutMuon<fvec> LitDetectorLayoutVec;
-typedef LitDetectorLayoutMuon<fscal> LitDetectorLayoutScal;
+typedef LitDetectorLayoutMuon<fvec> LitDetectorLayoutMuonVec;
+typedef LitDetectorLayoutMuon<fscal> LitDetectorLayoutMuonScal;
 
 #endif

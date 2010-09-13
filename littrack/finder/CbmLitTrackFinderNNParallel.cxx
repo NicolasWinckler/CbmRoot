@@ -28,7 +28,7 @@ CbmLitTrackFinderNNParallel::CbmLitTrackFinderNNParallel(
 	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
 
 	if (fTrackingType == "nn_parallel_muon") {
-		LitDetectorLayoutVec layout;
+		LitDetectorLayoutMuonVec layout;
 		env->GetMuchLayoutVec(layout);
 		fTFParallelMuon = new LitTrackFinderNNVecMuon();
 		fTFParallelMuon->SetDetectorLayout(layout);

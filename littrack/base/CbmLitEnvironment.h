@@ -37,8 +37,8 @@ public:
 	const CbmLitDetectorLayout& GetMuchLayout() {return fMuchLayout;}
 	const CbmLitDetectorLayout& GetTrdLayout() {return fTrdLayout;}
 
-	void GetMuchLayoutVec(LitDetectorLayoutVec& layout);
-	void GetMuchLayoutScal(LitDetectorLayoutScal& layout);
+	void GetMuchLayoutVec(LitDetectorLayoutMuonVec& layout);
+	void GetMuchLayoutScal(LitDetectorLayoutMuonScal& layout);
 	template<class T> void GetMuchLayout(LitDetectorLayoutMuon<T>& layout);
 
 	void GetTrdLayoutVec(LitDetectorLayoutElectronVec& layout);

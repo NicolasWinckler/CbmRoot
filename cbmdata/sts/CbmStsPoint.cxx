@@ -46,6 +46,16 @@ CbmStsPoint::~CbmStsPoint() { }
 
 
 
+// -----   Copy constructor with event and epoch time   --------------------
+CbmStsPoint::CbmStsPoint(const CbmStsPoint& point,
+			 Double_t eventTime, Double_t epochTime) {
+  *this = point;
+  fTime = point.GetTime() + eventTime - epochTime;
+}
+// -------------------------------------------------------------------------
+
+
+
 
 // -----   Public method Print   -------------------------------------------
 void CbmStsPoint::Print(const Option_t* opt) const {

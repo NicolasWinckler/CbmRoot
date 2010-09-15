@@ -21,13 +21,15 @@ set(CBMDATA_SRCS
 CbmBaseHit.cxx
 CbmDigi.cxx
 CbmHit.cxx
-CbmMCEvent.cxx
-CbmMCTrack.cxx
 CbmPixelHit.cxx
 CbmStack.cxx
 CbmStripHit.cxx
 CbmTrack.cxx
 CbmTrackMatch.cxx
+
+CbmMCEpoch.cxx
+CbmMCEvent.cxx
+CbmMCTrack.cxx
 
 mvd/CbmMvdCluster.cxx 
 mvd/CbmMvdDetectorId.cxx

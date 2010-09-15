@@ -15,6 +15,10 @@
 #pragma link C++ class CbmTrack+;
 #pragma link C++ class CbmTrackMatch+;
 
+#pragma link C++ class CbmMCEpoch+;
+#pragma link C++ class CbmMCEvent+;
+#pragma link C++ class CbmMCTrack+;
+
 #pragma link C++ class CbmMvdCluster+;
 #pragma link C++ class CbmMvdDetectorId+;
 #pragma link C++ class CbmMvdDigi+;

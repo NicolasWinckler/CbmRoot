@@ -46,8 +46,14 @@ class CbmStsPoint : public FairMCPoint
 	      Double_t tof, Double_t length, Double_t eLoss);
 
 
-  /** Copy constructor **/
-  CbmStsPoint(const CbmStsPoint& point) { *this = point; };
+  /** Copy constructor with event and epoch time 
+   ** Re-calculates time w.r.t. epoch time start
+   *@param eventTime   event start time [ns]
+   *@param epochTime   epoch start time [ns]
+   **/
+  CbmStsPoint(const CbmStsPoint& point, 
+	      Double_t eventTime = 0., 
+	      Double_t epochTime = 0.);
 
 
   /** Destructor **/

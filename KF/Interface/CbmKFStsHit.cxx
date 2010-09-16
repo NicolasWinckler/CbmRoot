@@ -32,9 +32,12 @@ void CbmKFStsHit::Create( CbmStsHit *h ){
   FitPoint.x = pos.X();
   FitPoint.y = pos.Y();
   FitPoint.z = pos.Z();
-  FitPoint.V[0] = err.X() * err.X();
-  FitPoint.V[1] = h->GetCovXY();
-  FitPoint.V[2] = err.Y() * err.Y();
+//   FitPoint.V[0] = err.X() * err.X();
+//   FitPoint.V[1] = h->GetCovXY();
+//   FitPoint.V[2] = err.Y() * err.Y();
+  FitPoint.V[0] = 3.000e-06;
+  FitPoint.V[1] = -1.120e-05;
+  FitPoint.V[2] = 8.357e-05;
 }
 
 

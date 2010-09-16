@@ -103,7 +103,7 @@
 #pragma link C++ class CbmLitCheckEnergyLossMuons+;
 #pragma link C++ class CbmLitCheckMultipleScattering+;
 #pragma link C++ class CbmLitCheckBrem+;
-#pragma link C++ class CbmLitTrackFitSpeedTest+;
+//#pragma link C++ class CbmLitTrackFitSpeedTest+;
 #pragma link C++ class CbmTrdHitsQa+;
 #pragma link C++ class CbmLitCreateStandaloneData+;
 

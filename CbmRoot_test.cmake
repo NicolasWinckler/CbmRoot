@@ -10,8 +10,10 @@ SET (CTEST_UPDATE_CHECKOUT  " ${CTEST_UPDATE_COMMAND} update ")
 SET (BUILD_COMMAND "make")
 SET (CTEST_BUILD_COMMAND "${BUILD_COMMAND} -j$ENV{number_of_processors}")
 
-
 if($ENV{ctest_model} MATCHES Nightly)
+
+Set (CTEST_CONFIGURE_COMMAND "${CMAKE_EXECUTABLE_NAME} ${CTEST_SOURCE_DIRECTORY} -DCMAKE_BUILD_TYPE=NIGHTLY")
+
   # get the information about conflicting or localy modified files
   # from svn, extract the relavant information about the file name
   # and put the result in the output variable

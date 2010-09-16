@@ -2952,11 +2952,11 @@ Double_t CbmL1CATrdTrackFinderSA::FitLSM(Int_t M[]){
     bY = 0,
     bX = 0;
 
-  for(int i = 0; i <= 12; i+=2){
+  for(int i = 0; i < 12; i+=2){
     yAv  += pHit[i]->GetY();
     zAvy += pHit[i]->GetZ();
   }
-  for(int i = 1; i <= 12; i+=2){
+  for(int i = 1; i < 12; i+=2){
     xAv  += pHit[i]->GetX();
     zAvx += pHit[i]->GetZ();
   }

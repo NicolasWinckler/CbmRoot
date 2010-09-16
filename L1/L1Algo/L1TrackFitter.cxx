@@ -353,7 +353,7 @@ void L1Algo::KFTrackFitter() // TODO: works only for same-z. Add pipe.
 
   for(unsigned int itrack = 0; itrack < N_vTracks; itrack+=fvecLen)
   {
-    if(N_vTracks - itrack < fvecLen)
+    if(N_vTracks - itrack < int(fvecLen))
       nTracks_SIMD = N_vTracks - itrack;
 
     for(i=0; i<nTracks_SIMD; i++)
@@ -409,7 +409,7 @@ void L1Algo::KFTrackFitter() // TODO: works only for same-z. Add pipe.
     dz = fz2-fz1;
     sta[i].fieldSlice.GetFieldValue( T.x + T.tx*dz, T.y + T.ty*dz, fB2 );
     fB2.Combine( fB[i-2], w[i-2] );
-    fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
+
     for( --i; i>=0; i-- )
     {
       fz0 = z[i];
@@ -473,7 +473,6 @@ void L1Algo::KFTrackFitter() // TODO: works only for same-z. Add pipe.
     dz = fz2-fz1;
     sta[i].fieldSlice.GetFieldValue( T.x + T.tx*dz, T.y + T.ty*dz, fB2 );
     fB2.Combine( fB[i+2], w[i+2] );
-    fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
 
     for( ++i; i<nHits; i++ )
     {

@@ -142,6 +142,7 @@ struct TL1PerfEfficiencies: public TL1Efficiencies
     TL1Efficiencies::operator+=(a);
     killed += a.killed; clone += a.clone;
     reco_length += a.reco_length;
+    return *this;
   };
   
   void CalcEff(){
@@ -233,7 +234,7 @@ void CbmL1::EfficienciesPerformance()
     double ratio_length = 0;
     if (reco){
       double mc_length = mtra.NStations();
-      for (int irt = 0; irt < rTracks.size(); irt++)
+      for (unsigned int irt = 0; irt < rTracks.size(); irt++)
         ratio_length += double(rTracks[irt]->GetNOfHits())/mc_length;
     }
       // number of clones
@@ -562,7 +563,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
 
   } // for reco tracks
 
-  int mc_total; // total amount of reconstructable mcTracks
+  int mc_total = 0; // total amount of reconstructable mcTracks
   for ( vector<CbmL1MCTrack>::iterator mtraIt = vMCTracks.begin(); mtraIt != vMCTracks.end(); mtraIt++ ) {
     CbmL1MCTrack &mtra = *(mtraIt);
     // No Sts hits? 
@@ -742,7 +743,8 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
 
 void CbmL1::TrackFitPerformance()
 {
-  static TH1F *h_fit[10], *h_fitL[10], *h_fitSV[10], *h_fitPV[10], *h_fit_chi2;
+  const int Nh_fit = 12;
+  static TH1F *h_fit[Nh_fit], *h_fitL[Nh_fit], *h_fitSV[Nh_fit], *h_fitPV[Nh_fit], *h_fit_chi2;
 
   static bool first_call = 1;
 
@@ -753,13 +755,13 @@ void CbmL1::TrackFitPerformance()
       //TDirectory *maindir = gDirectory;
       //histodir->cd();
 
-    TDirectory *curdir = gDirectory;
+      //TDirectory *curdir = gDirectory;
       //histodir = gROOT->mkdir("L1");
     histodir->cd();
     histodir->mkdir("Fit");
     gDirectory->cd("Fit");
     {
-      const int Nh_fit = 12;
+      
       struct {
         const char *name;
         const char *title;
@@ -1027,9 +1029,6 @@ void CbmL1::FieldApproxCheck()
       CbmStsStation *st = StsDigi.GetStation(ist - NMvdStations);
       z = st->GetZ();
 
-      CbmStsSectorDigiPar *sectorPar;
-      CbmStsSensorDigiPar *sensorPar;
-
       double x,y;
       for(int isec = 0; isec < st->GetNSectors(); isec++)
       {
@@ -1093,8 +1092,6 @@ void CbmL1::FieldApproxCheck()
         r[2] = z; r[0] = x; r[1] = y;
         MF->GetFieldValue( r, B );
         bbb = sqrt(B[0]*B[0]+B[1]*B[1]+B[2]*B[2]);
-
-        bool IsOnStation = 0;
 
         FSl.GetFieldValue(x,y,B_L1);
         bbb_L1 = sqrt(B_L1.x[0]*B_L1.x[0] + B_L1.y[0]*B_L1.y[0] + B_L1.z[0]*B_L1.z[0]);

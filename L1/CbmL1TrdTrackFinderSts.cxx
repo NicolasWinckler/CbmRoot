@@ -671,7 +671,7 @@ Double_t CbmL1TrdTrackFinderSts::GetChi2Hit(CbmKFTrack& track, CbmTrdHit* pHit)
 {
     // Get chi2 from track extrapolation to hit
     Double_t chi2 = 0.;
-    if(pHit->GetDx() < 1e-14 && pHit->GetDx() > pHit->GetDy() < 1e-14) {
+    if(pHit->GetDx() < 1e-14 && pHit->GetDx() > pHit->GetDy() && pHit->GetDy() < 1e-14) {
 	Double_t dx = track.GetTrack()[0] - pHit->GetX();
 	Double_t dy = track.GetTrack()[1] - pHit->GetY();
 	Double_t c0 = track.GetCovMatrix()[0];

@@ -120,6 +120,7 @@ inline TL1Efficiencies& TL1Efficiencies::operator+=(TL1Efficiencies& a)
 {
   mc += a.mc; reco += a.reco;
   ghosts += a.ghosts; clones += a.clones;
+  return *this;
 };
 
 inline void TL1Efficiencies::Inc(bool isReco, TString name)

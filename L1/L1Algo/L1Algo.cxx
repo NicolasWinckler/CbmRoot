@@ -133,7 +133,7 @@ void L1Algo::StripsToCoor(const fvec &u, const fvec &v, fvec &x, fvec &y, const 
   /// full the hit point by hit information.
 L1HitPoint L1Algo::CreateHitPoint(const L1StsHit &hit, char ista)
 {
-  L1Station &sta = vStations[ista];
+  L1Station &sta = vStations[int(ista)];
   L1Strip &u = vStsStrips[hit.f];
   L1Strip &v = vStsStripsB[hit.b];
   fscal x, y;

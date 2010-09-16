@@ -136,8 +136,8 @@ void CbmL1RichENNRingFinder::ENNRingFinder( vector<ENNHit> &Hits, vector<ENNRing
 
   const double R2Min = RMin*RMin, R2Max = RMax*RMax;  
   const double HitSize2 = 2 * HitSize;
-  const double HitSize4 = 4 * HitSize;
-  const double HitSizeSq4 = HitSize2 * HitSize2;
+//  const double HitSize4 = 4 * HitSize;
+//  const double HitSizeSq4 = HitSize2 * HitSize2;
   const double AreaSize  = 2 * RMax + HitSize;
   const double AreaSize2 = AreaSize * AreaSize;  
 
@@ -235,7 +235,7 @@ void CbmL1RichENNRingFinder::ENNRingFinder( vector<ENNHit> &Hits, vector<ENNRing
       R = sqrt( R2 );
 
       double Dcut      = Dmax * Rejection;            // cut for noise hits 
-      double RingCut   = HitSize4 * R ; // closeness
+//      double RingCut   = HitSize4 * R ; // closeness
       S0 = S1 = S2 = S3 = S4 = 0.0;
       NRingHits = 1;
       NAreaHits = 0;

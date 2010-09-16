@@ -507,7 +507,7 @@ inline void L1Algo::f30(	// input
     T_3.push_back(L1TrackPar_0);
     u_front_3.push_back(fvec_0);
     u_back_3.push_back(fvec_0);
-		for (int irh_index = duplet_b; irh_index < duplet_e; irh_index++){ //  2.1/10 sec
+		for (unsigned int irh_index = duplet_b; irh_index < duplet_e; irh_index++){ //  2.1/10 sec
 
 // 			if( n3 >= MaxPortionTriplets ) break;  // dbg 0
 			int irh = mrDuplets_hits[irh_index];
@@ -1352,11 +1352,12 @@ void L1Algo::CATrackFinder()
 #endif
 
 	cout.precision(6);
-
+        
+#ifdef XXX
   static unsigned int stat_N = 0; // number of events
 
   const int Nisec = 3; //number of main loops
-#ifdef XXX
+
 		// timers for different part of CATrackFinder
 	const int ntimers = 6; //number of timers + 1
 
@@ -2152,9 +2153,10 @@ void L1Algo::CATrackFinder()
 
 // 	cout << "End TrackFinder" << endl;
   CATime = (double(c_time.CpuTime()));
-	double CATimeReal = (double(c_time.RealTime()));
+
 
 #ifdef XXX
+  double CATimeReal = (double(c_time.RealTime()));
   /*
   cout<<"CA Track Finder: " << (double(c_time.CpuTime()))
       <<" (" << time_trip <<" ["

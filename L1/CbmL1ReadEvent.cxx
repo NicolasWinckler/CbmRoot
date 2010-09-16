@@ -359,7 +359,7 @@ void CbmL1::ReadEvent()
     }
 //     h.z = z_tmp;
     
-    int k;
+    unsigned int k;
     for (k = 0; k < vStsZPos_temp.size(); k++){
       if (vStsZPos_temp[k] == z_tmp){
         h.iz = k;
@@ -402,7 +402,7 @@ void CbmL1::ReadEvent()
     newToOldIndex.clear();
     newToOldIndex.push_back(0);
 
-    for (int k = 1; k < vStsZPos_temp.size(); k++){
+    for (unsigned int k = 1; k < vStsZPos_temp.size(); k++){
       vector<float>::iterator itpos = vStsZPos_temp2.begin()+1;
       vector<int>::iterator iti = newToOldIndex.begin()+1;
       for (; itpos < vStsZPos_temp2.end(); itpos++, iti++){
@@ -422,7 +422,7 @@ void CbmL1::ReadEvent()
     if (fVerbose >= 10) cout << "ReadEvent: z-pos are sorted." << endl;
     
       // save z-pos
-    for (int k = 0; k < vStsZPos_temp2.size(); k++)
+    for (unsigned int k = 0; k < vStsZPos_temp2.size(); k++)
       algo->vStsZPos.push_back(vStsZPos_temp2[k]);
       // correct index of z-pos in hits array
     int size_nto_tmp = newToOldIndex.size();

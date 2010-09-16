@@ -51,9 +51,9 @@ void CbmL1MCTrack::Init()
   CbmL1* L1 = CbmL1::Instance();
      // get stsHits
   StsHits.clear();
-  for (int iP = 0; iP < Points.size(); iP++){
+  for (unsigned int iP = 0; iP < Points.size(); iP++){
     CbmL1MCPoint* point = &(L1->vMCPoints[Points[iP]]);
-    for (int iH = 0; iH < point->hitIds.size(); iH++){
+    for (unsigned int iH = 0; iH < point->hitIds.size(); iH++){
       const int iih = point->hitIds[iH];
       if( std::find(StsHits.begin(), StsHits.end(), iih) == StsHits.end() )
         StsHits.push_back(iih);
@@ -70,7 +70,6 @@ void CbmL1MCTrack::Init()
 void CbmL1MCTrack::CalculateMCCont()
 {
   CbmL1* L1 = CbmL1::Instance();
-  L1Algo* algo = L1->algo;
   
   int nPoints = Points.size();
   nMCContStations = 0;
@@ -120,7 +119,7 @@ void CbmL1MCTrack::CalculateMaxNStaHits()
   nStations = 0;
   int lastSta = -1;
   int cur_maxNStaHits = 0;
-  for( int iH = 0; iH < StsHits.size(); iH++){
+  for(unsigned int iH = 0; iH < StsHits.size(); iH++){
     CbmL1HitStore& sh = L1->vHitStore[StsHits[iH]];
     if (sh.iStation == lastSta) 
       cur_maxNStaHits++;
@@ -144,7 +143,7 @@ void CbmL1MCTrack::CalculateMaxNStaMC()
   int lastSta = -1;
   float lastz = -1;
   int cur_maxNStaMC = 0 , cur_maxNSensorMC = 0;
-  for( int iH = 0; iH < Points.size(); iH++){
+  for(unsigned int iH = 0; iH < Points.size(); iH++){
     CbmL1MCPoint& mcP = L1->vMCPoints[Points[iH]];
     if (mcP.iStation == lastSta)
       cur_maxNStaMC++;

@@ -24,7 +24,7 @@ class L1Portion<L1TrackPar>
     };
     vType& operator[] (int i) { return a[i];}
     void resize(int size) { a.reserve(size); };
-    void resize2(int size) { for(int i = 0; i < a.size(); i++) a[i].reserve(size); };
+    void resize2(int size) { for(unsigned int i = 0; i < a.size(); i++) a[i].reserve(size); };
     void push_back(vType &v) { a.push_back(v); };
     void add_void(){
       vType v;
@@ -39,7 +39,7 @@ class L1Portion<L1TrackPar>
 
     int CalcSize() {
       int size = 0;
-      for(int i = 0; i < a.size(); i++) size += a[i].size();
+      for(unsigned int i = 0; i < a.size(); i++) size += a[i].size();
       return size*sizeof(T);
     };
 
@@ -66,7 +66,7 @@ template <>
     };
     vType& operator[] (int i) { return a[i];}
     void resize(int size) { a.reserve(size); };
-    void resize2(int size) { for(int i = 0; i < a.size(); i++) a[i].reserve(size); };
+    void resize2(int size) { for(unsigned int i = 0; i < a.size(); i++) a[i].reserve(size); };
     void push_back(vType &v) { a.push_back(v); };
     void add_void(){
       vType v;
@@ -81,7 +81,7 @@ template <>
 
     int CalcSize() {
       int size = 0;
-      for(int i = 0; i < a.size(); i++) size += a[i].size();
+      for(unsigned int i = 0; i < a.size(); i++) size += a[i].size();
       return size*sizeof(T);
     };
 

@@ -102,6 +102,7 @@ OffLineInterface/CbmL1StsTrackFinder.h
 # L1Algo/L1Algo.h
 )
 
+ADD_DEFINITIONS(-Wall -Wabi -Wsign-promo  -Wno-pmf-conversions -Wctor-dtor-privacy -Wreorder -Wno-deprecated -Wstrict-null-sentinel -Wno-non-template-friend) #    TODO: -Weffc++#  -Wnon-virtual-dtor,-Woverloaded-virtual  - too many warnings from other parts of cbmroot;  -Wold-style-cast - warnings in "root/include"
 
 # Check if SSE instructions are available on the machine where 
 # the project is compiled.

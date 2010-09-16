@@ -304,6 +304,7 @@ InitStatus CbmL1::Init()
       if( sector->GetType()==1 ){
         b_phi += 3.14159265358/2.;
         b_sigma = sector->GetDy()/sqrt(12.);
+        f_sigma = b_sigma; // CHECKME
       }
       else{
         f_phi +=sector->GetStereoF();
@@ -328,9 +329,6 @@ InitStatus CbmL1::Init()
       z = st->GetZ();
   
       Xmax=-100; Ymax=-100;
-
-      CbmStsSectorDigiPar *sectorPar;
-      CbmStsSensorDigiPar *sensorPar;
 
       double x,y;
       for(int isec = 0; isec<st->GetNSectors(); isec++)
@@ -361,7 +359,7 @@ InitStatus CbmL1::Init()
     TMatrixD A(N,N);
     TVectorD b0(N), b1(N), b2(N);
     for( int i=0; i<N; i++){
-      for( int j=0; j<N; j++) A(i,j)==0.;
+      for( int j=0; j<N; j++) A(i,j) = 0.;
       b0(i)=b1(i)=b2(i) = 0.;
     }
     for( double x=-Xmax; x<=Xmax; x+=dx )
@@ -812,7 +810,6 @@ void CbmL1::ReadSTAPGeoData(void* geo_, int &size)
   for (i = 0; !fgeo.eof(); i++){
     fscal tmp;
     fgeo >> tmp >> eatwhite;
-    fscal tmp2 = geo[i];
     geo[i] = tmp;
   };
   size = i;

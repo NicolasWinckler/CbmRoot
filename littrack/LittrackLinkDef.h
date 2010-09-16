@@ -40,14 +40,14 @@
 //#pragma link C++ class CbmLitGating+;
 
 // finder_cbm
-#pragma link C++ class CbmLitTrdTrackFinderBranch+;
-#pragma link C++ class CbmLitTrdTrackFinderNN+;
-#pragma link C++ class CbmLitTrdTrackFinderWeight+;
-#pragma link C++ class CbmLitTrdTrackFinderStandalone+;
+//#pragma link C++ class CbmLitTrdTrackFinderBranch+;
+//#pragma link C++ class CbmLitTrdTrackFinderNN+;
+//#pragma link C++ class CbmLitTrdTrackFinderWeight+;
+//#pragma link C++ class CbmLitTrdTrackFinderStandalone+;
 //#pragma link C++ class CbmLitMuchTrackFinderBranch+;
 //#pragma link C++ class CbmLitMuchTrackFinderNN+;
 //#pragma link C++ class CbmLitMuchTrackFinderWeight+;
-#pragma link C++ class CbmLitStsBasedTrackFinder+;
+//#pragma link C++ class CbmLitStsBasedTrackFinder+;
 //#pragma link C++ class CbmLitTofMerger+;
 #pragma link C++ class CbmLitFindGlobalTracks+;
 //#pragma link C++ class CbmLitCudaTest+;
@@ -103,7 +103,7 @@
 #pragma link C++ class CbmLitCheckEnergyLossMuons+;
 #pragma link C++ class CbmLitCheckMultipleScattering+;
 #pragma link C++ class CbmLitCheckBrem+;
-//#pragma link C++ class CbmLitTrackFitSpeedTest+;
+#pragma link C++ class CbmLitTrackFitSpeedTest+;
 #pragma link C++ class CbmTrdHitsQa+;
 #pragma link C++ class CbmLitCreateStandaloneData+;
 

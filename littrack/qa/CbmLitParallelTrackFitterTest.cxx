@@ -164,7 +164,7 @@ bool CbmLitParallelTrackFitterTest::CheckHit(
 		CbmLitTrack* track)
 {
 	unsigned char planeId = PlaneId(stationGroup, station, substation, layout);
-	for (unsigned int i = 0; i < track->GetNofHits(); i++) {
+	for (int i = 0; i < track->GetNofHits(); i++) {
 		const CbmLitHit* hit = track->GetHit(i);
 		if (hit->GetPlaneId() == planeId) return true;
 	}

@@ -10,11 +10,11 @@
 #include <cmath>
 
 CbmLitGating::CbmLitGating():
-	fSigmaCoef(3.5),
-	fMaxCovSq(20. * 20.),
 	fChiSqStripHitCut(4.),
 	fChiSqPixelHitCut(15.),
-	fUseFastSearch(true)
+	fUseFastSearch(true),
+	fSigmaCoef(3.5),
+	fMaxCovSq(20. * 20.)
 {
 }
 

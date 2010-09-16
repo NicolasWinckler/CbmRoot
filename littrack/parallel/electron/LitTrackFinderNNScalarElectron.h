@@ -83,7 +83,6 @@ public:
 			LitScalTrack* track,
 			const std::pair<unsigned int, unsigned int>& hits,
 			LitTrackParamScal* par,
-			unsigned int nofHits,
 			int stationGroup,
 			int station);
 

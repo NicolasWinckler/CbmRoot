@@ -13,10 +13,10 @@
 #ifndef LITTRACKFINDERNNVECMUON_H_
 #define LITTRACKFINDERNNVECMUON_H_
 
-#include "../LitHit.h"
-#include "../LitTrack.h"
 #include "LitDetectorGeometryMuon.h"
 #include "LitHitDataMuon.h"
+#include "../LitHit.h"
+#include "../LitTrack.h"
 #include "../LitTrackFinderNNBase.h"
 #include "../LitTrackFinder.h"
 

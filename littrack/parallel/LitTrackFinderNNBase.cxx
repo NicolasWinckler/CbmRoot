@@ -12,7 +12,7 @@
 //LitTrackFinderNNBase<T>::LitTrackFinderNNBase():
 LitTrackFinderNNBase::LitTrackFinderNNBase():
 	fMaxCovSq(20*20),
-	fSigmaCoef(3.5)
+	fSigmaCoef(5.)
 {
 
 }

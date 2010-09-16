@@ -64,7 +64,7 @@ LitTrackFinderNNScalarElectron::LitTrackFinderNNScalarElectron():
 	fPropagator = factory->CreateTrackPropagator("lit");
 
 	SetSigmaCoef(5.);
-	SetMaxCovSq(20*20);
+	SetMaxCovSq(20.*20.);
 
 #ifdef LIT_USE_TBB
 	tbb::task_scheduler_init init;
@@ -142,11 +142,11 @@ void LitTrackFinderNNScalarElectron::InitTrackSeeds(
 //	    				InitTrackSeedsClass(seeds, fTracks), tbb::auto_partitioner());
 
 	fNofTracks = 0;
-//	fscal QpCut = 1./1.5;
+	fscal QpCut = 1./0.1;
 	//TODO : add threads here
 	for (unsigned int i = 0; i < nofTrackSeeds; i++) {
 		LitScalTrack* track = trackSeeds[i];
-//		if (fabs(track->paramLast.Qp) > QpCut) continue;
+		if (fabs(track->paramLast.Qp) > QpCut) continue;
 //		if (fUsedSeedsSet.find((*track)->GetPreviousTrackId()) != fUsedSeedsSet.end()) continue;
 //		track->SetPDG(fPDG);
 		track->previouseTrackId = i;
@@ -164,36 +164,48 @@ void LitTrackFinderNNScalarElectron::InitTrackSeeds(
 void LitTrackFinderNNScalarElectron::FollowTracks()
 {
 #ifdef LIT_USE_TBB
-		tbb::parallel_for(tbb::blocked_range<unsigned int>(0, fNofTracks),
-		FollowTrackClass(this, fTracks), tbb::auto_partitioner());
+	tbb::parallel_for(tbb::blocked_range<unsigned int>(0, fNofTracks),
+	FollowTrackClass(this, fTracks), tbb::auto_partitioner());
 #else
-		for (unsigned int iTrack = 0; iTrack < fNofTracks; iTrack++) {
-			LitScalTrack* track = fTracks[iTrack];
-			PropagateToFirstStation(track);
-			FollowTrack(track);
-		}
+	for (unsigned int iTrack = 0; iTrack < fNofTracks; iTrack++) {
+		LitScalTrack* track = fTracks[iTrack];
+		PropagateToFirstStation(track);
+		FollowTrack(track);
+	}
 #endif
 }
 
 void LitTrackFinderNNScalarElectron::PropagateToFirstStation(
 		LitScalTrack* track)
 {
-    for (unsigned char ivp = 0; ivp < fLayout.GetNofVirtualPlanes()-1; ivp++) {
-    	LitVirtualPlaneElectron<fscal>& vp1 = fLayout.virtualPlanes[ivp];
-    	LitVirtualPlaneElectron<fscal>& vp2 = fLayout.virtualPlanes[ivp+1];
-
+//    for (unsigned char ivp = 0; ivp < fLayout.GetNofVirtualPlanes()-1; ivp++) {
+//    	LitVirtualPlaneElectron<fscal>& vp1 = fLayout.virtualPlanes[ivp];
+//    	LitVirtualPlaneElectron<fscal>& vp2 = fLayout.virtualPlanes[ivp+1];
+//
 //    	LitTrackParamScal lpar = track->paramLast;
 //    	CbmLitTrackParam par;
 //    	LitTrackParamScalToCbmLitTrackParam(&lpar, &par);
-////    	fPropagator->Propagate(&par, vp2.Z, 11, NULL);
-//    	fExtrapolator->Extrapolate(&par, vp2.Z);
+//    	fPropagator->Propagate(&par, vp2.Z, 11, NULL);
+////    	fExtrapolator->Extrapolate(&par, vp2.Z);
 //        CbmLitTrackParamToLitTrackParamScal(&par, &lpar);
 //        track->paramLast = lpar;
+//
+////    	LitRK4ExtrapolationElectron(track->paramLast, vp2.Z, vp1.fieldSlice, vp1.fieldSliceMid, vp2.fieldSlice);
+////    	LitRK4ExtrapolationElectron1(track->paramLast, vp2.Z, fField);
+////    	LitAddMaterial(track->paramLast, vp2.material);
+//    }
 
-    	LitRK4ExtrapolationElectron(track->paramLast, vp2.Z, vp1.fieldSlice, vp1.fieldSliceMid, vp2.fieldSlice);
-//    	LitRK4ExtrapolationElectron1(track->paramLast, vp2.Z, fField);
-    	LitAddMaterial(track->paramLast, vp2.material);
-    }
+    const LitStationElectron<fscal>& st = fLayout.GetStation(0, 0);
+
+	LitTrackParamScal lpar = track->paramLast;
+	CbmLitTrackParam par;
+	LitTrackParamScalToCbmLitTrackParam(&lpar, &par);
+	fPropagator->Propagate(&par, st.Z, 11, NULL);
+//    	fExtrapolator->Extrapolate(&par, vp2.Z);
+    CbmLitTrackParamToLitTrackParamScal(&par, &lpar);
+    track->paramLast = lpar;
+
+
 }
 
 void LitTrackFinderNNScalarElectron::FollowTrack(
@@ -216,8 +228,6 @@ bool LitTrackFinderNNScalarElectron::ProcessStationGroup(
 			if (track->nofMissingHits > fMaxNofMissingHits) return false;
 		}
 	}
-//	track->SetPDG(fPDG);
-//	track->SetLastPlaneId(stationGroup);
 	return true;
 }
 
@@ -232,19 +242,19 @@ bool LitTrackFinderNNScalarElectron::ProcessStation(
 
 	const LitStationElectronScal& st = fLayout.GetStation(stationGroup, station);
 
-//	LitTrackParamScal lpar = track->paramLast;
-//	CbmLitTrackParam par1;
-//	LitTrackParamScalToCbmLitTrackParam(&lpar, &par1);
-////	fPropagator->Propagate(&par1, st.Z, 11, NULL);
+	LitTrackParamScal lpar = track->paramLast;
+	CbmLitTrackParam par1;
+	LitTrackParamScalToCbmLitTrackParam(&lpar, &par1);
+	fPropagator->Propagate(&par1, st.Z, 11, NULL);
 //	fExtrapolator->Extrapolate(&par1, st.Z);
-//    CbmLitTrackParamToLitTrackParamScal(&par1, &lpar);
-//    track->paramLast = lpar;
-//    par=lpar;
+    CbmLitTrackParamToLitTrackParamScal(&par1, &lpar);
+    track->paramLast = lpar;
+    par = lpar;
 
-	LitLineExtrapolation(par, st.Z);
-
-	for (unsigned char im = 0; im < st.GetNofMaterialsBefore(); im++)
-		LitAddMaterial(par, st.materialsBefore[im]);
+//	LitLineExtrapolation(par, st.Z);
+//
+//	for (unsigned char im = 0; im < st.GetNofMaterialsBefore(); im++)
+//		LitAddMaterial(par, st.materialsBefore[im]);
 
 	std::pair<unsigned int, unsigned int> hits;
 	LitScalPixelHit** hitvec = fHitData.GetHits(stationGroup, station);
@@ -253,11 +263,10 @@ bool LitTrackFinderNNScalarElectron::ProcessStation(
 
 	MinMaxIndex(&par, hitvec, nh, err, hits.first, hits.second);
 
-	unsigned int nofHits = hits.second - hits.first;
-	hitAdded = AddNearestHit(track, hits, &par, nofHits, stationGroup, station);
+	hitAdded = AddNearestHit(track, hits, &par, stationGroup, station);
 
-	for (unsigned char im = 0; im < st.GetNofMaterialsAfter(); im++)
-		LitAddMaterial(par, st.materialsAfter[im]);
+//	for (unsigned char im = 0; im < st.GetNofMaterialsAfter(); im++)
+//		LitAddMaterial(par, st.materialsAfter[im]);
 
 	return hitAdded;
 }
@@ -266,7 +275,6 @@ bool LitTrackFinderNNScalarElectron::AddNearestHit(
 		LitScalTrack* track,
 		const std::pair<unsigned int, unsigned int>& hits,
 		LitTrackParamScal* par,
-		unsigned int nofHits,
 		int stationGroup,
 		int station)
 {

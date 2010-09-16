@@ -48,6 +48,7 @@ StatusCode CbmPropagatorGeane::Propagate(
    TVector3 v1(1, 0, 0);
    TVector3 v2(0, 1, 0);
    Bool_t result1 = fPropagator->PropagateFromPlane(v1, v2);
+   if (!result1) return kCBMERROR;
 
    // input parameter for the tracking
    // the input parameter is defined in the xy plane
@@ -66,6 +67,7 @@ StatusCode CbmPropagatorGeane::Propagate(
    // the plane is perpendicular to z axes
    TVector3 v0(0, 0, zOut);
    Bool_t result2 = fPropagator->PropagateToPlane(v0, v1, v2);
+   if (!result2) return kCBMERROR;
 
 //   pdg code of the particle,
 //   +/- 13 muon code

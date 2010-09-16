@@ -53,6 +53,7 @@ LitStatus CbmLitNearestHitToTrackMerger::DoMerge(
 			//attach nearest hit to track
 		}
 	}
+	return kLITSUCCESS;
 }
 
 bool CbmLitNearestHitToTrackMerger::AddNearestHit(

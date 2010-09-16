@@ -97,7 +97,7 @@ public:
     /* Returns string reperesentation of the class. Should be implemented in derived classes.
      * @return String reperesentation of the class.
      */
-	virtual std::string ToString() const {;}
+	virtual std::string ToString() const {return "";}
 
 private:
 	int fPlaneId; // detector plane identificator (usually absolute substation number)

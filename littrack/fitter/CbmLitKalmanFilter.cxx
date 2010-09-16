@@ -39,10 +39,12 @@ LitStatus CbmLitKalmanFilter::Update(
 		CbmLitTrackParam *par,
         const CbmLitHit *hit)
 {
+	LitStatus result = kLITSUCCESS;
 	if (hit->GetType() == kLITSTRIPHIT)
-		Update(par, static_cast<const CbmLitStripHit*>(hit));
+		result = Update(par, static_cast<const CbmLitStripHit*>(hit));
 	else if (hit->GetType() == kLITPIXELHIT)
-		Update(par, static_cast<const CbmLitPixelHit*>(hit));
+		result = Update(par, static_cast<const CbmLitPixelHit*>(hit));
+	return result;
 }
 
 LitStatus CbmLitKalmanFilter::Update(
@@ -218,11 +220,11 @@ LitStatus CbmLitKalmanFilter::Update(
 	 myf duu = hit->GetDu() * hit->GetDu();
 	 myf phiCos = hit->GetCosPhi();
 	 myf phiSin = hit->GetSinPhi();
-	 myf phiCosSq = phiCos * phiCos;
-	 myf phiSinSq = phiSin * phiSin;
-	 myf phi2SinCos = 2 * phiCos * phiSin;
+//	 myf phiCosSq = phiCos * phiCos;
+//	 myf phiSinSq = phiSin * phiSin;
+//	 myf phi2SinCos = 2 * phiCos * phiSin;
 
-	  const myf ZERO = 0.0, ONE = 1.;
+//	  const myf ZERO = 0.0, ONE = 1.;
 
 	  myf wi, zeta, zetawi, HCH;
 	  myf F0, F1, F2, F3, F4;

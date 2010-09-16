@@ -24,6 +24,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <limits>
 
 #define cnst static const fvec
 
@@ -284,7 +285,7 @@ void LitTrackFinderNNVecMuon::FollowTracks()
 	// Main loop over station groups for track following
 	unsigned char nofStationGroups = fLayout.GetNofStationGroups();
 	for(unsigned char iStationGroup = 0; iStationGroup < nofStationGroups; iStationGroup++) { // loop over station groups
-		LitStationGroupMuon<fvec> stg = fLayout.stationGroups[iStationGroup];
+		LitStationGroupMuon<fvec>& stg = fLayout.stationGroups[iStationGroup];
 
 		unsigned int nofTracks = nofTracksId1; // number of tracks
 		unsigned int nofTracksVec = nofTracks / fvecLen; // number of tracks grouped in vectors
@@ -501,7 +502,7 @@ bool LitTrackFinderNNVecMuon::AddNearestHit(
 	bool hitAdded = false;
 	LitScalPixelHit* hita = NULL;
 	LitTrackParamScal param;
-	fscal chiSq = 1e10;
+	fscal chiSq = std::numeric_limits<fscal>::max();
 
 	unsigned int nofHitsVec = nofHits / fvecLen; // number of hits grouped in vectors
 	unsigned int dHits = nofHits - fvecLen * nofHitsVec; // number of hits remained after grouping in vectors

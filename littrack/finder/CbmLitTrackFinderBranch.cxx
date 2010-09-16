@@ -22,8 +22,8 @@
 
 CbmLitTrackFinderBranch::CbmLitTrackFinderBranch():
 	fMaxNofHitsInValidationGate(3),
-	fIsProcessSubstationsTogether(true),
-	fMaxNofBranches(27)
+	fMaxNofBranches(27),
+	fIsProcessSubstationsTogether(true)
 {
 }
 

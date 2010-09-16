@@ -123,9 +123,9 @@ int CbmLitHitData::GetNofHits(
 
 void CbmLitHitData::Clear()
 {
-	for(int i = 0; i < fHits.size(); i++) {
-		for(int j = 0; j < fHits[i].size(); j++) {
-			for(int k = 0; k < fHits[i][j].size(); k++){
+	for(unsigned int i = 0; i < fHits.size(); i++) {
+		for(unsigned int j = 0; j < fHits[i].size(); j++) {
+			for(unsigned int k = 0; k < fHits[i][j].size(); k++){
 				fHits[i][j][k].clear();
 				fHits[i][j][k].reserve(1500);
 				fMaxErr[i][j][k] = std::pair<myf, char>(0., ' ');
@@ -138,11 +138,11 @@ std::string CbmLitHitData::ToString() const
 {
 	std::stringstream ss;
 	ss << "HitData:" << std::endl;
-	for(int i = 0; i < fHits.size(); i++) {
+	for(unsigned int i = 0; i < fHits.size(); i++) {
 		ss << " station group " << i << std::endl;
-		for(int j = 0; j < fHits[i].size(); j++) {
+		for(unsigned int j = 0; j < fHits[i].size(); j++) {
 			ss << "  station " << j << std::endl;
-			for(int k = 0; k < fHits[i][j].size(); k++){
+			for(unsigned int k = 0; k < fHits[i][j].size(); k++){
 				ss << "   substation " << k << ": " << GetNofHits(i, j, k) << " hits, "
 					<< "max err=(" << GetMaxErr(i, j, k).first << "," << GetMaxErr(i, j, k).second
 					<< ")" << std::endl;
@@ -159,8 +159,8 @@ void CbmLitHitData::StationByPlaneId(
 		int& substation) const
 {
 	int counter = 0;
-	for(int i = 0; i < fHits.size(); i++) {
-		for(int j = 0; j < fHits[i].size(); j++) {
+	for(unsigned int i = 0; i < fHits.size(); i++) {
+		for(unsigned int j = 0; j < fHits[i].size(); j++) {
 			counter += fHits[i][j].size();
 			if (counter > planeId) {
 				stationGroup = i;

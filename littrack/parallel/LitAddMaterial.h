@@ -23,7 +23,7 @@ template<class T>
 inline void LitAddMaterial(
 		LitTrackParam<T>& par,
 		const LitMaterialInfo<T>& mat) {
-	static const T ZERO = 0.0, ONE = 1., TWO = 2., THREE = 3., INF = 1.e5;
+	static const T ZERO = 0.0, ONE = 1., TWO = 2.;
 	static const T mass = 0.105658369; // muon mass [GeV/c]
 	static const T massSq = 0.105658369 * 0.105658369; // muon mass squared
 	static const T C1_2 = 0.5, C1_3 = 1./3.;

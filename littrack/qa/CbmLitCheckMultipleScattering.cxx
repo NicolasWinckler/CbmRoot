@@ -21,8 +21,8 @@
 #include <sstream>
 
 CbmLitCheckMultipleScattering::CbmLitCheckMultipleScattering():
-	fOutputDir("eloss/"),
-	fNEvents(0)
+	fNEvents(0),
+	fOutputDir("eloss/")
 {
 }
 

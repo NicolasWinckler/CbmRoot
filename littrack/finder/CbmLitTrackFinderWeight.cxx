@@ -162,8 +162,10 @@ bool CbmLitTrackFinderWeight::AddHits(
 			h.SetParam(&uPar);
 			h.SetChiSq(chi);
 			hits.push_back(h);
+			hitAdded = true;
 		}
 	}
+	return hitAdded;
 }
 
 void CbmLitTrackFinderWeight::FitTracks(

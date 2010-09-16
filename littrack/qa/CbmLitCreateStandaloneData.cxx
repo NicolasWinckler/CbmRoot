@@ -65,6 +65,8 @@ InitStatus CbmLitCreateStandaloneData::Init()
 	fHitsFile.open("sa_hits.txt");
 	fSeedsFile.open("sa_seeds.txt");
 	//
+
+	return kSUCCESS;
 }
 
 void CbmLitCreateStandaloneData::SetParContainers()

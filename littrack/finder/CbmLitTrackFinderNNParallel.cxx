@@ -21,8 +21,8 @@
 
 CbmLitTrackFinderNNParallel::CbmLitTrackFinderNNParallel(
 		const std::string& trackingType):
-	fEventNo(1),
 	fTime(0.),
+	fEventNo(1),
 	fTrackingType(trackingType)
 {
 	CbmLitEnvironment* env = CbmLitEnvironment::Instance();

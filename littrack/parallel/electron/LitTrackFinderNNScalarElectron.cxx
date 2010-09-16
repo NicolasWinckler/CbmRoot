@@ -118,7 +118,6 @@ void LitTrackFinderNNScalarElectron::ArrangeHits(
     // TODO : add threads here
     for (int i = 0; i < fLayout.GetNofStationGroups(); i++){
     	for (int j = 0; j < fLayout.GetNofStations(i); j++){
-			unsigned int nh = fHitData.GetNofHits(i, j);
 			LitScalPixelHit** shits = fHitData.GetHits(i, j);
 			LitScalPixelHit** begin = &shits[0];
 			LitScalPixelHit** end = &shits[0] + fHitData.GetNofHits(i, j);

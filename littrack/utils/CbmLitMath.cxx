@@ -13,11 +13,13 @@ myf ChiSq(
 		const CbmLitTrackParam* par,
 		const CbmLitHit* hit)
 {
+	myf chisq = 0.;
 	if (hit->GetType() == kLITSTRIPHIT) {
-		return ChiSq(par, static_cast<const CbmLitStripHit*>(hit));
+		chisq = ChiSq(par, static_cast<const CbmLitStripHit*>(hit));
 	} else if (hit->GetType() == kLITPIXELHIT) {
-		return ChiSq(par, static_cast<const CbmLitPixelHit*>(hit));
+		chisq = ChiSq(par, static_cast<const CbmLitPixelHit*>(hit));
 	}
+	return chisq;
 }
 
 //myf ChiSq(

@@ -17,6 +17,7 @@ InitStatus CbmLitCheckSimpleGeo::Init()
 {
 	fGeoConstructor = CbmLitSimpleGeometryConstructor::Instance();
 	fGeoConstructor->Draw();
+	return kSUCCESS;
 }
 
 void CbmLitCheckSimpleGeo::SetParContainers()

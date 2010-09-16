@@ -248,13 +248,13 @@ IF (SSE_TRUE)
   MESSAGE(STATUS "SSE extensions available")
   ADD_DEFINITIONS(-DHAVE_SSE)
   SET_SOURCE_FILES_PROPERTIES(${LITTRACK_SRCS} PROPERTIES COMPILE_FLAGS 
-  "-msse -O3")
+  "-msse -O3 -Wall")
 ELSE (SSE_TRUE)
   MESSAGE (STATUS "*********************************************************************************")
   MESSAGE(STATUS "NO SSE extensions available.")
   MESSAGE (STATUS "*********************************************************************************")
   SET_SOURCE_FILES_PROPERTIES(${LITTRACK_SRCS} PROPERTIES COMPILE_FLAGS 
-  "-O3")
+  "-O3 -Wall")
 ENDIF (SSE_TRUE)
 
 

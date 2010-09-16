@@ -90,7 +90,7 @@ LitStatus CbmLitTrackFitterWeight::CreateEffectiveTrack(
 	std::vector<HitPtrIteratorPair> bounds;
 	track->GetHitBounds(bounds);
 	etrack->ClearHits();
-	for (int i = 0; i < bounds.size(); i++) {
+	for (unsigned int i = 0; i < bounds.size(); i++) {
 		int nofHits = bounds[i].second - bounds[i].first;
 		if (nofHits > 1) {
 			//Create effective hit, from set of hits
@@ -196,7 +196,7 @@ LitStatus CbmLitTrackFitterWeight::CreateOutputTrack(
 //	track->ClearHits();
 
 	HitPtrVector newHits;
-	for (int i = 0; i < bounds.size(); i++) {
+	for (unsigned int i = 0; i < bounds.size(); i++) {
 		std::sort(bounds[i].first, bounds[i].second, CompareHitPtrWLess());
 		CbmLitHit* hit = (*(bounds[i].second-1));
 		if (!hit->IsOutlier()) {
@@ -210,7 +210,7 @@ LitStatus CbmLitTrackFitterWeight::CreateOutputTrack(
 		}
 	}
 	track->ClearHits();
-	for (int i = 0; i < newHits.size(); i++)
+	for (unsigned int i = 0; i < newHits.size(); i++)
 		track->AddHit(newHits[i]);
 	for_each(newHits.begin(), newHits.end(), DeleteObject());
 

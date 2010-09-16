@@ -38,6 +38,7 @@ InitStatus CbmTrdHitsQa::Init()
 {
 	ReadDataBranches();
 	CreateHistos();
+	return kSUCCESS;
 }
 
 void CbmTrdHitsQa::SetParContainers()
@@ -141,7 +142,7 @@ void CbmTrdHitsQa::CreateHistos()
 
 void CbmTrdHitsQa::ProcessHits()
 {
-	Int_t nofHits = fTrdHits->GetEntriesFast();
+	UInt_t nofHits = fTrdHits->GetEntriesFast();
 	for (UInt_t iHit = 0; iHit < nofHits; iHit++){
 		CbmTrdHit* hit = (CbmTrdHit*) fTrdHits->At(iHit);
 		CbmTrdPoint* point = (CbmTrdPoint*) fTrdPoints->At(hit->GetRefId());

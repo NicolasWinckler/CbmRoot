@@ -11,8 +11,8 @@
 //template<class T>
 //LitTrackFinderNNBase<T>::LitTrackFinderNNBase():
 LitTrackFinderNNBase::LitTrackFinderNNBase():
-	fMaxCovSq(20*20),
-	fSigmaCoef(5.)
+	fSigmaCoef(5.),
+	fMaxCovSq(20*20)
 {
 
 }

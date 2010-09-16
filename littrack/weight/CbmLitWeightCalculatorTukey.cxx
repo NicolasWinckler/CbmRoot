@@ -74,7 +74,6 @@ LitStatus CbmLitWeightCalculatorTukey::Normalize(
 		HitPtrIterator itEnd) const
 {
 	myf sumW = 0.;
-	myf sumCut = 0.;
 	for(HitPtrIterator it = itBegin; it != itEnd; it++) {
 		if ((*it)->IsOutlier()) continue;
 		sumW += (*it)->GetW();

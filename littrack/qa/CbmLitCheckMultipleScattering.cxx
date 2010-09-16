@@ -95,15 +95,15 @@ void CbmLitCheckMultipleScattering::Exec(
         Double_t mass = 0.139; // GeV
 		Double_t p = mom.Mag();
 		Double_t E = std::sqrt(mass * mass + p * p);
-		Double_t beta = p / E;
-		Double_t bcp = beta * p;
+//		Double_t beta = p / E;
+//		Double_t bcp = beta * p;
 
     	Double_t mc_theta = momOut.Theta() * std::cos(momOut.Phi());
 //    	std::cout << "mc_theta=" << mc_theta << std::endl;
         fh_theta_mc->Fill(mc_theta);
 
-        myf theta = 0.0136 * (1./bcp) * 1. * std::sqrt(length/X0) *
-        					(1. + 0.038 * std::log(length/X0));
+//        myf theta = 0.0136 * (1./bcp) * 1. * std::sqrt(length/X0) *
+//        					(1. + 0.038 * std::log(length/X0));
 //        std::cout << "calc_theta=" << theta << std::endl;
 
 

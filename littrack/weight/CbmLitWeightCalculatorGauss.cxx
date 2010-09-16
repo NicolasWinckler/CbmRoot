@@ -53,10 +53,12 @@ LitStatus CbmLitWeightCalculatorGauss::MultivariateGaussWeight(
 		CbmLitHit* hit,
 		myf T) const
 {
+	LitStatus result = kLITSUCCESS;
 	if (hit->GetType() == kLITSTRIPHIT)
-		return MultivariateGaussWeight(par, static_cast<const CbmLitStripHit*>(hit), T);
+		result = MultivariateGaussWeight(par, static_cast<const CbmLitStripHit*>(hit), T);
 	else if (hit->GetType() == kLITPIXELHIT)
-		return MultivariateGaussWeight(par, static_cast<const CbmLitPixelHit*>(hit), T);
+		result = MultivariateGaussWeight(par, static_cast<const CbmLitPixelHit*>(hit), T);
+	return result;
 }
 
 LitStatus CbmLitWeightCalculatorGauss::MultivariateGaussWeight(
@@ -65,6 +67,7 @@ LitStatus CbmLitWeightCalculatorGauss::MultivariateGaussWeight(
 		myf T) const
 {
 	std::cout << "MultivariateGaussWeight NOT IMPLEMENTED FOR STRIP HIT!!!!"<< std::endl;
+	return kLITSUCCESS;
 }
 
 LitStatus CbmLitWeightCalculatorGauss::MultivariateGaussWeight(
@@ -93,10 +96,12 @@ myf CbmLitWeightCalculatorGauss::MultivariateGaussCut(
 		myf T,
 		myf cutValue) const
 {
+	myf cut = 0.;
 	if (hit->GetType() == kLITSTRIPHIT)
-		MultivariateGaussCut(static_cast<const CbmLitStripHit*>(hit), T, cutValue);
+		cut = MultivariateGaussCut(static_cast<const CbmLitStripHit*>(hit), T, cutValue);
 	else if (hit->GetType() == kLITPIXELHIT)
-		MultivariateGaussCut(static_cast<const CbmLitPixelHit*>(hit), T, cutValue);
+		cut = MultivariateGaussCut(static_cast<const CbmLitPixelHit*>(hit), T, cutValue);
+	return cut;
 }
 
 myf CbmLitWeightCalculatorGauss::MultivariateGaussCut(
@@ -105,6 +110,7 @@ myf CbmLitWeightCalculatorGauss::MultivariateGaussCut(
 		myf cutValue) const
 {
 	std::cout << "MultivariateGaussCut NOT IMPLEMENTED FOR STRIP HIT!!!!"<< std::endl;
+	return 0;
 }
 
 myf CbmLitWeightCalculatorGauss::MultivariateGaussCut(

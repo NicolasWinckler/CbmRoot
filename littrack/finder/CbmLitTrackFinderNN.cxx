@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <limits>
 
 CbmLitTrackFinderNN::CbmLitTrackFinderNN():
 	fIsProcessSubstationsTogether(true)
@@ -196,7 +197,7 @@ bool CbmLitTrackFinderNN::AddNearestHit2(
 	for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
 		CbmLitTrackParam uPar, param;
 		HitPtrIterator hit(hits[iSubstation].second);
-		myf chiSq = 1e10;
+		myf chiSq = std::numeric_limits<myf>::max();
 		for (HitPtrIterator iHit = hits[iSubstation].first; iHit != hits[iSubstation].second; iHit++) {
 			//First update track parameters with KF, than check whether the hit is in the validation gate.
 			fFilter->Update(&par[iSubstation], &uPar, *iHit);

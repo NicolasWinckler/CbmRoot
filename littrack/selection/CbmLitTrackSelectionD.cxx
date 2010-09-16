@@ -3,8 +3,8 @@
 #include "CbmLitTrack.h"
 
 CbmLitTrackSelectionD::CbmLitTrackSelectionD():
-	fMinNofHits(0),
-	fMinLastPlaneId(0)
+	fMinLastPlaneId(0),
+	fMinNofHits(0)
 {
 }
 

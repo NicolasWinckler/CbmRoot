@@ -50,7 +50,7 @@ template<class T>
 class LitStationMuon
 {
 public:
-	LitStationMuon():nofSubstations(0), type(kLITPIXELHIT){}
+	LitStationMuon():type(kLITPIXELHIT), nofSubstations(0) {}
 
 	void AddSubstation(const LitSubstationMuon<T>& substation) {
 		substations[nofSubstations++] = substation;

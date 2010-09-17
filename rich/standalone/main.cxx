@@ -6,13 +6,15 @@
 #include "CbmRichRingFinderHough.h"
 #include "Stopwatch.h"
 
+#include "tbb/tick_count.h"
+
 int main( int argc, const char* argv[] )
 {
 	cout << "-I- Start ring finder" << endl;
 
 	cout <<"-I- Read data from text file" << endl;
 
-	std::ifstream fin("events.txt");
+	std::ifstream fin("../data/events.txt");
 	int nofEvents = 100;
 	int evNum, nhits;
 	float x,y;
@@ -35,7 +37,10 @@ int main( int argc, const char* argv[] )
 		}
 		dataAll.push_back(data);
 	}
-	Stopwatch timer;
+
+	//tbb::tick_count t0 = tbb::tick_count::now();
+
+	//Stopwatch timer;
 
 	CbmRichRingFinderHough* finder = new CbmRichRingFinderHough();
 	timer.Start();
@@ -43,9 +48,15 @@ int main( int argc, const char* argv[] )
 		cout << "-I- Event:" << iE << endl;
 		finder->DoFind(dataAll[iE]);
 	}
+	//tbb::tick_count t1 = tbb::tick_count::now();
+	//cout << "Exec time per event " << 1000.*(t1-t0).seconds()/nofEvents << " ms" << endl;
+
+
 	timer.Stop();
 	cout << "CPU time = " << 1000.*timer.CpuTime() / nofEvents<< " ms per event" << endl;
 	cout << "Real time = " << 1000.*timer.RealTime() / nofEvents<< " ms per event" << endl;
+
+
 	dataAll.clear();
 	delete finder;
 }

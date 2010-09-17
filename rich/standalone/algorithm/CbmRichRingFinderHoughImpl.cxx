@@ -29,7 +29,6 @@ CbmRichRingFinderHoughImpl::CbmRichRingFinderHoughImpl  ()
 void CbmRichRingFinderHoughImpl::Init()
 {
     SetParameters();
-
     fHist.resize(fNofBinsXY);
     fHistR.resize(fNofBinsR);
 	fHitInd.resize(fNofParts);

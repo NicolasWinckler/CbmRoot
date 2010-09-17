@@ -40,10 +40,9 @@ CbmRichRingQa::CbmRichRingQa() :FairTask("RichRingQa")
 CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
   :FairTask(name)
 {
-    // verbosity level
     fVerbose = verbose;
     fIsSaveToPdf = false;
-    fNofHitsInRingCut = 7; /// minumum number of hits in ring
+    fNofHitsInRingCut = 7; /// minimum number of hits in ring
 
     // count events
     fEventNumber = 0;
@@ -73,7 +72,7 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
     fh_RecElRingsBoverA = new TH1D("fh_RecElRingsBoverA","fh_RecElRingsBoverA",20,0,1);
     fh_AccElRingsBoverA = new TH1D("fh_AccElRingsBoverA","fh_AccElRingsBoverA",20,0,1);
 
-/// Difference Fake and True rings histogramms BEGIN
+/// Difference Fake and True rings histograms BEGIN
     fh_FakeNofHits = new TH1D("fh_FakeNofHits","Number of hits in ring;Nof hits in ring;Yield",50,0,50);
     fh_TrueElNofHits= new TH1D("fh_TrueElNofHits","Number of hits in ring;Nof hits in ring;Yield",50,0,50);
 
@@ -86,19 +85,19 @@ CbmRichRingQa::CbmRichRingQa(const char *name, const char *title, Int_t verbose)
     fh_FakeChi2 = new TH1D("fh_FakeChi2","Chi2;Chi2;Yield",50,0.,1.);
     fh_TrueElChi2 = new TH1D("fh_TrueElChi2","Chi2;Chi2;Yield",50,0.,1.);
 
-    fh_FakeRadPos = new TH1D("fh_FakeRadPos","Radial position;Radial position, cm;Yield",200,0,200);;
-    fh_TrueElRadPos = new TH1D("fh_TrueElRadPos","Radial position;Radial position, cm;Yield",200,0,200);;
+    fh_FakeRadPos = new TH1D("fh_FakeRadPos","Radial position;Radial position, cm;Yield",150,0,150);
+    fh_TrueElRadPos = new TH1D("fh_TrueElRadPos","Radial position;Radial position, cm;Yield",150,0,150);;
 
     fh_FakeRadius = new TH1D("fh_FakeRadius","Radius;Radius, cm;Yield",90,0,9);;
     fh_TrueElRadius = new TH1D("fh_TrueElRadius","Radius;Radius, cm;Yield",90,0,9);;
-/// Difference Fake and True rings histogramms END
+/// Difference Fake and True rings histograms END
 
     fh_WrongMatchElDistance = new TH1D("fh_WrongMatchElDistance","Distance between track and ring center",50,0,5);
     fh_TrueMatchElDistance = new TH1D("fh_TrueMatchElDistance","Distance between track and ring center",50,0,5);
     fh_TrueMatchElMom = new TH1D("fh_TrueMatchElMom","fh_TrueMatchElMom",40,0,10);
 
     //hits distribution (x,y)
-    fh_HitsXY = new TH2D("fh_HitsXY","Hits distribution (x,y), hits/cm^2/event;X, cm;Y, cm",400,-200,200,500,-250,250);
+    fh_HitsXY = new TH2D("fh_HitsXY","Hits distribution (x,y), hits/cm^2/event;X, cm;Y, cm;hits/cm^2/event",300,-150,150,400,-200,200);
     //number of hits per event
     fh_NhitsPerEvent = new TH1D("fh_NhitsPerEvent","Number of hits per event",100,1000,3000);
     //number of projections per event
@@ -609,7 +608,7 @@ void CbmRichRingQa::RingTrackMatchEff()
 
     for (Int_t iMatches = 0; iMatches < nMatches; iMatches++){
 
-        match   = (CbmRichRingMatch*)fMatches->At(iMatches);
+        match = (CbmRichRingMatch*)fMatches->At(iMatches);
         if (!match){
             cout << "-E- CbmRichRingQa::RingTrackMatchEff() no match"<<
             iMatches<<endl;
@@ -676,7 +675,6 @@ void CbmRichRingQa::SaveToPdf()
 
 void CbmRichRingQa::FinishTask()
 {
-
    // fRings->Clear();
     //fPoints->Clear();
    // fTracks->Clear();

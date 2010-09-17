@@ -165,9 +165,7 @@ private:
 	TH1D* fhTrdAnnEl;
 	TH1D* fhTrdAnnPi;
 
-
 	ClassDef(CbmRichElectronsQa,1)
-
 };
 
 #endif

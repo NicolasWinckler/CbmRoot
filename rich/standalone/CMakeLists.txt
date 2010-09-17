@@ -21,11 +21,14 @@ set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
 
 set(TBB_INCLUDE_DIRS "/u/andrey/soft/tbb/tbb22_009oss/include")
 set(TBB_LIBRARIES "/u/andrey/soft/tbb/Lenny64/libtbb.so")
+set(VC_INCLUDE_DIRS "/u/slebedev/Baykal/soft/Vc")
+set(VC_LIBRARIES "/u/slebedev/Baykal/soft/Vc/build/libVc.a")
+
 
 set(INCLUDE_DIRECTORIES
-${PROJECT_SOURCE_DIR}/littrack/base
-${PROJECT_SOURCE_DIR}/littrack/parallel
+${PROJECT_SOURCE_DIR}/algorithm
 ${TBB_INCLUDE_DIRS}
+${VC_INCLUDE_DIRS}
 )
 
 include_directories(${INCLUDE_DIRECTORIES})
@@ -40,9 +43,10 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(STANDALONE_SRCS
 main.cxx
-littrack/parallel/LitTrackFinderNNParallel.cxx
-sa_interface/EventReader.cxx
-sa_interface/DetectorLayoutReader.cxx
+algorithm/CbmRichRingFinderHough.cxx
+algorithm/CbmRichRingFinderHoughImpl.cxx
+algorithm/NNfunction.cxx
+algorithm/CbmRichRingFinderHoughSimd.cxx
 )
 
 #set(STANDALONE_HEADERS
@@ -79,3 +83,4 @@ add_library(parallel SHARED ${STANDALONE_SRCS})
 target_link_libraries(standalone parallel)
 
 target_link_libraries(parallel ${TBB_LIBRARIES})
+target_link_libraries(parallel ${VC_LIBRARIES})

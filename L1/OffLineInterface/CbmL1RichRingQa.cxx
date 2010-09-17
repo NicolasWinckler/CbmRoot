@@ -37,7 +37,11 @@ ClassImp(CbmL1RichRingQa)
 
 //------------  standard constructor (with verbosity level)  ---------------------------------
 CbmL1RichRingQa::CbmL1RichRingQa(const char *name, const char *title, Int_t verbose)
-  :FairTask(name)
+  :FairTask(name),
+  fRingArray(0),        // Array of CbmRichRings
+  fMCPointArray(0),       // Array of FairMCPoints
+  fMCTrackArray(0),       // Array of CbmMCTracks
+  fHitArray(0)         // Array of CbmRichHits
 {
   fVerbose = verbose;
 }

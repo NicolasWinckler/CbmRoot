@@ -19,44 +19,20 @@
 
 #include "CbmRichRingFinder.h"
 
+#include "TString.h"
+#include "TStopwatch.h"
+
 #include <vector>
 
 class ENNHit;
 class ENNRing;
 
-
+class CbmL1RichENNRingFinderParallel;
 class CbmL1RichENNRingFinder :public CbmRichRingFinder
 {
-
-  struct ENNHit {
-    int index;
-    double x, y;               // coordinates
-    double quality;               // quality of the best ring with this hit
-    // variables for local search:
-    double lx, ly, lr2;        // local coordinates
-    double S0, S1, S2, S3, S4; // coefficients for calculation of E
-    double C, Cx, Cy;          // coefficients for the parameter space
-    bool on_ring;              // is the hit close to the current ring
-  };
- 
-  struct ENNRing {
-    bool on;                   // is the ring selected?
-    double x, y, r;            // parameters
-    double chi2;               // chi^2
-    std::vector<ENNHit*> Hits;      // pointers to ring hits
-    // variables for the selection procedure:
-    int NHits;                 // number of ring hits
-    int NOwn;                  // number of its own hits
-    bool skip;                 // skip the ring during selection
-  };
-  
-  static bool CompareENNHits( const ENNHit &h1, const ENNHit &h2 ){
-    return ( h1.x < h2.x );
-  }
-
-  void ENNRingFinder( std::vector<ENNHit> &Hits, std::vector<ENNRing> &Rings,
-		      double HitSize = 1., int MinRingHits = 5, 
-		      double RMin = 2., double RMax = 6. );
+  private:
+    CbmL1RichENNRingFinder(const CbmL1RichENNRingFinder&);
+    CbmL1RichENNRingFinder operator=(const CbmL1RichENNRingFinder&);
 
  public:
   
@@ -82,7 +58,8 @@ class CbmL1RichENNRingFinder :public CbmRichRingFinder
 
  private:
 
-  Double_t fRecoTime;
+  CbmL1RichENNRingFinderParallel* finder;
+  Float_t fRecoTime;
   Int_t fNEvents;
 
  public:

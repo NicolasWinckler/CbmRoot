@@ -47,7 +47,12 @@ CbmL1.cxx
 CbmL1TrdTrackFinderSts.cxx 
 CbmL1TrackMerger.cxx 
 CbmL1TofMerger.cxx 
-OffLineInterface/CbmL1RichENNRingFinder.cxx 
+
+)
+set(L1_SRCS
+${L1RULECHECKER_SRCS}
+OffLineInterface/CbmL1RichENNRingFinder.cxx
+OffLineInterface/CbmL1RichENNRingFinderParallel.cxx 
 OffLineInterface/CbmL1StsTrackFinder.cxx 
 #OffLineInterface/CbmL1MuchFinder.cxx 
 #OffLineInterface/CbmL1MuchHit.cxx 
@@ -57,9 +62,7 @@ OffLineInterface/CbmL1RichRingQa.cxx
 #OffLineInterface/CbmL1SttHit.cxx 
 #OffLineInterface/CbmL1SttTrackFinder.cxx 
 #OffLineInterface/CbmL1SttTrack.cxx 
-)
-set(L1_SRCS
-${L1RULECHECKER_SRCS}
+
 L1Algo/L1Algo.cxx
 L1Algo/L1CATrackFinder.cxx
 L1Algo/L1TrackFitter.cxx
@@ -102,7 +105,7 @@ OffLineInterface/CbmL1StsTrackFinder.h
 # L1Algo/L1Algo.h
 )
 
-ADD_DEFINITIONS(-Wall -Wabi -Wsign-promo  -Wno-pmf-conversions -Wctor-dtor-privacy -Wreorder -Wno-deprecated -Wstrict-null-sentinel -Wno-non-template-friend -Weffc++) #    TODO: #  -Wnon-virtual-dtor,-Woverloaded-virtual  - too many warnings from other parts of cbmroot;  -Wold-style-cast - warnings in "root/include"
+ADD_DEFINITIONS(-Wall -Wabi -Wsign-promo  -Wno-pmf-conversions -Wctor-dtor-privacy -Wreorder -Wno-deprecated -Wstrict-null-sentinel -Wno-non-template-friend) #   -Weffc++ - wait for other parts of cbmroot.  TODO: #  -Wnon-virtual-dtor,-Woverloaded-virtual  - too many warnings from other parts of cbmroot;  -Wold-style-cast - warnings in "root/include"
 
 # Check if SSE instructions are available on the machine where 
 # the project is compiled.

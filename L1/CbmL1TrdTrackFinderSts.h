@@ -65,7 +65,7 @@ private:
     void MoveOut();
     void ProcessStation(CbmTrdTrack* pTrack, const Int_t& station);
     void UpdateTrack(Int_t station, CbmTrdTrack* track);
-    void Clear();
+    virtual void Clear(const Option_t* a = 0);
     void RemoveFakes();
     Bool_t Overlap(CbmKFTrack& track, CbmTrdHit* pHit);
     Double_t GetChi2Hit(CbmKFTrack& track, CbmTrdHit* pHit);

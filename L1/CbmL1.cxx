@@ -51,30 +51,76 @@ ClassImp(CbmL1)
 CbmL1 *CbmL1::fInstance = 0;
 
 
-CbmL1::CbmL1()
+
+CbmL1::CbmL1():
+    algo(0), // for access to L1 Algorithm from L1::Instance
+
+vRTracks(), // reconstructed tracks
+NStation(0), NMvdStations(0), NStsStations(0), // number of detector stations (all\sts\mvd)
+fPerformance(0),
+fSTAPDataMode(0),
+fSTAPDataDir(""),
+
+fTrackingLevel(2),  // really doesn't used
+fMomentumCutOff(0.1),  // really doesn't used
+fGhostSuppression(1),  // really doesn't used
+fUseMVD(0),  // really doesn't used
+
+StsDigi(),
+PrimVtx(),
+
+listMCTracks (0),
+listStsPts(0),
+listStsDigi(0),
+listStsClusters(0),
+listStsHits(0),
+
+listMvdPts(0),
+listMvdHits(0),
+listMvdHitMatches(0),
+vStsHits(),
+vMCPoints(),
+vMCTracks(),
+vHitMCRef(),
+histodir(0)
 {
   if( !fInstance ) fInstance = this;
-  fTrackingLevel = 2;
-  //fMomentumCutOff = 0.2;
-  fMomentumCutOff = 0.1;
-  fGhostSuppression = 1;
-//   fDetectorEfficiency = 1.;
-  fPerformance = 0;
-  fSTAPDataMode = 0; // off
-  fSTAPDataDir = "";
 }
 
-CbmL1::CbmL1(const char *name, Int_t iVerbose, Int_t _fPerformance, int fSTAPDataMode_, TString fSTAPDataDir_):FairTask(name,iVerbose)
+CbmL1::CbmL1(const char *name, Int_t iVerbose, Int_t _fPerformance, int fSTAPDataMode_, TString fSTAPDataDir_):FairTask(name,iVerbose),
+algo(0), // for access to L1 Algorithm from L1::Instance
+
+vRTracks(), // reconstructed tracks
+NStation(0), NMvdStations(0), NStsStations(0), // number of detector stations (all\sts\mvd)
+fPerformance(_fPerformance),
+fSTAPDataMode(fSTAPDataMode_),
+fSTAPDataDir(fSTAPDataDir_),
+
+fTrackingLevel(2),  // really doesn't used
+fMomentumCutOff(0.1),  // really doesn't used
+fGhostSuppression(1),  // really doesn't used
+fUseMVD(0),  // really doesn't used
+
+StsDigi(),
+PrimVtx(),
+
+listMCTracks (0),
+listStsPts(0),
+listStsDigi(0),
+listStsClusters(0),
+listStsHits(0),
+
+listMvdPts(0),
+listMvdHits(0),
+listMvdHitMatches(0),
+vStsHits(),
+vMCPoints(),
+vMCTracks(),
+vHitMCRef(),
+histodir(0)
 {
   if( !fInstance ) fInstance = this;
-  fTrackingLevel = 2;
-  //fMomentumCutOff = 0.2;
-  fMomentumCutOff = 0.1;
-  fGhostSuppression = 1;
-//   fDetectorEfficiency = 1.;
-  fPerformance = _fPerformance;
-  fSTAPDataMode = fSTAPDataMode_;
-  fSTAPDataDir = fSTAPDataDir_;
+
 }
 
 CbmL1::~CbmL1()

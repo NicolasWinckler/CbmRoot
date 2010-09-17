@@ -8,8 +8,9 @@ using std::vector;
 class CbmL1StsHit
 {
   public:
-  CbmL1StsHit(){};
-  CbmL1StsHit(int hitId_, int extIndex_):hitId(hitId_),extIndex(extIndex_){};
+  CbmL1StsHit():hitId(0),extIndex(0),mcPointIds(){};
+  CbmL1StsHit(int hitId_, int extIndex_)
+    :hitId(hitId_),extIndex(extIndex_),mcPointIds(){};
 
   int hitId;              // index of L1StsHit in algo->vStsHits array. Should be equal to index of this in L1->vStsHits
   int extIndex;          // index of hit in the TClonesArray array

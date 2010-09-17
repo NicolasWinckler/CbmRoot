@@ -19,7 +19,9 @@
 #include "L1Algo/L1Algo.h"
 
 CbmL1MCTrack::CbmL1MCTrack(double mass_, double q_, TVector3 vr, TLorentzVector vp, int _ID, int _mother_ID, int _pdg):
-    mass(mass_), q(q_), ID(_ID), mother_ID(_mother_ID), pdg(_pdg)
+  mass(mass_),q(q_),p(0),x(0),y(0),z(0),px(0),py(0),pz(0),ID(_ID), mother_ID(_mother_ID), pdg(_pdg),Points(),StsHits(),
+     nMCContStations(0),nHitContStations(0),maxNStaMC(0),maxNSensorMC(0),maxNStaHits(0),nStations(0),isReconstructable(0),
+     rTracks(),tTracks()
 {
   x = vr.X();
   y = vr.Y();

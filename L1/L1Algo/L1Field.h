@@ -12,7 +12,8 @@ class L1FieldValue{
 
 
   public:
-
+    L1FieldValue():x(0),y(0),z(0){};
+        
     fvec x, y, z;
 
     void Combine( L1FieldValue &B, fvec w )
@@ -83,6 +84,12 @@ class L1FieldSlice{
 class L1FieldRegion{
 
   public:
+    L1FieldRegion():
+      cx0(0), cx1(0), cx2(0),
+      cy0(0), cy1(0), cy2(0),
+      cz0(0), cz1(0), cz2(0),
+      z0(0)
+    {}
 
     fvec cx0, cx1, cx2 ; // Bx(z) = cx0 + cx1*(z-z0) + cx2*(z-z0)^2
     fvec cy0, cy1, cy2 ; // By(z) = cy0 + cy1*(z-z0) + cy2*(z-z0)^2

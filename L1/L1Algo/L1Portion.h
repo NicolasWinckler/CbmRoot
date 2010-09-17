@@ -15,8 +15,8 @@ class L1Portion<L1TrackPar>
 //     typedef vector<T> vType;
     typedef nsL1::vector<T>::TSimd vType;
 
-    L1Portion() { dataSize = 0; };
-    L1Portion(int size) { resize(size); dataSize = 0;};
+    L1Portion():dataSize(0){};
+    L1Portion(int size):dataSize(0) { resize(size); };
     L1Portion(int size, int size2) {
       resize(size);
 //     resize2(size2);
@@ -57,8 +57,8 @@ template <>
     typedef nsL1::vector<T>::TSimd vType;
 //     typedef std::vector<T, nsL1::SimdAlloc<T> > vType;
 
-    L1Portion() { dataSize = 0; };
-    L1Portion(int size) { resize(size); dataSize = 0;};
+    L1Portion():dataSize(0){};
+    L1Portion(int size):dataSize(0) { resize(size); };
     L1Portion(int size, int size2) {
       resize(size);
 //     resize2(size2);

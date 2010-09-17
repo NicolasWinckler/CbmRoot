@@ -14,8 +14,8 @@ class L1StsHit
   
   unsigned short int n; // number of event
   
-  L1StsHit():n(0) {}
-  L1StsHit(L1StsHit &h, unsigned short int _n, /*short*/ int sh, /*short*/ int shB){ f = h.f + sh; b = h.b + shB; n = _n;}
+  L1StsHit():f(0),b(0),iz(0),n(0) {}
+  L1StsHit(L1StsHit &h, unsigned short int _n, /*short*/ int sh, /*short*/ int shB):iz(0),f(h.f + sh),b(h.b + shB),n(_n){}
 
 };
 

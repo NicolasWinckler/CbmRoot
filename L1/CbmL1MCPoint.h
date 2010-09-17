@@ -21,7 +21,14 @@
 using std::vector;
 
 struct CbmL1MCPoint
-{ 
+{
+  CbmL1MCPoint():
+x(0), y(0), z(0), px(0), py(0), pz(0),
+p(0), q(0), mass(0),
+pdg(0), ID(0), mother_ID(0),
+iStation(0),hitIds()
+  {}
+  
   double x, y, z, px, py, pz;
   double p, q, mass;
   int pdg, ID, mother_ID;

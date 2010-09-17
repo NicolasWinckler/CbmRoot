@@ -16,31 +16,40 @@ class L1TrackPar{
       C40, C41, C42, C43, C44,
       chi2, NDF                ;
 
-    L1TrackPar(){};
-    L1TrackPar(double *T, double *C){
-      x = T[0];
-      y = T[1];
-      tx = T[2];
-      ty = T[3];
-      qp = T[4];
-      z = T[5];
+    L1TrackPar():
+        x(0),y(0),tx(0),ty(0),qp(0),z(0),
+    C00(0),
+    C10(0), C11(0),
+    C20(0), C21(0), C22(0),
+    C30(0), C31(0), C32(0), C33(0),
+    C40(0), C41(0), C42(0), C43(0), C44(0),
+    chi2(0), NDF(0)
+    {};
+    L1TrackPar(double *T, double *C):
+      x(T[0]),
+      y(T[1]),
+      tx(T[2]),
+      ty(T[3]),
+      qp(T[4]),
+      z(T[5]),
 
-      C00 = C[0];
-      C10 = C[1];
-      C11 = C[2];
-      C20 = C[3];
-      C21 = C[4];
-      C22 = C[5];
-      C30 = C[6];
-      C31 = C[7];
-      C32 = C[8];
-      C33 = C[9];
-      C40 = C[10];
-      C41 = C[11];
-      C42 = C[12];
-      C43 = C[13];
-      C44 = C[14];
-    };
+      C00(C[0]),
+      C10(C[1]),
+      C11(C[2]),
+      C20(C[3]),
+      C21(C[4]),
+      C22(C[5]),
+      C30(C[6]),
+      C31(C[7]),
+      C32(C[8]),
+      C33(C[9]),
+      C40(C[10]),
+      C41(C[11]),
+      C42(C[12]),
+      C43(C[13]),
+      C44(C[14]),
+      chi2(0), NDF(0)
+      {};
       
     void SetOneEntry( const int i0, const L1TrackPar &T1, const int i1 );
 

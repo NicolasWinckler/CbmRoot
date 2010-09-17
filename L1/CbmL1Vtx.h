@@ -20,6 +20,14 @@
 #include "CbmKFVertexInterface.h"
 
 struct CbmL1Vtx: public CbmKFVertexInterface {
+  CbmL1Vtx():
+    MC_mass(0), MC_q(0), MC_p(0), MC_x(0), MC_y(0), MC_z(0), MC_px(0), MC_py(0), MC_pz(0),
+    MC_ID(0), MC_pdg(0),
+    x(0), y(0), z(0), chi2(0),
+    NDF(0),
+    mass(0), mass_err(0)
+  {};
+  
   double MC_mass, MC_q, MC_p, MC_x, MC_y, MC_z, MC_px, MC_py, MC_pz;
   int MC_ID, MC_pdg;
 

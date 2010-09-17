@@ -33,7 +33,10 @@ class CbmL1TrdTracklet;
 class CbmL1TrdTracklet4;
 
 class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
-
+  private:
+    CbmL1CATrdTrackFinderSA(const CbmL1CATrdTrackFinderSA&);
+    CbmL1CATrdTrackFinderSA operator=(const CbmL1CATrdTrackFinderSA&);
+  
  public:
 
   /** Default constructor **/
@@ -55,6 +58,7 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
 
   struct Layer
   {
+    Layer(){}
     Double_t X[12];
     Double_t Y[12];
     Double_t Z[12];
@@ -70,6 +74,16 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
   /**  Structure contains trd hits divided per given station **/
   struct LayerWithHits
   {
+    LayerWithHits():
+hitIndex(0),
+mcTrackID(0),
+ X(0),
+ Y(0),
+ Z(0),
+ DX(0),
+ DY(0),
+planeID(0)
+    {}
     Int_t    hitIndex;
     Int_t    mcTrackID;
     Double_t X;
@@ -123,6 +137,7 @@ class CbmL1CATrdTrackFinderSA : public CbmTrdTrackFinder {
   /** Structure contains temporary values of track candidates **/
   struct TempTrackStruct
   {
+    TempTrackStruct():Chi2(0){};
     Double_t Chi2;
     Int_t M[12];
   } tempTrack;

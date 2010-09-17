@@ -5,7 +5,7 @@
 
 #include "CbmRichRingFinderHough.h"
 #include "CbmRichRingFinderHoughImpl.h"
-#include "CbmRichRingFinderHoughSimd.h"
+//#include "CbmRichRingFinderHoughSimd.h"
 //#include "../../littrack/utils/CbmLitMemoryManagment.h"
 
 #include "CbmRichHit.h"

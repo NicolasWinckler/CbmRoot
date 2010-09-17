@@ -14,7 +14,9 @@ class TH2F;
 
 
 class CbmL1TrackMerger : public CbmTrackMerger {
-
+  private:
+    CbmL1TrackMerger(const CbmL1TrackMerger&); // CHECKME
+    CbmL1TrackMerger operator=(const CbmL1TrackMerger&);
 private:
     Int_t         fMethod;         // Merging method: 1 - based on StsTrackIndex from TRD track
                                    //                 2 - merging of tracks at the first

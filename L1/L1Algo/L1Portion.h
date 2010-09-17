@@ -15,12 +15,11 @@ class L1Portion<L1TrackPar>
 //     typedef vector<T> vType;
     typedef nsL1::vector<T>::TSimd vType;
 
-    L1Portion():dataSize(0){};
-    L1Portion(int size):dataSize(0) { resize(size); };
-    L1Portion(int size, int size2) {
+    L1Portion():a(),dataSize(0){};
+    L1Portion(int size):a(),dataSize(0) { resize(size); };
+    L1Portion(int size, int size2):a(),dataSize(size2) {
       resize(size);
 //     resize2(size2);
-      dataSize = size2;
     };
     vType& operator[] (int i) { return a[i];}
     void resize(int size) { a.reserve(size); };
@@ -57,13 +56,13 @@ template <>
     typedef nsL1::vector<T>::TSimd vType;
 //     typedef std::vector<T, nsL1::SimdAlloc<T> > vType;
 
-    L1Portion():dataSize(0){};
-    L1Portion(int size):dataSize(0) { resize(size); };
-    L1Portion(int size, int size2) {
+    L1Portion():a(),dataSize(0){};
+    L1Portion(int size):a(),dataSize(0) { resize(size); };
+    L1Portion(int size, int size2):a(),dataSize(size2) {
       resize(size);
 //     resize2(size2);
-      dataSize = size2;
     };
+
     vType& operator[] (int i) { return a[i];}
     void resize(int size) { a.reserve(size); };
     void resize2(int size) { for(unsigned int i = 0; i < a.size(); i++) a[i].reserve(size); };
@@ -98,12 +97,11 @@ class L1Portion
  public:
   typedef vector<T> vType;
 
-  L1Portion() { dataSize = 0; };
-  L1Portion(int size) { resize(size); dataSize = 0;};
-  L1Portion(int size, int size2) {
+  L1Portion():a(),dataSize(0) { };
+  L1Portion(int size):a(),dataSize(0) { resize(size); };
+  L1Portion(int size, int size2):a(),dataSize(size2) {
     resize(size);
 //     resize2(size2);
-    dataSize = size2;
   };
   vType& operator[] (int i) { return a[i];}
   void resize(int size) { a.reserve(size); };

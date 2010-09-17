@@ -16,8 +16,8 @@ struct TL1TracksCatCounters // counters for different tracks categories
   
   vector<T> counters;
 
-  TL1TracksCatCounters():NCounters(0){ counters.clear(); };
-  TL1TracksCatCounters(int nCounters):NCounters(nCounters){ counters.resize( NCounters, T(0)); };
+  TL1TracksCatCounters():NCounters(0),counters(){ counters.clear(); };
+  TL1TracksCatCounters(int nCounters):NCounters(nCounters),counters(){ counters.resize( NCounters, T(0)); };
 
   void AddCounter(){ NCounters++; counters.push_back(T(0)); };
   void AddCounters(int nCounters){ NCounters += nCounters; counters.resize( NCounters, T(0)); };
@@ -63,9 +63,11 @@ struct TL1TracksCatCounters // counters for different tracks categories
 
 struct TL1Efficiencies
 {
-  TL1Efficiencies():ratio_ghosts(0),ratio_clones(0),ghosts(0),clones(0){
+  TL1Efficiencies():names(),indices(),ratio_reco(),ratio_ghosts(0),ratio_clones(0),mc(),reco(),ghosts(0),clones(0){
     // you should add counter with shortname="total" !!
   };
+
+  virtual ~TL1Efficiencies(){};
 
   virtual void AddCounter(TString shortname, TString name);
   

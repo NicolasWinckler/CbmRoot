@@ -24,6 +24,8 @@ class L1StsHit;
 
 struct L1Branch
 {
+  L1Branch():Quality(0),Momentum(0),chi2(0),StsHits(){}
+  
   unsigned short int Quality;
   float Momentum, chi2;
   std::vector<unsigned /*short*/ int > StsHits;

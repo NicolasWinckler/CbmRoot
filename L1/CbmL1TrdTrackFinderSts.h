@@ -21,7 +21,9 @@ class TH2F;
 
 
 class CbmL1TrdTrackFinderSts : public CbmTrdTrackFinder {
-
+  private:
+    CbmL1TrdTrackFinderSts(const CbmL1TrdTrackFinderSts&);
+    CbmL1TrdTrackFinderSts operator=(const CbmL1TrdTrackFinderSts&);
 private:
     Int_t                fEvents;                   // Number of events processed
     Int_t                fVerbose;                  // Verbosity level

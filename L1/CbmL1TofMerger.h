@@ -14,7 +14,9 @@ class FairTrackParam;
 
 
 class CbmL1TofMerger : public CbmTofMerger {
-
+  private:
+    CbmL1TofMerger(const CbmL1TofMerger&); // CHECKME
+    CbmL1TofMerger operator=(const CbmL1TofMerger&);
 private:
     TClonesArray *fArrayTrdTrack; // Array of TRD tracks
 

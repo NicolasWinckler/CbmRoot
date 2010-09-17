@@ -115,7 +115,14 @@ void CbmL1::TrackMatch(){
 
 struct TL1PerfEfficiencies: public TL1Efficiencies
 {
-  TL1PerfEfficiencies():TL1Efficiencies(){
+  TL1PerfEfficiencies():TL1Efficiencies(),
+ratio_killed(),
+ratio_clone(),
+ratio_length(),
+killed(),
+clone(),
+reco_length()
+  {
           // add total efficiency
     AddCounter("long_fast_prim" ,"LongRPrim efficiency");
     AddCounter("fast_prim"      ,"RefPrim   efficiency");
@@ -127,6 +134,8 @@ struct TL1PerfEfficiencies: public TL1Efficiencies
     AddCounter("slow"           ,"Extra     efficiency");
     AddCounter("d0"             ,"D0        efficiency");
   }
+  
+  virtual ~TL1PerfEfficiencies(){};
 
   virtual void AddCounter(TString shortname, TString name){
     TL1Efficiencies::AddCounter(shortname, name);

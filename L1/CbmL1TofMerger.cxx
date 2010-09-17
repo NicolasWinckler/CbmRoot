@@ -33,7 +33,7 @@ using std::make_pair;
 
 
 // ------------------------------------------------------------------
-CbmL1TofMerger::CbmL1TofMerger()
+CbmL1TofMerger::CbmL1TofMerger():fArrayTrdTrack(0)
 {
     // Default constructor
 }
@@ -41,7 +41,7 @@ CbmL1TofMerger::CbmL1TofMerger()
 
 
 // ------------------------------------------------------------------
-CbmL1TofMerger::CbmL1TofMerger(Int_t verbose)
+CbmL1TofMerger::CbmL1TofMerger(Int_t verbose):fArrayTrdTrack(0)
 {
     // Standard constructor
     fVerbose = 1;

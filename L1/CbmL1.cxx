@@ -54,8 +54,8 @@ CbmL1 *CbmL1::fInstance = 0;
 
 CbmL1::CbmL1():
     algo(0), // for access to L1 Algorithm from L1::Instance
-
 vRTracks(), // reconstructed tracks
+vHitStore(),
 NStation(0), NMvdStations(0), NStsStations(0), // number of detector stations (all\sts\mvd)
 fPerformance(0),
 fSTAPDataMode(0),
@@ -91,6 +91,7 @@ CbmL1::CbmL1(const char *name, Int_t iVerbose, Int_t _fPerformance, int fSTAPDat
 algo(0), // for access to L1 Algorithm from L1::Instance
 
 vRTracks(), // reconstructed tracks
+vHitStore(),
 NStation(0), NMvdStations(0), NStsStations(0), // number of detector stations (all\sts\mvd)
 fPerformance(_fPerformance),
 fSTAPDataMode(fSTAPDataMode_),

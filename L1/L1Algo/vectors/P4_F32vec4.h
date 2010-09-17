@@ -51,13 +51,11 @@ class F32vec4
   float & operator[]( int i ){ return ((float*)&v)[i]; }
   float   operator[]( int i ) const { return ((float*)&v)[i]; }
 
-  F32vec4( ){}
-  F32vec4( const __m128 &a ) { v = a; }
-  F32vec4( const float &a )  { v = _mm_set_ps1(a); }
+  F32vec4( ):v(_mm_set_ps1(0)) {}
+  F32vec4( const __m128 &a ):v(a) {}
+  F32vec4( const float &a ):v(_mm_set_ps1(a)) {}
 
-  F32vec4( const float &f0, const float &f1, const float &f2, const float &f3 ){ 
-    v = _mm_set_ps(f3,f2,f1,f0); 
-  }
+  F32vec4( const float &f0, const float &f1, const float &f2, const float &f3 ):v(_mm_set_ps(f3,f2,f1,f0)) {}
 
   /* Conversion function */
   operator  __m128() const { return v; }		/* Convert to __m128 */
@@ -105,9 +103,9 @@ class F32vec4
   friend F32vec4 operator!( const F32vec4 &a ){ // mask returned
     return _mm_xor_ps(a, _f32vec4_true);
   }
-  friend F32vec4 operator||( const F32vec4 &a, const F32vec4 &b ){ // mask returned
-    return _mm_or_ps(a, b);
-  }
+//   friend F32vec4 operator||( const F32vec4 &a, const F32vec4 &b ){ // mask returned
+//     return _mm_or_ps(a, b);
+//   }
 
   /* Comparison */
 

@@ -37,26 +37,42 @@ using std::map;
 
 
 // ------------------------------------------------------------------
-CbmL1TrackMerger::CbmL1TrackMerger()
+CbmL1TrackMerger::CbmL1TrackMerger():
+fMethod(1),         // Merging method: 1 - based on StsTrackIndex from TRD track
+fArrayStsTrackM(NULL), // Array of STS track matches
+fArrayTrdTrackM(NULL), // Array of TRD track matches
+fh_dx_true(0),      // Control histogramm
+fh_dx_false(0),     // Control histogramm
+fh_dy_true(0),      // Control histogramm
+fh_dy_false(0),     // Control histogramm
+fh_dtx_true(0),     // Control histogramm
+fh_dtx_false(0),    // Control histogramm
+fh_dty_true(0),     // Control histogramm
+fh_dty_false(0)    // Control histogramm
 {
     // Default constructor
     fVerbose = 1;
-    fMethod = 1;
-    fArrayStsTrackM = NULL;
-    fArrayTrdTrackM = NULL;
     CreateHistogramms();
 }
 // ------------------------------------------------------------------
 
 
 // ------------------------------------------------------------------
-CbmL1TrackMerger::CbmL1TrackMerger(Int_t verbose)
+CbmL1TrackMerger::CbmL1TrackMerger(Int_t verbose):
+    fMethod(1),         // Merging method: 1 - based on StsTrackIndex from TRD track
+fArrayStsTrackM(NULL), // Array of STS track matches
+fArrayTrdTrackM(NULL), // Array of TRD track matches
+fh_dx_true(0),      // Control histogramm
+fh_dx_false(0),     // Control histogramm
+fh_dy_true(0),      // Control histogramm
+fh_dy_false(0),     // Control histogramm
+fh_dtx_true(0),     // Control histogramm
+fh_dtx_false(0),    // Control histogramm
+fh_dty_true(0),     // Control histogramm
+fh_dty_false(0)    // Control histogramm
 {
     // Standard constructor
     fVerbose = verbose;
-    fMethod = 1;
-    fArrayStsTrackM = NULL;
-    fArrayTrdTrackM = NULL;
     CreateHistogramms();
 }
 // ------------------------------------------------------------------

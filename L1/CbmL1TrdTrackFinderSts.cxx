@@ -46,34 +46,69 @@ using std::map;
 //
 
 
+
 // -----------------------------------------------------------------------
-CbmL1TrdTrackFinderSts::CbmL1TrdTrackFinderSts()
+CbmL1TrdTrackFinderSts::CbmL1TrdTrackFinderSts():
+    fEvents(0),                   // Number of events processed
+fVerbose(1),                  // Verbosity level
+fArrayTrdPoint(NULL),            // Array of TRD points
+fArrayTrdHit(0),              // Array of TRD hits
+fArrayStsTrack(NULL),            // Array of STS tracks
+fArrayStsTrackM(NULL),           // Array of STS tracks
+fArrayKFTrdHit(new TClonesArray("CbmKFTrdHit")),            // Array of KF TRD hits
+fvTrdTrack(),
+fArrayTrdTrack(NULL),            // Output Array of TRD tracks
+fPid(211),                      // PID assumption
+fNoTrdStations(0),            // Number of TRD stations
+fNoTrdPerStation(0),          // Number of TRD layers per station
+fmapHitUsed(),
+fh_chi2hit(0),                // Control histogramm
+fh_chi2hit_plane(0),          // Control histogramm
+fh_resx_plane_true(0),        // Control histogramm
+fh_resy_plane_true(0),        // Control histogramm
+fh_resx_plane_fake(0),        // Control histogramm
+fh_resy_plane_fake(0),        // Control histogramm
+fh_resx_mom_true(0),          // Control histogramm
+fh_resy_mom_true(0),          // Control histogramm
+fh_pullx_plane_true(0),        // Control histogramm
+fh_pully_plane_true(0),        // Control histogramm
+fh_pullx_plane_fake(0),        // Control histogramm
+fh_pully_plane_fake(0),        // Control histogramm
+fLostTracks()
 {
-    // Default constructor
-    fEvents = 0;
-    fArrayTrdPoint = NULL;
-    fArrayStsTrack = NULL;
-    fArrayStsTrackM = NULL;
-    fArrayKFTrdHit = new TClonesArray("CbmKFTrdHit");
-    fArrayTrdTrack = NULL;
-    fVerbose = 1;
-    fPid = 211;
 }
 // -----------------------------------------------------------------------
 
 
 // -----------------------------------------------------------------------
-CbmL1TrdTrackFinderSts::CbmL1TrdTrackFinderSts(Int_t verbose)
+CbmL1TrdTrackFinderSts::CbmL1TrdTrackFinderSts(Int_t verbose):
+    fEvents(0),                   // Number of events processed
+fVerbose(verbose),                  // Verbosity level
+fArrayTrdPoint(NULL),            // Array of TRD points
+fArrayTrdHit(0),              // Array of TRD hits
+fArrayStsTrack(NULL),            // Array of STS tracks
+fArrayStsTrackM(NULL),           // Array of STS tracks
+fArrayKFTrdHit(new TClonesArray("CbmKFTrdHit")),            // Array of KF TRD hits
+fvTrdTrack(),
+fArrayTrdTrack(NULL),            // Output Array of TRD tracks
+fPid(211),                      // PID assumption
+fNoTrdStations(0),            // Number of TRD stations
+fNoTrdPerStation(0),          // Number of TRD layers per station
+fmapHitUsed(),
+fh_chi2hit(0),                // Control histogramm
+fh_chi2hit_plane(0),          // Control histogramm
+fh_resx_plane_true(0),        // Control histogramm
+fh_resy_plane_true(0),        // Control histogramm
+fh_resx_plane_fake(0),        // Control histogramm
+fh_resy_plane_fake(0),        // Control histogramm
+fh_resx_mom_true(0),          // Control histogramm
+fh_resy_mom_true(0),          // Control histogramm
+fh_pullx_plane_true(0),        // Control histogramm
+fh_pully_plane_true(0),        // Control histogramm
+fh_pullx_plane_fake(0),        // Control histogramm
+fh_pully_plane_fake(0),        // Control histogramm
+fLostTracks()
 {
-    // Standard constructor
-    fEvents = 0;
-    fArrayTrdPoint = NULL;
-    fArrayStsTrack = NULL;
-    fArrayStsTrackM = NULL;
-    fArrayKFTrdHit = new TClonesArray("CbmKFTrdHit");
-    fArrayTrdTrack = NULL;
-    fVerbose = verbose;
-    fPid = 211;
 }
 // -----------------------------------------------------------------------
 

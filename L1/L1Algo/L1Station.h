@@ -9,7 +9,13 @@
 class L1Station{
 
  public:
-
+  L1Station():
+  z(0), Rmin(0), Rmax(0), Sy(0),
+  materialInfo(),
+  fieldSlice(),
+  frontInfo(), backInfo(), xInfo(), yInfo(),
+  XYInfo(){}
+  
   fvec z, Rmin, Rmax, Sy;
   L1MaterialInfo materialInfo;
   L1FieldSlice fieldSlice;

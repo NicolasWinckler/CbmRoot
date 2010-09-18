@@ -539,7 +539,7 @@ void CbmL1TrdTrackFinderSts::UpdateTrack(Int_t station, CbmTrdTrack* pTrack)
 
 
 // -----------------------------------------------------------------------
-void CbmL1TrdTrackFinderSts::Clear()
+void CbmL1TrdTrackFinderSts::Clear(const Option_t* a)
 {
     // Delete bad tracks from track array
     CbmTrdTrack *track;

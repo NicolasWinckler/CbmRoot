@@ -10,7 +10,7 @@
 
 #include "CbmL1.h"
 #include "CbmL1Counters.h"
-#include "L1Algo/L1Types.h"
+#include "L1Algo/CbmL1Def.h"
 #include "L1Algo/L1Algo.h"
 #include "L1Algo/L1StsHit.h"
 

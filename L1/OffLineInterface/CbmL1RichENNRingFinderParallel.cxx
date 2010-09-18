@@ -38,15 +38,6 @@ using std::ios;
 using std::sqrt;
 using std::fabs;
 
-
-#if 1 && defined( __GNUC__ ) && __GNUC__ - 0 >= 3   // for speed up conditions
-  #define ISLIKELY(  x )    __builtin_expect( !!( x ),1 )
-  #define ISUNLIKELY(  x )  __builtin_expect( !!( x ),0 )
-#else
-  #define ISLIKELY(  x )   (  x )
-  #define ISUNLIKELY(  x )  (  x )
-#endif
-
 CbmL1RichENNRingFinderParallel::CbmL1RichENNRingFinderParallel(Int_t verbose ):fRecoTime(0),fNEvents(0)
 {
   fVerbose = verbose;

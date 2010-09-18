@@ -1,7 +1,7 @@
 #ifndef L1Field_h
 #define L1Field_h 1
 
-#include "L1Types.h"
+#include "CbmL1Def.h"
 #include <iostream>
 using std::cout;
 using std::ostream;

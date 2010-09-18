@@ -351,7 +351,7 @@ planeID(0)
   /** Function for sorting **/
     static Bool_t CompareChi2TrdTrack(const CbmTrdTrack* a, const CbmTrdTrack* b)
     {
-        return ( a->GetChiSq()/(Double_t)a->GetNDF() < b->GetChiSq()/(Double_t)b->GetNDF() );
+        return ( a->GetChiSq()/(Double_t)a->GetNDF() < b->GetChiSq()/static_cast<Double_t>(b->GetNDF()) );
     };
 
   ClassDef(CbmL1CATrdTrackFinderSA, 1);

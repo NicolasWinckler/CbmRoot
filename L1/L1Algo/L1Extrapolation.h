@@ -1,7 +1,7 @@
 #ifndef L1Extrapolation_h
 #define L1Extrapolation_h
 
-#include "L1Types.h"
+#include "CbmL1Def.h"
 #include "L1Field.h"
 #include "L1TrackPar.h"
 

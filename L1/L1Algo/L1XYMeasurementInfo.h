@@ -1,7 +1,7 @@
 #ifndef L1XYMeasurementInfo_h
 #define L1XYMeasurementInfo_h 1
 
-#include "L1Types.h"
+#include "CbmL1Def.h"
 
 
 class L1XYMeasurementInfo{

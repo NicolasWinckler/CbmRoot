@@ -1,7 +1,7 @@
 #ifndef L1MaterialInfo_h
 #define L1MaterialInfo_h
 
-#include "L1Types.h"
+#include "CbmL1Def.h"
 
 class L1MaterialInfo{
  public:

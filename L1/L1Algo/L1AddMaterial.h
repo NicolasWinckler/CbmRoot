@@ -1,7 +1,7 @@
 #ifndef L1AddMaterial_h
 #define L1AddMaterial_h
 
-#include "L1Types.h"
+#include "CbmL1Def.h"
 #include "L1MaterialInfo.h"
 #include "L1TrackPar.h"
 

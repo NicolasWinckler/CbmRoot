@@ -19,7 +19,7 @@
 
 
 #include "CbmRichRingFinder.h"
-#include "L1Types.h"
+#include "CbmL1Def.h"
 //#include "../vectors/PSEUDO_F32vec4.h" // for check
 //#include "../vectors/PSEUDO_F32vec1.h" // for check
 

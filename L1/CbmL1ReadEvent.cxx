@@ -101,7 +101,7 @@ void CbmL1::ReadEvent()
     for (int j=0; j <nEnt; j++ ){
       TmpHit th;
       {
-        CbmMvdHit *mh = (CbmMvdHit*) listMvdHits->At(j);
+        CbmMvdHit *mh = L1_DYNAMIC_CAST<CbmMvdHit*>( listMvdHits->At(j) );
         th.ExtIndex = -(1+j);
         th.iStation = mh->GetStationNr() - 1;
         th.iSector  = 0;
@@ -134,7 +134,7 @@ void CbmL1::ReadEvent()
 //     }
 //   }
       if( listMvdHitMatches ){
-        CbmMvdHitMatch *match = (CbmMvdHitMatch*) listMvdHitMatches->At(j);
+        CbmMvdHitMatch *match = L1_DYNAMIC_CAST<CbmMvdHitMatch*>( listMvdHitMatches->At(j) );
         if( match){
           iMC = match->GetPointId();
         }
@@ -167,10 +167,10 @@ void CbmL1::ReadEvent()
     Int_t nMC = (listStsPts) ? listStsPts->GetEntries() : 0;
     int negF=0;
     for (int j=0; j < nEnt; j++ ){
-      CbmStsHit *sh = (CbmStsHit*) listStsHits->At(j);
+      CbmStsHit *sh = L1_DYNAMIC_CAST<CbmStsHit*>( listStsHits->At(j) );
       TmpHit th;
       {
-        CbmStsHit *mh = (CbmStsHit*) listStsHits->At(j);
+        CbmStsHit *mh = L1_DYNAMIC_CAST<CbmStsHit*>( listStsHits->At(j) );
         th.ExtIndex = j;
         th.iStation = NMvdStations + mh->GetStationNr() - 1;
         th.iSector  = mh->GetSectorNr();
@@ -354,7 +354,7 @@ void CbmL1::ReadEvent()
       z_tmp = t.z;
     }
     else {
-      CbmStsHit *mh_m = (CbmStsHit*) (listStsHits->At(s.ExtIndex));
+      CbmStsHit *mh_m = L1_DYNAMIC_CAST<CbmStsHit*>( listStsHits->At(s.ExtIndex));
       z_tmp = mh_m->GetZ();
     }
 //     h.z = z_tmp;
@@ -495,7 +495,7 @@ void CbmL1::ReadEvent()
         T.ID = ID;
         if( listMCTracks )
         {
-          CbmMCTrack *MCTrack = (CbmMCTrack*) listMCTracks->At( T.ID );
+          CbmMCTrack *MCTrack = L1_DYNAMIC_CAST<CbmMCTrack*>( listMCTracks->At( T.ID ) );
           int mother_ID = MCTrack->GetMotherId();
           TVector3 vr;
           TLorentzVector vp;
@@ -547,7 +547,7 @@ bool CbmL1::ReadMCPoint( CbmL1MCPoint *MC, int iPoint, bool MVD )
   TVector3 xyzI,PI, xyzO,PO;
   Int_t mcID=-1;
   if( MVD && listMvdPts ){
-    CbmMvdPoint *pt = (CbmMvdPoint*) listMvdPts->At(iPoint);
+    CbmMvdPoint *pt = L1_DYNAMIC_CAST<CbmMvdPoint*>( listMvdPts->At(iPoint) );
     if ( !pt ) return 1;
     pt->Position(xyzI);
     pt->Momentum(PI);
@@ -555,7 +555,7 @@ bool CbmL1::ReadMCPoint( CbmL1MCPoint *MC, int iPoint, bool MVD )
     pt->MomentumOut(PO);
     mcID = pt->GetTrackID();
   }else if( listStsPts ){
-    CbmStsPoint *pt = (CbmStsPoint*) listStsPts->At(iPoint);
+    CbmStsPoint *pt = L1_DYNAMIC_CAST<CbmStsPoint*>( listStsPts->At(iPoint) );
     if ( !pt ) return 1;
     pt->Position(xyzI);
     pt->Momentum(PI);
@@ -574,7 +574,7 @@ bool CbmL1::ReadMCPoint( CbmL1MCPoint *MC, int iPoint, bool MVD )
   MC->p = sqrt( fabs( MC->px*MC->px + MC->py*MC->py + MC->pz*MC->pz ) );
   MC->ID = mcID;
 
-  CbmMCTrack *MCTrack = (CbmMCTrack*) listMCTracks->At( MC->ID );
+  CbmMCTrack *MCTrack = L1_DYNAMIC_CAST<CbmMCTrack*>( listMCTracks->At( MC->ID ) );
   if ( !MCTrack ) return 1;
   MC->pdg  = MCTrack->GetPdgCode();
   MC->mother_ID = MCTrack->GetMotherId();
@@ -600,18 +600,18 @@ void CbmL1::HitMatch()
     const bool isMvd = (hit.extIndex < 0);
     if (useLinks && !isMvd){
       if (listStsClusters){
-        CbmStsHit *stsHit = (CbmStsHit*) listStsHits->At(hit.extIndex);
+        CbmStsHit *stsHit = L1_DYNAMIC_CAST<CbmStsHit*>( listStsHits->At(hit.extIndex) );
         const int NLinks = stsHit->GetNLinks();
         if ( NLinks != 2 ) cout << "HitMatch: Error. Hit wasn't matched with 2 clusters." << endl;
           // see at 1-st cluster
         vector<int> stsPointIds;
         int iL = 0;
         FairLink link = stsHit->GetLink(iL);
-        CbmStsCluster *stsCluster = (CbmStsCluster*) listStsClusters->At( link.GetIndex() );
+        CbmStsCluster *stsCluster = L1_DYNAMIC_CAST<CbmStsCluster*>( listStsClusters->At( link.GetIndex() ) );
         int NLinks2 = stsCluster->GetNLinks();
         for ( int iL2 = 0; iL2 < NLinks2; iL2++){
           FairLink link2 = stsCluster->GetLink(iL2);
-          CbmStsDigi *stsDigi = (CbmStsDigi*) listStsDigi->At( link2.GetIndex() );
+          CbmStsDigi *stsDigi = L1_DYNAMIC_CAST<CbmStsDigi*>( listStsDigi->At( link2.GetIndex() ) );
           const int NLinks3 = stsDigi->GetNLinks();
           for ( int iL3 = 0; iL3 < NLinks3; iL3++){
             FairLink link3 = stsDigi->GetLink(iL3);
@@ -622,18 +622,18 @@ void CbmL1::HitMatch()
           // see at 2-nd cluster
         iL = 1;
         link = stsHit->GetLink(iL);
-        stsCluster = (CbmStsCluster*) listStsClusters->At( link.GetIndex() );
+        stsCluster = L1_DYNAMIC_CAST<CbmStsCluster*>( listStsClusters->At( link.GetIndex() ) );
         NLinks2 = stsCluster->GetNLinks();
         for ( int iL2 = 0; iL2 < NLinks2; iL2++){
           FairLink link2 = stsCluster->GetLink(iL2);
-          CbmStsDigi *stsDigi = (CbmStsDigi*) listStsDigi->At( link2.GetIndex() );
+          CbmStsDigi *stsDigi = L1_DYNAMIC_CAST<CbmStsDigi*>( listStsDigi->At( link2.GetIndex() ) );
           const int NLinks3 = stsDigi->GetNLinks();
           for ( int iL3 = 0; iL3 < NLinks3; iL3++){
             FairLink link3 = stsDigi->GetLink(iL3);
             int stsPointId = link3.GetIndex();
             
             if ( find(&(stsPointIds[0]), &(stsPointIds[stsPointIds.size()]), stsPointId) ){
-              CbmStsPoint *stsPoint = (CbmStsPoint*) listStsPts->At( stsPointId );
+              CbmStsPoint *stsPoint = L1_DYNAMIC_CAST<CbmStsPoint*>( listStsPts->At( stsPointId ) );
           
               int mcId = stsPoint->GetTrackID();
               TVector3 xyzIn,xyzOut;

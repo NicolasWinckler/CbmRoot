@@ -4,6 +4,8 @@
 // ------------------------------------------------------------------
 #include "CbmL1TofMerger.h"
 
+#include "CbmL1Def.h"
+
 #include "FairRootManager.h"
 #include "CbmTofHit.h"
 #include "CbmTrdTrack.h"
@@ -67,7 +69,7 @@ void CbmL1TofMerger::Init()
 	    << "ROOT manager is not instantiated!" << endl;
         return;
     }
-    fArrayTrdTrack = (TClonesArray*) rootMgr->GetObject("TrdTrack");
+    fArrayTrdTrack = L1_DYNAMIC_CAST<TClonesArray*>( rootMgr->GetObject("TrdTrack") );
     if(NULL == fArrayTrdTrack) {
 	cout << "-W- CbmL1TofMerger::Init: "
             << "no TRD track array" << endl;
@@ -127,7 +129,7 @@ Int_t CbmL1TofMerger::DoMerge(TClonesArray* glbTracks,
             if(mapTrack.find(iTrack) == mapTrack.end()) continue;
 
 	    // Get pointer to the global track
-	    track = (CbmGlobalTrack*) glbTracks->At(iTrack);
+            track = L1_DYNAMIC_CAST<CbmGlobalTrack*>( glbTracks->At(iTrack) );
 	    if(NULL == track) {
 		mapTrack.erase(iTrack);
 		continue;
@@ -142,7 +144,7 @@ Int_t CbmL1TofMerger::DoMerge(TClonesArray* glbTracks,
 
 	    // Get TRD track
 	    trdTrackIndex = track->GetTrdTrackIndex();
-	    trdTrack = (CbmTrdTrack*) fArrayTrdTrack->At(trdTrackIndex);
+      trdTrack = L1_DYNAMIC_CAST<CbmTrdTrack*>( fArrayTrdTrack->At(trdTrackIndex) );
 	    if(NULL == trdTrack) {
 		mapTrack.erase(iTrack);
 		continue;
@@ -159,7 +161,7 @@ Int_t CbmL1TofMerger::DoMerge(TClonesArray* glbTracks,
 		// Check if pair is not forbidden
                 if(mapForbidden[make_pair(iTrack,iTof)]) continue;
 		// Get TOF hit
-		tofHit = (CbmTofHit*) tofHits->At(iTof);
+                tofHit = L1_DYNAMIC_CAST<CbmTofHit*>( tofHits->At(iTof) );
 		if(NULL == tofHit) continue;
 		// Get z position of hit
 		zposTof = tofHit->GetZ();
@@ -183,9 +185,8 @@ Int_t CbmL1TofMerger::DoMerge(TClonesArray* glbTracks,
 		    // Check if this track is closer
 		    if(chi2min < mapTofHitChi2[indexOfClosest]) {
 			// Force previous track to be reprocessed
-                        oldTrackIndex = mapTofHitTrack[indexOfClosest];
-			track2 = (CbmGlobalTrack*) glbTracks->
-			    At(oldTrackIndex);
+      oldTrackIndex = mapTofHitTrack[indexOfClosest];
+      track2 = L1_DYNAMIC_CAST<CbmGlobalTrack*>( glbTracks->At(oldTrackIndex) );
 			track2->SetTofHitIndex(-1);
 			mapTrack[oldTrackIndex] = kTRUE;
                         nMerged -= 1;

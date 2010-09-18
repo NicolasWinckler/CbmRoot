@@ -52,7 +52,7 @@ struct TL1TracksCatCounters // counters for different tracks categories
   TL1TracksCatCounters<T2> operator/(double a){
     TL1TracksCatCounters<T2> b(NCounters);
     for (int iC = 0; iC < NCounters; iC++){
-      b.counters[iC] = (T2)Div(counters[iC],a);
+      b.counters[iC] = static_cast<T2>( Div(counters[iC],a) );
     }
     return b;
   };

@@ -14,8 +14,8 @@ void L1Algo::Init( fscal geo[] )
     vtxFieldValue = B[0];
   }
   //vStations.clear();
-  NStations = (int) geo[ind++];
-  NMvdStations = (int) geo[ind++];
+  NStations = static_cast<int>( geo[ind++] );
+  NMvdStations = static_cast<int>( geo[ind++] );
   std::cout<<"L1Algo Input "<<NStations<<" Stations:"<<std::endl;
   for( int i=0; i<NStations; i++ ){
     L1Station &st = vStations[i];
@@ -71,7 +71,7 @@ void L1Algo::Init( fscal geo[] )
     st.yInfo.sin_phi =-c_f/(c_b*s_f - c_f*s_b);
     st.yInfo.sigma2 = st.XYInfo.C11;
 
-    int N= (int) geo[ind++];
+    int N= static_cast<int>( geo[ind++] );
     for( int iC=0; iC<N; iC++ ) st.fieldSlice.cx[iC] = geo[ind++];
     for( int iC=0; iC<N; iC++ ) st.fieldSlice.cy[iC] = geo[ind++];
     for( int iC=0; iC<N; iC++ ) st.fieldSlice.cz[iC] = geo[ind++];
@@ -80,9 +80,9 @@ void L1Algo::Init( fscal geo[] )
     std::cout<<"       "<<f_phi<<" "<<f_sigma <<" "<<b_phi<<" "<<b_sigma <<std::endl;
   }
 
-  fTrackingLevel = (int) geo[ind++];
+  fTrackingLevel = static_cast<int>( geo[ind++] );
   fMomentumCutOff = geo[ind++];
-  fGhostSuppression = (int) geo[ind++];
+  fGhostSuppression = static_cast<int>( geo[ind++] );
 
   {
     fvec By0 = vStations[NStations-1].fieldSlice.cy[0];

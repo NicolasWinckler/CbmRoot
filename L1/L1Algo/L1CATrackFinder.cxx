@@ -786,13 +786,13 @@ inline void L1Algo::f4(	// input
 
     fscal scale = 255/(MaxInvMom*2);
 
-    qp    = ((unsigned int)(qp*scale) )%256;
-    Cqp   = ((unsigned int)(Cqp*scale))%256;
+    qp    = (static_cast<unsigned int>(qp*scale) )%256;
+    Cqp   = (static_cast<unsigned int>(Cqp*scale))%256;
     Cqp+= 1;
 
     if( Cqp<0   ) Cqp= 0;
     if( Cqp>20 ) Cqp= 20;
-    qp = (unsigned char) qp;
+    qp = static_cast<unsigned char>( qp );
 
     THitI ihitl = hitsl_3[i3] + StsHitsStartIndex[istal];
     THitI ihitm = hitsm_3[i3] + StsHitsStartIndex[istam];
@@ -802,9 +802,9 @@ inline void L1Algo::f4(	// input
     L1Triplet trip;
     trip.Set( ihitl, ihitm, ihitr,
               0, 0,
-              0, (unsigned char) qp, chi2);   // 1.2/1000 sec
+              0, static_cast<unsigned char>( qp ), chi2);   // 1.2/1000 sec
     
-    trip.Cqp   = (unsigned char) Cqp;
+    trip.Cqp   = static_cast<unsigned char>( Cqp );
 
           //count statistics
 
@@ -1026,10 +1026,10 @@ inline void L1Algo::DupletsStaPort(	// input
 				fscal *x_plus;
 				fscal *y_minus;
 				fscal *y_plus;
-				x_minus  = (fscal*) (&(x_minusV_1[0]));
-				x_plus   = (fscal*) (&(x_plusV_1 [0]));
-				y_minus  = (fscal*) (&(y_minusV_1[0]));
-				y_plus   = (fscal*) (&(y_plusV_1 [0]));
+				x_minus  = reinterpret_cast<fscal*>(&(x_minusV_1[0]));
+        x_plus   = reinterpret_cast<fscal*>(&(x_plusV_1 [0]));
+        y_minus  = reinterpret_cast<fscal*>(&(y_minusV_1[0]));
+        y_plus   = reinterpret_cast<fscal*>(&(y_plusV_1 [0]));
 
 // 				THitI *hitsm_2;
 // 				hitsm_2 = &(hitsm_g2[ip*MaxPortionDoublets+0]);

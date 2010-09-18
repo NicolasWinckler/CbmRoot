@@ -84,7 +84,8 @@ public:
 
 	static Bool_t CompareChi2(const CbmTrdTrack* a, const CbmTrdTrack* b)
 	{
-		return ( a->GetChiSq()/(Double_t)a->GetNDF() < b->GetChiSq()/(Double_t)b->GetNDF() );
+    return ( a->GetChiSq()/static_cast<Double_t>(a->GetNDF()) <
+        b->GetChiSq()/static_cast<Double_t>(b->GetNDF()) );
 	};
 
     ClassDef(CbmL1TrdTrackFinderSts, 1);

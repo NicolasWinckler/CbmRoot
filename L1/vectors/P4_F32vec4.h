@@ -20,7 +20,7 @@ const union
 {
   float f;
   int i;
-} __f_one = {(float)1.};
+} __f_one = {1.f};
 
 const union
 {
@@ -34,12 +34,12 @@ const union
   __f32vec4_true_cheat     = {{0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF}},
   __f32vec4_false_cheat    = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}};
 
-#define _f32vec4_abs_mask ((F32vec4)__f32vec4_abs_mask_cheat.m)
-#define _f32vec4_sgn_mask ((F32vec4)__f32vec4_sgn_mask_cheat.m)
-#define _f32vec4_zero     ((F32vec4)__f32vec4_zero_cheat.m)
-#define _f32vec4_one      ((F32vec4)__f32vec4_one_cheat.m)
-#define _f32vec4_true     ((F32vec4)__f32vec4_true_cheat.m)
-#define _f32vec4_false    ((F32vec4)__f32vec4_false_cheat.m)
+#define _f32vec4_abs_mask (static_cast<F32vec4>(__f32vec4_abs_mask_cheat.m))
+#define _f32vec4_sgn_mask (static_cast<F32vec4>(__f32vec4_sgn_mask_cheat.m))
+#define _f32vec4_zero     (static_cast<F32vec4>(__f32vec4_zero_cheat.m))
+#define _f32vec4_one      (static_cast<F32vec4>(__f32vec4_one_cheat.m))
+#define _f32vec4_true     (static_cast<F32vec4>(__f32vec4_true_cheat.m))
+#define _f32vec4_false    (static_cast<F32vec4>(__f32vec4_false_cheat.m))
 
 class F32vec4 
 {
@@ -47,8 +47,8 @@ class F32vec4
 
   __m128 v;
 
-  float & operator[]( int i ){ return ((float*)&v)[i]; }
-  float   operator[]( int i ) const { return ((float*)&v)[i]; }
+  float & operator[]( int i ){ return (reinterpret_cast<float*>(&v))[i]; }
+  float   operator[]( int i ) const { return (reinterpret_cast<const float*>(&v))[i]; }
 
   F32vec4( ):v(_mm_set_ps1(0)){}
   F32vec4( const __m128 &a ):v(a) {}

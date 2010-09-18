@@ -95,7 +95,7 @@ Int_t CbmL1RichENNRingFinderParallel::DoFind( TClonesArray* HitArray, TClonesArr
   const Int_t nhits = HitArray->GetEntriesFast();  
 
   for ( register Int_t i = 0; i < nhits; ++i ){
-    CbmRichHit * hit = (CbmRichHit*) HitArray->At( i );
+    CbmRichHit * hit = L1_DYNAMIC_CAST<CbmRichHit*>( HitArray->At( i ) );
     if ( !hit ) continue;
     ENNRingHit tmp;
     tmp.x = hit->GetX();
@@ -178,7 +178,7 @@ Int_t CbmL1RichENNRingFinderParallel::DoFind( TClonesArray* HitArray, TClonesArr
   for( vector<ENNRing>::iterator i=R.begin(); i!=R.end(); ++i ){
     if( !i->on ) continue;
     new((*RingArray)[NRings]) CbmRichRing();
-    CbmRichRing *ring = (CbmRichRing*) RingArray->At(NRings);
+    CbmRichRing *ring = L1_DYNAMIC_CAST<CbmRichRing*>( RingArray->At(NRings) );
     NRings++;
     ring->SetCenterX ( i->x );
     ring->SetCenterY ( i->y );

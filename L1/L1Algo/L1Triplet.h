@@ -32,7 +32,7 @@ class L1Triplet
     }
     Chi2 = sqrt(fabs(Chi2))*31./3.5 ; // 3.5 == 31
     if( Chi2>31 || !finite(Chi2) ) Chi2 = 31;
-    b0 = ( ((unsigned char) Chi2)<<3 ) + (Level%8);
+    b0 = ( (static_cast<unsigned char>( Chi2 ))<<3 ) + (Level%8);
     b1 = Qp;
     bl = Level;
   }

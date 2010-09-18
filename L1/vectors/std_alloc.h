@@ -102,9 +102,9 @@ namespace nsL1
 #ifdef DEBUG_nsL1
                     std::cerr << "Allocator: deallocate " << num << " element(s)"
                         << " of size " << sizeof(T)
-                        << " at: " << (void*)p << std::endl;
+                        << " at: " << static_cast<void*>(p) << std::endl;
 #endif // DEBUG_nsL1
-                    /*T::*/operator delete((void*)p, num*sizeof(T));
+                    /*T::*/operator delete(static_cast<void*>(p), num*sizeof(T));
 #ifdef DEBUG_nsL1
                            std::cerr << "done." << std::endl;
 #endif // DEBUG_nsL1

@@ -36,7 +36,7 @@ struct L1Branch
     unsigned short int ista = 16-iStation;
     float tmp = sqrt(Chi2)/3.5*255;
     if( tmp>255 ) tmp = 255;
-    unsigned short int chi_2 = 255 - (unsigned char ) tmp ;
+    unsigned short int chi_2 = 255 - static_cast<unsigned char>( tmp );
     Quality = (length<<12) + (ista<<8) + chi_2;
     Momentum = 1.0/fabs(Qp);
     chi2 = chi_2;

@@ -76,20 +76,20 @@ void L1Algo::KFTrackFitter_simple()  // TODO: Add pipe.
         L1Station &sta1 = vStations[ista1];
         L1Station &sta2 = vStations[ista2];
 
-        fvec u0  = (fscal)vStsStrips[hit0.f];
-        fvec v0  = (fscal)vStsStripsB[hit0.b];
+        fvec u0  = static_cast<fscal>( vStsStrips[hit0.f] );
+        fvec v0  = static_cast<fscal>( vStsStripsB[hit0.b] );
         fvec x0,y0;
         StripsToCoor(u0, v0, x0, y0, sta1);
         fvec z0 = vStsZPos[hit0.iz];
 
-        fvec u1  = (fscal)vStsStrips[hit1.f];
-        fvec v1  = (fscal)vStsStripsB[hit1.b];
+        fvec u1  = static_cast<fscal>( vStsStrips[hit1.f] );
+        fvec v1  = static_cast<fscal>( vStsStripsB[hit1.b] );
         fvec x1,y1;
         StripsToCoor(u1, v1, x1, y1, sta1);
         fvec z1 = vStsZPos[hit1.iz];
 
-        fvec u2  = (fscal)vStsStrips[hit2.f];
-        fvec v2  = (fscal)vStsStripsB[hit2.b];
+        fvec u2  = static_cast<fscal>( vStsStrips[hit2.f] );
+        fvec v2  = static_cast<fscal>( vStsStripsB[hit2.b] );
         fvec x2,y2;
         StripsToCoor(u2, v2, x2, y2, sta2);
         fvec z2 = vStsZPos[hit2.iz];
@@ -146,8 +146,8 @@ void L1Algo::KFTrackFitter_simple()  // TODO: Add pipe.
           L1AddMaterial( T, sta.materialInfo, qp0 );
 //         if (ista==NMvdStations-1) L1AddPipeMaterial( T, qp0);
 
-          fvec u = (fscal)vStsStrips[hit.f];
-          fvec v = (fscal)vStsStripsB[hit.b];
+          fvec u = static_cast<fscal>( vStsStrips[hit.f] );
+          fvec v = static_cast<fscal>( vStsStripsB[hit.b] );
           L1Filter( T, sta.frontInfo, u );
           L1Filter( T, sta.backInfo,  v );
           fB0 = fB1;
@@ -187,7 +187,7 @@ void L1Algo::KFTrackFitter_simple()  // TODO: Add pipe.
         t.CFirst[14] = T.C44[0];
 
         t.chi2 = T.chi2[0];
-        t.NDF = (int)T.NDF[0];
+        t.NDF = static_cast<int>( T.NDF[0] );
         qp0 = T.qp[0];
       } // fit backward
 
@@ -207,20 +207,20 @@ void L1Algo::KFTrackFitter_simple()  // TODO: Add pipe.
         L1Station &sta1 = vStations[ista1];
         L1Station &sta2 = vStations[ista2];
 
-        fvec u0  = (fscal)vStsStrips[hit0.f];
-        fvec v0  = (fscal)vStsStripsB[hit0.b];
+        fvec u0  = static_cast<fscal>( vStsStrips[hit0.f] );
+        fvec v0  = static_cast<fscal>( vStsStripsB[hit0.b] );
         fvec x0,y0;
         StripsToCoor(u0, v0, x0, y0, sta1);
         fvec z0 = vStsZPos[hit0.iz];
 
-        fvec u1  = (fscal)vStsStrips[hit1.f];
-        fvec v1  = (fscal)vStsStripsB[hit1.b];
+        fvec u1  = static_cast<fscal>( vStsStrips[hit1.f] );
+        fvec v1  = static_cast<fscal>( vStsStripsB[hit1.b] );
         fvec x1,y1;
         StripsToCoor(u1, v1, x1, y1, sta1);
         fvec z1 = vStsZPos[hit1.iz];
 
-        fvec u2  = (fscal)vStsStrips[hit2.f];
-        fvec v2  = (fscal)vStsStripsB[hit2.b];
+        fvec u2  = static_cast<fscal>( vStsStrips[hit2.f] );
+        fvec v2  = static_cast<fscal>( vStsStripsB[hit2.b] );
         fvec x2,y2;
         StripsToCoor(u2, v2, x2, y2, sta2);
         fvec z2 = vStsZPos[hit2.iz];
@@ -265,8 +265,8 @@ void L1Algo::KFTrackFitter_simple()  // TODO: Add pipe.
           L1StsHit &hit = vStsHits[hits[i]];
           ista = vSFlag[hit.f]/4;
           L1Station &sta = vStations[ista];
-          fvec u = (fscal)vStsStrips[hit.f];
-          fvec v = (fscal)vStsStripsB[hit.b];
+          fvec u = static_cast<fscal>( vStsStrips[hit.f] );
+          fvec v = static_cast<fscal>( vStsStripsB[hit.b] );
 
           L1Extrapolate( T, vStsZPos[hit.iz], qp0, fld );
 //           T.L1Extrapolate( sta.z, qp0, fld );
@@ -312,7 +312,7 @@ void L1Algo::KFTrackFitter_simple()  // TODO: Add pipe.
         t.CLast[14] = T.C44[0];
 
         t.chi2 += T.chi2[0];
-        t.NDF += (int)T.NDF[0];
+        t.NDF += static_cast<int>( T.NDF[0] );
       }
       qp0 = T.qp[0];
     }
@@ -456,7 +456,7 @@ void L1Algo::KFTrackFitter() // TODO: works only for same-z. Add pipe.
       t[iVec]->CFirst[14] = T.C44[iVec];
 
       t[iVec]->chi2 = T.chi2[iVec];
-      t[iVec]->NDF = (int)T.NDF[iVec];
+      t[iVec]->NDF = static_cast<int>( T.NDF[iVec] );
     }
 
     // fit forward
@@ -520,7 +520,7 @@ void L1Algo::KFTrackFitter() // TODO: works only for same-z. Add pipe.
       t[iVec]->CLast[14] = T.C44[iVec];
 
       t[iVec]->chi2 = T.chi2[iVec];
-      t[iVec]->NDF = (int)T.NDF[iVec];
+      t[iVec]->NDF = static_cast<int>( T.NDF[iVec] );
     }
   }
 }

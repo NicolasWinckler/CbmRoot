@@ -80,7 +80,7 @@ Int_t CbmL1StsTrackFinder::DoFind() {
     {
       CbmL1Track &T = *it;
       new((*fTracks)[ntracks]) CbmStsTrack();
-      CbmStsTrack *t = (CbmStsTrack*)fTracks->At(ntracks++);
+      CbmStsTrack *t = L1_DYNAMIC_CAST<CbmStsTrack*>( fTracks->At(ntracks++) );
       t->SetFlag(0);
       FairTrackParam* fpar = t->GetParamFirst(), * lpar = t->GetParamLast();      
       CbmKFMath::CopyTC2TrackParam( fpar, T.T, T.C );

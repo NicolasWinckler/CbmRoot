@@ -1041,7 +1041,7 @@ void CbmL1::FieldApproxCheck()
       double x,y;
       for(int isec = 0; isec < st->GetNSectors(); isec++)
       {
-        CbmStsSector *sect = (CbmStsSector*) st->GetSector(isec);
+        CbmStsSector *sect = L1_DYNAMIC_CAST<CbmStsSector*>( st->GetSector(isec) );
         for(int isen = 0; isen < sect->GetNSensors(); isen++)
         {
           x = sect->GetSensor(isen)->GetX0() + sect->GetSensor(isen)->GetLx()/2.;
@@ -1057,15 +1057,15 @@ void CbmL1::FieldApproxCheck()
 
     float step = 1.;
 
-    int NbinsX = (int) (2*Xmax/step);
-    int NbinsY = (int) (2*Ymax/step);
+    int NbinsX = static_cast<int>(2*Xmax/step);
+    int NbinsY = static_cast<int>(2*Ymax/step);
     float ddx = 2*Xmax/NbinsX;
     float ddy = 2*Ymax/NbinsY;
 
-    TH2F *stB  = new TH2F(Form("station %i, dB", ist+1) ,Form("station %i, dB, z = %0.f cm", ist+1,z) , (int) (NbinsX+1),-(Xmax+ddx/2.),(Xmax+ddx/2.), (int) (NbinsY+1),-(Ymax+ddy/2.),(Ymax+ddy/2.));
-    TH2F *stBx = new TH2F(Form("station %i, dBx", ist+1),Form("station %i, dBx, z = %0.f cm", ist+1,z), (int) (NbinsX+1),-(Xmax+ddx/2.),(Xmax+ddx/2.), (int) (NbinsY+1),-(Ymax+ddy/2.),(Ymax+ddy/2.));
-    TH2F *stBy = new TH2F(Form("station %i, dBy", ist+1),Form("station %i, dBy, z = %0.f cm", ist+1,z), (int) (NbinsX+1),-(Xmax+ddx/2.),(Xmax+ddx/2.), (int) (NbinsY+1),-(Ymax+ddy/2.),(Ymax+ddy/2.));
-    TH2F *stBz = new TH2F(Form("station %i, dBz", ist+1),Form("station %i, dBz, z = %0.f cm", ist+1,z), (int) (NbinsX+1),-(Xmax+ddx/2.),(Xmax+ddx/2.), (int) (NbinsY+1),-(Ymax+ddy/2.),(Ymax+ddy/2.));
+    TH2F *stB  = new TH2F(Form("station %i, dB", ist+1) ,Form("station %i, dB, z = %0.f cm", ist+1,z) , static_cast<int>(NbinsX+1),-(Xmax+ddx/2.),(Xmax+ddx/2.), static_cast<int>(NbinsY+1),-(Ymax+ddy/2.),(Ymax+ddy/2.));
+    TH2F *stBx = new TH2F(Form("station %i, dBx", ist+1),Form("station %i, dBx, z = %0.f cm", ist+1,z), static_cast<int>(NbinsX+1),-(Xmax+ddx/2.),(Xmax+ddx/2.), static_cast<int>(NbinsY+1),-(Ymax+ddy/2.),(Ymax+ddy/2.));
+    TH2F *stBy = new TH2F(Form("station %i, dBy", ist+1),Form("station %i, dBy, z = %0.f cm", ist+1,z), static_cast<int>(NbinsX+1),-(Xmax+ddx/2.),(Xmax+ddx/2.), static_cast<int>(NbinsY+1),-(Ymax+ddy/2.),(Ymax+ddy/2.));
+    TH2F *stBz = new TH2F(Form("station %i, dBz", ist+1),Form("station %i, dBz, z = %0.f cm", ist+1,z), static_cast<int>(NbinsX+1),-(Xmax+ddx/2.),(Xmax+ddx/2.), static_cast<int>(NbinsY+1),-(Ymax+ddy/2.),(Ymax+ddy/2.));
 
     Double_t r[3],B[3];
     L1FieldSlice FSl;
@@ -1201,7 +1201,7 @@ void CbmL1::InputPerformance()
     Int_t nEnt = listStsHits->GetEntries();
 //     Int_t nMC = listStsPts->GetEntries();
     for (int j=0; j < nEnt; j++ ){
-      CbmStsHit *sh = (CbmStsHit*) listStsHits->At(j);
+      CbmStsHit *sh = L1_DYNAMIC_CAST<CbmStsHit*>( listStsHits->At(j) );
       
         // strip - MC correspondence
       int iStripF = sh->GetDigi(0);
@@ -1220,7 +1220,7 @@ void CbmL1::InputPerformance()
       sh->Position(hitPos);
       sh->PositionError(hitErr);
       CbmStsPoint *pt = 0;
-      if( iMC>=0 && iMC<nMC) pt = (CbmStsPoint*) listStsPts->At(iMC);
+      if( iMC>=0 && iMC<nMC) pt = L1_DYNAMIC_CAST<CbmStsPoint*>( listStsPts->At(iMC) );
       if ( !pt ){
 //         cout << " No MC points! " << "iMC=" << iMC << endl;
         continue;
@@ -1246,8 +1246,8 @@ void CbmL1::InputPerformance()
     Int_t nEnt = listMvdHits->GetEntries();
 //     Int_t nMC = listStsPts->GetEntries();
     for (int j=0; j < nEnt; j++ ){
-      CbmMvdHit *sh = (CbmMvdHit*) listMvdHits->At(j);
-      CbmMvdHitMatch *hm = (CbmMvdHitMatch*) listMvdHitMatches->At(j);
+      CbmMvdHit *sh = L1_DYNAMIC_CAST<CbmMvdHit*>( listMvdHits->At(j) );
+      CbmMvdHitMatch *hm = L1_DYNAMIC_CAST<CbmMvdHitMatch*>( listMvdHitMatches->At(j) );
 
 //       int iMC = sh->GetRefIndex();
       int iMC = hm->GetPointId();
@@ -1258,7 +1258,7 @@ void CbmL1::InputPerformance()
       sh->Position(hitPos);
       sh->PositionError(hitErr);
       CbmMvdPoint *pt = 0;
-      if( iMC>=0 && iMC<nMC) pt = (CbmMvdPoint*) listMvdPts->At(iMC);
+      if( iMC>=0 && iMC<nMC) pt = L1_DYNAMIC_CAST<CbmMvdPoint*>( listMvdPts->At(iMC) );
       if ( !pt ){
 //         cout << " No MC points! " << "iMC=" << iMC << endl;
         continue;

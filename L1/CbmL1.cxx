@@ -187,23 +187,26 @@ InitStatus CbmL1::Init()
   FairRunAna *Run = FairRunAna::Instance();
   FairRuntimeDb *RunDB = Run->GetRuntimeDb();
   {
-    CbmGeoStsPar* StsPar = (CbmGeoStsPar*) (RunDB->findContainer("CbmGeoStsPar"));
-    CbmStsDigiPar *digiPar = (CbmStsDigiPar*)(RunDB->findContainer("CbmStsDigiPar"));
+    CbmGeoStsPar* StsPar = L1_DYNAMIC_CAST<CbmGeoStsPar*>( RunDB->findContainer("CbmGeoStsPar") );
+ //   CbmStsDigiPar *digiPar = L1_DYNAMIC_CAST<CbmStsDigiPar*>( RunDB->findContainer("CbmStsDigiPar") ); // TODO
+ //   CbmStsDigiPar *digiPar = dynamic_cast<CbmStsDigiPar*>( RunDB->findContainer("CbmStsDigiPar") );
+ //   CbmStsDigiPar *digiPar = static_cast<CbmStsDigiPar*>( RunDB->findContainer("CbmStsDigiPar") );
+    CbmStsDigiPar *digiPar = reinterpret_cast<CbmStsDigiPar*>( RunDB->findContainer("CbmStsDigiPar") ); // TODO
     StsDigi.Init(StsPar, digiPar);
   }
   {
     fUseMVD = 1;
-    CbmStsFindTracks * FindTask = (CbmStsFindTracks*) Run->GetTask("STSFindTracks");
+    CbmStsFindTracks * FindTask = L1_DYNAMIC_CAST<CbmStsFindTracks*>( Run->GetTask("STSFindTracks") );
     if( FindTask ) fUseMVD = FindTask->MvdUsage();
   }
 
   histodir = gROOT->mkdir("L1");
 
   if (fPerformance){
-    listMCTracks = (TClonesArray*) fManger->GetObject("MCTrack");
-    listStsPts = (TClonesArray *)  fManger->GetObject("StsPoint");
-    listStsClusters = (TClonesArray*) fManger->GetObject("StsCluster");
-    listStsDigi = (TClonesArray*) fManger->GetObject("StsDigi");
+    listMCTracks = L1_DYNAMIC_CAST<TClonesArray*>( fManger->GetObject("MCTrack") );
+    listStsPts = L1_DYNAMIC_CAST<TClonesArray*>(  fManger->GetObject("StsPoint") );
+    listStsClusters = L1_DYNAMIC_CAST<TClonesArray*>( fManger->GetObject("StsCluster") );
+    listStsDigi = L1_DYNAMIC_CAST<TClonesArray*>( fManger->GetObject("StsDigi") );
   }
   else{
     listMCTracks = 0;
@@ -211,15 +214,15 @@ InitStatus CbmL1::Init()
     listStsClusters = 0;
     listStsDigi = 0;
   }
-  listStsHits = (TClonesArray *)  fManger->GetObject("StsHit");
+  listStsHits = L1_DYNAMIC_CAST<TClonesArray*>(  fManger->GetObject("StsHit") );
 
   if (fPerformance){
     if( !fUseMVD ){
       listMvdPts = 0;
       listMvdHitMatches = 0;
     } else {
-      listMvdPts = (TClonesArray *)  fManger->GetObject("MvdPoint");
-      listMvdHitMatches = (TClonesArray *)  fManger->GetObject("MvdHitMatch");
+      listMvdPts = L1_DYNAMIC_CAST<TClonesArray*>(  fManger->GetObject("MvdPoint") );
+      listMvdHitMatches = L1_DYNAMIC_CAST<TClonesArray*>(  fManger->GetObject("MvdHitMatch") );
     }
   }
   else{
@@ -229,7 +232,7 @@ InitStatus CbmL1::Init()
   if( !fUseMVD ){
     listMvdHits = 0;
   } else {
-    listMvdHits = (TClonesArray *)  fManger->GetObject("MvdHit");
+    listMvdHits = L1_DYNAMIC_CAST<TClonesArray*>(  fManger->GetObject("MvdHit") );
   }
 
   NMvdStations = 0;
@@ -380,7 +383,7 @@ InitStatus CbmL1::Init()
       double x,y;
       for(int isec = 0; isec<st->GetNSectors(); isec++)
       {
-        CbmStsSector *sect = (CbmStsSector*) st->GetSector(isec);
+        CbmStsSector *sect = L1_DYNAMIC_CAST<CbmStsSector*>( st->GetSector(isec) );
         for(int isen = 0; isen < sect->GetNSensors(); isen++)
         {
           x = sect->GetSensor(isen)->GetX0() + sect->GetSensor(isen)->GetLx()/2.;
@@ -456,11 +459,11 @@ InitStatus CbmL1::Init()
 
   {
     if(fSTAPDataMode%2 == 1){ // 1,3
-      WriteSTAPGeoData( (void*)geo, ind);
+      WriteSTAPGeoData( static_cast<void*>(geo), ind);
     };
     if(fSTAPDataMode >= 2){ // 2,3
       int ind2;
-      ReadSTAPGeoData( (void*)geo, ind2);
+      ReadSTAPGeoData( static_cast<void*>(geo), ind2);
       if (ind2 != ind)  cout << "-E- CbmL1: Read geometry from file " << fSTAPDataDir + "geo_algo.txt was NOT successful." << endl;
     };
   }
@@ -566,7 +569,7 @@ void CbmL1::writedir2current( TObject *obj ){
     TDirectory *cur = gDirectory;
     TDirectory *sub = cur->mkdir(obj->GetName());
     sub->cd();
-    TList *listSub = ((TDirectory*)obj)->GetList();
+    TList *listSub = (L1_DYNAMIC_CAST<TDirectory*>(obj))->GetList();
     TIter it(listSub);
     while( TObject *obj1=it() ) writedir2current(obj1);
     cur->cd();
@@ -604,7 +607,7 @@ void CbmL1::IdealTrackFinder()
 
 void CbmL1::WriteSTAPGeoData(void* geo_, int size)
 {
-  fscal *geo = (fscal*) geo_;
+  fscal *geo = static_cast<fscal*>( geo_ );
     // write geo in file
   TString fgeo_name = fSTAPDataDir + "geo_algo.txt";
   ofstream fgeo(fgeo_name);
@@ -661,7 +664,7 @@ void CbmL1::WriteSTAPAlgoData()  // must be called after ReadEvent
     unsigned char element;
     for (int i = 0; i < n; i++){
       element = algo->vSFlag[i];
-      fadata << (int)element << endl;
+      fadata << static_cast<int>(element) << endl;
     };
     if (fVerbose >= 4) cout << "vSFlag[" << n << "]" << " have been written." << endl;
       // write vSFlagB
@@ -669,7 +672,7 @@ void CbmL1::WriteSTAPAlgoData()  // must be called after ReadEvent
     fadata << n << endl;
     for (int i = 0; i < n; i++){
       element = algo->vSFlagB[i];
-      fadata << (int)element << endl;
+      fadata << static_cast<int>(element) << endl;
     };
     if (fVerbose >= 4) cout << "vSFlagB[" << n << "]" << " have been written." << endl;
       // write vStsHits
@@ -679,11 +682,11 @@ void CbmL1::WriteSTAPAlgoData()  // must be called after ReadEvent
     char element3;
     for (int i = 0; i < n; i++){
       element2 = algo->vStsHits[i].f;
-      fadata  << (int)element2 << " ";
+      fadata  << static_cast<int>(element2) << " ";
       element2 = algo->vStsHits[i].b;
-      fadata  << (int)element2 << " ";
+      fadata  << static_cast<int>(element2) << " ";
       element3 = algo->vStsHits[i].iz;
-      fadata  << (int)element3 << endl;
+      fadata  << static_cast<int>(element3) << endl;
     };
     if (fVerbose >= 4) cout << "vStsHits[" << n << "]" << " have been written." << endl;
       // write StsHitsStartIndex and StsHitsStopIndex
@@ -848,7 +851,7 @@ istream& CbmL1::eatwhite(istream& is) // skip spaces
 
 void CbmL1::ReadSTAPGeoData(void* geo_, int &size)
 {
-  fscal *geo = (fscal*)geo_;
+  fscal *geo = static_cast<fscal*>( geo_ );
   TString fgeo_name = fSTAPDataDir + "geo_algo.txt";
   ifstream fgeo(fgeo_name);
 
@@ -918,7 +921,7 @@ void CbmL1::ReadSTAPAlgoData()
     for (int i = 0; i < n; i++){
       int element;
       fadata >> element;
-      algo->vSFlag.push_back((unsigned char)element);
+      algo->vSFlag.push_back(static_cast<unsigned char>(element));
     };
     if (fVerbose >= 4) cout << "vSFlag[" << n << "]" << " have been read." << endl;
       // read algo->vSFlagB
@@ -926,7 +929,7 @@ void CbmL1::ReadSTAPAlgoData()
     for (int i = 0; i < n; i++){
       int element;
       fadata >> element;
-      algo->vSFlagB.push_back((unsigned char)element);
+      algo->vSFlagB.push_back(static_cast<unsigned char>(element));
     };
     if (fVerbose >= 4) cout << "vSFlagB[" << n << "]" << " have been read." << endl;
       // read algo->vStsHits
@@ -937,9 +940,9 @@ void CbmL1::ReadSTAPAlgoData()
     for (int i = 0; i < n; i++){
       L1StsHit element;
       fadata >> element_f >> element_b >> element_iz;
-      element.f = (unsigned short int) element_f;
-      element.b = (unsigned short int) element_b;
-      element.iz = (char) element_iz;
+      element.f = static_cast<unsigned short int>(element_f);
+      element.b = static_cast<unsigned short int>(element_b);
+      element.iz = static_cast<char>(element_iz);
       algo->vStsHits.push_back(element);
     };
     if (fVerbose >= 4) cout << "vStsHits[" << n << "]" << " have been read." << endl;

@@ -5,6 +5,8 @@
 
 #include "CbmL1TrdTrackFinderSts.h"
 
+#include "CbmL1Def.h"
+
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairBaseParSet.h"
@@ -270,7 +272,7 @@ void CbmL1TrdTrackFinderSts::Sts2Trd(Double_t pmin, Double_t pmax,
     // Loop over STS tracks
     for(Int_t iStsTrack = 0; iStsTrack < nStsTrack; iStsTrack++) {
         // Get pointer to the STS track
-        stsTrack = (CbmStsTrack*) fArrayStsTrack->At(iStsTrack);
+        stsTrack = L1_DYNAMIC_CAST<CbmStsTrack*>( fArrayStsTrack->At(iStsTrack) );
 	if(NULL == stsTrack) continue;
 /*
 	// Cut on momentum
@@ -382,8 +384,8 @@ void CbmL1TrdTrackFinderSts::ProcessStation(CbmTrdTrack* pTrack,
   if(stsTrackIndex < 0) {
     Fatal("ProcessStation", "Invalid track index");
   }
-  CbmTrackMatch *stsM = (CbmTrackMatch*) fArrayStsTrackM->
-    At(stsTrackIndex);
+  CbmTrackMatch *stsM = L1_DYNAMIC_CAST<CbmTrackMatch*>( fArrayStsTrackM->
+    At(stsTrackIndex) );
   Int_t trackID = stsM->GetMCTrackId();
 
   // Loop over layers in this station
@@ -397,7 +399,7 @@ void CbmL1TrdTrackFinderSts::ProcessStation(CbmTrdTrack* pTrack,
     // Skip if no TRD hits
     if(fNoTrdHits[plane] < 1) continue;
     // Get z coordinate of plane
-    ze = ((CbmTrdHit*)fArrayTrdHit->At(fTrdHitIndex[plane][0]))->GetZ();
+    ze = (L1_DYNAMIC_CAST<CbmTrdHit*>( fArrayTrdHit->At(fTrdHitIndex[plane][0]) ) )->GetZ();
     // Extrapolate to the plane
     kfTrack.Extrapolate(ze, &qp0);
 
@@ -412,10 +414,10 @@ void CbmL1TrdTrackFinderSts::ProcessStation(CbmTrdTrack* pTrack,
       // If the hit is used, skip
       if(fmapHitUsed[hitIndex]) continue;
       // Get pointer to the hit
-      pHit = (CbmTrdHit*) fArrayTrdHit->At(hitIndex);
+      pHit = L1_DYNAMIC_CAST<CbmTrdHit*>( fArrayTrdHit->At(hitIndex) );
       // Get MC point
       pointIndex = pHit->GetRefId();
-      trdPoint = (CbmTrdPoint*) fArrayTrdPoint->At(pointIndex);
+      trdPoint = L1_DYNAMIC_CAST<CbmTrdPoint*>( fArrayTrdPoint->At(pointIndex) );
       trdPoint->Position(pos);
 
       Double_t c1 = kfTrack.GetCovMatrix()[0];
@@ -498,7 +500,7 @@ void CbmL1TrdTrackFinderSts::UpdateTrack(Int_t station, CbmTrdTrack* pTrack)
 
     // Get number of hits
     Int_t nHits = pTrack->GetNofHits();
-    if( nHits < (Int_t)((station+1)*fNoTrdPerStation) ) {
+    if( nHits < static_cast<Int_t>( (station+1)*fNoTrdPerStation ) ) {
         pTrack->SetFlag(1);
         return;
     }
@@ -513,16 +515,16 @@ void CbmL1TrdTrackFinderSts::UpdateTrack(Int_t station, CbmTrdTrack* pTrack)
     CbmTrdHit *pHit = NULL;
     CbmKFTrdHit *pKFHit = NULL;
     Double_t qp0 = pTrack->GetParamLast()->GetQp();
-    for(Int_t iHit = (Int_t)station*fNoTrdPerStation;
+    for(Int_t iHit = static_cast<Int_t>( station*fNoTrdPerStation );
 	iHit < nHits; iHit++) {
 	// Get hit index
         hitIndex = pTrack->GetHitIndex(iHit);
         // Get pointer to the hit
-        pHit = (CbmTrdHit*) fArrayTrdHit->At(hitIndex);
+        pHit = L1_DYNAMIC_CAST<CbmTrdHit*>( fArrayTrdHit->At(hitIndex) );
         // Extrapolate to this hit
         kfTrack.Extrapolate(pHit->GetZ());
         // Get KF TRD hit
-        pKFHit = (CbmKFTrdHit*) fArrayKFTrdHit->At(hitIndex);
+        pKFHit = L1_DYNAMIC_CAST<CbmKFTrdHit*>( fArrayKFTrdHit->At(hitIndex) );
         // Add measurement
         pKFHit->Filter(kfTrack, kTRUE, qp0);
     } // Loop over hits
@@ -531,7 +533,7 @@ void CbmL1TrdTrackFinderSts::UpdateTrack(Int_t station, CbmTrdTrack* pTrack)
     pTrack->SetChiSq(kfTrack.GetRefChi2());
     pTrack->SetNDF(kfTrack.GetRefNDF());
     if(station == (fNoTrdStations-1)) {
-	if(pTrack->GetChiSq()/(Double_t)pTrack->GetNDF() > 100) pTrack->SetFlag(1);
+	if(pTrack->GetChiSq()/static_cast<Double_t>(pTrack->GetNDF()) > 100) pTrack->SetFlag(1);
     }
 }
 // -----------------------------------------------------------------------
@@ -801,19 +803,19 @@ void CbmL1TrdTrackFinderSts::DataBranches()
         return;
     }
     // Get pointer to the TRD points
-    fArrayTrdPoint = (TClonesArray*) rootMgr->GetObject("TrdPoint");
+    fArrayTrdPoint = L1_DYNAMIC_CAST<TClonesArray*>( rootMgr->GetObject("TrdPoint") );
     if(NULL == fArrayTrdPoint) {
         cout << "-W- CbmL1TrdTrackFinderSts::DataBranches : "
             << "no TRD point array" << endl;
     }
     // Get pointer to the STS track array
-    fArrayStsTrack = (TClonesArray*) rootMgr->GetObject("StsTrack");
+    fArrayStsTrack = L1_DYNAMIC_CAST<TClonesArray*>( rootMgr->GetObject("StsTrack") );
     if(NULL == fArrayStsTrack) {
         cout << "-W- CbmL1TrdTrackFinderSts::DataBranches : "
             << "no STS track array" << endl;
     }
     // Get pointer to the STS track match array
-    fArrayStsTrackM = (TClonesArray*) rootMgr->GetObject("StsTrackMatch");
+    fArrayStsTrackM = L1_DYNAMIC_CAST<TClonesArray*>( rootMgr->GetObject("StsTrackMatch") );
     if(NULL == fArrayStsTrackM) {
         cout << "-W- CbmL1TrdTrackFinderSts::DataBranches : "
             << "no STS track match array" << endl;
@@ -844,7 +846,7 @@ void CbmL1TrdTrackFinderSts::TrdLayout()
     }
     // Get the pointer to container of base parameters
     FairBaseParSet* baseParSet =
-        (FairBaseParSet*) rtdb->getContainer("FairBaseParSet");
+        L1_DYNAMIC_CAST<FairBaseParSet*>( rtdb->getContainer("FairBaseParSet") );
     if(NULL == baseParSet) {
         cout << "-E- CbmL1TrdTrackFinderSts::TrdLayout :"
             <<" no container of base parameters!" << endl;
@@ -858,7 +860,7 @@ void CbmL1TrdTrackFinderSts::TrdLayout()
         return;
     }
     // Find TRD detector
-    FairDetector* trd = (FairDetector*) detList->FindObject("TRD");
+    FairDetector* trd = L1_DYNAMIC_CAST<FairDetector*>( detList->FindObject("TRD") );
     if(NULL == trd) {
         cout << "-E- CbmL1TrdTrackFinderSts::TrdLayout :"
             << " no TRD detector!" << endl;
@@ -907,11 +909,11 @@ void CbmL1TrdTrackFinderSts::SortTrdHits()
     // Loop over TRD hits
     for(Int_t iHit = 0; iHit < nTrdHits; iHit++) {
         // Get pointer to the hit
-        hit = (CbmTrdHit*) fArrayTrdHit->At(iHit);
+        hit = L1_DYNAMIC_CAST<CbmTrdHit*>( fArrayTrdHit->At(iHit) );
         if(NULL == hit) continue;
         // Create KF TRD hit
         new ((*fArrayKFTrdHit)[iHit]) CbmKFTrdHit();
-        kfHit = (CbmKFTrdHit*) fArrayKFTrdHit->At(iHit);
+        kfHit = L1_DYNAMIC_CAST<CbmKFTrdHit*>( fArrayKFTrdHit->At(iHit) );
         kfHit->Create(hit);
         // Get plane number
         planeNumber = hit->GetPlaneId() - 1;

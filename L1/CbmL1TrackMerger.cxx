@@ -4,6 +4,8 @@
 // ------------------------------------------------------------------
 #include "CbmL1TrackMerger.h"
 
+#include "CbmL1Def.h"
+
 #include "FairRootManager.h"
 #include "CbmTrackMatch.h"
 #include "CbmStsTrack.h"
@@ -96,12 +98,12 @@ void CbmL1TrackMerger::Init()
 	    << "FairRootManager is not instantiated!" << endl;
         return;
     }
-    fArrayStsTrackM = (TClonesArray*) rootMgr->GetObject("StsTrackMatch");
+    fArrayStsTrackM = L1_DYNAMIC_CAST<TClonesArray*>( rootMgr->GetObject("StsTrackMatch") );
     if(NULL == fArrayStsTrackM) {
 	cout << "-W- CbmL1TrackMerger::Init : "
             << "no STS track match array" << endl;
     }
-    fArrayTrdTrackM = (TClonesArray*) rootMgr->GetObject("TrdTrackMatch");
+    fArrayTrdTrackM = L1_DYNAMIC_CAST<TClonesArray*>( rootMgr->GetObject("TrdTrackMatch") );
     if(NULL == fArrayTrdTrackM) {
 	cout << "-W- CbmL1TrackMerger::Init : "
             << "no TRD track match array" << endl;
@@ -147,7 +149,7 @@ Int_t CbmL1TrackMerger::MergeSimple(TClonesArray* stsTracks,
     // and attach STS track
     for(Int_t iTrdTrack = 0; iTrdTrack < trdTracks->GetEntriesFast(); iTrdTrack++) {
 	// Get pointer to the TRD track
-	trdTrack = (CbmTrdTrack*) trdTracks->At(iTrdTrack);
+      trdTrack = L1_DYNAMIC_CAST<CbmTrdTrack*>( trdTracks->At(iTrdTrack) );
 	if(NULL == trdTrack) continue;
 	// Create global track
 	glbTrack = new ((*glbTracks)[nGlb]) CbmGlobalTrack();
@@ -223,14 +225,14 @@ Int_t CbmL1TrackMerger::MergeImPlane(TClonesArray* stsTracks,
     // Loop over STS tracks
     for(Int_t iStsTrack = 0; iStsTrack < stsTracks->GetEntriesFast(); iStsTrack++) {
 	// Get pointer to the STS track and track match
-	stsTrack = (CbmStsTrack*) stsTracks->At(iStsTrack);
+      stsTrack = L1_DYNAMIC_CAST<CbmStsTrack*>( stsTracks->At(iStsTrack) );
 	if(NULL == stsTrack) continue;
-	stsTrackM = (CbmTrackMatch*) fArrayStsTrackM->At(iStsTrack);
+  stsTrackM = L1_DYNAMIC_CAST<CbmTrackMatch*>( fArrayStsTrackM->At(iStsTrack) );
         if(NULL == stsTrackM) continue;
 
 	// Create global track
 	new ((*glbTracks)[nGlb]) CbmGlobalTrack();
-	glbTrack = (CbmGlobalTrack*) glbTracks->At(nGlb);
+  glbTrack = L1_DYNAMIC_CAST<CbmGlobalTrack*>( glbTracks->At(nGlb) );
         if(NULL == glbTrack) continue;
 	nGlb += 1;
 	// Set STS track index
@@ -244,9 +246,9 @@ Int_t CbmL1TrackMerger::MergeImPlane(TClonesArray* stsTracks,
 	    // Skip if already merged
             if(mapTrdTrackUsed[iTrdTrack]) continue;
 	    // Get pointer to the TRD track and track match
-	    trdTrack = (CbmTrdTrack*) trdTracks->At(iTrdTrack);
+            trdTrack = L1_DYNAMIC_CAST<CbmTrdTrack*>( trdTracks->At(iTrdTrack) );
 	    if(NULL == trdTrack) continue;
-	    trdTrackM = (CbmTrackMatch*) fArrayTrdTrackM->At(iTrdTrack);
+      trdTrackM = L1_DYNAMIC_CAST<CbmTrackMatch*>( fArrayTrdTrackM->At(iTrdTrack) );
             if(NULL == trdTrackM) continue;
 	    // Extrapolate STS track to the first plane of TRD track
 	    kfTrack.Extrapolate(trdTrack->GetParamFirst()->GetZ());
@@ -368,7 +370,7 @@ Int_t CbmL1TrackMerger::MergeImPlane(TClonesArray* stsTracks,
 	if(mapTrdTrackUsed[iTrdTrack]) continue;
 	// Create global track
 	new ((*glbTracks)[nGlb]) CbmGlobalTrack();
-	glbTrack = (CbmGlobalTrack*) glbTracks->At(nGlb);
+  glbTrack = L1_DYNAMIC_CAST<CbmGlobalTrack*>( glbTracks->At(nGlb) );
         if(NULL == glbTrack) continue;
 	nGlb += 1;
 	// Set TRD track index

@@ -17,13 +17,16 @@ void draw_diff_el_pi(TH1D* h1, TH1D* h2)
 
 	h1->Draw();
 	h2->Draw("same");
+	gPad->SetGridx(true);
+	gPad->SetGridy(true);
 }
 
 void draw_electrons_qa()
 {
 	SetStyles();
     // TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.qa.root");
-	TFile *file = new TFile( "/d/cbm02/andrey/test_electrons/elid.qa.0000.root");
+      //  TFile *file = new TFile( "/d/cbm02/andrey/test_electrons/elid.qa.0000.root");
+	TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/test_electrons/elid.qa.0000.root");
    // gROOT->SetStyle("Plain");
    // gStyle->SetPalette(1,0);
    // gStyle->SetOptStat(0000);
@@ -48,38 +51,54 @@ void draw_electrons_qa()
 	TH1D* fhPiasElRichTrd = (TH1D*)file->Get("fhPiasElRichTrd");
 	TH1D* fhPiasElRichTrdTof = (TH1D*)file->Get("fhPiasElRichTrdTof");
 
-	DrawAcc(fhMCRings, fhAccRings, fhAccRichTrdGlobal, fhAccRichTrdTofGlobal);
-	DrawMatchingEff(fhAccRings, fhTrueFoundRings, fhTrueMatchStsRichGlobal,
-			fhTrueMatchStsRichTrdGlobal,fhTrueMatchStsRichTrdTofGlobal);
-	DrawMatchingEff2(fhAccRings, fhTrueFoundRings, fhTrueMatchStsRichGlobal,
-			fhTrueMatchStsRichTrdGlobal, fhTrueMatchStsRichTrdTofGlobal);
-	DrawElidEff(fhAccRings, fhTrueFoundRings, fhTrueIdRich,
-			fhTrueIdRichTrd, fhTrueIdRichTrdTof,
-			fhAccPi, fhPiasElRich, fhPiasElRichTrd, fhPiasElRichTrdTof);
+       // DrawAcc(fhMCRings, fhAccRings, fhAccRichTrdGlobal, fhAccRichTrdTofGlobal);
+       // DrawMatchingEff(fhAccRings, fhTrueFoundRings, fhTrueMatchStsRichGlobal,
+      //  		fhTrueMatchStsRichTrdGlobal,fhTrueMatchStsRichTrdTofGlobal);
+      //  DrawMatchingEff2(fhAccRings, fhTrueFoundRings, fhTrueMatchStsRichGlobal,
+      //  		fhTrueMatchStsRichTrdGlobal, fhTrueMatchStsRichTrdTofGlobal);
+      //  DrawElidEff(fhAccRings, fhTrueFoundRings, fhTrueIdRich,
+      //  		fhTrueIdRichTrd, fhTrueIdRichTrdTof,
+      //  		fhAccPi, fhPiasElRich, fhPiasElRichTrd, fhPiasElRichTrdTof);
 
 ////Draw difference electron-pion
-    TCanvas* c6 = new TCanvas("c6","c6",500,500);
-	draw_diff_el_pi(fhTrdAnnEl,fhTrdAnnPi);
+   // TCanvas* c6 = new TCanvas("c6","c6",500,500);
+   //     draw_diff_el_pi(fhTrdAnnEl,fhTrdAnnPi);
 
-    TCanvas* c4 = new TCanvas("c4", "c4", 900, 900);
-	c4->Divide(3, 3);
+    TCanvas* c4 = new TCanvas("c4", "c4", 750, 250);
+	c4->Divide(3, 1);
+       // c4->cd(1);
+       // draw_diff_el_pi(fhAaxisEl, fhAaxisPi);
+      //  c4->cd(2);
+      //  draw_diff_el_pi(fhBAxisEl, fhBAxisPi);
 	c4->cd(1);
-	draw_diff_el_pi(fhAaxisEl, fhAaxisPi);
-	c4->cd(2);
-	draw_diff_el_pi(fhBAxisEl, fhBAxisPi);
-	c4->cd(3);
 	draw_diff_el_pi(fhAaxisCorEl, fhAaxisCorPi);
-	c4->cd(4);
+	TLine* l1= new TLine(5.6,0,5.6,1);
+        l1->SetLineWidth(4);
+	l1->Draw();
+	TLine* l2= new TLine(4.4,0,4.4,1);
+        l2->SetLineWidth(4);
+        l2->Draw();
+	c4->cd(2);
 	draw_diff_el_pi(fhBAxisCorEl, fhBAxisCorPi);
-	c4->cd(5);
+	TLine* l3= new TLine(5.5,0,5.5,1);
+        l3->SetLineWidth(4);
+	l3->Draw();
+	TLine* l4= new TLine(4.,0,4.,1);
+        l4->SetLineWidth(4);
+        l4->Draw();
+	c4->cd(3);
 	draw_diff_el_pi(fhDistEl, fhDistPi);
-	c4->cd(6);
-	draw_diff_el_pi(fhNofHitsEl, fhNofHitsPi);
-	c4->cd(7);
-	draw_diff_el_pi(fhChi2El, fhChi2Pi);
-	c4->cd(8);
-	draw_diff_el_pi(fhRadPosEl, fhRadPosPi);
+	TLine* l5= new TLine(1,0,1,1);
+        l5->SetLineWidth(4);
+        l5->Draw();
+       // c4->cd(4);
+       // draw_diff_el_pi(fhNofHitsEl, fhNofHitsPi);
+       // c4->cd(5);
+       // draw_diff_el_pi(fhChi2El, fhChi2Pi);
+       // c4->cd(8);
+       // draw_diff_el_pi(fhRadPosEl, fhRadPosPi);
 
+        return;
 	TCanvas* c5 = new TCanvas("c5", "c5", 600, 900);
 	c5->Divide(2, 3);
 	c5->cd(1);

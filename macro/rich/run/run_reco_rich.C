@@ -1,8 +1,6 @@
 void run_reco_rich(Int_t nEvents = 700) {
 	Int_t iVerbose = 0;
 
-
-
 	TString script = TString(gSystem->Getenv("SCRIPT"));
 	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
@@ -10,25 +8,18 @@ void run_reco_rich(Int_t nEvents = 700) {
 
 	TString inFile1 = "", inFile2 = "", inFile3 = "", parFile = "", outFile ="";
 
-	Bool_t isRichTrackingOn = true;
+	Bool_t isRichTrackingOn = false;
 	if (script != "yes") {
-	        TString inFile1 ="/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.mc.root";
-	        TString inFile2 ="/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.reco.root";
-	        TString parFile ="/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.params.root";
-	        TString outFile ="/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.recorich.root";
-
-	    //    TString outDir  = "/d/cbm06/user/slebedev/rich/ringsperevent/";
-	    //    TString inFile1 = outDir + "mc.0010.root";
-	    //    TString inFile2 = outDir + "reco.0010.root";
-	    //    TString parFile = outDir + "params.0010.root";
-	    //    TString outFile = outDir + "recorich.0010.root";
+	        TString inFile1 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
+	        TString inFile2 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
+	        TString parFile ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
+	        TString outFile ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.recorich.root";
 	} else {
-		isRichTrackingOn = true;
+		isRichTrackingOn = false;
 		inFile1 = TString(gSystem->Getenv("MCFILE"));
-		inFile2 = TString(gSystem->Getenv("GLOBALHITSFILE"));
-		inFile3 = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
+		inFile2 = TString(gSystem->Getenv("RECOFILE"));
 		parFile = TString(gSystem->Getenv("PARFILE"));
-		outFile = TString(gSystem->Getenv("RICHFILE"));
+		outFile = TString(gSystem->Getenv("RECORICHFILE"));
 	}
 
 	TString stsDigiFile = "sts_standard.digi.par";
@@ -40,20 +31,15 @@ void run_reco_rich(Int_t nEvents = 700) {
 	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
 	basiclibs();
 	gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
-         cbmlibs();
+    cbmlibs();
 
 	FairRunAna *run = new FairRunAna();
 	if (inFile1 != "") run->SetInputFile(inFile1);
 	if (inFile2 != "") run->AddFriend(inFile2);
-	if (inFile3 != "") run->AddFriend(inFile3);
-	if (inFile1 != "") run->SetOutputFile(outFile);
-
+	if (outFile != "") run->SetOutputFile(outFile);
 
     FairTask* kalman= new CbmKF();
     run->AddTask(kalman);
-	// =========================================================================
-	// ===                        RICH reconstruction                        ===
-	// =========================================================================
 
 	// ---------------------RICH Hit Producer ----------------------------------
 	Double_t richPmtRad = 0.4; // PMT radius [cm]
@@ -78,9 +64,8 @@ void run_reco_rich(Int_t nEvents = 700) {
 		 run->AddTask(richExtrapolate);
 		 //--------------------------------------------------------------------------
 
-
 		 //--------------------- Rich Track Projection to photodetector -------------
-		 Int_t richZFlag = 1;       // Projetion from IM plane (default)
+		 Int_t richZFlag = 1;       // Projection from IM plane (default)
 		 CbmRichProjectionProducer* richProj =
 		 new CbmRichProjectionProducer(iVerbose, richZFlag);
 		 run->AddTask(richProj);
@@ -90,16 +75,14 @@ void run_reco_rich(Int_t nEvents = 700) {
 	//--------------------- RICH Ring Finding ----------------------------------
 	//CbmL1RichENNRingFinder* richFinder = new CbmL1RichENNRingFinder(iVerbose);
 	TString richGeoType = "compact";
-	CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose,
-			richGeoType);
+	CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose,richGeoType);
 	CbmRichFindRings* richFindRings = new CbmRichFindRings();
 	richFindRings->UseFinder(richFinder);
 	run->AddTask(richFindRings);
 	//--------------------------------------------------------------------------
 
 	//-------------------- RICH Ring Fitting -----------------------------------
-	CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose,
-			1, richGeoType);
+	CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose,1, richGeoType);
 	CbmRichFitRings* fitRings = new CbmRichFitRings("", "", richFitter);
 	run->AddTask(fitRings);
 	//--------------------------------------------------------------------------
@@ -110,8 +93,8 @@ void run_reco_rich(Int_t nEvents = 700) {
 	// -------------------------------------------------------------------------
 
 	//--------------------- RICH ring-track assignment ------------------------
-	Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]
-	Int_t richNPoints = 5; // Minmum number of hits on ring
+	Double_t richDistance = 10.; // Max. distance between ring center to track [cm]
+	Int_t richNPoints = 5; // Minimum number of hits in ring
 	CbmRichRingTrackAssign* richAssign = new CbmRichRingTrackAssignClosestD(
 			richDistance, richNPoints, iVerbose);
 	CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();

@@ -1,230 +1,148 @@
 
 #include "../../../cbmbase/CbmDetectorList.h";
 
-void run_reco(Int_t nElectrons = 20, Int_t nEvents = 1000)
-{
+void run_reco(Int_t nEvents = 700){
+	Int_t iVerbose = 0;
 
-    //      TString outDir  = "/d/cbm06/user/slebedev/rich/ringsperevent/";
-    //      char txt[200];
-    //      sprintf(txt,"%.4i",nElectrons);
-    //      TString inFile = outDir + "mc."+txt+".root";
-    //      TString parFile = outDir + "params."+txt+".root";
-    //      TString outFile = outDir + "reco."+txt+".root";
+	TString script = TString(gSystem->Getenv("SCRIPT"));
+	TString parDir = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/parameters");
 
-    Int_t iVerbose =0;
+	gRandom->SetSeed(10);
+
+	TString inFile = "", parFile = "", outFile ="";
+
+	if (script != "yes") {
+		TString inFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
+		TString parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
+		TString outFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.reco.root";
+	} else {
+		inFile = TString(gSystem->Getenv("MCFILE"));
+		outFile = TString(gSystem->Getenv("RECOFILE"));
+		parFile = TString(gSystem->Getenv("PARFILE"));
+	}
 
     TString stsDigiFile = "sts_standard.digi.par";
+    gDebug = 0;
 
-  TString inFile = "/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.mc.root";
-  TString parFile = "/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.params.root";
-  TString outFile = "/d/cbm02/slebedev/rich/JUL09/test.auau.25gev.mbias.0000.reco.root";
+    TStopwatch timer;
+    timer.Start();
 
-  gDebug = 0;
+	// ----  Load libraries   -------------------------------------------------
+	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
+	basiclibs();
+	gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
+	cbmlibs();
 
-  TStopwatch timer;
-  timer.Start();
-
-  // ----  Load libraries   -------------------------------------------------
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
-  cbmlibs();
-  // ------------------------------------------------------------------------
-
-  // -----   Reconstruction run   -------------------------------------------
-  FairRunAna *run= new FairRunAna();
-  run->SetInputFile(inFile);
-  run->SetOutputFile(outFile);
-  // ------------------------------------------------------------------------
-
-  // =========================================================================
-  // ===                      STS local reconstruction                     ===
-  // =========================================================================
-
-  // -----   STS digitizer   -------------------------------------------------
-  FairTask* stsDigitize = new CbmStsIdealDigitize(iVerbose);
-  run->AddTask(stsDigitize);
-  // -------------------------------------------------------------------------
-
-  // -----   STS Cluster Finder   --------------------------------------------
-//  FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",
-//                               iVerbose);
-//  run->AddTask(stsClusterFinder);
-  // -------------------------------------------------------------------------
-
-  // -----  STS hit finding   ------------------------------------------------
-  FairTask* stsFindHits = new CbmStsIdealFindHits(iVerbose);
-  run->AddTask(stsFindHits);
-  // -------------------------------------------------------------------------
+	// -----   Reconstruction run   -------------------------------------------
+	FairRunAna *run= new FairRunAna();
+	if (inFile != "") run->SetInputFile(inFile);
+	if (outFile != "") run->SetOutputFile(outFile);
 
 
-  // -----  STS hit matching   -----------------------------------------------
-  CbmStsIdealMatchHits* stsMatchHits = new CbmStsIdealMatchHits(iVerbose);
-  run->AddTask(stsMatchHits);
-  // -------------------------------------------------------------------------
+	// =========================================================================
+	// ===                      STS local reconstruction                     ===
+	// =========================================================================
 
+	// -----   STS digitizer   -------------------------------------------------
+	FairTask* stsDigitize = new CbmStsIdealDigitize(iVerbose);
+	run->AddTask(stsDigitize);
 
-  // ---  STS track finding   ------------------------------------------------
-  CbmKF* kalman = new CbmKF();
-  run->AddTask(kalman);
-  CbmL1* l1 = new CbmL1();
-  run->AddTask(l1);
-  CbmStsTrackFinder* stsTrackFinder    = new CbmL1StsTrackFinder();
-  FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder);
-  run->AddTask(stsFindTracks);
-  // -------------------------------------------------------------------------
+	// -----   STS Cluster Finder   --------------------------------------------
+	//  FairTask* stsClusterFinder = new CbmStsClusterFinder("STS Cluster Finder",
+	//                               iVerbose);
+	//  run->AddTask(stsClusterFinder);
 
+	// -----  STS hit finding   ------------------------------------------------
+	FairTask* stsFindHits = new CbmStsIdealFindHits(iVerbose);
+	run->AddTask(stsFindHits);
 
-  // ---   STS track matching   ----------------------------------------------
-  FairTask* stsMatchTracks = new CbmStsMatchTracks(iVerbose);
-  run->AddTask(stsMatchTracks);
-  // -------------------------------------------------------------------------
+	// -----  STS hit matching   -----------------------------------------------
+	CbmStsIdealMatchHits* stsMatchHits = new CbmStsIdealMatchHits(iVerbose);
+	run->AddTask(stsMatchHits);
 
+	// ---  STS track finding   ------------------------------------------------
+	CbmKF* kalman = new CbmKF();
+	run->AddTask(kalman);
+	CbmL1* l1 = new CbmL1();
+	run->AddTask(l1);
+	CbmStsTrackFinder* stsTrackFinder    = new CbmL1StsTrackFinder();
+	FairTask* stsFindTracks = new CbmStsFindTracks(iVerbose, stsTrackFinder);
+	run->AddTask(stsFindTracks);
 
-  // ---   STS track fitting   -----------------------------------------------
-  CbmStsTrackFitter* stsTrackFitter = new CbmStsKFTrackFitter();
-  FairTask* stsFitTracks = new CbmStsFitTracks(stsTrackFitter, iVerbose);
-  run->AddTask(stsFitTracks);
-  // -------------------------------------------------------------------------
+	// ---   STS track matching   ----------------------------------------------
+	FairTask* stsMatchTracks = new CbmStsMatchTracks(iVerbose);
+	run->AddTask(stsMatchTracks);
 
-  // ===                 End of STS local reconstruction                   ===
-  // =========================================================================
+	// ---   STS track fitting   -----------------------------------------------
+	CbmStsTrackFitter* stsTrackFitter = new CbmStsKFTrackFitter();
+	FairTask* stsFitTracks = new CbmStsFitTracks(stsTrackFitter, iVerbose);
+	run->AddTask(stsFitTracks);
 
+	// =========================================================================
+	// ===                     TRD local reconstruction                      ===
+	// =========================================================================
 
-
-
-  // =========================================================================
-  // ===                     TRD local reconstruction                      ===
-  // =========================================================================
-
-  // Update of the values for the radiator F.U. 17.08.07
-  Int_t trdNFoils    = 130;      // number of polyetylene foils
-  Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
-  Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
-  Bool_t simpleTR = kTRUE;       // use fast and simple version for TR
+	// Update of the values for the radiator F.U. 17.08.07
+	Int_t trdNFoils    = 130;      // number of polyetylene foils
+	Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
+	Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
+	Bool_t simpleTR = kTRUE;       // use fast and simple version for TR
                                  // production
 
-  CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,
+	CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,
                                        trdDFoils, trdDGap);
 
-  // -----   TRD hit producer   ----------------------------------------------
-  Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
-  // Resolutions in y - station and angle dependent [mum]
-  Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
-  Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
-  Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
+	// -----   TRD hit producer   ----------------------------------------------
+	Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
+	// Resolutions in y - station and angle dependent [mum]
+	Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
+	Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
+	Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
-  CbmTrdHitProducerSmearing* trdHitProd = new
+	CbmTrdHitProducerSmearing* trdHitProd = new
            CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
 
-  trdHitProd->SetSigmaX(trdSigmaX);
-  trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
+	trdHitProd->SetSigmaX(trdSigmaX);
+	trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
+	run->AddTask(trdHitProd);
 
-  run->AddTask(trdHitProd);
+	// =========================================================================
+	// ===                     TOF local reconstruction                      ===
+	// =========================================================================
 
-  // -------------------------------------------------------------------------
+	// ------   TOF hit producer   ---------------------------------------------
+	CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer",
+	  							iVerbose);
+	run->AddTask(tofHitProd);
+
+	// =========================================================================
+	// ===                        Global tracking                            ===
+	// =========================================================================
+
+	CbmLitFindGlobalTracks* finder = new CbmLitFindGlobalTracks();
+	finder->SetTrackingType(std::string("branch"));
+	finder->SetMergerType("nearest_hit");
+	run->AddTask(finder);
+
+	// -----   Primary vertex finding   ---------------------------------------
+	CbmPrimaryVertexFinder* pvFinder = new CbmPVFinderKF();
+	CbmFindPrimaryVertex* findVertex = new CbmFindPrimaryVertex(pvFinder);
+	run->AddTask(findVertex);
 
 
-  // -----   TRD track finding   ---------------------------------------------
-  CbmTrdTrackFinder* trdTrackFinder    = new CbmLitTrdTrackFinderNN();
-  CbmTrdFindTracks* trdFindTracks = new CbmTrdFindTracks("TRD Track Finder");
-  trdFindTracks->UseFinder(trdTrackFinder);
-  run->AddTask(trdFindTracks);
-  // -------------------------------------------------------------------------
-
-
-  // -----   TRD track fitting   ---------------------------------------------
-  CbmTrdTrackFitter* trdTrackFitter    = new CbmTrdTrackFitterKF();
-  ((CbmTrdTrackFitterKF*)trdTrackFitter)->SetVerbose(iVerbose);
-  ((CbmTrdTrackFitterKF*)trdTrackFitter)->SetPid(211);
-  CbmTrdFitTracks* trdFitTracks = new CbmTrdFitTracks("TRD track fitter",
-						      "TRD",
-						      trdTrackFitter);
-  run->AddTask(trdFitTracks);
-  // -------------------------------------------------------------------------
+	// -----   TRD track matching   --------------------------------------------
+	CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(iVerbose);
+	run->AddTask(trdMatchTracks);
   
-
-  // -----   TRD track matching   --------------------------------------------
-  CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(iVerbose);
-  run->AddTask(trdMatchTracks);
-  
-  
-   
       // ----------- TRD track Pid Wkn ----------------------
     CbmTrdSetTracksPidWkn* trdSetTracksPidTask = new
     CbmTrdSetTracksPidWkn("trdFindTracks","trdFindTracks");
     run->AddTask(trdSetTracksPidTask);
-    // ----------------------------------------------------
 
     // ----------- TRD track Pid Ann ----------------------
     CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new
     CbmTrdSetTracksPidANN("Ann","Ann");
     run->AddTask(trdSetTracksPidAnnTask);
-    // ----------------------------------------------------
-  
-  // -------------------------------------------------------------------------
- 
-  // ===                 End of TRD local reconstruction                   ===
-  // =========================================================================
-
-
-
-
-
-
-  // =========================================================================
-  // ===                     TOF local reconstruction                      ===
-  // =========================================================================
-
-
-  // ------   TOF hit producer   ---------------------------------------------
-  CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer",
-  							iVerbose);
-  run->AddTask(tofHitProd);
-  // -------------------------------------------------------------------------
- 
-  // ===                   End of TOF local reconstruction                 ===
-  // =========================================================================
-
-
-
-
-
-   
-  // =========================================================================
-  // ===                        Global tracking                            ===
-  // =========================================================================     
- 
-  // -----   STS-TRD-TOF track merging   -------------------------------------
-  CbmL1TrackMerger* trackMerger          = new CbmL1TrackMerger();
-  trackMerger->SetMethod(1);
-  CbmL1TofMerger* tofMerger = new CbmL1TofMerger();
-  CbmFindGlobalTracks* findGlobal = new CbmFindGlobalTracks(trackMerger,
-							    NULL, tofMerger,
-							    iVerbose);
-  run->AddTask(findGlobal);
-  
-  //--------- TOF tracklength calculation -----------------------------------
-   CbmGlobalTrackFitterKF* globalFitter = new CbmGlobalTrackFitterKF();
-   CbmFitGlobalTracks* fitGlobal
-                 = new
-   CbmFitGlobalTracks("globalfitter",iVerbose,globalFitter);
-  
-   run->AddTask(fitGlobal);
-  //-------------------------------------------------------------------------
-
-   
-  // -----   Primary vertex finding   ---------------------------------------
-  CbmPrimaryVertexFinder* pvFinder = new CbmPVFinderKF();
-  CbmFindPrimaryVertex* findVertex = new CbmFindPrimaryVertex(pvFinder);
-  run->AddTask(findVertex);
-  // ------------------------------------------------------------------------
-  
-  // ===                      End of global tracking                       ===
-  // =========================================================================
-
-  
-
 
     // ----------- TRD track Pid Like ----------------------
     // Since in the newest version of this method depends on the global
@@ -232,147 +150,113 @@ void run_reco(Int_t nElectrons = 20, Int_t nEvents = 1000)
     CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask = new
     CbmTrdSetTracksPidLike("Likelihood","Likelihood");
     run->AddTask(trdSetTracksPidLikeTask);
-    // ----------------------------------------------------
 
 
+    // =========================================================================
+    // ===                        RICH reconstruction                        ===
+    // =========================================================================
 
-
-
-
-
-  // =========================================================================
-  // ===                        RICH reconstruction                        ===
-  // =========================================================================
-
-  // ---------------------RICH Hit Producer ----------------------------------
-  Double_t richPmtRad  = 0.4;     // PMT radius [cm]
-  Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
-  Int_t    richDetType = 4;       // Detector type Hamamatsu H8500-03
-  Int_t    richNoise   = 220;     // Number of noise points per event
-  Double_t collectionEff = 1.0;
-  Double_t richSMirror = 0.1;     // Sigma for additional point smearing due to light scattering in mirror
-  CbmRichHitProducer* richHitProd
-    = new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
+    // ---------------------RICH Hit Producer ----------------------------------
+    Double_t richPmtRad  = 0.4;     // PMT radius [cm]
+    Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
+    Int_t    richDetType = 4;       // Detector type Hamamatsu H8500-03
+    Int_t    richNoise   = 220;     // Number of noise points per event
+    Double_t collectionEff = 1.0;
+    Double_t richSMirror = 0.1;     // Sigma for additional point smearing due to light scattering in mirror
+    CbmRichHitProducer* richHitProd
+		= new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
 			     richNoise, iVerbose, collectionEff,richSMirror);
-  run->AddTask(richHitProd);
-  //--------------------------------------------------------------------------
+    run->AddTask(richHitProd);
 
+    //----------------------RICH Track Extrapolation ---------------------------
+    Int_t    richNSts = 4;     // minimum number of STS hits for extrapolation
+    Double_t richZPos = 300.;  // z position for extrapolation [cm]
+    CbmRichTrackExtrapolation* richExtra
+		= new CbmRichTrackExtrapolationKF(richNSts, iVerbose);
+    CbmRichExtrapolateTracks* richExtrapolate = new CbmRichExtrapolateTracks();
+    richExtrapolate->UseExtrapolation(richExtra,richZPos);
+    run->AddTask(richExtrapolate);
 
-//  //----------------------RICH Track Extrapolation ---------------------------
-//  Int_t    richNSts = 4;     // minimum number of STS hits for extrapolation
-//  Double_t richZPos = 300.;  // z position for extrapolation [cm]
-//  CbmRichTrackExtrapolation* richExtra
-//    = new CbmRichTrackExtrapolationKF(richNSts, iVerbose);
-//  CbmRichExtrapolateTracks* richExtrapolate = new CbmRichExtrapolateTracks();
-//  richExtrapolate->UseExtrapolation(richExtra,richZPos);
-//  run->AddTask(richExtrapolate);
-//  //--------------------------------------------------------------------------
-//
-//
-//  //--------------------- Rich Track Projection to photodetector -------------
-//  Int_t richZFlag = 1;       // Projetion from IM plane (default)
-//  CbmRichProjectionProducer* richProj =
-//  new CbmRichProjectionProducer(iVerbose, richZFlag);
-//  run->AddTask(richProj);
-//  //--------------------------------------------------------------------------
+    //--------------------- Rich Track Projection to photodetector -------------
+    Int_t richZFlag = 1;       // Projection from IM plane (default)
+    CbmRichProjectionProducer* richProj =
+    		new CbmRichProjectionProducer(iVerbose, richZFlag);
+    run->AddTask(richProj);
 
+    //--------------------- RICH Ring Finding ----------------------------------
+    //CbmL1RichENNRingFinder* richFinder = new CbmL1RichENNRingFinder(iVerbose);
+    TString richGeoType = "compact";
+    CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose, richGeoType);
+    CbmRichFindRings* richFindRings = new CbmRichFindRings();
+    richFindRings->UseFinder(richFinder);
+    run->AddTask(richFindRings);
 
-  //--------------------- RICH Ring Finding ----------------------------------
-  //CbmL1RichENNRingFinder* richFinder = new CbmL1RichENNRingFinder(iVerbose);
-  TString richGeoType = "compact";
-  CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose, richGeoType);
-  CbmRichFindRings* richFindRings = new CbmRichFindRings();
-  richFindRings->UseFinder(richFinder);
-  run->AddTask(richFindRings);
-  //--------------------------------------------------------------------------
+    //-------------------- RICH Ring Fitting -----------------------------------
+    CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, 1, richGeoType);
+    CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
+    run->AddTask(fitRings);
+    //--------------------------------------------------------------------------
 
-  //-------------------- RICH Ring Fitting -----------------------------------
-  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, 1, richGeoType);
-  CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
-  run->AddTask(fitRings);
-  //--------------------------------------------------------------------------
-
-  // ------------------- RICH Ring matching  ---------------------------------
-  CbmRichMatchRings* matchRings = new CbmRichMatchRings(0);
-  run->AddTask(matchRings);
-  // -------------------------------------------------------------------------
+    // ------------------- RICH Ring matching  ---------------------------------
+    CbmRichMatchRings* matchRings = new CbmRichMatchRings(0);
+    run->AddTask(matchRings);
+    // -------------------------------------------------------------------------
 
 //  //--------------------- RICH ring-track assignment ------------------------
-//  Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]
-//  Int_t    richNPoints  = 5;   // Minmum number of hits on ring
-//  CbmRichRingTrackAssign* richAssign   =
-//    new CbmRichRingTrackAssignClosestD(richDistance, richNPoints, 3);
-//  CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
-//  assignTrack->UseAssign(richAssign);
-//  run->AddTask(assignTrack);
-  // ------------------------------------------------------------------------
+    Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]
+    Int_t    richNPoints  = 5;   // Minmum number of hits on ring
+    CbmRichRingTrackAssign* richAssign   =
+    		new CbmRichRingTrackAssignClosestD(richDistance, richNPoints, 3);
+    CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
+    assignTrack->UseAssign(richAssign);
+    run->AddTask(assignTrack);
 
-  CbmRichRingQa* richQa   =  new CbmRichRingQa("Qa","qa", 0);
-  run->AddTask(richQa);
-
+    CbmRichRingQa* richQa   =  new CbmRichRingQa("Qa","qa", 0);
+    run->AddTask(richQa);
 
 
-  // ------------------------------------------------------------------------
-
-  // ===                 End of RICH local reconstruction                  ===
-  // =========================================================================
-
-  // =========================================================================
-  // ===                        ECAL reconstruction                        ===
-  // =========================================================================
+    // =========================================================================
+    // ===                        ECAL reconstruction                        ===
+    // =========================================================================
 
 //  // -----   ECAL hit producer  ----------------------------------------------
 //  CbmEcalHitProducerFastMC* ecalHitProd
 //    = new CbmEcalHitProducerFastMC("ECAL Hitproducer");
 //  run->AddTask(ecalHitProd);
-  // -------------------------------------------------------------------------
-
-  // ===                      End of ECAL reconstruction                   ===
-  // =========================================================================
 
 
+    // -----  Parameter database   --------------------------------------------
+    TString stsDigi = gSystem->Getenv("VMCWORKDIR");
+    stsDigi += "/parameters/sts/";
+    stsDigi += stsDigiFile;
+    FairRuntimeDb* rtdb = run->GetRuntimeDb();
+    FairParRootFileIo* parIo1 = new FairParRootFileIo();
+    FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
+    parIo1->open(parFile.Data());
+    parIo2->open(stsDigi.Data(),"in");
+    rtdb->setFirstInput(parIo1);
+    rtdb->setSecondInput(parIo2);
+    rtdb->setOutput(parIo1);
+    rtdb->saveOutput();
 
+    // -----   Intialise and run   --------------------------------------------
+    run->LoadGeometry();
+    run->Init();
+    cout << "Starting run" << endl;
+    run->Run(0,nEvents);
 
+    // -----   Finish   -------------------------------------------------------
+    timer.Stop();
+    Double_t rtime = timer.RealTime();
+    Double_t ctime = timer.CpuTime();
+    cout << endl << endl;
+    cout << "Macro finished succesfully." << endl;
+    cout << "Output file is "    << outFile << endl;
+    cout << "Parameter file is " << parFile << endl;
+    cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
+    cout << endl;
 
-  // -----  Parameter database   --------------------------------------------
-  TString stsDigi = gSystem->Getenv("VMCWORKDIR");
-  stsDigi += "/parameters/sts/";
-  stsDigi += stsDigiFile;
-  FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  FairParRootFileIo* parIo1 = new FairParRootFileIo();
-  FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
-  parIo1->open(parFile.Data());
-  parIo2->open(stsDigi.Data(),"in");
-  rtdb->setFirstInput(parIo1);
-  rtdb->setSecondInput(parIo2);
-  rtdb->setOutput(parIo1);
-  rtdb->saveOutput();
-  // ------------------------------------------------------------------------
-
-
-
-  // -----   Intialise and run   --------------------------------------------
-  run->LoadGeometry();
-  run->Init();
-  cout << "Starting run" << endl;
-  run->Run(0,nEvents);
-  // ------------------------------------------------------------------------
-
-
-
-  // -----   Finish   -------------------------------------------------------
-  timer.Stop();
-  Double_t rtime = timer.RealTime();
-  Double_t ctime = timer.CpuTime();
-  cout << endl << endl;
-  cout << "Macro finished succesfully." << endl;
-  cout << "Output file is "    << outFile << endl;
-  cout << "Parameter file is " << parFile << endl;
-  cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
-  cout << endl;
-  // ------------------------------------------------------------------------
-
-  cout << " Test passed" << endl;
-  cout << " All ok " << endl;
-  exit(0);
+    cout << " Test passed" << endl;
+    cout << " All ok " << endl;
+    exit(0);
 }

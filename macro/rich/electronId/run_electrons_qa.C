@@ -1,4 +1,4 @@
-void run_electrons_qa(Int_t nEvents = 100)
+void run_electrons_qa(Int_t nEvents = 700)
 {
 
     Int_t iVerbose = 0;
@@ -8,7 +8,7 @@ void run_electrons_qa(Int_t nEvents = 100)
 
     gRandom->SetSeed(10);
 
-    TString inFile1 = "", inFile2 = "", inFile3 = "", inFile4 = "", parFile = "", outFile ="";
+    TString inFile1 = "", inFile2 = "", parFile = "", outFile ="";
     string outImageDir = "";
     if (script != "yes") {
         TString inFile1 ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.mc.root";
@@ -17,9 +17,7 @@ void run_electrons_qa(Int_t nEvents = 100)
         TString outFile ="/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.qa.root";
     } else {
     	inFile1 = TString(gSystem->Getenv("MCFILE"));
-    	inFile2 = TString(gSystem->Getenv("GLOBALHITSFILE"));
-    	inFile3 = TString(gSystem->Getenv("GLOBALTRACKSFILE"));
-    	inFile4 = TString(gSystem->Getenv("RICHFILE"));
+    	inFile2 = TString(gSystem->Getenv("RECOFILE"));
     	parFile = TString(gSystem->Getenv("PARFILE"));
     	outFile = TString(gSystem->Getenv("ELIDFILE"));
     	outImageDir = string(gSystem->Getenv("IMAGEDIR"));
@@ -39,8 +37,6 @@ void run_electrons_qa(Int_t nEvents = 100)
 	FairRunAna *run = new FairRunAna();
 	if (inFile1 != "") run->SetInputFile(inFile1);
 	if (inFile2 != "") run->AddFriend(inFile2);
-	if (inFile3 != "") run->AddFriend(inFile3);
-	if (inFile4 != "") run->AddFriend(inFile4);
 
 	run->SetOutputFile(outFile);
 

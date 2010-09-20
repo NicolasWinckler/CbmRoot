@@ -1,4 +1,4 @@
-void run_reco_param_opt_ht(Float_t p1, Float_t p2)
+void run_reco_param_opt_ht(Float_t p1, Float_t p2, Float_t p3, Float_t p4, Float_t p5)
 {
 	Int_t nEvents = 700;
 
@@ -48,24 +48,25 @@ void run_reco_param_opt_ht(Float_t p1, Float_t p2)
   run->AddFriend(inFile2);
   run->SetOutputFile(outFile);
 
-
- // CbmL1RichENNRingFinder* richFinder = new CbmL1RichENNRingFinder(iVerbose);
   TString richGeoType = "compact";
-  //CbmL1RichENNRingFinder* richFinder = new CbmL1RichENNRingFinder();
   CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose, richGeoType);
   richFinder->SetFindOptPar(true);
   richFinder->SetParameters(
 		  2, //Nof parts
 		  11.5, 2.5, //Max-min dist
 		  3.3, 5.7, //Max-min radius
-		  p1, 2, p2, 2, //HTCut
+		  5, 2, 5, 2, //HTCut
 		  25, 25, 32, //NofBins
-		  -0.5, 0.35, 0.4,
-		  2, 0.8, 3., 1.2);
+		  p1, p4, p5,
+		  p2, p3, 3., 1.2);
 
   CbmRichFindRings* richFindRings = new CbmRichFindRings();
   richFindRings->UseFinder(richFinder);
   run->AddTask(richFindRings);
+
+  CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, 1, richGeoType);
+  CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
+  run->AddTask(fitRings);
 
   CbmRichMatchRings* matchRings = new CbmRichMatchRings(iVerbose);
   run->AddTask(matchRings);

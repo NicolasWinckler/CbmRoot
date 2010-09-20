@@ -1,4 +1,4 @@
-/** LitTrackFinderNNBase.h
+/** LitTrackFinderNNBase.cxx
  * @author Andrey Lebedev <andrey.lebedev@gsi.de>
  * @since 2010
  * @version 1.0

@@ -38,23 +38,23 @@ inline void CbmLitPixelHitToLitScalPixelHit(
 		lhit->Z = hit->GetZ();
 }
 
-/* Converts CbmPixelHit to LitScalPixelHit.
- * @param hit Pointer to CbmPixelHit.
- * @param lhit Pointer to LitScalPixelHit.
- */
-inline void CbmPixelHitToLitScalPixelHit(
-		const CbmPixelHit* hit,
-		LitScalPixelHit* lhit)
-{
-		lhit->X = hit->GetX();
-		lhit->Y = hit->GetY();
-		lhit->Dx = hit->GetDx();
-		lhit->Dy = hit->GetDy();
-		lhit->Dxy = hit->GetDxy();
-		lhit->planeId = hit->GetPlaneId() - 1;
-		lhit->refId = hit->GetRefId();
-		lhit->Z = hit->GetZ();
-}
+///* Converts CbmPixelHit to LitScalPixelHit.
+// * @param hit Pointer to CbmPixelHit.
+// * @param lhit Pointer to LitScalPixelHit.
+// */
+//inline void CbmPixelHitToLitScalPixelHit(
+//		const CbmPixelHit* hit,
+//		LitScalPixelHit* lhit)
+//{
+//		lhit->X = hit->GetX();
+//		lhit->Y = hit->GetY();
+//		lhit->Dx = hit->GetDx();
+//		lhit->Dy = hit->GetDy();
+//		lhit->Dxy = hit->GetDxy();
+//		lhit->planeId = hit->GetPlaneId() - 1;
+//		lhit->refId = hit->GetRefId();
+//		lhit->Z = hit->GetZ();
+//}
 
 /* Converts CbmLitTrackParam to LitTrackParamScal.
  * @param par Pointer to CbmLitTrackParam.

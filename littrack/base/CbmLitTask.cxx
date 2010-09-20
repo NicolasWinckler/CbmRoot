@@ -8,14 +8,20 @@
 
 #include <iostream>
 
-CbmLitTask::CbmLitTask()
+CbmLitTask::CbmLitTask():
+	fIsElectronSetup(false),
+	fIsSts(false),
+	fIsTrd(false),
+	fIsMuch(false),
+	fIsTof(false),
+	fEventNo(0),
+	fVerbose(0),
+	fOutputDir("")
 {
-
 }
 
 CbmLitTask::~CbmLitTask()
 {
-
 }
 
 

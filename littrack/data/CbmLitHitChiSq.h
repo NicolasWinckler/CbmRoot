@@ -9,6 +9,12 @@ class CbmLitHit;
 class CbmLitHitChiSq
 {
 public:
+	CbmLitHitChiSq():
+		fHit(NULL),
+		fChiSq(0.),
+		fParam(){}
+	~CbmLitHitChiSq() {}
+
 	void SetHit(const CbmLitHit* hit) {fHit = hit;}
 	void SetChiSq(myf chiSq) {fChiSq = chiSq;}
 	void SetParam(const CbmLitTrackParam* param) {fParam = *param;}

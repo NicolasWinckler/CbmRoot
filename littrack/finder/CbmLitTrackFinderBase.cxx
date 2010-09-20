@@ -14,6 +14,13 @@
 #include <algorithm>
 
 CbmLitTrackFinderBase::CbmLitTrackFinderBase():
+	fLayout(),
+	fHitData(),
+	fUsedHitsSet(),
+	fUsedSeedsSet(),
+	fNofIter(0),
+	fMaxNofMissingHits(0),
+	fPDG(),
 	fVerbose(1),
 	fEventNo(0)
 {

@@ -23,7 +23,16 @@
 
 CbmLitSimpleGeometryConstructor* CbmLitSimpleGeometryConstructor::fInstance = NULL;
 
-CbmLitSimpleGeometryConstructor::CbmLitSimpleGeometryConstructor()
+CbmLitSimpleGeometryConstructor::CbmLitSimpleGeometryConstructor():
+	fGeo(NULL),
+	fSimpleGeo(NULL),
+	fMedium(),
+	fMyGeoNodes(),
+	fMyMuchGeoNodes(),
+	fMyTrdGeoNodes(),
+	fIsTrd(false),
+	fIsMuch(false),
+	fIsTof(false)
 {
 	ConstructGeometry();
 }

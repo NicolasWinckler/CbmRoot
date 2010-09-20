@@ -18,9 +18,28 @@
 
 #include <iostream>
 
-CbmLitFindGlobalTracksIdeal::CbmLitFindGlobalTracksIdeal()
+CbmLitFindGlobalTracksIdeal::CbmLitFindGlobalTracksIdeal():
+	fIsElectronSetup(false),
+	fIsSts(false),
+	fIsTrd(false),
+	fIsMuch(false),
+	fIsTof(false),
+
+	fMCTracks(NULL),
+	fStsMatches(NULL),
+	fMuchMatches(NULL),
+	fTrdMatches(NULL),
+	fTofMCPoints(NULL),
+	fTofHits(NULL),
+	fGlobalTracks(NULL),
+
+	fMcStsMap(),
+	fMcTrdMap(),
+	fMcMuchMap(),
+	fMcTofMap(),
+
+	fEventNo(0)
 {
-	fEventNo = 0;
 }
 
 CbmLitFindGlobalTracksIdeal::~CbmLitFindGlobalTracksIdeal()

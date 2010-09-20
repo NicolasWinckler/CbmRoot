@@ -14,7 +14,9 @@
 #include <sstream>
 #include <iostream>
 
-CbmLitHitData::CbmLitHitData()
+CbmLitHitData::CbmLitHitData():
+	fHits(),
+	fMaxErr()
 {
 }
 

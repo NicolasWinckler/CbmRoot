@@ -24,6 +24,13 @@ template<class T>
 class LitSubstationMuon
 {
 public:
+	LitSubstationMuon():
+		Z(0.),
+		material(),
+		fieldSlice() {}
+
+	virtual ~LitSubstationMuon() {}
+
 	T Z;
 	LitMaterialInfo<T> material;
 	LitFieldSlice<T> fieldSlice;
@@ -51,6 +58,8 @@ class LitStationMuon
 {
 public:
 	LitStationMuon():type(kLITPIXELHIT), nofSubstations(0) {}
+
+	virtual ~LitStationMuon() {}
 
 	void AddSubstation(const LitSubstationMuon<T>& substation) {
 		substations[nofSubstations++] = substation;
@@ -95,6 +104,14 @@ template<class T>
 class LitAbsorber
 {
 public:
+	LitAbsorber():
+		Z(0.),
+		material(),
+		fieldSliceFront(),
+		fieldSliceBack() {}
+
+	virtual ~LitAbsorber() {}
+
 	T Z;
 	LitMaterialInfo<T> material;
 	LitFieldSlice<T> fieldSliceFront;
@@ -125,7 +142,9 @@ template<class T>
 class LitStationGroupMuon
 {
 public:
-	LitStationGroupMuon():nofStations(0) {}
+	LitStationGroupMuon():
+		nofStations(0),
+		absorber() {}
 
 	virtual ~LitStationGroupMuon() {}
 
@@ -176,6 +195,8 @@ class LitDetectorLayoutMuon
 {
 public:
 	LitDetectorLayoutMuon():nofStationGroups(0){};
+
+	virtual ~LitDetectorLayoutMuon(){}
 
 	void AddStationGroup(const LitStationGroupMuon<T>& stationGroup) {
 		stationGroups[nofStationGroups++] = stationGroup;

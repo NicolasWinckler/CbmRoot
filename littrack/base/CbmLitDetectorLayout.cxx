@@ -8,7 +8,8 @@
 
 #include <sstream>
 
-CbmLitDetectorLayout::CbmLitDetectorLayout()
+CbmLitDetectorLayout::CbmLitDetectorLayout():
+	fStationGroups()
 {
 }
 

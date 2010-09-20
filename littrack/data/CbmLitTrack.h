@@ -16,7 +16,7 @@ public:
 	virtual ~CbmLitTrack();
 
 	CbmLitTrack& operator=(const CbmLitTrack& track);
-	CbmLitTrack(const CbmLitTrack& track) { *this = track; };
+	CbmLitTrack(const CbmLitTrack& track);
 
 	int GetNofHits() const { return fHits.size(); }
 	int GetNofHits(int planeId);

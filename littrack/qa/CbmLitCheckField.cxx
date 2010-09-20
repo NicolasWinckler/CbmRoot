@@ -27,6 +27,30 @@
 
 
 CbmLitCheckField::CbmLitCheckField():
+	fField(NULL),
+	fHistoList(NULL),
+	fNofSlices(0),
+	fZpos(),
+	fXpos(),
+	fYpos(),
+	fCx(),
+	fCy(),
+	fCz(),
+//	fhB(),
+	fhBGraph(),
+	fhBAprGraph(),
+	fhBErrH2D(),
+	fhBErrH1D(),
+	fhBRelErrH1D(),
+	fhBRelErrH2D(),
+//	fhBErrPolyH1D(),
+	fhBErrAlongZH1D(),
+	fhBRelErrAlongZH1D(),
+	fhBAlongZGraph(),
+	fAlongZAngles(),
+	fZMin(-10.),
+	fZMax(300.),
+	fZStep(5.),
 	fDrawBx(true),
 	fDrawBy(true),
 	fDrawBz(true),
@@ -36,18 +60,17 @@ CbmLitCheckField::CbmLitCheckField():
 	fDrawPoly(true),
 	fDrawSlices(true),
 	fFixedBounds(true),
-	fNofSlices(0),
 	fXangle(25.),
 	fYangle(25.),
 	fNofBinsX(100),
 	fNofBinsY(100),
 	fUseEllipseAcc(true),
 	fOutputDir("./field/"),
+	fFitter(),
 	fPolynomDegreeIndex(1),
 	fNofPolynoms(4),
-	fZMin(-10.),
-	fZMax(300.),
-	fZStep(5.)
+	fDegrees()
+
 {
 
 }

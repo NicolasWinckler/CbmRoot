@@ -13,6 +13,12 @@
 #include <algorithm>
 
 CbmLitTrackFinderWeight::CbmLitTrackFinderWeight():
+	fTracks(),
+	fFitter(),
+	fFilter(),
+    fSeedSelection(),
+    fFinalSelection(),
+    fPropagator(),
 	fMaxNofHitsInValidationGate(4)
 {
 }

@@ -159,7 +159,7 @@ bool CbmLitTrackFinderNN::AddNearestHit1(
 	bool hitAdded = false;
 	CbmLitTrackParam uPar, param;
 	HitPtrIterator hit(hits[0].second);
-	myf chiSq = 1e10;
+	myf chiSq = std::numeric_limits<myf>::max();
 	for (int iSubstation = 0; iSubstation < nofSubstations; iSubstation++) {
 		for (HitPtrIterator iHit = hits[iSubstation].first; iHit != hits[iSubstation].second; iHit++) {
 			//First update track parameters with KF, than check whether the hit is in the validation gate.

@@ -21,6 +21,9 @@
 class CbmLitPolynom0 : public CbmLitPolynom
 {
 public:
+	CbmLitPolynom0(){}
+	virtual ~CbmLitPolynom0(){}
+
 	double Calculate(
 			double x,
 			double y,
@@ -36,6 +39,9 @@ public:
 class CbmLitPolynom1 : public CbmLitPolynom
 {
 public:
+	CbmLitPolynom1(){}
+	virtual ~CbmLitPolynom1(){}
+
 	double Calculate(
 			double x,
 			double y,
@@ -52,6 +58,9 @@ public:
 class CbmLitPolynom2 : public CbmLitPolynom
 {
 public:
+	CbmLitPolynom2(){}
+	virtual ~CbmLitPolynom2(){}
+
 	double Calculate(
 			double x,
 			double y,
@@ -69,6 +78,9 @@ public:
 class CbmLitPolynom3 : public CbmLitPolynom
 {
 public:
+	CbmLitPolynom3(){}
+	virtual ~CbmLitPolynom3(){}
+
 	double Calculate(
 			double x,
 			double y,
@@ -94,6 +106,9 @@ public:
 class CbmLitPolynom4 : public CbmLitPolynom
 {
 public:
+	CbmLitPolynom4(){}
+	virtual ~CbmLitPolynom4(){}
+
 	double Calculate(
 			double x,
 			double y,
@@ -146,6 +161,9 @@ public:
 class CbmLitPolynom5 : public CbmLitPolynom
 {
 public:
+	CbmLitPolynom5(){}
+	virtual ~CbmLitPolynom5(){}
+
 	double Calculate(
 			double x,
 			double y,
@@ -203,6 +221,9 @@ public:
 class CbmLitPolynom6 : public CbmLitPolynom
 {
 public:
+	CbmLitPolynom6(){}
+	virtual ~CbmLitPolynom6(){}
+
 	double Calculate(
 			double x,
 			double y,
@@ -272,6 +293,9 @@ public:
 class CbmLitPolynom7 : public CbmLitPolynom
 {
 public:
+	CbmLitPolynom7(){}
+	virtual ~CbmLitPolynom7(){}
+
 	double Calculate(
 			double x,
 			double y,
@@ -353,6 +377,9 @@ public:
 class CbmLitPolynom8 : public CbmLitPolynom
 {
 public:
+	CbmLitPolynom8(){}
+	virtual ~CbmLitPolynom8(){}
+
 	double Calculate(
 			double x,
 			double y,
@@ -449,6 +476,9 @@ public:
 class CbmLitPolynom9 : public CbmLitPolynom
 {
 public:
+	CbmLitPolynom9(){}
+	virtual ~CbmLitPolynom9(){}
+
 	double Calculate(
 			double x,
 			double y,
@@ -560,6 +590,9 @@ public:
 class CbmLitPolynom10 : public CbmLitPolynom
 {
 public:
+	CbmLitPolynom10(){}
+	virtual ~CbmLitPolynom10(){}
+
 	double Calculate(
 			double x,
 			double y,

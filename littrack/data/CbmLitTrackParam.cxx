@@ -11,9 +11,9 @@ CbmLitTrackParam::CbmLitTrackParam():
 	fZ(0.),
 	fTx(0.),
 	fTy(0.),
-	fQp(0.)
+	fQp(0.),
+	fCovMatrix(15, 0.)
 {
-	fCovMatrix.resize(15);
 }
 
 CbmLitTrackParam::~CbmLitTrackParam()

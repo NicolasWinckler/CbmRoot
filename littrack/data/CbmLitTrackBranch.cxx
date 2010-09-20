@@ -7,6 +7,8 @@
 #include <algorithm>
 
 CbmLitTrackBranch::CbmLitTrackBranch():
+	fHits(),
+	fParam(),
 	fChi2(0.),
 	fNDF(0),
 	fNofMissingHits(0),

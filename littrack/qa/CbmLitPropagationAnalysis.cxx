@@ -60,29 +60,80 @@
 #include <fstream>
 
 
-CbmLitPropagationAnalysis::CbmLitPropagationAnalysis()
+CbmLitPropagationAnalysis::CbmLitPropagationAnalysis():
+	fIsElectronSetup(false),
+	fIsSts(false),
+	fIsTrd(false),
+	fIsMuch(false),
+	fIsTof(false),
+
+	fLitTracks(),
+	fLitMcTracks(),
+
+	fNofPlanes(14),
+	fPDGCode(-1),
+
+	fNofTrdHits(0),
+	fNofMuchHits(13),
+	fNofTofHits(1),
+
+	fMCTracks(NULL),
+	fGlobalTracks(NULL),
+	fStsTracks(NULL),
+//	fStsTrackMatches(NULL),
+	fMuchTracks(NULL),
+	fMuchPixelHits(NULL),
+	fMuchStrawHits(NULL),
+	fMuchPoints(NULL),
+	fMuchTrackMatches(NULL),
+	fMuchPixelDigiMatches(NULL),
+	fMuchStrawDigiMatches(NULL),
+	fMuchClusters(NULL),
+	fTrdTracks(NULL),
+	fTrdHits(NULL),
+	fTrdPoints(NULL),
+	fTrdTrackMatches(NULL),
+	fTofPoints(NULL),
+	fTofHits(NULL),
+
+	fPropagator(),
+	fFilter(),
+	fFitter(),
+	fSmoother(),
+	fParallelFitter(),
+
+	fPropagationHistos(),
+	fFilterHistos(),
+	fSmootherHistos(),
+
+	fNofParams(12),
+
+	fStsHistos(),
+
+	fPropagationWatch(),
+	fFitterWatch(),
+	fSmootherWatch(),
+
+	fVerbose(1),
+	fEvents(0),
+
+	fIsTestFastPropagation(true),
+
+	fIsDrawPropagation(false),
+	fIsDrawFilter(true),
+	fIsDrawSmoother(false),
+
+	fIsCloseCanvas(true),
+
+	fOutputDir(""),
+
+	fIsFixedBounds(true),
+
+	fPlaneNoPhd(13),
+
+	fSigma(),
+	fRms()
 {
-	fVerbose = 1;
-	fEvents = 0;
-	fNofParams = 12;
-	fNofPlanes = 14;
-	fNofTrdHits = 0;
-	fNofMuchHits = 13;
-	fNofTofHits = 1;
-	fPDGCode = -1;
-
-	fIsTestFastPropagation = true;
-
-	fIsDrawPropagation = false;
-	fIsDrawFilter = true;
-	fIsDrawSmoother = false;
-	fIsCloseCanvas = true;
-
-	fIsFixedBounds = false;
-
-	fPlaneNoPhd = 13;
-
-	fOutputDir = "";
 }
 
 CbmLitPropagationAnalysis::~CbmLitPropagationAnalysis()

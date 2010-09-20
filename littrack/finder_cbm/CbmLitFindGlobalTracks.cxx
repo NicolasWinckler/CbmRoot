@@ -32,19 +32,40 @@
 #include <cmath>
 
 CbmLitFindGlobalTracks::CbmLitFindGlobalTracks():
-	fEventNo(0),
-	fTrackingType("branch"),
-	fMergerType("nearest_hit"),
-	fFitterType("lit_kalman"),
+	fIsElectronSetup(false),
+	fIsTrd(false),
+	fIsMuch(false),
+	fIsTof(false),
+
 	fStsTracks(NULL),
+	fStsHits(NULL),
 	fMuchPixelHits(NULL),
 	fMuchStrawHits(NULL),
 	fMuchTracks(NULL),
 	fTrdHits(NULL),
 	fTrdTracks(NULL),
 	fTofHits(NULL),
-	fGlobalTracks(NULL)
+	fGlobalTracks(NULL),
+
+	fLitStsTracks(),
+	fLitHits(),
+	fLitTofHits(),
+	fLitOutputTracks(),
+
+	fFinder(),
+	fMerger(),
+	fFitter(),
+
+	fTrackingType("branch"),
+	fMergerType("nearest_hit"),
+	fFitterType("lit_kalman"),
+
+	fTrackingWatch(),
+	fMergerWatch(),
+
+	fEventNo(0)
 {
+
 }
 
 CbmLitFindGlobalTracks::~CbmLitFindGlobalTracks()

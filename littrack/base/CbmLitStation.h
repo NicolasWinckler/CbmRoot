@@ -11,7 +11,9 @@
 class CbmLitStation
 {
 public:
-	CbmLitStation():fType(kLITPIXELHIT){};
+	CbmLitStation():
+		fType(kLITPIXELHIT),
+		fSubstations() {};
 	virtual ~CbmLitStation(){};
 
 	void SetType(LitHitType type) {fType = type;}

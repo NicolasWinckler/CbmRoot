@@ -51,33 +51,80 @@ const Int_t TRUEALL = 3;
 const Int_t FAKEALL = 4;
 
 CbmLitReconstructionQa::CbmLitReconstructionQa():
-  FairTask("LitReconstructionQA", 1)
+	FairTask("LitReconstructionQA", 1),
+
+	fMinNofPointsSts(4),
+	fMinNofPointsTrd(8),
+	fMinNofPointsMuch(10),
+	fMinNofPointsTof(1),
+	fQuota(0.7),
+
+	fMinNofHitsTrd(8),
+	fMinNofHitsMuch(10),
+
+	fIsElectronSetup(false),
+	fIsSts(false),
+	fIsTrd(false),
+	fIsMuch(false),
+	fIsTof(false),
+
+	fRefMomentum(2.),
+	fMinMom(0.),
+	fMaxMom(25.),
+	fNofBinsMom(25),
+	fMinAngle(0.),
+	fMaxAngle(30.),
+    fNofBinsAngle(3),
+
+    fMcStsMap(),
+    fMcHalfGlobalMap(),
+    fMcGlobalMap(),
+
+	fMCTracks(NULL),
+	fGlobalTracks(NULL),
+	fStsMatches(NULL),
+	fMuchPixelHits(NULL),
+	fMuchStrawHits(NULL),
+	fMuchMatches(NULL),
+	fTrdMatches(NULL),
+	fTrdHits(NULL),
+	fTofPoints(NULL),
+	fTofHits(NULL),
+
+	fNofCategories(6),
+	fNofTypes(3),
+
+	fhStsMom(),
+	fhStsNp(),
+	fhStsAngle(),
+	fhHalfGlobalMom(),
+	fhGlobalMom(),
+	fhRecMom(),
+	fhRecNp(),
+	fhRecAngle(),
+	fhTofMom(),
+
+	fhStsGhostNh(NULL),
+	fhRecGhostNh(NULL),
+
+	fhTrdNofHitsInStation(NULL),
+	fhMuchNofHitsInStation(NULL),
+	fhTofNofHitsInStation(NULL),
+
+	fhStsTrackHits(),
+	fhTrdTrackHits(),
+	fhMuchTrackHits(),
+
+	fHistoList(NULL),
+
+	fNofGlobalTracks(0),
+	fNofStsTracks(0),
+	fNofTrdTracks(0),
+	fNofMuchTracks(0),
+	fNofTofHits(0),
+	fEventNo(0),
+	fOutputDir("")
 {
-	fEventNo = 0;
-	fVerbose = 1;
-	fMinNofPointsSts = 4;
-	fMinNofPointsTrd = 8;
-	fMinNofPointsMuch = 10;
-	fMinNofPointsTof = 1;
-	fQuota = 0.7;
-	fMinNofHitsTrd = 8;
-	fMinNofHitsMuch = 10;
-	fRefMomentum = 2.;
-	fMinMom = 0.;
-	fMaxMom = 25.;
-	fMinAngle = 0.;
-	fMaxAngle = 30.;
-        fNofBinsAngle = 3;
-	fNofTypes = 3;
-	fNofCategories = 6;
-
-	fNofGlobalTracks = 0;
-	fNofStsTracks = 0;
-	fNofTrdTracks = 0;
-	fNofMuchTracks = 0;
-	fNofTofHits = 0;
-
-	fOutputDir = "";
 }
 
 CbmLitReconstructionQa::~CbmLitReconstructionQa()

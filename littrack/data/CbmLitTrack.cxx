@@ -11,20 +11,42 @@
 #include <sstream>
 #include <cmath>
 
-CbmLitTrack::CbmLitTrack() :
+CbmLitTrack::CbmLitTrack():
+	fHits(),
+	fParamFirst(),
+	fParamLast(),
+	fFitNodes(),
 	fQuality(kLITGOOD),
 	fChi2(0),
 	fNDF(0),
 	fPreviousTrackId(0),
 	fLastPlaneId(0),
 	fPDG(211),
-	fNofMissingHits(0)
+	fNofMissingHits(0),
+	fRefId(-1)
 {
 }
 
 CbmLitTrack::~CbmLitTrack()
 {
 	ClearHits();
+}
+
+CbmLitTrack::CbmLitTrack(const CbmLitTrack& track):
+	fHits(),
+	fParamFirst(),
+	fParamLast(),
+	fFitNodes(),
+	fQuality(kLITGOOD),
+	fChi2(0),
+	fNDF(0),
+	fPreviousTrackId(0),
+	fLastPlaneId(0),
+	fPDG(211),
+	fNofMissingHits(0),
+	fRefId(-1)
+{
+	*this = track;
 }
 
 CbmLitTrack& CbmLitTrack::operator=(

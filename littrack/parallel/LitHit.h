@@ -15,6 +15,14 @@ template<class T>
 class LitStripHit
 {
 public:
+	LitStripHit():
+		phiCos(0.),
+		phiSin(0.),
+		U(0.),
+		Du(0.) {}
+
+	virtual ~LitStripHit() {}
+
 	T phiCos;
 	T phiSin;
 	T U;
@@ -34,6 +42,15 @@ template<class T>
 class LitPixelHit
 {
 public:
+	LitPixelHit():
+		X(0.),
+		Y(0.),
+		Dx(0.),
+		Dy(0.),
+		Dxy(0.) {}
+
+	virtual ~LitPixelHit() {}
+
 	T X, Y;
 	T Dx, Dy;
 	T Dxy;
@@ -53,6 +70,17 @@ typedef LitPixelHit<fvec> LitPixelHitVec;
 class LitScalStripHit
 {
 public:
+	LitScalStripHit():
+		phiCos(0.),
+		phiSin(0.),
+		U(0.),
+		Du(0.),
+		planeId(0),
+		refId(0),
+		Z(0.) {}
+
+	virtual ~LitScalStripHit(){}
+
 	fscal phiCos;
 	fscal phiSin;
 	fscal U;
@@ -74,6 +102,18 @@ public:
 class LitScalPixelHit
 {
 public:
+	LitScalPixelHit():
+		X(0.),
+		Y(0.),
+		Dx(0.),
+		Dy(0.),
+		Dxy(0.),
+		planeId(0),
+		refId(0),
+		Z(0.) {}
+
+	virtual ~LitScalPixelHit() {}
+
 	fscal X, Y;
 	fscal Dx, Dy;
 	fscal Dxy;

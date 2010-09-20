@@ -16,6 +16,21 @@ template<class T>
 class LitMaterialInfo
 {
 public:
+	LitMaterialInfo():
+		Thickness(0.),
+		X0(0.),
+		Rho(0.),
+		Z(0.),
+		A(0.),
+		Zpos(0.),
+		RadThick(0.),
+		SqrtRadThick(0.),
+		LogRadThick(0.),
+		I(0.),
+		ElLoss(0.) {}
+
+	virtual ~LitMaterialInfo() {}
+
 	T Thickness; // Thickness of the material [cm]
 	T X0; // Radiation length [cm]
 	T Rho; // Density [g/cm^3]

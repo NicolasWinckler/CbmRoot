@@ -25,7 +25,8 @@ public:
 		fIsOutlier(false),
 		fHitType(kLITPIXELHIT),
 		fZ(0.),
-		fDz(0.) {};
+		fDz(0.),
+		fDetectorId(kLITTRD){};
 
 	/* Destructor */
 	virtual ~CbmLitHit() {};

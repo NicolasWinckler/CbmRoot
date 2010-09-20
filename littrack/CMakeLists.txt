@@ -151,6 +151,7 @@ If(TBB_FOUND)
       ${LITTRACK_SRCS_RULECHECKER}
       finder/CbmLitTrackFinderNNParallel.cxx
       parallel/LitTrackFinderNNBase.cxx
+      parallel/electron/LitTrackFinderNNBaseElectron.cxx
       parallel/electron/LitTrackFinderNNScalarElectron.cxx
       parallel/muon/LitTrackFinderNNVecMuon.cxx
       qa/CbmLitParallelTrackFitterTest.cxx 
@@ -248,13 +249,13 @@ IF (SSE_TRUE)
   MESSAGE(STATUS "SSE extensions available")
   ADD_DEFINITIONS(-DHAVE_SSE)
   SET_SOURCE_FILES_PROPERTIES(${LITTRACK_SRCS} PROPERTIES COMPILE_FLAGS 
-  "-msse -O3 -Wall")
+  "-msse -O3 -Weffc++")
 ELSE (SSE_TRUE)
   MESSAGE (STATUS "*********************************************************************************")
   MESSAGE(STATUS "NO SSE extensions available.")
   MESSAGE (STATUS "*********************************************************************************")
   SET_SOURCE_FILES_PROPERTIES(${LITTRACK_SRCS} PROPERTIES COMPILE_FLAGS 
-  "-O3 -Wall")
+  "-O3 -Weffc++")
 ENDIF (SSE_TRUE)
 
 

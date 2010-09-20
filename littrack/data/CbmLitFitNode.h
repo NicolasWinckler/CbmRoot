@@ -17,8 +17,14 @@ class CbmLitFitNode
 {
 public:
 	/* Constructor */
-	CbmLitFitNode() {
-		fF.resize(25);
+	CbmLitFitNode():
+		fF(25, 0.),
+		fPredictedParam(),
+		fUpdatedParam(),
+		fSmoothedParam(),
+		fChiSqFiltered(0.),
+		fChiSqSmoothed(0.)
+	{
 	}
 
 	/* Destructor */

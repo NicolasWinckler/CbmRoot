@@ -18,6 +18,8 @@ const unsigned char MAX_NOF_HITS_IN_TRACK = 30;
 class LitScalTrack {
 public:
 	LitScalTrack():
+		paramFirst(),
+		paramLast(),
 		chiSq(0.),
 		NDF(1),
 		nofHits(0),

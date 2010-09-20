@@ -48,7 +48,7 @@ void makeUpProfile(TProfile* prof, TString titleX, TString titleY)
   }
 }
 
-void Draw_L1_histo() {
+void Draw_L1_histo(TString filePrefix = "L1_histo") {
 
     // ============================ Set Styles ============================
   TStyle *histoStyle = new TStyle("histoStyle","Plain Style(no colors/fill areas)");
@@ -92,7 +92,10 @@ void Draw_L1_histo() {
 
   histoStyle->SetStatFont(textFont);
 
-
+//  histoStyle->SetGridStyle(5);
+  histoStyle->SetGridColor(10);
+//  histoStyle->SetGridWidth(0);
+  
   
   TStyle *profStyle = new TStyle("profStyle","Plain Style(no colors/fill areas)");
 //   TStyle *profStyle = gStyle;
@@ -106,12 +109,16 @@ void Draw_L1_histo() {
   profStyle->SetOptTitle(0); // without main up title
   profStyle->SetOptStat(0);
   profStyle->SetOptFit(0);
+  
+  profStyle->SetGridStyle(3);
+  
 
 
     // ============================ Open file ============================
 
-  const TString fileName = "L1_histo.root";
 
+  TString fileName = filePrefix+".root";
+  cout << "Read histo from file " << fileName << endl;
   TFile *fileIn = new TFile(fileName.Data(),"read");
 
   FILE *ress, *pulls;
@@ -245,8 +252,9 @@ void Draw_L1_histo() {
 
 //   c1->SaveAs("histo.png");
 
-  system("mkdir L1_histo -p");
-  chdir( "L1_histo" );
+  const TString command = "mkdir " + filePrefix + " -p";
+  system( command.Data() );
+  chdir( filePrefix.Data() );
   const int nParts = 2;
   int iPart = 1;
   histoStyle->cd();
@@ -254,6 +262,9 @@ void Draw_L1_histo() {
   if (!divide) c2 = new TCanvas("c2","c2",0,0,900,600);
           else c2 = new TCanvas("c2","c2",0,0,900*nParts,600*nParts);
   if (divide) c2->Divide(nParts, nParts);
+  
+  c2->SetGridx(1);
+  c2->SetGridy(1);
   
   histoStyle->cd();
   c2->cd();

@@ -20,6 +20,7 @@
 #include "LitHitDataElectron.h"
 #include "../LitTrackFinderNNBase.h"
 #include "../LitTrackFinder.h"
+#include "LitTrackFinderNNBaseElectron.h"
 
 #include "CbmLitPtrTypes.h"
 
@@ -27,9 +28,10 @@ class CbmLitField;
 
 //#define cnst static const fvec
 
-const unsigned int MAX_NOF_TRACKS_ELECTRON = 1500;
+//const unsigned int MAX_NOF_TRACKS_ELECTRON = 1500;
 
-class LitTrackFinderNNScalarElectron : public LitTrackFinderNNBase,
+class LitTrackFinderNNScalarElectron : public LitTrackFinderNNBaseElectronScal,
+	                                   public LitTrackFinderNNBase,
                                        public LitTrackFinder
 {
 public:
@@ -54,14 +56,6 @@ public:
 	}
 
 public:
-	void ArrangeHits(
-			LitScalPixelHit* hits[],
-			unsigned int nofHits);
-
-	void InitTrackSeeds(
-			LitScalTrack* trackSeeds[],
-			unsigned int nofTrackSeeds);
-
 	void FollowTracks();
 
 	void PropagateToFirstStation(
@@ -87,18 +81,19 @@ public:
 			int station);
 
 private:
-	LitScalTrack* fTracks[MAX_NOF_TRACKS_ELECTRON]; // local copy of tracks
-	unsigned int fNofTracks;
+//	LitScalTrack* fTracks[MAX_NOF_TRACKS_ELECTRON]; // local copy of tracks
+//	unsigned int fNofTracks;
 
-	LitDetectorLayoutElectronScal fLayout; // detector geometry
-	LitHitDataElectronScal fHitData; // arranged hits
+//	LitDetectorLayoutElectronScal fLayout; // detector geometry
+//	LitHitDataElectronScal fHitData; // arranged hits
 
-	unsigned char fMaxNofMissingHits;
+//	unsigned char fMaxNofMissingHits;
 //	fscal fSigmaCoef;
 //	fscal fMaxCovSq;
 
 	TrackExtrapolatorPtr fExtrapolator;
 	TrackPropagatorPtr fPropagator;
+	TrackUpdatePtr fFilter;
 	CbmLitField* fField;
 };
 

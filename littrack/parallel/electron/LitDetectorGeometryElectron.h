@@ -26,7 +26,12 @@ template<class T>
 class LitStationElectron
 {
 public:
-	LitStationElectron():nofMaterialsBefore(0), nofMaterialsAfter(0) {}
+	LitStationElectron():
+		nofMaterialsBefore(0),
+		nofMaterialsAfter(0),
+		Z(0.){}
+
+	virtual ~LitStationElectron();
 
 	T Z;
 	LitMaterialInfo<T> materialsBefore[MAX_NOF_MATERIAL_LAYERS_PER_STATION_BEFORE];
@@ -85,6 +90,14 @@ template<class T>
 class LitVirtualPlaneElectron
 {
 public:
+	LitVirtualPlaneElectron():
+		Z(0),
+		material(),
+		fieldSlice(),
+		fieldSliceMid(){}
+
+	virtual ~LitVirtualPlaneElectron() {}
+
 	T Z;
 	LitMaterialInfo<T> material;
 	LitFieldSlice<T> fieldSlice;
@@ -116,7 +129,8 @@ template<class T>
 class LitStationGroupElectron
 {
 public:
-	LitStationGroupElectron():nofStations(0) {}
+	LitStationGroupElectron():
+		nofStations(0) {}
 
 	virtual ~LitStationGroupElectron() {}
 
@@ -164,6 +178,9 @@ class LitDetectorLayoutElectron
 {
 public:
 	LitDetectorLayoutElectron():nofStationGroups(0), nofVirtualPlanes(0){};
+
+	virtual ~LitDetectorLayoutElectron() {}
+
 
 	void AddStationGroup(const LitStationGroupElectron<T>& stationGroup) {
 		stationGroups[nofStationGroups++] = stationGroup;

@@ -12,6 +12,8 @@
 #include "CbmLitEnvironment.h"
 #include "CbmLitMapField.h"
 #include "CbmLitToolFactory.h"
+#include "CbmLitPixelHit.h"
+#include "CbmLitKalmanFilter.h"
 
 #include <algorithm>
 #include <iostream>
@@ -53,8 +55,7 @@ public:
 };
 #endif
 
-LitTrackFinderNNScalarElectron::LitTrackFinderNNScalarElectron():
-	fMaxNofMissingHits(3)
+LitTrackFinderNNScalarElectron::LitTrackFinderNNScalarElectron()
 {
 	CbmLitEnvironment* env = CbmLitEnvironment::Instance();
 	fField = new CbmLitMapField(env->GetField());
@@ -62,9 +63,11 @@ LitTrackFinderNNScalarElectron::LitTrackFinderNNScalarElectron():
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
 	fExtrapolator = factory->CreateTrackExtrapolator("lit");
 	fPropagator = factory->CreateTrackPropagator("lit");
+	fFilter = factory->CreateTrackUpdate("kalman");
 
 	SetSigmaCoef(5.);
 	SetMaxCovSq(20.*20.);
+	SetMaxNofMissingHits(3);
 
 #ifdef LIT_USE_TBB
 	tbb::task_scheduler_init init;
@@ -101,63 +104,6 @@ void LitTrackFinderNNScalarElectron::DoFind(
 //	for_each(fTracks.begin(), fTracks.end(), DeleteObject());
 //	fTracks.clear();
 	fHitData.Clear();
-}
-
-void LitTrackFinderNNScalarElectron::ArrangeHits(
-		LitScalPixelHit* hits[],
-		unsigned int nofHits)
-{
-	// TODO : add threads here
-    for(unsigned int i = 0; i < nofHits; i++) {
-    	LitScalPixelHit* hit = hits[i];
-//    	if (fUsedHitsSet.find(hit->GetRefId()) != fUsedHitsSet.end()) continue;
-     	fHitData.AddHit(hit->planeId, hit);
-    }
-//    std::cout << fHitData;
-
-    // TODO : add threads here
-    for (int i = 0; i < fLayout.GetNofStationGroups(); i++){
-    	for (int j = 0; j < fLayout.GetNofStations(i); j++){
-			LitScalPixelHit** shits = fHitData.GetHits(i, j);
-			LitScalPixelHit** begin = &shits[0];
-			LitScalPixelHit** end = &shits[0] + fHitData.GetNofHits(i, j);
-
-#ifdef LIT_USE_TBB
-    		tbb::parallel_sort(begin, end, ComparePixelHitXLess());
-#else
-    		std::sort(begin, end, ComparePixelHitXLess());
-#endif
-    	}
-    }
-
-//    std::cout << fHitData;
-}
-
-void LitTrackFinderNNScalarElectron::InitTrackSeeds(
-		LitScalTrack* trackSeeds[],
-		unsigned int nofTrackSeeds)
-{
-//	tbb::parallel_for(tbb::blocked_range<unsigned int>(0, seeds.size()),
-//	    				InitTrackSeedsClass(seeds, fTracks), tbb::auto_partitioner());
-
-	fNofTracks = 0;
-	fscal QpCut = 1./0.1;
-	//TODO : add threads here
-	for (unsigned int i = 0; i < nofTrackSeeds; i++) {
-		LitScalTrack* track = trackSeeds[i];
-		if (fabs(track->paramLast.Qp) > QpCut) continue;
-//		if (fUsedSeedsSet.find((*track)->GetPreviousTrackId()) != fUsedSeedsSet.end()) continue;
-//		track->SetPDG(fPDG);
-		track->previouseTrackId = i;
-//		std::cout << track->previouseTrackId << "   ";
-
-		LitScalTrack* newTrack = new LitScalTrack(*track);
-//		newTrack->paramFirst = newTrack->paramLast;
-		newTrack->paramLast = newTrack->paramFirst;
-		fTracks[fNofTracks++] = newTrack;
-//		fTracks.push_back(newTrack);
-	}
-//	std::cout << "TrackSeed.size=" << seeds.size() << ", created:" << fTracks.size() << std::endl;
 }
 
 void LitTrackFinderNNScalarElectron::FollowTracks()
@@ -294,8 +240,22 @@ bool LitTrackFinderNNScalarElectron::AddNearestHit(
 		lhit.Dy = hit->Dy;
 		lhit.Dxy = hit->Dxy;
 
-		//First update track parameters with KF, than check whether the hit is in the validation gate.
+//		//First update track parameters with KF, than check whether the hit is in the validation gate.
+//		CbmLitTrackParam par;
+//		CbmLitPixelHit mhit;
+//		mhit.SetX(lhit.X);
+//		mhit.SetY(lhit.Y);
+//		mhit.SetDx(lhit.Dx);
+//		mhit.SetDy(lhit.Dy);
+//		mhit.SetDxy(lhit.Dxy);
+//		mhit.SetHitType(kLITPIXELHIT);
+//		LitTrackParamScalToCbmLitTrackParam(&upar, &par);
+//		fFilter->Update(&par, &mhit);
+//	    CbmLitTrackParamToLitTrackParamScal(&par, &upar);
+
 		LitFiltration(upar, lhit);
+
+
 		static const fscal CHISQCUT = 50.;
 		fscal chisq = ChiSq(upar, lhit);
 

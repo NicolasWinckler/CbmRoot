@@ -31,7 +31,7 @@ public:
 		nofMaterialsAfter(0),
 		Z(0.){}
 
-	virtual ~LitStationElectron();
+	virtual ~LitStationElectron() {};
 
 	T Z;
 	LitMaterialInfo<T> materialsBefore[MAX_NOF_MATERIAL_LAYERS_PER_STATION_BEFORE];

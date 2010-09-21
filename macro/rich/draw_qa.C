@@ -33,10 +33,10 @@ void draw_diff_true_fake(TH1D* h1, TH1D* h2)
 }
 
 void draw_qa(){
-        TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.recorich.root");
-       // TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/test_electrons/rich.reco.0000.root");
+        //TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.recorich.root");
+    TFile *file = new TFile("/d/cbm02/slebedev/rich/JUL09/rho0/hist.root");
 	TDirectory *current = gDirectory;
-        current->cd("RichRingQaHist");
+    current->cd("RichRingQaHist");
 
    // gROOT->SetStyle("Plain");
    // gStyle->SetPalette(1,0);
@@ -121,7 +121,6 @@ void draw_qa(){
 
     TCanvas *c7 = new TCanvas("c7","c7",500,500);
     fh_HitsXY->Draw("COLZ");
-
 
     cout << "Electron ring finding efficiency = " << (Double_t)fh_RecElRingsMom->GetEntries()/
                             (Double_t)fh_AccElRingsMom->GetEntries() << endl;

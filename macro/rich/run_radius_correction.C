@@ -6,7 +6,8 @@
     E-mail : S.Lebedev@gsi.de
 */
 #include <vector>
-
+#include "../../littrack/utils/CbmLitDrawHist.cxx"
+#include "../../littrack/utils/CbmLitUtils.cxx"
 void run_radius_correction ()
 {
     TStopwatch timer;
@@ -21,9 +22,13 @@ void run_radius_correction ()
     gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
     cbmlibs();
 
+   // gROOT->LoadMacro("$VMCWORKDIR/macro/rich/setstyle.C");
+   // setphdStyle();
+    SetStyles();
+
     char fileMC[200], fileRec[200];
 
-    sprintf(fileMC,"/d/cbm02/slebedev/rich/MAR09/correction.mc.0001.root");
+    sprintf(fileMC,"/d/cbm02/slebedev/rich/JUL09/correction/mc.00.root");
     cout<<fileMC<<endl;
     TFile *f1 = new TFile(fileMC,"R");
     TTree* t1 = f1->Get("cbmsim");
@@ -31,7 +36,7 @@ void run_radius_correction ()
     TClonesArray* fMCTracks = (TClonesArray*) fd1->FindObjectAny("MCTrack");
     t1->SetBranchAddress(fMCTracks->GetName(),&fMCTracks);
 
-    sprintf(fileRec, "/d/cbm02/slebedev/rich/MAR09/correction.reco.0001.root");
+    sprintf(fileRec, "/d/cbm02/slebedev/rich/JUL09/correction/reco.00.root");
     TFile *f = new TFile(fileRec,"R");
     TTree* t = f->Get("cbmsim");
     TFolder *fd = f->Get("cbmout");
@@ -40,8 +45,10 @@ void run_radius_correction ()
     TClonesArray *fRichMatches = (TClonesArray*) fd->FindObjectAny("RichRingMatch");
     t->SetBranchAddress(fRichMatches->GetName(),&fRichMatches);
 
-    Int_t fNofBinsX = 40;
-    Int_t fNofBinsY = 50;
+    //Int_t fNofBinsX = 40;
+    //Int_t fNofBinsY = 50;
+    Int_t fNofBinsX = 25;
+    Int_t fNofBinsY = 25;
     ///A axis
     TH2D* fh_axisAXYCount;
     TH2D* fh_axisAXYW;
@@ -57,25 +64,25 @@ void run_radius_correction ()
     TH2D* fh_axisBSigma;
     TH2D* mapaxisBXY;
 
-	mapaxisAXY = new TH2D("fh_mapaxisAXY","dA distribution (x,y);X, [cm];Y, [cm]",fNofBinsX,-200,200,fNofBinsY,-250,250);
-	mapaxisBXY = new TH2D("fh_mapaxisBXY","dB distribution (x,y);X, [cm];Y, [cm]",fNofBinsX,-200,200,fNofBinsY,-250,250);
+    mapaxisAXY = new TH2D("fh_mapaxisAXY","dA distribution (x,y);X, [cm];Y, [cm]",fNofBinsX,-200,200,fNofBinsY,-250,250);
+    mapaxisBXY = new TH2D("fh_mapaxisBXY","dB distribution (x,y);X, [cm];Y, [cm]",fNofBinsX,-200,200,fNofBinsY,-250,250);
     fh_axisAXYCount = new TH2D("fh_axisAXYCount","A Count",fNofBinsX,-200,200,fNofBinsY,-250,250);
     fh_axisAXYW = new TH2D("fh_axisAXYW","",fNofBinsX,-200,200,fNofBinsY,-250,250);
     fh_axisBXYCount = new TH2D("fh_axisBXYCount","B Count",fNofBinsX,-200,200,fNofBinsY,-250,250);
     fh_axisBXYW = new TH2D("fh_axisBXYW","",fNofBinsX,-200,200,fNofBinsY,-250,250);
-	fh_axisAXY = new TH2D("fh_axisAXY","A distribution (x,y);X, [cm];Y, [cm]",fNofBinsX,-200,200,fNofBinsY,-250,250);
-	fh_axisBXY = new TH2D("fh_axisBXY","B distribution (x,y);X, [cm];Y, [cm]",fNofBinsX,-200,200,fNofBinsY,-250,250);
+    fh_axisAXY = new TH2D("fh_axisAXY","A distribution (x,y);X, [cm];Y, [cm]",fNofBinsX,-200,200,fNofBinsY,-250,250);
+    fh_axisBXY = new TH2D("fh_axisBXY","B distribution (x,y);X, [cm];Y, [cm]",fNofBinsX,-200,200,fNofBinsY,-250,250);
 
-    Double_t fMinAaxis = 3.;
-    Double_t fMaxAaxis = 8.;
+    Double_t fMinAaxis = 4.5;
+    Double_t fMaxAaxis = 7.5;
 
     ///Set Mean value of A and B axeses, Compact RICH
     //Double_t fMeanAaxis = 5.06;
     //Double_t fMeanBaxis = 4.65;
 
     ///Set Mean value of A and B axeses, Large RICH
-    Double_t fMeanAaxis = 6.158;
-    Double_t fMeanBaxis = 5.62;
+    Double_t fMeanAaxis = 6.17;
+    Double_t fMeanBaxis = 5.6;
 
     Int_t nEvents=t->GetEntries();
     cout<<" nEvents ="<<nEvents<<endl;
@@ -145,25 +152,25 @@ void run_radius_correction ()
         }
     }
 
-    c1_0 = new TCanvas("c1_0","c1_0",10,10,800,800);
+    c1_0 = new TCanvas("c1_0","c1_0",10,10,600,600);
     c1_0->Divide(1,2);
     c1_0->cd(1);
     fh_axisAXYCount->Draw("COLZ");
     c1_0->cd(2);
     fh_axisBXYCount->Draw("COLZ");
 
-    c1 = new TCanvas("c1","c1",10,10,800,800);
+    c1 = new TCanvas("c1","c1",10,10,600,600);
     c1->Divide(1,2);
     c1->cd(1);
     fh_axisAXY->SetMinimum(5.0);
-    fh_axisAXY->SetMaximum(7.0);
+    fh_axisAXY->SetMaximum(6.4);
     fh_axisAXY->Draw("COLZ");
     c1->cd(2);
     fh_axisBXY->SetMinimum(5.0);
-    fh_axisBXY->SetMaximum(6.5);
+    fh_axisBXY->SetMaximum(6.0);
     fh_axisBXY->Draw("COLZ");
 
-    c2 = new TCanvas("c2","c2",10,10,800,800);
+    c2 = new TCanvas("c2","c2",10,10,600,600);
     c2->Divide(1,2);
     c2->cd(1);
     mapaxisAXY->SetMinimum(-0.5);
@@ -176,11 +183,11 @@ void run_radius_correction ()
 
 
 ///// Check correction procedure
-    TH1D* fh_Abefore = new TH1D("fh_Abefore","A before;radius, [cm]", 90, 0., 9.);;
-    TH1D* fh_Bbefore= new TH1D("fh_Bbefore","B before;radius, [cm]", 90, 0., 9.);;
+    TH1D* fh_Abefore = new TH1D("fh_Abefore","A before;A, [cm];yield", 300, 0., 9.);;
+    TH1D* fh_Bbefore= new TH1D("fh_Bbefore","B before;B, [cm];yield", 300, 0., 9.);;
 
-    TH1D* fh_A = new TH1D("fh_A","A after;radius, [cm]", 90, 0., 9.);;
-    TH1D* fh_B = new TH1D("fh_B","B after;radius, [cm]", 90, 0., 9.);;
+    TH1D* fh_A = new TH1D("fh_A","A after;A, [cm];yield", 300, 0., 9.);;
+    TH1D* fh_B = new TH1D("fh_B","B after;B, [cm];yield", 300, 0., 9.);;
 
     cout <<"Check correction procedure......" << endl;
     for(Int_t ievent=0;ievent<nEvents;ievent++ ) {
@@ -235,9 +242,10 @@ void run_radius_correction ()
 
 
   //  gStyle->SetOptStat(0);
-    c3 = new TCanvas("c3","c3",10,10,800,800);
+    c3 = new TCanvas("c3","c3",10,10,600,600);
     c3->Divide(2,2);
     c3->cd(1);
+    fh_Abefore->Scale(1./fh_Abefore->Integral());
     fh_Abefore->SetMaximum(fh_Abefore->GetMaximum()*1.3);
     fh_Abefore->Draw();
     fh_Abefore->SetAxisRange(fMinAaxis, fMaxAaxis);
@@ -248,8 +256,11 @@ void run_radius_correction ()
     TText* txtAb = new TText(4.3, fh_Abefore->GetMaximum()*0.85, sigmaTxtAb);
     txtAb->SetTextSize(0.1);
     txtAb->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
 
     c3->cd(2);
+    fh_Bbefore->Scale(1./fh_Bbefore->Integral());
     fh_Bbefore->SetMaximum(fh_Bbefore->GetMaximum()*1.3);
     fh_Bbefore->Draw();
     fh_Bbefore->SetAxisRange(fMinAaxis, fMaxAaxis);
@@ -260,8 +271,11 @@ void run_radius_correction ()
     TText* txtBb = new TText(4.3, fh_Bbefore->GetMaximum()*0.85, sigmaTxtBb);
     txtBb->SetTextSize(0.1);
     txtBb->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
 
     c3->cd(3);
+    fh_A->Scale(1./fh_A->Integral());
     fh_A->SetMaximum(fh_A->GetMaximum()*1.3);
     fh_A->SetAxisRange(fMinAaxis, fMaxAaxis);
     fh_A->Draw();
@@ -272,8 +286,11 @@ void run_radius_correction ()
     TText* txtA = new TText(4.3, fh_A->GetMaximum()*0.85, sigmaTxtA);
     txtA->SetTextSize(0.1);
     txtA->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
 
     c3->cd(4);
+    fh_B->Scale(1./fh_B->Integral());
     fh_B->SetMaximum(fh_B->GetMaximum()*1.3);
     fh_B->SetAxisRange(fMinAaxis, fMaxAaxis);
     fh_B->Draw();
@@ -284,6 +301,9 @@ void run_radius_correction ()
     TText* txtB = new TText(4.3, fh_B->GetMaximum()*0.85, sigmaTxtB);
     txtB->SetTextSize(0.1);
     txtB->Draw();
+    gPad->SetGridx(true);
+    gPad->SetGridy(true);
+
 
 /// Write correction map to the file
     TFile *file = new TFile("radius_correction_map.root", "recreate");

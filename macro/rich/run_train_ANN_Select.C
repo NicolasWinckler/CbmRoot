@@ -49,10 +49,10 @@ void run_train_ANN_Select(){
         }
     }
 
-    TMultiLayerPerceptron network("x1,x2,x3,x4,x5,x6:10:x11",simu,"Entry$+1");
+    TMultiLayerPerceptron network("x1,x2,x3,x4,x5,x6:5:x11",simu,"Entry$+1");
     network.LoadWeights("/u/slebedev/JUL09/trunk/parameters/rich/NeuralNet_RingSelection_Weights_Compact.txt");
    // network.Train(500,"text,update=1");
-  //  network.DumpWeights("NeuralNet_RingSelection_Weights1.txt");
+   // network.DumpWeights("NeuralNet_RingSelection_Weights1.txt");
     network.Export();
     Double_t minEval = -1.3;
     Double_t maxEval = 1.3;

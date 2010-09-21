@@ -1,6 +1,6 @@
-void run_sim_geotest(Int_t nElectrons = 500, Int_t nEvents = 1000)
+void run_sim_geotest(Int_t nElectrons = 500, Int_t nEvents = 250)
 {
-    nEvents = 1;
+  //  nEvents = 10;
 
   TString outDir  = "/d/cbm02/slebedev/rich/JUL09/correction/";
   char txt[200];

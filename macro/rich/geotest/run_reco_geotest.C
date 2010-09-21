@@ -1,5 +1,5 @@
 
-void run_reco_geotest(Int_t nEvents = 1000)
+void run_reco_geotest(Int_t nEvents = 250)
 {
 
   // ========================================================================

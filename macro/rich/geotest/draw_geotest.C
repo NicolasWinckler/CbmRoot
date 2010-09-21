@@ -11,7 +11,7 @@ void draw_geotest() {
 	gStyle->SetPalette(1,0);
 
 
-	TFile* fcompact = new TFile ("/home/semeon/d/rich/reco.00.root");
+	TFile* fcompact = new TFile ("/d/cbm06/user/slebedev/geotest/reco.00.root");
 
 
 	TCanvas* c1 = new TCanvas();

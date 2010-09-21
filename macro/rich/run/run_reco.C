@@ -33,6 +33,7 @@ void run_reco(Int_t nEvents = 700){
 	gROOT->LoadMacro("$VMCWORKDIR/macro/rich/cbmlibs.C");
 	cbmlibs();
 
+	gROOT->LoadMacro("$VMCWORKDIR/macro/littrack/determine_setup.C");
 	// -----   Reconstruction run   -------------------------------------------
 	FairRunAna *run= new FairRunAna();
 	if (inFile != "") run->SetInputFile(inFile);
@@ -81,39 +82,41 @@ void run_reco(Int_t nEvents = 700){
 	// =========================================================================
 	// ===                     TRD local reconstruction                      ===
 	// =========================================================================
+	if (IsTrd(parFile)) {
+		// Update of the values for the radiator F.U. 17.08.07
+		Int_t trdNFoils    = 130;      // number of polyetylene foils
+		Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
+		Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
+		Bool_t simpleTR = kTRUE;       // use fast and simple version for TR
+									 // production
 
-	// Update of the values for the radiator F.U. 17.08.07
-	Int_t trdNFoils    = 130;      // number of polyetylene foils
-	Float_t trdDFoils = 0.0013;    // thickness of 1 foil [cm]
-	Float_t trdDGap   = 0.02;      // thickness of gap between foils [cm]
-	Bool_t simpleTR = kTRUE;       // use fast and simple version for TR
-                                 // production
+		CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,
+										   trdDFoils, trdDGap);
 
-	CbmTrdRadiator *radiator = new CbmTrdRadiator(simpleTR , trdNFoils,
-                                       trdDFoils, trdDGap);
+		// -----   TRD hit producer   ----------------------------------------------
+		Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
+		// Resolutions in y - station and angle dependent [mum]
+		Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
+		Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
+		Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
 
-	// -----   TRD hit producer   ----------------------------------------------
-	Double_t trdSigmaX[] = {300, 400, 500};             // Resolution in x [mum]
-	// Resolutions in y - station and angle dependent [mum]
-	Double_t trdSigmaY1[] = {2700,   3700, 15000, 27600, 33000, 33000, 33000 };
-	Double_t trdSigmaY2[] = {6300,   8300, 33000, 33000, 33000, 33000, 33000 };
-	Double_t trdSigmaY3[] = {10300, 15000, 33000, 33000, 33000, 33000, 33000 };
+		CbmTrdHitProducerSmearing* trdHitProd = new
+			   CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
 
-	CbmTrdHitProducerSmearing* trdHitProd = new
-           CbmTrdHitProducerSmearing("TRD Hitproducer", "TRD task", radiator);
-
-	trdHitProd->SetSigmaX(trdSigmaX);
-	trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
-	run->AddTask(trdHitProd);
+		trdHitProd->SetSigmaX(trdSigmaX);
+		trdHitProd->SetSigmaY(trdSigmaY1, trdSigmaY2, trdSigmaY3);
+		run->AddTask(trdHitProd);
+	}// isTRD
 
 	// =========================================================================
 	// ===                     TOF local reconstruction                      ===
 	// =========================================================================
-
-	// ------   TOF hit producer   ---------------------------------------------
-	CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer",
-	  							iVerbose);
-	run->AddTask(tofHitProd);
+	if (IsTof(parFile)) {
+		// ------   TOF hit producer   ---------------------------------------------
+		CbmTofHitProducer* tofHitProd = new CbmTofHitProducer("TOF HitProducer",
+									iVerbose);
+		run->AddTask(tofHitProd);
+	} //isTof
 
 	// =========================================================================
 	// ===                        Global tracking                            ===
@@ -130,90 +133,89 @@ void run_reco(Int_t nEvents = 700){
 	run->AddTask(findVertex);
 
 
-	// -----   TRD track matching   --------------------------------------------
-	CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(iVerbose);
-	run->AddTask(trdMatchTracks);
-  
-      // ----------- TRD track Pid Wkn ----------------------
-    CbmTrdSetTracksPidWkn* trdSetTracksPidTask = new
-    CbmTrdSetTracksPidWkn("trdFindTracks","trdFindTracks");
-    run->AddTask(trdSetTracksPidTask);
+	if (IsTrd(parFile)) {
+		// -----   TRD track matching   --------------------------------------------
+		CbmTrdMatchTracks* trdMatchTracks = new CbmTrdMatchTracks(iVerbose);
+		run->AddTask(trdMatchTracks);
 
-    // ----------- TRD track Pid Ann ----------------------
-    CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new
-    CbmTrdSetTracksPidANN("Ann","Ann");
-    run->AddTask(trdSetTracksPidAnnTask);
+		  // ----------- TRD track Pid Wkn ----------------------
+		CbmTrdSetTracksPidWkn* trdSetTracksPidTask = new
+		CbmTrdSetTracksPidWkn("trdFindTracks","trdFindTracks");
+		run->AddTask(trdSetTracksPidTask);
 
-    // ----------- TRD track Pid Like ----------------------
-    // Since in the newest version of this method depends on the global
-    // track the task has to move after the global tracking
-    CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask = new
-    CbmTrdSetTracksPidLike("Likelihood","Likelihood");
-    run->AddTask(trdSetTracksPidLikeTask);
+		// ----------- TRD track Pid Ann ----------------------
+		CbmTrdSetTracksPidANN* trdSetTracksPidAnnTask = new
+		CbmTrdSetTracksPidANN("Ann","Ann");
+		run->AddTask(trdSetTracksPidAnnTask);
 
+		// ----------- TRD track Pid Like ----------------------
+		// Since in the newest version of this method depends on the global
+		// track the task has to move after the global tracking
+		CbmTrdSetTracksPidLike* trdSetTracksPidLikeTask = new
+		CbmTrdSetTracksPidLike("Likelihood","Likelihood");
+		run->AddTask(trdSetTracksPidLikeTask);
+	}//isTrd
 
     // =========================================================================
     // ===                        RICH reconstruction                        ===
     // =========================================================================
+	if (IsRich(parFile)) {
+		// ---------------------RICH Hit Producer ----------------------------------
+		Double_t richPmtRad  = 0.4;     // PMT radius [cm]
+		Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
+		Int_t    richDetType = 4;       // Detector type Hamamatsu H8500-03
+		Int_t    richNoise   = 220;     // Number of noise points per event
+		Double_t collectionEff = 1.0;
+		Double_t richSMirror = 0.1;     // Sigma for additional point smearing due to light scattering in mirror
+		CbmRichHitProducer* richHitProd
+			= new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
+					 richNoise, iVerbose, collectionEff,richSMirror);
+		run->AddTask(richHitProd);
 
-    // ---------------------RICH Hit Producer ----------------------------------
-    Double_t richPmtRad  = 0.4;     // PMT radius [cm]
-    Double_t richPmtDist = 0.;      // Distance between PMTs [cm]
-    Int_t    richDetType = 4;       // Detector type Hamamatsu H8500-03
-    Int_t    richNoise   = 220;     // Number of noise points per event
-    Double_t collectionEff = 1.0;
-    Double_t richSMirror = 0.1;     // Sigma for additional point smearing due to light scattering in mirror
-    CbmRichHitProducer* richHitProd
-		= new CbmRichHitProducer(richPmtRad, richPmtDist, richDetType,
-			     richNoise, iVerbose, collectionEff,richSMirror);
-    run->AddTask(richHitProd);
+		//----------------------RICH Track Extrapolation ---------------------------
+		Int_t    richNSts = 4;     // minimum number of STS hits for extrapolation
+		Double_t richZPos = 300.;  // z position for extrapolation [cm]
+		CbmRichTrackExtrapolation* richExtra
+			= new CbmRichTrackExtrapolationKF(richNSts, iVerbose);
+		CbmRichExtrapolateTracks* richExtrapolate = new CbmRichExtrapolateTracks();
+		richExtrapolate->UseExtrapolation(richExtra,richZPos);
+		run->AddTask(richExtrapolate);
 
-    //----------------------RICH Track Extrapolation ---------------------------
-    Int_t    richNSts = 4;     // minimum number of STS hits for extrapolation
-    Double_t richZPos = 300.;  // z position for extrapolation [cm]
-    CbmRichTrackExtrapolation* richExtra
-		= new CbmRichTrackExtrapolationKF(richNSts, iVerbose);
-    CbmRichExtrapolateTracks* richExtrapolate = new CbmRichExtrapolateTracks();
-    richExtrapolate->UseExtrapolation(richExtra,richZPos);
-    run->AddTask(richExtrapolate);
+		//--------------------- Rich Track Projection to photodetector -------------
+		Int_t richZFlag = 1;       // Projection from IM plane (default)
+		CbmRichProjectionProducer* richProj =
+				new CbmRichProjectionProducer(iVerbose, richZFlag);
+		run->AddTask(richProj);
 
-    //--------------------- Rich Track Projection to photodetector -------------
-    Int_t richZFlag = 1;       // Projection from IM plane (default)
-    CbmRichProjectionProducer* richProj =
-    		new CbmRichProjectionProducer(iVerbose, richZFlag);
-    run->AddTask(richProj);
+		//--------------------- RICH Ring Finding ----------------------------------
+		//CbmL1RichENNRingFinder* richFinder = new CbmL1RichENNRingFinder(iVerbose);
+		TString richGeoType = "compact";
+		CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose, richGeoType);
+		CbmRichFindRings* richFindRings = new CbmRichFindRings();
+		richFindRings->UseFinder(richFinder);
+		run->AddTask(richFindRings);
 
-    //--------------------- RICH Ring Finding ----------------------------------
-    //CbmL1RichENNRingFinder* richFinder = new CbmL1RichENNRingFinder(iVerbose);
-    TString richGeoType = "compact";
-    CbmRichRingFinderHough* richFinder = new CbmRichRingFinderHough(iVerbose, richGeoType);
-    CbmRichFindRings* richFindRings = new CbmRichFindRings();
-    richFindRings->UseFinder(richFinder);
-    run->AddTask(richFindRings);
+		//-------------------- RICH Ring Fitting -----------------------------------
+		CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, 1, richGeoType);
+		CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
+		run->AddTask(fitRings);
 
-    //-------------------- RICH Ring Fitting -----------------------------------
-    CbmRichRingFitter* richFitter = new CbmRichRingFitterEllipseTau(iVerbose, 1, richGeoType);
-    CbmRichFitRings* fitRings = new CbmRichFitRings("","",richFitter);
-    run->AddTask(fitRings);
-    //--------------------------------------------------------------------------
+		// ------------------- RICH Ring matching  ---------------------------------
+		CbmRichMatchRings* matchRings = new CbmRichMatchRings(0);
+		run->AddTask(matchRings);
 
-    // ------------------- RICH Ring matching  ---------------------------------
-    CbmRichMatchRings* matchRings = new CbmRichMatchRings(0);
-    run->AddTask(matchRings);
-    // -------------------------------------------------------------------------
+	    //--------------------- RICH ring-track assignment ------------------------
+		Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]
+		Int_t    richNPoints  = 5;   // Minmum number of hits on ring
+		CbmRichRingTrackAssign* richAssign   =
+				new CbmRichRingTrackAssignClosestD(richDistance, richNPoints, 3);
+		CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
+		assignTrack->UseAssign(richAssign);
+		run->AddTask(assignTrack);
 
-//  //--------------------- RICH ring-track assignment ------------------------
-    Double_t richDistance = 10.; // Max. dist. ring centre to track [cm]
-    Int_t    richNPoints  = 5;   // Minmum number of hits on ring
-    CbmRichRingTrackAssign* richAssign   =
-    		new CbmRichRingTrackAssignClosestD(richDistance, richNPoints, 3);
-    CbmRichAssignTrack* assignTrack = new CbmRichAssignTrack();
-    assignTrack->UseAssign(richAssign);
-    run->AddTask(assignTrack);
-
-    CbmRichRingQa* richQa   =  new CbmRichRingQa("Qa","qa", 0);
-    run->AddTask(richQa);
-
+		CbmRichRingQa* richQa   =  new CbmRichRingQa("Qa","qa", 0);
+		run->AddTask(richQa);
+	}//isRich
 
     // =========================================================================
     // ===                        ECAL reconstruction                        ===

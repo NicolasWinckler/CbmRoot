@@ -17,6 +17,8 @@ void run_sim(Int_t nEvents = 700)
 	Int_t NELECTRONS = 0;
 	Int_t NPOSITRONS = 0;
 	TString urqmd = ""; // If "yes" than UrQMD will be used as background
+	TString pluto = ""; // If "yes" PLUTO particles will be embedded
+	TString plutoFile = "";
 
 	if (script != "yes") {
 		inFile = "/d/cbm02/slebedev/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
@@ -40,6 +42,8 @@ void run_sim(Int_t nEvents = 700)
 		NELECTRONS = 5;
 		NPOSITRONS = 5;
 		urqmd = "yes";
+		pluto = "no";
+		plutoFile = "";
 	} else {
 		inFile = TString(gSystem->Getenv("INFILE"));
 		outFile = TString(gSystem->Getenv("MCFILE"));
@@ -63,6 +67,8 @@ void run_sim(Int_t nEvents = 700)
 		Int_t NPOSITRONS = TString(gSystem->Getenv("NPOSITRONS")).Atoi();
 		electrons = TString(gSystem->Getenv("ELECTRONS"));
 		urqmd = TString(gSystem->Getenv("URQMD"));
+		pluto = TString(gSystem->Getenv("PLUTO"));
+		plutoFile = TString(gSystem->Getenv("PLUTOFILE"));
 	}
 
 	// -----   Magnetic field   -----------------------------------------------
@@ -189,6 +195,11 @@ void run_sim(Int_t nEvents = 700)
 		boxGen2->SetCosTheta();
 		boxGen2->Init();
 		primGen->AddGenerator(boxGen2);
+	}
+
+	if (pluto == "yes") {
+		FairPlutoGenerator *plutoGen= new FairPlutoGenerator(plutoFile);
+		primGen->AddGenerator(plutoGen);
 	}
 
 	fRun->SetGenerator(primGen);

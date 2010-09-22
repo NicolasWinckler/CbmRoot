@@ -79,3 +79,14 @@ Bool_t IsRich(
 {
 	return CheckDetectorPresence(parFile, "rich");
 }
+
+
+/* Determines MVD detector presence in the TGeo.
+ * @param parFile Name of the parameter file with TGeo.
+ * @return True if RICH presents in the TGeo.
+ */
+Bool_t IsMvd(
+		const TString& parFile)
+{
+	return CheckDetectorPresence(parFile, "mvd");
+}

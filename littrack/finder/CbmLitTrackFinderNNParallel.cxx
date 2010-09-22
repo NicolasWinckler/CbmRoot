@@ -14,6 +14,7 @@
 #include "parallel/LitConverter.h"
 #include "parallel/muon/LitTrackFinderNNVecMuon.h"
 #include "parallel/electron/LitTrackFinderNNScalarElectron.h"
+#include "parallel/electron/LitTrackFinderNNVecElectron.h"
 
 #include <iostream>
 
@@ -37,6 +38,11 @@ CbmLitTrackFinderNNParallel::CbmLitTrackFinderNNParallel(
 		env->GetTrdLayoutScal(layout);
 		fTFScalElectron = new LitTrackFinderNNScalarElectron();
 		fTFScalElectron->SetDetectorLayout(layout);
+	} else if (fTrackingType == "nn_vec_electron") {
+		LitDetectorLayoutElectronVec layout;
+		env->GetTrdLayoutVec(layout);
+		fTFVecElectron = new LitTrackFinderNNVecElectron();
+		fTFVecElectron->SetDetectorLayout(layout);
 	} else {
 		std::cout << "-E- TRACKING TYPE NOT FOUND" << std::endl;
 		exit(0);
@@ -77,6 +83,9 @@ LitStatus CbmLitTrackFinderNNParallel::DoFind(
 		fTFParallelMuon->DoFind(lhits, hits.size(), lseeds, trackSeeds.size(), ltracks, nofTracks);
 	else if (fTrackingType == "nn_scalar_electron")
 		fTFScalElectron->DoFind(lhits, hits.size(), lseeds, trackSeeds.size(), ltracks, nofTracks);
+	else if (fTrackingType == "nn_vec_electron")
+		fTFVecElectron->DoFind(lhits, hits.size(), lseeds, trackSeeds.size(), ltracks, nofTracks);
+
 	tbb::tick_count t1 = tbb::tick_count::now();
 
 	double dtime = (t1-t0).seconds();
@@ -153,7 +162,7 @@ void CbmLitTrackFinderNNParallel::ConvertTracks(
 		CbmLitTrack* track = new CbmLitTrack;
 		if (fTrackingType == "nn_parallel_muon")
 			LitScalTrackToCbmLitTrack(ltrack, track, kLITMUCH);
-		else if (fTrackingType == "nn_scalar_electron")
+		else if (fTrackingType == "nn_scalar_electron" || fTrackingType == "nn_vec_electron")
 			LitScalTrackToCbmLitTrack(ltrack, track, kLITTRD);
 		tracks.push_back(track);
 	}

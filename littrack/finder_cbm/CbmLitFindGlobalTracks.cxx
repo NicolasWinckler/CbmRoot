@@ -186,14 +186,17 @@ void CbmLitFindGlobalTracks::InitTrackReconstruction()
 {
 	CbmLitToolFactory* factory = CbmLitToolFactory::Instance();
 	if (fIsElectronSetup) {
-		if (fTrackingType == "branch" || fTrackingType == "nn" || fTrackingType == "weight" || fTrackingType == "nn_scalar") {
+		if (fTrackingType == "branch" || fTrackingType == "nn" ||
+				fTrackingType == "weight" || fTrackingType == "nn_scalar" ||
+				fTrackingType == "nn_vec") {
 			std::string st("e_");
 			st += fTrackingType;
 			fFinder = factory->CreateTrackFinder(st);
 		} else
 			TObject::Fatal("CbmLitFindGlobalTracks","Tracking type not found");
 	} else {
-		if (fTrackingType == "branch" || fTrackingType == "nn" || fTrackingType == "weight" || fTrackingType == "nn_parallel") {
+		if (fTrackingType == "branch" || fTrackingType == "nn" ||
+				fTrackingType == "weight" || fTrackingType == "nn_parallel") {
 			std::string st("mu_");
 			st += fTrackingType;
 			fFinder = factory->CreateTrackFinder(st);

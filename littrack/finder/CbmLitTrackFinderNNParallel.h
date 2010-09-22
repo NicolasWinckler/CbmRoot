@@ -12,6 +12,7 @@
 
 class LitTrackFinderNNVecMuon;
 class LitTrackFinderNNScalarElectron;
+class LitTrackFinderNNVecElectron;
 class LitScalPixelHit;
 class LitScalTrack;
 
@@ -53,6 +54,8 @@ private:
 	LitTrackFinderNNVecMuon* fTFParallelMuon;
 
 	LitTrackFinderNNScalarElectron* fTFScalElectron;
+
+	LitTrackFinderNNVecElectron* fTFVecElectron;
 
 	double fTime;
 

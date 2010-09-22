@@ -24,11 +24,7 @@
 
 #include "CbmLitPtrTypes.h"
 
-class CbmLitField;
-
-//#define cnst static const fvec
-
-//const unsigned int MAX_NOF_TRACKS_ELECTRON = 1500;
+//class CbmLitField;
 
 class LitTrackFinderNNScalarElectron : public LitTrackFinderNNBaseElectronScal,
 	                                   public LitTrackFinderNNBase,
@@ -50,7 +46,8 @@ public:
 			LitScalTrack* tracks[],
 			unsigned int &nofTracks);
 
-	void SetDetectorLayout(LitDetectorLayoutElectronScal& layout) {
+	void SetDetectorLayout(
+			LitDetectorLayoutElectronScal& layout) {
 		fLayout = layout;
 		fHitData.SetDetectorLayout(layout);
 	}
@@ -80,23 +77,12 @@ public:
 			int stationGroup,
 			int station);
 
-private:
-//	LitScalTrack* fTracks[MAX_NOF_TRACKS_ELECTRON]; // local copy of tracks
-//	unsigned int fNofTracks;
-
-//	LitDetectorLayoutElectronScal fLayout; // detector geometry
-//	LitHitDataElectronScal fHitData; // arranged hits
-
-//	unsigned char fMaxNofMissingHits;
-//	fscal fSigmaCoef;
-//	fscal fMaxCovSq;
-
-	TrackExtrapolatorPtr fExtrapolator;
-	TrackPropagatorPtr fPropagator;
-	TrackUpdatePtr fFilter;
-	CbmLitField* fField;
+//private:
+//	TrackExtrapolatorPtr fExtrapolator;
+//	TrackPropagatorPtr fPropagator;
+//	TrackUpdatePtr fFilter;
+//	CbmLitField* fField;
 };
 
-//#undef cnst
 
 #endif /* LITTRACKFINDERNNSCALARELECTRON_H_ */

@@ -13,18 +13,17 @@
 
 #include <algorithm>
 
-
-const unsigned int MAX_NOF_TRACKS_ELECTRON = 1500;
-
 template<class T>
 class LitTrackFinderNNBaseElectron {
 public:
 	LitTrackFinderNNBaseElectron();
 	virtual ~LitTrackFinderNNBaseElectron();
 
-	void SetMaxNofMissingHits(T maxNofMissingHits) {
+	void SetMaxNofMissingHits(unsigned char maxNofMissingHits) {
 		fMaxNofMissingHits = maxNofMissingHits;
 	}
+
+	static const unsigned int MAX_NOF_TRACKS = 1500;
 
 protected:
 	void ArrangeHits(
@@ -36,7 +35,7 @@ protected:
 			unsigned int nofTrackSeeds);
 
 
-	LitScalTrack* fTracks[MAX_NOF_TRACKS_ELECTRON]; // local copy of tracks
+	LitScalTrack* fTracks[MAX_NOF_TRACKS]; // local copy of tracks
 	unsigned int fNofTracks;
 
 	LitDetectorLayoutElectron<T> fLayout; // detector geometry

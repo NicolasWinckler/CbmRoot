@@ -318,6 +318,12 @@ TrackFinderPtr CbmLitToolFactory::CreateTrackFinder(
 		TrackFinderPtr finder(finderNN);
 		return finder;
 	} else
+	if(name == "e_nn_vec") {
+		CbmLitTrackFinderNNParallel* finderNN = new CbmLitTrackFinderNNParallel("nn_vec_electron");
+		finderNN->Initialize();
+		TrackFinderPtr finder(finderNN);
+		return finder;
+	} else
 	if(name == "mu_branch") {
 		CbmLitTrackFinderBranch* muchFinderBranch = new CbmLitTrackFinderBranch();
 		muchFinderBranch->SetPropagator(CreateTrackPropagator("lit"));

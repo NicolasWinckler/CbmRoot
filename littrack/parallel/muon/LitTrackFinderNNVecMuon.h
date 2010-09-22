@@ -22,8 +22,6 @@
 
 #define cnst static const fvec
 
-const unsigned int MAX_NOF_TRACKS = 1500;
-
 class LitTrackFinderNNVecMuon : public LitTrackFinderNNBase,
                                 public LitTrackFinder
 {
@@ -47,6 +45,8 @@ public:
 		fLayout = layout;
 		fHitData.SetDetectorLayout(layout);
 	}
+
+	static const unsigned int MAX_NOF_TRACKS = 1500;
 
 public:
 	void ArrangeHits(

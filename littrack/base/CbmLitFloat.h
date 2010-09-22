@@ -11,6 +11,6 @@
 #ifndef CBMLITFLOAT_H_
 #define CBMLITFLOAT_H_
 
-typedef float myf;
+typedef double myf;
 
 #endif /*CBMLITFLOAT_H_*/

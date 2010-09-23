@@ -13,3 +13,8 @@ add_test(run_reco ${CBMROOT_BINARY_DIR}/macro/run/run_reco.sh)
 SET_TESTS_PROPERTIES(run_reco PROPERTIES TIMEOUT "200")
 SET_TESTS_PROPERTIES(run_reco PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
 
+GENERATE_ROOT_TEST_SCRIPT(${CBMROOT_SOURCE_DIR}/macro/run/check_overlaps.C)
+add_test(check_overlaps ${CBMROOT_BINARY_DIR}/macro/run/check_overlaps.sh)
+SET_TESTS_PROPERTIES(check_overlaps PROPERTIES TIMEOUT "30")
+SET_TESTS_PROPERTIES(check_overlaps PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed;All ok")
+

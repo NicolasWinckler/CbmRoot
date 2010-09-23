@@ -64,12 +64,13 @@ void CbmKF::SetParContainers()
   rtdb->getContainer("CbmStsDigiPar");
 }
 
-InitStatus CbmKF::Init()
+InitStatus CbmKF::ReInit()
 {
-  return ReInit();
+  StsDigi.Clear();
+  return Init();
 }
 
-InitStatus CbmKF::ReInit()
+InitStatus CbmKF::Init()
 {
   fMagneticField = 0;
 

@@ -121,6 +121,11 @@ class CbmL1RichENNRingFinderParallel :public CbmRichRingFinder
     THitIndex NOwn;                  // number of its own hits
     bool skip;                 // skip the ring during selection
     std::vector<THitIndex> localIHits; // indexes of hits in local array
+
+    static bool CompareENNHRings( const ENNRing &r1, const ENNRing &r2 ){
+      if (r1.NHits != r2.NHits) return ( r1.NHits > r2.NHits );
+      else return ( r1.chi2 < r2.chi2 );
+    };
   };
 
   struct ENNRingV {

@@ -14,7 +14,7 @@
  *====================================================================
  */
 
-//#define PRINT_TIMING
+#define PRINT_TIMING
 
 // CBM includes
 #include "CbmL1RichENNRingFinderParallel.h"
@@ -159,10 +159,10 @@ Int_t CbmL1RichENNRingFinderParallel::DoFind( TClonesArray* HitArray, TClonesArr
   
   vector< ENNRing > R;
 
-  float HitSize = 1.;
+  float HitSize = .5;
   THitIndex MinRingHits = 5;
   float RMin = 2.; 
-  float RMax = 7.; 
+  float RMax = 5.; 
 
   TStopwatch timer;
 
@@ -183,6 +183,7 @@ Int_t CbmL1RichENNRingFinderParallel::DoFind( TClonesArray* HitArray, TClonesArr
     ring->SetCenterX ( i->x );
     ring->SetCenterY ( i->y );
     ring->SetRadius  ( i->r );
+    ring->SetChi2    ( i->chi2 );    
     const THitIndex NHits = i->localIHits.size();
     for( THitIndex j = 0; j < NHits; j++ ){
       if ( i->y > 0. ) ring->AddHit( outIndicesUp  [i->localIHits[j]] );
@@ -240,16 +241,19 @@ void CbmL1RichENNRingFinderParallel::ENNRingFinder( const int NHits, nsL1vector<
   const fvec MinRingHits_v = MinRingHits;
   const fvec Rejection = .5;
   const float ShadowSize = HitSize/4;
-  const int    StartHitMaxQuality = 10;
-  const int    SearchHitMaxQuality = 10;
+  const int    StartHitMaxQuality = 15;
+  const int    SearchHitMaxQuality = 100; // TODO DELME
 
+  const fvec R2MinCut = 3.*3., R2MaxCut = 7.*7.;
   const fvec R2Min = RMin*RMin, R2Max = RMax*RMax;  
   const fvec HitSize2 = 2 * HitSize;
   const fvec HitSize4 = 4 * HitSize;
+  const fvec HitSizeSq_v  = HitSize  * HitSize;
+  const float HitSizeSq  = HitSizeSq_v[0];
   const fvec HitSizeSq4 = HitSize2 * HitSize2;
   const float AreaSize  = 2 * RMax[0] + HitSize;
   const float AreaSize2 = AreaSize * AreaSize;  
-
+  
   typedef vector<ENNRingHit>::iterator iH;
   typedef vector<ENNRingHit*>::iterator iP;
 
@@ -434,15 +438,13 @@ void CbmL1RichENNRingFinderParallel::ENNRingFinder( const int NHits, nsL1vector<
         ENNSearchHitV& sHit = SearchArea[ih];
         const fvec dx = sHit.lx - X;
         const fvec dy = sHit.ly - Y;
-        const fvec d2 = dx*dx + dy*dy - R2;
-          // oshibka pri d2=0
-          // sHit.on_ring = ( fabs( d2 - HitSizeSq4 ) <= RingCut );
         const fvec d = fabs(sqrt(dx*dx + dy*dy) - R);
-        sHit.on_ring = ( d <= HitSize2 ) & validHit;
+        const fvec dSq = d*d;
+        sHit.on_ring = ( d <= HitSize ) & validHit;
         const fvec dp = if3( sHit.on_ring , -1, fabs( sHit.C + sHit.Cx*X + sHit.Cy*Y ) );
         Dmax = if3((( dp <= Dcut ) & ( dp > Dmax )), dp, Dmax);
              
-        fvec w = if3(( sHit.on_ring ), 1, 1./(1.e-5+fabs(d2)));
+        fvec w = if3(( sHit.on_ring ), 1./(HitSizeSq_v+fabs(dSq)), 1./(1.e-5+fabs(dSq)));
         w = if3( (dp <= Dcut) & validHit , w, 0);
         S0 += w*sHit.S0;
         S1 += w*sHit.S1;
@@ -490,7 +492,7 @@ void CbmL1RichENNRingFinderParallel::ENNRingFinder( const int NHits, nsL1vector<
       R = sqrt( R2 );
     }// end of the final fit
 
-    validRing = !( (NRingHits < MinRingHits_v) | (R2 > R2Max) | (R2 < R2Min) );
+    validRing = !( (NRingHits < MinRingHits_v) | (R2 > R2MaxCut) | (R2 < R2MinCut) ); // ghost suppresion // TODO constants
 //    cout << validRing << endl;
 #ifdef PRINT_TIMING    
     GetTimer("Ring finding: Final fit").Stop();
@@ -528,7 +530,7 @@ void CbmL1RichENNRingFinderParallel::ENNRingFinder( const int NHits, nsL1vector<
         ringV.chi2 += d*d;
         ringV.localIHits.push_back( if3( validHit, sHit.localIndex, -1 ) );
         ringV.NHits += bool2int(validHit);
-        validHit = validHit & ( d <= ShadowSize );
+        validHit = validHit & ( d <= ShadowSize ); // TODO check *4
         if ( Empty (validHit) ) continue; // CHECKME
         Shadow.push_back( if3( validHit, sHit.localIndex, -1 ) );
       }
@@ -544,12 +546,12 @@ void CbmL1RichENNRingFinderParallel::ENNRingFinder( const int NHits, nsL1vector<
         ringV.chi2 += d*d;
         ringV.localIHits.push_back( if3( validHit, puHit.localIndex, -1 ) );
         ringV.NHits += bool2int(validHit);
-        validHit = validHit & ( d <= ShadowSize );
+        validHit = validHit & ( d <= ShadowSize ); // TODO check *4
         if ( Empty (validHit) ) continue; // CHECKME
         Shadow.push_back( if3( validHit, puHit.localIndex, -1 ) );
       }
 
-      ringV.chi2 = ringV.chi2 / ( ringV.NHits - 3)/.3/.3;
+      ringV.chi2 = ringV.chi2 / (( ringV.NHits - 3)*HitSizeSq);
       const fvec quality = ringV.NHits;
 
       
@@ -625,7 +627,7 @@ void CbmL1RichENNRingFinderParallel::ENNRingFinder( const int NHits, nsL1vector<
         Rings.pop_back(); 
         continue; 
       }
-      ring.chi2 = ring.chi2 / ( ring.NHits - 3)/.3/.3;
+      ring.chi2 = ring.chi2 / (( ring.NHits - 3)*HitSizeSq);
       int quality = ring.NHits;
 
         // for( iP j = ring.Hits.begin(); j != ring.Hits.end(); ++j ){
@@ -659,7 +661,242 @@ void CbmL1RichENNRingFinderParallel::ENNRingFinder( const int NHits, nsL1vector<
   iR Rbeg = Rings.begin() + NInRings;
   iR Rend = Rings.end();
 
+//#define NEW_SELECTION
+#ifdef NEW_SELECTION // TODO optimize. at the moment just creates additional ghosts
+  
+  sort(Rings.begin() + NInRings, Rings.end(), ENNRing::CompareENNHRings);
+
   const int NHitsV = HitsV.size();
+  for( int ih = 0; ih < NHitsV; ih++ ) HitsV[ih].quality = 0.;
+  
+  for( iR ir = Rbeg; ir != Rend; ++ir ){
+    ir->on = 0;
+    ir->NOwn = ir->NHits;
+  }
+
+  for( iR i = Rbeg; i != Rend; ++i ) {
+    if(i->skip) continue;
+    for( iR j = i+1; j != Rend; ++j ) {
+      if(j->skip) continue;
+
+      float dist = j->r + i->r + HitSize2[0];
+      float distCentr = sqrt((j->x-i->x)*(j->x-i->x)+(j->y-i->y)*(j->y-i->y));
+      if(distCentr > dist) continue;
+      Int_t NOverlaped=0;
+
+      const THitIndex maxI = i->localIHits.size();
+      const THitIndex maxJ = j->localIHits.size();      
+      for( THitIndex n = 0; n < maxI; n++ )
+        for( THitIndex m = 0; m < maxJ; ++m )
+          if (i->localIHits[n] == j->localIHits[m]) NOverlaped++;
+      ENNRing *BigRing = 0;
+      if(NOverlaped > 0.7 * maxI) BigRing = &(*i);
+      if(NOverlaped > 0.7 * maxJ) BigRing = &(*j);
+      if(BigRing != 0)
+      {
+        std::vector<THitIndex> newIndices;
+        for( THitIndex n = 0; n < maxI; n++ )
+        {
+          bool IsNew = 1;
+          for( THitIndex m = 0; m < maxJ; ++m )
+            if (i->localIHits[n] == j->localIHits[m]) IsNew = 0;
+          if(IsNew) newIndices.push_back(i->localIHits[n]);
+        }
+        if(maxI > maxJ)
+        {
+          j->x = i->x;
+          j->y = i->y;
+          j->r = i->r;
+        }
+        const THitIndex newISize = newIndices.size();
+        for( THitIndex in = 0; in < newISize; in++ )
+          j->localIHits.push_back(newIndices[in]);
+        i->skip = 1;
+        i->on = 0;
+        break;
+      }
+
+    } // j
+  } // i
+
+
+  for( iR i = Rbeg; i != Rend; ++i )
+  {
+    if(!(i->skip)) 
+    {
+      i->on = 1;
+      float S0 , S1 , S2 , S3, S4 , S5 , S6 , S7, X, Y, R;
+      S0 = S1 = S2 = S3 = S4 = S5 = S6 = S7 = 0.0;
+
+
+      const THitIndex firstIh = i->localIHits[0];
+      const ENNHitV &firstHit = HitsV[firstIh/fvecLen];
+      const int firstIh_4 = firstIh%fvecLen;
+      const THitIndex maxI = i->localIHits.size();
+
+      vector<ENNSearchHitV>  shits;
+      shits.resize(maxI);
+      for( THitIndex iih = 0; iih < maxI; iih++ ) {
+        const THitIndex ih = i->localIHits[iih];
+        const ENNHitV &hit = HitsV[ih/fvecLen];
+        const int ih_4 = ih%fvecLen;
+        ENNSearchHitV& shit = shits[iih];
+
+        shit.ly[0]  = hit.y[ih_4] - firstHit.y[firstIh_4];
+        shit.lx[0]  = hit.x[ih_4] - firstHit.x[firstIh_4];	
+        shit.S0[0]  = shit.lx[0] * shit.lx[0];
+        shit.S1[0]  = shit.ly[0] * shit.ly[0];
+        shit.lr2[0] = shit.S0[0] + shit.S1[0];	
+        float lr2 = shit.lr2[0];
+        float lr = sqrt(lr2);
+        shit.S2[0] = shit.lx[0] * shit.ly[0];
+        shit.S3[0] = shit.lx[0] * lr2;
+        shit.S4[0] = shit.ly[0] * lr2;
+        shit.C[0] = -lr*0.5;
+        float w;
+	if( lr > 1.E-4 ) w = 1./lr;
+        else w = 1.;
+        shit.Cx[0] = w*shit.lx[0];
+        shit.Cy[0] = w*shit.ly[0];
+
+      }
+      float Dmax = -1.;
+
+      X = i->x - firstHit.x[firstIh_4];
+      Y = i->y - firstHit.y[firstIh_4];
+      R = i->r;
+      int search_stop = 0;
+      do
+      { // final fit of 3 parameters (X,Y,R)      
+        float Dcut      = Dmax * Rejection[0];
+        int n = 0;
+        S0 = S1 = S2 = S3 = S4 = S5 = S6 = S7 = 0.0;
+        
+        for( THitIndex ih = 0; ih < maxI; ih++ ) {
+          ENNSearchHitV& shit = shits[ih];
+
+          float dx = shit.lx[0] - X;
+          float dy = shit.ly[0] - Y;
+          float d = fabs(sqrt(dx*dx + dy*dy) - R);
+          shit.on_ring[0] = ( d <= HitSize2[0] );
+          float w;
+          if( shit.on_ring[0] ){ 
+            n++;
+            w = 1;
+          }
+          else {
+            float dp = fabs( shit.C[0] + shit.Cx[0]*X + shit.Cy[0]*Y );
+            if( dp > Dcut ) continue;
+            if( dp > Dmax ) Dmax = dp;
+            n++;
+            w = 10./(1.e-5+fabs(d*d));
+          }
+
+          S0 += w*shit.S0[0];
+          S1 += w*shit.S1[0];
+          S2 += w*shit.S2[0];
+          S3 += w*shit.S3[0];
+          S4 += w*shit.S4[0];
+          S5 += w*shit.lx[0];
+          S6 += w*shit.ly[0];
+          S7 += w*shit.lr2[0];
+        } // ih
+        
+        float s0 = S6*S0-S2*S5;
+        float s1 = S0*S1-S2*S2;
+        float s2 = S0*S4-S2*S3;
+
+        if( fabs(s0) < 1.E-6 || fabs(s1) < 1.E-6 ) continue;
+        float tmp = s1*(S5*S5-n*S0)+s0*s0;
+        float A = ( ( S0*S7-S3*S5 )*s1-s2*s0 ) / tmp;
+        Y = (s2 + s0*A )/s1/2;
+        X = ( S3 + S5*A - S2*Y*2 )/S0/2;
+        float R2 = X*X+Y*Y-A;
+
+        if( R2 < 0 ) continue;
+        R = sqrt( R2 );
+        if(Dmax <= 0) search_stop++;
+      }while( search_stop < 2. );
+
+      i->r = R;
+      i->x = X + firstHit.x[firstIh_4];
+      i->y = Y + firstHit.y[firstIh_4];
+
+      if(R<2.5 || R>7.5)
+      {
+        i->on = 0;
+        i->skip =1;
+        continue;
+      }
+
+      std::vector<THitIndex> newHits;
+      i->chi2 = 0;
+      
+      for( THitIndex iih = 0; iih < maxI; iih++ ) {
+        const THitIndex ih = i->localIHits[iih];
+        const ENNHitV &hit = HitsV[ih/fvecLen];
+        ENNSearchHitV &shit = shits[iih];
+        const int ih_4 = ih%fvecLen;
+        
+        float dx = hit.x[ih_4] - i->x;
+        float dy = hit.y[ih_4] - i->y;
+        float d = fabs(sqrt(dx*dx + dy*dy) - i->r);
+        shit.on_ring[ih_4] = ( d <= HitSize );
+        if (shit.on_ring[ih_4]) 
+        {
+          newHits.push_back(ih);
+          i->chi2 += d*d;
+        }
+      }
+
+      i->localIHits.clear();
+      i->localIHits = newHits;
+      i->NHits = i->localIHits.size();
+      i->NOwn = i->NHits;
+
+      if( i->localIHits.size() < MinRingHits ){ 
+        i->on = 0;
+        i->skip = 1;
+        continue; 
+      }
+      i->chi2 = i->chi2 / (( i->localIHits.size() - 3) * HitSize*HitSize);//.3/.3;
+    }
+  }
+
+  sort(Rings.begin() + NInRings, Rings.end(), ENNRing::CompareENNHRings);
+  iR best;
+  for( iR i = Rbeg; i != Rend; ++i ){
+    i->on = 0;
+    if(i->skip) continue;
+    if ( i->NOwn > 5 ) {
+      best = i;
+      const THitIndex maxI = i->localIHits.size();
+      for( THitIndex n = 0; n < maxI; n++ ) {
+        const THitIndex ih = i->localIHits[n];
+        ENNHitV &hit = HitsV[ih/fvecLen];
+        const int ih_4 = ih%fvecLen;
+        hit.quality[ih_4] = 1;
+      }
+      for( iR j = i+1; j != Rend; ++j ){
+        if(i->skip) continue;
+        float dist = j->r + best->r + HitSize2[0];
+        if( fabs(j->x-best->x) > dist || fabs(j->y-best->y) > dist ) continue;
+        j->NOwn = 0;
+        const THitIndex maxJ = j->localIHits.size();
+        for( THitIndex m = 0; m < maxJ; m++ ) {
+          const THitIndex ihm = j->localIHits[m];
+          const ENNHitV &hitm = HitsV[ihm/fvecLen];
+          if( hitm.quality[ihm%fvecLen]==0 ) j->NOwn++;
+        }
+      }
+      i->on = 1;
+      i->skip = 1;
+    }
+    else i->skip = 1;
+  }
+#else // NEW_SELECTION
+
+    const int NHitsV = HitsV.size();
   for( int ih = 0; ih < NHitsV; ih++ ) HitsV[ih].quality = 0.;
   for( iR ir = Rbeg; ir != Rend; ++ir ){
     ir->on = 0;
@@ -708,6 +945,8 @@ void CbmL1RichENNRingFinderParallel::ENNRingFinder( const int NHits, nsL1vector<
       }
     }
   }while(1);
+#endif // else NEW_SELECTION
+
 #ifdef PRINT_TIMING
   GetTimer("Selection").Stop();
   GetTimer("All").Stop();

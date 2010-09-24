@@ -26,6 +26,7 @@
 #include "CbmStsStation.h"
 #include "CbmStsSector.h"
 #include "CbmStsSensor.h" // for field approx.
+#include "CbmStsDigiPar.h" // for dynamic_cast
 #include "CbmStsDigiScheme.h"
 #include "CbmStsFindTracks.h"
 #include "CbmKF.h"
@@ -46,7 +47,7 @@ using std::vector;
 ClassImp(CbmL1)
 
 
-    static L1Algo algo_static _fvecalignment;
+static L1Algo algo_static _fvecalignment;
 
 CbmL1 *CbmL1::fInstance = 0;
 
@@ -142,6 +143,7 @@ void CbmL1::SetParContainers()
 
 InitStatus CbmL1::ReInit()
 {
+  StsDigi.Clear();
   SetParContainers();
   return Init();
 }
@@ -188,10 +190,7 @@ InitStatus CbmL1::Init()
   FairRuntimeDb *RunDB = Run->GetRuntimeDb();
   {
     CbmGeoStsPar* StsPar = L1_DYNAMIC_CAST<CbmGeoStsPar*>( RunDB->findContainer("CbmGeoStsPar") );
- //   CbmStsDigiPar *digiPar = L1_DYNAMIC_CAST<CbmStsDigiPar*>( RunDB->findContainer("CbmStsDigiPar") ); // TODO
- //   CbmStsDigiPar *digiPar = dynamic_cast<CbmStsDigiPar*>( RunDB->findContainer("CbmStsDigiPar") );
- //   CbmStsDigiPar *digiPar = static_cast<CbmStsDigiPar*>( RunDB->findContainer("CbmStsDigiPar") );
-    CbmStsDigiPar *digiPar = reinterpret_cast<CbmStsDigiPar*>( RunDB->findContainer("CbmStsDigiPar") ); // TODO
+    CbmStsDigiPar *digiPar = L1_DYNAMIC_CAST<CbmStsDigiPar*>( RunDB->findContainer("CbmStsDigiPar") );
     StsDigi.Init(StsPar, digiPar);
   }
   {
@@ -475,8 +474,8 @@ InitStatus CbmL1::Init()
 
 void CbmL1::Exec(Option_t * option)
 {
-  static int nevent=1;
-  if( fVerbose>1 ) cout << endl << "CbmL1::Exec event " << nevent++ << " ..." << endl << endl;
+  static int nevent=0;
+  if( fVerbose>1 ) cout << endl << "CbmL1::Exec event " << ++nevent << " ..." << endl << endl;
 
     // repack data
   ReadEvent();

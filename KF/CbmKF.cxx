@@ -73,7 +73,8 @@ InitStatus CbmKF::ReInit()
 InitStatus CbmKF::Init()
 {
   fMagneticField = 0;
-
+  
+  vMvdMaterial.clear();
   vStsMaterial.clear();
   vTrdMaterial.clear();
   vSttMaterial.clear();

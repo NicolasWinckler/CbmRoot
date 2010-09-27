@@ -11,7 +11,7 @@
 #include "CbmMCTrack.h"
 #include "CbmRichRingMatch.h"
 #include "CbmRichRingLight.h"
-#include "/u/anagai/cbmroot_01/rich/fitter/CbmRichRingFitterEllipseTau.h"
+#include "CbmRichRingFitterEllipseTau.h"
 
 #include "TH1.h"
 #include "TH2F.h"

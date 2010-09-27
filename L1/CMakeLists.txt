@@ -19,6 +19,8 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/rich
 #${CBMROOT_SOURCE_DIR}/cbmdata/stt
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
 
+${CBMROOT_SOURCE_DIR}/rich/fitter
+
 ${CBMROOT_SOURCE_DIR}/L1
 ${CBMROOT_SOURCE_DIR}/L1/OffLineInterface
 ${CBMROOT_SOURCE_DIR}/sts

@@ -736,7 +736,7 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
 
   int NFakes = 0;
   for( unsigned int ih=0; ih<algo->vStsHits.size(); ih++){
-    int iMC = vHitMCRef[ih];
+    int iMC = vHitMCRef[ih]; // TODO2: adapt to linking
     if (iMC < 0) NFakes++;
   }
 
@@ -816,7 +816,7 @@ void CbmL1::TrackFitPerformance()
 
     if ( it->IsGhost() ) continue;
     { // first hit
-      int iMC = vHitMCRef[it->StsHits.front()]; // TODO: adapt to linking
+      int iMC = vHitMCRef[it->StsHits.front()]; // TODO2: adapt to linking
       if (iMC < 0) continue;
       CbmL1MCPoint &mc = vMCPoints[iMC];
       h_fit[0]->Fill( (mc.x-it->T[0]) *1.e4);
@@ -834,7 +834,7 @@ void CbmL1::TrackFitPerformance()
     }
     
     { // last hit
-      int iMC = vHitMCRef[it->StsHits.back()];
+      int iMC = vHitMCRef[it->StsHits.back()]; // TODO2: adapt to linking
       if (iMC < 0) continue;
       CbmL1MCPoint &mc = vMCPoints[iMC];
       h_fitL[0]->Fill( (mc.x-it->TLast[0]) *1.e4);

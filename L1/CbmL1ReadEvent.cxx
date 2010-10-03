@@ -139,7 +139,7 @@ void CbmL1::ReadEvent()
           iMC = match->GetPointId();
         }
       }
-      if( listStsPts && iMC>=0 ){
+      if( listStsPts && iMC>=0 ){ // TODO1: don't need this with FairLinks
         CbmL1MCPoint MC;
         if( ! ReadMCPoint( &MC, iMC, 1 ) ){
           MC.iStation = th.iStation;
@@ -197,7 +197,7 @@ void CbmL1::ReadEvent()
       }
       th.iMC=-1;
       
-      int iMC = sh->GetRefIndex();
+      int iMC = sh->GetRefIndex(); // TODO1: don't need this with FairLinks
       if( listStsPts && iMC>=0 && iMC<nMC){
         CbmL1MCPoint MC;
         if( ! ReadMCPoint( &MC, iMC, 0 ) ){
@@ -449,18 +449,20 @@ void CbmL1::ReadEvent()
   }
 
   if (fVerbose >= 10) cout << "ReadEvent: z-pos are saved." << endl;
+
+  HitMatch();
+  
+  if (fVerbose >= 10) cout << "HitMatch is done." << endl;
   
     // -- sort MC points --
   vector<TmpMCPoint> vtmpMCPoints;
-  for ( int i=0; i<nEffHits; i++ ){
-    int iMC = vHitMCRef[i];
-    if( iMC < 0 ) continue;
-    CbmL1MCPoint &MC = vMCPoints[iMC];
+  for ( unsigned int iMCPoint = 0; iMCPoint < vMCPoints.size(); iMCPoint++) {
+    CbmL1MCPoint &MC = vMCPoints[iMCPoint];
     TmpMCPoint tmp;
     tmp.ID = MC.ID;
     tmp.z = MC.z;
-    tmp.StsHit = i;
-    tmp.MCPoint = iMC;
+//    tmp.StsHit = i;
+    tmp.MCPoint = iMCPoint;
     tmp.eff = 1;
     vtmpMCPoints.push_back(tmp);
   }
@@ -489,7 +491,7 @@ void CbmL1::ReadEvent()
         nvtrackscurr=0;
     int ID = -10000;
     for ( vector<TmpMCPoint>::iterator i= vtmpMCPoints.begin(); i!=vtmpMCPoints.end(); ++i){
-      if( vMCTracks.empty() || i->ID!= ID ){
+      if( vMCTracks.empty() || i->ID!= ID ){ // new track
         ID = i->ID;
         CbmL1MCTrack T;
         T.ID = ID;
@@ -518,19 +520,19 @@ void CbmL1::ReadEvent()
             Vtxcurr.MC_z  = T.z;
             Vtxcurr.MC_ID = T.mother_ID;
             nvtrackscurr = 1;
-          }else nvtrackscurr++;
+          }
+          else nvtrackscurr++;
+          
         }
-      }
+      } // new track
       vMCTracks.back().Points.push_back(i->MCPoint);
 //       if( i->eff ) vMCTracks.back().StsHits.push_back(i->StsHit);
     } // for i of tmpMCPoints
     if( nvtrackscurr > nvtracks ) PrimVtx = Vtxcurr;
   } // fill MC tracks
   if (fVerbose >= 10) cout << "MCPoints and MCTracks are saved." << endl;
+
   
-  HitMatch();
-  if (fVerbose >= 10) cout << "HitMatch is done." << endl;
-    
     // calculate the max number of Hits\mcPoints on continuous(consecutive) stations
   for( vector<CbmL1MCTrack>::iterator it = vMCTracks.begin(); it != vMCTracks.end(); ++it){
     it->Init();
@@ -588,9 +590,10 @@ bool CbmL1::ReadMCPoint( CbmL1MCPoint *MC, int iPoint, bool MVD )
 
   /// Procedure for match hits and MCPoints.
   /// Read information about correspondence between hits and mcpoints and fill CbmL1MCPoint::hitIds and CbmL1StsHit::mcPointIds arrays
+  /// should be called after fill of algo
 void CbmL1::HitMatch()
 {
-  const bool useLinks = 0; // 0 - use HitMatch, one_to_one; 1 - use FairLinks, many_to_many. Set 0 to switch to old definition of efficiency.
+  const bool useLinks = 1; // 0 - use HitMatch, one_to_one; 1 - use FairLinks, many_to_many. Set 0 to switch to old definition of efficiency.
   // TODO: fix trunk problem with links. Set useLinks = 1
   
   const int NHits = vStsHits.size();
@@ -604,7 +607,7 @@ void CbmL1::HitMatch()
         const int NLinks = stsHit->GetNLinks();
         if ( NLinks != 2 ) cout << "HitMatch: Error. Hit wasn't matched with 2 clusters." << endl;
           // see at 1-st cluster
-        vector<int> stsPointIds;
+        vector<int> stsPointIds; // save here all mc-points matched with first cluster
         int iL = 0;
         FairLink link = stsHit->GetLink(iL);
         CbmStsCluster *stsCluster = L1_DYNAMIC_CAST<CbmStsCluster*>( listStsClusters->At( link.GetIndex() ) );
@@ -632,41 +635,49 @@ void CbmL1::HitMatch()
             FairLink link3 = stsDigi->GetLink(iL3);
             int stsPointId = link3.GetIndex();
             
-            if ( find(&(stsPointIds[0]), &(stsPointIds[stsPointIds.size()]), stsPointId) ){
+            if ( !find(&(stsPointIds[0]), &(stsPointIds[stsPointIds.size()]), stsPointId) ) continue; // check if first cluster matched with same mc-point
+
               CbmStsPoint *stsPoint = L1_DYNAMIC_CAST<CbmStsPoint*>( listStsPts->At( stsPointId ) );
-          
-              int mcId = stsPoint->GetTrackID();
+              
+                // find mcPoint in array
+              int mcTrackId = stsPoint->GetTrackID();
               TVector3 xyzIn,xyzOut;
               stsPoint->PositionIn(xyzIn);
               stsPoint->PositionOut(xyzOut);
               TVector3 xyz = .5*(xyzIn + xyzOut );
               double z =  xyz.z();
 
-//             cout << mcId << " " << z << endl;
-                // find mcPoint in array
               const int NPoints = vMCPoints.size();
               int iP;
               for (iP = 0; iP < NPoints; iP++){
-                if ( (vMCPoints[iP].ID == mcId) && (vMCPoints[iP].z == z) ) break;
+                if ( (vMCPoints[iP].ID == mcTrackId) && (vMCPoints[iP].z == z) ) break;
               };
 
-              if (iP == NPoints){
-//                 cout << "HitMatch: Error. No mcPoint found." << endl;
-                CbmL1MCPoint MC; // TODO: add to tracks too!
-                ReadMCPoint( &MC, mcId, 0 );
-                vMCPoints.push_back(MC);
+              if (iP == NPoints){ // No mc-point was found in vMCPoints array.
+                CbmL1MCPoint MC;
+                if ( !ReadMCPoint( &MC, stsPointId, 0 ) ) {
+                  MC.iStation = vHitStore[hit.hitId].iStation;
+                    //algo->GetFStation(algo->vSFlag[algo->vStsHits[hit.hitId].f]);
+                  vMCPoints.push_back(MC);
+                }
+                else {
+                  continue;
+                }
+
               }
-                // check if such point exist and save it if this is not the case
+                // check if the hit already matched with the mc-point and save it if this is not the case
               if ( !find(&(hit.mcPointIds[0]), &(hit.mcPointIds[hit.mcPointIds.size()]), iP) ){
                 hit.mcPointIds.push_back( iP );
                 vMCPoints[iP].hitIds.push_back(iH);
               }
-            } // if mcPoint found
+
           } // for mcPoint
         } // for digi
 
       } // if clusters
       else{
+        // CbmStsHit *stsHit = L1_DYNAMIC_CAST<CbmStsHit*>( listStsHits->At(hit.extIndex) );
+        // int iP = stsHit->GetRefIndex();
         int iP = vHitMCRef[iH];
         if (iP >= 0){
           hit.mcPointIds.push_back( iP );
@@ -675,6 +686,19 @@ void CbmL1::HitMatch()
       } // if no clusters
     } // if useLinks
     else{ // if no use Links or this is mvd hit
+      // int iP = -1; // TODO2
+      // if (isMvd) {
+      //   // CbmMvdHitMatch *match = L1_DYNAMIC_CAST<CbmMvdHitMatch*>( listMvdHitMatches->At( -hit.extIndex - 1 ) );
+      //   // if( match){
+      //   //   iP = match->GetPointId();
+      //   // }
+      //   iP = vHitMCRef[iH];
+      // }
+      // else {
+      //   CbmStsHit *stsHit = L1_DYNAMIC_CAST<CbmStsHit*>( listStsHits->At( hit.extIndex ) );
+      //   iP = stsHit->GetRefIndex();
+      // }
+
       int iP = vHitMCRef[iH];
       if (iP >= 0){
         hit.mcPointIds.push_back( iP );

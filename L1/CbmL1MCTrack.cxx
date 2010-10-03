@@ -107,7 +107,8 @@ void CbmL1MCTrack::CalculateHitCont()
       if( nHitContStations < ncont ) nHitContStations = ncont;
       ncont = 1;
     }
-    if (ista <= istaold ) continue; // backward direction
+    L1_assert( ista >= istaold );
+    if (ista == istaold ) continue; // backward direction
     istaold = ista;
   }
   if( nHitContStations<ncont ) nHitContStations=ncont;

@@ -3,6 +3,7 @@
 
 //#define FAST_CODE // FAST_CODE = more unsave
 
+#include <assert.h>
 
 #ifdef HAVE_SSE
   #include "vectors/P4_F32vec4.h"

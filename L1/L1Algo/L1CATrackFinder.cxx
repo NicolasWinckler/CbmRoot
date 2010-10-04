@@ -55,60 +55,60 @@ using std::endl;
 using std::vector;
 
 
-					/// Prepare the portion of left hits data
-inline void L1Algo::f10(	// input
+          /// Prepare the portion of left hits data
+inline void L1Algo::f10(  // input
                 int start_lh, int n1,  L1HitPoint *vStsHits_l,
-									// output
-								fvec *u_front, fvec *u_back, fvec *zPos,
-								vector<THitI> &hitsl_1
-								)
+                  // output
+                fvec *u_front, fvec *u_back, fvec *zPos,
+                vector<THitI> &hitsl_1
+                )
 {
-	int end_lh = start_lh+n1;
+  int end_lh = start_lh+n1;
   for (int ilh = start_lh, i1 = 0; ilh < end_lh; ilh++, i1++){
     int i1_V= i1/fvecLen;
     int i1_4= i1%fvecLen;
-		L1HitPoint &hitl = vStsHits_l[ilh];
+    L1HitPoint &hitl = vStsHits_l[ilh];
 
 //    hitsl_1[i1] = ilh;
     hitsl_1.push_back(ilh);
-		u_front[i1_V][i1_4] = hitl.x;
-		u_back [i1_V][i1_4] = hitl.v;
+    u_front[i1_V][i1_4] = hitl.x;
+    u_back [i1_V][i1_4] = hitl.v;
     zPos   [i1_V][i1_4] = hitl.z;
-	}
+  }
 }
 
 
-					/// Get the field approximation. Add the target to parameters estimation. Propagaete to middle station.
-inline void L1Algo::f11(	// input
-								int isec, int istal,
-								int n1_V,
+          /// Get the field approximation. Add the target to parameters estimation. Propagaete to middle station.
+inline void L1Algo::f11(  // input
+                int isec, int istal,
+                int n1_V,
 
                 fvec *u_front, fvec *u_back,  fvec *zPos,
-									// output
-// 								L1TrackPar *T_1,
+                  // output
+//                 L1TrackPar *T_1,
                 nsL1::vector<L1TrackPar>::TSimd &T_1,
                 nsL1::vector<L1FieldRegion>::TSimd &fld_1,
-								fvec* x_minusV, fvec* x_plusV, fvec* y_minusV, fvec* y_plusV
-							 )
+                fvec* x_minusV, fvec* x_plusV, fvec* y_minusV, fvec* y_plusV
+               )
 {
   L1Station &stal = vStations[istal];
-	L1Station &stam = vStations[istal+1];
+  L1Station &stam = vStations[istal+1];
   fvec zstal = stal.z;
   fvec zstam = stam.z;
 
-	for( int i1_V=0; i1_V<n1_V; i1_V++ ){
+  for( int i1_V=0; i1_V<n1_V; i1_V++ ){
         // get the magnetic field along the track.
         // (suppose track is straight line with origin in the target)
-		fvec &u = u_front[i1_V];
-		fvec &v = u_back [i1_V];
+    fvec &u = u_front[i1_V];
+    fvec &v = u_back [i1_V];
     fvec xl, yl; // left(1-st) hit coor
     fvec zl = zPos   [i1_V];
 
     fvec dzli = 1./(zl-targZ);
     StripsToCoor(u, v, xl, yl, stal);
 
-		fvec tx = (xl - targX)*dzli;
-		fvec ty = (yl - targY)*dzli;
+    fvec tx = (xl - targX)*dzli;
+    fvec ty = (yl - targY)*dzli;
 
     L1FieldRegion fld0;      // by  left   hit, target and "center" (station in-between). Used here for extrapolation to target and to middle hit
     L1FieldRegion fld1; // by  middle hit, left hit and "center" . Will be used for extrapolation to right hit
@@ -152,34 +152,34 @@ inline void L1Algo::f11(	// input
 #ifndef BEGIN_FROM_TARGET // the best now
     L1TrackPar T;
 
-		T.chi2 = 0.;
-		T.NDF = 2.;
-		if( isec==2) T.NDF = 0;
-		T.x  = xl;
-		T.y  = yl;
-		T.tx = tx;
-		T.ty = ty;
-		T.qp = 0.;
-		T.z  = zl;
-		T.C00 = stal.XYInfo.C00;
-		T.C10 = stal.XYInfo.C10;
-		T.C11 = stal.XYInfo.C11;
+    T.chi2 = 0.;
+    T.NDF = 2.;
+    if( isec==2) T.NDF = 0;
+    T.x  = xl;
+    T.y  = yl;
+    T.tx = tx;
+    T.ty = ty;
+    T.qp = 0.;
+    T.z  = zl;
+    T.C00 = stal.XYInfo.C00;
+    T.C10 = stal.XYInfo.C10;
+    T.C11 = stal.XYInfo.C11;
     T.C20 = T.C21 = 0;
     T.C30 = T.C31 = T.C32 = 0;
     T.C40 = T.C41 = T.C42 = T.C43 = 0;
     T.C22 = T.C33 = 10.; T.C44 = MaxInvMom/3.*MaxInvMom/3.;
 
-		//add the target
-		{
-			fvec eX, eY, J04, J14;
-			fvec dz;
-			dz = targZ - zl;
-			L1ExtrapolateJXY0(T.tx, T.ty, dz, fld0, eX, eY, J04, J14 );
-			fvec J[6];
-			J[0]= dz; J[1] = 0; J[2]= J04;
-			J[3] = 0; J[4]= dz; J[5]= J14;
-			L1FilterVtx( T, targX, targY, TargetXYInfo, eX, eY, J );
-		}
+    //add the target
+    {
+      fvec eX, eY, J04, J14;
+      fvec dz;
+      dz = targZ - zl;
+      L1ExtrapolateJXY0(T.tx, T.ty, dz, fld0, eX, eY, J04, J14 );
+      fvec J[6];
+      J[0]= dz; J[1] = 0; J[2]= J04;
+      J[3] = 0; J[4]= dz; J[5]= J14;
+      L1FilterVtx( T, targX, targY, TargetXYInfo, eX, eY, J );
+    }
 #else  // TODO: doesn't work. Why?
     L1TrackPar T;
 
@@ -214,53 +214,53 @@ inline void L1Algo::f11(	// input
     L1AddMaterial( T, stal.materialInfo, MaxInvMom );
     if (istal == NMvdStations - 1) L1AddPipeMaterial( T, MaxInvMom );
 
- 		L1Extrapolate0( T, zstam, fld0 ); // TODO: fld1 doesn't work!
+     L1Extrapolate0( T, zstam, fld0 ); // TODO: fld1 doesn't work!
 //     L1Extrapolate( T, zstam, T.qp, fld1 );
 
       // find region on next station to find middle hit
-// 		fvec dxm_est = Pick_m*sqrt(fabs(T.C00+stam.XYInfo.C00));
-// 		fvec dym_est = Pick_m*sqrt(fabs(T.C11+stam.XYInfo.C11));
+//     fvec dxm_est = Pick_m*sqrt(fabs(T.C00+stam.XYInfo.C00));
+//     fvec dym_est = Pick_m*sqrt(fabs(T.C11+stam.XYInfo.C11));
 // 
-// 		x_minusV[i1_V] = T.x - dxm_est;
-// 		x_plusV [i1_V] = T.x + dxm_est;
-// 		y_minusV[i1_V] = T.y - dym_est;
-// 		y_plusV [i1_V] = T.y + dym_est;
+//     x_minusV[i1_V] = T.x - dxm_est;
+//     x_plusV [i1_V] = T.x + dxm_est;
+//     y_minusV[i1_V] = T.y - dym_est;
+//     y_plusV [i1_V] = T.y + dym_est;
 
-		T_1.push_back(T);
-	}// i1_V
+    T_1.push_back(T);
+  }// i1_V
 }
 
 
-					/// Find the doublets. Reformat data in the portion of doublets.
-inline void L1Algo::f20(	// input
-								int n1, int istar, L1Station &stal, L1Station &stam,
+          /// Find the doublets. Reformat data in the portion of doublets.
+inline void L1Algo::f20(  // input
+                int n1, int istar, L1Station &stal, L1Station &stam,
                 L1HitPoint *vStsHits_l, L1HitPoint *vStsHits_m, int NHits_m,
-								fscal *y_minus, fscal *x_minus, fscal *y_plus, fscal *x_plus,
-								nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1,
-								vector<THitI> &hitsl_1,
-								map<unsigned /*short*/ int, THitI> &mrDuplets_start,
-									// output
-								int &n2,
+                fscal *y_minus, fscal *x_minus, fscal *y_plus, fscal *x_plus,
+                nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1,
+                vector<THitI> &hitsl_1,
+                map<unsigned /*short*/ int, THitI> &mrDuplets_start,
+                  // output
+                int &n2,
                 vector<THitI> &i1_2,
                 int &start_mhit,
 #ifdef DOUB_PERFORMANCE
                 vector<THitI> &hitsl_2,
 #endif // DOUB_PERFORMANCE
                 vector<THitI> &hitsm_2,
-								map<unsigned /*short*/ int, THitI> &lmDuplets_start, vector<THitI> &lmDuplets_hits, unsigned int &nDuplets_lm
-								)
+                map<unsigned /*short*/ int, THitI> &lmDuplets_start, vector<THitI> &lmDuplets_hits, unsigned int &nDuplets_lm
+                )
 {
-	n2 = 0; // number of doublet
-	for (int i1 = 0; i1 < n1; i1++){ // for each singlet
+  n2 = 0; // number of doublet
+  for (int i1 = 0; i1 < n1; i1++){ // for each singlet
     int i1_V = i1/fvecLen;
     int i1_4 = i1%fvecLen;
     L1TrackPar& T1 = T_1[i1_V];
 
-		lmDuplets_start[hitsl_1[i1]] = nDuplets_lm; // mark begin
+    lmDuplets_start[hitsl_1[i1]] = nDuplets_lm; // mark begin
 
     THitI nl = vStsHits_l[hitsl_1[i1]].n;
-			// -- find first possible hit for next singlet --
-		for (; start_mhit < NHits_m; start_mhit++){	    // 1.0/1000 sec
+      // -- find first possible hit for next singlet --
+    for (; start_mhit < NHits_m; start_mhit++){      // 1.0/1000 sec
       L1HitPoint &hitm = vStsHits_m[start_mhit];
 
         // find track position in the hit plane
@@ -274,12 +274,12 @@ inline void L1Algo::f20(	// input
         // check position
       fscal ym = hitm.y;
       if ( ym >= y_minus_new_break[i1_4]) break;
-		}
+    }
     
       // -- collect possible doublets --
-		for (int imh = start_mhit; imh < NHits_m; imh++){	 // 6.3/100 sec
-// 			if( n2 >= MaxPortionDoublets ) break;
-			L1HitPoint &hitm = vStsHits_m[imh];
+    for (int imh = start_mhit; imh < NHits_m; imh++){   // 6.3/100 sec
+//       if( n2 >= MaxPortionDoublets ) break;
+      L1HitPoint &hitm = vStsHits_m[imh];
 
          // find track position in the hit plane
       fscal &zm = hitm.z;
@@ -303,11 +303,11 @@ inline void L1Algo::f20(	// input
       fscal xm = hitm.x;
       if ( (xm < x_minus_new[i1_4] ) || (xm > x_plus_new[i1_4]) ) continue;
 
-// 			lmDuplets_hits[nDuplets_lm++]=imh;
+//       lmDuplets_hits[nDuplets_lm++]=imh;
       lmDuplets_hits.push_back(imh);
       nDuplets_lm++;
 
-// 			i1_2[n2] = i1;
+//       i1_2[n2] = i1;
 //      hitsm_2[n2] = imh;
       i1_2.push_back(i1);
 #ifdef DOUB_PERFORMANCE
@@ -315,70 +315,70 @@ inline void L1Algo::f20(	// input
 #endif // DOUB_PERFORMANCE
       hitsm_2.push_back(imh);
 
-			n2++;
-		}
+      n2++;
+    }
 
-		lmDuplets_start[hitsl_1[i1]+1] = nDuplets_lm; // mark the end
-	}  // for i1
+    lmDuplets_start[hitsl_1[i1]+1] = nDuplets_lm; // mark the end
+  }  // for i1
 }
 
 
-					/// Add the middle hits to parameters estimation. Propagate to right station.
-/*void inline f21(	// input
-								int n2_V,
-								L1Station &stam, L1Station &star,
-								fvec *u_front, fvec *u_back,
-								L1FieldRegion *fld_2,
-								double Pick_r,
-									// output
-								L1TrackPar *T_2,
-								fvec* x_minusV, fvec* x_plusV, fvec* y_minusV, fvec* y_plusV
-							 )
+          /// Add the middle hits to parameters estimation. Propagate to right station.
+/*void inline f21(  // input
+                int n2_V,
+                L1Station &stam, L1Station &star,
+                fvec *u_front, fvec *u_back,
+                L1FieldRegion *fld_2,
+                double Pick_r,
+                  // output
+                L1TrackPar *T_2,
+                fvec* x_minusV, fvec* x_plusV, fvec* y_minusV, fvec* y_plusV
+               )
 {
-	for( int i2_V=0; i2_V<n2_V; i2_V++){
+  for( int i2_V=0; i2_V<n2_V; i2_V++){
 
-		L1TrackPar &T2 = T_2[i2_V];
-		L1FieldRegion &f2 = fld_2[i2_V];
-		L1Filter( T2, stam.frontInfo, u_front[i2_V] );
-		L1Filter( T2, stam.backInfo,  u_back[i2_V] );
+    L1TrackPar &T2 = T_2[i2_V];
+    L1FieldRegion &f2 = fld_2[i2_V];
+    L1Filter( T2, stam.frontInfo, u_front[i2_V] );
+    L1Filter( T2, stam.backInfo,  u_back[i2_V] );
 
-		L1AddMaterial( T2, stam.materialInfo, T2.qp );
+    L1AddMaterial( T2, stam.materialInfo, T2.qp );
 
-		L1Extrapolate( T2, star.z, T2.qp, f2 );
-		fvec dxm_est = Pick_r*sqrt(fabs(T2.C00+star.XYInfo.C00));
-		fvec dym_est = Pick_r*sqrt(fabs(T2.C11+star.XYInfo.C11));
-		x_minusV[i2_V] = T2.x - dxm_est;
-		x_plusV [i2_V] = T2.x + dxm_est;
-		y_minusV[i2_V] = T2.y - dym_est;
-		y_plusV [i2_V] = T2.y + dym_est;
+    L1Extrapolate( T2, star.z, T2.qp, f2 );
+    fvec dxm_est = Pick_r*sqrt(fabs(T2.C00+star.XYInfo.C00));
+    fvec dym_est = Pick_r*sqrt(fabs(T2.C11+star.XYInfo.C11));
+    x_minusV[i2_V] = T2.x - dxm_est;
+    x_plusV [i2_V] = T2.x + dxm_est;
+    y_minusV[i2_V] = T2.y - dym_est;
+    y_plusV [i2_V] = T2.y + dym_est;
 
-	}
+  }
 }
 */
 
-					/// Add the middle hits to parameters estimation. Propagate to right station.
-					/// Find the triplets(right hit). Reformat data in the portion of triplets.
-inline void L1Algo::f30(	// input
+          /// Add the middle hits to parameters estimation. Propagate to right station.
+          /// Find the triplets(right hit). Reformat data in the portion of triplets.
+inline void L1Algo::f30(  // input
                 L1HitPoint *vStsHits_r, L1Station &stam, L1Station &star,
 
-								int istar, int n1,
-								L1HitPoint *vStsHits_m,
-								nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1,
+                int istar, int n1,
+                L1HitPoint *vStsHits_m,
+                nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1,
                 vector<THitI> &hitsl_1,
-								map<unsigned /*short*/ int, THitI> &lmDuplets_start, vector<THitI> &lmDuplets_hits,
+                map<unsigned /*short*/ int, THitI> &lmDuplets_start, vector<THitI> &lmDuplets_hits,
 
-								int n2,
+                int n2,
                 vector<THitI> &hitsm_2,
                 vector<THitI> &i1_2,
 
-								map<unsigned /*short*/ int, THitI> &mrDuplets_start, vector<THitI> &mrDuplets_hits,
-// 								int MaxPortionTriplets,
-									// output
-								int &n3,
+                map<unsigned /*short*/ int, THitI> &mrDuplets_start, vector<THitI> &mrDuplets_hits,
+//                 int MaxPortionTriplets,
+                  // output
+                int &n3,
                 nsL1::vector<L1TrackPar>::TSimd &T_3,
                 vector<THitI> &hitsl_3,  vector<THitI> &hitsm_3,  vector<THitI> &hitsr_3,
                 nsL1::vector<fvec>::TSimd &u_front_3, nsL1::vector<fvec>::TSimd &u_back_3
-								)
+                )
 {
   nsL1::vector<L1TrackPar>::TSimd T_2;
   nsL1::vector<L1FieldRegion>::TSimd fld_2;
@@ -406,13 +406,13 @@ inline void L1Algo::f30(	// input
 
 
 
-		// ---- Add the middle hits to parameters estimation. Propagate to right station. ----
+    // ---- Add the middle hits to parameters estimation. Propagate to right station. ----
   int n2_V = (n2+fvecLen-1)/fvecLen;
-	if (istar < NStations){
-		for (int i2_V = 0; i2_V < n2_V; i2_V++){
+  if (istar < NStations){
+    for (int i2_V = 0; i2_V < n2_V; i2_V++){
       const int max_i2_4 = ( (n2-i2_V*fvecLen) >= fvecLen ) ? fvecLen : (n2-i2_V*fvecLen);
-// 			L1TrackPar &T2 = T_2[i2_V];
-// 			L1FieldRegion &f2 = fld_2[i2_V];
+//       L1TrackPar &T2 = T_2[i2_V];
+//       L1FieldRegion &f2 = fld_2[i2_V];
       L1TrackPar T2;
       L1FieldRegion f2;
 
@@ -421,35 +421,35 @@ inline void L1Algo::f30(	// input
       u_back_2.push_back(fvec_0);
       zPos_2.push_back(fvec_0);
       for (int i2_4 = 0; i2_4 < max_i2_4; i2_4++){
-				int i2 = i2_V*fvecLen+i2_4;
-				int i1 = i1_2[i2];
-				int i1_V = i1/fvecLen;
-				int i1_4 = i1%fvecLen;
+        int i2 = i2_V*fvecLen+i2_4;
+        int i1 = i1_2[i2];
+        int i1_V = i1/fvecLen;
+        int i1_4 = i1%fvecLen;
 
-				L1TrackPar &T1 = T_1[i1_V];
-				L1FieldRegion &f1 = fld_1[i1_V];
+        L1TrackPar &T1 = T_1[i1_V];
+        L1FieldRegion &f1 = fld_1[i1_V];
         T2.SetOneEntry(i2_4, T1, i1_4);
         f2.SetOneEntry(i2_4, f1, i1_4);
         
-				int imh = hitsm_2[i2];
-				L1HitPoint &hitm = vStsHits_m[imh];
-				fscal &um = hitm.u;
-				fscal &vm = hitm.v;
+        int imh = hitsm_2[i2];
+        L1HitPoint &hitm = vStsHits_m[imh];
+        fscal &um = hitm.u;
+        fscal &vm = hitm.v;
         fscal &zm = hitm.z;
-				u_front_2[i2_V][i2_4] = um;
-				u_back_2 [i2_V][i2_4] = vm;
+        u_front_2[i2_V][i2_4] = um;
+        u_back_2 [i2_V][i2_4] = vm;
         zPos_2   [i2_V][i2_4] = zm;
 
-// 				hitsl_2[i2] = hitsl_1[i1];
+//         hitsl_2[i2] = hitsl_1[i1];
         hitsl_2.push_back(hitsl_1[i1]);
-			}  // i2_4
+      }  // i2_4
 
         // add middle hit
       L1ExtrapolateShort( T2, zPos_2[i2_V], T2.qp, f2);
-			L1Filter( T2, stam.frontInfo, u_front_2[i2_V] );
-			L1Filter( T2, stam.backInfo,  u_back_2[i2_V] );
+      L1Filter( T2, stam.frontInfo, u_front_2[i2_V] );
+      L1Filter( T2, stam.backInfo,  u_back_2[i2_V] );
 
-			L1AddMaterial( T2, stam.materialInfo, T2.qp );
+      L1AddMaterial( T2, stam.materialInfo, T2.qp );
       if (istar - 1 == NMvdStations) L1AddPipeMaterial( T2, T2.qp );
 
 //         // update field     // don't help
@@ -471,12 +471,12 @@ inline void L1Algo::f30(	// input
         // extrapolate to the right hit station
       L1Extrapolate( T2, star.z, T2.qp, f2 );
 //       T2.L1Extrapolate( star.z, T2.qp, f2 );
-// 			fvec dxm_est = Pick_r*sqrt(fabs(T2.C00+star.XYInfo.C00));
-// 			fvec dym_est = Pick_r*sqrt(fabs(T2.C11+star.XYInfo.C11));
-// // 			x_minusV_2[i2_V] = T2.x - dxm_est;
-// // 			x_plusV_2 [i2_V] = T2.x + dxm_est;
-// // 			y_minusV_2[i2_V] = T2.y - dym_est;
-// // 			y_plusV_2 [i2_V] = T2.y + dym_est;
+//       fvec dxm_est = Pick_r*sqrt(fabs(T2.C00+star.XYInfo.C00));
+//       fvec dym_est = Pick_r*sqrt(fabs(T2.C11+star.XYInfo.C11));
+// //       x_minusV_2[i2_V] = T2.x - dxm_est;
+// //       x_plusV_2 [i2_V] = T2.x + dxm_est;
+// //       y_minusV_2[i2_V] = T2.y - dym_est;
+// //       y_plusV_2 [i2_V] = T2.y + dym_est;
 //       x_minusV_2.push_back(T2.x - dxm_est);
 //       x_plusV_2 .push_back(T2.x + dxm_est);
 //       y_minusV_2.push_back(T2.y - dym_est);
@@ -484,8 +484,8 @@ inline void L1Algo::f30(	// input
 
       T_2.push_back(T2);
       fld_2.push_back(f2);
-		}	 // i2_V
-	}	// if
+    }   // i2_V
+  }  // if
 
 //   fscal *x_minus  = (fscal*) (&(x_minusV_2[0]));
 //   fscal *x_plus  =  (fscal*) (&(x_plusV_2 [0]));
@@ -493,26 +493,26 @@ inline void L1Algo::f30(	// input
 //   fscal *y_plus  =  (fscal*) (&(y_plusV_2 [0]));
 
     // ---- Find the triplets(right hit). Reformat data in the portion of triplets. ----
-	int n3_V = 0, n3_4 = 0;
-	for( int i2 = 0; i2 < n2; i2++){
-		int i2_V = i2/fvecLen;
-		int i2_4 = i2%fvecLen;
+  int n3_V = 0, n3_4 = 0;
+  for( int i2 = 0; i2 < n2; i2++){
+    int i2_V = i2/fvecLen;
+    int i2_4 = i2%fvecLen;
 
-		THitI duplet_b = mrDuplets_start[hitsm_2[i2]];			// < 0.001/100000 sec (cash!)
-		THitI duplet_e = mrDuplets_start[hitsm_2[i2]+1];
+    THitI duplet_b = mrDuplets_start[hitsm_2[i2]];      // < 0.001/100000 sec (cash!)
+    THitI duplet_e = mrDuplets_start[hitsm_2[i2]+1];
 
 //     THitI nm = vStsHits_m[hitsm_2[i2]].n;
-		L1TrackPar &T2 = T_2[i2_V];
+    L1TrackPar &T2 = T_2[i2_V];
 
     T_3.push_back(L1TrackPar_0);
     u_front_3.push_back(fvec_0);
     u_back_3.push_back(fvec_0);
-		for (unsigned int irh_index = duplet_b; irh_index < duplet_e; irh_index++){ //  2.1/10 sec
+    for (unsigned int irh_index = duplet_b; irh_index < duplet_e; irh_index++){ //  2.1/10 sec
 
-// 			if( n3 >= MaxPortionTriplets ) break;  // dbg 0
-			int irh = mrDuplets_hits[irh_index];
+//       if( n3 >= MaxPortionTriplets ) break;  // dbg 0
+      int irh = mrDuplets_hits[irh_index];
 
-			L1HitPoint &hitr = vStsHits_r[irh];
+      L1HitPoint &hitr = vStsHits_r[irh];
 
       fscal ur = hitr.u;
       fscal vr = hitr.v;
@@ -545,44 +545,44 @@ inline void L1Algo::f30(	// input
       if ((xr < x_minus_new[i2_4]) || (xr > x_plus_new[i2_4]) ) continue; // dbg 1
 
         // pack triplet
-			L1TrackPar &T3 = T_3[n3_V];
+      L1TrackPar &T3 = T_3[n3_V];
 
-// 			hitsl_3[n3] = hitsl_2[i2];   // 1/3  2.3/1000 sec
-// 			hitsm_3[n3] = hitsm_2[i2];	 // 1/3  2.3/1000 sec
-// 			hitsr_3[n3] = irh;					 // 1/3  2.3/1000 sec
+//       hitsl_3[n3] = hitsl_2[i2];   // 1/3  2.3/1000 sec
+//       hitsm_3[n3] = hitsm_2[i2];   // 1/3  2.3/1000 sec
+//       hitsr_3[n3] = irh;           // 1/3  2.3/1000 sec
       hitsl_3.push_back(hitsl_2[i2]);   // 1/3  2.3/1000 sec
       hitsm_3.push_back(hitsm_2[i2]);   // 1/3  2.3/1000 sec
       hitsr_3.push_back(irh);           // 1/3  2.3/1000 sec
 
       T3.SetOneEntry(n3_4, T2_new, i2_4);
       u_front_3[n3_V][n3_4] = ur;
-			u_back_3 [n3_V][n3_4] = vr;
+      u_back_3 [n3_V][n3_4] = vr;
 
 
-			n3++;										// < 0.001/1000000
-			n3_V = n3/fvecLen;			// < 0.001/1000000
-			n3_4 = n3 % fvecLen;
+      n3++;                    // < 0.001/1000000
+      n3_V = n3/fvecLen;      // < 0.001/1000000
+      n3_4 = n3 % fvecLen;
       if (!n3_4){ T_3.push_back(L1TrackPar_0); u_front_3.push_back(fvec_0); u_back_3.push_back(fvec_0); }
-		}
-	}// i2
+    }
+  }// i2
 
 }
 
 
-					/// Add the right hits to parameters estimation.
-inline void L1Algo::f31(	// input
-								int n3_V,
-								L1Station &star,
+          /// Add the right hits to parameters estimation.
+inline void L1Algo::f31(  // input
+                int n3_V,
+                L1Station &star,
                 nsL1::vector<fvec>::TSimd &u_front, nsL1::vector<fvec>::TSimd &u_back,
-									// output
+                  // output
                 //                L1TrackPar *T_3
                 nsL1::vector<L1TrackPar>::TSimd &T_3
-							 )
+               )
 {
-	for( int i3_V=0; i3_V<n3_V; i3_V++){
-		L1Filter( T_3[i3_V], star.frontInfo, u_front[i3_V] );		// 2.1/100 sec
-		L1Filter( T_3[i3_V], star.backInfo,  u_back [i3_V] );   // 2.0/100 sec
-	};
+  for( int i3_V=0; i3_V<n3_V; i3_V++){
+    L1Filter( T_3[i3_V], star.frontInfo, u_front[i3_V] );    // 2.1/100 sec
+    L1Filter( T_3[i3_V], star.backInfo,  u_back [i3_V] );   // 2.0/100 sec
+  };
 }
 
 
@@ -750,21 +750,21 @@ inline void L1Algo::f32( // input
 }
 
 
-					/// Select triplets. Save them into vTriplets.
-inline void L1Algo::f4(	// input
-								int n3, int istal,
-// 								L1TrackPar *T_3,
+          /// Select triplets. Save them into vTriplets.
+inline void L1Algo::f4(  // input
+                int n3, int istal,
+//                 L1TrackPar *T_3,
                 nsL1::vector<L1TrackPar>::TSimd &T_3,
 
                 vector<THitI> &hitsl_3,  vector<THitI> &hitsm_3,  vector<THitI> &hitsr_3,
-								// output
-								unsigned int &nstaltriplets,
+                // output
+                unsigned int &nstaltriplets,
                 std::vector<L1Triplet> &vTriplets_part,
-								unsigned int *TripStartIndexH, unsigned int *TripStopIndexH
+                unsigned int *TripStartIndexH, unsigned int *TripStopIndexH
 // #ifdef XXX
-// 								,unsigned int &stat_n_trip
+//                 ,unsigned int &stat_n_trip
 // #endif
-							 )
+               )
 {
   int istam = istal + 1;
   int istar = istal + 2;
@@ -821,108 +821,108 @@ inline void L1Algo::f4(	// input
 } // f4()
 
 
-					/// Find neighbours of triplets. Calculate level of triplets.
-inline void L1Algo::f5(	// input
-							 	// output
-							 unsigned int *TripStartIndexH, unsigned int *TripStopIndexH,
-							 int *nlevel
-							 )
+          /// Find neighbours of triplets. Calculate level of triplets.
+inline void L1Algo::f5(  // input
+                 // output
+               unsigned int *TripStartIndexH, unsigned int *TripStopIndexH,
+               int *nlevel
+               )
 {
-// 		cout << "Start  Finding levels of triplets "  << endl;
+//     cout << "Start  Finding levels of triplets "  << endl;
 
-	for	(int istal = NStations-4; istal >=0; istal--){
-		int istam = istal + 1;
-		int istar = istal + 2;
+  for  (int istal = NStations-4; istal >=0; istal--){
+    int istam = istal + 1;
+    int istar = istal + 2;
 
 
-		unsigned int offset_m = TripStartIndex[istam];
-		unsigned int offset_r = TripStartIndex[istar];
+    unsigned int offset_m = TripStartIndex[istam];
+    unsigned int offset_r = TripStartIndex[istar];
 
-		for (int it = TripStartIndex[istal]; it < TripStopIndex[istal]; it++){
-			L1Triplet *trip = &(vTriplets[it]);
+    for (int it = TripStartIndex[istal]; it < TripStopIndex[istal]; it++){
+      L1Triplet *trip = &(vTriplets[it]);
 
-			unsigned char level = 0;
-			float  chi2 = trip->GetChi2();
-			unsigned char  qp = trip->GetQp();
+      unsigned char level = 0;
+      float  chi2 = trip->GetChi2();
+      unsigned char  qp = trip->GetQp();
 
-			THitI ihitl = trip->GetLHit();
-			THitI ihitm = trip->GetMHit();
-			THitI ihitr = trip->GetRHit();
+      THitI ihitl = trip->GetLHit();
+      THitI ihitm = trip->GetMHit();
+      THitI ihitr = trip->GetRHit();
 
-			THitI first_neighbour = 0;
-			THitI end_neighbour = 0;
+      THitI first_neighbour = 0;
+      THitI end_neighbour = 0;
 
-				// neighbours should have 2 common hits
-			unsigned int first_triplet;
-			unsigned int last_triplet;
+        // neighbours should have 2 common hits
+      unsigned int first_triplet;
+      unsigned int last_triplet;
       unsigned int iN = TripStartIndexH[ihitm];   // first posible neighbour
-			unsigned int lastN = TripStopIndexH[ihitm]; // last posible neighbour
+      unsigned int lastN = TripStopIndexH[ihitm]; // last posible neighbour
 
-				// find first triplet with 2 common hits
-			for (; (iN < lastN); ++iN){
-				unsigned int jhitm;
-				if( vTriplets[iN].GetLevel()==0 )
-					jhitm = vTriplets[iN].GetMHit();
-				else
-					jhitm = vTriplets[offset_r+vTriplets[iN].GetFirstNeighbour()].GetLHit();
-				if (jhitm == ihitr) break;
-			};
+        // find first triplet with 2 common hits
+      for (; (iN < lastN); ++iN){
+        unsigned int jhitm;
+        if( vTriplets[iN].GetLevel()==0 )
+          jhitm = vTriplets[iN].GetMHit();
+        else
+          jhitm = vTriplets[offset_r+vTriplets[iN].GetFirstNeighbour()].GetLHit();
+        if (jhitm == ihitr) break;
+      };
 
 
-			if (iN < lastN) { // if exist at least one trip
+      if (iN < lastN) { // if exist at least one trip
         
           // find last triplets with 2 common hits
         first_triplet = iN;
-				for (; iN < lastN; ++iN){
-					if (vTriplets[iN].GetLHit() != ihitm) break;
-					unsigned int jhitm;
-					if( vTriplets[iN].GetLevel()==0 )
-							jhitm = vTriplets[iN].GetMHit();
-						else
-							jhitm = vTriplets[offset_r+vTriplets[iN].GetFirstNeighbour()].GetLHit();
-					if (jhitm != ihitr) break;
-				};
-				last_triplet = iN-1;
+        for (; iN < lastN; ++iN){
+          if (vTriplets[iN].GetLHit() != ihitm) break;
+          unsigned int jhitm;
+          if( vTriplets[iN].GetLevel()==0 )
+              jhitm = vTriplets[iN].GetMHit();
+            else
+              jhitm = vTriplets[offset_r+vTriplets[iN].GetFirstNeighbour()].GetLHit();
+          if (jhitm != ihitr) break;
+        };
+        last_triplet = iN-1;
 
-					// neighbours should have same qp
-				for (iN = first_triplet; iN <= last_triplet; ++iN){
-					unsigned int index = iN - offset_m;
-					L1Triplet *tripn = &vTriplets[iN];
+          // neighbours should have same qp
+        for (iN = first_triplet; iN <= last_triplet; ++iN){
+          unsigned int index = iN - offset_m;
+          L1Triplet *tripn = &vTriplets[iN];
 
-					fscal qp2 = tripn->GetQp();
-					fscal Cqp1 = trip->Cqp;
-					fscal Cqp2 = tripn->Cqp;
-          if ( fabs(qp - qp2) > PickNeighbour*( Cqp1 + Cqp2 ) )	continue;
+          fscal qp2 = tripn->GetQp();
+          fscal Cqp1 = trip->Cqp;
+          fscal Cqp2 = tripn->Cqp;
+          if ( fabs(qp - qp2) > PickNeighbour*( Cqp1 + Cqp2 ) )  continue;
 
-					if( end_neighbour == 0 ){
-						if( index > tripn->GetMaxFirstNeighbour() )	break;
-						first_neighbour = index;
-					}
-					if( index + 1 - first_neighbour >= tripn->GetMaxNNeighbours() )	break;
-					end_neighbour = index + 1;
+          if( end_neighbour == 0 ){
+            if( index > tripn->GetMaxFirstNeighbour() )  break;
+            first_neighbour = index;
+          }
+          if( index + 1 - first_neighbour >= tripn->GetMaxNNeighbours() )  break;
+          end_neighbour = index + 1;
             // calculate level
-					unsigned char jlevel = tripn->GetLevel();
-					if( level <= jlevel) level = jlevel + 1;
-				}
+          unsigned char jlevel = tripn->GetLevel();
+          if( level <= jlevel) level = jlevel + 1;
+        }
 
-			}; // if exist at least one trip
+      }; // if exist at least one trip
 
         // save information
-			trip->Set( ihitl, ihitm, ihitr,
-					first_neighbour, end_neighbour-first_neighbour,
-					level, qp, chi2);
+      trip->Set( ihitl, ihitm, ihitr,
+          first_neighbour, end_neighbour-first_neighbour,
+          level, qp, chi2);
 
-			nlevel[level]++;
+      nlevel[level]++;
 
-		}// vTriplets
-	} // istal
+    }// vTriplets
+  } // istal
 }
 
-																/// ------------------- doublets on station ----------------------
+                                /// ------------------- doublets on station ----------------------
 
-inline void L1Algo::DupletsStaPort(	// input
-											int isec,
-											int istal,
+inline void L1Algo::DupletsStaPort(  // input
+                      int isec,
+                      int istal,
                       std::vector<L1HitPoint> &svStsHits,
 #ifdef DOUB_PERFORMANCE
                       THitI* _RealIHit,
@@ -933,135 +933,135 @@ inline void L1Algo::DupletsStaPort(	// input
                       L1Portion<L1FieldRegion> &fld_g1,
                       L1Portion<THitI> &hitsl_g1,
 
-												// output
+                        // output
                       map<THitI,THitI> *Duplets_start, vector<THitI> *Duplets_hits,
 
                       vector<int> &n_g2,
                       L1Portion<THitI> &i1_g2,
                       L1Portion<THitI> &hitsm_g2
 
-											)
+                      )
 {
-			int istam = istal+1;
-			int istar = istal+2;
+      int istam = istal+1;
+      int istar = istal+2;
 
-			L1Station &stal = vStations[istal];
-			L1Station &stam = vStations[istam];
+      L1Station &stal = vStations[istal];
+      L1Station &stam = vStations[istam];
 
-						// prepare data
+            // prepare data
       map<THitI, THitI>
-			&mrDuplets_start = Duplets_start[istal+1],// mrDuplets_start - first right hit in mrDuplets_hits, array paralel to middle hits
-			&lmDuplets_start = Duplets_start[istal];// lmDuplets_start -
+      &mrDuplets_start = Duplets_start[istal+1],// mrDuplets_start - first right hit in mrDuplets_hits, array paralel to middle hits
+      &lmDuplets_start = Duplets_start[istal];// lmDuplets_start -
       vector<THitI>
 //       &mrDuplets_hits = Duplets_hits[istal+1], // mrDuplets_hits - right hits of middle-right doublets
       &lmDuplets_hits = Duplets_hits[istal]; // lmDuplets_hits - same for left-middle doublets
 
       L1HitPoint *vStsHits_l = &(svStsHits[0]) + StsHitsStartIndex[istal];
       L1HitPoint *vStsHits_m = &(svStsHits[0]) + StsHitsStartIndex[istam];
-			L1HitPoint *vStsHits_r = 0;
+      L1HitPoint *vStsHits_r = 0;
 
-			int NHits_m = StsHitsStopIndex[istam] - StsHitsStartIndex[istam] + 1;
-			int NHits_r = 0;
-			if( istar < NStations ){
+      int NHits_m = StsHitsStopIndex[istam] - StsHitsStartIndex[istam] + 1;
+      int NHits_r = 0;
+      if( istar < NStations ){
         vStsHits_r = &(svStsHits[0]) + StsHitsStartIndex[istar];
-				NHits_r = StsHitsStopIndex[istar] - StsHitsStartIndex[istar] + 1;
-			}
+        NHits_r = StsHitsStopIndex[istar] - StsHitsStartIndex[istar] + 1;
+      }
 
 
-			unsigned int nDuplets_lm = 0;  // number of created doublets on this stantion
-			int start_mhit = 0;   // hit on the middle stantion to start find new doublets
+      unsigned int nDuplets_lm = 0;  // number of created doublets on this stantion
+      int start_mhit = 0;   // hit on the middle stantion to start find new doublets
 
-			for(unsigned int ip = portionStopIndex[istal+1]; ip < portionStopIndex[istal]; ip++ ){
+      for(unsigned int ip = portionStopIndex[istal+1]; ip < portionStopIndex[istal]; ip++ ){
 
-				fvec u_front[Portion/fvecLen], u_back[Portion/fvecLen];
+        fvec u_front[Portion/fvecLen], u_back[Portion/fvecLen];
         fvec zPos[Portion/fvecLen];
 
-					/// prepare the portion of left hits data
+          /// prepare the portion of left hits data
 
-// 				THitI *hitsl_1;
-// 				hitsl_1 = &(hitsl_g1[ip*Portion+0]);
-				hitsl_g1.add_void(); vector<THitI> &hitsl_1 = hitsl_g1[ip];
+//         THitI *hitsl_1;
+//         hitsl_1 = &(hitsl_g1[ip*Portion+0]);
+        hitsl_g1.add_void(); vector<THitI> &hitsl_1 = hitsl_g1[ip];
 
-				int n1 = n_g1[ip];
+        int n1 = n_g1[ip];
 
-				f10(	// input
-						(ip-portionStopIndex[istal+1]) * Portion, n1, vStsHits_l,
-							// output
-						u_front, u_back, zPos,
-						hitsl_1
-					);
+        f10(  // input
+            (ip-portionStopIndex[istal+1]) * Portion, n1, vStsHits_l,
+              // output
+            u_front, u_back, zPos,
+            hitsl_1
+          );
 
-				int n1_V = (n1+fvecLen-1)/fvecLen;
+        int n1_V = (n1+fvecLen-1)/fvecLen;
 
-					/// Get the field approximation. Add the target to parameters estimation. Propagaete to middle station.
+          /// Get the field approximation. Add the target to parameters estimation. Propagaete to middle station.
 
-// 				L1TrackPar *T_1;			// parameters estimation
+//         L1TrackPar *T_1;      // parameters estimation
 
-// 				L1FieldRegion *fld_1;// field approximation on track
+//         L1FieldRegion *fld_1;// field approximation on track
 
-// 				T_1 = &(T_g1[ip*Portion/fvecLen+0]);
+//         T_1 = &(T_g1[ip*Portion/fvecLen+0]);
         T_g1.add_void(); nsL1::vector<L1TrackPar>::TSimd &T_1 = T_g1[ip];
-// 				fld_1 = &(fld_g1[ip*Portion/fvecLen+0]);
+//         fld_1 = &(fld_g1[ip*Portion/fvecLen+0]);
         fld_g1.add_void(); nsL1::vector<L1FieldRegion>::TSimd &fld_1 = fld_g1[ip];
 
-				fvec x_minusV_1[Portion/fvecLen];		// region on next station to add hit
-				fvec x_plusV_1 [Portion/fvecLen];
-				fvec y_minusV_1[Portion/fvecLen];
-				fvec y_plusV_1 [Portion/fvecLen];
+        fvec x_minusV_1[Portion/fvecLen];    // region on next station to add hit
+        fvec x_plusV_1 [Portion/fvecLen];
+        fvec y_minusV_1[Portion/fvecLen];
+        fvec y_plusV_1 [Portion/fvecLen];
 
 //         cout << "Run f11" << endl;
 
-				f11(isec, istal,
-						n1_V,
+        f11(isec, istal,
+            n1_V,
 
             u_front, u_back, zPos,
-							// output
-						T_1, fld_1,
-						x_minusV_1, x_plusV_1, y_minusV_1, y_plusV_1
-					);
+              // output
+            T_1, fld_1,
+            x_minusV_1, x_plusV_1, y_minusV_1, y_plusV_1
+          );
 
-					/// Find the doublets. Reformat data in the portion of doublets.
+          /// Find the doublets. Reformat data in the portion of doublets.
 
-				fscal *x_minus;
-				fscal *x_plus;
-				fscal *y_minus;
-				fscal *y_plus;
-				x_minus  = reinterpret_cast<fscal*>(&(x_minusV_1[0]));
+        fscal *x_minus;
+        fscal *x_plus;
+        fscal *y_minus;
+        fscal *y_plus;
+        x_minus  = reinterpret_cast<fscal*>(&(x_minusV_1[0]));
         x_plus   = reinterpret_cast<fscal*>(&(x_plusV_1 [0]));
         y_minus  = reinterpret_cast<fscal*>(&(y_minusV_1[0]));
         y_plus   = reinterpret_cast<fscal*>(&(y_plusV_1 [0]));
 
-// 				THitI *hitsm_2;
-// 				hitsm_2 = &(hitsm_g2[ip*MaxPortionDoublets+0]);
+//         THitI *hitsm_2;
+//         hitsm_2 = &(hitsm_g2[ip*MaxPortionDoublets+0]);
         hitsm_g2.add_void(); vector<THitI> &hitsm_2 = hitsm_g2[ip];
 #ifdef DOUB_PERFORMANCE
         vector<THitI> hitsl_2;
 #endif // DOUB_PERFORMANCE
 
-// 				THitI *i1_2;
-// 				i1_2 = &(i1_g2[ip*MaxPortionDoublets+0]);
+//         THitI *i1_2;
+//         i1_2 = &(i1_g2[ip*MaxPortionDoublets+0]);
         i1_g2.add_void(); vector<THitI> &i1_2 = i1_g2[ip];
 
- 				int n2;
+         int n2;
 
 
-				f20(	// input
-						n1, istar, stal, stam,
-						vStsHits_l, vStsHits_m, NHits_m,
-						y_minus, x_minus, y_plus, x_plus,
-						T_1, fld_1,
-						hitsl_1,
-						mrDuplets_start,
-							// output
-						n2,
-						i1_2,
-						start_mhit,
+        f20(  // input
+            n1, istar, stal, stam,
+            vStsHits_l, vStsHits_m, NHits_m,
+            y_minus, x_minus, y_plus, x_plus,
+            T_1, fld_1,
+            hitsl_1,
+            mrDuplets_start,
+              // output
+            n2,
+            i1_2,
+            start_mhit,
 #ifdef DOUB_PERFORMANCE
             hitsl_2,
 #endif // DOUB_PERFORMANCE
-						hitsm_2,
-						lmDuplets_start, lmDuplets_hits, nDuplets_lm
-					 );
+            hitsm_2,
+            lmDuplets_start, lmDuplets_hits, nDuplets_lm
+           );
 
 #ifdef DOUB_PERFORMANCE
         THitI* RealIHitL = &(_RealIHit[StsHitsStartIndex[istal]]);
@@ -1077,50 +1077,50 @@ inline void L1Algo::DupletsStaPort(	// input
         }
 #endif // DOUB_PERFORMANCE
 
-					// Add the middle hits to parameters estimation. Propagate to right station.
+          // Add the middle hits to parameters estimation. Propagate to right station.
 
-//  				int n2_V = (n2+fvecLen-1)/fvecLen;
+//          int n2_V = (n2+fvecLen-1)/fvecLen;
 
-// 				fvec *x_minusV_2;
-// 				fvec *x_plusV_2;
-// 				fvec *y_minusV_2;
-// 				fvec *y_plusV_2;
-// 				x_minusV_2 = (&(x_minusV_g2[ip*MaxPortionDoublets/fvecLen+0]));
-// 				x_plusV_2  = (&(x_plusV_g2 [ip*MaxPortionDoublets/fvecLen+0]));
-// 				y_minusV_2 = (&(y_minusV_g2[ip*MaxPortionDoublets/fvecLen+0]));
-// 				y_plusV_2  = (&(y_plusV_g2 [ip*MaxPortionDoublets/fvecLen+0]));
+//         fvec *x_minusV_2;
+//         fvec *x_plusV_2;
+//         fvec *y_minusV_2;
+//         fvec *y_plusV_2;
+//         x_minusV_2 = (&(x_minusV_g2[ip*MaxPortionDoublets/fvecLen+0]));
+//         x_plusV_2  = (&(x_plusV_g2 [ip*MaxPortionDoublets/fvecLen+0]));
+//         y_minusV_2 = (&(y_minusV_g2[ip*MaxPortionDoublets/fvecLen+0]));
+//         y_plusV_2  = (&(y_plusV_g2 [ip*MaxPortionDoublets/fvecLen+0]));
 
-// 				f21(	// input
-// 						n2_V,
-// 						stam, star,
-// 						u_front, u_back,
-// 						fld_2,
-// 						Pick_r,
-// 							// output
-// 						T_2,
-// 						x_minusV_2, x_plusV_2, y_minusV_2, y_plusV_2
-// 					 );
+//         f21(  // input
+//             n2_V,
+//             stam, star,
+//             u_front, u_back,
+//             fld_2,
+//             Pick_r,
+//               // output
+//             T_2,
+//             x_minusV_2, x_plusV_2, y_minusV_2, y_plusV_2
+//            );
 
 
-// 				if (n2 >= MaxPortionDoublets) cout << "isec: " << isec << " stantion: " << istal << " portion number: " << ip << " CATrackFinder: Warning: Too many doublets created in portion" << endl;
+//         if (n2 >= MaxPortionDoublets) cout << "isec: " << isec << " stantion: " << istal << " portion number: " << ip << " CATrackFinder: Warning: Too many doublets created in portion" << endl;
 
-// 				n_g2[ip] = n2;
+//         n_g2[ip] = n2;
         n_g2.push_back(n2);
 
-			} // portion of left hits
+      } // portion of left hits
 
 
-// 		if (nDuplets_lm > MaxArrSize) cout << "isec: " << isec << " stantion: " << istal << " CATrackFinder: Error: Too many doublets on stantion was created" << endl;
+//     if (nDuplets_lm > MaxArrSize) cout << "isec: " << isec << " stantion: " << istal << " CATrackFinder: Error: Too many doublets on stantion was created" << endl;
 
 
 }
 
 
-														/// ------------------- Triplets on station ----------------------
+                            /// ------------------- Triplets on station ----------------------
 
-inline void L1Algo::TripletsStaPort(	// input
-														int isec,
-														int istal,
+inline void L1Algo::TripletsStaPort(  // input
+                            int isec,
+                            int istal,
                             std::vector<L1HitPoint> &svStsHits,
                             THitI* _RealIHit,
 
@@ -1130,15 +1130,15 @@ inline void L1Algo::TripletsStaPort(	// input
                             L1Portion<L1FieldRegion> &fld_g1,
                             L1Portion<THitI> &hitsl_g1,
 
-	                          vector<int> &n_g2, unsigned int *portionStopIndex,
+                            vector<int> &n_g2, unsigned int *portionStopIndex,
                             L1Portion<THitI> &i1_g2,
                             L1Portion<THitI> &hitsm_g2,
 
-															// output
-														map<unsigned /*short*/ int,THitI> *Duplets_start, vector<THitI>  *Duplets_hits,
-														std::vector<L1Triplet> *vTriplets_part,
-														unsigned int *TripStartIndexH, unsigned int *TripStopIndexH
-														)
+                              // output
+                            map<unsigned /*short*/ int,THitI> *Duplets_start, vector<THitI>  *Duplets_hits,
+                            std::vector<L1Triplet> *vTriplets_part,
+                            unsigned int *TripStartIndexH, unsigned int *TripStopIndexH
+                            )
 {
 
         // prepare data
@@ -1301,17 +1301,17 @@ inline void L1Algo::TripletsStaPort(	// input
 
     ///**********************************************************************************************************************
     ///**********************************************************************************************************************
-		///**********************************************************************************************************************
+    ///**********************************************************************************************************************
     ///*                                                                                                                    *
-		///*                                                                                                                    *
-		///*                                                                                                                    *
+    ///*                                                                                                                    *
+    ///*                                                                                                                    *
     ///*                                          CATrackFinder procedure                                                   *
-		///*                                                                                                                    *
-		///*                                                                                                                    *
+    ///*                                                                                                                    *
+    ///*                                                                                                                    *
     ///*                                                                                                                    *
     ///**********************************************************************************************************************
     ///**********************************************************************************************************************
-		///**********************************************************************************************************************
+    ///**********************************************************************************************************************
 
 
 
@@ -1323,9 +1323,9 @@ void L1Algo::CATrackFinder()
 
 
 
-// 	cout<<" total STS hits "<<vStsHits.size()<<endl;
-		//cout<<" total STS hits, strips, back strips "
-		//<<vStsHits.size()<<" "<<vStsStrips.size()<<" "<<vStsStripsB.size()<<endl;
+//   cout<<" total STS hits "<<vStsHits.size()<<endl;
+    //cout<<" total STS hits, strips, back strips "
+    //<<vStsHits.size()<<" "<<vStsStrips.size()<<" "<<vStsStripsB.size()<<endl;
 
 #ifdef PULLS
   static L1AlgoPulls *l1Pulls_ = new L1AlgoPulls();
@@ -1351,86 +1351,86 @@ void L1Algo::CATrackFinder()
   draw.InitL1Draw(this);
 #endif
 
-	cout.precision(6);
+  cout.precision(6);
         
 #ifdef XXX
   static unsigned int stat_N = 0; // number of events
 
   const int Nisec = 3; //number of main loops
 
-		// timers for different part of CATrackFinder
-	const int ntimers = 6; //number of timers + 1
+    // timers for different part of CATrackFinder
+  const int ntimers = 6; //number of timers + 1
 
   static double
     stat_time = 0.0, stat_time_real = 0.0, stat_time_trip[Nisec], stat_time_fit[Nisec],  stat_time_fit_bra[Nisec], stat_time_fit_fin[Nisec];
 
-	if (stat_N == 0)
-		for(int i1 = 0; i1 < Nisec; i1++){
-			stat_time_trip[i1] = .0;
-			stat_time_fit[i1] = .0;
-			stat_time_fit_bra[i1] = .0;
-			stat_time_fit_fin[i1] = .0;
-		}
+  if (stat_N == 0)
+    for(int i1 = 0; i1 < Nisec; i1++){
+      stat_time_trip[i1] = .0;
+      stat_time_fit[i1] = .0;
+      stat_time_fit_bra[i1] = .0;
+      stat_time_fit_fin[i1] = .0;
+    }
 
   double
   time_trip[Nisec], time_fit[Nisec], time_fit_bra[Nisec], time_fit_fin[Nisec];
 
-	for(int i1 = 0; i1 < Nisec; i1++){
-		time_trip[i1] = .0;
-		time_fit[i1] = .0;
+  for(int i1 = 0; i1 < Nisec; i1++){
+    time_trip[i1] = .0;
+    time_fit[i1] = .0;
     time_fit_bra[i1] = .0;
-		time_fit_fin[i1] = .0;
-	}
+    time_fit_fin[i1] = .0;
+  }
 
-	static double stat_time_find[ntimers][2][Nisec];
-	if (stat_N == 0)
-		for(int i1 = 0; i1 < Nisec; i1++)
-			for(int i2 = 0; i2 < ntimers; i2++)
-				for(int i3 = 0; i3 < 2; i3++)
-					stat_time_find[i2][i3][i1] = 0.;
+  static double stat_time_find[ntimers][2][Nisec];
+  if (stat_N == 0)
+    for(int i1 = 0; i1 < Nisec; i1++)
+      for(int i2 = 0; i2 < ntimers; i2++)
+        for(int i3 = 0; i3 < 2; i3++)
+          stat_time_find[i2][i3][i1] = 0.;
 
-	double stat_time_find_all[ntimers][2];
-	for(int i2 = 0; i2 < ntimers; i2++)
-		for(int i3 = 0; i3 < 2; i3++)
-			stat_time_find_all[i2][i3] = 0.;
+  double stat_time_find_all[ntimers][2];
+  for(int i2 = 0; i2 < ntimers; i2++)
+    for(int i3 = 0; i3 < 2; i3++)
+      stat_time_find_all[i2][i3] = 0.;
 
 
-	double time_find[ntimers][2][Nisec];
-	for(int i1 = 0; i1 < Nisec; i1++)
-		for(int i2 = 0; i2 < ntimers; i2++)
-			for(int i3 = 0; i3 < 2; i3++)
-				time_find[i2][i3][i1] = 0.;
+  double time_find[ntimers][2][Nisec];
+  for(int i1 = 0; i1 < Nisec; i1++)
+    for(int i2 = 0; i2 < ntimers; i2++)
+      for(int i3 = 0; i3 < 2; i3++)
+        time_find[i2][i3][i1] = 0.;
 
-	TStopwatch c_time_find[ntimers][2];
+  TStopwatch c_time_find[ntimers][2];
 
 
 #endif
 
 
-  TStopwatch c_time;	// all CATrackFinder work time
-	c_time.Start();
+  TStopwatch c_time;  // all CATrackFinder work time
+  c_time.Start();
 
 #ifdef XXX
-		c_time_find[0][0].Start();
+    c_time_find[0][0].Start();
 #endif
 
-	vTracks.clear();
-	vRecoHits.clear();
+  vTracks.clear();
+  vRecoHits.clear();
 
-		// set all hits as usable
-	for( vector<unsigned char>::iterator is= vSFlag.begin(); is!=vSFlag.end(); ++is)
-		SetFUnUsed(*is);
-	for( vector<unsigned char>::iterator is= vSFlagB.begin(); is!=vSFlagB.end(); ++is)
-		SetFUnUsed(*is);
+    // set all hits as usable
+  for( vector<unsigned char>::iterator is= vSFlag.begin(); is!=vSFlag.end(); ++is)
+    SetFUnUsed(*is);
+  for( vector<unsigned char>::iterator is= vSFlagB.begin(); is!=vSFlagB.end(); ++is)
+    SetFUnUsed(*is);
 
 
 #ifdef XXX
-	unsigned int
-		stat_max_n_trip = 0,
-		stat_max_trip_size = 0,
-		stat_max_n_dup = 0,
-		stat_max_BranchSize = 0,
-		stat_max_n_branches = 0;
+  unsigned int
+    stat_max_n_trip = 0,
+    stat_max_trip_size = 0,
+    stat_max_n_dup = 0,
+    stat_max_BranchSize = 0,
+    stat_max_n_branches = 0;
 #endif
 
 // #ifdef DRAW
@@ -1442,52 +1442,52 @@ void L1Algo::CATrackFinder()
 //     draw.DrawAsk();
 // #endif
 
-  vector< L1StsHit > vStsDontUsedHits_A;	// arrays for copy from vStsHits only hits, which aren't used in created tracks
-	vector< L1StsHit > vStsDontUsedHits_B;
+  vector< L1StsHit > vStsDontUsedHits_A;  // arrays for copy from vStsHits only hits, which aren't used in created tracks
+  vector< L1StsHit > vStsDontUsedHits_B;
 
-	vector< L1HitPoint > vStsDontUsedHitsxy_A;	// arrays for contain prepared information
-	vector< L1HitPoint > vStsDontUsedHitsxy_B;
+  vector< L1HitPoint > vStsDontUsedHitsxy_A;  // arrays for contain prepared information
+  vector< L1HitPoint > vStsDontUsedHitsxy_B;
 
-	std::vector< L1StsHit > *svStsHits = &vStsDontUsedHits_B;			// array of hits uses on current iteration
-	std::vector< L1StsHit > *svStsHits_buf = &vStsDontUsedHits_A; // buffer for copy
+  std::vector< L1StsHit > *svStsHits = &vStsDontUsedHits_B;      // array of hits uses on current iteration
+  std::vector< L1StsHit > *svStsHits_buf = &vStsDontUsedHits_A; // buffer for copy
 
-	std::vector< L1HitPoint > *svStsHits2 = &vStsDontUsedHitsxy_B;// array of info for hits uses on current iteration
-	std::vector< L1HitPoint > *svStsHits_buf2 = &vStsDontUsedHitsxy_A;
+  std::vector< L1HitPoint > *svStsHits2 = &vStsDontUsedHitsxy_B;// array of info for hits uses on current iteration
+  std::vector< L1HitPoint > *svStsHits_buf2 = &vStsDontUsedHitsxy_A;
 
-	svStsHits_buf->clear();
-	svStsHits_buf2->clear();
-// 	unsigned int RealIHit[MaxNPortion*Portion*MaxNStations]; 
+  svStsHits_buf->clear();
+  svStsHits_buf2->clear();
+//   unsigned int RealIHit[MaxNPortion*Portion*MaxNStations]; 
   vector<THitI> RealIHit_v; // index of hit in vStsHits indexed by index of hit in svStsHits;
   RealIHit_v.reserve(vStsHits.size());
   THitI *RealIHit = &(RealIHit_v[0]);
 
 
-		// full arrays for first iteration
-	for(int ista = 0; ista < NStations; ista++){
-		for(int ih = StsHitsStartIndex[ista]; ih <= StsHitsStopIndex[ista]; ih++){
+    // full arrays for first iteration
+  for(int ista = 0; ista < NStations; ista++){
+    for(int ih = StsHitsStartIndex[ista]; ih <= StsHitsStopIndex[ista]; ih++){
       L1StsHit &hit = vStsHits[ih];
       
-			RealIHit[ih] = ih;
+      RealIHit[ih] = ih;
       vStsDontUsedHits_B  .push_back( hit );
-			vStsDontUsedHitsxy_B.push_back( CreateHitPoint(hit,ista) );
-		}
-	}
+      vStsDontUsedHitsxy_B.push_back( CreateHitPoint(hit,ista) );
+    }
+  }
 
 #ifdef XXX
-				c_time_find[0][0].Stop();
-				time_find[0][0][0] += double(c_time_find[0][0].CpuTime()); //ms
-				time_find[0][1][0] += double(c_time_find[0][0].RealTime()); //ms
+        c_time_find[0][0].Stop();
+        time_find[0][0][0] += double(c_time_find[0][0].CpuTime()); //ms
+        time_find[0][1][0] += double(c_time_find[0][0].RealTime()); //ms
 #endif
 
-		// iterations of finding:
-		// isec == 0 - primary fast track
+    // iterations of finding:
+    // isec == 0 - primary fast track
     // isec == 1 - primary all track
     // isec == 2 - secondary all track
-	for (int isec = 0; isec < fNFindIterations; isec++){ // all finder
+  for (int isec = 0; isec < fNFindIterations; isec++){ // all finder
 
 #ifdef XXX
 //     cout << " Begin of iteration " << isec << endl;
-		TStopwatch c_time_trip;  // time for find all triplets
+    TStopwatch c_time_trip;  // time for find all triplets
 #endif
 
     Pick_m = 2.0; // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
@@ -1506,75 +1506,75 @@ void L1Algo::CATrackFinder()
 //     }
 //     PickNeighbour = 1.0;
 
-		//double MaxInvMom = 1.0/1.;
-		//if (isec == 1) MaxInvMom =  1.0/0.2;
-		//if (isec == 2) MaxInvMom =  1.0/0.2;
-		MaxInvMom = 1.0/0.5;		 								// max considered q/p
-		if (isec == 1) MaxInvMom =  1.0/0.1;
-		if (isec == 2) MaxInvMom =  1.0/0.1;
-// 		if (isec == fTrackingLevel )  MaxInvMom = 1./fMomentumCutOff;
+    //double MaxInvMom = 1.0/1.;
+    //if (isec == 1) MaxInvMom =  1.0/0.2;
+    //if (isec == 2) MaxInvMom =  1.0/0.2;
+    MaxInvMom = 1.0/0.5;                     // max considered q/p
+    if (isec == 1) MaxInvMom =  1.0/0.1;
+    if (isec == 2) MaxInvMom =  1.0/0.1;
+//     if (isec == fTrackingLevel )  MaxInvMom = 1./fMomentumCutOff;
 
 
-			// define the target
+      // define the target
     targX = 0; targY = 0; targZ = 0;      //  suppose, what target will be at (0,0,0)
     
     float SigmaTargetX, SigmaTargetY; // target constraint [cm]
-		if (isec <= 1){ // target
-			targB = vtxFieldValue;
-			if (isec ==-1)
-				SigmaTargetX = SigmaTargetY = 0.01; // target
-			else
-				SigmaTargetX = SigmaTargetY = 0.1;
-		}
-		else{ //use outer radius of the 1st station as a constraint
-			L1Station &st = vStations[0];
-			SigmaTargetX = SigmaTargetY = 3;//st.Rmax[0];
-			targZ = 0.;//-1.;
-			st.fieldSlice.GetFieldValue( 0, 0, targB );
-		}
+    if (isec <= 1){ // target
+      targB = vtxFieldValue;
+      if (isec ==-1)
+        SigmaTargetX = SigmaTargetY = 0.01; // target
+      else
+        SigmaTargetX = SigmaTargetY = 0.1;
+    }
+    else{ //use outer radius of the 1st station as a constraint
+      L1Station &st = vStations[0];
+      SigmaTargetX = SigmaTargetY = 3;//st.Rmax[0];
+      targZ = 0.;//-1.;
+      st.fieldSlice.GetFieldValue( 0, 0, targB );
+    }
 
-		TargetXYInfo.C00 = SigmaTargetX * SigmaTargetX;
-		TargetXYInfo.C10 = 0;
-		TargetXYInfo.C11 = SigmaTargetY * SigmaTargetY;
+    TargetXYInfo.C00 = SigmaTargetX * SigmaTargetX;
+    TargetXYInfo.C10 = 0;
+    TargetXYInfo.C11 = SigmaTargetY * SigmaTargetY;
 
 
-		if (NStations > MaxNStations) cout << " CATrackFinder: Error: Too many Stantions" << endl;
+    if (NStations > MaxNStations) cout << " CATrackFinder: Error: Too many Stantions" << endl;
 
-// 		static THitI Duplets_hits[MaxArrSize*MaxNStations];	// right hits of doublets(left-right)
+//     static THitI Duplets_hits[MaxArrSize*MaxNStations];  // right hits of doublets(left-right)
     vector<THitI> Duplets_hits[MaxNStations];
-// 		static THitI Duplets_start[MaxArrSize*MaxNStations];	// index of first right hits of doublets in Duplets_hits array   indexed by left hit
+//     static THitI Duplets_start[MaxArrSize*MaxNStations];  // index of first right hits of doublets in Duplets_hits array   indexed by left hit
     map<THitI, THitI> Duplets_start[MaxNStations];
-// 					// set 0 for all doublets begin from last station - they don't exist.
+//           // set 0 for all doublets begin from last station - they don't exist.
 
     for (int i = 0; i < MaxNStations; i++){
       Duplets_hits[i].reserve(MaxArrSize);
 //       Duplets_start[i].reserve(MaxArrSize);
     }
 //     Duplets_hits[NStations-1].push_back(0);
-// 		for (unsigned int i = MaxArrSize*(NStations-1); i < MaxArrSize*NStations; i++){
-// 			Duplets_hits[i]  = 0;
-// 			Duplets_start[i] = 0;
-// 		};
+//     for (unsigned int i = MaxArrSize*(NStations-1); i < MaxArrSize*NStations; i++){
+//       Duplets_hits[i]  = 0;
+//       Duplets_start[i] = 0;
+//     };
 
       // global arrays for keep data of doublets on all stations
-// 		static int n_g1[MaxNPortion];	// number of singlets in same portion
+//     static int n_g1[MaxNPortion];  // number of singlets in same portion
     vector<int> n_g1;
-// 		static L1TrackPar T_g1[MaxNPortion*Portion/fvecLen];	// estimation of parameters
+//     static L1TrackPar T_g1[MaxNPortion*Portion/fvecLen];  // estimation of parameters
     L1Portion<L1TrackPar> T_g1(MaxNPortion, Portion/fvecLen);
 
-// 		static L1FieldRegion fld_g1[MaxNPortion*Portion/fvecLen];	// magnetic field
+//     static L1FieldRegion fld_g1[MaxNPortion*Portion/fvecLen];  // magnetic field
     L1Portion<L1FieldRegion> fld_g1(MaxNPortion, Portion/fvecLen);
-// 		static THitI hitsl_g1[MaxNPortion*Portion];  // left and middle hits indexed by number of doublets in portion(i2)
+//     static THitI hitsl_g1[MaxNPortion*Portion];  // left and middle hits indexed by number of doublets in portion(i2)
     L1Portion<THitI> hitsl_g1(MaxNPortion, Portion);
 
        // global arrays for get data of triplets on all stations
-// 		static int n_g2[MaxNPortion];	// number of doublets in same portion
+//     static int n_g2[MaxNPortion];  // number of doublets in same portion
     vector<int> n_g2;
 
-// 		static THitI i1_g2[MaxNPortion*MaxPortionDoublets]; 	// index in portion of singlets(i1) indexed by index in portion of doublets(i2)
+//     static THitI i1_g2[MaxNPortion*MaxPortionDoublets];   // index in portion of singlets(i1) indexed by index in portion of doublets(i2)
     L1Portion<THitI> i1_g2(MaxNPortion, MaxPortionDoublets);
 
-// 		static THitI hitsm_g2[MaxNPortion*MaxPortionDoublets];// left and middle hits indexed by number of doublets in portion(i2)
+//     static THitI hitsm_g2[MaxNPortion*MaxPortionDoublets];// left and middle hits indexed by number of doublets in portion(i2)
     L1Portion<THitI> hitsm_g2(MaxNPortion, MaxPortionDoublets);
 
     n_g1.reserve(MaxNPortion);
@@ -1589,44 +1589,44 @@ void L1Algo::CATrackFinder()
 
 
 
-		/*static*/ vector <L1Triplet> vTriplets_part[MaxNStations];  // temporary arrays for parallelizing save triplets
+    /*static*/ vector <L1Triplet> vTriplets_part[MaxNStations];  // temporary arrays for parallelizing save triplets
 
-		unsigned int portionStopIndex[MaxNStations];	//number of portion on each station
+    unsigned int portionStopIndex[MaxNStations];  //number of portion on each station
 
-// 		static unsigned int TripStartIndexH[MaxArrSize], TripStopIndexH[MaxArrSize]; // index region for triplets, which begins from hit, indexed by index of lhit.
+//     static unsigned int TripStartIndexH[MaxArrSize], TripStopIndexH[MaxArrSize]; // index region for triplets, which begins from hit, indexed by index of lhit.
     vector<unsigned int> TripStartIndexH_v, TripStopIndexH_v;
     TripStartIndexH_v.reserve(svStsHits->size());
     TripStopIndexH_v.reserve(svStsHits->size());
     unsigned int *TripStartIndexH = &(TripStartIndexH_v[0]), *TripStopIndexH = &(TripStopIndexH_v[0]);
-		for(unsigned int i = 0; i < svStsHits->size(); i++){
- 			TripStartIndexH[i] = 0; // actually don't need this one, will be initialized at f4(..)
+    for(unsigned int i = 0; i < svStsHits->size(); i++){
+       TripStartIndexH[i] = 0; // actually don't need this one, will be initialized at f4(..)
       
-			TripStopIndexH[i] = 0;
-		}
+      TripStopIndexH[i] = 0;
+    }
 
-		{		// split left hits on portions
-			portionStopIndex[NStations-1] = 0;
-			unsigned int ip = 0;	//index of curent portion
+    {    // split left hits on portions
+      portionStopIndex[NStations-1] = 0;
+      unsigned int ip = 0;  //index of curent portion
 
-			for (int istal = NStations-2; istal >= FIRSTCASTATION; istal--){  //start downstream chambers
-				int NHits_l = StsHitsStopIndex[istal] - StsHitsStartIndex[istal] + 1;
+      for (int istal = NStations-2; istal >= FIRSTCASTATION; istal--){  //start downstream chambers
+        int NHits_l = StsHitsStopIndex[istal] - StsHitsStartIndex[istal] + 1;
 
-				int NHits_l_P = NHits_l/Portion;
+        int NHits_l_P = NHits_l/Portion;
 
-				for( int ipp = 0; ipp < NHits_l_P; ipp++ ){
-// 					n_g1[ip++] = Portion;
+        for( int ipp = 0; ipp < NHits_l_P; ipp++ ){
+//           n_g1[ip++] = Portion;
           n_g1.push_back(Portion);
           ip++;
-				} // start_lh - portion of left hits
+        } // start_lh - portion of left hits
 
-// 				n_g1[ip++] = NHits_l - NHits_l_P*Portion;
+//         n_g1[ip++] = NHits_l - NHits_l_P*Portion;
         n_g1.push_back(NHits_l - NHits_l_P*Portion);
-				ip++;
-				portionStopIndex[istal]=ip;
-			}// lstations
-		}
+        ip++;
+        portionStopIndex[istal]=ip;
+      }// lstations
+    }
 
-    	///   CREATE doublets
+      ///   CREATE doublets
 
 #ifdef XXX
     cout << "CREATE doublets" << endl;
@@ -1634,74 +1634,74 @@ void L1Algo::CATrackFinder()
 
 
 #ifdef XXX
-		c_time_find[1][0].Start();
+    c_time_find[1][0].Start();
 #endif
 
 #ifdef TBB
-		{
-			task_scheduler_init init(nthreads);
-			static affinity_partitioner ap;
-			ParalleledDup af(	// input
-											isec,
-											vStations, NStations,
-											StsHitsStartIndex, StsHitsStopIndex,
-											vSFlag, vSFlagB,
-											*svStsHits2,
-											Pick_r,
-											Pick_m, MaxInvMom,
-											targX, targY, targZ, targB, TargetXYInfo,
+    {
+      task_scheduler_init init(nthreads);
+      static affinity_partitioner ap;
+      ParalleledDup af(  // input
+                      isec,
+                      vStations, NStations,
+                      StsHitsStartIndex, StsHitsStopIndex,
+                      vSFlag, vSFlagB,
+                      *svStsHits2,
+                      Pick_r,
+                      Pick_m, MaxInvMom,
+                      targX, targY, targZ, targB, TargetXYInfo,
 
-											n_g1, portionStopIndex,
-											T_g1,
-											fld_g1,
-											hitsl_g1,
+                      n_g1, portionStopIndex,
+                      T_g1,
+                      fld_g1,
+                      hitsl_g1,
 
-												// output
-											Duplets_start, Duplets_hits,
+                        // output
+                      Duplets_start, Duplets_hits,
 
-											n_g2,
-											i1_g2,
-											hitsm_g2
-											);
-			parallel_for(blocked_range<size_t>(FIRSTCASTATION,NStations-2+1,
-			                                   nblocks
-																				), af,ap);
-		}
+                      n_g2,
+                      i1_g2,
+                      hitsm_g2
+                      );
+      parallel_for(blocked_range<size_t>(FIRSTCASTATION,NStations-2+1,
+                                         nblocks
+                                        ), af,ap);
+    }
 #else // TBB
-		for (int istal = NStations-2; istal >= FIRSTCASTATION; istal--){//  //start downstream chambers
-			DupletsStaPort(	// input
-											isec,
-											istal,
-											*svStsHits2,
+    for (int istal = NStations-2; istal >= FIRSTCASTATION; istal--){//  //start downstream chambers
+      DupletsStaPort(  // input
+                      isec,
+                      istal,
+                      *svStsHits2,
 #ifdef DOUB_PERFORMANCE
                       RealIHit,
 #endif // DOUB_PERFORMANCE
 
-											n_g1, portionStopIndex,
-											T_g1,
-											fld_g1,
-											hitsl_g1,
+                      n_g1, portionStopIndex,
+                      T_g1,
+                      fld_g1,
+                      hitsl_g1,
 
-												// output
-											Duplets_start, Duplets_hits,
+                        // output
+                      Duplets_start, Duplets_hits,
 
-											n_g2,
-											i1_g2,
-											hitsm_g2
-											);
+                      n_g2,
+                      i1_g2,
+                      hitsm_g2
+                      );
     }// lstations
 #endif // TBB
 
 #ifdef XXX
-				c_time_find[1][0].Stop();
-				time_find[1][0][isec] += double(c_time_find[1][0].CpuTime()); //ms
-				time_find[1][1][isec] += double(c_time_find[1][0].RealTime()); //ms
+        c_time_find[1][0].Stop();
+        time_find[1][0][isec] += double(c_time_find[1][0].CpuTime()); //ms
+        time_find[1][1][isec] += double(c_time_find[1][0].RealTime()); //ms
 #endif
 
 #ifdef XXX
-		int istat_n_triplet_c=0;
-		for(unsigned int ip = 0; ip < portionStopIndex[FIRSTCASTATION]; ip++)
-			istat_n_triplet_c += n_g2[ip];
+    int istat_n_triplet_c=0;
+    for(unsigned int ip = 0; ip < portionStopIndex[FIRSTCASTATION]; ip++)
+      istat_n_triplet_c += n_g2[ip];
 #endif
 
 // #ifdef DRAW
@@ -1722,7 +1722,7 @@ void L1Algo::CATrackFinder()
 //     draw.SaveCanvas(sD);
 // #endif
 
-    	///   CREATE triplets
+      ///   CREATE triplets
 
 #ifdef XXX
     cout << " CREATE TRIPLETS " << endl;
@@ -1731,97 +1731,97 @@ void L1Algo::CATrackFinder()
 
 
 #ifdef XXX
-		c_time_find[1][0].Start();
+    c_time_find[1][0].Start();
 #endif
 
 #ifdef TBB
-		{
-			task_scheduler_init init(nthreads);
-			static affinity_partitioner ap;
-			ParalleledTrip af(	// input
-											isec,
-											vStations, NStations,
-											StsHitsStartIndex, StsHitsStopIndex,
-											*svStsHits2,
+    {
+      task_scheduler_init init(nthreads);
+      static affinity_partitioner ap;
+      ParalleledTrip af(  // input
+                      isec,
+                      vStations, NStations,
+                      StsHitsStartIndex, StsHitsStopIndex,
+                      *svStsHits2,
 
-											Pick_r, TRACK_CHI2_CUT, MaxInvMom,
-											n_g1,
-											T_g1,
-											fld_g1,
-											hitsl_g1,
-											n_g2, portionStopIndex,
-											i1_g2,
-											hitsm_g2,
-												// output
-											Duplets_start, Duplets_hits,
-											vTriplets_part,
-											TripStartIndexH, TripStopIndexH
-											);
-			parallel_for(blocked_range<size_t>(FIRSTCASTATION,NStations-2+1,
-																				nblocks
-																				), af,ap);
-		}
+                      Pick_r, TRACK_CHI2_CUT, MaxInvMom,
+                      n_g1,
+                      T_g1,
+                      fld_g1,
+                      hitsl_g1,
+                      n_g2, portionStopIndex,
+                      i1_g2,
+                      hitsm_g2,
+                        // output
+                      Duplets_start, Duplets_hits,
+                      vTriplets_part,
+                      TripStartIndexH, TripStopIndexH
+                      );
+      parallel_for(blocked_range<size_t>(FIRSTCASTATION,NStations-2+1,
+                                        nblocks
+                                        ), af,ap);
+    }
 #else // TBB
-		for (int istal = NStations-2; istal >= FIRSTCASTATION; istal--){//  //start downstream chambers
-			TripletsStaPort(	// input
-											isec,
-											istal,
+    for (int istal = NStations-2; istal >= FIRSTCASTATION; istal--){//  //start downstream chambers
+      TripletsStaPort(  // input
+                      isec,
+                      istal,
                       *svStsHits2,
                       RealIHit,
 
-											n_g1,
-											T_g1,
-											fld_g1,
-											hitsl_g1,
+                      n_g1,
+                      T_g1,
+                      fld_g1,
+                      hitsl_g1,
 
-											n_g2, portionStopIndex,
-											i1_g2,
-											hitsm_g2,
+                      n_g2, portionStopIndex,
+                      i1_g2,
+                      hitsm_g2,
 
-												// output
-											Duplets_start, Duplets_hits,
-											vTriplets_part,
-											TripStartIndexH, TripStopIndexH
-											);
+                        // output
+                      Duplets_start, Duplets_hits,
+                      vTriplets_part,
+                      TripStartIndexH, TripStopIndexH
+                      );
     }// l-stations
 #endif // TBB
 #ifdef XXX
-				c_time_find[1][0].Stop();
-				time_find[2][0][isec] += double(c_time_find[1][0].CpuTime()); //ms
-				time_find[2][1][isec] += double(c_time_find[1][0].RealTime()); //ms
+        c_time_find[1][0].Stop();
+        time_find[2][0][isec] += double(c_time_find[1][0].CpuTime()); //ms
+        time_find[2][1][isec] += double(c_time_find[1][0].RealTime()); //ms
 #endif
 
 // #ifdef XXX
-// 		cout<<"isec: " << isec <<  "  n hits, dup, tr_c, trip: "
-// 				<<istat_nhits<<" "<<istat_nduplets<<" "<<istat_n_triplet_c<<" "<<istat_n_triplets<<endl;
+//     cout<<"isec: " << isec <<  "  n hits, dup, tr_c, trip: "
+//         <<istat_nhits<<" "<<istat_nduplets<<" "<<istat_n_triplet_c<<" "<<istat_n_triplets<<endl;
 // #endif
 
-					/// save triplets in vTriplets
+          /// save triplets in vTriplets
 #ifdef XXX
     cout << " copy triplets in vTriplets " << endl;
 #endif
 #ifdef XXX
-		c_time_find[2][0].Start();
+    c_time_find[2][0].Start();
 #endif
 
-		vTriplets.clear();
+    vTriplets.clear();
 
-		for (int istal = NStations-2; istal >= FIRSTCASTATION; istal--){
-			TripStartIndex[istal] = vTriplets.size();
+    for (int istal = NStations-2; istal >= FIRSTCASTATION; istal--){
+      TripStartIndex[istal] = vTriplets.size();
 
-			for (unsigned int i = 0; i < vTriplets_part[istal].size(); i++){
-				vTriplets.push_back(vTriplets_part[istal][i]);
-			}
+      for (unsigned int i = 0; i < vTriplets_part[istal].size(); i++){
+        vTriplets.push_back(vTriplets_part[istal][i]);
+      }
 
-			for (int i = StsHitsStartIndex[istal]; i <=StsHitsStopIndex[istal]; i++){
-				if (TripStopIndexH[i] > 0){
-					TripStartIndexH[i]+=TripStartIndex[istal];
-					TripStopIndexH[i] +=TripStartIndex[istal];
-				};
-			}
+      for (int i = StsHitsStartIndex[istal]; i <=StsHitsStopIndex[istal]; i++){
+        if (TripStopIndexH[i] > 0){
+          TripStartIndexH[i]+=TripStartIndex[istal];
+          TripStopIndexH[i] +=TripStartIndex[istal];
+        };
+      }
 
-			TripStopIndex[istal] = vTriplets.size();
-		}
+      TripStopIndex[istal] = vTriplets.size();
+    }
 
 // #ifdef DRAW
 //     {
@@ -1877,30 +1877,30 @@ void L1Algo::CATrackFinder()
 #endif
 
 #ifdef XXX
-		c_time_find[2][0].Stop();
-		time_find[2][0][isec] += double(c_time_find[2][0].CpuTime()); //ms
+    c_time_find[2][0].Stop();
+    time_find[2][0][isec] += double(c_time_find[2][0].CpuTime()); //ms
 #endif
 
-					/// Find neighbours of triplets.
+          /// Find neighbours of triplets.
 #ifdef XXX
     cout << " Find neighbours of triplets. " << endl;
 #endif
 #ifdef XXX
-		c_time_find[4][0].Start();
+    c_time_find[4][0].Start();
 #endif
 
-		int nlevels[NStations];	// number of triplets with some number of neighbours.
+    int nlevels[NStations];  // number of triplets with some number of neighbours.
     for (int il = 0; il < NStations; ++il) nlevels[il] = 0;
 
- 		f5( 	// input
-					// output
-				TripStartIndexH, TripStopIndexH,
+     f5(   // input
+          // output
+        TripStartIndexH, TripStopIndexH,
         nlevels
-			);
+      );
 
 #ifdef XXX
-		c_time_find[4][0].Stop();
-		time_find[4][0][isec] += double(c_time_find[4][0].CpuTime()); //ms
+    c_time_find[4][0].Stop();
+    time_find[4][0][isec] += double(c_time_find[4][0].CpuTime()); //ms
 #endif
 
 #ifdef XXX
@@ -1938,60 +1938,60 @@ void L1Algo::CATrackFinder()
 
       for( int istaF = 0; istaF <= NStations-3-ilev; istaF++ ){ // choose first track-station
 
-				if( isec==2 && istaF>=4 ) break; // ghost supression !!!
+        if( isec==2 && istaF>=4 ) break; // ghost supression !!!
 
-				int trip_first = TripStartIndex[istaF];
-				int trip_end   = TripStopIndex[istaF];
-				for( int itrip=trip_first; itrip<trip_end; itrip++ ){
-					L1Triplet *first_trip = &vTriplets[itrip];
-					int lv=first_trip->GetLevel();
-					int jst= GetFStation( vSFlag[(*svStsHits)[first_trip->GetLHit()].f] );
-					int fl = GetFUsed( vSFlag[(*svStsHits)[first_trip->GetLHit()].f] | vSFlagB[(*svStsHits)[first_trip->GetLHit()].b] );
+        int trip_first = TripStartIndex[istaF];
+        int trip_end   = TripStopIndex[istaF];
+        for( int itrip=trip_first; itrip<trip_end; itrip++ ){
+          L1Triplet *first_trip = &vTriplets[itrip];
+          int lv=first_trip->GetLevel();
+          int jst= GetFStation( vSFlag[(*svStsHits)[first_trip->GetLHit()].f] );
+          int fl = GetFUsed( vSFlag[(*svStsHits)[first_trip->GetLHit()].f] | vSFlagB[(*svStsHits)[first_trip->GetLHit()].b] );
 
-					if ( lv != ilev) continue; // try only triplets, which can start track with ilev+3 length
-					if (ilev == 0){ // collect only MAPS tracks-triplets
-						if ( jst != 0) continue;
-					}
-					if( fl ) continue; // if used
+          if ( lv != ilev) continue; // try only triplets, which can start track with ilev+3 length
+          if (ilev == 0){ // collect only MAPS tracks-triplets
+            if ( jst != 0) continue;
+          }
+          if( fl ) continue; // if used
 
-					 // OK, search the best track candidate in the branches starting from the first_trip
+           // OK, search the best track candidate in the branches starting from the first_trip
 
-					L1Branch curr_tr;
-					curr_tr.StsHits.push_back(RealIHit[first_trip->GetLHit()]);
-					unsigned char curr_L = 1;
-					fscal curr_chi2 = first_trip->GetChi2();
+          L1Branch curr_tr;
+          curr_tr.StsHits.push_back(RealIHit[first_trip->GetLHit()]);
+          unsigned char curr_L = 1;
+          fscal curr_chi2 = first_trip->GetChi2();
 
-					L1Branch best_tr = curr_tr;
-					fscal best_chi2 = curr_chi2;
-					unsigned char best_L = curr_L;
-					int NCalls = 1;
-					CAFindTrack((*svStsHits), RealIHit, istaF, first_trip, best_tr, best_L, best_chi2, curr_tr, curr_L, curr_chi2, NCalls);
+          L1Branch best_tr = curr_tr;
+          fscal best_chi2 = curr_chi2;
+          unsigned char best_L = curr_L;
+          int NCalls = 1;
+          CAFindTrack((*svStsHits), RealIHit, istaF, first_trip, best_tr, best_L, best_chi2, curr_tr, curr_L, curr_chi2, NCalls);
           
           if ( best_L < ilev + 2 ) continue;      // lose maximum one hit
           if ( best_L < min_level + 3 ) continue; // should find all hits for min_level
 //           if ( best_L < ilev + 3 ) continue; // zero hits missing
           
-					int ndf = best_L*2-5;
-					best_chi2 = best_chi2/ndf; //normalize
-					if (best_chi2 > TRACK_CHI2_CUT) continue;
+          int ndf = best_L*2-5;
+          best_chi2 = best_chi2/ndf; //normalize
+          if (best_chi2 > TRACK_CHI2_CUT) continue;
 
 
 
-					if( fGhostSuppression ){//suppress ghost
-						if( best_L == 3 ){
-							//if( isec == 2 ) continue; // too /*short*/ secondary track
-							if( isec==2 && istaF != 0 ) continue; // too /*short*/ non-MAPS track
-							if( (isec<2)&&(best_chi2>5.0) ) continue;
-						}
-					}
+          if( fGhostSuppression ){//suppress ghost
+            if( best_L == 3 ){
+              //if( isec == 2 ) continue; // too /*short*/ secondary track
+              if( isec==2 && istaF != 0 ) continue; // too /*short*/ non-MAPS track
+              if( (isec<2)&&(best_chi2>5.0) ) continue;
+            }
+          }
           
-					   // store candidate
-					best_tr.Set( istaF, best_L, best_chi2, first_trip->GetQpOrig(MaxInvMom));
-					vtrackcandidate.push_back(best_tr);
+             // store candidate
+          best_tr.Set( istaF, best_L, best_chi2, first_trip->GetQpOrig(MaxInvMom));
+          vtrackcandidate.push_back(best_tr);
           
-					ntracks++;
-				}  // itrip
-				//cout<<" level "<<ilev<<", station "<<ista<<" ok"<<endl;
+          ntracks++;
+        }  // itrip
+        //cout<<" level "<<ilev<<", station "<<ista<<" ok"<<endl;
       } // istaF
 
       //cout <<"Level "<< ilev <<" track candidates "<< ntracks << ", ";
@@ -2008,58 +2008,58 @@ void L1Algo::CATrackFinder()
 #endif
         // sort track candidates
       vector<L1Branch*> vptrackcandidate;  // vptrackcandidate - array of pointers to vtrackcandidate
-			vptrackcandidate.clear();
+      vptrackcandidate.clear();
 
       for (vector<L1Branch>::iterator trIt = vtrackcandidate.begin();
-	   																	trIt != vtrackcandidate.end(); ++trIt){
-				vptrackcandidate.push_back(&(*trIt));
+                                       trIt != vtrackcandidate.end(); ++trIt){
+        vptrackcandidate.push_back(&(*trIt));
       }
       //if (isec <= 1)
-			sort(vptrackcandidate.begin(), vptrackcandidate.end(), L1Branch::comparePChi2);
-			//else
-			//sort(vptrackcandidate.begin(), vptrackcandidate.end(), L1Branch::comparePMomentum);
+      sort(vptrackcandidate.begin(), vptrackcandidate.end(), L1Branch::comparePChi2);
+      //else
+      //sort(vptrackcandidate.begin(), vptrackcandidate.end(), L1Branch::comparePMomentum);
 
 
 
         // choose and save tracks
 //       int nUsed[10] = {0,0,0,0,0, 0,0,0,0,0};
       ntracks = 0;
-      for (vector<L1Branch*>::iterator 	trIt = vptrackcandidate.begin();
-																				trIt != vptrackcandidate.end(); ++trIt){
+      for (vector<L1Branch*>::iterator   trIt = vptrackcandidate.begin();
+                                        trIt != vptrackcandidate.end(); ++trIt){
         L1Branch *tr = *trIt;
         
-				  // check if some hits have been used already
-				int nused = 0;
-				for (vector<THitI>::iterator phIt = tr->StsHits.begin();
-						phIt != tr->StsHits.end(); ++phIt){
-					L1StsHit &h = vStsHits[*phIt];
-					if ( GetFUsed( vSFlag[h.f] | vSFlagB[h.b] ) ) nused++;
-				}
+          // check if some hits have been used already
+        int nused = 0;
+        for (vector<THitI>::iterator phIt = tr->StsHits.begin();
+            phIt != tr->StsHits.end(); ++phIt){
+          L1StsHit &h = vStsHits[*phIt];
+          if ( GetFUsed( vSFlag[h.f] | vSFlagB[h.b] ) ) nused++;
+        }
         if (nused != 0){/*nUsed[nused+1]++;*/ continue;} // don't allow tracks have shared hits
 
-				//=======================================================
-				// gather MAPS hits using the Kalman filter
-				// was here, skipped for a moment
-				//=======================================================
+        //=======================================================
+        // gather MAPS hits using the Kalman filter
+        // was here, skipped for a moment
+        //=======================================================
 
-				  // store track
-				for (vector<THitI>::iterator phitIt = tr->StsHits.begin();
-																									phitIt != tr->StsHits.end(); ++phitIt){
-					L1StsHit &h = vStsHits[*phitIt];
-					SetFUsed( vSFlag[h.f] );
-					SetFUsed( vSFlagB[h.b] );
-					vRecoHits.push_back(*phitIt);
-				}
+          // store track
+        for (vector<THitI>::iterator phitIt = tr->StsHits.begin();
+                                                  phitIt != tr->StsHits.end(); ++phitIt){
+          L1StsHit &h = vStsHits[*phitIt];
+          SetFUsed( vSFlag[h.f] );
+          SetFUsed( vSFlagB[h.b] );
+          vRecoHits.push_back(*phitIt);
+        }
 
-				L1Track t;
-				t.NHits = tr->StsHits.size();
-				t.Momentum = tr->Momentum;
-				for( int i=0; i<6; i++) t.TFirst[i] = t.TLast[i]=0;
-				for( int i=0; i<15; i++ ) t.CFirst[i] = t.CLast[i] = 10;
-				t.chi2 = 100;
+        L1Track t;
+        t.NHits = tr->StsHits.size();
+        t.Momentum = tr->Momentum;
+        for( int i=0; i<6; i++) t.TFirst[i] = t.TLast[i]=0; // CHECKME don't need this
+        for( int i=0; i<15; i++ ) t.CFirst[i] = t.CLast[i] = 10;
+        t.chi2 = 100;
 
-				vTracks.push_back(t);
-				ntracks++;
+        vTracks.push_back(t);
+        ntracks++;
 
       } //trIt
 //       for (int iu = 0; iu < 10; iu++) cout << iu+1 << " " << nUsed[iu] << endl;
@@ -2068,11 +2068,11 @@ void L1Algo::CATrackFinder()
       time_fit_fin[isec] += double(c_time_fit_fin.CpuTime());
 
       unsigned int Bsize=0, nb=0;
-      for (vector<L1Branch*>::iterator 	trIt = vptrackcandidate.begin();
-	   																		trIt != vptrackcandidate.end(); ++trIt){
-				L1Branch *tr = *trIt;
-				Bsize+= sizeof(L1Branch) + sizeof(THitI) * tr->StsHits.size();
-				nb++;
+      for (vector<L1Branch*>::iterator   trIt = vptrackcandidate.begin();
+                                         trIt != vptrackcandidate.end(); ++trIt){
+        L1Branch *tr = *trIt;
+        Bsize+= sizeof(L1Branch) + sizeof(THitI) * tr->StsHits.size();
+        nb++;
       }
 
       if( Bsize>stat_max_BranchSize ) stat_max_BranchSize = Bsize;
@@ -2087,37 +2087,37 @@ void L1Algo::CATrackFinder()
     cout << " renew its arrays " << endl;
 #endif
 
-		int StsHitsStartIndex_temp;
-		int ista = 0;
-		int nDontUsedHits = 0;
-		svStsHits_buf->clear();
-		svStsHits_buf2->clear();
-		for(; ista < NStations; ista++){
+    int StsHitsStartIndex_temp;
+    int ista = 0;
+    int nDontUsedHits = 0;
+    svStsHits_buf->clear();
+    svStsHits_buf2->clear();
+    for(; ista < NStations; ista++){
 
-			StsHitsStartIndex_temp = StsHitsStartIndex[ista];
-			StsHitsStartIndex[ista] = nDontUsedHits;
-			for(int ih = StsHitsStartIndex_temp; ih <= StsHitsStopIndex[ista]; ih++){
-				int rih = RealIHit[ih];
+      StsHitsStartIndex_temp = StsHitsStartIndex[ista];
+      StsHitsStartIndex[ista] = nDontUsedHits;
+      for(int ih = StsHitsStartIndex_temp; ih <= StsHitsStopIndex[ista]; ih++){
+        int rih = RealIHit[ih];
 
-				L1StsHit hit = vStsHits[rih];
-				if( GetFUsed( vSFlag[hit.f] | vSFlagB[hit.b] ) ){ continue;} // if used
-				svStsHits_buf->push_back(hit);
-				svStsHits_buf2->push_back((*svStsHits2)[ih]);
+        L1StsHit hit = vStsHits[rih];
+        if( GetFUsed( vSFlag[hit.f] | vSFlagB[hit.b] ) ){ continue;} // if used
+        svStsHits_buf->push_back(hit);
+        svStsHits_buf2->push_back((*svStsHits2)[ih]);
 
-				RealIHit[nDontUsedHits] = rih;
-				nDontUsedHits++;
-			}
-			StsHitsStopIndex[ista] = nDontUsedHits-1;
-		}
-		std::vector< L1StsHit > *svStsHits_temp = svStsHits;
-		svStsHits = svStsHits_buf;
-		svStsHits_buf = svStsHits_temp;
-		std::vector< L1HitPoint > *svStsHits_temp2 = svStsHits2;
-		svStsHits2 = svStsHits_buf2;
-		svStsHits_buf2 = svStsHits_temp2;
+        RealIHit[nDontUsedHits] = rih;
+        nDontUsedHits++;
+      }
+      StsHitsStopIndex[ista] = nDontUsedHits-1;
+    }
+    std::vector< L1StsHit > *svStsHits_temp = svStsHits;
+    svStsHits = svStsHits_buf;
+    svStsHits_buf = svStsHits_temp;
+    std::vector< L1HitPoint > *svStsHits_temp2 = svStsHits2;
+    svStsHits2 = svStsHits_buf2;
+    svStsHits_buf2 = svStsHits_temp2;
 
-		svStsHits_buf->clear();
-		svStsHits_buf2->clear();
+    svStsHits_buf->clear();
+    svStsHits_buf2->clear();
 // cout << " clear hits array end " << endl;
 
 
@@ -2143,6 +2143,9 @@ void L1Algo::CATrackFinder()
 // #ifdef PULLS
 //       fL1Pulls->Build(1);
 // #endif
+
+
+    TrackExtender();
   } // for (int isec
 
   //cout<< "Total number of tracks found " << vTracks.size() <<endl;
@@ -2151,7 +2154,7 @@ void L1Algo::CATrackFinder()
 
   c_time.Stop();
 
-// 	cout << "End TrackFinder" << endl;
+//   cout << "End TrackFinder" << endl;
   CATime = (double(c_time.CpuTime()));
 
 
@@ -2171,62 +2174,62 @@ void L1Algo::CATrackFinder()
   */
   stat_N++;
   stat_time     += CATime;
-	stat_time_real += CATimeReal;
+  stat_time_real += CATimeReal;
 
 
-	cout.precision(3);
-	cout<<"CA stat time: " << (stat_time/stat_N) << "/" << stat_time_real/stat_N << "(k=" << stat_time/stat_time_real <<") s/ev"<<endl;
+  cout.precision(3);
+  cout<<"CA stat time: " << (stat_time/stat_N) << "/" << stat_time_real/stat_N << "(k=" << stat_time/stat_time_real <<") s/ev"<<endl;
 
-	for (int isec = 0; isec < Nisec; isec++){
-		stat_time_trip[isec] += time_trip[isec];
+  for (int isec = 0; isec < Nisec; isec++){
+    stat_time_trip[isec] += time_trip[isec];
 
-		for (int i1 = 0; i1 < ntimers; i1++)
-			for (int i2 = 0; i2 < 2; i2++)
-				stat_time_find[i1][i2][isec] += time_find[i1][i2][isec];
+    for (int i1 = 0; i1 < ntimers; i1++)
+      for (int i2 = 0; i2 < 2; i2++)
+        stat_time_find[i1][i2][isec] += time_find[i1][i2][isec];
 
-		stat_time_fit[isec] += time_fit[isec];
-		stat_time_fit_bra[isec] += time_fit_bra[isec];
-		stat_time_fit_fin[isec] += time_fit_fin[isec];
+    stat_time_fit[isec] += time_fit[isec];
+    stat_time_fit_bra[isec] += time_fit_bra[isec];
+    stat_time_fit_fin[isec] += time_fit_fin[isec];
 
 
 
-	cout  << isec << " isec : 	"
-				<<" (" << stat_time_trip[isec]/stat_N <<" ["
-					<< stat_time_find[1][0][isec]/stat_N  <<"/" << stat_time_find[1][1][isec]/stat_N
-					<<	"(k=" << stat_time_find[1][0][isec]/stat_time_find[1][1][isec] <<")+"
-					<< stat_time_find[2][0][isec]/stat_N  <<"/" << stat_time_find[2][1][isec]/stat_N
-					<<	"(k=" << stat_time_find[1][0][isec]/stat_time_find[1][1][isec] <<")+"
-					<< stat_time_find[2][0][isec]/stat_N  <<"/" << stat_time_find[2][1][isec]/stat_N <<" + "
-					<< stat_time_find[3][0][isec]/stat_N <<" + "
-					<< stat_time_find[4][0][isec]/stat_N
-					<< "]"
-				<< " + " << stat_time_fit[isec]/stat_N
-					<<" [" << stat_time_fit_bra[isec]/stat_N << "\\" << stat_time_fit_fin[isec]/stat_N << "]"
-				<< ") s/ev"<<endl;
+  cout  << isec << " isec :   "
+        <<" (" << stat_time_trip[isec]/stat_N <<" ["
+          << stat_time_find[1][0][isec]/stat_N  <<"/" << stat_time_find[1][1][isec]/stat_N
+          <<  "(k=" << stat_time_find[1][0][isec]/stat_time_find[1][1][isec] <<")+"
+          << stat_time_find[2][0][isec]/stat_N  <<"/" << stat_time_find[2][1][isec]/stat_N
+          <<  "(k=" << stat_time_find[1][0][isec]/stat_time_find[1][1][isec] <<")+"
+          << stat_time_find[2][0][isec]/stat_N  <<"/" << stat_time_find[2][1][isec]/stat_N <<" + "
+          << stat_time_find[3][0][isec]/stat_N <<" + "
+          << stat_time_find[4][0][isec]/stat_N
+          << "]"
+        << " + " << stat_time_fit[isec]/stat_N
+          <<" [" << stat_time_fit_bra[isec]/stat_N << "\\" << stat_time_fit_fin[isec]/stat_N << "]"
+        << ") s/ev"<<endl;
 
-	stat_time_find_all[1][0] += stat_time_find[1][0][isec];
-	stat_time_find_all[1][1] += stat_time_find[1][1][isec];
-	stat_time_find_all[2][0] += stat_time_find[2][0][isec];
-	stat_time_find_all[2][1] += stat_time_find[2][1][isec];
-	stat_time_find_all[3][0] += stat_time_find[3][0][isec];
-	stat_time_find_all[3][1] += stat_time_find[4][0][isec];
-	stat_time_find_all[4][0] += stat_time_fit[isec];
+  stat_time_find_all[1][0] += stat_time_find[1][0][isec];
+  stat_time_find_all[1][1] += stat_time_find[1][1][isec];
+  stat_time_find_all[2][0] += stat_time_find[2][0][isec];
+  stat_time_find_all[2][1] += stat_time_find[2][1][isec];
+  stat_time_find_all[3][0] += stat_time_find[3][0][isec];
+  stat_time_find_all[3][1] += stat_time_find[4][0][isec];
+  stat_time_find_all[4][0] += stat_time_fit[isec];
   } // isec
 
-	for(int i2 = 0; i2 < ntimers; i2++)
-		for(int i3 = 0; i3 < 2; i3++)
-			stat_time_find_all[i2][i3] /= stat_N;
+  for(int i2 = 0; i2 < ntimers; i2++)
+    for(int i3 = 0; i3 < 2; i3++)
+      stat_time_find_all[i2][i3] /= stat_N;
 
-	cout  << "all : 	"
-				<< stat_time_find[0][0] << "+"
-				<<" (" << "	["
-					<< stat_time_find_all[1][0]  <<"/" << 	stat_time_find_all[1][1] << "(k=" << stat_time_find_all[1][0]/stat_time_find_all[1][1] <<")+"
-					<< stat_time_find_all[2][0]  <<"/" << 	stat_time_find_all[2][1] << "(k=" << stat_time_find_all[2][0]/stat_time_find_all[2][1] <<")+"
-					<< stat_time_find_all[3][0]  <<"+"
-					<< stat_time_find_all[3][1]
-					<< "]"
-				<< " + " << stat_time_find_all[4][0]
-				<< ") s/ev"<<endl;
+  cout  << "all :   "
+        << stat_time_find[0][0] << "+"
+        <<" (" << "  ["
+          << stat_time_find_all[1][0]  <<"/" <<   stat_time_find_all[1][1] << "(k=" << stat_time_find_all[1][0]/stat_time_find_all[1][1] <<")+"
+          << stat_time_find_all[2][0]  <<"/" <<   stat_time_find_all[2][1] << "(k=" << stat_time_find_all[2][0]/stat_time_find_all[2][1] <<")+"
+          << stat_time_find_all[3][0]  <<"+"
+          << stat_time_find_all[3][1]
+          << "]"
+        << " + " << stat_time_find_all[4][0]
+        << ") s/ev"<<endl;
 
 
   static long int NTimes =0, NHits=0, HitSize =0, NStrips=0, StripSize =0, NStripsB=0, StripSizeB =0,
@@ -2302,9 +2305,9 @@ void L1Algo::CATrackFinder()
    ****************************************************************/
   
 void L1Algo::CAFindTrack(std::vector< L1StsHit > &svStsHits, unsigned int *RealIHit, int ista, const L1Triplet* curr_trip,
-			  L1Branch& best_tr, unsigned char &best_L, fscal &best_chi2,
-			  L1Branch &curr_tr, unsigned char &curr_L, fscal &curr_chi2,
-			  int &NCalls )
+        L1Branch& best_tr, unsigned char &best_L, fscal &best_chi2,
+        L1Branch &curr_tr, unsigned char &curr_L, fscal &curr_chi2,
+        int &NCalls )
 {
   if (curr_trip->GetLevel() == 0){ // the last triplet -> check and store // TODO: do we need recheck it??
     if ( (curr_L > best_L ) || ((curr_L == best_L )&&(curr_chi2<best_chi2)) ){
@@ -2381,4 +2384,10 @@ void L1Algo::CAFindTrack(std::vector< L1StsHit > &svStsHits, unsigned int *RealI
   } // for neighbours
 
   return;
+}
+
+  /// Try to extrapolate and find additional hits on other stations
+void L1Algo::TrackExtender()
+{
+  
 }

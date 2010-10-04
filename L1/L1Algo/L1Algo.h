@@ -42,32 +42,32 @@ template<int NHits> class L1AlgoEfficiencyPerformance;
 
 class L1Algo{
  public:
-   L1Algo():
-NStations(0),    // number of all detector stations
-   NMvdStations(0), // number of mvd stations
-vStsStrips(),  // strips positions created from hits. Front strips
-   vStsStripsB(), // back strips
-vStsZPos(),    // all possible z-positions of hits
-vStsHits(),     // hits as a combination of front-, backstrips and z-position
-vSFlag(),  // information of hits station & using hits in tracks(),
-   vSFlagB(),
-vTracks(), // reconstructed tracks
-vRecoHits(), // packed hits of reconstructed tracks
-CATime(0), // time of trackfinding
+  L1Algo():
+    NStations(0),    // number of all detector stations
+    NMvdStations(0), // number of mvd stations
+    vStsStrips(),  // strips positions created from hits. Front strips
+    vStsStripsB(), // back strips
+    vStsZPos(),    // all possible z-positions of hits
+    vStsHits(),     // hits as a combination of front-, backstrips and z-position
+    vSFlag(),  // information of hits station & using hits in tracks(),
+    vSFlagB(),
+    vTracks(), // reconstructed tracks
+    vRecoHits(), // packed hits of reconstructed tracks
+    CATime(0), // time of trackfinding
 
-Pick_m(0), // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
-  Pick_r(0), // same for right hits
-PickNeighbour(0), // (PickNeighbour < dp/dp_error)  =>  triplets are neighbours
-MaxInvMom(0),     // max considered q/p for tracks
-targX(0), targY(0), targZ(0),                        // target coor
-targB(),               // field in the target point
-TargetXYInfo(), // target constraint  [cm]
-vtxFieldRegion(),// really doesn't used
-vtxFieldValue(), // field at teh vertex position.
-vTriplets(), // container for triplets got in finding
-fTrackingLevel(0), fGhostSuppression(0), // really doesn't used
-fMomentumCutOff(0)// really doesn't used
-   {}
+    Pick_m(0), // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
+    Pick_r(0), // same for right hits
+    PickNeighbour(0), // (PickNeighbour < dp/dp_error)  =>  triplets are neighbours
+    MaxInvMom(0),     // max considered q/p for tracks
+    targX(0), targY(0), targZ(0),                        // target coor
+    targB(),               // field in the target point
+    TargetXYInfo(), // target constraint  [cm]
+    vtxFieldRegion(),// really doesn't used
+    vtxFieldValue(), // field at teh vertex position.
+    vTriplets(), // container for triplets got in finding
+    fTrackingLevel(0), fGhostSuppression(0), // really doesn't used
+    fMomentumCutOff(0)// really doesn't used
+  {}
        
    void Init( fscal geo[] );
    
@@ -101,7 +101,7 @@ fMomentumCutOff(0)// really doesn't used
   double CATime; // time of trackfinding
 
   friend class CbmL1;
-  private:
+ private:
 
         /// =================================  FUNCTIONAL PART  =================================
     
@@ -119,6 +119,8 @@ fMomentumCutOff(0)// really doesn't used
                    L1Branch& newtrack, unsigned char &new_L, fscal &new_chi2,
                    L1Branch &currenttrack, unsigned char &curr_L, fscal &curr_chi2,
                    int &NCalls);
+
+  void TrackExtender();
 
     /// -- Flags routines --
   unsigned char GetFStation( unsigned char flag ){ return flag/4; }

@@ -4,7 +4,7 @@
 #include "L1Strip.h"
 
 typedef unsigned /*short*/ int THitI; // strip index type
-typedef char TZPosI;                  // strip z-coor index type
+typedef unsigned short int TZPosI;    // strip z-coor index type
 
 class L1StsHit
 {

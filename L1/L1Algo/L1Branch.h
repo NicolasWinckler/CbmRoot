@@ -17,10 +17,11 @@
 #ifndef L1Branch_H
 #define L1Branch_H
 
+#include "L1StsHit.h"
 #include <vector>
 
 class L1Triplet;
-class L1StsHit;
+
 
 struct L1Branch
 {
@@ -28,18 +29,20 @@ struct L1Branch
   
   unsigned short int Quality;
   float Momentum, chi2;
-  std::vector<unsigned /*short*/ int > StsHits;
+  std::vector<THitI> StsHits;
 
   void Set( unsigned char iStation, unsigned char Length, float Chi2, float Qp ){
-    
-    unsigned short int length = Length;
     unsigned short int ista = 16-iStation;
     float tmp = sqrt(Chi2)/3.5*255;
     if( tmp>255 ) tmp = 255;
     unsigned short int chi_2 = 255 - static_cast<unsigned char>( tmp );
-    Quality = (length<<12) + (ista<<8) + chi_2;
+    Quality = (Length<<12) + (ista<<8) + chi_2;
     Momentum = 1.0/fabs(Qp);
     chi2 = chi_2;
+  }
+
+  void SetLength( unsigned char Length ){
+    Quality += - (Quality>>12) + (Length<<12);
   }
 
   static bool compareChi2(const L1Branch &a, const L1Branch &b){
@@ -54,6 +57,7 @@ struct L1Branch
   static bool comparePMomentum(const L1Branch *a, const L1Branch *b){
     return compareMomentum(*a,*b);
   }
+
 };
 
 #endif

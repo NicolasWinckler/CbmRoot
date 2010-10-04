@@ -298,21 +298,21 @@ void CbmL1::ReadEvent()
   Int_t NEffStrips = 0, NEffStripsB = 0;
   for( int i=0; i<NStrips; i++ ){
     TmpStrip &ts = tmpStrips[i];
-//     if( ts.effIndex == -1 ){
-      ts.effIndex = NEffStrips++;
-      char flag = ts.iStation*4;
-      algo->vStsStrips.push_back(ts.u);
-      algo->vSFlag.push_back(flag);
-//     }
+      //     if( ts.effIndex == -1 ){
+    ts.effIndex = NEffStrips++;
+    char flag = ts.iStation*4;
+    algo->vStsStrips.push_back(ts.u);
+    algo->vSFlag.push_back(flag);
+      //     }
   }
   for( int i=0; i<NStripsB; i++ ){
     TmpStrip &ts = tmpStripsB[i];
-//     if( ts.effIndex == -1 ){
-      ts.effIndex = NEffStripsB++;
-      char flag = ts.iStation*4;
-      algo->vStsStripsB.push_back(ts.u);
-      algo->vSFlagB.push_back(flag);
-//     }
+      //     if( ts.effIndex == -1 ){
+    ts.effIndex = NEffStripsB++;
+    char flag = ts.iStation*4;
+    algo->vStsStripsB.push_back(ts.u);
+    algo->vSFlagB.push_back(flag);
+      //     }
   }
 
   if (fVerbose >= 10) cout << "ReadEvent: strips are read." << endl;

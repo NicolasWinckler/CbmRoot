@@ -57,6 +57,7 @@ class L1Algo{
 
     Pick_m(0), // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
     Pick_r(0), // same for right hits
+    Pick_gather(0),
     PickNeighbour(0), // (PickNeighbour < dp/dp_error)  =>  triplets are neighbours
     MaxInvMom(0),     // max considered q/p for tracks
     targX(0), targY(0), targZ(0),                        // target coor
@@ -120,7 +121,24 @@ class L1Algo{
                    L1Branch &currenttrack, unsigned char &curr_L, fscal &curr_chi2,
                    int &NCalls);
 
-  void TrackExtender();
+
+    /// Fit track
+    /// t - track with hits
+    /// T - track params
+    /// dir - 0 - forward, 1 - backward
+    /// qp0 - momentum for extrapolation
+    /// initialize - should be params ititialized. 1 - yes.
+  void BranchFitter(const L1Branch &t, L1TrackPar& T, const bool dir, const fvec qp0 = 0., const bool initParams = true);
+
+    /// Find additional hits for existing track
+    /// t - track with hits
+    /// T - track params
+    /// dir - 0 - forward, 1 - backward
+    /// qp0 - momentum for extrapolation
+  void FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec qp0 = 0.0);
+
+      /// Find additional hits for existing track
+  void BranchExtender(L1Branch &t);
 
     /// -- Flags routines --
   unsigned char GetFStation( unsigned char flag ){ return flag/4; }
@@ -312,7 +330,8 @@ class L1Algo{
 
     /// parameters which are different for different iterations. Set in the begin of CAL1TrackFinder
   float Pick_m, // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
-  Pick_r; // same for right hits
+    Pick_r, // same for right hits
+    Pick_gather; // same for attaching additional hits to track
   float PickNeighbour; // (PickNeighbour < dp/dp_error)  =>  triplets are neighbours
   fscal MaxInvMom;     // max considered q/p for tracks
   fvec targX, targY, targZ;                        // target coor

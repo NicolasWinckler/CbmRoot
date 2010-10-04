@@ -41,7 +41,7 @@ class L1FieldSlice{
       for( int i=0; i<21; i++ ) cx[i] = cy[i] = cz[i] = 0;
     }
 
-    void GetFieldValue( const fvec &x, const fvec &y, L1FieldValue &B )
+    void GetFieldValue( const fvec &x, const fvec &y, L1FieldValue &B ) const
     {
       fvec x2 = x*x;
       fvec y2 = y*y;

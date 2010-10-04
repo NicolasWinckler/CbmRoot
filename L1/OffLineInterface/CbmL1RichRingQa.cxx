@@ -342,7 +342,7 @@ void CbmL1RichRingQa::Exec(Option_t* option)
     //Draw All Rings
     Up->cd(1);
     TArc* AllRingsUp = new TArc ( ArrRingX[i] , ArrRingY[i] , ArrRingR[i] , 0 , 360);
-    AllRingsUp->SetLineWidth(0.9);
+    AllRingsUp->SetLineWidth(1);
     AllRingsUp->SetLineColor(1);
     AllRingsUp->SetFillStyle(0);
     AllRingsUp->Draw("*");
@@ -355,7 +355,7 @@ void CbmL1RichRingQa::Exec(Option_t* option)
     */
     Up->cd(2);
     TArc* AllRingsDown = new TArc ( ArrRingX[i] , ArrRingY[i] , ArrRingR[i] , 0 , 360);
-    AllRingsDown->SetLineWidth(0.9);
+    AllRingsDown->SetLineWidth(1);
     AllRingsDown->SetLineColor(1);
     AllRingsDown->SetFillStyle(0);
     AllRingsDown->Draw("*");
@@ -596,7 +596,7 @@ void CbmL1RichRingQa::Exec(Option_t* option)
         else  MCUp->SetLineColor(5); // other MC Ring
         MCUp->SetFillStyle(0);
 
-       if (ring.kind == 0) {MCUp->SetLineStyle (3); MCUp->SetLineWidth(0.5); }
+       if (ring.kind == 0) {MCUp->SetLineStyle (3); MCUp->SetLineWidth(1); }
        else MCUp->SetLineStyle (1);
 
        // Draw NHits and P for MC rings
@@ -629,7 +629,7 @@ void CbmL1RichRingQa::Exec(Option_t* option)
 	else if ( ring.PDG == 211 || ring.PDG == -211 ) MCDown->SetLineColor(28); //pion MC Ring 
 		else MCDown->SetLineColor(5); // other MC Ring
        MCDown->SetFillStyle(0);
-       if (ring.kind == 0) { MCDown->SetLineStyle (3); MCDown->SetLineWidth(0.5); }
+       if (ring.kind == 0) { MCDown->SetLineStyle (3); MCDown->SetLineWidth(1); }
        else MCDown->SetLineStyle (1);
        MCDown->Draw("*");
 
@@ -722,9 +722,9 @@ void CbmL1RichRingQa::Exec(Option_t* option)
         CurrentMCTrack = j->first;
         MCRecoCor[ir] = MCRingMap[ j->first ].MCTrackID;
 	MCRingMap[ j->first ].Reconstructed++;
-        if ( ( static_cast<Double_t>( j->second ) ) > MCRingMap[ j->first ].NHitsBestReco) 
+        if ( ( static_cast<Int_t>( j->second ) ) > MCRingMap[ j->first ].NHitsBestReco) 
           {
-           MCRingMap[ j->first ].NHitsBestReco = ( static_cast<Double_t>( j->second ) ) ;
+           MCRingMap[ j->first ].NHitsBestReco = ( static_cast<Int_t>( j->second ) ) ;
            MCRingMap[ j->first ].NHitsBestvsNHitsMC = ( static_cast<Double_t>( j->second ) )/MCRingMap[ j->first ].NHits; 
           }
 	ghost = 0;
@@ -838,26 +838,26 @@ void CbmL1RichRingQa::Exec(Option_t* option)
           {
           Up->cd(1);
           TArc* MCringUp = new TArc ( ring.x , -ring.y , ring.r , 0 , 360);
-          MCringUp->SetLineWidth(0.5);
+          MCringUp->SetLineWidth(1);
           MCringUp->SetLineColor(2);
           MCringUp->SetFillStyle(0);
           ///MCringUp->Draw("*"); //Draw MC ring for clone 
           Up->cd(2);
           TArc* MCringDown = new TArc ( ring.x , -ring.y , ring.r , 0 , 360);
-          MCringDown->SetLineWidth(0.5);
+          MCringDown->SetLineWidth(1);
           MCringDown->SetLineColor(2);
           MCringDown->SetFillStyle(0);
           ///MCringDown->Draw("*"); //Draw MC ring for clone 
           }
         Up->cd(1);
         TArc* CloneUp = new TArc ( r->GetCenterX() , -r->GetCenterY() , r->GetRadius() , 0 , 360);
-        CloneUp->SetLineWidth(0.5);
+        CloneUp->SetLineWidth(1);
         CloneUp->SetLineColor(7);
         CloneUp->SetFillStyle(0);
         CloneUp->Draw("*");
         Up->cd(2);
         TArc* CloneDown = new TArc ( r->GetCenterX() , -r->GetCenterY() , r->GetRadius() , 0 , 360);
-        CloneDown->SetLineWidth(0.5);
+        CloneDown->SetLineWidth(1);
         CloneDown->SetLineColor(7);
         CloneDown->SetFillStyle(0);
         CloneDown->Draw("*");

@@ -342,7 +342,7 @@ void CbmL1RichENNRingFinderParallel::ENNRingFinder( const int NHits, nsL1vector<
         if( ISUNLIKELY( j == i_main ) ) continue;
 
         if( sHit.quality[i_4] >= SearchHitMaxQuality ) { // CHECKME do we really need PickUpArea
-          PickUpArea[PickUpAreaSize[i_4]++].CopyHit( HitsV[j_V], j_4, i_4 );
+          PickUpArea[static_cast<int>(PickUpAreaSize[i_4]++)].CopyHit( HitsV[j_V], j_4, i_4 );
           continue;
         }
         
@@ -593,12 +593,12 @@ void CbmL1RichENNRingFinderParallel::ENNRingFinder( const int NHits, nsL1vector<
       ring.x = iHit.x[i_4]+X[i_4];
       ring.y = iHit.y[i_4]+Y[i_4];
       ring.r = R[i_4];
-      ring.localIHits.push_back(iHit.localIndex[i_4]);
+      ring.localIHits.push_back(static_cast<THitIndex>(iHit.localIndex[i_4]));
       ring.NHits = 1;
       ring.chi2  = 0;
       vector<THitIndex> Shadow; // save hit indices of hits, which's quality will be changed
       Shadow.reserve(15);
-      Shadow.push_back(iHit.localIndex[i_4]);
+      Shadow.push_back(static_cast<THitIndex>(iHit.localIndex[i_4]));
       for( THitIndex ih = 0; ih < SearchAreaSize[i_4]; ih++){
         ENNSearchHitV &sHit = SearchArea[ih];
         const float dx = sHit.x[i_4] - ring.x;
@@ -608,7 +608,7 @@ void CbmL1RichENNRingFinderParallel::ENNRingFinder( const int NHits, nsL1vector<
           ring.chi2 += d*d;
           ring.localIHits.push_back(int(sHit.localIndex[i_4]));
           ring.NHits++;
-          if( d <= ShadowSize ) Shadow.push_back(sHit.localIndex[i_4]);
+          if( d <= ShadowSize ) Shadow.push_back(static_cast<THitIndex>(sHit.localIndex[i_4]));
         }
       }	   
       for( int ipu = 0; ipu < PickUpAreaSize[i_4]; ipu++ ) {
@@ -618,9 +618,9 @@ void CbmL1RichENNRingFinderParallel::ENNRingFinder( const int NHits, nsL1vector<
         const float d = fabs( sqrt(dx*dx+dy*dy) - ring.r );
         if( ISLIKELY ( d <= HitSize ) ){
           ring.chi2 += d*d;
-          ring.localIHits.push_back(puHit.localIndex[i_4]);
+          ring.localIHits.push_back(static_cast<THitIndex>(puHit.localIndex[i_4]));
           ring.NHits++;
-          if( d <= ShadowSize ) Shadow.push_back(puHit.localIndex[i_4]);
+          if( d <= ShadowSize ) Shadow.push_back(static_cast<THitIndex>(puHit.localIndex[i_4]));
         }
       }
       if( ISUNLIKELY( ring.NHits < MinRingHits ) ){ 

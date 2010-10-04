@@ -705,7 +705,7 @@ void CbmL1::HitMatch()
         vMCPoints[iP].hitIds.push_back(iH);
       }
     }
-    if (hit.mcPointIds.size() > 1){
+    if (hit.mcPointIds.size() > 1){ // CHECKME  never works!
       cout << "Hit number " << iH << " has been matched with " << hit.mcPointIds.size() << " mcPoints." << endl;
       cout << "Hit number " << iH << " " <<  hit.mcPointIds[0] << " " << vHitMCRef[iH] << endl;
     }

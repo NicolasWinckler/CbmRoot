@@ -198,8 +198,11 @@ void FieldMapTest(TString fieldMap = "field_electron_standard",
     Bool_t test_ok = kTRUE;
     Float_t compare_range = 0.00001;
       
-      
-    TFile* f = new TFile("out.root","READ");
+    TString inDir   = gSystem->Getenv("VMCWORKDIR");
+    TString inputFile = inDir + "/input/qa/Qa_"+fieldMap+".root";
+
+
+    TFile* f = new TFile(inputFile,"READ");
     TTree *tree = (TTree*)f->Get("T");
     tree->SetBranchAddress("posX",&posX);
     tree->SetBranchAddress("posY",&posY);

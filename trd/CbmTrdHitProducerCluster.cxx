@@ -255,14 +255,22 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex/*, MHitMap* ModuleH
   delete mPara;
 }
 // --------------------------------------------------------------------
+void CbmTrdHitProducerCluster::SortDigi()
+{
+  //create complet digi lookup map for neighbour search (combiId)
+  //maybe new struct to store info and new map or list for structs
+}
+// --------------------------------------------------------------------
 void CbmTrdHitProducerCluster::SortClusterDigi()
 {
-
+  //sort cluster digi by charge -> find multihits
 }
 // --------------------------------------------------------------------
 void CbmTrdHitProducerCluster::PrfReco(Int_t qMaxIndex, Float_t qMax)
 {
-
+  //within each row
+  //also possible to reconstruct in x and y direction by prf neighbours
+  //if no neighbours found -> simple reco
 }
 // --------------------------------------------------------------------
 void CbmTrdHitProducerCluster::SimpleReco(Int_t qMaxIndex, Float_t qMax, ModulePara* mPara, MyHit* hit/*, MHitMap* ModuleHitMap*/)

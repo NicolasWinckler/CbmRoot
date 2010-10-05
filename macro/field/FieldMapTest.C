@@ -299,7 +299,7 @@ void FieldMapTest(TString fieldMap = "field_electron_standard",
     }
     
     if ( test_ok) {
-      cout<<"Test passed"<<endl;
+      cout<<"Test Passed"<<endl;
       cout<<"All ok"<<endl;
     } else {
       cout<<"Test failed"<<endl;

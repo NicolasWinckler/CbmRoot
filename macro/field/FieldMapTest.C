@@ -97,7 +97,9 @@ void FieldMapTest(TString fieldMap = "field_electron_standard",
     
     // ----------------------------------------------------------------------
     
-    TFile* f = new TFile("out.root","RECREATE");
+    TString inputFile = "Qa_"+fieldMap+".root";
+
+    TFile* f = new TFile(inputFile,"RECREATE");
     TTree *tree = new TTree("T","Store field values and positions");
     tree->Branch("posX",&posX,"posX/D");
     tree->Branch("posY",&posY,"posY/D");

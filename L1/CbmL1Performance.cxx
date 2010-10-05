@@ -163,8 +163,9 @@ reco_fakes()
     TL1Efficiencies::CalcEff();
     ratio_killed = killed/mc;
     ratio_clone  = clone/mc;
-    ratio_length = reco_length/reco;
-    ratio_fakes  = reco_fakes/reco;
+    TL1TracksCatCounters<int> allReco = reco + clone;
+    ratio_length = reco_length/allReco;
+    ratio_fakes  = reco_fakes/allReco;
   };
   
   void Inc(bool isReco, bool isKilled, double _ratio_length, double _ratio_fakes, int _nclones, TString name){

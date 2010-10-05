@@ -34,6 +34,12 @@ struct TL1TracksCatCounters // counters for different tracks categories
     return *this;
   };
 
+  TL1TracksCatCounters operator+(TL1TracksCatCounters& a){
+    TL1TracksCatCounters res = *this;
+    res += a;
+    return res;
+  };
+
   template <typename T2>
   TL1TracksCatCounters<double> operator/(TL1TracksCatCounters<T2>& a){
     TL1TracksCatCounters<double> b(NCounters);

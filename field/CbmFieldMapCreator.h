@@ -41,7 +41,7 @@ class CbmFieldMapCreator
 
 
   /** Destructor **/
-  ~CbmFieldMapCreator();
+  virtual ~CbmFieldMapCreator();
 
 
   /** Set parameters 
@@ -97,6 +97,8 @@ class CbmFieldMapCreator
   TList    fFieldList;      // List of input fields;
   Bool_t   fInit;           // Flag whether map is initialised
 
+  CbmFieldMapCreator(const CbmFieldMapCreator&);
+  CbmFieldMapCreator& operator=(const CbmFieldMapCreator&);
 
   ClassDef(CbmFieldMapCreator,1);
 

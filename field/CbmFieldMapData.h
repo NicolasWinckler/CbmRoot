@@ -90,6 +90,8 @@ public:
   TArrayF* fBy;
   TArrayF* fBz;
 
+  CbmFieldMapData(const CbmFieldMapData&);
+  CbmFieldMapData& operator=(const CbmFieldMapData&);
 
   ClassDef(CbmFieldMapData,1) 
 

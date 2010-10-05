@@ -17,8 +17,18 @@ using std::setw;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmFieldConst::CbmFieldConst() {
-  fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = fBx = fBy = fBz = 0.;
+CbmFieldConst::CbmFieldConst() 
+  : FairField(),
+    fXmin(0.),   
+    fXmax(0.),
+    fYmin(0.),
+    fYmax(0.),
+    fZmin(0.),
+    fZmax(0.),
+    fBx(0.),
+    fBy(0.),
+    fBz(0.)
+{
   fType = 0;
 }
 // -------------------------------------------------------------------------
@@ -31,28 +41,40 @@ CbmFieldConst::CbmFieldConst(const char* name, Double_t xMin,
 			     Double_t yMax, Double_t zMin,
 			     Double_t zMax, Double_t bX, 
 			     Double_t bY, Double_t bZ) 
-  : FairField(name) {
-  fXmin = xMin;
-  fXmax = xMax;
-  fYmin = yMin;
-  fYmax = yMax;
-  fZmin = zMin;
-  fZmax = zMax;
-  fBx   = bX;
-  fBy   = bY;
-  fBz   = bZ;
-  fType = 0;
+  : FairField(name),
+    fXmin(xMin),   
+    fXmax(xMax),
+    fYmin(yMin),
+    fYmax(yMax),
+    fZmin(zMin),
+    fZmax(zMax),
+    fBx(bX),
+    fBy(bY),
+    fBz(bZ)
+{
+  fType=0;
 }
 // -------------------------------------------------------------------------
 
 
 
 // --------   Constructor from CbmFieldPar   -------------------------------
-CbmFieldConst::CbmFieldConst(CbmFieldPar* fieldPar) {
+CbmFieldConst::CbmFieldConst(CbmFieldPar* fieldPar) 
+  : FairField(),
+    fXmin(0.),   
+    fXmax(0.),
+    fYmin(0.),
+    fYmax(0.),
+    fZmin(0.),
+    fZmax(0.),
+    fBx(0.),
+    fBy(0.),
+    fBz(0.)
+{
   if ( ! fieldPar ) {
     cerr << "-W- CbmFieldConst::CbmFieldConst: empty parameter container!"
 	 << endl;
-  fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = fBx = fBy = fBz = 0.;
+    fType=0;
   }
   else {
     fXmin = fieldPar->GetXmin();

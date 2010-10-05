@@ -20,26 +20,50 @@ const int kMaxLen = 2048;
 // ------   Constructor   --------------------------------------------------
 CbmFieldPar::CbmFieldPar(const char* name, const char* title,
 			 const char* context) 
-  : FairParGenericSet(name, title, context) {
-  fType = -1;
-  fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = 0.;
-  fBx   = fBy   = fBz   = 0.;
-  fMapName = "";
-  fPosX = fPosY = fPosZ = 0.;
-  fScale = 0.;
-  fDistortionFilename = "";
+  : FairParGenericSet(name, title, context),
+    fType(-1),
+    fXmin(0.), 
+    fXmax(0.),
+    fYmin(0.), 
+    fYmax(0.),
+    fZmin(0.), 
+    fZmax(0.),
+    fBx(0.), 
+    fBy(0.),  
+    fBz(0.),
+    fMapName(""),
+    fPosX(0.), 
+    fPosY(0.), 
+    fPosZ(0.),
+    fScale(0.),
+    fDistortionFilename(""),
+    fParentName(""),
+    fTypeOfParent(0)
+{
 }
 // -------------------------------------------------------------------------
 
 CbmFieldPar::CbmFieldPar() 
- {
-  fType = -1;
-  fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = 0.;
-  fBx   = fBy   = fBz   = 0.;
-  fMapName = "";
-  fPosX = fPosY = fPosZ = 0.;
-  fScale = 0.;
-  fDistortionFilename = "";
+  : FairParGenericSet(),
+    fType(-1),
+    fXmin(0.), 
+    fXmax(0.),
+    fYmin(0.), 
+    fYmax(0.),
+    fZmin(0.), 
+    fZmax(0.),
+    fBx(0.), 
+    fBy(0.),  
+    fBz(0.),
+    fMapName(""),
+    fPosX(0.), 
+    fPosY(0.), 
+    fPosZ(0.),
+    fScale(0.),
+    fDistortionFilename(""),
+    fParentName(""),
+    fTypeOfParent(0)
+{
 }
 // -------------------------------------------------------------------------
 

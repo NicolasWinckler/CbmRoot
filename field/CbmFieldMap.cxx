@@ -30,17 +30,44 @@ using std::showpoint;
 
 
 // -------------   Default constructor  ----------------------------------
-CbmFieldMap::CbmFieldMap() {
-  fPosX  = fPosY  = fPosZ  = 0.;
-  fXmin  = fYmin  = fZmin  = 0.;
-  fXmax  = fYmax  = fZmax  = 0.;
-  fXstep = fYstep = fZstep = 0.;
-  fNx    = fNy    = fNz    = 0;
-  fScale = 1.;
-  fBx    = fBy    = fBz    = NULL;
-  fPosX = fPosY = fPosZ = 0.;
-  fName     = "";
-  fFileName = "";
+CbmFieldMap::CbmFieldMap() 
+  : FairField(),
+    fFileName(""),
+    fScale(1.),
+    fPosX(0.),
+    fPosY(0.),
+    fPosZ(0.),
+    fXmin(0.),
+    fXmax(0.),
+    fXstep(0.),
+    fYmin(0.),
+    fYmax(0.),
+    fYstep(0.),
+    fZmin(0.),
+    fZmax(0.),
+    fZstep(0.),
+    fNx(0),
+    fNy(0),
+    fNz(0),
+    fBx(NULL),
+    fBy(NULL),
+    fBz(NULL)
+{
+  // Initilization of arrays is to my knowledge not
+  // possible in member initalization lists
+  for (Int_t i=0; i < 2 ; i++) {
+    fHc[i]=0;
+    for (Int_t j=0; j < 2 ; j++) {
+      fHb[i][j]=0;
+      for (Int_t k=0; k < 2 ; k++) {
+ 	fHa[i][j][k]=0;
+      }
+    }
+  }
+  // Assign values to data members of base classes
+  // There is no appropriate constructor of the base
+  // class.
+  fName = "";
   fType = 1;
 }
 // ------------------------------------------------------------------------
@@ -49,19 +76,50 @@ CbmFieldMap::CbmFieldMap() {
 
 // -------------   Standard constructor   ---------------------------------
 CbmFieldMap::CbmFieldMap(const char* mapName, const char* fileType)
-  : FairField(mapName) {
-  fPosX  = fPosY  = fPosZ  = 0.;
-  fXmin  = fYmin  = fZmin  = 0.;
-  fXmax  = fYmax  = fZmax  = 0.;
-  fXstep = fYstep = fZstep = 0.;
-  fNx    = fNy    = fNz    = 0;
-  fScale = 1.;
-  fBx    = fBy    = fBz    = NULL;
-  fName  = mapName;
+  : FairField(),
+    fFileName(""),
+    fScale(1.),
+    fPosX(0.),
+    fPosY(0.),
+    fPosZ(0.),
+    fXmin(0.),
+    fXmax(0.),
+    fXstep(0.),
+    fYmin(0.),
+    fYmax(0.),
+    fYstep(0.),
+    fZmin(0.),
+    fZmax(0.),
+    fZstep(0.),
+    fNx(0),
+    fNy(0),
+    fNz(0),
+    fBx(NULL),
+    fBy(NULL),
+    fBz(NULL)
+{
+  // Initilization of arrays is to my knowledge not
+  // possible in member initalization lists
+  for (Int_t i=0; i < 2 ; i++) {
+    fHc[i]=0;
+    for (Int_t j=0; j < 2 ; j++) {
+      fHb[i][j]=0;
+      for (Int_t k=0; k < 2 ; k++) {
+ 	fHa[i][j][k]=0;
+      }
+    }
+  }
+  // Assign values to data members of base classes
+  // There is no appropriate constructor of the base
+  // class.
+  fName = mapName;
   TString dir = getenv("VMCWORKDIR");
   fFileName = dir + "/input/" + mapName;
-  if ( fileType[0] == 'R' ) fFileName += ".root";
-  else                      fFileName += ".dat";
+  if ( fileType[0] == 'R' ) {
+    fFileName += ".root";
+  } else {
+    fFileName += ".dat";
+  }
   fType = 1;
 }
 // ------------------------------------------------------------------------
@@ -69,21 +127,48 @@ CbmFieldMap::CbmFieldMap(const char* mapName, const char* fileType)
 
 
 // ------------   Constructor from CbmFieldPar   --------------------------
-CbmFieldMap::CbmFieldMap(CbmFieldPar* fieldPar) {
+CbmFieldMap::CbmFieldMap(CbmFieldPar* fieldPar) 
+  : FairField(),
+    fFileName(""),
+    fScale(1.),
+    fPosX(0.),
+    fPosY(0.),
+    fPosZ(0.),
+    fXmin(0.),
+    fXmax(0.),
+    fXstep(0.),
+    fYmin(0.),
+    fYmax(0.),
+    fYstep(0.),
+    fZmin(0.),
+    fZmax(0.),
+    fZstep(0.),
+    fNx(0),
+    fNy(0),
+    fNz(0),
+    fBx(NULL),
+    fBy(NULL),
+    fBz(NULL)
+{
+  // Initilization of arrays is to my knowledge not
+  // possible in member initalization lists
+  for (Int_t i=0; i < 2 ; i++) {
+    fHc[i]=0;
+    for (Int_t j=0; j < 2 ; j++) {
+      fHb[i][j]=0;
+      for (Int_t k=0; k < 2 ; k++) {
+ 	fHa[i][j][k]=0;
+      }
+    }
+  }
+  // Assign values to data members of base classes
+  // There is no appropriate constructor of the base
+  // class.
+  fName = "";
   fType = 1;
-  fPosX  = fPosY  = fPosZ  = 0.;
-  fXmin  = fYmin  = fZmin  = 0.;
-  fXmax  = fYmax  = fZmax  = 0.;
-  fXstep = fYstep = fZstep = 0.;
-  fNx    = fNy    = fNz    = 0;
-  fScale = 1.;
-  fBx    = fBy    = fBz    = NULL;
   if ( ! fieldPar ) {
     cerr << "-W- CbmFieldConst::CbmFieldMap: empty parameter container!"
 	 << endl;
-    fName     = "";
-    fFileName = "";
-    fType     = 1;
   }
   else {
     fieldPar->MapName(fName);
@@ -101,20 +186,47 @@ CbmFieldMap::CbmFieldMap(CbmFieldPar* fieldPar) {
 
 
 // ------------  Constructor from CbmFieldMapCreator  ---------------------
-CbmFieldMap::CbmFieldMap(CbmFieldMapCreator* creator) {
-  fType  = 1;
-  fPosX  = fPosY  = fPosZ  = 0.;
-  fXmin  = fYmin  = fZmin  = 0.;
-  fXmax  = fYmax  = fZmax  = 0.;
-  fXstep = fYstep = fZstep = 0.;
-  fNx    = fNy    = fNz    = 0;
-  fScale = 1.;
-  fBx    = fBy    = fBz    = NULL;
+CbmFieldMap::CbmFieldMap(CbmFieldMapCreator* creator) 
+  : FairField(),
+    fFileName(""),
+    fScale(1.),
+    fPosX(0.),
+    fPosY(0.),
+    fPosZ(0.),
+    fXmin(0.),
+    fXmax(0.),
+    fXstep(0.),
+    fYmin(0.),
+    fYmax(0.),
+    fYstep(0.),
+    fZmin(0.),
+    fZmax(0.),
+    fZstep(0.),
+    fNx(0),
+    fNy(0),
+    fNz(0),
+    fBx(NULL),
+    fBy(NULL),
+    fBz(NULL)
+{
+  // Initilization of arrays is to my knowledge not
+  // possible in member initalization lists
+  for (Int_t i=0; i < 2 ; i++) {
+    fHc[i]=0;
+    for (Int_t j=0; j < 2 ; j++) {
+      fHb[i][j]=0;
+      for (Int_t k=0; k < 2 ; k++) {
+ 	fHa[i][j][k]=0;
+      }
+    }
+  }
+  // Assign values to data members of base classes
+  // There is no appropriate constructor of the base
+  // class.
+  fName = "";
+  fType = 1;
   if ( ! creator ) {
     cerr << "-W- CbmFieldMap: no creator given!" << endl;
-    fName     = "";
-    fFileName = "";
-    fType     = 1;
   }
   else {
     fType = 1;
@@ -134,10 +246,9 @@ CbmFieldMap::CbmFieldMap(CbmFieldMapCreator* creator) {
     fBx = creator->GetBx();
     fBy = creator->GetBy();
     fBz = creator->GetBz();
-    fScale = 1.;
-    fPosX = fPosY = fPosZ = 0.;
   }
 }
+
 // ------------------------------------------------------------------------
 
 

@@ -195,7 +195,13 @@ public:
   Double_t fHa[2][2][2];            //! Field at corners of a grid cell
   Double_t fHb[2][2];               //! Interpolated field (2-dim)
   Double_t fHc[2];                  //! Interpolated field (1-dim)
-ClassDef(CbmFieldMap,1) 
+
+ private:
+
+  CbmFieldMap(const CbmFieldMap&);
+  CbmFieldMap& operator=(const CbmFieldMap&);
+
+  ClassDef(CbmFieldMap,1) 
 
 };
 

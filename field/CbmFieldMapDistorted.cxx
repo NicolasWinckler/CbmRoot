@@ -26,65 +26,88 @@ using std::endl;
 
 // -------------   Default constructor  ----------------------------------
 CbmFieldMapDistorted::CbmFieldMapDistorted()  
-  : CbmFieldMap() {
-
+  : CbmFieldMap(),
+    fParentField(NULL),
+    fTypeOfParent(1),
+    fDistortionFilename(""),
+    fBxDistortionFormulaMult(NULL), 
+    fBxDistortionFormulaAdd(NULL),
+    fByDistortionFormulaMult(NULL), 
+    fByDistortionFormulaAdd(NULL),
+    fBzDistortionFormulaMult(NULL), 
+    fBzDistortionFormulaAdd(NULL)
+{
   fType = kTypeDistorted;  
-  fTypeOfParent = 1;   // CbmFieldMap
-  fDistortionFilename = "";
-  fParentField=0;
-
-  fBxDistortionFormulaMult = fBxDistortionFormulaAdd = 0;    
-  fByDistortionFormulaMult = fByDistortionFormulaAdd = 0;    
-  fBzDistortionFormulaMult = fBzDistortionFormulaAdd = 0;
 }
 // ------------------------------------------------------------------------
 
 
 // -------------   Standard constructor (with FieldMap Parent Field )  ---------------------------------
-CbmFieldMapDistorted::CbmFieldMapDistorted(const char* mapName, const char* pfDistortionFilename, const char* parentName, 
-					   const char* fileTypeParent, Int_t pfTypeOfParent)
-  : CbmFieldMap() {
-
+CbmFieldMapDistorted::CbmFieldMapDistorted(const char* mapName, 
+					   const char* pfDistortionFilename, 
+					   const char* parentName, 
+					   const char* fileTypeParent, 
+					   Int_t pfTypeOfParent)
+  : CbmFieldMap(),
+    fParentField(NULL),
+    fTypeOfParent(pfTypeOfParent),
+    fDistortionFilename(pfDistortionFilename),
+    fBxDistortionFormulaMult(NULL), 
+    fBxDistortionFormulaAdd(NULL),
+    fByDistortionFormulaMult(NULL), 
+    fByDistortionFormulaAdd(NULL),
+    fBzDistortionFormulaMult(NULL), 
+    fBzDistortionFormulaAdd(NULL)
+{
   fName  = mapName;
   fType = kTypeDistorted;  
-  fTypeOfParent = pfTypeOfParent;   
-  fDistortionFilename = pfDistortionFilename;
-
+  
   switch (pfTypeOfParent) {
   case 3: fParentField = new  CbmFieldMapSym3 (parentName, fileTypeParent); break;
   case 2: fParentField = new  CbmFieldMapSym2 (parentName, fileTypeParent); break;
   case 5: fParentField = new  CbmFieldMapSym1 (parentName, fileTypeParent); break;
   default: fParentField = new  CbmFieldMap (parentName, fileTypeParent); break;
   }
-
-  fBxDistortionFormulaMult = fBxDistortionFormulaAdd = 0;    
-  fByDistortionFormulaMult = fByDistortionFormulaAdd = 0;    
-  fBzDistortionFormulaMult = fBzDistortionFormulaAdd = 0;
 }
 // ------------------------------------------------------------------------
 
 // -------------   Constructor (with Constant Parent Field )   -------------------------
-CbmFieldMapDistorted::CbmFieldMapDistorted (Double_t xMin, Double_t xMax,Double_t yMin, Double_t yMax, 
-					    Double_t zMin, Double_t zMax, Double_t bX, Double_t bY, Double_t bZ,
-					    const char* mapName, const char* pfDistortionFilename, const char* parentname )
-  : CbmFieldMap() {
+CbmFieldMapDistorted::CbmFieldMapDistorted (Double_t xMin, Double_t xMax,
+					    Double_t yMin, Double_t yMax, 
+					    Double_t zMin, Double_t zMax, 
+					    Double_t bX, Double_t bY, 
+					    Double_t bZ, const char* mapName, 
+					    const char* pfDistortionFilename, 
+					    const char* parentname )
+  : CbmFieldMap(),
+    fParentField(new  CbmFieldConst(parentname, xMin, xMax, yMin, yMax, zMin, zMax, bX, bY, bZ)),
+    fTypeOfParent(0),
+    fDistortionFilename(pfDistortionFilename),
+    fBxDistortionFormulaMult(NULL), 
+    fBxDistortionFormulaAdd(NULL),
+    fByDistortionFormulaMult(NULL), 
+    fByDistortionFormulaAdd(NULL),
+    fBzDistortionFormulaMult(NULL), 
+    fBzDistortionFormulaAdd(NULL)
+{
   fName  = mapName;
   fType = kTypeDistorted;  
-  fDistortionFilename = pfDistortionFilename;
-  fParentField = new  CbmFieldConst(parentname, xMin, xMax, yMin, yMax, zMin, zMax, bX, bY, bZ);
-
-  fBxDistortionFormulaMult = fBxDistortionFormulaAdd = 0;    
-  fByDistortionFormulaMult = fByDistortionFormulaAdd = 0;    
-  fBzDistortionFormulaMult = fBzDistortionFormulaAdd = 0;
 }
 
 
 // -------------   Constructor from CbmFieldPar   -------------------------
 CbmFieldMapDistorted::CbmFieldMapDistorted(CbmFieldPar* fieldPar)
- : CbmFieldMap() {
-
-  fTypeOfParent=0;
-
+  : CbmFieldMap(),
+    fParentField(NULL),
+    fTypeOfParent(0),
+    fDistortionFilename(""),
+    fBxDistortionFormulaMult(NULL), 
+    fBxDistortionFormulaAdd(NULL),
+    fByDistortionFormulaMult(NULL), 
+    fByDistortionFormulaAdd(NULL),
+    fBzDistortionFormulaMult(NULL), 
+    fBzDistortionFormulaAdd(NULL)
+{
   if ( fieldPar ) {
     fieldPar->MapName(fName);
     fType = fieldPar->GetType();
@@ -125,10 +148,6 @@ CbmFieldMapDistorted::CbmFieldMapDistorted(CbmFieldPar* fieldPar)
       fType = kTypeDistorted;
       fDistortionFilename = "";
     }}
-
-  fBxDistortionFormulaMult = fBxDistortionFormulaAdd = 0;    
-  fByDistortionFormulaMult = fByDistortionFormulaAdd = 0;    
-  fBzDistortionFormulaMult = fBzDistortionFormulaAdd = 0;
 }
 // ------------------------------------------------------------------------
 

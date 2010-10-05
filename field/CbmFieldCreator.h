@@ -15,13 +15,20 @@ class FairField;
 
 class CbmFieldCreator : public FairFieldFactory 
 {
-public:
-    CbmFieldCreator();
-    virtual ~CbmFieldCreator();
-    virtual FairField* createFairField();
-    virtual void SetParm();
-    ClassDef(CbmFieldCreator,1);
-protected:
-    CbmFieldPar* fFieldPar;
+
+ public:
+  CbmFieldCreator();
+  virtual ~CbmFieldCreator();
+  virtual FairField* createFairField();
+  virtual void SetParm();
+  ClassDef(CbmFieldCreator,1);
+  
+ protected:
+  CbmFieldPar* fFieldPar;
+  
+ private:
+  CbmFieldCreator(const CbmFieldCreator&);
+  CbmFieldCreator& operator=(const CbmFieldCreator&);
+
 };
 #endif //CBMFIELDCREATOR_H

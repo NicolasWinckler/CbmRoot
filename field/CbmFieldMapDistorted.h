@@ -112,6 +112,10 @@ public:
       TFormula* fByDistortionFormulaMult, *fByDistortionFormulaAdd;     //! getter/setter options: ("y","m"), ("y","a")
       TFormula* fBzDistortionFormulaMult, *fBzDistortionFormulaAdd;     //! getter/setter options: ("z","m"), ("z","a")
 
+ private:
+  CbmFieldMapDistorted(const CbmFieldMapDistorted&);
+  CbmFieldMapDistorted& operator=(const CbmFieldMapDistorted&);
+
   ClassDef(CbmFieldMapDistorted,1) 
 
 };

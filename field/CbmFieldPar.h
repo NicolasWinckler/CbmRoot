@@ -115,6 +115,10 @@ class CbmFieldPar : public FairParGenericSet
   /** Field type of parent field (in case of distorted field map) **/
   Int_t fTypeOfParent;
 
+
+  CbmFieldPar(const CbmFieldPar&);
+  CbmFieldPar& operator=(const CbmFieldPar&);
+
   ClassDef(CbmFieldPar,1);
 
 };

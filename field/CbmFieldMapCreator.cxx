@@ -15,28 +15,47 @@ using namespace std;
 
 
 // -------------   Default constructor  -----------------------------------
-CbmFieldMapCreator::CbmFieldMapCreator() {
-  fMapName = "";
-  fNx = fNy = fNz = 0;
-  fXmin = fYmin = fZmin = 0.;
-  fXmax = fYmax = fZmax = 0.;
-  fBx = fBy = fBz = NULL;
-  fFieldList.Clear();
-  fInit = kFALSE;
+CbmFieldMapCreator::CbmFieldMapCreator() 
+  : fMapName(""),
+    fNx(0), 
+    fNy(0), 
+    fNz(0),
+    fXmin(0.), 
+    fXmax(0.),
+    fYmin(0.), 
+    fYmax(0.),
+    fZmin(0.), 
+    fZmax(0.),
+    fBx(NULL),
+    fBy(NULL),
+    fBz(NULL),
+    fFieldList(),
+    fInit(kFALSE)
+{
 }
 // ------------------------------------------------------------------------
 
 
 
 // -------------   Standard constructor  ----------------------------------
-CbmFieldMapCreator::CbmFieldMapCreator(const char* mapName) {
-  fMapName = mapName;
-  fNx = fNy = fNz = 0;
-  fXmin = fYmin = fZmin = 0.;
-  fXmax = fYmax = fZmax = 0.;
-  fBx = fBy = fBz = NULL;
-  fFieldList.Clear();
-  fInit = kFALSE;
+CbmFieldMapCreator::CbmFieldMapCreator(const char* mapName) 
+  : fMapName(mapName),
+    fNx(0), 
+    fNy(0), 
+    fNz(0),
+    fXmin(0.), 
+    fXmax(0.),
+    fYmin(0.), 
+    fYmax(0.),
+    fZmin(0.), 
+    fZmax(0.),
+    fBx(NULL),
+    fBy(NULL),
+    fBz(NULL),
+    fFieldList(),
+    fInit(kFALSE)
+
+{
 }
 // ------------------------------------------------------------------------
 

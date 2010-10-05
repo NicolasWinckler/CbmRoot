@@ -26,37 +26,83 @@ Int_t checked_index_max(Int_t suggested_index,Int_t array_size)
 }
 
 CbmBsField::CbmBsField(const char* pBsName, Int_t  symType) 
-  : CbmFieldMap()    
+  : CbmFieldMap(),
+    NDIM(0), 
+    LL1(0), 
+    LL2(0), 
+    LL3(0), 
+    II1(0), 
+    II2(0), 
+    II3(0),
+    fBsBx(NULL),
+    fBsBy(NULL),
+    fBsBz(NULL),
+    fX(NULL),
+    fY(NULL),
+    fZ(NULL),
+    UX1(NULL),
+    UX2(NULL),
+    UX3(NULL),
+    F0(NULL),
+    G0(NULL),
+    U0(NULL),
+    fBsName(pBsName)
 { 
-  //  fType = symType;     // currently supported symType=3,2,0
   fType = 6;               // corresponds symType=3
-
-  NDIM = LL1 = LL2 = LL3 = II1 = II2 = II3= 0;
-  UX1 = UX2 = UX3 = F0 = G0 = U0 = 0;
-  fBsBx = fBsBy = fBsBz = fX = fY = fZ = 0 ;
-
-  fBsName = pBsName;
-
   this->SetName(pBsName);
   this->SetTitle(pBsName);
-
 }
 
 CbmBsField::CbmBsField()
-  : CbmFieldMap()    
+  : CbmFieldMap(),
+    NDIM(0), 
+    LL1(0), 
+    LL2(0), 
+    LL3(0), 
+    II1(0), 
+    II2(0), 
+    II3(0),
+    fBsBx(NULL),
+    fBsBy(NULL),
+    fBsBz(NULL),
+    fX(NULL),
+    fY(NULL),
+    fZ(NULL),
+    UX1(NULL),
+    UX2(NULL),
+    UX3(NULL),
+    F0(NULL),
+    G0(NULL),
+    U0(NULL),
+    fBsName("")
 {
   fType = 0;  
-
-  NDIM = LL1 = LL2 = LL3 = II1 = II2 = II3= 0;
-  UX1 = UX2 = UX3 = F0 = G0 = U0 = 0;
-  fBsBx = fBsBy = fBsBz = fX = fY = fZ = 0 ;
-
-  fBsName = "";
 }
 
 // -------------   Constructor from CbmFieldPar   -------------------------
 CbmBsField::CbmBsField(CbmFieldPar* fieldPar)
-  : CbmFieldMap(fieldPar) {
+  : CbmFieldMap(fieldPar),
+    NDIM(0), 
+    LL1(0), 
+    LL2(0), 
+    LL3(0), 
+    II1(0), 
+    II2(0), 
+    II3(0),
+    fBsBx(NULL),
+    fBsBy(NULL),
+    fBsBz(NULL),
+    fX(NULL),
+    fY(NULL),
+    fZ(NULL),
+    UX1(NULL),
+    UX2(NULL),
+    UX3(NULL),
+    F0(NULL),
+    G0(NULL),
+    U0(NULL),
+    fBsName("")
+{
   fType = 6;
 }
 

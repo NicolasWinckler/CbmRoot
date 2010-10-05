@@ -87,7 +87,11 @@ protected:
 	void PALC0(Double_t X,Double_t Y,Double_t Z,Double_t *BX,Double_t *BY,Double_t *BZ);    // from Fortran code
 	Float_t SPL0(Double_t T,Double_t X0,Double_t X1,Double_t X2,Double_t X3,Double_t X4);   // from Fortran code
 
-	ClassDef(CbmBsField,2) 
+ private:
+  CbmBsField(const CbmBsField&);
+  CbmBsField& operator=(const CbmBsField&);
+
+  ClassDef(CbmBsField,2) 
 };
 
 #endif

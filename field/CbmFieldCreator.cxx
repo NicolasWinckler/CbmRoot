@@ -21,14 +21,16 @@ using std::endl;
 static CbmFieldCreator gCbmFieldCreator;
 
 CbmFieldCreator::CbmFieldCreator()
-	:FairFieldFactory()
+  :FairFieldFactory(),
+   fFieldPar(NULL)
 {
 	fCreator=this;
-        fFieldPar=0;
 }
+
 CbmFieldCreator::~CbmFieldCreator()
 {
 }
+
 void CbmFieldCreator::SetParm()
 {
   FairRunAna *Run = FairRunAna::Instance();

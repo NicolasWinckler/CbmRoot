@@ -10,7 +10,11 @@
 #include "TArrayF.h"
 
 // -------------   Default constructor  ----------------------------------
-CbmFieldMapSym2::CbmFieldMapSym2() { 
+CbmFieldMapSym2::CbmFieldMapSym2()
+  : CbmFieldMap(),
+    fHemiX(0.), 
+    fHemiY(0.)
+{ 
   fType = 2;
 }
 // ------------------------------------------------------------------------
@@ -20,7 +24,10 @@ CbmFieldMapSym2::CbmFieldMapSym2() {
 // -------------   Standard constructor   ---------------------------------
 CbmFieldMapSym2::CbmFieldMapSym2(const char* mapName, 
 				 const char* fileType)
-  : CbmFieldMap(mapName, fileType) { 
+  : CbmFieldMap(mapName, fileType),
+    fHemiX(0.), 
+    fHemiY(0.)
+{ 
   fType = 2;
 }
 // ------------------------------------------------------------------------
@@ -29,7 +36,10 @@ CbmFieldMapSym2::CbmFieldMapSym2(const char* mapName,
 
 // ------------   Constructor from CbmFieldPar   --------------------------
 CbmFieldMapSym2::CbmFieldMapSym2(CbmFieldPar* fieldPar) 
-  : CbmFieldMap(fieldPar) {
+  : CbmFieldMap(fieldPar),
+    fHemiX(0.), 
+    fHemiY(0.)
+{
   fType = 2;
 }
 // ------------------------------------------------------------------------

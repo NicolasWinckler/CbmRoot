@@ -1492,10 +1492,13 @@ void L1Algo::CATrackFinder()
 
     Pick_m = 2.0; // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
     Pick_r = 4.0; // coefficient for size of region on right  station for add right  hits in triplets
+    Pick_gather = 3.0; // coefficient for size of region for attach new hits to created track
     if (isec == 2){ // it's hard to estimate errors correctly for slow tracks & w\o target!
       Pick_m =  3.0;
     }
-    Pick_gather = 3.0;
+    if (isec >= 1)
+      Pick_gather = 4.0;
+
     PickNeighbour = 1.0; // (PickNeighbour < dp/dp_error)  =>  triplets are neighbours
 
 //     // old values (before 08.07.2010):
@@ -1976,7 +1979,8 @@ void L1Algo::CATrackFinder()
           best_chi2 = best_chi2/ndf; //normalize
           if (best_chi2 > TRACK_CHI2_CUT) continue;
 
-
+          BranchExtender(best_tr);
+          best_L = best_tr.StsHits.size();
           
           if( fGhostSuppression ){//suppress ghost
             if( best_L == 3 ){
@@ -2014,8 +2018,6 @@ void L1Algo::CATrackFinder()
       for (vector<L1Branch>::iterator trIt = vtrackcandidate.begin();
                                        trIt != vtrackcandidate.end(); ++trIt){
 
-        // BranchExtender(*trIt);
-        // trIt->SetLength( trIt->StsHits.size() );
         vptrackcandidate.push_back(&(*trIt));
 
       }
@@ -2047,7 +2049,7 @@ void L1Algo::CATrackFinder()
         // was here, skipped for a moment
         //=======================================================
         
-        BranchExtender(*tr);
+        //BranchExtender(*tr);
         
           // store track
         for (vector<THitI>::iterator phitIt = tr->StsHits.begin();
@@ -2485,7 +2487,7 @@ void L1Algo::BranchFitter(const L1Branch &t, L1TrackPar& T, const bool dir, cons
           
         L1Extrapolate( T, vStsZPos[hit.iz], qp0, fld );
         L1AddMaterial( T, sta.materialInfo, qp0 );
-          //         if (ista==NMvdStations-1) L1AddPipeMaterial( T, qp0);
+        if (ista == NMvdStations-1) L1AddPipeMaterial( T, qp0 );
 
         fvec u = static_cast<fscal>( vStsStrips[hit.f] );
         fvec v = static_cast<fscal>( vStsStripsB[hit.b] );
@@ -2583,7 +2585,7 @@ void L1Algo::BranchFitter(const L1Branch &t, L1TrackPar& T, const bool dir, cons
 
         L1Extrapolate( T, vStsZPos[hit.iz], qp0, fld );
         L1AddMaterial( T, sta.materialInfo, qp0 );
-          //           if (ista==NMvdStations) L1AddPipeMaterial( T, qp0);
+        if (ista==NMvdStations) L1AddPipeMaterial( T, qp0 );
         L1Filter( T, sta.frontInfo, u );
         L1Filter( T, sta.backInfo,  v );
 
@@ -2608,7 +2610,6 @@ void L1Algo::BranchFitter(const L1Branch &t, L1TrackPar& T, const bool dir, cons
    /// qp0 - momentum for extrapolation
    /// initialize - should be params ititialized. 1 - yes.
 void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec qp0)
-    // TODO tested with same-z only // TODO combine with backward
 {
   std::vector<THitI> newHits;
   newHits.clear();
@@ -2662,12 +2663,11 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
 
   fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
 
-  for( ista += 2*step; ista < NStations; ista++ ){ 
+  for( ista += 2*step; ista < NStations; ista++ ){ // TODO try make improvments for diff-z
 
     L1Station &sta = vStations[ista];
           
     L1Extrapolate( T, sta.z, qp0, fld );
-    L1AddMaterial( T, sta.materialInfo, qp0 );
 
     fscal dxm_est = ( Pick_gather*sqrt(fabs(T.C00+sta.XYInfo.C00)) )[0];
     fscal dym_est = ( Pick_gather*sqrt(fabs(T.C11+sta.XYInfo.C11)) )[0];	
@@ -2691,9 +2691,9 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
       if (y < y_minus) continue;
       if (y > y_plus ) break;	      
       if ((x < x_minus) || (x > x_plus)) continue;
-      double dx = x - T.x[0];
-      double dy = y - T.y[0];
-      double d2 = dx*dx + dy*dy;
+      fscal dx = x - T.x[0];
+      fscal dy = y - T.y[0];
+      fscal d2 = dx*dx + dy*dy;
       if( d2 > r2_best ) continue;
       r2_best = d2;
       iHit_best = ih;
@@ -2707,10 +2707,11 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
     fvec v = static_cast<fvec>(vStsStripsB[hit.b]);
     fvec x, y;
     StripsToCoor(u, v, x, y, sta1);
-
+    
+    L1AddMaterial( T, sta.materialInfo, qp0 );
     L1Filter( T, sta.frontInfo, u );
     L1Filter( T, sta.backInfo,  v );
-    L1AddMaterial( T, sta.materialInfo, qp0 );
+
     fB0 = fB1;
     fB1 = fB2;
     fz0 = fz1;

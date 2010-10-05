@@ -138,7 +138,8 @@ class L1Algo{
   void FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec qp0 = 0.0);
 
       /// Find additional hits for existing track
-  void BranchExtender(L1Branch &t);
+      /// return chi2
+  fscal BranchExtender(L1Branch &t);
 
     /// -- Flags routines --
   unsigned char GetFStation( unsigned char flag ){ return flag/4; }

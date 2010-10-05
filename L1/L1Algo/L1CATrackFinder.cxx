@@ -1973,14 +1973,14 @@ void L1Algo::CATrackFinder()
           
           if ( best_L < ilev + 2 ) continue;      // lose maximum one hit
           if ( best_L < min_level + 3 ) continue; // should find all hits for min_level
-//           if ( best_L < ilev + 3 ) continue; // zero hits missing
+//          if ( best_L < ilev + 3 ) continue;   // zero hits missing
           
           int ndf = best_L*2-5;
           best_chi2 = best_chi2/ndf; //normalize
           if (best_chi2 > TRACK_CHI2_CUT) continue;
 
-          BranchExtender(best_tr);
-          best_L = best_tr.StsHits.size();
+          // BranchExtender(best_tr);
+          // best_L = best_tr.StsHits.size();
           
           if( fGhostSuppression ){//suppress ghost
             if( best_L == 3 ){
@@ -1989,6 +1989,9 @@ void L1Algo::CATrackFinder()
               if( (isec<2)&&(best_chi2>5.0) ) continue;
             }
           }
+
+          BranchExtender(best_tr);
+          best_L = best_tr.StsHits.size();
           
              // store candidate
           best_tr.Set( istaF, best_L, best_chi2, first_trip->GetQpOrig(MaxInvMom));
@@ -2042,7 +2045,7 @@ void L1Algo::CATrackFinder()
           L1StsHit &h = vStsHits[*phIt];
           if ( GetFUsed( vSFlag[h.f] | vSFlagB[h.b] ) ) nused++;
         }
-        if (nused != 0){/*nUsed[nused+1]++;*/ continue;} // don't allow tracks have shared hits
+        if (nused != 0){/*nUsed[nused+1]++;*/ continue;} // don't allow tracks have shared hits // track will be shorter, leave it for the next iteration
 
         //=======================================================
         // gather MAPS hits using the Kalman filter
@@ -2070,7 +2073,7 @@ void L1Algo::CATrackFinder()
         vTracks.push_back(t);
         ntracks++;
 
-      } //trIt
+      } // i_trackCandidate
 //       for (int iu = 0; iu < 10; iu++) cout << iu+1 << " " << nUsed[iu] << endl;
 #ifdef XXX
       c_time_fit_fin.Stop();
@@ -2663,18 +2666,11 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
 
   fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
 
-  for( ista += 2*step; ista < NStations; ista++ ){ // TODO try make improvments for diff-z
+  for( ista += 2*step; ista < NStations; ista++ ){
 
     L1Station &sta = vStations[ista];
           
     L1Extrapolate( T, sta.z, qp0, fld );
-
-    fscal dxm_est = ( Pick_gather*sqrt(fabs(T.C00+sta.XYInfo.C00)) )[0];
-    fscal dym_est = ( Pick_gather*sqrt(fabs(T.C11+sta.XYInfo.C11)) )[0];	
-    fscal x_minus = T.x[0] - dxm_est;
-    fscal x_plus  = T.x[0] + dxm_est;	  
-    fscal y_minus = T.y[0] - dym_est;
-    fscal y_plus  = T.y[0] + dym_est;
 
     fscal r2_best = 1e8; // best distance to hit
     int iHit_best = -1;  // index of the best hit
@@ -2682,17 +2678,27 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
       L1StsHit &hit = vStsHits[ih];
       if( GetFUsed( vSFlag[hit.f] | vSFlagB[hit.b] ) ) continue; // if used
 
-      fscal u = vStsStrips[hit.f];
-      fscal v = vStsStripsB[hit.b];
-        
-      fscal x, y;
-      StripsToCoor(u, v, x, y, sta1);
-  
-      if (y < y_minus) continue;
-      if (y > y_plus ) break;	      
-      if ((x < x_minus) || (x > x_plus)) continue;
-      fscal dx = x - T.x[0];
-      fscal dy = y - T.y[0];
+      // fscal u = vStsStrips[hit.f];
+      // fscal v = vStsStripsB[hit.b];
+      fscal x, y, z;
+      GetHitCoor(hit, x, y, z, sta);
+      // StripsToCoor(u,v,x,y,sta);
+      
+      L1TrackPar T_new = T;
+      L1ExtrapolateShort( T_new, z, qp0, fld);
+
+      fscal dym_est = ( Pick_gather*sqrt(fabs(T_new.C11+sta.XYInfo.C11)) )[0];
+      fscal y_minus_new = T_new.y[0] - dym_est;
+      if (y < y_minus_new) continue;
+      fscal y_plus_new = T_new.y[0] + dym_est;
+      if (y > y_plus_new ) break;
+      
+      fscal dxm_est = ( Pick_gather*sqrt(fabs(T_new.C00+sta.XYInfo.C00)) )[0];
+      fscal x_minus_new = T_new.x[0] - dxm_est;
+      fscal x_plus_new  = T_new.x[0] + dxm_est;
+      if ((x < x_minus_new) || (x > x_plus_new)) continue;
+      fscal dx = x - T_new.x[0];
+      fscal dy = y - T_new.y[0];
       fscal d2 = dx*dx + dy*dy;
       if( d2 > r2_best ) continue;
       r2_best = d2;
@@ -2705,9 +2711,11 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
     L1StsHit &hit = vStsHits[iHit_best];
     fvec u = static_cast<fvec>(vStsStrips[hit.f]);
     fvec v = static_cast<fvec>(vStsStripsB[hit.b]);
-    fvec x, y;
-    StripsToCoor(u, v, x, y, sta1);
-    
+    fvec x, y, z;
+    StripsToCoor(u, v, x, y, sta);
+    z = vStsZPos[hit.iz];
+      
+    L1ExtrapolateShort( T, z, qp0, fld);
     L1AddMaterial( T, sta.materialInfo, qp0 );
     L1Filter( T, sta.frontInfo, u );
     L1Filter( T, sta.backInfo,  v );
@@ -2746,7 +2754,7 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
 } // void L1Algo::FindMoreHits
 
   /// Try to extrapolate and find additional hits on other stations
-void L1Algo::BranchExtender(L1Branch &t) // TODO Simdize
+fscal L1Algo::BranchExtender(L1Branch &t) // TODO Simdize
 {
   L1TrackPar T;
 
@@ -2762,4 +2770,6 @@ void L1Algo::BranchExtender(L1Branch &t) // TODO Simdize
   BranchFitter (t, T, dir, 0, false); // 577
   //BranchFitter (t, T, dir, T.qp, false); // 571
   FindMoreHits(t, T, dir, T.qp);
+
+  return T.chi2[0];
 }

@@ -41,8 +41,8 @@ class CbmL1Track: public CbmL1TrackPar
     int  GetNMCTracks(){ return mcTracks.size();}
     bool IsGhost(){return !( mcTracks.size() );}
 
-    void SetMaxPurity(float maxPurity_){maxPurity = maxPurity_;}
-    float GetMaxPurity(){return maxPurity;}
+    void SetMaxPurity(double maxPurity_){maxPurity = maxPurity_;}
+    double GetMaxPurity(){return maxPurity;}
 
     static bool compareChi2(const CbmL1Track &a, const CbmL1Track &b){ return (a.chi2 < b.chi2); }
     static bool comparePChi2(const CbmL1Track *a, const CbmL1Track *b){ return (a->chi2 < b->chi2); }
@@ -56,7 +56,7 @@ class CbmL1Track: public CbmL1TrackPar
   private:
         // next members filled and used in Performance
     vector< CbmL1MCTrack* >  mcTracks; // array of assosiated recoTracks
-    float maxPurity; // [%]. maximum persent of hits, which belong to one mcTrack.
+    double maxPurity; // maximum persent of hits, which belong to one mcTrack.
 };
 
 #endif

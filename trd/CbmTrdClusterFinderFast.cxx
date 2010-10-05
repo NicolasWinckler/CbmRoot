@@ -149,7 +149,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t * option)
   for (Int_t iChargeTH = 0; iChargeTH < nChargeTH; iChargeTH++)
     {
       minimumChargeTH = mChargeTH[iChargeTH];
-
+      //minimumChargeTH = 0.0;
       /*
        * Digis are sorted according to the moduleId. A combiId is calculted based 
        * on the rowId and the colId to have a neighbouring criterion for digis within 
@@ -172,25 +172,35 @@ void CbmTrdClusterFinderFast::Exec(Option_t * option)
 	CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
 	if (digi->GetCharge() > minimumChargeTH)
 	  {
+
+	    /*
+	     *unrotate rotated modules in x- and y-direction (row <-> col)
+	     */
+	    Int_t moduleId = digi->GetDetId();
+	    Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId); 
+	    Int_t Station  = detInfo[1];
+	    Int_t Layer    = detInfo[2];
+
 	    digiCounter++;
 	    MyDigi *d = new MyDigi;
-	    Int_t moduleId = digi->GetDetId();
+	    
 	    fModuleInfo = fDigiPar->GetModule(moduleId);
 	    d->digiId = iDigi;
-	    d->rowId = digi->GetRow();
-	    d->colId = digi->GetCol();
+	    if (Layer%2 == 0) {
+	      d->colId = digi->GetRow();
+	      d->rowId = digi->GetCol();
+	    }
+	    else {
+	      d->rowId = digi->GetRow();
+	      d->colId = digi->GetCol();
+	    }
 	    d->charge = digi->GetCharge();
 
 	    if (optimization && minimumChargeTH == 0)
 	      {
 		DigiChargeSpectrum->Fill(digi->GetCharge());
 	      }
-	    /*
-	     *unrotate rotated modules in x- and y-direction (row <-> col)
-	     */
-	    Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId); 
-	    Int_t Station  = detInfo[1];
-	    Int_t Layer    = detInfo[2]; 
+ 
 	    /*
 	     *'rotated' modules are backrotated to get consistent notation of Row and Col
 	     */

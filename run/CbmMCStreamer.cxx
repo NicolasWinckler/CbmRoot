@@ -8,6 +8,7 @@
 #include "CbmMCStreamer.h"
 
 #include "CbmMCEpoch.h"
+#include "CbmMCEvent.h"
 
 #include "FairRootManager.h"
 
@@ -29,19 +30,22 @@ CbmMCStreamer::CbmMCStreamer() { }
 
 
 // -----   Standard constructor   --------------------------------------------
-CbmMCStreamer::CbmMCStreamer(Double_t interactionRate, 
-			       Int_t beamProfile,
-			       Double_t epochLength,
-			       Bool_t persistence, 
-			       Int_t verbosity, 
-			       const char* name) 
+CbmMCStreamer::CbmMCStreamer(Double_t eventRate, 
+			     Int_t beamProfile,
+			     Double_t epochLength,
+			     Bool_t persistence, 
+			     Int_t verbosity, 
+			     const char* name) 
   : FairTask(name, verbosity), 
-    fBeamRate(interactionRate), 
+    fEventRate(eventRate),
+    fEventTau(1.e9 / eventRate),
     fBeamProfile(beamProfile),
+    fPersistence(persistence),
     fEpochLength(epochLength),
-    fPersistence(persistence) {
-
-  fBeamTau = 1.e9 / fBeamRate;
+    fEvent(NULL),
+    fEventId(-1),
+    fEventTime(-666.),
+    fEpoch(NULL) {
 }
 // ---------------------------------------------------------------------------
 
@@ -65,14 +69,14 @@ InitStatus CbmMCStreamer::Init() {
 
   // Get input MCPoint arrays
   FairRootManager* ioman = FairRootManager::Instance();
-  fInMvd  = (TClonesArray*) ioman->GetObject("MVDPoint");
+  fEvent      = (CbmMCEvent*)   ioman->GetObject("MCEvent");
   fStsPoints  = (TClonesArray*) ioman->GetObject("StsPoint");
-  fInRich = (TClonesArray*) ioman->GetObject("RICHPoint");
-  fInTrd  = (TClonesArray*) ioman->GetObject("TRDPoint");
-  fInMuch = (TClonesArray*) ioman->GetObject("MUCHPoint");
-  fInTof  = (TClonesArray*) ioman->GetObject("TOFPoint");
-  fInEcal = (TClonesArray*) ioman->GetObject("ECALPOint");
-  fInPsd  = (TClonesArray*) ioman->GetObject("PSDPOint");
+
+  // Check MC event header
+  if ( ! fEvent ) {
+    cout << "-E- No MC event header branch found in file!" << endl;
+    return kFATAL;
+  }
 
   // Register output array
   fEpoch = new CbmMCEpoch(0., fEpochLength);
@@ -84,7 +88,7 @@ InitStatus CbmMCStreamer::Init() {
 
   cout << endl;
   cout << "-I-" << endl;
-  cout << "-I- Average event spacing " << fBeamTau << " ns" << endl;
+  cout << "-I- Average event spacing " << fEventTau << " ns" << endl;
   if ( ! fBeamProfile ) cout << "-I- Beam model: constant" << endl;
   else                  cout << "-I- Beam model: exponential" << endl;
   cout << "---------------------------------------------" << endl;
@@ -107,13 +111,15 @@ void CbmMCStreamer::Exec(Option_t* opt) {
   fEpochIsChanged = kFALSE;
   
 
-  // Determine event time
+  // Determine event time and event ID
+  if ( ! fEvent ) Fatal("ReadEvent", "No MC event header");
+  fEventId = fEvent->GetEventID();
   Double_t deltaT = 0;
-  if ( ! fBeamProfile ) deltaT = fBeamTau;
-  else                  deltaT = TMath::Nint(gRandom->Exp(fBeamTau));
+  if ( ! fBeamProfile ) deltaT = fEventTau;
+  else                  deltaT = TMath::Nint(gRandom->Exp(fEventTau));
   fEventTime += deltaT;
-  cout << "-I- " << GetName() << ": New event at " << fEventTime
-       << " ns" << endl;
+  cout << "-I- " << GetName() << ": New event " << fEventId << " at " 
+       << fEventTime << " ns" << endl;
 
 
   // Read event into buffer. If empty, skip execution (next event)
@@ -187,7 +193,8 @@ Int_t CbmMCStreamer::ReadEvent() {
       stsPoint = (CbmStsPoint*) fStsPoints->At(iPoint);
       Double_t pTime = stsPoint->GetTime() + fEventTime;
       stsBuffer.insert( pair<Double_t,CbmStsPoint>
-			(pTime, CbmStsPoint(*stsPoint, fEventTime, 0.) ) );
+			(pTime, CbmStsPoint(*stsPoint, fEventId, 
+					    fEventTime, 0.) ) );
       nPointsAdded++;
     }
 
@@ -240,8 +247,9 @@ void CbmMCStreamer::ProcessBuffer() {
       break;
     }
 
-    // Add (copy) point to current epoch
-    fEpoch->AddPoint(kSTS, (*it).second, 0.);
+    // Add (copy) point to current epoch. Time relative to epoch start is
+    // calculated by CbmMCEpoch.
+    fEpoch->AddPoint(kSTS, (*it).second, fEventId, 0.);
     cout <<  "-I- " << GetName() << ": Adding point to epoch at " 
 	 << ((*it).second).GetTime() << endl;
     fEpochIsChanged = kTRUE;

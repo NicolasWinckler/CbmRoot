@@ -46,8 +46,17 @@ class CbmMCEpoch : public TNamed
   virtual ~CbmMCEpoch();
 
 
-  /**   Add one MCPoint   **/
-  void AddPoint(DetectorId det, CbmStsPoint& stsPoint, Double_t eventTime);
+  /**   Add one MCPoint
+   **   The point will be copied to the internal array using its copy
+   **   constructor. The original object is kept. The point time is 
+   **   recalculated relative to the epoch start time.
+   *@param det  Detector system identifier
+   *@param stsPoint  Pointer to MCPoint to be added
+   *@param eventId   Event identifier (negative value keeps original event Id)
+   *@param eventTime MC event time
+   **/
+  void AddPoint(DetectorId det, CbmStsPoint& stsPoint, 
+		Int_t eventId = -1, Double_t eventTime = 0.);
 
 
   /**   Clear data   **/

@@ -21,6 +21,7 @@
 
 class TClonesArray;
 class CbmMCEpoch;
+class CbmMCEvent;
 
 
 using namespace std;
@@ -70,19 +71,21 @@ class CbmMCStreamer : public FairTask
 
  private:
 
-  Double_t fBeamRate;        /**  Interaction rate [1/s]      **/
-  Double_t fBeamTau;         /**  Average event spacing [ns]  **/
+  Double_t fEventRate;       /**  Interaction rate [1/s]      **/
+  Double_t fEventTau;        /**  Average event spacing [ns]  **/
   Int_t    fBeamProfile;     /**  Beam profile: 0=const., 1 = exponential **/
   Bool_t   fPersistence;     /**  Persistence flag for output array **/
   Double_t fEpochLength;     /**  Duration of epoch [ns] **/
 
+  CbmMCEvent* fEvent;        /**  Current event header  **/
+  Int_t       fEventId;      /**  ID of current event  **/
   Double_t    fEventTime;    /**  Time of current event [ns] **/
   CbmMCEpoch* fEpoch;        /**  Current epoch   **/
 
   Bool_t fEpochIsChanged;    /**  Flag whether current epoch was changed  **/
 
 
-  /**   Input arrays   **/
+  /**   Input arrays   **/   
   TClonesArray* fInMvd;
   TClonesArray* fStsPoints;
   TClonesArray* fInRich;

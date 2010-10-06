@@ -47,9 +47,10 @@ CbmMCEpoch::~CbmMCEpoch() {
 
 // -----   Add a MCPoint to the epoch   --------------------------------------
 void CbmMCEpoch::AddPoint(DetectorId det, CbmStsPoint& stsPoint, 
-			  Double_t eventTime) {
+			  Int_t eventId, Double_t eventTime) {
 
   new ((*fStsPoints)[GetNofPoints(kSTS)]) CbmStsPoint(stsPoint,
+						      eventId,
 						      eventTime,
 						      fStartTime);
 

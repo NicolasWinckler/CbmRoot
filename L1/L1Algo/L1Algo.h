@@ -128,8 +128,11 @@ class L1Algo{
     /// dir - 0 - forward, 1 - backward
     /// qp0 - momentum for extrapolation
     /// initialize - should be params ititialized. 1 - yes.
+  void BranchFitterFast(const L1Branch &t, L1TrackPar& T, const bool dir, const fvec qp0 = 0., const bool initParams = true);
+  
+    /// Fit track. more precise than FitterFast
   void BranchFitter(const L1Branch &t, L1TrackPar& T, const bool dir, const fvec qp0 = 0., const bool initParams = true);
-
+  
     /// Find additional hits for existing track
     /// t - track with hits
     /// T - track params

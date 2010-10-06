@@ -1983,11 +1983,11 @@ void L1Algo::CATrackFinder()
           
           int ndf = best_L*2-5;
           best_chi2 = best_chi2/ndf; //normalize
-          if (best_chi2 > TRACK_CHI2_CUT) continue;
+          if (best_chi2 > TRACK_CHI2_CUT) continue; // TODO make agreement with similar check in the CAFindTracks()
 
           // BranchExtender(best_tr);
           // best_L = best_tr.StsHits.size();
-          
+
           if( fGhostSuppression ){//suppress ghost
             if( best_L == 3 ){
               //if( isec == 2 ) continue; // too /*short*/ secondary track
@@ -2057,6 +2057,12 @@ void L1Algo::CATrackFinder()
         // gather MAPS hits using the Kalman filter
         // was here, skipped for a moment
         //=======================================================
+
+        // if(isec <= 2){ // check chi2. gives almost nothing
+        //   L1TrackPar T;
+        //   BranchFitterFast(*tr, T, 0);
+        //   if (T.chi2[0]/T.NDF[0] > TRACK_CHI2_CUT) continue;
+        // }
         
         BranchExtender(*tr);
         
@@ -2354,7 +2360,7 @@ void L1Algo::CAFindTrack(std::vector< L1StsHit > &svStsHits, unsigned int *RealI
     fscal dqp = fabs(qp1 - qp2);
     fscal Cqp = curr_trip->Cqp;
     Cqp      += new_trip->Cqp;
-    if ( dqp > PickNeighbour*Cqp  ) continue; // bad neighbour // TODO: do we need recheck it??
+    if ( dqp > PickNeighbour*Cqp  ) continue; // bad neighbour // CHECKME why do we need recheck it?? (it really change result)
 
         //  no used hits allowed
     if ( GetFUsed( vSFlag[svStsHits[new_trip->GetLHit()].f] | vSFlagB[svStsHits[new_trip->GetLHit()].b] ) ){
@@ -2374,10 +2380,10 @@ void L1Algo::CAFindTrack(std::vector< L1StsHit > &svStsHits, unsigned int *RealI
       curr_tr.StsHits.push_back(RealIHit[new_trip->GetLHit()]);
       curr_L+= 1;
         // estimate the track chi-square
-      dqp = dqp/Cqp*5.;  // TODO: understand
+      dqp = dqp/Cqp*5.;  // CHECKME: understand 5, why no sqrt(5)?
       curr_chi2 += dqp*dqp;
   //   dqp = dqp/Cqp; // IKu
-  //   curr_chi2 += dqp*dqp*2.;
+  //   curr_chi2 += dqp*dqp*5.;
       
       if( new_trip->GetLevel()==0 ){ // end of the track. So store rest of hits
         THitI ihitm = new_trip->GetMHit();
@@ -2390,10 +2396,17 @@ void L1Algo::CAFindTrack(std::vector< L1StsHit > &svStsHits, unsigned int *RealI
           curr_tr.StsHits.push_back(RealIHit[ihitr]);
           curr_L+= 1;
         }
+        
+        // if (curr_L >= 3){ // try to find more hits
+        //   BranchExtender(curr_tr);
+        //   curr_L = curr_tr.StsHits.size();
+        // }
+        
       }
 
+
       if( curr_chi2 <= TRACK_CHI2_CUT * (curr_L) ){ // go further
-  //   if( curr_chi2 <= TRACK_CHI2_CUT * (curr_L*2) ){ // IKu
+   //   if( curr_chi2 <= TRACK_CHI2_CUT * (curr_L*2-5) ){ // IKu
         CAFindTrack(svStsHits, RealIHit, ista+1,new_trip, best_tr, best_L, best_chi2, curr_tr, curr_L, curr_chi2,NCalls);
         NCalls++;
       }

@@ -14,14 +14,18 @@ using std::cout;
 using std::endl;
 using std::vector;
 
+
+
    /// Fit track
    /// t - track with hits
    /// T - track params
    /// dir - 0 - forward, 1 - backward
    /// qp0 - momentum for extrapolation
    /// initialize - should be params ititialized. 1 - yes.
-void L1Algo::BranchFitter(const L1Branch &t, L1TrackPar& T, const bool dir, const fvec qp0, const bool initParams)
+void L1Algo::BranchFitterFast(const L1Branch &t, L1TrackPar& T, const bool dir, const fvec qp0, const bool initParams)
 {
+  L1_assert(t.StsHits.size() >= 3);
+  
     // get hits of current track
   const std::vector<THitI>& hits = t.StsHits; // array of indeses of hits of current track
   const int nHits = t.StsHits.size();
@@ -220,6 +224,16 @@ void L1Algo::BranchFitter(const L1Branch &t, L1TrackPar& T, const bool dir, cons
       }
 
   }
+} // void L1Algo::BranchFitterFast
+
+  /// like BranchFitterFast but more precise
+void L1Algo::BranchFitter(const L1Branch &t, L1TrackPar& T, const bool dir, const fvec qp0, const bool initParams)
+{
+  BranchFitterFast (t, T, dir, qp0, initParams);
+  for (int i = 0; i < 3; i++) {
+    BranchFitterFast (t, T, !dir, T.qp, false);
+    BranchFitterFast (t, T, dir, T.qp, false);  
+  }
 } // void L1Algo::BranchFitter
 
    /// Find additional hits for existing track
@@ -282,7 +296,7 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
 
   fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
 
-  for( ista += 2*step; ista < NStations; ista++ ){
+  for( ista += 2*step; ista < NStations; ista += step ){
 
     L1Station &sta = vStations[ista];
           
@@ -372,31 +386,33 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
   /// Try to extrapolate and find additional hits on other stations
 fscal L1Algo::BranchExtender(L1Branch &t) // TODO Simdize
 {
+#define PRECISE_HIT_FINDING
+  //  const unsigned int minNHits = 3;
+  
   L1TrackPar T;
 
-  const unsigned int minNHits = 3;
-  const int nIter = 0;
     // forward
   bool dir = 0;
+#ifdef PRECISE_HIT_FINDING
   BranchFitter (t, T, dir);
-  for (int i = 0; i < nIter; i++) {
-    BranchFitter (t, T, !dir, T.qp, false);
-    BranchFitter (t, T, dir, T.qp, false);  
-  }
+#else
+  BranchFitterFast (t, T, dir);
+#endif
   
-  if (t.StsHits.size() < minNHits) return T.chi2[0];
+//  if (t.StsHits.size() < minNHits) return T.chi2[0];
   FindMoreHits(t, T, dir, T.qp);
 
     // backward
   dir = 1;
   //  BranchFitter (t, T, dir); // 577  // TODO investigate fitter
   //  BranchFitter (t, T, dir, T.qp); // 574
-  BranchFitter (t, T, dir, 0, false); // 577
-  for (int i = 0; i < nIter; i++) {
-    BranchFitter (t, T, !dir, T.qp, false);
-    BranchFitter (t, T, dir, T.qp, false);  
-  }
-  //BranchFitter (t, T, dir, T.qp, false); // 571
+  //  BranchFitter (t, T, dir, T.qp, false); // 571
+#ifdef PRECISE_HIT_FINDING
+  BranchFitter (t, T, dir, 0, false);
+#else
+  BranchFitterFast (t, T, dir, 0, false); // 577
+#endif
+
   FindMoreHits(t, T, dir, T.qp);
 
   return T.chi2[0];

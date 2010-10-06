@@ -1948,15 +1948,11 @@ void L1Algo::CATrackFinder()
         int trip_end   = TripStopIndex[istaF];
         for( int itrip=trip_first; itrip<trip_end; itrip++ ){
           L1Triplet *first_trip = &vTriplets[itrip];
-          int lv=first_trip->GetLevel();
-          int jst= GetFStation( vSFlag[(*svStsHits)[first_trip->GetLHit()].f] );
-          int fl = GetFUsed( vSFlag[(*svStsHits)[first_trip->GetLHit()].f] | vSFlagB[(*svStsHits)[first_trip->GetLHit()].b] );
 
-          if ( lv != ilev) continue; // try only triplets, which can start track with ilev+3 length
-          if (ilev == 0){ // collect only MAPS tracks-triplets
-            if ( jst != 0) continue;
-          }
-          if( fl ) continue; // if used
+          if ( first_trip->GetLevel() < ilev ) continue; // try only triplets, which can start track with ilev+3 length. w\o it have more ghosts, but efficiency either
+          if ( (ilev == 0) &&
+               (GetFStation(vSFlag[(*svStsHits)[first_trip->GetLHit()].f]) != 0) ) continue; // collect only MAPS tracks-triplets
+          if( GetFUsed( vSFlag[(*svStsHits)[first_trip->GetLHit()].f] | vSFlagB[(*svStsHits)[first_trip->GetLHit()].b] ) ) continue;
 
            // OK, search the best track candidate in the branches starting from the first_trip
 
@@ -1971,6 +1967,9 @@ void L1Algo::CATrackFinder()
           int NCalls = 1;
           CAFindTrack((*svStsHits), RealIHit, istaF, first_trip, best_tr, best_L, best_chi2, curr_tr, curr_L, curr_chi2, NCalls);
 
+          // if( (isec == 2) &&
+          //     (GetFStation((*svStsHits)[best_tr.StsHits[0]].f ) >= 4) ) break; // ghost supression !!!
+          
           // {
           //   if ( best_L < 3 ) continue;
           //   BranchExtender(best_tr);

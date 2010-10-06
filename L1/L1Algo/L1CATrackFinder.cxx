@@ -154,7 +154,7 @@ inline void L1Algo::f11(  // input
 
     T.chi2 = 0.;
     T.NDF = 2.;
-    if( isec==2) T.NDF = 0;
+    if( isec == kAllSecIter) T.NDF = 0;
     T.x  = xl;
     T.y  = yl;
     T.tx = tx;
@@ -185,7 +185,7 @@ inline void L1Algo::f11(  // input
 
     T.chi2 = 0.;
     T.NDF = 2.;
-    if( isec==2) T.NDF = 0;
+    if( isec == kAllSecIter) T.NDF = 0;
     T.x  = targX;
     T.y  = targY;
     T.tx = tx;
@@ -1356,7 +1356,7 @@ void L1Algo::CATrackFinder()
 #ifdef XXX
   static unsigned int stat_N = 0; // number of events
 
-  const int Nisec = 3; //number of main loops
+  const int Nisec = fNFindIterations; //number of main loops
 
     // timers for different part of CATrackFinder
   const int ntimers = 6; //number of timers + 1
@@ -1474,15 +1474,15 @@ void L1Algo::CATrackFinder()
   }
 
 #ifdef XXX
-        c_time_find[0][0].Stop();
-        time_find[0][0][0] += double(c_time_find[0][0].CpuTime()); //ms
-        time_find[0][1][0] += double(c_time_find[0][0].RealTime()); //ms
+  c_time_find[0][0].Stop();
+  time_find[0][0][0] += double(c_time_find[0][0].CpuTime()); //ms
+  time_find[0][1][0] += double(c_time_find[0][0].RealTime()); //ms
 #endif
 
     // iterations of finding:
-    // isec == 0 - primary fast track
-    // isec == 1 - primary all track
-    // isec == 2 - secondary all track
+    // kFastPrimIter = 0, // primary fast track
+    // kAllPrimIter,      // primary all track  
+    // kAllSecIter        // secondary all track 
   for (int isec = 0; isec < fNFindIterations; isec++){ // all finder
 
 #ifdef XXX
@@ -1492,45 +1492,30 @@ void L1Algo::CATrackFinder()
 
     Pick_m = 2.0; // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
     Pick_r = 4.0; // coefficient for size of region on right  station for add right  hits in triplets
-    Pick_gather = 3.0; // coefficient for size of region for attach new hits to created track
-    if (isec == 2){ // it's hard to estimate errors correctly for slow tracks & w\o target!
+    Pick_gather = 3.0; // coefficient for size of region for attach new hits to the created track
+    if (isec == kAllSecIter){ // it's hard to estimate errors correctly for slow tracks & w\o target!
       Pick_m =  3.0;
     }
-    if (isec >= 1)
+    if ( (isec == kAllPrimIter) || (isec == kAllSecIter) )
       Pick_gather = 4.0;
 
     PickNeighbour = 1.0; // (PickNeighbour < dp/dp_error)  =>  triplets are neighbours
 
-//     // old values (before 08.07.2010):
-//     Pick_m = 3.0;
-//     Pick_r = 5.0;
-//     //double Pick_gather = 5.0; //!!!
-//     if (isec == 0){
-//       Pick_m =  2.0;
-//     }
-//     PickNeighbour = 1.0;
-
-    //double MaxInvMom = 1.0/1.;
-    //if (isec == 1) MaxInvMom =  1.0/0.2;
-    //if (isec == 2) MaxInvMom =  1.0/0.2;
     MaxInvMom = 1.0/0.5;                     // max considered q/p
-    if (isec == 1) MaxInvMom =  1.0/0.1;
-    if (isec == 2) MaxInvMom =  1.0/0.1;
-//     if (isec == fTrackingLevel )  MaxInvMom = 1./fMomentumCutOff;
-
+    if ( (isec == kAllPrimIter) || (isec == kAllSecIter) ) MaxInvMom =  1.0/0.1;
 
       // define the target
     targX = 0; targY = 0; targZ = 0;      //  suppose, what target will be at (0,0,0)
     
     float SigmaTargetX, SigmaTargetY; // target constraint [cm]
-    if (isec <= 1){ // target
+    if ( (isec == kFastPrimIter) || (isec == kAllPrimIter) ){ // target
       targB = vtxFieldValue;
       if (isec ==-1)
         SigmaTargetX = SigmaTargetY = 0.01; // target
       else
         SigmaTargetX = SigmaTargetY = 0.1;
     }
-    else{ //use outer radius of the 1st station as a constraint
+    if (isec == kAllSecIter) { //use outer radius of the 1st station as a constraint
       L1Station &st = vStations[0];
       SigmaTargetX = SigmaTargetY = 3;//st.Rmax[0];
       targZ = 0.;//-1.;
@@ -1925,9 +1910,9 @@ void L1Algo::CATrackFinder()
     TStopwatch c_time_fit;
 #endif
     int min_level = 0; // min level for start triplet. So min track length = min_level+3.
-    if (isec == 1) min_level = 0;
-    if (isec == 2) min_level = 2; // only the long low momentum tracks
-    if (isec == -1) min_level = NStations-3 - 3; //only the longest tracks
+    if (isec == kAllPrimIter) min_level = 0;
+    if (isec == kAllSecIter) min_level = 2; // only the long low momentum tracks
+//    if (isec == -1) min_level = NStations-3 - 3; //only the longest tracks
 
       // collect consequtive: the longest tracks, shorter, more shorter and so on
     for (int ilev = NStations-3; ilev >= min_level; ilev--){ // choose length
@@ -1942,7 +1927,7 @@ void L1Algo::CATrackFinder()
 
       for( int istaF = 0; istaF <= NStations-3-ilev; istaF++ ){ // choose first track-station
 
-        if( isec==2 && istaF>=4 ) break; // ghost supression !!!
+        if( isec == kAllSecIter && istaF>=4 ) break; // ghost supression !!!
 
         int trip_first = TripStartIndex[istaF];
         int trip_end   = TripStopIndex[istaF];
@@ -1967,7 +1952,7 @@ void L1Algo::CATrackFinder()
           int NCalls = 1;
           CAFindTrack((*svStsHits), RealIHit, istaF, first_trip, best_tr, best_L, best_chi2, curr_tr, curr_L, curr_chi2, NCalls);
 
-          // if( (isec == 2) &&
+          // if( (isec == kAllSecIter) &&
           //     (GetFStation((*svStsHits)[best_tr.StsHits[0]].f ) >= 4) ) break; // ghost supression !!!
           
           // {
@@ -1990,8 +1975,8 @@ void L1Algo::CATrackFinder()
           if( fGhostSuppression ){//suppress ghost
             if( best_L == 3 ){
               //if( isec == 2 ) continue; // too /*short*/ secondary track
-              if( isec==2 && istaF != 0 ) continue; // too /*short*/ non-MAPS track
-              if( (isec<2)&&(best_chi2>5.0) ) continue;
+              if( (isec == kAllSecIter) && (istaF != 0) ) continue; // too /*short*/ non-MAPS track
+              if( ((isec == kFastPrimIter) || (isec == kAllPrimIter)) && (best_chi2 > 5.0) ) continue;
             }
           }
 
@@ -2057,7 +2042,7 @@ void L1Algo::CATrackFinder()
         // was here, skipped for a moment
         //=======================================================
 
-        // if(isec <= 2){ // check chi2. gives almost nothing
+        // if(isec <= kAllSecIter){ // check chi2. gives almost nothing
         //   L1TrackPar T;
         //   BranchFitterFast(*tr, T, 0);
         //   if (T.chi2[0]/T.NDF[0] > TRACK_CHI2_CUT) continue;

@@ -322,12 +322,13 @@ class L1Algo{
 
   enum { FIRSTCASTATION = 0 };  //first station used in CA
 
-    // fNFindIterations - set number of interation for trackfinding ( 0 < fNFindIterations <= 3 )
+    // fNFindIterations - set number of interation for trackfinding
     // itetation of finding:
-    // isec == 0 - primary fast track
-    // isec == 1 - primary all track  
-    // isec == 2 - secondary all track 
   enum { fNFindIterations = 3 };
+  enum { kFastPrimIter = 0, // primary fast track
+         kAllPrimIter,      // primary all track  
+         kAllSecIter        // secondary all track 
+  };
 
   static const float TRACK_CHI2_CUT = 10.0;  // cut for tracks candidates.
   static const float TRIPLET_CHI2_CUT = 5.0; // cut for selecting triplets before collecting tracks.

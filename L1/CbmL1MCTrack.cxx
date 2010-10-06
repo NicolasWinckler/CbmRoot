@@ -124,9 +124,11 @@ void CbmL1MCTrack::CalculateMaxNStaHits()
   int cur_maxNStaHits = 0;
   for(unsigned int iH = 0; iH < StsHits.size(); iH++){
     CbmL1HitStore& sh = L1->vHitStore[StsHits[iH]];
-    if (sh.iStation == lastSta) 
+    if (sh.iStation == lastSta){ 
       cur_maxNStaHits++;
+    }
     else{ // new station
+      L1_assert(sh.iStation > lastSta);
       if (cur_maxNStaHits > maxNStaHits) maxNStaHits = cur_maxNStaHits;
       cur_maxNStaHits = 1;
       lastSta = sh.iStation;
@@ -179,7 +181,7 @@ void CbmL1MCTrack::CalculateIsReconstructable()
   f &= (p > L1->MinRecoMom);
     // detected at least in 4 stations
 //   f &= (nMCContStations >= 4);
-  if (L1->fPerformance == 2) f &= (nStations        >= L1->MinNStations);     // QA definition
+  if (L1->fPerformance == 2) f &= (nStations        >= L1->MinNStations); // QA definition
   if (L1->fPerformance == 1) f &= (nHitContStations >= L1->MinNStations); // L1 definition
     // maximul 4 layers for a station.
 //   f &= (maxNStaHits <= 4);

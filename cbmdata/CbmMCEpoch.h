@@ -63,8 +63,18 @@ class CbmMCEpoch : public TNamed
   void Clear();
 
 
-  /**   Get number of points in this epoch for a given detector   **/
+  /**   Get number of points in this epoch for a given detector 
+   *@param det  Detector system identifier
+   **/
   Int_t GetNofPoints(DetectorId det);
+
+
+  /**   Get an MCPoint for a given detector
+   **@param det    Detector system identifier
+   **@param index  Index of point in array
+   **   Check for index range included.
+   **/
+  FairMCPoint* GetPoint(DetectorId det, Int_t index);
 
 
   /**   Get epoch start time   **/

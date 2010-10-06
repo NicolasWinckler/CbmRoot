@@ -89,6 +89,25 @@ Int_t CbmMCEpoch::GetNofPoints(DetectorId det) {
 
 
 
+// -----   Get a MCPoint from the array   ------------------------------------
+FairMCPoint* CbmMCEpoch::GetPoint(DetectorId det, Int_t index) {
+
+  if ( index >= 0  &&  index < GetNofPoints(det) ) {
+    switch (det) {
+    case kSTS: return ( (FairMCPoint*) fStsPoints->At(index) ); break;
+      default:   return NULL;
+    } 
+  }
+  cout << "-W- " << GetName() << "::GetPoint: Index " << index 
+       << "out of range for system " << det << endl;
+  return NULL;
+
+}
+// ---------------------------------------------------------------------------
+      
+
+
+
 // -----   Check for empty epoch   -------------------------------------------
 Bool_t CbmMCEpoch::IsEmpty() {
 

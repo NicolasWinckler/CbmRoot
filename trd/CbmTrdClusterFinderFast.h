@@ -83,7 +83,7 @@ class CbmTrdClusterFinderFast : public FairTask
   void Register();
 
  private:
-  ClusterList *clusterModule(MyDigiList *digis);  
+  ClusterList *clusterModule(MyDigiList *digis, MyDigiList *neighbours);  
   void mergeRowCluster(RowCluster *currentCluster,
 		       std::list<RowCluster*> *openList);
   ClusterList *findCluster(std::list<RowCluster*> *rowClusterList);

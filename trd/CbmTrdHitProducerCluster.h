@@ -4,6 +4,8 @@
 #include "FairTask.h"
 #include "CbmTrdDetectorId.h"
 
+#include "CbmTrdClusterFinderFast.h"
+
 #include "TVector3.h"
 #include <vector>
 #include <list>
@@ -18,6 +20,9 @@ typedef struct MyHit
   Int_t digiId;
   Int_t rowId;
   Int_t colId;
+  Int_t secIdX;
+  Int_t secIdY;
+  Int_t neighbourIds[4];
   //
   Int_t nCol;
   Int_t nRow;
@@ -59,7 +64,7 @@ typedef struct ModulePara
 } ModulePara;
 
 typedef std::list<MyHit*> MyHitList;
-
+typedef std::map<Int_t, MyDigiList*> MyDigiListMap;
 
 class CbmTrdHitProducerCluster : public FairTask
 {
@@ -82,11 +87,12 @@ class CbmTrdHitProducerCluster : public FairTask
   void Register();
 
  private:
+  Int_t GetSector(Bool_t x, Int_t DigiCol, ModulePara* mPara);
   void GetModuleInfo(Int_t qMaxIndex/*, MHitMap* ModuleHitMap*/);
-  void SortDigi();
-  void SortClusterDigi();
-  void PrfReco(Int_t qMaxIndex, Float_t qMax);
-  void SimpleReco(Int_t qMaxIndex, Float_t qMax, ModulePara* mPara, MyHit* hit/*, MHitMap* ModuleHitMap*/);
+  void SearchNeighbours(Int_t qMaxIndex, Int_t *neighbourIds, ModulePara* mPara, MyDigiList *neighbours, MyHit* hit);
+  Float_t Prf(Float_t padWidth, Float_t sigma, Float_t qLeft, Float_t qMax, Float_t qRight);
+  void PrfReco(Int_t qMaxIndex, Float_t qMax, ModulePara* mPara, Int_t *neighbourIds, MyHit* hit);
+  void SimpleReco(Int_t qMaxIndex, Float_t qMax, ModulePara* mPara, Int_t *neighbourIds, MyHit* hit/*, MHitMap* ModuleHitMap*/);
   void DrawHits();
   void AddHit(Int_t iHit, Int_t detectorId, TVector3& pos, TVector3& dpos, Double_t dxy, Int_t planeId, Double_t eLossTR, Double_t eLossdEdx, Double_t eLoss);
 
@@ -104,6 +110,8 @@ class CbmTrdHitProducerCluster : public FairTask
 
   std::map<Int_t, MyHitList*> ModuleHitMap;
 
-  ClassDef(CbmTrdHitProducerCluster,1);
+  std::map<Int_t, MyDigiList*> moduleDigiMap; //map of <moduleId, List of struct 'MyDigi' pointer>
+
+   ClassDef(CbmTrdHitProducerCluster,1);
 };
 #endif

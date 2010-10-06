@@ -67,6 +67,7 @@ OffLineInterface/CbmL1RichRingQa.cxx
 
 L1Algo/L1Algo.cxx
 L1Algo/L1CATrackFinder.cxx
+L1Algo/L1TrackExtender.cxx
 L1Algo/L1TrackFitter.cxx
 CbmL1Performance.cxx 
 CbmL1ReadEvent.cxx

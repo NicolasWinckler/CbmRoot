@@ -66,7 +66,7 @@ class CbmMCEpoch : public TNamed
   /**   Get number of points in this epoch for a given detector 
    *@param det  Detector system identifier
    **/
-  Int_t GetNofPoints(DetectorId det);
+  Int_t GetNofPoints(DetectorId det) const;
 
 
   /**   Get an MCPoint for a given detector
@@ -100,7 +100,13 @@ class CbmMCEpoch : public TNamed
   Double_t fStartTime;             /** Start time of epoch [ns] **/
   Double_t fEpochLength;           /** Duration of epoch [ns] **/ 
 
-  TClonesArray* fStsPoints;        /** Array of StsPoints in epoch **/
+  TClonesArray* fPoints[kTutDet];  /** Array of arrays with MCPoints **/
+
+
+  /**  Create MCPoint arrays
+   **  Used from the constructors.
+   **/
+  void CreateArrays();
 
 
   ClassDef(CbmMCEpoch,1);

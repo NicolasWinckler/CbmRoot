@@ -27,14 +27,26 @@ CbmMuchPoint::CbmMuchPoint() : FairMCPoint() {
 // -----   Standard constructor   ------------------------------------------
 CbmMuchPoint::CbmMuchPoint(Int_t trackID, Int_t detID, TVector3 posIn,
 			   TVector3 posOut, TVector3 momIn, TVector3 momOut,
-			   Double_t tof, Double_t length, Double_t eLoss)
-  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
+			   Double_t tof, Double_t length, Double_t eLoss,
+			   Int_t eventId)
+  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss, eventId) {
   fX_out  = posOut.X();
   fY_out  = posOut.Y();
   fZ_out  = posOut.Z();
   fPx_out = momOut.Px();
   fPy_out = momOut.Py();
   fPz_out = momOut.Pz();
+}
+// -------------------------------------------------------------------------
+
+
+
+// -----   Copy constructor with event and epoch time   --------------------
+CbmMuchPoint::CbmMuchPoint(const CbmMuchPoint& point, Int_t eventId,
+			   Double_t eventTime, Double_t epochTime) {
+  *this = point;
+  if ( eventId > 0 ) fEventId = eventId; 
+  fTime = point.GetTime() + eventTime - epochTime;
 }
 // -------------------------------------------------------------------------
 

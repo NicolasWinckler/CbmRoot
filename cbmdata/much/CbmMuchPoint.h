@@ -36,14 +36,24 @@ class CbmMuchPoint : public FairMCPoint
    *@param tof      Time since event start [ns]
    *@param length   Track length since creation [cm]
    *@param eLoss    Energy deposit [GeV]
+   *@param eventId  MC event identifier
    **/
   CbmMuchPoint(Int_t trackID, Int_t detID, TVector3 posIn,
 	       TVector3 posOut, TVector3 momIn, TVector3 momOut,
-	       Double_t tof, Double_t length, Double_t eLoss);
+	       Double_t tof, Double_t length, Double_t eLoss,
+	       Int_t eventId = 0);
 
 
-  /** Copy constructor **/
-  CbmMuchPoint(const CbmMuchPoint& point) { *this = point; };
+  /** Copy constructor with event and epoch time 
+   ** Re-calculates time w.r.t. epoch time start
+   *@param eventId     MC event identifier (negative values keep original event ID)
+   *@param eventTime   MC event time [ns]
+   *@param epochTime   epoch start time [ns]
+   **/
+  CbmMuchPoint(const CbmMuchPoint& point,
+	      Int_t    eventId   = -1,
+	      Double_t eventTime = 0., 
+	      Double_t epochTime = 0.);
 
 
   /** Destructor **/

@@ -12,7 +12,8 @@
 #ifndef CBMMCSTREAMER_H
 #define CBMMCSTREAMER_H 1
 
-#include "CbmStsPoint.h"
+#include "sts/CbmStsPoint.h"
+#include "much/CbmMuchPoint.h"
 
 #include "FairTask.h"
 
@@ -88,16 +89,12 @@ class CbmMCStreamer : public FairTask
   /**   Input arrays   **/   
   TClonesArray* fInMvd;
   TClonesArray* fStsPoints;
-  TClonesArray* fInRich;
-  TClonesArray* fInTrd;
-  TClonesArray* fInMuch;
-  TClonesArray* fInTof;
-  TClonesArray* fInEcal;
-  TClonesArray* fInPsd;
+  TClonesArray* fMuchPoints;
 
 
   /**   Buffers   **/
-  multimap<Double_t, CbmStsPoint> stsBuffer;
+  multimap<Double_t, CbmStsPoint>  stsBuffer;
+  multimap<Double_t, CbmMuchPoint> muchBuffer;
 
 
   /**   Show number of points in buffer   **/

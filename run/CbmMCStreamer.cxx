@@ -197,10 +197,24 @@ Int_t CbmMCStreamer::ReadEvent() {
 					    fEventTime, 0.) ) );
       nPointsAdded++;
     }
-
-    cout << "-I- " << GetName() << ": " << nStsPoints << 
-      " points added to buffer" << endl;
   }
+
+  if ( fMuchPoints ) {
+    Int_t    nMuchPoints = 0;
+    CbmMuchPoint* muchPoint = NULL;
+    nMuchPoints = fMuchPoints->GetEntriesFast();
+    for (Int_t iPoint = 0; iPoint < nMuchPoints; iPoint++) {
+      muchPoint = (CbmMuchPoint*) fMuchPoints->At(iPoint);
+      Double_t pTime = muchPoint->GetTime() + fEventTime;
+      muchBuffer.insert( pair<Double_t,CbmMuchPoint>
+			(pTime, CbmMuchPoint(*muchPoint, fEventId, 
+					     fEventTime, 0.) ) );
+      nPointsAdded++;
+    }
+  }
+
+  cout << "-I- " << GetName() << ": " << nPointsAdded << 
+    " points added to buffer" << endl;
 
   return nPointsAdded;
 }

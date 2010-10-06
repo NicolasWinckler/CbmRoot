@@ -17,8 +17,8 @@ using namespace std;
 
 // -----    Default  constructor   -------------------------------------------
 CbmMCEpoch::CbmMCEpoch() : TNamed("MCEpoch", "MCEpoch") {
-  
-  fStsPoints = new TClonesArray("CbmStsPoint", 1000);
+
+  CreateArrays();
 
 }
 // ---------------------------------------------------------------------------
@@ -30,8 +30,8 @@ CbmMCEpoch::CbmMCEpoch(Double_t startTime,
 		       Double_t epochLength) : TNamed("MCEpoch", "MCEpoch"),
 					       fStartTime(startTime),
 					       fEpochLength(epochLength) {
-  
-  fStsPoints = new TClonesArray("CbmStsPoint", 1000);
+
+  CreateArrays();
 
 }
 // ---------------------------------------------------------------------------
@@ -49,10 +49,13 @@ CbmMCEpoch::~CbmMCEpoch() {
 void CbmMCEpoch::AddPoint(DetectorId det, CbmStsPoint& stsPoint, 
 			  Int_t eventId, Double_t eventTime) {
 
-  new ((*fStsPoints)[GetNofPoints(kSTS)]) CbmStsPoint(stsPoint,
-						      eventId,
-						      eventTime,
-						      fStartTime);
+  switch (det) {
+  case kSTS: new ((*(fPoints[det]))[GetNofPoints(det)]) CbmStsPoint(stsPoint,
+								    eventId,
+								    eventTime,
+								    fStartTime);
+    break;
+  }
 
 }
 // ---------------------------------------------------------------------------
@@ -61,28 +64,31 @@ void CbmMCEpoch::AddPoint(DetectorId det, CbmStsPoint& stsPoint,
 
 // -----   Clear epoch   -----------------------------------------------------
 void CbmMCEpoch::Clear() {
+
+  /* Note: The loop over the detetcor id works only if the corresponding
+   * enum is continuous. Did not find a better solution yet. V.F.  */
+
   fStartTime = 0.;
-  fStsPoints->Clear("C");
+  for (Int_t iDet=kREF; iDet<kTutDet; iDet++) {
+    DetectorId det = DetectorId(iDet);
+    if ( fPoints[det] ) fPoints[det]->Clear("C");
+  }
+
 }
 // ---------------------------------------------------------------------------
 
 
 
 // -----   Get number of points in epoch   -----------------------------------
-Int_t CbmMCEpoch::GetNofPoints(DetectorId det) {
+Int_t CbmMCEpoch::GetNofPoints(DetectorId det) const {
 
-  Int_t nPoints = 0;
-
-  switch (det) {
-
-    case kSTS: nPoints = fStsPoints->GetEntriesFast(); break;
-      
-      cout << "-W- CbmMCEpoch:: Detector " << det << " not available"
-	   << endl;
-    
+  if ( ! fPoints[det] ) {
+    cout << "-W- " << GetName() << "::GetNofPoints: "
+	 << "No array for detector system " << det << endl;
+    return 0;
   }
 
-  return nPoints;
+  return fPoints[det]->GetEntriesFast();
 
 }
 // ---------------------------------------------------------------------------
@@ -92,15 +98,19 @@ Int_t CbmMCEpoch::GetNofPoints(DetectorId det) {
 // -----   Get a MCPoint from the array   ------------------------------------
 FairMCPoint* CbmMCEpoch::GetPoint(DetectorId det, Int_t index) {
 
-  if ( index >= 0  &&  index < GetNofPoints(det) ) {
-    switch (det) {
-    case kSTS: return ( (FairMCPoint*) fStsPoints->At(index) ); break;
-      default:   return NULL;
-    } 
+  if ( ! fPoints[det] ) {
+    cout << "-W- " << GetName() << "::GetPoint: "
+	 << "No array for detector system " << det << endl;
+    return NULL;
   }
-  cout << "-W- " << GetName() << "::GetPoint: Index " << index 
-       << "out of range for system " << det << endl;
-  return NULL;
+
+  if ( index < 0  ||  index >= GetNofPoints(det) ) {
+    cout << "-W- " << GetName() << "::GetPoint: Index " << index 
+	 << "out of range for system " << det << endl;
+    return NULL;
+  }
+
+  return ( (FairMCPoint*) fPoints[det]->At(index) );
 
 }
 // ---------------------------------------------------------------------------
@@ -111,8 +121,15 @@ FairMCPoint* CbmMCEpoch::GetPoint(DetectorId det, Int_t index) {
 // -----   Check for empty epoch   -------------------------------------------
 Bool_t CbmMCEpoch::IsEmpty() {
 
-  if (fStsPoints->GetEntriesFast()) return kFALSE;
-  return kTRUE;
+  Int_t nTotal = 0;
+
+  for (Int_t iDet=kREF; iDet<kTutDet; iDet++) {
+    DetectorId det = DetectorId(iDet);
+    if ( fPoints[iDet] ) nTotal += GetNofPoints(det);
+  }
+
+  if (nTotal > 0) return kTRUE;
+  return kFALSE;
 
 }
 // ---------------------------------------------------------------------------
@@ -120,12 +137,38 @@ Bool_t CbmMCEpoch::IsEmpty() {
 
 
 // -----   Print epoch info   ------------------------------------------------
-void CbmMCEpoch::Print(Option_t* opt) const {
+void CbmMCEpoch::Print(Option_t* opt) const { 
+
   cout << "-I- Epoch: Start time " << fStartTime << ", Points: ";
-  cout << "STS " << fStsPoints->GetEntriesFast() << endl;
+  TString sysName;
+  for (Int_t iDet = kREF; iDet<kTutDet; iDet++) {
+    DetectorId det = DetectorId(iDet);
+    if ( fPoints[iDet] ) {
+      CbmDetectorList::GetSystemName(DetectorId(iDet), sysName);
+      cout << sysName << " " << GetNofPoints(det) << " ";
+    }
+  }
+  cout << endl;
+
 }
 // ---------------------------------------------------------------------------
 
+
+
+// -----   Create MCPoint arrays   -------------------------------------------
+void CbmMCEpoch::CreateArrays() {
+
+  for (Int_t iDet=kREF; iDet<kTutDet; iDet++) {
+    DetectorId det = DetectorId(iDet);
+    switch(det) {
+    case kSTS:  fPoints[det] = new TClonesArray("CbmStsPoint", 1000); break;
+    case kMUCH: fPoints[det] = new TClonesArray("CbmMuchPoint", 1000); break;
+    default:    fPoints[det] = NULL;
+    }
+  }
+
+}
+// ---------------------------------------------------------------------------
 
 
 ClassImp(CbmMCEpoch)

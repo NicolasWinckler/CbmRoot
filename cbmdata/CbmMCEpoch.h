@@ -14,6 +14,7 @@
 
 
 #include "sts/CbmStsPoint.h"
+#include "much/CbmMuchPoint.h"
 #include "CbmDetectorList.h"
 
 
@@ -55,7 +56,7 @@ class CbmMCEpoch : public TNamed
    *@param eventId   Event identifier (negative value keeps original event Id)
    *@param eventTime MC event time
    **/
-  void AddPoint(DetectorId det, CbmStsPoint& stsPoint, 
+  void AddPoint(DetectorId det, FairMCPoint* point, 
 		Int_t eventId = -1, Double_t eventTime = 0.);
 
 

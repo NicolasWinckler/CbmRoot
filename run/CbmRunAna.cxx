@@ -59,7 +59,7 @@ void CbmRunAna::ExecRun(Int_t iStart, Int_t iStop) {
 
   // Event loop
   UInt_t tmpId = 0;
-  for (Int_t iEvent=iStart; iEvent<maxEvt; iEvent++) {
+  for (Int_t iEvent=iStart; iEvent<iStop; iEvent++) {
 
     // If input file is present: read one event
     if ( fInputFile ) {

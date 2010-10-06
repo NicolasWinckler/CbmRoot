@@ -44,7 +44,7 @@ CbmMCStreamer::CbmMCStreamer(Double_t eventRate,
     fEpochLength(epochLength),
     fEvent(NULL),
     fEventId(-1),
-    fEventTime(-666.),
+    fEventTime(0.),
     fEpoch(NULL) {
 }
 // ---------------------------------------------------------------------------
@@ -71,6 +71,8 @@ InitStatus CbmMCStreamer::Init() {
   FairRootManager* ioman = FairRootManager::Instance();
   fEvent      = (CbmMCEvent*)   ioman->GetObject("MCEvent");
   fStsPoints  = (TClonesArray*) ioman->GetObject("StsPoint");
+  fMuchPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
+  
 
   // Check MC event header
   if ( ! fEvent ) {
@@ -130,6 +132,7 @@ void CbmMCStreamer::Exec(Option_t* opt) {
   }
   PrintBuffer();
 
+  
   // Execute this loop until something is filled into the current epoch
   while ( kTRUE ) {
 \
@@ -145,11 +148,11 @@ void CbmMCStreamer::Exec(Option_t* opt) {
     }
 
     // Nothing added to epoch: fill tree and start next epoch
-      if ( ! fEpoch->IsEmpty() ) {
-	cout << "-I- " << GetName() << ": Filling epoch to output" << endl;
-	fEpoch->Print();
+    if ( ! fEpoch->IsEmpty() ) {
+      cout << "-I- " << GetName() << ": Filling epoch to output" << endl;
+      fEpoch->Print();
 	FairRootManager::Instance()->Fill();
-      }
+    }
     Double_t newEpochTime = fEpoch->GetStartTime() + fEpochLength;;
     fEpoch->Clear();
     fEpoch->SetStartTime(newEpochTime);
@@ -157,6 +160,8 @@ void CbmMCStreamer::Exec(Option_t* opt) {
     cout << "-I- " << GetName() << ": New epoch at " << newEpochTime << endl;
 
   }
+
+  
 
 }
 // ---------------------------------------------------------------------------
@@ -227,7 +232,8 @@ Int_t CbmMCStreamer::ReadEvent() {
 void CbmMCStreamer::PrintBuffer() {
 
   cout << "-I- " << GetName() << ": Entries in buffer: ";
-  cout << "STS " << stsBuffer.size() << endl;
+  cout << "STS " << stsBuffer.size();
+  cout << " MUCH " << muchBuffer.size() << endl;
 
 }
 // ---------------------------------------------------------------------------
@@ -238,15 +244,17 @@ void CbmMCStreamer::PrintBuffer() {
 // -----   Process buffer   --------------------------------------------------
 void CbmMCStreamer::ProcessBuffer() {
 
-  map<Double_t,CbmStsPoint>::iterator it;
-  map<Double_t,CbmStsPoint>::iterator eraseUntilHere = stsBuffer.begin();
-  for (it = stsBuffer.begin(); it != stsBuffer.end(); it++) {
 
+  // --- STS
+  map<Double_t,CbmStsPoint>::iterator stsIt;
+  while ( ! stsBuffer.empty() ) {
+    stsIt = stsBuffer.begin();
+    
     // Error if point time is before current epoch
-    if ( ( (*it).second).GetTime() < fEpoch->GetStartTime() ) {
+    if ( ( (*stsIt).second).GetTime() < fEpoch->GetStartTime() ) {
       cout << "-E- " << GetName() 
 	   << "::Exec: MCPoint time before current epoch!" << endl;
-      cout << "    " << "Point time: " << ((*it).second).GetTime() 
+      cout << "    " << "Point time: " << ((*stsIt).second).GetTime() 
 	   << " ns" << endl;
       cout << "    " << "Current epoch time " << fEpoch->GetStartTime()
 	   << " ns" << endl;
@@ -254,27 +262,59 @@ void CbmMCStreamer::ProcessBuffer() {
     }
 
     // Exit loop if point time is after current epoch
-    if ( ((*it).second).GetTime() > 
+    if ( ((*stsIt).second).GetTime() > 
 	 ( fEpoch->GetStartTime() + fEpochLength ) ) {
       cout << "-I- " << GetName() << ": Point time " 
-	   << (*it).second.GetTime() << " outside epoch" << endl;
+	   << (*stsIt).second.GetTime() << " outside epoch" << endl;
       break;
     }
 
     // Add (copy) point to current epoch. Time relative to epoch start is
     // calculated by CbmMCEpoch.
-    fEpoch->AddPoint(kSTS, (*it).second, fEventId, 0.);
-    cout <<  "-I- " << GetName() << ": Adding point to epoch at " 
-	 << ((*it).second).GetTime() << endl;
+    fEpoch->AddPoint(kSTS, &((*stsIt).second), fEventId, 0.);
+    cout <<  "-I- " << GetName() << ": Adding STS point to epoch at " 
+	 << ((*stsIt).second).GetTime() << endl;
+    stsBuffer.erase(stsIt);
     fEpochIsChanged = kTRUE;
-
-    // Mark for deletion
-    eraseUntilHere = it;
 
   }
 
-  // Remove copied points from the buffer
-  if ( fEpochIsChanged ) stsBuffer.erase(stsBuffer.begin(), ++eraseUntilHere);
+  // --- MUCH
+  /* I know it's not elegant copying the code, but do you have a better suggestion? */
+  map<Double_t,CbmMuchPoint>::iterator muchIt;
+  while ( ! muchBuffer.empty() ) {
+    muchIt = muchBuffer.begin();
+    
+    // Error if point time is before current epoch
+    if ( ( (*muchIt).second).GetTime() < fEpoch->GetStartTime() ) {
+      cout << "-E- " << GetName() 
+	   << "::Exec: MCPoint time before current epoch!" << endl;
+      cout << "    " << "Point time: " << ((*muchIt).second).GetTime() 
+	   << " ns" << endl;
+      cout << "    " << "Current epoch time " << fEpoch->GetStartTime()
+	   << " ns" << endl;
+      Fatal("Exec", "Cannot treat MCPoint time");
+    }
+
+    // Exit loop if point time is after current epoch
+    if ( ((*muchIt).second).GetTime() > 
+	 ( fEpoch->GetStartTime() + fEpochLength ) ) {
+      cout << "-I- " << GetName() << ": Point time " 
+	   << (*muchIt).second.GetTime() << " outside epoch" << endl;
+      break;
+    }
+
+    // Add (copy) point to current epoch. Time relative to epoch start is
+    // calculated by CbmMCEpoch.
+    fEpoch->AddPoint(kMUCH, &((*muchIt).second), fEventId, 0.);
+    cout <<  "-I- " << GetName() << ": Adding MUCH point to epoch at " 
+	 << ((*muchIt).second).GetTime() << endl;
+    muchBuffer.erase(muchIt);
+    fEpochIsChanged = kTRUE;
+
+  }
+
+
 
 }
 // ---------------------------------------------------------------------------

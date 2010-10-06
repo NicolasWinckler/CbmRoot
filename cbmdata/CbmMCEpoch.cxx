@@ -46,15 +46,29 @@ CbmMCEpoch::~CbmMCEpoch() {
 
 
 // -----   Add a MCPoint to the epoch   --------------------------------------
-void CbmMCEpoch::AddPoint(DetectorId det, CbmStsPoint& stsPoint, 
+void CbmMCEpoch::AddPoint(DetectorId det, FairMCPoint* point, 
 			  Int_t eventId, Double_t eventTime) {
 
   switch (det) {
-  case kSTS: new ((*(fPoints[det]))[GetNofPoints(det)]) CbmStsPoint(stsPoint,
-								    eventId,
-								    eventTime,
-								    fStartTime);
+
+  case kSTS: {
+    CbmStsPoint* stsPoint = (CbmStsPoint*) point;
+    new ((*(fPoints[det]))[GetNofPoints(det)]) CbmStsPoint(*stsPoint,
+							   eventId,
+							   eventTime,
+							   fStartTime);
+  }
     break;
+
+  case kMUCH: {
+    CbmMuchPoint* muchPoint = (CbmMuchPoint*) point;
+    new ((*(fPoints[det]))[GetNofPoints(det)]) CbmMuchPoint(*muchPoint,
+							    eventId,
+							    eventTime,
+							    fStartTime);
+  }
+    break;
+
   }
 
 }
@@ -128,8 +142,8 @@ Bool_t CbmMCEpoch::IsEmpty() {
     if ( fPoints[iDet] ) nTotal += GetNofPoints(det);
   }
 
-  if (nTotal > 0) return kTRUE;
-  return kFALSE;
+  if (nTotal) return kFALSE;
+  return kTRUE;
 
 }
 // ---------------------------------------------------------------------------

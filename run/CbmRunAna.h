@@ -48,7 +48,7 @@ class CbmRunAna : public FairRunAna
    **@param iStart   Number of first event
    **@param iStop    Number of last event
    **/
-  void Run(Int_t iStart, Int_t iStop) { ExecRun(iStart, iStop+1); }
+  void Run(Int_t iStart, Int_t iStop) { ExecRun(iStart-1, iStop); }
 
 
 

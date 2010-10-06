@@ -344,14 +344,8 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       fLayerZ[i] = 1;
     }
   
-  //cout << " FillMathiesonVector" << endl;
   FillMathiesonVector();
-  /*
-    for (Int_t r = 0; r < endOfMathiesonArray * Accuracy; r++) // values to be checked !!!!!
-    {
-    cout << fMathieson[r] << endl;
-    }
-  */
+
   Int_t nEntries = fTrdPoints->GetEntriesFast();
   //nEntries = 1;
   cout << " Found " << nEntries << " MC-Points in Collection of TRD" << endl;
@@ -1219,6 +1213,8 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
       ClusterMLL[0]    = local_inLL[0] + (0.5 * delta[0]) + (delta[0] * iPathSlice); 
       ClusterMLL[1]    = local_inLL[1] + (0.5 * delta[1]) + (delta[1] * iPathSlice); 
 
+      WireQuantisation(ClusterMLL);
+
       Col_slice = GetCol(ClusterMLL[0]);
       Row_slice = GetRow(ClusterMLL[1]);
 
@@ -1390,6 +1386,32 @@ void CbmTrdClusterizer::SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool
     }
 }
   // --------------------------------------------------------------------
+void CbmTrdClusterizer::WireQuantisation(Double_t *ClusterMLL)
+{
+  Float_t wireSpacing = 3; //[mm] anode wire spacing
+  Double_t tempPos = ClusterMLL[1];
+  Int_t iSec = GetSector(ClusterMLL[1]);
+  Int_t iRow = GetRow(ClusterMLL[1]);
+  Int_t NoWires = (fModuleInfo->GetPadSizey(iSec) * 10.) / wireSpacing;
+  for (Int_t i = 0; i < iSec; i++)
+    {
+      tempPos -= fModuleInfo->GetSectorSizey(i) * 10;
+    }
+  tempPos -= (fModuleInfo->GetPadSizey(iSec) * 10.) * (tempPos / Int_t(fModuleInfo->GetPadSizey(iSec) * 10.));
+  Int_t nextWire;
+  Int_t wireBelow = Int_t(tempPos / wireSpacing);
+  Float_t delta = (tempPos / wireSpacing) - wireBelow;
+  if (delta >= 0.5) {
+    nextWire = wireBelow + 1;
+  }
+  else {
+    nextWire = wireBelow;
+  }
+ 
+  Float_t nextWirePos = ClusterMLL[1] + (nextWire - (tempPos / wireSpacing)) * wireSpacing;
+  ClusterMLL[1] = nextWirePos;
+}
+  // --------------------------------------------------------------------
 void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H, TH2F* MathiesonTest)
 {
   //Int_t Accuracy = 1000;
@@ -1398,9 +1420,9 @@ void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, 
   Double_t Q = 0;
   Float_t r = 0.0;         // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
   /*
-  for (Int_t i = 0; i < 100; i++ )
+    for (Int_t i = 0; i < 100; i++ )
     {
-      cout << i << "  " << fMathieson[i] << endl;
+    cout << i << "  " << fMathieson[i] << endl;
     }
   */
   for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
@@ -1410,12 +1432,39 @@ void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, 
 	  fPadCharge[iPadRow][iPadCol] = 0.0;
 	}
     }
+  Float_t testMinMax;
+  Float_t testMaxMin;
+  Float_t testMinMin;
+  Float_t testMaxMax;
   for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++)
     { 
-      for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++)		
+       for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++)		
 	{ 
+	  testMinMin = sqrt(
+			    pow(((iPadCol - int(fPadNrX/2)) * W[iPadCol] / float(accuracy) - 0.5 * W[iPadCol]) - x_mean,2) + 
+			    pow(((iPadRow - int(fPadNrY/2)) * H[iPadRow] / float(accuracy) - 0.5 * H[iPadRow]) - y_mean,2)			 
+			    );
+	  testMaxMax = sqrt(
+			    pow((((iPadCol+1) - int(fPadNrX/2)) * W[iPadCol] / float(accuracy) - 0.5 * W[iPadCol]) - x_mean,2) + 
+			    pow((((iPadRow+1) - int(fPadNrY/2)) * H[iPadRow] / float(accuracy) - 0.5 * H[iPadRow]) - y_mean,2)			 
+			    );
+	  testMinMax = sqrt(
+			    pow(((iPadCol - int(fPadNrX/2)) * W[iPadCol] / float(accuracy) - 0.5 * W[iPadCol]) - x_mean,2) + 
+			    pow((((iPadRow+1) - int(fPadNrY/2)) * H[iPadRow] / float(accuracy) - 0.5 * H[iPadRow]) - y_mean,2)			 
+			    );
+	  testMaxMin = sqrt(
+			    pow((((iPadCol+1) - int(fPadNrX/2)) * W[iPadCol] / float(accuracy) - 0.5 * W[iPadCol]) - x_mean,2) + 
+			    pow(((iPadRow - int(fPadNrY/2)) * H[iPadRow] / float(accuracy) - 0.5 * H[iPadRow]) - y_mean,2)			 
+			    );
+	  if ( (Int_t(testMinMin * Accuracy)+2 > endOfMathiesonArray * Accuracy) && (Int_t(testMaxMax * Accuracy)+2 > endOfMathiesonArray * Accuracy) &&
+	       (Int_t(testMinMax * Accuracy)+2 > endOfMathiesonArray * Accuracy) && (Int_t(testMaxMin * Accuracy)+2 > endOfMathiesonArray * Accuracy)
+	       ) {
+	    //cout << "DEBUG: Look up table to small in X!!" << endl;
+	    continue;
+	  }
 	  for (Int_t yi = 0; yi < H[iPadRow] * accuracy; yi++)
 	    {
+
 	      for (Int_t xi = 0; xi < W[iPadCol] * accuracy; xi++)
 		{
 		  //Mathieson coordinate system ist centered in the center of the hit pad 
@@ -1427,7 +1476,7 @@ void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, 
 		    {
 		      rMin = Int_t(r * Accuracy);
 		      /*
-		      if (fMathieson[rMin] > 0)
+			if (fMathieson[rMin] > 0)
 			cout << rMin << "  " << fMathieson[rMin] << endl;
 		      */
 		      rMax = rMin+1;
@@ -1441,19 +1490,12 @@ void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, 
 			Float_t x = (((iPadCol - int(fPadNrX/2)) * W[iPadCol] + (xi + 0.5) / float(accuracy) - 0.5 * W[iPadCol]) - x_mean + (x_mean + 0.5 *  W[iPadCol]) + tempx)/10.;
 			Float_t y = (((iPadRow - int(fPadNrY/2)) * H[iPadRow] + (yi + 0.5) / float(accuracy) - 0.5 * H[iPadRow]) - y_mean + (y_mean + 0.5 *  H[iPadRow]) + tempy)/10.;
 			/*
-			cout << x << "," << y << endl;
-			cout << "   " << x_mean << "," << y_mean << endl;
+			  cout << x << "," << y << endl;
+			  cout << "   " << x_mean << "," << y_mean << endl;
 			*/
 			MathiesonTest->Fill(x,y,Q);
 		      }
 		    }		  
-		  else
-		    {
-		      //fPadCharge[iPadRow][iPadCol] += 0;
-		      /*
-			cout << "DEBUG: Look up table to small!!" << endl;
-		      */
-		    }
 		}
 	    }
 	  fPadCharge[iPadRow][iPadCol] *= SliceELoss;
@@ -1488,12 +1530,10 @@ void CbmTrdClusterizer::FillMathiesonVector()
     {
       value = pow(tanh(K2 * (r/Float_t(Accuracy)) / h),2);
       rho = (qa * K1 * (1. - value) /
-	     (1. + K3 * value)) / float((accuracy * accuracy)); 
-      //if (rho > 0)
-      //cout << "rho: " << rho << endl;
-      //fMathieson.push_back(rho);
+	     (1. + K3 * value)) / float((accuracy * accuracy)); // accuracy or Accuracy ???
+   
       fMathieson[r] = rho;
-      //cout << rho << endl;
+   
     }
   //cout << " Finished FillMathiesonVector" << endl;
 }

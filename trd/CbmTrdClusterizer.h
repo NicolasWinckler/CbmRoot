@@ -73,6 +73,8 @@ class CbmTrdClusterizer : public FairTask {
 
   void SplitPathSlices(const Int_t pointID, Bool_t Sector, Bool_t Histo, Bool_t TEST, TH2F* DeltaSlice2, TH2F* In, TH2F* Out, TH2F* Clusterposition, Double_t* PadChargeModule, Int_t nCol, Int_t nRow, Int_t j, Double_t* padW, Double_t* padH,  TH2F* Reco, TH2F* recoTRD1, TH2F* recoTRD2, TProfile* deltarecoTRD1, TH2F*  deltarecoTRD2, TProfile* deltarecoPad, TH1F* Xreco, TH1F* PR, TH2F* PRF, TProfile* PRF2, TH1F* TestIntegration, TH1F* TestIntegration1, TH1F* TestIntegration2, TH1F* TestIntegration3, TH2F* MathiesonTest);
 
+  void WireQuantisation(Double_t *ClusterMLL);
+
   void GetIntegrationArea(Bool_t Histo, TH1F* PadX ,TH1F* PadY);
 
   void ChargeConservation(Int_t Row_slice, Int_t Col_slice, Int_t nCol, Int_t nRow);

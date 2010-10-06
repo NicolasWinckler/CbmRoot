@@ -2064,7 +2064,7 @@ void L1Algo::CATrackFinder()
         //   if (T.chi2[0]/T.NDF[0] > TRACK_CHI2_CUT) continue;
         // }
         
-        BranchExtender(*tr);
+        // BranchExtender(*tr);
         
           // store track
         for (vector<THitI>::iterator phitIt = tr->StsHits.begin();
@@ -2332,8 +2332,8 @@ void L1Algo::CAFindTrack(std::vector< L1StsHit > &svStsHits, unsigned int *RealI
         L1Branch &curr_tr, unsigned char &curr_L, fscal &curr_chi2,
         int &NCalls )
 {
-  if (curr_trip->GetLevel() == 0){ // the last triplet -> check and store // TODO: do we need recheck it??
-    if ( (curr_L > best_L ) || ((curr_L == best_L )&&(curr_chi2<best_chi2)) ){
+  if (curr_trip->GetLevel() == 0){ // the end of the track -> check and store
+    if ( (curr_L > best_L ) || ( (curr_L == best_L) && (curr_chi2 < best_chi2) ) ){ // TODO: do we need recheck this??
       best_tr = curr_tr;
       best_chi2 = curr_chi2;
       best_L = curr_L;
@@ -2342,74 +2342,78 @@ void L1Algo::CAFindTrack(std::vector< L1StsHit > &svStsHits, unsigned int *RealI
   }
 
       
-  //  store hits & triplets of the current track
+    // save current tracklet
   L1Branch temp_tr = curr_tr;
   unsigned char temp_L = curr_L;
   fscal temp_chi2 = curr_chi2;
+
+    // try to extend. try all possible triplets
   int offset = TripStartIndex[ista+1];
   int first_neighbour = offset + curr_trip->GetFirstNeighbour();
   int end_neighbour = first_neighbour + curr_trip->GetNNeighbours();
-
   for(int index = first_neighbour; index < end_neighbour; ++index){
 
     L1Triplet *new_trip = &vTriplets[index];
 
+      // check new triplet
     if (curr_trip->GetLevel() != new_trip->GetLevel()+1) continue;
-    fscal qp1 = curr_trip->GetQp();
-    fscal qp2 = new_trip->GetQp();
+    const fscal qp1 = curr_trip->GetQp();
+    const fscal qp2 = new_trip->GetQp();
     fscal dqp = fabs(qp1 - qp2);
     fscal Cqp = curr_trip->Cqp;
     Cqp      += new_trip->Cqp;
-    if ( dqp > PickNeighbour*Cqp  ) continue; // bad neighbour // CHECKME why do we need recheck it?? (it really change result)
+    if ( dqp > PickNeighbour * Cqp  ) continue; // bad neighbour // CHECKME why do we need recheck it?? (it really change result)
 
-        //  no used hits allowed
-    if ( GetFUsed( vSFlag[svStsHits[new_trip->GetLHit()].f] | vSFlagB[svStsHits[new_trip->GetLHit()].b] ) ){
-          // compare and store track
-      if( (curr_L > best_L)|| ((curr_L == best_L)&&(curr_chi2<best_chi2)) ){
+    if ( GetFUsed( vSFlag[svStsHits[new_trip->GetLHit()].f] | vSFlagB[svStsHits[new_trip->GetLHit()].b] ) ){ 
+        //  no used hits allowed -> compare and store track
+      if( ( curr_L > best_L ) || ( (curr_L == best_L) && (curr_chi2 < best_chi2) ) ){
         best_tr  = curr_tr;
         best_chi2 = curr_chi2;
         best_L = curr_L;
       }
+      // break; // CHECKME it really change result. why?
     }
-    else{ //  add this triplet to the current track
+    else{ //  add new triplet to the current track
 
           // restore current track
       curr_tr = temp_tr;
       curr_chi2 = temp_chi2;
       curr_L = temp_L;
+
+        // add new hit
       curr_tr.StsHits.push_back(RealIHit[new_trip->GetLHit()]);
-      curr_L+= 1;
-        // estimate the track chi-square
+      curr_L += 1;
       dqp = dqp/Cqp*5.;  // CHECKME: understand 5, why no sqrt(5)?
       curr_chi2 += dqp*dqp;
   //   dqp = dqp/Cqp; // IKu
   //   curr_chi2 += dqp*dqp*5.;
       
-      if( new_trip->GetLevel()==0 ){ // end of the track. So store rest of hits
+      if( curr_chi2 > TRACK_CHI2_CUT * curr_L ) continue;
+            
+      if( new_trip->GetLevel() == 0 ){ // the end of the track. So store rest of hits
         THitI ihitm = new_trip->GetMHit();
         THitI ihitr = new_trip->GetRHit();
-        if( !GetFUsed( vSFlag[svStsHits[ihitm].f] |  vSFlagB[svStsHits[ihitm].b] )  ){
+        if( !GetFUsed( vSFlag[svStsHits[ihitm].f] | vSFlagB[svStsHits[ihitm].b] )  ){
           curr_tr.StsHits.push_back(RealIHit[ihitm]);
-          curr_L+= 1;
+          curr_L++;
         }
         if( !GetFUsed( vSFlag[svStsHits[ihitr].f] | vSFlagB[svStsHits[ihitr].b] ) ){
           curr_tr.StsHits.push_back(RealIHit[ihitr]);
-          curr_L+= 1;
+          curr_L++;
         }
         
-        // if (curr_L >= 3){ // try to find more hits
-        //   BranchExtender(curr_tr);
-        //   curr_L = curr_tr.StsHits.size();
-        // }
+        if( curr_chi2 > TRACK_CHI2_CUT * (curr_L*2-5) ) continue;
         
+        if (curr_L >= 3){ // try to find more hits
+          // curr_chi2 =  // good for ghosts, refSec, but bad for time
+          BranchExtender(curr_tr);
+          curr_L = curr_tr.StsHits.size();
+          //if( curr_chi2 > TRACK_CHI2_CUT * (curr_L*2-5) ) continue;
+        }
       }
 
-
-      if( curr_chi2 <= TRACK_CHI2_CUT * (curr_L) ){ // go further
-   //   if( curr_chi2 <= TRACK_CHI2_CUT * (curr_L*2-5) ){ // IKu
-        CAFindTrack(svStsHits, RealIHit, ista+1,new_trip, best_tr, best_L, best_chi2, curr_tr, curr_L, curr_chi2,NCalls);
-        NCalls++;
-      }
+      CAFindTrack(svStsHits, RealIHit, ista+1, new_trip, best_tr, best_L, best_chi2, curr_tr, curr_L, curr_chi2, NCalls);
+      NCalls++;
     } // add triplet to track
   } // for neighbours
 

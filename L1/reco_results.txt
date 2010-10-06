@@ -1,525 +1,68 @@
-// =============================maps_2010trunk_8900_UrQMD_===================================
-Setup:
-c:      central
-system: Au-Au
-det:    STS
-geo:    same-z
-hitPro: Ideal
-Time: 9:52 08.07.2010
-
-L1 ACCUMULATED STAT    : 10 EVENTS 
-
-Track category         :  Eff  / Killed / Length / Clones | All MC
-LongRPrim efficiency   : 0.990 / 0.004  / 0.964  / 0.003  | 3388
-RefPrim   efficiency   : 0.981 / 0.008  / 0.959  / 0.003  | 4203
-RefSec    efficiency   : 0.827 / 0.022  / 0.911  / 0.002  | 640
-Refset    efficiency   : 0.960 / 0.010  / 0.953  / 0.005  | 4843
-Allset    efficiency   : 0.908 / 0.013  / 0.940  / 0.009  | 7403
-ExtraPrim efficiency   : 0.932 / 0.012  / 0.919  / 0.003  | 1710
-ExtraSec  efficiency   : 0.561 / 0.033  / 0.887  / 0.001  | 850
-Extra     efficiency   : 0.809 / 0.019  / 0.912  / 0.004  | 2560
-Ghost     probability  : 0.017 | 111
-MC tracks/event found  : 672
-
-CA Track Finder: 0.458 s/ev
-
--------- Triplet performance ----------
-Track category         :  Eff  | All MC
-Allset    efficiency   : 0.932  | 39060
-Refset    efficiency   : 0.976  | 26799
-RefPrim   efficiency   : 0.991  | 23528
-RefSec    efficiency   : 0.869  | 3271
-Extra     efficiency   : 0.837  | 12261
-ExtraPrim efficiency   : 0.892  | 8500
-ExtraSec  efficiency   : 0.714  | 3761
-Clone     probability  : 0.000 | 1
-Ghost     probability  : 12.577 | 458031
-
-
-// =============================maps_2010trunk_8900_UrQMD_===================================
-Setup:
-c:      central
-system: p-C
-det:    STS
-geo:    same-z
-hitPro: Ideal
-
-L1 ACCUMULATED STAT    : 1000 EVENTS
-
-Track category         :  Eff  / Killed / Length | All MC
-LongRPrim efficiency   : 1.000 / 0.000  / 0.990  | 1980
-RefPrim   efficiency   : 1.000 / 0.000  / 0.983  | 2448
-RefSec    efficiency   : 0.884 / 0.004  / 0.954  | 242
-Refset    efficiency   : 0.990 / 0.000  / 0.980  | 2690
-Allset    efficiency   : 0.937 / 0.001  / 0.962  | 4346
-ExtraPrim efficiency   : 0.946 / 0.001  / 0.929  | 1269
-ExtraSec  efficiency   : 0.545 / 0.010  / 0.912  | 387
-Extra     efficiency   : 0.853 / 0.003  / 0.926  | 1656
-Clone     probability  : 0.010 | 42
-Ghost     probability  : 0.000 | 2
-MC tracks/event found  : 4
-
-CA Track Finder: 0.000 s/ev
-
-All entries:     24584
-Correct entries: 23787
-Pulls sigma & RMS:
-x       0.932010        1.025210
-y       0.976278        0.993221
-tx      1.573182        2.250864
-ty      1.266293        1.608442
-qp      1.543438        2.499736
-Residuals sigma & RMS:
-x       0.001443        0.001639
-y       0.008406        0.005248
-tx      0.000591        0.000839
-ty      0.000919        0.000966
-qp      0.023196        0.030611
-
- Name    Sigma  RMS
-fst_pQP 1.32314 1.61239
-fst_ptx 0.776143        0.895721
-fst_pty 0.924605        1.05175
-fst_px  0.995972        1.02816
-fst_py  1.02346 1.0306
-fst_P   0.0135732       0.0444642
-fst_tx  0.440884        0.556727
-fst_ty  0.741219        0.748345
-fst_x   14.1372 14.6651
-fst_y   66.7668 49.6644
-
-
-// =============================maps_2010trunk_8900_UrQMD_===================================
-Setup:
-c:      central
-system: p-C
-det:    STS
-geo:    diff-z
-hitPro: Ideal
-
-L1ExtrapolateShort = L1Extrapolate
-
-L1 ACCUMULATED STAT    : 1000 EVENTS
-
-Track category         :  Eff  / Killed / Length | All MC
-LongRPrim efficiency   : 1.000 / 0.000  / 0.990  | 2185
-RefPrim   efficiency   : 0.999 / 0.000  / 0.990  | 2688
-RefSec    efficiency   : 0.868 / 0.003  / 0.959  | 287
-Refset    efficiency   : 0.987 / 0.000  / 0.987  | 2975
-Allset    efficiency   : 0.943 / 0.002  / 0.968  | 4719
-ExtraPrim efficiency   : 0.944 / 0.000  / 0.934  | 1302
-ExtraSec  efficiency   : 0.647 / 0.016  / 0.919  | 442
-Extra     efficiency   : 0.869 / 0.004  / 0.931  | 1744
-Clone     probability  : 0.011 | 51
-Ghost     probability  : 0.000 | 1
-MC tracks/event found  : 4
-
-CA Track Finder: 0.001 s/ev
-
-
-All entries:     30448
-Correct entries: 29666
-Pulls sigma & RMS:
-x       0.941125        1.020651
-y       0.977181        0.991323
-tx      1.588484        2.291400
-ty      1.269063        1.610178
-qp      1.537694        2.483979
-Residuals sigma & RMS:
-x       0.001516        0.001682
-y       0.008858        0.005297
-tx      0.000603        0.000843
-ty      0.000918        0.000972
-qp      0.022150        0.030548
-
- Name    Sigma  RMS
-fst_pQP 1.33935 1.52641
-fst_ptx 0.809598        1.02666
-fst_pty 0.977361        1.09161
-fst_px  1.01092 1.0416
-fst_py  1.02657 1.03811
-fst_P   0.014042        0.0345788
-fst_tx  0.412729        0.554724
-fst_ty  0.742979        0.763279
-fst_x   14.9489 15.2705
-fst_y   66.6989 49.7636
-
-
-// =============================maps_2010trunk_8900_UrQMD_===================================
-Setup:
-c:      central
-system: Au-Au
-det:    STS
-geo:    diff-z
-hitPro: Ideal
-Time: 9:52 08.07.2010
-
+========= 8STS;	diff-z;	RD; deadTime=333 (ineff = 10%)
+---------no extend
 L1 ACCUMULATED STAT    : 10 EVENTS
 
-Track category         :  Eff  / Killed / Length / Clones | All MC
-LongRPrim efficiency   : 0.987 / 0.006  / 0.962  / 0.003  | 3760
-RefPrim   efficiency   : 0.972 / 0.010  / 0.963  / 0.003  | 4721
-RefSec    efficiency   : 0.795 / 0.039  / 0.908  / 0.001  | 743
-Refset    efficiency   : 0.948 / 0.014  / 0.956  / 0.004  | 5464
-Allset    efficiency   : 0.898 / 0.019  / 0.944  / 0.009  | 8067
-ExtraPrim efficiency   : 0.932 / 0.013  / 0.918  / 0.004  | 1733
-ExtraSec  efficiency   : 0.517 / 0.063  / 0.893  / 0.000  | 870
-Extra     efficiency   : 0.793 / 0.030  / 0.912  / 0.004  | 2603
-Ghost     probability  : 0.025 | 182
-MC tracks/event found  : 724
+Track category         :  Eff   / Killed / Length / Fakes  / Clones | All MC
+LongRPrim efficiency   : 0.944  / 0.031  / 0.873  / 0.007  / 0.007  | 1464
+RefPrim   efficiency   : 0.838  / 0.083  / 0.835  / 0.030  / 0.005  | 3977
+RefSec    efficiency   : 0.656  / 0.161  / 0.809  / 0.027  / 0.007  | 602
+Refset    efficiency   : 0.814  / 0.093  / 0.833  / 0.030  / 0.005  | 4579
+Allset    efficiency   : 0.762  / 0.102  / 0.828  / 0.029  / 0.005  | 6352
+ExtraPrim efficiency   : 0.718  / 0.094  / 0.813  / 0.025  / 0.005  | 1239
+ExtraSec  efficiency   : 0.425  / 0.202  / 0.805  / 0.030  / 0.002  | 534
+Extra     efficiency   : 0.629  / 0.126  / 0.812  / 0.026  / 0.004  | 1773
+Ghost     probability  : 0.086 | 417
+MC tracks/event found  : 484
 
-CA Track Finder: 0.709 s/ev
+CA Track Finder: 0.794 s/ev
 
--------- Triplet performance ----------
-Track category         :  Eff  | All MC
-Allset    efficiency   : 0.926  | 36382
-Refset    efficiency   : 0.970  | 25705
-RefPrim   efficiency   : 0.987  | 22496
-RefSec    efficiency   : 0.849  | 3209
-Extra     efficiency   : 0.820  | 10677
-ExtraPrim efficiency   : 0.884  | 7422
-ExtraSec  efficiency   : 0.675  | 3255
-Clone     probability  : 0.004 | 157
-Ghost     probability  : 20.320 | 684374
-
-
-// =============================maps_2010trunk_8900_UrQMD_===================================
-Setup:
-c:      central
-system: Au-Au
-det:    STS
-geo:    diff-z
-hitPro: Real
-occupancy  = 3. (standard)
-
-L1ExtrapolateShort = L1Extrapolate
-
-L1 ACCUMULATED STAT    : 10 EVENTS 
-
-Track category         :  Eff  / Killed / Length | All MC
-LongRPrim efficiency   : 0.987 / 0.011  / 0.890  | 2249
-RefPrim   efficiency   : 0.949 / 0.037  / 0.918  | 4303
-RefSec    efficiency   : 0.770 / 0.110  / 0.897  | 652
-Refset    efficiency   : 0.926 / 0.047  / 0.916  | 4955
-Allset    efficiency   : 0.884 / 0.061  / 0.914  | 6826
-ExtraPrim efficiency   : 0.892 / 0.059  / 0.907  | 1300
-ExtraSec  efficiency   : 0.508 / 0.189  / 0.908  | 571
-Extra     efficiency   : 0.774 / 0.099  / 0.907  | 1871
-Clone     probability  : 0.029 | 201
-Ghost     probability  : 0.058 | 349
-MC tracks/event found  : 603
-
-
-All entries:     3115511
-Correct entries: 435860
-Pulls sigma & RMS:
-x       1.016251        1.462868
-y       1.151081        1.217598
-tx      1.812457        3.019385
-ty      4.598993        4.115232
-qp      3.635279        3.899399
-Residuals sigma & RMS:
-x       0.001712        0.002441
-y       0.008558        0.005262
-tx      0.000647        0.000913
-ty      0.001219        0.001203
-qp      0.024629        0.033680
-
- Name    Sigma  RMS
-fst_pQP 1.27198 1.42172
-fst_ptx 0.771395        0.959091
-fst_pty 0.934581        1.12536
-fst_px  0.894358        1.04981
-fst_py  0.953772        1.02095
-fst_P   0.0146229       0.0708089
-fst_tx  0.353355        0.498614
-fst_ty  0.604031        0.679143
-fst_x   13.0795 15.0665
-fst_y   60.9049 48.0862
-
-
-
-
-
-// =============================maps_2010trunk_8900_UrQMD_===================================
-Setup:
-c:      central
-system: p-C
-det:    STS
-geo:    diff-z
-hitPro: Real
-occupancy  = 3. (standard)
-
-L1ExtrapolateShort = L1Extrapolate
-
-L1 ACCUMULATED STAT    : 1000 EVENTS
-
-Track category         :  Eff  / Killed / Length | All MC
-LongRPrim efficiency   : 0.999 / 0.000  / 0.993  | 1824
-RefPrim   efficiency   : 0.997 / 0.000  / 0.983  | 2563
-RefSec    efficiency   : 0.884 / 0.000  / 0.959  | 267
-Refset    efficiency   : 0.987 / 0.000  / 0.981  | 2830
-Allset    efficiency   : 0.951 / 0.002  / 0.965  | 4184
-ExtraPrim efficiency   : 0.945 / 0.000  / 0.928  | 1033
-ExtraSec  efficiency   : 0.657 / 0.025  / 0.920  | 321
-Extra     efficiency   : 0.877 / 0.006  / 0.927  | 1354
-Clone     probability  : 0.007 | 31
-Ghost     probability  : 0.001 | 3
-MC tracks/event found  : 3
-
-CA Track Finder: 0.001 s/ev
-
-
-
-All entries:     49997
-Correct entries: 28848
-Pulls sigma & RMS:
-x       0.881051        1.411922
-y       0.899168        0.998687
-tx      1.387466        2.404837
-ty      1.100520        1.784435
-qp      1.367581        2.544999
-Residuals sigma & RMS:
-x       0.001427        0.002257
-y       0.006717        0.004960
-tx      0.000505        0.000812
-ty      0.000770        0.000911
-qp      0.018855        0.029103
-
- Name    Sigma  RMS
-fst_pQP 1.28036 1.41232
-fst_ptx 0.751086        0.987788
-fst_pty 0.913035        1.05398
-fst_px  0.820584        0.941906
-fst_py  0.876622        0.918514
-fst_P   0.0138133       0.0530901
-fst_tx  0.381769        0.511257
-fst_ty  0.656867        0.701397
-fst_x   11.8091 13.7579
-fst_y   54.7717 46.3969
-
-
-
-// =============================maps_2010trunk_8900_UrQMD_===================================
-Setup:
-c:      central
-system: p-C
-det:    STS
-geo:    diff-z
-hitPro: Real
-occupancy  = 0.
-
-L1ExtrapolateShort = L1Extrapolate
-
-L1 ACCUMULATED STAT    : 1000 EVENTS
-
-Track category         :  Eff  / Killed / Length | All MC
-LongRPrim efficiency   : 0.999 / 0.000  / 0.993  | 1871
-RefPrim   efficiency   : 0.997 / 0.000  / 0.987  | 2568
-RefSec    efficiency   : 0.884 / 0.000  / 0.960  | 267
-Refset    efficiency   : 0.987 / 0.000  / 0.985  | 2835
-Allset    efficiency   : 0.951 / 0.002  / 0.968  | 4190
-ExtraPrim efficiency   : 0.946 / 0.000  / 0.931  | 1034
-ExtraSec  efficiency   : 0.657 / 0.025  / 0.922  | 321
-Extra     efficiency   : 0.877 / 0.006  / 0.929  | 1355
-Clone     probability  : 0.007 | 31
-Ghost     probability  : 0.001 | 3
-MC tracks/event found  : 3
-
-CA Track Finder: 0.001 s/ev
-
-
-All entries:     49997
-Correct entries: 28848
-Pulls sigma & RMS:
-x       0.881051        1.411922
-y       0.899168        0.998687
-tx      1.387466        2.404837
-ty      1.100520        1.784435
-qp      1.367581        2.544999
-Residuals sigma & RMS:
-x       0.001427        0.002257
-y       0.006717        0.004960
-tx      0.000505        0.000812
-ty      0.000770        0.000911
-qp      0.018855        0.029103
-
- Name    Sigma  RMS
-fst_pQP 1.27814 1.41179
-fst_ptx 0.74985 0.983472
-fst_pty 0.916886        1.06329
-fst_px  0.822331        0.934919
-fst_py  0.878001        0.917315
-fst_P   0.0137737       0.0529912
-fst_tx  0.379659        0.510129
-fst_ty  0.658547        0.704652
-fst_x   11.7923 13.753
-fst_y   54.7739 46.3933
-
-
-
-// =============================maps_2010trunk_8900_UrQMD_===================================
-Setup:
-c:      central
-system: Au-Au
-det:    STS
-geo:    diff-z
-hitPro: Real
-occupancy  = 0.
-
-L1ExtrapolateShort = L1Extrapolate
+--------extend. after candidates competition
 L1 ACCUMULATED STAT    : 10 EVENTS
 
-Track category         :  Eff  / Killed / Length | All MC
-LongRPrim efficiency   : 0.988 / 0.010  / 0.889  | 2299
-RefPrim   efficiency   : 0.950 / 0.036  / 0.921  | 4323
-RefSec    efficiency   : 0.776 / 0.105  / 0.896  | 657
-Refset    efficiency   : 0.927 / 0.045  / 0.919  | 4980
-Allset    efficiency   : 0.885 / 0.059  / 0.916  | 6859
-ExtraPrim efficiency   : 0.891 / 0.061  / 0.909  | 1306
-ExtraSec  efficiency   : 0.513 / 0.182  / 0.908  | 573
-Extra     efficiency   : 0.776 / 0.098  / 0.909  | 1879
-Clone     probability  : 0.030 | 205
-Ghost     probability  : 0.056 | 338
-MC tracks/event found  : 607
+Track category         :  Eff   / Killed / Length / Fakes  / Clones | All MC
+LongRPrim efficiency   : 0.942  / 0.032  / 0.917  / 0.007  / 0.002  | 1464
+RefPrim   efficiency   : 0.834  / 0.084  / 0.901  / 0.032  / 0.002  | 3977
+RefSec    efficiency   : 0.659  / 0.168  / 0.851  / 0.028  / 0.003  | 602
+Refset    efficiency   : 0.811  / 0.095  / 0.895  / 0.031  / 0.002  | 4579
+Allset    efficiency   : 0.760  / 0.103  / 0.882  / 0.031  / 0.002  | 6352
+ExtraPrim efficiency   : 0.717  / 0.092  / 0.840  / 0.028  / 0.002  | 1239
+ExtraSec  efficiency   : 0.423  / 0.189  / 0.825  / 0.030  / 0.000  | 534
+Extra     efficiency   : 0.628  / 0.121  / 0.837  / 0.028  / 0.002  | 1773
+Ghost     probability  : 0.076 | 365
+MC tracks/event found  : 482
 
-CA Track Finder: 6.661 s/ev
+CA Track Finder: 0.778 s/ev
 
-All entries:     3063897
-Correct entries: 427447
-Pulls sigma & RMS:
-x       1.005930        1.455715
-y       1.143103        1.212063
-tx      1.804686        3.002633
-ty      4.577661        4.106193
-qp      3.563580        3.870681
-Residuals sigma & RMS:
-x       0.001695        0.002427
-y       0.008484        0.005252
-tx      0.000645        0.000910
-ty      0.001212        0.001200
-qp      0.024300        0.033562
-
- Name    Sigma  RMS
-fst_pQP 1.27244 1.41847
-fst_ptx 0.773802        0.960183
-fst_pty 0.93503 1.12439
-fst_px  0.890347        1.04736
-fst_py  0.945364        1.02804
-fst_P   0.014538        0.0708118
-fst_tx  0.355087        0.499081
-fst_ty  0.602991        0.678811
-fst_x   13.042  14.9717
-fst_y   60.981  48.0697
-
-// =============================maps_2010trunk_8900_UrQMD_===================================
-Setup:
-c:      central
-system: Au-Au
-det:    STS+MVD
-geo:    same-z
-hitPro: Ideal
-Time: 9:52 08.07.2010
-
-L1 ACCUMULATED STAT    : 10 EVENTS 
-
-Track category         :  Eff  / Killed / Length / Clones | All MC
-LongRPrim efficiency   : 0.996 / 0.003  / 0.971  / 0.008  | 2422
-RefPrim   efficiency   : 0.967 / 0.021  / 0.949  / 0.013  | 4324
-RefSec    efficiency   : 0.791 / 0.053  / 0.907  / 0.002  | 641
-Refset    efficiency   : 0.945 / 0.025  / 0.944  / 0.015  | 4965
-Allset    efficiency   : 0.896 / 0.029  / 0.930  / 0.027  | 7628
-ExtraPrim efficiency   : 0.933 / 0.022  / 0.905  / 0.010  | 1781
-ExtraSec  efficiency   : 0.552 / 0.065  / 0.875  / 0.002  | 882
-Extra     efficiency   : 0.807 / 0.036  / 0.898  / 0.012  | 2663
-Ghost     probability  : 0.038 | 263
-MC tracks/event found  : 683
-
-CA Track Finder: 0.911 s/ev
-
--------- Triplet performance ----------
-Track category         :  Eff  | All MC
-Allset    efficiency   : 0.933  | 49092
-Refset    efficiency   : 0.976  | 33555
-RefPrim   efficiency   : 0.990  | 29914
-RefSec    efficiency   : 0.863  | 3641
-Extra     efficiency   : 0.840  | 15537
-ExtraPrim efficiency   : 0.889  | 11160
-ExtraSec  efficiency   : 0.717  | 4377
-Clone     probability  : 0.000 | 1
-Ghost     probability  : 47.615 | 2180865
-
-// =============================maps_2010trunk_8900_UrQMD_===================================
-Setup:
-c:      central
-system: Au-Au
-det:    STS+MVD
-geo:    diff-z
-hitPro: Ideal
-Time: 9:52 08.07.2010
-
-L1 ACCUMULATED STAT    : 10 EVENTS 
-
-Track category         :  Eff  / Killed / Length / Clones | All MC
-LongRPrim efficiency   : 0.995 / 0.004  / 0.972  / 0.009  | 2500
-RefPrim   efficiency   : 0.967 / 0.019  / 0.960  / 0.010  | 4743
-RefSec    efficiency   : 0.801 / 0.052  / 0.899  / 0.003  | 769
-Refset    efficiency   : 0.944 / 0.024  / 0.953  / 0.013  | 5512
-Allset    efficiency   : 0.893 / 0.032  / 0.937  / 0.025  | 8291
-ExtraPrim efficiency   : 0.933 / 0.025  / 0.912  / 0.010  | 1806
-ExtraSec  efficiency   : 0.531 / 0.089  / 0.859  / 0.002  | 973
-Extra     efficiency   : 0.792 / 0.048  / 0.900  / 0.012  | 2779
-Ghost     probability  : 0.056 | 415
-MC tracks/event found  : 740
-
-CA Track Finder: 1.432 s/ev
-
--------- Triplet performance ----------
-Track category         :  Eff  | All MC
-Allset    efficiency   : 0.930  | 45885
-Refset    efficiency   : 0.974  | 31857
-RefPrim   efficiency   : 0.989  | 28144
-RefSec    efficiency   : 0.860  | 3713
-Extra     efficiency   : 0.830  | 14028
-ExtraPrim efficiency   : 0.887  | 9890
-ExtraSec  efficiency   : 0.693  | 4138
-Clone     probability  : 0.004 | 171
-Ghost     probability  : 76.822 | 3277606
-
-
-// =============================maps_2010trunk_8900_UrQMD_===================================
-Setup:
-c:      central
-system: Au-Au
-det:    STS+MVD
-geo:    diff-z
-hitPro: Real
-Time: 9:52 08.07.2010
-
+--------extend. before candidates competition
 L1 ACCUMULATED STAT    : 10 EVENTS
 
-Track category         :  Eff  / Killed / Length / Clones | All MC
-LongRPrim efficiency   : 0.994 / 0.006  / 0.963  / 0.007  | 1586
-RefPrim   efficiency   : 0.942 / 0.047  / 0.952  / 0.021  | 4465
-RefSec    efficiency   : 0.759 / 0.129  / 0.907  / 0.002  | 692
-Refset    efficiency   : 0.918 / 0.058  / 0.947  / 0.023  | 5157
-Allset    efficiency   : 0.879 / 0.074  / 0.932  / 0.032  | 7347
-ExtraPrim efficiency   : 0.896 / 0.074  / 0.894  / 0.008  | 1520
-ExtraSec  efficiency   : 0.540 / 0.200  / 0.878  / 0.001  | 670
-Extra     efficiency   : 0.787 / 0.113  / 0.890  / 0.009  | 2190
-Ghost     probability  : 0.092 | 597
-MC tracks/event found  : 645
+Track category         :  Eff   / Killed / Length / Fakes  / Clones | All MC
+LongRPrim efficiency   : 0.942  / 0.033  / 0.917  / 0.006  / 0.001  | 1464
+RefPrim   efficiency   : 0.834  / 0.084  / 0.902  / 0.031  / 0.001  | 3977
+RefSec    efficiency   : 0.658  / 0.166  / 0.853  / 0.027  / 0.002  | 602
+Refset    efficiency   : 0.811  / 0.095  / 0.897  / 0.031  / 0.001  | 4579
+Allset    efficiency   : 0.759  / 0.102  / 0.884  / 0.030  / 0.001  | 6352
+ExtraPrim efficiency   : 0.713  / 0.090  / 0.842  / 0.028  / 0.002  | 1239
+ExtraSec  efficiency   : 0.421  / 0.193  / 0.829  / 0.028  / 0.000  | 534
+Extra     efficiency   : 0.625  / 0.121  / 0.839  / 0.028  / 0.002  | 1773
+Ghost     probability  : 0.076 | 365
+MC tracks/event found  : 482
 
-CA Track Finder: 4.390 s/ev
+CA Track Finder: 0.794 s/ev
 
--------- Triplet performance ----------
-Track category         :  Eff  | All MC
-Allset    efficiency   : 0.951  | 8039
-Refset    efficiency   : 0.981  | 5756
-RefPrim   efficiency   : 0.991  | 5239
-RefSec    efficiency   : 0.884  | 517
-Extra     efficiency   : 0.874  | 2283
-ExtraPrim efficiency   : 0.906  | 1780
-ExtraSec  efficiency   : 0.759  | 503
-Clone     probability  : 0.244 | 1963
-Ghost     probability  : 1222.221 | 9340210
+
+---------extend. during recursive procedure.
+Track category         :  Eff   / Killed / Length / Fakes  / Clones | All MC
+LongRPrim efficiency   : 0.942  / 0.032  / 0.918  / 0.006  / 0.001  | 1464
+RefPrim   efficiency   : 0.835  / 0.081  / 0.904  / 0.031  / 0.001  | 3977
+RefSec    efficiency   : 0.659  / 0.158  / 0.854  / 0.027  / 0.002  | 602
+Refset    efficiency   : 0.812  / 0.092  / 0.898  / 0.030  / 0.001  | 4579
+Allset    efficiency   : 0.760  / 0.100  / 0.885  / 0.030  / 0.001  | 6352
+ExtraPrim efficiency   : 0.713  / 0.094  / 0.843  / 0.029  / 0.002  | 1239
+ExtraSec  efficiency   : 0.425  / 0.189  / 0.829  / 0.030  / 0.000  | 534
+Extra     efficiency   : 0.626  / 0.123  / 0.840  / 0.029  / 0.002  | 1773
+Ghost     probability  : 0.072 | 346
+MC tracks/event found  : 482
+
+CA Track Finder: 0.823 s/ev
+

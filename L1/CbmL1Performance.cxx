@@ -792,16 +792,16 @@ void CbmL1::TrackFitPerformance()
         Double_t l,r;
       } Table[Nh_fit]=
       {
-        {"x",  "Residual X [#mum]",                   100, -100., 100.},
+        {"x",  "Residual X [#mum]",                   100, -30., 30.},
         {"y",  "Residual Y [#mum]",                   100, -100., 100.},
         {"tx", "Residual Tx [mrad]",                  100,   -2.,   2.},
         {"ty", "Residual Ty [mrad]",                  100,   -2.,   2.},
-        {"P",  "Resolution P/Q [100%]",               100,   -1,  1 },
-        {"px", "Pull X [residual/estimated_error]",   100,  -10.,  10.},
-        {"py", "Pull Y [residual/estimated_error]",   100,  -10.,  10.},
-        {"ptx","Pull Tx [residual/estimated_error]",  100,  -10.,  10.},
-        {"pty","Pull Ty [residual/estimated_error]",  100,  -10.,  10.},
-        {"pQP","Pull Q/P [residual/estimated_error]", 100,  -10.,  10.},
+        {"P",  "Resolution P/Q [100%]",               100,   -0.1,  0.1 },
+        {"px", "Pull X [residual/estimated_error]",   100,  -6.,  6.},
+        {"py", "Pull Y [residual/estimated_error]",   100,  -6.,  6.},
+        {"ptx","Pull Tx [residual/estimated_error]",  100,  -6.,  6.},
+        {"pty","Pull Ty [residual/estimated_error]",  100,  -6.,  6.},
+        {"pQP","Pull Q/P [residual/estimated_error]", 100,  -6.,  6.},
         {"QPreco","Reco Q/P ", 100,  -10.,  10.},
         {"QPmc","MC Q/P ", 100,  -10.,  10.}
       };

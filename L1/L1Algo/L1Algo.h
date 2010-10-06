@@ -77,7 +77,7 @@ class L1Algo{
 
     /// Track fitting procedures
   void KFTrackFitter_simple(); // version, which use procedured used during the reconstruction
-  void KFTrackFitter();        // version from SIMD-KF benchmark
+  void L1KFTrackFitter();        // version from SIMD-KF benchmark
 
     /// ----- Input data ----- 
       // filled in CbmL1::ReadEvent();
@@ -116,6 +116,7 @@ class L1Algo{
   
     /// ----- Subroutines used by L1Algo::CATrackFinder() ------
   
+
   void CAFindTrack(vector< L1StsHit > &svStsHits, unsigned int *RealIHit, int ista, const L1Triplet* ptrip,
                    L1Branch& newtrack, unsigned char &new_L, fscal &new_chi2,
                    L1Branch &currenttrack, unsigned char &curr_L, fscal &curr_chi2,
@@ -144,6 +145,14 @@ class L1Algo{
       /// return chi2
   fscal BranchExtender(L1Branch &t);
 
+    /// ----- Subroutines used by L1Algo::CAMergeClones() ------
+  void InvertCholetsky(fvec a[15]);
+  void MultiplySS(fvec const C[15], fvec const V[15], fvec K[5][5]);
+  void MultiplyMS(fvec const C[5][5], fvec const V[15], fvec K[15]);
+  void MultiplySR(fvec const C[15], fvec const r_in[5], fvec r_out[5]);
+  void FilterTracks(fvec const r[5], fvec const C[15], fvec const m[5], fvec const V[15], fvec R[5], fvec W[15], fvec *chi2);
+  void CAMergeClones();
+
     /// -- Flags routines --
   unsigned char GetFStation( unsigned char flag ){ return flag/4; }
   bool GetFUsed   ( unsigned char flag ){ return (flag&0x02)!=0; }
@@ -155,75 +164,75 @@ class L1Algo{
   void SetFUnUsed  ( unsigned char &flag ){ flag &= 0xFC; }
 //   void SetFUnUsedD ( unsigned char &flag ){ flag &= 0xFE; }
 
-					/// Prepare the portion of left hits data
-  void f10(	// input
+          /// Prepare the portion of left hits data
+  void f10(  // input
                 int start_lh, int n1,  L1HitPoint *vStsHits_l, 
-									// output
+                  // output
                 fvec *u_front, fvec *u_back,  fvec *zPos,
                 vector<THitI> &hitsl_1
-								);
+                );
 
-					/// Get the field approximation. Add the target to parameters estimation. Propagate to middle station.
-	void f11(	// input
-								int isec, int istal,
-								int n1_V, 
+          /// Get the field approximation. Add the target to parameters estimation. Propagate to middle station.
+  void f11(  // input
+                int isec, int istal,
+                int n1_V, 
 
                 fvec *u_front, fvec *u_back,  fvec *zPos,
-									// output
+                  // output
                 nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1,
-								fvec* x_minusV, fvec* x_plusV, fvec* y_minusV, fvec* y_plusV
-							 );
-	
-					/// Find the doublets. Reformat data in the portion of doublets.
-	void f20(	// input
-								int n1, int istar, L1Station &stal, L1Station &stam,
+                fvec* x_minusV, fvec* x_plusV, fvec* y_minusV, fvec* y_plusV
+               );
+  
+          /// Find the doublets. Reformat data in the portion of doublets.
+  void f20(  // input
+                int n1, int istar, L1Station &stal, L1Station &stam,
                 L1HitPoint *vStsHits_l, L1HitPoint *vStsHits_m, int NHits_m,
-								fscal *y_minus, fscal *x_minus, fscal *y_plus, fscal *x_plus,								
+                fscal *y_minus, fscal *x_minus, fscal *y_plus, fscal *x_plus,                
                 nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1,
                 vector<THitI> &hitsl_1,
                 map<THitI, THitI> &mrDuplets_start,
-									// output
-								int &n2,
+                  // output
+                int &n2,
                 vector<THitI> &i1_2,
-								int &start_mhit,
+                int &start_mhit,
 #ifdef DOUB_PERFORMANCE
                 vector<THitI> &hitsl_2,
 #endif // DOUB_PERFORMANCE
                 vector<THitI> &hitsm_2,
                 map<THitI, THitI> &lmDuplets_start, vector<THitI> &lmDuplets_hits, unsigned int &nDuplets_lm
-								);
-					
-					/// Add the middle hits to parameters estimation. Propagate to right station.
-					/// Find the triplets (right hit). Reformat data in the portion of triplets.
-	void f30(	// input
+                );
+          
+          /// Add the middle hits to parameters estimation. Propagate to right station.
+          /// Find the triplets (right hit). Reformat data in the portion of triplets.
+  void f30(  // input
                 L1HitPoint *vStsHits_r, L1Station &stam, L1Station &star,
-								
-								int istar, int n1,
-								L1HitPoint *vStsHits_m,
-								nsL1::vector<L1TrackPar>::TSimd &T_1,nsL1::vector<L1FieldRegion>::TSimd &fld_1,
+                
+                int istar, int n1,
+                L1HitPoint *vStsHits_m,
+                nsL1::vector<L1TrackPar>::TSimd &T_1,nsL1::vector<L1FieldRegion>::TSimd &fld_1,
                 vector<THitI> &hitsl_1,
                 map<THitI, THitI> &lmDuplets_start, vector<THitI> &lmDuplets_hits,
 
-								int n2,
-								vector<THitI> &hitsm_2,
+                int n2,
+                vector<THitI> &hitsm_2,
                 vector<THitI> &i1_2,
-																
+                                
                 map<THitI, THitI> &mrDuplets_start, vector<THitI> &mrDuplets_hits,
-									// output
-								int &n3,
+                  // output
+                int &n3,
                 nsL1::vector<L1TrackPar>::TSimd &T_3,
                 vector<THitI> &hitsl_3,  vector<THitI> &hitsm_3,  vector<THitI> &hitsr_3,
                 nsL1::vector<fvec>::TSimd &u_front_3, nsL1::vector<fvec>::TSimd &u_back_3
-								);
-					
-					/// Add the right hits to parameters estimation.
-	void f31(	// input
-								int n3_V,  
-								L1Station &star, 
+                );
+          
+          /// Add the right hits to parameters estimation.
+  void f31(  // input
+                int n3_V,  
+                L1Station &star, 
                 nsL1::vector<fvec>::TSimd &u_front_3, nsL1::vector<fvec>::TSimd &u_back_3,
-									// output
+                  // output
                 nsL1::vector<L1TrackPar>::TSimd &T_3
-							 );
+               );
 
           /// Refit Triplets.
   void f32( // input
@@ -233,32 +242,32 @@ class L1Algo{
                 int nIterations = 0
                          );
   
-					/// Select triplets. Save them into vTriplets.
-	void f4(	// input
-								int n3, int istal,
+          /// Select triplets. Save them into vTriplets.
+  void f4(  // input
+                int n3, int istal,
                 nsL1::vector<L1TrackPar>::TSimd &T_3,
                 vector<THitI> &hitsl_3,  vector<THitI> &hitsm_3,  vector<THitI> &hitsr_3,
-								// output
-								unsigned int &nstaltriplets,
-								vector<L1Triplet> &vTriplets_part,
-								unsigned int *TripStartIndexH, unsigned int *TripStopIndexH
-// #ifdef XXX								
-// 								,unsigned int &stat_n_trip			
+                // output
+                unsigned int &nstaltriplets,
+                vector<L1Triplet> &vTriplets_part,
+                unsigned int *TripStartIndexH, unsigned int *TripStopIndexH
+// #ifdef XXX                
+//                 ,unsigned int &stat_n_trip      
 // #endif
-							 );
+               );
 
-					/// Find neighbours of triplets. Calculate level of triplets.
-	void f5(	// input
-							 	// output
-							 unsigned int *TripStartIndexH, unsigned int *TripStopIndexH,
-							 int *nlevel
-							 );
+          /// Find neighbours of triplets. Calculate level of triplets.
+  void f5(  // input
+                 // output
+               unsigned int *TripStartIndexH, unsigned int *TripStopIndexH,
+               int *nlevel
+               );
 
-				 /// Find doublets on station
-	void DupletsStaPort(	// input
-											int isec,
-											int istal,
-											vector<L1HitPoint> &vStsHits,
+         /// Find doublets on station
+  void DupletsStaPort(  // input
+                      int isec,
+                      int istal,
+                      vector<L1HitPoint> &vStsHits,
 #ifdef DOUB_PERFORMANCE
                       THitI* _RealIHit,
 #endif // DOUB_PERFORMANCE
@@ -267,19 +276,19 @@ class L1Algo{
                       L1Portion<L1TrackPar> &T_g1,
                       L1Portion<L1FieldRegion> &fld_g1,
                       L1Portion<THitI> &hitsl_g1,
-						
-												// output
+            
+                        // output
                       map<THitI,THitI> *Duplets_start, vector<THitI> *Duplets_hits,
 
                       vector<int> &n_g2,
                       L1Portion<THitI> &i1_g2,
                       L1Portion<THitI> &hitsm_g2
-											);
-	
-						/// Find triplets on station
-	void TripletsStaPort(	// input
-														int isec,
-														int istal,
+                      );
+  
+            /// Find triplets on station
+  void TripletsStaPort(  // input
+                            int isec,
+                            int istal,
                             vector<L1HitPoint> &svStsHits,
                             THitI* _RealIHit,
 
@@ -291,29 +300,29 @@ class L1Algo{
                             vector<int> &n_g2, unsigned int *portionStopIndex,
                             L1Portion<THitI> &i1_g2,
                             L1Portion<THitI> &hitsm_g2,
-															
-															// output
+                              
+                              // output
                             map<THitI,THitI> *Duplets_start, vector<THitI>  *Duplets_hits,
-														vector<L1Triplet> *vTriplets_part,
-														unsigned int *TripStartIndexH, unsigned int *TripStopIndexH
-														);
+                            vector<L1Triplet> *vTriplets_part,
+                            unsigned int *TripStartIndexH, unsigned int *TripStopIndexH
+                            );
 
   
     ///  ------ Subroutines used by L1Algo::KFTrackFitter()  ------
   
-  void GuessVec( L1TrackPar &t, fvec *xV, fvec *yV, fvec *zV, fvec *wV, int NHits );
+  void GuessVec( L1TrackPar &t, fvec *xV, fvec *yV, fvec *zV, fvec *wV, int NHits, fvec *zCur = 0 );
   void FilterFirst( L1TrackPar &track,fvec &x, fvec &y, fvec &w, L1Station &st );
   void FilterLast( L1TrackPar &track,fvec &x, fvec &y, fvec &w, L1Station &st );
   void Filter( L1TrackPar &T, L1UMeasurementInfo &info, fvec &u , fvec &w);
   
 #ifdef TBB
-	enum { 
-		nthreads = 3, // number of threads
-		nblocks = 1 // number of stations on one thread
-	}; 	
+  enum { 
+    nthreads = 3, // number of threads
+    nblocks = 1 // number of stations on one thread
+  };   
 
-	friend class ParalleledDup;
-	friend class ParalleledTrip;
+  friend class ParalleledDup;
+  friend class ParalleledTrip;
 #endif // TBB
 
         /// =================================  DATA PART  =================================

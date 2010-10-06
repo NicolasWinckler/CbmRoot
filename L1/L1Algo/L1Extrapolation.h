@@ -8,7 +8,7 @@
 #define cnst static const fvec 
 
 
-inline void L1Extrapolate( L1TrackPar &T, fvec        z_out  , fvec       qp0    , L1FieldRegion &F );
+inline void L1Extrapolate( L1TrackPar &T, fvec        z_out  , fvec       qp0    , L1FieldRegion &F, fvec *w = 0 );
 inline void L1Extrapolate0( L1TrackPar &T, fvec        z_out     , L1FieldRegion &F );
 inline void L1Extrapolate00( L1TrackPar &T, fvec        z_out     , L1FieldRegion &F );
 inline void L1ExtrapolateLine( L1TrackPar &T, fvec z_out);
@@ -55,7 +55,8 @@ inline void L1Extrapolate
  L1TrackPar &T, // input track parameters (x,y,tx,ty,Q/p) and cov.matrix
  fvec        z_out  , // extrapolate to this z position
  fvec       qp0    , // use Q/p linearisation at this value
- L1FieldRegion &F
+ L1FieldRegion &F,
+ fvec *w
  )
 {
   //cout<<"Extrapolation..."<<endl;
@@ -242,11 +243,24 @@ inline void L1Extrapolate
   fvec ht3SA3 = ht3*SA3;
   fvec ht3SB3 = ht3*SB3;
 
-  T.x  += (x + ht1SA1 + ht2SA2 + ht3SA3)*dz ;
-  T.y  += (y + ht1SB1 + ht2SB2 + ht3SB3)*dz ;
-  T.tx += ht1sA1 + ht2sA2 + ht3sA3;
-  T.ty += ht1sB1 + ht2sB2 + ht3sB3;
-  T.z  += dz;
+  fvec initialised = ZERO;
+  if(w) //TODO use operator {?:}
+  {
+    fvec zero = ZERO;
+    initialised = fvec( zero < *w );
+  }
+  else
+  {
+    fvec one = ONE;
+    fvec zero = ZERO;
+    initialised = fvec( zero < one );
+  }
+
+  T.x  += (((x + ht1SA1 + ht2SA2 + ht3SA3)*dz)&initialised) ;
+  T.y  += (((y + ht1SB1 + ht2SB2 + ht3SB3)*dz)&initialised) ;
+  T.tx += ((ht1sA1 + ht2sA2 + ht3sA3)&initialised);
+  T.ty += ((ht1sB1 + ht2sB2 + ht3sB3)&initialised);
+  T.z  += ((dz)&initialised);
 
   fvec ctdz  = c_light*t*dz;
   fvec ctdz2 = c_light*t*dz2;
@@ -275,12 +289,13 @@ inline void L1Extrapolate
   fvec j24 = ctdz *( sA1 + c2*ht1*sA2 + c3*ht2*sA3 );
   fvec j34 = ctdz *( sB1 + c2*ht1*sB2 + c3*ht2*sB3 );
   
+
   // extrapolate inverse momentum
   
-  T.x +=j04*dqp;
-  T.y +=j14*dqp;
-  T.tx+=j24*dqp;
-  T.ty+=j34*dqp;
+  T.x +=((j04*dqp)&initialised);
+  T.y +=((j14*dqp)&initialised);
+  T.tx+=((j24*dqp)&initialised);
+  T.ty+=((j34*dqp)&initialised);
 
  //          covariance matrix transport 
  
@@ -306,22 +321,22 @@ inline void L1Extrapolate
   fvec cj23 = T.C22*j32 + T.C32*j33 + c42*j34;
   fvec cj33 = T.C32*j32 + T.C33*j33 + c43*j34;
 
-  T.C40+= c42*j02 + c43*j03 + T.C44*j04; // cj40
-  T.C41+= c42*j12 + c43*j13 + T.C44*j14; // cj41
-  T.C42 = c42*j22 + c43*j23 + T.C44*j24; // cj42
-  T.C43 = c42*j32 + c43*j33 + T.C44*j34; // cj43
+  T.C40+= ((c42*j02 + c43*j03 + T.C44*j04) & initialised); // cj40
+  T.C41+= ((c42*j12 + c43*j13 + T.C44*j14) & initialised); // cj41
+  T.C42 = ((c42*j22 + c43*j23 + T.C44*j24) & initialised) + (T.C42&(!initialised)); // cj42
+  T.C43 = ((c42*j32 + c43*j33 + T.C44*j34) & initialised) + (T.C43&(!initialised)); // cj43
 
-  T.C00 = cj00 + j02*cj20 + j03*cj30 + j04*T.C40;
-  T.C10 = cj01 + j02*cj21 + j03*cj31 + j04*T.C41;
-  T.C11 = cj11 + j12*cj21 + j13*cj31 + j14*T.C41;
+  T.C00 = ((cj00 + j02*cj20 + j03*cj30 + j04*T.C40) & initialised) + (T.C00&(!initialised));
+  T.C10 = ((cj01 + j02*cj21 + j03*cj31 + j04*T.C41) & initialised) + (T.C10&(!initialised));
+  T.C11 = ((cj11 + j12*cj21 + j13*cj31 + j14*T.C41) & initialised) + (T.C11&(!initialised));
 
-  T.C20 = j22*cj20 + j23*cj30 + j24*T.C40 ;
-  T.C30 = j32*cj20 + j33*cj30 + j34*T.C40 ;
-  T.C21 = j22*cj21 + j23*cj31 + j24*T.C41 ;
-  T.C31 = j32*cj21 + j33*cj31 + j34*T.C41 ;
-  T.C22 = j22*cj22 + j23*cj32 + j24*T.C42 ;
-  T.C32 = j32*cj22 + j33*cj32 + j34*T.C42 ;
-  T.C33 = j32*cj23 + j33*cj33 + j34*T.C43 ;
+  T.C20 = ((j22*cj20 + j23*cj30 + j24*T.C40) & initialised) + (T.C20&(!initialised)) ;
+  T.C30 = ((j32*cj20 + j33*cj30 + j34*T.C40) & initialised) + (T.C30&(!initialised)) ;
+  T.C21 = ((j22*cj21 + j23*cj31 + j24*T.C41) & initialised) + (T.C21&(!initialised)) ;
+  T.C31 = ((j32*cj21 + j33*cj31 + j34*T.C41) & initialised) + (T.C31&(!initialised)) ;
+  T.C22 = ((j22*cj22 + j23*cj32 + j24*T.C42) & initialised) + (T.C22&(!initialised)) ;
+  T.C32 = ((j32*cj22 + j33*cj32 + j34*T.C42) & initialised) + (T.C32&(!initialised)) ;
+  T.C33 = ((j32*cj23 + j33*cj33 + j34*T.C43) & initialised) + (T.C33&(!initialised)) ;
   //cout<<"Extrapolation ok"<<endl;
 
 }

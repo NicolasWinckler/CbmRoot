@@ -501,7 +501,7 @@ void CbmL1::Exec(Option_t * option)
   algo->CATrackFinder();
 //   IdealTrackFinder();
   if( fVerbose>1 ) cout<<"L1 Track finder ok"<<endl;
-//   algo->KFTrackFitter();
+//  algo->L1KFTrackFitter();
   algo->KFTrackFitter_simple();
   if( fVerbose>1 ) cout<<"L1 Track fitter  ok"<<endl;
   

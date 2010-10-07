@@ -1670,7 +1670,7 @@ void L1Algo::CAMergeClones()
       fvec Cf[15] = {Tf.C00,Tf.C10,Tf.C11,Tf.C20,Tf.C21,Tf.C22,Tf.C30,Tf.C31,Tf.C32,Tf.C33,Tf.C40,Tf.C41,Tf.C42,Tf.C43,Tf.C44};
       fvec Cb[15] = {Tb.C00,Tb.C10,Tb.C11,Tb.C20,Tb.C21,Tb.C22,Tb.C30,Tb.C31,Tb.C32,Tb.C33,Tb.C40,Tb.C41,Tb.C42,Tb.C43,Tb.C44};
       FilterTracks(rf,Cf,rb,Cb,0,0,&Chi2Tracks);
-      if(Chi2Tracks[0] > 100 ) continue;
+      if(Chi2Tracks[0] > 50 ) continue;
       if(Chi2Tracks[0] < TrackChi2[iTr] || Chi2Tracks[0] < TrackChi2[jTr])
       {
 //std::cout << "!!!!!!! Chi2 !!!!!!      "<<Chi2Tracks<<"     " <<iTr<<"  " <<jTr<< std::endl;

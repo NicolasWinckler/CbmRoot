@@ -54,6 +54,9 @@ much/CbmAnaDimuonCandidate.cxx
 much/CbmAnaDimuonAnalysis.cxx
 much/CbmAnaDimuonHisto.cxx
 much/CbmAnaAngularAcceptance.cxx
+
+timing/CbmAnaTimingAnalysis.cxx
+timing/CbmAnaEpochTest.cxx
 )
 
 

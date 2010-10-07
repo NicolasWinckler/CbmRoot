@@ -24,6 +24,8 @@
 #pragma link C++ class CbmAnaDimuonHisto+;
 #pragma link C++ class CbmAnaAngularAcceptance+;
 
+#pragma link C++ class CbmAnaTimingAnalysis+;
+#pragma link C++ class CbmAnaEpochTest+;
 #endif
 
 

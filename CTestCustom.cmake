@@ -91,6 +91,25 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         # -- Geant3 warnings
         "/geant3/TGeant3/TGeant3.h:"
         "/geant3/TGeant3/TGeant3TGeo.h:"
+
+        # ignore warnings from Fair base classes for the timebeeing
+	"FairAsciiGenerator.h:"
+	"FairPrimaryGenerator.h:"
+	"FairGeoMedium.h:"
+	"FairDetParAsciiFileIo.h:"
+	"FairParamList.h:"
+	"FairDetParRootFileIo.h:"
+	"FairIonGenerator.cxx:"
+	"FairParIo.h:"
+	"FairRtdbRun.h:"
+	"FairBoxGenerator.cxx:"
+	"FairDetParAsciiFileIo.cxx:"
+	"FairIonGenerator.h:"
+	"FairParRootFileIo.h:"
+	"FairLink.cxx:"
+	"FairParAsciiFileIo.h:"
+	"FairShieldGenerator.h:"
+	"FairShieldGenerator.cxx:"	
   )
 
 # -----------------------------------------------------------

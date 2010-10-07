@@ -1,9 +1,9 @@
-/** CbmMCEpochQA.cxx
+/** CbmMCStreamerQa.cxx
  *@author E.Kryshen <e.kryshen@gsi.de>
  *@since 2010-10-06
  **/
 
-#include "CbmMCEpochQA.h"
+#include "CbmMCStreamerQa.h"
 #include "CbmMCTrack.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
@@ -22,7 +22,7 @@
 using namespace std;
 
 // -----   Default constructor   -------------------------------------------
-CbmMCEpochQA::CbmMCEpochQA():
+CbmMCStreamerQa::CbmMCStreamerQa():
 fNepoch(0),
 fMcEpoch(NULL),
 fMcChain(NULL)
@@ -33,7 +33,7 @@ fMcChain(NULL)
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmMCEpochQA::CbmMCEpochQA(const char* name, TChain* mcChain)
+CbmMCStreamerQa::CbmMCStreamerQa(const char* name, TChain* mcChain)
 :FairTask(name),
 fNepoch(0),
 fMcEpoch(NULL),
@@ -46,13 +46,13 @@ fMcChain(mcChain)
 
 
 // -----   Destructor   ----------------------------------------------------
-CbmMCEpochQA::~CbmMCEpochQA(){
+CbmMCStreamerQa::~CbmMCStreamerQa(){
 }
 // -------------------------------------------------------------------------
 
 
 // -----  SetParContainers -------------------------------------------------
-void CbmMCEpochQA::SetParContainers(){
+void CbmMCStreamerQa::SetParContainers(){
   FairRunAna* ana = FairRunAna::Instance();
   FairRuntimeDb* rtdb = ana->GetRuntimeDb();
 
@@ -66,7 +66,7 @@ void CbmMCEpochQA::SetParContainers(){
 
 
 // -----   Public method Init (abstract in base class)  --------------------
-InitStatus CbmMCEpochQA::Init(){
+InitStatus CbmMCStreamerQa::Init(){
   
   // Get and check FairRootManager
   FairRootManager* fManager = FairRootManager::Instance();
@@ -103,7 +103,7 @@ InitStatus CbmMCEpochQA::Init(){
 
 
 // -----   Public method Exec   --------------------------------------------
-void CbmMCEpochQA::Exec(Option_t* opt){
+void CbmMCStreamerQa::Exec(Option_t* opt){
   fNepoch++;
   if (fVerbose>-1) printf("Epoch: %i",fNepoch);
   if (fVerbose>-1) printf("\n");
@@ -136,7 +136,7 @@ void CbmMCEpochQA::Exec(Option_t* opt){
 
 
 // -----   Public method Finish   ------------------------------------------
-void CbmMCEpochQA::Finish(){
+void CbmMCStreamerQa::Finish(){
   Int_t nEpochTotal = FairRootManager::Instance()->GetInChain()->GetEntries();
   if (fNepoch!=nEpochTotal) Warning("Finish","Not all MC epochs were analysed: analysed=%i total=%i\n",fNepoch,nEpochTotal);
 
@@ -177,4 +177,4 @@ void CbmMCEpochQA::Finish(){
 }
 // -------------------------------------------------------------------------
 
-ClassImp(CbmMCEpochQA);
+ClassImp(CbmMCStreamerQa);

@@ -7,6 +7,7 @@
 
 #pragma link C++ class CbmMCStreamer+;
 #pragma link C++ class CbmRunAna+;
+#pragma link C++ class CbmMCStreamerQa+;
 
 #endif
 

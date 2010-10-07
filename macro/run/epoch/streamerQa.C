@@ -1,8 +1,8 @@
-void epochQA(){
+void streamerQa(){
   TString dir = "data";
   TString inFile    = dir + "/epoch.root";
   TString parFile   = dir + "/param.0000.root";
-  TString outFile   = dir + "/epochQA.root";
+  TString outFile   = dir + "/streamerQa.root";
 
   TChain* mcFileChain = new TChain("cbmsim");
   mcFileChain->AddFile(dir+"/mc.0000.root");
@@ -30,9 +30,9 @@ void epochQA(){
   rtdb->setOutput(parIo1);
   rtdb->saveOutput();
 
-  CbmMCEpochQA* epochQA = new CbmMCEpochQA("EpochTest",mcFileChain);
-  epochQA->SetVerbose(0);
-  fRun->AddTask(epochQA);
+  CbmMCStreamerQa* streamerQa = new CbmMCStreamerQa("StreamerQa",mcFileChain);
+  streamerQa->SetVerbose(0);
+  fRun->AddTask(streamerQa);
   fRun->Init();
   fRun->Run();
 }

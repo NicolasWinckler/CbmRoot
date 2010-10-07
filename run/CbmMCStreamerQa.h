@@ -1,11 +1,11 @@
-/** CbmMCEpochQA.h
+/** CbmMCStreamerQa.h
  *@author E.Kryshen <e.kryshen@gsi.de>
  *@since 2010-10-06
  **
  **/
 
-#ifndef CbmMCEpochQA_H_
-#define CbmMCEpochQA_H_ 1
+#ifndef CbmMCStreamerQa_H_
+#define CbmMCStreamerQa_H_ 1
 
 #include "FairTask.h"
 #include "TString.h"
@@ -20,19 +20,19 @@ class TH1D;
 
 using namespace std;
 
-class CbmMCEpochQA : public FairTask{
+class CbmMCStreamerQa : public FairTask{
 public:
   /** Default constructor **/
-  CbmMCEpochQA();
+  CbmMCStreamerQa();
 
   /** Standard constructor
   *@param name   Name of class
   *@param title  Task title
   **/
-  CbmMCEpochQA(const char* name, TChain* mcChain);
+  CbmMCStreamerQa(const char* name, TChain* mcChain);
 
   /** Destructor **/
-  virtual ~CbmMCEpochQA();
+  virtual ~CbmMCStreamerQa();
 
   /** Initialisation **/
   virtual InitStatus Init();
@@ -52,7 +52,7 @@ private:
   TChain*       fMcChain; //! tree of MC events
   TClonesArray* fPointArrays[kTutDet];       //! Array of MC points per detector
   map<int,int>  fMapPointsInEvents[kTutDet]; //! map of point counters for each event per detector
-  ClassDef(CbmMCEpochQA,1);
+  ClassDef(CbmMCStreamerQa,1);
 };
 
 #endif

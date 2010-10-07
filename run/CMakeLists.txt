@@ -40,6 +40,7 @@ set(RUN_SRCS
 
 CbmMCStreamer.cxx
 CbmRunAna.cxx
+CbmMCStreamerQa.cxx
 
 )
 

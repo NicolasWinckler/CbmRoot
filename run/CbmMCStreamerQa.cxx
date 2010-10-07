@@ -125,8 +125,6 @@ void CbmMCStreamerQa::Exec(Option_t* opt){
       if (fVerbose>1) printf("  time=%8.2f",t);
       if (fVerbose>1) printf("\n");
       // increment point counter for the event
-      if (fMapPointsInEvents[detId].find(eventId)==fMapPointsInEvents[detId].end())
-           fMapPointsInEvents[detId][eventId]=0; 
       fMapPointsInEvents[detId][eventId]++;
     }
     
@@ -147,9 +145,9 @@ void CbmMCStreamerQa::Finish(){
     if (!fPointArrays[detId]) Warning("Finish","Array of MC points for detector %s not initialized",detName.Data());
 
     Int_t eventIdFirst = fMapPointsInEvents[detId].begin()->first;
-    Int_t eventIdLast  = fMapPointsInEvents[detId].end()->first;
+    Int_t eventIdLast  = (--fMapPointsInEvents[detId].end())->first;
 
-    printf("Detector: %s",detName.Data());
+    printf("Detector: %s size=%i ",detName.Data(),fMapPointsInEvents[detId].size());
     printf("  first event = %i",eventIdFirst);
     printf("  last event = %i",eventIdLast);
     printf("\n");
@@ -160,12 +158,12 @@ void CbmMCStreamerQa::Finish(){
     for (Int_t eventId=eventIdFirst;eventId<=eventIdLast;eventId++){
       fMcChain->GetEntry(eventId-1);
       Int_t nPointsInMcFile = fPointArrays[detId]->GetEntriesFast();
-      Int_t nPointsInEpoch  = (fMapPointsInEvents[detId].find(eventId)==fMapPointsInEvents[detId].end()) ? 0 : fMapPointsInEvents[detId][eventId];
+      Int_t nPointsInEpoch  = fMapPointsInEvents[detId][eventId];
       Bool_t isCorrect = (nPointsInMcFile==nPointsInEpoch);
-      if (fVerbose>1 || !isCorrect) printf(" Event: %i",eventId);
-      if (fVerbose>1 || !isCorrect) printf(" nPointsInMcFile=%i",nPointsInMcFile);
-      if (fVerbose>1 || !isCorrect) printf(" nPointsInEpoch=%i",nPointsInEpoch);
-      if (fVerbose>1 || !isCorrect) printf("\n");
+      if (fVerbose>0 || !isCorrect) printf(" Event: %i",eventId);
+      if (fVerbose>0 || !isCorrect) printf(" nPointsInMcFile=%i",nPointsInMcFile);
+      if (fVerbose>0 || !isCorrect) printf(" nPointsInEpoch=%i",nPointsInEpoch);
+      if (fVerbose>0 || !isCorrect) printf("\n");
       if (isCorrect) nCorrect++;
     }
 

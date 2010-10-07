@@ -181,8 +181,11 @@ void CbmL1MCTrack::CalculateIsReconstructable()
   f &= (p > L1->MinRecoMom);
     // detected at least in 4 stations
 //   f &= (nMCContStations >= 4);
+
+  if (L1->fPerformance == 3) f &= (nMCContStations  >= L1->MinNStations); // L1-MC
   if (L1->fPerformance == 2) f &= (nStations        >= L1->MinNStations); // QA definition
   if (L1->fPerformance == 1) f &= (nHitContStations >= L1->MinNStations); // L1 definition
+
     // maximul 4 layers for a station.
 //   f &= (maxNStaHits <= 4);
   f &= (maxNStaMC <= 4);

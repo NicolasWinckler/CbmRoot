@@ -127,7 +127,7 @@ void CbmMCStreamerQa::Exec(Option_t* opt){
       // increment point counter for the event
       if (fMapPointsInEvents[detId].find(eventId)==fMapPointsInEvents[detId].end())
            fMapPointsInEvents[detId][eventId]=0; 
-      else fMapPointsInEvents[detId][eventId]++;
+      fMapPointsInEvents[detId][eventId]++;
     }
     
   }
@@ -147,18 +147,18 @@ void CbmMCStreamerQa::Finish(){
     if (!fPointArrays[detId]) Warning("Finish","Array of MC points for detector %s not initialized",detName.Data());
 
     Int_t eventIdFirst = fMapPointsInEvents[detId].begin()->first;
-    Int_t eventIdLast = (--fMapPointsInEvents[detId].end())->first;
+    Int_t eventIdLast  = fMapPointsInEvents[detId].end()->first;
 
     printf("Detector: %s",detName.Data());
     printf("  first event = %i",eventIdFirst);
     printf("  last event = %i",eventIdLast);
     printf("\n");
     
-    if (eventIdLast-eventIdFirst<=0) continue;
+    if (eventIdLast-eventIdFirst<0) continue;
     
     Int_t nCorrect = 0;
     for (Int_t eventId=eventIdFirst;eventId<=eventIdLast;eventId++){
-      fMcChain->GetEntry(eventId);
+      fMcChain->GetEntry(eventId-1);
       Int_t nPointsInMcFile = fPointArrays[detId]->GetEntriesFast();
       Int_t nPointsInEpoch  = (fMapPointsInEvents[detId].find(eventId)==fMapPointsInEvents[detId].end()) ? 0 : fMapPointsInEvents[detId][eventId];
       Bool_t isCorrect = (nPointsInMcFile==nPointsInEpoch);

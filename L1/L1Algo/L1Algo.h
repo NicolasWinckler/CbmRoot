@@ -10,6 +10,8 @@
 // #define DRAW             // event display
 // #define XXX              // time debug
 
+// #define FIND_GAPED_TRACKS // use triplets with gaps
+
 #include "L1Field.h"
 #include "L1Station.h"
 #include "L1StsHit.h"
@@ -96,7 +98,8 @@ class L1Algo{
   int StsHitsStartIndex[MaxNStations+1], StsHitsStopIndex[MaxNStations+1]; // station-bounders in vStsHits array
 
    /// --- data used during finding iterations
-  
+
+  int isec; // iteration
   vector< L1StsHit > *vStsHitsUnused;
   std::vector< L1HitPoint > *vStsHitPointsUnused;
   THitI *RealIHit; // index in vStsHits indexed by index in vStsHitsUnused
@@ -124,11 +127,11 @@ class L1Algo{
   
     /// ----- Subroutines used by L1Algo::CATrackFinder() ------
   
-
-  void CAFindTrack(int ista, const L1Triplet* ptrip,
-                   L1Branch& newtrack, unsigned char &new_L, fscal &new_chi2,
-                   L1Branch &currenttrack, unsigned char &curr_L, fscal &curr_chi2,
-                   int &NCalls);
+  void CAFindTrack(int ista,
+                   L1Branch& best_tr, unsigned char &best_L, fscal &best_chi2,
+                   const L1Triplet* curr_trip,
+                   L1Branch &curr_tr, unsigned char &curr_L, fscal &curr_chi2,
+                   int &NCalls );
 
 
     /// Fit track
@@ -182,7 +185,7 @@ class L1Algo{
 
           /// Get the field approximation. Add the target to parameters estimation. Propagate to middle station.
   void f11(  // input
-                int isec, int istal,
+                int istal,
                 int n1_V, 
 
                 fvec *u_front, fvec *u_back,  fvec *zPos,
@@ -213,7 +216,7 @@ class L1Algo{
           /// Add the middle hits to parameters estimation. Propagate to right station.
           /// Find the triplets (right hit). Reformat data in the portion of triplets.
   void f30(  // input
-                L1HitPoint *vStsHits_r, L1Station &stam, L1Station &star,
+                L1HitPoint *vStsHits_r, int NHits_r, L1Station &stam, L1Station &star,
                 
                 int istar, int n1,
                 L1HitPoint *vStsHits_m,
@@ -273,7 +276,6 @@ class L1Algo{
 
          /// Find doublets on station
   void DupletsStaPort(  // input
-                      int isec,
                       int istal,
 
                       vector<int> &n_g1, unsigned int *portionStopIndex,
@@ -291,7 +293,6 @@ class L1Algo{
   
             /// Find triplets on station
   void TripletsStaPort(  // input
-                            int isec,
                             int istal,
 
                             vector<int> &n_g1,
@@ -335,19 +336,22 @@ class L1Algo{
 
     // fNFindIterations - set number of interation for trackfinding
     // itetation of finding:
-  // enum { fNFindIterations = 4 };
-  // enum { kFastPrimIter = 0, // primary fast track
-  //        kAllPrimIter,      // primary all track
-  //        kAllPrimJumpIter,  // primary tracks with gaps
-  //        kAllSecIter        // secondary all track 
-  // };
+#ifdef FIND_GAPED_TRACKS
+  enum { fNFindIterations = 3 };
+  enum { kFastPrimIter = 0, // primary fast track
+         kAllPrimIter,      // primary all track
+         kAllPrimJumpIter,  // primary tracks with gaps
+         kAllSecIter        // secondary all track 
+  };
+#else
   enum { fNFindIterations = 3 };
   enum { kFastPrimIter = 0, // primary fast track
          kAllPrimIter,      // primary all track
          kAllSecIter,       // secondary all track
          kAllPrimJumpIter   // 
   };
-
+#endif // FIND_GAPED_TRACKS
+  
   static const float TRACK_CHI2_CUT = 10.0;  // cut for tracks candidates.
   static const float TRIPLET_CHI2_CUT = 5.0; // cut for selecting triplets before collecting tracks.
 

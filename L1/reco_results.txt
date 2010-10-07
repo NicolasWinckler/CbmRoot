@@ -1,6 +1,7 @@
 ========= 8STS;	diff-z;	RD; MC-eff
 
---- deadTime=333ns (ineff = 10%)
+deadTime=333 (ineff = 10%).
+--- initial. no jumps
 L1 ACCUMULATED STAT    : 10 EVENTS
 
 Track category         :  Eff   / Killed / Length / Fakes  / Clones | All MC
@@ -17,60 +18,22 @@ MC tracks/event found  : 505
 
 CA Track Finder: 0.821 s/ev
 
---- ineff = 5%
+
+----
+2 iter
 L1 ACCUMULATED STAT    : 10 EVENTS
 
 Track category         :  Eff   / Killed / Length / Fakes  / Clones | All MC
-LongRPrim efficiency   : 0.965  / 0.017  / 0.930  / 0.004  / 0.002  | 1955
-RefPrim   efficiency   : 0.880  / 0.057  / 0.918  / 0.035  / 0.001  | 4464
-RefSec    efficiency   : 0.679  / 0.123  / 0.901  / 0.034  / 0.000  | 701
-Refset    efficiency   : 0.853  / 0.066  / 0.916  / 0.035  / 0.001  | 5165
-Allset    efficiency   : 0.796  / 0.077  / 0.911  / 0.034  / 0.001  | 7172
-ExtraPrim efficiency   : 0.764  / 0.073  / 0.893  / 0.032  / 0.001  | 1364
-ExtraSec  efficiency   : 0.401  / 0.177  / 0.889  / 0.036  / 0.000  | 643
-Extra     efficiency   : 0.648  / 0.106  / 0.892  / 0.033  / 0.001  | 2007
-Ghost     probability  : 0.035 | 200
-MC tracks/event found  : 570
+LongRPrim efficiency   : 0.945  / 0.027  / 0.918  / 0.006  / 0.001  | 1463
+RefPrim   efficiency   : 0.814  / 0.087  / 0.902  / 0.038  / 0.000  | 4287
+RefSec    efficiency   : 0.586  / 0.171  / 0.884  / 0.037  / 0.002  | 665
+Refset    efficiency   : 0.784  / 0.099  / 0.900  / 0.038  / 0.001  | 4952
+Allset    efficiency   : 0.729  / 0.106  / 0.895  / 0.038  / 0.001  | 6867
+ExtraPrim efficiency   : 0.708  / 0.094  / 0.876  / 0.037  / 0.002  | 1305
+ExtraSec  efficiency   : 0.325  / 0.190  / 0.877  / 0.039  / 0.000  | 610
+Extra     efficiency   : 0.586  / 0.125  / 0.877  / 0.037  / 0.001  | 1915
+Ghost     probability  : 0.063 | 314
+MC tracks/event found  : 500
 
-CA Track Finder: 0.607 s/ev
-
---- ineff = 3%
-L1 ACCUMULATED STAT    : 10 EVENTS
-
-Track category         :  Eff   / Killed / Length / Fakes  / Clones | All MC
-LongRPrim efficiency   : 0.972  / 0.013  / 0.935  / 0.004  / 0.002  | 2173
-RefPrim   efficiency   : 0.898  / 0.047  / 0.926  / 0.033  / 0.001  | 4537
-RefSec    efficiency   : 0.699  / 0.124  / 0.905  / 0.033  / 0.000  | 712
-Refset    efficiency   : 0.871  / 0.058  / 0.924  / 0.033  / 0.001  | 5249
-Allset    efficiency   : 0.813  / 0.068  / 0.917  / 0.033  / 0.001  | 7278
-ExtraPrim efficiency   : 0.776  / 0.064  / 0.895  / 0.031  / 0.001  | 1376
-ExtraSec  efficiency   : 0.420  / 0.162  / 0.894  / 0.034  / 0.000  | 653
-Extra     efficiency   : 0.661  / 0.096  / 0.895  / 0.031  / 0.001  | 2029
-Ghost     probability  : 0.030 | 180
-MC tracks/event found  : 591
-
-CA Track Finder: 0.537 s/ev
-
---- ineff = 0.3% (standard)
-L1 ACCUMULATED STAT    : 10 EVENTS
-
-Track category         :  Eff   / Killed / Length / Fakes  / Clones | All MC
-LongRPrim efficiency   : 0.986  / 0.008  / 0.947  / 0.003  / 0.002  | 2520
-RefPrim   efficiency   : 0.928  / 0.034  / 0.937  / 0.032  / 0.001  | 4587
-RefSec    efficiency   : 0.722  / 0.104  / 0.917  / 0.030  / 0.000  | 734
-Refset    efficiency   : 0.900  / 0.043  / 0.935  / 0.032  / 0.001  | 5321
-Allset    efficiency   : 0.838  / 0.055  / 0.927  / 0.031  / 0.001  | 7403
-ExtraPrim efficiency   : 0.799  / 0.058  / 0.900  / 0.029  / 0.001  | 1411
-ExtraSec  efficiency   : 0.426  / 0.142  / 0.890  / 0.030  / 0.000  | 671
-Extra     efficiency   : 0.679  / 0.085  / 0.898  / 0.029  / 0.001  | 2082
-Ghost     probability  : 0.022 | 139
-MC tracks/event found  : 620
-
-CA Track Finder: 0.454 s/ev
-
-
-
-deadTime=333 (ineff = 10%).
---- initial. no jumps
-
+CA Track Finder: 0.272 s/ev
 

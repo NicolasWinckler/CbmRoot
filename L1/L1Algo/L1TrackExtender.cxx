@@ -304,15 +304,12 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
 
     fscal r2_best = 1e8; // best distance to hit
     int iHit_best = -1;  // index of the best hit
-    for( int ih = StsHitsStartIndex[ista]; ih <= StsHitsStopIndex[ista]; ih++ ){ // optimize
-      L1StsHit &hit = vStsHits[ih];
+    for( int ih = StsHitsUnusedStartIndex[ista]; ih <= StsHitsUnusedStopIndex[ista]; ih++ ){ // optimize
+      L1StsHit &hit = (*vStsHitsUnused)[ih];
       if( GetFUsed( vSFlag[hit.f] | vSFlagB[hit.b] ) ) continue; // if used
 
-      // fscal u = vStsStrips[hit.f];
-      // fscal v = vStsStripsB[hit.b];
       fscal x, y, z;
       GetHitCoor(hit, x, y, z, sta);
-      // StripsToCoor(u,v,x,y,sta);
       
       L1TrackPar T_new = T;
       L1ExtrapolateShort( T_new, z, qp0, fld);
@@ -336,9 +333,9 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
     }
     if( iHit_best < 0 ) break;
     
-    newHits.push_back(iHit_best);
+    newHits.push_back(RealIHit[iHit_best]);
 
-    L1StsHit &hit = vStsHits[iHit_best];
+    L1StsHit &hit = (*vStsHitsUnused)[iHit_best];
     fvec u = static_cast<fvec>(vStsStrips[hit.f]);
     fvec v = static_cast<fvec>(vStsStripsB[hit.b]);
     fvec x, y, z;

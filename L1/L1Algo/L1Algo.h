@@ -95,6 +95,14 @@ class L1Algo{
                           vSFlagB;
   int StsHitsStartIndex[MaxNStations+1], StsHitsStopIndex[MaxNStations+1]; // station-bounders in vStsHits array
 
+   /// --- data used during finding iterations
+  
+  vector< L1StsHit > *vStsHitsUnused;
+  std::vector< L1HitPoint > *vStsHitPointsUnused;
+  THitI *RealIHit; // index in vStsHits indexed by index in vStsHitsUnused
+  int StsHitsUnusedStartIndex[MaxNStations+1], StsHitsUnusedStopIndex[MaxNStations+1];
+  
+
     /// ----- Output data ----- 
   vector< L1Track > vTracks; // reconstructed tracks
   vector< THitI > vRecoHits; // packed hits of reconstructed tracks
@@ -117,7 +125,7 @@ class L1Algo{
     /// ----- Subroutines used by L1Algo::CATrackFinder() ------
   
 
-  void CAFindTrack(vector< L1StsHit > &svStsHits, unsigned int *RealIHit, int ista, const L1Triplet* ptrip,
+  void CAFindTrack(int ista, const L1Triplet* ptrip,
                    L1Branch& newtrack, unsigned char &new_L, fscal &new_chi2,
                    L1Branch &currenttrack, unsigned char &curr_L, fscal &curr_chi2,
                    int &NCalls);
@@ -236,7 +244,7 @@ class L1Algo{
 
           /// Refit Triplets.
   void f32( // input
-                int n3, int istal, THitI* _RealIHit,
+                int n3, int istal,
                 nsL1::vector<L1TrackPar>::TSimd &T_3,
                 vector<THitI> &hitsl_3,  vector<THitI> &hitsm_3,  vector<THitI> &hitsr_3,
                 int nIterations = 0
@@ -267,10 +275,6 @@ class L1Algo{
   void DupletsStaPort(  // input
                       int isec,
                       int istal,
-                      vector<L1HitPoint> &vStsHits,
-#ifdef DOUB_PERFORMANCE
-                      THitI* _RealIHit,
-#endif // DOUB_PERFORMANCE
 
                       vector<int> &n_g1, unsigned int *portionStopIndex,
                       L1Portion<L1TrackPar> &T_g1,
@@ -289,8 +293,6 @@ class L1Algo{
   void TripletsStaPort(  // input
                             int isec,
                             int istal,
-                            vector<L1HitPoint> &svStsHits,
-                            THitI* _RealIHit,
 
                             vector<int> &n_g1,
                             L1Portion<L1TrackPar> &T_g1,
@@ -333,10 +335,17 @@ class L1Algo{
 
     // fNFindIterations - set number of interation for trackfinding
     // itetation of finding:
+  // enum { fNFindIterations = 4 };
+  // enum { kFastPrimIter = 0, // primary fast track
+  //        kAllPrimIter,      // primary all track
+  //        kAllPrimJumpIter,  // primary tracks with gaps
+  //        kAllSecIter        // secondary all track 
+  // };
   enum { fNFindIterations = 3 };
   enum { kFastPrimIter = 0, // primary fast track
-         kAllPrimIter,      // primary all track  
-         kAllSecIter        // secondary all track 
+         kAllPrimIter,      // primary all track
+         kAllSecIter,       // secondary all track
+         kAllPrimJumpIter   // 
   };
 
   static const float TRACK_CHI2_CUT = 10.0;  // cut for tracks candidates.

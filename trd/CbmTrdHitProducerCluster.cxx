@@ -242,7 +242,9 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     {
       iHit += Int_t((*it).second->size());
     }
+  Int_t nPoints = fTrdPoints->GetEntriesFast();
   cout << " Found " << iHit << " Hits" << endl;
+  cout << "  " << Float_t(iHit*100./nPoints)<< "% MC-point to hit efficiency" << endl;
   cout << "  " << fPrfSingleRecoCounter << " Hits are PRF based reconstructed in one dimension" << endl;
   cout << "  " << fPrfDoubleRecoCounter << " Hits are PRF based reconstructed in both dimension" << endl;
   cout << "   " << fSimpleRecoCounter << " Hits are 'position of pad with maximum charge' based reconstructed in both dimension" << endl;

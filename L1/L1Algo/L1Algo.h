@@ -10,7 +10,7 @@
 // #define DRAW             // event display
 // #define XXX              // time debug
 
-//#define FIND_GAPED_TRACKS // use triplets with gaps
+// #define FIND_GAPED_TRACKS // use triplets with gaps
 
 #include "L1Field.h"
 #include "L1Station.h"
@@ -196,7 +196,7 @@ class L1Algo{
   
           /// Find the doublets. Reformat data in the portion of doublets.
   void f20(  // input
-                int n1, int istar, L1Station &stal, L1Station &stam,
+                int n1, L1Station &stal, L1Station &stam,
                 L1HitPoint *vStsHits_l, L1HitPoint *vStsHits_m, int NHits_m,
                 fscal *y_minus, fscal *x_minus, fscal *y_plus, fscal *x_plus,                
                 nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1,
@@ -255,7 +255,7 @@ class L1Algo{
   
           /// Select triplets. Save them into vTriplets.
   void f4(  // input
-                int n3, int istal,
+                int n3, int istal, int istam, int istar,
                 nsL1::vector<L1TrackPar>::TSimd &T_3,
                 vector<THitI> &hitsl_3,  vector<THitI> &hitsm_3,  vector<THitI> &hitsr_3,
                 // output
@@ -276,16 +276,17 @@ class L1Algo{
 
          /// Find doublets on station
   void DupletsStaPort(  // input
-                      int istal,
+                      int istal, int istam,
 
                       vector<int> &n_g1, unsigned int *portionStopIndex,
+            
+                        // output
                       L1Portion<L1TrackPar> &T_g1,
                       L1Portion<L1FieldRegion> &fld_g1,
                       L1Portion<THitI> &hitsl_g1,
-            
-                        // output
+                      
                       map<THitI,THitI> *Duplets_start, vector<THitI> *Duplets_hits,
-
+                      
                       vector<int> &n_g2,
                       L1Portion<THitI> &i1_g2,
                       L1Portion<THitI> &hitsm_g2
@@ -293,7 +294,7 @@ class L1Algo{
   
             /// Find triplets on station
   void TripletsStaPort(  // input
-                            int istal,
+                            int istal, int istam, int istar,
 
                             vector<int> &n_g1,
                             L1Portion<L1TrackPar> &T_g1,
@@ -304,8 +305,10 @@ class L1Algo{
                             L1Portion<THitI> &i1_g2,
                             L1Portion<THitI> &hitsm_g2,
                               
+                            map<unsigned /*short*/ int,THitI> *Duplets1_start, vector<THitI>  *Duplets1_hits,
+                            map<unsigned /*short*/ int,THitI> *Duplets2_start, vector<THitI>  *Duplets2_hits,
+                            
                               // output
-                            map<THitI,THitI> *Duplets_start, vector<THitI>  *Duplets_hits,
                             vector<L1Triplet> *vTriplets_part,
                             unsigned int *TripStartIndexH, unsigned int *TripStopIndexH
                             );
@@ -337,7 +340,7 @@ class L1Algo{
     // fNFindIterations - set number of interation for trackfinding
     // itetation of finding:
 #ifdef FIND_GAPED_TRACKS
-  enum { fNFindIterations = 3 };
+  enum { fNFindIterations = 4 };
   enum { kFastPrimIter = 0, // primary fast track
          kAllPrimIter,      // primary all track
          kAllPrimJumpIter,  // primary tracks with gaps

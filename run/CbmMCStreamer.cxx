@@ -41,7 +41,7 @@ CbmMCStreamer::CbmMCStreamer(Double_t eventRate,
     fBeamProfile(beamProfile),
     fPersistence(persistence),
     fEpochLength(epochLength),
-    fEventId(0),
+    fEventId(-1),
     fEventTime(0.),
     fEpoch(NULL) {
 }

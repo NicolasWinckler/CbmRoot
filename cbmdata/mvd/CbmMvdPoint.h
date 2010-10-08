@@ -21,7 +21,7 @@
 #include "FairMCPoint.h"
 #include "CbmMvdDetectorId.h"
 
-//#include "TObject.h"
+#include "TObject.h"
 #include "TVector3.h"
 
 class CbmMvdPoint : public FairMCPoint, CbmMvdDetectorId
@@ -68,6 +68,8 @@ class CbmMvdPoint : public FairMCPoint, CbmMvdDetectorId
   Int_t GetPdgCode()   const {return fPdgCode;}
   Int_t GetSystemId()  const { return SystemId(fDetectorID); }
   Int_t GetStationNr() const { return StationNr(fDetectorID); }
+  Int_t GetPointId()   const {return fPointId;} // Returns index of this object in its TClonesArray.
+						// By default not filled. Used internally in the MvdDigitizer.
   void PositionOut(TVector3& pos) { pos.SetXYZ(fX_out,fY_out,fZ_out); }
   void MomentumOut(TVector3& mom) { mom.SetXYZ(fPx_out,fPy_out,fPz_out); }
 
@@ -76,6 +78,7 @@ class CbmMvdPoint : public FairMCPoint, CbmMvdDetectorId
   void SetPositionOut(TVector3 pos);
   void SetMomentumOut(TVector3 mom);
   void SetPdgCode(Int_t pdg){fPdgCode=pdg;}
+  void SetPointId(Int_t myId) {fPointId=myId;}
 
 
 
@@ -88,7 +91,8 @@ class CbmMvdPoint : public FairMCPoint, CbmMvdDetectorId
 
   Double32_t fX_out,  fY_out,  fZ_out;
   Double32_t fPx_out, fPy_out, fPz_out;
-  Int_t      fPdgCode;
+  Int_t      fPdgCode; // index of the object in its TClonesArray. By default not filled => -1.
+  Int_t      fPointId; // index of the object in its TClonesArray. By default not filled => -1.
 
 
 

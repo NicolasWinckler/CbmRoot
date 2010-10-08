@@ -25,14 +25,16 @@ CbmMvdDigi::CbmMvdDigi(){
     fDominatingPointY=0;
     fContributors=0;
     fMaxChargeContribution=0;
+    fTrackID=-1;
+    fPointID=-1;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Constructor with parameters   -----------------------------------
-CbmMvdDigi::CbmMvdDigi(Int_t iStation, Int_t iChannelNrX, Int_t iChannelNrY, Int_t charge, 
-                       Float_t pixelSizeX, Float_t pixelSizeY, Float_t dominatorX, Float_t dominatorY, Short_t contributors, Int_t maxChargeContribution, Int_t trackID)
+CbmMvdDigi::CbmMvdDigi(Int_t iStation, Int_t iChannelNrX, Int_t iChannelNrY, Float_t charge,
+                       Float_t pixelSizeX, Float_t pixelSizeY, Float_t dominatorX, Float_t dominatorY, Short_t contributors, Float_t maxChargeContribution, Int_t pointID, Int_t trackID)
 :CbmDigi(kMVD, 0)
 {
     // Check range for station
@@ -49,6 +51,7 @@ CbmMvdDigi::CbmMvdDigi(Int_t iStation, Int_t iChannelNrX, Int_t iChannelNrY, Int
     fPixelSizeX=pixelSizeX;
     fPixelSizeY=pixelSizeY;
     fTrackID=trackID;
+    fPointID=pointID;
    
 
     fDigiFlag=-1;

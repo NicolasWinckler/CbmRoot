@@ -15,9 +15,11 @@
 #define CBMMVDCLUSTER_H 1
 
 
+//#include "CbmHit.h"
+//#include "TVector3.h"
 #include "CbmMvdHit.h"
 
-class TVector3;
+#include "TVector3.h"
 
 class CbmMvdCluster : public CbmMvdHit
 {
@@ -45,9 +47,11 @@ class CbmMvdCluster : public CbmMvdHit
 
   /** Accessors **/
   Short_t GetPointInfo(Int_t index){return fPointInfo[index];};
-  Float_t GetPointX(Int_t index){return fPointX[index];};
-  Float_t GetPointY(Int_t index){return fPointY[index];};
+  Float_t GetPointX(Int_t index){return fPointX[index];}; //MC-Information for debugging
+  Float_t GetPointY(Int_t index){return fPointY[index];}; //MC-Information for debugging
   Short_t GetContributors(){return fContributors;};
+  Short_t* GetChargeArray(){return fChargeArray;}
+  Short_t* GetPointInfo(){return fPointInfo;} // MC-Information for debugging
 
   /** Modifiers **/
   void SetPointInfo(Short_t info, Int_t cell){fPointInfo[cell]=info;}

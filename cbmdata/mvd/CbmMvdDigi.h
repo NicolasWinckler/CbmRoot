@@ -8,8 +8,14 @@
 #ifndef CBMMVDDIGI_H
 #define CBMMVDDIGI_H 1
 
+#include "CbmDetectorList.h"
 #include "CbmDigi.h"
 #include "CbmMvdDetectorId.h"
+
+#include "TObject.h"
+#include "TMath.h"
+#include "TVector3.h"
+
 
 class CbmMvdDigi : public CbmDigi, public CbmMvdDetectorId
 {
@@ -21,9 +27,9 @@ public:
 
     /** Constructor with all variables **/
 
-    CbmMvdDigi(Int_t iStation, Int_t iChannelNrX, Int_t iChannelNrY, Int_t charge, Float_t pixelSizeX, 
+    CbmMvdDigi(Int_t iStation, Int_t iChannelNrX, Int_t iChannelNrY, Float_t charge, Float_t pixelSizeX,
     Float_t pixelSizeY, Float_t dominatorX, Float_t dominatorY, Short_t contributors, 
-    Int_t maxChargeContribution, Int_t trackID);
+    Float_t maxChargeContribution, Int_t pointID, Int_t trackID);
     /**
      charge     : of each fired pixel in electrons
      PixelSize  : in cm
@@ -33,7 +39,7 @@ public:
     virtual ~CbmMvdDigi();
 
     /** Accessors **/
-    Double_t GetCharge()   { return fCharge;     };
+    Float_t GetCharge()   { return fCharge;     };
     Int_t    GetPixelX();
     Int_t    GetPixelY();
     Double_t GetPixelSizeX() { return  fPixelSizeX; };
@@ -44,11 +50,12 @@ public:
     Float_t  GetDominatorY(){return fDominatingPointY;}
     Int_t    GetStationNr() { return StationNr(fDetectorId); }
     Int_t    GetTrackID(){return fTrackID;}
+    Int_t    GetPointID(){return fPointID;}
    
  
 
     /** Modifiers **/
-    void SetCharge(Int_t charge) { fCharge     = charge; };
+    void SetCharge(Float_t charge) { fCharge     = charge; };
     void SetPixelX(Int_t xIndex) { fChannelNrX = xIndex; };
     void SetPixelY(Int_t yIndex) { fChannelNrY = yIndex; };
     void SetPixelIndex(Int_t pixelIndex) { fChannelNr  = pixelIndex; };
@@ -58,16 +65,17 @@ public:
 private:
 
 
-    Int_t fCharge;
+    Float_t fCharge;
     Int_t fChannelNrX;
     Int_t fChannelNrY;
     Int_t fTrackID;
+    Int_t fPointID;
     Float_t fPixelSizeX;
     Float_t fPixelSizeY;
 
     Int_t fDigiFlag; // Debugging and analysis information
 
-    Int_t fMaxChargeContribution;
+    Float_t fMaxChargeContribution;
     Float_t fDominatingPointX;
     Float_t fDominatingPointY;
     Short_t fContributors;

@@ -22,7 +22,7 @@
 #include "CbmHit.h"
 #include "CbmMvdDetectorId.h"
 
-class TVector3;
+#include "TVector3.h"
 
 class CbmMvdHit : public CbmHit, public CbmMvdDetectorId 
 {

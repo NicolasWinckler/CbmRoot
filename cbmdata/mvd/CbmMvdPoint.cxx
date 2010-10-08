@@ -11,10 +11,22 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmMvdPoint::CbmMvdPoint() : FairMCPoint() {
-  fX_out      = fY_out  = fZ_out  = 0.;
-  fPx_out     = fPy_out = fPz_out = 0.;
-  fPdgCode = 0;
+CbmMvdPoint::CbmMvdPoint()
+    : FairMCPoint(),
+  //fX_out      = fY_out  = fZ_out  = 0.;
+  //fPx_out     = fPy_out = fPz_out = 0.;
+  //fPdgCode = 0;
+  //fPointId=-1;
+      	     fX_out(0), 
+      	     fY_out(0), 
+      	     fZ_out(0), 
+      	     fPx_out(0), 
+      	     fPy_out(0), 
+	     fPz_out(0)
+	     
+{
+  fPdgCode=0;
+  fPointId=-1;
 }
 // -------------------------------------------------------------------------
 
@@ -25,16 +37,30 @@ CbmMvdPoint::CbmMvdPoint(Int_t trackID, Int_t pdgCode, Int_t stationNr,
 			 TVector3 posIn, TVector3 posOut, TVector3 momIn, 
 			 TVector3 momOut, Double_t tof, Double_t length, 
 			 Double_t eLoss) 
-  : FairMCPoint(trackID, stationNr, posIn, momIn, tof, length, eLoss) {
-  fX_out   = posOut.X();
+  : FairMCPoint(trackID, stationNr, posIn, momIn, tof, length, eLoss),
+/*  fX_out   = posOut.X();
   fY_out   = posOut.Y();
   fZ_out   = posOut.Z();
   fPx_out  = momOut.Px();
   fPy_out  = momOut.Py();
-  fPz_out  = momOut.Pz();
-  fPdgCode = pdgCode;
-  fDetectorID = DetectorId(stationNr);
-}
+  fPz_out  = momOut.Pz();*/
+fX_out(posOut.X()),
+fY_out(posOut.Y()),
+fZ_out(posOut.Z()),
+fPx_out(momOut.Px()),
+fPy_out(momOut.Py()),
+fPz_out(momOut.Pz())
+
+
+
+{
+
+    SetLink(FairLink(kMCTrack, trackID));
+    fPdgCode=pdgCode;
+    fDetectorID = DetectorId(stationNr);
+    fPointId=-1;
+  }
+
 // -------------------------------------------------------------------------
 
 

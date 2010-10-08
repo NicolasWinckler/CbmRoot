@@ -22,7 +22,6 @@
 
 class TClonesArray;
 class CbmMCEpoch;
-class CbmMCEvent;
 
 
 using namespace std;
@@ -78,7 +77,6 @@ class CbmMCStreamer : public FairTask
   Bool_t   fPersistence;     /**  Persistence flag for output array **/
   Double_t fEpochLength;     /**  Duration of epoch [ns] **/
 
-  CbmMCEvent* fEvent;        /**  Current event header  **/
   Int_t       fEventId;      /**  ID of current event  **/
   Double_t    fEventTime;    /**  Time of current event [ns] **/
   CbmMCEpoch* fEpoch;        /**  Current epoch   **/

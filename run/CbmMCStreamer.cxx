@@ -8,7 +8,6 @@
 #include "CbmMCStreamer.h"
 
 #include "CbmMCEpoch.h"
-#include "CbmMCEvent.h"
 
 #include "FairRootManager.h"
 
@@ -42,8 +41,7 @@ CbmMCStreamer::CbmMCStreamer(Double_t eventRate,
     fBeamProfile(beamProfile),
     fPersistence(persistence),
     fEpochLength(epochLength),
-    fEvent(NULL),
-    fEventId(-1),
+    fEventId(0),
     fEventTime(0.),
     fEpoch(NULL) {
 }
@@ -69,27 +67,18 @@ InitStatus CbmMCStreamer::Init() {
 
   // Get input MCPoint arrays
   FairRootManager* ioman = FairRootManager::Instance();
-  fEvent      = (CbmMCEvent*)   ioman->GetObject("MCEvent");
   fStsPoints  = (TClonesArray*) ioman->GetObject("StsPoint");
   fMuchPoints = (TClonesArray*) ioman->GetObject("MuchPoint");
   
-
-  // Check MC event header
-  if ( ! fEvent ) {
-    cout << "-E- No MC event header branch found in file!" << endl;
-    return kFATAL;
-  }
 
   // Register output array
   fEpoch = new CbmMCEpoch(0., fEpochLength);
   fEpochIsChanged = kFALSE;
   ioman->Register("MCEpoch.", "MC epoch", fEpoch, fPersistence); 
 
-
-
-
   cout << endl;
   cout << "-I-" << endl;
+  cout << "-I- Epoch length " << fEpochLength << " ns" << endl;
   cout << "-I- Average event spacing " << fEventTau << " ns" << endl;
   if ( ! fBeamProfile ) cout << "-I- Beam model: constant" << endl;
   else                  cout << "-I- Beam model: exponential" << endl;
@@ -111,11 +100,13 @@ void CbmMCStreamer::Exec(Option_t* opt) {
 
   // Unset epoch change marker
   fEpochIsChanged = kFALSE;
+
+
+  // Imcrement event ID
+  fEventId++;
   
 
-  // Determine event time and event ID
-  if ( ! fEvent ) Fatal("ReadEvent", "No MC event header");
-  fEventId = fEvent->GetEventID();
+  // Determine event time
   Double_t deltaT = 0;
   if ( ! fBeamProfile ) deltaT = fEventTau;
   else                  deltaT = TMath::Nint(gRandom->Exp(fEventTau));
@@ -271,9 +262,10 @@ void CbmMCStreamer::ProcessBuffer() {
 
     // Add (copy) point to current epoch. Time relative to epoch start is
     // calculated by CbmMCEpoch.
-    fEpoch->AddPoint(kSTS, &((*stsIt).second), fEventId, 0.);
-    cout <<  "-I- " << GetName() << ": Adding STS point to epoch at " 
-	 << ((*stsIt).second).GetTime() << endl;
+    fEpoch->AddPoint(kSTS, &((*stsIt).second));
+    cout <<  "-I- " << GetName() << ": Adding STS point from event "
+	 << ((*stsIt).second).GetEventID() << " to epoch at " 
+	 << ((*stsIt).second).GetTime() << " ns" << endl;
     stsBuffer.erase(stsIt);
     fEpochIsChanged = kTRUE;
 
@@ -306,9 +298,10 @@ void CbmMCStreamer::ProcessBuffer() {
 
     // Add (copy) point to current epoch. Time relative to epoch start is
     // calculated by CbmMCEpoch.
-    fEpoch->AddPoint(kMUCH, &((*muchIt).second), fEventId, 0.);
-    cout <<  "-I- " << GetName() << ": Adding MUCH point to epoch at " 
-	 << ((*muchIt).second).GetTime() << endl;
+    fEpoch->AddPoint(kMUCH, &((*muchIt).second));
+    cout <<  "-I- " << GetName() << ": Adding MUCH point from event "
+	 << ((*muchIt).second).GetEventID() << " to epoch at " 
+	 << ((*muchIt).second).GetTime() << " ns" << endl;
     muchBuffer.erase(muchIt);
     fEpochIsChanged = kTRUE;
 

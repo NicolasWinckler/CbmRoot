@@ -153,7 +153,7 @@ Bool_t CbmMCEpoch::IsEmpty() {
 // -----   Print epoch info   ------------------------------------------------
 void CbmMCEpoch::Print(Option_t* opt) const { 
 
-  cout << "-I- Epoch: Start time " << fStartTime << ", Points: ";
+  cout << "-I- " << GetName() << " Start time " << fStartTime << ", Points: ";
   TString sysName;
   for (Int_t iDet = kREF; iDet<kTutDet; iDet++) {
     DetectorId det = DetectorId(iDet);

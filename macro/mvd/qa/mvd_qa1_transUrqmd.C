@@ -13,16 +13,18 @@
 
   // Input file
   TString inDir   = gSystem->Getenv("VMCWORKDIR");
+
+  TString workDir=inDir + "/macro/mvd/qaData/";
   TString inFile  = inDir + "/input/urqmd.ftn14";
   
   // Number of events
-  Int_t   nEvents = 3;
+  Int_t   nEvents = 5;
 
   // Output file name
-  TString outFile = "data/mvd.mc.root";
+  TString outFile = workDir+ "mvd.mcCentral.root";
 
   // Parameter file name
-  TString parFile = "data/params.root";
+  TString parFile = workDir+ "params.root";
 
   // Cave geometry
   TString caveGeom = "cave.geo";
@@ -41,7 +43,6 @@
 
   // MVD geometry
   TString mvdGeom = "mvd_standard.geo";
-
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -69,12 +70,9 @@
   gSystem->Load("libBase");
   gSystem->Load("libCbmBase");
   gSystem->Load("libCbmData");
-//  gSystem->Load("libCbmGenerators");
   gSystem->Load("libField");
-
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
-
   gSystem->Load("libMvd");
   // ------------------------------------------------------------------------
 
@@ -117,10 +115,10 @@
 
 
 
-  // -----   Create magnetic field   ---------------------------------------
-  if ( fieldMap == "field_electron_standard" )
+  // -----   Create magnetic field   ----------------------------------------
+  if ( fieldMap == "field_electron_standard")
     magField = new CbmFieldMapSym2(fieldMap);
-  else if ( fieldMap == "field_muon_standard" )
+  else if ( fieldMap == "FieldAlligator" )
     magField = new CbmFieldMapSym2(fieldMap);
   else if ( fieldMap == "FieldMuonMagnet" )
     magField = new CbmFieldMapSym3(fieldMap);

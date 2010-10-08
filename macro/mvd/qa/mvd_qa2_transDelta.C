@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------
+ // --------------------------------------------------------------
 //
 // Macro for standard transport simulation using UrQMD input and GEANT3
 // CBM setup with MVD only
@@ -11,18 +11,29 @@
   // ========================================================================
   //          Adjust this part according to your requirements
 
-  // Input file
-  TString inDir   = gSystem->Getenv("VMCWORKDIR");
-  TString inFile  = inDir + "/input/urqmd.ftn14";
-  
-  // Number of events
-  Int_t   nEvents = 3;
 
-  // Output file name
-  TString outFile = "data/mvd.mc.root";
+
+     // Input file
+  TString inDir   = gSystem->Getenv("VMCWORKDIR");
+  //  TString inFile  = inDir + "/input/urqmd.ftn14";
+
+
+ 
+  // Number of events
+  Int_t   nEvents = 50;
+
+
+  // Output path
+  TString outpath = inDir+"/macro/mvd/qaData/";
+
+  //output file
+  TString outfile = "mvd.mcDelta.root";
+
+  //output filename
+  TString outFile = outpath + outfile;
 
   // Parameter file name
-  TString parFile = "data/params.root";
+  TString parFile = outpath + "params.root";
 
   // Cave geometry
   TString caveGeom = "cave.geo";
@@ -34,14 +45,14 @@
   TString pipeGeom = "pipe_standard.geo";
 
   // Magnet geometry and field map
-  TString magnetGeom  = "magnet_electron_standard.geo";
+  TString magnetGeom  =  "magnet_electron_standard.geo";
   TString fieldMap    = "field_electron_standard";
   Double_t fieldZ     = 50.;     // z position of field centre
   Double_t fieldScale = 1.;      // field scaling factor
 
   // MVD geometry
-  TString mvdGeom = "mvd_standard.geo";
-
+     TString mvdGeom = "mvd_standard.geo";
+//     TString stsGeom = "sts_Standard_s3055AAFK5.SecD.geo";
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -69,13 +80,11 @@
   gSystem->Load("libBase");
   gSystem->Load("libCbmBase");
   gSystem->Load("libCbmData");
-//  gSystem->Load("libCbmGenerators");
   gSystem->Load("libField");
-
   gSystem->Load("libGen");
   gSystem->Load("libPassive");
-
   gSystem->Load("libMvd");
+  gSystem->Load("libSts");
   // ------------------------------------------------------------------------
 
  
@@ -104,23 +113,27 @@
   
   FairModule* target= new CbmTarget("Target");
   target->SetGeometryFileName(targetGeom);
-  fRun->AddModule(target);		
+  fRun->AddModule(target);
 
   FairModule* magnet= new CbmMagnet("MAGNET");
   magnet->SetGeometryFileName(magnetGeom);
   fRun->AddModule(magnet);
-  
+
   FairDetector* mvd= new CbmMvd("MVD", kTRUE);
   mvd->SetGeometryFileName(mvdGeom); 
   fRun->AddModule(mvd);
+
+
+  //FairDetector* sts= new CbmSts("STS", kTRUE);
+  //sts->SetGeometryFileName(stsGeom);
+  //fRun->AddModule(sts);
   // ------------------------------------------------------------------------
 
 
-
-  // -----   Create magnetic field   ---------------------------------------
-  if ( fieldMap == "field_electron_standard" )
+  // -----   Create magnetic field   ----------------------------------------
+  if ( fieldMap == "field_electron_standard")
     magField = new CbmFieldMapSym2(fieldMap);
-  else if ( fieldMap == "field_muon_standard" )
+  else if ( fieldMap == "FieldAlligator" )
     magField = new CbmFieldMapSym2(fieldMap);
   else if ( fieldMap == "FieldMuonMagnet" )
     magField = new CbmFieldMapSym3(fieldMap);
@@ -135,11 +148,24 @@
 
 
 
+  FairIon *fIon = new FairIon("My_Au", 79, 197, 79, 25.,183.47324);
+  fRun->AddNewIon(fIon);
+
   // -----   Create PrimaryGenerator   --------------------------------------
-  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
-  FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
-  primGen->AddGenerator(urqmdGen);
-  fRun->SetGenerator(primGen);       
+  FairPrimaryGenerator* primGen   = new FairPrimaryGenerator();
+  //FairAsciiGenerator*   signalGen = new FairAsciiGenerator(D0asciiFile);
+
+
+  FairIonGenerator*     fIongen   = new FairIonGenerator(79, 197,79,1, 0.,0., 25, 0.,0.,-1.);
+  //FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
+
+  //primGen->AddGenerator(urqmdGen);
+ // primGen->AddGenerator(signalGen);
+   primGen->AddGenerator(fIongen);
+
+  fRun->SetGenerator(primGen);
+
+
   // ------------------------------------------------------------------------
 
 

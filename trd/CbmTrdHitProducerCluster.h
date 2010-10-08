@@ -4,6 +4,7 @@
 #include "FairTask.h"
 #include "CbmTrdDetectorId.h"
 
+#include "CbmTrdClusterizer.h"
 #include "CbmTrdClusterFinderFast.h"
 
 #include "TVector3.h"
@@ -36,32 +37,6 @@ typedef struct MyHit
   Float_t dzPos;
   Float_t charge;
 } MyHit;
-
-typedef struct ModulePara
-{
-  Int_t Station;
-  Int_t Layer;
-  Int_t moduleId;
-  Int_t xPos;
-  Int_t yPos;
-  Int_t zPos;
-  Int_t nCol;
-  Int_t nRow;
-  Int_t NoSectors;
-  
-  std::vector<Float_t> SectorSizeX;
-  std::vector<Float_t> SectorSizeY;
-  std::vector<Float_t> PadSizeX;
-  std::vector<Float_t> PadSizeY;
-  std::vector<Int_t> SecCol;
-  std::vector<Int_t> SecRow;
- 
-  Float_t ModuleSizeX;
-  Float_t ModuleSizeY;
-  Float_t ModulePositionX;
-  Float_t ModulePositionY;
-  Float_t ModulePositionZ;
-} ModulePara;
 
 typedef std::list<MyHit*> MyHitList;
 typedef std::map<Int_t, MyDigiList*> MyDigiListMap;
@@ -105,6 +80,10 @@ class CbmTrdHitProducerCluster : public FairTask
   CbmTrdModule  *fModuleInfo; //!
   
   CbmTrdDetectorId fTrdId; //!
+
+  Int_t fPrfSingleRecoCounter;
+  Int_t fPrfDoubleRecoCounter;
+  Int_t fSimpleRecoCounter;
 
   std::vector<Int_t> fLayersBeforeStation; //! 
 

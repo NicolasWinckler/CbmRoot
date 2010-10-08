@@ -139,7 +139,9 @@ bool digiCidSorter(MyDigi *a, MyDigi *b)
 void CbmTrdHitProducerCluster::Exec(Option_t * option)
 {
   cout << "================CbmTrdHitProducerCluster==============" << endl;
-  
+  fPrfSingleRecoCounter = 0;
+  fPrfDoubleRecoCounter = 0;
+  fSimpleRecoCounter = 0;
   if (fDigis == NULL)
     cout << " DEBUG: fdigis is NULL" << endl;
   Int_t nDigis = fDigis->GetEntries();
@@ -158,19 +160,19 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     fModuleInfo = fDigiPar->GetModule(moduleId);
     d->digiId = iDigi;
     /*
-    if (Layer%2 == 0) {
+      if (Layer%2 == 0) {
       d->colId = digi->GetRow();
       d->rowId = digi->GetCol();
       d->combiId = d->rowId * (fModuleInfo->GetnRow() + 1) + d->colId;
-    }
-    else {
+      }
+      else {
     */
-      d->rowId = digi->GetRow();
-      d->colId = digi->GetCol();
-      d->combiId = d->rowId * (fModuleInfo->GetnCol() + 1) + d->colId;
-      /*
-    }
-      */
+    d->rowId = digi->GetRow();
+    d->colId = digi->GetCol();
+    d->combiId = d->rowId * (fModuleInfo->GetnCol() + 1) + d->colId;
+    /*
+      }
+    */
     d->charge = digi->GetCharge();
     if (moduleDigiMap.find(moduleId) == moduleDigiMap.end()) {
       moduleDigiMap[moduleId] = new MyDigiList;      
@@ -241,6 +243,9 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       iHit += Int_t((*it).second->size());
     }
   cout << " Found " << iHit << " Hits" << endl;
+  cout << "  " << fPrfSingleRecoCounter << " Hits are PRF based reconstructed in one dimension" << endl;
+  cout << "  " << fPrfDoubleRecoCounter << " Hits are PRF based reconstructed in both dimension" << endl;
+  cout << "   " << fSimpleRecoCounter << " Hits are 'position of pad with maximum charge' based reconstructed in both dimension" << endl;
 }
 
 
@@ -411,7 +416,17 @@ void CbmTrdHitProducerCluster::PrfReco(Int_t qMaxIndex, Float_t qMax, ModulePara
     padWidth = mPara->PadSizeY[hit->secIdY];
     dyPos = Prf( padWidth, sigma, qLeft, qMax, qRight);
   }
-
+  if ((left >= 0 && right >= 0) && (up >= 0 && down >= 0)) {
+    fPrfDoubleRecoCounter++;
+  }
+  else {
+    if ((left >= 0 && right >= 0) || (up >= 0 && down >= 0)) {
+      fPrfSingleRecoCounter++;
+    }
+    else {
+      fSimpleRecoCounter++;
+    }
+  }
   //cout << " x: " << dxPos << " y: " << dyPos << endl;
 
   hit->xPos += dxPos;

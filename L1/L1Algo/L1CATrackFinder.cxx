@@ -2414,7 +2414,7 @@ void L1Algo::CATrackFinder()
         for( int itrip=trip_first; itrip<trip_end; itrip++ ){
           L1Triplet *first_trip = &vTriplets[itrip];
           
-          if( isec != kAllPrimJumpIter ) {
+          if( (isec == kAllPrimIter) || (isec == kAllSecIter) ) {
             if ( first_trip->GetLevel() == 0 ) continue; // ghost suppression // find track with 3 hits only if it was created from a chain of triplets, but not from only one triplet
             if ( first_trip->GetLevel() < ilev ) continue; // try only triplets, which can start track with ilev+3 length. w\o it have more ghosts, but efficiency either
             if ( (ilev == 0) &&
@@ -2455,14 +2455,14 @@ void L1Algo::CATrackFinder()
           // BranchExtender(best_tr);
           // best_L = best_tr.StsHits.size();
 
-          if( isec != kAllPrimJumpIter )
-          if( fGhostSuppression ){//suppress ghost
-            if( best_L == 3 ){
-              //if( isec == 2 ) continue; // too /*short*/ secondary track
-              if( (isec == kAllSecIter) && (istaF != 0) ) continue; // too /*short*/ non-MAPS track
-              if( ((isec == kFastPrimIter) || (isec == kAllPrimIter) || (isec == kAllPrimJumpIter)) && (best_chi2 > 5.0) ) continue;
+          if( (isec == kAllPrimIter) || (isec == kAllSecIter) )
+            if( fGhostSuppression ){//suppress ghost
+              if( best_L == 3 ){
+                  //if( isec == 2 ) continue; // too /*short*/ secondary track
+                if( (isec == kAllSecIter) && (istaF != 0) ) continue; // too /*short*/ non-MAPS track
+                if( ((isec == kFastPrimIter) || (isec == kAllPrimIter) || (isec == kAllPrimJumpIter)) && (best_chi2 > 5.0) ) continue;
+              }
             }
-          }
 
           // BranchExtender(best_tr);
           // best_L = best_tr.StsHits.size();

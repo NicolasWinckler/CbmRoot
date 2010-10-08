@@ -10,7 +10,7 @@
 // #define DRAW             // event display
 // #define XXX              // time debug
 
-// #define FIND_GAPED_TRACKS // use triplets with gaps
+//#define FIND_GAPED_TRACKS // use triplets with gaps
 
 #include "L1Field.h"
 #include "L1Station.h"

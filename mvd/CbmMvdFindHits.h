@@ -17,6 +17,8 @@
 #include "TRefArray.h"
 #include "TCanvas.h"
 
+
+#include "TRandom3.h"
 #include "TStopwatch.h"
 #include "TString.h"
 #include "TMath.h"
@@ -29,6 +31,7 @@
 #include <utility>
 
 class TClonesArray;
+class TRandom3;
 class CbmMvdGeoPar;
 class CbmMvdPileupManager;
 class CbmMvdStation;
@@ -83,6 +86,7 @@ public:
     void SetAdcDynamic( Int_t adcDynamic ) { fAdcDynamic = adcDynamic; };
     void SetAdcOffset(Int_t adcOffset )    { fAdcOffset  = adcOffset;  };
     void SetAdcBits(Int_t adcBits)         { fAdcBits    = adcBits;    };
+    Int_t GetAdcCharge(Float_t charge);
 
     /**Detector Spatial resolution.
     Correlated with number of adc bits*/
@@ -100,6 +104,8 @@ public:
     Int_t fAdcDynamic;
     Int_t fAdcOffset;
     Int_t fAdcBits;
+    Int_t fAdcSteps;
+    Float_t fAdcStepSize;
 
     TClonesArray* fDigis;
     TClonesArray* fHits;
@@ -117,6 +123,9 @@ public:
     TH1F* fResolutionHistoMergedX;
     TH1F* fResolutionHistoMergedY;
     TH2F* fBadHitHisto;
+    Float_t* fGausArray;
+    Int_t fGausArrayIt;
+    Int_t fGausArrayLimit;
 
     map<pair<Int_t, Int_t>, Int_t> fDigiMap;
     map<pair<Int_t, Int_t>, Int_t>::iterator fDigiMapIt;
@@ -200,3 +209,8 @@ private:
 
 
 #endif
+
+/* fGausArray=new Float_t[fGausArrayLimit];
+    for(Int_t i=0;i<fGausArrayLimit;i++){fGausArray[i]=gRandom->Gaus(0, fSigmaNoise);};
+    fGausArrayIt=0;
+*/

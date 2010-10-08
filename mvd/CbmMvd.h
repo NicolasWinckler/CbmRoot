@@ -52,10 +52,6 @@ class CbmMvd : public FairDetector
   virtual ~CbmMvd();
 
 
-  /** Set registering of all particles (including neutrals)  **/
-  void RegisterAll(Bool_t choice = kTRUE) { fRegisterAll = choice; }
-
-
   /** Virtual method ProcessHits
    **
    ** Defines the action to be taken when a step is inside the
@@ -142,9 +138,6 @@ class CbmMvd : public FairDetector
     Bool_t         kGeoSaved;          //!
     TList*         fGeoPar;            //!  List of geometry parameters
     std::map<Int_t, Int_t> fStationMap;  //! Map from MC volume ID to station number
-
-
-    Bool_t fRegisterAll;              // Flag whether to register also neutral particles
 
     /** Private method AddHit
      **

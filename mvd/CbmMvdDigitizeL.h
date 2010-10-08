@@ -1,4 +1,4 @@
-#// ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // -----                    CbmMvdDigitizeL header file                     -----
 // -----                    Created by C.Dritsa (2009)                      -----
 // -----                    Maintained by M.Deveaux (m.deveaux(att)gsi.de   -----
@@ -14,11 +14,13 @@
 #ifndef CBMMVDDIGITIZEL_H
 #define CBMMVDDIGITIZEL_H 1
 
+//#include "omp.h"
 #include "FairTask.h"
 #include "CbmMvdPoint.h"
 #include "CbmMvdDigi.h"
 #include "MyG4UniversalFluctuationForSi.h"
 
+#include "TRandom3.h"
 #include "TStopwatch.h"
 #include "TString.h"
 #include "TMath.h"
@@ -38,6 +40,7 @@
 
 
 class TClonesArray;
+class TRandom3;
 class CbmMvdGeoPar;
 class CbmMvdPileupManager;
 class CbmMvdStation;
@@ -77,12 +80,12 @@ class CbmMvdDigitizeL : public FairTask
   /** Added by CDritsa **/
 
   void ProduceIonisationPoints(CbmMvdPoint* point, CbmMvdStation* station);
-  void ProduceSignalPoints();
+  //void ProduceSignalPoints();
   void ProducePixelCharge(CbmMvdPoint* point, CbmMvdStation* station);
   void TransformXYtoPixelIndex(Double_t x, Double_t y,Int_t & ix, Int_t & iy);
   void TransformPixelIndexToXY(Int_t ix, Int_t iy, Double_t & x, Double_t & y );
   void PositionWithinCell(Double_t x, Double_t y,  Int_t & ix, Int_t & iy, Double_t & xCell, Double_t & yCell);
-  void AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t charge, CbmMvdPoint* point);
+ // void AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t charge, CbmMvdPoint* point);
   Int_t BuildEvent();
   Double_t GetDetectorGeometry(CbmMvdPoint* point);
 
@@ -141,6 +144,8 @@ public:
     TH1F* fSegResolutionHistoX;
     TH1F* fSegResolutionHistoY;
     TH1F* fSegResolutionHistoZ;
+    TH1F* fTotalChargeHisto;
+    TH1F* fTotalSegmentChargeHisto;
 
 
     Double_t fLorentzY0;
@@ -152,6 +157,7 @@ public:
     Double_t fLandauMPV;
     Double_t fLandauSigma;
     Double_t fLandauGain;
+    TRandom3* fLandauRandom;
 
     Double_t fPixelSize;
     Double_t fPar0;
@@ -172,9 +178,13 @@ public:
     TClonesArray* fDigis;
     TClonesArray* fMCTracks;
     TClonesArray* fPixelCharge;
+    
+    std::vector<CbmMvdPixelCharge*> fPixelChargeShort;
+
     TObjArray* fPixelScanAccelerator;
     map<pair<Int_t, Int_t>, CbmMvdPixelCharge*> fChargeMap;
     map<pair<Int_t, Int_t>, CbmMvdPixelCharge*>::iterator fChargeMapIt;
+    
 
 
 private:
@@ -208,6 +218,7 @@ private:
 
 
   /** Random generator and Stopwatch **/
+  TRandom3   fRandGen; 
   TStopwatch fTimer;
   
 

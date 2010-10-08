@@ -22,6 +22,7 @@ CbmMvdPixelCharge::CbmMvdPixelCharge(){
     fContributors = 0;
     fTrackCharge  = 0;
     fTrackId=-1;
+    fPointId=-1;
 }
 // -------------------------------------------------------------------------
 Bool_t CbmMvdPixelCharge::TestXY(Int_t channelNrX,Int_t channelNrY)
@@ -37,7 +38,7 @@ Bool_t CbmMvdPixelCharge::TestXY(Int_t channelNrX,Int_t channelNrY)
 }
 
 // -----   Constructor with parameters   -----------------------------------
-CbmMvdPixelCharge::CbmMvdPixelCharge(Int_t charge, Int_t channelNrX, Int_t channelNrY, Int_t trackId):TObject()
+CbmMvdPixelCharge::CbmMvdPixelCharge(Float_t charge, Int_t channelNrX, Int_t channelNrY, Int_t pointId, Int_t trackId):TObject()
 {
     fTrackCharge = charge;
 
@@ -51,6 +52,7 @@ CbmMvdPixelCharge::CbmMvdPixelCharge(Int_t charge, Int_t channelNrX, Int_t chann
     fContributors = 0;
     fCharge       = 0;
     fTrackId        = trackId;
+    fPointId	= pointId;
 
 }
 
@@ -60,7 +62,7 @@ CbmMvdPixelCharge::CbmMvdPixelCharge(Int_t charge, Int_t channelNrX, Int_t chann
   // all segments of a track). Checks if a new track contributed charge to the pixel
   // Checks if the new track is dominant
   
-void CbmMvdPixelCharge::DigestCharge(Float_t pointX, Float_t pointY, Int_t trackId)
+void CbmMvdPixelCharge::DigestCharge(Float_t pointX, Float_t pointY, Int_t pointId, Int_t trackId)
 {
 
     if (fTrackCharge>0)
@@ -71,6 +73,7 @@ void CbmMvdPixelCharge::DigestCharge(Float_t pointX, Float_t pointY, Int_t track
 	    fDominatingPointX      = pointX;
 	    fDominatingPointY      = pointY;
 	    fTrackId                 = trackId;
+	    fPointId		   = pointId;
 	}
 
 	fCharge = fCharge+fTrackCharge; // Add charge of the track

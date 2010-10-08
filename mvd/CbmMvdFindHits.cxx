@@ -1,8 +1,8 @@
-// -------------------------------------------------------------------------
-// -----                    CbmMvdFindHits source file                 -----
+// --------------------------------------------------------------------------------------------
+// -----                    CbmMvdFindHits source file                 --------
 // -----                  Created 06/05/08  by C. Dritsa               -----
-// -----                                                               -----
-// -------------------------------------------------------------------------
+// -----   Code tuning and maintainance M.Deveaux 01/07/2010     -----
+// ---------------------------------------------------------------------------------------------
 // Includes from MVD
 #include "CbmMvdGeoPar.h"
 #include "CbmMvdHit.h"
@@ -31,7 +31,7 @@
 
 #include "TClonesArray.h"
 
-#include "TRandom.h"
+#include "TRandom3.h"
 #include "TString.h"
 #include "TVector3.h"
 #include "TMath.h"
@@ -76,9 +76,9 @@ CbmMvdFindHits::CbmMvdFindHits()
 
     //Cluster Finding parameters
     fSigmaNoise     = 15; //sigma of the gauss distribution of noise (in electrons)
-    fSeedThreshold  = 1;
+    fSeedThreshold  = 75;
     fNeighThreshold = 0;
-
+    fGausArrayLimit=500000;
 
     //Hit Position
     fHitPosX = 0;
@@ -126,7 +126,7 @@ CbmMvdFindHits::CbmMvdFindHits(const char* name, Int_t iMode,
     fHitPosErrZ = 0.0;
 
     fShowDebugHistos=kFALSE;
-
+    fGausArrayLimit=500000;
 
 }
 // -------------------------------------------------------------------------
@@ -202,7 +202,7 @@ InitStatus CbmMvdFindHits::Init() {
     fPixelChargeHistos=new TObjArray();
     for (Int_t i=0; i<49; i++)
     {
-	sprintf(histoName,"ChargePixel%i",i);
+	sprintf(histoName,"ChargePixel%i",i+1);
 	histo=new TH1F(histoName,histoName,100,0,12000);
 	fPixelChargeHistos->AddLast(histo);
     };
@@ -210,28 +210,28 @@ InitStatus CbmMvdFindHits::Init() {
      fTotalChargeInNpixelsArray = new TObjArray();
     for (Int_t i=0; i<49; i++)
     {
-	sprintf(histoTotalChargeName,"totalChargeInNPixels%i",i);
-	histoTotalCharge=new TH1F(histoTotalChargeName,histoTotalChargeName,200,70,14000);
+	sprintf(histoTotalChargeName,"totalChargeInNPixels%i",i+1);
+	histoTotalCharge=new TH1F(histoTotalChargeName,histoTotalChargeName,200,0,14000);
 	fTotalChargeInNpixelsArray->AddLast(histoTotalCharge);
     };
 
     //Number 49
-    histo = new TH1F("ChargePixelSeed","ChargePixelSeed",200,70,14000);
+    histo = new TH1F("ChargePixelSeed","ChargePixelSeed",200,0,14000);
     fPixelChargeHistos->AddLast(histo);
     //Number 50
-    histo = new TH1F("ChargePixel9of49","ChargePixel 9 Of 49",200,70,14000);
+    histo = new TH1F("ChargePixel9of49","ChargePixel 9 Of 49",200,0,14000);
     fPixelChargeHistos->AddLast(histo);
     //Number 51
-    histo = new TH1F("ChargePixel25of49","ChargePixel 25 Of 49",200,70,14000);
+    histo = new TH1F("ChargePixel25of49","ChargePixel 25 Of 49",200,0,14000);
     fPixelChargeHistos->AddLast(histo);
     //Number 52
-    histo = new TH1F("ChargePixel49of49","ChargePixel 49 Of 49",200,70,14000);
+    histo = new TH1F("ChargePixel49of49","ChargePixel 49 Of 49",200,0,14000);
     fPixelChargeHistos->AddLast(histo);
     //Number 53
-    histo = new TH1F("ChargePixel9of49Sorted","ChargePixel 9 Of 49 Sorted",200,70,14000);
+    histo = new TH1F("ChargePixel9of49Sorted","ChargePixel 9 Of 49 Sorted",200,0,14000);
     fPixelChargeHistos->AddLast(histo);
     //Number 54
-    histo = new TH1F("ChargePixel25of49Sorted","ChargePixel 25 Of 49 Sorted",200,70,14000);
+    histo = new TH1F("ChargePixel25of49Sorted","ChargePixel 25 Of 49 Sorted",200,0,14000);
     fPixelChargeHistos->AddLast(histo);
     //Number 55
     histo = new TH1F("ChargePixel49of49Sorted","ChargePixel 49 Of 49 Sorted",49,0.5,49.5);
@@ -244,6 +244,17 @@ InitStatus CbmMvdFindHits::Init() {
 
     cout << "------- CbmMvdFindHits::Init completed ------" << endl;
     cout << "---------------------------------------------" << endl;
+
+   
+    Int_t adcMax = fAdcOffset + fAdcDynamic;
+    fAdcSteps= (Int_t)TMath::Power(2,fAdcBits);
+    fAdcStepSize  = fAdcDynamic/fAdcSteps;
+
+    fGausArray=new Float_t[fGausArrayLimit];
+    for(Int_t i=0;i<fGausArrayLimit;i++){fGausArray[i]=gRandom->Gaus(0, fSigmaNoise);};
+    fGausArrayIt=0;
+
+
 }
 // -------------------------------------------------------------------------
 
@@ -370,7 +381,7 @@ void CbmMvdFindHits::Exec(Option_t* opt) {
 
 	    // test if station is correct and apply fNeighThreshold
 	    if( digi->GetStationNr() != station->GetStationNr() ){ continue; }
-	    if( digi->GetAdcCharge(fAdcDynamic, fAdcOffset, fAdcBits) < fNeighThreshold ) continue;
+	    if(GetAdcCharge(digi->GetCharge()) < fNeighThreshold ) continue;
 
 	    pair<Int_t, Int_t> a (digi->GetPixelX(),digi->GetPixelY());
 	    fDigiMap[a]=k;
@@ -402,7 +413,7 @@ void CbmMvdFindHits::Exec(Option_t* opt) {
 		cout << "-I- " << "CbmMvdFindHits: Checking for seed pixels..." << endl;
 	    }
 
-	    if( ( digi->GetAdcCharge(fAdcDynamic, fAdcOffset, fAdcBits)>fSeedThreshold ) && ( pixelUsed->At(iDigi)==kFALSE ) ){
+	    if( ( GetAdcCharge(digi->GetCharge())>fSeedThreshold ) && ( pixelUsed->At(iDigi)==kFALSE ) ){
 
 		clusterArray->clear();
 		clusterArray->push_back(digi);
@@ -529,7 +540,8 @@ Int_t CbmMvdFindHits::GetMvdGeometry() {
 //--------------------------------------------------------------------------
 
 void CbmMvdFindHits::AddNoiseToDigis(CbmMvdDigi* digi){
-    Double_t noise  = gRandom->Gaus(0,fSigmaNoise); // noise is simulated by a gauss
+    Double_t noise  = fGausArray[fGausArrayIt++]; // noise is simulated by a gauss
+    if (fGausArrayIt-2>fGausArrayLimit){fGausArrayIt=0;};
     Double_t charge = digi->GetCharge() + noise;
     digi->SetCharge((int)charge);
 }
@@ -571,13 +583,14 @@ void CbmMvdFindHits::GenerateFakeDigis(CbmMvdStation* station, Double_t pixelSiz
 
 	    if(  distance2>r2 || distance2<r2_inner )  continue;
 
-	    noise = gRandom->Gaus(0,fSigmaNoise); // noise is simulated by a gauss
+	   noise  = fGausArray[fGausArrayIt++]; // noise is simulated by a gauss
+    	   if (fGausArrayIt-2>fGausArrayLimit){fGausArrayIt=0;}; 
 
 	    if ( noise>fSeedThreshold /*&& pixel is not used ???*/){
                  Int_t nDigis = fDigis->GetEntriesFast();
 		 CbmMvdDigi* fakeDigi= 
 		       new ((*fDigis)[nDigis]) CbmMvdDigi(station->GetVolumeId(),i,j,(int)noise,
-		       					  pixelSizeX,pixelSizeY,0,0,0,0,-1);
+		       					  pixelSizeX,pixelSizeY,0,0,0,0,-4,-4);
 		}
 	}
     }
@@ -691,7 +704,7 @@ void CbmMvdFindHits::CreateHit(vector<CbmMvdDigi*>* clusterArray, CbmMvdStation*
          
     	pixelInCluster = clusterArray->at(iCluster);
 
-	charge      = pixelInCluster->GetAdcCharge(fAdcDynamic, fAdcOffset, fAdcBits);
+	charge      = GetAdcCharge(pixelInCluster->GetCharge());
 	xIndex      = pixelInCluster->GetPixelX();
 	yIndex      = pixelInCluster->GetPixelY();
 	pixelSizeX  = pixelInCluster->GetPixelSizeX();
@@ -781,22 +794,7 @@ void CbmMvdFindHits::CreateHit(vector<CbmMvdDigi*>* clusterArray, CbmMvdStation*
 
     Int_t k=0;
 
-    /*
-    CbmMvdDigi* digi = (CbmMvdDigi*) clusterArray->At(k);
-    maxCharge = digi->GetAdcCharge();
-
-    for  ( k=0; k<clusterSize; k++)
-    {
-	digi = clusterArray[k];
-	cout << endl;
-	cout << "Digi " << k << endl;
-	cout << "X " << digi->GetPixelX() << " ,  Y= " << digi->GetPixelY() << endl;
-        cout << "Xpitch " << digi->GetPixelSizeX() << " ,  Ypitch= " << digi->GetPixelSizeY() << endl;
-	cout << "charge = " << digi->GetCharge() << " ,  AdcCharge = " << digi->GetAdcCharge(fAdcDynamic, fAdcOffset, fAdcBits) << endl;
-	//h1->Fill(digi->GetCharge());
-
-    }
-    */
+   
 
     // fill the charge array indicating the shape of the cluster
     // the central pixel of the charge array contains the center of gravity
@@ -830,12 +828,13 @@ void CbmMvdFindHits::CreateHit(vector<CbmMvdDigi*>* clusterArray, CbmMvdStation*
 		    }
 
 		
-		    chargeArray[7*i+j] = digi->GetAdcCharge(fAdcDynamic, fAdcOffset, fAdcBits);
+		    chargeArray[7*i+j] = GetAdcCharge(digi->GetCharge());
 
 
                      // Fill Quality control Histograms
-		    TH1F* histo = (TH1F*)fPixelChargeHistos->At(7*i+j);
-		    histo->Fill( chargeArray[7*i+j] );
+		    if (fShowDebugHistos)
+		         {TH1F* histo = (TH1F*)fPixelChargeHistos->At(7*i+j);
+		          histo->Fill( chargeArray[7*i+j] );}
 
 
 		    if(i==3 && j==3){xCentralTrack=digi->GetDominatorX(); yCentralTrack=digi->GetDominatorY();
@@ -872,50 +871,47 @@ void CbmMvdFindHits::CreateHit(vector<CbmMvdDigi*>* clusterArray, CbmMvdStation*
 		} // if
 
 		if( !digiFound ){
-		    chargeArray   [7*i+j] = (Short_t)gRandom->Gaus(0,fSigmaNoise);;
+		    
+    	   	    if (fGausArrayIt-2>fGausArrayLimit){fGausArrayIt=0;}; 
+		    chargeArray   [7*i+j] = (Short_t)fGausArray[fGausArrayIt++]; //insert noise
 		    dominatorArray[7*i+j] = 0;
 		}
 	    } // for k
 	} // for j
     } // for i
 
-    //pixelSizeX=digi->GetPixelSizeX();
-    //pixelSizeY=digi->GetPixelSizeY();
 
-
-    // Save cluster into array
-//    Int_t nClusters = fClusters->GetEntriesFast();
-//    CbmMvdCluster* clusterNew=new ((*fClusters)[nClusters]) CbmMvdCluster(detId, pos, dpos, 0,  chargeArray, pixelSizeX, pixelSizeY);
-//    clusterNew->SetDebuggingInfo(dominatorArray,xPos,yPos);
-//    clusterNew->SetContributors(contributors);
-
-      // MDX - Fill Quality test Histograms
-    Float_t qSeed = chargeArray[24];
-    Float_t q9    = chargeArray[16] + chargeArray[17] + chargeArray[18]+
-	            chargeArray[23] + chargeArray[24] + chargeArray[25]+
-	            chargeArray[30] + chargeArray[31] + chargeArray[32];
-    Float_t q25= q9 +
-	chargeArray[8]  + chargeArray[9]  + chargeArray[10] + chargeArray[11] + chargeArray[12] +
-	chargeArray[15] + chargeArray[22] + chargeArray[29] +
-	chargeArray[19] + chargeArray[26] + chargeArray[33] +
-	chargeArray[36] + chargeArray[37] + chargeArray[38] + chargeArray[39] + chargeArray[40];
-    Float_t q49=0;
-    for(Int_t i=0; i<49; i++){q49+=chargeArray[i];};
-
-    ((TH1F*) fPixelChargeHistos->At(49))->Fill(qSeed);
-    ((TH1F*) fPixelChargeHistos->At(50))->Fill(q9);
-    ((TH1F*) fPixelChargeHistos->At(51))->Fill(q25);
-    ((TH1F*) fPixelChargeHistos->At(52))->Fill(q49);
-    // End - Fill Quality test Histograms
-
-    // Save cluster into array
     Int_t nClusters = fClusters->GetEntriesFast();
     CbmMvdCluster* clusterNew=new ((*fClusters)[nClusters]) CbmMvdCluster(detId, pos, dpos, 0,  chargeArray, pixelSizeX, pixelSizeY);
     clusterNew->SetDebuggingInfo(dominatorArray,xPos,yPos);
     clusterNew->SetContributors(contributors);
 
-    if(fShowDebugHistos) {
-        if( fHitPosX-xCentralTrack>0.003 && fHitPosZ<6 ) { fBadHitHisto->Fill(fHitPosX,fHitPosY); }
+	// Save hit into array
+    Int_t nHits = fHits->GetEntriesFast();
+    new ((*fHits)[nHits]) CbmMvdHit(station->GetStationNr(), pos, dpos, 0);
+    new ((*fMatches)[nHits]) CbmMvdHitMatch(0, 0, centralDigi->GetTrackID(), centralDigi->GetPointID(), clusterNew->GetContributors());
+    
+    if(fShowDebugHistos)
+	{ 
+
+	Float_t qSeed = chargeArray[24];
+        Float_t q9    = chargeArray[16] + chargeArray[17] + chargeArray[18]+
+	            chargeArray[23] + chargeArray[24] + chargeArray[25]+
+	            chargeArray[30] + chargeArray[31] + chargeArray[32];
+    	Float_t q25= q9 +
+	chargeArray[8]  + chargeArray[9]  + chargeArray[10] + chargeArray[11] + chargeArray[12] +
+	chargeArray[15] + chargeArray[22] + chargeArray[29] +
+	chargeArray[19] + chargeArray[26] + chargeArray[33] +
+	chargeArray[36] + chargeArray[37] + chargeArray[38] + chargeArray[39] + chargeArray[40];
+    	Float_t q49=0;
+    	for(Int_t i=0; i<49; i++){q49+=chargeArray[i];};
+
+    	((TH1F*) fPixelChargeHistos->At(49))->Fill(qSeed);
+    	((TH1F*) fPixelChargeHistos->At(50))->Fill(q9);
+    	((TH1F*) fPixelChargeHistos->At(51))->Fill(q25);
+    	((TH1F*) fPixelChargeHistos->At(52))->Fill(q49);
+
+	if( fHitPosX-xCentralTrack>0.003 && fHitPosZ<6 ) { fBadHitHisto->Fill(fHitPosX,fHitPosY); }
 
 	fResolutionHistoX->Fill(fHitPosX-xCentralTrack);
 	fResolutionHistoY->Fill(fHitPosY-yCentralTrack);
@@ -927,61 +923,28 @@ void CbmMvdFindHits::CreateHit(vector<CbmMvdDigi*>* clusterArray, CbmMvdStation*
 	    fResolutionHistoMergedX->Fill(fHitPosX-xCentralTrack);
 	    fResolutionHistoMergedY->Fill(fHitPosY-yCentralTrack);
 	};
-    };
+	
+	TMath::Sort(49,chargeArray,orderArray,kTRUE);
+	Float_t qSort=0;
+	for (Int_t i=0; i<9; i++){ qSort+=chargeArray[orderArray[i]]; };
+    	((TH1F*) fPixelChargeHistos->At(53))->Fill(qSort);
 
-     TH1F* histoTotalCharge;
-
-
-    TMath::Sort(49,chargeArray,orderArray,kTRUE);
-    
-    Float_t qSort=0;
-    
-    for (Int_t i=0; i<9; i++){ qSort+=chargeArray[orderArray[i]]; };
-    ((TH1F*) fPixelChargeHistos->At(53))->Fill(qSort);
-
-
-    for (Int_t i=9; i<25; i++){ qSort+=chargeArray[orderArray[i]]; };
-    ((TH1F*) fPixelChargeHistos->At(54))->Fill(qSort);
-
-    qSort=0;
-
-    for (Int_t i=0; i<49; i++){
-	//histoTotalCharge =(TH1F*) fTotalChargeInNpixelsArray->At(i) ;
-	//histoTotalCharge->Fill(chargeArray[orderArray[i]] );
-
-	qSort+=chargeArray[orderArray[i]];
-	((TH1F*) fPixelChargeHistos->At(55))->Fill(i+1,qSort);
-    };
-
-    qSort=0;
-    //for (Int_t i=0; i<1; i++){ qSort+=chargeArray[orderArray[i]]; };
-
-    for (Int_t i=0; i<49; i++){
-            qSort+=chargeArray[orderArray[i]];
-	    histoTotalCharge =(TH1F*) fTotalChargeInNpixelsArray->At(i) ;
-	    // histoTotalCharge->Fill(chargeArray[orderArray[i]] );
-	    histoTotalCharge->Fill(qSort);
-    }
-
+	for (Int_t i=9; i<25; i++) { qSort+=chargeArray[orderArray[i]]; };
+	((TH1F*) fPixelChargeHistos->At(54))->Fill(qSort);
+		
+	TH1F* histoTotalCharge;
+    	qSort=0;
+    	for (Int_t i=0; i<49; i++){
+		qSort+=chargeArray[orderArray[i]];
+		((TH1F*) fPixelChargeHistos->At(55))->Fill(i+1,qSort);
+		histoTotalCharge =(TH1F*) fTotalChargeInNpixelsArray->At(i) ;
+	    	histoTotalCharge->Fill(qSort);
+    		};
 
   
-    
-    /************************************************************/
-    /************************************************************/
+   	}
 
-    //cout << "++++++++++" << endl;
-    //cout<<"X= "<< pos.X() << " Y= "<< pos.Y() << " Z= " <<pos.Z() << endl;
-    //cout<<"XSeed= "<<xSeed << " ySeed= " << ySeed << endl; 
-    //for (Int_t k=0;k<clusterSize;k++)
-     // {CbmMvdDigi* digi=(CbmMvdDigi*) clusterArray->At(k);
-     //  cout <<k<<" "<< digi->GetPixelX()<<" "<< digi->GetPixelY()<< endl;
-        
-     // }
-
-               	// Save hit into array
-		Int_t nHits = fHits->GetEntriesFast();
-		new ((*fHits)[nHits]) CbmMvdHit(station->GetStationNr(), pos, dpos, 0);
-                new ((*fMatches)[nHits]) CbmMvdHitMatch(0, 0, centralDigi->GetTrackID(), 0, clusterNew->GetContributors());
+               	
 
 }
 
@@ -1019,15 +982,40 @@ void CbmMvdFindHits::Finish() {
 	fResolutionHistoCleanY->Draw();
 	fResolutionHistoCleanY->Write();
 	canvas->cd(5);
-	fResolutionHistoMergedX->Draw();
+	((TH1F*)fTotalChargeInNpixelsArray->At(24))->Draw();
+	((TH1F*)fTotalChargeInNpixelsArray->At(24))->Fit("landau");
 	fResolutionHistoMergedX->Write();
 	canvas->cd(6);
 	fResolutionHistoMergedY->Draw();
 	fResolutionHistoMergedY->Write();
-
+	
+	for(Int_t i=0;i<fPixelChargeHistos->GetEntries();i++)
+	{((TH1F*)fPixelChargeHistos->At(i))->Write();}
+	for(Int_t i=0;i<fTotalChargeInNpixelsArray->GetEntries();i++)
+	{((TH1F*)fTotalChargeInNpixelsArray->At(i))->Write();}
+	new TCanvas();
+	((TH1F*)fPixelChargeHistos->At(51))->Draw();
+	((TH1F*)fPixelChargeHistos->At(51))->Fit("landau");
+	new TCanvas();
+	((TH1F*)fPixelChargeHistos->At(49))->Draw();
+	((TH1F*)fPixelChargeHistos->At(49))->Fit("landau");
     }
 }
 //--------------------------------------------------------------------------
+
+Int_t CbmMvdFindHits::GetAdcCharge(Float_t charge)
+{
+
+    Int_t adcCharge;
+
+    if(charge<fAdcOffset){return 0;};
+
+    adcCharge = int( (charge-fAdcOffset)/fAdcStepSize );
+    if ( adcCharge>fAdcSteps-1 ) {adcCharge = fAdcSteps-1;}
+
+    return adcCharge;
+
+}
 
 
 // -----   Private method Reset   ------------------------------------------

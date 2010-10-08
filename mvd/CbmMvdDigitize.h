@@ -21,6 +21,7 @@
 #include "CbmMvdDigi.h"
 #include "MyG4UniversalFluctuationForSi.h"
 
+#include "TRandom3.h"
 #include "TStopwatch.h"
 #include "TString.h"
 #include "TMath.h"
@@ -35,6 +36,7 @@
 #include "CbmMvdPixelCharge.h"
 
 class TClonesArray;
+class TRandom3;
 class CbmMvdGeoPar;
 class CbmMvdPileupManager;
 class CbmMvdStation;
@@ -173,6 +175,7 @@ private:
 
 
   /** Random generator and Stopwatch **/
+  TRandom3   fRandGen; 
   TStopwatch fTimer;
   
 
@@ -254,6 +257,7 @@ private:
   TH2F* h_LengthVsAngle;
   TH2F* h_LengthVsEloss;
   TH2F* h_ElossVsMomIn;
+
 
   ClassDef(CbmMvdDigitize,1);
     

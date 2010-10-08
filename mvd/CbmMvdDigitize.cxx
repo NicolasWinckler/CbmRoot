@@ -80,33 +80,28 @@
 #include "CbmMvdPileupManager.h"
 #include "CbmMvdPoint.h"
 #include "CbmMvdStation.h"
-#include "CbmMCTrack.h"
 
 // Includes from base
 #include "FairGeoNode.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "CbmMCTrack.h"
 
 // Includes from ROOT
 #include "TArrayD.h"
 #include "TClonesArray.h"
 #include "TGeoManager.h"
+#include "TDatabasePDG.h"
 //#include "TGeoShape.h"
 #include "TGeoTube.h"
 #include "TObjArray.h"
-#include "TRandom.h"
+#include "TRandom3.h"
 #include "TString.h"
 #include "TVector3.h"
 #include "TMath.h"
 #include "TH1.h"
 #include "TH2.h"
-#ifndef ROOT_TParticlePDG
- #include "TParticlePDG.h"
-#endif
-#ifndef ROOT_TDatabasePDG
- #include "TDatabasePDG.h"
-#endif
 
 // Includes from C++
 #include <iostream>
@@ -143,6 +138,7 @@ CbmMvdDigitize::CbmMvdDigitize()
     fPixelCharge   = new TClonesArray("CbmMvdPixelCharge");
     fPileupManager = NULL;
     fDeltaManager  = NULL;
+    fRandGen.SetSeed(2736);
     fEvent       = 0;
     fTime        = 0.;
     fSigmaX      = 0.0005;
@@ -191,6 +187,7 @@ CbmMvdDigitize::CbmMvdDigitize(const char* name, Int_t iMode,
     fPixelCharge   = new TClonesArray("CbmMvdPixelCharge");
     fPileupManager = NULL;
     fDeltaManager  = NULL;
+    fRandGen.SetSeed(2736);
     fEvent       = 0;
     fTime        = 0.;
     fSigmaX      = 0.0005;
@@ -400,7 +397,7 @@ void CbmMvdDigitize::Exec(Option_t* opt) {
 	    for(Int_t f=0; f<fPixelCharge->GetEntriesFast(); f++)
 	    {
 		pixelCharge = (CbmMvdPixelCharge*) fPixelCharge->At(f);
-		pixelCharge->DigestCharge( ( (float)( point->GetX()+point->GetXOut() )/2 ) , ( (float)( point->GetY()+point->GetYOut() )/2 ), point->GetTrackID() );
+		pixelCharge->DigestCharge( ( (float)( point->GetX()+point->GetXOut() )/2 ) , ( (float)( point->GetY()+point->GetYOut() )/2 ),-1, point->GetTrackID() );
 	    };
 
 	} //loop on MCpoints
@@ -419,6 +416,7 @@ void CbmMvdDigitize::Exec(Option_t* opt) {
 			       pixel->GetPointX(), pixel->GetPointY(),
 			       pixel->GetContributors(),
 			       pixel->GetMaxChargeContribution(),
+			       pixel->GetPointId(),
 			       pixel->GetTrackId());
 	    }
 	}
@@ -731,7 +729,7 @@ void CbmMvdDigitize:: AddChargeToPixel(Int_t channelX, Int_t channelY, Int_t cha
     // Pixel not yet in map -> Add new pixel
     if ( fChargeMapIt == fChargeMap.end() ) {
         pixel= new ((*fPixelCharge)[fPixelCharge->GetEntriesFast()])
-	    CbmMvdPixelCharge(charge, channelX, channelY, point->GetTrackID());
+	    CbmMvdPixelCharge(charge, channelX, channelY, -1, point->GetTrackID());
 	fChargeMap[a] = pixel;
     }
 

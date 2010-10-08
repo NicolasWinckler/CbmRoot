@@ -104,9 +104,14 @@ InitStatus CbmTrdClusterFinderFast::Init()
 // --------------------------------------------------------------------
 
 // ---- Exec ----------------------------------------------------------
-void CbmTrdClusterFinderFast::Exec(Option_t * option)
+void CbmTrdClusterFinderFast::Exec(Option_t *option)
 {
   Bool_t optimization = false;
+  Bool_t rowClusterMerger = false;
+  if (optimization) {
+    rowClusterMerger = true;
+  }
+  //optimization ist only usefull if rowClusters are merged !!!
   Float_t minimumChargeTH = 5e-03;
   Float_t mChargeTH[57] = { 0.004,    0, 
 			    1e-06, 2e-06, 3e-06, 4e-06, 5e-06, 6e-06, 7e-06, 8e-06, 9e-06,
@@ -227,7 +232,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t * option)
       cout << " Used  " << digiCounter << " Digis after Minimum Charge Cut (" << minimumChargeTH << ")" << endl;
       std::map<Int_t, ClusterList*> fModClusterMap; //map of <moduleId, pointer of Vector of List of struct 'MyDigi' >
       for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin(); it != modules.end(); ++it) {
-	fModClusterMap[it->first] = clusterModule(it->second, ModuleNeighbourDigiMap[it->first]);
+	fModClusterMap[it->first] = clusterModule(rowClusterMerger, it->second, ModuleNeighbourDigiMap[it->first]);
     
 	//drawCluster(it->first, fModClusterMap[it->first]);
       }
@@ -272,7 +277,7 @@ bool digiSorter(MyDigi *a, MyDigi *b)
 { return (a->combiId < b->combiId); }
 
   //----------------------------------------------------------------------
-ClusterList *CbmTrdClusterFinderFast::clusterModule(MyDigiList *digis, MyDigiList *neighbours)
+ClusterList *CbmTrdClusterFinderFast::clusterModule(Bool_t rowClusterMerger, MyDigiList *digis, MyDigiList *neighbours)
 {
   /*
    *  3 new Lists are initialized: 
@@ -309,7 +314,9 @@ ClusterList *CbmTrdClusterFinderFast::clusterModule(MyDigiList *digis, MyDigiLis
        * (and merged to the clusters of the previous row) 
        * if a break between the activ digi and the currentCluster is found.
        */
-      //mergeRowCluster(currentCluster, &openList);
+      if (rowClusterMerger) {
+	mergeRowCluster(currentCluster, &openList);
+      }
       currentList.push_back(currentCluster);
  
       if ((*it)->rowId > currentCluster->row) {

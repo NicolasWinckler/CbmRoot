@@ -10,7 +10,7 @@
 // #define DRAW             // event display
 // #define XXX              // time debug
 
-// #define FIND_GAPED_TRACKS // use triplets with gaps
+ #define FIND_GAPED_TRACKS // use triplets with gaps
 
 #include "L1Field.h"
 #include "L1Station.h"
@@ -340,18 +340,20 @@ class L1Algo{
     // fNFindIterations - set number of interation for trackfinding
     // itetation of finding:
 #ifdef FIND_GAPED_TRACKS
-  enum { fNFindIterations = 4 };
-  enum { kFastPrimIter = 0, // primary fast track
-         kAllPrimIter,      // primary all track
+  enum { fNFindIterations = 5 };
+  enum { kFastPrimIter = 0, // primary fast tracks
+         kFastPrimJumpIter,  // primary fast tracks with gaps
+         kAllPrimIter,      // primary all tracks
          kAllPrimJumpIter,  // primary tracks with gaps
-         kAllSecIter        // secondary all track 
+         kAllSecIter        // secondary all tracks 
   };
 #else
   enum { fNFindIterations = 3 };
-  enum { kFastPrimIter = 0, // primary fast track
-         kAllPrimIter,      // primary all track
-         kAllSecIter,       // secondary all track
-         kAllPrimJumpIter   // 
+  enum { kFastPrimIter = 0, // primary fast tracks
+         kAllPrimIter,      // primary all tracks
+         kAllSecIter,       // secondary all tracks
+         kFastPrimJumpIter, // disabled
+         kAllPrimJumpIter   // disabled
   };
 #endif // FIND_GAPED_TRACKS
   

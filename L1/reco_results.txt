@@ -18,7 +18,25 @@ MC tracks/event found  : 541
 
 CA Track Finder: 0.829 s/ev
 
---- jumps. with ghostSuppression for jumpIter
+--- jumps on isec = 0` 1`. with ghostSuppression for jumpIter
+L1 ACCUMULATED STAT    : 10 EVENTS
+
+Track category         :  Eff   / Killed / Length / Fakes  / Clones | All MC
+LongRPrim efficiency   : 0.992  / 0.007  / 0.903  / 0.006  / 0.001  | 1463
+RefPrim   efficiency   : 0.924  / 0.047  / 0.874  / 0.035  / 0.002  | 4287
+RefSec    efficiency   : 0.647  / 0.146  / 0.860  / 0.036  / 0.003  | 665
+Refset    efficiency   : 0.887  / 0.060  / 0.873  / 0.035  / 0.002  | 4952
+Allset    efficiency   : 0.811  / 0.079  / 0.870  / 0.035  / 0.002  | 6867
+ExtraPrim efficiency   : 0.730  / 0.097  / 0.858  / 0.034  / 0.002  | 1305
+ExtraSec  efficiency   : 0.366  / 0.195  / 0.867  / 0.043  / 0.000  | 610
+Extra     efficiency   : 0.614  / 0.128  / 0.860  / 0.036  / 0.001  | 1915
+Ghost     probability  : 0.062 | 345
+MC tracks/event found  : 556
+
+CA Track Finder: 0.757 s/ev
+
+
+--- jumps on isec = 1`. with ghostSuppression for jumpIter
 L1 ACCUMULATED STAT    : 10 EVENTS
 
 Track category         :  Eff   / Killed / Length / Fakes  / Clones | All MC
@@ -36,7 +54,7 @@ MC tracks/event found  : 542
 CA Track Finder: 0.896 s/ev
 
 
---- jumps. w\o ghostSuppression for jumpIter
+--- jumps on isec = 1`. w\o ghostSuppression for jumpIter
 L1 ACCUMULATED STAT    : 10 EVENTS
 
 Track category         :  Eff   / Killed / Length / Fakes  / Clones | All MC

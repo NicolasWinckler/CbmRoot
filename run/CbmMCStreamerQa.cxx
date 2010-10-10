@@ -156,7 +156,7 @@ void CbmMCStreamerQa::Finish(){
     
     Int_t nCorrect = 0;
     for (Int_t eventId=eventIdFirst;eventId<=eventIdLast;eventId++){
-      fMcChain->GetEntry(eventId-1);
+      fMcChain->GetEntry(eventId);
       Int_t nPointsInMcFile = fPointArrays[detId]->GetEntriesFast();
       Int_t nPointsInEpoch  = fMapPointsInEvents[detId][eventId];
       Bool_t isCorrect = (nPointsInMcFile==nPointsInEpoch);
@@ -168,7 +168,7 @@ void CbmMCStreamerQa::Finish(){
     }
 
     printf("Detector: %4s",detName.Data());
-    if (eventIdLast-eventIdFirst==nCorrect) printf(" - number of points per event is correct");
+    if (eventIdLast-eventIdFirst+1==nCorrect) printf(" - number of points per event is correct");
     else                                    printf(" - number of points per event is wrong. See details above.");
     printf("\n");
   }

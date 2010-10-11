@@ -43,12 +43,12 @@ void run_reco(Int_t nEvents = 700){
     // =========================================================================
     // ===                     MVD local reconstruction                      ===
     // =========================================================================
-	if (isMvd(parFile)){
+//	if (IsMvd(parFile)) {
 		// -----   MVD Hitproducer   -----------------------------------------------
 		CbmMvdHitProducer* mvdHitProd = new CbmMvdHitProducer("MVDHitProducer", 0,
 								  iVerbose);
 		run->AddTask(mvdHitProd);
-	}
+//	}
 
 
 	// =========================================================================

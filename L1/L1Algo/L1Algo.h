@@ -185,7 +185,7 @@ class L1Algo{
 
           /// Get the field approximation. Add the target to parameters estimation. Propagate to middle station.
   void f11(  // input
-                int istal,
+                int istal, int istam,
                 int n1_V, 
 
                 fvec *u_front, fvec *u_back,  fvec *zPos,
@@ -218,7 +218,7 @@ class L1Algo{
   void f30(  // input
                 L1HitPoint *vStsHits_r, int NHits_r, L1Station &stam, L1Station &star,
                 
-                int istar, int n1,
+                int istam, int istar, int n1,
                 L1HitPoint *vStsHits_m,
                 nsL1::vector<L1TrackPar>::TSimd &T_1,nsL1::vector<L1FieldRegion>::TSimd &fld_1,
                 vector<THitI> &hitsl_1,

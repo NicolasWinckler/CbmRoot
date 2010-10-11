@@ -30,200 +30,108 @@ void L1Algo::BranchFitterFast(const L1Branch &t, L1TrackPar& T, const bool dir, 
   const std::vector<THitI>& hits = t.StsHits; // array of indeses of hits of current track
   const int nHits = t.StsHits.size();
 
-  if(dir) { // fit backward  // TODO combine code for backward and forward
-      L1StsHit &hit0 = vStsHits[hits[nHits-1]];
-      L1StsHit &hit1 = vStsHits[hits[nHits-2]];
-      L1StsHit &hit2 = vStsHits[hits[nHits-3]];
+  const signed short int step = -2*static_cast<int>(dir) + 1; // increment for station index
+  const int iFirstHit = (dir) ? nHits-1 : 0;
+  const int iLastHit  = (dir) ? 0 : nHits-1;
+  
+  L1StsHit &hit0 = vStsHits[hits[iFirstHit]];
+  L1StsHit &hit1 = vStsHits[hits[iFirstHit + step]];
+  L1StsHit &hit2 = vStsHits[hits[iFirstHit + 2*step]];
 
-      int ista0 = GetFStation(vSFlag[hit0.f]);
-      int ista1 = GetFStation(vSFlag[hit1.f]);
-      int ista2 = GetFStation(vSFlag[hit2.f]);
+  int ista0 = GetFStation(vSFlag[hit0.f]);
+  int ista1 = GetFStation(vSFlag[hit1.f]);
+  int ista2 = GetFStation(vSFlag[hit2.f]);
 
-        //cout<<"back: ista012="<<ista0<<" "<<ista1<<" "<<ista2<<endl;
-      L1Station &sta0 = vStations[ista0];
-      L1Station &sta1 = vStations[ista1];
-      L1Station &sta2 = vStations[ista2];
+  L1Station &sta0 = vStations[ista0];
+  L1Station &sta1 = vStations[ista1];
+  L1Station &sta2 = vStations[ista2];
 
-      fvec u0  = static_cast<fscal>( vStsStrips[hit0.f] );
-      fvec v0  = static_cast<fscal>( vStsStripsB[hit0.b] );
-      fvec x0,y0;
-      StripsToCoor(u0, v0, x0, y0, sta1);
-      fvec z0 = vStsZPos[hit0.iz];
+  fvec u0  = static_cast<fscal>( vStsStrips[hit0.f] );
+  fvec v0  = static_cast<fscal>( vStsStripsB[hit0.b] );
+  fvec x0,y0;
+  StripsToCoor(u0, v0, x0, y0, sta1);
+  fvec z0 = vStsZPos[hit0.iz];
 
-      fvec u1  = static_cast<fscal>( vStsStrips[hit1.f] );
-      fvec v1  = static_cast<fscal>( vStsStripsB[hit1.b] );
-      fvec x1,y1;
-      StripsToCoor(u1, v1, x1, y1, sta1);
-      fvec z1 = vStsZPos[hit1.iz];
+  fvec u1  = static_cast<fscal>( vStsStrips[hit1.f] );
+  fvec v1  = static_cast<fscal>( vStsStripsB[hit1.b] );
+  fvec x1,y1;
+  StripsToCoor(u1, v1, x1, y1, sta1);
+  fvec z1 = vStsZPos[hit1.iz];
 
-      fvec u2  = static_cast<fscal>( vStsStrips[hit2.f] );
-      fvec v2  = static_cast<fscal>( vStsStripsB[hit2.b] );
-      fvec x2,y2;
-      StripsToCoor(u2, v2, x2, y2, sta2);
-      fvec z2 = vStsZPos[hit2.iz];
+  fvec u2  = static_cast<fscal>( vStsStrips[hit2.f] );
+  fvec v2  = static_cast<fscal>( vStsStripsB[hit2.b] );
+  fvec x2,y2;
+  StripsToCoor(u2, v2, x2, y2, sta2);
+  fvec z2 = vStsZPos[hit2.iz];
 
-      fvec dzi = 1./(z1-z0);
+  fvec dzi = 1./(z1-z0);
 
-      const fvec vINF = .1;
-      T.x  = x0;
-      T.y  = y0;
-      if( initParams ){
-        T.tx = (x1-x0)*dzi;
-        T.ty = (y1-y0)*dzi;
-      }
+  const fvec vINF = .1;
+  T.x  = x0;
+  T.y  = y0;
+  if( initParams ){
+    T.tx = (x1-x0)*dzi;
+    T.ty = (y1-y0)*dzi;
+    T.qp = qp0;
+  }
 
-      T.qp = qp0;
-      T.z  = z0;
-      T.chi2 = 0.;
-      T.NDF = 2.;
-      T.C00 = sta0.XYInfo.C00;
-      T.C10 = sta0.XYInfo.C10;
-      T.C11 = sta0.XYInfo.C11;
+  T.z  = z0;
+  T.chi2 = 0.;
+  T.NDF = 2.;
+  T.C00 = sta0.XYInfo.C00;
+  T.C10 = sta0.XYInfo.C10;
+  T.C11 = sta0.XYInfo.C11;
 
-      T.C20 = T.C21 = 0;
-      T.C30 = T.C31 = T.C32 = 0;
-      T.C40 = T.C41 = T.C42 = T.C43 = 0;
-      T.C22 = T.C33 = vINF;
-      T.C44 = 1.;
+  T.C20 = T.C21 = 0;
+  T.C30 = T.C31 = T.C32 = 0;
+  T.C40 = T.C41 = T.C42 = T.C43 = 0;
+  T.C22 = T.C33 = vINF;
+  T.C44 = 1.;
 
-      static L1FieldValue fB0, fB1, fB2 _fvecalignment;
-      static L1FieldRegion fld _fvecalignment;
-      fvec fz0 = sta1.z; // suppose field is smoth
-      fvec fz1 = sta2.z;
-      fvec fz2 = sta0.z;
+  static L1FieldValue fB0, fB1, fB2 _fvecalignment;
+  static L1FieldRegion fld _fvecalignment;
+  fvec fz0 = sta1.z; // suppose field is smoth
+  fvec fz1 = sta2.z;
+  fvec fz2 = sta0.z;
 
 
-      sta1.fieldSlice.GetFieldValue( x1, y1, fB0 );
-      sta2.fieldSlice.GetFieldValue( x2, y2, fB1 );
-      sta0.fieldSlice.GetFieldValue( x0, y0, fB2 );
+  sta1.fieldSlice.GetFieldValue( x1, y1, fB0 );
+  sta2.fieldSlice.GetFieldValue( x2, y2, fB1 );
+  sta0.fieldSlice.GetFieldValue( x0, y0, fB2 );
 
-      fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
+  fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
 
-      int ista = ista2;
-        //cout<<"\nfit, iter=:"<<iter<<endl;
-      for( int i = nHits-2; i >= 0; i--){
-          //  if( fabs(T.qp[0])>2. ) break;  // iklm. Don't know it need for
-        L1StsHit &hit = vStsHits[hits[i]];
-        ista = GetFStation(vSFlag[hit.f]);
+  int ista_prev = ista1;
+  int ista = ista2;
 
-        L1Station &sta = vStations[ista];
+  for( int i = iFirstHit + step; step*i <= step*iLastHit; i += step){
+    L1StsHit &hit = vStsHits[hits[i]];
+    ista_prev = ista;
+    ista = GetFStation(vSFlag[hit.f]);
+
+    L1Station &sta = vStations[ista];
           
-        L1Extrapolate( T, vStsZPos[hit.iz], qp0, fld );
-        L1AddMaterial( T, sta.materialInfo, qp0 );
-        if (ista == NMvdStations-1) L1AddPipeMaterial( T, qp0 );
+    L1Extrapolate( T, vStsZPos[hit.iz], qp0, fld );
+    L1AddMaterial( T, sta.materialInfo, qp0 );
+    if ( (step*ista <= step*(NMvdStations + (step+1)/2 - 1)) && (step*ista_prev >= step*(NMvdStations + (step+1)/2 - 1 - step)) )
+      L1AddPipeMaterial( T, qp0 );
+  
+    fvec u = static_cast<fscal>( vStsStrips[hit.f] );
+    fvec v = static_cast<fscal>( vStsStripsB[hit.b] );
+    L1Filter( T, sta.frontInfo, u );
+    L1Filter( T, sta.backInfo,  v );
+    fB0 = fB1;
+    fB1 = fB2;
+    fz0 = fz1;
+    fz1 = fz2;
+    fvec x,y;
+    StripsToCoor(u, v, x, y, sta);
+    sta.fieldSlice.GetFieldValue( x, y, fB2 );
 
-        fvec u = static_cast<fscal>( vStsStrips[hit.f] );
-        fvec v = static_cast<fscal>( vStsStripsB[hit.b] );
-        L1Filter( T, sta.frontInfo, u );
-        L1Filter( T, sta.backInfo,  v );
-        fB0 = fB1;
-        fB1 = fB2;
-        fz0 = fz1;
-        fz1 = fz2;
-        fvec x,y;
-        StripsToCoor(u, v, x, y, sta);
-        sta.fieldSlice.GetFieldValue( x, y, fB2 );
+    fz2 = sta.z;
+    fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
+  } // i
 
-        fz2 = sta.z;
-        fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
-      } // i
-
-  }
-  else { // forward
-
-      L1StsHit &hit0 = vStsHits[hits[0]];
-      L1StsHit &hit1 = vStsHits[hits[1]];
-      L1StsHit &hit2 = vStsHits[hits[2]];
-
-      int ista0 = GetFStation( vSFlag[hit0.f] );
-      int ista1 = GetFStation( vSFlag[hit1.f] );
-      int ista2 = GetFStation( vSFlag[hit2.f] );
-
-      L1Station &sta0 = vStations[ista0];
-      L1Station &sta1 = vStations[ista1];
-      L1Station &sta2 = vStations[ista2];
-
-      fvec u0  = static_cast<fscal>( vStsStrips[hit0.f] );
-      fvec v0  = static_cast<fscal>( vStsStripsB[hit0.b] );
-      fvec x0,y0;
-      StripsToCoor(u0, v0, x0, y0, sta1);
-      fvec z0 = vStsZPos[hit0.iz];
-
-      fvec u1  = static_cast<fscal>( vStsStrips[hit1.f] );
-      fvec v1  = static_cast<fscal>( vStsStripsB[hit1.b] );
-      fvec x1,y1;
-      StripsToCoor(u1, v1, x1, y1, sta1);
-      fvec z1 = vStsZPos[hit1.iz];
-
-      fvec u2  = static_cast<fscal>( vStsStrips[hit2.f] );
-      fvec v2  = static_cast<fscal>( vStsStripsB[hit2.b] );
-      fvec x2,y2;
-      StripsToCoor(u2, v2, x2, y2, sta2);
-      fvec z2 = vStsZPos[hit2.iz];
-
-      fvec dzi = 1./(z1-z0);
-
-        //fvec qp0 = first_trip->GetQpOrig(MaxInvMom);
-
-
-      static L1FieldValue fB0, fB1, fB2 _fvecalignment;
-      static L1FieldRegion fld _fvecalignment;
-      fvec fz0 = sta1.z;
-      fvec fz1 = sta2.z;
-      fvec fz2 = sta0.z;
-
-      sta1.fieldSlice.GetFieldValue( x1, y1, fB0 );
-      sta2.fieldSlice.GetFieldValue( x2, y2, fB1 );
-      sta0.fieldSlice.GetFieldValue( x0, y0, fB2 );
-
-      fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
-
-
-      const fvec vINF = .1;
-      T.chi2 = 0.;
-      T.NDF = 2.;
-      T.x  = x0;
-      T.y  = y0;
-        //         T.tx = (x1-x0)*dzi;
-        //         T.ty = (y1-y0)*dzi;
-        //         qp0 = 0;
-      T.qp = qp0;
-      T.z  = z0;
-      T.C00 = sta0.XYInfo.C00;
-      T.C10 = sta0.XYInfo.C10;
-      T.C11 = sta0.XYInfo.C11;
-      T.C20 = T.C21 = 0;
-      T.C30 = T.C31 = T.C32 = 0;
-      T.C40 = T.C41 = T.C42 = T.C43 = 0;
-      T.C22 = T.C33 = vINF;
-      T.C44 = 1.;
-
-      int ista = ista2;
-      for( int i=1; i<nHits; i++){
-        L1StsHit &hit = vStsHits[hits[i]];
-        ista = GetFStation(vSFlag[hit.f]);
-        L1Station &sta = vStations[ista];
-        fvec u = static_cast<fscal>( vStsStrips[hit.f] );
-        fvec v = static_cast<fscal>( vStsStripsB[hit.b] );
-
-        L1Extrapolate( T, vStsZPos[hit.iz], qp0, fld );
-        L1AddMaterial( T, sta.materialInfo, qp0 );
-        if (ista==NMvdStations) L1AddPipeMaterial( T, qp0 );
-        L1Filter( T, sta.frontInfo, u );
-        L1Filter( T, sta.backInfo,  v );
-
-        fB0 = fB1;
-        fB1 = fB2;
-        fz0 = fz1;
-        fz1 = fz2;
-        fvec x,y;
-        StripsToCoor(u, v, x, y, sta);
-        sta.fieldSlice.GetFieldValue( x, y, fB2 );
-        fz2 = sta.z;
-        fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
-      }
-
-  }
 } // void L1Algo::BranchFitterFast
 
   /// like BranchFitterFast but more precise
@@ -296,7 +204,7 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
 
   fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
 
-  for( ista += 2*step; ista < NStations; ista += step ){
+  for( ista += 2*step; (ista < NStations) && (ista >= 0); ista += step ){
 
     L1Station &sta = vStations[ista];
           

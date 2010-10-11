@@ -80,7 +80,7 @@ inline void L1Algo::f10(  // input
 
           /// Get the field approximation. Add the target to parameters estimation. Propagaete to middle station.
 inline void L1Algo::f11(  // input
-                int istal,
+                int istal, int istam,
                 int n1_V,
 
                 fvec *u_front, fvec *u_back,  fvec *zPos,
@@ -92,7 +92,7 @@ inline void L1Algo::f11(  // input
                )
 {
   L1Station &stal = vStations[istal];
-  L1Station &stam = vStations[istal+1];
+  L1Station &stam = vStations[istam];
   fvec zstal = stal.z;
   fvec zstam = stam.z;
 
@@ -141,7 +141,7 @@ inline void L1Algo::f11(  // input
     }
 #else // if USE_3HITS  // the best now
     L1FieldValue r_B _fvecalignment;
-    L1Station &star = vStations[istal+2];
+    L1Station &star = vStations[istam+1];
     fvec zstar = star.z;
     star.fieldSlice.GetFieldValue( targX + tx*(zstar - targZ), targY + ty*(zstar - targZ), r_B );
     fld1.Set( r_B, zstar, m_B, zstam, l_B, zstal);
@@ -212,7 +212,7 @@ inline void L1Algo::f11(  // input
 #endif
 
     L1AddMaterial( T, stal.materialInfo, MaxInvMom );
-    if (istal == NMvdStations - 1) L1AddPipeMaterial( T, MaxInvMom );
+    if ( (istam >= NMvdStations) && (istal <= NMvdStations - 1) )  L1AddPipeMaterial( T, MaxInvMom );
 
      L1Extrapolate0( T, zstam, fld0 ); // TODO: fld1 doesn't work!
 //     L1Extrapolate( T, zstam, T.qp, fld1 );
@@ -361,7 +361,7 @@ inline void L1Algo::f20(  // input
 inline void L1Algo::f30(  // input
                 L1HitPoint *vStsHits_r, int NHits_r, L1Station &stam, L1Station &star,
 
-                int istar, int n1,
+                int istam, int istar, int n1,
                 L1HitPoint *vStsHits_m,
                 nsL1::vector<L1TrackPar>::TSimd &T_1, nsL1::vector<L1FieldRegion>::TSimd &fld_1,
                 vector<THitI> &hitsl_1,
@@ -450,7 +450,7 @@ inline void L1Algo::f30(  // input
       L1Filter( T2, stam.backInfo,  u_back_2[i2_V] );
 
       L1AddMaterial( T2, stam.materialInfo, T2.qp );
-      if ( (istar - 1 == NMvdStations) || ( ((isec == kFastPrimJumpIter) || (isec == kAllPrimJumpIter))&& (istar - 2 == NMvdStations) ) ) L1AddPipeMaterial( T2, T2.qp ); // CHECKME mvd
+      if ( (istar >= NMvdStations) && (istam <= NMvdStations - 1) ) L1AddPipeMaterial( T2, T2.qp );
 
 //         // update field     // don't help
 //       L1TrackPar T2_tmp = T2;
@@ -749,7 +749,7 @@ inline void L1Algo::f32( // input // TODO not updated after gaps introduction
 
     T3.SetOneEntry(i3_4, T,i3_4);
   }//i3
-}
+} // f32
 
 
           /// Select triplets. Save them into vTriplets.
@@ -1010,7 +1010,7 @@ inline void L1Algo::DupletsStaPort(  // input
 
 //         cout << "Run f11" << endl;
 
-        f11(istal,
+        f11(istal, istam,
             n1_V,
 
             u_front, u_back, zPos,
@@ -1215,7 +1215,7 @@ inline void L1Algo::TripletsStaPort(  // input
         f30(  // input
             vStsHits_r, NHits_r, stam, star,
 
-            istar, n1,
+            istam, istar, n1,
             vStsHits_m,
             T_1, fld_1,
             hitsl_1,
@@ -2255,9 +2255,9 @@ void L1Algo::CATrackFinder()
           fldG_g1,
           hitslG_g1,
 
-          n_g2, portionStopIndex,
-          i1_g2,
-          hitsm_g2,
+          nG_g2, portionStopIndex,
+          i1G_g2,
+          hitsmG_g2,
 
           DupletsG_start, DupletsG_hits,
           Duplets_start, Duplets_hits,
@@ -2475,7 +2475,7 @@ void L1Algo::CATrackFinder()
 
           int ndf = best_L*2-5;
           best_chi2 = best_chi2/ndf; //normalize
-          if (best_chi2 > TRACK_CHI2_CUT) continue; // TODO make agreement with similar check in the CAFindTracks()
+          if (best_chi2 > TRACK_CHI2_CUT) continue;
           
           // BranchExtender(best_tr);
           // best_L = best_tr.StsHits.size();

@@ -61,7 +61,9 @@ CbmRichDielectronTask::CbmRichDielectronTask(const char *name, const char *title
 : FairTask(name)
 {
     fEvents = 0;
+    fUseRich = true;
     fUseTrd = true;
+    fUseTof = true;
 }
 
 CbmRichDielectronTask::~CbmRichDielectronTask()
@@ -85,34 +87,36 @@ InitStatus CbmRichDielectronTask::Init()
 		return kERROR;
 	}
 
-	fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
-	if ( !fRichHits) {
-		cout << "-W- CbmRichDielectronTask::Init: No RichHit array!" << endl;
-	}
+	if (fUseRich == true){
+		fRichHits = (TClonesArray*) ioman->GetObject("RichHit");
+		if ( !fRichHits) {
+			cout << "-W- CbmRichDielectronTask::Init: No RichHit array!" << endl;
+		}
 
-	fRichRings = (TClonesArray*) ioman->GetObject("RichRing");
-	if ( !fRichRings) {
-		cout << "-E- CbmRichDielectronTask::Init: No RichRing array!" << endl;
-		return kERROR;
-	}
+		fRichRings = (TClonesArray*) ioman->GetObject("RichRing");
+		if ( !fRichRings) {
+			cout << "-E- CbmRichDielectronTask::Init: No RichRing array!" << endl;
+			return kERROR;
+		}
 
-	fRichPoints = (TClonesArray*) ioman->GetObject("RichPoint");
-	if ( !fRichPoints) {
-		cout << "-E- CbmRichDielectronTask::Init: No RichPoint array!" << endl;
-		return kERROR;
-	}
+		fRichPoints = (TClonesArray*) ioman->GetObject("RichPoint");
+		if ( !fRichPoints) {
+			cout << "-E- CbmRichDielectronTask::Init: No RichPoint array!" << endl;
+			return kERROR;
+		}
 
-	fRichRingMatches = (TClonesArray*) ioman->GetObject("RichRingMatch");
-	if ( !fRichRingMatches) {
-		cout << "-E- CbmRichDielectronTask::Init: No RichRingMatch array!" << endl;
-		return kERROR;
-	}
+		fRichRingMatches = (TClonesArray*) ioman->GetObject("RichRingMatch");
+		if ( !fRichRingMatches) {
+			cout << "-E- CbmRichDielectronTask::Init: No RichRingMatch array!" << endl;
+			return kERROR;
+		}
 
-	fRichProj = (TClonesArray*) ioman->GetObject("RichProjection");
-	if ( !fRichProj) {
-		cout << "-E- CbmRichDielectronTask::Init: No RichProjection array!" << endl;
-		return kERROR;
-	}
+		fRichProj = (TClonesArray*) ioman->GetObject("RichProjection");
+		if ( !fRichProj) {
+			cout << "-E- CbmRichDielectronTask::Init: No RichProjection array!" << endl;
+			return kERROR;
+		}
+	}//fUseRich
 
 	fStsTrackMatches = (TClonesArray*) ioman->GetObject("StsTrackMatch");
 	if ( !fStsTrackMatches) {
@@ -157,17 +161,20 @@ InitStatus CbmRichDielectronTask::Init()
 		}
 	}//fUseTrd
 
-	fTofPoints = (TClonesArray*) ioman->GetObject("TofPoint");
-	if ( !fTofPoints) {
-		cout << "-W- CbmRichDielectronTask::Init: No TOFPoint array!" << endl;
-		return kERROR;
-	}
 
-	fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
-	if ( !fTofHits) {
-		cout << "-W- CbmRichDielectronTask::Init: No TOFHit array!" << endl;
-		return kERROR;
-	}
+	if (fUseTof == true){
+		fTofPoints = (TClonesArray*) ioman->GetObject("TofPoint");
+		if ( !fTofPoints) {
+			cout << "-W- CbmRichDielectronTask::Init: No TOFPoint array!" << endl;
+			return kERROR;
+		}
+
+		fTofHits = (TClonesArray*) ioman->GetObject("TofHit");
+		if ( !fTofHits) {
+			cout << "-W- CbmRichDielectronTask::Init: No TOFHit array!" << endl;
+			return kERROR;
+		}
+	}//fUseTof
 
     fPrimVertex = (CbmVertex*) ioman->GetObject("PrimaryVertex");
     if (! fPrimVertex) {

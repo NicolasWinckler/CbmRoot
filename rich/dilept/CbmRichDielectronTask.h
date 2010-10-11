@@ -90,14 +90,19 @@ private:
 
     Int_t fEvents;
 
+    Bool_t fUseRich;
     Bool_t fUseTrd;
+    Bool_t fUseTof;
+
 
     Double_t fWeight;
 
     void CreateHistogramms();
 
 public:
+    void SetUseRich(Bool_t use){fUseRich = use;};
     void SetUseTrd(Bool_t use){fUseTrd = use;};
+    void SetUseTof(Bool_t use){fUseTof = use;};
 };
 
 #endif

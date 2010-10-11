@@ -7,7 +7,7 @@
 
 #include "CbmRichRingFinderHoughImpl.h"
 //#include "../L1/L1Algo/L1Types.h"
-#include "../L1/L1Algo/vectors/P4_F32vec4.h"
+//#include "../L1/L1Algo/vectors/P4_F32vec4.h"
 
 class CbmRichHoughHitVec {
 public:

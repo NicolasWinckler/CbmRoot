@@ -10,6 +10,7 @@ ${CBMROOT_SOURCE_DIR}/rich/finder
 ${CBMROOT_SOURCE_DIR}/rich/qa
 ${CBMROOT_SOURCE_DIR}/rich/tracks
 ${CBMROOT_SOURCE_DIR}/rich/selection
+${CBMROOT_SOURCE_DIR}/rich/dilept
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 

@@ -6,11 +6,11 @@
 #include "FairField.h"
 #include "FairGeanePro.h"
 
-//#include "TMatrixD.h"
+#include "TMatrixD.h"
 
 #include <vector>
 
-class TMatrixD;
+//class TMatrixD;
 
 class CbmPropagatorGeane: public CbmPropagator {
 public:

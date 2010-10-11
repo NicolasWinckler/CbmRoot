@@ -84,7 +84,10 @@ void dilep_run_analysis(Int_t nEvents = 700)
 //     task->SetPi0cut(0.2);      // pi0-Dalitz reconstruction
 //     task->SetCoutBunch(coutBunch);
 
+     task->SetUseRich(false);
      task->SetUseTrd(false);
+     task->SetUseTof(false);
+
      fRun->AddTask(task);
 
 

@@ -50,6 +50,8 @@
 #pragma link C++ class  CbmRichRingTrackAssignIdeal+;
 #pragma link C++ class  CbmRichAssignTrack+;
 
+
+#pragma link C++ class  CbmRichDielectronTask+;
 //#pragma link C++ class LhcbRingFinder;
 
 #endif

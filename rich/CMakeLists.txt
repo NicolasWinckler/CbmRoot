@@ -87,6 +87,7 @@ qa/CbmRichElectronsQa.cxx
 selection/CbmRichRingSelectImpl.cxx
 selection/CbmRichRingSelectNeuralNet.cxx  
 selection/NNfunction.cxx 
+dilept/CbmRichDielectronTask.cxx
 #LhcbRingFinder.cxx  
 )
 
@@ -132,6 +133,7 @@ qa/CbmRichGeoTest.h
 qa/CbmRichRingFitterQa.h 
 qa/CbmRichElectronsQa.h
 #qa/CbmRichParallelQa.h  
+dilept/CbmRichDielectronTask.h
 #LhcbRingFinder.h  
 )
 

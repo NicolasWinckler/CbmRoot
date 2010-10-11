@@ -13,14 +13,15 @@ void cbmlibs()
 	  gSystem->Load("libField");
 	  gSystem->Load("libGen");
 	  gSystem->Load("libPassive");
-	  gSystem->Load("libMvd");
+	  gSystem->Load("libEcal");
 	  gSystem->Load("libSts");
+	  gSystem->Load("libKF");
+	  gSystem->Load("libMvd");
+
 	  gSystem->Load("libRich");
 	  gSystem->Load("libTrd");
 	  gSystem->Load("libTof");
-	  gSystem->Load("libEcal");
 	  gSystem->Load("libGlobal");
-	  gSystem->Load("libKF");
 	  gSystem->Load("libL1");
 	  gSystem->Load("libLittrack");
 

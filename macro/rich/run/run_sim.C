@@ -21,6 +21,10 @@ void run_sim(Int_t nEvents = 700)
 	TString plutoFile = "";
 	TString plutoParticle = "";
 
+	// -----   Magnetic field   -----------------------------------------------
+	Double_t fieldZ     = 50.;             // field centre z position
+	Double_t fieldScale =  0.7;             // field scaling factor
+
 	if (script != "yes") {
 		inFile = "/d/cbm02/slebedev/urqmd/auau/25gev/centr/urqmd.auau.25gev.centr.0007.ftn14";
 		parFile = "/d/cbm02/slebedev/rich/JUL09/auau.25gev.centr.0000.params.root";
@@ -71,11 +75,8 @@ void run_sim(Int_t nEvents = 700)
 		pluto = TString(gSystem->Getenv("PLUTO"));
 		plutoFile = TString(gSystem->Getenv("PLUTOFILE"));
 		plutoParticle = TString(gSystem->Getenv("PLUTOPARTICLE"));
+		fieldScale = TString(gSystem->Getenv("FIELDMAPSCALE")).Atof();
 	}
-
-	// -----   Magnetic field   -----------------------------------------------
-	Double_t fieldZ     = 50.;             // field centre z position
-	Double_t fieldScale =  0.7;             // field scaling factor
 
 	gDebug = 0;
 	TStopwatch timer;

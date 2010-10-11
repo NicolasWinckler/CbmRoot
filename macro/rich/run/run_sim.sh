@@ -41,7 +41,8 @@ export PLUTO=yes
     export ECALGEOM=
     export FIELDMAP=field_electron_standard
     export MAGNETGEOM=magnet_electron_standard.geo
-
+	export FIELDMAPSCALE=0.7
+	
 #number of events for each thread
 export NEVENTS=500
 

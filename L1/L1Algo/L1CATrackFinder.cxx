@@ -154,7 +154,7 @@ inline void L1Algo::f11(  // input
 
     T.chi2 = 0.;
     T.NDF = 2.;
-    if( isec == kAllSecIter) T.NDF = 0;
+    if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) T.NDF = 0;
     T.x  = xl;
     T.y  = yl;
     T.tx = tx;
@@ -185,7 +185,7 @@ inline void L1Algo::f11(  // input
 
     T.chi2 = 0.;
     T.NDF = 2.;
-    if( isec == kAllSecIter) T.NDF = 0;
+    if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) T.NDF = 0;
     T.x  = targX;
     T.y  = targY;
     T.tx = tx;
@@ -832,8 +832,8 @@ inline void L1Algo::f5(  // input
 
   for  (int istal = NStations - 4; istal >= 0; istal--){
     for (int tripType = 0; tripType < 3; tripType++) { // tT = 0 - 123triplet, tT = 1 - 124triplet, tT = 2 - 134triplet
-      if ( ( ((isec != kFastPrimJumpIter) && (isec != kAllPrimJumpIter)) && (tripType != 0)          ) ||
-           ( ((isec == kFastPrimJumpIter) || (isec == kAllPrimJumpIter)) && (istal == NStations - 4) )
+      if ( ( ((isec != kFastPrimJumpIter) && (isec != kAllPrimJumpIter) && (isec != kAllSecJumpIter)) && (tripType != 0)          ) ||
+           ( ((isec == kFastPrimJumpIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecJumpIter)) && (istal == NStations - 4) )
         ) continue;
 
       int istam = istal + 1;
@@ -1918,17 +1918,16 @@ void L1Algo::CATrackFinder()
     Pick_m = 2.0; // coefficient for size of region on middle station for add middle hits in triplets: Dx = Pick*sigma_x Dy = Pick*sigma_y
     Pick_r = 4.0; // coefficient for size of region on right  station for add right  hits in triplets
     Pick_gather = 3.0; // coefficient for size of region for attach new hits to the created track
-    if (isec == kAllSecIter){ // it's hard to estimate errors correctly for slow tracks & w\o target!
+    if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ){ // it's hard to estimate errors correctly for slow tracks & w\o target!
       Pick_m =  3.0;
     }
-    if ( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) )
+    if ( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
       Pick_gather = 4.0;
 
     PickNeighbour = 1.0; // (PickNeighbour < dp/dp_error)  =>  triplets are neighbours
 
     MaxInvMom = 1.0/0.5;                     // max considered q/p
-    if ( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) ) MaxInvMom =  1.0/0.1;
-
+    if ( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) MaxInvMom =  1.0/0.1;
       // define the target
     targX = 0; targY = 0; targZ = 0;      //  suppose, what target will be at (0,0,0)
     
@@ -1940,7 +1939,7 @@ void L1Algo::CATrackFinder()
       else
         SigmaTargetX = SigmaTargetY = 0.1;
     }
-    if (isec == kAllSecIter) { //use outer radius of the 1st station as a constraint
+    if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) { //use outer radius of the 1st station as a constraint
       L1Station &st = vStations[0];
       SigmaTargetX = SigmaTargetY = 3;//st.Rmax[0];
       targZ = 0.;//-1.;
@@ -2117,7 +2116,7 @@ void L1Algo::CATrackFinder()
                       );
     }// lstations
 
-    if ( (isec == kFastPrimJumpIter) || (isec == kAllPrimJumpIter) ) {
+    if ( (isec == kFastPrimJumpIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecJumpIter) ) {
       for (int istal = NStations-3; istal >= FIRSTCASTATION; istal--){//  //start downstream chambers
         DupletsStaPort(  // input
                       istal, istal + 2,
@@ -2225,7 +2224,7 @@ void L1Algo::CATrackFinder()
         TripStartIndexH, TripStopIndexH
         );
     }// l-stations
-    if ( (isec == kFastPrimJumpIter) || (isec == kAllPrimJumpIter) ) {
+    if ( (isec == kFastPrimJumpIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecJumpIter) ) {
       for (int istal = NStations-3; istal >= FIRSTCASTATION; istal--){//  //start downstream chambers
         TripletsStaPort(  // input
           istal, istal + 1,  istal + 3,
@@ -2412,7 +2411,8 @@ void L1Algo::CATrackFinder()
     TStopwatch c_time_fit;
 #endif
     int min_level = 0; // min level for start triplet. So min track length = min_level+3.
-    if (isec == kAllSecIter) min_level = 2; // only the long low momentum tracks
+//    if (isec == kFastPrimJumpIter) min_level = 1;
+    if ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) min_level = 2; // only the long low momentum tracks
 //    if (isec == -1) min_level = NStations-3 - 3; //only the longest tracks
 
       // collect consequtive: the longest tracks, shorter, more shorter and so on
@@ -2428,7 +2428,8 @@ void L1Algo::CATrackFinder()
 
       for( int istaF = 0; istaF <= NStations-3-ilev; istaF++ ){ // choose first track-station
 
-        if( (isec == kAllSecIter) && (istaF >= 4) ) break; // ghost supression !!!
+        if( ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) &&
+            ( istaF >= 4 ) ) break; // ghost supression !!!
 
         int trip_first = TripStartIndex[istaF];
         int trip_end   = TripStopIndex[istaF];
@@ -2436,9 +2437,9 @@ void L1Algo::CATrackFinder()
           L1Triplet *first_trip = &vTriplets[itrip];
 
 #ifndef FIND_GAPED_TRACKS
-          if( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) ) {
+          if( /*(isec == kFastPrimIter) ||*/ (isec == kAllPrimIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) {
 #else
-          if( (isec == kFastPrimIter) || (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) ) {
+          if( (isec == kFastPrimIter) /*|| (isec == kFastPrimJumpIter)*/ || (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) {
 #endif
             if ( first_trip->GetLevel() == 0 ) continue; // ghost suppression // find track with 3 hits only if it was created from a chain of triplets, but not from only one triplet
             if ( first_trip->GetLevel() < ilev ) continue; // try only triplets, which can start track with ilev+3 length. w\o it have more ghosts, but efficiency either
@@ -2461,7 +2462,7 @@ void L1Algo::CATrackFinder()
           int NCalls = 1;
           CAFindTrack(istaF, best_tr, best_L, best_chi2, curr_trip, curr_tr, curr_L, curr_chi2, NCalls);
 
-          // if( (isec == kAllSecIter) &&
+          // if( ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) &&
           //     (GetFStation((*vStsHitsUnused)[best_tr.StsHits[0]].f ) >= 4) ) break; // ghost supression
           
           // {
@@ -2480,12 +2481,12 @@ void L1Algo::CATrackFinder()
           // BranchExtender(best_tr);
           // best_L = best_tr.StsHits.size();
 
-//          if( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) )
+//          if( (isec == kAllPrimIter) || (isec == kAllPrimJumpIter) || (isec == kAllSecIter) || (isec == kAllSecJumpIter) )
             if( fGhostSuppression ){
               if( best_L == 3 ){
                   // if( isec == kAllSecIter ) continue; // too /*short*/ secondary track
-                if( (isec == kAllSecIter) && (istaF != 0) ) continue; // too /*short*/ non-MAPS track
-                if( (isec != kAllSecIter) && (best_chi2 > 5.0) ) continue;
+                if( ( (isec == kAllSecIter) || (isec == kAllSecJumpIter) ) && (istaF != 0) ) continue; // too /*short*/ non-MAPS track
+                if( (isec != kAllSecIter) && (isec != kAllSecJumpIter) && (best_chi2 > 5.0) ) continue;
               }
             }
 

@@ -89,6 +89,7 @@ for Z in 1 2 3 4; do
 	  fi	  
 
 	 # . ./sim.sh
+	 #xterm -hold -e ". ./sim.sh $number"&
 	  bsub -q batch -J mc.$Z.$XXXX.run -o $DIR/log/$XXXX.log -N sh ./sim.sh
 	 done
 	done

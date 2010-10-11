@@ -49,42 +49,42 @@ void dilep_run_analysis(Int_t nEvents = 700)
 	TString plutoParticle = TString(gSystem->Getenv("PLUTOPARTICLE"));
 
      // create and add task
-     CbmDielectronTask *task = new CbmDielectronTask("name", "title");
-     // weight rho0 = Multiplicity * Branching Ratio = 23 * 4.7e-5 for 25 AGeV beam energy
-    // task->SetWeight(0.0012432); // BR = 5.4e-5
-    // weight rho0 = Multiplicity * Branching Ratio = 9 * 4.7e-5 for 10 AGeV beam energy
-     if (plutoParticle == "rho0") task->SetWeight(0.000423);
-
-   // weight omega = Multiplicity * Branching Ratio = 19 * 7.07e-5 for 10 AGeV beam energy
-     if (plutoParticle == "omegaepem" ) task->SetWeight(0.0013433);
-
-     // weight omega = Multiplicity * Branching Ratio = 19 * 5.9e-4 for 10 AGeV beam energy
-     if (plutoParticle == "omegadalitz") task->SetWeight(0.01121);
-
-     // weight phi = Multiplicity * Branching Ratio = 0.12 * 3.09e-4 for 10 AGeV beam energy
-     if (plutoParticle == "phi") task->SetWeight(0.00003708);
+     CbmRichDielectronTask *task = new CbmRichDielectronTask("name", "title");
+//    // weight rho0 = Multiplicity * Branching Ratio = 9 * 4.7e-5 for 10 AGeV beam energy
+//     if (plutoParticle == "rho0") task->SetWeight(0.000423);
+//
+//   // weight omega = Multiplicity * Branching Ratio = 19 * 7.07e-5 for 10 AGeV beam energy
+//     if (plutoParticle == "omegaepem" ) task->SetWeight(0.0013433);
+//
+//     // weight omega = Multiplicity * Branching Ratio = 19 * 5.9e-4 for 10 AGeV beam energy
+//     if (plutoParticle == "omegadalitz") task->SetWeight(0.01121);
+//
+//     // weight phi = Multiplicity * Branching Ratio = 0.12 * 3.09e-4 for 10 AGeV beam energy
+//     if (plutoParticle == "phi") task->SetWeight(0.00003708);
 
      // electron ID cuts
-     task->SetRichAnnCut(-0.5);
-     task->SetUseRichAnn(true);
-     task->SetRichMom(5.5);
-     task->SetRichDist(1.);          // if 0. momentum dependent cut will be used
-     task->SetRichAxisAmean(4.95);
-     task->SetRichAxisAsigma(0.30);
-     task->SetRichAxisBmean(4.54);
-     task->SetRichAxisBsigma(0.22);
-     task->SetRichCoeff(3.5);        // +-3.5 * sigma cut
-     task->SetTrdEloss(0.05);
-     task->SetTrdAnn(0.8);
-     task->SetTofM2(0.);             // if 0. momentum dependent cut will be used
-     // di-electron analysis cuts
-     task->SetGcut(0.03);       // Gamma conversion cut (GeV/c^2)
-     task->Set2Dpcut(1.5);       // Sqrt(momentum) of closest neighbour (GeV/c)
-     task->Set2Dtcut(1.5);       // Opening angle of closest neighbour (deg)
-     task->SetPtcut(0.25);       // Transverse momentum of the identified tracks (GeV/c)
-     task->SetTcut(2.);         // Opening angle (deg)
-     task->SetPi0cut(0.2);      // pi0-Dalitz reconstruction
-     task->SetCoutBunch(coutBunch);
+//     task->SetRichAnnCut(-0.5);
+//     task->SetUseRichAnn(true);
+//     task->SetRichMom(5.5);
+//     task->SetRichDist(1.);          // if 0. momentum dependent cut will be used
+//     task->SetRichAxisAmean(4.95);
+//     task->SetRichAxisAsigma(0.30);
+//     task->SetRichAxisBmean(4.54);
+//     task->SetRichAxisBsigma(0.22);
+//     task->SetRichCoeff(3.5);        // +-3.5 * sigma cut
+//     task->SetTrdEloss(0.05);
+//     task->SetTrdAnn(0.8);
+//     task->SetTofM2(0.);             // if 0. momentum dependent cut will be used
+//     // di-electron analysis cuts
+//     task->SetGcut(0.03);       // Gamma conversion cut (GeV/c^2)
+//     task->Set2Dpcut(1.5);       // Sqrt(momentum) of closest neighbour (GeV/c)
+//     task->Set2Dtcut(1.5);       // Opening angle of closest neighbour (deg)
+//     task->SetPtcut(0.25);       // Transverse momentum of the identified tracks (GeV/c)
+//     task->SetTcut(2.);         // Opening angle (deg)
+//     task->SetPi0cut(0.2);      // pi0-Dalitz reconstruction
+//     task->SetCoutBunch(coutBunch);
+
+     task->SetUseTrd(false);
      fRun->AddTask(task);
 
 

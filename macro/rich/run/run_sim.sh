@@ -45,7 +45,7 @@ export PLUTO=yes
 #number of events for each thread
 export NEVENTS=500
 
-for Z in 1 2 3 4; do
+for Z in 1; do
 	if [ $Z = "1" ] ; then 
 		export PLUTOPARTICLE=rho0 
 		export DIR=/lustre/cbm/user/slebedev/rho0
@@ -63,8 +63,8 @@ for Z in 1 2 3 4; do
 		export DIR=/lustre/cbm/user/slebedev/phi
 	fi
 	
-	for Y in 0 1 2 3 4 5 6 7 8 9; do
-	 for X in 0 1 2 3 4 5 6 7 8 9; do
+	for Y in 0; do
+	 for X in 0; do
 	  XXXX=00$Y$X
 	  echo batch $XXXX submitted
 	  export INFILE=/d/cbm03/urqmd/auau/10gev/centr/urqmd.AuAu.10gev.centr.$XXXX.ftn14
@@ -88,9 +88,9 @@ for Z in 1 2 3 4; do
 		  export PLUTOFILE=/d/cbm05/galatyuk/pluto/auau/10gev/phi/epem/pluto.auau.10gev.phi.epem.10k.$XXXX.root
 	  fi	  
 
-	 # . ./sim.sh
+	  . ./sim.sh
 	 #xterm -hold -e ". ./sim.sh $number"&
-	  bsub -q batch -J mc.$Z.$XXXX.run -o $DIR/log/$XXXX.log -N sh ./sim.sh
+	  #bsub -q batch -J mc.$Z.$XXXX.run -o $DIR/log/$XXXX.log -N sh ./sim.sh
 	 done
 	done
 done

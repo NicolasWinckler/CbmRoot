@@ -158,6 +158,8 @@ class CbmTrdClusterizer : public FairTask {
 
   void GetPadSizeMatrix(MyPoint *point, Double_t* H, Double_t* W, Double_t* padH, Double_t* padW);
 
+  Double_t fRound(Double_t value);
+
   //void TransformMod2Pad(Double_t* MCoordinate, Double_t* PCoordinate, Double_t* StrucDim);
  
   Int_t Digicounter;
@@ -173,8 +175,8 @@ class CbmTrdClusterizer : public FairTask {
 
   static const Int_t accuracy = 1;// '1/accuracy' integration step width [mm]
   static const Int_t Accuracy = 1000; // fMathieson array accuracy in values per mm
-  static const Int_t fPadNrX = 13;//7; // has to be odd
-  static const Int_t fPadNrY = 3;//5; // has to be odd
+  static const Int_t fPadNrX = 15;//7; // has to be odd
+  static const Int_t fPadNrY = 5;//5; // has to be odd
   static const Int_t fNoSectors = 3;
   static const Int_t endOfMathiesonArray = 35; //+- mm
   Double_t fMathieson[endOfMathiesonArray * 1000];//endOfMathiesonArray * Accuracy

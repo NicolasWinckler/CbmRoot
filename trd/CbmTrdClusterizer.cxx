@@ -171,11 +171,12 @@ void CbmTrdClusterizer::Exec(Option_t * option)
     
   for (int j = 0; j < nEntries ; j++ ) 
     {
+      /*
       if (int(j * 10 / float(nEntries)) - int((j-1) * 10 / float(nEntries)) == 1)
 	{
 	  printf("   %3d \n",(int)(j * 100 / float(nEntries)));
 	}
-
+      */
       // if random value above fEfficency reject point
       if (gRandom->Rndm() > fEfficiency ) continue;
  
@@ -747,6 +748,20 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
   point->clusterPosLL[1] = nextWirePos;
 }
     // --------------------------------------------------------------------
+
+Double_t fRound(Double_t value) 
+{
+  Double_t rounded;
+  if(value > 0) {
+    rounded = Int_t(value + 0.5);
+  }
+  else {
+    rounded = Int_t(value - 0.5);
+  }
+
+  return rounded;
+}
+// --------------------------------------------------------------------
 void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
 {
   //CalcMathieson(x_mean, y_mean, SliceELoss, W ,H);
@@ -758,53 +773,76 @@ void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, 
 
   for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) {
     for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
-      fPadCharge[iPadRow][iPadCol] = 0.0;
+      fPadCharge[iPadRow][iPadCol] = Q;
     }
   }
 
   Int_t xStep = 0;
-  Float_t xPosP = x_mean;
-  Float_t xPosN = x_mean;
-  Float_t yPosP = y_mean;
-  Float_t yPosN = y_mean;
+  /*
+    Float_t xDelta = fRound(x_mean) + 0.5;
+    Float_t yDelta = fRound(y_mean) + 0.5;
+  */
+
+
+  Float_t xPosP = x_mean + 0.5;
+  Float_t xPosN = x_mean - 0.5;
+  Float_t yPosP = y_mean + 0.5;
+  Float_t yPosN = y_mean - 0.5;
   Int_t iPadColP = Int_t(fPadNrX/2);
   Int_t iPadColN = Int_t(fPadNrX/2);
   Int_t iPadRowP = Int_t(fPadNrY/2);
   Int_t iPadRowN = Int_t(fPadNrY/2);
-  for (Int_t yStep = 0; yStep < endOfMathiesonArray-1; yStep++) { //y
+  Float_t xNextPadP =  0.5 * W[iPadColP];
+  Float_t xNextPadN = -0.5 * W[iPadColN];
+  Float_t yNextPadP =  0.5 * H[iPadRowP];
+  Float_t yNextPadN = -0.5 * H[iPadRowN];
+
+  for (Int_t yStep = 0; yStep < endOfMathiesonArray; yStep++) { //y
     xStep = 0;
     iPadColN = Int_t(fPadNrX/2);
     iPadColP = Int_t(fPadNrX/2);
 
-    yPosP = y_mean + yStep;
-    yPosN = y_mean - yStep;
-    if (yPosP > (iPadRowP - Int_t(fPadNrY/2)) * H[iPadRowP] + 0.5 * H[Int_t(fPadNrY/2)]) {
+    xNextPadP =  0.5 * W[iPadColP];
+    xNextPadN = -0.5 * W[iPadColN];
+
+    yPosP = y_mean + 0.5 + yStep;
+    yPosN = y_mean - 0.5 - yStep;
+
+
+    if (yPosP > yNextPadP) {
       iPadRowP++;
+      yNextPadP += H[iPadRowP];
     }
-    if (yPosN < (iPadRowN - Int_t(fPadNrY/2)) * H[iPadRowN] - 0.5 * H[Int_t(fPadNrY/2)]) {
+    if (yPosN < yNextPadN) {
       iPadRowN--;
+      yNextPadN -= H[iPadRowN];
     }
-    r = sqrt(pow(xStep ,2) + pow(yStep ,2));
+
+    r = sqrt(pow(xStep + 0.5 ,2) + pow(yStep + 0.5 ,2));
  
-    while (Int_t(r * Accuracy) < endOfMathiesonArray * Accuracy 
-	   && iPadColP < fPadNrX 
-	   && iPadColN >= 0 ) { //x
-      xPosP = x_mean + xStep;
-      xPosN = x_mean - xStep;
-      if (xPosP > (iPadColP - Int_t(fPadNrX/2)) * W[iPadColP] + 0.5 * W[Int_t(fPadNrX/2)]) {
+    while (Int_t(r * Accuracy) < endOfMathiesonArray * Accuracy + 2
+	   /*
+	     && iPadColP < fPadNrX 
+	     && iPadColN >= 0
+	   */ ) { //x
+      xPosP = x_mean + 0.5 + xStep;
+      xPosN = x_mean - 0.5 - xStep;
+      if (xPosP > xNextPadP) {
 	iPadColP++;
+	xNextPadP += W[iPadColP];
       }
-      if (xPosN < (iPadColN - Int_t(fPadNrX/2)) * W[iPadColN] - 0.5 * W[Int_t(fPadNrX/2)]) {
+      if (xPosN < xNextPadN) {
 	iPadColN--;
+	xNextPadN -= W[iPadColN];
       }
       /*
-	cout << "xStep:" << xStep << " yStep:" << yStep << endl;
-	cout << "     ColP:" << iPadColP << " ColN:" << iPadColN << endl;
-	cout << "     RowP:" << iPadRowP << " RowN:" << iPadRowN << endl;
-	cout << "    xPosP:" << xPosP << " xPosN:" << xPosN << " W:" << W[iPadColP] << endl;
-	cout << "    yPosP:" << yPosP << " yPosN:" << yPosN << " H:" << H[iPadRowP] << endl << endl;
+      cout << "xStep:" << xStep << " yStep:" << yStep << endl;
+      cout << "    xPosP:" << xPosP << "   nW:" << xNextPadP << "   W:" << W[iPadColP]  << "     ColP:" << iPadColP << endl;
+      cout << "    xPosN:" << xPosN << "   nW:" << xNextPadN << "   W:" << W[iPadColN]  << "     ColN:" << iPadColN << endl;
+      cout << "    yPosP:" << yPosP << "   nH:" << yNextPadP << "   H:" << H[iPadRowP]  << "     RowP:" << iPadRowP << endl;
+      cout << "    yPosN:" << yPosN << "   nH:" << yNextPadN << "   H:" << H[iPadRowN]  << "     RowN:" << iPadRowN << endl << endl;
       */
-      r = sqrt(pow(xStep ,2) + pow(yStep ,2));
+      r = sqrt(pow(xStep + 0.5 ,2) + pow(yStep + 0.5 ,2));
       if (Int_t(r * Accuracy) + 2 < endOfMathiesonArray * Accuracy) {
 	rMin = Int_t(r * Accuracy);
 	rMax = rMin+1;
@@ -815,14 +853,16 @@ void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, 
 	  fPadCharge[iPadRowP][iPadColP] += Q;
 	}
 	if (yPosP != yPosN) {
-	  if (iPadRowP < fPadNrY && iPadColN > 0) {
-	    fPadCharge[iPadRowP][iPadColN] += Q;
-	  }
-	  if (iPadRowN > 0 && iPadColP < fPadNrX) {
-	    fPadCharge[iPadRowN][iPadColP] += Q;
-	  }
-	  if (iPadRowN > 0 && iPadColN > 0) {
-	    fPadCharge[iPadRowN][iPadColN] += Q;
+	  if (xPosP != xPosN) {
+	    if (iPadRowP < fPadNrY && iPadColN >= 0) {
+	      fPadCharge[iPadRowP][iPadColN] += Q;
+	    }
+	    if (iPadRowN >= 0 && iPadColP < fPadNrX) {
+	      fPadCharge[iPadRowN][iPadColP] += Q;
+	    }
+	    if (iPadRowN >= 0 && iPadColN >= 0) {
+	      fPadCharge[iPadRowN][iPadColN] += Q;
+	    }
 	  }
 	}
       }

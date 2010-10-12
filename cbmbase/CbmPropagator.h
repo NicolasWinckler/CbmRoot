@@ -7,6 +7,7 @@
 #define CBMPROPAGATOR_H_
 
 #include "TObject.h"
+#include "TMatrixD.h"
 
 #include "CbmStatusCode.h"
 
@@ -16,7 +17,7 @@
 
 class FairTrackParam;
 
-class TMatrixD;
+//class TMatrixD;
 
 class CbmPropagator : public TObject {
 public:

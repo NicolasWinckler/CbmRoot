@@ -147,7 +147,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 {
   Bool_t lookup = true;
   cout << "================CbmTrdClusterizer=====================" << endl;
-   Digicounter = 0;
+  Digicounter = 0;
   CbmTrdPoint *pt=NULL;
   MyPoint* point = new MyPoint;
 
@@ -179,9 +179,9 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   for (int j = 0; j < nEntries ; j++ ) 
     {
       /*
-      if (int(j * 10 / float(nEntries)) - int((j-1) * 10 / float(nEntries)) == 1)
+	if (int(j * 10 / float(nEntries)) - int((j-1) * 10 / float(nEntries)) == 1)
 	{
-	  printf("   %3d \n",(int)(j * 100 / float(nEntries)));
+	printf("   %3d \n",(int)(j * 100 / float(nEntries)));
 	}
       */
       // if random value above fEfficency reject point
@@ -382,10 +382,13 @@ void CbmTrdClusterizer::Exec(Option_t * option)
     if (fDigiMapIt->second->GetDetId() == 111003) {
       cout<<"Add ModID 111003 to TClonesArray"<<endl;
     }
+    /*
+      new ((*fDigiCollection)[iDigi]) CbmTrdDigi(fDigiMapIt->second->GetDetId(), fDigiMapIt->second->GetCol(), fDigiMapIt->second->GetRow(), fDigiMapIt->second->GetCharge(),fDigiMapIt->second->GetTime(), fDigiMapIt->second->GetFirstMCIndex());
+      ;
+    */
+    new ((*fDigiCollection)[iDigi]) CbmTrdDigi();
+    (*fDigiCollection)[iDigi] = fDigiMapIt->second;
 
-    new ((*fDigiCollection)[iDigi]) CbmTrdDigi(fDigiMapIt->second->GetDetId(), fDigiMapIt->second->GetCol(), fDigiMapIt->second->GetRow(), fDigiMapIt->second->GetCharge(),fDigiMapIt->second->GetTime());
-    ;
-    
     CbmTrdDigiMatch *p = new ((*fDigiMatchCollection)[iDigi]) CbmTrdDigiMatch(); 
     std::vector<int> arr=fDigiMapIt->second->GetMCIndex();
     std::vector<int>::iterator it;
@@ -722,7 +725,7 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t lookup, const Int_t pointID, MyPo
 	  if (PadChargeModule[iRow * fModuleParaMap[fModuleID]->nCol + iCol] > 0)
 	    {	      
 	      Digicounter++;
-	      AddDigi(/*j*/Digicounter, iCol, iRow, fModuleParaMap[fModuleID]->nCol, fModuleParaMap[fModuleID]->nRow, Double_t(PadChargeModule[iRow * fModuleParaMap[fModuleID]->nCol + iCol]));
+	      AddDigi(j/*Digicounter*/, iCol, iRow, fModuleParaMap[fModuleID]->nCol, fModuleParaMap[fModuleID]->nRow, Double_t(PadChargeModule[iRow * fModuleParaMap[fModuleID]->nCol + iCol]));
 
 	    }
 	}
@@ -1265,64 +1268,68 @@ void CbmTrdClusterizer::CalcMathieson(Double_t x_mean, Double_t y_mean, Double_t
   // ------AddDigi--------------------------------------------------------------
 
   //void CbmTrdClusterizer::AddDigi() 
-  void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Int_t nCol, Int_t nRow, Double_t iCharge) 
-  {
-    //cout << "AddDigi" << endl;
-    // Add digi for pixel(x,y) in module to map for intermediate storage
-    // In case the pixel for this pixel/module combination does not exists
-    // it is added to the map.
-    // In case it exists already the information about another hit in this
-    // pixel is added. Also the additional energy loss is added to the pixel.
+void CbmTrdClusterizer::AddDigi(const Int_t pointID, Int_t iCol, Int_t iRow, Int_t nCol, Int_t nRow, Double_t iCharge) 
+{
+  //cout << "AddDigi" << endl;
+  // Add digi for pixel(x,y) in module to map for intermediate storage
+  // In case the pixel for this pixel/module combination does not exists
+  // it is added to the map.
+  // In case it exists already the information about another hit in this
+  // pixel is added. Also the additional energy loss is added to the pixel.
 
   
-    // Look for pixel in charge map
-    //pair<Int_t, Int_t> a(fCol_mean, fRow_mean);
-    Int_t temp;
-    pair<Int_t, Int_t> a;
-    if (fModuleParaMap[fModuleID]->Layer % 2 == 0)
-      {
-	//      pair<Int_t, Int_t> a(iRow, iCol);
-	/*
-	  a.first=iRow;
-	  a.second=iCol;
-	*/
-	temp = iCol;
-	iCol = fModuleParaMap[fModuleID]->nRow - (fModuleParaMap[fModuleID]->nRow - (iRow + 1) + 1);
-	iRow = fModuleParaMap[fModuleID]->nCol - (temp + 1);
-      }
-    else
-      {
-	//      pair<Int_t, Int_t> a(iCol, iRow);
-	/*
-	  a.first=iCol;
-	  a.second=iRow;
-	*/
-      }
-    a.first =iCol;
-    a.second=iRow;
-    pair<Int_t, pair<Int_t,Int_t> > b(fModuleID, a);
-    fDigiMapIt = fDigiMap.find(b);
-
-    //    cout<<"DetID: "<<fModuleID<<endl;
-
-    // Pixel not yet in map -> Add new pixel
-    if ( fDigiMapIt == fDigiMap.end() ) {
-      //  CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, fCol_mean, fRow_mean, fELoss, fMCindex);
-      fTime = 0.0;
-      CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, iCol, iRow, iCharge, fTime, pointID);
-      fDigiMap[b] = digi;
+  // Look for pixel in charge map
+  //pair<Int_t, Int_t> a(fCol_mean, fRow_mean);
+  Int_t temp;
+  pair<Int_t, Int_t> a;
+  if (fModuleParaMap[fModuleID]->Layer % 2 == 0)
+    {
+      //      pair<Int_t, Int_t> a(iRow, iCol);
+      /*
+	a.first=iRow;
+	a.second=iCol;
+      */
+      temp = iCol;
+      iCol = fModuleParaMap[fModuleID]->nRow - (fModuleParaMap[fModuleID]->nRow - (iRow + 1) + 1);
+      iRow = fModuleParaMap[fModuleID]->nCol - (temp + 1);
     }
-
-    // Pixel already in map -> Add charge
-    else {
-      CbmTrdDigi* digi = (CbmTrdDigi*)fDigiMapIt->second;
-      if ( ! digi ) Fatal("AddChargeToPixel", "Zero pointer in digi map!");
-      digi->AddCharge(iCharge);
-      digi->AddMCIndex(pointID);
-      //if( fTime > (digi->GetTime()) ) digi->SetTime(fTime);
+  else
+    {
+      //      pair<Int_t, Int_t> a(iCol, iRow);
+      /*
+	a.first=iCol;
+	a.second=iRow;
+      */
     }
-  
+  a.first =iCol;
+  a.second=iRow;
+  pair<Int_t, pair<Int_t,Int_t> > b(fModuleID, a);
+  fDigiMapIt = fDigiMap.find(b);
+
+  //    cout<<"DetID: "<<fModuleID<<endl;
+
+  // Pixel not yet in map -> Add new pixel
+  // cout << pointID << endl;
+  if ( fDigiMapIt == fDigiMap.end() ) {
+    //  CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, fCol_mean, fRow_mean, fELoss, fMCindex);
+    fTime = 0.0;
+    CbmTrdDigi* digi = new CbmTrdDigi(fModuleID, iCol, iRow, iCharge, fTime, pointID);
+
+    fDigiMap[b] = digi;
   }
+
+  // Pixel already in map -> Add charge
+  else {
+    CbmTrdDigi* digi = (CbmTrdDigi*)fDigiMapIt->second;
+    if ( ! digi ) Fatal("AddChargeToPixel", "Zero pointer in digi map!");
+    digi->AddCharge(iCharge);
+    if (digi->GetMCIndex().back() != pointID) { // avoid double pointIDs by SplitPathSlice()
+      digi->AddMCIndex(pointID);
+    }
+    //if( fTime > (digi->GetTime()) ) digi->SetTime(fTime);
+  }
+  
+}
 
   // ---- Register ------------------------------------------------------
   void CbmTrdClusterizer::Register()

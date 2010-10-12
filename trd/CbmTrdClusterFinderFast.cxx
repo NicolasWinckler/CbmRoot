@@ -113,7 +113,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
   }
   //optimization ist only usefull if rowClusters are merged !!!
   Float_t minimumChargeTH = 5e-03;
-  Float_t mChargeTH[57] = { 0.004,    0, 
+  Float_t mChargeTH[57] = { 0.003,    0, 
 			    1e-06, 2e-06, 3e-06, 4e-06, 5e-06, 6e-06, 7e-06, 8e-06, 9e-06,
 			    1e-05, 2e-05, 3e-05, 4e-05, 5e-05, 6e-05, 7e-05, 8e-05, 9e-05,
 			    1e-04, 2e-04, 3e-04, 4e-04, 5e-04, 6e-04, 7e-04, 8e-04, 9e-04,

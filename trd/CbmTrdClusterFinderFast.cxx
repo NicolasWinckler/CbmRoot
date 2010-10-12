@@ -178,6 +178,17 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
       for (Int_t iDigi=0; iDigi < nentries; iDigi++ ) {
 	CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(iDigi);
 	/*
+	//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+	Int_t size = digi->GetMCIndex().size();
+	std::vector<int> MCIndex = digi->GetMCIndex();
+	cout << size << ": ";
+	for (Int_t i = 0; i < size; i++) {
+	  cout << " ," << MCIndex[i];
+	}
+	cout << endl;
+	//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+	*/
+	/*
 	  if (digi->GetCharge() > minimumChargeTH)
 	  {
 	*/

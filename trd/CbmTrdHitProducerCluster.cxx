@@ -232,24 +232,24 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       */
      
       //cout << "      MaxID: " << qMaxIndex << "   MaxCharge: " << qMax << endl;
-    
-      //_______________Drawing_______________________ 
-      if (drawing) {
-	DrawHits();
-      }
-      //_______________Drawing_______________________ 
-      std::map<Int_t, MyHitList* >::iterator it;
-      for ( it = ModuleHitMap.begin(); it != ModuleHitMap.end(); it++)
-	{
-	  iHit += Int_t((*it).second->size());
-	}
-      Int_t nPoints = fTrdPoints->GetEntriesFast();
-      cout << " Found " << iHit << " Hits" << endl;
-      cout << "  " << Float_t(iHit*100./nPoints)<< "% MC-point to hit efficiency" << endl;
-      cout << "  " << fPrfSingleRecoCounter << " Hits are PRF based reconstructed in one dimension" << endl;
-      cout << "  " << fPrfDoubleRecoCounter << " Hits are PRF based reconstructed in both dimension" << endl;
-      cout << "   " << fSimpleRecoCounter << " Hits are 'position of pad with maximum charge' based reconstructed in both dimension" << endl;
     }
+  //_______________Drawing_______________________ 
+  if (drawing) {
+    DrawHits();
+  }
+  //_______________Drawing_______________________ 
+  std::map<Int_t, MyHitList* >::iterator it;
+  for ( it = ModuleHitMap.begin(); it != ModuleHitMap.end(); it++)
+    {
+      iHit += Int_t((*it).second->size());
+    }
+  Int_t nPoints = fTrdPoints->GetEntriesFast();
+  cout << " Found " << iHit << " Hits" << endl;
+  cout << "  " << Float_t(iHit*100./nPoints)<< "% MC-point to hit efficiency" << endl;
+  cout << "  " << fPrfSingleRecoCounter << " Hits are PRF based reconstructed in one dimension" << endl;
+  cout << "  " << fPrfDoubleRecoCounter << " Hits are PRF based reconstructed in both dimension" << endl;
+  cout << "   " << fSimpleRecoCounter << " Hits are 'position of pad with maximum charge' based reconstructed in both dimension" << endl;
+}
 
 
 
@@ -598,12 +598,32 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     //Bool_t mean = true;
     Bool_t drawMCPoints = false;
     //Bool_t drawMCPoints = true;
-    Bool_t drawDigis = false;
-    //Bool_t drawDigis = true;
+    //Bool_t drawDigis = false;
+    Bool_t drawDigis = true;
     Bool_t drawClusters = false;
     //Bool_t drawClusters = true;
     Bool_t drawHits = false;
     //Bool_t drawHits = true;
+    cout << "  Drawing ";
+    if(drawMCPoints) {
+      cout << "MC-Points ";
+      if(mean) {
+	cout << "mean, ";
+      }
+      else {
+	cout << "in and out, ";
+      }
+    }
+    if (drawDigis) {
+      cout << "Digis, ";
+    }
+    if (drawClusters) {
+      cout << "Clusters, ";
+    }
+    if (drawHits) {
+      cout << "Hits, ";
+    }
+    cout << endl;
     Int_t cs = 800;
     Int_t moduleId;
     //_____________MC Points_______________________________
@@ -809,7 +829,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     Int_t last = 0;
     if (drawDigis)
       {
-	printf("   Drawing Digis\n");  
+	//printf("   Drawing Digis\n");  
 	for ( it = ModuleDigiMap.begin(); it != ModuleDigiMap.end(); it++)
 	  {
 	    counter++;
@@ -873,7 +893,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       }
     if (drawClusters)
       {
-	printf("   Drawing Cluster\n");
+	//printf("   Drawing Cluster\n");
 	nEntries = Int_t(ModuleClusterMap.size());
 	counter = 0;
 	done = 0;
@@ -941,7 +961,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       }
     if (drawHits)
       {
-	printf("   Drawing Hits\n");
+	//printf("   Drawing Hits\n");
 	nEntries = Int_t(ModuleHitMap.size());
 	counter = 0;
 	done = 0;
@@ -1036,7 +1056,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       }
     if (drawMCPoints)
       {
-	printf("   Drawing MC-Points\n");
+	//printf("   Drawing MC-Points\n");
 	nEntries = Int_t(ModuleMCPointMap.size());
 	counter = 0;
 	done = 0;

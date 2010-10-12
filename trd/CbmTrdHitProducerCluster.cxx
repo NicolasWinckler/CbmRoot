@@ -198,6 +198,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   Int_t DigiCol;     //Column of the digi
   Float_t qMax;      //Maximum digi charge of the activ cluster
   Int_t qMaxIndex;   //Index of the digi containing the maximum charge of the activ cluster
+  Int_t NoMcPointsPerHit[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
   Int_t nCluster = fClusters->GetEntries(); // Number of clusters found by CbmTrdClusterFinderFast
   cout << " Found " << nCluster << " Cluster in Collection" << endl;
@@ -224,6 +225,25 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 	      qMaxIndex = DigiIndex;
 	    }
 	}
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+      CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxIndex);
+      Int_t size = digi->GetMCIndex().size();
+      Int_t MCs = size;
+      std::vector<int> MCIndex = digi->GetMCIndex();
+      //cout << size << ": ";
+      /*
+      for (Int_t i = 0; i < size; i++) {
+	CbmTrdDigi *d = (CbmTrdDigi*) fDigis->At(MCIndex[i]);
+	  if (d->GetCharge() < 0.001) {
+	    MCs--;
+	  }
+      }
+      */
+      if (size < 9) {
+	NoMcPointsPerHit[MCs]++;
+      }
+      //cout << endl;
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       GetModuleInfo(qMaxIndex/*, ModuleHitMap*/);
       /*
 	PrfReco(qMaxIndex, qMax);
@@ -243,12 +263,16 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     {
       iHit += Int_t((*it).second->size());
     }
+
   Int_t nPoints = fTrdPoints->GetEntriesFast();
-  cout << " Found " << iHit << " Hits" << endl;
-  cout << "  " << Float_t(iHit*100./nPoints)<< "% MC-point to hit efficiency" << endl;
+  cout << " Found " << iHit << " Hits" << endl << endl;
+  cout << "  " << iHit*100/Float_t(nPoints)<< "% MC-point to hit efficiency" << endl;
   cout << "  " << fPrfSingleRecoCounter << " Hits are PRF based reconstructed in one dimension" << endl;
   cout << "  " << fPrfDoubleRecoCounter << " Hits are PRF based reconstructed in both dimension" << endl;
-  cout << "   " << fSimpleRecoCounter << " Hits are 'position of pad with maximum charge' based reconstructed in both dimension" << endl;
+  cout << "   " << fSimpleRecoCounter << " Hits are 'position of pad with maximum charge' based reconstructed in both dimension" << endl << endl;
+  for (Int_t i = 0; i < 9; i++) {
+    cout << "  " << i << " MC-points per Hit: " << NoMcPointsPerHit[i] << " Hits  (" << NoMcPointsPerHit[i]*100/Float_t(iHit) << "%)" << endl;;
+  }
 }
 
 

@@ -127,7 +127,7 @@ class CbmTrdClusterizer : public FairTask {
 
   float GetFloatPositionY(Double_t tempPosY);
 
-  void SplitPathSlices(const Int_t pointID, MyPoint *point, Double_t* PadChargeModule, 
+  void SplitPathSlices(Bool_t lookup, const Int_t pointID, MyPoint *point, Double_t* PadChargeModule, 
 		       Int_t j, Double_t* padW, Double_t* padH );
 
   void WireQuantisation(/*Double_t *ClusterMLL,*/ MyPoint *point);

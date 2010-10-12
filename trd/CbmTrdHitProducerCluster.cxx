@@ -138,7 +138,7 @@ bool digiCidSorter(MyDigi *a, MyDigi *b)
 // ---- Exec ----------------------------------------------------------
 void CbmTrdHitProducerCluster::Exec(Option_t * option)
 {
-  Bool_t drawing = true;
+  Bool_t drawing = false;
   cout << "================CbmTrdHitProducerCluster==============" << endl;
   fPrfSingleRecoCounter = 0;
   fPrfDoubleRecoCounter = 0;
@@ -233,11 +233,11 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
      
       //cout << "      MaxID: " << qMaxIndex << "   MaxCharge: " << qMax << endl;
     }
-  //_______________Drawing_______________________ 
+ 
   if (drawing) {
     DrawHits();
   }
-  //_______________Drawing_______________________ 
+
   std::map<Int_t, MyHitList* >::iterator it;
   for ( it = ModuleHitMap.begin(); it != ModuleHitMap.end(); it++)
     {
@@ -588,6 +588,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   // --------------------------------------------------------------------
   void CbmTrdHitProducerCluster::DrawHits()
   {  
+    Char_t tracer[5] = "";
     Bool_t picEps = false;
     Bool_t picPng = true;
     if (picEps) {
@@ -842,7 +843,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 	    sprintf(title,"Module_%d_1_Digi",(*it).first);
 	    sprintf(name,"%d Digis",Int_t((*it).second->size()));
 	    if (picPng) {
-	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/%s_%s.png",title,name);
+	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/%s_%s_%s.png",title,name,tracer);
 	    }
 	    TCanvas* c = new TCanvas(title,name,cs,cs);
 	    c->Divide(1,1);
@@ -884,7 +885,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 	      Outimage->WriteImage(picPath);
 	    }
 	    if (picEps) {
-	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/eps/%s_%s.eps",title,name);
+	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/eps/%s_%s_%s.eps",title,name,tracer);
 	      c->cd(1)->Print(picPath);
 	    }
 	    delete Digi;
@@ -910,7 +911,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 	    sprintf(title,"Module_%d_2_Cluster",(*it).first);
 	    sprintf(name,"%d Cluster",Int_t((*it).second->size()));
 	    if (picPng) {
-	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/%s_%s.png",title,name);
+	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/%s_%s_%s.png",title,name,tracer);
 	    }
 	    TCanvas* c = new TCanvas(title,name,cs,cs);
 	    c->Divide(1,1);
@@ -952,7 +953,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 	      Outimage->WriteImage(picPath);
 	    }
 	    if (picEps) {
-	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/eps/%s_%s.eps",title,name);
+	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/eps/%s_%s_%s.eps",title,name,tracer);
 	      c->cd(1)->Print(picPath);
 	    }
 	    delete Cluster;
@@ -978,7 +979,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 	    sprintf(title,"Module_%d_3_Hit",(*it).first);
 	    sprintf(name,"%d Hits",Int_t((*it).second->size()));
 	    if (picPng) {
-	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/%s_%s.png",title,name);
+	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/%s_%s_%s.png",title,name,tracer);
 	    }
 	    TCanvas* c = new TCanvas(title,name,cs,cs);
 	    c->Divide(1,1);
@@ -1047,7 +1048,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 	    sprintf(title,"Module_%d_3_Hit",(*it).first);
 	    sprintf(name,"%d Hits",Int_t((*it).second->size()));
 	    if (picEps) {
-	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/eps/%s_%s.eps",title,name);
+	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/eps/%s_%s_%s.eps",title,name,tracer);
 	      c->cd(1)->Print(picPath);
 	    }
 	    delete Avatar;
@@ -1080,7 +1081,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 		sprintf(name,"%d Points_in_out",Int_t((*it).second->size()));
 	      }
 	    if (picPng) {
-	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/%s_%s.png",title,name);
+	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/%s_%s_%s.png",title,name,tracer);
 	    }
 	    TCanvas* c = new TCanvas(title,name,cs,cs);
 	    c->Divide(1,1);
@@ -1169,7 +1170,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 		sprintf(name,"%d Points_in_out",Int_t((*it).second->size()));
 	      }
 	    if (picEps) {
-	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/eps/%s_%s.eps",title,name);
+	      sprintf(picPath,"Pics/MCPoints_Digis_Clusters_Hits/eps/%s_%s_%s.eps",title,name,tracer);
 	      c->cd(1)->Print(picPath);
 	    }
 	    delete Avatar;

@@ -6,9 +6,9 @@ class L1Triplet
 
  private:
 
-  unsigned short int w0; // left hit (16b)  index in vStsHits array
-  unsigned short int w1; // middle hit(16b)
-  unsigned short int w2; // right hit(16b)
+  THitI w0; // left hit (16b)  index in vStsHits array
+  THitI w1; // middle hit(16b)
+  THitI w2; // right hit(16b)
   unsigned char      b0; // chi2(5b) + level(3b)
   unsigned char      bl; // level
   unsigned char      b1; // qp (8b)
@@ -41,13 +41,13 @@ class L1Triplet
     st = (iStaL<<4) + ((iStaM-iStaL-1)<<2) + (iStaR-iStaL-2);
   }
 
-  unsigned int GetLHit() const { 
+  THitI GetLHit() const { 
     return w0; 
   }
-  unsigned int GetMHit() const { 
+  THitI GetMHit() const { 
     return w1; 
   }
-  unsigned int GetRHit() const { 
+  THitI GetRHit() const { 
     return w2; 
   }
 

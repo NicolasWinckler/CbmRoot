@@ -150,22 +150,22 @@ void L1Algo::BranchFitter(const L1Branch &t, L1TrackPar& T, const bool dir, cons
    /// dir - 0 - forward, 1 - backward
    /// qp0 - momentum for extrapolation
    /// initialize - should be params ititialized. 1 - yes.
-void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec qp0)
+void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec qp0) // TODO take into account pipe
 {
   std::vector<THitI> newHits;
   newHits.clear();
   
-  const signed short int step = -2*static_cast<int>(dir) + 1; // increment for station index
+  const signed short int step = - 2*static_cast<int>(dir) + 1; // increment for station index
   const int iFirstHit = (dir) ? 2 : t.StsHits.size()-3;
-  int ista = GetFStation(vSFlag[vStsHits[t.StsHits[iFirstHit]].f]) + 2*step; // current station. set to the end of track
+//  int ista = GetFStation(vSFlag[vStsHits[t.StsHits[iFirstHit]].f]) + 2*step; // current station. set to the end of track
 
   const L1StsHit &hit0 = vStsHits[t.StsHits[iFirstHit         ]]; // optimize
   const L1StsHit &hit1 = vStsHits[t.StsHits[iFirstHit + step  ]];
   const L1StsHit &hit2 = vStsHits[t.StsHits[iFirstHit + 2*step]];
 
-  const int ista0 = ista - 2*step;
-  const int ista1 = ista - step;
-  const int ista2 = ista;
+  const int ista0 = GetFStation(vSFlag[hit0.f]);
+  const int ista1 = GetFStation(vSFlag[hit1.f]);
+  const int ista2 = GetFStation(vSFlag[hit2.f]);
 
   const L1Station &sta0 = vStations[ista0];
   const L1Station &sta1 = vStations[ista1];
@@ -203,8 +203,8 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
   sta0.fieldSlice.GetFieldValue( x0, y0, fB2 );
 
   fld.Set( fB2, fz2, fB1, fz1, fB0, fz0 );
-
-  for( ista += 2*step; (ista < NStations) && (ista >= 0); ista += step ){
+  
+  for( int ista = ista2 + 2*step; (ista < NStations) && (ista >= 0); ista += step ){ // CHECKME why ista2?
 
     L1Station &sta = vStations[ista];
           
@@ -212,8 +212,9 @@ void L1Algo::FindMoreHits(L1Branch &t, L1TrackPar& T, const bool dir, const fvec
 
     fscal r2_best = 1e8; // best distance to hit
     int iHit_best = -1;  // index of the best hit
-    for( int ih = StsHitsUnusedStartIndex[ista]; ih <= StsHitsUnusedStopIndex[ista]; ih++ ){ // optimize
+    for( THitI ih = StsHitsUnusedStartIndex[ista]; ih < StsHitsUnusedStopIndex[ista]; ih++ ){ // optimize
       L1StsHit &hit = (*vStsHitsUnused)[ih];
+
       if( GetFUsed( vSFlag[hit.f] | vSFlagB[hit.b] ) ) continue; // if used
 
       fscal x, y, z;

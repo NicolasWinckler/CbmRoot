@@ -90,8 +90,8 @@ void CbmL1::ReadEvent()
     // -- produce Sts hits from space points --
 
   for(int i = 0; i < NStation; i++){
-    algo->StsHitsStartIndex[i] = -1;
-    algo->StsHitsStopIndex[i]  = -2;
+    algo->StsHitsStartIndex[i] = static_cast<THitI>(-1);
+    algo->StsHitsStopIndex[i]  = 0;
   }
   
     // get MVD hits
@@ -376,12 +376,15 @@ void CbmL1::ReadEvent()
     algo->vStsHits.push_back(h);
     
     int sta = th.iStation;
-    if (algo->StsHitsStartIndex[sta] < 0) algo->StsHitsStartIndex[sta] = nEffHits;
+    if (algo->StsHitsStartIndex[sta] == static_cast<THitI>(-1)) algo->StsHitsStartIndex[sta] = nEffHits;
+    nEffHits++;
     algo->StsHitsStopIndex[sta] = nEffHits;
-    nEffHits ++;
-
+    
     vHitStore.push_back(s);
     vHitMCRef.push_back(th.iMC);
+  }
+  for(int i = 0; i < NStation; i++){
+    if (algo->StsHitsStartIndex[i] == static_cast<THitI>(-1)) algo->StsHitsStartIndex[i] = algo->StsHitsStopIndex[i];
   }
 
 //   if(0){ // check index z-pos befor sort

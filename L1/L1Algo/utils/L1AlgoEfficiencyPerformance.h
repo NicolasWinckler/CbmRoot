@@ -10,7 +10,7 @@
 
 #include "CbmL1.h"
 #include "CbmL1Counters.h"
-#include "L1Algo/CbmL1Def.h"
+#include "CbmL1Def.h"
 #include "L1Algo/L1Algo.h"
 #include "L1Algo/L1StsHit.h"
 
@@ -168,10 +168,10 @@ void L1AlgoEfficiencyPerformance<NHits>::FillMC()
 //     if( ! mtra.IsReconstructable() ) continue;
 
     const int NMCPoints = mtra.Points.size();
-    const int NIter = mtra.NStations()-NHits+1; // number of possible tracklets
+//    const int NIter = mtra.NStations()-NHits+1; // number of possible tracklets
     int lastIterSta = -1;
     for (int iterOffset = 0; iterOffset < NMCPoints;iterOffset++){ // first mcPoint on the station
-      const int iterMcId = mtra.Points[iterOffset];
+//      const int iterMcId = mtra.Points[iterOffset];
       int iterSta = fL1->vMCPoints[ mtra.Points[iterOffset] ].iStation;
       if (iterSta == lastIterSta) continue; // find offset for next station
       lastIterSta = iterSta;
@@ -235,11 +235,11 @@ template<int NHits>
     vector<int> &mcs2 = mcIds[level+1];
 
       // leave only matched ID-s.
-    for (int i2 = 0; i2 < mcs2.size(); i2++){
+    for (unsigned int i2 = 0; i2 < mcs2.size(); i2++){
       int &mc2 = mcs2[i2];
       bool flag = 0;
         // is the same ID on prev station?
-      for (int i1 = 0; i1 < mcs1.size(); i1++){
+      for (unsigned int i1 = 0; i1 < mcs1.size(); i1++){
         flag |= (mcs1[i1] == mc2);
       }
       if (!flag) mc2 = -2;
@@ -248,7 +248,7 @@ template<int NHits>
 
     // use first found // TODO: save all!!!
   vector<int> &mcsN = mcIds[NHits-1];
-  for (int i = 0; i < mcsN.size(); i++){
+  for (unsigned int i = 0; i < mcsN.size(); i++){
     if (mcsN[i] >= 0){
       trlet.mcTrackId = mcsN[i];
       trlet.iStation = fL1->vMCPoints[ fL1->vStsHits[iHits[0]].mcPointIds[0] ].iStation;

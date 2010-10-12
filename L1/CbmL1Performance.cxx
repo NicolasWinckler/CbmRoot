@@ -183,18 +183,19 @@ reco_fakes()
     cout.setf(ios::fixed);
     cout.setf(ios::showpoint);
     cout.precision(3);
-    cout << "Track category         : " << " Eff  "        <<" / "<< "Killed" <<" / "<< "Length" <<" / "<< "Fakes " <<" / "<< "Clones" <<" | "<< "All MC"  << endl;
+    cout << "Track category         : " << " Eff  "        <<" / "<< "Killed" <<" / "<< "Length" <<" / "<< "Fakes " <<" / "<< "Clones" <<" / "<< "All Reco" <<" | "<< "All MC"  << endl;
     
     int NCounters = mc.NCounters;
     for (int iC = 0; iC < NCounters; iC++){
       if (( names[iC] != "D0        efficiency") || (mc.counters[iC] != 0))
         cout << names[iC]  << "   : "
-            << ratio_reco.counters[iC]              
-            << "  / " << ratio_killed.counters[iC]  // tracks with aren't reco because other tracks takes their hit(-s)
-            << "  / " << ratio_length.counters[iC]  // nRecoMCHits/nMCHits
-            << "  / " << ratio_fakes.counters[iC]   // nFakeHits/nRecoAllHits
-            << "  / " << ratio_clone.counters[iC]   // nCloneTracks/nMCTracks
-            << "  | " << mc.counters[iC]  << endl;
+             << ratio_reco.counters[iC]              
+             << "  / " << ratio_killed.counters[iC]  // tracks with aren't reco because other tracks takes their hit(-s)
+             << "  / " << ratio_length.counters[iC]  // nRecoMCHits/nMCHits
+             << "  / " << ratio_fakes.counters[iC]   // nFakeHits/nRecoAllHits
+             << "  / " << ratio_clone.counters[iC]   // nCloneTracks/nMCTracks
+             << "  / " << reco.counters[iC]
+             << "    | " << mc.counters[iC]  << endl;
     }
     cout << "Ghost     probability  : " << ratio_ghosts <<" | "<< ghosts << endl;
   };

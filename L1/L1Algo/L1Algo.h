@@ -95,7 +95,7 @@ class L1Algo{
   vector< L1StsHit > vStsHits;     // hits as a combination of front-, backstrips and z-position
   vector< unsigned char > vSFlag,  // information of hits station & using hits in tracks;
                           vSFlagB;
-  int StsHitsStartIndex[MaxNStations+1], StsHitsStopIndex[MaxNStations+1]; // station-bounders in vStsHits array
+  THitI StsHitsStartIndex[MaxNStations+1], StsHitsStopIndex[MaxNStations+1]; // station-bounders in vStsHits array
 
    /// --- data used during finding iterations
 
@@ -103,7 +103,7 @@ class L1Algo{
   vector< L1StsHit > *vStsHitsUnused;
   std::vector< L1HitPoint > *vStsHitPointsUnused;
   THitI *RealIHit; // index in vStsHits indexed by index in vStsHitsUnused
-  int StsHitsUnusedStartIndex[MaxNStations+1], StsHitsUnusedStopIndex[MaxNStations+1];
+  THitI StsHitsUnusedStartIndex[MaxNStations+1], StsHitsUnusedStopIndex[MaxNStations+1];
   
 
     /// ----- Output data ----- 

@@ -1,7 +1,7 @@
 #ifndef CbmL1Def_h
 #define CbmL1Def_h 1
 
-//#define FAST_CODE // FAST_CODE = more unsave
+// #define FAST_CODE // FAST_CODE = more unsafe
 
 #include <assert.h>
 
@@ -35,7 +35,7 @@
 #define ISUNLIKELY(  x )  (  x )
 #endif
 
-#if defined( NDEBUG ) && !defined( L1_NO_ASSERT )
+#if defined( NDEBUG ) || defined( L1_NO_ASSERT )
 #define L1_ASSERT(v, msg)
 #define L1_assert(v)
 #else

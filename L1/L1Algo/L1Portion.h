@@ -16,14 +16,15 @@ class L1Portion<L1TrackPar>
     typedef nsL1::vector<T>::TSimd vType;
 
     L1Portion():a(),dataSize(0){};
-    L1Portion(int size):a(),dataSize(0) { resize(size); };
+    L1Portion(int size):a(),dataSize(0) { reserve(size); };
     L1Portion(int size, int size2):a(),dataSize(size2) {
-      resize(size);
-//     resize2(size2);
+      reserve(size);
+//     reserve2(size2);
     };
     vType& operator[] (int i) { return a[i];}
-    void resize(int size) { a.reserve(size); };
-    void resize2(int size) { for(unsigned int i = 0; i < a.size(); i++) a[i].reserve(size); };
+    void resize(int size) { a.resize(size); };
+    void reserve(int size) { a.reserve(size); };
+    void reserve2(int size) { for(unsigned int i = 0; i < a.size(); i++) a[i].reserve(size); };
     void push_back(vType &v) { a.push_back(v); };
     void add_void(){
       vType v;
@@ -57,15 +58,16 @@ template <>
 //     typedef std::vector<T, nsL1::SimdAlloc<T> > vType;
 
     L1Portion():a(),dataSize(0){};
-    L1Portion(int size):a(),dataSize(0) { resize(size); };
+    L1Portion(int size):a(),dataSize(0) { reserve(size); };
     L1Portion(int size, int size2):a(),dataSize(size2) {
-      resize(size);
-//     resize2(size2);
+      reserve(size);
+//     reserve2(size2);
     };
 
     vType& operator[] (int i) { return a[i];}
-    void resize(int size) { a.reserve(size); };
-    void resize2(int size) { for(unsigned int i = 0; i < a.size(); i++) a[i].reserve(size); };
+    void resize(int size) { a.resize(size); };
+    void reserve(int size) { a.reserve(size); };
+    void reserve2(int size) { for(unsigned int i = 0; i < a.size(); i++) a[i].reserve(size); };
     void push_back(vType &v) { a.push_back(v); };
     void add_void(){
       vType v;
@@ -98,14 +100,15 @@ class L1Portion
   typedef vector<T> vType;
 
   L1Portion():a(),dataSize(0) { };
-  L1Portion(int size):a(),dataSize(0) { resize(size); };
+  L1Portion(int size):a(),dataSize(0) { reserve(size); };
   L1Portion(int size, int size2):a(),dataSize(size2) {
-    resize(size);
-//     resize2(size2);
+    reserve(size);
+//     reserve2(size2);
   };
   vType& operator[] (int i) { return a[i];}
-  void resize(int size) { a.reserve(size); };
-  void resize2(int size) { for(int i = 0; i < a.size(); i++) a[i].reserve(size); };
+  void resize(int size) { a.resize(size); };
+  void reserve(int size) { a.reserve(size); };
+  void reserve2(int size) { for(int i = 0; i < a.size(); i++) a[i].reserve(size); };
   void push_back(vType &v) { a.push_back(v); };
   void add_void(){
     vType v;

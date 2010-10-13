@@ -8,6 +8,7 @@
 #include "CbmMCStreamer.h"
 
 #include "CbmMCEpoch.h"
+#include "CbmRunAna.h"
 
 #include "FairRootManager.h"
 
@@ -28,6 +29,7 @@ CbmMCStreamer::CbmMCStreamer() { }
 
 
 
+
 // -----   Standard constructor   --------------------------------------------
 CbmMCStreamer::CbmMCStreamer(Double_t eventRate, 
 			     Int_t beamProfile,
@@ -43,14 +45,136 @@ CbmMCStreamer::CbmMCStreamer(Double_t eventRate,
     fEpochLength(epochLength),
     fEventId(-1),
     fEventTime(0.),
-    fEpoch(NULL) {
+    fEpoch(NULL),
+    fEpochIsChanged(kFALSE),
+    fMarkNewEpoch(kFALSE) {
 }
 // ---------------------------------------------------------------------------
 
 
 
+
 // -----   Destructor   ------------------------------------------------------
 CbmMCStreamer::~CbmMCStreamer() { }
+// ---------------------------------------------------------------------------
+
+
+
+
+// -----   Activate or deactivate subtasks   ---------------------------------
+void CbmMCStreamer::ActivateTasks(Bool_t activate) {
+
+  TIter taskIter(GetListOfTasks());
+  FairTask* task;
+  while( ( task=dynamic_cast<FairTask*> ( taskIter() ) ) ) 
+    task->SetActive(activate);
+
+} 
+// ---------------------------------------------------------------------------
+
+
+
+
+// -----   Execution   -------------------------------------------------------
+void CbmMCStreamer::Exec(Option_t* opt) {
+
+  Int_t nPoints = 0;
+  cout.precision(8);
+
+
+  // Inactive subtasks (default, if no epoch is given to output)
+  ActivateTasks(kFALSE);
+
+
+  // Start new epoch if required (after old one was filled to output tree)
+  if ( fMarkNewEpoch ) NextEpoch();
+
+
+  // Unset epoch change marker and output fill marker
+  fEpochIsChanged = kFALSE;
+  ( (CbmRunAna*) CbmRunAna::Instance() )->MarkFill(kFALSE);
+      
+
+  // Imcrement event ID
+  fEventId++;
+  
+
+  // Determine event time
+  Double_t deltaT = 0;
+  if ( ! fBeamProfile ) deltaT = fEventTau;
+  else                  deltaT = TMath::Nint(gRandom->Exp(fEventTau));
+  fEventTime += deltaT;
+  cout << endl;
+  cout << "-I- " << GetName() << ": New event " << fEventId << " at " 
+       << fEventTime << " ns" << endl;
+
+
+  // Read event into buffer. If empty, skip execution (next event)
+  if ( ! ReadEvent() ) {
+    cout << "-I- " << GetName() << ": No points in event; stop execution"
+	 << endl;
+    return;
+  }
+  PrintBuffer();
+
+  
+  // Execute this loop until something is filled into the current epoch
+  while ( kTRUE ) {
+\
+    // Fill points from buffer into current epoch
+    ProcessBuffer();
+    PrintBuffer();
+
+    // If epoch changed (points added): end event execution (go to next event)
+    if ( fEpochIsChanged ) {
+      cout << "-I- " << GetName() << ": Epoch was updated. End excution."
+	   << endl;
+      break;
+    }
+
+    // Nothing added to epoch: so we can end it
+    if ( ! fEpoch->IsEmpty() ) {
+
+      // There's something in the epoch, so mark it for output and run all subtasks
+      cout << "-I- " << GetName() << ": Ending epoch" << endl;
+      fEpoch->Print();
+
+      // ---  Activate all subtasks
+      ActivateTasks(kTRUE);
+
+      // ---  Tell the run to fill the output tree at the end of all Execs
+      ( (CbmRunAna*) CbmRunAna::Instance() )->MarkFill();
+
+      // ---  Start new epoch at beginning of next event
+      fMarkNewEpoch = kTRUE;
+      
+      // ---  End execution
+      break;
+
+    }
+
+    // Points are in buffer, but epoch is empty: try next one
+    NextEpoch();
+
+  }
+
+}
+// ---------------------------------------------------------------------------
+
+
+
+
+// -----   Finish run   ------------------------------------------------------
+void CbmMCStreamer::Finish() {
+
+  // Fill last epoch into output
+  if ( ! fEpoch->IsEmpty() ) {
+	cout << "-I- " << GetName() << ": Filling epoch to output" << endl;
+	fEpoch->Print();
+	FairRootManager::Instance()->Fill();
+  }
+
+}
 // ---------------------------------------------------------------------------
 
 
@@ -92,127 +216,15 @@ InitStatus CbmMCStreamer::Init() {
 
 
 
-// -----   Execution   -------------------------------------------------------
-void CbmMCStreamer::Exec(Option_t* opt) {
+// -----   Start next epoch   ------------------------------------------------
+void CbmMCStreamer::NextEpoch() {
 
-  Int_t nPoints = 0;
-  cout.precision(8);
-
-  // Unset epoch change marker
-  fEpochIsChanged = kFALSE;
-
-
-  // Imcrement event ID
-  fEventId++;
-  
-
-  // Determine event time
-  Double_t deltaT = 0;
-  if ( ! fBeamProfile ) deltaT = fEventTau;
-  else                  deltaT = TMath::Nint(gRandom->Exp(fEventTau));
-  fEventTime += deltaT;
-  cout << "-I- " << GetName() << ": New event " << fEventId << " at " 
-       << fEventTime << " ns" << endl;
-
-
-  // Read event into buffer. If empty, skip execution (next event)
-  if ( ! ReadEvent() ) {
-    cout << "-I- " << GetName() << ": No points in event; stop execution"
-	 << endl;
-    return;
-  }
-  PrintBuffer();
-
-  
-  // Execute this loop until something is filled into the current epoch
-  while ( kTRUE ) {
-\
-    // Fill points from buffer into current epoch
-    ProcessBuffer();
-    PrintBuffer();
-
-    // If epoch changed (points added): end event execution (go to next event)
-    if ( fEpochIsChanged ) {
-      cout << "-I- " << GetName() << ": Epoch was updated. End excution."
-	   << endl;
-      break;
-    }
-
-    // Nothing added to epoch: fill tree and start next epoch
-    if ( ! fEpoch->IsEmpty() ) {
-      cout << "-I- " << GetName() << ": Filling epoch to output" << endl;
-      fEpoch->Print();
-	FairRootManager::Instance()->Fill();
-    }
     Double_t newEpochTime = fEpoch->GetStartTime() + fEpochLength;;
     fEpoch->Clear();
     fEpoch->SetStartTime(newEpochTime);
     fEpochIsChanged = kFALSE;
     cout << "-I- " << GetName() << ": New epoch at " << newEpochTime << endl;
 
-  }
-
-  
-
-}
-// ---------------------------------------------------------------------------
-
-
-
-
-// -----   Finish run   ------------------------------------------------------
-void CbmMCStreamer::Finish() {
-
-  // Fill last epoch into output
-  if ( ! fEpoch->IsEmpty() ) {
-	cout << "-I- " << GetName() << ": Filling epoch to output" << endl;
-	fEpoch->Print();
-	FairRootManager::Instance()->Fill();
-  }
-
-}
-// ---------------------------------------------------------------------------
-
-
-
-
-// -----   Read one event into the buffer   ----------------------------------
-Int_t CbmMCStreamer::ReadEvent() {
-
-  Int_t nPointsAdded = 0;
-
-  if ( fStsPoints ) {
-    Int_t    nStsPoints = 0;
-    CbmStsPoint* stsPoint = NULL;
-    nStsPoints = fStsPoints->GetEntriesFast();
-    for (Int_t iPoint = 0; iPoint < nStsPoints; iPoint++) {
-      stsPoint = (CbmStsPoint*) fStsPoints->At(iPoint);
-      Double_t pTime = stsPoint->GetTime() + fEventTime;
-      stsBuffer.insert( pair<Double_t,CbmStsPoint>
-			(pTime, CbmStsPoint(*stsPoint, fEventId, 
-					    fEventTime, 0.) ) );
-      nPointsAdded++;
-    }
-  }
-
-  if ( fMuchPoints ) {
-    Int_t    nMuchPoints = 0;
-    CbmMuchPoint* muchPoint = NULL;
-    nMuchPoints = fMuchPoints->GetEntriesFast();
-    for (Int_t iPoint = 0; iPoint < nMuchPoints; iPoint++) {
-      muchPoint = (CbmMuchPoint*) fMuchPoints->At(iPoint);
-      Double_t pTime = muchPoint->GetTime() + fEventTime;
-      muchBuffer.insert( pair<Double_t,CbmMuchPoint>
-			(pTime, CbmMuchPoint(*muchPoint, fEventId, 
-					     fEventTime, 0.) ) );
-      nPointsAdded++;
-    }
-  }
-
-  cout << "-I- " << GetName() << ": " << nPointsAdded << 
-    " points added to buffer" << endl;
-
-  return nPointsAdded;
 }
 // ---------------------------------------------------------------------------
 
@@ -308,11 +320,53 @@ void CbmMCStreamer::ProcessBuffer() {
   }
 
 
-
 }
 // ---------------------------------------------------------------------------
 
     
+
+
+// -----   Read one event into the buffer   ----------------------------------
+Int_t CbmMCStreamer::ReadEvent() {
+
+  Int_t nPointsAdded = 0;
+
+  if ( fStsPoints ) {
+    Int_t    nStsPoints = 0;
+    CbmStsPoint* stsPoint = NULL;
+    nStsPoints = fStsPoints->GetEntriesFast();
+    for (Int_t iPoint = 0; iPoint < nStsPoints; iPoint++) {
+      stsPoint = (CbmStsPoint*) fStsPoints->At(iPoint);
+      Double_t pTime = stsPoint->GetTime() + fEventTime;
+      stsBuffer.insert( pair<Double_t,CbmStsPoint>
+			(pTime, CbmStsPoint(*stsPoint, fEventId, 
+					    fEventTime, 0.) ) );
+      nPointsAdded++;
+    }
+  }
+
+  if ( fMuchPoints ) {
+    Int_t    nMuchPoints = 0;
+    CbmMuchPoint* muchPoint = NULL;
+    nMuchPoints = fMuchPoints->GetEntriesFast();
+    for (Int_t iPoint = 0; iPoint < nMuchPoints; iPoint++) {
+      muchPoint = (CbmMuchPoint*) fMuchPoints->At(iPoint);
+      Double_t pTime = muchPoint->GetTime() + fEventTime;
+      muchBuffer.insert( pair<Double_t,CbmMuchPoint>
+			(pTime, CbmMuchPoint(*muchPoint, fEventId, 
+					     fEventTime, 0.) ) );
+      nPointsAdded++;
+    }
+  }
+
+  cout << "-I- " << GetName() << ": " << nPointsAdded << 
+    " points added to buffer" << endl;
+
+  return nPointsAdded;
+}
+// ---------------------------------------------------------------------------
+
+
 
 
 ClassImp(CbmMCStreamer)

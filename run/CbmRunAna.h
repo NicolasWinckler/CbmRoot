@@ -31,6 +31,10 @@ class CbmRunAna : public FairRunAna
   virtual ~CbmRunAna();
 
 
+  /**   Mark tree for filling after tasks' execution  **/
+  void MarkFill(Bool_t mark = kTRUE) { fMarkFill = mark; }
+
+
   /**   Set asynchroneous output mode  **/
   void SetAsync(Bool_t async = kTRUE) { fAsync = async; }
 
@@ -62,6 +66,8 @@ class CbmRunAna : public FairRunAna
 
 
   Bool_t fAsync;       /** Flag for asynchroneous output mode **/
+  Bool_t fMarkFill;    /** Flag for filling output tree at end of event
+			** Only relevant in asynchroneous mode **/
 
 
 

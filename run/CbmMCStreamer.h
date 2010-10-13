@@ -82,6 +82,7 @@ class CbmMCStreamer : public FairTask
   CbmMCEpoch* fEpoch;        /**  Current epoch   **/
 
   Bool_t fEpochIsChanged;    /**  Flag whether current epoch was changed  **/
+  Bool_t fMarkNewEpoch;      /**  Flag to create a new epoch at the nxt call to Ecec **/
 
 
   /**   Input arrays   **/   
@@ -93,6 +94,14 @@ class CbmMCStreamer : public FairTask
   /**   Buffers   **/
   multimap<Double_t, CbmStsPoint>  stsBuffer;
   multimap<Double_t, CbmMuchPoint> muchBuffer;
+
+
+  /**   Activate / dactivate subtasks   **/
+  void ActivateTasks(Bool_t activate);
+
+
+  /**  Start new epoch   **/
+  void NextEpoch();
 
 
   /**   Show number of points in buffer   **/

@@ -84,8 +84,11 @@ void CbmRunAna::ExecRun(Int_t iStart, Int_t iStop) {
     fTask->ExecuteTask("");
 
 
-    // Fill output tree and finish event (not in asynchroneous mode)
-    if ( ! fAsync ) {
+    // In normal mode: mark output tree for filling
+    if ( ! fAsync ) MarkFill();
+
+    // If output marked for filling: do so
+    if ( fMarkFill ) {
       fRootManager->Fill();
       fTask->FinishEvent();
     }

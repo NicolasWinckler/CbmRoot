@@ -10,12 +10,9 @@ ${CBMROOT_SOURCE_DIR}/rich/finder
 ${CBMROOT_SOURCE_DIR}/rich/qa
 ${CBMROOT_SOURCE_DIR}/rich/tracks
 ${CBMROOT_SOURCE_DIR}/rich/selection
-${CBMROOT_SOURCE_DIR}/rich/dilept
 ${CBMROOT_SOURCE_DIR}/geobase 
 ${CBMROOT_SOURCE_DIR}/parbase 
 ${CBMROOT_SOURCE_DIR}/base 
-${CBMROOT_SOURCE_DIR}/KF
-${CBMROOT_SOURCE_DIR}/KF/Interface
 ${CBMROOT_SOURCE_DIR}/cbmbase 
 ${CBMROOT_SOURCE_DIR}/cbmdata
 ${CBMROOT_SOURCE_DIR}/cbmdata/rich
@@ -24,10 +21,6 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
-${CBMROOT_SOURCE_DIR}/field
-${CBMROOT_SOURCE_DIR}/globe
-${CBMROOT_SOURCE_DIR}/sts
-${CBMROOT_SOURCE_DIR}/passive
 #/u/slebedev/Baykal/tbb21_017oss/include
 #/u/andrey/soft/tbb/tbb22_009oss/include
 )
@@ -94,7 +87,6 @@ qa/CbmRichElectronsQa.cxx
 selection/CbmRichRingSelectImpl.cxx
 selection/CbmRichRingSelectNeuralNet.cxx  
 selection/NNfunction.cxx 
-dilept/CbmRichDielectronTask.cxx
 #LhcbRingFinder.cxx  
 )
 
@@ -140,7 +132,6 @@ qa/CbmRichGeoTest.h
 qa/CbmRichRingFitterQa.h 
 qa/CbmRichElectronsQa.h
 #qa/CbmRichParallelQa.h  
-dilept/CbmRichDielectronTask.h
 #LhcbRingFinder.h  
 )
 

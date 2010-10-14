@@ -739,7 +739,7 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
   Double_t tempPos = point->clusterPosLL[1];//ClusterMLL[1];
   Int_t iSec = point->Sec_cluster;//GetSector(ClusterMLL[1]);
   Int_t iRow = point->Row_cluster;//GetRow(ClusterMLL[1]);
-  Int_t NoWires = fModuleParaMap[fModuleID]->PadSizeY[point->Sec_cluster] / wireSpacing;
+  Int_t NoWires = Int_t(fModuleParaMap[fModuleID]->PadSizeY[point->Sec_cluster] / wireSpacing);
   for (Int_t i = 0; i < iSec; i++)
     {
       tempPos -= fModuleParaMap[fModuleID]->SectorSizeY[i];

@@ -1242,6 +1242,7 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, MyHit* hit)
 // --------------------------------------------------------------------
 void CbmTrdHitProducerCluster::CalcPR(Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F*& longPR, MyHit* hit)
 {
+  Bool_t combinatoric = true; //true := every paricipating mc-point is used as potential base of the reconstructed hit || false := the mc-point next to the reco hit is used
   CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxDigiIndex);
   Int_t size = digi->GetMCIndex().size();
   std::vector<int> MCIndex = digi->GetMCIndex();
@@ -1265,6 +1266,12 @@ void CbmTrdHitProducerCluster::CalcPR(Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F*
   Double_t x_mean;
   Double_t y_mean;
   Double_t z_mean;  
+
+  Double_t xPrMin = 100000;
+  Double_t yPrMin = 100000;
+
+  Double_t yDelta;
+  Double_t xDelta;
    
   for (Int_t i = 0; i < size; i++) {
     CbmTrdPoint *pt = (CbmTrdPoint*) fTrdPoints->At(MCIndex[i]);
@@ -1280,17 +1287,36 @@ void CbmTrdHitProducerCluster::CalcPR(Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F*
     z_mean = (z_in + z_out)/2.;
     xPosMCP = x_mean;
     yPosMCP = y_mean;
-  
-    if (Layer%2 == 0) {
-      shortPR->Fill(yPosMCP-yPosHit);
-      longPR ->Fill(xPosMCP-xPosHit);
+
+    xDelta = xPosMCP-xPosHit;
+    yDelta = yPosMCP-yPosHit;
+
+    if (sqrt(pow(xDelta,2) + pow(yDelta,2)) < sqrt(pow(xPrMin,2) + pow(yPrMin,2))) {
+      xPrMin = xDelta;
+      yPrMin = yDelta;
     }
-    else {
-      shortPR->Fill(xPosMCP-xPosHit);
-      longPR ->Fill(yPosMCP-yPosHit);
+   
+    if (combinatoric) {
+      if (Layer%2 == 0) {
+	shortPR->Fill(yDelta);
+	longPR ->Fill(xDelta);
+      }
+      else {
+	shortPR->Fill(xDelta);
+	longPR ->Fill(yDelta);
+      }
     }
   }
-  
+  if (!combinatoric) {
+    if (Layer%2 == 0) {
+      shortPR->Fill(yPrMin);
+      longPR ->Fill(xPrMin);
+    }
+    else {
+      shortPR->Fill(xPrMin);
+      longPR ->Fill(yPrMin);
+    }
+  }
 }
   // --------------------------------------------------------------------
   void CbmTrdHitProducerCluster::AddHit(Int_t iHit, Int_t detectorId, TVector3& pos, TVector3& dpos, Double_t dxy, Int_t planeId, Double_t eLossTR, Double_t eLossdEdx, Double_t eLoss)

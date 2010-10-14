@@ -45,11 +45,11 @@ class CbmTrdHitProducerCluster : public FairTask
 {
  public:
 
-// ---- Default constructor -------------------------------------------
+  // ---- Default constructor -------------------------------------------
   CbmTrdHitProducerCluster();
-// ---- Destructor ----------------------------------------------------
+  // ---- Destructor ----------------------------------------------------
   virtual ~CbmTrdHitProducerCluster();
- /** Initialisation **/
+  /** Initialisation **/
   virtual InitStatus ReInit();
   virtual InitStatus Init();
   virtual void SetParContainers();
@@ -63,12 +63,13 @@ class CbmTrdHitProducerCluster : public FairTask
 
  private:
   Int_t GetSector(Bool_t x, Int_t DigiCol, ModulePara* mPara);
-  void GetModuleInfo(Int_t qMaxIndex/*, MHitMap* ModuleHitMap*/);
+  void GetModuleInfo(Int_t qMaxIndex, MyHit* hit/*, MHitMap* ModuleHitMap*/);
   void SearchNeighbours(Int_t qMaxIndex, Int_t *neighbourIds, ModulePara* mPara, MyDigiList *neighbours, MyHit* hit);
   Float_t Prf(Float_t padWidth, Float_t sigma, Float_t qLeft, Float_t qMax, Float_t qRight);
   void PrfReco(Int_t qMaxIndex, Float_t qMax, ModulePara* mPara, Int_t *neighbourIds, MyHit* hit);
   void SimpleReco(Int_t qMaxIndex, Float_t qMax, ModulePara* mPara, Int_t *neighbourIds, MyHit* hit/*, MHitMap* ModuleHitMap*/);
   void DrawHits();
+  void CalcPR(Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F*& longPR, MyHit *hit);
   void AddHit(Int_t iHit, Int_t detectorId, TVector3& pos, TVector3& dpos, Double_t dxy, Int_t planeId, Double_t eLossTR, Double_t eLossdEdx, Double_t eLoss);
 
   TClonesArray*     fTrdPoints;   /** Input array of Trd MC points **/
@@ -91,6 +92,6 @@ class CbmTrdHitProducerCluster : public FairTask
 
   std::map<Int_t, MyDigiList*> moduleDigiMap; //map of <moduleId, List of struct 'MyDigi' pointer>
 
-   ClassDef(CbmTrdHitProducerCluster,1);
+  ClassDef(CbmTrdHitProducerCluster,1);
 };
 #endif

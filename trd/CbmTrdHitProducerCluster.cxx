@@ -139,14 +139,45 @@ bool digiCidSorter(MyDigi *a, MyDigi *b)
 void CbmTrdHitProducerCluster::Exec(Option_t * option)
 {
   Bool_t drawing = false;
+  Bool_t pr = true;
   cout << "================CbmTrdHitProducerCluster==============" << endl;
+  //std::list<Int_t> qMaxMcIdList;
+  TH1F *shortPR = NULL;
+  TH1F  *longPR = NULL;
+  if (pr) {
+    Int_t bins = 1000;
+    Int_t start = -0.05 * bins;
+    Int_t stop  =  0.05 * bins;
+
+    shortPR = new TH1F("shortPR","PR in short pad size direction",bins,start,stop); 
+    shortPR->SetXTitle("Hit Position - Contributing MC-Point Positions [mm]");
+    shortPR->SetYTitle("#");
+    shortPR->SetStats(kFALSE);
+    shortPR->GetXaxis()->SetLabelSize(0.02);
+    shortPR->GetYaxis()->SetLabelSize(0.02);
+    shortPR->GetXaxis()->SetTitleSize(0.025);
+    shortPR->GetYaxis()->SetTitleSize(0.025);
+    shortPR->GetXaxis()->SetTitleOffset(1.5);
+    shortPR->GetYaxis()->SetTitleOffset(2);
+
+    longPR = new TH1F("longPR", "PR in long pad size direction" ,bins,start*10,stop*10);
+    longPR->SetXTitle("Hit Position - Contributing MC-Point Positions [mm]");
+    longPR->SetYTitle("#");
+    longPR->SetStats(kFALSE);
+    longPR->GetXaxis()->SetLabelSize(0.02);
+    longPR->GetYaxis()->SetLabelSize(0.02);
+    longPR->GetXaxis()->SetTitleSize(0.025);
+    longPR->GetYaxis()->SetTitleSize(0.025);
+    longPR->GetXaxis()->SetTitleOffset(1.5);
+    longPR->GetYaxis()->SetTitleOffset(2);
+  }
+
   fPrfSingleRecoCounter = 0;
   fPrfDoubleRecoCounter = 0;
   fSimpleRecoCounter = 0;
   if (fDigis == NULL)
     cout << " DEBUG: fdigis is NULL" << endl;
   Int_t nDigis = fDigis->GetEntries();
-  //std::map<Int_t, MyDigiList*> modules; //map of <moduleId, List of struct 'MyDigi' pointer>
   for (Int_t iDigi=0; iDigi < nDigis; iDigi++ ) {
     
     //cout << (fDigis->GetEntries()-iDigi) << endl;
@@ -226,36 +257,42 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 	    }
 	}
       //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+      //qMaxMcIdList.push_back(qMaxIndex);
       CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxIndex);
       Int_t size = digi->GetMCIndex().size();
       Int_t MCs = size;
       std::vector<int> MCIndex = digi->GetMCIndex();
       //cout << size << ": ";
       /*
-      for (Int_t i = 0; i < size; i++) {
+	for (Int_t i = 0; i < size; i++) {
 	CbmTrdDigi *d = (CbmTrdDigi*) fDigis->At(MCIndex[i]);
-	  if (d->GetCharge() < 0.001) {
-	    MCs--;
-	  }
-      }
+	if (d->GetCharge() < 0.001) {
+	MCs--;
+	}
+	}
       */
       if (size < 9) {
 	NoMcPointsPerHit[MCs]++;
       }
-      //cout << endl;
       //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-      GetModuleInfo(qMaxIndex/*, ModuleHitMap*/);
-      /*
-	PrfReco(qMaxIndex, qMax);
-	SimpleReco(qMaxIndex, qMax);
-	AddHit(iHit);
-      */
-     
-      //cout << "      MaxID: " << qMaxIndex << "   MaxCharge: " << qMax << endl;
+      MyHit* hit = new MyHit;
+      GetModuleInfo(qMaxIndex, hit);
+      if (pr) {
+	CalcPR(qMaxIndex, shortPR, longPR, hit);
+      }
     }
  
   if (drawing) {
     DrawHits();
+  }
+  if (pr) {
+    TCanvas *cPR = new TCanvas("PR","PR",1400,600);
+    cPR->Divide(2,1);
+    cPR->cd(1);
+    shortPR->Draw();
+    cPR->cd(2);
+    longPR->Draw();
+    
   }
 
   std::map<Int_t, MyHitList* >::iterator it;
@@ -278,10 +315,10 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 
 
   // --------------------------------------------------------------------
-  void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex/*, MHitMap* ModuleHitMap*/)
+void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, MyHit* hit)
   {
     ModulePara* mPara = new ModulePara;
-    MyHit* hit = new MyHit;
+    //MyHit* hit = new MyHit;
  
     CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxIndex);  
     Int_t moduleId = digi->GetDetId();
@@ -1202,6 +1239,59 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 	  }
       }
   }
+// --------------------------------------------------------------------
+void CbmTrdHitProducerCluster::CalcPR(Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F*& longPR, MyHit* hit)
+{
+  CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxDigiIndex);
+  Int_t size = digi->GetMCIndex().size();
+  std::vector<int> MCIndex = digi->GetMCIndex();
+
+  Int_t moduleId = digi->GetDetId();
+  Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId);   
+  Int_t Station = detInfo[1];
+  Int_t Layer   = detInfo[2];
+
+  Double_t xPosHit = hit->xPos;
+  Double_t yPosHit = hit->yPos;
+  Double_t xPosMCP;
+  Double_t yPosMCP;
+
+  Double_t x_in;
+  Double_t x_out;
+  Double_t y_in;
+  Double_t y_out;
+  Double_t z_in;
+  Double_t z_out;
+  Double_t x_mean;
+  Double_t y_mean;
+  Double_t z_mean;  
+   
+  for (Int_t i = 0; i < size; i++) {
+    CbmTrdPoint *pt = (CbmTrdPoint*) fTrdPoints->At(MCIndex[i]);
+    moduleId = pt->GetDetectorID();
+    x_in   = pt->GetXIn()  * 10;
+    x_out  = pt->GetXOut() * 10;
+    y_in   = pt->GetYIn()  * 10;
+    y_out  = pt->GetYOut() * 10;
+    z_in   = pt->GetZIn()  * 10;
+    z_out  = pt->GetZOut() * 10;
+    x_mean = (x_in + x_out)/2.;
+    y_mean = (y_in + y_out)/2.;
+    z_mean = (z_in + z_out)/2.;
+    xPosMCP = x_mean;
+    yPosMCP = y_mean;
+  
+    if (Layer%2 == 0) {
+      shortPR->Fill(yPosMCP-yPosHit);
+      longPR ->Fill(xPosMCP-xPosHit);
+    }
+    else {
+      shortPR->Fill(xPosMCP-xPosHit);
+      longPR ->Fill(yPosMCP-yPosHit);
+    }
+  }
+  
+}
   // --------------------------------------------------------------------
   void CbmTrdHitProducerCluster::AddHit(Int_t iHit, Int_t detectorId, TVector3& pos, TVector3& dpos, Double_t dxy, Int_t planeId, Double_t eLossTR, Double_t eLossdEdx, Double_t eLoss)
   {

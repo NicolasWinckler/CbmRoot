@@ -37,42 +37,52 @@ using std::set;
 using std::map;
 
 // -----   Default constructor   ------------------------------------------
-CbmStsFindHits::CbmStsFindHits() : FairTask("STS Hit Finder", 1) {
-  fGeoPar  = NULL;
-  fDigiPar = NULL;
-  fClusters   = NULL;
-  fHits    = NULL;
-  fNHits = 0;
-  fDigiScheme = new CbmStsDigiScheme();
-}
+CbmStsFindHits::CbmStsFindHits() 
+  : FairTask("STS Hit Finder", 1), 
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fClusters(NULL),
+  fHits(NULL),
+  fNHits(0),
+  fDigiScheme(new CbmStsDigiScheme()),
+  fClusterMapF(),
+  fClusterMapB(),
+  fTimer()
+{}
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsFindHits::CbmStsFindHits(Int_t iVerbose) 
-  : FairTask("STSRealFindHits", iVerbose) {
-  fGeoPar  = NULL;
-  fDigiPar = NULL;
-  fClusters   = NULL;
-  fHits    = NULL;
-  fNHits = 0;
-  fDigiScheme = new CbmStsDigiScheme();
-}
+  : FairTask("STSRealFindHits", iVerbose), 
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fClusters(NULL),
+  fHits(NULL),
+  fNHits(0),
+  fDigiScheme(new CbmStsDigiScheme()),
+  fClusterMapF(),
+  fClusterMapB(),
+  fTimer()
+{}
 // -------------------------------------------------------------------------
 
 
 
 // -----   Constructor with name   -----------------------------------------
 CbmStsFindHits::CbmStsFindHits(const char* name, Int_t iVerbose) 
-  : FairTask(name, iVerbose) {
-  fGeoPar  = NULL;
-  fDigiPar = NULL;
-  fClusters   = NULL;
-  fHits    = NULL;
-  fNHits = 0;
-  fDigiScheme = new CbmStsDigiScheme();
-}
+  : FairTask(name, iVerbose), 
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fClusters(NULL),
+  fHits(NULL),
+  fNHits(0),
+  fDigiScheme(new CbmStsDigiScheme()),
+  fClusterMapF(),
+  fClusterMapB(),
+  fTimer()
+{}
 // -------------------------------------------------------------------------
 
 
@@ -387,46 +397,47 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
   Double_t tanstr = TMath::Tan(stereoB);
 
   // Calculate error matrix in sector system
-  Double_t vX, vY, vXY;
-  if ( iType == 1 ) {
-    vX  = dx / TMath::Sqrt(12.);
-    vY  = dy / TMath::Sqrt(12.);
-    vXY = 0.;
-  }
-  else if ( iType == 2 || iType == 3 ) {
+//   Double_t vX, vY, vXY;
+//   if ( iType == 1 ) {
 //     vX  = dx / TMath::Sqrt(12.);
-//     vY  = dx / TMath::Sqrt(6.) / TMath::Abs(tanstr);
-//     vXY = -1. * dx * dx / 12. / tanstr;
-
-    if (stereoF==0.) {
-      vX  = dx / TMath::Sqrt(12.);
-      vY  = dx / TMath::Sqrt(6.) / TMath::Abs(tanstr);
-      vXY = -1. * dx * dx / 12. / tanstr;
-    }
-    else {
-      vX  = dx / TMath::Sqrt(24.);
-      vY  = dx / TMath::Sqrt(24.) / TMath::Abs(tanstr);
-      vXY = 0.;
-    }
-
-  }
-  else {
-    cerr << "-E- " << fName << "::FindHits: Illegal sector type "
-	 << iType << endl;
-    return 0;
-  }
+//     vY  = dy / TMath::Sqrt(12.);
+//     vXY = 0.;
+//   }
+//   else if ( iType == 2 || iType == 3 ) {
+// 
+//     if (stereoF==0.&&stereoB*180/TMath::Pi()<80) {
+//       vX  = dx / TMath::Sqrt(12.);
+//       vY  = dx / TMath::Sqrt(6.) / TMath::Abs(TMath::Tan(stereoB));
+//       vXY = -1. * dx * dx / 12. / TMath::Tan(stereoB);
+//     }
+//     else if (stereoF==0.&&stereoB*180/TMath::Pi()>80) {
+//       vX  = dx / TMath::Sqrt(12.);
+//       vY  = dx / TMath::Sqrt(12.);
+//       vXY = 0.;
+//     }
+//     else {
+//       vX  = dx / TMath::Sqrt(24.);
+//       vY  = dx / TMath::Sqrt(24.) / TMath::Abs(TMath::Tan(stereoB));
+//       vXY = 0.;
+//     }
+//   }
+//   else {
+//     cerr << "-E- " << fName << "::FindHits: Illegal sector type "
+// 	 << iType << endl;
+//     return 0;
+//   }
     
   // Transform variances into global c.s.
-  Double_t wX  = vX * vX  * cosrot * cosrot 
-               - 2. * vXY * cosrot * sinrot
-               + vY * vY  * sinrot * sinrot;
-  Double_t wY  = vX * vX  * sinrot * sinrot
-               + 2. * vXY * cosrot * sinrot
-	       + vY * vY  * cosrot * cosrot; 
-  Double_t wXY = (vX*vX - vY*vY) * cosrot * sinrot
-               + vXY * ( cosrot*cosrot - sinrot*sinrot );
-  Double_t sigmaX = TMath::Sqrt(wX);
-  Double_t sigmaY = TMath::Sqrt(wY);
+//   Double_t wX  = vX * vX  * cosrot * cosrot 
+//                - 2. * vXY * cosrot * sinrot
+//                + vY * vY  * sinrot * sinrot;
+//   Double_t wY  = vX * vX  * sinrot * sinrot
+//                + 2. * vXY * cosrot * sinrot
+// 	       + vY * vY  * cosrot * cosrot; 
+//   Double_t wXY = (vX*vX - vY*vY) * cosrot * sinrot
+//                + vXY * ( cosrot*cosrot - sinrot*sinrot );
+//   Double_t sigmaX = TMath::Sqrt(wX);
+//   Double_t sigmaY = TMath::Sqrt(wY);
 
   // Now perform the loop over active channels
   set<Int_t>::iterator it1;
@@ -457,6 +468,24 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
     TVector3 pos, dpos;
     CbmStsCluster* clusterF = NULL;
     CbmStsCluster* clusterB = NULL;
+
+    Double_t vX, vY, vXY;
+    if (stereoF==0.&&stereoB*180/TMath::Pi()<80) {
+      vX  = dx / TMath::Sqrt(12.);
+      vY  = dx / TMath::Sqrt(6.) / TMath::Abs(TMath::Tan(stereoB));
+      vXY = -1. * dx * dx / 12. / TMath::Tan(stereoB);
+    }
+    else if (stereoF==0.&&stereoB*180/TMath::Pi()>80) {
+      vX  = dx / TMath::Sqrt(12.);
+      vY  = dx / TMath::Sqrt(12.);
+      vXY = 0.;
+    }
+    else {
+      vX  = dx / TMath::Sqrt(24.);
+      vY  = dx / TMath::Sqrt(24.) / TMath::Abs(TMath::Tan(stereoB));
+      vXY = 0.;
+    }
+    
     for (it1=fSet.begin(); it1!=fSet.end(); it1++) {
       iClusF = (*it1);
       clusterF  = (CbmStsCluster*) fClusters->At(iClusF);
@@ -485,13 +514,70 @@ Int_t CbmStsFindHits::FindHits(CbmStsStation* station,
 	if ( sensorDetId == -1 ) continue;
 
 	pos.SetXYZ(xHit, yHit, zHit);
-	if (stereoF==0.) {
-	  dpos.SetXYZ(vX*clusterF->GetMeanError(), (1./(tanstr))*TMath::Sqrt((vX*clusterF->GetMeanError())*(vX*clusterF->GetMeanError())+(vX*clusterB->GetMeanError())*(vX*clusterB->GetMeanError())), 0.);
+
+	Double_t vXTemp, vYTemp, vXYTemp;
+
+        Double_t wX  = vX * vX  * cosrot * cosrot 
+                 - 2. * vXY * cosrot * sinrot
+                 + vY * vY  * sinrot * sinrot;
+        Double_t wY  = vX * vX  * sinrot * sinrot
+                 + 2. * vXY * cosrot * sinrot
+	         + vY * vY  * cosrot * cosrot; 
+        Double_t wXY = (vX*vX - vY*vY) * cosrot * sinrot
+                 + vXY * ( cosrot*cosrot - sinrot*sinrot );
+        Double_t sigmaX = TMath::Sqrt(wX);
+        Double_t sigmaY = TMath::Sqrt(wY);
+
+	if (stereoF==0.&&stereoB*180/TMath::Pi()<80) {		//0&15 case
+
+          vXTemp = vX * clusterF->GetMeanError();
+	  vYTemp = (vX/(TMath::Tan(stereoB))) * TMath::Sqrt(clusterF->GetMeanError()*clusterF->GetMeanError() + clusterB->GetMeanError()*clusterB->GetMeanError());
+	  vXYTemp = - vXTemp * vXTemp / (TMath::Tan(stereoB));
+	
+	  wX = vXTemp * vXTemp  * cosrot * cosrot 
+                 - 2. * vXYTemp * cosrot * sinrot
+                 + vYTemp * vYTemp  * sinrot * sinrot;
+	  wY = vXTemp * vXTemp  * sinrot * sinrot
+                 + 2. * vXYTemp * cosrot * sinrot
+	         + vYTemp * vYTemp  * cosrot * cosrot; 
+	  wXY = (vXTemp*vXTemp - vYTemp*vYTemp) * cosrot * sinrot
+                 + vXYTemp * ( cosrot*cosrot - sinrot*sinrot );
+	  dpos.SetXYZ(TMath::Sqrt(wX),TMath::Sqrt(wY), 0.);
 	}
-	else {
-	  dpos.SetXYZ(0.5*TMath::Sqrt((vX*clusterF->GetMeanError())*(vX*clusterF->GetMeanError())+(vX*clusterB->GetMeanError())*(vX*clusterB->GetMeanError())), (0.5/tanstr)*TMath::Sqrt((vX*clusterF->GetMeanError())*(vX*clusterF->GetMeanError())+(vX*clusterB->GetMeanError())*(vX*clusterB->GetMeanError())), 0.);
+	else if (stereoF==0.&&stereoB*180/TMath::Pi()>80) {	//0&90 case
+
+	  vXTemp = vX * clusterF->GetMeanError();
+	  vYTemp = vX * clusterB->GetMeanError();
+	  vXYTemp = 0.;
+
+          wX = vXTemp * vXTemp  * cosrot * cosrot 
+                 - 2. * vXYTemp * cosrot * sinrot
+                 + vYTemp * vYTemp  * sinrot * sinrot;
+	  wY = vXTemp * vXTemp  * sinrot * sinrot
+                 + 2. * vXYTemp * cosrot * sinrot
+	         + vYTemp * vYTemp  * cosrot * cosrot; 
+	  wXY = (vXTemp*vXTemp - vYTemp*vYTemp) * cosrot * sinrot
+                 + vXYTemp * ( cosrot*cosrot - sinrot*sinrot );
+	  dpos.SetXYZ(TMath::Sqrt(wX),TMath::Sqrt(wY), 0.);
 	}
-// dpos.SetXYZ(0.5*TMath::Sqrt((sector->GetDx()*clusterF->GetMeanError())*(sector->GetDx()*clusterF->GetMeanError())+(sector->GetDx()*clusterB->GetMeanError())*(sector->GetDx()*clusterB->GetMeanError())), (0.5/tanstr)*TMath::Sqrt((sector->GetDx()*clusterF->GetMeanError())*(sector->GetDx()*clusterF->GetMeanError())+(sector->GetDx()*clusterB->GetMeanError())*(sector->GetDx()*clusterB->GetMeanError())), 0.);
+
+	else {							//7.5&-7.5 case
+
+	  vXTemp = (vX/2.) * TMath::Sqrt(clusterF->GetMeanError()*clusterF->GetMeanError() + clusterB->GetMeanError()*clusterB->GetMeanError());
+	  vYTemp = (vX/(2.*(TMath::Tan(stereoB)))) * TMath::Sqrt(clusterF->GetMeanError()*clusterF->GetMeanError() + clusterB->GetMeanError()*clusterB->GetMeanError());
+	  vXYTemp = 0.;
+	
+	  wX = vXTemp * vXTemp  * cosrot * cosrot 
+                 - 2. * vXYTemp * cosrot * sinrot
+                 + vYTemp * vYTemp  * sinrot * sinrot;
+	  wY = vXTemp * vXTemp  * sinrot * sinrot
+                 + 2. * vXYTemp * cosrot * sinrot
+	         + vYTemp * vYTemp  * cosrot * cosrot; 
+	  wXY = (vXTemp*vXTemp - vYTemp*vYTemp) * cosrot * sinrot
+                 + vXYTemp * ( cosrot*cosrot - sinrot*sinrot );
+	  dpos.SetXYZ(TMath::Sqrt(wX),TMath::Sqrt(wY), 0.);
+
+	}
 	
 	Int_t statLayer = -1;
 	for ( Int_t istatL = station->GetNofZ() ; istatL > 0 ; istatL-- ) 

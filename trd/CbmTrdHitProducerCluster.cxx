@@ -15,6 +15,7 @@
 #include "TGeoManager.h"
 #include "TClonesArray.h"
 #include "TArray.h"
+#include "TF1.h"
 #include "TH2F.h"
 #include "TProfile.h"
 #include "TLine.h"
@@ -140,19 +141,21 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 {
   Bool_t drawing = false;
   Bool_t pr = true;
+  Bool_t combinatoric = true;
   cout << "================CbmTrdHitProducerCluster==============" << endl;
   //std::list<Int_t> qMaxMcIdList;
   TH1F *shortPR = NULL;
   TH1F  *longPR = NULL;
+  TH2F *PRF = NULL;
   if (pr) {
-    Int_t bins = 1000;
-    Int_t start = -0.05 * bins;
-    Int_t stop  =  0.05 * bins;
-
-    shortPR = new TH1F("shortPR","PR in short pad size direction",bins,start,stop); 
+    //Int_t bins = 1000;
+    //Int_t start = -0.05 * bins;
+    //Int_t stop  =  0.05 * bins;
+    PRF = new TH2F("PRF","PRF for short pad size direction",15*10 , -7.5, 7.5 , 100, 0, 1);
+    shortPR = new TH1F("shortPR","PR in short pad size direction", 2*30*10, -30, 30); 
     shortPR->SetXTitle("Hit Position - Contributing MC-Point Positions [mm]");
     shortPR->SetYTitle("#");
-    shortPR->SetStats(kFALSE);
+    //shortPR->SetStats(kFALSE);
     shortPR->GetXaxis()->SetLabelSize(0.02);
     shortPR->GetYaxis()->SetLabelSize(0.02);
     shortPR->GetXaxis()->SetTitleSize(0.025);
@@ -160,10 +163,10 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     shortPR->GetXaxis()->SetTitleOffset(1.5);
     shortPR->GetYaxis()->SetTitleOffset(2);
 
-    longPR = new TH1F("longPR", "PR in long pad size direction" ,bins,start*10,stop*10);
+    longPR = new TH1F("longPR", "PR in long pad size direction", 2*150*10, -150, 150);
     longPR->SetXTitle("Hit Position - Contributing MC-Point Positions [mm]");
     longPR->SetYTitle("#");
-    longPR->SetStats(kFALSE);
+    //longPR->SetStats(kFALSE);
     longPR->GetXaxis()->SetLabelSize(0.02);
     longPR->GetYaxis()->SetLabelSize(0.02);
     longPR->GetXaxis()->SetTitleSize(0.025);
@@ -278,31 +281,51 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       MyHit* hit = new MyHit;
       GetModuleInfo(qMaxIndex, hit);
       if (pr) {
-	CalcPR(qMaxIndex, shortPR, longPR, hit);
+	CalcPR(combinatoric, qMaxIndex, shortPR, longPR, PRF, hit);
       }
     }
- 
-  if (drawing) {
-    DrawHits();
-  }
-  if (pr) {
-    TCanvas *cPR = new TCanvas("PR","PR",1400,600);
-    cPR->Divide(2,1);
-    cPR->cd(1);
-    shortPR->Draw();
-    cPR->cd(2);
-    longPR->Draw();
-    
-  }
 
   std::map<Int_t, MyHitList* >::iterator it;
   for ( it = ModuleHitMap.begin(); it != ModuleHitMap.end(); it++)
     {
       iHit += Int_t((*it).second->size());
     }
+  cout << " Found " << iHit << " Hits" << endl << endl;
+
+  if (drawing) {
+    DrawHits();
+  }
+  if (pr) {
+    TF1 *fit = new TF1("fit","gaus",-50,50);
+    Float_t shortSigma;
+    Float_t longSigma;
+    if (drawing) {
+      fit->SetLineColor(2);
+      TCanvas *cPR = new TCanvas("PR","PR",1400,600);
+      cPR->Divide(2,1);
+      cPR->cd(1);
+      shortPR->Draw();
+      shortPR->Fit("fit","QR");
+      shortSigma = fit->GetParameter(2);
+      cPR->cd(2);
+      longPR->Draw();
+      longPR->Fit("fit","QR");
+      longSigma = fit->GetParameter(2);
+    }
+    else {
+      shortPR->Fit("fit","0QR");
+      shortSigma = fit->GetParameter(2);
+      longPR->Fit("fit","0QR");
+      longSigma = fit->GetParameter(2);
+    }
+    cout << "  " << shortSigma << " mm position resolution for short pad size direction" << endl;
+    cout << "   " << longSigma  << " mm position resolution for long pad size direction"  << endl << endl;
+  }
+
+
 
   Int_t nPoints = fTrdPoints->GetEntriesFast();
-  cout << " Found " << iHit << " Hits" << endl << endl;
+  
   cout << "  " << iHit*100/Float_t(nPoints)<< "% MC-point to hit efficiency" << endl;
   cout << "  " << fPrfSingleRecoCounter << " Hits are PRF based reconstructed in one dimension" << endl;
   cout << "  " << fPrfDoubleRecoCounter << " Hits are PRF based reconstructed in both dimension" << endl;
@@ -660,8 +683,8 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, MyHit* hit)
     //Bool_t mean = true;
     Bool_t drawMCPoints = false;
     //Bool_t drawMCPoints = true;
-    //Bool_t drawDigis = false;
-    Bool_t drawDigis = true;
+    Bool_t drawDigis = false;
+    //Bool_t drawDigis = true;
     Bool_t drawClusters = false;
     //Bool_t drawClusters = true;
     Bool_t drawHits = false;
@@ -1240,9 +1263,9 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, MyHit* hit)
       }
   }
 // --------------------------------------------------------------------
-void CbmTrdHitProducerCluster::CalcPR(Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F*& longPR, MyHit* hit)
+void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F*& longPR, TH2F*& PRF, MyHit* hit)
 {
-  Bool_t combinatoric = true; //true := every paricipating mc-point is used as potential base of the reconstructed hit || false := the mc-point next to the reco hit is used
+  //Bool_t combinatoric = true; //true := every paricipating mc-point is used as potential base of the reconstructed hit || false := the mc-point next to the reco hit is used
   CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxDigiIndex);
   Int_t size = digi->GetMCIndex().size();
   std::vector<int> MCIndex = digi->GetMCIndex();
@@ -1306,7 +1329,9 @@ void CbmTrdHitProducerCluster::CalcPR(Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F*
 	longPR ->Fill(yDelta);
       }
     }
+
   }
+
   if (!combinatoric) {
     if (Layer%2 == 0) {
       shortPR->Fill(yPrMin);
@@ -1317,6 +1342,7 @@ void CbmTrdHitProducerCluster::CalcPR(Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F*
       longPR ->Fill(yPrMin);
     }
   }
+
 }
   // --------------------------------------------------------------------
   void CbmTrdHitProducerCluster::AddHit(Int_t iHit, Int_t detectorId, TVector3& pos, TVector3& dpos, Double_t dxy, Int_t planeId, Double_t eLossTR, Double_t eLossdEdx, Double_t eLoss)

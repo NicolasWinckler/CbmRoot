@@ -69,7 +69,7 @@ class CbmTrdHitProducerCluster : public FairTask
   void PrfReco(Int_t qMaxIndex, Float_t qMax, ModulePara* mPara, Int_t *neighbourIds, MyHit* hit);
   void SimpleReco(Int_t qMaxIndex, Float_t qMax, ModulePara* mPara, Int_t *neighbourIds, MyHit* hit/*, MHitMap* ModuleHitMap*/);
   void DrawHits();
-  void CalcPR(Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F*& longPR, MyHit *hit);
+  void CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F*& longPR, TH2F*& PRF, MyHit *hit);
   void AddHit(Int_t iHit, Int_t detectorId, TVector3& pos, TVector3& dpos, Double_t dxy, Int_t planeId, Double_t eLossTR, Double_t eLossdEdx, Double_t eLoss);
 
   TClonesArray*     fTrdPoints;   /** Input array of Trd MC points **/

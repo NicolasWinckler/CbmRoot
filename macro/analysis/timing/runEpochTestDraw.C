@@ -55,7 +55,7 @@ void runEpochTestDraw(){
   gPad->SetTopMargin(0.10);
   gPad->SetLogy();
   
-  hMuchTimeFull->SetTitle("First STS layer + First MUCH layer. All points.");
+  hStsTimeFull->SetTitle("First STS layer + First MUCH layer. All points.");
   hStsTimeFull->Draw();
   hMuchTimeFull->Draw("same");
   c3->cd(2);

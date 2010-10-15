@@ -29,7 +29,7 @@ void streamer(Int_t nEvents=5){
   rtdb->saveOutput();
 
   fRun->SetAsync(kTRUE);
-  CbmMCStreamer* streamer = new CbmMCStreamer(interacionRate,beamProfile,epochLength);
+  CbmMCStreamer* streamer = new CbmMCStreamer(interactionRate,beamProfile,epochLength);
   fRun->AddTask(streamer);
   
   fRun->Init();

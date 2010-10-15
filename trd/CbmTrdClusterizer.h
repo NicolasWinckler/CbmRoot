@@ -127,7 +127,7 @@ class CbmTrdClusterizer : public FairTask {
 
   float GetFloatPositionY(Double_t tempPosY);
 
-  void SplitPathSlices(Bool_t lookup, const Int_t pointID, MyPoint *point, Double_t* PadChargeModule, 
+  void SplitPathSlices(Bool_t fast, Bool_t lookup, Bool_t gaus, const Int_t pointID, MyPoint *point, Double_t* PadChargeModule, 
 		       Int_t j, Double_t* padW, Double_t* padH );
 
   void WireQuantisation(/*Double_t *ClusterMLL,*/ MyPoint *point);
@@ -138,7 +138,9 @@ class CbmTrdClusterizer : public FairTask {
 
   void ClusterMapping(MyPoint *point, Double_t* PadChargeModule);
 
-  void CalcMathieson(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
+  void CalcMathieson(Bool_t fast, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
+
+  void CalcGaus(Bool_t fast, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
 
   void FillMathiesonVector();
 

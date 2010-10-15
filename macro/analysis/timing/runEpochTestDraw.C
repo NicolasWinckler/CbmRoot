@@ -23,14 +23,14 @@ void runEpochTestDraw(){
   gPad->SetTopMargin(0.10);
   gPad->SetLogy();
   hStsTimeFull->SetTitle("First STS layer. All points.");
-  hStsTimeFull->Draw();
+  hStsTimeFull->DrawClone();
   c1->cd(2);
   gPad->SetRightMargin(0.02);
   gPad->SetLeftMargin(0.06);
   gPad->SetTopMargin(0.10);
   gPad->SetLogy();
   hStsTimeCentral->SetTitle("First STS layer. Central region.");
-  hStsTimeCentral->Draw();
+  hStsTimeCentral->DrawClone();
   TCanvas* c2 = new TCanvas("c2","Much time",1200,900);
   c2->Divide(1,2);
   c2->cd(1);
@@ -39,14 +39,14 @@ void runEpochTestDraw(){
   gPad->SetTopMargin(0.10);
   gPad->SetLogy();
   hMuchTimeFull->SetTitle("First MUCH layer. All points.");
-  hMuchTimeFull->Draw();
+  hMuchTimeFull->DrawClone();
   c2->cd(2);
   gPad->SetRightMargin(0.02);
   gPad->SetLeftMargin(0.06);
   gPad->SetTopMargin(0.10);
   gPad->SetLogy();
   hMuchTimeCentral->SetTitle("First MUCH layer. Central region.");
-  hMuchTimeCentral->Draw();
+  hMuchTimeCentral->DrawClone();
   TCanvas* c3 = new TCanvas("c3","STS+MUCH time",1200,900);
   c3->Divide(1,2);
   c3->cd(1);
@@ -56,15 +56,15 @@ void runEpochTestDraw(){
   gPad->SetLogy();
   
   hStsTimeFull->SetTitle("First STS layer + First MUCH layer. All points.");
-  hStsTimeFull->Draw();
-  hMuchTimeFull->Draw("same");
+  hStsTimeFull->DrawClone();
+  hMuchTimeFull->DrawClone("same");
   c3->cd(2);
   gPad->SetRightMargin(0.02);
   gPad->SetLeftMargin(0.06);
   gPad->SetTopMargin(0.10);
   gPad->SetLogy();
   hStsTimeCentral->SetTitle("First STS layer + First MUCH layer. Central region.");
-  hStsTimeCentral->Draw();
-  hMuchTimeCentral->Draw("same");
+  hStsTimeCentral->DrawClone();
+  hMuchTimeCentral->DrawClone("same");
   c3->cd();
 }

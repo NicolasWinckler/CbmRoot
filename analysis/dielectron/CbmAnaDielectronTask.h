@@ -1,5 +1,5 @@
-#ifndef CBM_RICH_DIELECTRON_TASK_H
-#define CBM_RICH_DIELECTRON_TASK_H
+#ifndef CBM_ANA_DIELECTRON_TASK_H
+#define CBM_ANA_DIELECTRON_TASK_H
 
 #include "FairTask.h"
 #include "FairBaseParSet.h"

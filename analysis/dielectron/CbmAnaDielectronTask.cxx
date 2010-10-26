@@ -44,9 +44,6 @@ using namespace std;
 #include "FairGeoNode.h"
 #include "TDatabasePDG.h"
 
-#include "CbmGeoStsPar.h"
-#include "CbmGeoPassivePar.h"
-
 #include "CbmStsHit.h"
 #include "CbmMvdHit.h"
 

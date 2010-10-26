@@ -13,6 +13,9 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/much
 ${CBMROOT_SOURCE_DIR}/cbmdata/mvd
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
+${CBMROOT_SOURCE_DIR}/cbmdata/rich
+${CBMROOT_SOURCE_DIR}/cbmdata/trd
+${CBMROOT_SOURCE_DIR}/cbmdata/tof
 ${CBMROOT_SOURCE_DIR}/global
 ${CBMROOT_SOURCE_DIR}/trackbase
 ${CBMROOT_SOURCE_DIR}/geane
@@ -22,6 +25,7 @@ ${CBMROOT_SOURCE_DIR}/sts
 ${CBMROOT_SOURCE_DIR}/KF 
 ${CBMROOT_SOURCE_DIR}/KF/Interface 
 ${CBMROOT_SOURCE_DIR}/much/geo
+${CBMROOT_SOURCE_DIR}/rich
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

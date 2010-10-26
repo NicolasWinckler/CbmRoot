@@ -97,8 +97,13 @@ private:
 
     Double_t fWeight;
 
-    void CreateHistogramms();
+    Int_t fNofMcEp;  //number of MC e+
+    Int_t fNofMcEm;  // number of MC e-
 
+    Int_t fNofAccEp; //number of accepted e+
+    Int_t fNofAccEm; //number of accepted e-
+    Int_t fNofAccPairs; //number of accepted pairs of e-/e+
+    
 public:
     void SetUseRich(Bool_t use){fUseRich = use;};
     void SetUseTrd(Bool_t use){fUseTrd = use;};

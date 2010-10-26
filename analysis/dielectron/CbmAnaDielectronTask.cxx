@@ -1,7 +1,3 @@
-#include <iostream>
-#include <map>
-using namespace std;
-
 #include "CbmAnaDielectronTask.h"
 
 #include "FairTask.h"
@@ -52,6 +48,8 @@ using namespace std;
 
 #define M2E 2.6112004954086e-7
 
+using namespace std;
+
 ClassImp(CbmAnaDielectronTask);
 
 CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
@@ -61,6 +59,11 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fUseRich = true;
     fUseTrd = true;
     fUseTof = true;
+    fNofMcEp = 0;
+    fNofMcEm = 0;
+    fNofAccEp = 0;
+    fNofAccEm = 0;
+    fNofAccPairs = 0;
 }
 
 CbmAnaDielectronTask::~CbmAnaDielectronTask()
@@ -188,29 +191,72 @@ void CbmAnaDielectronTask::Exec(Option_t *option)
 
     fEvents++;
     cout << "-I- CbmAnaDielectronTask event number " << fEvents << endl;
+    MCPairs();
+    SingleParticleAcceptance();
+    PairAcceptance();
 
+    cout << "fNofMcEp = " << fNofMcEp << ", per event " << fNofMcEp / (Double_t)fEvents << endl;
+    cout << "fNofMcEm = " << fNofMcEm << ", per event " << fNofMcEm / (Double_t)fEvents << endl;
+    cout << "fNofAccEp = " << fNofAccEp << ", per event " << fNofAccEp / (Double_t)fEvents << endl;
+    cout << "fNofAccEm = " << fNofAccEm << ", per event " << fNofAccEm / (Double_t)fEvents << endl;
+    cout << "fNofAccPairs = " << fNofAccPairs << ", per event " << fNofAccPairs / (Double_t)fEvents << endl;
 }// Exec
 
 void CbmAnaDielectronTask::MCPairs()
 {
-    Int_t nMCTracks = fMCTracks->GetEntries();
-
-
+    Int_t nMcTracks = fMCTracks->GetEntries();
+    for (Int_t i = 0; i < nMcTracks; i++){
+        CbmMCTrack* mctrack = (CbmMCTrack*) fMCTracks->At(i);
+        Int_t motherId = mctrack->GetMotherId();
+        Int_t pdg = mctrack->GetPdgCode();
+        if (motherId == -1 && pdg == -11) fNofMcEp++;
+        if (motherId == -1 && pdg == 11) fNofMcEm++;
+    }
 } //MC Pairs
 
 void CbmAnaDielectronTask::SingleParticleAcceptance()
 {
-    Int_t nGlobalTracks = fGlobalTracks->GetEntriesFast();
+    Int_t nMcTracks = fMCTracks->GetEntries();
+    for (Int_t i = 0; i < nMcTracks; i++) {
+        CbmMCTrack* mctrack = (CbmMCTrack*) fMCTracks->At(i);
+        Int_t motherId = mctrack->GetMotherId();
+        Int_t pdg = mctrack->GetPdgCode();
+        Int_t nMvdPoints = mctrack->GetNPoints(kMVD);
+        Int_t nStsPoints = mctrack->GetNPoints(kSTS);
+        Int_t nRichPoints = mctrack->GetNPoints(kRICH);
+        Bool_t isAcc = (nMvdPoints+nStsPoints >= 4);// && (nRichPoints > 0) ;
+        if (motherId == -1 && pdg == -11 && isAcc) fNofAccEp++;
+        if (motherId == -1 && pdg == 11 && isAcc) fNofAccEm++; 
+    }
 
-	for(Int_t i = 0; i < nGlobalTracks; i++){
-
-	}
 }
 
 void CbmAnaDielectronTask::PairAcceptance()
 {
-    Int_t nGlobalTracks = fGlobalTracks->GetEntriesFast();
-
+    Int_t nMcTracks = fMCTracks->GetEntries();
+    for (Int_t iP = 0; iP < nMcTracks; iP++) {
+        CbmMCTrack* mctrackP = (CbmMCTrack*) fMCTracks->At(iP);
+        Int_t motherId = mctrackP->GetMotherId();
+        Int_t pdg = mctrackP->GetPdgCode();
+        if ( !(motherId == -1 && pdg == -11 )) continue;
+        Int_t nMvdPoints = mctrackP->GetNPoints(kMVD);
+        Int_t nStsPoints = mctrackP->GetNPoints(kSTS);
+        Int_t nRichPoints = mctrackP->GetNPoints(kRICH);
+        Bool_t isAccP = (nMvdPoints+nStsPoints >= 4);// && (nRichPoints > 0) ;
+        if (isAccP){
+            for (Int_t iM = 0; iM < nMcTracks; iM++) {
+                CbmMCTrack* mctrackM = (CbmMCTrack*) fMCTracks->At(iM);
+                motherId = mctrackM->GetMotherId();
+                pdg = mctrackM->GetPdgCode();
+                if ( !(motherId == -1 && pdg == 11 )) continue;
+                nMvdPoints = mctrackM->GetNPoints(kMVD);
+                nStsPoints = mctrackM->GetNPoints(kSTS);
+                nRichPoints = mctrackM->GetNPoints(kRICH);
+                Bool_t isAccM = (nMvdPoints+nStsPoints >= 4);// && (nRichPoints > 0) ;
+                if (isAccP && isAccM) fNofAccPairs++;
+            }//iM
+        }
+    }//iP
 
 } // PairsAcceptance
 

@@ -95,7 +95,7 @@ private:
     Bool_t fUseTof;
 
 
-    Double_t fWeight;
+    Double_t fWeight; //Multiplicity*BR
 
     Int_t fNofMcEp;  //number of MC e+
     Int_t fNofMcEm;  // number of MC e-
@@ -103,6 +103,8 @@ private:
     Int_t fNofAccEp; //number of accepted e+
     Int_t fNofAccEm; //number of accepted e-
     Int_t fNofAccPairs; //number of accepted pairs of e-/e+
+    
+    TH2D* fh_mc_signal_pty; // pt/y distribution for signal mc
     
 public:
     void SetUseRich(Bool_t use){fUseRich = use;};

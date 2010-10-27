@@ -64,6 +64,8 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fNofAccEp = 0;
     fNofAccEm = 0;
     fNofAccPairs = 0;
+
+    fh_mc_signal_pty = new TH2D("fh_mc_signal_pty","fh_mc_signal_pty", 40, 0., 4., 20, 0., 2.);
 }
 
 CbmAnaDielectronTask::~CbmAnaDielectronTask()
@@ -211,7 +213,36 @@ void CbmAnaDielectronTask::MCPairs()
         Int_t pdg = mctrack->GetPdgCode();
         if (motherId == -1 && pdg == -11) fNofMcEp++;
         if (motherId == -1 && pdg == 11) fNofMcEm++;
-    }
+    } // nmber of e-/e+
+
+    for (Int_t iP = 0; iP < nMcTracks; iP++) {
+        CbmMCTrack* mctrackP = (CbmMCTrack*) fMCTracks->At(iP);
+        Int_t motherId  = mctrackP->GetMotherId();
+        Int_t pdg = mctrackP->GetPdgCode();
+        if ( !(motherId == -1 && pdg == -11)) continue;
+        TVector3 momP;  //momentum e+
+        mctrackP->GetMomentum(momP);
+        Double_t energyP = TMath::Sqrt(momP.Mag2() + M2E); 
+        for (Int_t iM = 0; iM < nMcTracks; iM++) {
+            CbmMCTrack* mctrackM = (CbmMCTrack*) fMCTracks->At(iM);
+            motherId = mctrackM->GetMotherId();
+            pdg = mctrackM->GetPdgCode();
+            if ( !(motherId == -1 && pdg == 11)) continue;
+            TVector3 momM;  //momentum e-
+            mctrackM->GetMomentum(momM);
+            Double_t energyM = TMath::Sqrt(momM.Mag2() + M2E);
+
+            //Calculate kinematic parameters of the pair
+            TVector3 momPair = momP + momM;
+            Double_t energyPair = energyP + energyM;
+            Double_t ptPair = momPair.Perp();
+            Double_t pzPair = momPair.Pz();
+            Double_t yPair = 0.5*TMath::Log((energyPair+pzPair)/(energyPair-pzPair));
+
+            fh_mc_signal_pty->Fill(yPair,ptPair,fWeight);
+        } //iM
+    } //iP
+
 } //MC Pairs
 
 void CbmAnaDielectronTask::SingleParticleAcceptance()
@@ -228,7 +259,6 @@ void CbmAnaDielectronTask::SingleParticleAcceptance()
         if (motherId == -1 && pdg == -11 && isAcc) fNofAccEp++;
         if (motherId == -1 && pdg == 11 && isAcc) fNofAccEm++; 
     }
-
 }
 
 void CbmAnaDielectronTask::PairAcceptance()
@@ -262,7 +292,9 @@ void CbmAnaDielectronTask::PairAcceptance()
 
 void CbmAnaDielectronTask::Finish()
 {
-
+    Double_t scale = 1./(Double_t)fEvents;
+    fh_mc_signal_pty->Scale(scale);
+    fh_mc_signal_pty->Write();
 }
 
 void CbmAnaDielectronTask::WriteOutput()

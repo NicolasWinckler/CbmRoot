@@ -105,6 +105,13 @@ private:
     Int_t fNofAccPairs; //number of accepted pairs of e-/e+
     
     TH2D* fh_mc_signal_pty; // pt/y distribution for signal mc
+    TH2D* fh_acc_signal_pty; // pt/y distribution for accepted signal
+    TH2D* fh_acc_signal_pty_eff; //efficiency of accepted signal 
+    TH1D* fh_mc_signal_mom; //momentum distribution for signal mc
+    TH1D* fh_acc_signal_mom; //momentum distribution of accepted signal
+    TH1D* fh_acc_signal_mom_eff; // momentum efficiency
+    TH1D* fh_mc_signal_minv; // invariant mass distribution for signal mc
+    TH1D* fh_acc_signal_minv; //invariant mass distribution for accepted signal
     
 public:
     void SetUseRich(Bool_t use){fUseRich = use;};

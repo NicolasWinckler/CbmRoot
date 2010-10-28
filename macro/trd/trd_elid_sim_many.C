@@ -166,7 +166,7 @@ void trd_elid_sim_many(Int_t fileNum, Int_t trdGeoType)
 	fRun->SetField(magField);
 // ------------------------------------------------------------------------
 
-    CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+    FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
 	Int_t kfCode1 = 11; // electrons
 	Int_t kfCode2 = -11; // positrons

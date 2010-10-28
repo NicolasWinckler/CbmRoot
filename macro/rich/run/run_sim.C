@@ -174,7 +174,7 @@ void run_sim(Int_t nEvents = 700)
 	fRun->SetField(magField);
 
 	// -----   Create PrimaryGenerator   --------------------------------------
-	CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+	FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
 	if (urqmd == "yes"){
 		FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);

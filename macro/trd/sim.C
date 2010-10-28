@@ -95,7 +95,7 @@ urqmd.auau.25gev.centr.0000.ftn14";
 
 
   // Create and Set Event Generator
-  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   fRun->SetGenerator(primGen);
 
   // Urqmd  Generator

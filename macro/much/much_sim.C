@@ -184,7 +184,7 @@ void much_sim(TString inputSignal = "",
 
   // -----   Create PrimaryGenerator   --------------------------------------
   cout << endl << "=== much_sim.C : Create generators ..." << endl;
-//  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+//  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   if ( inputSignal != "" ) {
   	FairPlutoGenerator *plutoGen= new FairPlutoGenerator(inputSignal);

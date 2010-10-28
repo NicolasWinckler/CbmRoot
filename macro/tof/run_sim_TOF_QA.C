@@ -168,7 +168,7 @@
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
-  CbmPrimaryGenerator* primGen   = new CbmPrimaryGenerator();
+  FairPrimaryGenerator* primGen   = new FairPrimaryGenerator();
   FairUrqmdGenerator* urqmdGen  = new FairUrqmdGenerator(inFile);
   //FairPlutoGenerator*   plutoGen  = new FairPlutoGenerator(inFile_pluto);
 

@@ -186,7 +186,7 @@ void run_sim_only_first_trd_layer(Int_t nEvents = 2)
   fRun->SetGenerator(primGen); 
 
 /*
-  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
   primGen->AddGenerator(urqmdGen);
   fRun->SetGenerator(primGen);       

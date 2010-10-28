@@ -100,7 +100,7 @@ void run_sim_geotest(Int_t nElectrons = 500, Int_t nEvents = 250)
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
-  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
   // -----   Create BoxGenerator   --------------------------------------
   Int_t kfCode1=11;   // electrons

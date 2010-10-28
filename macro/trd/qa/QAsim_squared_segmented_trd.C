@@ -179,7 +179,7 @@ void QAsim_squared_segmented_trd(Int_t nEvents = 2)
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
-//  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+//  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   FairUrqmdGenerator*  urqmdGen = new FairUrqmdGenerator(inFile);
   primGen->AddGenerator(urqmdGen);

@@ -228,7 +228,7 @@ void much_sim(char* dir = "data", Int_t fileNo=0, Int_t nEvents=10, Int_t seed=1
 //  // ------------------------------------------------------------------------
 
 //  // -----   Create PrimaryGenerator   --------------------------------------
-//  CbmPrimaryGenerator* primGen = new CbmPrimaryGenerator();
+//  FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 //
 //  cout << endl << "=== much_sim.C : Create generators ..." << endl;
 //  FairBoxGenerator* boxGen1 = new FairBoxGenerator(13,20);

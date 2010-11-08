@@ -1,5 +1,3 @@
-
-
 eventDisplay()
 {
 
@@ -40,20 +38,20 @@ eventDisplay()
   FairEventManager *fMan= new FairEventManager();
   FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
   FairMCPointDraw *RichPoint =   new FairMCPointDraw ("RichPoint",kOrange,  kFullSquare);
-  FairMCPointDraw *TofPoint =    new FairMCPointDraw ("TOFPoint",kBlue,  kFullSquare);
-  FairMCPointDraw *TrdPoint= new FairMCPointDraw ("TRDPoint",kTeal,  kFullSquare);
-  FairMCPointDraw *ECalPoint =    new FairMCPointDraw ("ECALPoint",kYellow,  kFullSquare);
+  FairMCPointDraw *TofPoint =    new FairMCPointDraw ("TofPoint",kBlue,  kFullSquare);
+  FairMCPointDraw *TrdPoint= new FairMCPointDraw ("TrdPoint",kTeal,  kFullSquare);
+  FairMCPointDraw *EcalPoint =    new FairMCPointDraw ("EcalPoint",kYellow,  kFullSquare);
   FairMCPointDraw *RefPlanePoint = new FairMCPointDraw ("RefPlanePoint",kPink,  kFullSquare);
-  FairMCPointDraw *STSPoint = new FairMCPointDraw ("STSPoint",kCyan,  kFullSquare);
+  FairMCPointDraw *StsPoint = new FairMCPointDraw ("StsPoint",kCyan,  kFullSquare);
                                                                
   fMan->AddTask(Track);
   
   fMan->AddTask(RichPoint);
-  fMan->AddTask(ECalPoint);   
+  fMan->AddTask(EcalPoint);   
   fMan->AddTask(TofPoint);   
   fMan->AddTask(TrdPoint);
   fMan->AddTask(RefPlanePoint);
-  fMan->AddTask(STSPoint);
+  fMan->AddTask(StsPoint);
  
     
   fMan->Init();                     

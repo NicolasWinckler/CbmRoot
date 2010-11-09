@@ -145,7 +145,12 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   cout << "================CbmTrdHitProducerCluster==============" << endl;
   //std::list<Int_t> qMaxMcIdList;
   TH1F *shortPR = NULL;
-  TH1F  *longPR = NULL;
+  TH1F  *longPR[10] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,};
+  /*
+    for (Int_t l = 0; l < 10; l++) {
+    longPR[l] = NULL;
+    }
+  */
   TH2F *PRF = NULL;
   if (pr) {
     PRF = new TH2F("PRF","PRF for short pad size direction",15*10 , -7.5, 7.5 , 100, 0, 1);
@@ -159,17 +164,20 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     shortPR->GetYaxis()->SetTitleSize(0.025);
     shortPR->GetXaxis()->SetTitleOffset(1.5);
     shortPR->GetYaxis()->SetTitleOffset(2);
-
-    longPR = new TH1F("longPR", "PR in long pad size direction", 2*150*10, -150, 150);
-    longPR->SetXTitle("Hit Position - Contributing MC-Point Positions [mm]");
-    longPR->SetYTitle("#");
-    //longPR->SetStats(kFALSE);
-    longPR->GetXaxis()->SetLabelSize(0.02);
-    longPR->GetYaxis()->SetLabelSize(0.02);
-    longPR->GetXaxis()->SetTitleSize(0.025);
-    longPR->GetYaxis()->SetTitleSize(0.025);
-    longPR->GetXaxis()->SetTitleOffset(1.5);
-    longPR->GetYaxis()->SetTitleOffset(2);
+    Char_t tempPR[15];
+    for (Int_t i = 0; i < 10; i++){
+      sprintf(tempPR,"longPR_%d",i);
+      longPR[i] = new TH1F(tempPR, "PR in long pad size direction", 2*150/**10*/, -150, 150);
+      longPR[i]->SetXTitle("Hit Position - Contributing MC-Point Positions [mm]");
+      longPR[i]->SetYTitle("#");
+      //longPR->SetStats(kFALSE);
+      longPR[i]->GetXaxis()->SetLabelSize(0.02);
+      longPR[i]->GetYaxis()->SetLabelSize(0.02);
+      longPR[i]->GetXaxis()->SetTitleSize(0.025);
+      longPR[i]->GetYaxis()->SetTitleSize(0.025);
+      longPR[i]->GetXaxis()->SetTitleOffset(1.5);
+      longPR[i]->GetYaxis()->SetTitleOffset(2);
+    }
   }
 
   fPrfSingleRecoCounter = 0;
@@ -297,26 +305,48 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     TF1 *fit = new TF1("fit","gaus",-50,50);
     Float_t shortSigma;
     Float_t longSigma;
+    Int_t entries;
     if (drawing) {
       fit->SetLineColor(2);
       TCanvas *cPR = new TCanvas("PR","PR",1400,600);
       cPR->Divide(2,1);
       cPR->cd(1);
       shortPR->Draw();
-      shortPR->Fit("fit","QR");
+      shortPR->Fit("fit","Q");
       shortSigma = fit->GetParameter(2);
-      cPR->cd(2);
-      longPR->Draw();
-      longPR->Fit("fit","QR");
+      printf("  %6.3f mm position resolution for short pad size direction (including x and y)\n",shortSigma);
+      cPR->cd(2);     
+      longPR[0]->Draw();     
+      fit->SetLineColor(1);
+      longPR[0]->Fit("fit","0Q");
       longSigma = fit->GetParameter(2);
+      printf("  %6.3f mm position resolution for long pad size direction  ('') 'longPR_0' (Summ over all pad sizes)\n",longSigma);   
+      for (Int_t l = 1; l < 10; l++) {
+	entries = longPR[l]->GetEntries();
+	if (entries > 0) {
+	  longPR[l]->SetLineColor(l+1);
+	  longPR[l]->Draw("same");
+	  fit->SetLineColor(l+1);
+	  longPR[l]->Fit("fit","0Q");
+	  longSigma = fit->GetParameter(2);
+	  printf("  %6.3f mm position resolution for long pad size direction  ('') 'longPR_%d'\n",longSigma,l);
+	}
+      }   
     }
     else {
-      shortPR->Fit("fit","0QR");
+      shortPR->Fit("fit","0Q");
       shortSigma = fit->GetParameter(2);
-      longPR->Fit("fit","0QR");
-      longSigma = fit->GetParameter(2);
+      printf("  %6.3f mm position resolution for short pad size direction (independent of global x and y)\n",shortSigma);
+      
+      for (Int_t l = 0; l < 10; l++) {
+	entries = longPR[l]->GetEntries();
+	if (entries > 0) {
+	  longPR[l]->Fit("fit","0Q");
+	  longSigma = fit->GetParameter(2);
+	  printf("  %6.3f mm position resolution for long pad size direction  ('') 'longPR_%d'\n",longSigma,l);
+	}
+      }     
     }
-    printf("  %6.3f mm position resolution for short pad size direction (including x and y)\n  %6.3f mm position resolution for long pad size direction  ('')\n",shortSigma,longSigma);
     /*
       cout << "  " << shortSigma << " mm position resolution for short pad size direction (including x and y)" << endl;
       cout << "   " << longSigma  << " mm position resolution for long pad size direction  ('')"  << endl << endl;
@@ -1269,7 +1299,7 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, MyHit* hit)
       }
   }
 // --------------------------------------------------------------------
-void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F*& longPR, TH2F*& PRF, MyHit* hit)
+void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F* longPR[10], TH2F*& PRF, MyHit* hit)
 {
   //Bool_t combinatoric = true; //true := every paricipating mc-point is used as potential base of the reconstructed hit || false := the mc-point next to the reco hit is used
   CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxDigiIndex);
@@ -1280,6 +1310,19 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
   Int_t* detInfo = fTrdId.GetDetectorInfo(moduleId);   
   Int_t Station = detInfo[1];
   Int_t Layer   = detInfo[2];
+  fModuleInfo = fDigiPar->GetModule(moduleId);
+  Float_t mSizeLong = (fModuleInfo->GetSizey()) * 2 * 10;
+  if (Layer%2 == 0) {
+    mSizeLong = (fModuleInfo->GetSizex()) * 2 * 10;
+  }
+  //std::map<Int_t,Int_t> fPadSizeLongMap;
+  std::map<Int_t,Int_t>::iterator it;
+  it = fPadSizeLongMap.find(mSizeLong);
+  if (it == fPadSizeLongMap.end()) {
+    fPadSizeLongMap[mSizeLong] = fPadSizeLongMap.size();
+    cout << "   longPR_" << fPadSizeLongMap[mSizeLong] << " corresponds to " << mSizeLong << " mm pad height" << endl;
+    //cout << mSizeLong << " " << fPadSizeLongMap[mSizeLong] << endl;
+  }
 
   Double_t xPosHit = hit->xPos;
   Double_t yPosHit = hit->yPos;
@@ -1328,11 +1371,13 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
     if (combinatoric) {
       if (Layer%2 == 0) {
 	shortPR->Fill(yDelta);
-	longPR ->Fill(xDelta);
+	longPR[0]->Fill(xDelta);
+	longPR[fPadSizeLongMap[mSizeLong]] -> Fill(xDelta);
       }
       else {
 	shortPR->Fill(xDelta);
-	longPR ->Fill(yDelta);
+	longPR[0]->Fill(yDelta);
+	longPR[fPadSizeLongMap[mSizeLong]] -> Fill(yDelta);
       }
     }
 
@@ -1341,11 +1386,13 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
   if (!combinatoric) {
     if (Layer%2 == 0) {
       shortPR->Fill(yPrMin);
-      longPR ->Fill(xPrMin);
+      longPR[0] ->Fill(xPrMin);
+      longPR[fPadSizeLongMap[mSizeLong]] -> Fill(xPrMin);
     }
     else {
       shortPR->Fill(xPrMin);
-      longPR ->Fill(yPrMin);
+      longPR[0] ->Fill(yPrMin);
+      longPR[fPadSizeLongMap[mSizeLong]] -> Fill(yPrMin);
     }
   }
 

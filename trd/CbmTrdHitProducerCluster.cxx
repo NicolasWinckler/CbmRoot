@@ -21,6 +21,7 @@
 #include "TLine.h"
 #include "TCanvas.h"
 #include "TImage.h"
+#include "TLegend.h"
 
 //#include <map>
 #include <iostream>
@@ -144,7 +145,8 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   Bool_t combinatoric = true;
   cout << "================CbmTrdHitProducerCluster==============" << endl;
   //std::list<Int_t> qMaxMcIdList;
-  TH1F *shortPR = NULL;
+  TLegend *legend   = NULL;
+  TH1F *shortPR     = NULL;
   TH1F  *longPR[20] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
   /*
     for (Int_t l = 0; l < 10; l++) {
@@ -153,6 +155,8 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   */
   TH2F *PRF = NULL;
   if (pr) {
+    legend = new TLegend(0.55,0.55,0.85,0.85);
+
     PRF = new TH2F("PRF","PRF for short pad size direction",15*10 , -7.5, 7.5 , 100, 0, 1);
     shortPR = new TH1F("shortPR","PR in short pad size direction", 2*30*10, -30, 30); 
     shortPR->SetXTitle("Hit Position - Contributing MC-Point Positions [mm]");
@@ -286,7 +290,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       MyHit* hit = new MyHit;
       GetModuleInfo(qMaxIndex, hit);
       if (pr) {
-	CalcPR(combinatoric, qMaxIndex, shortPR, longPR, PRF, hit);
+	CalcPR(combinatoric, qMaxIndex, shortPR, longPR, legend, PRF, hit);
       }
     }
 
@@ -315,7 +319,11 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       shortPR->Fit("fit","Q");
       shortSigma = fit->GetParameter(2);
       printf("  %6.3f mm position resolution for short pad size direction (including x and y)\n",shortSigma);
-      cPR->cd(2);     
+      cPR->cd(2);
+      Float_t integral = longPR[0]->Integral(); 
+      //longPR[0]->Scale(1/integral); 
+      //longPR[0]->Reset();  
+      longPR[0]->SetLineColor(0); 
       longPR[0]->Draw();     
       fit->SetLineColor(1);
       longPR[0]->Fit("fit","0Q");
@@ -324,6 +332,8 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       for (Int_t l = 1; l < 20; l++) {
 	entries = longPR[l]->GetEntries();
 	if (entries > 0) {
+	  integral = longPR[l]->Integral();
+	  //longPR[l]->Scale(1/integral);
 	  longPR[l]->SetLineColor(l+1);
 	  longPR[l]->Draw("same");
 	  fit->SetLineColor(l+1);
@@ -331,7 +341,8 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
 	  longSigma = fit->GetParameter(2);
 	  printf("  %6.3f mm position resolution for long pad size direction  ('') 'longPR_%d'\n",longSigma,l);
 	}
-      }   
+      }  
+      legend->Draw("same"); 
     }
     else {
       shortPR->Fit("fit","0Q");
@@ -1299,7 +1310,7 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, MyHit* hit)
       }
   }
 // --------------------------------------------------------------------
-void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F* longPR[20], TH2F*& PRF, MyHit* hit)
+void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F* longPR[20], TLegend*& legend, TH2F*& PRF, MyHit* hit)
 {
   //Bool_t combinatoric = true; //true := every paricipating mc-point is used as potential base of the reconstructed hit || false := the mc-point next to the reco hit is used
   CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxDigiIndex);
@@ -1325,9 +1336,16 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
   //std::map<Int_t,Int_t> fPadSizeLongMap;
   std::map<Int_t,Int_t>::iterator it;
   it = fPadSizeLongMap.find(pSizeLong);
+  Char_t title[50];
   if (it == fPadSizeLongMap.end()) {
+    if (fPadSizeLongMap.size() == 0) {
+      sprintf(title,"PR sum over all pad length");
+      //legend->AddEntry(longPR[0],title,"l");
+    }
     fPadSizeLongMap[Int_t(pSizeLong)] = fPadSizeLongMap.size();
     cout << "   longPR_" << fPadSizeLongMap[Int_t(pSizeLong)] << " corresponds to " << pSizeLong << " mm pad height" << endl;
+    sprintf(title,"PR for %3d mm long pads",Int_t(pSizeLong));
+    legend->AddEntry(longPR[fPadSizeLongMap.size()],title,"l");
     //cout << mSizeLong << " " << fPadSizeLongMap[mSizeLong] << endl;
   }
 

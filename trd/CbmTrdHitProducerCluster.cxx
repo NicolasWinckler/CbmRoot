@@ -145,7 +145,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   cout << "================CbmTrdHitProducerCluster==============" << endl;
   //std::list<Int_t> qMaxMcIdList;
   TH1F *shortPR = NULL;
-  TH1F  *longPR[10] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,};
+  TH1F  *longPR[20] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
   /*
     for (Int_t l = 0; l < 10; l++) {
     longPR[l] = NULL;
@@ -165,7 +165,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     shortPR->GetXaxis()->SetTitleOffset(1.5);
     shortPR->GetYaxis()->SetTitleOffset(2);
     Char_t tempPR[15];
-    for (Int_t i = 0; i < 10; i++){
+    for (Int_t i = 0; i < 20; i++){
       sprintf(tempPR,"longPR_%d",i);
       longPR[i] = new TH1F(tempPR, "PR in long pad size direction", 2*150/**10*/, -150, 150);
       longPR[i]->SetXTitle("Hit Position - Contributing MC-Point Positions [mm]");
@@ -296,7 +296,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       iHit += Int_t((*it).second->size());
     }
   cout << " Found " << iHit << " Hits" << endl << endl;
-
+  cout << "======================================================" << endl;
   if (drawing) {
     DrawHits();
   }
@@ -320,8 +320,8 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       fit->SetLineColor(1);
       longPR[0]->Fit("fit","0Q");
       longSigma = fit->GetParameter(2);
-      printf("  %6.3f mm position resolution for long pad size direction  ('') 'longPR_0' (Summ over all pad sizes)\n",longSigma);   
-      for (Int_t l = 1; l < 10; l++) {
+      printf("  %6.3f mm position resolution for long pad size direction  ('') 'longPR_0' (Sum  over all pad sizes)\n",longSigma);   
+      for (Int_t l = 1; l < 20; l++) {
 	entries = longPR[l]->GetEntries();
 	if (entries > 0) {
 	  longPR[l]->SetLineColor(l+1);
@@ -338,7 +338,7 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
       shortSigma = fit->GetParameter(2);
       printf("  %6.3f mm position resolution for short pad size direction (independent of global x and y)\n",shortSigma);
       
-      for (Int_t l = 0; l < 10; l++) {
+      for (Int_t l = 0; l < 20; l++) {
 	entries = longPR[l]->GetEntries();
 	if (entries > 0) {
 	  longPR[l]->Fit("fit","0Q");
@@ -1299,7 +1299,7 @@ void CbmTrdHitProducerCluster::GetModuleInfo(Int_t qMaxIndex, MyHit* hit)
       }
   }
 // --------------------------------------------------------------------
-void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F* longPR[10], TH2F*& PRF, MyHit* hit)
+void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, TH1F*& shortPR, TH1F* longPR[20], TH2F*& PRF, MyHit* hit)
 {
   //Bool_t combinatoric = true; //true := every paricipating mc-point is used as potential base of the reconstructed hit || false := the mc-point next to the reco hit is used
   CbmTrdDigi *digi = (CbmTrdDigi*) fDigis->At(qMaxDigiIndex);
@@ -1311,16 +1311,23 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
   Int_t Station = detInfo[1];
   Int_t Layer   = detInfo[2];
   fModuleInfo = fDigiPar->GetModule(moduleId);
-  Float_t mSizeLong = (fModuleInfo->GetSizey()) * 2 * 10;
-  if (Layer%2 == 0) {
-    mSizeLong = (fModuleInfo->GetSizex()) * 2 * 10;
+  Int_t NoSectors = fModuleInfo->GetNoSectors();
+  Float_t pSizeLong = 0;
+  for (Int_t iSec = 0; iSec < NoSectors; iSec++) {
+    if (Layer%2 == 0) {
+      pSizeLong += (fModuleInfo->GetPadSizex(iSec)) * 10;
+    }
+    else {
+      pSizeLong += (fModuleInfo->GetPadSizey(iSec)) * 10;
+    }
   }
+  pSizeLong /= NoSectors;
   //std::map<Int_t,Int_t> fPadSizeLongMap;
   std::map<Int_t,Int_t>::iterator it;
-  it = fPadSizeLongMap.find(mSizeLong);
+  it = fPadSizeLongMap.find(pSizeLong);
   if (it == fPadSizeLongMap.end()) {
-    fPadSizeLongMap[mSizeLong] = fPadSizeLongMap.size();
-    cout << "   longPR_" << fPadSizeLongMap[mSizeLong] << " corresponds to " << mSizeLong << " mm pad height" << endl;
+    fPadSizeLongMap[Int_t(pSizeLong)] = fPadSizeLongMap.size();
+    cout << "   longPR_" << fPadSizeLongMap[Int_t(pSizeLong)] << " corresponds to " << pSizeLong << " mm pad height" << endl;
     //cout << mSizeLong << " " << fPadSizeLongMap[mSizeLong] << endl;
   }
 
@@ -1372,12 +1379,12 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
       if (Layer%2 == 0) {
 	shortPR->Fill(yDelta);
 	longPR[0]->Fill(xDelta);
-	longPR[fPadSizeLongMap[mSizeLong]] -> Fill(xDelta);
+	longPR[fPadSizeLongMap[Int_t(pSizeLong)]] -> Fill(xDelta);
       }
       else {
 	shortPR->Fill(xDelta);
 	longPR[0]->Fill(yDelta);
-	longPR[fPadSizeLongMap[mSizeLong]] -> Fill(yDelta);
+	longPR[fPadSizeLongMap[Int_t(pSizeLong)]] -> Fill(yDelta);
       }
     }
 
@@ -1387,12 +1394,12 @@ void CbmTrdHitProducerCluster::CalcPR(Bool_t combinatoric, Int_t qMaxDigiIndex, 
     if (Layer%2 == 0) {
       shortPR->Fill(yPrMin);
       longPR[0] ->Fill(xPrMin);
-      longPR[fPadSizeLongMap[mSizeLong]] -> Fill(xPrMin);
+      longPR[fPadSizeLongMap[Int_t(pSizeLong)]] -> Fill(xPrMin);
     }
     else {
       shortPR->Fill(xPrMin);
       longPR[0] ->Fill(yPrMin);
-      longPR[fPadSizeLongMap[mSizeLong]] -> Fill(yPrMin);
+      longPR[fPadSizeLongMap[Int_t(pSizeLong)]] -> Fill(yPrMin);
     }
   }
 

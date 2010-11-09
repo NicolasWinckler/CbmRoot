@@ -106,14 +106,36 @@ InitStatus CbmTrdClusterFinderFast::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterFinderFast::Exec(Option_t *option)
 {
+  cout << "================CbmTrdClusterFinderFast===============" << endl;
+  Int_t counterI = 0;
+  Int_t counterJ = 0;
+  Float_t mRMax = 7500;
+  Bool_t dynamic = true;
   Bool_t optimization = false;
   Bool_t rowClusterMerger = false;
   if (optimization) {
+    dynamic = false;
     rowClusterMerger = true;
+    cout << "  minimum charge threshold optimization run" << endl <<"  rowClusterMerger: on" << endl;
+  }
+  else {
+    if (dynamic) {
+      cout << "  rowClusterMerger: on (as function of module distance (r_min = " << mRMax <<" mm) from beam pipe)"<< endl;
+    }
+    else {
+      if (rowClusterMerger) {
+	cout << "  rowClusterMerger: on" << endl;
+      }
+      else {
+	cout << "  rowClusterMerger: off" << endl;
+      }
+    }
   }
   //optimization ist only usefull if rowClusters are merged !!!
   Float_t minimumChargeTH = 5e-03;
-  Float_t mChargeTH[57] = { 0.003,    0, 
+  Float_t mChargeTH[57] = { 0.003,
+			    /*2e-06,*/ //for gausssian distributed charge
+			    0, 
 			    1e-06, 2e-06, 3e-06, 4e-06, 5e-06, 6e-06, 7e-06, 8e-06, 9e-06,
 			    1e-05, 2e-05, 3e-05, 4e-05, 5e-05, 6e-05, 7e-05, 8e-05, 9e-05,
 			    1e-04, 2e-04, 3e-04, 4e-04, 5e-04, 6e-04, 7e-04, 8e-04, 9e-04,
@@ -168,7 +190,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
        * rowCluster to avoid multiple usage of one rowCluster. drawCluster() can be used to
        * get a visual output.
        */
-      cout << "================CbmTrdClusterFinderFast===============" << endl;
+      
       Int_t nentries = fDigis->GetEntries();
       Int_t digiCounter = 0;
       cout << " Found " << nentries << " Digis in Collection" << endl;
@@ -183,7 +205,7 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
 	std::vector<int> MCIndex = digi->GetMCIndex();
 	cout << size << ": ";
 	for (Int_t i = 0; i < size; i++) {
-	  cout << " ," << MCIndex[i];
+	cout << " ," << MCIndex[i];
 	}
 	cout << endl;
 	//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -243,9 +265,27 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
       cout << " Used  " << digiCounter << " Digis after Minimum Charge Cut (" << minimumChargeTH << ")" << endl;
       std::map<Int_t, ClusterList*> fModClusterMap; //map of <moduleId, pointer of Vector of List of struct 'MyDigi' >
       for (std::map<Int_t, MyDigiList*>::iterator it = modules.begin(); it != modules.end(); ++it) {
+	if (dynamic) {
+	  fModuleInfo = fDigiPar->GetModule(it->first);
+	  
+	  Float_t mSizeX   = (fModuleInfo->GetSizex()) * 2 * 10;
+	  Float_t mSizeY   = (fModuleInfo->GetSizey()) * 2 * 10;
+	  Float_t mPosXC   = fModuleInfo->GetX() * 10;
+	  Float_t mPosYC   = fModuleInfo->GetY() * 10;
+	  Float_t mR = sqrt(pow(mPosXC,2) + pow(mPosYC,2));
+	  counterJ++;
+	  if (mR > mRMax) {
+	    rowClusterMerger = true;
+	    counterI++;
+	    //cout << it->first << "   "<< mR << endl;
+	  }
+	  else {
+	    rowClusterMerger = false;
+	    //cout << "  " << it->first << "   " << mR <<endl;
+	  }
+	}
 	fModClusterMap[it->first] = clusterModule(rowClusterMerger, it->second, ModuleNeighbourDigiMap[it->first]);
-    
-	//drawCluster(it->first, fModClusterMap[it->first]);
+    	//drawCluster(it->first, fModClusterMap[it->first]);
       }
       addCluster(fModClusterMap);
       /*
@@ -280,7 +320,8 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
       delete OptimalTH;
       delete DigiChargeSpectrum;
     }
-
+  //cout << "  " << counterI << " (" << counterI*100.0/Float_t(counterJ) << "%)" <<  " are reconstructed with rowClusterMerger" << endl;
+  printf("   %4d modules (%6.3f%%) are reconstructed with rowClusterMerger\n",counterI,counterI*100/Float_t(counterJ));
 }
 
   //----------------------------------------------------------------------

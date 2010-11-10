@@ -56,7 +56,7 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
 : FairTask(name)
 {
     fEvents = 0;
-    fWeight = 1;
+    fWeight = 0.00003708;
     fUseRich = true;
     fUseTrd = true;
     fUseTof = true;
@@ -76,6 +76,8 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
 
     fh_mc_signal_minv = new TH1D("fh_mc_signal_minv","fh_mc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_acc_signal_minv = new TH1D("fh_acc_signal_minv","fh_acc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+
+    fh_mc_mother_pdg = new TH1D("fh_mc_mother_pdg", "fh_mc_mother_pdg; Pdg code; yeild", 7000, -3500., 3500.);
 }
 
 CbmAnaDielectronTask::~CbmAnaDielectronTask()
@@ -226,6 +228,13 @@ void CbmAnaDielectronTask::MCPairs()
         if (motherId == -1 && pdg == -11) fNofMcEp++;
         if (motherId == -1 && pdg == 11) fNofMcEm++;
     } // nmber of e-/e+
+
+
+    //    mcMotherId = mctrack->GetMotherId();
+    //    mcMotherPdg = 0;
+    //    CbmMCTrack* mother = (CbmMCTrack*) fMCTracks->At(mcMotherId);
+    //    if (mother) mcMotherPdg = mother->GetPdgCode();
+
 
     for (Int_t iP = 0; iP < nMcTracks; iP++) {
         CbmMCTrack* mctrackP = (CbmMCTrack*) fMCTracks->At(iP);

@@ -29,20 +29,32 @@ class TH2F;
 
 class FairRootManager;
 
-class DiGlobalTrack{
+class DielectronCandidate{
 public:
 	CbmGlobalTrack *fGlobalTrack;
 	CbmMCTrack *fMCTrack;
 	TVector3 position, momentum;
 	Double_t mass, charge, energy, rapidity;
-	Double_t axisA, axisB, distance;
 	Double_t chiPrimary;
 	Int_t mcPdg, mcMotherID, mcMotherPdg;
-	Int_t stsMCid, richMCid;
-	Int_t stsInd, richInd, trdInd, tofInd;
-	Int_t is_sts, is_rich, is_trd, is_tof;
+	Int_t stsMCTrackId;
+	Int_t richMCTrackId;
+	Int_t stsInd;
+	Int_t richInd;
+	Int_t trdInd;
+	Int_t tofInd;
+	Bool_t isInSts;
+	Bool_t isInRich;
+	Bool_t isInTrd;
+	Bool_t isInTof;
+	Bool_t isRichElectron;
+	Bool_t isTrdElectron;
+	Bool_t isTofElectron;
+
+
 	Int_t is_fake, is_wrong, is_pion, is_proton;
-	Bool_t is_e;
+
+	Bool_t isMCSignalElectron;
 };
 
 class CbmAnaDielectronTask : public FairTask {
@@ -57,6 +69,8 @@ public:
     void SingleParticleAcceptance();
     void MCPairs();
     void PairAcceptance();
+    void FillCandidateArray();
+
 
     virtual void Finish();
     void WriteOutput();
@@ -87,6 +101,7 @@ private:
     TClonesArray *fTofPoints;
 
     CbmVertex *fPrimVertex;
+    CbmStsKFTrackFitter fKFFitter;
 
     Int_t fEvents;
 
@@ -94,6 +109,7 @@ private:
     Bool_t fUseTrd;
     Bool_t fUseTof;
 
+    vector<DielectronCandidate> fCandidates;
 
     Double_t fWeight; //Multiplicity*BR
 

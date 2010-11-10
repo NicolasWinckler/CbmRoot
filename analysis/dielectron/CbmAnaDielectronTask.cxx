@@ -194,7 +194,9 @@ InitStatus CbmAnaDielectronTask::Init()
 		return kERROR;
     }
 
-	return kSUCCESS;
+    fKFFitter.Init();
+
+    return kSUCCESS;
 }
 
 
@@ -336,6 +338,59 @@ void CbmAnaDielectronTask::PairAcceptance()
     }//iP
 
 } // PairsAcceptance
+
+
+void CbmAnaDielectronTask::FillCandidateArray()
+{
+    fCandidates.clear();
+    Int_t nGTracks = fGlobalTracks->GetEntriesFast();
+    fCandidates.reserve(nGTracks);
+
+    for (Int_t i = 0; i < nGTracks; i++){
+	DielectronCandidate cand;
+
+         CbmGlobalTrack* gTrack  = (CbmGlobalTrack*) fGlobalTracks->At(i);
+	 if(!gTrack) continue;
+
+// STS
+	 cand.stsInd = gTrack->GetStsTrackIndex();
+	 if (cand.stsInd < 0) continue;
+	 CbmStsTrack* stsTrack = (CbmStsTrack*) fStsTracks->At(cand.stsInd);
+	 if (stsTrack == NULL) continue;
+	 CbmTrackMatch* stsMatch  = (CbmTrackMatch*) fStsTrackMatches->At(cand.stsInd);
+	 if (stsMatch == NULL) continue;
+	 cand.stsMCTrackId = stsMatch->GetMCTrackId();
+	 if (cand.stsMCTrackId < 0) continue;
+	 CbmMCTrack* mcTrack1 = (CbmMCTrack*) fMCTracks->At(cand.stsMCTrackId);
+	 if (mcTrack1 == NULL) continue;
+
+	 cand.chiPrimary = fKFFitter.GetChiToVertex(stsTrack);
+
+
+// RICH
+	 cand.richInd = gTrack->GetRichRingIndex();
+         if (cand.richInd < 0) continue;
+         CbmRichRing* richRing = (CbmRichRing*) fRichRings->At(cand.richInd);
+         CbmRichRingMatch* richMatch  = (CbmRichRingMatch*) fRichRingMatches->At(cand.richInd);
+	 if (richMatch == NULL) continue;
+	 cand.richMCTrackId = richMatch->GetMCTrackID();
+	 if (cand.richMCTrackId < 0) continue;
+	 CbmMCTrack* mcTrack2 = (CbmMCTrack*) fMCTracks->At(cand.richMCTrackId);
+	 if (mcTrack2 == NULL) continue;
+
+         // check RICH ring - STS track matches
+	 if ( cand.stsMCTrackId == cand.richMCTrackId){
+	     Int_t pdg = TMath::Abs( mcTrack1->GetPdgCode() );
+	     Int_t motherId = mcTrack1->GetMotherId();
+             if (pdg == 11 && motherId == -1) cand.isMCSignalElectron;
+	 }
+
+         fCandidates.push_back(cand);
+
+
+    }// global tracks
+
+}
 
 void CbmAnaDielectronTask::Finish()
 {

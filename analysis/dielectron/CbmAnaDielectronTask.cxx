@@ -227,13 +227,23 @@ void CbmAnaDielectronTask::MCPairs()
         Int_t pdg = mctrack->GetPdgCode();
         if (motherId == -1 && pdg == -11) fNofMcEp++;
         if (motherId == -1 && pdg == 11) fNofMcEm++;
+        
+        
+//        mcMotherPdg = 0;
+//        if (pdg == -11 || pdg == 11) {
+//            CbmMCTrack* mother = (CbmMCTrack*) fMCTracks->At(mcMotherId);
+//            if (mother) mcMotherPdg = mother->GetPdgCode();
+//            fh_mc_mother_pdg->Fill(mcMotherPdg);
+//        }
     } // nmber of e-/e+
 
-
-    //    mcMotherId = mctrack->GetMotherId();
-    //    mcMotherPdg = 0;
-    //    CbmMCTrack* mother = (CbmMCTrack*) fMCTracks->At(mcMotherId);
-    //    if (mother) mcMotherPdg = mother->GetPdgCode();
+    
+        
+        mcMotherId = mctrack->GetMotherId();
+        mcMotherPdg = 0;
+        CbmMCTrack* mother = (CbmMCTrack*) fMCTracks->At(mcMotherId);
+        if (mother) mcMotherPdg = mother->GetPdgCode();
+        fh_mc_mother_pdg->Fill()
 
 
     for (Int_t iP = 0; iP < nMcTracks; iP++) {

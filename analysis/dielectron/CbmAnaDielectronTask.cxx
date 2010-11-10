@@ -229,23 +229,16 @@ void CbmAnaDielectronTask::MCPairs()
         if (motherId == -1 && pdg == 11) fNofMcEm++;
         
         
-//        mcMotherPdg = 0;
-//        if (pdg == -11 || pdg == 11) {
-//            CbmMCTrack* mother = (CbmMCTrack*) fMCTracks->At(mcMotherId);
-//            if (mother) mcMotherPdg = mother->GetPdgCode();
-//            fh_mc_mother_pdg->Fill(mcMotherPdg);
-//        }
+        Int_t mcMotherPdg = 0;
+        if (pdg == -11 || pdg == 11) {
+            CbmMCTrack* mother = (CbmMCTrack*) fMCTracks->At(motherId);
+            if (mother) mcMotherPdg = mother->GetPdgCode();
+            fh_mc_mother_pdg->Fill(mcMotherPdg);
+        }
     } // nmber of e-/e+
 
-    
+  
         
-        mcMotherId = mctrack->GetMotherId();
-        mcMotherPdg = 0;
-        CbmMCTrack* mother = (CbmMCTrack*) fMCTracks->At(mcMotherId);
-        if (mother) mcMotherPdg = mother->GetPdgCode();
-        fh_mc_mother_pdg->Fill()
-
-
     for (Int_t iP = 0; iP < nMcTracks; iP++) {
         CbmMCTrack* mctrackP = (CbmMCTrack*) fMCTracks->At(iP);
         Int_t motherId  = mctrackP->GetMotherId();
@@ -420,6 +413,7 @@ void CbmAnaDielectronTask::Finish()
     fh_acc_signal_mom->Scale(scale);
     fh_mc_signal_minv->Scale(scale);
     fh_acc_signal_minv->Scale(scale);
+    fh_mc_mother_pdg->Scale(scale);
     
     fh_acc_signal_pty_eff->Divide(fh_acc_signal_pty, fh_mc_signal_pty);
 //    fh_acc_signal_mom->Sumw2();
@@ -434,6 +428,7 @@ void CbmAnaDielectronTask::Finish()
     fh_acc_signal_mom_eff->Write();
     fh_mc_signal_minv->Write();
     fh_acc_signal_minv->Write();
+    fh_mc_mother_pdg->Write();
 }
 
 void CbmAnaDielectronTask::WriteOutput()

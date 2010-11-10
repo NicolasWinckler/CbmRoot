@@ -128,6 +128,7 @@ private:
     TH1D* fh_acc_signal_mom_eff; // momentum efficiency
     TH1D* fh_mc_signal_minv; // invariant mass distribution for signal mc
     TH1D* fh_acc_signal_minv; //invariant mass distribution for accepted signal
+    TH1D* fh_mc_mother_pdg; //mother pdg code for e-/e+
     
 public:
     void SetUseRich(Bool_t use){fUseRich = use;};

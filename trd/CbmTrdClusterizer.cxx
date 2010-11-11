@@ -145,9 +145,9 @@ InitStatus CbmTrdClusterizer::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterizer::Exec(Option_t * option)
 {
-  Bool_t lookup = true;
-  Bool_t gaus = false;
-  Bool_t fast = true;
+  Bool_t lookup = true; // use lookup table or calculate realtime
+  Bool_t gaus = false;  // use mathieson or gaus function
+  Bool_t fast = true;   // only for realtime!!! calculate over full area or circle area around mc-position
   cout << "================CbmTrdClusterizer=====================" << endl;
   Digicounter = 0;
   CbmTrdPoint *pt=NULL;
@@ -166,7 +166,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   
   FillMathiesonVector();
 
-  Int_t nEntries = fTrdPoints->GetEntriesFast();
+  Int_t nEntries = fTrdPoints->GetEntries();
   //nEntries = 1;
   cout << " Found " << nEntries << " MC-Points in Collection of TRD" << endl;
   if (lookup) {
@@ -185,6 +185,8 @@ void CbmTrdClusterizer::Exec(Option_t * option)
     
   for (int j = 0; j < nEntries ; j++ ) 
     {
+      //cout << "=========================================================================================" << endl;
+      //cout << j << "  ";
       /*
 	if (int(j * 10 / float(nEntries)) - int((j-1) * 10 / float(nEntries)) == 1)
 	{
@@ -195,13 +197,20 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       if (gRandom->Rndm() > fEfficiency ) continue;
  
       pt = (CbmTrdPoint*) fTrdPoints->At(j);
-  
+      if(NULL == pt) {
+	cout << " no point found " << endl;
+      }
       if(NULL == pt) continue;
 
       pt->Momentum(mom);
       fMCindex=pt->GetTrackID();
+      //cout << fMCindex << "  ";
 
       CbmMCTrack *p= (CbmMCTrack*) fMCStacks->At(fMCindex);
+      if(NULL == p) {
+	cout << " no point found " << endl;
+      }
+
       if(NULL == p) continue;
 
       Int_t pdgCode = p->GetPdgCode();
@@ -281,6 +290,8 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	}
 
       fModuleID = pt->GetDetectorID();
+
+      //cout << fModuleID << endl;
 
       GetModuleInformationFromDigiPar(fModuleID);
 
@@ -375,12 +386,17 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	      PadChargeModule[iRow * fModuleParaMap[fModuleID]->nCol + iCol] = 0.0;	      
 	      padW[iCol] = fModuleParaMap[fModuleID]->PadSizeX[0];
 	    }
-	}   
-      
-          
+	} 
+      /*  
+      for (Int_t i = 0; i < 3 ; i++){
+	cout << "H" << GetPadHeight(i) << endl;
+      }
+      cout << "nCol:" << nCol << " nRow:" << nRow << endl;
+      */  
       SplitPathSlices(fast, lookup, gaus, j, point, PadChargeModule, j, padW, padH );
       
     }
+  //cout << endl;
   printf(" Added %d TRD Digis to Collection\n  (Including multiple fired digis by differend particles in the same event)\n   %.2f Digis per MC-point in average\n",Digicounter,float(Digicounter/float(nEntries)));
  
   Int_t iDigi=0; 
@@ -646,7 +662,7 @@ int CbmTrdClusterizer::GetSector(Double_t tempPosY)/*tempPosY has to be in LL mo
   // ---- SplitPathSlices -------------------------------------------------
 void CbmTrdClusterizer::SplitPathSlices(Bool_t fast, Bool_t lookup, Bool_t gaus, const Int_t pointID, MyPoint *point, Double_t* PadChargeModule, Int_t j, Double_t* padW, Double_t* padH)
 {
-
+  //cout << "SplitPathSlices" << endl;
   Float_t ClusterDistance = 0.2 * fModuleParaMap[fModuleID]->PadSizeX[0] - 0.1; //Ar 94 electron/cm    Xe 307 electrons/cm
   Int_t DrawTH = Int_t(15 * fModuleParaMap[fModuleID]->PadSizeX[0] / ClusterDistance)/* * 100*/;
   Int_t nPathSlice = Int_t(point->deltaR / ClusterDistance) + 1;                       
@@ -772,23 +788,24 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
 }
     // --------------------------------------------------------------------
 
-Double_t fRound(Double_t value) 
+Double_t DeltaGrid(Double_t doubleV, Double_t offset) 
 {
-  Double_t rounded;
-  if(value > 0) {
-    rounded = Int_t(value + 0.5);
+  doubleV += offset;       // center origin to lower left corner
+  //doubleV -= 0.5;          // grid border offset 0.5 mm
+  Int_t intV = doubleV / 1;
+  
+  Double_t delta = doubleV - intV; 
+  
+  if(delta >= 0.5) {
+    delta = doubleV - (intV + 1);
   }
-  else {
-    rounded = Int_t(value - 0.5);
-  }
-
-  return rounded;
+  return delta + 0.5;
 }
 // --------------------------------------------------------------------
 void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
 {
   //CalcMathieson(x_mean, y_mean, SliceELoss, W ,H);
-  
+  //cout << "LookupMathiesonVector" << endl;
   Int_t rMax = 0;
   Int_t rMin = 0;
   Double_t Q = 0;
@@ -801,26 +818,126 @@ void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, 
   }
 
   Int_t xStep = 0;
+
   /*
-    Float_t xDelta = fRound(x_mean) + 0.5;
-    Float_t yDelta = fRound(y_mean) + 0.5;
+    Float_t xPosP = x_mean + 0.5;
+    Float_t xPosN = x_mean - 0.5;
+    Float_t yPosP = y_mean + 0.5;
+    Float_t yPosN = y_mean - 0.5;
+    Int_t iPadColP = Int_t(fPadNrX/2);
+    Int_t iPadColN = Int_t(fPadNrX/2);
+    Int_t iPadRowP = Int_t(fPadNrY/2);
+    Int_t iPadRowN = Int_t(fPadNrY/2);
+    Float_t xNextPadP =  0.5 * W[iPadColP];
+    Float_t xNextPadN = -0.5 * W[iPadColN];
+    Float_t yNextPadP =  0.5 * H[iPadRowP];
+    Float_t yNextPadN = -0.5 * H[iPadRowN];
+
+    Float_t xDeltaGridPos = DeltaGrid(x_mean, 0.5 * W[iPadColP]);
+    Float_t yDeltaGridPos = DeltaGrid(y_mean, 0.5 * H[iPadRowP]);
   */
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Int_t xSign[4] = { 1, 1,-1,-1};
+  Int_t ySign[4] = { 1,-1, 1,-1};
+  Float_t xPos = x_mean;
+  Float_t yPos = y_mean;
+  Int_t iPadCol = Int_t(fPadNrX/2);
+  Int_t iPadRow = Int_t(fPadNrY/2);
+  Float_t xNextPad =  0.5 * W[iPadCol];
+  Float_t yNextPad =  0.5 * H[iPadRow];
 
-
-  Float_t xPosP = x_mean + 0.5;
-  Float_t xPosN = x_mean - 0.5;
-  Float_t yPosP = y_mean + 0.5;
-  Float_t yPosN = y_mean - 0.5;
-  Int_t iPadColP = Int_t(fPadNrX/2);
-  Int_t iPadColN = Int_t(fPadNrX/2);
-  Int_t iPadRowP = Int_t(fPadNrY/2);
-  Int_t iPadRowN = Int_t(fPadNrY/2);
-  Float_t xNextPadP =  0.5 * W[iPadColP];
-  Float_t xNextPadN = -0.5 * W[iPadColN];
-  Float_t yNextPadP =  0.5 * H[iPadRowP];
-  Float_t yNextPadN = -0.5 * H[iPadRowN];
-
-  for (Int_t yStep = 0; yStep < endOfMathiesonArray; yStep++) { //y
+  Float_t xDeltaGridPos = DeltaGrid(x_mean, 0.5 * W[iPadCol]);
+  Float_t yDeltaGridPos = DeltaGrid(y_mean, 0.5 * H[iPadRow]);
+ 
+  //cout << x_mean << " - " << xDeltaGridPos << " = " << x_mean-xDeltaGridPos << endl;
+  for (Int_t direction = 0; direction < 4; direction++){
+    //cout << "for direction" << endl;
+    //cout << endl << endl << direction << xSign[direction] << ySign[direction] << endl;
+    iPadRow = Int_t(fPadNrY/2);
+    yNextPad = ySign[direction] * 0.5 * H[iPadRow];
+    //cout << " " << direction;
+    for (Int_t yStep = 0; yStep < endOfMathiesonArray; yStep++) { //y
+      //cout << " for yStep" << endl;
+      //cout << endl;;
+      xStep = 0;
+      iPadCol = Int_t(fPadNrX/2);
+      xNextPad = xSign[direction] * 0.5 * W[iPadCol];
+      yPos = y_mean + yDeltaGridPos + ySign[direction] * yStep;
+      if (direction == 0 || direction == 2) {
+	if (yPos > yNextPad) {
+	  iPadRow++;
+	  yNextPad += H[iPadRow];
+	  //cout << iPadRow << "--------------------- "<< yNextPad << " H"<< H[iPadRow] << endl;
+	}
+      }
+      else {
+	if (yPos < yNextPad) {
+	  iPadRow--;
+	  yNextPad -= H[iPadRow];
+	  //cout << iPadRow << "--------------------- "<< yNextPad << " H"<< H[iPadRow] << endl;
+	}
+      }
+      r = sqrt(pow(xSign[direction] * xStep + xDeltaGridPos ,2) + pow(ySign[direction] * yStep + yDeltaGridPos ,2));
+      
+      while (Int_t(r * Accuracy) + 2 < endOfMathiesonArray/*21*/ * Accuracy 
+	     && iPadCol < fPadNrX
+	     && iPadCol >= 0
+	     ) { //x
+	//cout << "x";
+	//cout << "  while xStep" << endl;
+	xPos = x_mean + xDeltaGridPos + xSign[direction] * xStep;
+	if (direction == 0 || direction == 1) {
+	  if (xPos > xNextPad) {
+	    iPadCol++;
+	    xNextPad += W[iPadCol];
+	    //cout << "|";
+	  }
+	}
+	else {
+	  if (xPos < xNextPad) {
+	    iPadCol--;
+	    xNextPad -= W[iPadCol];
+	    // cout << "|";
+	  }
+	}
+	//r = sqrt(pow(xSign[direction] * xStep + xDeltaGridPos ,2) + pow(ySign[direction] * yStep + yDeltaGridPos ,2));
+	
+	if (Int_t(r * Accuracy) + 2 < endOfMathiesonArray * Accuracy) {
+	  rMin = Int_t(r * Accuracy);
+	  rMax = rMin+1;
+	  
+	  Float_t m = ((fMathieson[rMax] - fMathieson[rMin]) / (Float_t(Accuracy)));
+	  Float_t b = fMathieson[rMax] - m * (rMax/Float_t(Accuracy));
+	  Q = m * r + b;
+	  
+	  //Q = 0.1;
+	  if (xStep > 0 && yStep > 0) {
+	    fPadCharge[iPadRow][iPadCol] += Q;
+	  }
+	  else {
+	    if ((xStep == 0 && direction == 0) || (xStep == 0 && direction == 3)) {
+	      fPadCharge[iPadRow][iPadCol] += Q;
+	    } 
+	    if ((yStep == 0 && direction == 1) || (yStep == 0 && direction == 2)) {
+	      fPadCharge[iPadRow][iPadCol] += Q;
+	    } 
+	  }
+	}
+	else {
+	  cout << "    " << xSign[direction] * xStep + xDeltaGridPos << " " << ySign[direction] * yStep + yDeltaGridPos << " " << r << endl;
+	}
+	xStep++;
+	r = sqrt(pow(xSign[direction] * xStep + xDeltaGridPos ,2) + pow(ySign[direction] * yStep + yDeltaGridPos ,2));
+      }  
+      //cout << "  while xStep" << endl;   
+    }
+    //cout << " for yStep" << endl;
+  }
+  //cout << "for direction" << endl;
+  //cout << endl;
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  /*
+    for (Int_t yStep = 0; yStep < endOfMathiesonArray; yStep++) { //y
     xStep = 0;
     iPadColN = Int_t(fPadNrX/2);
     iPadColP = Int_t(fPadNrX/2);
@@ -833,68 +950,60 @@ void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, 
 
 
     if (yPosP > yNextPadP) {
-      iPadRowP++;
-      yNextPadP += H[iPadRowP];
+    iPadRowP++;
+    yNextPadP += H[iPadRowP];
     }
     if (yPosN < yNextPadN) {
-      iPadRowN--;
-      yNextPadN -= H[iPadRowN];
+    iPadRowN--;
+    yNextPadN -= H[iPadRowN];
     }
 
     r = sqrt(pow(xStep + 0.5 ,2) + pow(yStep + 0.5 ,2));
  
     while (Int_t(r * Accuracy) < endOfMathiesonArray * Accuracy + 2
-	   /*
-	     && iPadColP < fPadNrX 
-	     && iPadColN >= 0
-	   */ ) { //x
-      xPosP = x_mean + 0.5 + xStep;
-      xPosN = x_mean - 0.5 - xStep;
-      if (xPosP > xNextPadP) {
-	iPadColP++;
-	xNextPadP += W[iPadColP];
-      }
-      if (xPosN < xNextPadN) {
-	iPadColN--;
-	xNextPadN -= W[iPadColN];
-      }
-      /*
-      cout << "xStep:" << xStep << " yStep:" << yStep << endl;
-      cout << "    xPosP:" << xPosP << "   nW:" << xNextPadP << "   W:" << W[iPadColP]  << "     ColP:" << iPadColP << endl;
-      cout << "    xPosN:" << xPosN << "   nW:" << xNextPadN << "   W:" << W[iPadColN]  << "     ColN:" << iPadColN << endl;
-      cout << "    yPosP:" << yPosP << "   nH:" << yNextPadP << "   H:" << H[iPadRowP]  << "     RowP:" << iPadRowP << endl;
-      cout << "    yPosN:" << yPosN << "   nH:" << yNextPadN << "   H:" << H[iPadRowN]  << "     RowN:" << iPadRowN << endl << endl;
-      */
-      r = sqrt(pow(xStep + 0.5 ,2) + pow(yStep + 0.5 ,2));
-      if (Int_t(r * Accuracy) + 2 < endOfMathiesonArray * Accuracy) {
-	rMin = Int_t(r * Accuracy);
-	rMax = rMin+1;
-	Float_t m = ((fMathieson[rMax] - fMathieson[rMin]) / (Float_t(Accuracy)));
-	Float_t b = fMathieson[rMax] - m * (rMax/Float_t(Accuracy));
-	Q = m * r + b;
-	if (iPadRowP < fPadNrY && iPadColP < fPadNrX) {
-	  fPadCharge[iPadRowP][iPadColP] += Q;
-	}
-	if (yPosP != yPosN) {
-	  if (xPosP != xPosN) {
-	    if (iPadRowP < fPadNrY && iPadColN >= 0) {
-	      fPadCharge[iPadRowP][iPadColN] += Q;
-	    }
-	    if (iPadRowN >= 0 && iPadColP < fPadNrX) {
-	      fPadCharge[iPadRowN][iPadColP] += Q;
-	    }
-	    if (iPadRowN >= 0 && iPadColN >= 0) {
-	      fPadCharge[iPadRowN][iPadColN] += Q;
-	    }
-	  }
-	}
-      }
-      xStep++;
+    ) { //x
+    xPosP = x_mean + 0.5 + xStep;
+    xPosN = x_mean - 0.5 - xStep;
+    if (xPosP > xNextPadP) {
+    iPadColP++;
+    xNextPadP += W[iPadColP];
+    }
+    if (xPosN < xNextPadN) {
+    iPadColN--;
+    xNextPadN -= W[iPadColN];
+    }
+
+    r = sqrt(pow(xStep + 0.5 ,2) + pow(yStep + 0.5 ,2));
+    if (Int_t(r * Accuracy) + 2 < endOfMathiesonArray * Accuracy) {
+    rMin = Int_t(r * Accuracy);
+    rMax = rMin+1;
+    Float_t m = ((fMathieson[rMax] - fMathieson[rMin]) / (Float_t(Accuracy)));
+    Float_t b = fMathieson[rMax] - m * (rMax/Float_t(Accuracy));
+    Q = m * r + b;
+    if (iPadRowP < fPadNrY && iPadColP < fPadNrX) {
+    fPadCharge[iPadRowP][iPadColP] += Q;
+    }
+    if (yPosP != yPosN) {
+    if (xPosP != xPosN) {
+    if (iPadRowP < fPadNrY && iPadColN >= 0) {
+    fPadCharge[iPadRowP][iPadColN] += Q;
+    }
+    if (iPadRowN >= 0 && iPadColP < fPadNrX) {
+    fPadCharge[iPadRowN][iPadColP] += Q;
+    }
+    if (iPadRowN >= 0 && iPadColN >= 0) {
+    fPadCharge[iPadRowN][iPadColN] += Q;
+    }
+    }
+    }
+    }
+    xStep++;
     }      
-  }
-  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) {
-    for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
-      fPadCharge[iPadRow][iPadCol] *= SliceELoss;
+    }
+  */
+  for (Int_t iPRow = 0; iPRow < fPadNrY; iPRow++) {
+    for (Int_t iPCol = 0; iPCol < fPadNrX; iPCol++) {
+      fPadCharge[iPRow][iPCol] *= SliceELoss;
     }
   }
 }
@@ -931,62 +1040,65 @@ void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, 
   }
 
   // --------------------------------------------------------------------
-  void CbmTrdClusterizer::GetPadSizeMatrix(MyPoint *point, Double_t* H, Double_t* W, Double_t* padH, Double_t* padW)
-  {  
-    //cout << "GetPadSizeMatrix" << endl;
-    for (Int_t iRow = 0; iRow <= fPadNrY / 2; iRow++)
-      {
-	if (iRow == 0)
-	  {
-	    H[(fPadNrY / 2)] = padH[point->Row_cluster];
-	  }
-	else
-	  {
-	    if (point->Row_cluster + iRow < fModuleParaMap[fModuleID]->nRow)
-	      {
-		H[(fPadNrY / 2) + iRow] = padH[point->Row_cluster + iRow];
-	      }
-	    else
-	      {
-		H[(fPadNrY / 2) + iRow] = H[iRow - 1];
-	      }
-	    if (point->Row_cluster - iRow > 0)
-	      {
-		H[(fPadNrY / 2) - iRow] = padH[point->Row_cluster - iRow];
-	      }
-	    else
-	      {
-		H[(fPadNrY / 2) - iRow] = H[iRow + 1];
-	      }
-	  }
-      }
-    for (Int_t iCol = 0; iCol <= fPadNrX / 2; iCol++)
-      {	   
-	if (iCol == 0)
-	  {
-	    W[(fPadNrX / 2)] = padW[point->Col_cluster];
-	  }
-	else
-	  {
-	    if (point->Col_cluster + iCol < fModuleParaMap[fModuleID]->nCol)
-	      {   
-		W[(fPadNrX / 2) + iCol] = padW[point->Col_cluster + iCol];
-	      }
-	    else
-	      {
-		W[(fPadNrX / 2) + iCol] = W[iCol - 1];
-	      }
-	    if (point->Col_cluster - iCol > 0)
-	      {
-		W[(fPadNrX / 2) - iCol] = padW[point->Col_cluster - iCol];
-	      }
-	    else
-	      {
-		W[(fPadNrX / 2) - iCol] = W[iCol + 1];
-	      }
-	  }
-      }  
-  }
+void CbmTrdClusterizer::GetPadSizeMatrix(MyPoint *point, Double_t* H, Double_t* W, Double_t* padH, Double_t* padW)
+{  
+  //cout << "GetPadSizeMatrix" << endl;
+  
+  Int_t rowPos = point->Row_cluster;
+  Int_t colPos = point->Col_cluster;
+  for (Int_t iRow = 0; iRow <= fPadNrY / 2; iRow++)
+    {
+      if (iRow == 0)
+	{
+	  H[(fPadNrY / 2)] = padH[rowPos];
+	}
+      else
+	{
+	  if (rowPos + iRow < fModuleParaMap[fModuleID]->nRow)
+	    {
+	      H[(fPadNrY / 2) + iRow] = padH[rowPos + iRow];
+	    }
+	  else
+	    {
+	      H[(fPadNrY / 2) + iRow] = H[(fPadNrY / 2) + iRow - 1];
+	    }
+	  if (rowPos - iRow > 0)
+	    {
+	      H[(fPadNrY / 2) - iRow] = padH[rowPos - iRow];
+	    }
+	  else
+	    {
+	      H[(fPadNrY / 2) - iRow] = H[(fPadNrY / 2) - iRow + 1];
+	    }
+	}
+    }
+  for (Int_t iCol = 0; iCol <= fPadNrX / 2; iCol++)
+    {	   
+      if (iCol == 0)
+	{
+	  W[(fPadNrX / 2)] = padW[colPos];
+	}
+      else
+	{
+	  if (colPos + iCol < fModuleParaMap[fModuleID]->nCol)
+	    {   
+	      W[(fPadNrX / 2) + iCol] = padW[colPos + iCol];
+	    }
+	  else
+	    {
+	      W[(fPadNrX / 2) + iCol] = W[(fPadNrX / 2) +iCol - 1];
+	    }
+	  if (colPos - iCol > 0)
+	    {
+	      W[(fPadNrX / 2) - iCol] = padW[colPos - iCol];
+	    }
+	  else
+	    {
+	      W[(fPadNrX / 2) - iCol] = W[(fPadNrX / 2) - iCol + 1];
+	    }
+	}
+    }
+ }
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
   void CbmTrdClusterizer::ChargeConservation(MyPoint *point)
@@ -1030,12 +1142,13 @@ void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, 
 	      }	      	     
 	  }
       }  
+    //cout << "ChargeConservation ende" << endl;
   }
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
   void CbmTrdClusterizer::ClusterMapping(MyPoint *point, Double_t* PadChargeModule)
   {
-    // cout << "ClusterMapping" << endl;
+    //cout << "ClusterMapping" << endl;
     /*
       Associates the integration are used within CalcMathieson() to the pad area of the module
     */  
@@ -1057,8 +1170,8 @@ void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, 
   // --------------------------------------------------------------------
 void CbmTrdClusterizer::CalcGaus(Bool_t fast, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
 {
-  Float_t sigma = 8.08257e-01; // [mm]
-  Float_t amplitude = 2.96136e-01;
+  Float_t sigma = 2.28388e+00;//8.08257e-01; // [mm]
+  Float_t amplitude = 2.96216e-01;//2.96136e-01;
   Float_t rho = 0;
   Float_t Q = 0;
   Float_t r;
@@ -1211,11 +1324,7 @@ void CbmTrdClusterizer::CalcMathieson(Bool_t fast, Double_t x_mean, Double_t y_m
   if (fast) {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Int_t xStep = 0;
-    /*
-      Float_t xDelta = fRound(x_mean) + 0.5;
-      Float_t yDelta = fRound(y_mean) + 0.5;
-    */
-
+  
     Float_t xPosP = x_mean + 0.5;
     Float_t xPosN = x_mean - 0.5;
     Float_t yPosP = y_mean + 0.5;
@@ -1228,6 +1337,9 @@ void CbmTrdClusterizer::CalcMathieson(Bool_t fast, Double_t x_mean, Double_t y_m
     Float_t xNextPadN = -0.5 * W[iPadColN];
     Float_t yNextPadP =  0.5 * H[iPadRowP];
     Float_t yNextPadN = -0.5 * H[iPadRowN];
+
+    Float_t xDeltaGridPos = DeltaGrid(x_mean, 0.5 * W[iPadColP]);
+    Float_t yDeltaGridPos = DeltaGrid(y_mean, 0.5 * H[iPadRowP]);
 
     for (Int_t yStep = 0; yStep < endOfMathiesonArray; yStep++) { //y
       xStep = 0;
@@ -1252,7 +1364,7 @@ void CbmTrdClusterizer::CalcMathieson(Bool_t fast, Double_t x_mean, Double_t y_m
 
       r = sqrt(pow(xStep + 0.5 ,2) + pow(yStep + 0.5 ,2));
  
-      while (Int_t(r * Accuracy) < endOfMathiesonArray * Accuracy + 2
+      while (Int_t(r * Accuracy) + 2 < endOfMathiesonArray * Accuracy 
 	     /*
 	       && iPadColP < fPadNrX 
 	       && iPadColN >= 0

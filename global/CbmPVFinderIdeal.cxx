@@ -44,7 +44,7 @@ void CbmPVFinderIdeal::Init() {
   }
 
   // Get MCTrack array
-  fMCTracks  = (TClonesArray*) ioman->ActivateBranch("MCTrack");
+  fMCTracks  = (TClonesArray*) ioman->GetObject("MCTrack");
   if ( ! fMCTracks) {
     cout << "-E- CbmPVFinderIdeal::Init: No MCTrack array!"
 	 << endl;

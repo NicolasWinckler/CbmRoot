@@ -114,14 +114,14 @@ InitStatus CbmTrdClusterizer::Init()
   FairRootManager *ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
     
-  fTrdPoints=(TClonesArray *)ioman->ActivateBranch("TrdPoint"); 
+  fTrdPoints=(TClonesArray *)ioman->GetObject("TrdPoint"); 
   if ( ! fTrdPoints ) {
     cout << "-W CbmTrdCluster::Init: No TrdPoints array!" << endl;
     cout << "                            Task will be inactive" << endl;
     return kERROR;
   }
 
-  fMCStacks = (TClonesArray*)ioman->ActivateBranch("MCTrack");
+  fMCStacks = (TClonesArray*)ioman->GetObject("MCTrack");
   if ( ! fMCStacks ) {
     cout << "-W CbmTrdCluster::Init: No MCTrack array!" << endl;
     cout << "                            Task will be inactive" << endl;

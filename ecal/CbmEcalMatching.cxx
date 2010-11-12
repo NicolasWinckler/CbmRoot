@@ -68,13 +68,13 @@ InitStatus CbmEcalMatching::Init()
     Fatal("Init", "Can't find an array of reconstructed photons.");
     return kFATAL;
   }
-  fMCTracks=(TClonesArray*)io->ActivateBranch("MCTrack");
+  fMCTracks=(TClonesArray*)io->GetObject("MCTrack");
   if (!fMCTracks)
   {
     Fatal("Init", "Can't find array of MC tracks");
     return kFATAL;
   }
-  fPoints=(TClonesArray*)io->ActivateBranch("EcalPoint");
+  fPoints=(TClonesArray*)io->GetObject("EcalPoint");
   if (!fPoints)
   {
     Fatal("Init", "Can't find array of Ecal Points");

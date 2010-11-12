@@ -66,8 +66,8 @@ InitStatus CbmTofHitProducer::Init()
 {
   FairRootManager *fManager = FairRootManager::Instance();
 
-    fTofPoints  = (TClonesArray *) fManager->ActivateBranch("TofPoint");
-    fMCTracks   = (TClonesArray *) fManager->ActivateBranch("MCTrack");
+    fTofPoints  = (TClonesArray *) fManager->GetObject("TofPoint");
+    fMCTracks   = (TClonesArray *) fManager->GetObject("MCTrack");
     
     FILE *par;
 

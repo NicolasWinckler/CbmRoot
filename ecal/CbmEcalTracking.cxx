@@ -45,7 +45,7 @@ InitStatus CbmEcalTracking::Init()
   }
   fTrackPar=new TClonesArray("FairTrackParam", 1000);
   io->Register("EcalTrackParam", "ECAL", fTrackPar, kTRUE);
-  fStru=(CbmEcalStructure*)io->ActivateBranch("EcalStructure");
+  fStru=(CbmEcalStructure*)io->GetObject("EcalStructure");
   if (!fStru) 
   {
     Fatal("Init()", "Can't find calorimeter structure in the system.");

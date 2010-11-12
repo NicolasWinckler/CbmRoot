@@ -61,7 +61,7 @@ InitStatus CbmEcalReconstructionFastMC::Init()
   FairRootManager* fManager = FairRootManager::Instance();
 
   // ECAL hits
-  fListECALhits = (TClonesArray*)fManager->ActivateBranch("EcalHitFastMC");
+  fListECALhits = (TClonesArray*)fManager->GetObject("EcalHitFastMC");
   // new list of ECAL reconstructed particles
   fListRecParticles = new TClonesArray("CbmEcalRecParticle",100);
   fManager->Register("EcalRecParticle","ECAL",fListRecParticles,kTRUE);

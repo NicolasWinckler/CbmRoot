@@ -39,19 +39,19 @@ InitStatus CbmEcalShowerCalibrator::Init()
 {
   FairRootManager* fManager=FairRootManager::Instance();
 
-  fLitePoints=(TClonesArray*)fManager->ActivateBranch("EcalPointLite");
+  fLitePoints=(TClonesArray*)fManager->GetObject("EcalPointLite");
   if (fLitePoints==NULL)
   {
     cerr << "There are no EcalPointLite branch in the file!!!" << endl;
     return kFATAL; 
   }
-  fEcalPoints=(TClonesArray*)fManager->ActivateBranch("EcalPoint");
+  fEcalPoints=(TClonesArray*)fManager->GetObject("EcalPoint");
   if (fEcalPoints==NULL)
   {
     cerr << "There are no EcalPoint branch in the file!!!" << endl;
     return kFATAL; 
   }
-  fMCTracks=(TClonesArray*)fManager->ActivateBranch("MCTrack");
+  fMCTracks=(TClonesArray*)fManager->GetObject("MCTrack");
   if (fMCTracks==NULL)
   {
     cerr << "There are no MCTrack branch in the file!!!" << endl;

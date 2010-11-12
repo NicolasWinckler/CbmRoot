@@ -77,7 +77,7 @@ InitStatus CbmTrdFindHits::Init()
 
     FairRootManager *ioman = FairRootManager::Instance();
 
-    TClonesArray *TrdCluster = (TClonesArray*) ioman->ActivateBranch("TRDCluster");
+    TClonesArray *TrdCluster = (TClonesArray*) ioman->GetObject("TRDCluster");
     if ( TrdCluster ) {
       cout << "--I-- CbmTrdFindHits::Init " << endl;
       cout << "--I-- activate CbmTrdFindHitsFromCluster " << endl;
@@ -94,7 +94,7 @@ InitStatus CbmTrdFindHits::Init()
       return kSUCCESS;
     }   
     //TrdDigi
-    TClonesArray *TrdDigi = (TClonesArray*) ioman->ActivateBranch("TRDDigi");
+    TClonesArray *TrdDigi = (TClonesArray*) ioman->GetObject("TRDDigi");
     if ( TrdDigi ) {
       cout << "--I-- CbmTrdFindHits::Init " << endl;
       cout << "--I-- activate CbmTrdHitProducerDigi" << endl;
@@ -111,7 +111,7 @@ InitStatus CbmTrdFindHits::Init()
       return kSUCCESS;
     }   
 
-    TClonesArray *TrdPoint = (TClonesArray*) ioman->ActivateBranch("TRDPoint");
+    TClonesArray *TrdPoint = (TClonesArray*) ioman->GetObject("TRDPoint");
     if ( TrdPoint ) {
       cout << "--I-- CbmTrdFindHits::Init " << endl;
       cout << "--I-- activate CbmTrdHitProducerSmearing" << endl;

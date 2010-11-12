@@ -92,7 +92,7 @@ InitStatus CbmTrdSimpleHitProducerCluster::Init()
 
     FairRootManager *ioman = FairRootManager::Instance();
 
-    fTrdDigi =(TClonesArray *)  ioman->ActivateBranch("TrdDigi");
+    fTrdDigi =(TClonesArray *)  ioman->GetObject("TrdDigi");
     if ( ! fTrdDigi ) {
       cout << "-W CbmTrdSimpleHitProducerCluster::Init: No TrdDigi array!" << endl;
       cout << "                            Task will be inactive" << endl;
@@ -100,7 +100,7 @@ InitStatus CbmTrdSimpleHitProducerCluster::Init()
     }
 
 
-    fTrdCluster =(TClonesArray *)  ioman->ActivateBranch("TrdCluster");
+    fTrdCluster =(TClonesArray *)  ioman->GetObject("TrdCluster");
     if ( ! fTrdDigi ) {
       cout << "-W CbmTrdSimpleHitProducerCluster::Init: No TrdCluster array!" << endl;
       cout << "                            Task will be inactive" << endl;

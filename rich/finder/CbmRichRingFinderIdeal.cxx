@@ -85,7 +85,7 @@ void CbmRichRingFinderIdeal::Init() {
   }
 
   // Get MCTrack array
-  fMCTrackArray  = (TClonesArray*) ioman->ActivateBranch("MCTrack");
+  fMCTrackArray  = (TClonesArray*) ioman->GetObject("MCTrack");
   if ( ! fMCTrackArray) {
     cout << "-E- CbmRichRingFinderIdeal::Init: No MCTrack array!"
 	 << endl;
@@ -93,7 +93,7 @@ void CbmRichRingFinderIdeal::Init() {
   }
 
   // Get MCPoint array
-  fMCRichPointArray  = (TClonesArray*) ioman->ActivateBranch("RichPoint");
+  fMCRichPointArray  = (TClonesArray*) ioman->GetObject("RichPoint");
   if ( ! fMCRichPointArray) {
     cout << "-E- CbmRichRingFinderIdeal::Init: No MCPoint array!"
 	 << endl;

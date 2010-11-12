@@ -94,19 +94,19 @@ InitStatus CbmTrdHitProducerCluster::Init()
 {
   cout << " * CbmTrdHitProducerCluster * :: Init()" << endl;
   FairRootManager *ioman = FairRootManager::Instance();
-  fTrdPoints=(TClonesArray *)ioman->ActivateBranch("TrdPoint"); 
+  fTrdPoints=(TClonesArray *)ioman->GetObject("TrdPoint"); 
   if ( ! fTrdPoints ) {
     cout << "-W CbmTrdHitProducerCluster::Init: No TrdPoints array!" << endl;
     cout << "                             Task will be inactive" << endl;
     return kERROR;
   }
-  fDigis =(TClonesArray *)  ioman->ActivateBranch("TrdDigi");
+  fDigis =(TClonesArray *)  ioman->GetObject("TrdDigi");
   if ( ! fDigis ) {
     cout << "-W CbmTrdHitProducerCluster::Init: No TrdDigi array!" << endl;
     cout << "                             Task will be inactive" << endl;
     return kERROR;
   }
-  fClusters =(TClonesArray *)  ioman->ActivateBranch("TrdCluster");
+  fClusters =(TClonesArray *)  ioman->GetObject("TrdCluster");
   if ( ! fClusters ) {
     cout << "-W CbmTrdHitProducerCluster::Init: No TrdCluster array!" << endl;
     cout << "                             Task will be inactive" << endl;

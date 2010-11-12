@@ -199,7 +199,7 @@ void CbmL1CATrdTrackFinderSA::Init()
   }
 
   // Get MCTrack array
-  fMCTrackArray  = L1_DYNAMIC_CAST<TClonesArray*>( ioman->ActivateBranch("MCTrack") );
+  fMCTrackArray  = L1_DYNAMIC_CAST<TClonesArray*>( ioman->GetObject("MCTrack") );
   if ( ! fMCTrackArray) {
     cout << "-E- CbmL1CATrdTrackFinderSA::Init: No MCTrack array!"
 	 << endl;
@@ -207,7 +207,7 @@ void CbmL1CATrdTrackFinderSA::Init()
   }
 
   // Get MCPoint array
-  fMCPointArray  = L1_DYNAMIC_CAST<TClonesArray*>( ioman->ActivateBranch("TrdPoint") );
+  fMCPointArray  = L1_DYNAMIC_CAST<TClonesArray*>( ioman->GetObject("TrdPoint") );
   if ( ! fMCPointArray) {
     cout << "-E- CbmL1CATrdTrackFinderSA::Init: No MCPoint array!"
 	 << endl;

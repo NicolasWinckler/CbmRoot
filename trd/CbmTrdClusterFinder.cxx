@@ -91,7 +91,7 @@ InitStatus CbmTrdClusterFinder::Init()
 
   FairRootManager *ioman = FairRootManager::Instance();
   
-  fDigis =(TClonesArray *)  ioman->ActivateBranch("TrdDigi");
+  fDigis =(TClonesArray *)  ioman->GetObject("TrdDigi");
   if ( ! fDigis ) {
     cout << "-W CbmTrdHitProducerDigi::Init: No TrdDigi array!" << endl;
     cout << "                            Task will be inactive" << endl;

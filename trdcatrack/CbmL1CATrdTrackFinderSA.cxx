@@ -90,7 +90,7 @@ void CbmL1CATrdTrackFinderSA::Init()
   }
 
   // Get MCTrack array
-  fMCTrackArray  = (TClonesArray*) ioman->ActivateBranch("MCTrack");
+  fMCTrackArray  = (TClonesArray*) ioman->GetObject("MCTrack");
   if ( ! fMCTrackArray) {
     cout << "-E- CbmL1CATrdTrackFinderSA::Init: No MCTrack array!"
 	 << endl;
@@ -98,7 +98,7 @@ void CbmL1CATrdTrackFinderSA::Init()
   }
 
   // Get MCPoint array
-  fMCPointArray  = (TClonesArray*) ioman->ActivateBranch("TrdPoint");
+  fMCPointArray  = (TClonesArray*) ioman->GetObject("TrdPoint");
   if ( ! fMCPointArray) {
     cout << "-E- CbmL1CATrdTrackFinderSA::Init: No MCPoint array!"
 	 << endl;

@@ -69,7 +69,7 @@ void CbmStsTrackFinderIdeal::Init() {
   }
 
   // Get MCTrack array
-  fMCTrackArray  = (TClonesArray*) ioman->ActivateBranch("MCTrack");
+  fMCTrackArray  = (TClonesArray*) ioman->GetObject("MCTrack");
   if ( ! fMCTrackArray) {
     cout << "-E- " << fName << "::Init: No MCTrack array!"
 	 << endl;
@@ -77,7 +77,7 @@ void CbmStsTrackFinderIdeal::Init() {
   }
 
   // Get MCPoint array
-  fMCPointArray  = (TClonesArray*) ioman->ActivateBranch("StsPoint");
+  fMCPointArray  = (TClonesArray*) ioman->GetObject("StsPoint");
   if ( ! fMCPointArray) {
     cout << "-E- " << fName << "::Init: No MCPoint array!"
 	 << endl;

@@ -110,7 +110,7 @@ InitStatus CbmTrdDigitizer::Init()
     if ( ! ioman ) Fatal("Init", "No FairRootManager");
     
     fTrdPoints=(TClonesArray *)  
-      ioman->ActivateBranch("TrdPoint");
+      ioman->GetObject("TrdPoint");
  
     if ( ! fTrdPoints ) {
       cout << "-W CbmTrdDigitizer::Init: No TrdPoints array!" << endl;
@@ -118,7 +118,7 @@ InitStatus CbmTrdDigitizer::Init()
       return kERROR;
     }
 
-    fMCStack = (TClonesArray*)ioman->ActivateBranch("MCTrack");
+    fMCStack = (TClonesArray*)ioman->GetObject("MCTrack");
 
     fDigiCollection = new TClonesArray("CbmTrdDigi", 100);
     ioman->Register("TrdDigi","TRD Digis",fDigiCollection,kTRUE);

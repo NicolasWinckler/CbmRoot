@@ -36,10 +36,10 @@ InitStatus CbmLitCheckMultipleScattering::Init()
 	FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman) Fatal("Init", "No CbmRootManager");
 
-    fMCTrackArray  = (TClonesArray*) ioman->ActivateBranch("MCTrack");
+    fMCTrackArray  = (TClonesArray*) ioman->GetObject("MCTrack");
     if (!fMCTrackArray) Fatal("Init", "No MCTrack array!");
 
-    fMCPointArray  = (TClonesArray*) ioman->ActivateBranch("LitDetPoint");
+    fMCPointArray  = (TClonesArray*) ioman->GetObject("LitDetPoint");
     if (!fMCPointArray) Fatal("Init", "No LitPoint array!");
 
     Int_t nBins = 500;

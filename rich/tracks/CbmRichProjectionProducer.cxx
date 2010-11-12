@@ -16,7 +16,7 @@
  * New FairTask design
  *
  * Revision 1.5  2005/12/08 15:13:04  turany
- * change GetRegistered, ActivateBranch and CheckActivatedBranch
+ * change GetRegistered, GetObject and CheckActivatedBranch
  * to GetObject, also add a flag to the arguments of Register which control saving
  * to file(kTRUE) or only in memory(kFALSE)
  *

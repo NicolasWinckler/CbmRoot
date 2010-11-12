@@ -105,7 +105,7 @@ InitStatus CbmTrdHitProducerDigi::Init()
 
     FairRootManager *ioman = FairRootManager::Instance();
 
-    fTrdDigi =(TClonesArray *)  ioman->ActivateBranch("TrdDigi");
+    fTrdDigi =(TClonesArray *)  ioman->GetObject("TrdDigi");
     if ( ! fTrdDigi ) {
       cout << "-W CbmTrdHitProducerDigi::Init: No TrdDigi array!" << endl;
       cout << "                            Task will be inactive" << endl;
@@ -113,14 +113,14 @@ InitStatus CbmTrdHitProducerDigi::Init()
     }
 
 
-    fTrdDigiMatch =(TClonesArray *)  ioman->ActivateBranch("TrdDigiMatch");
+    fTrdDigiMatch =(TClonesArray *)  ioman->GetObject("TrdDigiMatch");
     if ( ! fTrdDigi ) {
       cout << "-W CbmTrdHitProducerDigi::Init: No TrdDigiMatch array!" << endl;
       cout << "                            Task will be inactive" << endl;
       return kERROR;
     }
 
-    fMCStack = (TClonesArray*)ioman->ActivateBranch("MCTrack");
+    fMCStack = (TClonesArray*)ioman->GetObject("MCTrack");
 
     ioman->Register("TrdHit","TRD",fHitCollection,kTRUE);
 

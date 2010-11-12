@@ -44,7 +44,7 @@ InitStatus CbmAnaHypRecCascade::Init(){
   fRCTracks  = (TClonesArray*) fManager->GetObject("StsTrack");
   fRCMatch   = (TClonesArray*) fManager->GetObject("StsTrackMatch");
   fPV        = (CbmVertex*)    fManager->GetObject("PrimaryVertex");
-  fListRCLambda  = (TClonesArray*) fManager->ActivateBranch("V0Candidates");
+  fListRCLambda  = (TClonesArray*) fManager->GetObject("V0Candidates");
   fManager->Register("CascadeCandidates","Sts",fListCascades,kTRUE);
   fTree=fManager->GetInTree();
 

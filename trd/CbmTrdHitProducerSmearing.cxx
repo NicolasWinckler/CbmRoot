@@ -129,14 +129,14 @@ InitStatus CbmTrdHitProducerSmearing::Init()
 
   FairRootManager *ioman = FairRootManager::Instance();
   
-  fTrdPoints=(TClonesArray *)  ioman->ActivateBranch("TrdPoint");
+  fTrdPoints=(TClonesArray *)  ioman->GetObject("TrdPoint");
   if ( ! fTrdPoints ) {
     cout << "-W CbmTrdHitProducerSmearing::Init: No TrdPoints array!" << endl;
     cout << "                            Task will be inactive" << endl;
     return kERROR;
   }
   
-  fListStack = (TClonesArray*)ioman->ActivateBranch("MCTrack");
+  fListStack = (TClonesArray*)ioman->GetObject("MCTrack");
   
   fHitCollection = new TClonesArray("CbmTrdHit", 100);
   ioman->Register("TrdHit","TRD",fHitCollection,kTRUE);

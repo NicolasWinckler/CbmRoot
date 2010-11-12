@@ -1083,7 +1083,7 @@ void inputRoot::initSpecial(FairRootManager* manager) {
 	geometryFileDirectory += "/geometry/";
 
 	/* get pointer to the list of mc tracks */
-	inputTracks = (TClonesArray*) manager->ActivateBranch(MCTRACKBRANCH);
+	inputTracks = (TClonesArray*) manager->GetObject(MCTRACKBRANCH);
 
 	if (inputTracks == NULL)
 		throw noTrackInFileError(MCTRACKBRANCH);
@@ -1096,7 +1096,7 @@ void inputRoot::initSpecial(FairRootManager* manager) {
 
 		if (readMapsHits || readHybridHits || readStripHits) {
 	
-			inputStsPoints = (TClonesArray*) manager->ActivateBranch(STSPOINTBRANCH);
+			inputStsPoints = (TClonesArray*) manager->GetObject(STSPOINTBRANCH);
 
 			if (inputStsPoints == NULL)
 				throw noPointInFileError(STSPOINTBRANCH);
@@ -1107,7 +1107,7 @@ void inputRoot::initSpecial(FairRootManager* manager) {
 
 		if (readMapsHits) {
 	
-			inputMvdPoints = (TClonesArray*) manager->ActivateBranch(MVDPOINTBRANCH);
+			inputMvdPoints = (TClonesArray*) manager->GetObject(MVDPOINTBRANCH);
 
 			if (inputMvdPoints == NULL)
 				throw noPointInFileError(MVDPOINTBRANCH);
@@ -1116,7 +1116,7 @@ void inputRoot::initSpecial(FairRootManager* manager) {
 
 		if (readHybridHits || readStripHits) {
 	
-			inputStsPoints = (TClonesArray*) manager->ActivateBranch(STSPOINTBRANCH);
+			inputStsPoints = (TClonesArray*) manager->GetObject(STSPOINTBRANCH);
 
 			if (inputStsPoints == NULL)
 				throw noPointInFileError(STSPOINTBRANCH);
@@ -1139,7 +1139,7 @@ void inputRoot::initSpecial(FairRootManager* manager) {
 
 #else
 
-			inputMapsHits   = (TClonesArray*) manager->ActivateBranch(STSMAPSHITBRANCH);
+			inputMapsHits   = (TClonesArray*) manager->GetObject(STSMAPSHITBRANCH);
 
 #endif
 
@@ -1151,7 +1151,7 @@ void inputRoot::initSpecial(FairRootManager* manager) {
 
 #else
 
-			inputHybridHits = (TClonesArray*) manager->ActivateBranch(STSHYBRIDHITBRANCH);
+			inputHybridHits = (TClonesArray*) manager->GetObject(STSHYBRIDHITBRANCH);
 
 #endif
 
@@ -1163,7 +1163,7 @@ void inputRoot::initSpecial(FairRootManager* manager) {
 
 #else
 
-			inputStripHits  = (TClonesArray*) manager->ActivateBranch(STSSTRIPHITBRANCH);
+			inputStripHits  = (TClonesArray*) manager->GetObject(STSSTRIPHITBRANCH);
 
 #endif
 
@@ -1177,7 +1177,7 @@ void inputRoot::initSpecial(FairRootManager* manager) {
 
 #else
 
-			inputMvdHits   = (TClonesArray*) manager->ActivateBranch(MVDHITBRANCH);
+			inputMvdHits   = (TClonesArray*) manager->GetObject(MVDHITBRANCH);
 
 #endif
 
@@ -1189,7 +1189,7 @@ void inputRoot::initSpecial(FairRootManager* manager) {
 
 #else
 
-			inputStsHits = (TClonesArray*) manager->ActivateBranch(STSHITBRANCH);
+			inputStsHits = (TClonesArray*) manager->GetObject(STSHITBRANCH);
 
 #endif
 

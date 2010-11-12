@@ -102,31 +102,31 @@ InitStatus CbmTrdElectronsQa::Init()
 		return kFATAL;
 	}
 
-	fMCTracks  = (TClonesArray*) ioman->ActivateBranch("MCTrack");
+	fMCTracks  = (TClonesArray*) ioman->GetObject("MCTrack");
 	if ( ! fMCTracks) {
 		cout << "-E- CbmTrdElectronsQa::Init: No MCTrack array!" << endl;
 		return kFATAL;
 	}
 
-	fTrdPoints  = (TClonesArray*) ioman->ActivateBranch("TrdPoint");
+	fTrdPoints  = (TClonesArray*) ioman->GetObject("TrdPoint");
 	if ( ! fTrdPoints) {
 		cout << "-E- CbmTrdElectronsQa::Init: No TRDPoint array!" << endl;
 		return kFATAL;
 	}
 
-	fTrdTracks  = (TClonesArray*) ioman->ActivateBranch("TrdTrack");
+	fTrdTracks  = (TClonesArray*) ioman->GetObject("TrdTrack");
 	if ( ! fTrdTracks) {
 		cout << "-E- CbmTrdElectronsQa::Init: No TrdTrack array!" << endl;
 		return kFATAL;
 	}
 
-	fTrdTrackMatches  = (TClonesArray*) ioman->ActivateBranch("TrdTrackMatch");
+	fTrdTrackMatches  = (TClonesArray*) ioman->GetObject("TrdTrackMatch");
 	if ( ! fTrdTrackMatches) {
 		cout << "-E- CbmTrdElectronsQa::Init: No TrdTrackMatch array!" << endl;
 		return kFATAL;
 	}
 
-	fTrdHits  = (TClonesArray*) ioman->ActivateBranch("TrdHit");
+	fTrdHits  = (TClonesArray*) ioman->GetObject("TrdHit");
 	if ( ! fTrdHits) {
 		cout << "-E- CbmTrdElectronsQa::Init: No TRDHit array!" << endl;
 		return kFATAL;

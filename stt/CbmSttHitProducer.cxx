@@ -105,18 +105,18 @@ InitStatus CbmSttHitProducer::Init()
     cout<<" * HitProducer * :: Init() "<<endl;
 
     FairRootManager *ioman = FairRootManager::Instance();
-    fSttPoints=(TClonesArray *) ioman->ActivateBranch("SttPoint");
+    fSttPoints=(TClonesArray *) ioman->GetObject("SttPoint");
     if ( ! fSttPoints ) {
       cout << "-W CbmSttHitProducer::Init: No SttPoints array!" << endl;
       cout << "                          Task will be inactive" << endl;
       return kERROR;
     }
 
-    fListStack = (TClonesArray*)ioman->ActivateBranch("MCTrack");
+    fListStack = (TClonesArray*)ioman->GetObject("MCTrack");
     fHitCollection = new TClonesArray("CbmSttHit", 100);
     ioman->Register("SttHit","STT",fHitCollection,kTRUE);
     ioman->Register("MCEventHeader.","",
-		    (TClonesArray*)ioman->ActivateBranch("MCEventHeader."),kTRUE);
+		    (TClonesArray*)ioman->GetObject("MCEventHeader."),kTRUE);
 
     fGeoPar->print();
     // setting the parameter class on static mode

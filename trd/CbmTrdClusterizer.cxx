@@ -788,12 +788,12 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
 }
     // --------------------------------------------------------------------
 
-  void SlowIntegration(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
+  void CbmTrdClusterizer::SlowIntegration(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
   {
 
   }
     // --------------------------------------------------------------------
-  void FastIntegration(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
+  void CbmTrdClusterizer::FastIntegration(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
   {
   Int_t rMax = 0;
   Int_t rMin = 0;
@@ -892,7 +892,7 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
   }
   }
     // --------------------------------------------------------------------
-Double_t DeltaGrid(Double_t doubleV, Double_t offset) 
+Double_t CbmTrdClusterizer::DeltaGrid(Double_t doubleV, Double_t offset) 
 {
   doubleV += offset;       // center origin to lower left corner
   //doubleV -= 0.5;          // grid border offset 0.5 mm

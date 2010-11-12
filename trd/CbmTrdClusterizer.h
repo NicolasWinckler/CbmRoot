@@ -164,7 +164,7 @@ class CbmTrdClusterizer : public FairTask {
 
   void GetPadSizeMatrix(MyPoint *point, Double_t* H, Double_t* W, Double_t* padH, Double_t* padW);
 
-  Double_t fRound(Double_t doubleV, Double_t offset);
+  Double_t DeltaGrid(Double_t doubleV, Double_t offset);
 
   //void TransformMod2Pad(Double_t* MCoordinate, Double_t* PCoordinate, Double_t* StrucDim);
  

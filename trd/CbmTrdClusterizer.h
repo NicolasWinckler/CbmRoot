@@ -71,6 +71,8 @@ typedef struct ModulePara
   std::vector<Float_t> PadSizeY;
   std::vector<Int_t> SecCol;
   std::vector<Int_t> SecRow;
+  std::vector<Int_t> PadSizeXArray;
+  std::vector<Int_t> PadSizeYArray;
    
   Float_t ModuleSizeX;
   Float_t ModuleSizeY;
@@ -138,17 +140,17 @@ class CbmTrdClusterizer : public FairTask {
 
   void ClusterMapping(MyPoint *point, Double_t* PadChargeModule);
 
-  void CalcMathieson(Bool_t fast, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
+  Double_t CalcMathieson(Double_t r);
 
-  void CalcGaus(Bool_t fast, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
+  Double_t CalcGaus(Double_t r);
 
   void FillMathiesonVector();
 
-  void LookupMathiesonVector(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
+  Double_t LookupMathiesonVector(Double_t r);
 
-  void SlowIntegration(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
+  void SlowIntegration(Bool_t lookup, Bool_t gaus, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
 
-  void FastIntegration(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
+  void FastIntegration(Bool_t lookup, Bool_t gaus, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
 
   void TransformLL2C(Double_t* LLCoordinate, Double_t* CCoordinate, Double_t* StrucDim);
  

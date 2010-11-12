@@ -788,6 +788,110 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
 }
     // --------------------------------------------------------------------
 
+  void SlowIntegration(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
+  {
+
+  }
+    // --------------------------------------------------------------------
+  void FastIntegration(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
+  {
+  Int_t rMax = 0;
+  Int_t rMin = 0;
+  Double_t Q = 0;
+  Float_t r = 0.0;         // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
+
+  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) {
+    for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
+      fPadCharge[iPadRow][iPadCol] = Q;
+    }
+  }
+
+  Int_t xStep = 0;
+ Int_t xSign[4] = { 1, 1,-1,-1};
+  Int_t ySign[4] = { 1,-1, 1,-1};
+  Float_t xPos = x_mean;
+  Float_t yPos = y_mean;
+  Int_t iPadCol = Int_t(fPadNrX/2);
+  Int_t iPadRow = Int_t(fPadNrY/2);
+  Float_t xNextPad =  0.5 * W[iPadCol];
+  Float_t yNextPad =  0.5 * H[iPadRow];
+
+  Float_t xDeltaGridPos = DeltaGrid(x_mean, 0.5 * W[iPadCol]);
+  Float_t yDeltaGridPos = DeltaGrid(y_mean, 0.5 * H[iPadRow]);
+ 
+  for (Int_t direction = 0; direction < 4; direction++){
+    iPadRow = Int_t(fPadNrY/2);
+    yNextPad = ySign[direction] * 0.5 * H[iPadRow];
+    for (Int_t yStep = 0; yStep < endOfMathiesonArray; yStep++) { //y
+      xStep = 0;
+      iPadCol = Int_t(fPadNrX/2);
+      xNextPad = xSign[direction] * 0.5 * W[iPadCol];
+      yPos = y_mean + yDeltaGridPos + ySign[direction] * yStep;
+      if (direction == 0 || direction == 2) {
+	if (yPos > yNextPad) {
+	  iPadRow++;
+	  yNextPad += H[iPadRow];
+	}
+      }
+      else {
+	if (yPos < yNextPad) {
+	  iPadRow--;
+	  yNextPad -= H[iPadRow];
+	}
+      }
+      r = sqrt(pow(xSign[direction] * xStep + xDeltaGridPos ,2) + pow(ySign[direction] * yStep + yDeltaGridPos ,2));
+      
+      while (Int_t(r * Accuracy) + 2 < endOfMathiesonArray * Accuracy 
+	     && iPadCol < fPadNrX
+	     && iPadCol >= 0
+	     ) { //x
+	xPos = x_mean + xDeltaGridPos + xSign[direction] * xStep;
+	if (direction == 0 || direction == 1) {
+	  if (xPos > xNextPad) {
+	    iPadCol++;
+	    xNextPad += W[iPadCol];
+	  }
+	}
+	else {
+	  if (xPos < xNextPad) {
+	    iPadCol--;
+	    xNextPad -= W[iPadCol];
+	  }
+	}
+	if (Int_t(r * Accuracy) + 2 < endOfMathiesonArray * Accuracy) {
+	  rMin = Int_t(r * Accuracy);
+	  rMax = rMin+1;
+	  
+	  Float_t m = ((fMathieson[rMax] - fMathieson[rMin]) / (Float_t(Accuracy)));
+	  Float_t b = fMathieson[rMax] - m * (rMax/Float_t(Accuracy));
+	  Q = m * r + b;
+	  
+	  //Q = 0.1;
+	  if (xStep > 0 && yStep > 0) {
+	    fPadCharge[iPadRow][iPadCol] += Q;
+	  }
+	  else {
+	    if ((xStep == 0 && direction == 0) || (xStep == 0 && direction == 3)) {
+	      fPadCharge[iPadRow][iPadCol] += Q;
+	    } 
+	    if ((yStep == 0 && direction == 1) || (yStep == 0 && direction == 2)) {
+	      fPadCharge[iPadRow][iPadCol] += Q;
+	    } 
+	  }
+	}
+	xStep++;
+	r = sqrt(pow(xSign[direction] * xStep + xDeltaGridPos ,2) + pow(ySign[direction] * yStep + yDeltaGridPos ,2));
+      }   
+    }
+  }
+
+  for (Int_t iPRow = 0; iPRow < fPadNrY; iPRow++) {
+    for (Int_t iPCol = 0; iPCol < fPadNrX; iPCol++) {
+      fPadCharge[iPRow][iPCol] *= SliceELoss;
+    }
+  }
+  }
+    // --------------------------------------------------------------------
 Double_t DeltaGrid(Double_t doubleV, Double_t offset) 
 {
   doubleV += offset;       // center origin to lower left corner

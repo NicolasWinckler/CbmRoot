@@ -146,6 +146,10 @@ class CbmTrdClusterizer : public FairTask {
 
   void LookupMathiesonVector(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
 
+  void SlowIntegration(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
+
+  void FastIntegration(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H);
+
   void TransformLL2C(Double_t* LLCoordinate, Double_t* CCoordinate, Double_t* StrucDim);
  
   void TransformC2LL(Double_t* CCoordinate, Double_t* LLCoordinate, Double_t* StrucDim);

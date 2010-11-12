@@ -145,9 +145,15 @@ InitStatus CbmTrdClusterizer::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterizer::Exec(Option_t * option)
 {
-  Bool_t lookup = true; // use lookup table or calculate realtime
-  Bool_t gaus = false;  // use mathieson or gaus function
-  Bool_t fast = true;   // only for realtime!!! calculate over full area or circle area around mc-position
+  // use lookup table or calculate realtime
+  Bool_t lookup = true;
+
+  // use mathieson or gaus function 
+  Bool_t gaus = false; 
+
+  // calculate over full area or circle area around mc-position 
+  Bool_t fast = true;   
+
   cout << "================CbmTrdClusterizer=====================" << endl;
   Digicounter = 0;
   CbmTrdPoint *pt=NULL;
@@ -165,24 +171,32 @@ void CbmTrdClusterizer::Exec(Option_t * option)
     }
   
   FillMathiesonVector();
-
+  Int_t nCount = 0;
   Int_t nEntries = fTrdPoints->GetEntries();
   //nEntries = 1;
   cout << " Found " << nEntries << " MC-Points in Collection of TRD" << endl;
-  if (lookup) {
-    cout << " Using Mathieson lookup-table" << endl;
+  if (fast) {
+  cout << " Fast integration: on" << endl;
   }
   else {
+    cout << " Fast integration: off" << endl;
+  }
+  cout << " Mathieson lookup-table:";
+  if (lookup) {
+    cout << " on" << endl;
+  }
+  else {
+    cout << " off" << endl;
+    cout << " Real time calculation:";
     if (gaus) {
-      cout << " Using real time Gauss calculation" << endl;
+      cout << " Gauss" << endl;
     }
     else {
-      cout << " Using real time Mathieson calculation" << endl;
+      cout << " Mathieson " << endl;
     }
   }
   //nEntries = nEntries * 1 / 100;
   //nEntries = nEntries * 10 / 100;//5;
-    
   for (int j = 0; j < nEntries ; j++ ) 
     {
       //cout << "=========================================================================================" << endl;
@@ -214,7 +228,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
       if(NULL == p) continue;
 
       Int_t pdgCode = p->GetPdgCode();
-  
+      //nCount++;
 
       // Calculate point in the middle of the detector. This is
       // for safety reasons, because the point at exit is slightly
@@ -388,10 +402,10 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	    }
 	} 
       /*  
-      for (Int_t i = 0; i < 3 ; i++){
-	cout << "H" << GetPadHeight(i) << endl;
-      }
-      cout << "nCol:" << nCol << " nRow:" << nRow << endl;
+	  for (Int_t i = 0; i < 3 ; i++){
+	  cout << "H" << GetPadHeight(i) << endl;
+	  }
+	  cout << "nCol:" << nCol << " nRow:" << nRow << endl;
       */  
       SplitPathSlices(fast, lookup, gaus, j, point, PadChargeModule, j, padW, padH );
       
@@ -422,6 +436,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
     
     iDigi++;
   }
+  //cout << nCount << endl;
 }
    // --------------------------------------------------------------------
 
@@ -530,7 +545,9 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar( Int_t VolumeID)
       if (it == fModuleParaMap.end()) {
 	ModulePara *mPara = new ModulePara;
 	fModuleParaMap[detID] = mPara;
-    
+	/*
+	  add a matrix 0 -> nrow and ncol for pad width and height of each pad to get wride of the padsizematrix !!!! 
+	 */
 	mPara -> Station = detInfo[1];
 	mPara -> Layer = detInfo[2];
 	mPara -> moduleId = detID;//moduleId;
@@ -572,6 +589,16 @@ void CbmTrdClusterizer::GetModuleInformationFromDigiPar( Int_t VolumeID)
 	      mPara -> PadSizeY[i]    = 10 * fModuleInfo->GetPadSizex(i);
 	    }
 	  }
+	/*
+	mPara -> PadSizeXArray.resize(mPara -> nCol);
+	mPara -> PadSizeYArray.resize(mPara -> nRow);
+	for (Int_t i = 0; i < mPara -> nCol; i++) {
+	  mPara -> PadSizeXArray[i] = ;
+	}
+	for (Int_t i = 0; i < mPara -> nRow; i++) {
+	  mPara -> PadSizeYArray[i] = ;
+	}
+	*/
 	for (Int_t i = 0; i < NoSectors; i++) {
 	  mPara -> SecRow[i]      = Int_t(mPara->SectorSizeY[i] / mPara->PadSizeY[i]);
 	  mPara -> SecCol[i]      = Int_t(mPara->SectorSizeX[i] / mPara->PadSizeX[i]);
@@ -729,17 +756,26 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t fast, Bool_t lookup, Bool_t gaus,
       tempx = point->clusterPosLL[0] - (point->clusterPosC[0] + 0.5 * fModuleParaMap[fModuleID]->PadSizeX[0]);
       
       GetPadSizeMatrix(point, H, W, padH, padW);
+      if (fast) {
+	FastIntegration(lookup, gaus, point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W, H);
+      }
+      else {
+	SlowIntegration(lookup, gaus, point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W, H);
+      }
+      /*
       if (lookup) {
-	LookupMathiesonVector(point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W, H);
+	//LookupMathiesonVector(point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W, H);
+	FastIntegration(point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W, H);
       }
       else {
 	if (gaus) {
-	  CalcGaus(fast, point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W ,H);
+	  //CalcGaus(fast, point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W ,H);
 	}
 	else {
-	  CalcMathieson(fast, point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W ,H);
+	  //CalcMathieson(fast, point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W ,H);
 	}
       }
+      */
       ChargeConservation(point);
 
       ClusterMapping(point, PadChargeModule);
@@ -788,13 +824,79 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
 }
     // --------------------------------------------------------------------
 
-  void CbmTrdClusterizer::SlowIntegration(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
-  {
-
+void CbmTrdClusterizer::SlowIntegration(Bool_t lookup, Bool_t gaus, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
+{  
+  /*
+  x_mean = +0.4 * W[int(fPadNrX/2)];
+  y_mean = -0.4 * H[int(fPadNrY/2)];
+  */
+  printf(" (%5.1f,%5.1f)\n",x_mean,y_mean);
+  
+  Double_t deltaW = -0.5 * W[int(fPadNrX/2)];
+  for (Int_t i = 0; i < int(fPadNrX/2); i++) {
+    deltaW -= W[i];
   }
+  Double_t deltaWtemp = deltaW;
+
+  Double_t deltaH = -0.5 * H[int(fPadNrY/2)];
+  for (Int_t i = 0; i < int(fPadNrY/2); i++) {
+    deltaH -= H[i];
+  }
+  TCanvas *c = new TCanvas("c","c",1400,600);
+  c->Divide(2,1);
+  TH2F *Test = new TH2F("test","test",-2*int(deltaW)+1,deltaW+0.5,-deltaW-0.5,-2*int(deltaH)+1,deltaH+0.5,-deltaH-0.5);
+  TH2F *Test2 = new TH2F("test2","test2",fPadNrX,0,fPadNrX,fPadNrY,0,fPadNrY);
+  Double_t r = 0;
+  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) { 
+    deltaW = deltaWtemp;
+    for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) { 
+      for (Int_t yi = 0; yi < H[iPadRow] * accuracy; yi++) {
+	for (Int_t xi = 0; xi < W[iPadCol] * accuracy; xi++) {
+	  //Mathieson coordinate system ist centered in the center of the hit pad 
+	  r = sqrt(
+		   pow(deltaW + (xi + 0.5) / float(accuracy) - x_mean,2) 
+		   + 
+		   pow(deltaH + (yi + 0.5) / float(accuracy) - y_mean,2)
+		   );
+	  /*
+	    r = sqrt(
+	    pow(((iPadCol - int(fPadNrX/2)) * W[iPadCol] + (xi + 0.5) / float(accuracy) - 0.5 * W[int(fPadNrX/2)]) - x_mean,2) + 
+	    pow(((iPadRow - int(fPadNrY/2)) * H[iPadRow] + (yi + 0.5) / float(accuracy) - 0.5 * H[int(fPadNrY/2)]) - y_mean,2)
+	    );
+	  */
+
+	  if (lookup) {
+	    fPadCharge[iPadRow][iPadCol] += LookupMathiesonVector(r);
+	  } 
+	  else {
+	    if (gaus) {
+	      fPadCharge[iPadRow][iPadCol] += CalcGaus(r);
+	    } 
+	    else {
+	      fPadCharge[iPadRow][iPadCol] += CalcMathieson(r);
+	    }
+	  }
+	  Test->Fill(deltaW + (xi + 0.5) / float(accuracy),deltaH + (yi + 0.5) / float(accuracy), CalcMathieson(r) );
+	}
+      }
+      deltaW += W[iPadCol];
+    }
+    deltaH += H[iPadRow];
+  }
+  for (Int_t i = 0; i < fPadNrX; i++) {
+    for (Int_t j = 0; j < fPadNrY; j++) {
+      Test2->Fill(i,j,fPadCharge[j][i]);
+    }
+  }
+  c->cd(1);
+  Test->Draw("colz");
+  c->cd(2);
+  Test2->Draw("colz");
+}
+  
     // --------------------------------------------------------------------
-  void CbmTrdClusterizer::FastIntegration(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
-  {
+void CbmTrdClusterizer::FastIntegration(Bool_t lookup, Bool_t gaus, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
+{
   Int_t rMax = 0;
   Int_t rMin = 0;
   Double_t Q = 0;
@@ -807,7 +909,7 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
   }
 
   Int_t xStep = 0;
- Int_t xSign[4] = { 1, 1,-1,-1};
+  Int_t xSign[4] = { 1, 1,-1,-1};
   Int_t ySign[4] = { 1,-1, 1,-1};
   Float_t xPos = x_mean;
   Float_t yPos = y_mean;
@@ -818,6 +920,8 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
 
   Float_t xDeltaGridPos = DeltaGrid(x_mean, 0.5 * W[iPadCol]);
   Float_t yDeltaGridPos = DeltaGrid(y_mean, 0.5 * H[iPadRow]);
+
+  Float_t ySqr;
  
   for (Int_t direction = 0; direction < 4; direction++){
     iPadRow = Int_t(fPadNrY/2);
@@ -839,7 +943,8 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
 	  yNextPad -= H[iPadRow];
 	}
       }
-      r = sqrt(pow(xSign[direction] * xStep + xDeltaGridPos ,2) + pow(ySign[direction] * yStep + yDeltaGridPos ,2));
+      ySqr = pow(ySign[direction] * yStep + yDeltaGridPos ,2);
+      r = sqrt(pow(xSign[direction] * xStep + xDeltaGridPos ,2) + ySqr/*pow(ySign[direction] * yStep + yDeltaGridPos ,2)*/);
       
       while (Int_t(r * Accuracy) + 2 < endOfMathiesonArray * Accuracy 
 	     && iPadCol < fPadNrX
@@ -858,29 +963,51 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
 	    xNextPad -= W[iPadCol];
 	  }
 	}
-	if (Int_t(r * Accuracy) + 2 < endOfMathiesonArray * Accuracy) {
-	  rMin = Int_t(r * Accuracy);
-	  rMax = rMin+1;
-	  
-	  Float_t m = ((fMathieson[rMax] - fMathieson[rMin]) / (Float_t(Accuracy)));
-	  Float_t b = fMathieson[rMax] - m * (rMax/Float_t(Accuracy));
-	  Q = m * r + b;
-	  
-	  //Q = 0.1;
+	//if (Int_t(r * Accuracy) + 2 < endOfMathiesonArray * Accuracy) {
+	if (lookup) {
 	  if (xStep > 0 && yStep > 0) {
-	    fPadCharge[iPadRow][iPadCol] += Q;
+	    fPadCharge[iPadRow][iPadCol] += LookupMathiesonVector(r);
 	  }
 	  else {
 	    if ((xStep == 0 && direction == 0) || (xStep == 0 && direction == 3)) {
-	      fPadCharge[iPadRow][iPadCol] += Q;
+	      fPadCharge[iPadRow][iPadCol] += LookupMathiesonVector(r);
 	    } 
 	    if ((yStep == 0 && direction == 1) || (yStep == 0 && direction == 2)) {
-	      fPadCharge[iPadRow][iPadCol] += Q;
+	      fPadCharge[iPadRow][iPadCol] += LookupMathiesonVector(r);
 	    } 
 	  }
 	}
+	else {
+	  if (gaus) {
+	    if (xStep > 0 && yStep > 0) {
+	      fPadCharge[iPadRow][iPadCol] += CalcGaus(r);
+	    }
+	    else {
+	      if ((xStep == 0 && direction == 0) || (xStep == 0 && direction == 3)) {
+		fPadCharge[iPadRow][iPadCol] += CalcGaus(r);
+	      } 
+	      if ((yStep == 0 && direction == 1) || (yStep == 0 && direction == 2)) {
+		fPadCharge[iPadRow][iPadCol] += CalcGaus(r);
+	      } 
+	    }
+	  }
+	  else {
+	    if (xStep > 0 && yStep > 0) {
+	      fPadCharge[iPadRow][iPadCol] += CalcMathieson(r);
+	    }
+	    else {
+	      if ((xStep == 0 && direction == 0) || (xStep == 0 && direction == 3)) {
+		fPadCharge[iPadRow][iPadCol] += CalcMathieson(r);
+	      } 
+	      if ((yStep == 0 && direction == 1) || (yStep == 0 && direction == 2)) {
+		fPadCharge[iPadRow][iPadCol] += CalcMathieson(r);
+	      } 
+	    }
+	  }
+	}
+	//	}
 	xStep++;
-	r = sqrt(pow(xSign[direction] * xStep + xDeltaGridPos ,2) + pow(ySign[direction] * yStep + yDeltaGridPos ,2));
+	r = sqrt(pow(xSign[direction] * xStep + xDeltaGridPos ,2) + ySqr/*pow(ySign[direction] * yStep + yDeltaGridPos ,2)*/);
       }   
     }
   }
@@ -890,7 +1017,7 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
       fPadCharge[iPRow][iPCol] *= SliceELoss;
     }
   }
-  }
+}
     // --------------------------------------------------------------------
 Double_t CbmTrdClusterizer::DeltaGrid(Double_t doubleV, Double_t offset) 
 {
@@ -906,210 +1033,55 @@ Double_t CbmTrdClusterizer::DeltaGrid(Double_t doubleV, Double_t offset)
   return delta + 0.5;
 }
 // --------------------------------------------------------------------
-void CbmTrdClusterizer::LookupMathiesonVector(Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
+Double_t CbmTrdClusterizer::LookupMathiesonVector(Double_t r)
 {
-  //CalcMathieson(x_mean, y_mean, SliceELoss, W ,H);
-  //cout << "LookupMathiesonVector" << endl;
   Int_t rMax = 0;
   Int_t rMin = 0;
   Double_t Q = 0;
-  Float_t r = 0.0;         // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
 
-  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) {
-    for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
-      fPadCharge[iPadRow][iPadCol] = Q;
-    }
-  }
-
-  Int_t xStep = 0;
-
-  /*
-    Float_t xPosP = x_mean + 0.5;
-    Float_t xPosN = x_mean - 0.5;
-    Float_t yPosP = y_mean + 0.5;
-    Float_t yPosN = y_mean - 0.5;
-    Int_t iPadColP = Int_t(fPadNrX/2);
-    Int_t iPadColN = Int_t(fPadNrX/2);
-    Int_t iPadRowP = Int_t(fPadNrY/2);
-    Int_t iPadRowN = Int_t(fPadNrY/2);
-    Float_t xNextPadP =  0.5 * W[iPadColP];
-    Float_t xNextPadN = -0.5 * W[iPadColN];
-    Float_t yNextPadP =  0.5 * H[iPadRowP];
-    Float_t yNextPadN = -0.5 * H[iPadRowN];
-
-    Float_t xDeltaGridPos = DeltaGrid(x_mean, 0.5 * W[iPadColP]);
-    Float_t yDeltaGridPos = DeltaGrid(y_mean, 0.5 * H[iPadRowP]);
-  */
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Int_t xSign[4] = { 1, 1,-1,-1};
-  Int_t ySign[4] = { 1,-1, 1,-1};
-  Float_t xPos = x_mean;
-  Float_t yPos = y_mean;
-  Int_t iPadCol = Int_t(fPadNrX/2);
-  Int_t iPadRow = Int_t(fPadNrY/2);
-  Float_t xNextPad =  0.5 * W[iPadCol];
-  Float_t yNextPad =  0.5 * H[iPadRow];
-
-  Float_t xDeltaGridPos = DeltaGrid(x_mean, 0.5 * W[iPadCol]);
-  Float_t yDeltaGridPos = DeltaGrid(y_mean, 0.5 * H[iPadRow]);
- 
-  //cout << x_mean << " - " << xDeltaGridPos << " = " << x_mean-xDeltaGridPos << endl;
-  for (Int_t direction = 0; direction < 4; direction++){
-    //cout << "for direction" << endl;
-    //cout << endl << endl << direction << xSign[direction] << ySign[direction] << endl;
-    iPadRow = Int_t(fPadNrY/2);
-    yNextPad = ySign[direction] * 0.5 * H[iPadRow];
-    //cout << " " << direction;
-    for (Int_t yStep = 0; yStep < endOfMathiesonArray; yStep++) { //y
-      //cout << " for yStep" << endl;
-      //cout << endl;;
-      xStep = 0;
-      iPadCol = Int_t(fPadNrX/2);
-      xNextPad = xSign[direction] * 0.5 * W[iPadCol];
-      yPos = y_mean + yDeltaGridPos + ySign[direction] * yStep;
-      if (direction == 0 || direction == 2) {
-	if (yPos > yNextPad) {
-	  iPadRow++;
-	  yNextPad += H[iPadRow];
-	  //cout << iPadRow << "--------------------- "<< yNextPad << " H"<< H[iPadRow] << endl;
-	}
-      }
-      else {
-	if (yPos < yNextPad) {
-	  iPadRow--;
-	  yNextPad -= H[iPadRow];
-	  //cout << iPadRow << "--------------------- "<< yNextPad << " H"<< H[iPadRow] << endl;
-	}
-      }
-      r = sqrt(pow(xSign[direction] * xStep + xDeltaGridPos ,2) + pow(ySign[direction] * yStep + yDeltaGridPos ,2));
-      
-      while (Int_t(r * Accuracy) + 2 < endOfMathiesonArray/*21*/ * Accuracy 
-	     && iPadCol < fPadNrX
-	     && iPadCol >= 0
-	     ) { //x
-	//cout << "x";
-	//cout << "  while xStep" << endl;
-	xPos = x_mean + xDeltaGridPos + xSign[direction] * xStep;
-	if (direction == 0 || direction == 1) {
-	  if (xPos > xNextPad) {
-	    iPadCol++;
-	    xNextPad += W[iPadCol];
-	    //cout << "|";
-	  }
-	}
-	else {
-	  if (xPos < xNextPad) {
-	    iPadCol--;
-	    xNextPad -= W[iPadCol];
-	    // cout << "|";
-	  }
-	}
-	//r = sqrt(pow(xSign[direction] * xStep + xDeltaGridPos ,2) + pow(ySign[direction] * yStep + yDeltaGridPos ,2));
-	
-	if (Int_t(r * Accuracy) + 2 < endOfMathiesonArray * Accuracy) {
-	  rMin = Int_t(r * Accuracy);
-	  rMax = rMin+1;
-	  
-	  Float_t m = ((fMathieson[rMax] - fMathieson[rMin]) / (Float_t(Accuracy)));
-	  Float_t b = fMathieson[rMax] - m * (rMax/Float_t(Accuracy));
-	  Q = m * r + b;
-	  
-	  //Q = 0.1;
-	  if (xStep > 0 && yStep > 0) {
-	    fPadCharge[iPadRow][iPadCol] += Q;
-	  }
-	  else {
-	    if ((xStep == 0 && direction == 0) || (xStep == 0 && direction == 3)) {
-	      fPadCharge[iPadRow][iPadCol] += Q;
-	    } 
-	    if ((yStep == 0 && direction == 1) || (yStep == 0 && direction == 2)) {
-	      fPadCharge[iPadRow][iPadCol] += Q;
-	    } 
-	  }
-	}
-	else {
-	  cout << "    " << xSign[direction] * xStep + xDeltaGridPos << " " << ySign[direction] * yStep + yDeltaGridPos << " " << r << endl;
-	}
-	xStep++;
-	r = sqrt(pow(xSign[direction] * xStep + xDeltaGridPos ,2) + pow(ySign[direction] * yStep + yDeltaGridPos ,2));
-      }  
-      //cout << "  while xStep" << endl;   
-    }
-    //cout << " for yStep" << endl;
-  }
-  //cout << "for direction" << endl;
-  //cout << endl;
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  /*
-    for (Int_t yStep = 0; yStep < endOfMathiesonArray; yStep++) { //y
-    xStep = 0;
-    iPadColN = Int_t(fPadNrX/2);
-    iPadColP = Int_t(fPadNrX/2);
-
-    xNextPadP =  0.5 * W[iPadColP];
-    xNextPadN = -0.5 * W[iPadColN];
-
-    yPosP = y_mean + 0.5 + yStep;
-    yPosN = y_mean - 0.5 - yStep;
-
-
-    if (yPosP > yNextPadP) {
-    iPadRowP++;
-    yNextPadP += H[iPadRowP];
-    }
-    if (yPosN < yNextPadN) {
-    iPadRowN--;
-    yNextPadN -= H[iPadRowN];
-    }
-
-    r = sqrt(pow(xStep + 0.5 ,2) + pow(yStep + 0.5 ,2));
- 
-    while (Int_t(r * Accuracy) < endOfMathiesonArray * Accuracy + 2
-    ) { //x
-    xPosP = x_mean + 0.5 + xStep;
-    xPosN = x_mean - 0.5 - xStep;
-    if (xPosP > xNextPadP) {
-    iPadColP++;
-    xNextPadP += W[iPadColP];
-    }
-    if (xPosN < xNextPadN) {
-    iPadColN--;
-    xNextPadN -= W[iPadColN];
-    }
-
-    r = sqrt(pow(xStep + 0.5 ,2) + pow(yStep + 0.5 ,2));
-    if (Int_t(r * Accuracy) + 2 < endOfMathiesonArray * Accuracy) {
+  if (Int_t(r * Accuracy) + 2 < endOfMathiesonArray * Accuracy) {
     rMin = Int_t(r * Accuracy);
-    rMax = rMin+1;
+    rMax = rMin+1;	  
     Float_t m = ((fMathieson[rMax] - fMathieson[rMin]) / (Float_t(Accuracy)));
     Float_t b = fMathieson[rMax] - m * (rMax/Float_t(Accuracy));
-    Q = m * r + b;
-    if (iPadRowP < fPadNrY && iPadColP < fPadNrX) {
-    fPadCharge[iPadRowP][iPadColP] += Q;
-    }
-    if (yPosP != yPosN) {
-    if (xPosP != xPosN) {
-    if (iPadRowP < fPadNrY && iPadColN >= 0) {
-    fPadCharge[iPadRowP][iPadColN] += Q;
-    }
-    if (iPadRowN >= 0 && iPadColP < fPadNrX) {
-    fPadCharge[iPadRowN][iPadColP] += Q;
-    }
-    if (iPadRowN >= 0 && iPadColN >= 0) {
-    fPadCharge[iPadRowN][iPadColN] += Q;
-    }
-    }
-    }
-    }
-    xStep++;
-    }      
-    }
-  */
-  for (Int_t iPRow = 0; iPRow < fPadNrY; iPRow++) {
-    for (Int_t iPCol = 0; iPCol < fPadNrX; iPCol++) {
-      fPadCharge[iPRow][iPCol] *= SliceELoss;
-    }
+    Q = m * r + b;   
   }
+  return Q;
+}
+// --------------------------------------------------------------------
+Double_t CbmTrdClusterizer::CalcGaus(Double_t r)
+{
+  Float_t sigma = 2.28388e+00;//8.08257e-01; // [mm]
+  Float_t amplitude = 2.96216e-01;//2.96136e-01;
+  Float_t Q = 0;
+ 
+  Q = amplitude * exp(-0.5 * pow((r/sigma),2));
+
+  return Q;
+}
+
+// ---- CalcMathieson -------------------------------------------------
+Double_t CbmTrdClusterizer::CalcMathieson(Double_t r)
+{
+  Float_t h = 3;           //anode-cathode gap [mm]
+  Float_t s = 3;           //anode wire spacing [mm]
+  Float_t ra = 12.5E-3/2.; //anode wire radius [mm]
+  Float_t qa = 1700;       //anode neto charge [??] ???
+  Float_t par = 1.0;       // normalization factor
+  Float_t value = 0.0;
+  Float_t argument = 0.0;
+  Float_t taylor = 0.0;
+  Double_t rho = 0.0;      //charge at position x
+  Float_t K3 = 0.525;      //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
+  //Float_t K3 = -0.24 * (h / s) + 0.7 + (-0.75 * log(ra / s) - 3.64);// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
+  Float_t K2 = 3.14159265 / 2.* ( 1. - sqrt(K3)/2.);
+  Float_t K1 = (K2 * sqrt(K3)) / (4. * atan(sqrt(K3)));
+
+  value = pow(tanh(K2 * r / h),2);
+  rho = (qa * K1 * (1. - value) /
+	 (1. + K3 * value)) / float((accuracy * accuracy));
+ 
+  return rho;
 }
   // --------------------------------------------------------------------
   void CbmTrdClusterizer::FillMathiesonVector()
@@ -1271,347 +1243,7 @@ void CbmTrdClusterizer::GetPadSizeMatrix(MyPoint *point, Double_t* H, Double_t* 
       }  
   }
 
-  // --------------------------------------------------------------------
-void CbmTrdClusterizer::CalcGaus(Bool_t fast, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
-{
-  Float_t sigma = 2.28388e+00;//8.08257e-01; // [mm]
-  Float_t amplitude = 2.96216e-01;//2.96136e-01;
-  Float_t rho = 0;
-  Float_t Q = 0;
-  Float_t r;
-  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) {
-    for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
-      fPadCharge[iPadRow][iPadCol] = Q;
-    }
-  }
-  if (fast) {
-    Int_t xStep = 0;
-    Float_t xPosP = x_mean + 0.5;
-    Float_t xPosN = x_mean - 0.5;
-    Float_t yPosP = y_mean + 0.5;
-    Float_t yPosN = y_mean - 0.5;
-    Int_t iPadColP = Int_t(fPadNrX/2);
-    Int_t iPadColN = Int_t(fPadNrX/2);
-    Int_t iPadRowP = Int_t(fPadNrY/2);
-    Int_t iPadRowN = Int_t(fPadNrY/2);
-    Float_t xNextPadP =  0.5 * W[iPadColP];
-    Float_t xNextPadN = -0.5 * W[iPadColN];
-    Float_t yNextPadP =  0.5 * H[iPadRowP];
-    Float_t yNextPadN = -0.5 * H[iPadRowN];
 
-    for (Int_t yStep = 0; yStep < endOfMathiesonArray; yStep++) { //y
-      xStep = 0;
-      iPadColN = Int_t(fPadNrX/2);
-      iPadColP = Int_t(fPadNrX/2);
-
-      xNextPadP =  0.5 * W[iPadColP];
-      xNextPadN = -0.5 * W[iPadColN];
-
-      yPosP = y_mean + 0.5 + yStep;
-      yPosN = y_mean - 0.5 - yStep;
-
-
-      if (yPosP > yNextPadP) {
-	iPadRowP++;
-	yNextPadP += H[iPadRowP];
-      }
-      if (yPosN < yNextPadN) {
-	iPadRowN--;
-	yNextPadN -= H[iPadRowN];
-      }
-
-      r = sqrt(pow(xStep + 0.5 ,2) + pow(yStep + 0.5 ,2));
- 
-      while (Int_t(r * Accuracy) < endOfMathiesonArray * Accuracy + 2
-	     /*
-	       && iPadColP < fPadNrX 
-	       && iPadColN >= 0
-	     */ ) { //x
-	xPosP = x_mean + 0.5 + xStep;
-	xPosN = x_mean - 0.5 - xStep;
-	if (xPosP > xNextPadP) {
-	  iPadColP++;
-	  xNextPadP += W[iPadColP];
-	}
-	if (xPosN < xNextPadN) {
-	  iPadColN--;
-	  xNextPadN -= W[iPadColN];
-	}
-
-	r = sqrt(pow(xStep + 0.5 ,2) + pow(yStep + 0.5 ,2));
-	rho = amplitude * exp(-0.5 * pow((r/sigma),2));
-
-	if (iPadRowP < fPadNrY && iPadColP < fPadNrX) {
-	  fPadCharge[iPadRowP][iPadColP] += rho;
-	}
-      
-
-	if (yPosP != yPosN) {
-	  if (xPosP != xPosN) {
-	    if (iPadRowP < fPadNrY && iPadColN >= 0) {
-	      fPadCharge[iPadRowP][iPadColN] += rho;
-	    }
-	    if (iPadRowN >= 0 && iPadColP < fPadNrX) {
-	      fPadCharge[iPadRowN][iPadColP] += rho;
-	    }
-	    if (iPadRowN >= 0 && iPadColN >= 0) {
-	      fPadCharge[iPadRowN][iPadColN] +=rho;
-	    }
-	  }      
-	}
-	xStep++;
-      }
-    }
-  }
-  else {
-    for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) { 
-      for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) { 
-	for (Int_t yi = 0; yi < H[iPadRow] * accuracy; yi++) {
-	  for (Int_t xi = 0; xi < W[iPadCol] * accuracy; xi++) {
-			  
-	    //Mathieson coordinate system ist centered in the center of the hit pad 
-	    r = sqrt(
-		     pow(((iPadCol - int(fPadNrX/2)) * W[iPadCol] + (xi + 0.5) / float(accuracy) - 0.5 * W[iPadCol]) - x_mean,2) + 
-		     pow(((iPadRow - int(fPadNrY/2)) * H[iPadRow] + (yi + 0.5) / float(accuracy) - 0.5 * H[iPadRow]) - y_mean,2)
-			 
-		     );
-	    rho = amplitude * exp(-0.5 * pow((r/sigma),2));
-	    fPadCharge[iPadRow][iPadCol] += rho;
-	  }
-	}
-      }
-    }
-  }
-
-  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) {
-    for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
-      fPadCharge[iPadRow][iPadCol] *= SliceELoss;
-    }
-  }
-
-}
-
-    // ---- CalcMathieson -------------------------------------------------
-void CbmTrdClusterizer::CalcMathieson(Bool_t fast, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
-{
-  //Bool_t fast = false;
-  //cout << "CalcMathieson" << endl;
-  /*
-    Calculates the induced charge on tha area defind by 'fPadNrX' aand 'fPadNrY'  by using the mathieson formula for each cluster
-  */
-  //printf("CalcMathieson...\n");
-  //Int_t accuracy = 1;    // '1/accuracy' integration step width [mm]
-  Float_t h = 3;           //anode-cathode gap [mm]
-  Float_t s = 3;           //anode wire spacing [mm]
-  Float_t ra = 12.5E-3/2.; //anode wire radius [mm]
-  Float_t qa = 1700;       //anode neto charge [??] ???
-  Float_t par = 1.0;       // normalization factor
-  Float_t value = 0.0;
-  Float_t argument = 0.0;
-  Float_t taylor = 0.0;
-  Double_t rho = 0.0;      //charge at position x
-  Float_t K3 = 0.525;      //Mathieson parameter for 2nd MuBu prototype -> Parametrisation for chamber parameter
-  //Float_t K3 = -0.24 * (h / s) + 0.7 + (-0.75 * log(ra / s) - 3.64);// aproximation of 'E. Mathieson 'Cathode Charge Distributions in Multiwire Chambers' Nuclear Instruments and Methods in Physics Research A270,1988
-  Float_t K2 = 3.14159265 / 2.* ( 1. - sqrt(K3)/2.);
-  Float_t K1 = (K2 * sqrt(K3)) / (4. * atan(sqrt(K3)));
-  TH2F* Test = NULL;
-  TH2F* TestPos = NULL;
-  TH2F* Test2 = NULL;
-  Double_t Q = 0;
-  Float_t r = 0.0;         // local pad cylindrical coordinates in anode wire direction; r = sqrt(x^2+y^2) [mm]
-  
-  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) {
-    for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
-      fPadCharge[iPadRow][iPadCol] = Q;
-    }
-  }
-  if (fast) {
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Int_t xStep = 0;
-  
-    Float_t xPosP = x_mean + 0.5;
-    Float_t xPosN = x_mean - 0.5;
-    Float_t yPosP = y_mean + 0.5;
-    Float_t yPosN = y_mean - 0.5;
-    Int_t iPadColP = Int_t(fPadNrX/2);
-    Int_t iPadColN = Int_t(fPadNrX/2);
-    Int_t iPadRowP = Int_t(fPadNrY/2);
-    Int_t iPadRowN = Int_t(fPadNrY/2);
-    Float_t xNextPadP =  0.5 * W[iPadColP];
-    Float_t xNextPadN = -0.5 * W[iPadColN];
-    Float_t yNextPadP =  0.5 * H[iPadRowP];
-    Float_t yNextPadN = -0.5 * H[iPadRowN];
-
-    Float_t xDeltaGridPos = DeltaGrid(x_mean, 0.5 * W[iPadColP]);
-    Float_t yDeltaGridPos = DeltaGrid(y_mean, 0.5 * H[iPadRowP]);
-
-    for (Int_t yStep = 0; yStep < endOfMathiesonArray; yStep++) { //y
-      xStep = 0;
-      iPadColN = Int_t(fPadNrX/2);
-      iPadColP = Int_t(fPadNrX/2);
-
-      xNextPadP =  0.5 * W[iPadColP];
-      xNextPadN = -0.5 * W[iPadColN];
-
-      yPosP = y_mean + 0.5 + yStep;
-      yPosN = y_mean - 0.5 - yStep;
-
-
-      if (yPosP > yNextPadP) {
-	iPadRowP++;
-	yNextPadP += H[iPadRowP];
-      }
-      if (yPosN < yNextPadN) {
-	iPadRowN--;
-	yNextPadN -= H[iPadRowN];
-      }
-
-      r = sqrt(pow(xStep + 0.5 ,2) + pow(yStep + 0.5 ,2));
- 
-      while (Int_t(r * Accuracy) + 2 < endOfMathiesonArray * Accuracy 
-	     /*
-	       && iPadColP < fPadNrX 
-	       && iPadColN >= 0
-	     */ ) { //x
-	xPosP = x_mean + 0.5 + xStep;
-	xPosN = x_mean - 0.5 - xStep;
-	if (xPosP > xNextPadP) {
-	  iPadColP++;
-	  xNextPadP += W[iPadColP];
-	}
-	if (xPosN < xNextPadN) {
-	  iPadColN--;
-	  xNextPadN -= W[iPadColN];
-	}
-	/*
-	  cout << "xStep:" << xStep << " yStep:" << yStep << endl;
-	  cout << "    xPosP:" << xPosP << "   nW:" << xNextPadP << "   W:" << W[iPadColP]  << "     ColP:" << iPadColP << endl;
-	  cout << "    xPosN:" << xPosN << "   nW:" << xNextPadN << "   W:" << W[iPadColN]  << "     ColN:" << iPadColN << endl;
-	  cout << "    yPosP:" << yPosP << "   nH:" << yNextPadP << "   H:" << H[iPadRowP]  << "     RowP:" << iPadRowP << endl;
-	  cout << "    yPosN:" << yPosN << "   nH:" << yNextPadN << "   H:" << H[iPadRowN]  << "     RowN:" << iPadRowN << endl << endl;
-	*/
-	r = sqrt(pow(xStep + 0.5 ,2) + pow(yStep + 0.5 ,2));
-	value = pow(tanh(K2 * r / h),2);
-	rho = (qa * K1 * (1. - value) /
-	       (1. + K3 * value)) / float((accuracy * accuracy));
-
-	if (iPadRowP < fPadNrY && iPadColP < fPadNrX) {
-	  fPadCharge[iPadRowP][iPadColP] += rho;
-	}
-      
-
-	if (yPosP != yPosN) {
-	  if (xPosP != xPosN) {
-	    if (iPadRowP < fPadNrY && iPadColN >= 0) {
-	      fPadCharge[iPadRowP][iPadColN] += rho;
-	    }
-	    if (iPadRowN >= 0 && iPadColP < fPadNrX) {
-	      fPadCharge[iPadRowN][iPadColP] += rho;
-	    }
-	    if (iPadRowN >= 0 && iPadColN >= 0) {
-	      fPadCharge[iPadRowN][iPadColN] +=rho;
-	    }
-	  }      
-	}
-	xStep++;
-      }    
-    }
-    /*
-      for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) {
-      for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
-      fPadCharge[iPadRow][iPadCol] *= SliceELoss;
-      }
-      }
-    */
-  
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  }
-  else {
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    /**
-     * Basic difference between the previous (this) and the activ algorithm is 
-     * that the activ on uses 1 integration step per mm distance from the mc-point.
-     * This leads to symmetric integration values around the mc-point, but does not 
-     * ensure same number of integration steps per pad area for all pads since this 
-     * number depends now on the relative mc-coordinates. Therefor the results of this 
-     * new faster version differs a little bit from the previous one. The previous algorithm
-     * used integration step positions defined by the pad sizes which ensured same number of 
-     * integration steps per pad area.
-     **/    
- 
-    //************************************************************************
-    Float_t testMinMax, testMaxMin, testMinMin, testMaxMax;
-    Float_t termA, termB;
-    for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) { 
-      //termB = H[iPadRow] / Float_t(accuracy) - 0.5 * H[iPadRow];
-      for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) { 
-	//termA = W[iPadCol] / Float_t(accuracy) - 0.5 * W[iPadCol];
-	/* 
-	   testMinMin = sqrt(
-	   pow(((iPadCol     - Int_t(fPadNrX/2)) * termA) - x_mean,2) + 
-	   pow(((iPadRow     - Int_t(fPadNrY/2)) * termB) - y_mean,2)			 
-	   );
-	   testMaxMax = sqrt(
-	   pow((((iPadCol+1) - Int_t(fPadNrX/2)) * termA) - x_mean,2) + 
-	   pow((((iPadRow+1) - Int_t(fPadNrY/2)) * termB) - y_mean,2)			 
-	   );
-	   testMinMax = sqrt(
-	   pow(((iPadCol     - Int_t(fPadNrX/2)) * termA) - x_mean,2) + 
-	   pow((((iPadRow+1) - Int_t(fPadNrY/2)) * termB) - y_mean,2)			 
-	   );
-	   testMaxMin = sqrt(
-	   pow((((iPadCol+1) - Int_t(fPadNrX/2)) * termA) - x_mean,2) + 
-	   pow(((iPadRow     - Int_t(fPadNrY/2)) * termB) - y_mean,2)			 
-	   );
-	   if ( (Int_t(testMinMin * Accuracy)+2 > endOfMathiesonArray * Accuracy) && (Int_t(testMaxMax * Accuracy)+2 > endOfMathiesonArray * Accuracy) &&
-	   (Int_t(testMinMax * Accuracy)+2 > endOfMathiesonArray * Accuracy) && (Int_t(testMaxMin * Accuracy)+2 > endOfMathiesonArray * Accuracy)) {
-	    
-	   //continue;
-	   }
-	*/
-	//*********************************************************************************
-	for (Int_t yi = 0; yi < H[iPadRow] * accuracy; yi++) {
-	  for (Int_t xi = 0; xi < W[iPadCol] * accuracy; xi++) {
-			  
-	    //Mathieson coordinate system ist centered in the center of the hit pad 
-	    r = sqrt(
-		     pow(((iPadCol - int(fPadNrX/2)) * W[iPadCol] + (xi + 0.5) / float(accuracy) - 0.5 * W[iPadCol]) - x_mean,2) + 
-		     pow(((iPadRow - int(fPadNrY/2)) * H[iPadRow] + (yi + 0.5) / float(accuracy) - 0.5 * H[iPadRow]) - y_mean,2)
-			 
-		     );
-	    value = pow(tanh(K2 * r / h),2);
-		    
-	    // argument = K2 * r / h;
-	    // taylor = argument - pow(argument,3) / 3. + 2 * pow(argument,5) / 15. - 17 * pow(argument,7) / 315. + 62 * pow(argument,9) / 2835;
-	    // value = pow(taylor,2);
-		    
-	    //rho = r;
-	    //rho = (iPadRow * fPadNrX + iPadCol) / (H[iPadRow] * accuracy * W[iPadCol] * accuracy);
-	    //rho = (1.) / (H[iPadRow] * accuracy * W[iPadCol] * accuracy);
-		   
-	    //rho = (qa * K1 * (1. - tanh(K2 * r / h) * tanh(K2 * r / h)) /
-	    //(1. + K3 * tanh(K2 * r / h) * tanh(K2 * r / h))) / float((accuracy * accuracy));  
-		     
-	    rho = (qa * K1 * (1. - value) /
-		   (1. + K3 * value)) / float((accuracy * accuracy));         
-		 
-	    if (rho > 0.00) {
-	      fPadCharge[iPadRow][iPadCol] += rho;// * SliceELoss;
-	    }
-	  } //xi
-	} //yi
-      } //iPadCol
-    } //iPadRow    
-    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-  } //else
-
-  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) {
-    for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
-      fPadCharge[iPadRow][iPadCol] *= SliceELoss;
-    }
-  }
-
-}
 
     // -------------------------------------------------------------------
     // ------AddDigi--------------------------------------------------------------

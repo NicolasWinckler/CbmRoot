@@ -37,6 +37,8 @@ typedef struct MyHit
   Float_t dyPos;
   Float_t dzPos;
   Float_t charge;
+
+  Int_t NoPrfRecoDim;
 } MyHit;
 
 typedef std::list<MyHit*> MyHitList;

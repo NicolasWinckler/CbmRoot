@@ -593,13 +593,16 @@ void CbmTrdHitProducerCluster::PrfReco(Int_t qMaxIndex, Float_t qMax, ModulePara
   }
   if ((left >= 0 && right >= 0) && (up >= 0 && down >= 0)) {
     fPrfDoubleRecoCounter++;
+    hit->NoPrfRecoDim = 2;
   }
   else {
     if ((left >= 0 && right >= 0) || (up >= 0 && down >= 0)) {
       fPrfSingleRecoCounter++;
+      hit->NoPrfRecoDim = 1;
     }
     else {
       fSimpleRecoCounter++;
+      hit->NoPrfRecoDim = 0;
     }
   }
   //cout << " x: " << dxPos << " y: " << dyPos << endl;

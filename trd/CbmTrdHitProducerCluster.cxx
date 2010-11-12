@@ -144,6 +144,20 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
   Bool_t pr = true;
   Bool_t combinatoric = true;
   cout << "================CbmTrdHitProducerCluster==============" << endl;
+  cout << " Position resolution:";
+  if (pr) {
+    cout << " on" << endl;
+  }
+  else {
+    cout << " off" << endl;
+  }
+  cout << " Full hit to mc-point combinatoric:";
+  if (combinatoric) {
+    cout << " on" << endl;
+  }
+  else {
+    cout << " off" << endl;
+  }
   //std::list<Int_t> qMaxMcIdList;
   TH1F *hit2Mc      = NULL;
   TLegend *legend   = NULL;
@@ -560,10 +574,11 @@ void CbmTrdHitProducerCluster::SearchNeighbours(Int_t qMaxIndex, Int_t *neighbou
 void CbmTrdHitProducerCluster::PrfReco(Int_t qMaxIndex, Float_t qMax, ModulePara* mPara, Int_t *neighbourIds, MyHit* hit, TH2F*& PRF)
 {
   //cout << "PrfReco" << endl;
+  Double_t K3 = 0.525;
   Float_t dxPos = 0;
   Float_t dyPos = 0;
   Float_t dzPos = 0;
-  Float_t sigma = 0;
+  Float_t sigma = 0;//4 * pow(atanh(2 + K3),-0.5) / (3.14159265 * (1 - 0.5 * sqrt(K3)));
   Float_t padWidth;
   Float_t qLeft = 0;
   Float_t qRight = 0;

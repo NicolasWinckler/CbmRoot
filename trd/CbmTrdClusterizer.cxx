@@ -152,7 +152,10 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   Bool_t gaus = false; 
 
   // calculate over full area or circle area around mc-position 
-  Bool_t fast = true;   
+  Bool_t fast = true; 
+
+  // fastes algorithm approximates only allong one pad column
+  Bool_t approx = false;  
 
   cout << "================CbmTrdClusterizer=====================" << endl;
   Digicounter = 0;
@@ -407,7 +410,7 @@ void CbmTrdClusterizer::Exec(Option_t * option)
 	  }
 	  cout << "nCol:" << nCol << " nRow:" << nRow << endl;
       */  
-      SplitPathSlices(fast, lookup, gaus, j, point, PadChargeModule, j, padW, padH );
+      SplitPathSlices(approx, fast, lookup, gaus, j, point, PadChargeModule, j, padW, padH );
       
     }
   //cout << endl;
@@ -687,7 +690,7 @@ int CbmTrdClusterizer::GetSector(Double_t tempPosY)/*tempPosY has to be in LL mo
 }
   // --------------------------------------------------------------------
   // ---- SplitPathSlices -------------------------------------------------
-void CbmTrdClusterizer::SplitPathSlices(Bool_t fast, Bool_t lookup, Bool_t gaus, const Int_t pointID, MyPoint *point, Double_t* PadChargeModule, Int_t j, Double_t* padW, Double_t* padH)
+void CbmTrdClusterizer::SplitPathSlices(Bool_t approx, Bool_t fast, Bool_t lookup, Bool_t gaus, const Int_t pointID, MyPoint *point, Double_t* PadChargeModule, Int_t j, Double_t* padW, Double_t* padH)
 {
   //cout << "SplitPathSlices" << endl;
   Float_t ClusterDistance = 0.2 * fModuleParaMap[fModuleID]->PadSizeX[0] - 0.1; //Ar 94 electron/cm    Xe 307 electrons/cm
@@ -756,25 +759,31 @@ void CbmTrdClusterizer::SplitPathSlices(Bool_t fast, Bool_t lookup, Bool_t gaus,
       tempx = point->clusterPosLL[0] - (point->clusterPosC[0] + 0.5 * fModuleParaMap[fModuleID]->PadSizeX[0]);
       
       GetPadSizeMatrix(point, H, W, padH, padW);
-      if (fast) {
-	FastIntegration(lookup, gaus, point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W, H);
+
+      if (approx) {
+	PadPlaneSampling(point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W, H);
       }
       else {
-	SlowIntegration(lookup, gaus, point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W, H);
-      }
-      /*
-      if (lookup) {
-	//LookupMathiesonVector(point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W, H);
-	FastIntegration(point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W, H);
-      }
-      else {
-	if (gaus) {
-	  //CalcGaus(fast, point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W ,H);
+	if (fast) {
+	  FastIntegration(lookup, gaus, point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W, H);
 	}
 	else {
-	  //CalcMathieson(fast, point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W ,H);
+	  SlowIntegration(lookup, gaus, point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W, H);
 	}
       }
+      /*
+	if (lookup) {
+	//LookupMathiesonVector(point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W, H);
+	FastIntegration(point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W, H);
+	}
+	else {
+	if (gaus) {
+	//CalcGaus(fast, point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W ,H);
+	}
+	else {
+	//CalcMathieson(fast, point->clusterPosC[0], point->clusterPosC[1], SliceELoss, W ,H);
+	}
+	}
       */
       ChargeConservation(point);
 
@@ -823,14 +832,81 @@ void CbmTrdClusterizer::WireQuantisation(MyPoint *point)
   point->clusterPosLL[1] = nextWirePos;
 }
     // --------------------------------------------------------------------
+Double_t CbmTrdClusterizer::ApproxMathieson(Double_t x, Double_t W)
+{
+  Float_t K3 = 0.525; 
+  Float_t K2 = 3.14159265 / 2.* ( 1. - sqrt(K3)/2.);
+  Float_t K1 = (K2 * sqrt(K3)) / (4. * atan(sqrt(K3)));
+  //Float_t W = 5;
+  Float_t par = 1;
+  Float_t h = 3;
+  /*
+    Char_t formula[500];
+    sprintf(formula," -1. / (2. * atan(sqrt(%f))) * (atan(sqrt(%f) *tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f + 2.* x * %f) / (8.* %f) )) +  atan(sqrt(%f) *  tanh(3.14159265 * (-2. + sqrt(%f) ) * (%f - 2.* x * %f) / (8.* %f) )) )",K3,K3,K3,W,par,h,K3,K3,W,par,h);
+    TF1* mathiesonPRF = new TF1("mathieson",formula, -15, 15);
+  */
+  Double_t mathiesonPRF = 
+    -1. / (2. * atan(sqrt(K3))) * (
+				   atan(sqrt(K3) * tanh(3.14159265 * (-2. + sqrt(K3) ) * (W + 2.* x) / (8.* h) )) +
+				   atan(sqrt(K3) * tanh(3.14159265 * (-2. + sqrt(K3) ) * (W - 2.* x) / (8.* h) )) 
+				   );
+  return mathiesonPRF;
+}
+// --------------------------------------------------------------------
+void CbmTrdClusterizer::PadPlaneSampling( Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
+{
+  Double_t deltaW = 0;
+  Double_t x;
+  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) {
+    for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
+      fPadCharge[iPadRow][iPadCol] = 0;
+    }
+  }
+  for (Int_t iPadCol = 0; iPadCol < int(fPadNrX/2); iPadCol++) {
+    deltaW -= W[iPadCol];
+  }
 
+  Double_t deltaWtemp = deltaW;
+
+  for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) { 
+    deltaW = deltaWtemp;
+    //cout << endl;
+    for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
+
+      if (iPadRow == int(fPadNrY/2)) {
+	x = x_mean + deltaW;
+	if (fabs(x) < 35) {
+	  fPadCharge[iPadRow][iPadCol] += ApproxMathieson(x, W[iPadCol]);
+	  //printf(" %.3f",x);
+	}
+      }
+      /*
+	else {
+	fPadCharge[iPadRow][iPadCol] += 0.0;
+	}
+      */
+      deltaW += W[iPadCol];
+    }
+  }
+  //printf("\n");
+  for (Int_t iPRow = 0; iPRow < fPadNrY; iPRow++) {
+    //printf("\n");
+    for (Int_t iPCol = 0; iPCol < fPadNrX; iPCol++) {
+      fPadCharge[iPRow][iPCol] *= SliceELoss * 1e6;
+      if (fPadCharge[iPRow][iPCol] > 0) {
+	//printf (" %.2E",fPadCharge[iPRow][iPCol]);
+      }
+    }
+  }
+}
+// --------------------------------------------------------------------
 void CbmTrdClusterizer::SlowIntegration(Bool_t lookup, Bool_t gaus, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
 {  
   /*
   x_mean = +0.4 * W[int(fPadNrX/2)];
   y_mean = -0.4 * H[int(fPadNrY/2)];
   */
-  printf(" (%5.1f,%5.1f)\n",x_mean,y_mean);
+  //printf(" (%5.1f,%5.1f)\n",x_mean,y_mean);
   
   Double_t deltaW = -0.5 * W[int(fPadNrX/2)];
   for (Int_t i = 0; i < int(fPadNrX/2); i++) {
@@ -842,10 +918,12 @@ void CbmTrdClusterizer::SlowIntegration(Bool_t lookup, Bool_t gaus, Double_t x_m
   for (Int_t i = 0; i < int(fPadNrY/2); i++) {
     deltaH -= H[i];
   }
+  /*
   TCanvas *c = new TCanvas("c","c",1400,600);
   c->Divide(2,1);
   TH2F *Test = new TH2F("test","test",-2*int(deltaW)+1,deltaW+0.5,-deltaW-0.5,-2*int(deltaH)+1,deltaH+0.5,-deltaH-0.5);
   TH2F *Test2 = new TH2F("test2","test2",fPadNrX,0,fPadNrX,fPadNrY,0,fPadNrY);
+  */
   Double_t r = 0;
   for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) { 
     deltaW = deltaWtemp;
@@ -876,22 +954,25 @@ void CbmTrdClusterizer::SlowIntegration(Bool_t lookup, Bool_t gaus, Double_t x_m
 	      fPadCharge[iPadRow][iPadCol] += CalcMathieson(r);
 	    }
 	  }
-	  Test->Fill(deltaW + (xi + 0.5) / float(accuracy),deltaH + (yi + 0.5) / float(accuracy), CalcMathieson(r) );
+	  //Test->Fill(deltaW + (xi + 0.5) / float(accuracy),deltaH + (yi + 0.5) / float(accuracy), CalcMathieson(r) );
 	}
       }
       deltaW += W[iPadCol];
     }
     deltaH += H[iPadRow];
   }
-  for (Int_t i = 0; i < fPadNrX; i++) {
-    for (Int_t j = 0; j < fPadNrY; j++) {
-      Test2->Fill(i,j,fPadCharge[j][i]);
+  for (Int_t iPRow = 0; iPRow < fPadNrY; iPRow++) {
+    for (Int_t iPCol = 0; iPCol < fPadNrX; iPCol++) {
+      fPadCharge[iPRow][iPCol] *= SliceELoss;
+      //Test2->Fill(iPCol,iPRow,fPadCharge[iPRow][iPCol]);
     }
   }
+  /*
   c->cd(1);
   Test->Draw("colz");
   c->cd(2);
   Test2->Draw("colz");
+  */
 }
   
     // --------------------------------------------------------------------

@@ -1,6 +1,6 @@
 # -*- mode: cmake -*-
 
-message(" -- Read CTestCustom.cmake --")
+#message(" -- Read CTestCustom.cmake --")
 
 # -----------------------------------------------------------
 # -- Number of warnings to display

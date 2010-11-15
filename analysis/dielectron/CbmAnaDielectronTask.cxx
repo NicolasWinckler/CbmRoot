@@ -5,6 +5,10 @@
 #include "CbmVertex.h"
 #include "CbmGlobalTrack.h"
 #include "CbmStsKFTrackFitter.h"
+#include "FairMCPoint.h"
+
+#include "CbmMCTrack.h"
+
 #include "CbmStsTrack.h"
 #include "CbmRichRing.h"
 #include "CbmRichRingMatch.h"
@@ -17,6 +21,7 @@
 #include "CbmKF.h"
 
 #include "CbmRichPoint.h"
+#include "CbmTofPoint.h"
 
 #include "TClonesArray.h"
 #include "TObjArray.h"
@@ -56,12 +61,16 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
 : FairTask(name)
 {
     fEvents = 0;
-    fWeight = 0.00003708;
+
+    // weight for rho0 = 0.001081; omega_ee = 0.0026866; omega_dalitz = 0.02242; phi = 0.00039552; pi0 = 4.38   ------ for 25 GeV
+    fWeight = 0.0026866 ;
     fUseRich = true;
     fUseTrd = true;
     fUseTof = true;
     fNofMcEp = 0;
+    fNofMcEpBg = 0;
     fNofMcEm = 0;
+    fNofMcEmBg = 0;
     fNofAccEp = 0;
     fNofAccEm = 0;
     fNofAccPairs = 0;
@@ -71,13 +80,16 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fh_acc_signal_pty_eff = new TH2D("fh_acc_signal_pty_eff","fh_acc_signal_pty_eff;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
 
     fh_mc_signal_mom = new TH1D("fh_mc_signal_mom", "fh_mc_signal_mom;momentum [GeV/c];yeild",150, 0., 15.);
+    fh_mc_bg_mom = new TH1D("fh_mc_bg_mom", "fh_mc_bg_mom;momentum [GeV/c];yeild",150, 0., 15.);
     fh_acc_signal_mom = new TH1D("fh_acc_signal_mom","fh_acc_signal_mom;momentum [GeV/c];yeild", 150, 0., 15.);
     fh_acc_signal_mom_eff = new TH1D("fh_acc_signal_mom_eff","fh_acc_signal_mom_eff;momentum [GeV/c];yeild", 150, 0., 15.);
 
     fh_mc_signal_minv = new TH1D("fh_mc_signal_minv","fh_mc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+    fh_mc_bg_minv = new TH1D("fh_mc_bg_minv","fh_mc_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
     fh_acc_signal_minv = new TH1D("fh_acc_signal_minv","fh_acc_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
 
     fh_mc_mother_pdg = new TH1D("fh_mc_mother_pdg", "fh_mc_mother_pdg; Pdg code; yeild", 7000, -3500., 3500.);
+    fh_mc_mother_pdg_bg = new TH1D("fh_mc_mother_pdg_bg", "fh_mc_mother_pdg; Pdg code; yeild", 7000, -3500., 3500.);
 }
 
 CbmAnaDielectronTask::~CbmAnaDielectronTask()
@@ -208,6 +220,7 @@ void CbmAnaDielectronTask::Exec(Option_t *option)
     fEvents++;
     cout << "-I- CbmAnaDielectronTask event number " << fEvents << endl;
     MCPairs();
+    MCPairsBg();
     SingleParticleAcceptance();
     PairAcceptance();
 
@@ -216,6 +229,9 @@ void CbmAnaDielectronTask::Exec(Option_t *option)
     cout << "fNofAccEp = " << fNofAccEp << ", per event " << fNofAccEp / (Double_t)fEvents << endl;
     cout << "fNofAccEm = " << fNofAccEm << ", per event " << fNofAccEm / (Double_t)fEvents << endl;
     cout << "fNofAccPairs = " << fNofAccPairs << ", per event " << fNofAccPairs / (Double_t)fEvents << endl;
+    cout << "fNofMcEpBg = " << fNofMcEpBg << ", per event " << fNofMcEpBg / (Double_t)fEvents << endl;
+    cout << "fNofMcEmBg = " << fNofMcEmBg << ", per event " << fNofMcEmBg / (Double_t)fEvents << endl;
+
 }// Exec
 
 void CbmAnaDielectronTask::MCPairs()
@@ -237,7 +253,6 @@ void CbmAnaDielectronTask::MCPairs()
         }
     } // nmber of e-/e+
 
-  
         
     for (Int_t iP = 0; iP < nMcTracks; iP++) {
         CbmMCTrack* mctrackP = (CbmMCTrack*) fMCTracks->At(iP);
@@ -277,6 +292,63 @@ void CbmAnaDielectronTask::MCPairs()
     } //iP
 
 } //MC Pairs
+
+void CbmAnaDielectronTask::MCPairsBg()
+{
+    Int_t nMcTracks = fMCTracks->GetEntries();
+    for (Int_t i = 0; i < nMcTracks; i++){
+        CbmMCTrack* mctrack = (CbmMCTrack*) fMCTracks->At(i);
+        Int_t pdg = mctrack->GetPdgCode();
+        Int_t motherId = mctrack->GetMotherId();
+        if (pdg == -11) fNofMcEpBg++;
+        if (pdg == 11) fNofMcEmBg++;
+        
+        
+        Int_t mcMotherPdg = 0;
+        if (pdg == -11 || pdg == 11) {
+            CbmMCTrack* mother = (CbmMCTrack*) fMCTracks->At(motherId);
+            if (mother) mcMotherPdg = mother->GetPdgCode();
+            fh_mc_mother_pdg_bg->Fill(mcMotherPdg);
+        }
+    } // nmber of e-/e+
+
+        
+    for (Int_t iP = 0; iP < nMcTracks; iP++) {
+        CbmMCTrack* mctrackP = (CbmMCTrack*) fMCTracks->At(iP);
+        Int_t pdg = mctrackP->GetPdgCode();
+        if ( !(pdg == -11)) continue;
+
+        TVector3 momP;  //momentum e+
+        mctrackP->GetMomentum(momP);
+        Double_t energyP = TMath::Sqrt(momP.Mag2() + M2E);
+        TLorentzVector lorVecP(momP, energyP); 
+
+        for (Int_t iM = 0; iM < nMcTracks; iM++) {
+            CbmMCTrack* mctrackM = (CbmMCTrack*) fMCTracks->At(iM);
+            pdg = mctrackM->GetPdgCode();
+            if ( !(pdg == 11)) continue;
+
+            TVector3 momM;  //momentum e-
+            mctrackM->GetMomentum(momM);
+            Double_t energyM = TMath::Sqrt(momM.Mag2() + M2E);
+            TLorentzVector lorVecM(momM, energyM); 
+
+            //Calculate kinematic parameters of the pair
+            TVector3 momPair = momP + momM;
+            Double_t energyPair = energyP + energyM;
+            Double_t ptPair = momPair.Perp();
+            Double_t pzPair = momPair.Pz();
+            Double_t yPair = 0.5*TMath::Log((energyPair+pzPair)/(energyPair-pzPair));
+            Double_t anglePair = lorVecM.Angle(lorVecP.Vect());
+            Double_t minv = 2*TMath::Sin(anglePair / 2)*TMath::Sqrt(momM.Mag()*momP.Mag());
+            //Fill histogramms
+          //  fh_mc_signal_pty->Fill(yPair,ptPair,fWeight);
+            fh_mc_bg_mom->Fill(momPair.Mag());
+            fh_mc_bg_minv->Fill(minv);
+        } //iM
+    } //iP
+
+} //MC BG Pairs
 
 void CbmAnaDielectronTask::SingleParticleAcceptance()
 {
@@ -399,6 +471,41 @@ void CbmAnaDielectronTask::FillCandidateArray()
 
          fCandidates.push_back(cand);
 
+// TRD
+    cand.trdInd = gTrack->GetTrdTrackIndex();
+    if (cand.trdInd < 0) continue;
+    CbmTrdTrack* trdTrack = (CbmTrdTrack*) fTrdTracks->At(cand.trdInd);
+    if (trdTrack == NULL) continue;
+    CbmTrackMatch* trdMatch = (CbmTrackMatch*) fTrdTrackMatches->At(cand.trdInd);
+    if (trdMatch == NULL) continue;
+    cand.trdMCTrackId = trdMatch->GetMCTrackId();
+    if (cand.trdMCTrackId < 0) continue;
+    CbmMCTrack* mcTrack3 = (CbmMCTrack*) fMCTracks->At(cand.trdMCTrackId);
+    if (mcTrack3 == NULL) continue;
+
+        // check RICH -STS -TRD matches
+//    if (cand.stsMCTrackId == cand.richMCTrackId && 
+//          cand.stsMCTrackId == cand.trdMCTrackId){}  
+  
+// ToF
+    cand.tofInd = gTrack->GetTofHitIndex();
+    if (cand.tofInd < 0) continue;
+    CbmTofHit* tofHit = (CbmTofHit*) fTofHits->At(cand.tofInd);
+    if (tofHit == NULL) continue;
+    Int_t tofPointIndex = tofHit->GetRefId();
+    if (tofPointIndex < 0) continue;
+    FairMCPoint* tofPoint = (FairMCPoint*) fTofPoints->At(tofPointIndex);
+    if (tofPoint == NULL) continue;
+    cand.tofMCTrackId = tofPoint->GetTrackID();
+    if (cand.tofMCTrackId < 0) continue;
+    CbmMCTrack* mcTrack4 = (CbmMCTrack*) fMCTracks->At(cand.tofMCTrackId);
+    if (mcTrack4 == NULL) continue;
+
+    //check RICH-STS-TRD-ToF matches
+ /*   if (cand.stsMCTrackId == cand.richMCTrackId &&
+        cand.stsMCTrackId == cand.trdMCTrackId &&
+        cand.stsMCTrackId == cand.tofMCTrackId) {}    
+*/
 
     }// global tracks
 
@@ -410,10 +517,13 @@ void CbmAnaDielectronTask::Finish()
     fh_mc_signal_pty->Scale(scale);
     fh_acc_signal_pty->Scale(scale);
     fh_mc_signal_mom->Scale(scale);
+    fh_mc_bg_mom->Scale(scale);
     fh_acc_signal_mom->Scale(scale);
     fh_mc_signal_minv->Scale(scale);
+    fh_mc_bg_minv->Scale(scale);
     fh_acc_signal_minv->Scale(scale);
     fh_mc_mother_pdg->Scale(scale);
+    fh_mc_mother_pdg_bg->Scale(scale);
     
     fh_acc_signal_pty_eff->Divide(fh_acc_signal_pty, fh_mc_signal_pty);
 //    fh_acc_signal_mom->Sumw2();
@@ -424,11 +534,14 @@ void CbmAnaDielectronTask::Finish()
     fh_acc_signal_pty->Write();
     fh_acc_signal_pty_eff->Write();
     fh_mc_signal_mom->Write();
+    fh_mc_bg_mom->Write();
     fh_acc_signal_mom->Write();
     fh_acc_signal_mom_eff->Write();
     fh_mc_signal_minv->Write();
+    fh_mc_bg_minv->Write();
     fh_acc_signal_minv->Write();
     fh_mc_mother_pdg->Write();
+    fh_mc_mother_pdg_bg->Write();
 }
 
 void CbmAnaDielectronTask::WriteOutput()

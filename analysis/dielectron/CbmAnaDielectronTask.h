@@ -39,6 +39,8 @@ public:
 	Int_t mcPdg, mcMotherID, mcMotherPdg;
 	Int_t stsMCTrackId;
 	Int_t richMCTrackId;
+    Int_t trdMCTrackId;
+    Int_t tofMCTrackId;
 	Int_t stsInd;
 	Int_t richInd;
 	Int_t trdInd;
@@ -68,8 +70,10 @@ public:
 
     void SingleParticleAcceptance();
     void MCPairs();
+    void MCPairsBg();
     void PairAcceptance();
     void FillCandidateArray();
+
 
 
     virtual void Finish();
@@ -115,6 +119,8 @@ private:
 
     Int_t fNofMcEp;  //number of MC e+
     Int_t fNofMcEm;  // number of MC e-
+    Int_t fNofMcEpBg;  
+    Int_t fNofMcEmBg; 
 
     Int_t fNofAccEp; //number of accepted e+
     Int_t fNofAccEm; //number of accepted e-
@@ -124,11 +130,14 @@ private:
     TH2D* fh_acc_signal_pty; // pt/y distribution for accepted signal
     TH2D* fh_acc_signal_pty_eff; //efficiency of accepted signal 
     TH1D* fh_mc_signal_mom; //momentum distribution for signal mc
+    TH1D* fh_mc_bg_mom;
     TH1D* fh_acc_signal_mom; //momentum distribution of accepted signal
     TH1D* fh_acc_signal_mom_eff; // momentum efficiency
     TH1D* fh_mc_signal_minv; // invariant mass distribution for signal mc
+    TH1D* fh_mc_bg_minv;
     TH1D* fh_acc_signal_minv; //invariant mass distribution for accepted signal
     TH1D* fh_mc_mother_pdg; //mother pdg code for e-/e+
+    TH1D* fh_mc_mother_pdg_bg;
     
 public:
     void SetUseRich(Bool_t use){fUseRich = use;};

@@ -73,12 +73,14 @@ class CbmStsClusterFinder : public FairTask
   CbmStsDigiPar*    fDigiPar;     /** Digitisation parameters **/
   CbmStsDigiScheme* fDigiScheme;  /** Digitisation scheme **/
   TClonesArray*     fDigis;       /** Input array of CbmStsDigi **/
-  TClonesArray*     fClusters;    /** Input array of CbmStsDigi **/
+  TClonesArray*     fClustersCand;    /** Input array of CbmStsCluster **/
+  TClonesArray*     fClusters;    /** Input array of CbmStsCluster **/
   Int_t fNofDigis;
   map<CbmStsSector*, set<Int_t> > fDigiMapF;  /** sector digis (front) **/
   map<CbmStsSector*, set<Int_t> > fDigiMapB;  /** sector digis (back)  **/
   TStopwatch fTimer;
 
+  Int_t fNofClustersCand;
   Int_t fNofClusters;
   Int_t fNofClustersGood;
   Int_t fNofClustersWP;
@@ -113,6 +115,9 @@ class CbmStsClusterFinder : public FairTask
 
 //  void FindClusters(Int_t stationNr, Int_t sectorNr, Int_t iSide, set<Int_t>& digiSet);
   Int_t FindClusters(Int_t stationNr, Int_t sectorNr, Int_t iSide, set<Int_t>& digiSet);
+
+  CbmStsClusterFinder(const CbmStsClusterFinder&);
+  CbmStsClusterFinder operator=(const CbmStsClusterFinder&);
 
   ClassDef(CbmStsClusterFinder,1);
 

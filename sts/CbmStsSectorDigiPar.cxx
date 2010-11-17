@@ -9,8 +9,10 @@
 #include "TMath.h"
 
 // -----   Default constructor   -------------------------------------------
-CbmStsSectorDigiPar::CbmStsSectorDigiPar() {
-  fSectorNr   = -1;
+CbmStsSectorDigiPar::CbmStsSectorDigiPar() 
+:  fSectorNr(-1),
+   fSensors()
+{
   fSensors = new TObjArray();
 }
 // -------------------------------------------------------------------------
@@ -18,7 +20,10 @@ CbmStsSectorDigiPar::CbmStsSectorDigiPar() {
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmStsSectorDigiPar::CbmStsSectorDigiPar(Int_t sectorNr) {
+CbmStsSectorDigiPar::CbmStsSectorDigiPar(Int_t sectorNr) 
+:  fSectorNr(),
+   fSensors()
+{
   fSectorNr = sectorNr;
   fSensors   = new TObjArray();
 }

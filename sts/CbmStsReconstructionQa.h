@@ -222,6 +222,8 @@ class CbmStsReconstructionQa : public FairTask
   /** Timer **/
   TStopwatch fTimer;
 
+  CbmStsReconstructionQa(const CbmStsReconstructionQa&);
+  CbmStsReconstructionQa operator=(const CbmStsReconstructionQa&);
 
   ClassDef(CbmStsReconstructionQa,1);
 

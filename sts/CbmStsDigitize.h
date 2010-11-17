@@ -153,7 +153,8 @@ class CbmStsDigitize : public FairTask
   /** Reset eventwise counters **/
   void Reset();
 
-
+  CbmStsDigitize(const CbmStsDigitize&);
+  CbmStsDigitize operator=(const CbmStsDigitize&);
 
   ClassDef(CbmStsDigitize,1);
 

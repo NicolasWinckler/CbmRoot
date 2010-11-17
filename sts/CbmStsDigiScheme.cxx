@@ -32,7 +32,16 @@ using std::endl;
 using std::pair;
 
 // -----   Constructor   ---------------------------------------------------
-CbmStsDigiScheme::CbmStsDigiScheme() {
+CbmStsDigiScheme::CbmStsDigiScheme() 
+  : 
+  fStations(new TObjArray(10)),
+  fNSectors(0),
+  fNSensors(0),
+  fNChannels(0),
+  fStationMap(),
+  fDetIdByName(),
+  fSensorByName()
+{
   fStations = new TObjArray(10);
   fNSectors = fNSensors = fNChannels = 0;
 }

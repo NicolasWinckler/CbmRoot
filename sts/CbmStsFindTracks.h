@@ -105,6 +105,8 @@ class CbmStsFindTracks : public FairTask
   /** Finish at the end of each event **/
   virtual void Finish();
 
+  CbmStsFindTracks(const CbmStsFindTracks&);
+  CbmStsFindTracks operator=(const CbmStsFindTracks&);
 
   ClassDef(CbmStsFindTracks,1);
 

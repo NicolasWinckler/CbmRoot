@@ -28,52 +28,60 @@ using std::map;
 
 // -----   Default constructor   -------------------------------------------
 CbmStsMatchTracks::CbmStsMatchTracks()
-  : FairTask("STSMatchTracks") {
-  fTracks  = NULL;
-  fPoints  = NULL;
-  fHits    = NULL;
-  fMatches = NULL;
-  fTime    = 0.;
-  fNTrackMatches = 0.;
-  fNAllHits      = 0.;
-  fNTrueHits     = 0.;
-  fNEvents        = 0;
-  fNEventsFailed  = 0;
-}
+  : FairTask("STSMatchTracks"), 
+  fTracks(NULL),
+  fPoints(NULL),
+  fHits(NULL),
+  fMatches(NULL),
+  fTime(0.),
+  fNTrackMatches(0.),
+  fNAllHits(0.),
+  fNTrueHits(0.),
+  fNEvents(0),
+  fNEventsFailed(0),
+  fTimer(),
+  fMatchMap()
+{}
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor  -------------------------------------------
 CbmStsMatchTracks::CbmStsMatchTracks(Int_t iVerbose)
-  : FairTask("STSMatchTracks", iVerbose) {
-  fTracks  = NULL;
-  fPoints  = NULL;
-  fHits    = NULL;
-  fMatches = NULL;
-  fTime    = 0.;
-  fNTrackMatches = 0.;
-  fNAllHits      = 0.;
-  fNTrueHits     = 0.;
-  fNEvents        = 0;
-  fNEventsFailed  = 0;
-}
+  : FairTask("STSMatchTracks", iVerbose),
+  fTracks(NULL),
+  fPoints(NULL),
+  fHits(NULL),
+  fMatches(NULL),
+  fTime(0.),
+  fNTrackMatches(0.),
+  fNAllHits(0.),
+  fNTrueHits(0.),
+  fNEvents(0),
+  fNEventsFailed(0),
+  fTimer(),
+  fMatchMap()
+{}
 // -------------------------------------------------------------------------
 
 
 
 // -----   Constructor with task name   ------------------------------------
 CbmStsMatchTracks::CbmStsMatchTracks(const char* name, Int_t iVerbose)
-  : FairTask(name, iVerbose) {
-  fTracks  = NULL;
-  fPoints  = NULL;
-  fHits    = NULL;
-  fMatches = NULL;
-  fTime    = 0.;
-  fNTrackMatches = 0.;
-  fNAllHits      = 0.;
-  fNTrueHits     = 0.;
-}
+  : FairTask(name, iVerbose),
+  fTracks(NULL),
+  fPoints(NULL),
+  fHits(NULL),
+  fMatches(NULL),
+  fTime(0.),
+  fNTrackMatches(0.),
+  fNAllHits(0.),
+  fNTrueHits(0.),
+  fNEvents(0),
+  fNEventsFailed(0),
+  fTimer(),
+  fMatchMap()
+{}
 // -------------------------------------------------------------------------
 
 

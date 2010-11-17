@@ -55,63 +55,129 @@ using std::ios_base;
 using std::vector;
 
 // -----   Default constructor   ------------------------------------------
-CbmStsDigitize::CbmStsDigitize() : FairTask("STS Digitizer", 1) {
-  fGeoPar      = NULL;
-  fDigiPar     = NULL;
-  fPoints      = NULL;
-  fDigis       = NULL;
-  fDigiMatches = NULL;
-  fRealistic   = kFALSE;
+CbmStsDigitize::CbmStsDigitize() 
+  : FairTask("STS Digitizer", 1),
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fPoints(NULL),
+  fDigis(NULL),
+  fDigiMatches(NULL),
+  fRealistic(kFALSE),
+  fDigiScheme(NULL),
+  fNDigis(0),
+  fNMulti(0),
+  fNEvents(0),
+  fNPoints(0),
+  fNOutside(0),
+  fNDigisFront(0),
+  fNDigisBack(0),
+  fStep(0.001),
+  fEnergyLossToSignal(0.),
+  fFThreshold(8.0),
+  fBThreshold(8.0),
+  fFNoiseWidth(0.1),
+  fBNoiseWidth(0.1),
+  fStripDeadTime(10),
+  fFNofBits(20),
+  fBNofBits(20),
+  fFMinStep(0.01),
+  fBMinStep(0.01),
+  fFNofSteps(0),
+  fBNofSteps(0),
+  fStripSignalF(NULL),
+  fStripSignalB(NULL),
+  fTime(0.),
+  fTimer(),
+  fFChannelPointsMap(),
+  fBChannelPointsMap(),
+  fPointMap()
+{
   fDigiScheme  = new CbmStsDigiScheme();
   Reset();
-
-  fStep = 0.001;
-
-  fFThreshold  = 8.0;
-  fBThreshold  = 8.0;
-  fFNoiseWidth = 0.1;
-  fBNoiseWidth = 0.1;
-
-  fFNofBits    = 20;
-  fBNofBits    = 20;
-  fFMinStep    = 0.01;
-  fBMinStep    = 0.01;
-  fStripDeadTime = 10;
-  fNEvents = 0.;
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsDigitize::CbmStsDigitize(Int_t iVerbose) 
-  : FairTask("STSDigitize", iVerbose) { 
-  fGeoPar      = NULL;
-  fDigiPar     = NULL;
-  fPoints      = NULL;
-  fDigis       = NULL;
-  fDigiMatches = NULL;
-  fRealistic   = kFALSE;
+  : FairTask("STSDigitize", iVerbose), 
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fPoints(NULL),
+  fDigis(NULL),
+  fDigiMatches(NULL),
+  fRealistic(kFALSE),
+  fDigiScheme(NULL),
+  fNDigis(0),
+  fNMulti(0),
+  fNEvents(0),
+  fNPoints(0),
+  fNOutside(0),
+  fNDigisFront(0),
+  fNDigisBack(0),
+  fStep(0.001),
+  fEnergyLossToSignal(0.),
+  fFThreshold(8.0),
+  fBThreshold(8.0),
+  fFNoiseWidth(0.1),
+  fBNoiseWidth(0.1),
+  fStripDeadTime(10),
+  fFNofBits(20),
+  fBNofBits(20),
+  fFMinStep(0.01),
+  fBMinStep(0.01),
+  fFNofSteps(0),
+  fBNofSteps(0),
+  fStripSignalF(NULL),
+  fStripSignalB(NULL),
+  fTime(0.),
+  fTimer(),
+  fFChannelPointsMap(),
+  fBChannelPointsMap(),
+  fPointMap()
+{ 
   fDigiScheme  = new CbmStsDigiScheme();
   Reset();
-
-  fStep = 0.001;
-
-  fFThreshold  = 8.0;
-  fBThreshold  = 8.0;
-  fFNoiseWidth = 0.1;
-  fBNoiseWidth = 0.1;
-
-  fFNofBits    = 20;
-  fBNofBits    = 20;
-  fFMinStep    = 0.01;
-  fBMinStep    = 0.01;
-  fStripDeadTime = 10;
-  fNEvents = 0.;
 }
 // -------------------------------------------------------------------------
 
 // -----   Constructor with name   -----------------------------------------
 CbmStsDigitize::CbmStsDigitize(const char* name, Int_t iVerbose) 
-  : FairTask(name, iVerbose) { 
+  : FairTask(name, iVerbose), 
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fPoints(NULL),
+  fDigis(NULL),
+  fDigiMatches(NULL),
+  fRealistic(kFALSE),
+  fDigiScheme(NULL),
+  fNDigis(0),
+  fNMulti(0),
+  fNEvents(0),
+  fNPoints(0),
+  fNOutside(0),
+  fNDigisFront(0),
+  fNDigisBack(0),
+  fStep(0.001),
+  fEnergyLossToSignal(0.),
+  fFThreshold(8.0),
+  fBThreshold(8.0),
+  fFNoiseWidth(0.1),
+  fBNoiseWidth(0.1),
+  fStripDeadTime(10),
+  fFNofBits(20),
+  fBNofBits(20),
+  fFMinStep(0.01),
+  fBMinStep(0.01),
+  fFNofSteps(0),
+  fBNofSteps(0),
+  fStripSignalF(NULL),
+  fStripSignalB(NULL),
+  fTime(0.),
+  fTimer(),
+  fFChannelPointsMap(),
+  fBChannelPointsMap(),
+  fPointMap()
+{ 
   fGeoPar      = NULL;
   fDigiPar     = NULL;
   fPoints      = NULL;

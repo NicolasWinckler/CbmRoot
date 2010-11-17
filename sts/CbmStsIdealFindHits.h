@@ -102,19 +102,16 @@ class CbmStsIdealFindHits : public FairTask
   Int_t FindHits(CbmStsStation* station, CbmStsSector* sector,
 		 std::set<Int_t>& fSet, std::set<Int_t>& bSet);
 
+  CbmStsIdealFindHits(const CbmStsIdealFindHits&);
+  CbmStsIdealFindHits operator=(const CbmStsIdealFindHits&);
 
   ClassDef(CbmStsIdealFindHits,1);
   
   Int_t    fNStations;
   Int_t    fNEvents;        /** Number of events with success **/
-  /** Total real time used for good events **/
-   Double_t  fTime1;     
-   Double_t  fTime2;     
-   Double_t  fTime3;
-   Double_t  fTime4;
-   Double_t  fTime5;
-   Double_t  fTime6;
-   Double_t  fTime7;
+  Double_t  fTime1;         /** Total real time used for good events **/
+   
+
 };
 
 #endif

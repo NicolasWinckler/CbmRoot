@@ -37,39 +37,58 @@ using std::set;
 using std::map;
 
 // -----   Default constructor   ------------------------------------------
-CbmStsIdealFindHits::CbmStsIdealFindHits() : FairTask("STS Ideal Hit Finder", 1) {
-  fGeoPar  = NULL;
-  fDigiPar = NULL;
-  fDigis   = NULL;
-  fHits    = NULL;
-  fDigiScheme = new CbmStsDigiScheme();
-}
+CbmStsIdealFindHits::CbmStsIdealFindHits() 
+  : FairTask("STS Ideal Hit Finder", 1), 
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fDigis(NULL),
+  fHits(NULL),
+  fDigiScheme(new CbmStsDigiScheme()),
+  fNStations(0),
+  fNEvents(0),
+  fDigiMapF(),
+  fDigiMapB(),
+  fTimer(),
+  fTime1(0.)
+{}
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsIdealFindHits::CbmStsIdealFindHits(Int_t iVerbose) 
-  : FairTask("STSIdealFindHits", iVerbose) {
-  fGeoPar  = NULL;
-  fDigiPar = NULL;
-  fDigis   = NULL;
-  fHits    = NULL;
-  fDigiScheme = new CbmStsDigiScheme();
-}
+  : FairTask("STSIdealFindHits", iVerbose), 
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fDigis(NULL),
+  fHits(NULL),
+  fDigiScheme(new CbmStsDigiScheme()),
+  fNStations(0),
+  fNEvents(0),
+  fDigiMapF(),
+  fDigiMapB(),
+  fTimer(),
+  fTime1(0.)
+{}
 // -------------------------------------------------------------------------
 
 
 
 // -----   Constructor with name   -----------------------------------------
 CbmStsIdealFindHits::CbmStsIdealFindHits(const char* name, Int_t iVerbose) 
-  : FairTask(name, iVerbose) {
-  fGeoPar  = NULL;
-  fDigiPar = NULL;
-  fDigis   = NULL;
-  fHits    = NULL;
-  fDigiScheme = new CbmStsDigiScheme();
-}
+  : FairTask(name, iVerbose), 
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fDigis(NULL),
+  fHits(NULL),
+  fDigiScheme(new CbmStsDigiScheme()),
+  fNStations(0),
+  fNEvents(0),
+  fDigiMapF(),
+  fDigiMapB(),
+  fTimer(),
+  fTime1(0.)
+{}
 // -------------------------------------------------------------------------
 
 

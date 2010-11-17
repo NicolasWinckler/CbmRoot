@@ -53,20 +53,41 @@ using std::set;
 using std::map;
 
 // -----   Default constructor   ------------------------------------------
-CbmStsFindHitsQa::CbmStsFindHitsQa() : FairTask("STS Hit Finder", 1) {
-  fGeoPar  = NULL;
-  fDigiPar = NULL;
-  fMCTracks  = NULL;          // MCtrack
-  fStsPoints = NULL;          // StsPoints
-  fStsHits   = NULL;          // StsHits
-  fMatches   = NULL;          // StsTrackMatch
-  fStsDigis  = NULL;          // StsDigi
-  fStsClusters  = NULL;          // StsCluster
+CbmStsFindHitsQa::CbmStsFindHitsQa() 
+: FairTask("STS Hit Finder", 1),
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fDigiScheme(NULL),
+  fMCTracks(NULL),          // MCtrack
+  fStsPoints(NULL),        // StsPoints
+  fStsHits(NULL),          // StsHits
+  fMatches(NULL),          // StsTrackMatch
+  fStsDigis(NULL),          // StsDigi
+  fStsClusters(NULL),          // StsCluster
 
-  fNStations = 0;
-  fNEvents   = 0;
-  fTime1     = 0.;
-  
+  fNStations(0),
+  fNEvents(0),
+  fTime1(0.),
+
+  fhHitFindingEfficiency(),
+  fhEffIncAng(),
+  fhEffMom(),
+  fhEffPdgSec(),
+  fhEffPdgPrim(),
+  fhHitPointPull(),
+  fhHitPointCorr(),
+  fHistoList(),
+  fTimer(),
+  fNofHits(),
+  fNofPointsPrim(),
+  fNofPointsSec(),
+  fNofRecoPrim(),
+  fNofRecoSec(),
+  fNofPointsMomSum(),
+  fNofRecoPointsMomSum(),
+  fOnlineAnalysis(kFALSE),
+  recoCanvas()
+{  
   fDigiScheme = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -75,20 +96,39 @@ CbmStsFindHitsQa::CbmStsFindHitsQa() : FairTask("STS Hit Finder", 1) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsFindHitsQa::CbmStsFindHitsQa(Bool_t visualizeBool, Int_t iVerbose)
-  : FairTask("STSFindHitsQa", iVerbose) {
-  fOnlineAnalysis = visualizeBool;
-  fGeoPar  = NULL;
-  fDigiPar = NULL;
-  fMCTracks  = NULL;          // MCtrack
-  fStsPoints = NULL;          // StsPoints
-  fStsHits   = NULL;          // StsHits
-  fMatches   = NULL;          // StsTrackMatch
-  fStsClusters  = NULL;          // StsCluster
+  : FairTask("STSFindHitsQa", iVerbose), 
+  fOnlineAnalysis(visualizeBool),
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fDigiScheme(NULL),
+  fMCTracks(NULL),          // MCtrack
+  fStsPoints(NULL),          // StsPoints
+  fStsHits(NULL),          // StsHits
+  fMatches(NULL),          // StsTrackMatch
+  fStsClusters(NULL),          // StsCluster
+  fStsDigis(NULL),          // StsDigi
+  fNStations(0),
+  fNEvents(0),
+  fTime1(0.),
 
-  fNStations = 0;
-  fNEvents   = 0;
-  fTime1     = 0.;
-  
+  fhHitFindingEfficiency(),
+  fhEffIncAng(),
+  fhEffMom(),
+  fhEffPdgSec(),
+  fhEffPdgPrim(),
+  fhHitPointPull(),
+  fhHitPointCorr(),
+  fHistoList(),
+  fTimer(),
+  fNofHits(),
+  fNofPointsPrim(),
+  fNofPointsSec(),
+  fNofRecoPrim(),
+  fNofRecoSec(),
+  fNofPointsMomSum(),
+  fNofRecoPointsMomSum(),
+  recoCanvas()
+{  
   fDigiScheme = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -97,19 +137,39 @@ CbmStsFindHitsQa::CbmStsFindHitsQa(Bool_t visualizeBool, Int_t iVerbose)
 
 // -----   Constructor with name   -----------------------------------------
 CbmStsFindHitsQa::CbmStsFindHitsQa(const char* name, Int_t iVerbose) 
-  : FairTask(name, iVerbose) {
-  fGeoPar  = NULL;
-  fDigiPar = NULL;
-  fMCTracks  = NULL;          // MCtrack
-  fStsPoints = NULL;          // StsPoints
-  fStsHits   = NULL;          // StsHits
-  fMatches   = NULL;          // StsTrackMatch
-  fStsClusters  = NULL;          // StsCluster
+  : FairTask(name, iVerbose), 
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fDigiScheme(NULL),
+  fMCTracks(NULL),          // MCtrack
+  fStsPoints(NULL),          // StsPoints
+  fStsHits(NULL),          // StsHits
+  fMatches(NULL),          // StsTrackMatch
+  fStsClusters(NULL),          // StsCluster
+  fStsDigis(NULL),          // StsDigi
+  fNStations(0),
+  fNEvents(0),
+  fTime1(0.),
 
-  fNStations = 0;
-  fNEvents   = 0;
-  fTime1     = 0.;
-
+  fhHitFindingEfficiency(),
+  fhEffIncAng(),
+  fhEffMom(),
+  fhEffPdgSec(),
+  fhEffPdgPrim(),
+  fhHitPointPull(),
+  fhHitPointCorr(),
+  fHistoList(),
+  fTimer(),
+  fNofPointsPrim(),
+  fNofPointsSec(),
+  fNofRecoPrim(),
+  fNofRecoSec(),
+  fNofPointsMomSum(),
+  fNofRecoPointsMomSum(),
+  fNofHits(),
+  fOnlineAnalysis(kFALSE),
+  recoCanvas()
+{
   fDigiScheme = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -145,7 +205,12 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
   CbmStsSector*  sector  = NULL;
   
   Int_t nofStsDigis = fStsDigis->GetEntriesFast();
-  
+  for ( Int_t idigi = 0 ; idigi < nofStsDigis ; idigi++ ) {
+    CbmStsDigi *stsDigi     = (CbmStsDigi*)fStsDigis->At(idigi);
+    //  cout << "digi side = " << stsDigi->GetSide() << endl;
+//    fNofFiredDigis[stsDigi->GetStationNr()-1][stsDigi->GetSectorNr()-1][stsDigi->GetSide()] += 1;
+    fNofDigisPChip[stsDigi->GetStationNr()-1][stsDigi->GetSectorNr()-1][stsDigi->GetSide()][(Int_t)(stsDigi->GetChannelNr()/128)] += 1;
+  }
   Int_t nofStsHits = fStsHits->GetEntriesFast();
   Int_t nofStsPoints = fStsPoints->GetEntriesFast();
   Int_t hitStationLimits[2][100];
@@ -156,17 +221,46 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
   }
 
   // check for limits of hit indices on different stations...
+  
   for ( Int_t ihit = 0 ; ihit < nofStsHits ; ihit++ ) {
     CbmStsHit *stsHit     = (CbmStsHit*)fStsHits->At(ihit);
     fNofHits[stsHit->GetStationNr()-1][stsHit->GetSectorNr()-1][stsHit->GetSensorNr()-1] += 1; // count hits per sensor
-    if ( hitStationLimits[0][stsHit->GetStationNr()-1] == -1 )
+    if ( hitStationLimits[0][stsHit->GetStationNr()-1] == -1 ) {
       hitStationLimits[0][stsHit->GetStationNr()-1] = ihit;
+    }
     CbmStsHit *stsHitBack = (CbmStsHit*)fStsHits->At(nofStsHits-ihit-1);
     if ( hitStationLimits[1][stsHitBack->GetStationNr()-1] == -1 ) {
       hitStationLimits[1][stsHitBack->GetStationNr()-1] = nofStsHits-ihit;
     }
   }
- 
+  for ( Int_t istat = 0 ; istat < fDigiScheme->GetNStations() ; istat++ ) {
+    station = fDigiScheme->GetStation(istat);
+    for ( Int_t isect = 0 ; isect < station->GetNSectors() ; isect++ ) {
+      sector = station->GetSector(isect);
+
+      CbmStsSensor* sensor = (CbmStsSensor*)sector->GetSensor(0);
+      for ( Int_t iside = 0 ; iside<2; iside++){
+        for (Int_t iChip = 0; iChip<8; iChip++){
+          if (fNEvents==999) cout<<" St "<<istat+1<<" sect "<<isect+1<<" nofsens "<<sector->GetNSensors()<<" sectX "<<sensor->GetX0()<<" sectY "<<sensor->GetY0()<<" side "<<iside<<" chip "<<iChip+1<<" fNofDigisPChip "<<fNofDigisPChip[istat][isect][iside][iChip]<<endl;
+        }
+      }
+
+      for ( Int_t isens = 0 ; isens < sector->GetNSensors() ; isens++ ) {
+	//	cout << "filling   " << istat << " " << isect << " " << isens << endl;
+	fhNofHits[istat][isect][isens] -> Fill(fNofHits[istat][isect][isens]);
+	//	cout << "---> done " << isens << endl;
+      
+      }
+//       for ( Int_t iside = 0 ; iside < 2 ; iside++ ) {
+// 	fhNofFiredDigis[istat][isect][iside]->Fill(fNofFiredDigis[istat][isect][iside]);
+// 	for ( Int_t ichip = 0 ; ichip < 8 ; ichip++ ) {
+// 	  if ( fhNofDigisPChip[istat][isect][iside][ichip] )
+// 	    fhNofDigisPChip[istat][isect][iside][ichip]->Fill(fNofDigisPChip[istat][isect][iside][ichip]);
+// 	}
+//       }
+
+    }
+  }
   for ( Int_t ipnt = 0 ; ipnt < nofStsPoints ; ipnt++ ) {
     CbmStsPoint *stsPoint = (CbmStsPoint*)fStsPoints->At(ipnt);
 
@@ -256,10 +350,12 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
     //  cout << stationNr-1 << " " << sensor->GetSectorNr()-1 << " " << sensor->GetSensorNr()-1 << "/" << flush;
     fhPoints      [stationNr-1]->Fill(stsPoint->GetX(stsPoint->GetZ()),
 				      stsPoint->GetY(stsPoint->GetZ()));
+    fNofPointsSec = 1;
     if (trackPdg<10000&&motherId>=0) {
       fNofPointsPdgSec[trackPdg]  += 1;
       fNofPointsSec +=1;
     }
+    fNofPointsPrim = 1;
     if (trackPdg<10000&&motherId<0) {
       fNofPointsPdgPrim[trackPdg]  += 1;
       fNofPointsPrim +=1;
@@ -271,10 +367,12 @@ void CbmStsFindHitsQa::Exec(Option_t* opt) {
       if (TMath::Abs((Int_t)(mom))<1) fNofRecoPointsMomSum+=1;
       fhRecoPoints  [stationNr-1]->Fill(stsPoint->GetX(stsPoint->GetZ()),
 					stsPoint->GetY(stsPoint->GetZ()));
+      fNofRecoPrim = 1;
       if (trackPdg<10000&&motherId>=0) {
 	fNofRecoPdgSec[trackPdg] += 1;
 	fNofRecoSec +=1;
       }
+      fNofRecoPrim = 1;
       if (trackPdg<10000&&motherId<0) {
 	fNofRecoPdgPrim[trackPdg] += 1;
 	fNofRecoPrim +=1;
@@ -562,7 +660,7 @@ void CbmStsFindHitsQa::CreateHistos() {
   Double_t fSectorWidth = 0.;
   for ( Int_t istat = 0 ; istat < fNStations ; istat++ ) {
     station = fDigiScheme->GetStation(istat);
-
+   
     fhEnergyLoss[istat] = new TH3F(Form("hEnergyLossSt%d",istat+1),
 				   Form("Energy loss on station %d",istat+1),
 				   20,-100.,100.,20,-100.,100.,100,0,0.01);
@@ -571,7 +669,18 @@ void CbmStsFindHitsQa::CreateHistos() {
 				   100,-50,50,100,-40,40,20,0,100.);
     fHistoListPS[istat]->Add(fhEnergyLoss[istat]);
     fHistoListPS[istat]->Add(fhIncAngle[istat]);
-
+    for ( Int_t isect = 0 ; isect < station->GetNSectors() ; isect++ ) {
+      sector = station->GetSector(isect);
+      for ( Int_t isens = 0 ; isens < sector->GetNSensors() ; isens++ ) {
+	sensor = sector->GetSensor(isens);
+	fSectorWidth = 10.*sensor->GetLx();
+	fhNofHits[istat][isect][isens] = new TH1F(Form("hNofHitsSt%dSect%dSens%d",istat+1,isect+1,isens+1),
+						  Form("Number of hits in sector %d, sensor %d of station %d",isect+1,isens+1,istat+1),
+						  500,binningNofHits);
+	//					 500,-0.5,500.5);
+	fHistoListPS[istat]->Add(fhNofHits[istat][isect][isens]); 
+      }
+    }
   }
 
 }
@@ -773,6 +882,8 @@ void CbmStsFindHitsQa::Finish() {
     for ( Int_t isect = 0 ; isect < station->GetNSectors() ; isect++ ) {
       sector = station->GetSector(isect);
       for ( Int_t isens = 0 ; isens < sector->GetNSensors() ; isens++ ) {
+        HFE_reco = 1;
+        HFE_point = 1;
 	if ( fNofPoints[istat][isect][isens] ) {
 	  fhHitFindingEfficiency->Fill(2 << 24 | (istat+1) << 16 | (isect+1) << 4 | (isens+1) << 1,
 				       ((Float_t)(fNofRecoPoints[istat][isect][isens]))/

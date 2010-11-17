@@ -104,6 +104,9 @@ class CbmStsFindHits : public FairTask
   Int_t FindHits(CbmStsStation* station, CbmStsSector* sector,
 		 std::set<Int_t>& fSet, std::set<Int_t>& bSet);
 
+  CbmStsFindHits(const CbmStsFindHits&);
+  CbmStsFindHits operator=(const CbmStsFindHits&);
+
 
   ClassDef(CbmStsFindHits,1);
 

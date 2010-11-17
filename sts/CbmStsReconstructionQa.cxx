@@ -52,14 +52,84 @@ using std::flush;
 
 // -----   Default constructor   -------------------------------------------
 CbmStsReconstructionQa::CbmStsReconstructionQa(Int_t iVerbose) 
-  : FairTask("STSReconstructionQA", iVerbose) { 
-  fOnlineAnalysis = kFALSE;
-  fMinHits = 4;
-  fQuota   = 0.7;
+  : FairTask("STSReconstructionQA", iVerbose), 
+  fOnlineAnalysis(kFALSE),
+  fMinHits(4),
+  fQuota(0.7),
 
-  fShowStation1 = 2;
-  fShowStation2 = 5;
-}
+  fShowStation1(2),
+  fShowStation2(5),
+  fHitMap(),
+  fHitTrackMap(),
+  fMatchMap(),
+  fQualiMap(),
+  fMCTracks(NULL),          // MCtrack
+  fStsPoints(NULL),         // StsPoints
+  fStsHits(NULL),           // StsHits
+  fStsTracks(NULL),         // StsTrack
+  fMatches(NULL),           // StsTrackMatch
+  fStsDigis(NULL),          // StsDigi
+  fPassGeo(),
+  fStsGeo(),
+  fTargetPos(),
+  fNStations(0),
+
+  fhMomAccAll(),
+  fhMomRecAll(),
+  fhMomEffAll(),
+  fhMomAccPrim(),
+  fhMomRecPrim(),
+  fhMomEffPrim(),
+  fhMomAccSec(),
+  fhMomRecSec(),
+  fhMomEffSec(),
+  fhNpAccAll(),
+  fhNpRecAll(),
+  fhNpEffAll(),
+  fhNpAccPrim(),
+  fhNpRecPrim(),
+  fhNpEffPrim(),
+  fhNpAccSec(),
+  fhNpRecSec(),
+  fhNpEffSec(),
+  fhZAccSec(),
+  fhZRecSec(),
+  fhZEffSec(),
+  fhNhClones(),
+  fhNhGhosts(),
+  fhMomClones(),
+  fhMomGhosts(),
+  fhMomResAll(),
+  fhMomResPrim(),
+  fhMomResSec(),
+  fhLowBand(),
+  fhHigBand(),
+  fhPrimaryVertex(),
+  fhRefTracks(),
+  fhRecRefTracks(),
+  fhStsTrackFMom(),
+  fhStsTrackLMom(),
+  fhStsTrackChiSq(),
+  fHistoList(),
+  fOccupHList(),
+
+  fNAccAll(0),
+  fNAccPrim(0),
+  fNAccRef(0),
+  fNAccSec(0),
+  fNRecAll(0),
+  fNRecPrim(0),
+  fNRecRef(0),
+  fNRecSec(0),
+  fNGhosts(0),
+  fNClones(0),
+  fNStsTracks(0),
+  fNEvents(0),
+  fNEventsFailed(0),
+  fTime(0.),
+  fOnlineCanvas(),
+  fTimer()
+{}
 // -------------------------------------------------------------------------
 
 
@@ -67,14 +137,84 @@ CbmStsReconstructionQa::CbmStsReconstructionQa(Int_t iVerbose)
 // -----   Standard constructor   ------------------------------------------
 CbmStsReconstructionQa::CbmStsReconstructionQa(Bool_t visualizeBool, Int_t minHits, Double_t quota,
 				       Int_t iVerbose) 
-  : FairTask("STSReconstructionQA", iVerbose) {
-  fOnlineAnalysis = visualizeBool;
-  fMinHits = minHits;
-  fQuota   = quota;
+  : FairTask("STSReconstructionQA", iVerbose), 
+  fOnlineAnalysis(visualizeBool),
+  fMinHits(minHits),
+  fQuota(quota),
 
-  fShowStation1 = 2;
-  fShowStation2 = 5;
+  fShowStation1(2),
+  fShowStation2(5),
+  fHitMap(),
+  fHitTrackMap(),
+  fMatchMap(),
+  fQualiMap(),
+  fMCTracks(NULL),          // MCtrack
+  fStsPoints(NULL),         // StsPoints
+  fStsHits(NULL),           // StsHits
+  fStsTracks(NULL),         // StsTrack
+  fMatches(NULL),           // StsTrackMatch
+  fStsDigis(NULL),          // StsDigi
+  fPassGeo(),
+  fStsGeo(),
+  fTargetPos(),
+  fNStations(0),
 
+  fhMomAccAll(),
+  fhMomRecAll(),
+  fhMomEffAll(),
+  fhMomAccPrim(),
+  fhMomRecPrim(),
+  fhMomEffPrim(),
+  fhMomAccSec(),
+  fhMomRecSec(),
+  fhMomEffSec(),
+  fhNpAccAll(),
+  fhNpRecAll(),
+  fhNpEffAll(),
+  fhNpAccPrim(),
+  fhNpRecPrim(),
+  fhNpEffPrim(),
+  fhNpAccSec(),
+  fhNpRecSec(),
+  fhNpEffSec(),
+  fhZAccSec(),
+  fhZRecSec(),
+  fhZEffSec(),
+  fhNhClones(),
+  fhNhGhosts(),
+  fhMomClones(),
+  fhMomGhosts(),
+  fhMomResAll(),
+  fhMomResPrim(),
+  fhMomResSec(),
+  fhLowBand(),
+  fhHigBand(),
+  fhPrimaryVertex(),
+  fhRefTracks(),
+  fhRecRefTracks(),
+  fhStsTrackFMom(),
+  fhStsTrackLMom(),
+  fhStsTrackChiSq(),
+  fHistoList(),
+  fOccupHList(),
+
+  fNAccAll(0),
+  fNAccPrim(0),
+  fNAccRef(0),
+  fNAccSec(0),
+  fNRecAll(0),
+  fNRecPrim(0),
+  fNRecRef(0),
+  fNRecSec(0),
+  fNGhosts(0),
+  fNClones(0),
+  fNStsTracks(0),
+  fNEvents(0),
+  fNEventsFailed(0),
+  fTime(0.),
+  fOnlineCanvas(),
+  fTimer()
+{
   fPartPdgTable[0] =    11; // electron
   fPartPdgTable[1] = -  11; // positron
   fPartPdgTable[2] =   211; // pi +

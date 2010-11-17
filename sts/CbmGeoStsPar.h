@@ -19,6 +19,10 @@ public:
   Bool_t getParams(FairParamList*);
   TObjArray             *GetGeoSensitiveNodes(){return fGeoSensNodes;}
   TObjArray             *GetGeoPassiveNodes(){return fGeoPassNodes;}
+private:
+
+  CbmGeoStsPar(const CbmGeoStsPar&);
+  CbmGeoStsPar operator=(const CbmGeoStsPar&);
 
   ClassDef(CbmGeoStsPar,1)
 };

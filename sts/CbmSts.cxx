@@ -36,7 +36,22 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmSts::CbmSts() : FairDetector("STS", kTRUE, kSTS) {
+CbmSts::CbmSts()
+  : FairDetector("STS", kTRUE, kSTS),
+  fTrackID(0),   
+  fVolumeID(0), 
+  fPosIn(0.,0.,0.,0.), 
+  fPosOut(0.,0.,0.,0.), 
+  fMomIn(0.,0.,0.,0.),
+  fMomOut(0.,0.,0.,0.),
+  fTime(0.),
+  fLength(0.),
+  fELoss(0.),
+  fPosIndex(0),
+  fStsCollection(NULL),
+  kGeoSaved(kFALSE),
+  flGeoPar(new TList)
+{
   ResetParameters();
   fStsCollection = new TClonesArray("CbmStsPoint");
   fPosIndex = 0;
@@ -51,7 +66,21 @@ CbmSts::CbmSts() : FairDetector("STS", kTRUE, kSTS) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmSts::CbmSts(const char* name, Bool_t active) 
-  : FairDetector(name, active, kSTS) {
+  : FairDetector(name, active, kSTS),
+  fTrackID(0),   
+  fVolumeID(0), 
+  fPosIn(0.,0.,0.,0.), 
+  fPosOut(0.,0.,0.,0.), 
+  fMomIn(0.,0.,0.,0.),
+  fMomOut(0.,0.,0.,0.),
+  fTime(0.),
+  fLength(0.),
+  fELoss(0.),
+  fPosIndex(0),
+  fStsCollection(NULL),
+  kGeoSaved(kFALSE),
+  flGeoPar(new TList)
+{
   ResetParameters();
   fStsCollection = new TClonesArray("CbmStsPoint");
   fPosIndex = 0;

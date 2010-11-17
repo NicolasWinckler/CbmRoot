@@ -21,43 +21,46 @@ using std::setprecision;
 using std::fixed;
 
 // -----   Default constructor   -------------------------------------------
-CbmStsFitTracks::CbmStsFitTracks() : FairTask("STSFitTracks") {
-  fFitter        = NULL;
-  fTracks        = NULL;
-  fNTracks       = 0;
-  fTime          = 0.;
-  fNEvents       = 0;
-  fNFailed       = 0;
-}
+CbmStsFitTracks::CbmStsFitTracks() 
+  : FairTask("STSFitTracks"),
+  fFitter(NULL),
+  fTracks(NULL),
+  fNTracks(0),
+  fTime(0.),
+  fNEvents(0),
+  fNFailed(0),
+  fTimer()
+{}
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
-CbmStsFitTracks::CbmStsFitTracks(CbmStsTrackFitter* fitter,
-				 Int_t iVerbose) : FairTask("STSFitTracks") {
-  fFitter        = fitter;
-  fTracks        = NULL;
-  fNTracks       = 0;
-  fTime          = 0.;
-  fNEvents       = 0;
-  fNFailed       = 0;
-}
+CbmStsFitTracks::CbmStsFitTracks(CbmStsTrackFitter* fitter, Int_t iVerbose) 
+  : FairTask("STSFitTracks"),
+  fFitter(NULL),
+  fTracks(NULL),
+  fNTracks(0),
+  fTime(0.),
+  fNEvents(0),
+  fNFailed(0),
+  fTimer()
+{}
 // -------------------------------------------------------------------------
 
 
 
 // -----   Constructor with name   -----------------------------------------
-CbmStsFitTracks::CbmStsFitTracks(const char* name,
-				 CbmStsTrackFitter* fitter,
-				 Int_t iVerbose) : FairTask(name, iVerbose) {
-  fFitter        = fitter;
-  fTracks        = NULL;
-  fNTracks       = 0;
-  fTime          = 0.;
-  fNEvents       = 0;
-  fNFailed       = 0;
-}
+CbmStsFitTracks::CbmStsFitTracks(const char* name, CbmStsTrackFitter* fitter, Int_t iVerbose) 
+  : FairTask(name, iVerbose),
+  fFitter(NULL),
+  fTracks(NULL),
+  fNTracks(0),
+  fTime(0.),
+  fNEvents(0),
+  fNFailed(0),
+  fTimer()
+{}
 // -------------------------------------------------------------------------
 
 

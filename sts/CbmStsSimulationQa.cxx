@@ -43,16 +43,60 @@ using std::setprecision;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStsSimulationQa::CbmStsSimulationQa() {
-  fOnlineAnalysis = kFALSE;
-}
+CbmStsSimulationQa::CbmStsSimulationQa() 
+:  fMCTracks(),
+   fSTSPoints(),
+   fStsGeo(),
+   fPassGeo(),
+   fTargetPos(),
+   fNStations(0),
+   fhMomAll(),
+   fhYPtMapAll(),
+   fhPdgCodeAll(),
+   fhStsPointsAll(),
+   fhMomRec(),
+   fhYPtMapRec(),
+   fhPdgCodeRec(),
+   fhStsPointsRec(),
+   fhMomStsPoints(),
+   fhStsPointsPosition(),
+   fhNofEvents(),
+   fhNofStsStations(),
+   fNEvents(0),
+   fHistoList(),
+   fOnlineAnalysis(kFALSE),
+   fOnlineCanvas()  
+{}
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsSimulationQa::CbmStsSimulationQa(Bool_t visualizeBool, Int_t iVerbose)
-  : FairTask("STS Simulation QA", iVerbose) {
+  : FairTask("STS Simulation QA", iVerbose), 
+    fMCTracks(),
+    fSTSPoints(),
+    fStsGeo(),
+    fPassGeo(),
+    fTargetPos(),
+    fNStations(0),
+    fhMomAll(),
+    fhYPtMapAll(),
+    fhPdgCodeAll(),
+    fhStsPointsAll(),
+    fhMomRec(),
+    fhYPtMapRec(),
+    fhPdgCodeRec(),
+    fhStsPointsRec(),
+    fhMomStsPoints(),
+    fhStsPointsPosition(),
+    fhNofEvents(),
+    fhNofStsStations(),
+    fNEvents(0),
+    fHistoList(),
+    fOnlineAnalysis(kFALSE),
+    fOnlineCanvas()
+{
   fOnlineAnalysis = visualizeBool;
 }
 // -------------------------------------------------------------------------

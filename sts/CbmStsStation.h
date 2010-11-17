@@ -100,6 +100,11 @@ class CbmStsStation : public TNamed
   std::map<Int_t, Int_t> fMcIdMap;   //! Map from McId to index
   
   Double_t fSensorZ[10];
+ 
+ private:
+
+  CbmStsStation(const CbmStsStation&);
+  CbmStsStation operator=(const CbmStsStation&);
 
   ClassDef(CbmStsStation,1);
 

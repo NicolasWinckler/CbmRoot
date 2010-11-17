@@ -21,18 +21,29 @@ using std::vector;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStsSector::CbmStsSector() {
-  fDetectorId = 0;
-  fNChannelsFront = fNChannelsBack = 0;
+CbmStsSector::CbmStsSector() 
+: fDetectorId(0),
+  fType(-666),
+  fRotation(-666.),
+  fDx(-666.),
+  fDy(-666.),
+  fStereoF(-666.),
+  fStereoB(-666.),
+  fSigmaX(0.),
+  fSigmaY(0.),
+  fSigmaXY(0.),
+  fNChannelsFront(0),
+  fNChannelsBack(0),
+  fSensors(),
+  fFrontActive(),
+  fBackActive(),
+  fSensorMap(),
+  fTrueHits()
+{
+  
   cout << "-W- CbmStsSector: Do not use this constructor! " << endl;
 
-  fType = -666;
-  fRotation = -666.;
-  fDx       = -666.;
-  fDy       = -666.;
-  fStereoF  = -666.;
-  fStereoB  = -666.;
-  fSigmaX = fSigmaY = fSigmaXY = 0.;
+  
 
   fSensors = new TObjArray(100);
   fSensorMap.clear();
@@ -41,19 +52,26 @@ CbmStsSector::CbmStsSector() {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsSector::CbmStsSector(TString tempName, Int_t detId)
+: fDetectorId(0),
+  fType(-1),
+  fRotation(-666.),
+  fDx(-666.),
+  fDy(-666.),
+  fStereoF(-666.),
+  fStereoB(-666.),
+  fSigmaX(0.),
+  fSigmaY(0.),
+  fSigmaXY(0.),
+  fNChannelsFront(0),
+  fNChannelsBack(0),
+  fSensors(),
+  fFrontActive(),
+  fBackActive(),
+  fSensorMap(),
+  fTrueHits()
 {
   fName = tempName.Data();
   fDetectorId = detId;
-  fNChannelsFront = fNChannelsBack = 0;
-
-  fType = -1;
-  fRotation = -666.;
-  fDx       = -666.;
-  fDy       = -666.;
-  fStereoF  = -666.;
-  fStereoB  = -666.;
-  fSigmaX = fSigmaY = fSigmaXY = 0.;
-
   fSensors = new TObjArray(100);
   fSensorMap.clear();
 }

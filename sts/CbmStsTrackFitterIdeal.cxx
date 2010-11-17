@@ -24,6 +24,10 @@ using std::endl;
 
 // ---------------------------- Constructor --------------------------------
 CbmStsTrackFitterIdeal::CbmStsTrackFitterIdeal()
+:  fArrayMCTrack(NULL),
+   fArrayStsPoint(NULL),
+   fArrayStsHit(NULL),
+   dbPDG()
 {
 }
 // -------------------------------------------------------------------------
@@ -31,6 +35,7 @@ CbmStsTrackFitterIdeal::CbmStsTrackFitterIdeal()
 
 // ---------------------------- Destructor ---------------------------------
 CbmStsTrackFitterIdeal::~CbmStsTrackFitterIdeal()
+
 {
 }
 // -------------------------------------------------------------------------

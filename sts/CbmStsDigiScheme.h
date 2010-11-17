@@ -85,6 +85,9 @@ class CbmStsDigiScheme : public TObject
   std::map<TString, Int_t>          fDetIdByName;
   std::map<TString, CbmStsSensor*> fSensorByName;
 
+  CbmStsDigiScheme(const CbmStsDigiScheme&);
+  CbmStsDigiScheme operator=(const CbmStsDigiScheme&);
+
   ClassDef(CbmStsDigiScheme,1);
 };
 

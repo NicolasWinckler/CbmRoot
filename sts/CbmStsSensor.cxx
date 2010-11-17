@@ -21,20 +21,38 @@ using std::vector;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStsSensor::CbmStsSensor() {
-  fDetectorId = 0;
-  fX0 = fY0 = fZ0 = fRotation = fLx = fLy = fDx = fDy = fStereoF = fStereoB = 0.;
-  fNChannelsFront = fNChannelsBack = 0;
-  fSigmaX = fSigmaY = fSigmaXY = 0.;
-  fBackStripShift  = 0.;
-  fFrontStripShift = 0.;
+CbmStsSensor::CbmStsSensor() 
+  :
+  fName(""),
+  fDetectorId(0),
+  fType(0),
+  fX0(0.), 
+  fY0(0.), 
+  fZ0(0.),
+  fRotation(0.),
+  fLx(0.), 
+  fLy(0.),
+  fDx(0.),
+  fDy(0.),
+  fStereoF(0.),
+  fStereoB(0.),
+  fD(0.),
+  fNChannelsFront(0),
+  fNChannelsBack(0),
+  fBackStripShift(0.),
+  fFrontStripShift(0.),
+  fSigmaX(0.),
+  fSigmaY(0.),
+  fSigmaXY(0.),
+  fXSmearWidth(0.0005),
+  fZSmearSlope(0.04),
+  fFrontLorentzShift(0.132),
+  fBackLorentzShift(0.026),
+  fFrontActive(),
+  fBackActive(),
+  fTrueHits()
+{
   cout << "-W- CbmStsSensor: Do not use this constructor! " << endl;
-
-  fXSmearWidth = 0.0005;
-  fZSmearSlope = 0.04;
-
-  fFrontLorentzShift = 0.132;
-  fBackLorentzShift  = 0.026;
 }
 // -------------------------------------------------------------------------
 
@@ -44,8 +62,36 @@ CbmStsSensor::CbmStsSensor() {
 CbmStsSensor::CbmStsSensor(TString tempName, Int_t detId, Int_t iType, Double_t x0, Double_t y0, Double_t z0,
 			   Double_t rotation, Double_t lx, Double_t ly, 
 			   Double_t d, Double_t dx, Double_t dy, Double_t stereoF, Double_t stereoB)
+  :
+  fName(tempName.Data()),
+  fDetectorId(0),
+  fType(0),
+  fX0(0.), 
+  fY0(0.), 
+  fZ0(0.),
+  fRotation(0.),
+  fLx(0.), 
+  fLy(0.),
+  fDx(0.),
+  fDy(0.),
+  fStereoF(0.),
+  fStereoB(0.),
+  fD(0.),
+  fNChannelsFront(0),
+  fNChannelsBack(0),
+  fBackStripShift(0.),
+  fFrontStripShift(0.),
+  fSigmaX(0.),
+  fSigmaY(0.),
+  fSigmaXY(0.),
+  fXSmearWidth(0.0005),
+  fZSmearSlope(0.04),
+  fFrontLorentzShift(0.132),
+  fBackLorentzShift(0.026),
+  fFrontActive(),
+  fBackActive(),
+  fTrueHits()
 {
-
   fName = tempName.Data();
   fDetectorId = detId;
   fType       = iType;
@@ -79,7 +125,12 @@ CbmStsSensor::CbmStsSensor(TString tempName, Int_t detId, Int_t iType, Double_t 
   }
   else if ( fType == 3 ) {        // strip sensor with double metal layer
     fNChannelsFront = Int_t(TMath::Ceil ( dbNoX ));
-    fNChannelsBack  = fNChannelsFront;
+    if (fStereoB*180/TMath::Pi()>80) {
+      fNChannelsBack  = Int_t(TMath::Ceil ( fLy / fDy ));
+    }
+    else {
+      fNChannelsBack = fNChannelsFront;
+    }
   }
   else {
     cout << "-E- CbmStsSensor: Illegal sensor type " << fType << endl;
@@ -93,17 +144,20 @@ CbmStsSensor::CbmStsSensor(TString tempName, Int_t detId, Int_t iType, Double_t 
     fSigmaXY = 0.;
   }
   else if ( fType == 2 || fType == 3 ) {
-    Double_t tanStB = TMath::Tan(fStereoB);
-    Double_t tanStF = TMath::Tan(fStereoF);
-    Double_t absStF = TMath::Abs(fStereoF);
-    if (fStereoF==0. ) {
+
+    if (fStereoF==0. && fStereoB*180/TMath::Pi()<80 ) {
       fSigmaX  = fDx / TMath::Sqrt(12);
-      fSigmaY  = fDx / (TMath::Sqrt(6)*tanStB);
-      fSigmaXY = (-1. * fDx * fDx)/(12.*tanStB);
+      fSigmaY  = fDx / (TMath::Sqrt(6)*TMath::Tan(fStereoB));
+      fSigmaXY = (-1. * fDx * fDx)/(12.*TMath::Tan(fStereoB));
+    }
+    else if (fStereoF==0. && fStereoB*180/TMath::Pi()>80 ) {
+      fSigmaX  = fDx / TMath::Sqrt(12);
+      fSigmaY  = fDy / TMath::Sqrt(12);
+      fSigmaXY = 0.;
     }
     else {
       fSigmaX  = fDx / TMath::Sqrt(24);
-      fSigmaY  = fDx / (TMath::Sqrt(24)*tanStB);
+      fSigmaY  = fDx / (TMath::Sqrt(24)*TMath::Tan(fStereoB));
       fSigmaXY = 0.;
     }
     
@@ -114,12 +168,24 @@ CbmStsSensor::CbmStsSensor(TString tempName, Int_t detId, Int_t iType, Double_t 
       fFrontStripShift = 0.;
     }
     else if ( sensorNumber == 2 ) {
-      fBackStripShift  = fLy * TMath::Tan(fStereoB);
-      fFrontStripShift = fLy * TMath::Tan(fStereoF);
+      if (fStereoB*180/TMath::Pi()>80) {
+        fBackStripShift  = 0.;
+        fFrontStripShift = 1. * fLy * TMath::Tan(fStereoF);
+      }
+      else {
+        fBackStripShift  = 1. * fLy * TMath::Tan(fStereoB);
+        fFrontStripShift = 1. * fLy * TMath::Tan(fStereoF);
+      }
     }
     else if ( sensorNumber == 3 ){
-      fBackStripShift  = 2. * fLy * TMath::Tan(fStereoB);
-      fFrontStripShift = 2. * fLy * TMath::Tan(fStereoF);
+      if (fStereoB*180/TMath::Pi()>80) {
+        fBackStripShift  = 0.;
+        fFrontStripShift = 2. * fLy * TMath::Tan(fStereoF);
+      }
+      else {
+        fBackStripShift  = 2. * fLy * TMath::Tan(fStereoB);
+        fFrontStripShift = 2. * fLy * TMath::Tan(fStereoF);
+      }
     }
     
   }
@@ -156,8 +222,37 @@ CbmStsSensor::CbmStsSensor(TString tempName, Int_t detId, Int_t iType, Double_t 
 CbmStsSensor::CbmStsSensor(Int_t detId, Int_t iType, Double_t x0, 
 			   Double_t y0, Double_t rotation, Double_t lx, 
 			   Double_t ly, Double_t dx, Double_t dy, 
-			   Double_t stereoF, Double_t stereoB) {
-
+			   Double_t stereoF, Double_t stereoB) 
+  :
+  fName(""),
+  fDetectorId(0),
+  fType(0),
+  fX0(0.), 
+  fY0(0.), 
+  fZ0(0.),
+  fRotation(0.),
+  fLx(0.), 
+  fLy(0.),
+  fDx(0.),
+  fDy(0.),
+  fStereoF(0.),
+  fStereoB(0.),
+  fD(0.),
+  fNChannelsFront(0),
+  fNChannelsBack(0),
+  fBackStripShift(0.),
+  fFrontStripShift(0.),
+  fSigmaX(0.),
+  fSigmaY(0.),
+  fSigmaXY(0.),
+  fXSmearWidth(0.0005),
+  fZSmearSlope(0.04),
+  fFrontLorentzShift(0.132),
+  fBackLorentzShift(0.026),
+  fFrontActive(),
+  fBackActive(),
+  fTrueHits()
+{
   fDetectorId = detId;
   fType       = iType;
   fX0         = x0;
@@ -202,32 +297,46 @@ CbmStsSensor::CbmStsSensor(Int_t detId, Int_t iType, Double_t x0,
     fSigmaXY = 0.;
   }
   else if ( fType == 2 || fType == 3 ) {
-    Double_t tanStB = TMath::Tan(fStereoB);
-    Double_t tanStF = TMath::Tan(fStereoF);
-    Double_t absStF = TMath::Abs(fStereoF);
-    if (fStereoF==0. ) {
+     if (fStereoF==0. && fStereoB*180/TMath::Pi()<80 ) {
       fSigmaX  = fDx / TMath::Sqrt(12);
-      fSigmaY  = fDx / (TMath::Sqrt(6)*tanStB);
-      fSigmaXY = (-1. * fDx * fDx)/(12.*tanStB);
+      fSigmaY  = fDx / (TMath::Sqrt(6)*TMath::Tan(fStereoB));
+      fSigmaXY = (-1. * fDx * fDx)/(12.*TMath::Tan(fStereoB));
+    }
+    else if (fStereoF==0. && fStereoB*180/TMath::Pi()>80 ) {
+      fSigmaX  = fDx / TMath::Sqrt(12);
+      fSigmaY  = fDy / TMath::Sqrt(12);
+      fSigmaXY = 0.;
     }
     else {
       fSigmaX  = fDx / TMath::Sqrt(24);
-      fSigmaY  = fDx / (TMath::Sqrt(24)*tanStB);
+      fSigmaY  = fDx / (TMath::Sqrt(24)*TMath::Tan(fStereoB));
       fSigmaXY = 0.;
     }
     
     Int_t sensorNumber = ( fDetectorId & (7<<1) ) >> 1;
-    if ( sensorNumber  == 1 ) {
+    if ( sensorNumber == 1 ) {
       fBackStripShift  = 0.;
       fFrontStripShift = 0.;
     }
-    if ( sensorNumber  == 2 ) {
-      fBackStripShift  = fLy * TMath::Tan(fStereoB);
-      fFrontStripShift = fLy * TMath::Tan(fStereoF);
+    else if ( sensorNumber == 2 ) {
+      if (fStereoB*180/TMath::Pi()>80) {
+        fBackStripShift  = 0.;
+        fFrontStripShift = 1. * fLy * TMath::Tan(fStereoF);
+      }
+      else {
+        fBackStripShift  = 1. * fLy * TMath::Tan(fStereoB);
+        fFrontStripShift = 1. * fLy * TMath::Tan(fStereoF);
+      }
     }
-    else if ( sensorNumber == 3 ) {
-      fBackStripShift   = 2. * fLy * TMath::Tan(fStereoB);
-      fFrontStripShift  = 2. * fLy * TMath::Tan(fStereoF);
+    else if ( sensorNumber == 3 ){
+      if (fStereoB*180/TMath::Pi()>80) {
+        fBackStripShift  = 0.;
+        fFrontStripShift = 2. * fLy * TMath::Tan(fStereoF);
+      }
+      else {
+        fBackStripShift  = 2. * fLy * TMath::Tan(fStereoB);
+        fFrontStripShift = 2. * fLy * TMath::Tan(fStereoF);
+      }
     }
     
   }
@@ -347,13 +456,20 @@ Int_t CbmStsSensor::GetChannel(Double_t x, Double_t y, Int_t iSide) {
       }
     }
     else {                   // Back side
+      if (fStereoB*180/TMath::Pi()>80) {
+        Double_t xp = yint;
+	xp = xp - TMath::Floor(xp/fLy) * fLy;
+	iChan = Int_t( xp / fDy );
+      }
+      else {
+	// Project point along backside strip to y = 0 
+        Double_t xp = xint + fBackStripShift + yint * TMath::Tan(fStereoB);
+        // Calculate modulo w.r.t. sensor x width
+        xp = xp - TMath::Floor(xp/fLx) * fLx;
+        // Digitise
+        iChan = Int_t( xp / fDx );
+      }
       
-      // Project point along backside strip to y = 0 
-      Double_t xp = xint + fBackStripShift + yint * TMath::Tan(fStereoB);
-      // Calculate modulo w.r.t. sensor x width
-      xp = xp - TMath::Floor(xp/fLx) * fLx;
-      // Digitise
-      iChan = Int_t( xp / fDx );
       if ( iChan < 0 || iChan > fNChannelsBack ) {
 	cout << "-E- CbmStsSensor::GetChannel: "
 	     << "Back channel number " << iChan << " exceeds limit " 
@@ -450,20 +566,17 @@ Float_t CbmStsSensor::GetChannelPlus(Double_t x, Double_t y, Int_t iSide) {
     }
     else {                   // Back side
 
-//       Double_t backStripShift = 0.;
-//       Int_t sensorNumber = ( fDetectorId & (7<<1) ) >> 1;
-//       if ( sensorNumber != 1 ) {
-// 	backStripShift = fLy * TMath::Tan(fStereo);
-// 	if ( sensorNumber == 3 )
-// 	  backStripShift *= 2.;
-//       }
+      if (fStereoB*180/TMath::Pi()>80) {
+        Double_t xp = yint;
+        xp = xp - TMath::Floor(xp/fLy) * fLy;
+        iChan = xp / fDy;
+      }
+      else {
+	Double_t xp = xint + fBackStripShift + yint * TMath::Tan(fStereoB);
+        xp = xp - TMath::Floor(xp/fLx) * fLx;
+        iChan = xp / fDx;
+      }
       
-      // Project point along backside strip to y = 0 
-      Double_t xp = xint + fBackStripShift + yint * TMath::Tan(fStereoB);
-      // Calculate modulo w.r.t. sensor x width
-      xp = xp - TMath::Floor(xp/fLx) * fLx;
-      // Digitise
-      iChan = xp / fDx;
       if ( iChan < 0 || iChan > fNChannelsBack ) {
 	cout << "-E- CbmStsSensor::GetChannel: "
 	     << "Back channel number " << iChan << " exceeds limit " 
@@ -516,9 +629,8 @@ Int_t CbmStsSensor::GetFrontChannel(Double_t x, Double_t y, Double_t z) {
     
 // -----   Public method GetBackChannel   ----------------------------------
 Int_t CbmStsSensor::GetBackChannel (Double_t x, Double_t y, Double_t z) {
-  //cout << "back channel for " << x << " " << y << " " << z << " (" << fZ0-fD/2. << " " << fZ0+fD/2.<<")" << endl;
+
   z = fZ0 + fD/2. - z;
-  //cout << " temp z = " << z << endl;
   if ( z > fD ) return -1;
   if ( z < 0. ) return -1;
 
@@ -534,13 +646,17 @@ Int_t CbmStsSensor::GetBackChannel (Double_t x, Double_t y, Double_t z) {
 
 //  xint += gRandom->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
 //  yint += gRandom->Gaus(0.,fXSmearWidth+fZSmearSlope*z);
-
-  // Project point along backside strip to y = 0 
-  Double_t xp = xint + fBackStripShift + yint * TMath::Tan(fStereoB);
-  // Calculate modulo w.r.t. sensor x width
-  xp = xp - TMath::Floor(xp/fLx) * fLx;
-  // Digitise
-  iChan = (Int_t)(xp/fDx);
+  if (fStereoB*180/TMath::Pi()>80) {
+    Double_t xp = yint;
+    xp = xp - TMath::Floor(xp/fLy) * fLy;
+    iChan = (Int_t)(xp/fDy);
+  }
+  else {
+    Double_t xp = xint + fBackStripShift + yint * TMath::Tan(fStereoB);
+    xp = xp - TMath::Floor(xp/fLx) * fLx;
+    iChan = (Int_t)(xp/fDx);
+  }
+  
 
   //cout << "  " << xint << " " << yint << " -> " << xp << " -> " << iChan << endl;
   if ( iChan < 0 || iChan > fNChannelsBack ) return -1;
@@ -622,23 +738,23 @@ Int_t CbmStsSensor::Intersect(Int_t iFStrip, Int_t iBStrip,
   
   for (Int_t iSegB=0; iSegB<nSegB; iSegB++) {
      
-     for (Int_t iSegF=0; iSegF<nSegF; iSegF++) {
+    for (Int_t iSegF=0; iSegF<nSegF; iSegF++) {
      
-     x = ((-1./TMath::Tan(fStereoB)) * (xB -  Double_t(iSegB)*fLx) + ((1./TMath::Tan(fStereoF)) * (xF - Double_t(iSegF)*fLx)))/((1./TMath::Tan(fStereoF))-(1./TMath::Tan(fStereoB)));
-     y = (-1./TMath::Tan(fStereoB)) * x + (1./TMath::Tan(fStereoB)) * (xB - fBackStripShift + Double_t(iSegB)*fLx);
-    // y & x coordinate of intersection of back strip segment with front strip
-    //Double_t y = (xB - x - Double_t(iSegB) * fLx) / TMath::Tan(fStereoB);
+      x = ((-1./TMath::Tan(fStereoB)) * (xB -  Double_t(iSegB)*fLx) + ((1./TMath::Tan(fStereoF)) * (xF - Double_t(iSegF)*fLx)))/((1./TMath::Tan(fStereoF))-(1./TMath::Tan(fStereoB)));
+      y = (-1./TMath::Tan(fStereoB)) * x + (1./TMath::Tan(fStereoB)) * (xB - fBackStripShift + Double_t(iSegB)*fLx);
+      // y & x coordinate of intersection of back strip segment with front strip
+      //Double_t y = (xB - x - Double_t(iSegB) * fLx) / TMath::Tan(fStereoB);
     
-    if ( y < 0. || y > fLy ) continue;
-    if ( x < 0. || x > fLx ) continue;
+      if ( y < 0. || y > fLy ) continue;
+      if ( x < 0. || x > fLx ) continue;
 
-    // Transform x and y coordinates to the global c.s.
-    Double_t xHit = x * TMath::Cos(fRotation) - y * TMath::Sin(fRotation);
-    Double_t yHit = y * TMath::Cos(fRotation) + x * TMath::Sin(fRotation);
+      // Transform x and y coordinates to the global c.s.
+      Double_t xHit = x * TMath::Cos(fRotation) - y * TMath::Sin(fRotation);
+      Double_t yHit = y * TMath::Cos(fRotation) + x * TMath::Sin(fRotation);
 
-    // Fill coordinates in return arrays
-    xCross.push_back(xHit);
-    yCross.push_back(yHit);
+      // Fill coordinates in return arrays
+      xCross.push_back(xHit);
+      yCross.push_back(yHit);
     }
   }
 
@@ -687,60 +803,47 @@ Int_t CbmStsSensor::Intersect(Int_t iFStrip, Int_t iBStrip,
   Double_t x;
  
   Double_t xtemp, ytemp;
-  
-  Double_t x0B = ( Double_t(iBStrip) + 0.5 ) * fDx;
-  if ( iFStrip>600. && iBStrip < 200.) { 
-  x0B = x0 + fLx; 
-  }
-  
-  if (tanstrF==0.) 
-     {
+
+  if (tanstrF==0.) {
        
-       for (Int_t iStrip=nStripBegB; iStrip<=nStripMaxB; iStrip++) {
-       //Double_t war = /*GetSensorNr() * TMath::Abs(fLy * tanstrF) +*/ GetSensorNr() * TMath::Abs(fLy * tanstrB);
-       //if ( TMath::Abs(x0B-xint) > war ) continue;
-       
+    for (Int_t iStrip=nStripBegB; iStrip<=nStripMaxB; iStrip++) {       
          
-	 yint = ( x0 - xint - fBackStripShift + Double_t(iStrip) * fLx ) / tanstrB;
+      yint = ( x0 - xint - fBackStripShift + Double_t(iStrip) * fLx ) / tanstrB;
 
-         if ( ! ( yint>0. && yint<fLy ) ) continue;
+      if ( ! ( yint>0. && yint<fLy ) ) continue;
 
-         if ( zCross > 0.001 ) {
-           Fatal("Intersect","Intersection of two strips in two different points not valid");
-           return -1;
-          }
+      if ( zCross > 0.001 ) {
+        Fatal("Intersect","Intersection of two strips in two different points not valid");
+        return -1;
+      }
 
-          // Translation to centre of sector
-          xtemp = xint - fLx/2.;
-          ytemp = yint - fLy/2.;
+      // Translation to centre of sector
+      xtemp = xint - fLx/2.;
+      ytemp = yint - fLy/2.;
     
-          // Rotation around sector centre
-          xCross = xtemp * cosrot - ytemp * sinrot;
-          yCross = xtemp * sinrot + ytemp * cosrot;
+      // Rotation around sector centre
+      xCross = xtemp * cosrot - ytemp * sinrot;
+      yCross = xtemp * sinrot + ytemp * cosrot;
     
-          // Translation into global c.s.
-          xCross = xCross + fX0;
-          yCross = yCross + fY0;
-          zCross = fZ0;
-        }
-     }
+      // Translation into global c.s.
+      xCross = xCross + fX0;
+      yCross = yCross + fY0;
+      zCross = fZ0;
+    }
+  }
   else {
    
     for (Int_t iStripB=0; iStripB<=1; iStripB++) {
      
       for (Int_t iStripF=-1; iStripF<=0; iStripF++) {
-       
     
         x = ((-1./tanstrB) * (x0 - fBackStripShift + Double_t(iStripB)*fLx) + (1./tanstrF) * (xint - fFrontStripShift +  Double_t(iStripF)*fLx))/((1./tanstrF)-(1./tanstrB));
         yint = (-1./tanstrB) * x + (1./tanstrB) * (x0 - fBackStripShift + Double_t(iStripB)*fLx);
     
         if ( ! ( yint>0. && yint<fLy ) ) continue;
-   
         if ( ! ( x>0. && x<fLx ) ) continue;
      
         if ( zCross > 0.001 ) {
-          cout<< "Punkt przeciecia byl: "<< xtemp <<" i "<< ytemp << " przy sektorze "<< fFrontStripShift<< " & " <<fBackStripShift<<endl;
-          cout<< "Punkt przeciecia teraz jest: "<< x <<" i "<< yint << " przy sektorze "<< fFrontStripShift<< " & " <<fBackStripShift<<endl;
           Fatal("Intersect","1 Intersection of two strips in two different points not valid");
           return -1;
         }
@@ -760,7 +863,6 @@ Int_t CbmStsSensor::Intersect(Int_t iFStrip, Int_t iBStrip,
       } 
     }
   }
- // }
   // No intersection found
   if ( zCross < 0.001 ) return -1;
 
@@ -786,63 +888,101 @@ Int_t CbmStsSensor::IntersectClusters(Double_t fChan, Double_t bChan,
     return -1;
   }
   
-  //  fBackLorentzShift;
-  
   xCross = 0.;
   yCross = 0.;
   zCross = 0.;
   
   Double_t sinrot = TMath::Sin(fRotation);
   Double_t cosrot = TMath::Cos(fRotation);
-  Double_t tanstrB = TMath::Tan(fStereoB);
-  Double_t tanstrF = TMath::Tan(fStereoF);
            
   Double_t xint  = ( fChan + 0.5 ) * fDx - cosrot*fFrontLorentzShift*fD/2.;
-  Double_t xintF = ( fChan + 0.5 ) * fDx - cosrot*fFrontLorentzShift*fD/2.;
   
-  Int_t nStripMaxB = ( fStereoB<0. ? 0 :  Int_t(fLy*tanstrB/fLx)+1 ); // max. number of Bstrips
-  Int_t nStripBegB = ( fStereoB>0. ? 0 : -Int_t(fLy*tanstrB/fLx)-1 );
-  
-  Int_t nStripMaxF = ( fStereoF<=0. ? 0 :  Int_t(fLy*tanstrF/fLx)+1 ); // max. number of Fstrips
-  Int_t nStripBegF = ( fStereoF>0. ? 0 : -Int_t(fLy*tanstrF/fLx)-1 );
-
   Double_t x0  = ( bChan + 0.5 ) * fDx - cosrot*fBackLorentzShift*fD/2. ;
-  Double_t x0b = ( bChan + 0.5 ) * fDx - cosrot*fBackLorentzShift*fD/2. ;
 
   Double_t yint;
   Double_t x;
- /* if (xintF > fLy -(GetSensorNr()*TMath::Abs(fLy*tanstrF) + GetSensorNr()*TMath::Abs(fLy*tanstrB))  && bChan < 200) {
-    Double_t bChD = bChan + fNChannelsBack;
-    Double_t x0b = ( bChD + 0.5 ) * fDx - cosrot*fBackLorentzShift*fD/2. ;
-    }
-  if (bChan < 200 && fChan > 600) {
-    Double_t fChD = fChan - fNChannelsFront;
-    Double_t xintF = ( fChD + 0.5 ) * fDx - cosrot*fFrontLorentzShift*fD/2.;
-    }*/
-   
-  //  fFrontLorentzShift;
+
   Double_t xtemp, ytemp;
   
-  //if ( TMath::Abs(x0b-xintF) < (GetSensorNr() * TMath::Abs(fLy * tanstrF) + GetSensorNr() * TMath::Abs(fLy * tanstrB))  |  xintF > fLy -(GetSensorNr()*TMath::Abs(fLy*tanstrF) + GetSensorNr()*TMath::Abs(fLy*tanstrB)) | x0b < (GetSensorNr()*TMath::Abs(fLy*tanstrF) + GetSensorNr()*TMath::Abs(fLy*tanstrB))) {
-
-  if (tanstrF==0.) 
-     {
-       
-       for (Int_t iStrip=nStripBegB; iStrip<=nStripMaxB; iStrip++) {
-              
-         //if ( TMath::Abs(x0b-TMath::Abs(xintF)) > GetSensorNr() * TMath::Abs(fLy * tanstrF) + GetSensorNr() * TMath::Abs(fLy * tanstrB) ) continue;
+  if (fStereoF==0.&&fStereoB*180/TMath::Pi()<80) {
+    Double_t tanstrB = TMath::Tan(fStereoB);
+    Double_t tanstrF = TMath::Tan(fStereoF);
+    Int_t nStripMaxB = ( fStereoB<0. ? 0 :  Int_t(fLy*tanstrB/fLx)+1 ); // max. number of BSts
+    Int_t nStripBegB = ( fStereoB>0. ? 0 : -Int_t(fLy*tanstrB/fLx)-1 );
+  
+    Int_t nStripMaxF = ( fStereoF<=0. ? 0 :  Int_t(fLy*tanstrF/fLx)+1 ); // max. number of Fstrips
+    Int_t nStripBegF = ( fStereoF>0. ? 0 : -Int_t(fLy*tanstrF/fLx)-1 );
+    for (Int_t iStrip=nStripBegB; iStrip<=nStripMaxB; iStrip++) {
 	
-         yint = ( x0 - xint - fBackStripShift + Double_t(iStrip) * fLx ) / tanstrB;
+      yint = ( x0 - xint - fBackStripShift + Double_t(iStrip) * fLx ) / tanstrB;
 
-         if ( ! ( yint>0. && yint<fLy ) ) continue;
+      if ( ! ( yint>0. && yint<fLy ) ) continue;
 
-         if ( zCross > 0.001 ) {
-         Fatal("Intersect","Intersection of two strips in two different points not valid");
-         return -1;
-         }
+      if ( zCross > 0.001 ) {
+        Fatal("Intersect","Intersection of two strips in two different points not valid");
+        return -1;
+      }
+
+      // Translation to centre of sector
+      xtemp = xint - fLx/2.;
+      ytemp = yint - fLy/2.;
+    
+      // Rotation around sector centre
+      xCross = xtemp * cosrot - ytemp * sinrot;
+      yCross = xtemp * sinrot + ytemp * cosrot;
+    
+      // Translation into global c.s.
+      xCross = xCross + fX0;
+      yCross = yCross + fY0;
+      zCross = fZ0;
+    }
+  }
+  else if (fStereoB*180/TMath::Pi()>80) {
+    yint = ( bChan + 0.5 ) * fDy;
+
+    if ( zCross > 0.001 ) {
+      Fatal("Intersect","Intersection of two strips in two different points not valid");
+      return -1;
+    }
+
+    // Translation to centre of sector
+    xtemp = xint - fLx/2.;
+    ytemp = yint - fLy/2.;
+    
+    // Rotation around sector centre
+    xCross = xtemp * cosrot - ytemp * sinrot;
+    yCross = xtemp * sinrot + ytemp * cosrot;
+    
+    // Translation into global c.s.
+    xCross = xCross + fX0;
+    yCross = yCross + fY0;
+    zCross = fZ0;
+  }
+  else {
+    Double_t tanstrB = TMath::Tan(fStereoB);
+    Double_t tanstrF = TMath::Tan(fStereoF);
+    Int_t nStripMaxB = ( fStereoB<0. ? 0 :  Int_t(fLy*tanstrB/fLx)+1 ); // max. number of Bstrips
+    Int_t nStripBegB = ( fStereoB>0. ? 0 : -Int_t(fLy*tanstrB/fLx)-1 );
+  
+    Int_t nStripMaxF = ( fStereoF<=0. ? 0 :  Int_t(fLy*tanstrF/fLx)+1 ); // max. number of Fstrips
+    Int_t nStripBegF = ( fStereoF>0. ? 0 : -Int_t(fLy*tanstrF/fLx)-1 );
+    for (Int_t iStripB=0; iStripB<=1; iStripB++) {
+     
+      for (Int_t iStripF=-1; iStripF<=0; iStripF++) {
+     
+        x = ((-1./tanstrB) * (x0 - fBackStripShift + Double_t(iStripB)*fLx) + (1./tanstrF) * (xint - fFrontStripShift +  Double_t(iStripF)*fLx))/((1./tanstrF)-(1./tanstrB));
+        yint = (-1./tanstrB) * x + (1./tanstrB) * (x0 - fBackStripShift + Double_t(iStripB)*fLx);
+     
+        if ( ! ( yint>0. && yint<fLy ) ) continue;  
+        if ( ! ( x>0. && x<fLx ) ) continue;
+    
+        if ( zCross > 0.001 ) {
+          Fatal("Intersect","2 Intersection of two strips in two different points not valid");
+          return -1;
+        }
 
         // Translation to centre of sector
-        xtemp = xint - fLx/2.;
+        xtemp = x - fLx/2.;
         ytemp = yint - fLy/2.;
     
         // Rotation around sector centre
@@ -855,48 +995,14 @@ Int_t CbmStsSensor::IntersectClusters(Double_t fChan, Double_t bChan,
         zCross = fZ0;
       }
     }
-  else {
-    
-  for (Int_t iStripB=0; iStripB<=1; iStripB++) {
-     
-     for (Int_t iStripF=-1; iStripF<=0; iStripF++) {
-     
-       x = ((-1./tanstrB) * (x0 - fBackStripShift + Double_t(iStripB)*fLx) + (1./tanstrF) * (xint - fFrontStripShift +  Double_t(iStripF)*fLx))/((1./tanstrF)-(1./tanstrB));
-       yint = (-1./tanstrB) * x + (1./tanstrB) * (x0 - fBackStripShift + Double_t(iStripB)*fLx);
-     
-       if ( ! ( yint>0. && yint<fLy ) ) continue;  
-       if ( ! ( x>0. && x<fLx ) ) continue;
-    
-       if ( zCross > 0.001 ) {
-         Fatal("Intersect","2 Intersection of two strips in two different points not valid");
-         return -1;
-       }
-
-       // Translation to centre of sector
-       xtemp = x - fLx/2.;
-       ytemp = yint - fLy/2.;
-    
-       // Rotation around sector centre
-       xCross = xtemp * cosrot - ytemp * sinrot;
-       yCross = xtemp * sinrot + ytemp * cosrot;
-    
-       // Translation into global c.s.
-       xCross = xCross + fX0;
-       yCross = yCross + fY0;
-       zCross = fZ0;
-    }
-  }
   }
  
-    
-  //}
-  
-
   // No intersection found
   if ( zCross < 0.001 ) return -1;
 
   return fDetectorId;
 }
+
 // -------------------------------------------------------------------------
 
 
@@ -981,22 +1087,37 @@ Int_t CbmStsSensor::BackStripNumber(Double_t x, Double_t y) const {
   // If point is inside sensor, calculate projection onto readout line
   // and determine channel number
   if ( IntCoord(x, y, xint, yint) ) {
+    if (fStereoB*180/TMath::Pi()>80) {
+      Double_t xp = yint;
+      xp = xp - TMath::Floor(xp/fLy) * fLy;
+      Int_t iStrip = (Int_t) ( xp / fDy );
+      if (iStrip < 0 || iStrip > fNChannelsBack) {
+        cout << "-E- CbmStsSensor::BackStripNumber: Invalid strip number"
+	     << "  " << iStrip << endl;
+        cout << "    Sensor " << fDetectorId << ", x = " << xint << ", y = " 
+	     << yint << endl;
+        Fatal("BackStripNumber", "Invalid strip number" );
+      }
+      return iStrip;
+    }
+    else {
+      // Project point along backside strip to y = 0 
+      Double_t xp = xint + fBackStripShift + yint * TMath::Tan(fStereoB);
+      // Calculate modulo w.r.t. sensor x width
+      xp = xp - TMath::Floor(xp/fLx) * fLx;
+      // Digitise
+      Int_t iStrip = (Int_t) ( xp / fDx );
+      if (iStrip < 0 || iStrip > fNChannelsBack) {
+        cout << "-E- CbmStsSensor::BackStripNumber: Invalid strip number"
+	     << "  " << iStrip << endl;
+        cout << "    Sensor " << fDetectorId << ", x = " << xint << ", y = " 
+	     << yint << endl;
+        Fatal("BackStripNumber", "Invalid strip number" );
+      }
+      return iStrip;
+    }
     
-    // Project point along backside strip to y = 0 
-    Double_t xp = xint + fBackStripShift + yint * TMath::Tan(fStereoB);
-    // Calculate modulo w.r.t. sensor x width
-    xp = xp - TMath::Floor(xp/fLx) * fLx;
-    // Digitise
-    Int_t iStrip = (Int_t) ( xp / fDx );
-    
-    if (iStrip < 0 || iStrip > fNChannelsBack) {
-      cout << "-E- CbmStsSensor::BackStripNumber: Invalid strip number"
-	   << "  " << iStrip << endl;
-      cout << "    Sensor " << fDetectorId << ", x = " << xint << ", y = " 
-	   << yint << endl;
-      Fatal("BackStripNumber", "Invalid strip number" );
-  }
-    return iStrip;
+   
   }
 
   // Return -1 if point is outside sensor

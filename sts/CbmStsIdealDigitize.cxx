@@ -48,13 +48,22 @@ using std::map;
 
 
 // -----   Default constructor   ------------------------------------------
-CbmStsIdealDigitize::CbmStsIdealDigitize() : FairTask("STS Digitizer", 1) {
-  fGeoPar      = NULL;
-  fDigiPar     = NULL;
-  fPoints      = NULL;
-  fDigis       = NULL;
-  fDigiMatches = NULL;
-  fDigiScheme  = new CbmStsDigiScheme();
+CbmStsIdealDigitize::CbmStsIdealDigitize() 
+  : FairTask("STS Digitizer", 1),
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fDigiScheme(NULL),
+  fPoints(NULL),
+  fDigis(NULL),
+  fDigiMatches(NULL),
+  fNPoints(0),
+  fNFailed(0),
+  fNOutside(0),
+  fNMulti(0),
+  fNDigis(0),
+  fTimer(),
+  fChannelMap()
+{
   Reset();
 }
 // -------------------------------------------------------------------------
@@ -63,13 +72,21 @@ CbmStsIdealDigitize::CbmStsIdealDigitize() : FairTask("STS Digitizer", 1) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsIdealDigitize::CbmStsIdealDigitize(Int_t iVerbose) 
-  : FairTask("STSDigitize", iVerbose) { 
-  fGeoPar      = NULL;
-  fDigiPar     = NULL;
-  fPoints      = NULL;
-  fDigis       = NULL;
-  fDigiMatches = NULL;
-  fDigiScheme  = new CbmStsDigiScheme();
+  : FairTask("STSDigitize", iVerbose),
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fDigiScheme(NULL),
+  fPoints(NULL),
+  fDigis(NULL),
+  fDigiMatches(NULL),
+  fNPoints(0),
+  fNFailed(0),
+  fNOutside(0),
+  fNMulti(0),
+  fNDigis(0),
+  fTimer(),
+  fChannelMap()
+{ 
   Reset();
 }
 // -------------------------------------------------------------------------
@@ -78,12 +95,21 @@ CbmStsIdealDigitize::CbmStsIdealDigitize(Int_t iVerbose)
 
 // -----   Constructor with name   -----------------------------------------
 CbmStsIdealDigitize::CbmStsIdealDigitize(const char* name, Int_t iVerbose) 
-  : FairTask(name, iVerbose) { 
-  fGeoPar      = NULL;
-  fDigiPar     = NULL;
-  fPoints      = NULL;
-  fDigis       = NULL;
-  fDigiMatches = NULL;
+  : FairTask(name, iVerbose),
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fDigiScheme(NULL),
+  fPoints(NULL),
+  fDigis(NULL),
+  fDigiMatches(NULL),
+  fNPoints(0),
+  fNFailed(0),
+  fNOutside(0),
+  fNMulti(0),
+  fNDigis(0),
+  fTimer(),
+  fChannelMap()
+{ 
   fDigiScheme  = new CbmStsDigiScheme();
   Reset();
 }

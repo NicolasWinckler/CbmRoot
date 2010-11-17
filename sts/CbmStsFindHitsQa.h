@@ -118,6 +118,8 @@ class CbmStsFindHitsQa : public FairTask
   TH2F* fhHitPointPull;
   TH2F* fhHitPointCorr;
   
+  TH1F* fhNofHits      [20][300][3];     // per station, sector, sensor
+
   /** List of histograms **/
   TList* fHistoList;
   TList* fHistoListPS[20];
@@ -126,16 +128,9 @@ class CbmStsFindHitsQa : public FairTask
   Int_t    fNEvents;        /** Number of events with success **/
    /** Total real time used for good events **/
    Double_t  fTime1;     
-   Double_t  fTime2;     
-   Double_t  fTime3;
-   Double_t  fTime4;
-   Double_t  fTime5;
-   Double_t  fTime6;
-   Double_t  fTime7;
-   
  
   Int_t fNofHits      [20][300][3];     // per station, sector, sensor
-
+   Int_t fNofDigisPChip[20][300][2][20];
   Int_t fNofPoints    [20][300][3];
   Int_t fNofRecoPoints[20][300][3];
   Int_t fNofPointsIncAng     [1000];
@@ -167,6 +162,9 @@ class CbmStsFindHitsQa : public FairTask
   Bool_t fOnlineAnalysis;
   TCanvas* recoCanvas;
   TPad*    recoPad[20];
+
+  CbmStsFindHitsQa(const CbmStsFindHitsQa&);
+  CbmStsFindHitsQa operator=(const CbmStsFindHitsQa&);
 
   ClassDef(CbmStsFindHitsQa,1);
 

@@ -21,9 +21,12 @@ using std::endl;
 // -----   Standard constructor   ------------------------------------------
 CbmStsDigiPar::CbmStsDigiPar(const char* name, const char* title,
 			     const char* context)
-  : FairParSet(name, title, context) {
-  detName="STS";
+  : FairParSet(name, title, context),
+  fStations(NULL),
+  fStationMap()
+{
   fStations = new TObjArray();
+  detName="STS";
 }
 // -------------------------------------------------------------------------
 

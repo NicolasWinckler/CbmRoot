@@ -16,10 +16,23 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStsSensorDigiPar::CbmStsSensorDigiPar() {
-  fSensorNr = -1;
-  fType     =  0;
-  fX0 = fY0 = fZ0 = fRotation = fLx = fLy = fDx = fDy = fStereoF = fStereoB = 0.;
+CbmStsSensorDigiPar::CbmStsSensorDigiPar() 
+: fSensorNr(-1),
+  fType    (0),
+  fX0(0.),
+  fY0(0.),
+  fZ0(0.),
+  fRotation(0.),
+  fLx(0.),
+  fLy(0.),
+  fDx(0.),
+  fDy(0.),
+  fD(0.),
+  fStereoF(0.),
+  fStereoB(0.)
+
+{
+ 
   cout << "-W- CbmStsSensorDigiPar: Do not use this constructor! " 
        << endl;
 }
@@ -33,7 +46,21 @@ CbmStsSensorDigiPar::CbmStsSensorDigiPar(Int_t iSensor, Int_t iType,
 					 Double_t rotation, 
 					 Double_t lx, Double_t ly, 
 					 Double_t dx, Double_t dy,
-					 Double_t stereoF, Double_t stereoB) {
+					 Double_t stereoF, Double_t stereoB) 
+: fSensorNr(-1),
+  fType    (0),
+  fX0(0.),
+  fY0(0.),
+  fZ0(0.),
+  fRotation(0.),
+  fLx(0.),
+  fLy(0.),
+  fDx(0.),
+  fDy(0.),
+  fD(0.),
+  fStereoF(0.),
+  fStereoB(0.)  
+{
 
   fSensorNr = iSensor;
   fType     = iType;
@@ -77,7 +104,21 @@ CbmStsSensorDigiPar::CbmStsSensorDigiPar(Int_t iSensor, Int_t iType,
 					 Double_t rotation, 
 					 Double_t lx, Double_t ly, 
 					 Double_t d, Double_t dx, Double_t dy,
-					 Double_t stereoF, Double_t stereoB) {
+					 Double_t stereoF, Double_t stereoB) 
+: fSensorNr(-1),
+  fType    (0),
+  fX0(0.),
+  fY0(0.),
+  fZ0(0.),
+  fRotation(0.),
+  fLx(0.),
+  fLy(0.),
+  fDx(0.),
+  fDy(0.),
+  fD(0.),
+  fStereoF(0.),
+  fStereoB(0.)  
+{
 
   fSensorNr = iSensor;
   fType     = iType;

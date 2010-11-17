@@ -99,7 +99,8 @@ class CbmStsIdealMatchHits : public FairTask
   std::map<Double_t, Int_t> fCandMap;            //!
   std::map<Double_t, Int_t>::iterator fIter;     //!
 
-
+  CbmStsIdealMatchHits(const CbmStsIdealMatchHits&);
+  CbmStsIdealMatchHits operator=(const CbmStsIdealMatchHits&);
 
   ClassDef(CbmStsIdealMatchHits,1);
 

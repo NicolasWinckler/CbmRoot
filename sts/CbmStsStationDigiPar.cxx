@@ -9,9 +9,11 @@
 #include "TMath.h"
 
 // -----   Default constructor   -------------------------------------------
-CbmStsStationDigiPar::CbmStsStationDigiPar() {
-  fStationNr   = -1;
-  fRotation    =  0.;
+CbmStsStationDigiPar::CbmStsStationDigiPar() 
+:  fStationNr(-1),
+   fRotation(0.),
+   fSectors()
+{
   fSectors = new TObjArray();
 }
 // -------------------------------------------------------------------------
@@ -20,7 +22,11 @@ CbmStsStationDigiPar::CbmStsStationDigiPar() {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsStationDigiPar::CbmStsStationDigiPar(Int_t stationNr, 
-					   Double_t rotation) {
+					   Double_t rotation) 
+:  fStationNr(-1),
+   fRotation(0.),
+   fSectors()
+{
   fStationNr = stationNr;
   fRotation  = rotation * TMath::Pi() / 180.;
   fSectors   = new TObjArray();

@@ -38,13 +38,26 @@ using std::setprecision;
 
 
 // -----   Default constructor   -------------------------------------------
-CbmStsIdealMatchHits::CbmStsIdealMatchHits() : FairTask("STSMatchHits", 1) {
-  fGeoPar      = NULL;
-  fDigiPar     = NULL;
-  fPoints      = NULL;
-  fDigis       = NULL;
-  fDigiMatches = NULL;
-  fHits        = NULL;
+CbmStsIdealMatchHits::CbmStsIdealMatchHits() 
+  : FairTask("STSMatchHits", 1), 
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fPoints(NULL),
+  fDigis(NULL),
+  fDigiMatches(NULL),
+  fHits(NULL),
+  fDigiScheme(NULL),
+  fTimer(),
+  fNEvents(0),
+  fNEventsFailed(0),
+  fTime(0.),
+  fNHits(0.),
+  fNMatched(0.),
+  fNDistant(0.),
+  fNBackgrd(0.),
+  fCandMap(),
+  fIter()
+{
   fDigiScheme  = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -53,13 +66,25 @@ CbmStsIdealMatchHits::CbmStsIdealMatchHits() : FairTask("STSMatchHits", 1) {
 
 // -----   Standard constructor   ------------------------------------------
 CbmStsIdealMatchHits::CbmStsIdealMatchHits(Int_t iVerbose)
-  : FairTask("STSMatchHits", iVerbose) {
-  fGeoPar      = NULL;
-  fDigiPar     = NULL;
-  fPoints      = NULL;
-  fDigis       = NULL;
-  fDigiMatches = NULL;
-  fHits        = NULL;
+  : FairTask("STSMatchHits", iVerbose), 
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fPoints(NULL),
+  fDigis(NULL),
+  fDigiMatches(NULL),
+  fHits(NULL),
+  fDigiScheme(NULL),
+  fTimer(),
+  fNEvents(0),
+  fNEventsFailed(0),
+  fTime(0.),
+  fNHits(0.),
+  fNMatched(0.),
+  fNDistant(0.),
+  fNBackgrd(0.),
+  fCandMap(),
+  fIter()
+{
   fDigiScheme  = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------
@@ -68,13 +93,25 @@ CbmStsIdealMatchHits::CbmStsIdealMatchHits(Int_t iVerbose)
 
 // -----   Constructor with name   -----------------------------------------
 CbmStsIdealMatchHits::CbmStsIdealMatchHits(const char* name, Int_t iVerbose)
-  : FairTask(name, iVerbose) {
-  fGeoPar      = NULL;
-  fDigiPar     = NULL;
-  fPoints      = NULL;
-  fDigis       = NULL;
-  fDigiMatches = NULL;
-  fHits        = NULL;
+  : FairTask(name, iVerbose),
+  fGeoPar(NULL),
+  fDigiPar(NULL),
+  fPoints(NULL),
+  fDigis(NULL),
+  fDigiMatches(NULL),
+  fHits(NULL),
+  fDigiScheme(NULL),
+  fTimer(),
+  fNEvents(0),
+  fNEventsFailed(0),
+  fTime(0.),
+  fNHits(0.),
+  fNMatched(0.),
+  fNDistant(0.),
+  fNBackgrd(0.),
+  fCandMap(),
+  fIter()
+{
   fDigiScheme  = new CbmStsDigiScheme();
 }
 // -------------------------------------------------------------------------

@@ -148,7 +148,8 @@ void CbmStsClusterFinder::Exec(Option_t* opt) {
   fNofClustersCand = 0;
   fNofClusters = 0;
 //   fClustersCand->Clear();
-  fClusters->Clear();
+//  fClusters->Clear();
+  fClusters->Delete();
   //  cout << " after clear: " << fClusters->GetEntriesFast() << endl;
 
   // Sort STS digis with respect to sectors

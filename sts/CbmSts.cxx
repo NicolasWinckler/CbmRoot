@@ -225,7 +225,8 @@ void CbmSts::BeginEvent() {
 void CbmSts::EndOfEvent() {
 
   if (fVerboseLevel) Print();
-  fStsCollection->Clear();
+//  fStsCollection->Clear();
+  fStsCollection->Delete();
 
   ResetParameters();
 }
@@ -262,7 +263,8 @@ void CbmSts::Print() const {
 
 // -----   Public method Reset   ----------------------------------------------
 void CbmSts::Reset() {
-  fStsCollection->Clear();
+//  fStsCollection->Clear();
+  fStsCollection->Delete();
   ResetParameters();
 }
 // ----------------------------------------------------------------------------

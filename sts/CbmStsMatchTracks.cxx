@@ -100,7 +100,8 @@ void CbmStsMatchTracks::Exec(Option_t* opt) {
   Bool_t warn = kFALSE;
 
   // Clear output array
-  fMatches->Clear();
+  //  fMatches->Clear();
+  fMatches->Delete();
 
   // Create some pointers and variables
   CbmStsTrack* track = NULL;

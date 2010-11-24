@@ -364,8 +364,10 @@ InitStatus CbmStsIdealDigitize::ReInit() {
 void CbmStsIdealDigitize::Reset() {
   fNPoints = fNFailed = fNOutside = fNMulti = fNDigis = 0;
   fChannelMap.clear();
-  if ( fDigis ) fDigis->Clear();
-  if ( fDigiMatches ) fDigiMatches->Clear();
+  //  if ( fDigis ) fDigis->Clear();
+  //  if ( fDigiMatches ) fDigiMatches->Clear();
+  if ( fDigis ) fDigis->Delete();
+  if ( fDigiMatches ) fDigiMatches->Delete();
 }
 // -------------------------------------------------------------------------
 

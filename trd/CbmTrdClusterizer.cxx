@@ -24,6 +24,7 @@
 #include "TImage.h"
 #include "TClonesArray.h"
 #include "TGeoManager.h"
+#include "TStopwatch.h"
 
 #include "TPRegexp.h"
 #if ROOT_VERSION_CODE < ROOT_VERSION(5,20,0)
@@ -145,6 +146,8 @@ InitStatus CbmTrdClusterizer::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterizer::Exec(Option_t * option)
 {
+  TStopwatch timer;
+  timer.Start();
   // use lookup table or calculate realtime
   Bool_t lookup = true;
 
@@ -440,6 +443,13 @@ void CbmTrdClusterizer::Exec(Option_t * option)
     iDigi++;
   }
   //cout << nCount << endl;
+  timer.Stop();
+  Double_t rtime = timer.RealTime();
+  Double_t ctime = timer.CpuTime();
+
+  printf("\n\n******************** Reading Test  **********************\n");
+  printf("   RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
+  printf("*********************************************************\n\n");
 }
    // --------------------------------------------------------------------
 
@@ -856,8 +866,11 @@ Double_t CbmTrdClusterizer::ApproxMathieson(Double_t x, Double_t W)
 void CbmTrdClusterizer::PadPlaneSampling( Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)
 {
   Double_t deltaW = 0;
+  Double_t deltaH = 0;
   Double_t x;
+  Double_t y;
   for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) {
+    deltaH -= H[iPadRow];
     for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
       fPadCharge[iPadRow][iPadCol] = 0;
     }
@@ -867,11 +880,19 @@ void CbmTrdClusterizer::PadPlaneSampling( Double_t x_mean, Double_t y_mean, Doub
   }
 
   Double_t deltaWtemp = deltaW;
+  //Double_t deltaHtemp = deltaH;
 
   for (Int_t iPadRow = 0; iPadRow < fPadNrY; iPadRow++) { 
     deltaW = deltaWtemp;
     //cout << endl;
     for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
+
+      if (iPadCol == int(fPadNrX/2)) {
+	y = y_mean + deltaH;
+	if (fabs(y) < 35) {
+	  //fPadCharge[iPadRow][iPadCol] += ApproxMathieson(y, H[iPadCol]);
+	}
+      }
 
       if (iPadRow == int(fPadNrY/2)) {
 	x = x_mean + deltaW;
@@ -887,17 +908,20 @@ void CbmTrdClusterizer::PadPlaneSampling( Double_t x_mean, Double_t y_mean, Doub
       */
       deltaW += W[iPadCol];
     }
+    deltaH += H[iPadRow];
   }
   //printf("\n");
   for (Int_t iPRow = 0; iPRow < fPadNrY; iPRow++) {
     //printf("\n");
     for (Int_t iPCol = 0; iPCol < fPadNrX; iPCol++) {
       fPadCharge[iPRow][iPCol] *= SliceELoss * 1e6;
-      if (fPadCharge[iPRow][iPCol] > 0) {
-	//printf (" %.2E",fPadCharge[iPRow][iPCol]);
-      }
+      //if (fPadCharge[iPRow][iPCol] > 0) {
+      //printf (" %.2E",fPadCharge[iPRow][iPCol]);
+      //}
     }
+    //cout << endl;
   }
+  //cout << endl << endl;
 }
 // --------------------------------------------------------------------
 void CbmTrdClusterizer::SlowIntegration(Bool_t lookup, Bool_t gaus, Double_t x_mean, Double_t y_mean, Double_t SliceELoss, Double_t* W, Double_t* H)

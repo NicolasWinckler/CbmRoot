@@ -16,6 +16,7 @@
 #include "TProfile.h"
 #include "TCanvas.h"
 #include "TImage.h"
+#include "TStopwatch.h"
 
 //#include <map>
 #include <iostream>
@@ -106,6 +107,8 @@ InitStatus CbmTrdClusterFinderFast::Init()
 // ---- Exec ----------------------------------------------------------
 void CbmTrdClusterFinderFast::Exec(Option_t *option)
 {
+ TStopwatch timer;
+  timer.Start();
   cout << "================CbmTrdClusterFinderFast===============" << endl;
   Int_t counterI = 0;
   Int_t counterJ = 0;
@@ -322,6 +325,14 @@ void CbmTrdClusterFinderFast::Exec(Option_t *option)
     }
   //cout << "  " << counterI << " (" << counterI*100.0/Float_t(counterJ) << "%)" <<  " are reconstructed with rowClusterMerger" << endl;
   printf("   %4d modules (%6.3f%%) are reconstructed with rowClusterMerger\n",counterI,counterI*100/Float_t(counterJ));
+  timer.Stop();
+  Double_t rtime = timer.RealTime();
+  Double_t ctime = timer.CpuTime();
+
+  printf("\n\n******************** Reading Test  **********************\n");
+  printf("   RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
+  printf("*********************************************************\n\n");
+
 }
 
   //----------------------------------------------------------------------

@@ -22,6 +22,7 @@
 #include "TCanvas.h"
 #include "TImage.h"
 #include "TLegend.h"
+#include "TStopwatch.h"
 
 //#include <map>
 #include <iostream>
@@ -140,6 +141,8 @@ bool digiCidSorter(MyDigi *a, MyDigi *b)
 // ---- Exec ----------------------------------------------------------
 void CbmTrdHitProducerCluster::Exec(Option_t * option)
 {
+  TStopwatch timer;
+  timer.Start();
   Bool_t drawing = true;
   Bool_t pr = true;
   Bool_t combinatoric = true;
@@ -434,6 +437,13 @@ void CbmTrdHitProducerCluster::Exec(Option_t * option)
     PRF->Draw("colz");
     Mathieson->Draw("same");
   }
+  timer.Stop();
+  Double_t rtime = timer.RealTime();
+  Double_t ctime = timer.CpuTime();
+
+  printf("\n\n******************** Reading Test  **********************\n");
+  printf("   RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
+  printf("*********************************************************\n\n");
 }
 
 

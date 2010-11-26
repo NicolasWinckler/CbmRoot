@@ -925,6 +925,13 @@ void CbmMvdDigitizeL::ProducePixelCharge(CbmMvdPoint* point, CbmMvdStation* stat
 
     };
 
+    delete [] lowerXArray;
+    delete [] upperXArray;
+    delete [] lowerYArray;
+    delete [] upperYArray;
+    delete [] centreXArray;
+    delete [] centreYArray;
+
 
 }//end of function
 

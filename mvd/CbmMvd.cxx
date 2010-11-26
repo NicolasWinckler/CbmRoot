@@ -65,7 +65,10 @@ CbmMvd::CbmMvd(const char* name, Bool_t active)
 
 // -----   Destructor   ----------------------------------------------------
 CbmMvd::~CbmMvd() {
-  if ( fGeoPar ) delete flGeoPar;
+  if ( fGeoPar ) {
+    fGeoPar->Delete();
+    delete fGeoPar;
+  }
   if (fCollection) {
     fCollection->Delete();
     delete fCollection;
@@ -130,7 +133,8 @@ void CbmMvd::BeginEvent() { }
 // -----   Virtual public method EndOfEvent   ------------------------------
 void CbmMvd::EndOfEvent() {
   if (fVerboseLevel) Print();
-  fCollection->Clear();
+  //  fCollection->Clear();
+  fCollection->Delete();
   ResetParameters();
 }
 // -------------------------------------------------------------------------
@@ -167,7 +171,8 @@ void CbmMvd::Print() const {
 
 // -----   Virtual public method Reset   -----------------------------------
 void CbmMvd::Reset() {
-  fCollection->Clear();
+  //  fCollection->Clear();
+  fCollection->Delete();
   ResetParameters();
 }
 // -------------------------------------------------------------------------
@@ -218,9 +223,10 @@ void CbmMvd::ConstructGeometry() {
   FairGeoVolume* vol  = NULL;
 
   while( (node = (FairGeoNode*)iter.Next()) ) {
-      vol = dynamic_cast<FairGeoVolume*> ( node );
-       if ( node->isSensitive()  ) {
-           fSensNodes->AddLast( vol );
+    vol = dynamic_cast<FairGeoVolume*> ( node );
+    if ( node->isSensitive()  ) {
+      	cout<<"Add: "<<vol->GetName()<<endl;
+      fSensNodes->AddLast( vol );
        }else{
            fPassNodes->AddLast( vol );
        }

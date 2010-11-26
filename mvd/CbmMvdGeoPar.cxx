@@ -7,11 +7,14 @@
 #include "CbmMvdGeoPar.h"
 
 #include "FairParamList.h"
+#include "FairGeoNode.h"
 
 #include "TObjArray.h"
 
 #include <iostream>
 #include <iomanip>
+using std::cout;
+using std::endl;
 
 // -----   Constructor   ---------------------------------------------------
 CbmMvdGeoPar::CbmMvdGeoPar(const char* name, const char* title,
@@ -25,15 +28,22 @@ CbmMvdGeoPar::CbmMvdGeoPar(const char* name, const char* title,
 
 
 // -----   Destructor   ----------------------------------------------------
-CbmMvdGeoPar::~CbmMvdGeoPar(void) {
+CbmMvdGeoPar::~CbmMvdGeoPar(void) 
+{
+  /* commented due to problems during destruction
+  // somehow it is not possible to delete the last volume
+  // even if one get a correct pointer 
   if ( fGeoSensNodes ) {
     fGeoSensNodes->Delete();
     delete fGeoSensNodes;
   }
+
   if ( fGeoPassNodes ) {
     fGeoPassNodes->Delete();
     delete fGeoPassNodes;
   }
+  
+  */
 }
 // -------------------------------------------------------------------------
 

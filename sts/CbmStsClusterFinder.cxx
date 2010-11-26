@@ -150,6 +150,7 @@ void CbmStsClusterFinder::Exec(Option_t* opt) {
 //   fClustersCand->Clear();
 //  fClusters->Clear();
   fClusters->Delete();
+  fClustersCand->Delete();
   //  cout << " after clear: " << fClusters->GetEntriesFast() << endl;
 
   // Sort STS digis with respect to sectors
@@ -573,6 +574,7 @@ Int_t CbmStsClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int_t i
 	fLongestGoodCluster = clusterWidth;
     }
   }
+  //  delete clusterCand;
   
   return 1;
 
@@ -611,6 +613,7 @@ Int_t CbmStsClusterFinder::FindClusters(Int_t stationNr, Int_t sectorNr, Int_t i
 
     }*/
   //  cout << endl << "=============================================" << endl;
+
 }
 // -------------------------------------------------------------------------
 

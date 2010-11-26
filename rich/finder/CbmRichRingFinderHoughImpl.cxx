@@ -449,7 +449,10 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 		ring1->AddHit(fData[j].fHit, fData[j].fId);
 	}
 
-	if (ring1->GetNofHits() < 7) return;
+	if (ring1->GetNofHits() < 7) {
+	  delete ring1;
+	  return;
+	}
 
 	fFitCOP->DoFit(ring1);
 	Float_t drCOPCut = fRmsCoeffCOP*sqrt(ring1->GetChi2()/ring1->GetNofHits());
@@ -472,7 +475,10 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 		ring2->AddHit(fData[j].fHit, fData[j].fId);
 	}
 
-	if (ring2->GetNofHits() < 7) return;
+	if (ring2->GetNofHits() < 7) {
+	  delete ring2;
+	  return;
+	}
 
 	fFitCOP->DoFit(ring2);
 
@@ -492,6 +498,7 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 		fFoundRings.push_back(ring2);
 	}
 	//fFoundRings.push_back(ring2);
+	delete ring2;
 }
 
 void CbmRichRingFinderHoughImpl::RemoveHitsAroundRing(Int_t indmin, Int_t indmax,

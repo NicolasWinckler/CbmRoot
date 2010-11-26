@@ -254,6 +254,8 @@ InitStatus CbmMvdFindHits::Init() {
     for(Int_t i=0;i<fGausArrayLimit;i++){fGausArray[i]=gRandom->Gaus(0, fSigmaNoise);};
     fGausArrayIt=0;
 
+    delete histoName;
+    delete histoTotalChargeName;
 
 }
 // -------------------------------------------------------------------------

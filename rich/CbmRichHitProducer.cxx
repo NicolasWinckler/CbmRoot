@@ -177,6 +177,7 @@ InitStatus CbmRichHitProducer::Init()
     }
    */
   nrefrac = cerpar[3];
+  delete cerpar;
   if (fVerbose) cout << " refractive index for lowest photon energies (n-1)*10000  " << (nrefrac-1.0)*10000.0 << endl;
 
   // transform nominal detector position (for tilted photodetector), x>0, y>0:

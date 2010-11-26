@@ -498,6 +498,7 @@ void CbmRichRingFinderHoughImpl::FindPeak(Int_t indmin, Int_t indmax)
 		fFoundRings.push_back(ring2);
 	}
 	//fFoundRings.push_back(ring2);
+        ring2=NULL;
 	delete ring2;
 }
 

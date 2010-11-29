@@ -12,6 +12,7 @@
 #include "CbmVertex.h"
 #include "CbmStsKFTrackFitter.h"
 #include "CbmStsTrack.h"
+#include "CbmTrdTrack.h"
 #include "CbmMCTrack.h"
 #include "CbmGlobalTrack.h"
 #include "CbmRichElectronIdAnn.h"
@@ -31,8 +32,6 @@ class FairRootManager;
 
 class DielectronCandidate{
 public:
-	CbmGlobalTrack *fGlobalTrack;
-	CbmMCTrack *fMCTrack;
 	TVector3 position, momentum;
 	Double_t mass, charge, energy, rapidity;
 	Double_t chiPrimary;
@@ -73,6 +72,11 @@ public:
     void MCPairsBg();
     void PairAcceptance();
     void FillCandidateArray();
+    void DifferenceSignalAndBg();
+    void RecoQa();
+    void PairsReco();
+    void SetDefaultIdParameters();
+    void BgReco();
 
 
 
@@ -112,7 +116,9 @@ private:
     Bool_t fUseRich;
     Bool_t fUseTrd;
     Bool_t fUseTof;
-
+    Bool_t IsRichElectron(CbmRichRing* ring, Double_t momentum);
+    Bool_t IsTrdElectron(CbmTrdTrack* trdTrack);
+    Bool_t IsTofElectron(CbmGlobalTrack* gTrack, Double_t momentum);
     vector<DielectronCandidate> fCandidates;
 
     Double_t fWeight; //Multiplicity*BR
@@ -124,11 +130,38 @@ private:
 
     Int_t fNofAccEp; //number of accepted e+
     Int_t fNofAccEm; //number of accepted e-
+    Int_t fNofAccEpBg; //number of accepted e+ from BG 
+    Int_t fNofAccEmBg; //number of accepted e- from BG 
     Int_t fNofAccPairs; //number of accepted pairs of e-/e+
+
+    Int_t fNofRecPairs;
+    Int_t fNofRichIdPairs; //number of rich id signal pairs
+    Int_t fNofTrdIdPairs; //number of trd id signal pairs
+    Int_t fNofTofIdPairs; //number of tof id signal pairs
+
+    Int_t fNofRecBg;
+    Int_t fNofRichIdBg;
+    Int_t fNofTrdIdBg;
+    Int_t fNofTofIdBg;
+
+    Double_t fTrdAnnCut;
+    Double_t fRichAnnCut;
+    Double_t fMeanA;
+    Double_t fMeanB;
+    Double_t fRmsA;
+    Double_t fRmsB;
+    Double_t fRmsCoeff;
+    Double_t fDistCut;
+    
+    CbmRichElectronIdAnn * fElIdAnn;
+    Bool_t fUseRichAnn;
+    
+    Int_t fNofGlobalTracks; // number of global tracks
     
     TH2D* fh_mc_signal_pty; // pt/y distribution for signal mc
     TH2D* fh_acc_signal_pty; // pt/y distribution for accepted signal
     TH2D* fh_acc_signal_pty_eff; //efficiency of accepted signal 
+
     TH1D* fh_mc_signal_mom; //momentum distribution for signal mc
     TH1D* fh_mc_bg_mom;
     TH1D* fh_acc_signal_mom; //momentum distribution of accepted signal
@@ -137,7 +170,29 @@ private:
     TH1D* fh_mc_bg_minv;
     TH1D* fh_acc_signal_minv; //invariant mass distribution for accepted signal
     TH1D* fh_mc_mother_pdg; //mother pdg code for e-/e+
-    TH1D* fh_mc_mother_pdg_bg;
+    TH1D* fh_acc_mother_pdg; //mother pdg code for accepted e-/e+
+    TH1D* fh_rec_mc_mom_signal;
+    TH1D* fh_rec_signal_minv; //invariant mass distribution of reconstructed signal (ideal ID)
+
+    TH1D* fh_chi2_prim_signal; // Chi2 primary
+    TH1D* fh_chi2_prim_bg;
+    
+    TH2D* fh_mc_vertex_gamma_xz;
+    TH2D* fh_mc_vertex_gamma_yz;
+    TH2D* fh_mc_vertex_gamma_xy;
+
+    TH1D* fh_rich_id_signal_minv;
+    TH1D* fh_trd_id_signal_minv;
+    TH1D* fh_tof_id_signal_minv;
+
+    TH1D* fh_rich_id_bg_minv;
+    TH1D* fh_trd_id_bg_minv;
+    TH1D* fh_tof_id_bg_minv;
+    TH1D* fh_rec_bg_minv;
+
+    TH1D* fh_pt_signal;
+    TH1D* fh_pt_bg;
+     
     
 public:
     void SetUseRich(Bool_t use){fUseRich = use;};

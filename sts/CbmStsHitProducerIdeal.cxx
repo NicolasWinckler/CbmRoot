@@ -66,7 +66,8 @@ void CbmStsHitProducerIdeal::Exec(Option_t* opt) {
   // Reset output array
   if ( ! fHitArray ) Fatal("Exec", "No StsHit array");
 
-  fHitArray->Clear();
+  //  fHitArray->Clear();
+  fHitArray->Delete();
 
   // Declare some variables
   CbmStsPoint* point = NULL;

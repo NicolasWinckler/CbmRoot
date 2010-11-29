@@ -566,8 +566,10 @@ void CbmStsRealDigitize::Reset() {
   fNDigis = fNMulti = 0;
   fFChannelPointsMap.clear();
   fBChannelPointsMap.clear();
-  if ( fDigis ) fDigis->Clear();
-  if ( fDigiMatches ) fDigiMatches->Clear();
+  //  if ( fDigis ) fDigis->Clear();
+  //  if ( fDigiMatches ) fDigiMatches->Clear();
+  if ( fDigis ) fDigis->Delete();
+  if ( fDigiMatches ) fDigiMatches->Delete();
 }
 // -------------------------------------------------------------------------
 

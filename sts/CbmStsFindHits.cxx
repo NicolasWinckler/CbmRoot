@@ -111,7 +111,8 @@ void CbmStsFindHits::Exec(Option_t* opt) {
   }
 
   // Clear output array
-  fHits->Clear();
+  //  fHits->Clear();
+  fHits->Delete();
 
   // Sort STS digis with respect to sectors
   SortClusters();

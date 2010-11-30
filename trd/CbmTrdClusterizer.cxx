@@ -181,24 +181,29 @@ void CbmTrdClusterizer::Exec(Option_t * option)
   Int_t nEntries = fTrdPoints->GetEntries();
   //nEntries = 1;
   cout << " Found " << nEntries << " MC-Points in Collection of TRD" << endl;
-  if (fast) {
-  cout << " Fast integration: on" << endl;
+  if (approx) {
+    cout << " Mathieson approximation: on" << endl;
   }
   else {
-    cout << " Fast integration: off" << endl;
-  }
-  cout << " Mathieson lookup-table:";
-  if (lookup) {
-    cout << " on" << endl;
-  }
-  else {
-    cout << " off" << endl;
-    cout << " Real time calculation:";
-    if (gaus) {
-      cout << " Gauss" << endl;
+    if (fast) {
+      cout << " Fast integration: on" << endl;
     }
     else {
-      cout << " Mathieson " << endl;
+      cout << " Fast integration: off" << endl;
+    }
+    cout << " Mathieson lookup-table:";
+    if (lookup) {
+      cout << " on" << endl;
+    }
+    else {
+      cout << " off" << endl;
+      cout << " Real time calculation:";
+      if (gaus) {
+	cout << " Gauss" << endl;
+      }
+      else {
+	cout << " Mathieson " << endl;
+      }
     }
   }
   //nEntries = nEntries * 1 / 100;
@@ -888,18 +893,20 @@ void CbmTrdClusterizer::PadPlaneSampling( Double_t x_mean, Double_t y_mean, Doub
     for (Int_t iPadCol = 0; iPadCol < fPadNrX; iPadCol++) {
 
       if (iPadCol == int(fPadNrX/2)) {
-	y = y_mean + deltaH;
-	if (fabs(y) < 35) {
-	  //fPadCharge[iPadRow][iPadCol] += ApproxMathieson(y, H[iPadCol]);
-	}
+	y = -1 * y_mean + deltaH;
+	if (iPadRow == int(fPadNrY/2)) y = y_mean + deltaH;
+	//if (fabs(y) < 35) {
+	  fPadCharge[iPadRow][iPadCol] += ApproxMathieson(y, H[iPadCol]);
+	  //}
       }
 
       if (iPadRow == int(fPadNrY/2)) {
-	x = x_mean + deltaW;
-	if (fabs(x) < 35) {
+	x = -1 * x_mean + deltaW;
+	if (iPadCol == int(fPadNrX/2)) x = x_mean + deltaW;
+	//if (fabs(x) < 35) {
 	  fPadCharge[iPadRow][iPadCol] += ApproxMathieson(x, W[iPadCol]);
 	  //printf(" %.3f",x);
-	}
+	  //}
       }
       /*
 	else {

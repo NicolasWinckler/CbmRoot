@@ -85,6 +85,9 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
     fNofRichIdBg = 0;
     fNofTrdIdBg = 0;
     fNofTofIdBg = 0;
+    fNofPtcutPairs = 0;
+    fNofPtcutBg = 0;
+
 
     fh_mc_signal_pty = new TH2D("fh_mc_signal_pty","fh_mc_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
     fh_acc_signal_pty = new TH2D("fh_acc_signal_pty","fh_acc_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
@@ -125,7 +128,27 @@ CbmAnaDielectronTask::CbmAnaDielectronTask(const char *name, const char *title)
 
     fh_pt_signal = new TH1D("fh_pt_signal","fh_pt_signal;p_{t} [GeV/c];yeild",200, 0., 2.);
     fh_pt_bg = new TH1D("fh_pt_bg","fh_pt_bg;p_{t} [GeV/c];yeild",200, 0., 2.);
+
+    fh_position_signal = new TH1D("fh_position_signal","fh_position_signal", 100, 0., 0.02);
+    fh_position_bg = new TH1D("fh_position_bg","fh_position_bg",100, 0., 0.02);
     
+    fh_reco_signal_pty = new TH2D("fh_reco_signal_pty","fh_reco_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fh_rich_id_signal_pty = new TH2D("fh_rich_id_signal_pty","fh_rich_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fh_trd_id_signal_pty = new TH2D("fh_trd_id_signal_pty","fh_trd_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fh_tof_id_signal_pty = new TH2D("fh_tof_id_signal_pty","fh_tof_id_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+
+    fh_angle_signal = new TH1D("fh_angle_signal","fh_angle_signal;opening angle [deg];yeild", 360, 0., 180.);
+    fh_angle_bg = new TH1D("fh_angle_bg","fh_angle_bg;opening angle [deg];yeild", 360, 0., 180.); 
+
+    fh_ptcut_signal_minv = new TH1D("fh_ptcut_signal_minv","fh_ptcut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+    fh_ptcut_signal_pty = new TH2D("fh_ptcut_signal_pty","fh_ptcut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+    fh_anglecut_signal_minv = new TH1D("fh_anglecut_signal_minv","fh_anglecut_signal_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+    fh_anglecut_signal_pty = new TH2D("fh_anglecut_signal_pty","fh_anglecut_signal_pty;Rapidity;p_{t} [GeV/c]", 40, 0., 4., 20, 0., 2.);
+
+    fh_ptcut_bg_minv = new TH1D("fh_ptcut_bg_minv","fh_ptcut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+    fh_anglecut_bg_minv = new TH1D("fh_anglecut_bg_minv","fh_anglecut_bg_minv;M_{ee} [GeV/c^{2}];yeild",200, 0., 2.);
+    
+
     SetDefaultIdParameters();
 }
 
@@ -145,6 +168,8 @@ void CbmAnaDielectronTask::SetDefaultIdParameters()
     fRmsB = -1.;
     fRmsCoeff = -1.;
     fDistCut = -1.;
+    fPtCut = 0.2;
+    fAngleCut = 6.;
 }
 
 
@@ -302,11 +327,13 @@ void CbmAnaDielectronTask::Exec(Option_t *option)
     cout << "fNofRichIdPairs = " << fNofRichIdPairs << ", per event " << fNofRichIdPairs / (Double_t)fEvents << endl;
     cout << "fNofTrdIdPairs = " << fNofTrdIdPairs << ", per event " << fNofTrdIdPairs / (Double_t)fEvents << endl;
     cout << "fNofTofIdPairs = " << fNofTofIdPairs << ", per event " << fNofTofIdPairs / (Double_t)fEvents << endl;
+    cout << "fNofPtcutPairs = " << fNofPtcutPairs << ", per event " << fNofPtcutPairs /(Double_t)fEvents << endl;
 
     cout << "fNofRecBg = " << fNofRecBg << ", per event " << fNofRecBg /(Double_t)fEvents << endl;
     cout << "fNofRichIdBg = " << fNofRichIdBg << ", per event " << fNofRichIdBg /(Double_t)fEvents << endl;
     cout << "fNofTrdIdBg = " << fNofTrdIdBg << ", per event " << fNofTrdIdBg /(Double_t)fEvents << endl;
-     cout << "fNofTofIdBg = " << fNofTofIdBg << ", per event " << fNofTofIdBg /(Double_t)fEvents << endl;
+    cout << "fNofTofIdBg = " << fNofTofIdBg << ", per event " << fNofTofIdBg /(Double_t)fEvents << endl;
+    cout << "fNofPtcutBg = " << fNofPtcutBg << ", per event " << fNofPtcutBg /(Double_t)fEvents << endl;
 
 }// Exec
 
@@ -350,34 +377,19 @@ void CbmAnaDielectronTask::MCPairs()
         Int_t pdg = mctrackP->GetPdgCode();
         if ( !(motherId == -1 && pdg == -11)) continue;
 
-        TVector3 momP;  //momentum e+
-        mctrackP->GetMomentum(momP);
-        Double_t energyP = TMath::Sqrt(momP.Mag2() + M2E);
-        TLorentzVector lorVecP(momP, energyP); 
-
         for (Int_t iM = 0; iM < nMcTracks; iM++) {
+            if (iP == iM) continue;
             CbmMCTrack* mctrackM = (CbmMCTrack*) fMCTracks->At(iM);
             motherId = mctrackM->GetMotherId();
             pdg = mctrackM->GetPdgCode();
             if ( !(motherId == -1 && pdg == 11)) continue;
+            
+             KinematicParams p = CalculateKinematicParams(mctrackP,mctrackM);        
 
-            TVector3 momM;  //momentum e-
-            mctrackM->GetMomentum(momM);
-            Double_t energyM = TMath::Sqrt(momM.Mag2() + M2E);
-            TLorentzVector lorVecM(momM, energyM); 
-
-            //Calculate kinematic parameters of the pair
-            TVector3 momPair = momP + momM;
-            Double_t energyPair = energyP + energyM;
-            Double_t ptPair = momPair.Perp();
-            Double_t pzPair = momPair.Pz();
-            Double_t yPair = 0.5*TMath::Log((energyPair+pzPair)/(energyPair-pzPair));
-            Double_t anglePair = lorVecM.Angle(lorVecP.Vect());
-            Double_t minv = 2*TMath::Sin(anglePair / 2)*TMath::Sqrt(momM.Mag()*momP.Mag());
             //Fill histogramms
-            fh_mc_signal_pty->Fill(yPair,ptPair,fWeight);
-            fh_mc_signal_mom->Fill(momPair.Mag(),fWeight);
-            fh_mc_signal_minv->Fill(minv, fWeight);
+            fh_mc_signal_pty->Fill(p.rapidity,p.pt,fWeight);
+            fh_mc_signal_mom->Fill(p.momentumMag,fWeight);
+            fh_mc_signal_minv->Fill(p.minv, fWeight);
         } //iM
     } //iP
 
@@ -401,34 +413,18 @@ void CbmAnaDielectronTask::MCPairsBg()
         CbmMCTrack* mctrackP = (CbmMCTrack*) fMCTracks->At(iP);
         Int_t pdg = mctrackP->GetPdgCode();
         if ( !(pdg == -11)) continue;
-
-        TVector3 momP;  //momentum e+
-        mctrackP->GetMomentum(momP);
-        Double_t energyP = TMath::Sqrt(momP.Mag2() + M2E);
-        TLorentzVector lorVecP(momP, energyP); 
-
+     
         for (Int_t iM = 0; iM < nMcTracks; iM++) {
+            if (iP == iM) continue;
             CbmMCTrack* mctrackM = (CbmMCTrack*) fMCTracks->At(iM);
             pdg = mctrackM->GetPdgCode();
             if ( !(pdg == 11)) continue;
 
-            TVector3 momM;  //momentum e-
-            mctrackM->GetMomentum(momM);
-            Double_t energyM = TMath::Sqrt(momM.Mag2() + M2E);
-            TLorentzVector lorVecM(momM, energyM); 
+            KinematicParams p = CalculateKinematicParams(mctrackP,mctrackM);        
 
-            //Calculate kinematic parameters of the pair
-            TVector3 momPair = momP + momM;
-            Double_t energyPair = energyP + energyM;
-            Double_t ptPair = momPair.Perp();
-            Double_t pzPair = momPair.Pz();
-            Double_t yPair = 0.5*TMath::Log((energyPair+pzPair)/(energyPair-pzPair));
-            Double_t anglePair = lorVecM.Angle(lorVecP.Vect());
-            Double_t minv = 2*TMath::Sin(anglePair / 2)*TMath::Sqrt(momM.Mag()*momP.Mag());
-            //Fill histogramms
-          //  fh_mc_signal_pty->Fill(yPair,ptPair,fWeight);
-            fh_mc_bg_mom->Fill(momPair.Mag());
-            fh_mc_bg_minv->Fill(minv);
+             //Fill histogramms
+            fh_mc_bg_mom->Fill(p.momentumMag);
+            fh_mc_bg_minv->Fill(p.minv);
         } //iM
     } //iP
 
@@ -475,27 +471,18 @@ void CbmAnaDielectronTask::PairAcceptance()
         Int_t motherId = mctrackP->GetMotherId();
         Int_t pdg = mctrackP->GetPdgCode();
         if ( !(motherId == -1 && pdg == -11 )) continue;
-
-        TVector3 momP;
-        mctrackP->GetMomentum(momP);
-        Double_t energyP = TMath::Sqrt(momP.Mag2() + M2E);
-        TLorentzVector lorVecP(momP, energyP); 
-
+       
         Int_t nMvdPoints = mctrackP->GetNPoints(kMVD);
         Int_t nStsPoints = mctrackP->GetNPoints(kSTS);
         Int_t nRichPoints = mctrackP->GetNPoints(kRICH);
         Bool_t isAccP = (nMvdPoints+nStsPoints >= 4);// && (nRichPoints > 0) ;
         if (isAccP){
             for (Int_t iM = 0; iM < nMcTracks; iM++) {
+                if (iP == iM) continue;
                 CbmMCTrack* mctrackM = (CbmMCTrack*) fMCTracks->At(iM);
                 motherId = mctrackM->GetMotherId();
                 pdg = mctrackM->GetPdgCode();
                 if ( !(motherId == -1 && pdg == 11 )) continue;
-
-                TVector3 momM;
-                mctrackM->GetMomentum(momM);
-                Double_t energyM = TMath::Sqrt(momM.Mag2() +M2E);
-                TLorentzVector lorVecM(momM, energyM); 
 
                 nMvdPoints = mctrackM->GetNPoints(kMVD);
                 nStsPoints = mctrackM->GetNPoints(kSTS);
@@ -503,20 +490,13 @@ void CbmAnaDielectronTask::PairAcceptance()
                 Bool_t isAccM = (nMvdPoints+nStsPoints >= 4);// && (nRichPoints > 0) ;
                 if (isAccP && isAccM) fNofAccPairs++;
 
-                //Calculate kinematic parameters of the pair
-                TVector3 momPair = momP + momM;
-                Double_t energyPair = energyP + energyM;
-                Double_t ptPair = momPair.Perp();
-                Double_t pzPair = momPair.Pz();
-                Double_t yPair = 0.5*TMath::Log((energyPair+pzPair)/(energyPair-pzPair));
-                Double_t anglePair = lorVecM.Angle(lorVecP.Vect());
-                Double_t minv = 2*TMath::Sin(anglePair / 2)*TMath::Sqrt(momM.Mag()*momP.Mag());
+                 KinematicParams p = CalculateKinematicParams(mctrackP,mctrackM);        
                 
                 //Fill histogramms
                 if (isAccP && isAccM) {
-                    fh_acc_signal_pty->Fill(yPair, ptPair,fWeight);
-                    fh_acc_signal_mom->Fill(momPair.Mag(),fWeight);
-                    fh_acc_signal_minv->Fill(minv,fWeight);
+                    fh_acc_signal_pty->Fill(p.rapidity, p.pt,fWeight);
+                    fh_acc_signal_mom->Fill(p.momentumMag,fWeight);
+                    fh_acc_signal_minv->Fill(p.minv,fWeight);
                 }
             }//iM
         }
@@ -637,48 +617,56 @@ void CbmAnaDielectronTask::PairsReco()
 {
     Int_t ncand = fCandidates.size();
     for (Int_t iP = 0; iP < ncand; iP++){
-        if (fCandidates[iP].isMCSignalElectron == true){
-            TLorentzVector lorVecP(fCandidates[iP].momentum, fCandidates[iP].energy); 
+        CbmMCTrack* mctrackP = (CbmMCTrack*) fMCTracks->At(fCandidates[iP].stsMCTrackId);
+        if (fCandidates[iP].isMCSignalElectron && fCandidates[iP].charge > 0){
             for (Int_t iM = 0; iM < ncand; iM++){
-                if ((fCandidates[iM].isMCSignalElectron == true) && iM != iP){
-                    TLorentzVector lorVecM(fCandidates[iM].momentum, fCandidates[iM].energy);    
-           
-                    //Calculate kinematic parameters of the pair
-                    TVector3 momPair = fCandidates[iP].momentum +fCandidates[iM].momentum ;
-                    Double_t energyPair = fCandidates[iP].energy + fCandidates[iM].energy;
-                    Double_t ptPair = momPair.Perp();
-                    Double_t pzPair = momPair.Pz();
-                    Double_t yPair = 0.5*TMath::Log((energyPair+pzPair)/(energyPair-pzPair));
-                    Double_t anglePair = lorVecM.Angle(lorVecP.Vect());
-                    Double_t minv = 2*TMath::Sin(anglePair / 2)*TMath::Sqrt(fCandidates[iM].momentum.Mag() * fCandidates[iP].momentum.Mag());
+                CbmMCTrack* mctrackM = (CbmMCTrack*) fMCTracks->At(fCandidates[iM].stsMCTrackId);
+                if (fCandidates[iM].isMCSignalElectron && iM != iP && fCandidates[iM].charge < 0){
+                    
+                    KinematicParams pMC = CalculateKinematicParams(mctrackP,mctrackM); 
+                    fh_reco_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
 
-                    //fill histograms 
-               //     fh_rec_signal_pty->Fill(yPair,ptPair,fWeight);
-               //     fh_rec_signal_mom->Fill(momPair.Mag(),fWeight);
-                    fh_rec_signal_minv->Fill(minv, fWeight);
+                    KinematicParams pRec = CalculateKinematicParams(&fCandidates[iP],&fCandidates[iM]); 
+                    fh_rec_signal_minv->Fill(pRec.minv, fWeight);
                     fNofRecPairs++;
 
                     if (fCandidates[iP].isRichElectron && fCandidates[iM].isRichElectron) {
                         fNofRichIdPairs++;
-                        fh_rich_id_signal_minv->Fill(minv, fWeight);
+                        fh_rich_id_signal_minv->Fill(pRec.minv, fWeight);
+                        fh_rich_id_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
                     }
                     if ((fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron) && 
                         (fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron)) {
                         fNofTrdIdPairs++;
-                        fh_trd_id_signal_minv->Fill(minv, fWeight);
+                        fh_trd_id_signal_minv->Fill(pRec.minv, fWeight);
+                        fh_trd_id_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
                     }
 
                     if ((fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron) &&
                         (fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron && fCandidates[iM].isTofElectron)) {
                         fNofTofIdPairs++;
-                        fh_tof_id_signal_minv->Fill(minv, fWeight);
+                        fh_tof_id_signal_minv->Fill(pRec.minv, fWeight);
+                        fh_tof_id_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
+                        fh_angle_signal->Fill(pRec.angle);
                     }
-                }
+                    if ((fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron) &&
+                        (fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron && fCandidates[iM].isTofElectron)) {
+                        if (fCandidates[iP].momentum.Perp()>fPtCut && fCandidates[iM].momentum.Perp() > fPtCut){
+                            fNofPtcutPairs++;
+                            fh_ptcut_signal_minv->Fill(pRec.minv, fWeight);
+                            fh_ptcut_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
+                            if (pRec.angle >fAngleCut) {
+                                fh_anglecut_signal_minv->Fill(pRec.minv, fWeight);
+                                fh_anglecut_signal_pty->Fill(pMC.rapidity, pMC.pt, fWeight);
+                            } //opening angle cut
+
+                        }//Pt cut
+                    }
+                    
+                } // if
             }//iM
         }
-
     } //iP
-
 }
 
 void CbmAnaDielectronTask::BgReco()
@@ -689,54 +677,49 @@ void CbmAnaDielectronTask::BgReco()
             fNofRecBg++;
             if (fCandidates[i].isRichElectron) fNofRichIdBg++;
             if (fCandidates[i].isRichElectron && fCandidates[i].isTrdElectron) fNofTrdIdBg++;
-            if (fCandidates[i].isRichElectron && fCandidates[i].isTrdElectron && fCandidates[i].isTofElectron) fNofTofIdBg++;
-                                                            
+            if (fCandidates[i].isRichElectron && fCandidates[i].isTrdElectron && fCandidates[i].isTofElectron) fNofTofIdBg++;                                              
         }
-
     }
-
 
     for (Int_t iP = 0; iP < ncand; iP++){
         if (fCandidates[iP].charge < 0) continue; 
-        TLorentzVector lorVecP(fCandidates[iP].momentum, fCandidates[iP].energy); 
         for (Int_t iM = 0; iM < ncand; iM++){
             if (fCandidates[iM].charge > 0) continue; 
             if (iM == iP ) continue;
-            TLorentzVector lorVecM(fCandidates[iM].momentum, fCandidates[iM].energy); 
 
+            KinematicParams pRec = CalculateKinematicParams(&fCandidates[iP],&fCandidates[iM]); 
 
-                    //Calculate kinematic parameters of the pair
-            TVector3 momPair = fCandidates[iP].momentum +fCandidates[iM].momentum ;
-            Double_t energyPair = fCandidates[iP].energy + fCandidates[iM].energy;
-            Double_t ptPair = momPair.Perp();
-            Double_t pzPair = momPair.Pz();
-            Double_t yPair = 0.5*TMath::Log((energyPair+pzPair)/(energyPair-pzPair));
-            Double_t anglePair = lorVecM.Angle(lorVecP.Vect());
-            Double_t minv = 2*TMath::Sin(anglePair / 2)*TMath::Sqrt(fCandidates[iM].momentum.Mag() * fCandidates[iP].momentum.Mag());
-       
             if (!(fCandidates[iP].isMCSignalElectron && fCandidates[iM].isMCSignalElectron)) {
-                        
-                    fh_rec_bg_minv->Fill(minv);
+                fh_rec_bg_minv->Fill(pRec.minv);
         
-                    if (fCandidates[iP].isRichElectron && fCandidates[iM].isRichElectron){
-                        fh_rich_id_bg_minv->Fill(minv);
+                if (fCandidates[iP].isRichElectron && fCandidates[iM].isRichElectron){
+                    fh_rich_id_bg_minv->Fill(pRec.minv);
+                }
+                if (fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && 
+                    fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron) {
+                    fh_trd_id_bg_minv->Fill(pRec.minv);
+                } 
+                if (fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron && 
+                    fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron && fCandidates[iM].isTofElectron) {
+                    fh_tof_id_bg_minv->Fill(pRec.minv);
+                    fh_angle_bg->Fill(pRec.angle);   
+                }
+                  if ((fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron) &&
+                     (fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron && fCandidates[iM].isTofElectron)) {
+                        if (fCandidates[iP].momentum.Perp()>fPtCut && fCandidates[iM].momentum.Perp() > fPtCut){
+                            fNofPtcutBg++;
+                            fh_ptcut_bg_minv->Fill(pRec.minv);
+                            if (pRec.angle >fAngleCut) {
+                                fh_anglecut_bg_minv->Fill(pRec.minv);
+                            } //opening angle cut
+
+                        }//Pt cut
                     }
-                    if (fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && 
-                        fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron) {
-                        fh_trd_id_bg_minv->Fill(minv);
-                    } 
-                    if (fCandidates[iP].isRichElectron && fCandidates[iP].isTrdElectron && fCandidates[iP].isTofElectron && 
-                        fCandidates[iM].isRichElectron && fCandidates[iM].isTrdElectron && fCandidates[iM].isTofElectron) {
-                        fh_tof_id_bg_minv->Fill(minv);
-                    }
-          
+        
             } // if
         } // iM 
                                                
     } // iP
-
-
-
 }
 
 Bool_t CbmAnaDielectronTask::IsRichElectron(CbmRichRing * ring, Double_t momentum)
@@ -789,20 +772,79 @@ Bool_t CbmAnaDielectronTask::IsTofElectron(CbmGlobalTrack* gTrack, Double_t mome
     return false;
 }
 
+KinematicParams CbmAnaDielectronTask::CalculateKinematicParams(CbmMCTrack* mctrackP, CbmMCTrack* mctrackM)
+{
+    KinematicParams params;
+    
+    TVector3 momP;  //momentum e+
+    mctrackP->GetMomentum(momP);
+    Double_t energyP = TMath::Sqrt(momP.Mag2() + M2E);
+    TLorentzVector lorVecP(momP, energyP); 
+
+    TVector3 momM;  //momentum e-
+    mctrackM->GetMomentum(momM);
+    Double_t energyM = TMath::Sqrt(momM.Mag2() + M2E);
+    TLorentzVector lorVecM(momM, energyM); 
+
+    TVector3 momPair = momP + momM;
+    Double_t energyPair = energyP + energyM;
+    Double_t ptPair = momPair.Perp();
+    Double_t pzPair = momPair.Pz();
+    Double_t yPair = 0.5*TMath::Log((energyPair+pzPair)/(energyPair-pzPair));
+    Double_t anglePair = lorVecM.Angle(lorVecP.Vect());
+    Double_t theta = 180.*anglePair/TMath::Pi();
+    Double_t minv = 2.*TMath::Sin(anglePair / 2.)*TMath::Sqrt(momM.Mag()*momP.Mag());
+
+    params.momentumMag = momPair.Mag();
+    params.pt = ptPair;
+    params.rapidity = yPair;
+    params.minv = minv;
+    params.angle = theta;
+    return params;
+}
+
+KinematicParams CbmAnaDielectronTask::CalculateKinematicParams(DielectronCandidate* candP, DielectronCandidate* candM)
+{
+    KinematicParams params;
+    
+    TLorentzVector lorVecP(candP->momentum, candP->energy); 
+    TLorentzVector lorVecM(candM->momentum, candM->energy); 
+
+    TVector3 momPair = candP->momentum +candM->momentum ;
+    Double_t energyPair = candP->energy + candM->energy;
+    Double_t ptPair = momPair.Perp();
+    Double_t pzPair = momPair.Pz();
+    Double_t yPair = 0.5*TMath::Log((energyPair+pzPair)/(energyPair-pzPair));
+    Double_t anglePair = lorVecM.Angle(lorVecP.Vect());
+    Double_t theta = 180.*anglePair/TMath::Pi();
+    Double_t minv = 2.*TMath::Sin(anglePair / 2.)*TMath::Sqrt(candM->momentum.Mag() * candP->momentum.Mag());
+
+    params.momentumMag = momPair.Mag();
+    params.pt = ptPair;
+    params.rapidity = yPair;
+    params.minv = minv;
+    params.angle = theta;
+    return params;
+
+}
 
 void CbmAnaDielectronTask::DifferenceSignalAndBg()
 {
     Int_t nCand = fCandidates.size(); 
-    for (Int_t i = 0; i< nCand; i++){
+    for (Int_t i = 0; i < nCand; i++){
         if (!(fCandidates[i].isRichElectron && 
              fCandidates[i].isTrdElectron && 
              fCandidates[i].isTofElectron)) continue;
+
         if (fCandidates[i].isMCSignalElectron == true ){
             fh_pt_signal->Fill(fCandidates[i].momentum.Perp(), fWeight);
             fh_chi2_prim_signal->Fill(fCandidates[i].chiPrimary);
+            fh_position_signal->Fill(fCandidates[i].position.Mag());
+            
         } else {
             fh_pt_bg->Fill(fCandidates[i].momentum.Perp());
             fh_chi2_prim_bg->Fill(fCandidates[i].chiPrimary);
+            fh_position_bg->Fill(fCandidates[i].position.Mag());
         }
     }
 }
@@ -850,6 +892,21 @@ void CbmAnaDielectronTask::Finish()
     fh_tof_id_bg_minv->Scale(scale);
     fh_pt_signal->Scale(1./fh_pt_signal->Integral());
     fh_pt_bg->Scale(1./fh_pt_bg->Integral());
+    fh_position_signal->Scale(1./fh_position_signal->Integral());
+    fh_position_bg-> Scale(1./fh_position_bg->Integral());
+    fh_reco_signal_pty->Scale(scale);
+    fh_rich_id_signal_pty->Scale(scale); 
+    fh_trd_id_signal_pty->Scale(scale); 
+    fh_tof_id_signal_pty->Scale(scale);
+    fh_angle_signal->Scale(1./ fh_angle_signal->Integral());
+    fh_angle_bg->Scale(1./ fh_angle_bg->Integral());
+    fh_ptcut_signal_minv->Scale(scale);
+    fh_anglecut_signal_minv->Scale(scale);
+    fh_ptcut_bg_minv->Scale(scale);
+    fh_anglecut_bg_minv->Scale(scale);
+    fh_ptcut_signal_pty->Scale(scale);
+    fh_anglecut_signal_pty->Scale(scale);
+
 
     fh_chi2_prim_signal->Scale(1./fh_chi2_prim_signal->Integral());
     fh_chi2_prim_bg->Scale(1./fh_chi2_prim_bg->Integral());
@@ -887,9 +944,20 @@ void CbmAnaDielectronTask::Finish()
     fh_tof_id_bg_minv->Write();
     fh_pt_signal->Write();
     fh_pt_bg->Write();
-
-
-
+    fh_position_signal->Write();
+    fh_position_bg->Write();
+    fh_reco_signal_pty->Write();
+    fh_rich_id_signal_pty->Write();
+    fh_trd_id_signal_pty->Write();
+    fh_tof_id_signal_pty->Write();
+    fh_angle_signal->Write();
+    fh_angle_bg->Write();
+    fh_ptcut_signal_minv->Write();
+    fh_anglecut_signal_minv->Write();
+    fh_ptcut_bg_minv->Write();
+    fh_anglecut_bg_minv->Write();
+    fh_ptcut_signal_pty->Write();
+    fh_anglecut_signal_pty->Write();
 }
 
 void CbmAnaDielectronTask::WriteOutput()

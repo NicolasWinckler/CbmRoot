@@ -58,6 +58,15 @@ public:
 	Bool_t isMCSignalElectron;
 };
 
+class KinematicParams{
+public:
+    Double_t momentumMag;
+    Double_t pt;
+    Double_t rapidity;
+    Double_t minv;
+    Double_t angle; // opening angle
+};
+
 class CbmAnaDielectronTask : public FairTask {
 
 public:
@@ -66,6 +75,9 @@ public:
     virtual ~CbmAnaDielectronTask();
     virtual InitStatus Init();
     virtual void Exec(Option_t *option);
+    
+    KinematicParams CalculateKinematicParams(CbmMCTrack* mctrackP, CbmMCTrack* mctrackM);
+    KinematicParams CalculateKinematicParams(DielectronCandidate* candP, DielectronCandidate* candM);
 
     void SingleParticleAcceptance();
     void MCPairs();
@@ -138,12 +150,15 @@ private:
     Int_t fNofRichIdPairs; //number of rich id signal pairs
     Int_t fNofTrdIdPairs; //number of trd id signal pairs
     Int_t fNofTofIdPairs; //number of tof id signal pairs
+    Int_t fNofPtcutPairs;
 
     Int_t fNofRecBg;
     Int_t fNofRichIdBg;
     Int_t fNofTrdIdBg;
     Int_t fNofTofIdBg;
+    Int_t fNofPtcutBg;
 
+// ID cuts
     Double_t fTrdAnnCut;
     Double_t fRichAnnCut;
     Double_t fMeanA;
@@ -152,6 +167,9 @@ private:
     Double_t fRmsB;
     Double_t fRmsCoeff;
     Double_t fDistCut;
+// Analysis cuts
+    Double_t fPtCut;
+    Double_t fAngleCut;
     
     CbmRichElectronIdAnn * fElIdAnn;
     Bool_t fUseRichAnn;
@@ -192,6 +210,24 @@ private:
 
     TH1D* fh_pt_signal;
     TH1D* fh_pt_bg;
+    TH1D* fh_position_signal;
+    TH1D* fh_position_bg;
+
+    TH2D* fh_reco_signal_pty;
+    TH2D* fh_rich_id_signal_pty;
+    TH2D* fh_trd_id_signal_pty;
+    TH2D* fh_tof_id_signal_pty;
+
+    TH1D* fh_angle_signal;
+    TH1D* fh_angle_bg;
+
+    TH1D* fh_ptcut_signal_minv; //pt cut after identification for signal
+    TH1D* fh_anglecut_signal_minv; // openning angle after pt cut for signal
+    TH2D* fh_ptcut_signal_pty; 
+    TH2D* fh_anglecut_signal_pty;
+
+    TH1D* fh_ptcut_bg_minv; //pt cut after identification for BG
+    TH1D* fh_anglecut_bg_minv; // openning angle after pt cut for BG
      
     
 public:

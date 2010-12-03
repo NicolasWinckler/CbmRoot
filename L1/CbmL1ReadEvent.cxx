@@ -94,10 +94,22 @@ void CbmL1::ReadEvent()
     algo->StsHitsStopIndex[i]  = 0;
   }
   
+  //for a new definition of the reconstructable track (4 consequtive MC Points):
+  vector<bool> isUsedMvdPoint; //marks, whether Mvd MC Point already in the vMCPoints
+  vector<bool> isUsedStsPoint; //marks, whether Mvd MC Point already in the vMCPoints
+
     // get MVD hits
   int nMvdHits=0;
   if( listMvdHits ){
     Int_t nEnt  = listMvdHits->GetEntries();
+    Int_t nMC = (listMvdPts) ? listMvdPts->GetEntries() : 0;
+
+    if(listMvdPts)
+    {
+      isUsedMvdPoint.resize(nMC);
+      for(int iMc=0; iMc<nMC; iMc++) isUsedMvdPoint[iMc]=0;
+    }
+
     for (int j=0; j <nEnt; j++ ){
       TmpHit th;
       {
@@ -139,11 +151,12 @@ void CbmL1::ReadEvent()
           iMC = match->GetPointId();
         }
       }
-      if( listStsPts && iMC>=0 ){ // TODO1: don't need this with FairLinks
+      if( listMvdPts && iMC>=0 ){ // TODO1: don't need this with FairLinks
         CbmL1MCPoint MC;
         if( ! ReadMCPoint( &MC, iMC, 1 ) ){
           MC.iStation = th.iStation;
-      
+          isUsedMvdPoint[iMC] = 1;
+
 //       MC.ID = iMCTr; // because atch->GetPointId() == 0 !!! and ReadMCPoint don't work
 //       MC.z = th.iStation; // for sort in right order
       
@@ -165,6 +178,13 @@ void CbmL1::ReadEvent()
   if( listStsHits ){
     Int_t nEnt = listStsHits->GetEntries();
     Int_t nMC = (listStsPts) ? listStsPts->GetEntries() : 0;
+
+    if(listStsPts)
+    {
+      isUsedStsPoint.resize(nMC);
+      for(int iMc=0; iMc<nMC; iMc++) isUsedStsPoint[iMc]=0;
+    }
+
     int negF=0;
     for (int j=0; j < nEnt; j++ ){
       CbmStsHit *sh = L1_DYNAMIC_CAST<CbmStsHit*>( listStsHits->At(j) );
@@ -180,7 +200,7 @@ void CbmL1::ReadEvent()
         if( th.iStripF<0 ){ negF++; continue;}
         if( th.iStripF>=0 && th.iStripB>=0 ) th.isStrip  = 1;
         if( th.iStripB <0 ) th.iStripB = th.iStripF;
-    
+
         th.iStripF += nMvdHits;
         th.iStripB += nMvdHits;
 
@@ -190,19 +210,20 @@ void CbmL1::ReadEvent()
 
         th.x = pos.X();
         th.y = pos.Y();
-    
+
         L1Station &st = algo->vStations[th.iStation];
         th.u_front = th.x*st.frontInfo.cos_phi[0] + th.y*st.frontInfo.sin_phi[0];
         th.u_back  = th.x* st.backInfo.cos_phi[0] + th.y* st.backInfo.sin_phi[0];
       }
       th.iMC=-1;
-      
+
       int iMC = sh->GetRefIndex(); // TODO1: don't need this with FairLinks
       if( listStsPts && iMC>=0 && iMC<nMC){
         CbmL1MCPoint MC;
         if( ! ReadMCPoint( &MC, iMC, 0 ) ){
           MC.iStation = th.iStation;
           vMCPoints.push_back( MC );
+          isUsedStsPoint[iMC] = 1;
           th.iMC = vMCPoints.size()-1;
         }
       } // if listStsPts
@@ -216,7 +237,39 @@ void CbmL1::ReadEvent()
     } // for j
   } // if listStsHits
   if (fVerbose >= 10) cout << "ReadEvent: sts hits are gotten." << endl;
-  
+
+  //add MC points, which has not been added yet
+  if(listMvdPts)
+  {
+    int nMC = listMvdPts->GetEntriesFast();
+    for(int iMC=0; iMC<nMC; iMC++){
+      if(!(isUsedMvdPoint[iMC])) {
+        CbmL1MCPoint MC;
+        if( ! ReadMCPoint( &MC, iMC, 1 ) ){
+          MC.iStation = ((CbmMvdPoint*)listMvdPts->At(iMC))->GetStationNr() - 1;
+          isUsedMvdPoint[iMC] = 1;
+          vMCPoints.push_back( MC );
+        }
+      }
+    }
+  }
+  if(listStsPts)
+  {
+    int nMC = listStsPts->GetEntriesFast();
+    for(int iMC=0; iMC<nMC; iMC++){
+      if(!(isUsedStsPoint[iMC])) {
+        CbmL1MCPoint MC;
+        if( ! ReadMCPoint( &MC, iMC, 0 ) ){
+          MC.iStation = -1;
+          L1Station *sta = algo->vStations + NMvdStations;
+          for(int iSt=0; iSt < NStsStations; iSt++)
+            MC.iStation = ( MC.z > sta[iSt].z[0] - 2.5 ) ? (NMvdStations+iSt) : MC.iStation;
+          isUsedStsPoint[iMC] = 1;
+          vMCPoints.push_back( MC );
+        }
+      }
+    }
+  }
     // sort hits
   int nHits = nMvdHits + nStsHits;
   sort( tmpHits.begin(), tmpHits.end(), TmpHit::Compare );

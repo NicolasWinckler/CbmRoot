@@ -725,15 +725,22 @@ void CbmL1::HistoPerformance() // TODO: check if works correctly. Change vHitRef
       h_notfound_nhits->Fill(nmchits);
       h_notfound_station->Fill(ph.iStation);
       h_notfound_r->Fill(sqrt(fabs(ph.x*ph.x+ph.y*ph.y)));
-      CbmL1HitStore &ph21 = vHitStore[mtra.StsHits[0]];
-      CbmL1HitStore &ph22 = vHitStore[mtra.StsHits[1]];
-      
-      double z21 = algo->vStations[ph21.iStation].z[0];
-      double z22 = algo->vStations[ph22.iStation].z[0];
-      if( fabs(z22-z21)>1.e-4 ){
-        h_notfound_tx->Fill((ph22.x-ph21.x)/(z22-z21));
-        h_notfound_ty->Fill((ph22.y-ph21.y)/(z22-z21));
+
+      if(mtra.Points.size() > 0){
+        CbmL1MCPoint &pMC = vMCPoints[mtra.Points[0]];
+        h_notfound_tx->Fill(pMC.px/pMC.pz);
+        h_notfound_ty->Fill(pMC.py/pMC.pz);
       }
+
+//      CbmL1HitStore &ph21 = vHitStore[mtra.StsHits[0]];
+//      CbmL1HitStore &ph22 = vHitStore[mtra.StsHits[1]];
+
+//      double z21 = algo->vStations[ph21.iStation].z[0];
+//      double z22 = algo->vStations[ph22.iStation].z[0];
+//      if( fabs(z22-z21)>1.e-4 ){
+//        h_notfound_tx->Fill((ph22.x-ph21.x)/(z22-z21));
+//        h_notfound_ty->Fill((ph22.y-ph21.y)/(z22-z21));
+//      }
 
       if( mtra.IsDisturbed() ) killed = 1;
     }

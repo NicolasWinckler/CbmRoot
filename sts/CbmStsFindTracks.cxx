@@ -59,7 +59,7 @@ CbmStsFindTracks::CbmStsFindTracks(Int_t iVerbose,
 				   CbmStsTrackFinder* finder, 
 				   Bool_t useMvd, const char* name)
   : FairTask(name, iVerbose), 
-  fUseMvd(kFALSE),
+  fUseMvd(useMvd),
   fGeoPar(NULL),
   fDigiPar(NULL),
   fField(NULL),

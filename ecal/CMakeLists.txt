@@ -15,6 +15,8 @@ ${CBMROOT_SOURCE_DIR}/cbmdata/sts
 ${CBMROOT_SOURCE_DIR}/cbmdata/trd
 ${CBMROOT_SOURCE_DIR}/cbmdata/ecal 
 ${CBMROOT_SOURCE_DIR}/cbmdata/global
+${CBMROOT_SOURCE_DIR}/KF/Interface
+${CBMROOT_SOURCE_DIR}/KF
 
 ${CBMROOT_SOURCE_DIR}/ecal
 )
@@ -44,12 +46,17 @@ CbmEcalShowerLib.cxx CbmEcalTrackExtrapolation.cxx
 CbmEcalTracking.cxx CbmEcalStructureFiller.cxx
 CbmEcalTrackExport.cxx CbmEcalStructureExport.cxx
 CbmEcalRecoSimple.cxx CbmEcalClusterV1.cxx
-CbmEcalQualityCheck.cxx CbmEcalClusterFinderV1.cxx
+CbmEcalQualityCheck.cxx CbmEcalClusterFinderV1.cxx CbmEcalClusterFinderV2.cxx
 CbmEcalTrackImport.cxx CbmEcalCalibration.cxx
 CbmEcalParam.cxx CbmEcalRecoSlow.cxx CbmEcalMatching.cxx
 CbmEcalAnalysisPi0.cxx CbmEcalAnalysisPair.cxx CbmEcalAnalysisMaterial.cxx
 CbmEcalAnalysisNeutron.cxx CbmEcalTimeDigitizer.cxx
-CbmEcalIdentification.cxx CbmEcalLightMap.cxx
+CbmEcalIdentification.cxx CbmEcalLightMap.cxx CbmEcalDrawer2.cxx
+CbmEcalAnalysisCluster.cxx CbmEcalAnalysisUniformity.cxx
+CbmEcalAnalysisDst.cxx CbmEcalAnalysisBSh.cxx
+CbmEcalCalibrationV2.cxx CbmEcalAnalysisSimple.cxx CbmEcalIdentification2.cxx
+CbmEcalMaximum.cxx CbmEcalMaximumLocator.cxx CbmEcalAnalysisJPsi.cxx
+CbmEcalAnalysisSShape.cxx
 )
 
 SET(ECAL_SRCS ${ECAL_SRCS_RULECHECKER} CbmEcalInf.cxx)

@@ -15,8 +15,10 @@
 #pragma link C++ class  CbmGeoEcalPar;
 #pragma link C++ class  CbmEcalContFact;
 #pragma link C++ class  CbmEcalDrawer+;
+#pragma link C++ class  CbmEcalDrawer2;
 #pragma link C++ class  CbmEcalAnalysis+;
 #pragma link C++ class  CbmEcalAnalysisDS+;
+#pragma link C++ class  CbmEcalAnalysisCluster;
 #pragma link C++ class  CbmEcalHitProducer+;
 #pragma link C++ class  CbmEcalHitProducerFastMC+;
 #pragma link C++ class  CbmGeoEcal+;
@@ -42,8 +44,10 @@
 #pragma link C++ class  CbmEcalClusterV1+;
 #pragma link C++ class	CbmEcalQualityCheck;
 #pragma link C++ class  CbmEcalClusterFinderV1;
+#pragma link C++ class  CbmEcalClusterFinderV2;
 #pragma link C++ class  CbmEcalTrackImport;
 #pragma link C++ class  CbmEcalCalibration;
+#pragma link C++ class  CbmEcalCalibrationV2;
 #pragma link C++ class  CbmEcalParam+;
 #pragma link C++ class  CbmEcalMatching;
 #pragma link C++ class  CbmEcalAnalysisPi0;
@@ -52,6 +56,15 @@
 #pragma link C++ class  CbmEcalAnalysisMaterial;
 #pragma link C++ class  CbmEcalTimeDigitizer;
 #pragma link C++ class  CbmEcalIdentification;
+#pragma link C++ class  CbmEcalIdentification2;
 #pragma link C++ class  CbmEcalLightMap;
+#pragma link C++ class  CbmEcalAnalysisUniformity;
+#pragma link C++ class  CbmEcalAnalysisSimple;
+#pragma link C++ class  CbmEcalAnalysisJPsi;
+#pragma link C++ class  CbmEcalAnalysisDst;
+#pragma link C++ class  CbmEcalAnalysisBSh;
+#pragma link C++ class  CbmEcalMaximum;
+#pragma link C++ class  CbmEcalMaximumLocator;
+#pragma link C++ class  CbmEcalAnalysisSShape;
 
 #endif

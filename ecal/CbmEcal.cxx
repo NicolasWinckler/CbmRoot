@@ -127,6 +127,7 @@
 #include "TGeoBBox.h"
 #include "TGeoPgon.h"
 #include "TList.h"
+#include "TTree.h"
 
 #include <iostream>
 #include <stdlib.h>
@@ -203,11 +204,11 @@ CbmEcal::CbmEcal(const char* name, Bool_t active, const char* fileGeo)
   fThicknessPSscin=fInf->GetPSScin();
   fEcalPSgap=fInf->GetPSGap();
   
-  fNColumns1 = (Int_t)(fEcalSize[0]/2/fCellSize)*2;
-  fNRows1    = (Int_t)((fEcalSize[1]-fEcalHole[1])/4/fCellSize)*2;
+  fNColumns1 = TMath::Nint((fEcalSize[0]/2/fCellSize)*2);
+  fNRows1    = TMath::Nint(((fEcalSize[1]-fEcalHole[1])/4/fCellSize)*2);
 
-  fNColumns2 = (Int_t)((fEcalSize[0]-fEcalHole[0])/4/fCellSize)*2;
-  fNRows2    = (Int_t)(fEcalHole[1]/2/fCellSize)*2;
+  fNColumns2 = TMath::Nint(((fEcalSize[0]-fEcalHole[0])/4/fCellSize)*2);
+  fNRows2    = TMath::Nint((fEcalHole[1]/2/fCellSize)*2);
 
   fNColumns = TMath::Max(fNColumns1,fNColumns2);
   fNRows    = TMath::Max(fNRows1,fNRows2);
@@ -225,7 +226,12 @@ CbmEcal::CbmEcal(const char* name, Bool_t active, const char* fileGeo)
 
   if (fInf->GetFastMC()==1) return;
   fLiteCollection=new TClonesArray("CbmEcalPointLite");
-  
+}
+
+/** size in Mb (2^20) **/
+void CbmEcal::SetMaximumFileSize(Long64_t size)
+{
+  TTree::SetMaxTreeSize(size*1024*1024);
 }
 
 // -------------------------------------------------------------------------
@@ -563,8 +569,8 @@ Bool_t CbmEcal::FillLitePoint(Int_t volnum)
   static Float_t zmax=fZEcal+fEcalSize[2];
   static Float_t xecal=fEcalSize[0]/2;
   static Float_t yecal=fEcalSize[1]/2;
-  static Float_t xhole=fEcalHole[0]/2-0.1;
-  static Float_t yhole=fEcalHole[1]/2-0.1;
+  static Float_t xhole=fEcalHole[0]/2-0.01;
+  static Float_t yhole=fEcalHole[1]/2-0.01;
   TParticle* part=gMC->GetStack()->GetCurrentTrack();
   fTrackID=gMC->GetStack()->GetCurrentTrackNumber();
 
@@ -738,7 +744,7 @@ void CbmEcal::ConstructGeometry()
   fThicknessScin  *= fGeoScale;
   fThicknessTyvk  *= fGeoScale;
   fThicknessLayer  = fThicknessLead + fThicknessScin + 2*fThicknessTyvk;
-  fNLayers         = (Int_t)(fNLayers/fGeoScale);
+  fNLayers         = TMath::Nint(fNLayers/fGeoScale);
 
   // --------------- Container volume for the whole ECAL
   Double_t par[10], xPos, yPos, zPos;
@@ -820,8 +826,8 @@ void CbmEcal::ConstructGeometry()
   volume = gGeoManager->Division("ECAL1column","ECAL1"      ,1,-1,-par[0],fCellSize,0,"S");
   volume = gGeoManager->Division("ECAL1row"   ,"ECAL1column",2,-1,-par[1],fCellSize,0,"S");
   
-  fNColumns1 = (Int_t)((par[0]/fCellSize)*2);
-  fNRows1    = (Int_t)((par[1]/fCellSize)*2);
+  fNColumns1 = TMath::Nint((par[0]/fCellSize)*2);
+  fNRows1    = TMath::Nint((par[1]/fCellSize)*2);
 
   // --------------- Left and right parts of ECAL
   par[0] = (fEcalSize[0]-fEcalHole[0])/4;
@@ -837,8 +843,8 @@ void CbmEcal::ConstructGeometry()
   volume = gGeoManager->Division("ECAL2column","ECAL2"      ,1,-1,-par[0],fCellSize,0,"S");
   volume = gGeoManager->Division("ECAL2row"   ,"ECAL2column",2,-1,-par[1],fCellSize,0,"S");
   
-  fNColumns2 = (Int_t)((par[0]/fCellSize)*2);
-  fNRows2    = (Int_t)((par[1]/fCellSize)*2);
+  fNColumns2 = TMath::Nint((par[0]/fCellSize)*2);
+  fNRows2    = TMath::Nint((par[1]/fCellSize)*2);
 
   Int_t colmax=TMath::Max(fNColumns1,fNColumns2);
   Int_t rowmax=TMath::Max(fNRows1,fNRows2);
@@ -972,15 +978,15 @@ Int_t CbmEcal::GetVolIdMaxInf()
       return kFALSE;
     }
   }
-  static Float_t cellsize=inf->GetCellSize();
-  static Float_t xcalosize=inf->GetEcalSize(0);
-  static Float_t ycalosize=inf->GetEcalSize(1);
-  static Float_t xholesize=inf->GetEcalHole(0);
-  static Float_t yholesize=inf->GetEcalHole(1);
-  static Int_t NColumns1 = (Int_t)(xcalosize/2/cellsize)*2;
-  static Int_t NRows1    = (Int_t)((ycalosize-yholesize)/4/cellsize)*2;
-  static Int_t NColumns2 = (Int_t)((xcalosize-xholesize)/4/cellsize)*2;
-  static Int_t NRows2    = (Int_t)(yholesize/2/cellsize)*2;
+  static Double_t cellsize=inf->GetCellSize();
+  static Double_t xcalosize=inf->GetEcalSize(0);
+  static Double_t ycalosize=inf->GetEcalSize(1);
+  static Double_t xholesize=inf->GetEcalHole(0);
+  static Double_t yholesize=inf->GetEcalHole(1);
+  static Int_t NColumns1 = TMath::Nint((xcalosize/2/cellsize)*2);
+  static Int_t NRows1    = TMath::Nint(((ycalosize-yholesize)/4/cellsize)*2);
+  static Int_t NColumns2 = TMath::Nint(((xcalosize-xholesize)/4/cellsize)*2);
+  static Int_t NRows2    = TMath::Nint((yholesize/2/cellsize)*2);
   static Int_t colmax=TMath::Max(NColumns1,NColumns2);
   static Int_t rowmax=TMath::Max(NRows1,NRows2);
   static Int_t VolIdMax=colmax*rowmax+rowmax+(2*(4-1)+2-1)*colmax*rowmax;
@@ -996,11 +1002,11 @@ Int_t CbmEcal::GetVolIdMax()
   }
   static FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   static CbmGeoEcalPar* par=(CbmGeoEcalPar*)(rtdb->getContainer("CbmGeoEcalPar"));
-  static Float_t cellsize=par->GetVariable("cellsize");
-  static Float_t xcalosize=par->GetVariable("xecalsize");
-  static Float_t ycalosize=par->GetVariable("yecalsize");
-  static Float_t xholesize=par->GetVariable("xholesize");
-  static Float_t yholesize=par->GetVariable("yholesize");
+  static Double_t cellsize=par->GetVariable("cellsize");
+  static Double_t xcalosize=par->GetVariable("xecalsize");
+  static Double_t ycalosize=par->GetVariable("yecalsize");
+  static Double_t xholesize=par->GetVariable("xholesize");
+  static Double_t yholesize=par->GetVariable("yholesize");
   if (cellsize==-1111||xcalosize==-1111||ycalosize==-1111||xholesize==-1111||yholesize==-1111)
   {
     static Int_t here=0;
@@ -1015,10 +1021,10 @@ Int_t CbmEcal::GetVolIdMax()
     }
     return GetVolIdMaxInf();
   }
-  static Int_t NColumns1 = (Int_t)((xcalosize/2/cellsize)*2);
-  static Int_t NRows1    = (Int_t)(((ycalosize-yholesize)/4/cellsize)*2);
-  static Int_t NColumns2 = (Int_t)(((xcalosize-xholesize)/4/cellsize)*2);
-  static Int_t NRows2    = (Int_t)((yholesize/2/cellsize)*2);
+  static Int_t NColumns1 = TMath::Nint((xcalosize/2/cellsize)*2);
+  static Int_t NRows1    = TMath::Nint(((ycalosize-yholesize)/4/cellsize)*2);
+  static Int_t NColumns2 = TMath::Nint(((xcalosize-xholesize)/4/cellsize)*2);
+  static Int_t NRows2    = TMath::Nint((yholesize/2/cellsize)*2);
   static Int_t colmax=TMath::Max(NColumns1,NColumns2);
   static Int_t rowmax=TMath::Max(NRows1,NRows2);
   static Int_t VolIdMax=colmax*rowmax+rowmax+(2*(4-1)+2-1)*colmax*rowmax;
@@ -1039,15 +1045,15 @@ Bool_t CbmEcal::GetCellCoordInf(Int_t fVolID, Float_t &x, Float_t &y, Int_t& ten
       return kFALSE;
     }
   }
-  static Float_t cellsize=inf->GetCellSize();
-  static Float_t xcalosize=inf->GetEcalSize(0);
-  static Float_t ycalosize=inf->GetEcalSize(1);
-  static Float_t xholesize=inf->GetEcalHole(0);
-  static Float_t yholesize=inf->GetEcalHole(1);
-  static Int_t NColumns1 = (Int_t)((xcalosize/2/cellsize)*2);
-  static Int_t NRows1    = (Int_t)(((ycalosize-yholesize)/4/cellsize)*2);
-  static Int_t NColumns2 = (Int_t)(((xcalosize-xholesize)/4/cellsize)*2);
-  static Int_t NRows2    = (Int_t)((yholesize/2/cellsize)*2);
+  static Double_t cellsize=inf->GetCellSize();
+  static Double_t xcalosize=inf->GetEcalSize(0);
+  static Double_t ycalosize=inf->GetEcalSize(1);
+  static Double_t xholesize=inf->GetEcalHole(0);
+  static Double_t yholesize=inf->GetEcalHole(1);
+  static Int_t NColumns1 = TMath::Nint((xcalosize/2/cellsize)*2);
+  static Int_t NRows1    = TMath::Nint(((ycalosize-yholesize)/4/cellsize)*2);
+  static Int_t NColumns2 = TMath::Nint(((xcalosize-xholesize)/4/cellsize)*2);
+  static Int_t NRows2    = TMath::Nint((yholesize/2/cellsize)*2);
   static Int_t colmax=TMath::Max(NColumns1,NColumns2);
   static Int_t rowmax=TMath::Max(NRows1,NRows2);
   static Int_t VolIdMax=colmax*rowmax+rowmax+(2*(4-1)+2-1)*colmax*rowmax;
@@ -1097,11 +1103,11 @@ Bool_t CbmEcal::GetCellCoord(Int_t fVolID, Float_t &x, Float_t &y, Int_t& tenerg
   }
   static FairRuntimeDb* rtdb=ana->GetRuntimeDb();
   static CbmGeoEcalPar* par=(CbmGeoEcalPar*)(rtdb->getContainer("CbmGeoEcalPar"));
-  static Float_t cellsize=par->GetVariable("cellsize");
-  static Float_t xcalosize=par->GetVariable("xecalsize");
-  static Float_t ycalosize=par->GetVariable("yecalsize");
-  static Float_t xholesize=par->GetVariable("xholesize");
-  static Float_t yholesize=par->GetVariable("yholesize");
+  static Double_t cellsize=par->GetVariable("cellsize");
+  static Double_t xcalosize=par->GetVariable("xecalsize");
+  static Double_t ycalosize=par->GetVariable("yecalsize");
+  static Double_t xholesize=par->GetVariable("xholesize");
+  static Double_t yholesize=par->GetVariable("yholesize");
   if (cellsize==-1111||xcalosize==-1111||ycalosize==-1111||xholesize==-1111||yholesize==-1111)
   {
     static Int_t here=0;
@@ -1117,10 +1123,10 @@ Bool_t CbmEcal::GetCellCoord(Int_t fVolID, Float_t &x, Float_t &y, Int_t& tenerg
     return GetCellCoordInf(fVolID, x, y, tenergy);
   }
   
-  static Int_t NColumns1 = (Int_t)((xcalosize/2/cellsize)*2);
-  static Int_t NRows1    = (Int_t)(((ycalosize-yholesize)/4/cellsize)*2);
-  static Int_t NColumns2 = (Int_t)(((xcalosize-xholesize)/4/cellsize)*2);
-  static Int_t NRows2    = (Int_t)((yholesize/2/cellsize)*2);
+  static Int_t NColumns1 = TMath::Nint((xcalosize/2/cellsize)*2);
+  static Int_t NRows1    = TMath::Nint(((ycalosize-yholesize)/4/cellsize)*2);
+  static Int_t NColumns2 = TMath::Nint(((xcalosize-xholesize)/4/cellsize)*2);
+  static Int_t NRows2    = TMath::Nint((yholesize/2/cellsize)*2);
   static Int_t colmax=TMath::Max(NColumns1,NColumns2);
   static Int_t rowmax=TMath::Max(NRows1,NRows2);
   static Int_t VolIdMax=colmax*rowmax+rowmax+(2*(4-1)+2-1)*colmax*rowmax;

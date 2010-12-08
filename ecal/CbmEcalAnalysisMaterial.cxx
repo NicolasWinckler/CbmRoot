@@ -27,7 +27,7 @@ void CbmEcalAnalysisMaterial::Exec(Option_t* option)
   FairRadLenPoint* p;
   Int_t i;
   Int_t n;
-  Double_t z=1200;
+  Double_t z=150;
   TVector3 newp;
   TVector3 oldp(0.0, 0.0, 0.0);
   TVector3 d;

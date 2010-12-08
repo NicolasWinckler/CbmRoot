@@ -12,7 +12,6 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TVector3.h"
-#include "TClonesArray.h"
 
 #include <iostream>
 

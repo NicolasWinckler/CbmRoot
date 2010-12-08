@@ -34,6 +34,7 @@ public:
   /** Rough estimation of energy **/
   virtual Double_t GetERough(Double_t e) const;
   virtual ~CbmEcalCalibration();
+  virtual TString ParName() const {return fParName;} 
 private:
   /** Name of the parameter file **/
   TString fParName;

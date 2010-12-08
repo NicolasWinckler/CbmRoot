@@ -141,6 +141,9 @@ public:
   static Bool_t GetCellCoordInf(Int_t fVolumeID, Float_t &x, Float_t &y, Int_t& tenergy);
   CbmEcalInf* GetInf() const {return fInf;}
 
+  /** size in Mb (2^20)**/
+  void SetMaximumFileSize(Long64_t size);  
+
 protected:
   CbmEcalPoint* AddHit(Int_t trackID, Int_t detID, TVector3 pos,
                        TVector3 mom, Double_t time, Double_t length,

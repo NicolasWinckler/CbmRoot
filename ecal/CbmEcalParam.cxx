@@ -34,7 +34,7 @@ TString CbmEcalParam::GetString(const char* key) const
 {
   TObjString* value=(TObjString*)fVariables.GetValue(key);
   if (value==NULL)
-    Fatal("GetInteger","Can't find variable named %s.", key);
+    Fatal("GetString","Can't find variable named %s.", key);
   return value->GetString();
 }
 

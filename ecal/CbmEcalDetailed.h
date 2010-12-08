@@ -166,6 +166,7 @@ private:
   Float_t fYCell[cMaxModuleType];	//!
   /** Number of holes in modules  **/
   Int_t fNH[cMaxModuleType];		//!
+  Int_t fCF[cMaxModuleType];		//!
   /** Names of light maps **/
   TString fLightMapNames[cMaxModuleType];		//!
   /** Light maps **/

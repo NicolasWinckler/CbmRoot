@@ -11,26 +11,12 @@
 #include "CbmEcalClusterV1.h"
 #include "CbmEcalParam.h"
 #include "CbmEcalCalibration.h"
+#include "CbmEcalPreCluster.h"
 
 #include <iostream>
 #include <list>
 
 using namespace std;
-
-class __CbmEcalPreCluster
-{
-public:
-  __CbmEcalPreCluster(const list<CbmEcalCell*> cells, CbmEcalCell* max, CbmEcalCell* min) 
-    : fCells(cells), fMaximum(max), fMinimum(min), fMark(0)
-  {
-    ;
-  }
-
-  list<CbmEcalCell*> fCells;
-  CbmEcalCell* fMaximum;
-  CbmEcalCell* fMinimum;
-  Int_t fMark;
-};
 
 /** Exec a task **/
 void CbmEcalClusterFinderV1::Exec(Option_t* option)
@@ -67,11 +53,14 @@ InitStatus CbmEcalClusterFinderV1::Init()
     return kFATAL;
   }
   fInf=fStr->GetEcalInf();
-  fTracks=(TClonesArray*)io->GetObject("EcalTrackParam");
-  if (!fTracks)
+  if (fRemoveCharged==1)
   {
-    Fatal("Init", "Can't find EcalTrackParam.");
-    return kFATAL;
+    fTracks=(TClonesArray*)io->GetObject("EcalTrackParam");
+    if (!fTracks)
+    {
+      Fatal("Init", "Can't find EcalTrackParam.");
+      return kFATAL;
+    }
   }
   fCal=(CbmEcalCalibration*)io->GetObject("EcalCalibration");
   if (!fCal)
@@ -253,14 +242,14 @@ void CbmEcalClusterFinderV1::FormPreClusters()
       cells.push_back(min);
     if (fAttachCells>0) AttachCells(cells, cell);
     if (fPreClusterAlgo==0)
-      fPreClusters.push_back(new __CbmEcalPreCluster(cells, cell, min));
+      fPreClusters.push_back(new CbmEcalPreCluster(cells, cell, min));
     else
     {
       cs.clear();
       for(p=cells.begin();p!=cells.end();++p)
 	if (fCal->GetEnergy((*p)->GetTotalEnergy(), *p)>fMinCellE)
 	  cs.push_back(*p);
-      fPreClusters.push_back(new __CbmEcalPreCluster(cs, cell, NULL));
+      fPreClusters.push_back(new CbmEcalPreCluster(cs, cell, NULL));
     }
   }
 }
@@ -316,7 +305,7 @@ void CbmEcalClusterFinderV1::FormPreClustersAlice()
       }
     }
     if (fCal->GetEnergy(e, fMaximums[i])<fMinClusterE) continue;
-    fPreClusters.push_back(new __CbmEcalPreCluster(cells, fMaximums[i], NULL));
+    fPreClusters.push_back(new CbmEcalPreCluster(cells, fMaximums[i], NULL));
   }
 }
 
@@ -376,7 +365,7 @@ void CbmEcalClusterFinderV1::FormPreClustersPhenix()
       }
     }
     if (fCal->GetEnergy(e, fMaximums[i])<fMinClusterE) continue;
-    fPreClusters.push_back(new __CbmEcalPreCluster(cs, fMaximums[i], NULL));
+    fPreClusters.push_back(new CbmEcalPreCluster(cs, fMaximums[i], NULL));
   }
 }
 
@@ -438,8 +427,8 @@ void CbmEcalClusterFinderV1::FormClusters()
   /** CbmEcalClusterV1 needs a destructor call :-( **/
   fClusters->Delete();
   Int_t fN=0;
-  list<__CbmEcalPreCluster*>::const_iterator p1=fPreClusters.begin();
-  list<__CbmEcalPreCluster*>::const_iterator p2;
+  list<CbmEcalPreCluster*>::const_iterator p1=fPreClusters.begin();
+  list<CbmEcalPreCluster*>::const_iterator p2;
   list<CbmEcalCell*> cluster;
   list<CbmEcalCell*> minimums;
   list<CbmEcalCell*>::const_iterator pc;
@@ -506,7 +495,7 @@ void CbmEcalClusterFinderV1::FormClusters()
 /** Clear a preclusters list **/
 void CbmEcalClusterFinderV1::ClearPreClusters()
 {
-  list<__CbmEcalPreCluster*>::const_iterator p=fPreClusters.begin();
+  list<CbmEcalPreCluster*>::const_iterator p=fPreClusters.begin();
   for(;p!=fPreClusters.end();++p)
     delete (*p);
   fPreClusters.clear();

@@ -153,6 +153,8 @@ CbmEcalDetailed::CbmEcalDetailed(const char* name, Bool_t active, const char* fi
   for(i=1;i<cMaxModuleType;i++)
   {
     if (fModulesWithType[i]==0) continue;
+    nm="cf["; nm+=i; nm+="]";
+    fCF[i]=(Int_t)fInf->GetVariableStrict(nm);
     nm="nh[";nm+=i; nm+="]";
     fNH[i]=(Int_t)fInf->GetVariableStrict(nm);
     nm="lightmap["; nm+=i; nm+="]";
@@ -306,8 +308,13 @@ Bool_t  CbmEcalDetailed::ProcessHits(FairVolume* vol)
     type=fInf->GetType(mx, my);
     cx=cell%type;
     cy=cell/type;
-    px=mx*fModuleSize-fEcalSize[0]/2.0+cx*fModuleSize/type;
-    py=my*fModuleSize-fEcalSize[1]/2.0+cy*fModuleSize/type;
+    // An old version
+    // px=mx*fModuleSize-fEcalSize[0]/2.0+cx*fModuleSize/type;
+    // py=my*fModuleSize-fEcalSize[1]/2.0+cy*fModuleSize/type;
+    // With correction for steel tapes and edging
+    px=mx*fModuleSize-fEcalSize[0]/2.0+fXCell[type]*cx+(2*cx+1)*fEdging+fThicknessSteel;
+    py=my*fModuleSize-fEcalSize[1]/2.0+fYCell[type]*cy+(2*cy+1)*fEdging+fThicknessSteel;
+
     px=(x-px)/fXCell[type];
     py=(y-py)/fYCell[type];
     if (px>=0&&px<1&&py>=0&&py<1)
@@ -508,8 +515,8 @@ void CbmEcalDetailed::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t off
 // -----   Public method Register   ----------------------------------------
 void CbmEcalDetailed::Register()
 {
-  FairRootManager::Instance()->Register("EcalPoint","Ecal",fEcalCollection,kTRUE);
-  FairRootManager::Instance()->Register("EcalPointLite","EcalLite",fLiteCollection,kTRUE);
+  FairRootManager::Instance()->Register("ECALPoint","Ecal",fEcalCollection,kTRUE);
+  FairRootManager::Instance()->Register("ECALPointLite","EcalLite",fLiteCollection,kTRUE);
   ;
 }
 // -------------------------------------------------------------------------
@@ -874,7 +881,8 @@ void CbmEcalDetailed::ConstructTile(Int_t type, Int_t material)
       y=(j-nh/2+0.5)*fYCell[type]/nh;
       gGeoManager->Node(nm1.Data(), j*nh+i+1, nm.Data(), x, y, 0.0, 0, kTRUE, buf, 0);
     }
-    if (nh%2==0)
+    // clear fiber
+    if (nh%2==0&&fCF[type]!=0)
       gGeoManager->Node(nm1.Data(), j*nh+i+1, nm.Data(), 0.0, 0.0, 0.0, 0, kTRUE, buf, 0);
 
   }

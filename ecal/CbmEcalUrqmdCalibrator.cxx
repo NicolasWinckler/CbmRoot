@@ -27,12 +27,8 @@
 
 #include "TTree.h"
 #include "TClonesArray.h"
-#ifndef ROOT_TParticlePDG
- #include "TParticlePDG.h"
-#endif
-#ifndef ROOT_TDatabasePDG
- #include "TDatabasePDG.h"
-#endif
+#include "TDatabasePDG.h"
+#include "TParticlePDG.h"
 
 using std::cout;
 using std::cerr;

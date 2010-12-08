@@ -90,7 +90,7 @@ CbmEcalCell* CbmEcalStructure::GetCell(Int_t volId, Int_t& ten, Bool_t& isPS)
       lisPS=CbmEcal::GetCellCoord(volId,x,y,iten);
     if (fEcalVersion==1)
       lisPS=CbmEcalDetailed::GetCellCoordInf(volId, x, y, iten);
-    fHash[volId]->cell=GetCell(x+0.25,y+0.25);
+    fHash[volId]->cell=GetCell(x+0.025,y+0.025);
     fHash[volId]->isPsTen=iten*2;
     if (lisPS) fHash[volId]->isPsTen+=1;
   }

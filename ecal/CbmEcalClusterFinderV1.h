@@ -12,7 +12,7 @@ class CbmEcalStructure;
 class CbmEcalCell;
 class CbmEcalInf;
 class CbmEcalCalibration;
-class __CbmEcalPreCluster;
+class CbmEcalPreCluster;
 
 class CbmEcalClusterFinderV1: public FairTask
 {
@@ -71,7 +71,7 @@ private:
 
   /** A list of preclusters
    ** May be better use TClonesArray? **/
-  std::list<__CbmEcalPreCluster*> fPreClusters;		//!
+  std::list<CbmEcalPreCluster*> fPreClusters;		//!
 
   /** Maximums belong to charged tracks should excluded? **/
   Int_t fRemoveCharged;

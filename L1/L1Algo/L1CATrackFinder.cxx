@@ -70,7 +70,7 @@ inline void L1Algo::f10(  // input
     L1HitPoint &hitl = vStsHits_l[ilh];
 
     hitsl_1.push_back(ilh);
-    u_front[i1_V][i1_4] = hitl.x;
+    u_front[i1_V][i1_4] = hitl.u;
     u_back [i1_V][i1_4] = hitl.v;
     zPos   [i1_V][i1_4] = hitl.z;
   }

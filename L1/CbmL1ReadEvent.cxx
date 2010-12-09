@@ -649,7 +649,7 @@ bool CbmL1::ReadMCPoint( CbmL1MCPoint *MC, int iPoint, bool MVD )
   /// should be called after fill of algo
 void CbmL1::HitMatch()
 {
-  const bool useLinks = 1; // 0 - use HitMatch, one_to_one; 1 - use FairLinks, many_to_many. Set 0 to switch to old definition of efficiency.
+  const bool useLinks = 0; // 0 - use HitMatch, one_to_one; 1 - use FairLinks, many_to_many. Set 0 to switch to old definition of efficiency.
   // TODO: fix trunk problem with links. Set useLinks = 1
   
   const int NHits = vStsHits.size();

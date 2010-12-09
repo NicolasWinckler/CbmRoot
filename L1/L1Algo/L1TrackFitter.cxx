@@ -336,9 +336,9 @@ void L1Algo::L1KFTrackFitter()
 
   int ista;
   L1Station *sta = vStations;
-  fvec x[nHits], v[nHits], y[nHits], z[nHits];
+  fvec x[nHits], u[nHits], v[nHits], y[nHits], z[nHits];
   fvec w[nHits];
-  fvec y_temp;
+  fvec y_temp, x_temp;
   fvec fz0, fz1, fz2, dz, z_start, z_end;
   L1FieldValue fB[nHits], fB_temp _fvecalignment;
 
@@ -374,9 +374,13 @@ void L1Algo::L1KFTrackFitter()
         ista = vSFlag[hit.f]/4;
         w[ista][iVec] = 1.;
 
-        x[ista][iVec]  = vStsStrips[hit.f] ;
+        fvec x0,y0;
+
+        
+        u[ista][iVec]  = vStsStrips[hit.f] ;
         v[ista][iVec]  = vStsStripsB[hit.b];
-        y_temp         = sta[ista].yInfo.cos_phi*x[ista][iVec] + sta[ista].yInfo.sin_phi*v[ista][iVec];
+        StripsToCoor(u[ista], v[ista], x_temp, y_temp, sta[ista]);
+        x[ista][iVec]  = x_temp[iVec];
         y[ista][iVec]  = y_temp[iVec];
         z[ista][iVec]  = vStsZPos[hit.iz];
         sta[ista].fieldSlice.GetFieldValue( x[ista], y[ista], fB_temp );
@@ -427,7 +431,7 @@ void L1Algo::L1KFTrackFitter()
       L1Extrapolate( T, z[i], qp0, fld, &w1 );
       if(i == NMvdStations - 1) L1AddPipeMaterial( T, qp0 );
       L1AddMaterial( T, sta[i].materialInfo, qp0 );
-      Filter( T, sta[i].frontInfo, x[i], w[i] );
+      Filter( T, sta[i].frontInfo, u[i], w[i] );
       Filter( T, sta[i].backInfo,  v[i], w[i] );
       fB2 = fB1; 
       fz2 = fz1;
@@ -497,7 +501,7 @@ void L1Algo::L1KFTrackFitter()
       L1Extrapolate( T, z[i], qp0, fld,&w1 );
       if(i == NMvdStations ) L1AddPipeMaterial( T, qp0 );
       L1AddMaterial( T, sta[i].materialInfo, qp0 );
-      Filter( T, sta[i].frontInfo, x[i], w[i] );
+      Filter( T, sta[i].frontInfo, u[i], w[i] );
       Filter( T, sta[i].backInfo,  v[i], w[i] );
 
       fB2 = fB1; 

@@ -197,10 +197,21 @@ void CbmMvd::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 }
 // -------------------------------------------------------------------------
 
+void CbmMvd::ConstructGeometry(){
+
+  TString fileName=GetGeometryFileName();
+  if(fileName.EndsWith(".geo")){
+    ConstructASCIIGeometry();
+  }else if(fileName.EndsWith(".root")){
+    ConstructRootGeometry();
+  }else{
+    std::cout<< "Geometry format not supported " <<std::endl;
+  }
+}  
 
 
 // -----   Virtual public method ConstructGeometry   -----------------------
-void CbmMvd::ConstructGeometry() {
+void CbmMvd::ConstructASCIIGeometry() {
   
   FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
   FairGeoInterface* geoFace = geoLoad->getGeoInterface();
@@ -249,8 +260,8 @@ void CbmMvd::ConstructGeometry() {
       iStation++;
     }
   } while ( volId > -1 );
- 
 
+ 
 }
 // -------------------------------------------------------------------------
 
@@ -272,6 +283,15 @@ CbmMvdPoint* CbmMvd::AddHit(Int_t trackID, Int_t pdg, Int_t stationNr,
 }
 // ----------------------------------------------------------------------------
 
+Bool_t CbmMvd::CheckIfSensitive(std::string name)
+{
+  TString tsname = name; 
+  if (tsname.Contains("aktiv")){
+    cout<<"*** Register "<<tsname<<" as active volume."<<endl;
+    return kTRUE;
+  }
+  return false;
+}
 
 
 

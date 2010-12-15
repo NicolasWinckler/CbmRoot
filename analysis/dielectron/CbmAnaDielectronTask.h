@@ -36,6 +36,7 @@ public:
 	Double_t mass, energy, rapidity;
     Int_t charge;
 	Double_t chiPrimary;
+	Int_t MCMotherId;
 	Int_t stsMCTrackId;
 	Int_t richMCTrackId;
     Int_t trdMCTrackId;
@@ -48,6 +49,8 @@ public:
 	Bool_t isTrdElectron;
 	Bool_t isTofElectron;
 	Bool_t isMCSignalElectron;
+	Bool_t isMCPi0Electron;
+
 	Bool_t isPi0;
     Double_t dSts;
     Bool_t isTTCutElectron;
@@ -89,6 +92,7 @@ public:
     void PairsReco();
     void SetDefaultIdParameters();
     void BgReco();
+    void Pi0Reco();
     void CheckGammaConvAndPi0();
     void FindClosestMvdHit();
     void CheckTrackTopologyCut();
@@ -189,7 +193,6 @@ private:
     TH2D* fh_acc_signal_pty; // pt/y distribution for accepted signal
 
     TH1D* fh_mc_signal_mom; //momentum distribution for signal mc
-    TH1D* fh_mc_bg_mom;
     TH1D* fh_acc_signal_mom; //momentum distribution of accepted signal
     TH1D* fh_reco_signal_mom;
     
@@ -203,11 +206,6 @@ private:
     TH1D* fh_ttcut_signal_mom;
 
     TH1D* fh_mc_signal_minv; // invariant mass distribution for signal mc
-    TH1D* fh_mc_bg_minv;
-    TH1D* fh_mc_pi0_minv;
-    TH1D* fh_mc_eta_minv;
-    TH1D* fh_mc_gamma_minv;
-
     TH1D* fh_acc_signal_minv; //invariant mass distribution for accepted signal
     TH1D* fh_mc_mother_pdg; //mother pdg code for e-/e+
     TH1D* fh_acc_mother_pdg; //mother pdg code for accepted e-/e+
@@ -220,7 +218,8 @@ private:
     TH2D* fh_mc_vertex_gamma_xz;
     TH2D* fh_mc_vertex_gamma_yz;
     TH2D* fh_mc_vertex_gamma_xy;
-    
+
+//signal minv
     TH1D* fh_rec_signal_minv; //invariant mass distribution of reconstructed signal (ideal ID)
     TH1D* fh_rich_id_signal_minv;
     TH1D* fh_trd_id_signal_minv;
@@ -230,7 +229,7 @@ private:
     TH1D* fh_anglecut_signal_minv; // openning angle after pt cut for signal   
     TH1D* fh_pi0cut_signal_minv;
     TH1D* fh_ttcut_signal_minv;
-
+//BG minv
     TH1D* fh_rec_bg_minv;
     TH1D* fh_rich_id_bg_minv;
     TH1D* fh_trd_id_bg_minv;
@@ -240,6 +239,16 @@ private:
     TH1D* fh_anglecut_bg_minv; // openning angle after pt cut for BG
     TH1D* fh_pi0cut_bg_minv;
     TH1D* fh_ttcut_bg_minv;
+//pi0 minv
+    TH1D* fh_rec_pi0_minv;
+    TH1D* fh_rich_id_pi0_minv;
+    TH1D* fh_trd_id_pi0_minv;
+    TH1D* fh_tof_id_pi0_minv;
+    TH1D* fh_chi_prim_pi0_minv; //chi primary cut
+    TH1D* fh_ptcut_pi0_minv; //pt cut
+    TH1D* fh_anglecut_pi0_minv; // openning angle after pt cut for BG
+    TH1D* fh_pi0cut_pi0_minv;
+    TH1D* fh_ttcut_pi0_minv;
 
 // cuts distribution
     TH1D* fh_pt_signal;

@@ -33,9 +33,9 @@ class FairRootManager;
 class DielectronCandidate{
 public:
 	TVector3 position, momentum;
-	Double_t mass, charge, energy, rapidity;
+	Double_t mass, energy, rapidity;
+    Int_t charge;
 	Double_t chiPrimary;
-	Int_t mcPdg, mcMotherID, mcMotherPdg;
 	Int_t stsMCTrackId;
 	Int_t richMCTrackId;
     Int_t trdMCTrackId;
@@ -44,18 +44,16 @@ public:
 	Int_t richInd;
 	Int_t trdInd;
 	Int_t tofInd;
-	Bool_t isInSts;
-	Bool_t isInRich;
-	Bool_t isInTrd;
-	Bool_t isInTof;
 	Bool_t isRichElectron;
 	Bool_t isTrdElectron;
 	Bool_t isTofElectron;
-
-
-	Int_t is_fake, is_wrong, is_pion, is_proton;
-
 	Bool_t isMCSignalElectron;
+	Bool_t isPi0;
+    Double_t dSts;
+    Bool_t isTTCutElectron;
+    Double_t richAnn;
+    Double_t trdAnn;
+    Double_t mass2;
 };
 
 class KinematicParams{
@@ -78,6 +76,8 @@ public:
     
     KinematicParams CalculateKinematicParams(CbmMCTrack* mctrackP, CbmMCTrack* mctrackM);
     KinematicParams CalculateKinematicParams(DielectronCandidate* candP, DielectronCandidate* candM);
+    void CalculateArmPodParams(DielectronCandidate* candP, DielectronCandidate* candM,
+                       Double_t &alpha, Double_t &ptt);
 
     void SingleParticleAcceptance();
     void MCPairs();
@@ -89,11 +89,11 @@ public:
     void PairsReco();
     void SetDefaultIdParameters();
     void BgReco();
-
-
+    void CheckGammaConvAndPi0();
+    void FindClosestMvdHit();
+    void CheckTrackTopologyCut();
 
     virtual void Finish();
-    void WriteOutput();
 
     ClassDef(CbmAnaDielectronTask,1);
 
@@ -128,9 +128,11 @@ private:
     Bool_t fUseRich;
     Bool_t fUseTrd;
     Bool_t fUseTof;
-    Bool_t IsRichElectron(CbmRichRing* ring, Double_t momentum);
-    Bool_t IsTrdElectron(CbmTrdTrack* trdTrack);
-    Bool_t IsTofElectron(CbmGlobalTrack* gTrack, Double_t momentum);
+
+    void IsRichElectron(CbmRichRing* ring, Double_t momentum, DielectronCandidate* cand);
+    void IsTrdElectron(CbmTrdTrack* trdTrack, DielectronCandidate* cand);
+    void IsTofElectron(CbmGlobalTrack* gTrack, Double_t momentum, DielectronCandidate* cand);
+
     vector<DielectronCandidate> fCandidates;
 
     Double_t fWeight; //Multiplicity*BR
@@ -150,13 +152,18 @@ private:
     Int_t fNofRichIdPairs; //number of rich id signal pairs
     Int_t fNofTrdIdPairs; //number of trd id signal pairs
     Int_t fNofTofIdPairs; //number of tof id signal pairs
+    Int_t fNofChiPrimCutPairs;//number of signal pairs after chi primary cut
     Int_t fNofPtcutPairs;
+    Int_t fNofTTcutPairs;
 
     Int_t fNofRecBg;
     Int_t fNofRichIdBg;
     Int_t fNofTrdIdBg;
     Int_t fNofTofIdBg;
+    Int_t fNofChiPrimCutBg;
     Int_t fNofPtcutBg;
+    Int_t fNofTTcutBg;
+
 
 // ID cuts
     Double_t fTrdAnnCut;
@@ -168,9 +175,11 @@ private:
     Double_t fRmsCoeff;
     Double_t fDistCut;
 // Analysis cuts
+    Double_t fChiPrimCut;
     Double_t fPtCut;
     Double_t fAngleCut;
-    
+    Double_t fPi0Cut;
+
     CbmRichElectronIdAnn * fElIdAnn;
     Bool_t fUseRichAnn;
     
@@ -178,62 +187,99 @@ private:
     
     TH2D* fh_mc_signal_pty; // pt/y distribution for signal mc
     TH2D* fh_acc_signal_pty; // pt/y distribution for accepted signal
-    TH2D* fh_acc_signal_pty_eff; //efficiency of accepted signal 
 
     TH1D* fh_mc_signal_mom; //momentum distribution for signal mc
     TH1D* fh_mc_bg_mom;
     TH1D* fh_acc_signal_mom; //momentum distribution of accepted signal
-    TH1D* fh_acc_signal_mom_eff; // momentum efficiency
+    TH1D* fh_reco_signal_mom;
+    
+    TH1D* fh_rich_id_signal_mom;
+    TH1D* fh_trd_id_signal_mom;
+    TH1D* fh_tof_id_signal_mom;
+    TH1D* fh_chi_prim_signal_mom;
+    TH1D* fh_ptcut_signal_mom;
+    TH1D* fh_anglecut_signal_mom;
+    TH1D* fh_pi0cut_signal_mom;
+    TH1D* fh_ttcut_signal_mom;
+
     TH1D* fh_mc_signal_minv; // invariant mass distribution for signal mc
     TH1D* fh_mc_bg_minv;
+    TH1D* fh_mc_pi0_minv;
+    TH1D* fh_mc_eta_minv;
+    TH1D* fh_mc_gamma_minv;
+
     TH1D* fh_acc_signal_minv; //invariant mass distribution for accepted signal
     TH1D* fh_mc_mother_pdg; //mother pdg code for e-/e+
     TH1D* fh_acc_mother_pdg; //mother pdg code for accepted e-/e+
-    TH1D* fh_rec_mc_mom_signal;
-    TH1D* fh_rec_signal_minv; //invariant mass distribution of reconstructed signal (ideal ID)
 
-    TH1D* fh_chi2_prim_signal; // Chi2 primary
-    TH1D* fh_chi2_prim_bg;
+    TH1D* fh_rec_mc_mom_signal;
+    TH2D* fh_mom_res_vs_mom_signal;
+    TH1D* fh_mean_mom_vs_mom_signal;
+    TH1D* fh_count_mom_vs_mom_signal;
     
     TH2D* fh_mc_vertex_gamma_xz;
     TH2D* fh_mc_vertex_gamma_yz;
     TH2D* fh_mc_vertex_gamma_xy;
-
+    
+    TH1D* fh_rec_signal_minv; //invariant mass distribution of reconstructed signal (ideal ID)
     TH1D* fh_rich_id_signal_minv;
     TH1D* fh_trd_id_signal_minv;
     TH1D* fh_tof_id_signal_minv;
+    TH1D* fh_chi_prim_signal_minv; //chi primary cut after identification for signal
+    TH1D* fh_ptcut_signal_minv; //pt cut 
+    TH1D* fh_anglecut_signal_minv; // openning angle after pt cut for signal   
+    TH1D* fh_pi0cut_signal_minv;
+    TH1D* fh_ttcut_signal_minv;
 
+    TH1D* fh_rec_bg_minv;
     TH1D* fh_rich_id_bg_minv;
     TH1D* fh_trd_id_bg_minv;
     TH1D* fh_tof_id_bg_minv;
-    TH1D* fh_rec_bg_minv;
+    TH1D* fh_chi_prim_bg_minv; //chi primary cut 
+    TH1D* fh_ptcut_bg_minv; //pt cut 
+    TH1D* fh_anglecut_bg_minv; // openning angle after pt cut for BG
+    TH1D* fh_pi0cut_bg_minv;
+    TH1D* fh_ttcut_bg_minv;
 
+// cuts distribution
     TH1D* fh_pt_signal;
     TH1D* fh_pt_bg;
     TH1D* fh_position_signal;
     TH1D* fh_position_bg;
+    TH1D* fh_chi2_prim_signal; // Chi2 primary
+    TH1D* fh_chi2_prim_bg;
+    TH1D* fh_mom_signal; // signal e+/e- momentum 
+    TH1D* fh_mom_bg; // bg momentum
+    TH1D* fh_angle_signal;
+    TH1D* fh_angle_bg;
+    TH2D* fh_ttcut_signal;
+    TH2D* fh_ttcut_bg;
+    TH2D* fh_apcut_signal;
+    TH2D* fh_apcut_bg;
 
     TH2D* fh_reco_signal_pty;
     TH2D* fh_rich_id_signal_pty;
     TH2D* fh_trd_id_signal_pty;
     TH2D* fh_tof_id_signal_pty;
-
-    TH1D* fh_angle_signal;
-    TH1D* fh_angle_bg;
-
-    TH1D* fh_ptcut_signal_minv; //pt cut after identification for signal
-    TH1D* fh_anglecut_signal_minv; // openning angle after pt cut for signal
+    TH2D* fh_chi_prim_signal_pty; 
     TH2D* fh_ptcut_signal_pty; 
     TH2D* fh_anglecut_signal_pty;
+    TH2D* fh_pi0cut_signal_pty;
+    TH2D* fh_ttcut_signal_pty;
 
-    TH1D* fh_ptcut_bg_minv; //pt cut after identification for BG
-    TH1D* fh_anglecut_bg_minv; // openning angle after pt cut for BG
-     
-    
+    //ID cuts distributions
+    TH1D* fh_rich_ann_signal;
+    TH1D* fh_rich_ann_bg;
+    TH1D* fh_trd_ann_signal;
+    TH1D* fh_trd_ann_bg;
+    TH2D* fh_tof_m2_signal;
+    TH2D* fh_tof_m2_bg;
+
 public:
     void SetUseRich(Bool_t use){fUseRich = use;};
     void SetUseTrd(Bool_t use){fUseTrd = use;};
     void SetUseTof(Bool_t use){fUseTof = use;};
+    void SetWeight(Double_t weight){fWeight = weight;};
 };
 
 #endif

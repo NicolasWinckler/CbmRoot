@@ -216,19 +216,19 @@ void draw(){
     fh_pi0cut_signal_mom->Draw("same");
     fh_ttcut_signal_mom->Draw("same");
 
-    TLegend* leg2 = new TLegend(0.65,0.6,1., 1.);
-    leg2->AddEntry(fh_mc_signal_mom, "mc", "l");
-    leg2->AddEntry(fh_acc_signal_mom, "acc", "l");
-    leg2->AddEntry(fh_reco_signal_mom, "rec", "l");
-    leg2->AddEntry(fh_rich_id_signal_mom, "rich id", "l");
-    leg2->AddEntry(fh_trd_id_signal_mom, "trd id", "l");
-    leg2->AddEntry(fh_tof_id_signal_mom, "tof id", "l");
-    leg2->AddEntry(fh_chi_prim_signal_mom, "chi prim", "l");
-    leg2->AddEntry(fh_ptcut_signal_mom, "pt cut", "l");
-    leg2->AddEntry(fh_anglecut_signal_mom, "angle cut", "l");
-    leg2->AddEntry(fh_pi0cut_signal_mom, "gamma cut", "l");
-    leg2->AddEntry(fh_ttcut_signal_mom, "tt cut", "l");
-    leg2->Draw();
+    TLegend* leg3 = new TLegend(0.65,0.6,1., 1.);
+    leg3->AddEntry(fh_mc_signal_mom, "mc", "l");
+    leg3->AddEntry(fh_acc_signal_mom, "acc", "l");
+    leg3->AddEntry(fh_reco_signal_mom, "rec", "l");
+    leg3->AddEntry(fh_rich_id_signal_mom, "rich id", "l");
+    leg3->AddEntry(fh_trd_id_signal_mom, "trd id", "l");
+    leg3->AddEntry(fh_tof_id_signal_mom, "tof id", "l");
+    leg3->AddEntry(fh_chi_prim_signal_mom, "chi prim", "l");
+    leg3->AddEntry(fh_ptcut_signal_mom, "pt cut", "l");
+    leg3->AddEntry(fh_anglecut_signal_mom, "angle cut", "l");
+    leg3->AddEntry(fh_pi0cut_signal_mom, "gamma cut", "l");
+    leg3->AddEntry(fh_ttcut_signal_mom, "tt cut", "l");
+    leg3->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
@@ -491,7 +491,7 @@ void draw(){
     fh_ptcut_signal_minv->SetLineColor(kMagenta);
     fh_anglecut_signal_minv->SetLineColor(kViolet+10);
     fh_pi0cut_signal_minv->SetLineColor(kPink-6);
- //   fh_ttcut_signal_minv->SetLineColor(kYellow+1);
+    fh_ttcut_signal_minv->SetLineColor(kYellow+1);
     fh_rec_signal_minv->Draw("same");
     fh_rich_id_signal_minv->Draw("same");
     fh_trd_id_signal_minv->Draw("same");
@@ -500,20 +500,20 @@ void draw(){
     fh_ptcut_signal_minv->Draw("same");
     fh_anglecut_signal_minv->Draw("same");
     fh_pi0cut_signal_minv->Draw("same");
- //   fh_ttcut_signal_minv->Draw("same");
-    TLegend* leg2 = new TLegend(0.65,0.6,1., 1.);
-    leg2->AddEntry(fh_mc_signal_minv, "mc", "l");
-    leg2->AddEntry(fh_acc_signal_minv, "acc", "l");
-    leg2->AddEntry(fh_rec_signal_minv, "rec", "l");
-    leg2->AddEntry(fh_rich_id_signal_minv, "rich id", "l");
-    leg2->AddEntry(fh_trd_id_signal_minv, "trd id", "l");
-    leg2->AddEntry(fh_tof_id_signal_minv, "tof id", "l");
-    leg2->AddEntry(fh_chi_prim_signal_minv, "chi prim", "l");
-    leg2->AddEntry(fh_ptcut_signal_minv, "pt cut", "l");
-    leg2->AddEntry(fh_anglecut_signal_minv, "angle cut", "l");
-    leg2->AddEntry(fh_pi0cut_signal_minv, "gamma cut", "l");
-//    leg2->AddEntry(fh_ttcut_signal_minv, "tt cut", "l");
-    leg2->Draw();
+    fh_ttcut_signal_minv->Draw("same");
+    TLegend* leg3 = new TLegend(0.65,0.6,1., 1.);
+    leg3->AddEntry(fh_mc_signal_minv, "mc", "l");
+    leg3->AddEntry(fh_acc_signal_minv, "acc", "l");
+    leg3->AddEntry(fh_rec_signal_minv, "rec", "l");
+    leg3->AddEntry(fh_rich_id_signal_minv, "rich id", "l");
+    leg3->AddEntry(fh_trd_id_signal_minv, "trd id", "l");
+    leg3->AddEntry(fh_tof_id_signal_minv, "tof id", "l");
+    leg3->AddEntry(fh_chi_prim_signal_minv, "chi prim", "l");
+    leg3->AddEntry(fh_ptcut_signal_minv, "pt cut", "l");
+    leg3->AddEntry(fh_anglecut_signal_minv, "angle cut", "l");
+    leg3->AddEntry(fh_pi0cut_signal_minv, "gamma cut", "l");
+    leg3->AddEntry(fh_ttcut_signal_minv, "tt cut", "l");
+    leg3->Draw();
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
@@ -536,7 +536,7 @@ void draw(){
     fh_ptcut_bg_minv->Draw("same");
     fh_anglecut_bg_minv->Draw("same");
     fh_pi0cut_bg_minv->Draw("same");
-//    fh_ttcut_bg_minv->Draw("same");
+    fh_ttcut_bg_minv->Draw("same");
 
     TLegend* leg = new TLegend(0.65,0.6,1., 1.);
     leg->AddEntry(fh_rec_bg_minv, "rec", "l");
@@ -547,32 +547,49 @@ void draw(){
     leg->AddEntry(fh_ptcut_bg_minv, "pt cut", "l");
     leg->AddEntry(fh_anglecut_bg_minv, "angle cut", "l");
     leg->AddEntry(fh_pi0cut_bg_minv, "gamma cut", "l");
-//    leg->AddEntry(fh_ttcut_bg_minv, "tt cut", "l");
+    leg->AddEntry(fh_ttcut_bg_minv, "tt cut", "l");
     leg->Draw();
-
     gPad->SetGridx(true);
     gPad->SetGridy(true);
     gPad->SetLogy(true);
 
-/*    TCanvas *c6_3 = new TCanvas("c6_3-minv2", "c6_3-minv2", 500, 500);
-   
-    fh_mc_pi0_minv->SetLineColor(kGreen);
-    fh_mc_eta_minv->SetLineColor(kBlue);
-    fh_mc_gamma_minv->SetLineColor(kRed);
-    fh_mc_bg_minv->Draw();
-    fh_mc_pi0_minv->Draw("same");
-    fh_mc_eta_minv->Draw("same");
-    fh_mc_gamma_minv->Draw("same");
-    gPad->SetGridx(true);
-    gPad->SetGridy(true);
-    gPad->SetLogy(true);
-    TLegend* leg = new TLegend(0.65,0.6,1., 1.);
-    leg->AddEntry(fh_mc_bg_minv, "all", "l");
-    leg->AddEntry(fh_mc_pi0_minv, "pi0", "l");
-    leg->AddEntry(fh_mc_eta_minv, "eta", "l");
-    leg->AddEntry(fh_mc_gamma_minv, "gamma", "l");
-    leg->Draw();
-*/
+    TCanvas *c7 = new TCanvas("c7-minv", "c7-minv", 1200, 600);
+    c7->Divide(2,1);
+    c7->cd(1);
+    fh_mc_pi0_minv->Draw();
+    fh_acc_pi0_minv->Draw("same");
+    fh_rich_id_pi0_minv->SetLineColor(kRed);
+    fh_trd_id_pi0_minv->SetLineColor(kBlue);
+    fh_tof_id_pi0_minv->SetLineColor(kGreen);
+    fh_chi_prim_pi0_minv->SetLineColor(kOrange+7);
+    fh_ptcut_pi0_minv->SetLineColor(kMagenta);
+    fh_anglecut_pi0_minv->SetLineColor(kViolet+10);
+    fh_pi0cut_pi0_minv->SetLineColor(kPink-6);
+    fh_ttcut_pi0_minv->SetLineColor(kYellow+1);
+    fh_rec_pi0_minv->Draw("same");
+    fh_rich_id_pi0_minv->Draw("same");
+    fh_trd_id_pi0_minv->Draw("same");
+    fh_tof_id_pi0_minv->Draw("same");
+    fh_chi_prim_pi0_minv->Draw("same");
+    fh_ptcut_pi0_minv->Draw("same");
+    fh_anglecut_pi0_minv->Draw("same");
+    fh_pi0cut_pi0_minv->Draw("same");
+    fh_ttcut_pi0_minv->Draw("same");
+    TLegend* leg3 = new TLegend(0.65,0.6,1., 1.);
+    leg3->AddEntry(fh_rec_pi0_minv, "rec", "l");
+	leg3->AddEntry(fh_rich_id_pi0_minv, "rich id", "l");
+	leg3->AddEntry(fh_trd_id_pi0_minv, "trd id", "l");
+	leg3->AddEntry(fh_tof_id_pi0_minv, "tof id", "l");
+	leg3->AddEntry(fh_chi_prim_pi0_minv, "chi prim", "l");
+	leg3->AddEntry(fh_ptcut_pi0_minv, "pt cut", "l");
+	leg3->AddEntry(fh_anglecut_pi0_minv, "angle cut", "l");
+	leg3->AddEntry(fh_pi0cut_pi0_minv, "gamma cut", "l");
+	leg3->AddEntry(fh_ttcut_pi0_minv, "tt cut", "l");
+	leg3->Draw();
+	gPad->SetGridx(true);
+	gPad->SetGridy(true);
+	gPad->SetLogy(true);
+
     calculateSignalOverBg(fh_rec_signal_minv, fh_rec_bg_minv);
     calculateSignalOverBg(fh_rich_id_signal_minv, fh_rich_id_bg_minv);
     calculateSignalOverBg(fh_trd_id_signal_minv, fh_trd_id_bg_minv);
@@ -581,7 +598,7 @@ void draw(){
     calculateSignalOverBg(fh_ptcut_signal_minv, fh_ptcut_bg_minv);
     calculateSignalOverBg(fh_anglecut_signal_minv, fh_anglecut_bg_minv);
     calculateSignalOverBg(fh_pi0cut_signal_minv, fh_pi0cut_bg_minv);
-//    calculateSignalOverBg(fh_ttcut_signal_minv, fh_ttcut_bg_minv);
+    calculateSignalOverBg(fh_ttcut_signal_minv, fh_ttcut_bg_minv);
 
 }
 

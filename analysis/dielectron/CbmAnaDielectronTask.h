@@ -199,7 +199,7 @@ private:
     TH1D* fh_rich_id_signal_mom;
     TH1D* fh_trd_id_signal_mom;
     TH1D* fh_tof_id_signal_mom;
-    TH1D* fh_chi_prim_signal_mom;
+    TH1D* fh_chi_prim_signal_mom; 
     TH1D* fh_ptcut_signal_mom;
     TH1D* fh_anglecut_signal_mom;
     TH1D* fh_pi0cut_signal_mom;

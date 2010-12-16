@@ -789,7 +789,7 @@ void CbmAnaDielectronTask::Pi0Reco()
         for (Int_t iM = 0; iM < ncand; iM++){
             if (fCandidates[iM].charge > 0) continue;
             if (iM == iP ) continue;
-
+        
             KinematicParams pRec = CalculateKinematicParams(&fCandidates[iP],&fCandidates[iM]);
 
 			// select only electrons from the same pi0
